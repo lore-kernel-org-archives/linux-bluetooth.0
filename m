@@ -1,27 +1,27 @@
 Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 911BC16F90D
-	for <linux-bluetooth@vger.kernel.org>; Fri, 10 May 2024 12:14:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32ED917088E
+	for <linux-bluetooth@vger.kernel.org>; Fri, 10 May 2024 12:14:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715343259; cv=none; b=DAUvD4OmtsoEpdj/Ygmo64fSL+DVJ/jnP56x8uI+W6AInXSIfZeqdgwhOrGe8uLCcmAiqBpJ//5+90QomQzsR+cSWuTcYGwJoHBW4K14rG3JfQzBv0bl6UXE07wFhcuT5ZwkjwgtlGLNAZCqU5sKexGxx7zFCE5wqntAuq1hQNk=
+	t=1715343259; cv=none; b=D8OaXV7Gk/luv3m41CZpT9brAy8JVddDbf27UqZ/Svqj6bIR+mwWgH7CGPjMACUan2TbJoQ6quXMeNWgH7TqzDMty+tqoLECOC9KiesOWH0g+3pQlq4fzT8Q7V9fFvpwhQLEk+QWh0I0BHXbc5aQItHHDRnN2Y/YNWwSmtXQdUs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1715343259; c=relaxed/simple;
-	bh=vFe5qKmQHRVEE4cES7AAibKqsLuZAYq13Rek/uW306Y=;
+	bh=RBs/pTECN0ac63rTo4HqmGiHw5K+O2RiHGc5wsLMjOQ=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=hFdRCTlmCFp29asH7zpX9YhCx0jPalHRMMdlHMTKh/dyMjnkhIE+xMkJFfVYXFoPt/umk62eT1mkPZgwA8WkLZmXh5kVWkr/55cKDXpp5szxZqRSJZGiL06T1QOMIt09GQM27ckz9T8IoCAHGx3++Jy0xVBTjcIrTfQuyMk5nE4=
+	 MIME-Version; b=YW75hBGoa3wpo4alHms87rLdQh4V2YmYGModMbkS5KRFPQXoHmjoq90AZS2LnzI20W2J95hOu7wMexeqR89Km72pWG6Bhhx3S109k2B9cNUWeGwxBkMzLZPCa1KdwDfDI+MVKaostyXMI6AWqbG4ai2698SGxbJJAd45IfPKJmg=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.183.195
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hadess.net
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 2213060015;
-	Fri, 10 May 2024 12:14:01 +0000 (UTC)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id CD71060017;
+	Fri, 10 May 2024 12:14:00 +0000 (UTC)
 From: Bastien Nocera <hadess@hadess.net>
 To: linux-bluetooth@vger.kernel.org
 Cc: Bastien Nocera <hadess@hadess.net>
-Subject: [BlueZ v2 18/20] monitor: Work-around memory leak warning
-Date: Fri, 10 May 2024 14:10:28 +0200
-Message-ID: <20240510121355.3241456-19-hadess@hadess.net>
+Subject: [BlueZ v2 17/20] sdp: Fix use of uninitialised memory
+Date: Fri, 10 May 2024 14:10:27 +0200
+Message-ID: <20240510121355.3241456-18-hadess@hadess.net>
 X-Mailer: git-send-email 2.44.0
 In-Reply-To: <20240510121355.3241456-1-hadess@hadess.net>
 References: <20240510121355.3241456-1-hadess@hadess.net>
@@ -34,58 +34,31 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-GND-Sasl: hadess@hadess.net
 
-Work-around this warning by making the so pointer global.
-
-Error: RESOURCE_LEAK (CWE-772): [#def29] [important]
-bluez-5.75/monitor/jlink.c:87:3: alloc_fn: Storage is returned from allocation function "dlopen".
-bluez-5.75/monitor/jlink.c:87:3: var_assign: Assigning: "so" = storage returned from "dlopen(jlink_so_name[i], 1)".
-bluez-5.75/monitor/jlink.c:95:2: noescape: Resource "so" is not freed or pointed-to in "dlsym".
-bluez-5.75/monitor/jlink.c:96:2: noescape: Resource "so" is not freed or pointed-to in "dlsym".
-bluez-5.75/monitor/jlink.c:97:2: noescape: Resource "so" is not freed or pointed-to in "dlsym".
-bluez-5.75/monitor/jlink.c:98:2: noescape: Resource "so" is not freed or pointed-to in "dlsym".
-bluez-5.75/monitor/jlink.c:99:2: noescape: Resource "so" is not freed or pointed-to in "dlsym".
-bluez-5.75/monitor/jlink.c:100:2: noescape: Resource "so" is not freed or pointed-to in "dlsym".
-bluez-5.75/monitor/jlink.c:101:2: noescape: Resource "so" is not freed or pointed-to in "dlsym".
-bluez-5.75/monitor/jlink.c:102:2: noescape: Resource "so" is not freed or pointed-to in "dlsym".
-bluez-5.75/monitor/jlink.c:103:2: noescape: Resource "so" is not freed or pointed-to in "dlsym".
-bluez-5.75/monitor/jlink.c:104:2: noescape: Resource "so" is not freed or pointed-to in "dlsym".
-bluez-5.75/monitor/jlink.c:116:2: leaked_storage: Variable "so" going out of scope leaks the storage it points to.
-114|
-115|	/* don't dlclose(so) here cause symbols from it are in use now */
-116|->	return 0;
-117|   }
-118|
+Error: UNINIT (CWE-457): [#def10] [important]
+bluez-5.75/lib/sdp.c:2302:2: alloc_fn: Calling "malloc" which returns uninitialized memory.
+bluez-5.75/lib/sdp.c:2302:2: assign: Assigning: "seqDTDs" = "malloc(seqlen * 8UL)", which points to uninitialized data.
+bluez-5.75/lib/sdp.c:2355:2: uninit_use_in_call: Using uninitialized value "*seqDTDs" when calling "sdp_seq_alloc".
+2353|			}
+2354|		}
+2355|->		seq = sdp_seq_alloc(seqDTDs, seqs, seqlen);
+2356|		free(seqDTDs);
+2357|		free(seqs);
 ---
- monitor/jlink.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ lib/sdp.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/monitor/jlink.c b/monitor/jlink.c
-index f9d4037f4cdf..e08cc87139c9 100644
---- a/monitor/jlink.c
-+++ b/monitor/jlink.c
-@@ -47,6 +47,7 @@ struct rtt_desc {
- };
+diff --git a/lib/sdp.c b/lib/sdp.c
+index 34b0dbb94eb0..d43bbbd2de05 100644
+--- a/lib/sdp.c
++++ b/lib/sdp.c
+@@ -2299,7 +2299,7 @@ static sdp_data_t *access_proto_to_dataseq(sdp_record_t *rec, sdp_list_t *proto)
+ 	sdp_list_t *p;
  
- static struct rtt_desc rtt_desc;
-+static void *so = NULL;
- 
- typedef int (*jlink_emu_selectbyusbsn_func) (unsigned int sn);
- typedef int (*jlink_open_func) (void);
-@@ -80,7 +81,6 @@ static struct jlink jlink;
- 
- int jlink_init(void)
- {
--	void *so;
- 	unsigned int i;
- 
- 	for (i = 0; i < NELEM(jlink_so_name); i++) {
-@@ -109,6 +109,7 @@ int jlink_init(void)
- 			!jlink.emu_getproductname ||
- 			!jlink.rtterminal_control || !jlink.rtterminal_read) {
- 		dlclose(so);
-+		so = NULL;
- 		return -EIO;
- 	}
+ 	seqlen = sdp_list_len(proto);
+-	seqDTDs = malloc(seqlen * sizeof(void *));
++	seqDTDs = bt_malloc0(seqlen * sizeof(void *));
+ 	if (!seqDTDs)
+ 		return NULL;
  
 -- 
 2.44.0
