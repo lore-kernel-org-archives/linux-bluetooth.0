@@ -1,26 +1,26 @@
 Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [217.70.183.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 996AA165FDB
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 995F3165FD8
 	for <linux-bluetooth@vger.kernel.org>; Fri, 10 May 2024 09:18:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715332708; cv=none; b=EPbOOjd6YBmDtku9yIgrsjGlx+iAIT8ckG07vQSxba28aJhK+02hHj9XghcZSmWiIjzs27z9m6oXKkhoc3ysSsU5lm7aDgsvch/9IszqXXiAlWEF5UGhjxetYwAO5jnOsMHo4KG2fn60BWYwxL734xDojaMnzInAkbeH0kNg5Xs=
+	t=1715332709; cv=none; b=Vz65sskxuKK+cDLi9fnL1vk5E170S8Hj+7PcV+MlMkTFtah3zlEoT1OV0dYVtwkWjff5MiWOCIRSdur3Lar81YQMVF7xwoeXgkTgLbYLR79eql7RMTSrPm6EXIN9hjKsFP9lJomnSw5ntS8Hr9D1HIkZF8BPrlxbWtOLyazkzvY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715332708; c=relaxed/simple;
-	bh=Z4Ect0czkbLcBsbsoMl8fFiwHYkN+tVjcHoe1Tp/VkU=;
+	s=arc-20240116; t=1715332709; c=relaxed/simple;
+	bh=UVmzgHwRrHupYFJb/Xbq0QuAhlgLC7EEyPNuRozn0po=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=lAW7H39KdeWCueR1Rm0yJG27vbijEdEIttY313fxBcySal3wzBTrz2QBfLpRHTzBPNOcVMsZ7CCVbNeuhMnHxHOQtlUn6HVRB9NHO0113LE3rE4dSGmAC412rwGmfEqxEoeaiHjx02KOVM0WLZuWywKRC2zvC6D5Xgv6W+rGccQ=
+	 MIME-Version; b=kgAg4R09TNdWuMA+cxpmIdZx44DEH0Hig+WzpoPyv8UhAU4OdCmsvaFWmnwEwrzu0KUoxnBoqRJWETELMHAa6GmxHvb1mW/DcfllWOxpArzbxvh5UKXNMLpkSzGZncrb9N04lEwTj949KJYsxC4UKOEabt7KFIcpokiQPFRmpB8=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.183.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hadess.net
-Received: by mail.gandi.net (Postfix) with ESMTPSA id BC53D1BF213
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 0205A1BF214
 	for <linux-bluetooth@vger.kernel.org>; Fri, 10 May 2024 09:18:17 +0000 (UTC)
 From: Bastien Nocera <hadess@hadess.net>
 To: linux-bluetooth@vger.kernel.org
-Subject: [BlueZ 12/14] isotest: Fix error check after opening file
-Date: Fri, 10 May 2024 11:11:10 +0200
-Message-ID: <20240510091814.3172988-13-hadess@hadess.net>
+Subject: [BlueZ 13/14] client/player: Fix copy/paste error
+Date: Fri, 10 May 2024 11:11:11 +0200
+Message-ID: <20240510091814.3172988-14-hadess@hadess.net>
 X-Mailer: git-send-email 2.44.0
 In-Reply-To: <20240510091814.3172988-1-hadess@hadess.net>
 References: <20240510091814.3172988-1-hadess@hadess.net>
@@ -33,24 +33,32 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-GND-Sasl: hadess@hadess.net
 
-Consider "0" to be a valid fd.
+Error: COPY_PASTE_ERROR (CWE-398): [#def95] [important]
+bluez-5.75/client/player.c:1846:6: original: "qos->sync_cte_type" looks like the original copy.
+bluez-5.75/client/player.c:1852:6: copy_paste_error: "sync_cte_type" in "qos->sync_cte_type" looks like a copy-paste error.
+bluez-5.75/client/player.c:1852:6: remediation: Should it say "mse" instead?
+1850|		}
+1851|
+1852|->		if (qos->sync_cte_type) {
+1853|			bt_shell_printf("MSE %u\n", qos->mse);
+1854|			g_dbus_dict_append_entry(iter, "MSE", DBUS_TYPE_BYTE,
 ---
- tools/isotest.c | 2 +-
+ client/player.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/tools/isotest.c b/tools/isotest.c
-index 810d15d2df2a..ddace0da3044 100644
---- a/tools/isotest.c
-+++ b/tools/isotest.c
-@@ -720,7 +720,7 @@ static int open_file(const char *filename)
- 	syslog(LOG_INFO, "Opening %s ...", filename);
- 
- 	fd = open(filename, O_RDONLY);
--	if (fd <= 0) {
-+	if (fd < 0) {
- 		syslog(LOG_ERR, "Can't open file %s: %s\n",
- 						filename, strerror(errno));
+diff --git a/client/player.c b/client/player.c
+index 6b70e9ed3f9d..7f67425aaf8f 100644
+--- a/client/player.c
++++ b/client/player.c
+@@ -1849,7 +1849,7 @@ static void append_bcast_qos(DBusMessageIter *iter, struct endpoint_config *cfg)
+ 					&qos->sync_cte_type);
  	}
+ 
+-	if (qos->sync_cte_type) {
++	if (qos->mse) {
+ 		bt_shell_printf("MSE %u\n", qos->mse);
+ 		g_dbus_dict_append_entry(iter, "MSE", DBUS_TYPE_BYTE,
+ 						&qos->mse);
 -- 
 2.44.0
 
