@@ -1,128 +1,158 @@
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 638551BDCF
-	for <linux-bluetooth@vger.kernel.org>; Fri, 10 May 2024 17:54:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CB79EAC0
+	for <linux-bluetooth@vger.kernel.org>; Fri, 10 May 2024 19:14:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715363666; cv=none; b=D3/H2ZoqKnNQzV7CnEyZOI9dc4WfIecxf1ll7PIzo1iFDKIgrcsi/f1gDIAUM+hB84OosClYX55CLzPhu/eiNo0V4Hpc+81/xKI/0gI7sy1Kvc1ZrYzh1pmvva0RtaEhQItP/LLaGZsemqVBNWP7KMiYhgf+H1uoFvP38yvfAzQ=
+	t=1715368444; cv=none; b=ptd2hErwa6bBJQbkC1D+P84rcJ/ZKZf/zB7fbv158gi1aP98O2JFsTDLptaJ5f9eCULdOoOTLzw+qghNJrB5a5Gbrt1eRYWvgdERsiITe7ii1FHLxZUtBbj9l8wMZLWaOxm4GW3dVABcrUEqrL93bG2O65Ndts1rcGF62ayGWLg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715363666; c=relaxed/simple;
-	bh=hGoEWgindiRT6Vk+XOyt9W31yHai/vqtmBqLrgsoFQ4=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=ip7A51Riu0voPOgdsU7982ZgwxvNDzidtlWthkpcB/tF2vuabK1Exnpjo3JX2ItWjqqYfF5v6ltAiohQkRqv9rBhi2yfX54Qcy+ipKB/N+AM7cqoB7akvLVwQH6sdpdr3isxMjptVo/Idtxugb90hO++7xi8fKhI2BVmucOb7TA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ak22BdMx; arc=none smtp.client-ip=209.85.214.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1715368444; c=relaxed/simple;
+	bh=2HVxt79531612LIMbbeh7ZuktYpI2oIzB9557n+c4JE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=B96OUYnseABlQQt10a7oxL7f/+JybqVsd0Kei+NTpxSdDr2Oi4oVLTcluYTItkPKR1UAfYA3G7Luz9J1dIDFHdkBgt6Zq47UsNe7HAk39MFR1nufHPJVGXYdnj5WZC7Zfe/qA3tHifHICDg379DnzgEIASAzKdgL3Y+qKqxoX4I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=penguintechs.org; spf=pass smtp.mailfrom=penguintechs.org; dkim=pass (1024-bit key) header.d=penguintechs.org header.i=@penguintechs.org header.b=AeMdMQex; arc=none smtp.client-ip=209.85.210.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=penguintechs.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=penguintechs.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ak22BdMx"
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-1e4bf0b3e06so21051675ad.1
-        for <linux-bluetooth@vger.kernel.org>; Fri, 10 May 2024 10:54:25 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=penguintechs.org header.i=@penguintechs.org header.b="AeMdMQex"
+Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-6f4178aec15so2150728b3a.0
+        for <linux-bluetooth@vger.kernel.org>; Fri, 10 May 2024 12:14:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1715363664; x=1715968464; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=RdVY0gqRJfaMIeaqbCIEEne8xg0SWFlSVtqfye7T4yg=;
-        b=ak22BdMxjSzisg9Y9R7NRqdJQlkb4mFc7I2yRu45ul7xYof84mBYFzSQH2vfQbIFqG
-         vwqRJYcdW+f0xqMOT4myIOv8PxwXK3WvqT5UdQnxxoj2Tew1g78pR5LWMWkv5GCjZ2En
-         uL5SAiVB1lfWMV9ZqHH/rAphRX8MHsiESQWWYOinxiMPuejrj3g/WjbZ7FdVkmu9C9Xa
-         7s8qBymRAaHVDTJcYMaV29Xmt8Ixw4QYNd04VAZZg7O1alXcDtT5eHqduC7Ho/gT+dhT
-         kvQMWDIaRvXxW1Nl4AXVtFPfirsYTbQYZOUQacR0gjr1dZCLtUrclRRmurjGa8f2xQra
-         ZvMA==
+        d=penguintechs.org; s=google; t=1715368441; x=1715973241; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=CHXGXA0IVIBC4Ca74LUG8yr/KUUTpqMoG+NixzgkY2c=;
+        b=AeMdMQexWBFOYAXztZsweRldkXd1AOU2RKZJk49wOseCQ+fLq8eeacdexayf+v/tv3
+         zCCkIoMhmkFb5qugaDOnAKqfdXG0UADLAFe4WyLSE9GqEuky6wNybDnYqFLE0qVpRNQ2
+         YfvUrcxXKnf2jc+jHtZ2P/Kuw6vRJAoUAqmh8=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715363664; x=1715968464;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=RdVY0gqRJfaMIeaqbCIEEne8xg0SWFlSVtqfye7T4yg=;
-        b=I9M5p+gRkrK+bah6mHYR85BPshMyXgVP8z0IJD1wzS9UYcXoebYbiKbNZOcTshz7QT
-         VSFHFg6j//XgfQC1jRXka/VbbfIl1Vg6fUT+X7pnbQ6bCf2+QLHh7A8jVRpoPEzAulE+
-         3jOLPC8fM5pF08PJGhzPkFIc/1EAV/5uNuJm8xQas5dG/wDJR0p6fxuJTueLnbkruNGY
-         kNPYBmrqeuGtUgxK1W3Y6dTpD14RWB6JSUnHfOXs6B5cjm1dtckMR2OmhIhXtqs8drmA
-         usJikoB5v0BTmy3HvCT5WNyJsVlBnUA21nOpkZTegTHPZDkY2Pc/fj91u8be0OTtOP8R
-         JKMw==
-X-Gm-Message-State: AOJu0YxaR6L5q6vcFCflkvHkdfcu1bLtLJ1C3Cqa8Hxf0+HNAT00mspy
-	FTAHzoS6+HkNLB1gYnnNu0GiuQRg2FFX1Jq+siNsKLngPghsJhcxnOzmrw==
-X-Google-Smtp-Source: AGHT+IFxnZFEkSeQwKCyi30u19TOQHnKOObqyJdgDaanhGBAnp7smjoz41yyOQypX1q0OlFyi8smCA==
-X-Received: by 2002:a17:902:e5c1:b0:1e7:d482:9e07 with SMTP id d9443c01a7336-1ef43d0ac96mr42922155ad.12.1715363664428;
-        Fri, 10 May 2024 10:54:24 -0700 (PDT)
-Received: from [172.17.0.2] ([52.159.137.224])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1ef0c136a12sm35098105ad.251.2024.05.10.10.54.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 10 May 2024 10:54:24 -0700 (PDT)
-Message-ID: <663e5f50.170a0220.b5100.9e06@mx.google.com>
-Date: Fri, 10 May 2024 10:54:24 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============4242753600340686389=="
+        d=1e100.net; s=20230601; t=1715368441; x=1715973241;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=CHXGXA0IVIBC4Ca74LUG8yr/KUUTpqMoG+NixzgkY2c=;
+        b=pOG46+6+BMCK4SA6yeDeH/OHOAHrUEUi2hhenHNrSBZ2l4pM6pRZynULSUXyxN1Cnq
+         bsdpqOWlAWCZHerv647AXmdUK0E8kPR30p4OPW0Qt8C5oOKtUb7fo1f3OndmBSJJwIkT
+         MN7cylG18ZQSh2hadybUIksRqri1YzFYoclt+y1G6MX9p1ZrAuC3Nxh+WY6MpjRwX9nP
+         JceOmFPsji98zMzo4Kja2MeP9PCSNmQF7oh6ADzk6jRaA+Wr755MhpyRzvWMlZoM0BrM
+         RzL2eVFuv/IVMuxIrTt4kyysOtuS2gnmjiCw6rZUQcyTGuV63Jxmfxsb4MmWAT1hdj6x
+         +yVw==
+X-Gm-Message-State: AOJu0YyGNtcn6osKi24PS3D+wby07uO/pCAiuGSdvj0yAUtZ/QbUQLkD
+	c16I9c7nThe0qU3T/s3jyVNsjLtTnAG4182S2jioXLLCjMqMJjYFxbIg3TMl1Q==
+X-Google-Smtp-Source: AGHT+IG/A6HMKu6MeX4G7JOD3ZH02YShWgwwubSRhxxZzngujiXDtKIsgVrcLBR7fRcl1BeNYiyWDw==
+X-Received: by 2002:a05:6a20:1012:b0:1af:51d1:eab6 with SMTP id adf61e73a8af0-1afde1c5540mr3340413637.45.1715368441107;
+        Fri, 10 May 2024 12:14:01 -0700 (PDT)
+Received: from ?IPV6:2601:646:8700:dd30:5f3e:5ba7:e0ea:9a08? ([2601:646:8700:dd30:5f3e:5ba7:e0ea:9a08])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-6340bf1741csm2986374a12.27.2024.05.10.12.13.59
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 10 May 2024 12:14:00 -0700 (PDT)
+Message-ID: <560c5c03-563a-4f1c-abc1-1372ca73c421@penguintechs.org>
+Date: Fri, 10 May 2024 12:13:59 -0700
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [BlueZ,v3,1/4] profiles/gap: Some code cleanup
-In-Reply-To: <20240510150938.1492169-1-luiz.dentz@gmail.com>
-References: <20240510150938.1492169-1-luiz.dentz@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+User-Agent: Mozilla Thunderbird
+Subject: Re: path to landing patch to fix warm boot issue for qca6390
+Content-Language: en-US
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org,
+ Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
+ Zijun Hu <quic_zijuhu@quicinc.com>,
+ Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+References: <3475f0dd-6a0f-4319-9590-379eee33f504@penguintechs.org>
+ <CABBYNZ+FBwFtrqg1Hj72Q7_6f8hDSwVTNtkofP0XgEd98DRf9A@mail.gmail.com>
+From: Wren Turkal <wt@penguintechs.org>
+In-Reply-To: <CABBYNZ+FBwFtrqg1Hj72Q7_6f8hDSwVTNtkofP0XgEd98DRf9A@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
---===============4242753600340686389==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+On 5/6/24 12:49 PM, Luiz Augusto von Dentz wrote:
+> Hi Wren,
+> 
+> On Mon, May 6, 2024 at 3:24 PM Wren Turkal <wt@penguintechs.org> wrote:
+>>
+>> Krzysztof,
+>>
+>> I am reaching out to you as you had the most important objections to the
+>> change to fix qca6390 for the warm boot/module reload bug that I am
+>> experiencing.
+>>
+>> For context, the problem is that the hci_uart module will send specific
+>> vendor specfic commands during shutdown of the hardware under most
+>> situations. These VSCs put the bluetooth device into a non-working state
+>> on my Dell XPS 13 9310 with qca6390 bluetooth hardware.
+>>
+>> Zijun's proposed fix is to not send these commands when it's not
+>> appropriate for the hardware. The vendor commands should be avoided when
+>> the hardware does not have persistent configuration or when the device
+>> is in setup state (indicating that is has never been setup and should
+>> not be sent the VSCs on the shutdown path). This is what Zijun's patch
+>> implements.
+>>
+>> In addition, Zijun's change removes the influence of both
+>> the QCA_BT_OFF qca flag and and HCI_RUNNING hdev flag. Zijun asserts
+>> that those flags should not influence the sending of the VSCs in the
+>> shutdown path. If I understand KK's objections properly, this is where
+>> his objection is stemming from. KK, is this correct?
+>>
+>> Zijun's proposed fix can be seen here:
+>> https://patchwork.kernel.org/project/bluetooth/patch/1713932807-19619-3-git-send-email-quic_zijuhu@quicinc.com/
+>>
+>> I'm wondering if we can resolve this impasse by splitting the change
+>> into two changes, as follows:
+>>
+>> 1. Change that removes the influence of the QCA_BT_OFF and HCI_RUNNING
+>> flags in the shutdown path.
+>> 2. Add the quirk from Zijun's patch that fixes my hardward configuration.
+>>
+>> I'm hoping that better clearer descriptions for #1 can help get that
+>> landed since the logic current appears to be at odds with how the
+>> hardware works.
+>>
+>> Also, I am happy to split the patches into the two patches, or (maybe
+>> more ideally) just modify the commit message to better indicate the
+>> reason the change. I just need guidance from maintainers so that
+>> whatever work I do leads to something acceptable for y'all.
+>>
+>> So, please help me get this done. I am just a user with broken hardware
+>> and a fondness for Linux. I would love to help do what's needed to get
+>> this fix landed.
+> 
+> Ive also objected to that change, in fact the whole shutdown sequence
+> is sort of bogus in my opinion and the driver shall really have some
+> means to find out what mode it is in when it reboots, regardless if
+> cold or warm boot, since otherwise we are in trouble if the user is
+> booting from another OS that doesn't do the expected shutdown
+> sequence.
 
-This is automated email and please do not reply to this email!
+This criticism makes a ton of sense. I'm sorry I missed it before. There 
+were a lot of threads moving in parallel. However, I am curious. Given 
+that the patch improves the situation for users (like me). Is there any 
+way we can separate the redesign of the shutdown sequence and the UX 
+improvement that comes with this patch?
 
-Dear submitter,
+Here's my concern. I am happy to do the work to redesign this. However, 
+I don't think I have the information needed to do this since I don't 
+have access to the technical docs for the qca6390. I am worried that not 
+accepting some form of this patch is letting perfect be the enemy of the 
+good. And I am not sure how I personally can help with that. If you 
+think it's possible for me to do this without the docs for the hardware, 
+I am willing to give it a shot if I can get some guidance. Honestly, I 
+wish I had the skill to be confident about a change like this, but I don't.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=852343
+Any ideas on how to move forward would be greatly appreciated.
 
----Test result---
+And just to be perfectly clear, I have tested this patch on my laptop. 
+It greatly enhances my ability to use my hardware since I can reboot the 
+machine without having to make sure to power cycle the laptop. This is 
+not a theoretical improvement.
 
-Test Summary:
-CheckPatch                    FAIL      1.57 seconds
-GitLint                       PASS      0.81 seconds
-BuildEll                      PASS      24.18 seconds
-BluezMake                     PASS      1646.05 seconds
-MakeCheck                     PASS      13.67 seconds
-MakeDistcheck                 PASS      173.75 seconds
-CheckValgrind                 PASS      244.10 seconds
-CheckSmatch                   PASS      346.75 seconds
-bluezmakeextell               PASS      117.90 seconds
-IncrementalBuild              PASS      6038.21 seconds
-ScanBuild                     PASS      966.73 seconds
-
-Details
-##############################
-Test: CheckPatch - FAIL
-Desc: Run checkpatch.pl script
-Output:
-[BlueZ,v3,1/4] profiles/gap: Some code cleanup
-WARNING:TYPO_SPELLING: 'unecessary' may be misspelled - perhaps 'unnecessary'?
-#91: 
-Just removing unecessary function and code duplication.
-              ^^^^^^^^^^
-
-/github/workspace/src/src/13661723.patch total: 0 errors, 1 warnings, 89 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/src/13661723.patch has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============4242753600340686389==--
+Thanks,
+wt
+-- 
+You're more amazing than you think!
