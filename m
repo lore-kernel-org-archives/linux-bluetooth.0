@@ -1,144 +1,131 @@
-Received: from mail-qk1-f173.google.com (mail-qk1-f173.google.com [209.85.222.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E0AB12C539
-	for <linux-bluetooth@vger.kernel.org>; Fri, 10 May 2024 15:32:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EBB4CA6B
+	for <linux-bluetooth@vger.kernel.org>; Fri, 10 May 2024 15:40:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715355162; cv=none; b=sKvE1vy9Yl30BqhPGP8rC7OOZ4qvERT7y+g/CqBdcNXeHVTezZXVaXw+Q1KDHHQRdnWymvg0d4UrtS/n3XvfzcxsJc7gDdkYpR5Fgr6dX9Pcy6Hc/+KX8yXJ2XgvtD4X2V2pkgL9LYqTm6PVtd8+zAUR2Ct7Ncd3Qlgst8sRvi8=
+	t=1715355633; cv=none; b=QoyFvNhJT/FzhGeLqO7e9EvQCtMq/SJJ2RNlnKtQPTJO06uJg5dtd27qWUfsyidI05imjQKW+nbb7EFXh9JIWWnTYvQazlIy+qZrgrNCOizgQWxYrLFxFIo6pzdlv6TOHt9p/Ucykjdj7cbJJ2CuvkCv6pXxA+Oyet4VXsgXTd8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715355162; c=relaxed/simple;
-	bh=Vw3/IDg+lWyl4Bdle7IgWuSDOwOK65OIjvecylFyiJs=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=chnv+0X4E1Xb3WFo5U1HmuEb/wbieqtgqJZhQunUWhWz3G/M0/X371c0+qHE/a4ZzoloD5H511Iunxrc4U4gY8kN1TPVmIC6BGyCxg8NA+hnGxsXkCk/t6XLCJF4fSKgyzItpRejg4H7YOTlAR++QK+yPqjn5woNlx/+V1tKdgg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=axt91xr6; arc=none smtp.client-ip=209.85.222.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1715355633; c=relaxed/simple;
+	bh=QmNnbdnViwuzY2V9Y+Eo4zNA2dxsqD8JVwPyR+wd1cQ=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=Q57Cp/N/MPfDst3pf3Qtdt2RycTB7cbGjNNRF+LMGKjqJsOrO/tDGkm4/PhW7nLtRhGTqZkhN1WKptEloG8hxXeiDO9cwy/VxaHfJo6B/PZFQXlA0D+6zD4PL8ToKGHVCr4l17wILUC+V6TFi7dW+gHk/rLsKXZSx9LQDOns3aM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VX+rmF6z; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="axt91xr6"
-Received: by mail-qk1-f173.google.com with SMTP id af79cd13be357-792bd1f5b28so181834885a.2
-        for <linux-bluetooth@vger.kernel.org>; Fri, 10 May 2024 08:32:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1715355160; x=1715959960; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=27knQoR8dDgDd7FSx6b09++f5sqCj+WAHmx4r9vfrlI=;
-        b=axt91xr67SFruTA/cpxJ90p76qXHaGuufo77s2yEHcj51oDYKNRzfCAKswZyylnRx7
-         fOmrkkiLGuExpeEMoumzSWSzBpbLjlA7ostxEZkkObxUCZkZxJCH+lj1qjsjuJ1EzD0J
-         4eg9te1zEiE+YrvwJUYINSNcb56dj3aWXdCSWA+eyYA6dPRDjIWQSuW0vTQtkH3jGEvC
-         V5SGV15dZE7JtMhI+7wqIoBQnrRJs21KEt/kDHF8xJk0HOJ1Dsiwte3Q+iynHgK4kF2g
-         TFV7kwGuCxZ1PBVWp50CwkXpFNxrwaNF6uxgKKaEqhypFz98epb83bAQaM5HbEJppR22
-         q2NQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715355160; x=1715959960;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=27knQoR8dDgDd7FSx6b09++f5sqCj+WAHmx4r9vfrlI=;
-        b=nr4ov6bQFHbe0ksNl4duxo2zi9yE8GOyChoxOKuQ4oFLcE+SXvYd1+z0cTRfu6Tyw9
-         Dz33JjSktd6cvmS9PjRkj5lAhnUI9a5T7pq5UDjRsnAwA+8ak1JjS+sHFPEc4aI21BLR
-         AEeclRBqsCT4LA5qINIUE72f00REfml/7EXXOYCkfGquMPXy/OZfqfBV54AWOgrXzA1p
-         dGA3r+Mmsp2xL2Pbs4rwTFVeJ48n6EXJxS4YEFm00vQnRnlpIgTCtIWoiKORNY1UbSAZ
-         jMGxxjxm0l9F/QAtb7+tuAyuYKjWyinbLmx5qpv4SYkK7tA766OJKzg3n/gMeMflclSh
-         582Q==
-X-Gm-Message-State: AOJu0YyDz4db/tKi4xfuiMmIL2u7qitt8MqsR1TrUKIRTDr7NkHYcme9
-	8lDbvR4FOEji8HV0Z+FVUH+1+T+BS38B06EG4nxi5foyNSkBXYZcgkhcJUEg
-X-Google-Smtp-Source: AGHT+IHzWpxa/oUhh3QonYJMftyJjCsc2FYeWNKTJZKfWCntNMmRFyu2SMpQfuHJiZO6GM1yQN3L2w==
-X-Received: by 2002:a05:620a:102e:b0:78a:5fd9:46d7 with SMTP id af79cd13be357-792c75ffc85mr310309285a.67.1715355159605;
-        Fri, 10 May 2024 08:32:39 -0700 (PDT)
-Received: from [172.17.0.2] ([172.200.199.255])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-792bf2a3c8bsm189755285a.70.2024.05.10.08.32.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 10 May 2024 08:32:39 -0700 (PDT)
-Message-ID: <663e3e17.050a0220.b9e9b.5a1c@mx.google.com>
-Date: Fri, 10 May 2024 08:32:39 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============7061551724168026437=="
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VX+rmF6z"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id DDB1AC2BD10;
+	Fri, 10 May 2024 15:40:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1715355632;
+	bh=QmNnbdnViwuzY2V9Y+Eo4zNA2dxsqD8JVwPyR+wd1cQ=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=VX+rmF6zH0DfGG+t4SCPeKzzEm2i4fBqQDsdNY4LtyBoDiiqqAiX7Itcrw7MQXoQK
+	 fi7NmWro7eKSsGjcsY0j9Fc5y1GS0DuaA8RFx8ih6IjJoOSt/IpbNo9XMr8/H00bHB
+	 MiqSpQqb/JyrnM6y/SQNDLYHwobeu9dzUtiBYvtNkoDHM/ctOUu7k4gLYEkiu7Yw+r
+	 0GbAF4cmMCqE9mevFRp8ZQXwxxixfb9JGasLpgdKvPXtEwwsesoL7FLswn2iOQAjBM
+	 g3tiN0P1uR7paU4poEpXnbT7DvLC0xatwUG+q9WvSb9o4FMb6zqKSFzVa94/icZkGP
+	 K/X8GvVeWY6DQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id CBDF7C04E27;
+	Fri, 10 May 2024 15:40:32 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [v3] Bluetooth: MGMT: Make MGMT_OP_LOAD_CONN_PARAM update existing connection
-In-Reply-To: <20240510143645.1408056-1-luiz.dentz@gmail.com>
-References: <20240510143645.1408056-1-luiz.dentz@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
+Subject: Re: [BlueZ v2 00/20] Fix a number of static analysis issues
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <171535563283.2819.15014215823661998089.git-patchwork-notify@kernel.org>
+Date: Fri, 10 May 2024 15:40:32 +0000
+References: <20240510121355.3241456-1-hadess@hadess.net>
+In-Reply-To: <20240510121355.3241456-1-hadess@hadess.net>
+To: Bastien Nocera <hadess@hadess.net>
+Cc: linux-bluetooth@vger.kernel.org
 
---===============7061551724168026437==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hello:
 
-This is automated email and please do not reply to this email!
+This series was applied to bluetooth/bluez.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-Dear submitter,
+On Fri, 10 May 2024 14:10:10 +0200 you wrote:
+> Changes since v1:
+> - added 6 patches
+> - Fix syntax error in "client/gatt: Check write_value() retval"
+> 
+> Bastien Nocera (20):
+>   adapter: Use false instead of 0 for bool
+>   attrib/gatt: Guard against possible integer overflow
+>   client/gatt: Don't pass negative fd on error
+>   client/gatt: Check write_value() retval
+>   client/main: Fix array access
+>   client/main: Fix mismatched free
+>   monitor/att: Fix memory leak
+>   bap: Fix memory leaks
+>   media: Fix memory leak
+>   main: Fix memory leaks
+>   isotest: Consider "0" fd to be valid
+>   isotest: Fix error check after opening file
+>   client/player: Fix copy/paste error
+>   shared/vcp: Fix copy/paste error
+>   isotest: Fix fd leak
+>   iso-tester: Fix fd leak
+>   sdp: Fix use of uninitialised memory
+>   monitor: Work-around memory leak warning
+>   avrcp: Fix uninitialised memory usage
+>   main: Simplify variable assignment
+> 
+> [...]
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=852326
+Here is the summary with links:
+  - [BlueZ,v2,01/20] adapter: Use false instead of 0 for bool
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=d3fcc77f99da
+  - [BlueZ,v2,02/20] attrib/gatt: Guard against possible integer overflow
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=1e22fd9adbb3
+  - [BlueZ,v2,03/20] client/gatt: Don't pass negative fd on error
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=1ba9e5f21ca2
+  - [BlueZ,v2,04/20] client/gatt: Check write_value() retval
+    (no matching commit)
+  - [BlueZ,v2,05/20] client/main: Fix array access
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=f3f762b77b58
+  - [BlueZ,v2,06/20] client/main: Fix mismatched free
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=ab325450b0c2
+  - [BlueZ,v2,07/20] monitor/att: Fix memory leak
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=0b842fe9b1fe
+  - [BlueZ,v2,08/20] bap: Fix memory leaks
+    (no matching commit)
+  - [BlueZ,v2,09/20] media: Fix memory leak
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=3652e98d2bb6
+  - [BlueZ,v2,10/20] main: Fix memory leaks
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=45d151ec8a0f
+  - [BlueZ,v2,11/20] isotest: Consider "0" fd to be valid
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=d30dc38b0425
+  - [BlueZ,v2,12/20] isotest: Fix error check after opening file
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=9a36f191aa78
+  - [BlueZ,v2,13/20] client/player: Fix copy/paste error
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=6f041df23ecf
+  - [BlueZ,v2,14/20] shared/vcp: Fix copy/paste error
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=856353b254da
+  - [BlueZ,v2,15/20] isotest: Fix fd leak
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=3e03788ba80c
+  - [BlueZ,v2,16/20] iso-tester: Fix fd leak
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=c81f9320357b
+  - [BlueZ,v2,17/20] sdp: Fix use of uninitialised memory
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=dc60ce0b460a
+  - [BlueZ,v2,18/20] monitor: Work-around memory leak warning
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=e5925dbb84fa
+  - [BlueZ,v2,19/20] avrcp: Fix uninitialised memory usage
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=af2634ce0a62
+  - [BlueZ,v2,20/20] main: Simplify variable assignment
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=87edbabf3956
 
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      1.08 seconds
-GitLint                       PASS      0.33 seconds
-SubjectPrefix                 PASS      0.12 seconds
-BuildKernel                   PASS      29.98 seconds
-CheckAllWarning               PASS      32.82 seconds
-CheckSparse                   PASS      38.14 seconds
-CheckSmatch                   FAIL      36.05 seconds
-BuildKernel32                 PASS      28.98 seconds
-TestRunnerSetup               PASS      521.04 seconds
-TestRunner_l2cap-tester       PASS      20.32 seconds
-TestRunner_iso-tester         PASS      33.33 seconds
-TestRunner_bnep-tester        PASS      4.72 seconds
-TestRunner_mgmt-tester        FAIL      115.22 seconds
-TestRunner_rfcomm-tester      PASS      7.42 seconds
-TestRunner_sco-tester         PASS      15.04 seconds
-TestRunner_ioctl-tester       PASS      7.74 seconds
-TestRunner_mesh-tester        PASS      5.80 seconds
-TestRunner_smp-tester         PASS      6.79 seconds
-TestRunner_userchan-tester    PASS      4.89 seconds
-IncrementalBuild              PASS      28.11 seconds
-
-Details
-##############################
-Test: CheckSmatch - FAIL
-Desc: Run smatch tool with source
-Output:
-
-Segmentation fault (core dumped)
-make[4]: *** [scripts/Makefile.build:244: net/bluetooth/hci_core.o] Error 139
-make[4]: *** Deleting file 'net/bluetooth/hci_core.o'
-make[3]: *** [scripts/Makefile.build:485: net/bluetooth] Error 2
-make[2]: *** [scripts/Makefile.build:485: net] Error 2
-make[2]: *** Waiting for unfinished jobs....
-Segmentation fault (core dumped)
-make[4]: *** [scripts/Makefile.build:244: drivers/bluetooth/bcm203x.o] Error 139
-make[4]: *** Deleting file 'drivers/bluetooth/bcm203x.o'
-make[4]: *** Waiting for unfinished jobs....
-Segmentation fault (core dumped)
-make[4]: *** [scripts/Makefile.build:244: drivers/bluetooth/bpa10x.o] Error 139
-make[4]: *** Deleting file 'drivers/bluetooth/bpa10x.o'
-make[3]: *** [scripts/Makefile.build:485: drivers/bluetooth] Error 2
-make[2]: *** [scripts/Makefile.build:485: drivers] Error 2
-make[1]: *** [/github/workspace/src/src/Makefile:1919: .] Error 2
-make: *** [Makefile:240: __sub-make] Error 2
-##############################
-Test: TestRunner_mgmt-tester - FAIL
-Desc: Run mgmt-tester with test-runner
-Output:
-Total: 492, Passed: 489 (99.4%), Failed: 1, Not Run: 2
-
-Failed Test Cases
-LL Privacy - Remove Device 4 (Disable Adv)           Timed out    2.534 seconds
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
----
-Regards,
-Linux Bluetooth
-
-
---===============7061551724168026437==--
