@@ -1,173 +1,95 @@
-Received: from mail-vk1-f182.google.com (mail-vk1-f182.google.com [209.85.221.182])
+Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A40FE17108A
-	for <linux-bluetooth@vger.kernel.org>; Fri, 10 May 2024 15:09:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2ED4612C53F
+	for <linux-bluetooth@vger.kernel.org>; Fri, 10 May 2024 15:13:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715353789; cv=none; b=MZUEI7xU3Vu3Hp07HdQb1BxWcAvgG1pPxt9SLfi1k2p7cZdPWJIOgmJ6+l5Q5wuE2v2ZoeY+80MPVJ1wEoaji/8I4j6VnDmDBCycyBgHstnRnySVaRkdH4NVyE/BuixzHstT+4D4pPmiw1gvv1QhQjMpixLZTDOSuT/zJtZCTnw=
+	t=1715354023; cv=none; b=GD9OXwzQuOP6zRVxkVbnVwH6XFd34R9bLunwZlodo5vmUCjiN0JM/eIrxzCSjRQAChKtEO9THlLTrmiz/fed5/TFRAbDuS0Xne3Yz645DbBkRBVx4V+Ir/9+rCpiecuSgYoTG01z17YLe6lqcnkwhZXgzwgIGxBbbx0rBk7qMBQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715353789; c=relaxed/simple;
-	bh=VpBIqUpo+QLnRCHMR8h3+FEQs4JEgsZ6vfhrhHL9L2M=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=EC2APF6LKcavv2bR+mkrp8g6/NvgF4012O7ot0N484Anv4ZYYbUsJcSwO+T9W08wE9Ulw32Ul/NVyAbwxgjXo7fJD+BLPzD5T6c1IYN1BiR91opapNuFPUux4Q6top08PXGO0C8IeXQA8Rngm/+sxJHX+fadCohLtKQeGr4lfGI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=W+XAT2LC; arc=none smtp.client-ip=209.85.221.182
+	s=arc-20240116; t=1715354023; c=relaxed/simple;
+	bh=cOM/Oso0Ew4cg0z1qVZSsLsPJw+YkcxYVRAjogCEodw=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=VYT7z4UfwOMfjanDQUQ8J67Rh+7dZRU+/3TCbjHo7c+DzB5ity46mGr2bMXUoeCc2AG80IFKtC7rnXrA3507t7AH2jRgsvhkXBwJ/4vZKEaGMTpKKJ0srhE8e65iBKjVsjWMWw/xeq+IPjXgvPQcvC6xfyUcL24Y800pHp5V0OA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=erieX/Em; arc=none smtp.client-ip=209.85.210.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="W+XAT2LC"
-Received: by mail-vk1-f182.google.com with SMTP id 71dfb90a1353d-4df76f2e3easo646415e0c.2
-        for <linux-bluetooth@vger.kernel.org>; Fri, 10 May 2024 08:09:47 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="erieX/Em"
+Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-6f4603237e0so1481943b3a.0
+        for <linux-bluetooth@vger.kernel.org>; Fri, 10 May 2024 08:13:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1715353786; x=1715958586; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=5niJWmnTMJaWwLIzMOhrQKyuU/mu4Trq6xMfwRJ+dDA=;
-        b=W+XAT2LCAeLHwOVSKjWmgoATYUvmDt7rNThcMatSnpeeTCvH4TDA3dzRpZJn2ZxiDy
-         sjU4oQIzCJoRfzBo3WxfJj0dFoZPyHgrpKyv9kV7VpzLaYMAV1/sDjSxZoGqf48K4Jez
-         lbSd1kNy7keAZ8nfM1mwnE8hzd7G1EllVGEeTJmDPatn9M/8hxt5R+4EeQZG8LyCs+OJ
-         7aDFHUsFAUY0bzPm42GUIQiTG/SqDxmU+Wk72MXtW3ruV7Iac0Y+Kk3M/l6U/h/nic3V
-         nOfBLkBGjVRG6gGpKogwyBMACZT3oiabF/p7VcvCtVVSB61orkJRg3DBh/sF0+7HYfy3
-         18IA==
+        d=gmail.com; s=20230601; t=1715354021; x=1715958821; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=cOM/Oso0Ew4cg0z1qVZSsLsPJw+YkcxYVRAjogCEodw=;
+        b=erieX/Emcqo79nXQJ680aqqOESdvUc5NI0M6VdOSmv5PjrhBOFWzHXe6iilePdqS5F
+         baAlCX/+QP1TPBBlWKBcSddO9JVA5qHR/Z9+CpXc3V80A9QjOriZAEQ6luAC9ybpWzcn
+         rQiwR4BZvfvrJ1g8MSnrVjIzYPvoWw7KqBrcxEzEl9yVGQMm0hObL8hLcQtlRMr5XgEx
+         q/QTg1jm+T6vc+Ih4DUfBOCRnOo2IxpsnMyqOc938KkDasyWLSzzfb2tbj5yb+NjSYRq
+         xLjITn4XBT6dOa+e6h2jzKqLkO3UYbYEZqkjFQgpfN0kKgBLc7Wk+dAuRHmKRc5emAvL
+         HrAA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715353786; x=1715958586;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=5niJWmnTMJaWwLIzMOhrQKyuU/mu4Trq6xMfwRJ+dDA=;
-        b=Q7oY/ymvgcmgld+pCf1lVx93B4Otl0hXcTTd+EfPzws0OHj/upmITKUkgHRtvITr2e
-         pLd+vSEtdGUjkXI/khIIE9qxkrCtERxoWEC/PdE5+QIrcGqLfVSuPqA8kD1g3yVTR4Tc
-         DsPrP9CxE7sRs/kabjspxz89mHM2kQoRIIRarRM4/xF4i6/OlKlnEkCfCY1HTCO/JHD1
-         lDQYERsKQkTjcHfgvoHqziWc1do3yGahZoQouY78ZDi98o33zoluDlZdmSH6Jq7Etq5d
-         aMIiEyOs8llf75wyy9UbQ6VW9U8pDIaaBeY5juCWykvib2GfW+wXTC22nfE4SRlpy8MR
-         mEsg==
-X-Gm-Message-State: AOJu0YxO3WusypDPbPksxh2iluxFCG6cFfG71eAx3DRD9NfsRaxb0k99
-	le86iL6bxQC7ahALkqm++gAaRZwrx/rKiat7wxWIzk1QQdKovC93Ugnbdw==
-X-Google-Smtp-Source: AGHT+IEj3cVFgL2UsPrOHIojk91SymtWmIru7PSpq7Q+eVK58+pCVFho7XH7Kae2Kv6uysSkj6GEIg==
-X-Received: by 2002:a05:6102:e14:b0:47c:1cce:c465 with SMTP id ada2fe7eead31-48077ce81e1mr3370077137.0.1715353784960;
-        Fri, 10 May 2024 08:09:44 -0700 (PDT)
-Received: from lvondent-mobl4.. (syn-107-146-107-067.res.spectrum.com. [107.146.107.67])
-        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-4806cb008d2sm510050137.2.2024.05.10.08.09.44
-        for <linux-bluetooth@vger.kernel.org>
+        d=1e100.net; s=20230601; t=1715354021; x=1715958821;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=cOM/Oso0Ew4cg0z1qVZSsLsPJw+YkcxYVRAjogCEodw=;
+        b=Se2SFNqgRI1fA9zg75rbNEts3NbNJBCsrgsh9vSliP84pysCMJ8wYi5Td5LG77/yIF
+         960CJx8fGzPxwhYFiR1HvYDd2ZSgg+3rpN+KaRAesLTb/fyfgVprf2/QwZUaAO+NspNJ
+         fJ+ft5VZE1Y/eg+345PgtR74mxDKw6ndcHkflJ1g8dsM9oWfXpE0z6op85D91sFsPF5t
+         eAvppo7YLlaCBwdUD5ULmcvHlcCV0SqAdjAIJ4E2j4BDz1TjYYFbcOW49GYj1wQ2Zc9f
+         m3uhbHyxftZ8A/B7idlQo1RU55RdAwJbgxhxkwioF/hwylkOCnj8uld116KWJh4C1JqF
+         8ytQ==
+X-Gm-Message-State: AOJu0YyKXeuj+VtwKGFcXxaFS9GMz26wUn2wmQna5gGQERIL+35OVcnC
+	MoVRK7JbfnR1OdbxTMNB8/MJfZSe89NwfGkMCR9ZjXRgdWNvRDMOYclRFw==
+X-Google-Smtp-Source: AGHT+IF2nOYt4Up83KoJ1g/ALzZY6wY9WD2A13r39mAIZzVD5VaTT+y4RWdmvcqmNss3leH4CpORpA==
+X-Received: by 2002:a05:6a00:3d49:b0:6f3:e9bc:cc3d with SMTP id d2e1a72fcca58-6f4c90905a1mr9281859b3a.3.1715354020969;
+        Fri, 10 May 2024 08:13:40 -0700 (PDT)
+Received: from [172.17.0.2] ([52.234.36.44])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-6f4d2ade27fsm3047031b3a.108.2024.05.10.08.13.40
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 10 May 2024 08:09:44 -0700 (PDT)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v3 4/4] profiles/gap: Added support for PPCP characteristic
-Date: Fri, 10 May 2024 11:09:38 -0400
-Message-ID: <20240510150938.1492169-4-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.44.0
-In-Reply-To: <20240510150938.1492169-1-luiz.dentz@gmail.com>
-References: <20240510150938.1492169-1-luiz.dentz@gmail.com>
+        Fri, 10 May 2024 08:13:40 -0700 (PDT)
+Message-ID: <663e39a4.a70a0220.28934.8345@mx.google.com>
+Date: Fri, 10 May 2024 08:13:40 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============2317455349642639251=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [BlueZ,v1] shared/util: Fix build error on malloc0
+In-Reply-To: <20240510150919.1492039-1-luiz.dentz@gmail.com>
+References: <20240510150919.1492039-1-luiz.dentz@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-From: "Felipe F. Tonello" <eu@felipetonello.com>
+--===============2317455349642639251==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-The Peripheral Preferred Connection Parameters (PPCP) characteristic
-contains the preferred connection parameters of a peripheral device.
+This is an automated email and please do not reply to this email.
 
-These parameters are stored in the info file and loaded to Kernel using
-MGMT's respective command.
+Dear Submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
+
+----- Output -----
+
+error: patch failed: src/shared/util.h:85
+error: src/shared/util.h: patch does not apply
+hint: Use 'git am --show-current-patch' to see the failed patch
+
+Please resolve the issue and submit the patches again.
+
+
 ---
- profiles/gap/gas.c | 71 ++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 71 insertions(+)
+Regards,
+Linux Bluetooth
 
-diff --git a/profiles/gap/gas.c b/profiles/gap/gas.c
-index 713b9aaf28f2..b50a9c03acd1 100644
---- a/profiles/gap/gas.c
-+++ b/profiles/gap/gas.c
-@@ -160,6 +160,75 @@ static void handle_appearance(struct gas *gas, uint16_t value_handle)
- 		DBG("Failed to send request to read appearance");
- }
- 
-+static void read_ppcp_cb(bool success, uint8_t att_ecode,
-+			const uint8_t *value, uint16_t length,
-+			void *user_data)
-+{
-+	struct gas *gas = user_data;
-+	uint16_t min_interval, max_interval, latency, timeout, max_latency;
-+
-+	if (!success) {
-+		DBG("Reading PPCP failed with ATT error: %u", att_ecode);
-+		return;
-+	}
-+
-+	if (length != 8) {
-+		DBG("Malformed PPCP value");
-+		return;
-+	}
-+
-+	min_interval = get_le16(&value[0]);
-+	max_interval = get_le16(&value[2]);
-+	latency = get_le16(&value[4]);
-+	timeout = get_le16(&value[6]);
-+
-+	DBG("GAP Peripheral Preferred Connection Parameters:");
-+	DBG("\tMinimum connection interval: %u", min_interval);
-+	DBG("\tMaximum connection interval: %u", max_interval);
-+	DBG("\tSlave latency: %u", latency);
-+	DBG("\tConnection Supervision timeout multiplier: %u", timeout);
-+
-+	/* 0xffff indicates no specific min/max */
-+	if (min_interval == 0xffff)
-+		min_interval = 6;
-+
-+	if (max_interval == 0xffff)
-+		max_interval = 3200;
-+
-+	/* avoid persisting connection parameters that are not valid */
-+	if (min_interval > max_interval ||
-+	    min_interval < 6 || max_interval > 3200) {
-+		warn("GAS PPCP: Invalid Connection Parameters values");
-+		return;
-+	}
-+
-+	if (timeout < 10 || timeout > 3200) {
-+		warn("GAS PPCP: Invalid Connection Parameters values");
-+		return;
-+	}
-+
-+	if (max_interval >= timeout * 8) {
-+		warn("GAS PPCP: Invalid Connection Parameters values");
-+		return;
-+	}
-+
-+	max_latency = (timeout * 4 / max_interval) - 1;
-+	if (latency > 499 || latency > max_latency) {
-+		warn("GAS PPCP: Invalid Connection Parameters values");
-+		return;
-+	}
-+
-+	btd_device_set_conn_param(gas->device, min_interval, max_interval,
-+					latency, timeout);
-+}
-+
-+static void handle_ppcp(struct gas *gas, uint16_t value_handle)
-+{
-+	if (!bt_gatt_client_read_value(gas->client, value_handle,
-+						read_ppcp_cb, gas, NULL))
-+		DBG("Failed to send request to read PPCP");
-+}
-+
- static inline bool uuid_cmp(uint16_t u16, const bt_uuid_t *uuid)
- {
- 	bt_uuid_t lhs;
-@@ -186,6 +255,8 @@ static void handle_characteristic(struct gatt_db_attribute *attr,
- 		handle_device_name(gas, value_handle);
- 	else if (uuid_cmp(GATT_CHARAC_APPEARANCE, &uuid))
- 		handle_appearance(gas, value_handle);
-+	else if (uuid_cmp(GATT_CHARAC_PERIPHERAL_PREF_CONN, &uuid))
-+		handle_ppcp(gas, value_handle);
- 	else {
- 		char uuid_str[MAX_LEN_UUID_STR];
- 
--- 
-2.44.0
 
+--===============2317455349642639251==--
