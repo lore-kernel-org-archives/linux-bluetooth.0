@@ -1,233 +1,224 @@
-Received: from mail-lj1-f176.google.com (mail-lj1-f176.google.com [209.85.208.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A05F13B2B6
-	for <linux-bluetooth@vger.kernel.org>; Fri, 10 May 2024 21:25:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C78A1BDC8
+	for <linux-bluetooth@vger.kernel.org>; Fri, 10 May 2024 22:12:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715376324; cv=none; b=l4L3uzlwG7NOyj6OD5Kwbd6m3JxzfFzBGR5TCMIG6HC6A/lyoju1usEUASVD4iCiRhqtkawe4yLr6gmBCNmDCOIAoK9GCaC0EoziXh6zxVcWKGQEQGIItkjdpn4exhW+TudFFKqKwejTVgH6zLdUlQLSo8MMb5HUkwomCr35+DE=
+	t=1715379159; cv=none; b=F6HThTGaS7HhiulfGA8XOiBoNUKVPYC0rEstAv5TDl9lvscsMpd3kkNIYKZ6gyy8k2MmxaCPIBAmNsPYI/J6QOgEx5qrF4I94rebozjcj9Eot2LmGTauww/zPgdK3j3PSWJjUP9O7aH/FKtpA9WSlXpbruYmLbERr1aoSGWxB9w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715376324; c=relaxed/simple;
-	bh=xUFviK84qTXkC9kXPjMLjteGyj16DYAPFlH94s5sWiM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=R+WeFmsi6mEiHlKdff5n9AAeSc/X3sZ5Ua4JuPGc+i6mw6LXFB8ZL2T8eBenKHHyBTpdw9i8V8Ts4w4x/KdKEfon6he+ijBZni8bsqLA8Gc2mXqxN3tn8Ybsug/NwhWBeTNwrSZMkrNYhQGDgvt4fLLh/J8KBaL2dO1kg1mNFyQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lyVSEG2n; arc=none smtp.client-ip=209.85.208.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1715379159; c=relaxed/simple;
+	bh=CBjw0RHx7SJF0qYeY7R/Dmz9Bf+XASAExiSRT3ukPDc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bBiVGIP72k9MBCn+2X/OH4oH1e2ivZIULsxWAxak5acddhEToJxkY7pNd6EYNq9NGWC6iUVeKD3ih8B8KFnrdcGk2VuZscqeSzAdiJxlI9dEKQpitpjpXZDNCLRi336Rv+KQNzZ8+kPF8BKlpOiBTnBMqVo98pCy5vVm2RieHnA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=E0XAdk21; arc=none smtp.client-ip=198.175.65.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lyVSEG2n"
-Received: by mail-lj1-f176.google.com with SMTP id 38308e7fff4ca-2e27277d2c1so31447511fa.2
-        for <linux-bluetooth@vger.kernel.org>; Fri, 10 May 2024 14:25:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1715376320; x=1715981120; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=xUFviK84qTXkC9kXPjMLjteGyj16DYAPFlH94s5sWiM=;
-        b=lyVSEG2nywCx0CGrjjh7cg0IYkl6FGiDHJxDysEqFIOi8n0ovJxXSpsnGv+EJZU6Q9
-         VScAnOuK+JbvLHl1zKXDL3yUx1FzAKcHJidw50dnCyybSvByjDw3mqKFMFDP+Uz7RcsE
-         Ht6qs0G8JTsVb/LKXgodiAFJNguWeTnBXe5YQ9bPAz1nL+HWl8FqiNtn7H3awMzpmEdh
-         voSeWp0h7WUR3D63YI9eDtWCREbaTe5qng93AP4pDRMUr3aKKWXnHi3mZdyxxyTCL52y
-         TN3jTQs4I6ErTYsEvaFG8ZpFgyXQmE/X9eHlAXR//kfAtYgEqjBt3fOPGJxuKhGknxac
-         zO2Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715376320; x=1715981120;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=xUFviK84qTXkC9kXPjMLjteGyj16DYAPFlH94s5sWiM=;
-        b=eF70YWb4id4fKfVmE14zNfIysxXw8dzAHhCI7Yp0ZzSr4QOCftks15w9gD0LIC9zd9
-         aHOzf2ZCku1MzIXIqD/agLG1GYU/Dkkl3gPYiekw8Pb2XDepKWlFSCGqBGLHgxlB153F
-         QTHubkRUfiuca+aqpiyn0e3q2sOLmK2qJlFR9uDCWEDCI6pPahlSLsYUcw+Ag2L5IPCP
-         p6eOcau4GbEoZU7DGayKsVh6SOZjs7yISFJvpHYfsbXqIT32e/Y6X6INvrZ/Br+cWWyY
-         q4G4TVCXGPZ10/3GROfu8nsKMrKGCq2/cFUuGXn2h31scbOJ9u/+/a5ZwEBXlP+frHku
-         h9kQ==
-X-Gm-Message-State: AOJu0YymhnbLFMJnGQaaZHEbzW3ANE/983UgqQzbCPbgQBCHlR3Yi5yi
-	gtx5y6R+aNrjRWZvjPbXnkeqOr5Upfii2sb0WCLM7y3CTOEVZBHA+2zZGWSEkbUSN8ZSjAb0Ytm
-	0rzeenUTELLc6ZP3DqwSEOFEQxxA=
-X-Google-Smtp-Source: AGHT+IFUq0dxU8uR43rmqTpPQ9UlPIhIl846Oe24IA/SyZk0Z4Zk5y4/4X7WyW7sixHyLhER5s6vv+ItOYkKw37ad7o=
-X-Received: by 2002:a05:651c:550:b0:2df:b0e3:b548 with SMTP id
- 38308e7fff4ca-2e5203a4a63mr25651661fa.42.1715376320229; Fri, 10 May 2024
- 14:25:20 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="E0XAdk21"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1715379156; x=1746915156;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=CBjw0RHx7SJF0qYeY7R/Dmz9Bf+XASAExiSRT3ukPDc=;
+  b=E0XAdk21EcQgI49qVdZgMm00wOpJ0tKlUVu/SHLc4d5jYndzm8inl5f4
+   xI1h+yHOLV5f0gN77rrJFTs1AEzGtUvEfjZsj8t0Q3o7lcEhlqOAebL2I
+   Fp8bWb2obqcoRNDPGA77uzS0BE3HakdnVcq8sXMOgRYqV+4MC7nysYJl3
+   lT0rAbdO1+yRZ085JfmU1Z6//dFinykwtXUyu96tHEj8hdSkrCaYz5D4T
+   R0MKYawfJf3hRzuHk2q5YH9ZRWeGMie7oIFaJ7mmREhTeBaJD/HnpBJsP
+   YrFlqG3UKQiT77dCyzfxncoxp55zYF3yD/xqeUIZ5N3T2xaa2IAdyzNfF
+   w==;
+X-CSE-ConnectionGUID: ca0hsmR+Qk6gGLpsDAlCYA==
+X-CSE-MsgGUID: dFq/Qhq7TT6pr1WOpbKJ+g==
+X-IronPort-AV: E=McAfee;i="6600,9927,11069"; a="15213769"
+X-IronPort-AV: E=Sophos;i="6.08,152,1712646000"; 
+   d="scan'208";a="15213769"
+Received: from fmviesa009.fm.intel.com ([10.60.135.149])
+  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 May 2024 15:12:36 -0700
+X-CSE-ConnectionGUID: jaMgVNYZTUeEsCdt9MhDLw==
+X-CSE-MsgGUID: xU/PrQDkSCC6cA4UdFZ2Aw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.08,152,1712646000"; 
+   d="scan'208";a="29755742"
+Received: from lkp-server01.sh.intel.com (HELO f8b243fe6e68) ([10.239.97.150])
+  by fmviesa009.fm.intel.com with ESMTP; 10 May 2024 15:12:34 -0700
+Received: from kbuild by f8b243fe6e68 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1s5YTg-0006cv-1B;
+	Fri, 10 May 2024 22:12:32 +0000
+Date: Sat, 11 May 2024 06:11:41 +0800
+From: kernel test robot <lkp@intel.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev
+Subject: Re: [PATCH v3] Bluetooth: MGMT: Make MGMT_OP_LOAD_CONN_PARAM update
+ existing connection
+Message-ID: <202405110542.nDEonveB-lkp@intel.com>
+References: <20240510143645.1408056-1-luiz.dentz@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <3475f0dd-6a0f-4319-9590-379eee33f504@penguintechs.org>
- <CABBYNZ+FBwFtrqg1Hj72Q7_6f8hDSwVTNtkofP0XgEd98DRf9A@mail.gmail.com>
- <560c5c03-563a-4f1c-abc1-1372ca73c421@penguintechs.org> <CABBYNZK+FGe75VJ4YqsxxyGj-Ac+voeMb3CR9qRD+yz7d=d7oQ@mail.gmail.com>
- <44b75302-1349-445d-90ac-8df8a1fb91e2@penguintechs.org>
-In-Reply-To: <44b75302-1349-445d-90ac-8df8a1fb91e2@penguintechs.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Fri, 10 May 2024 17:25:08 -0400
-Message-ID: <CABBYNZ+KTV7y-UxWE_6jaHT0wDiMN-xReHW8zLT0WEPHCsyXQQ@mail.gmail.com>
-Subject: Re: path to landing patch to fix warm boot issue for qca6390
-To: Wren Turkal <wt@penguintechs.org>
-Cc: linux-bluetooth@vger.kernel.org, 
-	Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>, Zijun Hu <quic_zijuhu@quicinc.com>, 
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240510143645.1408056-1-luiz.dentz@gmail.com>
 
-Hi Wren,
+Hi Luiz,
 
-On Fri, May 10, 2024 at 4:54=E2=80=AFPM Wren Turkal <wt@penguintechs.org> w=
-rote:
->
-> On 5/10/24 12:48 PM, Luiz Augusto von Dentz wrote:
-> > Hi Wren,
-> >
-> > On Fri, May 10, 2024 at 3:14=E2=80=AFPM Wren Turkal <wt@penguintechs.or=
-g> wrote:
-> >>
-> >> On 5/6/24 12:49 PM, Luiz Augusto von Dentz wrote:
-> >>> Hi Wren,
-> >>>
-> >>> On Mon, May 6, 2024 at 3:24=E2=80=AFPM Wren Turkal <wt@penguintechs.o=
-rg> wrote:
-> >>>>
-> >>>> Krzysztof,
-> >>>>
-> >>>> I am reaching out to you as you had the most important objections to=
- the
-> >>>> change to fix qca6390 for the warm boot/module reload bug that I am
-> >>>> experiencing.
-> >>>>
-> >>>> For context, the problem is that the hci_uart module will send speci=
-fic
-> >>>> vendor specfic commands during shutdown of the hardware under most
-> >>>> situations. These VSCs put the bluetooth device into a non-working s=
-tate
-> >>>> on my Dell XPS 13 9310 with qca6390 bluetooth hardware.
-> >>>>
-> >>>> Zijun's proposed fix is to not send these commands when it's not
-> >>>> appropriate for the hardware. The vendor commands should be avoided =
-when
-> >>>> the hardware does not have persistent configuration or when the devi=
-ce
-> >>>> is in setup state (indicating that is has never been setup and shoul=
-d
-> >>>> not be sent the VSCs on the shutdown path). This is what Zijun's pat=
-ch
-> >>>> implements.
-> >>>>
-> >>>> In addition, Zijun's change removes the influence of both
-> >>>> the QCA_BT_OFF qca flag and and HCI_RUNNING hdev flag. Zijun asserts
-> >>>> that those flags should not influence the sending of the VSCs in the
-> >>>> shutdown path. If I understand KK's objections properly, this is whe=
-re
-> >>>> his objection is stemming from. KK, is this correct?
-> >>>>
-> >>>> Zijun's proposed fix can be seen here:
-> >>>> https://patchwork.kernel.org/project/bluetooth/patch/1713932807-1961=
-9-3-git-send-email-quic_zijuhu@quicinc.com/
-> >>>>
-> >>>> I'm wondering if we can resolve this impasse by splitting the change
-> >>>> into two changes, as follows:
-> >>>>
-> >>>> 1. Change that removes the influence of the QCA_BT_OFF and HCI_RUNNI=
-NG
-> >>>> flags in the shutdown path.
-> >>>> 2. Add the quirk from Zijun's patch that fixes my hardward configura=
-tion.
-> >>>>
-> >>>> I'm hoping that better clearer descriptions for #1 can help get that
-> >>>> landed since the logic current appears to be at odds with how the
-> >>>> hardware works.
-> >>>>
-> >>>> Also, I am happy to split the patches into the two patches, or (mayb=
-e
-> >>>> more ideally) just modify the commit message to better indicate the
-> >>>> reason the change. I just need guidance from maintainers so that
-> >>>> whatever work I do leads to something acceptable for y'all.
-> >>>>
-> >>>> So, please help me get this done. I am just a user with broken hardw=
-are
-> >>>> and a fondness for Linux. I would love to help do what's needed to g=
-et
-> >>>> this fix landed.
-> >>>
-> >>> Ive also objected to that change, in fact the whole shutdown sequence
-> >>> is sort of bogus in my opinion and the driver shall really have some
-> >>> means to find out what mode it is in when it reboots, regardless if
-> >>> cold or warm boot, since otherwise we are in trouble if the user is
-> >>> booting from another OS that doesn't do the expected shutdown
-> >>> sequence.
-> >>
-> >> This criticism makes a ton of sense. I'm sorry I missed it before. The=
-re
-> >> were a lot of threads moving in parallel. However, I am curious. Given
-> >> that the patch improves the situation for users (like me). Is there an=
-y
-> >> way we can separate the redesign of the shutdown sequence and the UX
-> >> improvement that comes with this patch?
-> >>
-> >> Here's my concern. I am happy to do the work to redesign this. However=
-,
-> >> I don't think I have the information needed to do this since I don't
-> >> have access to the technical docs for the qca6390. I am worried that n=
-ot
-> >> accepting some form of this patch is letting perfect be the enemy of t=
-he
-> >> good. And I am not sure how I personally can help with that. If you
-> >> think it's possible for me to do this without the docs for the hardwar=
-e,
-> >> I am willing to give it a shot if I can get some guidance. Honestly, I
-> >> wish I had the skill to be confident about a change like this, but I d=
-on't.
-> >>
-> >> Any ideas on how to move forward would be greatly appreciated.
-> >>
-> >> And just to be perfectly clear, I have tested this patch on my laptop.
-> >> It greatly enhances my ability to use my hardware since I can reboot t=
-he
-> >> machine without having to make sure to power cycle the laptop. This is
-> >> not a theoretical improvement.
-> >
-> > I would really love some explanation why can't the driver know under
-> > what mode the controller is when it gets probed, because to me we
-> > cannot accept a driver that only works under certain condition after
-> > the boot and in case it is really impossible, can't even power cycle
-> > it to get it back to cold boot stage???
->
-> This is a great technical criticism of the driver, and I think you
-> deserve that explanation.
->
-> However, with the driver already in the kernel, shouldn't the bias be
-> toward mitigating the extremely bad UX and not hold users hostage for
-> the bad design which has already been approved and landed in the kernel?
->
-> > Also the criticism here should be directed to the vendor, how long
-> > have we been discussing problems in the QCA driver? And the only thing
-> > I see coming our way are work-arounds of the problems, the address not
-> > being unique coming from the firmware itself and when provided via DT
-> > the address is in the wrong byteorder and now that the driver must
-> > communicate the firmware on shutdown in order to get it working
-> > properly on the next boot.
->
-> I agree that Qualcomm should get flack for this, however, the UX problem
-> can be mitigated with a logic fix that doesn't make the init/shutdown
-> design problem any worse than it currently seems to be. I mean, wouldn't
-> this logic have to exist somewhere even if it weren't the shutdown path?
->
-> If you are trying to use this as leverage to get Qualcomm to do a bigger
-> thing (redesign the init/shutdown logic), I do think that tactic
-> needlessly puts users in the crossfire. I can totally understand why
-> you'd do it. I am just suffering the crossfire in the meantime, and it
-> doesn't feel great.
+kernel test robot noticed the following build warnings:
 
-So you prefer to risk getting a kernel crash due to UAF over Bluetooth
-not working? Really? Because I haven't seen any configuration that
-those changes you tested don't reintroduce the UAF, which is why I
-haven't applied that change to begin with, so no I'm not holding back
-to pressure Qualcomm to redesign the shutdown logic, it just these
-things got entangled because I just realized the shutdown thingy is
-really out of place, imo, but I'd be fine if there is a temporary fix
-until someone finally decide to spend some time to really fix the
-shutdown logic.
+[auto build test WARNING on bluetooth-next/master]
+[also build test WARNING on bluetooth/master linus/master v6.9-rc7 next-20240510]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Luiz-Augusto-von-Dentz/Bluetooth-MGMT-Make-MGMT_OP_LOAD_CONN_PARAM-update-existing-connection/20240510-223834
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
+patch link:    https://lore.kernel.org/r/20240510143645.1408056-1-luiz.dentz%40gmail.com
+patch subject: [PATCH v3] Bluetooth: MGMT: Make MGMT_OP_LOAD_CONN_PARAM update existing connection
+config: arm-defconfig (https://download.01.org/0day-ci/archive/20240511/202405110542.nDEonveB-lkp@intel.com/config)
+compiler: clang version 14.0.6 (https://github.com/llvm/llvm-project f28c006a5895fc0e329fe15fead81e37457cb1d1)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240511/202405110542.nDEonveB-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202405110542.nDEonveB-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+>> net/bluetooth/mgmt.c:7922:6: warning: variable 'i' is uninitialized when used here [-Wuninitialized]
+           if (i > 1)
+               ^
+   net/bluetooth/mgmt.c:7896:7: note: initialize the variable 'i' to silence this warning
+           int i;
+                ^
+                 = 0
+   1 warning generated.
 
 
---=20
-Luiz Augusto von Dentz
+vim +/i +7922 net/bluetooth/mgmt.c
+
+  7888	
+  7889	static int load_conn_param(struct sock *sk, struct hci_dev *hdev, void *data,
+  7890				   u16 len)
+  7891	{
+  7892		struct mgmt_cp_load_conn_param *cp = data;
+  7893		const u16 max_param_count = ((U16_MAX - sizeof(*cp)) /
+  7894					     sizeof(struct mgmt_conn_param));
+  7895		u16 param_count, expected_len;
+  7896		int i;
+  7897	
+  7898		if (!lmp_le_capable(hdev))
+  7899			return mgmt_cmd_status(sk, hdev->id, MGMT_OP_LOAD_CONN_PARAM,
+  7900					       MGMT_STATUS_NOT_SUPPORTED);
+  7901	
+  7902		param_count = __le16_to_cpu(cp->param_count);
+  7903		if (param_count > max_param_count) {
+  7904			bt_dev_err(hdev, "load_conn_param: too big param_count value %u",
+  7905				   param_count);
+  7906			return mgmt_cmd_status(sk, hdev->id, MGMT_OP_LOAD_CONN_PARAM,
+  7907					       MGMT_STATUS_INVALID_PARAMS);
+  7908		}
+  7909	
+  7910		expected_len = struct_size(cp, params, param_count);
+  7911		if (expected_len != len) {
+  7912			bt_dev_err(hdev, "load_conn_param: expected %u bytes, got %u bytes",
+  7913				   expected_len, len);
+  7914			return mgmt_cmd_status(sk, hdev->id, MGMT_OP_LOAD_CONN_PARAM,
+  7915					       MGMT_STATUS_INVALID_PARAMS);
+  7916		}
+  7917	
+  7918		bt_dev_dbg(hdev, "param_count %u", param_count);
+  7919	
+  7920		hci_dev_lock(hdev);
+  7921	
+> 7922		if (i > 1)
+  7923			hci_conn_params_clear_disabled(hdev);
+  7924	
+  7925		for (i = 0; i < param_count; i++) {
+  7926			struct mgmt_conn_param *param = &cp->params[i];
+  7927			struct hci_conn_params *hci_param;
+  7928			u16 min, max, latency, timeout;
+  7929			u8 addr_type;
+  7930			bool update;
+  7931	
+  7932			bt_dev_dbg(hdev, "Adding %pMR (type %u)", &param->addr.bdaddr,
+  7933				   param->addr.type);
+  7934	
+  7935			if (param->addr.type == BDADDR_LE_PUBLIC) {
+  7936				addr_type = ADDR_LE_DEV_PUBLIC;
+  7937			} else if (param->addr.type == BDADDR_LE_RANDOM) {
+  7938				addr_type = ADDR_LE_DEV_RANDOM;
+  7939			} else {
+  7940				bt_dev_err(hdev, "ignoring invalid connection parameters");
+  7941				continue;
+  7942			}
+  7943	
+  7944			min = le16_to_cpu(param->min_interval);
+  7945			max = le16_to_cpu(param->max_interval);
+  7946			latency = le16_to_cpu(param->latency);
+  7947			timeout = le16_to_cpu(param->timeout);
+  7948	
+  7949			bt_dev_dbg(hdev, "min 0x%04x max 0x%04x latency 0x%04x timeout 0x%04x",
+  7950				   min, max, latency, timeout);
+  7951	
+  7952			if (hci_check_conn_params(min, max, latency, timeout) < 0) {
+  7953				bt_dev_err(hdev, "ignoring invalid connection parameters");
+  7954				continue;
+  7955			}
+  7956	
+  7957			/* Detect when the loading is for an existing parameter then
+  7958			 * attempt to trigger the connection update procedure.
+  7959			 */
+  7960			if (!i && param_count == 1) {
+  7961				hci_param = hci_conn_params_lookup(hdev,
+  7962								   &param->addr.bdaddr,
+  7963								   addr_type);
+  7964				if (hci_param)
+  7965					update = true;
+  7966				else
+  7967					hci_conn_params_clear_disabled(hdev);
+  7968			}
+  7969	
+  7970			hci_param = hci_conn_params_add(hdev, &param->addr.bdaddr,
+  7971							addr_type);
+  7972			if (!hci_param) {
+  7973				bt_dev_err(hdev, "failed to add connection parameters");
+  7974				continue;
+  7975			}
+  7976	
+  7977			hci_param->conn_min_interval = min;
+  7978			hci_param->conn_max_interval = max;
+  7979			hci_param->conn_latency = latency;
+  7980			hci_param->supervision_timeout = timeout;
+  7981	
+  7982			if (update) {
+  7983				struct hci_conn *conn;
+  7984	
+  7985				conn = hci_conn_hash_lookup_le(hdev, &hci_param->addr,
+  7986							       addr_type);
+  7987				if (conn && conn->role == HCI_ROLE_MASTER &&
+  7988				    (conn->le_conn_min_interval != min ||
+  7989				     conn->le_conn_max_interval != max ||
+  7990				     conn->le_conn_latency != latency ||
+  7991				     conn->le_supv_timeout != timeout))
+  7992					hci_cmd_sync_queue(hdev, conn_update_sync,
+  7993							   hci_param, NULL);
+  7994			}
+  7995		}
+  7996	
+  7997		hci_dev_unlock(hdev);
+  7998	
+  7999		return mgmt_cmd_complete(sk, hdev->id, MGMT_OP_LOAD_CONN_PARAM, 0,
+  8000					 NULL, 0);
+  8001	}
+  8002	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
