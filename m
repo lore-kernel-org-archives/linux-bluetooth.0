@@ -1,107 +1,96 @@
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f198.google.com (mail-il1-f198.google.com [209.85.166.198])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C61EA5490E
-	for <linux-bluetooth@vger.kernel.org>; Fri, 10 May 2024 06:45:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 031F014A0AD
+	for <linux-bluetooth@vger.kernel.org>; Fri, 10 May 2024 08:47:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.198
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715323518; cv=none; b=V7pbs0ne8fZpf2PhYj9J2Yv9UOUQnWyP3ZeiCXuSkw7ZfSK5+MjHFcBC5qIpfJD6W95tNwidUhA2QIFN9wtCDm+R8cPCVcWaKWIZI91XM6f5rCKsmGQZ/CYzwU/IV1loLfjEud/gvrOk6eVysi64qpxh618y+0vu0hW/yznusxk=
+	t=1715330849; cv=none; b=c5cIUEr2eacv1rFRVe7FLwXfrani5NEkMfffi6YKnE5jSp8nslvoQ/zddUzsnH9UWRF0tKjEszeNISebMkL4VUdvgNNKHyjlhU9zC1gdZpeW763fJ3jVpy7oWzmOd3LFb37ejrqNfHgGWeBMt9Zg8eXH/TsgPFLeNEf29lrhNyw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715323518; c=relaxed/simple;
-	bh=y96GLAfCjDFA4/+yLm8gb6N5lw9ko5Cbuar6qPhAkec=;
-	h=From:To:Cc:Subject:Date:Message-Id; b=l5QrDeBLfNO0ubvqzEO0aOqUlDgEtV0zECAP/T+pTP2i7Ks6RY0kLt3zQ3Re/TS3LnIt0tN9S6Y4nOKXM7nPnbcQa0AVylBTjj2jlJ0/RPd0OXQEb8yqF0Ph15g7qlsYtWP5R4DFqfGeRsjLzZOFQDkG75EzYIyDWtZv+STav4Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=qualcomm.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=ojLbbJd/; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="ojLbbJd/"
-Received: from pps.filterd (m0279867.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 44A2tiwR000751;
-	Fri, 10 May 2024 06:45:14 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	from:to:cc:subject:date:message-id; s=qcppdkim1; bh=Z9Pi8bnqwpsy
-	PQFP0DUrjJ45pBDbOiVb4kma2f/24T4=; b=ojLbbJd/5f51SgrJ3OaESD8R8r7B
-	1iCWuQ1fTWICcRFyAZDdNetJwmaM8BhP0yBMPqfqev2PNMNMj6TdQY+T3tDe/LH2
-	c5JHFWmhxw0tN1ZF0GnZm8d8w1DNjoHYtekbiFAl6g50athLFs0TA2/tQKOJQukp
-	GUksJSWLpb2lz/foUoYKmhCRhejuyvUBCOgib1YpEY4/qIIWCbQ2eWiAH0cDTpFl
-	4ieRbsXSa7yEpxdBHQNPPVaDxO7Qsg0fzW0zs9sRZ8H0lVzO24gHgVq//I9/dF12
-	YYmi4coWejgALCqGMt2lDh1g6d96pnBH8z64avyCtHgQpgzpIMUNCmcbwQ==
-Received: from apblrppmta02.qualcomm.com (blr-bdr-fw-01_GlobalNAT_AllZones-Outside.qualcomm.com [103.229.18.19])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3y16w0rsvb-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 10 May 2024 06:45:14 +0000 (GMT)
-Received: from pps.filterd (APBLRPPMTA02.qualcomm.com [127.0.0.1])
-	by APBLRPPMTA02.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTP id 44A6j9gL028514;
-	Fri, 10 May 2024 06:45:09 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-	by APBLRPPMTA02.qualcomm.com (PPS) with ESMTPS id 3xwe3krpdw-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
-	Fri, 10 May 2024 06:45:09 +0000
-Received: from APBLRPPMTA02.qualcomm.com (APBLRPPMTA02.qualcomm.com [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 44A6j9Ro028505;
-	Fri, 10 May 2024 06:45:09 GMT
-Received: from hu-maiyas-hyd.qualcomm.com (hu-rbujala-hyd.qualcomm.com [10.213.107.103])
-	by APBLRPPMTA02.qualcomm.com (PPS) with ESMTP id 44A6j97S028504;
-	Fri, 10 May 2024 06:45:09 +0000
-Received: by hu-maiyas-hyd.qualcomm.com (Postfix, from userid 4130939)
-	id 895D0609546; Fri, 10 May 2024 12:15:01 +0530 (+0530)
-From: Raghavender Reddy Bujala <quic_rbujala@quicinc.com>
-To: ofono@ofono.org, linux-bluetooth@vger.kernel.org
-Cc: quic_mohamull@quicinc.com, quic_hbandi@quicinc.com,
-        quic_anubhavg@quicinc.com,
-        Raghavender Reddy Bujala <quic_rbujala@quicinc.com>
-Subject: [PATCH v1] Permission for pulseaudio to use ofono.
-Date: Fri, 10 May 2024 12:14:56 +0530
-Message-Id: <20240510064456.24101-1-quic_rbujala@quicinc.com>
-X-Mailer: git-send-email 2.17.1
-X-QCInternal: smtphost
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: fn-NRKJnRqOT4BRi9ETWqpSW5N5Du8VX
-X-Proofpoint-ORIG-GUID: fn-NRKJnRqOT4BRi9ETWqpSW5N5Du8VX
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.650,FMLib:17.11.176.26
- definitions=2024-05-10_04,2024-05-10_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 bulkscore=0
- malwarescore=0 suspectscore=0 adultscore=0 mlxlogscore=801 phishscore=0
- mlxscore=0 lowpriorityscore=0 clxscore=1011 impostorscore=0
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2405010000 definitions=main-2405100047
+	s=arc-20240116; t=1715330849; c=relaxed/simple;
+	bh=z4fieskV9fBnvHcAQSR6SluMypmP6b+QigJYTswAuXY=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=Q8GMljH/ttyah3eYr7WEN50rcm7th4fae/mVkjXnbM45jkZa0BGR7Odz3kGWJpe5lcq6lBTnCFl6DA0uDIHUWAxvAJEehdJ7FNoDUUDUiBVpY1MGwFVKx7rXfn8gIN7OQ33MRzBW+lqE2Vk+CuYZuMHaA71bSBrO/xIHRj4JnAw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.198
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-36c60af9b4aso21377265ab.2
+        for <linux-bluetooth@vger.kernel.org>; Fri, 10 May 2024 01:47:27 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1715330847; x=1715935647;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=G7ysTa8lGB3gIp89Re4Hb5zO3F9EmrL6VpRkQGWIOKY=;
+        b=in7n2lqs1GCEHgYPX3ZcOZ9s3uVpAXUtt2x57XiTGYMd1DrW50T6o1FzofzuCCZ1R+
+         s0qGD+1yG7GQWlWRM/ZICLa4he1uLP4yTQG/Z2iR4Jr3wGr5f1LOjx7EV40PwB2quwW4
+         sti7zU5U4kdDHBx6iKt+XcjLQT03cfaRpM1NfKDNyjjxDoU7jStqrGT4wgGEn11FlD1S
+         sLiHwHXKF47FKQPqEWTAAlY5FtLc8RfPURT7iBQMlatMlkxUlrupp16W+VsD6VxvSPjg
+         KNMXEFYB0vMtv6IPnPq+W4AU66KcmCnoBej5D06DuuLodPSy5bsZ/je2VbIqmQi+KHBG
+         hu4Q==
+X-Gm-Message-State: AOJu0YynbVWoxfyTfsAoqJbqtmshLdk6fqjGdwbROPGEnCqQ0YlMOvWC
+	RODzGZnG7tGnsSNtfoRCYQmD48pfrpMrxQ8U+wIYr5l6I7OHksg6lqmaspm8JpVvtby6KLRJsxh
+	5o1gKMj1d5V9v6KkDPHwPM5AB+dY8H66k8bvkaTpOytlOWyQ5QHTyfNI=
+X-Google-Smtp-Source: AGHT+IHc0ETxoTnfULqi5pFfXN+tggwnOSONEjSVana0f0Oz1M23Mem0r9CAo328qe/t6U58PUgC4sx1zREtOZW7QwOBMm8sOVRr
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+X-Received: by 2002:a05:6e02:1c41:b0:36c:48c5:d59e with SMTP id
+ e9e14a558f8ab-36cc14f6cb7mr1060615ab.6.1715330847207; Fri, 10 May 2024
+ 01:47:27 -0700 (PDT)
+Date: Fri, 10 May 2024 01:47:27 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000d200cc0618159597@google.com>
+Subject: [syzbot] Monthly bluetooth report (May 2024)
+From: syzbot <syzbot+listd0ba33904b1725281a03@syzkaller.appspotmail.com>
+To: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	luiz.dentz@gmail.com, marcel@holtmann.org, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-When pulseaudio is trying to Register with  ofono
-on interface org.ofono.HandsfreeAudioManager, dbus
-is throwing org.freedesktop.DBus.Error.AccessDenied
-with string "Rejected send message".
+Hello bluetooth maintainers/developers,
 
-To allow pulseaudio to send messages to org.ofono
-service over dbus added this rule.
+This is a 31-day syzbot report for the bluetooth subsystem.
+All related reports/information can be found at:
+https://syzkaller.appspot.com/upstream/s/bluetooth
 
-Signed-off-by: Raghavender Reddy Bujala <quic_rbujala@quicinc.com>
+During the period, 10 new issues were detected and 0 were fixed.
+In total, 47 issues are still open and 63 have been fixed so far.
+
+Some of the still happening issues:
+
+Ref  Crashes Repro Title
+<1>  5056    Yes   WARNING in hci_conn_timeout
+                   https://syzkaller.appspot.com/bug?extid=2446dd3cb07277388db6
+<2>  2664    Yes   WARNING in call_timer_fn
+                   https://syzkaller.appspot.com/bug?extid=6fb78d577e89e69602f9
+<3>  2546    Yes   WARNING in hci_conn_del
+                   https://syzkaller.appspot.com/bug?extid=b2545b087a01a7319474
+<4>  913     Yes   KASAN: slab-use-after-free Read in __hci_req_sync
+                   https://syzkaller.appspot.com/bug?extid=27209997e4015fb4702e
+<5>  522     No    possible deadlock in __flush_workqueue
+                   https://syzkaller.appspot.com/bug?extid=da0a9c9721e36db712e8
+<6>  361     No    possible deadlock in touch_wq_lockdep_map
+                   https://syzkaller.appspot.com/bug?extid=91dbdfecdd3287734d8e
+<7>  236     Yes   KASAN: slab-use-after-free Write in sco_sock_timeout
+                   https://syzkaller.appspot.com/bug?extid=4c0d0c4cde787116d465
+<8>  119     Yes   general protection fault in lock_sock_nested
+                   https://syzkaller.appspot.com/bug?extid=d3ccfb78a0dc16ffebe3
+<9>  61      Yes   KASAN: slab-use-after-free Write in sco_conn_del
+                   https://syzkaller.appspot.com/bug?extid=6b9277cad941daf126a2
+<10> 7       Yes   BUG: sleeping function called from invalid context in hci_le_create_big_complete_evt
+                   https://syzkaller.appspot.com/bug?extid=2fb0835e0c9cefc34614
+
 ---
- ofono/src/ofono.conf | 4 ++++
- 1 file changed, 4 insertions(+)
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-diff --git a/ofono/src/ofono.conf b/ofono/src/ofono.conf
-index 6c5483ce..c946e822 100644
---- a/ofono/src/ofono.conf
-+++ b/ofono/src/ofono.conf
-@@ -32,6 +32,10 @@
-     <allow send_interface="org.ofono.intel.LteCoexistenceAgent"/>
-   </policy>
- 
-+  <policy user="pulse">
-+    <allow send_destination="org.ofono"/>
-+  </policy>
-+
-   <policy at_console="true">
-     <allow send_destination="org.ofono"/>
-   </policy>
--- 
-2.17.1
+To disable reminders for individual bugs, reply with the following command:
+#syz set <Ref> no-reminders
 
+To change bug's subsystems, reply with:
+#syz set <Ref> subsystems: new-subsystem
+
+You may send multiple commands in a single email message.
