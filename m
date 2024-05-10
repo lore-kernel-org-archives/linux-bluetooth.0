@@ -1,27 +1,27 @@
 Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AAFA16F829
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 788E416F0FD
 	for <linux-bluetooth@vger.kernel.org>; Fri, 10 May 2024 12:14:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715343257; cv=none; b=AugFvVFW5QhU8wKTBneX2en5uRX3lJT59W/OSnfyKxquDfMX1fQTfvFGcKwTR79kNRWVReP6gPVAbvtO8sXTyPqxXCuDJE6rRoP98U80NtVXhstdwUnQTDlx44rtltZkZ5kMArbFNsoH5N92bttj673bwWvT0RY0FzPjcMkVk2E=
+	t=1715343257; cv=none; b=Gubk5hhw0X2V3zQ8oXSzHQ8SIU5WVQJ1RnHthAPT28KoDPDTPDs9wQ7hjBtQsnqNxR2RRbIHCfNONXnjtywPO+dgyDHresYlttiPYkQpX4KCSmFScasMzol96h2RaX9WaO/WyFFI2rhJGT5xoxFb9O31UH/6LVIvOq2RzDw5Xt0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1715343257; c=relaxed/simple;
-	bh=XL/7SxkDVsEMuouDDcQaTT4AwMz/tx8Nfzhai1nup08=;
+	bh=LzkVIViMWIOKpornHLG/Viby6Q0GIaFx/oJcwTC9KMw=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=bvQMiCWRWNgoqTEfue5yu/G9k+Im4WOXSHjlqLxgNuYoKRT0ZCJEKXft1mDN/tiigXACHkBb3l/BHaDbtVcoJCZHQRBEZ45q+eKs/egnKQcvZKQyNdVYUXW+kpR8Cp7FHQqfePKY3T1Lf/XSYYMvVAY0SenN2ck3JS3Broayfqo=
+	 MIME-Version; b=n4fHFJeRGD1Nd2E4Oep4NSLoMPAWUBJWxaaJ99QkGA2p8zkGO7xVG9rxWDprwgiXyxuh88WS/OW8su+YPtBXMM9rOR8+84ewEwc3b010cQjkTUBJbwHLhjsACmNhrj+B+Jy5JJFs9e0m9Y0tYNcFScqLNq2qwLtto5cQqCfQDFM=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.183.195
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hadess.net
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 6CA1160011;
-	Fri, 10 May 2024 12:13:58 +0000 (UTC)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id C099660010;
+	Fri, 10 May 2024 12:13:57 +0000 (UTC)
 From: Bastien Nocera <hadess@hadess.net>
 To: linux-bluetooth@vger.kernel.org
 Cc: Bastien Nocera <hadess@hadess.net>
-Subject: [BlueZ v2 09/20] media: Fix memory leak
-Date: Fri, 10 May 2024 14:10:19 +0200
-Message-ID: <20240510121355.3241456-10-hadess@hadess.net>
+Subject: [BlueZ v2 07/20] monitor/att: Fix memory leak
+Date: Fri, 10 May 2024 14:10:17 +0200
+Message-ID: <20240510121355.3241456-8-hadess@hadess.net>
 X-Mailer: git-send-email 2.44.0
 In-Reply-To: <20240510121355.3241456-1-hadess@hadess.net>
 References: <20240510121355.3241456-1-hadess@hadess.net>
@@ -34,31 +34,214 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-GND-Sasl: hadess@hadess.net
 
-Error: RESOURCE_LEAK (CWE-772): [#def47] [important]
-bluez-5.75/profiles/audio/media.c:1278:2: alloc_arg: "asprintf" allocates memory that is stored into "name". [Note: The source code implementation of the function has been overridden by a builtin model.]
-bluez-5.75/profiles/audio/media.c:1291:2: noescape: Resource "name" is not freed or pointed-to in "bt_bap_add_vendor_pac".
-bluez-5.75/profiles/audio/media.c:1297:3: leaked_storage: Variable "name" going out of scope leaks the storage it points to.
-1295|			error("Unable to create PAC");
-1296|			free(metadata);
-1297|->			return false;
-1298|		}
-1299|
----
- profiles/audio/media.c | 1 +
- 1 file changed, 1 insertion(+)
+name2utf8() returns newly allocated memory which needs to be freed.
 
-diff --git a/profiles/audio/media.c b/profiles/audio/media.c
-index 07147a25d532..4bbd584deaba 100644
---- a/profiles/audio/media.c
-+++ b/profiles/audio/media.c
-@@ -1293,6 +1293,7 @@ static bool endpoint_init_pac(struct media_endpoint *endpoint, uint8_t type,
- 				&data, metadata);
- 	if (!endpoint->pac) {
- 		error("Unable to create PAC");
-+		free(name);
- 		free(metadata);
- 		return false;
- 	}
+Error: RESOURCE_LEAK (CWE-772): [#def27] [important]
+bluez-5.75/monitor/att.c:2291:2: alloc_fn: Storage is returned from allocation function "name2utf8".
+bluez-5.75/monitor/att.c:2291:2: var_assign: Assigning: "name" = storage returned from "name2utf8((uint8_t *)frame->data, frame->size)".
+bluez-5.75/monitor/att.c:2293:2: noescape: Resource "name" is not freed or pointed-to in "printf". [Note: The source code implementation of the function has been overridden by a builtin model.]
+bluez-5.75/monitor/att.c:2294:1: leaked_storage: Variable "name" going out of scope leaks the storage it points to.
+2292|
+2293|		print_field("  Media Player Name: %s", name);
+2294|-> }
+2295|
+2296|   static void mp_name_read(const struct l2cap_frame *frame)
+
+Error: RESOURCE_LEAK (CWE-772): [#def28] [important]
+bluez-5.75/monitor/att.c:2320:2: alloc_fn: Storage is returned from allocation function "name2utf8".
+bluez-5.75/monitor/att.c:2320:2: var_assign: Assigning: "name" = storage returned from "name2utf8((uint8_t *)frame->data, frame->size)".
+bluez-5.75/monitor/att.c:2322:2: noescape: Resource "name" is not freed or pointed-to in "printf". [Note: The source code implementation of the function has been overridden by a builtin model.]
+bluez-5.75/monitor/att.c:2323:1: leaked_storage: Variable "name" going out of scope leaks the storage it points to.
+2321|
+2322|		print_field("  Track Title: %s", name);
+2323|-> }
+2324|
+2325|   static void track_title_read(const struct l2cap_frame *frame)
+
+Error: RESOURCE_LEAK (CWE-772): [#def29] [important]
+bluez-5.75/monitor/att.c:2453:2: alloc_fn: Storage is returned from allocation function "name2utf8".
+bluez-5.75/monitor/att.c:2453:2: var_assign: Assigning: "name" = storage returned from "name2utf8((uint8_t *)frame->data, frame->size)".
+bluez-5.75/monitor/att.c:2455:2: noescape: Resource "name" is not freed or pointed-to in "printf". [Note: The source code implementation of the function has been overridden by a builtin model.]
+bluez-5.75/monitor/att.c:2456:1: leaked_storage: Variable "name" going out of scope leaks the storage it points to.
+2454|
+2455|		print_field("  Bearer Name: %s", name);
+2456|-> }
+2457|
+2458|   static void bearer_name_read(const struct l2cap_frame *frame)
+
+Error: RESOURCE_LEAK (CWE-772): [#def30] [important]
+bluez-5.75/monitor/att.c:2472:2: alloc_fn: Storage is returned from allocation function "name2utf8".
+bluez-5.75/monitor/att.c:2472:2: var_assign: Assigning: "name" = storage returned from "name2utf8((uint8_t *)frame->data, frame->size)".
+bluez-5.75/monitor/att.c:2474:2: noescape: Resource "name" is not freed or pointed-to in "printf". [Note: The source code implementation of the function has been overridden by a builtin model.]
+bluez-5.75/monitor/att.c:2475:1: leaked_storage: Variable "name" going out of scope leaks the storage it points to.
+2473|
+2474|		print_field("  Bearer Uci Name: %s", name);
+2475|-> }
+2476|
+2477|   static void print_technology_name(const struct l2cap_frame *frame)
+
+Error: RESOURCE_LEAK (CWE-772): [#def31] [important]
+bluez-5.75/monitor/att.c:2541:2: alloc_fn: Storage is returned from allocation function "name2utf8".
+bluez-5.75/monitor/att.c:2541:2: var_assign: Assigning: "name" = storage returned from "name2utf8((uint8_t *)frame->data, frame->size)".
+bluez-5.75/monitor/att.c:2543:2: noescape: Resource "name" is not freed or pointed-to in "printf". [Note: The source code implementation of the function has been overridden by a builtin model.]
+bluez-5.75/monitor/att.c:2544:1: leaked_storage: Variable "name" going out of scope leaks the storage it points to.
+2542|
+2543|		print_field("  Uri scheme Name: %s", name);
+2544|-> }
+2545|
+2546|   static void bearer_uri_schemes_list_read(const struct l2cap_frame *frame)
+
+Error: RESOURCE_LEAK (CWE-772): [#def32] [important]
+bluez-5.75/monitor/att.c:2653:2: alloc_fn: Storage is returned from allocation function "name2utf8".
+bluez-5.75/monitor/att.c:2653:2: var_assign: Assigning: "call_uri" = storage returned from "name2utf8((uint8_t *)frame->data, frame->size)".
+bluez-5.75/monitor/att.c:2655:2: noescape: Resource "call_uri" is not freed or pointed-to in "printf". [Note: The source code implementation of the function has been overridden by a builtin model.]
+bluez-5.75/monitor/att.c:2660:1: leaked_storage: Variable "call_uri" going out of scope leaks the storage it points to.
+2658|		if (frame->size)
+2659|			print_hex_field("  call_list Data", frame->data, frame->size);
+2660|-> }
+2661|
+2662|   static void bearer_current_call_list_read(const struct l2cap_frame *frame)
+
+Error: RESOURCE_LEAK (CWE-772): [#def33] [important]
+bluez-5.75/monitor/att.c:2741:2: alloc_fn: Storage is returned from allocation function "name2utf8".
+bluez-5.75/monitor/att.c:2741:2: var_assign: Assigning: "name" = storage returned from "name2utf8((uint8_t *)frame->data, frame->size)".
+bluez-5.75/monitor/att.c:2743:2: noescape: Resource "name" is not freed or pointed-to in "printf". [Note: The source code implementation of the function has been overridden by a builtin model.]
+bluez-5.75/monitor/att.c:2748:1: leaked_storage: Variable "name" going out of scope leaks the storage it points to.
+2746|		if (frame->size)
+2747|			print_hex_field("  Data", frame->data, frame->size);
+2748|-> }
+2749|
+2750|   static void incom_target_bearer_uri_read(const struct l2cap_frame *frame)
+
+Error: RESOURCE_LEAK (CWE-772): [#def34] [important]
+bluez-5.75/monitor/att.c:2851:3: alloc_fn: Storage is returned from allocation function "name2utf8".
+bluez-5.75/monitor/att.c:2851:3: var_assign: Assigning: "name" = storage returned from "name2utf8((uint8_t *)frame->data, frame->size)".
+bluez-5.75/monitor/att.c:2852:3: noescape: Resource "name" is not freed or pointed-to in "printf". [Note: The source code implementation of the function has been overridden by a builtin model.]
+bluez-5.75/monitor/att.c:2871:1: leaked_storage: Variable "name" going out of scope leaks the storage it points to.
+2869|		if (frame->size)
+2870|			print_hex_field("call_cp Data", frame->data, frame->size);
+2871|-> }
+2872|
+2873|   static void print_call_cp_notification(const struct l2cap_frame *frame)
+
+Error: RESOURCE_LEAK (CWE-772): [#def35] [important]
+bluez-5.75/monitor/att.c:3046:2: alloc_fn: Storage is returned from allocation function "name2utf8".
+bluez-5.75/monitor/att.c:3046:2: var_assign: Assigning: "name" = storage returned from "name2utf8((uint8_t *)frame->data, frame->size)".
+bluez-5.75/monitor/att.c:3048:2: noescape: Resource "name" is not freed or pointed-to in "printf". [Note: The source code implementation of the function has been overridden by a builtin model.]
+bluez-5.75/monitor/att.c:3053:1: leaked_storage: Variable "name" going out of scope leaks the storage it points to.
+3051|		if (frame->size)
+3052|			print_hex_field(" Data", frame->data, frame->size);
+3053|-> }
+3054|
+3055|   static void incoming_call_read(const struct l2cap_frame *frame)
+
+Error: RESOURCE_LEAK (CWE-772): [#def36] [important]
+bluez-5.75/monitor/att.c:3077:2: alloc_fn: Storage is returned from allocation function "name2utf8".
+bluez-5.75/monitor/att.c:3077:2: var_assign: Assigning: "name" = storage returned from "name2utf8((uint8_t *)frame->data, frame->size)".
+bluez-5.75/monitor/att.c:3079:2: noescape: Resource "name" is not freed or pointed-to in "printf". [Note: The source code implementation of the function has been overridden by a builtin model.]
+bluez-5.75/monitor/att.c:3084:1: leaked_storage: Variable "name" going out of scope leaks the storage it points to.
+3082|		if (frame->size)
+3083|			print_hex_field(" Data", frame->data, frame->size);
+3084|-> }
+3085|
+3086|   static void call_friendly_name_read(const struct l2cap_frame *frame)
+---
+ monitor/att.c | 19 +++++++++++++++++++
+ 1 file changed, 19 insertions(+)
+
+diff --git a/monitor/att.c b/monitor/att.c
+index b3fb3ba6a0ad..a23347ef7ede 100644
+--- a/monitor/att.c
++++ b/monitor/att.c
+@@ -2291,6 +2291,8 @@ static void print_mp_name(const struct l2cap_frame *frame)
+ 	name = name2utf8((uint8_t *)frame->data, frame->size);
+ 
+ 	print_field("  Media Player Name: %s", name);
++
++	g_free(name);
+ }
+ 
+ static void mp_name_read(const struct l2cap_frame *frame)
+@@ -2320,6 +2322,8 @@ static void print_track_title(const struct l2cap_frame *frame)
+ 	name = name2utf8((uint8_t *)frame->data, frame->size);
+ 
+ 	print_field("  Track Title: %s", name);
++
++	g_free(name);
+ }
+ 
+ static void track_title_read(const struct l2cap_frame *frame)
+@@ -2453,6 +2457,8 @@ static void print_bearer_name(const struct l2cap_frame *frame)
+ 	name = name2utf8((uint8_t *)frame->data, frame->size);
+ 
+ 	print_field("  Bearer Name: %s", name);
++
++	g_free(name);
+ }
+ 
+ static void bearer_name_read(const struct l2cap_frame *frame)
+@@ -2472,6 +2478,8 @@ static void bearer_uci_read(const struct l2cap_frame *frame)
+ 	name = name2utf8((uint8_t *)frame->data, frame->size);
+ 
+ 	print_field("  Bearer Uci Name: %s", name);
++
++	g_free(name);
+ }
+ 
+ static void print_technology_name(const struct l2cap_frame *frame)
+@@ -2541,6 +2549,8 @@ static void print_uri_scheme_list(const struct l2cap_frame *frame)
+ 	name = name2utf8((uint8_t *)frame->data, frame->size);
+ 
+ 	print_field("  Uri scheme Name: %s", name);
++
++	g_free(name);
+ }
+ 
+ static void bearer_uri_schemes_list_read(const struct l2cap_frame *frame)
+@@ -2654,6 +2664,8 @@ static void print_call_list(const struct l2cap_frame *frame)
+ 
+ 	print_field("  call_uri: %s", call_uri);
+ 
++	g_free(call_uri);
++
+ done:
+ 	if (frame->size)
+ 		print_hex_field("  call_list Data", frame->data, frame->size);
+@@ -2742,6 +2754,8 @@ static void print_target_uri(const struct l2cap_frame *frame)
+ 
+ 	print_field("  Uri: %s", name);
+ 
++	g_free(name);
++
+ done:
+ 	if (frame->size)
+ 		print_hex_field("  Data", frame->data, frame->size);
+@@ -2850,6 +2864,7 @@ static void print_call_cp(const struct l2cap_frame *frame)
+ 		str = "Originate";
+ 		name = name2utf8((uint8_t *)frame->data, frame->size);
+ 		print_field("  Operation: %s  Uri: %s", str, name);
++		g_free(name);
+ 		break;
+ 	case 0x05:
+ 		str = "Join";
+@@ -3047,6 +3062,8 @@ static void print_incom_call(const struct l2cap_frame *frame)
+ 
+ 	print_field("  call_string: %s", name);
+ 
++	g_free(name);
++
+ done:
+ 	if (frame->size)
+ 		print_hex_field(" Data", frame->data, frame->size);
+@@ -3078,6 +3095,8 @@ static void print_call_friendly_name(const struct l2cap_frame *frame)
+ 
+ 	print_field("  Friendly Name: %s", name);
+ 
++	g_free(name);
++
+ done:
+ 	if (frame->size)
+ 		print_hex_field(" Data", frame->data, frame->size);
 -- 
 2.44.0
 
