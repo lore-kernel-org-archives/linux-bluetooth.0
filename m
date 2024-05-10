@@ -1,26 +1,26 @@
 Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [217.70.183.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 618001635DC
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 617BA14E2D5
 	for <linux-bluetooth@vger.kernel.org>; Fri, 10 May 2024 09:18:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715332706; cv=none; b=Qo2YgNrU6UR0a39RXCKlHqtbOE9ZrpqXd7S3U8h9E8MPobzAW0GEypdBrcby3Ak8N9tLej2LlHTWjQRfgufyj6y4HVcYh/yOdVGZwUxiVQbtxv2PhizVq86Tz90ouINee1tryeDONTph4yNs1yRg63XWF2qPU1uJXHjTVj50Qrs=
+	t=1715332706; cv=none; b=juqDNLGlzf75g0QpgfGb/SJiaPlK57S740ObEaILUe5JqqojPTVcms6DR2NTeu/oqsLQFzbwuzOCvn+X36t8/2aoz+OkP70VCvJbeZ/QEtjbS7ej5TpimoDqy2rNxG81FoIombY2ZC7RrkGJQ8Fxrfo1DgaNGw+W0mlIA0c+Jw8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1715332706; c=relaxed/simple;
-	bh=LzkVIViMWIOKpornHLG/Viby6Q0GIaFx/oJcwTC9KMw=;
+	bh=G2B25kkAZiQUG7ifns57wTkbl2LqrY4Bf0pfzP6VO7M=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=AqNEcauKPdKGAVv61KNdtHurUF3Djz7D8SSNfGsOG6zLvuA5t6smI7lik35ys2xfbW40CHzhVa8OfLBoOMl+w/JT2DlkfjfJomVBwrH903xyFwcVQVWa+f1MHfFnEYJG5o7raUmGf6Ad8pNJxfdILhFnbgNLIccOJIjP18B9X5s=
+	 MIME-Version; b=beDjKMw3PJiU/omO2NJPWhZgsm5wappd7rEaovv9onG6pG5RhE5JPdlP0rFTENafZNGBtrPi2mStH3w1o3cu91sRqsQhJojdaN+yzcO5ENBRWawr7wELXGugmqXGIh4uh23LlQjyYKP0BZPM2c3cRqNVBUD2dPcVo4+gyzhtiK8=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.183.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hadess.net
-Received: by mail.gandi.net (Postfix) with ESMTPSA id B835B1BF20F
+Received: by mail.gandi.net (Postfix) with ESMTPSA id EE4641BF210
 	for <linux-bluetooth@vger.kernel.org>; Fri, 10 May 2024 09:18:16 +0000 (UTC)
 From: Bastien Nocera <hadess@hadess.net>
 To: linux-bluetooth@vger.kernel.org
-Subject: [BlueZ 07/14] monitor/att: Fix memory leak
-Date: Fri, 10 May 2024 11:11:05 +0200
-Message-ID: <20240510091814.3172988-8-hadess@hadess.net>
+Subject: [BlueZ 08/14] bap: Fix memory leaks
+Date: Fri, 10 May 2024 11:11:06 +0200
+Message-ID: <20240510091814.3172988-9-hadess@hadess.net>
 X-Mailer: git-send-email 2.44.0
 In-Reply-To: <20240510091814.3172988-1-hadess@hadess.net>
 References: <20240510091814.3172988-1-hadess@hadess.net>
@@ -33,214 +33,260 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-GND-Sasl: hadess@hadess.net
 
-name2utf8() returns newly allocated memory which needs to be freed.
+Error: RESOURCE_LEAK (CWE-772): [#def37] [important]
+bluez-5.75/profiles/audio/bap.c:1064:13: alloc_fn: Storage is returned from allocation function "util_malloc".
+bluez-5.75/profiles/audio/bap.c:1064:13: var_assign: Assigning: "__p" = storage returned from "util_malloc(__n * __s)".
+bluez-5.75/profiles/audio/bap.c:1064:13: noescape: Resource "__p" is not freed or pointed-to in "memset". [Note: The source code implementation of the function has been overridden by a builtin model.]
+bluez-5.75/profiles/audio/bap.c:1064:13: leaked_storage: Variable "__p" going out of scope leaks the storage it points to.
+bluez-5.75/profiles/audio/bap.c:1064:3: var_assign: Assigning: "l2_caps" = "({...; __p;})".
+bluez-5.75/profiles/audio/bap.c:1066:4: leaked_storage: Variable "l2_caps" going out of scope leaks the storage it points to.
+1064|			l2_caps = new0(struct iovec, 1);
+1065|			if (!util_iov_pull_u8(&iov, (void *)&l2_caps->iov_len))
+1066|->				goto fail;
+1067|
+1068|			util_iov_memcpy(l2_caps, util_iov_pull_mem(&iov,
 
-Error: RESOURCE_LEAK (CWE-772): [#def27] [important]
-bluez-5.75/monitor/att.c:2291:2: alloc_fn: Storage is returned from allocation function "name2utf8".
-bluez-5.75/monitor/att.c:2291:2: var_assign: Assigning: "name" = storage returned from "name2utf8((uint8_t *)frame->data, frame->size)".
-bluez-5.75/monitor/att.c:2293:2: noescape: Resource "name" is not freed or pointed-to in "printf". [Note: The source code implementation of the function has been overridden by a builtin model.]
-bluez-5.75/monitor/att.c:2294:1: leaked_storage: Variable "name" going out of scope leaks the storage it points to.
-2292|
-2293|		print_field("  Media Player Name: %s", name);
-2294|-> }
-2295|
-2296|   static void mp_name_read(const struct l2cap_frame *frame)
+Error: RESOURCE_LEAK (CWE-772): [#def38] [important]
+bluez-5.75/profiles/audio/bap.c:1064:13: alloc_fn: Storage is returned from allocation function "util_malloc".
+bluez-5.75/profiles/audio/bap.c:1064:13: var_assign: Assigning: "__p" = storage returned from "util_malloc(__n * __s)".
+bluez-5.75/profiles/audio/bap.c:1064:13: noescape: Resource "__p" is not freed or pointed-to in "memset". [Note: The source code implementation of the function has been overridden by a builtin model.]
+bluez-5.75/profiles/audio/bap.c:1064:13: leaked_storage: Variable "__p" going out of scope leaks the storage it points to.
+bluez-5.75/profiles/audio/bap.c:1064:3: var_assign: Assigning: "l2_caps" = "({...; __p;})".
+bluez-5.75/profiles/audio/bap.c:1068:3: noescape: Resource "l2_caps" is not freed or pointed-to in "util_iov_memcpy".
+bluez-5.75/profiles/audio/bap.c:1080:4: leaked_storage: Variable "l2_caps" going out of scope leaks the storage it points to.
+1078|			meta = new0(struct iovec, 1);
+1079|			if (!util_iov_pull_u8(&iov, (void *)&meta->iov_len))
+1080|->				goto fail;
+1081|
+1082|			util_iov_memcpy(meta,
 
-Error: RESOURCE_LEAK (CWE-772): [#def28] [important]
-bluez-5.75/monitor/att.c:2320:2: alloc_fn: Storage is returned from allocation function "name2utf8".
-bluez-5.75/monitor/att.c:2320:2: var_assign: Assigning: "name" = storage returned from "name2utf8((uint8_t *)frame->data, frame->size)".
-bluez-5.75/monitor/att.c:2322:2: noescape: Resource "name" is not freed or pointed-to in "printf". [Note: The source code implementation of the function has been overridden by a builtin model.]
-bluez-5.75/monitor/att.c:2323:1: leaked_storage: Variable "name" going out of scope leaks the storage it points to.
-2321|
-2322|		print_field("  Track Title: %s", name);
-2323|-> }
-2324|
-2325|   static void track_title_read(const struct l2cap_frame *frame)
+Error: RESOURCE_LEAK (CWE-772): [#def39] [important]
+bluez-5.75/profiles/audio/bap.c:1078:10: alloc_fn: Storage is returned from allocation function "util_malloc".
+bluez-5.75/profiles/audio/bap.c:1078:10: var_assign: Assigning: "__p" = storage returned from "util_malloc(__n * __s)".
+bluez-5.75/profiles/audio/bap.c:1078:10: noescape: Resource "__p" is not freed or pointed-to in "memset". [Note: The source code implementation of the function has been overridden by a builtin model.]
+bluez-5.75/profiles/audio/bap.c:1078:10: leaked_storage: Variable "__p" going out of scope leaks the storage it points to.
+bluez-5.75/profiles/audio/bap.c:1078:3: var_assign: Assigning: "meta" = "({...; __p;})".
+bluez-5.75/profiles/audio/bap.c:1080:4: leaked_storage: Variable "meta" going out of scope leaks the storage it points to.
+1078|			meta = new0(struct iovec, 1);
+1079|			if (!util_iov_pull_u8(&iov, (void *)&meta->iov_len))
+1080|->				goto fail;
+1081|
+1082|			util_iov_memcpy(meta,
 
-Error: RESOURCE_LEAK (CWE-772): [#def29] [important]
-bluez-5.75/monitor/att.c:2453:2: alloc_fn: Storage is returned from allocation function "name2utf8".
-bluez-5.75/monitor/att.c:2453:2: var_assign: Assigning: "name" = storage returned from "name2utf8((uint8_t *)frame->data, frame->size)".
-bluez-5.75/monitor/att.c:2455:2: noescape: Resource "name" is not freed or pointed-to in "printf". [Note: The source code implementation of the function has been overridden by a builtin model.]
-bluez-5.75/monitor/att.c:2456:1: leaked_storage: Variable "name" going out of scope leaks the storage it points to.
-2454|
-2455|		print_field("  Bearer Name: %s", name);
-2456|-> }
-2457|
-2458|   static void bearer_name_read(const struct l2cap_frame *frame)
+Error: RESOURCE_LEAK (CWE-772): [#def40] [important]
+bluez-5.75/profiles/audio/bap.c:1064:13: alloc_fn: Storage is returned from allocation function "util_malloc".
+bluez-5.75/profiles/audio/bap.c:1064:13: var_assign: Assigning: "__p" = storage returned from "util_malloc(__n * __s)".
+bluez-5.75/profiles/audio/bap.c:1064:13: noescape: Resource "__p" is not freed or pointed-to in "memset". [Note: The source code implementation of the function has been overridden by a builtin model.]
+bluez-5.75/profiles/audio/bap.c:1064:13: leaked_storage: Variable "__p" going out of scope leaks the storage it points to.
+bluez-5.75/profiles/audio/bap.c:1064:3: var_assign: Assigning: "l2_caps" = "({...; __p;})".
+bluez-5.75/profiles/audio/bap.c:1068:3: noescape: Resource "l2_caps" is not freed or pointed-to in "util_iov_memcpy".
+bluez-5.75/profiles/audio/bap.c:1119:4: noescape: Resource "l2_caps" is not freed or pointed-to in "bt_bap_add_bis".
+bluez-5.75/profiles/audio/bap.c:1119:4: noescape: Resource "l2_caps" is not freed or pointed-to in "bt_bap_add_bis".
+bluez-5.75/profiles/audio/bap.c:1097:5: leaked_storage: Variable "l2_caps" going out of scope leaks the storage it points to.
+1095|
+1096|				if (!util_iov_pull_u8(&iov, &bis_index))
+1097|->					goto fail;
+1098|
+1099|				util_debug(func, NULL, "BIS #%d", bis_index);
 
-Error: RESOURCE_LEAK (CWE-772): [#def30] [important]
-bluez-5.75/monitor/att.c:2472:2: alloc_fn: Storage is returned from allocation function "name2utf8".
-bluez-5.75/monitor/att.c:2472:2: var_assign: Assigning: "name" = storage returned from "name2utf8((uint8_t *)frame->data, frame->size)".
-bluez-5.75/monitor/att.c:2474:2: noescape: Resource "name" is not freed or pointed-to in "printf". [Note: The source code implementation of the function has been overridden by a builtin model.]
-bluez-5.75/monitor/att.c:2475:1: leaked_storage: Variable "name" going out of scope leaks the storage it points to.
-2473|
-2474|		print_field("  Bearer Uci Name: %s", name);
-2475|-> }
-2476|
-2477|   static void print_technology_name(const struct l2cap_frame *frame)
+Error: RESOURCE_LEAK (CWE-772): [#def41] [important]
+bluez-5.75/profiles/audio/bap.c:1078:10: alloc_fn: Storage is returned from allocation function "util_malloc".
+bluez-5.75/profiles/audio/bap.c:1078:10: var_assign: Assigning: "__p" = storage returned from "util_malloc(__n * __s)".
+bluez-5.75/profiles/audio/bap.c:1078:10: noescape: Resource "__p" is not freed or pointed-to in "memset". [Note: The source code implementation of the function has been overridden by a builtin model.]
+bluez-5.75/profiles/audio/bap.c:1078:10: leaked_storage: Variable "__p" going out of scope leaks the storage it points to.
+bluez-5.75/profiles/audio/bap.c:1078:3: var_assign: Assigning: "meta" = "({...; __p;})".
+bluez-5.75/profiles/audio/bap.c:1082:3: noescape: Resource "meta" is not freed or pointed-to in "util_iov_memcpy".
+bluez-5.75/profiles/audio/bap.c:1119:4: noescape: Resource "meta" is not freed or pointed-to in "bt_bap_add_bis".
+bluez-5.75/profiles/audio/bap.c:1119:4: noescape: Resource "meta" is not freed or pointed-to in "bt_bap_add_bis".
+bluez-5.75/profiles/audio/bap.c:1097:5: leaked_storage: Variable "meta" going out of scope leaks the storage it points to.
+1095|
+1096|				if (!util_iov_pull_u8(&iov, &bis_index))
+1097|->					goto fail;
+1098|
+1099|				util_debug(func, NULL, "BIS #%d", bis_index);
 
-Error: RESOURCE_LEAK (CWE-772): [#def31] [important]
-bluez-5.75/monitor/att.c:2541:2: alloc_fn: Storage is returned from allocation function "name2utf8".
-bluez-5.75/monitor/att.c:2541:2: var_assign: Assigning: "name" = storage returned from "name2utf8((uint8_t *)frame->data, frame->size)".
-bluez-5.75/monitor/att.c:2543:2: noescape: Resource "name" is not freed or pointed-to in "printf". [Note: The source code implementation of the function has been overridden by a builtin model.]
-bluez-5.75/monitor/att.c:2544:1: leaked_storage: Variable "name" going out of scope leaks the storage it points to.
-2542|
-2543|		print_field("  Uri scheme Name: %s", name);
-2544|-> }
-2545|
-2546|   static void bearer_uri_schemes_list_read(const struct l2cap_frame *frame)
+Error: RESOURCE_LEAK (CWE-772): [#def42] [important]
+bluez-5.75/profiles/audio/bap.c:1064:13: alloc_fn: Storage is returned from allocation function "util_malloc".
+bluez-5.75/profiles/audio/bap.c:1064:13: var_assign: Assigning: "__p" = storage returned from "util_malloc(__n * __s)".
+bluez-5.75/profiles/audio/bap.c:1064:13: noescape: Resource "__p" is not freed or pointed-to in "memset". [Note: The source code implementation of the function has been overridden by a builtin model.]
+bluez-5.75/profiles/audio/bap.c:1064:13: leaked_storage: Variable "__p" going out of scope leaks the storage it points to.
+bluez-5.75/profiles/audio/bap.c:1064:3: var_assign: Assigning: "l2_caps" = "({...; __p;})".
+bluez-5.75/profiles/audio/bap.c:1068:3: noescape: Resource "l2_caps" is not freed or pointed-to in "util_iov_memcpy".
+bluez-5.75/profiles/audio/bap.c:1104:5: leaked_storage: Variable "l2_caps" going out of scope leaks the storage it points to.
+1102|				l3_caps = new0(struct iovec, 1);
+1103|				if (!util_iov_pull_u8(&iov, (void *)&l3_caps->iov_len))
+1104|->					goto fail;
+1105|
+1106|				util_iov_memcpy(l3_caps,
 
-Error: RESOURCE_LEAK (CWE-772): [#def32] [important]
-bluez-5.75/monitor/att.c:2653:2: alloc_fn: Storage is returned from allocation function "name2utf8".
-bluez-5.75/monitor/att.c:2653:2: var_assign: Assigning: "call_uri" = storage returned from "name2utf8((uint8_t *)frame->data, frame->size)".
-bluez-5.75/monitor/att.c:2655:2: noescape: Resource "call_uri" is not freed or pointed-to in "printf". [Note: The source code implementation of the function has been overridden by a builtin model.]
-bluez-5.75/monitor/att.c:2660:1: leaked_storage: Variable "call_uri" going out of scope leaks the storage it points to.
-2658|		if (frame->size)
-2659|			print_hex_field("  call_list Data", frame->data, frame->size);
-2660|-> }
-2661|
-2662|   static void bearer_current_call_list_read(const struct l2cap_frame *frame)
+Error: RESOURCE_LEAK (CWE-772): [#def43] [important]
+bluez-5.75/profiles/audio/bap.c:1102:14: alloc_fn: Storage is returned from allocation function "util_malloc".
+bluez-5.75/profiles/audio/bap.c:1102:14: var_assign: Assigning: "__p" = storage returned from "util_malloc(__n * __s)".
+bluez-5.75/profiles/audio/bap.c:1102:14: noescape: Resource "__p" is not freed or pointed-to in "memset". [Note: The source code implementation of the function has been overridden by a builtin model.]
+bluez-5.75/profiles/audio/bap.c:1102:14: leaked_storage: Variable "__p" going out of scope leaks the storage it points to.
+bluez-5.75/profiles/audio/bap.c:1102:4: var_assign: Assigning: "l3_caps" = "({...; __p;})".
+bluez-5.75/profiles/audio/bap.c:1104:5: leaked_storage: Variable "l3_caps" going out of scope leaks the storage it points to.
+1102|				l3_caps = new0(struct iovec, 1);
+1103|				if (!util_iov_pull_u8(&iov, (void *)&l3_caps->iov_len))
+1104|->					goto fail;
+1105|
+1106|				util_iov_memcpy(l3_caps,
 
-Error: RESOURCE_LEAK (CWE-772): [#def33] [important]
-bluez-5.75/monitor/att.c:2741:2: alloc_fn: Storage is returned from allocation function "name2utf8".
-bluez-5.75/monitor/att.c:2741:2: var_assign: Assigning: "name" = storage returned from "name2utf8((uint8_t *)frame->data, frame->size)".
-bluez-5.75/monitor/att.c:2743:2: noescape: Resource "name" is not freed or pointed-to in "printf". [Note: The source code implementation of the function has been overridden by a builtin model.]
-bluez-5.75/monitor/att.c:2748:1: leaked_storage: Variable "name" going out of scope leaks the storage it points to.
-2746|		if (frame->size)
-2747|			print_hex_field("  Data", frame->data, frame->size);
-2748|-> }
-2749|
-2750|   static void incom_target_bearer_uri_read(const struct l2cap_frame *frame)
+Error: RESOURCE_LEAK (CWE-772): [#def44] [important]
+bluez-5.75/profiles/audio/bap.c:1078:10: alloc_fn: Storage is returned from allocation function "util_malloc".
+bluez-5.75/profiles/audio/bap.c:1078:10: var_assign: Assigning: "__p" = storage returned from "util_malloc(__n * __s)".
+bluez-5.75/profiles/audio/bap.c:1078:10: noescape: Resource "__p" is not freed or pointed-to in "memset". [Note: The source code implementation of the function has been overridden by a builtin model.]
+bluez-5.75/profiles/audio/bap.c:1078:10: leaked_storage: Variable "__p" going out of scope leaks the storage it points to.
+bluez-5.75/profiles/audio/bap.c:1078:3: var_assign: Assigning: "meta" = "({...; __p;})".
+bluez-5.75/profiles/audio/bap.c:1082:3: noescape: Resource "meta" is not freed or pointed-to in "util_iov_memcpy".
+bluez-5.75/profiles/audio/bap.c:1104:5: leaked_storage: Variable "meta" going out of scope leaks the storage it points to.
+1102|				l3_caps = new0(struct iovec, 1);
+1103|				if (!util_iov_pull_u8(&iov, (void *)&l3_caps->iov_len))
+1104|->					goto fail;
+1105|
+1106|				util_iov_memcpy(l3_caps,
 
-Error: RESOURCE_LEAK (CWE-772): [#def34] [important]
-bluez-5.75/monitor/att.c:2851:3: alloc_fn: Storage is returned from allocation function "name2utf8".
-bluez-5.75/monitor/att.c:2851:3: var_assign: Assigning: "name" = storage returned from "name2utf8((uint8_t *)frame->data, frame->size)".
-bluez-5.75/monitor/att.c:2852:3: noescape: Resource "name" is not freed or pointed-to in "printf". [Note: The source code implementation of the function has been overridden by a builtin model.]
-bluez-5.75/monitor/att.c:2871:1: leaked_storage: Variable "name" going out of scope leaks the storage it points to.
-2869|		if (frame->size)
-2870|			print_hex_field("call_cp Data", frame->data, frame->size);
-2871|-> }
-2872|
-2873|   static void print_call_cp_notification(const struct l2cap_frame *frame)
+Error: RESOURCE_LEAK (CWE-772): [#def45] [important]
+bluez-5.75/profiles/audio/bap.c:1064:13: alloc_fn: Storage is returned from allocation function "util_malloc".
+bluez-5.75/profiles/audio/bap.c:1064:13: var_assign: Assigning: "__p" = storage returned from "util_malloc(__n * __s)".
+bluez-5.75/profiles/audio/bap.c:1064:13: noescape: Resource "__p" is not freed or pointed-to in "memset". [Note: The source code implementation of the function has been overridden by a builtin model.]
+bluez-5.75/profiles/audio/bap.c:1064:13: leaked_storage: Variable "__p" going out of scope leaks the storage it points to.
+bluez-5.75/profiles/audio/bap.c:1064:3: var_assign: Assigning: "l2_caps" = "({...; __p;})".
+bluez-5.75/profiles/audio/bap.c:1068:3: noescape: Resource "l2_caps" is not freed or pointed-to in "util_iov_memcpy".
+bluez-5.75/profiles/audio/bap.c:1119:4: noescape: Resource "l2_caps" is not freed or pointed-to in "bt_bap_add_bis".
+bluez-5.75/profiles/audio/bap.c:1119:4: noescape: Resource "l2_caps" is not freed or pointed-to in "bt_bap_add_bis".
+bluez-5.75/profiles/audio/bap.c:1123:2: leaked_storage: Variable "l2_caps" going out of scope leaks the storage it points to.
+1121|			}
+1122|
+1123|->		}
+1124|		return true;
+1125|
 
-Error: RESOURCE_LEAK (CWE-772): [#def35] [important]
-bluez-5.75/monitor/att.c:3046:2: alloc_fn: Storage is returned from allocation function "name2utf8".
-bluez-5.75/monitor/att.c:3046:2: var_assign: Assigning: "name" = storage returned from "name2utf8((uint8_t *)frame->data, frame->size)".
-bluez-5.75/monitor/att.c:3048:2: noescape: Resource "name" is not freed or pointed-to in "printf". [Note: The source code implementation of the function has been overridden by a builtin model.]
-bluez-5.75/monitor/att.c:3053:1: leaked_storage: Variable "name" going out of scope leaks the storage it points to.
-3051|		if (frame->size)
-3052|			print_hex_field(" Data", frame->data, frame->size);
-3053|-> }
-3054|
-3055|   static void incoming_call_read(const struct l2cap_frame *frame)
-
-Error: RESOURCE_LEAK (CWE-772): [#def36] [important]
-bluez-5.75/monitor/att.c:3077:2: alloc_fn: Storage is returned from allocation function "name2utf8".
-bluez-5.75/monitor/att.c:3077:2: var_assign: Assigning: "name" = storage returned from "name2utf8((uint8_t *)frame->data, frame->size)".
-bluez-5.75/monitor/att.c:3079:2: noescape: Resource "name" is not freed or pointed-to in "printf". [Note: The source code implementation of the function has been overridden by a builtin model.]
-bluez-5.75/monitor/att.c:3084:1: leaked_storage: Variable "name" going out of scope leaks the storage it points to.
-3082|		if (frame->size)
-3083|			print_hex_field(" Data", frame->data, frame->size);
-3084|-> }
-3085|
-3086|   static void call_friendly_name_read(const struct l2cap_frame *frame)
+Error: RESOURCE_LEAK (CWE-772): [#def46] [important]
+bluez-5.75/profiles/audio/bap.c:1078:10: alloc_fn: Storage is returned from allocation function "util_malloc".
+bluez-5.75/profiles/audio/bap.c:1078:10: var_assign: Assigning: "__p" = storage returned from "util_malloc(__n * __s)".
+bluez-5.75/profiles/audio/bap.c:1078:10: noescape: Resource "__p" is not freed or pointed-to in "memset". [Note: The source code implementation of the function has been overridden by a builtin model.]
+bluez-5.75/profiles/audio/bap.c:1078:10: leaked_storage: Variable "__p" going out of scope leaks the storage it points to.
+bluez-5.75/profiles/audio/bap.c:1078:3: var_assign: Assigning: "meta" = "({...; __p;})".
+bluez-5.75/profiles/audio/bap.c:1082:3: noescape: Resource "meta" is not freed or pointed-to in "util_iov_memcpy".
+bluez-5.75/profiles/audio/bap.c:1119:4: noescape: Resource "meta" is not freed or pointed-to in "bt_bap_add_bis".
+bluez-5.75/profiles/audio/bap.c:1119:4: noescape: Resource "meta" is not freed or pointed-to in "bt_bap_add_bis".
+bluez-5.75/profiles/audio/bap.c:1123:2: leaked_storage: Variable "meta" going out of scope leaks the storage it points to.
+1121|			}
+1122|
+1123|->		}
+1124|		return true;
+1125|
 ---
- monitor/att.c | 19 +++++++++++++++++++
- 1 file changed, 19 insertions(+)
+ profiles/audio/bap.c | 47 +++++++++++++++++++++++++++++++-------------
+ 1 file changed, 33 insertions(+), 14 deletions(-)
 
-diff --git a/monitor/att.c b/monitor/att.c
-index b3fb3ba6a0ad..a23347ef7ede 100644
---- a/monitor/att.c
-+++ b/monitor/att.c
-@@ -2291,6 +2291,8 @@ static void print_mp_name(const struct l2cap_frame *frame)
- 	name = name2utf8((uint8_t *)frame->data, frame->size);
+diff --git a/profiles/audio/bap.c b/profiles/audio/bap.c
+index 8e4f4b311fba..15024e26f843 100644
+--- a/profiles/audio/bap.c
++++ b/profiles/audio/bap.c
+@@ -1028,6 +1028,7 @@ static bool parse_base(struct bt_bap *bap, struct bt_iso_base *base,
+ 	};
+ 	uint32_t pres_delay;
+ 	uint8_t num_subgroups;
++	bool ret = true;
  
- 	print_field("  Media Player Name: %s", name);
-+
-+	g_free(name);
+ 	util_debug(func, NULL, "BASE len: %ld", iov.iov_len);
+ 
+@@ -1043,13 +1044,15 @@ static bool parse_base(struct bt_bap *bap, struct bt_iso_base *base,
+ 	for (int idx = 0; idx < num_subgroups; idx++) {
+ 		uint8_t num_bis;
+ 		struct bt_bap_codec codec;
+-		struct iovec *l2_caps;
+-		struct iovec *meta;
++		struct iovec *l2_caps = NULL;
++		struct iovec *meta = NULL;
+ 
+ 		util_debug(func, NULL, "Subgroup #%d", idx);
+ 
+-		if (!util_iov_pull_u8(&iov, &num_bis))
++		if (!util_iov_pull_u8(&iov, &num_bis)) {
++			ret = false;
+ 			goto fail;
++		}
+ 		util_debug(func, NULL, "Number of BISes: %d", num_bis);
+ 
+ 		memcpy(&codec,
+@@ -1062,8 +1065,10 @@ static bool parse_base(struct bt_bap *bap, struct bt_iso_base *base,
+ 		/* Level 2 */
+ 		/* Read Codec Specific Configuration */
+ 		l2_caps = new0(struct iovec, 1);
+-		if (!util_iov_pull_u8(&iov, (void *)&l2_caps->iov_len))
+-			goto fail;
++		if (!util_iov_pull_u8(&iov, (void *)&l2_caps->iov_len)) {
++			ret = false;
++			goto group_fail;
++		}
+ 
+ 		util_iov_memcpy(l2_caps, util_iov_pull_mem(&iov,
+ 				l2_caps->iov_len),
+@@ -1076,8 +1081,10 @@ static bool parse_base(struct bt_bap *bap, struct bt_iso_base *base,
+ 
+ 		/* Read Metadata */
+ 		meta = new0(struct iovec, 1);
+-		if (!util_iov_pull_u8(&iov, (void *)&meta->iov_len))
+-			goto fail;
++		if (!util_iov_pull_u8(&iov, (void *)&meta->iov_len)) {
++			ret = false;
++			goto group_fail;
++		}
+ 
+ 		util_iov_memcpy(meta,
+ 				util_iov_pull_mem(&iov, meta->iov_len),
+@@ -1093,15 +1100,20 @@ static bool parse_base(struct bt_bap *bap, struct bt_iso_base *base,
+ 			uint8_t bis_index;
+ 			struct iovec *l3_caps;
+ 
+-			if (!util_iov_pull_u8(&iov, &bis_index))
+-				goto fail;
++			if (!util_iov_pull_u8(&iov, &bis_index)) {
++				ret = false;
++				goto group_fail;
++			}
+ 
+ 			util_debug(func, NULL, "BIS #%d", bis_index);
+ 
+ 			/* Read Codec Specific Configuration */
+ 			l3_caps = new0(struct iovec, 1);
+-			if (!util_iov_pull_u8(&iov, (void *)&l3_caps->iov_len))
+-				goto fail;
++			if (!util_iov_pull_u8(&iov, (void *)&l3_caps->iov_len)) {
++				free(l3_caps);
++				ret = false;
++				goto group_fail;
++			}
+ 
+ 			util_iov_memcpy(l3_caps,
+ 					util_iov_pull_mem(&iov,
+@@ -1120,13 +1132,20 @@ static bool parse_base(struct bt_bap *bap, struct bt_iso_base *base,
+ 					meta);
+ 		}
+ 
++group_fail:
++		if (l2_caps != NULL)
++			free(l2_caps);
++		if (meta != NULL)
++			free(meta);
++		if (!ret)
++			break;
+ 	}
+-	return true;
+ 
+ fail:
+-	util_debug(func, NULL, "Unable to parse Base");
++	if (!ret)
++		util_debug(func, NULL, "Unable to parse Base");
+ 
+-	return false;
++	return ret;
  }
  
- static void mp_name_read(const struct l2cap_frame *frame)
-@@ -2320,6 +2322,8 @@ static void print_track_title(const struct l2cap_frame *frame)
- 	name = name2utf8((uint8_t *)frame->data, frame->size);
- 
- 	print_field("  Track Title: %s", name);
-+
-+	g_free(name);
- }
- 
- static void track_title_read(const struct l2cap_frame *frame)
-@@ -2453,6 +2457,8 @@ static void print_bearer_name(const struct l2cap_frame *frame)
- 	name = name2utf8((uint8_t *)frame->data, frame->size);
- 
- 	print_field("  Bearer Name: %s", name);
-+
-+	g_free(name);
- }
- 
- static void bearer_name_read(const struct l2cap_frame *frame)
-@@ -2472,6 +2478,8 @@ static void bearer_uci_read(const struct l2cap_frame *frame)
- 	name = name2utf8((uint8_t *)frame->data, frame->size);
- 
- 	print_field("  Bearer Uci Name: %s", name);
-+
-+	g_free(name);
- }
- 
- static void print_technology_name(const struct l2cap_frame *frame)
-@@ -2541,6 +2549,8 @@ static void print_uri_scheme_list(const struct l2cap_frame *frame)
- 	name = name2utf8((uint8_t *)frame->data, frame->size);
- 
- 	print_field("  Uri scheme Name: %s", name);
-+
-+	g_free(name);
- }
- 
- static void bearer_uri_schemes_list_read(const struct l2cap_frame *frame)
-@@ -2654,6 +2664,8 @@ static void print_call_list(const struct l2cap_frame *frame)
- 
- 	print_field("  call_uri: %s", call_uri);
- 
-+	g_free(call_uri);
-+
- done:
- 	if (frame->size)
- 		print_hex_field("  call_list Data", frame->data, frame->size);
-@@ -2742,6 +2754,8 @@ static void print_target_uri(const struct l2cap_frame *frame)
- 
- 	print_field("  Uri: %s", name);
- 
-+	g_free(name);
-+
- done:
- 	if (frame->size)
- 		print_hex_field("  Data", frame->data, frame->size);
-@@ -2850,6 +2864,7 @@ static void print_call_cp(const struct l2cap_frame *frame)
- 		str = "Originate";
- 		name = name2utf8((uint8_t *)frame->data, frame->size);
- 		print_field("  Operation: %s  Uri: %s", str, name);
-+		g_free(name);
- 		break;
- 	case 0x05:
- 		str = "Join";
-@@ -3047,6 +3062,8 @@ static void print_incom_call(const struct l2cap_frame *frame)
- 
- 	print_field("  call_string: %s", name);
- 
-+	g_free(name);
-+
- done:
- 	if (frame->size)
- 		print_hex_field(" Data", frame->data, frame->size);
-@@ -3078,6 +3095,8 @@ static void print_call_friendly_name(const struct l2cap_frame *frame)
- 
- 	print_field("  Friendly Name: %s", name);
- 
-+	g_free(name);
-+
- done:
- 	if (frame->size)
- 		print_hex_field(" Data", frame->data, frame->size);
+ static void iso_pa_sync_confirm_cb(GIOChannel *io, void *user_data)
 -- 
 2.44.0
 
