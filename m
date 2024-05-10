@@ -1,83 +1,107 @@
-Received: from mail.marcansoft.com (marcansoft.com [212.63.210.85])
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2E9A13BAC8
-	for <linux-bluetooth@vger.kernel.org>; Fri, 10 May 2024 03:23:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.63.210.85
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C61EA5490E
+	for <linux-bluetooth@vger.kernel.org>; Fri, 10 May 2024 06:45:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715311387; cv=none; b=PIjRR9hRD5g0AQfcDA0liR9//1iUBLsl5PuJaYsfFfisMGUZVS1PE0Xo3/2/x1li6jUPRmc2SZuowpSrHgcQXgygQRiTrOCOX+8AXIxXEpxyZkz+A0ZkpIwh8ILxgoMM/THpyMnKU9nO9Mfa+FbHp7+uSmaSFL5q33w6B5WC9Hg=
+	t=1715323518; cv=none; b=V7pbs0ne8fZpf2PhYj9J2Yv9UOUQnWyP3ZeiCXuSkw7ZfSK5+MjHFcBC5qIpfJD6W95tNwidUhA2QIFN9wtCDm+R8cPCVcWaKWIZI91XM6f5rCKsmGQZ/CYzwU/IV1loLfjEud/gvrOk6eVysi64qpxh618y+0vu0hW/yznusxk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715311387; c=relaxed/simple;
-	bh=P3E9viqimfxaTvLtWRQTpfuvWfLKLLLdRLX+IkpS6oI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=mkIKzI4eRV+6PKPHOrPpWJjm+ndEFM5nGGeyOPgWSdCggyQ/7cfIFJppFzcff+yX8n9n8zGkeF48gt9T4GzGu7TJIEnGDgVR89oLkuWDIrUxDe3reMzqJLr/xhSBwrbVy9fNSHmFxzThLUwlBIhwORL4n3Jj5ALNpVo1giZkAF0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=marcan.st; spf=pass smtp.mailfrom=marcan.st; dkim=pass (2048-bit key) header.d=marcan.st header.i=@marcan.st header.b=DmuRKjTn; arc=none smtp.client-ip=212.63.210.85
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=marcan.st
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marcan.st
+	s=arc-20240116; t=1715323518; c=relaxed/simple;
+	bh=y96GLAfCjDFA4/+yLm8gb6N5lw9ko5Cbuar6qPhAkec=;
+	h=From:To:Cc:Subject:Date:Message-Id; b=l5QrDeBLfNO0ubvqzEO0aOqUlDgEtV0zECAP/T+pTP2i7Ks6RY0kLt3zQ3Re/TS3LnIt0tN9S6Y4nOKXM7nPnbcQa0AVylBTjj2jlJ0/RPd0OXQEb8yqF0Ph15g7qlsYtWP5R4DFqfGeRsjLzZOFQDkG75EzYIyDWtZv+STav4Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=qualcomm.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=ojLbbJd/; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marcan.st header.i=@marcan.st header.b="DmuRKjTn"
-Received: from [127.0.0.1] (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: marcan@marcan.st)
-	by mail.marcansoft.com (Postfix) with ESMTPSA id CE8EE45034;
-	Fri, 10 May 2024 03:13:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=marcan.st; s=default;
-	t=1715310817; bh=P3E9viqimfxaTvLtWRQTpfuvWfLKLLLdRLX+IkpS6oI=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To;
-	b=DmuRKjTn5gHrFu2h3Fa2qyNQEogt+Clc1H02kHBgpjOySzdPMrn4iCgohc20vEb08
-	 Rvg/4w/3XrcjQIatkMHFbAwOpmealSN11d5vApHnJjfwN+63fHf3uhikVbQb/ksjU1
-	 dAP11G8htk8FKqIgimiSJwZOIBR5tfTF1/wnbAZPXhjc8MDo1q7t6IiytKZpyOayEg
-	 gSFsBFcbG/FqnpSeMzRsbD9nDYHH9LLQknqpYYDXEkzVLSm4uDo+p7Wa5b8BYKrWy7
-	 Bj8C7X+4PtxLhX7ctY0WpUz2NFmRwCw8xTEtD3M0vdYpZ1thZwKk8lfVXySUozVOFD
-	 9IU2VkrRoswZw==
-Message-ID: <70078624-d766-4db6-8ddb-511251baf0f2@marcan.st>
-Date: Fri, 10 May 2024 12:13:30 +0900
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="ojLbbJd/"
+Received: from pps.filterd (m0279867.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 44A2tiwR000751;
+	Fri, 10 May 2024 06:45:14 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	from:to:cc:subject:date:message-id; s=qcppdkim1; bh=Z9Pi8bnqwpsy
+	PQFP0DUrjJ45pBDbOiVb4kma2f/24T4=; b=ojLbbJd/5f51SgrJ3OaESD8R8r7B
+	1iCWuQ1fTWICcRFyAZDdNetJwmaM8BhP0yBMPqfqev2PNMNMj6TdQY+T3tDe/LH2
+	c5JHFWmhxw0tN1ZF0GnZm8d8w1DNjoHYtekbiFAl6g50athLFs0TA2/tQKOJQukp
+	GUksJSWLpb2lz/foUoYKmhCRhejuyvUBCOgib1YpEY4/qIIWCbQ2eWiAH0cDTpFl
+	4ieRbsXSa7yEpxdBHQNPPVaDxO7Qsg0fzW0zs9sRZ8H0lVzO24gHgVq//I9/dF12
+	YYmi4coWejgALCqGMt2lDh1g6d96pnBH8z64avyCtHgQpgzpIMUNCmcbwQ==
+Received: from apblrppmta02.qualcomm.com (blr-bdr-fw-01_GlobalNAT_AllZones-Outside.qualcomm.com [103.229.18.19])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3y16w0rsvb-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 10 May 2024 06:45:14 +0000 (GMT)
+Received: from pps.filterd (APBLRPPMTA02.qualcomm.com [127.0.0.1])
+	by APBLRPPMTA02.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTP id 44A6j9gL028514;
+	Fri, 10 May 2024 06:45:09 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+	by APBLRPPMTA02.qualcomm.com (PPS) with ESMTPS id 3xwe3krpdw-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
+	Fri, 10 May 2024 06:45:09 +0000
+Received: from APBLRPPMTA02.qualcomm.com (APBLRPPMTA02.qualcomm.com [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 44A6j9Ro028505;
+	Fri, 10 May 2024 06:45:09 GMT
+Received: from hu-maiyas-hyd.qualcomm.com (hu-rbujala-hyd.qualcomm.com [10.213.107.103])
+	by APBLRPPMTA02.qualcomm.com (PPS) with ESMTP id 44A6j97S028504;
+	Fri, 10 May 2024 06:45:09 +0000
+Received: by hu-maiyas-hyd.qualcomm.com (Postfix, from userid 4130939)
+	id 895D0609546; Fri, 10 May 2024 12:15:01 +0530 (+0530)
+From: Raghavender Reddy Bujala <quic_rbujala@quicinc.com>
+To: ofono@ofono.org, linux-bluetooth@vger.kernel.org
+Cc: quic_mohamull@quicinc.com, quic_hbandi@quicinc.com,
+        quic_anubhavg@quicinc.com,
+        Raghavender Reddy Bujala <quic_rbujala@quicinc.com>
+Subject: [PATCH v1] Permission for pulseaudio to use ofono.
+Date: Fri, 10 May 2024 12:14:56 +0530
+Message-Id: <20240510064456.24101-1-quic_rbujala@quicinc.com>
+X-Mailer: git-send-email 2.17.1
+X-QCInternal: smtphost
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: fn-NRKJnRqOT4BRi9ETWqpSW5N5Du8VX
+X-Proofpoint-ORIG-GUID: fn-NRKJnRqOT4BRi9ETWqpSW5N5Du8VX
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.650,FMLib:17.11.176.26
+ definitions=2024-05-10_04,2024-05-10_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 bulkscore=0
+ malwarescore=0 suspectscore=0 adultscore=0 mlxlogscore=801 phishscore=0
+ mlxscore=0 lowpriorityscore=0 clxscore=1011 impostorscore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2405010000 definitions=main-2405100047
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1] Bluetooth: hci_sync: Use advertised PHYs on
- hci_le_ext_create_conn_sync
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Janne Grunau <j@jannau.net>
-Cc: linux-bluetooth@vger.kernel.org, regressions@lists.linux.dev,
- asahi@lists.linux.dev
-References: <20240405204037.3451091-1-luiz.dentz@gmail.com>
- <Zjz0atzRhFykROM9@robin>
- <CABBYNZLMODHp+jBu2oVDC5Pg6fyAKJugQF0N-XgarjWQJJPObg@mail.gmail.com>
- <Zj0tcmseJCjR4hK2@robin>
- <CABBYNZLnYz-vPrMbtsJTsLPsyo62j+cxctSkLjRom3bWEU9N3A@mail.gmail.com>
- <CABBYNZJ-6oyLnBov9H_jym9m-9qiUt1ELxYGuBOdZT29aj9MCA@mail.gmail.com>
-Content-Language: en-US
-From: Hector Martin <marcan@marcan.st>
-In-Reply-To: <CABBYNZJ-6oyLnBov9H_jym9m-9qiUt1ELxYGuBOdZT29aj9MCA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
 
-Hi,
+When pulseaudio is trying to Register with  ofono
+on interface org.ofono.HandsfreeAudioManager, dbus
+is throwing org.freedesktop.DBus.Error.AccessDenied
+with string "Rejected send message".
 
-On 2024/05/10 7:41, Luiz Augusto von Dentz wrote:
-<snip>
+To allow pulseaudio to send messages to org.ofono
+service over dbus added this rule.
 
-> If I print the actual value then we got:
-> 
-> Primary PHY: Reserved (0x81)
-> 
-> I guess one needs to disregard the reserved range, well until they are
-> no longer reserved then it will no longer work. Perhaps we should talk
-> to broadcom to know what is up with using reserved values and if that
-> is an apple thing then perhaps we could ask them to provide firmware
-> that acts according to the spec.
+Signed-off-by: Raghavender Reddy Bujala <quic_rbujala@quicinc.com>
+---
+ ofono/src/ofono.conf | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-Apple and Broadcom do not support Linux on this platform. The kernel has
-to work with the existing firmware (which is the firmware macOS uses),
-we don't get to request changes. If the firmware has quirks the kernel
-has to deal with it, that's how it goes. It would be great if we had
-vendor support, but that is not something we can control. This is common
-(Linux is full of quirks to support noncompliant hardware/firmware).
+diff --git a/ofono/src/ofono.conf b/ofono/src/ofono.conf
+index 6c5483ce..c946e822 100644
+--- a/ofono/src/ofono.conf
++++ b/ofono/src/ofono.conf
+@@ -32,6 +32,10 @@
+     <allow send_interface="org.ofono.intel.LteCoexistenceAgent"/>
+   </policy>
+ 
++  <policy user="pulse">
++    <allow send_destination="org.ofono"/>
++  </policy>
++
+   <policy at_console="true">
+     <allow send_destination="org.ofono"/>
+   </policy>
+-- 
+2.17.1
 
-- Hector
