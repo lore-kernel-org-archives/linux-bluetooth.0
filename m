@@ -1,182 +1,123 @@
-Received: from mail-lj1-f170.google.com (mail-lj1-f170.google.com [209.85.208.170])
+Received: from mail-oo1-f41.google.com (mail-oo1-f41.google.com [209.85.161.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98B614D9E9
-	for <linux-bluetooth@vger.kernel.org>; Fri, 10 May 2024 19:48:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 981353E48C
+	for <linux-bluetooth@vger.kernel.org>; Fri, 10 May 2024 19:49:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715370537; cv=none; b=JoBpMTHsEN5mzES7k24/eFjfjEWpTgdwZV76WNeIEEmXEuGRw96wItc7RSdqAsbi1zNsiQpI3Htfq+Y8zODyY6MfGVX7XO4+tV73Xh2pa88aQdat3O0mwRjxitGirMnWbO2aJWrpyvCLHGxKRxM3a8+nd3BtrnW+2cf9bNoTE3s=
+	t=1715370579; cv=none; b=ricjswO/BQauCEigzkfr/LbKUfPOe0gJrqICsD/BNczFLoOuCpuKQ+OlU9ZdvGw5FiJxgaCWe0uL8izNz4OSR8KJXmdVya9/VLReIZpO67TbM3XAJrPKQng5e4hRy13mlbvkwcDXkaNEf1POwub14kIkPhhtHCd71xNNKgILlxM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715370537; c=relaxed/simple;
-	bh=ngLNEUzhzG5Q4S+ar+BpinXjlbqJe6hM9PJgSejVmfA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=FrwGAbBy7mOBVxoZrZu90adxVp7Aj71Mn2oEg7MwFiJsVHHlututUkgGzcBPo6r314R0DN7oOGPEn7vA2MbCBKZFMGYeq6Uykby9+3jmXuHC73QgQjFdMDS+p/4hL4F+cn7BYVxzsbpWLFQ2z5iwAinWNcB669PxX686eHMXb8o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Kwzcpx4U; arc=none smtp.client-ip=209.85.208.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1715370579; c=relaxed/simple;
+	bh=JCFFmbNlsOn6FVvGztjgo6+wDYo3/QMxgC04ADQpeJY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=IJwpix+nKXuV3mowUIqquG6cOLXJPiKbMw39MvNCgpK3pJXyOwlaWAkeOw7iA1a+juZsa0I1bMaxOCfpFHFca6euoEQkr8jHwCtk/eZZtUhQfzSZOkZdRhzvL1/tAWTqn9GfZXIL6ZKGFXsm3ECP6oeVR/cyflNNOuew4E9fvpU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=penguintechs.org; spf=pass smtp.mailfrom=penguintechs.org; dkim=pass (1024-bit key) header.d=penguintechs.org header.i=@penguintechs.org header.b=YZgESg6e; arc=none smtp.client-ip=209.85.161.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=penguintechs.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=penguintechs.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Kwzcpx4U"
-Received: by mail-lj1-f170.google.com with SMTP id 38308e7fff4ca-2e4b90b03a9so26475411fa.1
-        for <linux-bluetooth@vger.kernel.org>; Fri, 10 May 2024 12:48:55 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=penguintechs.org header.i=@penguintechs.org header.b="YZgESg6e"
+Received: by mail-oo1-f41.google.com with SMTP id 006d021491bc7-5ac61cf3fffso1054968eaf.3
+        for <linux-bluetooth@vger.kernel.org>; Fri, 10 May 2024 12:49:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1715370534; x=1715975334; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ngLNEUzhzG5Q4S+ar+BpinXjlbqJe6hM9PJgSejVmfA=;
-        b=Kwzcpx4UPIwMzBgGNpABZEmdqq6uzMOzYK+wHlhKWlDI5hMW6IjnBLuTEPGN2ld+9H
-         xrw86tSAc+EXZT708E837lPPYQkTpn05zl3QO+NizWBSQG2tEuywDT2+wSAfqybLOr/y
-         TtmruZjNib+TQXP1en2CDLySMGGhhBC6qG5fQlveprrbWul+wb9N9AJd9FGEYAnQPd7K
-         d8HHEvdXS7UMgjdPFKVRKSiolWaFI/MnjAP23cC/MsSg7rjfAxnoSL1I6U3F7rUBuBs6
-         hbvFs7Hw6b8+UZWPAr+N8HujAbZFFsf+lD4HXz1IJ2tNtY4pkCw0Dsh1TIjklfyCsb6h
-         zAKQ==
+        d=penguintechs.org; s=google; t=1715370576; x=1715975376; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=yxWyXszhHGNezoVa9cm6qt9auwsbCofn2LFU7/T+05M=;
+        b=YZgESg6eBrMAaoeIa+C1eu2czx+4a0b2iF2AllDctx5CvMew/giAm1H+eyQ2Im9nzl
+         etaqrtAMU1wL1K5fPwQyhu+FswUv5dgpdbkb48AIfVOP8x4q/96e9C/37ji7vj/mVLdL
+         3k7deKhuwRwVByM2p3tLqVAJ58EawYjIrJ3cs=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715370534; x=1715975334;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ngLNEUzhzG5Q4S+ar+BpinXjlbqJe6hM9PJgSejVmfA=;
-        b=r9WZDd2Gd7RgKE5XrSL1ArctfY9wlt4UDYUVBZ+50DpIGZPUoZ2B/fbRfh4s4WMlvQ
-         B4ZCjUhs0G5VVDQ9VsfzPVMSVj0gpQRML23Rdr9Ct074HSxydnyrUSF4thMBue1IIM0F
-         7vseQavl0ADQv5D4UNMthnS5OghyPu9Z3YRNaTutjUe8MvhI0/SPIc7uRyKnihaouNOD
-         o582qetRkyVQhddLbektgFQ7y+FJ9Kdf3JESn6ruVyyOoCSL1paXcxesaCk1Csyxx38S
-         7Bk5Mmm3yoTKYOiAHD4Fudc51EmVX55asnQxxSJaYT2NCauDqzJ2jsgpMXkPeKJELtpy
-         GL+Q==
-X-Gm-Message-State: AOJu0YxrY/IZWo4R0ZrLDh0JSwNkpb/vWQVRaTqJSYSsEredM5R6Bnza
-	/s5j8yvX9hy5VxDvy4MbuMPze+llr1n4SseMYgvNfUB21kMfgCxdfS3DlE/LIwPgft5yDKx1X1q
-	82iTqsOH30UbICGiMbn3FuhFJ8Co=
-X-Google-Smtp-Source: AGHT+IGZnOcB5H1ta9TvzWgjIKKBpXZka7YJRkK66QJunope6ibq+HJPuWiTWhWWSZDKb/zbxcP0B8uqgh7Os/DB3g4=
-X-Received: by 2002:a2e:b01a:0:b0:2de:3421:9edd with SMTP id
- 38308e7fff4ca-2e5203a4665mr20935131fa.33.1715370533311; Fri, 10 May 2024
- 12:48:53 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1715370576; x=1715975376;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=yxWyXszhHGNezoVa9cm6qt9auwsbCofn2LFU7/T+05M=;
+        b=D8Bod3dM9hxvLdGWkRB1Rz1JN8zMZKyiGWC0WpI9hFSBGQyUYpg94rV8cE8SbMDhk+
+         /wTrbwlUSjADvhZ3cRG8ukjwz6RHjwwlpe7a5Z8u1Y465xpYzPNZMgpwyY1AqOvTt3/9
+         xg5/NpqImLS5VHs2U6tQwBkxFHhp+rKBeNW3cAiGc2brayySVYHBJ/g2eTvT/vUYlfxw
+         3UDTrj3lwWa+CgQkA+SbzmCr1Lp43lhd52XCmbIlxqFc4plvumgdvpVNyHqmwk0UKJHt
+         wcyKFgZAi/ONlT6zL64OHp3HE8qAmP0id/qPl0FRDUC0BkyJiiHcP7lINxstretZUUrO
+         +gyA==
+X-Gm-Message-State: AOJu0YxG2x1RQBEMS1MeKmAS1juXU4vsx/lSDl0NujakKntZzGB9AAvZ
+	oJSmLS0I1sQCcxR+CSGNltro1VqU7mW+zGA2/eMupZq5kX55geHJmLaU981Tlw==
+X-Google-Smtp-Source: AGHT+IEX+36Sj6GYkUunsowtfhH38q+3cvxoAjNx4PliHhEkHO5WeF7xTXdWc4kLq9JBMqeDbGP8yg==
+X-Received: by 2002:a05:6358:93a3:b0:192:9d35:b025 with SMTP id e5c5f4694b2df-193bb63f056mr351397055d.16.1715370576521;
+        Fri, 10 May 2024 12:49:36 -0700 (PDT)
+Received: from ?IPV6:2601:646:8700:dd30:5f3e:5ba7:e0ea:9a08? ([2601:646:8700:dd30:5f3e:5ba7:e0ea:9a08])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-6340c4d4a1csm3462978a12.40.2024.05.10.12.49.35
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 10 May 2024 12:49:36 -0700 (PDT)
+Message-ID: <d9232cf5-b0ca-47f2-841d-45f5880368c8@penguintechs.org>
+Date: Fri, 10 May 2024 12:49:34 -0700
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <3475f0dd-6a0f-4319-9590-379eee33f504@penguintechs.org>
- <CABBYNZ+FBwFtrqg1Hj72Q7_6f8hDSwVTNtkofP0XgEd98DRf9A@mail.gmail.com> <560c5c03-563a-4f1c-abc1-1372ca73c421@penguintechs.org>
-In-Reply-To: <560c5c03-563a-4f1c-abc1-1372ca73c421@penguintechs.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Fri, 10 May 2024 15:48:41 -0400
-Message-ID: <CABBYNZK+FGe75VJ4YqsxxyGj-Ac+voeMb3CR9qRD+yz7d=d7oQ@mail.gmail.com>
-Subject: Re: path to landing patch to fix warm boot issue for qca6390
-To: Wren Turkal <wt@penguintechs.org>
-Cc: linux-bluetooth@vger.kernel.org, 
-	Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>, Zijun Hu <quic_zijuhu@quicinc.com>, 
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v1] Bluetooth: qca: Fix BT enable failure again for
+ QCA6390 after warm reboot
+Content-Language: en-US
+To: Krzysztof Kozlowski <krzk@kernel.org>, Zijun Hu
+ <quic_zijuhu@quicinc.com>, luiz.dentz@gmail.com, luiz.von.dentz@intel.com,
+ marcel@holtmann.org
+Cc: linux-bluetooth@vger.kernel.org, regressions@lists.linux.dev,
+ stable@vger.kernel.org
+References: <1714658761-15326-1-git-send-email-quic_zijuhu@quicinc.com>
+ <5e5e869c-da12-4818-837e-55709f0c4db9@kernel.org>
+From: Wren Turkal <wt@penguintechs.org>
+In-Reply-To: <5e5e869c-da12-4818-837e-55709f0c4db9@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hi Wren,
+On 5/3/24 3:16 AM, Krzysztof Kozlowski wrote:
+> On 02/05/2024 16:06, Zijun Hu wrote:
+>> Commit 272970be3dab ("Bluetooth: hci_qca: Fix driver shutdown on closed
+>> serdev") will cause below regression issue:
+>>
+>> BT can't be enabled after below steps:
+>> cold boot -> enable BT -> disable BT -> warm reboot -> BT enable failure
+>> if property enable-gpios is not configured within DT|ACPI for QCA6390.
+>>
+>> The commit is to fix a use-after-free issue within qca_serdev_shutdown()
+>> during reboot, but also introduces this regression issue regarding above
+>> steps since the VSC is not sent to reset controller during warm reboot.
+>>
+>> Fixed by sending the VSC to reset controller within qca_serdev_shutdown()
+>> once BT was ever enabled, and the use-after-free issue is also be fixed
+>> by this change since serdev is still opened when send to serdev.
+>>
+>> Fixes: 272970be3dab ("Bluetooth: hci_qca: Fix driver shutdown on closed serdev")
+>> Cc: stable@vger.kernel.org
+>> Reported-by: Wren Turkal <wt@penguintechs.org>
+>> Closes: https://bugzilla.kernel.org/show_bug.cgi?id=218726
+>> Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
+>> Tested-by: Wren Turkal <wt@penguintechs.org>
+>> ---
+>>   drivers/bluetooth/hci_qca.c | 5 ++---
+> 
+> I don't think this is v1. Version your patches properly and provide
+> changelog.
+> 
+> I asked already *two times*:
+> 1. On which kernel did you test it?
+> 2. On which hardware did you test it?
 
-On Fri, May 10, 2024 at 3:14=E2=80=AFPM Wren Turkal <wt@penguintechs.org> w=
-rote:
->
-> On 5/6/24 12:49 PM, Luiz Augusto von Dentz wrote:
-> > Hi Wren,
-> >
-> > On Mon, May 6, 2024 at 3:24=E2=80=AFPM Wren Turkal <wt@penguintechs.org=
-> wrote:
-> >>
-> >> Krzysztof,
-> >>
-> >> I am reaching out to you as you had the most important objections to t=
-he
-> >> change to fix qca6390 for the warm boot/module reload bug that I am
-> >> experiencing.
-> >>
-> >> For context, the problem is that the hci_uart module will send specifi=
-c
-> >> vendor specfic commands during shutdown of the hardware under most
-> >> situations. These VSCs put the bluetooth device into a non-working sta=
-te
-> >> on my Dell XPS 13 9310 with qca6390 bluetooth hardware.
-> >>
-> >> Zijun's proposed fix is to not send these commands when it's not
-> >> appropriate for the hardware. The vendor commands should be avoided wh=
-en
-> >> the hardware does not have persistent configuration or when the device
-> >> is in setup state (indicating that is has never been setup and should
-> >> not be sent the VSCs on the shutdown path). This is what Zijun's patch
-> >> implements.
-> >>
-> >> In addition, Zijun's change removes the influence of both
-> >> the QCA_BT_OFF qca flag and and HCI_RUNNING hdev flag. Zijun asserts
-> >> that those flags should not influence the sending of the VSCs in the
-> >> shutdown path. If I understand KK's objections properly, this is where
-> >> his objection is stemming from. KK, is this correct?
-> >>
-> >> Zijun's proposed fix can be seen here:
-> >> https://patchwork.kernel.org/project/bluetooth/patch/1713932807-19619-=
-3-git-send-email-quic_zijuhu@quicinc.com/
-> >>
-> >> I'm wondering if we can resolve this impasse by splitting the change
-> >> into two changes, as follows:
-> >>
-> >> 1. Change that removes the influence of the QCA_BT_OFF and HCI_RUNNING
-> >> flags in the shutdown path.
-> >> 2. Add the quirk from Zijun's patch that fixes my hardward configurati=
-on.
-> >>
-> >> I'm hoping that better clearer descriptions for #1 can help get that
-> >> landed since the logic current appears to be at odds with how the
-> >> hardware works.
-> >>
-> >> Also, I am happy to split the patches into the two patches, or (maybe
-> >> more ideally) just modify the commit message to better indicate the
-> >> reason the change. I just need guidance from maintainers so that
-> >> whatever work I do leads to something acceptable for y'all.
-> >>
-> >> So, please help me get this done. I am just a user with broken hardwar=
-e
-> >> and a fondness for Linux. I would love to help do what's needed to get
-> >> this fix landed.
-> >
-> > Ive also objected to that change, in fact the whole shutdown sequence
-> > is sort of bogus in my opinion and the driver shall really have some
-> > means to find out what mode it is in when it reboots, regardless if
-> > cold or warm boot, since otherwise we are in trouble if the user is
-> > booting from another OS that doesn't do the expected shutdown
-> > sequence.
->
-> This criticism makes a ton of sense. I'm sorry I missed it before. There
-> were a lot of threads moving in parallel. However, I am curious. Given
-> that the patch improves the situation for users (like me). Is there any
-> way we can separate the redesign of the shutdown sequence and the UX
-> improvement that comes with this patch?
->
-> Here's my concern. I am happy to do the work to redesign this. However,
-> I don't think I have the information needed to do this since I don't
-> have access to the technical docs for the qca6390. I am worried that not
-> accepting some form of this patch is letting perfect be the enemy of the
-> good. And I am not sure how I personally can help with that. If you
-> think it's possible for me to do this without the docs for the hardware,
-> I am willing to give it a shot if I can get some guidance. Honestly, I
-> wish I had the skill to be confident about a change like this, but I don'=
-t.
->
-> Any ideas on how to move forward would be greatly appreciated.
->
-> And just to be perfectly clear, I have tested this patch on my laptop.
-> It greatly enhances my ability to use my hardware since I can reboot the
-> machine without having to make sure to power cycle the laptop. This is
-> not a theoretical improvement.
+I thought I had already chimed in with this information. I am using a 
+Dell XPS 13 9310. It's the only hardware I have access to. I can say 
+that the fix seems to work as advertised in that it fixes the warm boot 
+issue I have been experiencing.
 
-I would really love some explanation why can't the driver know under
-what mode the controller is when it gets probed, because to me we
-cannot accept a driver that only works under certain condition after
-the boot and in case it is really impossible, can't even power cycle
-it to get it back to cold boot stage???
+As a user, I vastly prefer a one time cold boot rather than having to do 
+it every time. As such, I can do the test. However, I do not think that 
+the patch not working in that case should block landing logic that 
+empirically improved my experience with the hardware and minimizes the 
+corner case to a much smaller corner (that of warm booting from an OS 
+that improperly puts the device in a bad state to a Linux kernel with 
+this UX improvement).
 
-Also the criticism here should be directed to the vendor, how long
-have we been discussing problems in the QCA driver? And the only thing
-I see coming our way are work-arounds of the problems, the address not
-being unique coming from the firmware itself and when provided via DT
-the address is in the wrong byteorder and now that the driver must
-communicate the firmware on shutdown in order to get it working
-properly on the next boot.
-
---=20
-Luiz Augusto von Dentz
+wt
+-- 
+You're more amazing than you think!
