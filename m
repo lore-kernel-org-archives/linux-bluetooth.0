@@ -1,27 +1,27 @@
 Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 650B716F267
-	for <linux-bluetooth@vger.kernel.org>; Fri, 10 May 2024 12:14:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34573170850
+	for <linux-bluetooth@vger.kernel.org>; Fri, 10 May 2024 12:14:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715343257; cv=none; b=NeTxyJ6B+V9ZEZy5Htx31kbzc9Hg7GT/L3hDN9DfMaIPgbrNu+2HjfmJEBy9I86J2ScKg3sBT1JIoxcrWBTLXp9kyj0knvtHg6rN5d/iIwPTPK/AEa3B/7j4FDIoNyOhDDUQxLUe4QtZSFegk+OcvGpMxopKvdNKFs1/IckvGSQ=
+	t=1715343257; cv=none; b=W6jMsm5Ltr2sGutbn4cpV3IBao94KEaOBkWZX3LqR4ScxOSbWzDCk0zXJIPmxMUY+W7fu2jirBbgf57bE+XUD6TbqR/REbHN8nYcdKiYc+G8dUoGoF6YsGjszdFnmuSxHAVARcAWg0AdmkXQP4SDLzy3mDBrZU4XG3nQzOVs25s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1715343257; c=relaxed/simple;
-	bh=F9aBXHTyJ8yCD7egItUeFRNE5MgkR7fAK7lVYebRWgM=;
+	bh=UVmzgHwRrHupYFJb/Xbq0QuAhlgLC7EEyPNuRozn0po=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=S8I+AAGNAFcZGoffWyO64kUgN/EszFM4JOiR5tatHGo+D7wB+3bsBxoBayxsdgKbSICLeDTtfhjNGj4O6mvlx7N1AlM+M6INNQcFA8EEfQxivkYsB5RI4hNNaEXir0elf9wf8kUnvqyZBh1ywnYDTSBu2RcPywT7dMKIfWNxJ4g=
+	 MIME-Version; b=fgx1m/Y7Neyj0D/+qKpVqSmTRIY0zA0H8D9dJki/l6yLXMdny206r2P+CDKbzC+uoPazmI0Hd9Uo/2aerm4q0sgOimSo5s2lPm+GMOImgPjcBwsrY0TMblVSf9to/ahPXBtw82GrzEub7/sonuKTx95HvRPKiueVQ59Wo9uZUcI=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.183.195
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hadess.net
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 75ED46000F;
-	Fri, 10 May 2024 12:13:57 +0000 (UTC)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id A30066000C;
+	Fri, 10 May 2024 12:13:59 +0000 (UTC)
 From: Bastien Nocera <hadess@hadess.net>
 To: linux-bluetooth@vger.kernel.org
 Cc: Bastien Nocera <hadess@hadess.net>
-Subject: [BlueZ v2 06/20] client/main: Fix mismatched free
-Date: Fri, 10 May 2024 14:10:16 +0200
-Message-ID: <20240510121355.3241456-7-hadess@hadess.net>
+Subject: [BlueZ v2 13/20] client/player: Fix copy/paste error
+Date: Fri, 10 May 2024 14:10:23 +0200
+Message-ID: <20240510121355.3241456-14-hadess@hadess.net>
 X-Mailer: git-send-email 2.44.0
 In-Reply-To: <20240510121355.3241456-1-hadess@hadess.net>
 References: <20240510121355.3241456-1-hadess@hadess.net>
@@ -34,32 +34,32 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-GND-Sasl: hadess@hadess.net
 
-Error: ALLOC_FREE_MISMATCH (CWE-762): [#def37]
-bluez-5.75/client/main.c:2108:2: alloc: Allocation of memory which must be freed using "g_free".
-bluez-5.75/client/main.c:2108:2: assign: Assigning: "desc" = "g_strdup_printf("\x1b[0;94m[%s]\x1b[0m# ", attr)".
-bluez-5.75/client/main.c:2111:2: free: Calling "free" frees "desc" using "free" but it should have been freed using "g_free".
-2109|
-2110|		bt_shell_set_prompt(desc);
-2111|->		free(desc);
-2112|   }
-2113|
+Error: COPY_PASTE_ERROR (CWE-398): [#def95] [important]
+bluez-5.75/client/player.c:1846:6: original: "qos->sync_cte_type" looks like the original copy.
+bluez-5.75/client/player.c:1852:6: copy_paste_error: "sync_cte_type" in "qos->sync_cte_type" looks like a copy-paste error.
+bluez-5.75/client/player.c:1852:6: remediation: Should it say "mse" instead?
+1850|		}
+1851|
+1852|->		if (qos->sync_cte_type) {
+1853|			bt_shell_printf("MSE %u\n", qos->mse);
+1854|			g_dbus_dict_append_entry(iter, "MSE", DBUS_TYPE_BYTE,
 ---
- client/main.c | 2 +-
+ client/player.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/client/main.c b/client/main.c
-index f703cc91b24a..f967c149e7bd 100644
---- a/client/main.c
-+++ b/client/main.c
-@@ -2113,7 +2113,7 @@ static void set_default_local_attribute(char *attr)
- 	desc = g_strdup_printf(COLOR_BLUE "[%s]" COLOR_OFF "# ", attr);
+diff --git a/client/player.c b/client/player.c
+index 6b70e9ed3f9d..7f67425aaf8f 100644
+--- a/client/player.c
++++ b/client/player.c
+@@ -1849,7 +1849,7 @@ static void append_bcast_qos(DBusMessageIter *iter, struct endpoint_config *cfg)
+ 					&qos->sync_cte_type);
+ 	}
  
- 	bt_shell_set_prompt(desc);
--	free(desc);
-+	g_free(desc);
- }
- 
- static void cmd_select_attribute(int argc, char *argv[])
+-	if (qos->sync_cte_type) {
++	if (qos->mse) {
+ 		bt_shell_printf("MSE %u\n", qos->mse);
+ 		g_dbus_dict_append_entry(iter, "MSE", DBUS_TYPE_BYTE,
+ 						&qos->mse);
 -- 
 2.44.0
 
