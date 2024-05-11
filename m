@@ -1,146 +1,359 @@
-Received: from mail-io1-f77.google.com (mail-io1-f77.google.com [209.85.166.77])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C72FD12E6D
-	for <linux-bluetooth@vger.kernel.org>; Sat, 11 May 2024 01:30:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.77
+Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.4])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4694621345;
+	Sat, 11 May 2024 04:11:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715391034; cv=none; b=P5vkOL1sYVIsCo24ZzvCGUs/if4vCWCX8ddzZBIdMWiznWdDnCoRNttqu6i84O3zorOac5BzToV4MpFeKy4xjOugoE/JNzS+iBD2nnL+vmzNOZ34w6sMboEdbFOaQOE/gNAoV6Uu0tU6///BJMNCdb/3LY+C0c5ZrngCcdrSVvc=
+	t=1715400667; cv=none; b=pe48gAE0eInMLqr3zbUG+MceO5IuqNF79JbtVXilWPj9xMe612Bu+KnbOUEoDlR7kHY4aCutIoHM5yR2wnphjj1DkcYASiwQAqFUP/azfg60Zrd3/hgGsv/8p3fBQttMy9D8Y4zdACDXDTcW3lkcG2+UIAZuidpRyRDraU+jOsk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715391034; c=relaxed/simple;
-	bh=/NzO4UlNFsjUHtR7jv4ftpKn0qIqx6mFKxkUp1R4yUY=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=tAQ54ha5WldLM3ofBj5V6gApumeXFA53MKo6WvGmJQqZCf6PVxe7a1I25L+NghbToqpKqYDoPxROYJIjPr5nCO0sWXH/BSueJ8754z+0bdPK6/DyTKXrqyd9cCdOmZ5/9bPb7iUo+7BRSQ9Oxb2IPht6aZrgnnc2O08glNZp9uA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.77
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f77.google.com with SMTP id ca18e2360f4ac-7e1b80d4004so144705739f.2
-        for <linux-bluetooth@vger.kernel.org>; Fri, 10 May 2024 18:30:32 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715391032; x=1715995832;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=rO41aFDTMkky0tLm4R2rtubdXnkNc+OLIH0Zd0ZRJ28=;
-        b=vOckWT2A/GbwXi/Y9+ymJ2SbVqzlb5sdpi5RgXdxFjfpaJhoLTOlOrh0HpjMvizJsw
-         T5fs+BqjMCAqthL56jtPKihRLesCpnMTZE0uGfnXVsDRcq9KdBhiXyHPhic24YGqyF5Q
-         XGKZvdzNfR1gYefX9iWWhYsFejNoeDhOCGz0sZsbNKjXk0CtvwV2n9hs1DdmTUtdQlv0
-         tKR9VE06QGks1qojYe6YqpxG1TF5Sej9sMDBkoIKXBLsfgtXC3+iR38Hb5ti5irFgPyJ
-         P92vQ9mDaOpq8j7twRTYuoOp0awlqWviQYFN8kUk90bLIc8fxD0H29KgUIazcwgZGq8n
-         iapQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWhew0p923qzz2rpqD0Eq4WoFJlSVgO0LtaQD4JVRKHV1MTI1rZV0EJCWLQ4jmUYnV6JISbESO+4nr4Qr9JwWVO6zYyEGvE7VYITvnGKy3H
-X-Gm-Message-State: AOJu0YwVghw2kUEpoVc8lvaipLLMnyHDsGoQOjakomSoKgiQp/xnbfVY
-	eDsj4+8w5DqI/Dfp6/pSGyQZwrQNAnZ6zNHERuQGYbgTly5dsjR85foCoW5PmZB21bXz6Dp7tz5
-	4dzJqqbA6Kw/YA9Z6uIQhhqOi4b9aFUthV+TUOngGLbZz4AH5Ffn1vA0=
-X-Google-Smtp-Source: AGHT+IHd5uc9NH9sDg2gbbjWb+wc7G5tZ/rMrcZyrdK/tQfw3//ErVdE41NAEr5MM6IiUPE6brE+KqSKkqF4q1FAofaVUycOA1Ed
+	s=arc-20240116; t=1715400667; c=relaxed/simple;
+	bh=0toZUhGF8FJX7UXdtVZTp+PiWoBQGdQKjqcT/9LHNbQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=gTUvHVyC0QKmvg8hPAQIBqSj9dh+ddlMwHyCUP6TXYZRHZqVEqZJMGXn2N6vZ/OTI+aSySyagg9iYjgZmBjhyN0T/yOMIDeYsQJyy+QMHy94cRudgOGlVCYqb8+bBEzL4lIaWaJuBdIavnSJILQc1qKrfgGFWPZ5dlxNpQoAZeE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=GLtfYqpK; arc=none smtp.client-ip=220.197.31.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="GLtfYqpK"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=Message-ID:Date:MIME-Version:Subject:From:
+	Content-Type; bh=wW/THnZT9ev5Ooy1RcXrjVT3wCbr+5nAAFKRvIdwNLA=;
+	b=GLtfYqpKNfk5O2xgA/nflpEVg05YLc/2xgp/p40p7JS7LSYq6xG/w/mnT+1aRd
+	AEPZ3LQAaoj6Wd9VRapDkYLJ477tK2q8NbUE7VrTpQiFsX14F8QdauxVc21NuK27
+	h0cLML0z0LQK8g4yk7A+6j5KpWjTvNNTPN8QzxN/LP4vw=
+Received: from [192.168.1.14] (unknown [183.195.4.13])
+	by gzga-smtp-mta-g1-1 (Coremail) with SMTP id _____wDHdouE7z5m7C1OEA--.49919S2;
+	Sat, 11 May 2024 12:09:41 +0800 (CST)
+Message-ID: <a80e0da7-be55-4cb0-92c9-51fa258788f0@163.com>
+Date: Sat, 11 May 2024 12:09:40 +0800
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6638:8305:b0:487:100b:9212 with SMTP id
- 8926c6da1cb9f-48958af8591mr283597173.3.1715391030481; Fri, 10 May 2024
- 18:30:30 -0700 (PDT)
-Date: Fri, 10 May 2024 18:30:30 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <00000000000005ea3206182399ea@google.com>
-Subject: [syzbot] [bluetooth?] WARNING in sco_chan_del
-From: syzbot <syzbot+85e9ce7008aa4afb189e@syzkaller.appspotmail.com>
-To: johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, luiz.dentz@gmail.com, marcel@holtmann.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
-
-Hello,
-
-syzbot found the following issue on:
-
-HEAD commit:    ee5b455b0ada Merge tag 'slab-for-6.9-rc7-fixes' of git://g..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=16caf2d4980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=7144b4fe7fbf5900
-dashboard link: https://syzkaller.appspot.com/bug?extid=85e9ce7008aa4afb189e
-compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
-
-Unfortunately, I don't have any reproducer for this issue yet.
-
-Downloadable assets:
-disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/7bc7510fe41f/non_bootable_disk-ee5b455b.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/96e27f6a83fe/vmlinux-ee5b455b.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/49d89ce985f7/bzImage-ee5b455b.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+85e9ce7008aa4afb189e@syzkaller.appspotmail.com
-
-------------[ cut here ]------------
-WARNING: CPU: 2 PID: 8103 at kernel/workqueue.c:2335 __queue_work+0xc13/0x1020 kernel/workqueue.c:2334
-Modules linked in:
-CPU: 2 PID: 8103 Comm: syz-executor.0 Not tainted 6.9.0-rc7-syzkaller-00008-gee5b455b0ada #0
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
-RIP: 0010:__queue_work+0xc13/0x1020 kernel/workqueue.c:2334
-Code: 07 83 c0 03 38 d0 7c 09 84 d2 74 05 e8 46 4b 90 00 8b 5b 2c 31 ff 83 e3 20 89 de e8 47 f9 34 00 85 db 75 2a e8 5e fe 34 00 90 <0f> 0b 90 e9 4d f9 ff ff e8 50 fe 34 00 90 0f 0b 90 e9 fc f8 ff ff
-RSP: 0018:ffffc90003d37a20 EFLAGS: 00010087
-RAX: 0000000000004b93 RBX: 0000000000000000 RCX: ffffc90004461000
-RDX: 0000000000040000 RSI: ffffffff8158ce92 RDI: 0000000000000005
-RBP: 0000000000000000 R08: 0000000000000005 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000002 R12: ffff88802c7788c8
-R13: 0000000000000008 R14: ffff88802c7788d0 R15: ffff8880291bc800
-FS:  00007efff9b636c0(0000) GS:ffff88806b400000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f5739842d58 CR3: 00000000524fc000 CR4: 0000000000350ef0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- __queue_delayed_work+0x21b/0x2e0 kernel/workqueue.c:2564
- queue_delayed_work_on+0x10e/0x130 kernel/workqueue.c:2608
- queue_delayed_work include/linux/workqueue.h:620 [inline]
- hci_conn_drop include/net/bluetooth/hci_core.h:1623 [inline]
- hci_conn_drop include/net/bluetooth/hci_core.h:1593 [inline]
- sco_chan_del+0x1f8/0x500 net/bluetooth/sco.c:171
- __sco_sock_close+0xf2/0x690 net/bluetooth/sco.c:455
- sco_sock_close net/bluetooth/sco.c:470 [inline]
- sco_sock_release+0x6f/0x2d0 net/bluetooth/sco.c:1245
- __sock_release+0xb0/0x270 net/socket.c:659
- sock_close+0x1c/0x30 net/socket.c:1421
- __fput+0x270/0xb80 fs/file_table.c:422
- task_work_run+0x14e/0x250 kernel/task_work.c:180
- get_signal+0x1ca/0x2710 kernel/signal.c:2683
- arch_do_signal_or_restart+0x90/0x7e0 arch/x86/kernel/signal.c:310
- exit_to_user_mode_loop kernel/entry/common.c:111 [inline]
- exit_to_user_mode_prepare include/linux/entry-common.h:328 [inline]
- __syscall_exit_to_user_mode_work kernel/entry/common.c:207 [inline]
- syscall_exit_to_user_mode+0x14a/0x2a0 kernel/entry/common.c:218
- do_syscall_64+0xdc/0x260 arch/x86/entry/common.c:89
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7efff8e7dca9
-Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 e1 20 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b0 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007efff9b630c8 EFLAGS: 00000246 ORIG_RAX: 000000000000002a
-RAX: fffffffffffffffc RBX: 00007efff8fabf80 RCX: 00007efff8e7dca9
-RDX: 0000000000000008 RSI: 0000000020000040 RDI: 0000000000000005
-RBP: 00007efff8ec947e R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 000000000000000b R14: 00007efff8fabf80 R15: 00007ffe83d40458
- </TASK>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v1] Bluetooth: qca: Fix BT enable failure again for
+ QCA6390 after warm reboot
+To: Wren Turkal <wt@penguintechs.org>, quic_zijuhu <quic_zijuhu@quicinc.com>,
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: luiz.von.dentz@intel.com, marcel@holtmann.org,
+ linux-bluetooth@vger.kernel.org, regressions@lists.linux.dev,
+ stable@vger.kernel.org, Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+References: <1714658761-15326-1-git-send-email-quic_zijuhu@quicinc.com>
+ <CABBYNZJc=Pzt02f0L3KOSLqkJ+2SwO=OZibA=0S0T3vKPDwPyw@mail.gmail.com>
+ <c5998fbd-bd63-4f7d-8f51-3dd081913449@quicinc.com>
+ <CABBYNZJOVnBShpgbWEpFBcu_MnHW+TKLndLKnZkkB9C71EfJNA@mail.gmail.com>
+ <b8cc1486-b627-4186-a53c-8331b84e2318@quicinc.com>
+ <d553edef-c1a4-4d52-a892-715549d31ebe@163.com>
+ <5b9e0b36-4d6f-49d2-a810-dc59f8312e03@penguintechs.org>
+Content-Language: en-US
+From: Lk Sii <lk_sii@163.com>
+In-Reply-To: <5b9e0b36-4d6f-49d2-a810-dc59f8312e03@penguintechs.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:_____wDHdouE7z5m7C1OEA--.49919S2
+X-Coremail-Antispam: 1Uf129KBjvAXoW3Cr4UuF48XrWxtFWkZr1rXrb_yoW8JrW8Wo
+	WfXw4xZa18Jr1UCF1UAa4DJFy3J3s8Aw1rJrW7tr4rAr1vq345Xw18Cw15XFW3JF4Fgr4U
+	J34UArnxZry3tFs5n29KB7ZKAUJUUUU8529EdanIXcx71UUUUU7v73VFW2AGmfu7bjvjm3
+	AaLaJ3UbIYCTnIWIevJa73UjIFyTuYvjxU3zBTUUUUU
+X-CM-SenderInfo: 5onb2xrl6rljoofrz/1tbisgDbNWVODIWv8AABsg
 
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+On 2024/5/11 04:45, Wren Turkal wrote:
+> On 5/7/24 6:48 AM, Lk Sii wrote:
+>> On 2024/5/4 05:51, quic_zijuhu wrote:
+>>> On 5/4/2024 5:25 AM, Luiz Augusto von Dentz wrote:
+>>>> Hi,
+>>>>
+>>>> On Fri, May 3, 2024 at 4:18 PM quic_zijuhu <quic_zijuhu@quicinc.com>
+>>>> wrote:
+>>>>>
+>>>>> On 5/4/2024 3:22 AM, Luiz Augusto von Dentz wrote:
+>>>>>> Hi Zijun,
+>>>>>>
+>>>>>> On Thu, May 2, 2024 at 10:06 AM Zijun Hu <quic_zijuhu@quicinc.com>
+>>>>>> wrote:
+>>>>>>>
+>>>>>>> Commit 272970be3dab ("Bluetooth: hci_qca: Fix driver shutdown on
+>>>>>>> closed
+>>>>>>> serdev") will cause below regression issue:
+>>>>>>>
+>>>>>>> BT can't be enabled after below steps:
+>>>>>>> cold boot -> enable BT -> disable BT -> warm reboot -> BT enable
+>>>>>>> failure
+>>>>>>> if property enable-gpios is not configured within DT|ACPI for
+>>>>>>> QCA6390.
+>>>>>>>
+>>>>>>> The commit is to fix a use-after-free issue within
+>>>>>>> qca_serdev_shutdown()
+>>>>>>> during reboot, but also introduces this regression issue
+>>>>>>> regarding above
+>>>>>>> steps since the VSC is not sent to reset controller during warm
+>>>>>>> reboot.
+>>>>>>>
+>>>>>>> Fixed by sending the VSC to reset controller within
+>>>>>>> qca_serdev_shutdown()
+>>>>>>> once BT was ever enabled, and the use-after-free issue is also be
+>>>>>>> fixed
+>>>>>>> by this change since serdev is still opened when send to serdev.
+>>>>>>>
+>>>>>>> Fixes: 272970be3dab ("Bluetooth: hci_qca: Fix driver shutdown on
+>>>>>>> closed serdev")
+>>>>>>> Cc: stable@vger.kernel.org
+>>>>>>> Reported-by: Wren Turkal <wt@penguintechs.org>
+>>>>>>> Closes: https://bugzilla.kernel.org/show_bug.cgi?id=218726
+>>>>>>> Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
+>>>>>>> Tested-by: Wren Turkal <wt@penguintechs.org>
+>>>>>>> ---
+>>>>>>>   drivers/bluetooth/hci_qca.c | 5 ++---
+>>>>>>>   1 file changed, 2 insertions(+), 3 deletions(-)
+>>>>>>>
+>>>>>>> diff --git a/drivers/bluetooth/hci_qca.c
+>>>>>>> b/drivers/bluetooth/hci_qca.c
+>>>>>>> index 0c9c9ee56592..8e35c9091486 100644
+>>>>>>> --- a/drivers/bluetooth/hci_qca.c
+>>>>>>> +++ b/drivers/bluetooth/hci_qca.c
+>>>>>>> @@ -2450,13 +2450,12 @@ static void qca_serdev_shutdown(struct
+>>>>>>> device *dev)
+>>>>>>>          struct qca_serdev *qcadev =
+>>>>>>> serdev_device_get_drvdata(serdev);
+>>>>>>>          struct hci_uart *hu = &qcadev->serdev_hu;
+>>>>>>>          struct hci_dev *hdev = hu->hdev;
+>>>>>>> -       struct qca_data *qca = hu->priv;
+>>>>>>>          const u8 ibs_wake_cmd[] = { 0xFD };
+>>>>>>>          const u8 edl_reset_soc_cmd[] = { 0x01, 0x00, 0xFC, 0x01,
+>>>>>>> 0x05 };
+>>>>>>>
+>>>>>>>          if (qcadev->btsoc_type == QCA_QCA6390) {
+>>>>>>> -               if (test_bit(QCA_BT_OFF, &qca->flags) ||
+>>>>>>> -                   !test_bit(HCI_RUNNING, &hdev->flags))
+>>>>>>
+>>>>>> This probably deserves a comment on why you end up with
+>>>>>> HCI_QUIRK_NON_PERSISTENT_SETUP and HCI_SETUP flags here, also why you
+>>>>>> are removing the flags above since that was introduce to prevent
+>>>>>> use-after-free this sort of revert it so I do wonder how serdev can
+>>>>>> still be open if you haven't tested for QCA_BT_OFF for example?
+>>>>>>
+>>>>> okay, let me give comments at next version.
+>>>>> this design logic is shown below. you maybe review it.
+>>>>>
+>>>>> if HCI_QUIRK_NON_PERSISTENT_SETUP is set, it means that hdev->setup()
+>>>>> is able to be invoked by every open() to initializate SoC without any
+>>>>> help. so we don't need to send the VSC to reset SoC into initial and
+>>>>> clean state for the next hdev->setup() call success.
+>>>>>
+>>>>> otherwise, namely, HCI_QUIRK_NON_PERSISTENT_SETUP is not set.
+>>>>>
+>>>>> if HCI_SETUP is set, it means hdev->setup() was never be invoked,
+>>>>> so the
+>>>>> SOC is already in the initial and clean state, so we also don't
+>>>>> need to
+>>>>> send the VSC to reset SOC.
+>>>>>
+>>>>> otherwise, we need to send the VSC to reset Soc into a initial and
+>>>>> clean
+>>>>> state for hdev->setup() call success after "warm reboot -> enable BT"
+>>>>>
+>>>>> for the case commit message cares about, the only factor which
+>>>>> decide to
+>>>>> send the VSC is that SoC is a initial and clean state or not after
+>>>>> warm
+>>>>> reboot, any other factors are irrelevant to this decision.
+>>>>>
+>>>>> why the serdev is still open after go through
+>>>>> (test_bit(HCI_QUIRK_NON_PERSISTENT_SETUP, &hdev->quirks)
+>>>>> || hci_dev_test_flag(hdev, HCI_SETUP) checking is that
+>>>>> serdev is not closed by hci_uart_close().
+>>>>
+>>>> Sounds like a logical jump to me, in fact hci_uart_close doesn't
+>>>> really change any of those flags, beside these flags are not really
+>>>> meant to tell the driver if serdev_device_close has been called or not
+>>>> which seems to be the intention with HCI_UART_PROTO_READY so how about
+>>>> we use that instead?
+>>>>
+>>> sorry for that i maybe not give good explanation, let me explain again.
+>>> hci_uart_close() is the only point which maybe close serdev before
+>>> qca_serdev_shutdown() is called, but for our case that
+>>> HCI_QUIRK_NON_PERSISTENT_SETUP is NOT set, hci_uart_close() will not
+>>> close serdev for our case, so serdev must be open state before sending
+>>> the VSC. so should not need other checking.
+>>>
+>> hello, i have paid attention to your discussion for a long time, i would
+>> like to join this discussion now.
+>>
+>> The serdev is still open before sending the VSC for this patch.
+>>
+>> are you agree with above Zijun's point?
+> 
+> I will say that this part of the discussion seems to be addressing KK's
+> concerns.
+> 
+> @KK, is this accurate?
+> 
+> @Zijun, this description along with the info about the baud rate issues
+> should probably be part of the commit message. In these last two
+> messages, you have been much clearer about why this logic is needed and
+> correct. I wish you'd provided this description from the beginning when
+> KK asked for more information about the logic change.
+> 
+>>>> Another thing that is troubling me is that having traffic on shutdown
+>>>> is not common, specially if you are going to reboot, etc, and even if
+>>>> it doesn't get power cycle why don't you reset on probe rather than
+>>>> shutdown? That way we don't have to depend on what has been done in a
+>>>> previous boot, which can really become a problem in case of multi-OS
+>>>> where you have another system that may not be doing what you expect.
+>>> as you know, BT UART are working at 3M baudrate for normal usage.
+>>> we can't distinguish if SoC expects 3M or default 11.52K baudarate
+>>> during probe() after reboot. so we send the VSC within shutdown to make
+>>> sure SoC enter a initial state with 11.52 baudrate.
+>>>
+>>> for cold boot, SOC expects default 11.52K baudrate for probe().
+>>> for Enable BT -> warm boot, SOC expects 3M baudrate for probe().
+>>> we can't tell these two case within probe(). so need to send the VSC
+>>> within shutdown().
+>>>
+>> it seems the traffic within qca_serdev_shutdown() actually does software
+>> reset for BT SOC.
+>>
+>>  From Zijun's points. the reasons why to do software reset within
+>> shutdown() instead of probe() maybe be shown below
+>> 1) it is impossible to do software reset within probe().
+>> 2) it seems it is easier to do it within shutdown() than probe.
+>>
+>> Zijun's simple fix only change the condition and does NOT change the
+>> location to send the VSC, i think it maybe be other topic about location
+>> where(probe() or shutdown()) to do software reset.
+>>
+>> are you agree with this point?
+> 
+> From a practical standpoint, this change does seem to fix the warm boot
+> issue on my laptop. I do not think that it would fix the issue of
+> booting from an OS that puts the hardware into an unknown state.
+>
+we may not need to focus on below multi-OS issue Luiz assume
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
+Other OS such as Windows -> warm boot -> boot linux OS -> enable BT failure.
 
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
+firstly, we don't know and can't confirm that other OS don't the similar
+jobs as linux kernel do, so can't confirm if the assumed issue is a real
+and valid issue.
 
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
+secondary, if other OS is supported as announced by vendor Qualcomm,
+their BT driver for other OS maybe have contained solution for Multi-OS
+relevant concerns.
 
-If you want to undo deduplication, reply with:
-#syz undup
+>> For concern about multi-OS, i would like to show my points.
+>>
+>> the patch is for linux kernel, we maybe only need to care about linux
+>> OS. it maybe out-of-scope to make assumptions about other OSs vendor
+>> announced supported such as Windows OS we don't known much about.
+>>
+>> are you agree with this point?
+> 
+> I would not fully agree with this point. However, I would agree
+> completely with your proposal for moving forward (i.e. landing the change).
+> 
+i agree with above Wren's point about moving forward.
+
+> I would say that it is a problem if the kernel is not doing something to
+> setup the hardware correctly in any case where it is technically
+> possible. That is clearly a bug in the driver and Qualcomm should take
+> responsibility for fixing this poor design. Luiz is totally right here.
+>i don't agree with your above point that it is a bug and driver's poor
+design, i don't actually understand how|who to conclude that present
+design is clearly a bug and is poor design.
+
+it seems this design(software reset within shutdown()) is dedicated
+for the scenario that HOST doesn't have H/W resource to reset SOC if you
+noticed below link
+https://patchwork.kernel.org/project/bluetooth/patch/1713947712-4307-1-git-send-email-quic_zijuhu@quicinc.com/
+
+For the scenario, perhaps, vendor Qualcomm have had more considerations
+than you can image and finally selected this doable design.
+
+as i commented previously. this patch doesn't touch software reset
+location designed. so it maybe be out-of-scope to discuss why probe()
+does not do the job.
+
+> Having said that, I don't see that bug as a blocker for a logic fix that
+> creates an obvious (in my mind) UX improvement.
+> 
+> Here's my view of the situation. Right now, I experience a bug on every
+> single warm boot or module reload).
+> 
+> After Zijun's improvement commit, I might experience this problem iif
+> the right set of rare circumstances occurs (i.e. whenever I warm boot
+> from an OS that puts the hardware in an unknown state, like the current
+> mainline kernel to a kernel with the improvement).
+> > In the world where the design problem of the init/shutdown sequences are
+> fixed AND this logic change is applied, I might never see this problem
+> again.
+> 
+> These seem like two different problems in my head. They don't seem
+> directly logically related, and the blast radii of the problems are very
+> different.
+> 
+> Here's the facts as I see them:
+> 1. Logic improvement problem and init/shutdown sequence problem are 2
+> orthogonal problems
+> 2. Logic improvement greatly users' chances of running into the bad UX
+> of the current code.
+> 3. Init/shutdown isn't a trivial extension from the logic improvement.
+> 4. Logic improvement has a pretty low cost to apply.
+> 5. Init/shutdown sequence fix seems to be more fundamental and more
+> intrusive.
+> 
+> All of these together indicate to me that the logic improvement should
+> be landed. The init/shutdown issue should also be fixed, but a fix for
+> that issue should not block the logic improvement.
+> 
+> My basic reasoning for this is that a visible UX fix should not e
+> blocked for a change like the init/shutdown logic fix when the logic fix
+> will help users.
+> 
+> However, Qualcomm does need to feel some pressure to fix their driver
+> code. I would like to think that user's will not be held hostage for
+> putting pressure on a vendor in this case as the balance seems very
+> intrusive for users. It certainly feels intrusive as a user to have to
+> be very careful about how I reboot my laptop.
+> 
+>>>>> see hci_uart_close() within drivers/bluetooth/hci_serdev.c
+>>>>> static int hci_uart_close(struct hci_dev *hdev)
+>>>>> {
+>>>>> ......
+>>>>>          /* When QUIRK HCI_QUIRK_NON_PERSISTENT_SETUP is set by
+>>>>> driver,
+>>>>>           * BT SOC is completely powered OFF during BT OFF, holding
+>>>>> port
+>>>>>           * open may drain the battery.
+>>>>>           */
+>>>>>          if (test_bit(HCI_QUIRK_NON_PERSISTENT_SETUP,
+>>>>> &hdev->quirks)) {
+>>>>>                  clear_bit(HCI_UART_PROTO_READY, &hu->flags);
+>>>>>                  serdev_device_close(hu->serdev);
+>>>>>          }
+>>>>>
+>>>>>          return 0;
+>>>>> }
+>>>>>
+>>>>>>> +               if (test_bit(HCI_QUIRK_NON_PERSISTENT_SETUP,
+>>>>>>> &hdev->quirks) ||
+>>>>>>> +                   hci_dev_test_flag(hdev, HCI_SETUP))
+>>>>>>>                          return;
+>>>>>>>
+>>>>>>>                  serdev_device_write_flush(serdev);
+>>>>>>> -- 
+>>>>>>> 2.7.4
+>>>>>>>
+>>>>>>
+>>>>>>
+>>>>>
+>>>>
+>>>>
+>>>
+>>>
+>>>
+>>
+> 
+
