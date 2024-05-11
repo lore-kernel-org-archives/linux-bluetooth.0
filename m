@@ -1,104 +1,156 @@
-Received: from mail-qk1-f173.google.com (mail-qk1-f173.google.com [209.85.222.173])
+Received: from mail-lj1-f180.google.com (mail-lj1-f180.google.com [209.85.208.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0F3F52F70
-	for <linux-bluetooth@vger.kernel.org>; Sat, 11 May 2024 13:51:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44CD456446
+	for <linux-bluetooth@vger.kernel.org>; Sat, 11 May 2024 15:22:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715435481; cv=none; b=JW0eNPWIo5nrK5ZgRalqSt+dGnEPHfI4EQtUJkFMiuaiD5kZHODWb1gIPu9GrE/QoNwpjgwkdsPm+ewADmlRAthIYFGx6zV33E7iyZTmX2Z1bKRdNp4AjVEExR6WCSjRunlZUZPsPxftXtCu5OuOJi2XW3X5HyDLTcsZK59XMis=
+	t=1715440977; cv=none; b=XMcmTdTKswuWrXRYBxKBx9CiCczoU/xlwRZo/3Q4kGz6xBwz5YMyX4bWi2LXr2SJrMmxGGoentoayxDZgs4dgXwq70WDTTMx3O1M4aIJw7oo0notS2+wyDSZGlQdE2ojl7HdJGw0Uc9C/gPZW1DWAm0Gb5ZZBQxKdxn5yI+E+CU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715435481; c=relaxed/simple;
-	bh=vCGIuisMEfrmISk2n7SeuvmWwuSBAzczx0xOj0tKKsg=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=clbmALG3OAKeUfEvd/FCES44hV9MeKFrfYLdcgqVnSL56PUaur0cFvIbb5eyeKjxKPLlR+MMmTNDDdj63f4Ift5EVmWc+9QLO79xIQOLLcpbKxtEQg31yqWGfdVd99Y6FW/Xcv+9Njj14UMDTbZv2N3Qd0k4J+SCEp8gzgPo3B4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ngyNu8Hv; arc=none smtp.client-ip=209.85.222.173
+	s=arc-20240116; t=1715440977; c=relaxed/simple;
+	bh=pXMeCWJw8S1D/bVDtLk0KQbzD3+0vpdObnkPAL0cVLo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Zd07lQS+WEjoM3Y1vvGoFwyO1zC4ColjeM6CvtjEC/IiK6IPLOONEgOxR4u9xwWj504bk4qreerm06xypGpUvNrkEH7wzC1n3E1IMgX25MlCiQQOTmWjZtXtQsVLoNBMADnyJ4+BPbrLBoqqemRxi8x3CFaueBYhmFO/gmD24Ow=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cAP3krpF; arc=none smtp.client-ip=209.85.208.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ngyNu8Hv"
-Received: by mail-qk1-f173.google.com with SMTP id af79cd13be357-792ce7a1fa8so94456385a.1
-        for <linux-bluetooth@vger.kernel.org>; Sat, 11 May 2024 06:51:19 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cAP3krpF"
+Received: by mail-lj1-f180.google.com with SMTP id 38308e7fff4ca-2e576057c06so4705611fa.0
+        for <linux-bluetooth@vger.kernel.org>; Sat, 11 May 2024 08:22:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1715435478; x=1716040278; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=3bB8PVqtGGIxK/Eps1doEZSDScrlxTgPdf7BMQfolGA=;
-        b=ngyNu8HvqtxjGC+qFB+8TQv9A+y8zb2Dil6hBX+C86Bn3YrzV4hm4fR6FXwszhYIJG
-         PuliZlzu5Uc+R8FdqCfWzRk+AIMUOZPKOJHKMeptn2oQYHegjQttRC6DGUALK74HDXPA
-         Vr6QjZ5XHdBPogAMTFErTzgoMlybhwalaf+/XOy6y5wacUzEJ44B7pWAuA9NiSU3zpAX
-         cbYf0j1KwvgFIy1ovhylqFzrQSvUtRNJNF/yt3YudHw0k2nTXJFsETnC8ED1b8G5/Jed
-         zCp9ntodLnvXzwnQGi9Qw1x9MngEZJ9eZcnuYhhSIZxaesS8YsaEsJOdDkDTYvoakCxp
-         NPqQ==
+        d=gmail.com; s=20230601; t=1715440974; x=1716045774; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=aUp2JhFNXMqGOh8rdzOB1bSX7aSOlcV/QVTJzKubOk4=;
+        b=cAP3krpFRzugYJ4THrsPnm5hROj9OgFMk/JLa+abfLRm/r6gOrZFWxVDbLZFjP72wd
+         /eskkAYWr93Juiy6PZF6IoxtJ+SR6JtU74u8RAu5bP2GoPxMSA6OHa/cqLlAlGuNd/+w
+         X1cU+v8CIHQ4+GRSrlS9AByZvcV8KzeFxjciZlY3RpJKafL0LbnZIfMfJCk3V/jVaWQV
+         uknanrjNVk4RlkiWzQ26O1aIEhZ+Y6iN+AmnA1lule9tlLeocERJUbKritmgzGQ50QZt
+         jKuOpC3oG4UaYsb9Or/ycJMcTu1Z/7HhAWmdtYdvBVCT8Tjp9GPEJQPummO//yg81IJA
+         ZoHA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715435478; x=1716040278;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=3bB8PVqtGGIxK/Eps1doEZSDScrlxTgPdf7BMQfolGA=;
-        b=no03+jJPbbjxeOGA+MFbtYAr4zpbmFkcQqZ5Ns4ir7iTTtFxAiCmgXxRSe5wm7o6qB
-         NOU3in1B4Q0tfOPVVA+pPcL2wHf9fAwKUl5CJ39gm0F4H0jgyyguWCpLacABrfztd8jw
-         3gudbS4WiY/12koA3/JG1sbs0IsRJLN6Y8ELJX45ZhfxK3347I83vNm3REGXrbB61QVH
-         R3DqIcnmsWrHSw55VI0uEUURGVRwRIP4MMvAHASjoDl/NIiKlr3DlpWN25ax6a+em/cT
-         XiS6tiTOiuBNj8l2aPkdZSWP4c8JAXPeDzz4g+pXZIPyRMxMgr2tT4DiWSmufrUW/KtL
-         +CUQ==
-X-Gm-Message-State: AOJu0YwWy88vBR1+KzygejiU3kjGnGVloBS3lJSk98hHpX3aaMPhBDtT
-	kKzb5YkKjx04tJ1+/HJaB71sMU0kwSZyre8iXyQBVbfoIx5J3hBk+Eoslw==
-X-Google-Smtp-Source: AGHT+IHRPF5cb1cp68C5kr9+FqvkTmlcK8sSXl9Jg/QrRMXxoZ49wZSqcbpt1i9QBKGhk0VZJAA78g==
-X-Received: by 2002:a05:620a:55bc:b0:792:92e5:4f1 with SMTP id af79cd13be357-792c758ff1bmr601393685a.24.1715435478554;
-        Sat, 11 May 2024 06:51:18 -0700 (PDT)
-Received: from [172.17.0.2] ([172.183.107.241])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-792bf2a11e8sm276535285a.58.2024.05.11.06.51.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 11 May 2024 06:51:18 -0700 (PDT)
-Message-ID: <663f77d6.e90a0220.d3627.8a58@mx.google.com>
-Date: Sat, 11 May 2024 06:51:18 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============6339949491598195915=="
+        d=1e100.net; s=20230601; t=1715440974; x=1716045774;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=aUp2JhFNXMqGOh8rdzOB1bSX7aSOlcV/QVTJzKubOk4=;
+        b=aTBPoGq+5VS2WKafXsQj4aec6pyKzDt01Kf2iLr1f4zHEQfPX5EPzRJlKZ4p+x91py
+         oC7/wFxAS8TdcrEn2/7BemfAs5YftBqV8CPfn1x+41mA4cGN1m8jGvvoBvFjuCzTw0zr
+         R50J+CBwc2iv6FInUl4cgim1CPIt6CykxREuEsvhmkwpXUvKZD34GOpIEolu8gLYSMOn
+         k7ezQuPzWE7ZuyfTz3HXES5b61QwKwKAoSasXd0UacFMOHIHDfo6CGA/eW4v96akIUpn
+         YuIL7WAawf+QpFyh3swu3uLYRVtfjisLAOqQUdynvEmCtl/3hwKuTsiJa5xuZruwJdk5
+         F5tQ==
+X-Gm-Message-State: AOJu0YyDolTpRQWswMexdwOvBnCjrAPzeFG1Cz/JOmVl90IDB7fZqtkV
+	i14ANiTN4HoucXcZThhGLqJbbu6sKrhcZ0NmwnA3O8N8epjx/hCJy7MQ3tgzYMAsYI7WKO7cW6n
+	UFXHhwCJnvlmOsbyIcq1O/BhA0pE=
+X-Google-Smtp-Source: AGHT+IFwov/YFrkRFxYmZ85aMEqJzoiPRUVZF7GpP3rm9tkG9HCJXTTJN9NJhrQPvMRkYtT/fhkxB3r3MAMIJO0cgu8=
+X-Received: by 2002:a2e:b0db:0:b0:2d6:dba1:6d37 with SMTP id
+ 38308e7fff4ca-2e51fd2d389mr33068701fa.11.1715440974038; Sat, 11 May 2024
+ 08:22:54 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, pav@iki.fi
-Subject: RE: [BlueZ] client: fix ISO send data rate
-In-Reply-To: <9b88a0238679d24aa5d68a4c473483943a8ea2b6.1715427163.git.pav@iki.fi>
 References: <9b88a0238679d24aa5d68a4c473483943a8ea2b6.1715427163.git.pav@iki.fi>
-Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <9b88a0238679d24aa5d68a4c473483943a8ea2b6.1715427163.git.pav@iki.fi>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Sat, 11 May 2024 11:22:41 -0400
+Message-ID: <CABBYNZ+zVn+GYG4sFubU4CMRkJBvhmjEX7UsAPROeQM1Pyjoqw@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] client: fix ISO send data rate
+To: Pauli Virtanen <pav@iki.fi>
+Cc: linux-bluetooth@vger.kernel.org, vlad.pruteanu@nxp.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
---===============6339949491598195915==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi Pauli,
 
-This is automated email and please do not reply to this email!
+On Sat, May 11, 2024 at 7:34=E2=80=AFAM Pauli Virtanen <pav@iki.fi> wrote:
+>
+> We are sending data to controller at wrong average rate not equal to
+> 1 packet / SDU interval, if Transport_Latency is not an integer multiple
+> of SDU_Interval.  The calculation currently may also give zero, so no
+> data gets sent.
+>
+> We are sending data in bursts of num ~=3D Transport_Latency/SDU_Interval
+> packets, in hopes that possibly larger timer interval makes things more
+> efficient.
+>
+> Fix the data rate by sending num packets every num*SDU_Interval, so that
+> the average data rate is correct.
+>
+> Also fix use of itimerspect.it_value with TFD_TIMER_ABSTIME.  The value
+> set previously is going to always be in the past in CLOCK_MONOTONIC so
+> just set it to 1, and leave sending the initial packets to the main
+> loop.
+> ---
+>
+> Notes:
+>     This assumes kernel shall set qos.interval to SDU_Interval and not
+>     ISO_Interval.
+>
+>  client/player.c | 20 ++++++++++++++------
+>  1 file changed, 14 insertions(+), 6 deletions(-)
+>
+> diff --git a/client/player.c b/client/player.c
+> index 7f67425aa..8d17022de 100644
+> --- a/client/player.c
+> +++ b/client/player.c
+> @@ -5066,22 +5066,30 @@ static int transport_send(struct transport *trans=
+port, int fd,
+>         if (timer_fd < 0)
+>                 return -errno;
+>
+> +       /* Send data in bursts of
+> +        * num =3D ROUND_CLOSEST(Transport_Latency (ms) / SDU_Interval (u=
+s))
+> +        * with average data rate =3D 1 packet / SDU_Interval
+> +        */
+> +       transport->num =3D ROUND_CLOSEST(qos->latency * 1000, qos->interv=
+al);
+> +       if (!transport->num)
+> +               transport->num =3D 1;
+> +
+>         memset(&ts, 0, sizeof(ts));
+> -       ts.it_value.tv_nsec =3D qos->latency * 1000000;
+> -       ts.it_interval.tv_nsec =3D qos->latency * 1000000;
+> +       ts.it_value.tv_nsec =3D 1;
+> +       ts.it_interval.tv_nsec =3D transport->num * qos->interval * 1000;
+>
+> -       if (timerfd_settime(timer_fd, TFD_TIMER_ABSTIME, &ts, NULL) < 0)
+> +       if (timerfd_settime(timer_fd, TFD_TIMER_ABSTIME, &ts, NULL) < 0) =
+{
+> +               close(timer_fd);
+>                 return -errno;
+> +       }
+>
+>         transport->fd =3D fd;
+> -       /* num of packets =3D ROUND_CLOSEST(latency (ms) / interval (us))=
+ */
+> -       transport->num =3D ROUND_CLOSEST(qos->latency * 1000, qos->interv=
+al);
+>         transport->timer_io =3D io_new(timer_fd);
+>
+>         io_set_read_handler(transport->timer_io, transport_timer_read,
+>                                                 transport, NULL);
+>
+> -       return transport_send_seq(transport, fd, 1);
 
-Dear submitter,
+The above was actually done on purpose so we are always one interval
+ahead to keep controller buffer full as much as possible.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=852520
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      0.41 seconds
-GitLint                       PASS      0.29 seconds
-BuildEll                      PASS      24.81 seconds
-BluezMake                     PASS      1755.50 seconds
-MakeCheck                     PASS      13.61 seconds
-MakeDistcheck                 PASS      181.36 seconds
-CheckValgrind                 PASS      252.17 seconds
-CheckSmatch                   PASS      359.45 seconds
-bluezmakeextell               PASS      122.46 seconds
-IncrementalBuild              PASS      1490.77 seconds
-ScanBuild                     PASS      1058.36 seconds
+> +       return 0;
+>  }
+>
+>  static void cmd_send_transport(int argc, char *argv[])
+> --
+> 2.45.0
+>
+>
 
 
-
----
-Regards,
-Linux Bluetooth
-
-
---===============6339949491598195915==--
+--=20
+Luiz Augusto von Dentz
