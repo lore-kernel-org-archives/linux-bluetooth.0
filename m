@@ -1,37 +1,37 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C5261CD13;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C58C20323;
 	Sun, 12 May 2024 12:12:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715515938; cv=none; b=jlRA5Web5+CPu1+tWLpqlcvkUvk6OPQlpzLjIA3Ef/vJlDJQZ7ciHET1o6LbTNVPbmFXwMCzNm1E5pBiwilH8R3GIeMVA3zLLiuz6nCh5vz9KlCmnWopS4KWdVus2t8xAfjV/KBNi0IIpz1Kd5ssg1i387yhQ84ylmrlQculGG8=
+	t=1715515938; cv=none; b=PjKBDAgsUSCt5lEmlEl0XWfnY2oQQpjoP2R4V/6QdW6pIoQ01+P7Ne5E7ZJxQIEnzV+khCVe739GtSpLcyUIt2g9BNlhvsxEvmRfHSJ1c5EovHRTHfJLZuBNq8zEtbtDcJ0GM/NyQze9yIWPLDLVQEMqAZ+62gNYACYY8RPyCIk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1715515938; c=relaxed/simple;
-	bh=uQn2LpSYH3VSkLT8zOSF6zifQuGNp9REuyof47a4VwA=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=j+soa6LsFLTjW0aS2FK+x1jd+PBfuQA3TdJck98J91GeyA0fnwtoDib/8z/A+9WMqYVtUGSt8Bn+MjMtYqsHNcEtN2GFlV63pmmoJNBVXPFGWF9BcOZtkl+riv+EQlxg+ZMTPdNzCulyimFQmnDA0zABroXyQNHPO2038X96F9o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AqNnZpM3; arc=none smtp.client-ip=10.30.226.201
+	bh=lOIv9CYGdaM8Wpum8P1i2gOjEdfKKm5DnGLmgvog6Z4=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=j0dDIDyKql0tIQFC0f7S/NnZlTb0ezyFJjOI21bDxZVIVHuhiq5cmVSWjCgkRT6t7fCfbf91u4fKBY0DFRxaJgkcuNjMcJ2zUOgH0YuQjLxc9zoa6tqHlfd+BAniC4eQVQAyDip7R+OWSrC9SM2rJsfK0aVi+KHv5Nmtq7oSk4E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=H7Yot5SR; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AqNnZpM3"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id CF572C32783;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="H7Yot5SR"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id C52D2C116B1;
 	Sun, 12 May 2024 12:12:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1715515937;
-	bh=uQn2LpSYH3VSkLT8zOSF6zifQuGNp9REuyof47a4VwA=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
-	b=AqNnZpM3MZ5HNyZPwo2bV4eQ1+sLLGVHhFFC4vZYXptzUoi4p2vuPTCkBk23SLaPQ
-	 E+aiLzKIBT9goBdCFK/VjCEy06HdZXfinaiASvNGbk4WgptoBjCMFMfMMpukJR7BNP
-	 etcIHwtrNTMmButKi9Yh18kLziysGCaMa8h1h3woL/CIL0z+ItfpMo2yFyh33lvzJn
-	 8Cyn65p0NHcS9L2KiZhjx69mKu8H7whT4havYJWa25KIcaQoHfqb9gt3Uo6zghQR5m
-	 7+yr3Qa/kT9+8ygJ83M9KEjP4Mn+JpWI0XuVpLs1krkw4L8bsK1aKmeoDO2Bgh0dUm
-	 pQ6ysO5elyClw==
+	bh=lOIv9CYGdaM8Wpum8P1i2gOjEdfKKm5DnGLmgvog6Z4=;
+	h=From:Subject:Date:To:Cc:Reply-To:From;
+	b=H7Yot5SR7bM+tEik8pWRwqRAEyzVhl04jbeFEwCIQqEXeLkHpk527/AIfSY9F9QGs
+	 TpTeDUeh3Us2zNuLhth8jqK7+PBM0v5fi4GtvkkRF1rfPCSRHmCJazFGgRAVwxT3yU
+	 um5ty7Py1qzlgp2fubDrq8YqvSuSXP5XOo7+hCRbv1l5lo1aktw5Nq8iPSdCrZ+DT/
+	 uaR1ecJOh98ZGq9lpRI0v4DOVmsf+g+z4LnT5rGWYHW6t0dxIyiCphEaV05BkzyCkd
+	 zBTKtUA+PF7efPJiMQBPb0kAuPJ08dJFkCu2MfgRBeXuE1rQqhJY5ultxNqJLkEhRi
+	 VGtXZj5q85e3Q==
 Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C7E7AC10F1A;
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BA205C25B5F;
 	Sun, 12 May 2024 12:12:17 +0000 (UTC)
 From: Sven Peter via B4 Relay <devnull+sven.svenpeter.dev@kernel.org>
-Date: Sun, 12 May 2024 12:12:07 +0000
-Subject: [PATCH 1/2] Bluetooth: hci_bcm4377: Increase boot timeout
+Subject: [PATCH 0/2] Bluetooth: hci_bcm4377 fixes
+Date: Sun, 12 May 2024 12:12:06 +0000
+Message-Id: <20240512-btfix-msgid-v1-0-ab1bd938a7f4@svenpeter.dev>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -40,22 +40,22 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20240512-btfix-msgid-v1-1-ab1bd938a7f4@svenpeter.dev>
-References: <20240512-btfix-msgid-v1-0-ab1bd938a7f4@svenpeter.dev>
-In-Reply-To: <20240512-btfix-msgid-v1-0-ab1bd938a7f4@svenpeter.dev>
+X-B4-Tracking: v=1; b=H4sIABayQGYC/6tWKk4tykwtVrJSqFYqSi3LLM7MzwNyDHUUlJIzE
+ vPSU3UzU4B8JSMDIxMDU0Mj3aSStMwK3dzi9MwU3RRzMwMjy0TzFEtDcyWgjoKiVKAk2LTo2Np
+ aAC/1v5RdAAAA
 To: Hector Martin <marcan@marcan.st>, 
  Alyssa Rosenzweig <alyssa@rosenzweig.io>, 
  Marcel Holtmann <marcel@holtmann.org>, 
  Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Cc: asahi@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
  linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
- Sven Peter <sven@svenpeter.dev>
+ Sven Peter <sven@svenpeter.dev>, stable@vger.kernel.org
 X-Mailer: b4 0.13.0
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1715515936; l=1230;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1715515936; l=990;
  i=sven@svenpeter.dev; s=20240512; h=from:subject:message-id;
- bh=l5zSo1PIT3qiMZokOHqlZSiHEp61gw9G4TR1ydgJdn8=;
- b=n9bTv01yWWAEQyW+jcLjnXCkBT8m4v+1sdLTdkCYA3JsdBqYIW4HWVo/du2TPgpdY0+vEtEB4
- T1TnR3JSZ2OAgeOOqyVSTnayjE6KuEhWnqjURCkz09+JQZmZBnRmMWq
+ bh=lOIv9CYGdaM8Wpum8P1i2gOjEdfKKm5DnGLmgvog6Z4=;
+ b=jo+i34A8NOxsam6xXuE0fOchQDV91L+Thb8dJuNz0ff62D+4IpNSyLKnSj5jHwq69S1kkNjWn
+ LBUq4GIaVAvCemQrrixNxdXViAjDxtvuELGEqQxzUC16YPHvmWJTjQy
 X-Developer-Key: i=sven@svenpeter.dev; a=ed25519;
  pk=jIiCK29HFM4fFOT2YTiA6N+4N7W+xZYQDGiO0E37bNU=
 X-Endpoint-Received: by B4 Relay for sven@svenpeter.dev/20240512 with
@@ -63,43 +63,34 @@ X-Endpoint-Received: by B4 Relay for sven@svenpeter.dev/20240512 with
 X-Original-From: Sven Peter <sven@svenpeter.dev>
 Reply-To: sven@svenpeter.dev
 
-From: Hector Martin <marcan@marcan.st>
+Hi,
 
-BCM4388 takes over 2 seconds to boot, so increase the timeout (and also
-fix the units while we're here).
+There are just two minor fixes from Hector that we've been carrying downstream
+for a while now. One increases the timeout while waiting for the firmware to
+boot which is optional for the controller already supported upstream but
+required for a newer 4388 board for which we'll also submit support soon.
+It also fixes the units for the timeouts which is why I've already included it
+here. The other one fixes a call to bitmap_release_region where we only wanted
+to release a single bit but are actually releasing much more.
 
-Signed-off-by: Hector Martin <marcan@marcan.st>
-Reviewed-by: Sven Peter <sven@svenpeter.dev>
+Best,
+
+Sven
+
 Signed-off-by: Sven Peter <sven@svenpeter.dev>
 ---
- drivers/bluetooth/hci_bcm4377.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+Hector Martin (2):
+      Bluetooth: hci_bcm4377: Increase boot timeout
+      Bluetooth: hci_bcm4377: Fix msgid release
 
-diff --git a/drivers/bluetooth/hci_bcm4377.c b/drivers/bluetooth/hci_bcm4377.c
-index 9a7243d5db71..5b818a0e33d6 100644
---- a/drivers/bluetooth/hci_bcm4377.c
-+++ b/drivers/bluetooth/hci_bcm4377.c
-@@ -32,7 +32,8 @@ enum bcm4377_chip {
- #define BCM4378_DEVICE_ID 0x5f69
- #define BCM4387_DEVICE_ID 0x5f71
- 
--#define BCM4377_TIMEOUT 1000
-+#define BCM4377_TIMEOUT msecs_to_jiffies(1000)
-+#define BCM4377_BOOT_TIMEOUT msecs_to_jiffies(5000)
- 
- /*
-  * These devices only support DMA transactions inside a 32bit window
-@@ -1857,7 +1858,7 @@ static int bcm4377_boot(struct bcm4377_data *bcm4377)
- 	dev_dbg(&bcm4377->pdev->dev, "waiting for firmware to boot\n");
- 
- 	ret = wait_for_completion_interruptible_timeout(&bcm4377->event,
--							BCM4377_TIMEOUT);
-+							BCM4377_BOOT_TIMEOUT);
- 	if (ret == 0) {
- 		ret = -ETIMEDOUT;
- 		goto out_dma_free;
+ drivers/bluetooth/hci_bcm4377.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
+---
+base-commit: cf87f46fd34d6c19283d9625a7822f20d90b64a4
+change-id: 20240512-btfix-msgid-d76029a7d917
 
+Best regards,
 -- 
-2.34.1
+Sven Peter <sven@svenpeter.dev>
 
 
