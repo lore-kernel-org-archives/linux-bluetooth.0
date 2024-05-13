@@ -1,109 +1,147 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail115-118.sinamail.sina.com.cn (mail115-118.sinamail.sina.com.cn [218.30.115.118])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BF222AF09;
-	Mon, 13 May 2024 22:43:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2249382488
+	for <linux-bluetooth@vger.kernel.org>; Mon, 13 May 2024 23:27:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=218.30.115.118
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715640214; cv=none; b=Ab1myaSfkfDyUuLsUwujIh7ld6ZlUOuNFTeUFCJ8rTriuobPKsWqxVZ5BvcqaXbXnzdu2BRnruhCZRp0FaYwG8Xlk1Qdw3UAkw40suRN1cc8YMCcifq2ZA8LRS0luqCd1WqGZxif/2XpAbph+tpXq/iFYhGU7hwpc8kd+Rj5IHE=
+	t=1715642837; cv=none; b=PtVN1B3T/AAgiicQXQfbcfcemgOEvvfurueICMz8Q222sXCm17/mRB3QxB8ghWLj13vOY/8n3lEyVFC6ue0mAP+AawJJRVMPadoU2VFhkgEKTMiSCTSnYqZWqvYqTC/QucqwyQ2ZN5u0Vz/WulKznMvpIcvZwVtHVZ66F/E+myw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715640214; c=relaxed/simple;
-	bh=VQ9Urm59rmUv8jDvOau4fdEQRHbiw9popBWNhKOZ7Bw=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=siRwSjJlufyV2CUZLkRgIondt88nDbN654mhKApPomH0XAw4diGuapuvoKBNGuhD3MuE1fp5iVqCuLgzam72ecM8I1XUbS9CDp3PvLkADiN4pyJawPIux0nuHr6EPHTToEZOt7N/UgvWO/OlOgdDkUTrVHn9lUAUAn/M+HswA8s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tQ7vlJVR; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tQ7vlJVR"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4644EC113CC;
-	Mon, 13 May 2024 22:43:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1715640213;
-	bh=VQ9Urm59rmUv8jDvOau4fdEQRHbiw9popBWNhKOZ7Bw=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=tQ7vlJVRc2ECTpRE6TpVoz4yGD+gwv2CHAwasKSsvG2OxlS5H6QwNS16joypOrN0s
-	 UpWX9AzJqYSTh9M9y6NZCJwZBzODNK+yb2kBN2D8sDIwsNWbfXiHjhrj4KaoyOxJip
-	 yIjXaY/m+Kx2bWVT/KkNgE2qZvnrSOB1exe3K/+y9uxsx7w0kgBL6ZockGQBJaEqA7
-	 pHtnGWIw3tktLWlj5h3tOsAJuNJIq/H+CwQJ1yOKIIZg9pyFL1XfnljeEmzYVxLupC
-	 xNyNU7K5AR32fSXnZ5OQQoSqMUnEtXiH/CKjF0Xd5+n8i+Mqhh5u8EzR2FVWxcnBlW
-	 hwDsf+yheyc7Q==
-Date: Mon, 13 May 2024 15:43:32 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, davem@davemloft.net,
- linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org, Pauli Virtanen
- <pav@iki.fi>
-Subject: Re: pull request: bluetooth-next 2024-05-10
-Message-ID: <20240513154332.16e4e259@kernel.org>
-In-Reply-To: <CABBYNZKn5YBRjj+RT_TVDtjOBS6V_H7BQmFMufQj-cOTC=RXDA@mail.gmail.com>
-References: <20240510211431.1728667-1-luiz.dentz@gmail.com>
-	<20240513142641.0d721b18@kernel.org>
-	<CABBYNZKn5YBRjj+RT_TVDtjOBS6V_H7BQmFMufQj-cOTC=RXDA@mail.gmail.com>
+	s=arc-20240116; t=1715642837; c=relaxed/simple;
+	bh=zMzkmfe/SImkrDD6F58Ahl/biyaLPosnlc2zhtCaLCo=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=WQwsXXZTT3AjZYpj4HnGeqCez+fVkbEuEeygG6H1lZw0K+F0iCGR9JjKkrAYuljD/N/LMZL+hf29RefEZAyogZLXGHMAcTTYehVKqKgaU1GOgSYFzMesw2vdvZdTBNgSXo4T554C+aXE0AjcVwskGp8zNlPMK5DXRgFXFGZy2U0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sina.com; spf=pass smtp.mailfrom=sina.com; arc=none smtp.client-ip=218.30.115.118
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sina.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sina.com
+X-SMAIL-HELO: localhost.localdomain
+Received: from unknown (HELO localhost.localdomain)([113.88.50.104])
+	by sina.com (172.16.235.25) with ESMTP
+	id 6642A1C600000526; Mon, 14 May 2024 07:27:04 +0800 (CST)
+X-Sender: hdanton@sina.com
+X-Auth-ID: hdanton@sina.com
+Authentication-Results: sina.com;
+	 spf=none smtp.mailfrom=hdanton@sina.com;
+	 dkim=none header.i=none;
+	 dmarc=none action=none header.from=hdanton@sina.com
+X-SMAIL-MID: 60530034210354
+X-SMAIL-UIID: F7BD05331E194D2091A55FB4A3CBD377-20240514-072704-1
+From: Hillf Danton <hdanton@sina.com>
+To: syzbot <syzbot+55cd5225f71c5cff7f6f@syzkaller.appspotmail.com>
+Cc: johan.hedberg@gmail.com,
+	linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	luiz.dentz@gmail.com,
+	marcel@holtmann.org,
+	Takashi Iwai <tiwai@suse.de>,
+	Nicolai Stange <nstange@suse.de>,
+	syzkaller-bugs@googlegroups.com
+Subject: [syzbot] [bluetooth?] BUG: sleeping function called from invalid context in lock_sock_nested (3)
+Date: Tue, 14 May 2024 07:26:52 +0800
+Message-Id: <20240513232652.3080-1-hdanton@sina.com>
+In-Reply-To: <0000000000009f2fe006185570d8@google.com>
+References: 
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On Mon, 13 May 2024 18:09:31 -0400 Luiz Augusto von Dentz wrote:
-> > There is one more warning in the Intel driver:
-> >
-> > drivers/bluetooth/btintel_pcie.c:673:33: warning: symbol 'causes_list'
-> > was not declared. Should it be static?  
+On Mon, 13 May 2024 05:58:21 -0700
+> syzbot found the following issue on:
 > 
-> We have a fix for that but I was hoping to have it in before the merge
-> window and then have the fix merged later.
+> HEAD commit:    1c9135d29e9e Merge branch 'for-next/core' into for-kernelci
+> git tree:       git://git.kernel.org/pub/scm/linux/kernel/git/arm64/linux.git for-kernelci
+> console output: https://syzkaller.appspot.com/x/log.txt?x=10df1ea8980000
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=7d2d53e64c7e6a4f
+> dashboard link: https://syzkaller.appspot.com/bug?extid=55cd5225f71c5cff7f6f
+> compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+> userspace arch: arm64
 > 
-> > It'd also be great to get an ACK from someone familiar with the socket
-> > time stamping (Willem?) I'm not sure there's sufficient detail in the
-> > commit message to explain the choices to:
-> >  - change the definition of SCHED / SEND to mean queued / completed,
-> >    while for Ethernet they mean queued to qdisc, queued to HW.  
+> Unfortunately, I don't have any reproducer for this issue yet.
 > 
-> hmm I thought this was hardware specific, it obviously won't work
-> exactly as Ethernet since it is a completely different protocol stack,
-> or are you suggesting we need other definitions for things like TX
-> completed?
+> Downloadable assets:
+> disk image: https://storage.googleapis.com/syzbot-assets/52dd1b4921ab/disk-1c9135d2.raw.xz
+> vmlinux: https://storage.googleapis.com/syzbot-assets/1a4f1788dc25/vmlinux-1c9135d2.xz
+> kernel image: https://storage.googleapis.com/syzbot-assets/b8d8ebd42a80/Image-1c9135d2.gz.xz
+> 
+> IMPORTANT: if you fix the issue, please add the following tag to the commit:
+> Reported-by: syzbot+55cd5225f71c5cff7f6f@syzkaller.appspotmail.com
+> 
+> BUG: sleeping function called from invalid context at net/core/sock.c:3537
+> in_atomic(): 1, irqs_disabled(): 0, non_block: 0, pid: 6274, name: kworker/u9:3
+> preempt_count: 1, expected: 0
+> RCU nest depth: 0, expected: 0
+> 6 locks held by kworker/u9:3/6274:
+>  #0: ffff0000d8c79948 ((wq_completion)hci0#2){+.+.}-{0:0}, at: process_one_work+0x668/0x15d4 kernel/workqueue.c:3241
+>  #1: ffff8000a9cb7c20 ((work_completion)(&hdev->rx_work)){+.+.}-{0:0}, at: process_one_work+0x6b4/0x15d4 kernel/workqueue.c:3241
+>  #2: ffff0000e8294078 (&hdev->lock){+.+.}-{3:3}, at: hci_sync_conn_complete_evt+0xa4/0x870 net/bluetooth/hci_event.c:5061
+>  #3: ffff800091d51708 (hci_cb_list_lock){+.+.}-{3:3}, at: hci_connect_cfm include/net/bluetooth/hci_core.h:2010 [inline]
+>  #3: ffff800091d51708 (hci_cb_list_lock){+.+.}-{3:3}, at: hci_sync_conn_complete_evt+0x3d4/0x870 net/bluetooth/hci_event.c:5144
+>  #4: ffff0000d0bf4420 (&conn->lock#2){+.+.}-{2:2}, at: spin_lock include/linux/spinlock.h:351 [inline]
+>  #4: ffff0000d0bf4420 (&conn->lock#2){+.+.}-{2:2}, at: sco_conn_ready net/bluetooth/sco.c:1273 [inline]
+>  #4: ffff0000d0bf4420 (&conn->lock#2){+.+.}-{2:2}, at: sco_connect_cfm+0x260/0x94c net/bluetooth/sco.c:1358
+>  #5: ffff0000cd046258 (sk_lock-AF_BLUETOOTH-BTPROTO_SCO){+.+.}-{0:0}, at: lock_sock include/net/sock.h:1673 [inline]
+>  #5: ffff0000cd046258 (sk_lock-AF_BLUETOOTH-BTPROTO_SCO){+.+.}-{0:0}, at: sco_conn_ready net/bluetooth/sco.c:1286 [inline]
+>  #5: ffff0000cd046258 (sk_lock-AF_BLUETOOTH-BTPROTO_SCO){+.+.}-{0:0}, at: sco_connect_cfm+0x3e8/0x94c net/bluetooth/sco.c:1358
+> Preemption disabled at:
+> [<ffff80008a0d70d4>] spin_lock include/linux/spinlock.h:351 [inline]
+> [<ffff80008a0d70d4>] sco_conn_ready net/bluetooth/sco.c:1273 [inline]
+> [<ffff80008a0d70d4>] sco_connect_cfm+0x260/0x94c net/bluetooth/sco.c:1358
 
-I don't know anything about queuing in BT, in terms of timestamping
-the SEND - SCHED difference is supposed to indicate the level of
-host delay or host congestion. If the queuing in BT happens mostly in 
-the device HW queue then it may make sense to generate SCHED when
-handing over to the driver. OTOH if the devices can coalesce or delay
-completions the completion timeout may be less accurate than stamping
-before submitting to HW... I'm looking for the analysis that the choices
-were well thought thru.
+A known issue in 2021 [1]
 
-> >    How does it compare to stamping in the driver in terms of accuracy?  
-> 
-> @Pauli any input here?
-> 
-> >  - the "experimental" BT_POLL_ERRQUEUE, how does the user space look?  
-> 
-> There are test cases in BlueZ:
-> 
-> https://github.com/bluez/bluez/commit/141f66411ca488e26bdd64e6f858ffa190395d23
-> 
-> >    What is the "upper layer"? What does it mean for kernel uAPI to be
-> >    "experimental"? When does the "upper layer" get to run and how does
-> >    it know that there are time stamps on the error queue?  
-> 
-> The socketopt only gets enabled with use of MGMT Set Experimental
-> Feature Command:
-> 
-> https://github.com/bluez/bluez/blob/master/doc/mgmt-api.txt#L3205
-> 
-> Anyway you can see on the tests how we are using it.
+[1] Subject: Possible sleep-in-atomic in BT SCO code
+https://lore.kernel.org/lkml/s5hilz8n1an.wl-tiwai@suse.de/
 
-Either I didn't grok the test or it doesn't answer my question.
-What is the lower layer that we want to "protect" from POLLERR?
-
-> > Would be great to get more info and/or second opinion, because it's not
-> > sufficiently "obviously right" to me to pull right away :(  
+> CPU: 0 PID: 6274 Comm: kworker/u9:3 Not tainted 6.9.0-rc7-syzkaller-g1c9135d29e9e #0
+> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 03/27/2024
+> Workqueue: hci0 hci_rx_work
+> Call trace:
+>  dump_backtrace+0x1b8/0x1e4 arch/arm64/kernel/stacktrace.c:317
+>  show_stack+0x2c/0x3c arch/arm64/kernel/stacktrace.c:324
+>  __dump_stack lib/dump_stack.c:88 [inline]
+>  dump_stack_lvl+0xe4/0x150 lib/dump_stack.c:114
+>  dump_stack+0x1c/0x28 lib/dump_stack.c:123
+>  __might_resched+0x374/0x4d0 kernel/sched/core.c:10197
+>  __might_sleep+0x90/0xe4 kernel/sched/core.c:10126
+>  lock_sock_nested+0x6c/0x11c net/core/sock.c:3537
+>  lock_sock include/net/sock.h:1673 [inline]
+>  sco_conn_ready net/bluetooth/sco.c:1286 [inline]
+>  sco_connect_cfm+0x3e8/0x94c net/bluetooth/sco.c:1358
+>  hci_connect_cfm include/net/bluetooth/hci_core.h:2013 [inline]
+>  hci_sync_conn_complete_evt+0x438/0x870 net/bluetooth/hci_event.c:5144
+>  hci_event_func net/bluetooth/hci_event.c:7545 [inline]
+>  hci_event_packet+0x740/0x1098 net/bluetooth/hci_event.c:7597
+>  hci_rx_work+0x318/0xa78 net/bluetooth/hci_core.c:4171
+>  process_one_work+0x7b8/0x15d4 kernel/workqueue.c:3267
+>  process_scheduled_works kernel/workqueue.c:3348 [inline]
+>  worker_thread+0x938/0xef4 kernel/workqueue.c:3429
+>  kthread+0x288/0x310 kernel/kthread.c:388
+>  ret_from_fork+0x10/0x20 arch/arm64/kernel/entry.S:860
+> Bluetooth: hci0: command tx timeout
 > 
-> Well I assumed sockopt starting with SO_ sort of means it applies that
-> all socket families, in fact SO_TIMESTAMP already seem to work without
-> these changes they just don't generate anything, so in a way we are
-> just implementing a missing feature.
+> 
+> ---
+> This report is generated by a bot. It may contain errors.
+> See https://goo.gl/tpsmEJ for more information about syzbot.
+> syzbot engineers can be reached at syzkaller@googlegroups.com.
+> 
+> syzbot will keep track of this issue. See:
+> https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+> 
+> If the report is already addressed, let syzbot know by replying with:
+> #syz fix: exact-commit-title
+> 
+> If you want to overwrite report's subsystems, reply with:
+> #syz set subsystems: new-subsystem
+> (See the list of subsystem names on the web dashboard)
+> 
+> If the report is a duplicate of another one, reply with:
+> #syz dup: exact-subject-of-another-report
+> 
+> If you want to undo deduplication, reply with:
+> #syz undup
+> 
