@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70097153572
-	for <linux-bluetooth@vger.kernel.org>; Mon, 13 May 2024 14:00:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16331153815
+	for <linux-bluetooth@vger.kernel.org>; Mon, 13 May 2024 14:10:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715608832; cv=none; b=Ks5GjU/+wPR6jIFt17bRd5zSR+vyWWiYgAScQxNjznnANaGtgp+L5t9rJFk89U13Govv7X7sEUM00K2czxWM/A9hl1dKnprcM35TSJg2b3Z0Lv3EXG7Vc3XLy03JFEuNIht2TnD1WSE0hWrlMb/71EgHAw2P36l4VIKd9Mc5FEw=
+	t=1715609428; cv=none; b=Sj7l1XHgc72vnoa1IvzfLIFfcpZQ7+bPPNcKhRbydPHoCrQKT8w/g27Jhfctw+/vVVeafD3rqbSs5FcycdG4enP9lMhYDUQA7rwFCOK+CTl8nVTHNhd708+mNotUknPlNAyG3oeC/0qRGgd8ggBHkJClyy/nTFQEJedIJso9sog=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715608832; c=relaxed/simple;
-	bh=jTmPoYNTAFr8UccCYSlecA4CUJyXHoMQbxNV0HloD2g=;
+	s=arc-20240116; t=1715609428; c=relaxed/simple;
+	bh=xkfVd6YHB6IBXkZgJ66OKU6uTmF62OA8L56R6EJW9CY=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=LeHBRsjKFED9u4TzqBq25soACciinSsLoZxaGegarPt9fBI/qPRqTQohTJd3Aqo4wB6SF7tmgUSwiS+1ObeESJ+1K/hFnU2Rgkitb1vFGdJDa9omtv0rvqCKC9qC1o4zhDvihXU3rUOZp9nucUv8UcfK9SvpM84IUF+4SSLkOto=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ScqrNGMF; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=nLBOQG7rZli3HCGt07PbLl+xRsgwR0E34CZE+0vjMZL9bcgv8QKyCs1++D83BeiA9xNDz4QOiX1kWlwkntBkTNCGh1dNu3xBgxqN1/g2iS1tGHUdgkW4E9j2a7zn98GueAyc5d/SQnbHI5Fxh3gvVUv+JOFvyGo7Dvj2fA9tH9M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=heq4Lu8G; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ScqrNGMF"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 0B8E9C4AF16;
-	Mon, 13 May 2024 14:00:32 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="heq4Lu8G"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id B8021C4AF09;
+	Mon, 13 May 2024 14:10:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1715608832;
-	bh=jTmPoYNTAFr8UccCYSlecA4CUJyXHoMQbxNV0HloD2g=;
+	s=k20201202; t=1715609427;
+	bh=xkfVd6YHB6IBXkZgJ66OKU6uTmF62OA8L56R6EJW9CY=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=ScqrNGMFgmSmmYjht8NEVbd6utZ7gMJ9+7tF/h2X5OeJ6R/50tolVpMvzIv4ZsGlB
-	 F8NSwOmzY8F2PFrpzl9o5PXZ/EhEMGQ9lnYvsejn7mKKOX0n4/uAJFXvuy+ySyX5Qh
-	 RvAhVe9GtADve5qyGQpGy/HUmlMVvmjG1iw93C/WoZfAhG5ub9oc3fjpN6z3KJIhZC
-	 EhKoB1QHBYy2usLgXmlGWgoNtln/zsHK5Mqb5rBnJkSJvC6gsaOOzI45IdFRiYxWfg
-	 OeyAXXbJ/QjCXEKrdIlADGjl5/UcfF9vLfpeERz8ngSZJ85nMeG0x44mwaY1SucgM5
-	 jjHjEyfoCB0hA==
+	b=heq4Lu8Grrb0awqxx+sqAcjwBhOUCnBcou3GGX1wB4Hg9vcrohqtJDxtPgY1CsANS
+	 bUduXzyuxUq86CzhMyFq0/4HtgVwtSdm8yHLjb6//Oo+zO4A8D9V+Uv7GbAW/h3N40
+	 9fGpiSyX0ATZtfOCGI0u1vKzZUTsONl86wdTwJVJEPD49fXfOXCS2JOq+YeFLLO0Zd
+	 0PPcdh8CRLX6/yFUAxKVkAVJh47Be5eP9PqpJ4XUlsh2FCAAiVWBvWlP8tuGxhf69p
+	 2zcUj3Fd1l2vH1gPZ551D3pRcVpLgcK+XSLxE8MvPuXxw0NHKZFOQDx8lEC/kEeFUr
+	 d9rBrYsI+fyqQ==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id ECE8DC433F2;
-	Mon, 13 May 2024 14:00:31 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id A5CDBC43443;
+	Mon, 13 May 2024 14:10:27 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -37,15 +37,14 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH BlueZ 0/1] Update python2 examples to run properly with
- python3
+Subject: Re: [PATCH BlueZ v2] client: fix ISO send data rate
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <171560883196.16121.9583318969959869241.git-patchwork-notify@kernel.org>
-Date: Mon, 13 May 2024 14:00:31 +0000
-References: <20240509214231.2783781-1-me@prestonhunt.com>
-In-Reply-To: <20240509214231.2783781-1-me@prestonhunt.com>
-To: Preston Hunt <me@prestonhunt.com>
+ <171560942767.21927.2728272166472720576.git-patchwork-notify@kernel.org>
+Date: Mon, 13 May 2024 14:10:27 +0000
+References: <30fd803be62f762706486698821e9e5fff2d0b63.1715442270.git.pav@iki.fi>
+In-Reply-To: <30fd803be62f762706486698821e9e5fff2d0b63.1715442270.git.pav@iki.fi>
+To: Pauli Virtanen <pav@iki.fi>
 Cc: linux-bluetooth@vger.kernel.org
 
 Hello:
@@ -53,19 +52,21 @@ Hello:
 This patch was applied to bluetooth/bluez.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Thu,  9 May 2024 14:42:30 -0700 you wrote:
-> Several of the examples in the test/ directory are python2 scripts. In
-> commit d31f04aa928ae8fb7a4fc5b0876dd17ea65d4513, added a python3
-> shebang, causing these scripts to be run by python3. Because they are
-> python2 scripts, they won't run properly.
+On Sat, 11 May 2024 18:45:46 +0300 you wrote:
+> We are sending data to controller at wrong average rate not equal to
+> 1 packet / SDU interval, if Transport_Latency is not an integer multiple
+> of SDU_Interval.  The calculation currently may also give zero, so no
+> data gets sent.
 > 
-> Fixed by running Python's 2to3 utility.
+> We are sending data in bursts of num ~= Transport_Latency/SDU_Interval
+> packets, in hopes that possibly larger timer interval makes things more
+> efficient.
 > 
 > [...]
 
 Here is the summary with links:
-  - [BlueZ,1/1] test examples: fix python3 errors
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=832412f5e36a
+  - [BlueZ,v2] client: fix ISO send data rate
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=e453a336c404
 
 You are awesome, thank you!
 -- 
