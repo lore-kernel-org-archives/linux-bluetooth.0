@@ -1,180 +1,152 @@
-Received: from mail-lj1-f173.google.com (mail-lj1-f173.google.com [209.85.208.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from EUR03-AM7-obe.outbound.protection.outlook.com (mail-am7eur03olkn2036.outbound.protection.outlook.com [40.92.59.36])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B40911C694
-	for <linux-bluetooth@vger.kernel.org>; Mon, 13 May 2024 17:14:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.173
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715620464; cv=none; b=CxNNPqfDZh62EDH43HY88z7yv0uPt8YvDJUp6wIGRyAI+d8tHsZsec6ph7+z3RbdXrguVgK6Xvs7+TSsg8SIPhYblfOGlBKCWcCnGoZlpcAOg5TGPA47HpHNW9k9vdfVwhyF7a7xc8RkdcO4Huh8+oX16wD5SxdXHJTtb/jkLV4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715620464; c=relaxed/simple;
-	bh=0Hj3m80/vcjsB9jFL3IohRMKJJXwbmqb2e3u4HQN/CI=;
-	h=Message-ID:Date:MIME-Version:To:From:Subject:Cc:Content-Type; b=SkQrvy6jC1Xyk7xmESUm75L+XUXfxTr7om2isQn4A3/owORiQjd3VVFjjeHVd4lMI37GzfFdnCLeKQaEU1cS4jPl+kh1X+efkHfX1rwqQi764yKgVcH/70eA9lQbokU0QWmvLC4LXkntpMhqOunv5PWNuv3rsdBrauOnjcVuYFc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eDZ2syMp; arc=none smtp.client-ip=209.85.208.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDC7C200C3;
+	Mon, 13 May 2024 17:19:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.92.59.36
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1715620790; cv=fail; b=u7GaVD9iFTmbpfHIa/F6bkRZldcpLEtU3AXkhrEQZPAJDXDEH87fXBNsRe/5hqfmOzsZZhc24PTDnGfXNjClWi1JQCWdYdzR9LUxlJtyxrxFVNh7Wll3ijPQbA0WNnz72B5ul9AWEy9X9tcQS5izKceWNxpBH9BqVsLvDpsmWJw=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1715620790; c=relaxed/simple;
+	bh=ZgbVEL+vsrij1DSMczoVQ4FTy6aeHqktaS/azvnWwH4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=j19Uoak8iC6vcetiKogS24gPBF7hKOnDr2mP5QJQzejmrkxWdpz4XcfPeFcMilkFDtQQXDYRcB1b4FPdg2SLZ0iEcw0n71VqHGbmRS8hGZi8pifzLrjClDVUgi4ylU0jVi1aTxArQrYQm9UjDeU7TiZL1kUNgYvweQLlOBArUrA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com; spf=pass smtp.mailfrom=outlook.com; dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b=riSzfD9p; arc=fail smtp.client-ip=40.92.59.36
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=outlook.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eDZ2syMp"
-Received: by mail-lj1-f173.google.com with SMTP id 38308e7fff4ca-2e34e85ebf4so40554291fa.2
-        for <linux-bluetooth@vger.kernel.org>; Mon, 13 May 2024 10:14:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1715620461; x=1716225261; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:subject:from:content-language:to
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=JC+8wb41tXnmaqSI69k73+yCS7xP3be/jrlSImwrGQ0=;
-        b=eDZ2syMpQwcO4lqBLVxtmiWKHs3P6pbC0onbDyGOM3KGaigL9iVD9MrB0R80zDOaqC
-         pa/FMAac5zI5iT+2tIdwGmb6/iZue3X76Jxxf5KTfSOuEBA96PbGUyIEs6V4blCkvMhH
-         +G0p48yLLsrYn8f3zi0YCINxf7w8TkKhg91Nyl1fBerwKUKxsObs/YsPjvLIIKiDKuBf
-         f0BQf3yT+rQrVUU2tfWCfRQ9gDzfayrmBN0Fz9cAU2WnR6zRtfPwPE/OtYEK6NeEM2m1
-         S1GwjueK7yko7JLSkzjYo29fWqk2XVjn78f2yuXpyJwmFWsXzlvQN9BLLoBQXPY/c9XN
-         BNpw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715620461; x=1716225261;
-        h=content-transfer-encoding:cc:subject:from:content-language:to
-         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=JC+8wb41tXnmaqSI69k73+yCS7xP3be/jrlSImwrGQ0=;
-        b=FIasWmEIYTwJFyVskMeTaD0AESbwZS0Is/jDwjhsMk7yDYUbcHN7MnWWY2hytHeS9m
-         G8BtZJGL5ZOFuGOeuAltwkXR8DmOLqY9xkliFdHZTgBpLPSUngU8ofif+gQOiwwDqd7w
-         IRgT1g8UBsTG+BPcfkiUQyKgXow8EXJ0XA1beXb9p5E5vxzY6XAzPIBQc6O8iUQmREV1
-         nmb32gC0jBA251fg2QeG2kdQQnXFP2kDy4tfAW4sPNe4rr/+qsd6fr8TJI3gV+9k31Dl
-         HgCEcPYO7/S/WgGWq3FRc0R9ZQkcpm2Dg/f4bXGsZKKYKqunUakusW2BCrX5Eu5Skbh5
-         OUjQ==
-X-Gm-Message-State: AOJu0YwA3TcaShkLsENDAgAkn0RUiCayoLW5LRVFeRXvaXwqAz8KleYo
-	iWPCSY+CcxLy+ePNqqEW98D4tzBBsFQ1PWXyLUj37QIRipxPAyTVXJzgQKa32befVA==
-X-Google-Smtp-Source: AGHT+IEPZWPuJ8XpzdHgv2PyzI3IYX+vCFt4CRRdwS0Ky5SX0dl0Dc2w42UHpQUXeVt//92yqXEzQg==
-X-Received: by 2002:a2e:9584:0:b0:2e4:9606:6b88 with SMTP id 38308e7fff4ca-2e51fc36498mr69979311fa.3.1715620451491;
-        Mon, 13 May 2024 10:14:11 -0700 (PDT)
-Received: from [192.168.50.232] ([176.196.131.103])
-        by smtp.gmail.com with ESMTPSA id 38308e7fff4ca-2e55d7ce0f5sm10163831fa.50.2024.05.13.10.14.10
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 13 May 2024 10:14:11 -0700 (PDT)
-Message-ID: <b00b4f66-1aba-4182-bae2-01f37eb1c34b@gmail.com>
-Date: Tue, 14 May 2024 00:14:11 +0700
+	dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b="riSzfD9p"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=gFt+1Lat4suMMssH1VqYXBWs1LnsafpBCdJh+lGtt/nLsAS51aLzRi9EXR3rNNq9lyLS4NvdAqjtvsEf3D8V3r0nprwuqMhLUF1Ty2Y75TnIcLsH5mUY7M64Q8APzxI958nJwCw4UwEmtZIXXIewR9fRbqxwJswmg7YeuLomjuoHDzzmDUXD3W8ENATs5TH97jfm/85srDbqAp70Hkqani4NG+EEhFAXXYb4yFz5vbXftcgbBOCSgxGtF8YvS5roLQRCC2sM1Dw14ie578NZRhWtFBauuUFH6JOC27A37KEdgMUOpRAv1e+ZU2nfK737zH+WPOuVMI29vX4XXLAwGg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=hBSFxt6DKoMUnf98J40iCQppC4H0Qk+LIoOpb0XIiz0=;
+ b=F54SvvN8rWTzX53tMD99ZDK7IiHgr1KrMuYHoyH0/k+oKHPjDSmG0Ija30i/VVl9BJQIcPEyCXArqijRWlkhNyFY+Viyq9nlFg7s0DPUkNw6sqeOkLzET0v+oVQ1KsayvL2g1XE7aovzaLEUHrQaeaFafV+XfVZNKzT+8PnIlIEjcQ9WjgNXDquRhUIJi3ry9VhC18gpwUa1E59ELgaPHcBwT1uAeTF8GRgckUtPObco2hDN+4Hc4XSZRILVUEAGbZ0Q/HZA/8DtnS9rpkXtUDhA73mJfJqZipHTuAr8+CNx4Ra5h6u63Re6yVmDKUaKtbJRM0ADgFT4lpV+2iIIXQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
+ dkim=none; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=hBSFxt6DKoMUnf98J40iCQppC4H0Qk+LIoOpb0XIiz0=;
+ b=riSzfD9pVKCDZZjIHm53Ob/zplpuhSpLep1HXRpZmTUdkqMRJAINwv/mkqNh7DVCt61VxZJj80kqUF4Rs4NjaHHCNhnU+WlRjWKn1WhlUF9pfzJUkLbc/IqnoOz5iGGKBGj3tNvUfWXtS16aInuFnwzsZWNUbQBuFQ+LF7cKA8G5S6UZgMmClHmrHFmuRA9Jl26VgKCDTA57iPov1eXCAukEVKWKbBNInZv+tbW5XMKd2Sik+pD9arg8ERUoNFKdGBB6wN1Jr/L5uVWZEQbMilNy4LZJWSFWI5bzScHWMLPKJooIHlgcn37opiky9FZbQQi9SPc6sn+P0sQwPaVm4Q==
+Received: from AS8PR02MB7237.eurprd02.prod.outlook.com (2603:10a6:20b:3f1::10)
+ by DB9PR02MB9780.eurprd02.prod.outlook.com (2603:10a6:10:451::6) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7544.55; Mon, 13 May
+ 2024 17:19:46 +0000
+Received: from AS8PR02MB7237.eurprd02.prod.outlook.com
+ ([fe80::409b:1407:979b:f658]) by AS8PR02MB7237.eurprd02.prod.outlook.com
+ ([fe80::409b:1407:979b:f658%5]) with mapi id 15.20.7544.052; Mon, 13 May 2024
+ 17:19:45 +0000
+Date: Mon, 13 May 2024 19:19:43 +0200
+From: Erick Archer <erick.archer@outlook.com>
+To: Kees Cook <keescook@chromium.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Erick Archer <erick.archer@outlook.com>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	"David S.  Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Nick Desaulniers <ndesaulniers@google.com>,
+	Bill Wendling <morbo@google.com>,
+	Justin Stitt <justinstitt@google.com>,
+	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org,
+	llvm@lists.linux.dev
+Subject: Re: [PATCH] Bluetooth: hci_core: Prefer struct_size over open coded
+ arithmetic
+Message-ID:
+ <AS8PR02MB7237C71997007C058A51233E8BE22@AS8PR02MB7237.eurprd02.prod.outlook.com>
+References: <AS8PR02MB7237ECD397BDB7F529ADC7468BE12@AS8PR02MB7237.eurprd02.prod.outlook.com>
+ <202405122008.8A333C2@keescook>
+ <CABBYNZJcg5SpO_pew6ZwN98n1sR7kNZs6VtkFToyOs9NM1bO8Q@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CABBYNZJcg5SpO_pew6ZwN98n1sR7kNZs6VtkFToyOs9NM1bO8Q@mail.gmail.com>
+X-TMN: [zlDpCEdadwWhEMJF58mS9nRALgBSH1at]
+X-ClientProxiedBy: MA4P292CA0011.ESPP292.PROD.OUTLOOK.COM
+ (2603:10a6:250:2d::17) To AS8PR02MB7237.eurprd02.prod.outlook.com
+ (2603:10a6:20b:3f1::10)
+X-Microsoft-Original-Message-ID: <20240513171943.GB7952@titan>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-To: linux-bluetooth@vger.kernel.org
-Content-Language: ru, en-GB
-From: =?UTF-8?B?0JTQsNC90LjQuw==?= <danstiv404@gmail.com>
-Subject: abandoned patches for ATS2851
-Cc: raul.cheleguini@gmail.com
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+X-MS-Exchange-MessageSentRepresentingType: 1
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AS8PR02MB7237:EE_|DB9PR02MB9780:EE_
+X-MS-Office365-Filtering-Correlation-Id: 4f48050f-e8e3-472c-9d0b-08dc7370e2b5
+X-Microsoft-Antispam:
+	BCL:0;ARA:14566002|461199019|440099019|3412199016|1710799017;
+X-Microsoft-Antispam-Message-Info:
+	SBurZOrSjFH12RoEYCRK9S411xTtk5NwudYUPHN8oFKYCfZO8w2fUypa2DRI2bWLo2CJlF/Q4BUbXUR9q2C719O9JS9KPMIwwS6c8sErg//4zaULw+2MYVNA8GE2SWDPqO3FUURKgstqLEOBSsYm1Toyc0IBBAWwKlnKLIyUWAs/GSVtkeJ+pXYkQQkNm0sn4nxgCk1nbT/c/O71qLhx4UJGqCNYZo6Hyo7VSf+eI/sO5+ALF/aCGBXL1WkFavyyFVqlT6BQ9BWtSkxMCQCMqRngC9d3Qvw6xXAa3jeqvcXc39v88/6xsLo8AnfkLIMdZgmvqRj/yJaOMTIOfqTQu8b4JrDh3lmdkUUCq7k4DQGEKONOnggx2+iLAvW0dBe0/VDG3zx7zBwEJ36RRCTdXeDddf6tbaY4DYWqwT/Ro9PV1/nqr8iugGi7Pp5vnHrfQC8JcqOMPvjk/tpdZhEf9y0BjYYaKt3U+hUCoojeb8bbzHQovcXQPwQDrV7KdBmUQeATLoWwn3Yizcx8+z3mddV6DIhDdr2nLpQKDA5CGXY6Tm7fJtcB1OWaraU/iupqPGHUg4d1bK2HxFiXaKiFsx9269NY6lVUW/SrK+fS0qAbZRIiUHOqjyx6bMMQUmgF
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?V1ExcWNqUG1DUkthLzZPRiszeVlCVHBYajArL09ZUk5xeVNyTDFmdmJCdUtp?=
+ =?utf-8?B?U3Q3WTNyVHlIaVdyeFhCcElLdkRDUGRPb04xOTRwQ2dNVWlOQ3N4am5jYjI2?=
+ =?utf-8?B?WXh0L3kza0FjQVo0TlRmY2xpU1YweGNvdU9hM2pQTlBVZHZTaTNMUWZCRHdq?=
+ =?utf-8?B?Wjg4MTBPblVZbFp6THdmOWxiVWF2dTEyUmsvcnZMdmlyaS9OOXF4bkNuUEsw?=
+ =?utf-8?B?VlZUYkYwY1orWTRFRUJqRlpROHp2M3d6dkNRSzhvTjFKWVF2dkFFTjliZ3JC?=
+ =?utf-8?B?RnNZMnErdVVCaGt5b2hvazdZd08yd1IvdUFNZjJSMnVjUElBSU5hcGo2dnVW?=
+ =?utf-8?B?Q3lxSDlBSXpBRVJDNjFzTkFvQVVnMHFzSFVhZ0hxQW9NNlVxMmFSWi84Zm9I?=
+ =?utf-8?B?dnJ2cStNN2Y3R2FReUxzWjZSOUhZR0NGTXJReDF3NlhBZ3lXbFpGQnVuQ0ZC?=
+ =?utf-8?B?ZnY1L3JmWHZjOFgvN3o2RVZLQjg1QTFrT2pMMHZCcXJmc1hqNXdDelFDVmlk?=
+ =?utf-8?B?RlcyUnR4VjYyMGpOOEVXcEVjZ3RQK2dtamZWVzUwNUptVk1XdURVLzRPUENL?=
+ =?utf-8?B?UEExMEk4V1g2NWdjVkdRUXdtYThlN0NIcUhaQldBQXg3TFptbGEwZ1lIVGt4?=
+ =?utf-8?B?dzdaSjBseFUxOE1HcXBqQitUdUExZlhuZzA3aUc4elBDZFY1dWZmbzhwWlZL?=
+ =?utf-8?B?eUZwWERrQ0c5ekdWQ1FZYm00aTNUZndSM0hGVkxVQlVQMFA1RE5jZWRUSWww?=
+ =?utf-8?B?Q2xCRHBPZ0NJdGF0MXRDTnZWRCtKVDg3cmpwSUxyaE8xbkJSNjY4OW1jVzE0?=
+ =?utf-8?B?ZjFRamc1WkxJWTJhMUFpQXZQdGJTbmhiN2RjS2xjVVFYTE52SjEzZzBwbEZE?=
+ =?utf-8?B?Zlo1K0RkaDFXT0djVjFTVHJBbDd1ZjUzam1odkJBdWxhaGE2VFNmbmtuQlE2?=
+ =?utf-8?B?d0d5alVaeGxUVFVvWExyVm9KUEZWYVRtWHZ4Mk53QzQ3alVCbXJDNVJ3TUxw?=
+ =?utf-8?B?aW0wOERrclhEZmZnZy9FeGNvUUNObWZYQlhKUHpCbkxQSDFCYThIeU9Wd0Rv?=
+ =?utf-8?B?bW4yWGtpZ2pnL2FZeXNhekw5Wi9HdHhIMWNFRThOMWxaOWZ6VVFWVlBobXN3?=
+ =?utf-8?B?RVVhTGtueDVkMDZFNUF3b3NBM2ZWTEU2ZzdsWW5Ub1lZYU1YTmd3dDNtVWlB?=
+ =?utf-8?B?SEovWGVpK0cwWTBzeHRpdkNpMFIyRy9KM0xnVXBpaWNpOTZrVTB4dTVXL094?=
+ =?utf-8?B?WS9YMHFJU0VpYld0YldHUjJyL1c2MXNwRFl3UzdISjdQRGZoaG5XZm9HK0VG?=
+ =?utf-8?B?VFZheCs5Ums2UzMzRXZKS1JMVkhVeXRJaU8vUzcrdHRIQUk3T29DSFRRTnph?=
+ =?utf-8?B?YUx0a0RUMUwxOUtocU9maElxeURnNVloVThZOERJVUlhT3ZWRmt2QktyQ0pH?=
+ =?utf-8?B?V3dVVzdZZEx1WU9oZk91WFpSeGdvTldZa0VVYTBpRHZoQVlGeEdZZTJDb1pq?=
+ =?utf-8?B?eWZlYU9pdlgwdE5jK0Nsd3BGbU5qaXRmNFF2M0NaRFpEWjM4ZG5qUUFETk5h?=
+ =?utf-8?B?OE1yMXZFbFd3RjRrVFU5TGFjb0NPK0RFNGVVNkFJUW5rVTRkV2VOYVhwSkFC?=
+ =?utf-8?B?NVlYQkF4dU5qSTdld2V5b3lqMXVzUVJFbHE1UXc1ZzYvUE9EdlF5cUdZaFlh?=
+ =?utf-8?Q?ZNuEid4kfyTmHiV9xheF?=
+X-OriginatorOrg: outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4f48050f-e8e3-472c-9d0b-08dc7370e2b5
+X-MS-Exchange-CrossTenant-AuthSource: AS8PR02MB7237.eurprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 May 2024 17:19:45.8113
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
+X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg:
+	00000000-0000-0000-0000-000000000000
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB9PR02MB9780
 
-Hello!
-I encountered a problem with a USB bluetooth adapter which probably uses 
-an ATS2851.
-I'm not 100% sure about this, but the symptoms match the problem 
-described in the patch.
+Hi Kees and Luiz,
+First of all, thanks for the reviews.
 
-Here are the patches I found.
-1. It seems to have been applied.
-https://lore.kernel.org/linux-bluetooth/168150781825.20001.4973139468540739153.git-patchwork-notify@kernel.org/T/#t
+On Mon, May 13, 2024 at 12:31:29PM -0400, Luiz Augusto von Dentz wrote:
+> Hi Eric,
+> 
+> On Sun, May 12, 2024 at 11:08 PM Kees Cook <keescook@chromium.org> wrote:
+> >
+> > On Sun, May 12, 2024 at 04:17:06PM +0200, Erick Archer wrote:
+> > > [...]
+> > > Also remove the "size" variable as it is no longer needed and refactor
+> > > the list_for_each_entry() loop to use dr[n] instead of (dr + n).
+> 
+> Have the change above split on its own patch.
 
-2. It seems it was not applied.
-https://lore.kernel.org/linux-bluetooth/20230323135804.3962783-1-raul.cheleguini@gmail.com/T/#t
+Ok, no problem. I will send a new version.
 
-3. It seems it was not applied.
-https://patchwork.kernel.org/project/bluetooth/patch/20230426184017.2051211-1-raul.cheleguini@gmail.com/#25314789
-
-Patches 2 and 3 were not applied, as I understand, due to some minor 
-problems with code formatting, is it possible to complete the process of 
-applying them?
-
-Here is some information about the device:
-
-dmesg
-[    0.000000] Linux version 6.6.13+bpo-rt-amd64 
-(debian-kernel@lists.debian.org) (gcc-12 (Debian 12.2.0-14) 12.2.0, GNU 
-ld (GNU Binutils for Debian) 2.40) #1 SMP PREEMPT_RT Debian 
-6.6.13-1~bpo12+1 (2024-02-15)
-[    0.000000] Command line: 
-BOOT_IMAGE=/boot/vmlinuz-6.6.13+bpo-rt-amd64 
-root=UUID=b9338182-ab4b-48cb-b492-60e7ed340018 ro 
-systemd.unified_cgroup_hierarchy=false quiet reboot=pci
-...
-[  110.420763] usb 1-2: new full-speed USB device number 2 using uhci_hcd
-[  110.609798] usb 1-2: New USB device found, idVendor=10d7, 
-idProduct=b012, bcdDevice=88.91
-[  110.609814] usb 1-2: New USB device strings: Mfr=1, Product=2, 
-SerialNumber=3
-[  110.609820] usb 1-2: Product: general adapter
-[  110.609824] usb 1-2: Manufacturer: Actions
-[  110.609829] usb 1-2: SerialNumber: ACTIONS1234
-[  110.614223] Bluetooth: hci1: HCI Read Default Erroneous Data 
-Reporting command is advertised, but not supported.
-[  110.614245] Bluetooth: hci1: HCI Read Transmit Power Level command is 
-advertised, but not supported.
-[  110.614252] Bluetooth: hci1: HCI LE Set Random Private Address 
-Timeout command is advertised, but not supported.
-[  110.666673] Bluetooth: MGMT ver 1.22
-
-lsusb -v
-...
-Bus 001 Device 002: ID 10d7:b012 Actions general adapter
-Device Descriptor:
-   bLength                18
-   bDescriptorType         1
-   bcdUSB               2.00
-   bDeviceClass          224 Wireless
-   bDeviceSubClass         1 Radio Frequency
-   bDeviceProtocol         1 Bluetooth
-   bMaxPacketSize0        64
-   idVendor           0x10d7
-   idProduct          0xb012
-   bcdDevice           88.91
-   iManufacturer           1 Actions
-   iProduct                2 general adapter
-   iSerial                 3 ACTIONS1234
-   bNumConfigurations      1
-...
-
-btmon
-...
-< HCI Command: LE Extended Create Connection (0x08|0x0043) plen 58 #48 
-[hci0] 2.000505
-         Filter policy: Accept list is not used (0x00)
-         Own address type: Public (0x00)
-         Peer address type: Random (0x01)
-         Peer address: E8:42:26:5C:0F:07 (Static)
-         Initiating PHYs: 0x07
-         Entry 0: LE 1M
-           Scan interval: 60.000 msec (0x0060)
-           Scan window: 60.000 msec (0x0060)
-           Min connection interval: 30.00 msec (0x0018)
-           Max connection interval: 50.00 msec (0x0028)
-           Connection latency: 0 (0x0000)
-           Supervision timeout: 420 msec (0x002a)
-           Min connection length: 0.000 msec (0x0000)
-           Max connection length: 0.000 msec (0x0000)
-         Entry 1: LE 2M
-           Scan interval: 60.000 msec (0x0060)
-           Scan window: 60.000 msec (0x0060)
-           Min connection interval: 30.00 msec (0x0018)
-           Max connection interval: 50.00 msec (0x0028)
-           Connection latency: 0 (0x0000)
-           Supervision timeout: 420 msec (0x002a)
-           Min connection length: 0.000 msec (0x0000)
-           Max connection length: 0.000 msec (0x0000)
-         Entry 2: LE Coded
-           Scan interval: 60.000 msec (0x0060)
-           Scan window: 60.000 msec (0x0060)
-           Min connection interval: 30.00 msec (0x0018)
-           Max connection interval: 50.00 msec (0x0028)
-           Connection latency: 0 (0x0000)
-           Supervision timeout: 420 msec (0x002a)
-           Min connection length: 0.000 msec (0x0000)
-           Max connection length: 0.000 msec (0x0000)
- > HCI Event: Command Status (0x0f) plen 4 #49 [hci0] 2.001242
-       LE Extended Create Connection (0x08|0x0043) ncmd 1
-         Status: Unknown HCI Command (0x01)
-...
-The adapter supports le, I was able to connect to a le device from 
-windows 11.
+Regards,
+Erick
 
