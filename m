@@ -1,156 +1,104 @@
-Received: from mail-lj1-f172.google.com (mail-lj1-f172.google.com [209.85.208.172])
+Received: from mail-yw1-f178.google.com (mail-yw1-f178.google.com [209.85.128.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC4B12119;
-	Mon, 13 May 2024 22:09:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCCB3D51A
+	for <linux-bluetooth@vger.kernel.org>; Mon, 13 May 2024 22:40:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715638187; cv=none; b=DSg+brfS8ZnmKKS+NrPdjV5IE5CSII1NcQqclhcaNGy6mAngn92Dgih7oeY8osTOfkuqrhlM4D5wQ7/9TNlMz3HfQwmhGiPBwrPngsXDnD4wO1z9Ul+5Izh49E+xRH/XgRWkZ9rgY3IfHK2W/3+BRkDavKHYzT95kjDbPOu9/VQ=
+	t=1715640061; cv=none; b=OMVicuhtwCGoGQAuN/7xC0S4pZwXbGciR1Rh+nV4VQJTAFclttS7LLkANomlZKy/5ul8xoHXjBFc7t+qMH+OwHQzD5Uf86d1kE5ivShcBOscTKii0Yhi7axPnYrBWgf9geXZmOYDVQpGp/krlHoXzZSh6d6nwv4HnIQjLOrOZ/k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715638187; c=relaxed/simple;
-	bh=KgLLBqp3cuJxKACzy4sN1Q3Z0Z7Ey7fyY3vJR+VRmuA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=H3znNfooUxMN5k9i+YAebEMtwIw4bO11UJycOXRqrTv3k+WK04X6WMXJH8++XAb3Vrps0YQ/sazypBMC9226JZPM7SMFTpRe3uzPrMzDCsVxJcn+OP5aWSoFDCJDm9wzTXULVPfR514+Mz3bX2bJezi3qVjs0njBHn91fLotNUY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RHlsxZRL; arc=none smtp.client-ip=209.85.208.172
+	s=arc-20240116; t=1715640061; c=relaxed/simple;
+	bh=MP4wOFqYWQgBSPgAJELmR1WhAaBJG0e8te2hY8kIeVI=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=ID+yMaw6e3KPqPlXgVHLP3/ZIbHC1hF0O5zFh6/LysigpUtXQehNAFG+J7zgp7nzDcKehGZIU58U89OLMg4gRPJTvpDecmPr0LLOtSZ5hCiaoiapbZtg77s6d7p3omgbbUVJsqBQ4dYaKaJyKhJFWoXSDowtNdkkYTvFwFwiQ3o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=K+u2iKmo; arc=none smtp.client-ip=209.85.128.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RHlsxZRL"
-Received: by mail-lj1-f172.google.com with SMTP id 38308e7fff4ca-2e4939c5323so61831041fa.2;
-        Mon, 13 May 2024 15:09:45 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="K+u2iKmo"
+Received: by mail-yw1-f178.google.com with SMTP id 00721157ae682-61ae4743d36so49149497b3.2
+        for <linux-bluetooth@vger.kernel.org>; Mon, 13 May 2024 15:40:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1715638184; x=1716242984; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=snkDChq8Qi7plQQXnc8M+8yvrUlNpWweMVToZD8bXc8=;
-        b=RHlsxZRLHo9Mv2vFyssenaCFi4Si7lZsWb8eyz527pmtkkb/c5lxH1MsyZijQWJNpW
-         vjJ5szeiHFqoRWeZ8qjOSmcXSQLVPfKPiLwlYWlljkvV+SOBKsE4lK5kWqhY2CxImlCQ
-         DODmzlfZZ9KWxrUOnWtbLfRueigVUjjG3lc19IeYLdvbhmwSNkJB62D7wVWNMxZu4F19
-         tFRtPx64NoJOAylHe+T977TMxdZZc5h+9q3VmyAdCFQiSGb58Y2guilY1i93uK6YC/Bz
-         yWu3Msof1Ns1HmbtBCzYkxifPmR/+uHBUpj4VZmCiidn6xUY5tF+8fYVfN5Jrh9JW97G
-         4XUw==
+        d=gmail.com; s=20230601; t=1715640058; x=1716244858; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=Liu+qBC9j+Aq3erd5wqu1s2Oi3arspUUUw4QIotMW0U=;
+        b=K+u2iKmoTLgcQsBtMytNEEY/yD4/0rWD+YIP3My91n7YBQVLitnZGNuOn0FIfreZjo
+         zwRHazj+7Nnxms+sWfqzqhA3MWfGk4tq0PTlLZq3guLOLQFfyDP9xO5hxzTFOkO9XdhI
+         E2Cz8JNHsVb/mwY8bHEHLLUSEcerTYhOWXHXXX/7ngGc+jrbgehdAqy04wkSvDewrMLa
+         PzQpElqufh+3QOZayBZzwcdoZPIObCJBqMpsGa3e54InCjKLE6X3ZeSSx3oYTacn5tYs
+         IpuPUJRGM+Hl9MYzYnX8z922B9swrT/nGOGbXe/WKVJJnpx/wmItWsJi1LIthntytMBE
+         wuVA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715638184; x=1716242984;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=snkDChq8Qi7plQQXnc8M+8yvrUlNpWweMVToZD8bXc8=;
-        b=AljTpcl8tJkrB3pe3zP46Pu/2SZphrBA2DMIoJhAeEuGY83g+N0egpVKqAujZSpUwr
-         SDmiwxmRSPuS6JBmUvsTBcH1eNEvd+Ub5BxwIFJnNpJ729TVDS9m7FliPGIKAgSFNGab
-         F+hsl8UgtCzDw2jUOdJuHhj0zXNYk2+pZLzURwV9yAjmm0PtL3W92WRYOjmSq3DHB9yF
-         sidmYeacr2T+TO4UrlidDGkPd+2AnmQdTMftxkPAXXYNs59ZA81Q5utwqEXl9Kp3+hvq
-         ipYLW1mwLz2qzSdMUir8VI5SIhuuPs2Z5UOoKnQ2JwYHPiehH9L2PWXEASXPImICuUx+
-         D9iA==
-X-Forwarded-Encrypted: i=1; AJvYcCWqkXrWBe9qonw8KQzNozB1IQdfTGe87QzbTnSphNDQg2t+uloSMrxGWOBNhVusES3wONXsYBQVAOyhTU4xGovtdZnx5qeq0N5+bIOLLt4fNJtOlD4k6OyGPRdrUcz578Vr94L4wkQ1
-X-Gm-Message-State: AOJu0Yxfc34N0j/6/mzR22wX+fmsxlNwt3oSBkKCvGRTowiHVCJ5zwoL
-	LvcrW0WYGDkij8Jf32pPgfXfrUKT6LI3ojRWPf7pfPVkZ6brSU1pje3lCLPxzTra2KwQgTu56x/
-	ttf/qY0DkZUe15Lzl5pmQku6kBUk=
-X-Google-Smtp-Source: AGHT+IFOWH89XWA1ZBb0ZzMIrcB16rm7Kn/F7Q/aWT+PsPht5wNSKSbQev1+tS5lJDfMmLs5PY99V9z7u60vuivLMeQ=
-X-Received: by 2002:a2e:9894:0:b0:2da:36be:1b4a with SMTP id
- 38308e7fff4ca-2e51fe531e0mr99375891fa.19.1715638183496; Mon, 13 May 2024
- 15:09:43 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1715640058; x=1716244858;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Liu+qBC9j+Aq3erd5wqu1s2Oi3arspUUUw4QIotMW0U=;
+        b=r3tiFbpYr/3KrJSVwU4msDlyAng7yUGYjdGD9lj0VJYYRy4p+Vr5P9DjnNtEyhl/Hh
+         uBCVSxtVOTyRv27B6owUi3PXItE9Q176i02gpPmzH1Q3LmOKDbMEhkQcFhH96jRLwm1o
+         FWYPmfzltDC/wInaOQDlWYvMOpGMMm0iU1iGM8MapObzaNymzZDJyIwVrW3SOh32civh
+         CRA687MZQ5rrCWo9jeoz1Q7wX30jTQHMVFIRGH78Gb1/NJdI5eQmN2+yqAjAGjpjeYAg
+         C3axD+Fi6L0/4Gf+dz47U19VvGubZ+b4bfiJl/4V9LVXYIC3AeUq0p2+Yft/KehQOvDp
+         H71g==
+X-Gm-Message-State: AOJu0YyXaCFmhhSAdhK6WCaJc+gWwGK0uXbBG53gD+GB3akNepUfV4H3
+	i4YeXkv1omXOJdPbOPKdjnTf8cR1tioF9wnu0jrrgik8VoMcWJi4WP4u3Q==
+X-Google-Smtp-Source: AGHT+IEBLnB7OVpe+IwmaSit4difVSiRgM3zKYqWD5yJA0QVQtGVCVcex/TdZybuoAW1cIRXj8W+PA==
+X-Received: by 2002:a05:690c:386:b0:61b:3402:805f with SMTP id 00721157ae682-622affc6370mr121338057b3.10.1715640058590;
+        Mon, 13 May 2024 15:40:58 -0700 (PDT)
+Received: from [172.17.0.2] ([20.51.207.129])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-43e069a24basm41434411cf.67.2024.05.13.15.40.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 13 May 2024 15:40:58 -0700 (PDT)
+Message-ID: <664296fa.050a0220.bbac8.d9c8@mx.google.com>
+Date: Mon, 13 May 2024 15:40:58 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============8547033972397979563=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240510211431.1728667-1-luiz.dentz@gmail.com> <20240513142641.0d721b18@kernel.org>
-In-Reply-To: <20240513142641.0d721b18@kernel.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 13 May 2024 18:09:31 -0400
-Message-ID: <CABBYNZKn5YBRjj+RT_TVDtjOBS6V_H7BQmFMufQj-cOTC=RXDA@mail.gmail.com>
-Subject: Re: pull request: bluetooth-next 2024-05-10
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, davem@davemloft.net, 
-	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org, 
-	Pauli Virtanen <pav@iki.fi>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [BlueZ,v1] mesh: Fix not setting rpl_dir as static
+In-Reply-To: <20240513203732.435344-1-luiz.dentz@gmail.com>
+References: <20240513203732.435344-1-luiz.dentz@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Hi Jakub,
+--===============8547033972397979563==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-On Mon, May 13, 2024 at 5:26=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
-ote:
->
-> On Fri, 10 May 2024 17:14:28 -0400 Luiz Augusto von Dentz wrote:
-> > The following changes since commit f8beae078c82abde57fed4a5be0bbc3579b5=
-9ad0:
-> >
-> >   Merge tag 'gtp-24-05-07' of git://git.kernel.org/pub/scm/linux/kernel=
-/git/pablo/gtp Pablo neira Ayuso says: (2024-05-10 13:59:27 +0100)
-> >
-> > are available in the Git repository at:
-> >
-> >   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-nex=
-t.git tags/for-net-next-2024-05-10
-> >
-> > for you to fetch changes up to 75f819bdf9cafb0f1458e24c05d24eec17b2f597=
-:
-> >
-> >   Bluetooth: btintel: Fix compiler warning for multi_v7_defconfig confi=
-g (2024-05-10 17:04:15 -0400)
-> >
-> > ----------------------------------------------------------------
-> > bluetooth-next pull request for net-next:
-> >
-> >  - Add support MediaTek MT7921S SDIO
-> >  - Various fixes for -Wflex-array-member-not-at-end and -Wfamnae
-> >  - Add USB HW IDs for MT7921/MT7922/MT7925
-> >  - Add support for Intel BlazarI and Filmore Peak2 (BE201)
-> >  - Add initial support for Intel PCIe driver
-> >  - Remove HCI_AMP support
-> >  - Add TX timestamping support
->
-> There is one more warning in the Intel driver:
->
-> drivers/bluetooth/btintel_pcie.c:673:33: warning: symbol 'causes_list'
-> was not declared. Should it be static?
+This is automated email and please do not reply to this email!
 
-We have a fix for that but I was hoping to have it in before the merge
-window and then have the fix merged later.
+Dear submitter,
 
-> It'd also be great to get an ACK from someone familiar with the socket
-> time stamping (Willem?) I'm not sure there's sufficient detail in the
-> commit message to explain the choices to:
->  - change the definition of SCHED / SEND to mean queued / completed,
->    while for Ethernet they mean queued to qdisc, queued to HW.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=852915
 
-hmm I thought this was hardware specific, it obviously won't work
-exactly as Ethernet since it is a completely different protocol stack,
-or are you suggesting we need other definitions for things like TX
-completed?
+---Test result---
 
->    How does it compare to stamping in the driver in terms of accuracy?
+Test Summary:
+CheckPatch                    PASS      0.46 seconds
+GitLint                       PASS      0.33 seconds
+BuildEll                      PASS      24.69 seconds
+BluezMake                     PASS      1678.68 seconds
+MakeCheck                     PASS      13.11 seconds
+MakeDistcheck                 PASS      176.37 seconds
+CheckValgrind                 PASS      246.07 seconds
+CheckSmatch                   PASS      352.98 seconds
+bluezmakeextell               PASS      119.79 seconds
+IncrementalBuild              PASS      1521.01 seconds
+ScanBuild                     PASS      994.87 seconds
 
-@Pauli any input here?
 
->  - the "experimental" BT_POLL_ERRQUEUE, how does the user space look?
 
-There are test cases in BlueZ:
+---
+Regards,
+Linux Bluetooth
 
-https://github.com/bluez/bluez/commit/141f66411ca488e26bdd64e6f858ffa190395=
-d23
 
->    What is the "upper layer"? What does it mean for kernel uAPI to be
->    "experimental"? When does the "upper layer" get to run and how does
->    it know that there are time stamps on the error queue?
-
-The socketopt only gets enabled with use of MGMT Set Experimental
-Feature Command:
-
-https://github.com/bluez/bluez/blob/master/doc/mgmt-api.txt#L3205
-
-Anyway you can see on the tests how we are using it.
-
-> Would be great to get more info and/or second opinion, because it's not
-> sufficiently "obviously right" to me to pull right away :(
-
-Well I assumed sockopt starting with SO_ sort of means it applies that
-all socket families, in fact SO_TIMESTAMP already seem to work without
-these changes they just don't generate anything, so in a way we are
-just implementing a missing feature.
-
---=20
-Luiz Augusto von Dentz
+--===============8547033972397979563==--
