@@ -1,33 +1,33 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16331153815
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 162EC153814
 	for <linux-bluetooth@vger.kernel.org>; Mon, 13 May 2024 14:10:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715609428; cv=none; b=Sj7l1XHgc72vnoa1IvzfLIFfcpZQ7+bPPNcKhRbydPHoCrQKT8w/g27Jhfctw+/vVVeafD3rqbSs5FcycdG4enP9lMhYDUQA7rwFCOK+CTl8nVTHNhd708+mNotUknPlNAyG3oeC/0qRGgd8ggBHkJClyy/nTFQEJedIJso9sog=
+	t=1715609428; cv=none; b=Aotou1KcEICEImX/yEMDwHxp3SawNZh+Y9n2AcQuDleqRzSBkUdQo2FZFWPwBmx1xyQc5/nHfXO78em8jiizWTA7mFbE6YaIAeKFOmM6bmf0ZsdJxpf/W/atAoy2Y/loWTAALFcgBAW6TAZWDOwXx6fKhbcZ4C2cBxgxMMwTDKw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1715609428; c=relaxed/simple;
-	bh=xkfVd6YHB6IBXkZgJ66OKU6uTmF62OA8L56R6EJW9CY=;
+	bh=3LXZm6MiljU6uxEnBesbIndsI3pOb/r62ngKU0Wbgak=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=nLBOQG7rZli3HCGt07PbLl+xRsgwR0E34CZE+0vjMZL9bcgv8QKyCs1++D83BeiA9xNDz4QOiX1kWlwkntBkTNCGh1dNu3xBgxqN1/g2iS1tGHUdgkW4E9j2a7zn98GueAyc5d/SQnbHI5Fxh3gvVUv+JOFvyGo7Dvj2fA9tH9M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=heq4Lu8G; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=tsfZs2mL4zbU3rVgw7q26TZH0Qf7ubsOVSYjVpo2PEeMPjc+qSiVPmAV0QQZ4mpGumxdjjkuGhEnli+bY6bcmF/nFCUVnhKKVZc9TUMS10GsSixhZ4E131GDI38aCIsVUa31lQOgtwjSt+nK1/PynWkAAnyrCfXL+EoN3NPKVSg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZWMhhTi1; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="heq4Lu8G"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id B8021C4AF09;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZWMhhTi1"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id BECDBC4AF10;
 	Mon, 13 May 2024 14:10:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1715609427;
-	bh=xkfVd6YHB6IBXkZgJ66OKU6uTmF62OA8L56R6EJW9CY=;
+	bh=3LXZm6MiljU6uxEnBesbIndsI3pOb/r62ngKU0Wbgak=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=heq4Lu8Grrb0awqxx+sqAcjwBhOUCnBcou3GGX1wB4Hg9vcrohqtJDxtPgY1CsANS
-	 bUduXzyuxUq86CzhMyFq0/4HtgVwtSdm8yHLjb6//Oo+zO4A8D9V+Uv7GbAW/h3N40
-	 9fGpiSyX0ATZtfOCGI0u1vKzZUTsONl86wdTwJVJEPD49fXfOXCS2JOq+YeFLLO0Zd
-	 0PPcdh8CRLX6/yFUAxKVkAVJh47Be5eP9PqpJ4XUlsh2FCAAiVWBvWlP8tuGxhf69p
-	 2zcUj3Fd1l2vH1gPZ551D3pRcVpLgcK+XSLxE8MvPuXxw0NHKZFOQDx8lEC/kEeFUr
-	 d9rBrYsI+fyqQ==
+	b=ZWMhhTi1OLGcsBKMHwd1yUXuZA8p3IIsUUS1cehGVHhj8n1FgvjFOAzmUD4++IjyH
+	 H1hFJOocXWDR2Q8AoJ4fGbzalNd61Vwn7h/opyk7/sJaRGvIH13+LyJ9YMS1Dwefd/
+	 4e0zNNyW/5hScPox4VdzQIy17GaHqhEvsYYyyoF0oUGOrhgd0IsD+C0NoeIzHwRapv
+	 v8xUAdDQG5na0YWdiJd7vvVZillKvcQx+kDza1tZ2W4a5iiqapZyHcrJzYnluq3E4T
+	 I9fRnYfQ4lDwN+PXT6yvgqRqiNNPLb2UXo4DwKsWVP4aQFoFYcvmUMgXsva88i0HTS
+	 VS4JWYD8xxOmA==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id A5CDBC43443;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id ADDB9C433E9;
 	Mon, 13 May 2024 14:10:27 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -37,13 +37,13 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH BlueZ v2] client: fix ISO send data rate
+Subject: Re: [PATCH BlueZ] tools: fix using too small buffers in test-runner
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <171560942767.21927.2728272166472720576.git-patchwork-notify@kernel.org>
+ <171560942770.21927.763537423012567620.git-patchwork-notify@kernel.org>
 Date: Mon, 13 May 2024 14:10:27 +0000
-References: <30fd803be62f762706486698821e9e5fff2d0b63.1715442270.git.pav@iki.fi>
-In-Reply-To: <30fd803be62f762706486698821e9e5fff2d0b63.1715442270.git.pav@iki.fi>
+References: <9b7b8130a4296de7e02435d7be3c6d00c4976427.1715423446.git.pav@iki.fi>
+In-Reply-To: <9b7b8130a4296de7e02435d7be3c6d00c4976427.1715423446.git.pav@iki.fi>
 To: Pauli Virtanen <pav@iki.fi>
 Cc: linux-bluetooth@vger.kernel.org
 
@@ -52,21 +52,18 @@ Hello:
 This patch was applied to bluetooth/bluez.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Sat, 11 May 2024 18:45:46 +0300 you wrote:
-> We are sending data to controller at wrong average rate not equal to
-> 1 packet / SDU interval, if Transport_Latency is not an integer multiple
-> of SDU_Interval.  The calculation currently may also give zero, so no
-> data gets sent.
+On Sat, 11 May 2024 13:32:07 +0300 you wrote:
+> Fix compiler warning:
 > 
-> We are sending data in bursts of num ~= Transport_Latency/SDU_Interval
-> packets, in hopes that possibly larger timer interval makes things more
-> efficient.
-> 
-> [...]
+> tools/test-runner.c:309:57: error: 'sprintf' may write a terminating nul
+>   past the end of the destination [-Werror=format-overflow=]
+> ---
+>  tools/test-runner.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 
 Here is the summary with links:
-  - [BlueZ,v2] client: fix ISO send data rate
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=e453a336c404
+  - [BlueZ] tools: fix using too small buffers in test-runner
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=24039249854e
 
 You are awesome, thank you!
 -- 
