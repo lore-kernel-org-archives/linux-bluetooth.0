@@ -1,144 +1,145 @@
-Received: from mail-qv1-f46.google.com (mail-qv1-f46.google.com [209.85.219.46])
+Received: from mail-oo1-f51.google.com (mail-oo1-f51.google.com [209.85.161.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D9C023768
-	for <linux-bluetooth@vger.kernel.org>; Mon, 13 May 2024 17:31:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D23840851
+	for <linux-bluetooth@vger.kernel.org>; Mon, 13 May 2024 18:51:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715621467; cv=none; b=EC4QBuug/6BRFUm3Nl3cZMTZYtjamYNh1UySpYnvpegGKNFpeUNfoi4+tljn5cSQQLcun0JYJCQs2Hdj3oa0lHu71BVU0Q1fid8UMWiQ0x7/fMgyDp/saFrAluKygnsgP4jKKHjFW9yJhXiIihogeUR8gnMEHQLgz+J7DTAmRF8=
+	t=1715626301; cv=none; b=IpDY0Y+gRTNYIFW8tZQT3V7BwaoGZNNiFV2NbeUl/ILfWsoMftryYfhEUkX+ofmUCz/D5VhFMjhK7hmS93RizseORhtkTXuC8QrR3kzGdZwFyHNXueQGsMjSfKAwmE5MmVJK1X3GvtqhxpNgrHcAFryfPc0slMW5ynz8teMcpJM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715621467; c=relaxed/simple;
-	bh=8wVVfwTZyaNLIi7jCxAZW5KFBZcpIW4Q8ejD9VSW1nE=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=Jgvgt4p4odWGEAkP2ogoTzF1U2osP0ybp+wsLMWOy8N+OTeZ740L+gbcpJw5Fp+9GtAR4ns2b9mdY8xha2vxsViPRwSvjk1vB0ZDuhNiunhXcjwmRiumaqpEs5xwkMyL78jtZvj2IUh/Ai4mRk7pk9IhqF3JPeRcibJ6Cz7TXiQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HQzBzhMv; arc=none smtp.client-ip=209.85.219.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1715626301; c=relaxed/simple;
+	bh=bvx6mCnzX8C2T7z/ykshZS5xSeo3dI7Pp2H7YdnXt/4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=d5tYrMtLbAld3MLNpHfZMKbZ7u0D+RQiYYfAThTyyFV3MVopXbhz2myrkbuwZofUaCWrXYFSE4hTiH9dR/JGZwm8sdwAAmbcEqL7Vh6XkoMtMeW/LYj+iSsqChR5AT6mBLRa97DBuzfRqjj9D5poZ2omuw2oUv2wVCK1armRFgs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=chCf5mVF; arc=none smtp.client-ip=209.85.161.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HQzBzhMv"
-Received: by mail-qv1-f46.google.com with SMTP id 6a1803df08f44-69b730fc89bso15402606d6.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 13 May 2024 10:31:05 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="chCf5mVF"
+Received: by mail-oo1-f51.google.com with SMTP id 006d021491bc7-5b279e04391so2639761eaf.3
+        for <linux-bluetooth@vger.kernel.org>; Mon, 13 May 2024 11:51:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1715621465; x=1716226265; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=cyx1ZM+IjEGyEus0VxSJQh5lD7FkG534VfM1Nm3/V/w=;
-        b=HQzBzhMvwlan7X1+fy3v1kO4JlmxJVBLqi8o2PJz4448ybcq3KtfOsZJGy9r8X4o+P
-         kDS3yIPydTNkeKEM+S3oGQJcCe8VMO96O7/z1yNoytgVxi5tExJX8h0cTRpPBzQX+WSU
-         CjwsV3ck9X+sQwOJNq03ikam6iC7usybKEuIME1ISA+iKgUD2YAnOlPqYC6EN/XjxAkj
-         WVGVzoQVkf3M1oJtQIIZfCvLTOjEO2moI0VcYBzw2vwPRhzbyTc9RoRNrI54zKQsVYdQ
-         73Qn4kuIYt/dXOKD/L+mq2kN8INa2WHeAwVswwSjjmFPy7haT0XwEkH5FGeOUFVWV0sR
-         +RPg==
+        d=chromium.org; s=google; t=1715626298; x=1716231098; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=uyix+o2/yzI/teQyeT3mBLMMtNsSET+xVm+DqXsTGyI=;
+        b=chCf5mVFJ8CkQzfA9IqZt8XTTy+24M+77aVJuIbrAev3NEheKEiorAcdUJYFhaKd8d
+         MeoUM+Rm89aS4dcMF68cIZFPvZivkpNa7zVdnzXgyLcZr08VjbcbtDn1oBeFzb4FykpE
+         OmY2LgVtqqG8dPyMGgiDdNWMVSRjYcdwKZg9Q=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715621465; x=1716226265;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=cyx1ZM+IjEGyEus0VxSJQh5lD7FkG534VfM1Nm3/V/w=;
-        b=E8Dae02Vgvg69YYWCWFeo4LMdmVGL27PmBlMVrA0dB5vogvtvkLsr2jTMI7EE5dwSX
-         gpztnn96CKRR7tSJUmS1pJrLKWGgNkA9JZlAMpy/hoA9yqxT8ilQ1/nffY9oxd/BzOxR
-         ++IqexOsj6nanDZZtIt/bMeHOyexKMfz8N8xH3FSA66GsnvX/y4F9XODH1Yy0gMKDwCs
-         R2ns9SDsNBmvZV0ezAyskxb7Ky/LUncq+rJE3KjMiScX9jUhGu+HBEuM26rzdX6cKSTn
-         s4Uo48req3Q9IOlAQL2Q28HJyEv4TDu6U2MxTeXVr5Zpq4zXZFOmmV5E3+opoXKU4zVz
-         V6zA==
-X-Gm-Message-State: AOJu0YzZTWn98uQBiYAfHLV2vpLMQqAms92qOaSRmNo1Zz7TuBUDB88z
-	MAnepb/GuYvgoZlG9o2c0P+lONsyQSjRTGUOnNbtAy73EaW1RGeDzU+Cpg==
-X-Google-Smtp-Source: AGHT+IFlSHn2X2eFpQO1SI10Rc/qJ7gMqJUKwWSj7kT33AD3bOU1EkMwg4C/clCuHFMrKliSoK9/0A==
-X-Received: by 2002:a05:6214:5509:b0:6a0:c6e3:c025 with SMTP id 6a1803df08f44-6a168163e1emr124586426d6.18.1715621464850;
-        Mon, 13 May 2024 10:31:04 -0700 (PDT)
-Received: from [172.17.0.2] ([172.200.199.166])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6a15f1cd3desm45350106d6.88.2024.05.13.10.31.04
+        d=1e100.net; s=20230601; t=1715626298; x=1716231098;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=uyix+o2/yzI/teQyeT3mBLMMtNsSET+xVm+DqXsTGyI=;
+        b=J3DLTToCHSRT7z8OzH9+LXUBz0bWVF+uk3xQxMCFaXD24s8uEs2xeyiDMdk/imPqZk
+         aFUZ9ekiouAjd/n7xPNgta3DToBBx+nFp7yiZGggeqpKKRpf0CZH73KFHSq1Di9Jghxa
+         3Y17hu2e/7xijOPIf2p01p1cUHQjkNy9tvByqFHm5CtpMDLCVKenf/fRUCoy3tx7K97i
+         TYsMKQ/Xh6bPZC58eFZLc2WCjNEwt32D3lAQpxSa/QsbvMJ74oBR/QPeEtbFzeM7i/W+
+         /3AYskgvbj677/zIa09cTy0QX5DuKYMJypTGH2dUtek4YqyUWRXEpf7goDfno51B2IM/
+         O2yA==
+X-Forwarded-Encrypted: i=1; AJvYcCXqtjfVorCSO8n50biGOb66dVGnfffIYMhzOuXCCDK8b+E0hFhL1dTRHYR251CmijBy2ka4YftkYgAxrV1XcMDkWMSp7mOxKTnUoPS2ZN26
+X-Gm-Message-State: AOJu0YwX0i+XwkyXYxv7n/egNgPxgLVfxiYNMQQZ0UKzzYRhAx/dLHVA
+	sn2xHy1KJ908TQZ45Z/jXziM6SE8oJt9OHsM61ugLvivnKJvi5QGjhyV3xNJuA==
+X-Google-Smtp-Source: AGHT+IGv1B1Gx2wKtJWfijbWmucGg9LEe4iuF9AOrXx3x9zQT6qPe6BMe/LLFnyboO/EG8WWyTenMw==
+X-Received: by 2002:a05:6358:6505:b0:192:5b28:1ace with SMTP id e5c5f4694b2df-193bd007a1cmr1186924055d.29.1715626298112;
+        Mon, 13 May 2024 11:51:38 -0700 (PDT)
+Received: from www.outflux.net ([198.0.35.241])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-634103f6982sm6959074a12.60.2024.05.13.11.51.37
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 13 May 2024 10:31:04 -0700 (PDT)
-Message-ID: <66424e58.d40a0220.360ec.e1da@mx.google.com>
-Date: Mon, 13 May 2024 10:31:04 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============6340515130409889104=="
+        Mon, 13 May 2024 11:51:37 -0700 (PDT)
+Date: Mon, 13 May 2024 11:51:37 -0700
+From: Kees Cook <keescook@chromium.org>
+To: Erick Archer <erick.archer@outlook.com>
+Cc: Jiri Slaby <jirislaby@kernel.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	"David S.  Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Nick Desaulniers <ndesaulniers@google.com>,
+	Bill Wendling <morbo@google.com>,
+	Justin Stitt <justinstitt@google.com>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Geert Uytterhoeven <geert@linux-m68k.org>,
+	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org,
+	llvm@lists.linux.dev
+Subject: Re: [PATCH v2] tty: rfcomm: prefer struct_size over open coded
+ arithmetic
+Message-ID: <202405131150.31B872F41A@keescook>
+References: <AS8PR02MB7237262C62B054FABD7229168BE12@AS8PR02MB7237.eurprd02.prod.outlook.com>
+ <d11dacfa-5925-4040-b60b-02ab731d5f1a@kernel.org>
+ <CABBYNZ+4CcoBvkj8ze7mZ4vVfWfm_tyBxdFspvreVASi0VR=6A@mail.gmail.com>
+ <AS8PR02MB72379B760CF7B6A26A69C5558BE22@AS8PR02MB7237.eurprd02.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, tharvey@gateworks.com
-Subject: RE: Bluetooth: btsdio: Do not bind to non-removable CYW4373
-In-Reply-To: <20240513162200.2658571-1-tharvey@gateworks.com>
-References: <20240513162200.2658571-1-tharvey@gateworks.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <AS8PR02MB72379B760CF7B6A26A69C5558BE22@AS8PR02MB7237.eurprd02.prod.outlook.com>
 
---===============6340515130409889104==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+On Mon, May 13, 2024 at 07:12:57PM +0200, Erick Archer wrote:
+> Hi Kees, Jiri and Luiz,
+> First of all, thanks for the reviews.
+> 
+> On Mon, May 13, 2024 at 12:29:04PM -0400, Luiz Augusto von Dentz wrote:
+> > Hi Jiri, Eric,
+> > 
+> > On Mon, May 13, 2024 at 1:07 AM Jiri Slaby <jirislaby@kernel.org> wrote:
+> > >
+> > > On 12. 05. 24, 13:17, Erick Archer wrote:
+> > > > This is an effort to get rid of all multiplications from allocation
+> > > > functions in order to prevent integer overflows [1][2].
+> > > >
+> > > > As the "dl" variable is a pointer to "struct rfcomm_dev_list_req" and
+> > > > this structure ends in a flexible array:
+> > > ...
+> > > > --- a/include/net/bluetooth/rfcomm.h
+> > > > +++ b/include/net/bluetooth/rfcomm.h
+> > > ...
+> > > > @@ -528,12 +527,12 @@ static int rfcomm_get_dev_list(void __user *arg)
+> > > >       list_for_each_entry(dev, &rfcomm_dev_list, list) {
+> > > >               if (!tty_port_get(&dev->port))
+> > > >                       continue;
+> > > > -             (di + n)->id      = dev->id;
+> > > > -             (di + n)->flags   = dev->flags;
+> > > > -             (di + n)->state   = dev->dlc->state;
+> > > > -             (di + n)->channel = dev->channel;
+> > > > -             bacpy(&(di + n)->src, &dev->src);
+> > > > -             bacpy(&(di + n)->dst, &dev->dst);
+> > > > +             di[n].id      = dev->id;
+> > > > +             di[n].flags   = dev->flags;
+> > > > +             di[n].state   = dev->dlc->state;
+> > > > +             di[n].channel = dev->channel;
+> > > > +             bacpy(&di[n].src, &dev->src);
+> > > > +             bacpy(&di[n].dst, &dev->dst);
+> > >
+> > > This does not relate much to "prefer struct_size over open coded
+> > > arithmetic". It should have been in a separate patch.
+> > 
+> > +1, please split these changes into its own patch so we can apply it separately.
+> 
+> Ok, no problem. Also, I will simplify the "bacpy" lines with direct
+> assignments as Kees suggested:
+> 
+>    di[n].src = dev->src;
+>    di[n].dst = dev->dst;
+> 
+> instead of:
+> 
+>    bacpy(&di[n].src, &dev->src);
+>    bacpy(&di[n].dst, &dev->dst);
 
-This is automated email and please do not reply to this email!
+I think that's a separate thing and you can leave bacpy() as-is for now.
 
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=852863
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      0.66 seconds
-GitLint                       PASS      0.33 seconds
-SubjectPrefix                 PASS      0.13 seconds
-BuildKernel                   PASS      29.79 seconds
-CheckAllWarning               PASS      32.82 seconds
-CheckSparse                   PASS      38.17 seconds
-CheckSmatch                   FAIL      36.10 seconds
-BuildKernel32                 PASS      28.81 seconds
-TestRunnerSetup               PASS      519.15 seconds
-TestRunner_l2cap-tester       PASS      18.47 seconds
-TestRunner_iso-tester         FAIL      31.44 seconds
-TestRunner_bnep-tester        PASS      4.80 seconds
-TestRunner_mgmt-tester        PASS      109.18 seconds
-TestRunner_rfcomm-tester      PASS      7.23 seconds
-TestRunner_sco-tester         PASS      14.97 seconds
-TestRunner_ioctl-tester       PASS      9.75 seconds
-TestRunner_mesh-tester        PASS      5.78 seconds
-TestRunner_smp-tester         PASS      6.76 seconds
-TestRunner_userchan-tester    PASS      4.85 seconds
-IncrementalBuild              PASS      27.91 seconds
-
-Details
-##############################
-Test: CheckSmatch - FAIL
-Desc: Run smatch tool with source
-Output:
-
-Segmentation fault (core dumped)
-make[4]: *** [scripts/Makefile.build:244: net/bluetooth/hci_core.o] Error 139
-make[4]: *** Deleting file 'net/bluetooth/hci_core.o'
-make[3]: *** [scripts/Makefile.build:485: net/bluetooth] Error 2
-make[2]: *** [scripts/Makefile.build:485: net] Error 2
-make[2]: *** Waiting for unfinished jobs....
-Segmentation fault (core dumped)
-make[4]: *** [scripts/Makefile.build:244: drivers/bluetooth/bcm203x.o] Error 139
-make[4]: *** Deleting file 'drivers/bluetooth/bcm203x.o'
-make[4]: *** Waiting for unfinished jobs....
-Segmentation fault (core dumped)
-make[4]: *** [scripts/Makefile.build:244: drivers/bluetooth/bpa10x.o] Error 139
-make[4]: *** Deleting file 'drivers/bluetooth/bpa10x.o'
-make[3]: *** [scripts/Makefile.build:485: drivers/bluetooth] Error 2
-make[2]: *** [scripts/Makefile.build:485: drivers] Error 2
-make[1]: *** [/github/workspace/src/src/Makefile:1919: .] Error 2
-make: *** [Makefile:240: __sub-make] Error 2
-##############################
-Test: TestRunner_iso-tester - FAIL
-Desc: Run iso-tester with test-runner
-Output:
-Total: 122, Passed: 121 (99.2%), Failed: 1, Not Run: 0
-
-Failed Test Cases
-ISO Connect2 Suspend - Success                       Failed       4.225 seconds
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============6340515130409889104==--
+-- 
+Kees Cook
