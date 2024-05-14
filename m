@@ -1,27 +1,27 @@
-Received: from inva020.nxp.com (inva020.nxp.com [92.121.34.13])
+Received: from inva021.nxp.com (inva021.nxp.com [92.121.34.21])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAF96FC1F;
-	Tue, 14 May 2024 09:04:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=92.121.34.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86EA5208CE;
+	Tue, 14 May 2024 09:09:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=92.121.34.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715677465; cv=none; b=B42bCzeL4Cdb7YIHqPZCdSfvvyRFwTum1zRZH2K191nI6CqvwoY1FL18Ohu2HbpQkANjGcl798t73h+ZKFVrQU2/2ymmQPYhGTTWFWtvoOfzjDreb6FJM5IvbHI6sFFEOFOgyTtTxCG1Y2vTa1tMPUcTLiX0z+kQfMyQHjcA1x4=
+	t=1715677767; cv=none; b=SKlzKCtr8sPsiB4KD795690jY6Vq/bRHSXwf0iNzCsDTkTBPolizA0bQk8GUtlKQ7qN2Rn6s4w5geSfUjFLMqeekxFwqgk27GQc4laeMg2/LWQlquIbdFmpx9Mb9/PaW2UgudIbc6WjbCX6dyy/uIVHQ0vBJ8RGRWhi+4ZruWyg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715677465; c=relaxed/simple;
-	bh=DN8MJhZE/6ABuaOgDNbrslUWBDHWkr4DQN1q02HGp+I=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=byFJGfOmwmMNDGXg+VwQYQbQD3c6pOmaPR2mivs209D3dH26HlGfXH3BHOFjsavvJtYfgaZZAJ97x/41MHr7iCj5SZU/dxnPs2nY/NhQK7Ihcb5hoqG03jGUzlIgfxcKzEb9ouds0Bt7OG+BoDEjOGBTUJ9jYkQxpG4bCIinTio=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; arc=none smtp.client-ip=92.121.34.13
+	s=arc-20240116; t=1715677767; c=relaxed/simple;
+	bh=wy1kEIFNWuIKDXwii9P9BWgUPVTkXwG6PerXplT8Hik=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=o9K7920lh9AAi1zCZYydSA0Al3mVcdZq0/gChmFfwCuuHTfqRKmAo4xjM+ne/Q8Irxn0aKxPe8lymrEd33aitIWTz1dUd36zy5fcir5axy2ac4cJwQoOq8/bODv/E0yO4f9zf8Mshu0DybdWvd6RAqVhh+fjAnIMYGzAzt/yBXA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; arc=none smtp.client-ip=92.121.34.21
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
-Received: from inva020.nxp.com (localhost [127.0.0.1])
-	by inva020.eu-rdc02.nxp.com (Postfix) with ESMTP id E3F461A1D80;
-	Tue, 14 May 2024 11:04:19 +0200 (CEST)
+Received: from inva021.nxp.com (localhost [127.0.0.1])
+	by inva021.eu-rdc02.nxp.com (Postfix) with ESMTP id A083C2015E6;
+	Tue, 14 May 2024 11:09:23 +0200 (CEST)
 Received: from aprdc01srsp001v.ap-rdc01.nxp.com (aprdc01srsp001v.ap-rdc01.nxp.com [165.114.16.16])
-	by inva020.eu-rdc02.nxp.com (Postfix) with ESMTP id 9CD211A1D42;
-	Tue, 14 May 2024 11:04:19 +0200 (CEST)
+	by inva021.eu-rdc02.nxp.com (Postfix) with ESMTP id 591AD201909;
+	Tue, 14 May 2024 11:09:23 +0200 (CEST)
 Received: from pe-lt8779.in-pnq01.nxp.com (pe-lt8779.in-pnq01.nxp.com [10.17.104.141])
-	by aprdc01srsp001v.ap-rdc01.nxp.com (Postfix) with ESMTP id BE3EE180222C;
-	Tue, 14 May 2024 17:04:17 +0800 (+08)
+	by aprdc01srsp001v.ap-rdc01.nxp.com (Postfix) with ESMTP id 7E902180222C;
+	Tue, 14 May 2024 17:09:21 +0800 (+08)
 From: Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>
 To: marcel@holtmann.org,
 	luiz.dentz@gmail.com
@@ -34,9 +34,9 @@ Cc: linux-bluetooth@vger.kernel.org,
 	ziniu.wang_1@nxp.com,
 	haibo.chen@nxp.com,
 	LnxRevLi@nxp.com
-Subject: [PATCH v2] Bluetooth: btnxpuart: Enable Power Save feature on startup
-Date: Tue, 14 May 2024 14:32:58 +0530
-Message-Id: <20240514090258.1507934-1-neeraj.sanjaykale@nxp.com>
+Subject: [PATCH v1 1/1] Bluetooth: btnxpuart: Add handling for boot-signature timeout errors
+Date: Tue, 14 May 2024 14:39:13 +0530
+Message-Id: <20240514090913.1507990-1-neeraj.sanjaykale@nxp.com>
 X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -47,39 +47,109 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Virus-Scanned: ClamAV using ClamSMTP
 
-This sets the default power save mode setting to enabled.
+This handles the timeout errors seen in the bootloader signatures during
+FW download.
 
-The power save feature is now stable and stress test issues, such as the
-TX timeout error, have been resolved.
-commit c7ee0bc8db32 ("Bluetooth: btnxpuart: Resolve TX timeout error in
-power save stress test")
+When the bootloader does not receive a response packet from the host
+within a specific time, it adds an error code to the bootloader
+signature while requesting for the FW chunk from the same offset.
 
-With this setting, the driver will send the vendor command to FW at
-startup, to enable power save feature.
+The host is expected to clear this error code with a NAK, and reply to
+only those bootloader signatures which have error code 0.
 
-User can disable this feature using the following vendor command:
-hcitool cmd 3f 23 03 00 00 (HCI_NXP_AUTO_SLEEP_MODE)
+This error handling is valid for data_req bootloader signatures for V3
+and future bootloader versions.
 
 Signed-off-by: Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>
-Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
 ---
-v2: Corrected subject line. Added commit reference. (Paul Menzel)
- drivers/bluetooth/btnxpuart.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/bluetooth/btnxpuart.c | 46 ++++++++++++++++++++++++++++++++---
+ 1 file changed, 42 insertions(+), 4 deletions(-)
 
 diff --git a/drivers/bluetooth/btnxpuart.c b/drivers/bluetooth/btnxpuart.c
-index 7f88b6f52f26..42e929f0d141 100644
+index 0b93c2ff29e4..2018513fb961 100644
 --- a/drivers/bluetooth/btnxpuart.c
 +++ b/drivers/bluetooth/btnxpuart.c
-@@ -281,7 +281,7 @@ static u8 crc8_table[CRC8_TABLE_SIZE];
+@@ -187,6 +187,10 @@ struct btnxpuart_dev {
+ #define NXP_NAK_V3		0x7b
+ #define NXP_CRC_ERROR_V3	0x7c
+ 
++#define NXP_ACK_RX_TIMEOUT	0x0002
++#define NXP_HDR_RX_TIMEOUT	0x0003
++#define NXP_DATA_RX_TIMEOUT	0x0004
++
+ #define HDR_LEN			16
+ 
+ #define NXP_RECV_CHIP_VER_V1 \
+@@ -277,6 +281,12 @@ struct nxp_bootloader_cmd {
+ 	__be32 crc;
+ } __packed;
+ 
++struct nxp_v3_rx_timeout_nak {
++	u8 nak;
++	__le32 offset;
++	u8 crc;
++} __packed;
++
+ static u8 crc8_table[CRC8_TABLE_SIZE];
  
  /* Default configurations */
- #define DEFAULT_H2C_WAKEUP_MODE	WAKEUP_METHOD_BREAK
--#define DEFAULT_PS_MODE		PS_MODE_DISABLE
-+#define DEFAULT_PS_MODE		PS_MODE_ENABLE
- #define FW_INIT_BAUDRATE	HCI_NXP_PRI_BAUDRATE
+@@ -899,6 +909,32 @@ static int nxp_recv_chip_ver_v3(struct hci_dev *hdev, struct sk_buff *skb)
+ 	return 0;
+ }
  
- static struct sk_buff *nxp_drv_send_cmd(struct hci_dev *hdev, u16 opcode,
++static void nxp_handle_fw_dnld_error(struct hci_dev *hdev, struct v3_data_req *req)
++{
++	struct btnxpuart_dev *nxpdev = hci_get_drvdata(hdev);
++	__u32 offset = __le32_to_cpu(req->offset);
++	__u16 err = __le16_to_cpu(req->error);
++	struct nxp_v3_rx_timeout_nak nak_tx_buf;
++
++	switch (err) {
++	case NXP_ACK_RX_TIMEOUT:
++	case NXP_HDR_RX_TIMEOUT:
++	case NXP_DATA_RX_TIMEOUT:
++		nak_tx_buf.nak = NXP_NAK_V3;
++		nak_tx_buf.offset = __cpu_to_le32(offset);
++		nak_tx_buf.crc = crc8(crc8_table, (u8 *)&nak_tx_buf,
++				      sizeof(nak_tx_buf) - 1, 0xff);
++		serdev_device_write_buf(nxpdev->serdev, (u8 *)&nak_tx_buf,
++					sizeof(nak_tx_buf));
++		break;
++	default:
++		bt_dev_dbg(hdev, "Unknown bootloader error: %d", err);
++		break;
++
++	}
++
++}
++
+ static int nxp_recv_fw_req_v3(struct hci_dev *hdev, struct sk_buff *skb)
+ {
+ 	struct btnxpuart_dev *nxpdev = hci_get_drvdata(hdev);
+@@ -913,7 +949,12 @@ static int nxp_recv_fw_req_v3(struct hci_dev *hdev, struct sk_buff *skb)
+ 	if (!req || !nxpdev->fw)
+ 		goto free_skb;
+ 
+-	nxp_send_ack(NXP_ACK_V3, hdev);
++	if (!req->error) {
++		nxp_send_ack(NXP_ACK_V3, hdev);
++	} else {
++		nxp_handle_fw_dnld_error(hdev, req);
++		goto free_skb;
++	}
+ 
+ 	len = __le16_to_cpu(req->len);
+ 
+@@ -940,9 +981,6 @@ static int nxp_recv_fw_req_v3(struct hci_dev *hdev, struct sk_buff *skb)
+ 		wake_up_interruptible(&nxpdev->fw_dnld_done_wait_q);
+ 		goto free_skb;
+ 	}
+-	if (req->error)
+-		bt_dev_dbg(hdev, "FW Download received err 0x%02x from chip",
+-			   req->error);
+ 
+ 	offset = __le32_to_cpu(req->offset);
+ 	if (offset < nxpdev->fw_v3_offset_correction) {
 -- 
 2.34.1
 
