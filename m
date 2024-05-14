@@ -1,122 +1,72 @@
-Received: from mail-yw1-f181.google.com (mail-yw1-f181.google.com [209.85.128.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 342891C36;
-	Tue, 14 May 2024 02:25:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE6E1AD48
+	for <linux-bluetooth@vger.kernel.org>; Tue, 14 May 2024 02:40:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715653559; cv=none; b=f6sFgWvZWvJnPEBycYL1Y3bIlJGrBMJ8DuSaq7TJb8dlt3k5IsG2Xgu915hAVaDzNEtW0GsLOJzm0a9Be/Bp+NII0D6f7bHgs7hLNzpGTE6YH9ZwaTCwHKo8aY3fuwb9gH/QvlyWQAn2og2kcU3kfBzi/ozIEyKu0c5E+SwWv+4=
+	t=1715654429; cv=none; b=TpgRVYRS8/rkyd2rGu3bh8uZAxbmZT2olWqnuzpwK8ytH3apdPnXkK8F1Oa4ebNs6e0iguLhDTdjDJg6thMTQyGCaGCxoCoD5r15jtFELTwatexg2WD1xDpvgtcqwCsC6k/Gl1ad7XcvM2E1brcpdJoHCy/SgCkFMOo9xsd9bP4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715653559; c=relaxed/simple;
-	bh=+a2RxBxWnxcA46Thf9ANLvCZNlU+Od+JII0GFSrtrTM=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=Wyh8XsfmkvN5t4XFoYehlITS0lXacRRPopDbq0Dz1fo13spEepXzUD5zQgY6swjnOZ/J+yO1uYsKda/+BEhgoxLEJ12sYkGDCd1AT0Pv1o+lf6thU+IRw9jQiXSeigmKqC8GmTkdH2C9DOpSmrCyet3RmvQxUSTsdTEhNG7Bv2k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=W7UEjUWM; arc=none smtp.client-ip=209.85.128.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1715654429; c=relaxed/simple;
+	bh=KdaP4RbhcZMscfsSACJJuxt8J5rxm04CooBM93xOh0I=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=uJMIQu0xxiRp7dULmWiUgqdzIzzk44DH5KcQO6jzcb85QfNwLKAGOXywyRfMuaExoobfALYlJsZLyhP9tNYRWg65WRaT7h/IH/6HQqw2KBjKbZsdSDtPNSOpNDN//aXbEFiMzaEXV11uYUTO59yfa9XyuWO4F7+cev0n4aQpG2I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=l9X+9fkw; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="W7UEjUWM"
-Received: by mail-yw1-f181.google.com with SMTP id 00721157ae682-61af74a010aso47780587b3.0;
-        Mon, 13 May 2024 19:25:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1715653557; x=1716258357; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=mx4RFDf6WgXAWKWwP6oMkLQ8rk0CdMUrz/uyMHvaUJY=;
-        b=W7UEjUWMHKZPwBAv+42MNRfR2YVu5H5tpE1S/EYADt7mIn13DS5JPStzU6KdynwLaO
-         t/TgvhXdK1AfZbRo5xMUEIhwWEN2uYkhs8xLDgFaRa4L7GwiofY8s81017fgNJ5L0Ohw
-         Mj1R5UmBnEHuVSEDQJIfkPc0zMl8V8aiLU//hEv1fitHLq/AAFc9jACLyZ2fij9cV47w
-         3bD9A2+vHMImnkQKfJJxbI8gqmZ5dZdyAqjfROwlxBx05VlaNBxRkSQCYfU2aj+DOXQe
-         afTzrEIRlPpHa57mob6tgbgCNfp3COFKdMNCdVSZqid3EWpFjn4E7djR382el4RzV2Ct
-         qizg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715653557; x=1716258357;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=mx4RFDf6WgXAWKWwP6oMkLQ8rk0CdMUrz/uyMHvaUJY=;
-        b=o12lOTLbafnalwpqtelre7+7GG025BuHkp815oVOo1Kz0xCiIwsfEUwhVJHziicBjU
-         tI92RWUDAdKr6P4UGo9+77odr3K3E8ada7oObq1PWfbmerm0PAWpTEbEKrtInk4mZMCd
-         e3c4LYhAwN4UrjDLIqJa7dpClQ2Szb9yRnwzm7NTWW5U50aCthYrtptb4K9xFL3IyRbw
-         vGtht8aEYWTVgYf/+jmmzj1kCodp9/EBzsjbL9auR9tmUk9LfRbLgRDZPJWyq0/dZ9k5
-         ZNlYVuwoxlYey4IWRwV7YKBcP1k4TUoJae6wSev4doQXDPZMk3MtWzsZKdbPO8XB77e7
-         nmIQ==
-X-Forwarded-Encrypted: i=1; AJvYcCW07OBGwo0UE8s8G8670aOspbBpOnsJRtCfUal+QyZprjCHqUqnIj8Iz7W8pHj8pSu0tYDiJa7Q0wzIFWRWq/UwENmVBQVpUMWTu6+gO2kQpTQqBR0DINfnE6pMz7UgFMBAfr8v0YOR
-X-Gm-Message-State: AOJu0YxaFhueWWCfe+2PRrC7cNIg6K40ovbz/NUuGbB0P4j+YoP1RQRK
-	JzTd/4G6T9eMVM+IOM5so4lMDYz6U6GLfTBxDEQbujOSHrzOT1MLoY1qxA==
-X-Google-Smtp-Source: AGHT+IHniwQQiYpd+TSCEkO0ItdZFVEhjPhlluaGCZGQkZZy2E2jyDTudjBeqgvzDdoqqXThA+rIjg==
-X-Received: by 2002:a0d:d6c9:0:b0:61e:a36:8d85 with SMTP id 00721157ae682-622b01384d2mr102100187b3.50.1715653557034;
-        Mon, 13 May 2024 19:25:57 -0700 (PDT)
-Received: from localhost (164.146.150.34.bc.googleusercontent.com. [34.150.146.164])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-43e19256258sm20030401cf.49.2024.05.13.19.25.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 13 May 2024 19:25:56 -0700 (PDT)
-Date: Mon, 13 May 2024 22:25:56 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, 
- davem@davemloft.net, 
- linux-bluetooth@vger.kernel.org, 
- netdev@vger.kernel.org, 
- Pauli Virtanen <pav@iki.fi>
-Message-ID: <6642cbb4309a1_205cc6294a4@willemb.c.googlers.com.notmuch>
-In-Reply-To: <CABBYNZKdbvyev+BV=CMGrzWPECJraP4OVJeysQYV=EFLKf_WVw@mail.gmail.com>
-References: <20240510211431.1728667-1-luiz.dentz@gmail.com>
- <20240513142641.0d721b18@kernel.org>
- <CABBYNZKn5YBRjj+RT_TVDtjOBS6V_H7BQmFMufQj-cOTC=RXDA@mail.gmail.com>
- <20240513154332.16e4e259@kernel.org>
- <6642bf28469d6_203b4c294bc@willemb.c.googlers.com.notmuch>
- <CABBYNZKJSpQcY+k8pczPgNYEoF+OE6enZFE5=Qu_HeWDkcfZEg@mail.gmail.com>
- <6642c7f3427b5_20539c2949a@willemb.c.googlers.com.notmuch>
- <CABBYNZKdbvyev+BV=CMGrzWPECJraP4OVJeysQYV=EFLKf_WVw@mail.gmail.com>
-Subject: Re: pull request: bluetooth-next 2024-05-10
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="l9X+9fkw"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 3D41CC113CC;
+	Tue, 14 May 2024 02:40:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1715654429;
+	bh=KdaP4RbhcZMscfsSACJJuxt8J5rxm04CooBM93xOh0I=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=l9X+9fkw5N3vNlUEWe3P+y7Fgn5ehDLTQ4D2OBAK4G57dFJ0IW9uTb/h7urUYmGEn
+	 GutfGjJMyuFIjQ8kUldKQfvnCD5VUSF81o6E2s7gDUFQVGlssMJg8Cz4te+gIv5jt/
+	 Gb9ywGP414EjIX3wrM7GqOYtW5nzb3NhiSs+7Y7DGv1bCg4jjxnjzGc8ZM23Vzd4rl
+	 XgO9n/iaWSyGovbT3ub+SolR84B9p6R77Jr4twiXihigp8fczrSlXpG4mPAZ51nfwA
+	 ZQZiApglt7X4Ytw1MpZD36pNH0OdGxzEj3ccB6+gJn/37OIuWGA9xysIWTka1bGUa9
+	 rgCp6Og58zZFQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 30800C433F2;
+	Tue, 14 May 2024 02:40:29 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH BlueZ v1] mesh: Fix not setting rpl_dir as static
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <171565442919.23416.8732153573969683911.git-patchwork-notify@kernel.org>
+Date: Tue, 14 May 2024 02:40:29 +0000
+References: <20240513203732.435344-1-luiz.dentz@gmail.com>
+In-Reply-To: <20240513203732.435344-1-luiz.dentz@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
 
-> > > > As for the "experimental" BT_POLL_ERRQUEUE. This is an addition to the
-> > > > ABI, right? So immutable. Is it fair to call that experimental?
-> > >
-> > > I guess you are referring to the fact that sockopt ID reserved to
-> > > BT_POLL_ERRQUEUE cannot be reused anymore even if we drop its usage in
-> > > the future, yes that is correct, but we can actually return
-> > > ENOPROTOOPT as it current does:
-> > >
-> > >         if (!bt_poll_errqueue_enabled())
-> > >             return -ENOPROTOOPT
-> >
-> > I see. Once applications rely on a feature, it can be hard to actually
-> > deprecate. But in this case it may be possible.
-> >
-> > > Anyway I would be really happy to drop it so we don't have to worry
-> > > about it later.
-> > >
-> > > > It might be safer to only suppress the sk_error_report in
-> > > > sock_queue_err_skb. Or at least in bt_sock_poll to check the type of
-> > > > all outstanding errors and only suppress if all are timestamps.
-> > >
-> > > Or perhaps we could actually do that via poll/epoll directly? Not that
-> > > it would make it much simpler since the library tends to wrap the
-> > > usage of poll/epoll but POLLERR meaning both errors or errqueue events
-> > > is sort of the problem we are trying to figure out how to process them
-> > > separately.
-> >
-> > The process would still be awoken, of course. If bluetoothd can just
-> > be modified to ignore the reports, that would indeed be easiest from
-> > a kernel PoV.
+Hello:
+
+This patch was applied to bluetooth/bluez.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+
+On Mon, 13 May 2024 16:37:32 -0400 you wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 > 
-> @Pauli Virtanen tried that but apparently it would keep waking up the
-> process until the errqueue is fully read, maybe we are missing
-> something, or glib is not really doing a good job wrt to poll/epoll
-> handling.
+> rpl_dir shall be made static to be properly scoped.
+> ---
+>  mesh/rpl.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
-Perhaps this is because poll is level triggered. Maybe epoll in edge
-triggered mode would avoid re-waking for the same outstanding events.
+Here is the summary with links:
+  - [BlueZ,v1] mesh: Fix not setting rpl_dir as static
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=c7445d973694
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
