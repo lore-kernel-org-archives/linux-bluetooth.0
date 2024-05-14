@@ -1,115 +1,92 @@
-Received: from mail-4027.protonmail.ch (mail-4027.protonmail.ch [185.70.40.27])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C641E12C474
-	for <linux-bluetooth@vger.kernel.org>; Tue, 14 May 2024 10:52:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.70.40.27
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE0C713CF93
+	for <linux-bluetooth@vger.kernel.org>; Tue, 14 May 2024 11:11:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715683956; cv=none; b=mr38NxQ+Rp94g8LX4/h51Ihud7cUIEKc9FEt1exkqYhOCAe0SnaKixR4Uh/OhZFI1kfX5TBkr6qDdDMOYF0mQWymbXXdz/sgT88bUSTCuwppYLQybl1CgE5doiOqWb/Cb6eHhBt3+JOPsEyJ2fwfKf30XVWatrjuXrWQD4KJUI0=
+	t=1715685094; cv=none; b=dJFMELlh1kXc/LWOdFoR3C1/dha80WiRXly/zOKXl4KQVr6r3XilA1GTCSO6Gynufd4mCjUvFYZ3bry0ZNrcuLB59YKzCC1A+548s5YE2V0LtoG2rKr7i99UfWzelkdhleRrPjItM3hx7OYIoJl/8oTDfHwJLbHalwcSHQkIH3o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715683956; c=relaxed/simple;
-	bh=ZkYogbEGN8eYzhwpggq3OqaVz7J2MKyL0AB4jX+nygU=;
-	h=Date:To:From:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=oAchfza0/4j+DLw3Yi4gh42vKBApooAegZTbx7kKKeuswnelV6llQWnVu+A4dcgVuCrulXHKCKJ8z9sS2Rsuye95KvaP80cct/B9AzN8hyv7iS2FkjjNHifFP9e0I6oSvI+S25gqr6SVUx850nUOi8FFWGFWRNBm2sWYKG9tuyA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me; spf=pass smtp.mailfrom=proton.me; dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b=IvzrDRon; arc=none smtp.client-ip=185.70.40.27
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=proton.me
+	s=arc-20240116; t=1715685094; c=relaxed/simple;
+	bh=AVxxQmtiMw58GomTLJMnPVby3KLGBbSrBaEC9W9qtL8=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=jhepSMmqaSpdzu4/XNegEQRaDSIz7cp9LgjNs+V7I9uFIBHyjfp132tlE4s1jLAmXNNIRvUzQVTCBzHJJCef0+XyyhKgsMVeo74yyfY2W0MrvHcagLs3biBAJzR369kNitSL98cidOQUIw3JUiliKg9dWn/87EQbvNw59zdfH8Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EdbkkUft; arc=none smtp.client-ip=209.85.210.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b="IvzrDRon"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
-	s=protonmail; t=1715683951; x=1715943151;
-	bh=ZkYogbEGN8eYzhwpggq3OqaVz7J2MKyL0AB4jX+nygU=;
-	h=Date:To:From:Cc:Subject:Message-ID:Feedback-ID:From:To:Cc:Date:
-	 Subject:Reply-To:Feedback-ID:Message-ID:BIMI-Selector;
-	b=IvzrDRonBWWVxOdCMVdBPLbbsIH2c/1J2uNfzWSQLSg3d3fGZJTv+LrPPiLNih2hD
-	 rKBwhKPF2rzR1to5CGAOcaOncpkx6R8ZKSDppxJlaIfBMxPWwfVcIBS1hHs6Sk/WmQ
-	 RD9ulqeK38XA09Mrsi8w9LLwuXPJKZa1QNzGwBzMnFteP+jzOwkEw7B4IdM0b6TyoR
-	 NtpUqq0kms6j2pupqgEVjciuF4ExwPTE6HHb99m52dK//GwXXBUJw2uzXZwhInmv4T
-	 XtjHZ8OPrY4DWLWN3+CNfIYuwg1as0zNhxilm44GqQ8B0r9Ii1uTVXJnbww7DNUuEC
-	 vujMKXY4pj9zw==
-Date: Tue, 14 May 2024 10:52:29 +0000
-To: "marcel@holtmann.org" <marcel@holtmann.org>, "luiz.dentz@gmail.com" <luiz.dentz@gmail.com>
-From: "SoloSaravanan@proton.me" <SoloSaravanan@proton.me>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: [PATCH] Bluetooth: btusb: Add device 13d3:3606 as MT7921 device
-Message-ID: <5aweNli8mhqprLPB0O418QX4MYtylYw3R6Zaof-xBxNqcuBY9WfT23vrdlrPGSDs2lksHC0iwXGzyVQq91VRQ38hJOecQZX2c_eEqk8Snz4=@proton.me>
-Feedback-ID: 84438951:user:proton
-X-Pm-Message-ID: 43b918bdc097dd85a3d99f87b251b9118e56e8d3
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EdbkkUft"
+Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-6f44881ad9eso4292195b3a.3
+        for <linux-bluetooth@vger.kernel.org>; Tue, 14 May 2024 04:11:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1715685092; x=1716289892; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=AVxxQmtiMw58GomTLJMnPVby3KLGBbSrBaEC9W9qtL8=;
+        b=EdbkkUftvcDWx4gJ5KApMPWyI2hYulxjuyHRf2PkNfpoXZSk7PSaxt0uorzlsh/S8r
+         CqoVBtMv/isA7O/nDTXeHA5/WoYfoXNJcKqJC4QVfBFcrzZF4yNXI8Z9tzCTj9UpnnaR
+         /PbVJsFiiw+1fRZf6xR54E8JRBu2X4/5wTZtfT0JN6+f9wpRzSnYTBj8Fcp8taLfjRAc
+         135bF/Et9c8lYohXHp8B1iJeUjGVEflPneH7ZQJQaWdR8gNxUqCRu1TYcFNFBAKZDLJx
+         OBB6zpRVkFbXoAhPmpFhnz5m8/3kqLCTb2WxDqNa6GSm+VMIZN0AEbGCGCGOGm9k+hgi
+         EErQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1715685092; x=1716289892;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=AVxxQmtiMw58GomTLJMnPVby3KLGBbSrBaEC9W9qtL8=;
+        b=qE9fy7AJahlJ+w7ncWSSHQOEeMZxi1bqN6Uiw7MGcKnIpQQLqwezOqo0hchOn73sZz
+         EvBzwYUr0EJZG1+4vgi+9p3H1nIAv83EyWyHPJDeG1oRJoB5dvpQLExCHwKWl9k/i0ZD
+         M5ZqDjlzXnkJf6bPtMXiqZq7fpCZCPqXXX6kcR1GNQbF0V0yUxbQLF3FxZpnxzMbyIb8
+         K+2T88GHJ5wnbwdaOzcRozoLOz07puupBOXxI6ROPw0Febwm42F7LPMPHQ8/+64bUUvk
+         dP9F3jQssImyJCL65rVLk1wFiU6dWBzHftpq5hKTnmzdYzOvdhl1lFFlsCgNQ4KloqYV
+         R3/Q==
+X-Gm-Message-State: AOJu0YwNWK2bNZgWiAvzKfkDwZrDe0n+i3Bf9C1gtfXsiW6r15Ft9ckC
+	z35zYfCbrlO+hP3337M0gO0jOXh78tqzWEDTeAJb6vYaw33mgT9/zJw3Ow==
+X-Google-Smtp-Source: AGHT+IFZ8AcTQTTspEtDCZjqFQpyIVoYTFuROLDKfTgliWv5HwVldZDnA/IoAbjAIJ2O1EjDG0u5pA==
+X-Received: by 2002:a05:6a00:1a8e:b0:6f3:88c5:fed6 with SMTP id d2e1a72fcca58-6f4e02d341emr13993592b3a.19.1715685091838;
+        Tue, 14 May 2024 04:11:31 -0700 (PDT)
+Received: from [172.17.0.2] ([20.253.152.177])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-6f4d2b26593sm8871112b3a.201.2024.05.14.04.11.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 14 May 2024 04:11:31 -0700 (PDT)
+Message-ID: <664346e3.a70a0220.60909.6e96@mx.google.com>
+Date: Tue, 14 May 2024 04:11:31 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============8670074523521803822=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/mixed;
- boundary="b1_zPeR0nwFNwl1S8RkK9z2SL2ksqsqGeq7xB99Of9deY"
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, SoloSaravanan@proton.me
+Subject: RE: Bluetooth: btusb: Add device 13d3:3606 as MT7921 device
+In-Reply-To: <5aweNli8mhqprLPB0O418QX4MYtylYw3R6Zaof-xBxNqcuBY9WfT23vrdlrPGSDs2lksHC0iwXGzyVQq91VRQ38hJOecQZX2c_eEqk8Snz4=@proton.me>
+References: <5aweNli8mhqprLPB0O418QX4MYtylYw3R6Zaof-xBxNqcuBY9WfT23vrdlrPGSDs2lksHC0iwXGzyVQq91VRQ38hJOecQZX2c_eEqk8Snz4=@proton.me>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-This is a multi-part message in MIME format.
+--===============8670074523521803822==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
---b1_zPeR0nwFNwl1S8RkK9z2SL2ksqsqGeq7xB99Of9deY
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+This is an automated email and please do not reply to this email.
 
-Empty Message
---b1_zPeR0nwFNwl1S8RkK9z2SL2ksqsqGeq7xB99Of9deY
-Content-Type: text/x-patch; name=0001-Bluetooth-btusb-Add-device-13d3-3606-as-MT7921-devic.patch
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename=0001-Bluetooth-btusb-Add-device-13d3-3606-as-MT7921-devic.patch
+Dear Submitter,
 
-RnJvbSBhMThlYjk3NDc5NjY4MjJiNzA4YjJmODJlMWNhMDNmYWI3OTYwODBiIE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBTb2xvU2FyYXZhbmFuIDxTb2xvU2FyYXZhbmFuQHByb3Rvbi5t
-ZT4KRGF0ZTogVHVlLCAxNCBNYXkgMjAyNCAxNjoxODowNSArMDUzMApTdWJqZWN0OiBbUEFUQ0hd
-IEJsdWV0b290aDogYnR1c2I6IEFkZCBkZXZpY2UgMTNkMzozNjA2IGFzIE1UNzkyMSBkZXZpY2UK
-CkFkZCBWZW5kb3JJRCAxM2QzICYgUHJvZElEIDM2MDYgZm9yIE1lZGlhVGVrIE1UNzkyMSBVU0Ig
-Qmx1ZXRvb3RoIGNoaXAuCgpUaGUgaW5mb3JtYXRpb24gaW4gL3N5cy9rZXJuZWwvZGVidWcvdXNi
-L2RldmljZXMgYWJvdXQgdGhlIEJsdWV0b290aApkZXZpY2UgaXMgbGlzdGVkIGFzIHRoZSBiZWxv
-dy4KClQ6ICBCdXM9MDMgTGV2PTAxIFBybnQ9MDEgUG9ydD0wOSBDbnQ9MDMgRGV2Iz0gIDQgU3Bk
-PTQ4MCAgTXhDaD0gMApEOiAgVmVyPSAyLjEwIENscz1lZihtaXNjICkgU3ViPTAyIFByb3Q9MDEg
-TXhQUz02NCAjQ2Zncz0gIDEKUDogIFZlbmRvcj0xM2QzIFByb2RJRD0zNjA2IFJldj0gMS4wMApT
-OiAgTWFudWZhY3R1cmVyPU1lZGlhVGVrIEluYy4KUzogIFByb2R1Y3Q9V2lyZWxlc3NfRGV2aWNl
-ClM6ICBTZXJpYWxOdW1iZXI9MDAwMDAwMDAwCkM6KiAjSWZzPSAzIENmZyM9IDEgQXRyPWUwIE14
-UHdyPTEwMG1BCkE6ICBGaXJzdElmIz0gMCBJZkNvdW50PSAzIENscz1lMCh3bGNvbikgU3ViPTAx
-IFByb3Q9MDEKSToqIElmIz0gMCBBbHQ9IDAgI0VQcz0gMyBDbHM9ZTAod2xjb24pIFN1Yj0wMSBQ
-cm90PTAxIERyaXZlcj1idHVzYgpFOiAgQWQ9ODEoSSkgQXRyPTAzKEludC4pIE14UFM9ICAxNiBJ
-dmw9MTI1dXMKRTogIEFkPTgyKEkpIEF0cj0wMihCdWxrKSBNeFBTPSA1MTIgSXZsPTBtcwpFOiAg
-QWQ9MDIoTykgQXRyPTAyKEJ1bGspIE14UFM9IDUxMiBJdmw9MG1zCkk6KiBJZiM9IDEgQWx0PSAw
-ICNFUHM9IDIgQ2xzPWUwKHdsY29uKSBTdWI9MDEgUHJvdD0wMSBEcml2ZXI9YnR1c2IKRTogIEFk
-PTgzKEkpIEF0cj0wMShJc29jKSBNeFBTPSAgIDAgSXZsPTFtcwpFOiAgQWQ9MDMoTykgQXRyPTAx
-KElzb2MpIE14UFM9ICAgMCBJdmw9MW1zCkk6ICBJZiM9IDEgQWx0PSAxICNFUHM9IDIgQ2xzPWUw
-KHdsY29uKSBTdWI9MDEgUHJvdD0wMSBEcml2ZXI9YnR1c2IKRTogIEFkPTgzKEkpIEF0cj0wMShJ
-c29jKSBNeFBTPSAgIDkgSXZsPTFtcwpFOiAgQWQ9MDMoTykgQXRyPTAxKElzb2MpIE14UFM9ICAg
-OSBJdmw9MW1zCkk6ICBJZiM9IDEgQWx0PSAyICNFUHM9IDIgQ2xzPWUwKHdsY29uKSBTdWI9MDEg
-UHJvdD0wMSBEcml2ZXI9YnR1c2IKRTogIEFkPTgzKEkpIEF0cj0wMShJc29jKSBNeFBTPSAgMTcg
-SXZsPTFtcwpFOiAgQWQ9MDMoTykgQXRyPTAxKElzb2MpIE14UFM9ICAxNyBJdmw9MW1zCkk6ICBJ
-ZiM9IDEgQWx0PSAzICNFUHM9IDIgQ2xzPWUwKHdsY29uKSBTdWI9MDEgUHJvdD0wMSBEcml2ZXI9
-YnR1c2IKRTogIEFkPTgzKEkpIEF0cj0wMShJc29jKSBNeFBTPSAgMjUgSXZsPTFtcwpFOiAgQWQ9
-MDMoTykgQXRyPTAxKElzb2MpIE14UFM9ICAyNSBJdmw9MW1zCkk6ICBJZiM9IDEgQWx0PSA0ICNF
-UHM9IDIgQ2xzPWUwKHdsY29uKSBTdWI9MDEgUHJvdD0wMSBEcml2ZXI9YnR1c2IKRTogIEFkPTgz
-KEkpIEF0cj0wMShJc29jKSBNeFBTPSAgMzMgSXZsPTFtcwpFOiAgQWQ9MDMoTykgQXRyPTAxKElz
-b2MpIE14UFM9ICAzMyBJdmw9MW1zCkk6ICBJZiM9IDEgQWx0PSA1ICNFUHM9IDIgQ2xzPWUwKHds
-Y29uKSBTdWI9MDEgUHJvdD0wMSBEcml2ZXI9YnR1c2IKRTogIEFkPTgzKEkpIEF0cj0wMShJc29j
-KSBNeFBTPSAgNDkgSXZsPTFtcwpFOiAgQWQ9MDMoTykgQXRyPTAxKElzb2MpIE14UFM9ICA0OSBJ
-dmw9MW1zCkk6ICBJZiM9IDEgQWx0PSA2ICNFUHM9IDIgQ2xzPWUwKHdsY29uKSBTdWI9MDEgUHJv
-dD0wMSBEcml2ZXI9YnR1c2IKRTogIEFkPTgzKEkpIEF0cj0wMShJc29jKSBNeFBTPSAgNjMgSXZs
-PTFtcwpFOiAgQWQ9MDMoTykgQXRyPTAxKElzb2MpIE14UFM9ICA2MyBJdmw9MW1zCkk6KiBJZiM9
-IDIgQWx0PSAwICNFUHM9IDIgQ2xzPWUwKHdsY29uKSBTdWI9MDEgUHJvdD0wMSBEcml2ZXI9KG5v
-bmUpCkU6ICBBZD04YShJKSBBdHI9MDMoSW50LikgTXhQUz0gIDY0IEl2bD0xMjV1cwpFOiAgQWQ9
-MGEoTykgQXRyPTAzKEludC4pIE14UFM9ICA2NCBJdmw9MTI1dXMKSTogIElmIz0gMiBBbHQ9IDEg
-I0VQcz0gMiBDbHM9ZTAod2xjb24pIFN1Yj0wMSBQcm90PTAxIERyaXZlcj0obm9uZSkKRTogIEFk
-PThhKEkpIEF0cj0wMyhJbnQuKSBNeFBTPSA1MTIgSXZsPTEyNXVzCkU6ICBBZD0wYShPKSBBdHI9
-MDMoSW50LikgTXhQUz0gNTEyIEl2bD0xMjV1cwoKU2lnbmVkLW9mZi1ieTogU29sb1NhcmF2YW5h
-biA8U29sb1NhcmF2YW5hbkBwcm90b24ubWU+Ci0tLQogZHJpdmVycy9ibHVldG9vdGgvYnR1c2Iu
-YyB8IDMgKysrCiAxIGZpbGUgY2hhbmdlZCwgMyBpbnNlcnRpb25zKCspCgpkaWZmIC0tZ2l0IGEv
-ZHJpdmVycy9ibHVldG9vdGgvYnR1c2IuYyBiL2RyaXZlcnMvYmx1ZXRvb3RoL2J0dXNiLmMKaW5k
-ZXggZTM5NDZmN2I3MzZlLi5hYWRhYjA0Yzc0NTYgMTAwNjQ0Ci0tLSBhL2RyaXZlcnMvYmx1ZXRv
-b3RoL2J0dXNiLmMKKysrIGIvZHJpdmVycy9ibHVldG9vdGgvYnR1c2IuYwpAQCAtNjE4LDYgKzYx
-OCw5IEBAIHN0YXRpYyBjb25zdCBzdHJ1Y3QgdXNiX2RldmljZV9pZCBxdWlya3NfdGFibGVbXSA9
-IHsKIAl7IFVTQl9ERVZJQ0UoMHgwZThkLCAweDA2MDgpLCAuZHJpdmVyX2luZm8gPSBCVFVTQl9N
-RURJQVRFSyB8CiAJCQkJCQkgICAgIEJUVVNCX1dJREVCQU5EX1NQRUVDSCB8CiAJCQkJCQkgICAg
-IEJUVVNCX1ZBTElEX0xFX1NUQVRFUyB9LAorCXsgVVNCX0RFVklDRSgweDEzZDMsIDB4MzYwNiks
-IC5kcml2ZXJfaW5mbyA9IEJUVVNCX01FRElBVEVLIHwKKwkJCQkJCSAgICAgQlRVU0JfV0lERUJB
-TkRfU1BFRUNIIHwKKwkJCQkJCSAgICAgQlRVU0JfVkFMSURfTEVfU1RBVEVTIH0sCiAKIAkvKiBN
-ZWRpYVRlayBNVDc5MjJBIEJsdWV0b290aCBkZXZpY2VzICovCiAJeyBVU0JfREVWSUNFKDB4MDQ4
-OSwgMHhlMGQ4KSwgLmRyaXZlcl9pbmZvID0gQlRVU0JfTUVESUFURUsgfAotLSAKMi40NS4wCgo=
+Thank you for submitting the patches to the linux bluetooth mailing list.
+While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
 
---b1_zPeR0nwFNwl1S8RkK9z2SL2ksqsqGeq7xB99Of9deY--
+----- Output -----
 
+
+Please resolve the issue and submit the patches again.
+
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============8670074523521803822==--
