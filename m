@@ -1,161 +1,127 @@
-Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
+Received: from mail-40130.protonmail.ch (mail-40130.protonmail.ch [185.70.40.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D8BC5B5D3
-	for <linux-bluetooth@vger.kernel.org>; Tue, 14 May 2024 10:05:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56BCA64CCC;
+	Tue, 14 May 2024 10:08:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.70.40.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715681156; cv=none; b=OtEtHm5OnjPDfqprndfR/i4mLe4xRi9SfK7vfFu+YxXQaWx/A7Udz8p2c9pQBugWXFaUVaWDxlFjovZ6KdDUFtb0N1st4NMfsOBlNnopXMNjG8+KmLFe1K/nB2DFeMlz9Wj6r3x/kweLuoFvt2u5T4rKdZMm6dnsi3AScg1GvTc=
+	t=1715681302; cv=none; b=ARBOJRmpSfxF2GhMxgibbKwz2OXfU7NuR9VQQoTRUCI19yD/90KXH/cdBvYrH2YghtYUFPbmCutrA8IsAObcF6tV+UjyP1z17dJFzDs2Kuncl+npCEATf4nLJn1Zg3nPZ/OodEj0PEFNJFRX9roYYUJzPGOOo0D9tGNLS+S00ig=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715681156; c=relaxed/simple;
-	bh=Leyc9rNXfismxXbcqgI0v1FeMq2aARRWIRJUl84tUQ8=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=bYLhujLxCL18g2fMbc6x/11woCoiOExqMe1IG7QHR4E6YtamneIP5NzDvfQV8FJzkweEagk3Z7IrFtLIvzy/xLcq1uK3XCQhJ3tNW6DMzu4O5KQt+QWKkJNeWSz0NkvMDKKgHy8PDCJ6I93pcYr/ioJRF0rRSPo5uwrQZ1OgguU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.183.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hadess.net
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 0C4126000E;
-	Tue, 14 May 2024 10:05:45 +0000 (UTC)
-Message-ID: <c7847f16f683a367b86d01cb572533236ec84bad.camel@hadess.net>
-Subject: Re: [BlueZ v2 00/20] Fix a number of static analysis issues
-From: Bastien Nocera <hadess@hadess.net>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
-	patchwork-bot+bluetooth@kernel.org
-Cc: linux-bluetooth@vger.kernel.org
-Date: Tue, 14 May 2024 12:05:45 +0200
-In-Reply-To: <CABBYNZJevU71O4wp_=UG+ch5HY42Gp9=7Fqf5OERp0GvZ9Cppg@mail.gmail.com>
-References: <20240510121355.3241456-1-hadess@hadess.net>
-	 <171535563283.2819.15014215823661998089.git-patchwork-notify@kernel.org>
-	 <CABBYNZJevU71O4wp_=UG+ch5HY42Gp9=7Fqf5OERp0GvZ9Cppg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
+	s=arc-20240116; t=1715681302; c=relaxed/simple;
+	bh=QyKYD3PwPSFlPeTWf1A6/mdsJu/IVZlMnqS0/afEXBA=;
+	h=Date:To:From:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=huUI9fyTh5yHg44kXyQsULDqS/RtId4bQbvnWf9OMTPJYpmc0zxaEaCIUFwfut/T/MayGZ7ilt4XrPbDeJXpoMGYzXGcDPC38Z6TkB5k4SAO1I3lr4qTiI1TF/mKF3E90nH/zXU29mhOj3GgBD+mwxA7fd/cPUXD4ucE8ycHRIg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me; spf=pass smtp.mailfrom=proton.me; dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b=IkZtOLmk; arc=none smtp.client-ip=185.70.40.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=proton.me
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b="IkZtOLmk"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
+	s=protonmail; t=1715681292; x=1715940492;
+	bh=pDQ/GZuN6/xzmKr4VIr850YYvdaKXfcBGi96KdzKmCs=;
+	h=Date:To:From:Cc:Subject:Message-ID:Feedback-ID:From:To:Cc:Date:
+	 Subject:Reply-To:Feedback-ID:Message-ID:BIMI-Selector;
+	b=IkZtOLmkcBx1CuMDvnT4u5THBvtDjLxi5uL5N9xM3lWpy/X2S6Lau3LNPzfodDras
+	 zIJexQyRrWhfd+fWQPANY4nsrYGZ3FoL38tEwMU/KEVQjJvZNRGlk69yokNgiW8lPG
+	 /NIbM289FXLpq9ltjROYy2nYFgwKzLT6GmOPY0qSx/hCeXZqYptHDmRwECp+5EuY5B
+	 uhnrNd8UKvsoFHsrAGOx0r3Jgx2N32cg+LPG5QyGl530fsKk6Z4YpYANtu1C1xi0nj
+	 9fYlnRcB+wReQj3vmz6CXdgLm3WRBSdXPdDBu56XYEmvACli58kuiaK4P4Gz8wBMMa
+	 mI+Ae52wWREBQ==
+Date: Tue, 14 May 2024 10:08:06 +0000
+To: "marcel@holtmann.org" <marcel@holtmann.org>, "luiz.dentz@gmail.com" <luiz.dentz@gmail.com>
+From: "SoloSaravanan@proton.me" <SoloSaravanan@proton.me>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: [PATCH] Bluetooth: btusb: Add device 13d3:3606 as MT7921 device
+Message-ID: <JXwMChGqaA3oLmTz9wy26FlzjhHGqOWSO0HRbgYAeoy7jX3jcAaHmbwR6Dl-aMdkPzhdHO_kgV4MqoYahTdhn39W_GCOo-GbP1kU0C6kx2o=@proton.me>
+Feedback-ID: 84438951:user:proton
+X-Pm-Message-ID: a01415225bb1c36746ba7ebddec821c4357c5703
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-GND-Sasl: hadess@hadess.net
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, 2024-05-10 at 12:42 -0400, Luiz Augusto von Dentz wrote:
-> Hi Bastien,
->=20
-> On Fri, May 10, 2024 at 11:48=E2=80=AFAM <patchwork-bot+bluetooth@kernel.=
-org>
-> wrote:
-> >=20
-> > Hello:
-> >=20
-> > This series was applied to bluetooth/bluez.git (master)
-> > by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
-> >=20
-> > On Fri, 10 May 2024 14:10:10 +0200 you wrote:
-> > > Changes since v1:
-> > > - added 6 patches
-> > > - Fix syntax error in "client/gatt: Check write_value() retval"
-> > >=20
-> > > Bastien Nocera (20):
-> > > =C2=A0 adapter: Use false instead of 0 for bool
-> > > =C2=A0 attrib/gatt: Guard against possible integer overflow
-> > > =C2=A0 client/gatt: Don't pass negative fd on error
-> > > =C2=A0 client/gatt: Check write_value() retval
-> > > =C2=A0 client/main: Fix array access
-> > > =C2=A0 client/main: Fix mismatched free
-> > > =C2=A0 monitor/att: Fix memory leak
-> > > =C2=A0 bap: Fix memory leaks
-> > > =C2=A0 media: Fix memory leak
-> > > =C2=A0 main: Fix memory leaks
-> > > =C2=A0 isotest: Consider "0" fd to be valid
-> > > =C2=A0 isotest: Fix error check after opening file
-> > > =C2=A0 client/player: Fix copy/paste error
-> > > =C2=A0 shared/vcp: Fix copy/paste error
-> > > =C2=A0 isotest: Fix fd leak
-> > > =C2=A0 iso-tester: Fix fd leak
-> > > =C2=A0 sdp: Fix use of uninitialised memory
-> > > =C2=A0 monitor: Work-around memory leak warning
-> > > =C2=A0 avrcp: Fix uninitialised memory usage
-> > > =C2=A0 main: Simplify variable assignment
-> > >=20
-> > > [...]
-> >=20
-> > Here is the summary with links:
-> > =C2=A0 - [BlueZ,v2,01/20] adapter: Use false instead of 0 for bool
-> > =C2=A0=C2=A0=C2=A0
-> > https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=3Dd3fcc77f99da
-> > =C2=A0 - [BlueZ,v2,02/20] attrib/gatt: Guard against possible integer
-> > overflow
-> > =C2=A0=C2=A0=C2=A0
-> > https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=3D1e22fd9adbb3
-> > =C2=A0 - [BlueZ,v2,03/20] client/gatt: Don't pass negative fd on error
-> > =C2=A0=C2=A0=C2=A0
-> > https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=3D1ba9e5f21ca2
-> > =C2=A0 - [BlueZ,v2,04/20] client/gatt: Check write_value() retval
-> > =C2=A0=C2=A0=C2=A0 (no matching commit)
-> > =C2=A0 - [BlueZ,v2,05/20] client/main: Fix array access
-> > =C2=A0=C2=A0=C2=A0
-> > https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=3Df3f762b77b58
-> > =C2=A0 - [BlueZ,v2,06/20] client/main: Fix mismatched free
-> > =C2=A0=C2=A0=C2=A0
-> > https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=3Dab325450b0c2
-> > =C2=A0 - [BlueZ,v2,07/20] monitor/att: Fix memory leak
-> > =C2=A0=C2=A0=C2=A0
-> > https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=3D0b842fe9b1fe
-> > =C2=A0 - [BlueZ,v2,08/20] bap: Fix memory leaks
-> > =C2=A0=C2=A0=C2=A0 (no matching commit)
-> > =C2=A0 - [BlueZ,v2,09/20] media: Fix memory leak
-> > =C2=A0=C2=A0=C2=A0
-> > https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=3D3652e98d2bb6
-> > =C2=A0 - [BlueZ,v2,10/20] main: Fix memory leaks
-> > =C2=A0=C2=A0=C2=A0
-> > https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=3D45d151ec8a0f
-> > =C2=A0 - [BlueZ,v2,11/20] isotest: Consider "0" fd to be valid
-> > =C2=A0=C2=A0=C2=A0
-> > https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=3Dd30dc38b0425
-> > =C2=A0 - [BlueZ,v2,12/20] isotest: Fix error check after opening file
-> > =C2=A0=C2=A0=C2=A0
-> > https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=3D9a36f191aa78
-> > =C2=A0 - [BlueZ,v2,13/20] client/player: Fix copy/paste error
-> > =C2=A0=C2=A0=C2=A0
-> > https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=3D6f041df23ecf
-> > =C2=A0 - [BlueZ,v2,14/20] shared/vcp: Fix copy/paste error
-> > =C2=A0=C2=A0=C2=A0
-> > https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=3D856353b254da
-> > =C2=A0 - [BlueZ,v2,15/20] isotest: Fix fd leak
-> > =C2=A0=C2=A0=C2=A0
-> > https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=3D3e03788ba80c
-> > =C2=A0 - [BlueZ,v2,16/20] iso-tester: Fix fd leak
-> > =C2=A0=C2=A0=C2=A0
-> > https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=3Dc81f9320357b
-> > =C2=A0 - [BlueZ,v2,17/20] sdp: Fix use of uninitialised memory
-> > =C2=A0=C2=A0=C2=A0
-> > https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=3Ddc60ce0b460a
-> > =C2=A0 - [BlueZ,v2,18/20] monitor: Work-around memory leak warning
-> > =C2=A0=C2=A0=C2=A0
-> > https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=3De5925dbb84fa
-> > =C2=A0 - [BlueZ,v2,19/20] avrcp: Fix uninitialised memory usage
-> > =C2=A0=C2=A0=C2=A0
-> > https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=3Daf2634ce0a62
-> > =C2=A0 - [BlueZ,v2,20/20] main: Simplify variable assignment
-> > =C2=A0=C2=A0=C2=A0
-> > https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=3D87edbabf3956
-> >=20
-> > You are awesome, thank you!
-> > --
-> > Deet-doot-dot, I am a bot.
-> > https://korg.docs.kernel.org/patchwork/pwbot.html
->=20
-> Had to revert the last one since it was causing bluetoothd to crash
-> at star.
+From 6c5cec6d7a84c140958786bcb082d94f1b147ece Mon Sep 17 00:00:00 2001
+From: SoloSaravanan <SoloSaravanan@proton.me>
+Date: Tue, 14 May 2024 15:01:29 +0530
+Subject: [PATCH] Bluetooth: btusb: Add device 13d3:3606 as MT7921 device
 
-Thanks very much!
+Add VendorID 13d3 & ProdID 3606 for MediaTek MT7921 USB Bluetooth chip.
 
-I should have at least mildly tested the resulting builds, my fault, I
-also misunderstood what this portion of code did. I've made another
-attempt at fixing this issue, and will be submitting more bug fixes in
-the near future.
+The information in /sys/kernel/debug/usb/devices about the Bluetooth device=
+ is listed as the below.
 
-Cheers
+T: Bus=3D03 Lev=3D01 Prnt=3D01 Port=3D09 Cnt=3D03 Dev#=3D 4 Spd=3D480 MxCh=
+=3D 0 D: Ver=3D 2.10 Cls=3Def(misc ) Sub=3D02 Prot=3D01 MxPS=3D64 #Cfgs=3D =
+1 P: Vendor=3D13d3 ProdID=3D3606 Rev=3D 1.00
+S: Manufacturer=3DMediaTek Inc.
+S: Product=3DWireless_Device
+S: SerialNumber=3D000000000
+C:* #Ifs=3D 3 Cfg#=3D 1 Atr=3De0 MxPwr=3D100mA
+A: FirstIf#=3D 0 IfCount=3D 3 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 I:* If#=3D=
+ 0 Alt=3D 0 #EPs=3D 3 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 Driver=3Dbtusb E: =
+Ad=3D81(I) Atr=3D03(Int.) MxPS=3D 16 Ivl=3D125us
+E: Ad=3D82(I) Atr=3D02(Bulk) MxPS=3D 512 Ivl=3D0ms
+E: Ad=3D02(O) Atr=3D02(Bulk) MxPS=3D 512 Ivl=3D0ms
+I:* If#=3D 1 Alt=3D 0 #EPs=3D 2 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 Driver=
+=3Dbtusb
+E: Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D 0 Ivl=3D1ms
+E: Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D 0 Ivl=3D1ms
+I: If#=3D 1 Alt=3D 1 #EPs=3D 2 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 Driver=3D=
+btusb
+E: Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D 9 Ivl=3D1ms
+E: Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D 9 Ivl=3D1ms
+I: If#=3D 1 Alt=3D 2 #EPs=3D 2 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 Driver=3D=
+btusb
+E: Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D 17 Ivl=3D1ms
+E: Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D 17 Ivl=3D1ms
+I: If#=3D 1 Alt=3D 3 #EPs=3D 2 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 Driver=3D=
+btusb
+E: Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D 25 Ivl=3D1ms
+E: Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D 25 Ivl=3D1ms
+I: If#=3D 1 Alt=3D 4 #EPs=3D 2 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 Driver=3D=
+btusb
+E: Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D 33 Ivl=3D1ms
+E: Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D 33 Ivl=3D1ms
+I: If#=3D 1 Alt=3D 5 #EPs=3D 2 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 Driver=3D=
+btusb
+E: Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D 49 Ivl=3D1ms
+E: Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D 49 Ivl=3D1ms
+I: If#=3D 1 Alt=3D 6 #EPs=3D 2 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 Driver=3D=
+btusb
+E: Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D 63 Ivl=3D1ms
+E: Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D 63 Ivl=3D1ms
+I:* If#=3D 2 Alt=3D 0 #EPs=3D 2 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 Driver=
+=3D(none)
+E: Ad=3D8a(I) Atr=3D03(Int.) MxPS=3D 64 Ivl=3D125us
+E: Ad=3D0a(O) Atr=3D03(Int.) MxPS=3D 64 Ivl=3D125us
+I: If#=3D 2 Alt=3D 1 #EPs=3D 2 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 Driver=3D=
+(none)
+E: Ad=3D8a(I) Atr=3D03(Int.) MxPS=3D 512 Ivl=3D125us
+E: Ad=3D0a(O) Atr=3D03(Int.) MxPS=3D 512 Ivl=3D125us
 
->=20
+Signed-off-by: SoloSaravanan <SoloSaravanan@proton.me>
+---
+ drivers/bluetooth/btusb.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index effa54629..65e4b7fc6 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -615,6 +615,9 @@ static const struct usb_device_id quirks_table[] =3D {
+ =09{ USB_DEVICE(0x0e8d, 0x0608), .driver_info =3D BTUSB_MEDIATEK |
+ =09=09=09=09=09=09     BTUSB_WIDEBAND_SPEECH |
+ =09=09=09=09=09=09     BTUSB_VALID_LE_STATES },
++=09{ USB_DEVICE(0x13d3, 0x3606), .driver_info =3D BTUSB_MEDIATEK |
++=09=09=09=09=09=09     BTUSB_WIDEBAND_SPEECH |
++=09=09=09=09=09=09     BTUSB_VALID_LE_STATES },
+=20
+ =09/* MediaTek MT7922A Bluetooth devices */
+ =09{ USB_DEVICE(0x0489, 0xe0d8), .driver_info =3D BTUSB_MEDIATEK |
+--=20
+2.45.0
+
 
