@@ -1,35 +1,43 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from inva020.nxp.com (inva020.nxp.com [92.121.34.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE6E1AD48
-	for <linux-bluetooth@vger.kernel.org>; Tue, 14 May 2024 02:40:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAF96FC1F;
+	Tue, 14 May 2024 09:04:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=92.121.34.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715654429; cv=none; b=TpgRVYRS8/rkyd2rGu3bh8uZAxbmZT2olWqnuzpwK8ytH3apdPnXkK8F1Oa4ebNs6e0iguLhDTdjDJg6thMTQyGCaGCxoCoD5r15jtFELTwatexg2WD1xDpvgtcqwCsC6k/Gl1ad7XcvM2E1brcpdJoHCy/SgCkFMOo9xsd9bP4=
+	t=1715677465; cv=none; b=B42bCzeL4Cdb7YIHqPZCdSfvvyRFwTum1zRZH2K191nI6CqvwoY1FL18Ohu2HbpQkANjGcl798t73h+ZKFVrQU2/2ymmQPYhGTTWFWtvoOfzjDreb6FJM5IvbHI6sFFEOFOgyTtTxCG1Y2vTa1tMPUcTLiX0z+kQfMyQHjcA1x4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715654429; c=relaxed/simple;
-	bh=KdaP4RbhcZMscfsSACJJuxt8J5rxm04CooBM93xOh0I=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=uJMIQu0xxiRp7dULmWiUgqdzIzzk44DH5KcQO6jzcb85QfNwLKAGOXywyRfMuaExoobfALYlJsZLyhP9tNYRWg65WRaT7h/IH/6HQqw2KBjKbZsdSDtPNSOpNDN//aXbEFiMzaEXV11uYUTO59yfa9XyuWO4F7+cev0n4aQpG2I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=l9X+9fkw; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="l9X+9fkw"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 3D41CC113CC;
-	Tue, 14 May 2024 02:40:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1715654429;
-	bh=KdaP4RbhcZMscfsSACJJuxt8J5rxm04CooBM93xOh0I=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=l9X+9fkw5N3vNlUEWe3P+y7Fgn5ehDLTQ4D2OBAK4G57dFJ0IW9uTb/h7urUYmGEn
-	 GutfGjJMyuFIjQ8kUldKQfvnCD5VUSF81o6E2s7gDUFQVGlssMJg8Cz4te+gIv5jt/
-	 Gb9ywGP414EjIX3wrM7GqOYtW5nzb3NhiSs+7Y7DGv1bCg4jjxnjzGc8ZM23Vzd4rl
-	 XgO9n/iaWSyGovbT3ub+SolR84B9p6R77Jr4twiXihigp8fczrSlXpG4mPAZ51nfwA
-	 ZQZiApglt7X4Ytw1MpZD36pNH0OdGxzEj3ccB6+gJn/37OIuWGA9xysIWTka1bGUa9
-	 rgCp6Og58zZFQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 30800C433F2;
-	Tue, 14 May 2024 02:40:29 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1715677465; c=relaxed/simple;
+	bh=DN8MJhZE/6ABuaOgDNbrslUWBDHWkr4DQN1q02HGp+I=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=byFJGfOmwmMNDGXg+VwQYQbQD3c6pOmaPR2mivs209D3dH26HlGfXH3BHOFjsavvJtYfgaZZAJ97x/41MHr7iCj5SZU/dxnPs2nY/NhQK7Ihcb5hoqG03jGUzlIgfxcKzEb9ouds0Bt7OG+BoDEjOGBTUJ9jYkQxpG4bCIinTio=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; arc=none smtp.client-ip=92.121.34.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+Received: from inva020.nxp.com (localhost [127.0.0.1])
+	by inva020.eu-rdc02.nxp.com (Postfix) with ESMTP id E3F461A1D80;
+	Tue, 14 May 2024 11:04:19 +0200 (CEST)
+Received: from aprdc01srsp001v.ap-rdc01.nxp.com (aprdc01srsp001v.ap-rdc01.nxp.com [165.114.16.16])
+	by inva020.eu-rdc02.nxp.com (Postfix) with ESMTP id 9CD211A1D42;
+	Tue, 14 May 2024 11:04:19 +0200 (CEST)
+Received: from pe-lt8779.in-pnq01.nxp.com (pe-lt8779.in-pnq01.nxp.com [10.17.104.141])
+	by aprdc01srsp001v.ap-rdc01.nxp.com (Postfix) with ESMTP id BE3EE180222C;
+	Tue, 14 May 2024 17:04:17 +0800 (+08)
+From: Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>
+To: marcel@holtmann.org,
+	luiz.dentz@gmail.com
+Cc: linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	amitkumar.karwar@nxp.com,
+	rohit.fule@nxp.com,
+	neeraj.sanjaykale@nxp.com,
+	sherry.sun@nxp.com,
+	ziniu.wang_1@nxp.com,
+	haibo.chen@nxp.com,
+	LnxRevLi@nxp.com
+Subject: [PATCH v2] Bluetooth: btnxpuart: Enable Power Save feature on startup
+Date: Tue, 14 May 2024 14:32:58 +0530
+Message-Id: <20240514090258.1507934-1-neeraj.sanjaykale@nxp.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -37,36 +45,41 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH BlueZ v1] mesh: Fix not setting rpl_dir as static
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <171565442919.23416.8732153573969683911.git-patchwork-notify@kernel.org>
-Date: Tue, 14 May 2024 02:40:29 +0000
-References: <20240513203732.435344-1-luiz.dentz@gmail.com>
-In-Reply-To: <20240513203732.435344-1-luiz.dentz@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
+X-Virus-Scanned: ClamAV using ClamSMTP
 
-Hello:
+This sets the default power save mode setting to enabled.
 
-This patch was applied to bluetooth/bluez.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+The power save feature is now stable and stress test issues, such as the
+TX timeout error, have been resolved.
+commit c7ee0bc8db32 ("Bluetooth: btnxpuart: Resolve TX timeout error in
+power save stress test")
 
-On Mon, 13 May 2024 16:37:32 -0400 you wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> 
-> rpl_dir shall be made static to be properly scoped.
-> ---
->  mesh/rpl.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+With this setting, the driver will send the vendor command to FW at
+startup, to enable power save feature.
 
-Here is the summary with links:
-  - [BlueZ,v1] mesh: Fix not setting rpl_dir as static
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=c7445d973694
+User can disable this feature using the following vendor command:
+hcitool cmd 3f 23 03 00 00 (HCI_NXP_AUTO_SLEEP_MODE)
 
-You are awesome, thank you!
+Signed-off-by: Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>
+Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
+---
+v2: Corrected subject line. Added commit reference. (Paul Menzel)
+ drivers/bluetooth/btnxpuart.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/bluetooth/btnxpuart.c b/drivers/bluetooth/btnxpuart.c
+index 7f88b6f52f26..42e929f0d141 100644
+--- a/drivers/bluetooth/btnxpuart.c
++++ b/drivers/bluetooth/btnxpuart.c
+@@ -281,7 +281,7 @@ static u8 crc8_table[CRC8_TABLE_SIZE];
+ 
+ /* Default configurations */
+ #define DEFAULT_H2C_WAKEUP_MODE	WAKEUP_METHOD_BREAK
+-#define DEFAULT_PS_MODE		PS_MODE_DISABLE
++#define DEFAULT_PS_MODE		PS_MODE_ENABLE
+ #define FW_INIT_BAUDRATE	HCI_NXP_PRI_BAUDRATE
+ 
+ static struct sk_buff *nxp_drv_send_cmd(struct hci_dev *hdev, u16 opcode,
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.34.1
 
