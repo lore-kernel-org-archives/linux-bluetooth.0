@@ -1,110 +1,75 @@
-Received: from mail-qk1-f171.google.com (mail-qk1-f171.google.com [209.85.222.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CEB4139589
-	for <linux-bluetooth@vger.kernel.org>; Tue, 14 May 2024 14:17:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A95F17EBA5;
+	Tue, 14 May 2024 14:34:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715696239; cv=none; b=k/tUYbAo4i4tKC7VMFNxN04TzKJU3t1gDeF9BX4ZVQGdLbIKW4asnU6L8nW3OJbihGD+LfFwC8rG7QIamu7WG8dkMK+DYHfTEF1Pz59Rnv3XiWWatIyUgNkoTVldfjI/lV6tf5qc1n4CBOuxFie3/SVqHx75WOA0h5Q9NI/gThY=
+	t=1715697244; cv=none; b=hrppoj6nU6Wy1Q/TXlaGquspiEVO3dbFIx2lO/d/uHuO9pIEaVTDXbK8pGVqCNnkOX35Od3RfSbwCdrD173LxKUBsjpkwyzcMVfjCfZbSwZCDVZbqjuoyJfKPSh81+p2IGkgrITiZd2ZHDO0SGw1FNi4LNQfUEei8YfnYRZphI4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715696239; c=relaxed/simple;
-	bh=H3ICYss1CKDdn2Csif/9mqG3pCeo6vNx+s/gup47KOc=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=mWyPNJPe+8czZvaZomw5pVqoHMNWtDTQ4MO4jd+/6Q36XWieqRbLHiKuWMC6nLxjiOuL5uYJdJaKF4dNp1FaIVaHIq2bN5Y7KU3Z8RuJrQDmJaYQbAVWy+55pmYLHkXG/vdV99ab9v5lhRjyjt1fAsrufpbZfiw6pOhtfPKfkao=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Nq+O+sWK; arc=none smtp.client-ip=209.85.222.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1715697244; c=relaxed/simple;
+	bh=vp+pb1AL5SqjxH5Mubn4EN8sHuiOw80ODPCTptQGbQc=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=E+2TFujbnBXsn0uaJZNs56fOXHJEG7ZIgZLl1uoio760qdGcCLNx0kqW7UMyKzoQ5g8VRw2jPalAuphaZwkJOK1C4hWpbFckW2jqFaPTJZZiGiia/kqrADZpEKhHD7YABCin9cDAR+8ZoA5kPBvmiiONJxOdEe+8qYWbCEY67pw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PM/yPOKu; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Nq+O+sWK"
-Received: by mail-qk1-f171.google.com with SMTP id af79cd13be357-792b8c9046bso485374685a.3
-        for <linux-bluetooth@vger.kernel.org>; Tue, 14 May 2024 07:17:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1715696237; x=1716301037; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=w4qBWCez/0D4/AOx34FB9RLqs0f0nWhL7JTaI5PSx+E=;
-        b=Nq+O+sWK8KPxMIkTg+OHErySuqnEFBD4FAcoAOIZ5eq+jHf/5ko6mZkyOwQhyemxyy
-         JIH4Izh/1SmzMMTsaVa4YIgDsAjNjLs2+sSNzi9pyVq8LHOPqecsB0p2Nhnt3scN5cZd
-         NFfiFC+fbpKgLYxiJr7+Y3OjJCC1lM6V08YnQfKUaA8N5CMGW6pxwBEWDt33OclyRCzV
-         Pmrw0S0A+kxhoAKvHBXY9aHAXEDeWIbATe1FrtWGXwbV4tUP8yKkLGbsJAhwk7LyE73d
-         rVh953N+NHkCr+0VVsfIDHVbK6kNBv9Sh3mzg4EONCu30aihDkYj6btFO+RsxHXIMM9G
-         RbMw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715696237; x=1716301037;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=w4qBWCez/0D4/AOx34FB9RLqs0f0nWhL7JTaI5PSx+E=;
-        b=wuiAFcTiokeJfVkKpt73wGYdDKABN/4321po4/eH6La+L8d+lzZbuPejC82qk2bQJz
-         IT1Sa/aLKQmvW2xcF482t85Mjh/ZHr1+Ck86+f2o5lWl6AvlJlY2cUGYdhaIT/mhQIX6
-         +d0IB4EFXs2UfQMRA0+5ey2pSPeyN6cnQd+vVe+sGQOtgShUSfHVkyVT/UcT9jp8Gawq
-         +xYvOOV38qR5b57aYI/eXj7gAjYiZAwIXo2IUEmpnPw+oklJLZ20hB7c9AM2K8t2GYxT
-         8GDTZKFlbkIBeqUa01hIVZGJUx8Udkkv8K0uEINOKMNcsg5npBJMOz1QFnqDfF3iQy8V
-         1U5Q==
-X-Gm-Message-State: AOJu0YyKZTU4RT3J13HC9BveLTADbP/owM6pz0yoeH1LhjeNd2PFhXN8
-	JqTHX6L7hrjfSNXqVW8Cga+QME0sBDCROo6REuywAaol8jIz6itoLP8+ug==
-X-Google-Smtp-Source: AGHT+IEPe29FzlNdJ0fObTIZQa81iECXhA2CROX97hMPT0KcuIlDFMfIxlpaouZj0xK2nR9M919J8Q==
-X-Received: by 2002:a05:620a:5631:b0:792:bc96:233b with SMTP id af79cd13be357-792c759856fmr1322198785a.21.1715696237325;
-        Tue, 14 May 2024 07:17:17 -0700 (PDT)
-Received: from [172.17.0.2] ([20.109.39.135])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-792bf1cd143sm570374185a.0.2024.05.14.07.17.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 14 May 2024 07:17:17 -0700 (PDT)
-Message-ID: <6643726d.050a0220.5f35d.1c83@mx.google.com>
-Date: Tue, 14 May 2024 07:17:17 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============2086616896142007882=="
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PM/yPOKu"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C7639C2BD10;
+	Tue, 14 May 2024 14:34:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1715697244;
+	bh=vp+pb1AL5SqjxH5Mubn4EN8sHuiOw80ODPCTptQGbQc=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=PM/yPOKuKbblOVKppmWZiL6Nv4WlTZ4f1hjserq8Aqm8XnshnwVxGgFA1KGwgfbUa
+	 t7H2XgKXrHoTC1Y3r2Brh5Pu2PwFfffbxP8IWhcPmvLKRuny/0HNCt4H7A5tDZ26KX
+	 X3vBTupYqubWvMvRG/YoioX1qBcokOF3jRiPo7IAlH4UBJN/u6yQTRhNvYNySPcVMW
+	 Rfpo7N+ruQWwmTZFQG3PXnAa2yxgaZ5hjo9hCcNy31Rq1uAV058BcxGFeH7Sp6UbiQ
+	 HoJNKE2ebd6sECIzoFwyaaDPFD8U1TSlHOtGxSb9m1eD1BT2Hq3awQgmugGdpUtPsa
+	 u+g/5pbWf8XVw==
+Date: Tue, 14 May 2024 07:34:02 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, davem@davemloft.net,
+ linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org, Pauli Virtanen
+ <pav@iki.fi>
+Subject: Re: pull request: bluetooth-next 2024-05-10
+Message-ID: <20240514073402.72d2887c@kernel.org>
+In-Reply-To: <CABBYNZ+f8L946_=6RyGvsN3bmu4EwJ2tTgxPg9YmNxckJTc_iw@mail.gmail.com>
+References: <20240510211431.1728667-1-luiz.dentz@gmail.com>
+	<20240513142641.0d721b18@kernel.org>
+	<CABBYNZKn5YBRjj+RT_TVDtjOBS6V_H7BQmFMufQj-cOTC=RXDA@mail.gmail.com>
+	<20240513154332.16e4e259@kernel.org>
+	<6642bf28469d6_203b4c294bc@willemb.c.googlers.com.notmuch>
+	<CABBYNZKJSpQcY+k8pczPgNYEoF+OE6enZFE5=Qu_HeWDkcfZEg@mail.gmail.com>
+	<CABBYNZ+f8L946_=6RyGvsN3bmu4EwJ2tTgxPg9YmNxckJTc_iw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, andrei.istodorescu@nxp.com
-Subject: RE: Create transports for matching BISes
-In-Reply-To: <20240514113914.21048-2-andrei.istodorescu@nxp.com>
-References: <20240514113914.21048-2-andrei.istodorescu@nxp.com>
-Reply-To: linux-bluetooth@vger.kernel.org
-
---===============2086616896142007882==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-This is automated email and please do not reply to this email!
+On Mon, 13 May 2024 22:12:04 -0400 Luiz Augusto von Dentz wrote:
+> > > It might be safer to only suppress the sk_error_report in
+> > > sock_queue_err_skb. Or at least in bt_sock_poll to check the type of
+> > > all outstanding errors and only suppress if all are timestamps.  
+> >
+> > Or perhaps we could actually do that via poll/epoll directly? Not that
+> > it would make it much simpler since the library tends to wrap the
+> > usage of poll/epoll but POLLERR meaning both errors or errqueue events
+> > is sort of the problem we are trying to figure out how to process them
+> > separately.  
+> 
+> @Jakub Kicinski I'm fine removing these from the pull request, or if
+> you want to do it yourself, in order not to miss the merge window,
+> then we can discuss it better and even put you and Willem on CC to
+> review the upcoming changes.
 
-Dear submitter,
+Sounds like the best way forward, thanks!
+Could you drop them and resend the PR?
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=853097
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      1.24 seconds
-GitLint                       PASS      0.65 seconds
-BuildEll                      PASS      25.19 seconds
-BluezMake                     PASS      1647.34 seconds
-MakeCheck                     PASS      13.75 seconds
-MakeDistcheck                 PASS      176.41 seconds
-CheckValgrind                 PASS      246.00 seconds
-CheckSmatch                   WARNING   354.24 seconds
-bluezmakeextell               PASS      120.67 seconds
-IncrementalBuild              PASS      3040.13 seconds
-ScanBuild                     PASS      999.94 seconds
-
-Details
-##############################
-Test: CheckSmatch - WARNING
-Desc: Run smatch tool with source
-Output:
-src/shared/bap.c:285:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structuressrc/shared/bap.c:285:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structuressrc/shared/bap.c:285:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structuressrc/shared/bap.c:285:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structuressrc/shared/bap.c:285:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structuressrc/shared/bap.c:285:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structures
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============2086616896142007882==--
+It's going to take me until noon pacific to write up the PR text
+for all of net-next, to give you a sense of when our PR will come
+out.
