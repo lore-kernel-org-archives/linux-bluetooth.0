@@ -1,60 +1,65 @@
-Received: from mail-qk1-f169.google.com (mail-qk1-f169.google.com [209.85.222.169])
+Received: from mail-qk1-f179.google.com (mail-qk1-f179.google.com [209.85.222.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E85613EFE5
-	for <linux-bluetooth@vger.kernel.org>; Wed, 15 May 2024 16:12:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C87A3156256
+	for <linux-bluetooth@vger.kernel.org>; Wed, 15 May 2024 16:12:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715789577; cv=none; b=XHCdDI48TdU2kXU+CQp8AcsCAYvCAEBPTsXovye0gsbe1VRvCCPBlqT5iQTlMtCzVHA//dvPrBrmES8GNZ9Pul5useRrhKlPIb6IERS5HqaCkZNzHTCI142FjVlZlnq2NyiVc8bRLAIZx7lNYOAnTrcMTXQUfmTBlMPiuFj9r5k=
+	t=1715789579; cv=none; b=Pg5ZGnJ7Mn2JFd7Phal3NCByteIMbhgKy2gyrOICZx5h6rwrogXcm6tk0ttjdRcWJUqeXWof17VwLOt6m+T89STpH0tzoS0hQHGG95Wu2EgeFXAyRs6BlALIV6ALdQMKsLW5YfMctcKy11BrbmWJds37JqRsueY101dzYVuNJs8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715789577; c=relaxed/simple;
-	bh=I84OuA88hN8g10G7raMl68EbjgGBQiR0QXvR+m062MU=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=a2zY+kKOYwg6gwflHjhIodp9ibaPOCjIJIBkAW4rtF+4qqp6rMMebJIyQpaAw4+IsuceNFnHtX82pcC/kL2HAfDcalJqdQBxmGkZkZtOuZsDuOnfUk8ofSM+tXvB6WQMOYE7DTvEmzbYZZTUche6pMNrYixy1DxPsfRO7A+PjdI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=feYI/oRM; arc=none smtp.client-ip=209.85.222.169
+	s=arc-20240116; t=1715789579; c=relaxed/simple;
+	bh=VIuAmRE8nO/J3UHLv/JJx1vQzvRS/zObSE/ZHnyabNU=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=lYGTnXGXlnizgs5qIUJzy5OYBanPTSySFOgO7dDR/GvbG3swnot/+5W803UZ0M5+WZ4sUMxBZshpqbxtA2Bsms/geufcmPh8Yv1xuY0bSJW5YufhA5NTsTOhARu+7J7BZNNcbtjL3rTnaLGkQ8NEqkRTvdBYBYrFyHsxGj/xs84=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DzxdF6yk; arc=none smtp.client-ip=209.85.222.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="feYI/oRM"
-Received: by mail-qk1-f169.google.com with SMTP id af79cd13be357-792b8d989e8so467640785a.0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 15 May 2024 09:12:55 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DzxdF6yk"
+Received: by mail-qk1-f179.google.com with SMTP id af79cd13be357-792bdf626beso643145385a.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 15 May 2024 09:12:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1715789574; x=1716394374; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=qHe5Ac02Z+ezAadv0j/nYeTMV0ARsiPZjb374QiVn3Y=;
-        b=feYI/oRMXd9JBGHAQVSacK/zZphePbu7oEuH6k8ipvwh/uPT84AVDWmfSAP0nxJI3L
-         xXFW2sG/k0i5zO9x8Y6ojGyjvJPvLgKXxROaQNd1HIyXMhGsSgLHd+eNoui9nHq9GOw8
-         r/a4gx9Ab2741umuVPRCHwiq86bQ2wf2fT+DGJiLNQeaJI0vWWU/3bnLs843CbU20FAf
-         bd/aB28+RxHzygTqA4JeFhMcl+hJWzTeTvsJEZ/8k/uwKGc8/QkRW9tqVvUcE6jZj1jg
-         mcf98KW5x8UQKv51YDuf9lU8c0IfydHQluEo0x/ugQq8DH3UrhstJXFnY7KI84CPC5yi
-         1Xjg==
+        d=gmail.com; s=20230601; t=1715789576; x=1716394376; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=r+wfVKVUYiLyErPZON/jikVxcIVeYEcr6S7rKaXnSjI=;
+        b=DzxdF6ykTQhTSBffhaMfKPf+Qfueam5vAwN0OISvbGefyd9JQIccPmHaau8VRTQyRv
+         vDoEsMcfIb9onpPBQdb6NSCpPisEWvIIp86JvSo0zenn3Qk7qvZNC0ao8uwiYl+GdYFf
+         pmIEHPZe2BFvNT7eVgWPRjej0S38A6F3cO1TL/ngo1aVHmdYyu51XFvWYzoA8Ksx7n/z
+         B2/C5ceGmVtzMKzl3tJ2iPOvTzcRnznCBCOtnFxxQux7zR1RqJpVR7qOHowY7WSlef3z
+         wQMfUEDqsOJ813RGVQtkZxmfAyWT88CuCBc4huDkl5fnCuaX9tJEBilROKHh2YWVh3T9
+         rU0w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715789574; x=1716394374;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=qHe5Ac02Z+ezAadv0j/nYeTMV0ARsiPZjb374QiVn3Y=;
-        b=hxDFWrV6AA+09gd5+zQ8TGpHiAxn8G9mDbSSH1rhK72CtLNufT4ssfaSoXT768lvbq
-         HqUPSkwnaMflsLaVhUvWh1+Z1Af3siJo/hHfU+JNdqbybnj2hWoBU5shzXTYMzrhDZnV
-         YREDTlmjJYM07QYqwIbESuqNykPOGg7yUj8krKpLvvAR4fuH0e9s3aO1q3/UyLjxDzQo
-         wVkMtJdgX3WlLnET7OEdEMdR+1sz6AdqeTdoqfl/n08GnHazWmb3VIvH6E1DY0tvsBo6
-         lqxUofb14pOl0DsZB0tmxdBekYWccKSfvsEpBPKuL/eqrv5NVigUMPAq/9iDGqVit//X
-         0Wsw==
-X-Gm-Message-State: AOJu0YyBek6ptlz4bt7nadkIPItB30F73L9nESckRChpDSLg/ZW4L8vV
-	3d9ADlFwOizfBGo+V2AfFisN7E2fb8t80bzdbbPHqXxQnGMEE3ApWJAatQ==
-X-Google-Smtp-Source: AGHT+IGmJd4akbQpF0cEPDfSHHrmBU0AoGCUi1nWpRNlblRMnSTok3KSCK8spXRq26li29yt66MZbQ==
-X-Received: by 2002:a05:620a:1a8c:b0:792:f467:6d40 with SMTP id af79cd13be357-792f4676daemr664730885a.17.1715789573847;
-        Wed, 15 May 2024 09:12:53 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1715789576; x=1716394376;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=r+wfVKVUYiLyErPZON/jikVxcIVeYEcr6S7rKaXnSjI=;
+        b=xNq/MJKu7RQpikUD2ZoEFOGE9mhoh+iH4fwjCiQg9WUZQko+oDMFvt96dpDruA2jqc
+         Fx+qtuXdaVyE+S4Q3POlKz+i+Buz0pSneCQvLVdDxGnsWObW0M3RJsyc0IwvEXP0YV/F
+         5fzmYPun+iScXxDQ+VrRb3BYJuN703PnA/wVhHjYq88E9ncRrtim26Y4gUjJ9CAz4Wz7
+         xd+CB0quNPsJMEQwrWFYqAYl/ninf03lLCOkt4m/IeY9ke+48ZNbY2yfBzENt++zmN/9
+         XIeJrQySgEM+U4/0OWVZu9W+V4d0pT+UrEAYNC2XQMduBzq5Dc99yI4Lb9JPxMyph3T3
+         pPOQ==
+X-Gm-Message-State: AOJu0Yw/wyuwgt/wuoTZiS4oI4VwyOsr9Z5UzEiyVMICEPqUdsTfpQZM
+	Qo0Oeg7GkjiPfDn3z0aoNqOXxq4EeQCaZ+zl4Jh82HkjdNlCBFYOFFCOwQ==
+X-Google-Smtp-Source: AGHT+IG8n6Wa5R5rIpsAPwvOFir8A4fy0OMIddP8drdYpU8gX/SP/nQsY1CdLY1Hb4gaaaHLtVfP/A==
+X-Received: by 2002:a05:620a:414b:b0:792:f3b0:c64a with SMTP id af79cd13be357-792f3b0cc1fmr596463585a.31.1715789575938;
+        Wed, 15 May 2024 09:12:55 -0700 (PDT)
 Received: from lvondent-mobl4.. (syn-107-146-107-067.res.spectrum.com. [107.146.107.67])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-4df7bf7beb9sm1819877e0c.20.2024.05.15.09.12.52
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-4df7bf7beb9sm1819877e0c.20.2024.05.15.09.12.54
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 15 May 2024 09:12:52 -0700 (PDT)
+        Wed, 15 May 2024 09:12:54 -0700 (PDT)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v1 1/2] shared/ad: Add bt_ad_length
-Date: Wed, 15 May 2024 12:12:49 -0400
-Message-ID: <20240515161250.1714375-1-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v1 2/2] advertising: Detect when EA needs to be used
+Date: Wed, 15 May 2024 12:12:50 -0400
+Message-ID: <20240515161250.1714375-2-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.45.0
+In-Reply-To: <20240515161250.1714375-1-luiz.dentz@gmail.com>
+References: <20240515161250.1714375-1-luiz.dentz@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -65,56 +70,31 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This adds bt_ad_length which can be used to return the current size of
-the bt_ad data.
+This attempts to detect when an advertising instance needs to set the
+secondary PHY in order to force EA PDUs to be used because its data is
+too big for legacy PDUs.
 ---
- src/shared/ad.c | 11 ++++++++---
- src/shared/ad.h |  2 ++
- 2 files changed, 10 insertions(+), 3 deletions(-)
+ src/advertising.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-diff --git a/src/shared/ad.c b/src/shared/ad.c
-index f3fb428e25c6..d08ce7af9b85 100644
---- a/src/shared/ad.c
-+++ b/src/shared/ad.c
-@@ -520,9 +520,14 @@ static size_t data_length(struct queue *queue)
- 	return length;
+diff --git a/src/advertising.c b/src/advertising.c
+index b9d923d5d2c0..5d373e0884b1 100644
+--- a/src/advertising.c
++++ b/src/advertising.c
+@@ -884,6 +884,13 @@ static int get_adv_flags(struct btd_adv_client *client)
+ 
+ 	flags |= client->flags;
+ 
++	/* Detect if the length is bigger that legacy and secondary is not set
++	 * then force it to be set to ensure the kernel uses EA.
++	 */
++	if (bt_ad_length(client->data) > BT_AD_MAX_DATA_LEN &&
++			!(flags & MGMT_ADV_FLAG_SEC_MASK))
++		flags |= MGMT_ADV_FLAG_SEC_1M;
++
+ 	return flags;
  }
  
--static size_t calculate_length(struct bt_ad *ad)
-+size_t bt_ad_length(struct bt_ad *ad)
- {
--	size_t length = 0;
-+	size_t length;
-+
-+	if (!ad)
-+		return 0;
-+
-+	length = 0;
- 
- 	length += uuid_list_length(ad->service_uuids);
- 
-@@ -698,7 +703,7 @@ uint8_t *bt_ad_generate(struct bt_ad *ad, size_t *length)
- 	if (!ad)
- 		return NULL;
- 
--	*length = calculate_length(ad);
-+	*length = bt_ad_length(ad);
- 
- 	if (*length > ad->max_len)
- 		return NULL;
-diff --git a/src/shared/ad.h b/src/shared/ad.h
-index 11900706f9ed..90cc82de9d63 100644
---- a/src/shared/ad.h
-+++ b/src/shared/ad.h
-@@ -108,6 +108,8 @@ struct bt_ad *bt_ad_ref(struct bt_ad *ad);
- 
- void bt_ad_unref(struct bt_ad *ad);
- 
-+size_t bt_ad_length(struct bt_ad *ad);
-+
- uint8_t *bt_ad_generate(struct bt_ad *ad, size_t *length);
- 
- bool bt_ad_is_empty(struct bt_ad *ad);
 -- 
 2.45.0
 
