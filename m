@@ -1,33 +1,33 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88BD13032A
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88C1539FE4
 	for <linux-bluetooth@vger.kernel.org>; Wed, 15 May 2024 17:40:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715794831; cv=none; b=XSR9ZUYknQE/wiQgCnZwQYaF8gIZRJ+LASFk8KacGactlIuLS9AqK1lyVl6Y3mm8CAMzEo0QfLgj299LwO55486Wq+yCgY/2B21d0SoB5n2kVxBLiowvzimLC6srKAcXSY2CnkG0aUMFKW/FXuduKsHghP6EECuwWRGqpWgDmqc=
+	t=1715794831; cv=none; b=ft6UTvZ3J+LFYfcgA328TmhfZf3IBbbkAzrpi8VJBu7c73GtoJxi1ITP0qSe7uM6a7tQ1C4Lh6r1Kn+q/9iNp6Ked9DFGQ65bjWrL5ZwkpZmCRa+lpfbdArHWmC6XW8Yj11IYZY1jNSOFk+yKMf6jLxEgFYKjEMRb7QsVzOW77Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1715794831; c=relaxed/simple;
-	bh=N/Om0lf+jiBpsdulqgwupy/AybYAo/FKzbJjKZxBi48=;
+	bh=ji3GukNQQz0dB95Uiq4mWoMo2QPzkQnvI2lWvl8o/70=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=CDrB1ZuUbhFy860F6d/xtOeRj6H9foiqCBR3RT7cTqHFvT+nM4rL3+J0wGBG65xxBNjVH+28T474Md33yzeyoopeIIywrjtbrItVruelvX74T1+rn3SXBkyRlH7NNzruXKW47rhrzhHsfIrWXkPekETVq5c8CEESyWzcs4AK+wM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AvYIgC8R; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=nKlxn7np+5TKrxw8cjMoRqY5Uy0hBSIKCUURKipOH1AcPveu5OiyGuFkYxqCTGXZ7c9hlRrkmG30PSUPhkEikP2SmSqxGhPb2o0/vXX7n1LK7i6NRQoe+rYxhAjAapma6ohyckLyOXh1+WUmG0K7Vp/bCgXdNTs8wnrVWPNE1i8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AMpQW8Q9; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AvYIgC8R"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 2918EC4AF08;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AMpQW8Q9"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 1FB27C32781;
 	Wed, 15 May 2024 17:40:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1715794831;
-	bh=N/Om0lf+jiBpsdulqgwupy/AybYAo/FKzbJjKZxBi48=;
+	bh=ji3GukNQQz0dB95Uiq4mWoMo2QPzkQnvI2lWvl8o/70=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=AvYIgC8R1E3K5posFA4J3fuRARz/nI/hegwuJKOpi5645Vg7BF+gQTcma8KIr5Lja
-	 OtYnT0TgqVohBxoeGtW4pVyBflpBlWp90sbq0J+j7DydC5MaMIBWmbh/U1/bbNGHpP
-	 Cqe1HZMOHUc5n7o+omnvDa3fNag+00S2H6SVv5AMG6wj4kp/nT/YC5ji5nrTSOvDSU
-	 wqCLYkq2fMU/XpuK0Z+ydpm6xq75K631VD1ekkTP3VQc3IvdkbDgyPJKQAuZA+sdgq
-	 0sLlEj9oJmV+hq4h7qGRCbx5ryZO9wbLM1789HcVZOtX9q8SOxfCB1qqg6PczEXf69
-	 kkgt5BMxsQvZA==
+	b=AMpQW8Q9Ffj9SSBg9vi7aim8LFam5kgg7FLZVmgKrosPUM/ny5K26lS6K/tkLHXMA
+	 le9XuyhQyRoPwx37OytiSta+GP2/zQmKuv8/YrMb7dwSi2vGleWHuos41wDvSoSDp7
+	 wsMKpcEQ5zvABdGE473zeb/zk45eFtSjxAZeZSrMNic7wkpyf4hNuw66rK2zEHWOMW
+	 vL2cFaicvBjOjtu6OWUbEGA4m2wcej6u1TzwYo7bra11IhGEudiX1XMnB7uau5BRuV
+	 u3RVJblYHCv942edfRZMq5VJVcGHgZXWPKE2nxjHeBwVFVArvGC8MZT/C8ovlArgTz
+	 pnlyqFj/d7Ydw==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 0FC2BC43332;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 08963C43336;
 	Wed, 15 May 2024 17:40:31 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -37,15 +37,14 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH BlueZ 1/3] shared/tester: add ability to skip tests unless
- explicitly selected
+Subject: Re: [PATCH BlueZ v1 1/2] shared/ad: Add bt_ad_length
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <171579483106.13625.1147783090330624729.git-patchwork-notify@kernel.org>
+ <171579483103.13625.11595016065783571034.git-patchwork-notify@kernel.org>
 Date: Wed, 15 May 2024 17:40:31 +0000
-References: <d832a406db3b7f8509fdc67d0e9f2775c6ea7b6d.1715719254.git.pav@iki.fi>
-In-Reply-To: <d832a406db3b7f8509fdc67d0e9f2775c6ea7b6d.1715719254.git.pav@iki.fi>
-To: Pauli Virtanen <pav@iki.fi>
+References: <20240515161250.1714375-1-luiz.dentz@gmail.com>
+In-Reply-To: <20240515161250.1714375-1-luiz.dentz@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
 
 Hello:
@@ -53,25 +52,21 @@ Hello:
 This series was applied to bluetooth/bluez.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Tue, 14 May 2024 23:41:48 +0300 you wrote:
-> Make it possible to skip running a test, and skip running if the test
-> was not explicitly selected on command line.
+On Wed, 15 May 2024 12:12:49 -0400 you wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> 
+> This adds bt_ad_length which can be used to return the current size of
+> the bt_ad data.
 > ---
-> 
-> Notes:
->     This series disables the TX timestamping related tests by default for
->     now. The TX timestamping itself should be OK, and the assumption is we'd
->     re-enable these tests again once the kernel feature is reworked.
-> 
-> [...]
+>  src/shared/ad.c | 11 ++++++++---
+>  src/shared/ad.h |  2 ++
+>  2 files changed, 10 insertions(+), 3 deletions(-)
 
 Here is the summary with links:
-  - [BlueZ,1/3] shared/tester: add ability to skip tests unless explicitly selected
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=a9f80a8195b7
-  - [BlueZ,2/3] tools: disable running TX timestamping tests for now
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=975d3b148694
-  - [BlueZ,3/3] Revert "mgmt-tester: update for Poll Errqueue experimental fature"
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=d9de306a28fe
+  - [BlueZ,v1,1/2] shared/ad: Add bt_ad_length
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=263d6f7da564
+  - [BlueZ,v1,2/2] advertising: Detect when EA needs to be used
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=ea242fbf8602
 
 You are awesome, thank you!
 -- 
