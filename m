@@ -1,180 +1,93 @@
-Received: from mail-vs1-f43.google.com (mail-vs1-f43.google.com [209.85.217.43])
+Received: from mail-ot1-f45.google.com (mail-ot1-f45.google.com [209.85.210.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5977443AA4
-	for <linux-bluetooth@vger.kernel.org>; Wed, 15 May 2024 07:33:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA08715531A
+	for <linux-bluetooth@vger.kernel.org>; Wed, 15 May 2024 14:34:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715758394; cv=none; b=R/MSTCSNqMakVprYSGb2xMih/V6S0Pt5FGQOTiWK81zKGHO45Uugj5BzjL8h/VqLQb2+L3uzc3i2jd6afhzDElxl6qUmv8yTiNB8wU5o0cg5doy7vkAkIaU67rKMpqTVJQrYdm2/CJPxK3UpLt1Srn9YkNVevmurvSnlSoGn23w=
+	t=1715783694; cv=none; b=j2q8TzpgrKy7v2A/Yr5j2Fb1/biEJyshep/kg6ghvQUCGfGvJvl4diFam8nk8J3cPNeyHE0ISW7DoXi53vpjkR4wNMEpopKzB7ncELX9P4n7ioe739WYti08Rlh0Jjcer4FPfD4PsxEfLob8vtNzAAhR1g2zQxNoVS8fMJDXd0k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715758394; c=relaxed/simple;
-	bh=TLh03MCSiqN+5UcXuSYZ52ymbXmnq0IFRrLRK252MdQ=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=DddaMF3MrHoezVYE62B0J+K5TS3ylFTc3lc78MBYouRLI7P7NLVg8QfpWs/RjsL3ExyOowvFDcCG/Tun3CUY1Lfz/Zkk4UY5Txeq3E2PSn0oJrcuyA1Ume4yJtZoWe2hdjDUGD9QFYt9hbWdHKoduvUW5M86OIM7r3ipeSxP2Gk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kKOQcnQj; arc=none smtp.client-ip=209.85.217.43
+	s=arc-20240116; t=1715783694; c=relaxed/simple;
+	bh=JLm9lzS/vn/cAwcVT3HcVW6APe8L55KK4dq0SZKyJI0=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=FyKTUZLkAcRxI1YAbZ/1b5s7GNH0zO4MIhXgXYA5JRUp/BQxlToy1XYn6KRYWIWAMX4qn59bjt1ylx61JoQAwCFrFf3+ApVkYFQe+aibJOr5QT6ksaDP/V0K5reA8dUD4uNmyOj3D3rAMgVfzm+V3qbNypDNDx1A04px2aTBQM0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=c03ZvqbV; arc=none smtp.client-ip=209.85.210.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kKOQcnQj"
-Received: by mail-vs1-f43.google.com with SMTP id ada2fe7eead31-47efcb120feso1951141137.2
-        for <linux-bluetooth@vger.kernel.org>; Wed, 15 May 2024 00:33:13 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="c03ZvqbV"
+Received: by mail-ot1-f45.google.com with SMTP id 46e09a7af769-6f0e2612303so3821161a34.2
+        for <linux-bluetooth@vger.kernel.org>; Wed, 15 May 2024 07:34:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1715758392; x=1716363192; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=OxYsEFRZ4jHBYKzbLILZDk82wmluZ7w/ABrgfc2B8Fg=;
-        b=kKOQcnQjLSwjGsGtUP00KRRadRyN2RbvqEhkn8d4D/jj0kNKRfjAt5bq58aXo+R6pe
-         1dTbSZeG6/1DFZ6JG5+kLePUA8X8hPOgVhxZ5JRJui3JOR+ZpRp3wd0odzAgncp7H+Cf
-         a3aRW2G6H4aKHi4ceXVibtPdcUr6851Q066nyMbiC5uZGrVRmrW2utYMvWC0/K6IdBoi
-         SeV/X7Axd7rx3vVjP3wLSSjKskpk9jR63wW+EwOs6LBtO6NtgOP0VT646UQ3qBTodTzQ
-         oLUTA006LUN40Ahs3tSvWaIYAevzw5PWXueSZ87YPpjVjmTq4fOkXkHVIVwSW9Zo17AR
-         lFSg==
+        d=gmail.com; s=20230601; t=1715783690; x=1716388490; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=CrftWPDEcb6mAAm+6I66nuTCv/3OtlWKYgkDves+hT8=;
+        b=c03ZvqbVHHOkYW8Ry5+iHytdIHwCcfY87TzRUicXi5RYgLC0ZlzpB2AEYxFHeEqPhB
+         vhmg4hnQJf5++wU9HaNPFxGJ+GX2yIUQI5SqYsJxMC4OxKEWzGhchQJ06ZE8QxYwE7J0
+         NPaFLKVy8pEnGYSAdeBumRBFPOnYismgZSBm4rl4zbyWlk7f1CeWzaInLTBqhYhUvRBK
+         PwVrz35nX6nnY8drYy7Q8BSlOaahMWCLCakzwl2EXi6BzGsUH+M7U53Hv0ASVCAOvp2G
+         Y25nr2DabtbQY2bcwDRtEoEhk9lCbYNNAGXFHVcqVWoRQ1CjBE24fbA3k1qqXQiOKrTU
+         6+Yg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715758392; x=1716363192;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=OxYsEFRZ4jHBYKzbLILZDk82wmluZ7w/ABrgfc2B8Fg=;
-        b=drCmlA25B5VGNhWnp7oNC1vRS+Uomy3bn92L9OaE2z8YmrgZuVi4FQaSAxxoHrsgH2
-         YoXY7d/XV164mh3AicySl/UV2UHpn8fnIeL+SwvU9lHR6NKwAy7Tav97zFzdfphDKKQH
-         oJF1MmsElGVpddlehFJBmJR9WoU35sc/JSnDNOzSi1YWMAgRA1sp2jNUF1iRgg8g4cxS
-         alngvfvRuGVnpL5rNtwKa7hJJwO0CEoK/RIqSd1QLB7d83TcPVEbSZZM2F/3aktDHCdR
-         rFWQnby6eIAyRfqDgae+iJJAVZenYQO34NFZro6Vw39PtXaD5oKJX/P1PB8oUVPSB1d8
-         HojA==
-X-Gm-Message-State: AOJu0YxIf3FBowbBOC/b5PkjiB1mRtKUtiNFzf28cxRmbySbJ7OJv1KG
-	rySx3Lk7ml77v86hRe/aA14g2UDjaEVBieo6YKbryVB9qa2/9jQzA3/nvQ==
-X-Google-Smtp-Source: AGHT+IGgU6kVCLOvw44m/TNTsjett0f8+hoyiqimdoQroyf7h4Ch6PmaCN+NjV63KH6mJguJ+c41xA==
-X-Received: by 2002:a05:6102:3f01:b0:47e:fbbe:605f with SMTP id ada2fe7eead31-48077ea29camr17447544137.32.1715758391889;
-        Wed, 15 May 2024 00:33:11 -0700 (PDT)
-Received: from [172.17.0.2] ([20.97.191.99])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6a15f1d6cbdsm61014696d6.104.2024.05.15.00.33.11
+        d=1e100.net; s=20230601; t=1715783690; x=1716388490;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=CrftWPDEcb6mAAm+6I66nuTCv/3OtlWKYgkDves+hT8=;
+        b=SfLv3/kefCXsGDfjMqhy/rykJLlkd3+8pmOmZ5nNTq0Pmmm2o1uDC8CB4T9iR6zSyc
+         4tWV7y3sFgAh6rQHVuWXWjHcRlVaAFHL8spEFHERvccUbytg9/e1oW8Ileipv51+hW+h
+         XCg2zvEmqDDpjIpcoclasT/jffHaxthK41DUVWlqrG5CM//EaqdtHhyZ3LhQY33b8G1m
+         wsCFOPBR9S3wTPpB33NCi4DSWbmRfLMvEjcaNLx3fc8Hy/yhK8p638l0pZ7VQ/VfQ4Tx
+         bWdQPp/c/1OCbLGQmNcTn99/Hb1XYCLM9XJ2/iwqgsq9nTyZ1maW3oD6X+zIvDn/v8+h
+         n8iA==
+X-Gm-Message-State: AOJu0Yw8JfctF/fz5K/ArCqcfNWXQgA4OVddlnT2/PsItUKub5SucFYa
+	LqZWzpdS1VraCb8DCF+/vwZlV02KI0r/xAQtsjo7VWq5OCLoC8+Z3ZmyqQ==
+X-Google-Smtp-Source: AGHT+IFMn292f/d1J5rE/1y9AXf4D3qemv2cZf715UUfdNgnjR1nDye3QND2P8de8hTFyh3igNiu7g==
+X-Received: by 2002:a05:6830:22d2:b0:6f1:23f0:7ec2 with SMTP id 46e09a7af769-6f123f080b5mr1899620a34.18.1715783690345;
+        Wed, 15 May 2024 07:34:50 -0700 (PDT)
+Received: from lvondent-mobl4.. (syn-107-146-107-067.res.spectrum.com. [107.146.107.67])
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-4df994eef05sm1255328e0c.18.2024.05.15.07.34.49
+        for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 15 May 2024 00:33:11 -0700 (PDT)
-Message-ID: <66446537.050a0220.cf3bb.3d32@mx.google.com>
-Date: Wed, 15 May 2024 00:33:11 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============1722459042990511681=="
+        Wed, 15 May 2024 07:34:49 -0700 (PDT)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH v1] Bluetooth: hci_sync: Fix not using correct handle
+Date: Wed, 15 May 2024 10:34:47 -0400
+Message-ID: <20240515143447.1371779-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.45.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, neeraj.sanjaykale@nxp.com
-Subject: RE: Enable status prints for firmware download
-In-Reply-To: <20240515070657.85132-2-neeraj.sanjaykale@nxp.com>
-References: <20240515070657.85132-2-neeraj.sanjaykale@nxp.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 
---===============1722459042990511681==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This is automated email and please do not reply to this email!
+When setting up an advertisement the code shall always attempt to use
+the handle set by the instance since it may not be equal to the instance
+ID.
 
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=853314
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      2.18 seconds
-GitLint                       FAIL      1.14 seconds
-SubjectPrefix                 PASS      0.35 seconds
-BuildKernel                   PASS      30.80 seconds
-CheckAllWarning               PASS      33.53 seconds
-CheckSparse                   PASS      39.12 seconds
-CheckSmatch                   FAIL      35.57 seconds
-BuildKernel32                 PASS      28.60 seconds
-TestRunnerSetup               PASS      519.51 seconds
-TestRunner_l2cap-tester       FAIL      23.08 seconds
-TestRunner_iso-tester         FAIL      38.16 seconds
-TestRunner_bnep-tester        PASS      4.67 seconds
-TestRunner_mgmt-tester        FAIL      113.69 seconds
-TestRunner_rfcomm-tester      PASS      7.30 seconds
-TestRunner_sco-tester         FAIL      17.39 seconds
-TestRunner_ioctl-tester       PASS      7.68 seconds
-TestRunner_mesh-tester        PASS      5.79 seconds
-TestRunner_smp-tester         PASS      6.74 seconds
-TestRunner_userchan-tester    PASS      4.87 seconds
-IncrementalBuild              PASS      35.92 seconds
-
-Details
-##############################
-Test: GitLint - FAIL
-Desc: Run gitlint
-Output:
-[v1,1/3] Bluetooth: btnxpuart: Fix Null pointer dereference in btnxpuart_flush()
-
-WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
-8: B1 Line exceeds max length (99>80): "[   54.634586] Unable to handle kernel NULL pointer dereference at virtual address 0000000000000080"
-22: B1 Line exceeds max length (391>80): "[   54.710152] Modules linked in: btnxpuart(-) overlay fsl_jr_uio caam_jr caamkeyblob_desc caamhash_desc caamalg_desc crypto_engine authenc libdes crct10dif_ce polyval_ce polyval_generic snd_soc_imx_spdif snd_soc_imx_card snd_soc_ak5558 snd_soc_ak4458 caam secvio error snd_soc_fsl_micfil snd_soc_fsl_spdif snd_soc_fsl_sai snd_soc_fsl_utils imx_pcm_dma gpio_ir_recv rc_core sch_fq_codel fuse"
-23: B1 Line exceeds max length (88>80): "[   54.744357] CPU: 3 PID: 72 Comm: kworker/u9:0 Not tainted 6.6.3-otbr-g128004619037 #2"
-##############################
-Test: CheckSmatch - FAIL
-Desc: Run smatch tool with source
-Output:
-
-Segmentation fault (core dumped)
-make[4]: *** [scripts/Makefile.build:244: net/bluetooth/hci_core.o] Error 139
-make[4]: *** Deleting file 'net/bluetooth/hci_core.o'
-make[3]: *** [scripts/Makefile.build:485: net/bluetooth] Error 2
-make[2]: *** [scripts/Makefile.build:485: net] Error 2
-make[2]: *** Waiting for unfinished jobs....
-Segmentation fault (core dumped)
-make[4]: *** [scripts/Makefile.build:244: drivers/bluetooth/bcm203x.o] Error 139
-make[4]: *** Deleting file 'drivers/bluetooth/bcm203x.o'
-make[4]: *** Waiting for unfinished jobs....
-make[3]: *** [scripts/Makefile.build:485: drivers/bluetooth] Error 2
-make[2]: *** [scripts/Makefile.build:485: drivers] Error 2
-make[1]: *** [/github/workspace/src/src/Makefile:1919: .] Error 2
-make: *** [Makefile:240: __sub-make] Error 2
-##############################
-Test: TestRunner_l2cap-tester - FAIL
-Desc: Run l2cap-tester with test-runner
-Output:
-Total: 55, Passed: 53 (96.4%), Failed: 2, Not Run: 0
-
-Failed Test Cases
-L2CAP BR/EDR Client - TX Timestamping                Timed out    2.411 seconds
-L2CAP LE Client - TX Timestamping                    Timed out    2.236 seconds
-##############################
-Test: TestRunner_iso-tester - FAIL
-Desc: Run iso-tester with test-runner
-Output:
-Total: 122, Passed: 118 (96.7%), Failed: 4, Not Run: 0
-
-Failed Test Cases
-ISO Send - TX Timestamping                           Timed out    1.838 seconds
-ISO Send - TX Sched Timestamping                     Timed out    1.993 seconds
-ISO Send - TX CMSG Timestamping                      Timed out    1.994 seconds
-ISO Send - TX No Poll Timestamping                   Failed       0.162 seconds
-##############################
-Test: TestRunner_mgmt-tester - FAIL
-Desc: Run mgmt-tester with test-runner
-Output:
-Total: 492, Passed: 488 (99.2%), Failed: 2, Not Run: 2
-
-Failed Test Cases
-Read Exp Feature - Success (Index None)              Failed       0.075 seconds
-LL Privacy - Start Discovery 2 (Disable RL)          Failed       0.170 seconds
-##############################
-Test: TestRunner_sco-tester - FAIL
-Desc: Run sco-tester with test-runner
-Output:
-Total: 15, Passed: 14 (93.3%), Failed: 1, Not Run: 0
-
-Failed Test Cases
-SCO CVSD Send - TX Timestamping                      Timed out    2.273 seconds
-
-
+Fixes: e77f43d531af ("Bluetooth: hci_core: Fix not handling hdev->le_num_of_adv_sets=1")
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 ---
-Regards,
-Linux Bluetooth
+ net/bluetooth/hci_sync.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
+diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+index 353de476a5cd..d24b08a111c0 100644
+--- a/net/bluetooth/hci_sync.c
++++ b/net/bluetooth/hci_sync.c
+@@ -1194,7 +1194,7 @@ int hci_setup_ext_adv_instance_sync(struct hci_dev *hdev, u8 instance)
+ 
+ 	cp.own_addr_type = own_addr_type;
+ 	cp.channel_map = hdev->le_adv_channel_map;
+-	cp.handle = instance;
++	cp.handle = adv ? adv->handle : instance;
+ 
+ 	if (flags & MGMT_ADV_FLAG_SEC_2M) {
+ 		cp.primary_phy = HCI_ADV_PHY_1M;
+-- 
+2.45.0
 
---===============1722459042990511681==--
