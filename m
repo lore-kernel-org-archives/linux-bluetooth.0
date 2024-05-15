@@ -1,90 +1,104 @@
-Received: from mail-lf1-f41.google.com (mail-lf1-f41.google.com [209.85.167.41])
+Received: from mail-oo1-f46.google.com (mail-oo1-f46.google.com [209.85.161.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1080C15B107
-	for <linux-bluetooth@vger.kernel.org>; Wed, 15 May 2024 20:16:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1453158DD8
+	for <linux-bluetooth@vger.kernel.org>; Wed, 15 May 2024 21:02:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715804184; cv=none; b=PSodXUKPSTyhopbIefv9nInhw0gdv4N8ZD9az/QxfkDXajSgYkOgvPTt8nCv8lTGryDi5XbgS0B+mYefIG7hmeQA98UTaeA7J+thlP01cG2LotH0hCVn8teMSCWYe85sIfG1ILnwhreHZPPtXli4Ylq8ByFAhZ0rArQdeqHBVbk=
+	t=1715806953; cv=none; b=lBZS3etq8whIik9xnonHP+NhTs/W1L3FjUWdye16nCqyBjWlozUmrI55vBOkM6jmb/LM4GnOblG1uZJYmchJoMPMCATalN4KwewR4XV7vMddqDhJuKJxKv2HHxwVWgeJToz4fCxH9glV00vXvFoO/PTMGwYKtUnyWEn5VwPIC+Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715804184; c=relaxed/simple;
-	bh=ZguKYdN/iMozp/GB5Cfsl1QrHZ1Hztu1zg1nE3FZ4/Y=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=TxwIA8+nd9H60JXr8xwP5rvST5rD6mvfOX0a4sLei5wpD6d8rjj7vMvG+UyoH88dOzdDmP4aLOTWWfOK2AtQ05rfAkHhhmrOzh6NCYWUPAfCtS9mf+bZ+tO9N/68qjUXy3yg1Uad8J5+tGxM0MYkl0hdBpKD9yLpTdmVRkQuiWU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=asymptotic.io; spf=pass smtp.mailfrom=asymptotic.io; dkim=pass (2048-bit key) header.d=asymptotic.io header.i=@asymptotic.io header.b=uc1kGYvy; arc=none smtp.client-ip=209.85.167.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=asymptotic.io
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=asymptotic.io
+	s=arc-20240116; t=1715806953; c=relaxed/simple;
+	bh=IBnHGsSnS5LNqVsPJ1AZ88hyqhEqH5Z+BZty5W38CVg=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=fBmVy3RGHY00YT4gK/EBBiEozXeVTqNPjnsuZAB0lXpwwSS447pdWqrOmW2VbhblmclUMt2eTqJv3TLKM2Vg0Dsj/vhXxdWBda8cmgg/jlIRyZ70TguyeEQzyz6TXEaq+0xoTe8TWPGaSgq87i7/Sz30RpXShVoZPzlvq4dRdZU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ip4xuJWx; arc=none smtp.client-ip=209.85.161.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=asymptotic.io header.i=@asymptotic.io header.b="uc1kGYvy"
-Received: by mail-lf1-f41.google.com with SMTP id 2adb3069b0e04-52389c1308dso2114570e87.3
-        for <linux-bluetooth@vger.kernel.org>; Wed, 15 May 2024 13:16:22 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ip4xuJWx"
+Received: by mail-oo1-f46.google.com with SMTP id 006d021491bc7-5b2768410d3so3420841eaf.2
+        for <linux-bluetooth@vger.kernel.org>; Wed, 15 May 2024 14:02:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=asymptotic.io; s=google; t=1715804181; x=1716408981; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=AjCipZTmzBvwWD52PMAXup3LXscw2Ozf5wMm+FDuE+g=;
-        b=uc1kGYvyU5EuC1XWzUbSM6KMTAZ2p+IpqhMDBLgkjUT0/8dDb2UQt03tK3ybCqgEbM
-         ZJMLgtk3A8n+1aqFvf6ik0x/HJqrVWKJTqH0ZxMkcgJYawJV7IDgTIFa75kahLvcaTF8
-         121CpoNUbPkgbrOmRp/yJSHcBtYxbNhBrxVmO79mkWcqsHBg2U//h29D+suzFk0VoJRZ
-         bRXHDpWgjKX312zVgBDckK7ctYcVp0Y5BiDWzvNXfbn1mojd3jHq8lt3MljR3BlrrJAF
-         dU4CVSfUADX56v7Hlck8o7vtEISJhjw+P46FjuKWXLoliLrUfd5pS1A10y8wYUpelpMu
-         W0AA==
+        d=gmail.com; s=20230601; t=1715806951; x=1716411751; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=Tb1OJLTb5QdBjdnd0dSzfZOZfMlqeD1JwlI1lo3b4yo=;
+        b=Ip4xuJWxx5w3vnZQqYhmHjCzIGPMjyoNT4/i7uxD9Zt0012FkjGeBnSAZK0ikK/2o3
+         xTtrY5StImzfpkFb+y3P3/T8ALECg/g3EDGFEng9CNhzZC+Q8Yr/LhN8Q69xdEa3QrDg
+         8gASB3T/LvnPGSACTlJyCnRELwKkkTT6KJWbsRDBeDGfmKLjUY0I1bDSSToMbuY1gdQq
+         BMhbFeaNpUSHcdxYOcmpXqR6IElvDYcq443TU6Je3sNVVG3uiB5sb/BJn4YvsBFBglDi
+         xQy/pSOn5fwyjZPSrhSxHRG3U3/jFqbMcQdN7j4nAK7hHZXFkonwkNs02lteOcPF1xy8
+         6qxA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715804181; x=1716408981;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=AjCipZTmzBvwWD52PMAXup3LXscw2Ozf5wMm+FDuE+g=;
-        b=suAJD6HUeQxs6doiqdhD4LPKUVm2oVebBXf0fNL9pYU8VCJqKtt0h7km7q/BaMYj+q
-         yM11b0F3rXlpGPoazVohkBbPQwZxjG+ZkEhEgQsggcj7h5nMQrGZD6oSNFcJoZi3JtOr
-         6+DRszl6GcQ4zf50NFmtkB5r2AiYp2E4+rsJd5EFyS8towGXjtmk2I5ss8RK34/0sYVa
-         k4K8xqsq31Z8dc4f/vlkiuYeNXm7THG4tlz26PNfxj7wp5lVvpJveppyFRAeVGsx+JMg
-         vkngc0pMEtWlioK7hi46+2pEtrhcG9HTAyaOP9nKWOSehzBFEKTPymutLgbmDY0Myv/j
-         k7hA==
-X-Gm-Message-State: AOJu0YzXuMjAVNvMkuz4Xk7pkxye/QLMTCGmTbQHP+4W2Gj8efMJGZKG
-	HNcNYMOjjihz6Cbl1cP2byveCayYcMQRHnCjAjp9xpIMSYKV2XDpV66DQgAdxAdqW+NtBk5+z2z
-	0
-X-Google-Smtp-Source: AGHT+IG4JhY7IEwa7XDGE5Pa8vyxDy9RUcWxUFtp50QRGdaoUFUIlk/N+R7roqkvjmbFjB7TWZEeAA==
-X-Received: by 2002:ac2:5598:0:b0:522:297f:cb06 with SMTP id 2adb3069b0e04-522298f0e12mr7853883e87.32.1715804181195;
-        Wed, 15 May 2024 13:16:21 -0700 (PDT)
-Received: from andromeda.lan ([74.15.47.99])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5743065dd09sm7457142a12.64.2024.05.15.13.16.19
+        d=1e100.net; s=20230601; t=1715806951; x=1716411751;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Tb1OJLTb5QdBjdnd0dSzfZOZfMlqeD1JwlI1lo3b4yo=;
+        b=BLxY5Fso1/udmyKvLsHJQJopsQr6nFwWMDv04MRDJgITwOsxzsla2z1Qa/UmQuH5Ua
+         +ntoozJshq1VDA1RBOCW/lvIn9z6ZmcwbdAHIp1IHEZW4jofgCxi2L9JUFcfyy5S8u/B
+         9iihkiqf16gs0ZwyWNb+AT8kjYXNsaG9Ig7FAR8vRqxJ87LZW3qyKlRs2pbeinKUzMF7
+         KiPnI1yYpuUoaMUXqs+Qf4QyjExqP30EjnOHkxeI8lw1E7tyTL9SuqZfyZCNtbZUC5TK
+         nkbJ0flYXDHbFLbooKxr7C6KIuxwBcMTDk/EXQeI5sFPqdov5SG9HodYgm0vo2BAGTtG
+         GZ9g==
+X-Gm-Message-State: AOJu0Yy+s2wtTmxtbqMqJLDWEr76060Pm++9Pbx8K7flEaqX4QXpmAgb
+	8T4eNLwaw2p2gWHU7T1CA8WxX5mArPTIrgbawY/COZnz9QylYKqnLvMU3Q==
+X-Google-Smtp-Source: AGHT+IHV0sfqwRK3dDcdTtDDajpXgQCkWNTMveZqVILA9xiTRlSO+Aaunyt9utdlP/zK3lyZcEtceQ==
+X-Received: by 2002:a05:6359:4587:b0:183:9ea4:74a9 with SMTP id e5c5f4694b2df-193bb638a50mr1407440255d.15.1715806950601;
+        Wed, 15 May 2024 14:02:30 -0700 (PDT)
+Received: from [172.17.0.2] ([20.109.39.147])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6a166309ba5sm62297296d6.122.2024.05.15.14.02.30
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 15 May 2024 13:16:20 -0700 (PDT)
-From: Arun Raghavan <arun@asymptotic.io>
-To: linux-bluetooth@vger.kernel.org
-Cc: Arun Raghavan <arun@asymptotic.io>
-Subject: [PATCH BlueZ,v3 5/5] gitignore: Add __pycache__
-Date: Wed, 15 May 2024 16:15:52 -0400
-Message-ID: <20240515201552.1831618-6-arun@asymptotic.io>
-X-Mailer: git-send-email 2.45.0
-In-Reply-To: <20240515201552.1831618-1-arun@asymptotic.io>
-References: <20240515201552.1831618-1-arun@asymptotic.io>
+        Wed, 15 May 2024 14:02:30 -0700 (PDT)
+Message-ID: <664522e6.0c0a0220.78588.68e7@mx.google.com>
+Date: Wed, 15 May 2024 14:02:30 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============1653334201423404049=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [RFC,BlueZ,v1] doc: Add initial L2CAP(7) documentation
+In-Reply-To: <20240515192655.1784475-1-luiz.dentz@gmail.com>
+References: <20240515192655.1784475-1-luiz.dentz@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-These directories are created when running scripts in test/ in-tree, and
-can safely be ignored.
+--===============1653334201423404049==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=853502
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.44 seconds
+GitLint                       PASS      0.32 seconds
+BuildEll                      PASS      24.34 seconds
+BluezMake                     PASS      1684.58 seconds
+MakeCheck                     PASS      13.09 seconds
+MakeDistcheck                 PASS      177.33 seconds
+CheckValgrind                 PASS      246.23 seconds
+CheckSmatch                   PASS      357.46 seconds
+bluezmakeextell               PASS      122.35 seconds
+IncrementalBuild              PASS      1467.60 seconds
+ScanBuild                     PASS      1008.10 seconds
+
+
+
 ---
- .gitignore | 2 ++
- 1 file changed, 2 insertions(+)
+Regards,
+Linux Bluetooth
 
-diff --git a/.gitignore b/.gitignore
-index 6a6422379..041a707af 100644
---- a/.gitignore
-+++ b/.gitignore
-@@ -187,3 +187,5 @@ compile_commands.json
- cscope.in.out
- cscope.out
- cscope.po.out
-+
-+**/__pycache__
--- 
-2.45.0
 
+--===============1653334201423404049==--
