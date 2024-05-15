@@ -1,115 +1,135 @@
-Received: from mail-oi1-f170.google.com (mail-oi1-f170.google.com [209.85.167.170])
+Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDF9B15CD46;
-	Wed, 15 May 2024 23:15:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A100341A88
+	for <linux-bluetooth@vger.kernel.org>; Wed, 15 May 2024 23:48:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715814943; cv=none; b=F6RAzSkOlXxfx0jGxBmKmZBYNSq86kg9pKqoU2uwdXiPzDmAhyzOAW5irVuGB/BdqWRVC1u5cbjalvw+b0A2TFCpQZ14Gf1KJhYf7uhwloAdvc3xDLao3G0e/P3kH8e4sdrQgOkGOIvKMChfF5FbRS95Qq0o39152dwW3UU435M=
+	t=1715816891; cv=none; b=X2kplvMU2Iw/LiW9kx24gZkw2f2idDqAs2T9+hrmcR9xkfgEN+RvuRTMgzaV04xGtBFj0tmpHdaHk6Bjs9L/W2viHMFu2uSLpb0YyGlUkTVS3ZZswFYXH1vjVif3TeCSYGfVzZGt7S/E0ygmsA1Ez/5PJZIkCyHOB26gUe5rfCo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715814943; c=relaxed/simple;
-	bh=Jp3BgbsRv61fdluoqzPcfIEveCnVhqg8xF3iPZw2188=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=iG0aKf3dT4HNVIhMuwyR6KWMOP+7Le0BsF/gXWsDDWaBGcvv5xNEELH9suM5n9Pqy4aR3IsnrB5iyNZVwh1dNswTs6y2dGRQ4RZedICgAHE821T8zx+0USoxA94zCjv02lNOUVVMUQI3phcPE5fjzRdwfoVPUcJLmqBli14x0fs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.167.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	s=arc-20240116; t=1715816891; c=relaxed/simple;
+	bh=zUKp08+bBx8grL4bDUGiEk0DWYXvfov0ryS9RtdUILE=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=VzT4FcQ/+YbGWwqphJ/e58IBbwbAQj2hW7I65rnf9e5aL5fsDHPaPtNkkKagbHy4/8be+S8HLnSfhLNI9RPYduTE79bxyLgahGs+bEt7nMUWPM5NIQlKYOhsZsJ2cavYgvjc25/VSJQAAPl2xhYEYO3od8d7iGFXbyXZaIp+6AU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ydm71sWw; arc=none smtp.client-ip=209.85.214.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oi1-f170.google.com with SMTP id 5614622812f47-3c998b36c6bso1208073b6e.3;
-        Wed, 15 May 2024 16:15:41 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ydm71sWw"
+Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-1ec4dc64c6cso54148865ad.0
+        for <linux-bluetooth@vger.kernel.org>; Wed, 15 May 2024 16:48:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1715816888; x=1716421688; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=qQagz+QEdfxudDfPoW3Zj96aGje2ntIP78I1mX8Rc6o=;
+        b=Ydm71sWwfINBtE6vJoDDb68lRa6h6vbGU9JEjJ9Cmv4ViELIxJAh+Yaj24tihPbqoi
+         19A2VReyVpvm2WpIEkqUi913OwryEw4Tnn2qBTIlW/KaQXdOsSoIWXFp+mpEys4lIGan
+         oi3MZNRDE+2ebqlUkE2S5ViWsCKQu/V6GduzdRPlr7BaQt650pRwIv7OA/X2SI8DL1sS
+         eseahN3G2WsZ28QPNW0McOZFYGXyhfMQLFuILaqOMXxW6D1Mu6/Do7v8RdE9cJayfjM2
+         bcFHolUOGW6yeBis6Stil0793citnSW+12Vz4iDelCrG9+fiSIa8dPKIWsJ95aG8XOFM
+         AKbQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715814941; x=1716419741;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Ze1QygMwN68meqo9PDmwz469IrrkJxaffJS5Hm7aDfQ=;
-        b=p/1DFGmnDUJn2dxuWA/VA4gbpJX0Q3UajADBE2wcWF/CGcB33g6FcgJQSkpjYI8bOl
-         vgC9tcKQ3LT+ZclLD2LV40KiVBCjk5vo1Kq0QGysfLSQVBLprKrkOafmCYR43gmViQlE
-         12miX+dJMqZoLGg8XCYxIMiC16QsKCwd7GhJhdZD20FmZfBXAD64c1/x93N4aTevjxaO
-         7dXvoI00kKBgAQrl6jbf06ijwQ/hHqnq9hctXXjEjyZRTgLTMABfCF2/X4XNf8d/KfL/
-         TVHRj6E/kw8BhQIhyPhv1DWu9/jG8Tl+mBC7xwba6CyVaRBmSmk/o6cmqKRsuxAs5WtD
-         T4sA==
-X-Forwarded-Encrypted: i=1; AJvYcCVchA+hcKpXZmISWS5ht3g2t5Tsaqzz9zHSnshF2YvjwI9M2PEABlKtW5tZOjgntlZpQiapAWdHKTYs77IUZQaGT626npPIYMkthRU6
-X-Gm-Message-State: AOJu0YwF6F24yrdG/WyJuo0xz4J5pZ+FwTcqplJ5ADoADrKXmw9thB+d
-	fPV+yMg1sXvV/v0WtMzz37Cvdm0iQrYMT+ES6t3JLvv/RTKGU+T2
-X-Google-Smtp-Source: AGHT+IFeY6IBOmS16l1KarBie8GoRXUZtYtFiMESabNjNgeh9/aF2ykz5OpkEZWWolf+VV2rf5fl6g==
-X-Received: by 2002:a4a:de14:0:b0:5b2:7aa7:7b29 with SMTP id 006d021491bc7-5b28193d5e7mr17763186eaf.1.1715814940930;
-        Wed, 15 May 2024 16:15:40 -0700 (PDT)
-Received: from sean-ThinkPad-T450s.lan ([207.191.35.252])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-6f0ec2e566dsm2032159a34.15.2024.05.15.16.15.39
+        d=1e100.net; s=20230601; t=1715816888; x=1716421688;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=qQagz+QEdfxudDfPoW3Zj96aGje2ntIP78I1mX8Rc6o=;
+        b=FMj9yBbPnpqvG08aXM/r4of44ZTZtFo37BsElgGfuMFvI9QoQFyfOkiQlXYSo7Q41T
+         UHGdXKzwIeYjy4Xe5YcyLYA3QKPTgMfA/59htIsGHFNIcb+HzsG8ebr96LUWPBCdV8CM
+         lnVB64HALT99f2NgeQvChc8WkKMj0M6khZPDX9c4OIMeu5HxnoWWj/TrAUNMTVTOjPlG
+         x9si9wx3gwVuo/XwpfQNfAKhbtRYLMxZC/q+JFgEI4uj0DqwYDS60h/hyEygh+1cswQm
+         mS9hl5qEQbnMAa4CfAZU6ZZ/YOH4150q/souZ6YWiy1qRvdNZSgL6KWnS7YyfxSgMZ4t
+         CAmQ==
+X-Gm-Message-State: AOJu0YxKfjXtslOzJlhM5djZr0/fCQ/IE1cACz8SthSiH8wwFaYZtm3S
+	eCu4UzERsW8xTsb7mIhIhQ2PY2Kx9b9YqdTSQ0sdOtEy6QTSJ++it5CaBw==
+X-Google-Smtp-Source: AGHT+IFE3B3FxxPAyhsomV8gY4Lr/LVJO0eVtHalsMpfxAS0a5/LfysYfJU6eQSqEK/P3OdNZ3nk9Q==
+X-Received: by 2002:a17:902:f791:b0:1e5:5be8:15af with SMTP id d9443c01a7336-1ef43d2972fmr225294165ad.17.1715816888447;
+        Wed, 15 May 2024 16:48:08 -0700 (PDT)
+Received: from [172.17.0.2] ([20.172.17.135])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1ef2ee602d6sm115493245ad.26.2024.05.15.16.48.07
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 15 May 2024 16:15:40 -0700 (PDT)
-From: sean.wang@kernel.org
-To: marcel@holtmann.org,
-	johan.hedberg@gmail.com,
-	luiz.dentz@gmail.com
-Cc: linux-bluetooth@vger.kernel.org,
-	linux-mediatek@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	Hao Qin <hao.qin@mediatek.com>,
-	Sean Wang <sean.wang@mediatek.com>
-Subject: [PATCH v5 5/5] Bluetooth: btusb: mediatek: add MT7922 subsystem reset
-Date: Wed, 15 May 2024 16:15:21 -0700
-Message-Id: <90f8b0663933990ed1bf47dd6698d8ff69f1a948.1715813148.git.sean.wang@kernel.org>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <ce0337178bf617d52ff320a36837d75bf537df2d.1715813148.git.sean.wang@kernel.org>
-References: <ce0337178bf617d52ff320a36837d75bf537df2d.1715813148.git.sean.wang@kernel.org>
+        Wed, 15 May 2024 16:48:08 -0700 (PDT)
+Message-ID: <664549b8.170a0220.8216e.eadc@mx.google.com>
+Date: Wed, 15 May 2024 16:48:08 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============2579329769128384875=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, arun@asymptotic.io
+Subject: RE: ASHA plugin
+In-Reply-To: <20240515201552.1831618-2-arun@asymptotic.io>
+References: <20240515201552.1831618-2-arun@asymptotic.io>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-From: Hao Qin <hao.qin@mediatek.com>
+--===============2579329769128384875==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Add the support of MT7922 bluetooth subsystem reset that was called the
-auto revert to self-recover from the fatal error in the controller like
-the host encounters HCI cmd timeout or the controller crashes.
+This is automated email and please do not reply to this email!
 
-Co-developed-by: Sean Wang <sean.wang@mediatek.com>
-Signed-off-by: Sean Wang <sean.wang@mediatek.com>
-Signed-off-by: Hao Qin <hao.qin@mediatek.com>
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=853506
+
+---Test result---
+
+Test Summary:
+CheckPatch                    FAIL      2.36 seconds
+GitLint                       PASS      1.07 seconds
+BuildEll                      PASS      24.44 seconds
+BluezMake                     PASS      1666.53 seconds
+MakeCheck                     PASS      13.26 seconds
+MakeDistcheck                 PASS      178.56 seconds
+CheckValgrind                 PASS      248.43 seconds
+CheckSmatch                   PASS      354.05 seconds
+bluezmakeextell               PASS      119.54 seconds
+IncrementalBuild              PASS      7792.07 seconds
+ScanBuild                     WARNING   1012.28 seconds
+
+Details
+##############################
+Test: CheckPatch - FAIL
+Desc: Run checkpatch.pl script
+Output:
+[BlueZ,v3,3/5] test: Add a script to test ASHA
+ERROR:EXECUTE_PERMISSIONS: do not set execute permissions for source files
+#103: FILE: test/simple-asha
+
+/github/workspace/src/src/13665531.patch total: 1 errors, 0 warnings, 158 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/src/13665531.patch has style problems, please review.
+
+NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+##############################
+Test: ScanBuild - WARNING
+Desc: Run Scan Build
+Output:
+profiles/audio/media.c:1048:7: warning: Use of memory after it is freed
+                if (req->cb != pac_select_cb) {
+                    ^~~~~~~
+1 warning generated.
+
+
+
 ---
-v3: split from the v2 to make the patch do one thing in a patch.
-v4: rebase onto the latest code
-v5: no change
----
- drivers/bluetooth/btusb.c | 14 +++++++++++++-
- 1 file changed, 13 insertions(+), 1 deletion(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index ddd5ca7596e5..79aefdb3324d 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -3039,7 +3039,16 @@ static int btusb_mtk_subsys_reset(struct hci_dev *hdev, u32 dev_id)
- 	u32 val;
- 	int err;
- 
--	if (dev_id == 0x7925) {
-+	if (dev_id == 0x7922) {
-+		btusb_mtk_uhw_reg_read(data, MTK_BT_SUBSYS_RST, &val);
-+		val |= 0x00002020;
-+		btusb_mtk_uhw_reg_write(data, MTK_BT_SUBSYS_RST, val);
-+		btusb_mtk_uhw_reg_write(data, MTK_EP_RST_OPT, 0x00010001);
-+		btusb_mtk_uhw_reg_read(data, MTK_BT_SUBSYS_RST, &val);
-+		val |= BIT(0);
-+		btusb_mtk_uhw_reg_write(data, MTK_BT_SUBSYS_RST, val);
-+		msleep(100);
-+	} else if (dev_id == 0x7925) {
- 		btusb_mtk_uhw_reg_read(data, MTK_BT_RESET_REG_CONNV3, &val);
- 		val |= (1 << 5);
- 		btusb_mtk_uhw_reg_write(data, MTK_BT_RESET_REG_CONNV3, val);
-@@ -3079,6 +3088,9 @@ static int btusb_mtk_subsys_reset(struct hci_dev *hdev, u32 dev_id)
- 	if (err < 0)
- 		bt_dev_err(hdev, "Reset timeout");
- 
-+	if (dev_id == 0x7922)
-+		btusb_mtk_uhw_reg_write(data, MTK_UDMA_INT_STA_BT, 0x000000FF);
-+
- 	btusb_mtk_id_get(data, 0x70010200, &val);
- 	if (!val)
- 		bt_dev_err(hdev, "Can't get device id, subsys reset fail.");
--- 
-2.25.1
 
+--===============2579329769128384875==--
