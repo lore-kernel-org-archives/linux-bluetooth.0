@@ -1,104 +1,95 @@
-Received: from mail-qt1-f174.google.com (mail-qt1-f174.google.com [209.85.160.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3B3D158DA0
-	for <linux-bluetooth@vger.kernel.org>; Wed, 15 May 2024 18:07:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0A1A158DA8;
+	Wed, 15 May 2024 18:15:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715796480; cv=none; b=pJT0cVCK3Ej5neS0EzMkAatnHN/4Sr1qrXwoZYiVoFe9RnZK0eQnEDwGiGYmEVMpi4aGduZZW7czYWkqyO1LGPDFVmi9iuG3qaMkcLhH1L8JE7zUQi8CcCoAuS+eBtMieQXaCJ+Uen+uKRoZ9MKJ20ptImuTWWi1+6bGW9EgK1k=
+	t=1715796913; cv=none; b=h1IgBe02HoJ3C6NpWjqGvz/rekxwyPYiOHqdyeuDUYaAUzWJNZxHzoh0p+Vjr90+cHXsoFIw5hYLUOTiKWyzGPukOnI4FRp72pslKjWsj3yrflFUGZ7Tch/cUeiIQqnySEYL70TyNDgnZYOsPx5eh9Fqy2DYvgX3zzD87xg6R+U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715796480; c=relaxed/simple;
-	bh=myA6WNQ2TFzmolEXQqcTwjcz3WbtPAVr+l0XPiaqxn0=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=Hu7SvX4ypFoACltS3efXkoaYfHIJ61wB/x0hhu7CuaYOl+QgB1BYgNXPJWAai6GsQUvaO1/nlpikdndDml5OGD1aNImaQabdqAuGIGnuYao32RX02074OJrlGm9MPMMEya1paRoN1dEr5GZ8EN7yY2LjfaPLnZZCmEFL0Qbf2uM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=P2fkm01k; arc=none smtp.client-ip=209.85.160.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1715796913; c=relaxed/simple;
+	bh=06YY8ApMgy1OpGHdIukderyzK7KzMNwwBa335Fe5Jbo=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=O5KClwUwerdleU7Kd72ZAuZtk479TPk2fzINrqG5SWuD3t/5WdcPenA2R8V/tQdPFkDaFBsOMHfq4zbLEv897r7gOMnAv5m25BdtHUFDNf+6dUCQIPkFkyQCI19/glru66S57SYjUB0KD4w2rLzukpcM+8AzEElUhDN0txBgZmk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OoetWJYT; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="P2fkm01k"
-Received: by mail-qt1-f174.google.com with SMTP id d75a77b69052e-43e23ce7b07so15154671cf.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 15 May 2024 11:07:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1715796477; x=1716401277; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=8uItHYb0YoGuvyHeQ5tSwhqtJfLDVnpvV3g6KBefrd0=;
-        b=P2fkm01k/MHHi7eJzKxBBWGpOqhgVDvxF6WrDhN+eUiUpRafBx6/ch/Pfa6griEsez
-         hD/IYb7LHxm6mlcLMcaR4FfXZHwNOD6VOXeMt4FPYqSLTH3PDsw+QtKA6oqeFUsTpkYS
-         e40qW20czVtdq1tVpDPcGWRuJCWDq8ouqo1fzBb45zUvdv8q7JvHAmYw/HVB9sEcbLR+
-         1DtHJP37UPAl5NI3Q3rS9nkrhnWq3wDJyKVgkd39qZUmeRvQ1kdx8dqscFwlCERxFIed
-         RDctWMDZQp3h+75iLSeBRSkQB2fVVhtxnT3OaQpcZveEBsuvl+rb/nAt4mDvptSSPpmj
-         eCXg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715796477; x=1716401277;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=8uItHYb0YoGuvyHeQ5tSwhqtJfLDVnpvV3g6KBefrd0=;
-        b=cUWqGNVRzeHpvjR7vWQTyqANFY25icMCXY3WY7Vnt/275q/Xc8jH0M02o7v79qOEpy
-         U/fYiZUNVuH71m6RXDYVk+c9wrxCKZoXqo13zEnAC6f6JRCC2CdWRIrs3Fdhj5OBl1M8
-         577AmXh6NhZywapa+UdSxhHKu495WHwNEhJV9xXD+F3UG1g1mw4A8LSguogTtf6YpzMF
-         CXiW8IIpwICcstSOvzQXz86ueWCKoFfaEyyV8eCiwXwSxw3qBWrjibOcVNYtz3Qko3JI
-         kO1wJQ4qD78lu07tCqOSjHA/EPFDTkZUQ8VgBJraz4Km2hAeRifAzCOEKVo18WVX9hk3
-         Qjcw==
-X-Gm-Message-State: AOJu0YwonP2NghusTSkiwHbgj1buRO+NLOFE2ychSVT4olwB7v9YjTyT
-	+RJ+w3tWCZJN8QNTh0dWnbo5u8CdbpvRMy/YBMoZpIzIP0+0YDPGGIL4hQ==
-X-Google-Smtp-Source: AGHT+IEMapgOVopu4jfzUCYJR0vekQzYVE/Lk/LqvUVT9iZMHlQK+XSrOAlHa3VTYovghn1jlRIb2Q==
-X-Received: by 2002:ac8:5d0e:0:b0:43d:dee6:812a with SMTP id d75a77b69052e-43dfdd0d327mr193828631cf.61.1715796477501;
-        Wed, 15 May 2024 11:07:57 -0700 (PDT)
-Received: from [172.17.0.2] ([20.102.199.110])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-43e16c5485fsm45797011cf.2.2024.05.15.11.07.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 15 May 2024 11:07:57 -0700 (PDT)
-Message-ID: <6644f9fd.050a0220.52f4.fc22@mx.google.com>
-Date: Wed, 15 May 2024 11:07:57 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============0980542157905522357=="
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OoetWJYT"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 93A7EC32781;
+	Wed, 15 May 2024 18:15:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1715796912;
+	bh=06YY8ApMgy1OpGHdIukderyzK7KzMNwwBa335Fe5Jbo=;
+	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
+	b=OoetWJYTHEGhiEbwzPmF15VydeMUzSo15wEoZUAf52avZs8u9Z0Capl5nyjpRk3W4
+	 S+/7xbtCMD1BMV0K80Uf3kyV19yF+ERRAyBN5FB/I2NmBlBgKRfR1rxLxLCyby4Jel
+	 DjF+igxvNhXh5xzcC4tZ3vqqGK+e5BL1um58rLGP1ph8QbLpoZIVrDxZw0uzT08EB6
+	 qoTMoKkSVDpXgjrsNuWfoWqww6P8+/WpCqYuIWkSrH721Kjpdy1IVlZw+W9IiluqZ6
+	 M8hO6mx+1M7F2AaKCXS+ykqCaY2v8ohJD8SofkvBSXoHfo07bN5loH25qTdX4AUu9q
+	 ejsYMQfY1cziQ==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 85575C25B78;
+	Wed, 15 May 2024 18:15:12 +0000 (UTC)
+From: Sven Peter via B4 Relay <devnull+sven.svenpeter.dev@kernel.org>
+Date: Wed, 15 May 2024 18:15:02 +0000
+Subject: [PATCH v2 1/3] Bluetooth: hci_bcm4377: Use correct unit for
+ timeouts
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [BlueZ,v1,1/2] shared/ad: Add bt_ad_length
-In-Reply-To: <20240515161250.1714375-1-luiz.dentz@gmail.com>
-References: <20240515161250.1714375-1-luiz.dentz@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
-
---===============0980542157905522357==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+Message-Id: <20240515-btfix-msgid-v2-1-bb06b9ecb6d1@svenpeter.dev>
+References: <20240515-btfix-msgid-v2-0-bb06b9ecb6d1@svenpeter.dev>
+In-Reply-To: <20240515-btfix-msgid-v2-0-bb06b9ecb6d1@svenpeter.dev>
+To: Hector Martin <marcan@marcan.st>, 
+ Alyssa Rosenzweig <alyssa@rosenzweig.io>, 
+ Marcel Holtmann <marcel@holtmann.org>, 
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: asahi@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
+ linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ Sven Peter <sven@svenpeter.dev>
+X-Mailer: b4 0.13.0
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1715796911; l=839;
+ i=sven@svenpeter.dev; s=20240512; h=from:subject:message-id;
+ bh=7gQn02PYjfQWipM5wmSh7cRXbC3rcrKdfUfT0gxlvsA=;
+ b=5vuT3iBepkv/NY4S5torbyPLDbQY84+ans4BusJj/uJoM6EIqY5izWUCJv/R9gWadUKYhg+sU
+ pnvq3oniF36ArujjWEGXIvjbZukR6B/RB7+8A1jxROyY4DQpNkQcJra
+X-Developer-Key: i=sven@svenpeter.dev; a=ed25519;
+ pk=jIiCK29HFM4fFOT2YTiA6N+4N7W+xZYQDGiO0E37bNU=
+X-Endpoint-Received: by B4 Relay for sven@svenpeter.dev/20240512 with
+ auth_id=159
+X-Original-From: Sven Peter <sven@svenpeter.dev>
+Reply-To: sven@svenpeter.dev
 
-This is automated email and please do not reply to this email!
+From: Sven Peter <sven@svenpeter.dev>
 
-Dear submitter,
+BCM4377_TIMEOUT is always used to wait for completitions and their API
+expects a timeout in jiffies instead of msecs.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=853469
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      0.76 seconds
-GitLint                       PASS      0.53 seconds
-BuildEll                      PASS      26.76 seconds
-BluezMake                     PASS      1686.82 seconds
-MakeCheck                     PASS      12.91 seconds
-MakeDistcheck                 PASS      178.64 seconds
-CheckValgrind                 PASS      247.58 seconds
-CheckSmatch                   PASS      350.63 seconds
-bluezmakeextell               PASS      118.55 seconds
-IncrementalBuild              PASS      2981.30 seconds
-ScanBuild                     PASS      982.69 seconds
-
-
-
+Fixes: 8a06127602de ("Bluetooth: hci_bcm4377: Add new driver for BCM4377 PCIe boards")
+Signed-off-by: Sven Peter <sven@svenpeter.dev>
 ---
-Regards,
-Linux Bluetooth
+ drivers/bluetooth/hci_bcm4377.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/bluetooth/hci_bcm4377.c b/drivers/bluetooth/hci_bcm4377.c
+index 9a7243d5db71..caf9b64c8111 100644
+--- a/drivers/bluetooth/hci_bcm4377.c
++++ b/drivers/bluetooth/hci_bcm4377.c
+@@ -32,7 +32,7 @@ enum bcm4377_chip {
+ #define BCM4378_DEVICE_ID 0x5f69
+ #define BCM4387_DEVICE_ID 0x5f71
+ 
+-#define BCM4377_TIMEOUT 1000
++#define BCM4377_TIMEOUT msecs_to_jiffies(1000)
+ 
+ /*
+  * These devices only support DMA transactions inside a 32bit window
+
+-- 
+2.34.1
 
 
---===============0980542157905522357==--
