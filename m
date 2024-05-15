@@ -1,192 +1,145 @@
-Received: from mail-lf1-f42.google.com (mail-lf1-f42.google.com [209.85.167.42])
+Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 515AF3BBF6
-	for <linux-bluetooth@vger.kernel.org>; Wed, 15 May 2024 18:54:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3340238FA6
+	for <linux-bluetooth@vger.kernel.org>; Wed, 15 May 2024 18:59:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715799272; cv=none; b=L+XCQy+JjVBkbrS+ho3qyrRJh+c9XuNRpL9NtGl/3I3XkfxX+MLiRjOzGo5MEI6sXagJNphsNAUnvlnjJLO7nWwsK44/Kh7Tc+vCOBGbPo+kJvU0ffztwkiz3mmm4jNHCljubhOnR7HYo1KG5TXwe73Fb2sIyWMQ52HGBLaWhs0=
+	t=1715799558; cv=none; b=HBZ7ogf+Iczpn1L5PnBTtKcwg2idD1lQ64G7/agDbwpGzP0CLvyZaeNHpUW1LoF76wI+Vn9iK1ZfSbxRFyCA418P2sp6ncZEwFU/Ds0xT6i83v3lbiCfvEggY0rFHFDQR9oPJD1h0sWtj43I289eCkSAUpY2b9L9JZrVGBVHm1I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715799272; c=relaxed/simple;
-	bh=hjio7Sn1KDdRYB41xhBIlYR2jWAchFBGcBam8iPEX0I=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:References:
-	 In-Reply-To:Content-Type; b=j3oaO+9aVN14j4ECPfQlZVDJRCaVYJPQyPX5ZdzNf4fHFfk26gs/V4pIrxTWh1+CMCR76CN8GBhjPweJCfROMWgCTGJYDhQvbhd0Kfn90x7fKw5ZiBQAoU0c8MyxJ5e/6YJ/U2a3afasbkL50tC9JmrsLPMzXSvR9VmWh3Tbt9A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EtYiYOeh; arc=none smtp.client-ip=209.85.167.42
+	s=arc-20240116; t=1715799558; c=relaxed/simple;
+	bh=ZAyMd331l81ydV2LHGYeWruOKeH94Wq+6eYmH5+2O7M=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=mCYMeePTD3u4hNSZCeVAO9g6rMDtcd9n2mG8IozNh0ThscJxadgcAkvqVfGuC1X8vDLHx1sbg8QvTqWbe/qcmhFboHY6LhCz6Xnr7e12DQVXwAe1zD300u5jJkRpvB3NDWgyA65lqz/PGyAanDir5uiL62rKAKzq7dHBPqbu85Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LCiHJnh4; arc=none smtp.client-ip=209.85.214.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EtYiYOeh"
-Received: by mail-lf1-f42.google.com with SMTP id 2adb3069b0e04-5231efd80f2so4918195e87.2
-        for <linux-bluetooth@vger.kernel.org>; Wed, 15 May 2024 11:54:30 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LCiHJnh4"
+Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-1ee42b97b32so59769745ad.2
+        for <linux-bluetooth@vger.kernel.org>; Wed, 15 May 2024 11:59:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1715799268; x=1716404068; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :to:from:subject:user-agent:mime-version:date:message-id:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=FpzDVN9xEFaaaoSvggsaGDOC7EzPMQ13dlrCeT5SfOE=;
-        b=EtYiYOeh/goEtudBcHEtQ0sykPM0pnh9DYxLLiZElxBwfgvOf1Qtbb7e8p+8G6rbQh
-         wZC/eWJ21P776fRs491x2NkGVVnkKrHId9mYtp/K11yW5uOCv6D5U88pDp11MxTowEmd
-         PCRdR6jA2Y2QfhY6ZfOI7oiUR+xWFaXhFHL+ZhzmQV3TwFBWEHDS6YyuAS8bbOqKQ4eI
-         lm68oWKMovQr8uXRenfKMvWum+SN3oWTQngHiUwPk6jx1E2NOls4Dug0FGjUDdeBAZUi
-         ifF7omYELk3uvD0/k6ou0Uk5v5lr01qz1DAZAeBWoFsOX9LVFxl6lWbNOlKghPm5Uf85
-         sVnw==
+        d=gmail.com; s=20230601; t=1715799556; x=1716404356; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=TmoTLTQxMrMM+qKQoSKfFKtQ4Lja2Hcl3lvBTYwC4QQ=;
+        b=LCiHJnh4ZvvAkQaPqXsbSlgH6A1p6qQESUBo0xNwNr0oHGephjWEsCLZqkt02fXdpj
+         LMbamXNvbE2vts/0p9ohPUHf0Yh7FzYda6qYIQHiNNMSBguMhoSei3bv8C2yz2Uj3kxJ
+         AIVjdHw802eVACOktX9OlNVhyrn+hcCJsMyDeYSydT3KOO/rwAmHUULhreb/iGslkTdy
+         yBMbsSe1Mfd8uppeP+ruu65uPnGCiKHHsmTGYJObtkR8bbfQOuP3piCj+IRfOc7G7dzf
+         eNLeGfD9t8XaJKTxMBhhW1wDxBgM9Y87eHLMeeeqMmiJWL/zYRkgMb6UPPsbhFYhAaVl
+         SFnw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715799268; x=1716404068;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :to:from:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=FpzDVN9xEFaaaoSvggsaGDOC7EzPMQ13dlrCeT5SfOE=;
-        b=LAth/lRcfnYuwIu/idUlDBEz3gfHQRItbmRE9K+d3DCqRkCeIT9h1hx/vj9PyR2IBU
-         qVBR9H2OMNPIxnjjM5tFzpZhJe+sF+flNQaOhh7pbh2tanwsC+Rf15Bad+3AWRx9aCC2
-         Ur/BbW8qMzaQCIqiTjY8DD8sbVgM5vQ6xA7q5+ujGIY661naGoUp+EynDaXEdb5HXUGH
-         5YWlXDGT8hLbMYR4PtngbAuss55S6BOKP5yRnVxMchJtc8mqaVKnMLFXn2JM+g7hT8Y9
-         L02tZT2XjxLVY302+fusbLB1ISC2FCC4FwtCy2x/j6d+neP8dlWVLz14/BES2KPPMEHB
-         chYw==
-X-Gm-Message-State: AOJu0Yzk5QWcbEbRLpGBjfiT9lHuxmQ7E5wXXI43Rgh9ym9d3Zs0iEau
-	mh+UPSIX1mc5CwTT2wng/RgsPgWAs3MUPMgzG9ODOWMylm6Y0lsYtssc97mQq9Sg2Cpf
-X-Google-Smtp-Source: AGHT+IHaC3butomcIG2Xqvsm4kVDDD3/c6M/deJ2bJIVWQALx9QWWEG6f0NFso6aQ4PgN5WBQfroXw==
-X-Received: by 2002:a05:6512:3605:b0:51f:b781:729d with SMTP id 2adb3069b0e04-5220fd7acf5mr9079550e87.38.1715799268120;
-        Wed, 15 May 2024 11:54:28 -0700 (PDT)
-Received: from [192.168.50.232] ([176.196.131.103])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-52394a319f1sm351304e87.64.2024.05.15.11.54.27
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 15 May 2024 11:54:27 -0700 (PDT)
-Message-ID: <2e9efc65-d408-48db-bf7c-1c186bd73446@gmail.com>
-Date: Thu, 16 May 2024 01:54:26 +0700
+        d=1e100.net; s=20230601; t=1715799556; x=1716404356;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=TmoTLTQxMrMM+qKQoSKfFKtQ4Lja2Hcl3lvBTYwC4QQ=;
+        b=lEEQ4v0iBaxRpzsm1+bt+QTYuJmEextspUbQhwXXxNzOZ/HziCB1Yc/8QKDpbqZPnl
+         YKWlJgdU5aXIFKY9nIuubBfV5J6fv4Hl4J2gf5/1xCBd5rewaZ1Dw6weNQRBzNn6dzCr
+         eRtxe8rzJHyop3hWstL1AoTitTU/mGGn8/WwIxxDXashWr8/+DngrDmz2XByT8RPgFUZ
+         dagY64fhxWcFbGphHkRPv8kpNbOKw4lTT1zg8tDyAa1bU7jAX1YsIwarhRzn1Erk1isU
+         6UZ4fTGArBhPeHnzuY5fygyT2qQW5P4L+of7SgUhFiNusOGZUr627R8A3hPcfqWXbiOy
+         VqzQ==
+X-Gm-Message-State: AOJu0Yxb4B09rmCBTZJvvRNkhy8BBCmdcuUnRo7mKwSH7LbpZtvzfHGR
+	Rl6+cVo2oEg98/3rGl5vmlJr+dNqcwAv1yiOtAH/Ji1ydFzDnBauQlWR2g==
+X-Google-Smtp-Source: AGHT+IEkJxG+Ge/+0B/Y9BN9l6vzx3AC/+Dd2chbBZAJMmpkfaiAnUBazh5+Jyby3dX/L5/KQACgRA==
+X-Received: by 2002:a17:903:11c4:b0:1e4:9c2f:d343 with SMTP id d9443c01a7336-1ef43c0fd9dmr193139165ad.7.1715799556205;
+        Wed, 15 May 2024 11:59:16 -0700 (PDT)
+Received: from [172.17.0.2] ([52.238.28.65])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1ef0b9d1734sm121362035ad.29.2024.05.15.11.59.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 15 May 2024 11:59:15 -0700 (PDT)
+Message-ID: <66450603.170a0220.b02d.f679@mx.google.com>
+Date: Wed, 15 May 2024 11:59:15 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============7024756818947665427=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: abandoned patches for ATS2851
-From: =?UTF-8?B?0JTQsNC90LjQuw==?= <danstiv404@gmail.com>
-To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com,
- johan.hedberg@gmail.com, marcel@holtmann.org
-References: <b00b4f66-1aba-4182-bae2-01f37eb1c34b@gmail.com>
-Content-Language: ru, en-GB
-In-Reply-To: <b00b4f66-1aba-4182-bae2-01f37eb1c34b@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, devnull+sven.svenpeter.dev@kernel.org
+Subject: RE: Bluetooth: hci_bcm4377 fixes
+In-Reply-To: <20240515-btfix-msgid-v2-1-bb06b9ecb6d1@svenpeter.dev>
+References: <20240515-btfix-msgid-v2-1-bb06b9ecb6d1@svenpeter.dev>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Hello!
-Sorry, this is my first time interacting with a kernel mailing list, and 
-I think I should have specified more recipients.
-Now I'm trying again.
+--===============7024756818947665427==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-14.05.2024 0:14, Данил пишет:
-> Hello!
-> I encountered a problem with a USB bluetooth adapter which probably 
-> uses an ATS2851.
-> I'm not 100% sure about this, but the symptoms match the problem 
-> described in the patch.
->
-> Here are the patches I found.
-> 1. It seems to have been applied.
-> https://lore.kernel.org/linux-bluetooth/168150781825.20001.4973139468540739153.git-patchwork-notify@kernel.org/T/#t 
->
->
-> 2. It seems it was not applied.
-> https://lore.kernel.org/linux-bluetooth/20230323135804.3962783-1-raul.cheleguini@gmail.com/T/#t 
->
->
-> 3. It seems it was not applied.
-> https://patchwork.kernel.org/project/bluetooth/patch/20230426184017.2051211-1-raul.cheleguini@gmail.com/#25314789 
->
->
-> Patches 2 and 3 were not applied, as I understand, due to some minor 
-> problems with code formatting, is it possible to complete the process 
-> of applying them?
->
-> Here is some information about the device:
->
-> dmesg
-> [    0.000000] Linux version 6.6.13+bpo-rt-amd64 
-> (debian-kernel@lists.debian.org) (gcc-12 (Debian 12.2.0-14) 12.2.0, 
-> GNU ld (GNU Binutils for Debian) 2.40) #1 SMP PREEMPT_RT Debian 
-> 6.6.13-1~bpo12+1 (2024-02-15)
-> [    0.000000] Command line: 
-> BOOT_IMAGE=/boot/vmlinuz-6.6.13+bpo-rt-amd64 
-> root=UUID=b9338182-ab4b-48cb-b492-60e7ed340018 ro 
-> systemd.unified_cgroup_hierarchy=false quiet reboot=pci
-> ...
-> [  110.420763] usb 1-2: new full-speed USB device number 2 using uhci_hcd
-> [  110.609798] usb 1-2: New USB device found, idVendor=10d7, 
-> idProduct=b012, bcdDevice=88.91
-> [  110.609814] usb 1-2: New USB device strings: Mfr=1, Product=2, 
-> SerialNumber=3
-> [  110.609820] usb 1-2: Product: general adapter
-> [  110.609824] usb 1-2: Manufacturer: Actions
-> [  110.609829] usb 1-2: SerialNumber: ACTIONS1234
-> [  110.614223] Bluetooth: hci1: HCI Read Default Erroneous Data 
-> Reporting command is advertised, but not supported.
-> [  110.614245] Bluetooth: hci1: HCI Read Transmit Power Level command 
-> is advertised, but not supported.
-> [  110.614252] Bluetooth: hci1: HCI LE Set Random Private Address 
-> Timeout command is advertised, but not supported.
-> [  110.666673] Bluetooth: MGMT ver 1.22
->
-> lsusb -v
-> ...
-> Bus 001 Device 002: ID 10d7:b012 Actions general adapter
-> Device Descriptor:
->   bLength                18
->   bDescriptorType         1
->   bcdUSB               2.00
->   bDeviceClass          224 Wireless
->   bDeviceSubClass         1 Radio Frequency
->   bDeviceProtocol         1 Bluetooth
->   bMaxPacketSize0        64
->   idVendor           0x10d7
->   idProduct          0xb012
->   bcdDevice           88.91
->   iManufacturer           1 Actions
->   iProduct                2 general adapter
->   iSerial                 3 ACTIONS1234
->   bNumConfigurations      1
-> ...
->
-> btmon
-> ...
-> < HCI Command: LE Extended Create Connection (0x08|0x0043) plen 58 #48 
-> [hci0] 2.000505
->         Filter policy: Accept list is not used (0x00)
->         Own address type: Public (0x00)
->         Peer address type: Random (0x01)
->         Peer address: E8:42:26:5C:0F:07 (Static)
->         Initiating PHYs: 0x07
->         Entry 0: LE 1M
->           Scan interval: 60.000 msec (0x0060)
->           Scan window: 60.000 msec (0x0060)
->           Min connection interval: 30.00 msec (0x0018)
->           Max connection interval: 50.00 msec (0x0028)
->           Connection latency: 0 (0x0000)
->           Supervision timeout: 420 msec (0x002a)
->           Min connection length: 0.000 msec (0x0000)
->           Max connection length: 0.000 msec (0x0000)
->         Entry 1: LE 2M
->           Scan interval: 60.000 msec (0x0060)
->           Scan window: 60.000 msec (0x0060)
->           Min connection interval: 30.00 msec (0x0018)
->           Max connection interval: 50.00 msec (0x0028)
->           Connection latency: 0 (0x0000)
->           Supervision timeout: 420 msec (0x002a)
->           Min connection length: 0.000 msec (0x0000)
->           Max connection length: 0.000 msec (0x0000)
->         Entry 2: LE Coded
->           Scan interval: 60.000 msec (0x0060)
->           Scan window: 60.000 msec (0x0060)
->           Min connection interval: 30.00 msec (0x0018)
->           Max connection interval: 50.00 msec (0x0028)
->           Connection latency: 0 (0x0000)
->           Supervision timeout: 420 msec (0x002a)
->           Min connection length: 0.000 msec (0x0000)
->           Max connection length: 0.000 msec (0x0000)
-> > HCI Event: Command Status (0x0f) plen 4 #49 [hci0] 2.001242
->       LE Extended Create Connection (0x08|0x0043) ncmd 1
->         Status: Unknown HCI Command (0x01)
-> ...
-> The adapter supports le, I was able to connect to a le device from 
-> windows 11.
->
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=853487
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      1.37 seconds
+GitLint                       PASS      0.56 seconds
+SubjectPrefix                 PASS      0.16 seconds
+BuildKernel                   PASS      30.43 seconds
+CheckAllWarning               PASS      32.81 seconds
+CheckSparse                   PASS      39.27 seconds
+CheckSmatch                   FAIL      37.98 seconds
+BuildKernel32                 PASS      29.23 seconds
+TestRunnerSetup               PASS      530.30 seconds
+TestRunner_l2cap-tester       PASS      20.59 seconds
+TestRunner_iso-tester         PASS      28.30 seconds
+TestRunner_bnep-tester        PASS      4.66 seconds
+TestRunner_mgmt-tester        FAIL      111.38 seconds
+TestRunner_rfcomm-tester      PASS      7.42 seconds
+TestRunner_sco-tester         PASS      14.99 seconds
+TestRunner_ioctl-tester       PASS      7.81 seconds
+TestRunner_mesh-tester        PASS      6.05 seconds
+TestRunner_smp-tester         PASS      6.95 seconds
+TestRunner_userchan-tester    PASS      5.05 seconds
+IncrementalBuild              PASS      39.84 seconds
+
+Details
+##############################
+Test: CheckSmatch - FAIL
+Desc: Run smatch tool with source
+Output:
+
+Segmentation fault (core dumped)
+make[4]: *** [scripts/Makefile.build:244: net/bluetooth/hci_core.o] Error 139
+make[4]: *** Deleting file 'net/bluetooth/hci_core.o'
+make[3]: *** [scripts/Makefile.build:485: net/bluetooth] Error 2
+make[2]: *** [scripts/Makefile.build:485: net] Error 2
+make[2]: *** Waiting for unfinished jobs....
+Segmentation fault (core dumped)
+make[4]: *** [scripts/Makefile.build:244: drivers/bluetooth/bcm203x.o] Error 139
+make[4]: *** Deleting file 'drivers/bluetooth/bcm203x.o'
+make[4]: *** Waiting for unfinished jobs....
+Segmentation fault (core dumped)
+make[4]: *** [scripts/Makefile.build:244: drivers/bluetooth/bpa10x.o] Error 139
+make[4]: *** Deleting file 'drivers/bluetooth/bpa10x.o'
+make[3]: *** [scripts/Makefile.build:485: drivers/bluetooth] Error 2
+make[2]: *** [scripts/Makefile.build:485: drivers] Error 2
+make[1]: *** [/github/workspace/src/src/Makefile:1919: .] Error 2
+make: *** [Makefile:240: __sub-make] Error 2
+##############################
+Test: TestRunner_mgmt-tester - FAIL
+Desc: Run mgmt-tester with test-runner
+Output:
+Total: 492, Passed: 488 (99.2%), Failed: 2, Not Run: 2
+
+Failed Test Cases
+LL Privacy - Add Device 6 (RL is full)               Failed       0.197 seconds
+LL Privacy - Remove Device 4 (Disable Adv)           Timed out    2.571 seconds
+
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============7024756818947665427==--
