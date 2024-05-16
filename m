@@ -1,254 +1,192 @@
-Received: from mail-lj1-f182.google.com (mail-lj1-f182.google.com [209.85.208.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [185.185.170.37])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 171E314D433;
-	Thu, 16 May 2024 15:55:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.182
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715874958; cv=none; b=PtchZHNivoBAKSGHPeQaWfYnHx9YKObjaUm1ArdEk7ODj4RgPQtc9Mg03wYrcjathyQhn2zgVq709NCRbza0SHf5u9d6AhaxfJNNXg5zMv5aJ4wFAHi244zbkhzRSA8NWrJNFNdJYsnlzzv9xAUdLBxQAL4l2+2RdOw5jqqBCCQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715874958; c=relaxed/simple;
-	bh=GotmUVvg3yCA1K/0AUhNy3lVYojERI0YjVqh8CZv7+w=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=q9VqC2sUTegxi3EWTRPPKkYhB+QziU5b8UEsFdH7Dvd3VqsJixoTfyhPFYQWBGXoiN1lt5UgjPud47O2g+melUaYAvzrAL3sCtSolOsBHuVxYT9Udg7J8meOnzXC8m9g3qatCMZ/gjxDvzZywKegsihkZH/+ui7LpISq7AKnGGY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mH0rw4ZE; arc=none smtp.client-ip=209.85.208.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8292914D45E
+	for <linux-bluetooth@vger.kernel.org>; Thu, 16 May 2024 16:00:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=185.185.170.37
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1715875221; cv=pass; b=ZmXosQS2zVOxc0F90kBhelZl6vPd01fXJeZp75j22RpHWpPWeBwOaFXdfwJ5R1sB74WnLT2RvEQVlLn6hYIinb8U4lEhkVsMNK1uUScur6aTlq/Zj2afHEbxdS30xLP9TOvuWSPBq1N0TTWvlkHLWZ1jMB4qF9x3wvrsDecuscY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1715875221; c=relaxed/simple;
+	bh=k0JQcN14OsqtVBdNVS345clT+N3t4Yqhsuxfyf2Grpk=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=qGCfNDhQ4QANZfnMG827p7yOT7/gqgVcleSNJniqls2GJZI2qXgHxEUke9ErYulFbBPnefTMU/AfKPhfOGx1DtZN76jlbsB6oifxtkaOzFeRCKE27fNvBN2RbLBx/JVWD3+++U6bPXK3W46g8mobNCM4FTgS7l9aiOG5mgjoAtc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=unvBmXoh; arc=pass smtp.client-ip=185.185.170.37
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mH0rw4ZE"
-Received: by mail-lj1-f182.google.com with SMTP id 38308e7fff4ca-2e538a264e0so12590191fa.1;
-        Thu, 16 May 2024 08:55:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1715874955; x=1716479755; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=X51fSppkpogm5g68VevzSjdTrmvDiJaepwBpjEkIupc=;
-        b=mH0rw4ZE8DYaBErseHsfNcfGV7lsSzzcWmM95sDTocg9bUa/KC0tcvFkuNU7GpFQdO
-         9abnf8YUuVcYRDKLK+hPg9PsFcgf7Bt1EzRRDtEODzgO1JlBLPB7L31MJ0DGVP/nymh+
-         e5R3n/kDBbTJ5z80f0v5KCXHiYT7euwb57I6ClHMtkjTCT/NrvrcLtVZ4smlOfqVqePJ
-         T76ON7MJDMQDmFuvl8HWfJGsz9PCvxrYfM9l3RgmFo0ZxMLOl9XRPk+1BWhGOC8Iov7L
-         ucQoRBsjiPpQVZc7ZMWLZG6OJ72DAq88362Dbhxkog3aWs02WMZLuJq514ah7BMBTNKB
-         ufSw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715874955; x=1716479755;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=X51fSppkpogm5g68VevzSjdTrmvDiJaepwBpjEkIupc=;
-        b=JMzXzset/mxUJ+ZbGJ0PJ9+bPEmt3pD17oySEXMc+QuG80VyKW79HJYZETtOdBJiBt
-         q87SM2FUJRZg9l+2wcDx4Rz4/xgR2QQ0fevC7nMWT86EuRiXhvkY0S+2CJSPJbszgDd6
-         Ev8vNs8SMcpOX0rAS4FXBrQNZnKqXQhUEDPkyAFJhXgNXU67IkwzBI4dNaueByPb8xAl
-         bODekKky0g/GPZb88GUB3S3zNlK89RHsK0mPtf187OwkpGNFxnevibULdstI6u7PYFzy
-         Y032lc+P/xUQzGYArqY95LauFyE5vOmKjtJNGo9zTE6HIg66Oyc8voFQa5hzazbGArBH
-         vCsg==
-X-Forwarded-Encrypted: i=1; AJvYcCXZYoixWEIyaOW3Plg98DE7QqGPrAPlACGa5Lk9EJE8JVXCuH6pqza9TPXyXB71IwwsWIzk42BQ6ZxMDhrHq+9mxXoayc6VeFIxuy8JK/IiGZMCqbg9GSwmGUgg0VHpKqUYsagtskaK
-X-Gm-Message-State: AOJu0Yyb87uTg/50dTzpDOrNfw7MD/Fqe2+PbFMgFe1fPIAL2qRAVueA
-	tuzh5IBVfeencB1pVueGckGhwFV5V0HvybT9I8v16irqWnf8gSmDAQ7iLKLWn2BbKp/vbJWg8/U
-	oJVoaLw2e7fJXtW/EWcwV8JaYiT0+RJEq
-X-Google-Smtp-Source: AGHT+IEFeaCtLRNo5VoiulyvOQ9u5fQIcZftbw9jZKZ2+uGwIk1yQQuY5A0kQEIrPVM/0MW0dIOTQUmRUckvz++9TIM=
-X-Received: by 2002:a2e:9657:0:b0:2e6:f57a:9854 with SMTP id
- 38308e7fff4ca-2e6f57aa0afmr56199111fa.38.1715874954817; Thu, 16 May 2024
- 08:55:54 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="unvBmXoh"
+Received: from monolith.lan (unknown [IPv6:2a02:ed04:3581:3::d001])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pav@iki.fi)
+	by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4VgFD809Rnz49Q5W;
+	Thu, 16 May 2024 19:00:07 +0300 (EEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
+	t=1715875209;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=3Jgby1G4S9dU8I4NXJikeU1oTrOGj0yg2PcN0u1/EsE=;
+	b=unvBmXohGMTQrktDYFJ8MmQ2nccP6klVt+Ko/ba0s6gN02h46hRdbWdQnd1C01EUJOrl6V
+	DgnEqrudifpsYUuuSD9Oe9/34ZJn49uazO05vp1w5+TPVsm3HiD6wtayLJJ+LjPAJxm6bR
+	TPpKc0u0taklPstHW3VnUitlFsOkL8b/i3XRyUn1RlmWNkg58ZdcimH1xvIOuEO8DalN8L
+	411k8o4OkEph3MLWMZV72opmrTEo4dq+ahEYP3TCYJs7Cvdy3Y0+J7xLbzPIXiCSMc96sw
+	LBbT/7ZNumzhj5L4N3/UWoJr2HAM4h3dRfw1zZVaQFGHTDZ1cbF8f5h8ndkRBQ==
+ARC-Seal: i=1; s=lahtoruutu; d=iki.fi; t=1715875209; a=rsa-sha256;
+	cv=none;
+	b=qKnXICLvpnYyBn8Zlj0QZSYrbm1+dtr0tNSnieKyBkRt1dwKc/33YZRK0TAzKuTL//ozMw
+	JLXNoY4jfGkVIga5ZgzTNO4Nh2SVabJB8Tfp0RYoHPyl0145DIJILN9rfzmT8o9i8r8N4s
+	FUL89PhBPAW+EfqheJgWDH/wbOoNLuVOT0MdbM7URzlforbKim2PGBhRVdbBmhRLh7Ud/x
+	z3RaVXPDXT1VZEY0WP5ByuwJQy5aPxBOGpq8M7dc7mdiQ9qk1+d/hPvxQIf0wb9Im6gtEy
+	TESZVEtZ57QPjutj0iF5iHBo7gglzUbsCLHLqFNxRMtfOEQOxFNm+KyaYWJHXw==
+ARC-Authentication-Results: i=1;
+	ORIGINATING;
+	auth=pass smtp.auth=pav@iki.fi smtp.mailfrom=pav@iki.fi
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
+	s=lahtoruutu; t=1715875209;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=3Jgby1G4S9dU8I4NXJikeU1oTrOGj0yg2PcN0u1/EsE=;
+	b=eAoK7XSM6I7YCk2FhOAMuFCOvqSQo7dcG3o6SEJWx//2Be+jRMBng+vuSC+dxyUKW0qlnh
+	zX986WCLMHq0RXz8hbU5D7iFHRc/ilg0pCdDuhxDpqzQUg+LA5CjSC/3nKA7iTemNyYXqr
+	BPjWEYU2X1AHSG2Cycsama1YMDjxVzQYAp/gkFf2VsAx6AODnxgkTepr15RGWaFD9aZB3V
+	F+/f9RmZ++rk/Doa2sE2esCuKlqRVU2UpjNK+qO7b1fsX/viNWhDLxLbVSG411hWI6gBFG
+	JE6vFlWvN1bYtA+G1/42evcZ/g0BKDmROS3lY7cEqY8ixJwv3S7zwaszGFfgZg==
+Message-ID: <99abd5269d6b72f391b39cec2c5f608654995beb.camel@iki.fi>
+Subject: Re: seid structure in profiles/audio/avdtp.c
+From: Pauli Virtanen <pav@iki.fi>
+To: Bastien Nocera <hadess@hadess.net>
+Cc: linux-bluetooth@vger.kernel.org
+Date: Thu, 16 May 2024 19:00:04 +0300
+In-Reply-To: <78e4c9a65b6e7509a1f743f945270568a8548f26.camel@hadess.net>
+References: <78e4c9a65b6e7509a1f743f945270568a8548f26.camel@hadess.net>
+Autocrypt: addr=pav@iki.fi; prefer-encrypt=mutual;
+ keydata=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
+ bzyGkKh2h8XdrYhtDjw9LmrprPQ==
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.52.1 (3.52.1-1.fc40) 
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <1715866294-1549-1-git-send-email-quic_zijuhu@quicinc.com> <f343ecae-efee-4bdc-ac38-89b614e081b5@163.com>
-In-Reply-To: <f343ecae-efee-4bdc-ac38-89b614e081b5@163.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Thu, 16 May 2024 11:55:42 -0400
-Message-ID: <CABBYNZ+nLgozYxL=znsXrg0qoz-ENgSBwcPzY-KrBnVJJut8Kw@mail.gmail.com>
-Subject: Re: [PATCH v2] Bluetooth: qca: Fix BT enable failure again for
- QCA6390 after warm reboot
-To: Lk Sii <lk_sii@163.com>
-Cc: Zijun Hu <quic_zijuhu@quicinc.com>, luiz.von.dentz@intel.com, marcel@holtmann.org, 
-	linux-bluetooth@vger.kernel.org, wt@penguintechs.org, 
-	regressions@lists.linux.dev, pmenzel@molgen.mpg.de, 
-	krzysztof.kozlowski@linaro.org, stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
 Hi,
 
-On Thu, May 16, 2024 at 10:57=E2=80=AFAM Lk Sii <lk_sii@163.com> wrote:
->
->
->
-> On 2024/5/16 21:31, Zijun Hu wrote:
-> > Commit 272970be3dab ("Bluetooth: hci_qca: Fix driver shutdown on closed
-> > serdev") will cause below regression issue:
-> >
-> > BT can't be enabled after below steps:
-> > cold boot -> enable BT -> disable BT -> warm reboot -> BT enable failur=
-e
-> > if property enable-gpios is not configured within DT|ACPI for QCA6390.
-> >
-> > The commit is to fix a use-after-free issue within qca_serdev_shutdown(=
-)
-> > by adding condition to avoid the serdev is flushed or wrote after close=
-d
-> > but also introduces this regression issue regarding above steps since t=
-he
-> > VSC is not sent to reset controller during warm reboot.
-> >
-> > Fixed by sending the VSC to reset controller within qca_serdev_shutdown=
-()
-> > once BT was ever enabled, and the use-after-free issue is also fixed by
-> > this change since the serdev is still opened before it is flushed or wr=
-ote.
-> >
-> > Verified by the reported machine Dell XPS 13 9310 laptop over below two
-> > kernel commits:
-> > commit e00fc2700a3f ("Bluetooth: btusb: Fix triggering coredump
-> > implementation for QCA") of bluetooth-next tree.
-> > commit b23d98d46d28 ("Bluetooth: btusb: Fix triggering coredump
-> > implementation for QCA") of linus mainline tree.
-> >
-> > Fixes: 272970be3dab ("Bluetooth: hci_qca: Fix driver shutdown on closed=
- serdev")
-> > Cc: stable@vger.kernel.org
-> > Reported-by: Wren Turkal <wt@penguintechs.org>
-> > Closes: https://bugzilla.kernel.org/show_bug.cgi?id=3D218726
-> > Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
-> > Tested-by: Wren Turkal <wt@penguintechs.org>
-> > ---
-> > V1 -> V2: Add comments and more commit messages
-> >
-> > V1 discussion link:
-> > https://lore.kernel.org/linux-bluetooth/d553edef-c1a4-4d52-a892-715549d=
-31ebe@163.com/T/#t
-> >
-> >  drivers/bluetooth/hci_qca.c | 18 +++++++++++++++---
-> >  1 file changed, 15 insertions(+), 3 deletions(-)
-> >
-> > diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-> > index 0c9c9ee56592..9a0bc86f9aac 100644
-> > --- a/drivers/bluetooth/hci_qca.c
-> > +++ b/drivers/bluetooth/hci_qca.c
-> > @@ -2450,15 +2450,27 @@ static void qca_serdev_shutdown(struct device *=
-dev)
-> >       struct qca_serdev *qcadev =3D serdev_device_get_drvdata(serdev);
-> >       struct hci_uart *hu =3D &qcadev->serdev_hu;
-> >       struct hci_dev *hdev =3D hu->hdev;
-> > -     struct qca_data *qca =3D hu->priv;
-> >       const u8 ibs_wake_cmd[] =3D { 0xFD };
-> >       const u8 edl_reset_soc_cmd[] =3D { 0x01, 0x00, 0xFC, 0x01, 0x05 }=
-;
-> >
-> >       if (qcadev->btsoc_type =3D=3D QCA_QCA6390) {
-> > -             if (test_bit(QCA_BT_OFF, &qca->flags) ||
-> > -                 !test_bit(HCI_RUNNING, &hdev->flags))
-> > +             /* The purpose of sending the VSC is to reset SOC into a =
-initial
-> > +              * state and the state will ensure next hdev->setup() suc=
-cess.
-> > +              * if HCI_QUIRK_NON_PERSISTENT_SETUP is set, it means tha=
-t
-> > +              * hdev->setup() can do its job regardless of SoC state, =
-so
-> > +              * don't need to send the VSC.
-> > +              * if HCI_SETUP is set, it means that hdev->setup() was n=
-ever
-> > +              * invoked and the SOC is already in the initial state, s=
-o
-> > +              * don't also need to send the VSC.
-> > +              */
-> > +             if (test_bit(HCI_QUIRK_NON_PERSISTENT_SETUP, &hdev->quirk=
-s) ||
-> > +                 hci_dev_test_flag(hdev, HCI_SETUP))
-> >                       return;
-> >
-> > +             /* The serdev must be in open state when conrol logic arr=
-ives
-> > +              * here, so also fix the use-after-free issue caused by t=
-hat
-> > +              * the serdev is flushed or wrote after it is closed.
-> > +              */
-> >               serdev_device_write_flush(serdev);
-> >               ret =3D serdev_device_write_buf(serdev, ibs_wake_cmd,
-> >                                             sizeof(ibs_wake_cmd));
-> i believe Zijun's change is able to fix both below issues and don't
-> introduce new issue.
->
-> regression issue A:  BT enable failure after warm reboot.
-> issue B:  use-after-free issue, namely, kernel crash.
->
->
-> For issue B, i have more findings related to below commits ordered by tim=
-e.
->
-> Commit A: 7e7bbddd029b ("Bluetooth: hci_qca: Fix qca6390 enable failure
-> after warm reboot")
->
-> Commit B: de8892df72be ("Bluetooth: hci_serdev: Close UART port if
-> NON_PERSISTENT_SETUP is set")
-> this commit introduces issue B, it is also not suitable to associate
-> protocol state with state of lower level transport type such as serdev
-> or uart, in my opinion, protocol state should be independent with
-> transport type state, flag HCI_UART_PROTO_READY is for protocol state,
-> it means if protocol hu->proto is initialized and if we can invoke its
-> interfaces.it is common for various kinds of transport types. perhaps,
-> this is the reason why Zijun's change doesn't use flag HCI_UART_PROTO_REA=
-DY.
+to, 2024-05-16 kello 11:13 +0200, Bastien Nocera kirjoitti:
+> I was looking at the code in profiles/audio/avdtp.c surrounding those
+> static analyser warnings, and couldn't understand how the seid arrays
+> were constructed.
+>=20
+> There's similar code in android/ which might also need fixing.
+>=20
+> I could only find the code that assigned ".first_seid", nothing about
+> how the rest of the structure is allocated and assigned.
 
-Don't really follow you here, if HCI_UART_PROTO_READY indicates the
-protocol state they is even _more_ important to use before invoking
-serdev APIs, so checking for the quirk sound like a problem because:
+These structs are from AVDTP spec, see eg. =C2=A78.13 for Start Stream
+Command <-> struct start_req.
 
-[1] hci_uart_close
-     /* When QUIRK HCI_QUIRK_NON_PERSISTENT_SETUP is set by driver,
-     * BT SOC is completely powered OFF during BT OFF, holding port
-     * open may drain the battery.
-     */
-    if (test_bit(HCI_QUIRK_NON_PERSISTENT_SETUP, &hdev->quirks)) {
-        clear_bit(HCI_UART_PROTO_READY, &hu->flags);
-        serdev_device_close(hu->serdev);
-    }
+IIUC, they're actually arrays of struct seid, but the first element is
+defined as a separate field. I guess the static checker chokes on that,
+and not sure right now if this is even strictly allowed in C.
 
-[2] hci_uart_unregister_device
-    if (test_bit(HCI_UART_PROTO_READY, &hu->flags)) {
-        clear_bit(HCI_UART_PROTO_READY, &hu->flags);
-        serdev_device_close(hu->serdev);
-    }
+The structures are allocated in send_request() for the outgoing
+messages and the bounds checking is via req->data_size. For incoming
+messages they're raw message data from the remote device.
 
-So only in case 1 checking the quirk is equivalent to
-HCI_UART_PROTO_READY on case 2 it does actually check the quirk and
-will proceed to call serdev_device_close, now perhaps the code is
-assuming that shutdown won't be called after that, but it looks it
-does since:
 
-static void serdev_drv_remove(struct device *dev)
-{
-    const struct serdev_device_driver *sdrv =3D
-to_serdev_device_driver(dev->driver);
-    if (sdrv->remove)
-        sdrv->remove(to_serdev_device(dev));
-
-    dev_pm_domain_detach(dev, true);
-}
-
-dev_pm_domain_detach says it will power off so I assume that means
-that shutdown will be called _after_ remove, so not I'm not really
-convinced that we can avoid using HCI_UART_PROTO_READY, in fact the
-following sequence might always be triggering:
-
-serdev_drv_remove -> qca_serdev_remove -> hci_uart_unregister_device
--> serdev_device_close -> qca_close -> kfree(qca)
-dev_pm_domain_detach -> ??? -> qca_serdev_shutdown
-
-If this sequence is correct then qca_serdev_shutdown accessing
-qca_data will always result in a UAF problem.
-
-> Commit C: 272970be3dab ("Bluetooth: hci_qca: Fix driver shutdown on
-> closed serdev")
-> this commit is to fix issue B which is actually caused by Commit B, but
-> it has Fixes tag for Commit A. and it also introduces the regression
-> issue A.
->
-
+> Cheers
+>=20
+> PS: Please CC: on the answer, as I'm not subscribed to the list
+>=20
+> Error: ARRAY_VS_SINGLETON (CWE-119): [#def29] [important]
+> bluez-5.75/profiles/audio/avdtp.c:1675:2: address_of: Taking address with=
+ "&start->first_seid" yields a singleton pointer.
+> bluez-5.75/profiles/audio/avdtp.c:1675:2: assign: Assigning: "seid" =3D "=
+&start->first_seid".
+> bluez-5.75/profiles/audio/avdtp.c:1679:25: ptr_arith: Using "seid" as an =
+array.  This might corrupt or misinterpret adjacent memory locations.
+> # 1677|   	int i;
+> # 1678|  =20
+> # 1679|-> 	for (i =3D 0; i < count; i++, seid++) {
+> # 1680|   		if (seid->seid =3D=3D id) {
+> # 1681|   			req->collided =3D TRUE;
+>=20
+> Error: ARRAY_VS_SINGLETON (CWE-119): [#def30] [important]
+> bluez-5.75/profiles/audio/avdtp.c:1690:2: address_of: Taking address with=
+ "&suspend->first_seid" yields a singleton pointer.
+> bluez-5.75/profiles/audio/avdtp.c:1690:2: assign: Assigning: "seid" =3D "=
+&suspend->first_seid".
+> bluez-5.75/profiles/audio/avdtp.c:1694:25: ptr_arith: Using "seid" as an =
+array.  This might corrupt or misinterpret adjacent memory locations.
+> # 1692|   	int i;
+> # 1693|  =20
+> # 1694|-> 	for (i =3D 0; i < count; i++, seid++) {
+> # 1695|   		if (seid->seid =3D=3D id) {
+> # 1696|   			req->collided =3D TRUE;
+>=20
+> Error: ARRAY_VS_SINGLETON (CWE-119): [#def31] [important]
+> bluez-5.75/profiles/audio/avdtp.c:1799:2: address_of: Taking address with=
+ "&req->first_seid" yields a singleton pointer.
+> bluez-5.75/profiles/audio/avdtp.c:1799:2: assign: Assigning: "seid" =3D "=
+&req->first_seid".
+> bluez-5.75/profiles/audio/avdtp.c:1801:30: ptr_arith: Using "seid" as an =
+array.  This might corrupt or misinterpret adjacent memory locations.
+> # 1799|   	seid =3D &req->first_seid;
+> # 1800|  =20
+> # 1801|-> 	for (i =3D 0; i < seid_count; i++, seid++) {
+> # 1802|   		failed_seid =3D seid->seid;
+> # 1803|  =20
+>=20
+> Error: ARRAY_VS_SINGLETON (CWE-119): [#def32] [important]
+> bluez-5.75/profiles/audio/avdtp.c:1912:2: address_of: Taking address with=
+ "&req->first_seid" yields a singleton pointer.
+> bluez-5.75/profiles/audio/avdtp.c:1912:2: assign: Assigning: "seid" =3D "=
+&req->first_seid".
+> bluez-5.75/profiles/audio/avdtp.c:1914:30: ptr_arith: Using "seid" as an =
+array.  This might corrupt or misinterpret adjacent memory locations.
+> # 1912|   	seid =3D &req->first_seid;
+> # 1913|  =20
+> # 1914|-> 	for (i =3D 0; i < seid_count; i++, seid++) {
+> # 1915|   		failed_seid =3D seid->seid;
+> # 1916|  =20
 
 --=20
-Luiz Augusto von Dentz
+Pauli Virtanen
