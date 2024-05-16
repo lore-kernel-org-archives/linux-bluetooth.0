@@ -1,90 +1,128 @@
-Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6F28156F4A
-	for <linux-bluetooth@vger.kernel.org>; Thu, 16 May 2024 19:38:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11A7BD271
+	for <linux-bluetooth@vger.kernel.org>; Thu, 16 May 2024 19:43:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715888336; cv=none; b=STrBPK8ErrwzYWLA1ZsD2zw68SMx2UkzfeH32FAgXcZuei6ywmH73rNLM9y5+vUQ/uOwxsSKxAFk5F3VSvNaxBQTWH3WJJBpqw/lpjloVzKxuTaInnV3BulmtC/Htes4f/5rFQSrpeiQtPmD0snFchhLAK2Oti7hHgsnvVW5Nko=
+	t=1715888637; cv=none; b=lMccsE8xEj6UWI/zSmlpfk0CvAoUSPw5fwfIjUeij/LOvaVvRb8aRHaf/jEebm2rHQp3b/Rcqqi/9GNWe/AuzWAN5ame80qVS0t+qxXT4NHsge+66mrNH7aoCcCrv4lb0uIJm8EFweYHdIYPVgVfJIGCE+f1EtzTab3ARaPHZ/0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715888336; c=relaxed/simple;
-	bh=ZguKYdN/iMozp/GB5Cfsl1QrHZ1Hztu1zg1nE3FZ4/Y=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ZwT/6ebhL5RpKVrvI4+j6ZNA+liycdT+E2I8QdnturretWXvl34H9pGNcnL1oBExn/FmqDp61EZwvdYv5WQsqkCv9fUWS3j0GA7xFW/3r1GqmW6Tr3ghPJa8MsuZWFQ1hlC6ElJ0doJjsiqI8SBFHc5Vjk5eCXjFt3cbzMgvZm0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=asymptotic.io; spf=pass smtp.mailfrom=asymptotic.io; dkim=pass (2048-bit key) header.d=asymptotic.io header.i=@asymptotic.io header.b=Mu9F9nO7; arc=none smtp.client-ip=209.85.218.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=asymptotic.io
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=asymptotic.io
+	s=arc-20240116; t=1715888637; c=relaxed/simple;
+	bh=LTfmtFCBmSRqcn56AbASH2+mF4i4przll0JQpuKsY54=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=BJjTatAD08PxeD99ZVs/5O8g+rQqhN+hSy2s6Pibq2pVn4g/pvyhagfXnw33kBc1kfJ8Q5Au63lGszEQx2E2b3mDRXderEZXCwgGYWabn/LQHZ1TN6/IQucKcd9bXT60OQGtJC/T02DbDyEbDxoZjMLGaN0oUAr/BHuz8jb5qTw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=XvCjf065; arc=none smtp.client-ip=198.175.65.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=asymptotic.io header.i=@asymptotic.io header.b="Mu9F9nO7"
-Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-a59b49162aeso344626366b.3
-        for <linux-bluetooth@vger.kernel.org>; Thu, 16 May 2024 12:38:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=asymptotic.io; s=google; t=1715888333; x=1716493133; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=AjCipZTmzBvwWD52PMAXup3LXscw2Ozf5wMm+FDuE+g=;
-        b=Mu9F9nO72l7SFt/qLd31rE+q8Ct2h6hIqutVyxITfed/LvWNXzVU/iXOTbLgZ2Zbgm
-         h+t3eUKC2altP2xQM8DfzxRYUozgYLBElkknhWJbJtHjlQwMML2/ovhR9kx2sjzyL9yB
-         FpPhgttKiT8rSVwQ2BF+pH1ZvRIYfyxFux7qaonJaTTu0wSGCQ7d02J/5I2cjJH7Cx42
-         03LOwPORtxnTZr5hduG+Jyyw/C/tf3OZM9jlgKtiA12uJ9+hTsVj24qFZP8K0fpftyTY
-         XD36/7segZ8baREIRayhHfDgv4we8mbRinoLVlEFMlF7BKO2kYYmOPwAvKZ0HMkLhBU7
-         F0KA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715888333; x=1716493133;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=AjCipZTmzBvwWD52PMAXup3LXscw2Ozf5wMm+FDuE+g=;
-        b=wt3sIsS8Fq8lro4ftH3lWGhYHa1p4UntJof0uXyQjfcztlwhSMa2keBvN0C8JmC2wL
-         SjRpFiu0rwZReDO9oAe4ZzNar/iP/GMHNO3mlgY3iWEW6xisv/wJqmrYX7W0XB4VGBfo
-         1iWUan4J3tlZdmMToalb5KnTNHqGmYJgHJ3uCyBkF/3ZrHoMCtj3qRhIkr1JCEVPYcHq
-         o6D2AzezaME11aayGcgu2khhbh9Tep93LtpIUXkA6oy9W0F7zin3UQ7l3H0ct5jXj3qo
-         FaRe54S2dVDdSSFYeE0YIb9PkU1p4EAaxOLNIG4mEgOHZzizscwjNBaBeA4muGWOzhbq
-         eAbg==
-X-Gm-Message-State: AOJu0YyG9O9qUipvRzTwv9KF1u2xWgEho051XngMOVQfUlGA501EFhhF
-	72PosGkge6duVXXmvEWB2KWxdct7djU8tX4IqYC7f06MKiRIkCSJwDdyiX7o0j/cx6Gz4e7rLTT
-	8ppQ=
-X-Google-Smtp-Source: AGHT+IGv00A6l1OMuMJBgf5gBcfYtDjOw0Nw4w5g1xxr7eOZG3AS8KUbDzDQu2M7RYplJhiQIoH9+Q==
-X-Received: by 2002:a17:907:3f28:b0:a59:bd78:34ca with SMTP id a640c23a62f3a-a5a2d5c89f3mr1585431566b.36.1715888332914;
-        Thu, 16 May 2024 12:38:52 -0700 (PDT)
-Received: from andromeda.lan (bras-base-toroon0359w-grc-19-74-15-47-99.dsl.bell.ca. [74.15.47.99])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a5a1781cd85sm1031241766b.15.2024.05.16.12.38.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 16 May 2024 12:38:52 -0700 (PDT)
-From: Arun Raghavan <arun@asymptotic.io>
-To: linux-bluetooth@vger.kernel.org
-Cc: Arun Raghavan <arun@asymptotic.io>
-Subject: [PATCH BlueZ,v6 5/5] gitignore: Add __pycache__
-Date: Thu, 16 May 2024 15:38:36 -0400
-Message-ID: <20240516193836.228281-6-arun@asymptotic.io>
-X-Mailer: git-send-email 2.45.0
-In-Reply-To: <20240516193836.228281-1-arun@asymptotic.io>
-References: <20240516193836.228281-1-arun@asymptotic.io>
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="XvCjf065"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1715888635; x=1747424635;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=LTfmtFCBmSRqcn56AbASH2+mF4i4przll0JQpuKsY54=;
+  b=XvCjf065y3dKEQfxv68JydALIs9wxOQjRqNxf31H2cmGz/DgomziOBLz
+   804CxA49V8pgKcx3Bge60Sunw5BCdHCl2gD41eqHbR/rQKpxJFegFhQ8L
+   F/aZf2nBSEw1YpyId+7Lg6vh1dD8yg/uCYSX9E115qdXF4RmPK6O/zrc5
+   NrTh9ouXeA408u6wmALSe2pT73Tj8db+jLHDIjFIJdYLj7DG6YAxK2VFo
+   viTxCYEOG27DNc857/pAGB34CrFmHD0hu8TDWw0J7iqeZkvkzxvPF0x5s
+   WfvulRpG0V+CicnWlTsaFpk6ndbOWL3ISZpjrt4P1FTYlvNzIeYmzHpW1
+   w==;
+X-CSE-ConnectionGUID: ht0+h4qfSm68VD5Y+Z935w==
+X-CSE-MsgGUID: X7wYKK9gSMyZsvP4vSiqFw==
+X-IronPort-AV: E=McAfee;i="6600,9927,11074"; a="15858935"
+X-IronPort-AV: E=Sophos;i="6.08,165,1712646000"; 
+   d="scan'208";a="15858935"
+Received: from orviesa002.jf.intel.com ([10.64.159.142])
+  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 May 2024 12:43:55 -0700
+X-CSE-ConnectionGUID: N8RlK2NwQdSvKxX9nTJQQw==
+X-CSE-MsgGUID: fZ8FPP/gTx6K77oLl2ghIg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.08,165,1712646000"; 
+   d="scan'208";a="62369706"
+Received: from lkp-server01.sh.intel.com (HELO f8b243fe6e68) ([10.239.97.150])
+  by orviesa002.jf.intel.com with ESMTP; 16 May 2024 12:43:53 -0700
+Received: from kbuild by f8b243fe6e68 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1s7h14-000Ei5-2B;
+	Thu, 16 May 2024 19:43:50 +0000
+Date: Fri, 17 May 2024 03:43:10 +0800
+From: kernel test robot <lkp@intel.com>
+To: Nobuaki.Tsunashima@infineon.com, marcel@holtmann.org,
+	luiz.dentz@gmail.com
+Cc: oe-kbuild-all@lists.linux.dev, linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: Patch for CYW4373 hci up fail issue
+Message-ID: <202405170330.QEHgPNm1-lkp@intel.com>
+References: <6267800d70ae4344acaba3486b54bc0c@infineon.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <6267800d70ae4344acaba3486b54bc0c@infineon.com>
 
-These directories are created when running scripts in test/ in-tree, and
-can safely be ignored.
----
- .gitignore | 2 ++
- 1 file changed, 2 insertions(+)
+Hi,
 
-diff --git a/.gitignore b/.gitignore
-index 6a6422379..041a707af 100644
---- a/.gitignore
-+++ b/.gitignore
-@@ -187,3 +187,5 @@ compile_commands.json
- cscope.in.out
- cscope.out
- cscope.po.out
-+
-+**/__pycache__
+kernel test robot noticed the following build warnings:
+
+[auto build test WARNING on bluetooth/master]
+[also build test WARNING on bluetooth-next/master linus/master v6.9 next-20240516]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Nobuaki-Tsunashima-infineon-com/Bluetooth-Patch-for-CYW4373-hci-up-fail-issue/20240516-131000
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git master
+patch link:    https://lore.kernel.org/r/6267800d70ae4344acaba3486b54bc0c%40infineon.com
+patch subject: [PATCH] Bluetooth: Patch for CYW4373 hci up fail issue
+config: arm-pxa_defconfig (https://download.01.org/0day-ci/archive/20240517/202405170330.QEHgPNm1-lkp@intel.com/config)
+compiler: arm-linux-gnueabi-gcc (GCC) 13.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240517/202405170330.QEHgPNm1-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202405170330.QEHgPNm1-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+   drivers/bluetooth/btbcm.c: In function 'btbcm_is_disable_broken_read_tx_power_by_chip_ver':
+>> drivers/bluetooth/btbcm.c:453:48: warning: initialization discards 'const' qualifier from pointer target type [-Wdiscarded-qualifiers]
+     453 |         struct bcm_chip_version_table *entry = &disable_broken_read_transmit_power_by_chip_ver[0];
+         |                                                ^
+
+
+vim +/const +453 drivers/bluetooth/btbcm.c
+
+   440	
+   441	struct bcm_chip_version_table {
+   442		u8	chip_id;
+   443		u16 baseline;
+   444	};
+   445	#define BCM_ROMFW_BASELINE_NUM	0xFFFF
+   446	static const struct bcm_chip_version_table disable_broken_read_transmit_power_by_chip_ver[] = {
+   447		{0x87, BCM_ROMFW_BASELINE_NUM}		/* CYW4373/4373E */
+   448	};
+   449	static bool btbcm_is_disable_broken_read_tx_power_by_chip_ver(u8 chip_id, u16 baseline)
+   450	{
+   451		int i;
+   452		int table_size = sizeof(disable_broken_read_transmit_power_by_chip_ver)/sizeof(disable_broken_read_transmit_power_by_chip_ver[0]);
+ > 453		struct bcm_chip_version_table *entry = &disable_broken_read_transmit_power_by_chip_ver[0];
+   454	
+   455		for( i=0 ; i<table_size ; i++, entry++)
+   456		{
+   457			if( (chip_id == entry->chip_id) && (baseline == entry->baseline) )
+   458				return true;
+   459		}
+   460	
+   461		return false;
+   462	}
+   463	
+
 -- 
-2.45.0
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
