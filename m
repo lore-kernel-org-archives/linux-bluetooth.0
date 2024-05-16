@@ -1,118 +1,145 @@
-Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-21.smtp.github.com (out-21.smtp.github.com [192.30.252.204])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7191D4A2C
-	for <linux-bluetooth@vger.kernel.org>; Thu, 16 May 2024 16:53:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F27B1429E
+	for <linux-bluetooth@vger.kernel.org>; Thu, 16 May 2024 17:36:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.204
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715878411; cv=none; b=rgdjlDv92SutyVQlEEvLfkiUe8Q7TNgQgk/xZTRl8x4wzu1rYFWDXhQldQtkMzQfUqiQZ7WtdTvxEqHWiiVk8VDub9N4eOJ0WGeUlZhvvYqStBtvs7bSjmZJkRzACPdt/1Oq9oGiykmHFvsB/ABlVzdoT/qpLBaVnL9RiYjR+9c=
+	t=1715881019; cv=none; b=Qz5mWCdgBfsy8kOpX+Sc/KqJlou5IUS+dh++tcFCVC+043l5T/zy3X5QLnJQ0TQnVORJS4F9tdX/GEZThivSwMnGB1VWlfHoyQzkoj9GiioKpFwDUh4YARQjOkHsgAMMEpe+rJosyukpS1aNdSbw5YKxGB5PQNuIABq2jzChku8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715878411; c=relaxed/simple;
-	bh=IQ8lRBjDRqaeUTlXAdF5vlkC7XW8WhL63+MgxwZzMDs=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=Xb86pc4dnooKbNldKh0ch31p+vfExcQKpJTC9LFp/u1G3pwhbb7mZYOaY3cRc6WiI+NxXf1ro7mjgMHf6gFQIsCllHPSQNQwXa62be2uHFEkENBIWtAO5l5ttrK1lX+zw2/BNJqKFhrpflwSQR6w2BcJnN357vXQFwic2j3NBvI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Xy5jJXuW; arc=none smtp.client-ip=209.85.210.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1715881019; c=relaxed/simple;
+	bh=U2tfma21NQYU0YkgPxX3uBmxa2ciRr86OTVug4ttwEQ=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=q6cLF830nUoLJ6RLIWoU8AvE8M114vbLPAJmVU2TO5Rya5pDnsmblgvdYXV68XTYChzktX2Lv947p7QXFITrxGCar2rFJcMLeQCVE1BTHxQtPPiy+4u6xmbOaV4ZQBiKNGLH0GuOpkL9AAjRwVywBFHtD7LqHCKYi6boMzBKmlM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=FLstRjk6; arc=none smtp.client-ip=192.30.252.204
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Xy5jJXuW"
-Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-6f45f1179c3so391695b3a.3
-        for <linux-bluetooth@vger.kernel.org>; Thu, 16 May 2024 09:53:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1715878409; x=1716483209; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=XlFa81AWuYkukimynNYYVSMF3bi6PLOuCkQGVwNLbnY=;
-        b=Xy5jJXuWaip9Wppr8gKhpCJ/t8hzzeTmUHGcqfBqU6uGURqz8GlTe+paMgWvm/e5Hr
-         CFyvoDwKtqwpDhGuLr3B6mE3R2Bms7IQY1yxyr45e7dSW7kFktWpFdvpdZsZkH7REEXj
-         k89+eLS8Qo1LvhQoxloXJ+2ZOfcOyHqJB6Pp/8Ql+abrECAom0FEi1x477AgyXAj2JzO
-         bAVPwLIBgofRoYAab30BHlbMO21ZkTMA3SpSDsriuDh0oW7mhs9mp0fFS3lIBMzq3cTF
-         aiQ/HjE+wDvx/KO/xtldvyE7cIU68IqwVvE6cs4KF8rC8je0IMmqziZw8Q6DXmzucEXG
-         iPuQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715878409; x=1716483209;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=XlFa81AWuYkukimynNYYVSMF3bi6PLOuCkQGVwNLbnY=;
-        b=TXNNUgK+gI3v6A89/nIz51XihkODkgSdvn8nJc/LJBMOjJwrbxS0lSM+iiArtWen1t
-         Fq8UwEKJg0oay30CDUO6l6/X8ht7lbP3YSTln0hzH2Axvqs5Vhzl+uq2YbOZ7cPQ2kWh
-         KnTt+vybA8korgtH20kv0B2cV+IaAgF6uzF0PM8M067kTEwsWfKipgh8cPej1Kym/XPB
-         E1COvIZA4g00G76D5Gn9yzlwL2h+vHOkGcdz5xQ0guhAjkDxPeQGDnu/fKtKfpw+KSHP
-         WubqtSq2I89Yg/7YjuqE+JnuqdvM8Hcf+M+qsPnKEtftyVc59aKA5DrYhAKdIc2Epc9V
-         7OTA==
-X-Gm-Message-State: AOJu0YxAhJPxpwvDtfNNaj95qNFO5BjdHmPaastrjc2qxwZKxoeSdL2a
-	6a2LIWfTLrTR/uJwSrL7ZiO8+JPwjD5Z5Pl6GiK7VwQFN2vq6KKXF5dsDQ==
-X-Google-Smtp-Source: AGHT+IFDHosFEmI2RgfUq66NMp+81NmUyi2go5nVUP8TrjXheGYhDysIrtZltNuMvVx5ufeTt1XJYQ==
-X-Received: by 2002:a05:6a00:4645:b0:6ec:d76b:6fac with SMTP id d2e1a72fcca58-6f4e02ad046mr19235344b3a.12.1715878409411;
-        Thu, 16 May 2024 09:53:29 -0700 (PDT)
-Received: from [172.17.0.2] ([20.253.152.177])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-6f4d2b300d9sm13274384b3a.215.2024.05.16.09.53.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 16 May 2024 09:53:28 -0700 (PDT)
-Message-ID: <66463a08.a70a0220.d9494.2633@mx.google.com>
-Date: Thu, 16 May 2024 09:53:28 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============5008004878417671003=="
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="FLstRjk6"
+Received: from github.com (hubbernetes-node-957705c.ac4-iad.github.net [10.52.160.14])
+	by smtp.github.com (Postfix) with ESMTPA id AADE1700860
+	for <linux-bluetooth@vger.kernel.org>; Thu, 16 May 2024 10:36:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1715881017;
+	bh=Pj+TW2s47PGeDJQRcaw+dQ3/ngi2yZNd8YhXUnym5SY=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=FLstRjk6T2jWWRKbsQ52sGVXeq1NFQDJeXMLGEb6G3/UkUwUkJHyIKAhDUxakn5jx
+	 nm8Ug1xRmGTI+3yIfrY4fbjAGtizt2vKt/WEVI0QduBWQYPypDxkV7hf9iKNyeR1EY
+	 rOfr/3AEMjlvwDp2T6RZYHJlgCKZWrwUq83PqX/U=
+Date: Thu, 16 May 2024 10:36:57 -0700
+From: Andrei Istodorescu <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/master/d9de30-745f32@github.com>
+Subject: [bluez/bluez] 98818d: shared/bap: Update stream management to avoid
+ PACs
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, andrei.istodorescu@nxp.com
-Subject: RE: Create transports for matching BISes
-In-Reply-To: <20240516130400.16713-2-andrei.istodorescu@nxp.com>
-References: <20240516130400.16713-2-andrei.istodorescu@nxp.com>
-Reply-To: linux-bluetooth@vger.kernel.org
-
---===============5008004878417671003==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
 Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-This is automated email and please do not reply to this email!
+  Branch: refs/heads/master
+  Home:   https://github.com/bluez/bluez
+  Commit: 98818da25b2329dd0ff82009c167724df19db880
+      https://github.com/bluez/bluez/commit/98818da25b2329dd0ff82009c167724df19db880
+  Author: Andrei Istodorescu <andrei.istodorescu@nxp.com>
+  Date:   2024-05-16 (Thu, 16 May 2024)
 
-Dear submitter,
+  Changed paths:
+    M src/shared/bap.c
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=853706
+  Log Message:
+  -----------
+  shared/bap: Update stream management to avoid PACs
 
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      2.04 seconds
-GitLint                       FAIL      1.62 seconds
-BuildEll                      PASS      24.38 seconds
-BluezMake                     PASS      1644.91 seconds
-MakeCheck                     PASS      12.80 seconds
-MakeDistcheck                 PASS      176.03 seconds
-CheckValgrind                 PASS      246.87 seconds
-CheckSmatch                   WARNING   350.27 seconds
-bluezmakeextell               PASS      118.84 seconds
-IncrementalBuild              PASS      9437.52 seconds
-ScanBuild                     PASS      985.68 seconds
-
-Details
-##############################
-Test: GitLint - FAIL
-Desc: Run gitlint
-Output:
-[BlueZ,v5,6/6] shared/bap: Add stream ops for get_location, get_dir and get_state
-
-WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
-1: T1 Title exceeds max length (81>80): "[BlueZ,v5,6/6] shared/bap: Add stream ops for get_location, get_dir and get_state"
-##############################
-Test: CheckSmatch - WARNING
-Desc: Run smatch tool with source
-Output:
-src/shared/bap.c:285:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structuressrc/shared/bap.c:285:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structuressrc/shared/bap.c:285:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structuressrc/shared/bap.c:285:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structuressrc/shared/bap.c:285:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structuressrc/shared/bap.c:285:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structuressrc/shared/bap.c:285:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structuressrc/shared/bap.c:285:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structuressrc/shared/bap.c:285:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structuressrc/shared/bap.c:285:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structuressrc/shared/bap.c:285:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structuressrc/shared/bap.c:285:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structuressrc/shared/bap.c:285:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structuressrc/shared/bap.c:285:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structuressrc/shared/bap.c:285:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structures
+Remove PAC logic for BAP Broadcast Sink stream creation.
 
 
----
-Regards,
-Linux Bluetooth
+  Commit: db8c96059c02fefd232d49dcbeb16d6b22481100
+      https://github.com/bluez/bluez/commit/db8c96059c02fefd232d49dcbeb16d6b22481100
+  Author: Andrei Istodorescu <andrei.istodorescu@nxp.com>
+  Date:   2024-05-16 (Thu, 16 May 2024)
+
+  Changed paths:
+    M src/shared/bap.c
+    M src/shared/bap.h
+
+  Log Message:
+  -----------
+  shared/bap: Add function to check the validity of a BIS
+
+Add utilitary function to check if the information from a BIS is matching
+the capabilities in bt_bap. This utilitary is used when parsing the BASE
+data so that we can decide if we create a new setup/stream/transport for
+it, or advance to the next BIS.
 
 
---===============5008004878417671003==--
+  Commit: 32d147959b8e7de3fd3d4dc7d208b25f0f2d652e
+      https://github.com/bluez/bluez/commit/32d147959b8e7de3fd3d4dc7d208b25f0f2d652e
+  Author: Andrei Istodorescu <andrei.istodorescu@nxp.com>
+  Date:   2024-05-16 (Thu, 16 May 2024)
+
+  Changed paths:
+    M profiles/audio/bap.c
+
+  Log Message:
+  -----------
+  bap: Update BIS management
+
+Use the BIS index received in the BASE to synchronize to the BIG.
+Allow bt_bap_endpoint to be NULL.
+Remove the Broadcast Sink code from set_configuration.
+Update BASE parsing so that it creates streams and transports, without a
+remote PAC and endpoint.
+Update bap_find_setup_by_stream to find the setup in case the stream does
+not contain an endpoint.
+
+
+  Commit: 7aecf3bbcdb2257661116758154d827e5d15eb24
+      https://github.com/bluez/bluez/commit/7aecf3bbcdb2257661116758154d827e5d15eb24
+  Author: Andrei Istodorescu <andrei.istodorescu@nxp.com>
+  Date:   2024-05-16 (Thu, 16 May 2024)
+
+  Changed paths:
+    M src/shared/bap.c
+    M src/shared/bap.h
+
+  Log Message:
+  -----------
+  shared/bap: Remove not needed function
+
+
+  Commit: 7b1e0e503cb8a4e555496a542c06c318e112bd48
+      https://github.com/bluez/bluez/commit/7b1e0e503cb8a4e555496a542c06c318e112bd48
+  Author: Andrei Istodorescu <andrei.istodorescu@nxp.com>
+  Date:   2024-05-16 (Thu, 16 May 2024)
+
+  Changed paths:
+    M src/shared/bap.c
+
+  Log Message:
+  -----------
+  shared/bap: Return the local PAC when matching a BIS
+
+
+  Commit: 745f324de5898bb63878356bd6639ae6b7e2c3fe
+      https://github.com/bluez/bluez/commit/745f324de5898bb63878356bd6639ae6b7e2c3fe
+  Author: Andrei Istodorescu <andrei.istodorescu@nxp.com>
+  Date:   2024-05-16 (Thu, 16 May 2024)
+
+  Changed paths:
+    M src/shared/bap.c
+
+  Log Message:
+  -----------
+  shared/bap: Add stream ops for get_location, get_dir and get_state
+
+
+Compare: https://github.com/bluez/bluez/compare/d9de306a28fe...745f324de589
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
