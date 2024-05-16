@@ -1,105 +1,129 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34D7822092
-	for <linux-bluetooth@vger.kernel.org>; Thu, 16 May 2024 20:50:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4231B1514D6
+	for <linux-bluetooth@vger.kernel.org>; Thu, 16 May 2024 20:58:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715892634; cv=none; b=Rv037pJMXN/biHR9iakXglCxMHoqCSK9HMgw1rU09UJMojk1Td8dy1tMnn3jclGwWpt6+f8ScYwRwGbGFuyQImA6sMyXN3m/2S2VmKz11Gabqk9oUhM1CI93c+t5yPjRVCSAfi7UkVz2MuiVgB9S9x1hGF+MLG0sq6rGjpGPvcA=
+	t=1715893092; cv=none; b=Hlbohi7T+sKljO50kjiit5Ga7tYnWz962eDAUgqzHahkr+xf/fN/6Zop4j4KbzQO40M0AlLRSTEE9zgzILucOYTpRrko7ROhMAM6qseXN2xKfrhOiWXinycsp8l59kTiPcSTxNdHD0uPzvgGh0ctxYex3TgcWT/tDpy7GWt6FNE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715892634; c=relaxed/simple;
-	bh=JJdOe+UqqY5i5nGSpE4bBZ5UqPOLoecQQcxEQwqDmTk=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=R283MwFVLPHXjcAbmNSB4u4syuhhR+cU2GC3z7oFKcyL8W9hIsgEvava0QTf9PPnoxzsKOt9Pc6QkAEI6Waa99UPLEVUTWdxfZplb7ewz6SVdp82Xlhzvdou8GvbzCvRfJuTDK3Gjs1W8ihGPrXFgqtqbsRMEXkkz6FRtYknO2Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VPwd1Hz6; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1715893092; c=relaxed/simple;
+	bh=ctWB/dFDLpYDVoZ2Jy6AFmL4gx6JFcg93o7Aw7dtoqs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=I6OzaSCPwIwy8WQWk6TQQ/498w6wUrInNDPCf7xZLKyKEPwZC3NxD0cuEy8NxS1YJE/RRuDjAi61slIfvy2m9LL1uXPGq80m/4+t9oPh1LHDqI1bITsw5fnLDb9q26IiJAmxhP+DncU38F+pCsvjtV3ZkqXY6HOhLqlCUnUR3CU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Xrap/Q+u; arc=none smtp.client-ip=198.175.65.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VPwd1Hz6"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id DC396C32782;
-	Thu, 16 May 2024 20:50:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1715892633;
-	bh=JJdOe+UqqY5i5nGSpE4bBZ5UqPOLoecQQcxEQwqDmTk=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=VPwd1Hz6Fsk7VZhRDnYNe9JpMKZHG4WQWE/qQLZQC0o4wcsOz3RdXKZ4Sk1CkuoV4
-	 Y0B03cPn06fd5M9F4dXENHCRstjdF+DnGTUTjMz687tGUwhNqk9hUo0IthoRjL5IyO
-	 SL4Hd1UHeqdYEfZ1xF0p7+K3eSXvlz/di7CBMK3/RrhZZiyN4Jcs4hQQqQ1Ozz62rm
-	 lDQBkpfz4BaFqMSDJGQoFsy06isMYqWPX9zOUdjqD/fwqMbDIxWooJhTrIr8omlXOR
-	 7z6rXyPP4+/jVf1tN4Totsear/oaljlZg3SQdAMjyQAr6P9yBuPjXxu6bt1Hez4tIT
-	 bBmC1e46e3lgg==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id C9F94C54BB6;
-	Thu, 16 May 2024 20:50:33 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Xrap/Q+u"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1715893091; x=1747429091;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=ctWB/dFDLpYDVoZ2Jy6AFmL4gx6JFcg93o7Aw7dtoqs=;
+  b=Xrap/Q+uk5wJbJG7jTD/9KvahnsGhgzBANwZUedqZtHRLIpKb9asOke6
+   6WwBRO8xDIo0FVlMqXHPRZHmimqNuNBCH86J1SG1dpO+d3RRqMRuAfKAA
+   NOg4nqRdjOC4xWauBg3wNinQX2VY0TtHoIzk4J2hXjhQHtyl88lsEAtfE
+   7EvuKTlVcuCb+JYHCcrzGfqT9WCXhem3sCleeFeMceBckW6D7Mvo6UUvu
+   uhTp+EvL65rN4xO9Y9dykccGkeIg6k7nwd1luzn2gq6l4QYnD8Kzl/JlJ
+   a449mbz/Svy2XZCogQu5XB9EtiJP2MzfhpqXMyWy4gM9mG35yi6/j+9b6
+   w==;
+X-CSE-ConnectionGUID: Aj+SwSA/To28mVBcF3hc1g==
+X-CSE-MsgGUID: XcB1mFkkQA6gL+8gpliUMQ==
+X-IronPort-AV: E=McAfee;i="6600,9927,11074"; a="11890976"
+X-IronPort-AV: E=Sophos;i="6.08,165,1712646000"; 
+   d="scan'208";a="11890976"
+Received: from orviesa009.jf.intel.com ([10.64.159.149])
+  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 May 2024 13:58:11 -0700
+X-CSE-ConnectionGUID: GdxwgKv7RJ2AMMyvEVt5dQ==
+X-CSE-MsgGUID: 6KluEpYARt+n2hgkZHdDqQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.08,165,1712646000"; 
+   d="scan'208";a="31687972"
+Received: from lkp-server01.sh.intel.com (HELO f8b243fe6e68) ([10.239.97.150])
+  by orviesa009.jf.intel.com with ESMTP; 16 May 2024 13:58:09 -0700
+Received: from kbuild by f8b243fe6e68 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1s7iAw-000Emn-26;
+	Thu, 16 May 2024 20:58:06 +0000
+Date: Fri, 17 May 2024 04:57:55 +0800
+From: kernel test robot <lkp@intel.com>
+To: Nobuaki.Tsunashima@infineon.com, marcel@holtmann.org,
+	luiz.dentz@gmail.com
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: Patch for CYW4373 hci up fail issue
+Message-ID: <202405170433.qYUNBTtS-lkp@intel.com>
+References: <6267800d70ae4344acaba3486b54bc0c@infineon.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [BlueZ 00/15] Fix a number of static analysis issues #2
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <171589263382.16065.450653433983934585.git-patchwork-notify@kernel.org>
-Date: Thu, 16 May 2024 20:50:33 +0000
-References: <20240516090340.61417-1-hadess@hadess.net>
-In-Reply-To: <20240516090340.61417-1-hadess@hadess.net>
-To: Bastien Nocera <hadess@hadess.net>
-Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <6267800d70ae4344acaba3486b54bc0c@infineon.com>
 
-Hello:
+Hi,
 
-This series was applied to bluetooth/bluez.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+kernel test robot noticed the following build errors:
 
-On Thu, 16 May 2024 11:03:04 +0200 you wrote:
-> "main: Simplify variable assignment" makes a come back, moving out the
-> single special-case out of the function.
-> 
-> For "shared/gatt-client: Fix uninitialised variable usage", please verify
-> that this default value is correct.
-> 
-> Happy to iterate on any patches you feel are suboptimal. Note that the
-> only patches that received any sort of real-world testing are the one
-> mentioned above and the gdbus one.
-> 
-> [...]
+[auto build test ERROR on bluetooth/master]
+[also build test ERROR on bluetooth-next/master linus/master v6.9 next-20240516]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-Here is the summary with links:
-  - [BlueZ,01/15] main: Simplify variable assignment
-    (no matching commit)
-  - [BlueZ,02/15] shared/ecc: Fix uninitialised variable usage
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=0a1159dc1055
-  - [BlueZ,03/15] shared/gatt-client: Fix uninitialised variable usage
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=75eda690c4af
-  - [BlueZ,04/15] tools/mesh-cfgclient: Fix uninitialised variable usage
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=c63b7b0d732e
-  - [BlueZ,05/15] test-runner: Remove unused envp
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=9f4b2d0287ef
-  - [BlueZ,06/15] test-runner: Fix uninitialised variable usage
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=0640d99ebfae
-  - [BlueZ,07/15] test-runner: Fix uninitialised variable usage
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=9672cf410f8b
-  - [BlueZ,08/15] shared/bap: Fix possible use-after-free
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=52336ad64548
-  - [BlueZ,09/15] isotest: Fix bad free
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=7a6385570494
-  - [BlueZ,10/15] test-runner: Fix fd leak on failure
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=566af9c2f5ef
-  - [BlueZ,11/15] isotest: Fix string size expectations
-    (no matching commit)
-  - [BlueZ,12/15] mgmt-tester: Fix non-nul-terminated string
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=49d06560692f
-  - [BlueZ,13/15] gdbus: Check sprintf retval
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=20a0255b9e5f
-  - [BlueZ,14/15] shared/bap: Fix memory leak in error path
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=377f2ec0721f
-  - [BlueZ,15/15] android/handsfree: Check sprintf retval
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=c9fe888793e5
+url:    https://github.com/intel-lab-lkp/linux/commits/Nobuaki-Tsunashima-infineon-com/Bluetooth-Patch-for-CYW4373-hci-up-fail-issue/20240516-131000
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git master
+patch link:    https://lore.kernel.org/r/6267800d70ae4344acaba3486b54bc0c%40infineon.com
+patch subject: [PATCH] Bluetooth: Patch for CYW4373 hci up fail issue
+config: x86_64-buildonly-randconfig-003-20240517 (https://download.01.org/0day-ci/archive/20240517/202405170433.qYUNBTtS-lkp@intel.com/config)
+compiler: clang version 18.1.5 (https://github.com/llvm/llvm-project 617a15a9eac96088ae5e9134248d8236e34b91b1)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240517/202405170433.qYUNBTtS-lkp@intel.com/reproduce)
 
-You are awesome, thank you!
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202405170433.qYUNBTtS-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+>> drivers/bluetooth/btbcm.c:453:33: error: initializing 'struct bcm_chip_version_table *' with an expression of type 'const struct bcm_chip_version_table *' discards qualifiers [-Werror,-Wincompatible-pointer-types-discards-qualifiers]
+     453 |         struct bcm_chip_version_table *entry = &disable_broken_read_transmit_power_by_chip_ver[0];
+         |                                        ^       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   1 error generated.
+
+
+vim +453 drivers/bluetooth/btbcm.c
+
+   440	
+   441	struct bcm_chip_version_table {
+   442		u8	chip_id;
+   443		u16 baseline;
+   444	};
+   445	#define BCM_ROMFW_BASELINE_NUM	0xFFFF
+   446	static const struct bcm_chip_version_table disable_broken_read_transmit_power_by_chip_ver[] = {
+   447		{0x87, BCM_ROMFW_BASELINE_NUM}		/* CYW4373/4373E */
+   448	};
+   449	static bool btbcm_is_disable_broken_read_tx_power_by_chip_ver(u8 chip_id, u16 baseline)
+   450	{
+   451		int i;
+   452		int table_size = sizeof(disable_broken_read_transmit_power_by_chip_ver)/sizeof(disable_broken_read_transmit_power_by_chip_ver[0]);
+ > 453		struct bcm_chip_version_table *entry = &disable_broken_read_transmit_power_by_chip_ver[0];
+   454	
+   455		for( i=0 ; i<table_size ; i++, entry++)
+   456		{
+   457			if( (chip_id == entry->chip_id) && (baseline == entry->baseline) )
+   458				return true;
+   459		}
+   460	
+   461		return false;
+   462	}
+   463	
+
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
