@@ -1,135 +1,102 @@
-Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
+Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5406156C7C
-	for <linux-bluetooth@vger.kernel.org>; Thu, 16 May 2024 18:28:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62A121E487
+	for <linux-bluetooth@vger.kernel.org>; Thu, 16 May 2024 19:38:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715884098; cv=none; b=YiRnx8ejBkHsF93HyBZOzkJxzcfAJiZsTZf3MdDnGYbkEOIH/n7JN5hAypsLWK2/sAxZ2/o9wAaIuaq9AdeF/1aY6Nau+wyMP1dEfWTt+HsF//hNEn0eqqxZDmuVbV6m0TUoYripp4cGYrGebANfcjFtgI03Y0U3UkavraWHOIM=
+	t=1715888330; cv=none; b=XkGSCqbskuzSxprBQ9eD2dYvjuoZu4qesQOmw7bdHedqMvOcGxhQE3dySVkULorHxTjQjS7yyXR5qfYJE/QazBBhonfxBunhRDsFvur+6is8g5BN5xFFucPyzdE0hO/oSYEKwWnPfNlvVfQLWo+lwXtccQbLz4WPLnZ0kpMpMgQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715884098; c=relaxed/simple;
-	bh=1COew3QEWWCnn2Gct0qqGtiJp06dQPf5aRvQ1KOB0ik=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=Fxx1N1tiwn8J93Mu/iSVpTqcXvohZgOi0+GQWi5uRx659mNUAKhz6LN9W71PdJ7x6MPm+VF02tFHLeRH88KyL/3Gkvf9TLyi1MOwVCdJmqIv4hFTnLa/owGY936uDqCzcCby8WmCZPZPEzGZrW7uAmchw6LmtxDmsxshOoHf9I4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lDV+QTzK; arc=none smtp.client-ip=209.85.210.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1715888330; c=relaxed/simple;
+	bh=cY1zme3OLL5/rgC9qKcd1ZwEYE7vRQhSJdR21l+UhPc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=eSgS3aJzddt95NMMuR8Kwqk8gCy7O/L311GE85QMcKe0Kw0s0q2LO7zLtawhk5gmwtoYlH7HWRU6a7z6Oxx677fwDNmuwssSp4M17N8X5ARvtU0+umi91LAgJJpwRf/euauBqf4esh4IBta6yMsLm/LDDu1M4Ltv6NJ6S2TtlNk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=asymptotic.io; spf=pass smtp.mailfrom=asymptotic.io; dkim=pass (2048-bit key) header.d=asymptotic.io header.i=@asymptotic.io header.b=u3qdHe56; arc=none smtp.client-ip=209.85.208.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=asymptotic.io
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=asymptotic.io
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lDV+QTzK"
-Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-6f4178aec15so512484b3a.0
-        for <linux-bluetooth@vger.kernel.org>; Thu, 16 May 2024 11:28:16 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=asymptotic.io header.i=@asymptotic.io header.b="u3qdHe56"
+Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-572baf393ddso5580882a12.1
+        for <linux-bluetooth@vger.kernel.org>; Thu, 16 May 2024 12:38:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1715884096; x=1716488896; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=FITarwh2+GOhDseQyEOmjRb6Kp2ZPJkmNtFBnmcivF8=;
-        b=lDV+QTzKMsVTa3Yk+X2H/vyaEXuGI9UEd5+KikpRXSf1ox1W0hXXw9WlXPSpIxczzz
-         I2bnttlYMBs5Pk6o6PsQNks+E3xl3epdmVHlyrYFd4vyuXjFJfyDfbgguNKB9zaCMI3w
-         t2teb9hOwQRwvQ1Y89X+Ph34LXmdPi4d85mQK5CiWwbRma0K2jzLE4aW6O+BZXWPrldw
-         v+XEx6fB6iZsk+dLwqD+sytpw2HR8q147yIQR5oy6aW9gq2Mr5Z5EUdgZqWxfi92ovz2
-         oeKZUaJXY2i2c2JhPlr62yQcJse71otuFCa+8z8BTpvCKxzX8/OuSPvjZ2pnk7h78kJT
-         Qlrw==
+        d=asymptotic.io; s=google; t=1715888326; x=1716493126; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=QRi2jSAg+nP+cthCiPfofaTdmkXgXQWiEWeWJYJZoUU=;
+        b=u3qdHe56ja38o5y+ux59mgaCKA0iWOswPn+QZSgCGOXGn5AkmUBqYg6E8kHGKCBNzg
+         INMdYMFqU2EiLOd1tw2orQzWyid59EX60LVJSkLxh4O5dLeHASGOiJDc88D0Uasp7yyJ
+         trVn12kslVlFar4MJAEuIdmKQ1uQTVUEtjsykkUbNAUqRz0a1/j+T2+Kqa+laMK9hx7L
+         hDyahFND9Gn5WhdXM/iAALEC+Ww331nwpX7WexqrbmIJ+ZNITRMRzg6XKgP+TzLUlejo
+         zIDTQTK0SxDp9+YM7W40TCiTW0gwa1o4BC49c9cXvVT77To6v/vv3NVYw3leFYD8MWQf
+         ueuw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715884096; x=1716488896;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20230601; t=1715888326; x=1716493126;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=FITarwh2+GOhDseQyEOmjRb6Kp2ZPJkmNtFBnmcivF8=;
-        b=eq0BI8ZQdx9iSj0bFvOgGLq+AO6wVfxiVqnmGq/ee7+QuEXLbULU7St2YF1bAqBOky
-         w0f2b78c+CRN0qxiA66kND+nGUOAngdiPCGU38IQvXAm3kb1tTclTLfKe7fxrdBv0Go9
-         OpoULu4wmg6EUTHrqReS4r6092sJ2pW/sGhdPkLkQiaYJN9HOMwZ9k7H+cDSDKOPPC/B
-         iBz+IyPyyEd845mjEIm5nzIq/KujvYXjUu4+ImkOqZyYF5KUuqundjCXR95llgM/pXEX
-         3cy6HEWKXZxaCtMLB9285q4JV2tS4oTndyz9jUJwgM5Vwcnz6sNaR0CxSbTW/gbzpLiz
-         OfrQ==
-X-Gm-Message-State: AOJu0Yx5Yh5q8oroezpch73nn06lSAiZuul+h/gyIfd1B4L0x5drKPkp
-	/ZSt3h3GerQKWq3f0IvYZFwtIpeH4kiljYuVEH712gxs05+l4+AQtlC2kA==
-X-Google-Smtp-Source: AGHT+IEW0ksi2p2W3O9uOKnQ0zkXiRjFtCOvDfZdr9jbf+1UezPPQqWvNyjZ4bmYegn+AYdlO9bBcw==
-X-Received: by 2002:a05:6a00:230a:b0:6ec:fd67:a27e with SMTP id d2e1a72fcca58-6f4e0299dfemr22510178b3a.1.1715884095769;
-        Thu, 16 May 2024 11:28:15 -0700 (PDT)
-Received: from [172.17.0.2] ([52.238.28.180])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-6f4d2af2969sm13296873b3a.152.2024.05.16.11.28.14
+        bh=QRi2jSAg+nP+cthCiPfofaTdmkXgXQWiEWeWJYJZoUU=;
+        b=PmFc0KInEaTGA2VjFg70QWk0Lv6TpOJBUvqgbJd9dc1SYV18zo6BfYrbWJ9fORg7bY
+         dSqa3ljXCfbKerJXkj3FXfb5cH6gbZ+uLvaWGjDAsv+VmXQIF1CkkBKsDzgO36Gn93gj
+         WfKKupOwJQkfe+i2eDkrLVClHJYCx+RBrBOhdIQ+2pGg4iGO5Ml5ZYgibJUqpsh08Cpk
+         r7DM6Gqwhoq9br/qy/C4ABKO93hfKo3yAKN5Q9yHrD1qLwHJIrlB+ofrYU9c7jnepTTY
+         3Tcg6ys3TohXv8iX2dgDQXfrmQBUn2OkXN23kZ3C4RM038NbVcLK516RxL/xE5FFtyrN
+         Yjpw==
+X-Gm-Message-State: AOJu0YwSxWhar2Q1TLnuV0FfotiaeeoKxy3PH1rES5RNe07uRKGEab98
+	1RROZ70Riz+yinI5Lzp2J7TVkYmivxRWZrhJ6U8427LYI8mEW8eriuSKzoOufR87/+u0yW6ltJ2
+	D7bE=
+X-Google-Smtp-Source: AGHT+IG0a+3Fx0xqEUPTkj6xrD8e53lLi/Obq+UZczZu3k8ojIlh3wOfTx3hZqzrmNTQh2/N6ZlPhA==
+X-Received: by 2002:a17:906:55cc:b0:a59:a431:a8d6 with SMTP id a640c23a62f3a-a5a2d317577mr1525647866b.38.1715888326425;
+        Thu, 16 May 2024 12:38:46 -0700 (PDT)
+Received: from andromeda.lan (bras-base-toroon0359w-grc-19-74-15-47-99.dsl.bell.ca. [74.15.47.99])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a5a1781cd85sm1031241766b.15.2024.05.16.12.38.45
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 16 May 2024 11:28:15 -0700 (PDT)
-Message-ID: <6646503f.620a0220.e829b.2d9f@mx.google.com>
-Date: Thu, 16 May 2024 11:28:15 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============3486725373446365169=="
+        Thu, 16 May 2024 12:38:45 -0700 (PDT)
+From: Arun Raghavan <arun@asymptotic.io>
+To: linux-bluetooth@vger.kernel.org
+Cc: Arun Raghavan <arun@asymptotic.io>
+Subject: [PATCH BlueZ,v6 0/5] ASHA plugin
+Date: Thu, 16 May 2024 15:38:31 -0400
+Message-ID: <20240516193836.228281-1-arun@asymptotic.io>
+X-Mailer: git-send-email 2.45.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, arun@asymptotic.io
-Subject: RE: ASHA plugin
-In-Reply-To: <20240516145501.134118-2-arun@asymptotic.io>
-References: <20240516145501.134118-2-arun@asymptotic.io>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 
---===============3486725373446365169==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hello again,
+Sorry about the noise, but there was a bug with the MTU setting in the
+previous set.
 
-This is automated email and please do not reply to this email!
+Cheers,
+Arun
 
-Dear submitter,
+Arun Raghavan (5):
+  src/shared: Add initial implementation for an ASHA profile
+  profiles/audio: Add an ASHA plugin
+  test: Add a script to test ASHA
+  gitignore: Add compile_commands.json
+  gitignore: Add __pycache__
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=853729
+ .gitignore                 |   3 +
+ Makefile.am                |   3 +-
+ Makefile.plugins           |   5 +
+ configure.ac               |   4 +
+ lib/uuid.h                 |   3 +
+ profiles/audio/asha.c      | 336 +++++++++++++++++++++++
+ profiles/audio/media.c     |  30 +++
+ profiles/audio/media.h     |   2 +
+ profiles/audio/transport.c | 174 +++++++++++-
+ src/shared/asha.c          | 529 +++++++++++++++++++++++++++++++++++++
+ src/shared/asha.h          |  75 ++++++
+ test/simple-asha           | 162 ++++++++++++
+ 12 files changed, 1323 insertions(+), 3 deletions(-)
+ create mode 100644 profiles/audio/asha.c
+ create mode 100644 src/shared/asha.c
+ create mode 100644 src/shared/asha.h
+ create mode 100755 test/simple-asha
 
----Test result---
+-- 
+2.45.0
 
-Test Summary:
-CheckPatch                    FAIL      2.74 seconds
-GitLint                       PASS      1.02 seconds
-BuildEll                      PASS      24.26 seconds
-BluezMake                     PASS      1678.59 seconds
-MakeCheck                     PASS      12.97 seconds
-MakeDistcheck                 PASS      184.66 seconds
-CheckValgrind                 PASS      246.97 seconds
-CheckSmatch                   PASS      358.24 seconds
-bluezmakeextell               PASS      119.64 seconds
-IncrementalBuild              PASS      7952.05 seconds
-ScanBuild                     WARNING   1017.30 seconds
-
-Details
-##############################
-Test: CheckPatch - FAIL
-Desc: Run checkpatch.pl script
-Output:
-[BlueZ,v4,3/5] test: Add a script to test ASHA
-ERROR:EXECUTE_PERMISSIONS: do not set execute permissions for source files
-#103: FILE: test/simple-asha
-
-/github/workspace/src/src/13666280.patch total: 1 errors, 0 warnings, 158 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/src/13666280.patch has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-##############################
-Test: ScanBuild - WARNING
-Desc: Run Scan Build
-Output:
-profiles/audio/media.c:1048:7: warning: Use of memory after it is freed
-                if (req->cb != pac_select_cb) {
-                    ^~~~~~~
-1 warning generated.
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============3486725373446365169==--
