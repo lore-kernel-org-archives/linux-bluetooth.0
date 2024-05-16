@@ -1,138 +1,99 @@
-Received: from mail-qv1-f53.google.com (mail-qv1-f53.google.com [209.85.219.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFE0518635
-	for <linux-bluetooth@vger.kernel.org>; Thu, 16 May 2024 05:33:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1DCA11CA0;
+	Thu, 16 May 2024 05:45:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715837615; cv=none; b=POgRMZ7xaptaVSIjk3gL+oUqNvH9FsKIQ0ozw7i+DwVE7iuEfA9l/LtpDjDRs8W5Q1TFgnE9tGN1Dx5sQcjFkgDK+MaGAnmdp+DQkjz7JVG0AazXpEz0KvQCdHNO/iVLsZUEECywrf1ZlIHukfTnvTiLtkddi/hALu0tSyGgcNk=
+	t=1715838317; cv=none; b=G6gX3kp9VCo0jVRhCnuGD1g4UuaBqRhkfm1OGxZmqTECOqRFAW1NzTFCMpLFfuwYhBqQv9LUJQ3BP2aWEHuwQT0oG8awxbj2yzpuz0LI2tASlm0isyeSFxxcXPJpyHCiBLrfposcdkB0sa+chvJ5jhCmMOomDCLNwpfnQgC0MSU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715837615; c=relaxed/simple;
-	bh=O7bo2rd62OzjUcQcF6wGVHrckWBruMZ2f8uOW4Q4j/0=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=shZdJ2eubVoCeO45X/mexWG+Psi8en/u7UWg9W4kLoWnTW3YU0RNTp1pDzuNbYaQKVwrTjKS3cmfO8wDZI7ojWkcKb2ib1szeRo4/JC0YdsC88wMb9KJIWuL4czCavAikNd/T/9RgbWWYGvQPycWyWUEBkqfnLp/X3SgYI2213s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=amKWsZK2; arc=none smtp.client-ip=209.85.219.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="amKWsZK2"
-Received: by mail-qv1-f53.google.com with SMTP id 6a1803df08f44-6a04bae513cso27986786d6.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 15 May 2024 22:33:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1715837612; x=1716442412; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=uHPjbVmS18vC3rd9C/zLu1TZX68moMG1e9TXuWV3orA=;
-        b=amKWsZK2rXm7ZYo4NhZD87KXuWkYqqctsnTm8yOgAvo20tJo/8lcU8FjYVxMi59kNj
-         ZccqKZNYX8VNfbwZod6dvSryeZo3MwY05JVF3GvZEagL1dxfJYLKD1kQnM3uU75SBGLM
-         2xIcQTdJIARXkQpJxoDrOZXd+JE4FmYXH8lE7LXeCrjQ1aNoAQxMurUWC73CqywgksS1
-         sLfiuvOcVG6wFTbzTk5F4r7q1z9PQg7nDT69S21wWiLHq5P9u/rBvwv8imh7vFUfHPG8
-         aZhLY/qKq90x37CHykcHh5KVUJPaxT0b7RLYkb4Uc8IZDIUdRgfuYErIhK/+saKjOoIJ
-         4M4w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715837612; x=1716442412;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=uHPjbVmS18vC3rd9C/zLu1TZX68moMG1e9TXuWV3orA=;
-        b=dLP9l1HKW3dg9VgLo6EWs3dbp1l39WvQHZuqXMXQcgRJVlXsMYralEycgJoR1UnJdT
-         dTiHAUTAOCf/bVZSlxd/KMccPhJeGj/22knXxIitfkiIR2QmCqhVvCtZCSi7+r3LZD0R
-         ZVEKsX12jGJP9PBP1lNLIx9SbxErTmvav9AWfrx8i2uGwi8kflhJ6mwUj2BQsM1HVAL6
-         9nSk5rLp7/k4St7e/CAPB0p7Mx/KZsTO+iMnMmp+t80pdRUk2SzyLGNcbYOtLNQFqF2F
-         DfcPohA6ekT437jRshHCfAvvVQcn3Rohn+ld9APcTqBcAjC2D5fUiw5ll19VUTQYveRK
-         wTdw==
-X-Gm-Message-State: AOJu0Yw2TlWyoZIPCQKOBbwyCNxERgcb3fZiRdwaNy2HNPmHAFdQJnu7
-	dHiRh6dIcdmsFvQ5oGnKdNo6+to0LNQocYd1AFz/Ut7PBa+FgMopx2EGPQ==
-X-Google-Smtp-Source: AGHT+IEuqYn3HWj7ybJUVSX0NiGo/x8DozwRq4XOd72vMRKNj3YlH7drOpG0A/J6a4oBKNWydGB1iQ==
-X-Received: by 2002:a05:6214:43c4:b0:6a0:5ad6:54f4 with SMTP id 6a1803df08f44-6a1681b9879mr201454446d6.33.1715837612317;
-        Wed, 15 May 2024 22:33:32 -0700 (PDT)
-Received: from [172.17.0.2] ([20.75.95.97])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6a15f194945sm71223746d6.61.2024.05.15.22.33.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 15 May 2024 22:33:32 -0700 (PDT)
-Message-ID: <66459aac.0c0a0220.27bb8.84a1@mx.google.com>
-Date: Wed, 15 May 2024 22:33:32 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============2483978029752640205=="
+	s=arc-20240116; t=1715838317; c=relaxed/simple;
+	bh=kNqTM4bX8IampPJrP/pQJTOVJFaoMRwaXGjYsBwVtiI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=blYisxr30EWbwy6xR8TYmnAMfCVO0aoO9CCUqf8a5e0DJSC3o6HLYjHXLpy/Ld7dJH9hnLMtBgqDDVMveISCXmU4OKZSFbklII38psVbqylCNZeF+lISnTOZ0iHcgqtJIcFGQ/HwWXML93f8dQwbbqih5ZilDYlkSkJa3OpZCic=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
+Received: from [192.168.0.224] (ip5f5aefc6.dynamic.kabel-deutschland.de [95.90.239.198])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id D4D4161E5FE01;
+	Thu, 16 May 2024 07:44:46 +0200 (CEST)
+Message-ID: <5aa68ee5-dd84-4ac2-9fd1-36160358fdcf@molgen.mpg.de>
+Date: Thu, 16 May 2024 07:44:44 +0200
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, oneukum@suse.com
-Subject: RE: bluetooth: btintel_pcie: nonsense error recording in irq
-In-Reply-To: <20240516045118.18552-1-oneukum@suse.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] bluetooth: btintel_pcie: nonsense error recording in irq
+To: Oliver Neukum <oneukum@suse.com>, marcel@holtmann.org,
+ luiz.dentz@gmail.com, linux-bluetooth@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Kiran K <kiran.k@intel.com>
 References: <20240516045118.18552-1-oneukum@suse.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Language: en-US
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <20240516045118.18552-1-oneukum@suse.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
---===============2483978029752640205==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+[Cc: +Kiran]
 
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=853575
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      0.64 seconds
-GitLint                       PASS      0.30 seconds
-SubjectPrefix                 FAIL      0.47 seconds
-BuildKernel                   PASS      30.54 seconds
-CheckAllWarning               PASS      33.41 seconds
-CheckSparse                   PASS      38.03 seconds
-CheckSmatch                   FAIL      35.28 seconds
-BuildKernel32                 PASS      28.82 seconds
-TestRunnerSetup               PASS      519.42 seconds
-TestRunner_l2cap-tester       PASS      20.24 seconds
-TestRunner_iso-tester         PASS      30.48 seconds
-TestRunner_bnep-tester        PASS      4.70 seconds
-TestRunner_mgmt-tester        PASS      110.01 seconds
-TestRunner_rfcomm-tester      PASS      7.22 seconds
-TestRunner_sco-tester         PASS      14.91 seconds
-TestRunner_ioctl-tester       PASS      7.73 seconds
-TestRunner_mesh-tester        PASS      5.84 seconds
-TestRunner_smp-tester         PASS      6.74 seconds
-TestRunner_userchan-tester    PASS      6.93 seconds
-IncrementalBuild              PASS      27.88 seconds
-
-Details
-##############################
-Test: SubjectPrefix - FAIL
-Desc: Check subject contains "Bluetooth" prefix
-Output:
-"Bluetooth: " prefix is not specified in the subject
-##############################
-Test: CheckSmatch - FAIL
-Desc: Run smatch tool with source
-Output:
-
-Segmentation fault (core dumped)
-make[4]: *** [scripts/Makefile.build:244: net/bluetooth/hci_core.o] Error 139
-make[4]: *** Deleting file 'net/bluetooth/hci_core.o'
-make[3]: *** [scripts/Makefile.build:485: net/bluetooth] Error 2
-make[2]: *** [scripts/Makefile.build:485: net] Error 2
-make[2]: *** Waiting for unfinished jobs....
-Segmentation fault (core dumped)
-make[4]: *** [scripts/Makefile.build:244: drivers/bluetooth/bcm203x.o] Error 139
-make[4]: *** Deleting file 'drivers/bluetooth/bcm203x.o'
-make[4]: *** Waiting for unfinished jobs....
-make[3]: *** [scripts/Makefile.build:485: drivers/bluetooth] Error 2
-make[2]: *** [scripts/Makefile.build:485: drivers] Error 2
-make[1]: *** [/github/workspace/src/src/Makefile:1919: .] Error 2
-make: *** [Makefile:240: __sub-make] Error 2
+Dear Oliver,
 
 
----
-Regards,
-Linux Bluetooth
+Thank you for the patch. I have two minor comments. Could you please 
+word the summary as a statement by adding a verb (in imperative mood). 
+Maybe:
+
+ > Fix nonsense …
+
+or
+
+ > Remove unused `ret` assignment
+
+Am 16.05.24 um 06:50 schrieb Oliver Neukum:
+> Either you return an error or you ignore it.
+> Recording it but then overwriting it makes no sense.
+It’d be great if you added a Fixes: tag.
+
+> Signed-off-by: Oliver Neukum <oneukum@suse.com>
+> ---
+>   drivers/bluetooth/btintel_pcie.c | 8 ++------
+>   1 file changed, 2 insertions(+), 6 deletions(-)
+> 
+> diff --git a/drivers/bluetooth/btintel_pcie.c b/drivers/bluetooth/btintel_pcie.c
+> index 590c188a4bb3..c507422d6b1b 100644
+> --- a/drivers/bluetooth/btintel_pcie.c
+> +++ b/drivers/bluetooth/btintel_pcie.c
+> @@ -498,19 +498,15 @@ static int btintel_pcie_submit_rx_work(struct btintel_pcie_data *data, u8 status
+>   	rfh_hdr = buf;
+>   
+>   	len = rfh_hdr->packet_len;
+> -	if (len <= 0) {
+> -		ret = -EINVAL;
+> +	if (len <= 0)
+>   		goto resubmit;
+> -	}
+>   
+>   	/* Remove RFH header */
+>   	buf += sizeof(*rfh_hdr);
+>   
+>   	skb = alloc_skb(len, GFP_ATOMIC);
+> -	if (!skb) {
+> -		ret = -ENOMEM;
+> +	if (!skb)
+>   		goto resubmit;
+> -	}
+>   
+>   	skb_put_data(skb, buf, len);
+>   	skb_queue_tail(&data->rx_skb_q, skb);
 
 
---===============2483978029752640205==--
+Kind regards,
+
+Paul
