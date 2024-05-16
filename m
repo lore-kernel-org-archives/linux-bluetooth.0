@@ -1,90 +1,158 @@
-Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A8A014D28A
-	for <linux-bluetooth@vger.kernel.org>; Thu, 16 May 2024 14:55:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
+Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.3])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0634146D7F;
+	Thu, 16 May 2024 14:57:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.3
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715871325; cv=none; b=rNJN5jONFAZjPgpimF6s3gAp1Gv1ur8mVn/HNwX0KRjIlpNT0DvnP6qi1uhtbLfvSdkUMWeao+nqHYQKKxlJU9Zug7hLBP+BGgBlgokzF9NIIRGtn4ufBIRpvuvBoXRaQ5Tcoj8UufpDimUqPUb+DTnyNj4hSY6+Plb2y9SAcqc=
+	t=1715871440; cv=none; b=Rqr4UyMxWakWvi+DOZMdcFKnVHbkp19FUk1OWq3T3QfqwIO4W415bHixwGsZ+sWXf5zh/hjRCG10LX1neLMdkBQGxRAg2xDkaO0ThAhgVZUSZEgn5NvNagVkS9e8nlF9tym4JvcB9ne5GhRyffzwdprIzOfHH14oAhWPpwaywQk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715871325; c=relaxed/simple;
-	bh=ZguKYdN/iMozp/GB5Cfsl1QrHZ1Hztu1zg1nE3FZ4/Y=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=KGMXKZdSNWkUpYWbL57FgWmei3T0i5f8xCo7q6+BicsQNnn1sJuVRBSaNHVRmAQ+W/a5QfqmUJG2oCzPcECsfwZevu9EITETdS06Fwn+xBmy7UkhJJr67QzTetGvdCNKhW54Ky9AzJpya/kfSH466HnDbVZCczQ7rtBqGR81DnU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=asymptotic.io; spf=pass smtp.mailfrom=asymptotic.io; dkim=pass (2048-bit key) header.d=asymptotic.io header.i=@asymptotic.io header.b=KO2zr/EG; arc=none smtp.client-ip=209.85.208.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=asymptotic.io
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=asymptotic.io
+	s=arc-20240116; t=1715871440; c=relaxed/simple;
+	bh=GDsm3h/IcVDrPZBroUZRxpkn4pFPy1u/7Ui0+oUlALk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=uEQ7HvWIJ1hbgm/ijMwaVeMnGKrSH570ueOt3/J7uVMe6PU8EzKABDUokHOClRFYx6lqHqCSUXeLAc7gp5eStxvXIfDDe/fSb4DORtZvv1o2CtFHGrydQnbWlq9ZwYaiTBkyHKJF2PgwyWeEHXF/KB4JTwy3xLbhhFFuX+iS4/4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=ksaherUH; arc=none smtp.client-ip=117.135.210.3
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=asymptotic.io header.i=@asymptotic.io header.b="KO2zr/EG"
-Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-56e1bbdb362so2862868a12.1
-        for <linux-bluetooth@vger.kernel.org>; Thu, 16 May 2024 07:55:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=asymptotic.io; s=google; t=1715871322; x=1716476122; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=AjCipZTmzBvwWD52PMAXup3LXscw2Ozf5wMm+FDuE+g=;
-        b=KO2zr/EGYfdMRTAuF/DBFtJQoW2JNok7lMAKwpBWKlppUNtcit3Z13Akd9A8PhWayN
-         UXKf6pmpRcnuCNrKLqE4wA4H+DPePh7N0AjHrx7SGFSjXqmdp81x1som575ZZ/O10hWy
-         tRztsXsA2zs5MiNnrByNdRyIzomikzY1PliQ0EnMqPOhsIJMbgF1AWKOWxSHVVxv+qB1
-         FQQCNcawhsGxEMDqzq7GRJ0jknOGd/7sOlgmlSGhl76E8FoYtTVIbwAWsSk6YkglsVHY
-         Q0sNKCO1d1s8DRGihIHj+eLnIULJPoJaJIFsjSGAmCxUHmFHAX778cMR2e9+yHSkBrNr
-         Cm/w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715871322; x=1716476122;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=AjCipZTmzBvwWD52PMAXup3LXscw2Ozf5wMm+FDuE+g=;
-        b=gYMlBhH0hD28oGLdYScj9Hk2i6MKpoJUnhQo+8V9nYqBj7EkJYMndsXgrQLEeWdv8x
-         Cl0PFhM0lC7dtjuPrWnRFG+FDMujJY3Cn9n39NpuSGtvtrtN3C+MEULNQoHrtLX0DoIZ
-         NJH7NVz1NwYJvU16HH6Coc0gblJnAQa9kO5JUrEjeYebuM65GrJGFVYZYql3rUf6M+Xx
-         z+aQcZ7HyADLGdngmINmReMA6202Ai/JqLctojyKVzz4EjWqio1EsxTMnI585q4fn3dP
-         woGEZG1iFkFmpTnJz6QLwgVPMAAy+8WD4uXcXK1mqVkKtFS4nwzz5LlavgXJoeJZ03GG
-         vP2A==
-X-Gm-Message-State: AOJu0Yy/R4d5gRKp7PrNMJZE9+2fqHWKosDMwzcQ6yS0lO0IzWxTpm3y
-	/EDvhF5vFd0j/btfCoGdjPi678/DacBpNSMcDHFD4q/u9mk9VVKrF1XNikeUNRAIOBDTl92koMl
-	qu90=
-X-Google-Smtp-Source: AGHT+IHcVxZJSYl79VdGwIUzPRnQ7xnhUjK5oVFe6bXqHnZMB8RiaO/mWK3vCMMI2qfmibd3dMh5ug==
-X-Received: by 2002:a50:a45b:0:b0:572:6dd5:67da with SMTP id 4fb4d7f45d1cf-5734d705b2dmr18323575a12.36.1715871322404;
-        Thu, 16 May 2024 07:55:22 -0700 (PDT)
-Received: from andromeda.lan ([74.15.47.99])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-574b6f6c53asm7484372a12.16.2024.05.16.07.55.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 16 May 2024 07:55:22 -0700 (PDT)
-From: Arun Raghavan <arun@asymptotic.io>
-To: linux-bluetooth@vger.kernel.org
-Cc: Arun Raghavan <arun@asymptotic.io>
-Subject: [PATCH BlueZ,v4 5/5] gitignore: Add __pycache__
-Date: Thu, 16 May 2024 10:55:01 -0400
-Message-ID: <20240516145501.134118-6-arun@asymptotic.io>
-X-Mailer: git-send-email 2.45.0
-In-Reply-To: <20240516145501.134118-1-arun@asymptotic.io>
-References: <20240516145501.134118-1-arun@asymptotic.io>
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="ksaherUH"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=Message-ID:Date:MIME-Version:Subject:From:
+	Content-Type; bh=tfyLnpZVWwLnHmF639fNbdaFAOdB0N4LYCqcFVqG7cU=;
+	b=ksaherUHCSAskro6zB/RNWlVjKnvaYMrMn8v65pAu2yb4NOzxxdcYjZEQ6IrBZ
+	X4p4blgZBBbzPeqUqbyPaAgLuHobaCKZKmohp4JtE7n97vG64Ptr55pIPqZbAhEc
+	7cYx+AYiFwrMsx8OJjkH5bXwqqoKQQ0Af/f4gpTu4ay68=
+Received: from [192.168.1.25] (unknown [183.195.4.13])
+	by gzga-smtp-mta-g2-2 (Coremail) with SMTP id _____wD3n59eHkZmdIodEw--.60785S2;
+	Thu, 16 May 2024 22:55:28 +0800 (CST)
+Message-ID: <f343ecae-efee-4bdc-ac38-89b614e081b5@163.com>
+Date: Thu, 16 May 2024 22:55:26 +0800
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2] Bluetooth: qca: Fix BT enable failure again for
+ QCA6390 after warm reboot
+To: Zijun Hu <quic_zijuhu@quicinc.com>, luiz.dentz@gmail.com,
+ luiz.von.dentz@intel.com, marcel@holtmann.org
+Cc: linux-bluetooth@vger.kernel.org, wt@penguintechs.org,
+ regressions@lists.linux.dev, pmenzel@molgen.mpg.de,
+ krzysztof.kozlowski@linaro.org, stable@vger.kernel.org
+References: <1715866294-1549-1-git-send-email-quic_zijuhu@quicinc.com>
+Content-Language: en-US
+From: Lk Sii <lk_sii@163.com>
+In-Reply-To: <1715866294-1549-1-git-send-email-quic_zijuhu@quicinc.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-CM-TRANSID:_____wD3n59eHkZmdIodEw--.60785S2
+X-Coremail-Antispam: 1Uf129KBjvJXoWxZr1kGr4Dtw4xKF4rZF43Wrg_yoWrtFy5pF
+	WqgFyakrWUJr97CFnrAw4xWFy5Zwnav3y3urW7K345JaySyrZ8GF4xt3y5Aa4UCryUCr4j
+	qFnrX34UKas09F7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07j4Hq7UUUUU=
+X-CM-SenderInfo: 5onb2xrl6rljoofrz/1tbiEwbgNWXAlLRsnwAAs2
 
-These directories are created when running scripts in test/ in-tree, and
-can safely be ignored.
----
- .gitignore | 2 ++
- 1 file changed, 2 insertions(+)
 
-diff --git a/.gitignore b/.gitignore
-index 6a6422379..041a707af 100644
---- a/.gitignore
-+++ b/.gitignore
-@@ -187,3 +187,5 @@ compile_commands.json
- cscope.in.out
- cscope.out
- cscope.po.out
-+
-+**/__pycache__
--- 
-2.45.0
+
+On 2024/5/16 21:31, Zijun Hu wrote:
+> Commit 272970be3dab ("Bluetooth: hci_qca: Fix driver shutdown on closed
+> serdev") will cause below regression issue:
+> 
+> BT can't be enabled after below steps:
+> cold boot -> enable BT -> disable BT -> warm reboot -> BT enable failure
+> if property enable-gpios is not configured within DT|ACPI for QCA6390.
+> 
+> The commit is to fix a use-after-free issue within qca_serdev_shutdown()
+> by adding condition to avoid the serdev is flushed or wrote after closed
+> but also introduces this regression issue regarding above steps since the
+> VSC is not sent to reset controller during warm reboot.
+> 
+> Fixed by sending the VSC to reset controller within qca_serdev_shutdown()
+> once BT was ever enabled, and the use-after-free issue is also fixed by
+> this change since the serdev is still opened before it is flushed or wrote.
+> 
+> Verified by the reported machine Dell XPS 13 9310 laptop over below two
+> kernel commits:
+> commit e00fc2700a3f ("Bluetooth: btusb: Fix triggering coredump
+> implementation for QCA") of bluetooth-next tree.
+> commit b23d98d46d28 ("Bluetooth: btusb: Fix triggering coredump
+> implementation for QCA") of linus mainline tree.
+> 
+> Fixes: 272970be3dab ("Bluetooth: hci_qca: Fix driver shutdown on closed serdev")
+> Cc: stable@vger.kernel.org
+> Reported-by: Wren Turkal <wt@penguintechs.org>
+> Closes: https://bugzilla.kernel.org/show_bug.cgi?id=218726
+> Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
+> Tested-by: Wren Turkal <wt@penguintechs.org>
+> ---
+> V1 -> V2: Add comments and more commit messages
+> 
+> V1 discussion link:
+> https://lore.kernel.org/linux-bluetooth/d553edef-c1a4-4d52-a892-715549d31ebe@163.com/T/#t
+> 
+>  drivers/bluetooth/hci_qca.c | 18 +++++++++++++++---
+>  1 file changed, 15 insertions(+), 3 deletions(-)
+> 
+> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+> index 0c9c9ee56592..9a0bc86f9aac 100644
+> --- a/drivers/bluetooth/hci_qca.c
+> +++ b/drivers/bluetooth/hci_qca.c
+> @@ -2450,15 +2450,27 @@ static void qca_serdev_shutdown(struct device *dev)
+>  	struct qca_serdev *qcadev = serdev_device_get_drvdata(serdev);
+>  	struct hci_uart *hu = &qcadev->serdev_hu;
+>  	struct hci_dev *hdev = hu->hdev;
+> -	struct qca_data *qca = hu->priv;
+>  	const u8 ibs_wake_cmd[] = { 0xFD };
+>  	const u8 edl_reset_soc_cmd[] = { 0x01, 0x00, 0xFC, 0x01, 0x05 };
+>  
+>  	if (qcadev->btsoc_type == QCA_QCA6390) {
+> -		if (test_bit(QCA_BT_OFF, &qca->flags) ||
+> -		    !test_bit(HCI_RUNNING, &hdev->flags))
+> +		/* The purpose of sending the VSC is to reset SOC into a initial
+> +		 * state and the state will ensure next hdev->setup() success.
+> +		 * if HCI_QUIRK_NON_PERSISTENT_SETUP is set, it means that
+> +		 * hdev->setup() can do its job regardless of SoC state, so
+> +		 * don't need to send the VSC.
+> +		 * if HCI_SETUP is set, it means that hdev->setup() was never
+> +		 * invoked and the SOC is already in the initial state, so
+> +		 * don't also need to send the VSC.
+> +		 */
+> +		if (test_bit(HCI_QUIRK_NON_PERSISTENT_SETUP, &hdev->quirks) ||
+> +		    hci_dev_test_flag(hdev, HCI_SETUP))
+>  			return;
+>  
+> +		/* The serdev must be in open state when conrol logic arrives
+> +		 * here, so also fix the use-after-free issue caused by that
+> +		 * the serdev is flushed or wrote after it is closed.
+> +		 */
+>  		serdev_device_write_flush(serdev);
+>  		ret = serdev_device_write_buf(serdev, ibs_wake_cmd,
+>  					      sizeof(ibs_wake_cmd));
+i believe Zijun's change is able to fix both below issues and don't
+introduce new issue.
+
+regression issue A:  BT enable failure after warm reboot.
+issue B:  use-after-free issue, namely, kernel crash.
+
+
+For issue B, i have more findings related to below commits ordered by time.
+
+Commit A: 7e7bbddd029b ("Bluetooth: hci_qca: Fix qca6390 enable failure
+after warm reboot")
+
+Commit B: de8892df72be ("Bluetooth: hci_serdev: Close UART port if
+NON_PERSISTENT_SETUP is set")
+this commit introduces issue B, it is also not suitable to associate
+protocol state with state of lower level transport type such as serdev
+or uart, in my opinion, protocol state should be independent with
+transport type state, flag HCI_UART_PROTO_READY is for protocol state,
+it means if protocol hu->proto is initialized and if we can invoke its
+interfaces.it is common for various kinds of transport types. perhaps,
+this is the reason why Zijun's change doesn't use flag HCI_UART_PROTO_READY.
+
+Commit C: 272970be3dab ("Bluetooth: hci_qca: Fix driver shutdown on
+closed serdev")
+this commit is to fix issue B which is actually caused by Commit B, but
+it has Fixes tag for Commit A. and it also introduces the regression
+issue A.
 
