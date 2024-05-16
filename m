@@ -1,161 +1,197 @@
-Received: from smtp14.infineon.com (smtp14.infineon.com [217.10.52.160])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24F1711182
-	for <linux-bluetooth@vger.kernel.org>; Thu, 16 May 2024 05:08:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.10.52.160
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E467711721
+	for <linux-bluetooth@vger.kernel.org>; Thu, 16 May 2024 05:33:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715836111; cv=none; b=J79TRa2jtEgAuqnr1eN1f/ANF4K7uP7/WebOGIrVUxQerVb5QSiXLyAp3Ne2lQFhYiA0HAr0NA7qO4/WvovRd5XoUjoljWpURiEYiA0WaEW/1DPbpBeomze4vRpyttKCbP1MFdC1nQi6cANKw61y1d5qIZK8B1Dj6Fibwqy2xas=
+	t=1715837596; cv=none; b=PAlP5Tugu3/w4Ysh3XqNhr3KvSjq6+iXmReJXw55eYU0XBU6hur+uttgRhJs7YbSBpko3rlO0CcuA5wdf1MCV2w0RBJXBVhSr9m+OzMPDZ29svZ0y29GnHMBw757QYZpt8zWLHf+N4d+/vU1rNa+vHp+lT/q7JRGeZjjw1Y1GpU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715836111; c=relaxed/simple;
-	bh=r5CXpKkb2JJizH9kG0U43RhdFOyHjP8VFqqjSoLi3lE=;
-	h=From:To:CC:Subject:Date:Message-ID:Content-Type:MIME-Version; b=iNDbcIHdqBTtiI215xTs+SvrIF8atUnthc3ATv5zggaqV3/AS/3dIB9CXCaGen3XVI/DzdUVzYFR31LaEZAXyW9+haN1h4f0qTK47Ho8FLC1l8uBzBHvWP6rF2+5d1WHrh2/pjtcroTz/d4WAOJq75jwaxaXBoL4DXlqGPj95+k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infineon.com; spf=pass smtp.mailfrom=infineon.com; dkim=pass (1024-bit key) header.d=infineon.com header.i=@infineon.com header.b=qRy+HtF8; arc=none smtp.client-ip=217.10.52.160
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infineon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=infineon.com
+	s=arc-20240116; t=1715837596; c=relaxed/simple;
+	bh=7LUly53ELpJ3N+lFbIoceTHszXcPiD+D+6VwlUgDv6o=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=AYd4EM4yk/vvBeYGsCnZiKHx3pCZze4qZgVno9WzO9PEoLxCEAknMckCCeIfWLO9boWmw53OUtAb4I6VIl/MDNPw0n9Hu++q27L9V0P18+0E0VXXjZTVrztHI9qAcW04EYxpKTcFTXWxZ5mwcQL5wwi4skYO5YTepR/lp93gjxE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OLacP9ls; arc=none smtp.client-ip=209.85.210.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=infineon.com header.i=@infineon.com header.b="qRy+HtF8"
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=infineon.com; i=@infineon.com; q=dns/txt; s=IFXMAIL;
-  t=1715836110; x=1747372110;
-  h=from:to:cc:subject:date:message-id:
-   content-transfer-encoding:mime-version;
-  bh=r5CXpKkb2JJizH9kG0U43RhdFOyHjP8VFqqjSoLi3lE=;
-  b=qRy+HtF8uXTUSYsTuQVK4mg+xL+2RsHXkWfl5bI/3qtEt7hT7TFAwX3g
-   YVTTLourOTbJ9OsS4eHjEwnSsapXnM3eqSfkNZ5il9hEUy+67TGtzQSBg
-   BhjCZvAtu4aAH6voexLIQkzaFqXjPJRf0evmQMZ/3V/k0V5gMPXybs0qF
-   I=;
-X-IronPort-AV: E=McAfee;i="6600,9927,11074"; a="51074034"
-X-IronPort-AV: E=Sophos;i="6.08,163,1712613600"; 
-   d="scan'208";a="51074034"
-Received: from unknown (HELO MUCSE822.infineon.com) ([172.23.29.53])
-  by smtp14.infineon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 May 2024 07:08:27 +0200
-Received: from MUCSE835.infineon.com (172.23.7.107) by MUCSE822.infineon.com
- (172.23.29.53) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.40; Thu, 16 May
- 2024 07:08:26 +0200
-Received: from MUCSE832.infineon.com (172.23.7.104) by MUCSE835.infineon.com
- (172.23.7.107) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.40; Thu, 16 May
- 2024 07:08:26 +0200
-Received: from MUCSE832.infineon.com ([fe80::6918:9b7d:1c9c:3175]) by
- MUCSE832.infineon.com ([fe80::6918:9b7d:1c9c:3175%15]) with mapi id
- 15.02.1118.040; Thu, 16 May 2024 07:08:26 +0200
-From: <Nobuaki.Tsunashima@infineon.com>
-To: <marcel@holtmann.org>, <luiz.dentz@gmail.com>
-CC: <linux-bluetooth@vger.kernel.org>
-Subject: [PATCH] Bluetooth: Patch for CYW4373 hci up fail issue
-Thread-Topic: [PATCH] Bluetooth: Patch for CYW4373 hci up fail issue
-Thread-Index: AdqnTUe0gn8yrR5qRPOdTOn0GveE1w==
-Date: Thu, 16 May 2024 05:08:26 +0000
-Message-ID: <6267800d70ae4344acaba3486b54bc0c@infineon.com>
-Accept-Language: ja-JP, en-US
-Content-Language: ja-JP
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OLacP9ls"
+Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-6f4e59191a1so4890172b3a.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 15 May 2024 22:33:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1715837594; x=1716442394; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=7LUly53ELpJ3N+lFbIoceTHszXcPiD+D+6VwlUgDv6o=;
+        b=OLacP9lsiO5HJL9zN8n+yRGk/2zbKVi+NVpWTRMfpAa3cfvZ/ALKJy8PO6E0wpnDx2
+         M8V4hloAMa0T3/u9F5YzzfNrLQm+CQfTmDrX2kToFy28c76oC2V7zf7sYcVe0BS25K0A
+         CvnKekb+ilBBqMfXx6qiuZHuBxIET3AT3EZoa0a/KxZ+0oz+s8PrEQ/6rlqYQvfkj2SU
+         bhzN7l6L/tjL2PtR7qfzFm9TyIBaKPOR2WXmw3050O1c0YgVVEw3X9fD6lzHItDnDa1M
+         r+RdRwwgGD1gQ2jj+fB5dX1pTh+YyqvqSDy0Xegq8IszPLG/aAscnaatDdPmnUgHi3BP
+         XCuQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1715837594; x=1716442394;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=7LUly53ELpJ3N+lFbIoceTHszXcPiD+D+6VwlUgDv6o=;
+        b=WwHT7UiBsOczvMipCIQTmUj1O9pCwoVFWwLxSsd0oGhW0KFw8kmrHUTYRUaIov6Spj
+         ISAoDNVlu261GKuPnqG//rQq3688s7IZutjogRzHoGPlT8+khKIIwG0WrR1nrXmgmtTd
+         uaDmmyE5GKmX/46KdN95OOneB4iucMUbLsuj2aUgXp+cAMCbiLMPCzyWbAHNYhEEPIE3
+         VTeaNxI2cR2/6HpnnT5HS5MArEl9am6HEVSKFWeC0DzB/VQjnYkqEuDLJukhNiltdd5l
+         1ywxPPgp9PVDnhZGsIZJuwL04ZUl9Ykqe98OH8ii9tF1RsUCuKSM+ybDDCRDlz+++dnb
+         B72Q==
+X-Gm-Message-State: AOJu0YyVyjpfe2PijDccLaYPUtwWTUdXPy5hKjptnLCbQfR3jePGB0E4
+	hhbbG2z4p9wV7bNHZ2v/nlZj1xEaVba0rXSPty1ElJoxGQsqUeY9aD3x3A==
+X-Google-Smtp-Source: AGHT+IEB8rPjaSZDBIySN0Ty1o2gKcfXeC5qnf3v32eLf51hSbWsoOcJtpmOOXXIv8sKaHDdqaWSkQ==
+X-Received: by 2002:a05:6a20:1590:b0:1af:939b:d477 with SMTP id adf61e73a8af0-1afde12444bmr21625115637.36.1715837593922;
+        Wed, 15 May 2024 22:33:13 -0700 (PDT)
+Received: from [172.17.0.2] ([20.172.28.132])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2b628ea59absm14594381a91.47.2024.05.15.22.33.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 15 May 2024 22:33:13 -0700 (PDT)
+Message-ID: <66459a99.170a0220.e66e4.7072@mx.google.com>
+Date: Wed, 15 May 2024 22:33:13 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============8908154732997578586=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, Nobuaki.Tsunashima@infineon.com
+Subject: RE: Bluetooth: Patch for CYW4373 hci up fail issue
+In-Reply-To: <6267800d70ae4344acaba3486b54bc0c@infineon.com>
+References: <6267800d70ae4344acaba3486b54bc0c@infineon.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-CYW4373 ROM FW has an issue that it claims LE_Read_Transmit_Power command
-as supported in a response of Read_Local_Supported_Command command but
-rejects the LE_Read_Transmit_Power command with "Unknown HCI Command"
-status.
-Due to the issue, Bluetooth driver of 5.15 and later kernel fails to hci up=
-.
-Especially in USB i/f case, it would be difficult to download patch FW that=
- includes
-Its fix unless hci is up. The patch forces the driver to skip LE_Read_Trans=
-mit_Power
-Command when it detects CYW4373 with ROM FW build.
+--===============8908154732997578586==
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
 
-Signed-off-by: Nobuaki Tsunashima <nobuaki.tsunashima@infineon.com>
+VGhpcyBpcyBhdXRvbWF0ZWQgZW1haWwgYW5kIHBsZWFzZSBkbyBub3QgcmVwbHkgdG8gdGhpcyBl
+bWFpbCEKCkRlYXIgc3VibWl0dGVyLAoKVGhhbmsgeW91IGZvciBzdWJtaXR0aW5nIHRoZSBwYXRj
+aGVzIHRvIHRoZSBsaW51eCBibHVldG9vdGggbWFpbGluZyBsaXN0LgpUaGlzIGlzIGEgQ0kgdGVz
+dCByZXN1bHRzIHdpdGggeW91ciBwYXRjaCBzZXJpZXM6ClBXIExpbms6aHR0cHM6Ly9wYXRjaHdv
+cmsua2VybmVsLm9yZy9wcm9qZWN0L2JsdWV0b290aC9saXN0Lz9zZXJpZXM9ODUzNTc4CgotLS1U
+ZXN0IHJlc3VsdC0tLQoKVGVzdCBTdW1tYXJ5OgpDaGVja1BhdGNoICAgICAgICAgICAgICAgICAg
+ICBGQUlMICAgICAgMS4wNyBzZWNvbmRzCkdpdExpbnQgICAgICAgICAgICAgICAgICAgICAgIEZB
+SUwgICAgICAwLjQ0IHNlY29uZHMKU3ViamVjdFByZWZpeCAgICAgICAgICAgICAgICAgUEFTUyAg
+ICAgIDAuMDcgc2Vjb25kcwpCdWlsZEtlcm5lbCAgICAgICAgICAgICAgICAgICBQQVNTICAgICAg
+MjkuNTQgc2Vjb25kcwpDaGVja0FsbFdhcm5pbmcgICAgICAgICAgICAgICBXQVJOSU5HICAgMzIu
+MTYgc2Vjb25kcwpDaGVja1NwYXJzZSAgICAgICAgICAgICAgICAgICBXQVJOSU5HICAgMzcuNDYg
+c2Vjb25kcwpDaGVja1NtYXRjaCAgICAgICAgICAgICAgICAgICBGQUlMICAgICAgMzUuNzMgc2Vj
+b25kcwpCdWlsZEtlcm5lbDMyICAgICAgICAgICAgICAgICBQQVNTICAgICAgMjguMzMgc2Vjb25k
+cwpUZXN0UnVubmVyU2V0dXAgICAgICAgICAgICAgICBQQVNTICAgICAgNTE2LjY3IHNlY29uZHMK
+VGVzdFJ1bm5lcl9sMmNhcC10ZXN0ZXIgICAgICAgUEFTUyAgICAgIDIwLjM0IHNlY29uZHMKVGVz
+dFJ1bm5lcl9pc28tdGVzdGVyICAgICAgICAgUEFTUyAgICAgIDMyLjU2IHNlY29uZHMKVGVzdFJ1
+bm5lcl9ibmVwLXRlc3RlciAgICAgICAgUEFTUyAgICAgIDQuNjYgc2Vjb25kcwpUZXN0UnVubmVy
+X21nbXQtdGVzdGVyICAgICAgICBQQVNTICAgICAgMTExLjM0IHNlY29uZHMKVGVzdFJ1bm5lcl9y
+ZmNvbW0tdGVzdGVyICAgICAgUEFTUyAgICAgIDcuMjQgc2Vjb25kcwpUZXN0UnVubmVyX3Njby10
+ZXN0ZXIgICAgICAgICBQQVNTICAgICAgMTQuOTAgc2Vjb25kcwpUZXN0UnVubmVyX2lvY3RsLXRl
+c3RlciAgICAgICBQQVNTICAgICAgNy42NSBzZWNvbmRzClRlc3RSdW5uZXJfbWVzaC10ZXN0ZXIg
+ICAgICAgIFBBU1MgICAgICA1Ljc4IHNlY29uZHMKVGVzdFJ1bm5lcl9zbXAtdGVzdGVyICAgICAg
+ICAgUEFTUyAgICAgIDYuNjggc2Vjb25kcwpUZXN0UnVubmVyX3VzZXJjaGFuLXRlc3RlciAgICBQ
+QVNTICAgICAgNC45MCBzZWNvbmRzCkluY3JlbWVudGFsQnVpbGQgICAgICAgICAgICAgIFBBU1Mg
+ICAgICAyNy4yMCBzZWNvbmRzCgpEZXRhaWxzCiMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMj
+IwpUZXN0OiBDaGVja1BhdGNoIC0gRkFJTApEZXNjOiBSdW4gY2hlY2twYXRjaC5wbCBzY3JpcHQK
+T3V0cHV0OgpCbHVldG9vdGg6IFBhdGNoIGZvciBDWVc0MzczIGhjaSB1cCBmYWlsIGlzc3VlCldB
+Uk5JTkc6IFByZWZlciBhIG1heGltdW0gNzUgY2hhcnMgcGVyIGxpbmUgKHBvc3NpYmxlIHVud3Jh
+cHBlZCBjb21taXQgZGVzY3JpcHRpb24/KQojODQ6IApEdWUgdG8gdGhlIGlzc3VlLCBCbHVldG9v
+dGggZHJpdmVyIG9mIDUuMTUgYW5kIGxhdGVyIGtlcm5lbCBmYWlscyB0byBoY2kgdXAuCgpXQVJO
+SU5HOiBsaW5lIGxlbmd0aCBvZiAxMzggZXhjZWVkcyAxMDAgY29sdW1ucwojMTE0OiBGSUxFOiBk
+cml2ZXJzL2JsdWV0b290aC9idGJjbS5jOjQ1MToKKwlpbnQgdGFibGVfc2l6ZSA9IHNpemVvZihk
+aXNhYmxlX2Jyb2tlbl9yZWFkX3RyYW5zbWl0X3Bvd2VyX2J5X2NoaXBfdmVyKS9zaXplb2YoZGlz
+YWJsZV9icm9rZW5fcmVhZF90cmFuc21pdF9wb3dlcl9ieV9jaGlwX3ZlclswXSk7CgpXQVJOSU5H
+OiBQcmVmZXIgQVJSQVlfU0laRShkaXNhYmxlX2Jyb2tlbl9yZWFkX3RyYW5zbWl0X3Bvd2VyX2J5
+X2NoaXBfdmVyKQojMTE0OiBGSUxFOiBkcml2ZXJzL2JsdWV0b290aC9idGJjbS5jOjQ1MToKKwlp
+bnQgdGFibGVfc2l6ZSA9IHNpemVvZihkaXNhYmxlX2Jyb2tlbl9yZWFkX3RyYW5zbWl0X3Bvd2Vy
+X2J5X2NoaXBfdmVyKS9zaXplb2YoZGlzYWJsZV9icm9rZW5fcmVhZF90cmFuc21pdF9wb3dlcl9i
+eV9jaGlwX3ZlclswXSk7CgpFUlJPUjogdGhhdCBvcGVuIGJyYWNlIHsgc2hvdWxkIGJlIG9uIHRo
+ZSBwcmV2aW91cyBsaW5lCiMxMTc6IEZJTEU6IGRyaXZlcnMvYmx1ZXRvb3RoL2J0YmNtLmM6NDU0
+OgorCWZvciggaT0wIDsgaTx0YWJsZV9zaXplIDsgaSsrLCBlbnRyeSsrKQorCXsKCkVSUk9SOiBz
+cGFjZXMgcmVxdWlyZWQgYXJvdW5kIHRoYXQgJz0nIChjdHg6VnhWKQojMTE3OiBGSUxFOiBkcml2
+ZXJzL2JsdWV0b290aC9idGJjbS5jOjQ1NDoKKwlmb3IoIGk9MCA7IGk8dGFibGVfc2l6ZSA7IGkr
+KywgZW50cnkrKykKIAkgICAgICBeCgpFUlJPUjogc3BhY2VzIHJlcXVpcmVkIGFyb3VuZCB0aGF0
+ICc8JyAoY3R4OlZ4VikKIzExNzogRklMRTogZHJpdmVycy9ibHVldG9vdGgvYnRiY20uYzo0NTQ6
+CisJZm9yKCBpPTAgOyBpPHRhYmxlX3NpemUgOyBpKyssIGVudHJ5KyspCiAJICAgICAgICAgICAg
+XgoKRVJST1I6IHNwYWNlIHByb2hpYml0ZWQgYWZ0ZXIgdGhhdCBvcGVuIHBhcmVudGhlc2lzICco
+JwojMTE3OiBGSUxFOiBkcml2ZXJzL2JsdWV0b290aC9idGJjbS5jOjQ1NDoKKwlmb3IoIGk9MCA7
+IGk8dGFibGVfc2l6ZSA7IGkrKywgZW50cnkrKykKCkVSUk9SOiBzcGFjZSByZXF1aXJlZCBiZWZv
+cmUgdGhlIG9wZW4gcGFyZW50aGVzaXMgJygnCiMxMTc6IEZJTEU6IGRyaXZlcnMvYmx1ZXRvb3Ro
+L2J0YmNtLmM6NDU0OgorCWZvciggaT0wIDsgaTx0YWJsZV9zaXplIDsgaSsrLCBlbnRyeSsrKQoK
+RVJST1I6IHNwYWNlIHByb2hpYml0ZWQgYWZ0ZXIgdGhhdCBvcGVuIHBhcmVudGhlc2lzICcoJwoj
+MTE5OiBGSUxFOiBkcml2ZXJzL2JsdWV0b290aC9idGJjbS5jOjQ1NjoKKwkJaWYoIChjaGlwX2lk
+ID09IGVudHJ5LT5jaGlwX2lkKSAmJiAoYmFzZWxpbmUgPT0gZW50cnktPmJhc2VsaW5lKSApCgpF
+UlJPUjogc3BhY2UgcHJvaGliaXRlZCBiZWZvcmUgdGhhdCBjbG9zZSBwYXJlbnRoZXNpcyAnKScK
+IzExOTogRklMRTogZHJpdmVycy9ibHVldG9vdGgvYnRiY20uYzo0NTY6CisJCWlmKCAoY2hpcF9p
+ZCA9PSBlbnRyeS0+Y2hpcF9pZCkgJiYgKGJhc2VsaW5lID09IGVudHJ5LT5iYXNlbGluZSkgKQoK
+RVJST1I6IHNwYWNlIHJlcXVpcmVkIGJlZm9yZSB0aGUgb3BlbiBwYXJlbnRoZXNpcyAnKCcKIzEx
+OTogRklMRTogZHJpdmVycy9ibHVldG9vdGgvYnRiY20uYzo0NTY6CisJCWlmKCAoY2hpcF9pZCA9
+PSBlbnRyeS0+Y2hpcF9pZCkgJiYgKGJhc2VsaW5lID09IGVudHJ5LT5iYXNlbGluZSkgKQoKV0FS
+TklORzogRnJvbTovU2lnbmVkLW9mZi1ieTogZW1haWwgbmFtZSBtaXNtYXRjaDogJ0Zyb206IE5v
+YnVha2kuVHN1bmFzaGltYUBpbmZpbmVvbi5jb20nICE9ICdTaWduZWQtb2ZmLWJ5OiBOb2J1YWtp
+IFRzdW5hc2hpbWEgPG5vYnVha2kudHN1bmFzaGltYUBpbmZpbmVvbi5jb20+JwoKdG90YWw6IDgg
+ZXJyb3JzLCA0IHdhcm5pbmdzLCA1OSBsaW5lcyBjaGVja2VkCgpOT1RFOiBGb3Igc29tZSBvZiB0
+aGUgcmVwb3J0ZWQgZGVmZWN0cywgY2hlY2twYXRjaCBtYXkgYmUgYWJsZSB0bwogICAgICBtZWNo
+YW5pY2FsbHkgY29udmVydCB0byB0aGUgdHlwaWNhbCBzdHlsZSB1c2luZyAtLWZpeCBvciAtLWZp
+eC1pbnBsYWNlLgoKL2dpdGh1Yi93b3Jrc3BhY2Uvc3JjL3NyYy8xMzY2NTc0My5wYXRjaCBoYXMg
+c3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuCgpOT1RFOiBJZ25vcmVkIG1lc3NhZ2UgdHlw
+ZXM6IFVOS05PV05fQ09NTUlUX0lECgpOT1RFOiBJZiBhbnkgb2YgdGhlIGVycm9ycyBhcmUgZmFs
+c2UgcG9zaXRpdmVzLCBwbGVhc2UgcmVwb3J0CiAgICAgIHRoZW0gdG8gdGhlIG1haW50YWluZXIs
+IHNlZSBDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKCiMjIyMjIyMjIyMjIyMjIyMjIyMjIyMj
+IyMjIyMjIwpUZXN0OiBHaXRMaW50IC0gRkFJTApEZXNjOiBSdW4gZ2l0bGludApPdXRwdXQ6CkJs
+dWV0b290aDogUGF0Y2ggZm9yIENZVzQzNzMgaGNpIHVwIGZhaWwgaXNzdWUKCldBUk5JTkc6IEkz
+IC0gaWdub3JlLWJvZHktbGluZXM6IGdpdGxpbnQgd2lsbCBiZSBzd2l0Y2hpbmcgZnJvbSB1c2lu
+ZyBQeXRob24gcmVnZXggJ21hdGNoJyAobWF0Y2ggYmVnaW5uaW5nKSB0byAnc2VhcmNoJyAobWF0
+Y2ggYW55d2hlcmUpIHNlbWFudGljcy4gUGxlYXNlIHJldmlldyB5b3VyIGlnbm9yZS1ib2R5LWxp
+bmVzLnJlZ2V4IG9wdGlvbiBhY2NvcmRpbmdseS4gVG8gcmVtb3ZlIHRoaXMgd2FybmluZywgc2V0
+IGdlbmVyYWwucmVnZXgtc3R5bGUtc2VhcmNoPVRydWUuIE1vcmUgZGV0YWlsczogaHR0cHM6Ly9q
+b3Jpc3Jvb3ZlcnMuZ2l0aHViLmlvL2dpdGxpbnQvY29uZmlndXJhdGlvbi8jcmVnZXgtc3R5bGUt
+c2VhcmNoCjg6IEIxIExpbmUgZXhjZWVkcyBtYXggbGVuZ3RoICg4ND44MCk6ICJFc3BlY2lhbGx5
+IGluIFVTQiBpL2YgY2FzZSwgaXQgd291bGQgYmUgZGlmZmljdWx0IHRvIGRvd25sb2FkIHBhdGNo
+IEZXIHRoYXQgaW5jbHVkZXMiCjk6IEIxIExpbmUgZXhjZWVkcyBtYXggbGVuZ3RoICg4ND44MCk6
+ICJJdHMgZml4IHVubGVzcyBoY2kgaXMgdXAuIFRoZSBwYXRjaCBmb3JjZXMgdGhlIGRyaXZlciB0
+byBza2lwIExFX1JlYWRfVHJhbnNtaXRfUG93ZXIiCiMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMj
+IyMjIwpUZXN0OiBDaGVja0FsbFdhcm5pbmcgLSBXQVJOSU5HCkRlc2M6IFJ1biBsaW51eCBrZXJu
+ZWwgd2l0aCBhbGwgd2FybmluZyBlbmFibGVkCk91dHB1dDoKZHJpdmVycy9ibHVldG9vdGgvYnRi
+Y20uYzogSW4gZnVuY3Rpb24g4oCYYnRiY21faXNfZGlzYWJsZV9icm9rZW5fcmVhZF90eF9wb3dl
+cl9ieV9jaGlwX3ZlcuKAmTpkcml2ZXJzL2JsdWV0b290aC9idGJjbS5jOjQ1Mzo0MTogd2Fybmlu
+ZzogaW5pdGlhbGl6YXRpb24gZGlzY2FyZHMg4oCYY29uc3TigJkgcXVhbGlmaWVyIGZyb20gcG9p
+bnRlciB0YXJnZXQgdHlwZSBbLVdkaXNjYXJkZWQtcXVhbGlmaWVyc10gIDQ1MyB8ICBzdHJ1Y3Qg
+YmNtX2NoaXBfdmVyc2lvbl90YWJsZSAqZW50cnkgPSAmZGlzYWJsZV9icm9rZW5fcmVhZF90cmFu
+c21pdF9wb3dlcl9ieV9jaGlwX3ZlclswXTsgICAgICB8ICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICBeCiMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIwpUZXN0OiBD
+aGVja1NwYXJzZSAtIFdBUk5JTkcKRGVzYzogUnVuIHNwYXJzZSB0b29sIHdpdGggbGludXgga2Vy
+bmVsCk91dHB1dDoKZHJpdmVycy9ibHVldG9vdGgvYnRiY20uYzogSW4gZnVuY3Rpb24g4oCYYnRi
+Y21faXNfZGlzYWJsZV9icm9rZW5fcmVhZF90eF9wb3dlcl9ieV9jaGlwX3ZlcuKAmTpkcml2ZXJz
+L2JsdWV0b290aC9idGJjbS5jOjQ1Mzo0MTogd2FybmluZzogaW5pdGlhbGl6YXRpb24gZGlzY2Fy
+ZHMg4oCYY29uc3TigJkgcXVhbGlmaWVyIGZyb20gcG9pbnRlciB0YXJnZXQgdHlwZSBbLVdkaXNj
+YXJkZWQtcXVhbGlmaWVyc11kcml2ZXJzL2JsdWV0b290aC9idGJjbS5jOjQ1Mzo5NTogd2Fybmlu
+ZzogaW5jb3JyZWN0IHR5cGUgaW4gaW5pdGlhbGl6ZXIgKGRpZmZlcmVudCBtb2RpZmllcnMpZHJp
+dmVycy9ibHVldG9vdGgvYnRiY20uYzo0NTM6OTU6ICAgIGV4cGVjdGVkIHN0cnVjdCBiY21fY2hp
+cF92ZXJzaW9uX3RhYmxlICplbnRyeWRyaXZlcnMvYmx1ZXRvb3RoL2J0YmNtLmM6NDUzOjk1OiAg
+ICBnb3Qgc3RydWN0IGJjbV9jaGlwX3ZlcnNpb25fdGFibGUgY29uc3QgKgojIyMjIyMjIyMjIyMj
+IyMjIyMjIyMjIyMjIyMjIyMKVGVzdDogQ2hlY2tTbWF0Y2ggLSBGQUlMCkRlc2M6IFJ1biBzbWF0
+Y2ggdG9vbCB3aXRoIHNvdXJjZQpPdXRwdXQ6CgpTZWdtZW50YXRpb24gZmF1bHQgKGNvcmUgZHVt
+cGVkKQptYWtlWzRdOiAqKiogW3NjcmlwdHMvTWFrZWZpbGUuYnVpbGQ6MjQ0OiBuZXQvYmx1ZXRv
+b3RoL2hjaV9jb3JlLm9dIEVycm9yIDEzOQptYWtlWzRdOiAqKiogRGVsZXRpbmcgZmlsZSAnbmV0
+L2JsdWV0b290aC9oY2lfY29yZS5vJwptYWtlWzNdOiAqKiogW3NjcmlwdHMvTWFrZWZpbGUuYnVp
+bGQ6NDg1OiBuZXQvYmx1ZXRvb3RoXSBFcnJvciAyCm1ha2VbMl06ICoqKiBbc2NyaXB0cy9NYWtl
+ZmlsZS5idWlsZDo0ODU6IG5ldF0gRXJyb3IgMgptYWtlWzJdOiAqKiogV2FpdGluZyBmb3IgdW5m
+aW5pc2hlZCBqb2JzLi4uLgpTZWdtZW50YXRpb24gZmF1bHQgKGNvcmUgZHVtcGVkKQptYWtlWzRd
+OiAqKiogW3NjcmlwdHMvTWFrZWZpbGUuYnVpbGQ6MjQ0OiBkcml2ZXJzL2JsdWV0b290aC9iY20y
+MDN4Lm9dIEVycm9yIDEzOQptYWtlWzRdOiAqKiogRGVsZXRpbmcgZmlsZSAnZHJpdmVycy9ibHVl
+dG9vdGgvYmNtMjAzeC5vJwptYWtlWzRdOiAqKiogV2FpdGluZyBmb3IgdW5maW5pc2hlZCBqb2Jz
+Li4uLgpTZWdtZW50YXRpb24gZmF1bHQgKGNvcmUgZHVtcGVkKQptYWtlWzRdOiAqKiogW3Njcmlw
+dHMvTWFrZWZpbGUuYnVpbGQ6MjQ0OiBkcml2ZXJzL2JsdWV0b290aC9icGExMHgub10gRXJyb3Ig
+MTM5Cm1ha2VbNF06ICoqKiBEZWxldGluZyBmaWxlICdkcml2ZXJzL2JsdWV0b290aC9icGExMHgu
+bycKbWFrZVszXTogKioqIFtzY3JpcHRzL01ha2VmaWxlLmJ1aWxkOjQ4NTogZHJpdmVycy9ibHVl
+dG9vdGhdIEVycm9yIDIKbWFrZVsyXTogKioqIFtzY3JpcHRzL01ha2VmaWxlLmJ1aWxkOjQ4NTog
+ZHJpdmVyc10gRXJyb3IgMgptYWtlWzFdOiAqKiogWy9naXRodWIvd29ya3NwYWNlL3NyYy9zcmMv
+TWFrZWZpbGU6MTkxOTogLl0gRXJyb3IgMgptYWtlOiAqKiogW01ha2VmaWxlOjI0MDogX19zdWIt
+bWFrZV0gRXJyb3IgMgoKCi0tLQpSZWdhcmRzLApMaW51eCBCbHVldG9vdGgKCg==
 
----
- drivers/bluetooth/btbcm.c | 32 +++++++++++++++++++++++++++++++-
- drivers/bluetooth/btusb.c |  4 ++++
- 2 files changed, 35 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/bluetooth/btbcm.c b/drivers/bluetooth/btbcm.c
-index 0a5445ac5e1b..c64d1ddd140d 100644
---- a/drivers/bluetooth/btbcm.c
-+++ b/drivers/bluetooth/btbcm.c
-@@ -437,18 +437,48 @@ static const struct dmi_system_id disable_broken_read=
-_transmit_power[] =3D {
- 	{ }
- };
-=20
-+struct bcm_chip_version_table {
-+	u8	chip_id;
-+	u16 baseline;
-+};
-+#define BCM_ROMFW_BASELINE_NUM	0xFFFF
-+static const struct bcm_chip_version_table disable_broken_read_transmit_po=
-wer_by_chip_ver[] =3D {
-+	{0x87, BCM_ROMFW_BASELINE_NUM}		/* CYW4373/4373E */
-+};
-+static bool btbcm_is_disable_broken_read_tx_power_by_chip_ver(u8 chip_id, =
-u16 baseline)
-+{
-+	int i;
-+	int table_size =3D sizeof(disable_broken_read_transmit_power_by_chip_ver)=
-/sizeof(disable_broken_read_transmit_power_by_chip_ver[0]);
-+	struct bcm_chip_version_table *entry =3D &disable_broken_read_transmit_po=
-wer_by_chip_ver[0];
-+
-+	for( i=3D0 ; i<table_size ; i++, entry++)
-+	{
-+		if( (chip_id =3D=3D entry->chip_id) && (baseline =3D=3D entry->baseline)=
- )
-+			return true;
-+	}
-+
-+	return false;
-+}
-+
- static int btbcm_read_info(struct hci_dev *hdev)
- {
- 	struct sk_buff *skb;
-+	u8 chip_id;
-+	u16 baseline;
-=20
- 	/* Read Verbose Config Version Info */
- 	skb =3D btbcm_read_verbose_config(hdev);
- 	if (IS_ERR(skb))
- 		return PTR_ERR(skb);
--
-+	chip_id =3D skb->data[1];
-+	baseline =3D skb->data[3] | (skb->data[4] << 8);
- 	bt_dev_info(hdev, "BCM: chip id %u", skb->data[1]);
- 	kfree_skb(skb);
-=20
-+	/* Check Chip ID and disable broken Read LE Min/Max Tx Power */
-+	if (btbcm_is_disable_broken_read_tx_power_by_chip_ver(chip_id, baseline))
-+		set_bit(HCI_QUIRK_BROKEN_READ_TRANSMIT_POWER, &hdev->quirks);
-+
- 	return 0;
- }
-=20
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index d31edad7a056..52561c8d8828 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -142,6 +142,10 @@ static const struct usb_device_id btusb_table[] =3D {
- 	{ USB_VENDOR_AND_INTERFACE_INFO(0x04ca, 0xff, 0x01, 0x01),
- 	  .driver_info =3D BTUSB_BCM_PATCHRAM },
-=20
-+	/* Cypress devices with vendor specific id */
-+	{ USB_VENDOR_AND_INTERFACE_INFO(0x04b4, 0xff, 0x01, 0x01),
-+	  .driver_info =3D BTUSB_BCM_PATCHRAM },
-+
- 	/* Broadcom devices with vendor specific id */
- 	{ USB_VENDOR_AND_INTERFACE_INFO(0x0a5c, 0xff, 0x01, 0x01),
- 	  .driver_info =3D BTUSB_BCM_PATCHRAM },
---=20
-2.25.1
-
+--===============8908154732997578586==--
