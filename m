@@ -1,225 +1,253 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
+Received: from EUR05-DB8-obe.outbound.protection.outlook.com (mail-db8eur05on2071.outbound.protection.outlook.com [40.107.20.71])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8F28145B28
-	for <linux-bluetooth@vger.kernel.org>; Thu, 16 May 2024 13:03:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18D1114658E
+	for <linux-bluetooth@vger.kernel.org>; Thu, 16 May 2024 13:04:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.20.71
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715864628; cv=fail; b=FzcFzx/3CT8sphRrAw5ktEuk1UndtCpHp1xcGUv4NhyYPsYrBnQ0XMHTYGuc22MSTL+I+Oc55z17QlwOjC8pS8J9PT38DJHZuftUjv+2ckFLJ3osM2urzGphZz+blmUHxW1SLVTgpDXVphli70tl0Z1UBVJ+pLFGz98O6ilyuYk=
+	t=1715864654; cv=fail; b=JGmXUZnMOQgmRpAes/HLSosbqusASQ+lJTROFguw9Q+V+TSzmqoKcnmAaW3WT6rZ/pUDjmz8BnftFoUwguU2oCJHbxYFg8SJXpjHUQ+HGl8UAaRYH4OywIS/1HCJ4fdNCkcwITk9J7XEcvdS0QZ8cjGCOWXM2Rxi3qawCP3P20E=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715864628; c=relaxed/simple;
-	bh=Ak1mCqAH2YU/z5i6VGJvLtxT3dXWK6wUIrUcl5yS8gY=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=pTUvkhulbPZS+xI/I2aT6Q6oTT0814l0heNVX1tIk9melBtocWLW853xAonOkWp4c1QBMTvq1TLM4DSM63jypCVQTLWsKNI3w/SscfL4PedUK+CbVXye9uH9522+UFLr/vGuwWRZ6ELqcQFQ7UVG6qkZrfeIM4AtipBN+nEu8lw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=hfycm0/1; arc=fail smtp.client-ip=192.198.163.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1715864654; c=relaxed/simple;
+	bh=D5LxS67YP5NZj/fkWROgOC+HmBaoNl7qkzsQOLdG024=;
+	h=From:To:Cc:Subject:Date:Message-Id:Content-Type:MIME-Version; b=FBwEoFz78CBVuGhZOmS5u9ThUfOBMjOTcUBOGii7Hywjz//7CHn1Fn7AA1l4l1bzz+VU3tmOavyzHVq0dAzJJVK0iAl1aAzrdV8Wbfu2lJwXPL5DneqNZqEQqEcGfhTlxClC+tj/+N7y3ylmGHj9qWeVCV3klxhsD8OrPre478A=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b=C9SaJ0dF; arc=fail smtp.client-ip=40.107.20.71
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="hfycm0/1"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1715864627; x=1747400627;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=Ak1mCqAH2YU/z5i6VGJvLtxT3dXWK6wUIrUcl5yS8gY=;
-  b=hfycm0/1RXcj6+l0nVjVmyEVksu1Z2nz9bOaffe/r7bq1a0oPiW11VCt
-   6RUY+IF5l78b1b0mZVa7G7AR1c9jv0hNMelL+R29j0bEzBTUOiVFsIiIY
-   qXb6j7kHdPnkpOhZwbqnZhxsfbGtNRgbaIEfvU0xE3cqHmp17B7VD8oIh
-   PsypKewInFQV/Do53c8R1QPOPpzk2M0PG8qpkMBa9TVRwRfX9qZwm2b/k
-   ApIXPUlzw+lHiDjw9IhMO+bwZX96DIw67KRYUkmYtr9xZDOT15f3KieVM
-   qQj+zEkOTxqeV92eZeZ35cMWjXd4h9XIyTx122pgKH2VFft2zfjr4zrhc
-   g==;
-X-CSE-ConnectionGUID: KGN/XK25SviF7baKFbnWYQ==
-X-CSE-MsgGUID: 45xBUgpFSzeIvU4KTkUc6A==
-X-IronPort-AV: E=McAfee;i="6600,9927,11074"; a="11781289"
-X-IronPort-AV: E=Sophos;i="6.08,164,1712646000"; 
-   d="scan'208";a="11781289"
-Received: from orviesa003.jf.intel.com ([10.64.159.143])
-  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 May 2024 06:03:46 -0700
-X-CSE-ConnectionGUID: Lz2tuQoMTvqfGPc7i+02rA==
-X-CSE-MsgGUID: vkdDAEDqTUiegizsY5C5aw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.08,164,1712646000"; 
-   d="scan'208";a="36154578"
-Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
-  by orviesa003.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 16 May 2024 06:03:45 -0700
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Thu, 16 May 2024 06:03:43 -0700
-Received: from orsmsx601.amr.corp.intel.com (10.22.229.14) by
- ORSMSX610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Thu, 16 May 2024 06:03:26 -0700
-Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
- orsmsx601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Thu, 16 May 2024 06:03:26 -0700
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (104.47.56.168)
- by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Thu, 16 May 2024 06:03:20 -0700
+	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="C9SaJ0dF"
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Fo9dSZug/cKBGze2WRlaYfViJlMJa8QjS2F58yatzIalFi4bisAuh5Czh5DrOmhBEMpN0afMln5oDl7DN+HSqI9CbpWWslmS6SrsusegFb0QaP8m+UIty8k4Ref6Ma28BInE5dMG/7If1j677qKwSB3oO6aF2rKZ0XpI9CllwKwIa+e1OELsk7m+twzupTcpYGqeS1/G8DOvpECAagHiCTTx7z9ArVQ2TDe3y2jM30aIh3z21RnxlI04JpE3V4Ohc1z0K3ismuwYjF3EZKl8Nfd65kjSZ1vfC0wSJV2/qhXN0KayTIhRYlqAG8WePhq91z8H1OCi/AZ5/gXPn0I5sw==
+ b=GSpKAs3/Qn3n36xW3hLJLedQW2107lBN+zKnmd1CBrkTNWFMKE+auvRUd2JcbinHuarBx/MX1d/k5AgPLmfQ5CT4p2eyuS1kVzeUKBG3v/0ADdP6wyopiWsG3mCJr4T60uqH6v4BLBNh+ulsaYNB5e50OgyYNk8vXTyLJIzVxzO9MyPkCCcxQkTuuJ72797yOGq0JaJPwbipquCpD1nxRR6nNFt1VU97HKGslm5RoZrLzUbMbSuR9Rz+MrDwHiltISjpR1QxgbG+axCMiu+ISdyRAx0xf/hLR90AkcCOHSL4Gd/Wi+zaLsBS/r4yxDyevW75/0oxw996PDlLPBEvxg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=1fn0P9qhU/hmxSMQA5OFTmZ527PGcGIBh853wGYleLQ=;
- b=VdCqenAeg2LaU9WJVzTcHjunFGtyAevX/ClK8cmG8DhPqHLVYoda8e5j4kIS8v1R5gXHa2waR+2F0F5szztAsV8/PQP4LXWipZEHjHe6VR9WxOeLBmRlfyLVDDcWD2n4aBfWgjJ89+FV3vgbqcOswP4IE750b1PD8PZNPUMntI/4ohbU4mQRbegv1fbN0NZrR683iN6uae+6bmKTMdzMOvhldrpmOPimGsSuOh6fP0KUx0eOgkWPo9Gvq29TRHAdfwiikehMJYZ2Fe0sD3Wf7FpM/kQD4tOcWBWwpiPaR+6ZVhYibVjbnAR28WCtUCe1zSHxcAuKe0wm7NZnfvshzA==
+ bh=DA6NCO/giJpdKyrtKj5I8njLip8EEvIz2lYwhwb4mtg=;
+ b=G7tanAqtB8RNRX9ncnD+DHh5NhuvXWv8ndmtr+4gxZ6GyRy9e1KbKyJuzRC1JQfmbZh3L8zJ8WLOO1dRGwIc3n9uh457t6IqL0FlNI3liF0DITyX5tR8TaQjGqdE/cnx8DQfyA3BCUVPyLui2oSXj9obIYiaGxiClAsnh8onjNpcaeuc0K4xKp4xex5EotgkSrGWsctKMT1S4J3jr/G6k4DboDXb6LWEegdm0QUHxf+MSoucaLj65QbGzsDXWb6DRRpjCwSGH0LPkJy8cvYkIqC8TK3cfFzGdEGCIUzAtNeOPvZDVKTDud3Bq3dfGp2N80K5jXAEB+Q6VTwVYShgsg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from PH0PR11MB7585.namprd11.prod.outlook.com (2603:10b6:510:28f::10)
- by CH3PR11MB7251.namprd11.prod.outlook.com (2603:10b6:610:147::10) with
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=DA6NCO/giJpdKyrtKj5I8njLip8EEvIz2lYwhwb4mtg=;
+ b=C9SaJ0dFURmhtG3xkLpgGoUbK52Foo0lzlLYOnzgnAdvBm1imEJnwxN0Dr3U1muqIF7b9TS3zbaKSFbUPb4mLuIeQKzdiIqxrky2PN3B48harUxlouAogsPRFNUKvwmfBPOrPGNliLK94bTCew6VYubLfYZ2ZI1pjWSVU9UG/Xk=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from AM9PR04MB8938.eurprd04.prod.outlook.com (2603:10a6:20b:409::20)
+ by AS8PR04MB8564.eurprd04.prod.outlook.com (2603:10a6:20b:423::7) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7587.28; Thu, 16 May
- 2024 13:03:18 +0000
-Received: from PH0PR11MB7585.namprd11.prod.outlook.com
- ([fe80::9ba4:34:81ac:5010]) by PH0PR11MB7585.namprd11.prod.outlook.com
- ([fe80::9ba4:34:81ac:5010%7]) with mapi id 15.20.7587.028; Thu, 16 May 2024
- 13:03:18 +0000
-From: "K, Kiran" <kiran.k@intel.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-CC: "Srivatsa, Ravishankar" <ravishankar.srivatsa@intel.com>, "Tumkur Narayan,
- Chethan" <chethan.tumkur.narayan@intel.com>, "Satija, Vijay"
-	<vijay.satija@intel.com>
-Subject: RE: [PATCH v1 3/3] Bluetooth: btintel_pcie: Fix REVERSE_INULL issue
- reported by coverity
-Thread-Topic: [PATCH v1 3/3] Bluetooth: btintel_pcie: Fix REVERSE_INULL issue
- reported by coverity
-Thread-Index: AQHap4wgIzWqHInHzUGt/5hlU9MTx7GZ03Aw
-Date: Thu, 16 May 2024 13:03:17 +0000
-Message-ID: <PH0PR11MB7585A340F55F0B7C1961B18BF5ED2@PH0PR11MB7585.namprd11.prod.outlook.com>
-References: <20240516123938.891523-1-kiran.k@intel.com>
- <20240516123938.891523-3-kiran.k@intel.com>
-In-Reply-To: <20240516123938.891523-3-kiran.k@intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: PH0PR11MB7585:EE_|CH3PR11MB7251:EE_
-x-ms-office365-filtering-correlation-id: 148097c2-a4c7-42bc-8941-08dc75a88e50
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230031|376005|1800799015|366007|38070700009;
-x-microsoft-antispam-message-info: =?us-ascii?Q?AX4kS/VAyL480w65Z0eibFoEcsWCylwRX8v4nT/RCL1V0Zk2bmNnZZd9FUS+?=
- =?us-ascii?Q?++jook90EQuvns3diUZl44rkU3ynBOmCwH5N9yCWb5P8fu+bCHj/d6JzBpHa?=
- =?us-ascii?Q?1BjdEbo6rioGkX+Ntlj31i0e1CpMPtPpONtrFxQJSSaMRmOOHmUDFJ967Uid?=
- =?us-ascii?Q?Ncrxrvl9B44NhBn29MnnPuOJgCidvj5jb43Wrm9jEWGgfbVQNrNHJ3kZGf+g?=
- =?us-ascii?Q?i9jNTkTsVivyOzM/iUa/BzI9PvLnajMOhF4edOPxVZO5OlRoZUtmhH2A7NVK?=
- =?us-ascii?Q?QuXKzkDMEeJcv6q/YPcVU8UAShNabAIq3w62guBxOoXAVqkyHVIst4u+PvXo?=
- =?us-ascii?Q?c+ZTk2ZlFaeIMfBlwhR7a4a8/3W4WXtSZjTSJ5Ma3+zylM8prFNMmgxbXgyG?=
- =?us-ascii?Q?R/j/FAACM9E/I7M/9w4zb6lDj8dHvkRxLjsv4D1ZA6OCgRPbEm0SPoU6UFFS?=
- =?us-ascii?Q?8+HiZN1seSb+DAmwWYcDMwhW2tKM7Bv78bI32W/WHfk3Zgt/5uvOkaQ94Rxv?=
- =?us-ascii?Q?xii66t4AMmhDKZt561neY5DdxRNXmF/FAyu1FQ2/qdaLn8fWGRm9Bda1kXU2?=
- =?us-ascii?Q?MeisvJC6okxLFkTXUaiLDV5gceQq76ufYpsobHmWKM4iz3br1WJ+IMcgYzSM?=
- =?us-ascii?Q?eSlLWildTpw5DMcs6bChS4FTnmDcMxkcoX4ecr0c+8FFCeNQsCbK8I90mpHa?=
- =?us-ascii?Q?UDc0Eyp1IIIDVRkEjRiTia7sak198rduyseHf3h0ofFt4IN4Ly+7Mg87yM1+?=
- =?us-ascii?Q?9IZl89uB2wv2xWptWYM7VMGokCadczKObX0iQwu1xcTo2U6bxR6Hpk7L9fyl?=
- =?us-ascii?Q?TNI4O1rNdOl1iDdh6CH59phyRkUy+xlgfBjZng/FPLiXqxjmmj4YZUkmXovb?=
- =?us-ascii?Q?XL9qYy3GQsgRzyYyIWfkvXqykpKN7Kg1TiZeCcuQXY5dvj5T2RdSavgWKDBo?=
- =?us-ascii?Q?Wdh7ZwW0p1UEre+SmkzgHUM0+addX80cAqKcg7c8E7bkbSFq5a4Qf5iFERKv?=
- =?us-ascii?Q?gKATYNVJyFzJ4OL9usfZxshaWNyZgOlrwjoG3N7/tP58KVnG9HXgxGuGQlzp?=
- =?us-ascii?Q?VOf8U/IC3lBFNdCNrGPPqAiiIqCo/d/UF5GsLFpCbaZ82jpkYR1ZD4vK8nC+?=
- =?us-ascii?Q?cXqrzesBD7DUFqP1Y76QzYfohC1E6oM066yag2RMpOm0+diP7RVdp5LXXdtW?=
- =?us-ascii?Q?Eq/YZPyXuqJ9XVZ9uY7yLYvHVjyJaQ4SFFhyWW8LZvKjNtSdR+kU7kVkVoES?=
- =?us-ascii?Q?KZoaOrRmfDFLZUoHMsXtfLstuXWvOYpNJ2hy5r6YS5TqxzcCSQMgU/IGpb5a?=
- =?us-ascii?Q?VfgJOYA8cWvXX/GvpM4Y2e4BYr/XlH3DZA6v/x+4ubRCuQ=3D=3D?=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR11MB7585.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005)(1800799015)(366007)(38070700009);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?p20//X648+m3dlArOeqjWeLxsKRv5rxpREk11NoC06GSsr67t1hwbA0WMmBt?=
- =?us-ascii?Q?D/N6qxywmNWXlsKAAPVIFSS8SJqeAC3Dzg8wEGhAuA6JMSjamIFvipbdbRXr?=
- =?us-ascii?Q?6VHHN6hZRI7G4EodjlRP4LE1OksMz1dk0nkbzJ1JDPDhn8gUFOT38bmZkvyl?=
- =?us-ascii?Q?ZsXC8LUqCtpaRy3RvuGqLwuWOUaucjrzhssgPP87SRJdqcEAItbXX1Bzp0y6?=
- =?us-ascii?Q?XasRym+ArNrAh31Yll/DLal3ux+Nx3iTDFe6Q1+hFmxTQZLq8Xnhllau+XCf?=
- =?us-ascii?Q?Av3MMrpbPDrMsdNV+9rp2X3j7M3aXAVtIqBMx/iGw80xkbogLXnOs4Jyq+KT?=
- =?us-ascii?Q?UQNcNeoJBnnZSbHRZ9y/oDV+kUcxh+JavQZ7IajMPR9/KP2x9qyrpwtMMyuZ?=
- =?us-ascii?Q?LSlF+dSzeUm7dv6+cJh5pm3jZBHlJ7p2lftuQTAolpCRqdIbznEVopkIIQr5?=
- =?us-ascii?Q?pE1QvRqbQnmUIpJzA2xFRb+nZssDyam76x6dUfwgHwtjzdkD6V/bjNjbeX5Y?=
- =?us-ascii?Q?lcZI+3W/QNvpVv/z2ELZ/D5T8+WiN33NAiXlPfmkIS2QkuzKgyTAUhYNuOGz?=
- =?us-ascii?Q?/cr1bVWczhe9wsVvgwehX2czJTHxfVpG4e21TWLpJlQhp47cGVEouZcr+XuJ?=
- =?us-ascii?Q?SR9Tg+rY3hXSVqrIrhIWkxctyFbJEe8TjY5gykMlMDT71102o7p/Q3P9/XfN?=
- =?us-ascii?Q?yQhjTbWzeh1fzvJXqtdnFtPxhR500o8hvNVAh1YvcBiDcRPLFpKr8QUN4q3j?=
- =?us-ascii?Q?fi9A2rQIcZKiuuG39+s0hLGKiD4fZ2xqcizqR83Jjg2NIrJr+GISXJzPzfOo?=
- =?us-ascii?Q?ReYqjmqrYg1yw8H/eJ4WmdOpfNKQUGslkC6cCV3KvoB7NcpV7xNhpGPKQlmv?=
- =?us-ascii?Q?kHdgSC9/c8k2mkcNrLrZMNTIKoaBrlsZ2CuKO7nb9cGE6WIXCk5B+d+TmXfR?=
- =?us-ascii?Q?uPUD3qoNspBPFrFUF2tksDoK0+hXbOEMTCDpUaniuU/0607TSiWIP2JiMqSl?=
- =?us-ascii?Q?tHMeVhX9zzqU7/igh6Zm52jQ1IxOlhocCl89k65sXRQttxg4Sg0+/M99dikp?=
- =?us-ascii?Q?Vf4GgMxKmY9UFUmsaJ5i1qbb0pxHsRnWStfJ3sboAw5UVqNE4IPnK4Ko1GFl?=
- =?us-ascii?Q?//0VAtwlNNaeTEik8dDgKUhd6h2PQMBZmcuXi41mbEFFskXgISmzjhM51zZw?=
- =?us-ascii?Q?64PDWG8p44noLogo/q7Bp9utcW9d3tsOA7OpefAgT5XUz8+lw9ufw1/QmfD7?=
- =?us-ascii?Q?Px8BpTxgCeaByQpOfX0F6uT9l2wXfL+vsRZc6mthSQ6pTeYFplGBV9nU68Me?=
- =?us-ascii?Q?z/klE+nBTuwIWD7p4LYQCZU2U0XQiZp+5u03hmCHSofAw2nYY2dsumCT+C22?=
- =?us-ascii?Q?wUH3bpLFa73LpPdkSvEQRqBy+3OACHxS0U+00OJEd02cWi94tVaZxHOcShuT?=
- =?us-ascii?Q?V9NKFwtgZd1CIq5IwYFXZGULwKOC7Z3WQyEb468FwpgR4rziLP6hVcM5dXCO?=
- =?us-ascii?Q?0l51iPW7hdEPg1G0ayckTjVimHjK6JCxp1V3S6yy4I831AVUpKAoytZjVDmn?=
- =?us-ascii?Q?tEh54yvTKYJwHHwmLbU=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7544.55; Thu, 16 May
+ 2024 13:04:04 +0000
+Received: from AM9PR04MB8938.eurprd04.prod.outlook.com
+ ([fe80::b7d3:ac7a:a87b:5fbd]) by AM9PR04MB8938.eurprd04.prod.outlook.com
+ ([fe80::b7d3:ac7a:a87b:5fbd%7]) with mapi id 15.20.7587.028; Thu, 16 May 2024
+ 13:04:04 +0000
+From: Andrei Istodorescu <andrei.istodorescu@nxp.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: luiz.dentz@gmail.com,
+	mihai-octavian.urzica@nxp.com,
+	silviu.barbulescu@nxp.com,
+	vlad.pruteanu@nxp.com,
+	iulia.tanasescu@nxp.com,
+	Andrei Istodorescu <andrei.istodorescu@nxp.com>
+Subject: [PATCH BlueZ v5 0/6] Create transports for matching BISes
+Date: Thu, 16 May 2024 16:03:54 +0300
+Message-Id: <20240516130400.16713-1-andrei.istodorescu@nxp.com>
+X-Mailer: git-send-email 2.40.1
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: AM0PR06CA0098.eurprd06.prod.outlook.com
+ (2603:10a6:208:fa::39) To AM9PR04MB8938.eurprd04.prod.outlook.com
+ (2603:10a6:20b:409::20)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AM9PR04MB8938:EE_|AS8PR04MB8564:EE_
+X-MS-Office365-Filtering-Correlation-Id: 79a94dd5-56d7-4488-05af-08dc75a8a99b
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230031|366007|376005|1800799015;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?39hDBhhqeSxQs12933DzNIX9vT9S+TKc/wL4I49rLk5caSmiKduG29l0PTx+?=
+ =?us-ascii?Q?ywrE8AEoMymw5hjwKYFJYNfh26h/jKYi6ffvoB1mB2x6AHLI65i6U3aKNNUG?=
+ =?us-ascii?Q?JQBOgVSbkczBhBrX9/UWg5lZQdter+En3HRNR3OZIwH/wOMB/UnYrWWRLss0?=
+ =?us-ascii?Q?tdPDWGEmDiRBc47nBatTzyuagQ2TkTIA1duTGp1vyJWmi0Y7fut61HmOXr7V?=
+ =?us-ascii?Q?45AkE3lRBWToPwTA7K0I8ZkuKO9XqKgrKNZzRa67NkmRgdqmZfcRLfRyrZFQ?=
+ =?us-ascii?Q?KmyFkLK0EpQChJWp3N4yelrSzmRTMPzIPEJ+0L+0RlxNFDWDZ7Soxrn8A5jz?=
+ =?us-ascii?Q?6NR0ZaCvpi32ubU5Sq9j6g2u5dXp2N1y30DQhFDN1HLsLem85j5rCip8brgc?=
+ =?us-ascii?Q?0fMYXjmdEob1Wj5UIsUznex9BIdefugVWLsucXDzce4nSrb106zAuq83nekj?=
+ =?us-ascii?Q?TfYL2Om9OY5OimNpD2SXdIWWVQ4J5Izl7EmD4rxfXIjBY7Rxo0KeMsauGEsL?=
+ =?us-ascii?Q?7F4NUiMbN6IU3G41gwvNIcqjpG+7f/YhSBitcNfcSPQMOXfoeQLbdq9oS4I/?=
+ =?us-ascii?Q?Hs1tvFYIXmQBb+b6CPcmTnACdzKAIZfA9YnNAM3Frxs/MIVvmoO7hMIoUIHk?=
+ =?us-ascii?Q?rs1HlQlAFSc7BKW8ANGncvEEAZgEhK0NxA3+JycpUjRjg8/DQcJ6I7O+aQa5?=
+ =?us-ascii?Q?tETKPeW4uhZk37DMb/edU5ldXEhG8CDPWDIX3e7fMe31hV4d7D1frxWxVmSB?=
+ =?us-ascii?Q?IXfPgCXNFja6+PXLZYPvhhSQZKotuSEYks0+yGYpaX4PPHCd4NYhcTL1MecT?=
+ =?us-ascii?Q?QCoLMGr4pQOS5MFgYZNd9p/qq7A6PSPKZiX0/whHt1tpmqKv2NRbnF72WRLZ?=
+ =?us-ascii?Q?6I34Pl2sDBpJfMqqK1/tRyJdbwK/u161xnAhwDN4VRzAPOwXMwsWi1Cjg3RY?=
+ =?us-ascii?Q?0frQloCp9RleWM0trINs+qvJ9mciKEPiS40764vlntIszJpqdWGYnf5N7Ekk?=
+ =?us-ascii?Q?3QFFHhIier0kpLzNxq6RuPes5CJpmGXxnHqW5UJxW4K6GMhZn1VrlAovDjMm?=
+ =?us-ascii?Q?PqskKdsQ6AGIBw3QnMe8xU2R1G+R/Ugdu8tPRWqrMEF2yUB91Y2SrFSwzJbR?=
+ =?us-ascii?Q?kSQfkfXoJ9gLTyaMz0c+gY3/RijkZXtQGfI6OUE8zizyLZmNR3BCWzOU1FLz?=
+ =?us-ascii?Q?IHjOA5uBDRDypo0/OLq+N0z0vXEnlrNIPvisGFODw9NO3atQESkQOVxhMXzZ?=
+ =?us-ascii?Q?0thhbpiTnSqyAT8CKQpm3vuLPkmGS9+Skluqps7R+Q=3D=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM9PR04MB8938.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366007)(376005)(1800799015);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?3hTm9MAh6HORT5RQP8kzXV+vLKSPOVBnF73HHQT2qHWom8RQXivxtEolol4+?=
+ =?us-ascii?Q?cAskZjkuWfBwVrizsDvounhpKNNSxktFvaNeUiXC9QEGplGBW5tBHtLnKGNB?=
+ =?us-ascii?Q?4X4jUAwMD8+PLkvSICLSdZFWcAXysOSygdJQCYeQRYKg3i+gKATNRKC9kD+J?=
+ =?us-ascii?Q?t6cm9io4HYjuZPE2vH8obM/S+fNp1H2w6PjHTmXVD5HmoWK2FN/G+sAJEFGD?=
+ =?us-ascii?Q?drpMPiPHhGw/MdR4UPO1ajpipd5G2RZt6iGv5QalX7zyaebmwVLm8mgMZuYe?=
+ =?us-ascii?Q?TC1P24OjXjAxneht+vP7DXwZub/fU/AjS8LtnWjTT0/J5Peocm56/fX4LCW0?=
+ =?us-ascii?Q?qx6eNSLRN2CmzFhA2NE0pIRulkpK+KnBqyotWrD5e5IDGbY5aFm/K+LGXGs/?=
+ =?us-ascii?Q?vmQ82zs5NNmdPBCluKyUM4mP7GpMZnmmakHLGpA6lzkYwWexxUEPJAylrGXR?=
+ =?us-ascii?Q?Im7LWRRfYFZZWcIQ5NwOY+XELBhfDG9DcgKMyzgsW+t58CjBsxYH/uGiR4kP?=
+ =?us-ascii?Q?B69StTxmCTRiUXLjo88wFsmzFmfEEn42zd4423w2sUKXJ/B+RlOutogVjllc?=
+ =?us-ascii?Q?NISNsBLeh0OJvyfDPswvNv/4UMNCAUPwD0Zu0KqadVW8p/mSlbVZHJhfwK8V?=
+ =?us-ascii?Q?qxTJQhvU0P9Ze10RhP+n8fDjfKaOBiRUQ0BLEN3TdSmVAlHVHG60dEmjDuSU?=
+ =?us-ascii?Q?pgtNsYd7TiO1PtniLRt+M0Vz7OreWyRtEp5MKSokpdcXa9OaKiUVS2dmQapW?=
+ =?us-ascii?Q?FTkSYjqX4e1KnyM47XtXz3EVdUNe+QuOw2/CarD0hodQwSixMZVIkFWYfXKn?=
+ =?us-ascii?Q?n6gnbbhg857M7iL4Bic+Ids+TP1/LFeAHsUss0mT30dYfta8aAZtFdYqPMDV?=
+ =?us-ascii?Q?9IwR4OEHCXwxxwiUDSgkjqLe2oBT1ALJzkkQcdlZSLrypFH7DhWfUOqN40kP?=
+ =?us-ascii?Q?3DXoeYemWhEWp4op8uhH8Jy4q56BUeeYqfP/veS/JoGlgu+5paVu5LFkhPUp?=
+ =?us-ascii?Q?YYR0akVXW/vgkpEiHPVbTrbbSJe8KH6YW+mQKwM1jm7H6X23uZzFXyeMMsph?=
+ =?us-ascii?Q?aNxPixTlgOZyVje4EXczHwI3BZOlMIXEJuAATF4eD+SjG/i2MfWw012GxXEd?=
+ =?us-ascii?Q?0Rz+hGkLpQGAUqWShPeOHvkJqXVmGtpXm3++0k6T+CWkPVaKjaJfzdWRf1Gl?=
+ =?us-ascii?Q?Mm6u6o8Z/I3QjvXx7pkt2vFQtSjk1au9GbEJrVIKNWkaoek8ZP2KjRToQU0l?=
+ =?us-ascii?Q?3fytt3qXqkXTAyd4lAsyjmJG5D2aw3ElfJw6wgmCvjGDM/+8V+aFN/Ct6ghY?=
+ =?us-ascii?Q?V8TiAXCn9aMDwOs1wEpF3EJ5lCZrzdps7Tmjb5ToMFwg2gx0aW8fzOKvt0Q1?=
+ =?us-ascii?Q?PzCE88LxLNbJnuNxixpDSUtuSTA3ZRyocmvxG8qZ5iNeeka2V1708KQdglhj?=
+ =?us-ascii?Q?FlDidsE8cBgj+/1Xdwu9qJ3qSlnYpi/A4Nj6SXYU/wcJQ2FcmbM2qY1zV3Fp?=
+ =?us-ascii?Q?yNPCrXltUGejULZF4iERq7r5VpMqyAYcNOD77Yw3XO58l2Q8yNGwZrwfrfFg?=
+ =?us-ascii?Q?7P/TpQmnxvgbL8i4Dx+rxvYqfMhCMyS7f3vfUlEl9PnIJJfDAwxKi0LNwsXj?=
+ =?us-ascii?Q?kg=3D=3D?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 79a94dd5-56d7-4488-05af-08dc75a8a99b
+X-MS-Exchange-CrossTenant-AuthSource: AM9PR04MB8938.eurprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR11MB7585.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 148097c2-a4c7-42bc-8941-08dc75a88e50
-X-MS-Exchange-CrossTenant-originalarrivaltime: 16 May 2024 13:03:18.1905
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 May 2024 13:04:04.1268
  (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: VxzVPnKn4ArInt+5UNfvLui3B97pHvM5xNFhW5kE3TzfwwRGd2X6jh+1yUUy+NTtfDY6ScSrOFYO2c5zPgSkaw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR11MB7251
-X-OriginatorOrg: intel.com
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: V3i6K14L37X1DDGYTiAh+jp18eCSXDgd1VOgxQ8OVrrGi7Q2lg8DQ4YpiniPnNNcTvv4Ifo5u+KdjpQXWPPoiAXkLcoGTS6Mi/+y79M2fzo=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR04MB8564
 
-Please ignore v1 series. I have published v2 version with Fixes tag include=
-d.
+This patch refactors the flow for the BAP Broadcast Sink.
+After observing the BASE information, streams and transports will be
+generated for each BIS that matches local PAC capabilities.
+Because endpoints are not available any more, local PAC (which contain
+local registered capabilities) has a new list of setups. Each setup is 
+generated based on the matching BIS observed.
+Then, the setup is used to configure a stream which then generates a
+MediaTransport.
+The transport is in the TRANSPORT_STATE_IDLE state until someone
+acquires it. The "Acquire" procedure results in creating the IO using
+BIG Create Sync. The successful reply of it causes the transport to be
+advanced in TRANSPORT_STATE_ACTIVE state.
 
-Thanks,
-Kiran
+bluetoothctl log with two transports being created and acquired:
+endpoint.register 00001851-0000-1000-8000-00805f9b34fb 0x06
+[/local/endpoint/ep0] Auto Accept (yes/no): y
+[/local/endpoint/ep0] Max Transports (auto/value): a
+[/local/endpoint/ep0] Locations: 3
+[/local/endpoint/ep0] Supported Context (value): 3
+Capabilities:
+  03 01 ff 00 02 02 03 02 03 03 05 04 1a 00 f0 00  ................
+Metadata:
+[bluetooth]# Endpoint /local/endpoint/ep0 registered
+
+scan le
+
+[bluetooth]# SetDiscoveryFilter success
+[bluetooth]# hci7 type 6 discovering on
+[bluetooth]# Discovery started
+[bluetooth]# [CHG] Controller 00:60:37:A6:AE:22 Discovering: yes
+[bluetooth]# [NEW] Device 07:34:BB:4B:6F:C3 07-34-BB-4B-6F-C3
+[bluetooth]# hci7 07:34:BB:4B:6F:C3 type LE Random connected eir_len 0
+[bluetooth]# [NEW] Transport /org/bluez/hci7/dev_07_34_BB_4B_6F_C3/bis1/
+fd0 
+[bluetooth]# Endpoint: SetConfiguration
+[bluetooth]# 	Transport /org/bluez/hci7/dev_07_34_BB_4B_6F_C3/bis1/fd0
+[bluetooth]# 	Properties.Device: /org/bluez/hci7/dev_07_34_BB_4B_6F_C3
+[bluetooth]# Auto Accepting...
+[bluetooth]# [NEW] Transport /org/bluez/hci7/dev_07_34_BB_4B_6F_C3/bis2/
+fd1 
+[bluetooth]# Endpoint: SetConfiguration
+[bluetooth]# 	Transport /org/bluez/hci7/dev_07_34_BB_4B_6F_C3/bis2/fd1
+[bluetooth]# 	Properties.Device: /org/bluez/hci7/dev_07_34_BB_4B_6F_C3
+[bluetooth]# Auto Accepting...
+[CHG] Device 07:34:BB:4B:6F:C3 Connected: yes
+
+[07-34-BB-4B-6F-C3]# transport.acquire /org/bluez/hci7/
+dev_07_34_BB_4B_6F_C3/bis1/fd0 
+auto acquiring...
+Transport /org/bluez/hci7/dev_07_34_BB_4B_6F_C3/bis1/fd0 acquiring
+[07-34-BB-4B-6F-C3]# hci7 07:34:BB:4B:6F:C3 type LE Random connected 
+eir_len 0
+[07-34-BB-4B-6F-C3]# hci7 07:34:BB:4B:6F:C3 type LE Random connected 
+eir_len 0
+[07-34-BB-4B-6F-C3]# Transport /org/bluez/hci7/dev_07_34_BB_4B_6F_C3/
+bis1/fd0 acquiring complete
+[07-34-BB-4B-6F-C3]# Acquire successful: fd 8 MTU 40:0
+[07-34-BB-4B-6F-C3]# [CHG] Transport /org/bluez/hci7/
+dev_07_34_BB_4B_6F_C3/bis1/fd0 State: active
+hci7 type 6 discovering offm[seq 0] recv: 0 bytes #            1
+hci7 type 6 discovering on9m[seq 146] recv: 0 bytes #              7
+hci7 type 6 discovering offm[seq 149] recv: 0 bytes #             50
+hci7 type 6 discovering on
+[seq 2446] recv: 0 bytes #transport.release /org/bluez/hci7/
+dev_07_34_BB_4B_6F_C3/bis1/fd0 
+[07-34-BB-4B-6F-C3]# [CHG] Transport /org/bluez/hci7/dev_07_34_BB_4B_6F_C3
+/bis1/fd0 State: idle
+[07-34-BB-4B-6F-C3]# Release successful
+
+[07-34-BB-4B-6F-C3]# transport.acquire /org/bluez/hci7/
+dev_07_34_BB_4B_6F_C3/bis2/fd1 
+auto acquiring...
+Transport /org/bluez/hci7/dev_07_34_BB_4B_6F_C3/bis2/fd1 acquiring
+[07-34-BB-4B-6F-C3]# hci7 07:34:BB:4B:6F:C3 type LE Random connected 
+eir_len 0
+[07-34-BB-4B-6F-C3]# hci7 07:34:BB:4B:6F:C3 type LE Random connected 
+eir_len 0
+[07-34-BB-4B-6F-C3]# Transport /org/bluez/hci7/dev_07_34_BB_4B_6F_C3/bis2
+/fd1 acquiring complete
+[07-34-BB-4B-6F-C3]# Acquire successful: fd 9 MTU 40:0
+[07-34-BB-4B-6F-C3]# [CHG] Transport /org/bluez/hci7/dev_07_34_BB_4B_6F_C3
+/bis2/fd1 State: active
+hci7 type 6 discovering off
+hci7 type 6 discovering on
+[seq 1330] recv: 0 bytes #transport.release /org/bluez/hci7/
+dev_07_34_BB_4B_6F_C3/bis2/fd1 
+[07-34-BB-4B-6F-C3]#   1;39m[seq 1331] recv: 0 bytes #Transport fd
+disconnected
+[07-34-BB-4B-6F-C3]# [CHG] Transport /org/bluez/hci7/dev_07_34_BB_4B_6F_C3
+/bis2/fd1 State: idle
+[07-34-BB-4B-6F-C3]# Release successful
+
+The difference from v2 patch is that match_data is not initialized any 
+more, to overcome scan-build warning:
+warning: Value stored to 'match_data' during its initialization is never
+read struct bt_ltv_match match_data = {0}.
+
+Andrei Istodorescu (6):
+  shared/bap: Update stream management to avoid PACs
+  shared/bap: Add function to check the validity of a BIS
+  bap: Update BIS management
+  shared/bap: Remove not needed function
+  shared/bap: Return the local PAC when matching a BIS
+  shared/bap: Add stream ops for get_location, get_dir and get_state
+
+ profiles/audio/bap.c | 320 ++++++++++++++++++++++++++++++-------------
+ src/shared/bap.c     | 290 ++++++++++++++++++---------------------
+ src/shared/bap.h     |   5 +-
+ 3 files changed, 362 insertions(+), 253 deletions(-)
 
 
->-----Original Message-----
->From: K, Kiran <kiran.k@intel.com>
->Sent: Thursday, May 16, 2024 6:10 PM
->To: linux-bluetooth@vger.kernel.org
->Cc: Srivatsa, Ravishankar <ravishankar.srivatsa@intel.com>; Tumkur Narayan=
-,
->Chethan <chethan.tumkur.narayan@intel.com>; Satija, Vijay
-><vijay.satija@intel.com>; K, Kiran <kiran.k@intel.com>
->Subject: [PATCH v1 3/3] Bluetooth: btintel_pcie: Fix REVERSE_INULL issue
->reported by coverity
->
->From: Vijay Satija <vijay.satija@intel.com>
->
->check pdata return of skb_pull_data, instead of data.
->
->Signed-off-by: Vijay Satija <vijay.satija@intel.com>
->Signed-off-by: Kiran K <kiran.k@intel.com>
->---
-> drivers/bluetooth/btintel_pcie.c | 2 +-
-> 1 file changed, 1 insertion(+), 1 deletion(-)
->
->diff --git a/drivers/bluetooth/btintel_pcie.c b/drivers/bluetooth/btintel_=
-pcie.c
->index d8f82e0f6435..58144c82b1cb 100644
->--- a/drivers/bluetooth/btintel_pcie.c
->+++ b/drivers/bluetooth/btintel_pcie.c
->@@ -382,7 +382,7 @@ static int btintel_pcie_recv_frame(struct
->btintel_pcie_data *data,
->
-> 	/* The first 4 bytes indicates the Intel PCIe specific packet type */
-> 	pdata =3D skb_pull_data(skb, BTINTEL_PCIE_HCI_TYPE_LEN);
->-	if (!data) {
->+	if (!pdata) {
-> 		bt_dev_err(hdev, "Corrupted packet received");
-> 		ret =3D -EILSEQ;
-> 		goto exit_error;
->--
->2.40.1
+base-commit: d9de306a28fecd711d3d2f88bf778f98f2772424
+-- 
+2.40.1
 
