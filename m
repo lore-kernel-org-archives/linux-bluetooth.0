@@ -1,92 +1,131 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA11414658E
-	for <linux-bluetooth@vger.kernel.org>; Thu, 16 May 2024 13:00:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 933CC14658E
+	for <linux-bluetooth@vger.kernel.org>; Thu, 16 May 2024 13:01:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715864457; cv=none; b=PNkSimwEUi+fYBhqUHseqLv4JRtwrnmxxAdtToGaC81+OtZg2w38qB2C5HdRov/j5tZyLW6IkxcBNReTSBAAaDidxSNd83ieU25YwrgpPDnFxxC4BlxW7kAHEt212QWefbBYODoFIwyqfXdSSz6/n1WD7J9bbXlpoYGiTFmC/MA=
+	t=1715864504; cv=none; b=PLc3O+/4Xl5LU9HsIlK8YTcqRVUC6ZzPrPYdxZ5nMzbyk1TXl+oebQO/0atcXBrHVRbvKuGP6VIXqD78CEuQ9kciXmWhZBTsGIgQFcAHKO4V5SBjhi2VeCB9YECFuW+rXvJoOHYGR6A/rpvdY8s0FBCgxaaxZ7KwsURX252BYKQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715864457; c=relaxed/simple;
-	bh=UelzzseOVEb5xnEvTVZqUl1Wg2Y8s5/14CVh7FmByKc=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=XssINKF4DoaslMBQV8ATBPato9tdq5rgFW++2N6yFsmLtpbzNHW9Zzjcy1a4/t8O2z3l8DvPVHlNGBh7Gj0SO7oWJGTU/ZGFASP61xcU7fOt4IYupFliYVzgc1wS+hVYH7P14BDIyerErGi5KsYKyBWzQS4q9oM064Ue3TIm3EU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=NcwFgYsr; arc=none smtp.client-ip=198.175.65.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="NcwFgYsr"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1715864455; x=1747400455;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=UelzzseOVEb5xnEvTVZqUl1Wg2Y8s5/14CVh7FmByKc=;
-  b=NcwFgYsrBtpqE4Fv4rPFhZK0l6n29kFx672ro0SSTmnZebAn6sZ1P0Nh
-   ClIShpOKHM46HNk7meVQx2gD0chNOQVEhB0jxGdPpuG8X1eN6jqIioYiT
-   Aq/XZe3yMNM8gJiJJVIylgU1Rn/ymLaSskFGqsEAgJ4z6pMqY7or06RMj
-   sLPOaaTt3SbSWZD4Z0Yl+k/ICqXWrSBKxThF0QefK26zPXrhcNLf1zvEf
-   QoyVmbRY3fLa4QpUHkhTKP8+uFU2RtzgJGGhcFjnXJov8fsoHWq2427rB
-   DJDLnKBMw2GugqTKzx9Lp3RE8pN1SeFGEAUe0v+Ya7nOT96pc6JyeeKii
-   Q==;
-X-CSE-ConnectionGUID: Vxx1uErKSBW3oUO+I3U3EQ==
-X-CSE-MsgGUID: L9t4BmECQRiMCD6IuSsK9w==
-X-IronPort-AV: E=McAfee;i="6600,9927,11074"; a="23108551"
-X-IronPort-AV: E=Sophos;i="6.08,164,1712646000"; 
-   d="scan'208";a="23108551"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 May 2024 06:00:55 -0700
-X-CSE-ConnectionGUID: OU6ZoC5eRz2okfKmOYXb/A==
-X-CSE-MsgGUID: iEXJhYNPQoS5zrrSmid/8Q==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.08,164,1712646000"; 
-   d="scan'208";a="54623627"
-Received: from intel-lenovo-legion-y540-15irh-pg0.iind.intel.com ([10.224.186.95])
-  by fmviesa002.fm.intel.com with ESMTP; 16 May 2024 06:00:53 -0700
-From: Kiran K <kiran.k@intel.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: ravishankar.srivatsa@intel.com,
-	chethan.tumkur.narayan@intel.com,
-	vijay.satija@intel.com,
-	Kiran K <kiran.k@intel.com>
-Subject: [PATCH v2 3/3] Bluetooth: btintel_pcie: Fix REVERSE_INULL issue reported by coverity
-Date: Thu, 16 May 2024 18:45:10 +0530
-Message-Id: <20240516131510.904787-3-kiran.k@intel.com>
-X-Mailer: git-send-email 2.40.1
-In-Reply-To: <20240516131510.904787-1-kiran.k@intel.com>
-References: <20240516131510.904787-1-kiran.k@intel.com>
+	s=arc-20240116; t=1715864504; c=relaxed/simple;
+	bh=JnNVVNb3IZU4skbapC9iRAU52F0SyxiFF2eGVJ8ecWA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=JiBP+SFCDvpLh/kwWI+F7BqsMUdRSo/1U+InqTFXJsUi2rtNtDK4SctXLXjBKugb/Lhu2DRmNffJNCm+bLmYQsx3mPaq8YOli5msHde3VpkY3D3RgpnLQWHtnbIgfcJsvQ27SrKZPDhM413YCwIzT/kJVrip9+tpcoXkVOnFiHk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
+Received: from [141.14.220.56] (g56.guest.molgen.mpg.de [141.14.220.56])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id CCD6E61E5FE38;
+	Thu, 16 May 2024 15:01:22 +0200 (CEST)
+Message-ID: <f42caf85-6a43-4d18-b14d-b5a3c55af0d3@molgen.mpg.de>
+Date: Thu, 16 May 2024 15:01:22 +0200
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v1 1/3] Bluetooth: btintel_pcie: Print Firmware Sequencer
+ information
+To: Kiran K <kiran.k@intel.com>
+Cc: ravishankar.srivatsa@intel.com, chethan.tumkur.narayan@intel.com,
+ vijay.satija@intel.com, linux-bluetooth@vger.kernel.org
+References: <20240516123938.891523-1-kiran.k@intel.com>
+Content-Language: en-US
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <20240516123938.891523-1-kiran.k@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-From: Vijay Satija <vijay.satija@intel.com>
+Dear Kiran,
 
-check pdata return of skb_pull_data, instead of data.
 
-Fixes: c2b636b3f788 ("Bluetooth: btintel_pcie: Add support for PCIe transport")
-Signed-off-by: Vijay Satija <vijay.satija@intel.com>
-Signed-off-by: Kiran K <kiran.k@intel.com>
----
- drivers/bluetooth/btintel_pcie.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Am 16.05.24 um 14:39 schrieb Kiran K:
+> From: Kiran <kiran.k@intel.com>
 
-diff --git a/drivers/bluetooth/btintel_pcie.c b/drivers/bluetooth/btintel_pcie.c
-index d8f82e0f6435..58144c82b1cb 100644
---- a/drivers/bluetooth/btintel_pcie.c
-+++ b/drivers/bluetooth/btintel_pcie.c
-@@ -382,7 +382,7 @@ static int btintel_pcie_recv_frame(struct btintel_pcie_data *data,
- 
- 	/* The first 4 bytes indicates the Intel PCIe specific packet type */
- 	pdata = skb_pull_data(skb, BTINTEL_PCIE_HCI_TYPE_LEN);
--	if (!data) {
-+	if (!pdata) {
- 		bt_dev_err(hdev, "Corrupted packet received");
- 		ret = -EILSEQ;
- 		goto exit_error;
--- 
-2.40.1
+Should this be Kiran K?
 
+> Firmware sequencer (FSEQ) is a common code shared across Bluetooth
+> and Wifi. Printing FSEQ will help to debug if there is any mismatch
+
+So, make `btintel_print_fseq_info()` public, and call it in btintel_pci.
+
+> between Bluetooth and Wifi FSEQ.
+
+Please paste one example message.
+
+> Signed-off-by: Kiran <kiran.k@intel.com>
+> ---
+>   drivers/bluetooth/btintel.c      | 3 ++-
+>   drivers/bluetooth/btintel.h      | 5 +++++
+>   drivers/bluetooth/btintel_pcie.c | 2 ++
+>   3 files changed, 9 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
+> index 0c855c3ee1c1..2c434ff9c47c 100644
+> --- a/drivers/bluetooth/btintel.c
+> +++ b/drivers/bluetooth/btintel.c
+> @@ -2713,7 +2713,7 @@ void btintel_set_msft_opcode(struct hci_dev *hdev, u8 hw_variant)
+>   }
+>   EXPORT_SYMBOL_GPL(btintel_set_msft_opcode);
+>   
+> -static void btintel_print_fseq_info(struct hci_dev *hdev)
+> +void btintel_print_fseq_info(struct hci_dev *hdev)
+>   {
+>   	struct sk_buff *skb;
+>   	u8 *p;
+> @@ -2825,6 +2825,7 @@ static void btintel_print_fseq_info(struct hci_dev *hdev)
+>   
+>   	kfree_skb(skb);
+>   }
+> +EXPORT_SYMBOL_GPL(btintel_print_fseq_info);
+>   
+>   static int btintel_setup_combined(struct hci_dev *hdev)
+>   {
+> diff --git a/drivers/bluetooth/btintel.h b/drivers/bluetooth/btintel.h
+> index b5fea735e260..796953547932 100644
+> --- a/drivers/bluetooth/btintel.h
+> +++ b/drivers/bluetooth/btintel.h
+> @@ -244,6 +244,7 @@ int btintel_bootloader_setup_tlv(struct hci_dev *hdev,
+>   				 struct intel_version_tlv *ver);
+>   int btintel_shutdown_combined(struct hci_dev *hdev);
+>   void btintel_hw_error(struct hci_dev *hdev, u8 code);
+> +void btintel_print_fseq_info(struct hci_dev *hdev);
+>   #else
+>   
+>   static inline int btintel_check_bdaddr(struct hci_dev *hdev)
+> @@ -373,4 +374,8 @@ static inline int btintel_shutdown_combined(struct hci_dev *hdev)
+>   static inline void btintel_hw_error(struct hci_dev *hdev, u8 code)
+>   {
+>   }
+> +
+> +static void btintel_print_fseq_info(struct hci_dev *hdev)
+> +{
+> +}
+>   #endif
+> diff --git a/drivers/bluetooth/btintel_pcie.c b/drivers/bluetooth/btintel_pcie.c
+> index 5b6805d87fcf..8d282ee2322c 100644
+> --- a/drivers/bluetooth/btintel_pcie.c
+> +++ b/drivers/bluetooth/btintel_pcie.c
+> @@ -1197,9 +1197,11 @@ static int btintel_pcie_setup(struct hci_dev *hdev)
+>   		bt_dev_err(hdev, "Unsupported Intel hw variant (%u)",
+>   			   INTEL_HW_VARIANT(ver_tlv.cnvi_bt));
+>   		err = -EINVAL;
+> +		goto exit_error;
+>   		break;
+>   	}
+>   
+> +	btintel_print_fseq_info(hdev);
+>   exit_error:
+>   	kfree_skb(skb);
+>   
+
+
+Kind regards,
+
+Paul
