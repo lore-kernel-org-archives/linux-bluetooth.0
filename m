@@ -1,141 +1,142 @@
-Received: from mail-qv1-f54.google.com (mail-qv1-f54.google.com [209.85.219.54])
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B1AD4F8BC
-	for <linux-bluetooth@vger.kernel.org>; Wed, 15 May 2024 23:56:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71DD210A23;
+	Thu, 16 May 2024 04:51:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715817371; cv=none; b=TRX7pM6YyNnKWlm7BKxHaFttuYK1WYXvxN9J0R2xASfPtZXjoAGorn28aQ27G+Z70B68TuYAqZBhT5PKzeVBgi//0/qSfgZsghQmFD+9uFccH24kM9kTdNBC1Jbkm1JyrLdyKVhVG1lHreQRErXrQkyOIocxu4m3erBhkrx3lUI=
+	t=1715835086; cv=none; b=MJjvhvnAezvpwKfUul9vv1tTnV6cZFVqMIgaiv7ot0DPw4jvbYnBh0swaBIPNoHDmtjYIZ4BcCDLL6NsH41h50VvdtylDSSPSi0SaDFFeGnMxApl5PJthCJg33l2Vjk9QKhZDiP/p5tol+oPNSCorLMSpvalYn+Coe8kT57GXQY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715817371; c=relaxed/simple;
-	bh=TysP2xjoRjVrkGeC+EMmm1M1/6+c4r6eB6EW7h4wKro=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=Bgs6pMtFeYXuC7m78Zo9nOm45dRIP+K8fDmvQvuAbrnXI5Z0ZclV9dpef0mjPyku8h17pBBKNCGu6bJ6rngrXs52SqXLiPzzEJOgros3vqMXWDrJgURWLdV112/n5i3XsTIqTfK3xoS5fvQ5v/LocKo+SUgldmFNF5dqEHi4kfM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fBiLlx/i; arc=none smtp.client-ip=209.85.219.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1715835086; c=relaxed/simple;
+	bh=QOYbLekM5Zrc4zhKXVC4BYi0CMmtznr3IyXJv1O/Imk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=tRarcgP3BFA5qB3A4t1+esnSNG4D53iFCW/kVnpBq5KE4jifC/jCEhVJwjdo41Kb92WfCBUUkUDDEP9scC8WaNew/ZTTzXAoY6CImAjWYPTEdr8qZlQ00ChWLh0hKz/zBrSkNC18dVlFp9GR9MMplrFU2Z5UihW0a8yYb94r4HQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b=HCg+PwTw; dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b=HCg+PwTw; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fBiLlx/i"
-Received: by mail-qv1-f54.google.com with SMTP id 6a1803df08f44-6a0c8fb3540so50463576d6.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 15 May 2024 16:56:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1715817369; x=1716422169; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=aCnS1lyBor4Lo7T8HiHMm/Xnu6TNzoOMlRmDYrgZzMY=;
-        b=fBiLlx/iNAa5XyJ3kX0czFTad2HG+F4nAuHpnqAnUyYKRX4MTdfSxOJWpAB6lmkZOU
-         jlBJhj80aqiGtgj6nAsYwUfz0KlOVxI31ifk+Jcy2CMg+45qR3/mYexxVz1Uyz2r4UTk
-         whRk2mI9n1Kj67L98jLdh2iVB0wFz3wXiBdx6EM12kCk6oP4MCuDiHz3yqwCJnuEymPK
-         s/YRmACmlc3DCIZ0dckWDG3kjpmtxpDStUHJphJQL/D72bVljiBxxKg0ta1eeFsaDIPr
-         +7an5VZLsjCk7jO8cHY3gSKGjOr4fUG5E1WqL7oh+EaED76DEQI4k7YPnFnmQzQuGsoN
-         k3kA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715817369; x=1716422169;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=aCnS1lyBor4Lo7T8HiHMm/Xnu6TNzoOMlRmDYrgZzMY=;
-        b=vL+HmM/y9LVsglkInQyk+UL/VgsAJsHylzPpgX5+mZN0QC4Wak3NJD26C8rMjvkZB7
-         /ezRVHVhpppqNOXHeIrvA6MLpLBDtjxVtrzJeECpl4dBX7k0z0QvXVUTsetWs0FR60Hc
-         4y821JNDMSmSLevDUz3VLYCUNf1MLlyE5dh6lQUerBoUeCOYkU8/lRYy/0D0vzgQ7hhV
-         oEnOMyXPxtMarin+uHCBZMEElEJr4THjdKnqDwzLeVqTqCw6Y1LarAP8bOO3cGaLf8GD
-         Y6W/5Cfot9l2GHlVKZaupKLDfFIMnd9lcttsMONPxYFF2rSZrN1Et2Q+HKzhajnRiAVs
-         K7jg==
-X-Gm-Message-State: AOJu0YzIN/NavecPin9UGfpOyfA1b8sM+5jWKeu6u++DOC4NAm07I6xK
-	p/ga66bHSeUn3Bq6C4Y0ugg3WadJE4uKmqhJ8D9XsXN0qF/lH0DfoPO3PQ==
-X-Google-Smtp-Source: AGHT+IHSfBtPansgk1UakASwYxFSHssTRaGluTbdHJmhokpvW6mrvSJiaqcPUJXi+JlfbRgLDOaXYw==
-X-Received: by 2002:a05:6214:469c:b0:6a3:551a:db7f with SMTP id 6a1803df08f44-6a3551addfcmr80203926d6.21.1715817368780;
-        Wed, 15 May 2024 16:56:08 -0700 (PDT)
-Received: from [172.17.0.2] ([20.109.38.204])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6a35290b864sm17553206d6.143.2024.05.15.16.56.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 15 May 2024 16:56:08 -0700 (PDT)
-Message-ID: <66454b98.050a0220.58a8a.76dd@mx.google.com>
-Date: Wed, 15 May 2024 16:56:08 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============6066672689112332014=="
+	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b="HCg+PwTw";
+	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b="HCg+PwTw"
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 562E83442D;
+	Thu, 16 May 2024 04:51:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+	t=1715835082; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=RTMlqtQa49a+mfw38qG65gipfBimeGz2d1N6Q2vYIC0=;
+	b=HCg+PwTwvn2eFl2vgvtO8l9IcsFCAyOJ8YkQdvcmhdpeAY1fq0ccZpDP+w7u6UyU7b/efc
+	QM4hxxBsCJ9cyFK469kpWVeuibXQ5fMd/lnaIuG/9sxLIrpmnyzRX6LG5LQTp0dqNomyR9
+	BOSFtmXcRfMYBFBtdLBEgwUuBuw266Y=
+Authentication-Results: smtp-out1.suse.de;
+	dkim=pass header.d=suse.com header.s=susede1 header.b=HCg+PwTw
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+	t=1715835082; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=RTMlqtQa49a+mfw38qG65gipfBimeGz2d1N6Q2vYIC0=;
+	b=HCg+PwTwvn2eFl2vgvtO8l9IcsFCAyOJ8YkQdvcmhdpeAY1fq0ccZpDP+w7u6UyU7b/efc
+	QM4hxxBsCJ9cyFK469kpWVeuibXQ5fMd/lnaIuG/9sxLIrpmnyzRX6LG5LQTp0dqNomyR9
+	BOSFtmXcRfMYBFBtdLBEgwUuBuw266Y=
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 0A8FC137C3;
+	Thu, 16 May 2024 04:51:22 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id 5IeKAMqQRWakQwAAD6G6ig
+	(envelope-from <oneukum@suse.com>); Thu, 16 May 2024 04:51:22 +0000
+From: Oliver Neukum <oneukum@suse.com>
+To: marcel@holtmann.org,
+	luiz.dentz@gmail.com,
+	linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: Oliver Neukum <oneukum@suse.com>
+Subject: [PATCH] bluetooth: btintel_pcie: nonsense error recording in irq
+Date: Thu, 16 May 2024 06:50:47 +0200
+Message-ID: <20240516045118.18552-1-oneukum@suse.com>
+X-Mailer: git-send-email 2.45.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, sean.wang@kernel.org
-Subject: RE: [v5,1/5] Bluetooth: btmtk: add the function to get the fw name
-In-Reply-To: <ce0337178bf617d52ff320a36837d75bf537df2d.1715813148.git.sean.wang@kernel.org>
-References: <ce0337178bf617d52ff320a36837d75bf537df2d.1715813148.git.sean.wang@kernel.org>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
+X-Spam-Level: *
+X-Spamd-Result: default: False [1.48 / 50.00];
+	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	R_MISSING_CHARSET(0.50)[];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	R_DKIM_ALLOW(-0.20)[suse.com:s=susede1];
+	MIME_GOOD(-0.10)[text/plain];
+	MX_GOOD(-0.01)[];
+	BAYES_HAM(-0.01)[46.55%];
+	MIME_TRACE(0.00)[0:+];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	DKIM_SIGNED(0.00)[suse.com:s=susede1];
+	TO_DN_SOME(0.00)[];
+	FREEMAIL_TO(0.00)[holtmann.org,gmail.com,vger.kernel.org];
+	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	ARC_NA(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[5];
+	TAGGED_RCPT(0.00)[];
+	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.com:dkim,suse.com:email,imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns];
+	FROM_EQ_ENVFROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
+	DKIM_TRACE(0.00)[suse.com:+];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_ENVRCPT(0.00)[gmail.com]
+X-Spam-Flag: NO
+X-Spam-Score: 1.48
+X-Spamd-Bar: +
+X-Rspamd-Queue-Id: 562E83442D
+X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
+X-Rspamd-Action: no action
 
---===============6066672689112332014==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Either you return an error or you ignore it.
+Recording it but then overwriting it makes no sense.
 
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=853525
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      3.60 seconds
-GitLint                       FAIL      1.71 seconds
-SubjectPrefix                 PASS      0.58 seconds
-BuildKernel                   PASS      29.25 seconds
-CheckAllWarning               PASS      32.14 seconds
-CheckSparse                   PASS      37.90 seconds
-CheckSmatch                   FAIL      34.30 seconds
-BuildKernel32                 PASS      28.20 seconds
-TestRunnerSetup               PASS      513.42 seconds
-TestRunner_l2cap-tester       PASS      18.10 seconds
-TestRunner_iso-tester         PASS      28.65 seconds
-TestRunner_bnep-tester        PASS      4.71 seconds
-TestRunner_mgmt-tester        PASS      112.77 seconds
-TestRunner_rfcomm-tester      PASS      7.28 seconds
-TestRunner_sco-tester         PASS      14.84 seconds
-TestRunner_ioctl-tester       PASS      7.62 seconds
-TestRunner_mesh-tester        PASS      5.79 seconds
-TestRunner_smp-tester         PASS      6.73 seconds
-TestRunner_userchan-tester    PASS      4.87 seconds
-IncrementalBuild              PASS      48.16 seconds
-
-Details
-##############################
-Test: GitLint - FAIL
-Desc: Run gitlint
-Output:
-[v5,4/5] Bluetooth: btusb: mediatek: reset the controller before downloading the fw
-
-WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
-1: T1 Title exceeds max length (83>80): "[v5,4/5] Bluetooth: btusb: mediatek: reset the controller before downloading the fw"
-##############################
-Test: CheckSmatch - FAIL
-Desc: Run smatch tool with source
-Output:
-
-Segmentation fault (core dumped)
-make[4]: *** [scripts/Makefile.build:244: net/bluetooth/hci_core.o] Error 139
-make[4]: *** Deleting file 'net/bluetooth/hci_core.o'
-make[3]: *** [scripts/Makefile.build:485: net/bluetooth] Error 2
-make[2]: *** [scripts/Makefile.build:485: net] Error 2
-make[2]: *** Waiting for unfinished jobs....
-Segmentation fault (core dumped)
-make[4]: *** [scripts/Makefile.build:244: drivers/bluetooth/bcm203x.o] Error 139
-make[4]: *** Deleting file 'drivers/bluetooth/bcm203x.o'
-make[4]: *** Waiting for unfinished jobs....
-make[3]: *** [scripts/Makefile.build:485: drivers/bluetooth] Error 2
-make[2]: *** [scripts/Makefile.build:485: drivers] Error 2
-make[1]: *** [/github/workspace/src/src/Makefile:1919: .] Error 2
-make: *** [Makefile:240: __sub-make] Error 2
-
-
+Signed-off-by: Oliver Neukum <oneukum@suse.com>
 ---
-Regards,
-Linux Bluetooth
+ drivers/bluetooth/btintel_pcie.c | 8 ++------
+ 1 file changed, 2 insertions(+), 6 deletions(-)
 
+diff --git a/drivers/bluetooth/btintel_pcie.c b/drivers/bluetooth/btintel_pcie.c
+index 590c188a4bb3..c507422d6b1b 100644
+--- a/drivers/bluetooth/btintel_pcie.c
++++ b/drivers/bluetooth/btintel_pcie.c
+@@ -498,19 +498,15 @@ static int btintel_pcie_submit_rx_work(struct btintel_pcie_data *data, u8 status
+ 	rfh_hdr = buf;
+ 
+ 	len = rfh_hdr->packet_len;
+-	if (len <= 0) {
+-		ret = -EINVAL;
++	if (len <= 0)
+ 		goto resubmit;
+-	}
+ 
+ 	/* Remove RFH header */
+ 	buf += sizeof(*rfh_hdr);
+ 
+ 	skb = alloc_skb(len, GFP_ATOMIC);
+-	if (!skb) {
+-		ret = -ENOMEM;
++	if (!skb)
+ 		goto resubmit;
+-	}
+ 
+ 	skb_put_data(skb, buf, len);
+ 	skb_queue_tail(&data->rx_skb_q, skb);
+-- 
+2.45.0
 
---===============6066672689112332014==--
