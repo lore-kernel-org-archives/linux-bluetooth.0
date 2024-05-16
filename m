@@ -1,27 +1,27 @@
 Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [217.70.183.197])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94618143723
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8DBB14375A
 	for <linux-bluetooth@vger.kernel.org>; Thu, 16 May 2024 09:03:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.197
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715850233; cv=none; b=uMFjekW/rypUxXIDes9sQMTPT71ELJAvyM58xKsXCSRKA0c8sVawj23o8CyKmhd6y7s6t7BOc+cQRjG41guGq/DRa7CFNGFBzwHQjWifDSJGgpK53HqWIunO9i0FMNxmvAcywZ72/YGfBmEMMlbkEjWFvFEBVnoSFLejuw6ncd0=
+	t=1715850233; cv=none; b=GiUE3WuLiphumcVpN6Fng7vwPDqPNGKNiakQL+UcLwCQryjPsOlQtMGHSibDB6lVJrYtmj0sid1NJozrChTtnDMSm3k22UhaAMNIbbdLFJZ18exm6aJ0hMYCEWF4Dd6XprwiGJoaUibzZhWodTAJFaXfsrNTFSdrDVHAAJ3WQw0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1715850233; c=relaxed/simple;
-	bh=Jk9CuUK1Vq4XCmvzya9AeYL6PQDfubXCa0q6QxXAV2s=;
+	bh=QV8iOXArHBSYhkapCBUq3kge/lWMrwIohrKFkyrnxNY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=G6vV914t1tAstgTJK+S7KWuYvsWJKkOOZNxa53p99NajrkCIpfD2hNf2ho+ZqG++YtlTSZjQNMRQymhXTFvuVG+kMv5BXpQI7Nb58VmmkKbs4ssYGuSgYVrGvGvn2OKsGCnhjmS3V2U381ejQAEYSuzXowMNLrYrHny+SG7GYPE=
+	 MIME-Version; b=fsi1UXLgDAp+VGwcwpt3HIBHtYLTnYV7X1vfaumvF5269WDCbS0YesgH6dLcVUYQLpebEPW1Pz/Nzb9/BISaUFfP9FCd308g8B/LsY9lQMQwpA7nUzx08Kc4FGUtfxu8c359fwm5J9yCNuxznfTwb/zjzXVvpizPtIxAsOD1tP8=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.183.197
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hadess.net
-Received: by mail.gandi.net (Postfix) with ESMTPSA id D63DB1C001A;
-	Thu, 16 May 2024 09:03:44 +0000 (UTC)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 785721C0018;
+	Thu, 16 May 2024 09:03:45 +0000 (UTC)
 From: Bastien Nocera <hadess@hadess.net>
 To: linux-bluetooth@vger.kernel.org
 Cc: Bastien Nocera <hadess@hadess.net>
-Subject: [BlueZ 13/15] gdbus: Check sprintf retval
-Date: Thu, 16 May 2024 11:03:17 +0200
-Message-ID: <20240516090340.61417-14-hadess@hadess.net>
+Subject: [BlueZ 15/15] android/handsfree: Check sprintf retval
+Date: Thu, 16 May 2024 11:03:19 +0200
+Message-ID: <20240516090340.61417-16-hadess@hadess.net>
 X-Mailer: git-send-email 2.44.0
 In-Reply-To: <20240516090340.61417-1-hadess@hadess.net>
 References: <20240516090340.61417-1-hadess@hadess.net>
@@ -34,85 +34,55 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-GND-Sasl: hadess@hadess.net
 
-Error: SNYK_CODE_WARNING (CWE-125): [#def63] [important]
-bluez-5.75/gdbus/watch.c:131:11: error[cpp/NegativeIndex]: The value from snprintf, a standard library function that can return a negative value is used as an index. A negative array index can lead to reading or writing outside the bounds of the array. Ensure the value of the index used is within bounds before use.
-129|	int offset;
-130|
-131|->	offset = snprintf(rule, size, "type='signal'");
-132|	sender = data->name ? : data->owner;
-133|
+Error: SNYK_CODE_WARNING (CWE-125): [#def62] [important]
+bluez-5.75/android/handsfree.c:1247:15: error[cpp/NegativeIndex]: The value from sprintf, a standard library function that can return a negative value is used as an index. A negative array index can lead to reading or writing outside the bounds of the array. Ensure the value of the index used is within bounds before use.
+1245|			buf = g_malloc(len);
+1246|
+1247|->			ptr = buf + sprintf(buf, "+CIND:");
+1248|
+1249|			for (i = 0; i < IND_COUNT; i++) {
 ---
- gdbus/watch.c | 46 ++++++++++++++++++++++++++++++++++------------
- 1 file changed, 34 insertions(+), 12 deletions(-)
+ android/handsfree.c | 14 +++++++++++---
+ 1 file changed, 11 insertions(+), 3 deletions(-)
 
-diff --git a/gdbus/watch.c b/gdbus/watch.c
-index 25f367613a52..22f77ea72861 100644
---- a/gdbus/watch.c
-+++ b/gdbus/watch.c
-@@ -123,29 +123,51 @@ static struct filter_data *filter_data_find(DBusConnection *connection)
- 	return NULL;
- }
+diff --git a/android/handsfree.c b/android/handsfree.c
+index 2365356c2cf7..7b803fae5263 100644
+--- a/android/handsfree.c
++++ b/android/handsfree.c
+@@ -1243,15 +1243,22 @@ static void at_cmd_cind(struct hfp_context *result, enum hfp_gw_cmd_type type,
+ 		}
  
--static void format_rule(struct filter_data *data, char *rule, size_t size)
-+static gboolean format_rule(struct filter_data *data, char *rule, size_t size)
- {
- 	const char *sender;
--	int offset;
-+	int offset, ret;
+ 		buf = g_malloc(len);
+-
+-		ptr = buf + sprintf(buf, "+CIND:");
++		if (sprintf(buf, "+CIND:") != strlen("+CIND:")) {
++			g_free(buf);
++			break;
++		}
++		ptr = buf + strlen("+CIND:");
  
- 	offset = snprintf(rule, size, "type='signal'");
-+	if (offset < 0)
-+		return FALSE;
- 	sender = data->name ? : data->owner;
+ 		for (i = 0; i < IND_COUNT; i++) {
+-			ptr += sprintf(ptr, "(\"%s\",(%d%c%d)),",
++			int printed;
++			printed = sprintf(ptr, "(\"%s\",(%d%c%d)),",
+ 					dev->inds[i].name,
+ 					dev->inds[i].min,
+ 					dev->inds[i].max == 1 ? ',' : '-',
+ 					dev->inds[i].max);
++			if (printed < 0)
++				goto fail;
++			ptr += printed;
+ 		}
  
--	if (sender)
--		offset += snprintf(rule + offset, size - offset,
-+	if (sender) {
-+		ret = snprintf(rule + offset, size - offset,
- 				",sender='%s'", sender);
--	if (data->path)
--		offset += snprintf(rule + offset, size - offset,
-+		if (ret < 0)
-+			return FALSE;
-+		offset += ret;
-+	}
-+	if (data->path) {
-+		ret = snprintf(rule + offset, size - offset,
- 				",path='%s'", data->path);
--	if (data->interface)
--		offset += snprintf(rule + offset, size - offset,
-+		if (ret < 0)
-+			return FALSE;
-+		offset += ret;
-+	}
-+	if (data->interface) {
-+		ret = snprintf(rule + offset, size - offset,
- 				",interface='%s'", data->interface);
--	if (data->member)
--		offset += snprintf(rule + offset, size - offset,
-+		if (ret < 0)
-+			return FALSE;
-+		offset += ret;
-+	}
-+	if (data->member) {
-+		ret = snprintf(rule + offset, size - offset,
- 				",member='%s'", data->member);
--	if (data->argument)
--		snprintf(rule + offset, size - offset,
-+		if (ret < 0)
-+			return FALSE;
-+		offset += ret;
-+	}
-+	if (data->argument) {
-+		ret = snprintf(rule + offset, size - offset,
- 				",arg0='%s'", data->argument);
-+		if (ret < 0)
-+			return FALSE;
-+	}
-+	return TRUE;
- }
+ 		ptr--;
+@@ -1273,6 +1280,7 @@ static void at_cmd_cind(struct hfp_context *result, enum hfp_gw_cmd_type type,
+ 		break;
+ 	}
  
- static gboolean add_match(struct filter_data *data,
++fail:
+ 	hfp_gw_send_result(dev->gw, HFP_RESULT_ERROR);
+ 
+ 	if (dev->state != HAL_EV_HANDSFREE_CONN_STATE_SLC_CONNECTED)
 -- 
 2.44.0
 
