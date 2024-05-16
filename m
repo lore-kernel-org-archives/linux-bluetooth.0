@@ -1,145 +1,92 @@
-Received: from out-21.smtp.github.com (out-21.smtp.github.com [192.30.252.204])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F27B1429E
-	for <linux-bluetooth@vger.kernel.org>; Thu, 16 May 2024 17:36:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.204
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EE1D1E880
+	for <linux-bluetooth@vger.kernel.org>; Thu, 16 May 2024 17:40:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715881019; cv=none; b=Qz5mWCdgBfsy8kOpX+Sc/KqJlou5IUS+dh++tcFCVC+043l5T/zy3X5QLnJQ0TQnVORJS4F9tdX/GEZThivSwMnGB1VWlfHoyQzkoj9GiioKpFwDUh4YARQjOkHsgAMMEpe+rJosyukpS1aNdSbw5YKxGB5PQNuIABq2jzChku8=
+	t=1715881233; cv=none; b=AKv80gWysZXvfgEY570yeZa40FBCW7jSzaBGJjN5H5NVVGJGnHtoPAYo/VBz726FWgWaGUu9IXZ3arkdjxaK0ioy3HpTh6Q9agY2H/+ymeQXOiQ3bnEF84uxu3SnsikCJajTnpBDljinh606/sN840PqQyRzb8F4oQvJ6s6l/Vc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715881019; c=relaxed/simple;
-	bh=U2tfma21NQYU0YkgPxX3uBmxa2ciRr86OTVug4ttwEQ=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=q6cLF830nUoLJ6RLIWoU8AvE8M114vbLPAJmVU2TO5Rya5pDnsmblgvdYXV68XTYChzktX2Lv947p7QXFITrxGCar2rFJcMLeQCVE1BTHxQtPPiy+4u6xmbOaV4ZQBiKNGLH0GuOpkL9AAjRwVywBFHtD7LqHCKYi6boMzBKmlM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=FLstRjk6; arc=none smtp.client-ip=192.30.252.204
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1715881233; c=relaxed/simple;
+	bh=7zWH2zj54Xq/HwvDJR8VE9lQFzkslzEXJ5qYp6eickM=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=eWvII6lFi2baJP73HOcswVOFvlSJUbwfkBVxwb5wpM+l1UbbBFE6MHh20yMrRU/Hj6+/1G4U0xyBLy+k3J9DETvXS5TxDz2BklEAknCpOP2luM29ngPRRQiiqjAG2atE01dYEFWRgKOgqEd6xYFdOvtKa/ZkEWGvYy8L2BWBt1s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hfHgKOMK; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="FLstRjk6"
-Received: from github.com (hubbernetes-node-957705c.ac4-iad.github.net [10.52.160.14])
-	by smtp.github.com (Postfix) with ESMTPA id AADE1700860
-	for <linux-bluetooth@vger.kernel.org>; Thu, 16 May 2024 10:36:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1715881017;
-	bh=Pj+TW2s47PGeDJQRcaw+dQ3/ngi2yZNd8YhXUnym5SY=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=FLstRjk6T2jWWRKbsQ52sGVXeq1NFQDJeXMLGEb6G3/UkUwUkJHyIKAhDUxakn5jx
-	 nm8Ug1xRmGTI+3yIfrY4fbjAGtizt2vKt/WEVI0QduBWQYPypDxkV7hf9iKNyeR1EY
-	 rOfr/3AEMjlvwDp2T6RZYHJlgCKZWrwUq83PqX/U=
-Date: Thu, 16 May 2024 10:36:57 -0700
-From: Andrei Istodorescu <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/master/d9de30-745f32@github.com>
-Subject: [bluez/bluez] 98818d: shared/bap: Update stream management to avoid
- PACs
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hfHgKOMK"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 22DECC32781;
+	Thu, 16 May 2024 17:40:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1715881233;
+	bh=7zWH2zj54Xq/HwvDJR8VE9lQFzkslzEXJ5qYp6eickM=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=hfHgKOMK50fkshItMO4bFT5qpGSvYj/TLQ40zuL2QqDadkmf0Hepd6t+zJwuPDW2G
+	 FsXAQ8mrSBX3lfbQv5UjaZIDb8xEd3Ol+YEA88iVCGpBUnWQIX9dI+cvtNo+oebwxS
+	 mZWSA8PY8fjSB4OW/n1RXFN325S2w3ycUQV8nueXfKK1wNIA1g2R64eOKoSuvKjfmk
+	 9V8QPmh9yY+KpkcmDqlfMDjVfwMsyj2F8yHMz7y5caeD2KOpYzJ9gQjQNbE+o4wW44
+	 Y4qocDsf9c9cd5I0/dHKcLklADzPRsFbg1h52N+8Bmfg1wWMfVhF3d+19r++9n5iIb
+	 2KM1jfUvw52Sg==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 0E372C54BBB;
+	Thu, 16 May 2024 17:40:33 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH BlueZ v5 0/6] Create transports for matching BISes
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <171588123305.10202.16565510212790050530.git-patchwork-notify@kernel.org>
+Date: Thu, 16 May 2024 17:40:33 +0000
+References: <20240516130400.16713-1-andrei.istodorescu@nxp.com>
+In-Reply-To: <20240516130400.16713-1-andrei.istodorescu@nxp.com>
+To: Andrei Istodorescu <andrei.istodorescu@nxp.com>
+Cc: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com,
+ mihai-octavian.urzica@nxp.com, silviu.barbulescu@nxp.com,
+ vlad.pruteanu@nxp.com, iulia.tanasescu@nxp.com
 
-  Branch: refs/heads/master
-  Home:   https://github.com/bluez/bluez
-  Commit: 98818da25b2329dd0ff82009c167724df19db880
-      https://github.com/bluez/bluez/commit/98818da25b2329dd0ff82009c167724df19db880
-  Author: Andrei Istodorescu <andrei.istodorescu@nxp.com>
-  Date:   2024-05-16 (Thu, 16 May 2024)
+Hello:
 
-  Changed paths:
-    M src/shared/bap.c
+This series was applied to bluetooth/bluez.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-  Log Message:
-  -----------
-  shared/bap: Update stream management to avoid PACs
+On Thu, 16 May 2024 16:03:54 +0300 you wrote:
+> This patch refactors the flow for the BAP Broadcast Sink.
+> After observing the BASE information, streams and transports will be
+> generated for each BIS that matches local PAC capabilities.
+> Because endpoints are not available any more, local PAC (which contain
+> local registered capabilities) has a new list of setups. Each setup is
+> generated based on the matching BIS observed.
+> Then, the setup is used to configure a stream which then generates a
+> MediaTransport.
+> The transport is in the TRANSPORT_STATE_IDLE state until someone
+> acquires it. The "Acquire" procedure results in creating the IO using
+> BIG Create Sync. The successful reply of it causes the transport to be
+> advanced in TRANSPORT_STATE_ACTIVE state.
+> 
+> [...]
 
-Remove PAC logic for BAP Broadcast Sink stream creation.
+Here is the summary with links:
+  - [BlueZ,v5,1/6] shared/bap: Update stream management to avoid PACs
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=98818da25b23
+  - [BlueZ,v5,2/6] shared/bap: Add function to check the validity of a BIS
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=db8c96059c02
+  - [BlueZ,v5,3/6] bap: Update BIS management
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=32d147959b8e
+  - [BlueZ,v5,4/6] shared/bap: Remove not needed function
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=7aecf3bbcdb2
+  - [BlueZ,v5,5/6] shared/bap: Return the local PAC when matching a BIS
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=7b1e0e503cb8
+  - [BlueZ,v5,6/6] shared/bap: Add stream ops for get_location, get_dir and get_state
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=745f324de589
 
-
-  Commit: db8c96059c02fefd232d49dcbeb16d6b22481100
-      https://github.com/bluez/bluez/commit/db8c96059c02fefd232d49dcbeb16d6b22481100
-  Author: Andrei Istodorescu <andrei.istodorescu@nxp.com>
-  Date:   2024-05-16 (Thu, 16 May 2024)
-
-  Changed paths:
-    M src/shared/bap.c
-    M src/shared/bap.h
-
-  Log Message:
-  -----------
-  shared/bap: Add function to check the validity of a BIS
-
-Add utilitary function to check if the information from a BIS is matching
-the capabilities in bt_bap. This utilitary is used when parsing the BASE
-data so that we can decide if we create a new setup/stream/transport for
-it, or advance to the next BIS.
-
-
-  Commit: 32d147959b8e7de3fd3d4dc7d208b25f0f2d652e
-      https://github.com/bluez/bluez/commit/32d147959b8e7de3fd3d4dc7d208b25f0f2d652e
-  Author: Andrei Istodorescu <andrei.istodorescu@nxp.com>
-  Date:   2024-05-16 (Thu, 16 May 2024)
-
-  Changed paths:
-    M profiles/audio/bap.c
-
-  Log Message:
-  -----------
-  bap: Update BIS management
-
-Use the BIS index received in the BASE to synchronize to the BIG.
-Allow bt_bap_endpoint to be NULL.
-Remove the Broadcast Sink code from set_configuration.
-Update BASE parsing so that it creates streams and transports, without a
-remote PAC and endpoint.
-Update bap_find_setup_by_stream to find the setup in case the stream does
-not contain an endpoint.
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
-  Commit: 7aecf3bbcdb2257661116758154d827e5d15eb24
-      https://github.com/bluez/bluez/commit/7aecf3bbcdb2257661116758154d827e5d15eb24
-  Author: Andrei Istodorescu <andrei.istodorescu@nxp.com>
-  Date:   2024-05-16 (Thu, 16 May 2024)
-
-  Changed paths:
-    M src/shared/bap.c
-    M src/shared/bap.h
-
-  Log Message:
-  -----------
-  shared/bap: Remove not needed function
-
-
-  Commit: 7b1e0e503cb8a4e555496a542c06c318e112bd48
-      https://github.com/bluez/bluez/commit/7b1e0e503cb8a4e555496a542c06c318e112bd48
-  Author: Andrei Istodorescu <andrei.istodorescu@nxp.com>
-  Date:   2024-05-16 (Thu, 16 May 2024)
-
-  Changed paths:
-    M src/shared/bap.c
-
-  Log Message:
-  -----------
-  shared/bap: Return the local PAC when matching a BIS
-
-
-  Commit: 745f324de5898bb63878356bd6639ae6b7e2c3fe
-      https://github.com/bluez/bluez/commit/745f324de5898bb63878356bd6639ae6b7e2c3fe
-  Author: Andrei Istodorescu <andrei.istodorescu@nxp.com>
-  Date:   2024-05-16 (Thu, 16 May 2024)
-
-  Changed paths:
-    M src/shared/bap.c
-
-  Log Message:
-  -----------
-  shared/bap: Add stream ops for get_location, get_dir and get_state
-
-
-Compare: https://github.com/bluez/bluez/compare/d9de306a28fe...745f324de589
-
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
