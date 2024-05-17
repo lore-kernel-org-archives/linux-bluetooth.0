@@ -1,575 +1,813 @@
-Received: from EUR05-AM6-obe.outbound.protection.outlook.com (mail-am6eur05on2041.outbound.protection.outlook.com [40.107.22.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f174.google.com (mail-lj1-f174.google.com [209.85.208.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDB334642D
-	for <linux-bluetooth@vger.kernel.org>; Fri, 17 May 2024 12:35:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.22.41
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715949328; cv=fail; b=mCkkhi5lzCgt1YwjCrxRB2yJ8E+MNyJ57AGclfsUtDYU62MMFxTDmaapg+Jh4oIfGIAQU2dqgGoQIHX4+oW54jOE1KxtfawC7DXWpnqagWZmrVWQMZSh4Iw4jgZ2xCOlsRRHS8LkCGD/VBEOC2u3MMPE90PBOXx3ODhfcIl0mjc=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715949328; c=relaxed/simple;
-	bh=/Nyqy/68Kh7eRtPv1rEqUgATksdq2geBo2SS3/yJAd8=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=S1zLmozmEIuzYSXcDgquaNckoSpzUkl4lOS/F/aUoQ6YK6DfV2cbRAWEL6Z47Mb3CITsb4tvf2azjLITDKd3gxGw4axTVHPZxBxNbCtOUf6CXBQ6Z8nW66WFz3e2ne5P/CdUM9ohmD2x2mQPnVxGRJF4b66losPc0dO20X5tPmU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b=QNQ12LuI; arc=fail smtp.client-ip=40.107.22.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB49F69953
+	for <linux-bluetooth@vger.kernel.org>; Fri, 17 May 2024 14:23:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.174
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1715955822; cv=none; b=NYcjrQ43+HfmXUgR2nxARQrF7kHpo9mSxopXa3Rw+W6+Dq4eo3kdDxjcRRsZpkSYNWUKNvFM3CUHzL6kY//8/6TDldMDQCStGXI5i0uL4YhHatHx9zeUU7E4OovhQYdvMIqsVIn5FGGTRfwHMRGz92rl86Jep78rYAMeFjwRW/E=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1715955822; c=relaxed/simple;
+	bh=OnIG5XbPXzEXg6Q423lRnc1aXHMgw8Ci41KH+KquB0k=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=R3hNdnrbyUAwchpianUv+xPijbk09Xn+eepbMWpUPXtESySFHI0wguu0EbAzg5LphEy8e39/umQEzPcCEJV4HwPmKh/9oT1G2AhTFsar3JvhcWDatvCt9nd2ZP/sj6OF+WcKL5Ab7WIuZrd3XPYsQBeOTCx1dmG/Xkc9WlSJsro=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kny/oNvA; arc=none smtp.client-ip=209.85.208.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="QNQ12LuI"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=d234aw9H62B3I7rrO7rQtl3umvi4vazGEmeoXh4+Sr0kdawsYGXbAu9cPJyjSWLc8aTeg7qwuqRUOPOrH07XFGRYRXPOb9maLl0pWBBio5HO9462pxV7sWUwuJwh/bR7ymRGbw1A0VBMQCALy3Y1w3Jc2cIqFiSoiJcIAOA86sbB9iUELiH8Ce/VOYXTVcRqBSxuY9BeaWp1DIrdArYuW8AZCbHyq+5bC5b/DDVnBaFqrTm9fwO9N9Gr6dF8ZVIsPbsx4N+9kQSUSNN30taHzGhQ+d1BDhOv7f/85ST8D/gfgtags8kCzwJwmnEzfjk1TCJVFr6qt707DXC0PScF4Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=HhSrGx32/Yy41Iwx2LPjAAT6oXUevPw8EPAEhBE32Zs=;
- b=gs0ZJlqInI1Zdc50kLFWDkYm0L/sssnPN2xtJ1EKiIjZA/fQDHdhseTdnyjqbliq76mmCwfawIPty8Nyyly9fObOu0OCPmiXZp9xmkUjr1wClNejqCbYBhh/4MAV8bWc8h+5JbKLnXYj9SRgBZ2wq1nztV6HmjwGuyGFUDuP9sKZuvog3SVoau/vw1UsaQJtwPjiNI72mJFxL3ABFzYJeRF1+ZMkm7GZP8/WyDDpRHsM2QdzvcqdIc+oPzoCMViQuToKyp6Cmqbx2dcEDhD20tjF09p8LKF8io8j5cngNRVB+nghPs1XMJ+2T91MNv+DgVxmcQAMg3mzSNG3ph+tsw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=HhSrGx32/Yy41Iwx2LPjAAT6oXUevPw8EPAEhBE32Zs=;
- b=QNQ12LuIEyHcTq35B+5a5xbiXHuJhILRXh1vnTNzvSRKnL6JcsD+QsCJSgzae3S0LDAQaUTsrpvaEEcEkSWsOpNsMZjV06MrUhUeDucYYkthH3ogygg1ZtLjpSApbadPMskrdyaa8/oTRg3l3wlExfZjHhOolz6T4HfhRtR0HH0=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from AS8PR04MB8898.eurprd04.prod.outlook.com (2603:10a6:20b:42d::15)
- by DB9PR04MB8362.eurprd04.prod.outlook.com (2603:10a6:10:241::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7587.30; Fri, 17 May
- 2024 12:35:22 +0000
-Received: from AS8PR04MB8898.eurprd04.prod.outlook.com
- ([fe80::5e22:869c:33c:9654]) by AS8PR04MB8898.eurprd04.prod.outlook.com
- ([fe80::5e22:869c:33c:9654%4]) with mapi id 15.20.7587.028; Fri, 17 May 2024
- 12:35:22 +0000
-From: Iulia Tanasescu <iulia.tanasescu@nxp.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: claudia.rosu@nxp.com,
-	mihai-octavian.urzica@nxp.com,
-	silviu.barbulescu@nxp.com,
-	vlad.pruteanu@nxp.com,
-	andrei.istodorescu@nxp.com,
-	luiz.dentz@gmail.com,
-	Iulia Tanasescu <iulia.tanasescu@nxp.com>
-Subject: [PATCH BlueZ 5/5] test-bap: Add Broadcast Sink SCC tests
-Date: Fri, 17 May 2024 15:34:36 +0300
-Message-Id: <20240517123436.146332-6-iulia.tanasescu@nxp.com>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20240517123436.146332-1-iulia.tanasescu@nxp.com>
-References: <20240517123436.146332-1-iulia.tanasescu@nxp.com>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: AM0PR03CA0096.eurprd03.prod.outlook.com
- (2603:10a6:208:69::37) To AS8PR04MB8898.eurprd04.prod.outlook.com
- (2603:10a6:20b:42d::15)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kny/oNvA"
+Received: by mail-lj1-f174.google.com with SMTP id 38308e7fff4ca-2dfb4ea2bbfso23594741fa.2
+        for <linux-bluetooth@vger.kernel.org>; Fri, 17 May 2024 07:23:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1715955818; x=1716560618; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=dDwfqWbVOjV6tA68f3L2KkJvNLJpFrKSVSGj9Jo0G7o=;
+        b=kny/oNvA6h0YU496Y4aSoY93pMGsE+P1MqvuXeDrhX5bIKW6TN0t34Y9r/Rey5Z9nd
+         m/IZwNQY4JADAtNxLlgwGxI2ikb7vWkZDmfDCeQshbnBLm3MM4CJexitMcXE/gxL5yam
+         t4hBGaS1Js/SolIqczCDeIOtX8bDowNtOQ6tJIZcRHKcHK8SwVcyKpCAdAd6I9oej3tk
+         KMzwdc+UcOsURVozUvnHql9BdYO1tZv9FQI/Op4EH1/ShUsGLRbocMC2xaZtROodWokC
+         izO0ayfpFIxZ0mrxwd/AyIXjEpFmckLjRy29BuENpR2F5OaHmp4QflGh7WV4Sp+TWMuf
+         lmJQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1715955818; x=1716560618;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=dDwfqWbVOjV6tA68f3L2KkJvNLJpFrKSVSGj9Jo0G7o=;
+        b=itBY7cPxfv1+SF72j13Dh5G8wEKDFyIvZz1h72qFuSzOkVwxFvJ9hlekgDTjcfSZm1
+         qWa7bjyT80D77geuJALAAWVZ6YF3jcqizLPg5/G89AEmBXplZMRbc3Ec718LX5OQGcgO
+         uJ8Tn2UHvUGww1er9JbbwLBpnWcB7MesOidHQGnWuTzdvEier9c3JFPiKUPadNq3SsiL
+         b597/g6NnUf9UZ0LK6A7sl9YShXWHCgKyYvoCh3YxZFuiWmKHw/9Ko2qaAsYnoTYMhAi
+         Ois1A2y128ETK5qnykhxPegItQhBR19mFWcMgsC4pV91U/KL/+kDV03+dSIxipXfhejU
+         brSA==
+X-Gm-Message-State: AOJu0YxxqyPuJimY+7fit48R9T61qO47O1g8WrEwE17hkAFhHv4nITdY
+	Es3hYcnXl6fLdGEFMlWmcZ2/g3BMMmQO6x6iufMkwQPTs86mKsQNCJM2NtLcROheLmEBBZ2XAsd
+	d0JY0RAbpm4ik85P91MSDzBTVzo7Gcw==
+X-Google-Smtp-Source: AGHT+IEXzntaIyQ2RsPgCIw+rmaOK48jxHMn9jnZr2fNmr2umnGjrmF8fsBRqNcGL0ZWGTNcAQJGhyYMGAFciLDgqes=
+X-Received: by 2002:a2e:1319:0:b0:2e6:be3c:9d37 with SMTP id
+ 38308e7fff4ca-2e6be3ce4d9mr86395191fa.14.1715955817402; Fri, 17 May 2024
+ 07:23:37 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AS8PR04MB8898:EE_|DB9PR04MB8362:EE_
-X-MS-Office365-Filtering-Correlation-Id: a2eafe7e-f3e4-439f-31b7-08dc766dd1f3
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230031|366007|1800799015|376005;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?TO3n/WYvUJkC201QayUfxlHjR+fcfwGxZuwe9UJfL1X0/kC+ry9EuF9dfOHm?=
- =?us-ascii?Q?Hksp7oYvoA9R3mvP8RNkMQcF1reHYOVFZnHJ3jS0EinnrUa+6x8SzBspaTka?=
- =?us-ascii?Q?CiTyz9TG2RMeKp2y3cKA7jcZsEZZA/zKEqcPHzscDgDwxuDTHi1TZMaISxmH?=
- =?us-ascii?Q?O3UDps6foNxiKdEwJIg/+B/HTRg7Fs62IsIMludDYDcoiqfwT7ZKjE31fyjX?=
- =?us-ascii?Q?vWSxenXHL5M4n0dT/1FFSxToCLzy0/II0e/uljUwsm7EzbXHalSYlt5YLn7u?=
- =?us-ascii?Q?ydbxJoV0Sdhxis8ime2DWQ0CwEUL/zaO04FnPbE8RB/c6XhQSaCoMbOIDuK9?=
- =?us-ascii?Q?V2SQa2qnxwfHbWks6wnGK8e9FWkT80tyLXTR3JDSsuKSakJVlErzj9l8Pz33?=
- =?us-ascii?Q?0i0qgF328F4+G6yn+QJF94B93i/GLKL1Q8oXUTp3h1esyNZxH+J65kAO2wSe?=
- =?us-ascii?Q?uynceWCh7O3qnVLUCcy0XWD2i6ukQGMew05ZglFlJqsNN88Bg7jEol+UjXbb?=
- =?us-ascii?Q?YVyy5sUhR32C0lrIij4lAX2o/2FLnTmc2aTX1oBWBOCPOTt8hnPQnVHmSQLL?=
- =?us-ascii?Q?xWvTJK3azcM4tAfCC9GYkj6taV7/n48PtFYVxJs5V9b17kA5nAvzVOryomKF?=
- =?us-ascii?Q?FijxLAHO7OwnX/AsPa/0P4yIPnWzZCvoK+/4GyjKFywEMX7MrDsN12HYy842?=
- =?us-ascii?Q?IhGFQ/MAZx4R1URPPFfC+ipV501iyuncqWvJNzCwUcF8mKCNqlk1JnRR9SUp?=
- =?us-ascii?Q?DslUc3nSl3t5IG1L1W7KCHHQjcNbZGNiIvkQ+WfGlYdIfZHyzKq1HveH1kAH?=
- =?us-ascii?Q?pkuDTNkf+LYgXWxvurKlqePZKjOWKxEh7Xb8DGUl14fJUESpYi/uv6DRrxOw?=
- =?us-ascii?Q?vDsf2gGKmFV771kzLr/+alJ/jMzsSsmATXPQYfQ9jAKnYWlGEV6owsVCtMFJ?=
- =?us-ascii?Q?mDbgpyaYV+POPmh/Fm5gkrzAwBRFBXVDAl9AklVQSrSZwwXud6rXKBcRLSxB?=
- =?us-ascii?Q?fWWAkROtQ5sozjVLWKkx/o9GuH4C5M5BhBSTb5+LuiPU13LDLTPdFEp/qnA7?=
- =?us-ascii?Q?CDA1smQV++5q16secay+59YhFHr1iXjDmRmaCkWdL0wouPvuROIWtzY0Gua7?=
- =?us-ascii?Q?oFAOk4rUGlZZEdpq5hx8jLcbV3fxCqyah+InSF3M/VHxiMXMTO2aEbj9L5jq?=
- =?us-ascii?Q?6VkkV5knzrjF6EZTv2Dv2fRDQh5LP2Rc0s8NWuiL0c1F+6iP0lO9g2gBOBoi?=
- =?us-ascii?Q?52ru5gw1vbNf3I0E7VP7qmwAx7IfuJvMhXHEMbRWdw=3D=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AS8PR04MB8898.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366007)(1800799015)(376005);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?4Z4P5N4jxuHylF0BNq3OP+SSTxYxrgofgh2wos/oqK9f0Ok9QExshLONoLpE?=
- =?us-ascii?Q?FVJFTTnQunW4AiOMsqwFYbRHZZHCLjQOfKnmcakFuU4xB1EV+yCzAbMiqMfM?=
- =?us-ascii?Q?cd9JeZRu3ZtOe76rs2s9LMndA5cB39ttXbva/vQlN+elWYlyz9T0wSaozgXh?=
- =?us-ascii?Q?EO7K/Ed+1AHIIl19EONsPTNdxFDQLfQ6FQaPzBs0iPfrp5tk11elHQJs1iBN?=
- =?us-ascii?Q?vcH0YxmtzVTNfnCDVTEun8WfbKkFz1EGR9aHE1xMuOfODTEcL8ogJTpvSLb3?=
- =?us-ascii?Q?SrOK/wah0z5GtP7OsUDnqGsy65TkYdTd7oPlREW6Gib2Wj8lZprDH93h5MOn?=
- =?us-ascii?Q?Fs6WrJ8+phQIuctiA4DPXAntMd/vQkvRqdP+t7iXeoaIgltx/JECKvjwoA1Z?=
- =?us-ascii?Q?Xc4+euNgQzHoXb/7ZYXGxAZ53Z8WQrR/qPCpzsWZvzc59eG5e6/OhRCjOyu8?=
- =?us-ascii?Q?x9ps40aCXs2VltLJirCSUBU2S0y1zXsNva1srj5UsTPY313zjTgYo4/k9xwL?=
- =?us-ascii?Q?poprW7pCJ5eD/3VNOjVydM4BTLursrbH2P81R7AAf1FBXz6Byme7fPo+x+KJ?=
- =?us-ascii?Q?uTbiCrYPLn9/jck/6mvDFyypkCqlzjWqe0P2L1CC8ogY0dR2v2JvBfT2OH8W?=
- =?us-ascii?Q?OOsCs7q70legOpXxqxe5XseoN4dzx/KFv3OlvWZhjojeDPKJjBLlZRod25pi?=
- =?us-ascii?Q?xMOAv7rmcAmTabz3oFrnzdUg+6Yo9crfCGWnyKIy3sTP+rnxqm6yAuIiCtV+?=
- =?us-ascii?Q?u+oQQoPf/jPEThKxWn9NvfdOMt+KaGxcsx/fpyvBtMzgPqQvwEInbtiL99k3?=
- =?us-ascii?Q?bSfhybmDOH6Z6AxGOw7Jgt6G1E5d01fUczwEbysDKiu4uHAKpbTMNIoXweKs?=
- =?us-ascii?Q?YB1FGoZnCVEkzSTaUMFcZ4gjykPGgwnVUuY9ORd7K5Pugr+84XeYyPDfOOeO?=
- =?us-ascii?Q?PAt8m5mTkbkX2rv1MgL1A33vEh7DM4nzNaUA/8Mo4NMPRYfpptXe8/2FexNX?=
- =?us-ascii?Q?wa7w+bjNoFYqmtDiYT/aN6X3vAw82ICeaeNH5vQjYlRRpfUwl8W3/2ydHJRm?=
- =?us-ascii?Q?6cbUoFPF9uNA0GaLC4ymrjCU8k62a+9JWNehb56bik0NKaWKnjsXS+JxVqga?=
- =?us-ascii?Q?CDoOswnZTO/LRavnqxuhQ+RtLKbQOKwWnlzb2v4nLXzps1FHF99E0B8Nplik?=
- =?us-ascii?Q?wiVWftyo1bc/JrlUBQnlXOmba0W54wDxHavG7XYCUCxJWPz1PmDsanfUx6lw?=
- =?us-ascii?Q?KBCrwZGU35rXwGEun+uyGEPj4VEHXg9MgRaDDfdi8rWDPtC05ryzflQtxDlj?=
- =?us-ascii?Q?LTVKmgoc4mKmAhmv4hZ5DN8ICvySIE8CDeYgpFiIyHrnRcvgOypesbQviGqK?=
- =?us-ascii?Q?uNY4TF8/01591IjH6DxA7ZB1IVhNLnemDg9pwwtmiFBW99q/hGYyipOzH86f?=
- =?us-ascii?Q?ciG4l/GobygN5BSYmjDmJZ6QumtbAxWVhCru/4gLwpHC0GrqcaDjUxmhm+dM?=
- =?us-ascii?Q?rWCcs8wvMJ1LsVCQpn9DtRkPLIJjo1eRzMNx6raV/eizx4KYZ9stkH2T0R/3?=
- =?us-ascii?Q?K/Q41LJWXbQcY6XweM+y7zmzps8WMq43ZoZKRW1P/4r6xF8tEehN9ji0H+Hk?=
- =?us-ascii?Q?4Q=3D=3D?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a2eafe7e-f3e4-439f-31b7-08dc766dd1f3
-X-MS-Exchange-CrossTenant-AuthSource: AS8PR04MB8898.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 May 2024 12:35:22.7333
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: RK3V72Nyd1SWSkBDcLsBpUmMsy0+7f0J4m+jCTwW2mmZH/j/emJzzqsWFPNikoHGk0CUmA0tpVEJ2VV7hLOHLw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB9PR04MB8362
+References: <20240516193836.228281-1-arun@asymptotic.io> <20240516193836.228281-2-arun@asymptotic.io>
+In-Reply-To: <20240516193836.228281-2-arun@asymptotic.io>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Fri, 17 May 2024 10:23:25 -0400
+Message-ID: <CABBYNZLriw3OMX_oNA84FohCp20i0zeskZn9MZGOD5qg=EaPEg@mail.gmail.com>
+Subject: Re: [PATCH BlueZ,v6 1/5] src/shared: Add initial implementation for
+ an ASHA profile
+To: Arun Raghavan <arun@asymptotic.io>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-4.13.2 Broadcast Sink Synchronizes to PA (page 177)
+Hi Arun,
 
-     Test Purpose:
-     Verify that a Broadcast Sink IUT can synchronize to the PA
-     associated with a broadcast Audio Stream transmitted by a
-     Broadcast Source.
+On Fri, May 17, 2024 at 9:07=E2=80=AFAM Arun Raghavan <arun@asymptotic.io> =
+wrote:
+>
+> This implements the server role for the Audio Streaming for Hearing Aid
+> specification[1]. Includes basic ability to probe the ASHA GATT service,
+> as well as starting/stopping streaming.
+>
+> [1] https://source.android.com/docs/core/connect/bluetooth/asha
+> ---
+>  Makefile.am       |   3 +-
+>  configure.ac      |   4 +
+>  lib/uuid.h        |   3 +
+>  src/shared/asha.c | 529 ++++++++++++++++++++++++++++++++++++++++++++++
+>  src/shared/asha.h |  75 +++++++
+>  5 files changed, 613 insertions(+), 1 deletion(-)
+>  create mode 100644 src/shared/asha.c
+>  create mode 100644 src/shared/asha.h
+>
+> diff --git a/Makefile.am b/Makefile.am
+> index 05d02932f..3e6610017 100644
+> --- a/Makefile.am
+> +++ b/Makefile.am
+> @@ -238,7 +238,8 @@ shared_sources =3D src/shared/io.h src/shared/timeout=
+.h \
+>                         src/shared/bass.h src/shared/bass.c \
+>                         src/shared/ccp.h src/shared/ccp.c \
+>                         src/shared/lc3.h src/shared/tty.h \
+> -                       src/shared/bap-defs.h
+> +                       src/shared/bap-defs.h \
+> +                       src/shared/asha.h src/shared/asha.c
+>
+>  if READLINE
+>  shared_sources +=3D src/shared/shell.c src/shared/shell.h
+> diff --git a/configure.ac b/configure.ac
+> index 8b3cdb4e8..213e36b32 100644
+> --- a/configure.ac
+> +++ b/configure.ac
+> @@ -216,6 +216,10 @@ AC_ARG_ENABLE(csip, AS_HELP_STRING([--disable-csip],
+>                 [disable CSIP profile]), [enable_csip=3D${enableval}])
+>  AM_CONDITIONAL(CSIP, test "${enable_csip}" !=3D "no")
+>
+> +AC_ARG_ENABLE(asha, AS_HELP_STRING([--disable-asha],
+> +               [disable ASHA support]), [enable_asha=3D${enableval}])
+> +AM_CONDITIONAL(ASHA, test "${enable_asha}" !=3D "no")
+> +
+>  AC_ARG_ENABLE(tools, AS_HELP_STRING([--disable-tools],
+>                 [disable Bluetooth tools]), [enable_tools=3D${enableval}]=
+)
+>  AM_CONDITIONAL(TOOLS, test "${enable_tools}" !=3D "no")
+> diff --git a/lib/uuid.h b/lib/uuid.h
+> index 8404b287e..479986f06 100644
+> --- a/lib/uuid.h
+> +++ b/lib/uuid.h
+> @@ -163,6 +163,9 @@ extern "C" {
+>  #define BAA_SERVICE                                    0x1851
+>  #define BAA_SERVICE_UUID       "00001851-0000-1000-8000-00805f9b34fb"
+>
+> +#define ASHA_SERVICE                                   0xFDF0
+> +#define ASHA_PROFILE_UUID      "0000FDF0-0000-1000-8000-00805f9b34fb"
+> +
+>  #define PAC_CONTEXT                                    0x2bcd
+>  #define PAC_SUPPORTED_CONTEXT                          0x2bce
+>
+> diff --git a/src/shared/asha.c b/src/shared/asha.c
+> new file mode 100644
+> index 000000000..db86846fa
+> --- /dev/null
+> +++ b/src/shared/asha.c
+> @@ -0,0 +1,529 @@
+> +// SPDX-License-Identifier: GPL-2.0-or-later
+> +/*
+> + *
+> + *  BlueZ - Bluetooth protocol stack for Linux
+> + *
+> + *  Copyright (C) 2024  Asymptotic Inc.
+> + *
+> + *  Author: Arun Raghavan <arun@asymptotic.io>
+> + *
+> + *
+> + */
+> +
+> +#ifdef HAVE_CONFIG_H
+> +#include <config.h>
+> +#endif
+> +
+> +#define _GNU_SOURCE
+> +#include <errno.h>
+> +
+> +#include <stdbool.h>
+> +#include <stdint.h>
+> +#include <stdlib.h>
+> +#include <string.h>
+> +#include <unistd.h>
+> +#include <sys/socket.h>
+> +
+> +#include "lib/bluetooth.h"
+> +#include "lib/l2cap.h"
+> +#include "lib/uuid.h"
+> +
+> +#include "src/adapter.h"
+> +#include "src/device.h"
 
-     Test Case Configuration:
-     BAP/BSNK/SCC/BV-01-C [Sync to PA, LC3 8_1_1]
-     BAP/BSNK/SCC/BV-02-C [Sync to PA, LC3 8_2_1]
-     BAP/BSNK/SCC/BV-03-C [Sync to PA, LC3 16_1_1]
-     BAP/BSNK/SCC/BV-04-C [Sync to PA, LC3 16_2_1]
-     BAP/BSNK/SCC/BV-05-C [Sync to PA, LC3 24_1_1]
-     BAP/BSNK/SCC/BV-06-C [Sync to PA, LC3 24_2_1]
-     BAP/BSNK/SCC/BV-07-C [Sync to PA, LC3 32_1_1]
-     BAP/BSNK/SCC/BV-08-C [Sync to PA, LC3 32_2_1]
-     BAP/BSNK/SCC/BV-09-C [Sync to PA, LC3 44.1_1_1]
-     BAP/BSNK/SCC/BV-10-C [Sync to PA, LC3 44.1_2_1]
-     BAP/BSNK/SCC/BV-11-C [Sync to PA, LC3 48_1_1]
-     BAP/BSNK/SCC/BV-12-C [Sync to PA, LC3 48_2_1]
-     BAP/BSNK/SCC/BV-13-C [Sync to PA, LC3 48_3_1]
-     BAP/BSNK/SCC/BV-14-C [Sync to PA, LC3 48_4_1]
-     BAP/BSNK/SCC/BV-15-C [Sync to PA, LC3 48_5_1]
-     BAP/BSNK/SCC/BV-16-C [Sync to PA, LC3 48_6_1]
-     BAP/BSNK/SCC/BV-17-C [Sync to PA, LC3 8_1_2]
-     BAP/BSNK/SCC/BV-18-C [Sync to PA, LC3 8_2_2]
-     BAP/BSNK/SCC/BV-19-C [Sync to PA, LC3 16_1_2]
-     BAP/BSNK/SCC/BV-20-C [Sync to PA, LC3 16_2_2]
-     BAP/BSNK/SCC/BV-21-C [Sync to PA, LC3 24_1_2]
-     BAP/BSNK/SCC/BV-22-C [Sync to PA, LC3 24_2_2]
-     BAP/BSNK/SCC/BV-23-C [Sync to PA, LC3 32_1_2]
-     BAP/BSNK/SCC/BV-24-C [Sync to PA, LC3 32_2_2]
-     BAP/BSNK/SCC/BV-25-C [Sync to PA, LC3 44.1_1_2]
-     BAP/BSNK/SCC/BV-26-C [Sync to PA, LC3 44.1_2_2]
-     BAP/BSNK/SCC/BV-27-C [Sync to PA, LC3 48_1_2]
-     BAP/BSNK/SCC/BV-28-C [Sync to PA, LC3 48_2_2]
-     BAP/BSNK/SCC/BV-29-C [Sync to PA, LC3 48_3_2]
-     BAP/BSNK/SCC/BV-30-C [Sync to PA, LC3 48_4_2]
-     BAP/BSNK/SCC/BV-31-C [Sync to PA, LC3 48_5_2]
-     BAP/BSNK/SCC/BV-32-C [Sync to PA, LC3 48_6_2]
-     BAP/BSNK/SCC/BV-33-C [Sync to PA, VS]
+This is not quite right, we can't depend on libbluetooth since that is
+GPL also both adapter.h and device.h, or any header that adds btd_
+APIs, are probably only meant for use in bluetoothd internals, usually
+that means that the connection setup, socket handling etc, needs to be
+done at the plugin side and then attached to the bt_asha instance as a
+pure file descriptor then you can manage it via io handling.
 
-     Pass verdict:
-     The received AdvData field of AUX_SYNC_IND and optionally
-     AUX_CHAIN_IND PDUs contains the configured BASE information.
+> +#include "src/shared/util.h"
+> +#include "src/shared/att.h"
+> +#include "src/shared/gatt-client.h"
+> +#include "src/shared/gatt-db.h"
+> +#include "src/log.h"
+> +
+> +#include "asha.h"
+> +
+> +/* We use strings instead of uint128_t to maintain readability */
+> +#define ASHA_CHRC_READ_ONLY_PROPERTIES_UUID "6333651e-c481-4a3e-9169-7c9=
+02aad37bb"
+> +#define ASHA_CHRC_AUDIO_CONTROL_POINT_UUID "f0d4de7e-4a88-476c-9d9f-1937=
+b0996cc0"
+> +#define ASHA_CHRC_AUDIO_STATUS_UUID "38663f1a-e711-4cac-b641-326b5640483=
+7"
+> +#define ASHA_CHRC_VOLUME_UUID "00e4ca9e-ab14-41e4-8823-f9e70c7e91df"
+> +#define ASHA_CHRC_LE_PSM_OUT_UUID "2d410339-82b6-42aa-b34e-e2e01df8cc1a"
+> +
+> +/* 2 byte SDU length, 1 byte sequence number, and then 20ms of G.722 */
+> +#define ASHA_MIN_MTU 163
+> +#define ASHA_CONNECTION_MTU 512                        /* The default of=
+ 672 does not
+> +                                                * work */
+> +
+> +struct bt_asha_device *bt_asha_device_new(void)
+> +{
+> +       struct bt_asha_device *asha;
+> +
+> +       asha =3D new0(struct bt_asha_device, 1);
+> +
+> +       return asha;
+> +}
+> +
+> +void bt_asha_device_reset(struct bt_asha_device *asha)
+> +{
+> +       if (asha->status_notify_id) {
+> +               bt_gatt_client_unregister_notify(asha->client,
+> +                                               asha->status_notify_id);
+> +       }
+> +
+> +       if (asha->volume_notify_id) {
+> +               bt_gatt_client_unregister_notify(asha->client,
+> +                                               asha->volume_notify_id);
+> +       }
+> +
+> +       gatt_db_unref(asha->db);
+> +       asha->db =3D NULL;
+> +
+> +       bt_gatt_client_unref(asha->client);
+> +       asha->client =3D NULL;
+> +
+> +       asha->psm =3D 0;
+> +}
+> +
+> +void bt_asha_state_reset(struct bt_asha_device *asha)
+> +{
+> +       close(asha->fd);
+> +       asha->fd =3D -1;
+> +
+> +       asha->state =3D ASHA_STOPPED;
+> +       asha->resume_id =3D 0;
+> +
+> +       asha->cb =3D NULL;
+> +       asha->cb_user_data =3D NULL;
+> +}
+> +
+> +void bt_asha_device_free(struct bt_asha_device *asha)
+> +{
+> +       gatt_db_unref(asha->db);
+> +       bt_gatt_client_unref(asha->client);
+> +       free(asha);
+> +}
+> +
+> +uint16_t bt_asha_device_get_render_delay(struct bt_asha_device *asha)
+> +{
+> +       return asha->render_delay;
+> +}
+> +
+> +enum bt_asha_state_t bt_asha_device_get_state(struct bt_asha_device *ash=
+a)
+> +{
+> +       return asha->state;
+> +}
+> +
+> +int bt_asha_device_get_fd(struct bt_asha_device *asha)
+> +{
+> +       return asha->fd;
+> +}
+> +
+> +uint16_t bt_asha_device_get_omtu(struct bt_asha_device *asha)
+> +{
+> +       return asha->omtu;
+> +}
+> +uint16_t bt_asha_device_get_imtu(struct bt_asha_device *asha)
+> +{
+> +       return asha->imtu;
+> +}
+> +
+> +static int asha_connect_socket(struct bt_asha_device *asha)
+> +{
+> +       int fd =3D 0, err;
+> +       struct sockaddr_l2 addr =3D { 0, };
+> +       struct l2cap_options opts;
+> +       socklen_t len;
+> +
+> +       fd =3D socket(PF_BLUETOOTH, SOCK_SEQPACKET, BTPROTO_L2CAP);
+> +       if (fd < 0) {
+> +               error("Could not open L2CAP CoC socket: %s", strerror(err=
+no));
+> +               goto error;
+> +       }
+> +
+> +       addr.l2_family =3D AF_BLUETOOTH;
+> +       addr.l2_bdaddr_type =3D BDADDR_LE_PUBLIC;
+> +
+> +       /*
+> +        * We need to bind before connect to work around getting the wron=
+g addr
+> +        * type on older(?) kernels
+> +        */
+> +       err =3D bind(fd, (struct sockaddr *) &addr, sizeof(addr));
+> +       if (err < 0) {
+> +               error("Could not bind L2CAP CoC socket: %s", strerror(err=
+no));
+> +               goto error;
+> +       }
+> +
+> +       addr.l2_psm =3D asha->psm;
+> +       bacpy(&addr.l2_bdaddr, device_get_address(asha->device));
+> +
+> +       opts.mode =3D BT_MODE_LE_FLOWCTL;
+> +       opts.omtu =3D opts.imtu =3D ASHA_MIN_MTU;
+> +
+> +       err =3D setsockopt(fd, SOL_BLUETOOTH, BT_MODE, &opts.mode,
+> +                                                       sizeof(opts.mode)=
+);
+> +       if (err < 0) {
+> +               error("Could not set L2CAP CoC socket flow control mode: =
+%s",
+> +                               strerror(errno));
+> +               /* Let this be non-fatal? */
+> +       }
+> +
+> +       opts.imtu =3D ASHA_CONNECTION_MTU;
+> +       err =3D setsockopt(fd, SOL_BLUETOOTH, BT_RCVMTU, &opts.imtu,
+> +                                                       sizeof(opts.imtu)=
+);
+> +       if (err < 0) {
+> +               error("Could not set L2CAP CoC socket receive MTU: %s",
+> +                               strerror(errno));
+> +               /* Let this be non-fatal? */
+> +       }
+> +
+> +       err =3D connect(fd, (struct sockaddr *)&addr, sizeof(addr));
+> +       if (err < 0) {
+> +               error("Could not connect L2CAP CoC socket: %s",
+> +                                                       strerror(errno));
+> +               goto error;
+> +       }
+> +
+> +       err =3D getsockopt(fd, SOL_BLUETOOTH, BT_SNDMTU, &opts.omtu, &len=
+);
+> +       if (err < 0) {
+> +               error("Could not get L2CAP CoC socket receive MTU: %s",
+> +                               strerror(errno));
+> +               /* Let this be non-fatal? */
+> +       }
+> +
+> +       err =3D getsockopt(fd, SOL_BLUETOOTH, BT_RCVMTU, &opts.imtu, &len=
+);
+> +       if (err < 0) {
+> +               error("Could not get L2CAP CoC socket receive MTU: %s",
+> +                               strerror(errno));
+> +               /* Let this be non-fatal? */
+> +       }
+> +
+> +       asha->fd =3D fd;
+> +       asha->imtu =3D opts.imtu;
+> +       asha->omtu =3D opts.omtu;
+> +
+> +       DBG("L2CAP CoC socket is open");
+> +       return 0;
+> +
+> +error:
+> +       if (fd)
+> +               close(fd);
+> +       return -1;
+> +}
+> +
+> +static void asha_acp_sent(bool success, uint8_t err, void *user_data)
+> +{
+> +       struct bt_asha_device *asha =3D user_data;
+> +
+> +       if (success) {
+> +               DBG("AudioControlPoint command successfully sent");
+> +       } else {
+> +               error("Failed to send AudioControlPoint command: %d", err=
+);
+> +
+> +               if (asha->cb)
+> +                       asha->cb(-1, asha->cb_user_data);
+> +
+> +               bt_asha_state_reset(asha);
+> +       }
+> +}
+> +
+> +static int asha_send_acp(struct bt_asha_device *asha, uint8_t *cmd,
+> +               unsigned int len, bt_asha_cb_t cb, void *user_data)
+> +{
+> +       if (!bt_gatt_client_write_value(asha->client, asha->acp_handle, c=
+md,
+> +                               len, asha_acp_sent, asha, NULL)) {
+> +               error("Error writing ACP start");
+> +               return -1;
+> +       }
+> +
+> +       asha->cb =3D cb;
+> +       asha->cb_user_data =3D user_data;
+> +
+> +       return 0;
+> +}
+> +
+> +unsigned int bt_asha_device_start(struct bt_asha_device *asha, bt_asha_c=
+b_t cb,
+> +               void *user_data)
+> +{
+> +       uint8_t acp_start_cmd[] =3D {
+> +               0x01,           /* START */
+> +               0x01,           /* G.722, 16 kHz */
+> +               0,              /* Unknown media type */
+> +               asha->volume,   /* Volume */
+> +               0,              /* Other disconnected */
+> +       };
+> +       int ret;
+> +
+> +       if (asha->state !=3D ASHA_STOPPED) {
+> +               error("ASHA device start failed. Bad state %d", asha->sta=
+te);
+> +               return 0;
+> +       }
+> +
+> +       ret =3D asha_connect_socket(asha);
+> +       if (ret < 0)
+> +               return 0;
+> +
+> +       ret =3D asha_send_acp(asha, acp_start_cmd, sizeof(acp_start_cmd),=
+ cb,
+> +                       user_data);
+> +       if (ret < 0)
+> +               return 0;
+> +
+> +       asha->state =3D ASHA_STARTING;
+> +
+> +       return (++asha->resume_id);
+> +}
+> +
+> +unsigned int bt_asha_device_stop(struct bt_asha_device *asha, bt_asha_cb=
+_t cb,
+> +               void *user_data)
+> +{
+> +       uint8_t acp_stop_cmd[] =3D {
+> +               0x02, /* STOP */
+> +       };
+> +       int ret;
+> +
+> +       if (asha->state !=3D ASHA_STARTED)
+> +               return 0;
+> +
+> +       asha->state =3D ASHA_STOPPING;
+> +
+> +       ret =3D asha_send_acp(asha, acp_stop_cmd, sizeof(acp_stop_cmd), c=
+b,
+> +                       user_data);
+> +       if (ret < 0)
+> +               return 0;
+> +
+> +       return asha->resume_id;
+> +}
+> +
+> +int8_t bt_asha_device_get_volume(struct bt_asha_device *asha)
+> +{
+> +       return asha->volume;
+> +}
+> +
+> +bool bt_asha_device_set_volume(struct bt_asha_device *asha, int8_t volum=
+e)
+> +{
+> +       if (!bt_gatt_client_write_value(asha->client, asha->volume_handle=
+,
+> +                               (const uint8_t *)&volume, 1, NULL, NULL,
+> +                               NULL)) {
+> +               error("Error writing ACP start");
+> +               return false;
+> +       }
+> +
+> +       asha->volume =3D volume;
+> +       return true;
+> +}
+> +
+> +static bool uuid_cmp(const char *uuid1, const bt_uuid_t *uuid2)
+> +{
+> +       bt_uuid_t lhs;
+> +
+> +       bt_string_to_uuid(&lhs, uuid1);
+> +
+> +       return bt_uuid_cmp(&lhs, uuid2) =3D=3D 0;
+> +}
+> +
+> +static void read_psm(bool success,
+> +                       uint8_t att_ecode,
+> +                       const uint8_t *value,
+> +                       uint16_t length,
+> +                       void *user_data)
+> +{
+> +       struct bt_asha_device *asha =3D user_data;
+> +
+> +       if (!success) {
+> +               DBG("Reading PSM failed with ATT error: %u", att_ecode);
+> +               return;
+> +       }
+> +
+> +       if (length !=3D 2) {
+> +               DBG("Reading PSM failed: unexpected length %u", length);
+> +               return;
+> +       }
+> +
+> +       asha->psm =3D get_le16(value);
+> +
+> +       DBG("Got PSM: %u", asha->psm);
+> +}
+> +
+> +static void read_rops(bool success,
+> +                       uint8_t att_ecode,
+> +                       const uint8_t *value,
+> +                       uint16_t length,
+> +                       void *user_data)
+> +{
+> +       struct bt_asha_device *asha =3D user_data;
+> +
+> +       if (!success) {
+> +               DBG("Reading ROPs failed with ATT error: %u", att_ecode);
+> +               return;
+> +       }
+> +
+> +       if (length !=3D 17) {
+> +               DBG("Reading ROPs failed: unexpected length %u", length);
+> +               return;
+> +       }
+> +
+> +       if (value[0] !=3D 0x01) {
+> +               DBG("Unexpected ASHA version: %u", value[0]);
+> +               return;
+> +       }
+> +
+> +       /* Device Capabilities */
+> +       asha->right_side =3D (value[1] & 0x1) !=3D 0;
+> +       asha->binaural =3D (value[1] & 0x2) !=3D 0;
+> +       asha->csis_supported =3D (value[1] & 0x4) !=3D 0;
+> +       /* HiSyncId: 2 byte company id, 6 byte ID shared by left and righ=
+t */
+> +       memcpy(asha->hisyncid, &value[2], 8);
+> +       /* FeatureMap */
+> +       asha->coc_streaming_supported =3D (value[10] & 0x1) !=3D 0;
+> +       /* RenderDelay */
+> +       asha->render_delay =3D get_le16(&value[11]);
+> +       /* byte 13 & 14 are reserved */
+> +       /* Codec IDs */
+> +       asha->codec_ids =3D get_le16(&value[15]);
+> +
+> +       DBG("Got ROPS: side %u, binaural %u, csis: %u, delay %u, codecs: =
+%u",
+> +                       asha->right_side, asha->binaural, asha->csis_supp=
+orted,
+> +                       asha->render_delay, asha->codec_ids);
+> +}
+> +
+> +static void audio_status_notify(uint16_t value_handle, const uint8_t *va=
+lue,
+> +                                       uint16_t length, void *user_data)
+> +{
+> +       struct bt_asha_device *asha =3D user_data;
+> +       uint8_t status =3D *value;
+> +       /* Back these up to survive the reset paths */
+> +       bt_asha_cb_t cb =3D asha->cb;
+> +       bt_asha_cb_t cb_user_data =3D asha->cb_user_data;
+> +
+> +       if (asha->state =3D=3D ASHA_STARTING) {
+> +               if (status =3D=3D 0) {
+> +                       asha->state =3D ASHA_STARTED;
+> +                       DBG("ASHA start complete");
+> +               } else {
+> +                       bt_asha_state_reset(asha);
+> +                       DBG("ASHA start failed");
+> +               }
+> +       } else if (asha->state =3D=3D ASHA_STOPPING) {
+> +               /* We reset our state, regardless */
+> +               bt_asha_state_reset(asha);
+> +               DBG("ASHA stop %s", status =3D=3D 0 ? "complete" : "faile=
+d");
+> +       }
+> +
+> +       if (cb) {
+> +               cb(status, cb_user_data);
+> +               asha->cb =3D NULL;
+> +               asha->cb_user_data =3D NULL;
+> +       }
+> +}
+> +
+> +static void read_volume(bool success,
+> +                       uint8_t att_ecode,
+> +                       const uint8_t *value,
+> +                       uint16_t length,
+> +                       void *user_data)
+> +{
+> +       struct bt_asha_device *asha =3D user_data;
+> +
+> +       if (!success) {
+> +               DBG("Reading volume failed with ATT error: %u", att_ecode=
+);
+> +               return;
+> +       }
+> +
+> +       if (length !=3D 2) {
+> +               DBG("Reading volume failed: unexpected length %u", length=
+);
+> +               return;
+> +       }
+> +
+> +       asha->volume =3D get_s8(value);
+> +
+> +       DBG("Got volume: %d", asha->volume);
+> +}
+> +
+> +static void volume_notify(uint16_t value_handle, const uint8_t *value,
+> +                                       uint16_t length, void *user_data)
+> +{
+> +       struct bt_asha_device *asha =3D user_data;
+> +
+> +       asha->volume =3D get_s8(value);
+> +
+> +       DBG("Volume changed: %d", asha->volume);
+> +}
+> +
+> +static void handle_characteristic(struct gatt_db_attribute *attr,
+> +                                                               void *use=
+r_data)
+> +{
+> +       struct bt_asha_device *asha =3D user_data;
+> +       uint16_t value_handle;
+> +       bt_uuid_t uuid;
+> +
+> +       if (!gatt_db_attribute_get_char_data(attr, NULL, &value_handle, N=
+ULL,
+> +                                                               NULL, &uu=
+id)) {
+> +               error("Failed to obtain characteristic data");
+> +               return;
+> +       }
+> +
+> +       if (uuid_cmp(ASHA_CHRC_LE_PSM_OUT_UUID, &uuid)) {
+> +               if (!bt_gatt_client_read_value(asha->client, value_handle=
+,
+> +                                       read_psm, asha, NULL))
+> +                       DBG("Failed to send request to read battery level=
+");
+> +       } else if (uuid_cmp(ASHA_CHRC_READ_ONLY_PROPERTIES_UUID, &uuid)) =
+{
+> +               if (!bt_gatt_client_read_value(asha->client, value_handle=
+,
+> +                                       read_rops, asha, NULL))
+> +                       DBG("Failed to send request for readonly properti=
+es");
+> +       } else if (uuid_cmp(ASHA_CHRC_AUDIO_CONTROL_POINT_UUID, &uuid)) {
+> +               /* Store this for later writes */
+> +               asha->acp_handle =3D value_handle;
+> +       } else if (uuid_cmp(ASHA_CHRC_VOLUME_UUID, &uuid)) {
+> +               /* Store this for later reads and writes */
+> +               asha->volume_handle =3D value_handle;
+> +               asha->volume_notify_id =3D
+> +                       bt_gatt_client_register_notify(asha->client,
+> +                               value_handle, NULL, volume_notify, asha,
+> +                               NULL);
+> +               if (!asha->status_notify_id)
+> +                       DBG("Failed to send request to notify volume");
+> +               if (!bt_gatt_client_read_value(asha->client, value_handle=
+,
+> +                                       read_volume, asha, NULL))
+> +                       DBG("Failed to send request to volume");
+> +       } else if (uuid_cmp(ASHA_CHRC_AUDIO_STATUS_UUID, &uuid)) {
+> +               asha->status_notify_id =3D
+> +                       bt_gatt_client_register_notify(asha->client,
+> +                               value_handle, NULL, audio_status_notify, =
+asha,
+> +                               NULL);
+> +               if (!asha->status_notify_id)
+> +                       DBG("Failed to send request to notify AudioStatus=
+");
+> +       } else {
+> +               char uuid_str[MAX_LEN_UUID_STR];
+> +
+> +               bt_uuid_to_string(&uuid, uuid_str, sizeof(uuid_str));
+> +               DBG("Unsupported characteristic: %s", uuid_str);
+> +       }
+> +}
+> +
+> +static void foreach_asha_service(struct gatt_db_attribute *attr,
+> +                                                       void *user_data)
+> +{
+> +       struct bt_asha_device *asha =3D user_data;
+> +
+> +       DBG("Found ASHA GATT service");
+> +
+> +       asha->attr =3D attr;
+> +       gatt_db_service_foreach_char(asha->attr, handle_characteristic, a=
+sha);
+> +}
+> +
+> +bool bt_asha_device_probe(struct bt_asha_device *asha)
+> +{
+> +       struct btd_device *device =3D asha->device;
+> +       struct gatt_db *db =3D btd_device_get_gatt_db(device);
+> +       struct bt_gatt_client *client =3D btd_device_get_gatt_client(devi=
+ce);
+> +       bt_uuid_t asha_uuid;
+> +
+> +       asha->db =3D gatt_db_ref(db);
+> +       asha->client =3D bt_gatt_client_clone(client);
+> +
+> +       bt_uuid16_create(&asha_uuid, ASHA_SERVICE);
+> +       gatt_db_foreach_service(db, &asha_uuid, foreach_asha_service, ash=
+a);
+> +
+> +       if (!asha->attr) {
+> +               error("ASHA attribute not found");
+> +               bt_asha_device_reset(asha);
+> +               return false;
+> +       }
+> +
+> +       return true;
+> +}
+> diff --git a/src/shared/asha.h b/src/shared/asha.h
+> new file mode 100644
+> index 000000000..24fe5d5bd
+> --- /dev/null
+> +++ b/src/shared/asha.h
+> @@ -0,0 +1,75 @@
+> +// SPDX-License-Identifier: GPL-2.0-or-later
+> +/*
+> + *
+> + *  BlueZ - Bluetooth protocol stack for Linux
+> + *
+> + *  Copyright (C) 2024  Asymptotic Inc.
+> + *
+> + *  Author: Arun Raghavan <arun@asymptotic.io>
+> + *
+> + *
+> + */
+> +
+> +#include <stdbool.h>
+> +#include <stdint.h>
+> +
+> +struct bt_asha_device;
+> +
+> +enum bt_asha_state_t {
+> +       ASHA_STOPPED =3D 0,
+> +       ASHA_STARTING,
+> +       ASHA_STARTED,
+> +       ASHA_STOPPING,
+> +};
+> +
+> +typedef void (*bt_asha_cb_t)(int status, void *data);
+> +
+> +struct bt_asha_device {
+> +       struct btd_device *device;
+> +       struct bt_gatt_client *client;
+> +       struct gatt_db *db;
+> +       struct gatt_db_attribute *attr;
+> +       uint16_t acp_handle;
+> +       uint16_t volume_handle;
+> +       unsigned int status_notify_id;
+> +       unsigned int volume_notify_id;
+> +
+> +       uint16_t psm;
+> +       bool right_side;
+> +       bool binaural;
+> +       bool csis_supported;
+> +       bool coc_streaming_supported;
+> +       uint8_t hisyncid[8];
+> +       uint16_t render_delay;
+> +       uint16_t codec_ids;
+> +       int8_t volume;
+> +
+> +       struct media_transport *transport;
+> +       int fd;
+> +       uint16_t imtu, omtu;
+> +       enum bt_asha_state_t state;
+> +       bt_asha_cb_t cb;
+> +       void *cb_user_data;
+> +       int resume_id;
+> +};
+> +
+> +struct bt_asha_device *bt_asha_device_new(void);
+> +void bt_asha_device_reset(struct bt_asha_device *asha);
+> +void bt_asha_state_reset(struct bt_asha_device *asha);
+> +void bt_asha_device_free(struct bt_asha_device *asha);
+> +
+> +uint16_t bt_asha_device_get_render_delay(struct bt_asha_device *asha);
+> +enum bt_asha_state_t bt_asha_device_get_state(struct bt_asha_device *ash=
+a);
+> +int bt_asha_device_get_fd(struct bt_asha_device *asha);
+> +uint16_t bt_asha_device_get_omtu(struct bt_asha_device *asha);
+> +uint16_t bt_asha_device_get_imtu(struct bt_asha_device *asha);
+> +
+> +unsigned int bt_asha_device_start(struct bt_asha_device *asha, bt_asha_c=
+b_t cb,
+> +               void *user_data);
+> +unsigned int bt_asha_device_stop(struct bt_asha_device *asha, bt_asha_cb=
+_t cb,
+> +               void *user_data);
+> +
+> +int8_t bt_asha_device_get_volume(struct bt_asha_device *asha);
+> +bool bt_asha_device_set_volume(struct bt_asha_device *asha, int8_t volum=
+e);
+> +
+> +bool bt_asha_device_probe(struct bt_asha_device *asha);
+> --
+> 2.45.0
+>
+>
 
-Test Summary
-------------
-BAP/BSNK/SCC/BV-01-C [Sync to PA, LC3 8_1_1]         Passed
-BAP/BSNK/SCC/BV-02-C [Sync to PA, LC3 8_2_1]         Passed
-BAP/BSNK/SCC/BV-03-C [Sync to PA, LC3 16_1_1]        Passed
-BAP/BSNK/SCC/BV-04-C [Sync to PA, LC3 16_2_1]        Passed
-BAP/BSNK/SCC/BV-05-C [Sync to PA, LC3 24_1_1]        Passed
-BAP/BSNK/SCC/BV-06-C [Sync to PA, LC3 24_2_1]        Passed
-BAP/BSNK/SCC/BV-07-C [Sync to PA, LC3 32_1_1]        Passed
-BAP/BSNK/SCC/BV-08-C [Sync to PA, LC3 32_2_1]        Passed
-BAP/BSNK/SCC/BV-09-C [Sync to PA, LC3 44.1_1_1]      Passed
-BAP/BSNK/SCC/BV-10-C [Sync to PA, LC3 44.1_2_1]      Passed
-BAP/BSNK/SCC/BV-11-C [Sync to PA, LC3 48_1_1]        Passed
-BAP/BSNK/SCC/BV-12-C [Sync to PA, LC3 48_2_1]        Passed
-BAP/BSNK/SCC/BV-13-C [Sync to PA, LC3 48_3_1]        Passed
-BAP/BSNK/SCC/BV-14-C [Sync to PA, LC3 48_4_1]        Passed
-BAP/BSNK/SCC/BV-15-C [Sync to PA, LC3 48_5_1]        Passed
-BAP/BSNK/SCC/BV-16-C [Sync to PA, LC3 48_6_1]        Passed
-BAP/BSNK/SCC/BV-17-C [Sync to PA, LC3 8_1_2]         Passed
-BAP/BSNK/SCC/BV-18-C [Sync to PA, LC3 8_2_2]         Passed
-BAP/BSNK/SCC/BV-19-C [Sync to PA, LC3 16_1_2]        Passed
-BAP/BSNK/SCC/BV-20-C [Sync to PA, LC3 16_2_2]        Passed
-BAP/BSNK/SCC/BV-21-C [Sync to PA, LC3 24_1_2]        Passed
-BAP/BSNK/SCC/BV-22-C [Sync to PA, LC3 24_2_2]        Passed
-BAP/BSNK/SCC/BV-23-C [Sync to PA, LC3 32_1_2]        Passed
-BAP/BSNK/SCC/BV-24-C [Sync to PA, LC3 32_2_2]        Passed
-BAP/BSNK/SCC/BV-25-C [Sync to PA, LC3 44.1_1_2]      Passed
-BAP/BSNK/SCC/BV-26-C [Sync to PA, LC3 44.1_2_2]      Passed
-BAP/BSNK/SCC/BV-27-C [Sync to PA, LC3 48_1_2]        Passed
-BAP/BSNK/SCC/BV-28-C [Sync to PA, LC3 48_2_2]        Passed
-BAP/BSNK/SCC/BV-29-C [Sync to PA, LC3 48_3_2]        Passed
-BAP/BSNK/SCC/BV-30-C [Sync to PA, LC3 48_4_2]        Passed
-BAP/BSNK/SCC/BV-31-C [Sync to PA, LC3 48_5_2]        Passed
-BAP/BSNK/SCC/BV-32-C [Sync to PA, LC3 48_6_2]        Passed
-BAP/BSNK/SCC/BV-33-C [Sync to PA, VS]                Passed
----
- unit/test-bap.c | 299 ++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 299 insertions(+)
 
-diff --git a/unit/test-bap.c b/unit/test-bap.c
-index a6e24e605..46ee0e4e5 100644
---- a/unit/test-bap.c
-+++ b/unit/test-bap.c
-@@ -52,6 +52,7 @@ struct test_data {
- 	struct bt_bap_pac *snk;
- 	struct bt_bap_pac *src;
- 	struct bt_bap_pac *bsrc;
-+	struct bt_bap_pac *bsnk;
- 	struct iovec *base;
- 	struct iovec *caps;
- 	struct test_config *cfg;
-@@ -565,6 +566,59 @@ static void bsrc_state(struct bt_bap_stream *stream, uint8_t old_state,
- 	}
- }
- 
-+static void bsnk_pac_added(struct bt_bap_pac *pac, void *user_data)
-+{
-+	struct test_data *data = user_data;
-+	struct bt_bap_pac *lpac;
-+	struct iovec *cc;
-+	struct bt_bap_codec codec = {0};
-+
-+	if (data->cfg->vs)
-+		codec.id = 0xff;
-+	else
-+		codec.id = LC3_ID;
-+
-+	bt_bap_verify_bis(data->bap, 1, &codec,
-+			&data->cfg->cc, NULL, &lpac, &cc);
-+
-+	g_assert(lpac);
-+	g_assert(pac == lpac);
-+	g_assert(cc);
-+
-+	bt_bap_pac_set_ops(pac, &bcast_pac_ops, NULL);
-+
-+	data->stream = bt_bap_stream_new(data->bap,
-+		pac, NULL, &data->cfg->qos, cc);
-+
-+	g_assert(data->stream);
-+
-+	bt_bap_stream_config(data->stream, &data->cfg->qos,
-+			cc, NULL, NULL);
-+
-+	util_iov_free(cc, 1);
-+}
-+
-+static void bsnk_state(struct bt_bap_stream *stream, uint8_t old_state,
-+				uint8_t new_state, void *user_data)
-+{
-+	struct test_data *data = user_data;
-+	struct iovec *cc;
-+
-+	switch (new_state) {
-+	case BT_BAP_STREAM_STATE_CONFIG:
-+		/* Check that stream has been configured as expected */
-+		cc = bt_bap_stream_get_config(stream);
-+
-+		g_assert(cc);
-+		g_assert(cc->iov_len == data->cfg->cc.iov_len);
-+		g_assert(memcmp(cc->iov_base, data->cfg->cc.iov_base,
-+				cc->iov_len) == 0);
-+
-+		tester_test_passed();
-+		break;
-+	}
-+}
-+
- static void test_bcast_config(struct test_data *data)
- {
- 	if (!data->cfg)
-@@ -590,6 +644,27 @@ static void test_bcast_config(struct test_data *data)
- 
- 		g_assert(data->bsrc);
- 	}
-+
-+	if (data->cfg->snk) {
-+		bt_bap_pac_register(data->bap, bsnk_pac_added,
-+						NULL, data, NULL);
-+
-+		if (data->cfg->vs)
-+			data->bsnk = bt_bap_add_vendor_pac(data->db,
-+							"test-bap-bsnk",
-+							BT_BAP_BCAST_SINK,
-+							0xff, 0x0000, 0x0000,
-+							NULL, data->caps,
-+							NULL);
-+		else
-+			data->bsnk = bt_bap_add_pac(data->db, "test-bap-bsnk",
-+							BT_BAP_BCAST_SINK,
-+							LC3_ID,
-+							NULL, data->caps,
-+							NULL);
-+
-+		g_assert(data->bsnk);
-+	}
- }
- 
- static void test_bcast(const void *user_data)
-@@ -626,6 +701,7 @@ static void test_teardown(const void *user_data)
- 	bt_bap_remove_pac(data->snk);
- 	bt_bap_remove_pac(data->src);
- 	bt_bap_remove_pac(data->bsrc);
-+	bt_bap_remove_pac(data->bsnk);
- 	gatt_db_unref(data->db);
- 
- 	tester_teardown_complete();
-@@ -6045,6 +6121,228 @@ static void test_bsrc_scc(void)
- 		NULL, test_bcast, &cfg_bsrc_vs, IOV_NULL);
- }
- 
-+static struct test_config cfg_bsnk_8_1 = {
-+	.cc = LC3_CONFIG_8_1,
-+	.qos = QOS_BCAST,
-+	.snk = true,
-+	.state_func = bsnk_state,
-+};
-+
-+static struct test_config cfg_bsnk_8_2 = {
-+	.cc = LC3_CONFIG_8_2,
-+	.qos = QOS_BCAST,
-+	.snk = true,
-+	.state_func = bsnk_state,
-+};
-+
-+static struct test_config cfg_bsnk_16_1 = {
-+	.cc = LC3_CONFIG_16_1,
-+	.qos = QOS_BCAST,
-+	.snk = true,
-+	.state_func = bsnk_state,
-+};
-+
-+static struct test_config cfg_bsnk_16_2 = {
-+	.cc = LC3_CONFIG_16_2,
-+	.qos = QOS_BCAST,
-+	.snk = true,
-+	.state_func = bsnk_state,
-+};
-+
-+static struct test_config cfg_bsnk_24_1 = {
-+	.cc = LC3_CONFIG_24_1,
-+	.qos = QOS_BCAST,
-+	.snk = true,
-+	.state_func = bsnk_state,
-+};
-+
-+static struct test_config cfg_bsnk_24_2 = {
-+	.cc = LC3_CONFIG_24_2,
-+	.qos = QOS_BCAST,
-+	.snk = true,
-+	.state_func = bsnk_state,
-+};
-+
-+static struct test_config cfg_bsnk_32_1 = {
-+	.cc = LC3_CONFIG_32_1,
-+	.qos = QOS_BCAST,
-+	.snk = true,
-+	.state_func = bsnk_state,
-+};
-+
-+static struct test_config cfg_bsnk_32_2 = {
-+	.cc = LC3_CONFIG_32_2,
-+	.qos = QOS_BCAST,
-+	.snk = true,
-+	.state_func = bsnk_state,
-+};
-+
-+static struct test_config cfg_bsnk_44_1 = {
-+	.cc = LC3_CONFIG_44_1,
-+	.qos = QOS_BCAST,
-+	.snk = true,
-+	.state_func = bsnk_state,
-+};
-+
-+static struct test_config cfg_bsnk_44_2 = {
-+	.cc = LC3_CONFIG_44_2,
-+	.qos = QOS_BCAST,
-+	.snk = true,
-+	.state_func = bsnk_state,
-+};
-+
-+static struct test_config cfg_bsnk_48_1 = {
-+	.cc = LC3_CONFIG_48_1,
-+	.qos = QOS_BCAST,
-+	.snk = true,
-+	.state_func = bsnk_state,
-+};
-+
-+static struct test_config cfg_bsnk_48_2 = {
-+	.cc = LC3_CONFIG_48_2,
-+	.qos = QOS_BCAST,
-+	.snk = true,
-+	.state_func = bsnk_state,
-+};
-+
-+static struct test_config cfg_bsnk_48_3 = {
-+	.cc = LC3_CONFIG_48_3,
-+	.qos = QOS_BCAST,
-+	.snk = true,
-+	.state_func = bsnk_state,
-+};
-+
-+static struct test_config cfg_bsnk_48_4 = {
-+	.cc = LC3_CONFIG_48_4,
-+	.qos = QOS_BCAST,
-+	.snk = true,
-+	.state_func = bsnk_state,
-+};
-+
-+static struct test_config cfg_bsnk_48_5 = {
-+	.cc = LC3_CONFIG_48_5,
-+	.qos = QOS_BCAST,
-+	.snk = true,
-+	.state_func = bsnk_state,
-+};
-+
-+static struct test_config cfg_bsnk_48_6 = {
-+	.cc = LC3_CONFIG_48_6,
-+	.qos = QOS_BCAST,
-+	.snk = true,
-+	.state_func = bsnk_state,
-+};
-+
-+static struct test_config cfg_bsnk_vs = {
-+	.cc = UTIL_IOV_INIT(VS_CC),
-+	.qos = QOS_BCAST,
-+	.snk = true,
-+	.vs = true,
-+	.state_func = bsnk_state,
-+};
-+
-+static void test_bsnk_scc(void)
-+{
-+	define_test("BAP/BSNK/SCC/BV-01-C [Sync to PA, LC3 8_1_1]",
-+		NULL, test_bcast, &cfg_bsnk_8_1, IOV_NULL);
-+
-+	define_test("BAP/BSNK/SCC/BV-02-C [Sync to PA, LC3 8_2_1]",
-+		NULL, test_bcast, &cfg_bsnk_8_2, IOV_NULL);
-+
-+	define_test("BAP/BSNK/SCC/BV-03-C [Sync to PA, LC3 16_1_1]",
-+		NULL, test_bcast, &cfg_bsnk_16_1, IOV_NULL);
-+
-+	define_test("BAP/BSNK/SCC/BV-04-C [Sync to PA, LC3 16_2_1]",
-+		NULL, test_bcast, &cfg_bsnk_16_2, IOV_NULL);
-+
-+	define_test("BAP/BSNK/SCC/BV-05-C [Sync to PA, LC3 24_1_1]",
-+		NULL, test_bcast, &cfg_bsnk_24_1, IOV_NULL);
-+
-+	define_test("BAP/BSNK/SCC/BV-06-C [Sync to PA, LC3 24_2_1]",
-+		NULL, test_bcast, &cfg_bsnk_24_2, IOV_NULL);
-+
-+	define_test("BAP/BSNK/SCC/BV-07-C [Sync to PA, LC3 32_1_1]",
-+		NULL, test_bcast, &cfg_bsnk_32_1, IOV_NULL);
-+
-+	define_test("BAP/BSNK/SCC/BV-08-C [Sync to PA, LC3 32_2_1]",
-+		NULL, test_bcast, &cfg_bsnk_32_2, IOV_NULL);
-+
-+	define_test("BAP/BSNK/SCC/BV-09-C [Sync to PA, LC3 44.1_1_1]",
-+		NULL, test_bcast, &cfg_bsnk_44_1, IOV_NULL);
-+
-+	define_test("BAP/BSNK/SCC/BV-10-C [Sync to PA, LC3 44.1_2_1]",
-+		NULL, test_bcast, &cfg_bsnk_44_2, IOV_NULL);
-+
-+	define_test("BAP/BSNK/SCC/BV-11-C [Sync to PA, LC3 48_1_1]",
-+		NULL, test_bcast, &cfg_bsnk_48_1, IOV_NULL);
-+
-+	define_test("BAP/BSNK/SCC/BV-12-C [Sync to PA, LC3 48_2_1]",
-+		NULL, test_bcast, &cfg_bsnk_48_2, IOV_NULL);
-+
-+	define_test("BAP/BSNK/SCC/BV-13-C [Sync to PA, LC3 48_3_1]",
-+		NULL, test_bcast, &cfg_bsnk_48_3, IOV_NULL);
-+
-+	define_test("BAP/BSNK/SCC/BV-14-C [Sync to PA, LC3 48_4_1]",
-+		NULL, test_bcast, &cfg_bsnk_48_4, IOV_NULL);
-+
-+	define_test("BAP/BSNK/SCC/BV-15-C [Sync to PA, LC3 48_5_1]",
-+		NULL, test_bcast, &cfg_bsnk_48_5, IOV_NULL);
-+
-+	define_test("BAP/BSNK/SCC/BV-16-C [Sync to PA, LC3 48_6_1]",
-+		NULL, test_bcast, &cfg_bsnk_48_6, IOV_NULL);
-+
-+	define_test("BAP/BSNK/SCC/BV-17-C [Sync to PA, LC3 8_1_2]",
-+		NULL, test_bcast, &cfg_bsnk_8_1, IOV_NULL);
-+
-+	define_test("BAP/BSNK/SCC/BV-18-C [Sync to PA, LC3 8_2_2]",
-+		NULL, test_bcast, &cfg_bsnk_8_2, IOV_NULL);
-+
-+	define_test("BAP/BSNK/SCC/BV-19-C [Sync to PA, LC3 16_1_2]",
-+		NULL, test_bcast, &cfg_bsnk_16_1, IOV_NULL);
-+
-+	define_test("BAP/BSNK/SCC/BV-20-C [Sync to PA, LC3 16_2_2]",
-+		NULL, test_bcast, &cfg_bsnk_16_2, IOV_NULL);
-+
-+	define_test("BAP/BSNK/SCC/BV-21-C [Sync to PA, LC3 24_1_2]",
-+		NULL, test_bcast, &cfg_bsnk_24_1, IOV_NULL);
-+
-+	define_test("BAP/BSNK/SCC/BV-22-C [Sync to PA, LC3 24_2_2]",
-+		NULL, test_bcast, &cfg_bsnk_24_2, IOV_NULL);
-+
-+	define_test("BAP/BSNK/SCC/BV-23-C [Sync to PA, LC3 32_1_2]",
-+		NULL, test_bcast, &cfg_bsnk_32_1, IOV_NULL);
-+
-+	define_test("BAP/BSNK/SCC/BV-24-C [Sync to PA, LC3 32_2_2]",
-+		NULL, test_bcast, &cfg_bsnk_32_2, IOV_NULL);
-+
-+	define_test("BAP/BSNK/SCC/BV-25-C [Sync to PA, LC3 44.1_1_2]",
-+		NULL, test_bcast, &cfg_bsnk_44_1, IOV_NULL);
-+
-+	define_test("BAP/BSNK/SCC/BV-26-C [Sync to PA, LC3 44.1_2_2]",
-+		NULL, test_bcast, &cfg_bsnk_44_2, IOV_NULL);
-+
-+	define_test("BAP/BSNK/SCC/BV-27-C [Sync to PA, LC3 48_1_2]",
-+		NULL, test_bcast, &cfg_bsnk_48_1, IOV_NULL);
-+
-+	define_test("BAP/BSNK/SCC/BV-28-C [Sync to PA, LC3 48_2_2]",
-+		NULL, test_bcast, &cfg_bsnk_48_2, IOV_NULL);
-+
-+	define_test("BAP/BSNK/SCC/BV-29-C [Sync to PA, LC3 48_3_2]",
-+		NULL, test_bcast, &cfg_bsnk_48_3, IOV_NULL);
-+
-+	define_test("BAP/BSNK/SCC/BV-30-C [Sync to PA, LC3 48_4_2]",
-+		NULL, test_bcast, &cfg_bsnk_48_4, IOV_NULL);
-+
-+	define_test("BAP/BSNK/SCC/BV-31-C [Sync to PA, LC3 48_5_2]",
-+		NULL, test_bcast, &cfg_bsnk_48_5, IOV_NULL);
-+
-+	define_test("BAP/BSNK/SCC/BV-32-C [Sync to PA, LC3 48_6_2]",
-+		NULL, test_bcast, &cfg_bsnk_48_6, IOV_NULL);
-+
-+	define_test("BAP/BSNK/SCC/BV-33-C [Sync to PA, VS]",
-+		NULL, test_bcast, &cfg_bsnk_vs, IOV_NULL);
-+}
-+
- int main(int argc, char *argv[])
- {
- 	tester_init(&argc, &argv);
-@@ -6052,6 +6350,7 @@ int main(int argc, char *argv[])
- 	test_disc();
- 	test_scc();
- 	test_bsrc_scc();
-+	test_bsnk_scc();
- 
- 	return tester_run();
- }
--- 
-2.39.2
-
+--=20
+Luiz Augusto von Dentz
