@@ -1,149 +1,93 @@
-Received: from mail-vs1-f46.google.com (mail-vs1-f46.google.com [209.85.217.46])
+Received: from mail-lf1-f42.google.com (mail-lf1-f42.google.com [209.85.167.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B2C613DDD7
-	for <linux-bluetooth@vger.kernel.org>; Fri, 17 May 2024 17:56:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4148433A6
+	for <linux-bluetooth@vger.kernel.org>; Fri, 17 May 2024 18:39:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715968566; cv=none; b=SXa1Dvcc9zrFurFnKI/JLSGsKnUJp7KCunucuWuW4VXtr69qtgRz9UThOhQEEo8As/N0sJuwBLi6NeVn8RSLfRa2V+hoUIjbMw02BX/y0dPVnTe+o5qfW31xpVTgTacMgZzrtGMKzH7jWDc+rPtjNdS6g9pvQaW09kNBqVfFSyc=
+	t=1715971199; cv=none; b=SMu8+llen+l85eXZTO62lb6IcVL6PWwLhcNz+gLLSMati32ok2MWGHbJ5ucFZYkwNPanhr9wpISl+WBZ9wcoNZGAsoyba994SpHTCxH/Jd8Lhj2/HBIFP/Wmql3x22uj+hHuu4yYW6Ay2M7EyIRN9hJN73srikM0WtR8jx1AuEk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715968566; c=relaxed/simple;
-	bh=hnThPtyTGBEuPCLhYKbi16H5V5an+OkZ5Z/39YphDt8=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=lakn2Q03cbB5SwDmFnmxwfyUG5upb9gx+U8wktHcItNKhjKDzc6kmYlYeTYMOJifwrBDE/5637xCVGysRznR99dMgfaJlqDVPGVcsOVkgtuH7f+qP5pmh4yAbLL3QLBhd0A4Zb+JGQc22xaGPwIUBxrn3iYrvKcuzfMVYFgYH3s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fODYfOyn; arc=none smtp.client-ip=209.85.217.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1715971199; c=relaxed/simple;
+	bh=JlAeTKD0+EV/EwvTZfncjcpuXgOagKQREc6m+G6rqqM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=i71MrKE2CJflc+/qhppnmajdWorh3kAEdOx+0jRVk9TgsUYHXsdGDv+vGConHE4VPEDbscUNxEILlrgnbdjmg9egzUTSBiJIaNkJ18Eg2DgaFlb5nkdgTHZObnnIv3N09Fny2fq73WiyRJ+WgZ66RUko/9RKwVTC0PW0Be+/yTM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=asymptotic.io; spf=pass smtp.mailfrom=asymptotic.io; dkim=pass (2048-bit key) header.d=asymptotic.io header.i=@asymptotic.io header.b=G13nnSmn; arc=none smtp.client-ip=209.85.167.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=asymptotic.io
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=asymptotic.io
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fODYfOyn"
-Received: by mail-vs1-f46.google.com with SMTP id ada2fe7eead31-48072da2f81so75804137.0
-        for <linux-bluetooth@vger.kernel.org>; Fri, 17 May 2024 10:56:04 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=asymptotic.io header.i=@asymptotic.io header.b="G13nnSmn"
+Received: by mail-lf1-f42.google.com with SMTP id 2adb3069b0e04-5231efd80f2so2502768e87.2
+        for <linux-bluetooth@vger.kernel.org>; Fri, 17 May 2024 11:39:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1715968564; x=1716573364; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=NC50EJykBIeIvfuIidZracGGGplzRcf+XBtZz4mDDgE=;
-        b=fODYfOynHkcbEG3BYy8NXLbD7+0INYxZ812w5Ck79K9g61T/Oe4DZ/iSJPJWlpGqxp
-         XikAv6qpucLTHB5oHb5TzIk7lDpFtHSDTrB8OVwYm1hCMZqfefzYUIKahy7gaDBTcO0f
-         G8vkXm3CNdVI/stwaTiGlEwAuc0TPDl8yBPbNyV+UiHJ/L9/CCN+S7/gcMpsQtS39idT
-         idJXD2JyawrKDE6iLfvRWZHqoXmR7/BK9HYKEsGTowpRpawImFjgI6yD2yopT8AQm/rh
-         17u+bJ6sjj3RC8ho0C2n7chyr43Wc0NctSeqvoBItLssjAc81Jxw3qUqrpS6eCFypACk
-         gTNQ==
+        d=asymptotic.io; s=google; t=1715971195; x=1716575995; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=JlAeTKD0+EV/EwvTZfncjcpuXgOagKQREc6m+G6rqqM=;
+        b=G13nnSmnSkwbKS2EbfPTmGAsXr+M0hG65FuP951x850QOLimEUoqcwuVZEu8AUq6Hc
+         IMlkp5mEg4SdC6GzLO0vKXYXKGbd1z43jHES7bjvINp+LSY9Ex2IYcjO2t+avTXuac2q
+         cQb2i6kZxQHJlb8Bl7sjDhAin6yRZJ2jvpIv3fU7z/867kV0oUXl72rWxsGeXtGgGe4t
+         56dJm6L3o9Ki+dtFXaI8ljSJegtw2a8670pDPdbU2aj3sPJfGOR5YR5s3g14JR/4n9ED
+         BnG4tAicwljBaIFfVWSRhk8UMdoKJ/8cj+406Js/smgFdbPWyCJ3Z8RjI5Sx9cH5DmOq
+         VmNA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715968564; x=1716573364;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20230601; t=1715971195; x=1716575995;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=NC50EJykBIeIvfuIidZracGGGplzRcf+XBtZz4mDDgE=;
-        b=Eh6bIjnpd+4Wbe+2WYTqPyszEsv5JmN/fXuNxC9WsDbnDoGq4pwv6OOSeWLhhoNaA/
-         a6i5CTrVLRDsKgsgEdJOAzIBXoOQxwz1P86n3DdkYG0vVBPJafcaPjYfHZJ75TCR5LUq
-         bgIx2SGpWojZFyHEmo37tVZsHAqWVRGIqSRBIZfFuOE7m0QhE/DXj0R+XFOzgGmY+Cqh
-         CiMV0HzkQABBcQNUHKeWe4HiIww47MnlpnAUwwqZ7Cdpmfw9E6abW4Ac2BF0IT/8SKFH
-         ph7f5hvrv5efpkw7zCkQ3XPGFUtcB6tfSxE8TKSDNdQv9h2BLQQihopEAUJTC8p4dUpK
-         d7QQ==
-X-Gm-Message-State: AOJu0YxxhDK45hg2rQgyeu3leTIy+aFOTH+1RY364fgiZqLMbdNeULwf
-	hDVbwm/I/ZnyX26FIenApnHhaAHfZITmj5tcZn8T7NEyOcbXBIa6mIyRdg==
-X-Google-Smtp-Source: AGHT+IE6rcErViEwpWNk/IA+kUGFI/Nh48suSlb1jAUxlQOszFYxfAjXOWCP3YOW4dsJ3KXHaox+9A==
-X-Received: by 2002:a05:6102:d87:b0:47b:e9ce:42ac with SMTP id ada2fe7eead31-48077ddcebfmr24976981137.4.1715968563900;
-        Fri, 17 May 2024 10:56:03 -0700 (PDT)
-Received: from [172.17.0.2] ([40.76.119.0])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6a340d25a18sm48422576d6.40.2024.05.17.10.56.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 17 May 2024 10:56:03 -0700 (PDT)
-Message-ID: <66479a33.d40a0220.bbbbb.1f26@mx.google.com>
-Date: Fri, 17 May 2024 10:56:03 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============0740471723447972939=="
+        bh=JlAeTKD0+EV/EwvTZfncjcpuXgOagKQREc6m+G6rqqM=;
+        b=amN38dSVd5IuWdFKGvxs36nRA3cMYOuuvGI9Wz7C1vGVrYKv6m6bBNlOs6ZKumB2O0
+         A6ACwYXAhp/m9iW2Zv4n3XU8z3TNfT6prtsj/Guz38gQ31C1frdoWSGHekJheZVGYgKp
+         v45s/OUsE8C2sGDUekDJlga9JH6DkyIIia/sJrTGuqojKK1yM4gU7WoSWPUJ8wR6hv6V
+         OGSPoLkqaf4jmRGi+7xFRlUOileCTHxzk4AEZcM0DduHmUS0fe35/pAad1QWMzkUBDeY
+         u4kvE07jeEm/NsxFgfxcKozfkWDwsC02QDgq5fAy3HxWAxx4P84KQRjppBotmJDgTe35
+         hOBA==
+X-Gm-Message-State: AOJu0YyogDpwpzU+z1h/NURungHqqz/eNaoSTUkSeilCu7A2Y3iXY6YL
+	DlQDsACahuz3tRt72TXq+Pz/mMisyj5V3VzP5XBeQkSTfS6MaY/2Qawha2ZsWS6nhPpTMwy6mU+
+	1kt2E79fzFzI2JWRazCA8Ec8yR3h/8zrgQgdytr6iZLr8LDO5/Ss=
+X-Google-Smtp-Source: AGHT+IHtk3tTDzN3O2CuhiolSywAEN/Va/Ob7EOnF1A5gERCMC5uQwHokw5d6Oph9jWHtwYaxfg5A8LBhrXAXuUO62k=
+X-Received: by 2002:ac2:59cf:0:b0:523:88e9:9cd2 with SMTP id
+ 2adb3069b0e04-52388e99ddemr5736624e87.67.1715971194832; Fri, 17 May 2024
+ 11:39:54 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, erick.archer@outlook.com
-Subject: RE: tty: rfcomm: refactor rfcomm_get_dev_list() function
-In-Reply-To: <AS8PR02MB72375B833F3EBFF72A0CF1628BEE2@AS8PR02MB7237.eurprd02.prod.outlook.com>
-References: <AS8PR02MB72375B833F3EBFF72A0CF1628BEE2@AS8PR02MB7237.eurprd02.prod.outlook.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+References: <20240516193836.228281-1-arun@asymptotic.io> <20240516193836.228281-2-arun@asymptotic.io>
+ <CABBYNZLriw3OMX_oNA84FohCp20i0zeskZn9MZGOD5qg=EaPEg@mail.gmail.com>
+In-Reply-To: <CABBYNZLriw3OMX_oNA84FohCp20i0zeskZn9MZGOD5qg=EaPEg@mail.gmail.com>
+From: Arun Raghavan <arun@asymptotic.io>
+Date: Fri, 17 May 2024 14:39:19 -0400
+Message-ID: <CAN03qa_TgFEA7hCXKH1JfUMCBkotqLHkrX=W1+p-UvakRGiv7Q@mail.gmail.com>
+Subject: Re: [PATCH BlueZ,v6 1/5] src/shared: Add initial implementation for
+ an ASHA profile
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
---===============0740471723447972939==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hey Luiz,
 
-This is automated email and please do not reply to this email!
+On Fri, 17 May 2024 at 10:23, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+[...]
+> This is not quite right, we can't depend on libbluetooth since that is
+> GPL also both adapter.h and device.h, or any header that adds btd_
+> APIs, are probably only meant for use in bluetoothd internals, usually
+> that means that the connection setup, socket handling etc, needs to be
+> done at the plugin side and then attached to the bt_asha instance as a
+> pure file descriptor then you can manage it via io handling.
 
-Dear submitter,
+I'm not sure I follow how the code is meant to be structured. Is there
+any documentation or something I can read up on?
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=854073
+As I understand it, you're saying anything that relies on btd_* calls
+should be inside profiles/audio/..., and not in src/shared/...
 
----Test result---
+In this case, all the GATT bits will need to move back to
+profiles/audio/asha.c, and there's not much left in src/shared/asha.c
+that would be useful, which would leave things similar to v1, where
+everything was in profiles/audio/
 
-Test Summary:
-CheckPatch                    PASS      1.56 seconds
-GitLint                       FAIL      0.88 seconds
-SubjectPrefix                 FAIL      0.48 seconds
-BuildKernel                   PASS      30.02 seconds
-CheckAllWarning               PASS      32.89 seconds
-CheckSparse                   PASS      38.94 seconds
-CheckSmatch                   FAIL      35.28 seconds
-BuildKernel32                 PASS      29.46 seconds
-TestRunnerSetup               PASS      521.79 seconds
-TestRunner_l2cap-tester       PASS      18.30 seconds
-TestRunner_iso-tester         PASS      30.53 seconds
-TestRunner_bnep-tester        PASS      4.75 seconds
-TestRunner_mgmt-tester        PASS      114.54 seconds
-TestRunner_rfcomm-tester      PASS      7.29 seconds
-TestRunner_sco-tester         PASS      14.97 seconds
-TestRunner_ioctl-tester       PASS      7.74 seconds
-TestRunner_mesh-tester        PASS      5.84 seconds
-TestRunner_smp-tester         PASS      6.80 seconds
-TestRunner_userchan-tester    PASS      4.93 seconds
-IncrementalBuild              PASS      33.23 seconds
-
-Details
-##############################
-Test: GitLint - FAIL
-Desc: Run gitlint
-Output:
-[v3,1/2] tty: rfcomm: prefer struct_size over open coded arithmetic
-
-WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
-10: B3 Line contains hard tab characters (\t): "	[...]"
-11: B3 Line contains hard tab characters (\t): "	struct   rfcomm_dev_info dev_info[];"
-36: B1 Line exceeds max length (117>80): "Link: https://www.kernel.org/doc/html/latest/process/deprecated.html#open-coded-arithmetic-in-allocator-arguments [1]"
-##############################
-Test: SubjectPrefix - FAIL
-Desc: Check subject contains "Bluetooth" prefix
-Output:
-"Bluetooth: " prefix is not specified in the subject
-"Bluetooth: " prefix is not specified in the subject
-##############################
-Test: CheckSmatch - FAIL
-Desc: Run smatch tool with source
-Output:
-
-Segmentation fault (core dumped)
-make[4]: *** [scripts/Makefile.build:244: net/bluetooth/hci_core.o] Error 139
-make[4]: *** Deleting file 'net/bluetooth/hci_core.o'
-make[3]: *** [scripts/Makefile.build:485: net/bluetooth] Error 2
-make[2]: *** [scripts/Makefile.build:485: net] Error 2
-make[2]: *** Waiting for unfinished jobs....
-Segmentation fault (core dumped)
-make[4]: *** [scripts/Makefile.build:244: drivers/bluetooth/bcm203x.o] Error 139
-make[4]: *** Deleting file 'drivers/bluetooth/bcm203x.o'
-make[4]: *** Waiting for unfinished jobs....
-make[3]: *** [scripts/Makefile.build:485: drivers/bluetooth] Error 2
-make[2]: *** [scripts/Makefile.build:485: drivers] Error 2
-make[1]: *** [/github/workspace/src/src/Makefile:1919: .] Error 2
-make: *** [Makefile:240: __sub-make] Error 2
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============0740471723447972939==--
+Cheers,
+Arun
