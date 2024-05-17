@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F076748E;
-	Fri, 17 May 2024 14:40:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63A4728F1
+	for <linux-bluetooth@vger.kernel.org>; Fri, 17 May 2024 14:50:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715956834; cv=none; b=V5eEWMwgVrv4uH6MrCw0uXGRB3cC/oDFWFzqZWCK64SQga6/gv5baEigxMUfQleKfyDAb35JnU+vop6OrPm90SpbWgvLEI6A62YteFfxO2B8O62vonJCl9KAg1aGYlb1mnq3ewDU1wx5dZizGZksSHuhCQh5jV1Nw6HKAw4HmrU=
+	t=1715957433; cv=none; b=ViMFSZBQZjQCwDv4KUXZ0VLzqhqfClYS0x5rh7DtzqrxMcUTyYtI2reXzZTdh66pxdUsBF+aYab7gKPtpVOiVLF/rty1fIn7fwPXjj5c4cvptxG103iXtAfdZZHohbyeidLiG3oy41utUVMilFPGYP7afHLQCtkMpJWxvqZc+kA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715956834; c=relaxed/simple;
-	bh=WcnDMWC5m0Qf3HEHyWs/JC3uDjcP2QIwCvwotQ5JlEs=;
+	s=arc-20240116; t=1715957433; c=relaxed/simple;
+	bh=fQubphhMdqhEOLi47iVXXjpTvLLyOpf5LVnIP+jUoN8=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=IdT6V/vvEvBYWRv4nHZzX4HL/yNFmJZlhqUyxfvczseHFmFwbhen3ew9Y8KJlPYJLBBLj8zLfcv6XWm3xRuJTNBhJhuUzEwFMc3sGCxM//haFjMAgxASGpKCay/X1qfH/5dkgv3uV16z/PykkSEMJT7vuvke3wkhAF9nQ+xV0vs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RXFw+nJY; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=PeLKEW7I9SfhEKHcA0XcLowx+OMrf4KLo8gbXorp5NpTtkFJyo0e3m/NSlVyhRN2dapIjIkJPv/BslQeiPyschU1SzPk4uaYVotVa7heTJJr48tk2gb+idyAAPDDCh/z5uKNhEdJNBTJtedSdwHFg8PoSyWEAhjgj7GcE8ncwK0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MQeAJYWc; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RXFw+nJY"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id D7A1FC32789;
-	Fri, 17 May 2024 14:40:33 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MQeAJYWc"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id E7A6FC32781;
+	Fri, 17 May 2024 14:50:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1715956833;
-	bh=WcnDMWC5m0Qf3HEHyWs/JC3uDjcP2QIwCvwotQ5JlEs=;
+	s=k20201202; t=1715957432;
+	bh=fQubphhMdqhEOLi47iVXXjpTvLLyOpf5LVnIP+jUoN8=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=RXFw+nJYPQYnASuWo6jyxiEqP1yqqxziusrnrvlwQ5ez+852or9YlH/nigC95Sx13
-	 +ONpKFgHPtXpRxtVdEPHfru4l54k7dfSOAWoTYuHUO0sqsaFwROdU4BNo/D5GJOErs
-	 z8K/7d0BbLtMmc/3SEMPutAnBD2p3FyJ/Mr2weAkhw+CO/dEkrcurYi6tdKhUfClIV
-	 HM+dI25qt12o+XcNSg7GcCFA21qFKYouYkkDG7D2xRzXTuxOBMD/fTCfy6XHGFiGqz
-	 khj5vA1nQ9jI4AGOQbrtwI+NKQNi15zHC/QHShhxGPXYgDtX909M9/dalMKk2Pab+j
-	 Rz5ZZvoEcFkdw==
+	b=MQeAJYWcL1iTPmctXSw8tvHadXb4YjPLVS2eEPvUqOfDZxUtL8TZNT+cM07Z7QHGL
+	 Bnd8HOg9i9AEVzszxhYTyVGKTWyt++Erq33+vu7VXdUBMTf4c5F0uk2xj4SliPlm2E
+	 a4ZrcXQwuyf7nzVuOIPsV+ImLAZ3aV6ywl8MN42pGqE7v5Mm9KgZ+RwNj2ADUK1Uzc
+	 WnLUbg4bCR8kGmNft5mxbjupNXYFlxYJ5sCOIQsBTEn7iUIFGTk26FDlrVCIWc7MYZ
+	 F5JKsCh/fvm4grCIQmcmpUktXUSCCdRyK1ssffejsRZdJNgRCoAxQnJm2YkxwFwyrK
+	 fbQgOFv+eb2Fg==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id C1613C54BD4;
-	Fri, 17 May 2024 14:40:33 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id D6490C1614E;
+	Fri, 17 May 2024 14:50:32 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -37,40 +37,41 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] Bluetooth: btnxpuart: Shutdown timer and prevent rearming
- when driver unloading
+Subject: Re: [BlueZ] obexd: Fix memory leak
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <171595683378.30517.9280094714253637646.git-patchwork-notify@kernel.org>
-Date: Fri, 17 May 2024 14:40:33 +0000
-References: <20240517111535.856723-1-ziniu.wang_1@nxp.com>
-In-Reply-To: <20240517111535.856723-1-ziniu.wang_1@nxp.com>
-To: None <ziniu.wang_1@nxp.com>
-Cc: marcel@holtmann.org, luiz.dentz@gmail.com,
- linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
- amitkumar.karwar@nxp.com, rohit.fule@nxp.com, neeraj.sanjaykale@nxp.com,
- sherry.sun@nxp.com, haibo.chen@nxp.com, jun.li@nxp.com,
- guillaume.legoupil@nxp.com, salim.chebbo@nxp.com, imx@lists.linux.dev
+ <171595743287.5154.9091403956918765881.git-patchwork-notify@kernel.org>
+Date: Fri, 17 May 2024 14:50:32 +0000
+References: <20240516134053.102475-1-hadess@hadess.net>
+In-Reply-To: <20240516134053.102475-1-hadess@hadess.net>
+To: Bastien Nocera <hadess@hadess.net>
+Cc: linux-bluetooth@vger.kernel.org
 
 Hello:
 
-This patch was applied to bluetooth/bluetooth-next.git (master)
+This patch was applied to bluetooth/bluez.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Fri, 17 May 2024 19:15:35 +0800 you wrote:
-> From: Luke Wang <ziniu.wang_1@nxp.com>
+On Thu, 16 May 2024 15:40:48 +0200 you wrote:
+> To not leak "buf", we need object->buffer to take ownership of it using
+> g_string_new_take() (but it's only available in 2.78 and newer), or we
+> need to actually free "buf".
 > 
-> When unload the btnxpuart driver, its associated timer will be deleted.
-> If the timer happens to be modified at this moment, it leads to the
-> kernel call this timer even after the driver unloaded, resulting in
-> kernel panic.
-> Use timer_shutdown_sync() instead of del_timer_sync() to prevent rearming.
+> Error: RESOURCE_LEAK (CWE-772): [#def66] [important]
+> bluez-5.75/obexd/plugins/filesystem.c:411:3: alloc_arg: "g_file_get_contents" allocates memory that is stored into "buf".
+> bluez-5.75/obexd/plugins/filesystem.c:418:3: noescape: Resource "buf" is not freed or pointed-to in "g_string_new".
+> bluez-5.75/obexd/plugins/filesystem.c:440:2: leaked_storage: Variable "buf" going out of scope leaks the storage it points to.
+> 438|			*err = 0;
+> 439|
+> 440|->	return object;
+> 441|
+> 442|   fail:
 > 
 > [...]
 
 Here is the summary with links:
-  - Bluetooth: btnxpuart: Shutdown timer and prevent rearming when driver unloading
-    https://git.kernel.org/bluetooth/bluetooth-next/c/3afc41cbec84
+  - [BlueZ] obexd: Fix memory leak
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=46c0e376fe13
 
 You are awesome, thank you!
 -- 
