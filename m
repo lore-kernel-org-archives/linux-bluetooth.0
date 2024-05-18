@@ -1,153 +1,143 @@
-Received: from EUR05-VI1-obe.outbound.protection.outlook.com (mail-vi1eur05olkn2057.outbound.protection.outlook.com [40.92.90.57])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 685B317BA9;
-	Sat, 18 May 2024 08:31:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.92.90.57
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716021078; cv=fail; b=GIW2ra2w04yGU1vAeav7XffG1itrUDB7Pep24e/EHIcUJe/93T3R/2HLGGKuubbUOYpeiLpfWmhTC0t7GByOvTWw7NW23RfHYEqCKzn67qxYxvzHZCJm6mPaGMf7iQOwhtJMINmZRnA8pdTStqnTcJebwmwUgE8pesfOJSRGIkY=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716021078; c=relaxed/simple;
-	bh=BfcUnnoGavhSUjWNm6uA9jJ5/41YkMxKsdVPjLPCZUc=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=FUAYrOWeOaw+jWdf81taUHFJXnFOTj5JKCut2PZdydKIesV+4wgl6PNM6eUtpEJihj35ClCiNib/mb1iJcsBr7bknthxILPoSdDJ+JSQ0+fhZid/eixFY66X7Y9FFcQ2u4nx7Lh7Q1IR8O1Ood1O6ao39llpq9fhLsK54gxgfZg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com; spf=pass smtp.mailfrom=outlook.com; dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b=rLZrLKbk; arc=fail smtp.client-ip=40.92.90.57
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=outlook.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B9E2101C5
+	for <linux-bluetooth@vger.kernel.org>; Sat, 18 May 2024 08:57:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1716022624; cv=none; b=njWJEh/PNXHbRVxs2duyKFa+WHWM6Gyr8rJ0WcKDFG8jiMASiUwitKIQ1oTCLe3Lql1EyrmyjL5rrOg7WLusmj+sJGjbXW8yDeW0tqRtjN+vLJ6N8eE5hZnFMyzxKJ3i23H0JxK1AbJ5Kg414vfiMbE1KtkkDglkjeljniuScE0=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1716022624; c=relaxed/simple;
+	bh=fbGIk3dz1BnR+sYmoRToXkknj1pTdZrjcANuu8VqZOs=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=enNN4QIMg8jyxFHTLUBWAFPtHRYKsPhLF+eoffTBtzL8qcwhnFw+FxArabo01EzxCbZZaKGzUT3jLYUm1459ey1HX5Kyz5rXjgevP7qqN8j+2tCAjcxB75IJ/10ZkDyRowGHpLRUxJKQ+3r/zLs4Z6pmKm1wMuqm4XmXiobAU64=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VC+yZnYb; arc=none smtp.client-ip=209.85.214.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b="rLZrLKbk"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=DL8tE5YZ6lmdSwBqIB9IAb97DSoy2DmhZ2+cnNGkGf1zQf1REBd9yXodPAg9/kBXsMkGhp0T1QcuaBTPcbSBnWqNwrc1bZHBzJpJ2MRdaIa3g1VZI1GqaLpkgmQRyFKz0xMA5JiWsQc+nElgnK/WCLOH6c7NoynHdyVA+ZvABKH9ih8+T7wTI0RTuAKAJzkVRadmK+9V81AkiDUbOcQxK/9l9AWW2op8GKYhiPCQTr69OYb4vTgUlFXLo084c39+goQihNB6Ltyw0G9kaWKU81mhoJhDD4ir7WXt62Nr14Dl+y5B/BA3o7OTx+Pw1ClwsqZJt5CPAHa2bSB5rjik/g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=daC3THgyOiQzGJtJX2KuIaT/NeDMy0RudLFDY/u4FOQ=;
- b=L4nhkD7MliCGsUQ6xGrkCURpKKONFA0VbSnDkIYzvqPxtZvZWHGjtK6kCq14OzPgaf586x243Otg1XnPNBVp2xKkoTDYumW+7bRLLBv37k/tVRwmkhSI/6ZhBuzJtyn66YfWpTzXCbuIndsc20htuxJZ3sIX+lXHUknr/tcaTgHQSdAfHcVdZe7WTP6YM08TtdyirbZJC/CkeUv17dDbxTdYozHs+YaBV3/GK1l+2Z68blHZooeYrS7cHwZ9djYd68L3Ko23anl7RPr07NO/GdKUehlEmf8/xxRZZpSihXSVDfenH+LObyelsYgksffWd8rN7mO/4gzOC5nQpXh+/A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
- dkim=none; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=daC3THgyOiQzGJtJX2KuIaT/NeDMy0RudLFDY/u4FOQ=;
- b=rLZrLKbkgiC7QmEIgpBTpHgrR4+oXF7uMLqQynu9HuK6QvQNvwVhW5j82K1ivgWrqZsqQKsymjFsQhXmavmn7AiuNU939QDMXMdwQropKcbWfBH9IeKIYsRgzkGdd+SH5RjglpbXq58A/hpap6dzhsDg4hl7iXjpyJnleePbbgtj2/hOBKsmxHOrb64kd/tqStu1VxPfIVtkQToH31xscMysNChFpGCmvTWx6f6t2/UKHPzjKIrvKpLj2j3XVTIL/P7F7mKBZk6idmRsPZ2pVdZ6qCDexXtrUesMMx3PXazgSU77WRKsRJJXchZZOjxEkv3BVSf9RMbmDvqPyqLbGA==
-Received: from AS8PR02MB7237.eurprd02.prod.outlook.com (2603:10a6:20b:3f1::10)
- by GV2PR02MB8723.eurprd02.prod.outlook.com (2603:10a6:150:7c::7) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7587.31; Sat, 18 May
- 2024 08:31:09 +0000
-Received: from AS8PR02MB7237.eurprd02.prod.outlook.com
- ([fe80::409b:1407:979b:f658]) by AS8PR02MB7237.eurprd02.prod.outlook.com
- ([fe80::409b:1407:979b:f658%5]) with mapi id 15.20.7587.028; Sat, 18 May 2024
- 08:31:09 +0000
-From: Erick Archer <erick.archer@outlook.com>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Kees Cook <keescook@chromium.org>,
-	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Nick Desaulniers <ndesaulniers@google.com>,
-	Bill Wendling <morbo@google.com>,
-	Justin Stitt <justinstitt@google.com>
-Cc: Erick Archer <erick.archer@outlook.com>,
-	linux-bluetooth@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-hardening@vger.kernel.org,
-	llvm@lists.linux.dev
-Subject: [PATCH v2 2/2] Bluetooth: hci_core: Prefer array indexing over pointer arithmetic
-Date: Sat, 18 May 2024 10:30:39 +0200
-Message-ID:
- <AS8PR02MB72370994136D06FC99680CC88BEF2@AS8PR02MB7237.eurprd02.prod.outlook.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20240518083039.7202-1-erick.archer@outlook.com>
-References: <20240518083039.7202-1-erick.archer@outlook.com>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-TMN: [K7kVgqjXF+OcZcPiLQyP3yju7H8n/SLb]
-X-ClientProxiedBy: MA2P292CA0026.ESPP292.PROD.OUTLOOK.COM (2603:10a6:250::12)
- To AS8PR02MB7237.eurprd02.prod.outlook.com (2603:10a6:20b:3f1::10)
-X-Microsoft-Original-Message-ID:
- <20240518083039.7202-3-erick.archer@outlook.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VC+yZnYb"
+Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-1f0537e39b3so30453615ad.3
+        for <linux-bluetooth@vger.kernel.org>; Sat, 18 May 2024 01:57:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1716022622; x=1716627422; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=2yyvV0vjPOovnrulTd8gPM4NQHsJksn5xh/CnHZcjcY=;
+        b=VC+yZnYbFbMekUqnEd2BWWLMwkjXWJ8u4VMRhQ5L6hjLL8LrrAA0A6a0CGJTrCXgNb
+         aebDYOH+VX6A8J01HzKx3A9YPrkKzzsY4eSCqR+dhZcMrHa/L6PBiarIhFdsjtxLFShX
+         U2BkvTK6Tp+rxbzoza2elpFvB8kJ2B31VWiMivwIxBylCFdJjl4nLkC82sghfUhw9yaU
+         AxxieezU315DkzdOSG76DgavwWHIqBkGjKTWYMS11NtA/Zuip1XRgzVaZnX86g3/YMiv
+         KDPQUTWDsxG7X8q5w68B6NWHT+j+uD3Mv647EGJ3smZhA+44Tm1a2HoRSo0KKZRrj0TV
+         iYPg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1716022622; x=1716627422;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=2yyvV0vjPOovnrulTd8gPM4NQHsJksn5xh/CnHZcjcY=;
+        b=JyvGiXZTjIgjGKcMloR4exxBSfuhVOGqlXkWfV41dPkPpovu/ioZQmzs6uWMzyAmlE
+         87RzQsQRIYzrdUNKwSHmPFpddhbba5jAZDegSJfwRJFn6RW+qZE9hhU1apUiE3j/rASl
+         D3lEV3YxlYwYFdp/zZKZ52woecH8Kpxib+us9wEh+VFCPgR5mP0MTiOPRBQCWnUoSk6W
+         PaQpodz4ftSG2KgowNfk3ZIHPk8s2ePOEGl9emFYjY8q9RPUMXFdljSJcChk/na2kHjy
+         0hkITdM7JUZWnB0PijlcKXCAg7iOTLTDrKXAIA3VHZ6MYhyOdCaWOaCkPoskKFgF8TMC
+         vIrg==
+X-Gm-Message-State: AOJu0Yx1uv7Cc6XlQKTyXdsWpxC/k1yFbHIvwziM1x8D2lqomjUf2TA/
+	xPWkmJHLBpKXKAn1xQBZRIeO896E+uZov/hKs+HyMO4ZQ0eAkOuLM9Wujw==
+X-Google-Smtp-Source: AGHT+IFvCKhhp5NSxUr93k9exfbvb1fw13AIMBpSpo9jZn8+hYv9kydJ4I/7+HJcerLuIEhwgChbdw==
+X-Received: by 2002:a17:90b:185:b0:2b6:c4d7:fbf9 with SMTP id 98e67ed59e1d1-2b6cc758aa9mr19579196a91.13.1716022622045;
+        Sat, 18 May 2024 01:57:02 -0700 (PDT)
+Received: from [172.17.0.2] ([20.172.7.0])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2b6711660fdsm16745828a91.16.2024.05.18.01.57.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 18 May 2024 01:57:01 -0700 (PDT)
+Message-ID: <66486d5d.170a0220.9fc2f.ad83@mx.google.com>
+Date: Sat, 18 May 2024 01:57:01 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============4915839975433500951=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AS8PR02MB7237:EE_|GV2PR02MB8723:EE_
-X-MS-Office365-Filtering-Correlation-Id: 2e869dab-8e2c-4783-1da5-08dc7714de47
-X-Microsoft-Antispam:
-	BCL:0;ARA:14566002|461199019|3412199016|440099019|1710799017;
-X-Microsoft-Antispam-Message-Info:
-	o9/tebtvu7Ue7q3F+507HAQkdZneZz0j5KyvzNedAnAy1dMq8wh+OU2n/x0waeYBm0te5Cy6O64wsXC7fTtk/RSaBLcIzZpicfAIHT+o8hicNrGg1XqnNXQf/jPzI2GKbgX2VKP7rdFZNkw4tFLbx3dQYGofCopdelSA21L5P1QyMRqpjL/x2Yn4KE/hzNq187ggiWv8l0nl/IYF5sXfYmczHNOGnzIptSsRKLOhZzdHRuEeV+Ej2FrYvIizcIYun7Fu9oV7PAcXSSlkzsAMeqnKXzvvywbJrleTwiZ8mvHT0cEkOC0OupT0WsgX4II03D3dvB+5cbYKQ+2qHbGNMVPZye4uQWNfX2iG47ckAOk6sGqljo/fxAXavzLTiL8aQQqsz46OtexoX9lTkQUZPbz+KRsUx5dVZegTI5O7tqEk1jfSLVmPAAc6815/w9VbxZYrzmJ7xHj18tKxo5loqCz028kNYkaFlTJh4ssl0B4/yZ8KKLGU2NsjNasa4FKJBWHp/Fs0w3ciQzHjvghNxbrgghAwAJifkTh9XFsjS4W41H4g/qG7bAoh1rGpvyohjFvOx2zR2QK+cKN4xygRHckrqZPCB1vMj+yRbtWflbXURAyYQzOwTnDPK9dbS/L1
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?Mnkoa4uBiNhQfD++9Jmsvh+qf/9XsmZG4Mu5F1fdkj5U2NpmtVlIFUX9tDAX?=
- =?us-ascii?Q?nW8SX5yO4x/uhH1HrxiX1RO97RRg4VJ1NckU8h8kBAXThncbjGHfbmTfJiNP?=
- =?us-ascii?Q?oB86ROgZc+tZ1evxYlTNV0xzrNTXHt9cAlfM5PMoBmnZvBO4KQOLbvd2cWcR?=
- =?us-ascii?Q?zFab9AhKreGYlMKjlWXZHy/ujSluEovft9MelSsmkepxEit9Sk8CWlEVLyWg?=
- =?us-ascii?Q?i8AJaw67L6/GlFVLIJPBSkdNoDgYdjJB7irbptErB6jr6HcQyWth0LOdHGpz?=
- =?us-ascii?Q?/iJ4HU0zvxGmJJ/4K3HjGc/w2LaXsZLGwYGhs+Zg6rTdPXNe8rtM/ChirZVh?=
- =?us-ascii?Q?+79bcW582LQ6NZmhve1EkulqnZO4OvPp5RLZBYXMZl4NU33eBcBkrROjCowN?=
- =?us-ascii?Q?wiUyKPJyThrcJyem97AWsREHknyRTHzYVFvkunhtjNsouS7EfVB2amgmHNbn?=
- =?us-ascii?Q?oXOmFPg+E8ezEsZJDFi8a1gJWyeknf/x5VmCd+bRQZbbAgqglKeQatYLtt8H?=
- =?us-ascii?Q?og4jwQUrGJNIHVkMQgFgX7APw9J1oW5I1gNO9IsY+V1zm4tZ7UoZGmKGtzAu?=
- =?us-ascii?Q?b7JEBNOG0T2osYig8PkphAhDpIbfLHPr11cskNHFTWyFFhi4F8uDYYf99ENz?=
- =?us-ascii?Q?D4b2NtbIBLaHM+ofKxOIWRkO1FvUKaF15hWnkByWOHijScPabnWbgeJ0/aFL?=
- =?us-ascii?Q?XISxhjZJMq/nKQ8unKZch/vWqRXeBBO+dzbvM0dSl2floYfeykU9dPztJw7t?=
- =?us-ascii?Q?ggSocGpV4YbNtVNzla2n9JSASO9p4AgIbPS6aYL8ghvbuRcr4tixe1T0F1Ou?=
- =?us-ascii?Q?+uU9cP43J1f5EboFC6XHDFdaK79PWEuSg3FjKQWP/T83w93hM7QPyq/UFjiQ?=
- =?us-ascii?Q?KbRdRj8W9DWZmbTA0Aw3t1FE0COzYPis5jrikMs9wgkz8UxJhOGXV0iz8AIN?=
- =?us-ascii?Q?KU6CfqizM3BBx3J4dnDVaa7X0E5aMF95T7W9ZoPliVZ9bAWHPHgLrFqTK4Om?=
- =?us-ascii?Q?h05jGW1Oml0kfY2WqjF/GeKFLIDZJNwq8B3D2EegyoVR5uGCgBg1IIdEM7kk?=
- =?us-ascii?Q?9f7D/tI9HKKZFMn7RnRhVdpJgyce4Vg9Z2T5uRWXYkncu8pOl+F1s6eSEB7F?=
- =?us-ascii?Q?d56fZa3voe9wlZjXVHDrR6iBcNUyviJSp+2bpnupPb7XcJH745Z8qIXZuYjd?=
- =?us-ascii?Q?2JQGI6DChRMD+pzhOO02hvkZZVJfKvwieea0OQUQphzsPwhpl6q25sSeoGnc?=
- =?us-ascii?Q?pNuXlPop4Q9GfSnxVuJm?=
-X-OriginatorOrg: outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2e869dab-8e2c-4783-1da5-08dc7714de47
-X-MS-Exchange-CrossTenant-AuthSource: AS8PR02MB7237.eurprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 May 2024 08:31:09.4329
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
-X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg: 00000000-0000-0000-0000-000000000000
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: GV2PR02MB8723
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, erick.archer@outlook.com
+Subject: RE: Bluetooth: hci_core: Refactor hci_get_dev_list() function
+In-Reply-To: <AS8PR02MB723788E9DB59D20465408A0C8BEF2@AS8PR02MB7237.eurprd02.prod.outlook.com>
+References: <AS8PR02MB723788E9DB59D20465408A0C8BEF2@AS8PR02MB7237.eurprd02.prod.outlook.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Refactor the list_for_each_entry() loop of hci_get_dev_list()
-function to use array indexing instead of pointer arithmetic.
+--===============4915839975433500951==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-This way, the code is more readable and idiomatic.
+This is automated email and please do not reply to this email!
 
-Reviewed-by: Kees Cook <keescook@chromium.org>
-Signed-off-by: Erick Archer <erick.archer@outlook.com>
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=854158
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      1.23 seconds
+GitLint                       FAIL      0.70 seconds
+SubjectPrefix                 PASS      0.17 seconds
+BuildKernel                   PASS      29.48 seconds
+CheckAllWarning               PASS      32.68 seconds
+CheckSparse                   PASS      37.85 seconds
+CheckSmatch                   FAIL      34.73 seconds
+BuildKernel32                 PASS      28.71 seconds
+TestRunnerSetup               PASS      519.57 seconds
+TestRunner_l2cap-tester       PASS      18.15 seconds
+TestRunner_iso-tester         PASS      30.18 seconds
+TestRunner_bnep-tester        PASS      4.68 seconds
+TestRunner_mgmt-tester        PASS      108.74 seconds
+TestRunner_rfcomm-tester      PASS      7.22 seconds
+TestRunner_sco-tester         PASS      14.84 seconds
+TestRunner_ioctl-tester       PASS      7.72 seconds
+TestRunner_mesh-tester        PASS      5.77 seconds
+TestRunner_smp-tester         PASS      6.76 seconds
+TestRunner_userchan-tester    PASS      4.85 seconds
+IncrementalBuild              PASS      33.18 seconds
+
+Details
+##############################
+Test: GitLint - FAIL
+Desc: Run gitlint
+Output:
+[v2,1/2] Bluetooth: hci_core: Prefer struct_size over open coded arithmetic
+
+WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
+10: B3 Line contains hard tab characters (\t): "	[...]"
+11: B3 Line contains hard tab characters (\t): "	struct hci_dev_req dev_req[];	/* hci_dev_req structures */"
+36: B1 Line exceeds max length (117>80): "Link: https://www.kernel.org/doc/html/latest/process/deprecated.html#open-coded-arithmetic-in-allocator-arguments [1]"
+##############################
+Test: CheckSmatch - FAIL
+Desc: Run smatch tool with source
+Output:
+
+Segmentation fault (core dumped)
+make[4]: *** [scripts/Makefile.build:244: net/bluetooth/hci_core.o] Error 139
+make[4]: *** Deleting file 'net/bluetooth/hci_core.o'
+make[3]: *** [scripts/Makefile.build:485: net/bluetooth] Error 2
+make[2]: *** [scripts/Makefile.build:485: net] Error 2
+make[2]: *** Waiting for unfinished jobs....
+Segmentation fault (core dumped)
+make[4]: *** [scripts/Makefile.build:244: drivers/bluetooth/bcm203x.o] Error 139
+make[4]: *** Deleting file 'drivers/bluetooth/bcm203x.o'
+make[4]: *** Waiting for unfinished jobs....
+make[3]: *** [scripts/Makefile.build:485: drivers/bluetooth] Error 2
+make[2]: *** [scripts/Makefile.build:485: drivers] Error 2
+make[1]: *** [/github/workspace/src/src/Makefile:1919: .] Error 2
+make: *** [Makefile:240: __sub-make] Error 2
+
+
 ---
- net/bluetooth/hci_core.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 81fe0958056d..b3ee9ff17624 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -864,8 +864,8 @@ int hci_get_dev_list(void __user *arg)
- 		if (hci_dev_test_flag(hdev, HCI_AUTO_OFF))
- 			flags &= ~BIT(HCI_UP);
- 
--		(dr + n)->dev_id  = hdev->id;
--		(dr + n)->dev_opt = flags;
-+		dr[n].dev_id  = hdev->id;
-+		dr[n].dev_opt = flags;
- 
- 		if (++n >= dev_num)
- 			break;
--- 
-2.25.1
 
+--===============4915839975433500951==--
