@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBC5719BBA;
-	Mon, 20 May 2024 19:40:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 217618C06;
+	Mon, 20 May 2024 19:50:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716234032; cv=none; b=NeQtocWdg91ZhrWHjhd0b8eK9H8x87Ao5yTSPu1vbY8Hz/dz5cZv4vsWMs6iAkP0mvt+UvCB1bEbz6UJ4JH63JxvlcJfrNQtHHIKkKaTdxLxCyuV3Lz6YJRMsxvtOmegLyZ1NfrEMW0CLrWjcn8OJdh23uFjaZ61Imn/U4bYml0=
+	t=1716234631; cv=none; b=c6o2sUxpMOn3AuJX2uQSnnKP0vrs9y3+Zh+CDP5XwOS13H4aqUxHZuv3aYGBLvay+VOHneg5PImAC0wWrmA1n2zmVTCEL0llAlL8FcdhXPkKM/2jPfew7JeycSFt20vXIJpfw37sw314aF/IWEr4kd8wy67fB5YRqV2LOCN+pkk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716234032; c=relaxed/simple;
-	bh=KKvmUiNEkdDNOF+4LIuWQvPdLdakaCHzGqUIUcvsXaM=;
+	s=arc-20240116; t=1716234631; c=relaxed/simple;
+	bh=EvgQOLJlhEDLuvEcXOFO1LKZforMGGSKQWSuu1CIxy8=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=UrRs6xH2L1HXAORJ8eomo34y5uxaANa0+AqoFeO68q6zY2RAumSq7BqNNLB4sPgEMB7cJGu19Gga5RpEO4ogxfmvC7y4it2anIU+yukCMRn0kXltr8GdVdazk6SwhzQsPdDMhAbQbpC+woyTS3SKlnGpiDfn0QFep7Roip3Z60c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tOg8RPra; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=ilmb7qgs43HmLa2/tvj7wX2fR3McdtjOOThNRHRLLM/bQu6mfa8NTPki4PtHzt5HIpdXgiJr3NU69UY0gawooxG9s30feUlPA8PiZQybD4TXgYeOnkGR46kzfymhbwhc47hk66yqkKwrV1/Kyu56g3bonSw4BYce6D4TGjrh+Yo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Vc1Cmh1d; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tOg8RPra"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 6872BC32789;
-	Mon, 20 May 2024 19:40:32 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Vc1Cmh1d"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 965A9C4AF07;
+	Mon, 20 May 2024 19:50:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1716234032;
-	bh=KKvmUiNEkdDNOF+4LIuWQvPdLdakaCHzGqUIUcvsXaM=;
+	s=k20201202; t=1716234630;
+	bh=EvgQOLJlhEDLuvEcXOFO1LKZforMGGSKQWSuu1CIxy8=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=tOg8RPralfb5JUgiBhuOkvD4qy/awCGhqgdY6MgIl11YzgpkuA9WdJeVmkHfdWRTU
-	 2UNInfTbEn7dUochGzuClWoz2e9EkfPTNzInitxgDHWT36v6jn2QPkRFZp6wxLUvix
-	 uLG5SwvhtlyU678Wvx4FF8w3gS0HBYD+hc8u84rF4HBDSCrj8HbrXYHqHrjk29dEEH
-	 eVDxf/hUE7XSWsHSAkDpIzf60lE0nAM7224xuHZBWhYEjRBOJSLR2qkjKN4yypKHWW
-	 sOkGBv/bfxnoMBOVyCgCx8tPnJ306dHPmPpjmKfJjY0JBEv/V0HdjA2z8T2vqvD/XN
-	 L3vPd8ifwFQgg==
+	b=Vc1Cmh1dyaHUlTzuHmyzA8EkgAib/Qwfh1vj9sEYyuKgXfdenGeo53qKzsqUIJhwB
+	 xiuv7P5yL7bc1nK/eRCb9v7hJRSuQDwutVxpDBv+YxVtUk5lUKe3M2QHfRw2bgH6MW
+	 dI7+N7uBWenfbVxheOq7S1KDzA75UcN5okBT6qUUXEZ3n5e0btPpeLp5dsiQorCZEn
+	 gzDYkv2AKf4Dayzto/MUg1YwWmINCYZ5NqBIVTUzQYI/6x8NK88cSRcXOXMlxZsl7n
+	 BdJ99WZEp9fQ0OP26iGUjfMgLmv/CEsRf2ax/OCC6adGeF1pRmczmKZySrebdoktU7
+	 J/+CnNY4DVz9Q==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 58154C54BB0;
-	Mon, 20 May 2024 19:40:32 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 79A39C54BB0;
+	Mon, 20 May 2024 19:50:30 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -37,44 +37,47 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v5 1/5] Bluetooth: btmtk: add the function to get the fw name
+Subject: Re: [PATCH v2 0/2] Bluetooth: hci_core: Refactor hci_get_dev_list()
+ function
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <171623403235.10216.9445226154249031065.git-patchwork-notify@kernel.org>
-Date: Mon, 20 May 2024 19:40:32 +0000
-References: <ce0337178bf617d52ff320a36837d75bf537df2d.1715813148.git.sean.wang@kernel.org>
-In-Reply-To: <ce0337178bf617d52ff320a36837d75bf537df2d.1715813148.git.sean.wang@kernel.org>
-To: Sean Wang <sean.wang@kernel.org>
+ <171623463049.16907.5107608936857144260.git-patchwork-notify@kernel.org>
+Date: Mon, 20 May 2024 19:50:30 +0000
+References: <AS8PR02MB72371852645FF17D07AE0CA98BEF2@AS8PR02MB7237.eurprd02.prod.outlook.com>
+In-Reply-To: <AS8PR02MB72371852645FF17D07AE0CA98BEF2@AS8PR02MB7237.eurprd02.prod.outlook.com>
+To: Erick Archer <erick.archer@outlook.com>
 Cc: marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
- linux-bluetooth@vger.kernel.org, linux-mediatek@lists.infradead.org,
- linux-kernel@vger.kernel.org, sean.wang@mediatek.com
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ keescook@chromium.org, gustavoars@kernel.org, nathan@kernel.org,
+ ndesaulniers@google.com, morbo@google.com, justinstitt@google.com,
+ linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org,
+ llvm@lists.linux.dev
 
 Hello:
 
 This series was applied to bluetooth/bluetooth-next.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Wed, 15 May 2024 16:15:17 -0700 you wrote:
-> From: Sean Wang <sean.wang@mediatek.com>
+On Sat, 18 May 2024 10:30:37 +0200 you wrote:
+> This is an effort to get rid of all multiplications from allocation
+> functions in order to prevent integer overflows [1][2].
 > 
-> Include a shared function to get the firmware name, to prevent repeating
-> code for similar chipsets.
+> As the "dl" variable is a pointer to "struct hci_dev_list_req" and this
+> structure ends in a flexible array:
 > 
-> Signed-off-by: Sean Wang <sean.wang@mediatek.com>
+> struct hci_dev_list_req {
+> 	[...]
+> 	struct hci_dev_req dev_req[];	/* hci_dev_req structures */
+> };
 > 
 > [...]
 
 Here is the summary with links:
-  - [v5,1/5] Bluetooth: btmtk: add the function to get the fw name
-    https://git.kernel.org/bluetooth/bluetooth-next/c/1a9f00aa23b8
-  - [v5,2/5] Bluetooth: btmtk: apply the common btmtk_fw_get_filename
-    https://git.kernel.org/bluetooth/bluetooth-next/c/8a5b9ee69fe6
-  - [v5,3/5] Bluetooth: btusb: mediatek: refactor the function btusb_mtk_reset
-    https://git.kernel.org/bluetooth/bluetooth-next/c/9d5a3b40987d
-  - [v5,4/5] Bluetooth: btusb: mediatek: reset the controller before downloading the fw
-    https://git.kernel.org/bluetooth/bluetooth-next/c/8f9fa6c70d35
-  - [v5,5/5] Bluetooth: btusb: mediatek: add MT7922 subsystem reset
-    https://git.kernel.org/bluetooth/bluetooth-next/c/2a6bc5724952
+  - [v2,1/2] Bluetooth: hci_core: Prefer struct_size over open coded arithmetic
+    https://git.kernel.org/bluetooth/bluetooth-next/c/d2526ccaab74
+  - [v2,2/2] Bluetooth: hci_core: Prefer array indexing over pointer arithmetic
+    https://git.kernel.org/bluetooth/bluetooth-next/c/68b1e55bdf24
 
 You are awesome, thank you!
 -- 
