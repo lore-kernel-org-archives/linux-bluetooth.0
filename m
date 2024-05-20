@@ -1,109 +1,104 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f179.google.com (mail-qk1-f179.google.com [209.85.222.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E6F91643A;
-	Mon, 20 May 2024 11:02:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D2552E417
+	for <linux-bluetooth@vger.kernel.org>; Mon, 20 May 2024 12:07:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716202944; cv=none; b=OxmpgkwL6mwBQ+GSEm5W6GhTChOrdtiDj4T6Uj4AnrWy4tbCrXAEsc7vwqdBqZyR8Kul6y6BaBseqVhbd3y2as3epukca/80y0H9LhcqslzLno7CzW9P2Q/y7oEW4Oyigfxe9qI5VC9NXjnZh1//5GJoR6eZm+FxVsM/KJXK+T8=
+	t=1716206873; cv=none; b=s5VntYVeeiIQsCoekKzs23cQ+Bgo5ULnB0YLk+fc4jGOkD0+tLaapnFyAWo4oYmUYaTCZ1Ghgia5nss/VgM141intbDcJLKCFTfDokvEkxAMBU2EOLVjFtmhgJvtKqqtKhUMIev05zK5McEeup/+HCQOpaHZ2fxjkGuZR5xuygU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716202944; c=relaxed/simple;
-	bh=fBMRsCfYJyR6hIrSKyh6obRGMiWNwGySypQNPgZYSl4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GgeiBdN8YJ67UsBqyHCZINrIL2bBbY14hOe3rpEEzF/s0/k5AlpY43/od6CB4oGwh8u1exoDmHD0t+SelWDXboitRSJHE/xZHtib2OW68RD0pbRshkC0m96HblqIOVCeSA8FLwZbMmPVIwdCfsRD2P4EFhNydWlJ92zUVFwyAo4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Y76dXG6F; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1716206873; c=relaxed/simple;
+	bh=tZKpQq/0GfaKZEjIXJ7/PGWAIP2DzZ+y2MuIo/lTGsQ=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=A9tw7FBamBPSM0D5jjFHScgStoT1kaRfgY90C9rt29ZFOp5fto8o0ZYtkRFV3GcTYVZLmvVOBgz8AGCTw9uebDVouLydyTXhDNrpJIqEu4Se6WiItnJgKHmlyO0/G8gQcPrEvlMXjERpq6u53fh0x9qMU8yrG/Kh79LO4nRa/1I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=X3mNlUir; arc=none smtp.client-ip=209.85.222.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Y76dXG6F"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D4CF6C2BD10;
-	Mon, 20 May 2024 11:02:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1716202943;
-	bh=fBMRsCfYJyR6hIrSKyh6obRGMiWNwGySypQNPgZYSl4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Y76dXG6Ff9lU0BseLExi/9Goan23DJwqM6QOWeL9VrauQ1i65KbvD2B7xRGnzJIRV
-	 c7iZLWDvaQAi9T46TWXS/chVnyHoRXS1UtoSh+xBXJjokGvwcxb8aN5tkIqakxaZ4m
-	 X1RL6xx5vDTWiJ0FnvEwIHgQWPg3Fe0UAtmWImTePIoPF1/805iDB5w0H54KD1+qG8
-	 HgTSoOKYMT6QKZ+78TF6cRznbBFLe1O8DdeskLvn64kLH2d8QQLxPHbJRnkldDQAmA
-	 MZ+n+z8GrIkUyvbBAki/9hXnltYr35GW/nUXxy67F3izkKlOeJ/ukglEFNi7HSvAkG
-	 hv2boHYgq8JUw==
-Received: from johan by xi.lan with local (Exim 4.97.1)
-	(envelope-from <johan@kernel.org>)
-	id 1s90mZ-000000003iD-1MbO;
-	Mon, 20 May 2024 13:02:19 +0200
-Date: Mon, 20 May 2024 13:02:19 +0200
-From: Johan Hovold <johan@kernel.org>
-To: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Tedd Ho-Jeong An <tedd.an@intel.com>, Kiran K <kiran.k@intel.com>,
-	linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org,
-	Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: btintel_pcie: Fix the error handling path of
- btintel_pcie_probe()
-Message-ID: <Zkstu34CQYwKdtfr@hovoldconsulting.com>
-References: <692b4749f4267436363a5a8840140da8cd8858a1.1716190895.git.christophe.jaillet@wanadoo.fr>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="X3mNlUir"
+Received: by mail-qk1-f179.google.com with SMTP id af79cd13be357-7948b7e4e5dso27477085a.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 20 May 2024 05:07:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1716206871; x=1716811671; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=Vzgl/sEH5yJTXYaRvvWIerFH2pzyEvEwZ0124tBRFrg=;
+        b=X3mNlUirSO3Upq82TaQCtqDiRlQF9BW+/dl+ZVNOfTsW9UjIKHrbHe7rpZeEenaCz4
+         EKMh2LqyAoq1JK8CrOCvp0RDfzwBBZfa9bz8NFysRvXQ8bMDuDOW9yenIu2QFrF0jgw5
+         6k+ruQ1zx2iLw36F7eiwiGLm+evvFWXBtfULtIbEPBl32PJYhaj8s4bhwEDAgpwtZKw4
+         ThOKwJy2NSVDXFog4LOfYWp9g6Fl7aaJC/RV6YZYD3nH8GNT2+TMXFPIkEUvueD5o3EX
+         LX4Jp7Cr5PrwCCi6Yn5qJdMP83gjutiC49vJsfvDF/SrOEaiYV0lJY+Fu2PohXXGkNId
+         ogXA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1716206871; x=1716811671;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Vzgl/sEH5yJTXYaRvvWIerFH2pzyEvEwZ0124tBRFrg=;
+        b=KgyqQw/gGlLgQgr6ZrAI8dVoEA17Pf0FssesWer0dAXa1bgaTh1a/TZ76x5TNBGQT4
+         Fr+Om90R1Bu/ecb6Z/XONWUW0BqP6Wb1QrtqM8KpjcjH/ptiDMICaeFWQz1bXfPi77Om
+         6LoERByauYcUPk4KPOgD0UlECkJEX5xH+NJwR7kHKNbn1aNjTxQ8lihuvgG+N5qJ9oUn
+         sLEuY6TpBNk4QKi8qIXhCInnF6BxhrFxwA7wlgybRywerps9oxHHcDRSaGAxGNfZxrSl
+         ANgRhWCJS8Xy7cL1YsaulFGDZRQ1fOHx05FOTVRXk9qZPgK3/8E7yzeYX6BZxY3UogVG
+         ry7A==
+X-Gm-Message-State: AOJu0YzcalbXro/VVdhYDCNzzOaPvGSjYbfZC8aMWFeQFutxcZT/myFZ
+	/+PX5vI8hfd0vfXuqSsE37gqmapWBmlR+/eeIERxdpOOlw456F9MECEyvA==
+X-Google-Smtp-Source: AGHT+IF53l7QrNxVtk/L+ToN4qt7Ta9CHU8JWjkIp9FfHW1i8+XnjUQjn1MStr5iWpPcitxwrsbRmw==
+X-Received: by 2002:a05:620a:201c:b0:78d:67de:50a0 with SMTP id af79cd13be357-792c75af7f1mr2984565885a.44.1716206870873;
+        Mon, 20 May 2024 05:07:50 -0700 (PDT)
+Received: from [172.17.0.2] ([20.102.46.180])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-792bf275b12sm1183854785a.22.2024.05.20.05.07.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 20 May 2024 05:07:50 -0700 (PDT)
+Message-ID: <664b3d16.050a0220.b9860.54f1@mx.google.com>
+Date: Mon, 20 May 2024 05:07:50 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============4124727940867779333=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <692b4749f4267436363a5a8840140da8cd8858a1.1716190895.git.christophe.jaillet@wanadoo.fr>
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, iulia.tanasescu@nxp.com
+Subject: RE: test-bap: Add Broadcast Sink STR one BIS tests
+In-Reply-To: <20240520102014.24236-2-iulia.tanasescu@nxp.com>
+References: <20240520102014.24236-2-iulia.tanasescu@nxp.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-On Mon, May 20, 2024 at 09:41:57AM +0200, Christophe JAILLET wrote:
-> Some resources freed in the remove function are not handled by the error
-> handling path of the probe.
-> 
-> Add the needed function calls.
-> 
-> Fixes: c2b636b3f788 ("Bluetooth: btintel_pcie: Add support for PCIe transport")
-> Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-> ---
-> Compile tested only.
-> Maybe incomplete.
-> ---
->  drivers/bluetooth/btintel_pcie.c | 20 ++++++++++++++------
->  1 file changed, 14 insertions(+), 6 deletions(-)
-> 
-> diff --git a/drivers/bluetooth/btintel_pcie.c b/drivers/bluetooth/btintel_pcie.c
-> index 5b6805d87fcf..d572576d0dbc 100644
-> --- a/drivers/bluetooth/btintel_pcie.c
-> +++ b/drivers/bluetooth/btintel_pcie.c
-> @@ -1280,17 +1280,17 @@ static int btintel_pcie_probe(struct pci_dev *pdev,
->  
->  	err = btintel_pcie_config_pcie(pdev, data);
->  	if (err)
-> -		goto exit_error;
-> +		goto exit_destroy_worqueue;
+--===============4124727940867779333==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-typo: workqueue
+This is automated email and please do not reply to this email!
 
-[...]
+Dear submitter,
 
->  	bt_dev_dbg(data->hdev, "cnvi: 0x%8.8x cnvr: 0x%8.8x", data->cnvi,
->  		   data->cnvr);
->  	return 0;
->  
-> -exit_error:
-> +exit_free_pcie:
-> +	btintel_pcie_free(data);
-> +
-> +exit_free_irq_vectors:
-> +	pci_free_irq_vectors(pdev);
-> +
-> +exit_destroy_worqueue:
-> +	destroy_workqueue(data->workqueue);
-> +
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=854371
 
-Please use an 'err_' prefix which is shorter and clearly indicates that
-these are error paths.
+---Test result---
 
-I'd also drop the newlines.
+Test Summary:
+CheckPatch                    PASS      0.59 seconds
+GitLint                       PASS      0.34 seconds
+BuildEll                      PASS      24.47 seconds
+BluezMake                     PASS      1748.69 seconds
+MakeCheck                     PASS      13.21 seconds
+MakeDistcheck                 PASS      180.58 seconds
+CheckValgrind                 PASS      254.29 seconds
+CheckSmatch                   PASS      352.87 seconds
+bluezmakeextell               PASS      120.27 seconds
+IncrementalBuild              PASS      1602.87 seconds
+ScanBuild                     PASS      1062.29 seconds
 
->  	/* reset device before exit */
->  	btintel_pcie_reset_bt(data);
 
-Johan
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============4124727940867779333==--
