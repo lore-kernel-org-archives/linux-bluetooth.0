@@ -1,164 +1,133 @@
-Received: from smtp9.infineon.com (smtp9.infineon.com [217.10.52.204])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f45.google.com (mail-qv1-f45.google.com [209.85.219.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AAED1BC23
-	for <linux-bluetooth@vger.kernel.org>; Mon, 20 May 2024 08:23:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.10.52.204
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DD6B10A24
+	for <linux-bluetooth@vger.kernel.org>; Mon, 20 May 2024 08:35:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716193383; cv=none; b=c1KOOodmYTmdiy6jLhxeLSprzNVwrqv08GmNnQ7SbCKGYXxCNOrw7QC6qst9BwW3Z5iPdEd/lV+leWHl9RAQQ5ULG/Z+48Jgv5zIgEAYqpqLTu3AsDian0bqtrFg0S0aYxUHg0p2iAsOLCnsbPIiKje2HPPj7/ATufb+PNEcsME=
+	t=1716194139; cv=none; b=bYDcLjv0OTZa9jdpCvKdREOqO95Vmfla8IhJpLGBttYAzAnLUz6n2XAz/HkwVFAyeOecvqi8Tqa7R2iz0gLKVdKsZSQHIMZ1WdL5igcYzalMTJmxvJgDPbqW6zAvJffzrgULjW/9Ai+15Xqcj/KmPk0aiX3q9MberY2Db7qsB5I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716193383; c=relaxed/simple;
-	bh=bGAyD3ixI6iTBtEyZPh/mmBmmc00y8EuZD435YwkgKg=;
-	h=From:To:CC:Subject:Date:Message-ID:Content-Type:MIME-Version; b=ULnpiByqx3am0VRHLF58J/3/5MfITYBIMgQ9LdCmUhMTXEKrHlHfa3m0s72YGIfaWXDwiODgi+RvaCIjbpL/RXF/s05NvoeNSD5KU1cgxBOYOHyWoepbKPVtIRFnvdpHqIksvkhFNHUyXqm8IRDk8Jr04Wz5lqkczOaDRKRn8vY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infineon.com; spf=pass smtp.mailfrom=infineon.com; dkim=pass (1024-bit key) header.d=infineon.com header.i=@infineon.com header.b=TPqoTGqq; arc=none smtp.client-ip=217.10.52.204
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infineon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=infineon.com
+	s=arc-20240116; t=1716194139; c=relaxed/simple;
+	bh=yM79cb20Ojzl5hHQkjFsU0qrYhIUV86+b8xg/zG9ytU=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=AgjMP9fl2XESpfhw9NNzcRJlm9XxDVUWjEBgcmQ/zVLfGDCS1PUOY2SFvFEtrgyeO89098B7G7ymWiVfzgVmwhtFLCzvU2EWuUVbFo3lx0UUqtVhgYuCf+u9m5xbcQHcXh9N6J0x2ngWmFbPvLruha8p0LqwDisRQyVl2BcftXo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Q/Osygzk; arc=none smtp.client-ip=209.85.219.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=infineon.com header.i=@infineon.com header.b="TPqoTGqq"
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=infineon.com; i=@infineon.com; q=dns/txt; s=IFXMAIL;
-  t=1716193382; x=1747729382;
-  h=from:to:cc:subject:date:message-id:
-   content-transfer-encoding:mime-version;
-  bh=bGAyD3ixI6iTBtEyZPh/mmBmmc00y8EuZD435YwkgKg=;
-  b=TPqoTGqq1XIxiYN+cRfVWfy9VUNsqvVoN4Duxmp2Dr8XVSKKCrELd4wE
-   MlKlQjaL+aDpBa4PmBwlyfHvbPzzQ650VyQkUYlMMMQpQt5+rrRgTNMo8
-   izzwKko4oOsbQRo3lvjNuw1t6SLugFrd5pfnP+qglqesm5SP8nEnQMWCW
-   8=;
-X-IronPort-AV: E=McAfee;i="6600,9927,11077"; a="19490355"
-X-IronPort-AV: E=Sophos;i="6.08,174,1712613600"; 
-   d="scan'208";a="19490355"
-Received: from unknown (HELO MUCSE812.infineon.com) ([172.23.29.38])
-  by smtp9.infineon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 May 2024 10:22:54 +0200
-Received: from MUCSE837.infineon.com (172.23.7.109) by MUCSE812.infineon.com
- (172.23.29.38) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.40; Mon, 20 May
- 2024 10:22:53 +0200
-Received: from MUCSE832.infineon.com (172.23.7.104) by MUCSE837.infineon.com
- (172.23.7.109) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.40; Mon, 20 May
- 2024 10:22:52 +0200
-Received: from MUCSE832.infineon.com ([fe80::6918:9b7d:1c9c:3175]) by
- MUCSE832.infineon.com ([fe80::6918:9b7d:1c9c:3175%15]) with mapi id
- 15.02.1118.040; Mon, 20 May 2024 10:22:52 +0200
-From: <Nobuaki.Tsunashima@infineon.com>
-To: <marcel@holtmann.org>, <luiz.dentz@gmail.com>
-CC: <linux-bluetooth@vger.kernel.org>
-Subject: [PATCH v2] Patch for CYW4373 hci up fail issue
-Thread-Topic: [PATCH v2] Patch for CYW4373 hci up fail issue
-Thread-Index: Adqqjj3ae2mX8VZUTA2IVSUTW9hBaw==
-Date: Mon, 20 May 2024 08:22:52 +0000
-Message-ID: <016dd2b28cd5435ba6f13b01d4da0d44@infineon.com>
-Accept-Language: ja-JP, en-US
-Content-Language: ja-JP
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Q/Osygzk"
+Received: by mail-qv1-f45.google.com with SMTP id 6a1803df08f44-69b782287f9so7540376d6.0
+        for <linux-bluetooth@vger.kernel.org>; Mon, 20 May 2024 01:35:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1716194137; x=1716798937; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=QMu4coUjOUxCoEy2aU8gh19L2lOpUS06Opsvto4CeD0=;
+        b=Q/OsygzkVrp5tB+Wnv4DpZIXwUk/1Gvz3BXLUj+WHd2fnREHalWO4lM/tQd/vpDnzg
+         A1KVkV2HLsklQUdvlpRxzAKxXD8oMqQqsQeXRy7HGezZRhrgnyjU4I33TTQdigUZMIY1
+         it8WAIF0bYXCIOftGoUb7Nuoup2l62dqZoWFyENmV6+tHw7sooU3hzEut80EPbC8JTq9
+         NFK9QSwbW/xgEUgUuW57ZP2X9H4qicZq6m/sKytQ5E+/RelBbqdcRTXBcfGl9auUeT51
+         KNHIwK+gPfwfMUrme5uvUZ5zY7DaiVmETYWCCkXhkmhYlSVnRP0fOetiL0IOto024oet
+         ZoxQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1716194137; x=1716798937;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=QMu4coUjOUxCoEy2aU8gh19L2lOpUS06Opsvto4CeD0=;
+        b=BlepbwPrScf8gdhm7mQT5BvpQcSQOS93qEyXKlMnFXVsgixPn7UhyDalXNQ64nb/Nq
+         Fke0IXANS2UGJ5cNRGvDxzKcU2CQ55Xij0mMufkv6PLFNTW5NkCN1JIdffh1F5j6CGbp
+         ijrL4yLBik/fc7H4iljmP7jrylfYN4fthQk1Z5FipZN6H/0kc9RMwUe3oHaiAaxYWn5p
+         55jG8J8x6f8qOaL3OnWS7u99Q3+fKjk+nDTi8PXXavcE2X0wXk6eBoHZujNqa07mbY6X
+         m/ykBqC5bojcXxRVmOpN/0/e/Qv7RtgYfVizrshxTOR3r5RBjYbC2xacIq9faBP8PW7+
+         t/bA==
+X-Gm-Message-State: AOJu0Yx55S2r8QtKoox9HY9sbfOxNW//MeBEHYgV9PCHte0AWX+wW3X6
+	PDND33lekgQeTp1xArxWCQbqBZRYWVFSBE9LrWOoi+36V0n/32CLXQgr+w==
+X-Google-Smtp-Source: AGHT+IHni0sppgD4SfDiaKQ8a/Ku/PmKt1M86E/6Ok5M3FIMrSuJud84vAldqmWaB2oFq4kqwQ/6ew==
+X-Received: by 2002:a0c:f40f:0:b0:6ab:2406:8d0e with SMTP id 6a1803df08f44-6ab2406925emr10726806d6.9.1716194136770;
+        Mon, 20 May 2024 01:35:36 -0700 (PDT)
+Received: from [172.17.0.2] ([172.183.107.255])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6aa3280f16fsm10554836d6.12.2024.05.20.01.35.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 20 May 2024 01:35:36 -0700 (PDT)
+Message-ID: <664b0b58.d40a0220.16ff4.1f2c@mx.google.com>
+Date: Mon, 20 May 2024 01:35:36 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============0108234324128092888=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, christophe.jaillet@wanadoo.fr
+Subject: RE: Bluetooth: btintel_pcie: Fix the error handling path of btintel_pcie_probe()
+In-Reply-To: <692b4749f4267436363a5a8840140da8cd8858a1.1716190895.git.christophe.jaillet@wanadoo.fr>
+References: <692b4749f4267436363a5a8840140da8cd8858a1.1716190895.git.christophe.jaillet@wanadoo.fr>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-CYW4373 ROM FW has an issue that it claims LE_Read_Transmit_Power command a=
-s supported in a response
-of Read_Local_Supported_Command command but rejects the LE_Read_Transmit_Po=
-wer command with
-"Unknown HCI Command" status.
-Due to the issue, Bluetooth driver of 5.15 and later kernel fails to hci up=
-.
-Especially in USB i/f case, it would be difficult to download patch FW that=
- includes Its fix unless hci is up.
-The patch forces the driver to skip LE_Read_Transmit_Power Command when it =
-detects CYW4373 with ROM
-FW build.
+--===============0108234324128092888==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Signed-off-by: Nobuaki Tsunashima <nobuaki.tsunashima@infineon.com>
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=854340
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.61 seconds
+GitLint                       PASS      0.48 seconds
+SubjectPrefix                 PASS      0.11 seconds
+BuildKernel                   PASS      29.78 seconds
+CheckAllWarning               PASS      32.49 seconds
+CheckSparse                   PASS      37.82 seconds
+CheckSmatch                   FAIL      34.83 seconds
+BuildKernel32                 PASS      28.79 seconds
+TestRunnerSetup               PASS      517.74 seconds
+TestRunner_l2cap-tester       PASS      18.11 seconds
+TestRunner_iso-tester         PASS      28.22 seconds
+TestRunner_bnep-tester        PASS      4.73 seconds
+TestRunner_mgmt-tester        PASS      111.80 seconds
+TestRunner_rfcomm-tester      PASS      7.30 seconds
+TestRunner_sco-tester         PASS      14.84 seconds
+TestRunner_ioctl-tester       PASS      10.97 seconds
+TestRunner_mesh-tester        PASS      5.82 seconds
+TestRunner_smp-tester         PASS      6.83 seconds
+TestRunner_userchan-tester    PASS      4.95 seconds
+IncrementalBuild              PASS      28.29 seconds
+
+Details
+##############################
+Test: CheckSmatch - FAIL
+Desc: Run smatch tool with source
+Output:
+
+Segmentation fault (core dumped)
+make[4]: *** [scripts/Makefile.build:244: net/bluetooth/hci_core.o] Error 139
+make[4]: *** Deleting file 'net/bluetooth/hci_core.o'
+make[3]: *** [scripts/Makefile.build:485: net/bluetooth] Error 2
+make[2]: *** [scripts/Makefile.build:485: net] Error 2
+make[2]: *** Waiting for unfinished jobs....
+Segmentation fault (core dumped)
+make[4]: *** [scripts/Makefile.build:244: drivers/bluetooth/bcm203x.o] Error 139
+make[4]: *** Deleting file 'drivers/bluetooth/bcm203x.o'
+make[4]: *** Waiting for unfinished jobs....
+make[3]: *** [scripts/Makefile.build:485: drivers/bluetooth] Error 2
+make[2]: *** [scripts/Makefile.build:485: drivers] Error 2
+make[1]: *** [/github/workspace/src/src/Makefile:1919: .] Error 2
+make: *** [Makefile:240: __sub-make] Error 2
+
 
 ---
-V1 -> V2: Fix several coding style warnings.
+Regards,
+Linux Bluetooth
 
- drivers/bluetooth/btbcm.c | 33 ++++++++++++++++++++++++++++++++-
- drivers/bluetooth/btusb.c |  4 ++++
- 2 files changed, 36 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/bluetooth/btbcm.c b/drivers/bluetooth/btbcm.c
-index 0a5445ac5e1b..da4718a268d0 100644
---- a/drivers/bluetooth/btbcm.c
-+++ b/drivers/bluetooth/btbcm.c
-@@ -437,18 +437,49 @@ static const struct dmi_system_id disable_broken_read=
-_transmit_power[] =3D {
- 	{ }
- };
-=20
-+struct bcm_chip_version_table {
-+	u8	chip_id;
-+	u16 baseline;
-+};
-+#define BCM_ROMFW_BASELINE_NUM	0xFFFF
-+static const struct bcm_chip_version_table disable_broken_read_transmit_po=
-wer_by_chip_ver[] =3D {
-+	{0x87, BCM_ROMFW_BASELINE_NUM}		/* CYW4373/4373E */
-+};
-+static bool btbcm_is_disable_broken_read_tx_power_by_chip_ver(u8 chip_id, =
-u16 baseline)
-+{
-+	int i;
-+	int table_size =3D ARRAY_SIZE(disable_broken_read_transmit_power_by_chip_=
-ver);
-+	const struct bcm_chip_version_table *entry =3D=20
-+							&disable_broken_read_transmit_power_by_chip_ver[0];
-+
-+	for (i =3D 0 ; i < table_size ; i++, entry++)
-+	{
-+		if ((chip_id =3D=3D entry->chip_id) && (baseline =3D=3D entry->baseline)=
-)
-+			return true;
-+	}
-+
-+	return false;
-+}
-+
- static int btbcm_read_info(struct hci_dev *hdev)
- {
- 	struct sk_buff *skb;
-+	u8 chip_id;
-+	u16 baseline;
-=20
- 	/* Read Verbose Config Version Info */
- 	skb =3D btbcm_read_verbose_config(hdev);
- 	if (IS_ERR(skb))
- 		return PTR_ERR(skb);
--
-+	chip_id =3D skb->data[1];
-+	baseline =3D skb->data[3] | (skb->data[4] << 8);
- 	bt_dev_info(hdev, "BCM: chip id %u", skb->data[1]);
- 	kfree_skb(skb);
-=20
-+	/* Check Chip ID and disable broken Read LE Min/Max Tx Power */
-+	if (btbcm_is_disable_broken_read_tx_power_by_chip_ver(chip_id, baseline))
-+		set_bit(HCI_QUIRK_BROKEN_READ_TRANSMIT_POWER, &hdev->quirks);
-+
- 	return 0;
- }
-=20
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index d31edad7a056..52561c8d8828 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -142,6 +142,10 @@ static const struct usb_device_id btusb_table[] =3D {
- 	{ USB_VENDOR_AND_INTERFACE_INFO(0x04ca, 0xff, 0x01, 0x01),
- 	  .driver_info =3D BTUSB_BCM_PATCHRAM },
-=20
-+	/* Cypress devices with vendor specific id */
-+	{ USB_VENDOR_AND_INTERFACE_INFO(0x04b4, 0xff, 0x01, 0x01),
-+	  .driver_info =3D BTUSB_BCM_PATCHRAM },
-+
- 	/* Broadcom devices with vendor specific id */
- 	{ USB_VENDOR_AND_INTERFACE_INFO(0x0a5c, 0xff, 0x01, 0x01),
- 	  .driver_info =3D BTUSB_BCM_PATCHRAM },
---=20
-2.25.1
-
+--===============0108234324128092888==--
