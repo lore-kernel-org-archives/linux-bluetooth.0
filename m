@@ -1,109 +1,189 @@
-Received: from mail-ua1-f47.google.com (mail-ua1-f47.google.com [209.85.222.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-27.smtp.github.com (out-27.smtp.github.com [192.30.252.210])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C47481CD39
-	for <linux-bluetooth@vger.kernel.org>; Mon, 20 May 2024 20:10:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A87426AC1
+	for <linux-bluetooth@vger.kernel.org>; Mon, 20 May 2024 20:14:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.210
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716235830; cv=none; b=gfEfaCQqVC8Uop79xcjd1CaNvjw6vmqjOXWU3pstpyC8K1BLOPwRRfvf0uoF7KIPUGnXDFXuyi/xwRYlKnkRtJQiurQQjdg6jOKIaaLIs16Eauc4GYTODzNDyOC303NkyEL+63SJRkW6NjHtzjY/AcMjAGpnhH014MmuOX3RBLI=
+	t=1716236053; cv=none; b=Zw8PNb5eS8C2CJOQEwAIRd6wv7OkEMQd4gdRWPDDoeHCesKoItcWcy8L0i7pTUzY2emo6GKcjA4mmkqb9x+4KdHuv2g9nk2AcmEpywmD2LCySLgrfNMBfvh+gpe32ZkLm6lFuhxoy0fs22yqHEdePeW7fi2fuHC82IXpumF697k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716235830; c=relaxed/simple;
-	bh=TWC+ZOOXvAWWR3XzoQ3Ky5DBWJ85eGrZORcCRwzE5DU=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=A74WEtL1HX6zaqbCIq2zMN2lJttjHfV31/glzcwcjtOuoCLOE72TzzgVvWqIEqFDEQAFtzx1EgrXz6zstYwkz+NmAIY/aTXE/21mjSlQasiqmOn5P1l0w1/yLunetJOec3wI4WYH+kIkR45I9CePPMpcutKVT42qtqdVpZVIJWU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YGv7zmwX; arc=none smtp.client-ip=209.85.222.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1716236053; c=relaxed/simple;
+	bh=wYATLZ8xUeyuXvy3kJ9rLfzEeB4JGLyVpNNwyfdBUis=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=htFuKP4XrH60JxujuGZUmbdAJgjwJnXkvTj5KNxex3ddlWj+uEEQZMZnvj1TV3bTOzZGVIpWdk+hT1ukd3bEbFdIQAcQEwXa49YeW0B7QUgZhUQCLtAN12LJWszUO1EjWWqialwmAB1NjT2KEmnk1N3t1VnOQnkh7YRIJqzbdYY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=GEuTtN5S; arc=none smtp.client-ip=192.30.252.210
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YGv7zmwX"
-Received: by mail-ua1-f47.google.com with SMTP id a1e0cc1a2514c-7f919bc2e1cso1785409241.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 20 May 2024 13:10:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1716235827; x=1716840627; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=8yR3clpzcV/wPbdIQW/CsMCbzfmYu7wisd9LZ8FAEN0=;
-        b=YGv7zmwXLG37a62neXuJfA5i84w40fNOvykGt7NC+zNsrP9C/1ja26WrqWUtmgHpfr
-         7dy0cGT0edbBIalqMnBgUe99MvjhEAy6ju/zAuNCtWPGpcyc2NW+5NZgTeOTzmA8+F0a
-         Wr/mWC7BMeHCROeoXoU+5LawcKzzcH2ppEPQNzrziYN3nLGcK4Nc/TNRqdUjHON1TYcy
-         EVaH/Hr71NzNeltZXzTMduVh6W2RRFrOdgHhlPpXGPbcz7KbSL7MPPthtAokx6RwG+1Y
-         3BrnAHGlSwVAQjlXv++N4NZNpkqHRGd3vQkxfyyyinxCFg9GaiZEm43AZQoNEU4gMWVN
-         c+FA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716235827; x=1716840627;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=8yR3clpzcV/wPbdIQW/CsMCbzfmYu7wisd9LZ8FAEN0=;
-        b=wN7G/OfJoRCGVAiCn//U8EB+kQ8MVXwjQsO2UugZx+JX4aooKMbY/dee3bXhV8x5jO
-         QNnwAls+DJPHbBC3yDjItnEeWff8LOcYmX3fRgcwKL+B5UkpdoS4qgCv8t0fzxT6iaVS
-         Z5ZbS05fOY1pCxOi4Vj+QJs4mCdLgwuDD8QSeiJFsj6y/0MoVhI0Io+UwiErQ2vYzemd
-         s8BNkj4TRw3x1O4nvWhKucCguoDFW5C91O6Jd9/JGm7NqXfcqURJKGCGrHIx1K6lz80f
-         FYCfV0Wij/K7Ndfm4h53ceqGsogQTcmJTel3+hgPrqm0RktxAeGWljYa7ITazYLhiF0Z
-         cFeA==
-X-Gm-Message-State: AOJu0Yzxhj6Nzaui7U8Grc1EakdzD8pCS3jLRTGKhMZhdlFsCfHsuudk
-	ctyqNSRTALLZR0Vd9rYkp0znpuM1xnoP2s/L0llmLbUCGpm6WbVCTdl7BQ==
-X-Google-Smtp-Source: AGHT+IGwWV7lOTmcEeF07lIUt+JoEha1Na3zPiJz1yeXaG6b9NHZT8TgLZHa4w2935eMNwN8fBgQ4w==
-X-Received: by 2002:a05:6102:548d:b0:47c:362f:4c47 with SMTP id ada2fe7eead31-48851e85101mr6372752137.14.1716235825392;
-        Mon, 20 May 2024 13:10:25 -0700 (PDT)
-Received: from lvondent-mobl4.. (syn-107-146-107-067.res.spectrum.com. [107.146.107.67])
-        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-7f8ff9eaf93sm3396680241.2.2024.05.20.13.10.24
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 20 May 2024 13:10:24 -0700 (PDT)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="GEuTtN5S"
+Received: from github.com (hubbernetes-node-280a920.ash1-iad.github.net [10.56.153.38])
+	by smtp.github.com (Postfix) with ESMTPA id 382B9601185
+	for <linux-bluetooth@vger.kernel.org>; Mon, 20 May 2024 13:14:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1716236051;
+	bh=mN2R66lGUMUn0qWmsgqyc3xrg33RYDcfjTd3OyihaqQ=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=GEuTtN5SQE3jVH2+NWhCfdN88bwCQOinGmX5mCqUd7l+jfTQJbXu3bDzqyFfeFISr
+	 JtDlsHD9Cs4dtnz5IhuoYDaLfXkSMzwzni9lzA5p5lzM1qM+whNeoejt+KLDxMuI+j
+	 tM50/jOgn4f64WLkOG5hI690wgm+SJ3ZHq7ClTSE=
+Date: Mon, 20 May 2024 13:14:11 -0700
+From: iulia-tanasescu <noreply@github.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v1] Bluetooth: L2CAP: Fix rejecting L2CAP_CONN_PARAM_UPDATE_REQ
-Date: Mon, 20 May 2024 16:10:23 -0400
-Message-ID: <20240520201023.1437548-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.45.1
+Message-ID: <bluez/bluez/push/refs/heads/master/62d38d-a2438e@github.com>
+Subject: [bluez/bluez] 25d3b6: device: Add btd_device_get_icon
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Branch: refs/heads/master
+  Home:   https://github.com/bluez/bluez
+  Commit: 25d3b629e4df3be30463750d46b843a78464983f
+      https://github.com/bluez/bluez/commit/25d3b629e4df3be30463750d46b843a78464983f
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2024-05-20 (Mon, 20 May 2024)
 
-This removes the bogus check for max > hcon->le_conn_max_interval since
-the later is just the initial maximum conn interval not the maximum the
-stack could support which is really 3200=4000ms.
+  Changed paths:
+    M src/device.c
+    M src/device.h
 
-In order to pass GAP/CONN/CPUP/BV-05-C one shall probably enter values
-of the following fields in IXIT that would cause hci_check_conn_params
-to fail:
+  Log Message:
+  -----------
+  device: Add btd_device_get_icon
 
-TSPX_conn_update_int_min
-TSPX_conn_update_int_max
-TSPX_conn_update_peripheral_latency
-TSPX_conn_update_supervision_timeout
+This adds btd_device_get_icon which can be used to retriev the icon
+string of a device object.
 
-Link: https://github.com/bluez/bluez/issues/847
-Fixes: e4b019515f95 ("Bluetooth: Enforce validation on max value of connection interval")
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
----
- net/bluetooth/l2cap_core.c | 8 +-------
- 1 file changed, 1 insertion(+), 7 deletions(-)
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 5b509b767557..c49e0d4b3c0d 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -4647,13 +4647,7 @@ static inline int l2cap_conn_param_update_req(struct l2cap_conn *conn,
- 
- 	memset(&rsp, 0, sizeof(rsp));
- 
--	if (max > hcon->le_conn_max_interval) {
--		BT_DBG("requested connection interval exceeds current bounds.");
--		err = -EINVAL;
--	} else {
--		err = hci_check_conn_params(min, max, latency, to_multiplier);
--	}
--
-+	err = hci_check_conn_params(min, max, latency, to_multiplier);
- 	if (err)
- 		rsp.result = cpu_to_le16(L2CAP_CONN_PARAM_REJECTED);
- 	else
--- 
-2.45.1
+  Commit: db383a5b4a8d5ce5ae26c33abeff0dfd56860d21
+      https://github.com/bluez/bluez/commit/db383a5b4a8d5ce5ae26c33abeff0dfd56860d21
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2024-05-20 (Mon, 20 May 2024)
 
+  Changed paths:
+    M android/hidhost.c
+    M profiles/input/hog-lib.c
+    M profiles/input/hog-lib.h
+    M profiles/input/hog.c
+
+  Log Message:
+  -----------
+  hog-lib: Add force parameter to bt_hog_detach
+
+This adds force parameter to bt_hog_detach which indicates if the
+bt_uhid_destroy shall be called.
+
+
+  Commit: e4f6c68f2a4dfbbdbc24379a5242564c65aa9ae2
+      https://github.com/bluez/bluez/commit/e4f6c68f2a4dfbbdbc24379a5242564c65aa9ae2
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2024-05-20 (Mon, 20 May 2024)
+
+  Changed paths:
+    M android/hidhost.c
+    M profiles/input/device.c
+    M profiles/input/hog-lib.c
+    M profiles/input/hog-lib.h
+    M profiles/input/hog.c
+    M src/shared/uhid.c
+    M src/shared/uhid.h
+    M unit/test-hog.c
+    M unit/test-uhid.c
+
+  Log Message:
+  -----------
+  shared/uhid: Add special handling for non-keyboards
+
+This adds special handling for non-keyboards so they are destroyed when
+disconnected rather than keeping their device node around.
+
+Fixes: https://github.com/bluez/bluez/issues/848
+
+
+  Commit: a2438e46f8129d8e08cfb00001a4b63f5616cdda
+      https://github.com/bluez/bluez/commit/a2438e46f8129d8e08cfb00001a4b63f5616cdda
+  Author: Iulia Tanasescu <iulia.tanasescu@nxp.com>
+  Date:   2024-05-20 (Mon, 20 May 2024)
+
+  Changed paths:
+    M unit/test-bap.c
+
+  Log Message:
+  -----------
+  test-bap: Add Broadcast Sink STR one BIS tests
+
+4.14.2 Broadcast Audio Stream with One BIS - Sink (page 189):
+
+    Test Purpose:
+    Verify that a Broadcast Sink IUT can stream one BIS from a
+    Broadcast Source. Verification is performed for each set of
+    codec specific capabilities in turn.
+
+    Test Case Configuration:
+    BAP/BSNK/STR/BV-01-C [BSNK, LC3 8_1]
+    BAP/BSNK/STR/BV-02-C [BSNK, LC3 8_2]
+    BAP/BSNK/STR/BV-03-C [BSNK, LC3 16_1]
+    BAP/BSNK/STR/BV-04-C [BSNK, LC3 16_2]
+    BAP/BSNK/STR/BV-05-C [BSNK, LC3 24_1]
+    BAP/BSNK/STR/BV-06-C [BSNK, LC3 24_2]
+    BAP/BSNK/STR/BV-07-C [BSNK, LC3 32_1]
+    BAP/BSNK/STR/BV-08-C [BSNK, LC3 32_2]
+    BAP/BSNK/STR/BV-09-C [BSNK, LC3 44.1_1]
+    BAP/BSNK/STR/BV-10-C [BSNK, LC3 44.1_2]
+    BAP/BSNK/STR/BV-11-C [BSNK, LC3 48_1]
+    BAP/BSNK/STR/BV-12-C [BSNK, LC3 48_2]
+    BAP/BSNK/STR/BV-13-C [BSNK, LC3 48_3]
+    BAP/BSNK/STR/BV-14-C [BSNK, LC3 48_4]
+    BAP/BSNK/STR/BV-15-C [BSNK, LC3 48_5]
+    BAP/BSNK/STR/BV-16-C [BSNK, LC3 48_6]
+    BAP/BSNK/STR/BV-17-C [BSNK, VS]
+
+    Pass verdict:
+    The IUT synchronizes to the Lower Tester (the Link Layer
+    receives a BIS Data PDU). The host on the IUT receives an
+    LE BIG Sync Established event.
+
+    If the Codec ID is LC3, the IUT receives BIS Data PDUs on
+    the broadcast Audio Stream containing encoded LC3 audio data
+    formatted using the LC3 Media Packet format.
+
+    If the Codec ID is a vendor-specific Codec ID, the IUT
+    receives BIS Data PDUs on the broadcast Audio Stream.
+    The parameters included in the Codec_Specific_Configuration
+    data are as defined in TSPX_VS_Codec_Specific_Configuration.
+
+    If the Codec ID is LC3, each parameter included in
+    Codec_Specific_Configuration data is formatted in an LTV
+    structure with the length, type, and value specified in
+    Table 4.81.
+
+Test Summary
+------------
+BAP/BSNK/STR/BV-01-C [BSNK, LC3 8_1]                 Passed
+BAP/BSNK/STR/BV-02-C [BSNK, LC3 8_2]                 Passed
+BAP/BSNK/STR/BV-03-C [BSNK, LC3 16_1]                Passed
+BAP/BSNK/STR/BV-04-C [BSNK, LC3 16_2]                Passed
+BAP/BSNK/STR/BV-05-C [BSNK, LC3 24_1]                Passed
+BAP/BSNK/STR/BV-06-C [BSNK, LC3 24_2]                Passed
+BAP/BSNK/STR/BV-07-C [BSNK, LC3 32_1]                Passed
+BAP/BSNK/STR/BV-08-C [BSNK, LC3 32_2]                Passed
+BAP/BSNK/STR/BV-09-C [BSNK, LC3 44.1_1]              Passed
+BAP/BSNK/STR/BV-10-C [BSNK, LC3 44.1_2]              Passed
+BAP/BSNK/STR/BV-11-C [BSNK, LC3 48_1]                Passed
+BAP/BSNK/STR/BV-12-C [BSNK, LC3 48_2]                Passed
+BAP/BSNK/STR/BV-13-C [BSNK, LC3 48_3]                Passed
+BAP/BSNK/STR/BV-14-C [BSNK, LC3 48_4]                Passed
+BAP/BSNK/STR/BV-15-C [BSNK, LC3 48_5]                Passed
+BAP/BSNK/STR/BV-16-C [BSNK, LC3 48_6]                Passed
+BAP/BSNK/STR/BV-17-C [BSNK, VS]                      Passed
+
+
+Compare: https://github.com/bluez/bluez/compare/62d38d6c9ef4...a2438e46f812
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
