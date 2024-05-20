@@ -1,95 +1,101 @@
-Received: from mail-oo1-f42.google.com (mail-oo1-f42.google.com [209.85.161.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0977A1847
-	for <linux-bluetooth@vger.kernel.org>; Mon, 20 May 2024 02:29:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D24412B73;
+	Mon, 20 May 2024 05:12:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716172194; cv=none; b=MCT/xR+E8Vp1Y9NUzkpUDQ9cbV0zlhDyGXHVu2+ni8JpQjNRdFJDooPZfUu+mSpD7P10wYELjQvyt93t8Ed56fukUp72Y/KT6r7r03fxuOmbz/8NBfsKvighdNI6XN8YmyLuUd6p5a+3cPSASZ/Fm3vJx7KkF+vXOhEu8bbbUnY=
+	t=1716181975; cv=none; b=IeXZVU5DKo/x2i2pDNehVU3YKY3tpubJvVw46KvALionpAyN2IYN1J8ff2/CdHMoTSH/CKTR3xtKRg6zujyVItk1VmfG1Ygew8k5L1cbmojqZjEqpbn8g7GcRKVBAeHWb5V91IJkDh/DOMERvXiI54uN3cXbMof2TKf0D6c3X5o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716172194; c=relaxed/simple;
-	bh=/RTlvCgs/t8L6SWG+QrwpNf90ndLM8MINAAE7gc84CA=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=GhbRn9EDBf2J3dbrK/o8aOsJq68kRe4/8+WDI53/UaCb98YGIzb/3iq7joJRF9ykmlVm4wPh9rXjDYyKUE5ThvJX0FLcPr03duq7k5BugygK47H6KjsfOnKGFmtHgyAWRinFAI6UJeHQDD3yPfDfJ9UdmXfO/GBfDkOtl3gbCfo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JyOs0RIX; arc=none smtp.client-ip=209.85.161.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JyOs0RIX"
-Received: by mail-oo1-f42.google.com with SMTP id 006d021491bc7-5b31f2c6e52so802777eaf.2
-        for <linux-bluetooth@vger.kernel.org>; Sun, 19 May 2024 19:29:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1716172192; x=1716776992; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=/RTlvCgs/t8L6SWG+QrwpNf90ndLM8MINAAE7gc84CA=;
-        b=JyOs0RIX+Hksashj/z442/9WlbxoBD503ivEMywI92rahczjU2JIw7wRXcCGfdIe6I
-         DRfJNuoLYM/+oPPb86n39Jy6O572lqSi2luR0kgYpYFyJEA+4YA9vevqni2Pg+zrJKl9
-         IRVKvhupN1DQGHrw/j9eKkf8rrUqao+6z2yur2OOoEcrBS/veVpKU2RLWCyKOqTsUf+/
-         WneoxiF47iFiw6tb9ujqhyxtCjPkrjiTqyi+pqpuif8IW3DD45n8aF63gp9UaS08QpOf
-         Avo5xQ/6A4PtAHO62vqyGAhRwUR8wnwRGsSBvHp1cJ/q2iS6jxxZu7ZW8tj7dJLJ8A0d
-         irQA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716172192; x=1716776992;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=/RTlvCgs/t8L6SWG+QrwpNf90ndLM8MINAAE7gc84CA=;
-        b=lg8hfddqyOR6qpw94cPZ3xpu8QGNNizPMx6LoYgV9IpPbOw7u7PKagXTwjFmTWLfta
-         oE5sPY8IaFgumfJ+0J3mdLGSao1H0/YjpNHcMy+g7CyHk1Pnvg7az/d8aldUANkU+OTM
-         NdKz3fD27Ku7xcSs3yZJUqfKzzftsiQxrZawH8xR5C34tQAaqnw4JFDv4avQkGa08z1H
-         UKXjnBTXcNr0unCHgipVfM56IvKnm35/aQAtOucZGEJcZVnw1riV1Dou2NA0F7qPMiac
-         F105WXYSgVCgigw460TXIghtAwjOe+DVKRQG9MV/1DtG/UxlrOb592wxaqX0psBE0cut
-         HZBw==
-X-Gm-Message-State: AOJu0YwKnGFE0cm3YZwzfiBsj4D7h6C/LU00pOAwrbSObxIsJhBPoRrP
-	Roq2GsQ3YkTFgpeaXBjeEbQCCVlZU7UljoK4CAyT/B+sIw/I+xq6HOfRDg==
-X-Google-Smtp-Source: AGHT+IGZVkf4OC8Ep9hSMvUjPA2HTYH9cHbuCBPt/KrR7fdcQ/xZliV9RUsFY4Vn0P1XtShTNcw8SQ==
-X-Received: by 2002:a05:6359:4593:b0:186:131e:822 with SMTP id e5c5f4694b2df-193bb50c2f1mr3158016555d.3.1716172191822;
-        Sun, 19 May 2024 19:29:51 -0700 (PDT)
-Received: from [172.17.0.2] ([52.157.5.226])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-658c79ca62dsm5795655a12.92.2024.05.19.19.29.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 19 May 2024 19:29:51 -0700 (PDT)
-Message-ID: <664ab59f.050a0220.4b733.e70c@mx.google.com>
-Date: Sun, 19 May 2024 19:29:51 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============1669941453508903916=="
+	s=arc-20240116; t=1716181975; c=relaxed/simple;
+	bh=E9qDEFQY1grBMvG2pLW44IhOXhR0mVV6WnchLTdLq6Y=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=RGBQv09KtSVIeIrJIRbssRa42TM61/MhaEFoQiKpEEAfrT5gjMRllgVCjV1IsVfRtxJzACZRSO9pl4/tozLU19BptIuenvXyF10fibbOYvggf9v35x20XNnFaHT0ypMplzBbt4Rh0Lo1zifjPWT/JN2pzBXhPbCx52ImhEsKD64=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
+Received: from [192.168.0.3] (ip5f5af1d0.dynamic.kabel-deutschland.de [95.90.241.208])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id CADD861E5FE06;
+	Mon, 20 May 2024 07:12:09 +0200 (CEST)
+Message-ID: <28196c54-3c65-4646-84f6-76da79368f8e@molgen.mpg.de>
+Date: Mon, 20 May 2024 07:12:09 +0200
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, suhui@nfschina.com
-Subject: RE: [1/2] Bluetooth: btintel: remove useless code in btintel_set_dsm_reset_method
-In-Reply-To: <20240520021625.110430-1-suhui@nfschina.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/2] Bluetooth: btintel: remove useless code in
+ btintel_set_dsm_reset_method
+To: Su Hui <suhui@nfschina.com>
+Cc: marcel@holtmann.org, luiz.dentz@gmail.com, nathan@kernel.org,
+ ndesaulniers@google.com, morbo@google.com, justinstitt@google.com,
+ linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+ llvm@lists.linux.dev, kernel-janitors@vger.kernel.org
 References: <20240520021625.110430-1-suhui@nfschina.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Language: en-US
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <20240520021625.110430-1-suhui@nfschina.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
---===============1669941453508903916==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-
-This is an automated email and please do not reply to this email.
-
-Dear Submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
-
------ Output -----
-
-error: patch failed: drivers/bluetooth/btintel.c:1364
-error: drivers/bluetooth/btintel.c: patch does not apply
-hint: Use 'git am --show-current-patch' to see the failed patch
-
-Please resolve the issue and submit the patches again.
+Dear Su,
 
 
----
-Regards,
-Linux Bluetooth
+Thank you for your patch. Some minor comments.
 
 
---===============1669941453508903916==--
+Am 20.05.24 um 04:16 schrieb Su Hui:
+> Clang static checker(scan-build) warning:
+
+Please add a space before (. Noting the version of scan build would also 
+be nice.
+
+> drivers/bluetooth/btintel.c:2537:14:
+> Value stored to 'handle' during its initialization is never read.
+> 
+> No need to repeatedly assign values to 'handle'. Remove this useless
+> code to save some space.
+
+The plural “values” is misleading to me. Maybe just remove the sentence, 
+and say:
+
+Remove this unused assignment.
+
+For the summary, “useless code” could also be more specific:
+
+Bluetooth: btintel: Remove unused assignement in 
+btintel_set_dsm_reset_method()
+
+Maybe also add a Fixes: tag.
+
+> Signed-off-by: Su Hui <suhui@nfschina.com>
+
+
+Kind regards,
+
+Paul
+
+
+> ---
+>   drivers/bluetooth/btintel.c | 2 --
+>   1 file changed, 2 deletions(-)
+> 
+> diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
+> index 0c855c3ee1c1..f1c101dc0c28 100644
+> --- a/drivers/bluetooth/btintel.c
+> +++ b/drivers/bluetooth/btintel.c
+> @@ -2542,8 +2542,6 @@ static void btintel_set_dsm_reset_method(struct hci_dev *hdev,
+>   		RESET_TYPE_VSEC
+>   	};
+>   
+> -	handle = ACPI_HANDLE(GET_HCIDEV_DEV(hdev));
+> -
+>   	if (!handle) {
+>   		bt_dev_dbg(hdev, "No support for bluetooth device in ACPI firmware");
+>   		return;
