@@ -1,160 +1,187 @@
-Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-24.smtp.github.com (out-24.smtp.github.com [192.30.252.207])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DB031B299
-	for <linux-bluetooth@vger.kernel.org>; Tue, 21 May 2024 16:02:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DF3C4C66
+	for <linux-bluetooth@vger.kernel.org>; Tue, 21 May 2024 16:16:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.207
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716307361; cv=none; b=uHWYpkoC75fx3usz0IazK3cyaixXmR5lYtwr6HeXYNggFcDaD5thnpCT0AXr74OnajI83KNxjgy8zbFgSp825x2F6RCTnFqULoPXImhgkTMjcSl3PNakIic1O5cAbjAVt+5q+DBhpYFTfPMgnDW/LhKWCEpfVlNFaUwx8LbSB50=
+	t=1716308210; cv=none; b=GnH5Ooa3f1xl9dHTsEjeXgFFFh8/QpBVkQMzX4ogoc/cVuKLgv7UDrgsLjCr3PcQJygfeGrrxP6fRHlSqhfvmf5uUKMedQOW/U4uqW9DUs9tlAhy3vM/ugolSic7GIclwStAwUZDDK3JzUWGD+lqK1N/bICSAb+qXn/DJU4L75M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716307361; c=relaxed/simple;
-	bh=LvQkK1x6wKDbqniMQIsTNsYXVp9z4lc1HTvxzlRvhOQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Cj+/YP/RflCrjFBHYv6RQg0P7xc7yW8OHIdjWZPHWdOj0gn/db7JtevBs7qMdYUI89BJ9HsoXReTJrXxqPMbbklqez4nBC04T7ugyn6HLnl77ReNUlP89xUdwTeAm4yaL60EMLscuye5XUZuCHlORVK9VAkYhbOkssIDaCPh0wY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=FT4A5aoO; arc=none smtp.client-ip=209.85.221.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	s=arc-20240116; t=1716308210; c=relaxed/simple;
+	bh=lTIQoZyjetoT9WTrmJ23Q/vUiN/BQeJzLk6FFu9uz1I=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=JIiIAYkXqb1lfQKSjIBPBTItc05cACg7lwPxXZnG9HfuwE2PkFQ6nxqQHoHvRNw01rnPF4cddewgay1XbBhIPwUrqV/LlwPRRBXpSRf9qTjJ67SQP1VIvnIXJ3Skk/+o+5ElmFMdDnWH/DWJzttEn5mkWwrChDfp+Jy35W+v0VA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=m6/X2HXr; arc=none smtp.client-ip=192.30.252.207
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="FT4A5aoO"
-Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-352129e3c8eso3505425f8f.2
-        for <linux-bluetooth@vger.kernel.org>; Tue, 21 May 2024 09:02:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1716307358; x=1716912158; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :from:references:cc:to:subject:user-agent:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=CwLrAnoDcKfl4pASlzPf6/g0NwpfS2Ef+d5jWtjl7A0=;
-        b=FT4A5aoOog15/yw8YC3DaPCRduTyyo6At9ji5oh8W1ZwpW/y8K8/Cm/lMsvRYFtDad
-         gxmvSa04zOmDzUqdWzHylPALyN5NeruabDpvVPUTEo0I1Tw7TzIvnzAtBWnVAft6lSGz
-         nCZs/gncNMznweb4yQVrUSCX+3hwRIbMkhG2KlmJ9gFBRHWcFTrPYVG2UrgtBw5AWC+H
-         KlULgUtEnS0XZ5bCaJA65Kah2X6Hz8lY1i/F7vuhBrm6aIy3qTnW2szAkPVauCpHKwJx
-         /Uy8ITzLMc3kVwA2msp/1mGi+lY6II8csHGPN/ssouHqJbfCBXuUKhKyBOMObbeXIlAM
-         65LQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716307358; x=1716912158;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :from:references:cc:to:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=CwLrAnoDcKfl4pASlzPf6/g0NwpfS2Ef+d5jWtjl7A0=;
-        b=YQSEwRBpKygec4JVwsZf9S6RJmwilhLhoLVaZ5iHopQsJ5DgcmCPJJgDeLDRfoXqu2
-         y8dhWmNQCU8Yij1nVIP+6+bhi2c2TbFmw+soaJ3o9ldX6caMCSvqhM4JB2Ct6Ez+Km/z
-         tNrAcw6trmYStF08PIqprhMncEKSthqWvc/MbfKEDYDDYAtKBlZxcvOq6SvU+YZqP/j3
-         OAq3Jk6nhZvYTtKAR/Ml3fb1NSXC1SyprEv9hdkDBNeoHaGNUCDZqh345/Q6rJ+zwIbD
-         EUrQKLQfZpyqmL7EoJvJT4uFgjdSmXRP6FV98hZvWKMaW7+G1fVRTNY5Kby/YdnhtVEe
-         87iQ==
-X-Gm-Message-State: AOJu0YzixaIwF14vwIXjDPhy9p5EQbBZZFprff0Gx47mW9S+SL12O/na
-	nLS0jbnwhxMrM/zrKecJyRAE1lRezLnXN3poW/4tf1X4AbwGYhvAKyh3oyCWYRg=
-X-Google-Smtp-Source: AGHT+IFWv2DibPTZdRxMs8ItKbWP+f7I+Zrb3KKf4jtBV49zvoSqvL8D0wlAMMaY6rsZbNEw+9hBRA==
-X-Received: by 2002:a5d:6044:0:b0:34c:5448:b81a with SMTP id ffacd0b85a97d-3504a96a820mr25830846f8f.48.1716307358313;
-        Tue, 21 May 2024 09:02:38 -0700 (PDT)
-Received: from [192.168.1.20] ([178.197.206.169])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3502baacfb9sm32096026f8f.68.2024.05.21.09.02.36
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 21 May 2024 09:02:37 -0700 (PDT)
-Message-ID: <7927abbe-3395-4a53-9eed-7b4204d57df5@linaro.org>
-Date: Tue, 21 May 2024 18:02:35 +0200
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="m6/X2HXr"
+Received: from github.com (hubbernetes-node-38032fe.ac4-iad.github.net [10.52.151.31])
+	by smtp.github.com (Postfix) with ESMTPA id 15D14641017
+	for <linux-bluetooth@vger.kernel.org>; Tue, 21 May 2024 09:16:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1716308206;
+	bh=KRB+6/JL1x13U8cJZQWSzFXVrW05MhfTW5jELdG9VAI=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=m6/X2HXreTV5N6+WPAK/CzaRvAAvkYpCmDqkikknMrjjzIkAgjYpjZNvyJ4CXPq5T
+	 axv8rjx++Q5Zs8x/dijw5HeVowUKXxdfLN4myGVyY/4XKtfLErf/OU7RWk0tEF711X
+	 yZRJ7BmY9kYjvCq4Sn5caTysNkAOWgZgFbvmOPHc=
+Date: Tue, 21 May 2024 09:16:46 -0700
+From: Luiz Augusto von Dentz <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/master/a2438e-6e51ac@github.com>
+Subject: [bluez/bluez] 41340a: test-bap: Keep streams queue in test_data
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2] Bluetooth: qca: Fix BT enable failure again for
- QCA6390 after warm reboot
-To: Zijun Hu <quic_zijuhu@quicinc.com>, luiz.dentz@gmail.com,
- luiz.von.dentz@intel.com, marcel@holtmann.org
-Cc: linux-bluetooth@vger.kernel.org, wt@penguintechs.org,
- regressions@lists.linux.dev, pmenzel@molgen.mpg.de, lk_sii@163.com,
- stable@vger.kernel.org
-References: <1715866294-1549-1-git-send-email-quic_zijuhu@quicinc.com>
-From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Content-Language: en-US
-Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
- 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
- D2GYIS41Kv4Isx2dEFh+/Q==
-In-Reply-To: <1715866294-1549-1-git-send-email-quic_zijuhu@quicinc.com>
-Content-Type: text/plain; charset=UTF-8
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
 Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-On 16/05/2024 15:31, Zijun Hu wrote:
-> Commit 272970be3dab ("Bluetooth: hci_qca: Fix driver shutdown on closed
-> serdev") will cause below regression issue:
-> 
-> BT can't be enabled after below steps:
-> cold boot -> enable BT -> disable BT -> warm reboot -> BT enable failure
-> if property enable-gpios is not configured within DT|ACPI for QCA6390.
-> 
-> The commit is to fix a use-after-free issue within qca_serdev_shutdown()
-> by adding condition to avoid the serdev is flushed or wrote after closed
-> but also introduces this regression issue regarding above steps since the
-> VSC is not sent to reset controller during warm reboot.
-> 
-> Fixed by sending the VSC to reset controller within qca_serdev_shutdown()
-> once BT was ever enabled, and the use-after-free issue is also fixed by
-> this change since the serdev is still opened before it is flushed or wrote.
-> 
-> Verified by the reported machine Dell XPS 13 9310 laptop over below two
-> kernel commits:
+  Branch: refs/heads/master
+  Home:   https://github.com/bluez/bluez
+  Commit: 41340a74bf83b16304cf6ed388bf6341f41c7ed1
+      https://github.com/bluez/bluez/commit/41340a74bf83b16304cf6ed388bf6341f41c7ed1
+  Author: Iulia Tanasescu <iulia.tanasescu@nxp.com>
+  Date:   2024-05-21 (Tue, 21 May 2024)
 
-I don't understand how does it solve my question. I asked you: on which
-hardware did you, not the reporter, test?
+  Changed paths:
+    M unit/test-bap.c
 
-> commit e00fc2700a3f ("Bluetooth: btusb: Fix triggering coredump
-> implementation for QCA") of bluetooth-next tree.
-> commit b23d98d46d28 ("Bluetooth: btusb: Fix triggering coredump
-> implementation for QCA") of linus mainline tree.
+  Log Message:
+  -----------
+  test-bap: Keep streams queue in test_data
 
-? Same commit with different hashes? No, it looks like you are working
-on some downstream tree with cherry picks.
+Some BAP test configurations require multiple streams to be created
+(for example, 4.14.4 Broadcast Sink Receives Audio Data Over Multiple
+BISes).
 
-No, test it on mainline and answer finally, after *five* tries, which
-kernel and which hardware did you use for testing this.
+This replaces the stream pointer inside test_data with a queue of
+streams, where each created stream is pushed.
+
+Unicast callbacks where the created stream needs to be accessed
+already pass the stream reference as parameter, so there is no need
+to access it from test_data.
 
 
+  Commit: 25eaeeb7e1bc9a35091a1bb21c0fb20581fcbe8a
+      https://github.com/bluez/bluez/commit/25eaeeb7e1bc9a35091a1bb21c0fb20581fcbe8a
+  Author: Iulia Tanasescu <iulia.tanasescu@nxp.com>
+  Date:   2024-05-21 (Tue, 21 May 2024)
 
-Best regards,
-Krzysztof
+  Changed paths:
+    M unit/test-bap.c
 
+  Log Message:
+  -----------
+  test-bap: Add support for multiple bcast streams
+
+This adds support for implementing Broadcast tests that require multiple
+streams to be configured (for example, 4.14.4 Broadcast Sink Receives
+Audio Data Over Multiple BISes).
+
+The number of required streams is added inside the test_config struct.
+The bsnk_pac_added and the bsnk_state_str callbacks have been updated
+to support multiple streams.
+
+
+  Commit: c41943fe392dec833ce7c0b5e37de40d07c51b61
+      https://github.com/bluez/bluez/commit/c41943fe392dec833ce7c0b5e37de40d07c51b61
+  Author: Iulia Tanasescu <iulia.tanasescu@nxp.com>
+  Date:   2024-05-21 (Tue, 21 May 2024)
+
+  Changed paths:
+    M unit/test-bap.c
+
+  Log Message:
+  -----------
+  test-bap: Add Broadcast Sink STR MBIS tests
+
+4.14.4 Broadcast Sink Receives Audio Data Over Multiple BISes (page 193):
+
+    Test Purpose:
+    Verify that a Broadcast Sink IUT can receive audio data over
+    multiple BISes from a Broadcast Source. The verification is
+    performed for each set of parameters in turn.
+
+    Test Case Configuration:
+    BAP/BSNK/STR/BV-18-C [BSNK, Multiple BISes, LC3 8_1]
+    BAP/BSNK/STR/BV-19-C [BSNK, Multiple BISes, LC3 8_2]
+    BAP/BSNK/STR/BV-20-C [BSNK, Multiple BISes, LC3 16_1]
+    BAP/BSNK/STR/BV-21-C [BSNK, Multiple BISes, LC3 16_2]
+    BAP/BSNK/STR/BV-22-C [BSNK, Multiple BISes, LC3 24_1]
+    BAP/BSNK/STR/BV-23-C [BSNK, Multiple BISes, LC3 24_2]
+    BAP/BSNK/STR/BV-24-C [BSNK, Multiple BISes, LC3 32_1]
+    BAP/BSNK/STR/BV-25-C [BSNK, Multiple BISes, LC3 32_2]
+    BAP/BSNK/STR/BV-26-C [BSNK, Multiple BISes, LC3 44.1_1]
+    BAP/BSNK/STR/BV-27-C [BSNK, Multiple BISes, LC3 44.1_2]
+    BAP/BSNK/STR/BV-28-C [BSNK, Multiple BISes, LC3 48_1]
+    BAP/BSNK/STR/BV-29-C [BSNK, Multiple BISes, LC3 48_2]
+    BAP/BSNK/STR/BV-30-C [BSNK, Multiple BISes, LC3 48_3]
+    BAP/BSNK/STR/BV-31-C [BSNK, Multiple BISes, LC3 48_4]
+    BAP/BSNK/STR/BV-32-C [BSNK, Multiple BISes, LC3 48_5]
+    BAP/BSNK/STR/BV-33-C [BSNK, Multiple BISes, LC3 48_6]
+    BAP/BSNK/STR/BV-34-C [BSNK, Multiple BISes, VS]
+
+    Pass verdict:
+    The IUT synchronizes to the Lower Tester (the Link Layer
+    receives a BIS Data PDU). The host on the IUT receives an
+    LE BIG Sync Established event.
+
+    If the Codec ID is LC3, the IUT receives encoded LC3 audio
+    data in BIS Data PDUs on each synchronized BIS. The audio
+    data is formatted using the LC3 Media Packet format.
+
+    If the Codec ID is a vendor-specific Codec ID, the IUT receives
+    BIS Data PDUs on each synchronized BIS. The parameters included
+    in the Codec_Specific_Configuration data are as defined in
+    TSPX_VS_Codec_Specific_Configuration.
+
+    If the Codec ID is LC3, each parameter included in
+    Codec_Specific_Configuration data is formatted in an LTV structure
+    with the length, type, and value specified in Table 4.85.
+
+Test Summary
+------------
+BAP/BSNK/STR/BV-18-C [BSNK, Multiple BISes, LC3 8_1]    Passed
+BAP/BSNK/STR/BV-19-C [BSNK, Multiple BISes, LC3 8_2]    Passed
+BAP/BSNK/STR/BV-20-C [BSNK, Multiple BISes, LC3 16_1]   Passed
+BAP/BSNK/STR/BV-21-C [BSNK, Multiple BISes, LC3 16_2]   Passed
+BAP/BSNK/STR/BV-22-C [BSNK, Multiple BISes, LC3 24_1]   Passed
+BAP/BSNK/STR/BV-23-C [BSNK, Multiple BISes, LC3 24_2]   Passed
+BAP/BSNK/STR/BV-24-C [BSNK, Multiple BISes, LC3 32_1]   Passed
+BAP/BSNK/STR/BV-25-C [BSNK, Multiple BISes, LC3 32_2]   Passed
+BAP/BSNK/STR/BV-26-C [BSNK, Multiple BISes, LC3 44.1_1] Passed
+BAP/BSNK/STR/BV-27-C [BSNK, Multiple BISes, LC3 44.1_2] Passed
+BAP/BSNK/STR/BV-28-C [BSNK, Multiple BISes, LC3 48_1]   Passed
+BAP/BSNK/STR/BV-29-C [BSNK, Multiple BISes, LC3 48_2]   Passed
+BAP/BSNK/STR/BV-30-C [BSNK, Multiple BISes, LC3 48_3]   Passed
+BAP/BSNK/STR/BV-31-C [BSNK, Multiple BISes, LC3 48_4]   Passed
+BAP/BSNK/STR/BV-32-C [BSNK, Multiple BISes, LC3 48_5]   Passed
+BAP/BSNK/STR/BV-33-C [BSNK, Multiple BISes, LC3 48_6]   Passed
+BAP/BSNK/STR/BV-34-C [BSNK, Multiple BISes, VS]         Passed
+
+
+  Commit: 6e51acb0e846a141e3a1ccd0f243b7fe9de7c111
+      https://github.com/bluez/bluez/commit/6e51acb0e846a141e3a1ccd0f243b7fe9de7c111
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2024-05-21 (Tue, 21 May 2024)
+
+  Changed paths:
+    M unit/test-bap.c
+
+  Log Message:
+  -----------
+  test-bap: Rename num_str to streams
+
+This renames test_config.num_str to test_config.streams just be clearer
+on what is the intent of the field.
+
+
+Compare: https://github.com/bluez/bluez/compare/a2438e46f812...6e51acb0e846
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
