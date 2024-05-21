@@ -1,60 +1,59 @@
-Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
+Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 283BA18054
-	for <linux-bluetooth@vger.kernel.org>; Tue, 21 May 2024 16:00:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DB031B299
+	for <linux-bluetooth@vger.kernel.org>; Tue, 21 May 2024 16:02:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716307219; cv=none; b=S0eaATDTFFsOVm4d4SuI+8G6B24QzyiQkh/AazvTFJXw33D38sTcY/iTTWsSBuQzMoZVcy0PxShmD6KkOzGKIpK5sjknaNqMre1DPcyG9ZyErMYOOwxne4TlFEBI+xkfASwhI1H+3rpXA5hGBG3/1H0wb2aM0wReq/RP1djYnII=
+	t=1716307361; cv=none; b=uHWYpkoC75fx3usz0IazK3cyaixXmR5lYtwr6HeXYNggFcDaD5thnpCT0AXr74OnajI83KNxjgy8zbFgSp825x2F6RCTnFqULoPXImhgkTMjcSl3PNakIic1O5cAbjAVt+5q+DBhpYFTfPMgnDW/LhKWCEpfVlNFaUwx8LbSB50=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716307219; c=relaxed/simple;
-	bh=vVAEAyfrohFgwQUdSFubvGXi+5gPA2p8YiWJ6hKb29M=;
+	s=arc-20240116; t=1716307361; c=relaxed/simple;
+	bh=LvQkK1x6wKDbqniMQIsTNsYXVp9z4lc1HTvxzlRvhOQ=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=lU7KoR2hMBD1InZOF7E7st/Sfcayj9wHOyRfB8dESy+4zk6W8dHW8Q3aBxXTIhjgixGZpQ1bHHbhUm8WDtmiKUnuQzIBlFMUpav/gt/5KQTQZGASmnY8NbkghnIWnYCVk/66Zp/jpEtHUtKW3LuxKFE0u55WKmzHegRTlm2WMp0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=Mg+AIiCY; arc=none smtp.client-ip=209.85.221.51
+	 In-Reply-To:Content-Type; b=Cj+/YP/RflCrjFBHYv6RQg0P7xc7yW8OHIdjWZPHWdOj0gn/db7JtevBs7qMdYUI89BJ9HsoXReTJrXxqPMbbklqez4nBC04T7ugyn6HLnl77ReNUlP89xUdwTeAm4yaL60EMLscuye5XUZuCHlORVK9VAkYhbOkssIDaCPh0wY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=FT4A5aoO; arc=none smtp.client-ip=209.85.221.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Mg+AIiCY"
-Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-34e0d8b737eso2134330f8f.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 21 May 2024 09:00:16 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="FT4A5aoO"
+Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-352129e3c8eso3505425f8f.2
+        for <linux-bluetooth@vger.kernel.org>; Tue, 21 May 2024 09:02:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1716307215; x=1716912015; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1716307358; x=1716912158; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:autocrypt:content-language
          :from:references:cc:to:subject:user-agent:mime-version:date
          :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=8P8f3Xe3WKGb6+A4BlKH0j6nQd7Typm/M8fTWRmWe/8=;
-        b=Mg+AIiCYQYFNBMQw58mWdM5x1Bm+gIFhMJGoq4VxtlgsdJl3+nSiPq978Zf2xOntdL
-         /eWu+s+uGmGkdslfLexbBocoMHIDQg2/nfjuJsklDZgWkFZcNx2zF6TVgnkGySDEsCP9
-         4fL0Tg/yap0+XNqHXlRQkOAmZCLLP/Vj3yi5tUYD3t5KJAwucFWDQh1eIoOTrTRlw7iY
-         M6gWuedvwV2qQ7RuQVNJS0itJj13MK6cBr1jjZB9dy+Q5vfbZMC6z/9P085hZ5uQRfdI
-         IS9O532QPt87qFtuovdUT3rW0yb2md4g8mDiANzGzpZxwApzfItOj/HQUyXBX5I+57Re
-         7t0g==
+        bh=CwLrAnoDcKfl4pASlzPf6/g0NwpfS2Ef+d5jWtjl7A0=;
+        b=FT4A5aoOog15/yw8YC3DaPCRduTyyo6At9ji5oh8W1ZwpW/y8K8/Cm/lMsvRYFtDad
+         gxmvSa04zOmDzUqdWzHylPALyN5NeruabDpvVPUTEo0I1Tw7TzIvnzAtBWnVAft6lSGz
+         nCZs/gncNMznweb4yQVrUSCX+3hwRIbMkhG2KlmJ9gFBRHWcFTrPYVG2UrgtBw5AWC+H
+         KlULgUtEnS0XZ5bCaJA65Kah2X6Hz8lY1i/F7vuhBrm6aIy3qTnW2szAkPVauCpHKwJx
+         /Uy8ITzLMc3kVwA2msp/1mGi+lY6II8csHGPN/ssouHqJbfCBXuUKhKyBOMObbeXIlAM
+         65LQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716307215; x=1716912015;
+        d=1e100.net; s=20230601; t=1716307358; x=1716912158;
         h=content-transfer-encoding:in-reply-to:autocrypt:content-language
          :from:references:cc:to:subject:user-agent:mime-version:date
          :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=8P8f3Xe3WKGb6+A4BlKH0j6nQd7Typm/M8fTWRmWe/8=;
-        b=Kk7jzMir/CG/qUyP10BZzAZjnIJLOn0vw2UCibo2pcsQQgkIbjRqixuAmkNnBxGRRj
-         ZS1G7+kyTPoKiv+hvP35AFUtIqra2kUBcskpc2k/aFoQuEvBDL8Y630XjvzPq/dGtBbC
-         hmhufcb6jgHfTmCq107nm8tw17inZ619RyfSAUpEpDZwqvZWks45J46fQ8cLx2GrkfNK
-         a14cOjmOa1gutTuSlVLIIWcJtgCmbtKYxEkjLGKo8KYu7Fg9YqzOn4qFbdGC/8AIk022
-         O/ZhCZ1xwwWYAyReWf2bpusl+Yk5xz6f1p2BEVx+5B/SlnVPdGlxdKad+uJKaXxhlnjt
-         jgtg==
-X-Forwarded-Encrypted: i=1; AJvYcCW+ohmnV8g/vJKNk7sUVwEM5QdUmuoYPx34G8Ih0lIOWi+QJllW0vpdJX9GkCpecqisIjc6MdudcsbAFAemlCWCqtnS7wgbzubxtgGkv0cr
-X-Gm-Message-State: AOJu0Yxi75GiHBleP2zCQD9fZab59XdGUVy9PFxUXIPsGT9Q5DLb8FKS
-	ScJPP1W9wnZqNNfgcoV5ieN6I3/BociBftmD+10IOFcB2tJ07W/XyyWOmYZX108=
-X-Google-Smtp-Source: AGHT+IGsBK0SGmhtIHLM1fIBm3F0YiryCUR9LulcVEo0MSe6Wkw4Nnpo7JzMUoA92SZizwcd5PkxAw==
-X-Received: by 2002:adf:a18c:0:b0:34c:cae0:c989 with SMTP id ffacd0b85a97d-354b8e38ec8mr8449631f8f.33.1716307215517;
-        Tue, 21 May 2024 09:00:15 -0700 (PDT)
+        bh=CwLrAnoDcKfl4pASlzPf6/g0NwpfS2Ef+d5jWtjl7A0=;
+        b=YQSEwRBpKygec4JVwsZf9S6RJmwilhLhoLVaZ5iHopQsJ5DgcmCPJJgDeLDRfoXqu2
+         y8dhWmNQCU8Yij1nVIP+6+bhi2c2TbFmw+soaJ3o9ldX6caMCSvqhM4JB2Ct6Ez+Km/z
+         tNrAcw6trmYStF08PIqprhMncEKSthqWvc/MbfKEDYDDYAtKBlZxcvOq6SvU+YZqP/j3
+         OAq3Jk6nhZvYTtKAR/Ml3fb1NSXC1SyprEv9hdkDBNeoHaGNUCDZqh345/Q6rJ+zwIbD
+         EUrQKLQfZpyqmL7EoJvJT4uFgjdSmXRP6FV98hZvWKMaW7+G1fVRTNY5Kby/YdnhtVEe
+         87iQ==
+X-Gm-Message-State: AOJu0YzixaIwF14vwIXjDPhy9p5EQbBZZFprff0Gx47mW9S+SL12O/na
+	nLS0jbnwhxMrM/zrKecJyRAE1lRezLnXN3poW/4tf1X4AbwGYhvAKyh3oyCWYRg=
+X-Google-Smtp-Source: AGHT+IFWv2DibPTZdRxMs8ItKbWP+f7I+Zrb3KKf4jtBV49zvoSqvL8D0wlAMMaY6rsZbNEw+9hBRA==
+X-Received: by 2002:a5d:6044:0:b0:34c:5448:b81a with SMTP id ffacd0b85a97d-3504a96a820mr25830846f8f.48.1716307358313;
+        Tue, 21 May 2024 09:02:38 -0700 (PDT)
 Received: from [192.168.1.20] ([178.197.206.169])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-354cece0054sm2411078f8f.102.2024.05.21.09.00.14
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3502baacfb9sm32096026f8f.68.2024.05.21.09.02.36
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 21 May 2024 09:00:14 -0700 (PDT)
-Message-ID: <4ed8d1fc-40b9-4254-90a1-9d621adc71a4@linaro.org>
-Date: Tue, 21 May 2024 18:00:12 +0200
+        Tue, 21 May 2024 09:02:37 -0700 (PDT)
+Message-ID: <7927abbe-3395-4a53-9eed-7b4204d57df5@linaro.org>
+Date: Tue, 21 May 2024 18:02:35 +0200
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -64,15 +63,12 @@ MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Subject: Re: [PATCH v2] Bluetooth: qca: Fix BT enable failure again for
  QCA6390 after warm reboot
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Lk Sii <lk_sii@163.com>
-Cc: Zijun Hu <quic_zijuhu@quicinc.com>, luiz.von.dentz@intel.com,
- marcel@holtmann.org, linux-bluetooth@vger.kernel.org, wt@penguintechs.org,
- regressions@lists.linux.dev, pmenzel@molgen.mpg.de, stable@vger.kernel.org
+To: Zijun Hu <quic_zijuhu@quicinc.com>, luiz.dentz@gmail.com,
+ luiz.von.dentz@intel.com, marcel@holtmann.org
+Cc: linux-bluetooth@vger.kernel.org, wt@penguintechs.org,
+ regressions@lists.linux.dev, pmenzel@molgen.mpg.de, lk_sii@163.com,
+ stable@vger.kernel.org
 References: <1715866294-1549-1-git-send-email-quic_zijuhu@quicinc.com>
- <f343ecae-efee-4bdc-ac38-89b614e081b5@163.com>
- <CABBYNZ+nLgozYxL=znsXrg0qoz-ENgSBwcPzY-KrBnVJJut8Kw@mail.gmail.com>
- <34a8e7c3-8843-4f07-9eef-72fb1f8e9378@163.com>
- <CABBYNZLzTcnXP3bKdQB3wdBCMgCJrqu=jXQ91ws6+c1mioYt9A@mail.gmail.com>
 From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 Content-Language: en-US
 Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
@@ -119,43 +115,45 @@ Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
  KQ06ztUMRrj8eVtpImjsWCd0bDWRaaR4vqhCHvAG9iWXZu4qh3ipie2Y0oSJygcZT7H3UZxq
  fyYKiqEmRuqsvv6dcbblD8ZLkz1EVZL6djImH5zc5x8qpVxlA0A0i23v5QvN00m6G9NFF0Le
  D2GYIS41Kv4Isx2dEFh+/Q==
-In-Reply-To: <CABBYNZLzTcnXP3bKdQB3wdBCMgCJrqu=jXQ91ws6+c1mioYt9A@mail.gmail.com>
+In-Reply-To: <1715866294-1549-1-git-send-email-quic_zijuhu@quicinc.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 21/05/2024 17:48, Luiz Augusto von Dentz wrote:
->> driver->remove() even is not triggered during above steps.
->>>> Commit C: 272970be3dab ("Bluetooth: hci_qca: Fix driver shutdown on
->>>> closed serdev")
->>>> this commit is to fix issue B which is actually caused by Commit B, but
->>>> it has Fixes tag for Commit A. and it also introduces the regression
->>>> issue A.
->>>>
->>>
->>>
+On 16/05/2024 15:31, Zijun Hu wrote:
+> Commit 272970be3dab ("Bluetooth: hci_qca: Fix driver shutdown on closed
+> serdev") will cause below regression issue:
 > 
-> Reading again the commit message for the UAF fix it sounds like a
-> different problem:
+> BT can't be enabled after below steps:
+> cold boot -> enable BT -> disable BT -> warm reboot -> BT enable failure
+> if property enable-gpios is not configured within DT|ACPI for QCA6390.
 > 
->     The driver shutdown callback (which sends EDL_SOC_RESET to the device
->     over serdev) should not be invoked when HCI device is not open (e.g. if
->     hci_dev_open_sync() failed), because the serdev and its TTY are not open
->     either.  Also skip this step if device is powered off
->     (qca_power_shutdown()).
+> The commit is to fix a use-after-free issue within qca_serdev_shutdown()
+> by adding condition to avoid the serdev is flushed or wrote after closed
+> but also introduces this regression issue regarding above steps since the
+> VSC is not sent to reset controller during warm reboot.
 > 
-> So if hci_dev_open_sync has failed it says serdev and its TTY will not
-> be open either, so I guess that's why HCI_SETUP was added as a
-> condition to bail out? So it seems correct to do that although I'd
-> change the comments.
+> Fixed by sending the VSC to reset controller within qca_serdev_shutdown()
+> once BT was ever enabled, and the use-after-free issue is also fixed by
+> this change since the serdev is still opened before it is flushed or wrote.
 > 
-> @Krzysztof Kozlowski do you still have a test setup for 272970be3dab
-> ("Bluetooth: hci_qca: Fix driver shutdown on closed serdev"), can you
-> try with these changes?
+> Verified by the reported machine Dell XPS 13 9310 laptop over below two
+> kernel commits:
 
-Unfortunately not at the moment, because mainline never had a proper
-support for a variant of this Bluetooth/WiFi on our boards, so it was
-working with few out of tree patches. I think Bartosz is working on
-fixing it via power sequence, but that's not in the mainline yet.
+I don't understand how does it solve my question. I asked you: on which
+hardware did you, not the reporter, test?
+
+> commit e00fc2700a3f ("Bluetooth: btusb: Fix triggering coredump
+> implementation for QCA") of bluetooth-next tree.
+> commit b23d98d46d28 ("Bluetooth: btusb: Fix triggering coredump
+> implementation for QCA") of linus mainline tree.
+
+? Same commit with different hashes? No, it looks like you are working
+on some downstream tree with cherry picks.
+
+No, test it on mainline and answer finally, after *five* tries, which
+kernel and which hardware did you use for testing this.
+
+
 
 Best regards,
 Krzysztof
