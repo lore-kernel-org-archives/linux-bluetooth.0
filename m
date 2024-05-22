@@ -1,60 +1,65 @@
-Received: from mail-vk1-f178.google.com (mail-vk1-f178.google.com [209.85.221.178])
+Received: from mail-vk1-f181.google.com (mail-vk1-f181.google.com [209.85.221.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7198D7E575
-	for <linux-bluetooth@vger.kernel.org>; Wed, 22 May 2024 20:42:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52E39770EA
+	for <linux-bluetooth@vger.kernel.org>; Wed, 22 May 2024 20:42:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716410578; cv=none; b=tuY0ok1+bk/urfzWQ579xoHJ1Xrt4wqCsByXUpwh4aXWCQ0oEII/fYm/3eeRJqzmPpnBqwrFhCuW2fsGc41meygf2A0P7SimIh3tFOzVLwSO34qI2G7FBU4M4yVQdVr3nfFTQU4/kf0DZqGOlXHH0uSYpTn5uRtS5GxcMochOl8=
+	t=1716410579; cv=none; b=ZtvW7HYdmUXlR6SBo8EgupLagRUyoRYgnd14a0c0bVDorIlb6qYVOdULAn6ImD63t5RXCjGz78Yu1WrNsA2FE+BYw1Q+EueB+67v3xC7wIan5QkhvUDlsY9Z1BUu4hRMAoZCTM4BSEmWFyIL0sUAtxVf39adXOC/rqDVzmnUiN4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716410578; c=relaxed/simple;
-	bh=5jvbGWvClORCs8ssqPzjT4tzJhfsBs6UHVltYH78Wgs=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=DSKyWSJ0hwn3vVFGiNu//tKxAPcelHGXY1m78zyKaTFDUZIwQfAhLFRfUZOFqqXF+Y+z6FyRMi/ye8+VIH5oH7npU9QFfKieDv5bCEP7XJqCNHzez43tErJBP4okbiP4K54SiQZE2gmyQ67v57o3Fltw+a67cyXBKU4NMuqGsIo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GcRNOXyf; arc=none smtp.client-ip=209.85.221.178
+	s=arc-20240116; t=1716410579; c=relaxed/simple;
+	bh=17zB42KjqnDIMm2UmNpJ1oBOCEhVQimS2IrccfCAwCc=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=Uw1dk+o8l8+YV4teMtqzfTeRJT/BWhcEUZ+zcZvGTFlwAiEgDueASTikFTMpZL5AqzhQabvw0Z7TK77gX5761A99u/y4zLxU6HoZqx1oj0Sik7gpKG4iyShlkfcW9qvrX1LqanEON6ksL5TC+H4868wI6kySyhc4AbSPgJas3pI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AA4ff4Ls; arc=none smtp.client-ip=209.85.221.181
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GcRNOXyf"
-Received: by mail-vk1-f178.google.com with SMTP id 71dfb90a1353d-4df3e3c674fso2132031e0c.2
-        for <linux-bluetooth@vger.kernel.org>; Wed, 22 May 2024 13:42:56 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AA4ff4Ls"
+Received: by mail-vk1-f181.google.com with SMTP id 71dfb90a1353d-4e15ef06569so700706e0c.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 22 May 2024 13:42:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1716410575; x=1717015375; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=GiTad0WkrpOGxdvwu/Vf6Dg3jk9yXPS+P/Wgz6N97X0=;
-        b=GcRNOXyfcVeo+YTA49UfgHqwXiFZv4+SoCKdN9IlJiniMxMdroDJcsGNwOnKZpICu1
-         kmlPtndMV2cQIP8nP9oUw+ACXityRd3EacKL+698UWpFbLoVlzzpU83O3pCjrzyTwvXE
-         Y11pgVxcIfo4I7Chy6WvHLAdCqUkZeSs9Cg0OhAgNGjOOzp2+wy6F/zzKYAslUHizKMY
-         sJV3UeM14YqrbnIIDvHMWkcPf3E91PSEwJhMiZhEagQaNTGrAlaQzdzrXETZv4+ZDugb
-         cr7xmVXbIIkTWAg9YZiVFnd5P9GRRzZqHV+ipvJm52L34GRWZAhjPjsAqtF+VFNBxR1K
-         gqEg==
+        d=gmail.com; s=20230601; t=1716410576; x=1717015376; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Y3hjf6CRrFMxjq3B9ns7PbIfvbdpD9likKacRSDiYvk=;
+        b=AA4ff4Ls3AE0iRgzbChh8ujSfwiwhOdYvWkSg3gqguaTHv0/rRw0otNqjMy5JIns58
+         kTiUt8zTny8KtBH4M0nhkLtzH6aYJZRlNCLPAXaT+PTZYGaI05+T5WhvfXyYEngt3bZf
+         4jLJLSfhMbZOfyMp7hdgstg6GJK7MF7KTYTiaZK40EtEXt0IpEJWZXjTiq015dghwrDk
+         YRq+HgKJizCQvpZrA3hSDmIR/xqBERRY7v2YSxtBxe9y6PcClUYNXfC4dAudRjdN/x3p
+         ZisT5aeUFBraP7ryQReiW3aWOJyNrGw6L88bUlbxtdwmTWez5w0dMCq6rMI0f/iunKh8
+         ZfIw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716410575; x=1717015375;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=GiTad0WkrpOGxdvwu/Vf6Dg3jk9yXPS+P/Wgz6N97X0=;
-        b=WcBANrskX21AENcle4f13QBQU29ys/HJzQOH6aqAnbSxFAO1q2SGZjyVyYm1Mr5v/3
-         /6zSnO4WRHW7reY9qZT/16pBlHx2l0LU6ZqfRboIlOqgxYS5mTFrxk6LIWvMP0Aoz1SW
-         fVaXfjxj87+pyeScNwY1jw/FEW5Mb2qukNGebs6J3lfPNpOFGms1dP8Cytg7CLFSp1Mj
-         tkW8sDP5PAZ9h7DfRzhBnTv/qxQfK3FphOtnWJMDtXGSnwGNBhPjE43vODIDPoigwn4/
-         isFgJ/IpIXjHt87U00X3ZxBbcjz5AimEX/sZy/46aO15eP0lCl4slObZEBvPD4sFHezM
-         QDcA==
-X-Gm-Message-State: AOJu0YyoshSlswpEipKQTLsHcE1KmpWtZtlvzzMombeGRK1rr9HyyIS0
-	w9SPKYB1PZEy0SIMOI+aKDRwrjxV30aTcbLNcoqFVwfzP+nJjhUj4gr9mQ==
-X-Google-Smtp-Source: AGHT+IGFLfJdLdFHHMjbfTXf0RNXOBV8lVw9CGWH0WWfVhonrYtB/boH+B2UeDPqztvwQoy0Bw5C6w==
-X-Received: by 2002:a05:6122:318e:b0:4df:31f2:a4d5 with SMTP id 71dfb90a1353d-4e2184e9739mr3094991e0c.4.1716410574515;
-        Wed, 22 May 2024 13:42:54 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1716410576; x=1717015376;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Y3hjf6CRrFMxjq3B9ns7PbIfvbdpD9likKacRSDiYvk=;
+        b=Aww3LxkP6s3zxHWPJ5veUbIByE2/aquyq2v/2LG+wJX8l4m6S93M+JLNJuyznssvA6
+         gFmymsPrPF6ySOc0S0Da40nZJ4BTjKmYCvxcNluM73J+pcBPT25+9sgoiWGU9TWnYbC0
+         B0Du8pyELi14qATt/1BB9JhUjNt0am2BDfZzbkXzPlAmPyxVPHmunyAusw2FBR/hsf+j
+         w5jGWm7KnXWUIc9+6CwbnFTFbJMrjByTc1n+SWl40/wImubX8Tp8Gb9oV6lyTvmr3XpS
+         oE+edUUIVsPyUOFl6iZpUvKAyury2gbHzlziCxWKiWoleqybgLL42NzryE2FPhk2ZAUk
+         wyRw==
+X-Gm-Message-State: AOJu0YwZ8uYFQDsy7ZNJBOc6K613CEW4aUTB2InsPY4Xoa+BwXu+Ks9G
+	PTjpC5qECpQMmHkVtjxVFHFa3eKi55gJWNPdREDYcWJaRv4YL4iVlIui+Q==
+X-Google-Smtp-Source: AGHT+IFixKYzntuEKPgv2Z1wSf8ycI/h50+ijaHlgCHKK6g4c0dU/XtjzVYVNvpLi1j4N1qGLsPLpw==
+X-Received: by 2002:a05:6122:1078:b0:4da:ddb4:feca with SMTP id 71dfb90a1353d-4e4e4d30f9amr282385e0c.8.1716410576441;
+        Wed, 22 May 2024 13:42:56 -0700 (PDT)
 Received: from lvondent-mobl4.. (syn-107-146-107-067.res.spectrum.com. [107.146.107.67])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-4df7c050c57sm3749913e0c.36.2024.05.22.13.42.53
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-4df7c050c57sm3749913e0c.36.2024.05.22.13.42.54
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 22 May 2024 13:42:53 -0700 (PDT)
+        Wed, 22 May 2024 13:42:54 -0700 (PDT)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v2 1/2] doc: Add initial L2CAP(7) documentation
-Date: Wed, 22 May 2024 16:42:51 -0400
-Message-ID: <20240522204252.1891896-1-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v2 2/2] doc: Add initial RFCOMM(7) documentation
+Date: Wed, 22 May 2024 16:42:52 -0400
+Message-ID: <20240522204252.1891896-2-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.45.1
+In-Reply-To: <20240522204252.1891896-1-luiz.dentz@gmail.com>
+References: <20240522204252.1891896-1-luiz.dentz@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -65,65 +70,48 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This adds initial documentation for L2CAP sockets.
+This adds initial documentation for RFCOMM sockets.
 ---
- Makefile.am   |   7 ++
- doc/l2cap.rst | 241 ++++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 248 insertions(+)
- create mode 100644 doc/l2cap.rst
+ Makefile.am    |   4 +-
+ doc/rfcomm.rst | 214 +++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 216 insertions(+), 2 deletions(-)
+ create mode 100644 doc/rfcomm.rst
 
 diff --git a/Makefile.am b/Makefile.am
-index 05d02932f205..8aedbb20d0d8 100644
+index 8aedbb20d0d8..8f5d2fb553b4 100644
 --- a/Makefile.am
 +++ b/Makefile.am
-@@ -348,6 +348,7 @@ CLEANFILES += $(builtin_files)
+@@ -348,7 +348,7 @@ CLEANFILES += $(builtin_files)
  
  if MANPAGES
  man_MANS += src/bluetoothd.8
-+man_MANS += doc/l2cap.7
+-man_MANS += doc/l2cap.7
++man_MANS += doc/l2cap.7 doc/rfcomm.7
  man_MANS += doc/org.bluez.Adapter.5 doc/org.bluez.Device.5 \
  		doc/org.bluez.DeviceSet.5 doc/org.bluez.AgentManager.5 \
  		doc/org.bluez.Agent.5 doc/org.bluez.ProfileManager.5 \
-@@ -380,6 +381,7 @@ man_MANS += doc/org.bluez.obex.Client.5 doc/org.bluez.obex.Session.5 \
+@@ -381,7 +381,7 @@ man_MANS += doc/org.bluez.obex.Client.5 doc/org.bluez.obex.Session.5 \
  		doc/org.bluez.obex.AgentManager.5 doc/org.bluez.obex.Agent.5
  endif
  manual_pages += src/bluetoothd.8
-+manual_pages += doc/l2cap.7
+-manual_pages += doc/l2cap.7
++manual_pages += doc/l2cap.7 doc/rfcomm.7
  manual_pages += doc/org.bluez.Adapter.5 doc/org.bluez.Device.5 \
  		doc/org.bluez.DeviceSet.5 doc/org.bluez.AgentManager.5 \
  		doc/org.bluez.Agent.5 doc/org.bluez.ProfileManager.5 \
-@@ -457,6 +459,8 @@ EXTRA_DIST += doc/mgmt-api.txt \
- 		doc/health-api.txt \
- 		doc/sap-api.txt
- 
-+EXTRA_DIST += doc/l2cap.rst
-+
- EXTRA_DIST += doc/org.bluez.Adapter.rst doc/org.bluez.Device.rst \
- 		doc/org.bluez.DeviceSet.rst doc/org.bluez.AgentManager.rst \
- 		doc/org.bluez.Agent.rst doc/org.bluez.ProfileManager.rst \
-@@ -758,6 +762,9 @@ endif
- %.5: %.rst Makefile
- 	$(RST2MAN_PROCESS)
- 
-+%.7: %.rst Makefile
-+	$(RST2MAN_PROCESS)
-+
- %.8: %.rst Makefile
- 	$(RST2MAN_PROCESS)
- 
-diff --git a/doc/l2cap.rst b/doc/l2cap.rst
+diff --git a/doc/rfcomm.rst b/doc/rfcomm.rst
 new file mode 100644
-index 000000000000..cad0c54f08a6
+index 000000000000..989d3c66dca9
 --- /dev/null
-+++ b/doc/l2cap.rst
-@@ -0,0 +1,241 @@
-+=====
-+l2cap
-+=====
++++ b/doc/rfcomm.rst
+@@ -0,0 +1,214 @@
++======
++rfcomm
++======
 +
-+--------------
-+L2CAP protocol
-+--------------
++---------------
++RFCOMM protocol
++---------------
 +
 +:Version: BlueZ
 +:Copyright: Free use of this software is granted under ther terms of the GNU
@@ -139,34 +127,28 @@ index 000000000000..cad0c54f08a6
 +
 +    #include <sys/socket.h>
 +    #include <bluetooth/bluetooth.h>
-+    #include <bluetooth/l2cap.h>
++    #include <bluetooth/rfcomm.h>
 +
-+    l2cap_socket = socket(AF_BLUETOOTH, SOCK_SEQPACKET, BTPROTO_L2CAP);
++    rfcomm_socket = socket(AF_BLUETOOTH, SOCK_STREAM, BTPROTO_RFCOMM);
 +
 +DESCRIPTION
 +===========
 +
-+L2CAP is a protocol that provides an interface for higher-level protocols to
-+send and receive data over a Bluetooth connection. L2CAP sits on top of the
-+Bluetooth Host Controller Interface (HCI) and provides a set of channels that
-+can be used by higher-level protocols to transmit data.
++The RFCOMM protocol provides emulation of serial ports over the L2CAP(7)
++protocol. The protocol is based on the ETSI standard TS 07.10.
 +
-+L2CAP provides a number of services to higher-level protocols, including
-+segmentation and reassembly of large data packets and flow control to prevent
-+overloading of the receiver. L2CAP also supports multiple channels per
-+connection, allowing for concurrent data transmission using different protocols.
++RFCOMM is a simple transport protocol, with additional provisions for emulating
++the 9 circuits of RS-232 (EIATIA-232-E) serial ports.
 +
 +SOCKET ADDRESS
 +==============
 +
 +.. code-block:: c
 +
-+    struct sockaddr_l2 {
-+       sa_family_t	l2_family;
-+       unsigned short	l2_psm;
-+       bdaddr_t	l2_bdaddr;
-+       unsigned short	l2_cid;
-+       uint8_t		l2_bdaddr_type;
++    struct sockaddr_rc {
++        sa_family_t rc_family;
++        unsigned short rc_bdaddr;
++        unsigned char rc_channel;
 +    };
 +
 +SOCKET OPTIONS
@@ -195,7 +177,7 @@ index 000000000000..cad0c54f08a6
 +.. code-block:: c
 +
 +    int level = BT_SECURITY_HIGH;
-+    int err = setsockopt(l2cap_socket, SOL_BLUETOOTH, BT_SECURITY, &level,
++    int err = setsockopt(rfcomm_socket, SOL_BLUETOOTH, BT_SECURITY, &level,
 +			 sizeof(level));
 +    if (err == -1) {
 +        perror("setsockopt");
@@ -221,22 +203,22 @@ index 000000000000..cad0c54f08a6
 +.. code-block:: c
 +
 +    int defer_setup = 1;
-+    int err = setsockopt(l2cap_socket, SOL_BLUETOOTH, BT_DEFER_SETUP,
++    int err = setsockopt(rfcomm_socket, SOL_BLUETOOTH, BT_DEFER_SETUP,
 +                         &defer_setup, sizeof(defer_setup));
 +    if (err == -1) {
 +        perror("setsockopt");
 +        return err;
 +    }
 +
-+    err = listen(l2cap_socket, 5);
++    err = listen(rfcomm_socket, 5);
 +    if (err) {
 +        perror("listen");
 +        return err;
 +    }
 +
-+    struct sockaddr_l2 remote_addr = {0};
++    struct sockaddr_rc remote_addr = {0};
 +    socklen_t addr_len = sizeof(remote_addr);
-+    int new_socket = accept(l2cap_socket, (struct sockaddr*)&remote_addr,
++    int new_socket = accept(rfcomm_socket, (struct sockaddr*)&remote_addr,
 +                            &addr_len);
 +    if (new_socket < 0) {
 +        perror("accept");
@@ -322,27 +304,6 @@ index 000000000000..cad0c54f08a6
 +    **BT_PHY_BR_3M_1SLOT**, BIT 6, EDR 3Mbps 1SLOT
 +    **BT_PHY_BR_3M_3SLOT**, BIT 7, EDR 3Mbps 3SLOT
 +    **BT_PHY_BR_3M_5SLOT**, BIT 8, EDR 3Mbps 5SLOT
-+    **BT_PHY_LE_1M_TX**, BIT 9, LE 1Mbps TX
-+    **BT_PHY_LE_1M_RX**, BIT 10, LE 1Mbps RX
-+    **BT_PHY_LE_2M_TX**, BIT 11, LE 2Mbps TX
-+    **BT_PHY_LE_2M_RX**, BIT 12, LE 2Mbps RX
-+    **BT_PHY_LE_CODED_TX**, BIT 13, LE Coded TX
-+    **BT_PHY_LE_CODED_RX**, BIT 14, LE Coded RX
-+
-+BT_MODE (since Linux 5.10)
-+--------------------------
-+
-+Channel Mode, possible values:
-+
-+.. csv-table::
-+    :header: "Define", "Value", "Description"
-+    :widths: auto
-+
-+    **BT_MODE_BASIC**, 0x00, Basic mode - default
-+    **BT_MODE_ERTM**, 0x01, Enhanced Retransmission mode - BR/EDR only
-+    **BT_MODE_STREAM**, 0x02, Stream mode - BR/EDR only
-+    **BT_MODE_LE_FLOWCTL**, 0x03, Credit based flow control mode - LE only
-+    **BT_MODE_EXT_FLOWCTL**, 0x04, Extended Credit based flow control mode
 +
 +RESOURCES
 +=========
@@ -357,7 +318,7 @@ index 000000000000..cad0c54f08a6
 +SEE ALSO
 +========
 +
-+socket(7), l2test(1)
++socket(7), rctest(1)
 -- 
 2.45.1
 
