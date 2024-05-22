@@ -1,209 +1,363 @@
-Received: from mail-lj1-f174.google.com (mail-lj1-f174.google.com [209.85.208.174])
+Received: from mail-vk1-f178.google.com (mail-vk1-f178.google.com [209.85.221.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2383C210EC
-	for <linux-bluetooth@vger.kernel.org>; Wed, 22 May 2024 18:44:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7198D7E575
+	for <linux-bluetooth@vger.kernel.org>; Wed, 22 May 2024 20:42:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716403450; cv=none; b=qRPxOEZ6TRxlOYG/5v2EePi8szxIUEH9o6ifgkRqi6tXsT3tacs6JmKeDrVjoZsSE6QVvz9KpbDAc4YpVTZk8bfIiP4XLm+FS3N08ezsJVtJBfR0KmG9Z5tHUQTeC4AVtArAk72lAiJ28DUCir7pva+aImN+1pNActTdGyUanvI=
+	t=1716410578; cv=none; b=tuY0ok1+bk/urfzWQ579xoHJ1Xrt4wqCsByXUpwh4aXWCQ0oEII/fYm/3eeRJqzmPpnBqwrFhCuW2fsGc41meygf2A0P7SimIh3tFOzVLwSO34qI2G7FBU4M4yVQdVr3nfFTQU4/kf0DZqGOlXHH0uSYpTn5uRtS5GxcMochOl8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716403450; c=relaxed/simple;
-	bh=Ji2hNR62HJExgnXzCsmRMWLeJvT4xObu7J7qdDKWxZo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=WNVu55YzQcjgnu0VkwXU5FCqtsG7pSmoEBKQDgCXdVOGrxjUhOySvUU6wqZsiQSnwOIh/zxHmq4Z42PrUZiVlEGI9AxZi5vqXO3EjB34fSEbrLyYcuXt8wAvY87QMQfZGZ8yVkoDJPQ8nmXtm/OZrSUfd8xOOAr0zDtvL7hEJ7E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dyFEzqwE; arc=none smtp.client-ip=209.85.208.174
+	s=arc-20240116; t=1716410578; c=relaxed/simple;
+	bh=5jvbGWvClORCs8ssqPzjT4tzJhfsBs6UHVltYH78Wgs=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=DSKyWSJ0hwn3vVFGiNu//tKxAPcelHGXY1m78zyKaTFDUZIwQfAhLFRfUZOFqqXF+Y+z6FyRMi/ye8+VIH5oH7npU9QFfKieDv5bCEP7XJqCNHzez43tErJBP4okbiP4K54SiQZE2gmyQ67v57o3Fltw+a67cyXBKU4NMuqGsIo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GcRNOXyf; arc=none smtp.client-ip=209.85.221.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dyFEzqwE"
-Received: by mail-lj1-f174.google.com with SMTP id 38308e7fff4ca-2e719bab882so51154441fa.3
-        for <linux-bluetooth@vger.kernel.org>; Wed, 22 May 2024 11:44:08 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GcRNOXyf"
+Received: by mail-vk1-f178.google.com with SMTP id 71dfb90a1353d-4df3e3c674fso2132031e0c.2
+        for <linux-bluetooth@vger.kernel.org>; Wed, 22 May 2024 13:42:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1716403447; x=1717008247; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=0R/H2ZxRgcTDKjoml22C7/U25tmAJzn0uDdpWw2qbq4=;
-        b=dyFEzqwEh5rKvz5K620bs6JoPPs+yTzHr5E8rHWa0y0j0MgWFdZwSmI8wj2SaXD2vX
-         YnLp2xnqR/5NyscDA8LxbnVYfXG7i1qbOJxQwfmwtSTMHXVS2He96kLtO3I0VuBv8pwK
-         qAhPGkHGRPR3h1+Z38JKgh20xa9YmoX7oO9kMOsPKU3Ddy2cLnKB2MpCdUVgSyT+31Cu
-         Du7kHBah4iw5KyoWD6o3oMQ9AE28MX8d/cmJnbcLGxMxloyh/BVOc9nihDIeycMvIq6B
-         5M7bTOuzgSDaONyJFGIIyXtcwC99yopnX2hfr9Usl6/OtP6yiOvb5Xv5+1/Qk2Xcc5Ee
-         2T3Q==
+        d=gmail.com; s=20230601; t=1716410575; x=1717015375; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=GiTad0WkrpOGxdvwu/Vf6Dg3jk9yXPS+P/Wgz6N97X0=;
+        b=GcRNOXyfcVeo+YTA49UfgHqwXiFZv4+SoCKdN9IlJiniMxMdroDJcsGNwOnKZpICu1
+         kmlPtndMV2cQIP8nP9oUw+ACXityRd3EacKL+698UWpFbLoVlzzpU83O3pCjrzyTwvXE
+         Y11pgVxcIfo4I7Chy6WvHLAdCqUkZeSs9Cg0OhAgNGjOOzp2+wy6F/zzKYAslUHizKMY
+         sJV3UeM14YqrbnIIDvHMWkcPf3E91PSEwJhMiZhEagQaNTGrAlaQzdzrXETZv4+ZDugb
+         cr7xmVXbIIkTWAg9YZiVFnd5P9GRRzZqHV+ipvJm52L34GRWZAhjPjsAqtF+VFNBxR1K
+         gqEg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716403447; x=1717008247;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=0R/H2ZxRgcTDKjoml22C7/U25tmAJzn0uDdpWw2qbq4=;
-        b=Q2m8P6uqNFfCMW7SRVJY0UBFYDySmeXGW4r28wpQEKgQjQybuoGkrNxy1Tm0oHQsgQ
-         jkBhMdnPTzU76Z9sDBXFdDFWQCX2n6SZJ5sXlavEGrleIurtzyVRxyvB5OcCo5NlTdVF
-         qJin7DQfJ97C8CiCYjUCxXhkbo51Z7ymF1NygWECM8kh8z4HVi9EwLKnEWlIFqwdCUA2
-         TZXqpWFhHqHHtHeM6Xwkwz9Vz9m4O6DvesEkuCPnF54NmB5+d/eVgSLKQP4uIJJo09AW
-         V00TXnf5CHSeiV8pS77byoTvoaqz7FSmX+VWkdWsEpG1QAGU8aN+PZeTolQfW/cwPOJG
-         gOVA==
-X-Gm-Message-State: AOJu0YyVcGmvu+QHEwa585sSQFv4M7zNkkjCZGrVBWr/AXMfTweopgve
-	sirGWG64s80NWRQg8GQywmRjeezrdCWnmQSzttpwC/DZdof3WgR8Gh7dOj40ujwSi82sRzp0wlE
-	pSbA1Kd/IIGc8EZRxVAEAphgARsruGw==
-X-Google-Smtp-Source: AGHT+IGl3KQ+NdDcgxeD+6m0e3AqB4gIiwbsDwEGuTJ6wRV6jseldJYhRIYT2bp4R0XGC3azM05qW+PfDwEEH4M3dGE=
-X-Received: by 2002:a2e:9c07:0:b0:2e5:15d0:511c with SMTP id
- 38308e7fff4ca-2e94969e177mr17656601fa.40.1716403446940; Wed, 22 May 2024
- 11:44:06 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1716410575; x=1717015375;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=GiTad0WkrpOGxdvwu/Vf6Dg3jk9yXPS+P/Wgz6N97X0=;
+        b=WcBANrskX21AENcle4f13QBQU29ys/HJzQOH6aqAnbSxFAO1q2SGZjyVyYm1Mr5v/3
+         /6zSnO4WRHW7reY9qZT/16pBlHx2l0LU6ZqfRboIlOqgxYS5mTFrxk6LIWvMP0Aoz1SW
+         fVaXfjxj87+pyeScNwY1jw/FEW5Mb2qukNGebs6J3lfPNpOFGms1dP8Cytg7CLFSp1Mj
+         tkW8sDP5PAZ9h7DfRzhBnTv/qxQfK3FphOtnWJMDtXGSnwGNBhPjE43vODIDPoigwn4/
+         isFgJ/IpIXjHt87U00X3ZxBbcjz5AimEX/sZy/46aO15eP0lCl4slObZEBvPD4sFHezM
+         QDcA==
+X-Gm-Message-State: AOJu0YyoshSlswpEipKQTLsHcE1KmpWtZtlvzzMombeGRK1rr9HyyIS0
+	w9SPKYB1PZEy0SIMOI+aKDRwrjxV30aTcbLNcoqFVwfzP+nJjhUj4gr9mQ==
+X-Google-Smtp-Source: AGHT+IGFLfJdLdFHHMjbfTXf0RNXOBV8lVw9CGWH0WWfVhonrYtB/boH+B2UeDPqztvwQoy0Bw5C6w==
+X-Received: by 2002:a05:6122:318e:b0:4df:31f2:a4d5 with SMTP id 71dfb90a1353d-4e2184e9739mr3094991e0c.4.1716410574515;
+        Wed, 22 May 2024 13:42:54 -0700 (PDT)
+Received: from lvondent-mobl4.. (syn-107-146-107-067.res.spectrum.com. [107.146.107.67])
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-4df7c050c57sm3749913e0c.36.2024.05.22.13.42.53
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 22 May 2024 13:42:53 -0700 (PDT)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ v2 1/2] doc: Add initial L2CAP(7) documentation
+Date: Wed, 22 May 2024 16:42:51 -0400
+Message-ID: <20240522204252.1891896-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.45.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240522064504.7560-1-quic_nakella@quicinc.com>
-In-Reply-To: <20240522064504.7560-1-quic_nakella@quicinc.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Wed, 22 May 2024 14:43:54 -0400
-Message-ID: <CABBYNZLX0PGEVEFhtWGiLdCN4gJTyg+mqSmRiq2y0sT--skjPQ@mail.gmail.com>
-Subject: Re: [PATCH v3] Adding Sepolicy rules to allow bluetoothctl and
- dbus-daemon to access unix stream sockets.
-To: Naga Bhavani Akella <quic_nakella@quicinc.com>
-Cc: linux-bluetooth@vger.kernel.org, quic_mohamull@quicinc.com, 
-	quic_hbandi@quicinc.com, quic_anubhavg@quicinc.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-Hi Naga,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Wed, May 22, 2024 at 2:46=E2=80=AFAM Naga Bhavani Akella
-<quic_nakella@quicinc.com> wrote:
->
-> Required for using acquire-notify, acquire-write options (Gatt Client)
-> and Sending notifications (Gatt Server)
->
-> Below are the avc denials that are fixed with this patch -
->
-> 1. audit: type=3D1400 audit(1651238006.276:496):
-> avc:  denied  { read write } for  pid=3D2165 comm=3D"bluetoothd"
-> path=3D"socket:[43207]" dev=3D"sockfs" ino=3D43207
-> scontext=3Dsystem_u:system_r:bluetooth_t:s0-s15:c0.c1023
-> tcontext=3Dsystem_u:system_r:initrc_t:s0-s15:c0.c1023
-> tclass=3Dunix_stream_socket permissive=3D1
-> 2. audit: type=3D1400 audit(1651238006.276:497):
-> avc:  denied  { getattr } for  pid=3D2165 comm=3D"bluetoothd"
-> path=3D"socket:[43207]" dev=3D"sockfs" ino=3D43207
-> scontext=3Dsystem_u:system_r:bluetooth_t:s0-s15:c0.c1023
-> tcontext=3Dsystem_u:system_r:initrc_t:s0-s15:c0.c1023
-> tclass=3Dunix_stream_socket permissive=3D1
-> 3. audit: type=3D1400 audit(1651238006.272:495):
-> avc:  denied  { read write } for  pid=3D689 comm=3D"dbus-daemon"
-> path=3D"socket:[43207]" dev=3D"sockfs" ino=3D43207
-> scontext=3Dsystem_u:system_r:system_dbusd_t:s0-s15:c0.c1023
-> tcontext=3Dsystem_u:system_r:initrc_t:s0-s15:c0.c1023
-> tclass=3Dunix_stream_socket permissive=3D1
-> 4. audit: type=3D1400 audit(315966559.395:444):
-> avc:  denied  { use } for  pid=3D710 comm=3D"dbus-daemon"
-> path=3D"socket:[13196]" dev=3D"sockfs" ino=3D13196
-> scontext=3Dsystem_u:system_r:system_dbusd_t:s0-s15:c0.c1023
-> tcontext=3Dsystem_u:system_r:bluetooth_t:s0-s15:c0.c1023
-> tclass=3Dfd permissive=3D0
-> 5. audit: type=3D1400 audit(315999854.939:523):
-> avc:  denied  { read write } for  pid=3D812 comm=3D"dbus-daemon"
-> path=3D"socket:[99469]" dev=3D"sockfs" ino=3D99469
-> scontext=3Dsystem_u:system_r:system_dbusd_t:s0-s15:c0.c1023
-> tcontext=3Dsystem_u:system_r:bluetooth_t:s0-s15:c0.c1023
-> tclass=3Dbluetooth_socket permissive=3D1
->
-> Signed-off-by: Naga Bhavani Akella <quic_nakella@quicinc.com>
-> ---
->  policy/modules/apps/pulseaudio.te    |  2 +-
->  policy/modules/services/bluetooth.if | 23 +++++++++++++++++++++++
->  policy/modules/services/dbus.te      |  2 +-
->  policy/modules/services/obex.te      |  2 +-
->  4 files changed, 26 insertions(+), 3 deletions(-)
+This adds initial documentation for L2CAP sockets.
+---
+ Makefile.am   |   7 ++
+ doc/l2cap.rst | 241 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 248 insertions(+)
+ create mode 100644 doc/l2cap.rst
 
-Where is this coming from? I don't think we even have a policy folder,
-and this might be an are where the distros want to have their own
-policies so I'm not sure if we shall have this upstream, or perhaps
-this is just for reference?
+diff --git a/Makefile.am b/Makefile.am
+index 05d02932f205..8aedbb20d0d8 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -348,6 +348,7 @@ CLEANFILES += $(builtin_files)
+ 
+ if MANPAGES
+ man_MANS += src/bluetoothd.8
++man_MANS += doc/l2cap.7
+ man_MANS += doc/org.bluez.Adapter.5 doc/org.bluez.Device.5 \
+ 		doc/org.bluez.DeviceSet.5 doc/org.bluez.AgentManager.5 \
+ 		doc/org.bluez.Agent.5 doc/org.bluez.ProfileManager.5 \
+@@ -380,6 +381,7 @@ man_MANS += doc/org.bluez.obex.Client.5 doc/org.bluez.obex.Session.5 \
+ 		doc/org.bluez.obex.AgentManager.5 doc/org.bluez.obex.Agent.5
+ endif
+ manual_pages += src/bluetoothd.8
++manual_pages += doc/l2cap.7
+ manual_pages += doc/org.bluez.Adapter.5 doc/org.bluez.Device.5 \
+ 		doc/org.bluez.DeviceSet.5 doc/org.bluez.AgentManager.5 \
+ 		doc/org.bluez.Agent.5 doc/org.bluez.ProfileManager.5 \
+@@ -457,6 +459,8 @@ EXTRA_DIST += doc/mgmt-api.txt \
+ 		doc/health-api.txt \
+ 		doc/sap-api.txt
+ 
++EXTRA_DIST += doc/l2cap.rst
++
+ EXTRA_DIST += doc/org.bluez.Adapter.rst doc/org.bluez.Device.rst \
+ 		doc/org.bluez.DeviceSet.rst doc/org.bluez.AgentManager.rst \
+ 		doc/org.bluez.Agent.rst doc/org.bluez.ProfileManager.rst \
+@@ -758,6 +762,9 @@ endif
+ %.5: %.rst Makefile
+ 	$(RST2MAN_PROCESS)
+ 
++%.7: %.rst Makefile
++	$(RST2MAN_PROCESS)
++
+ %.8: %.rst Makefile
+ 	$(RST2MAN_PROCESS)
+ 
+diff --git a/doc/l2cap.rst b/doc/l2cap.rst
+new file mode 100644
+index 000000000000..cad0c54f08a6
+--- /dev/null
++++ b/doc/l2cap.rst
+@@ -0,0 +1,241 @@
++=====
++l2cap
++=====
++
++--------------
++L2CAP protocol
++--------------
++
++:Version: BlueZ
++:Copyright: Free use of this software is granted under ther terms of the GNU
++            Lesser General Public Licenses (LGPL).
++:Date: May 2024
++:Manual section: 7
++:Manual group: Linux System Administration
++
++SYNOPSIS
++========
++
++.. code-block:: c
++
++    #include <sys/socket.h>
++    #include <bluetooth/bluetooth.h>
++    #include <bluetooth/l2cap.h>
++
++    l2cap_socket = socket(AF_BLUETOOTH, SOCK_SEQPACKET, BTPROTO_L2CAP);
++
++DESCRIPTION
++===========
++
++L2CAP is a protocol that provides an interface for higher-level protocols to
++send and receive data over a Bluetooth connection. L2CAP sits on top of the
++Bluetooth Host Controller Interface (HCI) and provides a set of channels that
++can be used by higher-level protocols to transmit data.
++
++L2CAP provides a number of services to higher-level protocols, including
++segmentation and reassembly of large data packets and flow control to prevent
++overloading of the receiver. L2CAP also supports multiple channels per
++connection, allowing for concurrent data transmission using different protocols.
++
++SOCKET ADDRESS
++==============
++
++.. code-block:: c
++
++    struct sockaddr_l2 {
++       sa_family_t	l2_family;
++       unsigned short	l2_psm;
++       bdaddr_t	l2_bdaddr;
++       unsigned short	l2_cid;
++       uint8_t		l2_bdaddr_type;
++    };
++
++SOCKET OPTIONS
++==============
++
++The socket options listed below can be set by using **setsockopt(2)** and read
++with **getsockopt(2)** with the socket level set to SOL_BLUETOOTH.
++
++BT_SECURITY (since Linux 2.6.30)
++--------------------------------
++
++Channel security level, possible values:
++
++.. csv-table::
++    :header: "Value", "Security Level", "Link Key Type", "Encryption"
++    :widths: auto
++
++    **BT_SECURITY_SDP**, 0 (SDP Only), None, Not required
++    **BT_SECURITY_LOW**, 1 (Low), Unauthenticated, Not required
++    **BT_SECURITY_MEDIUM**, 2 (Medium - default), Unauthenticated, Desired
++    **BT_SECURITY_HIGH**, 3 (High), Authenticated, Required
++    **BT_SECURITY_FIPS** (since Linux 3.15), 4 (Secure Only), Authenticated (P-256 based Secure Simple Pairing and Secure Authentication), Required
++
++Example:
++
++.. code-block:: c
++
++    int level = BT_SECURITY_HIGH;
++    int err = setsockopt(l2cap_socket, SOL_BLUETOOTH, BT_SECURITY, &level,
++			 sizeof(level));
++    if (err == -1) {
++        perror("setsockopt");
++        return 1;
++    }
++
++BT_DEFER_SETUP (since Linux 2.6.30)
++-----------------------------------
++
++Channel defer connection setup, this control if the connection procedure
++needs to be authorized by userspace before responding which allows
++authorization at profile level, possible values:
++
++.. csv-table::
++    :header: "Value", "Description"
++    :widths: auto
++
++    **0**, Disable (userspace authorization not required)
++    **1**, Enable (userspace authorization required)
++
++Example:
++
++.. code-block:: c
++
++    int defer_setup = 1;
++    int err = setsockopt(l2cap_socket, SOL_BLUETOOTH, BT_DEFER_SETUP,
++                         &defer_setup, sizeof(defer_setup));
++    if (err == -1) {
++        perror("setsockopt");
++        return err;
++    }
++
++    err = listen(l2cap_socket, 5);
++    if (err) {
++        perror("listen");
++        return err;
++    }
++
++    struct sockaddr_l2 remote_addr = {0};
++    socklen_t addr_len = sizeof(remote_addr);
++    int new_socket = accept(l2cap_socket, (struct sockaddr*)&remote_addr,
++                            &addr_len);
++    if (new_socket < 0) {
++        perror("accept");
++        return new_socket;
++    }
++
++    /* To complete the connection setup of new_socket read 1 byte */
++    char c;
++    struct pollfd pfd;
++
++    memset(&pfd, 0, sizeof(pfd));
++    pfd.fd = new_socket;
++    pfd.events = POLLOUT;
++
++    err = poll(&pfd, 1, 0);
++    if (err) {
++        perror("poll");
++        return err;
++    }
++
++    if (!(pfd.revents & POLLOUT)) {
++        err = read(sk, &c, 1);
++        if (err < 0) {
++            perror("read");
++            return err;
++        }
++    }
++
++BT_FLUSHABLE (since Linux 2.6.39)
++---------------------------------
++
++Channel flushable flag, this control if the channel data can be flushed or
++not, possible values:
++
++.. csv-table::
++    :header: "Define", "Value", "Description"
++    :widths: auto
++
++    **BT_FLUSHABLE_OFF**, 0x00, Do not flush data
++    **BT_FLUSHABLE_ON**, 0x01, Flush data
++
++BT_POWER (since Linux 3.1)
++--------------------------
++
++Channel power policy, this control if the channel shall force exit of sniff
++mode or not, possible values:
++
++.. csv-table::
++    :header: "Define", "Value", "Description"
++    :widths: auto
++
++    **BT_POWER_FORCE_ACTIVE_OFF**, 0x00, Don't force exit of sniff mode
++    **BT_POWER_FORCE_ACTIVE_ON**, 0x01, Force exit of sniff mode
++
++BT_CHANNEL_POLICY (since Linux 3.10)
++------------------------------------
++
++High-speed (AMP) channel policy, possible values:
++
++.. csv-table::
++    :header: "Define", "Value", "Description"
++    :widths: auto
++
++    **BT_CHANNEL_POLICY_BREDR_ONLY**, 0, BR/EDR only - default
++    **BT_CHANNEL_POLICY_BREDR_PREFERRED**, 1, BR/EDR Preferred
++    **BT_CHANNEL_POLICY_BREDR_PREFERRED**, 2, AMP Preferred
++
++BT_PHY (since Linux 5.10)
++-------------------------
++
++Channel supported PHY(s), possible values:
++
++.. csv-table::
++    :header: "Define", "Value", "Description"
++    :widths: auto
++
++    **BT_PHY_BR_1M_1SLOT**, BIT 0, BR 1Mbps 1SLOT
++    **BT_PHY_BR_1M_3SLOT**, BIT 1, BR 1Mbps 3SLOT
++    **BT_PHY_BR_1M_5SLOT**, BIT 2, BR 1Mbps 5SLOT
++    **BT_PHY_BR_2M_1SLOT**, BIT 3, EDR 2Mbps 1SLOT
++    **BT_PHY_BR_2M_3SLOT**, BIT 4, EDR 2Mbps 3SLOT
++    **BT_PHY_BR_2M_5SLOT**, BIT 5, EDR 2Mbps 5SLOT
++    **BT_PHY_BR_3M_1SLOT**, BIT 6, EDR 3Mbps 1SLOT
++    **BT_PHY_BR_3M_3SLOT**, BIT 7, EDR 3Mbps 3SLOT
++    **BT_PHY_BR_3M_5SLOT**, BIT 8, EDR 3Mbps 5SLOT
++    **BT_PHY_LE_1M_TX**, BIT 9, LE 1Mbps TX
++    **BT_PHY_LE_1M_RX**, BIT 10, LE 1Mbps RX
++    **BT_PHY_LE_2M_TX**, BIT 11, LE 2Mbps TX
++    **BT_PHY_LE_2M_RX**, BIT 12, LE 2Mbps RX
++    **BT_PHY_LE_CODED_TX**, BIT 13, LE Coded TX
++    **BT_PHY_LE_CODED_RX**, BIT 14, LE Coded RX
++
++BT_MODE (since Linux 5.10)
++--------------------------
++
++Channel Mode, possible values:
++
++.. csv-table::
++    :header: "Define", "Value", "Description"
++    :widths: auto
++
++    **BT_MODE_BASIC**, 0x00, Basic mode - default
++    **BT_MODE_ERTM**, 0x01, Enhanced Retransmission mode - BR/EDR only
++    **BT_MODE_STREAM**, 0x02, Stream mode - BR/EDR only
++    **BT_MODE_LE_FLOWCTL**, 0x03, Credit based flow control mode - LE only
++    **BT_MODE_EXT_FLOWCTL**, 0x04, Extended Credit based flow control mode
++
++RESOURCES
++=========
++
++http://www.bluez.org
++
++REPORTING BUGS
++==============
++
++linux-bluetooth@vger.kernel.org
++
++SEE ALSO
++========
++
++socket(7), l2test(1)
+-- 
+2.45.1
 
-> diff --git a/policy/modules/apps/pulseaudio.te b/policy/modules/apps/puls=
-eaudio.te
-> index 65b9a7428..42ed3a1d2 100644
-> --- a/policy/modules/apps/pulseaudio.te
-> +++ b/policy/modules/apps/pulseaudio.te
-> @@ -193,7 +193,7 @@ optional_policy(`
->  ')
->
->  optional_policy(`
-> -       bluetooth_stream_connect(pulseaudio_t)
-> +       bluetooth_use(pulseaudio_t)
->  ')
->
->  optional_policy(`
-> diff --git a/policy/modules/services/bluetooth.if b/policy/modules/servic=
-es/bluetooth.if
-> index c7e1c3f14..edead1fa1 100644
-> --- a/policy/modules/services/bluetooth.if
-> +++ b/policy/modules/services/bluetooth.if
-> @@ -85,6 +85,29 @@ interface(`bluetooth_stream_connect',`
->         stream_connect_pattern($1, bluetooth_runtime_t, bluetooth_runtime=
-_t, bluetooth_t)
->  ')
->
-> +#####################################
-> +## <summary>
-> +##     Connect to bluetooth over a unix domain
-> +##     stream socket.
-> +## </summary>
-> +## <param name=3D"domain">
-> +##     <summary>
-> +##     Domain allowed access.
-> +##     </summary>
-> +## </param>
-> +#
-> +interface(`bluetooth_use',`
-> +       gen_require(`
-> +               type bluetooth_t, bluetooth_runtime_t;
-> +       ')
-> +
-> +       files_search_runtime($1)
-> +       allow $1 bluetooth_t:bluetooth_socket rw_socket_perms;
-> +       allow $1 bluetooth_t:unix_stream_socket { connectto rw_socket_per=
-ms };
-> +       allow $1 bluetooth_t:fd use;
-> +       bluetooth_stream_connect($1);
-> +')
-> +
->  ########################################
->  ## <summary>
->  ##     Execute bluetooth in the bluetooth domain.
-> diff --git a/policy/modules/services/dbus.te b/policy/modules/services/db=
-us.te
-> index 2d1d09d71..855ce86bd 100644
-> --- a/policy/modules/services/dbus.te
-> +++ b/policy/modules/services/dbus.te
-> @@ -265,7 +265,7 @@ optional_policy(`
->  ')
->
->  optional_policy(`
-> -       bluetooth_stream_connect(system_dbusd_t)
-> +       bluetooth_use(system_dbusd_t)
->  ')
->
->  optional_policy(`
-> diff --git a/policy/modules/services/obex.te b/policy/modules/services/ob=
-ex.te
-> index 6686edb37..5e2f20578 100644
-> --- a/policy/modules/services/obex.te
-> +++ b/policy/modules/services/obex.te
-> @@ -31,7 +31,7 @@ miscfiles_read_localization(obex_t)
->  userdom_search_user_home_content(obex_t)
->
->  optional_policy(`
-> -       bluetooth_stream_connect(obex_t)
-> +       bluetooth_use(obex_t)
->  ')
->
->  optional_policy(`
-> --
->
-
-
---=20
-Luiz Augusto von Dentz
