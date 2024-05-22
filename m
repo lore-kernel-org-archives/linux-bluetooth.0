@@ -1,76 +1,80 @@
-Received: from mail-qk1-f180.google.com (mail-qk1-f180.google.com [209.85.222.180])
+Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40BA4146A91
-	for <linux-bluetooth@vger.kernel.org>; Wed, 22 May 2024 22:13:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0092842078
+	for <linux-bluetooth@vger.kernel.org>; Wed, 22 May 2024 22:19:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716416001; cv=none; b=ehUw19jvOG2dBhfdoc0GfS43WVaDODO7trejAs5pC8SldBg++UyTKnjPYmXTdgEjFjkoaB9R4c85WChPrnO0i4nvnicKLT+mW/DMLwtxkUh/YIyIJ2Bsdqy8xR4ulT3q/EI6n4yTn4OJOnhvn4rKSlkHLvUZPow5INOis9qSKzI=
+	t=1716416349; cv=none; b=Ukj4MfqGKG5Bo5nOIEnsP6e7F8fL6IrrofNKaq2HiHaue2TIVy19+i4EbUTrWrkYPpXWDxZfD/5X2OimMayvGTxms9S5Uvuw4OnxNWV9e5qNRa2HVQrI6xqXqHb8FOLMJnjEJHHOVqZwleHqQQDeBBXxIOxc4Ub4xV2+jtFSM40=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716416001; c=relaxed/simple;
-	bh=YOJPhPBNVLdaAo1qYLiUsZbTsEXU/hUCe/QbH6GPyik=;
-	h=MIME-Version:In-Reply-To:References:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=hsBylNW1OPyZmxYE/mqYC+06iEugombtL7LvIj26ksz2xsVAArYJ+S1EamMwYzJqJlzLDMuegMvoESSBbvw9SCfvP2doTU6+bpYorT8cX3yOucCWDZrt7ANhG39YKz7CxBnk3gO62tlZw5pPTKcvo5XAy5Bx9ytD2lLT0CUDKUY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=L5GcUjJr; arc=none smtp.client-ip=209.85.222.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+	s=arc-20240116; t=1716416349; c=relaxed/simple;
+	bh=swwro8lOZgvb3QDkxq4qjw5SkDE6YkcxR3UDNunhgjU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=msdj30tGe4ShPifo9zUk16j3ym5Lkbnjh/iSmhq8rfVAZdCSC2/1WOfWox66EponvTUTxCMGz2rr0l/gUSm8PGAOD6Q5zkr454jwQkb+RNrdwxyM5BiDtf971IPPXCd3xq8KK/o7iSxLaDTB/HKbRwYcVXQ8XlYeA0SAP/i7aS8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=vo1S0kIo; arc=none smtp.client-ip=209.85.208.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="L5GcUjJr"
-Received: by mail-qk1-f180.google.com with SMTP id af79cd13be357-792bd1f5b38so438684585a.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 22 May 2024 15:13:18 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vo1S0kIo"
+Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-5724736770cso1984a12.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 22 May 2024 15:19:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1716415998; x=1717020798; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:user-agent:from:references
-         :in-reply-to:mime-version:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=G0yw445eZNI0Ov1C5uvraWYm6H31vdS3UWaoIxWyhXI=;
-        b=L5GcUjJrFeUdcxV4ha764df4rDhFOP/Zyn5OCkKUO/K9ZFWN+7MjaRv94T6wEphgaP
-         /EeTtP5oeha0pfLS0niZ/sRO6SMgTwqrcATJhd9JyBq9rZmTJN5KbmE+RZFqIJKdD2zB
-         JX29Yryf828EdBbgp14K2zR6ln1cRK0PKP6KQ=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716415998; x=1717020798;
-        h=cc:to:subject:message-id:date:user-agent:from:references
-         :in-reply-to:mime-version:x-gm-message-state:from:to:cc:subject:date
+        d=google.com; s=20230601; t=1716416346; x=1717021146; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=G0yw445eZNI0Ov1C5uvraWYm6H31vdS3UWaoIxWyhXI=;
-        b=gshaBVTheoSut0QfcfMPzzjMBoNTpMunWWOex6pLBDWiYYZPyDIcOWillXbH5VS/iC
-         P4dkjWEQc2d+FMQtKQ8gkDMCsT/LK7vVYwygp/L8emv5s1FBZpMREy5iFSF5zHQT3p8V
-         QZ63QjZWOgRG/ZLV4H+XBg0NOeDS8vuIJP5a5xEx5Oje1mIKKvAam77HMgovWxPi3nfP
-         zyOlKFkiWWCniYSWhtFc6zMIhBN64EoY1Zy0o6WugFsa+s0DCca+YbgcjCN+E4q+XHfS
-         dD9wOHOZG2Rvd92qkkR0VaoWI7qMF9n+4ijee7rlEdO5R0kBhxadPo+2g+2CUiq/jd97
-         xfVQ==
-X-Forwarded-Encrypted: i=1; AJvYcCV5E6t5eG1XqG1VzqDimFDoF9Bt1QyxxdCYBZ+O5yRRsGvXYxY0yqVaQoB8IXRxD1xeKNEH/IYiHpzC5GRfBMDqWMxX8X5DeXgnbcNyCWmY
-X-Gm-Message-State: AOJu0Yw6Heu/j63+fDMiR1FAO+7T6UlSIZEvRmMbPTMK04iRT+TpZWil
-	Sm0QtOVo9Ac5zkAKjUH982oguG1TzivtxISSxiVlWAHdeAETfxhXJ6e30rUOCo5/ZmoXBImnM4D
-	8zsjOe/3nIxInFPr1yCU1kWVHH1VXfhHqdvCJ
-X-Google-Smtp-Source: AGHT+IGmjkCQXz+RTwsJXVyVlj1mN5OAUd57w+Ue3ubYg935P8+YuFTsLQDxZ8hiJZB/4tzj2HzSG+4eVqOwa3dZ3wg=
-X-Received: by 2002:a05:620a:5648:b0:792:d51f:2d38 with SMTP id
- af79cd13be357-794994d058cmr317259785a.77.1716415998216; Wed, 22 May 2024
- 15:13:18 -0700 (PDT)
-Received: from 753933720722 named unknown by gmailapi.google.com with
- HTTPREST; Wed, 22 May 2024 18:13:17 -0400
+        bh=dhrevzC6PfRPXcTVZKdgRT8gCvrtytd4Oo1yvznuYr8=;
+        b=vo1S0kIocnO+7JNu2yVpq6kFxVrRiUgn60vLk4EGZ7KsoUK7deRm7/CovIesjdW7Ig
+         LjIxAotbJmbn0rbsJgF5cTBJekhsl2CMkXFGa2iTW/RTqlb6UEcW6eJ55ITAADKNcNzq
+         c1T4Nvp65Po7+ddgPNbZARXgxT1Bm76xPKBSnusfhwz6ajMpw9zt8sBm6IWdkxILjvyu
+         D3RBYgWDvMft7QQh8JZf7o9o2LP2xrlClLKpHMjKbbwONyvqtVVkdUeCL4cT9IUfrGVd
+         gLMAeXMbcsNMWyn+B/gp2sbLwMnz2Gz5v+rbh62ubpxbo65BSSrhUwfXW291QQSfiadr
+         OJZg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1716416346; x=1717021146;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=dhrevzC6PfRPXcTVZKdgRT8gCvrtytd4Oo1yvznuYr8=;
+        b=FL9VfMbD7wtC73Viuy2Lj9MzSpOGiEi/c5yRUVRv0JE1dwvcQMD9AxB0Q7SiWp2H+x
+         IkU6Bh61CYRTZuz9fhVCKygSUUqBE0HDwCEFMbcXTTZia4FUHMcoq3V5+b9eorKxO6eV
+         W5ozE5U5MrRiBJNp8sXTdmJaheL050IJ/+wzf4HsKXFRLg3IEC6VAw0SRidRUKurktfp
+         7Reoy/jMGo1q8MuPyPqzastKxDkwByHAKFk+yitsPpqiEJKPz1W5tSvxZvsMXd6Amfn7
+         clZsPIQapoi9qoqEStOYrvBIRuiHWW9iNCJHVt46Zx/41JStSViHtkXqbRHbpZ81rBrn
+         TvbQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUk3LZnIxBT5ivKRzBaDhrym41pn6id3o7wdzyKpmh1CSa9kIGn1tYkbt72bppFbP///Rdx3bs6C5UEjVUuqtud+xPe0neId9eiFuFcD9be
+X-Gm-Message-State: AOJu0Yzo8HLX/xwaBqJTk6Z1XcO1kmmchA9+B3qZ0A5aRmrYEIKk/M0C
+	VESM0muM5MIzyeD3htFkTcI+KTll8Y5ld7PJ8NLvu8TtRPJwVZ/mizDoO2IDKHYje8WBlJEea/+
+	aMGS/u6zuGWn/ZKwwRKWp70OeHKlZZG28WMoN
+X-Google-Smtp-Source: AGHT+IF62mCggB+fp0Hi8G7QtAYVSXNBfMqCEAUF0DXMxHEcTp4ynDaEWTuM179DypO8UKzQBxEYxqqj04GQD38VKbA=
+X-Received: by 2002:a05:6402:3551:b0:572:e6fb:ab07 with SMTP id
+ 4fb4d7f45d1cf-57845a7c1b2mr12747a12.7.1716416346140; Wed, 22 May 2024
+ 15:19:06 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20240517170246.1.Ia769fe5fbeaa6aca2edfb01b82eb7df0c6955459@changeid>
 References: <20240517170246.1.Ia769fe5fbeaa6aca2edfb01b82eb7df0c6955459@changeid>
-From: Stephen Boyd <swboyd@chromium.org>
-User-Agent: alot/0.10
-Date: Wed, 22 May 2024 18:13:17 -0400
-Message-ID: <CAE-0n50=p-XvueHV9m9c_1H-XwsJgEMTNNi1OFi=aUzNC-s65g@mail.gmail.com>
+In-Reply-To: <20240517170246.1.Ia769fe5fbeaa6aca2edfb01b82eb7df0c6955459@changeid>
+From: Guenter Roeck <groeck@google.com>
+Date: Wed, 22 May 2024 15:18:52 -0700
+Message-ID: <CABXOdTdPM7b5uYGnQ3KbN+9AzKb=D1Pq-TZcftO1_z3efXjg9Q@mail.gmail.com>
 Subject: Re: [PATCH] Bluetooth: qca: If memdump doesn't work, re-enable IBS
-To: Douglas Anderson <dianders@chromium.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
-	Marcel Holtmann <marcel@holtmann.org>
-Cc: Guenter Roeck <groeck@chromium.org>, Johan Hovold <johan+linaro@kernel.org>, 
+To: Douglas Anderson <dianders@chromium.org>
+Cc: Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
+	Stephen Boyd <swboyd@chromium.org>, Guenter Roeck <groeck@chromium.org>, 
+	Johan Hovold <johan+linaro@kernel.org>, 
 	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>, 
 	Sai Teja Aluvala <quic_saluvala@quicinc.com>, linux-bluetooth@vger.kernel.org, 
 	linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Quoting Douglas Anderson (2024-05-17 17:02:46)
+On Fri, May 17, 2024 at 5:03=E2=80=AFPM Douglas Anderson <dianders@chromium=
+.org> wrote:
+>
 > On systems in the field, we are seeing this sometimes in the kernel logs:
 >   Bluetooth: qca_controller_memdump() hci0: hci_devcd_init Return:-95
 >
@@ -86,6 +90,34 @@ Quoting Douglas Anderson (2024-05-17 17:02:46)
 >
 > Fixes: 06d3fdfcdf5c ("Bluetooth: hci_qca: Add qcom devcoredump support")
 > Signed-off-by: Douglas Anderson <dianders@chromium.org>
-> ---
 
-Reviewed-by: Stephen Boyd <swboyd@chromium.org>
+Reviewed-by: Guenter Roeck <groeck@chromium.org>
+
+> ---
+> I'm nowhere near an expert on this code so please give extra eyes on
+> this patch. I also have no idea how to reproduce the problem nor even
+> how to trigger a memdump to test it. I'd love any advice that folks
+> could give. ;-)
+>
+>  drivers/bluetooth/hci_qca.c | 1 +
+>  1 file changed, 1 insertion(+)
+>
+> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+> index 0c9c9ee56592..1ef12f5a115d 100644
+> --- a/drivers/bluetooth/hci_qca.c
+> +++ b/drivers/bluetooth/hci_qca.c
+> @@ -1090,6 +1090,7 @@ static void qca_controller_memdump(struct work_stru=
+ct *work)
+>                                 qca->memdump_state =3D QCA_MEMDUMP_COLLEC=
+TED;
+>                                 cancel_delayed_work(&qca->ctrl_memdump_ti=
+meout);
+>                                 clear_bit(QCA_MEMDUMP_COLLECTION, &qca->f=
+lags);
+> +                               clear_bit(QCA_IBS_DISABLED, &qca->flags);
+>                                 mutex_unlock(&qca->hci_memdump_lock);
+>                                 return;
+>                         }
+> --
+> 2.45.0.rc1.225.g2a3ae87e7f-goog
+>
