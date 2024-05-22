@@ -1,324 +1,91 @@
-Received: from mail-vk1-f181.google.com (mail-vk1-f181.google.com [209.85.221.181])
+Received: from mail-qk1-f180.google.com (mail-qk1-f180.google.com [209.85.222.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52E39770EA
-	for <linux-bluetooth@vger.kernel.org>; Wed, 22 May 2024 20:42:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40BA4146A91
+	for <linux-bluetooth@vger.kernel.org>; Wed, 22 May 2024 22:13:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716410579; cv=none; b=ZtvW7HYdmUXlR6SBo8EgupLagRUyoRYgnd14a0c0bVDorIlb6qYVOdULAn6ImD63t5RXCjGz78Yu1WrNsA2FE+BYw1Q+EueB+67v3xC7wIan5QkhvUDlsY9Z1BUu4hRMAoZCTM4BSEmWFyIL0sUAtxVf39adXOC/rqDVzmnUiN4=
+	t=1716416001; cv=none; b=ehUw19jvOG2dBhfdoc0GfS43WVaDODO7trejAs5pC8SldBg++UyTKnjPYmXTdgEjFjkoaB9R4c85WChPrnO0i4nvnicKLT+mW/DMLwtxkUh/YIyIJ2Bsdqy8xR4ulT3q/EI6n4yTn4OJOnhvn4rKSlkHLvUZPow5INOis9qSKzI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716410579; c=relaxed/simple;
-	bh=17zB42KjqnDIMm2UmNpJ1oBOCEhVQimS2IrccfCAwCc=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Uw1dk+o8l8+YV4teMtqzfTeRJT/BWhcEUZ+zcZvGTFlwAiEgDueASTikFTMpZL5AqzhQabvw0Z7TK77gX5761A99u/y4zLxU6HoZqx1oj0Sik7gpKG4iyShlkfcW9qvrX1LqanEON6ksL5TC+H4868wI6kySyhc4AbSPgJas3pI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AA4ff4Ls; arc=none smtp.client-ip=209.85.221.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1716416001; c=relaxed/simple;
+	bh=YOJPhPBNVLdaAo1qYLiUsZbTsEXU/hUCe/QbH6GPyik=;
+	h=MIME-Version:In-Reply-To:References:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=hsBylNW1OPyZmxYE/mqYC+06iEugombtL7LvIj26ksz2xsVAArYJ+S1EamMwYzJqJlzLDMuegMvoESSBbvw9SCfvP2doTU6+bpYorT8cX3yOucCWDZrt7ANhG39YKz7CxBnk3gO62tlZw5pPTKcvo5XAy5Bx9ytD2lLT0CUDKUY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=L5GcUjJr; arc=none smtp.client-ip=209.85.222.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AA4ff4Ls"
-Received: by mail-vk1-f181.google.com with SMTP id 71dfb90a1353d-4e15ef06569so700706e0c.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 22 May 2024 13:42:58 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="L5GcUjJr"
+Received: by mail-qk1-f180.google.com with SMTP id af79cd13be357-792bd1f5b38so438684585a.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 22 May 2024 15:13:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1716410576; x=1717015376; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
+        d=chromium.org; s=google; t=1716415998; x=1717020798; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:user-agent:from:references
+         :in-reply-to:mime-version:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=Y3hjf6CRrFMxjq3B9ns7PbIfvbdpD9likKacRSDiYvk=;
-        b=AA4ff4Ls3AE0iRgzbChh8ujSfwiwhOdYvWkSg3gqguaTHv0/rRw0otNqjMy5JIns58
-         kTiUt8zTny8KtBH4M0nhkLtzH6aYJZRlNCLPAXaT+PTZYGaI05+T5WhvfXyYEngt3bZf
-         4jLJLSfhMbZOfyMp7hdgstg6GJK7MF7KTYTiaZK40EtEXt0IpEJWZXjTiq015dghwrDk
-         YRq+HgKJizCQvpZrA3hSDmIR/xqBERRY7v2YSxtBxe9y6PcClUYNXfC4dAudRjdN/x3p
-         ZisT5aeUFBraP7ryQReiW3aWOJyNrGw6L88bUlbxtdwmTWez5w0dMCq6rMI0f/iunKh8
-         ZfIw==
+        bh=G0yw445eZNI0Ov1C5uvraWYm6H31vdS3UWaoIxWyhXI=;
+        b=L5GcUjJrFeUdcxV4ha764df4rDhFOP/Zyn5OCkKUO/K9ZFWN+7MjaRv94T6wEphgaP
+         /EeTtP5oeha0pfLS0niZ/sRO6SMgTwqrcATJhd9JyBq9rZmTJN5KbmE+RZFqIJKdD2zB
+         JX29Yryf828EdBbgp14K2zR6ln1cRK0PKP6KQ=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716410576; x=1717015376;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Y3hjf6CRrFMxjq3B9ns7PbIfvbdpD9likKacRSDiYvk=;
-        b=Aww3LxkP6s3zxHWPJ5veUbIByE2/aquyq2v/2LG+wJX8l4m6S93M+JLNJuyznssvA6
-         gFmymsPrPF6ySOc0S0Da40nZJ4BTjKmYCvxcNluM73J+pcBPT25+9sgoiWGU9TWnYbC0
-         B0Du8pyELi14qATt/1BB9JhUjNt0am2BDfZzbkXzPlAmPyxVPHmunyAusw2FBR/hsf+j
-         w5jGWm7KnXWUIc9+6CwbnFTFbJMrjByTc1n+SWl40/wImubX8Tp8Gb9oV6lyTvmr3XpS
-         oE+edUUIVsPyUOFl6iZpUvKAyury2gbHzlziCxWKiWoleqybgLL42NzryE2FPhk2ZAUk
-         wyRw==
-X-Gm-Message-State: AOJu0YwZ8uYFQDsy7ZNJBOc6K613CEW4aUTB2InsPY4Xoa+BwXu+Ks9G
-	PTjpC5qECpQMmHkVtjxVFHFa3eKi55gJWNPdREDYcWJaRv4YL4iVlIui+Q==
-X-Google-Smtp-Source: AGHT+IFixKYzntuEKPgv2Z1wSf8ycI/h50+ijaHlgCHKK6g4c0dU/XtjzVYVNvpLi1j4N1qGLsPLpw==
-X-Received: by 2002:a05:6122:1078:b0:4da:ddb4:feca with SMTP id 71dfb90a1353d-4e4e4d30f9amr282385e0c.8.1716410576441;
-        Wed, 22 May 2024 13:42:56 -0700 (PDT)
-Received: from lvondent-mobl4.. (syn-107-146-107-067.res.spectrum.com. [107.146.107.67])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-4df7c050c57sm3749913e0c.36.2024.05.22.13.42.54
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 22 May 2024 13:42:54 -0700 (PDT)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v2 2/2] doc: Add initial RFCOMM(7) documentation
-Date: Wed, 22 May 2024 16:42:52 -0400
-Message-ID: <20240522204252.1891896-2-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.45.1
-In-Reply-To: <20240522204252.1891896-1-luiz.dentz@gmail.com>
-References: <20240522204252.1891896-1-luiz.dentz@gmail.com>
+        d=1e100.net; s=20230601; t=1716415998; x=1717020798;
+        h=cc:to:subject:message-id:date:user-agent:from:references
+         :in-reply-to:mime-version:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=G0yw445eZNI0Ov1C5uvraWYm6H31vdS3UWaoIxWyhXI=;
+        b=gshaBVTheoSut0QfcfMPzzjMBoNTpMunWWOex6pLBDWiYYZPyDIcOWillXbH5VS/iC
+         P4dkjWEQc2d+FMQtKQ8gkDMCsT/LK7vVYwygp/L8emv5s1FBZpMREy5iFSF5zHQT3p8V
+         QZ63QjZWOgRG/ZLV4H+XBg0NOeDS8vuIJP5a5xEx5Oje1mIKKvAam77HMgovWxPi3nfP
+         zyOlKFkiWWCniYSWhtFc6zMIhBN64EoY1Zy0o6WugFsa+s0DCca+YbgcjCN+E4q+XHfS
+         dD9wOHOZG2Rvd92qkkR0VaoWI7qMF9n+4ijee7rlEdO5R0kBhxadPo+2g+2CUiq/jd97
+         xfVQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV5E6t5eG1XqG1VzqDimFDoF9Bt1QyxxdCYBZ+O5yRRsGvXYxY0yqVaQoB8IXRxD1xeKNEH/IYiHpzC5GRfBMDqWMxX8X5DeXgnbcNyCWmY
+X-Gm-Message-State: AOJu0Yw6Heu/j63+fDMiR1FAO+7T6UlSIZEvRmMbPTMK04iRT+TpZWil
+	Sm0QtOVo9Ac5zkAKjUH982oguG1TzivtxISSxiVlWAHdeAETfxhXJ6e30rUOCo5/ZmoXBImnM4D
+	8zsjOe/3nIxInFPr1yCU1kWVHH1VXfhHqdvCJ
+X-Google-Smtp-Source: AGHT+IGmjkCQXz+RTwsJXVyVlj1mN5OAUd57w+Ue3ubYg935P8+YuFTsLQDxZ8hiJZB/4tzj2HzSG+4eVqOwa3dZ3wg=
+X-Received: by 2002:a05:620a:5648:b0:792:d51f:2d38 with SMTP id
+ af79cd13be357-794994d058cmr317259785a.77.1716415998216; Wed, 22 May 2024
+ 15:13:18 -0700 (PDT)
+Received: from 753933720722 named unknown by gmailapi.google.com with
+ HTTPREST; Wed, 22 May 2024 18:13:17 -0400
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20240517170246.1.Ia769fe5fbeaa6aca2edfb01b82eb7df0c6955459@changeid>
+References: <20240517170246.1.Ia769fe5fbeaa6aca2edfb01b82eb7df0c6955459@changeid>
+From: Stephen Boyd <swboyd@chromium.org>
+User-Agent: alot/0.10
+Date: Wed, 22 May 2024 18:13:17 -0400
+Message-ID: <CAE-0n50=p-XvueHV9m9c_1H-XwsJgEMTNNi1OFi=aUzNC-s65g@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: qca: If memdump doesn't work, re-enable IBS
+To: Douglas Anderson <dianders@chromium.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
+	Marcel Holtmann <marcel@holtmann.org>
+Cc: Guenter Roeck <groeck@chromium.org>, Johan Hovold <johan+linaro@kernel.org>, 
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>, 
+	Sai Teja Aluvala <quic_saluvala@quicinc.com>, linux-bluetooth@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Quoting Douglas Anderson (2024-05-17 17:02:46)
+> On systems in the field, we are seeing this sometimes in the kernel logs:
+>   Bluetooth: qca_controller_memdump() hci0: hci_devcd_init Return:-95
+>
+> This means that _something_ decided that it wanted to get a memdump
+> but then hci_devcd_init() returned -EOPNOTSUPP (AKA -95).
+>
+> The cleanup code in qca_controller_memdump() when we get back an error
+> from hci_devcd_init() undoes most things but forgets to clear
+> QCA_IBS_DISABLED. One side effect of this is that, during the next
+> suspend, qca_suspend() will always get a timeout.
+>
+> Let's fix it so that we clear the bit.
+>
+> Fixes: 06d3fdfcdf5c ("Bluetooth: hci_qca: Add qcom devcoredump support")
+> Signed-off-by: Douglas Anderson <dianders@chromium.org>
+> ---
 
-This adds initial documentation for RFCOMM sockets.
----
- Makefile.am    |   4 +-
- doc/rfcomm.rst | 214 +++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 216 insertions(+), 2 deletions(-)
- create mode 100644 doc/rfcomm.rst
-
-diff --git a/Makefile.am b/Makefile.am
-index 8aedbb20d0d8..8f5d2fb553b4 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -348,7 +348,7 @@ CLEANFILES += $(builtin_files)
- 
- if MANPAGES
- man_MANS += src/bluetoothd.8
--man_MANS += doc/l2cap.7
-+man_MANS += doc/l2cap.7 doc/rfcomm.7
- man_MANS += doc/org.bluez.Adapter.5 doc/org.bluez.Device.5 \
- 		doc/org.bluez.DeviceSet.5 doc/org.bluez.AgentManager.5 \
- 		doc/org.bluez.Agent.5 doc/org.bluez.ProfileManager.5 \
-@@ -381,7 +381,7 @@ man_MANS += doc/org.bluez.obex.Client.5 doc/org.bluez.obex.Session.5 \
- 		doc/org.bluez.obex.AgentManager.5 doc/org.bluez.obex.Agent.5
- endif
- manual_pages += src/bluetoothd.8
--manual_pages += doc/l2cap.7
-+manual_pages += doc/l2cap.7 doc/rfcomm.7
- manual_pages += doc/org.bluez.Adapter.5 doc/org.bluez.Device.5 \
- 		doc/org.bluez.DeviceSet.5 doc/org.bluez.AgentManager.5 \
- 		doc/org.bluez.Agent.5 doc/org.bluez.ProfileManager.5 \
-diff --git a/doc/rfcomm.rst b/doc/rfcomm.rst
-new file mode 100644
-index 000000000000..989d3c66dca9
---- /dev/null
-+++ b/doc/rfcomm.rst
-@@ -0,0 +1,214 @@
-+======
-+rfcomm
-+======
-+
-+---------------
-+RFCOMM protocol
-+---------------
-+
-+:Version: BlueZ
-+:Copyright: Free use of this software is granted under ther terms of the GNU
-+            Lesser General Public Licenses (LGPL).
-+:Date: May 2024
-+:Manual section: 7
-+:Manual group: Linux System Administration
-+
-+SYNOPSIS
-+========
-+
-+.. code-block:: c
-+
-+    #include <sys/socket.h>
-+    #include <bluetooth/bluetooth.h>
-+    #include <bluetooth/rfcomm.h>
-+
-+    rfcomm_socket = socket(AF_BLUETOOTH, SOCK_STREAM, BTPROTO_RFCOMM);
-+
-+DESCRIPTION
-+===========
-+
-+The RFCOMM protocol provides emulation of serial ports over the L2CAP(7)
-+protocol. The protocol is based on the ETSI standard TS 07.10.
-+
-+RFCOMM is a simple transport protocol, with additional provisions for emulating
-+the 9 circuits of RS-232 (EIATIA-232-E) serial ports.
-+
-+SOCKET ADDRESS
-+==============
-+
-+.. code-block:: c
-+
-+    struct sockaddr_rc {
-+        sa_family_t rc_family;
-+        unsigned short rc_bdaddr;
-+        unsigned char rc_channel;
-+    };
-+
-+SOCKET OPTIONS
-+==============
-+
-+The socket options listed below can be set by using **setsockopt(2)** and read
-+with **getsockopt(2)** with the socket level set to SOL_BLUETOOTH.
-+
-+BT_SECURITY (since Linux 2.6.30)
-+--------------------------------
-+
-+Channel security level, possible values:
-+
-+.. csv-table::
-+    :header: "Value", "Security Level", "Link Key Type", "Encryption"
-+    :widths: auto
-+
-+    **BT_SECURITY_SDP**, 0 (SDP Only), None, Not required
-+    **BT_SECURITY_LOW**, 1 (Low), Unauthenticated, Not required
-+    **BT_SECURITY_MEDIUM**, 2 (Medium - default), Unauthenticated, Desired
-+    **BT_SECURITY_HIGH**, 3 (High), Authenticated, Required
-+    **BT_SECURITY_FIPS** (since Linux 3.15), 4 (Secure Only), Authenticated (P-256 based Secure Simple Pairing and Secure Authentication), Required
-+
-+Example:
-+
-+.. code-block:: c
-+
-+    int level = BT_SECURITY_HIGH;
-+    int err = setsockopt(rfcomm_socket, SOL_BLUETOOTH, BT_SECURITY, &level,
-+			 sizeof(level));
-+    if (err == -1) {
-+        perror("setsockopt");
-+        return 1;
-+    }
-+
-+BT_DEFER_SETUP (since Linux 2.6.30)
-+-----------------------------------
-+
-+Channel defer connection setup, this control if the connection procedure
-+needs to be authorized by userspace before responding which allows
-+authorization at profile level, possible values:
-+
-+.. csv-table::
-+    :header: "Value", "Description"
-+    :widths: auto
-+
-+    **0**, Disable (userspace authorization not required)
-+    **1**, Enable (userspace authorization required)
-+
-+Example:
-+
-+.. code-block:: c
-+
-+    int defer_setup = 1;
-+    int err = setsockopt(rfcomm_socket, SOL_BLUETOOTH, BT_DEFER_SETUP,
-+                         &defer_setup, sizeof(defer_setup));
-+    if (err == -1) {
-+        perror("setsockopt");
-+        return err;
-+    }
-+
-+    err = listen(rfcomm_socket, 5);
-+    if (err) {
-+        perror("listen");
-+        return err;
-+    }
-+
-+    struct sockaddr_rc remote_addr = {0};
-+    socklen_t addr_len = sizeof(remote_addr);
-+    int new_socket = accept(rfcomm_socket, (struct sockaddr*)&remote_addr,
-+                            &addr_len);
-+    if (new_socket < 0) {
-+        perror("accept");
-+        return new_socket;
-+    }
-+
-+    /* To complete the connection setup of new_socket read 1 byte */
-+    char c;
-+    struct pollfd pfd;
-+
-+    memset(&pfd, 0, sizeof(pfd));
-+    pfd.fd = new_socket;
-+    pfd.events = POLLOUT;
-+
-+    err = poll(&pfd, 1, 0);
-+    if (err) {
-+        perror("poll");
-+        return err;
-+    }
-+
-+    if (!(pfd.revents & POLLOUT)) {
-+        err = read(sk, &c, 1);
-+        if (err < 0) {
-+            perror("read");
-+            return err;
-+        }
-+    }
-+
-+BT_FLUSHABLE (since Linux 2.6.39)
-+---------------------------------
-+
-+Channel flushable flag, this control if the channel data can be flushed or
-+not, possible values:
-+
-+.. csv-table::
-+    :header: "Define", "Value", "Description"
-+    :widths: auto
-+
-+    **BT_FLUSHABLE_OFF**, 0x00, Do not flush data
-+    **BT_FLUSHABLE_ON**, 0x01, Flush data
-+
-+BT_POWER (since Linux 3.1)
-+--------------------------
-+
-+Channel power policy, this control if the channel shall force exit of sniff
-+mode or not, possible values:
-+
-+.. csv-table::
-+    :header: "Define", "Value", "Description"
-+    :widths: auto
-+
-+    **BT_POWER_FORCE_ACTIVE_OFF**, 0x00, Don't force exit of sniff mode
-+    **BT_POWER_FORCE_ACTIVE_ON**, 0x01, Force exit of sniff mode
-+
-+BT_CHANNEL_POLICY (since Linux 3.10)
-+------------------------------------
-+
-+High-speed (AMP) channel policy, possible values:
-+
-+.. csv-table::
-+    :header: "Define", "Value", "Description"
-+    :widths: auto
-+
-+    **BT_CHANNEL_POLICY_BREDR_ONLY**, 0, BR/EDR only - default
-+    **BT_CHANNEL_POLICY_BREDR_PREFERRED**, 1, BR/EDR Preferred
-+    **BT_CHANNEL_POLICY_BREDR_PREFERRED**, 2, AMP Preferred
-+
-+BT_PHY (since Linux 5.10)
-+-------------------------
-+
-+Channel supported PHY(s), possible values:
-+
-+.. csv-table::
-+    :header: "Define", "Value", "Description"
-+    :widths: auto
-+
-+    **BT_PHY_BR_1M_1SLOT**, BIT 0, BR 1Mbps 1SLOT
-+    **BT_PHY_BR_1M_3SLOT**, BIT 1, BR 1Mbps 3SLOT
-+    **BT_PHY_BR_1M_5SLOT**, BIT 2, BR 1Mbps 5SLOT
-+    **BT_PHY_BR_2M_1SLOT**, BIT 3, EDR 2Mbps 1SLOT
-+    **BT_PHY_BR_2M_3SLOT**, BIT 4, EDR 2Mbps 3SLOT
-+    **BT_PHY_BR_2M_5SLOT**, BIT 5, EDR 2Mbps 5SLOT
-+    **BT_PHY_BR_3M_1SLOT**, BIT 6, EDR 3Mbps 1SLOT
-+    **BT_PHY_BR_3M_3SLOT**, BIT 7, EDR 3Mbps 3SLOT
-+    **BT_PHY_BR_3M_5SLOT**, BIT 8, EDR 3Mbps 5SLOT
-+
-+RESOURCES
-+=========
-+
-+http://www.bluez.org
-+
-+REPORTING BUGS
-+==============
-+
-+linux-bluetooth@vger.kernel.org
-+
-+SEE ALSO
-+========
-+
-+socket(7), rctest(1)
--- 
-2.45.1
-
+Reviewed-by: Stephen Boyd <swboyd@chromium.org>
