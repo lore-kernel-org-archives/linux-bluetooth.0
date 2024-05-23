@@ -1,75 +1,84 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-20.smtp.github.com (out-20.smtp.github.com [192.30.252.203])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15B7710A0A;
-	Thu, 23 May 2024 16:10:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E664017C8B
+	for <linux-bluetooth@vger.kernel.org>; Thu, 23 May 2024 16:40:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.203
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716480639; cv=none; b=Eow1QyDceBRArmVw3zG8WC75yuPb6FFFiWn5kVUW1HGgrp7PQY8TFQo/MGEaDxD/lTHwVPk1egF26gkcGAezlg2PiHOY6i2PJPzT6uqt5dDwtD580BkUFsFhYf8BbgIoBJO5PnA4cX32GVFUEuv3lAJQat8UYzNi3WVezNvqqzE=
+	t=1716482431; cv=none; b=Ug2hLQbMSaOt3sWjz92e8aG1IAARUcFYZF/y7DakwqZ4mxYObkwMAMFCmt6zzY6nMZ4R/rIbP7wPyJjjsTsJzH/GqrT+UQ+Ee8ZHEwPnGswXXeTYmyMJo5T9E+bUOPMBTLJw50LChibMriTpI2Nte6FrbrsDiJkUF5r9ogQAoF0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716480639; c=relaxed/simple;
-	bh=LUsu4+PX8HsFrCk8/Sb8NQm534d/KZ3eS2N0XqMdpHg=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=bh42irsx7ievWiPNj2xR/uKrKb7I1BSqLQ8PK8Zk6eADL162zIL4NHM7tiTgZkvE5d5ucvDuFZmzpyi13WD4qrpngttoRxsRuNn/xIidlEL5L4ZzHQSODLse232y6pg4ThbrLn8lr8OURF1WyiYpHuI2wxhSCZQOJH/YLo1RAUE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kXxfZkEG; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1716482431; c=relaxed/simple;
+	bh=AJy/NP1fc3SBaVCa5tbiMvIuwfNDvf43n4/6uh25mP0=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=tgsAGvXtsBaZ9pDZQmz3QrNkY4mMwmUPulHf1fRY0NesHKQ6VYHBOfuxmHpFqX/1Moqs9XX9AMqhbC88XX9hlKojk9+iGwdwCeSyawYbmj+9vRGeApVadp5Bq6Y4D/dM6hDnN4FJ8sfJX74FiAY/qOsPksgRMA94dY0xEj5gsJA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=AHYiqmS3; arc=none smtp.client-ip=192.30.252.203
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kXxfZkEG"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 9A757C32786;
-	Thu, 23 May 2024 16:10:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1716480638;
-	bh=LUsu4+PX8HsFrCk8/Sb8NQm534d/KZ3eS2N0XqMdpHg=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=kXxfZkEGLdXSFxnQMlsPxG+vWCa8FAGpZwnuwSq5WdcX005UEN93ymOePHzbBkpwT
-	 gFOVU2T0ZgBsLryd/ISd+JRTbX/WKFChGRE/ECpTkTKuLJ5VhtcO+aLe+msfTcaSwu
-	 wFMbCZ4Ysf6nd7fRXLQ25MWaCNoLs3Bgg4tyMLAHne2ArKkCDZnUMh/HqKpahx8llV
-	 qfIPqS+hCHyTaSulWh7aaGMFAx6qRqUID9zblBFMOWpCaFlR/uFXT5xfxfJZxMnl1o
-	 SYHDP8jiAKGMzXZuAg19ThakW1Pbvx9cDa+M6/mpJw/07Sj6RAUqFTsPQyIjr+mOpV
-	 dpQuOYqeaSk0A==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 88EB1C54BB3;
-	Thu, 23 May 2024 16:10:38 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="AHYiqmS3"
+Received: from github.com (hubbernetes-node-f60b2a7.va3-iad.github.net [10.48.206.47])
+	by smtp.github.com (Postfix) with ESMTPA id 0A83C8C075D
+	for <linux-bluetooth@vger.kernel.org>; Thu, 23 May 2024 09:40:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1716482429;
+	bh=Xrs4PSCXFuwViXe1SCILbRBNWgoVwx+6v1IkU4fWItk=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=AHYiqmS3yFb7389gaBOwkW/yDw6zv6H3J9qZFonhpQLlVpr0N3rAPYaa4/LMO6uW9
+	 WqruZC7xh8JlbhQicYwYwXTcf5DWRf4i0+8pSm5anOhpkl2zwFJi9BcQv6fC4xEYME
+	 Ko41L+kAy3EfMvFefilX4VEf040ub2uSbf+VB/s4=
+Date: Thu, 23 May 2024 09:40:29 -0700
+From: silviubarbulescu <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/master/6e51ac-758930@github.com>
+Subject: [bluez/bluez] 5da00f: shared/bap: Update BAP Broadcast Source state
+ machine
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] Bluetooth/nokia: Remove unused struct 'hci_nokia_radio_hdr'
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <171648063855.15817.12738258117203307401.git-patchwork-notify@kernel.org>
-Date: Thu, 23 May 2024 16:10:38 +0000
-References: <20240509001138.204427-1-linux@treblig.org>
-In-Reply-To: <20240509001138.204427-1-linux@treblig.org>
-To: Dr. David Alan Gilbert <linux@treblig.org>
-Cc: marcel@holtmann.org, luiz.dentz@gmail.com,
- linux-bluetooth@vger.kernel.org, sre@kernel.org, linux-kernel@vger.kernel.org
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-Hello:
+  Branch: refs/heads/master
+  Home:   https://github.com/bluez/bluez
+  Commit: 5da00f712989c9840c5adb538be2d4e14db0b523
+      https://github.com/bluez/bluez/commit/5da00f712989c9840c5adb538be2d4e14db0b523
+  Author: Silviu Florian Barbulescu <silviu.barbulescu@nxp.com>
+  Date:   2024-05-23 (Thu, 23 May 2024)
 
-This patch was applied to bluetooth/bluetooth-next.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+  Changed paths:
+    M src/shared/bap.c
+    M unit/test-bap.c
 
-On Thu,  9 May 2024 01:11:38 +0100 you wrote:
-> From: "Dr. David Alan Gilbert" <linux@treblig.org>
-> 
-> 'hci_nokia_radio_hdr' looks like it was unused since it's
-> initial commit.
-> 
-> Signed-off-by: Dr. David Alan Gilbert <linux@treblig.org>
-> 
-> [...]
+  Log Message:
+  -----------
+  shared/bap: Update BAP Broadcast Source state machine
 
-Here is the summary with links:
-  - Bluetooth/nokia: Remove unused struct 'hci_nokia_radio_hdr'
-    https://git.kernel.org/bluetooth/bluetooth-next/c/04e83604f585
+Update BAP Broadcast Source state machine states to use BAP define states
+ for source Idle, Config, Streaming, and an intermediary state enabling.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+Updated test-bap too.
 
 
+  Commit: 75893035705da57efd6f8a84bba77d596c463d34
+      https://github.com/bluez/bluez/commit/75893035705da57efd6f8a84bba77d596c463d34
+  Author: Silviu Florian Barbulescu <silviu.barbulescu@nxp.com>
+  Date:   2024-05-23 (Thu, 23 May 2024)
+
+  Changed paths:
+    M profiles/audio/bap.c
+
+  Log Message:
+  -----------
+  bap: Update BAP Broadcast Source state machine states
+
+Update BAP Broadcast Source state machine states
+
+
+Compare: https://github.com/bluez/bluez/compare/6e51acb0e846...75893035705d
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
