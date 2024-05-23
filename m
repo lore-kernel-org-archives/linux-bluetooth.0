@@ -1,66 +1,35 @@
-Received: from mail-lf1-f44.google.com (mail-lf1-f44.google.com [209.85.167.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8E6C15E81
-	for <linux-bluetooth@vger.kernel.org>; Thu, 23 May 2024 15:53:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15B7710A0A;
+	Thu, 23 May 2024 16:10:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716479600; cv=none; b=W4Onrs4u2GIcL/8DpZwL05d8sOCo89Y1zzkLGN6dlYlRoUiUL54YlKmfmr7X7EoW1LegGlNA4InWEh4X8Seeavsey57StRJID51IOlYGuA/iYQ1U2tzbizR9Be5nI/x1wczNuSphMZG8Zac1chP+F62JObxrCDCx199NWGQAPSQ=
+	t=1716480639; cv=none; b=Eow1QyDceBRArmVw3zG8WC75yuPb6FFFiWn5kVUW1HGgrp7PQY8TFQo/MGEaDxD/lTHwVPk1egF26gkcGAezlg2PiHOY6i2PJPzT6uqt5dDwtD580BkUFsFhYf8BbgIoBJO5PnA4cX32GVFUEuv3lAJQat8UYzNi3WVezNvqqzE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716479600; c=relaxed/simple;
-	bh=rT6OLdnBR/mk8EeKmF/bsQGed82UsuRd0DbD7NjpT9w=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Sm1E6g4g7LSW0107UGlExwI80m5/a/FDuGEz1u/oJ1vq59pBFm+nHpqWeLfkTxssKxVH0SynMmgPR9NDj0m122MDF/cOOv1G55tyHISWPt5glclhNvEmgPQ7NUkuRp9L8y+oLUx7+c+GXAPYdbODcYsld7e2pq2zhBM4tPab16c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=asymptotic.io; spf=pass smtp.mailfrom=asymptotic.io; dkim=pass (2048-bit key) header.d=asymptotic.io header.i=@asymptotic.io header.b=vQWvWr/1; arc=none smtp.client-ip=209.85.167.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=asymptotic.io
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=asymptotic.io
+	s=arc-20240116; t=1716480639; c=relaxed/simple;
+	bh=LUsu4+PX8HsFrCk8/Sb8NQm534d/KZ3eS2N0XqMdpHg=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=bh42irsx7ievWiPNj2xR/uKrKb7I1BSqLQ8PK8Zk6eADL162zIL4NHM7tiTgZkvE5d5ucvDuFZmzpyi13WD4qrpngttoRxsRuNn/xIidlEL5L4ZzHQSODLse232y6pg4ThbrLn8lr8OURF1WyiYpHuI2wxhSCZQOJH/YLo1RAUE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kXxfZkEG; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=asymptotic.io header.i=@asymptotic.io header.b="vQWvWr/1"
-Received: by mail-lf1-f44.google.com with SMTP id 2adb3069b0e04-51fdc9af005so11847887e87.3
-        for <linux-bluetooth@vger.kernel.org>; Thu, 23 May 2024 08:53:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=asymptotic.io; s=google; t=1716479596; x=1717084396; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=OJ1MCXegTloF+LteSI5RonTSHmIiXIbRQRSEkRpzFZw=;
-        b=vQWvWr/18OFIqurRi4cPAEyTzz8AMVakF+u+5XrUXMr0L4UE4bCtdUNPlXdRvqB387
-         R3X2FOJP1YWaw3DbYtmGc+R/zE9TqXzQhVQqPTcS/kwi3W6twOkdWZ2A/PTF9f0zJCkY
-         rT6PnANe6N0Jr14/lQcGvIOGOFVGayze/LMvx31j/BAhGdMnLvglXLFSxugQQG/Tspzq
-         mRw30hqKpotmA6/ufMj7hKh+M+GIVGFIOiQ1syER0XWxU21TXBMwS1MCtoUGUQ2Ygjui
-         LK0PTMuakaQbG3b7sQtSzas/bgEaUOWLCq1xLOepQ00YLifVcqbyC0WQxQU6C6IdJrpW
-         SEQg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716479596; x=1717084396;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=OJ1MCXegTloF+LteSI5RonTSHmIiXIbRQRSEkRpzFZw=;
-        b=jexMYEbOKODiZbWU/qx0diIgA4JTEwh9UwL0xH0W0QT7H6l3X3jJnqr6Boz/lz82UZ
-         BaR1pHf62HmoO7eOPDseYevX6V6R/WQpOmOHbyIGJBK5EFr+ZTnaALT7AQbq1S7koWJS
-         kZTqotbEXydPoXLaQ66l7K59HgEOlTPEDSvs1T8x3AGIta9GCk6H6iKKrx8+inL/7VDJ
-         xCoqOcsi+VZfbytVoIeWZKn/hSucoUkzi65dI4X5JVsgbUDX8VTzarDTtgJHOMb8UlNv
-         Pwc3IVrH1EIrW0o7T55yncp2v2g7eyOIoxQJgzC8OrPh/Z3F5D2xPkCuqvfOq39NX+i8
-         aDVA==
-X-Gm-Message-State: AOJu0YyIkceqPqiKCk4dCzCYj6FKx2Lb/FdXG2rN+vz6tSqBe38Bs4pu
-	CQ5YiyMBI2yuMJ25rEODYJxr9WkNH3+MhH6SY/EcCECKM8sDf6Kxx0HxwZn4sj6MeQEO7EBg2i0
-	S
-X-Google-Smtp-Source: AGHT+IFB+8uLu+smAqvJSjnRzbrW1ZDu2cnm30pbex5wkDLwCVtH7lXE8vgbzKGq4Ukw07TCoMmdSg==
-X-Received: by 2002:ac2:4433:0:b0:51d:9aa7:23e with SMTP id 2adb3069b0e04-526c1214499mr4047949e87.65.1716479596457;
-        Thu, 23 May 2024 08:53:16 -0700 (PDT)
-Received: from andromeda.llama-bortle.ts.net (bras-base-toroon0359w-grc-41-70-27-101-40.dsl.bell.ca. [70.27.101.40])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a5a1787c686sm1947600566b.47.2024.05.23.08.53.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 23 May 2024 08:53:16 -0700 (PDT)
-From: Arun Raghavan <arun@asymptotic.io>
-To: linux-bluetooth@vger.kernel.org
-Cc: Arun Raghavan <arun@asymptotic.io>
-Subject: [PATCH BlueZ,v8 5/5] gitignore: Add __pycache__
-Date: Thu, 23 May 2024 11:53:01 -0400
-Message-ID: <20240523155301.140522-6-arun@asymptotic.io>
-X-Mailer: git-send-email 2.45.1
-In-Reply-To: <20240523155301.140522-1-arun@asymptotic.io>
-References: <20240523155301.140522-1-arun@asymptotic.io>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kXxfZkEG"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 9A757C32786;
+	Thu, 23 May 2024 16:10:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1716480638;
+	bh=LUsu4+PX8HsFrCk8/Sb8NQm534d/KZ3eS2N0XqMdpHg=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=kXxfZkEGLdXSFxnQMlsPxG+vWCa8FAGpZwnuwSq5WdcX005UEN93ymOePHzbBkpwT
+	 gFOVU2T0ZgBsLryd/ISd+JRTbX/WKFChGRE/ECpTkTKuLJ5VhtcO+aLe+msfTcaSwu
+	 wFMbCZ4Ysf6nd7fRXLQ25MWaCNoLs3Bgg4tyMLAHne2ArKkCDZnUMh/HqKpahx8llV
+	 qfIPqS+hCHyTaSulWh7aaGMFAx6qRqUID9zblBFMOWpCaFlR/uFXT5xfxfJZxMnl1o
+	 SYHDP8jiAKGMzXZuAg19ThakW1Pbvx9cDa+M6/mpJw/07Sj6RAUqFTsPQyIjr+mOpV
+	 dpQuOYqeaSk0A==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 88EB1C54BB3;
+	Thu, 23 May 2024 16:10:38 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -68,23 +37,39 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH] Bluetooth/nokia: Remove unused struct 'hci_nokia_radio_hdr'
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <171648063855.15817.12738258117203307401.git-patchwork-notify@kernel.org>
+Date: Thu, 23 May 2024 16:10:38 +0000
+References: <20240509001138.204427-1-linux@treblig.org>
+In-Reply-To: <20240509001138.204427-1-linux@treblig.org>
+To: Dr. David Alan Gilbert <linux@treblig.org>
+Cc: marcel@holtmann.org, luiz.dentz@gmail.com,
+ linux-bluetooth@vger.kernel.org, sre@kernel.org, linux-kernel@vger.kernel.org
 
-These directories are created when running scripts in test/ in-tree, and
-can safely be ignored.
----
- .gitignore | 2 ++
- 1 file changed, 2 insertions(+)
+Hello:
 
-diff --git a/.gitignore b/.gitignore
-index 6a6422379..041a707af 100644
---- a/.gitignore
-+++ b/.gitignore
-@@ -187,3 +187,5 @@ compile_commands.json
- cscope.in.out
- cscope.out
- cscope.po.out
-+
-+**/__pycache__
+This patch was applied to bluetooth/bluetooth-next.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+
+On Thu,  9 May 2024 01:11:38 +0100 you wrote:
+> From: "Dr. David Alan Gilbert" <linux@treblig.org>
+> 
+> 'hci_nokia_radio_hdr' looks like it was unused since it's
+> initial commit.
+> 
+> Signed-off-by: Dr. David Alan Gilbert <linux@treblig.org>
+> 
+> [...]
+
+Here is the summary with links:
+  - Bluetooth/nokia: Remove unused struct 'hci_nokia_radio_hdr'
+    https://git.kernel.org/bluetooth/bluetooth-next/c/04e83604f585
+
+You are awesome, thank you!
 -- 
-2.45.1
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
