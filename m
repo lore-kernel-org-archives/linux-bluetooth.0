@@ -1,156 +1,98 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx.treblig.org (mx.treblig.org [46.235.229.95])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76AA56FA8
-	for <linux-bluetooth@vger.kernel.org>; Thu, 23 May 2024 14:54:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B27C9445;
+	Thu, 23 May 2024 15:08:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.229.95
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716476069; cv=none; b=MMVv01fC60BskTgqZvEOQycF3c063D4XRKV9iTrPdbk1eZjRySML5/L1k+OgsX73GTVlJlkvxnN1nQCeh5OqnbeD5yw3+17hNXMaYFQnPbhTcH2FoSw4H1QIlpvX1zGX7Pi2cKzljbjDdV9wmAdiQToNRWLWaP8E59WoW5WAFKM=
+	t=1716476915; cv=none; b=ldVmduZgWCmvExanhETo7WxJDvR5vGRCHXWdEEDnNOfRpgPd2Qt6CqNPxZH6bHZhDsSX/qA6VfR0hyUObaoF7nS0nUAi/EJNgNp7/1Td1NukSvdcp3IH0zrXHgSBov0ii1VeWPK5d5DVE1HBQ5gw55sqL8lpz3OiLV+/5uKU8oI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716476069; c=relaxed/simple;
-	bh=a+6kRVQPLE+lcsf8EHjdESEaI3NKdl2Dcv64aF619aY=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=Z6xGq/KfyQQjmLCPhlpt0sVV3lwFlo8iwP1+Z5mV3nxvdu8odcZqgUaoJQDBq+TP7xNCTeEj/BxMSQvjiT4ASIyHAMws+UFtyOasMufhDHYlIDRFoycIcLQpnKwizWR6h5u3xynuqFGPOrmOqkyA2gf/CitNqwypi2jitfBlsIw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uevEGYDC; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1716476915; c=relaxed/simple;
+	bh=IyIGy6VWgLqUXcFrF3VdTl+p4eBZcX4cd1pLlZhwBMs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=iJXzXR481c1YIJT8/0tDnakbo1wef7GYeFF5HdHQSDD9fn7ojmt+uBPyjFN1Tn7N5l7u1Rdm3DZIeDpwOqkobBvetb4Fb6Pl0zt9hAPVJ4KvXmmILnEGmswpxjmOkL1cvGa0kgVJjaXFX7YxXo5LGJHxOY2xaZvi7fKpv38yYfM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org; spf=pass smtp.mailfrom=treblig.org; dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b=kqPLEkRp; arc=none smtp.client-ip=46.235.229.95
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=treblig.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uevEGYDC"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id E9B7DC4AF08
-	for <linux-bluetooth@vger.kernel.org>; Thu, 23 May 2024 14:54:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1716476068;
-	bh=a+6kRVQPLE+lcsf8EHjdESEaI3NKdl2Dcv64aF619aY=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=uevEGYDC3oK8g3hL7h7MEvW59h6koqxyY6AGLU1mcbkAFZMfG1GIUKoCLEBZhut6+
-	 fW+zP8nIRV2lV99mrYEu4rjA4hJiU1zoOCK1WQ/wEBFZ63e6NhsQFr7mQtSBfFJte5
-	 hcu26ykORO5TlCjtkI0tk/Fzn8k1RRVlH9EAsAkg0f+JxAguuzWI64CGCHtjSoRtQn
-	 6aIfihyyvjkJ2Oc2hsYGT0d9IdcDOCEt2AN8+V0WAhuF+mZSRbIs6WJazNAchTkDo2
-	 do2CC5mU19uQi/THCpIxL/aDNR5I6/aqZZj3AwRc4blBf9+OFVBNBD4sSetod82Hvr
-	 YlVR1gm+tESNw==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id E0A93C53B7F; Thu, 23 May 2024 14:54:28 +0000 (UTC)
-From: bugzilla-daemon@kernel.org
-To: linux-bluetooth@vger.kernel.org
-Subject: [Bug 218416] hci0: command 0xfc05 tx timeout in kernel 6.7.1
-Date: Thu, 23 May 2024 14:54:28 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: nickolas@gupton.xyz
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P3
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-218416-62941-3XxMJ5vLuS@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-218416-62941@https.bugzilla.kernel.org/>
-References: <bug-218416-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+	dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b="kqPLEkRp"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=treblig.org
+	; s=bytemarkmx; h=Content-Type:MIME-Version:Message-ID:Subject:From:Date:From
+	:Subject; bh=mHuv9GVH4hRpVlLMKaOsNb8TFghnSs0MzQgBlppEn1w=; b=kqPLEkRpn+tKOFQF
+	1Wq7+EeCnSOeFPwy4a+K0GetzMeKVpn7MMu2+agkwzQXy2Gfa8CfGah8oyT2MX5yr/7CjFS2g9Hng
+	f3sCDljaKlEq2hOr6TF8McsLrWbaU1MESh21cijziSWs1eGRIjBTDOb2fJVqE3vYhkFkHt2xfJFz4
+	1xjRg1S1CyDNPMjCXFh8dCyu0/D8B8G4B/e4HNUGGZkeph2cn/byjBSojejDMIt1gIKCSoOzLQYp6
+	j643RJOiuT5/mHzV9UdkkUSO1tO5ucUyd7YvMjLP6CCVnuIZtnFjyhBZ7KPvEHUiSrWSkmHRxBHzW
+	6rMz7/j7qiz6tC3nmA==;
+Received: from dg by mx.treblig.org with local (Exim 4.96)
+	(envelope-from <dg@treblig.org>)
+	id 1sAA3P-002FKt-28;
+	Thu, 23 May 2024 15:08:27 +0000
+Date: Thu, 23 May 2024 15:08:27 +0000
+From: "Dr. David Alan Gilbert" <linux@treblig.org>
+To: marcel@holtmann.org, luiz.dentz@gmail.com
+Cc: linux-bluetooth@vger.kernel.org, sre@kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth/nokia: Remove unused struct
+ 'hci_nokia_radio_hdr'
+Message-ID: <Zk9b683tsQrDCjl0@gallifrey>
+References: <20240509001138.204427-1-linux@treblig.org>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20240509001138.204427-1-linux@treblig.org>
+X-Chocolate: 70 percent or better cocoa solids preferably
+X-Operating-System: Linux/6.1.0-21-amd64 (x86_64)
+X-Uptime: 15:07:45 up 15 days,  2:21,  1 user,  load average: 0.00, 0.00, 0.00
+User-Agent: Mutt/2.2.12 (2023-09-09)
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D218416
+* linux@treblig.org (linux@treblig.org) wrote:
+> From: "Dr. David Alan Gilbert" <linux@treblig.org>
+> 
+> 'hci_nokia_radio_hdr' looks like it was unused since it's
+> initial commit.
+> 
+> Signed-off-by: Dr. David Alan Gilbert <linux@treblig.org>
 
---- Comment #25 from Nickolas Gupton (nickolas@gupton.xyz) ---
-kernel: 6.9.1=20
-linux-firmware: 20240510
+Ping?
+I see a message from the bot asking for a change to the header
+which I think wants Bluetooth: nokia: ?
+(But then a load of segfaults in the test scripts).
 
-For me bluetooth still does not work on boot, the timeout error is no longer
-shown in the logs but without running that reset script the journal will ju=
-st
-endlessly repeat these messages and the bluetooth will never work. I think =
-the
-'fix' that was put in for this simply hid the issue from the logs and wasn't
-actually resolved.
+Anything else?
 
-$ lsusb | grep -i bluetooth
-Bus 001 Device 007: ID 8087:0029 Intel Corp. AX200 Bluetooth
+Dave
 
-$ journalctl --since 2024-05-22 | grep -E -i bluetooth
-May 23 07:21:03 andromeda kernel: Bluetooth: Core ver 2.22
-May 23 07:21:03 andromeda kernel: NET: Registered PF_BLUETOOTH protocol fam=
-ily
-May 23 07:21:03 andromeda kernel: Bluetooth: HCI device and connection mana=
-ger
-initialized
-May 23 07:21:03 andromeda kernel: Bluetooth: HCI socket layer initialized
-May 23 07:21:03 andromeda kernel: Bluetooth: L2CAP socket layer initialized
-May 23 07:21:03 andromeda kernel: Bluetooth: SCO socket layer initialized
-May 23 07:21:03 andromeda systemd[1]: Reached target Bluetooth Support.
-May 23 07:21:03 andromeda kernel: Bluetooth: hci0: Found device firmware:
-intel/ibt-20-1-3.sfi
-May 23 07:21:03 andromeda kernel: Bluetooth: hci0: Boot Address: 0x24800
-May 23 07:21:03 andromeda kernel: Bluetooth: hci0: Firmware Version: 132-3.=
-24
-May 23 07:21:03 andromeda kernel: Bluetooth: hci0: Firmware already loaded
-May 23 07:21:03 andromeda kernel: Bluetooth: hci0: HCI LE Coded PHY feature=
- bit
-is set, but its usage is not supported.
-May 23 07:21:03 andromeda NetworkManager[789]: <info>  [1716466863.8963] Lo=
-aded
-device plugin: NMBluezManager
-(/usr/lib/NetworkManager/1.46.0-2/libnm-device-plugin-bluetooth.so)
-May 23 07:24:04 andromeda kernel: Bluetooth: Core ver 2.22
-May 23 07:24:04 andromeda kernel: NET: Registered PF_BLUETOOTH protocol fam=
-ily
-May 23 07:24:04 andromeda kernel: Bluetooth: HCI device and connection mana=
-ger
-initialized
-May 23 07:24:04 andromeda kernel: Bluetooth: HCI socket layer initialized
-May 23 07:24:04 andromeda kernel: Bluetooth: L2CAP socket layer initialized
-May 23 07:24:04 andromeda kernel: Bluetooth: SCO socket layer initialized
-May 23 07:24:04 andromeda systemd[1]: Reached target Bluetooth Support.
-May 23 07:24:04 andromeda kernel: Bluetooth: hci0: Found device firmware:
-intel/ibt-20-1-3.sfi
-May 23 07:24:04 andromeda kernel: Bluetooth: hci0: Boot Address: 0x24800
-May 23 07:24:04 andromeda kernel: Bluetooth: hci0: Firmware Version: 132-3.=
-24
-May 23 07:24:04 andromeda kernel: Bluetooth: hci0: Firmware already loaded
-May 23 07:24:04 andromeda kernel: Bluetooth: hci0: HCI LE Coded PHY feature=
- bit
-is set, but its usage is not supported.
-May 23 07:24:05 andromeda NetworkManager[779]: <info>  [1716467045.0155] Lo=
-aded
-device plugin: NMBluezManager
-(/usr/lib/NetworkManager/1.46.0-2/libnm-device-plugin-bluetooth.so)
-May 23 07:28:33 andromeda kernel: Bluetooth: Core ver 2.22
-May 23 07:28:33 andromeda kernel: NET: Registered PF_BLUETOOTH protocol fam=
-ily
-May 23 07:28:33 andromeda kernel: Bluetooth: HCI device and connection mana=
-ger
-initialized
-May 23 07:28:33 andromeda kernel: Bluetooth: HCI socket layer initialized
-May 23 07:28:33 andromeda kernel: Bluetooth: L2CAP socket layer initialized
-May 23 07:28:33 andromeda kernel: Bluetooth: SCO socket layer initialized
-May 23 07:28:33 andromeda systemd[1]: Reached target Bluetooth Support.
-May 23 07:28:33 andromeda kernel: Bluetooth: hci0: Found device firmware:
-intel/ibt-20-1-3.sfi
-May 23 07:28:33 andromeda kernel: Bluetooth: hci0: Boot Address: 0x24800
-May 23 07:28:33 andromeda kernel: Bluetooth: hci0: Firmware Version: 132-3.=
-24
-May 23 07:28:33 andromeda kernel: Bluetooth: hci0: Firmware already loaded
-May 23 07:28:33 andromeda kernel: Bluetooth: hci0: HCI LE Coded PHY feature=
- bit
-is set, but its usage is not supported.
-May 23 07:28:33 andromeda NetworkManager[779]: <info>  [1716467313.7052] Lo=
-aded
-device plugin: NMBluezManager
-(/usr/lib/NetworkManager/1.46.0-2/libnm-device-plugin-bluetooth.so)
-
---=20
-You may reply to this email to add a comment.
-
-You are receiving this mail because:
-You are the assignee for the bug.=
+> ---
+>  drivers/bluetooth/hci_nokia.c | 5 -----
+>  1 file changed, 5 deletions(-)
+> 
+> diff --git a/drivers/bluetooth/hci_nokia.c b/drivers/bluetooth/hci_nokia.c
+> index 97da0b2bfd17e..62633d9ba7c43 100644
+> --- a/drivers/bluetooth/hci_nokia.c
+> +++ b/drivers/bluetooth/hci_nokia.c
+> @@ -116,11 +116,6 @@ struct hci_nokia_neg_evt {
+>  #define SETUP_BAUD_RATE		921600
+>  #define INIT_BAUD_RATE		120000
+>  
+> -struct hci_nokia_radio_hdr {
+> -	u8	evt;
+> -	u8	dlen;
+> -} __packed;
+> -
+>  struct nokia_bt_dev {
+>  	struct hci_uart hu;
+>  	struct serdev_device *serdev;
+> -- 
+> 2.45.0
+> 
+-- 
+ -----Open up your eyes, open up your mind, open up your code -------   
+/ Dr. David Alan Gilbert    |       Running GNU/Linux       | Happy  \ 
+\        dave @ treblig.org |                               | In Hex /
+ \ _________________________|_____ http://www.treblig.org   |_______/
