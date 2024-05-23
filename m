@@ -1,167 +1,115 @@
-Received: from mail-qt1-f181.google.com (mail-qt1-f181.google.com [209.85.160.181])
+Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AED646AF
-	for <linux-bluetooth@vger.kernel.org>; Thu, 23 May 2024 09:56:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7686E13D53F
+	for <linux-bluetooth@vger.kernel.org>; Thu, 23 May 2024 10:29:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716458177; cv=none; b=bZZAyohnZVGIicWbZAlqlAMVPpfd5TwlZ6lusAZLlTmD1sEsXjjys/MPzUgbfADdGK3RawgbKb+mznLH2CZGJp0+aiI0Ymv3XzlPrzympjOKGrfjeQeDsZiNc2N7l88miQcgZIV/JLaXJ4kZ6aJTeah0EHnXhIbB46lP3q65Q3U=
+	t=1716460180; cv=none; b=rPpU9x4DwpaO5t1NbfP+am1J+RDRxL2O0dPPIDuq8HmmnUVnc7d9Mj78kKAaggOJrhaCSzH39gy09TRpYxEVWB4NQwGBHNgszuwL5jtYDXeKiCzrTbRY/+rgIf6lxCH97ZCeZkBi7OQS5JBJccBeEs25tch26K/vseR1tIfQWJs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716458177; c=relaxed/simple;
-	bh=sJUzu7fnVWkXhY+LWRBA0fmf4kI07m1H+vWpdtZQAPA=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=XDB4lrLoNod9Oh8VYohU8aMeY9mYVvR1M0uZHYDPU0TKMCwyhFkg+WFY8yK72Ddq68Z3gPRNPGMj0dvesQVwexbG5PC6EHvx+FQe4peWnd1k9zENnwOKFhcyJjGD40htxTc9h3pau6Zz1EoAgTPWtuo+vQVKiSjNXSLHlDZX8CM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LZeKpNIV; arc=none smtp.client-ip=209.85.160.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1716460180; c=relaxed/simple;
+	bh=iLWPpyxQuPztOV1Z+9KtAWWTY9dB8zIxRFpeTj9k5Io=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=YApQTzhO8oRCCgxlJbJ/Z/9B4+0dXmx+axBVf/h+mjZxXEXr7Ze6nneRldKIyd2B5Rk+sTy4fI7RLntA0ct8CoQQeIhPfXX4BS1DiDYoMt4QWDE9Yu8CK4sN/b3M6VL9g4eto0BjgengQStU1mdayXAqqYIkYLy08AlPV3VFKxY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=asymptotic.io; spf=pass smtp.mailfrom=asymptotic.io; dkim=pass (2048-bit key) header.d=asymptotic.io header.i=@asymptotic.io header.b=FTpddFmj; arc=none smtp.client-ip=209.85.218.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=asymptotic.io
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=asymptotic.io
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LZeKpNIV"
-Received: by mail-qt1-f181.google.com with SMTP id d75a77b69052e-43e1e98aaf0so11923131cf.2
-        for <linux-bluetooth@vger.kernel.org>; Thu, 23 May 2024 02:56:15 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=asymptotic.io header.i=@asymptotic.io header.b="FTpddFmj"
+Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-a5a5cce2ce6so997725866b.3
+        for <linux-bluetooth@vger.kernel.org>; Thu, 23 May 2024 03:29:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1716458175; x=1717062975; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=YBdyG8Ai396+4/E5MAJNhf1rtn7ALm6P+RycpIsKRKg=;
-        b=LZeKpNIVf4d8q1ucJV3s4K7XCjSU3zzF/zFpZsNIX6GZZa82yL1OM+9jgl/GC04qEy
-         QWNuUiel3jbXhhypPj5pvnys3FibIS4jEqhUDxmclU4ZSm/tZiW0iNthUWwE1NIY4FCV
-         KlzFN3gGjZvMyVJR5Yhug5zKmQfpDYvU7/zdZrUtbBPFrRNc+UHn2wqNY6F8jLgJ7hvW
-         wbMWWGlRJ4QsFllzPa1irr858mNQO2mPW1YKg0wXsBGzQXOccJ9+0lZ4XlmtQmn6Kd31
-         cJPtDbg35OryECBP58kU+51lQIVGCFJUCyOpdQAlTApqUwuTUZ+aEEe9+JnZNaFvxcre
-         WwwQ==
+        d=asymptotic.io; s=google; t=1716460176; x=1717064976; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=HVSQrTLcsvbXnGxzSAg0UCOImPQiFASqfgWH5lchEZU=;
+        b=FTpddFmjJNri4pqBVYe+7a1K0tRFAtNuXesWxMTYQPbc+sD/SXfVnSoKdzz6CNtslP
+         21nlWGHPZVNRtZ7kQBOw9BztHzSU/MQmUJZ5LaJB6wUwNOQAQ9qClcYcQHytxsRGcjMy
+         6IJTFsfAAIwO+3wrVyh96oaufVtskcrbknFoPatux/YODSH1Sb2RSk2m9lu92do2jpPt
+         XdeWAGn3MPaM/iDVILdAtA53kINN1ccJM5k/y6eMhUsynW9aewqSStMEAx9/LXt1vr8/
+         okvnqEmgyvYQ0RW7FjHe+DlWB6BZgarPHhh3/VHjAMB3Bub04SqovyMMFMOzUrX8aFRI
+         VZ/A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716458175; x=1717062975;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20230601; t=1716460176; x=1717064976;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=YBdyG8Ai396+4/E5MAJNhf1rtn7ALm6P+RycpIsKRKg=;
-        b=YY+H2C5VbL5bUcJ08BxoJy2LP3rIJPk3W4Le5vE+r/8+P9Zrgiy2x5KZ885zsgnl9c
-         d8/pG/cfMRW3+OHMs3pnF2z6bmL7VeWig/NmXPXT7XTx+7YsBsk1OR0thFrkXkn48Ow8
-         SVjw5/dpM4dUqRAFNLhc6aU2w9+Y2PE180oyOdpps+g+cUXKRMAwruiyhOO72KODINc0
-         xeEdzz7Axd1k39HQsOzW9LNRETKNnXoC9CEp7xv42FPwOaaKk+Bv91buOXFHinGY3k5a
-         X7Tev1u7f3UQbOG9Vl88ChDNPXQ7ruodzfaRGHUzoDhnnKrqA8UvKpxTVp25VI/fy+GH
-         VhdQ==
-X-Gm-Message-State: AOJu0Yykc9Pe+kyBahPRrZFXFqNKOYRP+nI0pS1AG6lwTVUrtMqgQVx3
-	3oRaDhZllMl8K8UgivbriEC+1IkMVLymfwuSZj8fwiTuVXn6LXlgJUI1Aw==
-X-Google-Smtp-Source: AGHT+IHKMfynIKiU9yecPzVvCtgaMEjFHGCZuOtBMY3cRK55U9ChtHyjWSmGK0qF6xqi0MmqcX1kJg==
-X-Received: by 2002:a05:622a:560e:b0:43f:a025:d278 with SMTP id d75a77b69052e-43fa025d3b9mr32437211cf.3.1716458174828;
-        Thu, 23 May 2024 02:56:14 -0700 (PDT)
-Received: from [172.17.0.2] ([172.183.112.123])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-43e137a737asm145511131cf.4.2024.05.23.02.56.14
+        bh=HVSQrTLcsvbXnGxzSAg0UCOImPQiFASqfgWH5lchEZU=;
+        b=MKYCG6S1w1KCgB7eNjo4M7E3RLmkVkAoAhZlOQ/vz+17sPGi3mEYb4ZeZjiVOy4V7p
+         Nplp9ENm7gUb9NbbnBMkIhB3MQWn2kfYPOHGXDTJwVMSmZmIrf5C66xdHdaauVsqFJT0
+         PfbhVAmh9aqN3/H+ITtEMcu5pu/MI5uc2d740DN2ydT+WONOjFmnZ28jXYPcC6YptpbW
+         L8LRpU6eviY7liT3AhBOjlxe+fmfhKpXYxJ+naGnr2Rsd9Mpb/T/4lkmwOdXvDXEPsSi
+         BBOkFv/kQdpaa1746633sGFCIdXJRYOQVXlTO6DxNTjYlIYYQrtIUkE0XT/wA2T7naU+
+         ASxg==
+X-Gm-Message-State: AOJu0YyySqwaZPnFHwz1hDkw84ccj8FxcEQIKG0jtOXgwXw74e3GN9zA
+	wjau3fAXstK9imlGNxUVLFCBLIEnXFqvJ/OV/+6U66VhmS8KfGM2Vxg6Y8uR1/VV1716gNv6xFE
+	E
+X-Google-Smtp-Source: AGHT+IFTNAKxifm0BeLdLpWVvs9Ju4oodvephnAuaNF7XKNi/laJGfBGwlpdEOmbbLANag/eXf22RQ==
+X-Received: by 2002:a17:906:b202:b0:a59:c23d:85d2 with SMTP id a640c23a62f3a-a622814319bmr265991166b.55.1716460175703;
+        Thu, 23 May 2024 03:29:35 -0700 (PDT)
+Received: from andromeda.llama-bortle.ts.net (bras-base-toroon0359w-grc-41-70-27-101-40.dsl.bell.ca. [70.27.101.40])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a5a50365669sm1673515666b.193.2024.05.23.03.29.34
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 23 May 2024 02:56:14 -0700 (PDT)
-Message-ID: <664f12be.050a0220.b6cbd.0558@mx.google.com>
-Date: Thu, 23 May 2024 02:56:14 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============6149310406169246711=="
+        Thu, 23 May 2024 03:29:35 -0700 (PDT)
+From: Arun Raghavan <arun@asymptotic.io>
+To: linux-bluetooth@vger.kernel.org
+Cc: Arun Raghavan <arun@asymptotic.io>
+Subject: [PATCH BlueZ,v7 0/6] ASHA plugin
+Date: Thu, 23 May 2024 06:29:23 -0400
+Message-ID: <20240523102929.37761-1-arun@asymptotic.io>
+X-Mailer: git-send-email 2.45.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, jiangyunshui@kylinos.cn
-Subject: RE: Bluetooth: 6lowpan: use DEV_STAT_INC() to avoid races
-In-Reply-To: <20240523091850.1117138-1-jiangyunshui@kylinos.cn>
-References: <20240523091850.1117138-1-jiangyunshui@kylinos.cn>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 
---===============6149310406169246711==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hello again,
+This is v7 of the ASHA plugin patchset:
 
-This is automated email and please do not reply to this email!
+  * src/shared code does not depend on any device/adapter bits, as
+    requested. The fd connection code is still in there, but it's
+    factored out into a separate step, so the caller can mock the fd
+    setup if needed.
+  * We've had testing by folks with various devices, which is great!
+    Some minor bug fixes and additional logging as a result
+  * The plugin now claims the GATT service, to avoid contention
+  * Added an additional patch to use the new connection parameters API,
+    avoids the need to change main.conf to make things work (has a
+    kernel dependency[1])
 
-Dear submitter,
+[1] https://github.com/bluez/bluetooth-next/commit/831be422f3bbe9a766e110ec018e7fb29af060c6
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=855260
+Cheers,
+Arun
 
----Test result---
+Arun Raghavan (6):
+  src/shared: Add initial implementation for an ASHA profile
+  profiles/audio: Add an ASHA plugin
+  test: Add a script to test ASHA
+  gitignore: Add compile_commands.json
+  gitignore: Add __pycache__
+  profiles/asha: Use new btd connection parameters API
 
-Test Summary:
-CheckPatch                    FAIL      0.93 seconds
-GitLint                       PASS      0.28 seconds
-SubjectPrefix                 PASS      0.10 seconds
-BuildKernel                   PASS      31.29 seconds
-CheckAllWarning               PASS      33.02 seconds
-CheckSparse                   PASS      38.08 seconds
-CheckSmatch                   FAIL      36.41 seconds
-BuildKernel32                 PASS      28.85 seconds
-TestRunnerSetup               PASS      526.91 seconds
-TestRunner_l2cap-tester       PASS      20.60 seconds
-TestRunner_iso-tester         FAIL      34.63 seconds
-TestRunner_bnep-tester        PASS      4.87 seconds
-TestRunner_mgmt-tester        PASS      111.28 seconds
-TestRunner_rfcomm-tester      PASS      7.45 seconds
-TestRunner_sco-tester         PASS      15.46 seconds
-TestRunner_ioctl-tester       PASS      7.85 seconds
-TestRunner_mesh-tester        PASS      5.90 seconds
-TestRunner_smp-tester         PASS      6.91 seconds
-TestRunner_userchan-tester    PASS      5.10 seconds
-IncrementalBuild              PASS      27.95 seconds
+ .gitignore                 |   3 +
+ Makefile.am                |   3 +-
+ Makefile.plugins           |   5 +
+ configure.ac               |   4 +
+ lib/uuid.h                 |   3 +
+ profiles/audio/asha.c      | 347 ++++++++++++++++++++++++++
+ profiles/audio/media.c     |  30 +++
+ profiles/audio/media.h     |   2 +
+ profiles/audio/transport.c | 204 ++++++++++++++-
+ src/shared/asha.c          | 497 +++++++++++++++++++++++++++++++++++++
+ src/shared/asha.h          |  75 ++++++
+ test/simple-asha           | 166 +++++++++++++
+ 12 files changed, 1336 insertions(+), 3 deletions(-)
+ create mode 100644 profiles/audio/asha.c
+ create mode 100644 src/shared/asha.c
+ create mode 100644 src/shared/asha.h
+ create mode 100755 test/simple-asha
 
-Details
-##############################
-Test: CheckPatch - FAIL
-Desc: Run checkpatch.pl script
-Output:
-Bluetooth: 6lowpan: use DEV_STAT_INC() to avoid races
-WARNING: Reported-by: should be immediately followed by Closes: with a URL to the report
-#80: 
-Reported-by: syzbot <syzkaller@googlegroups.com>
-Signed-off-by: yunshui <jiangyunshui@kylinos.cn>
+-- 
+2.45.1
 
-total: 0 errors, 1 warnings, 0 checks, 45 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/src/13671513.patch has style problems, please review.
-
-NOTE: Ignored message types: UNKNOWN_COMMIT_ID
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-##############################
-Test: CheckSmatch - FAIL
-Desc: Run smatch tool with source
-Output:
-
-Segmentation fault (core dumped)
-make[4]: *** [scripts/Makefile.build:244: net/bluetooth/hci_core.o] Error 139
-make[4]: *** Deleting file 'net/bluetooth/hci_core.o'
-make[3]: *** [scripts/Makefile.build:485: net/bluetooth] Error 2
-make[2]: *** [scripts/Makefile.build:485: net] Error 2
-make[2]: *** Waiting for unfinished jobs....
-Segmentation fault (core dumped)
-make[4]: *** [scripts/Makefile.build:244: drivers/bluetooth/bcm203x.o] Error 139
-make[4]: *** Deleting file 'drivers/bluetooth/bcm203x.o'
-make[4]: *** Waiting for unfinished jobs....
-Segmentation fault (core dumped)
-make[4]: *** [scripts/Makefile.build:244: drivers/bluetooth/bpa10x.o] Error 139
-make[4]: *** Deleting file 'drivers/bluetooth/bpa10x.o'
-make[3]: *** [scripts/Makefile.build:485: drivers/bluetooth] Error 2
-make[2]: *** [scripts/Makefile.build:485: drivers] Error 2
-make[1]: *** [/github/workspace/src/src/Makefile:1919: .] Error 2
-make: *** [Makefile:240: __sub-make] Error 2
-##############################
-Test: TestRunner_iso-tester - FAIL
-Desc: Run iso-tester with test-runner
-Output:
-Total: 122, Passed: 117 (95.9%), Failed: 1, Not Run: 4
-
-Failed Test Cases
-ISO Connect Suspend - Success                        Failed       4.164 seconds
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============6149310406169246711==--
