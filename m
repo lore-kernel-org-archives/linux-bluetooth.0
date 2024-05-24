@@ -1,75 +1,93 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 486B139ADB;
-	Fri, 24 May 2024 20:00:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26A122C6BD
+	for <linux-bluetooth@vger.kernel.org>; Fri, 24 May 2024 20:41:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716580830; cv=none; b=WvVRH5mMMaq2PtIMbFkyh3cZC1VU09ZLgz07JNgCImM9S8PvlsAojqLiQl+N71hCdHvE74bfgQy5FDDLjCwekh144zw1RV6tQikT2p26W2qknS/cvQzfaXijzVSGR2ItEw0FoQ3Za1IXyryrgRfyaJN3pX0HUTyL9mdKslXL3XY=
+	t=1716583275; cv=none; b=dE4ILdTANwr2OILLZFHV1a6+BJSYSmBxMl2FwQxrcVUgD8Owa3Xa/lzwqonoNN0/mf4QV3VISfCYPlGpr0C7nDVyFu4ekBSj+Qh2fsm1x6Gde8sdK+UCQQ6Zw2EnqVSb5/tphIoRfo42mcKbX4AN6T5r+ijvtRlqa5sMYFPtLZ8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716580830; c=relaxed/simple;
-	bh=pyAGi8octoMcFhKKOiNrCFOsbeRCbTUlZAwIwrRUJx0=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=b2jhjEvsUBrVVbz5ftfOZqV05sHlitKmu0GZTMKxJzyVXey5Lg3oQ8GCn8YHR7Fv7sFPPileCRHwrhgHglYlKR6pBKQt7Wlf0mC2sb09ooE5koBVU/4VuM+9ubHVB9tzse0ovqlP4xje8voTTOJ611e8RCy+XjkigTHEvRecLys=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=T1MAEQ6B; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1716583275; c=relaxed/simple;
+	bh=Oudv07xyRxoqP6G9Bxo5k57Ubkl2biHF0F+hC6wpZ48=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=BV+JNywoxyhL2ZUj/bJU6xJeZutO7sxL0aqSqYDj4Q7klMvjJZsJ9n+bKcDkrRx8LKuwO2QUXeyLsMYPlgIFPJ1C5WJ6MfpIw+7oYzxhEg8LEk2uWJ+JVUnrOUBPX1HYA5mcwjtiLhcF+f0CxRMJG4vRbU1gZasHA92USJ5CAN8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=P/iyriqH; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="T1MAEQ6B"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id DD8D2C2BBFC;
-	Fri, 24 May 2024 20:00:29 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="P/iyriqH"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 96B32C4AF08
+	for <linux-bluetooth@vger.kernel.org>; Fri, 24 May 2024 20:41:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1716580829;
-	bh=pyAGi8octoMcFhKKOiNrCFOsbeRCbTUlZAwIwrRUJx0=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=T1MAEQ6BgEbJ0/8OMoz8FvtdPnuSPCSHHZYYBn1yhfp9t1+1xosA1Mcdvolb9nPpD
-	 qwo2X2HOXkJ1qeJJHdawSFS56Bn1IZWXaAyFzA3AMYlFJFgD6fovUeAqOKJVJyjUoR
-	 ETP1EoYmFdW8V+5Ai4Vcp0Cs4G3KW3dc0X5FtY2aoMYBiaOhD7vnhOhk66UOOpzDNz
-	 ImLIwsJcKG5Vr1vI0UY2kaXQ5TLKJBkkxMSGLY6Y5OsqTpSsbS7Jz3tqOQpr/XKzbR
-	 nM6s/E83iRmnGxJpiho5NhiPXm6TV+bTx32hfGGLB23jPE5S8Ir+djqPqxIggMlnMD
-	 ohm4n+qDgA+/A==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id C9926C4332E;
-	Fri, 24 May 2024 20:00:29 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1716583274;
+	bh=Oudv07xyRxoqP6G9Bxo5k57Ubkl2biHF0F+hC6wpZ48=;
+	h=From:To:Subject:Date:In-Reply-To:References:From;
+	b=P/iyriqHmFMrX2i8oFD6HywiClM6OZ91cKD03meymKwIcYYlleJC3p3H4STHFKB53
+	 hyza2ofp187wty/i5pG5j6DDDb39zqhEAz5wf8x9sbS0C8g7ilahRJzBAZy/mFyj6n
+	 wLVI7k7rQG1kW7gAeGE8A5ZolQPf8wI3aRd4ftMwXfpCk3B8Msz2yWnLrN9eStOLB1
+	 AWHWIYEK86CiFKwNWh+L2fHJkBARTfHI0hYErOZjTMnpm1rbkqpREp109pqJb0vVtD
+	 GNG9J8ULfFUVZrL33fRDmgiWQEP5KhztHwdrSBKy9NG7K69vxZ/XaRpwsPwmZN4d0E
+	 7a7SOHRzRqYRQ==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+	id 8FEEEC53B50; Fri, 24 May 2024 20:41:14 +0000 (UTC)
+From: bugzilla-daemon@kernel.org
+To: linux-bluetooth@vger.kernel.org
+Subject: [Bug 218416] hci0: command 0xfc05 tx timeout in kernel 6.7.1
+Date: Fri, 24 May 2024 20:41:14 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: pmenzel+bugzilla.kernel.org@molgen.mpg.de
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P3
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-218416-62941-fJSkTidR4V@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-218416-62941@https.bugzilla.kernel.org/>
+References: <bug-218416-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] Bluetooth:  MGMT: Uninitialized variable in load_conn_param()
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <171658082982.8511.1384944537099920085.git-patchwork-notify@kernel.org>
-Date: Fri, 24 May 2024 20:00:29 +0000
-References: <819ed9b8-8790-4d15-b2a0-20929328d582@moroto.mountain>
-In-Reply-To: <819ed9b8-8790-4d15-b2a0-20929328d582@moroto.mountain>
-To: Dan Carpenter <dan.carpenter@linaro.org>
-Cc: luiz.von.dentz@intel.com, marcel@holtmann.org, johan.hedberg@gmail.com,
- luiz.dentz@gmail.com, linux-bluetooth@vger.kernel.org,
- linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
 
-Hello:
+https://bugzilla.kernel.org/show_bug.cgi?id=3D218416
 
-This patch was applied to bluetooth/bluetooth-next.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+--- Comment #28 from Paul Menzel (pmenzel+bugzilla.kernel.org@molgen.mpg.de=
+) ---
+@dustin, thank you, but please *attach* the full log next time.
 
-On Fri, 24 May 2024 13:14:02 +0300 you wrote:
-> The "update" variable needs to be initialized to false.
-> 
-> Fixes: 831be422f3bb ("Bluetooth: MGMT: Make MGMT_OP_LOAD_CONN_PARAM update existing connection")
-> Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
-> ---
->  net/bluetooth/mgmt.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+    [90310.622241] Bluetooth: hci0: Retrieving Intel exception info failed
+(-16)
 
-Here is the summary with links:
-  - Bluetooth: MGMT: Uninitialized variable in load_conn_param()
-    https://git.kernel.org/bluetooth/bluetooth-next/c/8e8f72ff2710
+is different from this issue title. Please create a new issue, and attach a=
+ll
+the information there.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+> This is a regression. It has been broken since 6.5. It worked fine in pri=
+or
+> kernel versions.
 
+That is actually a good thing. It=E2=80=99d be great if you bisected the co=
+mmit
+introducing the regression [1].
 
+[1]:
+https://www.kernel.org/doc/html/latest/admin-guide/verify-bugs-and-bisect-r=
+egressions.html
+
+--=20
+You may reply to this email to add a comment.
+
+You are receiving this mail because:
+You are the assignee for the bug.=
