@@ -1,38 +1,38 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D495208A1
-	for <linux-bluetooth@vger.kernel.org>; Fri, 24 May 2024 08:44:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEA6E82892
+	for <linux-bluetooth@vger.kernel.org>; Fri, 24 May 2024 08:45:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716540292; cv=none; b=IY4Mu57TRa7Ptar54Gx6fWGdGQ/Gmd0BplkUl0sU4qjiGrXuKoZ2tIUgs/XKm8CmICbAFDxb7gVtVx49VfxQ+Seii9FJjyBa8SPOD0eN6X3rKiUUC9whoRzaVSR2Td9LvlXgIoar3pIMZsavmQ+rju64TXUSvSKhqP86nCFG988=
+	t=1716540311; cv=none; b=V82C6jHmcJCggWKA8mWKIBDWM6vZI1abxQmQzWfflWGYl7PvHAG/t5g5P0NdegYvdaiz6KhhjH0Y9si3AQfp/vyDJ/i9UCEwOfqaLrJJlwreoxZYcFZhZt8ZczJ9zUDlZPs39qOtFjptmlo/eW6P324RR/BYpPcFmkaBECmGCCI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716540292; c=relaxed/simple;
-	bh=tRsvLXIFozs9x5GblDz1Tl7OkZSNWWZr21rv3BybihI=;
+	s=arc-20240116; t=1716540311; c=relaxed/simple;
+	bh=GdnklgyOv991Qm7pDl9guGN9UTK35HgPNqw5A1PXAzw=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=kpwMuXCUqMjPzd+Y9+g51AQIqhxfv7TzBho81H9tMPZww3zm7D2OEq6vC3DXJMUhxX0VWd8ll3CJqo16dnWq419h4QuDulW6uxfmbfxMX+0ALiL71JVlqFW9ShQf1mZjvjHpRLRV8BKm3xpnBz3DPdGzOqJ+GlmX3AAEnZ2mV2w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EeXIeW9z; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:MIME-Version; b=dMf0Xh66LGyEile1I9CrP3IPZN2IGlFCElGufZCrez+rCwsiXot7f46rqhnKXqwT62HKQVQpxrLs3uqh9a3NdjWVVgGAeXbFruLOmw9ecdlPqC+OqG3wimYNf53c+oQKGy4xrlqb3b2KxCx8qc+xpM3tZoupuJS5j6igyasXwIA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FbZln4q3; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EeXIeW9z"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id AB76DC32782
-	for <linux-bluetooth@vger.kernel.org>; Fri, 24 May 2024 08:44:51 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FbZln4q3"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 5A7A5C2BBFC
+	for <linux-bluetooth@vger.kernel.org>; Fri, 24 May 2024 08:45:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1716540291;
-	bh=tRsvLXIFozs9x5GblDz1Tl7OkZSNWWZr21rv3BybihI=;
+	s=k20201202; t=1716540311;
+	bh=GdnklgyOv991Qm7pDl9guGN9UTK35HgPNqw5A1PXAzw=;
 	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=EeXIeW9zHkX+vz+0lyBFUM6LIHAiqQEgaKmKnqzL88vJTwkT744/7z3e1lUsovdlC
-	 yKhfc2/y/F9Sx2YfOZgcrOOTekaD92+RYys5gtYZigFAowB8hKkmqBly2xJHHrs8Wr
-	 HQfugBFIfRVPT8GMijXthdYco7BOmF9b0vIUMuuTB4BdciaDowyjOLzdzaIoDJ1ph9
-	 65/BgiylNH6AEiRytXVEowLAdJscFiZa7l0wi9+7CukznyVZPcaiDfsbMJgqGEVYrd
-	 fkyBZ/v4Db/n9USySddyO9hGUusDlW+hWKg3xEBlqqMCrD4HQOkkY5iBUSwIQDi0Fz
-	 QT5sHwB9iWc4g==
+	b=FbZln4q32cWYpEAsdjRq9fAPxfjCHRVA1TVw0y1tMxzRe2kZBU7s2v67VotHjKh3A
+	 n7THZ1N0Jn/EHiTnxlX3GVsu/fd/T0TRaD8AIY8RRKZITjXdhA5+9oSjGDBZFhwGeU
+	 yYisOgmDIMX4aZGZQgmQXBpxN7LHX4LbzSAc1OMCuBBuZCojOCZQqCrmTwJYMPKzGG
+	 FwaiW1xj05Z/0OASXP5watKyqLAJVKsQfmGmttWU0pIXTm3qgP2kHTteubmuPX4Unf
+	 ebmZTIOiieonoXi0EOvxSBAqh8N7E2TXP3lvQg9Zqd/jlDGif/wK8nDTMUfU3FbQy9
+	 XFR6ljanFCGjQ==
 Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id 98BC2C53BB7; Fri, 24 May 2024 08:44:51 +0000 (UTC)
+	id 5185DC53B73; Fri, 24 May 2024 08:45:11 +0000 (UTC)
 From: bugzilla-daemon@kernel.org
 To: linux-bluetooth@vger.kernel.org
 Subject: [Bug 218880] HCI_EVT Packet 'Flush Occurred' Misalignment
-Date: Fri, 24 May 2024 08:44:51 +0000
-X-Bugzilla-Reason: AssignedTo
+Date: Fri, 24 May 2024 08:45:11 +0000
+X-Bugzilla-Reason: CC AssignedTo
 X-Bugzilla-Type: changed
 X-Bugzilla-Watch-Reason: None
 X-Bugzilla-Product: Drivers
@@ -46,8 +46,8 @@ X-Bugzilla-Resolution:
 X-Bugzilla-Priority: P3
 X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
 X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: cc cf_kernel_version
-Message-ID: <bug-218880-62941-c9y1XXlvA0@https.bugzilla.kernel.org/>
+X-Bugzilla-Changed-Fields: cc
+Message-ID: <bug-218880-62941-QybuCPoeRO@https.bugzilla.kernel.org/>
 In-Reply-To: <bug-218880-62941@https.bugzilla.kernel.org/>
 References: <bug-218880-62941@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
@@ -67,12 +67,12 @@ Yuxuan Hu (yuxuanhu@buaa.edu.cn) changed:
 
            What    |Removed                     |Added
 ----------------------------------------------------------------------------
-                 CC|                            |johan.hedberg@gmail.com,
-                   |                            |yuxuanhu@buaa.edu.cn
-     Kernel Version|                            |6.7.9
+                 CC|                            |linux-bluetooth@vger.kernel
+                   |                            |.org
 
 --=20
 You may reply to this email to add a comment.
 
 You are receiving this mail because:
+You are on the CC list for the bug.
 You are the assignee for the bug.=
