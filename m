@@ -1,190 +1,141 @@
-Received: from EUR04-VI1-obe.outbound.protection.outlook.com (mail-vi1eur04olkn2102.outbound.protection.outlook.com [40.92.75.102])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f176.google.com (mail-yb1-f176.google.com [209.85.219.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAFD986AD6;
-	Fri, 24 May 2024 17:12:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.92.75.102
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716570743; cv=fail; b=dzLiIgcf5PgWoiXfOKgfTsPnYibHHPTa7O8G3L2mNDPD9T04gV8K8Ud1EcpGdMx9W+vwlHaPLZr9pwGiKnna8pLVObjqdB1qwguUKWF57h8YssrvXgrTPToRGZtnNaDVoP+4w7nLx0oSI6VhDVkkLcnmOzg8d9cKe0KMCXi0K9k=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716570743; c=relaxed/simple;
-	bh=1UXLovxeAgzSjvDc2yXWbJPeeNh2gr6RKoMG0xB/eG8=;
-	h=From:To:Cc:Subject:Date:Message-ID:Content-Type:MIME-Version; b=N99+ezGUxtTfRCcLcVoH1PwArSIo30lTORrLQ1JxlLXkZZyXUX0DwV/0rxYokSACn3elUGlmBBRhFDkUExa0tcgaCsvuCeieCBkkeAIgBp3TawN1h6X4N+An4VmoFpADdy5/ELcUoPNhNasKnU93qzbw8lFq++sRvdkC76kqHz8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com; spf=pass smtp.mailfrom=outlook.com; dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b=cQIdqI1z; arc=fail smtp.client-ip=40.92.75.102
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=outlook.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA8DC3B28F
+	for <linux-bluetooth@vger.kernel.org>; Fri, 24 May 2024 17:57:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.176
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1716573463; cv=none; b=Ml6MM6CcB9HHVU8yq4yWBJEKSYb1/hRksX/6t1G9qP8/4+Q2Wb69yBXs2lMIoQe9spbvssI2bBZLpALPn/b/lel+Sq9e2v/ZDqBXPxk3O9dYzdHhv1Te58hgAXtxsJPO/gSdnCsdzrjHSTkAcVYnzisZqhNoHU1Di2VTkgqgQdM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1716573463; c=relaxed/simple;
+	bh=ayFbHz5S3s7w5FCzf0HEiZuaE2LLgFTQ3tU+Epzz0us=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=NaiMSJJ9Biq8UBq4iN/szR6wdqCrTTEakjEkOJobkWn9zg65Pr+h9USjGD25Jn7VR98BbPJWFYfUZ4rN/kYgstSTCrK4qviOjM0J7Gkzo5Cn7f99ZwHIx8MfveUM6GOKOHVoSjfoWhuIEdL2bX685aYCkQwsw4oGaiKfFD5Ju6o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lRIR8UOl; arc=none smtp.client-ip=209.85.219.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b="cQIdqI1z"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=aoQA9szjuhjkDUzJk7r9rlaNreBJ9UGCVA9CrAcNJqAFzfb7wBYczJ3LxFnUQZG0Wht+IPFERDL/QUyuSY7wHFhd2vWqynX/QZRUIlc4vsFLoQP4asJp4sqdYubfVDL1H/qtARG0T1PBi8aCI7ILuGjCdliW9NL/xs1QmAmz3JqQJL1FgEzxNZcAX8KzCf6F29gVMhUIq5y0OmGWHCUmcxzyUmux7u7pbCFcsH26FQgbzoePDxz6zUS5zYV73pD9MwYfIYYb8TEjqqBUUWqqBdHjDLv2EU8RLXaDMfKAfDmw3lEBMAVv+V+s8H83zzJvM/kKxnofNoTtGZYNElXtgQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=zgKf7j3gWUPnLMX+JYaBNqSXKLBikjVcbfxnTjduWuY=;
- b=gCpEgiSFsOqDt4kh8CzQ6mLQd8cb2g1b9zB8TfyGpOjqKZMrClroKDBZpts6kCGEy7aYruF3PaEZs321CPdPMxaGJOq9R8uTsU8lDHtFskxh8MTJcLaZ1Ku7wIO5zKD9BvsP4a48y1MqlW+csi1fbY8JE6DjrS7iqrreUdSp9HlDVcdMI3qIsFLSIz56+01cTizqLTK+ZdVUFGcsJoRNhINSSN+WUj/WtoRKGW8f2sFQaZbt3SKwqFIyfMsd+On4fCDT2C4ERO+68ctbtO5PLBlDYgrbLRB5oL4aODFR5zwzJkRGCtqcXM4rwnGzYwSQ6gLXsx7xY+IACdbbvzp4VA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
- dkim=none; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=zgKf7j3gWUPnLMX+JYaBNqSXKLBikjVcbfxnTjduWuY=;
- b=cQIdqI1zhGTZBm9WD42v8GG1FD25ncwyfPr14CMIi/M5qUY9n9Gld3eY4zjtqEkShABzSeDASgWOxGKtqFTFoNVTcjsxTh/6+IBJED82D3VTxzhTczc1LbV4tKb41aAjIGMVvFgSF3uCf6lt3bG3ynFQTxV8aPfpGERVXCWlexqDtgKBYpFbhNnuy0sNETvTRdlzEjZrw6caXKL0GVDICf/u9IuEJDxeNzKzNjspNEieP5Gwl4x0NUHgIG5oc0/Y1Rpd7HpoMBtHVt1FpmEsCy90L/giTx1THgiCm1wL7uXzVjoNmAVB/042+5HaoV0AZU6Nm7xLJsC2xbd6txZmAA==
-Received: from AS8PR02MB7237.eurprd02.prod.outlook.com (2603:10a6:20b:3f1::10)
- by PAXPR02MB7293.eurprd02.prod.outlook.com (2603:10a6:102:1c6::9) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7611.22; Fri, 24 May
- 2024 17:12:18 +0000
-Received: from AS8PR02MB7237.eurprd02.prod.outlook.com
- ([fe80::409b:1407:979b:f658]) by AS8PR02MB7237.eurprd02.prod.outlook.com
- ([fe80::409b:1407:979b:f658%5]) with mapi id 15.20.7611.025; Fri, 24 May 2024
- 17:12:18 +0000
-From: Erick Archer <erick.archer@outlook.com>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Kees Cook <keescook@chromium.org>,
-	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
-	Justin Stitt <justinstitt@google.com>
-Cc: Erick Archer <erick.archer@outlook.com>,
-	linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-hardening@vger.kernel.org
-Subject: [PATCH] Bluetooth: Use sizeof(*pointer) instead of sizeof(type)
-Date: Fri, 24 May 2024 19:11:51 +0200
-Message-ID:
- <AS8PR02MB72373F23330301EA5B897D6E8BF52@AS8PR02MB7237.eurprd02.prod.outlook.com>
-X-Mailer: git-send-email 2.25.1
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-TMN: [B7y2UPhLhJelmJCbGHhwU6f4xaI/4ZGC]
-X-ClientProxiedBy: MA3P292CA0002.ESPP292.PROD.OUTLOOK.COM
- (2603:10a6:250:2c::17) To AS8PR02MB7237.eurprd02.prod.outlook.com
- (2603:10a6:20b:3f1::10)
-X-Microsoft-Original-Message-ID:
- <20240524171151.15303-1-erick.archer@outlook.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lRIR8UOl"
+Received: by mail-yb1-f176.google.com with SMTP id 3f1490d57ef6-df4d5d0b8d0so3964561276.2
+        for <linux-bluetooth@vger.kernel.org>; Fri, 24 May 2024 10:57:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1716573461; x=1717178261; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=4Uxsjo2bIOsMLDBI2pt7wuhMj1uCbAaQ351AKht8iAA=;
+        b=lRIR8UOlQ++NH/GgN2yNz1oG7SVS9aKCfGtDR5Kj0WyAy14fK+QunFnZ+v8QrVIiaS
+         12AkOXhgRlpzvahz3kvanfDz0lcJFMRuGkPrLgNuBNTNKGAdQwV3ubGv0opQo2AcTfrH
+         xMKZD1AadA7t31VAdtAApaI9Xw2z1IfOZ2/kAAoOUDhQSTxqYWcxfS+KyE/5/NnoDy0+
+         CMXcizYBBFzogBVlfbCrLYO4OsZxv/4205JeUwjdzB533KkmVBd3iwK8sKprZTdaN/p1
+         pzjF55gbamu35O1EYshkFJTyR8um+OO3DzZEVpBHSF3fzwEP07QgphGUKUa1x6dpsF3P
+         /Y2g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1716573461; x=1717178261;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=4Uxsjo2bIOsMLDBI2pt7wuhMj1uCbAaQ351AKht8iAA=;
+        b=SeQFq8dYjHXL0bc6m4RB7lB4xl7rEzOzOg54ePdnulCtd1APmuwU8Lh8IMM9yl0S4o
+         6eJWT2QHZ7M7MBQeAH1+8zDbDYCUgLcOXK0COQMK5EE51ZqYxM/Rofe6BGnLA50xpnIR
+         0+tmR/U7c2i4LDqGCBOXiioqacIAuNOD849pVaoZDH4MAMsjPE1ffbtgHp3qD66NSE25
+         fB98Bekq07Fasg2yKGa7bAGzE5PyxhidWs0soL2FNVV17L4m4Y5NFrKm9q2/EtUSMNhI
+         RoFeyk2l1VSf37wIBRnR8b5ePhtkSo3TlZz7d+xX7p4xQKerKD8WwOblOAs4B8TJIw8d
+         nOeg==
+X-Gm-Message-State: AOJu0YwrtGKjKC1/DD/6tsrkjHKGtlNo07kUWMchOBPSCbPm1k0Cpjqn
+	OrWtqIX/V8a4Sy7F8DUUrBi0Lh509OMN0uHuw7CjndPkgoRMqX1j75KA9w==
+X-Google-Smtp-Source: AGHT+IFSc+XM1sJIFkXyVfdX91dnJYmpKyCWJBMAdZv3CSmMv+u5Kxs2VzTCACMJ9JpH2r2I2aZbNQ==
+X-Received: by 2002:a25:256:0:b0:df4:ea00:d01 with SMTP id 3f1490d57ef6-df77225db4bmr2896403276.62.1716573460595;
+        Fri, 24 May 2024 10:57:40 -0700 (PDT)
+Received: from [172.17.0.2] ([20.102.46.223])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-794abd46562sm81242385a.134.2024.05.24.10.57.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 24 May 2024 10:57:40 -0700 (PDT)
+Message-ID: <6650d514.e90a0220.54129.3540@mx.google.com>
+Date: Fri, 24 May 2024 10:57:40 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============3666380899691388857=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AS8PR02MB7237:EE_|PAXPR02MB7293:EE_
-X-MS-Office365-Filtering-Correlation-Id: ac7af50d-89d8-404d-0fcd-08dc7c14a547
-X-Microsoft-Antispam:
-	BCL:0;ARA:14566002|461199019|440099019|3412199016|1710799017;
-X-Microsoft-Antispam-Message-Info:
-	KF+VNRE++xU7tipDWsv8gd42QyHSuWkUUGMwPX1ylIWxQBpTGSNufkZuDdn6SJEJG04YkaOe8tylc4yBxDGl1tt3JjA9KLOX0rgOiXEW9yg4bUZjfrRQwdpUqAfSfS8jH1U83IVlqzVAC9J1z+kyF4rnrPIi5u1uaRNnyv1pIDJ4IEGwzXz1nRbV4kbryJI0KAvaFsoJMwAHqXvgXlq61B6jt3sS4dtQU8YyfcxW8N/2TIZ252nCbjrTHwHeVh5F7gpgNRVkF6AMp6OybT7cetEgDZ+YJ+8e+3hAQgUhc8ZJGNdHdtHCH3KhCwoxxm7HP+0/hpAYT5sAGVGRGNMkx8yVi4IJKVJXwqUsZqIJ6EMB3mq+Aas++da3iOtdwfjuxvYbJQfIDWFm3QM+YRG3rMDiVWmubTZCrh67DHDQJrHN8oOVzoruOiLgQeajRkllmXQfj+G5gGWaM2MEC4AqerBr4EpN6DO0yf1c18hb20d9tH9W4CqeHWcb8/cBEW7lyhFhW6RmzNXy/HCgThPMePeTLJd+FcH70gz2xxK9p6lAolSREzS92xaC3NFUCjvcPX5AcrSkMIq7S/7VwxFtS8WYB9qyLiuKhetZdvR3Zma6D8dl+oWQdxNWbJa6hFSg
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?bOmJOFYIJ0gCOIYedNw9pnzTdChtoivx2ly9jB39vhAK2kjqkfc3yfJCM+04?=
- =?us-ascii?Q?zMl9KhNji8tq6/n2xNjiMioW+Szcr5U4tc2YL4bIGuL1S5M8YzC1Y0ARjyIU?=
- =?us-ascii?Q?HI6zJ5JIUiY8MceSk0MtvvYA23Wk/+BNHcz1hSZ4RJ3IID7XKw+NPl3o3VkJ?=
- =?us-ascii?Q?7TodeCGuyhh6BSYdX0qbtc6+E1mrVlDWLVTuZ6sAyhOZyI6XrJrz2SrN7pGt?=
- =?us-ascii?Q?9Kc0JKM95qhL6s21DxH1cpF33GvtRq9saxxSOfENVFoLw8RrLAaVXm6CVAHZ?=
- =?us-ascii?Q?BE1Sgw4RYh2jvA6q+52t6HUJaTkXqXRNufMMc/KNDNpBb2hXsU0Gkz4JTC1g?=
- =?us-ascii?Q?95HcepbPWoF65kyYwnxKBQ8MXrURR1PXALK3V5mkZR1x97miBzuqV0P3QyON?=
- =?us-ascii?Q?bwa/1FeXKBcnN3YGqI7TqgILUrVPEtEkHucqZpLdpXhjyCYagP5kCiLsXu6v?=
- =?us-ascii?Q?Vkgq84MLsYxlW1kLJRjWh7fzooTlHFJA2ryy3xvxbgsOn06Xix3LBCShO3PT?=
- =?us-ascii?Q?39F1h6/bdhrO3mA/T4iIOvurJnBUeVNZGYnronR///FvMJNbI7eCLl/qmtpJ?=
- =?us-ascii?Q?qPOaewYlPSLf45WlT82fypVtwoa3K73ZdNhE5aLBN1OYjVKZIi1DMjoRfl0y?=
- =?us-ascii?Q?AIE++DuQyr2iEKWC4Bc5yBh+7ScUfAPAT30YyMeHJuQag8QBlZNcr0uOAAgY?=
- =?us-ascii?Q?VFcR3k+wSnY/OA4rggmkjYkAFOpIpJ7f8Gjqp82yVE8BhRCGWAJJTAqwsAEo?=
- =?us-ascii?Q?nsKEOGjEKw5s3f4tZeGTCWVMClDErsS7aevc/xI/uylnVixuKbSz3MJbBLMU?=
- =?us-ascii?Q?1+A/Cj0YBLHAOmF3A6PubSc07pr2hLliBBlAxfUl1liQoFU/sxNfKegggb+V?=
- =?us-ascii?Q?z06eCDIa0Y1zDxr8RpztmSRhxrwYi/+C40xbI8vHnIeQNdQGy9OCxfvO1vGZ?=
- =?us-ascii?Q?o3FVdwbVt/3xS9U/sXUvaPtBXhLGWCCV4l1k/EPoJaKo/yodCmHHRoIQoVfw?=
- =?us-ascii?Q?fsRwlGHEMQR0hhCvGXxUj98im7givrrKJV3Y/yLNvsOve5gaFXkSMmV9Ortg?=
- =?us-ascii?Q?dqz0U+UhPg22oyP7ZViwtADKOM1QhX83omQy+rk6Y7SYrDyfERwYUmtKTvb6?=
- =?us-ascii?Q?H5QnhWfdIxNjtR0v5yMGLCxU2HCSqi7TRcC5BvW8BMIclQ8SqdGhM17+vEEi?=
- =?us-ascii?Q?xMsBD6bDwNVgx9UuphbJPuNCj/ygE1cq+psvFnCbFzAiwYFq9qy0q2li2BXz?=
- =?us-ascii?Q?NrQwCY5jh/Z5/XhK1syv?=
-X-OriginatorOrg: outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: ac7af50d-89d8-404d-0fcd-08dc7c14a547
-X-MS-Exchange-CrossTenant-AuthSource: AS8PR02MB7237.eurprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 May 2024 17:12:13.3074
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
-X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg: 00000000-0000-0000-0000-000000000000
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PAXPR02MB7293
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, erick.archer@outlook.com
+Subject: RE: Bluetooth: Use sizeof(*pointer) instead of sizeof(type)
+In-Reply-To: <AS8PR02MB72373F23330301EA5B897D6E8BF52@AS8PR02MB7237.eurprd02.prod.outlook.com>
+References: <AS8PR02MB72373F23330301EA5B897D6E8BF52@AS8PR02MB7237.eurprd02.prod.outlook.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-It is preferred to use sizeof(*pointer) instead of sizeof(type)
-due to the type of the variable can change and one needs not
-change the former (unlike the latter). This patch has no effect
-on runtime behavior.
+--===============3666380899691388857==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Signed-off-by: Erick Archer <erick.archer@outlook.com>
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=855756
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      1.25 seconds
+GitLint                       PASS      0.34 seconds
+SubjectPrefix                 PASS      0.13 seconds
+BuildKernel                   PASS      31.68 seconds
+CheckAllWarning               PASS      34.92 seconds
+CheckSparse                   PASS      40.10 seconds
+CheckSmatch                   FAIL      36.75 seconds
+BuildKernel32                 PASS      31.00 seconds
+TestRunnerSetup               PASS      552.81 seconds
+TestRunner_l2cap-tester       PASS      18.88 seconds
+TestRunner_iso-tester         FAIL      32.64 seconds
+TestRunner_bnep-tester        PASS      5.18 seconds
+TestRunner_mgmt-tester        PASS      114.80 seconds
+TestRunner_rfcomm-tester      PASS      7.70 seconds
+TestRunner_sco-tester         PASS      15.39 seconds
+TestRunner_ioctl-tester       PASS      8.17 seconds
+TestRunner_mesh-tester        PASS      6.23 seconds
+TestRunner_smp-tester         PASS      7.17 seconds
+TestRunner_userchan-tester    PASS      5.27 seconds
+IncrementalBuild              PASS      29.54 seconds
+
+Details
+##############################
+Test: CheckSmatch - FAIL
+Desc: Run smatch tool with source
+Output:
+
+Segmentation fault (core dumped)
+make[4]: *** [scripts/Makefile.build:244: net/bluetooth/hci_core.o] Error 139
+make[4]: *** Deleting file 'net/bluetooth/hci_core.o'
+make[3]: *** [scripts/Makefile.build:485: net/bluetooth] Error 2
+make[2]: *** [scripts/Makefile.build:485: net] Error 2
+make[2]: *** Waiting for unfinished jobs....
+Segmentation fault (core dumped)
+make[4]: *** [scripts/Makefile.build:244: drivers/bluetooth/bcm203x.o] Error 139
+make[4]: *** Deleting file 'drivers/bluetooth/bcm203x.o'
+make[4]: *** Waiting for unfinished jobs....
+make[3]: *** [scripts/Makefile.build:485: drivers/bluetooth] Error 2
+make[2]: *** [scripts/Makefile.build:485: drivers] Error 2
+make[1]: *** [/github/workspace/src/src/Makefile:1919: .] Error 2
+make: *** [Makefile:240: __sub-make] Error 2
+##############################
+Test: TestRunner_iso-tester - FAIL
+Desc: Run iso-tester with test-runner
+Output:
+Total: 122, Passed: 117 (95.9%), Failed: 1, Not Run: 4
+
+Failed Test Cases
+ISO Connect2 Suspend - Success                       Failed       4.230 seconds
+
+
 ---
- drivers/bluetooth/btrtl.c     | 2 +-
- drivers/bluetooth/hci_ldisc.c | 2 +-
- drivers/bluetooth/hci_qca.c   | 5 ++---
- drivers/bluetooth/hci_vhci.c  | 2 +-
- 4 files changed, 5 insertions(+), 6 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/drivers/bluetooth/btrtl.c b/drivers/bluetooth/btrtl.c
-index 4f1e37b4f780..f2f37143c454 100644
---- a/drivers/bluetooth/btrtl.c
-+++ b/drivers/bluetooth/btrtl.c
-@@ -811,7 +811,7 @@ static int rtl_download_firmware(struct hci_dev *hdev,
- 	struct sk_buff *skb;
- 	struct hci_rp_read_local_version *rp;
- 
--	dl_cmd = kmalloc(sizeof(struct rtl_download_cmd), GFP_KERNEL);
-+	dl_cmd = kmalloc(sizeof(*dl_cmd), GFP_KERNEL);
- 	if (!dl_cmd)
- 		return -ENOMEM;
- 
-diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
-index 17a2f158a0df..30192bb08354 100644
---- a/drivers/bluetooth/hci_ldisc.c
-+++ b/drivers/bluetooth/hci_ldisc.c
-@@ -488,7 +488,7 @@ static int hci_uart_tty_open(struct tty_struct *tty)
- 	if (tty->ops->write == NULL)
- 		return -EOPNOTSUPP;
- 
--	hu = kzalloc(sizeof(struct hci_uart), GFP_KERNEL);
-+	hu = kzalloc(sizeof(*hu), GFP_KERNEL);
- 	if (!hu) {
- 		BT_ERR("Can't allocate control structure");
- 		return -ENFILE;
-diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-index 0c9c9ee56592..384a2bbbf303 100644
---- a/drivers/bluetooth/hci_qca.c
-+++ b/drivers/bluetooth/hci_qca.c
-@@ -569,7 +569,7 @@ static int qca_open(struct hci_uart *hu)
- 	if (!hci_uart_has_flow_control(hu))
- 		return -EOPNOTSUPP;
- 
--	qca = kzalloc(sizeof(struct qca_data), GFP_KERNEL);
-+	qca = kzalloc(sizeof(*qca), GFP_KERNEL);
- 	if (!qca)
- 		return -ENOMEM;
- 
-@@ -1040,8 +1040,7 @@ static void qca_controller_memdump(struct work_struct *work)
- 		}
- 
- 		if (!qca_memdump) {
--			qca_memdump = kzalloc(sizeof(struct qca_memdump_info),
--					      GFP_ATOMIC);
-+			qca_memdump = kzalloc(sizeof(*qca_memdump), GFP_ATOMIC);
- 			if (!qca_memdump) {
- 				mutex_unlock(&qca->hci_memdump_lock);
- 				return;
-diff --git a/drivers/bluetooth/hci_vhci.c b/drivers/bluetooth/hci_vhci.c
-index 28750a40f0ed..c4046f8f1985 100644
---- a/drivers/bluetooth/hci_vhci.c
-+++ b/drivers/bluetooth/hci_vhci.c
-@@ -633,7 +633,7 @@ static int vhci_open(struct inode *inode, struct file *file)
- {
- 	struct vhci_data *data;
- 
--	data = kzalloc(sizeof(struct vhci_data), GFP_KERNEL);
-+	data = kzalloc(sizeof(*data), GFP_KERNEL);
- 	if (!data)
- 		return -ENOMEM;
- 
--- 
-2.25.1
 
+--===============3666380899691388857==--
