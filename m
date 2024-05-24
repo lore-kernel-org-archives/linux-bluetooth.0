@@ -1,76 +1,218 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D5A112AAF2
-	for <linux-bluetooth@vger.kernel.org>; Fri, 24 May 2024 08:48:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from zg8tmja2lje4os43os4xodqa.icoremail.net (zg8tmja2lje4os43os4xodqa.icoremail.net [206.189.79.184])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0421684E03
+	for <linux-bluetooth@vger.kernel.org>; Fri, 24 May 2024 08:55:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=206.189.79.184
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716540512; cv=none; b=eayLU9ozxU3XY1zsPE0uI31PwVJqWDknCzs7hnbb/M61uP0ZeSoaIVMFRARBLjzwg77W0EJOPKangzCjf6NM1nqdavjn60jZIWkG+RFWOi0Jn5wBe/zKd2LIj5gdnT9S2qprLCIxS1ofgPVYHZmCxo3q7VO2gXIJh1bt0FIVjQA=
+	t=1716540959; cv=none; b=CRtc7NhUfzS+R+0GLLcG1+HYOzvmNVZhNJtgJqrE1a5ToBHFnREZaI3FqSLXP6UnGo07kLvTG2pIZczYN//kxPXx0BWzq3lXLMen56xgINNS/ZJQ7mtdhmbT9l6W5UvsunvLukLgSJXJD21emyh97pCzvfP/f327Hn+J944Atas=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716540512; c=relaxed/simple;
-	bh=aXOH0PZpjleape/WaedvkD/fkWOvtobDP3Wq9mfnRMM=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=s+E2Rn1r4nQnYHHesHae+PMeZTOE5YGG8isDkYXFL/kQZXzWIFK64GEd+Igt3DqzSPf+cXOHxGRuZVZJWrcNHWctXmELiB2yB4Hm2ThrmSDDCwqhUe1UC67hZMrDOBsEvqWoM7PLWQ5yftnD1ql1a4O4Agt8RC9vj71NmV8vxdo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PvFts6FF; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1716540959; c=relaxed/simple;
+	bh=5ITjnbFNdZqDuWPS7Db+9PBsQA+jgpDCjuhm23qw0Tg=;
+	h=Content-Type:Message-ID:Date:MIME-Version:To:From:Subject:Cc; b=TDiZhyp9NOFzHEroHEKNlw4OhR66+5JhfAKudi5N18xFJ/9OD/c2xpMoeVqvgEirJs+02Lp36QJzXXvt7TuikiSi6UF3L4WY9Par1q/ET6K+LYrz5SUb/LLnHhaZ21n5EsoQGcM5PmOttOMBU8APgVcLKrCqdsNLem+vmYVMR6I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=buaa.edu.cn; spf=pass smtp.mailfrom=buaa.edu.cn; dkim=pass (1024-bit key) header.d=buaa.edu.cn header.i=@buaa.edu.cn header.b=OD2NWMNo; arc=none smtp.client-ip=206.189.79.184
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=buaa.edu.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=buaa.edu.cn
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PvFts6FF"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 33697C4AF0C
-	for <linux-bluetooth@vger.kernel.org>; Fri, 24 May 2024 08:48:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1716540512;
-	bh=aXOH0PZpjleape/WaedvkD/fkWOvtobDP3Wq9mfnRMM=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=PvFts6FF7enpmGM5H/SxqQniZXRCpc4yaRDTJK1U/z9eimHvNLqjyvaiXNETcyarT
-	 umJWjvGA1aDkyCXf7TdA5uywdFo+EPifJLnlLro/FIW+tq3tq6xFPpXIE3L+BEvVyX
-	 /Oov43h//hM6DlLuuBk75JDlPUxndWYBNNf9B+6lI6jT5R6zZIZJUpKdncyvVBmS28
-	 QSytDZTtYo3QVacv4hI7hrta0MlhWPEher4z8o2/G9sdebwgwsgu2xKIqmHIjLVhf1
-	 8mpWltzL+xHKbOSMzIPj9K+xdtRmTk6vETRX1MnsiY/74/GtHp6uZpYQPR/MzxrCHW
-	 kLVSbQfR29aGQ==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id 268E0C53B73; Fri, 24 May 2024 08:48:32 +0000 (UTC)
-From: bugzilla-daemon@kernel.org
-To: linux-bluetooth@vger.kernel.org
-Subject: [Bug 218880] HCI_EVT Packet 'Flush Occurred' Misalignment
-Date: Fri, 24 May 2024 08:48:31 +0000
-X-Bugzilla-Reason: CC AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: yuxuanhu@buaa.edu.cn
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P3
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: attachments.created
-Message-ID: <bug-218880-62941-TRxKZzlpc7@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-218880-62941@https.bugzilla.kernel.org/>
-References: <bug-218880-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+	dkim=pass (1024-bit key) header.d=buaa.edu.cn header.i=@buaa.edu.cn header.b="OD2NWMNo"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=buaa.edu.cn; s=buaa; h=Received:Content-Type:Message-ID:Date:
+	MIME-Version:User-Agent:To:From:Subject:Cc; bh=C8tLVnumCKjmW9Qy0
+	Nr2nHsnQH4r1HMYZiUCqgOHOgo=; b=OD2NWMNo++zvt93RwxNQxxIepPXwseTh9
+	ZIOvR3PpaO1wmBoSKVszgWxsuyMZMaAKgVOYvHeSZIAxVBFnnIbM7X5rlwQCIdCg
+	qKc0nTDasGJzGfPL+1+Va+T5uOCBgro45FAZEq9M2/kUqRPVb7ajinRO4PFpHff4
+	TsXBg4QIM0=
+Received: from [192.168.1.125] (unknown [10.130.147.18])
+	by coremail-app2 (Coremail) with SMTP id Nyz+CgA3QTgPVlBmgaVOAQ--.47478S2;
+	Fri, 24 May 2024 16:55:43 +0800 (CST)
+Content-Type: multipart/mixed; boundary="------------RPiOa1eO3rfjjsP3iJaQbfKy"
+Message-ID: <fefc349d-9dc1-462a-be2f-29d82dc30157@buaa.edu.cn>
+Date: Fri, 24 May 2024 16:55:45 +0800
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+To: johan.hedberg@gmail.com, Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+ marcel@holtmann.org
+From: Yuxuan-Hu <yuxuanhu@buaa.edu.cn>
+Subject: HCI_EVT Packet 'Flush Occurred' Misalignment
+Cc: linux-bluetooth@vger.kernel.org, baijiaju1990 <baijiaju1990@gmail.com>
+X-CM-TRANSID:Nyz+CgA3QTgPVlBmgaVOAQ--.47478S2
+X-Coremail-Antispam: 1UD129KBjvJXoW7XFWkJFWDXFWrCr1kXr47urg_yoW8Jr4rpa
+	ykC3sxtw4DJrW7tFyUZw48Kry5Z3yktrWDG34kX3yYkwsIgFnYkFsI9F1Yg3WYg3ZYqa1U
+	ZFn2qFyfWrnrZF7anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUU9ab7Iv0xC_tr1lb4IE77IF4wAFc2x0x2IEx4CE42xK8VAvwI8I
+	cIk0rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2
+	AK021l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v2
+	6r4UJVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI
+	0_GcCE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wASzI0EjI02j7AqF2xKxwAqx4xG64xv
+	F2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r
+	4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvEwIxGrwACY4xI67k04243AVC20s07MxkI
+	ecxEwVCm-wCF04k20xvY0x0EwIxGrwCF04k20xvE74AGY7Cv6cx26F1DJr1UJwCFx2IqxV
+	CFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r10
+	6r1rMI8E67AF67kF1VAFwI0_JF0_Jw1lIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxV
+	WUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG
+	6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Jr0_Gr
+	UvcSsGvfC2KfnxnUUI43ZEXa7IU8VyIUUUUUU==
+X-CM-SenderInfo: ysqtljawssquxxddhvlgxou0/
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D218880
+This is a multi-part message in MIME format.
+--------------RPiOa1eO3rfjjsP3iJaQbfKy
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
---- Comment #2 from Yuxuan Hu (yuxuanhu@buaa.edu.cn) ---
-Created attachment 306329
-  --> https://bugzilla.kernel.org/attachment.cgi?id=3D306329&action=3Dedit
-TShark pcap file
+Hi All,
 
---=20
-You may reply to this email to add a comment.
+Our fuzzing tool found a possible bug when testing Bluetooth RFCOMM connection:
 
-You are receiving this mail because:
-You are on the CC list for the bug.
-You are the assignee for the bug.=
+(1) A'Flush Occurred'  HCI_EVT packet with incorrect'parameter_total_length' field and parameters was maliciously sent to the host (hexadecimal content:'11 3D C4 02 62 D1').
+
+(2) Because'hci_ev_table'(/net/bluetooth/hci_event.c: 7514) does not include'Flush Occurred'  event, the function'hci_event_func'(/net/bluetooth/hci_event.c: 7644) doesn't check the'parameter_total_length'  field of this packet.
+
+(3) When the controller transmits additional HCI packets to the host, these packets are concatenated to the previously mentioned Flush Occurred packet. This results in the packets being disregarded by the host.
+
+Attachment 1 is Kernel Log, which includes the printed HCI packet interactions between the host and controller. All HCI packets following the line mentioned below are ignored by the host:
+
+'''
+[ 1555.520646] <- [EVT] 11 3D C4 02 62 D1
+'''
+Attachment 2 contains packet captures from tshark.
+
+It remains unclear whether this behavior constitutes a bug or a feature. We apologize if this inquiry causes any offense.
+Thank you very much for taking the time to read.
+
+Best Regard,
+Yuxuan Hu.
+
+--------------RPiOa1eO3rfjjsP3iJaQbfKy
+Content-Type: text/plain; charset=UTF-8; name="kernel_log.txt"
+Content-Disposition: attachment; filename="kernel_log.txt"
+Content-Transfer-Encoding: base64
+
+W1FTZXJ2ZXJdIGJlZ2luIGNvbm5lY3RfYnQoKQpbIDE1NTUuMzM5NjIyXSAtPiBbQ01EXSAw
+NSAwNCAwRCBBOCAyNSBEMSBFQiAyNyBCOCAxOCBDQyAwMiAwMCAwMCAwMCAwMSAKWyAxNTU1
+LjM0MDE3NF0gPC0gW0VWVF0gMEYgMDQgMDAgMDEgMDUgMDQgClsgMTU1NS4zNDI5NzBdIDwt
+IFtFVlRdIDEyIDA4IDAwIEE4IDI1IEQxIEVCIDI3IEI4IDAxIApbIDE1NTUuMzQ2NDU1XSA8
+LSBbRVZUXSAwMyAwQiAwMCAwQiAwMCBBOCAyNSBEMSBFQiAyNyBCOCAwMSAwMCAKWyAxNTU1
+LjM0NzAwNl0gLT4gW0NNRF0gMUIgMDQgMDIgMEIgMDAgClsgMTU1NS4zNDgyNDRdIDwtIFtF
+VlRdIDFCIDAzIDBCIDAwIDA1IApbIDE1NTUuMzY2MDE4XSA8LSBbQUNMXSAwQiAyMCAwQSAw
+MCAwNiAwMCAwMSAwMCAwQSAwMSAwMiAwMCAwMiAwMCAKWyAxNTU1LjM2NjczMl0gPC0gW0VW
+VF0gMEYgMDQgMDAgMDEgMUIgMDQgClsgMTU1NS4zNjcyMTddIC0+IFtDTURdIDFBIDBDIDAx
+IDAwIApbIDE1NTUuMzY4OTM2XSA8LSBbRVZUXSAwQiAwQiAwMCAwQiAwMCBCRiBGRSBDRiBG
+RSBEQiBGRiA3QiA4NyAKWyAxNTU1LjM2OTc5N10gPC0gW0VWVF0gMEUgMDQgMDEgMUEgMEMg
+MDAgClsgMTU1NS4zNzAxNjddIC0+IFtDTURdIDFDIDA0IDAzIDBCIDAwIDAxIApbIDE1NTUu
+MzcwNjM2XSA8LSBbRVZUXSAwRSAwNCAwMSAxQSAwQyAwMCAKWyAxNTU1LjQyMDEwNl0gPC0g
+W0VWVF0gMEYgMDQgMDAgMDEgMUMgMDQgClsgMTU1NS40MjIxMjBdIDwtIFtFVlRdIDIzIDBE
+IDAwIDBCIDAwIDAxIDAyIDBCIDAwIDAwIDAwIDAwIDAwIDAwIDAwIApbIDE1NTUuNDIyNjIx
+XSAtPiBbQ01EXSAxOSAwNCAwQSBBOCAyNSBEMSBFQiAyNyBCOCAwMiAwMCAwMCAwMCAKWyAx
+NTU1LjQyMzM2NF0gPC0gW0VWVF0gMEYgMDQgMDAgMDEgMTkgMDQgClsgMTU1NS40NjE0MDVd
+IDwtIFtFVlRdIDA3IEZGIDAwIEE4IDI1IEQxIEVCIDI3IEI4IDcyIDYxIDczIDcwIDYyIDY1
+IDcyIDcyIDc5IDcwIDY5IDAwIDAwIDAwIDAwIDAwIDAwIDAwIDAwCiAwMCAwMCAwMCAwMCAw
+MCAwMCAwMCAwMCAwMCAwMCAwMCAwMCAwMCAwMCAwMCAwMCAwMCAwMCAwMCAwMCAwMCAwMCAw
+MCAwMCAwMCAwMCAwMCAwMCAwMCAwMCAwMCAwMCAwMCAwMCAwMCAwCjAgMDAgMDAgMDAgMDAg
+MDAgMDAgMDAgMDAgMDAgMDAgMDAgMDAgMDAgMDAgMDAgMDAgMDAgMDAgMDAgMDAgMDAgMDAg
+MDAgMDAgMDAgMDAgMDAgMDAgMDAgMDAgMDAgMDAgMDAgMDAgMDAgCjAwIDAwIDAwIDAwIDAw
+IDAwIDAwIDAwIDAwIDAwIDAwIDAwIDAwIDAwIDAwIDAwIDAwIDAwIDAwIDAwIDAwIDAwIDAw
+IDAwIDAwIDAwIDAwIDAwIDAwIDAwIDAwIDAwIDAwIDAwIDAwIDAwCiAwMCAwMCAwMCAwMCAw
+MCAwMCAwMCAwMCAwMCAwMCAwMCAwMCAwMCAwMCAwMCAwMCAwMCAwMCAwMCAwMCAwMCAwMCAw
+MCAwMCAwMCAwMCAwMCAwMCAwMCAwMCAwMCAwMCAwMCAwMCAwMCAwCjAgMDAgMDAgMDAgMDAg
+MDAgMDAgMDAgMDAgMDAgMDAgMDAgMDAgMDAgMDAgMDAgMDAgMDAgMDAgMDAgMDAgMDAgMDAg
+MDAgMDAgMDAgMDAgMDAgMDAgMDAgMDAgMDAgMDAgMDAgMDAgMDAgCjAwIDAwIDAwIDAwIDAw
+IDAwIDAwIDAwIDAwIDAwIDAwIDAwIDAwIDAwIDAwIDAwIDAwIDAwIDAwIDAwIDAwIDAwIDAw
+IDAwIDAwIDAwIDAwIDAwIDAwIDAwIDAwIDAwIDAwIDAwIDAwIDAwCiAwMCAwMCAwMCAwMCAw
+MCAwMCAwMCAwMCAwMCAwMCAwMCAwMCAwMCAwMCAwMCAKWyAxNTU1LjQ2NzUxNF0gLT4gW0NN
+RF0gMTEgMDQgMDIgMEIgMDAgClsgMTU1NS40NjgzMTVdIDwtIFtFVlRdIDBGIDA0IDAwIDAx
+IDExIDA0IApbIDE1NTUuNDg1MTgyXSA8LSBbRVZUXSAxNyAwNiBBOCAyNSBEMSBFQiAyNyBC
+OCAKWyAxNTU1LjQ4NTcwOV0gLT4gW0NNRF0gMEIgMDQgMTYgQTggMjUgRDEgRUIgMjcgQjgg
+RTkgQjcgQTAgNTMgNDQgRkQgMEMgQjggOTcgOEMgQkQgQkEgMzIgOEYgODYgQjMgClsgMTU1
+NS40ODY5NTddIDwtIFtFVlRdIDBFIDBBIDAxIDBCIDA0IDAwIEE4IDI1IEQxIEVCIDI3IEI4
+IApbIDE1NTUuNTIwMTMzXSA8LSBbRVZUXSAwNiAwMyAwMCAwQiAwMCAKWyAxNTU1LjUyMDM4
+MF0gLT4gW0NNRF0gMTMgMDQgMDMgMEIgMDAgMDEgClsgMTU1NS41MjA2NDZdIDwtIFtFVlRd
+IDExIDNEIEM0IDAyIDYyIEQxIApbIDE1NTUuNTUxODk0XSA8LSBbRVZUXSAwOCAwNCAwMCAw
+QiAwMCAwMiAKWyAxNTU1LjYwMDk0MV0gPC0gW0VWVF0gRUQgQkEgNDcgOTEgRDAgMjYgMEEg
+OUYgQjcgClsgMTU1NS42MzE5MTZdIDwtIFtBQ0xdIDBCIDIwIDEwIDAwIDBDIDAwIDAxIDAw
+IDBCIDAxIDA4IDAwIDAyIDAwIDAwIDAwIEI4IDAyIDAwIDAwIApbIDE1NTUuNjMzOTAxXSA8
+LSBbRVZUXSAxMyAwNSAwMSAwQiAwMCAwMiAwMCAKWyAxNTU1LjY4MzAzN10gPC0gW0FDTF0g
+MEIgMjAgMEEgMDAgMDYgMDAgMDEgMDAgMEEgMDIgMDIgMDAgMDMgMDAgClsgMTU1NS43MzE5
+MTddIDwtIFtBQ0xdIEY0IDA3IDgyIEYxIDNBIDlGIDE0IDRCIDJDIDI2IDVDIDcyIEFFIEFD
+IEFFIEYzIDVBIEU5IDgwIDM5IDEyIEQ0IDRDIDZBIApbIDE1NTUuNzMzODg0XSA8LSBbRVZU
+XSAxMyAwNSAwMSAwQiAwMCAwMiAwMCAKWyAxNTU1Ljc4MjkzMl0gPC0gW0FDTF0gMEIgMjAg
+MTAgMDAgMEMgMDAgMDEgMDAgMDMgMDMgMDggMDAgNDAgMDAgNDAgMDAgMDAgMDAgMDAgMDAg
+ClsgMTU1NS44MzE5MDFdIDwtIFtBQ0xdIDBCIDIwIDFCIDAwIDE3IDAwIDAxIDAwIDA0IDAz
+IDEzIDAwIDQwIDAwIDAwIDAwIDAxIDAyIEZEIDAzIDA0IDA5IDAwIDAwIDAwIDAwIDAwIDAw
+CiAwMCAwMCAwMCAKWyAxNTU1Ljg2MzkxN10gPC0gW0VWVF0gMTMgMDUgMDEgMEIgMDAgMDIg
+MDAgClsgMTU1NS45MTI5NTldIDwtIFtBQ0xdIDBCIDIwIDEyIDAwIDBFIDAwIDAxIDAwIDA1
+IDA0IDBBIDAwIDQwIDAwIDAwIDAwIDAwIDAwIDAxIDAyIEZEIDAzIApbIDE1NTUuOTQ2ODk5
+XSA8LSBbRVZUXSAxMyAwNSAwMSAwQiAwMCAwMiAwMCAKWyAxNTU1Ljk5NTkyM10gPC0gW0FD
+TF0gMEIgMjAgMDggMDAgMDQgMDAgNDAgMDAgMDMgNzMgMDEgRDcgClsgMTU1Ni4wNDQ5MjZd
+IDwtIFtBQ0xdIDBCIDIwIDEyIDAwIDBFIDAwIDQwIDAwIDAxIEVGIDE1IDgxIDExIDAyIEUw
+IDA3IDAwIEY4IDAzIDAwIDA3IEFBIApbIDE1NTYuMDYxODk5XSA8LSBbRVZUXSAxMyAwNSAw
+MSAwQiAwMCAwMiAwMCAKWyAxNTU2LjExMDkwN10gPC0gW0FDTF0gMEIgMjAgMDggMDAgMDQg
+MDAgNDAgMDAgMEIgNzMgMDEgOTIgClsgMTU1Ni4xNTk5MDddIDwtIFtBQ0xdIDBCIDIwIDBD
+IDAwIDA4IDAwIDQwIDAwIDAxIEVGIDA5IEUzIDA1IDBCIDhEIEFBIApbIDE1NTYuMjA4OTEy
+XSA8LSBbQUNMXSAwQiAyMCAwQyAwMCAwOCAwMCA0MCAwMCAwMSBFRiAwOSBFMSAwNSAwQiA4
+RCBBQSAKWyAxNTU2LjIxMDg4OF0gPC0gW0VWVF0gMTMgMDUgMDEgMEIgMDAgMDIgMDAgClsg
+MTU1Ni4yMTI4OTJdIDwtIFtBQ0xdIDBCIDIwIDA5IDAwIDA1IDAwIDQwIDAwIDA5IEZGIDAx
+IDIxIDVDIApbIDE1NTYuMjQ1OTAzXSA8LSBbQUNMXSAwQiAyMCAxQSAwMCAxNiAwMCA0MCAw
+MCAwOSBFRiAyNSA0OCA2NSA2QyA2QyA2RiAyMCA2NiA3MiA2RiA2RCAyMCA1MSA1MyA2NSA3
+MiA3NiA2NQogNzIgNDAgClsgMTU1Ni4yNDc4ODFdIDwtIFtFVlRdIDEzIDA1IDAxIDBCIDAw
+IDAyIDAwIApbIDE1NTYuMjk2OTAxXSA8LSBbQUNMXSAwQiAyMCAwOCAwMCAwNCAwMCA0MCAw
+MCAwOSA1MyAwMSBEOSAKWyAxNTU2LjMyNzg5N10gPC0gW0VWVF0gMTMgMDUgMDEgMEIgMDAg
+MDIgMDAgClsgMTU1Ni4zNzY5MDVdIDwtIFtBQ0xdIDBCIDIwIDA4IDAwIDA0IDAwIDQwIDAw
+IDBCIDczIDAxIDkyIApbIDE1NTYuNDI1OTE1XSA8LSBbQUNMXSAwQiAyMCAwOCAwMCAwNCAw
+MCA0MCAwMCAwQiAxRiAwMSA3MyAKWyAxNTU2LjYzNTkzNl0gPC0gW0VWVF0gMTMgMDUgMDEg
+MEIgMDAgMDEgMDAgClsgMTU1Ni42ODQ4OTFdIDwtIFtBQ0xdIDBCIDIwIDA4IDAwIDA0IDAw
+IDQwIDAwIDAxIDUzIDAxIDlDIApbIDE1NTYuNzMzOTA0XSA8LSBbQUNMXSAwQiAyMCAwOCAw
+MCAwNCAwMCA0MCAwMCAwMyA3MyAwMSBENyAKWyAxNTU2Ljc4MjkwN10gPC0gW0FDTF0gMEIg
+MjAgMEMgMDAgMDggMDAgMDEgMDAgMDYgMDQgMDQgMDAgNDAgMDAgNDAgMDAgClsgMTU1Ni44
+MTU4OTddIDwtIFtFVlRdIDEzIDA1IDAxIDBCIDAwIDAyIDAwIApbIDE1NTYuODY0OTA2XSA8
+LSBbQUNMXSAwQiAyMCAwQyAwMCAwOCAwMCAwMSAwMCAwNyAwNSAwNCAwMCA0MCAwMCA0MCAw
+MCAKWyAxNTU2Ljg2Njg4N10gPC0gW0VWVF0gMTMgMDUgMDEgMEIgMDAgMDIgMDAgClsgMTU1
+Ni45MTU5MTJdIDwtIFtFVlRdIDBGIDA0IDAwIDAxIDA2IDA0IApbIDE1NTYuOTE3ODg3XSA8
+LSBbRVZUXSAwNSAwNCAwMCAwQiAwMCAxNiAKWyAxNTU2Ljk2NjkyOF0gPC0gW0VWVF0gMEUg
+MDQgMDEgMUEgMEMgMDAgClsgMTU1Ny41Nzk5ODNdIEJsdWV0b290aDogaGNpMDogY29tbWFu
+ZCAweDA0MTMgdHggdGltZW91dApbUVNlcnZlcl0gQ2hpbGQgdGVybWluYXRlZCBieSBzaWdu
+YWwgS2lsbGVkCg==
+--------------RPiOa1eO3rfjjsP3iJaQbfKy
+Content-Type: application/octet-stream;
+ name="Flush_Occurred_Misalignment.pcap"
+Content-Disposition: attachment; filename="Flush_Occurred_Misalignment.pcap"
+Content-Transfer-Encoding: base64
+
+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
+
+--------------RPiOa1eO3rfjjsP3iJaQbfKy--
+
