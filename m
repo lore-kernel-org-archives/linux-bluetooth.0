@@ -1,198 +1,159 @@
-Received: from mail-lj1-f179.google.com (mail-lj1-f179.google.com [209.85.208.179])
+Received: from mail-lj1-f177.google.com (mail-lj1-f177.google.com [209.85.208.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9512F55E5B;
-	Fri, 24 May 2024 19:22:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 518295BACF;
+	Fri, 24 May 2024 19:39:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716578559; cv=none; b=GLt7bw5vobFY9+93qiar6u5B4BobXOkB3DN6Os6A/F5e9x2klMFZkVmXEQ+aerY0FBgt9z8+DraOBlekuDnqg6tQ7+u9/j5Dr29zfceCpCkb2dIPkUJQfN3w1c+Vx8+M9IYoFeb34ZNcrI3nW20QqK6XQkggzt8eVFxEK53F8MY=
+	t=1716579584; cv=none; b=NSOIbWvR6+nlI3dFNuq/5WIYXkuvha0OM977FCu1de5iDaYemIv54iW97l0DXtnDaCz2AmhbUJOsr4PVcB8JBaQm1fVhK7diZ8aDAhjmazxla+oWNmi1vGqGeGFSjQxW4wCYgwoQUmixIJgjScktEFLwe2I9f/o6CNrz58Lfrbo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716578559; c=relaxed/simple;
-	bh=o+O4qg3jlg+Kj0uo37ivxe16BIKMl4kpu2HAeKhw0Bo=;
+	s=arc-20240116; t=1716579584; c=relaxed/simple;
+	bh=AO6flEiY5GN86OBnbWq/A3cQxhOqbBj/HG/J6IbbzR4=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=f6/YrAuuj/vqkoFlYuqlseCCW73MJAOO0pUja0a1Db9HY9p+Bky3SpCAtosYXaAvpxhWocCfl2wl2pQIMHmTzLYD7bCKiGX0ltRiumz72Bucdv/uOo9H9B/ltMHV1ri3vtiJ2XaxiwRf4mVFurF+veIGJfoE0l8nM43fw+j5C0g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ndYxUEx3; arc=none smtp.client-ip=209.85.208.179
+	 To:Cc:Content-Type; b=edXwNp2Y2tiQjlN+JncbXnfGuSfby9R5EdAtJ2Zzkfb3zbtSdIhty2sCRmLYZlv/g6K1m9qGMQRrOTFmYY5jZRE3ik8Jpkwbx3RPCBGI32heE0bRTPreZleuEwVWrkMkJb6Z7ir79ghEePtKvtQHuJoAPrxHfwDjel1iyw85URA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fpNqhp7m; arc=none smtp.client-ip=209.85.208.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ndYxUEx3"
-Received: by mail-lj1-f179.google.com with SMTP id 38308e7fff4ca-2e3efa18e6aso33712971fa.0;
-        Fri, 24 May 2024 12:22:37 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fpNqhp7m"
+Received: by mail-lj1-f177.google.com with SMTP id 38308e7fff4ca-2e719bab882so79656891fa.3;
+        Fri, 24 May 2024 12:39:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1716578556; x=1717183356; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1716579581; x=1717184381; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Id4dzP3Wcb5ApEWbbo6ZZWSl9MfSzG4QR1RyXqGKis8=;
-        b=ndYxUEx3odyBX80ewnTV00IcawruHrZPIqCkFjjSHSWQnFlnI1JgHdeszBoI+qKyA8
-         Jz3+eXcm8aEo8zx9Cyxfz+Hr4T8KCFY4WTNoXhYMUx87WisuuGtRSI4UXLuHWV2UJZjq
-         i1qke9epZiW8AHUiTOke8bKym6RfH6zO+qyNm1EIxZc5HaEbmcG6mr2Xe7PCGChuKN5X
-         EpFTNAyXutuCZJ85lkX7niHL4/JVQoy8IzelAU/Nrm2vtTG7/qWsquwVAkNK8mDGuK5X
-         r72e9PVFNethfcC3gufrHX/uaMLcKRpRz4fsID9IJTnwjTFZVGtDDj4dm4AMToApawBF
-         yDqQ==
+        bh=vvA1TEXJy8UZ30B8rAec5iNH0YYUOMkxldrbK8cu0os=;
+        b=fpNqhp7mEyZmRsonidx1iLVfgQMsxODqXHqFQjtcwik/bVS71vfMR6ppE/l89inEPu
+         SRX7D0j7QtYGPIn5aLjlthMNKz+AKLjt0bwuibRD6btcgml0ddsaQoKK4fKhTwRBU1Oc
+         c28aOzgg0VBS6zhMBWX40hAj6AQrsNCzKcu2PZjCuRJ8l2R8Qo8zTqHYX4QiilDF1C/V
+         U/Q9qmQCYjREc11Vc+fIbh7P6FzSM01OdVL6G+BsiUr2h+S/lGD71KrE5Sv4vIIAo0gx
+         q2y9mxwQohBdoLWrO13NyA7UeVq+Afdn2fsfE4cMA/aFiT4hz6DYmcF6dVgFG/uBStP6
+         PN1Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716578556; x=1717183356;
+        d=1e100.net; s=20230601; t=1716579581; x=1717184381;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=Id4dzP3Wcb5ApEWbbo6ZZWSl9MfSzG4QR1RyXqGKis8=;
-        b=iUcl77kH3lfeZbRZV7VIsyGTBuC8VOq0phV/FW0oJcSrSU1YxrDUfm5Zvk60odBjHL
-         XX6MXOjQPlvV8WGlLKxmjx70ZYN7Rfimmkq8thGKaxPuGaNTrczKsbuQ4cY5ykrqW3QP
-         HmpJa3eWfqstKD3P1I+yTcz+RFZ5TMPp08XPv8mQb9YmPva5PUVduPyeTxXIxhhuYoqN
-         oTNn+nUjeHEQm9weLL7F2SDXGOidgJQj9ICy5PZrhkXiwrr4VBOpvVT5uoEosBbYVLsb
-         XHCzNwxtGQQCIjfIkyLIykLdCR70/Y9XjGTHqhFBkAmr6DVUOCEDbMFCVioRajPGI8w3
-         w51w==
-X-Forwarded-Encrypted: i=1; AJvYcCWphAwnakOmqBfGkyJS80Qb4r9Dq7VA61oyzATbFibF70leAnYHeavbMk/7WKmg2/o/G5RU3FXYqnfbOIK1Qcl68WTL43Y3y/vA3e4GLP6TWVczGtWIL/0v+ddXqvjWhEEBmhznSMwbSKybxcyG
-X-Gm-Message-State: AOJu0YyDrmw73/lRmyPMuIUFCTJjoQ6D4XmS9Elt/ueOZS4M/g8kV+Wz
-	gBV4aPsZdyPMlpquobpihHPaOAZzHpnkTsSQijreRqHXwVHqd0OVlj4uVIdj38hzJ6auQcCJR6q
-	VKS4Gtl/rGnkrSNkO/pXiNNh6b8o=
-X-Google-Smtp-Source: AGHT+IHqyCYbmdYS3ZS0dAvkeGUOFauCUjjEiZV5AYEknncFQ8vSdNjVsqZSlXzLRynGH4NofRN4A5SfgO0cWICS+nE=
-X-Received: by 2002:a2e:a795:0:b0:2e1:c97b:6f25 with SMTP id
- 38308e7fff4ca-2e95a096142mr13050031fa.1.1716578555411; Fri, 24 May 2024
- 12:22:35 -0700 (PDT)
+        bh=vvA1TEXJy8UZ30B8rAec5iNH0YYUOMkxldrbK8cu0os=;
+        b=Fae0I5QoxJoANM9sPV8YVhZUoDgTdziSR2QdvEWorII8T7MMgNrY3dNCTOdnzf7/OD
+         1knUTRM3ty8S7P0HsRC6My9aregaTJOgbHMKsjPs3wa3dmUoorwrtx0hv0BHG0tVeVWq
+         A52QLJvlKPyJ2FCT1RCrIG19Eblxb7BmvggUTofUa+hTAdmg619f0h2xS0triu9L7EyF
+         qzJ9Xk6MCBcR0RU3bW6uM+jvXx6K52owbpzutC3IL63jraGOxwOVsSbujd3o+4aBgATJ
+         BNxzPxgjsmLZ88rDGOf87f88ZjX1Udw6+NtSZkVCvsYB34CWxSZJDRJ+JNN0RrCrWVee
+         lU5w==
+X-Forwarded-Encrypted: i=1; AJvYcCWTeRBbECuQWhmUpCoKyAx0pj2rPch445fKkoqXy73PL6j0FnlTloM2Y5n+oCIn36kcq88FkPw/nJ4xjgwQk9T/Ef6u8xgh4PpWfZDOWOJ3XgJkH1VzSatgSTc7FityEaUO3UeEr0gvcUT0EaSI0V1I6SHyUqMzpM5AR1KT9FUuTREb8Olv0QmXhvmFb45l
+X-Gm-Message-State: AOJu0YxiD5V+6eo1e38VrQ6Y7FnwqvwKiDeGdMlDwUrvKHMyXiJOtau/
+	GKc3HjdcXoO1sjLypMvdqQwWQF/+HqZqlniYSHCONzMQq0iKwMsSK/6JMsRdtpE474RMyBu2EhR
+	yCmuhWMvFh1F3eaiHOpWzO+0Q9kqwvQ==
+X-Google-Smtp-Source: AGHT+IH/Fts2MZ9JzhPQTFc1u/R6qIz3bkV8n8VX15J9OkSYxcuMJAlWmONNhgDMZkSm5Y85aUEXz0rqzNRZEaB/Riw=
+X-Received: by 2002:a2e:b74c:0:b0:2de:8685:d07b with SMTP id
+ 38308e7fff4ca-2e95b2cf26bmr17130481fa.46.1716579581149; Fri, 24 May 2024
+ 12:39:41 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240524013127.434500-1-nobuaki.tsunashima@infineon.com>
-In-Reply-To: <20240524013127.434500-1-nobuaki.tsunashima@infineon.com>
+References: <692b4749f4267436363a5a8840140da8cd8858a1.1716190895.git.christophe.jaillet@wanadoo.fr>
+In-Reply-To: <692b4749f4267436363a5a8840140da8cd8858a1.1716190895.git.christophe.jaillet@wanadoo.fr>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Fri, 24 May 2024 15:22:22 -0400
-Message-ID: <CABBYNZ+yvQL0KBagUXtzrBUFmFxp-ek_5aFDJNVyUKsA-xJ-Zg@mail.gmail.com>
-Subject: Re: [PATCH v4] Bluetooth: btbcm: Apply HCI_QUIRK_BROKEN_READ_TRANSMIT_POWER
- to CYW4373
-To: Nobuaki Tsunashima <nobuaki.tsunashima@infineon.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
+Date: Fri, 24 May 2024 15:39:28 -0400
+Message-ID: <CABBYNZLeM7MQrBuGE49KN9Xm1EQ-cFK3nR57sg2hWB0jOUFn7A@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: btintel_pcie: Fix the error handling path of btintel_pcie_probe()
+To: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+Cc: Marcel Holtmann <marcel@holtmann.org>, Tedd Ho-Jeong An <tedd.an@intel.com>, Kiran K <kiran.k@intel.com>, 
+	linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org, 
+	Luiz Augusto von Dentz <luiz.von.dentz@intel.com>, linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi Nobuaki,
+Hi Christophe,
 
-On Thu, May 23, 2024 at 9:31=E2=80=AFPM Nobuaki Tsunashima
-<nobuaki.tsunashima@infineon.com> wrote:
+On Mon, May 20, 2024 at 3:42=E2=80=AFAM Christophe JAILLET
+<christophe.jaillet@wanadoo.fr> wrote:
 >
-> From: Nobuaki Tsunashima <Nobuaki.Tsunashima@infineon.com>
+> Some resources freed in the remove function are not handled by the error
+> handling path of the probe.
 >
-> CYW4373 ROM FW has an issue that it claims LE_Read_Transmit_Power command
-> as supported in a response of Read_Local_Supported_Command command but
-> rejects the LE_Read_Transmit_Power command with "Unknown HCI Command"
-> status. Because Bluetooth driver of kernel 5.11 added sending the
-> LE_Read_Transmit_Power command in initialize phase, hci up fails due to t=
-he
-> issue.
+> Add the needed function calls.
 >
-> Especially in USB i/f case, it would be difficult to download patch FW th=
-at
-> includes its fix unless hci is up.
->
-> The driver already contains infrastructure to apply the quirk for the
-> issue, but currently it only supports DMI based matching. Add support to
-> match by chip id and baseline FW version to detect CYW4373 ROM FW build
-> in generic system.
->
-> Fixes: 7c395ea521e6 ("Bluetooth: Query LE tx power on startup")
-> Signed-off-by: Nobuaki Tsunashima <Nobuaki.Tsunashima@infineon.com>
+> Fixes: c2b636b3f788 ("Bluetooth: btintel_pcie: Add support for PCIe trans=
+port")
+> Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
 > ---
-> V3 -> V4: Fix a few coding style warnings and refine comments for clarify=
-.
-> V2 -> V3: Fix a few coding style warnings and change the subject as more =
-specific.
-> V1 -> V2: Fix several coding style warnings.
+> Compile tested only.
+> Maybe incomplete.
+> ---
+>  drivers/bluetooth/btintel_pcie.c | 20 ++++++++++++++------
+>  1 file changed, 14 insertions(+), 6 deletions(-)
 >
->  drivers/bluetooth/btbcm.c | 32 +++++++++++++++++++++++++++++++-
->  drivers/bluetooth/btusb.c |  4 ++++
->  2 files changed, 35 insertions(+), 1 deletion(-)
+> diff --git a/drivers/bluetooth/btintel_pcie.c b/drivers/bluetooth/btintel=
+_pcie.c
+> index 5b6805d87fcf..d572576d0dbc 100644
+> --- a/drivers/bluetooth/btintel_pcie.c
+> +++ b/drivers/bluetooth/btintel_pcie.c
+> @@ -1280,17 +1280,17 @@ static int btintel_pcie_probe(struct pci_dev *pde=
+v,
 >
-> diff --git a/drivers/bluetooth/btbcm.c b/drivers/bluetooth/btbcm.c
-> index 0a5445ac5e1b..29e3f83a19fa 100644
-> --- a/drivers/bluetooth/btbcm.c
-> +++ b/drivers/bluetooth/btbcm.c
-> @@ -437,18 +437,48 @@ static const struct dmi_system_id disable_broken_re=
-ad_transmit_power[] =3D {
->         { }
->  };
+>         err =3D btintel_pcie_config_pcie(pdev, data);
+>         if (err)
+> -               goto exit_error;
+> +               goto exit_destroy_worqueue;
 >
-> +struct bcm_chip_version_table {
-> +       u8 chip_id;                     /* Chip ID */
-> +       u16 baseline;           /* Baseline version of patch FW */
-> +};
-> +#define BCM_ROMFW_BASELINE_NUM 0xFFFF
-> +static const struct bcm_chip_version_table disable_broken_read_transmit_=
-power_by_chip_ver[] =3D {
-> +       { 0x87, BCM_ROMFW_BASELINE_NUM }                /* CYW4373/4373E =
-*/
-> +};
-> +static bool btbcm_is_disable_broken_read_tx_power_by_chip_ver(u8 chip_id=
-, u16 baseline)
-> +{
-> +       int i;
-> +       size_t table_size =3D ARRAY_SIZE(disable_broken_read_transmit_pow=
-er_by_chip_ver);
-> +       const struct bcm_chip_version_table *entry =3D
-> +                                               &disable_broken_read_tran=
-smit_power_by_chip_ver[0];
-> +
-> +       for (i =3D 0 ; i < table_size ; i++, entry++)     {
-> +               if ((chip_id =3D=3D entry->chip_id) && (baseline =3D=3D e=
-ntry->baseline))
-> +                       return true;
-> +       }
-> +
-> +       return false;
-> +}
-> +
->  static int btbcm_read_info(struct hci_dev *hdev)
->  {
->         struct sk_buff *skb;
-> +       u8 chip_id;
-> +       u16 baseline;
+>         pci_set_drvdata(pdev, data);
 >
->         /* Read Verbose Config Version Info */
->         skb =3D btbcm_read_verbose_config(hdev);
->         if (IS_ERR(skb))
->                 return PTR_ERR(skb);
-> -
-> +       chip_id =3D skb->data[1];
-> +       baseline =3D skb->data[3] | (skb->data[4] << 8);
-
-This is not really safe, you shouldn't attempt to access skb->data
-without first checking skb->len, actually it would be much better that
-you would use skb_pull_data which does skb->len check before pulling
-data.
-
->         bt_dev_info(hdev, "BCM: chip id %u", skb->data[1]);
->         kfree_skb(skb);
+>         err =3D btintel_pcie_alloc(data);
+>         if (err)
+> -               goto exit_error;
+> +               goto exit_free_irq_vectors;
 >
-> +       /* Check Chip ID and disable broken Read LE Min/Max Tx Power */
-> +       if (btbcm_is_disable_broken_read_tx_power_by_chip_ver(chip_id, ba=
-seline))
-> +               set_bit(HCI_QUIRK_BROKEN_READ_TRANSMIT_POWER, &hdev->quir=
-ks);
-> +
+>         err =3D btintel_pcie_enable_bt(data);
+>         if (err)
+> -               goto exit_error;
+> +               goto exit_free_pcie;
+>
+>         /* CNV information (CNVi and CNVr) is in CSR */
+>         data->cnvi =3D btintel_pcie_rd_reg32(data, BTINTEL_PCIE_CSR_HW_RE=
+V_REG);
+> @@ -1299,17 +1299,25 @@ static int btintel_pcie_probe(struct pci_dev *pde=
+v,
+>
+>         err =3D btintel_pcie_start_rx(data);
+>         if (err)
+> -               goto exit_error;
+> +               goto exit_free_pcie;
+>
+>         err =3D btintel_pcie_setup_hdev(data);
+>         if (err)
+> -               goto exit_error;
+> +               goto exit_free_pcie;
+>
+>         bt_dev_dbg(data->hdev, "cnvi: 0x%8.8x cnvr: 0x%8.8x", data->cnvi,
+>                    data->cnvr);
 >         return 0;
->  }
 >
-> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> index d31edad7a056..52561c8d8828 100644
-> --- a/drivers/bluetooth/btusb.c
-> +++ b/drivers/bluetooth/btusb.c
-> @@ -142,6 +142,10 @@ static const struct usb_device_id btusb_table[] =3D =
-{
->         { USB_VENDOR_AND_INTERFACE_INFO(0x04ca, 0xff, 0x01, 0x01),
->           .driver_info =3D BTUSB_BCM_PATCHRAM },
->
-> +       /* Cypress devices with vendor specific id */
-> +       { USB_VENDOR_AND_INTERFACE_INFO(0x04b4, 0xff, 0x01, 0x01),
-> +         .driver_info =3D BTUSB_BCM_PATCHRAM },
+> -exit_error:
+> +exit_free_pcie:
+> +       btintel_pcie_free(data);
 > +
->         /* Broadcom devices with vendor specific id */
->         { USB_VENDOR_AND_INTERFACE_INFO(0x0a5c, 0xff, 0x01, 0x01),
->           .driver_info =3D BTUSB_BCM_PATCHRAM },
+> +exit_free_irq_vectors:
+> +       pci_free_irq_vectors(pdev);
+> +
+> +exit_destroy_worqueue:
+> +       destroy_workqueue(data->workqueue);
+> +
+
+This looks a bit messy, perhaps we should really be calling
+btintel_pcie_remove instead and adapt it to check if a field has been
+initialized or not then proceed to free/cleanup/etc.
+
+>         /* reset device before exit */
+>         btintel_pcie_reset_bt(data);
+>
 > --
-> 2.25.1
+> 2.45.1
 >
 
 
