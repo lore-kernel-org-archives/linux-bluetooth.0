@@ -1,58 +1,58 @@
-Received: from mail-qt1-f181.google.com (mail-qt1-f181.google.com [209.85.160.181])
+Received: from mail-yb1-f180.google.com (mail-yb1-f180.google.com [209.85.219.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F64513A89E
-	for <linux-bluetooth@vger.kernel.org>; Mon, 27 May 2024 10:00:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF51915DBB9
+	for <linux-bluetooth@vger.kernel.org>; Mon, 27 May 2024 11:54:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716804047; cv=none; b=Pz5H76Kx71p0iA5eSbmphorUVsxQoeqD0+OxGaMVU2GePEGjaxJMT31FESqT1Dopxh3SVgGXQMSNKhLq4HFoy5rGXXJMhDpZI6MNdl+UPaBaQqBz+uYFtIU3L/x3Di9B4DiIlMTVSLH7CmtuR9hbZjtMwub405tA4ndm8S27QDs=
+	t=1716810885; cv=none; b=WCYtYWSdzTQdXmdEprRoCAgnrOXHQ5tlRGne0Ffebh0sEekbNGcud2KEhr1uSpfH6q2FjzJzi2zVB4fDkUSqqt8wB77CwqD7s+c4A8Rxz2pxDAJlIEM3ecssp9VCUzMjjyC5IVMJ8V5fZigr39Sq0a4v6nRb8fsJW37GeD4bwps=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716804047; c=relaxed/simple;
-	bh=8S37kB+mZpep6SbW6jTS1/XsmxaeswjXM6FsraTG+bk=;
+	s=arc-20240116; t=1716810885; c=relaxed/simple;
+	bh=IsvEyiIap4MwRPL7+I78TVklz9nBKQ+p1Hyi2O3BqJw=;
 	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=KEBqa8Q2mCU9bXXshw5A73TWpDFzyIQLPSHUvAmVZfpKHY7BPUlj5xC3zAlustQGZ2x4a8z4Sl6Ub1JEKYgVlOYZdH97ejuSmSfVZuGVUa47iETPC7Ge1s2Thyf7TUKUaOmEgDQIAhMjQ+5jzYPsbjr/ccGv1PmP2KaEozDmYLs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NuP6pnuL; arc=none smtp.client-ip=209.85.160.181
+	 In-Reply-To:References; b=KZ/M0j1weQqTzboWCStvUJtkS7P9c7WSXvx3FfQ37Xl1TLZ/gBTdYZ8JGYg9IwY0dzkMxu5k1hyBN1I5P/TTldqpsIYe6SkLYCqXNLXP58zk12/Z/oP4/sk0jJUDZthpp21X4j9ZkGIJ3kdZHCzmTHI3QtKybICgBHNAYe32vxA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MURjiDdI; arc=none smtp.client-ip=209.85.219.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NuP6pnuL"
-Received: by mail-qt1-f181.google.com with SMTP id d75a77b69052e-43fbbd06e48so11145801cf.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 27 May 2024 03:00:46 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MURjiDdI"
+Received: by mail-yb1-f180.google.com with SMTP id 3f1490d57ef6-df7812c4526so2315507276.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 27 May 2024 04:54:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1716804045; x=1717408845; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1716810883; x=1717415683; darn=vger.kernel.org;
         h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
          :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=pr+4q0NpnN4tQZx6pYtn0vDc0FSzhY4RfOW2KTjNrHc=;
-        b=NuP6pnuLhMhHPblh0XYsOOat/N90jcYPFJO/G5cQhm7aJ984uYQ04L3ElyqA7+LD7K
-         q/ynKUjht/kgMMfNe26sLlKoJSSDDm9Wy0zkZweyg07jkMbyr2VFu9Uqb5hDEcCOa2VX
-         ZBM7fcxlGlT12m8XUJjommd/0GH3gFcnFqDeO6gX7rUixjc4uEAwj9WGFSaOtg9xqgN8
-         NFoTV5EovaugrCydIw02+Y2VC9BMRgrb5DJRg8KJ0Ug2X503MjlkX9mxRxG5qvFCLtR9
-         wo3TnxQXx18HYtTntg7bHRF8nrWbjZqANQBCAZGjF1vYmBaR6b8XGxhx6wsoAvq359M2
-         YIcg==
+        bh=1Im0MspvIZzheGIPpWMlVJpsWkX6iqlotN1MARYU4Wg=;
+        b=MURjiDdIC1RKL43mOfyc+Zpon9LMkjp08HWw85yxlr1V84aGmRIbyFi9i/7Gzbbeja
+         SjAa7Oun2vfq0Kr643wovmsfF36Wfl3oJ4+hChqCvqfMPbeDiYwBEmi7Q383pXOFFMdB
+         /5KwY+6fCPb1W0zQc3olHtAUml8Xk78vPNmPtbP4CQDhBC5D7MY9fIy9mPKQPMVOYs1C
+         wE9bZbCduGxHMN0V1nSES6cN7MbPp1EqXBbVYdYasWSeK6QoDG/9nilBjuCySfxo4U2/
+         BCLRl61ki9XDxSksqFQonQRn7AqxHuwTBlaAI/T/a6eCt5xQZdsR6Yvpm+7izx0uT+O4
+         orYA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716804045; x=1717408845;
+        d=1e100.net; s=20230601; t=1716810883; x=1717415683;
         h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
          :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=pr+4q0NpnN4tQZx6pYtn0vDc0FSzhY4RfOW2KTjNrHc=;
-        b=XgEkJFUG2kvcXOwDcviqKLDGPypjFRY5awlFlgPgE/fDNsvx/mezCO/MpiAnMP73QS
-         /AcDmyvXoWLainNhcMJOZR5f+Z9ybWGZ3XPtcnlgTUMQ35vShox2uomH8NadvSDYFDiM
-         C1E8IZy21bj2rvTJR6t0AiHRduNufpnrMBHG9084CrQWAkb13GyoLWfg8DqmgXhaWHIi
-         FliLkIUP9N3PSfA9LcduVqMu50LWrECn9H3RT5wqs2wYNraWV0NL/tXeTM/bQMAvb6Ko
-         0/idb/PZAlkQpWwrtBJ30ShaDVpiL11Jg6z5Tp5wF5naOf4LWTAggpyGDGIK/F/r6J7E
-         UdqQ==
-X-Gm-Message-State: AOJu0YxHe+94o9ITXWcf/3F3/NNttMsL27OcmCV5LoN6AaA7AIKZ21wA
-	S16R2+y3ZmV718fy7WGV2cEeqB4ys/Axaxxq/D0p23qyd+tZ31IFWdiqZw==
-X-Google-Smtp-Source: AGHT+IEyZWy5NQmjvi3ZBSGYHIK8WQR7dW1v+RLed0wACYfBVZ/QO2ceg3NjIB+2G0VQqS1TtEFwZQ==
-X-Received: by 2002:a05:622a:164e:b0:43b:173e:ce1b with SMTP id d75a77b69052e-43fa74df0a0mr193266871cf.32.1716804044961;
-        Mon, 27 May 2024 03:00:44 -0700 (PDT)
-Received: from [172.17.0.2] ([74.235.135.240])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-43fb18c313fsm32577121cf.89.2024.05.27.03.00.44
+        bh=1Im0MspvIZzheGIPpWMlVJpsWkX6iqlotN1MARYU4Wg=;
+        b=NHrmTfIJbP+uLyhVkSCEcHRVD3I/YzNRYmMoLIBshBmxoE1edIz0WL8/1rUBAnAEZP
+         WOpIn0aJRSzt11pvjn6Ia2QHkSoT0E9mKuHZWGA1EvM26ZP0DFFnj69r2dnBdTMd7vxr
+         RK5mxMX/P/kPa2hRu5Q5J8t7SG7vW9zHRzk0qTDaKGLt5uuPLboHfC/FFc59p0mlm+AN
+         PQlVB1CaOmE9bbTyafkwUtxvTI5xJzpwmPpRafQJFGnP4C7yPHFGkzJRWFyo4sGgn50O
+         zFFp168RzUZPp84BKFTT+d8H/MhXyeOmRAUMjOy7TWWYuoeR/3daYB2pxc2jiiNeHzcv
+         OBUA==
+X-Gm-Message-State: AOJu0YzM0dqbz4w1/nkcy3Tl7xi2B2Ydv90orM4nauIl1RdoXd6CFfmY
+	KWk7/MG1nKP37uTLobnFeQESF1/EYlZYTzIPmpsY757dzshk0NrGtBa6/w==
+X-Google-Smtp-Source: AGHT+IFKJPapvItNKJ89PazUdHyRa2+GYYp1ozDDT2dUIf2tiOvnmwbB2PS/bNQL9Zki6EgYrfOL0g==
+X-Received: by 2002:a25:b2a2:0:b0:dcb:e82c:f7d with SMTP id 3f1490d57ef6-df772256da5mr8721284276.41.1716810882555;
+        Mon, 27 May 2024 04:54:42 -0700 (PDT)
+Received: from [172.17.0.2] ([20.51.198.150])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-794abd31557sm290091485a.116.2024.05.27.04.54.42
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 27 May 2024 03:00:44 -0700 (PDT)
-Message-ID: <665459cc.050a0220.4c7cc.a915@mx.google.com>
-Date: Mon, 27 May 2024 03:00:44 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============3717775451843846402=="
+        Mon, 27 May 2024 04:54:42 -0700 (PDT)
+Message-ID: <66547482.050a0220.35509.9829@mx.google.com>
+Date: Mon, 27 May 2024 04:54:42 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============4830813423146128683=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -60,13 +60,13 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, hadess@hadess.net
-Subject: RE: [BlueZ] main: Simplify parse_config_string()
-In-Reply-To: <20240527082730.967400-1-hadess@hadess.net>
-References: <20240527082730.967400-1-hadess@hadess.net>
+To: linux-bluetooth@vger.kernel.org, iulia.tanasescu@nxp.com
+Subject: RE: Add new BAP BSRC/SCC tests
+In-Reply-To: <20240527075422.18953-2-iulia.tanasescu@nxp.com>
+References: <20240527075422.18953-2-iulia.tanasescu@nxp.com>
 Reply-To: linux-bluetooth@vger.kernel.org
 
---===============3717775451843846402==
+--===============4830813423146128683==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -77,37 +77,29 @@ Dear submitter,
 
 Thank you for submitting the patches to the linux bluetooth mailing list.
 This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=856060
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=856047
 
 ---Test result---
 
 Test Summary:
-CheckPatch                    PASS      0.52 seconds
-GitLint                       FAIL      0.47 seconds
-BuildEll                      PASS      24.03 seconds
-BluezMake                     PASS      1611.55 seconds
-MakeCheck                     PASS      13.57 seconds
-MakeDistcheck                 PASS      172.83 seconds
-CheckValgrind                 PASS      245.74 seconds
-CheckSmatch                   PASS      346.67 seconds
-bluezmakeextell               PASS      117.44 seconds
-IncrementalBuild              PASS      1387.87 seconds
-ScanBuild                     PASS      978.17 seconds
+CheckPatch                    PASS      2.74 seconds
+GitLint                       PASS      1.89 seconds
+BuildEll                      PASS      24.37 seconds
+BluezMake                     PASS      1633.36 seconds
+MakeCheck                     PASS      13.23 seconds
+MakeDistcheck                 PASS      176.30 seconds
+CheckValgrind                 PASS      248.67 seconds
+CheckSmatch                   WARNING   352.24 seconds
+bluezmakeextell               PASS      119.17 seconds
+IncrementalBuild              PASS      9382.93 seconds
+ScanBuild                     PASS      980.76 seconds
 
 Details
 ##############################
-Test: GitLint - FAIL
-Desc: Run gitlint
+Test: CheckSmatch - WARNING
+Desc: Run smatch tool with source
 Output:
-[BlueZ] main: Simplify parse_config_string()
-
-WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
-15: B1 Line exceeds max length (108>80): "bluez-5.75/src/main.c:425:2: alloc_fn: Storage is returned from allocation function "g_key_file_get_string"."
-16: B1 Line exceeds max length (132>80): "bluez-5.75/src/main.c:425:2: var_assign: Assigning: "tmp" = storage returned from "g_key_file_get_string(config, group, key, &err)"."
-17: B1 Line exceeds max length (126>80): "bluez-5.75/src/main.c:433:2: noescape: Assuming resource "tmp" is not freed or pointed-to as ellipsis argument to "btd_debug"."
-18: B1 Line exceeds max length (110>80): "bluez-5.75/src/main.c:440:2: leaked_storage: Variable "tmp" going out of scope leaks the storage it points to."
-19: B3 Line contains hard tab characters (\t): "438|	}"
-21: B3 Line contains hard tab characters (\t): "440|->	return true;"
+src/shared/bap.c:286:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structuressrc/shared/bap.c:286:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structuressrc/shared/bap.c:286:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structuressrc/shared/bap.c:286:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structuressrc/shared/bap.c:286:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structuressrc/shared/bap.c:286:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structures
 
 
 ---
@@ -115,4 +107,4 @@ Regards,
 Linux Bluetooth
 
 
---===============3717775451843846402==--
+--===============4830813423146128683==--
