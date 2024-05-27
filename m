@@ -1,95 +1,131 @@
-Received: from smtp14.infineon.com (smtp14.infineon.com [217.10.52.160])
+Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0FAA79CC;
-	Mon, 27 May 2024 01:59:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.10.52.160
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8364C22301;
+	Mon, 27 May 2024 06:58:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716775164; cv=none; b=jzUEBQMd88pwkd/Zdj3y6ziyKyCm+LEGxRPhnZnOaj+6nOJTDdsdQ/1A0WSa12boCqYrD6XdO74SOWmwr1Py8DiKUyUIDWEKForLaOoZXEWZ1Ydwhr7Um402EcJyg0fQ3GA+5vRHeVq7nGmqNGehIdc1XjZCGzIkRvej0hY4YG0=
+	t=1716793114; cv=none; b=dF1p2+8TZ8jmIi2mTRQzzHjhQe2XHXQZF8Q66f6RgGWfMkKrU46vj2eJEYiFdJ/I0bc4Qq6UfQuc0IMZI/1JQUGHFNIr88ZyfRhJAcMlUHbh0KeOLWh66wYIttFO0+WQ8TtLrD+tjL7DUntyo04fI/Rt2vyHdz1lddPakqsfPVc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716775164; c=relaxed/simple;
-	bh=HkaNFuBrTVxYNPWeD6kFeLSKVPgVwvMG4VXUqpIXbho=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=B2u/n3P320SxXJELqeNpQXrdrS6SJK90o0ywnE9hU2emxzy9dECPa5SG63A2i1SDwkf3NlCqdHpwsAq4B2CBMcESm/n9ODJLEvrIKSn1/RRxLAN6iPljaO7UgjefA3ZIXC+cLtzekj1UPgzQicprk6YMHfZWp5mtd5Mh2Tyza8U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infineon.com; spf=pass smtp.mailfrom=infineon.com; dkim=pass (1024-bit key) header.d=infineon.com header.i=@infineon.com header.b=JUu5NKQn; arc=none smtp.client-ip=217.10.52.160
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infineon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=infineon.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=infineon.com header.i=@infineon.com header.b="JUu5NKQn"
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=infineon.com; i=@infineon.com; q=dns/txt; s=IFXMAIL;
-  t=1716775163; x=1748311163;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=HkaNFuBrTVxYNPWeD6kFeLSKVPgVwvMG4VXUqpIXbho=;
-  b=JUu5NKQnrGan2V5XRkbpjfe0Dpv5KRxT6PG8mHc+tDZMsRmeJowTSwrH
-   H/08eTRsMISKuYUgBlgE6Kcc0MpfM3HH3QRmIOFb2v1Si7HNHkI/U1i5+
-   B6bmFoq1+GQ8EtnL51ZemqADOJUYFrfPQTbYDGrWxaZQoQIK1JIlckRyy
-   k=;
-X-IronPort-AV: E=McAfee;i="6600,9927,11084"; a="51929722"
-X-IronPort-AV: E=Sophos;i="6.08,191,1712613600"; 
-   d="scan'208";a="51929722"
-Received: from unknown (HELO MUCSE822.infineon.com) ([172.23.29.53])
-  by smtp14.infineon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 May 2024 03:59:14 +0200
-Received: from KLUSE834.infineon.com (172.28.156.178) by MUCSE822.infineon.com
- (172.23.29.53) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.40; Mon, 27 May
- 2024 03:59:13 +0200
-Received: from KLUSE832.infineon.com (172.28.156.177) by KLUSE834.infineon.com
- (172.28.156.178) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1258.34; Mon, 27 May
- 2024 03:59:13 +0200
-Received: from KLUSE832.infineon.com ([fe80::66a7:739f:6a03:4e1c]) by
- KLUSE832.infineon.com ([fe80::66a7:739f:6a03:4e1c%7]) with mapi id
- 15.02.1258.034; Mon, 27 May 2024 03:59:13 +0200
-From: <Nobuaki.Tsunashima@infineon.com>
-To: <luiz.dentz@gmail.com>
-CC: <marcel@holtmann.org>, <linux-bluetooth@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-Subject: RE: [PATCH v4] Bluetooth: btbcm: Apply
- HCI_QUIRK_BROKEN_READ_TRANSMIT_POWER to CYW4373
-Thread-Topic: [PATCH v4] Bluetooth: btbcm: Apply
- HCI_QUIRK_BROKEN_READ_TRANSMIT_POWER to CYW4373
-Thread-Index: AQHarXodRFaIWgJslEGA5+113yeWdrGmousAgAOzr9A=
-Date: Mon, 27 May 2024 01:59:12 +0000
-Message-ID: <f7a5e281c48b4232a4ba74022dd3f83a@infineon.com>
-References: <20240524013127.434500-1-nobuaki.tsunashima@infineon.com>
- <CABBYNZ+yvQL0KBagUXtzrBUFmFxp-ek_5aFDJNVyUKsA-xJ-Zg@mail.gmail.com>
-In-Reply-To: <CABBYNZ+yvQL0KBagUXtzrBUFmFxp-ek_5aFDJNVyUKsA-xJ-Zg@mail.gmail.com>
-Accept-Language: ja-JP, en-US
-Content-Language: ja-JP
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	s=arc-20240116; t=1716793114; c=relaxed/simple;
+	bh=jcBeXkLp9/vLz8JsiJjEJjDaakT7Qi/f7KbzmUzwCs8=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=SLTWTFFwMys29JXe/yjCmHGjz3lDvnqqGLCbbb02JaLygSBJ7V+O1pGCg545lFB1PnS3yNyAYG/qVf6mCeN5CGPgVJW4SrJwZPxsRjEbyUBcp9Yq9thKix+/xaqXGCzzbSgK89ks9ZS8YENQPeHlvWRf4rwxqTElZbjlboi2kr0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
+X-UUID: c305963a1bf511ef9305a59a3cc225df-20240527
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.1.38,REQID:484e5f6c-e6c9-4284-8a1f-f0eab2c3368f,IP:10,
+	URL:0,TC:0,Content:0,EDM:0,RT:0,SF:-15,FILE:0,BULK:0,RULE:Release_Ham,ACTI
+	ON:release,TS:-5
+X-CID-INFO: VERSION:1.1.38,REQID:484e5f6c-e6c9-4284-8a1f-f0eab2c3368f,IP:10,UR
+	L:0,TC:0,Content:0,EDM:0,RT:0,SF:-15,FILE:0,BULK:0,RULE:Release_Ham,ACTION
+	:release,TS:-5
+X-CID-META: VersionHash:82c5f88,CLOUDID:491e44b15889e9cfa681da0cff0a05a1,BulkI
+	D:2405271453031MF999TC,BulkQuantity:0,Recheck:0,SF:66|24|17|19|44|102,TC:n
+	il,Content:0,EDM:-3,IP:-2,URL:0,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,CO
+	L:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0
+X-CID-BVR: 0,NGT
+X-CID-BAS: 0,NGT,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR,TF_CID_SPAM_FAS,TF_CID_SPAM_FSD,TF_CID_SPAM_FSI
+X-UUID: c305963a1bf511ef9305a59a3cc225df-20240527
+Received: from mail.kylinos.cn [(39.156.73.10)] by mailgw.kylinos.cn
+	(envelope-from <jiangyunshui@kylinos.cn>)
+	(Generic MTA)
+	with ESMTP id 1353223314; Mon, 27 May 2024 14:53:02 +0800
+Received: from mail.kylinos.cn (localhost [127.0.0.1])
+	by mail.kylinos.cn (NSMail) with SMTP id 3AEFBE000EBB;
+	Mon, 27 May 2024 14:53:02 +0800 (CST)
+X-ns-mid: postfix-66542DCE-92878345
+Received: from kylin-pc.. (unknown [172.25.130.133])
+	by mail.kylinos.cn (NSMail) with ESMTPA id 4E09AE000EBB;
+	Mon, 27 May 2024 14:53:01 +0800 (CST)
+From: yunshui <jiangyunshui@kylinos.cn>
+To: linux-kernel@vger.kernel.org,
+	linux-bluetooth@vger.kernel.org
+Cc: marcel@holtmann.org,
+	johan.hedberg@gmail.com,
+	luiz.dentz@gmail.com,
+	yunshui <jiangyunshui@kylinos.cn>
+Subject: [PATCH v2] Bluetooth: 6lowpan: use DEV_STAT_INC() to avoid races
+Date: Mon, 27 May 2024 14:52:58 +0800
+Message-Id: <20240527065258.1014049-1-jiangyunshui@kylinos.cn>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
 
-SGkgTHVpeiwNCg0KVGhhbmtzIGZvciB5b3VyIHJldmlldy4NCg0KPj4gIHN0YXRpYyBpbnQgYnRi
-Y21fcmVhZF9pbmZvKHN0cnVjdCBoY2lfZGV2ICpoZGV2KSAgew0KPj4gICAgICAgICBzdHJ1Y3Qg
-c2tfYnVmZiAqc2tiOw0KPj4gKyAgICAgICB1OCBjaGlwX2lkOw0KPj4gKyAgICAgICB1MTYgYmFz
-ZWxpbmU7DQo+Pg0KPj4gICAgICAgICAvKiBSZWFkIFZlcmJvc2UgQ29uZmlnIFZlcnNpb24gSW5m
-byAqLw0KPj4gICAgICAgICBza2IgPSBidGJjbV9yZWFkX3ZlcmJvc2VfY29uZmlnKGhkZXYpOw0K
-Pj4gICAgICAgICBpZiAoSVNfRVJSKHNrYikpDQo+PiAgICAgICAgICAgICAgICAgcmV0dXJuIFBU
-Ul9FUlIoc2tiKTsNCj4+IC0NCj4+ICsgICAgICAgY2hpcF9pZCA9IHNrYi0+ZGF0YVsxXTsNCj4+
-ICsgICAgICAgYmFzZWxpbmUgPSBza2ItPmRhdGFbM10gfCAoc2tiLT5kYXRhWzRdIDw8IDgpOw0K
-Pg0KPlRoaXMgaXMgbm90IHJlYWxseSBzYWZlLCB5b3Ugc2hvdWxkbid0IGF0dGVtcHQgdG8gYWNj
-ZXNzIHNrYi0+ZGF0YSB3aXRob3V0IGZpcnN0IGNoZWNraW5nIHNrYi0+bGVuLCBhY3R1YWxseSBp
-dCB3b3VsZCBiZSBtdWNoIGJldHRlciB0aGF0ID55b3Ugd291bGQgdXNlIHNrYl9wdWxsX2RhdGEg
-d2hpY2ggZG9lcyBza2ItPmxlbiBjaGVjayBiZWZvcmUgcHVsbGluZyBkYXRhLg0KDQpJIHRoaW5r
-IGl0IGNvdWxkIGJlIHNhZmUgYmVjYXVzZSBpdHMgbGVuZ3RoIGlzIGNoZWNrZWQgaW5zaWRlIGJ0
-YmNtX3JlYWRfdmVyYm9zZV9jb25maWcoKSBhcyBiZWxvdy4NClBsZWFzZSBsZXQgbWUga25vdyBp
-ZiBmdXJ0aGVyIGNoZWNraW5nIGlzIG5lZWRlZC4NCg0KPj4+DQpzdGF0aWMgc3RydWN0IHNrX2J1
-ZmYgKmJ0YmNtX3JlYWRfdmVyYm9zZV9jb25maWcoc3RydWN0IGhjaV9kZXYgKmhkZXYpDQp7DQoJ
-c3RydWN0IHNrX2J1ZmYgKnNrYjsNCg0KCXNrYiA9IF9faGNpX2NtZF9zeW5jKGhkZXYsIDB4ZmM3
-OSwgMCwgTlVMTCwgSENJX0lOSVRfVElNRU9VVCk7DQoJaWYgKElTX0VSUihza2IpKSB7DQoJCWJ0
-X2Rldl9lcnIoaGRldiwgIkJDTTogUmVhZCB2ZXJib3NlIGNvbmZpZyBpbmZvIGZhaWxlZCAoJWxk
-KSIsDQoJCQkgICBQVFJfRVJSKHNrYikpOw0KCQlyZXR1cm4gc2tiOw0KCX0NCg0KCWlmIChza2It
-PmxlbiAhPSA3KSB7DQoJCWJ0X2Rldl9lcnIoaGRldiwgIkJDTTogVmVyYm9zZSBjb25maWcgbGVu
-Z3RoIG1pc21hdGNoIik7DQoJCWtmcmVlX3NrYihza2IpOw0KCQlyZXR1cm4gRVJSX1BUUigtRUlP
-KTsNCgl9DQoNCglyZXR1cm4gc2tiOw0KfQ0KPDw8DQoNCkJlc3QgUmVnYXJkcywNCk5vYnVha2kg
-VHN1bmFzaGltYQ0KDQo=
+syzbot/KCSAN reported that races happen when multiple cpus
+updating dev->stats.tx_error concurrently.
+
+Adopt SMP safe DEV_STATS_INC() to update dev->stats fields.
+
+Signed-off-by: yunshui <jiangyunshui@kylinos.cn>
+---
+ net/bluetooth/6lowpan.c | 17 +++++++++--------
+ 1 file changed, 9 insertions(+), 8 deletions(-)
+
+diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
+index 50cfec8ccac4..b8906f55e2b2 100644
+--- a/net/bluetooth/6lowpan.c
++++ b/net/bluetooth/6lowpan.c
+@@ -295,8 +295,8 @@ static int recv_pkt(struct sk_buff *skb, struct net_d=
+evice *dev,
+ 			goto drop;
+ 		}
+=20
+-		dev->stats.rx_bytes +=3D skb->len;
+-		dev->stats.rx_packets++;
++		DEV_STATS_ADD(dev, rx_bytes, skb->len);
++		DEV_STATS_INC(dev, rx_packets);
+=20
+ 		consume_skb(local_skb);
+ 		consume_skb(skb);
+@@ -323,8 +323,8 @@ static int recv_pkt(struct sk_buff *skb, struct net_d=
+evice *dev,
+ 			goto drop;
+ 		}
+=20
+-		dev->stats.rx_bytes +=3D skb->len;
+-		dev->stats.rx_packets++;
++		DEV_STATS_ADD(dev, rx_bytes, skb->len);
++		DEV_STATS_INC(dev, rx_packets);
+=20
+ 		consume_skb(local_skb);
+ 		consume_skb(skb);
+@@ -336,7 +336,8 @@ static int recv_pkt(struct sk_buff *skb, struct net_d=
+evice *dev,
+ 	return NET_RX_SUCCESS;
+=20
+ drop:
+-	dev->stats.rx_dropped++;
++
++	DEV_STATS_INC(dev, rx_dropped);
+ 	return NET_RX_DROP;
+ }
+=20
+@@ -445,13 +446,13 @@ static int send_pkt(struct l2cap_chan *chan, struct=
+ sk_buff *skb,
+=20
+ 	err =3D l2cap_chan_send(chan, &msg, skb->len);
+ 	if (err > 0) {
+-		netdev->stats.tx_bytes +=3D err;
+-		netdev->stats.tx_packets++;
++		DEV_STATS_ADD(netdev, tx_bytes, err);
++		DEV_STATS_INC(netdev, tx_packets);
+ 		return 0;
+ 	}
+=20
+ 	if (err < 0)
+-		netdev->stats.tx_errors++;
++		DEV_STATS_INC(netdev, tx_errors);
+=20
+ 	return err;
+ }
+--=20
+2.34.1
+
