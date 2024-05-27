@@ -1,141 +1,164 @@
-Received: from mail-qv1-f44.google.com (mail-qv1-f44.google.com [209.85.219.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from EUR02-DB5-obe.outbound.protection.outlook.com (mail-db5eur02on2066.outbound.protection.outlook.com [40.107.249.66])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8990517BCA
-	for <linux-bluetooth@vger.kernel.org>; Mon, 27 May 2024 07:34:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.44
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716795251; cv=none; b=E4uCc47/iblKEWS7xqhIxi3tc7eOi4UpTsK14vrTA81n3LeUsfV81Rn2UFI0qRTSwBcmwzU/UNftClolO0UV6//vei6Q9WIQBcKUACiTkWRe4/jl4+fiAxriTPt0XFxGyFVXy70qcEzD0XSosrUOHDbNINQJS/N/h0eI176STHM=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716795251; c=relaxed/simple;
-	bh=aSIL+OR9KlUdmWIJNn8ysx0dVSaGoyzBjiO2sGrqaRM=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=sbFF0rqXl2vz8f3YarpV7ElNRpYQr7nSnzvzYkFRmKGBh2AXSLN4fnldIeUalo4xU23AD1srADTIlvxBwHcjJFp6IxENgdiU6oRPPvpIl1hEAhuAQbyww2WR8lFIAxMyYdLErFlsQoj9ROs3Cr+TNBGTu8MKVHRgl/TnNfHdveI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hM4D+DBE; arc=none smtp.client-ip=209.85.219.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CC8536120
+	for <linux-bluetooth@vger.kernel.org>; Mon, 27 May 2024 07:54:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.249.66
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1716796472; cv=fail; b=G7iwYEF68sqaZjqgjgxzB3yVSuCbuge4SxUZHP6fyioybQ9Bie5tnbXpFv8emEtNcVMRM31qTKOLVNpjTjNPH4PL6H88u6XZC5Rtr9Y767oAQZeAyf4oy4NV6Et3NtHBsQQyMZbr+lbRh5VWDwJpQU7/HBrolts9GwmtXpInPRU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1716796472; c=relaxed/simple;
+	bh=DN4xheHs508SLv6tLThjGAWNfLk+CQLdxNqa8qNQkaE=;
+	h=From:To:Cc:Subject:Date:Message-Id:Content-Type:MIME-Version; b=GnAxdntsOmAxBSbbsgTNmbo7tzD6vy7Zl//bBiJvgNnXxiWal11AAah7xJobh1MEykD/aESQPd9pP2kXw5VqFmWW7J+2TbyYE2wRvaTWdn8dvB3X56fjllNDVRyuwlM0/YDYlXrlGo12YhnX9TqCA3J7t/BElK37zfH9uRn2HaA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b=htjJCrpK; arc=fail smtp.client-ip=40.107.249.66
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hM4D+DBE"
-Received: by mail-qv1-f44.google.com with SMTP id 6a1803df08f44-6ab9d3d878bso15512216d6.2
-        for <linux-bluetooth@vger.kernel.org>; Mon, 27 May 2024 00:34:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1716795248; x=1717400048; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=tIKxOa4XBlRpayDVwfZ19JHNwTUTNOe8dDgg/r4s2JE=;
-        b=hM4D+DBE4qrAS5ry36GLkcvo38oykKMK7uJo4oi/4+CmMlcDja6X7iD8HO3lDdurEL
-         QqEbTS/HTtfczkMGA63BOeRx5zCsT3GU/JZy3RyieciWOcPAkNzuh9QXSRfrMoSxo2xi
-         DrSbVLvOwN4F9dKdUYByN9154u+KrIBdzuqL4TMpAPjOOpHkxMdME7PAuHIrgnYfMs52
-         1vt0n07Ndd4djusxcGihxInJR7k+IcooN6bjtCK1j1Sv9524J5qZRzRTPPBS9rycTcPj
-         PsvmRiXI4tLjKY0HjXGT+N4VMhQQSNlg+ITlC5RsW/kpgPqEz6woxbhQVkH1CIv/+cD2
-         ypNw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716795248; x=1717400048;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=tIKxOa4XBlRpayDVwfZ19JHNwTUTNOe8dDgg/r4s2JE=;
-        b=nHnAlmbmEM0I/WXkWshtQWZY2jm2Qhxy/QfhLdrF6Z4zO+WVmIkmr9rLX9XBGqobKP
-         0wWMy4VWW0cLmmK1SVtFrgC+cDZys9Xgj1gtkumTU2s4YWSin7cwmSFnFQfwXMt85yiD
-         tGRke/2FdoJlvcEETm8cGmKBSs+MEeL8WLJrpUuZua0m4MZsw64oPfgyoO0w/fGv8FwU
-         W1DniBOh6IzhpIgXX/vdwbJHgEjaysPUdbNcG6GZN9AJTGSPwThEKm/7RAvsrdq71Aha
-         Q365jGTmw7PIWPm39augjQYB/FXmaUCmKQAf5Y2vlwmNGhjwrWb5bhT2kiD3qDbPC9jd
-         J/7A==
-X-Gm-Message-State: AOJu0YxOb1gc6Cj15l5MlEXvaQSf0CeprJsz5cdSJl+DaKqTaC+kAuzl
-	LGGG00fNJy69KY92yaRBpunl1MiGlVvpqacIKX86+/KIE1XOf2XSkfZrsg==
-X-Google-Smtp-Source: AGHT+IEkv28f6bcTJGoIOBCbRrKuOVTYEGCmxo5n9NkRPRK6nwUnRR3XuB+seAqCRbfpXkdRLOUnvA==
-X-Received: by 2002:a0c:9cc5:0:b0:6ad:5e4c:4e08 with SMTP id 6a1803df08f44-6ad5e4c55femr72277466d6.53.1716795248233;
-        Mon, 27 May 2024 00:34:08 -0700 (PDT)
-Received: from [172.17.0.2] ([172.183.107.244])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6ad7a8086b2sm11866296d6.1.2024.05.27.00.34.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 27 May 2024 00:34:07 -0700 (PDT)
-Message-ID: <6654376f.050a0220.4ae4.2b74@mx.google.com>
-Date: Mon, 27 May 2024 00:34:07 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============0619389466910182428=="
+	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="htjJCrpK"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=P48CYoA8sLV3Z2AlNxMd6lsWcJDGY0nCFfW6L7Zv4Iu1uuYx//OjSusfcLvXPzcOr+UD5G3SieUeoHabtAn6ktvEUHZ55EKS5kY9Mc0zfwHfI9K7lGNOslazX7e7JKXUAahSgBJrT8/vQQoXp/no0yxFfFqpYlq+cYkQRljDyrg5MCrPbuxqBeNG4mAJzdHFGlYfyPUSnI6rnbVKfUlHkQJGRuLHZJPDewG1SHUIsIIpk2gJSHhgqa3SkAdMYAhkP1NLXZUCFCvTY+9wkiGjEwg9o7CAHQDFSHRvVGMMyRjfJF76AMi0w6lyHyonS3KCwJq9zmat2Wxf2iHzRVMWcQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=9QZQAxeHd4BRdcPkJLGogr3ZC6FaAjOlS3ayjo6LP7Q=;
+ b=cnFPnIi9SMisFmE9N4e19grm3D9C7oappzb33VfAcpXZfBgO4bEZy2fL1uvxOeg/GL881OLvuC8UwWjgeYoCF90XihnoJ2zrA3VYfLHrXmjbtgBAD4dHboty3IZhaQqNRALYlsIKaK+tp5TgqWyOkvzEGLhRnF9mcgPVYulBNTu6xjiHoYFXaicWriHLpYJ9/P08IkI0eL5RCIPmFDe3/MtyesfDeGMApd6LX3jbOxlTk4WHXipJeY1eCCwygH/3pBOEv/qyxpF7hwmNh8osEi6yxniptFHALsUA1AvffQmROr/1JyNbuZafnlQ1bmyFpbjbI2HfivveWOw3B6OyWg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=9QZQAxeHd4BRdcPkJLGogr3ZC6FaAjOlS3ayjo6LP7Q=;
+ b=htjJCrpK8oiwItju9uf6ylfZ9xCnsd3DXM0V2RnZ9Tq3QvRK2VR+PPn6MNch/iVRb0EckJtqARyqoKC7AIlhp/GBaQas1jlva82VgIo7Kqkoca+C4AT17c44F4Hy0t2TxP2jKnB6WO3DAnWKvwj9bruPXoqzv8MxmUANSOx3uN0=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from AS8PR04MB8898.eurprd04.prod.outlook.com (2603:10a6:20b:42d::15)
+ by AS8PR04MB7990.eurprd04.prod.outlook.com (2603:10a6:20b:2a5::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7611.29; Mon, 27 May
+ 2024 07:54:28 +0000
+Received: from AS8PR04MB8898.eurprd04.prod.outlook.com
+ ([fe80::5e22:869c:33c:9654]) by AS8PR04MB8898.eurprd04.prod.outlook.com
+ ([fe80::5e22:869c:33c:9654%4]) with mapi id 15.20.7611.025; Mon, 27 May 2024
+ 07:54:27 +0000
+From: Iulia Tanasescu <iulia.tanasescu@nxp.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: claudia.rosu@nxp.com,
+	mihai-octavian.urzica@nxp.com,
+	silviu.barbulescu@nxp.com,
+	vlad.pruteanu@nxp.com,
+	andrei.istodorescu@nxp.com,
+	luiz.dentz@gmail.com,
+	Iulia Tanasescu <iulia.tanasescu@nxp.com>
+Subject: [PATCH BlueZ 0/6] Add new BAP BSRC/SCC tests
+Date: Mon, 27 May 2024 10:54:16 +0300
+Message-Id: <20240527075422.18953-1-iulia.tanasescu@nxp.com>
+X-Mailer: git-send-email 2.39.2
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: AM0PR03CA0082.eurprd03.prod.outlook.com
+ (2603:10a6:208:69::23) To AS8PR04MB8898.eurprd04.prod.outlook.com
+ (2603:10a6:20b:42d::15)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, jiangyunshui@kylinos.cn
-Subject: RE: [v2] Bluetooth: 6lowpan: use DEV_STAT_INC() to avoid races
-In-Reply-To: <20240527065258.1014049-1-jiangyunshui@kylinos.cn>
-References: <20240527065258.1014049-1-jiangyunshui@kylinos.cn>
-Reply-To: linux-bluetooth@vger.kernel.org
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AS8PR04MB8898:EE_|AS8PR04MB7990:EE_
+X-MS-Office365-Filtering-Correlation-Id: 3dd3f940-4ff7-4464-fede-08dc7e223bda
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230031|366007|376005|1800799015;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?ZMUxI0tbmAhw6BVbCkiHTNWeAQttUJxRKN+b+swuJdxS3KAmlXvnk4GQ+MPm?=
+ =?us-ascii?Q?Pg9SG4zjcatgzKU6+joG8+Oa0xxEfeWqocO3U0FWtp9jHUWjVGfMRZacCP9z?=
+ =?us-ascii?Q?xw1VEBXgrGKyoo8caFLuWU3xaPEO8Kknt538TdjA8mhn3IhrvXuC1DmDRF4L?=
+ =?us-ascii?Q?2XrAD+ps4S7Lj+NC0YzNzYnqrTT3b9mJwCqAV8v0OQ2ZmFrNVblDKbA4VEkC?=
+ =?us-ascii?Q?snNr4qgA4Gg0mkH9f7z5MLKtMZT4mgXqOy1M9SR+Ed6M0sRkA0HGdofbOaCT?=
+ =?us-ascii?Q?U46ws+LZejqEIZNQrvoqfQDyD37Vsm3fys3yGBRenzOJp/pzPs5KIT7lr9SC?=
+ =?us-ascii?Q?Y051XD1gcEblBDKvjwUxPpZngbdTLTXPr4PIrcRlmBZbzY0igfIYvb+KVuek?=
+ =?us-ascii?Q?1ky5ImxXJPUEniKbgyHci3l7P21cuivP96BtQBFt61QGPKzi5UV+SOC1KAoY?=
+ =?us-ascii?Q?MNnzjMFd39dmBrVpb54C7swVByOII4NDT9YjQzeUia5ZLDgN+BiF0XRl81Ff?=
+ =?us-ascii?Q?kdICcMC1brywhwWNa1ApDI6RRgU6XGLmsh1DzwsSwNfWalmeAt7JF+qcY9ex?=
+ =?us-ascii?Q?Lr6Q7FMkKh02xTnUGkIzGC/hFAyaY0siTqwniIfjQI1k+lZyNocsrKJ6NHyg?=
+ =?us-ascii?Q?aSFUlMkvqnF4KnCNvc7MDzHJX2LXVBVsTa4ZThW2tGJzQwATBtKg2sK2ThCK?=
+ =?us-ascii?Q?78yNvkjl8AB991sGb3zRWVfvWnhsydPTGPQWGJelFVZ1uLYVV/SLGGbf7oUd?=
+ =?us-ascii?Q?Obpj9EkSvtaYxGjWXyIgKAtNL6VHyWHjvMCK72pmDUw1bZcQJf5ouLPLiL8l?=
+ =?us-ascii?Q?b9aJeZa1g0Qn6qNZ5Lo/pwr1T+Dmg8WwwAsH8wU1ljKtmk77qkbCVqsVXTNT?=
+ =?us-ascii?Q?H709dDzSax/YK9wBDaNOgXDtFJPPY5KQPeseKXMV1XeXFNW3e+MZZpDC885q?=
+ =?us-ascii?Q?nrGhr5zCi8FMnekpUGaakVJ8TD/jfJFaFG1cp5nWk6pQYTID4bcKGu1IGSDZ?=
+ =?us-ascii?Q?f4OMRLnDLsdqXRT7ZJu6Xh02IPYVc8i8nc4obErC1t8/f3HsIk+9JN0ab/sz?=
+ =?us-ascii?Q?vfhUr+24Mz4hg2hJ9o7usCmNBk839VHGFMBqG6pxUwQxho5jUj9vTebyiDsL?=
+ =?us-ascii?Q?S0pfMqpPIwOhgK7enYjmWcPNgAxBUuEIKwly3L32BUBb71/WnjEwfn6waml/?=
+ =?us-ascii?Q?7Pj5Yahir/bXfp+YLZi5i3ARMwXGwhnEzFRcKImESPkyFwLVOFpSb6NfT2yr?=
+ =?us-ascii?Q?XWPJPx4fJ8TpLPPRImTnAGaRJy4cG1kWl/nd1Zj7gg=3D=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AS8PR04MB8898.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366007)(376005)(1800799015);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?HK3f+lo3mZ8U/9sUHSHyKRHFUZAeeBXVzOYB4h7HMqPOsjVsKBcqNNphe/mu?=
+ =?us-ascii?Q?U5kIZnizXkDTu/0ONwQeJBet75RgEbRBGsu2UInYYaOZukXddpuhbX6ef3eo?=
+ =?us-ascii?Q?F7l70q3+N/XPF99MkqkqHVTwmAw5xpNGVMjra96avEtb5ofWUPn/QgEo1Xd+?=
+ =?us-ascii?Q?0n2hfw75FiAW6+xZMCVrM6i9Kgcna9Ih70I6j+3Hq2cHEqgcuREjCtYbiKX1?=
+ =?us-ascii?Q?v6UekKkV0P8ex0p/zB+SI+XbThFlbclUlTY+2oakcwU63mLLdH5aOuKOxIGA?=
+ =?us-ascii?Q?cAd+OCiFjACNNpwP4fElG5bLIBavhQsZC8sSDpI/aEpgE1yKQj2d+0ytGfZz?=
+ =?us-ascii?Q?oMTWK6aXorRsUGLR2LyUBXzJDadhulMl64jqSvacZlzTD7kth4NZulQbEdgm?=
+ =?us-ascii?Q?EbQzCbbMwu/LBq1wi2XW6dAcJs0rxrVuNGHVCd+y1chxDJTskROqWpVbKo4o?=
+ =?us-ascii?Q?oAXHLmfWY5yNJzDz6eNpdzwlXF0wuVFLFqVacv8EibAhJBj3/UcFZ+ODl+tw?=
+ =?us-ascii?Q?iUQR3dfhuhJS7NKq8da6MvBn3N7c+kJ5FQL9TwU2/Zqh9Ri+QMjvZWAIWrQu?=
+ =?us-ascii?Q?huHuCV13zKYwKUCZyCzTIcXsnWmg05tR23tXowszPW8YhBIZ05Cvw4nkXSsA?=
+ =?us-ascii?Q?jN+OJrH6oQ6HSjQcJdZ+gyw4X4/IEIidQMfcKjeDWZNfT8BzS2aLbrGa4ySh?=
+ =?us-ascii?Q?dXaudE9wr5xXIjK0qDslCQ6b65VfhiNrV+Cq95DDVXKh717DDku1sgM6des8?=
+ =?us-ascii?Q?6CE7Kdi0caadaWkln0rRU4ugJkOwK5gWbAAaGJX0fMaj2Z2DGNFx5ycGADwv?=
+ =?us-ascii?Q?F1elLzmr4uOW3UR1OOUocL7PORxORZCky6cBGE+i+gOl7Mcib+GW08ujAIjt?=
+ =?us-ascii?Q?n0MA1sSeX/HRjhdcmWW/hahSNzYFq3yh8FyYv+XhfutNO9tdtULFqAbY4QZt?=
+ =?us-ascii?Q?2GMHJYguf1ECCVOpgbkT8+r6hGiVh19hBiRt92RUwarAA5LbOQbyz3aIuoE0?=
+ =?us-ascii?Q?Sdo9TZt3FBSV80pcbWh8QxA0Ovxo92xQdbVCTz/fAPQHDAB/+QLULkdhTpmp?=
+ =?us-ascii?Q?LEx5lQXfWOMGiXl9NNqG9PrPdypydm5n7T/h1lQJQ6tUV/5dHD8FUVb3CFFh?=
+ =?us-ascii?Q?g5sSbRZYNl1ERWZ3SHqsYrwrmmtOvKXIfuUDT4JGXeJacAReMWjdn51fpMdB?=
+ =?us-ascii?Q?owm7eiRQWAxNSSSCAz21Z9Fvh0dhw2mjKDNQNbipPOTVFQUvZA+ISHA1HSxJ?=
+ =?us-ascii?Q?h4EDFTWT3ksIFv2/Ftp6b7+PMwlSKgIEr0mibOdHnRJIYNxuG+HslCN8n9kx?=
+ =?us-ascii?Q?8v3XK9o00UQHnz49UG2rVJlbh2ngDW8USSZWP6lca5pWjPFuqljOAzaHNAUR?=
+ =?us-ascii?Q?1SwxZUEsSatHOTqkVuVLzz1BAFTyWofHox4v8esMMsl4WK0QiPEwaeZmT1Sv?=
+ =?us-ascii?Q?d1WEqekX7cllABc742JSZEfBPCfnJ1A8EsvPsZdQ1OPcIH4SP0jSLyCZl5lt?=
+ =?us-ascii?Q?oXs2lNzHHgghP+ox8es975j3diWLAS7Zs3aS7rJaqHdilGTulai5PqtM16Kh?=
+ =?us-ascii?Q?ukiuDECpkJv/5DQuxARRJRwsTajAxZrOIGpti68IRK8caVjnS4PrLlytbc2p?=
+ =?us-ascii?Q?+Q=3D=3D?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3dd3f940-4ff7-4464-fede-08dc7e223bda
+X-MS-Exchange-CrossTenant-AuthSource: AS8PR04MB8898.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 May 2024 07:54:27.8987
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 4wO/pCMRvQ5DUJKCLwF57woe3Udqw8wcIvXU3iBCE2R+gGwe9KiFgvr2B8VkOT+E5R8Iai5+mSp8wDUS/MtKyw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR04MB7990
 
---===============0619389466910182428==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+This patch adds BAP unit tests for Broadcast Source stream
+establishment (BAP/BSRC/SCC/BV-35-C [Establishes Broadcast] - page 175),
+stream disable (BAP/BSRC/SCC/BV-36-C [Disables Broadcast] - page 176) and
+stream release (BAP/BSRC/SCC/BV-37-C [Releases Broadcast] - page 176).
 
-This is automated email and please do not reply to this email!
+This patch also adds shared/bap fixes regarding broadcast stream
+management, required for successful test implementation.
 
-Dear submitter,
+Iulia Tanasescu (6):
+  shared/bap: Remove DISABLING case from bcast state cb
+  shared/bap: Fix potential stream access after free
+  test-bap: Update bsrc_state to just handle CONFIG state
+  test-bap: Add Broadcast Source Establish test
+  test-bap: Add Broadcast Source Disable test
+  test-bap: Add Broadcast Source Release test
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=856029
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      1.48 seconds
-GitLint                       PASS      0.28 seconds
-SubjectPrefix                 PASS      0.09 seconds
-BuildKernel                   PASS      30.17 seconds
-CheckAllWarning               PASS      33.30 seconds
-CheckSparse                   PASS      38.45 seconds
-CheckSmatch                   FAIL      38.05 seconds
-BuildKernel32                 PASS      28.90 seconds
-TestRunnerSetup               PASS      523.54 seconds
-TestRunner_l2cap-tester       PASS      20.42 seconds
-TestRunner_iso-tester         FAIL      32.55 seconds
-TestRunner_bnep-tester        PASS      4.88 seconds
-TestRunner_mgmt-tester        PASS      114.01 seconds
-TestRunner_rfcomm-tester      PASS      8.52 seconds
-TestRunner_sco-tester         PASS      15.01 seconds
-TestRunner_ioctl-tester       PASS      7.88 seconds
-TestRunner_mesh-tester        PASS      6.11 seconds
-TestRunner_smp-tester         PASS      6.94 seconds
-TestRunner_userchan-tester    PASS      5.07 seconds
-IncrementalBuild              PASS      27.55 seconds
-
-Details
-##############################
-Test: CheckSmatch - FAIL
-Desc: Run smatch tool with source
-Output:
-
-Segmentation fault (core dumped)
-make[4]: *** [scripts/Makefile.build:244: net/bluetooth/hci_core.o] Error 139
-make[4]: *** Deleting file 'net/bluetooth/hci_core.o'
-make[3]: *** [scripts/Makefile.build:485: net/bluetooth] Error 2
-make[2]: *** [scripts/Makefile.build:485: net] Error 2
-make[2]: *** Waiting for unfinished jobs....
-Segmentation fault (core dumped)
-make[4]: *** [scripts/Makefile.build:244: drivers/bluetooth/bcm203x.o] Error 139
-make[4]: *** Deleting file 'drivers/bluetooth/bcm203x.o'
-make[4]: *** Waiting for unfinished jobs....
-make[3]: *** [scripts/Makefile.build:485: drivers/bluetooth] Error 2
-make[2]: *** [scripts/Makefile.build:485: drivers] Error 2
-make[1]: *** [/github/workspace/src/src/Makefile:1919: .] Error 2
-make: *** [Makefile:240: __sub-make] Error 2
-##############################
-Test: TestRunner_iso-tester - FAIL
-Desc: Run iso-tester with test-runner
-Output:
-Total: 122, Passed: 117 (95.9%), Failed: 1, Not Run: 4
-
-Failed Test Cases
-ISO Connect Suspend - Success                        Failed       4.178 seconds
+ src/shared/bap.c |  26 ++++--
+ unit/test-bap.c  | 210 ++++++++++++++++++++++++++++++++++++++---------
+ 2 files changed, 186 insertions(+), 50 deletions(-)
 
 
----
-Regards,
-Linux Bluetooth
+base-commit: 75893035705da57efd6f8a84bba77d596c463d34
+-- 
+2.39.2
 
-
---===============0619389466910182428==--
