@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9290120FAA0;
-	Mon, 27 May 2024 14:18:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE9EA16E868;
+	Mon, 27 May 2024 14:18:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716819487; cv=none; b=QjqwnIGScaMN4WuRB9+8qt3D4zlF0Y9/+fOZgWx2Qn7oPdoSE/fQFPnNowW3pU1CL6/GFDEmpAHfV53SrZwMyT8SEmdgPi3FGQIg2lzmUN50yl/g+U8KsZyzKz3B3o6ZHTS3eszBDM3zh6NvX4cyYi9CgIMTZ0F3js1kENJPT0k=
+	t=1716819530; cv=none; b=Qx7ZuYg8R/TmtxY2qHfLtKxb7FbI1uxEihnClWnOszHHhcUW8zjGvY6lWoAOeYfP59oTYLlRcpOLZesHpKNUhe+BckX8NOd5zfoBI/J3SrG79eE3B/jKC24H0Qw/p+ewPOXw0LR81JBYIOyINJ4on5TgdRhFudBGbEhS2SYYz14=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716819487; c=relaxed/simple;
-	bh=UUX6FM7FevEjcmk/Q+b3AHxsD6DcfXw/QHAtxiCn7Kc=;
+	s=arc-20240116; t=1716819530; c=relaxed/simple;
+	bh=Z5T0gu59/dQrO1Cfehp1ybI1Sur9v7U7wxLbsRARcmA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=gE2wGgloGVr5oBJaoPMNNeygZEvJSjapRikmJAq9JGEoBs2cAeJfJCgunM6dVlzqLYAbRsE+VzQN73r2YOEKQso+J9nDWr8qdf7tg1ercJbH2yDhMUjsDuLaS2n9Wd7pF3/6PVE+tah46baIweMweMZANtgqH3JN8e5eicQECqg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RbIUC7Ag; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=uzBMU0x5AdXj5iWDj/eJSwm+p7ygoKTZ8ZVCj31hA9duecnbPDJMTaEu+C0NNf1nitSQ3JUUVd01c1enhZr+9Gb7r7qSkoHqKOTvCkyJOZ7B/XFT8mga5PZ/JegidICNWkTLaDiOTvDchKeU3slvYfdxZagYO5r4iwuHklLY76k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Bc4dU6F4; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RbIUC7Ag"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3A7AAC2BBFC;
-	Mon, 27 May 2024 14:18:06 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Bc4dU6F4"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A2427C32781;
+	Mon, 27 May 2024 14:18:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1716819487;
-	bh=UUX6FM7FevEjcmk/Q+b3AHxsD6DcfXw/QHAtxiCn7Kc=;
+	s=k20201202; t=1716819529;
+	bh=Z5T0gu59/dQrO1Cfehp1ybI1Sur9v7U7wxLbsRARcmA=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=RbIUC7AgHsKZMRn+68OfEGrtHwESK1rtJpR1k0dkEhwoZ/UCkWRPeb8rkeNnehPd6
-	 qt5LhOcnQdHfiQEspX9+PUFt3CRQ0oSnapb8d/Cl6j7Q14BljszEHhcpwSCh1mVh+a
-	 bpJZL9zCEVRHzMF+RCZNs2B18QDxIWjATl8oQELDhAlmnkh1vtH2HIjvWv7ifgrZMU
-	 uDGWDEKh85uZQgROY/31MuQ7NQ5FQIfoCAv6D44f1uXIqr1COlEyRQl1TBTCzHXwDA
-	 ldFx12q4W2Gc9X1/h42pwDSM3qLMOAZbF/8bTxaiZ5ewlvcvropjWplhsCUdekdrsY
-	 8GbUYkpJN9h1Q==
+	b=Bc4dU6F4BMLEko2pd7P8i9Mudi6yBZtRBzCxxGMai21fYfI8YJzLtxtyX0ziQwYEd
+	 AOYFJxs9jZPAcxTFMKzxeWT+Zok2DsZ4yH0xKq3Xqtc4wuSS3o9hK/xXpjnYBxEhJi
+	 WUMpzilbzHMAU4n0SFimpSbT+ury1pIjfT+BjWJ3TzpPB8TAOPbEtQCBVX6U09tfuk
+	 6RAaflufoaWQH9coycoJuoVjlHoTsgM4R0uOhf6LkQlWwg2rmmA8SG0HRO6ms7O8yn
+	 teygqmil4JA9x9YTvyQzwt5uopskiyjpbmD096zmY4yv3I6IlWRmZZN4Ww/RGDLFHq
+	 QMaG52uhP/u5Q==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
@@ -35,12 +35,12 @@ Cc: Uri Arev <me@wantyapps.xyz>,
 	marcel@holtmann.org,
 	luiz.dentz@gmail.com,
 	linux-bluetooth@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.1 17/17] Bluetooth: ath3k: Fix multiple issues reported by checkpatch.pl
-Date: Mon, 27 May 2024 10:16:54 -0400
-Message-ID: <20240527141712.3853988-17-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.15 13/13] Bluetooth: ath3k: Fix multiple issues reported by checkpatch.pl
+Date: Mon, 27 May 2024 10:18:07 -0400
+Message-ID: <20240527141819.3854376-13-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240527141712.3853988-1-sashal@kernel.org>
-References: <20240527141712.3853988-1-sashal@kernel.org>
+In-Reply-To: <20240527141819.3854376-1-sashal@kernel.org>
+References: <20240527141819.3854376-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -49,7 +49,7 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.1.92
+X-stable-base: Linux 5.15.160
 Content-Transfer-Encoding: 8bit
 
 From: Uri Arev <me@wantyapps.xyz>
@@ -126,7 +126,7 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 11 insertions(+), 14 deletions(-)
 
 diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
-index 88262d3a93923..ce97b336fbfb8 100644
+index 759d7828931d9..56ada48104f0e 100644
 --- a/drivers/bluetooth/ath3k.c
 +++ b/drivers/bluetooth/ath3k.c
 @@ -3,7 +3,6 @@
@@ -137,7 +137,7 @@ index 88262d3a93923..ce97b336fbfb8 100644
  #include <linux/module.h>
  #include <linux/kernel.h>
  #include <linux/init.h>
-@@ -128,7 +127,6 @@ MODULE_DEVICE_TABLE(usb, ath3k_table);
+@@ -129,7 +128,6 @@ MODULE_DEVICE_TABLE(usb, ath3k_table);
   * for AR3012
   */
  static const struct usb_device_id ath3k_blist_tbl[] = {
@@ -145,7 +145,7 @@ index 88262d3a93923..ce97b336fbfb8 100644
  	/* Atheros AR3012 with sflash firmware*/
  	{ USB_DEVICE(0x0489, 0xe04e), .driver_info = BTUSB_ATH3012 },
  	{ USB_DEVICE(0x0489, 0xe04d), .driver_info = BTUSB_ATH3012 },
-@@ -202,7 +200,7 @@ static inline void ath3k_log_failed_loading(int err, int len, int size,
+@@ -203,7 +201,7 @@ static inline void ath3k_log_failed_loading(int err, int len, int size,
  #define TIMEGAP_USEC_MAX	100
  
  static int ath3k_load_firmware(struct usb_device *udev,
@@ -154,7 +154,7 @@ index 88262d3a93923..ce97b336fbfb8 100644
  {
  	u8 *send_buf;
  	int len = 0;
-@@ -237,9 +235,9 @@ static int ath3k_load_firmware(struct usb_device *udev,
+@@ -238,9 +236,9 @@ static int ath3k_load_firmware(struct usb_device *udev,
  		memcpy(send_buf, firmware->data + sent, size);
  
  		err = usb_bulk_msg(udev, pipe, send_buf, size,
@@ -166,7 +166,7 @@ index 88262d3a93923..ce97b336fbfb8 100644
  			ath3k_log_failed_loading(err, len, size, count);
  			goto error;
  		}
-@@ -262,7 +260,7 @@ static int ath3k_get_state(struct usb_device *udev, unsigned char *state)
+@@ -263,7 +261,7 @@ static int ath3k_get_state(struct usb_device *udev, unsigned char *state)
  }
  
  static int ath3k_get_version(struct usb_device *udev,
@@ -175,7 +175,7 @@ index 88262d3a93923..ce97b336fbfb8 100644
  {
  	return usb_control_msg_recv(udev, 0, ATH3K_GETVERSION,
  				    USB_TYPE_VENDOR | USB_DIR_IN, 0, 0,
-@@ -271,7 +269,7 @@ static int ath3k_get_version(struct usb_device *udev,
+@@ -272,7 +270,7 @@ static int ath3k_get_version(struct usb_device *udev,
  }
  
  static int ath3k_load_fwfile(struct usb_device *udev,
@@ -184,7 +184,7 @@ index 88262d3a93923..ce97b336fbfb8 100644
  {
  	u8 *send_buf;
  	int len = 0;
-@@ -310,8 +308,8 @@ static int ath3k_load_fwfile(struct usb_device *udev,
+@@ -311,8 +309,8 @@ static int ath3k_load_fwfile(struct usb_device *udev,
  		memcpy(send_buf, firmware->data + sent, size);
  
  		err = usb_bulk_msg(udev, pipe, send_buf, size,
@@ -195,7 +195,7 @@ index 88262d3a93923..ce97b336fbfb8 100644
  			ath3k_log_failed_loading(err, len, size, count);
  			kfree(send_buf);
  			return err;
-@@ -425,7 +423,6 @@ static int ath3k_load_syscfg(struct usb_device *udev)
+@@ -426,7 +424,6 @@ static int ath3k_load_syscfg(struct usb_device *udev)
  	}
  
  	switch (fw_version.ref_clock) {
@@ -203,7 +203,7 @@ index 88262d3a93923..ce97b336fbfb8 100644
  	case ATH3K_XTAL_FREQ_26M:
  		clk_value = 26;
  		break;
-@@ -441,7 +438,7 @@ static int ath3k_load_syscfg(struct usb_device *udev)
+@@ -442,7 +439,7 @@ static int ath3k_load_syscfg(struct usb_device *udev)
  	}
  
  	snprintf(filename, ATH3K_NAME_LEN, "ar3k/ramps_0x%08x_%d%s",
@@ -212,7 +212,7 @@ index 88262d3a93923..ce97b336fbfb8 100644
  
  	ret = request_firmware(&firmware, filename, &udev->dev);
  	if (ret < 0) {
-@@ -456,7 +453,7 @@ static int ath3k_load_syscfg(struct usb_device *udev)
+@@ -457,7 +454,7 @@ static int ath3k_load_syscfg(struct usb_device *udev)
  }
  
  static int ath3k_probe(struct usb_interface *intf,
@@ -221,7 +221,7 @@ index 88262d3a93923..ce97b336fbfb8 100644
  {
  	const struct firmware *firmware;
  	struct usb_device *udev = interface_to_usbdev(intf);
-@@ -505,10 +502,10 @@ static int ath3k_probe(struct usb_interface *intf,
+@@ -506,10 +503,10 @@ static int ath3k_probe(struct usb_interface *intf,
  	if (ret < 0) {
  		if (ret == -ENOENT)
  			BT_ERR("Firmware file \"%s\" not found",
