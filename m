@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE9EA16E868;
-	Mon, 27 May 2024 14:18:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06C3E15FA70;
+	Mon, 27 May 2024 14:19:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716819530; cv=none; b=Qx7ZuYg8R/TmtxY2qHfLtKxb7FbI1uxEihnClWnOszHHhcUW8zjGvY6lWoAOeYfP59oTYLlRcpOLZesHpKNUhe+BckX8NOd5zfoBI/J3SrG79eE3B/jKC24H0Qw/p+ewPOXw0LR81JBYIOyINJ4on5TgdRhFudBGbEhS2SYYz14=
+	t=1716819584; cv=none; b=tRH5O4FK07n1jmcRT6U+KvqRN7T6yJBFFMbsw9l7vV+yKIO38+yp/lFBkQUOx6WpNG6YLu5BDBlHiRIVPsI/9vkUeh6M0wn7zR6u3WDcnjWfA3vrQf+FMeAipFz4nkYC9z8H9XIxlUbVkLhf0h4KeOWQmyTl2+LhAjXZdmT4Cv4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716819530; c=relaxed/simple;
+	s=arc-20240116; t=1716819584; c=relaxed/simple;
 	bh=Z5T0gu59/dQrO1Cfehp1ybI1Sur9v7U7wxLbsRARcmA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=uzBMU0x5AdXj5iWDj/eJSwm+p7ygoKTZ8ZVCj31hA9duecnbPDJMTaEu+C0NNf1nitSQ3JUUVd01c1enhZr+9Gb7r7qSkoHqKOTvCkyJOZ7B/XFT8mga5PZ/JegidICNWkTLaDiOTvDchKeU3slvYfdxZagYO5r4iwuHklLY76k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Bc4dU6F4; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=gutGe14iFGzAGn8/nPuOS3hf+OLChfwZbO/3aOCtGJbCDaw3YvDG1+s2SFRqPaWGkCpLakwLT2YN6AgW5aho1yEZ5aonjPmZlMO3dpXV5nGkavSJDNTXtMWyC7vbPoaOkNYKIJCTp53taSRG6Ss7cEgFmhSZJhSpS2W8PN7s+Q8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qSdJ+ycd; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Bc4dU6F4"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A2427C32781;
-	Mon, 27 May 2024 14:18:48 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qSdJ+ycd"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9B30FC4AF07;
+	Mon, 27 May 2024 14:19:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1716819529;
+	s=k20201202; t=1716819583;
 	bh=Z5T0gu59/dQrO1Cfehp1ybI1Sur9v7U7wxLbsRARcmA=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Bc4dU6F4BMLEko2pd7P8i9Mudi6yBZtRBzCxxGMai21fYfI8YJzLtxtyX0ziQwYEd
-	 AOYFJxs9jZPAcxTFMKzxeWT+Zok2DsZ4yH0xKq3Xqtc4wuSS3o9hK/xXpjnYBxEhJi
-	 WUMpzilbzHMAU4n0SFimpSbT+ury1pIjfT+BjWJ3TzpPB8TAOPbEtQCBVX6U09tfuk
-	 6RAaflufoaWQH9coycoJuoVjlHoTsgM4R0uOhf6LkQlWwg2rmmA8SG0HRO6ms7O8yn
-	 teygqmil4JA9x9YTvyQzwt5uopskiyjpbmD096zmY4yv3I6IlWRmZZN4Ww/RGDLFHq
-	 QMaG52uhP/u5Q==
+	b=qSdJ+ycdrkohU4p+nzSryBxVHc6uo0gVNfssofwruSG4jLoY8/hLSGWKPOoDWgo8S
+	 PqF6yQtgGEYBSZSgHr5lkB5fV3jdJFdFapHaQr/+m2MG2hyd2gDwadIWZD+dP8f2Ag
+	 6sT/BrvdsF7MHjUjr1q38tQeIiBdFFvbwmRohvymry907NvBxIxpvjI0CIFb/o6k/x
+	 WsrQx4KgaNwvIC+owUclQI7/PSpRunQik99cWVFP7EfZkiacfPPynex0ukPFQsFZRc
+	 xq80pqORXn3uFkaGCBITKS7QgEavbTsRHDD2MezpsO3ZaWIAyIXNSm8lFoDaZWqvNf
+	 2rh3JkTUsD5KQ==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
@@ -35,12 +35,12 @@ Cc: Uri Arev <me@wantyapps.xyz>,
 	marcel@holtmann.org,
 	luiz.dentz@gmail.com,
 	linux-bluetooth@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.15 13/13] Bluetooth: ath3k: Fix multiple issues reported by checkpatch.pl
-Date: Mon, 27 May 2024 10:18:07 -0400
-Message-ID: <20240527141819.3854376-13-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.10 13/13] Bluetooth: ath3k: Fix multiple issues reported by checkpatch.pl
+Date: Mon, 27 May 2024 10:18:50 -0400
+Message-ID: <20240527141901.3854691-13-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240527141819.3854376-1-sashal@kernel.org>
-References: <20240527141819.3854376-1-sashal@kernel.org>
+In-Reply-To: <20240527141901.3854691-1-sashal@kernel.org>
+References: <20240527141901.3854691-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -49,7 +49,7 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 5.15.160
+X-stable-base: Linux 5.10.218
 Content-Transfer-Encoding: 8bit
 
 From: Uri Arev <me@wantyapps.xyz>
