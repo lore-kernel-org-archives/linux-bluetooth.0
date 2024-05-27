@@ -1,149 +1,239 @@
-Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F7621640B
-	for <linux-bluetooth@vger.kernel.org>; Mon, 27 May 2024 13:56:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C3D316FF52;
+	Mon, 27 May 2024 14:13:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716818182; cv=none; b=auE3PyJxtvZB2ftcOyRHCzxGPISlsuPM2WuVIXGuN1LUKevajm8PGrqws54/w3fiwhMUVXHW6fvad6xtYRvBlZlMBO1uCWgjTnmeGGZh9/krV1oYFEbGP8AVdgel63SJ2zTCxeCadjH5+zPPWF4cUDDg8UVOoaGVql+rfV9AaOk=
+	t=1716819218; cv=none; b=Lmzv5KmL5wLk0Z1et1X01LVXxXYCvwOZi+aN37WHZ8gn5DZS1bZbo/XKz2qYko8HTDscz3RRjNheXms51Ms5C6Ne5aYxTNwOnJ4wm2Wp+imK+3pvhSsr8soV2NdLsVMeJ0GVhQj3GKnxsxlexTZgXWWKp+iRTsRlieU8k1WLF10=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716818182; c=relaxed/simple;
-	bh=NNQ/EBPGM9ZqlLBOXhDr2E7wKj+yGxNttKWKEoE3Yc0=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=YZAMXsYNQcmDvQbWwW6k0mb/mBHdCuJYdci6XPQMQpCB1w6tsESCMs4lKGcQIqfnmFeYK2tB+za7xKSdqC9Flv/Wv9ZxystTu7Q2/fb1uIrovF/8W4PZtzJoQITPm0jXhhYXZuJQ31MykmyhwfWmTuZiI8IHDOhIuQAdZaSxqx0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=E7S1PgwQ; arc=none smtp.client-ip=209.85.210.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1716819218; c=relaxed/simple;
+	bh=UUX6FM7FevEjcmk/Q+b3AHxsD6DcfXw/QHAtxiCn7Kc=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=I7VCTRE4OxcRERKOdp08tjFkWIln2ZW0CmwWVzCIHhsNpiVq1ZOmJAoMVc+qPD+wFWKuUutAa9h42Fj4JE9DQFeAAn8QI60CLunjbaF/56eMG2aqS8OfCJm6T6JGIu5yXg8CKv7XF9lMufHr9ybREGl+QWT1ASlEA5OGf1qxJ8Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JIVV015V; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="E7S1PgwQ"
-Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-6fbbd937719so1905951b3a.0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 27 May 2024 06:56:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1716818180; x=1717422980; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=qEPtuia/R2nnwPQ342ApH51M2D2tfllXiPxSAFnsUpY=;
-        b=E7S1PgwQBkeryXEfh3muBVdda+mW9AOf3RxSllGno+tXVVEIppirsvtQJCmsSIiRYV
-         QR+NN+y38vGNEGeD7yxDnc5XlpwXxRl1y+xzLU9mXgNJsj1lEHRoVdSMEYpbvnuTgLyD
-         iwfsZ4b4bNWAgZbQxQyLJtXsv1evcw/W/8aJN/ebive7L3Ho8oqGbzIv+yYf6htLAyN1
-         RNXuytaUNqvxqe0GIZDiict4HCfEMdweIy9IxQghhAyUb7k+YImttBvb8KCWws8KLkTr
-         U6HrBeFs3gG14iv2wNiXBXqJ6Wxda/HrVrdrCCe9j3Aqp8PTUZuQdELQ2+0FdH+FJ6X7
-         Hxkg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716818180; x=1717422980;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=qEPtuia/R2nnwPQ342ApH51M2D2tfllXiPxSAFnsUpY=;
-        b=vjjLLOFC0vTrLtU5pgx0HEnJ2uxfhjGexpvYzaB42/gp+SrE6yL0GDiX+yio6suM7T
-         Ks21Ge+yNbr82+1NWhzhaxMvr6tEbrKKzDEjLFGCLBTL/Y79snVfnbLIABoC9dIFK9e1
-         IdM5rPortzLZCYYMA9sOy8DumYCxNtUHRSkRnDJWR7gnrjR74GOMK0w/a42JYYRhy2kw
-         0nfLVoDU458pD7K9bQaT+hTc7UozouIQNvfzmLXyV7/sGmEQdDH+2ueeDTabyzLukKpO
-         W5noSpInx8bq/rFwhjWInNDw2r5Hw0rWmaiFAJ2L0TH8ugF3cG8D3SvtgCQHYw9yeQNc
-         7MOQ==
-X-Gm-Message-State: AOJu0YyREEKUoM01VNJzIm8qETSgjujGtQeZ96uuAgn+q96u/9WSU0ft
-	3xlIiNA4ZU6yUIGPGsgq0VTz8hUIN8oJ309KkCT4l15PG7FkJmi2/0st0A==
-X-Google-Smtp-Source: AGHT+IHbUxwVijuLJRM/9rkRqF7XJYX3AQ2iKBVAmXE+7wltRRfBeYdi7Qr3h54grQkVD9qqqdZJ5g==
-X-Received: by 2002:a05:6a20:3945:b0:1af:ce5e:ca5e with SMTP id adf61e73a8af0-1b212d0f9d0mr10909398637.22.1716818180109;
-        Mon, 27 May 2024 06:56:20 -0700 (PDT)
-Received: from [172.17.0.2] ([20.172.28.129])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-6f8fd4d51a2sm4887923b3a.189.2024.05.27.06.56.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 27 May 2024 06:56:19 -0700 (PDT)
-Message-ID: <66549103.a70a0220.af32d.bfc3@mx.google.com>
-Date: Mon, 27 May 2024 06:56:19 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============5409592004357117324=="
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JIVV015V"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 52B91C2BBFC;
+	Mon, 27 May 2024 14:13:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1716819218;
+	bh=UUX6FM7FevEjcmk/Q+b3AHxsD6DcfXw/QHAtxiCn7Kc=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=JIVV015Vflbg+7VOdkP5vELeb4zFTzPwrFoRUw+B5RN3HjBEl2bxKwWDeG/0Vuiph
+	 aRCfYNK/Gqmm1OLgfQ3hjQ8ulFLqvAnOsmykXrNuIB7tNMbw+aLcZpLOxjz+a84SVy
+	 n8m3ULzR+vFHbAYiLZbKAQRvPB/Q+hi/SCFoPRNIEWQoxl2Cw/WDyqbw+z4CgcGB72
+	 9owRDPUwmmuu6Q53s+F7ICj8uiY0NiI71diubFKBq8jUw5AOvlxWHeLhIAoHvz50dH
+	 KSiLzBSPQkzR1f1DV6z87o690+wYkEacTkYPlSV6QyRSFTcj11/D9K2X1jmL4G3qUk
+	 lCjCHQTvlyjWQ==
+From: Sasha Levin <sashal@kernel.org>
+To: linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Cc: Uri Arev <me@wantyapps.xyz>,
+	Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
+	Sasha Levin <sashal@kernel.org>,
+	marcel@holtmann.org,
+	luiz.dentz@gmail.com,
+	linux-bluetooth@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.9 35/35] Bluetooth: ath3k: Fix multiple issues reported by checkpatch.pl
+Date: Mon, 27 May 2024 10:11:40 -0400
+Message-ID: <20240527141214.3844331-35-sashal@kernel.org>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20240527141214.3844331-1-sashal@kernel.org>
+References: <20240527141214.3844331-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, ilpo.jarvinen@linux.intel.com
-Subject: RE: [1/1] Bluetooth: hci_bcm4377: Convert PCIBIOS_* return codes to errnos
-In-Reply-To: <20240527132552.14119-1-ilpo.jarvinen@linux.intel.com>
-References: <20240527132552.14119-1-ilpo.jarvinen@linux.intel.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+X-stable: review
+X-Patchwork-Hint: Ignore
+X-stable-base: Linux 6.9.2
+Content-Transfer-Encoding: 8bit
 
---===============5409592004357117324==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+From: Uri Arev <me@wantyapps.xyz>
 
-This is automated email and please do not reply to this email!
+[ Upstream commit 68aa21054ec3a1a313af90a5f95ade16c3326d20 ]
 
-Dear submitter,
+This fixes some CHECKs reported by the checkpatch script.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=856174
+Issues reported in ath3k.c:
+-------
+ath3k.c
+-------
+CHECK: Please don't use multiple blank lines
++
++
 
----Test result---
+CHECK: Blank lines aren't necessary after an open brace '{'
++static const struct usb_device_id ath3k_blist_tbl[] = {
++
 
-Test Summary:
-CheckPatch                    PASS      0.52 seconds
-GitLint                       PASS      0.22 seconds
-SubjectPrefix                 PASS      0.07 seconds
-BuildKernel                   PASS      30.98 seconds
-CheckAllWarning               PASS      33.58 seconds
-CheckSparse                   PASS      38.99 seconds
-CheckSmatch                   FAIL      36.25 seconds
-BuildKernel32                 PASS      30.08 seconds
-TestRunnerSetup               PASS      538.33 seconds
-TestRunner_l2cap-tester       PASS      18.73 seconds
-TestRunner_iso-tester         FAIL      35.79 seconds
-TestRunner_bnep-tester        PASS      4.90 seconds
-TestRunner_mgmt-tester        PASS      111.85 seconds
-TestRunner_rfcomm-tester      PASS      7.63 seconds
-TestRunner_sco-tester         PASS      15.16 seconds
-TestRunner_ioctl-tester       PASS      8.03 seconds
-TestRunner_mesh-tester        FAIL      6.27 seconds
-TestRunner_smp-tester         PASS      7.08 seconds
-TestRunner_userchan-tester    PASS      5.16 seconds
-IncrementalBuild              PASS      28.91 seconds
+CHECK: Alignment should match open parenthesis
++static int ath3k_load_firmware(struct usb_device *udev,
++                               const struct firmware *firmware)
 
-Details
-##############################
-Test: CheckSmatch - FAIL
-Desc: Run smatch tool with source
-Output:
+CHECK: Alignment should match open parenthesis
++               err = usb_bulk_msg(udev, pipe, send_buf, size,
++                                       &len, 3000);
 
-Segmentation fault (core dumped)
-make[4]: *** [scripts/Makefile.build:244: net/bluetooth/hci_core.o] Error 139
-make[4]: *** Deleting file 'net/bluetooth/hci_core.o'
-make[3]: *** [scripts/Makefile.build:485: net/bluetooth] Error 2
-make[2]: *** [scripts/Makefile.build:485: net] Error 2
-make[2]: *** Waiting for unfinished jobs....
-Segmentation fault (core dumped)
-make[4]: *** [scripts/Makefile.build:244: drivers/bluetooth/bcm203x.o] Error 139
-make[4]: *** Deleting file 'drivers/bluetooth/bcm203x.o'
-make[4]: *** Waiting for unfinished jobs....
-make[3]: *** [scripts/Makefile.build:485: drivers/bluetooth] Error 2
-make[2]: *** [scripts/Makefile.build:485: drivers] Error 2
-make[1]: *** [/github/workspace/src/src/Makefile:1919: .] Error 2
-make: *** [Makefile:240: __sub-make] Error 2
-##############################
-Test: TestRunner_iso-tester - FAIL
-Desc: Run iso-tester with test-runner
-Output:
-Total: 122, Passed: 117 (95.9%), Failed: 1, Not Run: 4
+CHECK: Unnecessary parentheses around 'len != size'
++               if (err || (len != size)) {
 
-Failed Test Cases
-ISO Connect Suspend - Success                        Failed       4.172 seconds
-##############################
-Test: TestRunner_mesh-tester - FAIL
-Desc: Run mesh-tester with test-runner
-Output:
-Total: 10, Passed: 9 (90.0%), Failed: 1, Not Run: 0
+CHECK: Alignment should match open parenthesis
++static int ath3k_get_version(struct usb_device *udev,
++                       struct ath3k_version *version)
 
-Failed Test Cases
-Mesh - Send cancel - 1                               Failed       0.110 seconds
+CHECK: Alignment should match open parenthesis
++static int ath3k_load_fwfile(struct usb_device *udev,
++               const struct firmware *firmware)
 
+CHECK: Alignment should match open parenthesis
++               err = usb_bulk_msg(udev, pipe, send_buf, size,
++                                       &len, 3000);
 
+CHECK: Unnecessary parentheses around 'len != size'
++               if (err || (len != size)) {
+
+CHECK: Blank lines aren't necessary after an open brace '{'
++       switch (fw_version.ref_clock) {
++
+
+CHECK: Alignment should match open parenthesis
++       snprintf(filename, ATH3K_NAME_LEN, "ar3k/ramps_0x%08x_%d%s",
++               le32_to_cpu(fw_version.rom_version), clk_value, ".dfu");
+
+CHECK: Alignment should match open parenthesis
++static int ath3k_probe(struct usb_interface *intf,
++                       const struct usb_device_id *id)
+
+CHECK: Alignment should match open parenthesis
++                       BT_ERR("Firmware file \"%s\" not found",
++                                                       ATH3K_FIRMWARE);
+
+CHECK: Alignment should match open parenthesis
++               BT_ERR("Firmware file \"%s\" request failed (err=%d)",
++                                               ATH3K_FIRMWARE, ret);
+
+total: 0 errors, 0 warnings, 14 checks, 540 lines checked
+
+Signed-off-by: Uri Arev <me@wantyapps.xyz>
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
-Regards,
-Linux Bluetooth
+ drivers/bluetooth/ath3k.c | 25 +++++++++++--------------
+ 1 file changed, 11 insertions(+), 14 deletions(-)
 
+diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
+index 88262d3a93923..ce97b336fbfb8 100644
+--- a/drivers/bluetooth/ath3k.c
++++ b/drivers/bluetooth/ath3k.c
+@@ -3,7 +3,6 @@
+  * Copyright (c) 2008-2009 Atheros Communications Inc.
+  */
+ 
+-
+ #include <linux/module.h>
+ #include <linux/kernel.h>
+ #include <linux/init.h>
+@@ -128,7 +127,6 @@ MODULE_DEVICE_TABLE(usb, ath3k_table);
+  * for AR3012
+  */
+ static const struct usb_device_id ath3k_blist_tbl[] = {
+-
+ 	/* Atheros AR3012 with sflash firmware*/
+ 	{ USB_DEVICE(0x0489, 0xe04e), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x0489, 0xe04d), .driver_info = BTUSB_ATH3012 },
+@@ -202,7 +200,7 @@ static inline void ath3k_log_failed_loading(int err, int len, int size,
+ #define TIMEGAP_USEC_MAX	100
+ 
+ static int ath3k_load_firmware(struct usb_device *udev,
+-				const struct firmware *firmware)
++			       const struct firmware *firmware)
+ {
+ 	u8 *send_buf;
+ 	int len = 0;
+@@ -237,9 +235,9 @@ static int ath3k_load_firmware(struct usb_device *udev,
+ 		memcpy(send_buf, firmware->data + sent, size);
+ 
+ 		err = usb_bulk_msg(udev, pipe, send_buf, size,
+-					&len, 3000);
++				   &len, 3000);
+ 
+-		if (err || (len != size)) {
++		if (err || len != size) {
+ 			ath3k_log_failed_loading(err, len, size, count);
+ 			goto error;
+ 		}
+@@ -262,7 +260,7 @@ static int ath3k_get_state(struct usb_device *udev, unsigned char *state)
+ }
+ 
+ static int ath3k_get_version(struct usb_device *udev,
+-			struct ath3k_version *version)
++			     struct ath3k_version *version)
+ {
+ 	return usb_control_msg_recv(udev, 0, ATH3K_GETVERSION,
+ 				    USB_TYPE_VENDOR | USB_DIR_IN, 0, 0,
+@@ -271,7 +269,7 @@ static int ath3k_get_version(struct usb_device *udev,
+ }
+ 
+ static int ath3k_load_fwfile(struct usb_device *udev,
+-		const struct firmware *firmware)
++			     const struct firmware *firmware)
+ {
+ 	u8 *send_buf;
+ 	int len = 0;
+@@ -310,8 +308,8 @@ static int ath3k_load_fwfile(struct usb_device *udev,
+ 		memcpy(send_buf, firmware->data + sent, size);
+ 
+ 		err = usb_bulk_msg(udev, pipe, send_buf, size,
+-					&len, 3000);
+-		if (err || (len != size)) {
++				   &len, 3000);
++		if (err || len != size) {
+ 			ath3k_log_failed_loading(err, len, size, count);
+ 			kfree(send_buf);
+ 			return err;
+@@ -425,7 +423,6 @@ static int ath3k_load_syscfg(struct usb_device *udev)
+ 	}
+ 
+ 	switch (fw_version.ref_clock) {
+-
+ 	case ATH3K_XTAL_FREQ_26M:
+ 		clk_value = 26;
+ 		break;
+@@ -441,7 +438,7 @@ static int ath3k_load_syscfg(struct usb_device *udev)
+ 	}
+ 
+ 	snprintf(filename, ATH3K_NAME_LEN, "ar3k/ramps_0x%08x_%d%s",
+-		le32_to_cpu(fw_version.rom_version), clk_value, ".dfu");
++		 le32_to_cpu(fw_version.rom_version), clk_value, ".dfu");
+ 
+ 	ret = request_firmware(&firmware, filename, &udev->dev);
+ 	if (ret < 0) {
+@@ -456,7 +453,7 @@ static int ath3k_load_syscfg(struct usb_device *udev)
+ }
+ 
+ static int ath3k_probe(struct usb_interface *intf,
+-			const struct usb_device_id *id)
++		       const struct usb_device_id *id)
+ {
+ 	const struct firmware *firmware;
+ 	struct usb_device *udev = interface_to_usbdev(intf);
+@@ -505,10 +502,10 @@ static int ath3k_probe(struct usb_interface *intf,
+ 	if (ret < 0) {
+ 		if (ret == -ENOENT)
+ 			BT_ERR("Firmware file \"%s\" not found",
+-							ATH3K_FIRMWARE);
++			       ATH3K_FIRMWARE);
+ 		else
+ 			BT_ERR("Firmware file \"%s\" request failed (err=%d)",
+-							ATH3K_FIRMWARE, ret);
++			       ATH3K_FIRMWARE, ret);
+ 		return ret;
+ 	}
+ 
+-- 
+2.43.0
 
---===============5409592004357117324==--
