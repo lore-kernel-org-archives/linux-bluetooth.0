@@ -1,110 +1,149 @@
-Received: from mail-yb1-f180.google.com (mail-yb1-f180.google.com [209.85.219.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF51915DBB9
-	for <linux-bluetooth@vger.kernel.org>; Mon, 27 May 2024 11:54:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCBD915E5CC;
+	Mon, 27 May 2024 13:26:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716810885; cv=none; b=WCYtYWSdzTQdXmdEprRoCAgnrOXHQ5tlRGne0Ffebh0sEekbNGcud2KEhr1uSpfH6q2FjzJzi2zVB4fDkUSqqt8wB77CwqD7s+c4A8Rxz2pxDAJlIEM3ecssp9VCUzMjjyC5IVMJ8V5fZigr39Sq0a4v6nRb8fsJW37GeD4bwps=
+	t=1716816366; cv=none; b=tTMd682wjXv6/7aOJygnB5CdtO8ISnzKCfqZP9S+isEjXXRoHXtqo3Wm6OG/mSSIf2U1/6HSTWW9cx3LwYHlnSW51jRLF3u+3zl4dZKKIx7mgIhEmaJdJwU3zHiqLRHzAFuRNnvacDlxVIzcxg+I3PkHxUCiKDxoKv7YOTlNvkQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716810885; c=relaxed/simple;
-	bh=IsvEyiIap4MwRPL7+I78TVklz9nBKQ+p1Hyi2O3BqJw=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=KZ/M0j1weQqTzboWCStvUJtkS7P9c7WSXvx3FfQ37Xl1TLZ/gBTdYZ8JGYg9IwY0dzkMxu5k1hyBN1I5P/TTldqpsIYe6SkLYCqXNLXP58zk12/Z/oP4/sk0jJUDZthpp21X4j9ZkGIJ3kdZHCzmTHI3QtKybICgBHNAYe32vxA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MURjiDdI; arc=none smtp.client-ip=209.85.219.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1716816366; c=relaxed/simple;
+	bh=A7OKadLaoCRz5R/qj8fiyIi+G0M1yoSql7UbDHY+5UY=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=Wg7K5xD0WewiZ1W5I5xXLi45hbgV0HMxk2YX6txcoMCIztpFAOpit9Ty021RQ0iiLjbik4RkKzyzQ8HCesy2AQmCXdUBh66aT4/2lfsZSCDBVWIaIpbphrp81B0UrH7HIeev1L3pfiaVRY5kksOsvB+nLVrCJYWk/krwwjxPmYY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=FQAYcjta; arc=none smtp.client-ip=192.198.163.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MURjiDdI"
-Received: by mail-yb1-f180.google.com with SMTP id 3f1490d57ef6-df7812c4526so2315507276.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 27 May 2024 04:54:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1716810883; x=1717415683; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=1Im0MspvIZzheGIPpWMlVJpsWkX6iqlotN1MARYU4Wg=;
-        b=MURjiDdIC1RKL43mOfyc+Zpon9LMkjp08HWw85yxlr1V84aGmRIbyFi9i/7Gzbbeja
-         SjAa7Oun2vfq0Kr643wovmsfF36Wfl3oJ4+hChqCvqfMPbeDiYwBEmi7Q383pXOFFMdB
-         /5KwY+6fCPb1W0zQc3olHtAUml8Xk78vPNmPtbP4CQDhBC5D7MY9fIy9mPKQPMVOYs1C
-         wE9bZbCduGxHMN0V1nSES6cN7MbPp1EqXBbVYdYasWSeK6QoDG/9nilBjuCySfxo4U2/
-         BCLRl61ki9XDxSksqFQonQRn7AqxHuwTBlaAI/T/a6eCt5xQZdsR6Yvpm+7izx0uT+O4
-         orYA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716810883; x=1717415683;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=1Im0MspvIZzheGIPpWMlVJpsWkX6iqlotN1MARYU4Wg=;
-        b=NHrmTfIJbP+uLyhVkSCEcHRVD3I/YzNRYmMoLIBshBmxoE1edIz0WL8/1rUBAnAEZP
-         WOpIn0aJRSzt11pvjn6Ia2QHkSoT0E9mKuHZWGA1EvM26ZP0DFFnj69r2dnBdTMd7vxr
-         RK5mxMX/P/kPa2hRu5Q5J8t7SG7vW9zHRzk0qTDaKGLt5uuPLboHfC/FFc59p0mlm+AN
-         PQlVB1CaOmE9bbTyafkwUtxvTI5xJzpwmPpRafQJFGnP4C7yPHFGkzJRWFyo4sGgn50O
-         zFFp168RzUZPp84BKFTT+d8H/MhXyeOmRAUMjOy7TWWYuoeR/3daYB2pxc2jiiNeHzcv
-         OBUA==
-X-Gm-Message-State: AOJu0YzM0dqbz4w1/nkcy3Tl7xi2B2Ydv90orM4nauIl1RdoXd6CFfmY
-	KWk7/MG1nKP37uTLobnFeQESF1/EYlZYTzIPmpsY757dzshk0NrGtBa6/w==
-X-Google-Smtp-Source: AGHT+IFKJPapvItNKJ89PazUdHyRa2+GYYp1ozDDT2dUIf2tiOvnmwbB2PS/bNQL9Zki6EgYrfOL0g==
-X-Received: by 2002:a25:b2a2:0:b0:dcb:e82c:f7d with SMTP id 3f1490d57ef6-df772256da5mr8721284276.41.1716810882555;
-        Mon, 27 May 2024 04:54:42 -0700 (PDT)
-Received: from [172.17.0.2] ([20.51.198.150])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-794abd31557sm290091485a.116.2024.05.27.04.54.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 27 May 2024 04:54:42 -0700 (PDT)
-Message-ID: <66547482.050a0220.35509.9829@mx.google.com>
-Date: Mon, 27 May 2024 04:54:42 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============4830813423146128683=="
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="FQAYcjta"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1716816364; x=1748352364;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=A7OKadLaoCRz5R/qj8fiyIi+G0M1yoSql7UbDHY+5UY=;
+  b=FQAYcjtaMzByrHv6M3SYsoiHQ3N9++azZPl2xrZiiLAmghvFynWDDre0
+   IO8CHV70lvgVNIQsCCwpqnKCQB1oVlM7dvZo8ogb2UFDhUvcW0Q8vq95J
+   k4JhN4XzFttiNg+WIgZms+mvd6U9ZxKi7kM1i7HFNFbQIHrQ26iUgJhGF
+   HX187Pl79JrIvZu1etKnxaabrn92RpGehAy6Tc/B8VX/2QiCi85v/I7Ij
+   zuKNdp7E+YuWPpGE9poqTJRvhUnWXWyIkGT0OfS2pmMKfUOn0h42dkXA7
+   bBcyvGLZ9sCN8Jbhxw2VDEX/VZGXhV+Bx9bJzoecVSon4MA2cxLIHdtgy
+   Q==;
+X-CSE-ConnectionGUID: GkD4pJqjT9qHxbbAIKKvOg==
+X-CSE-MsgGUID: RhlEt2DLQX+WiAsCh9tFBQ==
+X-IronPort-AV: E=McAfee;i="6600,9927,11084"; a="38520281"
+X-IronPort-AV: E=Sophos;i="6.08,192,1712646000"; 
+   d="scan'208";a="38520281"
+Received: from fmviesa003.fm.intel.com ([10.60.135.143])
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 May 2024 06:26:03 -0700
+X-CSE-ConnectionGUID: 8oR2m5pISKebTliMcOv3GQ==
+X-CSE-MsgGUID: /4BWKaQbQue2aftMKpOPhg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.08,192,1712646000"; 
+   d="scan'208";a="39206633"
+Received: from unknown (HELO localhost) ([10.245.247.140])
+  by fmviesa003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 May 2024 06:25:59 -0700
+From: =?UTF-8?q?Ilpo=20J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>
+To: Hector Martin <marcan@marcan.st>,
+	Sven Peter <sven@svenpeter.dev>,
+	Alyssa Rosenzweig <alyssa@rosenzweig.io>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	asahi@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: =?UTF-8?q?Ilpo=20J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>,
+	stable@vger.kernel.org
+Subject: [PATCH 1/1] Bluetooth: hci_bcm4377: Convert PCIBIOS_* return codes to errnos
+Date: Mon, 27 May 2024 16:25:51 +0300
+Message-Id: <20240527132552.14119-1-ilpo.jarvinen@linux.intel.com>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, iulia.tanasescu@nxp.com
-Subject: RE: Add new BAP BSRC/SCC tests
-In-Reply-To: <20240527075422.18953-2-iulia.tanasescu@nxp.com>
-References: <20240527075422.18953-2-iulia.tanasescu@nxp.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
---===============4830813423146128683==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+bcm4377_init_cfg() uses pci_{read,write}_config_dword() that return
+PCIBIOS_* codes. The return codes are returned into the calling
+bcm4377_probe() which directly returns the error which is of incorrect
+type (a probe should return normal errnos).
 
-This is automated email and please do not reply to this email!
+Convert PCIBIOS_* returns code using pcibios_err_to_errno() into normal
+errno before returning it from bcm4377_init_cfg. This conversion is the
+easiest by adding a label next to return and doing the conversion there
+once rather than adding pcibios_err_to_errno() into every single return
+statement.
 
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=856047
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      2.74 seconds
-GitLint                       PASS      1.89 seconds
-BuildEll                      PASS      24.37 seconds
-BluezMake                     PASS      1633.36 seconds
-MakeCheck                     PASS      13.23 seconds
-MakeDistcheck                 PASS      176.30 seconds
-CheckValgrind                 PASS      248.67 seconds
-CheckSmatch                   WARNING   352.24 seconds
-bluezmakeextell               PASS      119.17 seconds
-IncrementalBuild              PASS      9382.93 seconds
-ScanBuild                     PASS      980.76 seconds
-
-Details
-##############################
-Test: CheckSmatch - WARNING
-Desc: Run smatch tool with source
-Output:
-src/shared/bap.c:286:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structuressrc/shared/bap.c:286:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structuressrc/shared/bap.c:286:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structuressrc/shared/bap.c:286:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structuressrc/shared/bap.c:286:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structuressrc/shared/bap.c:286:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structures
-
-
+Fixes: 8a06127602de ("Bluetooth: hci_bcm4377: Add new driver for BCM4377 PCIe boards")
+Cc: stable@vger.kernel.org
+Signed-off-by: Ilpo Järvinen <ilpo.jarvinen@linux.intel.com>
 ---
-Regards,
-Linux Bluetooth
+ drivers/bluetooth/hci_bcm4377.c | 18 ++++++++++--------
+ 1 file changed, 10 insertions(+), 8 deletions(-)
 
+diff --git a/drivers/bluetooth/hci_bcm4377.c b/drivers/bluetooth/hci_bcm4377.c
+index 0c2f15235b4c..b00240109dc3 100644
+--- a/drivers/bluetooth/hci_bcm4377.c
++++ b/drivers/bluetooth/hci_bcm4377.c
+@@ -2134,44 +2134,46 @@ static int bcm4377_init_cfg(struct bcm4377_data *bcm4377)
+ 				     BCM4377_PCIECFG_BAR0_WINDOW1,
+ 				     bcm4377->hw->bar0_window1);
+ 	if (ret)
+-		return ret;
++		goto fail;
+ 
+ 	ret = pci_write_config_dword(bcm4377->pdev,
+ 				     BCM4377_PCIECFG_BAR0_WINDOW2,
+ 				     bcm4377->hw->bar0_window2);
+ 	if (ret)
+-		return ret;
++		goto fail;
+ 
+ 	ret = pci_write_config_dword(
+ 		bcm4377->pdev, BCM4377_PCIECFG_BAR0_CORE2_WINDOW1,
+ 		BCM4377_PCIECFG_BAR0_CORE2_WINDOW1_DEFAULT);
+ 	if (ret)
+-		return ret;
++		goto fail;
+ 
+ 	if (bcm4377->hw->has_bar0_core2_window2) {
+ 		ret = pci_write_config_dword(bcm4377->pdev,
+ 					     BCM4377_PCIECFG_BAR0_CORE2_WINDOW2,
+ 					     bcm4377->hw->bar0_core2_window2);
+ 		if (ret)
+-			return ret;
++			goto fail;
+ 	}
+ 
+ 	ret = pci_write_config_dword(bcm4377->pdev, BCM4377_PCIECFG_BAR2_WINDOW,
+ 				     BCM4377_PCIECFG_BAR2_WINDOW_DEFAULT);
+ 	if (ret)
+-		return ret;
++		goto fail;
+ 
+ 	ret = pci_read_config_dword(bcm4377->pdev,
+ 				    BCM4377_PCIECFG_SUBSYSTEM_CTRL, &ctrl);
+ 	if (ret)
+-		return ret;
++		goto fail;
+ 
+ 	if (bcm4377->hw->clear_pciecfg_subsystem_ctrl_bit19)
+ 		ctrl &= ~BIT(19);
+ 	ctrl |= BIT(16);
+ 
+-	return pci_write_config_dword(bcm4377->pdev,
+-				      BCM4377_PCIECFG_SUBSYSTEM_CTRL, ctrl);
++	ret = pci_write_config_dword(bcm4377->pdev,
++				     BCM4377_PCIECFG_SUBSYSTEM_CTRL, ctrl);
++fail:
++	return pcibios_err_to_errno(ret);
+ }
+ 
+ static int bcm4377_probe_dmi(struct bcm4377_data *bcm4377)
+-- 
+2.39.2
 
---===============4830813423146128683==--
