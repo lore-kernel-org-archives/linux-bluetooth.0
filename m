@@ -1,130 +1,133 @@
-Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5FF7101C5;
-	Tue, 28 May 2024 02:26:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA82BEED6
+	for <linux-bluetooth@vger.kernel.org>; Tue, 28 May 2024 03:04:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716863187; cv=none; b=QKVJBxH1Ah3ciOJelney1efkAAnRUK1ISSuy6ogaL+9w3YgS3//X2LGwNk8+baCtR4cZvohEVtTY7JdchLQMdJtCoCzTZ//hrk5JyU31Uutnnl7bQUScLwZFAxzcFmB8QJMRSIHtroBc1WFZEC0ulGcUCpRTBuBRB9PFDghzUXU=
+	t=1716865489; cv=none; b=tUxhewRiQn18WTVZBTEbDKwk5f+3ZBAH6f27eAGIwlRY4ikpjElk1dFkKLpgZrlx9DAvd/pPPf3PtXldRZz5g5waAbxHnXbitpcUxqjZH+dRn4X/M/NypSxhm2VFnTds2Nrac7R+FRwIrwZggEF1FbWVyiRAhRy7XZI5iYF8ugQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716863187; c=relaxed/simple;
-	bh=sJ7T7KFcp90vesE12nZApEMOYDYTcaHY8VsfRZpRCFg=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=T1BKl8DL1vkgeYVy9rkLoR+O06A3LSIfs5DGgS23Opi3i3HWGhRw8EFPbOGx+plw+DoD6oBrl2vJPFNa26FJbU2XnXW7biZshMiPHw6HQCTYumM+8NGVmQFi+QvfqWDlaUW9S8IDTuxnhy/0ePL26uurjA4dZZL5/L1GRFgRDpo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
-X-UUID: a9cfbaac1c9911ef9305a59a3cc225df-20240528
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.1.38,REQID:23330111-d458-421c-8338-26bc86d8450e,IP:20,
-	URL:0,TC:0,Content:0,EDM:0,RT:0,SF:-15,FILE:0,BULK:0,RULE:Release_Ham,ACTI
-	ON:release,TS:5
-X-CID-INFO: VERSION:1.1.38,REQID:23330111-d458-421c-8338-26bc86d8450e,IP:20,UR
-	L:0,TC:0,Content:0,EDM:0,RT:0,SF:-15,FILE:0,BULK:0,RULE:Release_Ham,ACTION
-	:release,TS:5
-X-CID-META: VersionHash:82c5f88,CLOUDID:4bc1deb82b12753c767b28bc0c1f5f35,BulkI
-	D:240528102617GGBWLTU8,BulkQuantity:0,Recheck:0,SF:66|24|17|19|44|102,TC:n
-	il,Content:0,EDM:-3,IP:-2,URL:0,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,CO
-	L:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0
-X-CID-BVR: 0,NGT
-X-CID-BAS: 0,NGT,0,_
-X-CID-FACTOR: TF_CID_SPAM_SNR,TF_CID_SPAM_FAS,TF_CID_SPAM_FSD,TF_CID_SPAM_FSI
-X-UUID: a9cfbaac1c9911ef9305a59a3cc225df-20240528
-Received: from mail.kylinos.cn [(39.156.73.10)] by mailgw.kylinos.cn
-	(envelope-from <jiangyunshui@kylinos.cn>)
-	(Generic MTA)
-	with ESMTP id 1625702118; Tue, 28 May 2024 10:26:17 +0800
-Received: from mail.kylinos.cn (localhost [127.0.0.1])
-	by mail.kylinos.cn (NSMail) with SMTP id 5F90DE000EB9;
-	Tue, 28 May 2024 10:26:17 +0800 (CST)
-X-ns-mid: postfix-665540C9-243563493
-Received: from kylin-pc.. (unknown [172.25.130.133])
-	by mail.kylinos.cn (NSMail) with ESMTPA id 29B55E000EB9;
-	Tue, 28 May 2024 10:26:16 +0800 (CST)
-From: Yunshui Jiang <jiangyunshui@kylinos.cn>
-To: linux-kernel@vger.kernel.org,
-	linux-bluetooth@vger.kernel.org
-Cc: marcel@holtmann.org,
-	johan.hedberg@gmail.com,
-	luiz.dentz@gmail.com,
-	Yunshui Jiang <jiangyunshui@kylinos.cn>
-Subject: [PATCH -v3] Bluetooth: 6lowpan: use DEV_STAT_INC() to avoid races
-Date: Tue, 28 May 2024 10:26:13 +0800
-Message-Id: <20240528022613.1974961-1-jiangyunshui@kylinos.cn>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1716865489; c=relaxed/simple;
+	bh=oo5ErvbZLtCzb36j2WmivnwMC2qItRLN8Lf4KycxmKc=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=CigAa9eqy6J8oU7buhnsKAHnCOD5s3mUd8vPxiywZecuUR59VczC2WPYHSAaDiZ53/DHlqgp7K9QOqNOQCnz9Offz8wP5D4gIMcMG30DRld6+UwyDVoBBEPuNTqWnV3bBzXxUW6d87wjUNNVtzi4PS1t2Zh1e6cbJesBuvV7BQk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XUTBNsh9; arc=none smtp.client-ip=209.85.214.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XUTBNsh9"
+Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-1f47728fa4cso2440425ad.3
+        for <linux-bluetooth@vger.kernel.org>; Mon, 27 May 2024 20:04:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1716865487; x=1717470287; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=T0wu7PuVSK3taz38lWD04FduouFm5fRzBmkdoRgNc3c=;
+        b=XUTBNsh9z6GL4QEYoji/cMXI1BxGIIvYNq4xxx8ST6UrxpYXD5+AGSSGRwMvnabfh/
+         ZFElQ7UE1zSBEEojg/rdECvRI6t47CYi2Fko2vUsTkkPibZ9oLmCXXpObXMjNy53RBH8
+         5Z69pNPWjysZ140PBjAP/Wt9wMUq7UoYDecdM4MRiLrOpRqMz9qidJPM6qmZPmxKUh2R
+         pqi3s1hQ98AwlTOmDsarCJJlp0exDXHgnURhM64/2KuMJwX6ptu/Qs+sx49MpgVl7W0x
+         n6UhuAe9/B6pmJcDuRz3gqr1+EuoeXnUY/VFtnG4MZSmlYzyKdUJ+jurF38L5VPFixUA
+         QDGA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1716865487; x=1717470287;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=T0wu7PuVSK3taz38lWD04FduouFm5fRzBmkdoRgNc3c=;
+        b=e/DmmOIIH5N7Brt0q/WfqXFDGfhVAtPrBI1CtM5wx/yNk6UzVXhiyWlY4ho4TbvZ2A
+         zObv5ZyvepolK6xS2vL7x8Xo1v76ZQKfG/TwKxNxvktogs7TDgkmeXL8krqXohaqnjwR
+         /pE2sXm4aVK/7gZS+nRAVi8IyTG73BDTKJpr3ItnfKtqnXs3xgNCrhLI5J2ERVBSjg1M
+         tjL4ovM4fGYRFX+lC1jdS2pZncTrJ/8LXQT7b6KgGJ/yibZPGVsBwHVATpcV0+4ZOlbN
+         06aFpRf3jTdilbc9W+AM7T5uplAnDES2tFQjEQJQZ4TcAS8E1doX9HMQzCfxZ+eBrRXW
+         2hsA==
+X-Gm-Message-State: AOJu0YxEbAGxZiOtJMmzVdnEqoVXN43b3pTbty9mmTfyjwdmg7xkBBMR
+	bsdoTDOMCw/NJcvQPGZUS52Lfg9x7ofBxcZCgIAARgmEOm3sKSKfeB6dAg==
+X-Google-Smtp-Source: AGHT+IHlFln/Yl1jXglTW9Q9zCr7cgzObqSI0P/DIDrxhu7X0aK5Ge3Ypz4BdLDGSfg9IPU+4OIxQA==
+X-Received: by 2002:a17:902:f682:b0:1f4:5a89:39a4 with SMTP id d9443c01a7336-1f45a893e7cmr106663215ad.21.1716865486824;
+        Mon, 27 May 2024 20:04:46 -0700 (PDT)
+Received: from [172.17.0.2] ([13.91.68.175])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1f44c9683besm68345375ad.138.2024.05.27.20.04.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 27 May 2024 20:04:46 -0700 (PDT)
+Message-ID: <665549ce.170a0220.a4e51.1644@mx.google.com>
+Date: Mon, 27 May 2024 20:04:46 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============4163811627371675144=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, jiangyunshui@kylinos.cn
+Subject: RE: [-v3] Bluetooth: 6lowpan: use DEV_STAT_INC() to avoid races
+In-Reply-To: <20240528022613.1974961-1-jiangyunshui@kylinos.cn>
+References: <20240528022613.1974961-1-jiangyunshui@kylinos.cn>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-syzbot/KCSAN reported that races happen when multiple cpus
-updating dev->stats.tx_error concurrently.
+--===============4163811627371675144==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Adopt SMP safe DEV_STATS_INC() to update dev->stats fields.
+This is automated email and please do not reply to this email!
 
-Signed-off-by: Yunshui Jiang <jiangyunshui@kylinos.cn>
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=856341
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.46 seconds
+GitLint                       PASS      0.19 seconds
+SubjectPrefix                 PASS      0.06 seconds
+BuildKernel                   PASS      29.45 seconds
+CheckAllWarning               PASS      32.52 seconds
+CheckSparse                   PASS      37.78 seconds
+CheckSmatch                   FAIL      34.80 seconds
+BuildKernel32                 PASS      28.65 seconds
+TestRunnerSetup               PASS      521.62 seconds
+TestRunner_l2cap-tester       PASS      18.17 seconds
+TestRunner_iso-tester         PASS      32.60 seconds
+TestRunner_bnep-tester        PASS      4.81 seconds
+TestRunner_mgmt-tester        PASS      112.67 seconds
+TestRunner_rfcomm-tester      PASS      7.35 seconds
+TestRunner_sco-tester         PASS      14.94 seconds
+TestRunner_ioctl-tester       PASS      7.78 seconds
+TestRunner_mesh-tester        PASS      6.81 seconds
+TestRunner_smp-tester         PASS      6.93 seconds
+TestRunner_userchan-tester    PASS      4.99 seconds
+IncrementalBuild              PASS      27.66 seconds
+
+Details
+##############################
+Test: CheckSmatch - FAIL
+Desc: Run smatch tool with source
+Output:
+
+Segmentation fault (core dumped)
+make[4]: *** [scripts/Makefile.build:244: net/bluetooth/hci_core.o] Error 139
+make[4]: *** Deleting file 'net/bluetooth/hci_core.o'
+make[3]: *** [scripts/Makefile.build:485: net/bluetooth] Error 2
+make[2]: *** [scripts/Makefile.build:485: net] Error 2
+make[2]: *** Waiting for unfinished jobs....
+Segmentation fault (core dumped)
+make[4]: *** [scripts/Makefile.build:244: drivers/bluetooth/bcm203x.o] Error 139
+make[4]: *** Deleting file 'drivers/bluetooth/bcm203x.o'
+make[4]: *** Waiting for unfinished jobs....
+make[3]: *** [scripts/Makefile.build:485: drivers/bluetooth] Error 2
+make[2]: *** [scripts/Makefile.build:485: drivers] Error 2
+make[1]: *** [/github/workspace/src/src/Makefile:1919: .] Error 2
+make: *** [Makefile:240: __sub-make] Error 2
+
+
 ---
- net/bluetooth/6lowpan.c | 16 ++++++++--------
- 1 file changed, 8 insertions(+), 8 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
-index 50cfec8ccac4..8eb2cf58c00e 100644
---- a/net/bluetooth/6lowpan.c
-+++ b/net/bluetooth/6lowpan.c
-@@ -295,8 +295,8 @@ static int recv_pkt(struct sk_buff *skb, struct net_d=
-evice *dev,
- 			goto drop;
- 		}
-=20
--		dev->stats.rx_bytes +=3D skb->len;
--		dev->stats.rx_packets++;
-+		DEV_STATS_ADD(dev, rx_bytes, skb->len);
-+		DEV_STATS_INC(dev, rx_packets);
-=20
- 		consume_skb(local_skb);
- 		consume_skb(skb);
-@@ -323,8 +323,8 @@ static int recv_pkt(struct sk_buff *skb, struct net_d=
-evice *dev,
- 			goto drop;
- 		}
-=20
--		dev->stats.rx_bytes +=3D skb->len;
--		dev->stats.rx_packets++;
-+		DEV_STATS_ADD(dev, rx_bytes, skb->len);
-+		DEV_STATS_INC(dev, rx_packets);
-=20
- 		consume_skb(local_skb);
- 		consume_skb(skb);
-@@ -336,7 +336,7 @@ static int recv_pkt(struct sk_buff *skb, struct net_d=
-evice *dev,
- 	return NET_RX_SUCCESS;
-=20
- drop:
--	dev->stats.rx_dropped++;
-+	DEV_STATS_INC(dev, rx_dropped);
- 	return NET_RX_DROP;
- }
-=20
-@@ -445,13 +445,13 @@ static int send_pkt(struct l2cap_chan *chan, struct=
- sk_buff *skb,
-=20
- 	err =3D l2cap_chan_send(chan, &msg, skb->len);
- 	if (err > 0) {
--		netdev->stats.tx_bytes +=3D err;
--		netdev->stats.tx_packets++;
-+		DEV_STATS_ADD(netdev, tx_bytes, err);
-+		DEV_STATS_INC(netdev, tx_packets);
- 		return 0;
- 	}
-=20
- 	if (err < 0)
--		netdev->stats.tx_errors++;
-+		DEV_STATS_INC(netdev, tx_errors);
-=20
- 	return err;
- }
---=20
-2.34.1
 
+--===============4163811627371675144==--
