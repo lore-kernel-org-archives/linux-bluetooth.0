@@ -1,97 +1,86 @@
-Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mailgw01.mediatek.com (unknown [60.244.123.138])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F3DA17B409;
-	Tue, 28 May 2024 20:54:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3CFF15A855;
+	Wed, 29 May 2024 03:30:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=60.244.123.138
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716929680; cv=none; b=s1f/5zHSCx8HYrXn6osFlAxspeKIf9YyBePl3ZW6AF2xokG5XxqDarPKkAFqgs3Hor9Axy7kSvplednm6xhVLVdM2oE1Q0SoEbmkD+5k45ug5n+CjxTKxwKV8XwiihMhtROIDvztLOY+dkI34Sq9iahznBYN5GBqZlnyQ8n3P2o=
+	t=1716953448; cv=none; b=JVykzRKHk/KLcKdqfrH2xazHAC+rcbefrtyTfbhR/czLDOIIHXtnZ1v5axKNYaIfLKhSV/nKZSIUjfSFiF1ZJ6sZ8kkdNbqbRvbg1Td2Zx/dOTVb2SWgSNeLh0OYl0S0nO2MsOs+DLM5p13n48X1pHH3zhE9y+t63sT5n2plaTc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716929680; c=relaxed/simple;
-	bh=iEcVS7kNwhO3HFB9CScl6vFacYu+gRoXrd/D5F+ZUUM=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:In-Reply-To:
-	 Content-Type; b=EeSMwIMVXbRZcTFpC5i+3455GV+ck0pOvk7fscDB3enHyaffRvGAc+CKxcVTTu/HCl/AfofmZhuJ68CUnwQRy0uoZBYlXMyY9rZ9jggspKyoLlr9+P6XmBWltWsB1irArQgwSovKvVMtvfkfB31Ix4EM51eJeAufAJKhiPytdWY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=T899pEGx; arc=none smtp.client-ip=209.85.221.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1716953448; c=relaxed/simple;
+	bh=xL9ffgj8ECADyDd5UAvUtyWmf7r5zRrwShyMG8xrDLg=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=HHcCf2VMABGi88hf5fRhMhtIPXPRNaG0yfZ/wkyE26K7QINBxJ1Ca2sUalX9LYvfiwa2xXUSS5/A5iyb9B3frU7ev/lAvJfTteFLkbsBka00QVzXu9nGstvmvLKn7d0SlDT9Xzs42D2dFxqbVTzyozsDpVbP/KlZeIR8z16EJFk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com; spf=pass smtp.mailfrom=mediatek.com; dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b=hBnK7hz3; arc=none smtp.client-ip=60.244.123.138
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mediatek.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="T899pEGx"
-Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-35502a992c9so1376103f8f.3;
-        Tue, 28 May 2024 13:54:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1716929677; x=1717534477; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:cc:to
-         :subject:from:user-agent:mime-version:date:message-id:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=y6FE63oTYkWPlAI/9XHCPUmOHWIDgyDXFFG5HlAkfZ4=;
-        b=T899pEGxGmAAghF+LXRCsHlCpjVYCI8XBjQ/8fKIBgku1OF/2OI1jdF67/xQjCH81k
-         BX6FOtbxnvgOA3p167bc+8b/nbfZhD3JFW0HwPAInEGay/4oH3DmxgRQaRgVcj8Wpsv5
-         G3yCjX/2xTWzoHG0HYXxzPyJU/48BamQK5og6mLTqrgHg7nrN8PVgoYxAz68txW8Vx67
-         sJ/0X+jiD51IZ1W6zF2TnNnI6H1Zlq7etLoGRYDixwCLRyEtFAI3A5+OX/V3HVgSqJ17
-         1HNpjetm+UccP3wrVlw14SsIBINyVfMiH++C6zyeP42tflHD/kJ671QhZNGg5Tl1dEW4
-         gTzQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716929677; x=1717534477;
-        h=content-transfer-encoding:in-reply-to:content-language:cc:to
-         :subject:from:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=y6FE63oTYkWPlAI/9XHCPUmOHWIDgyDXFFG5HlAkfZ4=;
-        b=l/R9Ky4g6HZkMHsinXGIsFRwjfqtLiYovzeRO4pik08GSioonkDiE6kTWAwRk8i368
-         iCGYTNFfNg9kTINt38yrIJLMo0MNTH0deA68MaDxXBtxpCqqVZsUAegTfYfZsvCKEeyW
-         96Z8n2/USReAzQTA7/OkrUhq7VnLV2G1azESrCMXk7DaknKvSckBdM3zBWDzBkGCIi7M
-         +9Vmj6IkacR9p6/tVQ+7gQl7b7GRaSaCyTanVZZtpWHNvFRSCtszxtPLz+gbG+ClYoUF
-         +jwzGtmyxRpQxjUnrvnShaay+xst4UfckFdJx/I1YAJwVfG2+ccqUdehLt4etbRMwydw
-         gsPQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVjudLa6FRCYKQo+wH4ZFMz8e3dLTw8965VtId6fKJaLZrP8gIM9Wc3TlwEMIiZazktetWG8W3pTlognl2oLxh8N11H17VCVknCJtL9/qqA
-X-Gm-Message-State: AOJu0Yy674H4PtLvk978PRPaRedxoy4DGtRNA59nSBOhnPs1P5DX9XWD
-	HSZocJdAPH3U9UbqsExuAFm1T4gyHuir/SU1Yfy6s24FsV1jYjMk
-X-Google-Smtp-Source: AGHT+IHjFpmdzBHqUWc+Pqo+B6yRQMIbFlgbaMgYEfh7yVC87GyDVnV/XkxD6Xeb2MSXu/Gut4OMVw==
-X-Received: by 2002:adf:fc91:0:b0:355:3cf:49ad with SMTP id ffacd0b85a97d-3552fe185b8mr11130763f8f.65.1716929677150;
-        Tue, 28 May 2024 13:54:37 -0700 (PDT)
-Received: from [100.64.100.6] ([179.61.241.28])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3557a08abd8sm12751917f8f.32.2024.05.28.13.54.31
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 28 May 2024 13:54:36 -0700 (PDT)
-Message-ID: <c947e600-e126-43ea-9530-0389206bef5e@gmail.com>
-Date: Tue, 28 May 2024 22:54:27 +0200
+	dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b="hBnK7hz3"
+X-UUID: d39c3e781d6b11ef8c37dd7afa272265-20240529
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
+	h=Content-Type:MIME-Version:Message-ID:Date:Subject:CC:To:From; bh=K7lqLTLsGSV7DHnyTmq6v65NX0/0mNc9+lxlhGDwmvI=;
+	b=hBnK7hz3Ei5k448cdIr1zIwLmnJLwVZxJPg1hqzzTRgdNvaBkW2BG4vbvUiI9hgtrlmI1woPig3oFC9ZXKiNiqsMk10M5jtEXFJhEqFMuFdrWkBsEe7ZG19xafPuH3veFr8Dx9fcRkMXpbxbNmqjxqkCmFJWfvhphPNcN6+75+g=;
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.1.39,REQID:34f93bd7-f387-40f0-8f4a-197df445d090,IP:0,U
+	RL:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
+	release,TS:0
+X-CID-META: VersionHash:393d96e,CLOUDID:f2c2ee43-4544-4d06-b2b2-d7e12813c598,B
+	ulkID:nil,BulkQuantity:0,Recheck:0,SF:102,TC:nil,Content:1,EDM:-3,IP:nil,U
+	RL:0,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES:1,
+	SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
+X-CID-BVR: 0
+X-CID-BAS: 0,_,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR
+X-UUID: d39c3e781d6b11ef8c37dd7afa272265-20240529
+Received: from mtkmbs13n2.mediatek.inc [(172.21.101.108)] by mailgw01.mediatek.com
+	(envelope-from <chris.lu@mediatek.com>)
+	(Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
+	with ESMTP id 176390028; Wed, 29 May 2024 11:30:42 +0800
+Received: from mtkmbs13n2.mediatek.inc (172.21.101.108) by
+ mtkmbs13n2.mediatek.inc (172.21.101.108) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.26; Wed, 29 May 2024 11:30:40 +0800
+Received: from mtksdccf07.mediatek.inc (172.21.84.99) by
+ mtkmbs13n2.mediatek.inc (172.21.101.73) with Microsoft SMTP Server id
+ 15.2.1118.26 via Frontend Transport; Wed, 29 May 2024 11:30:40 +0800
+From: Chris Lu <chris.lu@mediatek.com>
+To: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg
+	<johan.hedberg@gmail.com>, Luiz Von Dentz <luiz.dentz@gmail.com>
+CC: Sean Wang <sean.wang@mediatek.com>, Deren Wu <deren.Wu@mediatek.com>,
+	Aaron Hou <aaron.hou@mediatek.com>, Steve Lee <steve.lee@mediatek.com>,
+	linux-bluetooth <linux-bluetooth@vger.kernel.org>, linux-kernel
+	<linux-kernel@vger.kernel.org>, linux-mediatek
+	<linux-mediatek@lists.infradead.org>, Chris Lu <chris.lu@mediatek.com>
+Subject: [PATCH 0/3] Bluetooth: btusb: MediaTek ISO data transmission support
+Date: Wed, 29 May 2024 11:30:35 +0800
+Message-ID: <20240529033038.28458-1-chris.lu@mediatek.com>
+X-Mailer: git-send-email 2.18.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-From: Mike <user.service2016@gmail.com>
-Subject: Re: Bluetooth kernel BUG with Intel AX211 (regression in 6.1.83)
-To: "Linux regression tracking (Thorsten Leemhuis)"
- <regressions@leemhuis.info>
-Cc: "stable@vger.kernel.org" <stable@vger.kernel.org>,
- Marcel Holtmann <marcel@holtmann.org>,
- Johan Hedberg <johan.hedberg@gmail.com>,
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
- linux-bluetooth@vger.kernel.org, Paul Menzel <pmenzel@molgen.mpg.de>,
- Greg KH <gregkh@linuxfoundation.org>, Sasha Levin <sashal@kernel.org>,
- =?UTF-8?Q?Jeremy_Lain=C3=A9?= <jeremy.laine@m4x.org>,
- Linux regressions mailing list <regressions@lists.linux.dev>
-Content-Language: en-US
-In-Reply-To: <8e8ca7a6-1511-4794-a214-2b75326e5484@leemhuis.info>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
 
-On 29.04.24 20:46, Linux regression tracking (Thorsten Leemhuis) wrote:> 
-Well, did you try what I suggested earlier (see above) and check if a
-> revert of 6083089ab00631617f9eac678df3ab050a9d837a ontop of latest 6.1.y
-> helps?
+Since SIG hasn't clearly defined the specification about ISO data over USB 
+transmission yet, MediaTek adopts a method by adding an additional interrupt
+endpoint for ISO data transmission which is different from current way
+on Bluetooth upstream driver using existed bulk. Interrupt endpoint has
+guaranteed bandwidth, sufficient max data length for LE audio packet and
+support error checking. These characteristics are similar to the use of ISO data.
 
-Hello Thorsten, Jeremy,
-I hope you don't mind if I jump into the conversation trying to help.
-I'm also experiencing this bug (with an Intel AX200) and I don't see
-any updates in this thread since a month.
+Chris Lu (3):
+  Bluetooth: net: add hci_iso_hdr function for iso data
+  Bluetooth: btmtk: add macro to get/set/clear MediaTek defined flags
+  Bluetooth: btusb: mediatek: add MediaTek ISO data transmission
+    function
 
-I tried reverting 6083089ab00631617f9eac678df3ab050a9d837a
-on top of6.1.91 and it looks much better: it's been 10 days, and the BT 
-and the system are stable.
-Previously, I encountered the mentioned "kernel BUG" at each boot, and I 
-was unable to stop/kill the bluetoothd process.
-Let me know if/how I can help further.
-M.
+ drivers/bluetooth/btmtk.c   |  35 +++++
+ drivers/bluetooth/btmtk.h   |  46 ++++++
+ drivers/bluetooth/btusb.c   | 293 +++++++++++++++++++++++++++++++++++-
+ include/net/bluetooth/hci.h |   5 +
+ 4 files changed, 378 insertions(+), 1 deletion(-)
+
+-- 
+2.18.0
+
