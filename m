@@ -1,106 +1,80 @@
-Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [80.237.130.52])
+Received: from inva020.nxp.com (inva020.nxp.com [92.121.34.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 049761E888;
-	Wed, 29 May 2024 09:07:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.237.130.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89C7E16A379;
+	Wed, 29 May 2024 09:55:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=92.121.34.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716973623; cv=none; b=fJdIQK0y3fAwGCUey0OZ4t4Qnsz7NjBPNIuISTT0zSUMgZxHB2RP5lMqhh8rsLFVri1/faCewV7UljKOw7zsxSlejFHhF0hNsqgTitkk0fO2LEnJ4Ex0fekWbvPRYc/53EQl8rRdeAFSAMbt79p7vVfeexzzVdY9brQvNSKHAB8=
+	t=1716976559; cv=none; b=twTeqToEHl9gfn2UWQokaXOvw2bZD0HKkz9HV1lKTQFA77Qf3R1RUB84VyjFR1rGrqxQBmqZrzqWI56lpdSQwW3CovqupD9R6lLtqHUvmmzCRXouzi/eAAygfApfhIUVcAjX/J5jEUfUY2cEZLDCNg9TJB09VaaTSAOD6y99fC8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716973623; c=relaxed/simple;
-	bh=8a+y4xebRj73GpHCVAWuMNXwnLAcUllC70MgJC5/I3U=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=srVdmour4zM29w5KayZ8Xq7yJM4ZRA9DtZEVMdaYg1fdPZEXpk147wICCvGhsnyeY3DNIiGNPYu9qdpzvyN1Infkbefjn+orIU9CntmhFVdMXbGb0F/R1Oo2lVbujev7Y/NXEMfx6P5I8nuPt9vUn9BGqOxTf/K9IyytG0Xmr2w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=leemhuis.info; spf=pass smtp.mailfrom=leemhuis.info; dkim=pass (2048-bit key) header.d=leemhuis.info header.i=@leemhuis.info header.b=o3ixHpwm; arc=none smtp.client-ip=80.237.130.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=leemhuis.info
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=leemhuis.info
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=leemhuis.info header.i=@leemhuis.info header.b="o3ixHpwm"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=leemhuis.info; s=he214686; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:From:
-	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:In-Reply-To:
-	References; bh=8a+y4xebRj73GpHCVAWuMNXwnLAcUllC70MgJC5/I3U=; t=1716973621;
-	x=1717405621; b=o3ixHpwmnNyZxqPYM3+EEPY1+/8VMyGKMzkha4/IbfKQUHqZH7Bwy96IpmsJ3
-	RMTlJ93BuWn1FZX0PRMCropLHn/8AAHQ0l+mnQN36CtABtnstLd7OR2yN1BYCG4d5vV+Sp9i0O/Xa
-	ykh1Xb2KkxUCG38DAtt1vDRdN/1ZLFeQWAMmZkKND7oTObKbm3Q1HYCVVZOfNTt06k9IAmAOvEtu2
-	a8nmG+UKOzElKHMDFXU2rC3+qsvf71LCP/lKHMzwkcTLYBNoJXyG/hW0gbXcI1xp7Ms5gVLujZOh3
-	TcumqFQq1Fwxsgz7TCvCvdE5kjn8n2LbRrxyNzcRmVSmO7tE1A==;
-Received: from [2a02:8108:8980:2478:8cde:aa2c:f324:937e]; authenticated
-	by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
-	id 1sCFGm-0005Uo-Dr; Wed, 29 May 2024 11:06:52 +0200
-Message-ID: <ecee3a54-1a09-40fa-afdb-057ca02cb574@leemhuis.info>
-Date: Wed, 29 May 2024 11:06:51 +0200
+	s=arc-20240116; t=1716976559; c=relaxed/simple;
+	bh=aDoySUW0f6x8n5i6pbvRD7e32dK1WDjQkjJh3ud7g7U=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=EQU6Szn6YtRt1IMBWrGMqqvXUEPMc+RSXwS7vgyPZ16+bT4uz6OcR9n5PRCSB7vM/ugvdiN0Kx9ZKEn/JI6pIvI9c7X+ZUf6+h4Xk6DCE6qWvw24MLAKiMn3jWVXAkYv2NUUhUmWdsBS4IZZmxTJY6ItAGSGavh/fD3RoJdd634=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; arc=none smtp.client-ip=92.121.34.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+Received: from inva020.nxp.com (localhost [127.0.0.1])
+	by inva020.eu-rdc02.nxp.com (Postfix) with ESMTP id D170D1A15AB;
+	Wed, 29 May 2024 11:55:55 +0200 (CEST)
+Received: from aprdc01srsp001v.ap-rdc01.nxp.com (aprdc01srsp001v.ap-rdc01.nxp.com [165.114.16.16])
+	by inva020.eu-rdc02.nxp.com (Postfix) with ESMTP id 8111B1A13BE;
+	Wed, 29 May 2024 11:55:55 +0200 (CEST)
+Received: from pe-lt8779.in-pnq01.nxp.com (pe-lt8779.in-pnq01.nxp.com [10.17.104.141])
+	by aprdc01srsp001v.ap-rdc01.nxp.com (Postfix) with ESMTP id 3D05B180222F;
+	Wed, 29 May 2024 17:55:53 +0800 (+08)
+From: Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>
+To: marcel@holtmann.org,
+	luiz.dentz@gmail.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	robh@kernel.org,
+	krzk+dt@kernel.org,
+	conor+dt@kernel.org
+Cc: linux-bluetooth@vger.kernel.org,
+	netdev@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	amitkumar.karwar@nxp.com,
+	rohit.fule@nxp.com,
+	neeraj.sanjaykale@nxp.com,
+	sherry.sun@nxp.com,
+	ziniu.wang_1@nxp.com,
+	haibo.chen@nxp.com,
+	LnxRevLi@nxp.com
+Subject: [PATCH v3 0/2] Bluetooth: btnxpuart: Update firmware names
+Date: Wed, 29 May 2024 15:23:45 +0530
+Message-Id: <20240529095347.22186-1-neeraj.sanjaykale@nxp.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: Bluetooth kernel BUG with Intel AX211 (regression in 6.1.83)
-To: Mike <user.service2016@gmail.com>
-Cc: "stable@vger.kernel.org" <stable@vger.kernel.org>,
- Marcel Holtmann <marcel@holtmann.org>,
- Johan Hedberg <johan.hedberg@gmail.com>,
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
- linux-bluetooth@vger.kernel.org, Paul Menzel <pmenzel@molgen.mpg.de>,
- Greg KH <gregkh@linuxfoundation.org>, Sasha Levin <sashal@kernel.org>,
- =?UTF-8?Q?Jeremy_Lain=C3=A9?= <jeremy.laine@m4x.org>,
- Linux regressions mailing list <regressions@lists.linux.dev>
-References: <c947e600-e126-43ea-9530-0389206bef5e@gmail.com>
-From: Thorsten Leemhuis <regressions@leemhuis.info>
-Content-Language: en-US, de-DE
-In-Reply-To: <c947e600-e126-43ea-9530-0389206bef5e@gmail.com>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-bounce-key: webpack.hosteurope.de;regressions@leemhuis.info;1716973621;f632811f;
-X-HE-SMSGID: 1sCFGm-0005Uo-Dr
+X-Virus-Scanned: ClamAV using ClamSMTP
 
-On 28.05.24 22:54, Mike wrote:
-> On 29.04.24 20:46, Linux regression tracking (Thorsten Leemhuis) wrote:>
->> Well, did you try what I suggested earlier (see above) and check if a
->> revert of 6083089ab00631617f9eac678df3ab050a9d837a ontop of latest 6.1.y
->> helps?
->
-> I hope you don't mind if I jump into the conversation trying to help.
+This patch series updates the BT firmware file names in BTNXPUART
+driver, and adds a new optional firmware-name device tree property to
+override the firmware file names hardcoded in the driver. This will
+allow user to continue using the older firmware files.
 
-On the contrary, thx for providing the needed information!
+This change is necessary as newer firmware releases will have
+standardized naming convention aligned across all newer and legacy
+chipsets.
 
-> I tried reverting 6083089ab00631617f9eac678df3ab050a9d837a
-> on top of6.1.91 and it looks much better: it's been 10 days, and the BT
-> and the system are stable.
-> Previously, I encountered the mentioned "kernel BUG" at each boot,
+Signed-off-by: Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>
 
-Might be a good idea to share it, the developers might want to confirm
-it's really the same bug.
+Neeraj Sanjay Kale (2):
+  dt-bindings: net: bluetooth: nxp: Add firmware-name property
+  Bluetooth: btnxpuart: Update firmware names
 
-> and I was unable to stop/kill the bluetoothd process.
-> Let me know if/how I can help further.
+ .../net/bluetooth/nxp,88w8987-bt.yaml         |  4 +++
+ drivers/bluetooth/btnxpuart.c                 | 28 +++++++++++--------
+ 2 files changed, 21 insertions(+), 11 deletions(-)
 
-Jeremy Lainé already confirmed that 6.9-rc5[1] worked fine and that
-another fix for the culprit did not help[2]. Therefore we just have
-three options left:
+-- 
+2.34.1
 
-1. test another fix for the culprit I found on lore -- but note, this is
-just a shot in the dark
-https://lore.kernel.org/all/20240411151929.403263-1-kovalev@altlinux.org/
-
-2. revert 6083089ab00631617f9eac678df3ab050a9d837a in 6.1.y if that is
-still possible, does not create a even bigger regression, or leads to
-some security vulnerability
-
-3. motivate the BT developers to look into this (some other patch the
-culprit depends on might be missing), even if this strictly speaking is
-a problem they are free to ignore.
-
-Maybe give "1." a try; then we'll ask Greg for "2.", unless this
-discussion or something else leads to "3."
-
-Ciao, Thorsten
-
-[1]
-https://lore.kernel.org/all/CADRbXaA2yFjMo=_8_ZTubPbrrmWH9yx+aG5pUadnk395koonXg@mail.gmail.com/
-[2]
-https://lore.kernel.org/all/CADRbXaBkkGmqnibGvcAF2YH5CjLRJ2bnnix1xKozKdw_Hv3qNg@mail.gmail.com/
