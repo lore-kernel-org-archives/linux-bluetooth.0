@@ -1,38 +1,38 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 521921BC41
-	for <linux-bluetooth@vger.kernel.org>; Thu, 30 May 2024 02:02:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 058F414286
+	for <linux-bluetooth@vger.kernel.org>; Thu, 30 May 2024 02:02:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717034549; cv=none; b=tiuLgQoHyMK8BaEFs8TiEFF0TPjZPBFHpY0JoxuIpz+4pjh+swUt7XG+VQOTYp3He2PSwBoa3nE0oy6FK9L65YFEy/4PTlAkfPhNTTL0W4wedoH5UUjysCc/5FzlSSFDHK8riktzeVa/yE7PcD2k09S0PUIf1GB/8ARECMDq2ac=
+	t=1717034563; cv=none; b=GBcKCGiPA6Q5zubOkp66kVPTcu0fmHVyKBebU6CUGGaz32KS5c8I92Dba6LgkS9UntxFrV7YvcxwhFZ8JWKBl5s9W54Q+LOAjgDgno6+fbeM8T6fBkeiUdU7fPvEbIWepJI9ryr7jeFKFp6MfMzbDhgV34OcfJRl2IqsezLLg3s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717034549; c=relaxed/simple;
-	bh=cM++/QXXIv80GkZcTitr4jdrH0iEafCvaHx3rTSM57k=;
+	s=arc-20240116; t=1717034563; c=relaxed/simple;
+	bh=SgznRHKys9eTMyzgS7UkKu2QOH9dvdgORdCv+cAS7m8=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=qObLIgrBZSI9K97WcePfTpLVsrQYRW4+f2+0ZTNnWCrAkxoFUwFraCY1AVViNhutHPG4xw8HBZpLevXAlIzk7fzrXgY4W0QmCeSLgDEORHafZTlyK3yq0Kj1FzxYw4AJ/PEKj6tPaoogiLrb2wvEFSUbAwgL1C3HdjkOUDcoecU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hWCN9s8l; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:MIME-Version; b=RPxVU+CAYgYiKKhhxsqirHezA2FKAa2jyYxFLMU46mjU9nyntK4y3vujC5pR1qQzBd343iNkVV7jW3d8+pvBQx044UxrvHi4ldsvR0igbDI/ZQdco/J2kwFl1Ri5R4rBFtsYI6bopC41aYKSPPQcKAzI3izvH60YwMM9ODpLVt4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LHDkGxc0; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hWCN9s8l"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id BB897C4AF07
-	for <linux-bluetooth@vger.kernel.org>; Thu, 30 May 2024 02:02:28 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LHDkGxc0"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 8E042C4AF07
+	for <linux-bluetooth@vger.kernel.org>; Thu, 30 May 2024 02:02:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1717034548;
-	bh=cM++/QXXIv80GkZcTitr4jdrH0iEafCvaHx3rTSM57k=;
+	s=k20201202; t=1717034562;
+	bh=SgznRHKys9eTMyzgS7UkKu2QOH9dvdgORdCv+cAS7m8=;
 	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=hWCN9s8lhf6UAc1h92ZPkWAVLXjhYJTEnxos8/0w/D+h313txNiRoOaLmwv5/SYgR
-	 8OAglpALl7DZ7PLBIyS6VKJot95chEeUe3m4jPXi5LJswms/a0htNY9Uk5RtQCstoQ
-	 JkRrlB9XV6Uvazz35zuo0CMX9sWQpnu7A0+EYuIZXQ8/CiQYG+/aOuK/3xLZPgiOzO
-	 69a1vuijNfbA7v6d/4EcPg8YwMTNSRsu9Yn2j5SnOEZZyt09ZP7Rp+4jiXRsTuA64G
-	 i0nsMIdKPMptos3ZVVbr6Xy2TiZ7xeRDDX01a1PiGbgn9F+BjcpK0jt9snmDEbaoHS
-	 TfRS552pjXkhQ==
+	b=LHDkGxc0ZZl/BdFydayX3tGgZomy1Kf36f6e6xqQkUrPwYFySQMFP0xLDxMuQEUrq
+	 VUCP9cw2Mz2AcQiJnqJfocR8Ad0hTwB+rBIfLWPU8btTZkpNohf1J5Z/cVFplJNw+b
+	 dobnIW0f5qL3JXux3zxeAZs6LNLyekF9Qr/3GZCgMkjZ7aqpajgFGXEZcPnJTTmv0Q
+	 jgAvmQBgdk6z4wdcBfQozUO4HmJsemDvYoB6/ZytoYRigDjjVwxyOo7fY+eNRiMkUh
+	 cXkTb/FshKjKfiTrmVaAyVZ13YGtPBtRbvlFGmLoe/5EWbELvRq8k/p+Ciswe6jj4m
+	 6Sy/Lg/E6eUVA==
 Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id B6976C53BB0; Thu, 30 May 2024 02:02:28 +0000 (UTC)
+	id 8692BC53BB0; Thu, 30 May 2024 02:02:42 +0000 (UTC)
 From: bugzilla-daemon@kernel.org
 To: linux-bluetooth@vger.kernel.org
 Subject: [Bug 218914] Missing HCI event REMOTE_NAME Causing Subsequent
  Bluetooth Connection Failures
-Date: Thu, 30 May 2024 02:02:28 +0000
+Date: Thu, 30 May 2024 02:02:42 +0000
 X-Bugzilla-Reason: CC AssignedTo
 X-Bugzilla-Type: changed
 X-Bugzilla-Watch-Reason: None
@@ -48,7 +48,7 @@ X-Bugzilla-Priority: P3
 X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
 X-Bugzilla-Flags: 
 X-Bugzilla-Changed-Fields: attachments.created
-Message-ID: <bug-218914-62941-sjx76jYLnb@https.bugzilla.kernel.org/>
+Message-ID: <bug-218914-62941-7RK4n97my8@https.bugzilla.kernel.org/>
 In-Reply-To: <bug-218914-62941@https.bugzilla.kernel.org/>
 References: <bug-218914-62941@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
@@ -64,10 +64,10 @@ MIME-Version: 1.0
 
 https://bugzilla.kernel.org/show_bug.cgi?id=3D218914
 
---- Comment #1 from Yuxuan Hu (yuxuanhu@buaa.edu.cn) ---
-Created attachment 306373
-  --> https://bugzilla.kernel.org/attachment.cgi?id=3D306373&action=3Dedit
-Attachment 1: Log file containing HCI packet contents.
+--- Comment #2 from Yuxuan Hu (yuxuanhu@buaa.edu.cn) ---
+Created attachment 306374
+  --> https://bugzilla.kernel.org/attachment.cgi?id=3D306374&action=3Dedit
+Attachment 2: ftrace records of bluetooth and rfcomm modules.
 
 --=20
 You may reply to this email to add a comment.
