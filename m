@@ -1,27 +1,27 @@
 Received: from relay7-d.mail.gandi.net (relay7-d.mail.gandi.net [217.70.183.200])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF00017C216
-	for <linux-bluetooth@vger.kernel.org>; Thu, 30 May 2024 15:01:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4AE5839E3
+	for <linux-bluetooth@vger.kernel.org>; Thu, 30 May 2024 15:01:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.200
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717081263; cv=none; b=ChTPISny4YR1wpKG5GroQsPRhJmi1hOX+BU1AWQ4srnd3eLvf4cRrtJJHAr0aF5hcPCtrWCxlK6pSbDXSoqJ8FhQwMPAcBxzRkuP6HbKAd438bSByF1ot+Pop9tFUXyl9FaTiv0F+bKGqd+FhMxL3OdbS97xovUj9AwFPtiaN6I=
+	t=1717081263; cv=none; b=FqFwtDXbrm8uuGFNMaWbfgYFF4DOgaEq5iNtiTDBPX9l9CDj1eMCCuSYxsV9QA+JRL6QuaHXmLWFA59hMgP6nX1JDCEFRQFPiBgj6V3Ran1HjMnr5JaFEs8SaGYwN/Hus70doopBjYgEJmDUB+5bei3PBhLe5A/yByb06/RRxm0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1717081263; c=relaxed/simple;
-	bh=mqvn619TSm5ld0odQr215jbTYvsACUe3F6Wkz9yu7qU=;
+	bh=ee2MtFQfQtU/kqb6rS+D2WqPs7QmF9VRRDIgJT6sSE0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=g0Af6bf/59Bnof5b7tsfJEj8nn6du4WLU56O2r3ZCPzRGaABmtHhe2+91EQHUuEiMi1jufLpgbo2J2QiTC0ntHH2ntgEcQyK1FQRolKZ02suIRfXQaTVHLH/59RimxfOjAtK9BMgrdVRoVvO/7yrpl8TRiMP1lhKxud7CwFaxrc=
+	 MIME-Version; b=pokO8uSHx89xVeAwIeDl6wbyrJWmXyeSEVqIT1oBQGY8+jJZ+SIUm6VntfR8OJSLD4cH8Vl4KondpIlmlh3chqw+lObrZdx4+y4hre3bBEz62UOI+XjLt8X0EzU1yXZS6GgkUSWiJ3ep5iyTDKxGzBEtsbgzlJTpWKKAMYROE40=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.183.200
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hadess.net
-Received: by mail.gandi.net (Postfix) with ESMTPSA id EAAA220017;
-	Thu, 30 May 2024 15:00:59 +0000 (UTC)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id D1DAC2000A;
+	Thu, 30 May 2024 15:00:58 +0000 (UTC)
 From: Bastien Nocera <hadess@hadess.net>
 To: linux-bluetooth@vger.kernel.org
 Cc: Bastien Nocera <hadess@hadess.net>
-Subject: [BlueZ 8/9] bap: Fix more memory leaks on error
-Date: Thu, 30 May 2024 16:58:02 +0200
-Message-ID: <20240530150057.444585-9-hadess@hadess.net>
+Subject: [BlueZ 4/9] rfkill: Avoid using a signed int for an unsigned variable
+Date: Thu, 30 May 2024 16:57:58 +0200
+Message-ID: <20240530150057.444585-5-hadess@hadess.net>
 X-Mailer: git-send-email 2.45.1
 In-Reply-To: <20240530150057.444585-1-hadess@hadess.net>
 References: <20240530150057.444585-1-hadess@hadess.net>
@@ -34,51 +34,42 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-GND-Sasl: hadess@hadess.net
 
-Error: RESOURCE_LEAK (CWE-772): [#def32] [important]
-bluez-5.76/profiles/audio/bap.c:1166:4: alloc_arg: "asprintf" allocates memory that is stored into "path". [Note: The source code implementation of the function has been overridden by a builtin model.]
-bluez-5.76/profiles/audio/bap.c:1178:5: leaked_storage: Variable "path" going out of scope leaks the storage it points to.
-1176|					free(l3_caps);
-1177|					ret = false;
-1178|->					goto group_fail;
-1179|				}
-1180|
+Error: INTEGER_OVERFLOW (CWE-190): [#def37] [important]
+bluez-5.76/src/rfkill.c:101:3: tainted_data_argument: The value "event" is considered tainted.
+bluez-5.76/src/rfkill.c:105:3: tainted_data_argument: "event.idx" is considered tainted.
+bluez-5.76/src/rfkill.c:105:3: underflow: The cast of "event.idx" to a signed type could result in a negative number.
+103|			break;
+104|
+105|->		id = get_adapter_id_for_rfkill(event.idx);
+106|
+107|		if (index == id) {
 
-Error: RESOURCE_LEAK (CWE-772): [#def33] [important]
-bluez-5.76/profiles/audio/bap.c:1166:4: alloc_arg: "asprintf" allocates memory that is stored into "path". [Note: The source code implementation of the function has been overridden by a builtin model.]
-bluez-5.76/profiles/audio/bap.c:1199:5: leaked_storage: Variable "path" going out of scope leaks the storage it points to.
-1197|
-1198|				if (matched_lpac == NULL || merged_caps == NULL)
-1199|->					continue;
-1200|
-1201|				create_stream_for_bis(bap_data, matched_lpac, qos,
+Error: INTEGER_OVERFLOW (CWE-190): [#def38] [important]
+bluez-5.76/src/rfkill.c:133:2: tainted_data_argument: The value "event" is considered tainted.
+bluez-5.76/src/rfkill.c:143:2: tainted_data_argument: "event.idx" is considered tainted.
+bluez-5.76/src/rfkill.c:157:2: underflow: The cast of "event.idx" to a signed type could result in a negative number.
+155|		return TRUE;
+156|
+157|->	id = get_adapter_id_for_rfkill(event.idx);
+158|	if (id < 0)
+159|		return TRUE;
 ---
- profiles/audio/bap.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ src/rfkill.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/profiles/audio/bap.c b/profiles/audio/bap.c
-index 3fcf21df58aa..53e7b3e34378 100644
---- a/profiles/audio/bap.c
-+++ b/profiles/audio/bap.c
-@@ -1174,6 +1174,7 @@ static bool parse_base(struct bap_data *bap_data, struct bt_iso_base *base,
- 			if (!util_iov_pull_u8(&iov,
- 						(void *)&l3_caps->iov_len)) {
- 				free(l3_caps);
-+				free(path);
- 				ret = false;
- 				goto group_fail;
- 			}
-@@ -1195,8 +1196,10 @@ static bool parse_base(struct bap_data *bap_data, struct bt_iso_base *base,
- 					l2_caps, l3_caps, &matched_lpac,
- 					&merged_caps);
+diff --git a/src/rfkill.c b/src/rfkill.c
+index a0a50d9e45d9..8a0e48f01c4f 100644
+--- a/src/rfkill.c
++++ b/src/rfkill.c
+@@ -55,7 +55,7 @@ struct rfkill_event {
+ };
+ #define RFKILL_EVENT_SIZE_V1    8
  
--			if (matched_lpac == NULL || merged_caps == NULL)
-+			if (matched_lpac == NULL || merged_caps == NULL) {
-+				free(path);
- 				continue;
-+			}
- 
- 			create_stream_for_bis(bap_data, matched_lpac, qos,
- 					merged_caps, meta, path);
+-static int get_adapter_id_for_rfkill(int rfkill_id)
++static int get_adapter_id_for_rfkill(uint32_t rfkill_id)
+ {
+ 	char sysname[PATH_MAX];
+ 	int namefd;
 -- 
 2.45.1
 
