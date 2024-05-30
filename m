@@ -1,61 +1,30 @@
-Received: from mail-lj1-f182.google.com (mail-lj1-f182.google.com [209.85.208.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EE21169AC6
-	for <linux-bluetooth@vger.kernel.org>; Thu, 30 May 2024 11:02:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.182
+Received: from m15.mail.163.com (m15.mail.163.com [45.254.50.220])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B77D56F2F1;
+	Thu, 30 May 2024 13:33:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.254.50.220
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717066966; cv=none; b=rKGr7nKFkGqarEY7IN+4NYqNfrqQtvFKWK5CqYx1W+fqs1VLYNHXGtSQlnMYNJ1HDL/u+8JX9LNaa4ZXdArKiBojvGVNTb+t5Of/EODWasw6FOg1965YffAfbL7j9DnN0vA6gsL28jKk5Q2KdnkhqhsVHnKVBNgK6ZW3pY5HK04=
+	t=1717076039; cv=none; b=UMkKruJawg8mEoSQuYX1QMZMJLqFksEax7JTeDqgDW7GsOe4toR6r4Whigtww6PIcIyMmFUEI4wM/f85/ZN9bpy/NxrUyYUmTEqGZ0UFiFO+/5zkndlkVN3u6IxUQCmZajQ1jGPWFs5+NXLI2cXzKtKJ9S72/vxEsEHWkp0AEOY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717066966; c=relaxed/simple;
-	bh=ze99tk+tgTu5+kvB3B+xjJ6rgWHqjZwCG275dnpJOtQ=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=RHhB4JIPdZWP++NQDfrrgGBEwSLFkl3+a2Z/FobLVmQAVbA2z233hIYGIwumZ4XZfJHgOlIAgryviNYGOO0sptjQYJisvW6iu+5UW9Ead1iwSZLDDb/r270hR540iJ//w8jqdxuv+Zuy/KxI2kcJd/C+puhxNyD6hbQ9XMqzdpI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=ztf0UMet; arc=none smtp.client-ip=209.85.208.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	s=arc-20240116; t=1717076039; c=relaxed/simple;
+	bh=02g4NPHt0vqM/QKC+gUgbhGM+0/b6bQTbGbXCggwrS8=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=Jqnw/MHhqGgq+/APywzkkZr/lGx6x+x5PawAxfxsUvVkDlLR6gp+4RQcwz/qWYcme/UOe2nVv9lNcg4YT2JrBtklXYJddYGnGqke8eyEn+XDnI4CKMU2DtZ6Gdcypabs9mlzT5ujDJzsDeCqajk2Feq7qHt5ShFsT2jgQuaLyg0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=pi42PIo+; arc=none smtp.client-ip=45.254.50.220
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ztf0UMet"
-Received: by mail-lj1-f182.google.com with SMTP id 38308e7fff4ca-2e974857588so7700361fa.3
-        for <linux-bluetooth@vger.kernel.org>; Thu, 30 May 2024 04:02:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1717066962; x=1717671762; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt
-         :content-language:references:cc:to:subject:reply-to:from:user-agent
-         :mime-version:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=wdJdpjrFVd2jyJBfi7/1Ypm+QKe5VhIURoGePuM+Fi8=;
-        b=ztf0UMetXZ0g9IScgcxjnFeBmBr7/L8eOw/WkTMRWXeNQuPU/Q0neC0wsqiJtu5v+t
-         9CBR+LUm21lQLZ177DjzcJt+sXK/v3YPJHRNaNcb/60JxmE0uI9YKOXXikHyH3h4I5iW
-         x7J9vPAzS7AWCM9N931lYbaG9Ish5q7+j93JkBRYK7LnuEdbq1EXAst6j/f9kqbbR8Rj
-         ZaJ7nb7/ShLRmPxe0VP4YnU5TDty5Dg+2fOsUhJQ7i4O+Sb/oDyfNFU23YMJ2JHCZ7Jd
-         AIZ+FxfIqSs7GoIRux/4fEGna698XqDY/5+9T9dXypITYokhGSNGzGez5eLc+kweHvcg
-         FrLg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717066962; x=1717671762;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt
-         :content-language:references:cc:to:subject:reply-to:from:user-agent
-         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=wdJdpjrFVd2jyJBfi7/1Ypm+QKe5VhIURoGePuM+Fi8=;
-        b=XcwFm2U20RNOvpq5HAqiu8YMgDn2WmE5IJn19QZIQC6pPsU6NonnNRw7W49qhUobrT
-         xbVyXaDmDqh/VMUQM+kBGM7Id+ua+7LPdg/QLIon15ZC5cf1n4LqjK+441+GmCnP+Di7
-         HA6GFCjC125Bh+GPJ9ssfizYz0dgPPMQAUsUFKfRjmMeCht+FNg678ENyVkVzhfiQXd2
-         UfSv1vOk5wDfqYMN93BlZzDFf9TFN9DlGyxGndCVz9K808yogmiT3EiFYHBg0uLZHtXr
-         FOfFa52Sv4rZivBalCgpR4XsXxOJJ0tmZWfFhGEquhSeaHuQ8jK3/JXfaBKiJVEFTQOf
-         ozZg==
-X-Forwarded-Encrypted: i=1; AJvYcCU18QGnprvTUBC8a5PtHEoZlzGxYsz/R/ArOGhUXx4Eq7wh9QwHU8OSQ+syV5EekoPY57Tu6RVD+9jC5xpaehjkMfi+AOpqbKkf34nwyNT9
-X-Gm-Message-State: AOJu0YyHoYD9XrQekXESt2vXCQJPt5SB4XOS1mD0NeNBAFBDpbI0vfff
-	/ehRA4cvX+dvKRt+8KudV4fCQBQNR2bopbek1QMidbdkUbHLxi2l6Rgstx2FFFI=
-X-Google-Smtp-Source: AGHT+IFvRk0G/cssi1T5jykWS+sj3N7w+SJtv/NxzFC1qgP86vHMQCqJ5uR4sfMEFkv8MZ00HcJ33w==
-X-Received: by 2002:a2e:9d89:0:b0:2e5:1dae:1789 with SMTP id 38308e7fff4ca-2ea847f5e1dmr9802301fa.22.1717066962166;
-        Thu, 30 May 2024 04:02:42 -0700 (PDT)
-Received: from ?IPV6:2a01:e0a:982:cbb0:6c5:6f34:623a:2f88? ([2a01:e0a:982:cbb0:6c5:6f34:623a:2f88])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-35579d7d88esm17272899f8f.19.2024.05.30.04.02.40
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 30 May 2024 04:02:41 -0700 (PDT)
-Message-ID: <177a7a7e-9e99-4e2a-9f85-e2994a049892@linaro.org>
-Date: Thu, 30 May 2024 13:02:39 +0200
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="pi42PIo+"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=Message-ID:Date:MIME-Version:Subject:From:
+	Content-Type; bh=zigVr5BDnsO4ppRhiFXsbtgsgRHeWaYc/lAgc8Kq7ys=;
+	b=pi42PIo+3+ma5MNGy75dmx3ljb2l4qUOUPvLiZ18M2lNTg5rztz5Y17deup9iS
+	L5wlJBE2DbTttR/a5NUVEsRhOEm3x9e4HV7Rb9lw9Q0y/20SPY58COgO1kPLRyo8
+	eGSjhxboKW+SoNCQG8kJnlH2bB0uAaJPmE9PSNadKOO7E=
+Received: from [192.168.1.26] (unknown [183.195.6.89])
+	by gzga-smtp-mta-g0-5 (Coremail) with SMTP id _____wDXv2MPgFhmaPn8GQ--.31227S2;
+	Thu, 30 May 2024 21:33:06 +0800 (CST)
+Message-ID: <ca7adc9d-9df3-4050-8943-3c489097b995@163.com>
+Date: Thu, 30 May 2024 21:33:03 +0800
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -63,385 +32,296 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-From: Neil Armstrong <neil.armstrong@linaro.org>
-Reply-To: neil.armstrong@linaro.org
-Subject: Re: [PATCH v8 00/17] power: sequencing: implement the subsystem and
- add first users
-To: Bartosz Golaszewski <brgl@bgdev.pl>, Liam Girdwood <lgirdwood@gmail.com>,
- Mark Brown <broonie@kernel.org>, Rob Herring <robh@kernel.org>,
- Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
- <conor+dt@kernel.org>, Marcel Holtmann <marcel@holtmann.org>,
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Balakrishna Godavarthi <quic_bgodavar@quicinc.com>,
- Rocky Liao <quic_rjliao@quicinc.com>, Kalle Valo <kvalo@kernel.org>,
- Jeff Johnson <jjohnson@kernel.org>, Bjorn Andersson <andersson@kernel.org>,
- Konrad Dybcio <konrad.dybcio@linaro.org>, Bjorn Helgaas
- <bhelgaas@google.com>, Srini Kandagatla <srinivas.kandagatla@linaro.org>,
- Elliot Berman <quic_eberman@quicinc.com>,
- Caleb Connolly <caleb.connolly@linaro.org>,
- Dmitry Baryshkov <dmitry.baryshkov@linaro.org>, Alex Elder <elder@kernel.org>
-Cc: linux-arm-msm@vger.kernel.org, linux-kernel@vger.kernel.org,
- devicetree@vger.kernel.org, linux-bluetooth@vger.kernel.org,
- netdev@vger.kernel.org, linux-wireless@vger.kernel.org,
- ath11k@lists.infradead.org, Jeff Johnson <quic_jjohnson@quicinc.com>,
- ath12k@lists.infradead.org, linux-pm@vger.kernel.org,
- linux-pci@vger.kernel.org,
- Bartosz Golaszewski <bartosz.golaszewski@linaro.org>, kernel@quicinc.com,
- Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
- Amit Pundir <amit.pundir@linaro.org>
-References: <20240528-pwrseq-v8-0-d354d52b763c@linaro.org>
-Content-Language: en-US, fr
-Autocrypt: addr=neil.armstrong@linaro.org; keydata=
- xsBNBE1ZBs8BCAD78xVLsXPwV/2qQx2FaO/7mhWL0Qodw8UcQJnkrWmgTFRobtTWxuRx8WWP
- GTjuhvbleoQ5Cxjr+v+1ARGCH46MxFP5DwauzPekwJUD5QKZlaw/bURTLmS2id5wWi3lqVH4
- BVF2WzvGyyeV1o4RTCYDnZ9VLLylJ9bneEaIs/7cjCEbipGGFlfIML3sfqnIvMAxIMZrvcl9
- qPV2k+KQ7q+aXavU5W+yLNn7QtXUB530Zlk/d2ETgzQ5FLYYnUDAaRl+8JUTjc0CNOTpCeik
- 80TZcE6f8M76Xa6yU8VcNko94Ck7iB4vj70q76P/J7kt98hklrr85/3NU3oti3nrIHmHABEB
- AAHNKk5laWwgQXJtc3Ryb25nIDxuZWlsLmFybXN0cm9uZ0BsaW5hcm8ub3JnPsLAkQQTAQoA
- OwIbIwULCQgHAwUVCgkICwUWAgMBAAIeAQIXgBYhBInsPQWERiF0UPIoSBaat7Gkz/iuBQJk
- Q5wSAhkBAAoJEBaat7Gkz/iuyhMIANiD94qDtUTJRfEW6GwXmtKWwl/mvqQtaTtZID2dos04
- YqBbshiJbejgVJjy+HODcNUIKBB3PSLaln4ltdsV73SBcwUNdzebfKspAQunCM22Mn6FBIxQ
- GizsMLcP/0FX4en9NaKGfK6ZdKK6kN1GR9YffMJd2P08EO8mHowmSRe/ExAODhAs9W7XXExw
- UNCY4pVJyRPpEhv373vvff60bHxc1k/FF9WaPscMt7hlkbFLUs85kHtQAmr8pV5Hy9ezsSRa
- GzJmiVclkPc2BY592IGBXRDQ38urXeM4nfhhvqA50b/nAEXc6FzqgXqDkEIwR66/Gbp0t3+r
- yQzpKRyQif3OwE0ETVkGzwEIALyKDN/OGURaHBVzwjgYq+ZtifvekdrSNl8TIDH8g1xicBYp
- QTbPn6bbSZbdvfeQPNCcD4/EhXZuhQXMcoJsQQQnO4vwVULmPGgtGf8PVc7dxKOeta+qUh6+
- SRh3vIcAUFHDT3f/Zdspz+e2E0hPV2hiSvICLk11qO6cyJE13zeNFoeY3ggrKY+IzbFomIZY
- 4yG6xI99NIPEVE9lNBXBKIlewIyVlkOaYvJWSV+p5gdJXOvScNN1epm5YHmf9aE2ZjnqZGoM
- Mtsyw18YoX9BqMFInxqYQQ3j/HpVgTSvmo5ea5qQDDUaCsaTf8UeDcwYOtgI8iL4oHcsGtUX
- oUk33HEAEQEAAcLAXwQYAQIACQUCTVkGzwIbDAAKCRAWmrexpM/4rrXiB/sGbkQ6itMrAIfn
- M7IbRuiSZS1unlySUVYu3SD6YBYnNi3G5EpbwfBNuT3H8//rVvtOFK4OD8cRYkxXRQmTvqa3
- 3eDIHu/zr1HMKErm+2SD6PO9umRef8V82o2oaCLvf4WeIssFjwB0b6a12opuRP7yo3E3gTCS
- KmbUuLv1CtxKQF+fUV1cVaTPMyT25Od+RC1K+iOR0F54oUJvJeq7fUzbn/KdlhA8XPGzwGRy
- 4zcsPWvwnXgfe5tk680fEKZVwOZKIEuJC3v+/yZpQzDvGYJvbyix0lHnrCzq43WefRHI5XTT
- QbM0WUIBIcGmq38+OgUsMYu4NzLu7uZFAcmp6h8g
-Organization: Linaro
-In-Reply-To: <20240528-pwrseq-v8-0-d354d52b763c@linaro.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Subject: Re: [PATCH v2] Bluetooth: qca: Fix BT enable failure again for
+ QCA6390 after warm reboot
+From: Lk Sii <lk_sii@163.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Zijun Hu <quic_zijuhu@quicinc.com>, luiz.von.dentz@intel.com,
+ marcel@holtmann.org, linux-bluetooth@vger.kernel.org, wt@penguintechs.org,
+ regressions@lists.linux.dev, pmenzel@molgen.mpg.de,
+ krzysztof.kozlowski@linaro.org, stable@vger.kernel.org
+References: <1715866294-1549-1-git-send-email-quic_zijuhu@quicinc.com>
+ <f343ecae-efee-4bdc-ac38-89b614e081b5@163.com>
+ <CABBYNZ+nLgozYxL=znsXrg0qoz-ENgSBwcPzY-KrBnVJJut8Kw@mail.gmail.com>
+ <34a8e7c3-8843-4f07-9eef-72fb1f8e9378@163.com>
+ <CABBYNZLzTcnXP3bKdQB3wdBCMgCJrqu=jXQ91ws6+c1mioYt9A@mail.gmail.com>
+ <f7a408b4-ccef-4a4c-a919-df501cf3e878@163.com>
+Content-Language: en-US
+In-Reply-To: <f7a408b4-ccef-4a4c-a919-df501cf3e878@163.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:_____wDXv2MPgFhmaPn8GQ--.31227S2
+X-Coremail-Antispam: 1Uf129KBjvJXoW3tw47tFWrWryDAF4fJFWxXrb_yoWkZr4xpF
+	WDGFyYkr4UJr1xCry2vr17WFyjqw13tr47Wr15G34UGanYvry5Gr4xtryUCa48Gry5Gr4j
+	vr17X343W34YkFJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07j4Hq7UUUUU=
+X-CM-SenderInfo: 5onb2xrl6rljoofrz/1tbisg-uNWVODbMmvgABsq
 
-On 28/05/2024 21:03, Bartosz Golaszewski wrote:
-> Note: I am resending this series in its entirety once more for
-> discussions and reviews. If there won't be any major objections, I'll
-> then start sending individual bits and pieces to appropriate trees.
-> 
-> Merging strategy: The DT binding and DTS changes are a no-brainer, they
-> can go through the wireless, regulator and arm-msm trees separately. The
-> bluetooth and PCI changes have a build-time dependency on the power
-> sequencing code. The bluetooth changes also have a run-time dependency on
-> the PCI pwrctl part. In order to get it into next I plan to pick up the
-> power sequencing code into my own tree and maintain it. I can then
-> provide an immutable tag for the BT and PCI trees to pull. I wouldn't
-> stress about the BT runtime dependency as it will be fixed once all
-> changes are in next.
-> 
-> The actual cover letter follows:
-> 
-> --
-> 
-> Problem statement #1: Dynamic bus chicken-and-egg problem.
-> 
-> Certain on-board PCI devices need to be powered up before they are can be
-> detected but their PCI drivers won't get bound until the device is
-> powered-up so enabling the relevant resources in the PCI device driver
-> itself is impossible.
-> 
-> Problem statement #2: Sharing inter-dependent resources between devices.
-> 
-> Certain devices that use separate drivers (often on different busses)
-> share resources (regulators, clocks, etc.). Typically these resources
-> are reference-counted but in some cases there are additional interactions
-> between them to consider, for example specific power-up sequence timings.
-> 
-> ===
-> 
-> The reason for tackling both of these problems in a single series is the
-> fact the the platform I'm working on - Qualcomm RB5 - deals with both and
-> both need to be addressed in order to enable WLAN and Bluetooth support
-> upstream.
-> 
-> The on-board WLAN/BT package - QCA6391 - has a Power Management Unit that
-> takes inputs from the host and exposes LDO outputs consumed by the BT and
-> WLAN modules which can be powered-up and down independently. However
-> a delay of 100ms must be respected between enabling the BT- and
-> WLAN-enable GPIOs.
-> 
-> A similar design with a discreet PMU is also employed in other models of
-> the WCN family of chips although we can often do without the delays. With
-> this series we add support for the WCN7850 as well.
-> 
-> ===
-> 
-> We introduce a new subsystem here - the power sequencing framework. The
-> qcom-wcn driver that we add is its first user. It implements the power-up
-> sequences for QCA6390 and WCN7850 chips. However - we only use it to
-> power-up the bluetooth module in the former. We use it to driver the WLAN
-> modules in both. The reason for this is that for WCN7850 we have
-> comprehensive bindings already upstream together with existing DT users.
-> Porting them to using the pwrseq subsystem can be done separately and in
-> an incremental manner once the subsystem itself is upstream. We will also
-> have to ensure backward DT compatibility. To avoid overcomplicating this
-> series, let's leave it out for now.
-> 
-> ===
-> 
-> This series is logically split into several sections. I'll go
-> patch-by-patch and explain each step.
-> 
-> Patches 1/16-5/16:
-> 
-> These contain all relevant DT bindings changes. We add new documents for
-> the QCA6390 & WCN7850 PMUs and ATH12K devices as well as extend the bindings
-> for the Qualcomm Bluetooth and ATH11K modules with regulators used by them
-> in QCA6390.
-> 
-> Patches 6/16-8/16:
-> 
-> These contain changes to device-tree sources for the three platforms we
-> work with in this series. We model the PMUs of the WLAN/BT chips as
-> top-level platform devices on the device tree. In order to limit the scope
-> of this series and not introduce an excessive amount of confusion with
-> deprecating DT bindings, we leave the Bluetooth nodes on sm8650 and sm8550
-> as is (meaning: they continue to consumer the GPIOs and power inputs from
-> the host). As the WCN7850 module doesn't require any specific timings, we can
-> incrementally change that later.
-> 
-> In both cases we add WLAN nodes that consume the power outputs of the PMU.
-> For QCA6390 we also make the Bluetooth node of the RB5 consume the outputs
-> of the PMU - we can do it as the bindings for this chip did not define any
-> supply handles prior to this series meaning we are able to get this correct
-> right away.
-> 
-> Patches 9/16-12/16:
-> 
-> These contain the bulk of the PCI changes for this series. We introduce
-> a simple framework for powering up PCI devices before detecting them on
-> the bus.
-> 
-> The general approach is as follows: PCI devices that need special
-> treatment before they can be powered up, scanned and bound to their PCI
-> drivers must be described on the device-tree as child nodes of the PCI
-> port node. These devices will be instantiated on the platform bus. They
-> will in fact be generic platform devices with the compatible of the form
-> used for PCI devices already upstream ("pci<vendor ID>,<device ID">). We
-> add a new directory under drivers/pci/pwrctl/ that contains PCI pwrctl
-> drivers. These drivers are platform drivers that will now be matched
-> against the devices instantiated from port children just like any other
-> platform pairs.
-> 
-> Both the power control platform device *AND* the associated PCI device
-> reuse the same OF node and have access to the same properties. The goal
-> of the platform driver is to request and bring up any required resources
-> and let the pwrctl framework know that it's now OK to rescan the bus and
-> detect the devices. When the device is bound, we are notified about it
-> by the PCI bus notifier event and can establish a device link between the
-> power control device and the PCI device so that any future extension for
-> power-management will already be able to work with the correct hierachy.
-> 
-> The reusing of the OF node is the reason for the small changes to the PCI
-> OF core: as the bootloader can possibly leave the relevant regulators on
-> before booting linux, the PCI device can be detected before its platform
-> abstraction is probed. In this case, we find that device first and mark
-> its OF node as reused. The pwrctl framework handles the opposite case
-> (when the PCI device is detected only after the platform driver
-> successfully enabled it).
-> 
-> Patch 13/16 - 14/16:
-> 
-> These add a relatively simple power sequencing subsystem and the first
-> driver using it: the pwrseq module for the PMUs on the WCN family of chips.
-> 
-> I'm proposing to add a subsystem that allows different devices to use a shared
-> power sequence split into consumer-specific as well as common "units".
-> 
-> A power sequence provider driver registers a set of units with pwrseq
-> core. Each unit can be enabled and disabled and contains an optional list
-> of other units which must be enabled before it itself can be. A unit
-> represents a discreet chunk of the power sequence.
-> 
-> It also registers a list of targets: a target is an abstraction wrapping
-> a unit which allows consumers to tell pwrseq which unit they want to
-> reach. Real-life example is the driver we're adding here: there's a set
-> of common regulators, two PCIe-specific ones and two enable GPIOs: one
-> for Bluetooth and one for WLAN.
-> 
-> The Bluetooth driver requests a descriptor to the power sequencer and
-> names the target it wants to reach:
-> 
->      pwrseq = devm_pwrseq_get(dev, "bluetooth");
-> 
-> The pwrseq core then knows that when the driver calls:
-> 
->      pwrseq_power_on(pwrseq);
-> 
-> It must enable the "bluetooth-enable" unit but it depends on the
-> "regulators-common" unit so this one is enabled first. The provider
-> driver is also in charge of assuring an appropriate delay between
-> enabling the BT and WLAN enable GPIOs. The WLAN-specific resources are
-> handled by the "wlan-enable" unit and so are not enabled until the WLAN
-> driver requests the "wlan" target to be powered on.
-> 
-> Another thing worth discussing is the way we associate the consumer with
-> the relevant power sequencer. DT maintainers have expressed a discontent
-> with the existing mmc pwrseq bindings and have NAKed an earlier
-> initiative to introduce global pwrseq bindings to the kernel[1].
-> 
-> In this approach, we model the existing regulators and GPIOs in DT but
-> the pwrseq subsystem requires each provider to provide a .match()
-> callback. Whenever a consumer requests a power sequencer handle, we
-> iterate over the list of pwrseq drivers and call .match() for each. It's
-> up to the driver to verify in a platform-specific way whether it deals
-> with its consumer and let the core pwrseq code know.
-> 
-> The advantage of this over reusing the regulator or reset subsystem is
-> that it's more generalized and can handle resources of all kinds as well
-> as deal with any kind of power-on sequences: for instance, Qualcomm has
-> a PCI switch they want a driver for but this switch requires enabling
-> some resources first (PCI pwrctl) and then configuring the device over
-> I2C (which can be handled by the pwrseq provider).
-> 
-> Patch 15:
-> 
-> This patch makes the Qualcomm Bluetooth driver get and use the power
-> sequencer for QCA6390.
-> 
-> Patch 16:
-> 
-> While tiny, this patch is possibly the highlight of the entire series.
-> It uses the two abstraction layers we introduced before to create an
-> elegant power sequencing PCI power control driver and supports the ath11k
-> module on QCA6390 and ath12k on WCN7850.
-> 
-> With this series we can now enable BT and WLAN on several new Qualcomm
-> boards upstream.
-> 
-> Tested on RB5, sm8650-qrd, sm8650-hdk and sm8550-qrd.
-> 
-> Changelog:
-> 
-> Since v7:
-> - added DTS changes for sm8650-hdk
-> - added circular dependency detection for pwrseq units
-> - fixed a KASAN reported use-after-free error in remove path
-> - improve Kconfig descriptions
-> - fix typos in bindings and Kconfig
-> - fixed issues reported by smatch
-> - fix the unbind path in PCI pwrctl
-> - lots of minor improvements to the pwrseq core
-> 
-> Since v6:
-> - kernel doc fixes
-> - drop myself from the DT bindings maintainers list for ath12k
-> - wait until the PCI bridge device is fully added before creating the
->    PCI pwrctl platform devices for its sub-nodes, otherwise we may see
->    sysfs and procfs attribute failures (due to duplication, we're
->    basically trying to probe the same device twice at the same time)
-> - I kept the regulators for QCA6390's ath11k as required as they only
->    apply to this specific Qualcomm package
-> 
-> Since v5:
-> - unify the approach to modelling the WCN WLAN/BT chips by always exposing
->    the PMU node on the device tree and making the WLAN and BT nodes become
->    consumers of its power outputs; this includes a major rework of the DT
->    sources, bindings and driver code; there's no more a separate PCI
->    pwrctl driver for WCN7850, instead its power-up sequence was moved
->    into the pwrseq driver common for all WCN chips
-> - don't set load_uA from new regulator consumers
-> - fix reported kerneldoc issues
-> - drop voltage ranges for PMU outputs from DT
-> - many minor tweaks and reworks
-> 
-> v1: Original RFC:
-> 
-> https://lore.kernel.org/lkml/20240104130123.37115-1-brgl@bgdev.pl/T/
-> 
-> v2: First real patch series (should have been PATCH v2) adding what I
->      referred to back then as PCI power sequencing:
-> 
-> https://lore.kernel.org/linux-arm-kernel/2024021413-grumbling-unlivable-c145@gregkh/T/
-> 
-> v3: RFC for the DT representation of the PMU supplying the WLAN and BT
->      modules inside the QCA6391 package (was largely separate from the
->      series but probably should have been called PATCH or RFC v3):
-> 
-> https://lore.kernel.org/all/CAMRc=Mc+GNoi57eTQg71DXkQKjdaoAmCpB=h2ndEpGnmdhVV-Q@mail.gmail.com/T/
-> 
-> v4: Second attempt at the full series with changed scope (introduction of
->      the pwrseq subsystem, should have been RFC v4)
-> 
-> https://lore.kernel.org/lkml/20240201155532.49707-1-brgl@bgdev.pl/T/
-> 
-> v5: Two different ways of handling QCA6390 and WCN7850:
-> 
-> https://lore.kernel.org/lkml/20240216203215.40870-1-brgl@bgdev.pl/
-> 
-> Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-> ---
-> Bartosz Golaszewski (16):
->        regulator: dt-bindings: describe the PMU module of the QCA6390 package
->        regulator: dt-bindings: describe the PMU module of the WCN7850 package
->        dt-bindings: net: bluetooth: qualcomm: describe regulators for QCA6390
->        dt-bindings: net: wireless: qcom,ath11k: describe the ath11k on QCA6390
->        dt-bindings: net: wireless: describe the ath12k PCI module
->        arm64: dts: qcom: sm8550-qrd: add the Wifi node
->        arm64: dts: qcom: sm8650-qrd: add the Wifi node
->        arm64: dts: qcom: qrb5165-rb5: add the Wifi node
->        power: sequencing: implement the pwrseq core
->        power: pwrseq: add a driver for the PMU module on the QCom WCN chipsets
->        PCI: hold the rescan mutex when scanning for the first time
->        PCI/pwrctl: reuse the OF node for power controlled devices
->        PCI/pwrctl: create platform devices for child OF nodes of the port node
->        PCI/pwrctl: add PCI power control core code
->        PCI/pwrctl: add a PCI power control driver for power sequenced devices
->        Bluetooth: qca: use the power sequencer for QCA6390
-> 
-> Neil Armstrong (1):
->        arm64: dts: qcom: sm8650-hdk: add the Wifi node
-> 
->   .../bindings/net/bluetooth/qualcomm-bluetooth.yaml |   17 +
->   .../bindings/net/wireless/qcom,ath11k-pci.yaml     |   46 +
->   .../bindings/net/wireless/qcom,ath12k.yaml         |   99 ++
->   .../bindings/regulator/qcom,qca6390-pmu.yaml       |  185 ++++
->   MAINTAINERS                                        |    8 +
->   arch/arm64/boot/dts/qcom/qrb5165-rb5.dts           |  103 +-
->   arch/arm64/boot/dts/qcom/sm8250.dtsi               |    2 +-
->   arch/arm64/boot/dts/qcom/sm8550-qrd.dts            |   97 ++
->   arch/arm64/boot/dts/qcom/sm8550.dtsi               |    2 +-
->   arch/arm64/boot/dts/qcom/sm8650-hdk.dts            |   89 ++
->   arch/arm64/boot/dts/qcom/sm8650-qrd.dts            |   89 ++
->   arch/arm64/boot/dts/qcom/sm8650.dtsi               |    2 +-
->   drivers/bluetooth/hci_qca.c                        |   74 +-
->   drivers/pci/Kconfig                                |    1 +
->   drivers/pci/Makefile                               |    1 +
->   drivers/pci/bus.c                                  |    9 +
->   drivers/pci/of.c                                   |   14 +-
->   drivers/pci/probe.c                                |    2 +
->   drivers/pci/pwrctl/Kconfig                         |   17 +
->   drivers/pci/pwrctl/Makefile                        |    6 +
->   drivers/pci/pwrctl/core.c                          |  137 +++
->   drivers/pci/pwrctl/pci-pwrctl-pwrseq.c             |   89 ++
->   drivers/pci/remove.c                               |    3 +-
->   drivers/power/Kconfig                              |    1 +
->   drivers/power/Makefile                             |    1 +
->   drivers/power/sequencing/Kconfig                   |   28 +
->   drivers/power/sequencing/Makefile                  |    6 +
->   drivers/power/sequencing/core.c                    | 1105 ++++++++++++++++++++
->   drivers/power/sequencing/pwrseq-qcom-wcn.c         |  336 ++++++
->   include/linux/pci-pwrctl.h                         |   51 +
->   include/linux/pwrseq/consumer.h                    |   56 +
->   include/linux/pwrseq/provider.h                    |   75 ++
->   32 files changed, 2717 insertions(+), 34 deletions(-)
-> ---
-> base-commit: 6dc544b66971c7f9909ff038b62149105272d26a
-> change-id: 20240527-pwrseq-76fc025248a2
-> 
-> Best regards,
 
-Tested-by: Neil Armstrong <neil.armstrong@linaro.org> # on SM8550-QRD
-Tested-by: Neil Armstrong <neil.armstrong@linaro.org> # on SM8650-QRD
-Tested-by: Neil Armstrong <neil.armstrong@linaro.org> # on SM8650-HDK
 
-Thanks,
-Neil
+On 2024/5/23 08:17, Lk Sii wrote:
+> 
+> 
+> On 2024/5/21 23:48, Luiz Augusto von Dentz wrote:
+>> Hi,
+>>
+>> On Tue, May 21, 2024 at 10:52 AM Lk Sii <lk_sii@163.com> wrote:
+>>>
+>>>
+>>>
+>>> On 2024/5/16 23:55, Luiz Augusto von Dentz wrote:
+>>>> Hi,
+>>>>
+>>>> On Thu, May 16, 2024 at 10:57 AM Lk Sii <lk_sii@163.com> wrote:
+>>>>>
+>>>>>
+>>>>>
+>>>>> On 2024/5/16 21:31, Zijun Hu wrote:
+>>>>>> Commit 272970be3dab ("Bluetooth: hci_qca: Fix driver shutdown on closed
+>>>>>> serdev") will cause below regression issue:
+>>>>>>
+>>>>>> BT can't be enabled after below steps:
+>>>>>> cold boot -> enable BT -> disable BT -> warm reboot -> BT enable failure
+>>>>>> if property enable-gpios is not configured within DT|ACPI for QCA6390.
+>>>>>>
+>>>>>> The commit is to fix a use-after-free issue within qca_serdev_shutdown()
+>>>>>> by adding condition to avoid the serdev is flushed or wrote after closed
+>>>>>> but also introduces this regression issue regarding above steps since the
+>>>>>> VSC is not sent to reset controller during warm reboot.
+>>>>>>
+>>>>>> Fixed by sending the VSC to reset controller within qca_serdev_shutdown()
+>>>>>> once BT was ever enabled, and the use-after-free issue is also fixed by
+>>>>>> this change since the serdev is still opened before it is flushed or wrote.
+>>>>>>
+>>>>>> Verified by the reported machine Dell XPS 13 9310 laptop over below two
+>>>>>> kernel commits:
+>>>>>> commit e00fc2700a3f ("Bluetooth: btusb: Fix triggering coredump
+>>>>>> implementation for QCA") of bluetooth-next tree.
+>>>>>> commit b23d98d46d28 ("Bluetooth: btusb: Fix triggering coredump
+>>>>>> implementation for QCA") of linus mainline tree.
+>>>>>>
+>>>>>> Fixes: 272970be3dab ("Bluetooth: hci_qca: Fix driver shutdown on closed serdev")
+>>>>>> Cc: stable@vger.kernel.org
+>>>>>> Reported-by: Wren Turkal <wt@penguintechs.org>
+>>>>>> Closes: https://bugzilla.kernel.org/show_bug.cgi?id=218726
+>>>>>> Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
+>>>>>> Tested-by: Wren Turkal <wt@penguintechs.org>
+>>>>>> ---
+>>>>>> V1 -> V2: Add comments and more commit messages
+>>>>>>
+>>>>>> V1 discussion link:
+>>>>>> https://lore.kernel.org/linux-bluetooth/d553edef-c1a4-4d52-a892-715549d31ebe@163.com/T/#t
+>>>>>>
+>>>>>>  drivers/bluetooth/hci_qca.c | 18 +++++++++++++++---
+>>>>>>  1 file changed, 15 insertions(+), 3 deletions(-)
+>>>>>>
+>>>>>> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+>>>>>> index 0c9c9ee56592..9a0bc86f9aac 100644
+>>>>>> --- a/drivers/bluetooth/hci_qca.c
+>>>>>> +++ b/drivers/bluetooth/hci_qca.c
+>>>>>> @@ -2450,15 +2450,27 @@ static void qca_serdev_shutdown(struct device *dev)
+>>>>>>       struct qca_serdev *qcadev = serdev_device_get_drvdata(serdev);
+>>>>>>       struct hci_uart *hu = &qcadev->serdev_hu;
+>>>>>>       struct hci_dev *hdev = hu->hdev;
+>>>>>> -     struct qca_data *qca = hu->priv;
+>>>>>>       const u8 ibs_wake_cmd[] = { 0xFD };
+>>>>>>       const u8 edl_reset_soc_cmd[] = { 0x01, 0x00, 0xFC, 0x01, 0x05 };
+>>>>>>
+>>>>>>       if (qcadev->btsoc_type == QCA_QCA6390) {
+>>>>>> -             if (test_bit(QCA_BT_OFF, &qca->flags) ||
+>>>>>> -                 !test_bit(HCI_RUNNING, &hdev->flags))
+>>>>>> +             /* The purpose of sending the VSC is to reset SOC into a initial
+>>>>>> +              * state and the state will ensure next hdev->setup() success.
+>>>>>> +              * if HCI_QUIRK_NON_PERSISTENT_SETUP is set, it means that
+>>>>>> +              * hdev->setup() can do its job regardless of SoC state, so
+>>>>>> +              * don't need to send the VSC.
+>>>>>> +              * if HCI_SETUP is set, it means that hdev->setup() was never
+>>>>>> +              * invoked and the SOC is already in the initial state, so
+>>>>>> +              * don't also need to send the VSC.
+>>>>>> +              */
+>>>>>> +             if (test_bit(HCI_QUIRK_NON_PERSISTENT_SETUP, &hdev->quirks) ||
+>>>>>> +                 hci_dev_test_flag(hdev, HCI_SETUP))
+>>>>>>                       return;
+>>> The main purpose of above checking is NOT to make sure the serdev within
+>>> open state as its comments explained.
+>>>>>>
+>>>>>> +             /* The serdev must be in open state when conrol logic arrives
+>>>>>> +              * here, so also fix the use-after-free issue caused by that
+>>>>>> +              * the serdev is flushed or wrote after it is closed.
+>>>>>> +              */
+>>>>>>               serdev_device_write_flush(serdev);
+>>>>>>               ret = serdev_device_write_buf(serdev, ibs_wake_cmd,
+>>>>>>                                             sizeof(ibs_wake_cmd));
+>>>>> i believe Zijun's change is able to fix both below issues and don't
+>>>>> introduce new issue.
+>>>>>
+>>>>> regression issue A:  BT enable failure after warm reboot.
+>>>>> issue B:  use-after-free issue, namely, kernel crash.
+>>>>>
+>>>>>
+>>>>> For issue B, i have more findings related to below commits ordered by time.
+>>>>>
+>>>>> Commit A: 7e7bbddd029b ("Bluetooth: hci_qca: Fix qca6390 enable failure
+>>>>> after warm reboot")
+>>>>>
+>>>>> Commit B: de8892df72be ("Bluetooth: hci_serdev: Close UART port if
+>>>>> NON_PERSISTENT_SETUP is set")
+>>>>> this commit introduces issue B, it is also not suitable to associate
+>>>>> protocol state with state of lower level transport type such as serdev
+>>>>> or uart, in my opinion, protocol state should be independent with
+>>>>> transport type state, flag HCI_UART_PROTO_READY is for protocol state,
+>>>>> it means if protocol hu->proto is initialized and if we can invoke its
+>>>>> interfaces.it is common for various kinds of transport types. perhaps,
+>>>>> this is the reason why Zijun's change doesn't use flag HCI_UART_PROTO_READY.
+>>>>
+>>>> Don't really follow you here, if HCI_UART_PROTO_READY indicates the
+>>>> protocol state they is even _more_ important to use before invoking
+>>>> serdev APIs, so checking for the quirk sound like a problem because:
+>>>>
+>>>> [1] hci_uart_close
+>>>>      /* When QUIRK HCI_QUIRK_NON_PERSISTENT_SETUP is set by driver,
+>>>>      * BT SOC is completely powered OFF during BT OFF, holding port
+>>>>      * open may drain the battery.
+>>>>      */
+>>>>     if (test_bit(HCI_QUIRK_NON_PERSISTENT_SETUP, &hdev->quirks)) {
+>>>>         clear_bit(HCI_UART_PROTO_READY, &hu->flags);
+>>>>         serdev_device_close(hu->serdev);
+>>>>     }
+>>>>
+>>>> [2] hci_uart_unregister_device
+>>>>     if (test_bit(HCI_UART_PROTO_READY, &hu->flags)) {
+>>>>         clear_bit(HCI_UART_PROTO_READY, &hu->flags);
+>>>>         serdev_device_close(hu->serdev);
+>>>>     }
+>>>> both case 1 and case 2 were introduced by Commit B in question which
+>>> uses protocol state flag HCI_UART_PROTO_READY to track lower level
+>>> transport type state, i don't think it is perfect.
+>>>
+>>> for common files hci_serdev.c and hci_ldisc.c, as you saw, the purpose
+>>> of checking HCI_UART_PROTO_READY is to call protocol relevant
+>>> interfaces, moreover, these protocol relevant interfaces do not deal
+>>> with lower transport state. you maybe even notice below present function
+>>> within which lower level serdev is flushed before HCI_UART_PROTO_READY
+>>> is checked:
+>>>
+>>> static int hci_uart_flush(struct hci_dev *hdev)
+>>> {
+>>> ......
+>>>         /* Flush any pending characters in the driver and discipline. */
+>>>         serdev_device_write_flush(hu->serdev);
+>>>
+>>>         if (test_bit(HCI_UART_PROTO_READY, &hu->flags))
+>>>                 hu->proto->flush(hu);
+>>>
+>>>         return 0;
+>>> }
+>>>
+>>> in my opinion, that is why qca_serdev_shutdown() does not check
+>>> HCI_UART_PROTO_READY for later lower level serdev operations.
+>>>> So only in case 1 checking the quirk is equivalent to
+>>>> HCI_UART_PROTO_READY on case 2 it does actually check the quirk and
+>>>> will proceed to call serdev_device_close, now perhaps the code is
+>>>> assuming that shutdown won't be called after that, but it looks it
+>>>> does since:
+>>>>
+>>> qca_serdev_shutdown() will never be called after case 2 as explained
+>>> in the end.
+>>>> static void serdev_drv_remove(struct device *dev)
+>>>> {
+>>>>     const struct serdev_device_driver *sdrv =
+>>>> to_serdev_device_driver(dev->driver);
+>>>>     if (sdrv->remove)
+>>>>         sdrv->remove(to_serdev_device(dev));
+>>>>
+>>>>     dev_pm_domain_detach(dev, true);
+>>>> }
+>>>>
+>>>> dev_pm_domain_detach says it will power off so I assume that means
+>>>> that shutdown will be called _after_ remove, so not I'm not really
+>>>> convinced that we can avoid using HCI_UART_PROTO_READY, in fact the
+>>>> following sequence might always be triggering:
+>>>>
+>>> dev_pm_domain_detach() should be irrelevant with qca_serdev_shutdown(),
+>>> should not trigger call of qca_serdev_shutdown() as explained in the end
+>>>> serdev_drv_remove -> qca_serdev_remove -> hci_uart_unregister_device
+>>>> -> serdev_device_close -> qca_close -> kfree(qca)
+>>>> dev_pm_domain_detach -> ??? -> qca_serdev_shutdown
+>>>>
+>>>> If this sequence is correct then qca_serdev_shutdown accessing
+>>>> qca_data will always result in a UAF problem.
+>>>>
+>>> above sequence should not correct as explained below.
+>>>
+>>> serdev and its driver should also follow below generic device and driver
+>>> design.
+>>>
+>>> 1)
+>>> driver->shutdown() will be called during shut-down time at this time
+>>> driver->remove() should not have been called.
+>>>
+>>> 2)
+>>> driver->shutdown() is impossible to be called once driver->remove()
+>>> was called.
+>>>
+>>> 3) for serdev, driver->remove() does not trigger call of
+>>> driver->shutdown() since PM relevant poweroff is irrelevant with
+>>> driver->shutdown() and i also don't find any PM relevant interfaces will
+>>> call driver->shutdown().
+>>>
+>>> i would like to explain issue B based on comments Zijun posted by public
+>>> as below:
+>>>
+>>> issue B actually happens during reboot and let me look at these steps
+>>> boot -> enable BT -> disable BT -> reboot.
+>>>
+>>> 1) step boot will call driver->probe() to register hdev and the serdev
+>>> is opened after boot.
+>>>
+>>> 2) step enable will call hdev->open() and the serdev will still in open
+>>> state
+>>>
+>>> 3) step disable will call hdev->close() and the serdev will be closed
+>>> after hdev->close() for machine with config which results in
+>>> HCI_QUIRK_NON_PERSISTENT_SETUP is set.
+>>>
+>>> 4) step reboot will call qca_serdev_shutdown() which will flush and
+>>> write the serdev which are closed by above step disable, so cause the
+>>> UAF issue, namely, kernel crash issue.
+>>>
+>>> so this issue is caused by commit B which close the serdev during
+>>> hdev->close().
+>>>
+>>> driver->remove() even is not triggered during above steps.
+>>>>> Commit C: 272970be3dab ("Bluetooth: hci_qca: Fix driver shutdown on
+>>>>> closed serdev")
+>>>>> this commit is to fix issue B which is actually caused by Commit B, but
+>>>>> it has Fixes tag for Commit A. and it also introduces the regression
+>>>>> issue A.
+>>>>>
+>>>>
+>>>>
+>>
+>> Reading again the commit message for the UAF fix it sounds like a
+>> different problem:
+>>
+>>     The driver shutdown callback (which sends EDL_SOC_RESET to the device
+>>     over serdev) should not be invoked when HCI device is not open (e.g. if
+>>     hci_dev_open_sync() failed), because the serdev and its TTY are not open
+>>     either.  Also skip this step if device is powered off
+>>     (qca_power_shutdown()).
+>>
+>> So if hci_dev_open_sync has failed it says serdev and its TTY will not
+>> be open either, so I guess that's why HCI_SETUP was added as a
+>> condition to bail out? So it seems correct to do that although I'd
+>> change the comments.
+>>
+> yes, agree with you on these points, Zijun's change is able to fix this
+> different problem as well.
+@Luiz:
+do you have any other concerns?
+how to move forward ?
+>> @Krzysztof Kozlowski do you still have a test setup for 272970be3dab
+>> ("Bluetooth: hci_qca: Fix driver shutdown on closed serdev"), can you
+>> try with these changes?
+>>
+
