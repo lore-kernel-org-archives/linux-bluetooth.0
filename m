@@ -1,105 +1,86 @@
-Received: from mail-lj1-f177.google.com (mail-lj1-f177.google.com [209.85.208.177])
+Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B005F17C7B5
-	for <linux-bluetooth@vger.kernel.org>; Fri, 31 May 2024 17:17:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED9221C6BD
+	for <linux-bluetooth@vger.kernel.org>; Fri, 31 May 2024 19:37:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717175860; cv=none; b=tjNhSNQhcxHbd1DNa0XVlnRP6Cq6SsgsScHcy1nTR5JlrLKYfuym0Ko07ZSH5jO8IQH17z7LJjO0cCpSUpCHAz2Cg0VM66y2lshQu3KCJasCA12TGEFwlqt+yYFt5SdkmQh6d94zX3I71N5MIlTkk5obriDL5Y5t44LLnVfE6yo=
+	t=1717184229; cv=none; b=HdUz/JS/lJ+MiRCh4gKArsRs6VTJSg7FTvJihOahm0fKxBn6HlpNrvXel29Y6Qv5xp1XVJq2nv2wTGsPd6m+pUaG94ylVq571/Q+hnyRRALEGSXQuhPdFtXEGbvyzD6zUDk5+XCR174Znq1tTDn9/Q1WgvrJhUGKhX1yPVjLGV0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717175860; c=relaxed/simple;
-	bh=vxm+D4Vma6+LOr5JUg9gt71NcFnX4tLUX5AKFnsK1xQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=YtQ5B/Vt6nrq9ECJBOD5pAHpK5k/On3xyc6YlQDM9qh01HfBVfaZSakWvMqIFAcSN6ZcM/29RCzNxAacxsS0pdeyQmf84xvUgIJTtTfXwdYZsY2oDPYqyJBevENbVlQqFIHt2Cxe+mGG5nxw/U8pcTusED8tTAK7puY+5TDFkNE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XT7nDasn; arc=none smtp.client-ip=209.85.208.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1717184229; c=relaxed/simple;
+	bh=fM8DXtS0g3ad3SkWJ74fl9vbVdU9ZZhOPrhX+Q++VA0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=D1q3rnJug3wG/50lO1mTI7w/g4q8RSnAeGwz/MeTp1iuOxSpkU0+YTibOjAtJpz/eKnq6TR06MElJE7aXeB3rPe4cUAPLRZQe7kG8GOE00es/PAH7nWpEfEdv5gEB513lGlzjqqIoLZj27CgAsYybYzR22kYzVFXqe6vs31OoHQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=prestonhunt.com; spf=pass smtp.mailfrom=prestonhunt.com; dkim=pass (2048-bit key) header.d=prestonhunt-com.20230601.gappssmtp.com header.i=@prestonhunt-com.20230601.gappssmtp.com header.b=pLWVBsRH; arc=none smtp.client-ip=209.85.210.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=prestonhunt.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=prestonhunt.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XT7nDasn"
-Received: by mail-lj1-f177.google.com with SMTP id 38308e7fff4ca-2ea8fff1486so13160351fa.1
-        for <linux-bluetooth@vger.kernel.org>; Fri, 31 May 2024 10:17:38 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=prestonhunt-com.20230601.gappssmtp.com header.i=@prestonhunt-com.20230601.gappssmtp.com header.b="pLWVBsRH"
+Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-7023b6d810bso1517999b3a.3
+        for <linux-bluetooth@vger.kernel.org>; Fri, 31 May 2024 12:37:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1717175857; x=1717780657; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=eOaxlcqnUpYqcx26j++GDsSKWj68SWxWl1UMC+K+AXU=;
-        b=XT7nDasn11dm2Tbw8xjLyQTCdqBmRxPXrWDgpSP5U5IXRtelNZisNvctamktintfmS
-         G1/uEhK2K01OFsNt/DbqrEznORyb5Y8S8Ot5eLvi30jBZ6gdAkUSoRpCFSgduEOTICNt
-         XkbCuslwb4fL3/1OMUXHNUW0or+dR2bIhjpFhhTT8Ma1p2iWi5adJN7gjEkfUnrxWOyO
-         20mcGc2+z/4nBAbDNN2NbL54q5quFAPvaQBy4j5rnUUe770+V6DPPEqtr3kGyn5Xvahq
-         YfaRJTz72yZu6PiYCHac0G4X5d20Jg7g43JcuhxAPKsx41yUB40sN/gYN4Hc0WLwzsw7
-         ZZlA==
+        d=prestonhunt-com.20230601.gappssmtp.com; s=20230601; t=1717184227; x=1717789027; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=wEeGm70tcJLMIZtXwuy+rG4HE0SVtA85dqOwWXBg8qQ=;
+        b=pLWVBsRHczO7hgU4cvPozlR+QgsfMZLvXNnAok/sInv5jk9CK2ycPzrPRACjNRG3pI
+         0AZmRds++tkbos5ueEcUlQrX+GdmNPoboQ3HHe3J4kJYn2XUbpDat6i4Mxlf8ner2vZt
+         0eAtzIk5Y1g79pF8HyimFyFIx81/HXaOacR2d0uOfTfLoZOJIGkZZ4QRkJO4k2dYVNmW
+         wKwmflrLbR81wefaCPnpgTqtskbx57KdDdv4O8yqMQQ8uTpuyh5K+WVeSVB6zbTbPeb2
+         wmsz1GszzzY9X9eYsMnkfCal8okkzSPVXfXuxonofzwJ6yacB5vfaR8Cti3yVNG6Udu1
+         YrvQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717175857; x=1717780657;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=eOaxlcqnUpYqcx26j++GDsSKWj68SWxWl1UMC+K+AXU=;
-        b=aBw/xXg4wz5LAeDeB1W4tn0f+Kri3Y7vmu2n3NqpFnJHlxYRWRNwF73qzOYNIXOm7j
-         /bnIU9XDY15fGxgoK24CuzB652vf6YI69TW/S+oovTVoJAOHSmpxuGds09YbcBsobwNZ
-         iP7c/EJer7LB4RV4Ef5feicrOdOnqXEAlCyYSLORVXDDPWj3fTkIq066KRw2sdRvPKAO
-         9XwWErNfZ55WCeA0YvmPjmMMDmKuSWZluygsXgEhHLrAUzi0ZHOHUHlRih8w1GfRFM2N
-         7L3JvfuA2glARqltU96HgLwwPzSaG6ynDi/YfkMMrsPI40Vl4MEG92BqpV+qb0fIgTRU
-         kc8A==
-X-Gm-Message-State: AOJu0Yx5WkWupuuJJWlqq0lq5bs3klZ+gSyT4oquLgV2ZtRkwPuooRut
-	wla4DGWg3mQnIVc0i9k6q3ZaQCUd6kN9JPUOtLldI9nXOsjIDn6LqDm2xIaBec1ClzbSvtXS5gr
-	UoLvgS1/gMbGD+w0NBQzVgIzWBogZIA==
-X-Google-Smtp-Source: AGHT+IGEI8QGPM4WfR0IE34608F1p8t0OvO4YxFPCfahXay3StiPb+8Ain3Ne5XE4zi9VFgxIV8pvvjuV71ez64vTzo=
-X-Received: by 2002:a2e:9042:0:b0:2ea:9bf3:d139 with SMTP id
- 38308e7fff4ca-2ea9bf3ea1amr3215471fa.19.1717175856496; Fri, 31 May 2024
- 10:17:36 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1717184227; x=1717789027;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=wEeGm70tcJLMIZtXwuy+rG4HE0SVtA85dqOwWXBg8qQ=;
+        b=jCaw+xhP5j+T5okHJALBUB8uVTcD1dVNu5B+Pq7q3hzbAz93msSbHba2T43xMprPUZ
+         3WNb0ZX3jiIT76h+8AR/FefX/KQyy92kbDRq3yL9o5n1gPadlsE+pBdnYX7p85uvURYX
+         3f78SF/8nqFh8EOxGOj4Nv6K74J/xqpnxgc5IrO7tsWBh9JXI7jGjC9XvKPIVA2nB/7g
+         WRn8AFgeyvRWwErac7SwcZSJPkA66FiGEDTo6YYslQghrPcAiLb1Tqa911GDN7jSkDxK
+         YY30dV0kvCebR5ruradFm8xDuxf0/gRoGifJB6vMv6niXBrdD15katc6GHRUeMLnSgsa
+         h2cw==
+X-Gm-Message-State: AOJu0YxUz1DNUkjfMiueRCkKjupQ8QKfMXbt+IZalo6tyKznOUYLFd0G
+	XF22TsM0xYu3ou54EG/ftwjO9P6mOO4ibfUMxkZnQ2IWwrtgbky471NV/MIQecY9SDlFJutoHe0
+	G
+X-Google-Smtp-Source: AGHT+IH3qt9nP7QwaWSKmhJn2rumZlC47+sSn1U2cr/nGOMRKpcx4pVn8GOptpY/fbVQ88uM7zl6QA==
+X-Received: by 2002:a05:6a21:99a6:b0:1a9:c4ca:dc74 with SMTP id adf61e73a8af0-1b26f0e6242mr3779249637.5.1717184226215;
+        Fri, 31 May 2024 12:37:06 -0700 (PDT)
+Received: from localhost.localdomain ([97.115.143.6])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-70242b2c262sm1720956b3a.190.2024.05.31.12.37.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 31 May 2024 12:37:05 -0700 (PDT)
+From: Preston Hunt <me@prestonhunt.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Preston Hunt <me@prestonhunt.com>
+Subject: [PATCH BlueZ 0/1] Fix GLib deprecation warning in example-gatt-client/server
+Date: Fri, 31 May 2024 12:36:21 -0700
+Message-ID: <20240531193622.1696328-1-me@prestonhunt.com>
+X-Mailer: git-send-email 2.42.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240527075422.18953-1-iulia.tanasescu@nxp.com>
-In-Reply-To: <20240527075422.18953-1-iulia.tanasescu@nxp.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Fri, 31 May 2024 13:17:24 -0400
-Message-ID: <CABBYNZLUKCdrHd7tH8ro8AD1ERAph0JPm2FxeUdPcsKSrR-cdw@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 0/6] Add new BAP BSRC/SCC tests
-To: Iulia Tanasescu <iulia.tanasescu@nxp.com>
-Cc: linux-bluetooth@vger.kernel.org, claudia.rosu@nxp.com, 
-	mihai-octavian.urzica@nxp.com, silviu.barbulescu@nxp.com, 
-	vlad.pruteanu@nxp.com, andrei.istodorescu@nxp.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-Hi Iulia,
+Updates example-gatt-client and example-gatt-server sample applications
+in test/ directory to fix deprecation warning:
 
-On Mon, May 27, 2024 at 3:54=E2=80=AFAM Iulia Tanasescu <iulia.tanasescu@nx=
-p.com> wrote:
->
-> This patch adds BAP unit tests for Broadcast Source stream
-> establishment (BAP/BSRC/SCC/BV-35-C [Establishes Broadcast] - page 175),
-> stream disable (BAP/BSRC/SCC/BV-36-C [Disables Broadcast] - page 176) and
-> stream release (BAP/BSRC/SCC/BV-37-C [Releases Broadcast] - page 176).
->
-> This patch also adds shared/bap fixes regarding broadcast stream
-> management, required for successful test implementation.
->
-> Iulia Tanasescu (6):
->   shared/bap: Remove DISABLING case from bcast state cb
->   shared/bap: Fix potential stream access after free
->   test-bap: Update bsrc_state to just handle CONFIG state
->   test-bap: Add Broadcast Source Establish test
->   test-bap: Add Broadcast Source Disable test
->   test-bap: Add Broadcast Source Release test
->
->  src/shared/bap.c |  26 ++++--
->  unit/test-bap.c  | 210 ++++++++++++++++++++++++++++++++++++++---------
->  2 files changed, 186 insertions(+), 50 deletions(-)
->
->
-> base-commit: 75893035705da57efd6f8a84bba77d596c463d34
-> --
-> 2.39.2
+    PyGIDeprecationWarning: GObject.MainLoop is deprecated; use
+    GLib.MainLoop instead
 
-I'm off this week, will review this set next week.
+Also, remove python2 import since the script is run with a python3
+shebang.
 
+Preston Hunt (1):
+  test/example-gatt: fix deprecation warning
 
---=20
-Luiz Augusto von Dentz
+ test/example-gatt-client |  7 ++-----
+ test/example-gatt-server | 11 ++++-------
+ 2 files changed, 6 insertions(+), 12 deletions(-)
+
+-- 
+2.42.0
+
