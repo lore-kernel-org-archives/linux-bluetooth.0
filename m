@@ -1,121 +1,243 @@
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f77.google.com (mail-io1-f77.google.com [209.85.166.77])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3282B80029
-	for <linux-bluetooth@vger.kernel.org>; Fri, 31 May 2024 07:04:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AA4E848D
+	for <linux-bluetooth@vger.kernel.org>; Fri, 31 May 2024 14:19:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.77
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717139068; cv=none; b=pgz72L7GocYNu8aZuFn1s4r1oj5FmS8Ys2VNVkFFy1nt4YRSAiymf57X+W9hxVMAxC9OxeU3SW6xZr0c1RPZC5nNzipgKVAgaiZVmpSenMNNOY00Vkve7KHhzFc6DcwM/O3RUxtbxbHEHwcGgbXSyliFhS422ZnifCHTPBSd+7M=
+	t=1717165182; cv=none; b=uQhCGva23UEJBrMNX3YvMl2P5GdcmVAjQwNVAof0H+PQTT+naq1sJvAFd53nv2REjNY5g4DBRnukwg0u6Ovf+jcZB/I9SUJb9n2yt6htn8XSe1ECG0xeUciaXOcsnxIQoxNZA+CBa0aMVXb3EeSV/DW0Z/cRNL+z/GcEu7qlKKU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717139068; c=relaxed/simple;
-	bh=/dZPROiwyfBri1XohbJgsYQ/ZxSPJ0HpY+cRVHjK6Fs=;
-	h=From:To:Subject:Date:Message-ID:Content-Type:MIME-Version; b=dkBE5pHRJpuq2u/oPWoHRBIt5L8CmdsMvII0mOO2HAfKs2HX0CepAESh9uGCM1sSnMACuW8R8rORB1dnQeM75dF/x4e2Rdeq9bSZSk6JlTGznhK5My1Uqdft97Es5rbs6Fn/j0V3gOYvc5EvP3oLTDj+Jg+qJOVzXkZOuAA14nE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=jLEE9nEv; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="jLEE9nEv"
-Received: from pps.filterd (m0279865.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 44V3cX9w015776
-	for <linux-bluetooth@vger.kernel.org>; Fri, 31 May 2024 07:04:26 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	content-transfer-encoding:content-type:date:from:message-id
-	:mime-version:subject:to; s=qcppdkim1; bh=/dZPROiwyfBri1XohbJgsY
-	Q/ZxSPJ0HpY+cRVHjK6Fs=; b=jLEE9nEv80V9lPdn8EPzw3D7KQ8rjZDJz8xH+v
-	XM4DqMrtdEgwLy6Wz3VECMbQIUBtWiCQ5MPADFcnv0OWS7ZDNcGgGYxeBck7sDrH
-	8diY4lJm8momkn4i05Row9sf+CxxNRJuIAlV/n0JzUv47ObwZoXc8UoduJqxfZk7
-	06Q92bGCPrFMFPXd4+2tZ6oTMnQGOrAUQy0frsORPgApGwBjpRbIT2fiAqvcxXI2
-	Lu6aRSF+2T0iQa8Q+KqKl9XnJKrOFXbC0T7AXN/QcaU9a3iQFi3wHA2oWe6gHouW
-	zV6TH06z/VeM/XjMQeeZbXBoyNGVnz5PupVP5VmRnuF6KAxw==
-Received: from nasanppmta02.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3ydyws5rvh-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <linux-bluetooth@vger.kernel.org>; Fri, 31 May 2024 07:04:26 +0000 (GMT)
-Received: from nasanex01a.na.qualcomm.com (nasanex01a.na.qualcomm.com [10.52.223.231])
-	by NASANPPMTA02.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 44V74PWo003817
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <linux-bluetooth@vger.kernel.org>; Fri, 31 May 2024 07:04:25 GMT
-Received: from nasanex01c.na.qualcomm.com (10.45.79.139) by
- nasanex01a.na.qualcomm.com (10.52.223.231) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.9; Fri, 31 May 2024 00:04:25 -0700
-Received: from nasanex01c.na.qualcomm.com ([fe80::4223:f723:395d:74fa]) by
- nasanex01c.na.qualcomm.com ([fe80::4223:f723:395d:74fa%13]) with mapi id
- 15.02.1544.009; Fri, 31 May 2024 00:04:25 -0700
-From: "Amisha Jain (QUIC)" <quic_amisjain@quicinc.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: MAP server crash during connection
-Thread-Topic: MAP server crash during connection
-Thread-Index: AdqzKJeyPcFb24X1Rwqc4W+GcA5qlw==
-Date: Fri, 31 May 2024 07:04:25 +0000
-Message-ID: <ec4a4adbfee94a699ebd635abc51f01c@quicinc.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1717165182; c=relaxed/simple;
+	bh=d0lqwuMmnvoycozfOc4O/PNMzwaVe2DPlVTCU1B/ZlE=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=vDRU0YlMUxoz5+tA0ZWpIaWc3/Rpy5Pr3SZQylI2WAZ9OBv+xEmoF+dYmAvM5RpTcyx5RsI0ofAuj3+7qyiVx8E3V+wOLE0fvANd5z9e/q/gvw6HM3RhBuesqclrZxC4nXu/4nls5qNXQIqa6hskzH5zgfnSCdjqg332NwTbew4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.77
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f77.google.com with SMTP id ca18e2360f4ac-7e1eb98f144so256306839f.0
+        for <linux-bluetooth@vger.kernel.org>; Fri, 31 May 2024 07:19:40 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1717165180; x=1717769980;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=yb7XUNpfrq0Yb/ulfO/du1Gq7Pjr6h5I06Xeddne7Uo=;
+        b=FgZkhuVkbw8oXPsN+0V5SiKj0PQWOK5hg+JTky/OqW7kQWqdeRmhzTcAD0Fo60VXkt
+         3hrJM/a+7HY3C2hI9rqCGn6gkZa2N92rsC7rO0WHesq6byZM+W/DkJXh8V6npcNh1unF
+         eSrOgsexcJ9VrE3Q7+MTi6Az3nhPekTlv3crZtU6ot8CPGdgVqLbEejlSYUe2xCtBd1Y
+         nw1S3tMND50L/fZrR/Bfx8hTOwPk841giGeYaeA42vUzATHXe8Z7AVzsGmxljtRtidBM
+         Pl6bwK5vq2AW0ANRLKfMIyOGkPTwt5jVwPjqnnn02tG9LfZxdXUIKFq2OFkHpAXm40OW
+         c4yA==
+X-Forwarded-Encrypted: i=1; AJvYcCUodBp0eUOedXPVfVIaYbFHoaIr3OQNDdcIcx0FV+QEgxJL6vasec8dwjCxH2/xsF71uTw0wuIlSIx1NPUza+gNCCPnti72XeesGwsDpVZp
+X-Gm-Message-State: AOJu0Yzpib3RF1nwQ/5bp6WCnR57gu7yWstxb56cmfUgeXOJ+rCHIejB
+	wyzAAZ6MtXoeMRxn56c/ZtRr6Q+34pwU5JXIBlhIME9dPj8Pa76DQLFhkA3yfwtCZ43qcyBGyOO
+	Cl/36h1MPiazMBqJyCR8Ie8Qr5clTsJj6541M+KBzf96uXTtkx1ztLrI=
+X-Google-Smtp-Source: AGHT+IGZLBPCpmE94111hFaaksBT+LGBpnXbs/qv/xXPfIaxB+nH9J/tzR4SgNcKW6Cg3feTwhos+CgRGtcZzOC3OPVavqZpEtC2
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: yKIjsRcGIkb4Mh6yU7wQ7H55D0PEuiEg
-X-Proofpoint-GUID: yKIjsRcGIkb4Mh6yU7wQ7H55D0PEuiEg
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.650,FMLib:17.12.28.16
- definitions=2024-05-31_04,2024-05-30_01,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 phishscore=0
- malwarescore=0 impostorscore=0 suspectscore=0 mlxscore=0 mlxlogscore=774
- priorityscore=1501 spamscore=0 lowpriorityscore=0 bulkscore=0
- clxscore=1011 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2405170001 definitions=main-2405310053
+X-Received: by 2002:a92:ca0e:0:b0:374:5315:95de with SMTP id
+ e9e14a558f8ab-3748ba1fedbmr1480845ab.6.1717165179807; Fri, 31 May 2024
+ 07:19:39 -0700 (PDT)
+Date: Fri, 31 May 2024 07:19:39 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000903a6d0619c0ac91@google.com>
+Subject: [syzbot] [bluetooth?] KASAN: slab-use-after-free Read in l2cap_sock_ready_cb
+From: syzbot <syzbot+542cd57c45c01d9c33f8@syzkaller.appspotmail.com>
+To: johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, luiz.dentz@gmail.com, marcel@holtmann.org, 
+	netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-Hi bluez team,
-I have been trying to verify MAP Server obex profile on bluez 5.65.
-While trying=A0connection, I have noticed the crash on the server side (con=
-nection initiated from client side) and hence connection is failing.
-Please find the backtrace of the crash -
+Hello,
 
-=A0 assertion failed "i =3D=3D len" file "../../dbus-1.14.8/dbus/dbus-objec=
-t-tree.c" line 1321 function _dbus_decompose_path
-=A0 /usr/lib/libdbus-1.so.3(_dbus_print_backtrace+0x28) [0xfffff7f4cc9c]
-=A0 /usr/lib/libdbus-1.so.3(_dbus_abort+0x14) [0xfffff7f4fe3c]
-=A0 /usr/lib/libdbus-1.so.3(+0x4a9cc) [0xfffff7f3a9cc]
-=A0 /usr/lib/libdbus-1.so.3(+0x36c5c) [0xfffff7f26c5c]
-=A0 /usr/lib/libdbus-1.so.3(dbus_connection_get_object_path_data+0xc4) [0xf=
-ffff7f0f818]
-=A0 /usr/libexec/bluetooth/obexd(g_dbus_emit_property_changed_full+0x30) [0=
-x450dc4]
-=A0 /usr/libexec/bluetooth/obexd(g_dbus_emit_property_changed+0x14) [0x450e=
-c0]
-=A0 /usr/libexec/bluetooth/obexd(manager_emit_transfer_property+0x34) [0x42=
-9408]
-=A0 /usr/libexec/bluetooth/obexd(obex_put_stream_start+0xc8) [0x42b314]
-=A0 /usr/libexec/bluetooth/obexd() [0x425f58]
-=A0 /usr/libexec/bluetooth/obexd() [0x42adcc]
-=A0 /usr/libexec/bluetooth/obexd() [0x4171dc]
-=A0 /usr/libexec/bluetooth/obexd() [0x418078]
-=A0 /usr/lib/libglib-2.0.so.0(+0xb20cc) [0xfffff7e420cc]
-=A0 /usr/lib/libglib-2.0.so.0(+0x54a30) [0xfffff7de4a30]
-=A0 /usr/lib/libglib-2.0.so.0(g_main_context_dispatch+0x44) [0xfffff7de850c=
-]
-=A0 /usr/lib/libglib-2.0.so.0(+0x5868c) [0xfffff7de868c]
-=A0 /usr/lib/libglib-2.0.so.0(g_main_loop_run+0x1ac) [0xfffff7de8b08]
-=A0 /usr/libexec/bluetooth/obexd(main+0x128) [0x427d6c]
-=A0 /lib/libc.so.6(+0x2affc) [0xfffff7c0affc]
-=A0 /lib/libc.so.6(__libc_start_main+0x90) [0xfffff7c0b0c4]
-=A0 /usr/libexec/bluetooth/obexd(_start+0x30) [0x4101b0]
+syzbot found the following issue on:
 
-=A0 Program received signal SIGABRT, Aborted.
+HEAD commit:    66ad4829ddd0 Merge tag 'net-6.10-rc1' of git://git.kernel...
+git tree:       net-next
+console output: https://syzkaller.appspot.com/x/log.txt?x=149350d8980000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=48c05addbb27f3b0
+dashboard link: https://syzkaller.appspot.com/bug?extid=542cd57c45c01d9c33f8
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
 
-=A0__pthread_kill_implementation (threadid=3D<optimized out>, signo=3Dsigno=
-@entry=3D6, no_tid=3Dno_tid@entry=3D0) at pthread_kill.c:4
+Unfortunately, I don't have any reproducer for this issue yet.
 
-Please help support the issue.
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/32f7723d467f/disk-66ad4829.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/2cb82a76d362/vmlinux-66ad4829.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/07340808386b/bzImage-66ad4829.xz
 
-Thanks,
-Amisha
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+542cd57c45c01d9c33f8@syzkaller.appspotmail.com
+
+==================================================================
+BUG: KASAN: slab-use-after-free in l2cap_sock_ready_cb+0xd7/0x140 net/bluetooth/l2cap_sock.c:1662
+Read of size 8 at addr ffff88806c4de188 by task kworker/1:1/17633
+
+CPU: 1 PID: 17633 Comm: kworker/1:1 Not tainted 6.9.0-syzkaller-12071-g66ad4829ddd0 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 04/02/2024
+Workqueue: events l2cap_info_timeout
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:88 [inline]
+ dump_stack_lvl+0x241/0x360 lib/dump_stack.c:114
+ print_address_description mm/kasan/report.c:377 [inline]
+ print_report+0x169/0x550 mm/kasan/report.c:488
+ kasan_report+0x143/0x180 mm/kasan/report.c:601
+ l2cap_sock_ready_cb+0xd7/0x140 net/bluetooth/l2cap_sock.c:1662
+ l2cap_chan_ready net/bluetooth/l2cap_core.c:1256 [inline]
+ l2cap_conn_start+0x8db/0x1140 net/bluetooth/l2cap_core.c:1506
+ process_one_work kernel/workqueue.c:3231 [inline]
+ process_scheduled_works+0xa2c/0x1830 kernel/workqueue.c:3312
+ worker_thread+0x86d/0xd70 kernel/workqueue.c:3393
+ kthread+0x2f0/0x390 kernel/kthread.c:389
+ ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
+ </TASK>
+
+Allocated by task 27936:
+ kasan_save_stack mm/kasan/common.c:47 [inline]
+ kasan_save_track+0x3f/0x80 mm/kasan/common.c:68
+ poison_kmalloc_redzone mm/kasan/common.c:370 [inline]
+ __kasan_kmalloc+0x98/0xb0 mm/kasan/common.c:387
+ kasan_kmalloc include/linux/kasan.h:211 [inline]
+ __do_kmalloc_node mm/slub.c:4121 [inline]
+ __kmalloc_noprof+0x1f9/0x400 mm/slub.c:4134
+ kmalloc_noprof include/linux/slab.h:664 [inline]
+ sk_prot_alloc+0xe0/0x210 net/core/sock.c:2080
+ sk_alloc+0x38/0x370 net/core/sock.c:2133
+ bt_sock_alloc+0x3c/0x340 net/bluetooth/af_bluetooth.c:148
+ l2cap_sock_alloc net/bluetooth/l2cap_sock.c:1869 [inline]
+ l2cap_sock_create+0x13f/0x2d0 net/bluetooth/l2cap_sock.c:1909
+ bt_sock_create+0x161/0x230 net/bluetooth/af_bluetooth.c:132
+ __sock_create+0x490/0x920 net/socket.c:1571
+ sock_create net/socket.c:1622 [inline]
+ __sys_socket_create net/socket.c:1659 [inline]
+ __sys_socket+0x150/0x3c0 net/socket.c:1706
+ __do_sys_socket net/socket.c:1720 [inline]
+ __se_sys_socket net/socket.c:1718 [inline]
+ __x64_sys_socket+0x7a/0x90 net/socket.c:1718
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+Freed by task 27935:
+ kasan_save_stack mm/kasan/common.c:47 [inline]
+ kasan_save_track+0x3f/0x80 mm/kasan/common.c:68
+ kasan_save_free_info+0x40/0x50 mm/kasan/generic.c:579
+ poison_slab_object+0xe0/0x150 mm/kasan/common.c:240
+ __kasan_slab_free+0x37/0x60 mm/kasan/common.c:256
+ kasan_slab_free include/linux/kasan.h:184 [inline]
+ slab_free_hook mm/slub.c:2195 [inline]
+ slab_free mm/slub.c:4436 [inline]
+ kfree+0x149/0x360 mm/slub.c:4557
+ sk_prot_free net/core/sock.c:2116 [inline]
+ __sk_destruct+0x476/0x5f0 net/core/sock.c:2208
+ l2cap_sock_release+0x15b/0x1d0 net/bluetooth/l2cap_sock.c:1417
+ __sock_release net/socket.c:659 [inline]
+ sock_close+0xbc/0x240 net/socket.c:1421
+ __fput+0x406/0x8b0 fs/file_table.c:422
+ __do_sys_close fs/open.c:1555 [inline]
+ __se_sys_close fs/open.c:1540 [inline]
+ __x64_sys_close+0x7f/0x110 fs/open.c:1540
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+The buggy address belongs to the object at ffff88806c4de000
+ which belongs to the cache kmalloc-2k of size 2048
+The buggy address is located 392 bytes inside of
+ freed 2048-byte region [ffff88806c4de000, ffff88806c4de800)
+
+The buggy address belongs to the physical page:
+page: refcount:1 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x6c4d8
+head: order:3 mapcount:0 entire_mapcount:0 nr_pages_mapped:0 pincount:0
+anon flags: 0xfff00000000040(head|node=0|zone=1|lastcpupid=0x7ff)
+page_type: 0xffffefff(slab)
+raw: 00fff00000000040 ffff888015042000 0000000000000000 dead000000000001
+raw: 0000000000000000 0000000000080008 00000001ffffefff 0000000000000000
+head: 00fff00000000040 ffff888015042000 0000000000000000 dead000000000001
+head: 0000000000000000 0000000000080008 00000001ffffefff 0000000000000000
+head: 00fff00000000003 ffffea0001b13601 ffffffffffffffff 0000000000000000
+head: 0000000000000008 0000000000000000 00000000ffffffff 0000000000000000
+page dumped because: kasan: bad access detected
+page_owner tracks the page as allocated
+page last allocated via order 3, migratetype Unmovable, gfp_mask 0x1d20c0(__GFP_IO|__GFP_FS|__GFP_NOWARN|__GFP_NORETRY|__GFP_COMP|__GFP_NOMEMALLOC|__GFP_HARDWALL), pid 26413, tgid 26413 (syz-executor.2), ts 1938838512727, free_ts 1929373430793
+ set_page_owner include/linux/page_owner.h:32 [inline]
+ post_alloc_hook+0x1f3/0x230 mm/page_alloc.c:1468
+ prep_new_page mm/page_alloc.c:1476 [inline]
+ get_page_from_freelist+0x2e2d/0x2ee0 mm/page_alloc.c:3402
+ __alloc_pages_noprof+0x256/0x6c0 mm/page_alloc.c:4660
+ __alloc_pages_node_noprof include/linux/gfp.h:269 [inline]
+ alloc_pages_node_noprof include/linux/gfp.h:296 [inline]
+ alloc_slab_page+0x5f/0x120 mm/slub.c:2264
+ allocate_slab+0x5a/0x2e0 mm/slub.c:2427
+ new_slab mm/slub.c:2480 [inline]
+ ___slab_alloc+0xcd1/0x14b0 mm/slub.c:3666
+ __slab_alloc+0x58/0xa0 mm/slub.c:3756
+ __slab_alloc_node mm/slub.c:3809 [inline]
+ slab_alloc_node mm/slub.c:3988 [inline]
+ __do_kmalloc_node mm/slub.c:4120 [inline]
+ kmalloc_node_track_caller_noprof+0x281/0x440 mm/slub.c:4141
+ kmemdup_noprof+0x2a/0x60 mm/util.c:131
+ ip_vs_control_net_init_sysctl net/netfilter/ipvs/ip_vs_ctl.c:4284 [inline]
+ ip_vs_control_net_init+0x7da/0x17f0 net/netfilter/ipvs/ip_vs_ctl.c:4463
+ __ip_vs_init+0x2d2/0x460 net/netfilter/ipvs/ip_vs_core.c:2308
+ ops_init+0x359/0x610 net/core/net_namespace.c:139
+ setup_net+0x515/0xca0 net/core/net_namespace.c:343
+ copy_net_ns+0x4e2/0x7b0 net/core/net_namespace.c:508
+ create_new_namespaces+0x425/0x7b0 kernel/nsproxy.c:110
+ unshare_nsproxy_namespaces+0x124/0x180 kernel/nsproxy.c:228
+page last free pid 26200 tgid 26200 stack trace:
+ reset_page_owner include/linux/page_owner.h:25 [inline]
+ free_pages_prepare mm/page_alloc.c:1088 [inline]
+ free_unref_page+0xd22/0xea0 mm/page_alloc.c:2565
+ vfree+0x186/0x2e0 mm/vmalloc.c:3346
+ kcov_put kernel/kcov.c:429 [inline]
+ kcov_close+0x2b/0x50 kernel/kcov.c:525
+ __fput+0x406/0x8b0 fs/file_table.c:422
+ task_work_run+0x24f/0x310 kernel/task_work.c:180
+ exit_task_work include/linux/task_work.h:38 [inline]
+ do_exit+0xa27/0x27e0 kernel/exit.c:874
+ do_group_exit+0x207/0x2c0 kernel/exit.c:1023
+ get_signal+0x16a1/0x1740 kernel/signal.c:2909
+ arch_do_signal_or_restart+0x96/0x860 arch/x86/kernel/signal.c:310
+ exit_to_user_mode_loop kernel/entry/common.c:111 [inline]
+ exit_to_user_mode_prepare include/linux/entry-common.h:328 [inline]
+ __syscall_exit_to_user_mode_work kernel/entry/common.c:207 [inline]
+ syscall_exit_to_user_mode+0xc9/0x370 kernel/entry/common.c:218
+ do_syscall_64+0x100/0x230 arch/x86/entry/common.c:89
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+Memory state around the buggy address:
+ ffff88806c4de080: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+ ffff88806c4de100: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+>ffff88806c4de180: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+                      ^
+ ffff88806c4de200: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+ ffff88806c4de280: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+==================================================================
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
