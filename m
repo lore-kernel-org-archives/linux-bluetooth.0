@@ -1,220 +1,116 @@
-Received: from out-25.smtp.github.com (out-25.smtp.github.com [192.30.252.208])
+Received: from mail2.andi.de1.cc (vmd64148.contaboserver.net [161.97.139.27])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01B185664
-	for <linux-bluetooth@vger.kernel.org>; Mon,  3 Jun 2024 14:13:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.208
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1E6984A35;
+	Mon,  3 Jun 2024 14:44:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=161.97.139.27
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717424015; cv=none; b=gYR1zU+KfXW1ecZlU/xWtfHH/T0f73bXhma6d3LbtRDyozpm9LklyzKXSacuMqZ59HGIG1NaSxFQ9tQ8a6+e/WhSr1cFCm7Kr8GfR1cuCs3yCZBpyO7TRFTYWuYlmQrHz+CqKa6Y6denLRb0LwWYgqFQVXarMiVwIwYsuDwRlY8=
+	t=1717425871; cv=none; b=EGplKHKqCvCi8UP/HvGedj/rHtcw/otAgDKurbV1IVjJ6eucZbsQcnMdSuPgR5Yc8CI/GlQBVwbTLgMNejfwaDWF0ETupTuYy0cdCKn7g5e0I3Hc7f4ZJRZ++U0Igxgkzcgx3Ho69ksJhm42IKGnVQE47aR4nXnui/DHrDMpsZg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717424015; c=relaxed/simple;
-	bh=wRrP0iQojsER8zHP7e6e0xh/HizkvBAsZoou/9Otn78=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=qMrsNTwZEZc1tg9G0a1W0A2Pnj4kQqEo/n0+Qwpfklnc8ZMy64skft5IsQXJiM9692sxlRm8khqComzLe4twF71zUyPdWVm+DiUyiICQSc3CKIXWwsSIMBFHkFDt+zk8x5bcJPvXwzMT4OE5KaZvK6vrQIjqT0JhuV43iJ3sGDM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=aAFKvtex; arc=none smtp.client-ip=192.30.252.208
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1717425871; c=relaxed/simple;
+	bh=LL9VTFcQkhlxWV1L/jgrJeTOtwYRWbP06bumMRDRhSI=;
+	h=From:To:Subject:Date:Message-Id:MIME-Version; b=hJ+heJ+m0cwkPpfc22loE0z4SSJ5iPYefRrSfLLKiLVCAZg3IQXRXOJ7hSJWmFOcISbxKHGgv8/eBS7I/nHgDYnnTdKqfXKlNJBz8AeGboh7oF17qOFoRd/PaBncdv1NF9uxxL61dIruUshgcx44yml+69LawLnO22i+1xUiPBA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kemnade.info; spf=pass smtp.mailfrom=kemnade.info; dkim=pass (2048-bit key) header.d=kemnade.info header.i=@kemnade.info header.b=pp7Ap/yp; arc=none smtp.client-ip=161.97.139.27
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kemnade.info
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kemnade.info
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="aAFKvtex"
-Received: from github.com (hubbernetes-node-5b47623.ash1-iad.github.net [10.56.161.38])
-	by smtp.github.com (Postfix) with ESMTPA id 2224B1411CC
-	for <linux-bluetooth@vger.kernel.org>; Mon,  3 Jun 2024 07:13:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1717424013;
-	bh=/vTpaGPyoUixtRPi7H6hYj1483cjTTE8MNTgNv00TKo=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=aAFKvtexbT8kyfTct0qwOwfOc0W5KdOV50fdkSgT7bDP4x6wk1vmGKPB8pq5EtKng
-	 6DvARN4fdD9sKl+vHyHSpxw/2ZtTl+IjgtbJCj57sIeXCOvfCkkKTH7xuNawDC/jfe
-	 J4TJvgBvm6iqWA/IF6ymFieQ23cantakDRGhK2YQ=
-Date: Mon, 03 Jun 2024 07:13:33 -0700
-From: iulia-tanasescu <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/master/758930-3f7477@github.com>
-Subject: [bluez/bluez] f5e598: doc: Add initial L2CAP(7) documentation
+	dkim=pass (2048-bit key) header.d=kemnade.info header.i=@kemnade.info header.b="pp7Ap/yp"
+Received: from mail.andi.de1.cc ([2a02:c205:3004:2154::1])
+	by mail2.andi.de1.cc with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <andreas@kemnade.info>)
+	id 1sE8v6-008hAf-2v;
+	Mon, 03 Jun 2024 16:44:22 +0200
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=kemnade.info; s=20220719; h=Content-Transfer-Encoding:MIME-Version:
+	Message-Id:Date:Subject:To:From:Sender:Reply-To:Cc:Content-Type:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:
+	List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=brF7VvD3tRd3wTM6Hl6zpzwjSLrm8R+002hZn2Vpoiw=; b=pp7Ap/yptWDGmByh3o0em4Bf5E
+	wO8c3Y/RAUi+KuVxRdTqJRWyATtsTGB3OP8db3xSbMqK7hR2yJGhXRHWcxbWF9F7pIYC/mNGvi+Ez
+	CSRINYpOz+DJd1FEJKx17YXgJyYJ59frgrZcFPmibd6u+6wWZa7FOVYpWkHNmWlnDJ/D/OdavGbWo
+	5sru4wx1+jlgeBGstFCzZ8RGjW93MTEQS9C0llNO+cQMd/PqwPsTevI0v5WqCWTesrkZrbNSaNv0C
+	ICX7BFTj6VY0+WxyxwyKB3c3FSPwH7K6ti2/NcmMMAWqTMTOYvdNMmRrvXYCsDL2EKLMP1TGFSCxx
+	3DYVgRlQ==;
+Received: from p200300c20737c2001a3da2fffebfd33a.dip0.t-ipconnect.de ([2003:c2:737:c200:1a3d:a2ff:febf:d33a] helo=aktux)
+	by mail.andi.de1.cc with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <andreas@kemnade.info>)
+	id 1sE8v2-002UeY-2a;
+	Mon, 03 Jun 2024 16:44:18 +0200
+Received: from andi by aktux with local (Exim 4.96)
+	(envelope-from <andreas@kemnade.info>)
+	id 1sE8v3-009DAi-1F;
+	Mon, 03 Jun 2024 16:44:17 +0200
+From: Andreas Kemnade <andreas@kemnade.info>
+To: marcel@holtmann.org,
+	luiz.dentz@gmail.com,
+	johan@kernel.org,
+	gregkh@linuxfoundation.org,
+	jirislaby@kernel.org,
+	andreas@kemnade.info,
+	pmenzel@molgen.mpg.de,
+	linux-kernel@vger.kernel.org,
+	linux-bluetooth@vger.kernel.org,
+	Adam Ford <aford173@gmail.com>,
+	Tony Lindgren <tony@atomide.com>,
+	tomi.valkeinen@ideasonboard.com,
+	=?UTF-8?q?P=C3=A9ter=20Ujfalusi?= <peter.ujfalusi@gmail.com>,
+	robh@kernel.org,
+	hns@goldelico.com
+Subject: [PATCH v3 0/4] bluetooth/gnss: GNSS support for TiWi chips
+Date: Mon,  3 Jun 2024 16:43:56 +0200
+Message-Id: <20240603144400.2195564-1-andreas@kemnade.info>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-  Branch: refs/heads/master
-  Home:   https://github.com/bluez/bluez
-  Commit: f5e59893e634b32e899db1bc8c3d16dfb82efcf4
-      https://github.com/bluez/bluez/commit/f5e59893e634b32e899db1bc8c3d16dfb82efcf4
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2024-05-23 (Thu, 23 May 2024)
+Some of these chips have GNSS support. In some vendor kernels
+a driver on top of misc/ti-st can be found providing a /dev/tigps
+device which speaks the secretive Air Independent Interface (AI2) protocol.
 
-  Changed paths:
-    M Makefile.am
-    A doc/l2cap.rst
+To be more compatible with userspace send out NMEA by default but
+allow a more raw mode by using a module parameter.
 
-  Log Message:
-  -----------
-  doc: Add initial L2CAP(7) documentation
+This was tested on the Epson Moverio BT-200.
 
-This adds initial documentation for L2CAP sockets.
+Changes since V2:
+- Optimize waits
+- Fix some packet analysis / checksum computation issue
+- Adding a proposal for removing those waits as RFC
+- Minor spell corrections and improved descriptions
 
+Changes since V1:
+- Set up things for NMEA output
+- Powerup/down at open()/close()
+- split out logic between drivers/bluetooth and drivers/gnss
+- leave out drivers/misc/ti-st driver removal to avoid
+  filling up mailboxes during the iterations, this series is
+  still a proof that it is not needed, will take the brush after
+  this series is accepted.
 
-  Commit: 098ff00dea086764b309d8e43bab83b70eff8941
-      https://github.com/bluez/bluez/commit/098ff00dea086764b309d8e43bab83b70eff8941
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2024-05-23 (Thu, 23 May 2024)
+Andreas Kemnade (4):
+  gnss: Add AI2 protocol used by some TI combo chips.
+  Bluetooth: ti-st: Add GNSS subdevice for TI Wilink chips
+  gnss: Add driver for AI2 protocol
+  gnss: ai2: replace long sleeps by wait for acks
 
-  Changed paths:
-    M Makefile.am
-    A doc/rfcomm.rst
+ drivers/bluetooth/hci_ll.c   |  81 +++++
+ drivers/gnss/Kconfig         |  13 +
+ drivers/gnss/Makefile        |   3 +
+ drivers/gnss/ai2.c           | 560 +++++++++++++++++++++++++++++++++++
+ drivers/gnss/core.c          |   1 +
+ include/linux/gnss.h         |   1 +
+ include/linux/ti_wilink_st.h |   8 +
+ 7 files changed, 667 insertions(+)
+ create mode 100644 drivers/gnss/ai2.c
 
-  Log Message:
-  -----------
-  doc: Add initial RFCOMM(7) documentation
+-- 
+2.39.2
 
-This adds initial documentation for RFCOMM sockets.
-
-
-  Commit: 491e5b35370099bf61ef89ca9dcdcf6b6b4c4f89
-      https://github.com/bluez/bluez/commit/491e5b35370099bf61ef89ca9dcdcf6b6b4c4f89
-  Author: Iulia Tanasescu <iulia.tanasescu@nxp.com>
-  Date:   2024-06-03 (Mon, 03 Jun 2024)
-
-  Changed paths:
-    M src/shared/bap.c
-
-  Log Message:
-  -----------
-  shared/bap: Remove DISABLING case from bcast state cb
-
-This removes the switch case for the DISABLING state from
-bap_bcast_set_state, since this state is not used for broadcast.
-
-
-  Commit: af2873b2691291e165b3ee3f24b651433885537f
-      https://github.com/bluez/bluez/commit/af2873b2691291e165b3ee3f24b651433885537f
-  Author: Iulia Tanasescu <iulia.tanasescu@nxp.com>
-  Date:   2024-06-03 (Mon, 03 Jun 2024)
-
-  Changed paths:
-    M src/shared/bap.c
-
-  Log Message:
-  -----------
-  shared/bap: Fix potential stream access after free
-
-In bap_bcast_set_state, state->func might trigger the stream to be
-released, thus the stream would have been freed before reaching the
-switch. After calling stream->func, the stream reference should not
-be accessed anymore, apart from when the stream has not yet been
-released and those cases will be handled inside the switch.
-
-This commit also handles the case when stream ops might lead to a
-state machine that ends with stream release, so the stream should
-avoid being accessed after the ops are executed.
-
-
-  Commit: 6cb268f47f477a07185a6b982e96787f82de98bf
-      https://github.com/bluez/bluez/commit/6cb268f47f477a07185a6b982e96787f82de98bf
-  Author: Iulia Tanasescu <iulia.tanasescu@nxp.com>
-  Date:   2024-06-03 (Mon, 03 Jun 2024)
-
-  Changed paths:
-    M unit/test-bap.c
-
-  Log Message:
-  -----------
-  test-bap: Update bsrc_state to just handle CONFIG state
-
-This updates bsrc_state to just handle the CONFIG stream state. Dedicated
-state changed callbacks will be implemented for tests that require streams
-to be established, disabled etc.
-
-
-  Commit: bb30b19901547b012896b239dfa10a2a9e95c665
-      https://github.com/bluez/bluez/commit/bb30b19901547b012896b239dfa10a2a9e95c665
-  Author: Iulia Tanasescu <iulia.tanasescu@nxp.com>
-  Date:   2024-06-03 (Mon, 03 Jun 2024)
-
-  Changed paths:
-    M unit/test-bap.c
-
-  Log Message:
-  -----------
-  test-bap: Add Broadcast Source Establish test
-
-BAP/BSRC/SCC/BV-35-C [Establishes Broadcast] (page 175):
-
-    Test Purpose:
-    Verify that a Broadcast Source IUT can establish a broadcast
-    Audio Stream.
-
-    Pass verdict:
-    The IUT sends AUX_SYNC_IND PDUs with an Extended Header
-    containing BIGInfo in the ACAD field.
-
-    The IUT sends BIS Data PDUs over the broadcast Audio
-    Stream.
-
-Test Summary
-------------
-BAP/BSRC/SCC/BV-35-C [Establishes Broadcast]         Passed
-
-
-  Commit: 06a905d6b8c89ad518badd90b07fea122ecdee8d
-      https://github.com/bluez/bluez/commit/06a905d6b8c89ad518badd90b07fea122ecdee8d
-  Author: Iulia Tanasescu <iulia.tanasescu@nxp.com>
-  Date:   2024-06-03 (Mon, 03 Jun 2024)
-
-  Changed paths:
-    M unit/test-bap.c
-
-  Log Message:
-  -----------
-  test-bap: Add Broadcast Source Disable test
-
-BAP/BSRC/SCC/BV-36-C [Disables Broadcast] (page 176):
-
-    Test Purpose:
-    Verify that a Broadcast Source IUT can disable a broadcast
-    Audio Stream.
-
-    Pass verdict:
-    The IUT sends a BIG_TERMINATE_IND PDU.
-
-Test Summary
-------------
-BAP/BSRC/SCC/BV-36-C [Disables Broadcast]            Passed
-
-
-  Commit: 3f747788c1b19dd328299b87b616c220311ab65c
-      https://github.com/bluez/bluez/commit/3f747788c1b19dd328299b87b616c220311ab65c
-  Author: Iulia Tanasescu <iulia.tanasescu@nxp.com>
-  Date:   2024-06-03 (Mon, 03 Jun 2024)
-
-  Changed paths:
-    M unit/test-bap.c
-
-  Log Message:
-  -----------
-  test-bap: Add Broadcast Source Release test
-
-BAP/BSRC/SCC/BV-37-C [Releases Broadcast] (page 176):
-
-    Test Purpose:
-    Verify that a Broadcast Source IUT can release a broadcast
-    Audio Stream and transition from Configured state to Idle
-    state.
-
-    Pass verdict:
-    The IUT stops transmitting periodic advertising.
-
-Test Summary
-------------
-BAP/BSRC/SCC/BV-37-C [Releases Broadcast]            Passed
-
-
-Compare: https://github.com/bluez/bluez/compare/75893035705d...3f747788c1b1
-
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
