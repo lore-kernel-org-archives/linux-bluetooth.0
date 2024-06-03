@@ -1,48 +1,49 @@
 Received: from mail2.andi.de1.cc (vmd64148.contaboserver.net [161.97.139.27])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1E6984A35;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1E1E82D8E;
 	Mon,  3 Jun 2024 14:44:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=161.97.139.27
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717425871; cv=none; b=EGplKHKqCvCi8UP/HvGedj/rHtcw/otAgDKurbV1IVjJ6eucZbsQcnMdSuPgR5Yc8CI/GlQBVwbTLgMNejfwaDWF0ETupTuYy0cdCKn7g5e0I3Hc7f4ZJRZ++U0Igxgkzcgx3Ho69ksJhm42IKGnVQE47aR4nXnui/DHrDMpsZg=
+	t=1717425871; cv=none; b=TLACjSJdC2q5O5mCOKEKjX2cVbhx78rsLvalJZcDILo30G2AYk6d898ZVaB+OY9ivyxxjMr63uTUEBDOl/5c/DRxQ0cpPenhCZ8/LJTvHaYfqVSMpc7m9whT5UDWmJp+YtVoYthpGTuqFyqyMeckdHGT7maTez1eKKsKgE+jBtU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1717425871; c=relaxed/simple;
-	bh=LL9VTFcQkhlxWV1L/jgrJeTOtwYRWbP06bumMRDRhSI=;
-	h=From:To:Subject:Date:Message-Id:MIME-Version; b=hJ+heJ+m0cwkPpfc22loE0z4SSJ5iPYefRrSfLLKiLVCAZg3IQXRXOJ7hSJWmFOcISbxKHGgv8/eBS7I/nHgDYnnTdKqfXKlNJBz8AeGboh7oF17qOFoRd/PaBncdv1NF9uxxL61dIruUshgcx44yml+69LawLnO22i+1xUiPBA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kemnade.info; spf=pass smtp.mailfrom=kemnade.info; dkim=pass (2048-bit key) header.d=kemnade.info header.i=@kemnade.info header.b=pp7Ap/yp; arc=none smtp.client-ip=161.97.139.27
+	bh=6kMGZvbbwAVpUY7o/3Mo1hVEWC+DsN8qKwLMZzsvR7s=;
+	h=From:To:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=jjQd+8QPHnf5VxHUcJY3skyebWrS0Y+HHOPy6x63K88L+cs3cjnmDk0DTHjf+ofX5xPscFEnmQEvVlUREmI6NQxbmSWWRgh9lUpy2ABk6gt9giM5gEsAmtQZrP/9ku6s6JzU4E0TT6B6SQ5z8fu9MKNMNm73OaI1HZ6nGVNJ01M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kemnade.info; spf=pass smtp.mailfrom=kemnade.info; dkim=pass (2048-bit key) header.d=kemnade.info header.i=@kemnade.info header.b=mQigtz+E; arc=none smtp.client-ip=161.97.139.27
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kemnade.info
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kemnade.info
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kemnade.info header.i=@kemnade.info header.b="pp7Ap/yp"
+	dkim=pass (2048-bit key) header.d=kemnade.info header.i=@kemnade.info header.b="mQigtz+E"
 Received: from mail.andi.de1.cc ([2a02:c205:3004:2154::1])
 	by mail2.andi.de1.cc with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.96)
 	(envelope-from <andreas@kemnade.info>)
-	id 1sE8v6-008hAf-2v;
+	id 1sE8v6-008hAe-2w;
 	Mon, 03 Jun 2024 16:44:22 +0200
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=kemnade.info; s=20220719; h=Content-Transfer-Encoding:MIME-Version:
-	Message-Id:Date:Subject:To:From:Sender:Reply-To:Cc:Content-Type:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:
-	List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=brF7VvD3tRd3wTM6Hl6zpzwjSLrm8R+002hZn2Vpoiw=; b=pp7Ap/yptWDGmByh3o0em4Bf5E
-	wO8c3Y/RAUi+KuVxRdTqJRWyATtsTGB3OP8db3xSbMqK7hR2yJGhXRHWcxbWF9F7pIYC/mNGvi+Ez
-	CSRINYpOz+DJd1FEJKx17YXgJyYJ59frgrZcFPmibd6u+6wWZa7FOVYpWkHNmWlnDJ/D/OdavGbWo
-	5sru4wx1+jlgeBGstFCzZ8RGjW93MTEQS9C0llNO+cQMd/PqwPsTevI0v5WqCWTesrkZrbNSaNv0C
-	ICX7BFTj6VY0+WxyxwyKB3c3FSPwH7K6ti2/NcmMMAWqTMTOYvdNMmRrvXYCsDL2EKLMP1TGFSCxx
-	3DYVgRlQ==;
+	References:In-Reply-To:Message-Id:Date:Subject:To:From:Sender:Reply-To:Cc:
+	Content-Type:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=bMF1CyWf3RbQIO/q5KxisncBbMfKZqOgAKsNghJdEpk=; b=mQigtz+Ea4BY1ZoY399w8Dqs9i
+	BwDrTkYfBhqIIt2dN8f3yD7SSH27sC+lzGBOR9WzQG4W0Odq5eNjJr+G4WFhAmC6dJpQqIqwyccdc
+	h9G54vhXpqtlmJdL8xsLKe8DD/3aUegBBcYpZPnlHG+7imipme3/lO7ZxxYJvUKOKZAF3NdBFStv4
+	nTRk6GFNv+yzj7bHipc05RXZ873IwH/p2xAMeBytJzDE1e9Ex2D7IF12Veg8pdk8VWcG6UYQeTtpL
+	S9x+mDzlWXVtRTH75KMDKnlviNRHiUkwi3PZlKmQGjlzJQ+pU42BlZFHdt9EqTREdT5UewhauS3Rg
+	DrIRAW7g==;
 Received: from p200300c20737c2001a3da2fffebfd33a.dip0.t-ipconnect.de ([2003:c2:737:c200:1a3d:a2ff:febf:d33a] helo=aktux)
 	by mail.andi.de1.cc with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.96)
 	(envelope-from <andreas@kemnade.info>)
-	id 1sE8v2-002UeY-2a;
+	id 1sE8v3-002Uea-1s;
 	Mon, 03 Jun 2024 16:44:18 +0200
 Received: from andi by aktux with local (Exim 4.96)
 	(envelope-from <andreas@kemnade.info>)
-	id 1sE8v3-009DAi-1F;
-	Mon, 03 Jun 2024 16:44:17 +0200
+	id 1sE8v4-009DAn-1x;
+	Mon, 03 Jun 2024 16:44:18 +0200
 From: Andreas Kemnade <andreas@kemnade.info>
 To: marcel@holtmann.org,
 	luiz.dentz@gmail.com,
@@ -59,10 +60,12 @@ To: marcel@holtmann.org,
 	=?UTF-8?q?P=C3=A9ter=20Ujfalusi?= <peter.ujfalusi@gmail.com>,
 	robh@kernel.org,
 	hns@goldelico.com
-Subject: [PATCH v3 0/4] bluetooth/gnss: GNSS support for TiWi chips
-Date: Mon,  3 Jun 2024 16:43:56 +0200
-Message-Id: <20240603144400.2195564-1-andreas@kemnade.info>
+Subject: [PATCH v3 1/4] gnss: Add AI2 protocol used by some TI combo chips.
+Date: Mon,  3 Jun 2024 16:43:57 +0200
+Message-Id: <20240603144400.2195564-2-andreas@kemnade.info>
 X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20240603144400.2195564-1-andreas@kemnade.info>
+References: <20240603144400.2195564-1-andreas@kemnade.info>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -71,46 +74,43 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Some of these chips have GNSS support. In some vendor kernels
-a driver on top of misc/ti-st can be found providing a /dev/tigps
-device which speaks the secretive Air Independent Interface (AI2) protocol.
+Texas Instruments uses something called Air Independent Interface (AI2) for
+their WLAN/BT/GPS combo chips.
 
-To be more compatible with userspace send out NMEA by default but
-allow a more raw mode by using a module parameter.
+No public documentation is available, but allow that protocol to be
+specified.
 
-This was tested on the Epson Moverio BT-200.
+Signed-off-by: Andreas Kemnade <andreas@kemnade.info>
+Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
+---
+ drivers/gnss/core.c  | 1 +
+ include/linux/gnss.h | 1 +
+ 2 files changed, 2 insertions(+)
 
-Changes since V2:
-- Optimize waits
-- Fix some packet analysis / checksum computation issue
-- Adding a proposal for removing those waits as RFC
-- Minor spell corrections and improved descriptions
-
-Changes since V1:
-- Set up things for NMEA output
-- Powerup/down at open()/close()
-- split out logic between drivers/bluetooth and drivers/gnss
-- leave out drivers/misc/ti-st driver removal to avoid
-  filling up mailboxes during the iterations, this series is
-  still a proof that it is not needed, will take the brush after
-  this series is accepted.
-
-Andreas Kemnade (4):
-  gnss: Add AI2 protocol used by some TI combo chips.
-  Bluetooth: ti-st: Add GNSS subdevice for TI Wilink chips
-  gnss: Add driver for AI2 protocol
-  gnss: ai2: replace long sleeps by wait for acks
-
- drivers/bluetooth/hci_ll.c   |  81 +++++
- drivers/gnss/Kconfig         |  13 +
- drivers/gnss/Makefile        |   3 +
- drivers/gnss/ai2.c           | 560 +++++++++++++++++++++++++++++++++++
- drivers/gnss/core.c          |   1 +
- include/linux/gnss.h         |   1 +
- include/linux/ti_wilink_st.h |   8 +
- 7 files changed, 667 insertions(+)
- create mode 100644 drivers/gnss/ai2.c
-
+diff --git a/drivers/gnss/core.c b/drivers/gnss/core.c
+index 48f2ee0f78c4d..cac9f45aec4b2 100644
+--- a/drivers/gnss/core.c
++++ b/drivers/gnss/core.c
+@@ -335,6 +335,7 @@ static const char * const gnss_type_names[GNSS_TYPE_COUNT] = {
+ 	[GNSS_TYPE_SIRF]	= "SiRF",
+ 	[GNSS_TYPE_UBX]		= "UBX",
+ 	[GNSS_TYPE_MTK]		= "MTK",
++	[GNSS_TYPE_AI2]		= "AI2",
+ };
+ 
+ static const char *gnss_type_name(const struct gnss_device *gdev)
+diff --git a/include/linux/gnss.h b/include/linux/gnss.h
+index 36968a0f33e8d..16b565dab83ea 100644
+--- a/include/linux/gnss.h
++++ b/include/linux/gnss.h
+@@ -23,6 +23,7 @@ enum gnss_type {
+ 	GNSS_TYPE_SIRF,
+ 	GNSS_TYPE_UBX,
+ 	GNSS_TYPE_MTK,
++	GNSS_TYPE_AI2,
+ 
+ 	GNSS_TYPE_COUNT
+ };
 -- 
 2.39.2
 
