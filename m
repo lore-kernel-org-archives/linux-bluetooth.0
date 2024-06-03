@@ -1,173 +1,141 @@
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f177.google.com (mail-qt1-f177.google.com [209.85.160.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17C3D3AC0C;
-	Mon,  3 Jun 2024 07:09:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF9E9374FF
+	for <linux-bluetooth@vger.kernel.org>; Mon,  3 Jun 2024 07:32:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717398559; cv=none; b=dOmfvvEaZZ6aFZdyOgC/Zdcm2SkL4i6g+Ny7GxTZ10RfTofje3Rwsc7EkU0CUDa6nlRTJQwvzUl29CdCm08Qf+57ANKpeTX4g8DitE7+GBVE98bdFHfTmNi/Jb75oCS+7K5ZiJ6Nf9IUNHphBqyn6FyngRA8lbhepbMi241r8T4=
+	t=1717399973; cv=none; b=VtSDKZOCErQecAYu/UQ0Brmwfhi9PVVdvtfP1tEepcEs8+EUr7TLy48EL3QceeSJjrqg1Pn+Shv72oU8b02KwikOSrg9i9B5Sla8WQssLdHImlyIkchxI7hyfS+G0itfZt0PBRCkTFtmo2HHcIUUYmVcixnGy9HFxkuhf73zRr8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717398559; c=relaxed/simple;
-	bh=TSAOtr8sheTBhZFjKCBZYmQPbrwbVxDGpOMc1B0GEyc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=WpblOdP1jyfSMoXJe4G/9T8S6NQKL3Yt7ZeoO8D5yStYT6537i8WTUWYcm8cCvE7kdJ9zWJqfsqbUcJ2EB3h3Z0zi71tjgmpXvYyV1KtMijH1O7mqyGUEP92zXBA/jchRAisx/NPwBwcEeU8anf72p9g1M8K8vyuV65RuBTB/oY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from [192.168.0.224] (ip5f5aee76.dynamic.kabel-deutschland.de [95.90.238.118])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 11CD661E5FE01;
-	Mon,  3 Jun 2024 09:08:59 +0200 (CEST)
-Message-ID: <1793d793-2282-43a4-a65d-abfcb590f5cc@molgen.mpg.de>
-Date: Mon, 3 Jun 2024 09:08:58 +0200
+	s=arc-20240116; t=1717399973; c=relaxed/simple;
+	bh=ydWAB4HxT3RaZFKjAXFxynNACGaEmuRYSuP1KUA3fbM=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=c9fIbxHbxgteEOjuzaKNcdujpddC+j0y5gfOIDf6Ehf+xsUrxqWgIhiVE6zx7YI7RHe27D1MWK/gIJIQbTNZZyq0LmwXqsNJNpA+NWVfnxDosohwEAbgl/jT3kH9WOw51lwCZZNEjtp00bgZz/ESXqNptYw67duI/Cwg7KOuUq8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=M8BXcc5i; arc=none smtp.client-ip=209.85.160.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="M8BXcc5i"
+Received: by mail-qt1-f177.google.com with SMTP id d75a77b69052e-43fb058873bso16227421cf.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 03 Jun 2024 00:32:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1717399970; x=1718004770; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=MZagUn0Xabn4MNZmUozjFcezu6tX3HWjYVjyzT3EEpY=;
+        b=M8BXcc5iDmCANyUOpbRe3KDcqVri54cB58NE9DbpRuv+hGICqEyFqLXn/l4bOtAFb3
+         8d0HapW511pDZ7j3qtmg43QOMtuPKbN8fxqPhVF76g+HoSsLDEXtEN9u0Y8yvP+0VKho
+         UC7Z1MF/Auk5Dj7frFPJFVYNFYN4XJODa0hArWKzvC85m8TeZWRjbRzaKxN8of2yWXHi
+         RyGqhfbL8NHDbiPKQyO427RCJ+Oul8EPpTGPzrp8OmI1lw6MBF0c972mMKtMJ5KVNgMd
+         TCudTj/qraBayiywbeI2JSC+0EaeXAPIGhmNRk/AWLYvVFBfQmN6i0A9WEDihDjzbj1R
+         lhqQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1717399970; x=1718004770;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=MZagUn0Xabn4MNZmUozjFcezu6tX3HWjYVjyzT3EEpY=;
+        b=INHoU4rogj9zYv9DQrzkA5XZISOiMYy2r43yIHHlvQ1m1F6+ntpAMx4EwZTz6DCL86
+         BF1tzmctHWeoCTB3bKFMTQnH+586kn/5FonGmZIhHulNHhasxtUVVE1FAPOy/u1WMJLF
+         B9pkQN475ORncKbIbsRe4ZkEH9RupPcoiXUP5EVwVIj+bq9bDZnS9iNOy4oCHqBzsNrg
+         RQ29DxYmMavdygaknJ4mPmyt14bJWHcBuPb0mEo6kTbIAwBKGMRmJtvdFGLn81uy25Ja
+         iP5twFkW2ZoJAHEAosvzxACr7arwnke5l6EXaM2BanN/1cLigG80qFsprFmz6VzYQ//1
+         zrVg==
+X-Gm-Message-State: AOJu0YzFszPDKGArOt4f6Fm07+qIsdlvP5ERweQ9Aj8oLMdYk+E7Eg4Q
+	mOB61gV8EnJQrve9OF4/WKTg09zbV+caE3W0MoKL7ArL/RcYiHlOQSC0yA==
+X-Google-Smtp-Source: AGHT+IHmAZiUCYFTbDOD/CDGVcTfXFX0XRgin8IH0oGlcDznHMV+5K6AGCo9S3l38qiqUIRyUd/5aw==
+X-Received: by 2002:ac8:5f46:0:b0:43a:74d8:8971 with SMTP id d75a77b69052e-43ff52487dfmr96799791cf.23.1717399970574;
+        Mon, 03 Jun 2024 00:32:50 -0700 (PDT)
+Received: from [172.17.0.2] ([40.76.119.129])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-43ff258039fsm36947341cf.79.2024.06.03.00.32.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 03 Jun 2024 00:32:50 -0700 (PDT)
+Message-ID: <665d71a2.050a0220.44da0.f22a@mx.google.com>
+Date: Mon, 03 Jun 2024 00:32:50 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============9186306105606444101=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1 1/1] Bluetooth: btnxpuart: Add handling for
- boot-signature timeout errors
-To: Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>
-Cc: marcel@holtmann.org, luiz.dentz@gmail.com,
- linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
- amitkumar.karwar@nxp.com, rohit.fule@nxp.com, sherry.sun@nxp.com,
- ziniu.wang_1@nxp.com, haibo.chen@nxp.com, LnxRevLi@nxp.com
-References: <20240603063753.134272-1-neeraj.sanjaykale@nxp.com>
-Content-Language: en-US
-From: Paul Menzel <pmenzel@molgen.mpg.de>
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, neeraj.sanjaykale@nxp.com
+Subject: RE: [v1,1/1] Bluetooth: btnxpuart: Add handling for boot-signature timeout errors
 In-Reply-To: <20240603063753.134272-1-neeraj.sanjaykale@nxp.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+References: <20240603063753.134272-1-neeraj.sanjaykale@nxp.com>
+Reply-To: linux-bluetooth@vger.kernel.org
+
+--===============9186306105606444101==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
 
-Dear Neeraj,
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=858161
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      3.18 seconds
+GitLint                       PASS      1.59 seconds
+SubjectPrefix                 PASS      0.16 seconds
+BuildKernel                   PASS      29.90 seconds
+CheckAllWarning               PASS      32.62 seconds
+CheckSparse                   PASS      38.59 seconds
+CheckSmatch                   FAIL      34.86 seconds
+BuildKernel32                 PASS      28.91 seconds
+TestRunnerSetup               PASS      524.43 seconds
+TestRunner_l2cap-tester       PASS      20.40 seconds
+TestRunner_iso-tester         PASS      28.57 seconds
+TestRunner_bnep-tester        PASS      4.83 seconds
+TestRunner_mgmt-tester        PASS      116.55 seconds
+TestRunner_rfcomm-tester      PASS      8.72 seconds
+TestRunner_sco-tester         PASS      15.00 seconds
+TestRunner_ioctl-tester       PASS      7.90 seconds
+TestRunner_mesh-tester        FAIL      6.14 seconds
+TestRunner_smp-tester         PASS      6.89 seconds
+TestRunner_userchan-tester    PASS      5.09 seconds
+IncrementalBuild              PASS      28.05 seconds
+
+Details
+##############################
+Test: CheckSmatch - FAIL
+Desc: Run smatch tool with source
+Output:
+
+Segmentation fault (core dumped)
+make[4]: *** [scripts/Makefile.build:244: net/bluetooth/hci_core.o] Error 139
+make[4]: *** Deleting file 'net/bluetooth/hci_core.o'
+make[3]: *** [scripts/Makefile.build:485: net/bluetooth] Error 2
+make[2]: *** [scripts/Makefile.build:485: net] Error 2
+make[2]: *** Waiting for unfinished jobs....
+Segmentation fault (core dumped)
+make[4]: *** [scripts/Makefile.build:244: drivers/bluetooth/bcm203x.o] Error 139
+make[4]: *** Deleting file 'drivers/bluetooth/bcm203x.o'
+make[4]: *** Waiting for unfinished jobs....
+make[3]: *** [scripts/Makefile.build:485: drivers/bluetooth] Error 2
+make[2]: *** [scripts/Makefile.build:485: drivers] Error 2
+make[1]: *** [/github/workspace/src/src/Makefile:1919: .] Error 2
+make: *** [Makefile:240: __sub-make] Error 2
+##############################
+Test: TestRunner_mesh-tester - FAIL
+Desc: Run mesh-tester with test-runner
+Output:
+Total: 10, Passed: 9 (90.0%), Failed: 1, Not Run: 0
+
+Failed Test Cases
+Mesh - Send cancel - 2                               Failed       0.094 seconds
 
 
-Am 03.06.24 um 08:37 schrieb Neeraj Sanjay Kale:
-> This handles the timeout errors seen in the bootloader signatures during
-> FW download.
-
-Please add the error to the commit message.
-
-> When the bootloader does not receive a response packet from the host
-> within a specific time, it adds an error code to the bootloader
-> signature while requesting for the FW chunk from the same offset.
-> 
-> The host is expected to clear this error code with a NAK, and reply to
-> only those bootloader signatures which have error code 0.
-> 
-> This error handling is valid for data_req bootloader signatures for V3
-> and future bootloader versions.
-> 
-> Signed-off-by: Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>
-
-Add a Fixes: tag?
-
-> ---
->   drivers/bluetooth/btnxpuart.c | 46 ++++++++++++++++++++++++++++++++---
->   1 file changed, 42 insertions(+), 4 deletions(-)
-> 
-> diff --git a/drivers/bluetooth/btnxpuart.c b/drivers/bluetooth/btnxpuart.c
-> index 0b93c2ff29e4..2018513fb961 100644
-> --- a/drivers/bluetooth/btnxpuart.c
-> +++ b/drivers/bluetooth/btnxpuart.c
-> @@ -187,6 +187,10 @@ struct btnxpuart_dev {
->   #define NXP_NAK_V3		0x7b
->   #define NXP_CRC_ERROR_V3	0x7c
->   
-> +#define NXP_ACK_RX_TIMEOUT	0x0002
-> +#define NXP_HDR_RX_TIMEOUT	0x0003
-> +#define NXP_DATA_RX_TIMEOUT	0x0004
-> +
-
-Please mention the datasheet name, revision and section in the commit 
-message for review.
-
->   #define HDR_LEN			16
->   
->   #define NXP_RECV_CHIP_VER_V1 \
-> @@ -277,6 +281,12 @@ struct nxp_bootloader_cmd {
->   	__be32 crc;
->   } __packed;
->   
-> +struct nxp_v3_rx_timeout_nak {
-> +	u8 nak;
-> +	__le32 offset;
-> +	u8 crc;
-> +} __packed;
-> +
->   static u8 crc8_table[CRC8_TABLE_SIZE];
->   
->   /* Default configurations */
-> @@ -899,6 +909,32 @@ static int nxp_recv_chip_ver_v3(struct hci_dev *hdev, struct sk_buff *skb)
->   	return 0;
->   }
->   
-> +static void nxp_handle_fw_dnld_error(struct hci_dev *hdev, struct v3_data_req *req)
-
-I would not use abbreviations, and use download.
-
-> +{
-> +	struct btnxpuart_dev *nxpdev = hci_get_drvdata(hdev);
-> +	__u32 offset = __le32_to_cpu(req->offset);
-> +	__u16 err = __le16_to_cpu(req->error);
-> +	struct nxp_v3_rx_timeout_nak nak_tx_buf;
-> +
-> +	switch (err) {
-> +	case NXP_ACK_RX_TIMEOUT:
-> +	case NXP_HDR_RX_TIMEOUT:
-> +	case NXP_DATA_RX_TIMEOUT:
-> +		nak_tx_buf.nak = NXP_NAK_V3;
-> +		nak_tx_buf.offset = __cpu_to_le32(offset);
-> +		nak_tx_buf.crc = crc8(crc8_table, (u8 *)&nak_tx_buf,
-
-Can the cast be avoided and written differently?
-
-> +				      sizeof(nak_tx_buf) - 1, 0xff);
-> +		serdev_device_write_buf(nxpdev->serdev, (u8 *)&nak_tx_buf,
-> +					sizeof(nak_tx_buf));
-> +		break;
-> +	default:
-> +		bt_dev_dbg(hdev, "Unknown bootloader error: %d", err);
-> +		break;
-> +
-> +	}
-> +
-> +}
-> +
->   static int nxp_recv_fw_req_v3(struct hci_dev *hdev, struct sk_buff *skb)
->   {
->   	struct btnxpuart_dev *nxpdev = hci_get_drvdata(hdev);
-> @@ -913,7 +949,12 @@ static int nxp_recv_fw_req_v3(struct hci_dev *hdev, struct sk_buff *skb)
->   	if (!req || !nxpdev->fw)
->   		goto free_skb;
->   
-> -	nxp_send_ack(NXP_ACK_V3, hdev);
-> +	if (!req->error) {
-> +		nxp_send_ack(NXP_ACK_V3, hdev);
-> +	} else {
-> +		nxp_handle_fw_dnld_error(hdev, req);
-> +		goto free_skb;
-> +	}
->   
->   	len = __le16_to_cpu(req->len);
->   
-> @@ -940,9 +981,6 @@ static int nxp_recv_fw_req_v3(struct hci_dev *hdev, struct sk_buff *skb)
->   		wake_up_interruptible(&nxpdev->fw_dnld_done_wait_q);
->   		goto free_skb;
->   	}
-> -	if (req->error)
-> -		bt_dev_dbg(hdev, "FW Download received err 0x%02x from chip",
-> -			   req->error);
->   
->   	offset = __le32_to_cpu(req->offset);
->   	if (offset < nxpdev->fw_v3_offset_correction) {
+---
+Regards,
+Linux Bluetooth
 
 
-Kind regards,
-
-Paul
+--===============9186306105606444101==--
