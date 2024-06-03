@@ -1,126 +1,90 @@
-Received: from mail-lj1-f179.google.com (mail-lj1-f179.google.com [209.85.208.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 769E52CCB4
-	for <linux-bluetooth@vger.kernel.org>; Mon,  3 Jun 2024 19:19:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FB96405D8
+	for <linux-bluetooth@vger.kernel.org>; Mon,  3 Jun 2024 19:20:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717442382; cv=none; b=bSNa38tKlMitZ92+CPxc9R0vCDmKwnqHpq31tayZokPiV9g8vc7K0TL/dBj7Q0q/pN4BRh3BVYKx0+Ll9+nZoG0hLq4qICXGy9ax7v7EuvocG1lB/4VS2du8hK6RZPTsI6RqCmoExOw/zvkpHhOkWrGesd2/oHPGv4IWydIXp7s=
+	t=1717442431; cv=none; b=dq8h1wdov4AgK85dZ99V9IBemGHG9Z1ZYl+6zegK+Vet8q7l+wywJt07eFevEa9+k6U2qOX03jdARoDrZLnIMCPdz2qAKEGuEh7lpiRoPrdK0uOntYq2QRhJph3+tmDW6SDAAsyMghJLvxNRsClIsUAe2Yvi4VE7dVngNESaXis=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717442382; c=relaxed/simple;
-	bh=tCzwGjg5K40/T1yQbNKc1g/2WDKmf2YaYvIFivGr1YA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=TG2+mPeNxmO9iN+aV74o60g/unjLZ5x6IqQF2w5wq7bfioRUd738rNjumBKDSN+emGYWqBcyn9d6hAD6h2tQQqghF2q5dYZbTY7I8ogkKpGII6tJgI8edDi4tffnZLaUNPjJsFCL0zvTYQ/jAUfvEFa1mfsP+kijmlwn4VHy4oY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AEYEzWW4; arc=none smtp.client-ip=209.85.208.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1717442431; c=relaxed/simple;
+	bh=nog+91wN50PlxmPtW65u+0eM/JzsVdW2ITXsFC+4rGA=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=TaD7b43dLvMVEwcFHBZuD/BnkxVgcoXaKmUsM4ugCYrC0gBeBY8IH7I+hr7yuxpYx6bkmree1OQJYnDt/A0yPrZSScrTteWvnxt2NYoKzhDaDKbTuUxL35WHBPJx9ukziLJ5oRBPqlVuv1VJrTcXi8e9SvEWLJg/77aeIPgLjgY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sie4ng3B; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AEYEzWW4"
-Received: by mail-lj1-f179.google.com with SMTP id 38308e7fff4ca-2e724bc466fso55558191fa.3
-        for <linux-bluetooth@vger.kernel.org>; Mon, 03 Jun 2024 12:19:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1717442379; x=1718047179; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=USNvqm5WvNRGKKhJJ1e1P4+1h5ipgXUhPahXgxecy14=;
-        b=AEYEzWW41pNOuzAMVjN46C7XhLpiJ0482VVI4hK9DP50Yl9PRL27RHuuFvB5FV5R3F
-         sCcl4wkdYJO/p0Rg8Pxf5AWF77FtRx0dFC6HR+5gYd9lKu5d/YEzbKLOwDPmJUXdXadK
-         7N9vz/b8eFLT4Abf5CMPdUcnZKp5cVaigR1aehvJGcmMJANszLXJbT2oz6/V3Rpqs4lX
-         l0itbYyW+d+3gjR/tReHeQEbFAxnFAfyBkr0o22HQbITihFAYOCRjNlhhVnTRNdUyAdw
-         C/FuR7wmRvuRZMuEJ8ncUvMf6G1TgYgtJ2e4A8c3PEPyknn28PgC/xS3qGAPnkOf3yR8
-         ZAMw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717442379; x=1718047179;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=USNvqm5WvNRGKKhJJ1e1P4+1h5ipgXUhPahXgxecy14=;
-        b=ih4gjnIf/9tvxNhoDYkNhior4XSSta1bJi+0c970USr+aL+4/cwrUPLIs6dHNLkX/r
-         uhUU2T9VLWq8t9MKeD35EKXvU3p+pvEXmYlq7yJAzogaltAMlFH9aKWXYknKXekEy0hH
-         UzYLIHuRFXF4izZP4/z9CvMurW1tpcqx39CxbeKi5/Ih1fyoavrc9IKhHIT+yqpJEmu0
-         LUuTplxReiVTN2DEr2BimxV7dIwkxYTEvVludgBsiPVIPhTSM/j1rJ4LTvWkElrCBLgD
-         U/OFGWZLUnfjgA/lqPhWc1c37qo8jcLJBf8AgW2AMEvx2sH51Pi4YqNhm+T1EzE+Zerc
-         8Vvw==
-X-Forwarded-Encrypted: i=1; AJvYcCV/4vR8n0k96p7cSLhiuD01CcM8WkiI+bnteaLt61vJ7cyEOFpEDZ7jqTgMYIh5dMBOn58xdrCm6AbmSaT1kPY3wn4AuHj9yXq5PqEevYRb
-X-Gm-Message-State: AOJu0YxmiHVdEcGvSDy3l4/34ALiMafKeTDXtp6p1J7AkiO84b9L51k7
-	v/AugVc96G351puABjeQHPizkEdzQftUOO/20cNJ5Ekj1NPNof9HNNdFQF1kundZGjLxqOMXTAZ
-	XbDeRI/QCV4dEs4n+DvtH5mWsmSI=
-X-Google-Smtp-Source: AGHT+IFE7EdxSbnUDKI6YZL50O1WZLogZCK7uyf+Fhz8xr/jpsvJaxLUN5AZuK4vxnGf1EbRfX39TTQD2cWWm0ze9Sk=
-X-Received: by 2002:a2e:9ccb:0:b0:2e7:174b:8c1c with SMTP id
- 38308e7fff4ca-2ea951e4be1mr75797791fa.38.1717442378269; Mon, 03 Jun 2024
- 12:19:38 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sie4ng3B"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 4F893C4AF07;
+	Mon,  3 Jun 2024 19:20:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1717442431;
+	bh=nog+91wN50PlxmPtW65u+0eM/JzsVdW2ITXsFC+4rGA=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=sie4ng3BAzLZcWU5CoE0NFS9qw5s8Lq93Xxx3iPu6T+b+nbDSWSxqxMF2vM2ZWcfm
+	 49C00ddxxx83T3uDobrI8oCsfkFJ1TDaDhCcg8nsdCDW2nEC2ixJFPaVCaYpdVLT8S
+	 dfhjkYl1d6TUoQvdZ/FtA2ZMmIyb48kob2cJIZFKW3JZ+b+JW3YwlhO7QQGDK+UVmJ
+	 6Pz9DzmsR6Mnl87opIlfnqSs9F+F8OSL/0X0Qxf04H57iVasJEcPFyI4zXSUVyWVMx
+	 MLf4f4VxsAFAz2mq3MV9W7sqeFg2D8UoBMQNb2iZBHB0M/ZUZ6vDh8EppORTpUDabp
+	 SAzXnWIbD+B+A==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 43729C43617;
+	Mon,  3 Jun 2024 19:20:31 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240530150057.444585-1-hadess@hadess.net> <20240530150057.444585-10-hadess@hadess.net>
- <8c979897beeb8316616bb7c15f60093be177577c.camel@iki.fi> <727c93065d8d1e56e9fcd5b5bed724d63dfbe871.camel@hadess.net>
-In-Reply-To: <727c93065d8d1e56e9fcd5b5bed724d63dfbe871.camel@hadess.net>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 3 Jun 2024 15:19:25 -0400
-Message-ID: <CABBYNZJB5kYZd5=jEz6sC5TOe9EMphMDBkKgHGjpTf_AH8fXdQ@mail.gmail.com>
-Subject: Re: [BlueZ 9/9] avdtp: Fix manipulating struct as an array
+Content-Transfer-Encoding: 8bit
+Subject: Re: [BlueZ 0/9] Fix a number of static analysis issues #3
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <171744243127.17125.6571783732357865049.git-patchwork-notify@kernel.org>
+Date: Mon, 03 Jun 2024 19:20:31 +0000
+References: <20240530150057.444585-1-hadess@hadess.net>
+In-Reply-To: <20240530150057.444585-1-hadess@hadess.net>
 To: Bastien Nocera <hadess@hadess.net>
-Cc: Pauli Virtanen <pav@iki.fi>, linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Cc: linux-bluetooth@vger.kernel.org
 
-Hi Bastien,
+Hello:
 
-On Fri, May 31, 2024 at 11:51=E2=80=AFAM Bastien Nocera <hadess@hadess.net>=
- wrote:
->
-> On Thu, 2024-05-30 at 19:57 +0300, Pauli Virtanen wrote:
-> > Hi,
-> >
-> > to, 2024-05-30 kello 16:58 +0200, Bastien Nocera kirjoitti:
-> > > Don't manipulate the "req" structs as if they were flat arrays,
-> > > static
-> > > analysis and humans are both equally confused by this kind of
-> > > usage.
-> >
-> > struct start_req {
-> >       union {
-> >               struct seid required[1];
-> >               struct seid seids[0];
-> >       };
-> > } __attribute__ ((packed));
-> >
-> > and access only via req->seids?
->
-> That's a good idea, I'll give it a try.
->
-> > <snip>
-> > > +#define
-> > > REQ_GET_NTH_SEID(x)                                         \
-> > > +   static struct seid
-> > > *                                           \
-> > > +   x##_req_get_nth_seid(struct x##_req *req, int count, int
-> > > i)  \
-> > > +   {
-> > >     \
-> > > +           if (count =3D=3D 0 || i >=3D
-> > > count)                              \
-> > > +                   return
-> > > NULL;                                       \
-> > > +           if (i =3D=3D
-> > > 1)                                          \
-> > > +                   return &req-
-> > > >first_seid;                        \
-> > > +           return &req-
-> > > >other_seids[i];                            \
-> >
-> > (i =3D=3D 0) and [i - 1]?
->
-> *facepalm*
->
-> Yes, this will need a v2, thanks for spotting that.
+This series was applied to bluetooth/bluez.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-Ive applied the set except for this one, please resend once you are
-done with the suggested changes.
+On Thu, 30 May 2024 16:57:54 +0200 you wrote:
+> 14 defects fixed, and 1 error check added.
+> 
+> Let me know whether there's any problems with the implementation, I'm
+> thinking in particular of the avdtp changes which are pretty invasive.
+> 
+> Cheers
+> 
+> [...]
 
---=20
-Luiz Augusto von Dentz
+Here is the summary with links:
+  - [BlueZ,1/9] rctest: Fix possible overrun
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=24cf04939502
+  - [BlueZ,2/9] mgmt-tester: Fix buffer overrun
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=aa54087f13d5
+  - [BlueZ,3/9] l2test: Add missing error checking
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=ccec5e8ef171
+  - [BlueZ,4/9] rfkill: Avoid using a signed int for an unsigned variable
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=c9fcea121f9a
+  - [BlueZ,5/9] shared/mainloop: Fix integer overflow
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=6cf9117bfd3f
+  - [BlueZ,6/9] sdp: Fix ineffective error guard
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=bd954700e631
+  - [BlueZ,7/9] obexd: Fix buffer overrun
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=1764cea5c7fd
+  - [BlueZ,8/9] bap: Fix more memory leaks on error
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=cc8e6ef63509
+  - [BlueZ,9/9] avdtp: Fix manipulating struct as an array
+    (no matching commit)
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
