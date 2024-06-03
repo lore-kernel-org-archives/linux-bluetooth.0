@@ -1,114 +1,83 @@
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB84B84E1C;
-	Mon,  3 Jun 2024 12:54:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEFAC1304B0;
+	Mon,  3 Jun 2024 13:00:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717419271; cv=none; b=AEdBDu8RKrZySHU11rUOl4SbM1/V4tvh3fIAJnpZvsdoBNzoKV4yp0/2G7ZJBqveQuQYXRm8K/FImdCSKAQW2u/RNuaSDyaa9flDbXg2LpZoO5EWb7fBnj120RsLhbs/fgJjtZywLBSVmApY0HTxSVqIOLR/irg1446xnvzOQ2U=
+	t=1717419630; cv=none; b=bn2J3jKOcOxN6NQ5BXxqKCZz+EyFyla8lPhkwLlKpiXaxN9FGyDjglqYqt9JrSRqZp7nH0sXIlQ6v7wZEXGisYr14GyDJ57sVOsa0kfCtseJMVor4w/u6rfHA5ddeHk2cLsJlSYHnI81TLQX6w0TqmVJfKp2/WD0Sl6bJnkFOB4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717419271; c=relaxed/simple;
-	bh=Klr9xhZV+I6k2FQesG4sY2yBk1nNGSSVrtAem4YIPz4=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=AKPK0QnHN2HsQKwWOletl/3BVcIwPKW7sG1+T4gc8LgS0+5gPz7DTFDbFM535D+TDZVqWQQl4OgxdLLYpw+QpDwT1J6uH9GSvJUZeM6u4rNC2loMPeY8D+5VjxeigdhUFeU5MGmBS/OT3T7pTOiEWe3v2zQsz04ExBvUQ28u29I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=jXoErLu0; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+	s=arc-20240116; t=1717419630; c=relaxed/simple;
+	bh=Q72Tv4sMGNv7GdLHS+0Z8Gj75xba7+6TdHAU/WbXGv0=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=XihazXCvWHWhvpXbyyIyB0wpCW43irEACnfBLJloRqHaXya7CIuHGc8d37TomHppTeiRAzzijb1urtxdufpXCVTKOqxfxlSpTIeK5R4/0lcMz5EPvULH2kxT1TP//uSNcfqPTSxVLb2ssRucx1RQIbnXmMhamkcYMzQ7fdqO3gk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=M3ClA1DC; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="jXoErLu0"
-Received: from pps.filterd (m0279870.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4530GX70020269;
-	Mon, 3 Jun 2024 12:54:27 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=qcppdkim1; bh=WmU+f25Abmug8NQIuVhV19e7
-	A10T3q8jZsyCdyPsYG4=; b=jXoErLu0CM8hUoC34eCAe/tXIvyV9atui4Bv3qPN
-	PczbIxgh9mhYQqAjRV/pQSgStXjRUKFdX1IsExMMnoCJ4JRnAfMKTIuo4ZxQ3g3A
-	Km/wZOsX3mCU4FdCSfR0fpxGdJLbgpzxeOH2Y9o1kVNqcr8ZFtC1SMfwTm3WZbjh
-	kp9FWChNioWTo+l5OLgpqWqfjJ1QYRwMG4UlA2QtYSaIEgew/ndLaXfmUetvfIno
-	Xs6pGUPZ9fPYIGJ8MjDhuynmMB1uARu/en+HECZiCXIPhS0pjFC5zM0/ZWL2HQmK
-	4FsOGY4fAGnBMXD0V/bHh6oXoku0vc/QAUmb/H/JZcr6Lw==
-Received: from nalasppmta02.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3yfw42uvt4-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 03 Jun 2024 12:54:26 +0000 (GMT)
-Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
-	by NALASPPMTA02.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 453CsPoF016732
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 3 Jun 2024 12:54:25 GMT
-Received: from hu-janathot-hyd.qualcomm.com (10.80.80.8) by
- nalasex01a.na.qualcomm.com (10.47.209.196) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.9; Mon, 3 Jun 2024 05:54:23 -0700
-From: Janaki Ramaiah Thota <quic_janathot@quicinc.com>
-To: Marcel Holtmann <marcel@holtmann.org>,
-        Luiz Augusto von Dentz
-	<luiz.dentz@gmail.com>
-CC: <quic_mohamull@quicinc.com>, <quic_hbandi@quicinc.com>,
-        <linux-bluetooth@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: [PATCH v1] Bluetooth: hci_qca: Increase settling time for baudrate change VSC
-Date: Mon, 3 Jun 2024 18:23:57 +0530
-Message-ID: <20240603125357.3035-2-quic_janathot@quicinc.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20240603125357.3035-1-quic_janathot@quicinc.com>
-References: <20240603125357.3035-1-quic_janathot@quicinc.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="M3ClA1DC"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 3D635C4AF0D;
+	Mon,  3 Jun 2024 13:00:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1717419630;
+	bh=Q72Tv4sMGNv7GdLHS+0Z8Gj75xba7+6TdHAU/WbXGv0=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=M3ClA1DCUwD/Ezv4Q06mEushpDezB61obknyzvuAS8ALyV1Fs4dE0B+Ku3seRqT8w
+	 Ar77fYgWcvwtiqax5Ro/9Bbqd9TRWJYlzqw5UcqBicbCMed1cXfHuYPZdS4HyuywBR
+	 W8wC6fVK92tEzniCe/ZgoS8699cCmPc1B8IgG/VyuE90q/HTfZOeKeRiZkescqnksx
+	 WIq1GbJyOHbHNl+52kTvq11vizXJaBqtD9acV1ys2JcRxE1h696LiAbNK25wTdwR2x
+	 6N/K25thMumMVfm7zQrVK9UP9SDDPv1J60XmbgmlcwJOXMwaQanFPLrotsf9DFfFOX
+	 3tJoK0wWv3vZQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 2B295C43617;
+	Mon,  3 Jun 2024 13:00:30 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nalasex01a.na.qualcomm.com (10.47.209.196)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: _9JXeD0hPCGutFbA8X4JaK6M-Ppvrk-H
-X-Proofpoint-ORIG-GUID: _9JXeD0hPCGutFbA8X4JaK6M-Ppvrk-H
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.650,FMLib:17.12.28.16
- definitions=2024-06-03_08,2024-05-30_01,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 spamscore=0
- impostorscore=0 mlxlogscore=928 clxscore=1015 bulkscore=0
- priorityscore=1501 suspectscore=0 phishscore=0 malwarescore=0 adultscore=0
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2405170001 definitions=main-2406030107
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v4] Bluetooth: Add vendor-specific packet classification for
+ ISO data
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <171741963017.17349.14932650657966489507.git-patchwork-notify@kernel.org>
+Date: Mon, 03 Jun 2024 13:00:30 +0000
+References: <20240529080123.2146946-1-yinghsu@chromium.org>
+In-Reply-To: <20240529080123.2146946-1-yinghsu@chromium.org>
+To: Ying Hsu <yinghsu@chromium.org>
+Cc: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com,
+ pmenzel@molgen.mpg.de, horms@kernel.org,
+ chromeos-bluetooth-upstreaming@chromium.org, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, johan.hedberg@gmail.com,
+ marcel@holtmann.org, pabeni@redhat.com, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org
 
-This change is done to align the settling time and
-synchronization for baudrate VSC for WCN6750.
+Hello:
 
-In logging disabled builds and few devices
-baudrate change and flow control is taking time
-so increasing the wait time to controller and uart
-to handle baudrate change request properly.
+This patch was applied to bluetooth/bluetooth-next.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-Signed-off-by: Janaki Ramaiah Thota <quic_janathot@quicinc.com>
----
- drivers/bluetooth/hci_qca.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+On Wed, 29 May 2024 08:00:00 +0000 you wrote:
+> When HCI raw sockets are opened, the Bluetooth kernel module doesn't
+> track CIS/BIS connections. User-space applications have to identify
+> ISO data by maintaining connection information and look up the mapping
+> for each ACL data packet received. Besides, btsnoop log captured in
+> kernel couldn't tell ISO data from ACL data in this case.
+> 
+> To avoid additional lookups, this patch introduces vendor-specific
+> packet classification for Intel BT controllers to distinguish
+> ISO data packets from ACL data packets.
+> 
+> [...]
 
-diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-index 0c9c9ee56592..667687835306 100644
---- a/drivers/bluetooth/hci_qca.c
-+++ b/drivers/bluetooth/hci_qca.c
-@@ -1356,12 +1356,15 @@ static int qca_set_baudrate(struct hci_dev *hdev, uint8_t baudrate)
- 	case QCA_WCN3990:
- 	case QCA_WCN3991:
- 	case QCA_WCN3998:
--	case QCA_WCN6750:
- 	case QCA_WCN6855:
- 	case QCA_WCN7850:
- 		usleep_range(1000, 10000);
- 		break;
- 
-+	case QCA_WCN6750:
-+		msleep(30);
-+		break;
-+
- 	default:
- 		msleep(300);
- 	}
+Here is the summary with links:
+  - [v4] Bluetooth: Add vendor-specific packet classification for ISO data
+    https://git.kernel.org/bluetooth/bluetooth-next/c/d33224ba26e5
+
+You are awesome, thank you!
 -- 
-The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum,
-a Linux Foundation Collaborative Project
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
