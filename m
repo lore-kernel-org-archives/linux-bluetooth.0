@@ -1,33 +1,33 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FB96405D8
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7852982D94
 	for <linux-bluetooth@vger.kernel.org>; Mon,  3 Jun 2024 19:20:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717442431; cv=none; b=dq8h1wdov4AgK85dZ99V9IBemGHG9Z1ZYl+6zegK+Vet8q7l+wywJt07eFevEa9+k6U2qOX03jdARoDrZLnIMCPdz2qAKEGuEh7lpiRoPrdK0uOntYq2QRhJph3+tmDW6SDAAsyMghJLvxNRsClIsUAe2Yvi4VE7dVngNESaXis=
+	t=1717442431; cv=none; b=FG1VEjFLTy33ff94OBJ+1QANW4A8MPYHZj3lxgOSYM9coJQsa1T/gswk8+9MWK5ac9peHJ0RX3FbBzsl3BlQBTw50J951VUvJZW7pizVa5VLtLZ3SgpMEWo8kAhd6ZMg+AuBZ5Bi/KirBblhQbnzjoKyJmOyQtIu9POjAhbawXE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1717442431; c=relaxed/simple;
-	bh=nog+91wN50PlxmPtW65u+0eM/JzsVdW2ITXsFC+4rGA=;
+	bh=v8CnxmBJTnahR8+54nScLOr8r4UhFXnQJe6mbfUaxAk=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=TaD7b43dLvMVEwcFHBZuD/BnkxVgcoXaKmUsM4ugCYrC0gBeBY8IH7I+hr7yuxpYx6bkmree1OQJYnDt/A0yPrZSScrTteWvnxt2NYoKzhDaDKbTuUxL35WHBPJx9ukziLJ5oRBPqlVuv1VJrTcXi8e9SvEWLJg/77aeIPgLjgY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sie4ng3B; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=no+7FUeSE+2i7AHAckkPZGdq/QDemA67IS8wCjCiquiVnxvnRpWyAdDaNbSqol9ijzJfePHoXhUSL2n45kgK6+fmw0RfmGAZdit33gxiTeq6+mdPMWfXVCwphnuIghRw36onG8c+Rkn1/KXh9czRznP2AY9VtSW3SiO9FtMFKpA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sc83gI5X; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sie4ng3B"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 4F893C4AF07;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sc83gI5X"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 58E6EC32782;
 	Mon,  3 Jun 2024 19:20:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1717442431;
-	bh=nog+91wN50PlxmPtW65u+0eM/JzsVdW2ITXsFC+4rGA=;
+	bh=v8CnxmBJTnahR8+54nScLOr8r4UhFXnQJe6mbfUaxAk=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=sie4ng3BAzLZcWU5CoE0NFS9qw5s8Lq93Xxx3iPu6T+b+nbDSWSxqxMF2vM2ZWcfm
-	 49C00ddxxx83T3uDobrI8oCsfkFJ1TDaDhCcg8nsdCDW2nEC2ixJFPaVCaYpdVLT8S
-	 dfhjkYl1d6TUoQvdZ/FtA2ZMmIyb48kob2cJIZFKW3JZ+b+JW3YwlhO7QQGDK+UVmJ
-	 6Pz9DzmsR6Mnl87opIlfnqSs9F+F8OSL/0X0Qxf04H57iVasJEcPFyI4zXSUVyWVMx
-	 MLf4f4VxsAFAz2mq3MV9W7sqeFg2D8UoBMQNb2iZBHB0M/ZUZ6vDh8EppORTpUDabp
-	 SAzXnWIbD+B+A==
+	b=sc83gI5Xxm37UtfanMic0LkROxZioTRGDxobj1kB+vTzKc9hw8dRRmcHvca14lvFv
+	 6eq4miscYdAFdJE9Ns9WH1KQJluuTaqUF3nzCUh9Q4zIfO/rU2Vmh1Bjcqq7Jv6/tT
+	 JXX4lDYupio6w49l5Mgzbc/jeOAV8FGDx38/ZEAMfnAvthTdXUbiWWvwlvySo3hCM4
+	 3TAHF/BQ17JAFIDFyUmBl7NlfVc/u/0ldYhqqEW2QSpSUM/c6/NRLcCz0t/VW3nR/Y
+	 /Apo5xOFu5i0s4W42J8szL9tuoqfzU5z/vOox8CXsK1aEtavy+VmlmNrlPWstB+xI6
+	 qkcmJdikeWcgg==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 43729C43617;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 4C612CF21FD;
 	Mon,  3 Jun 2024 19:20:31 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -37,50 +37,37 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [BlueZ 0/9] Fix a number of static analysis issues #3
+Subject: Re: [PATCH BlueZ 0/1] Fix GLib deprecation warning in
+ example-gatt-client/server
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <171744243127.17125.6571783732357865049.git-patchwork-notify@kernel.org>
+ <171744243130.17125.14523008723819707357.git-patchwork-notify@kernel.org>
 Date: Mon, 03 Jun 2024 19:20:31 +0000
-References: <20240530150057.444585-1-hadess@hadess.net>
-In-Reply-To: <20240530150057.444585-1-hadess@hadess.net>
-To: Bastien Nocera <hadess@hadess.net>
+References: <20240531193622.1696328-1-me@prestonhunt.com>
+In-Reply-To: <20240531193622.1696328-1-me@prestonhunt.com>
+To: Preston Hunt <me@prestonhunt.com>
 Cc: linux-bluetooth@vger.kernel.org
 
 Hello:
 
-This series was applied to bluetooth/bluez.git (master)
+This patch was applied to bluetooth/bluez.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Thu, 30 May 2024 16:57:54 +0200 you wrote:
-> 14 defects fixed, and 1 error check added.
+On Fri, 31 May 2024 12:36:21 -0700 you wrote:
+> Updates example-gatt-client and example-gatt-server sample applications
+> in test/ directory to fix deprecation warning:
 > 
-> Let me know whether there's any problems with the implementation, I'm
-> thinking in particular of the avdtp changes which are pretty invasive.
+>     PyGIDeprecationWarning: GObject.MainLoop is deprecated; use
+>     GLib.MainLoop instead
 > 
-> Cheers
+> Also, remove python2 import since the script is run with a python3
+> shebang.
 > 
 > [...]
 
 Here is the summary with links:
-  - [BlueZ,1/9] rctest: Fix possible overrun
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=24cf04939502
-  - [BlueZ,2/9] mgmt-tester: Fix buffer overrun
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=aa54087f13d5
-  - [BlueZ,3/9] l2test: Add missing error checking
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=ccec5e8ef171
-  - [BlueZ,4/9] rfkill: Avoid using a signed int for an unsigned variable
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=c9fcea121f9a
-  - [BlueZ,5/9] shared/mainloop: Fix integer overflow
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=6cf9117bfd3f
-  - [BlueZ,6/9] sdp: Fix ineffective error guard
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=bd954700e631
-  - [BlueZ,7/9] obexd: Fix buffer overrun
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=1764cea5c7fd
-  - [BlueZ,8/9] bap: Fix more memory leaks on error
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=cc8e6ef63509
-  - [BlueZ,9/9] avdtp: Fix manipulating struct as an array
-    (no matching commit)
+  - [BlueZ,1/1] test/example-gatt: fix deprecation warning
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=684a17f7cc78
 
 You are awesome, thank you!
 -- 
