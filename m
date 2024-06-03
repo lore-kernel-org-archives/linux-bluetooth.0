@@ -1,62 +1,62 @@
-Received: from mail-vk1-f182.google.com (mail-vk1-f182.google.com [209.85.221.182])
+Received: from mail-vk1-f181.google.com (mail-vk1-f181.google.com [209.85.221.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43E22139D03
-	for <linux-bluetooth@vger.kernel.org>; Mon,  3 Jun 2024 18:53:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0F9713A24B
+	for <linux-bluetooth@vger.kernel.org>; Mon,  3 Jun 2024 18:53:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717440799; cv=none; b=N1zEAyakgIe9PV1b11QyNbIWlhEUGBw4/Ry9U/i5TZhvldGefheu+N4POWUDo7k29aYjYcReic8TOcxSfntQ7rMf5X9JS1k4K4Quaj6z5HkaFsOYNWvqdrwVf6DIuLrFJOKG6WbrgB5190r63ZQ9jeX/3+L6nQ6+paZFZ7vNmog=
+	t=1717440801; cv=none; b=LDMkur//pkpqCnTggWkfCUJTeZcyBKqjIGk0cUB6/sLfIcSwM4b5+FdQCAjGRKv9XEmVsRCEpFKbN37WwVZTwlwSrSXqtiys0eiyYGVMrVwOOsGs/bRW+LS5eo5gLrFNZxq+GKWgchnvpvkdDV9JFgHoQAwg+tik50fg/f/pE+I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717440799; c=relaxed/simple;
-	bh=BlMQ+hgTxxVK9SiYt7DjZJcwexb5fb9X1HYYnXHRsa0=;
+	s=arc-20240116; t=1717440801; c=relaxed/simple;
+	bh=Utr1b1s+QbLd3QWfNltY5j3vVWsGJaT5qjN1KF+2Gi0=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=jsF2JSf78jKXh35oMug25sLxoX/CknZrA9oDRkBa3bdaLgx6HYNuE5zd9ElMMhERk74mLpHqIseN95ySXRHjU1d4aYXi3MDBApThSC6UYcPo6tIbFOswgRhbTW2HH1Blb3mZhHDTsuf4GM71aLgTxT/SYqXa9Jhd73j7CObXxAo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ql7Jcqrz; arc=none smtp.client-ip=209.85.221.182
+	 MIME-Version; b=VqBpZH9zmHzOLd1lQMXRYc3JYFMutoOfldH7R59vYaFbxFDSfztyqRSvJ2FOpkfY9SMd0/uPJ2USGoVMWbnZTfWOuaS+PFTXNH0Xcn4VLz/hytXC1IBkpJqUaNdfNdp2hYEiepDfCtRyAmDSva6Iwu4Zd6ppCGeKNU/m2HeregA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Xx4PUfLK; arc=none smtp.client-ip=209.85.221.181
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ql7Jcqrz"
-Received: by mail-vk1-f182.google.com with SMTP id 71dfb90a1353d-4eaf67ad82dso1354490e0c.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 03 Jun 2024 11:53:17 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Xx4PUfLK"
+Received: by mail-vk1-f181.google.com with SMTP id 71dfb90a1353d-4eb270d92eeso298905e0c.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 03 Jun 2024 11:53:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1717440796; x=1718045596; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1717440798; x=1718045598; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=Euucq6IfSWE4jNGcSdYkP4D/Lw58XowlpkSXFe+Qksw=;
-        b=Ql7JcqrzaAtbc3PwjRqNKaxpK3ukw4fn7ZdWjeUWYg6lqwre95UAaSAfYsi5A7JeoF
-         5SbKLGnhZphJ4GZieUyaVNalNUVuIk43LDRN4y8MssYeIRTTBSFQTdCYh56SZ7W34w0/
-         7CbqqOfDj0tU6nl0A0Xmi1Z3sUtSdupr+rdbNMeLe+EErHIopp3Vrjqu2Tl2mrl9SscR
-         QDLCJ5QgEU+ICXqQEWU/viBne7oLUo8l2qULxW9/xgsW0unkXgfCdyQT7JqhPTtD69VF
-         tV/V5e+nGYYINNX28FHD7M0bAhC0lu3OfuY4uR3ekckz1s/3Qla640qn0fHj14RCUIte
-         7xmw==
+        bh=1GRcAJxyronPVZcX3Qf21BpeiFl3m59jKgvmWujKkls=;
+        b=Xx4PUfLKXt0g/CiiuE4W97ZNDE8H52zonkuccCPBOEs3yLAtLZOYQw9UNkKfg7htof
+         PLgaWXP++JT0mnRvJyYGZ7J1+k96qzjynsXzE264sMtg79iYyGcr15CHNyUs/8VU2wAe
+         YqzdHTuooE7gPC7lVxFXoLw18h8c7AKs5m0GEJVB3blSZy8njl8uHCMn+h4nIqIpsEZs
+         FCBCuxbUafGKPgtW66YMV5oxzJP0waWjMkGkWxazDksFYwl29ZkzVZLT8KlQQXfgKR+k
+         WnBJDDGXs8Vbuo5GyTqRGbjXKkJu1oy6jM+7AWudUN1K9PbyQcIUf5+5M98uvWJMKU9r
+         1QDg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717440796; x=1718045596;
+        d=1e100.net; s=20230601; t=1717440798; x=1718045598;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=Euucq6IfSWE4jNGcSdYkP4D/Lw58XowlpkSXFe+Qksw=;
-        b=DMaDVG8FlmLn16TeScm8Zqby/yrJLTqW7wQdX2D46s6NgFqWWU6hvGV4ElNlv+xiWv
-         rHgrj8emysdTJ8cP6ki6fn1uDPNGozgNKZsNfPTvJhmKSry/117cNraFtyibjkN7sM4F
-         QFXAFVRvZ/5mIx4mARhzNqbDxME50RtWtG3llhp+U5quX0Uxmkjmr062yye/HVwLAFTq
-         BWvfT2QJSUnJfrdL5gAx6xuTBgpS38eSKMg+gh6gZfZpHC5GX1ZUGLSYMWH48jfnbO33
-         TG4/+dCOxw1IY4N38NfdacGJLP3lX9z76VS2OPKvQSIrK2UoZJv5ue6guXUw4bm3Qxzq
-         SObw==
-X-Gm-Message-State: AOJu0YxNPo3lCgbGixAY9gL0o6z24GO6+JeTbSlHgScTUCAYCVK/NfGv
-	g3sMLt8WZ3XEqvre78MMQ5mBHpuSrN6SZxL6fbRNRebOZ05CmzgAOia6wQ==
-X-Google-Smtp-Source: AGHT+IEZyYeLjouf704dFtN3nUdzC+78nwqNTc9ovbFF2d+sG4i0XJnUWfAntzLWui78TopmZtsTIw==
-X-Received: by 2002:ac5:c888:0:b0:4c9:2540:8520 with SMTP id 71dfb90a1353d-4eb02d7c90amr8709989e0c.1.1717440796231;
-        Mon, 03 Jun 2024 11:53:16 -0700 (PDT)
+        bh=1GRcAJxyronPVZcX3Qf21BpeiFl3m59jKgvmWujKkls=;
+        b=D6zPqRXq5rDb7AjuACaa272aVeHCOQXjVJk7Iab+6v4ibg6DL82f1qaJgBT5gzQWZD
+         tqDAcmEm9beGbWR40W5FtJgDpzlUHIBmg4nqhW5AE7QY9ZfDsP5/u4vpD063sK/r1UHE
+         GXWW1TbbdEEeFF+4GEq+S474pHrEQZBCsAOBAL0ae+kip8BnRzZeaCY9aEbWaGIDnMry
+         mwilAMc18E+yKNC60RZ+4nC2zBlj4BjmRwn+BnTMcyigM6mD4ANbiQdUSluGq+eY/5+P
+         wg4UYZ4t0boZUVZQNnusZJOsBC4OXBdmLQ42OEdKiJOARjPGOMEAX/mZAG4X93bPRhyQ
+         6vCQ==
+X-Gm-Message-State: AOJu0Yw8W5EAlJbEPF4QKDTs2IdF2aPLe9QyLyrtRAdNTlrowIfC0lM+
+	zfrzLtiYqCM8wd8+nulKiKwjDCau2ksA4SAnlxLAIttsWAN36RXwbanTgQ==
+X-Google-Smtp-Source: AGHT+IHCr5IIETawENqUgJlC7U8Zh0yXWmG1PveESInD0f2bXd46/1kkVYd6ZUbZzsB3W5Af3bIrBw==
+X-Received: by 2002:a1f:7284:0:b0:4e4:ecf6:c7fa with SMTP id 71dfb90a1353d-4eb02ea92a5mr8384412e0c.15.1717440798161;
+        Mon, 03 Jun 2024 11:53:18 -0700 (PDT)
 Received: from lvondent-mobl4.. (syn-107-146-107-067.res.spectrum.com. [107.146.107.67])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-4eafecbab81sm1231658e0c.0.2024.06.03.11.53.15
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-4eafecbab81sm1231658e0c.0.2024.06.03.11.53.16
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 03 Jun 2024 11:53:15 -0700 (PDT)
+        Mon, 03 Jun 2024 11:53:16 -0700 (PDT)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v2 2/3] shared/gatt-db: Introduce gatt_db_clone
-Date: Mon,  3 Jun 2024 14:53:11 -0400
-Message-ID: <20240603185312.162337-2-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v2 3/3] set: Attempt to use existing set gatt-db
+Date: Mon,  3 Jun 2024 14:53:12 -0400
+Message-ID: <20240603185312.162337-3-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.45.1
 In-Reply-To: <20240603185312.162337-1-luiz.dentz@gmail.com>
 References: <20240603185312.162337-1-luiz.dentz@gmail.com>
@@ -70,90 +70,122 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This introduces gatt_db_clone which can be used to clonse/deep copy and
-existing database.
----
- src/shared/gatt-db.c | 54 ++++++++++++++++++++++++++++++++++++++++++++
- src/shared/gatt-db.h |  1 +
- 2 files changed, 55 insertions(+)
+Most sets should be clone of each other, or at least very similar, so
+this attempts to clone the existing gatt-db of the first member found
+when connecting new sets, this substantially speed up the process of
+bonding sets if their database matches which is something that is
+currently ranging from 20-30 seconds depending on the manufacturer and
+with this changes it cuts 5-10 seconds by bypassing discovery all
+procedure of other members.
 
-diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
-index 2c8e7d31eda1..d8d21392fee6 100644
---- a/src/shared/gatt-db.c
-+++ b/src/shared/gatt-db.c
-@@ -260,6 +260,60 @@ struct gatt_db *gatt_db_new(void)
- 	return gatt_db_ref(db);
+If the dbs don't really match bt_gatt_client instance will attempt to
+rediscover the ranges that don't match.
+---
+ src/device.c         | 21 +++++++++++++++++++++
+ src/device.h         |  1 +
+ src/set.c            | 22 ++++++++++++++++++++--
+ src/shared/gatt-db.c |  4 ++--
+ 4 files changed, 44 insertions(+), 4 deletions(-)
+
+diff --git a/src/device.c b/src/device.c
+index 620bbd55ebad..5dc1cd0cdbf2 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -6994,6 +6994,27 @@ struct gatt_db *btd_device_get_gatt_db(struct btd_device *device)
+ 	return device->db;
  }
  
-+static void service_clone(void *data, void *user_data)
-+{
-+	struct gatt_db_service *service = data;
-+	struct gatt_db *db = user_data;
-+	struct gatt_db_service *clone;
-+	int i;
-+
-+	clone = new0(struct gatt_db_service, 1);
-+	clone->db = db;
-+	clone->active = service->active;
-+	clone->num_handles = service->num_handles;
-+	clone->attributes = new0(struct gatt_db_attribute *,
-+					service->num_handles);
-+
-+	/* Clone attributes */
-+	for (i = 0; i < service->num_handles; i++) {
-+		struct gatt_db_attribute *attr = service->attributes[i];
-+
-+		/* Only clone values for characteristics since that is
-+		 * cacheable.
-+		 */
-+		if (bt_uuid_len(&attr->uuid) == 2 &&
-+				attr->uuid.value.u16 == GATT_CHARAC_UUID)
-+			clone->attributes[i] = new_attribute(clone,
-+							attr->handle,
-+							&attr->uuid,
-+							attr->value,
-+							attr->value_len);
-+		else
-+			clone->attributes[i] = new_attribute(clone,
-+							attr->handle,
-+							&attr->uuid,
-+							NULL, 0);
-+	}
-+
-+	queue_push_tail(db->services, clone);
-+}
-+
-+struct gatt_db *gatt_db_clone(struct gatt_db *db)
++bool btd_device_set_gatt_db(struct btd_device *device, struct gatt_db *db)
 +{
 +	struct gatt_db *clone;
 +
-+	if (!db)
-+		return NULL;
++	if (!device)
++		return false;
 +
-+	clone = gatt_db_new();
-+	if (!clone)
-+		return NULL;
++	clone = gatt_db_clone(db);
++	if (clone)
++		return false;
 +
-+	queue_foreach(db->services, service_clone, clone);
++	gatt_db_unregister(device->db, device->db_id);
++	gatt_db_unref(device->db);
 +
-+	return clone;
++	device->db = clone;
++	device->db_id = gatt_db_register(device->db, gatt_service_added,
++					gatt_service_removed, device, NULL);
++
++	return true;
 +}
 +
- static void notify_destroy(void *data)
+ struct bt_gatt_client *btd_device_get_gatt_client(struct btd_device *device)
  {
- 	struct notify *notify = data;
-diff --git a/src/shared/gatt-db.h b/src/shared/gatt-db.h
-index f7596e33529a..dc2daf7fc1ba 100644
---- a/src/shared/gatt-db.h
-+++ b/src/shared/gatt-db.h
-@@ -12,6 +12,7 @@ struct gatt_db;
- struct gatt_db_attribute;
+ 	if (!device)
+diff --git a/src/device.h b/src/device.h
+index a2b7bb15d200..0794f92d0178 100644
+--- a/src/device.h
++++ b/src/device.h
+@@ -66,6 +66,7 @@ struct gatt_primary *btd_device_get_primary(struct btd_device *device,
+ 							const char *uuid);
+ GSList *btd_device_get_primaries(struct btd_device *device);
+ struct gatt_db *btd_device_get_gatt_db(struct btd_device *device);
++bool btd_device_set_gatt_db(struct btd_device *device, struct gatt_db *db);
+ struct bt_gatt_client *btd_device_get_gatt_client(struct btd_device *device);
+ struct bt_gatt_server *btd_device_get_gatt_server(struct btd_device *device);
+ bool btd_device_is_initiator(struct btd_device *device);
+diff --git a/src/set.c b/src/set.c
+index bf35ee403b39..4ca2f78c3702 100644
+--- a/src/set.c
++++ b/src/set.c
+@@ -28,6 +28,8 @@
+ #include "src/shared/queue.h"
+ #include "src/shared/ad.h"
+ #include "src/shared/crypto.h"
++#include "src/shared/att.h"
++#include "src/shared/gatt-db.h"
  
- struct gatt_db *gatt_db_new(void);
-+struct gatt_db *gatt_db_clone(struct gatt_db *db);
+ #include "log.h"
+ #include "error.h"
+@@ -277,8 +279,24 @@ static void foreach_rsi(void *data, void *user_data)
  
- struct gatt_db *gatt_db_ref(struct gatt_db *db);
- void gatt_db_unref(struct gatt_db *db);
+ 	bt_crypto_unref(crypto);
+ 
+-	if (!memcmp(ad->data, res, sizeof(res)))
+-		device_connect_le(set->device);
++	if (memcmp(ad->data, res, sizeof(res)))
++		return;
++
++	/* Attempt to use existing gatt_db from set if device has never been
++	 * connected before.
++	 *
++	 * If dbs don't really match bt_gatt_client will attempt to rediscover
++	 * the ranges that don't match.
++	 */
++	if (gatt_db_isempty(btd_device_get_gatt_db(set->device))) {
++		struct btd_device *device;
++
++		device = queue_get_entries(set->devices)->data;
++		btd_device_set_gatt_db(set->device,
++					btd_device_get_gatt_db(device));
++	}
++
++	device_connect_le(set->device);
+ }
+ 
+ static void foreach_device(struct btd_device *device, void *data)
+diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
+index d8d21392fee6..16abcba2ec1c 100644
+--- a/src/shared/gatt-db.c
++++ b/src/shared/gatt-db.c
+@@ -278,8 +278,8 @@ static void service_clone(void *data, void *user_data)
+ 	for (i = 0; i < service->num_handles; i++) {
+ 		struct gatt_db_attribute *attr = service->attributes[i];
+ 
+-		/* Only clone values for characteristics since that is
+-		 * cacheable.
++		/* Only clone values for characteristics declaration since that
++		 * is considered when calculating the db hash.
+ 		 */
+ 		if (bt_uuid_len(&attr->uuid) == 2 &&
+ 				attr->uuid.value.u16 == GATT_CHARAC_UUID)
 -- 
 2.45.1
 
