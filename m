@@ -1,136 +1,139 @@
-Received: from mail-oo1-f46.google.com (mail-oo1-f46.google.com [209.85.161.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D969E59B4A
-	for <linux-bluetooth@vger.kernel.org>; Mon,  3 Jun 2024 13:24:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11628839EA;
+	Mon,  3 Jun 2024 13:48:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717421101; cv=none; b=KJplhrc7fEGUuATH/hYuvEVoMy7VUzD1jlGzR5C+EqX2m4abKBeZkwAPYE+yDu5T8bBdG39kKJ3N2eTOZi3GlK30mAVg6WCUDdd32D9Jniqf5hAk1nC8tqcGnln/klTqwDJv33ay7bJBXyhZz/fIYHtF8ZCjL9mgVQLVEBBBVkQ=
+	t=1717422482; cv=none; b=KzK6+nRL2LWrjYdQWTF9Tim+iTihuY4JqGPH0kraNaoYitzQyb4LxXW9I/Thqixf7nn14S6+EIyYn6y+jQFKm7FswKZKG+WF3vdQ5RKE+V6JGqY9vkBrcXaIp8xXSvE58TiXSFzf7qpOKmS2sIJI/gZYBMpObatSvLmuG1jOrm8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717421101; c=relaxed/simple;
-	bh=mjOZoQusAEG72l1HlEML2WkWSLo8+ld0iNaFIfqePek=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=ODUBuiID94o2wbt5s9ZE9S28whgrefE1VouM5Bv62BACEZsmcr0v9xYtYx39PwZTBhp7QoSuW0nWvJJX/0KHcmQqb9IlYGof8nJadeUaGknMKGeijQM3Y2xIyAV7qW458TTvXqc/ppdptq7eZUB4X/WGhnLUOuJlbNbcuh0rUtA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bGk7x/uB; arc=none smtp.client-ip=209.85.161.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1717422482; c=relaxed/simple;
+	bh=B2comQGPWiA3xBp9uUkroEcDm6wjkalHIm57nIP3IqI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:CC:From:
+	 In-Reply-To:Content-Type; b=SdGlrVM3Lw4hV0lZMrO4lKYqjdVfNUZz/3NFe/C8PuLdCNbWNlHe4a8D0TC90U05Z1lBfL8GQwe9TPcHO8G/gvB1NSODYVUFzeOusbzvSDTY1d2KOhPSoxaja+OxCC6PbNrrUhEGDxcc4xQbqc/4vXo10KK97tRCLX/e4KUgw4o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=PQaseuCQ; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bGk7x/uB"
-Received: by mail-oo1-f46.google.com with SMTP id 006d021491bc7-5b98f49e27bso1712089eaf.2
-        for <linux-bluetooth@vger.kernel.org>; Mon, 03 Jun 2024 06:24:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1717421099; x=1718025899; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=+mGA6F90g0ENSiiO1WvzkZGG3IQT+yi38SiNOV4WirM=;
-        b=bGk7x/uBGfzK6twM2Kc4lDZ+HViz3XxH9bnbWo2Vie6A/Sk4IecxhefqNyWeuAOOtE
-         YxUSY/u7NND26aoSmJ7Y05zd5hT+tAwHm0tVUVEfYyYkZ6qtOvRHoW9ArkzG/wfdndF7
-         utYcBlSIt5XlYMyFXxb6B7WjQkUpmRMr6iTYarESoFcD9I4/dIcnzFNqi+HjsN4K3/w3
-         YWvpj/w/YkEwF96wagzj4f95vWhezM2KcOpcFNdnkTfi0a7PZzBNjWjy80h3TolXqSGZ
-         KoedfvSjZ6sggiFM5Yh5s0yw1xATZEvgncXiGF+DEPX9LHE0BcWJOxyVt57B66zbr9Vw
-         0L8g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717421099; x=1718025899;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=+mGA6F90g0ENSiiO1WvzkZGG3IQT+yi38SiNOV4WirM=;
-        b=VTHAyQAJPDzqfY4paKVf/ww9OIt59trL3LRHmKxRFbFhJEnjO0O7AkUYeQXCiDvlsN
-         vl0gJSTjyfUobj1m+OYluNshW9BkvdBVsjrwaA/gRysgQdpF1NJ6R7PTzmG0PfcC1IHL
-         PeiPVPj8pOfRzsVPhR1yvEsYvo+YBO++qOIeugLzhJPSynQ/SzFtT9aFxkOhpOYte+5i
-         28/ZOQ6nDl+jlWmj0RQbnR5mZRoyOZ11hgFldcDMPhakQHiFZbp/lUigS6jd3lKOWcpR
-         TGxFOKFBxhuAynW336wOzZ7sTsSMqin54pH5lS4yAS4tmwdYaIXWXwAH097S2rViuN69
-         alwg==
-X-Gm-Message-State: AOJu0Yznb+FzAqHaup0V8zy81x0ibs07Z/di+rXb8GBZVGD5QZjhuhWi
-	YuQpTsXqYzrI2O5MYvpKqeCdGlvLbneI8QQHW7qroQZFYLz5h4SIQqBsLg==
-X-Google-Smtp-Source: AGHT+IGVGHLktln3UxAGY3UZoEhy+bur8KZV3jQDXmwAJLztU1Qr7j3RE8tPREwePlj0P12xYZwoCQ==
-X-Received: by 2002:a05:6820:511:b0:5b9:f802:ba3e with SMTP id 006d021491bc7-5ba05d3143fmr9665192eaf.4.1717421098662;
-        Mon, 03 Jun 2024 06:24:58 -0700 (PDT)
-Received: from [172.17.0.2] ([172.172.121.189])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6aed6160ee9sm27616246d6.110.2024.06.03.06.24.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 03 Jun 2024 06:24:58 -0700 (PDT)
-Message-ID: <665dc42a.050a0220.e8099.af67@mx.google.com>
-Date: Mon, 03 Jun 2024 06:24:58 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============1348727350356545026=="
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="PQaseuCQ"
+Received: from pps.filterd (m0279865.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 453AvFeR026168;
+	Mon, 3 Jun 2024 13:47:57 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	YbV79DXRW1o1/8XJ18egV70PRdZOxFk/z/HkiX7J25k=; b=PQaseuCQDVWNUx89
+	5yE3FNJYeTc1U4CVLjGbJUbIZ2iMncW/j3BDoBIpWzCc9hJ5vmbV9kwcUmU5136j
+	FLDeQG/yfhoNS6DvXT7aFM+o6s69xIGdQLJLxoVDVe7WJB9baYxpIMt+bAbRCMoU
+	GbF708i2ReOR8xq6vPv1jYzWa9XVIexFxjGwkmMVn0UYv9dYuVh/FMpQOyp1CezM
+	8+bO4uLJ8YpoBER5T5PoZkcPwTvR7DNTqYIJeQCDK8Kll2j/PGqiJC2774wHZA6b
+	bML5N85lCAqK8HGX/FAqfND8gwGC3KhQP86AiggxTYg+BaYaeKSp8pj0jYFyM9JE
+	ZNhPsQ==
+Received: from nalasppmta03.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3yfw5wm1uf-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 03 Jun 2024 13:47:56 +0000 (GMT)
+Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
+	by NALASPPMTA03.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 453DluaM006477
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 3 Jun 2024 13:47:56 GMT
+Received: from [10.218.29.219] (10.80.80.8) by nalasex01a.na.qualcomm.com
+ (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Mon, 3 Jun 2024
+ 06:47:53 -0700
+Message-ID: <44e2840e-06b9-4900-bfe6-881d27081ff0@quicinc.com>
+Date: Mon, 3 Jun 2024 19:17:50 +0530
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, quic_janathot@quicinc.com
-Subject: RE: [v1] Bluetooth: hci_qca: Increase settling time for baudrate change VSC
-In-Reply-To: <20240603125357.3035-2-quic_janathot@quicinc.com>
-References: <20240603125357.3035-2-quic_janathot@quicinc.com>
-Reply-To: linux-bluetooth@vger.kernel.org
-
---===============1348727350356545026==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: FW: [PATCH] PENDING: Bluetooth: Increase settling time for
+ baudrate change VSC
+Content-Language: en-US
+To: Marcel Holtmann <marcel@holtmann.org>,
+        Luiz Augusto von Dentz
+	<luiz.dentz@gmail.com>
+References: <20240603125357.3035-1-quic_janathot@quicinc.com>
+ <SA1PR02MB8694BA5D75CF5FF8C86C7274E1FF2@SA1PR02MB8694.namprd02.prod.outlook.com>
+CC: <linux-bluetooth@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <quic_hbandi@quicinc.com>, <quic_mohamull@quicinc.com>
+From: Janaki Ramaiah Thota <quic_janathot@quicinc.com>
+In-Reply-To: <SA1PR02MB8694BA5D75CF5FF8C86C7274E1FF2@SA1PR02MB8694.namprd02.prod.outlook.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 7bit
-
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=858290
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      0.70 seconds
-GitLint                       PASS      0.34 seconds
-SubjectPrefix                 PASS      0.14 seconds
-BuildKernel                   PASS      29.93 seconds
-CheckAllWarning               PASS      32.48 seconds
-CheckSparse                   PASS      37.91 seconds
-CheckSmatch                   FAIL      36.07 seconds
-BuildKernel32                 PASS      28.59 seconds
-TestRunnerSetup               PASS      520.82 seconds
-TestRunner_l2cap-tester       PASS      20.30 seconds
-TestRunner_iso-tester         PASS      30.07 seconds
-TestRunner_bnep-tester        PASS      4.80 seconds
-TestRunner_mgmt-tester        PASS      111.73 seconds
-TestRunner_rfcomm-tester      PASS      7.35 seconds
-TestRunner_sco-tester         PASS      14.95 seconds
-TestRunner_ioctl-tester       PASS      7.83 seconds
-TestRunner_mesh-tester        PASS      5.88 seconds
-TestRunner_smp-tester         PASS      6.86 seconds
-TestRunner_userchan-tester    PASS      5.05 seconds
-IncrementalBuild              PASS      27.70 seconds
-
-Details
-##############################
-Test: CheckSmatch - FAIL
-Desc: Run smatch tool with source
-Output:
-
-Segmentation fault (core dumped)
-make[4]: *** [scripts/Makefile.build:244: net/bluetooth/hci_core.o] Error 139
-make[4]: *** Deleting file 'net/bluetooth/hci_core.o'
-make[3]: *** [scripts/Makefile.build:485: net/bluetooth] Error 2
-make[2]: *** [scripts/Makefile.build:485: net] Error 2
-make[2]: *** Waiting for unfinished jobs....
-Segmentation fault (core dumped)
-make[4]: *** [scripts/Makefile.build:244: drivers/bluetooth/bcm203x.o] Error 139
-make[4]: *** Deleting file 'drivers/bluetooth/bcm203x.o'
-make[4]: *** Waiting for unfinished jobs....
-Segmentation fault (core dumped)
-make[4]: *** [scripts/Makefile.build:244: drivers/bluetooth/bpa10x.o] Error 139
-make[4]: *** Deleting file 'drivers/bluetooth/bpa10x.o'
-make[3]: *** [scripts/Makefile.build:485: drivers/bluetooth] Error 2
-make[2]: *** [scripts/Makefile.build:485: drivers] Error 2
-make[1]: *** [/github/workspace/src/src/Makefile:1919: .] Error 2
-make: *** [Makefile:240: __sub-make] Error 2
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nalasex01a.na.qualcomm.com (10.47.209.196)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: t7jyk-zsv-nLGduq1CA6BH_i6UELT1hQ
+X-Proofpoint-ORIG-GUID: t7jyk-zsv-nLGduq1CA6BH_i6UELT1hQ
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.650,FMLib:17.12.28.16
+ definitions=2024-06-03_09,2024-05-30_01,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 mlxscore=0
+ adultscore=0 suspectscore=0 priorityscore=1501 clxscore=1015
+ lowpriorityscore=0 mlxlogscore=999 bulkscore=0 spamscore=0 phishscore=0
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2405170001 definitions=main-2406030114
 
 
----
-Regards,
-Linux Bluetooth
+> From: Janaki Ramaiah Thota (Temp) (QUIC) <quic_janathot@quicinc.com>
+> Sent: Monday, June 3, 2024 6:24 PM
+> To: Marcel Holtmann <marcel@holtmann.org>; Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+> Cc: Mohammed Sameer Mulla (QUIC) <quic_mohamull@quicinc.com>; Harish Bandi (QUIC) <quic_hbandi@quicinc.com>; linux-bluetooth@vger.kernel.org; linux-kernel@vger.kernel.org
+> Subject: [PATCH] PENDING: Bluetooth: Increase settling time for baudrate change VSC
+> 
+> From: Harish Bandi <quic_hbandi@quicinc.com>
+> 
+> This change is done to align the settling time and synchronization for baudrate VSC for WCN6750.
+> 
+> In logging disabled builds and few devices baudrate change and flow control is taking time so increasing the wait time to controller and uart to handle baudrate change request properly.
+> 
+> Change-Id: If0631cb886e53817f963f075e626c89a791b7be4
+> Signed-off-by: Harish Bandi <quic_hbandi@quicinc.com>
+> ---
+> 
+> diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c index eba9165..a59b35e 100644
+> --- a/drivers/bluetooth/btqca.c
+> +++ b/drivers/bluetooth/btqca.c
+> @@ -600,7 +600,6 @@
+>                  rom_ver = ((soc_ver & 0x00000f00) >> 0x04) | (soc_ver & 0x0000000f);
+> 
+>          if (soc_type == QCA_WCN6750) {
+> -               msleep(100);
+>                  qca_send_patch_config_cmd(hdev);
+>          }
+> 
+> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c index d8abd27..0b41214 100644
+> --- a/drivers/bluetooth/hci_qca.c
+> +++ b/drivers/bluetooth/hci_qca.c
+> @@ -1356,11 +1356,13 @@
+>          case QCA_WCN3990:
+>          case QCA_WCN3991:
+>          case QCA_WCN3998:
+> -       case QCA_WCN6750:
+>          case QCA_WCN6855:
+>          case QCA_WCN7850:
+>                  usleep_range(1000, 10000);
+>                  break;
+> +       case QCA_WCN6750:
+> +               msleep(30);
+> +               break;
+> 
+>          default:
+>                  msleep(300);
+> @@ -1904,7 +1906,6 @@
+>                  qca_set_speed(hu, QCA_INIT_SPEED);
+>          }
+> 
+> -       usleep_range(1000, 20000);
+>          /* Setup user speed if needed */
+>          speed = qca_get_speed(hu, QCA_OPER_SPEED);
+>          if (speed) {
 
+Please ignore the above patch.
 
---===============1348727350356545026==--
+-Janaki Ram
