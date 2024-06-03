@@ -1,170 +1,119 @@
-Received: from mail-oi1-f175.google.com (mail-oi1-f175.google.com [209.85.167.175])
+Received: from mail-vk1-f178.google.com (mail-vk1-f178.google.com [209.85.221.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD520882B
-	for <linux-bluetooth@vger.kernel.org>; Mon,  3 Jun 2024 15:34:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CBE813958F
+	for <linux-bluetooth@vger.kernel.org>; Mon,  3 Jun 2024 18:53:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717428874; cv=none; b=rd8ZX03z7gPTd+W5/Y6xckPtgQ27Ny3FD+crRpvvl+W994pFeRPrFDMZCElo7kvqXtnbNoPaA/rk4dx+QBNiUQ9W2BdQWSA8c/muGV0RGJYCKpx7kwq3Z0B3V1ieRp9NPEii1nE4g0wZXt9sRk45DJNiIcM9NITypDCChD32O98=
+	t=1717440799; cv=none; b=p03pSeqUCoOt+ktOB+kx9cLaS/Z6bC+XqTyvQStYrkQ/F6XGdwYQTw43DsYWh+rJjGmcgqaLqSDOKD3MP7D+7bjsxmVe7oCznOx18JTqmjJ6F11PziSxTmkChrHoGXdXkoYkXkUGUzljlH9NqZLN2NOhJWqC/EWW8Ol25+RWuvc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717428874; c=relaxed/simple;
-	bh=UJppz/OvgW6UKAsNuhaO5MxLndHb0iaImF5KflyX8wY=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=Zo2cp3zlGW3K9JjlPnS8vDvlSfNsMDyg3YQCSHsRJ+S7L0Qo7M57fhojQArAnJtjIoxAS9epkmEXi7fUevfwVaEqUy1w2/+tzwPZcKcVfXjWJcsIIQSJqg3Zv6JbtUupIBQon1wjnEdKpMd5N3Gik8Tog1wJ5czAiVe/jSAAru0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JqelwwV1; arc=none smtp.client-ip=209.85.167.175
+	s=arc-20240116; t=1717440799; c=relaxed/simple;
+	bh=U3JXHJoXfxXplytEMZ36wZ4tJSsPc/8Q27PTauh6eWU=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=UkMGRyTxasukkQv/G0SumXqbVrl2a+NICowK+IoiGge0w2lAhKws3CsBnc+EKe5z3snFiK8n9z9OSYBf08kggvsLpB4KzBVNsVD7+jubpwRagulv2F9KBGp3KHUg75no5BdjNcbiWwReKMgGnVYOTpWbOZzWqYDGf++RqBHMwH4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=S2q4ir+o; arc=none smtp.client-ip=209.85.221.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JqelwwV1"
-Received: by mail-oi1-f175.google.com with SMTP id 5614622812f47-3d1e17dd278so1915443b6e.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 03 Jun 2024 08:34:32 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="S2q4ir+o"
+Received: by mail-vk1-f178.google.com with SMTP id 71dfb90a1353d-4eb1b9865e4so561429e0c.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 03 Jun 2024 11:53:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1717428872; x=1718033672; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=bNxIzVrfita4lJwqyiScC1x+ImAYFOWCnPoWL+w0vRM=;
-        b=JqelwwV17fd8lHJq5JeKZayeLcfFRO4Ri7FoeUvZfT3U9Dy0A6UKov8aa8mkkqePzV
-         CUBiayPvYzfp4kMPKFh5QIFVOJUbYkLfBGsQcv2FGx9uVpPEK+jfBSx7ZBdN2Rk1Y8fi
-         SdkjzFK2qKYBEIJdjmDygo4bg9AKVVB38cXvx6yZTG3KLvMpZ6XhCYA46XUeqZWwbXg1
-         zFlX/UjNTFBwh+DScGlbe/T6cjGOUTBVf9FoY+WGrS1AGWQd+MqAaai2Aaz7T5b27qid
-         IdG62e1zQlp8s6+yrnVG/0Leeq1vjwpiiMjn+o53+B9vpRUhk0PphkCZN4EW1vQI8fx9
-         iKKw==
+        d=gmail.com; s=20230601; t=1717440796; x=1718045596; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=9B5sTBsDV/euPRNapmwxQ9v3fRRczY8l/+j7l6rxQ+I=;
+        b=S2q4ir+ouZCfSjGpT5hFemG1+iRnPh4Tu2IvkORahp2sZQiUuZeqKfcPef/CGYp1Cy
+         Upaf41Qa+yekdWZZS5dnodP9k+6rEzfHhoEG3/c4nMfOTQyM0Hrcv24hqmv6IhxcFhrm
+         kzy2SoPvaOA6lA5DKjM/NSRJLWrTxq7MRVuHti9T4KRt2FMXGdxDDS6qAXVAQ+tukda2
+         tykO7aXGpP3NbCVkELdc0wZQeJt86DcurOJjxR9NvAASFt7Wl984vVWoxNAQYAv7vpml
+         PmU9y2ZudaluGRCZOzqG5KZjVja80EkcmGsnBo4t4TJ+KkVY6lZv/RBLn61iqWYscYAf
+         zCYQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717428872; x=1718033672;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=bNxIzVrfita4lJwqyiScC1x+ImAYFOWCnPoWL+w0vRM=;
-        b=dvqBb8NXywU/GIjuynGnyHfeyk6PFhw7n1/vUyQvp/S+EhSm40RerFl2B2twv6WKwD
-         vdFf8NDf9aQlnuRy/qf7+IV1716CD+IGKz8JppYZU6AgS8Zc3N/5/fZ1nX68gqV1y8gH
-         ZcLCtyioV9ELOjCdMpGHEaCCBMU/Da33r31fCtTMd6aqz4mK0byZqFTbOyrSXqNppP4y
-         4LAHD4BKU3xtwjO8quDNB/92NMgrcMhXIp+Bw4SV93eCe35Jes2jc7CNludIKh6ouiyY
-         AWjfcxY958Iue3CWaMrbJtzAu2yoha9zyqkcqrkw8M4G2BHs1f3J3lfJbwMtaL7dgZKk
-         OM3g==
-X-Gm-Message-State: AOJu0YzOVE+82Sn4YbnmPPMI83VryDHRpI340Z1lG9INK2wv/9j4t4N4
-	qLkKZVXAF/1eV+RfpAF6n+vY0nSJlyrQAVPHkLemi5OXf26LIeRbZMHp0A==
-X-Google-Smtp-Source: AGHT+IFV00SrDGrKHIBm7NrawhH3Vgzxcwey0T29DicaOaPPg3UPad59jLNJuyxU45Ypv2Jx9sKg+w==
-X-Received: by 2002:a05:6808:481:b0:3d1:d0ee:8635 with SMTP id 5614622812f47-3d1e34a6898mr9273234b6e.32.1717428869935;
-        Mon, 03 Jun 2024 08:34:29 -0700 (PDT)
-Received: from [172.17.0.2] ([20.55.14.230])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6afba632e2bsm13555846d6.117.2024.06.03.08.34.29
+        d=1e100.net; s=20230601; t=1717440796; x=1718045596;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=9B5sTBsDV/euPRNapmwxQ9v3fRRczY8l/+j7l6rxQ+I=;
+        b=ofrSgLYuCfHRGr71jMJpwxPvN9JkFFVV6+Rgy8OUgf0ac/1tTnPVKBfxeeHlXnxIKZ
+         zz/LMZRrW0udc+t6rBs99fgAhkA9DRN1DfRfEeNoeMFht5Aue92IOJVpg8NZYgYj8w7R
+         Akju2TXkfIisgqyhGj7aRNG+cDRxNk4OL+4HdY7liHKNBt7h/8iv6Sr+hbcCmfeqLrZv
+         PHrRXNAJgJ5e3Qlpbfy+R1TaZQa/+7gk1/DDcglHdihtoG6eiDAxpcWd8n/VN5Mk9gU/
+         J8MoYJMMMp6QVliFNui367bPIYTJWunjhPgqdG4CPbxUJndclL8NliteG+bWG0IiHrUi
+         4P7Q==
+X-Gm-Message-State: AOJu0YxypfXe+LXx522CcYnSbI3X0hgJBVUfZ8/OPu/9ZU+1P2A1ZWE1
+	iChDUjCNEvAwp3ybxauQkNmksSq/j1DgyZl8Ah9I6pUuORdM43rlUhbiNQ==
+X-Google-Smtp-Source: AGHT+IF9/1+UghZIZrP5QrymJnAXaA0NNmVUomwJPYEw+LiMfd4E7biyIVYZX+KP3i44PNoMxyIN0w==
+X-Received: by 2002:a05:6122:12b7:b0:4d8:37eb:9562 with SMTP id 71dfb90a1353d-4eb02c71bd2mr9396580e0c.0.1717440795088;
+        Mon, 03 Jun 2024 11:53:15 -0700 (PDT)
+Received: from lvondent-mobl4.. (syn-107-146-107-067.res.spectrum.com. [107.146.107.67])
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-4eafecbab81sm1231658e0c.0.2024.06.03.11.53.13
+        for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 03 Jun 2024 08:34:29 -0700 (PDT)
-Message-ID: <665de285.050a0220.b074e.4412@mx.google.com>
-Date: Mon, 03 Jun 2024 08:34:29 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============4057854469398163378=="
+        Mon, 03 Jun 2024 11:53:14 -0700 (PDT)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ v2 1/3] shared/csip: Fix memory leak
+Date: Mon,  3 Jun 2024 14:53:10 -0400
+Message-ID: <20240603185312.162337-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.45.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, andreas@kemnade.info
-Subject: RE: bluetooth/gnss: GNSS support for TiWi chips
-In-Reply-To: <20240603144400.2195564-2-andreas@kemnade.info>
-References: <20240603144400.2195564-2-andreas@kemnade.info>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 
---===============4057854469398163378==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This is automated email and please do not reply to this email!
+This fixes the following leak:
 
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=858321
-
----Test result---
-
-Test Summary:
-CheckPatch                    FAIL      4.08 seconds
-GitLint                       FAIL      1.54 seconds
-SubjectPrefix                 FAIL      0.72 seconds
-BuildKernel                   PASS      29.90 seconds
-CheckAllWarning               PASS      32.84 seconds
-CheckSparse                   PASS      38.35 seconds
-CheckSmatch                   FAIL      34.96 seconds
-BuildKernel32                 PASS      28.90 seconds
-TestRunnerSetup               PASS      523.03 seconds
-TestRunner_l2cap-tester       PASS      18.24 seconds
-TestRunner_iso-tester         PASS      30.81 seconds
-TestRunner_bnep-tester        PASS      4.82 seconds
-TestRunner_mgmt-tester        PASS      111.23 seconds
-TestRunner_rfcomm-tester      PASS      7.39 seconds
-TestRunner_sco-tester         PASS      15.00 seconds
-TestRunner_ioctl-tester       PASS      9.49 seconds
-TestRunner_mesh-tester        PASS      5.95 seconds
-TestRunner_smp-tester         PASS      6.91 seconds
-TestRunner_userchan-tester    PASS      5.07 seconds
-IncrementalBuild              PASS      41.21 seconds
-
-Details
-##############################
-Test: CheckPatch - FAIL
-Desc: Run checkpatch.pl script
-Output:
-[v3,3/4] gnss: Add driver for AI2 protocol
-WARNING: added, moved or deleted file(s), does MAINTAINERS need updating?
-#139: 
-new file mode 100644
-
-total: 0 errors, 1 warnings, 550 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/src/13683899.patch has style problems, please review.
-
-NOTE: Ignored message types: UNKNOWN_COMMIT_ID
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-##############################
-Test: GitLint - FAIL
-Desc: Run gitlint
-Output:
-[v3,1/4] gnss: Add AI2 protocol used by some TI combo chips.
-
-WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
-1: T3 Title has trailing punctuation (.): "[v3,1/4] gnss: Add AI2 protocol used by some TI combo chips."
-##############################
-Test: SubjectPrefix - FAIL
-Desc: Check subject contains "Bluetooth" prefix
-Output:
-"Bluetooth: " prefix is not specified in the subject
-"Bluetooth: " prefix is not specified in the subject
-"Bluetooth: " prefix is not specified in the subject
-##############################
-Test: CheckSmatch - FAIL
-Desc: Run smatch tool with source
-Output:
-
-Segmentation fault (core dumped)
-make[4]: *** [scripts/Makefile.build:244: net/bluetooth/hci_core.o] Error 139
-make[4]: *** Deleting file 'net/bluetooth/hci_core.o'
-make[3]: *** [scripts/Makefile.build:485: net/bluetooth] Error 2
-make[2]: *** [scripts/Makefile.build:485: net] Error 2
-make[2]: *** Waiting for unfinished jobs....
-Segmentation fault (core dumped)
-make[4]: *** [scripts/Makefile.build:244: drivers/bluetooth/bcm203x.o] Error 139
-make[4]: *** Deleting file 'drivers/bluetooth/bcm203x.o'
-make[4]: *** Waiting for unfinished jobs....
-make[3]: *** [scripts/Makefile.build:485: drivers/bluetooth] Error 2
-make[2]: *** [scripts/Makefile.build:485: drivers] Error 2
-make[1]: *** [/github/workspace/src/src/Makefile:1919: .] Error 2
-make: *** [Makefile:240: __sub-make] Error 2
-
-
+102 bytes in 6 blocks are definitely lost in loss record 660 of 909
+   at 0x484282F: malloc (vg_replace_malloc.c:446)
+   by 0x5A078B: util_malloc (util.c:46)
+   by 0x649162: read_sirk (csip.c:485)
+   by 0x5C74FA: read_cb (gatt-client.c:2713)
+   by 0x5C4137: handle_rsp (att.c:880)
+   by 0x5C4137: can_read_data (att.c:1072)
+   by 0x65DDA4: watch_callback (io-glib.c:157)
+   by 0x49656AB: ??? (in /usr/lib64/libglib-2.0.so.0.8000.2)
+   by 0x49C6707: ??? (in /usr/lib64/libglib-2.0.so.0.8000.2)
+   by 0x496B666: g_main_loop_run (in /usr/lib64/libglib-2.0.so.0.8000.2)
+   by 0x65FE3D: mainloop_run (mainloop-glib.c:66)
+   by 0x6605A3: mainloop_run_with_signal (mainloop-notify.c:188)
+   by 0x31DEFA: main (main.c:1468)
 ---
-Regards,
-Linux Bluetooth
+ src/shared/csip.c | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
 
+diff --git a/src/shared/csip.c b/src/shared/csip.c
+index e13efb6ce634..87b4590d926d 100644
+--- a/src/shared/csip.c
++++ b/src/shared/csip.c
+@@ -128,6 +128,15 @@ void bt_csip_detach(struct bt_csip *csip)
+ 	queue_foreach(csip_cbs, csip_detached, csip);
+ }
+ 
++static void csis_free(struct bt_csis *csis)
++{
++	if (!csis)
++		return;
++
++	free(csis->sirk_val);
++	free(csis);
++}
++
+ static void csip_db_free(void *data)
+ {
+ 	struct bt_csip_db *cdb = data;
+@@ -137,7 +146,7 @@ static void csip_db_free(void *data)
+ 
+ 	gatt_db_unref(cdb->db);
+ 
+-	free(cdb->csis);
++	csis_free(cdb->csis);
+ 	free(cdb);
+ }
+ 
+-- 
+2.45.1
 
---===============4057854469398163378==--
