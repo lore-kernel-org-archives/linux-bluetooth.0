@@ -1,203 +1,152 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
+Received: from EUR01-HE1-obe.outbound.protection.outlook.com (mail-he1eur01on2089.outbound.protection.outlook.com [40.107.13.89])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 355153236;
-	Tue,  4 Jun 2024 11:30:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717500616; cv=none; b=WGiLTnQHZQokUbWjcurFwV9OYL0kiYLIurtsgaeiPn+j3zrgvd5k1A90BUHCZHpG9BHRh6tP+cMqTphO5tziPZuQysupldxKSd1TGXoJf5EHa66Fsv6l5kTZkKsaIGKFflSsRCKpgG3HW186kHT/JbzCCk8u/Jz781FbNoXd214=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717500616; c=relaxed/simple;
-	bh=TSTA2G2LQUoLI818l9IzE6WcYMZFTkdSN3J60PlP/OM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oUK6K1LtbYSCJ0YdbuSatG5du47SttAExr+uHpWPjePti8Th4cBiGjkhXHpJQ525u9wYF6bmUj5gLKOX1hemBxzmozqIPIwuHooxEWPRCwFeDl8Yc2tQyyfUmFQmpJoxm6yc7SEYe7Qoe3EAbR6dm+B3u1rVkl0XMmQ/Lc2j1tI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=OdRrewFP; arc=none smtp.client-ip=192.198.163.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A203131182
+	for <linux-bluetooth@vger.kernel.org>; Tue,  4 Jun 2024 11:47:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.13.89
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1717501640; cv=fail; b=s3xTHiBiUJMWM+u72G41yTBluEQvwq0t5SGY26v25I6pNoNJVxCBEjusQmWFj9QYZfJhhgoR2ZFQs7oTBHA77Bs0OIxa/QYmrO58XfLWoevHpxRTL5Ce/yDL0DWj7RjSZbiL/ZYd/895VFYzktEugYQAReyteHT1K2cOIWdvw4E=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1717501640; c=relaxed/simple;
+	bh=Wb+qW7CRQgnGZCj/caZsIQXza5VFWNTptEeQZ6HaevM=;
+	h=From:To:Cc:Subject:Date:Message-Id:Content-Type:MIME-Version; b=pt9L8up+5i39tWggXW21sXp3Q1W/n/F385z6ahPLOpreEEPn4hm1Y21QAnRqC3iHRdNZUtEl5S2mpvgd58kEGxI3LgZD0shcVoC76lSG96gZydjrn0gNCV2YxwhRZlXI5807mcEqIIUVdWF+kVeLa+AQQ+deQq/46ohy3V3xFfM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b=m1HF6N06; arc=fail smtp.client-ip=40.107.13.89
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="OdRrewFP"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1717500614; x=1749036614;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=TSTA2G2LQUoLI818l9IzE6WcYMZFTkdSN3J60PlP/OM=;
-  b=OdRrewFP5MUVENDRqkkcuHEBPp/VmaAIOHBfvDoyeVA4sPjbgEcgCn+S
-   mxS1mSQ8fZGnK1y1AclN/EBBmcyRA4VeNzfzYc7xIXy8mzC92z0Z9OQo6
-   8T90/gbKrZdzLAdL51tZ4FSlZ+7DHBP+h779lyRKiylWQwPL7EQ2KTNfQ
-   SclejSY99WDVb806Iqa+nbC+Eucb5tpLuztueF/LV5BnzorMWgL/VCKDR
-   vIVEASKy38b2JvYomtHUuGQp55sQa4iO/DYQ14gvZm8llWbPP3IJdXPTE
-   cri0RB0+ANh7CRRBNsvbq8HGCgQAu+FW9GUnj4c8YD1/WjRmRxRwYZfyW
-   A==;
-X-CSE-ConnectionGUID: yoedKoM6S3+44ld1Z20dUw==
-X-CSE-MsgGUID: WKEPKTdaRlmfMrXI8MXxvA==
-X-IronPort-AV: E=McAfee;i="6600,9927,11092"; a="14263076"
-X-IronPort-AV: E=Sophos;i="6.08,213,1712646000"; 
-   d="scan'208";a="14263076"
-Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Jun 2024 04:30:13 -0700
-X-CSE-ConnectionGUID: SpeJQ3pTRt+lLlyUgBliTg==
-X-CSE-MsgGUID: PDxX2zhER16Ox+JxrCjxVw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.08,213,1712646000"; 
-   d="scan'208";a="41670248"
-Received: from unknown (HELO 0610945e7d16) ([10.239.97.151])
-  by fmviesa005.fm.intel.com with ESMTP; 04 Jun 2024 04:30:09 -0700
-Received: from kbuild by 0610945e7d16 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1sESMh-000N8x-06;
-	Tue, 04 Jun 2024 11:30:07 +0000
-Date: Tue, 4 Jun 2024 19:29:28 +0800
-From: kernel test robot <lkp@intel.com>
-To: Andreas Kemnade <andreas@kemnade.info>, marcel@holtmann.org,
-	luiz.dentz@gmail.com, johan@kernel.org, gregkh@linuxfoundation.org,
-	jirislaby@kernel.org, pmenzel@molgen.mpg.de,
-	linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-	Adam Ford <aford173@gmail.com>, Tony Lindgren <tony@atomide.com>,
-	tomi.valkeinen@ideasonboard.com,
-	=?iso-8859-1?Q?P=E9ter?= Ujfalusi <peter.ujfalusi@gmail.com>,
-	robh@kernel.org, hns@goldelico.com
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev
-Subject: Re: [PATCH v3 3/4] gnss: Add driver for AI2 protocol
-Message-ID: <202406041854.1Ad8rnRn-lkp@intel.com>
-References: <20240603144400.2195564-4-andreas@kemnade.info>
+	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="m1HF6N06"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=fjXM/IO0KXa4XkXjcDJddbz9Ap+8BdTWBcFKObufaswuvCgStG5rp2nTvTUi7a91FArOoWDDvu/OOEnob/V8sVb8SEhLEILUahMPXBnB2PhCL0DNXNdx0WZSifQjgWqzP/YpV9VTTb6KsMBUnVSzmJJLDNoawdA4pINaxYlwArXqq1zrI1FpMvtEqw3/eC549WnLmrUGpqtyzHOlmAowMKKnHJQTH32abgxeVq+Prf5OhDClhGVBpkDdmNNyj6SvjEMC7gB9Mc7L3KeHvGGKS8fkrSIxKXjZzU/lUbAfdzopT1e70DBz3bEpFyNpAFMAfoUzykHZzecvr2brW0J3oA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=OV05FN3ERMNWvhLlx71mDfV5uwDTFjSNOY6kJrQNUTw=;
+ b=ZdY7AkOOSSJ7+NwwpgP9ORXQ6BrVsZq4yUHq53oYYbXX+9NxG/eFb7F9T1Oqw0kZgz2XH1hETo40NbwFOH8tCxoOpcec2GmRSUTtOB7ho9hz748V71V2n5InOLfVm9EKsrKv6/pCIsVuXZDGdZTtmhSWvI8XvQ+53xSHFJYbWHdtSDnD5vL75YpTpe/eFcVyaVpkCUQMmZEMhNVh3zBvVn49zAJl7le/fMk0/K+A33cuu/P65wojvZa1nQ2aqRtdsjn1LEcSjBliZR+dqVwf209IBieAeD+T3LyHkpDFehcr1wKyHWdovrwKX9+d8+dPKEwrvNwTfijQDl25pEKRkA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=OV05FN3ERMNWvhLlx71mDfV5uwDTFjSNOY6kJrQNUTw=;
+ b=m1HF6N06zHHYxLIdh/l6QbbSpxzeWT3w5S050aeEVDWb4b44uNsoCqH9x+bE4RKK0RfY5bWh5q7cF1afunAq3XZunef2xP6Hf3hQ7an2/TYJOLBErck9fWnRKQkT+br1vMHqWeViwqcH6VvfqEEuvbvdPw4P/16h+rWTmaZEwdE=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from PAXPR04MB8909.eurprd04.prod.outlook.com (2603:10a6:102:20c::19)
+ by AS1PR04MB9478.eurprd04.prod.outlook.com (2603:10a6:20b:4d8::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7633.23; Tue, 4 Jun
+ 2024 11:47:15 +0000
+Received: from PAXPR04MB8909.eurprd04.prod.outlook.com
+ ([fe80::d39b:a5b:8f24:ae30]) by PAXPR04MB8909.eurprd04.prod.outlook.com
+ ([fe80::d39b:a5b:8f24:ae30%4]) with mapi id 15.20.7633.021; Tue, 4 Jun 2024
+ 11:47:15 +0000
+From: Iulia Tanasescu <iulia.tanasescu@nxp.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: claudia.rosu@nxp.com,
+	mihai-octavian.urzica@nxp.com,
+	vlad.pruteanu@nxp.com,
+	andrei.istodorescu@nxp.com,
+	luiz.dentz@gmail.com,
+	Iulia Tanasescu <iulia.tanasescu@nxp.com>
+Subject: [PATCH BlueZ 0/1] test-bap: Add Broadcast Source STR one BIS tests
+Date: Tue,  4 Jun 2024 14:47:07 +0300
+Message-Id: <20240604114708.33423-1-iulia.tanasescu@nxp.com>
+X-Mailer: git-send-email 2.39.2
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: AM0PR02CA0213.eurprd02.prod.outlook.com
+ (2603:10a6:20b:28f::20) To PAXPR04MB8909.eurprd04.prod.outlook.com
+ (2603:10a6:102:20c::19)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240603144400.2195564-4-andreas@kemnade.info>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PAXPR04MB8909:EE_|AS1PR04MB9478:EE_
+X-MS-Office365-Filtering-Correlation-Id: f800d0cb-81be-4728-5b47-08dc848c1478
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230031|366007|376005|1800799015;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?zXzu1yLoD28xfVVqWRPrOzBBmmvelKFCus/ol7iTtNKU7wLO91wOdzpHnJwt?=
+ =?us-ascii?Q?ZMN/z7Pd7pdli5ZL2yBqQUzKrB4clZ8kgmWWB5okjW3kVvHhC6bDbIm+nuSP?=
+ =?us-ascii?Q?0VLSHXwbiop3zt5+TfDN7PbEorYQZwIDjKxMj+s5+tmJXn9WMg2lYgzUKwEB?=
+ =?us-ascii?Q?EQ+Aga+FuKf96uwp3B5r2ADwH8U42xhdsGr+88+wHOyuklViXYv+Xz/+dMZW?=
+ =?us-ascii?Q?2dW3EQ4TGiLEbQ0aPkiVP06MRqAKbAVpATVAbErweFILQIPlpViHN3wOYOGw?=
+ =?us-ascii?Q?QlqGuM6uxjT57T+3KigHk98dQ6oUDrH/4NMqTmK1QP8xOTCjo/+1N1B/Ukp7?=
+ =?us-ascii?Q?cpu2GHAsaDaZOz2Xh7an8eN++20diTtCUYbpTxAEbibjhPl2sK68C76DV+0A?=
+ =?us-ascii?Q?2K0LySuTcJbGB/8sh4z6a0PevfuGsirPzgO0LC3ilPsGXvqaKem057je76jf?=
+ =?us-ascii?Q?cAzopi5fNbvW38gxgaQl5GJjq1wiiXZSol/6m1Hb7LSpLAZ5XVMErwulWbs+?=
+ =?us-ascii?Q?e5GdxUAK7b6Gyf2EWgaqpC8uP9H1fZvUiJggpBK/JzAAx0Wl/fQEPkmc6ogT?=
+ =?us-ascii?Q?wll3ndwekPNW1tWwkFSSydWpnqTpnndsKe4pfktCbIwH5KLrqPiK6qJDoZtR?=
+ =?us-ascii?Q?KhzBn/3Ong0zdWBC0QPF4fwwbnLyZoXBxb53t7Tq91VGpz6KeIAjJnSLKA6K?=
+ =?us-ascii?Q?7itdGsvruGopsu3d9lOX930pL7Cjnk007EzhfWfqbJI48xPW9XDLnuZAhycD?=
+ =?us-ascii?Q?jWEnv78GbxCPOaBN/XZsIyROmnjj/zjuFrTRM8mDcLyFvHXd5DHqsnVM0saF?=
+ =?us-ascii?Q?wqaS2LSU3z+74K3vqXMmFE67Iit+tdb3SwAkt3sjbEbnLTqUju8mpbHr5t20?=
+ =?us-ascii?Q?5BpdOviu9ncrIWVxqKIfcinenfePHVaCBHJgsWa13cNtqLXJ5CHQ7y0CfALT?=
+ =?us-ascii?Q?Nzy2V1wUdZeML/SqHryYviKGaPYOf8lo7Oav6Dcwbxq86VMp7DXkR0EJH+Jm?=
+ =?us-ascii?Q?KD2Kzj6JDdy17LQbFM29XxEoawc6TeasCjFFd+lqUttSDT1ofcD7wXR3P1IY?=
+ =?us-ascii?Q?XcFQLmwRPBwLpNe8rSGq8utVEBHe7dKrTTWRA1sbmTh14xt990viK9LScdUs?=
+ =?us-ascii?Q?jc6MGv7zw6pqlRxtdVo9sD9cSXUEqr597GMRXaAg4pCtEu2B7nTOY8ZXx00h?=
+ =?us-ascii?Q?RX0NF60AiDmnl2NyXtvWhNSY4qKuPqSWSP7fJayate7HdIlEktUxr1jUYMYk?=
+ =?us-ascii?Q?EaZ60CIY5YOytx5S8FajMVZpOh7ShVR8TFrWDJHasA=3D=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR04MB8909.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366007)(376005)(1800799015);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?c6003PBk7f6+AKOzZkGEQyxREgGKzq0/OAbas2+9UrDrn2E4izf5XJkOeKmc?=
+ =?us-ascii?Q?QXVUCnkPU9K3Fnq4CczluRdvwv/sMtlgthB6MLzLZmHmXZC4JOCnxEWPUAVE?=
+ =?us-ascii?Q?v7+MWrVyrXcIv8gxskbUnWqEdm5JY3z5aT8naPq7cifqcljp7XkUOlOBX+JP?=
+ =?us-ascii?Q?vId8qdPWHvLApMcFEP/Ur8jkQhEeNEv103U4D72MoxpodTh22Pg0a4W7eEZv?=
+ =?us-ascii?Q?+THoF670kb5h+gHrDWOiup6T1xHTltcGR9sAnQbTGHiTrjiafSJ04D34ao94?=
+ =?us-ascii?Q?04dOdETwQdcCz+FNY4DwKBR1/amBD/MIDKbr3zMgODDP30/OgXUVs/0e1NnT?=
+ =?us-ascii?Q?41UDqTtVg6SLhR9UWoErbzjxfcyBA+8QKmeA5MTj9eCdFMM9qfuAMBSbMzcP?=
+ =?us-ascii?Q?HwkoIOhXcgr5kPJYuw3Mub8aCxb7K/jbazcYcXNUa1GTIE63wPMBYuy+Az39?=
+ =?us-ascii?Q?PMf00TuQaINNLbS57h1x47hXRm8W+oIq386SLErAdYZz4YQHFu5yHLHI9+cs?=
+ =?us-ascii?Q?tkAhcD17IbKHbFS7mLV3UqWXOBvAMC19j3juTJQ5P9Le6M9BJLscLHSoy2Uy?=
+ =?us-ascii?Q?Qb4yzjC5f3F+/cEcg1fk5W//vrPHieoFJsaq9X8r+P+xq5hw3Z+UouLeSRTL?=
+ =?us-ascii?Q?wWrmLeN6FvP80wNoM3nrfe+YFjL5C3tOAd97JGreOQ5QPuTVyT21McpIzoD1?=
+ =?us-ascii?Q?MOLd/mBxdVNJJfB7pcRORsjBnsD7eXXwlvH2H9uj/nZbXLDjx0wQddScAiZu?=
+ =?us-ascii?Q?fZ0+k1XEiXK+CMK/bE6PQSc+JCzg/8qsEBC9/LCBXLau6mD8Co9i3mUiUKTo?=
+ =?us-ascii?Q?hG7c5MK2SVckJmNswUA49MZKq/bc2/IbwratwkCluXiwTe3FJNYqLN476tN9?=
+ =?us-ascii?Q?4jSYqyFWhWvHspfia8TSk+fkkRFvJjgB5CYP+OZ0Bh6sy2Om5mnGCYeOl1br?=
+ =?us-ascii?Q?IoG6mT0g5kAWXPkttCGQLyeGc0rhyUOuKeR8Zsw+osqXGuCUXAPZ9rMw9UsL?=
+ =?us-ascii?Q?w049dYoOpRT8B7tcB/LO4TZeGk4MLnYH9QlkRj3QZg/OTSjUnz4aCfISsNmO?=
+ =?us-ascii?Q?dMXH8WwSw5niu4UG2j+KK1y602+nTmb/DCMhbk0JyRcGf2K18hzh8w6BSNeh?=
+ =?us-ascii?Q?AMzO5PfCNqeazEmXCAT0xsZ241sS9rdTs1nkBye6gJgLUxZD2yfNa9B+Zoel?=
+ =?us-ascii?Q?P8DTYQdOyYRwoK8YOBxhfKy0l9S+qv/HQMka7DqsfuCbwRve5DaFOnuucUje?=
+ =?us-ascii?Q?td92BeSKagtUHp+xCQemDcrY3F+bTfDpUPnS/bip4D87mhNTam3cfSUeYl6A?=
+ =?us-ascii?Q?BjBdjIEAt1nf9ojZoALPwHuNZEB0ZTGesHBpi9u1ujGJ4RssHAKiPgI2U76J?=
+ =?us-ascii?Q?vD6J0IZr89i33/DtjR00JhbASHkJiHKvWs+rIEuWho3KhWWR+TUPwr/+uEpc?=
+ =?us-ascii?Q?Nz63alULJve6nf/l9AjwfamawEQz6yqBufo9AZVixW7OcKvK3P8ZUKTke4WW?=
+ =?us-ascii?Q?0DJABxRZuQSBwHcykA8no/QHVRhRZVsuv3kX460O9W2dukWcPCcn+QcOFiLz?=
+ =?us-ascii?Q?tmWDiyPHZk7b2t3OfSjBMbNy9XEySP9sg4DTScvCgox+SU9tDljKMD9gN64J?=
+ =?us-ascii?Q?ww=3D=3D?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: f800d0cb-81be-4728-5b47-08dc848c1478
+X-MS-Exchange-CrossTenant-AuthSource: PAXPR04MB8909.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Jun 2024 11:47:15.4546
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: BGsvY957HnMy2tB5/UggxzWofR65xRv+edZk0EdTNxLWUDi0s82uL43bVHgsuErV3LsZs/0xJ8S8pZsSxvXqrg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS1PR04MB9478
 
-Hi Andreas,
+This patch adds BAP unit tests for Broadcast Source streaming with one
+BIS (4.14.1 Broadcast Audio Stream with One BIS - Source - page 180).
 
-kernel test robot noticed the following build errors:
+Iulia Tanasescu (1):
+  test-bap: Add Broadcast Source STR one BIS tests
 
-[auto build test ERROR on bluetooth/master]
-[also build test ERROR on bluetooth-next/master char-misc/char-misc-testing char-misc/char-misc-next char-misc/char-misc-linus linus/master v6.10-rc2 next-20240604]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Andreas-Kemnade/gnss-Add-AI2-protocol-used-by-some-TI-combo-chips/20240603-224753
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git master
-patch link:    https://lore.kernel.org/r/20240603144400.2195564-4-andreas%40kemnade.info
-patch subject: [PATCH v3 3/4] gnss: Add driver for AI2 protocol
-config: hexagon-allyesconfig (https://download.01.org/0day-ci/archive/20240604/202406041854.1Ad8rnRn-lkp@intel.com/config)
-compiler: clang version 19.0.0git (https://github.com/llvm/llvm-project d7d2d4f53fc79b4b58e8d8d08151b577c3699d4a)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240604/202406041854.1Ad8rnRn-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202406041854.1Ad8rnRn-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
-   In file included from drivers/gnss/ai2.c:9:
-   In file included from include/linux/gnss.h:13:
-   In file included from include/linux/kfifo.h:42:
-   In file included from include/linux/scatterlist.h:8:
-   In file included from include/linux/mm.h:2210:
-   include/linux/vmstat.h:522:36: warning: arithmetic between different enumeration types ('enum node_stat_item' and 'enum lru_list') [-Wenum-enum-conversion]
-     522 |         return node_stat_name(NR_LRU_BASE + lru) + 3; // skip "nr_"
-         |                               ~~~~~~~~~~~ ^ ~~~
-   In file included from drivers/gnss/ai2.c:9:
-   In file included from include/linux/gnss.h:13:
-   In file included from include/linux/kfifo.h:42:
-   In file included from include/linux/scatterlist.h:9:
-   In file included from arch/hexagon/include/asm/io.h:328:
-   include/asm-generic/io.h:547:31: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     547 |         val = __raw_readb(PCI_IOBASE + addr);
-         |                           ~~~~~~~~~~ ^
-   include/asm-generic/io.h:560:61: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     560 |         val = __le16_to_cpu((__le16 __force)__raw_readw(PCI_IOBASE + addr));
-         |                                                         ~~~~~~~~~~ ^
-   include/uapi/linux/byteorder/little_endian.h:37:51: note: expanded from macro '__le16_to_cpu'
-      37 | #define __le16_to_cpu(x) ((__force __u16)(__le16)(x))
-         |                                                   ^
-   In file included from drivers/gnss/ai2.c:9:
-   In file included from include/linux/gnss.h:13:
-   In file included from include/linux/kfifo.h:42:
-   In file included from include/linux/scatterlist.h:9:
-   In file included from arch/hexagon/include/asm/io.h:328:
-   include/asm-generic/io.h:573:61: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     573 |         val = __le32_to_cpu((__le32 __force)__raw_readl(PCI_IOBASE + addr));
-         |                                                         ~~~~~~~~~~ ^
-   include/uapi/linux/byteorder/little_endian.h:35:51: note: expanded from macro '__le32_to_cpu'
-      35 | #define __le32_to_cpu(x) ((__force __u32)(__le32)(x))
-         |                                                   ^
-   In file included from drivers/gnss/ai2.c:9:
-   In file included from include/linux/gnss.h:13:
-   In file included from include/linux/kfifo.h:42:
-   In file included from include/linux/scatterlist.h:9:
-   In file included from arch/hexagon/include/asm/io.h:328:
-   include/asm-generic/io.h:584:33: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     584 |         __raw_writeb(value, PCI_IOBASE + addr);
-         |                             ~~~~~~~~~~ ^
-   include/asm-generic/io.h:594:59: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     594 |         __raw_writew((u16 __force)cpu_to_le16(value), PCI_IOBASE + addr);
-         |                                                       ~~~~~~~~~~ ^
-   include/asm-generic/io.h:604:59: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     604 |         __raw_writel((u32 __force)cpu_to_le32(value), PCI_IOBASE + addr);
-         |                                                       ~~~~~~~~~~ ^
->> drivers/gnss/ai2.c:340:6: error: call to undeclared function 'get_unaligned_le16'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
-     340 |         if (get_unaligned_le16(data + i) != sum) {
-         |             ^
-   7 warnings and 1 error generated.
+ unit/test-bap.c | 259 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 259 insertions(+)
 
 
-vim +/get_unaligned_le16 +340 drivers/gnss/ai2.c
-
-   324	
-   325	/* do some sanity checks and split frame into packets */
-   326	static void process_ai2_frame(struct ai2_device *ai2dev)
-   327	{
-   328		u16 sum;
-   329		int i;
-   330		u8 *head;
-   331		u8 *data;
-   332	
-   333		sum = 0;
-   334		data = ai2dev->recv_skb->data;
-   335		for (i = 0; i < ai2dev->recv_skb->len - 2; i++)
-   336			sum += data[i];
-   337	
-   338		print_hex_dump_bytes("ai2 frame: ", DUMP_PREFIX_OFFSET, data, ai2dev->recv_skb->len);
-   339	
- > 340		if (get_unaligned_le16(data + i) != sum) {
-   341			dev_dbg(ai2dev->dev,
-   342				"checksum error in reception, dropping frame\n");
-   343			return;
-   344		}
-   345	
-   346		/* reached if byte 1 in the command packet is set to 1 */
-   347		if (data[1] == AI2_ACK)
-   348			return;
-   349	
-   350		head = skb_pull(ai2dev->recv_skb, 2); /* drop frame start marker */
-   351		while (head && (ai2dev->recv_skb->len >= 3)) {
-   352			u8 cmd;
-   353			u16 pktlen;
-   354	
-   355			cmd = head[0];
-   356			pktlen = get_unaligned_le16(head + 1);
-   357			data = skb_pull(ai2dev->recv_skb, 3);
-   358			if (!data)
-   359				break;
-   360	
-   361			if (pktlen > ai2dev->recv_skb->len)
-   362				break;
-   363	
-   364			head = skb_pull(ai2dev->recv_skb, pktlen);
-   365	
-   366			process_ai2_packet(ai2dev, cmd, data, pktlen);
-   367		}
-   368	}
-   369	
-
+base-commit: cbe4144dea6fde87e13016c2861c9ba5f75f716f
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+2.39.2
+
