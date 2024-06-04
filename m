@@ -1,105 +1,144 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f174.google.com (mail-pg1-f174.google.com [209.85.215.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A5EE1442F5;
-	Tue,  4 Jun 2024 23:23:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFBE7A5F
+	for <linux-bluetooth@vger.kernel.org>; Tue,  4 Jun 2024 23:34:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717543430; cv=none; b=Z2sIp53nvEbgZkn4Ps1WbSFU+5ACKyKNfYCvWPMvKiRVt0+p+8zOp1ekWaGwJMGju0gEscF0LqE8EvQNLvZHGMpOTCGd3M0eYP8f6KmDow5PYUjJPWu77UP8jX4lqcLDT8oaT61LrcTl8GJWXkv45KHDmHa0bXhAPuB9tjyJtVE=
+	t=1717544076; cv=none; b=n1Wp8sC1bLH4V/fBwbEc+3KoWM+ygg2K/L+qqb7p3rNP2Iy1R2uDjpCrOLKs1ulCMAz7DBVo8N1vrRzYqScaa5ChEbyRhzfoeOHcQT8t+F8qfysP7EId5sQMv2VuHsbC9l9nB46zmrQv+qn+/5xiNRh20c/piG7AbqgqMEmS5aY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717543430; c=relaxed/simple;
-	bh=TcM91AOH5mARdOX+sC1EAXIn04cXXNDDk3iF8SmOPds=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To; b=ZC+4MBiOncvQHflM4Suy6R2rD2UKjB7NFhppXg/sAWDhIdMzaHxo8jDGD3vEEv0iJTpUxCt0OaTgm+J6PGU4GjSg4BAsEDvQDPCvpgndpfSEEPfox9vvrKezYPei6Wjgk4rVMOANiWsbTYASRIc6zeHIuVuCYPeFuyHdY49lEiQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HLiPBDnK; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1717544076; c=relaxed/simple;
+	bh=pBPTkXXvFg4BhFT3rx8FS5yU3jyGWzshezpG/kc/Qzw=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=dQNdewIP2hPK+eJkzsEb8HL5hGtK6RcRUEhDTxmZIFMMf0q85/z92vYFJ5q6crxbOop65uWuufgDDX5ba7Ji8nUF6yl/o3LSJeczt5kkFVEqNLCo9eFj5TcWOsFc9q43bfYk+z0aFKRrai2v4X713/1cAHDSMAeIQLWA0OoFULk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WRIc2Vew; arc=none smtp.client-ip=209.85.215.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HLiPBDnK"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 67E83C3277B;
-	Tue,  4 Jun 2024 23:23:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1717543429;
-	bh=TcM91AOH5mARdOX+sC1EAXIn04cXXNDDk3iF8SmOPds=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:From;
-	b=HLiPBDnKEroIafHmkKhjL6ZMtwQGyKIKNbO+TcKl/05kSJIwg0yO1zoMMQbmOFtv3
-	 BPwiExtk5Je89Q0RCvCcP3KlX4Gh/9Y/96+4Th9xJSJREAr9tGTnYtD0hKHOUVm8i0
-	 rjrBa1hjbTsB2cAxnsTkD0mIW0nAt1HupIBiC4A3ABFImA1myBc45JQ3fI68abpMiw
-	 FrSRmzcAkYkvGQ9Cux3ZCT6BXB2Q07caU5VI5TY6DxiGtNCxTfI+3q8uT3jeG6ugDG
-	 bMO4Zbad0NPDHHGrNKyQfl8QS8RH9L5uVpcBiiwcQRkGeBpZCcqKAFD5AbiCUxhYJc
-	 Hrn3BtBW16vpg==
-Date: Tue, 4 Jun 2024 18:23:47 -0500
-From: Bjorn Helgaas <helgaas@kernel.org>
-To: Bartosz Golaszewski <brgl@bgdev.pl>
-Cc: Liam Girdwood <lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Balakrishna Godavarthi <quic_bgodavar@quicinc.com>,
-	Rocky Liao <quic_rjliao@quicinc.com>, Kalle Valo <kvalo@kernel.org>,
-	Jeff Johnson <jjohnson@kernel.org>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Konrad Dybcio <konrad.dybcio@linaro.org>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Srini Kandagatla <srinivas.kandagatla@linaro.org>,
-	Elliot Berman <quic_eberman@quicinc.com>,
-	Caleb Connolly <caleb.connolly@linaro.org>,
-	Neil Armstrong <neil.armstrong@linaro.org>,
-	Dmitry Baryshkov <dmitry.baryshkov@linaro.org>,
-	Alex Elder <elder@kernel.org>, linux-arm-msm@vger.kernel.org,
-	linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-	linux-wireless@vger.kernel.org, ath11k@lists.infradead.org,
-	Jeff Johnson <quic_jjohnson@quicinc.com>,
-	ath12k@lists.infradead.org, linux-pm@vger.kernel.org,
-	linux-pci@vger.kernel.org,
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
-	kernel@quicinc.com, Amit Pundir <amit.pundir@linaro.org>
-Subject: Re: [PATCH v8 16/17] PCI/pwrctl: add a PCI power control driver for
- power sequenced devices
-Message-ID: <20240604232347.GA740032@bhelgaas>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WRIc2Vew"
+Received: by mail-pg1-f174.google.com with SMTP id 41be03b00d2f7-681ad26f4a5so3612751a12.2
+        for <linux-bluetooth@vger.kernel.org>; Tue, 04 Jun 2024 16:34:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1717544074; x=1718148874; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=tUmYVbefyf2P5AyFTjwHnHB3iX6iQBsFJvAE2fyepVQ=;
+        b=WRIc2Vew34pQ07Hje4YsvZ4e/PJZwUh05A442ifFgQULDAOmgeTHhK6U+xlgj2fq0J
+         4Si4/fQcy6f1isy4nnW/xM/Kc5MLb7xeZI/adalCLm5A86KZhyGzmiJOzWnHqHqlO0KI
+         dz3mokTAnBjUsl25pO5lnn4OHsWstH60bFh0OkqzNtxq3ql5ue1EyXgyEj1RM3rZnmGy
+         J3HCEoFPijvaNUXZAuW7SxaQsCWaXqjUs0kbd8QjXt1pWgYVjAGIIvT7knUjK7LCqCSc
+         yCV7zLqv2RHBTwOQjbjo7mJucAf9F5ZJxnm5Srpmky6zmP1KgjFHSLaSoemGwybPwDld
+         au1Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1717544074; x=1718148874;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=tUmYVbefyf2P5AyFTjwHnHB3iX6iQBsFJvAE2fyepVQ=;
+        b=JkxQcpf6pYGIdnx5n420bMZC5Ndz3TdKDMYU4h3NFWTu5OFInPYGFcoKe/2N9B59lW
+         yu8cAfqry+PUUXk801+UScoqWWD3sjN3ip8lATXmzlc31T9zS4e2Ida10rf/bkq22so+
+         ycNz8w6ASlJ5iTBMmCxIWD8kIDfs441yLVKk7fE4P2TsXceRLaO6xShJLJi6Ojyp3oHU
+         xJ7AmeOsvhharisw/a/7GA/DrgrisJap6DaleMcBoNvsG8sZHV5nbrxmIuAUd8UKJJ+s
+         9z9dgh4Vrq7KEo/FInSVT2GBt49WyeW+1tOz/8Fpo+fBDAA6Y9jiDnJvmWUIprpyi0Ix
+         QXTA==
+X-Gm-Message-State: AOJu0Yx9jLHyJ7ROU7buVSlVgOuaT3cAkrR4uODpppv+OQs/gkdAbYE3
+	cMD7E6l9Pjb80cJbvXHHFNUPq6YZeH1nO59KcMwtCkK66s3kwiFwHjZvkg==
+X-Google-Smtp-Source: AGHT+IHnSLcGXkNBKyX0XRP90KPLBxfuikZ5yQDVD4ux51JNkjLqfpZTX0Ksa+2dLnZ3Te0sSv8/gA==
+X-Received: by 2002:a17:90a:ab97:b0:2bd:dd7f:76a1 with SMTP id 98e67ed59e1d1-2c27db581b1mr950131a91.38.1717544073475;
+        Tue, 04 Jun 2024 16:34:33 -0700 (PDT)
+Received: from [172.17.0.2] ([52.234.38.65])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2c28067d508sm84590a91.20.2024.06.04.16.34.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 04 Jun 2024 16:34:33 -0700 (PDT)
+Message-ID: <665fa489.170a0220.1718a3.0564@mx.google.com>
+Date: Tue, 04 Jun 2024 16:34:33 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============4875267186106505329=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240528-pwrseq-v8-16-d354d52b763c@linaro.org>
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, sean.wang@kernel.org
+Subject: RE: [1/2] Bluetooth: btusb: mediatek: remove the unnecessary goto tag
+In-Reply-To: <8f809ae0094c89ed99efb4074472edd119db8ec1.1717540338.git.sean.wang@kernel.org>
+References: <8f809ae0094c89ed99efb4074472edd119db8ec1.1717540338.git.sean.wang@kernel.org>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-On Tue, May 28, 2024 at 09:03:24PM +0200, Bartosz Golaszewski wrote:
-> From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-> 
-> Add a PCI power control driver that's capable of correctly powering up
-> devices using the power sequencing subsystem. The first users of this
-> driver are the ath11k module on QCA6390 and ath12k on WCN7850.
+--===============4875267186106505329==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Can you add a little detail here about what benefit we will see from
-this driver?  E.g., something that doesn't work correctly now, but
-will work with this driver?
+This is automated email and please do not reply to this email!
 
-> +static const struct of_device_id pci_pwrctl_pwrseq_of_match[] = {
-> +	{
-> +		/* ATH11K in QCA6390 package. */
-> +		.compatible = "pci17cb,1101",
-> +		.data = "wlan",
-> +	},
-> +	{
-> +		/* ATH12K in WCN7850 package. */
-> +		.compatible = "pci17cb,1107",
-> +		.data = "wlan",
-> +	},
+Dear submitter,
 
-IIUC, "pci17cb,1101" and "pci17cb,1107" exist partly so we can check
-that a DTS conforms to the schema, e.g., a "pci17cb,1101" node
-contains all the required regulators.  For that use, we obviously need
-a very specific "compatible" string.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=858840
 
-Is there any opportunity to add a more generic "compatible" string in
-addition to those so this list doesn't have to be updated for every
-PMU?  The .data here is "wlan" in both cases, and for this purpose, we
-don't care whether it's "pci17cb,1101" or "pci17cb,1107".
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      1.00 seconds
+GitLint                       PASS      0.40 seconds
+SubjectPrefix                 PASS      0.12 seconds
+BuildKernel                   PASS      29.32 seconds
+CheckAllWarning               PASS      32.32 seconds
+CheckSparse                   PASS      37.66 seconds
+CheckSmatch                   FAIL      35.68 seconds
+BuildKernel32                 PASS      28.33 seconds
+TestRunnerSetup               PASS      516.17 seconds
+TestRunner_l2cap-tester       PASS      18.50 seconds
+TestRunner_iso-tester         FAIL      30.18 seconds
+TestRunner_bnep-tester        PASS      4.73 seconds
+TestRunner_mgmt-tester        PASS      111.34 seconds
+TestRunner_rfcomm-tester      PASS      7.19 seconds
+TestRunner_sco-tester         PASS      16.44 seconds
+TestRunner_ioctl-tester       PASS      7.67 seconds
+TestRunner_mesh-tester        PASS      5.77 seconds
+TestRunner_smp-tester         PASS      6.75 seconds
+TestRunner_userchan-tester    PASS      4.90 seconds
+IncrementalBuild              PASS      32.33 seconds
+
+Details
+##############################
+Test: CheckSmatch - FAIL
+Desc: Run smatch tool with source
+Output:
+
+Segmentation fault (core dumped)
+make[4]: *** [scripts/Makefile.build:244: net/bluetooth/hci_core.o] Error 139
+make[4]: *** Deleting file 'net/bluetooth/hci_core.o'
+make[3]: *** [scripts/Makefile.build:485: net/bluetooth] Error 2
+make[2]: *** [scripts/Makefile.build:485: net] Error 2
+make[2]: *** Waiting for unfinished jobs....
+Segmentation fault (core dumped)
+make[4]: *** [scripts/Makefile.build:244: drivers/bluetooth/bcm203x.o] Error 139
+make[4]: *** Deleting file 'drivers/bluetooth/bcm203x.o'
+make[4]: *** Waiting for unfinished jobs....
+Segmentation fault (core dumped)
+make[4]: *** [scripts/Makefile.build:244: drivers/bluetooth/bpa10x.o] Error 139
+make[4]: *** Deleting file 'drivers/bluetooth/bpa10x.o'
+make[3]: *** [scripts/Makefile.build:485: drivers/bluetooth] Error 2
+make[2]: *** [scripts/Makefile.build:485: drivers] Error 2
+make[1]: *** [/github/workspace/src/src/Makefile:1919: .] Error 2
+make: *** [Makefile:240: __sub-make] Error 2
+##############################
+Test: TestRunner_iso-tester - FAIL
+Desc: Run iso-tester with test-runner
+Output:
+Total: 122, Passed: 117 (95.9%), Failed: 1, Not Run: 4
+
+Failed Test Cases
+ISO Connect2 Suspend - Success                       Failed       4.237 seconds
+
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============4875267186106505329==--
