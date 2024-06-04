@@ -1,135 +1,127 @@
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+Received: from mailgw01.mediatek.com (unknown [60.244.123.138])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09C30136E2B
-	for <linux-bluetooth@vger.kernel.org>; Tue,  4 Jun 2024 06:13:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89A061EB30;
+	Tue,  4 Jun 2024 07:41:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=60.244.123.138
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717481589; cv=none; b=UcYZJJDjp/uIggd41HAgDh4ubUxnOBiWzYBvVEiYDZrKB93imlu3ahpup/nKMIaPcUbu3SexuAbEHxDAL+9I+1RSdhEN+A3baYt4D3amrVscgE9/z97xQyJP4oV9rSj/hrl2AGGhTVLzIphxZ1N/GWBExreeljVR5j8Z3lSBtbc=
+	t=1717486905; cv=none; b=C1bLs8NlGpyLTGsX0GSwtuu05Z7XjbR1pkrIZszc6f6h+4md5Y2/T8X+g0wJIm3WUipjUpm1z1Hp0uAf3/W3mHGDzDYHXMcsE5H+XIKLTl04RAn9PWhiZX2U4D93FMizefZke1GDDEVZ03HQSfS98U6MZGaa3nIjQxCBONVz+yA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717481589; c=relaxed/simple;
-	bh=nk8FaQIPDz65hZ8Gav0TfzKsigTPUX2Er9pfsnMhYLo=;
-	h=From:To:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=QJlkaWXTpWRx8VPGNnlaPBJvOsJGE+gAgg0N96r+bDvptD6xVHT4g81CQO4PL6t1nx+TRotftsYdU6Dxk1MYnNwhv7IEWr3yXc2lWEiidHs6oFiSR10CVzQiKRD3HtQqIzy0PKDN9EQf7RFp8/6oYzg805IVlt7PjvWsCwaD1lQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=OYpotitX; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+	s=arc-20240116; t=1717486905; c=relaxed/simple;
+	bh=dkVXzums6rTRSBN+PD2u6Ye0UZiO6StWMO+FNoWaoQE=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=OovecJ9GwdKe7jxwo+3xj6hLDTpnQiLPjbVVii6II3xmL2qofE4gA7H8TXrD34TCfrcrqqBkNaHKb56X6E7WoJGLxGom9FCp1vM7YlCIgRFib7zEeIkXgmGYd7MD7u1+Yzl55HLIRydv1gfNSymwyfqLXN6Y7hmHxE6PXCaKwnE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com; spf=pass smtp.mailfrom=mediatek.com; dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b=ty0Hjejg; arc=none smtp.client-ip=60.244.123.138
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mediatek.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="OYpotitX"
-Received: from pps.filterd (m0279869.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 45431xrO018795
-	for <linux-bluetooth@vger.kernel.org>; Tue, 4 Jun 2024 06:13:07 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	nk8FaQIPDz65hZ8Gav0TfzKsigTPUX2Er9pfsnMhYLo=; b=OYpotitXkJ5E48Xv
-	nk9fjM6y9Hh4xSSVqaWDcPwn+07TULXEKh6ihkQbM+9nTd/0weyOG/VS6wbIjRkV
-	LF/3PVtrRe0FXH7OjlHOVu0v1OINyWzZrv3CgGAf3/fQnYt7M+HA2cx/8g7w5444
-	1I4Jeq0HSLjI/8pHFglj5wfyss7HkPmNtTBlMPzhl+BJ+RYHmYK3pmU1MaqWhd9k
-	+wnQrgN41cn1YlGy8PSw3lc0wrJo9YXLwLzc4e/fqTYcp5zn8y6JU+uDiY57Ufcr
-	WLdObsMUbc9xmILHXAIPK5d23C3bJl/y0dnwMbVOIo2CZ+ub/fnjMaDHI1Bf+keU
-	8fUJsg==
-Received: from nasanppmta04.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3yfw4bdv9w-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <linux-bluetooth@vger.kernel.org>; Tue, 04 Jun 2024 06:13:06 +0000 (GMT)
-Received: from nasanex01a.na.qualcomm.com (nasanex01a.na.qualcomm.com [10.52.223.231])
-	by NASANPPMTA04.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 4546D5Lp025348
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <linux-bluetooth@vger.kernel.org>; Tue, 4 Jun 2024 06:13:05 GMT
-Received: from nasanex01c.na.qualcomm.com (10.45.79.139) by
- nasanex01a.na.qualcomm.com (10.52.223.231) with Microsoft SMTP Server
+	dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b="ty0Hjejg"
+X-UUID: dce319dc224511efbace61486a71fe2b-20240604
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
+	h=Content-Type:MIME-Version:Message-ID:Date:Subject:CC:To:From; bh=vCnoMy4gW37pGjxNmOGfcGS87C3TvaA24Lp8NUng/m0=;
+	b=ty0Hjejg1DYOz7PPH9gbkJgSYFB3JIw17xNfdMHQFgG7IKidg2TOo6JOVC3xVY55LQQRXwxwFbhK7UWNOnXlv6ZPW9PXVrH8nJZQ0A5T708FzSNuPcCQySmMGO1ZyaIkIEPcgH93KvQoNipwtgVbHvvoD+aKxiJNuJOC4iVC6J8=;
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.1.39,REQID:b6dd6ba2-b461-44f4-804f-1a781c203b02,IP:0,U
+	RL:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
+	release,TS:0
+X-CID-META: VersionHash:393d96e,CLOUDID:d4fd2d44-4544-4d06-b2b2-d7e12813c598,B
+	ulkID:nil,BulkQuantity:0,Recheck:0,SF:102,TC:nil,Content:0,EDM:-3,IP:nil,U
+	RL:11|1,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES
+	:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
+X-CID-BVR: 0,NGT
+X-CID-BAS: 0,NGT,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR,TF_CID_SPAM_ULN
+X-UUID: dce319dc224511efbace61486a71fe2b-20240604
+Received: from mtkmbs14n2.mediatek.inc [(172.21.101.76)] by mailgw01.mediatek.com
+	(envelope-from <jiande.lu@mediatek.com>)
+	(Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
+	with ESMTP id 1740364105; Tue, 04 Jun 2024 15:41:32 +0800
+Received: from mtkmbs11n1.mediatek.inc (172.21.101.185) by
+ MTKMBS14N1.mediatek.inc (172.21.101.75) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.9; Mon, 3 Jun 2024 23:13:05 -0700
-Received: from nasanex01c.na.qualcomm.com ([fe80::4223:f723:395d:74fa]) by
- nasanex01c.na.qualcomm.com ([fe80::4223:f723:395d:74fa%13]) with mapi id
- 15.02.1544.009; Mon, 3 Jun 2024 23:13:05 -0700
-From: "Amisha Jain (QUIC)" <quic_amisjain@quicinc.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: RE: MAP server crash during connection
-Thread-Topic: MAP server crash during connection
-Thread-Index: AdqzKJeyPcFb24X1Rwqc4W+GcA5qlwDHZ+PQ
-Date: Tue, 4 Jun 2024 06:13:04 +0000
-Message-ID: <3ffea594e86647208806e321275df2c6@quicinc.com>
-References: <ec4a4adbfee94a699ebd635abc51f01c@quicinc.com>
-In-Reply-To: <ec4a4adbfee94a699ebd635abc51f01c@quicinc.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+ 15.2.1118.26; Tue, 4 Jun 2024 15:41:30 +0800
+Received: from mtksdccf07.mediatek.inc (172.21.84.99) by
+ mtkmbs11n1.mediatek.inc (172.21.101.73) with Microsoft SMTP Server id
+ 15.2.1118.26 via Frontend Transport; Tue, 4 Jun 2024 15:41:30 +0800
+From: Jiande Lu <jiande.lu@mediatek.com>
+To: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg
+	<johan.hedberg@gmail.com>, Luiz Von Dentz <luiz.dentz@gmail.com>
+CC: Sean Wang <sean.wang@mediatek.com>, Chris Lu <chris.lu@mediatek.com>,
+	Deren Wu <deren.Wu@mediatek.com>, Aaron Hou <aaron.hou@mediatek.com>, "Steve
+ Lee" <steve.lee@mediatek.com>, linux-bluetooth
+	<linux-bluetooth@vger.kernel.org>, linux-kernel
+	<linux-kernel@vger.kernel.org>, linux-mediatek
+	<linux-mediatek@lists.infradead.org>, Jiande Lu <jiande.lu@mediatek.com>
+Subject: [PATCH] Bluetooth: btusb: Add USB HW IDs for MT7920/MT7925
+Date: Tue, 4 Jun 2024 15:41:00 +0800
+Message-ID: <20240604074100.572-1-jiande.lu@mediatek.com>
+X-Mailer: git-send-email 2.18.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: KtOwWIs6rBNJNAofeT_BPFp2_OIjJS7L
-X-Proofpoint-GUID: KtOwWIs6rBNJNAofeT_BPFp2_OIjJS7L
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.650,FMLib:17.12.28.16
- definitions=2024-06-04_02,2024-05-30_01,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 suspectscore=0
- phishscore=0 malwarescore=0 priorityscore=1501 mlxscore=0 impostorscore=0
- bulkscore=0 lowpriorityscore=0 spamscore=0 mlxlogscore=942 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2405170001
- definitions=main-2406040049
+Content-Type: text/plain
+X-TM-AS-Product-Ver: SMEX-14.0.0.3152-9.1.1006-23728.005
+X-TM-AS-Result: No-10--4.703900-8.000000
+X-TMASE-MatchedRID: yvDAzrttxFVys0UAwvp+/ANARH50Lwx2uLwbhNl9B5VUvqB5o/Lqcx4u
+	a24ul9odlQyR652shZxIg7V1v/s3Rx1YpEPWJiyz4pdq9sdj8LUK3n1SHen81Xe9QDr8+LTcPOm
+	svTTYiPHi8zVgXoAltsIJ+4gwXrEtwrbXMGDYqV+eVW/ZdL52j0CK+Db3ho1yetUmjQUx2zddNn
+	8SXR397s3/wxQI4Cm55M5efyQJ5Xs2GIkImAO0vyKNY+qbNCUOjK6ZzRHW/PGz2uN2Wc67hHZrU
+	bEZipAEiWT09mQz7szw9kH8zAy44aOuVLnx3A74
+X-TM-AS-User-Approved-Sender: No
+X-TM-AS-User-Blocked-Sender: No
+X-TMASE-Result: 10--4.703900-8.000000
+X-TMASE-Version: SMEX-14.0.0.3152-9.1.1006-23728.005
+X-TM-SNTS-SMTP:
+	08934D42DCF5218560D29DD22AA74B15C6C053DEC15DEBE8655CB9616CDD33102000:8
+X-MTK: N
 
-Hi,
-Please help with the below issue.
+Add HW IDs for wireless module. These HW IDs are extracted from
+Windows driver inf file. Note these HW IDs without official drivers,
+still in testing phase. Thus, we update module HW ID and test
+ensure consistent boot success.
 
-> -----Original Message-----
-> From: Amisha Jain (QUIC)
-> Sent: Friday, May 31, 2024 12:34 PM
-> To: 'linux-bluetooth@vger.kernel.org' <linux-bluetooth@vger.kernel.org>
-> Subject: MAP server crash during connection
->=20
-> Hi bluez team,
-> I have been trying to verify MAP Server obex profile on bluez 5.65.
-> While trying=A0connection, I have noticed the crash on the server side
-> (connection initiated from client side) and hence connection is failing.
-> Please find the backtrace of the crash -
->=20
-> =A0 assertion failed "i =3D=3D len" file "../../dbus-1.14.8/dbus/dbus-obj=
-ect-tree.c"
-> line 1321 function _dbus_decompose_path
-> =A0 /usr/lib/libdbus-1.so.3(_dbus_print_backtrace+0x28) [0xfffff7f4cc9c]
-> =A0 /usr/lib/libdbus-1.so.3(_dbus_abort+0x14) [0xfffff7f4fe3c]
-> =A0 /usr/lib/libdbus-1.so.3(+0x4a9cc) [0xfffff7f3a9cc]
-> =A0 /usr/lib/libdbus-1.so.3(+0x36c5c) [0xfffff7f26c5c]
-> =A0 /usr/lib/libdbus-1.so.3(dbus_connection_get_object_path_data+0xc4)
-> [0xfffff7f0f818]
-> =A0 /usr/libexec/bluetooth/obexd(g_dbus_emit_property_changed_full+0x30)
-> [0x450dc4]
-> =A0 /usr/libexec/bluetooth/obexd(g_dbus_emit_property_changed+0x14)
-> [0x450ec0]
-> =A0 /usr/libexec/bluetooth/obexd(manager_emit_transfer_property+0x34)
-> [0x429408]
-> =A0 /usr/libexec/bluetooth/obexd(obex_put_stream_start+0xc8) [0x42b314]
-> =A0 /usr/libexec/bluetooth/obexd() [0x425f58]
-> =A0 /usr/libexec/bluetooth/obexd() [0x42adcc]
-> =A0 /usr/libexec/bluetooth/obexd() [0x4171dc]
-> =A0 /usr/libexec/bluetooth/obexd() [0x418078]
-> =A0 /usr/lib/libglib-2.0.so.0(+0xb20cc) [0xfffff7e420cc]
-> =A0 /usr/lib/libglib-2.0.so.0(+0x54a30) [0xfffff7de4a30]
-> =A0 /usr/lib/libglib-2.0.so.0(g_main_context_dispatch+0x44) [0xfffff7de85=
-0c]
-> =A0 /usr/lib/libglib-2.0.so.0(+0x5868c) [0xfffff7de868c]
-> =A0 /usr/lib/libglib-2.0.so.0(g_main_loop_run+0x1ac) [0xfffff7de8b08]
-> =A0 /usr/libexec/bluetooth/obexd(main+0x128) [0x427d6c]
-> =A0 /lib/libc.so.6(+0x2affc) [0xfffff7c0affc]
-> =A0 /lib/libc.so.6(__libc_start_main+0x90) [0xfffff7c0b0c4]
-> =A0 /usr/libexec/bluetooth/obexd(_start+0x30) [0x4101b0]
->=20
-> =A0 Program received signal SIGABRT, Aborted.
->=20
-> =A0__pthread_kill_implementation (threadid=3D<optimized out>,
-> signo=3Dsigno@entry=3D6, no_tid=3Dno_tid@entry=3D0) at pthread_kill.c:4
->=20
-> Please help support the issue.
->=20
-> Thanks,
-> Amisha
+Signed-off-by: Jiande Lu <jiande.lu@mediatek.com>
+---
+ drivers/bluetooth/btusb.c | 17 +++++++++++++++++
+ 1 file changed, 17 insertions(+)
+
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 79aefdb3324d..62fc836f8afb 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -585,6 +585,20 @@ static const struct usb_device_id quirks_table[] = {
+ 						     BTUSB_WIDEBAND_SPEECH |
+ 						     BTUSB_VALID_LE_STATES },
+ 
++	/* Additional MediaTek MT7920 Bluetooth devices */
++	{ USB_DEVICE(0x0489, 0xe134), .driver_info = BTUSB_MEDIATEK |
++						     BTUSB_WIDEBAND_SPEECH |
++						     BTUSB_VALID_LE_STATES },
++	{ USB_DEVICE(0x13d3, 0x3620), .driver_info = BTUSB_MEDIATEK |
++						     BTUSB_WIDEBAND_SPEECH |
++						     BTUSB_VALID_LE_STATES },
++	{ USB_DEVICE(0x13d3, 0x3621), .driver_info = BTUSB_MEDIATEK |
++						     BTUSB_WIDEBAND_SPEECH |
++						     BTUSB_VALID_LE_STATES },
++	{ USB_DEVICE(0x13d3, 0x3622), .driver_info = BTUSB_MEDIATEK |
++						     BTUSB_WIDEBAND_SPEECH |
++						     BTUSB_VALID_LE_STATES },
++
+ 	/* Additional MediaTek MT7921 Bluetooth devices */
+ 	{ USB_DEVICE(0x0489, 0xe0c8), .driver_info = BTUSB_MEDIATEK |
+ 						     BTUSB_WIDEBAND_SPEECH |
+@@ -685,6 +699,9 @@ static const struct usb_device_id quirks_table[] = {
+ 	{ USB_DEVICE(0x0489, 0xe113), .driver_info = BTUSB_MEDIATEK |
+ 						     BTUSB_WIDEBAND_SPEECH |
+ 						     BTUSB_VALID_LE_STATES },
++	{ USB_DEVICE(0x0489, 0xe139), .driver_info = BTUSB_MEDIATEK |
++						     BTUSB_WIDEBAND_SPEECH |
++						     BTUSB_VALID_LE_STATES },
+ 	{ USB_DEVICE(0x13d3, 0x3602), .driver_info = BTUSB_MEDIATEK |
+ 						     BTUSB_WIDEBAND_SPEECH |
+ 						     BTUSB_VALID_LE_STATES },
+-- 
+2.18.0
+
