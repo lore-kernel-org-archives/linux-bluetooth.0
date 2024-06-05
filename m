@@ -1,129 +1,104 @@
-Received: from mail-vk1-f180.google.com (mail-vk1-f180.google.com [209.85.221.180])
+Received: from mail-qt1-f182.google.com (mail-qt1-f182.google.com [209.85.160.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B382D15443B
-	for <linux-bluetooth@vger.kernel.org>; Wed,  5 Jun 2024 19:56:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91A8917559
+	for <linux-bluetooth@vger.kernel.org>; Wed,  5 Jun 2024 21:43:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717617377; cv=none; b=RwIMNrcuj3NEjeeK3+OrbDRHCu1teOtnzA7Q+mFoDVASehp0R9F+UJ64B3iihmp+xld2sdxDetoO3nhnXzcrwSZAI6QX3ddngF7LUereN4MhJ6Qxhy18QBSser/ZEx+FNsb5xjocky9YkxI+6Xa01VbICtlqV6vMgIMWGfK6iro=
+	t=1717623795; cv=none; b=hGaWJ6+voxYi1pru8oo/lwyrK6BGPLAtZu3UK7RA+AAqqmMqBLvAczKxyJbJnhxzGZ6pzCsVG073CR9LWRjiuZAOmbYbr9ZpnbcG26bP/pWqsSsdwaYhNS1jpeDMgL9hVGHsjNhAfWWAEYGltuykyItvkMMt39g2ycEPePOz/0Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717617377; c=relaxed/simple;
-	bh=l/88sdieBY0qIroIEWjRcoHogWsYTNqvpnsgaocediQ=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=H0PdX3bjcnx8cEphwcAQEvLFBpHFsk/vbj6aDXlsk0xcCviTZyM0dFpfYXruMCNC/RLS4fOxXIlOKla7YGZ/DKOctJL9BJn57IoHaNEuc2rZYyd4N+2szCmGbH29sUBFEMmeOQI3qmWNiMjE/ADB4wsIkHLwpNPC9WDyVPLNajE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JhrlPGGk; arc=none smtp.client-ip=209.85.221.180
+	s=arc-20240116; t=1717623795; c=relaxed/simple;
+	bh=QoXRPSsedGQD69BCZ2Nv/SeoeEMasD5DC045lp+T0/8=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=P/yImxTv2H0H4wpsm0rlu9jNuhrRrXB08CPx0yKFuCz5hF0vd2aoztPV/Gr2Sf79UEsKPUjQSulS+w+pzXMv+7H+ZbDvdm2Os3bs1x87B/PJ/Ihhdmzu3lW6LBUKRKs3LYn6lYM+NSHG5calWimurdOPx53WnUy3dTzxIIp7g+Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bMe9V5gA; arc=none smtp.client-ip=209.85.160.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JhrlPGGk"
-Received: by mail-vk1-f180.google.com with SMTP id 71dfb90a1353d-4e4f0020ca3so54217e0c.2
-        for <linux-bluetooth@vger.kernel.org>; Wed, 05 Jun 2024 12:56:15 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bMe9V5gA"
+Received: by mail-qt1-f182.google.com with SMTP id d75a77b69052e-44022c9433bso1169471cf.2
+        for <linux-bluetooth@vger.kernel.org>; Wed, 05 Jun 2024 14:43:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1717617374; x=1718222174; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=y66lqqP7a/kXVSUJWpYanHjolkYwXl/fXGDQW6xD/jE=;
-        b=JhrlPGGkzNa1g2R/zcj5lwy0A/RuTe+sgMOtlKivQYjJT8aCnjxgixMOpUKcoTnc0N
-         XzCv8/5mOAdZsF+9XRvrLZYTxNXgNniPOXH1fv8KsbaSMEREexos1h+Uy+QPYTt2C6wC
-         0CRJUAl8o1OEu3r7BryLgPrjRhsGw+7Azu8oGZa3rLl36+s3+RQ+GhM6+c6qajPApNl4
-         hEYcXFrNODqB7THXjFYfzA4EEi8xksG8S1wXawJX3Llx76oQBkdB30Co6hsO4Gi4NDDD
-         4AlONujzja6hHJFcY5MoexnD6oIkDvB/NUal6F2wc9Qb+J2XlpGuBnW3skGV4BypGg82
-         fpVg==
+        d=gmail.com; s=20230601; t=1717623793; x=1718228593; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=FagD27VUEmZaJ4aHFVqUufXDXYdVSylhiVminNZPjHs=;
+        b=bMe9V5gAWMWcJbnSNF2QHotx1oBMjyZvquqxDPa3RFEur2uOPbQNi+tBKVNJSkYATC
+         kkQtLMNW4bEsyoV6fRLNeGTyWHVfv6mD7S0V8ls1jiizBodj4xHzloem89krgdE9p6Qz
+         +y5ylkEzeXso9Xv4Do/DyImctemRAc6j7SSwZRjAYnIRY45ZtarjLaYvzkIDugk8hsOG
+         BuLT2O4tb25n11FmGmvjCD5efnp6zQ16mf8YYs1n4vwAH3ow2mBa5zBZic6KnlNRnOJc
+         pFUQFb6coNsi5bQYzBh6RllEpbKUW/5ncD+9efhr5NOh9zJWwUM3PYBPIRQInCbfpqSS
+         8z+A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717617374; x=1718222174;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=y66lqqP7a/kXVSUJWpYanHjolkYwXl/fXGDQW6xD/jE=;
-        b=IVH1qkSmngOcn+L8tyLzzJXyTHZ9yum9HB4q6hk9hikeuVyETylUDOrl2osACNeIyG
-         pLr07OCICOFwoY+JMJlgq2NxPnIOTFwWBU0NLC+bRG6Y4DeZsRNS6RMqjKB+3IjaNoVQ
-         6Oe/SstpzF6BYq1wGsnA9vmvd01GucT+t1mINWu9dm4WrNexCylcNu0VpNwIxUwsQu47
-         k6SDraKK824ir3d57JyEZxlPPOxAzIz7jCEMj0Sxe20QTVFnhAaSgcOrUIVwY5zu3Lha
-         kqxFrDc4+VVIj7aQ2cIulqNoMoEx9mbqvRUKUyyM407jaaXXIydEiPG9e+LVDnjQ728s
-         DOBA==
-X-Gm-Message-State: AOJu0YzfpDPcdvIDn1ZjRTQxikuGhkOQPKhm32DLQeLBH7IWK5jLU1mE
-	nvdOhJ8IyEvWykLMJFsOWE8QKKzLLVlAlOuINHG12/Ic/RzGFSIyDrtFEA==
-X-Google-Smtp-Source: AGHT+IFirb/RmH59xtdZBh702EPQiz5Jt2hGFq2AMqG1fFzNFl1ML4QaNHsMRUuFEMmR7njwjgxMVg==
-X-Received: by 2002:a05:6122:1da1:b0:4d8:df31:6b34 with SMTP id 71dfb90a1353d-4eb3a426488mr4231523e0c.8.1717617373837;
-        Wed, 05 Jun 2024 12:56:13 -0700 (PDT)
-Received: from lvondent-mobl4.. (syn-107-146-107-067.res.spectrum.com. [107.146.107.67])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-4eafedabe04sm1719083e0c.3.2024.06.05.12.56.11
-        for <linux-bluetooth@vger.kernel.org>
+        d=1e100.net; s=20230601; t=1717623793; x=1718228593;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=FagD27VUEmZaJ4aHFVqUufXDXYdVSylhiVminNZPjHs=;
+        b=NXH+GoC2vyNm3brwu2X03qr3PqMzq/CLT6Kta6satobZ6ZCA9scu3xh1YJsytKLgIX
+         5Y3nezOAf8KoDdUrjYJQ6xZBRz+ji7KjbHIFRZrnQasTidLV1kwxNdbAcZ93FOlXLvzr
+         D9YoGG3dKjO2RJOzNVxaweZ4riQ2TZawQsDQrflrBZKihCn6wthzNhJQqBzor/BUp+B4
+         Zj0JPAhb/JWZBIiKktXr8tOdsSFDxvtUJeuilvdR3gDmPuqAeiCSa4fymY7V7wu9D494
+         +315QqiYexQQHF2paAWhJc4TTzxafkmjsnGCeJf0QUREXaRkFHljGd81IAVk2ZpBvaYl
+         +4Rg==
+X-Gm-Message-State: AOJu0Yz/xfjIOfL4k7lWr3MbAEEzFkygW3/4+3iglAzIh+tdbHaRjmwn
+	rOhh7ozqKGrwcjlMsSnxTeK2C10CfMO6UnW31ugPWDeWo6kNqq4fUyAJU+2b
+X-Google-Smtp-Source: AGHT+IGNesfR9jwS57pqp8qk7USXx7mLxF6P7kBzDbWLtZN/giHijttlyk8QLAyGRQ+ZnauHiYFmTQ==
+X-Received: by 2002:a05:622a:153:b0:43e:9eb:d714 with SMTP id d75a77b69052e-4402b658737mr36723111cf.54.1717623793088;
+        Wed, 05 Jun 2024 14:43:13 -0700 (PDT)
+Received: from [172.17.0.2] ([172.183.208.194])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-44038ab3484sm150551cf.52.2024.06.05.14.43.12
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 05 Jun 2024 12:56:12 -0700 (PDT)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v1] transport: Fix not always being able to Acquire when linked
-Date: Wed,  5 Jun 2024 15:56:10 -0400
-Message-ID: <20240605195610.534491-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.45.1
+        Wed, 05 Jun 2024 14:43:12 -0700 (PDT)
+Message-ID: <6660dbf0.050a0220.82fe3.0247@mx.google.com>
+Date: Wed, 05 Jun 2024 14:43:12 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============5626125654521142921=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [BlueZ,v1] transport: Fix not always being able to Acquire when linked
+In-Reply-To: <20240605195610.534491-1-luiz.dentz@gmail.com>
+References: <20240605195610.534491-1-luiz.dentz@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+--===============5626125654521142921==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-If a linked transport becomes ready and sets an fd it means it can be
-acquired via Acquire/TryAcquire methods but that shall also be valid for
-linked transports as well since they share the same fd/IO it can already
-be transferred despite the state of the stream.
+This is automated email and please do not reply to this email!
 
-Fixes: https://github.com/bluez/bluez/issues/862
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=859222
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.42 seconds
+GitLint                       PASS      0.29 seconds
+BuildEll                      PASS      25.78 seconds
+BluezMake                     PASS      1716.00 seconds
+MakeCheck                     PASS      13.53 seconds
+MakeDistcheck                 PASS      182.51 seconds
+CheckValgrind                 PASS      253.03 seconds
+CheckSmatch                   PASS      356.44 seconds
+bluezmakeextell               PASS      122.46 seconds
+IncrementalBuild              PASS      1477.12 seconds
+ScanBuild                     PASS      1036.21 seconds
+
+
+
 ---
- profiles/audio/transport.c | 27 ++++++++++++++++++++++++++-
- 1 file changed, 26 insertions(+), 1 deletion(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/profiles/audio/transport.c b/profiles/audio/transport.c
-index 5b11bfeb6ab6..64d38ae669da 100644
---- a/profiles/audio/transport.c
-+++ b/profiles/audio/transport.c
-@@ -1492,11 +1492,20 @@ static guint transport_bap_resume(struct media_transport *transport,
- 
- 	if (!bap->stream)
- 		return 0;
-+
- 	if (bap->resume_id)
--		return 0;
-+		return bap->resume_id;
- 
- 	bap_update_links(transport);
- 
-+	/* If there is already an fd set consider it ready and proceed to
-+	 * complete the resume process.
-+	 */
-+	if (transport->fd >= 0) {
-+		bap->resume_id = g_idle_add(bap_resume_complete_cb, transport);
-+		return bap->resume_id;
-+	}
-+
- 	switch (bt_bap_stream_get_state(bap->stream)) {
- 	case BT_BAP_STREAM_STATE_ENABLING:
- 		bap_enable_complete(bap->stream, 0x00, 0x00, owner);
-@@ -1671,6 +1680,22 @@ static void bap_state_changed(struct bt_bap_stream *stream, uint8_t old_state,
- 	g_io_channel_unref(chan);
- 
- 	media_transport_set_fd(transport, fd, imtu, omtu);
-+
-+	/* If the transport is linked update the fd in the link as well as they
-+	 * share the same io channel.
-+	 */
-+	if (bap->linked) {
-+		struct bt_bap_stream *link = bt_bap_stream_io_get_link(stream);
-+
-+		if (link) {
-+			struct media_transport *t;
-+
-+			t = find_transport_by_bap_stream(link);
-+			if (t)
-+				media_transport_set_fd(t, fd, imtu, omtu);
-+		}
-+	}
-+
- 	transport_update_playing(transport, TRUE);
- 
- done:
--- 
-2.45.1
 
+--===============5626125654521142921==--
