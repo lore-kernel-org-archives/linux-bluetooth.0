@@ -1,71 +1,73 @@
-Received: from mail-lj1-f178.google.com (mail-lj1-f178.google.com [209.85.208.178])
+Received: from mail-lj1-f169.google.com (mail-lj1-f169.google.com [209.85.208.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B01F18C34B
-	for <linux-bluetooth@vger.kernel.org>; Wed,  5 Jun 2024 07:43:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7428149647
+	for <linux-bluetooth@vger.kernel.org>; Wed,  5 Jun 2024 08:47:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717573397; cv=none; b=qodm75+hzktYJQCC34pEp7Dt67O2eATFJRZ7f/LCk/qvLwwD9j/9KuCpHNMfgLD2TuqhAy7enLw+C9ENDC/qMeIqO18fa5inQTgJgwPgzadK44mIXZfcdRqvs27grjc83CjkQVh051rCkxc91Z8gbdsKu9EVaY58PZMb4/q5WRA=
+	t=1717577267; cv=none; b=DKMwNi/yOSDXq6akyTdj8GiDM5U7GZYXE1orOHVGHmQxcyIVUd4Ma9JIe7178Me/E3pNCaHuNsOjOjIrXLqiXo81SMcfwitRB9/9f11Bfp+Jgb/ODCgQJiRYWl4ioVyvJHvMiGJXHO0n5o7LVl+41U/RktEi31VXgf7D9Y4Dokc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717573397; c=relaxed/simple;
-	bh=l9sh3+D2x2FynAmR7WZMbPzPELRCyU/6nGYVYGh1LAE=;
+	s=arc-20240116; t=1717577267; c=relaxed/simple;
+	bh=uSKkoIGoa2SrkckhNzNgT8KTYQPaLTtB710iSC/tAE0=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Ie/ftK/pOtZAJ19BhmQ20PvKrRb5ri09phPgsbLwCiUNtNVWIehjLGEtosG5TUSAnSVp7DwWA22BJedtCWrJJRGnrAjGHtLFPqkvBouk3LnAo3tTAlwdb8rbFKTlyHAWM0VaY07MJeQo9N74godMFK2Qafn8q14XFejxph/UIvA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=HTV5YG13; arc=none smtp.client-ip=209.85.208.178
+	 To:Cc:Content-Type; b=ReZVw4uiKPJ5gqQbQR44VwZ6IC0pKb/NwC1eEoOF5d6PDnTre1taCL4usD4GeAODwnFwgGMr4btxrD6ZoJYRqD5jXwDn1XMM7DUV9QRSY0PVXh5O8iHNvRFiJgVnBwAJy6kSxF5P5qDCgmHH8WdfNx/Wxly7DhDopAM+pTN48sQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=yzvJC92G; arc=none smtp.client-ip=209.85.208.169
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="HTV5YG13"
-Received: by mail-lj1-f178.google.com with SMTP id 38308e7fff4ca-2eaa80cb573so52308091fa.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 05 Jun 2024 00:43:15 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="yzvJC92G"
+Received: by mail-lj1-f169.google.com with SMTP id 38308e7fff4ca-2e73359b900so21289031fa.2
+        for <linux-bluetooth@vger.kernel.org>; Wed, 05 Jun 2024 01:47:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1717573393; x=1718178193; darn=vger.kernel.org;
+        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1717577264; x=1718182064; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=iyjciw8omyqWPArx3sDq7VVjOnmIsURoasHM7cx8Qy0=;
-        b=HTV5YG13McBHbauqZYCInJNrmgXetedB/PCKdKjY1kwXtdxdhowEOQgO0OOL9hlmjr
-         4+pGWrjna1UZBZNtSeq7WeEXK7B7yTitBmw6kECgsoTbz+cQQW6ZCBYF68d1qLG6CZZs
-         jO75kBaem+6XdTzgXNDI1X6BXzrELrACMU9qrgvheHimU2tTxX8sT90uoRoXxlteL+4i
-         n8hcmdH7ucs8Ynob6uMB3S+C4fxMie6q4C6OUDUfUM/tlaMd+JzSVJw4tg3NYmK+Lea8
-         +/UqJAX/37Gf9VTavnoRp+j3OI2b8/zQ0h7IGLmR11cHRskxd6FyuJOjRxabrsKL74eq
-         3daQ==
+        bh=nPra9VnPeBiNtl2fHAj/AHY/htZJd5zpefm5z/7mvlE=;
+        b=yzvJC92GX+CnQx7m4LPXyXYsNpBvK/idur5bYDpywh8Go7jQHrXy2gFaqm1K9hDcp+
+         RxJgnqtVk1pwaF88JnMjI68vVZuPrK3wPVivjqPPQrjHbPT8EqHKLt+7THl2eNqqUtku
+         A3Xz6vhJGFl1D+NVsA+4ugRneDGyK/wDAjILU/Trg1wqc9c4y+tcvmoD0PJuKKNqmoWY
+         NHoh1GL1anfB2oaJlnMuNZsi1syUrrgOdDe3NRxMe08Q+pd1IsXVryykPVrFCVT0avuf
+         W3WSu/oCgsVzfqKlx+V4PK4jmd6hAlfYSzFa5murwfQd4FvoqTlDsVOdCC6wTyvn3YGq
+         qpsg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717573393; x=1718178193;
+        d=1e100.net; s=20230601; t=1717577264; x=1718182064;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=iyjciw8omyqWPArx3sDq7VVjOnmIsURoasHM7cx8Qy0=;
-        b=MgkDV9ny21RwZfhmkBCpv+yt39eKSh97HwAFXE2DC5WRcOIBrDkEBHUbxLuAt3LSvv
-         AzxZPGUkMCwpx5/iNs7Wp5p/WEEX26gQjHwJNimGzJ5rInlXy8kgsISyu5pUNg0LBIem
-         K3r0B2aBtK187b+Ghl6fRurNGhi9WaFaKHe5tDv1X774XhB/y7Ubik8dIE+w4Kx2gRv+
-         ofDFLMg+uIy+mAEO59Xl/vwK8kVzpqAiPc1NOdRkpZSmZ50c8sxztdYFTnO68JgjuZVi
-         17Im/oXFleA1DM7/4ZSotzkUeFeDfzorKnZ8b2D1HQULGxrW2/J9VyFuBd9p4rYlKavu
-         m6pQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVjrVTxGWp4cPv+HXcPHvXabq2W+erhcUZ2lkex5gHD7SLIrGvejvOBxfVX/vtSq0k6W+AylBlCnmbVeY726qVgAIOtaXi4nO91HFx3XHzY
-X-Gm-Message-State: AOJu0Yyvsr8NXk0+YlkHzWUV5xlsUgm56oOsAOY1AzwXrJvsjqOD1Qn8
-	CDGNidSSVOx/iYIdeDtsMwpvTGSbeK+0pbpWJ94kVDiv9ZM7vVtk3KcDePcQXvR6pTKM1B3/sn2
-	ihR22qsWrhNttRBfWt00Lws6w/bxKsvv7LC7GUQ==
-X-Google-Smtp-Source: AGHT+IFiHKKNVWneGGr50WzFkObsQ9oUM8GSCkWSrf/BaWFo5gFPEh8dKnIHSJrU2YjGwU9b3MU7THwqkd1DB3CAvSE=
-X-Received: by 2002:a2e:2416:0:b0:2e2:72a7:843c with SMTP id
- 38308e7fff4ca-2eac7a54169mr9164901fa.36.1717573393470; Wed, 05 Jun 2024
- 00:43:13 -0700 (PDT)
+        bh=nPra9VnPeBiNtl2fHAj/AHY/htZJd5zpefm5z/7mvlE=;
+        b=wp5kIX3CjbcSFbJ03mundrWgOnPoJIvG+HFqwBCUl7looS++y34hzMoKE3i/VMjN2/
+         v161NqC8BBM2GOCzhXl6qja4p+vwlBW3HyIEQm23rbU2NfTC9QRkLdjyDmWi02gVsmxL
+         ppeaabKftD1UEgwsYsN004thOPwfvnfmTj/UuA4hXKx7pSEuR11ZtcbUCrB5i12pocrW
+         rhA4oAtJ7tRwCsE7WoGysf6EoIlLerI/6QfcAz8wDOKn8x1UxQboFIgNMCpcL44li7aL
+         hYFWlAEFTjvyxanuG9ARavuBQwzFBwZapdBnNpob4Rb5h3gNE3te8XTC7LE3J5a/2l+y
+         iCCQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUNJ/XwAcn30ukCRp0/Fja61bJWiIawQmISfylkIIscpKZUGxWDezNmKHIucKvIEhNaRe7jxNksPEIfvaC1+/Rh2W9rxmStUFfuRZTx1COv
+X-Gm-Message-State: AOJu0YwHbFjSKyw/XmXlsb3sNhrtdwHC94WdQUCwloct6BgCXZvHkHjJ
+	ePh1+YVg3pPqJ2gLvIdHal3X6xw7endAMr2Yyn3yDarnGlkKkWhllMqDI0XmnqbxRGxC5xdFshJ
+	TJoRZMC8xs0BpMTWDYLKzo8Gt7Qw6p2KJvFHAMg==
+X-Google-Smtp-Source: AGHT+IFvAhNmZjR8e0W7tisE1L2rItCbACVQEOeSPIHCQ/2JT5Lzac0kUX9ZWXyqBUxDLGDW1jONb8JYHYsrWH/7fyo=
+X-Received: by 2002:a2e:7a0a:0:b0:2da:b59c:a94b with SMTP id
+ 38308e7fff4ca-2eac7a2299fmr11245531fa.25.1717577263571; Wed, 05 Jun 2024
+ 01:47:43 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240528-pwrseq-v8-0-d354d52b763c@linaro.org> <20240528-pwrseq-v8-10-d354d52b763c@linaro.org>
- <20240605065245.GB3452034@maili.marvell.com>
-In-Reply-To: <20240605065245.GB3452034@maili.marvell.com>
+References: <CAA8EJpomPLQmQbW8w3_ms_NMKHoSPcqBa7f2OhNTTOUSdB+9Eg@mail.gmail.com>
+ <20240605021346.GA746121@bhelgaas>
+In-Reply-To: <20240605021346.GA746121@bhelgaas>
 From: Bartosz Golaszewski <brgl@bgdev.pl>
-Date: Wed, 5 Jun 2024 09:43:02 +0200
-Message-ID: <CAMRc=MfyCJgOCBSh7AY4jEujWXGqZBB7Tnkq0VRrAKKCcJ9hAQ@mail.gmail.com>
-Subject: Re: [PATCH v8 10/17] power: sequencing: implement the pwrseq core
-To: Ratheesh Kannoth <rkannoth@marvell.com>
-Cc: Liam Girdwood <lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>, 
-	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+Date: Wed, 5 Jun 2024 10:47:32 +0200
+Message-ID: <CAMRc=Mckab1QYoBuE3iSv0x+GEjFNBQS5Hw_Mry=r7h5XGHZEQ@mail.gmail.com>
+Subject: Re: [PATCH v8 16/17] PCI/pwrctl: add a PCI power control driver for
+ power sequenced devices
+To: Bjorn Helgaas <helgaas@kernel.org>
+Cc: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>, Liam Girdwood <lgirdwood@gmail.com>, 
+	Mark Brown <broonie@kernel.org>, Rob Herring <robh@kernel.org>, 
+	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
 	Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
 	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
@@ -74,120 +76,121 @@ Cc: Liam Girdwood <lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>,
 	Bjorn Andersson <andersson@kernel.org>, Konrad Dybcio <konrad.dybcio@linaro.org>, 
 	Bjorn Helgaas <bhelgaas@google.com>, Srini Kandagatla <srinivas.kandagatla@linaro.org>, 
 	Elliot Berman <quic_eberman@quicinc.com>, Caleb Connolly <caleb.connolly@linaro.org>, 
-	Neil Armstrong <neil.armstrong@linaro.org>, Dmitry Baryshkov <dmitry.baryshkov@linaro.org>, 
-	Alex Elder <elder@kernel.org>, linux-arm-msm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, devicetree@vger.kernel.org, 
-	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-wireless@vger.kernel.org, ath11k@lists.infradead.org, 
-	Jeff Johnson <quic_jjohnson@quicinc.com>, ath12k@lists.infradead.org, 
-	linux-pm@vger.kernel.org, linux-pci@vger.kernel.org, 
+	Neil Armstrong <neil.armstrong@linaro.org>, Alex Elder <elder@kernel.org>, 
+	linux-arm-msm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	devicetree@vger.kernel.org, linux-bluetooth@vger.kernel.org, 
+	netdev@vger.kernel.org, linux-wireless@vger.kernel.org, 
+	ath11k@lists.infradead.org, Jeff Johnson <quic_jjohnson@quicinc.com>, 
+	ath12k@lists.infradead.org, linux-pm@vger.kernel.org, 
+	linux-pci@vger.kernel.org, 
 	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>, kernel@quicinc.com, 
 	Amit Pundir <amit.pundir@linaro.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Jun 5, 2024 at 8:52=E2=80=AFAM Ratheesh Kannoth <rkannoth@marvell.c=
-om> wrote:
+On Wed, Jun 5, 2024 at 4:13=E2=80=AFAM Bjorn Helgaas <helgaas@kernel.org> w=
+rote:
 >
-> On 2024-05-29 at 00:33:18, Bartosz Golaszewski (brgl@bgdev.pl) wrote:
-> > From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+> On Wed, Jun 05, 2024 at 02:34:52AM +0300, Dmitry Baryshkov wrote:
+> > On Wed, 5 Jun 2024 at 02:23, Bjorn Helgaas <helgaas@kernel.org> wrote:
+> > >
+> > > On Tue, May 28, 2024 at 09:03:24PM +0200, Bartosz Golaszewski wrote:
+> > > > From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+> > > >
+> > > > Add a PCI power control driver that's capable of correctly powering=
+ up
+> > > > devices using the power sequencing subsystem. The first users of th=
+is
+> > > > driver are the ath11k module on QCA6390 and ath12k on WCN7850.
+>
+> > > > +static const struct of_device_id pci_pwrctl_pwrseq_of_match[] =3D =
+{
+> > > > +     {
+> > > > +             /* ATH11K in QCA6390 package. */
+> > > > +             .compatible =3D "pci17cb,1101",
+> > > > +             .data =3D "wlan",
+> > > > +     },
+> > > > +     {
+> > > > +             /* ATH12K in WCN7850 package. */
+> > > > +             .compatible =3D "pci17cb,1107",
+> > > > +             .data =3D "wlan",
+> > > > +     },
+> > >
+> > > IIUC, "pci17cb,1101" and "pci17cb,1107" exist partly so we can check
+> > > that a DTS conforms to the schema, e.g., a "pci17cb,1101" node
+> > > contains all the required regulators.  For that use, we obviously nee=
+d
+> > > a very specific "compatible" string.
+> > >
+> > > Is there any opportunity to add a more generic "compatible" string in
+> > > addition to those so this list doesn't have to be updated for every
+> > > PMU?  The .data here is "wlan" in both cases, and for this purpose, w=
+e
+> > > don't care whether it's "pci17cb,1101" or "pci17cb,1107".
 > >
-> > Implement the power sequencing subsystem allowing devices to share
-> > complex powering-up and down procedures. It's split into the consumer
-> > and provider parts but does not implement any new DT bindings so that
-> > the actual power sequencing is never revealed in the DT representation.
-> >
-> > Tested-by: Amit Pundir <amit.pundir@linaro.org>
-> > Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-> > ---
-> > +
-> > +static struct pwrseq_unit_dep *pwrseq_unit_dep_new(struct pwrseq_unit =
-*unit)
-> nit. pwrseq_unit_dep_alloc/create rhymes well with pwrseq_unit_dep_free()=
-,
-
-So what?
-
-> > +static void pwrseq_unit_free_deps(struct list_head *list)
-> > +{
-> > +     struct pwrseq_unit_dep *dep, *next;
-> > +
-> > +     list_for_each_entry_safe(dep, next, list, list) {
-> no need of 'locks' to protect against simutaneous 'add' ?
-
-No, this only happens once during release.
-
-> > +
-> > +static int pwrseq_unit_setup_deps(const struct pwrseq_unit_data **data=
-,
-> > +                               struct list_head *dep_list,
-> > +                               struct list_head *unit_list,
-> > +                               struct radix_tree_root *processed_units=
-)
-> > +{
-> > +     const struct pwrseq_unit_data *pos;
-> > +     struct pwrseq_unit_dep *dep;
-> > +     struct pwrseq_unit *unit;
-> > +     int i;
-> > +
-> > +     for (i =3D 0; data[i]; i++) {
-> Can we add range for i ? just depending on data[i] to be zero looks to be=
- risky.
+> > These two devices have different set of regulators and different
+> > requirements to power them on.
+>
+> Right, but I don't think pci_pwrctl_pwrseq_probe() knows about those
+> different sets.  It basically looks like:
+>
+>   pci_pwrctl_pwrseq_probe(struct platform_device *pdev)
+>   {
+>     struct pci_pwrctl_pwrseq_data *data;
+>     struct device *dev =3D &pdev->dev;
+>
+>     data->pwrseq =3D devm_pwrseq_get(dev, of_device_get_match_data(dev));
+>     pwrseq_power_on(data->pwrseq);
+>     data->ctx.dev =3D dev;
+>     devm_pci_pwrctl_device_set_ready(dev, &data->ctx);
+>   }
+>
+> I think of_device_get_match_data(dev) will return "wlan" for both
+> "pci17cb,1101" and "pci17cb,1107", so devm_pwrseq_get(),
+> pwrseq_power_on(), and devm_pci_pwrctl_device_set_ready() don't see
+> the distinction between them.
 >
 
-Why? It's perfectly normal to expect users to end the array with a
-NULL pointer. The docs say these arrays must be NULL-terminated.
+These are only the first two users of this generic driver. We may end
+up adding more that will use different targets or even extend the
+match data with additional fields.
 
-> > +             pos =3D data[i];
-> > +
-> > +             unit =3D pwrseq_unit_setup(pos, unit_list, processed_unit=
-s);
-> > +             if (IS_ERR(unit))
-> > +                     return PTR_ERR(unit);
-> > +
-> > +             dep =3D pwrseq_unit_dep_new(unit);
-> > +             if (!dep) {
-> > +                     pwrseq_unit_decref(unit);
-> This frees only one 'unit'. is there any chance for multiple 'unit', then=
- better clean
-> up here ?
+> Of course, they also get "dev", so they can find the device-specifc
+> stuff that way, but I think that's on the drivers/power/sequencing/
+> side, not in this pci-pwrctl-pwrseq driver itself.
+>
+> So what if there were a more generic "compatible" string, e.g., if the
+> DT contained something like this:
+>
+>   wifi@0 {
+>     compatible =3D "pci17cb,1101", "wlan-pwrseq";
 
-The references to those will be dropped in pwrseq_release().
+What even is "pwrseq" in the context of the hardware description? DT
+maintainers would like to have a word with you. :)
 
-> > +
-> > +     /*
-> > +      * From this point onwards the device's release() callback is
-> > +      * responsible for freeing resources.
-> > +      */
-> > +     device_initialize(&pwrseq->dev);
-> > +
-> > +     ret =3D dev_set_name(&pwrseq->dev, "pwrseq.%d", pwrseq->id);
-> > +     if (ret)
-> > +             goto err_put_pwrseq;
-> > +
-> > +     pwrseq->owner =3D config->owner ?: THIS_MODULE;
-> > +     pwrseq->match =3D config->match;
-> > +
-> > +     init_rwsem(&pwrseq->rw_lock);
-> > +     mutex_init(&pwrseq->state_lock);
-> > +     INIT_LIST_HEAD(&pwrseq->targets);
-> > +     INIT_LIST_HEAD(&pwrseq->units);
-> > +
-> > +     ret =3D pwrseq_setup_targets(config->targets, pwrseq);
-> > +     if (ret)
-> > +             goto err_put_pwrseq;
-> > +
-> > +     scoped_guard(rwsem_write, &pwrseq_sem) {
-> > +             ret =3D device_add(&pwrseq->dev);
-> > +             if (ret)
-> > +                     goto err_put_pwrseq;
-> > +     }
-> > +
-> > +     return pwrseq;
-> > +
-> > +err_put_pwrseq:
-> no need to kfree(pwrseq) ?
+>     ...
+>   }
+>
+> and pci_pwrctl_pwrseq_of_match[] had this:
+>
+>   { .compatible =3D "wlan-pwrseq", .data =3D "wlan", }
+>
+> Wouldn't this pci-pwrctl-pwrseq driver work the same?  I'm not a DT
+> whiz, so likely I'm missing something, but it would be nice if we
+> didn't have to update this very generic-looking driver to add every
+> device that needs it.
+>
 
-It's literally put on the next line?
+Device-tree describes hardware, not the implementation. You can see
+elsewhere in this series that we have the PMU described as a PMIC on
+the device tree but we never register with the regulator subsystem nor
+do we create actual regulators in C. The HW description does not have
+to match the C implementation 1:1 but has to be accurate. There's not
+such HW component as "wlan-pwrseq". If you want a good example of such
+generic fallback - it'll be the C45 ethernet PHYs as they actually
+exist: there's a HW definition of what a broader C45 PHY is, even
+though it can be extended in concrete HW designs.
+
+I'd leave this as is.
 
 Bart
