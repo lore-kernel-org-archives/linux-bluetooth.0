@@ -1,26 +1,26 @@
 Received: from mail2.andi.de1.cc (vmd64148.contaboserver.net [161.97.139.27])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63D523B79F;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 653B53BBEA;
 	Thu,  6 Jun 2024 18:30:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=161.97.139.27
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717698648; cv=none; b=awbjD4qZjE4v7Zz7HbFrnRQs899JbV6mduS4Rq9MS+M+FkhilHF7bjGJXJLXPdrOSsizjd37KBWrq0JazxTTPV8itYj/G5vMezDvJ2w2OZNOeIv3ZDkWEsHC3foyEBCSpJM9iAEZzz+4ZmOfNDUMhj1FsDAvZBWBXHLuVKGM5ZI=
+	t=1717698648; cv=none; b=XqXXaM43BzvwCl67MESr99hfxc2T796d0y4PjHCZuxMTtlp/1U9NR5bqgiiPloKVYiwQl48winnnZXwk6Ff6+9AUPIZpeczt28U7u9gxvEV7o3zIbgES2/U7lNfdXY5IG6SDQSi6oy0Ouoc4XQeGVs2JYxpX7dz0toMjXZPRw2s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1717698648; c=relaxed/simple;
-	bh=audM1GFMFlK0723o2y3zV7ty4VIfDO8jaEerO3PeTN0=;
+	bh=XzN2/X/h7ea2/ODfnW/pP1cbTwHZn9QChK5YcHmgzCA=;
 	h=From:To:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=daD6Aw34ixvSVMdKzYHF39DI4WQxdEh+w/yoQ/8JwbcA4UeMZOfRkHIYvDNXg9pwj3lMzFpp1ai9eQXSiK9nnWgQEBv+xT+0yr+07zKZDzzGZTNw2os8eUlBDWSG5LXf+dGGxgZ9mWyGgEo/bs9RBQG2hlru3HYpS+RMDtYnPkQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kemnade.info; spf=pass smtp.mailfrom=kemnade.info; dkim=pass (2048-bit key) header.d=kemnade.info header.i=@kemnade.info header.b=PGDAZ2wx; arc=none smtp.client-ip=161.97.139.27
+	 MIME-Version; b=hPl3vp3eqvSpn/EJyK98GJB+z1BjFynW0jzA6LPwlkephMdFZDPV4zdNTCL8LyAk2g29kGq6YMu76kATRHQsJrS2c4+RMIGHwXk14jiDnPQ2E4LwKya+Kc/ixtnlJGwYVxAkNPQB0a7cIN2oqDZYclJnlxE6yjjJ6M10IdaZ/jo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kemnade.info; spf=pass smtp.mailfrom=kemnade.info; dkim=pass (2048-bit key) header.d=kemnade.info header.i=@kemnade.info header.b=jx/thCQu; arc=none smtp.client-ip=161.97.139.27
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kemnade.info
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kemnade.info
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kemnade.info header.i=@kemnade.info header.b="PGDAZ2wx"
+	dkim=pass (2048-bit key) header.d=kemnade.info header.i=@kemnade.info header.b="jx/thCQu"
 Received: from mail.andi.de1.cc ([2a02:c205:3004:2154::1])
 	by mail2.andi.de1.cc with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.96)
 	(envelope-from <andreas@kemnade.info>)
-	id 1sFHsp-0090wt-0N;
+	id 1sFHsp-0090x1-1g;
 	Thu, 06 Jun 2024 20:30:44 +0200
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=kemnade.info; s=20220719; h=Content-Transfer-Encoding:MIME-Version:
@@ -28,22 +28,22 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	Content-Type:Content-ID:Content-Description:Resent-Date:Resent-From:
 	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
 	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=/wRtwRt7d5bwW8PrzaTjfLtLqO+p3QGKLvHTBjCKdYg=; b=PGDAZ2wxfmD5rDL7K2/WWKZNUq
-	Nrhd+fkmeFKYCYGcx5SypVZIBt8G7BNVaGq1ct2gajEpVWdZB2WGM7ExJXhf1T1D4PFB7uMBWVKNI
-	ZR1ZXjCzNXEgQbwJo03MDz3qqj2U0gEdXONAaAwnPrPEQpFwXDbRKWZ8DdxJJChTR1s5MZ9i6L1tD
-	aK4IOPTu1E8B2pRFKIjhy8z7llEBR8X4zyqyS9BiZvZYbt53xkZwq2kzrq09yeS5MwZ8zQoK5xiZ3
-	CdMAder8gNw/5Z2QGgW4lYh8ZUHy6UCFzFE0UYeT3cTJQVZdnwdo4y1f60QXFczSp5l+9YFYFnKVH
-	Fra0jnlQ==;
+	bh=MoxophO5n8C+KSi96vfvN5u7MvN/HB7mzLUuu3SG3mU=; b=jx/thCQus4sqw0bm7pTrG0vsan
+	LUneHrvfbM4pU/Fer9KamxgwxX0xpvgbSnjIJnhvGcTnGGlq051GoxJuuUxX4g4+xGthnEnEhCP5j
+	ERno7i/yzcysuWBnrsZadUI7exkFTdfQyM4Nc00wwI6g9BY0VmwYFw27oE18vZYVHHTDuyAvDljDK
+	EUjFKAXI/cZPBpfySofqb1if0o3CCJYKEeEaRLXH2jYjZS8ikZ2CJXlNbt3Jqcywd5MZP28pHSqua
+	R0eVM7nb2rakn/xg+fdevbke3n69V2IQIvKhV/mlSPOS2oocBS4IfkoPplRCOLZfK20XMsrblzOno
+	INxzwdFg==;
 Received: from p200300c20737c2001a3da2fffebfd33a.dip0.t-ipconnect.de ([2003:c2:737:c200:1a3d:a2ff:febf:d33a] helo=aktux)
 	by mail.andi.de1.cc with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.96)
 	(envelope-from <andreas@kemnade.info>)
-	id 1sFHsn-002nvz-0A;
-	Thu, 06 Jun 2024 20:30:42 +0200
+	id 1sFHsl-002nvZ-2I;
+	Thu, 06 Jun 2024 20:30:41 +0200
 Received: from andi by aktux with local (Exim 4.96)
 	(envelope-from <andreas@kemnade.info>)
-	id 1sFHsn-002s4g-3D;
-	Thu, 06 Jun 2024 20:30:42 +0200
+	id 1sFHsm-002s4b-2G;
+	Thu, 06 Jun 2024 20:30:40 +0200
 From: Andreas Kemnade <andreas@kemnade.info>
 To: marcel@holtmann.org,
 	luiz.dentz@gmail.com,
@@ -60,9 +60,9 @@ To: marcel@holtmann.org,
 	=?UTF-8?q?P=C3=A9ter=20Ujfalusi?= <peter.ujfalusi@gmail.com>,
 	robh@kernel.org,
 	hns@goldelico.com
-Subject: [PATCH RFC v4 4/4] gnss: ai2: replace long sleeps by wait for acks
-Date: Thu,  6 Jun 2024 20:30:32 +0200
-Message-Id: <20240606183032.684481-5-andreas@kemnade.info>
+Subject: [PATCH v4 3/4] gnss: Add driver for AI2 protocol
+Date: Thu,  6 Jun 2024 20:30:31 +0200
+Message-Id: <20240606183032.684481-4-andreas@kemnade.info>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20240606183032.684481-1-andreas@kemnade.info>
 References: <20240606183032.684481-1-andreas@kemnade.info>
@@ -74,258 +74,591 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Previously there were long sleeps for everything sent out.
-Replace the sleeps by some wait for completion.
-Wait times like 60ms are seen.
-There are ack packets sent out if requested. Unfortunately
-just waiting for them seems not stable, some open()/close()
-loop stress-testing brings the communication into complete
-disorder. Unfortunately these ack packets arrive before
-a complete answer of the command has been received but
-apparently after some processing has been done.
-Properly declaring expected answers might help but adding
-that can only be justified after some wider testing.
-
-So leaving this part of the series as a RFC and base
-for future optimzations.
+Add a driver for the Air Independent Interface protocol used by some TI
+Wilink combo chips. Per default, send out just NMEA to userspace and turn
+on/off things at open()/close() but keep the door open for any
+sophisticated development regarding the AI2 protocol by having a kernel
+parameter to turn it into raw mode (ai2raw) resembling /dev/tigps provided
+by some TI vendor kernels.
+The fork used by the BT200 is at:
+http://epsonservice.goepson.com/downloads/VI-APS/BT200_kernel.tgz
 
 Signed-off-by: Andreas Kemnade <andreas@kemnade.info>
+Acked-by: Paul Menzel <pmenzel@molgen.mpg.de>
 ---
- drivers/gnss/ai2.c | 110 +++++++++++++++++++++++++++++----------------
- 1 file changed, 71 insertions(+), 39 deletions(-)
+ drivers/gnss/Kconfig  |  13 ++
+ drivers/gnss/Makefile |   3 +
+ drivers/gnss/ai2.c    | 528 ++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 544 insertions(+)
+ create mode 100644 drivers/gnss/ai2.c
 
+diff --git a/drivers/gnss/Kconfig b/drivers/gnss/Kconfig
+index d7fe265c28696..95fdab6e7ae94 100644
+--- a/drivers/gnss/Kconfig
++++ b/drivers/gnss/Kconfig
+@@ -65,4 +65,17 @@ config GNSS_USB
+ 
+ 	  If unsure, say N.
+ 
++config GNSS_AI2
++	tristate "TI AI2 procotol support"
++	depends on BT_HCIUART_LL
++	help
++	  Say Y here if you have a Texas Instruments Wilink combo chip
++	  containing among other things a GNSS receiver speaking the
++	  Air Independent Interface (AI2) protocol.
++
++	  To compile this driver as a module, choose M here: the module will
++	  be called gnss-ai2.
++
++	  If unsure, say N.
++
+ endif # GNSS
+diff --git a/drivers/gnss/Makefile b/drivers/gnss/Makefile
+index bb2cbada34359..bf6fefcb2e823 100644
+--- a/drivers/gnss/Makefile
++++ b/drivers/gnss/Makefile
+@@ -20,3 +20,6 @@ gnss-ubx-y := ubx.o
+ 
+ obj-$(CONFIG_GNSS_USB)			+= gnss-usb.o
+ gnss-usb-y := usb.o
++
++obj-$(CONFIG_GNSS_AI2)			+= gnss-ai2.o
++gnss-ai2-y := ai2.o
 diff --git a/drivers/gnss/ai2.c b/drivers/gnss/ai2.c
-index 930c065050917..be72fb7fcc272 100644
---- a/drivers/gnss/ai2.c
+new file mode 100644
+index 0000000000000..930c065050917
+--- /dev/null
 +++ b/drivers/gnss/ai2.c
-@@ -6,6 +6,7 @@
-  * Copyright (C) 2024 Andreas Kemnade <andreas@kemnade.info>
-  */
- #include <asm/byteorder.h>
-+#include <linux/completion.h>
- #include <linux/errno.h>
- #include <linux/gnss.h>
- #include <linux/init.h>
-@@ -68,6 +69,16 @@ struct ai2_device {
- 	struct device *dev;
- 	struct sk_buff *recv_skb;
- 	bool recv_esc;
+@@ -0,0 +1,528 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * Texas Instruments AI2 (Air independent interface) protocol device driver
++ * Used for some TI WLAN/Bluetooth/GNSS combo chips.
++ *
++ * Copyright (C) 2024 Andreas Kemnade <andreas@kemnade.info>
++ */
++#include <asm/byteorder.h>
++#include <linux/errno.h>
++#include <linux/gnss.h>
++#include <linux/init.h>
++#include <linux/kernel.h>
++#include <linux/module.h>
++#include <linux/mod_devicetable.h>
++#include <linux/platform_device.h>
++#include <linux/slab.h>
++#include <linux/ti_wilink_st.h>
++#include <net/bluetooth/bluetooth.h>
++#include <net/bluetooth/hci_core.h>
++
++/* Channel-9 details for GPS */
++#define GPS_CH9_PKT_NUMBER		0x9
++#define GPS_CH9_OP_WRITE		0x1
++#define GPS_CH9_OP_READ			0x2
++#define GPS_CH9_OP_COMPLETED_EVT	0x3
++
++/* arbitarily chosen, should fit everything seen in the past */
++#define MAX_AI2_FRAME_SIZE 2048
++
++#define AI2_ESCAPE 0x10 /* if sent as data, it is doubled */
++#define AI2_END_MARKER 0x3
++#define AI2_ACK 0x2
++
++/* reports */
++#define AI2_REPORT_NMEA 0xd3
++
++#define NMEA_HEADER_LEN 4
++
++/* commands */
++#define AI2_CMD_RECEIVER_STATE 2
++
++#define RECEIVER_STATE_OFF 1
++#define RECEIVER_STATE_IDLE 2
++#define RECEIVER_STATE_ON 3
++
++#define AI2_CMD_CONFIG_NMEA 0xe5
++#define NMEA_MASK_GGA (1 << 0)
++#define NMEA_MASK_GLL (1 << 1)
++#define NMEA_MASK_GSA (1 << 2)
++#define NMEA_MASK_GSV (1 << 3)
++#define NMEA_MASK_RMC (1 << 4)
++#define NMEA_MASK_VTG (1 << 5)
++
++#define NMEA_MASK_ALL (NMEA_MASK_GGA | \
++		NMEA_MASK_GLL | \
++		NMEA_MASK_GSA | \
++		NMEA_MASK_GSV | \
++		NMEA_MASK_RMC | \
++		NMEA_MASK_VTG)
++
++
++static bool ai2raw;
++
++struct ai2_device {
++	struct mutex gdev_mutex;
++	bool gdev_open;
++	struct gnss_device *gdev;
++	struct device *dev;
++	struct sk_buff *recv_skb;
++	bool recv_esc;
++};
++
++static struct sk_buff *ai2_skb_alloc(unsigned int len, gfp_t how)
++{
++	struct sk_buff *skb;
++
++	skb = bt_skb_alloc(len + sizeof(struct gps_event_hdr), how);
++	if (skb)
++		skb_reserve(skb, sizeof(struct gps_event_hdr));
++
++	return skb;
++}
++
++static int ai2_send_frame(struct ai2_device *ai2dev,
++			  struct sk_buff *skb)
++{
++	int len;
++	struct gps_event_hdr *gnssdrv_hdr;
++	struct hci_dev *hdev;
++
++	if (skb->len >= U16_MAX)
++		return -EINVAL;
++
 +	/*
-+	 * completion for the lower level around
-+	 * GPS_CH9_OP_COMPLETED_EVT
-+	 * probably more important if we send large
-+	 * fragmented packets
++	 * note: fragmentation at this point not handled yet
++	 * not needed for simple config commands
 +	 */
-+	struct completion ch9_complete;
++	len = skb->len;
++	gnssdrv_hdr = skb_push(skb, sizeof(struct gps_event_hdr));
++	gnssdrv_hdr->opcode = GPS_CH9_OP_WRITE;
++	gnssdrv_hdr->plen = __cpu_to_le16(len);
 +
-+	/* completion for AI2 ack packets */
-+	struct completion ai2_ack_complete;
- };
- 
- static struct sk_buff *ai2_skb_alloc(unsigned int len, gfp_t how)
-@@ -87,6 +98,7 @@ static int ai2_send_frame(struct ai2_device *ai2dev,
- 	int len;
- 	struct gps_event_hdr *gnssdrv_hdr;
- 	struct hci_dev *hdev;
++	hci_skb_pkt_type(skb) = GPS_CH9_PKT_NUMBER;
++	hdev = st_get_hci(ai2dev->dev->parent);
++	return hdev->send(hdev, skb);
++}
++
++static void ai2_put_escaped(struct sk_buff *skb, u8 d)
++{
++	skb_put_u8(skb, d);
++	if (d == 0x10)
++		skb_put_u8(skb, d);
++}
++
++static struct sk_buff *ai2_compose_frame(bool request_ack,
++					u8 cmd,
++					const u8 *data,
++					int len)
++{
++	u16 sum;
++	int i;
++	/* duplicate the length to have space for worst case escaping */
++	struct sk_buff *skb = ai2_skb_alloc(2 + len * 2 + 2 + 2, GFP_KERNEL);
++
++	skb_put_u8(skb, AI2_ESCAPE);
++	skb_put_u8(skb, request_ack ? 1 : 0);
++
++	sum = AI2_ESCAPE;
++	if (request_ack)
++		sum++;
++
++	ai2_put_escaped(skb, cmd);
++	sum += cmd;
++
++	ai2_put_escaped(skb, len & 0xff);
++	sum += len & 0xff;
++
++	ai2_put_escaped(skb, len >> 8);
++	sum += len >> 8;
++
++	for (i = 0; i < len; i++) {
++		sum += data[i];
++		ai2_put_escaped(skb, data[i]);
++	}
++
++	ai2_put_escaped(skb, sum & 0xFF);
++	ai2_put_escaped(skb, sum >> 8);
++	skb_put_u8(skb, AI2_ESCAPE);
++	skb_put_u8(skb, AI2_END_MARKER);
++
++	return skb;
++}
++
++static int ai2_set_receiver_state(struct ai2_device *ai2dev,
++					      uint8_t state)
++{
++	struct sk_buff *skb = ai2_compose_frame(true, AI2_CMD_RECEIVER_STATE,
++						&state, 1);
++	if (!skb)
++		return -ENOMEM;
++
++	return ai2_send_frame(ai2dev, skb);
++}
++
++static int ai2_config_nmea_reports(struct ai2_device *ai2dev,
++				   uint8_t mask)
++{
++	u8 buf[4] = {0};
++	struct sk_buff *skb;
++
++	buf[0] = mask;
++	skb = ai2_compose_frame(true, AI2_CMD_CONFIG_NMEA,
++				buf, sizeof(buf));
++	if (!skb)
++		return -ENOMEM;
++
++	return ai2_send_frame(ai2dev, skb);
++}
++
++/*
++ * Unknown commands, give some version information, must be sent
++ * once, not sure what undoes them besides resetting the whole
++ * bluetooth part, but no signs of significant things being still
++ * turned on without undoing this.
++ */
++static int gnss_ai2_init(struct ai2_device *ai2dev)
++{
 +	int ret;
- 
- 	if (skb->len >= U16_MAX)
- 		return -EINVAL;
-@@ -96,13 +108,25 @@ static int ai2_send_frame(struct ai2_device *ai2dev,
- 	 * not needed for simple config commands
- 	 */
- 	len = skb->len;
-+	print_hex_dump_bytes("ai2 send frame: ", DUMP_PREFIX_OFFSET, skb->data, skb->len);
++	u8 d = 0x01;
++	struct sk_buff *skb = ai2_compose_frame(true, 0xf5, &d, 1);
 +
- 	gnssdrv_hdr = skb_push(skb, sizeof(struct gps_event_hdr));
- 	gnssdrv_hdr->opcode = GPS_CH9_OP_WRITE;
- 	gnssdrv_hdr->plen = __cpu_to_le16(len);
--
- 	hci_skb_pkt_type(skb) = GPS_CH9_PKT_NUMBER;
- 	hdev = st_get_hci(ai2dev->dev->parent);
--	return hdev->send(hdev, skb);
-+	reinit_completion(&ai2dev->ch9_complete);
++	if (!skb)
++		return -ENOMEM;
 +
-+	ret = hdev->send(hdev, skb);
++	ret = ai2_send_frame(ai2dev, skb);
 +	if (ret)
 +		return ret;
 +
-+	if (!wait_for_completion_timeout(&ai2dev->ch9_complete,
-+					 msecs_to_jiffies(2000)))
-+		return -ETIMEDOUT;
-+	dev_dbg(ai2dev->dev, "send finished\n");
++	msleep(200); /* seen some 60ms response time here, so wait a bit */
++	d = 5;
++	skb = ai2_compose_frame(true, 0xf1, &d, 1);
++	if (!skb)
++		return -ENOMEM;
 +
-+	return 0;
- }
- 
- static void ai2_put_escaped(struct sk_buff *skb, u8 d)
-@@ -151,30 +175,50 @@ static struct sk_buff *ai2_compose_frame(bool request_ack,
- 	return skb;
- }
- 
--static int ai2_set_receiver_state(struct ai2_device *ai2dev,
--					      uint8_t state)
-+static int ai2_compose_send_frame(struct ai2_device *ai2dev,
-+				  bool request_ack,
-+				  u8 cmd,
-+				  const u8 *data,
-+				  int len)
- {
--	struct sk_buff *skb = ai2_compose_frame(true, AI2_CMD_RECEIVER_STATE,
--						&state, 1);
-+	struct sk_buff *skb = ai2_compose_frame(request_ack, cmd, data, len);
- 	if (!skb)
- 		return -ENOMEM;
- 
-+	if (request_ack) {
-+		int ret;
-+
-+		reinit_completion(&ai2dev->ai2_ack_complete);
-+
-+		ret = ai2_send_frame(ai2dev, skb);
-+		if (ret)
-+			return ret;
-+
-+		if (!wait_for_completion_timeout(&ai2dev->ai2_ack_complete,
-+						 msecs_to_jiffies(2000)))
-+			return -ETIMEDOUT;
-+
-+		return 0;
-+	}
-+
- 	return ai2_send_frame(ai2dev, skb);
- }
- 
-+static int ai2_set_receiver_state(struct ai2_device *ai2dev,
-+				  uint8_t state)
-+{
-+	return ai2_compose_send_frame(ai2dev, true, AI2_CMD_RECEIVER_STATE,
-+				      &state, 1);
++	return ai2_send_frame(ai2dev, skb);
 +}
 +
- static int ai2_config_nmea_reports(struct ai2_device *ai2dev,
- 				   uint8_t mask)
- {
- 	u8 buf[4] = {0};
--	struct sk_buff *skb;
- 
- 	buf[0] = mask;
--	skb = ai2_compose_frame(true, AI2_CMD_CONFIG_NMEA,
--				buf, sizeof(buf));
--	if (!skb)
--		return -ENOMEM;
--
--	return ai2_send_frame(ai2dev, skb);
-+	return ai2_compose_send_frame(ai2dev, true, AI2_CMD_CONFIG_NMEA,
-+				      buf, sizeof(buf));
- }
- 
- /*
-@@ -187,22 +231,12 @@ static int gnss_ai2_init(struct ai2_device *ai2dev)
- {
- 	int ret;
- 	u8 d = 0x01;
--	struct sk_buff *skb = ai2_compose_frame(true, 0xf5, &d, 1);
--
--	if (!skb)
--		return -ENOMEM;
--
--	ret = ai2_send_frame(ai2dev, skb);
-+	ret = ai2_compose_send_frame(ai2dev, true, 0xf5, &d, 1);
- 	if (ret)
- 		return ret;
- 
--	msleep(200); /* seen some 60ms response time here, so wait a bit */
- 	d = 5;
--	skb = ai2_compose_frame(true, 0xf1, &d, 1);
--	if (!skb)
--		return -ENOMEM;
--
--	return ai2_send_frame(ai2dev, skb);
-+	return ai2_compose_send_frame(ai2dev, true, 0xf1, &d, 1);
- }
- 
- static int gnss_ai2_open(struct gnss_device *gdev)
-@@ -220,18 +254,14 @@ static int gnss_ai2_open(struct gnss_device *gdev)
- 	if (ret)
- 		goto err;
- 
--	/* TODO: find out on what kind of ack we should wait */
--	msleep(50);
- 	ret = ai2_set_receiver_state(ai2dev, RECEIVER_STATE_IDLE);
- 	if (ret)
- 		goto err;
- 
--	msleep(100);
- 	ret = ai2_config_nmea_reports(ai2dev, NMEA_MASK_ALL);
- 	if (ret)
- 		goto err;
- 
--	msleep(50);
- 	ret = ai2_set_receiver_state(ai2dev, RECEIVER_STATE_ON);
- 	if (ret)
- 		goto err;
-@@ -254,13 +284,9 @@ static void gnss_ai2_close(struct gnss_device *gdev)
- {
- 	struct ai2_device *ai2dev = gnss_get_drvdata(gdev);
- 
--	/* TODO: find out on what kind of ack we should wait */
- 	if (!ai2raw) {
--		msleep(50);
- 		ai2_set_receiver_state(ai2dev, RECEIVER_STATE_IDLE);
--		msleep(50);
- 		ai2_set_receiver_state(ai2dev, RECEIVER_STATE_OFF);
--		msleep(200); /* seen some longer response time here, so wait */
- 	}
- 
- 	mutex_lock(&ai2dev->gdev_mutex);
-@@ -345,8 +371,10 @@ static void process_ai2_frame(struct ai2_device *ai2dev)
- 	}
- 
- 	/* reached if byte 1 in the command packet is set to 1 */
--	if (data[1] == AI2_ACK)
-+	if (data[1] == AI2_ACK) {
-+		complete(&ai2dev->ai2_ack_complete);
- 		return;
-+	}
- 
- 	head = skb_pull(ai2dev->recv_skb, 2); /* drop frame start marker */
- 	while (head && (ai2dev->recv_skb->len >= 3)) {
-@@ -434,11 +462,9 @@ static void gnss_recv_frame(struct device *dev, struct sk_buff *skb)
- 	gnss_hdr = (struct gps_event_hdr *)skb->data;
- 
- 	data = skb_pull(skb, sizeof(*gnss_hdr));
--	/*
--	 * REVISIT: maybe do something with the completed
--	 * event
--	 */
--	if (gnss_hdr->opcode ==	GPS_CH9_OP_READ) {
++static int gnss_ai2_open(struct gnss_device *gdev)
++{
++	struct ai2_device *ai2dev = gnss_get_drvdata(gdev);
++	int ret;
 +
-+	switch (gnss_hdr->opcode) {
-+	case GPS_CH9_OP_READ:
- 		mutex_lock(&ai2dev->gdev_mutex);
- 		if (ai2dev->gdev_open) {
- 			if (ai2raw)
-@@ -450,6 +476,10 @@ static void gnss_recv_frame(struct device *dev, struct sk_buff *skb)
- 				"receiving data while chip should be off\n");
- 		}
- 		mutex_unlock(&ai2dev->gdev_mutex);
-+		break;
-+	case GPS_CH9_OP_COMPLETED_EVT:
-+		complete(&ai2dev->ch9_complete);
-+		break;
- 	}
- 	kfree_skb(skb);
- }
-@@ -475,6 +505,8 @@ static int gnss_ai2_probe(struct platform_device *pdev)
- 	platform_set_drvdata(pdev, ai2dev);
- 	st_set_gnss_recv_func(pdev->dev.parent, gnss_recv_frame);
- 	mutex_init(&ai2dev->gdev_mutex);
-+	init_completion(&ai2dev->ch9_complete);
-+	init_completion(&ai2dev->ai2_ack_complete);
- 
- 	ret = gnss_register_device(gdev);
- 	if (ret)
++	mutex_lock(&ai2dev->gdev_mutex);
++	ai2dev->gdev_open = true;
++	mutex_unlock(&ai2dev->gdev_mutex);
++	if (ai2raw)
++		return 0;
++
++	ret = gnss_ai2_init(ai2dev);
++	if (ret)
++		goto err;
++
++	/* TODO: find out on what kind of ack we should wait */
++	msleep(50);
++	ret = ai2_set_receiver_state(ai2dev, RECEIVER_STATE_IDLE);
++	if (ret)
++		goto err;
++
++	msleep(100);
++	ret = ai2_config_nmea_reports(ai2dev, NMEA_MASK_ALL);
++	if (ret)
++		goto err;
++
++	msleep(50);
++	ret = ai2_set_receiver_state(ai2dev, RECEIVER_STATE_ON);
++	if (ret)
++		goto err;
++
++	msleep(50);
++
++	return 0;
++err:
++	mutex_lock(&ai2dev->gdev_mutex);
++	ai2dev->gdev_open = false;
++	if (ai2dev->recv_skb)
++		kfree_skb(ai2dev->recv_skb);
++
++	ai2dev->recv_skb = NULL;
++	mutex_unlock(&ai2dev->gdev_mutex);
++	return ret;
++}
++
++static void gnss_ai2_close(struct gnss_device *gdev)
++{
++	struct ai2_device *ai2dev = gnss_get_drvdata(gdev);
++
++	/* TODO: find out on what kind of ack we should wait */
++	if (!ai2raw) {
++		msleep(50);
++		ai2_set_receiver_state(ai2dev, RECEIVER_STATE_IDLE);
++		msleep(50);
++		ai2_set_receiver_state(ai2dev, RECEIVER_STATE_OFF);
++		msleep(200); /* seen some longer response time here, so wait */
++	}
++
++	mutex_lock(&ai2dev->gdev_mutex);
++	ai2dev->gdev_open = false;
++	if (ai2dev->recv_skb)
++		kfree_skb(ai2dev->recv_skb);
++
++	ai2dev->recv_skb = NULL;
++	mutex_unlock(&ai2dev->gdev_mutex);
++}
++
++
++static int gnss_ai2_write_raw(struct gnss_device *gdev,
++		const unsigned char *buf, size_t count)
++{
++	struct ai2_device *ai2dev = gnss_get_drvdata(gdev);
++	int err = 0;
++	struct sk_buff *skb = NULL;
++
++	if (!ai2raw)
++		return -EPERM;
++
++	/* allocate packet */
++	skb = ai2_skb_alloc(count, GFP_KERNEL);
++	if (!skb) {
++		BT_ERR("cannot allocate memory for HCILL packet");
++		err = -ENOMEM;
++		goto out;
++	}
++
++	skb_put_data(skb, buf, count);
++
++	err = ai2_send_frame(ai2dev, skb);
++	if (err)
++		goto out;
++
++	return count;
++out:
++	return err;
++}
++
++static const struct gnss_operations gnss_ai2_ops = {
++	.open		= gnss_ai2_open,
++	.close		= gnss_ai2_close,
++	.write_raw	= gnss_ai2_write_raw,
++};
++
++static void process_ai2_packet(struct ai2_device *ai2dev,
++			       u8 cmd, u8 *data, u16 len)
++{
++	if (cmd != AI2_REPORT_NMEA)
++		return;
++
++	if (len <= NMEA_HEADER_LEN)
++		return;
++
++	len -= NMEA_HEADER_LEN;
++	data += NMEA_HEADER_LEN;
++
++	gnss_insert_raw(ai2dev->gdev, data, len);
++}
++
++/* do some sanity checks and split frame into packets */
++static void process_ai2_frame(struct ai2_device *ai2dev)
++{
++	u16 sum;
++	int i;
++	u8 *head;
++	u8 *data;
++
++	sum = 0;
++	data = ai2dev->recv_skb->data;
++	for (i = 0; i < ai2dev->recv_skb->len - 2; i++)
++		sum += data[i];
++
++	print_hex_dump_bytes("ai2 frame: ", DUMP_PREFIX_OFFSET, data, ai2dev->recv_skb->len);
++
++	if (get_unaligned_le16(data + i) != sum) {
++		dev_dbg(ai2dev->dev,
++			"checksum error in reception, dropping frame\n");
++		return;
++	}
++
++	/* reached if byte 1 in the command packet is set to 1 */
++	if (data[1] == AI2_ACK)
++		return;
++
++	head = skb_pull(ai2dev->recv_skb, 2); /* drop frame start marker */
++	while (head && (ai2dev->recv_skb->len >= 3)) {
++		u8 cmd;
++		u16 pktlen;
++
++		cmd = head[0];
++		pktlen = get_unaligned_le16(head + 1);
++		data = skb_pull(ai2dev->recv_skb, 3);
++		if (!data)
++			break;
++
++		if (pktlen > ai2dev->recv_skb->len)
++			break;
++
++		head = skb_pull(ai2dev->recv_skb, pktlen);
++
++		process_ai2_packet(ai2dev, cmd, data, pktlen);
++	}
++}
++
++static void process_ai2_data(struct ai2_device *ai2dev,
++			     u8 *data, int len)
++{
++	int i;
++
++	for (i = 0; i < len; i++) {
++		if (!ai2dev->recv_skb) {
++			ai2dev->recv_esc = false;
++			if (data[i] != AI2_ESCAPE) {
++				dev_dbg(ai2dev->dev, "dropping data, trying to resync\n");
++				continue;
++			}
++			ai2dev->recv_skb = alloc_skb(MAX_AI2_FRAME_SIZE, GFP_KERNEL);
++			if (!ai2dev->recv_skb)
++				return;
++
++			dev_dbg(ai2dev->dev, "starting packet\n");
++
++			/* this initial AI2_ESCAPE is part of checksum computation */
++			skb_put_u8(ai2dev->recv_skb, data[i]);
++			continue;
++		}
++		if (ai2dev->recv_skb->len == 1) {
++			if (data[i] == AI2_END_MARKER) {
++				dev_dbg(ai2dev->dev, "unexpected end of frame received\n");
++				kfree_skb(ai2dev->recv_skb);
++				ai2dev->recv_skb = NULL;
++				continue;
++			}
++			skb_put_u8(ai2dev->recv_skb, data[i]);
++		} else {
++			/* drop one of two AI2_ESCAPE */
++			if ((!ai2dev->recv_esc) &&
++			   (data[i] == AI2_ESCAPE)) {
++				ai2dev->recv_esc = true;
++				continue;
++			}
++
++			if (ai2dev->recv_esc &&
++			    (data[i] == AI2_END_MARKER)) {
++				process_ai2_frame(ai2dev);
++				kfree_skb(ai2dev->recv_skb);
++				ai2dev->recv_skb = NULL;
++				continue;
++			}
++
++			ai2dev->recv_esc = false;
++			skb_put_u8(ai2dev->recv_skb, data[i]);
++		}
++	}
++}
++
++static void gnss_recv_frame(struct device *dev, struct sk_buff *skb)
++{
++	struct ai2_device *ai2dev = dev_get_drvdata(dev);
++	struct gps_event_hdr *gnss_hdr;
++	u8 *data;
++
++	if (!ai2dev->gdev) {
++		kfree_skb(skb);
++		return;
++	}
++
++	gnss_hdr = (struct gps_event_hdr *)skb->data;
++
++	data = skb_pull(skb, sizeof(*gnss_hdr));
++	/*
++	 * REVISIT: maybe do something with the completed
++	 * event
++	 */
++	if (gnss_hdr->opcode ==	GPS_CH9_OP_READ) {
++		mutex_lock(&ai2dev->gdev_mutex);
++		if (ai2dev->gdev_open) {
++			if (ai2raw)
++				gnss_insert_raw(ai2dev->gdev, data, skb->len);
++			else
++				process_ai2_data(ai2dev, data, skb->len);
++		} else {
++			dev_dbg(ai2dev->dev,
++				"receiving data while chip should be off\n");
++		}
++		mutex_unlock(&ai2dev->gdev_mutex);
++	}
++	kfree_skb(skb);
++}
++
++static int gnss_ai2_probe(struct platform_device *pdev)
++{
++	struct gnss_device *gdev;
++	struct ai2_device *ai2dev;
++	int ret;
++
++	ai2dev = devm_kzalloc(&pdev->dev, sizeof(*ai2dev), GFP_KERNEL);
++	if (!ai2dev)
++		return -ENOMEM;
++
++	ai2dev->dev = &pdev->dev;
++	gdev = gnss_allocate_device(&pdev->dev);
++	if (!gdev)
++		return -ENOMEM;
++
++	gdev->ops = &gnss_ai2_ops;
++	gdev->type = ai2raw ? GNSS_TYPE_AI2 : GNSS_TYPE_NMEA;
++	gnss_set_drvdata(gdev, ai2dev);
++	platform_set_drvdata(pdev, ai2dev);
++	st_set_gnss_recv_func(pdev->dev.parent, gnss_recv_frame);
++	mutex_init(&ai2dev->gdev_mutex);
++
++	ret = gnss_register_device(gdev);
++	if (ret)
++		goto err;
++
++	ai2dev->gdev = gdev;
++	return 0;
++
++err:
++	st_set_gnss_recv_func(pdev->dev.parent, NULL);
++
++	if (ai2dev->recv_skb)
++		kfree_skb(ai2dev->recv_skb);
++
++	gnss_put_device(gdev);
++	return ret;
++}
++
++static void gnss_ai2_remove(struct platform_device *pdev)
++{
++	struct ai2_device *ai2dev =  platform_get_drvdata(pdev);
++
++	st_set_gnss_recv_func(pdev->dev.parent, NULL);
++	gnss_deregister_device(ai2dev->gdev);
++	gnss_put_device(ai2dev->gdev);
++	if (ai2dev->recv_skb)
++		kfree_skb(ai2dev->recv_skb);
++}
++
++static const struct platform_device_id gnss_ai2_id[] = {
++	{
++		.name = "ti-ai2-gnss"
++	}, {
++		/* sentinel */
++	}
++};
++MODULE_DEVICE_TABLE(platform, gnss_ai2_id);
++
++static struct platform_driver gnss_ai2_driver = {
++	.driver = {
++		.name = "gnss-ai2",
++	},
++	.probe		= gnss_ai2_probe,
++	.remove_new	= gnss_ai2_remove,
++	.id_table	= gnss_ai2_id,
++};
++module_platform_driver(gnss_ai2_driver);
++
++module_param(ai2raw, bool, 0600);
++MODULE_DESCRIPTION("AI2 GNSS driver");
++MODULE_LICENSE("GPL");
 -- 
 2.39.2
 
