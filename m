@@ -1,116 +1,128 @@
-Received: from mail-lj1-f182.google.com (mail-lj1-f182.google.com [209.85.208.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail2.andi.de1.cc (vmd64148.contaboserver.net [161.97.139.27])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBFBE6D1A9;
-	Thu,  6 Jun 2024 20:10:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F65138F9C;
+	Thu,  6 Jun 2024 20:19:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=161.97.139.27
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717704635; cv=none; b=aatqwfwPrU8Ga/bhGiG0lNG25lh2bqPObM23F3FPtt/jK76HvyxS+9VJLwNUHwPFwe4x0kI91znsD6CS2gNAuqfeGGO684l3MgrfJwwF+LSdCfIAU7cRSVqfN+T2+yLu4SnVvqZIFIl50vVuus+3YBQgAnsdAXJuckGQidkTlgk=
+	t=1717705188; cv=none; b=i91l7mDa0qnD7TKMkTn6XuXPqdReIwpKSptqgp54y+wHsWn9V65KoPwrJue/G24CgAgqzgdEZ/IhCGMJ4aCma64e0w6BhysngHA7j3jtOI6ua31jjEXS75Wjgfl8GWQtkYwraGW66MDADutyWPLYBOy35bN7VIaoB4dTo1K814c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717704635; c=relaxed/simple;
-	bh=f+0mO3lyWhRWDhdZwJ+G9tdZPcEOT4dALbeWYuTQdWA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=NobLgBLdsyWms0LCy6a43WVaQR2CDCHxnJQaITlIx9/aSd7+ZgIBwwhK+SHygxzSKYfNMTaTgnz0NxLcreh06ZSKXA26fdMuJJj/aC+O/bw5kkHeLkra/uwrCZtRd9i9Dopm4vANY0uaHo/GomBr278j7HXBjZEegsJQZW157WI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BjPEoNy4; arc=none smtp.client-ip=209.85.208.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1717705188; c=relaxed/simple;
+	bh=wa3BBdGR1+78PPUuJsMGHRdeHoVZKgnZms8c31qQteY=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=GfWpfDSFcOUyLRlDfJpsCdLjY7ho5Fy7ya0bkSSQUPIwQmDbopfG8VyP0ubZO7jxnOQzLH/guNKFINKqKv92WeEiHzqN6PrmyDkU6jPJAX0sSC7s/eogAHaSc67m3b1vbK62UNzlgoiv8uxgHgWNik0fQfJZd0schZjuXoEiYcA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kemnade.info; spf=pass smtp.mailfrom=kemnade.info; dkim=pass (2048-bit key) header.d=kemnade.info header.i=@kemnade.info header.b=kFAacZI8; arc=none smtp.client-ip=161.97.139.27
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kemnade.info
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kemnade.info
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BjPEoNy4"
-Received: by mail-lj1-f182.google.com with SMTP id 38308e7fff4ca-2eaa80cb573so16231111fa.1;
-        Thu, 06 Jun 2024 13:10:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1717704631; x=1718309431; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Hutjf4WwE6IKhYhoDpmSZWk+TUgz4ul3jgLdpMGfmk8=;
-        b=BjPEoNy4cBa8kVaLImqSclFKfQrxUvdxLPAtwk8zCwpEV+OLg59Ra07GSPwnZRLNgE
-         u+8RYXl98neYllmkFByMFe8tE0OrmHaAGEMIhJIcUJAmPT4XFH+svtUhLOjYiymK7uHN
-         5fxM5IYvBWk9Nt9RM47Q88AQoyrPJ8PPqBQSgjMDb8w/cyFJkXL0Gqb21B5DsiR2C3U7
-         QpQX80g9Y0DAa7PDrr2kKySwTtIvUMgedzauf1rbyrnPtBELhCN/+DgoRNTTGaiFdFWr
-         kS3gqvYzwkfAPxp4nxlz0gevEzuS7L64ELZ/0jEDK1rJ5ZtJ/5yYEYdRUdqyJJ7NJNci
-         b8AQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717704631; x=1718309431;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Hutjf4WwE6IKhYhoDpmSZWk+TUgz4ul3jgLdpMGfmk8=;
-        b=Fxy0oP7ASe+wMv9wmaRCjY10jYuI/yz1jYy5D29E2wo/FD4r57H0ssfsvTwlquuf2k
-         2q3KzEpar1E6DkGxEGe4C53rhCcPyEbKvgTS2BHpI91nAAF+tNyhax6SrzUoEpmZK66F
-         UE6SQJs7OLIWNyMYTHwZfkKI1dsWSHoHBWeYMicdJZ7hKrg8UMAxOlh62JOmvtRq9CXn
-         QmwmKCbiDBVjLjaAHjmtd2gB/mm0rtYmeFS/X00/ez+nG8Xi4iet4nkpuS8ytOiZVVfZ
-         k9W/fTiSz8JfLQ6dlxYAfx/CUTrgWXBDGclkcoPn+QTZwjyxMUOon2ySqWU/UEdS6krB
-         YuQg==
-X-Forwarded-Encrypted: i=1; AJvYcCUp512Rey1aog1YdB1C90m1/g4f+DK8FnbI1FmCJHic2DBC1TErb28uOUixQ6ukZOmc0I68//zAK6xoiYctJ7X9jea58n7wtwOH+eMaj++OXugu/n5ZiNZrMzLwf7nPGxAPuUfjqKPNFWY+gRHR
-X-Gm-Message-State: AOJu0YwpVmngoN6lWZDGEyqHian9ncJoxxtiGWKJTJv+7N1LAGnDoNiV
-	jWaRTT6j9gwonVgogHNDIuAebdMsaXnHTHhsCmCCQnSN3eyEKkmkT1KpzqgE9NVy1NdhI8q4MYa
-	UlOYawJRWHFMi5tkIo1mxlDQCjBB/7g==
-X-Google-Smtp-Source: AGHT+IHAsDb5+nsNxizNL0s50nQsiWVLkPf55QznG57cKaBnbaVfMJ/g6/XbUdNeCRsat4LY6v+75fSHMUV0aMYRwfU=
-X-Received: by 2002:a2e:b016:0:b0:2e1:7acb:6c40 with SMTP id
- 38308e7fff4ca-2eadce3f9a6mr4248981fa.29.1717704630713; Thu, 06 Jun 2024
- 13:10:30 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kemnade.info header.i=@kemnade.info header.b="kFAacZI8"
+Received: from mail.andi.de1.cc ([2a02:c205:3004:2154::1])
+	by mail2.andi.de1.cc with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <andreas@kemnade.info>)
+	id 1sFJaJ-0094PM-2s;
+	Thu, 06 Jun 2024 22:19:45 +0200
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=kemnade.info; s=20220719; h=Content-Transfer-Encoding:Content-Type:
+	MIME-Version:References:In-Reply-To:Message-ID:Subject:Cc:To:From:Date:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=SL5BnMk1PEOausbJHr2HCDEZ4yWEUH7QQMEph3aTbgw=; b=kFAacZI8g90v4i6fUcbrkwDdnX
+	rU4s8/cXRH16qiyrT6glZHCQqOS0qjjpaVHSoWDzodbsGebPoAZ38sQqHyEcRsI+iH1QN4xbEkN+E
+	Schyei93eUPhiZyZY5XzGaNAx4bdwQctlJ0LNF/cYgLj0TE5FN945zWuCr8T86nKO1289GnIrg+Uj
+	lx0p25iRrQxeLlXogaMV2DApnE9iWI0u4ssRQsFqmhGNZ2UIuS+qRsStKYVdwNOYrKJRcbd2iH7kF
+	Opl0hzyujsLnKiLb5wtldC+ssVrUw9WP93OYYfyowBKHPKtXXv8XIbokTrHgbMML/AoOk6g+8CgZG
+	NlM6cPOA==;
+Received: from p200300c20737c2001a3da2fffebfd33a.dip0.t-ipconnect.de ([2003:c2:737:c200:1a3d:a2ff:febf:d33a] helo=aktux)
+	by mail.andi.de1.cc with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <andreas@kemnade.info>)
+	id 1sFJaH-002oCx-35;
+	Thu, 06 Jun 2024 22:19:43 +0200
+Date: Thu, 6 Jun 2024 22:19:41 +0200
+From: Andreas Kemnade <andreas@kemnade.info>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: marcel@holtmann.org, johan@kernel.org, pmenzel@molgen.mpg.de,
+ jirislaby@kernel.org, gregkh@linuxfoundation.org,
+ linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org, Adam Ford
+ <aford173@gmail.com>, Tony Lindgren <tony@atomide.com>,
+ tomi.valkeinen@ideasonboard.com, =?UTF-8?B?UMOpdGVy?= Ujfalusi
+ <peter.ujfalusi@gmail.com>, robh@kernel.org, hns@goldelico.com
+Subject: Re: [PATCH v4 0/4] Bluetooth/gnss: GNSS support for TiWi chips
+Message-ID: <20240606221941.333a9704@aktux>
+In-Reply-To: <CABBYNZ+Fz2TLSNa28H3kjVKOSA7C-XOzdQJiHdJs3FKxnq01DA@mail.gmail.com>
+References: <20240606183032.684481-1-andreas@kemnade.info>
+	<CABBYNZ+Fz2TLSNa28H3kjVKOSA7C-XOzdQJiHdJs3FKxnq01DA@mail.gmail.com>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240606114321.30515-1-chris.lu@mediatek.com> <20240606114321.30515-2-chris.lu@mediatek.com>
-In-Reply-To: <20240606114321.30515-2-chris.lu@mediatek.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Thu, 6 Jun 2024 16:10:17 -0400
-Message-ID: <CABBYNZJdY8Oo5rwoJx7rAFPaTRhYRe7p0CEN52hv+7tBEoYCxg@mail.gmail.com>
-Subject: Re: [PATCH v4 1/4] Bluetooth: net: add hci_iso_hdr function for iso data
-To: Chris Lu <chris.lu@mediatek.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg <johan.hedberg@gmail.com>, 
-	Sean Wang <sean.wang@mediatek.com>, Deren Wu <deren.Wu@mediatek.com>, 
-	Aaron Hou <aaron.hou@mediatek.com>, Steve Lee <steve.lee@mediatek.com>, 
-	linux-bluetooth <linux-bluetooth@vger.kernel.org>, 
-	linux-kernel <linux-kernel@vger.kernel.org>, 
-	linux-mediatek <linux-mediatek@lists.infradead.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 
-Hi Chris,
+Hi Luiz,
 
-On Thu, Jun 6, 2024 at 7:43=E2=80=AFAM Chris Lu <chris.lu@mediatek.com> wro=
-te:
->
-> Add function hci_iso_hdr to get skb->data when packet type is ISO.
->
-> Signed-off-by: Chris Lu <chris.lu@mediatek.com>
-> Signed-off-by: Sean Wang <sean.wang@mediatek.com>
-> ---
->  include/net/bluetooth/hci.h | 5 +++++
->  1 file changed, 5 insertions(+)
->
-> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-> index e372a88e8c3f..b9f8f91f6c7f 100644
-> --- a/include/net/bluetooth/hci.h
-> +++ b/include/net/bluetooth/hci.h
-> @@ -2898,6 +2898,11 @@ static inline struct hci_sco_hdr *hci_sco_hdr(cons=
-t struct sk_buff *skb)
->         return (struct hci_sco_hdr *) skb->data;
->  }
->
-> +static inline struct hci_iso_hdr *hci_iso_hdr(const struct sk_buff *skb)
-> +{
-> +       return (struct hci_iso_hdr *) skb->data;
-> +}
+On Thu, 6 Jun 2024 16:04:10 -0400
+Luiz Augusto von Dentz <luiz.dentz@gmail.com> wrote:
 
-We might as well check the skb->len before attempting to cast
-skb->data or better yet use skb_pull_data but I guess that is not
-possible since you don't want to consume the skb?
+> Hi Andreas,
+>=20
+> On Thu, Jun 6, 2024 at 2:30=E2=80=AFPM Andreas Kemnade <andreas@kemnade.i=
+nfo> wrote:
+> >
+> > Some of these chips have GNSS support. In some vendor kernels
+> > a driver on top of misc/ti-st can be found providing a /dev/tigps
+> > device which speaks the secretive Air Independent Interface (AI2) proto=
+col.
+> >
+> > To be more compatible with userspace send out NMEA by default but
+> > allow a more raw mode by using a module parameter.
+> >
+> > This was tested on the Epson Moverio BT-200.
+> >
+> > Who will take this series (1-3)? GNSS with ack from Bluetooth?
+> >
+> > Changes since V3:
+> > - Finally remove the period from 1/4 subject
+> > - include things directly for get_unaligned_le16() to fix 0-day issues
+> >
+> > Changes since V2:
+> > - Optimize waits
+> > - Fix some packet analysis / checksum computation issue
+> > - Adding a proposal for removing those waits as RFC
+> > - Minor spell corrections and improved descriptions
+> >
+> > Changes since V1:
+> > - Set up things for NMEA output
+> > - Powerup/down at open()/close()
+> > - split out logic between drivers/bluetooth and drivers/gnss
+> > - leave out drivers/misc/ti-st driver removal to avoid
+> >   filling up mailboxes during the iterations, this series is
+> >   still a proof that it is not needed, will take the brush after
+> >   this series is accepted.
+> >
+> >
+> > Andreas Kemnade (4):
+> >   gnss: Add AI2 protocol used by some TI combo chips
+> >   Bluetooth: ti-st: Add GNSS subdevice for TI Wilink chips =20
+>=20
+> The bluetooth one looks relatively simple so I could take that one and
+> push to bluetooth-next if there are no dependencies on the other
+> changes.
+>=20
+There is:
 
->  /* Command opcode pack/unpack */
->  #define hci_opcode_pack(ogf, ocf)      ((__u16) ((ocf & 0x03ff)|(ogf << =
-10)))
->  #define hci_opcode_ogf(op)             (op >> 10)
-> --
-> 2.18.0
->
+include/linux/ti_wilink_st.h |   8 +
 
+We have compile time deps here. Patch 3 compile time depends on patch 2. If=
+ we
+cannot take everything in for  6.11, you might opt to take the bluetooth pa=
+rt.
+That would work.
 
---=20
-Luiz Augusto von Dentz
+Regards,
+Andreas
