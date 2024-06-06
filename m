@@ -1,141 +1,220 @@
-Received: from mail-qv1-f49.google.com (mail-qv1-f49.google.com [209.85.219.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B89C6194AE3
-	for <linux-bluetooth@vger.kernel.org>; Thu,  6 Jun 2024 12:42:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.49
+Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.3])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38548194AE0;
+	Thu,  6 Jun 2024 12:56:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.3
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717677758; cv=none; b=ezIQkj1PSiJ/mPaG1p4fSCEkW9fKISCob/1PCppoFWGJ/KoFKzu8nTQrN6/7KKw9Cy6M1KTOo61XXRluv3ErTUg/s57yQrhQAnMeKF0a8P4ROQjJQifqW33Mduqj0QedfJydOsoLP2CVz+PU6yMB0Kvupi2JjZz3FcoROJyE1Rw=
+	t=1717678573; cv=none; b=b0uCKawWHj0VDa2+hLa5DK7k2rFZdGH7PHWYRnONyrs3pJ1Sb16NyLUtjYHe62VtF8OToPM58bL2Myiac37V1Uvk+vy0Obsy3KsXRS8qZxzO9ip1oQWmzXSi5ays7gK3oQQ/ibvTKE0dW16zDMMVTZNglKZop/tkx46vZOXxHqE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717677758; c=relaxed/simple;
-	bh=EddiI6kA/h66qRl4t0ZoGMrY0rHc5o+Wo+FG/xOyngw=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=MapZrQ6cSqC3Li5rsYivkXqtBO98wdJZgwp/zVlb5C7P2ZAwRmRRaaA7LMxtOLC5EYsd3ozT7lprzfOfbWrHLXYx0yd44jouCDbh9fFJwD5OS/EWHclEIoEQw68IjoDJQSQzzCUUdoXbH8DPcycIrqfDtj21oWrLANsgiQlSIbE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Jju/jzO6; arc=none smtp.client-ip=209.85.219.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1717678573; c=relaxed/simple;
+	bh=cEVrspVFLlAdphidp+ueWsk+T+6siYuuBszC9SCLjPA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=roYtEbAtGlSItyuV/G+sJgPIbqyUqLLXGc0h+HJdw+LSgFZWnI8yv7RzBP+I+XWvSIId78WNypSH03E0MUityzo098dmyMDXszz+ejb8xokUH8tBVgcJuXAoKV/Rn6iZywSmhonDOdPczDV28p9OCqRWhxvMeockiVVFgUZyOLE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=NkFjAdcN; arc=none smtp.client-ip=117.135.210.3
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Jju/jzO6"
-Received: by mail-qv1-f49.google.com with SMTP id 6a1803df08f44-6ae84d0cd2eso4749656d6.0
-        for <linux-bluetooth@vger.kernel.org>; Thu, 06 Jun 2024 05:42:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1717677755; x=1718282555; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=kDvAF3MbIa84lspxMOfjCc84tXLZQGCuxdcT2LVvFb4=;
-        b=Jju/jzO6STWYseBvc5kD5Xe8Y/Ay0gxcpArFZqJcU4GB3tZuiSMxwG03CNfYbuXy2f
-         c6SYd1uzCZNbtwHvISwD2Fh9tJlCp8qXyPrx1Y5xmzXQa/zguvuNj1m79P1Bj807hirw
-         Ly5hnk+HgaPdQeyREyV7T3J5VavpRz44Eb/IeVaFPKKkm2N7Wbm6JQ4RSW1qo+FL9i5q
-         EwY6EqVM65GOcXGCOf7JLpYhn/tZwqeLBErTAR1+AtlOpbmllt0Plx7fu19w06XJmFRB
-         9mqCJDgs4l85u3u2Ktl5lpnWcUd1X51KHYM4HQQiaO1jijv1Lt455qQuJOdxjY9LGFes
-         fBwQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717677755; x=1718282555;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=kDvAF3MbIa84lspxMOfjCc84tXLZQGCuxdcT2LVvFb4=;
-        b=E9OeNMdx1o27HvmxIOSIkg+RzSaLyPJD66Z61QvReOTMAM65dR21ApcreO6trbwUcR
-         3cHrUFYi9kq+sn4511eplDOTn/rGdpSYN9+gg2OGEbGljOtIrdZk5lhUeIPkQfhY2gSk
-         OmbV1P1SENGFGdSgsHKk4bNIesisAPnYFdVKy9SDgzkI+7PWeOitMoH3wrTiSgMTCFY6
-         1mtxtfUvic2z8T+97JXAF4sMkkr0Ehb9rF0xQCU7qVeTsi5tF2YedY3d44ly4MWwyoNc
-         CRqkc+BmFEOmJ/58v/WaSUrTEd+cAzw/J2eJx6DojwCBApDP+U90gRJHA6AtPuVSzKLV
-         a0/A==
-X-Gm-Message-State: AOJu0YzblU6D4ngE5TTk1qPOwQsv+cSTKX42+gxNDehkMfPqtnuzn1PW
-	bDdh20Uj4VH8Km1RqdvegEOS8uRi+/0YwO9S4VX1AStMFcB1FaR95tI3hQ==
-X-Google-Smtp-Source: AGHT+IG3Q+mwnwQto56vo6Iio2Wv5o2+0hGRNEUSJxivRqgiZSVJI9roRPm0gpzNyAzMsyZhw2lcJg==
-X-Received: by 2002:a05:6214:5543:b0:6a0:cd66:ffb0 with SMTP id 6a1803df08f44-6b02bf9155dmr68213886d6.38.1717677755197;
-        Thu, 06 Jun 2024 05:42:35 -0700 (PDT)
-Received: from [172.17.0.2] ([20.51.159.34])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6b04f6b74bcsm5829806d6.49.2024.06.06.05.42.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 06 Jun 2024 05:42:35 -0700 (PDT)
-Message-ID: <6661aebb.050a0220.29809f.1b98@mx.google.com>
-Date: Thu, 06 Jun 2024 05:42:35 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============7842160899253117983=="
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="NkFjAdcN"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=Message-ID:Date:MIME-Version:Subject:From:
+	Content-Type; bh=7vKOefyFBAgQHTWauKj2f/7nx/nSq5Db9+JQLNepCxI=;
+	b=NkFjAdcNw7otoFP2mDb40z6wy0AemNkZMbUqNiEAWPVCtw7rlEIHm6PcYvxV45
+	2YbCDdobn7pSYabxQC5utxRche3++3MgHfAdCsy0bYGpGb9YJc4EKnuCfJdghd27
+	0xybfgQNVlwEfYcgCR4y4XjcCwkj+UnG98B+0HpRUYdTE=
+Received: from [192.168.1.25] (unknown [183.195.6.89])
+	by gzga-smtp-mta-g2-4 (Coremail) with SMTP id _____wDXHyCPsWFm_XfQCA--.26956S2;
+	Thu, 06 Jun 2024 20:54:39 +0800 (CST)
+Message-ID: <fc035bd7-c9e3-458f-b419-f4ac50322d02@163.com>
+Date: Thu, 6 Jun 2024 20:54:39 +0800
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, chris.lu@mediatek.com
-Subject: RE: Bluetooth: btusb: MediaTek ISO data transmission
-In-Reply-To: <20240606114321.30515-2-chris.lu@mediatek.com>
-References: <20240606114321.30515-2-chris.lu@mediatek.com>
-Reply-To: linux-bluetooth@vger.kernel.org
-
---===============7842160899253117983==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2] Bluetooth: qca: Fix BT enable failure again for
+ QCA6390 after warm reboot
+To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
+ Zijun Hu <quic_zijuhu@quicinc.com>, luiz.dentz@gmail.com,
+ luiz.von.dentz@intel.com, marcel@holtmann.org
+Cc: linux-bluetooth@vger.kernel.org, wt@penguintechs.org,
+ regressions@lists.linux.dev, pmenzel@molgen.mpg.de, stable@vger.kernel.org
+References: <1715866294-1549-1-git-send-email-quic_zijuhu@quicinc.com>
+ <7927abbe-3395-4a53-9eed-7b4204d57df5@linaro.org>
+ <29333872-4ff2-4f4e-8166-4c847c7605c1@163.com>
+ <5df56d58-309a-4ff1-9a41-818a3f114bbb@linaro.org>
+ <0618805b-2f7a-473d-b9fb-aea39a1ef659@163.com>
+ <3d27add1-782c-4c19-9d84-d0074113c7a2@linaro.org>
+Content-Language: en-US
+From: Lk Sii <lk_sii@163.com>
+In-Reply-To: <3d27add1-782c-4c19-9d84-d0074113c7a2@linaro.org>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=859492
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      3.38 seconds
-GitLint                       PASS      4.54 seconds
-SubjectPrefix                 PASS      0.54 seconds
-BuildKernel                   PASS      30.86 seconds
-CheckAllWarning               PASS      33.77 seconds
-CheckSparse                   PASS      39.37 seconds
-CheckSmatch                   FAIL      36.34 seconds
-BuildKernel32                 PASS      30.15 seconds
-TestRunnerSetup               PASS      530.41 seconds
-TestRunner_l2cap-tester       PASS      20.18 seconds
-TestRunner_iso-tester         PASS      32.62 seconds
-TestRunner_bnep-tester        PASS      4.84 seconds
-TestRunner_mgmt-tester        PASS      112.07 seconds
-TestRunner_rfcomm-tester      PASS      7.47 seconds
-TestRunner_sco-tester         PASS      17.06 seconds
-TestRunner_ioctl-tester       PASS      7.86 seconds
-TestRunner_mesh-tester        FAIL      6.07 seconds
-TestRunner_smp-tester         PASS      6.94 seconds
-TestRunner_userchan-tester    PASS      5.02 seconds
-IncrementalBuild              PASS      45.59 seconds
-
-Details
-##############################
-Test: CheckSmatch - FAIL
-Desc: Run smatch tool with source
-Output:
-
-Segmentation fault (core dumped)
-make[4]: *** [scripts/Makefile.build:244: net/bluetooth/hci_core.o] Error 139
-make[4]: *** Deleting file 'net/bluetooth/hci_core.o'
-make[3]: *** [scripts/Makefile.build:485: net/bluetooth] Error 2
-make[2]: *** [scripts/Makefile.build:485: net] Error 2
-make[2]: *** Waiting for unfinished jobs....
-Segmentation fault (core dumped)
-make[4]: *** [scripts/Makefile.build:244: drivers/bluetooth/bcm203x.o] Error 139
-make[4]: *** Deleting file 'drivers/bluetooth/bcm203x.o'
-make[4]: *** Waiting for unfinished jobs....
-make[3]: *** [scripts/Makefile.build:485: drivers/bluetooth] Error 2
-make[2]: *** [scripts/Makefile.build:485: drivers] Error 2
-make[1]: *** [/github/workspace/src/src/Makefile:1919: .] Error 2
-make: *** [Makefile:240: __sub-make] Error 2
-##############################
-Test: TestRunner_mesh-tester - FAIL
-Desc: Run mesh-tester with test-runner
-Output:
-Total: 10, Passed: 9 (90.0%), Failed: 1, Not Run: 0
-
-Failed Test Cases
-Mesh - Send cancel - 2                               Failed       0.095 seconds
+X-CM-TRANSID:_____wDXHyCPsWFm_XfQCA--.26956S2
+X-Coremail-Antispam: 1Uf129KBjvJXoW3Jw1rXw4rZr13WF1rWF1fXrb_yoWxuw1kpF
+	WUGF1Dtr4UJr1Fyr1Iyr1xKFyYywnrtF18Wrn8GrWUJa90vF1rJr4Iqr45uF98urWxWF1j
+	va1DX3sF9ryDCaDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07UYiiDUUUUU=
+X-CM-SenderInfo: 5onb2xrl6rljoofrz/1tbishL1NWVODiNtPwAAs0
 
 
----
-Regards,
-Linux Bluetooth
 
+On 2024/6/5 15:14, Krzysztof Kozlowski wrote:
+> On 05/06/2024 03:49, Lk Sii wrote:
+>>
+>>
+>> On 2024/6/4 23:18, Krzysztof Kozlowski wrote:
+>>> On 04/06/2024 16:25, Lk Sii wrote:
+>>>>
+>>>>
+>>>> On 2024/5/22 00:02, Krzysztof Kozlowski wrote:
+>>>>> On 16/05/2024 15:31, Zijun Hu wrote:
+>>>>>> Commit 272970be3dab ("Bluetooth: hci_qca: Fix driver shutdown on closed
+>>>>>> serdev") will cause below regression issue:
+>>>>>>
+>>>>>> BT can't be enabled after below steps:
+>>>>>> cold boot -> enable BT -> disable BT -> warm reboot -> BT enable failure
+>>>>>> if property enable-gpios is not configured within DT|ACPI for QCA6390.
+>>>>>>
+>>>>>> The commit is to fix a use-after-free issue within qca_serdev_shutdown()
+>>>>>> by adding condition to avoid the serdev is flushed or wrote after closed
+>>>>>> but also introduces this regression issue regarding above steps since the
+>>>>>> VSC is not sent to reset controller during warm reboot.
+>>>>>>
+>>>>>> Fixed by sending the VSC to reset controller within qca_serdev_shutdown()
+>>>>>> once BT was ever enabled, and the use-after-free issue is also fixed by
+>>>>>> this change since the serdev is still opened before it is flushed or wrote.
+>>>>>>
+>>>>>> Verified by the reported machine Dell XPS 13 9310 laptop over below two
+>>>>>> kernel commits:
+>>>>>
+>>>>> I don't understand how does it solve my question. I asked you: on which
+>>>>> hardware did you, not the reporter, test?
+>>>>> It seems Zijun did NOT perform any tests obviously.
+>>>> All these tests were performed by reporter Wren with her machine
+>>>> "Dell XPS 13 9310 laptop".
+>>>
+>>> Wren != Zijun.
+>>>
+>>>>
+>>>> From previous discussion, it seems she have tested this change
+>>>> several times with positive results over different trees with her
+>>>> machine. i noticed she given you reply for your questions within
+>>>> below v1 discussion link as following:
+>>>>
+>>>> Here are v1 discussion link.
+>>>> https://lore.kernel.org/linux-bluetooth/d553edef-c1a4-4d52-a892-715549d31ebe@163.com/T/#m7371df555fd58ba215d0da63055134126a43c460
+>>>>
+>>>> Here are Krzysztof's questions.
+>>>> "I asked already *two times*:
+>>>> 1. On which kernel did you test it?
+>>>> 2. On which hardware did you test it?"
+>>>>
+>>>> Here are Wren's reply for Krzysztof's questions
+>>>> "I thought I had already chimed in with this information. I am using a
+>>>> Dell XPS 13 9310. It's the only hardware I have access to. I can say
+>>>> that the fix seems to work as advertised in that it fixes the warm boot
+>>>> issue I have been experiencing."
+>>>
+>>> I asked Zijun, not Wren. I believe all this is tested or done by
+>>> Qualcomm on some other kernel, so that's my question.
+>>>
+>> Zijun is the only guy from Qualcomm who ever joined our discussion,
+>> he ever said he belongs to Bluetooth team, so let us suppose the term
+>> "Qualcomm" you mentioned above is Zijun.
+>>
+>> from discussion history. in fact, ALL these tests were performed by
+>> reporter Wren instead of Zijun, and there are also NOT Zijun's Tested-by
+>> tag, so what you believe above is wrong in my opinion.
+> 
+> Patch author is supposed to test the code. Are you implying that
+> Qualcomm Bluetooth team cannot test the patch on any of Qualcomm
+> Bluetooth devices?
+> 
+i guess Zijun did not test the patch on himself based on below reasons:
+1) the patch has been tested by reporter with report's machine.
+2) perhaps, Zijun is confident about his patch based on his experience.
+3) perhaps, it is difficult for Zijun to find a suitable machine to
+perform tests, and test machines must have QCA6390 *embedded* and use
+Bluez solution.
 
---===============7842160899253117983==--
+>>
+>> Only Zijun and reporter were involved during those early debugging days,
+>> Zijun shared changes for reporter to verify with reporter's machine,
+>> then Zijun posted his fixes after debugging and verification were done.
+>>
+>>> That's important because Wren did not test particular scenarios, like
+>>> PREEMPT_RT or RB5 hardware, but Zijun is claiming problems are solved.
+>>> Maybe indeed solved, but if takes one month and still not answer which
+>>> kernel you are using, then I am sure: this was nowhere tested by Zijun
+>>> on the hardware and on the kernel the Qualcomm wants it to be.
+>>>
+>>>>
+>>>>>> commit e00fc2700a3f ("Bluetooth: btusb: Fix triggering coredump
+>>>>>> implementation for QCA") of bluetooth-next tree.
+>>>>>> commit b23d98d46d28 ("Bluetooth: btusb: Fix triggering coredump
+>>>>>> implementation for QCA") of linus mainline tree.
+>>>>>
+>>>>> ? Same commit with different hashes? No, it looks like you are working
+>>>>> on some downstream tree with cherry picks.
+>>>>>
+>>>> From Zijun's commit message, for the same commit, it seems
+>>>> bluetooth-next tree has different hashes as linus tree.
+>>>> not sure if this scenario is normal during some time window.
+>>>>> No, test it on mainline and answer finally, after *five* tries, which
+>>>>> kernel and which hardware did you use for testing this.
+>>>>>
+>>>>>
+>>>> it seems there are two issues mentioned with Zijun's commit message.
+>>>> regression issue A:  BT enable failure after warm reboot.
+>>>> issue B:  use-after-free issue, namely, kernel crash.
+>>>>
+>>>> @Krzysztof
+>>>> which issue to test based on your concerns with mainline tree?
+>>>
+>>> No one tested this on non-laptop platform. Wren did not, which is fine.
+>>> Qualcomm should, but since they avoid any talks about it for so long
+>>> (plus pushy comments during review, re-spinning v1 suggesting entire
+>>> discussion is gone), I do not trust their statements at all.
+>>>
+>>
+>> For issue A:
+>> reporter's tests are enough in my opinion.
+>> Zijun ever said that "he known the root cause and this fix logic was
+>> introduced from the very beginning when he saw reporter's issue
+>> description" by below link:
+>> https://lore.kernel.org/lkml/1d0878e0-d138-4de2-86b8-326ab9ebde3f@quicinc.com/
+>>
+>>> So really, did anything test it on any Qualcomm embedded platform?
+>>> Anyone tested the actual race visible with PREEMPT_RT?
+>>> For issue B, it was originally fixed and verified by you,
+>> it is obvious for the root cause and current fix solution after
+>> our discussion.
+>>
+>> luzi also ever tried to ask you if you have a chance to verify issue B
+>> with your machine for this change.
+> 
+> I tried, but my setup is incomplete since ~half a year and will remain
+> probably for another short time, depending on ongoing work on power
+> sequencing. Therefore I cannot test whether anything improves or
+> deteriorates regarding this patch.
+> 
+>>
+>>> Why Zijun cannot provide answer on which kernel was it tested? Why the
+>>> hardware cannot be mentioned?
+>>>
+>> i believe zijun never perform any tests for these two issues as
+>> explained above.
+> 
+> yeah, and that was worrying me.
+>
+Only RB5 has QCA6390 *embedded* among DTS of mainline kernel, but we
+can't have a RB5 to test.
+
+Don't worry about due to below points:
+1) Reporter have tested it with her machine
+2) issue B and relevant fix is obvious after discussion.
+
+> Best regards,
+> Krzysztof
+
