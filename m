@@ -1,154 +1,146 @@
-Received: from mail-ua1-f48.google.com (mail-ua1-f48.google.com [209.85.222.48])
+Received: from mail-qt1-f176.google.com (mail-qt1-f176.google.com [209.85.160.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 746E9188CC6
-	for <linux-bluetooth@vger.kernel.org>; Thu,  6 Jun 2024 16:29:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BF1019883C
+	for <linux-bluetooth@vger.kernel.org>; Thu,  6 Jun 2024 16:59:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717691362; cv=none; b=mzY5ldatB94+FDyeA1hS2c9fLVSF7Fe8RQEpNXvCHtX6k/pGPfmrcHOYjMVTLHr49kyBZDoJjWvtE4YfJiS56etQjgNddGJml3k+50Q5fADk4v3+CEYIXCJm5DLPHO5xaEUik3U+nmSmvojWFkisbKsZk8d9ej4SXd4XOCjT0m4=
+	t=1717693196; cv=none; b=J2lV83VBJQvo1rgawL1J+iOPIDmfWlhq4uXSCKPQ/wtH9vImfx4eR5/tVh5x6uIm0aHeRavhiHgSxV3GPPCQHoCJXKGZvHIuFsEEVFYloSbxJie6LZh/Apje1c4aKB9knkhB+VafhC3eUoT/Y6mJjtyv+w7qh2LnhqVIKBqmjyI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717691362; c=relaxed/simple;
-	bh=Vvg/zYMyhVbg5vNjLVI01diA6xgcRQNdjZkynk0cSgY=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type; b=PItMJo9WLnDCOqnreTKJUFt1wcoYL8cemdtqCWf8/VMAq5X5N+QBXsdiB0qBInxi1q2HSOdtMdQ5lJOzXnJa9a/dBnzr/n4gZQcZii+7Try5EghwKmMV+S3v2n0HEU+S3ofu7zWBHIDMVZJMXSp55kFdl3UTuH2RyHG2OxIYNko=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jgbxGOY9; arc=none smtp.client-ip=209.85.222.48
+	s=arc-20240116; t=1717693196; c=relaxed/simple;
+	bh=+/Cv0ZHBto3HRPqOOZId8Rd0G3Aq3YdjDIZeIEWniSY=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=td6Zv0BVOl5rsVy0eyUFJQrQwFVCcN7P8QCwPv2WK1ZRNVwzw6y0x99/aq+7LrsFEdMbxlwK7o4EaY/uVVF5MQcQM6DCZ8Hw5rCEzcy1K1S7zizRk9UBzPQQ0StawNDE0sDgINNoqrUda27GwOOOWylKL1vw3Dw/DjBKqxYuHFM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NV0yloEf; arc=none smtp.client-ip=209.85.160.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jgbxGOY9"
-Received: by mail-ua1-f48.google.com with SMTP id a1e0cc1a2514c-80acdff7515so381283241.3
-        for <linux-bluetooth@vger.kernel.org>; Thu, 06 Jun 2024 09:29:21 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NV0yloEf"
+Received: by mail-qt1-f176.google.com with SMTP id d75a77b69052e-4402f7cd5d7so5940101cf.3
+        for <linux-bluetooth@vger.kernel.org>; Thu, 06 Jun 2024 09:59:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1717691359; x=1718296159; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=ABs8vofmhCnDemqBsSxDpRCqC1ADwtC+xMe5gdHhVh4=;
-        b=jgbxGOY9eoMr4yU9FwPrWQ+U6A+gdx6qgnRtu+nKcFFwt8usO51s1VSPI/Ohj2Qale
-         MhlmInIZvXEtbhw3bvK5FA3kFoAQuxs37LVRQ9cxhpF4iJCwTpEr9VePd1uvlSrXHK3s
-         H6VXOj0p50BcAQIdP/9Hc4pDm3k7ya6AHJX/3487QMSU9tm8h191JExFWlxeJ3xdFoDg
-         ORKLidM281T/934BWAUbRdWld9pIZfd6M9c3NkkB6auQeaWcCJ61/0hl9BPUZ/Prd/rU
-         IG1CERrmOhJjBXaLy914gVPxtRINTc40ZeCExGAo3X2uItXstSio+XJFdu2U41gMc5eR
-         vPaw==
+        d=gmail.com; s=20230601; t=1717693194; x=1718297994; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=r4LfOtmSKRplqruOsauJIQiEjDMaXsFWz+ZS3gULaMo=;
+        b=NV0yloEflLYO7Szl6gM/Cwrk+xeMHI/PaLYHjM1EI2yWvebR1xlVrqVkOKZQe4MDMH
+         imvaFmr6fC0Ta6oFKFjHQ3Nk2mdA5+wJa2/Dpt7DW0ITMyx1ugKo3Z26oLdGODD/pG9L
+         40IsZ6b7l26O3LddsX1dmYs6k+J0vQogz682t4a9G2XR7UDYkA7kDkprS28fOGzjn0vF
+         4WMWP1gjqYQYVfp1xr6VZbB1GyFRyGa6WQIkzboBwz8nVzof9oRWNjrb1Ong1vZ1uecj
+         eYQ+D+rkSGRCgkqnCUq8WMwEbTP7EcNgCfHAAa8vRNcP17Bwijepa0eWT1bLECaV5wY4
+         JpvA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717691359; x=1718296159;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ABs8vofmhCnDemqBsSxDpRCqC1ADwtC+xMe5gdHhVh4=;
-        b=K1nizXgfzr/ClcfZ51kPs/Sm+dbeDmmCRhkIJD1F42FG5/AFSDvzsnhANBFBuJqjlh
-         ASvto8z0Rn+oFR2VHbs8YSIA2ABEajKN4kCICFajRnXRZH1B3PN5hhI3+4DvLfZBVKUf
-         ohjp29A3yv1P/LfZeahT9ld2rQK3AfBlA2V1jn701bLTwC/uV9N5523Numn3aCMLRbZO
-         qovYZ2bQPxDSz5ZrXAaJWTfxd3YkzU/zA9ZiGfcF2pWwlIx3VS70cu8Oo0vfA99N1gSt
-         vjG91N3tkeedzWCLQSg2V3zs6kKVmHMrGXpK2gVctbx1XqFgh0BfNnPNKkWU9bqcwJX2
-         QYwQ==
-X-Gm-Message-State: AOJu0YwQoqCHvF8t535QgeAVi9p4b9SZAq3mLkQSWVRcLLZpJMalAxjC
-	mFPvf+834puXh0aHnq4sx7eAdzPeGTVltuy6h/yksE/1kh+0KLCC/wL/qA==
-X-Google-Smtp-Source: AGHT+IGqIk0HK0S5EKFnaaqQFo3EJDhzwpgYDYwNCIGPvkd+nhpMa9+GyseZ3LmpanPHai8e5x6GAA==
-X-Received: by 2002:a05:6122:6029:b0:4eb:13ff:cd90 with SMTP id 71dfb90a1353d-4eb562bfe62mr98245e0c.13.1717691359190;
-        Thu, 06 Jun 2024 09:29:19 -0700 (PDT)
-Received: from lvondent-mobl4.. (syn-107-146-107-067.res.spectrum.com. [107.146.107.67])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-4eb4acaf242sm217294e0c.26.2024.06.06.09.29.18
-        for <linux-bluetooth@vger.kernel.org>
+        d=1e100.net; s=20230601; t=1717693194; x=1718297994;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=r4LfOtmSKRplqruOsauJIQiEjDMaXsFWz+ZS3gULaMo=;
+        b=qjViURp97YQNsUL/IO/0imwYFDEs8o0RQJMNLELSB5+4lTMa7LQhrXvWPUUnXuDmCd
+         9Sj6+REUVmT7hKLmcy6GgqXfhWcybFS9zxXy+0ET6tYRC0WqLouS3Sw4GZSqVHBJIiLM
+         tVnxGDBNZC/PEGJSjQQ3DPwh7HYh1ME3exuu+SyY0rlF8W5rjX2ZXmvfJAbv07bMlzpN
+         5oVS2vmu826wKcIb0i56MNyz65cRO/LSaJ0gRBVlIjU2wSyH6M2iDlwbc6FNnl9XRakM
+         gB+7N/tnsV5NwnEfJCONa4EP/gXbXTGG1iefyh1vgdZ/ZJ10DpO4DP4bEOhBpOuzrYKr
+         9vtA==
+X-Gm-Message-State: AOJu0YwJhEkzUqMaprvO/BWBqShnN/ZYWJ3pu1YJz/qTpG6RLScExbfC
+	V1bhgC3Th++qretc124ppP43PQcjhaIUUQCw4k1ywFWIn0pZ/cFw+LmlQw==
+X-Google-Smtp-Source: AGHT+IFIzI3ZSkS83vJ58u5sK45zmcwXtsz2C+sDriCYrE1DnS0b4jsMG1CjAB/gSmSWyOqh5vTxXQ==
+X-Received: by 2002:a05:622a:1448:b0:440:287b:348b with SMTP id d75a77b69052e-44041c4d007mr2462721cf.19.1717693193854;
+        Thu, 06 Jun 2024 09:59:53 -0700 (PDT)
+Received: from [172.17.0.2] ([172.183.130.198])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-44038a68e55sm5816561cf.24.2024.06.06.09.59.53
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 06 Jun 2024 09:29:18 -0700 (PDT)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v1] Bluetooth: hci_event: Fix setting of unicast qos interval
-Date: Thu,  6 Jun 2024 12:29:17 -0400
-Message-ID: <20240606162917.621031-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.45.1
+        Thu, 06 Jun 2024 09:59:53 -0700 (PDT)
+Message-ID: <6661eb09.050a0220.f1069.2735@mx.google.com>
+Date: Thu, 06 Jun 2024 09:59:53 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============4409274361072127306=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [v1] Bluetooth: hci_event: Fix setting of unicast qos interval
+In-Reply-To: <20240606162917.621031-1-luiz.dentz@gmail.com>
+References: <20240606162917.621031-1-luiz.dentz@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+--===============4409274361072127306==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-qos->ucast interval reffers to the SDU interval, and should not
-be set to the interval value reported by the LE CIS Established
-event since the latter reffers to the ISO interval. These two
-interval are not the same thing:
+This is automated email and please do not reply to this email!
 
-BLUETOOTH CORE SPECIFICATION Version 5.3 | Vol 6, Part G
+Dear submitter,
 
-Isochronous interval:
-The time between two consecutive BIS or CIS events (designated
-ISO_Interval in the Link Layer)
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=859628
 
-SDU interval:
-The nominal time between two consecutive SDUs that are sent or
-received by the upper layer.
+---Test result---
 
-So this instead uses the following formula from the spec to calculate
-the resulting SDU interface:
+Test Summary:
+CheckPatch                    PASS      0.65 seconds
+GitLint                       PASS      0.30 seconds
+SubjectPrefix                 PASS      0.12 seconds
+BuildKernel                   PASS      29.40 seconds
+CheckAllWarning               PASS      32.63 seconds
+CheckSparse                   WARNING   37.91 seconds
+CheckSmatch                   FAIL      34.94 seconds
+BuildKernel32                 PASS      29.17 seconds
+TestRunnerSetup               PASS      516.53 seconds
+TestRunner_l2cap-tester       PASS      20.15 seconds
+TestRunner_iso-tester         FAIL      30.46 seconds
+TestRunner_bnep-tester        PASS      4.74 seconds
+TestRunner_mgmt-tester        PASS      109.16 seconds
+TestRunner_rfcomm-tester      PASS      8.54 seconds
+TestRunner_sco-tester         PASS      14.85 seconds
+TestRunner_ioctl-tester       PASS      7.72 seconds
+TestRunner_mesh-tester        PASS      5.81 seconds
+TestRunner_smp-tester         PASS      6.70 seconds
+TestRunner_userchan-tester    PASS      4.90 seconds
+IncrementalBuild              PASS      27.70 seconds
 
-BLUETOOTH CORE SPECIFICATION Version 5.4 | Vol 6, Part G
-page 3075:
+Details
+##############################
+Test: CheckSparse - WARNING
+Desc: Run sparse tool with linux kernel
+Output:
+net/bluetooth/hci_event.c: note: in included file (through include/net/bluetooth/hci_core.h):
+##############################
+Test: CheckSmatch - FAIL
+Desc: Run smatch tool with source
+Output:
 
-Transport_Latency_C_To_P = CIG_Sync_Delay + (FT_C_To_P) ×
-ISO_Interval + SDU_Interval_C_To_P
-Transport_Latency_P_To_C = CIG_Sync_Delay + (FT_P_To_C) ×
-ISO_Interval + SDU_Interval_P_To_C
+Segmentation fault (core dumped)
+make[4]: *** [scripts/Makefile.build:244: net/bluetooth/hci_core.o] Error 139
+make[4]: *** Deleting file 'net/bluetooth/hci_core.o'
+make[3]: *** [scripts/Makefile.build:485: net/bluetooth] Error 2
+make[2]: *** [scripts/Makefile.build:485: net] Error 2
+make[2]: *** Waiting for unfinished jobs....
+Segmentation fault (core dumped)
+make[4]: *** [scripts/Makefile.build:244: drivers/bluetooth/bcm203x.o] Error 139
+make[4]: *** Deleting file 'drivers/bluetooth/bcm203x.o'
+make[4]: *** Waiting for unfinished jobs....
+make[3]: *** [scripts/Makefile.build:485: drivers/bluetooth] Error 2
+make[2]: *** [scripts/Makefile.build:485: drivers] Error 2
+make[1]: *** [/github/workspace/src/src/Makefile:1919: .] Error 2
+make: *** [Makefile:240: __sub-make] Error 2
+##############################
+Test: TestRunner_iso-tester - FAIL
+Desc: Run iso-tester with test-runner
+Output:
+Total: 122, Passed: 117 (95.9%), Failed: 1, Not Run: 4
 
-Link: https://github.com/bluez/bluez/issues/823
-Fixes: 2be22f1941d5 ("Bluetooth: hci_event: Fix parsing of CIS Established Event")
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Failed Test Cases
+ISO Connect Suspend - Success                        Failed       4.181 seconds
+
+
 ---
- net/bluetooth/hci_event.c | 22 +++++++++++++++++++---
- 1 file changed, 19 insertions(+), 3 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index da10738a052d..5d23bcf18716 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -6667,6 +6667,7 @@ static void hci_le_cis_estabilished_evt(struct hci_dev *hdev, void *data,
- 	struct bt_iso_qos *qos;
- 	bool pending = false;
- 	u16 handle = __le16_to_cpu(ev->handle);
-+	u32 c_sdu_interval, p_sdu_interval;
- 
- 	bt_dev_dbg(hdev, "status 0x%2.2x", ev->status);
- 
-@@ -6691,12 +6692,25 @@ static void hci_le_cis_estabilished_evt(struct hci_dev *hdev, void *data,
- 
- 	pending = test_and_clear_bit(HCI_CONN_CREATE_CIS, &conn->flags);
- 
--	/* Convert ISO Interval (1.25 ms slots) to SDU Interval (us) */
--	qos->ucast.in.interval = le16_to_cpu(ev->interval) * 1250;
--	qos->ucast.out.interval = qos->ucast.in.interval;
-+	/* BLUETOOTH CORE SPECIFICATION Version 5.4 | Vol 6, Part G
-+	 * page 3075:
-+	 * Transport_Latency_C_To_P = CIG_Sync_Delay + (FT_C_To_P) ×
-+	 * ISO_Interval + SDU_Interval_C_To_P
-+	 * ...
-+	 * SDU_Interval = (CIG_Sync_Delay + (FT) x ISO_Interval) -
-+	 *					Transport_Latency
-+	 */
-+	c_sdu_interval = (get_unaligned_le24(ev->cig_sync_delay) +
-+			 (ev->c_ft * le16_to_cpu(ev->interval) * 1250)) -
-+			get_unaligned_le24(ev->c_latency);
-+	p_sdu_interval = (get_unaligned_le24(ev->cig_sync_delay) +
-+			 (ev->p_ft * le16_to_cpu(ev->interval) * 1250)) -
-+			get_unaligned_le24(ev->p_latency);
- 
- 	switch (conn->role) {
- 	case HCI_ROLE_SLAVE:
-+		qos->ucast.in.interval = c_sdu_interval;
-+		qos->ucast.out.interval = p_sdu_interval;
- 		/* Convert Transport Latency (us) to Latency (msec) */
- 		qos->ucast.in.latency =
- 			DIV_ROUND_CLOSEST(get_unaligned_le24(ev->c_latency),
-@@ -6710,6 +6724,8 @@ static void hci_le_cis_estabilished_evt(struct hci_dev *hdev, void *data,
- 		qos->ucast.out.phy = ev->p_phy;
- 		break;
- 	case HCI_ROLE_MASTER:
-+		qos->ucast.in.interval = p_sdu_interval;
-+		qos->ucast.out.interval = c_sdu_interval;
- 		/* Convert Transport Latency (us) to Latency (msec) */
- 		qos->ucast.out.latency =
- 			DIV_ROUND_CLOSEST(get_unaligned_le24(ev->c_latency),
--- 
-2.45.1
 
+--===============4409274361072127306==--
