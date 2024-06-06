@@ -1,241 +1,155 @@
-Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [80.237.130.52])
+Received: from EUR02-VI1-obe.outbound.protection.outlook.com (mail-vi1eur02on2075.outbound.protection.outlook.com [40.107.241.75])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A788194A74;
-	Thu,  6 Jun 2024 10:18:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.237.130.52
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717669103; cv=none; b=KS2qyfCI1iI9Unc9otWbBMSelsr9U/fdnm93LIUOa/rKBmOXLRDHPPai1TXLPnECq2o4dLiX63Rl5NL2GdrRd1YuBwHuskh9bnBBBSNcOqP5WtxMQDlvpLWNYyc7qPQyjhFI0H7FFVFzT3vveU9T2w+XWPPSqWE2KW/DD5SsE7w=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717669103; c=relaxed/simple;
-	bh=4BkHntbcbNxwx6A8rzC9SXJVpauMc85WvuNkuBlvhgA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=dtkfQ/K1yIPjhpOMdgpzmmYRpFsTW62R9rjixjTqrU/srekdPA/L5/3be5pds7bzDM2rz2eNvv7/y1PzVi3enYHUokFuy+zvbKoWHAqvGHQX7wpFlQ5yupbmTzG8+wROr0NUlgtwNHpnjfp/xrl1at/xrqtr3WxyXtfo6ziKF8w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=leemhuis.info; spf=pass smtp.mailfrom=leemhuis.info; dkim=pass (2048-bit key) header.d=leemhuis.info header.i=@leemhuis.info header.b=udBssSLH; arc=none smtp.client-ip=80.237.130.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=leemhuis.info
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=leemhuis.info
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A3CF13C673
+	for <linux-bluetooth@vger.kernel.org>; Thu,  6 Jun 2024 10:25:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.241.75
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1717669558; cv=fail; b=XdNV82XlHFAUaZ9/aC1pZH6qN4ReAEfMJRn2gdgoK0pAkbubV5Qf8wg2yvjP7QP1/kKAvMpYy9VxZYJdP7pg80OAtRymKh6eToVGegnWNF/x2EPzhWDG0mbkmjQ/wMTpInTX2PKyyg9rJJt/4V+6Xeoud52IzkWD80AQ481sfAg=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1717669558; c=relaxed/simple;
+	bh=svlg67758Iu8Z7e/j4B2oehtaxhylL0yuVgu0tvkmA8=;
+	h=From:To:Cc:Subject:Date:Message-Id:Content-Type:MIME-Version; b=U6SMIQaeYThmorxxRHN5t9wsmhfAicpW7+aSFbvCZ8s0LJFMyzMkjIFpCTgcTaLXoEjiRSu0DjTO3UyMyxxmrROdtWP3iZqthSaYZ1lkX6SfJUDq6ouyAOFafegihpJzHDlgqmNVzqlHTtT60qtiosw8vL96wSeRZZX/nTdDAQ0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b=S/xXLw/7; arc=fail smtp.client-ip=40.107.241.75
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=leemhuis.info header.i=@leemhuis.info header.b="udBssSLH"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=leemhuis.info; s=he214686; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:From:
-	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:In-Reply-To:
-	References; bh=IP1N4QPeOhfnxSknl2JunkbY7wey9LDoXvM37stTPG8=; t=1717669101;
-	x=1718101101; b=udBssSLH7S3ESMt9qI6xFsbfH6UMzAm+nnYnCZ61GXOt3QbDeo1YWS1ub9o65
-	reHpH9ouncJ2bUCOyXcXQ0KrJo0YYGTXuWRCCiF19EoXtzob+3ZLFt60M8V6WDIdz8v7HgPo/ZuZW
-	BxC8rwXSi6+wxWb2sOpXioYdun+7vJzNflq9CDhBrr49T3YjhmEScMFCVGQwyQOYxtwVOtBTHqSu+
-	6KmEMkSOG4tSTChnB2Gim/jLwYvQQzJ933YKnk3WYhEOdb+pyxMa1MJ0seaPh8QJf7yAMcQPqHj55
-	RsAReki/vaZMKKsckuyjHlep7bf+yMh9xSIHCudLfG0p6kgRvA==;
-Received: from [2a02:8108:8980:2478:8cde:aa2c:f324:937e]; authenticated
-	by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
-	id 1sFACJ-0003pU-0J; Thu, 06 Jun 2024 12:18:19 +0200
-Message-ID: <c09d4f5b-0c4b-4f57-8955-28a963cc7e16@leemhuis.info>
-Date: Thu, 6 Jun 2024 12:18:18 +0200
+	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="S/xXLw/7"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=CJxohtxlCUO/5tjN2F230KPz9R5cGWrsnqBYGaVycbZhlagNO/I3HBHCIB9FT+SS+v8fUD6kHm1riB+GVwcQAH8XLOwZt7mbm5iOh+X+TAeHNq/cylw45o5e7UDtEESGx6qGXsq15PH2H3kVJWmuKuCQC/jrjGw8NAuWWoPtotCkpAVzycwHkSg6iQ6MftCxQB6j0iKACoJG1VjTszX0c1Vfwh4DmSdyOk3o6CRE9/JWwsbTjgLzwDf8Zn6s8sX5j2aOKMVk68EtavOR9oyk6c6oNzdMu8pkSnspIE9WLj2w2Igb6KMVmaIY9gcLd5h8xYN0DcUIKBB323wFG9mxfQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=c6CmHaslYFs0yKChIRL5nzaJUc+dwjqr+OfKLX28u+Y=;
+ b=WJRgw+N/iyrcMzOsgZ0PEzY64BNAdcD3jkhQ5bNzHX9Twyt6kbULJJUzf4DSAdsf8D5u5BBDfArIZyUQ3BSEteX334xgh5ul+82RR//K+x8U9A4RIzSK6CI3AAM9t/BLhp3mDe8e9E5WMTntLNJfmv7v1+cjkHx7irCjLfdpU9/5ZS4ki7191yqPa1TYWtUTtcGJn+wfwWkCY8oaitl+doYhbe3O+tmlzVd+2RO+DMgEfRTTxvdecHUMqBAy6nN0TlrlS7m/XLHsrvawYTEKfVEWoe1yV5DVhfvjP+BT31c+IASBbFc1m8GJTusJeVkFhUckHjPI8hRMD08odA6mTw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=c6CmHaslYFs0yKChIRL5nzaJUc+dwjqr+OfKLX28u+Y=;
+ b=S/xXLw/7H3Pe5+jBB50oUKSdJ1KMGnUpi/F+ZQrhUUdtB8wQCQFYe5VvXKTCrGiHxpwtaMliBjlE++gxjnthZxLRtEnRTaCm3GMNtTa8nrIKtLuI9mKnkzN076j7hLFg6xS+AwDKo37QZd5SsOQpcihcdO8RUxPRyyNGYJlX07M=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from AS8PR04MB8898.eurprd04.prod.outlook.com (2603:10a6:20b:42d::15)
+ by AM0PR04MB7027.eurprd04.prod.outlook.com (2603:10a6:208:191::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7633.33; Thu, 6 Jun
+ 2024 10:25:52 +0000
+Received: from AS8PR04MB8898.eurprd04.prod.outlook.com
+ ([fe80::5e22:869c:33c:9654]) by AS8PR04MB8898.eurprd04.prod.outlook.com
+ ([fe80::5e22:869c:33c:9654%5]) with mapi id 15.20.7633.021; Thu, 6 Jun 2024
+ 10:25:52 +0000
+From: Iulia Tanasescu <iulia.tanasescu@nxp.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: claudia.rosu@nxp.com,
+	mihai-octavian.urzica@nxp.com,
+	vlad.pruteanu@nxp.com,
+	andrei.istodorescu@nxp.com,
+	luiz.dentz@gmail.com,
+	Iulia Tanasescu <iulia.tanasescu@nxp.com>
+Subject: [PATCH BlueZ 0/2] test-bap: Add Broadcast Source STR MBIS tests
+Date: Thu,  6 Jun 2024 13:25:39 +0300
+Message-Id: <20240606102541.5395-1-iulia.tanasescu@nxp.com>
+X-Mailer: git-send-email 2.39.2
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: AM0PR06CA0139.eurprd06.prod.outlook.com
+ (2603:10a6:208:ab::44) To AS8PR04MB8898.eurprd04.prod.outlook.com
+ (2603:10a6:20b:42d::15)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: Bluetooth kernel BUG with Intel AX211 (regression in 6.1.83)
-To: "stable@vger.kernel.org" <stable@vger.kernel.org>,
- Greg KH <gregkh@linuxfoundation.org>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
- Johan Hedberg <johan.hedberg@gmail.com>,
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
- linux-bluetooth@vger.kernel.org, Paul Menzel <pmenzel@molgen.mpg.de>,
- Sasha Levin <sashal@kernel.org>, =?UTF-8?Q?Jeremy_Lain=C3=A9?=
- <jeremy.laine@m4x.org>,
- Linux regressions mailing list <regressions@lists.linux.dev>,
- Mike <user.service2016@gmail.com>
-References: <30f4b18f-4b96-403c-a0ab-d81809d9888a@gmail.com>
-From: Thorsten Leemhuis <regressions@leemhuis.info>
-Content-Language: en-US, de-DE
-In-Reply-To: <30f4b18f-4b96-403c-a0ab-d81809d9888a@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-bounce-key: webpack.hosteurope.de;regressions@leemhuis.info;1717669101;34ae2c28;
-X-HE-SMSGID: 1sFACJ-0003pU-0J
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AS8PR04MB8898:EE_|AM0PR04MB7027:EE_
+X-MS-Office365-Filtering-Correlation-Id: 90d00cfc-d436-4af5-bf55-08dc86130aff
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230031|366007|376005|1800799015;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?eXQRTgvgVaK7fKCI+pu3H/aFSraNSZpKBdbpeEp6u7FIBSPMnXoe5dLbo3HY?=
+ =?us-ascii?Q?fmRtztigQKz9CZLYNLjb2eDVm1QtSh/QOBD6GhY/ijqQZBBPZgpi4rfBF1lJ?=
+ =?us-ascii?Q?s0cskUrNVvIftEabcXloQvcDE9/r+0OL8piX59ewi2kLrTO76Ts8U4sXk6y7?=
+ =?us-ascii?Q?IW61GAb9iVlMAiW4vs3uLIecNprWmNHZfmKe4wxJwINRh5EvxHsTCQVQrdAx?=
+ =?us-ascii?Q?av5YfubfX7osJXx3UVLo3prSQmPxZMTdwOChbobTDqrslbjLQlkqRsd9pvmq?=
+ =?us-ascii?Q?WcaLT3HJNzPIykYg6jNDjAwDZE9di+Mx8lH1JMSVZbeYbFqzbN1la63VWzjt?=
+ =?us-ascii?Q?ghgycRLuv1f3CHJTDPLwje5mpbvxd6ijgd5L0QFNk+3uKSFw7T+YCzQ272HW?=
+ =?us-ascii?Q?kzT1b8aPnaKAjVeqRXf0X1OQNXYvuwIPKsJkHZZxph2XsS4dL32eeofLL/7z?=
+ =?us-ascii?Q?np5+m4wvcnxSTmUxnGNCnujgO3diJEF4foIE4w1FO5S5hSYdrqa8qPG+Jvq4?=
+ =?us-ascii?Q?q3x+vK/deMq29gnO6XMnKDmLcAnfhAo5MDiLbLywaLdQvaxMZY+8voEK3rGU?=
+ =?us-ascii?Q?Z4re/S+EjjEN7ZEgznCKbqLP9yg9bh8LtaD2GTjhrFukHUK08xHnD18hoXiF?=
+ =?us-ascii?Q?eFGoNZSzoUeugEMNcpqr5fr/2co931hOqwIv0B7I1tXUPlqswM3IZmtvo2QP?=
+ =?us-ascii?Q?r5e/xJjdAG9wWerXMyNt6VK9lIAr3KxWbQvLiIuwvVCXTMO4KyY0b0flzTJK?=
+ =?us-ascii?Q?ttHxRAwUbMVZtSMwnR1JROGgLHV6NEZeAqglUsXDRgJo+wAEacGOUR4VIrk/?=
+ =?us-ascii?Q?UHvHvcX4UdyHS8LJgwsKeELaeyZuyrYC39ObsWSIjLj6x5C2+Cnzioo0idH4?=
+ =?us-ascii?Q?20hHYKSI0X/wJtjko4G3P+0FzRNXqHhpD2B3OTdECq3j6jc7N5l4069DhAXP?=
+ =?us-ascii?Q?pu2gW6LQBXQ3kAA/oQKQDPLUMODwVhAAht7r63geJn9Yx7VR1ORwK8c9ZVMh?=
+ =?us-ascii?Q?WX4hBnKJSUS9Ga/TT17w5DAH2Q2gVDT4LKvfcnyR7Oz3DEYYcEECDUTCe7U3?=
+ =?us-ascii?Q?0AoM2AmvDT+2VlXEQ/vEjTgW/vmGarMofenH3Hqb7VP46YqKvFG9Uq6myJb/?=
+ =?us-ascii?Q?6+/BWenphwqSQk63KgXSq1azjv6DtcjvfhiZ7oVheSP7dMFUt8AULMdrww30?=
+ =?us-ascii?Q?NAYX67VsjQMkWkHcfPwUaVDMm/vSzvqeFJnqNOmOXHHNs37whVrRcrxP9Os2?=
+ =?us-ascii?Q?osHKsY8MsNX13Ka4OzpjSAl00IjZNpBm07ZZTfV9NKzMaj8Qee1y8Fa0znkN?=
+ =?us-ascii?Q?W5rknj0m24E4pp0AA567rYWb?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AS8PR04MB8898.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366007)(376005)(1800799015);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?PJJCTsAP1KSi4lecX/0PJRuP1uhZUMo0mOLHF6KLYaIqx8A/kdpXxuQIbzau?=
+ =?us-ascii?Q?flP7F9Qn23cxT3bJ0L6WVdkhQ3m6ItArlv2QeI5xwWffAf3jIDaxpMko3Kio?=
+ =?us-ascii?Q?Z5j6oNpxeX+KvI37IogoXYyr12XDA7BtL9YW0K/hAXuGI/69OMstznulMKk9?=
+ =?us-ascii?Q?Y9ihJ92Fo1KinmgHcttL0kI8kMR/XqN/njb/X/vInb60Sx/9xiCmDwl1USyc?=
+ =?us-ascii?Q?mGkshq/3zstZzxyeGYiO/vpur4Kn2td37Zo8jOMkUeCQn4AemccFjJRVCHcp?=
+ =?us-ascii?Q?8vBnYIGSyG+cCYf6TKsyexZ3MApOQHhggoNeOXzEg2j46mNLAKrX7+MlRCEn?=
+ =?us-ascii?Q?MgIqVQWZ8yGCZVo/l/p1K4MvyBk7H4pBnT/fH4nUk+I5fSl7wB7a9chWFysQ?=
+ =?us-ascii?Q?VYZQndNHLYpkr7vL5P2aLS1m9PQ2cSeZVnwP+Ppn+xm0UvgD02DJF+8qJBUT?=
+ =?us-ascii?Q?mb0zttrj8rqLTGazQORmFup7TJZzrpg+gVdrAhs9Jg5MIOkUt2zWr8K14X7w?=
+ =?us-ascii?Q?YQXegT3rOCtJZ9NXKl+YSKbTEDBx1A6PBLj341F8kS7jsb8/nJRacjXcUVgO?=
+ =?us-ascii?Q?NCrfnNWlE5zP1ywpQKbJLP9h9Qy2u/fh/xIjBfu3xo4iiaTEEZcauWimPQKe?=
+ =?us-ascii?Q?PmzSWJohshedaP5TgLCVwC2UMZcjF1ViMhKUsgHOIpXsOn/Oyl8a4wM7QdPv?=
+ =?us-ascii?Q?RugaleT66Pbf+QDLdrxKjbFqOb2Fpq9tSOLyeOy9NN2kfmtZ6cK7xXUy2RWC?=
+ =?us-ascii?Q?59IU8sS1EIb4q+9nIwVrst0jjfASYBQWEdyXl3idBVKwuAYgrIF0dISBEj2O?=
+ =?us-ascii?Q?12aRY07FtsjVvb1b4r14D3FhTOMx89sVup1657/Ud54ztxQTQ0ptWVTtbdf3?=
+ =?us-ascii?Q?IMzg7pCQ8SvfLJHTZ2wne6jKvR+JAKhBfDlhua0N7aG4b3Wze/YdsX6ldXDX?=
+ =?us-ascii?Q?bxSOQ8VMShDp3Y4hkltTxuWCU6n9tTSG7RxCxKObYNRi58py6Y0qDt0YC8V0?=
+ =?us-ascii?Q?IWIkh7JZ3wIiKDdGaTGk21gUDy1irHY9AHRlGnSNvMzvU4Kigilynval/IMQ?=
+ =?us-ascii?Q?TMVLuYVsbewlnigSErrSFQCFBuOkzXxRJ1vFuVIbtt87DdcBKeU04LzB3Vvb?=
+ =?us-ascii?Q?ctaE2vv8ygjPA6gJRWFHr7aFNzaBcuM28/3Ehd9nPKlTknqvXEcEI7kBdUAf?=
+ =?us-ascii?Q?eHc60EN06IVf5QTbqwvIb5HZ7cV8EYGDgYSPpMqX6t6JCVhlXrThzUItwH6d?=
+ =?us-ascii?Q?pscNtFxJ/jCNRcqxhB3nvPr5lZoYoZIKAA8jGGKMDZMfPVQf/30FD+sIwSf9?=
+ =?us-ascii?Q?JxsjaUA3CNvasIXB82vIPiEWtyF55nr7deJtRVFP2oCdx8h2ToJeLHDHzUOG?=
+ =?us-ascii?Q?is9JuZ7p/XFaWIALQRe7572Wj9Gjw+6Bgs5ahzYI9onzq0bGEW4n6uOZelhi?=
+ =?us-ascii?Q?N0Z84QRE3rxmNK/+fcnEhHg1rgbjB1756wMopd5+0sdSsbbaZ7fTac7DIL1D?=
+ =?us-ascii?Q?Bx27QYAlZxX9ugHK4QfTP9I5IFXlM2METPr8T8W/1MpayLcKyEKxYCAgSfig?=
+ =?us-ascii?Q?kUFeCBFgEZoVYjVjzXZtm+RGmD1r1KwZIB4c7AX2G3VGysRlQE9vXT/MgMVH?=
+ =?us-ascii?Q?fA=3D=3D?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 90d00cfc-d436-4af5-bf55-08dc86130aff
+X-MS-Exchange-CrossTenant-AuthSource: AS8PR04MB8898.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Jun 2024 10:25:52.7867
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 9S7Dd6d4JJZQ5/TbfBsf+IVHPl9t7zJpccaQFyfjEYtOXHBTWOxE6sOvWw0vMHPQlFiWDLTvnH1gqPgQIvaKNw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM0PR04MB7027
 
-On 03.06.24 22:03, Mike wrote:
-> On 29.05.24 11:06, Thorsten Leemhuis wrote:
->> Might be a good idea to share it, the developers might want to confirm
->> it's really the same bug.
-> I'm attaching the stacktrace [1] and decodecode [2] at the end, generated
-> on 6.1.92 vanilla+patch (1.).
-> [...]
-> I understand that 6.9-rc5[1] worked fine, but I guess it will take some
-> time to be
-> included in Debian stable, so having a patch for 6.1.x will be much
-> appreciated.
-> I do not have the time to follow the vanilla (latest) release as is
-> likely the case for
-> many other Linux users.
-> 
-> Let me know if there's anything else useful I can do for you.
-> Thank you,
+This patch adds BAP unit tests for Broadcast Source streaming with
+multiple BISes (4.14.3 Broadcast Audio Stream with Multiple BISes -
+Source - page 184).
 
-Still no reaction from the bluetooth developers. Guess they are busy
-and/or do not care about 6.1.y. In that case:
+Iulia Tanasescu (2):
+  test-bap: Add support to config multiple bsrc streams
+  test-bap: Add Broadcast Source STR MBIS tests
 
-@Greg: do you might have an idea how the 6.1.y commit a13f316e90fdb1
-("Bluetooth: hci_conn: Consolidate code for aborting connections") might
-cause this or if it's missing some per-requisite? If not I wonder if
-reverting that patch from 6.1.y might be the best move to resolve this
-regression. Mike earlier in
-https://lore.kernel.org/all/c947e600-e126-43ea-9530-0389206bef5e@gmail.com/
-confirmed that this fixed the problem in tests. Jeremy (who started the
-thread and afaics has the same problem) did not reply.
+ unit/test-bap.c | 406 ++++++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 391 insertions(+), 15 deletions(-)
 
-Ciao, Thorsten
 
-> [1]
-> 2024-06-03T21:04:49.730983+02:00 mike kernel: [   24.110172] kernel BUG
-> at lib/list_debug.c:56!
-> 2024-06-03T21:04:49.730984+02:00 mike kernel: [   24.110181] invalid
-> opcode: 0000 [#1] PREEMPT SMP NOPTI
-> 2024-06-03T21:04:49.730985+02:00 mike kernel: [   24.110184] CPU: 2 PID:
-> 868 Comm: kworker/u65:2 Not tainted 6.1.92 #2
-> 2024-06-03T21:04:49.730985+02:00 mike kernel: [   24.110187] Hardware
-> name: Micro-Star International Co., Ltd. MS-7B93/MPG X570 GAMING PRO
-> CARBON WIFI (MS-7B93), BIOS 1.M0 04/02/2024
-> 2024-06-03T21:04:49.730986+02:00 mike kernel: [   24.110191] Workqueue:
-> hci0 hci_cmd_sync_work [bluetooth]
-> 2024-06-03T21:04:49.730986+02:00 mike kernel: [   24.110234] RIP:
-> 0010:__list_del_entry_valid.cold+0x4b/0x6f
-> 2024-06-03T21:04:49.730987+02:00 mike kernel: [   24.110240] Code: fe ff
-> 0f 0b 48 89 f2 48 89 fe 48 c7 c7 c0 2d fa a6 e8 07 a1 fe ff 0f 0b 48 89
-> fe 48 89 ca 48 c7 c7 88 2d fa a6 e8 f3 a0 fe ff <0f> 0b 48 89 fe 48 c7
-> c7 50 2d fa a6 e8 e2 a0 fe ff 0f 0b 48 89 fe
-> 2024-06-03T21:04:49.730987+02:00 mike kernel: [   24.110243] RSP:
-> 0018:ffffb5fe04863de0 EFLAGS: 00010246
-> 2024-06-03T21:04:49.730988+02:00 mike kernel: [   24.110247] RAX:
-> 000000000000004e RBX: ffff9bff53430800 RCX: 0000000000000027
-> 2024-06-03T21:04:49.730988+02:00 mike kernel: [   24.110249] RDX:
-> 0000000000000000 RSI: 0000000000000001 RDI: ffff9c064eaa03a0
-> 2024-06-03T21:04:49.730988+02:00 mike kernel: [   24.110252] RBP:
-> ffff9bff4d2ce000 R08: 0000000000000000 R09: ffffb5fe04863c78
-> 2024-06-03T21:04:49.730989+02:00 mike kernel: [   24.110254] R10:
-> 0000000000000003 R11: ffff9c066f2fc3e8 R12: ffff9bff4d2ce000
-> 2024-06-03T21:04:49.730997+02:00 mike kernel: [   24.110256] R13:
-> ffff9bff4d2ce770 R14: ffff9bff62e919c0 R15: dead000000000100
-> 2024-06-03T21:04:49.730997+02:00 mike kernel: [   24.110259] FS:
-> 0000000000000000(0000) GS:ffff9c064ea80000(0000) knlGS:0000000000000000
-> 2024-06-03T21:04:49.730997+02:00 mike kernel: [   24.110262] CS: 0010
-> DS: 0000 ES: 0000 CR0: 0000000080050033
-> 2024-06-03T21:04:49.730998+02:00 mike kernel: [   24.110265] CR2:
-> 000055ff08f14638 CR3: 0000000169804000 CR4: 0000000000350ee0
-> 2024-06-03T21:04:49.730998+02:00 mike kernel: [   24.110268] Call Trace:
-> 2024-06-03T21:04:49.730999+02:00 mike kernel: [   24.110270] <TASK>
-> 2024-06-03T21:04:49.730999+02:00 mike kernel: [   24.110273]  ?
-> __die_body.cold+0x1a/0x1f
-> 2024-06-03T21:04:49.730999+02:00 mike kernel: [   24.110278]  ?
-> die+0x2a/0x50
-> 2024-06-03T21:04:49.731000+02:00 mike kernel: [   24.110283]  ?
-> do_trap+0xc5/0x110
-> 2024-06-03T21:04:49.731000+02:00 mike kernel: [   24.110287]  ?
-> __list_del_entry_valid.cold+0x4b/0x6f
-> 2024-06-03T21:04:49.731000+02:00 mike kernel: [   24.110293]  ?
-> do_error_trap+0x6a/0x90
-> 2024-06-03T21:04:49.731001+02:00 mike kernel: [   24.110296]  ?
-> __list_del_entry_valid.cold+0x4b/0x6f
-> 2024-06-03T21:04:49.731002+02:00 mike kernel: [   24.110301]  ?
-> exc_invalid_op+0x4c/0x60
-> 2024-06-03T21:04:49.731002+02:00 mike kernel: [   24.110305]  ?
-> __list_del_entry_valid.cold+0x4b/0x6f
-> 2024-06-03T21:04:49.731002+02:00 mike kernel: [   24.110309]  ?
-> asm_exc_invalid_op+0x16/0x20
-> 2024-06-03T21:04:49.731003+02:00 mike kernel: [   24.110316]  ?
-> __list_del_entry_valid.cold+0x4b/0x6f
-> 2024-06-03T21:04:49.731003+02:00 mike kernel: [   24.110321]
-> hci_conn_del+0x136/0x3e0 [bluetooth]
-> 2024-06-03T21:04:49.731003+02:00 mike kernel: [   24.110357]
-> hci_abort_conn_sync+0xaa/0x230 [bluetooth]
-> 2024-06-03T21:04:49.731004+02:00 mike kernel: [   24.110395]  ?
-> srso_return_thunk+0x5/0x10
-> 2024-06-03T21:04:49.731004+02:00 mike kernel: [   24.110399]  ?
-> abort_conn_sync+0x3d/0x70 [bluetooth]
-> 2024-06-03T21:04:49.731004+02:00 mike kernel: [   24.110435]
-> hci_cmd_sync_work+0xa2/0x150 [bluetooth]
-> 2024-06-03T21:04:49.731005+02:00 mike kernel: [   24.110471]
-> process_one_work+0x1c7/0x380
-> 2024-06-03T21:04:49.731005+02:00 mike kernel: [   24.110477]
-> worker_thread+0x4d/0x380
-> 2024-06-03T21:04:49.731005+02:00 mike kernel: [   24.110482]  ?
-> rescuer_thread+0x3a0/0x3a0
-> 2024-06-03T21:04:49.731006+02:00 mike kernel: [   24.110486]
-> kthread+0xda/0x100
-> 2024-06-03T21:04:49.731006+02:00 mike kernel: [   24.110490]  ?
-> kthread_complete_and_exit+0x20/0x20
-> 2024-06-03T21:04:49.731006+02:00 mike kernel: [   24.110494]
-> ret_from_fork+0x22/0x30
-> 2024-06-03T21:04:49.731007+02:00 mike kernel: [   24.110503] </TASK>
-> 2024-06-03T21:04:49.731007+02:00 mike kernel: [   24.110505] Modules
-> linked in: rfcomm snd_seq_dummy snd_hrtimer snd_seq snd_seq_device
-> xt_CHECKSUM tun uhid bridge stp llc qrtr cpufreq_powersave
-> cpufreq_userspace cpufreq_conservative cpufreq_ondemand cmac algif_hash
-> algif_skcipher af_alg bnep uinput nft_chain_nat xt_MASQUERADE nf_nat
-> xt_LOG nf_log_syslog xt_mac ipt_REJECT nf_reject_ipv4 xt_conntrack
-> nf_conntrack nf_defrag_ipv6 nf_defrag_ipv4 xt_tcpudp xt_pkttype
-> nft_compat sunrpc binfmt_misc nf_tables nfnetlink pktcdvd nls_ascii
-> nls_cp437 vfat fat snd_hda_codec_realtek snd_hda_codec_generic
-> ledtrig_audio snd_hda_codec_hdmi intel_rapl_msr intel_rapl_common
-> edac_mce_amd btusb snd_hda_intel btrtl snd_intel_dspcfg btbcm
-> snd_intel_sdw_acpi btintel kvm_amd iwlmvm btmtk snd_hda_codec ccp
-> bluetooth mac80211 snd_hda_core libarc4 snd_hwdep jitterentropy_rng
-> snd_pcm kvm snd_timer irqbypass iwlwifi drbg snd sp5100_tco rapl
-> wmi_bmof soundcore ansi_cprng k10temp watchdog cfg80211 ecdh_generic ecc
-> rfkill joydev evdev button acpi_cpufreq sg msr
-> 2024-06-03T21:04:49.731007+02:00 mike kernel: [   24.110606] dm_crypt
-> loop fuse efi_pstore configfs ip_tables x_tables autofs4 ext4 crc16
-> mbcache jbd2 btrfs blake2b_generic xor raid6_pq zstd_compress libcrc32c
-> crc32c_generic efivarfs linear dm_mirror dm_region_hash dm_log
-> hid_logitech_hidpp hid_logitech_dj hid_generic dm_mod raid1 usbhid hid
-> md_mod amdgpu drm_ttm_helper ttm video crc32_pclmul gpu_sched uas
-> crc32c_intel usb_storage sr_mod drm_buddy sd_mod ghash_clmulni_intel
-> cdrom sha512_ssse3 drm_display_helper sha512_generic drm_kms_helper
-> sha256_ssse3 nvme ahci sha1_ssse3 xhci_pci nvme_core libahci drm
-> xhci_hcd t10_pi aesni_intel libata crypto_simd cec cryptd
-> crc64_rocksoft_generic usbcore igb rc_core i2c_piix4 crc64_rocksoft
-> scsi_mod crc_t10dif crct10dif_generic usb_common dca crct10dif_pclmul
-> scsi_common i2c_algo_bit crc64 crct10dif_common wmi
-> 2024-06-03T21:04:49.731008+02:00 mike kernel: [   24.110695] ---[ end
-> trace 0000000000000000 ]---
-> 
-> [2]
-> 2024-06-03T21:04:49.731009+02:00 mike kernel: [ 24.243204] Code: fe ff
-> 0f 0b 48 89 f2 48 89 fe 48 c7 c7 c0 2d fa a6 e8 07 a1 fe ff 0f 0b 48 89
-> fe 48 89 ca 48 c7 c7 88 2d fa a6 e8 f3 a0 fe ff <0f> 0b 48 89 fe 48 c7
-> c7 50 2d fa a6 e8 e2 a0 fe ff 0f 0b 48 89 fe
-> All code
-> ========
->    0:   fe                      (bad)
->    1:   ff 0f                   decl   (%rdi)
->    3:   0b 48 89                or     -0x77(%rax),%ecx
->    6:   f2 48 89 fe             repnz mov %rdi,%rsi
->    a:   48 c7 c7 c0 2d fa a6    mov    $0xffffffffa6fa2dc0,%rdi
->   11:   e8 07 a1 fe ff          call   0xfffffffffffea11d
->   16:   0f 0b                   ud2
->   18:   48 89 fe                mov    %rdi,%rsi
->   1b:   48 89 ca                mov    %rcx,%rdx
->   1e:   48 c7 c7 88 2d fa a6    mov    $0xffffffffa6fa2d88,%rdi
->   25:   e8 f3 a0 fe ff          call   0xfffffffffffea11d
->   2a:*  0f 0b                   ud2             <-- trapping instruction
->   2c:   48 89 fe                mov    %rdi,%rsi
->   2f:   48 c7 c7 50 2d fa a6    mov    $0xffffffffa6fa2d50,%rdi
->   36:   e8 e2 a0 fe ff          call   0xfffffffffffea11d
->   3b:   0f 0b                   ud2
->   3d:   48 89 fe                mov    %rdi,%rsi
-> 
-> Code starting with the faulting instruction
-> ===========================================
->    0:   0f 0b                   ud2
->    2:   48 89 fe                mov    %rdi,%rsi
->    5:   48 c7 c7 50 2d fa a6    mov    $0xffffffffa6fa2d50,%rdi
->    c:   e8 e2 a0 fe ff          call   0xfffffffffffea0f3
->   11:   0f 0b                   ud2
->   13:   48 89 fe                mov    %rdi,%rsi
-> 
-> 
+base-commit: 7c619d864afd01df6a98baeffe7030a3d144b22a
+-- 
+2.39.2
+
