@@ -1,137 +1,114 @@
-Received: from mail-lj1-f169.google.com (mail-lj1-f169.google.com [209.85.208.169])
+Received: from mail-lj1-f182.google.com (mail-lj1-f182.google.com [209.85.208.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB8E81FAA;
-	Thu,  6 Jun 2024 20:04:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBFBE6D1A9;
+	Thu,  6 Jun 2024 20:10:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717704267; cv=none; b=MR35sbfMpPBXZPWQPDOf93vG+me3lrzejHXUS8SRRdB1Z2s3BmXdiX0eZ1CMAWWiT5X0PBzKs1u0gK6l5Hu7QM6UR6A8663Z4H7iuiVp7zJ7FcTPkz44lNdXsi5DXov4g9Ll8NmX1qypBtl8vjRu+iT3L6PBN8NJsuA3Zx56qY8=
+	t=1717704635; cv=none; b=aatqwfwPrU8Ga/bhGiG0lNG25lh2bqPObM23F3FPtt/jK76HvyxS+9VJLwNUHwPFwe4x0kI91znsD6CS2gNAuqfeGGO684l3MgrfJwwF+LSdCfIAU7cRSVqfN+T2+yLu4SnVvqZIFIl50vVuus+3YBQgAnsdAXJuckGQidkTlgk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717704267; c=relaxed/simple;
-	bh=/G3jstf66m0MVDwW/vbsLQCy0RU2r+Dp06fH2y3b4T0=;
+	s=arc-20240116; t=1717704635; c=relaxed/simple;
+	bh=f+0mO3lyWhRWDhdZwJ+G9tdZPcEOT4dALbeWYuTQdWA=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=kD+NLOj4KxAhZWvJC9eu8WJnPFf9Jlx1wZKS132g2pt4h8dEDom6ObVR0VPnYWylETsx9iI8+0zw4AIE2V0y6QePWUjFLcmpvRJOcWjk7qFDHLQqUMyYHRjKHW6TmaKeZ9Yrw5A2sEKi8jKcQGMl2wXVK1Rg2BMsuUkshU+ruEE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cuihxeWH; arc=none smtp.client-ip=209.85.208.169
+	 To:Cc:Content-Type; b=NobLgBLdsyWms0LCy6a43WVaQR2CDCHxnJQaITlIx9/aSd7+ZgIBwwhK+SHygxzSKYfNMTaTgnz0NxLcreh06ZSKXA26fdMuJJj/aC+O/bw5kkHeLkra/uwrCZtRd9i9Dopm4vANY0uaHo/GomBr278j7HXBjZEegsJQZW157WI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BjPEoNy4; arc=none smtp.client-ip=209.85.208.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cuihxeWH"
-Received: by mail-lj1-f169.google.com with SMTP id 38308e7fff4ca-2eaccc097e2so15704211fa.0;
-        Thu, 06 Jun 2024 13:04:25 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BjPEoNy4"
+Received: by mail-lj1-f182.google.com with SMTP id 38308e7fff4ca-2eaa80cb573so16231111fa.1;
+        Thu, 06 Jun 2024 13:10:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1717704264; x=1718309064; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1717704631; x=1718309431; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=s8zBiOnzctc1Ld3pBSWs+XeG/g5v5NHQpM9V6CGdabk=;
-        b=cuihxeWHToMumF8P9ZjfmKSNcKHkOAF1xBmpjxy8t2BBszmy3FrrTdwBDMwUHUcAZX
-         0Tg4r5nv7Kr9QxLYvCp2eljgZKJSM7WPTTkTSQC9Wbo53LN260IHsU/ZvRTgS82uiK+O
-         JDC4Ig6WS+aK/tNGalNWwlJARx5LiGYwacmQuJuVIPdQm9dLIDFHxorqB6hvhRjEFijh
-         0RsewhY6C1+eMYSIz2EBbo/i+5rGaqoEm2FCXP1ntzGfGJvNyQecnrc/MnjVAF2dd6c6
-         u+RXx768Bsxk3YcArSFOAkH/3IQIyzTUDYn3VbfjVnz4AZmcbVrx2UFvJtpnxzVbOmvt
-         az9w==
+        bh=Hutjf4WwE6IKhYhoDpmSZWk+TUgz4ul3jgLdpMGfmk8=;
+        b=BjPEoNy4cBa8kVaLImqSclFKfQrxUvdxLPAtwk8zCwpEV+OLg59Ra07GSPwnZRLNgE
+         u+8RYXl98neYllmkFByMFe8tE0OrmHaAGEMIhJIcUJAmPT4XFH+svtUhLOjYiymK7uHN
+         5fxM5IYvBWk9Nt9RM47Q88AQoyrPJ8PPqBQSgjMDb8w/cyFJkXL0Gqb21B5DsiR2C3U7
+         QpQX80g9Y0DAa7PDrr2kKySwTtIvUMgedzauf1rbyrnPtBELhCN/+DgoRNTTGaiFdFWr
+         kS3gqvYzwkfAPxp4nxlz0gevEzuS7L64ELZ/0jEDK1rJ5ZtJ/5yYEYdRUdqyJJ7NJNci
+         b8AQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717704264; x=1718309064;
+        d=1e100.net; s=20230601; t=1717704631; x=1718309431;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=s8zBiOnzctc1Ld3pBSWs+XeG/g5v5NHQpM9V6CGdabk=;
-        b=iM+U4GvijWmbizNND9vHkgiqvsbc9OYGpvvL+8T7R9xX0C0HfsiPtzu3mpxBmEn4jn
-         MrQki0bV0rw66oXd3YcxcJJUcvjJiPTPlnZVKTl0FMbtJrk4C4KH/IUuijNixD+q+z+g
-         ztACxPkHCt9tDCFq+SghwLRYPjnO8PrAcD4t3Uyp7ge/9bjA+PVv6CCgqioStWRJmcnu
-         jDt2yKDCC1Z1qx1o6Kdnr+Dd27KDxle9skiM8ws8NpdwrV7+0msWYrS37rTw8J+LABng
-         MZpWTl4L8G4ICZp4oMV9M3JJRNSAzNTMoRG5A8Egw/j3DWTY+FEnZl3nb+jUQQ0n7h8x
-         9SxQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVg5tKZwmpNgCle6QcpzKxlem6IqFvLUJ21cSt2wVF8/gO4daxplUGRuJxjTKw1ZSaNtm8DKEQRR8UknzP/MQCNGc3Q/NMo2oO3XYSWupwM+iV3OUeo30qdpvZVs/rrOgY418+cXibGRifG6gIb
-X-Gm-Message-State: AOJu0YysxWus66onUzflyfR5tlDkKTFSpW8xWT97WKa7dZ4Dk/kM34VC
-	YrPy696CCWDOVuGbla399ATjawc037WDIhTvm4XhSWqlSkkYZ6yax+2BTFJ6tPXjtPYFX0av9e7
-	glcYcUDMtDQ5+VdgPkOGKOhTmbnz7kA==
-X-Google-Smtp-Source: AGHT+IEPatTRNz4t3IlZrrARONOfqpJodkwoY1B33k2VOZpGRppSY/lcC+zUbX86vGLB2+n8TDuKrhpCnoWPGZbt2pc=
-X-Received: by 2002:a2e:9c53:0:b0:2ea:d13b:cc38 with SMTP id
- 38308e7fff4ca-2eadce16e40mr4413171fa.3.1717704263707; Thu, 06 Jun 2024
- 13:04:23 -0700 (PDT)
+        bh=Hutjf4WwE6IKhYhoDpmSZWk+TUgz4ul3jgLdpMGfmk8=;
+        b=Fxy0oP7ASe+wMv9wmaRCjY10jYuI/yz1jYy5D29E2wo/FD4r57H0ssfsvTwlquuf2k
+         2q3KzEpar1E6DkGxEGe4C53rhCcPyEbKvgTS2BHpI91nAAF+tNyhax6SrzUoEpmZK66F
+         UE6SQJs7OLIWNyMYTHwZfkKI1dsWSHoHBWeYMicdJZ7hKrg8UMAxOlh62JOmvtRq9CXn
+         QmwmKCbiDBVjLjaAHjmtd2gB/mm0rtYmeFS/X00/ez+nG8Xi4iet4nkpuS8ytOiZVVfZ
+         k9W/fTiSz8JfLQ6dlxYAfx/CUTrgWXBDGclkcoPn+QTZwjyxMUOon2ySqWU/UEdS6krB
+         YuQg==
+X-Forwarded-Encrypted: i=1; AJvYcCUp512Rey1aog1YdB1C90m1/g4f+DK8FnbI1FmCJHic2DBC1TErb28uOUixQ6ukZOmc0I68//zAK6xoiYctJ7X9jea58n7wtwOH+eMaj++OXugu/n5ZiNZrMzLwf7nPGxAPuUfjqKPNFWY+gRHR
+X-Gm-Message-State: AOJu0YwpVmngoN6lWZDGEyqHian9ncJoxxtiGWKJTJv+7N1LAGnDoNiV
+	jWaRTT6j9gwonVgogHNDIuAebdMsaXnHTHhsCmCCQnSN3eyEKkmkT1KpzqgE9NVy1NdhI8q4MYa
+	UlOYawJRWHFMi5tkIo1mxlDQCjBB/7g==
+X-Google-Smtp-Source: AGHT+IHAsDb5+nsNxizNL0s50nQsiWVLkPf55QznG57cKaBnbaVfMJ/g6/XbUdNeCRsat4LY6v+75fSHMUV0aMYRwfU=
+X-Received: by 2002:a2e:b016:0:b0:2e1:7acb:6c40 with SMTP id
+ 38308e7fff4ca-2eadce3f9a6mr4248981fa.29.1717704630713; Thu, 06 Jun 2024
+ 13:10:30 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240606183032.684481-1-andreas@kemnade.info>
-In-Reply-To: <20240606183032.684481-1-andreas@kemnade.info>
+References: <20240606114321.30515-1-chris.lu@mediatek.com> <20240606114321.30515-2-chris.lu@mediatek.com>
+In-Reply-To: <20240606114321.30515-2-chris.lu@mediatek.com>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Thu, 6 Jun 2024 16:04:10 -0400
-Message-ID: <CABBYNZ+Fz2TLSNa28H3kjVKOSA7C-XOzdQJiHdJs3FKxnq01DA@mail.gmail.com>
-Subject: Re: [PATCH v4 0/4] Bluetooth/gnss: GNSS support for TiWi chips
-To: Andreas Kemnade <andreas@kemnade.info>
-Cc: marcel@holtmann.org, johan@kernel.org, pmenzel@molgen.mpg.de, 
-	jirislaby@kernel.org, gregkh@linuxfoundation.org, 
-	linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org, 
-	Adam Ford <aford173@gmail.com>, Tony Lindgren <tony@atomide.com>, tomi.valkeinen@ideasonboard.com, 
-	=?UTF-8?Q?P=C3=A9ter_Ujfalusi?= <peter.ujfalusi@gmail.com>, robh@kernel.org, 
-	hns@goldelico.com
+Date: Thu, 6 Jun 2024 16:10:17 -0400
+Message-ID: <CABBYNZJdY8Oo5rwoJx7rAFPaTRhYRe7p0CEN52hv+7tBEoYCxg@mail.gmail.com>
+Subject: Re: [PATCH v4 1/4] Bluetooth: net: add hci_iso_hdr function for iso data
+To: Chris Lu <chris.lu@mediatek.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg <johan.hedberg@gmail.com>, 
+	Sean Wang <sean.wang@mediatek.com>, Deren Wu <deren.Wu@mediatek.com>, 
+	Aaron Hou <aaron.hou@mediatek.com>, Steve Lee <steve.lee@mediatek.com>, 
+	linux-bluetooth <linux-bluetooth@vger.kernel.org>, 
+	linux-kernel <linux-kernel@vger.kernel.org>, 
+	linux-mediatek <linux-mediatek@lists.infradead.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi Andreas,
+Hi Chris,
 
-On Thu, Jun 6, 2024 at 2:30=E2=80=AFPM Andreas Kemnade <andreas@kemnade.inf=
-o> wrote:
+On Thu, Jun 6, 2024 at 7:43=E2=80=AFAM Chris Lu <chris.lu@mediatek.com> wro=
+te:
 >
-> Some of these chips have GNSS support. In some vendor kernels
-> a driver on top of misc/ti-st can be found providing a /dev/tigps
-> device which speaks the secretive Air Independent Interface (AI2) protoco=
-l.
+> Add function hci_iso_hdr to get skb->data when packet type is ISO.
 >
-> To be more compatible with userspace send out NMEA by default but
-> allow a more raw mode by using a module parameter.
+> Signed-off-by: Chris Lu <chris.lu@mediatek.com>
+> Signed-off-by: Sean Wang <sean.wang@mediatek.com>
+> ---
+>  include/net/bluetooth/hci.h | 5 +++++
+>  1 file changed, 5 insertions(+)
 >
-> This was tested on the Epson Moverio BT-200.
+> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+> index e372a88e8c3f..b9f8f91f6c7f 100644
+> --- a/include/net/bluetooth/hci.h
+> +++ b/include/net/bluetooth/hci.h
+> @@ -2898,6 +2898,11 @@ static inline struct hci_sco_hdr *hci_sco_hdr(cons=
+t struct sk_buff *skb)
+>         return (struct hci_sco_hdr *) skb->data;
+>  }
 >
-> Who will take this series (1-3)? GNSS with ack from Bluetooth?
->
-> Changes since V3:
-> - Finally remove the period from 1/4 subject
-> - include things directly for get_unaligned_le16() to fix 0-day issues
->
-> Changes since V2:
-> - Optimize waits
-> - Fix some packet analysis / checksum computation issue
-> - Adding a proposal for removing those waits as RFC
-> - Minor spell corrections and improved descriptions
->
-> Changes since V1:
-> - Set up things for NMEA output
-> - Powerup/down at open()/close()
-> - split out logic between drivers/bluetooth and drivers/gnss
-> - leave out drivers/misc/ti-st driver removal to avoid
->   filling up mailboxes during the iterations, this series is
->   still a proof that it is not needed, will take the brush after
->   this series is accepted.
->
->
-> Andreas Kemnade (4):
->   gnss: Add AI2 protocol used by some TI combo chips
->   Bluetooth: ti-st: Add GNSS subdevice for TI Wilink chips
+> +static inline struct hci_iso_hdr *hci_iso_hdr(const struct sk_buff *skb)
+> +{
+> +       return (struct hci_iso_hdr *) skb->data;
+> +}
 
-The bluetooth one looks relatively simple so I could take that one and
-push to bluetooth-next if there are no dependencies on the other
-changes.
+We might as well check the skb->len before attempting to cast
+skb->data or better yet use skb_pull_data but I guess that is not
+possible since you don't want to consume the skb?
 
->   gnss: Add driver for AI2 protocol
->   gnss: ai2: replace long sleeps by wait for acks
->
->  drivers/bluetooth/hci_ll.c   |  81 +++++
->  drivers/gnss/Kconfig         |  13 +
->  drivers/gnss/Makefile        |   3 +
->  drivers/gnss/ai2.c           | 560 +++++++++++++++++++++++++++++++++++
->  drivers/gnss/core.c          |   1 +
->  include/linux/gnss.h         |   1 +
->  include/linux/ti_wilink_st.h |   8 +
->  7 files changed, 667 insertions(+)
->  create mode 100644 drivers/gnss/ai2.c
->
+>  /* Command opcode pack/unpack */
+>  #define hci_opcode_pack(ogf, ocf)      ((__u16) ((ocf & 0x03ff)|(ogf << =
+10)))
+>  #define hci_opcode_ogf(op)             (op >> 10)
 > --
-> 2.39.2
+> 2.18.0
 >
 
 
