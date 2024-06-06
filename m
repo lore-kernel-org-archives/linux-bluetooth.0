@@ -1,113 +1,122 @@
-Received: from mail-lj1-f173.google.com (mail-lj1-f173.google.com [209.85.208.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC7341DFD1;
-	Thu,  6 Jun 2024 21:23:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A41D71B5B;
+	Thu,  6 Jun 2024 23:53:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717709007; cv=none; b=hIKUk6Qa8PcOrwG0iYu1c1Cu6g2mzVIcdAmkyp0P2S8+P1G+Ur+dXP7VaI+/qPqPNqPmCqLjUgwUKk5WGmj7czUnJLBs7K0rhAEVreXvl6xsn0+IAS6QU0ygDUANItvoEKFNAy0JQ/i4qD/Whr9Uh4UHVPFvxp2eWNLsZG6wPKg=
+	t=1717718007; cv=none; b=JTSVSWnl70kxrcq8v81YpKgCdhdeVDvTqoFqDPQWW9vSM9AxNV8FP1zC8TDT+bka6ORBbHs6JBAwkRqbk8VoKVmXypGZQbhXaX9rMCQWtI332HoA5b1u6vSgjqeNSRaJYDhCNNjG+zKpjNAS0JTqKaDFe5+dlkP1fMh2vO67L9M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717709007; c=relaxed/simple;
-	bh=18ErmTQ+WGncl+Pa0OIgOMyrs4urCsczi4HxtdcrsRU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=flK/rvvjm7iWotP/Yhhlb2ALXpH7WrukyNb63g38L92h44h9VagqX6B92qk0KVATXkLQ6np5PoXiDwdG+UpgKgsDGAliOezUXK9h+rRQWgBNHTp9zN8D2jZSzbsQhln+FIVCg8+r0/LSYx/GK9MyRIz99onSap+LsIBY0LLOLdM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Nzp9e4aW; arc=none smtp.client-ip=209.85.208.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1717718007; c=relaxed/simple;
+	bh=E/psiguQLxhslxk3Ia2n2N/Obzi4NeEoU2JEow9x5zs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=duBEGQQE8tn0aUd0BfQw4OfpFrlsIjxJItsWLFOD7Iifm6VKbp/4qTkWo58+s45wjDr/m9L0dTtdktwkk+zTjYr0mhbhQ/EdE0RiGo87+TR8dz2LlLguV11tyoroqzcG9lUGDzUbVtKyQ0AwSJ6mqqezdAG4sXrZGWjBsxE46GY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=VdUsvxNc; arc=none smtp.client-ip=198.175.65.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Nzp9e4aW"
-Received: by mail-lj1-f173.google.com with SMTP id 38308e7fff4ca-2eab19e7034so23284141fa.0;
-        Thu, 06 Jun 2024 14:23:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1717709004; x=1718313804; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=18ErmTQ+WGncl+Pa0OIgOMyrs4urCsczi4HxtdcrsRU=;
-        b=Nzp9e4aWVJ6OGPC7/Rv90fZ1IeTfB20ysO9DWi4FA4Rv+jVFf4qdxRYtCsNFamPti7
-         rywlm/Id2AbvczOCTNFh1u9Q3aXjpxB3cqrZAuZI/93gRWrUg5iKgpvZEN7BRY8CCZFI
-         Gc++LBrEoAvtgmdS8RVw9DFlhJAA9fi8lI7x8rwMXNWVIbHufxGM0j6eugaiYD9xT3wK
-         oR+tnYnfQJrWEBpbzcxy7riq6XrZTkf4j9vHyFvF+/+ed7Tq4acDf7He5d1TxJ86vhjX
-         SYw5PQCbcYg6QohDZq/UOcDtToRk/mBPwe2kaHxjlnXhnE47n21LlLgJx3wNfe9aLflp
-         5f+w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717709004; x=1718313804;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=18ErmTQ+WGncl+Pa0OIgOMyrs4urCsczi4HxtdcrsRU=;
-        b=lRI3BfZVZcS4pgB9Jh8X4rnWCkKL0uTGseezNVLHDujaunBpejKNqPx2LYHwVIHAQv
-         dqMbz4HHJIjssDZaggN9JegtFHYO+y6n/DZP3coIpJ82cyIQaTP/T1vOG6AXZPVPV+fx
-         /F8PowvjWmvH+MEzaUjzBxlxsSjcO++MMs3TF2c2/jnJNegvZempzAUY5+NFbcksWJiY
-         cxXTLc3N/Pu60nnAj6B/4OV6N099lMKs9/AQgupg7LT6pCKf/59+dvIpO8jbOyhAqIcv
-         QVxtQ6zXOgqsQHtO9USMhb5WwnSpR9UxTqAuFXJlpplowM/6CLUHsEjNCbrnZiGmtp0Y
-         jZoQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWZVG/KuhUNaoMprI5UnlLsaz+rt0/xtO8N3qRTjsScK1ICp6o9s7PXXeZP94KbIfeXO/TdiY/x89w6oCVwCq74wNvmN5evkeZIZjnLKFc7
-X-Gm-Message-State: AOJu0YwU32pFAE5jd5vqZmYCCYEBUsIuHrUopDQtiFwmoxM/ZqlACvQ+
-	fYDZJiRZOToD9dSbQJR26Gk4QZPoeMez6yGumh4NIJV9L/B6kJfL/Bj6DSPIFaYQVYfzoAokRws
-	aDXL3LAU8ccpSgshfOR6GaENGN6A=
-X-Google-Smtp-Source: AGHT+IG2uNcusRrlYiy5pSN/MoSZfc+1gv2u2voDfSUD2LA4yyPyxkGk9q2e9tLZT7lM4NLeRsHMKiBiDHCj2x0EHXw=
-X-Received: by 2002:a2e:9e4a:0:b0:2e3:331e:e33d with SMTP id
- 38308e7fff4ca-2ead00b8920mr10688881fa.11.1717709003796; Thu, 06 Jun 2024
- 14:23:23 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="VdUsvxNc"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1717718006; x=1749254006;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=E/psiguQLxhslxk3Ia2n2N/Obzi4NeEoU2JEow9x5zs=;
+  b=VdUsvxNc5mZQB+HrpNGPIbvVIXwkUXWNSzfErSeLSAqpJbfAfD/JWsW+
+   lSAJyuK+5FlSrgc3iEpIStd7Qx5Zh6qLTVqunXi6QKjgxhE3RsJUtoU6m
+   wd4ySzwpTy/28c1nv/f41zhV7tlQuU6TkE+KtLzH/4CbAlLPzIu9F6JNU
+   ikoR0/k5BaY8DPqINtB7TskN8JCe6IZuWlWhL5AfVVK1nUt29i9YdZzXd
+   tSonMZW0+DguskG5GuQ8YdP5JQz3TrDkg9VFTdVnFnKUSgayV3xQDRrwI
+   jiY8R16jtT9/5ofKvLfQ3/o+bhbBQrHhIZCiskkAOsdMd/wihDLFQtRxi
+   w==;
+X-CSE-ConnectionGUID: wMuYTFsBSTGS6BHNUv63jw==
+X-CSE-MsgGUID: Osxiw/cWTHiMTstJmnf+7w==
+X-IronPort-AV: E=McAfee;i="6600,9927,11095"; a="14256665"
+X-IronPort-AV: E=Sophos;i="6.08,219,1712646000"; 
+   d="scan'208";a="14256665"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jun 2024 16:53:26 -0700
+X-CSE-ConnectionGUID: qzxj3XGARuOCaxb2qIW7vg==
+X-CSE-MsgGUID: ZUVJ06S5QWeSRKnoNgHKqg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.08,219,1712646000"; 
+   d="scan'208";a="69310958"
+Received: from unknown (HELO 0610945e7d16) ([10.239.97.151])
+  by fmviesa001.fm.intel.com with ESMTP; 06 Jun 2024 16:53:23 -0700
+Received: from kbuild by 0610945e7d16 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1sFMv2-0003se-2y;
+	Thu, 06 Jun 2024 23:53:20 +0000
+Date: Fri, 7 Jun 2024 07:52:33 +0800
+From: kernel test robot <lkp@intel.com>
+To: Chris Lu <chris.lu@mediatek.com>, Marcel Holtmann <marcel@holtmann.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	Luiz Von Dentz <luiz.dentz@gmail.com>
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	Sean Wang <sean.wang@mediatek.com>,
+	Deren Wu <deren.Wu@mediatek.com>,
+	Aaron Hou <aaron.hou@mediatek.com>,
+	Steve Lee <steve.lee@mediatek.com>,
+	linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+	linux-kernel <linux-kernel@vger.kernel.org>,
+	linux-mediatek <linux-mediatek@lists.infradead.org>,
+	Chris Lu <chris.lu@mediatek.com>
+Subject: Re: [PATCH v4 4/4] Bluetooth: btusb: mediatek: add ISO data
+ transmission functions
+Message-ID: <202406070759.EDNrdv4q-lkp@intel.com>
+References: <20240606114321.30515-5-chris.lu@mediatek.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAGew7BttU+g40uRnSCN5XmbXs1KX1ZBbz+xyXC_nw5p4dR2dGA@mail.gmail.com>
-In-Reply-To: <CAGew7BttU+g40uRnSCN5XmbXs1KX1ZBbz+xyXC_nw5p4dR2dGA@mail.gmail.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Thu, 6 Jun 2024 17:23:11 -0400
-Message-ID: <CABBYNZLE9uYiRM-baoBt=RQktq__TguMETgmVWGzfeorARfm4w@mail.gmail.com>
-Subject: Re: Bluetooth Kernel Bug: After connecting either HFP/HSP or A2DP is
- not available (Regression in 6.9.3, 6.8.12)
-To: =?UTF-8?Q?Timo_Schr=C3=B6der?= <der.timosch@gmail.com>
-Cc: stable@vger.kernel.org, regressions@lists.linux.dev, 
-	linux-bluetooth@vger.kernel.org, luiz.von.dentz@intel.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240606114321.30515-5-chris.lu@mediatek.com>
 
-Hi Timo,
+Hi Chris,
 
-On Thu, Jun 6, 2024 at 4:46=E2=80=AFPM Timo Schr=C3=B6der <der.timosch@gmai=
-l.com> wrote:
->
-> Hallo,
-> on my two notebooks, one with Ubuntu (Mainline Kernel 6.9.3, bluez
-> 5.7.2) and the other one with Manjaro (6.9.3, bluez 5.7.6) I'm having
-> problems with my Sony WH-1000XM3 and Shure BT1. Either A2DP or HFP/HSP
-> is not available after the connection has been established after a
-> reboot or a reconnection. It's reproducible that with the WH-1000XM3
-> the A2DP profiles are missing and with the Shure BT1 HFP/HSP profiles
-> are missing. It also takes longer than usual to connect and I have a
-> log message in the journal:
->
-> Jun 06 16:28:10 liebig bluetoothd[854]:
-> profiles/audio/avdtp.c:cancel_request() Discover: Connection timed out
-> (110)
->
-> When I disable and re-enable bluetooth (while the Headsets are still
-> on) and trigger a reconnect from the notebooks, A2DP and HFP/HSP
-> Profiles are available again.
->
-> I also tested it with 6.8.12 and it's the same problem. 6.8.11 and
-> 6.9.2 don't have the problem.
-> So I did a bisection. After reverting commit
-> af1d425b6dc67cd67809f835dd7afb6be4d43e03 "Bluetooth: HCI: Remove
-> HCI_AMP support" for 6.9.3 it's working again without problems.
->
-> Let me know if you need anything from me.
+kernel test robot noticed the following build errors:
 
-Wait what, that patch has nothing to do with any of these profiles not
-really sure how that would cause a regression really, are you sure you
-don't have actual connection timeout happening at the link layer and
-that by some chance didn't happen when running with HCI_AMP reverted?
+[auto build test ERROR on bluetooth-next/master]
+[also build test ERROR on next-20240606]
+[cannot apply to bluetooth/master linus/master v6.10-rc2]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-I'd be surprised that HCI_AMP has any effect in most controllers
-anyway, only virtual controllers was using that afaik.
+url:    https://github.com/intel-lab-lkp/linux/commits/Chris-Lu/Bluetooth-net-add-hci_iso_hdr-function-for-iso-data/20240606-194619
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
+patch link:    https://lore.kernel.org/r/20240606114321.30515-5-chris.lu%40mediatek.com
+patch subject: [PATCH v4 4/4] Bluetooth: btusb: mediatek: add ISO data transmission functions
+config: x86_64-buildonly-randconfig-003-20240607 (https://download.01.org/0day-ci/archive/20240607/202406070759.EDNrdv4q-lkp@intel.com/config)
+compiler: clang version 18.1.5 (https://github.com/llvm/llvm-project 617a15a9eac96088ae5e9134248d8236e34b91b1)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240607/202406070759.EDNrdv4q-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202406070759.EDNrdv4q-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+   In file included from drivers/bluetooth/btusb.c:28:
+>> drivers/bluetooth/btmtk.h:259:9: error: incompatible pointer to integer conversion returning 'void *' from a function with result type 'int' [-Wint-conversion]
+     259 |         return ERR_PTR(-EOPNOTSUPP);
+         |                ^~~~~~~~~~~~~~~~~~~~
+   1 error generated.
 
 
---=20
-Luiz Augusto von Dentz
+vim +259 drivers/bluetooth/btmtk.h
+
+   256	
+   257	static int btmtk_isopkt_pad(struct hci_dev *hdev, struct sk_buff *skb)
+   258	{
+ > 259		return ERR_PTR(-EOPNOTSUPP);
+   260	}
+   261	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
