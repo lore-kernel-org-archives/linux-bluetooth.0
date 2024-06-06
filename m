@@ -1,104 +1,123 @@
-Received: from mail-qk1-f173.google.com (mail-qk1-f173.google.com [209.85.222.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail2.andi.de1.cc (vmd64148.contaboserver.net [161.97.139.27])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3174198E74
-	for <linux-bluetooth@vger.kernel.org>; Thu,  6 Jun 2024 18:06:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5682C3B1BC;
+	Thu,  6 Jun 2024 18:30:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=161.97.139.27
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717697213; cv=none; b=BNNk1D5PTBQeH10m32MUeWsNT/Lp6+jdxNZaYZrs3r5oXMQ/jOK95KL1B+ircgnwuHk9wg4dZsnf8ztQ5umqTaAi4pKWKSM2aOI2uWR4/mH5qmc+16gm1z73eeDp4l+IFTXW/nuu4qTr+ni76rLOwcxnJD5Kz3ra3L7BpUY2XEs=
+	t=1717698647; cv=none; b=fE6kZFMXpQj7TN2119QLcoqnieBXFT9+h4eqWPy8wFe+/WMmYY2XrDezSkEautd3oVo5GWNx7THo0ly2D85wikWRK3sJyYq5R3BBguKkk7oXnuRUjAahfyuKGfuY2WOwNyoTbgNBFch8FP5csBLBqs7j2mCv7qvw9UexTcwYVcs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717697213; c=relaxed/simple;
-	bh=4PE6UFSfNfqEtKKp9w9Lz9hU55M94QxtFryp0CAadII=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=TTAPHgITpIsKwDQfVCQER0fwkPRCnuWmLkkvAmb4TNJFf1SXirU9ygt9ZBqzFyAD4VW+6vU6N3DLRv51IxG/ukyXrEa2pVFn2fWO+qa/8Rb0Y7zoYPhhZnGAQVRpNS6btd6FCzBzw2BbRTVVt/LPExz9Dn9/umXw0r/ba0LkcqM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=haEOAvvo; arc=none smtp.client-ip=209.85.222.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1717698647; c=relaxed/simple;
+	bh=eiFOztAyht4OQS06fzz0niDBbZpbcltfMxTe5TVsVLU=;
+	h=From:To:Subject:Date:Message-Id:MIME-Version; b=Il/i04EnDoXim77I8ZRWvFIkqFuXCfpSUpiaXmL4kM/djtItLWwOMBpGzjV9XWhQu0fcVsZ2P3beqhV2wa70/UzTSXPwlOGvIhil0OUbGPVmmI1iflZT1WN6A/WpNc8sFU2026+sk/OazHpD6rKfmWFDHZDxGeL8iBbdcRTZHKE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kemnade.info; spf=pass smtp.mailfrom=kemnade.info; dkim=pass (2048-bit key) header.d=kemnade.info header.i=@kemnade.info header.b=BGHcMQ3O; arc=none smtp.client-ip=161.97.139.27
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kemnade.info
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kemnade.info
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="haEOAvvo"
-Received: by mail-qk1-f173.google.com with SMTP id af79cd13be357-7951cf70432so86264885a.3
-        for <linux-bluetooth@vger.kernel.org>; Thu, 06 Jun 2024 11:06:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1717697210; x=1718302010; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=T6+aK8R5mA1yq8kq6wkYtC1xrjzu9s6Gygu/PwFKB4A=;
-        b=haEOAvvooKLegmUktmgkKfG+Op1Asru/7IlqTrWN6g0pC1ftDp+818sb7xVLiBcmWj
-         7H1Al1dngh4k8XgHmZMJU8c4pPHkk63NW/AxHLWmuzHUvifBn226ROweDPtLabJ/uA0I
-         KGwZsv/BD/2T/Y6RWdy2CCowrRNHGkuUi6l6mLA/PW0a4AZISRqSPn5eHr/ILMmv2AH9
-         ATQTVKyFAlXiuUuURthGIhniJHf/LIpvw3NiyeWU+pT7nSnui30+LynCB6mNwou3i147
-         2m2mnCjiNHA0W8xlL7daWgBY1GekzfDuEpBdlVpi8HAIBj6hc+7+gUMvT5rTSFjOaJW+
-         +aSQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717697210; x=1718302010;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=T6+aK8R5mA1yq8kq6wkYtC1xrjzu9s6Gygu/PwFKB4A=;
-        b=B9LM3276vliAdAX4y3vkVdGeumGxJ3T5lvhx/f48bjFdNAr/mAHSW0qv8ZB5JhbQkg
-         4sldXddKeLPdaO/4Hz5WGsDh1pNv0PK18+PUBCFhjpPGFA1RpzmySky9a2MNrrjgsBnj
-         HepFblF3HHdPGLcWLEX5O4tl0ofMZXYNCfSRetNF8ehOZfCdiq4c2/rB+0KIb+YXgxmO
-         zAScBx/5Cf9Eiazd1Nf6sCz1idx/zNs4Y3EvffMY1FckiZx7lxBwl9ZE7LW/NmVT93Zl
-         +grVZ5vOhv7KJ/yLWCFKEw8wIVtu2rGEBoF/KVUZcMjx72lxlyOmO80rf7JsJeprMIBn
-         c5Sw==
-X-Gm-Message-State: AOJu0Yw5one8MlHGlz0pvVWYjMY0FV7WoKqS8v0f8JavZ4JSBprnyobU
-	2P4m3JKx7Pih0y75vUL0B09jeIxxxJHXqiGnoiC6O0OGXnncnFTVaTuSLw==
-X-Google-Smtp-Source: AGHT+IFhCUX3nvmjaOUwIK3JJc4pxa8+lEfHFzRhuwk9YNdEnpjHTDLjoeaulaVBGdOz6D78IoSwbQ==
-X-Received: by 2002:a05:620a:4090:b0:795:1c6a:686 with SMTP id af79cd13be357-7953c5e15f7mr12316785a.11.1717697210364;
-        Thu, 06 Jun 2024 11:06:50 -0700 (PDT)
-Received: from [172.17.0.2] ([20.42.106.69])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-795332e7558sm81816485a.130.2024.06.06.11.06.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 06 Jun 2024 11:06:50 -0700 (PDT)
-Message-ID: <6661faba.050a0220.1e2df6.36d2@mx.google.com>
-Date: Thu, 06 Jun 2024 11:06:50 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============2047590016712980319=="
+	dkim=pass (2048-bit key) header.d=kemnade.info header.i=@kemnade.info header.b="BGHcMQ3O"
+Received: from mail.andi.de1.cc ([2a02:c205:3004:2154::1])
+	by mail2.andi.de1.cc with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <andreas@kemnade.info>)
+	id 1sFHso-0090wq-34;
+	Thu, 06 Jun 2024 20:30:44 +0200
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=kemnade.info; s=20220719; h=Content-Transfer-Encoding:MIME-Version:
+	Message-Id:Date:Subject:To:From:Sender:Reply-To:Cc:Content-Type:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:
+	List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=ychHDkTsgy+jS6D/8C9orKrwj+iW1wCK5Xyhu/ynjbg=; b=BGHcMQ3O39NECSs5U0lIjPkcxi
+	8qfTfTt9TBD1iCEicDKWq6d/DdFXk7aX8I+24YODZgqniX28vFPilJU4KNODgGS5Lc8BvMM3X9DXj
+	KX1V66fyJFSwCw09bgcpNpSAE1cU0MaSoBuiLqQADQtjrrHj0S5hIjzZ+1GlXMVmMp52mH72pBS6p
+	EhFwz+L2okX1H9huaOv5LKCOEOnmlZUWDVoOv6CjsawqumfThyq6c03tcoLD+NIJwgS2D/Rk+is0w
+	TzH4h7Gw1U7c6vNaS5n6mxts5F6sKB5iAwAC5uk7iEJMMDeCm6MZi4xSbVv364vGTkXIFV4/nCkTs
+	8DpMruFw==;
+Received: from p200300c20737c2001a3da2fffebfd33a.dip0.t-ipconnect.de ([2003:c2:737:c200:1a3d:a2ff:febf:d33a] helo=aktux)
+	by mail.andi.de1.cc with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <andreas@kemnade.info>)
+	id 1sFHsj-002nvS-1W;
+	Thu, 06 Jun 2024 20:30:39 +0200
+Received: from andi by aktux with local (Exim 4.96)
+	(envelope-from <andreas@kemnade.info>)
+	id 1sFHsk-002s4M-01;
+	Thu, 06 Jun 2024 20:30:38 +0200
+From: Andreas Kemnade <andreas@kemnade.info>
+To: marcel@holtmann.org,
+	luiz.dentz@gmail.com,
+	johan@kernel.org,
+	pmenzel@molgen.mpg.de,
+	jirislaby@kernel.org,
+	andreas@kemnade.info,
+	gregkh@linuxfoundation.org,
+	linux-kernel@vger.kernel.org,
+	linux-bluetooth@vger.kernel.org,
+	Adam Ford <aford173@gmail.com>,
+	Tony Lindgren <tony@atomide.com>,
+	tomi.valkeinen@ideasonboard.com,
+	=?UTF-8?q?P=C3=A9ter=20Ujfalusi?= <peter.ujfalusi@gmail.com>,
+	robh@kernel.org,
+	hns@goldelico.com
+Subject: [PATCH v4 0/4] Bluetooth/gnss: GNSS support for TiWi chips
+Date: Thu,  6 Jun 2024 20:30:28 +0200
+Message-Id: <20240606183032.684481-1-andreas@kemnade.info>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [BlueZ,v1] isotest: Fix ISO send data rate
-In-Reply-To: <20240606162903.620906-1-luiz.dentz@gmail.com>
-References: <20240606162903.620906-1-luiz.dentz@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 
---===============2047590016712980319==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Some of these chips have GNSS support. In some vendor kernels
+a driver on top of misc/ti-st can be found providing a /dev/tigps
+device which speaks the secretive Air Independent Interface (AI2) protocol.
 
-This is automated email and please do not reply to this email!
+To be more compatible with userspace send out NMEA by default but
+allow a more raw mode by using a module parameter.
 
-Dear submitter,
+This was tested on the Epson Moverio BT-200.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=859627
+Who will take this series (1-3)? GNSS with ack from Bluetooth?
 
----Test result---
+Changes since V3:
+- Finally remove the period from 1/4 subject
+- include things directly for get_unaligned_le16() to fix 0-day issues
 
-Test Summary:
-CheckPatch                    PASS      0.48 seconds
-GitLint                       PASS      0.34 seconds
-BuildEll                      PASS      24.70 seconds
-BluezMake                     PASS      1778.70 seconds
-MakeCheck                     PASS      13.34 seconds
-MakeDistcheck                 PASS      181.33 seconds
-CheckValgrind                 PASS      255.58 seconds
-CheckSmatch                   PASS      355.87 seconds
-bluezmakeextell               PASS      120.02 seconds
-IncrementalBuild              PASS      1481.70 seconds
-ScanBuild                     PASS      1004.49 seconds
+Changes since V2:
+- Optimize waits
+- Fix some packet analysis / checksum computation issue
+- Adding a proposal for removing those waits as RFC
+- Minor spell corrections and improved descriptions
+
+Changes since V1:
+- Set up things for NMEA output
+- Powerup/down at open()/close()
+- split out logic between drivers/bluetooth and drivers/gnss
+- leave out drivers/misc/ti-st driver removal to avoid
+  filling up mailboxes during the iterations, this series is
+  still a proof that it is not needed, will take the brush after
+  this series is accepted.
 
 
+Andreas Kemnade (4):
+  gnss: Add AI2 protocol used by some TI combo chips
+  Bluetooth: ti-st: Add GNSS subdevice for TI Wilink chips
+  gnss: Add driver for AI2 protocol
+  gnss: ai2: replace long sleeps by wait for acks
 
----
-Regards,
-Linux Bluetooth
+ drivers/bluetooth/hci_ll.c   |  81 +++++
+ drivers/gnss/Kconfig         |  13 +
+ drivers/gnss/Makefile        |   3 +
+ drivers/gnss/ai2.c           | 560 +++++++++++++++++++++++++++++++++++
+ drivers/gnss/core.c          |   1 +
+ include/linux/gnss.h         |   1 +
+ include/linux/ti_wilink_st.h |   8 +
+ 7 files changed, 667 insertions(+)
+ create mode 100644 drivers/gnss/ai2.c
 
+-- 
+2.39.2
 
---===============2047590016712980319==--
