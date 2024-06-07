@@ -1,107 +1,175 @@
-Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [80.237.130.52])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B19E8152168;
-	Fri,  7 Jun 2024 06:10:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.237.130.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00C76DDD9
+	for <linux-bluetooth@vger.kernel.org>; Fri,  7 Jun 2024 07:00:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717740614; cv=none; b=gyiIqbleI1xCxKpfvrFHqJRROGMFGbKWMPRZEJ5xL2s7JmPOXzb2XOhh0EqTpGO7tVo7dhUdaC+x45cAKsgeIqisZb3p1fK7Ya2GEHiV9kmPU/u9HQqsiStqhln8/NzZygyT1Tg2bjHNm5Q/yTyOO8k73OOlGzsvo3LtkB3XfXY=
+	t=1717743633; cv=none; b=cKIJ6oO6OYi0Tauh7HX5N2f+rVLjAABC1ZPgISmRthMK8HGvriU9QrphR4vyzgE1bM1wPsmWdMfV+j3YW+uIY1bCCwT/qLsmK2wRS+hCCfE/iFv8qZd9g6pO5FfRRmwS+7EkTbPsfMcdj2E1HG5wn+yp3E8tztqwj6fQLM+irBw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717740614; c=relaxed/simple;
-	bh=ckioJl9vajbY1NY8xPgM0DgSe4tTZ088rXm8lefAKNg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=KUi7K5SMmwqyeYAZnsJvR3EkBRiHcl116JX3T/JEJEIRRUPNWb8knjhtp8+2HetGEG/RxYO0XrjYWRmYPDM1DI6z/bG+UPqoYSfCXaBSG0DXz6jNH4p3wUanXKwJobokmXhApPgY5v36SbC2cJynYX9L6oxexxhMumu4sWGJcVk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=leemhuis.info; spf=pass smtp.mailfrom=leemhuis.info; dkim=pass (2048-bit key) header.d=leemhuis.info header.i=@leemhuis.info header.b=JmvfL000; arc=none smtp.client-ip=80.237.130.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=leemhuis.info
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=leemhuis.info
+	s=arc-20240116; t=1717743633; c=relaxed/simple;
+	bh=vqurLvfMJwYqyHYjXDaVgERo/W/vNxiB+I0htU1KDgM=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=fLjShMatI75oHrYudw0O+/zXSd+wWo4rnibZgw6hsd5bdvrLITn1ITewYBWPPd4RTi2jiu9BnGt3Q8ze+CfYBTm0N9fbHCLSaSzFwkAah82GYyIDPJPf0gjEmQ0archG3gEivyOEbNn16o9Z/DurH/sXBh8cvEpw2eTNB3cjn/Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=XdLI60FN; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=leemhuis.info header.i=@leemhuis.info header.b="JmvfL000"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=leemhuis.info; s=he214686; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
-	Message-ID:From:Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:
-	Content-Type:Content-Transfer-Encoding:Content-ID:Content-Description:
-	In-Reply-To:References; bh=UKY9mfcsSIWUumL/x92ZX9UOfQJ5ndiPQuj7lVX4LJA=;
-	t=1717740612; x=1718172612; b=JmvfL000RzKOWtFyD9IcNLFCOOjp5luVRjMa7DIcyPsLDF9
-	WdCgDmQYiEl1AnQxruZvSlcXFyL4YLb8M5v/cTGanqey4kFpWTdApXVmwtQjypoc37DPDOcRfMqFX
-	E86moI2SP/DraN2xC/xaBuQW2JiWIK+VrJm03nprwo0r9u6lZvN4A/V+sUcK+lvcB5u7aXioCXdFc
-	x3HWYm3Ib51UyUi3Tw17kti4iMAzQtOllpx0tC+fWZV4RTTlfO2xG2eEWTHgAtfySTq8iRwsibHFA
-	RWMmuYdD1ktTrgyCht7+jCRHp180M/7407TwRMuA7nZRm8nyj60ctfK6L1d0Kr3Q==;
-Received: from [2a02:8108:8980:2478:8cde:aa2c:f324:937e]; authenticated
-	by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
-	id 1sFSnh-0006r7-Rs; Fri, 07 Jun 2024 08:10:09 +0200
-Message-ID: <212fca4c-fc1f-4da4-b48e-c6a4b64a2b35@leemhuis.info>
-Date: Fri, 7 Jun 2024 08:10:09 +0200
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="XdLI60FN"
+Received: from pps.filterd (m0279872.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4572aeMB020320
+	for <linux-bluetooth@vger.kernel.org>; Fri, 7 Jun 2024 07:00:30 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	8HCJDCruMoMEMRwZQ/FzHdXtH3QWm8pHmweWoyjuI78=; b=XdLI60FNM2Y5gGZA
+	6ZQgHdshPoXItFZK/xKJcIowdL9S9Nn/x+4oaOf1B+zM3OTkp7ne+4HKuQnKbleh
+	C5vkdj+Cmp6G0EuV1dmO/6Hi3oKedZ9syINrwNEulzcHadG48VoshwfHyzlKa8xe
+	xZhEAuvydACekzhC0K93yEN8bv/Xntw8+k4WOUnAJP4H4cE4hPuVddfW34tQRkvX
+	TzanYg9B128nhA1acjTSzoV97AMHS6cEl7z0L/kRDQd+9dlZO0Y8aQ1vuFXWoE8/
+	u70fnSWd5ZvnoovqhEZg/vOp9nBVXyuR6vhVzmURvMp4FYkAwpqMlBfd4tAoaEVL
+	7HiDqg==
+Received: from nasanppmta05.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3yk3h2u7tq-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <linux-bluetooth@vger.kernel.org>; Fri, 07 Jun 2024 07:00:30 +0000 (GMT)
+Received: from nasanex01a.na.qualcomm.com (nasanex01a.na.qualcomm.com [10.52.223.231])
+	by NASANPPMTA05.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 45770TxS003958
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <linux-bluetooth@vger.kernel.org>; Fri, 7 Jun 2024 07:00:29 GMT
+Received: from nasanex01c.na.qualcomm.com (10.45.79.139) by
+ nasanex01a.na.qualcomm.com (10.52.223.231) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.9; Fri, 7 Jun 2024 00:00:28 -0700
+Received: from nasanex01c.na.qualcomm.com ([fe80::4223:f723:395d:74fa]) by
+ nasanex01c.na.qualcomm.com ([fe80::4223:f723:395d:74fa%13]) with mapi id
+ 15.02.1544.009; Fri, 7 Jun 2024 00:00:28 -0700
+From: "Amisha Jain (QUIC)" <quic_amisjain@quicinc.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+CC: "Mohammed Sameer Mulla (QUIC)" <quic_mohamull@quicinc.com>
+Subject: RE: MAP server crash during connection
+Thread-Topic: MAP server crash during connection
+Thread-Index: AdqzKJeyPcFb24X1Rwqc4W+GcA5qlwDHZ+PQAJhNwjA=
+Date: Fri, 7 Jun 2024 07:00:28 +0000
+Message-ID: <6a7a26622a3f47aaa7b531773ce35f48@quicinc.com>
+References: <ec4a4adbfee94a699ebd635abc51f01c@quicinc.com>
+ <3ffea594e86647208806e321275df2c6@quicinc.com>
+In-Reply-To: <3ffea594e86647208806e321275df2c6@quicinc.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: Bluetooth Kernel Bug: After connecting either HFP/HSP or A2DP is
- not available (Regression in 6.9.3, 6.8.12)
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
- =?UTF-8?Q?Timo_Schr=C3=B6der?= <der.timosch@gmail.com>
-Cc: stable@vger.kernel.org, regressions@lists.linux.dev,
- linux-bluetooth@vger.kernel.org, luiz.von.dentz@intel.com
-References: <CAGew7BttU+g40uRnSCN5XmbXs1KX1ZBbz+xyXC_nw5p4dR2dGA@mail.gmail.com>
- <CABBYNZLE9uYiRM-baoBt=RQktq__TguMETgmVWGzfeorARfm4w@mail.gmail.com>
-From: "Linux regression tracking (Thorsten Leemhuis)"
- <regressions@leemhuis.info>
-Content-Language: en-US, de-DE
-Reply-To: Linux regressions mailing list <regressions@lists.linux.dev>
-In-Reply-To: <CABBYNZLE9uYiRM-baoBt=RQktq__TguMETgmVWGzfeorARfm4w@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-bounce-key: webpack.hosteurope.de;regressions@leemhuis.info;1717740612;e4727336;
-X-HE-SMSGID: 1sFSnh-0006r7-Rs
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: c2tG60G4K_MDUrCYaCx9D78d5I8wQrSn
+X-Proofpoint-ORIG-GUID: c2tG60G4K_MDUrCYaCx9D78d5I8wQrSn
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-06-07_01,2024-06-06_02,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ impostorscore=0 bulkscore=0 mlxscore=0 priorityscore=1501 clxscore=1015
+ suspectscore=0 spamscore=0 mlxlogscore=999 adultscore=0 phishscore=0
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2405170001 definitions=main-2406070048
 
-On 06.06.24 23:23, Luiz Augusto von Dentz wrote:
-> On Thu, Jun 6, 2024 at 4:46 PM Timo Schröder <der.timosch@gmail.com> wrote:
->> on my two notebooks, one with Ubuntu (Mainline Kernel 6.9.3, bluez
->> 5.7.2) and the other one with Manjaro (6.9.3, bluez 5.7.6) I'm having
->> problems with my Sony WH-1000XM3 and Shure BT1. Either A2DP or HFP/HSP
->> is not available after the connection has been established after a
->> reboot or a reconnection. It's reproducible that with the WH-1000XM3
->> the A2DP profiles are missing and with the Shure BT1 HFP/HSP profiles
->> are missing. It also takes longer than usual to connect and I have a
->> log message in the journal:
->>
->> Jun 06 16:28:10 liebig bluetoothd[854]:
->> profiles/audio/avdtp.c:cancel_request() Discover: Connection timed out
->> (110)
->>
->> When I disable and re-enable bluetooth (while the Headsets are still
->> on) and trigger a reconnect from the notebooks, A2DP and HFP/HSP
->> Profiles are available again.
->>
->> I also tested it with 6.8.12 and it's the same problem. 6.8.11 and
->> 6.9.2 don't have the problem.
->> So I did a bisection. After reverting commit
->> af1d425b6dc67cd67809f835dd7afb6be4d43e03 "Bluetooth: HCI: Remove
->> HCI_AMP support" for 6.9.3 it's working again without problems.
->>
->> Let me know if you need anything from me.
-> 
-> Wait what, that patch has nothing to do with any of these profiles not
-> really sure how that would cause a regression really, are you sure you
-> don't have actual connection timeout happening at the link layer and
-> that by some chance didn't happen when running with HCI_AMP reverted?
-> 
-> I'd be surprised that HCI_AMP has any effect in most controllers
-> anyway, only virtual controllers was using that afaik.
+Hi,
+To resolve the MAP crash issue, We have added the below fix -
 
-Stupid question from a bystander without knowledge in the field (so feel
-free to ignore this): is that patch maybe causing trouble because it has
-some hidden dependency on a earlier change that was not backported to
-6.9.y?
 
-Timo, to rule that out (and it's good to know in general, too) it would
-be good to known if current mainline (e.g. 6.10-rc) is affected as well.
-
-Ciao, Thorsten (wearing his 'the Linux kernel's regression tracker' hat)
+diff --git a/obexd/src/obex.c b/obexd/src/obex.c
+index 3a68fd6..7c95075 100644
+--- a/obexd/src/obex.c
++++ b/obexd/src/obex.c
+@@ -716,7 +716,7 @@ int obex_put_stream_start(struct obex_session *os, cons=
+t char *filename)
+ 		return err;
+ 	}
+=20
+-	if (os->size !=3D OBJECT_SIZE_DELETE && os->size !=3D OBJECT_SIZE_UNKNOWN=
+)
++	if (os->size !=3D OBJECT_SIZE_DELETE && os->size !=3D OBJECT_SIZE_UNKNOWN=
+ && strcmp(os->service->name, "Message Access server") !=3D 0)
+ 		manager_emit_transfer_property(os->service_data, "Size");
+=20
+ 	os->path =3D g_strdup(filename);
 --
-Everything you wanna know about Linux kernel regression tracking:
-https://linux-regtracking.leemhuis.info/about/#tldr
-If I did something stupid, please tell me, as explained on that page.
+
+Please review the above fix and let us know if we can go ahead with this ch=
+ange.
+
+Thanks,
+Amisha
+
+> -----Original Message-----
+> From: Amisha Jain (QUIC)
+> Sent: Tuesday, June 4, 2024 11:43 AM
+> To: 'linux-bluetooth@vger.kernel.org' <linux-bluetooth@vger.kernel.org>
+> Subject: RE: MAP server crash during connection
+>=20
+> Hi,
+> Please help with the below issue.
+>=20
+> > -----Original Message-----
+> > From: Amisha Jain (QUIC)
+> > Sent: Friday, May 31, 2024 12:34 PM
+> > To: 'linux-bluetooth@vger.kernel.org'
+> > <linux-bluetooth@vger.kernel.org>
+> > Subject: MAP server crash during connection
+> >
+> > Hi bluez team,
+> > I have been trying to verify MAP Server obex profile on bluez 5.65.
+> > While trying=A0connection, I have noticed the crash on the server side
+> > (connection initiated from client side) and hence connection is failing=
+.
+> > Please find the backtrace of the crash -
+> >
+> > =A0 assertion failed "i =3D=3D len" file "../../dbus-1.14.8/dbus/dbus-o=
+bject-tree.c"
+> > line 1321 function _dbus_decompose_path
+> > =A0 /usr/lib/libdbus-1.so.3(_dbus_print_backtrace+0x28) [0xfffff7f4cc9c=
+]
+> > =A0 /usr/lib/libdbus-1.so.3(_dbus_abort+0x14) [0xfffff7f4fe3c]
+> > =A0 /usr/lib/libdbus-1.so.3(+0x4a9cc) [0xfffff7f3a9cc]
+> > =A0 /usr/lib/libdbus-1.so.3(+0x36c5c) [0xfffff7f26c5c]
+> > =A0 /usr/lib/libdbus-1.so.3(dbus_connection_get_object_path_data+0xc4)
+> > [0xfffff7f0f818]
+> > =A0 /usr/libexec/bluetooth/obexd(g_dbus_emit_property_changed_full+0x30=
+)
+> > [0x450dc4]
+> > =A0 /usr/libexec/bluetooth/obexd(g_dbus_emit_property_changed+0x14)
+> > [0x450ec0]
+> > =A0 /usr/libexec/bluetooth/obexd(manager_emit_transfer_property+0x34)
+> > [0x429408]
+> > =A0 /usr/libexec/bluetooth/obexd(obex_put_stream_start+0xc8) [0x42b314]
+> > =A0 /usr/libexec/bluetooth/obexd() [0x425f58]
+> > =A0 /usr/libexec/bluetooth/obexd() [0x42adcc]
+> > =A0 /usr/libexec/bluetooth/obexd() [0x4171dc]
+> > =A0 /usr/libexec/bluetooth/obexd() [0x418078]
+> > =A0 /usr/lib/libglib-2.0.so.0(+0xb20cc) [0xfffff7e420cc]
+> > =A0 /usr/lib/libglib-2.0.so.0(+0x54a30) [0xfffff7de4a30]
+> > =A0 /usr/lib/libglib-2.0.so.0(g_main_context_dispatch+0x44)
+> > [0xfffff7de850c]
+> > =A0 /usr/lib/libglib-2.0.so.0(+0x5868c) [0xfffff7de868c]
+> > =A0 /usr/lib/libglib-2.0.so.0(g_main_loop_run+0x1ac) [0xfffff7de8b08]
+> > =A0 /usr/libexec/bluetooth/obexd(main+0x128) [0x427d6c]
+> > =A0 /lib/libc.so.6(+0x2affc) [0xfffff7c0affc]
+> > =A0 /lib/libc.so.6(__libc_start_main+0x90) [0xfffff7c0b0c4]
+> > =A0 /usr/libexec/bluetooth/obexd(_start+0x30) [0x4101b0]
+> >
+> > =A0 Program received signal SIGABRT, Aborted.
+> >
+> > =A0__pthread_kill_implementation (threadid=3D<optimized out>,
+> > signo=3Dsigno@entry=3D6, no_tid=3Dno_tid@entry=3D0) at pthread_kill.c:4
+> >
+> > Please help support the issue.
+> >
+> > Thanks,
+> > Amisha
