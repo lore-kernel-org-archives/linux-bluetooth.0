@@ -1,104 +1,173 @@
-Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+Received: from mail-lj1-f169.google.com (mail-lj1-f169.google.com [209.85.208.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2426EDF51
-	for <linux-bluetooth@vger.kernel.org>; Fri,  7 Jun 2024 13:48:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DFB51953AA
+	for <linux-bluetooth@vger.kernel.org>; Fri,  7 Jun 2024 14:03:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717768131; cv=none; b=cPNUEHF3ov0IxNtM4wFwCMPJiIRWq2U/XIaeWRJ5GI0OpBoGOV4A0aXkJo2DsYsYhP2tVvMrzCVxgXWEGFK1Z2qL0Tlod+0jdoWjCTpWFDfNAYWv8t7qa3cCr39KE9EtPtfHsDrxxez6Ya+Yir9n4zNmOIJNYy2bU8o//Zv0b24=
+	t=1717769031; cv=none; b=iPjRpdI2O6IDA00sKjoVhoTDhzkrjkmyR6jmg4YoxhBoCdUzrOKqxHEYPN+nnhZaMbzx+yien2tWpeQwiqq94xBNi/Y/d2j5RPGWlFDw9L1efhM3IExgnBvQC2+MmzR/AWu1LLgWtysZkfCO2sXTd8SDdKH3yL7aDsIYLUYiacI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717768131; c=relaxed/simple;
-	bh=7je/t8BoWGlet0L0DVHuSGXH7+F0GJ4xcncA00eqbS0=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=eswoHRPIpm0nvCrr5CTyFB1NE4rnJ/Bir3NoEedifi8tTcOMqMAzB5TiaGdfWkfsIfsURHL5tkF4ouiKS9CGIAEsSqqQloZrb72GplcL4+ktMzlZghRs6vOUrGSwMl1SGAfA3OdrdAmtDmwVjQzELwFpegge4tEa1F65gOGlKwI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JttmiV/x; arc=none smtp.client-ip=209.85.214.174
+	s=arc-20240116; t=1717769031; c=relaxed/simple;
+	bh=HZV+tFeNh6iLe61XF+Co6euktdWBohji+f+XAl/74as=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=B48iLr5ne+w6mDU8MX4fG8WlnBO3/RJXossvpIwacIZFCSuMupGXcFdRYgC9pCxNoXE7RZcE6VUIuiyUw+Id51UtkHI9iKBsqigEV7SVV6M0/KG9eGRdma4CYMjNAzjfjrT0qfYs3T/6BwYYPLJStAv5VmRpL3r7pqqz24f5VBQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Rif1s7DV; arc=none smtp.client-ip=209.85.208.169
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JttmiV/x"
-Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-1f6559668e1so18857735ad.3
-        for <linux-bluetooth@vger.kernel.org>; Fri, 07 Jun 2024 06:48:49 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Rif1s7DV"
+Received: by mail-lj1-f169.google.com with SMTP id 38308e7fff4ca-2eaa80cb4d3so32602011fa.1
+        for <linux-bluetooth@vger.kernel.org>; Fri, 07 Jun 2024 07:03:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1717768129; x=1718372929; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=DjB4ZbeBGuTl2rVJsU6CoEcLaxNPSzUFDFZn2WrI4Cw=;
-        b=JttmiV/xmSS+Gp0m7NlF15KEglngiO+DMYWUIrbucVZr8W2Z/QrpU3sjmUq7gQPoC2
-         Va4QgSJntRzx/Ke0K+MX0w9MYWVcyWpmKmjPmwvrpcXVozM7+F8lboDDy7ylmJbs97re
-         tTeLCpOVZfvbNwpgb95RrbLBPfLiWEtVNBGgc1gLpFZaZ+DOwUvgNBAlDQZrJ7617/C8
-         MreNDzYhup08koyy1F9R/gEIe7AqgoGzw29uVoJmyIYIn3Mg8Mp9AwlTG6WPrR7ituLh
-         XzEjDUXuhZyXK7SKpJUT3gwOSGH/J8iyriw3E+xcqfvp1+Ne21jdw7fy6eAgZz5IUS+U
-         ycow==
+        d=gmail.com; s=20230601; t=1717769028; x=1718373828; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=zLbFCAJwIjrDdp8X2GQ49yFb5DqCrpc1/XDv+EEAIeU=;
+        b=Rif1s7DVMN2l78SqJlCneqdu/4kJMxXKz0RQeTxOiVrkox1RNgGmELPBLEmzgrdRga
+         J/PfGk4t9b3xzbwv3pgrnjwNZRaMO3g0GR/IcONAdPcSSGrgC+4TafZTHUM1D0u1i54n
+         kqa1DeWDRU/rZB3j1RakR95mVCvM9vlJqK6Prqd3kNaw9t409xBjg+yHb7f/IrYXL474
+         YgqIp6MXzgrR1Oo4Awgz/wA0H7mV74j4kBAVpIrSin5KPsiKp/+SKqP3YTTm/8/J1ajR
+         c8HDyXMKpKuXdsAFT4KTmVHrofArsMRx03CXdSGsVWU1+6O0mPyO/mQT1bXbiniwJu87
+         e1PQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717768129; x=1718372929;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=DjB4ZbeBGuTl2rVJsU6CoEcLaxNPSzUFDFZn2WrI4Cw=;
-        b=xFuaoGqTJB3moBliUHEDWd0sX3Y+cXSOuirZmSulY8ld9sYsUmzQYjcCzTcsKEoFcB
-         1rso0oEw2YyE5XIzurdXrOO55+dC4owhZZShtJEIiPBfRBolHVtgcG0OE2Ojpft/6EKe
-         y9WHm1bhIsIewQEyS7TlmQVuKlWQJMd0zbzVqNRPuM2CuKIYUOv+RYdvn9fOggIxIuKu
-         Yo3od8WcShQD3e/2X2FKrZ3ekpKocOJNhQz7YvuBvnh8v16LncXUg0Oe6PejrJXLqkps
-         61Xck/m3owHCN9dGBtzSdc1bvT25DbdVBlTMBLtvzC/HbNS7PtzsjawFlGNOYfjyuEyS
-         /z7A==
-X-Gm-Message-State: AOJu0YxYLwsQOEgefR6XQLxl50kCKwQabIb2feHtmMUD9egwh2wkKGNS
-	406Makq+1sFsBfLULwlnXy0QAtxjonLz8euUkWZtrsrvGOSkrv2c/Kb7zQ==
-X-Google-Smtp-Source: AGHT+IFzJAAkSXo4CoWG0SiS7Ofh4ZP89OpM9XLRMpshfadsjYTqggbKXRtTVVlQEFnFjq1YT1t6PQ==
-X-Received: by 2002:a17:903:189:b0:1f6:3750:5258 with SMTP id d9443c01a7336-1f6d039d055mr27074165ad.43.1717768129121;
-        Fri, 07 Jun 2024 06:48:49 -0700 (PDT)
-Received: from [172.17.0.2] ([52.190.187.44])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1f6bd7fdd5esm34223065ad.287.2024.06.07.06.48.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 07 Jun 2024 06:48:48 -0700 (PDT)
-Message-ID: <66630fc0.170a0220.3b07f1.8e04@mx.google.com>
-Date: Fri, 07 Jun 2024 06:48:48 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============0679527754849819856=="
+        d=1e100.net; s=20230601; t=1717769028; x=1718373828;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=zLbFCAJwIjrDdp8X2GQ49yFb5DqCrpc1/XDv+EEAIeU=;
+        b=EeNLzP0NGl+sigC1I6LHsY4llzsrg7DqgzmQ7seZeM+nRyn5ELtyQi8cv9LJWxxjDF
+         SLKuMtKqSc0FQkEXRENLdbbBASn5W+FVLnHTVg6mtbvrh5bz0JBuDuwe7GazMhtwgbZo
+         ODa7A9Zk6ZLVF3V9MLRq85TN81FqRFbaAbsqiOOa4yNJu/nINxqBvC3j7fcKh8GqHA4Q
+         ofaCKV8oFs5YDqZ7xm93SRXuwDkY7BYI4im/P7trL/gNyXT5nFtZg/ECouz+FJuywBhZ
+         YtUSieUh4dThDlnXuevxKMJi2HqDwvY+AAtyKIT3cSmrulV/nquzsMW1uP2+s3r9k+pb
+         Dybg==
+X-Gm-Message-State: AOJu0Yw7ECOGbJD0w4izaF06q/C67OeJZNuqp0FFbSHgAsIyO00vkEHe
+	Ib4m2gpqrs6nUIAKCbEU2OAjtYivAFcFtjzKEOTKIU33Kjn5435KuV5DYH8z5UhC4PVnYbGGAYE
+	MPyQvJCNlsqxvV609fT+wq+FJNjSAvA==
+X-Google-Smtp-Source: AGHT+IFK6+EHZTz1q6QA2lJ5ixxWZzUyG803h1L0SiVaCudUa/67KSdswteIXKM1NGFaT/tk0lQNyPl1RV41asGsXL4=
+X-Received: by 2002:a05:651c:221f:b0:2de:8697:e08b with SMTP id
+ 38308e7fff4ca-2eadce4d93cmr27062531fa.26.1717769027780; Fri, 07 Jun 2024
+ 07:03:47 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, yauhen.kharuzhy@softeq.com
-Subject: RE: [BlueZ] mcp: Implement Next Track and Previous Track commands
-In-Reply-To: <20240607121522.1255175-1-yauhen.kharuzhy@softeq.com>
 References: <20240607121522.1255175-1-yauhen.kharuzhy@softeq.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20240607121522.1255175-1-yauhen.kharuzhy@softeq.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Fri, 7 Jun 2024 10:03:35 -0400
+Message-ID: <CABBYNZ+czz7S9Dk0mRC4D+uU+Y8V6BZXnZWpvS9eN_GPbDhsmg@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] mcp: Implement Next Track and Previous Track commands
+To: Yauhen Kharuzhy <yauhen.kharuzhy@softeq.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
---===============0679527754849819856==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi Yauhen,
 
-This is automated email and please do not reply to this email!
+On Fri, Jun 7, 2024 at 8:15=E2=80=AFAM Yauhen Kharuzhy
+<yauhen.kharuzhy@softeq.com> wrote:
+>
+> Add implementation of Next/Previous Track commands to audio/mcp profile
+> and shared/mcp.{c,h} code.
+> ---
+>  profiles/audio/mcp.c | 18 ++++++++++++++++--
+>  src/shared/mcp.c     | 20 ++++++++++++++++++++
+>  src/shared/mcp.h     |  2 ++
 
-Dear submitter,
+Please have the changes to src/shared split from other changes, they
+have different licenses and shared may actually be subject to unit
+testing.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=859921
+>  3 files changed, 38 insertions(+), 2 deletions(-)
+>
+> diff --git a/profiles/audio/mcp.c b/profiles/audio/mcp.c
+> index b410b3d2a..8d1b7588e 100644
+> --- a/profiles/audio/mcp.c
+> +++ b/profiles/audio/mcp.c
+> @@ -224,13 +224,27 @@ static int ct_stop(struct media_player *mp, void *u=
+ser_data)
+>         return bt_mcp_stop(mcp);
+>  }
+>
+> +static int ct_next(struct media_player *mp, void *user_data)
+> +{
+> +       struct bt_mcp *mcp =3D user_data;
+> +
+> +       return bt_mcp_next_track(mcp);
+> +}
+> +
+> +static int ct_previous(struct media_player *mp, void *user_data)
+> +{
+> +       struct bt_mcp *mcp =3D user_data;
+> +
+> +       return bt_mcp_previous_track(mcp);
+> +}
+> +
+>  static const struct media_player_callback ct_cbs =3D {
+>         .set_setting    =3D NULL,
+>         .play           =3D &ct_play,
+>         .pause          =3D &ct_pause,
+>         .stop           =3D &ct_stop,
+> -       .next           =3D NULL,
+> -       .previous       =3D NULL,
+> +       .next           =3D &ct_next,
+> +       .previous       =3D &ct_previous,
+>         .fast_forward   =3D NULL,
+>         .rewind         =3D NULL,
+>         .press          =3D NULL,
+> diff --git a/src/shared/mcp.c b/src/shared/mcp.c
+> index b3726ebae..71fc2d151 100644
+> --- a/src/shared/mcp.c
+> +++ b/src/shared/mcp.c
+> @@ -628,6 +628,26 @@ unsigned int bt_mcp_stop(struct bt_mcp *mcp)
+>         return mcp_send(mcp, BT_MCS_CMD_STOP);
+>  }
+>
+> +unsigned int bt_mcp_next_track(struct bt_mcp *mcp)
+> +{
+> +       if (!(mcp->session.cp_op_supported & BT_MCS_CMD_NEXT_TRACK_SUPPOR=
+TED))
+> +               return -ENOTSUP;
+> +
+> +       DBG(mcp, "mcp %p", mcp);
+> +
+> +       return mcp_send(mcp, BT_MCS_CMD_NEXT_TRACK);
+> +}
+> +
+> +unsigned int bt_mcp_previous_track(struct bt_mcp *mcp)
+> +{
+> +       if (!(mcp->session.cp_op_supported & BT_MCS_CMD_PREV_TRACK_SUPPOR=
+TED))
+> +               return -ENOTSUP;
+> +
+> +       DBG(mcp, "mcp %p", mcp);
+> +
+> +       return mcp_send(mcp, BT_MCS_CMD_PREV_TRACK);
+> +}
+> +
+>  static void mcp_mp_set_player_name(struct bt_mcp *mcp, const uint8_t *va=
+lue,
+>                                         uint16_t length)
+>  {
+> diff --git a/src/shared/mcp.h b/src/shared/mcp.h
+> index a2cd6fc45..ee57ed4bf 100644
+> --- a/src/shared/mcp.h
+> +++ b/src/shared/mcp.h
+> @@ -59,3 +59,5 @@ void *bt_mcp_get_user_data(struct bt_mcp *mcp);
+>  unsigned int bt_mcp_play(struct bt_mcp *mcp);
+>  unsigned int bt_mcp_pause(struct bt_mcp *mcp);
+>  unsigned int bt_mcp_stop(struct bt_mcp *mcp);
+> +unsigned int bt_mcp_next_track(struct bt_mcp *mcp);
+> +unsigned int bt_mcp_previous_track(struct bt_mcp *mcp);
+> --
+> 2.45.1
+>
+>
 
----Test result---
 
-Test Summary:
-CheckPatch                    PASS      0.30 seconds
-GitLint                       PASS      0.22 seconds
-BuildEll                      PASS      24.15 seconds
-BluezMake                     PASS      1589.51 seconds
-MakeCheck                     PASS      12.62 seconds
-MakeDistcheck                 PASS      170.33 seconds
-CheckValgrind                 PASS      243.43 seconds
-CheckSmatch                   PASS      342.97 seconds
-bluezmakeextell               PASS      115.30 seconds
-IncrementalBuild              PASS      1363.20 seconds
-ScanBuild                     PASS      950.36 seconds
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============0679527754849819856==--
+--=20
+Luiz Augusto von Dentz
