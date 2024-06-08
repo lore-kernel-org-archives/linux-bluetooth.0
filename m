@@ -1,169 +1,157 @@
-Received: from mail-qk1-f170.google.com (mail-qk1-f170.google.com [209.85.222.170])
+Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AB1F11718;
-	Sat,  8 Jun 2024 12:25:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F36D1799D;
+	Sat,  8 Jun 2024 19:00:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717849502; cv=none; b=CcCEtq5EvG+ZLq9k+FH1q5mcYhwWCPzggjikmvECeM3zRPWnbLIjp2Ho4/09OoVDRdKuxtp6zEBuPG1Q9EPiXgbG1MMaTWRdRkQZgGKyU1yHx0m/tNXQMdstTwG13E4XnqmE5+TpmLEnSVQgXpzHlfChJ7GOm2IyxrGkzNMae3U=
+	t=1717873251; cv=none; b=H33ZmmbfIGAB7sXWNuFEoyGU81JVTGw03IgxnrAQadZ2Yn5jtjK/Ve1UQhfhAHMaZampxWpSxyif8UEL3CdBHALdaIkQjwZM8iwzEHJDuSHEY8jk4BbHnmrFIzTKcCPrr6BxR/P5MaOiK35XLRi84976P3DC5Nk7+T4rI7OPu/w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717849502; c=relaxed/simple;
-	bh=QoinzhZ0NTt2RazVwLGKw0mPLwu4odIDkMio21l5+mU=;
+	s=arc-20240116; t=1717873251; c=relaxed/simple;
+	bh=lUKcZ0NOZIGF2roeexyRtcuCwZmnc8vD0aRuMnMXqlA=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=mopuIC3sHGkQ/j9hlCV6YaHpB3E0ar+q7r4LLoDmOydSJyb04cfP1I/YWO31gGu6BC3pmOPgh+y9okfgQ48MVE/qd2iIAvMRFvYJusFtuIDS+Pwp0CAy19kxSGwtrbwhwciygs6gvLZI+10LMvqcvd8EaN+uG6Tk/E7QY3Ylplo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=j7ihe5fL; arc=none smtp.client-ip=209.85.222.170
+	 To:Cc:Content-Type; b=E1wP1OA2h+5D9zz/0tfuIDXrabBfXoiZDhm29xgK0MH9tL86DgdJ2pQRSC8ZH5iUCn9M1ZM9Pr7jqTlX8RTD5bdrxPQBWP+tmAInH9Z0Vx9mSF39Wf60JpOsOe4tEnNPT75NJGjPRN0xd3I9fqZAIfqitH8oJjKQgdgjGYGuQxM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZYRErWMe; arc=none smtp.client-ip=209.85.216.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="j7ihe5fL"
-Received: by mail-qk1-f170.google.com with SMTP id af79cd13be357-7952a920e13so3718085a.2;
-        Sat, 08 Jun 2024 05:25:00 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZYRErWMe"
+Received: by mail-pj1-f41.google.com with SMTP id 98e67ed59e1d1-2c27bc473d9so2634560a91.3;
+        Sat, 08 Jun 2024 12:00:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1717849499; x=1718454299; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1717873250; x=1718478050; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=QoinzhZ0NTt2RazVwLGKw0mPLwu4odIDkMio21l5+mU=;
-        b=j7ihe5fLLe/RUQdS6tgxDvo2U6XpYFY43vIj7WCGJ+VXR8EFsUGu8tCJbFS/nwO6VX
-         Y3IXUYuynBlOGz4oC1XSotcv5kMryGI/zH4ifGL3KqA4CsCbeWwJ6IyZp5y/65So1fXz
-         Thxy3o8BK6tIfUI73/EQ0ySqaJd+YcxQKH4xrgPuKfftL+9G1vJcqEJVQnC3P0qYo4V9
-         d0opg47v8I4MaYjIGmDlTjbuTXEBibrrAYejFYFbAjLRv1YFl/7dXfYHe1TxJ/B6rW76
-         jiMOmI/t3oVzOqFJNkaQ4jMADpIUuEzOwHNFgkMdhr9zpXoMJdw3SGqBos1GsOKTd0hR
-         DyLw==
+        bh=XzPlb+KNnIK84yqsSCymGwCYl+X3d6bDXkoBesrFE4w=;
+        b=ZYRErWMeDVvXikFtbtlzEWWqUMh+RVrnZx8JafCCeIqEUcJbhQPU8MENkk+13rBeJQ
+         XDA3djwsVnOdddi+wtJctlsuCp+eMVz9GkTqbqvD0jhRA1Ls3M/jcqjwFq4ALkBfV09y
+         HWnAGukeYk0ZeyBGFoqIjONr6O84dUiA7ZdBFhUX4k0E1IMb4jmeclWpRfKLHfriDu+k
+         +Pl/aB3xb0XLz63T/20kwLtu4UlGkn9SuOxWHR0ndIbgIZPqLwhs7BT8M/fQBR2Z5/Hi
+         pki5PhcG5FFfd/yeV+EeECoIruI9xccFEOVunZcLnfDxFPbh3ZmSn4HP0HMMK2hCOvI1
+         sXdw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717849499; x=1718454299;
+        d=1e100.net; s=20230601; t=1717873250; x=1718478050;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=QoinzhZ0NTt2RazVwLGKw0mPLwu4odIDkMio21l5+mU=;
-        b=C0gDBPS+MhAPYqCIwk8On211Y2IqnDfHZ/8aebOq1mmVKnkXRixONk9PPVTdAMxjy8
-         eL9Ymm/zWHDorvCEjCeNMBTs8Rq6LVCsJpuMjjbTZVb+1xomXVj2efQ0FXs+JxXvMSfz
-         6CK2PIgPfTOfAuLjy+fRVeZTaXEhcKlQt5yjY9+uFjKvwDRV7V1N0tgqybKrzIXJrbby
-         dUn19s44Sm4Hvgv9TkSkuSrTczetZwtiTYGhDZmq/srIiAOxD15+zGT71aLQckzdstvW
-         WbwBZu2ADXQso2s6xfVQZN0R4Y/2DtzM3hwRxLiizfFlSVwwCPbnIUxymqj8USG30yWt
-         AaiA==
-X-Forwarded-Encrypted: i=1; AJvYcCWzCwolpg0f9TTXwRYSFOI9ZgUX907R/QfJ8DT38rdqeaDniJ9Y0QQhE0Fgn0kg2qr7pJoJ3Ivw2I5KXx4SoHWEQ/IjOwecPhL631R1j/qrPqhmOntyuTZbcM0MREcuebJRq5/p+Xww
-X-Gm-Message-State: AOJu0YwkhJZjhN/3cEc5hq6eWt7PtpoHI+5gKBWTfWlYW/lBdXq4rDnc
-	wmuRk5xCJETx1T79Do+EfxvYpMoftdvC6/howPb4Bwvtj4VC6ZfbdsYGpfgnEoEW54TR8W46K/n
-	CfW/2NsnvMUIZzl01c7Q0n7/c1ZiBNLRYtc4/1g==
-X-Google-Smtp-Source: AGHT+IFzVyQrf/hm5K3mdu8pWgHJLLh8th/uXE0cNXLmjwJDQLLEinNWXgKtNEL7KXbD5e5wZHkVVgBzgM73hlOOh1A=
-X-Received: by 2002:a05:620a:2853:b0:795:4bfb:fe2f with SMTP id
- af79cd13be357-7954bfc037emr370896785a.1.1717849499349; Sat, 08 Jun 2024
- 05:24:59 -0700 (PDT)
+        bh=XzPlb+KNnIK84yqsSCymGwCYl+X3d6bDXkoBesrFE4w=;
+        b=L4msxDid0q4YF9pdk3Ey1PzXvwf4FxJpNVjb9cc+gv+kuJwaAP0eamoCuIYSLgvbvd
+         lLVl91NUQXoakZMLnSB0+O4VvDx2mENHQwvzagqXoEcRUl4BI+S5GFtYndH1bu+u3RHm
+         Fkwz60SZExC1MNkbRSW7AEu34nVSMEHqd/nC2njYoGsu6cDlmSIMQrlrj8RjREfCsCd0
+         RrF1w0hVIadwkHrRWKpo1zZGEDNd3YSw+aaMJ6RoT3kQqSnhz3SC85NPTLCxGjhzRPf5
+         gF9UFaOf9TktJNHSX1SKWu9mo9MDrjtTOb9MwYQ84H86VI9+UlXI0iWVQkcuhPVGRZ23
+         6KDg==
+X-Forwarded-Encrypted: i=1; AJvYcCWvf7KAYVx7rmvRY6R5MtqV/t6EpftubKo2wvGc1mCK1g8b/pXx06kvsIwQVi9fNSuIBeiF4MemBsjV7au9204qTqPYM5CBlM4PY4KxNaLhw4SVdWLQCyRjfGsTWV3vtr1ROunZcDrpBnF4mBO/
+X-Gm-Message-State: AOJu0YzBV5T59ghe1Azjnqg4Hx82NVBvdZvqncJc8zJG5nYnRSp9e7Vn
+	Be9WwB9PSN9TWiYPD9CPdl+QiGXAL65pRskfwNHxNmipVwvXq01Xu4Po+mW2w9kCzQw1XqeSxZB
+	ii+gU3ilafK1wYRP5kIrqWUwj8nk=
+X-Google-Smtp-Source: AGHT+IHy69wumVASu/61R/Fjf2UyRyAY0w+h+xTzlnA5QSxt9N/pf88fG72ZcV37ZMbk6kGOKqksuj3im194CCMHYPk=
+X-Received: by 2002:a17:90a:f614:b0:2c1:424c:1721 with SMTP id
+ 98e67ed59e1d1-2c2bcad1161mr5292449a91.3.1717873249617; Sat, 08 Jun 2024
+ 12:00:49 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAGew7BttU+g40uRnSCN5XmbXs1KX1ZBbz+xyXC_nw5p4dR2dGA@mail.gmail.com>
- <CABBYNZLE9uYiRM-baoBt=RQktq__TguMETgmVWGzfeorARfm4w@mail.gmail.com>
- <212fca4c-fc1f-4da4-b48e-c6a4b64a2b35@leemhuis.info> <CAGew7BseJ18yjTu5AFWr=B3c41gXe4T=B0JqFWvXjQYvcDPfTA@mail.gmail.com>
- <CABBYNZJqULvfnafB5vA4PHPtzs_qmEQK8JZ3C09Q=wmvSZqwBA@mail.gmail.com>
-In-Reply-To: <CABBYNZJqULvfnafB5vA4PHPtzs_qmEQK8JZ3C09Q=wmvSZqwBA@mail.gmail.com>
-From: =?UTF-8?Q?Timo_Schr=C3=B6der?= <der.timosch@gmail.com>
-Date: Sat, 8 Jun 2024 14:24:48 +0200
-Message-ID: <CAGew7Bu3FBQfUya4vK-qr+D6zRiP4dquXY_0uND9TaHh-VT10w@mail.gmail.com>
-Subject: Re: Bluetooth Kernel Bug: After connecting either HFP/HSP or A2DP is
- not available (Regression in 6.9.3, 6.8.12)
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: regressions@leemhuis.info, stable@vger.kernel.org, 
-	regressions@lists.linux.dev, linux-bluetooth@vger.kernel.org, 
-	luiz.von.dentz@intel.com
+References: <20240606183032.684481-1-andreas@kemnade.info> <CABBYNZ+Fz2TLSNa28H3kjVKOSA7C-XOzdQJiHdJs3FKxnq01DA@mail.gmail.com>
+ <20240606221941.333a9704@aktux>
+In-Reply-To: <20240606221941.333a9704@aktux>
+From: Adam Ford <aford173@gmail.com>
+Date: Sat, 8 Jun 2024 14:00:38 -0500
+Message-ID: <CAHCN7xLhbiqTTOwPZ22KekALDn0KtH6vNQEJpSmSCTiMggX5Qg@mail.gmail.com>
+Subject: Re: [PATCH v4 0/4] Bluetooth/gnss: GNSS support for TiWi chips
+To: Andreas Kemnade <andreas@kemnade.info>
+Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>, marcel@holtmann.org, johan@kernel.org, 
+	pmenzel@molgen.mpg.de, jirislaby@kernel.org, gregkh@linuxfoundation.org, 
+	linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org, 
+	Tony Lindgren <tony@atomide.com>, tomi.valkeinen@ideasonboard.com, 
+	=?UTF-8?Q?P=C3=A9ter_Ujfalusi?= <peter.ujfalusi@gmail.com>, robh@kernel.org, 
+	hns@goldelico.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi Luiz,
-as requested I opened an issue. Please see:
-https://github.com/bluez/bluez/issues/865
-
-Best regards,
-Timo
-
-Am Sa., 8. Juni 2024 um 00:01 Uhr schrieb Luiz Augusto von Dentz
-<luiz.dentz@gmail.com>:
+On Thu, Jun 6, 2024 at 3:19=E2=80=AFPM Andreas Kemnade <andreas@kemnade.inf=
+o> wrote:
 >
-> Hi Timo,
+> Hi Luiz,
 >
-> On Fri, Jun 7, 2024 at 5:43=E2=80=AFPM Timo Schr=C3=B6der <der.timosch@gm=
-ail.com> wrote:
+> On Thu, 6 Jun 2024 16:04:10 -0400
+> Luiz Augusto von Dentz <luiz.dentz@gmail.com> wrote:
+>
+> > Hi Andreas,
 > >
-> > Am Fr., 7. Juni 2024 um 08:10 Uhr schrieb Linux regression tracking
-> > (Thorsten Leemhuis) <regressions@leemhuis.info>:
+> > On Thu, Jun 6, 2024 at 2:30=E2=80=AFPM Andreas Kemnade <andreas@kemnade=
+.info> wrote:
 > > >
-> > > On 06.06.24 23:23, Luiz Augusto von Dentz wrote:
-> > > > On Thu, Jun 6, 2024 at 4:46=E2=80=AFPM Timo Schr=C3=B6der <der.timo=
-sch@gmail.com> wrote:
-> > > >> on my two notebooks, one with Ubuntu (Mainline Kernel 6.9.3, bluez
-> > > >> 5.7.2) and the other one with Manjaro (6.9.3, bluez 5.7.6) I'm hav=
-ing
-> > > >> problems with my Sony WH-1000XM3 and Shure BT1. Either A2DP or HFP=
-/HSP
-> > > >> is not available after the connection has been established after a
-> > > >> reboot or a reconnection. It's reproducible that with the WH-1000X=
-M3
-> > > >> the A2DP profiles are missing and with the Shure BT1 HFP/HSP profi=
-les
-> > > >> are missing. It also takes longer than usual to connect and I have=
- a
-> > > >> log message in the journal:
-> > > >>
-> > > >> Jun 06 16:28:10 liebig bluetoothd[854]:
-> > > >> profiles/audio/avdtp.c:cancel_request() Discover: Connection timed=
- out
-> > > >> (110)
-> > > >>
-> > > >> When I disable and re-enable bluetooth (while the Headsets are sti=
-ll
-> > > >> on) and trigger a reconnect from the notebooks, A2DP and HFP/HSP
-> > > >> Profiles are available again.
-> > > >>
-> > > >> I also tested it with 6.8.12 and it's the same problem. 6.8.11 and
-> > > >> 6.9.2 don't have the problem.
-> > > >> So I did a bisection. After reverting commit
-> > > >> af1d425b6dc67cd67809f835dd7afb6be4d43e03 "Bluetooth: HCI: Remove
-> > > >> HCI_AMP support" for 6.9.3 it's working again without problems.
-> > > >>
-> > > >> Let me know if you need anything from me.
-> > > >
-> > > > Wait what, that patch has nothing to do with any of these profiles =
-not
-> > > > really sure how that would cause a regression really, are you sure =
-you
-> > > > don't have actual connection timeout happening at the link layer an=
-d
-> > > > that by some chance didn't happen when running with HCI_AMP reverte=
-d?
-> > > >
-> > > > I'd be surprised that HCI_AMP has any effect in most controllers
-> > > > anyway, only virtual controllers was using that afaik.
+> > > Some of these chips have GNSS support. In some vendor kernels
+> > > a driver on top of misc/ti-st can be found providing a /dev/tigps
+> > > device which speaks the secretive Air Independent Interface (AI2) pro=
+tocol.
+
+I think you may have sent me a file to test, but I can't find the
+e-mail.   Can you tell me what tool you used to test it?  I can get
+gnss0 to enumerate, so I am close.
+
+[   20.759857] hci-ti serial0-0: using DT
+'/ocp@68000000/serial@4806c000/bluetooth-gnss' for 'enable' GPIO
+lookup
+[   20.770263] of_get_named_gpiod_flags: parsed 'enable-gpios'
+property of node '/ocp@68000000/serial@4806c000/bluetooth-gnss[0]' -
+status (0)
+[   29.221588] gnss: GNSS driver registered with major 244
+
+
+adam
+
 > > >
-> > > Stupid question from a bystander without knowledge in the field (so f=
-eel
-> > > free to ignore this): is that patch maybe causing trouble because it =
-has
-> > > some hidden dependency on a earlier change that was not backported to
-> > > 6.9.y?
+> > > To be more compatible with userspace send out NMEA by default but
+> > > allow a more raw mode by using a module parameter.
 > > >
-> > > Timo, to rule that out (and it's good to know in general, too) it wou=
-ld
-> > > be good to known if current mainline (e.g. 6.10-rc) is affected as we=
-ll.
+> > > This was tested on the Epson Moverio BT-200.
 > > >
-> > > Ciao, Thorsten (wearing his 'the Linux kernel's regression tracker' h=
-at)
-> > > --
-> > > Everything you wanna know about Linux kernel regression tracking:
-> > > https://linux-regtracking.leemhuis.info/about/#tldr
-> > > If I did something stupid, please tell me, as explained on that page.
+> > > Who will take this series (1-3)? GNSS with ack from Bluetooth?
+> > >
+> > > Changes since V3:
+> > > - Finally remove the period from 1/4 subject
+> > > - include things directly for get_unaligned_le16() to fix 0-day issue=
+s
+> > >
+> > > Changes since V2:
+> > > - Optimize waits
+> > > - Fix some packet analysis / checksum computation issue
+> > > - Adding a proposal for removing those waits as RFC
+> > > - Minor spell corrections and improved descriptions
+> > >
+> > > Changes since V1:
+> > > - Set up things for NMEA output
+> > > - Powerup/down at open()/close()
+> > > - split out logic between drivers/bluetooth and drivers/gnss
+> > > - leave out drivers/misc/ti-st driver removal to avoid
+> > >   filling up mailboxes during the iterations, this series is
+> > >   still a proof that it is not needed, will take the brush after
+> > >   this series is accepted.
+> > >
+> > >
+> > > Andreas Kemnade (4):
+> > >   gnss: Add AI2 protocol used by some TI combo chips
+> > >   Bluetooth: ti-st: Add GNSS subdevice for TI Wilink chips
 > >
-> > Hallo Thorsten, I tried with 6.10-rc2 and it's the same problem on my s=
-ystems.
+> > The bluetooth one looks relatively simple so I could take that one and
+> > push to bluetooth-next if there are no dependencies on the other
+> > changes.
+> >
+> There is:
 >
-> Could you please create a issue at
-> https://github.com/bluez/bluez/issues and then attach btmon traces and
-> bluetoothd? This is a really weird regression, also is your system
-> using pulseaudio or pipewire?
+> include/linux/ti_wilink_st.h |   8 +
 >
-> --
-> Luiz Augusto von Dentz
+> We have compile time deps here. Patch 3 compile time depends on patch 2. =
+If we
+> cannot take everything in for  6.11, you might opt to take the bluetooth =
+part.
+> That would work.
+>
+> Regards,
+> Andreas
