@@ -1,136 +1,112 @@
 Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04A7A42ABB;
-	Sun,  9 Jun 2024 15:01:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA4491CD39
+	for <linux-bluetooth@vger.kernel.org>; Sun,  9 Jun 2024 15:06:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=195.140.195.201
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717945299; cv=pass; b=ILqPfqVraQhgFwboK3lAa6Y2bobfIsfhy2XO9yfKb39vZDu1cgsSaB9X5Lj0t2mi5o7dOiAvSO3GH1+sL88LqRFGHp3u2IrpoCMS7/+RIm1fXb/pJB+2vyDweOsmTz0YoklODRmWRS2URUryTpaXLrq0mgXSDyRBlp15ToS3UMI=
+	t=1717945591; cv=pass; b=Wus1N0/S9pAYkmYItGqDLF+hxhkwIobQkG6+OYM310u1QXH06zS10jfBqL9avJnPJyIMC5aCRXdyRdLpXcU2ar6sy42yIuzWcoXapLwZDBEeJgZ4r9RCxAH3+TRf1oDJT+aTt2UgmJP5sHcvzXFxH6WCYvS0M9gwQbn9Kkz9FN0=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717945299; c=relaxed/simple;
-	bh=sn0BBoGPmqS/LCfQCIEaY2vfwueBz3zAXmZxwGNsV3M=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=otcoZEhYvoBGrcgEOwkFarHCuwsvvepBM0lSqgRGn51tzwNyhRBe1SkdeaQaQvComP7YWPboCvHrBSBiMBfJakDoDC06KMH/5LNDQdujJl1pou/PX/Z8hrYaqKP0MoMXc4bs5gLK8C1MQS71yEupH48cTKYynOzwxKITDkULqMI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=LkkVwdwl; arc=pass smtp.client-ip=195.140.195.201
+	s=arc-20240116; t=1717945591; c=relaxed/simple;
+	bh=VSlKgT7RsWzDeHBJYkDwFlw3dCLKx4i/ocpT+WeNJHo=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=Lg1UW+RF3AEHZRkeeU+8sgtTkFHHbZAGnCtUI7m2scI04rUpeR8ubAlDKMV+Ye808bJmZ+vcvB51yvkS5cVaK4/8n8V2tOzvWUsWo5gCkv2+clp71aIeS+252r+0yvMxMVWCA5q+ctmpIh8AW6OKC0XS9eLCm3rCXiLyK19OHWE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=rWif+wR2; arc=pass smtp.client-ip=195.140.195.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="LkkVwdwl"
-Received: from monolith.lan (91-152-121-138.elisa-laajakaista.fi [91.152.121.138])
+	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="rWif+wR2"
+Received: from monolith.lan (unknown [193.138.7.178])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	(Authenticated sender: pav@iki.fi)
-	by meesny.iki.fi (Postfix) with ESMTPSA id 4VxynT26y0zyQL;
-	Sun,  9 Jun 2024 18:01:33 +0300 (EEST)
+	(Authenticated sender: pav)
+	by meesny.iki.fi (Postfix) with ESMTPSA id 4Vxyv554qtzyQL;
+	Sun,  9 Jun 2024 18:06:25 +0300 (EEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
-	t=1717945293;
+	t=1717945586;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=SMrkupduALvabSuxIR2q8uxLk8GFltsccXQ5z5lTVac=;
-	b=LkkVwdwlq0tGQHRCjKtoGkTE3pFlITBMPF721DTAZl2q0yVQAeLrF/B0uSzWDi4nAdhZZG
-	icDQZQO1ueBcPwpN75t80pCqQ4Wz7eZDB0GAiH0vBBNMYh95W3c1qAxG1aNji8Jg3aQ9Il
-	Zp1mQFN18H3aRBQdOZjaUjbXHFaRrDo=
+	bh=uWdjrq++B+FOCbuXHCPq7PJ9s19J5GeWTrapYXSiC0U=;
+	b=rWif+wR2Zs7MsaHSfyUdEGYYd2HXQRdGlPk17QnaakIajVRGKqtTbsaTs8eCkJL08ElhWD
+	/rIeeD6aBcoNjUTg0oS8J2Dv6GL9xM/Vi6sGXDJHIHInouBVfhE3jdmkP69Hbdi/OgHMny
+	0V9ysdg4YNVuqUV7HhziiVS9j/vyNX0=
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=meesny; t=1717945293;
+	s=meesny; t=1717945586;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=SMrkupduALvabSuxIR2q8uxLk8GFltsccXQ5z5lTVac=;
-	b=Vehdua56cPiR+tnaW2xgwAz6xFZLG60R1LeXkKmHNBW+S8EEd8XIbVpqYBNNGs3pjIJGSM
-	Dm+JsSnj/95QYCBox70W4DGzz/HYBdQ+UaqFRFzGqm9tQjMvjettsj15syJXWAOgvfl124
-	2lTirfNcYGAb7boHHXihCZvrsN/6Nao=
+	bh=uWdjrq++B+FOCbuXHCPq7PJ9s19J5GeWTrapYXSiC0U=;
+	b=IW85KDDqcppLLKrjZlwg4VshMvx2C8mzdOJAod12mNi9QPYBgmzqpYF5L1ws9s10ycMcvZ
+	hlDDGSk0UBCliqx+Q7vvA37le5kWHl0TIfnOEVrbLztPSb1A7vHHUMKkzbi+UXPbUtTwrh
+	lz48QFTqVdiTi+yEGA4w8r5wilADVqw=
 ARC-Authentication-Results: i=1;
 	ORIGINATING;
-	auth=pass smtp.auth=pav@iki.fi smtp.mailfrom=pav@iki.fi
-ARC-Seal: i=1; s=meesny; d=iki.fi; t=1717945293; a=rsa-sha256; cv=none;
-	b=DwbRwUxyWmJqeohGbDJnpF5B+kWGf6GGLMM8DwRUx3l/B4BuyZRyX3AKGTf+8VGT9kgswV
-	7Dkq+xsucxcnzH95aeJ+RBCUmfaFybgDAueMh3RQnQrKcrPRWhVwN7B8jj68jdZzG6cdGX
-	aDifNocTwtjWqVZ3ncY/tLnCWFksZwA=
-Message-ID: <74eb0c7120f0f26db090810be2386eadd7137495.camel@iki.fi>
-Subject: Re: [PATCH] Bluetooth: fix connection setup in l2cap_connect
+	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
+ARC-Seal: i=1; s=meesny; d=iki.fi; t=1717945586; a=rsa-sha256; cv=none;
+	b=FGrnCCrOwW4rC35XJYVawqNi1mFXhhk95IlIFr2jMZvf0qQtkuMILeN2+aE17aIwg6HsW3
+	B+t1ZhR2Ew0szt2OGQ4BQtcFeAVNtUOjJmuolPF+rtZFYqVUI4Da3EKpp+WDqqHZcBlrT4
+	sM54plIx0CnX+s5+s2HWroYFDP1jh94=
 From: Pauli Virtanen <pav@iki.fi>
-To: Timo =?ISO-8859-1?Q?Schr=F6der?= <der.timosch@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org, stable@vger.kernel.org, 
-	luiz.von.dentz@intel.com
-Date: Sun, 09 Jun 2024 18:01:32 +0300
-In-Reply-To: <CAGew7Bsdb4iOKrZ+1pBRXs38+GwVJDgQh7N1Zn4DP73fZ_ejeA@mail.gmail.com>
-References: 
-	<CAGew7BttU+g40uRnSCN5XmbXs1KX1ZBbz+xyXC_nw5p4dR2dGA@mail.gmail.com>
-	 <de9169c3e607696a9430f5beb182c914c136edcf.1717883849.git.pav@iki.fi>
-	 <CAGew7Bsdb4iOKrZ+1pBRXs38+GwVJDgQh7N1Zn4DP73fZ_ejeA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.52.2 (3.52.2-1.fc40) 
+To: linux-bluetooth@vger.kernel.org
+Cc: Pauli Virtanen <pav@iki.fi>,
+	luiz.von.dentz@intel.com,
+	der.timosch@gmail.com
+Subject: [PATCH v2] Bluetooth: fix connection setup in l2cap_connect
+Date: Sun,  9 Jun 2024 18:06:20 +0300
+Message-ID: <ad69720e0ba720209cb04240fbc3c5ff059accbc.1717945321.git.pav@iki.fi>
+X-Mailer: git-send-email 2.45.2
+In-Reply-To: <CAGew7BttU+g40uRnSCN5XmbXs1KX1ZBbz+xyXC_nw5p4dR2dGA@mail.gmail.com>
+References: <CAGew7BttU+g40uRnSCN5XmbXs1KX1ZBbz+xyXC_nw5p4dR2dGA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-Hi,
+The amp_id argument of l2cap_connect() was removed in
+commit 84a4bb6548a2 ("Bluetooth: HCI: Remove HCI_AMP support")
 
-su, 2024-06-09 kello 14:49 +0200, Timo Schr=C3=B6der kirjoitti:
-> Hi Pauli,
->=20
-> unfortunately it doesn't fix the issue. I'm still experiencing the
-> same behaviour. I attached btmon traces and bluetoothd log.
+It was always called with amp_id == 0, i.e. AMP_ID_BREDR == 0x00 (ie.
+non-AMP controller).  In the above commit, the code path for amp_id != 0
+was preserved, although it should have used the amp_id == 0 one.
 
-Right, sorry, I see now the patch is wrong and did it for the wrong if
-branch... I'll send a v2.
+Restore the previous behavior of the non-AMP code path, to fix problems
+with L2CAP connections.
 
-	Pauli
+Fixes: 84a4bb6548a2 ("Bluetooth: HCI: Remove HCI_AMP support")
+Signed-off-by: Pauli Virtanen <pav@iki.fi>
+---
 
->=20
-> Best regards,
-> Timo
->=20
-> Am So., 9. Juni 2024 um 00:02 Uhr schrieb Pauli Virtanen <pav@iki.fi>:
-> >=20
-> > The amp_id argument of l2cap_connect() was removed in
-> > commit 84a4bb6548a2 ("Bluetooth: HCI: Remove HCI_AMP support")
-> >=20
-> > It was always called with amp_id =3D=3D 0, i.e. AMP_ID_BREDR =3D=3D 0x0=
-0 (ie.
-> > non-AMP controller).  In the above commit, the code path for amp_id !=
-=3D 0
-> > was preserved, although it should have used the amp_id =3D=3D 0 one.
-> >=20
-> > Restore the previous behavior of the non-AMP code path, to fix problems
-> > with L2CAP connections.
-> >=20
-> > Fixes: 84a4bb6548a2 ("Bluetooth: HCI: Remove HCI_AMP support")
-> > Signed-off-by: Pauli Virtanen <pav@iki.fi>
-> > ---
-> >=20
-> > Notes:
-> >     Tried proofreading the commit, and this part seemed suspicious.
-> >     Can you try if this fixes the problem?
-> >=20
-> >  net/bluetooth/l2cap_core.c | 4 ++--
-> >  1 file changed, 2 insertions(+), 2 deletions(-)
-> >=20
-> > diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-> > index c49e0d4b3c0d..fc633feb12a1 100644
-> > --- a/net/bluetooth/l2cap_core.c
-> > +++ b/net/bluetooth/l2cap_core.c
-> > @@ -4016,8 +4016,8 @@ static void l2cap_connect(struct l2cap_conn *conn=
-, struct l2cap_cmd_hdr *cmd,
-> >                                 status =3D L2CAP_CS_NO_INFO;
-> >                         }
-> >                 } else {
-> > -                       l2cap_state_change(chan, BT_CONNECT2);
-> > -                       result =3D L2CAP_CR_PEND;
-> > +                       l2cap_state_change(chan, BT_CONFIG);
-> > +                       result =3D L2CAP_CR_SUCCESS;
-> >                         status =3D L2CAP_CS_AUTHEN_PEND;
-> >                 }
-> >         } else {
-> > --
-> > 2.45.2
-> >=20
+Notes:
+    v2: do the change in the actually right if branch
+    
+    Tried proofreading the commit, and this part seemed suspicious.
+    Can you try if this fixes the problem?
+
+ net/bluetooth/l2cap_core.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index c49e0d4b3c0d..aed025734d04 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -4011,8 +4011,8 @@ static void l2cap_connect(struct l2cap_conn *conn, struct l2cap_cmd_hdr *cmd,
+ 				status = L2CAP_CS_AUTHOR_PEND;
+ 				chan->ops->defer(chan);
+ 			} else {
+-				l2cap_state_change(chan, BT_CONNECT2);
+-				result = L2CAP_CR_PEND;
++				l2cap_state_change(chan, BT_CONFIG);
++				result = L2CAP_CR_SUCCESS;
+ 				status = L2CAP_CS_NO_INFO;
+ 			}
+ 		} else {
+-- 
+2.45.2
 
