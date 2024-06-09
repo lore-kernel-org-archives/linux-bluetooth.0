@@ -1,141 +1,121 @@
-Received: from mail-qk1-f170.google.com (mail-qk1-f170.google.com [209.85.222.170])
+Received: from mail-qk1-f172.google.com (mail-qk1-f172.google.com [209.85.222.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F27FF210E4
-	for <linux-bluetooth@vger.kernel.org>; Sun,  9 Jun 2024 15:32:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 112342230F;
+	Sun,  9 Jun 2024 16:30:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717947128; cv=none; b=EnTOCRA1P6Ew2Y8GN3SYpaIyHtErz3lrtUqXdc4RdNxiNUDPdphpnJiO5azChxd2kklpUlOsoLa1441/2hWnN8xygJzomy4TcvE9SO9dpuD6Z8Upjsa7N2hpQQYcDR4vpZjva6ZCRyceo/wx34YZ1uEWJ6UAHM/05c+SOmvj/zk=
+	t=1717950608; cv=none; b=FxobSX/nIcJlYNLE53d3KYyoZT8MIoRL4fZ8OPeUgTk16ptbGY7NQgJHkug5iCHdxFq2gs/XzhKG9wr6tsS1+9ogpItBxAm62iXEuVJCfODZHqQJvYEr9JYMas1U2B92lwZg5/+esF3etuf706vSKTqP44m7EsVeH7RPyB3TMpQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717947128; c=relaxed/simple;
-	bh=6A0zIQi74U9lbuO/ZXSOGSvVTRlJrc4Kj9KbcG80m7s=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=ktqR0HSv5/G0E2YcjQ5N7/a2Vd51dUKYxZ+QGZ+e3q1KQkNvhmS5Fza+h94via1FsPxbsYyFcxEOdf6TVbvnx+9efAKvXsr5JCUJDkkg+tAMYYuSvu4/Xfyj2rv1vVoTYLDggp0m2vs1lD1jf0ImYbPuHiD6YhCnZ4AAqt5MFe4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MERaOhVg; arc=none smtp.client-ip=209.85.222.170
+	s=arc-20240116; t=1717950608; c=relaxed/simple;
+	bh=N66cO1s+WqUulUht0vyqX3t/6zdqQj9W39CF0jOCJkk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=MtsAhcR8qAYqxmWyzeyWH3HvBiJaP1VOni5rFxVD0kjTXZo8lENM6Oo4UfNhNFEGstKqUmHV+nldhZay0t6nCeJ2Sk6440lFN5BABXSUzcpar+g6efo8UOm1R4ftHK2NHuCsRfTvcXj/Udl/nOvqL71iP2fP/XpyQMC5Nc0uG70=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WI3XBIbW; arc=none smtp.client-ip=209.85.222.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MERaOhVg"
-Received: by mail-qk1-f170.google.com with SMTP id af79cd13be357-795dc9e0d15so11494985a.1
-        for <linux-bluetooth@vger.kernel.org>; Sun, 09 Jun 2024 08:32:06 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WI3XBIbW"
+Received: by mail-qk1-f172.google.com with SMTP id af79cd13be357-7955186e796so4560985a.3;
+        Sun, 09 Jun 2024 09:30:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1717947126; x=1718551926; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=uAIDGT3v3AN69P4WOQ9CX8XkgQkKUWgm1smjm+Gs8Is=;
-        b=MERaOhVg09/JNiN/r6l+eyLumXf9KllBSAGLjeOssxukubVk4YOnLyTQ8K0gCaH2iy
-         L9iemv6HedrLDIcbYlpQQHikhj4IxoZTnnZMml6/37aao4EC0EG7dDukDe2CLQ1ubZuD
-         wkuJ2/M+a0pQrfhX/bICeBA3fpHT2TPtLuOK21AjjNldO6GlCXY3XDPHayaAKunA2pmL
-         dFNK7ZPFK3J3bWO2dHQhkC7onam3GkEGqrnCUR1DKR1I7Y0tkGTRBs2BeEpEunBwMeNW
-         2N5wX4aZFc2KP2cRm4FgzZ7FPHKbP6CEHRX/uVGWebn4wpG0zL8FnGqZf+7E288m8Pa1
-         JyNg==
+        d=gmail.com; s=20230601; t=1717950606; x=1718555406; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=TF7YavKalGLEiJlQ7xFhH0uBmMREnW8y1VUFULiv4I4=;
+        b=WI3XBIbWjCrt/32V+V3v8qUpntDJRT2J9jVmVuNiScLm9BWdcv83gVXLTlGcdjcwbp
+         jTEH7UNOdUw/JBdfmCvjelKrvfFuIIfn4OUeqbsWyZ9/B6xZ3lyNAUPAvZGxyh++nmEH
+         shyO8SXJWfOeu9NVLR49ba2lWcm5K4ttX98+IOfOmZDtMQyMFBgLvnWZu7IcrTuHzaI9
+         urVu/8q+47bVUBzuahCZ1LK69ogEvFE1HWwLXd40W1jzZLSkGqgO9Xz/innH4a9beMWr
+         VYc8mKfThyQBZX9Tg9WLYQrQJ0DKLLX5hoDySCYWPKY/7/SH0qOAcdwyG5yqrzptXY6A
+         mi5w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717947126; x=1718551926;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20230601; t=1717950606; x=1718555406;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=uAIDGT3v3AN69P4WOQ9CX8XkgQkKUWgm1smjm+Gs8Is=;
-        b=l/pquoyriWA2JTlt2+ahYX0+iDzp201ubRxMHBs2B3nWtNRnkRlWUUtyuQM+cXAdqx
-         J+Z80V2f/047wSsVpIQn5MNi2kNgbNSHvcFlLwrIBwCwTnrlMrA+6Lg2T2DPvm/Qx0DG
-         Xs6Vm/gq21b3BbyX14E85w0XO3umkIp2+sK9Ac34sNlzYS6RQwvm02HqZxhwmSQ5x/+e
-         QU8bipfxm81hWMKkodvuXvDUDff01HHXNwpkIjTPqazb9rL0KZdZhVClz2mzjeADE4Ob
-         5jrBEUf7pEEAQ1iKHJXY57ZU9T13vR0IghxhP5edKg9aV9w6gZA1892y67T8ULDI4rog
-         a+Mg==
-X-Gm-Message-State: AOJu0YwS3f1nGbLcut2nKvKc3NxCQwx9hq2q2WrPyYNyIqYIXv4AJ+KQ
-	YEqn9L6KRscgWE1hqIW+8GQCuoPwW6ScQFYZH/T7M7tsG9e5fAaYl3YZSg==
-X-Google-Smtp-Source: AGHT+IFnG8dV5ZAl0MiC+eKtRRVU9JsuVp7fl8er60Tt+w6JgXEbH7ekCz71stTN2vgCLWElhwrnlg==
-X-Received: by 2002:a05:620a:4710:b0:795:4711:21d9 with SMTP id af79cd13be357-79547112354mr694669385a.41.1717947125606;
-        Sun, 09 Jun 2024 08:32:05 -0700 (PDT)
-Received: from [172.17.0.2] ([172.190.111.253])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7954e1be2a3sm193726985a.38.2024.06.09.08.32.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 09 Jun 2024 08:32:05 -0700 (PDT)
-Message-ID: <6665caf5.050a0220.eefa4.6b4f@mx.google.com>
-Date: Sun, 09 Jun 2024 08:32:05 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============3098542558909889412=="
+        bh=TF7YavKalGLEiJlQ7xFhH0uBmMREnW8y1VUFULiv4I4=;
+        b=QZ3ZYpRqD8PqJzTZhYIlj8XiSvvpQt0ytcGDc/m193MTjR/Kzor2Gf922hEFw1Q1PO
+         9XzD6xu+7ToHwcvnjQA00MujadNnEM89aGk18ow8UBRWt1Mq9enD2KaIiKIvA/a+7DHh
+         v/beeegIqxWhSytlHGMgo72q7nR++nFujsaBa4Z17m+wlUYGtybAwxFdS5a7UxlmQrzX
+         RMKDRAU3X+3bjmbH/pTnV/G9n7xQTbqAqlIk5vtYBvHtLWvqkUQARl+IBdL9xlCUBEh8
+         Eh18mBgYHagvG/PdOFLcsZdNC1W59/iS1ybvbu2pX/eaM12rMI0e6LzcGuJOCwb+b/A8
+         /S8Q==
+X-Forwarded-Encrypted: i=1; AJvYcCVv554tiTSndz2gQVZLtjVISuC5yIHx8D+wDPlexyLQpQIiOrGhtFVdbcHXhSjD/yuyf41xIVATrXsm7EA+hkK10gAK420T
+X-Gm-Message-State: AOJu0YxCdxb2MAI+PjrTeRtn6gGKHXPoGW4Df9mMziQ9Q8F/Kz1sYTh3
+	DxHCw9TCgHtV59JMXG6JOay3KKjJ/9sVr8tMA9c3PmUqVGDfJpUkzbyu7bYMVlC44jabKuQWGzA
+	fnwTu1BGm2u2meuDanVQdn1ButVo=
+X-Google-Smtp-Source: AGHT+IG6BkY7CqMlCxmzceKgSHInDK6S4FTmtCyPQmGZpUdtneJNd79jnGzDxCtGBlO4b+mR8u2gnc0L/XA3QT45UJk=
+X-Received: by 2002:a05:620a:2681:b0:793:325:d05d with SMTP id
+ af79cd13be357-7953c182583mr810402785a.0.1717950605734; Sun, 09 Jun 2024
+ 09:30:05 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, pav@iki.fi
-Subject: RE: [v2] Bluetooth: fix connection setup in l2cap_connect
+References: <CAGew7BttU+g40uRnSCN5XmbXs1KX1ZBbz+xyXC_nw5p4dR2dGA@mail.gmail.com>
+ <ad69720e0ba720209cb04240fbc3c5ff059accbc.1717945321.git.pav@iki.fi>
 In-Reply-To: <ad69720e0ba720209cb04240fbc3c5ff059accbc.1717945321.git.pav@iki.fi>
-References: <ad69720e0ba720209cb04240fbc3c5ff059accbc.1717945321.git.pav@iki.fi>
-Reply-To: linux-bluetooth@vger.kernel.org
+From: =?UTF-8?Q?Timo_Schr=C3=B6der?= <der.timosch@gmail.com>
+Date: Sun, 9 Jun 2024 18:29:54 +0200
+Message-ID: <CAGew7BvnxmmeoZqzETgCrSsVKU96tV+pe1DKn5r+QEsXguc1kw@mail.gmail.com>
+Subject: Re: [PATCH v2] Bluetooth: fix connection setup in l2cap_connect
+To: Pauli Virtanen <pav@iki.fi>
+Cc: linux-bluetooth@vger.kernel.org, luiz.von.dentz@intel.com, 
+	regressions@leemhuis.info, stable@vger.kernel.org, 
+	regressions@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
 
---===============3098542558909889412==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi Pauli,
 
-This is automated email and please do not reply to this email!
+well done! This patch fixes the issue. Thank you.
 
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=860256
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      0.79 seconds
-GitLint                       FAIL      0.54 seconds
-SubjectPrefix                 PASS      0.13 seconds
-BuildKernel                   PASS      30.75 seconds
-CheckAllWarning               PASS      33.22 seconds
-CheckSparse                   PASS      39.03 seconds
-CheckSmatch                   FAIL      35.74 seconds
-BuildKernel32                 PASS      28.69 seconds
-TestRunnerSetup               PASS      520.59 seconds
-TestRunner_l2cap-tester       PASS      20.24 seconds
-TestRunner_iso-tester         PASS      32.85 seconds
-TestRunner_bnep-tester        PASS      4.74 seconds
-TestRunner_mgmt-tester        PASS      112.00 seconds
-TestRunner_rfcomm-tester      PASS      7.42 seconds
-TestRunner_sco-tester         PASS      14.92 seconds
-TestRunner_ioctl-tester       PASS      7.73 seconds
-TestRunner_mesh-tester        PASS      5.82 seconds
-TestRunner_smp-tester         PASS      6.79 seconds
-TestRunner_userchan-tester    PASS      4.90 seconds
-IncrementalBuild              PASS      27.56 seconds
-
-Details
-##############################
-Test: GitLint - FAIL
-Desc: Run gitlint
-Output:
-[v2] Bluetooth: fix connection setup in l2cap_connect
-
-WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
-18: B2 Line has trailing whitespace: "    "
-##############################
-Test: CheckSmatch - FAIL
-Desc: Run smatch tool with source
-Output:
-
-Segmentation fault (core dumped)
-make[4]: *** [scripts/Makefile.build:244: net/bluetooth/hci_core.o] Error 139
-make[4]: *** Deleting file 'net/bluetooth/hci_core.o'
-make[3]: *** [scripts/Makefile.build:485: net/bluetooth] Error 2
-make[2]: *** [scripts/Makefile.build:485: net] Error 2
-make[2]: *** Waiting for unfinished jobs....
-Segmentation fault (core dumped)
-make[4]: *** [scripts/Makefile.build:244: drivers/bluetooth/bcm203x.o] Error 139
-make[4]: *** Deleting file 'drivers/bluetooth/bcm203x.o'
-make[4]: *** Waiting for unfinished jobs....
-make[3]: *** [scripts/Makefile.build:485: drivers/bluetooth] Error 2
-make[2]: *** [scripts/Makefile.build:485: drivers] Error 2
-make[1]: *** [/github/workspace/src/src/Makefile:1919: .] Error 2
-make: *** [Makefile:240: __sub-make] Error 2
+Best regards,
+Timo
 
 
----
-Regards,
-Linux Bluetooth
-
-
---===============3098542558909889412==--
+Am So., 9. Juni 2024 um 17:06 Uhr schrieb Pauli Virtanen <pav@iki.fi>:
+>
+> The amp_id argument of l2cap_connect() was removed in
+> commit 84a4bb6548a2 ("Bluetooth: HCI: Remove HCI_AMP support")
+>
+> It was always called with amp_id == 0, i.e. AMP_ID_BREDR == 0x00 (ie.
+> non-AMP controller).  In the above commit, the code path for amp_id != 0
+> was preserved, although it should have used the amp_id == 0 one.
+>
+> Restore the previous behavior of the non-AMP code path, to fix problems
+> with L2CAP connections.
+>
+> Fixes: 84a4bb6548a2 ("Bluetooth: HCI: Remove HCI_AMP support")
+> Signed-off-by: Pauli Virtanen <pav@iki.fi>
+> ---
+>
+> Notes:
+>     v2: do the change in the actually right if branch
+>
+>     Tried proofreading the commit, and this part seemed suspicious.
+>     Can you try if this fixes the problem?
+>
+>  net/bluetooth/l2cap_core.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+>
+> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+> index c49e0d4b3c0d..aed025734d04 100644
+> --- a/net/bluetooth/l2cap_core.c
+> +++ b/net/bluetooth/l2cap_core.c
+> @@ -4011,8 +4011,8 @@ static void l2cap_connect(struct l2cap_conn *conn, struct l2cap_cmd_hdr *cmd,
+>                                 status = L2CAP_CS_AUTHOR_PEND;
+>                                 chan->ops->defer(chan);
+>                         } else {
+> -                               l2cap_state_change(chan, BT_CONNECT2);
+> -                               result = L2CAP_CR_PEND;
+> +                               l2cap_state_change(chan, BT_CONFIG);
+> +                               result = L2CAP_CR_SUCCESS;
+>                                 status = L2CAP_CS_NO_INFO;
+>                         }
+>                 } else {
+> --
+> 2.45.2
+>
