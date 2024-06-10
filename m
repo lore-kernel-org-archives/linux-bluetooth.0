@@ -1,1040 +1,233 @@
-Received: from mail-yw1-f180.google.com (mail-yw1-f180.google.com [209.85.128.180])
+Received: from mail-qk1-f180.google.com (mail-qk1-f180.google.com [209.85.222.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 187701509A5
-	for <linux-bluetooth@vger.kernel.org>; Mon, 10 Jun 2024 22:36:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A552746BA0
+	for <linux-bluetooth@vger.kernel.org>; Mon, 10 Jun 2024 22:53:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718058975; cv=none; b=Wd6U5N46eW2ETgr2ZMrtuEGnKv7bzZD6vQifuyv92Xizjp9+YEZtDk1dzqpwFRIBDloYXLUtmxy8WKd03/oqkYJiFfWO46Hl5WJUBKKYlLWMjsWPpZET0FhO6nn+EcEb+7CngecNMkb1aN1+M2TpXgrj9Yo8mY9SNSQV87tYPSs=
+	t=1718059997; cv=none; b=KfSyChQCBYed2Mogmb0JqQahhNsP4fxEDOgxbLbbjYnZJgJiipNhJ4Y0dpgHKiwlPCwDNTS0gHee1UFBUh1mR3Ek4pE21a+kr1DGrqN8aJXLb+bCVBVtHk5bKOME4OuEnh79BqOiQaD/o20BTo4RsnpJQ2/CCRq8nQbq6gxWvrQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718058975; c=relaxed/simple;
-	bh=QuMrTDnBnYoru9RgjjLGoOXPZcj2+6cHE0YCjC//44I=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=UAVFDZDiczyp65CNImvHySS3eS/2XHo9HEPdLeluw8+duKhQ40g40L6tvpV9ELKTOIsVmBjqZ9eec+Ja5D3gcPrx7G02mOhimwUjRBA5+ONlxmJ2cdxOtdulJ6H5Hq5MPWfIlmVex2B+gTk7XNYk/l5uX97pV97xqpRx7NkwnuA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=asymptotic.io; spf=pass smtp.mailfrom=asymptotic.io; dkim=pass (2048-bit key) header.d=asymptotic.io header.i=@asymptotic.io header.b=XDP1lvVe; arc=none smtp.client-ip=209.85.128.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=asymptotic.io
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=asymptotic.io
+	s=arc-20240116; t=1718059997; c=relaxed/simple;
+	bh=u6aMGVgtVarEWOp/fpCKKB6z6kJkcYov8hZbvdkh77M=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=QT1mjCB8DookhNGiwingkgQcVv33MnGzHs4oJZCyu80VeOQCmPJFvoAed2WdOdU8kEMpbQuuw2wiJfI6+/1dpIrg2DEnNEDnlO0xWdKUbq+tCoNnIxGlwwewRN/nnwwjw3rYcWyvwLJ9644ipB12evlx5H81YjOklYCQ75BUAPk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lg5d9WKg; arc=none smtp.client-ip=209.85.222.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=asymptotic.io header.i=@asymptotic.io header.b="XDP1lvVe"
-Received: by mail-yw1-f180.google.com with SMTP id 00721157ae682-62a2a6a5ccfso6135407b3.3
-        for <linux-bluetooth@vger.kernel.org>; Mon, 10 Jun 2024 15:36:12 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lg5d9WKg"
+Received: by mail-qk1-f180.google.com with SMTP id af79cd13be357-7955ddc6516so126121385a.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 10 Jun 2024 15:53:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=asymptotic.io; s=google; t=1718058971; x=1718663771; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ITIKDbzW/4wq+RqRcHAE3OjjzLRleV+jOvXcRNP9CXY=;
-        b=XDP1lvVeaPy+SqoQDbtWqka1rw3MyzdQvcOhBoxDezUrQ0EpDrRKksIzn62NF7Dwcs
-         dzuhEQr2SI6XlpSZS5U3IfvnfjM/+nlV0FC43sTGAVgIE/fO4U58cYJnKT2r19btYeSM
-         W3b2F3A0LnWUPh4vfREFZD24ahPflibjV5Zfz+8WMNVlbpMhKwuP7Zi6SbI4KWPuAALg
-         MmTZ82gRVTHCmDebOQfVQLWrb5TxF3Bw+Dy3SxlqDFPzS34XZSh4AcDPB5Kd3IHQUXba
-         z7HI3mv5u+HQEn2yVg0S0D0qgtmuzRvch//AmgSOBFxhxJxVv038bpKruiuOgrMm4UDB
-         zpqA==
+        d=gmail.com; s=20230601; t=1718059994; x=1718664794; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=u6aMGVgtVarEWOp/fpCKKB6z6kJkcYov8hZbvdkh77M=;
+        b=lg5d9WKg4bTdTxZ/N+PfcUhtaEQAK8ek9tm8a5FoeFmqoe10Jadw9HHwUBYyjgLbeb
+         7cdjjFULmyYGY0almQVj21Ec7BRoK0q3ycfRv6IOhPoBwHVaj4exg5pDQsbUyg65N6xJ
+         B/07aDQqiRDXICbjbyF228nYr6pb7/bQoQRctEkHZpNM3fOQIa5dUf2OmB5j05Dd8J2m
+         tTE49jlqxmHIS+KgKWcMlf+vFrCGwm0zH3ufz42T81+GZV05GXYGh6IMGukxhxjUvP5h
+         GXdCu4TuvofS7Xdj0WFO4FWvCBj8dqaJYDTCXg5P1Vfcdk5go6IHggtGBs+6R9HvH6ig
+         HrJg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718058971; x=1718663771;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ITIKDbzW/4wq+RqRcHAE3OjjzLRleV+jOvXcRNP9CXY=;
-        b=g+Cvudpfu3IXCDUDxP3bXd9axgMByz0QfveguklSt70IwivsPe+Jyz6xzMAGEgn/QM
-         DQt6FhyriEpbc1LiaQmwNTQX+5INKNVYo0KeT/xlAhlFu+3jC3MHGcW7meQ+dzRPNBJK
-         2jvrDLC9opOeHdYeZkWUY53WH/KKLurVDaGVB33jdr5uJx1GG4uxOO1Z7fTgE6gWJdro
-         nl771aH7lC55Nh8GEsoOECfLElxRzkFsTSAjBVQKeAc97cwlSzrTr4fJYPp10ZUPI7uC
-         iKrCRbOpHuYFWKp9y323HASxvjGEmZo3WbsD+DP09qSSlm04Iny/vgmNk97uN5BxDGGV
-         3eRw==
-X-Gm-Message-State: AOJu0YzZB6QiTwIhZ2FRKp5eQKDEZe6+QeQ9E8rCrfVgQglq1ZIryU5u
-	SOsY8JczX1cCLbW0Rw3UYXW6S2KotDsBpeQ8c2g5QCkArac03KFgTxzligHv8vGpY5KYQhiInhc
-	P
-X-Google-Smtp-Source: AGHT+IFrc9xqsbsNa2Yxxcn5DT8JSnjqBrODfPBJzO2sHGflO8FedbImJTVbRE9V/82c8OZ2om2pMw==
-X-Received: by 2002:a0d:eb47:0:b0:627:a917:76b1 with SMTP id 00721157ae682-62cd5688263mr105885967b3.44.1718058970386;
-        Mon, 10 Jun 2024 15:36:10 -0700 (PDT)
-Received: from andromeda.lan (bras-base-toroon0359w-grc-41-70-27-101-40.dsl.bell.ca. [70.27.101.40])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-440711c3c53sm16283221cf.80.2024.06.10.15.36.09
+        d=1e100.net; s=20230601; t=1718059994; x=1718664794;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=u6aMGVgtVarEWOp/fpCKKB6z6kJkcYov8hZbvdkh77M=;
+        b=LW0lNUAaKrxavUUv5sxHn7oJR8nOiwHIW7ASHgKURf6VBafVKi4gOJlKtbfOv8cfiS
+         fjCWerCNhxxsUe7JO+SfCm2KSFqLrCs/v0z9uuaNNYhlPmbtjbhAaQUoxO3pUZFzF4X4
+         QA+h8AF6fj0h+EiuUgg4CBMYTOope/i7NvaNm2P60NyzSNZ6qm+3ZHp2DMsveImktOGr
+         fr0nHm4k4tYyiidDs8ypJN0ySqYl7daWVMOfWAS2CVYWym/6G/rncjWt6tzMSoV+/YLB
+         j3XE3hynDAKBYFK6Ix7N12w049DlJvrZeI83IlDxQ6NYm1NjPOSVncfFU166ycYRTOsG
+         v3BA==
+X-Gm-Message-State: AOJu0Yxh5UOaCZxSdieDo3PcE6KZnfiad7uLzZPG+YttdSS+YxO3Pl8R
+	fTV3ZWe4NjoMaJsG/UQjAshVNSnAb3ILa5Xw4WGovRfVOwzSHGvN1gwt4Q==
+X-Google-Smtp-Source: AGHT+IHL8uRxJj/pBVpUtPL+f/CUmbCdiFYrLOUDPzi/R5g3qDzOJbwnZRQwmR2ufy0pP5ldBx7Skw==
+X-Received: by 2002:a05:620a:2904:b0:795:5efe:e70 with SMTP id af79cd13be357-7955efe12e6mr680184385a.14.1718059993694;
+        Mon, 10 Jun 2024 15:53:13 -0700 (PDT)
+Received: from [172.17.0.2] ([172.183.162.113])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-79555162807sm255251885a.33.2024.06.10.15.53.13
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 10 Jun 2024 15:36:10 -0700 (PDT)
-From: Arun Raghavan <arun@asymptotic.io>
-To: linux-bluetooth@vger.kernel.org
-Cc: Arun Raghavan <arun@asymptotic.io>
-Subject: [PATCH BlueZ,v9 2/3] profiles/audio: Add an ASHA plugin
-Date: Mon, 10 Jun 2024 18:36:00 -0400
-Message-ID: <20240610223601.378127-3-arun@asymptotic.io>
-X-Mailer: git-send-email 2.45.2
-In-Reply-To: <20240610223601.378127-1-arun@asymptotic.io>
-References: <20240610223601.378127-1-arun@asymptotic.io>
+        Mon, 10 Jun 2024 15:53:13 -0700 (PDT)
+Message-ID: <666783d9.050a0220.c658b.9c82@mx.google.com>
+Date: Mon, 10 Jun 2024 15:53:13 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============6139508672429794343=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, arun@asymptotic.io
+Subject: RE: ASHA plugin
+In-Reply-To: <20240610223601.378127-2-arun@asymptotic.io>
+References: <20240610223601.378127-2-arun@asymptotic.io>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-This exposes the ASHA profile implementation in the previous commit as
-an audio profile.
+--===============6139508672429794343==
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
 
-The implementation registers a remote endpoint using a subset of the
-MediaEndpoint1 interface, without any mechanism for setting/selecting a
-configuration, as this is all static in the spec for now. Also exposed
-on connection is a MediaTransport1 object, which can be used to obtain
-an fd to stream to the device.
----
- Makefile.plugins           |   5 +
- configure.ac               |   4 +
- profiles/audio/asha.c      | 524 +++++++++++++++++++++++++++++++++++++
- profiles/audio/asha.h      |  38 +++
- profiles/audio/media.c     |  30 +++
- profiles/audio/media.h     |   2 +
- profiles/audio/transport.c | 201 +++++++++++++-
- 7 files changed, 802 insertions(+), 2 deletions(-)
- create mode 100644 profiles/audio/asha.c
- create mode 100644 profiles/audio/asha.h
+VGhpcyBpcyBhdXRvbWF0ZWQgZW1haWwgYW5kIHBsZWFzZSBkbyBub3QgcmVwbHkgdG8gdGhpcyBl
+bWFpbCEKCkRlYXIgc3VibWl0dGVyLAoKVGhhbmsgeW91IGZvciBzdWJtaXR0aW5nIHRoZSBwYXRj
+aGVzIHRvIHRoZSBsaW51eCBibHVldG9vdGggbWFpbGluZyBsaXN0LgpUaGlzIGlzIGEgQ0kgdGVz
+dCByZXN1bHRzIHdpdGggeW91ciBwYXRjaCBzZXJpZXM6ClBXIExpbms6aHR0cHM6Ly9wYXRjaHdv
+cmsua2VybmVsLm9yZy9wcm9qZWN0L2JsdWV0b290aC9saXN0Lz9zZXJpZXM9ODYwNTQ5CgotLS1U
+ZXN0IHJlc3VsdC0tLQoKVGVzdCBTdW1tYXJ5OgpDaGVja1BhdGNoICAgICAgICAgICAgICAgICAg
+ICBGQUlMICAgICAgMi40MyBzZWNvbmRzCkdpdExpbnQgICAgICAgICAgICAgICAgICAgICAgIFBB
+U1MgICAgICAwLjg2IHNlY29uZHMKQnVpbGRFbGwgICAgICAgICAgICAgICAgICAgICAgUEFTUyAg
+ICAgIDI0LjcxIHNlY29uZHMKQmx1ZXpNYWtlICAgICAgICAgICAgICAgICAgICAgRkFJTCAgICAg
+IDE5LjE1IHNlY29uZHMKTWFrZUNoZWNrICAgICAgICAgICAgICAgICAgICAgRkFJTCAgICAgIDM2
+Ljk2IHNlY29uZHMKTWFrZURpc3RjaGVjayAgICAgICAgICAgICAgICAgUEFTUyAgICAgIDE3OC41
+MiBzZWNvbmRzCkNoZWNrVmFsZ3JpbmQgICAgICAgICAgICAgICAgIEZBSUwgICAgICAxNi4yOCBz
+ZWNvbmRzCkNoZWNrU21hdGNoICAgICAgICAgICAgICAgICAgIEZBSUwgICAgICAyMy4zOCBzZWNv
+bmRzCmJsdWV6bWFrZWV4dGVsbCAgICAgICAgICAgICAgIEZBSUwgICAgICAxNC43MCBzZWNvbmRz
+CkluY3JlbWVudGFsQnVpbGQgICAgICAgICAgICAgIEZBSUwgICAgICAyMC4xNyBzZWNvbmRzClNj
+YW5CdWlsZCAgICAgICAgICAgICAgICAgICAgIEZBSUwgICAgICA1NDMuMDIgc2Vjb25kcwoKRGV0
+YWlscwojIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMKVGVzdDogQ2hlY2tQYXRjaCAtIEZB
+SUwKRGVzYzogUnVuIGNoZWNrcGF0Y2gucGwgc2NyaXB0Ck91dHB1dDoKW0JsdWVaLHY5LDIvM10g
+cHJvZmlsZXMvYXVkaW86IEFkZCBhbiBBU0hBIHBsdWdpbgpFUlJPUjpTUEFDSU5HOiBzcGFjZSBw
+cm9oaWJpdGVkIGJlZm9yZSB0aGF0IGNsb3NlIHBhcmVudGhlc2lzICcpJwojMjQzOiBGSUxFOiBw
+cm9maWxlcy9hdWRpby9hc2hhLmM6OTU6CisJCQkJQlRfSU9fT1BUX0lOVkFMSUQgKSkgewoKV0FS
+TklORzpMT05HX0xJTkU6IGxpbmUgbGVuZ3RoIG9mIDkyIGV4Y2VlZHMgODAgY29sdW1ucwojMjg0
+OiBGSUxFOiBwcm9maWxlcy9hdWRpby9hc2hhLmM6MTM2OgorCQkJCUJUX0lPX09QVF9ERVNUX0JE
+QUREUiwgZGV2aWNlX2dldF9hZGRyZXNzKGFzaGFfZGV2LT5kZXZpY2UpLAoKL2dpdGh1Yi93b3Jr
+c3BhY2Uvc3JjL3NyYy8xMzY5MjQ4OS5wYXRjaCB0b3RhbDogMSBlcnJvcnMsIDEgd2FybmluZ3Ms
+IDg5NyBsaW5lcyBjaGVja2VkCgpOT1RFOiBGb3Igc29tZSBvZiB0aGUgcmVwb3J0ZWQgZGVmZWN0
+cywgY2hlY2twYXRjaCBtYXkgYmUgYWJsZSB0bwogICAgICBtZWNoYW5pY2FsbHkgY29udmVydCB0
+byB0aGUgdHlwaWNhbCBzdHlsZSB1c2luZyAtLWZpeCBvciAtLWZpeC1pbnBsYWNlLgoKL2dpdGh1
+Yi93b3Jrc3BhY2Uvc3JjL3NyYy8xMzY5MjQ4OS5wYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBs
+ZWFzZSByZXZpZXcuCgpOT1RFOiBJZ25vcmVkIG1lc3NhZ2UgdHlwZXM6IENPTU1JVF9NRVNTQUdF
+IENPTVBMRVhfTUFDUk8gQ09OU1RfU1RSVUNUIEZJTEVfUEFUSF9DSEFOR0VTIE1JU1NJTkdfU0lH
+Tl9PRkYgUFJFRkVSX1BBQ0tFRCBTUERYX0xJQ0VOU0VfVEFHIFNQTElUX1NUUklORyBTU0NBTkZf
+VE9fS1NUUlRPCgpOT1RFOiBJZiBhbnkgb2YgdGhlIGVycm9ycyBhcmUgZmFsc2UgcG9zaXRpdmVz
+LCBwbGVhc2UgcmVwb3J0CiAgICAgIHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZSBDSEVDS1BB
+VENIIGluIE1BSU5UQUlORVJTLgoKCltCbHVlWix2OSwzLzNdIHRlc3Q6IEFkZCBhIHNjcmlwdCB0
+byB0ZXN0IEFTSEEKRVJST1I6RVhFQ1VURV9QRVJNSVNTSU9OUzogZG8gbm90IHNldCBleGVjdXRl
+IHBlcm1pc3Npb25zIGZvciBzb3VyY2UgZmlsZXMKIzEwNDogRklMRTogdGVzdC9zaW1wbGUtYXNo
+YQoKL2dpdGh1Yi93b3Jrc3BhY2Uvc3JjL3NyYy8xMzY5MjQ4OC5wYXRjaCB0b3RhbDogMSBlcnJv
+cnMsIDAgd2FybmluZ3MsIDE2NiBsaW5lcyBjaGVja2VkCgpOT1RFOiBGb3Igc29tZSBvZiB0aGUg
+cmVwb3J0ZWQgZGVmZWN0cywgY2hlY2twYXRjaCBtYXkgYmUgYWJsZSB0bwogICAgICBtZWNoYW5p
+Y2FsbHkgY29udmVydCB0byB0aGUgdHlwaWNhbCBzdHlsZSB1c2luZyAtLWZpeCBvciAtLWZpeC1p
+bnBsYWNlLgoKL2dpdGh1Yi93b3Jrc3BhY2Uvc3JjL3NyYy8xMzY5MjQ4OC5wYXRjaCBoYXMgc3R5
+bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuCgpOT1RFOiBJZ25vcmVkIG1lc3NhZ2UgdHlwZXM6
+IENPTU1JVF9NRVNTQUdFIENPTVBMRVhfTUFDUk8gQ09OU1RfU1RSVUNUIEZJTEVfUEFUSF9DSEFO
+R0VTIE1JU1NJTkdfU0lHTl9PRkYgUFJFRkVSX1BBQ0tFRCBTUERYX0xJQ0VOU0VfVEFHIFNQTElU
+X1NUUklORyBTU0NBTkZfVE9fS1NUUlRPCgpOT1RFOiBJZiBhbnkgb2YgdGhlIGVycm9ycyBhcmUg
+ZmFsc2UgcG9zaXRpdmVzLCBwbGVhc2UgcmVwb3J0CiAgICAgIHRoZW0gdG8gdGhlIG1haW50YWlu
+ZXIsIHNlZSBDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKCiMjIyMjIyMjIyMjIyMjIyMjIyMj
+IyMjIyMjIyMjIwpUZXN0OiBCbHVlek1ha2UgLSBGQUlMCkRlc2M6IEJ1aWxkIEJsdWVaCk91dHB1
+dDoKCnNyYy9zaGFyZWQvYXNoYS5jOiBJbiBmdW5jdGlvbiDigJhidF9hc2hhX3N0b3DigJk6CnNy
+Yy9zaGFyZWQvYXNoYS5jOjE0Njo2OiBlcnJvcjogdW51c2VkIHZhcmlhYmxlIOKAmHJldOKAmSBb
+LVdlcnJvcj11bnVzZWQtdmFyaWFibGVdCiAgMTQ2IHwgIGludCByZXQ7CiAgICAgIHwgICAgICBe
+fn4KY2MxOiBhbGwgd2FybmluZ3MgYmVpbmcgdHJlYXRlZCBhcyBlcnJvcnMKbWFrZVsxXTogKioq
+IFtNYWtlZmlsZTo4NjczOiBzcmMvc2hhcmVkL2xpYnNoYXJlZF9tYWlubG9vcF9sYS1hc2hhLmxv
+XSBFcnJvciAxCm1ha2VbMV06ICoqKiBXYWl0aW5nIGZvciB1bmZpbmlzaGVkIGpvYnMuLi4uCm1h
+a2U6ICoqKiBbTWFrZWZpbGU6NDY2NjogYWxsXSBFcnJvciAyCiMjIyMjIyMjIyMjIyMjIyMjIyMj
+IyMjIyMjIyMjIwpUZXN0OiBNYWtlQ2hlY2sgLSBGQUlMCkRlc2M6IFJ1biBCbHVleiBNYWtlIENo
+ZWNrCk91dHB1dDoKCnNyYy9zaGFyZWQvYXNoYS5jOiBJbiBmdW5jdGlvbiDigJhidF9hc2hhX3N0
+b3DigJk6CnNyYy9zaGFyZWQvYXNoYS5jOjE0Njo2OiBlcnJvcjogdW51c2VkIHZhcmlhYmxlIOKA
+mHJldOKAmSBbLVdlcnJvcj11bnVzZWQtdmFyaWFibGVdCiAgMTQ2IHwgIGludCByZXQ7CiAgICAg
+IHwgICAgICBefn4KY2MxOiBhbGwgd2FybmluZ3MgYmVpbmcgdHJlYXRlZCBhcyBlcnJvcnMKbWFr
+ZVsxXTogKioqIFtNYWtlZmlsZTo4NDI4OiBzcmMvc2hhcmVkL2xpYnNoYXJlZF9nbGliX2xhLWFz
+aGEubG9dIEVycm9yIDEKbWFrZTogKioqIFtNYWtlZmlsZToxMjI5MjogY2hlY2tdIEVycm9yIDIK
+IyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjClRlc3Q6IENoZWNrVmFsZ3JpbmQgLSBGQUlM
+CkRlc2M6IFJ1biBCbHVleiBNYWtlIENoZWNrIHdpdGggVmFsZ3JpbmQKT3V0cHV0OgoKc3JjL3No
+YXJlZC9hc2hhLmM6IEluIGZ1bmN0aW9uIOKAmGJ0X2FzaGFfc3RvcOKAmToKc3JjL3NoYXJlZC9h
+c2hhLmM6MTQ2OjY6IGVycm9yOiB1bnVzZWQgdmFyaWFibGUg4oCYcmV04oCZIFstV2Vycm9yPXVu
+dXNlZC12YXJpYWJsZV0KICAxNDYgfCAgaW50IHJldDsKICAgICAgfCAgICAgIF5+fgpjYzE6IGFs
+bCB3YXJuaW5ncyBiZWluZyB0cmVhdGVkIGFzIGVycm9ycwptYWtlWzFdOiAqKiogW01ha2VmaWxl
+Ojg2NzM6IHNyYy9zaGFyZWQvbGlic2hhcmVkX21haW5sb29wX2xhLWFzaGEubG9dIEVycm9yIDEK
+bWFrZVsxXTogKioqIFdhaXRpbmcgZm9yIHVuZmluaXNoZWQgam9icy4uLi4KbWFrZTogKioqIFtN
+YWtlZmlsZToxMjI5MjogY2hlY2tdIEVycm9yIDIKIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMj
+IyMjClRlc3Q6IENoZWNrU21hdGNoIC0gRkFJTApEZXNjOiBSdW4gc21hdGNoIHRvb2wgd2l0aCBz
+b3VyY2UKT3V0cHV0OgoKc3JjL3NoYXJlZC9jcnlwdG8uYzoyNzE6MjE6IHdhcm5pbmc6IFZhcmlh
+YmxlIGxlbmd0aCBhcnJheSBpcyB1c2VkLgpzcmMvc2hhcmVkL2NyeXB0by5jOjI3MjoyMzogd2Fy
+bmluZzogVmFyaWFibGUgbGVuZ3RoIGFycmF5IGlzIHVzZWQuCnNyYy9zaGFyZWQvZ2F0dC1oZWxw
+ZXJzLmM6NzY4OjMxOiB3YXJuaW5nOiBWYXJpYWJsZSBsZW5ndGggYXJyYXkgaXMgdXNlZC4Kc3Jj
+L3NoYXJlZC9nYXR0LWhlbHBlcnMuYzo4MzA6MzE6IHdhcm5pbmc6IFZhcmlhYmxlIGxlbmd0aCBh
+cnJheSBpcyB1c2VkLgpzcmMvc2hhcmVkL2dhdHQtaGVscGVycy5jOjEzMjM6MzE6IHdhcm5pbmc6
+IFZhcmlhYmxlIGxlbmd0aCBhcnJheSBpcyB1c2VkLgpzcmMvc2hhcmVkL2dhdHQtaGVscGVycy5j
+OjEzNTQ6MjM6IHdhcm5pbmc6IFZhcmlhYmxlIGxlbmd0aCBhcnJheSBpcyB1c2VkLgpzcmMvc2hh
+cmVkL2dhdHQtc2VydmVyLmM6Mjc4OjI1OiB3YXJuaW5nOiBWYXJpYWJsZSBsZW5ndGggYXJyYXkg
+aXMgdXNlZC4Kc3JjL3NoYXJlZC9nYXR0LXNlcnZlci5jOjYyMToyNTogd2FybmluZzogVmFyaWFi
+bGUgbGVuZ3RoIGFycmF5IGlzIHVzZWQuCnNyYy9zaGFyZWQvZ2F0dC1zZXJ2ZXIuYzo3MjA6MjU6
+IHdhcm5pbmc6IFZhcmlhYmxlIGxlbmd0aCBhcnJheSBpcyB1c2VkLgpzcmMvc2hhcmVkL2JhcC5j
+OjI4NjoyNTogd2FybmluZzogYXJyYXkgb2YgZmxleGlibGUgc3RydWN0dXJlcwpzcmMvc2hhcmVk
+L2JhcC5jOiBub3RlOiBpbiBpbmNsdWRlZCBmaWxlOgouL3NyYy9zaGFyZWQvYXNjcy5oOjg4OjI1
+OiB3YXJuaW5nOiBhcnJheSBvZiBmbGV4aWJsZSBzdHJ1Y3R1cmVzCnNyYy9zaGFyZWQvYXNoYS5j
+OiBJbiBmdW5jdGlvbiDigJhidF9hc2hhX3N0b3DigJk6CnNyYy9zaGFyZWQvYXNoYS5jOjE0Njo2
+OiBlcnJvcjogdW51c2VkIHZhcmlhYmxlIOKAmHJldOKAmSBbLVdlcnJvcj11bnVzZWQtdmFyaWFi
+bGVdCiAgMTQ2IHwgIGludCByZXQ7CiAgICAgIHwgICAgICBefn4KY2MxOiBhbGwgd2FybmluZ3Mg
+YmVpbmcgdHJlYXRlZCBhcyBlcnJvcnMKbWFrZVsxXTogKioqIFtNYWtlZmlsZTo4NjczOiBzcmMv
+c2hhcmVkL2xpYnNoYXJlZF9tYWlubG9vcF9sYS1hc2hhLmxvXSBFcnJvciAxCm1ha2VbMV06ICoq
+KiBXYWl0aW5nIGZvciB1bmZpbmlzaGVkIGpvYnMuLi4uCm1ha2U6ICoqKiBbTWFrZWZpbGU6NDY2
+NjogYWxsXSBFcnJvciAyCiMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIwpUZXN0OiBibHVl
+em1ha2VleHRlbGwgLSBGQUlMCkRlc2M6IEJ1aWxkIEJsdWV6IHdpdGggRXh0ZXJuYWwgRUxMCk91
+dHB1dDoKCnNyYy9zaGFyZWQvYXNoYS5jOiBJbiBmdW5jdGlvbiDigJhidF9hc2hhX3N0b3DigJk6
+CnNyYy9zaGFyZWQvYXNoYS5jOjE0Njo2OiBlcnJvcjogdW51c2VkIHZhcmlhYmxlIOKAmHJldOKA
+mSBbLVdlcnJvcj11bnVzZWQtdmFyaWFibGVdCiAgMTQ2IHwgIGludCByZXQ7CiAgICAgIHwgICAg
+ICBefn4KY2MxOiBhbGwgd2FybmluZ3MgYmVpbmcgdHJlYXRlZCBhcyBlcnJvcnMKbWFrZVsxXTog
+KioqIFtNYWtlZmlsZTo4NjczOiBzcmMvc2hhcmVkL2xpYnNoYXJlZF9tYWlubG9vcF9sYS1hc2hh
+LmxvXSBFcnJvciAxCm1ha2VbMV06ICoqKiBXYWl0aW5nIGZvciB1bmZpbmlzaGVkIGpvYnMuLi4u
+Cm1ha2U6ICoqKiBbTWFrZWZpbGU6NDY2NjogYWxsXSBFcnJvciAyCiMjIyMjIyMjIyMjIyMjIyMj
+IyMjIyMjIyMjIyMjIwpUZXN0OiBJbmNyZW1lbnRhbEJ1aWxkIC0gRkFJTApEZXNjOiBJbmNyZW1l
+bnRhbCBidWlsZCB3aXRoIHRoZSBwYXRjaGVzIGluIHRoZSBzZXJpZXMKT3V0cHV0OgpbQmx1ZVos
+djksMS8zXSBzcmMvc2hhcmVkOiBBZGQgaW5pdGlhbCBpbXBsZW1lbnRhdGlvbiBmb3IgYW4gQVNI
+QSBwcm9maWxlCgpzcmMvc2hhcmVkL2FzaGEuYzogSW4gZnVuY3Rpb24g4oCYYnRfYXNoYV9zdG9w
+4oCZOgpzcmMvc2hhcmVkL2FzaGEuYzoxNDY6NjogZXJyb3I6IHVudXNlZCB2YXJpYWJsZSDigJhy
+ZXTigJkgWy1XZXJyb3I9dW51c2VkLXZhcmlhYmxlXQogIDE0NiB8ICBpbnQgcmV0OwogICAgICB8
+ICAgICAgXn5+CmNjMTogYWxsIHdhcm5pbmdzIGJlaW5nIHRyZWF0ZWQgYXMgZXJyb3JzCm1ha2Vb
+MV06ICoqKiBbTWFrZWZpbGU6ODY2Mzogc3JjL3NoYXJlZC9saWJzaGFyZWRfbWFpbmxvb3BfbGEt
+YXNoYS5sb10gRXJyb3IgMQptYWtlWzFdOiAqKiogV2FpdGluZyBmb3IgdW5maW5pc2hlZCBqb2Jz
+Li4uLgptYWtlOiAqKiogW01ha2VmaWxlOjQ2NjA6IGFsbF0gRXJyb3IgMgojIyMjIyMjIyMjIyMj
+IyMjIyMjIyMjIyMjIyMjIyMKVGVzdDogU2NhbkJ1aWxkIC0gRkFJTApEZXNjOiBSdW4gU2NhbiBC
+dWlsZApPdXRwdXQ6CgpzcmMvc2hhcmVkL2dhdHQtY2xpZW50LmM6NDUxOjIxOiB3YXJuaW5nOiBV
+c2Ugb2YgbWVtb3J5IGFmdGVyIGl0IGlzIGZyZWVkCiAgICAgICAgZ2F0dF9kYl91bnJlZ2lzdGVy
+KG9wLT5jbGllbnQtPmRiLCBvcC0+ZGJfaWQpOwogICAgICAgICAgICAgICAgICAgICAgICAgICBe
+fn5+fn5+fn5+CnNyYy9zaGFyZWQvZ2F0dC1jbGllbnQuYzo2OTY6Mjogd2FybmluZzogVXNlIG9m
+IG1lbW9yeSBhZnRlciBpdCBpcyBmcmVlZAogICAgICAgIGRpc2NvdmVyeV9vcF9jb21wbGV0ZShv
+cCwgZmFsc2UsIGF0dF9lY29kZSk7CiAgICAgICAgXn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+
+fn5+fn5+fn5+fn5+fn5+fgpzcmMvc2hhcmVkL2dhdHQtY2xpZW50LmM6OTk2OjI6IHdhcm5pbmc6
+IFVzZSBvZiBtZW1vcnkgYWZ0ZXIgaXQgaXMgZnJlZWQKICAgICAgICBkaXNjb3Zlcnlfb3BfY29t
+cGxldGUob3AsIHN1Y2Nlc3MsIGF0dF9lY29kZSk7CiAgICAgICAgXn5+fn5+fn5+fn5+fn5+fn5+
+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+CnNyYy9zaGFyZWQvZ2F0dC1jbGllbnQuYzoxMTAy
+OjI6IHdhcm5pbmc6IFVzZSBvZiBtZW1vcnkgYWZ0ZXIgaXQgaXMgZnJlZWQKICAgICAgICBkaXNj
+b3Zlcnlfb3BfY29tcGxldGUob3AsIHN1Y2Nlc3MsIGF0dF9lY29kZSk7CiAgICAgICAgXn5+fn5+
+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+CnNyYy9zaGFyZWQvZ2F0dC1j
+bGllbnQuYzoxMjk0OjI6IHdhcm5pbmc6IFVzZSBvZiBtZW1vcnkgYWZ0ZXIgaXQgaXMgZnJlZWQK
+ICAgICAgICBkaXNjb3Zlcnlfb3BfY29tcGxldGUob3AsIHN1Y2Nlc3MsIGF0dF9lY29kZSk7CiAg
+ICAgICAgXn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+CnNyYy9z
+aGFyZWQvZ2F0dC1jbGllbnQuYzoxMzU5OjI6IHdhcm5pbmc6IFVzZSBvZiBtZW1vcnkgYWZ0ZXIg
+aXQgaXMgZnJlZWQKICAgICAgICBkaXNjb3Zlcnlfb3BfY29tcGxldGUob3AsIHN1Y2Nlc3MsIGF0
+dF9lY29kZSk7CiAgICAgICAgXn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+
+fn5+fn5+CnNyYy9zaGFyZWQvZ2F0dC1jbGllbnQuYzoxNjM0OjY6IHdhcm5pbmc6IFVzZSBvZiBt
+ZW1vcnkgYWZ0ZXIgaXQgaXMgZnJlZWQKICAgICAgICBpZiAocmVhZF9kYl9oYXNoKG9wKSkgewog
+ICAgICAgICAgICBefn5+fn5+fn5+fn5+fn5+CnNyYy9zaGFyZWQvZ2F0dC1jbGllbnQuYzoxNjM5
+OjI6IHdhcm5pbmc6IFVzZSBvZiBtZW1vcnkgYWZ0ZXIgaXQgaXMgZnJlZWQKICAgICAgICBkaXNj
+b3Zlcl9hbGwob3ApOwogICAgICAgIF5+fn5+fn5+fn5+fn5+fn4Kc3JjL3NoYXJlZC9nYXR0LWNs
+aWVudC5jOjIxNDM6Njogd2FybmluZzogVXNlIG9mIG1lbW9yeSBhZnRlciBpdCBpcyBmcmVlZAog
+ICAgICAgIGlmIChyZWFkX2RiX2hhc2gob3ApKSB7CiAgICAgICAgICAgIF5+fn5+fn5+fn5+fn5+
+fn4Kc3JjL3NoYXJlZC9nYXR0LWNsaWVudC5jOjIxNTE6ODogd2FybmluZzogVXNlIG9mIG1lbW9y
+eSBhZnRlciBpdCBpcyBmcmVlZAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgIGRpc2NvdmVyeV9vcF9yZWYob3ApLAogICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIF5+fn5+fn5+fn5+fn5+fn5+
+fn5+CnNyYy9zaGFyZWQvZ2F0dC1jbGllbnQuYzozMjQwOjI6IHdhcm5pbmc6IFVzZSBvZiBtZW1v
+cnkgYWZ0ZXIgaXQgaXMgZnJlZWQKICAgICAgICBjb21wbGV0ZV93cml0ZV9sb25nX29wKHJlcSwg
+c3VjY2VzcywgMCwgZmFsc2UpOwogICAgICAgIF5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+
+fn5+fn5+fn5+fn5+fn5+fn4Kc3JjL3NoYXJlZC9nYXR0LWNsaWVudC5jOjMyNjI6Mjogd2Fybmlu
+ZzogVXNlIG9mIG1lbW9yeSBhZnRlciBpdCBpcyBmcmVlZAogICAgICAgIHJlcXVlc3RfdW5yZWYo
+cmVxKTsKICAgICAgICBefn5+fn5+fn5+fn5+fn5+fn4KMTIgd2FybmluZ3MgZ2VuZXJhdGVkLgpz
+cmMvc2hhcmVkL2FzaGEuYzogSW4gZnVuY3Rpb24g4oCYYnRfYXNoYV9zdG9w4oCZOgpzcmMvc2hh
+cmVkL2FzaGEuYzoxNDY6NjogZXJyb3I6IHVudXNlZCB2YXJpYWJsZSDigJhyZXTigJkgWy1XZXJy
+b3I9dW51c2VkLXZhcmlhYmxlXQogIDE0NiB8ICBpbnQgcmV0OwogICAgICB8ICAgICAgXn5+CmNj
+MTogYWxsIHdhcm5pbmdzIGJlaW5nIHRyZWF0ZWQgYXMgZXJyb3JzCm1ha2VbMV06ICoqKiBbTWFr
+ZWZpbGU6ODY2Mzogc3JjL3NoYXJlZC9saWJzaGFyZWRfbWFpbmxvb3BfbGEtYXNoYS5sb10gRXJy
+b3IgMQptYWtlWzFdOiAqKiogV2FpdGluZyBmb3IgdW5maW5pc2hlZCBqb2JzLi4uLgptYWtlOiAq
+KiogW01ha2VmaWxlOjQ2NjA6IGFsbF0gRXJyb3IgMgoKCi0tLQpSZWdhcmRzLApMaW51eCBCbHVl
+dG9vdGgKCg==
 
-diff --git a/Makefile.plugins b/Makefile.plugins
-index 4aa2c9c92..44fda4536 100644
---- a/Makefile.plugins
-+++ b/Makefile.plugins
-@@ -147,3 +147,8 @@ if CSIP
- builtin_modules += csip
- builtin_sources += profiles/audio/csip.c
- endif
-+
-+if ASHA
-+builtin_modules += asha
-+builtin_sources += profiles/audio/asha.h profiles/audio/asha.c
-+endif
-diff --git a/configure.ac b/configure.ac
-index ac9de6ec4..1d88daa0b 100644
---- a/configure.ac
-+++ b/configure.ac
-@@ -216,6 +216,10 @@ AC_ARG_ENABLE(csip, AS_HELP_STRING([--disable-csip],
- 		[disable CSIP profile]), [enable_csip=${enableval}])
- AM_CONDITIONAL(CSIP, test "${enable_csip}" != "no")
- 
-+AC_ARG_ENABLE(asha, AS_HELP_STRING([--disable-asha],
-+		[disable ASHA support]), [enable_asha=${enableval}])
-+AM_CONDITIONAL(ASHA, test "${enable_asha}" != "no")
-+
- AC_ARG_ENABLE(tools, AS_HELP_STRING([--disable-tools],
- 		[disable Bluetooth tools]), [enable_tools=${enableval}])
- AM_CONDITIONAL(TOOLS, test "${enable_tools}" != "no")
-diff --git a/profiles/audio/asha.c b/profiles/audio/asha.c
-new file mode 100644
-index 000000000..1c4f751d1
---- /dev/null
-+++ b/profiles/audio/asha.c
-@@ -0,0 +1,524 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2024  Asymptotic Inc.
-+ *
-+ *  Author: Arun Raghavan <arun@asymptotic.io>
-+ *
-+ *
-+ */
-+
-+#ifdef HAVE_CONFIG_H
-+#include <config.h>
-+#endif
-+
-+#define _GNU_SOURCE
-+#include <errno.h>
-+
-+#include <stdbool.h>
-+#include <stdint.h>
-+#include <unistd.h>
-+#include <sys/socket.h>
-+
-+#include <dbus/dbus.h>
-+#include <glib.h>
-+
-+#include "btio/btio.h"
-+#include "gdbus/gdbus.h"
-+#include "lib/bluetooth.h"
-+#include "lib/l2cap.h"
-+#include "lib/uuid.h"
-+
-+#include "src/dbus-common.h"
-+#include "src/adapter.h"
-+#include "src/device.h"
-+#include "src/log.h"
-+#include "src/plugin.h"
-+#include "src/profile.h"
-+#include "src/service.h"
-+#include "src/shared/util.h"
-+
-+#include "profiles/audio/asha.h"
-+#include "profiles/audio/media.h"
-+#include "profiles/audio/transport.h"
-+
-+#define MEDIA_ENDPOINT_INTERFACE "org.bluez.MediaEndpoint1"
-+
-+/* 2 byte SDU length, 1 byte sequence number, and then 20ms of G.722 */
-+#define ASHA_MIN_MTU 163
-+/* The default of 672 does not work */
-+#define ASHA_CONNECTION_MTU 512
-+
-+struct bt_asha_device {
-+	struct bt_asha *asha;
-+	struct btd_device *device;
-+	struct media_transport *transport;
-+
-+	GIOChannel *io;
-+	uint16_t imtu, omtu;
-+
-+	unsigned int resume_id;
-+};
-+
-+static char *make_endpoint_path(struct bt_asha_device *asha_dev)
-+{
-+	char *path;
-+	int err;
-+
-+	err = asprintf(&path, "%s/asha", device_get_path(asha_dev->device));
-+	if (err < 0) {
-+		error("Could not allocate path for remote %s",
-+				device_get_path(asha_dev->device));
-+		return NULL;
-+	}
-+
-+	return path;
-+}
-+
-+struct connect_data {
-+	struct bt_asha_device *asha_dev;
-+	bt_asha_cb_t cb;
-+	void *cb_user_data;
-+};
-+
-+static void connect_cb(GIOChannel *io, GError *err, gpointer user_data)
-+{
-+	struct connect_data *conn_data = user_data;
-+	struct bt_asha_device *asha_dev = conn_data->asha_dev;
-+	GError *gerr = NULL;
-+
-+	if (!bt_io_get(io, &gerr,
-+				BT_IO_OPT_IMTU, &asha_dev->imtu,
-+				BT_IO_OPT_OMTU, &asha_dev->omtu,
-+				BT_IO_OPT_INVALID )) {
-+		/* Let this be non-fatal? */
-+		asha_dev->omtu = ASHA_MIN_MTU;
-+		asha_dev->imtu = ASHA_CONNECTION_MTU;
-+		error("Could not get L2CAP CoC socket MTU: %s", err->message);
-+		g_error_free(gerr);
-+	}
-+
-+	asha_dev->io = io;
-+
-+	bt_asha_start(asha_dev->asha, conn_data->cb,
-+					conn_data->cb_user_data);
-+}
-+
-+static int asha_connect_socket(struct bt_asha_device *asha_dev,
-+					bt_asha_cb_t cb, void *user_data)
-+{
-+	GError *gerr = NULL;
-+	const bdaddr_t *src_addr;
-+	struct connect_data *conn_data;
-+
-+	if (asha_dev->asha->state != ASHA_STOPPED) {
-+		error("ASHA device connect failed. Bad state %d",
-+							asha_dev->asha->state);
-+		return 0;
-+	}
-+
-+	conn_data = g_new0(struct connect_data, 1);
-+	conn_data->asha_dev = asha_dev;
-+	conn_data->cb = cb;
-+	conn_data->cb_user_data = user_data;
-+
-+	src_addr = btd_adapter_get_address(
-+			device_get_adapter(asha_dev->device));
-+
-+	if (!bt_io_connect(connect_cb, conn_data,
-+				g_free, &gerr,
-+				BT_IO_OPT_MODE, BT_IO_MODE_LE_FLOWCTL,
-+				BT_IO_OPT_SOURCE_TYPE, BDADDR_LE_PUBLIC,
-+				BT_IO_OPT_SOURCE_BDADDR, src_addr,
-+				BT_IO_OPT_DEST_TYPE, BDADDR_LE_PUBLIC,
-+				BT_IO_OPT_DEST_BDADDR, device_get_address(asha_dev->device),
-+				BT_IO_OPT_PSM, asha_dev->asha->psm,
-+				BT_IO_OPT_OMTU, ASHA_MIN_MTU,
-+				BT_IO_OPT_IMTU, ASHA_CONNECTION_MTU,
-+				BT_IO_OPT_INVALID)) {
-+		error("Could not open L2CAP CoC socket: %s", gerr->message);
-+		g_error_free(gerr);
-+		goto error;
-+	}
-+
-+	DBG("L2CAP CoC socket is open");
-+	return 0;
-+
-+error:
-+	return -1;
-+}
-+
-+unsigned int bt_asha_device_start(struct bt_asha_device *asha_dev,
-+					bt_asha_cb_t cb, void *user_data)
-+{
-+	int ret;
-+
-+	btd_device_set_conn_param(asha_dev->device,
-+			0x0010 /* min interval = 1.25ms intervals => 20ms */,
-+			0x0010 /* max interval = 1.25ms intervals => 20ms */,
-+			0x000A /* 10 events' latency */,
-+			0x0064 /* 1s timeout */);
-+
-+	ret = asha_connect_socket(asha_dev, cb, user_data);
-+
-+	if (ret < 0)
-+		return 0;
-+	else
-+		return (++asha_dev->resume_id);
-+}
-+
-+unsigned int bt_asha_device_stop(struct bt_asha_device *asha_dev,
-+					bt_asha_cb_t cb, void *user_data)
-+{
-+	bt_asha_stop(asha_dev->asha, cb, user_data);
-+
-+	if (asha_dev->io) {
-+		g_io_channel_shutdown(asha_dev->io, TRUE, NULL);
-+		g_io_channel_unref(asha_dev->io);
-+		asha_dev->io = NULL;
-+	};
-+
-+	return asha_dev->resume_id;
-+}
-+
-+void bt_asha_device_state_reset(struct bt_asha_device *asha_dev)
-+{
-+	if (asha_dev->io) {
-+		g_io_channel_shutdown(asha_dev->io, TRUE, NULL);
-+		g_io_channel_unref(asha_dev->io);
-+		asha_dev->io = NULL;
-+	};
-+
-+	bt_asha_state_reset(asha_dev->asha);
-+
-+	asha_dev->resume_id = 0;
-+}
-+
-+unsigned int bt_asha_device_device_get_resume_id(
-+					struct bt_asha_device *asha_dev)
-+{
-+	return asha_dev->resume_id;
-+}
-+
-+enum bt_asha_state_t bt_asha_device_get_state(
-+					struct bt_asha_device *asha_dev)
-+{
-+	return asha_dev->asha->state;
-+}
-+
-+uint16_t bt_asha_device_get_render_delay(struct bt_asha_device *asha_dev)
-+{
-+	return asha_dev->asha->render_delay;
-+}
-+
-+int8_t bt_asha_device_get_volume(struct bt_asha_device *asha_dev)
-+{
-+	return asha_dev->asha->volume;
-+}
-+
-+bool bt_asha_device_set_volume(struct bt_asha_device *asha_dev, int8_t volume)
-+{
-+	return bt_asha_set_volume(asha_dev->asha, volume);
-+}
-+
-+int bt_asha_device_get_fd(struct bt_asha_device *asha_dev)
-+{
-+	return g_io_channel_unix_get_fd(asha_dev->io);
-+}
-+
-+uint16_t bt_asha_device_get_imtu(struct bt_asha_device *asha_dev)
-+{
-+	return asha_dev->imtu;
-+}
-+
-+uint16_t bt_asha_device_get_omtu(struct bt_asha_device *asha_dev)
-+{
-+	return asha_dev->omtu;
-+}
-+
-+
-+static gboolean get_uuid(const GDBusPropertyTable *property,
-+					DBusMessageIter *iter, void *data)
-+{
-+	const char *uuid;
-+
-+	uuid = ASHA_PROFILE_UUID;
-+
-+	dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING, &uuid);
-+
-+	return TRUE;
-+}
-+
-+static gboolean get_side(const GDBusPropertyTable *property,
-+					DBusMessageIter *iter, void *data)
-+{
-+	struct bt_asha_device *asha_dev = data;
-+	const char *side = asha_dev->asha->right_side ? "right" : "left";
-+
-+	/* Use a string in case we want to support more types in the future */
-+	dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING, &side);
-+
-+	return TRUE;
-+}
-+
-+
-+static gboolean get_binaural(const GDBusPropertyTable *property,
-+					DBusMessageIter *iter, void *data)
-+{
-+	struct bt_asha_device *asha_dev = data;
-+	dbus_bool_t binaural = asha_dev->asha->binaural;
-+
-+	dbus_message_iter_append_basic(iter, DBUS_TYPE_BOOLEAN, &binaural);
-+
-+	return TRUE;
-+}
-+
-+static gboolean get_hisyncid(const GDBusPropertyTable *property,
-+					DBusMessageIter *iter, void *data)
-+{
-+	struct bt_asha_device *asha_dev = data;
-+	DBusMessageIter array;
-+	uint8_t *hisyncid = asha_dev->asha->hisyncid;
-+
-+	dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY,
-+					DBUS_TYPE_BYTE_AS_STRING, &array);
-+
-+	dbus_message_iter_append_fixed_array(&array, DBUS_TYPE_BYTE,
-+			&hisyncid, sizeof(asha_dev->asha->hisyncid));
-+
-+	dbus_message_iter_close_container(iter, &array);
-+
-+	return TRUE;
-+}
-+
-+static gboolean get_codecs(const GDBusPropertyTable *property,
-+					DBusMessageIter *iter, void *data)
-+{
-+	struct bt_asha_device *asha_dev = data;
-+	dbus_uint16_t codecs = asha_dev->asha->codec_ids;
-+
-+	dbus_message_iter_append_basic(iter, DBUS_TYPE_UINT16, &codecs);
-+
-+	return TRUE;
-+}
-+
-+static gboolean get_device(const GDBusPropertyTable *property,
-+					DBusMessageIter *iter, void *data)
-+{
-+	struct bt_asha_device *asha_dev = data;
-+	const char *path;
-+
-+	path = device_get_path(asha_dev->device);
-+
-+	dbus_message_iter_append_basic(iter, DBUS_TYPE_OBJECT_PATH, &path);
-+
-+	return TRUE;
-+}
-+
-+static gboolean get_transport(const GDBusPropertyTable *property,
-+					DBusMessageIter *iter, void *data)
-+{
-+	struct bt_asha_device *asha_dev = data;
-+	const char *path;
-+
-+	path = media_transport_get_path(asha_dev->transport);
-+
-+	dbus_message_iter_append_basic(iter, DBUS_TYPE_OBJECT_PATH, &path);
-+
-+	return TRUE;
-+}
-+
-+static int asha_source_device_probe(struct btd_service *service)
-+{
-+	struct bt_asha_device *asha_dev;
-+	struct btd_device *device = btd_service_get_device(service);
-+	char addr[18];
-+
-+	ba2str(device_get_address(device), addr);
-+	DBG("Probing ASHA device %s", addr);
-+
-+	asha_dev = g_new0(struct bt_asha_device, 1);
-+
-+	asha_dev->device = device;
-+	asha_dev->asha = bt_asha_new();
-+	asha_dev->io = NULL;
-+
-+	btd_service_set_user_data(service, asha_dev);
-+
-+	return 0;
-+}
-+
-+static void asha_source_device_remove(struct btd_service *service)
-+{
-+	struct bt_asha_device *asha_dev;
-+	struct btd_device *device = btd_service_get_device(service);
-+	char addr[18];
-+
-+	ba2str(device_get_address(device), addr);
-+	DBG("Removing ASHA device %s", addr);
-+
-+	asha_dev = btd_service_get_user_data(service);
-+	if (!asha_dev) {
-+		/* Can this actually happen? */
-+		DBG("Not handlihng ASHA profile");
-+		return;
-+	}
-+
-+	bt_asha_free(asha_dev->asha);
-+	g_free(asha_dev);
-+}
-+
-+static const GDBusMethodTable asha_ep_methods[] = {
-+	{ },
-+};
-+
-+static const GDBusPropertyTable asha_ep_properties[] = {
-+	{ "UUID", "s", get_uuid, NULL, NULL,
-+					G_DBUS_PROPERTY_FLAG_EXPERIMENTAL },
-+	{ "Side", "s", get_side, NULL, NULL,
-+					G_DBUS_PROPERTY_FLAG_EXPERIMENTAL },
-+	{ "Binaural", "b", get_binaural, NULL, NULL,
-+					G_DBUS_PROPERTY_FLAG_EXPERIMENTAL },
-+	{ "HiSyncId", "ay", get_hisyncid, NULL, NULL,
-+					G_DBUS_PROPERTY_FLAG_EXPERIMENTAL },
-+	{ "Codecs", "q", get_codecs, NULL, NULL,
-+					G_DBUS_PROPERTY_FLAG_EXPERIMENTAL },
-+	{ "Device", "o", get_device, NULL, NULL,
-+					G_DBUS_PROPERTY_FLAG_EXPERIMENTAL },
-+	{ "Transport", "o", get_transport, NULL, NULL,
-+					G_DBUS_PROPERTY_FLAG_EXPERIMENTAL },
-+	{ }
-+};
-+
-+static void asha_source_endpoint_register(struct bt_asha_device *asha_dev)
-+{
-+	char *path;
-+	const struct media_endpoint *asha_ep;
-+
-+	path = make_endpoint_path(asha_dev);
-+	if (!path)
-+		goto error;
-+
-+	if (g_dbus_register_interface(btd_get_dbus_connection(),
-+				path, MEDIA_ENDPOINT_INTERFACE,
-+				asha_ep_methods, NULL,
-+				asha_ep_properties,
-+				asha_dev, NULL) == FALSE) {
-+		error("Could not register remote ep %s", path);
-+		goto error;
-+	}
-+
-+	asha_ep = media_endpoint_get_asha();
-+	asha_dev->transport = media_transport_create(asha_dev->device, path,
-+					NULL, 0, (void *) asha_ep, asha_dev);
-+
-+error:
-+	if (path)
-+		free(path);
-+}
-+
-+static void asha_source_endpoint_unregister(struct bt_asha_device *asha)
-+{
-+	char *path;
-+
-+	path = make_endpoint_path(asha);
-+	if (!path)
-+		goto error;
-+
-+	g_dbus_unregister_interface(btd_get_dbus_connection(),
-+				path, MEDIA_ENDPOINT_INTERFACE);
-+
-+	if (asha->transport) {
-+		media_transport_destroy(asha->transport);
-+		asha->transport = NULL;
-+	}
-+
-+error:
-+	if (path)
-+		free(path);
-+}
-+
-+static int asha_source_accept(struct btd_service *service)
-+{
-+	struct btd_device *device = btd_service_get_device(service);
-+	struct gatt_db *db = btd_device_get_gatt_db(device);
-+	struct bt_gatt_client *client = btd_device_get_gatt_client(device);
-+	struct bt_asha_device *asha_dev = btd_service_get_user_data(service);
-+	char addr[18];
-+
-+	ba2str(device_get_address(device), addr);
-+	DBG("Accepting ASHA connection on %s", addr);
-+
-+	if (!asha_dev) {
-+		/* Can this actually happen? */
-+		DBG("Not handling ASHA profile");
-+		return -1;
-+	}
-+
-+	if (!bt_asha_probe(asha_dev->asha, db, client))
-+		return -1;
-+
-+	asha_source_endpoint_register(asha_dev);
-+
-+	btd_service_connecting_complete(service, 0);
-+
-+	return 0;
-+}
-+
-+static int asha_source_disconnect(struct btd_service *service)
-+{
-+	struct btd_device *device = btd_service_get_device(service);
-+	struct bt_asha_device *asha_dev = btd_service_get_user_data(service);
-+	char addr[18];
-+
-+	ba2str(device_get_address(device), addr);
-+	DBG("Disconnecting ASHA on %s", addr);
-+
-+	if (!asha_dev) {
-+		/* Can this actually happen? */
-+		DBG("Not handlihng ASHA profile");
-+		return -1;
-+	}
-+
-+	asha_source_endpoint_unregister(asha_dev);
-+	bt_asha_reset(asha_dev->asha);
-+
-+	btd_service_disconnecting_complete(service, 0);
-+
-+	return 0;
-+}
-+
-+static struct btd_profile asha_source_profile = {
-+	.name		= "asha-source",
-+	.priority	= BTD_PROFILE_PRIORITY_MEDIUM,
-+	.remote_uuid	= ASHA_PROFILE_UUID,
-+	.experimental	= true,
-+
-+	.device_probe	= asha_source_device_probe,
-+	.device_remove	= asha_source_device_remove,
-+
-+	.auto_connect	= true,
-+	.accept		= asha_source_accept,
-+	.disconnect	= asha_source_disconnect,
-+};
-+
-+static int asha_init(void)
-+{
-+	int err;
-+
-+	err = btd_profile_register(&asha_source_profile);
-+	if (err)
-+		return err;
-+
-+	return 0;
-+}
-+
-+static void asha_exit(void)
-+{
-+	btd_profile_unregister(&asha_source_profile);
-+}
-+
-+BLUETOOTH_PLUGIN_DEFINE(asha, VERSION, BLUETOOTH_PLUGIN_PRIORITY_DEFAULT,
-+							asha_init, asha_exit)
-diff --git a/profiles/audio/asha.h b/profiles/audio/asha.h
-new file mode 100644
-index 000000000..afd23e137
---- /dev/null
-+++ b/profiles/audio/asha.h
-@@ -0,0 +1,38 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2024  Asymptotic Inc.
-+ *
-+ *  Author: Arun Raghavan <arun@asymptotic.io>
-+ *
-+ *
-+ */
-+
-+#include <stdbool.h>
-+#include <stdint.h>
-+
-+#include "src/shared/asha.h"
-+
-+struct bt_asha_device;
-+
-+unsigned int bt_asha_device_start(struct bt_asha_device *asha_dev,
-+					bt_asha_cb_t cb, void *user_data);
-+unsigned int bt_asha_device_stop(struct bt_asha_device *asha_dev,
-+					bt_asha_cb_t cb, void *user_data);
-+
-+void bt_asha_device_state_reset(struct bt_asha_device *asha_dev);
-+unsigned int bt_asha_device_device_get_resume_id(
-+					struct bt_asha_device *asha_dev);
-+
-+uint16_t bt_asha_device_get_render_delay(struct bt_asha_device *asha_dev);
-+enum bt_asha_state_t bt_asha_device_get_state(
-+					struct bt_asha_device *asha_dev);
-+
-+int bt_asha_device_get_fd(struct bt_asha_device *asha_dev);
-+uint16_t bt_asha_device_get_omtu(struct bt_asha_device *asha_dev);
-+uint16_t bt_asha_device_get_imtu(struct bt_asha_device *asha_dev);
-+
-+int8_t bt_asha_device_get_volume(struct bt_asha_device *asha_dev);
-+bool bt_asha_device_set_volume(struct bt_asha_device *asha_dev, int8_t volume);
-diff --git a/profiles/audio/media.c b/profiles/audio/media.c
-index 4bbd584de..b5644736a 100644
---- a/profiles/audio/media.c
-+++ b/profiles/audio/media.c
-@@ -38,6 +38,7 @@
- #include "src/log.h"
- #include "src/error.h"
- #include "src/gatt-database.h"
-+#include "src/shared/asha.h"
- #include "src/shared/util.h"
- #include "src/shared/queue.h"
- #include "src/shared/att.h"
-@@ -88,6 +89,7 @@ struct endpoint_request {
- struct media_endpoint {
- 	struct a2dp_sep		*sep;
- 	struct bt_bap_pac	*pac;
-+	struct bt_asha_device	*asha;
- 	char			*sender;	/* Endpoint DBus bus id */
- 	char			*path;		/* Endpoint object path */
- 	char			*uuid;		/* Endpoint property UUID */
-@@ -1330,6 +1332,12 @@ static bool endpoint_init_broadcast_sink(struct media_endpoint *endpoint,
- 	return endpoint_init_pac(endpoint, BT_BAP_BCAST_SINK, err);
- }
- 
-+static bool endpoint_init_asha(struct media_endpoint *endpoint,
-+						int *err)
-+{
-+	return true;
-+}
-+
- static bool endpoint_properties_exists(const char *uuid,
- 						struct btd_device *dev,
- 						void *user_data)
-@@ -1454,6 +1462,11 @@ static bool experimental_bcast_sink_ep_supported(struct btd_adapter *adapter)
- 	return g_dbus_get_flags() & G_DBUS_FLAG_ENABLE_EXPERIMENTAL;
- }
- 
-+static bool experimental_asha_supported(struct btd_adapter *adapter)
-+{
-+	return g_dbus_get_flags() & G_DBUS_FLAG_ENABLE_EXPERIMENTAL;
-+}
-+
- static const struct media_endpoint_init {
- 	const char *uuid;
- 	bool (*func)(struct media_endpoint *endpoint, int *err);
-@@ -1471,6 +1484,8 @@ static const struct media_endpoint_init {
- 			experimental_broadcaster_ep_supported },
- 	{ BAA_SERVICE_UUID, endpoint_init_broadcast_sink,
- 			experimental_bcast_sink_ep_supported },
-+	{ ASHA_PROFILE_UUID, endpoint_init_asha,
-+			experimental_asha_supported },
- };
- 
- static struct media_endpoint *
-@@ -3393,3 +3408,18 @@ bool media_endpoint_is_broadcast(struct media_endpoint *endpoint)
- 
- 	return false;
- }
-+
-+const struct media_endpoint *media_endpoint_get_asha(void)
-+{
-+	/*
-+	 * Because ASHA does not require the application to register an
-+	 * endpoint, we need a minimal media_endpoint for transport creation to
-+	 * work, so let's create one
-+	 */
-+	static struct media_endpoint asha_endpoint =  {
-+		.uuid = ASHA_PROFILE_UUID,
-+		.codec = 0x2, /* Currently on G.722 is defined by the spec */
-+	};
-+
-+	return &asha_endpoint;
-+}
-diff --git a/profiles/audio/media.h b/profiles/audio/media.h
-index 2b579877b..2b2e8e157 100644
---- a/profiles/audio/media.h
-+++ b/profiles/audio/media.h
-@@ -24,3 +24,5 @@ struct btd_adapter *media_endpoint_get_btd_adapter(
- 					struct media_endpoint *endpoint);
- bool media_endpoint_is_broadcast(struct media_endpoint *endpoint);
- int8_t media_player_get_device_volume(struct btd_device *device);
-+
-+const struct media_endpoint *media_endpoint_get_asha(void);
-diff --git a/profiles/audio/transport.c b/profiles/audio/transport.c
-index 5b11bfeb6..0ce94bae3 100644
---- a/profiles/audio/transport.c
-+++ b/profiles/audio/transport.c
-@@ -37,6 +37,7 @@
- #include "src/shared/bap.h"
- #include "src/shared/io.h"
- 
-+#include "asha.h"
- #include "avdtp.h"
- #include "media.h"
- #include "transport.h"
-@@ -115,7 +116,7 @@ struct media_transport {
- 	char			*path;		/* Transport object path */
- 	struct btd_device	*device;	/* Transport device */
- 	struct btd_adapter	*adapter;	/* Transport adapter bcast*/
--	const char		*remote_endpoint; /* Transport remote SEP */
-+	char			*remote_endpoint; /* Transport remote SEP */
- 	struct media_endpoint	*endpoint;	/* Transport endpoint */
- 	struct media_owner	*owner;		/* Transport owner */
- 	uint8_t			*configuration; /* Transport configuration */
-@@ -219,6 +220,9 @@ void media_transport_destroy(struct media_transport *transport)
- 	g_dbus_unregister_interface(btd_get_dbus_connection(), path,
- 						MEDIA_TRANSPORT_INTERFACE);
- 
-+	if (transport->remote_endpoint)
-+		g_free(transport->remote_endpoint);
-+
- 	g_free(path);
- }
- 
-@@ -1199,6 +1203,32 @@ static const GDBusPropertyTable transport_bap_bc_properties[] = {
- 	{ }
- };
- 
-+static gboolean get_asha_delay(const GDBusPropertyTable *property,
-+					DBusMessageIter *iter, void *data)
-+{
-+	struct media_transport *transport = data;
-+	struct bt_asha_device *asha_dev = transport->data;
-+	uint16_t delay;
-+
-+	// Delay property is in 1/10ths of ms, while ASHA RenderDelay is in ms
-+	delay = bt_asha_device_get_render_delay(asha_dev) * 10;
-+
-+	dbus_message_iter_append_basic(iter, DBUS_TYPE_UINT16, &delay);
-+
-+	return TRUE;
-+}
-+
-+static const GDBusPropertyTable transport_asha_properties[] = {
-+	{ "Device", "o", get_device },
-+	{ "Endpoint", "o", get_endpoint, NULL, endpoint_exists },
-+	{ "UUID", "s", get_uuid },
-+	{ "Codec", "y", get_codec },
-+	{ "State", "s", get_state },
-+	{ "Delay", "q", get_asha_delay },
-+	{ "Volume", "q", get_volume, set_volume, volume_exists },
-+	{ }
-+};
-+
- static void transport_a2dp_destroy(void *data)
- {
- 	struct a2dp_transport *a2dp = data;
-@@ -1716,6 +1746,164 @@ static void *transport_bap_init(struct media_transport *transport, void *stream)
- 	return bap;
- }
- 
-+static void asha_transport_sync_state(struct media_transport *transport,
-+						struct bt_asha_device *asha_dev)
-+{
-+	switch (bt_asha_device_get_state(asha_dev)) {
-+	case ASHA_STOPPED:
-+		transport_set_state(transport, TRANSPORT_STATE_IDLE);
-+		break;
-+	case ASHA_STARTING:
-+		transport_set_state(transport, TRANSPORT_STATE_REQUESTING);
-+		break;
-+	case ASHA_STARTED:
-+		transport_set_state(transport, TRANSPORT_STATE_ACTIVE);
-+		break;
-+	case ASHA_STOPPING:
-+		transport_set_state(transport, TRANSPORT_STATE_SUSPENDING);
-+		break;
-+	}
-+}
-+
-+static void asha_transport_state_cb(int status, void *user_data)
-+{
-+	struct media_owner *owner = user_data;
-+	struct media_transport *transport = owner->transport;
-+	struct bt_asha_device *asha_dev;
-+	enum bt_asha_state_t state;
-+
-+	if (!transport) {
-+		DBG("Lost owner while connecting, bailing");
-+		return;
-+	}
-+
-+	asha_dev = transport->data;
-+	state = bt_asha_device_get_state(asha_dev);
-+
-+	if (state == ASHA_STARTED) {
-+		int fd;
-+		uint16_t imtu, omtu;
-+		gboolean ret;
-+
-+		fd = bt_asha_device_get_fd(asha_dev);
-+		imtu = bt_asha_device_get_imtu(asha_dev);
-+		omtu = bt_asha_device_get_omtu(asha_dev);
-+
-+		media_transport_set_fd(transport, fd, imtu, omtu);
-+
-+		owner->pending->id = 0;
-+		ret = g_dbus_send_reply(btd_get_dbus_connection(),
-+				owner->pending->msg,
-+				DBUS_TYPE_UNIX_FD, &fd,
-+				DBUS_TYPE_UINT16, &imtu,
-+				DBUS_TYPE_UINT16, &omtu,
-+				DBUS_TYPE_INVALID);
-+		if (!ret) {
-+			media_transport_remove_owner(transport);
-+			return;
-+		}
-+
-+		media_owner_remove(owner);
-+	} else if (state == ASHA_STOPPED) {
-+		if (owner->pending) {
-+			owner->pending->id = 0;
-+			media_request_reply(owner->pending, 0);
-+			media_owner_remove(owner);
-+		}
-+
-+		media_transport_remove_owner(transport);
-+	}
-+
-+	asha_transport_sync_state(transport, asha_dev);
-+}
-+
-+static guint transport_asha_resume(struct media_transport *transport,
-+						struct media_owner *owner)
-+{
-+	struct bt_asha_device *asha_dev = transport->data;
-+	guint ret;
-+
-+	ret = bt_asha_device_start(asha_dev, asha_transport_state_cb, owner);
-+	asha_transport_sync_state(transport, asha_dev);
-+
-+	return ret > 0 ? ret : 0;
-+}
-+
-+static guint transport_asha_suspend(struct media_transport *transport,
-+						struct media_owner *owner)
-+{
-+	struct bt_asha_device *asha_dev = transport->data;
-+	guint ret = 0;
-+
-+	if (owner) {
-+		ret = bt_asha_device_stop(asha_dev, asha_transport_state_cb,
-+									owner);
-+		asha_transport_sync_state(transport, asha_dev);
-+	} else {
-+		ret = bt_asha_device_stop(asha_dev, NULL, NULL);
-+		/* We won't have a callback to set the final state */
-+		transport_set_state(transport, TRANSPORT_STATE_IDLE);
-+	}
-+
-+	return ret;
-+}
-+
-+static void transport_asha_cancel(struct media_transport *transport, guint id)
-+{
-+	struct bt_asha_device *asha_dev = transport->data;
-+	enum bt_asha_state_t state = bt_asha_device_get_state(asha_dev);
-+
-+	if (id != bt_asha_device_device_get_resume_id(asha_dev)) {
-+		/* Not current, ignore */
-+		DBG("Ignoring cancel request for id %d", id);
-+		return;
-+	}
-+
-+	if (state == ASHA_STARTING || state == ASHA_STARTED) {
-+		DBG("Cancel requested, stopping");
-+		bt_asha_device_stop(asha_dev, NULL, NULL);
-+		/* We won't have a callback to set the final state */
-+		transport_set_state(transport, TRANSPORT_STATE_IDLE);
-+	} else if (state == ASHA_STOPPING) {
-+		DBG("Cancel requested, resetting transport state");
-+		/* We already dispatched a stop, just reset our state */
-+		bt_asha_device_state_reset(asha_dev);
-+		transport_set_state(transport, TRANSPORT_STATE_IDLE);
-+	}
-+}
-+
-+static int8_t transport_asha_get_volume(struct media_transport *transport)
-+{
-+	struct bt_asha_device *asha_dev = transport->data;
-+	int8_t volume;
-+	int scaled_volume;
-+
-+	volume = bt_asha_device_get_volume(asha_dev);
-+
-+	/* Convert -128-0 to 0-127 */
-+	scaled_volume = ((((int) volume) + 128) * 127) / 128;
-+
-+	return scaled_volume;
-+}
-+
-+static int transport_asha_set_volume(struct media_transport *transport,
-+								int8_t volume)
-+{
-+	struct bt_asha_device *asha_dev = transport->data;
-+	int scaled_volume;
-+
-+	/* Convert 0-127 to -128-0 */
-+	scaled_volume = ((((int) volume) * 128) / 127) - 128;
-+
-+	return bt_asha_device_set_volume(asha_dev, scaled_volume) ? 0 : -EIO;
-+}
-+
-+static void *transport_asha_init(struct media_transport *transport, void *data)
-+{
-+	/* We just store the struct asha_device on the transport */
-+	return data;
-+}
-+
- #define TRANSPORT_OPS(_uuid, _props, _set_owner, _remove_owner, _init, \
- 		      _resume, _suspend, _cancel, _set_state, _get_stream, \
- 		      _get_volume, _set_volume, _destroy) \
-@@ -1757,6 +1945,14 @@ static void *transport_bap_init(struct media_transport *transport, void *stream)
- #define BAP_BC_OPS(_uuid) \
- 	BAP_OPS(_uuid, transport_bap_bc_properties, NULL, NULL)
- 
-+#define ASHA_OPS(_uuid) \
-+	TRANSPORT_OPS(_uuid, transport_asha_properties, NULL, NULL, \
-+			transport_asha_init, \
-+			transport_asha_resume, transport_asha_suspend, \
-+			transport_asha_cancel, NULL, NULL, \
-+			transport_asha_get_volume, transport_asha_set_volume, \
-+			NULL)
-+
- static const struct media_transport_ops transport_ops[] = {
- 	A2DP_OPS(A2DP_SOURCE_UUID, transport_a2dp_src_init,
- 			transport_a2dp_src_set_volume,
-@@ -1768,6 +1964,7 @@ static const struct media_transport_ops transport_ops[] = {
- 	BAP_UC_OPS(PAC_SINK_UUID),
- 	BAP_BC_OPS(BCAA_SERVICE_UUID),
- 	BAP_BC_OPS(BAA_SERVICE_UUID),
-+	ASHA_OPS(ASHA_PROFILE_UUID),
- };
- 
- static const struct media_transport_ops *
-@@ -1805,7 +2002,7 @@ struct media_transport *media_transport_create(struct btd_device *device,
- 	transport->endpoint = endpoint;
- 	transport->configuration = util_memdup(configuration, size);
- 	transport->size = size;
--	transport->remote_endpoint = remote_endpoint;
-+	transport->remote_endpoint = g_strdup(remote_endpoint);
- 
- 	if (device)
- 		transport->path = g_strdup_printf("%s/fd%d",
--- 
-2.45.2
-
+--===============6139508672429794343==--
