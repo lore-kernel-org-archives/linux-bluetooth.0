@@ -1,152 +1,100 @@
-Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
+Received: from mail-vs1-f48.google.com (mail-vs1-f48.google.com [209.85.217.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D01D284D2A
-	for <linux-bluetooth@vger.kernel.org>; Mon, 10 Jun 2024 13:24:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8A5F78B4C;
+	Mon, 10 Jun 2024 13:58:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718025848; cv=none; b=BV4ncDFRzGUW3atnOeNHtey5oZDhquNqLMmPlr9z8NsDrUhiSzJ/LlZeMH3aCqzubMr//n+KljJ4WsGMlXRNrtrm1gNvODFCihODUpdJJ2EeFz+FIcF+GplqGNcp3IabuUdaKtfjIVNdnv1ik/CV4/DeZtn+0n7+GXC1r/+z9AM=
+	t=1718027888; cv=none; b=GX0wp8amSgIbSLfvWKYeskc7xwtkL8Lal4DIeBHZykV8sW+EsUpVVH8Jt0J8I4ONlmrEbHFTOOZc0EC3ydtsSmosaR7y/CQLFGSyxX3yMDZJnt1trxuKypw76f5ENbclBpOHl2n7GFcFPeAcLTKCxIA0NmFftr4PdLoyy49gAzA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718025848; c=relaxed/simple;
-	bh=cv21a25imgzIQyzA2Q03tYU95MuYdhWUZXDOTajmmvw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=I4yqpby5sv7qIQE/LGQsnlO6Z2bAwdp9XBanEe9ViJ0xlDpMCKh2aEm39UON0mUJqlcf9u79gNClbFtmYIkfD8+GJpHS6CxVvps4U0z3NwKLd4s/8lzj/u8OaUZk7B6tXjd+af1K9xsL2wjHSOKsz/wZ7LEdoqOEowbM+4QgBEk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=k0LCZwGN; arc=none smtp.client-ip=209.85.221.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	s=arc-20240116; t=1718027888; c=relaxed/simple;
+	bh=eM6Kxzv9gey2fJjyA0QKesIoFr7zX6fUAJ/vGkRuEPo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=p18BwtT5h9aUbzNdgmXR46Bm0wjgD/MslbsZ32G+g12SPiBPwnShvJxBbq3SNGpcWS7lCcYfHiIttmjxVV7ysC/RuHSpxBVS0brpdBVohAIt5Wk9VjLVEuTlknr+swkn7tYLhO6ojMh3Z3IGQHtt4K4HjkYRCvo3TsgdyqlqIJo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZBOtw49u; arc=none smtp.client-ip=209.85.217.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="k0LCZwGN"
-Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-35f1bc63981so1085621f8f.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 10 Jun 2024 06:24:06 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZBOtw49u"
+Received: by mail-vs1-f48.google.com with SMTP id ada2fe7eead31-48a3989641cso1411621137.1;
+        Mon, 10 Jun 2024 06:58:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1718025845; x=1718630645; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :from:references:cc:to:subject:user-agent:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=cv21a25imgzIQyzA2Q03tYU95MuYdhWUZXDOTajmmvw=;
-        b=k0LCZwGNXUi/WhGyln2mBqXgXv9RnqU8iM4FTGiRQPP9JUC1rIdvqnAGwFV/tysxib
-         W6DaYELNfma5ftfyKw57kz2Rg57q7JAu+Gfu/0xeDMB0x8M6N2SBe/WUYg+2cfH1NDAY
-         QYR221zyPXiKh2VSqjc7hpcRJv7HNppN8XvaPtVOOIFMWNZw9o20GMkfeyrRxy6t0EE1
-         AxJn0dQUaoILdbvu3phIX0DkeYNAoDb38+cXqE7oUY+kjHrz1LUJjAwySDLw7KT8EP5S
-         8pp56yL2d1FMUw/sjNQ4pJYQhxlhrte0rOzgRJEe5ERRBn2x08g4Z3UMd7SHSOZlZ1qo
-         P+Wg==
+        d=gmail.com; s=20230601; t=1718027885; x=1718632685; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=drJFdNW3k8l+o1rIbvMV2Zru9hxcakn4dwTzn7AUT6E=;
+        b=ZBOtw49uVF27xvTWYwYUJQVVcucJy4Kj7hM+yobkoAT96Q4i17/wSuTnD9uY+lrAKG
+         DL+xV3CSAnyjslqOokkRkDpjq7FAuW0CkKNzs5cDi1wPxup/JV/rHTaustGQnbB4QZGs
+         I3v5d1cSDJKkyiuDmch7KCEVXJsoPeY/cq9k84jgSjzxfX8O5BjQLCHmAGrbM3jWAN49
+         k2z5h+1ZjvN75otIS80d0/hFGecSFCOw/eDG806IsdxRKlg377y0uNFt5UfBft6ZFEBd
+         V8pMWIh3N2yFTVn81akaafu3PTY2+ry+/jTK5nkBN5jPSB291vp2BcNlc2CCdWAkdVqd
+         7NnQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718025845; x=1718630645;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :from:references:cc:to:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20230601; t=1718027885; x=1718632685;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=cv21a25imgzIQyzA2Q03tYU95MuYdhWUZXDOTajmmvw=;
-        b=dAZGX/g2Y9B8yJb6ToHkiksnsRp+hNLkXmH/Txz7vLVdPdLA4Vyz05lQYIUx5y1ctZ
-         +TfGwVuxne6oScg10OCfPbpVwtCc9WCIAwdSzImwZMYG1r0kbQYfqn/Ph0k/huZhUIkT
-         yoBYfzkTCV+qcb7YyeAGconjr/KwHqMwPCfcrbbx+sA2eu8awdWv5BrBxWMVryQcBX4Q
-         DszsaYeKo8ZZth1BismZvCyz0zUnVSDK2sfxFdmgS/HTxW4dLlv8eOLmmNa5gHDl0fvZ
-         YVOA8Q7qHSRHI2CQHpDXsVuwEzLXT7HtOm+aeE3+NuIDoz+nqp2i2K7LJsu/1CCWCFzL
-         2FmA==
-X-Gm-Message-State: AOJu0YwXM32I5CEPrzG0JF3nkK7cFYtabFKQ3n4YByf1KtFbC0WS7VLE
-	fKClY4B892cqUoOJyih9fc61GliWQrSNnmkRhIh8DJgV/d2lmbW6vsC6hRNKn4c=
-X-Google-Smtp-Source: AGHT+IELeDdUHRR6TRaU6TpFZEZBK6Xj754Ty2RAKhoNehyoy5XlhvC8rHMwKFIfAgQ7ltP/WqgBZg==
-X-Received: by 2002:adf:cd0c:0:b0:35f:1f66:d708 with SMTP id ffacd0b85a97d-35f1f66d867mr4582947f8f.22.1718025845081;
-        Mon, 10 Jun 2024 06:24:05 -0700 (PDT)
-Received: from [192.168.1.20] ([178.197.219.137])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-35f1c57bac8sm5121659f8f.83.2024.06.10.06.24.03
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 10 Jun 2024 06:24:04 -0700 (PDT)
-Message-ID: <eca0655a-260e-45d3-bb4d-7de6519ac148@linaro.org>
-Date: Mon, 10 Jun 2024 15:24:03 +0200
+        bh=drJFdNW3k8l+o1rIbvMV2Zru9hxcakn4dwTzn7AUT6E=;
+        b=vbOKa6BleHeEDBx4lRP+NKPPoWx3MEvjs6i+Aa3I4zBMaz0THXnAnlZ80YgRJukoQk
+         mbLXWSMlGOE2ryXasGvEC4B0XELbJhDcnD8V0jjrn/yrO6/RPVeBD/CrAcHY2UEPrxqk
+         3aQ98E8NJAx2FyUXgtzcGjCQqGE5kGLVh0gTY+ZQ0iZbehkBu5SZBJ40XS5qhMK//3yt
+         0Es6NEI7gzyh7I2FNdc8Pu7HL4SYPWds8Y8qUYlvoxf7AhIGZZnvxtS/pVivwkVsyDtd
+         0WYiErBuadKcjYoGkkwhLX11iyOUMpX71O6dkiM6Yis+R6o4l8G8OriSCqt3L6Ip7aRd
+         BVLA==
+X-Forwarded-Encrypted: i=1; AJvYcCVsdIzntoWz2Re/zA6g1rZ8J6vMH6o9Ncm8A5oHviW98H2Ca+s37nAcNP2b362QpdLHyhmOG0yWiXa/q7HG2iasJ2iPwR70
+X-Gm-Message-State: AOJu0YxUxa+4QZbcdH8MpfYyqLAKxWT0QvqVipCtSvxvUgmsLqlc/345
+	qm+tXqqvHCI+R9xp8J4kccKju4yLCIJfTAzvWi4Fpj+1kfTZUdtb
+X-Google-Smtp-Source: AGHT+IErVbKVBK13vCvqbamXizalym0DMh8fpDks6BaKywIL+act7BytxdyuPnZG5+6p/WMDWKwMDw==
+X-Received: by 2002:a67:e3a5:0:b0:48c:45a8:a3b2 with SMTP id ada2fe7eead31-48c45a8ab9cmr4702187137.24.1718027885421;
+        Mon, 10 Jun 2024 06:58:05 -0700 (PDT)
+Received: from lvondent-mobl4.. (syn-107-146-107-067.res.spectrum.com. [107.146.107.67])
+        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-48c1a0c33c4sm2019558137.27.2024.06.10.06.58.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 10 Jun 2024 06:58:04 -0700 (PDT)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: davem@davemloft.net,
+	kuba@kernel.org
+Cc: linux-bluetooth@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: pull request: bluetooth 2024-06-10
+Date: Mon, 10 Jun 2024 09:58:03 -0400
+Message-ID: <20240610135803.920662-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2] Bluetooth: qca: Fix BT enable failure again for
- QCA6390 after warm reboot
-To: Lk Sii <lk_sii@163.com>, Zijun Hu <quic_zijuhu@quicinc.com>,
- luiz.dentz@gmail.com, luiz.von.dentz@intel.com, marcel@holtmann.org
-Cc: linux-bluetooth@vger.kernel.org, wt@penguintechs.org,
- regressions@lists.linux.dev, pmenzel@molgen.mpg.de, stable@vger.kernel.org
-References: <1715866294-1549-1-git-send-email-quic_zijuhu@quicinc.com>
- <7927abbe-3395-4a53-9eed-7b4204d57df5@linaro.org>
- <29333872-4ff2-4f4e-8166-4c847c7605c1@163.com>
- <5df56d58-309a-4ff1-9a41-818a3f114bbb@linaro.org>
- <0618805b-2f7a-473d-b9fb-aea39a1ef659@163.com>
- <3d27add1-782c-4c19-9d84-d0074113c7a2@linaro.org>
- <fc035bd7-c9e3-458f-b419-f4ac50322d02@163.com>
- <caa701f8-0d2d-4052-9e55-2b755b172c56@163.com>
-From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Content-Language: en-US
-Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
- 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
- D2GYIS41Kv4Isx2dEFh+/Q==
-In-Reply-To: <caa701f8-0d2d-4052-9e55-2b755b172c56@163.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 10/06/2024 15:17, Lk Sii wrote:
->>>>> Why Zijun cannot provide answer on which kernel was it tested? Why the
->>>>> hardware cannot be mentioned?
->>>>>
->>>> i believe zijun never perform any tests for these two issues as
->>>> explained above.
->>>
->>> yeah, and that was worrying me.
->>>
->> Only RB5 has QCA6390 *embedded* among DTS of mainline kernel, but we
->> can't have a RB5 to test.
->>
->> Don't worry about due to below points:
->> 1) Reporter have tested it with her machine
->> 2) issue B and relevant fix is obvious after discussion.
->>
-> I believe we have had too much discussion for this simple change.
-> @Krzysztof
-> do you have any other concerns?
+The following changes since commit 93792130a9387b26d825aa78947e4065deb95d15:
 
-No, nothing from me.
+  Merge branch 'geneve-fixes' (2024-06-10 13:18:09 +0100)
 
-Best regards,
-Krzysztof
+are available in the Git repository at:
 
+  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2024-06-10
+
+for you to fetch changes up to c695439d198d30e10553a3b98360c5efe77b6903:
+
+  Bluetooth: fix connection setup in l2cap_connect (2024-06-10 09:48:30 -0400)
+
+----------------------------------------------------------------
+bluetooth pull request for net:
+
+ - hci_sync: Fix not using correct handle
+ - L2CAP: Fix rejecting L2CAP_CONN_PARAM_UPDATE_REQ
+ - L2CAP: fix connection setup in l2cap_connect
+
+----------------------------------------------------------------
+Luiz Augusto von Dentz (2):
+      Bluetooth: hci_sync: Fix not using correct handle
+      Bluetooth: L2CAP: Fix rejecting L2CAP_CONN_PARAM_UPDATE_REQ
+
+Pauli Virtanen (1):
+      Bluetooth: fix connection setup in l2cap_connect
+
+ include/net/bluetooth/hci_core.h | 36 ++++++++++++++++++++++++++++++++----
+ net/bluetooth/hci_sync.c         |  2 +-
+ net/bluetooth/l2cap_core.c       | 12 +++---------
+ 3 files changed, 36 insertions(+), 14 deletions(-)
