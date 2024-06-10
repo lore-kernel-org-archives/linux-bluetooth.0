@@ -1,33 +1,33 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 459EE14F9FE
-	for <linux-bluetooth@vger.kernel.org>; Mon, 10 Jun 2024 14:03:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 459A814F9FD;
+	Mon, 10 Jun 2024 14:03:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718028212; cv=none; b=QSJOnHAMTuXviiyVmqAo+abDpsIXCpfnvVdkoAgkfPzbxsijng4OtuDZ8YpVv/muVti9auPsco+CzKeyBVRLkpzcX6G/YxPSWDAhr7ZNgXfi8wOJSpDNG6lCNsM2IRgVlWU5yvTTCk/2bZely47ymd3RJ6nrbyS5INQA9QWLwNA=
+	t=1718028212; cv=none; b=KleBnQUdN25n8m3yX0EnGRw8dxIJpj8RBggcP3qiijDz/TWgrjHMla5BuFSMe+bDoJKYEzKiUeuDy0Q262xUIcoq3BHxTRsXEiRw6HPnigye6zXPOIHt0TuZNCaakC/3mjV4tvp+346niYzoVaezEyQEm5sOUSu3W8wAsA7vE1M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1718028212; c=relaxed/simple;
-	bh=GEQv4UG44dDdt2F27iv/wOFklHaBVypZ4qqj0tU/CcI=;
+	bh=TJFgYFoarlwarKU8ibHn8fuCcroyby1ChvuIleGsJrQ=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=GwRgtc8zKysSbC2JeNs1JMoaau43QwhbGOtlVfk08nwU/w4RMSEUAvMhITywBMZX3fBDb4HVYXzUc8NureXl1YImYqx/x+/BmoNRx75IWlU1aq5D7Zr5KEIHEzqsnjkQsI2gznArjVag6fVaf4ZAcpdBFQs/VUrYBuE4ynPGDwk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Xopg1P5n; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=mOw/IjR2Nu1HlUvJ/7Pq2bIX2jBwrZgX1GVA+hjei52fbRtOHbyKUOlBalFMiJNDvL3J4LF1x0+h36WQTX4z8qL3Dpt+qw4jybyVlyVdAwHj/d0aqAMgKW6z8AW5fMDa9vM4GoFH/PpD8r2A3tBpO04/aVhxC3KD6kvTJ0CPTYQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=r60OMkwd; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Xopg1P5n"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id F05E9C4AF1C;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="r60OMkwd"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id EB34DC32786;
 	Mon, 10 Jun 2024 14:03:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1718028212;
-	bh=GEQv4UG44dDdt2F27iv/wOFklHaBVypZ4qqj0tU/CcI=;
+	bh=TJFgYFoarlwarKU8ibHn8fuCcroyby1ChvuIleGsJrQ=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Xopg1P5nY4OgiQEgiqMrxHXSx+68Jqc4I7aP+eaMwx2QiDwHnw5Phrprgwkg9l4g4
-	 lzRX8o+Xomv/CJO5rd0do4MhrxuymE+kB0MIccy88M1rXMRM6sWE7DQBxpxuMtMLT+
-	 F1AqTaa7IlIWRL2aQZXo4Q71/M5u+2/+YHfukm5D0KWn1U6m7tXeKwcQW64sSufeu0
-	 0rlUqJ9wlefHOWGp7StF96gj0ZOQpgalidWBAQdcwXYrwjnhR3ekuP4Rs/YsHIA9T4
-	 /qpvEfov0GeFR4HIkDgoON3PkQyzRoMOgbP4gyRG5fDhC0to35w3thhU3tlYM8Vgu3
-	 bHqXqwT4O2Trg==
+	b=r60OMkwdsYA8f7hYSD3gNv6dnEwMwUo616a+rOteItKAOlpGgspNh2UE/XQXB0S0d
+	 HrpIjPY5iwEOAu4/ZXtlA8X/Cr/4CskglLCDR9+NBAk7n5WPuuONfNqaZd75l/iZC6
+	 NKbgm5rpY+zvroS418vQ+gEkg8h7L0ZXLELZdN+A3pCBE292UIfDkwxONQBBifwgpZ
+	 eY5IGMS7G3jD0E2pbHJVINu/UDlVYd3Bg78jFco5AjNmm8Tq6HIIYs33MFvZFMs0Pj
+	 8GRRQ5qSQb9nwB1cLkhpLw6BdV1MoZyzyzIVWhupltVgg1b0eVgvL6Ko3lElv/HdJ2
+	 7BtHbdlKR25lQ==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id DCE69C595C0;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id D16AFE7B609;
 	Mon, 10 Jun 2024 14:03:31 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -37,35 +37,36 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2] Bluetooth: fix connection setup in l2cap_connect
+Subject: Re: pull request: bluetooth-next 2024-05-14
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <171802821189.16143.4037295666100940791.git-patchwork-notify@kernel.org>
+ <171802821184.16143.6011335078863757009.git-patchwork-notify@kernel.org>
 Date: Mon, 10 Jun 2024 14:03:31 +0000
-References: <ad69720e0ba720209cb04240fbc3c5ff059accbc.1717945321.git.pav@iki.fi>
-In-Reply-To: <ad69720e0ba720209cb04240fbc3c5ff059accbc.1717945321.git.pav@iki.fi>
-To: Pauli Virtanen <pav@iki.fi>
-Cc: linux-bluetooth@vger.kernel.org, luiz.von.dentz@intel.com,
- der.timosch@gmail.com
+References: <20240514150206.606432-1-luiz.dentz@gmail.com>
+In-Reply-To: <20240514150206.606432-1-luiz.dentz@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: davem@davemloft.net, kuba@kernel.org, linux-bluetooth@vger.kernel.org,
+ netdev@vger.kernel.org
 
 Hello:
 
-This patch was applied to bluetooth/bluetooth-next.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+This pull request was applied to bluetooth/bluetooth-next.git (master)
+by Jakub Kicinski <kuba@kernel.org>:
 
-On Sun,  9 Jun 2024 18:06:20 +0300 you wrote:
-> The amp_id argument of l2cap_connect() was removed in
-> commit 84a4bb6548a2 ("Bluetooth: HCI: Remove HCI_AMP support")
+On Tue, 14 May 2024 11:02:05 -0400 you wrote:
+> The following changes since commit 5c1672705a1a2389f5ad78e0fea6f08ed32d6f18:
 > 
-> It was always called with amp_id == 0, i.e. AMP_ID_BREDR == 0x00 (ie.
-> non-AMP controller).  In the above commit, the code path for amp_id != 0
-> was preserved, although it should have used the amp_id == 0 one.
+>   net: revert partially applied PHY topology series (2024-05-13 18:35:02 -0700)
+> 
+> are available in the Git repository at:
+> 
+>   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git tags/for-net-next-2024-05-14
 > 
 > [...]
 
 Here is the summary with links:
-  - [v2] Bluetooth: fix connection setup in l2cap_connect
-    https://git.kernel.org/bluetooth/bluetooth-next/c/5fe0be8868aa
+  - pull request: bluetooth-next 2024-05-14
+    https://git.kernel.org/bluetooth/bluetooth-next/c/79982e8f8a01
 
 You are awesome, thank you!
 -- 
