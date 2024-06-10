@@ -1,204 +1,172 @@
-Received: from mail-lj1-f172.google.com (mail-lj1-f172.google.com [209.85.208.172])
+Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7382F13212E
-	for <linux-bluetooth@vger.kernel.org>; Mon, 10 Jun 2024 14:07:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 596E923B0
+	for <linux-bluetooth@vger.kernel.org>; Mon, 10 Jun 2024 14:19:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718028442; cv=none; b=QUp+LOUBf8OkbUq9jjPvn6iMeGI5H/gzkr7wrEWtOxjQ8+AChezLbfUENDw6dW1xC3QZthiZKyxQ0RFrkVSV423077QRoqVOl2zQ+5ayB3y2ZWd6k7EG/UHjQSR54m2mLwdRDPIPSn/fdyDqIapCcE/ZcnTlIuQT8SZBFbOp5uI=
+	t=1718029176; cv=none; b=uLQJQzkFS06Eu6HirdmINGaEyi9kJWGdSjb3BofjzUZUP3JOWVR0RWVu3Z7bk3VknCTRYtMpP8k4Tm4cQcd6TpXWVAATioQa8KDtc+EhlxLutZV3VzPoeBK78rGeofrPwmIXv+z2+7o8JaGNqSLwyF1K62xXClfX/XoPYBXr1Kk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718028442; c=relaxed/simple;
-	bh=KJTo9yqBxdXCQ6jSMX21Mq8qnuooJPm4rNa/zh0tccs=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=g15EYJFS/iUjy/CMBbTTjhGrGX3VR5YhjYNQ/Qg8v4KgG4WgH96bkcoKXSp1przAuwdprVyVQbZdwGI/uVkPfOScQUHDooDYZjVfTJHBh2PIKaWmtwcXNGLgm/C3i5IFpEFfpbJT/VsjjZ2uHc+rNHNiFR3MpyP6x8FkQe+BTqE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=nIRu0Olz; arc=none smtp.client-ip=209.85.208.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
+	s=arc-20240116; t=1718029176; c=relaxed/simple;
+	bh=4QNNwmrYS1hoGpukYtjY4o8FR1Cjzh9Dsb/xKb3v0Qg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=LjweT9HqvtjUA/etFiOPnPK6seujsjeR078qViPwuBPtY0aLSBSk+FzVQmkQMTf2kJGCQiHzD0212gyK8ziOQYkXd7923uYj955ssekxB/us+KnY1QmVnPHv1REGN3ryBEPbwU/7bo8x8hGR4DvrmdQvNs2UkCp9ktGxxQTuauE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=C179FBu8; arc=none smtp.client-ip=209.85.128.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="nIRu0Olz"
-Received: by mail-lj1-f172.google.com with SMTP id 38308e7fff4ca-2eabd22d3f4so54982921fa.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 10 Jun 2024 07:07:20 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="C179FBu8"
+Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-4217c7eb6b4so13845225e9.2
+        for <linux-bluetooth@vger.kernel.org>; Mon, 10 Jun 2024 07:19:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1718028439; x=1718633239; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=IrfSjnwxqc0Uz7WM4Z+0VwCDyHj4O4ZPqDfD8wg1X5A=;
-        b=nIRu0OlzefH1RUBwL2SpbvKvz6+6atsY5VNR+KoxsbhCLwi38buwQX4M049LLaooTV
-         dFRNUM/GVy7HmnWLKDUGTp4wwAcyBNrPU/ZXoY4BLK2416OvslMnKFQIHO0UYUyFlOmy
-         H4JrMFldz0J5nzS8So0WzeDNyJJNw7SR3wmh3L5bFau1on04yRgT1714MU+Lymud/zY5
-         uROx6ni67BcBnks9+z5zTnMA5yfkdFwK4eHL6x9+POGTRFjKmoWPc9Aq3VysngEBl52h
-         FfezpnzUW+arVQjjouyN/cIoLUcNWU4UFdBQ3sAIHCbd8HikVVsSAATp0UIEudOO2O9S
-         PKVA==
+        d=linaro.org; s=google; t=1718029173; x=1718633973; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
+         :from:references:cc:to:subject:user-agent:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=7CyBtd5B83ygD6GbkOpwE4mpTzqZVwTF1rJgNbid/14=;
+        b=C179FBu85GoKzy4Vmn8H1xF7WEYxpoUyZfBeKdkJutJDYJbiNlMZhcW6hdR3I3gRqs
+         jL4CDv5IIk2AgeFkwu0sIGGIOpAxIUjUxn+uKDTFeZSnHZwSKx7b3sr5COj95OTjMfnI
+         9ktJ2qFAsOiMzoqtgvwZ4HV3OANWT6I+2JYlrgscb1KkvPtm1wXhF015hfeGvAtmlKZJ
+         DuAjVzKZV9/MzcN/wGi9sCAKu+IDNXD+gjFgjSkJwaI5xOa3qfvY2mPBdXkzqCPJ3dfM
+         KzWOoh+q8h5Tu6AXzk9GkrSeu6IgSKdi2G8Hdvv/xTPeSZUQSVuJDaPnpWgBtGWADsAG
+         dXSQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718028439; x=1718633239;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=IrfSjnwxqc0Uz7WM4Z+0VwCDyHj4O4ZPqDfD8wg1X5A=;
-        b=cKy+rWIv56dO3aQRsgrkJ5zdAoAjzHVzRE6sPhXSr6hdt+ngS+QHrDjR2iEa94AdQB
-         TpUWiun4egkaOeqmSUWSvInVXZEjjCopa/VnolrWOLhj/a4BZs6EXlsCOH92xC2VNKJE
-         z2c8uDr5hOEbOcvuimcTsYEmXygvIaDNhtBUeLvQ5kjDV6MZh3U8UBXoYPzo+Xq5q4I2
-         Fn7wqe5VZClOg94nKvmp8XR+WzVRskp7eICiQOsrqJowXEFMcEA+DMuPiiswZMjv3SIz
-         4bBHR339YfbHKPVTGawZfvC+dekx0TJawVq92/maU2/E3F3abG8mCeCfQ1Rj9g0hN2WK
-         +1Ww==
-X-Gm-Message-State: AOJu0Yx4ZKdx1DpymlmUU0K09pIz/0PJKfI/zKlnOBUW1v89ym3nOakw
-	63cs3D/FfguLoBBaKZW5xzPEjLU4AmzlHVyFDoiX2cFAvCsjf/xUSlHMxGaA+S/Y8OMsXmqUyz8
-	zBhANZKm55fv026+ugaWQ9dxMR+Ta2TeSV18+5g==
-X-Google-Smtp-Source: AGHT+IGI1oMRglxlhhOgtO94XvGP6BEJ+a2XAStspIknp9a4KpTCltzqemXiZHzEYDdn4kYV/gJEn73/Q/CUPbWeTEE=
-X-Received: by 2002:a2e:a601:0:b0:2ea:8174:231b with SMTP id
- 38308e7fff4ca-2eadce1609cmr64703571fa.2.1718028438671; Mon, 10 Jun 2024
- 07:07:18 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1718029173; x=1718633973;
+        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
+         :from:references:cc:to:subject:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=7CyBtd5B83ygD6GbkOpwE4mpTzqZVwTF1rJgNbid/14=;
+        b=GOaisXsU3GOuiSEUDz9Wh+WMJwJadmBYaldWb7nlXt94i5IDktQUjwNp2Nf6Us66Sv
+         8uCJklCi5a+Dd4SWr2iTqg9U3vRZ9lcgNJHH5an917NP4/VPr0evZ0taSqwgAFFlbQo8
+         I3J2GVHRal1cwEd+U93sOn6DnypwRPzoGXCPk+pglAqDb1JyBFahBJjWEWnxW4D/753S
+         2sEVr1UFr7LWWTKzjG5y4b4HuzvenqWPe7+orpXqjNZdQ0UCiP9rQX+yJvKCigl1nMZ3
+         GIcadkLHTnyCnxW1Vdm8lbIMQzNmrbaiIIvi9aaZ/aNvW9LU/Mg3ytB39ddZWMJybqDv
+         L8bA==
+X-Forwarded-Encrypted: i=1; AJvYcCXeyC6uLDITAxDoul3rpFRbn2qPTR8Cwvcfnnj/+4lDucy9XYWVjUKvteegMrwXbAs1DeilPhD37v9PFFarUClzwYlFEp2Rhw7RR7gFecqL
+X-Gm-Message-State: AOJu0YysoRLbTYnea/qxZaKHEMd57NaForYl0oEnhz2U2+2RVN6XUAQM
+	ZyaoXKueWYRn9Udvfiw5nsLTd0TbIIvOCu0mZ42fKII+C58tAi8CiTCa/4COlFCD8ZxPMv7jvR7
+	K
+X-Google-Smtp-Source: AGHT+IEx6wsSafpyFfRNQ3AQwe3T6JBrembToAkJGFNVgSFYx0ydy1h2DK/X+G08h5Dr4RVBiFepng==
+X-Received: by 2002:a05:600c:a45:b0:421:5605:8c92 with SMTP id 5b1f17b1804b1-42164a030b0mr79617075e9.20.1718029172734;
+        Mon, 10 Jun 2024 07:19:32 -0700 (PDT)
+Received: from [192.168.1.20] ([178.197.219.137])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4215c1aa1desm144900145e9.11.2024.06.10.07.19.31
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 10 Jun 2024 07:19:32 -0700 (PDT)
+Message-ID: <e11fabde-9aec-4699-a7b7-15cf667657ad@linaro.org>
+Date: Mon, 10 Jun 2024 16:19:30 +0200
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240605123850.24857-1-brgl@bgdev.pl>
-In-Reply-To: <20240605123850.24857-1-brgl@bgdev.pl>
-From: Bartosz Golaszewski <brgl@bgdev.pl>
-Date: Mon, 10 Jun 2024 16:07:07 +0200
-Message-ID: <CAMRc=Mc0Ju6wJUsMw+ap__KUagmDW0pWiF5EzpkfSqdpqRNaig@mail.gmail.com>
-Subject: Re: [PATCH v9 0/2] pwrseq: introduce the subsystem and first driver
-To: Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
-	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Kalle Valo <kvalo@kernel.org>, Bjorn Andersson <andersson@kernel.org>, 
-	Konrad Dybcio <konrad.dybcio@linaro.org>, Liam Girdwood <lgirdwood@gmail.com>, 
-	Mark Brown <broonie@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>, 
-	Will Deacon <will@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>, 
-	Bartosz Golaszewski <brgl@bgdev.pl>, Saravana Kannan <saravanak@google.com>, 
-	Geert Uytterhoeven <geert+renesas@glider.be>, Arnd Bergmann <arnd@arndb.de>, 
-	Neil Armstrong <neil.armstrong@linaro.org>, Marek Szyprowski <m.szyprowski@samsung.com>, 
-	Alex Elder <elder@linaro.org>, Srini Kandagatla <srinivas.kandagatla@linaro.org>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Abel Vesa <abel.vesa@linaro.org>, 
-	Manivannan Sadhasivam <mani@kernel.org>, Lukas Wunner <lukas@wunner.de>, 
-	Dmitry Baryshkov <dmitry.baryshkov@linaro.org>, Amit Pundir <amit.pundir@linaro.org>, 
-	Xilin Wu <wuxilin123@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org, 
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-wireless@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, linux-pci@vger.kernel.org, 
-	linux-pm@vger.kernel.org, 
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2] Bluetooth: qca: Fix BT enable failure again for
+ QCA6390 after warm reboot
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Lk Sii <lk_sii@163.com>, Zijun Hu <quic_zijuhu@quicinc.com>,
+ luiz.von.dentz@intel.com, marcel@holtmann.org,
+ linux-bluetooth@vger.kernel.org, wt@penguintechs.org,
+ regressions@lists.linux.dev, pmenzel@molgen.mpg.de, stable@vger.kernel.org
+References: <1715866294-1549-1-git-send-email-quic_zijuhu@quicinc.com>
+ <7927abbe-3395-4a53-9eed-7b4204d57df5@linaro.org>
+ <29333872-4ff2-4f4e-8166-4c847c7605c1@163.com>
+ <5df56d58-309a-4ff1-9a41-818a3f114bbb@linaro.org>
+ <0618805b-2f7a-473d-b9fb-aea39a1ef659@163.com>
+ <3d27add1-782c-4c19-9d84-d0074113c7a2@linaro.org>
+ <fc035bd7-c9e3-458f-b419-f4ac50322d02@163.com>
+ <caa701f8-0d2d-4052-9e55-2b755b172c56@163.com>
+ <eca0655a-260e-45d3-bb4d-7de6519ac148@linaro.org>
+ <CABBYNZKx15mrTgvE6bSvxn6YVv=jJKj7jHu1UXVFrtvffHQa9Q@mail.gmail.com>
+From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Content-Language: en-US
+Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
+ 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
+ D2GYIS41Kv4Isx2dEFh+/Q==
+In-Reply-To: <CABBYNZKx15mrTgvE6bSvxn6YVv=jJKj7jHu1UXVFrtvffHQa9Q@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Wed, Jun 5, 2024 at 2:39=E2=80=AFPM Bartosz Golaszewski <brgl@bgdev.pl> =
-wrote:
->
-> From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
->
-> Hi!
->
-> These are the power sequencing patches sent separately after some
-> improvements suggested by Bjorn Helgaas. I intend to pick them up into a
-> new branch and maintain the subsystem from now on. I then plan to
-> provide an immutable tag to the Bluetooth and PCI subsystems so that the
-> rest of the C changes can be applied. This new branch will then be
-> directly sent to Linus Torvalds for the next merge window.
->
-> Changelog:
->
-> Since v8:
-> - split the pwrseq patches out into their own series
-> - rename incref/decref functions to get/put for consistency
-> - fix typos
-> - make it very explicit in docs that arrays of targets and units must be
->   NULL-terminated
-> - Link to v8: https://lore.kernel.org/r/20240528-pwrseq-v8-0-d354d52b763c=
-@linaro.org
->
-> Since v7:
-> - added DTS changes for sm8650-hdk
-> - added circular dependency detection for pwrseq units
-> - fixed a KASAN reported use-after-free error in remove path
-> - improve Kconfig descriptions
-> - fix typos in bindings and Kconfig
-> - fixed issues reported by smatch
-> - fix the unbind path in PCI pwrctl
-> - lots of minor improvements to the pwrseq core
->
-> Since v6:
-> - kernel doc fixes
-> - drop myself from the DT bindings maintainers list for ath12k
-> - wait until the PCI bridge device is fully added before creating the
->   PCI pwrctl platform devices for its sub-nodes, otherwise we may see
->   sysfs and procfs attribute failures (due to duplication, we're
->   basically trying to probe the same device twice at the same time)
-> - I kept the regulators for QCA6390's ath11k as required as they only
->   apply to this specific Qualcomm package
->
-> Since v5:
-> - unify the approach to modelling the WCN WLAN/BT chips by always exposin=
-g
->   the PMU node on the device tree and making the WLAN and BT nodes become
->   consumers of its power outputs; this includes a major rework of the DT
->   sources, bindings and driver code; there's no more a separate PCI
->   pwrctl driver for WCN7850, instead its power-up sequence was moved
->   into the pwrseq driver common for all WCN chips
-> - don't set load_uA from new regulator consumers
-> - fix reported kerneldoc issues
-> - drop voltage ranges for PMU outputs from DT
-> - many minor tweaks and reworks
->
-> v1: Original RFC:
->
-> https://lore.kernel.org/lkml/20240104130123.37115-1-brgl@bgdev.pl/T/
->
-> v2: First real patch series (should have been PATCH v2) adding what I
->     referred to back then as PCI power sequencing:
->
-> https://lore.kernel.org/linux-arm-kernel/2024021413-grumbling-unlivable-c=
-145@gregkh/T/
->
-> v3: RFC for the DT representation of the PMU supplying the WLAN and BT
->     modules inside the QCA6391 package (was largely separate from the
->     series but probably should have been called PATCH or RFC v3):
->
-> https://lore.kernel.org/all/CAMRc=3DMc+GNoi57eTQg71DXkQKjdaoAmCpB=3Dh2ndE=
-pGnmdhVV-Q@mail.gmail.com/T/
->
-> v4: Second attempt at the full series with changed scope (introduction of
->     the pwrseq subsystem, should have been RFC v4)
->
-> https://lore.kernel.org/lkml/20240201155532.49707-1-brgl@bgdev.pl/T/
->
-> v5: Two different ways of handling QCA6390 and WCN7850:
->
-> https://lore.kernel.org/lkml/20240216203215.40870-1-brgl@bgdev.pl/
->
-> Bartosz Golaszewski (2):
->   power: sequencing: implement the pwrseq core
->   power: pwrseq: add a driver for the PMU module on the QCom WCN
->     chipsets
->
->  MAINTAINERS                                |    8 +
->  drivers/power/Kconfig                      |    1 +
->  drivers/power/Makefile                     |    1 +
->  drivers/power/sequencing/Kconfig           |   29 +
->  drivers/power/sequencing/Makefile          |    6 +
->  drivers/power/sequencing/core.c            | 1105 ++++++++++++++++++++
->  drivers/power/sequencing/pwrseq-qcom-wcn.c |  336 ++++++
->  include/linux/pwrseq/consumer.h            |   56 +
->  include/linux/pwrseq/provider.h            |   75 ++
->  9 files changed, 1617 insertions(+)
->  create mode 100644 drivers/power/sequencing/Kconfig
->  create mode 100644 drivers/power/sequencing/Makefile
->  create mode 100644 drivers/power/sequencing/core.c
->  create mode 100644 drivers/power/sequencing/pwrseq-qcom-wcn.c
->  create mode 100644 include/linux/pwrseq/consumer.h
->  create mode 100644 include/linux/pwrseq/provider.h
->
-> --
-> 2.40.1
->
+On 10/06/2024 16:02, Luiz Augusto von Dentz wrote:
+> Hi Krzysztof,
+> 
+> On Mon, Jun 10, 2024 at 9:24 AM Krzysztof Kozlowski
+> <krzysztof.kozlowski@linaro.org> wrote:
+>>
+>> On 10/06/2024 15:17, Lk Sii wrote:
+>>>>>>> Why Zijun cannot provide answer on which kernel was it tested? Why the
+>>>>>>> hardware cannot be mentioned?
+>>>>>>>
+>>>>>> i believe zijun never perform any tests for these two issues as
+>>>>>> explained above.
+>>>>>
+>>>>> yeah, and that was worrying me.
+>>>>>
+>>>> Only RB5 has QCA6390 *embedded* among DTS of mainline kernel, but we
+>>>> can't have a RB5 to test.
+>>>>
+>>>> Don't worry about due to below points:
+>>>> 1) Reporter have tested it with her machine
+>>>> 2) issue B and relevant fix is obvious after discussion.
+>>>>
+>>> I believe we have had too much discussion for this simple change.
+>>> @Krzysztof
+>>> do you have any other concerns?
+>>
+>> No, nothing from me.
+> 
+> Ok, but I guess since you didn't sign off that means you are still
+> unconvinced that this should be applied? I could try pushing it to
+> bluetooth-next to check if it blows up on the next merge window, but
+> it is not that nice to have things completely untested, as far
+> upstream goes, being pushed that way.
 
-With no objections, I plan to pick it up into its own pwrseq branch on
-Wednesday.
+The patch is fixing at least one case, so at least one group of users
+would be happy with it.
 
-Review and Ack tags are welcome.
+Best regards,
+Krzysztof
 
-Bartosz
