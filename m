@@ -1,59 +1,59 @@
-Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
+Received: from mail-lf1-f47.google.com (mail-lf1-f47.google.com [209.85.167.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21E7181745
-	for <linux-bluetooth@vger.kernel.org>; Mon, 10 Jun 2024 15:06:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B7311E4A0
+	for <linux-bluetooth@vger.kernel.org>; Mon, 10 Jun 2024 15:07:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718031963; cv=none; b=RhEXYNEYv6dQ6XOHxPmRcl0iUTG6C98uJqgNVB55tkklTJsVnVuPRnSvXMEXVhuQbUpxJ1SwD8pwLPEZcbAv8D1jCU/vB/Dgg1HqV5QAA/bU+tBEjUyeIIER7dFyPl1vRgTW3G/qeUJgxpsWkJ3DJWxrxiM5aKInuCwD9pGMZN0=
+	t=1718032032; cv=none; b=Nts/ZbXl9SZsQdbKIo7NoEiI5+WcPK0SmVzx6d2E0bPvQDko/+T+NSVrHHFy4fB0MffQXAjpCk7bJ8utDuzPjWu3n0ShtYESsgEbLy7X0oqZV9GN3xMIgJY4hwtbmI41xNDX/hu0aZWGiWFT/uaa0r8X0CxX+AmsSBW+HOZHJ8g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718031963; c=relaxed/simple;
-	bh=pad+I7k+4FFbU2DWRLOttwYkaG/8gei/sDMUy8eHO90=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ajDor064FNh5zxyjtisdfqW/wTz41baZ2eDCD5w7DyJIw22ru8QNIXmTzP72wYHz+7o7mHBokHWv003PH8WEfRLytBQgJhqX/PEM59HPIGX4uv1fQQJVWIeqC+X/xBsAoAJ48gcduygsPDPwAb4rU9ahDQlnIbKR9UXlreuGN/o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=Nhe7hei1; arc=none smtp.client-ip=209.85.128.46
+	s=arc-20240116; t=1718032032; c=relaxed/simple;
+	bh=BHUKNWu9Gm7BFV2h2F+vtKAxK01wDm8l07XgvB9kSDE=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=s2oD8Ff08lmS5WgAAkAYxWz6iCX2zEIMZ9Le7YLj1+zZZgFvsr7BZYV6vJelTJ+2I4EFItTqv0q5IQwsOjMINfKS0fpHXqJ4jFYame/Vlcukr1gVFqk6324VR7HviIAsuy4l3io5bqDeVLM02bAHvVnysWoLWiZ7sThSRCFR6Z8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=MeibQCtB; arc=none smtp.client-ip=209.85.167.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Nhe7hei1"
-Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-421820fc26dso11383215e9.2
-        for <linux-bluetooth@vger.kernel.org>; Mon, 10 Jun 2024 08:06:01 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="MeibQCtB"
+Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-52c89d6b4adso1182159e87.3
+        for <linux-bluetooth@vger.kernel.org>; Mon, 10 Jun 2024 08:07:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1718031960; x=1718636760; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1718032028; x=1718636828; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :from:references:cc:to:subject:user-agent:mime-version:date
+         :references:cc:to:from:subject:user-agent:mime-version:date
          :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=M+ZYBtEY1L5KUrPo7HAqo4GF2M1oLwupkk7P1JXGwN8=;
-        b=Nhe7hei1RIRM8U8jQOhquM7XzX72kdZ3+aRr6m4ySQUOXEftCHPCEjQpokpxmL/CMJ
-         RIMbpNEe/PwKYkr/x2dbWLAz+f8P/CQ4az+OLB7mLWCOTQfIlnDjNjrLT5WzGaqdC7Km
-         0Ue3yeikn2F9pSa1Crjv37re4cdXwBX/GjUk5ktMO4fRhCbxfGksMekWZM+aNTHoY7ZL
-         pVsGAiamnXb1/hnLq/LV9HkG5kk0Dxr78mBCSZl178lYEt0lc+ts30NgMsfAlm4Y4ukU
-         ZxvHlRFG044qregNH3DhBNofJ+h+AOTAW9jQZl3EuaVHCND4uE6OalN/piNX6cRir1io
-         dbPg==
+        bh=h9kWcRmGR8cLJ82ciTUgDAD6Cy9Z+U9GhZ0rBx9PYEE=;
+        b=MeibQCtBLodHNGDT+mVWFDX0U8tFDIL0Y9J6ps59vAkOuTzYNA6xazU9dVtXKf0oll
+         S3GC1AWid4FNNhqfOB+FjmUux9MGmt0Szs325YOTsdlodiGru6SdCvwEwaZMFgtJTtDi
+         NObeu5pVWqCJWaM5u4soYit0hgKeFmmcS9xBFfIpoY8pILyC77SJCRiuZb7Atllzs7wt
+         5AO64+5SmxcJlncjdHUhiqD4pIIXyLdWOzmx5/5f8adxMUQBCv/s/z7NG3EAJB38/Pq7
+         z3MJF7SdOwMxL04JDIKpLG33jSldVTj0rI7D0Izq8G9/saO6SbPVi5VgIQ2V/adSIL1y
+         0YYw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718031960; x=1718636760;
+        d=1e100.net; s=20230601; t=1718032028; x=1718636828;
         h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :from:references:cc:to:subject:user-agent:mime-version:date
+         :references:cc:to:from:subject:user-agent:mime-version:date
          :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=M+ZYBtEY1L5KUrPo7HAqo4GF2M1oLwupkk7P1JXGwN8=;
-        b=LahcXNKHTZB3v9ICvFNRy8eqMn7xtFa7IMjMih5HacBDlskCzt7z6huDohKmp5P+vn
-         t9DDvMbPB6CLwJ/Z+m6PaU9XoJvHaEes8mi60g0RSbYwhtPsgiWFZ+mQe/xl7N2cLafF
-         RdvvzQfuaNwcLDNBrVUg6lPQgiJ7qBAIlR94ighgasZFirla0U8AXpESALWgQIP8IISz
-         CSHrkGzLi4Q88jCib+U/nyyTN+2xLjq9PVzNqkgrRMU5HUjEB05GNjC6Y88nWiINajLH
-         9kGdL1jLB1Ag7KVqoBzi5A+K/JYakJz2/ksvZCIUXYvOZcJ/ha68NNJys0R4KE3XMNJ5
-         BoFA==
-X-Gm-Message-State: AOJu0YzVN+ARgDEzhVx0b28XRvMRnlrydQSPB8/VlWZNNVSucWr56SW2
-	UHGqzN/RA5az9I36Vp+FIYHyFWige/jJXNneigFQOVb38fDNMTx9ahOa8spWEh0=
-X-Google-Smtp-Source: AGHT+IElC5ILscmKzgrWXjiogLXFcs59hes8mC6WByCehlFHlFZoBaiB6kpLIJz7ffdCNqrNSImalw==
-X-Received: by 2002:a05:6000:128b:b0:35f:f58:38fb with SMTP id ffacd0b85a97d-35f0f589629mr4805162f8f.62.1718031960445;
-        Mon, 10 Jun 2024 08:06:00 -0700 (PDT)
+        bh=h9kWcRmGR8cLJ82ciTUgDAD6Cy9Z+U9GhZ0rBx9PYEE=;
+        b=g2zXUQ4K40V80BSm/eUnGL194Ty3uKA6Wp7wvjBPAsWQDeFgESGK0WarOtxZkCtXdx
+         X5AAZSAGNDY+C24lB2c+QZm7X+m7yvaghhSkw8+hXLLNmHKWQCqfJcGk2/aX/tRL47nK
+         arBZQB89Z4G35BinYLnvLPKBPFjIGtgB+QwxmXkVUrvc0FYuuxNpWo/RtXO3PuJN8nO5
+         H5DEzyHz2pg8cVw3N572rYcnUQSQEvGxRGBcymwuy3FP/duF1Ddc2sDQqWFOm4JGRVhi
+         lfG5IFGhpEa2BdG4mzpcuMIVq7cTeOYvrFqU14JtVslEQYsr+Ap7msXt6vhY8mx3z+Ym
+         CLoQ==
+X-Gm-Message-State: AOJu0YxfE48iLdvuGLX38a+VItmCXeBS3vSviQqaY3GRmLMCC71lUPcu
+	TnUQiWRIFrSv94leEdB7/cMuQ/Mh7xByi2WoMdn7VNK5j4lxa5wyzY2raQC76Cw=
+X-Google-Smtp-Source: AGHT+IElQ/NmsD0/0eKD3JUYRHo+Iv+RmXxwHvybvSNVCfKdGJPsv5LDDbzVkR1JOditnQZBbQsPqg==
+X-Received: by 2002:a05:6512:3da3:b0:52c:86eb:a2e6 with SMTP id 2adb3069b0e04-52c86eba461mr2983156e87.4.1718032026006;
+        Mon, 10 Jun 2024 08:07:06 -0700 (PDT)
 Received: from [192.168.1.20] ([178.197.219.137])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-35f2210ae90sm3754271f8f.97.2024.06.10.08.05.58
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42196386d13sm47420235e9.12.2024.06.10.08.07.03
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 10 Jun 2024 08:05:59 -0700 (PDT)
-Message-ID: <e7c997a3-8d68-410d-9f04-8637d76a0d61@linaro.org>
-Date: Mon, 10 Jun 2024 17:05:57 +0200
+        Mon, 10 Jun 2024 08:07:05 -0700 (PDT)
+Message-ID: <bc56ecb2-9940-48b5-afbc-1a447b1ff46f@linaro.org>
+Date: Mon, 10 Jun 2024 17:07:02 +0200
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -63,6 +63,7 @@ MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Subject: Re: [PATCH v9 2/2] power: pwrseq: add a driver for the PMU module on
  the QCom WCN chipsets
+From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 To: Bartosz Golaszewski <brgl@bgdev.pl>, Marcel Holtmann
  <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
  "David S . Miller" <davem@davemloft.net>, Eric Dumazet
@@ -93,7 +94,7 @@ Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
  Caleb Connolly <caleb.connolly@linaro.org>
 References: <20240605123850.24857-1-brgl@bgdev.pl>
  <20240605123850.24857-3-brgl@bgdev.pl>
-From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+ <e7c997a3-8d68-410d-9f04-8637d76a0d61@linaro.org>
 Content-Language: en-US
 Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
  xsFNBFVDQq4BEAC6KeLOfFsAvFMBsrCrJ2bCalhPv5+KQF2PS2+iwZI8BpRZoV+Bd5kWvN79
@@ -139,39 +140,44 @@ Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
  KQ06ztUMRrj8eVtpImjsWCd0bDWRaaR4vqhCHvAG9iWXZu4qh3ipie2Y0oSJygcZT7H3UZxq
  fyYKiqEmRuqsvv6dcbblD8ZLkz1EVZL6djImH5zc5x8qpVxlA0A0i23v5QvN00m6G9NFF0Le
  D2GYIS41Kv4Isx2dEFh+/Q==
-In-Reply-To: <20240605123850.24857-3-brgl@bgdev.pl>
+In-Reply-To: <e7c997a3-8d68-410d-9f04-8637d76a0d61@linaro.org>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 05/06/2024 14:38, Bartosz Golaszewski wrote:
-> From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+On 10/06/2024 17:05, Krzysztof Kozlowski wrote:
+> On 05/06/2024 14:38, Bartosz Golaszewski wrote:
+>> From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+>>
+>> This adds the power sequencing driver for the PMU modules present on the
+>> Qualcomm WCN Bluetooth and Wifi chipsets. It uses the pwrseq subsystem
+>> and knows how to match the sequencer to the consumer device by verifying
+>> the relevant properties and DT layout. Using this driver will allow the
+>> BT and WLAN drivers to respect the required delays between enabling the
+>> two modules.
+>>
 > 
-> This adds the power sequencing driver for the PMU modules present on the
-> Qualcomm WCN Bluetooth and Wifi chipsets. It uses the pwrseq subsystem
-> and knows how to match the sequencer to the consumer device by verifying
-> the relevant properties and DT layout. Using this driver will allow the
-> BT and WLAN drivers to respect the required delays between enabling the
-> two modules.
+> ...
 > 
+> 
+>> +
+>> +	ctx->bt_gpio = devm_gpiod_get_optional(dev, "bt-enable", GPIOD_OUT_LOW);
+>> +	if (IS_ERR(ctx->bt_gpio))
+>> +		return dev_err_probe(dev, PTR_ERR(ctx->bt_gpio),
+>> +				     "Failed to get the Bluetooth enable GPIO\n");
+>> +
+>> +	ctx->wlan_gpio = devm_gpiod_get_optional(dev, "wlan-enable",
+>> +						 GPIOD_OUT_LOW);
+>> +	if (IS_ERR(ctx->wlan_gpio))
+>> +		return dev_err_probe(dev, PTR_ERR(ctx->wlan_gpio),
+>> +				     "Failed to get the WLAN enable GPIO\n");
+>> +
+>> +	ctx->clk = devm_clk_get_optional(dev, NULL);
+> 
+> Your binding does not allow the clock. Do you need it for non-DT platforms?
 
-...
+Bah, damn covid, now I see second commit with clocks.
 
-
-> +
-> +	ctx->bt_gpio = devm_gpiod_get_optional(dev, "bt-enable", GPIOD_OUT_LOW);
-> +	if (IS_ERR(ctx->bt_gpio))
-> +		return dev_err_probe(dev, PTR_ERR(ctx->bt_gpio),
-> +				     "Failed to get the Bluetooth enable GPIO\n");
-> +
-> +	ctx->wlan_gpio = devm_gpiod_get_optional(dev, "wlan-enable",
-> +						 GPIOD_OUT_LOW);
-> +	if (IS_ERR(ctx->wlan_gpio))
-> +		return dev_err_probe(dev, PTR_ERR(ctx->wlan_gpio),
-> +				     "Failed to get the WLAN enable GPIO\n");
-> +
-> +	ctx->clk = devm_clk_get_optional(dev, NULL);
-
-Your binding does not allow the clock. Do you need it for non-DT platforms?
+Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 
 Best regards,
 Krzysztof
