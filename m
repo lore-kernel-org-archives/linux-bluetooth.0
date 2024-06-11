@@ -1,183 +1,140 @@
-Received: from mail2.andi.de1.cc (vmd64148.contaboserver.net [161.97.139.27])
+Received: from out162-62-58-216.mail.qq.com (out162-62-58-216.mail.qq.com [162.62.58.216])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 170E4174EE4;
-	Tue, 11 Jun 2024 08:33:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=161.97.139.27
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 904F02868D;
+	Tue, 11 Jun 2024 15:02:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.62.58.216
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718094793; cv=none; b=T+gmOwDVeQmGYpHMWA2PhIL7ftGWy7FworP0ZEVLk8MLfoM8Fx2rnRsvbUL+KN7ioGjVvhsqW3ub/+4f3wSfrxW3+5H6AOIrPOG3+KpulLxy8UiWEPY4piZBGZ87o8S6j4ZB9SY4KC2rHHeMnC8Z1wPr3IHqZ2qOngiRSoUm7u4=
+	t=1718118176; cv=none; b=IWH98dlPHrDmttp2UEYPgq8QUWUzm4ElUBhOaO5oKQp8wkuaqMdzOEccqiHrkczg9o4SR5Tq83pSgEst2wCsWvv/22Dq1YT1g5l/1atU6ouTZ1VCrNyuNYPZSSIZdZfVYH3toUHu7PSIUJV18Z8Isc3L9CMbw+CCaqnamCMLWr4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718094793; c=relaxed/simple;
-	bh=CtnVECJ3Sqv+zIcHzuKNfaum0O8bvOkhLfRsNVVkeVA=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=XuOMX4f/idTgQ10dynkVmxDBfi5FIR6UtIzmni1SoUNYvAVGfk0iNX8rBVAjnGOSpNI9vp7L73+J6HrsTXvEcHFdQxD7XuiF3y5buD/d/jn6wVfQq5nhgaqYASd6+i43RcsZLdH5pQJDMaarJBppaOz2LQJyXZ12ThaDriCb5hs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kemnade.info; spf=pass smtp.mailfrom=kemnade.info; dkim=pass (2048-bit key) header.d=kemnade.info header.i=@kemnade.info header.b=bY850SoV; arc=none smtp.client-ip=161.97.139.27
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kemnade.info
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kemnade.info
+	s=arc-20240116; t=1718118176; c=relaxed/simple;
+	bh=SD9Ox2uEgLQshHdPNaSlBqTcE1dEXOGR6zfPNYTOHgQ=;
+	h=Message-ID:From:To:Cc:Subject:Date:In-Reply-To:References:
+	 MIME-Version; b=gRg0h3g8AMpgDt+iiNFVrobDSQs7LXwU0Y4T73GRULf9WYk67jSoOMk1Ylqx/8w7/Oj/dudX+2LaTgid8DbTDg2aYLWJjMYFRR4wkVZtNbiu5iID89hHTVDrRqCYNNNoCNvXqEbeplWvNaKLppCcsLdwNnQuA7ixG5KkfELJxD4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com; spf=pass smtp.mailfrom=qq.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=f42GHxX+; arc=none smtp.client-ip=162.62.58.216
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kemnade.info header.i=@kemnade.info header.b="bY850SoV"
-Received: from mail.andi.de1.cc ([2a02:c205:3004:2154::1])
-	by mail2.andi.de1.cc with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <andreas@kemnade.info>)
-	id 1sGwwB-0007za-0M;
-	Tue, 11 Jun 2024 10:33:03 +0200
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=kemnade.info; s=20220719; h=Content-Transfer-Encoding:Content-Type:
-	MIME-Version:References:In-Reply-To:Message-ID:Subject:Cc:To:From:Date:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=uxBtCY19yODZNGkHF7p72TwtLkbwXAYNX7XgY9uZj5E=; b=bY850SoVU4kt1ak7F0R7JsX9QO
-	DdB29QsoOvKrafPCzplJFZTJdsKy1JFENOjrDVwyoJYHEd8vNRSL/KBSdsnpHl/rydwRwOgBieTLC
-	DeSmCQ1iQsjOilOeG+bzK5Gqih3Qq3l2tICIOBxbBFceynZg6wUtJJiby5kxqIKwgk3OPDIqI1ZmU
-	AL0HPjcA/xmWYeSMTyTsT9IEAIgyxIvW5ElKBtEQ3yw3A+MW1jtv+BRqHgRfxttKYEzCko9nijKlJ
-	f/uBX51kv2UL7WRP5Brfxh3O3V2Fc9jsn6xZA3AEJYrfpkkMEw+d0tUpChXY63fD5L7AFmCFYfG83
-	/DOPLVxQ==;
-Received: from p200300c20737c2001a3da2fffebfd33a.dip0.t-ipconnect.de ([2003:c2:737:c200:1a3d:a2ff:febf:d33a] helo=aktux)
-	by mail.andi.de1.cc with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <andreas@kemnade.info>)
-	id 1sGww6-0031HS-0Z;
-	Tue, 11 Jun 2024 10:32:59 +0200
-Date: Tue, 11 Jun 2024 10:32:56 +0200
-From: Andreas Kemnade <andreas@kemnade.info>
-To: Adam Ford <aford173@gmail.com>
-Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>, marcel@holtmann.org,
- johan@kernel.org, pmenzel@molgen.mpg.de, jirislaby@kernel.org,
- gregkh@linuxfoundation.org, linux-kernel@vger.kernel.org,
- linux-bluetooth@vger.kernel.org, Tony Lindgren <tony@atomide.com>,
- tomi.valkeinen@ideasonboard.com, =?UTF-8?B?UMOpdGVy?= Ujfalusi
- <peter.ujfalusi@gmail.com>, robh@kernel.org, hns@goldelico.com
-Subject: Re: [PATCH v4 0/4] Bluetooth/gnss: GNSS support for TiWi chips
-Message-ID: <20240611103256.4e64dd16@aktux>
-In-Reply-To: <CAHCN7xLDjnW1gK8DF4codzFLEvC_hDgeACR8wtWF8nxCJ=+RBg@mail.gmail.com>
-References: <20240606183032.684481-1-andreas@kemnade.info>
-	<CABBYNZ+Fz2TLSNa28H3kjVKOSA7C-XOzdQJiHdJs3FKxnq01DA@mail.gmail.com>
-	<20240606221941.333a9704@aktux>
-	<CAHCN7xLhbiqTTOwPZ22KekALDn0KtH6vNQEJpSmSCTiMggX5Qg@mail.gmail.com>
-	<20240608212004.3707d8ea@aktux>
-	<CAHCN7xLDjnW1gK8DF4codzFLEvC_hDgeACR8wtWF8nxCJ=+RBg@mail.gmail.com>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; x86_64-pc-linux-gnu)
+	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="f42GHxX+"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
+	t=1718118165; bh=EYZJeMpHWJRkQqovyVl3G5DqtUj1NtUFyItaVN67Ogk=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=f42GHxX+j+2EYRXI3DgQqOOzhfCb1/4MUj2V49+H5LEvRrxnPjG9SJL3EvyuQGROY
+	 fHxwfiQK+gIAouaqOYeYLQHeI2KmfWjrix+fUP3lVf20Kql43B4glSyVYJZvV29OxT
+	 Kfmena5swtfEepp8mvkTVJ6CmbqvqzhGj2tp8EBs=
+Received: from pek-lxu-l1.wrs.com ([111.198.228.153])
+	by newxmesmtplogicsvrsza29-0.qq.com (NewEsmtp) with SMTP
+	id C9107ACF; Tue, 11 Jun 2024 22:50:17 +0800
+X-QQ-mid: xmsmtpt1718117417tpy0idpsl
+Message-ID: <tencent_0CCE4C90A7C306FCD2EE466AC9882EFFAE06@qq.com>
+X-QQ-XMAILINFO: MB5+LsFw85NotV1rPa9aT9fXzjVDRjmoVre1tPCLpk+PR3dw+8o/OClgcieWx/
+	 Z+J5aQb0hcyNQhrKegLlWcSOX1GZT+vxFZChIuE9eoFfdg8zrOdWFS45YmTJ1zxgm49m2a5Yv597
+	 ayyBDbo595mOsHMJG253NmqW2lX91Y1WXnha9C1NdTJ9+aT5y8rrRGataNf1TqhDOVqC8YC5EBvg
+	 j8Rh1bP5ieC+tMEDRD9jogUAKLrFFnS4/Xiy4XoZPQ5ukc22+2YfjFoNofsOe07X//cghIuYcUkG
+	 1QgFad5EkH57Nhoa2lukc8qcxFFH4CnSrB5Fx/v11Pi1BUwj6TZ1/7irlxVF3BsfAlCSMmiFnZIA
+	 weQoZ88Y6+NjeMyqKbnL6NHmEvTMo5aBfq2Gt25MZSPBBhuGBZNiRDhm9YhZqbbGVS7oslzoHvdL
+	 CpI0MUeQzrTJNFVNuYO+CmuEVgtIeZp/RdWW2ATCXFf+BPHJk5fL5kHQv3hS8OYTlHRmmyqVzYQC
+	 bOeHuPDBrQI9h0oT6+NP4h92rTJCfmeHvW5BUMW6ItkgUhiZhINnrnRFM7qIMHcajXPY6K1WLtOx
+	 mgH3/Vx32vYLjMyK7H+2EY3uWDCOhqiExPVKfLnM7QljgC7RnRob6nIVL+nUKcZBaaFVgjsLukiR
+	 OmY9M9eRpQlzLuKoPdaE9+t5yysAT9cZmOkj6A4st8wCsSRv5JJTmEMn1eYFqvGk06yl6+tDrnD7
+	 omiAWwxi7fdqAL/Q31TAT4PeMzl6NUoYGKRg8HVv/JyIi9GwJcO2Z6WeowkdGoTtFAiOD1BZx8CD
+	 FgKuiaL+FnsEJ9xhgYPruS3mJFuvxXbVPxvDX9adD+bRDJ+MdtCWHzs2yeTXElhe2U0/QqAhNvZ5
+	 +/RF+6PmJ4ubmXwi2AXDmDrr9LhAXrIhE1TG5oHOn0tE/q/X8ecCrIcw/xT1U2uAMtsvipmo2K
+X-QQ-XMRINFO: OD9hHCdaPRBwq3WW+NvGbIU=
+From: Edward Adam Davis <eadavis@qq.com>
+To: syzbot+b7f6f8c9303466e16c8a@syzkaller.appspotmail.com
+Cc: johan.hedberg@gmail.com,
+	linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	luiz.dentz@gmail.com,
+	marcel@holtmann.org,
+	syzkaller-bugs@googlegroups.com
+Subject: [PATCH] bluetooth/l2cap: sync sock recv cb and release
+Date: Tue, 11 Jun 2024 22:50:17 +0800
+X-OQ-MSGID: <20240611145016.2085712-2-eadavis@qq.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <000000000000b0906d061a468b93@google.com>
+References: <000000000000b0906d061a468b93@google.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-Hi Adam,
+The problem occurs between the system call to close the sock and hci_rx_work,
+where the former releases the sock and the latter accesses it without lock protection.
 
-On Mon, 10 Jun 2024 18:17:05 -0500
-Adam Ford <aford173@gmail.com> wrote:
+           CPU0                       CPU1
+           ----                       ----
+           sock_close                 hci_rx_work
+	   l2cap_sock_release         hci_acldata_packet
+	   l2cap_sock_kill            l2cap_recv_frame
+	   sk_free                    l2cap_conless_channel
+	                              l2cap_sock_recv_cb
 
-> On Sat, Jun 8, 2024 at 2:20=E2=80=AFPM Andreas Kemnade <andreas@kemnade.i=
-nfo> wrote:
-> >
-> > Hi Adam,
-> >
-> > On Sat, 8 Jun 2024 14:00:38 -0500
-> > Adam Ford <aford173@gmail.com> wrote:
-> > =20
-> > > On Thu, Jun 6, 2024 at 3:19=E2=80=AFPM Andreas Kemnade <andreas@kemna=
-de.info> wrote: =20
-> > > >
-> > > > Hi Luiz,
-> > > >
-> > > > On Thu, 6 Jun 2024 16:04:10 -0400
-> > > > Luiz Augusto von Dentz <luiz.dentz@gmail.com> wrote:
-> > > > =20
-> > > > > Hi Andreas,
-> > > > >
-> > > > > On Thu, Jun 6, 2024 at 2:30=E2=80=AFPM Andreas Kemnade <andreas@k=
-emnade.info> wrote: =20
-> > > > > >
-> > > > > > Some of these chips have GNSS support. In some vendor kernels
-> > > > > > a driver on top of misc/ti-st can be found providing a /dev/tig=
-ps
-> > > > > > device which speaks the secretive Air Independent Interface (AI=
-2) protocol. =20
-> > >
-> > > I think you may have sent me a file to test, but I can't find the
-> > > e-mail.   Can you tell me what tool you used to test it?  I can get
-> > > gnss0 to enumerate, so I am close.
-> > > =20
-> > hmm, /bin/cat is sufficient. It should spit out nmea now by default.
-> >
-> > For playing around with raw mode, you need the ai2raw parameter
-> > and then you can play around with read-gps from
-> > https://github.com/akemnade/bt200tools
-> > =20
-> > > [   20.759857] hci-ti serial0-0: using DT
-> > > '/ocp@68000000/serial@4806c000/bluetooth-gnss' for 'enable' GPIO
-> > > lookup
-> > > [   20.770263] of_get_named_gpiod_flags: parsed 'enable-gpios'
-> > > property of node '/ocp@68000000/serial@4806c000/bluetooth-gnss[0]' -
-> > > status (0)
-> > > [   29.221588] gnss: GNSS driver registered with major 244
-> > > =20
-> > That is nice. =20
->=20
-> I think I am stuck.  The closed-sourced GPS binary that Logic PD did
-> was done a 3rd party which has since been sold, and Logic PD never had
-> the source code, I just get junk with this driver:
->=20
-Well, the whole thing is kept in secrecy. But the junk you get is just=20
-plain NMEA which I get also when device is indoors, so you got the chip
-into a mode which common user space (like gpsd) understands. So IMHO that i=
-s a
-Tested-By. So thanks a lot. I am happy with that result for the first step.
+If hci_rx_work processes the data that needs to be received before the sock is
+closed, then everything is normal; Otherwise, the work thread may access the
+released sock when receiving data.
 
-So first rpc was tested with a Motorola tablet and the BT200, this one now
-with two different devices, so it is a good situation.=20
+Add a chan mutex in the rx callback of the sock to achieve synchronization between
+the sock release and recv cb.
 
-> $GPGLL,,,,,,V,N*64
-> $GPRMC,,V,,,,,,,,,,N*53
-> $GPGGA,,,,,,0,,,,,,,,*66
-> $GPVTG,,T,,M,,N,,K,N*2C
-> $GPGSA,M,1,,,,,,,,,,,,,,,*12
-> $GPGSV,1,1,00*79
-> $GPGLL,,,,,,V,N*64
-> $GPRMC,,V,,,,,,,,,,N*53
-> $GPGGA,,,,,,0,,,,,,,,*66
-> $GPVTG,,T,,M,,N,,K,N*2C
-> $GPGSA,M,1,,,,,,,,,,,,,,,*12
-> $GPGSV,1,1,00*79
-> $GPGLL,,,,,,V,N*64
-> $GPRMC,,V,,,,,,,,,,N*53
-> $GPGGA,,,,,,0,,,,,,,,*66
-> $GPVTG,,T,,M,,N,,K,N*2C
-> $GPGSA,M,1,,,,,,,,,,,,,,,*12
-> $GPGSV,1,1,00*79
->=20
-A note: contrary to other GPS I have seen, this one does not give
-out satellite reception strength if not much is known about
-position. So this pattern might continue a bit even if antenna
-is there and gps reception is good. Much development of this
-driver was done in a hammock with keyboard in a sleeping bag outside
-so I know a bit...
+Reported-and-tested-by: syzbot+b7f6f8c9303466e16c8a@syzkaller.appspotmail.com
+Signed-off-by: Edward Adam Davis <eadavis@qq.com>
+---
+ net/bluetooth/l2cap_sock.c | 20 +++++++++++++++++---
+ 1 file changed, 17 insertions(+), 3 deletions(-)
 
-> I am not 100% positive, but I think the antenna might be required to
-> be powered.  I'll talk with the HW engineer who designed the Torpedo +
-> Wireless SOM and see if he remembers anyhthing about the GPS.  I know
-> for a fact that Logic PD doesn't have the source code for their GPS
-> demo, and I know it doesn't work with modern kernels, so i can't
-> compare the performance.
->=20
-Well, and demo tools are not easily available anywhere...
-Well, I think if there is some special antenna powering stuff,
-that can be done in a second step. Probably just a gpio or something.
-But that would affect both the testing tools and the in-kernel
-solution.
+diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+index 6db60946c627..f3e9236293e1 100644
+--- a/net/bluetooth/l2cap_sock.c
++++ b/net/bluetooth/l2cap_sock.c
+@@ -1413,6 +1413,8 @@ static int l2cap_sock_release(struct socket *sock)
+ 	l2cap_chan_hold(chan);
+ 	l2cap_chan_lock(chan);
+ 
++	if (refcount_read(&sk->sk_refcnt) == 1)
++		chan->data = NULL;
+ 	sock_orphan(sk);
+ 	l2cap_sock_kill(sk);
+ 
+@@ -1481,12 +1483,22 @@ static struct l2cap_chan *l2cap_sock_new_connection_cb(struct l2cap_chan *chan)
+ 
+ static int l2cap_sock_recv_cb(struct l2cap_chan *chan, struct sk_buff *skb)
+ {
+-	struct sock *sk = chan->data;
+-	struct l2cap_pinfo *pi = l2cap_pi(sk);
++	struct sock *sk;
++	struct l2cap_pinfo *pi;
+ 	int err;
+ 
+-	lock_sock(sk);
++	l2cap_chan_hold(chan);
++	l2cap_chan_lock(chan);
++	sk = chan->data;
++
++	if (!sk) {
++		l2cap_chan_unlock(chan);
++		l2cap_chan_put(chan);
++		return -ENXIO;
++	}
+ 
++	pi = l2cap_pi(sk);
++	lock_sock(sk);
+ 	if (chan->mode == L2CAP_MODE_ERTM && !list_empty(&pi->rx_busy)) {
+ 		err = -ENOMEM;
+ 		goto done;
+@@ -1535,6 +1547,8 @@ static int l2cap_sock_recv_cb(struct l2cap_chan *chan, struct sk_buff *skb)
+ 
+ done:
+ 	release_sock(sk);
++	l2cap_chan_unlock(chan);
++	l2cap_chan_put(chan);
+ 
+ 	return err;
+ }
+-- 
+2.43.0
 
-As said, you might use the ai2raw=3D1 parameter and try the read_gps from
-bt200tools. Or the demo might work if you symlink gnss0 to tigps.
-
-> :-(
-
-Well, no, correct is :-)
-
-Regards,
-Andreas
