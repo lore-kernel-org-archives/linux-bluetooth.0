@@ -1,60 +1,60 @@
-Received: from out162-62-58-216.mail.qq.com (out162-62-58-216.mail.qq.com [162.62.58.216])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ua1-f49.google.com (mail-ua1-f49.google.com [209.85.222.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 904F02868D;
-	Tue, 11 Jun 2024 15:02:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.62.58.216
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D03993D0C5
+	for <linux-bluetooth@vger.kernel.org>; Tue, 11 Jun 2024 16:35:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718118176; cv=none; b=IWH98dlPHrDmttp2UEYPgq8QUWUzm4ElUBhOaO5oKQp8wkuaqMdzOEccqiHrkczg9o4SR5Tq83pSgEst2wCsWvv/22Dq1YT1g5l/1atU6ouTZ1VCrNyuNYPZSSIZdZfVYH3toUHu7PSIUJV18Z8Isc3L9CMbw+CCaqnamCMLWr4=
+	t=1718123747; cv=none; b=i8RXRPUCGvb158prQnJaljDjrM6j0cjOhXmSDX3FRX3ADh3unlmT1SV6Tgm93a8iNCcIdZL+WFeiXG00s4jl24oulCx0qv1dmihr9ArPwvtlzm7hYmsez8qPwFpx+wwofw3KmnBGqTXythUiI+9DeMiX3nvHMb6y3Hj8F/ZvE1g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718118176; c=relaxed/simple;
-	bh=SD9Ox2uEgLQshHdPNaSlBqTcE1dEXOGR6zfPNYTOHgQ=;
-	h=Message-ID:From:To:Cc:Subject:Date:In-Reply-To:References:
-	 MIME-Version; b=gRg0h3g8AMpgDt+iiNFVrobDSQs7LXwU0Y4T73GRULf9WYk67jSoOMk1Ylqx/8w7/Oj/dudX+2LaTgid8DbTDg2aYLWJjMYFRR4wkVZtNbiu5iID89hHTVDrRqCYNNNoCNvXqEbeplWvNaKLppCcsLdwNnQuA7ixG5KkfELJxD4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com; spf=pass smtp.mailfrom=qq.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=f42GHxX+; arc=none smtp.client-ip=162.62.58.216
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
+	s=arc-20240116; t=1718123747; c=relaxed/simple;
+	bh=/md9T9hMmhmAG2VNOjqDru57HXxp7w5IBZFKek8n6nQ=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=JwldPsLXTL7S0JRAVdd30h12dVw9dYYgBFaR3kfw3v4MXun7cBELlnvTTTJDD2s/SE+03UOlZTrofdcQffCVHH+kKIRtnTpOd0nykC+azVpSVhwNYwE1alIh9x4pOKfgsd3P+sXgr/GgSe6XmBCPw4TVyBqUZBZQyp+XeL/Zd5E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=X8qmW/3f; arc=none smtp.client-ip=209.85.222.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="f42GHxX+"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
-	t=1718118165; bh=EYZJeMpHWJRkQqovyVl3G5DqtUj1NtUFyItaVN67Ogk=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=f42GHxX+j+2EYRXI3DgQqOOzhfCb1/4MUj2V49+H5LEvRrxnPjG9SJL3EvyuQGROY
-	 fHxwfiQK+gIAouaqOYeYLQHeI2KmfWjrix+fUP3lVf20Kql43B4glSyVYJZvV29OxT
-	 Kfmena5swtfEepp8mvkTVJ6CmbqvqzhGj2tp8EBs=
-Received: from pek-lxu-l1.wrs.com ([111.198.228.153])
-	by newxmesmtplogicsvrsza29-0.qq.com (NewEsmtp) with SMTP
-	id C9107ACF; Tue, 11 Jun 2024 22:50:17 +0800
-X-QQ-mid: xmsmtpt1718117417tpy0idpsl
-Message-ID: <tencent_0CCE4C90A7C306FCD2EE466AC9882EFFAE06@qq.com>
-X-QQ-XMAILINFO: MB5+LsFw85NotV1rPa9aT9fXzjVDRjmoVre1tPCLpk+PR3dw+8o/OClgcieWx/
-	 Z+J5aQb0hcyNQhrKegLlWcSOX1GZT+vxFZChIuE9eoFfdg8zrOdWFS45YmTJ1zxgm49m2a5Yv597
-	 ayyBDbo595mOsHMJG253NmqW2lX91Y1WXnha9C1NdTJ9+aT5y8rrRGataNf1TqhDOVqC8YC5EBvg
-	 j8Rh1bP5ieC+tMEDRD9jogUAKLrFFnS4/Xiy4XoZPQ5ukc22+2YfjFoNofsOe07X//cghIuYcUkG
-	 1QgFad5EkH57Nhoa2lukc8qcxFFH4CnSrB5Fx/v11Pi1BUwj6TZ1/7irlxVF3BsfAlCSMmiFnZIA
-	 weQoZ88Y6+NjeMyqKbnL6NHmEvTMo5aBfq2Gt25MZSPBBhuGBZNiRDhm9YhZqbbGVS7oslzoHvdL
-	 CpI0MUeQzrTJNFVNuYO+CmuEVgtIeZp/RdWW2ATCXFf+BPHJk5fL5kHQv3hS8OYTlHRmmyqVzYQC
-	 bOeHuPDBrQI9h0oT6+NP4h92rTJCfmeHvW5BUMW6ItkgUhiZhINnrnRFM7qIMHcajXPY6K1WLtOx
-	 mgH3/Vx32vYLjMyK7H+2EY3uWDCOhqiExPVKfLnM7QljgC7RnRob6nIVL+nUKcZBaaFVgjsLukiR
-	 OmY9M9eRpQlzLuKoPdaE9+t5yysAT9cZmOkj6A4st8wCsSRv5JJTmEMn1eYFqvGk06yl6+tDrnD7
-	 omiAWwxi7fdqAL/Q31TAT4PeMzl6NUoYGKRg8HVv/JyIi9GwJcO2Z6WeowkdGoTtFAiOD1BZx8CD
-	 FgKuiaL+FnsEJ9xhgYPruS3mJFuvxXbVPxvDX9adD+bRDJ+MdtCWHzs2yeTXElhe2U0/QqAhNvZ5
-	 +/RF+6PmJ4ubmXwi2AXDmDrr9LhAXrIhE1TG5oHOn0tE/q/X8ecCrIcw/xT1U2uAMtsvipmo2K
-X-QQ-XMRINFO: OD9hHCdaPRBwq3WW+NvGbIU=
-From: Edward Adam Davis <eadavis@qq.com>
-To: syzbot+b7f6f8c9303466e16c8a@syzkaller.appspotmail.com
-Cc: johan.hedberg@gmail.com,
-	linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	luiz.dentz@gmail.com,
-	marcel@holtmann.org,
-	syzkaller-bugs@googlegroups.com
-Subject: [PATCH] bluetooth/l2cap: sync sock recv cb and release
-Date: Tue, 11 Jun 2024 22:50:17 +0800
-X-OQ-MSGID: <20240611145016.2085712-2-eadavis@qq.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <000000000000b0906d061a468b93@google.com>
-References: <000000000000b0906d061a468b93@google.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="X8qmW/3f"
+Received: by mail-ua1-f49.google.com with SMTP id a1e0cc1a2514c-808c613ade5so314249241.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 11 Jun 2024 09:35:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1718123744; x=1718728544; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=MeYQxSF1nuy4x/pEKdQb6ODssY7uCs8QFY6rTQfkE0s=;
+        b=X8qmW/3fXfbBKCf7QkFYGc77GDfbN26lkVltejMsyT2qAdEA4j8avahufqgbUXWy5b
+         0PLCaGVE/PzS/IRE4Os+ceRNTciexFb2BaJUla0URTyEVRA8GrPqs589AbH8n9LmcaCt
+         8FiCj3bjjpwwB53yz/yMd8/n2fQ8E3JqQbJZy3DCXBsB6FtvMcxjW8o8HNNNUpV2jvZu
+         R8PJhix+dXHPdGeyHbP8lY6NW9yiCof/wfUNkfZndIwtW+Te3aejrWHSc57e12cw0XM2
+         gI4AOg7DzTtGEvy56+mN1YPcVZhw2tOjyOVuXVvcsabkrF6/S5oO/kmVam7dzlUSHmWP
+         yAZg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718123744; x=1718728544;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=MeYQxSF1nuy4x/pEKdQb6ODssY7uCs8QFY6rTQfkE0s=;
+        b=JQ6a5pP8rfT5XFcBlt57GUO/7wPLM1OfTA2iQAYb2zTibXv8TrZP5S0PTb8/SAZ+AI
+         pt+kkcqrSMSG/Susjto4S0eF7APhoak+HfDjQKK4/kupx3OnzMx9O4tddzhrFxSDoJhQ
+         DT4L6eDVFy2RVudjapplWTgDDkevpP2p0Tf6dbZyWry3DL8QfOsOXKSr7U15wN3ujYEF
+         /QDxnrnNODr44fBnohfmWKc+GaSBWQwKfyp/rTAZKAE6ldl2AoypAJwaIOGumka6ANf4
+         PCnsqTVHhsg/bmP2lp4jjSqU/XxHStzjIGaGi0xx2lb9z2ga4bYp1kun7CUr6LaGes9v
+         whDA==
+X-Gm-Message-State: AOJu0Yy7eoiqKDv8pny4PygR/SIjQft5VkLN0JmYCFSmKHVktb32LJFV
+	ZmWZnCAsyZCVCUFlFEjJiAab4Pe11me+QkdnU3ngbGd7ojNsnG5HMFIGHQ==
+X-Google-Smtp-Source: AGHT+IFWBmWmMxlBwJ7rQW6vctXak52vHCKuRt6RyeHv6nNHDGowi0W+Ur9BN7SNN4B4Hbfc34KS+Q==
+X-Received: by 2002:a05:6122:20a4:b0:4d8:7970:28e6 with SMTP id 71dfb90a1353d-4eb5615afdemr12650644e0c.0.1718123743965;
+        Tue, 11 Jun 2024 09:35:43 -0700 (PDT)
+Received: from lvondent-mobl4.. (syn-107-146-107-067.res.spectrum.com. [107.146.107.67])
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-4ecf9b30a1bsm132291e0c.32.2024.06.11.09.35.42
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 11 Jun 2024 09:35:43 -0700 (PDT)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ v1 1/2] shared/gatt-db: Fix gatt_db_clone
+Date: Tue, 11 Jun 2024 12:35:41 -0400
+Message-ID: <20240611163542.1161789-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -63,78 +63,58 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The problem occurs between the system call to close the sock and hci_rx_work,
-where the former releases the sock and the latter accesses it without lock protection.
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-           CPU0                       CPU1
-           ----                       ----
-           sock_close                 hci_rx_work
-	   l2cap_sock_release         hci_acldata_packet
-	   l2cap_sock_kill            l2cap_recv_frame
-	   sk_free                    l2cap_conless_channel
-	                              l2cap_sock_recv_cb
-
-If hci_rx_work processes the data that needs to be received before the sock is
-closed, then everything is normal; Otherwise, the work thread may access the
-released sock when receiving data.
-
-Add a chan mutex in the rx callback of the sock to achieve synchronization between
-the sock release and recv cb.
-
-Reported-and-tested-by: syzbot+b7f6f8c9303466e16c8a@syzkaller.appspotmail.com
-Signed-off-by: Edward Adam Davis <eadavis@qq.com>
+The process of cloning an existing db shall also clone certain values
+that are considered when calculating the hash since the resulting clone
+shall have the same hash.
 ---
- net/bluetooth/l2cap_sock.c | 20 +++++++++++++++++---
- 1 file changed, 17 insertions(+), 3 deletions(-)
+ src/shared/gatt-db.c | 23 ++++++++++++++++++++---
+ 1 file changed, 20 insertions(+), 3 deletions(-)
 
-diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-index 6db60946c627..f3e9236293e1 100644
---- a/net/bluetooth/l2cap_sock.c
-+++ b/net/bluetooth/l2cap_sock.c
-@@ -1413,6 +1413,8 @@ static int l2cap_sock_release(struct socket *sock)
- 	l2cap_chan_hold(chan);
- 	l2cap_chan_lock(chan);
- 
-+	if (refcount_read(&sk->sk_refcnt) == 1)
-+		chan->data = NULL;
- 	sock_orphan(sk);
- 	l2cap_sock_kill(sk);
- 
-@@ -1481,12 +1483,22 @@ static struct l2cap_chan *l2cap_sock_new_connection_cb(struct l2cap_chan *chan)
- 
- static int l2cap_sock_recv_cb(struct l2cap_chan *chan, struct sk_buff *skb)
- {
--	struct sock *sk = chan->data;
--	struct l2cap_pinfo *pi = l2cap_pi(sk);
-+	struct sock *sk;
-+	struct l2cap_pinfo *pi;
- 	int err;
- 
--	lock_sock(sk);
-+	l2cap_chan_hold(chan);
-+	l2cap_chan_lock(chan);
-+	sk = chan->data;
+diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
+index 16abcba2ec1c..b35763410d17 100644
+--- a/src/shared/gatt-db.c
++++ b/src/shared/gatt-db.c
+@@ -281,18 +281,35 @@ static void service_clone(void *data, void *user_data)
+ 		/* Only clone values for characteristics declaration since that
+ 		 * is considered when calculating the db hash.
+ 		 */
+-		if (bt_uuid_len(&attr->uuid) == 2 &&
+-				attr->uuid.value.u16 == GATT_CHARAC_UUID)
++		if (bt_uuid_len(&attr->uuid) != 2) {
++			clone->attributes[i] = new_attribute(clone,
++							attr->handle,
++							&attr->uuid,
++							NULL, 0);
++			continue;
++		}
 +
-+	if (!sk) {
-+		l2cap_chan_unlock(chan);
-+		l2cap_chan_put(chan);
-+		return -ENXIO;
-+	}
++		/* Attribute values that are used for generating the hash needs
++		 * to be cloned as well.
++		 */
++		switch (attr->uuid.value.u16) {
++		case GATT_PRIM_SVC_UUID:
++		case GATT_SND_SVC_UUID:
++		case GATT_INCLUDE_UUID:
++		case GATT_CHARAC_UUID:
+ 			clone->attributes[i] = new_attribute(clone,
+ 							attr->handle,
+ 							&attr->uuid,
+ 							attr->value,
+ 							attr->value_len);
+-		else
++			break;
++		default:
+ 			clone->attributes[i] = new_attribute(clone,
+ 							attr->handle,
+ 							&attr->uuid,
+ 							NULL, 0);
++			break;
++		}
+ 	}
  
-+	pi = l2cap_pi(sk);
-+	lock_sock(sk);
- 	if (chan->mode == L2CAP_MODE_ERTM && !list_empty(&pi->rx_busy)) {
- 		err = -ENOMEM;
- 		goto done;
-@@ -1535,6 +1547,8 @@ static int l2cap_sock_recv_cb(struct l2cap_chan *chan, struct sk_buff *skb)
- 
- done:
- 	release_sock(sk);
-+	l2cap_chan_unlock(chan);
-+	l2cap_chan_put(chan);
- 
- 	return err;
- }
+ 	queue_push_tail(db->services, clone);
 -- 
-2.43.0
+2.45.2
 
