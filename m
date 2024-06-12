@@ -1,116 +1,139 @@
-Received: from mail-lj1-f179.google.com (mail-lj1-f179.google.com [209.85.208.179])
+Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CB7E12F5A1
-	for <linux-bluetooth@vger.kernel.org>; Wed, 12 Jun 2024 07:11:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBAF816C6B7
+	for <linux-bluetooth@vger.kernel.org>; Wed, 12 Jun 2024 07:25:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718176268; cv=none; b=TKXN2CkFwFmFRrau79FDrzSoJB6L4G+vLcqUt+E129hp5mduMl7VHLjT+0RmyH5DbqWU/jOWq3Gsl6I8of2JxLPbm48/FHvQKkFCKrbY/b7AEO5MMTqBbyInt7/bQkTt3vc6VKqw21022fujMAX+tFh6vWf6CwBtoSaSHGebhMw=
+	t=1718177103; cv=none; b=pdWaviXRj8rQA9kXt59p4T5eIfRwelLiKm6CG4FxiwPASt6lQyVbb2TccqGRHelHfrsu6wpUH9OK/Oye2+HRMolowhNtyWZOnbQHWAmCouDOJuRdASpYuXyAOIpwY2zuAMuvq4rWzs/GodSa4gx1f7JV57zKiQaH1xwxLBnteHY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718176268; c=relaxed/simple;
-	bh=i6o0FZBPMx+nOIu/mzHBniZ5GdF+FcAxR4uXfrLlAu8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=fl2619W/bVm1nq9ebP11MpwXxe/xl0j7Ie2xxusWm8yP8xMHI4x1lg2oQnSvgGzOLK096hJJTHKKJ4xpJqQbbXn8sU4qoLVO2VbeRkbWpdKrHMFt3tmmhXzMgwy/EJ/+S16866OFu1hTM1EzHKHvWBXaZP28Fmv6iVm0T0nbwAc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=o7Zd1oeZ; arc=none smtp.client-ip=209.85.208.179
+	s=arc-20240116; t=1718177103; c=relaxed/simple;
+	bh=GV8vhLk5W+15Fu37cvfJGGkkE6AbEn/05xw+plQAHrs=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=hxHJ2CDfghp1HuJ+cCIwSaG/DnJxUSUwhQCM/asB4leyXr+2t3wZWbd3RPDYSiq3LTjR0NhV8IO+v//BDsCFLSmPNdjNT6FC/MWwwf/M/mbe0mv4Nd4oYHztQLydw2gnHE3Doum+EFCBh5FoSOb/Q7CqtLrZhuQKd+HLockUHe0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=eNd5Ceix; arc=none smtp.client-ip=209.85.128.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="o7Zd1oeZ"
-Received: by mail-lj1-f179.google.com with SMTP id 38308e7fff4ca-2eaea28868dso63172801fa.3
-        for <linux-bluetooth@vger.kernel.org>; Wed, 12 Jun 2024 00:11:06 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="eNd5Ceix"
+Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-42189d3c7efso31512635e9.2
+        for <linux-bluetooth@vger.kernel.org>; Wed, 12 Jun 2024 00:25:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1718176264; x=1718781064; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
+        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1718177100; x=1718781900; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=i6o0FZBPMx+nOIu/mzHBniZ5GdF+FcAxR4uXfrLlAu8=;
-        b=o7Zd1oeZPpPLURaHzb321yRhJty2DLlnC4qlpDAKYRFrE37XjKXxDcFOiFIb9S/k59
-         zOiDJoKQKHDthECblWTjcuySU2K8pVGTszGKSP28d8Wqu8RslcoPlcygzf1gMvZwyl3I
-         pvNZo+1wN7nmbggtNN8Z6x2LMRnZSBpP+Z+J+iGRVSpfGK9gO4MbtRortXxuZgYt/y25
-         pNZA62NRWFLhqawVq7KXbsVGQsn49MwnAqnVQsnthUWtbAjJMYPwSAy5XiqKVPxQxpr8
-         LGRrV3JLU8vv3DDdZY6lCL2a6PAUrgpA0YzkKe44ijQH5GLO9atBJnYnPCFtsPgtHWjb
-         1ISQ==
+        bh=nZZ648vF2hGd45hekWosmU80qN8L5wlOVqhbijLkjGE=;
+        b=eNd5Ceixs5u/g3v6ODZjFyxjAEDPzadGTSf/6GUQL7AfM8wJycLhpqO50pAS875tqF
+         pg+mNBSeEF7bXrFHJo9gihBclpdBSOEVmvXZIOw+od0s+EhKU7y+XEdx8FQsmCZL/V9a
+         LeEY2OVP4QZOeFICVlJxoNQ61YWf5BHY63T+p624Daf1A8qank+N2v3o0rZSAykbW9W5
+         +vylme+bJks+NgvEyucWZ7G8dgWY3kT7Q4sJWubMgbPALPNtJsFcGzKYrP82VtCdiQs7
+         nh6saJxbGvhw+xi0l05gHc3uU/GxIAy12BRCGYvNigqyXA9PnY/DtWXlj0c4QURYFkpB
+         C6EA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718176264; x=1718781064;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1718177100; x=1718781900;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=i6o0FZBPMx+nOIu/mzHBniZ5GdF+FcAxR4uXfrLlAu8=;
-        b=QbtMiWBOVCo6OIEL300vjqDSqk0QY2JOOtcyyu7p2QK1zLadB5sfoJOr8be9ZN/vzn
-         lWCYN5H6WG6vqGQEPZeZ8tdWvGQcRvuLPtH7ZbFleGqQ4TaMPoUPk1pJX8r4rI3DyQYG
-         dOGB6ZSrvDH71YRLeuJD/HUwS24G0meQ2FKgwc6vIH0L0ZCFk+qOPb02RlpVQeWCJOol
-         TKyO29u5w/sGebZobSc6bcvWFkULWbzf0jSseA4EJmyB61BV80hcRn6g03NNsjN80xys
-         YLSs+qwfc+el1DK7pC1EWyy/NfJYKCg7P82bsKbil2z1tvAoW/2nVd30j0zcvpxF9DKI
-         JLfA==
-X-Forwarded-Encrypted: i=1; AJvYcCX6wRwXizBdR1WLRraI+2Cmo/pbQdI/PahIr50NUJCIq7NdoNKa0YMtEMDYD+i5tMitUb3wd+6Hyl/NJQiAr6K/hw7o3VFFIuLsmG86Vw3L
-X-Gm-Message-State: AOJu0YyNuzGfQI+ZVGt1umnvkvYJEJ+zHc9jpOzkEpdBolZXQf4+hH35
-	N7pHSTDEKDpaBD3hYly8hnxssmbY8jTaiaAB4YBF3i0JyiRvObpTrWJhUEolTTnuMN1uwNDw75U
-	s8hs/DbfPO64nz/PbpMXtLPg4tzNi+k/fzFM/Vw==
-X-Google-Smtp-Source: AGHT+IGbd4X2fJf6zNeYZx/X1mM77+GhoF1Zhv+mm3RhXCxcJXVvZIgRJjoUptYt08IGG4KjkAvHHP/xFOcuJD7oR1M=
-X-Received: by 2002:ac2:4c4a:0:b0:52c:826f:f3f1 with SMTP id
- 2adb3069b0e04-52c9a3bfbb7mr898457e87.2.1718176264237; Wed, 12 Jun 2024
- 00:11:04 -0700 (PDT)
+        bh=nZZ648vF2hGd45hekWosmU80qN8L5wlOVqhbijLkjGE=;
+        b=AfgzbV1CAyMcpWo8/WIF4OuvV1HboTRS2a/TBQpbkCBHk5Cqht/n4nPD65gyxqOaNv
+         OnkDXK9c6ZAp8f7dlTsHsQ9F9LmwKYHgqoYo1lsv9CXrMn27rlQKeGu5BVF+yuNJeAb6
+         o5FMPwKD4xf1o3y+Cby6TNw7mfve7fjBhvYChqpaepe+99I/Y3EHTTgChB34BdNAs/1G
+         TJVbOMEPX5fEYPUa8rxPTfOX5NCAT+vW3TmLwzspjT4njoHnc/7fd0ZzLIY4zkqT0Klb
+         V4fSzEdReUxNi4cC1OYT/fql6dmaxo1TzIK+MQ/iYnFFVQMKvJATBzJBD2muoBuMcG49
+         ZGyg==
+X-Forwarded-Encrypted: i=1; AJvYcCXO6R5fnwBJRs4TcmfsFZJs/uE16J23rpnkph49TD4c6QG0NBcwmBX3iWXu6GJRkZhqpJrJ2CIQXOZoG4D9RntME6nt2BK+FB3baHZ0MLHM
+X-Gm-Message-State: AOJu0Ywy8G1aayZevFfilYktmr0UvArFpDUM2Ihm1sqLlCrjwIMSq/1d
+	CSs/qp220e9D/hsRpUdhZlXG0KHeMiAZ8AuIgzYtmXgZGrA0nzVFZD2WSAzXwxA=
+X-Google-Smtp-Source: AGHT+IHzJQZOo7VhfwHUIA0Rvt2UNlF28rgiuiNCV0gXUegLqiznXfYjxQF2KbE4ePZs0+9rQ3O3JQ==
+X-Received: by 2002:adf:e6c1:0:b0:354:eb62:365a with SMTP id ffacd0b85a97d-35fdf7adcd2mr650626f8f.25.1718177100076;
+        Wed, 12 Jun 2024 00:25:00 -0700 (PDT)
+Received: from brgl-uxlite.home ([2a01:cb1d:8d3:3800:a172:4e8b:453e:2f03])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-35f0f551c20sm11692172f8f.69.2024.06.12.00.24.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 12 Jun 2024 00:24:59 -0700 (PDT)
+From: Bartosz Golaszewski <brgl@bgdev.pl>
+To: Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Kalle Valo <kvalo@kernel.org>,
+	Bjorn Andersson <andersson@kernel.org>,
+	Konrad Dybcio <konrad.dybcio@linaro.org>,
+	Liam Girdwood <lgirdwood@gmail.com>,
+	Mark Brown <broonie@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Saravana Kannan <saravanak@google.com>,
+	Geert Uytterhoeven <geert+renesas@glider.be>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Neil Armstrong <neil.armstrong@linaro.org>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Srini Kandagatla <srinivas.kandagatla@linaro.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Abel Vesa <abel.vesa@linaro.org>,
+	Manivannan Sadhasivam <mani@kernel.org>,
+	Lukas Wunner <lukas@wunner.de>,
+	Dmitry Baryshkov <dmitry.baryshkov@linaro.org>,
+	Amit Pundir <amit.pundir@linaro.org>,
+	Xilin Wu <wuxilin123@gmail.com>,
+	Alex Elder <elder@kernel.org>,
+	Bartosz Golaszewski <brgl@bgdev.pl>
+Cc: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
+	linux-bluetooth@vger.kernel.org,
+	netdev@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-wireless@vger.kernel.org,
+	linux-arm-msm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-pci@vger.kernel.org,
+	linux-pm@vger.kernel.org
+Subject: Re: [PATCH v9 0/2] pwrseq: introduce the subsystem and first driver
+Date: Wed, 12 Jun 2024 09:24:56 +0200
+Message-ID: <171817709104.16429.1270997690165832044.b4-ty@linaro.org>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20240605123850.24857-1-brgl@bgdev.pl>
+References: <20240605123850.24857-1-brgl@bgdev.pl>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240528-pwrseq-v8-0-d354d52b763c@linaro.org> <20240611225428.GA1005695@bhelgaas>
-In-Reply-To: <20240611225428.GA1005695@bhelgaas>
-From: Bartosz Golaszewski <brgl@bgdev.pl>
-Date: Wed, 12 Jun 2024 09:10:53 +0200
-Message-ID: <CAMRc=MfE0o=ohK6fpJN6=J7hmywifneBaNdSxOgeGH9iZ1uvTQ@mail.gmail.com>
-Subject: Re: [PATCH v8 00/17] power: sequencing: implement the subsystem and
- add first users
-To: Bjorn Helgaas <helgaas@kernel.org>
-Cc: Liam Girdwood <lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>, 
-	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Balakrishna Godavarthi <quic_bgodavar@quicinc.com>, Rocky Liao <quic_rjliao@quicinc.com>, 
-	Kalle Valo <kvalo@kernel.org>, Jeff Johnson <jjohnson@kernel.org>, 
-	Bjorn Andersson <andersson@kernel.org>, Konrad Dybcio <konrad.dybcio@linaro.org>, 
-	Bjorn Helgaas <bhelgaas@google.com>, Srini Kandagatla <srinivas.kandagatla@linaro.org>, 
-	Elliot Berman <quic_eberman@quicinc.com>, Caleb Connolly <caleb.connolly@linaro.org>, 
-	Neil Armstrong <neil.armstrong@linaro.org>, Dmitry Baryshkov <dmitry.baryshkov@linaro.org>, 
-	Alex Elder <elder@kernel.org>, linux-arm-msm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, devicetree@vger.kernel.org, 
-	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-wireless@vger.kernel.org, ath11k@lists.infradead.org, 
-	Jeff Johnson <quic_jjohnson@quicinc.com>, ath12k@lists.infradead.org, 
-	linux-pm@vger.kernel.org, linux-pci@vger.kernel.org, 
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>, kernel@quicinc.com, 
-	Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>, Amit Pundir <amit.pundir@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 
-On Wed, Jun 12, 2024 at 12:54=E2=80=AFAM Bjorn Helgaas <helgaas@kernel.org>=
- wrote:
->
-> On Tue, May 28, 2024 at 09:03:08PM +0200, Bartosz Golaszewski wrote:
-> > Note: I am resending this series in its entirety once more for
-> > discussions and reviews. If there won't be any major objections, I'll
-> > then start sending individual bits and pieces to appropriate trees.
-> >
-> > Merging strategy: The DT binding and DTS changes are a no-brainer, they
-> > can go through the wireless, regulator and arm-msm trees separately. Th=
-e
-> > bluetooth and PCI changes have a build-time dependency on the power
-> > sequencing code. The bluetooth changes also have a run-time dependency =
-on
-> > the PCI pwrctl part. In order to get it into next I plan to pick up the
-> > power sequencing code into my own tree and maintain it. I can then
-> > provide an immutable tag for the BT and PCI trees to pull. I wouldn't
-> > stress about the BT runtime dependency as it will be fixed once all
-> > changes are in next.
->
-> The PCI changes are very self-contained and any conflicts will be
-> trivial, so rather than messing with an immutable tag, how about if I
-> just ack them and you can include them in your tree directly?
+From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
 
-Sure, if you're convinced that eventual conflicts in PCI core won't be
-an issue then it's even better.
 
-Bart
+On Wed, 05 Jun 2024 14:38:48 +0200, Bartosz Golaszewski wrote:
+> From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+> 
+> Hi!
+> 
+> These are the power sequencing patches sent separately after some
+> improvements suggested by Bjorn Helgaas. I intend to pick them up into a
+> new branch and maintain the subsystem from now on. I then plan to
+> provide an immutable tag to the Bluetooth and PCI subsystems so that the
+> rest of the C changes can be applied. This new branch will then be
+> directly sent to Linus Torvalds for the next merge window.
+> 
+> [...]
+
+Applied, thanks!
+
+[1/2] power: sequencing: implement the pwrseq core
+      commit: 249ebf3f65f8530beb2cbfb91bff1d83ba88d23c
+[2/2] power: pwrseq: add a driver for the PMU module on the QCom WCN chipsets
+      commit: 2f1630f437dff20d02e4b3f07e836f42869128dd
+
+Best regards,
+-- 
+Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
