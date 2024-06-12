@@ -1,185 +1,116 @@
-Received: from mail-io1-f77.google.com (mail-io1-f77.google.com [209.85.166.77])
+Received: from mail-lj1-f179.google.com (mail-lj1-f179.google.com [209.85.208.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB41818E3F
-	for <linux-bluetooth@vger.kernel.org>; Wed, 12 Jun 2024 04:20:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.77
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CB7E12F5A1
+	for <linux-bluetooth@vger.kernel.org>; Wed, 12 Jun 2024 07:11:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718166033; cv=none; b=aU5NfOU9CtVI+AVGeApXaLG/AGBY6AdHYiPLVjxqyl+X8W71wS6GZsGqfwU7FmcVL4DP9i3MR5WflIZ+fKDwUidtUzea+2H7dqRhpPV4gkfLGwArl+tmeJuEqp+8EbJxMWZdFqPiz41/dXxX6Ni6ewDOjY7irmHW3bNN9TvPiXk=
+	t=1718176268; cv=none; b=TKXN2CkFwFmFRrau79FDrzSoJB6L4G+vLcqUt+E129hp5mduMl7VHLjT+0RmyH5DbqWU/jOWq3Gsl6I8of2JxLPbm48/FHvQKkFCKrbY/b7AEO5MMTqBbyInt7/bQkTt3vc6VKqw21022fujMAX+tFh6vWf6CwBtoSaSHGebhMw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718166033; c=relaxed/simple;
-	bh=GctkiOdVRpfP7LUutwUwpfgSAb/wlxs4NY6m/Ij4VrI=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=oKBEkPdyeFkyO9Uf6/uFOmpexTnnjPaneDiSmkYj8XTnv+05QqAHtvpRs/7qen57GEOT1sSHfFUF5cIQGcj8JOarlw3r26w0zDA8E+Yh9wZt6XoZegThzDeP+WuL5nrbxFq98tjRYr9UUP3BYOQ3OnCKL+NPmbAm5r4O70Z1dsQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.77
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f77.google.com with SMTP id ca18e2360f4ac-7eafdb25dbbso692099739f.3
-        for <linux-bluetooth@vger.kernel.org>; Tue, 11 Jun 2024 21:20:31 -0700 (PDT)
+	s=arc-20240116; t=1718176268; c=relaxed/simple;
+	bh=i6o0FZBPMx+nOIu/mzHBniZ5GdF+FcAxR4uXfrLlAu8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=fl2619W/bVm1nq9ebP11MpwXxe/xl0j7Ie2xxusWm8yP8xMHI4x1lg2oQnSvgGzOLK096hJJTHKKJ4xpJqQbbXn8sU4qoLVO2VbeRkbWpdKrHMFt3tmmhXzMgwy/EJ/+S16866OFu1hTM1EzHKHvWBXaZP28Fmv6iVm0T0nbwAc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=o7Zd1oeZ; arc=none smtp.client-ip=209.85.208.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="o7Zd1oeZ"
+Received: by mail-lj1-f179.google.com with SMTP id 38308e7fff4ca-2eaea28868dso63172801fa.3
+        for <linux-bluetooth@vger.kernel.org>; Wed, 12 Jun 2024 00:11:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1718176264; x=1718781064; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=i6o0FZBPMx+nOIu/mzHBniZ5GdF+FcAxR4uXfrLlAu8=;
+        b=o7Zd1oeZPpPLURaHzb321yRhJty2DLlnC4qlpDAKYRFrE37XjKXxDcFOiFIb9S/k59
+         zOiDJoKQKHDthECblWTjcuySU2K8pVGTszGKSP28d8Wqu8RslcoPlcygzf1gMvZwyl3I
+         pvNZo+1wN7nmbggtNN8Z6x2LMRnZSBpP+Z+J+iGRVSpfGK9gO4MbtRortXxuZgYt/y25
+         pNZA62NRWFLhqawVq7KXbsVGQsn49MwnAqnVQsnthUWtbAjJMYPwSAy5XiqKVPxQxpr8
+         LGRrV3JLU8vv3DDdZY6lCL2a6PAUrgpA0YzkKe44ijQH5GLO9atBJnYnPCFtsPgtHWjb
+         1ISQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718166031; x=1718770831;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=dnEcZQSlSSfWGLe3U4JPeUiGUJ9V4peTlbScVRNrxNs=;
-        b=JOT+Q7YhO20vy6RC/sM/i0Uv3U/LatNSeN2uY9SFtkxSqCk/Rm2376trg/U4C4a9ro
-         QGA3FeHLuv9SFbf4eBU9cKdFuNW9P69lc1Xs9/vDXSPkrlyU796O0r/kb3jWZukx1M81
-         Qp0/V3nw25dLGjxwiT4syP6l/pPqh/DPNRZr127YuFH0l6mAdeQVV1uWPY4dr9kbTMHX
-         cQJ2Um+7lMo2iDUE8Pn6dxkdd0aMCPs67NDvW4LuNO56Z3UEt55ULhHmQLJj8Gvo0jPE
-         r2LtXsIvi1DS0hvimQvNKU7Ircq0Jjr+rUSQABKOP6VDB1GVppM6RmtVL3qopaCDDPs2
-         W+hg==
-X-Forwarded-Encrypted: i=1; AJvYcCV9364cdxpdLCXby24xJObzxt1h6Le0NXdC5utMiLXiv91K0t+Z0xc7DhYqdD8+h9Li7M2R0mwwhMSaG/JFBkH7GLg+7EsbeQ9egXR4yM85
-X-Gm-Message-State: AOJu0YynvI+ro4RgUvcpoSy88P2ZII44iLDT7LzegYeDe20k8IwYCSLO
-	4v4BHdl/Axsk3nNQB89OCuvACeroaHB+qFK/y4SSOdlrH9fPkGT8Bb6f+rzvqr8iBJRcHJrR3bi
-	nGXSIy+KyA8mtUsJFu811k5IaZ5hAKxckVbQl4I/tg40mm1aEJiw4jUI=
-X-Google-Smtp-Source: AGHT+IFkTHvhhUdoUr2ZTibKNN6lcj7J6RVdaWsARGNYjEPc/B+AzfjC6+2yOQ4dNQPTLPLLJ81bK6hiZ5Ht25sDs/lEC7M/Z4TX
+        d=1e100.net; s=20230601; t=1718176264; x=1718781064;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=i6o0FZBPMx+nOIu/mzHBniZ5GdF+FcAxR4uXfrLlAu8=;
+        b=QbtMiWBOVCo6OIEL300vjqDSqk0QY2JOOtcyyu7p2QK1zLadB5sfoJOr8be9ZN/vzn
+         lWCYN5H6WG6vqGQEPZeZ8tdWvGQcRvuLPtH7ZbFleGqQ4TaMPoUPk1pJX8r4rI3DyQYG
+         dOGB6ZSrvDH71YRLeuJD/HUwS24G0meQ2FKgwc6vIH0L0ZCFk+qOPb02RlpVQeWCJOol
+         TKyO29u5w/sGebZobSc6bcvWFkULWbzf0jSseA4EJmyB61BV80hcRn6g03NNsjN80xys
+         YLSs+qwfc+el1DK7pC1EWyy/NfJYKCg7P82bsKbil2z1tvAoW/2nVd30j0zcvpxF9DKI
+         JLfA==
+X-Forwarded-Encrypted: i=1; AJvYcCX6wRwXizBdR1WLRraI+2Cmo/pbQdI/PahIr50NUJCIq7NdoNKa0YMtEMDYD+i5tMitUb3wd+6Hyl/NJQiAr6K/hw7o3VFFIuLsmG86Vw3L
+X-Gm-Message-State: AOJu0YyNuzGfQI+ZVGt1umnvkvYJEJ+zHc9jpOzkEpdBolZXQf4+hH35
+	N7pHSTDEKDpaBD3hYly8hnxssmbY8jTaiaAB4YBF3i0JyiRvObpTrWJhUEolTTnuMN1uwNDw75U
+	s8hs/DbfPO64nz/PbpMXtLPg4tzNi+k/fzFM/Vw==
+X-Google-Smtp-Source: AGHT+IGbd4X2fJf6zNeYZx/X1mM77+GhoF1Zhv+mm3RhXCxcJXVvZIgRJjoUptYt08IGG4KjkAvHHP/xFOcuJD7oR1M=
+X-Received: by 2002:ac2:4c4a:0:b0:52c:826f:f3f1 with SMTP id
+ 2adb3069b0e04-52c9a3bfbb7mr898457e87.2.1718176264237; Wed, 12 Jun 2024
+ 00:11:04 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6638:8414:b0:4b9:13c9:b0fb with SMTP id
- 8926c6da1cb9f-4b93eef52camr57346173.5.1718166031186; Tue, 11 Jun 2024
- 21:20:31 -0700 (PDT)
-Date: Tue, 11 Jun 2024 21:20:31 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000f45085061aa9b37e@google.com>
-Subject: [syzbot] [bluetooth?] [usb?] BUG: soft lockup in hci_cmd_timeout
-From: syzbot <syzbot+1b2abad17596ad03dcff@syzkaller.appspotmail.com>
-To: johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-usb@vger.kernel.org, luiz.dentz@gmail.com, 
-	marcel@holtmann.org, syzkaller-bugs@googlegroups.com
+References: <20240528-pwrseq-v8-0-d354d52b763c@linaro.org> <20240611225428.GA1005695@bhelgaas>
+In-Reply-To: <20240611225428.GA1005695@bhelgaas>
+From: Bartosz Golaszewski <brgl@bgdev.pl>
+Date: Wed, 12 Jun 2024 09:10:53 +0200
+Message-ID: <CAMRc=MfE0o=ohK6fpJN6=J7hmywifneBaNdSxOgeGH9iZ1uvTQ@mail.gmail.com>
+Subject: Re: [PATCH v8 00/17] power: sequencing: implement the subsystem and
+ add first users
+To: Bjorn Helgaas <helgaas@kernel.org>
+Cc: Liam Girdwood <lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>, 
+	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Balakrishna Godavarthi <quic_bgodavar@quicinc.com>, Rocky Liao <quic_rjliao@quicinc.com>, 
+	Kalle Valo <kvalo@kernel.org>, Jeff Johnson <jjohnson@kernel.org>, 
+	Bjorn Andersson <andersson@kernel.org>, Konrad Dybcio <konrad.dybcio@linaro.org>, 
+	Bjorn Helgaas <bhelgaas@google.com>, Srini Kandagatla <srinivas.kandagatla@linaro.org>, 
+	Elliot Berman <quic_eberman@quicinc.com>, Caleb Connolly <caleb.connolly@linaro.org>, 
+	Neil Armstrong <neil.armstrong@linaro.org>, Dmitry Baryshkov <dmitry.baryshkov@linaro.org>, 
+	Alex Elder <elder@kernel.org>, linux-arm-msm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, devicetree@vger.kernel.org, 
+	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-wireless@vger.kernel.org, ath11k@lists.infradead.org, 
+	Jeff Johnson <quic_jjohnson@quicinc.com>, ath12k@lists.infradead.org, 
+	linux-pm@vger.kernel.org, linux-pci@vger.kernel.org, 
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>, kernel@quicinc.com, 
+	Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>, Amit Pundir <amit.pundir@linaro.org>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hello,
+On Wed, Jun 12, 2024 at 12:54=E2=80=AFAM Bjorn Helgaas <helgaas@kernel.org>=
+ wrote:
+>
+> On Tue, May 28, 2024 at 09:03:08PM +0200, Bartosz Golaszewski wrote:
+> > Note: I am resending this series in its entirety once more for
+> > discussions and reviews. If there won't be any major objections, I'll
+> > then start sending individual bits and pieces to appropriate trees.
+> >
+> > Merging strategy: The DT binding and DTS changes are a no-brainer, they
+> > can go through the wireless, regulator and arm-msm trees separately. Th=
+e
+> > bluetooth and PCI changes have a build-time dependency on the power
+> > sequencing code. The bluetooth changes also have a run-time dependency =
+on
+> > the PCI pwrctl part. In order to get it into next I plan to pick up the
+> > power sequencing code into my own tree and maintain it. I can then
+> > provide an immutable tag for the BT and PCI trees to pull. I wouldn't
+> > stress about the BT runtime dependency as it will be fixed once all
+> > changes are in next.
+>
+> The PCI changes are very self-contained and any conflicts will be
+> trivial, so rather than messing with an immutable tag, how about if I
+> just ack them and you can include them in your tree directly?
 
-syzbot found the following issue on:
+Sure, if you're convinced that eventual conflicts in PCI core won't be
+an issue then it's even better.
 
-HEAD commit:    8867bbd4a056 mm: arm64: Fix the out-of-bounds issue in con..
-git tree:       git://git.kernel.org/pub/scm/linux/kernel/git/arm64/linux.git for-kernelci
-console output: https://syzkaller.appspot.com/x/log.txt?x=112ad20a980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=3b4350cf56c61c80
-dashboard link: https://syzkaller.appspot.com/bug?extid=1b2abad17596ad03dcff
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-userspace arch: arm64
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1112d2ce980000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=12c37286980000
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/6ea21f50498b/disk-8867bbd4.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/e2fed09364aa/vmlinux-8867bbd4.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/4860173c7a18/Image-8867bbd4.gz.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+1b2abad17596ad03dcff@syzkaller.appspotmail.com
-
-cdc_wdm 1-1:1.0: nonzero urb status received: -71
-cdc_wdm 1-1:1.0: wdm_int_callback - 0 bytes
-cdc_wdm 1-1:1.0: nonzero urb status received: -71
-cdc_wdm 1-1:1.0: wdm_int_callback - 0 bytes
-watchdog: BUG: soft lockup - CPU#0 stuck for 27s! [kworker/u9:2:6293]
-CPU#0 Utilization every 4s during lockup:
-	#1:  97% system,	  1% softirq,	  4% hardirq,	  0% idle
-	#2:  98% system,	  1% softirq,	  3% hardirq,	  0% idle
-	#3:  97% system,	  0% softirq,	  3% hardirq,	  0% idle
-	#4:  98% system,	  1% softirq,	  3% hardirq,	  0% idle
-	#5:  98% system,	  1% softirq,	  3% hardirq,	  0% idle
-Modules linked in:
-irq event stamp: 150196
-hardirqs last  enabled at (150195): [<ffff80008037bc00>] console_emit_next_record kernel/printk/printk.c:2935 [inline]
-hardirqs last  enabled at (150195): [<ffff80008037bc00>] console_flush_all+0x650/0xb74 kernel/printk/printk.c:2994
-hardirqs last disabled at (150196): [<ffff80008af10b00>] __el1_irq arch/arm64/kernel/entry-common.c:533 [inline]
-hardirqs last disabled at (150196): [<ffff80008af10b00>] el1_interrupt+0x24/0x68 arch/arm64/kernel/entry-common.c:551
-softirqs last  enabled at (150190): [<ffff8000801ea530>] softirq_handle_end kernel/softirq.c:400 [inline]
-softirqs last  enabled at (150190): [<ffff8000801ea530>] handle_softirqs+0xa60/0xc34 kernel/softirq.c:582
-softirqs last disabled at (150185): [<ffff800080020de8>] __do_softirq+0x14/0x20 kernel/softirq.c:588
-CPU: 0 PID: 6293 Comm: kworker/u9:2 Tainted: G        W          6.10.0-rc2-syzkaller-g8867bbd4a056 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 04/02/2024
-Workqueue: hci0 hci_cmd_timeout
-pstate: 80400005 (Nzcv daif +PAN -UAO -TCO -DIT -SSBS BTYPE=--)
-pc : __daif_local_irq_restore arch/arm64/include/asm/irqflags.h:176 [inline]
-pc : arch_local_irq_restore arch/arm64/include/asm/irqflags.h:195 [inline]
-pc : console_emit_next_record kernel/printk/printk.c:2935 [inline]
-pc : console_flush_all+0x67c/0xb74 kernel/printk/printk.c:2994
-lr : console_emit_next_record kernel/printk/printk.c:2935 [inline]
-lr : console_flush_all+0x678/0xb74 kernel/printk/printk.c:2994
-sp : ffff8000993f7360
-x29: ffff8000993f7460 x28: ffff8000993f7510 x27: 0000000000000001
-x26: ffff80009090b530 x25: ffff80009090b520 x24: dfff800000000000
-x23: 1ffff000121216af x22: dfff800000000000 x21: ffff80009090b578
-x20: 0000000000000000 x19: 00000000000000c0 x18: ffff8000993f7298
-x17: 6965636572207375 x16: ffff80008033878c x15: 0000000000000001
-x14: 1ffff00011e379c8 x13: 0000000000000000 x12: 0000000000000003
-x11: 0000000000000001 x10: 0000000000ff0100 x9 : 0000000000000000
-x8 : ffff0000d3a39e40 x7 : ffff800080381d44 x6 : 0000000000000000
-x5 : 0000000000000001 x4 : 0000000000000001 x3 : 0000000000000000
-x2 : 0000000000000006 x1 : 0000000000000080 x0 : 0000000000000000
-Call trace:
- __daif_local_irq_restore arch/arm64/include/asm/irqflags.h:175 [inline]
- arch_local_irq_restore arch/arm64/include/asm/irqflags.h:195 [inline]
- console_emit_next_record kernel/printk/printk.c:2935 [inline]
- console_flush_all+0x67c/0xb74 kernel/printk/printk.c:2994
- console_unlock+0xec/0x3d4 kernel/printk/printk.c:3063
- vprintk_emit+0x1ec/0x350 kernel/printk/printk.c:2345
- vprintk_default+0xa0/0xe4 kernel/printk/printk.c:2360
- vprintk+0x200/0x2d4 kernel/printk/printk_safe.c:45
- _printk+0xdc/0x128 kernel/printk/printk.c:2370
- bt_err+0xfc/0x144 net/bluetooth/lib.c:296
- hci_cmd_timeout+0xd8/0x1cc net/bluetooth/hci_core.c:1528
- process_one_work+0x7b0/0x15e8 kernel/workqueue.c:3231
- process_scheduled_works kernel/workqueue.c:3312 [inline]
- worker_thread+0x938/0xef4 kernel/workqueue.c:3393
- kthread+0x288/0x310 kernel/kthread.c:389
- ret_from_fork+0x10/0x20 arch/arm64/kernel/entry.S:860
-Sending NMI from CPU 0 to CPUs 1:
-NMI backtrace for cpu 1
-CPU: 1 PID: 0 Comm: swapper/1 Tainted: G        W          6.10.0-rc2-syzkaller-g8867bbd4a056 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 04/02/2024
-pstate: 80400005 (Nzcv daif +PAN -UAO -TCO -DIT -SSBS BTYPE=--)
-pc : arch_local_irq_enable+0x8/0xc arch/arm64/include/asm/irqflags.h:50
-lr : default_idle_call+0xf8/0x128 kernel/sched/idle.c:124
-sp : ffff800093e97d10
-x29: ffff800093e97d10 x28: dfff800000000000 x27: 1ffff000127d2fb0
-x26: ffff80008efed000 x25: 0000000000000000 x24: 0000000000000002
-x23: 1ffff00011dfdaad x22: ffff80008efed568 x21: 0000000000000000
-x20: ffff0000c1b70000 x19: ffff8000802e6e08 x18: 1fffe000367b6bde
-x17: ffff80008efed000 x16: ffff8000802e66cc x15: 0000000000000001
-x14: 1fffe000367b8941 x13: 0000000000000000 x12: 0000000000000003
-x11: 0000000000000001 x10: 0000000000000003 x9 : 0000000000000000
-x8 : 00000000000b17a9 x7 : ffff80008047f238 x6 : 0000000000000000
-x5 : 0000000000000001 x4 : 0000000000000001 x3 : ffff80008af14fe8
-x2 : 0000000000000000 x1 : ffff80008b0900a0 x0 : ffff800124e80000
-Call trace:
- __daif_local_irq_enable arch/arm64/include/asm/irqflags.h:26 [inline]
- arch_local_irq_enable+0x8/0xc arch/arm64/include/asm/irqflags.h:48
- cpuidle_idle_call kernel/sched/idle.c:191 [inline]
- do_idle+0x1f0/0x4e4 kernel/sched/idle.c:332
- cpu_startup_entry+0x5c/0x74 kernel/sched/idle.c:430
- secondary_start_kernel+0x1bc/0x1e4 arch/arm64/kernel/smp.c:279
- __secondary_switched+0xb8/0xbc arch/arm64/kernel/head.S:417
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+Bart
