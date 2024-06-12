@@ -1,135 +1,125 @@
-Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
+Received: from mail-vs1-f45.google.com (mail-vs1-f45.google.com [209.85.217.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1CFC7D096
-	for <linux-bluetooth@vger.kernel.org>; Wed, 12 Jun 2024 18:59:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C86C381AF
+	for <linux-bluetooth@vger.kernel.org>; Wed, 12 Jun 2024 19:11:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718218748; cv=none; b=TSxJh/goKp+NNh1Ozjgun6i1c6Z9L40GjbLnIbFa+1e8UMoq3aVIsK5YrlX4tN8bU/lHYSKz0m7IlFrCB44PYQ5FP1N8thLpdt4+S+l+QuqhQXeQE67oDVFRvpysD0hGi2Vk7ntU4wxPF5uJfxjJxAkrFmsQ6Z6eziq4TorED8M=
+	t=1718219511; cv=none; b=S1vD3MzDj4DZ2+to4C0XJyap+FkHruJmcI/vUOUyXIL704SUsboaMo33qXj6iqk93domg5V0j7kSL2KzBRmeX0JGxPpKTVL7ZcdfHiaNOnvxEW3uDgTHhH1AeX5xpsNk9Bq9PPz0cZOw29NL52xM5+NP84T4RVn0X59oA6HdfMk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718218748; c=relaxed/simple;
-	bh=PxBLc5/+2zWIJOw2a0zi+2LybfyHDKeEoIg3EZ3iZHE=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=eeg38gHAfs31f7yuIcKW9n7TGUkN8eSwub8y5zg1dt3bgYzan7x4te9l47/WrxkNC2qQeHFlWb0t74jEwO0LKdknkNI+cESfjpmPtTGjAwYvSPATckczbcMUkg1KkezlxE830u0kbmbvcY35XyARIxGDCss/VdjFDp4cWgxhQwI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=My1PWcd7; arc=none smtp.client-ip=209.85.210.179
+	s=arc-20240116; t=1718219511; c=relaxed/simple;
+	bh=F4J4efZTwxHQDJk2qK69YTUmbWtvlR1LVQvQgFnGbyo=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=IEhOwcpENMIiiP+04eJXzHLTxMuGrqPNE9pwMjmmRqIRFzKEJLtj+nl3PvOtfAiFevTfISqxSZPAQV/NzPDhDnEgf8H02OxmYFH86gVtPika+WoYUt9jirRqo5xfxUFVrvbPfOJq+vaLHymXx5XhsAYZlJBS+pJgaU+oL2B6RhQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Apgv/N8y; arc=none smtp.client-ip=209.85.217.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="My1PWcd7"
-Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-7042882e741so116533b3a.2
-        for <linux-bluetooth@vger.kernel.org>; Wed, 12 Jun 2024 11:59:06 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Apgv/N8y"
+Received: by mail-vs1-f45.google.com with SMTP id ada2fe7eead31-48c4c15e57fso75461137.3
+        for <linux-bluetooth@vger.kernel.org>; Wed, 12 Jun 2024 12:11:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1718218746; x=1718823546; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=712oFhqD20nxJGNyIR5z1+RDkDjMJS9aPW6s5UGkJ8w=;
-        b=My1PWcd78O2z9zWiVR6Rnbj5SqkGTSSKzk5SYJbCnycxzsZ2jngnwQyoADRbTe4pgy
-         nEdAqulqJ/7AoYTyq7RzNSBC9TxoYQ+pQSy9DnE2o2KGtbWB9xmHn1C415NnBspYT5bN
-         hJjBtw2GzJpmVHrKBVQqCZbwXc6q0bfJvU9W+5uyUa9x90OfTs8q7x6GcL8gMqI0L+5l
-         rqhwGJG43QnU1z0b7NGwQazCRGyvZtWIwoN2T4ZBgdUr4ky/WLoCYobsOdLsceS1SIaq
-         mRfnL84JpqMKQZAX9/Kfcn+j2xpRSRK+lrmu3SPfUT3hzwPSc795hQyF0M+oHZzzTyfy
-         pzUQ==
+        d=gmail.com; s=20230601; t=1718219508; x=1718824308; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=LxelnDaGXHSBue2jtsAwnUYUt2Mhf3DQsmqRxsR3gMw=;
+        b=Apgv/N8yAXXEjgkObUuIt0SS8Exk5EvJaR+QaCTcWbSuEbLdXUabl01d4F11Ts9LWp
+         TKssuVVVVAl2MMXjypLak+igRcog5q3tQ+lOCpQhvezEizRKaKUlBsSZOUdMsvnyd2WQ
+         dEQ+FRIBlMuSgOEPHA/3crkA1VUwrTfWiIz9/PnMnC3+iskQSC6iXlUZv/Fs/Xz07YDp
+         avbv3yflORVknuAhdkM/JDOjxpj2sLOUBofGejBCwidwRhmAMRse8CAB8xQMaFd9vZq/
+         7yQCauU7vNCsRYdV9WmEAIkH9GYZocgSFwNRYVgcopuVCb0VIOLeyjQPJ7sWUAH/Z8nF
+         XfTA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718218746; x=1718823546;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=712oFhqD20nxJGNyIR5z1+RDkDjMJS9aPW6s5UGkJ8w=;
-        b=iGLFjzFav21NOupBKT+VLNR7t3GVi1iO9Cbv5iyIfECgZukFyrWOPMNfrBFPqHZpug
-         29Skzqe40Dkr+2AODl2Pfme7674Nqgu0DW5RON7EETuN0YZPz2+N/cjmBCRejJ2f+9VH
-         tqaCwDd2FjyPiLiql7BhPuY6DDTTy9KZfdOgb+90j5Ed/Vs1V41IY4Imar6WMbHscc9+
-         DbRGJNaWuEpJ2Spzqzngb9IZXQt2kNQTAnEAzNixxwT/7NAKvQWAJvCqjSSQC++gtqju
-         UaymtWnoOeVtO9ZBVzzUHivReib4gHqTbfUvoB6PaJDwkoEbqs+qIlGqFDh1fcp6FcSp
-         g76w==
-X-Gm-Message-State: AOJu0YxpANLmFNnVJafXc4xc5fnLmiD0QOKWuqIoucZvjjHLohMGKGyZ
-	HMNa7fB1rq90bHaWMF4AyDsTxt6PHPOTXqQfg9jtIVz/oWHQiSYE01y43g==
-X-Google-Smtp-Source: AGHT+IHa24zC1XiZcsZtvDaVV8Pq0j8Ao/VDuKkKlfYEDbGVfVMfKusgUcdjbruWZn2ESKk4g8k2Zw==
-X-Received: by 2002:a05:6a00:2382:b0:705:c431:74fd with SMTP id d2e1a72fcca58-705c4318047mr1838111b3a.28.1718218745909;
-        Wed, 12 Jun 2024 11:59:05 -0700 (PDT)
-Received: from [172.17.0.2] ([52.225.76.189])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-70431fe7bfesm6873571b3a.41.2024.06.12.11.59.05
+        d=1e100.net; s=20230601; t=1718219508; x=1718824308;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=LxelnDaGXHSBue2jtsAwnUYUt2Mhf3DQsmqRxsR3gMw=;
+        b=mzPIqcKr/tR33dAVzF4yPmH1+ib4ZWd6eOAlAqgp+aPA+a6X+dP22fKXUYbqj6MmjN
+         z9zukrSTUcKSmaE9+cAjsn4fm/OTXLf9q6uYilzYn/512hgRz7TCBlKmHws6UEHj/0B1
+         8qzNysnPFBuVT1IDHGLWDT9tCKNK51IMtpQP3B+GM6kOYfWkR2+8zYeoYQB+vYNVhtJH
+         H32iHYSjhXrcBuUcpJ3ht3Tl1xWU9kwW+sCEb5MFsX3owW+RY1bQ2K6QTyRDyltCDulo
+         yxAK7BNQMDbvDJIK/l96TcTLJXZFSAzyi/2YbgxhmF4Fc6q7vDS74ZBq1D/JdkosPLJ2
+         +PHw==
+X-Gm-Message-State: AOJu0YzhLtSWbPlCPf27fXpLymyw0AFl0HOKnPz7H7ixz3a+w7N2KbGV
+	gKrbGq3voITWC/kRMZnlMWJZvplSqr4D4dg7nqPlMKhi/0Ndl8cPmNmY3g==
+X-Google-Smtp-Source: AGHT+IGKBy7KE9yE93CAz4+o8LmpMZISBoh17bNrVzM2SJcQe+BpyWSAD8/MBajfNc2mIDCabJV/NA==
+X-Received: by 2002:a05:6102:515:b0:47a:231a:3856 with SMTP id ada2fe7eead31-48d91de1a04mr3240969137.16.1718219508384;
+        Wed, 12 Jun 2024 12:11:48 -0700 (PDT)
+Received: from lvondent-mobl4.. (syn-107-146-107-067.res.spectrum.com. [107.146.107.67])
+        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-48d92a165d3sm478706137.31.2024.06.12.12.11.46
+        for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 12 Jun 2024 11:59:05 -0700 (PDT)
-Message-ID: <6669eff9.050a0220.1b097.5b77@mx.google.com>
-Date: Wed, 12 Jun 2024 11:59:05 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============5660072111011872810=="
+        Wed, 12 Jun 2024 12:11:47 -0700 (PDT)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ v1 1/2] device: Fix storing conn parameters without first attempting to use them
+Date: Wed, 12 Jun 2024 15:11:44 -0400
+Message-ID: <20240612191145.1379415-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, arun@asymptotic.io
-Subject: RE: ASHA plugin
-In-Reply-To: <20240612162041.689679-2-arun@asymptotic.io>
-References: <20240612162041.689679-2-arun@asymptotic.io>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 
---===============5660072111011872810==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This is automated email and please do not reply to this email!
+Some controller seems to have problems to use connections parameters
+that comes from PPCP as seem bellow, so instead of storing the
+parameters immediately this wait the MGMT_EV_NEW_CONN_PARAM to confirm
+the connection parameters are save to be stored:
 
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=861276
-
----Test result---
-
-Test Summary:
-CheckPatch                    FAIL      1.88 seconds
-GitLint                       PASS      0.63 seconds
-BuildEll                      PASS      24.99 seconds
-BluezMake                     PASS      1703.92 seconds
-MakeCheck                     PASS      13.54 seconds
-MakeDistcheck                 PASS      177.93 seconds
-CheckValgrind                 PASS      250.39 seconds
-CheckSmatch                   PASS      353.68 seconds
-bluezmakeextell               PASS      120.61 seconds
-IncrementalBuild              PASS      4577.41 seconds
-ScanBuild                     WARNING   1025.75 seconds
-
-Details
-##############################
-Test: CheckPatch - FAIL
-Desc: Run checkpatch.pl script
-Output:
-[BlueZ,v10,3/3] test: Add a script to test ASHA
-ERROR:EXECUTE_PERMISSIONS: do not set execute permissions for source files
-#105: FILE: test/simple-asha
-
-/github/workspace/src/src/13695335.patch total: 1 errors, 0 warnings, 166 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/src/13695335.patch has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-##############################
-Test: ScanBuild - WARNING
-Desc: Run Scan Build
-Output:
-profiles/audio/media.c:1048:7: warning: Use of memory after it is freed
-                if (req->cb != pac_select_cb) {
-                    ^~~~~~~
-1 warning generated.
-
-
-
+< HCI Command: LE Extended Create Connection (0x08|0x0043) plen 42
+        Filter policy: Accept list is not used (0x00)
+        Own address type: Public (0x00)
+        Peer address type: Random (0x01)
+        Peer address: FE:D5:D9:EC:AB:99 (Static)
+        Initiating PHYs: 0x03
+        Entry 0: LE 1M
+          Scan interval: 60.000 msec (0x0060)
+          Scan window: 60.000 msec (0x0060)
+          Min connection interval: 7.50 msec (0x0006)
+          Max connection interval: 4000.00 msec (0x0c80)
+          Connection latency: 0 (0x0000)
+          Supervision timeout: 5000 msec (0x01f4)
+          Min connection length: 0.000 msec (0x0000)
+          Max connection length: 0.000 msec (0x0000)
+        Entry 1: LE 2M
+          Scan interval: 60.000 msec (0x0060)
+          Scan window: 60.000 msec (0x0060)
+          Min connection interval: 7.50 msec (0x0006)
+          Max connection interval: 4000.00 msec (0x0c80)
+          Connection latency: 0 (0x0000)
+          Supervision timeout: 5000 msec (0x01f4)
+          Min connection length: 0.000 msec (0x0000)
+          Max connection length: 0.000 msec (0x0000)
+> HCI Event: Command Status (0x0f) plen 4
+      LE Extended Create Connection (0x08|0x0043) ncmd 1
+        Status: Invalid HCI Command Parameters (0x12)
 ---
-Regards,
-Linux Bluetooth
+ src/device.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
+diff --git a/src/device.c b/src/device.c
+index ce794f315995..85857577ae11 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -7435,10 +7435,10 @@ void btd_device_set_conn_param(struct btd_device *device, uint16_t min_interval,
+ 					uint16_t max_interval, uint16_t latency,
+ 					uint16_t timeout)
+ {
+-	btd_adapter_store_conn_param(device->adapter, &device->bdaddr,
+-					device->bdaddr_type, min_interval,
+-					max_interval, latency,
+-					timeout);
++	/* Attempt to load the new connection parameters, in case it is
++	 * successful the MGMT_EV_NEW_CONN_PARAM will be generated which will
++	 * then trigger btd_adapter_store_conn_param.
++	 */
+ 	btd_adapter_load_conn_param(device->adapter, &device->bdaddr,
+ 					device->bdaddr_type, min_interval,
+ 					max_interval, latency,
+-- 
+2.45.2
 
---===============5660072111011872810==--
