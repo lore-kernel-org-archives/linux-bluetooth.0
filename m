@@ -1,45 +1,62 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f43.google.com (mail-lf1-f43.google.com [209.85.167.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE8EA374D3;
-	Wed, 12 Jun 2024 12:04:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10B98171E7D
+	for <linux-bluetooth@vger.kernel.org>; Wed, 12 Jun 2024 12:37:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718193883; cv=none; b=LlET33QSOzTncyRWdeRPSzpzYNpxE3epN1o4h5rv/l+GKmXfI+VJCGKlP9nUSvwSLi4pdevDHcehWNOrLW0/ARu8LodYFAl5Pa7cDFUAbafISC4HUq0caxxB2Vij3U5zAaz+vYmU1/K8skX4i7J6zbLIUvPh5ZMdZP93KqdB7T4=
+	t=1718195842; cv=none; b=a2+A/JbRP9y2HhOAPLy+hmvo9J8Xplb7+M+eFzlXgfaZuhLYa6UuWRClJ21zI/IWBhDaA8l4asI5EUrcy2CNBD488dFhwFIkh8cNk4MnA5Q3ShJQskl4WUSO/9PKWcc9ixeSx+DyG6lomlDVLVH83HalIxVI5kTkFrPvgWEh2/I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718193883; c=relaxed/simple;
-	bh=2B9cF8w213BqeGDWK69iJPR4rJyOwb3Wh0NtbWC8BSI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VctAa6V1xUja74sWK7XJag17hm57+701RR6fNVNckCv7glIwsFNiuUSU2YdF442qoLfa8Hv/O2P2zkkaHvKaKe21KzdsMoTDbNvjKZb2aBsDWYc1d/d+pBPkQwIocvusbuN4HOMoevfaIIoXio/YaDXpxOd/JKPKwTuGS0/LDug=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=wjf2cfxV; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1718195842; c=relaxed/simple;
+	bh=q9Hi4EAC7u/D8TWFxDRTyUT9vdV7F9/lgJX0aCN1TAk=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=eQ+lHaiv/rzxymZzWCBpqdphMn5psc1vhkbxP/YT8xbA9fy7iqvjOpSMhd0AUs/CHXL1l/CvdaOcAaEWa2VQQhklAPgTldMROi74lerkje0TlHqLS/GlLpVF185wFHM29pODKyqSCgFPAvjjh7Cha94dQoh5N5+xW/DTf6v6sto=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=cU3BPSE+; arc=none smtp.client-ip=209.85.167.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="wjf2cfxV"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 61689C3277B;
-	Wed, 12 Jun 2024 12:04:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1718193882;
-	bh=2B9cF8w213BqeGDWK69iJPR4rJyOwb3Wh0NtbWC8BSI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=wjf2cfxVvoniGDsb1tz6Ftg/fWlITXjuLZfBhXwqHfHGPLmBcceqsBI4WaffaHixq
-	 hFwzr7Ti81rAXJSxdVvisD5qw9J38qmKXw8meK5ebUk5Fkyg9a9SOP4i27EnF1OpiS
-	 YtXhGSBaTpEopKZAbwIkr2i3roa9zOpBbTG9YFVY=
-Date: Wed, 12 Jun 2024 14:04:40 +0200
-From: Greg KH <gregkh@linuxfoundation.org>
-To: Thorsten Leemhuis <regressions@leemhuis.info>
-Cc: "stable@vger.kernel.org" <stable@vger.kernel.org>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	linux-bluetooth@vger.kernel.org,
-	Paul Menzel <pmenzel@molgen.mpg.de>,
-	Sasha Levin <sashal@kernel.org>,
-	Jeremy =?iso-8859-1?Q?Lain=E9?= <jeremy.laine@m4x.org>,
-	Linux regressions mailing list <regressions@lists.linux.dev>,
-	Mike <user.service2016@gmail.com>
-Subject: Re: Bluetooth kernel BUG with Intel AX211 (regression in 6.1.83)
-Message-ID: <2024061258-boxy-plaster-7219@gregkh>
-References: <30f4b18f-4b96-403c-a0ab-d81809d9888a@gmail.com>
- <c09d4f5b-0c4b-4f57-8955-28a963cc7e16@leemhuis.info>
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="cU3BPSE+"
+Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-52bc335e49aso2930192e87.3
+        for <linux-bluetooth@vger.kernel.org>; Wed, 12 Jun 2024 05:37:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1718195839; x=1718800639; darn=vger.kernel.org;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=p96uUxQOoHzqFpi1OyHubdPKWLJfefsiFVXI61S3V4g=;
+        b=cU3BPSE+y4Uq1G6gwLaQocOFtc2EjhIQN8kFIJPJet9r5ZGGdRLvFjBpzCrKLsT/qr
+         X4jtjVEh9twY/QiTl2Otnk9tWgspdWf+ECQtrD5Edb9j8l26fe0nZSJyc12/iDU+LH4k
+         hrAxkk6NgdWmJ2ORWkw3czlpUmYfp1XGu3zpOFk+CfYmdEwml4EJ+0tGMAZggKxG/K4p
+         FpYtdSro1gg16Q1mzyY2XT4e9qASCAimmFod+5d1KEbvU/8a7iAqAkAkaM7IoI0XWXvQ
+         7COM/ymG0pBKp1LmlInPwwvjg0LyRCJF/8F0EzeRoZ2jJ156E0XlL76V8nhsT9nVDZYM
+         0xNA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718195839; x=1718800639;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=p96uUxQOoHzqFpi1OyHubdPKWLJfefsiFVXI61S3V4g=;
+        b=fwBP31OQmQmgOs6Gmc+MJBTxT0TFgg2zQ65quveOiUnaX0MlqKtmomghDzUor/Or4J
+         pS0fJhQ4GD9eox5lnNc576q5KIBuTedb7R78FnFu0KJ7N0/Fr57Sbbck6qUJoa3ZKFqW
+         /7R1xI9wuhgByiT8L/723zdgx3klTX6tZ2cxLj4zghoyXispFVWwD8POdu3CbYxFUF8a
+         h7TJyW7GfhxrRT0v1FeJ8+O17oFDq+TdeYRYvCu7IyD3Ke5D5aNqAKJTy4NujuMnB8sE
+         wFEKbId8PRnv7bMFL5LKZn2I0TlJ7O+1UEipAQu/4LJ7oMvNc3XGEv4xnm5z9GpNYKi1
+         t4Zg==
+X-Gm-Message-State: AOJu0YwpS0eYFTkxgzdN6pEDHvgfhAH2TocnPC4K6YvlJsjOfwkkfNAD
+	L6RYKhELsxnSsnP8bP+apNZOhOHX1te+WabDVqXuNs6fuOk18qf8uDxStEs/SrBellohn/fFVgr
+	D
+X-Google-Smtp-Source: AGHT+IH8SQN72CUC2VdO64jw0I+vX5XNyPy2ghOwARb+WCR3G73xpodE3heHPMb2zfvw7b5WH3+2ig==
+X-Received: by 2002:a05:6512:3989:b0:52c:9d38:9df1 with SMTP id 2adb3069b0e04-52c9d389e68mr1313197e87.10.1718195839005;
+        Wed, 12 Jun 2024 05:37:19 -0700 (PDT)
+Received: from localhost ([102.222.70.76])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-35f24ebfbbbsm8080432f8f.61.2024.06.12.05.37.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 12 Jun 2024 05:37:18 -0700 (PDT)
+Date: Wed, 12 Jun 2024 15:37:14 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: Iulia Tanasescu <iulia.tanasescu@nxp.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: [bug report] Bluetooth: ISO: Use defer setup to separate PA sync and
+ BIG sync
+Message-ID: <1fe76229-9b40-400d-9d63-03a025603bdf@moroto.mountain>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -48,45 +65,47 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <c09d4f5b-0c4b-4f57-8955-28a963cc7e16@leemhuis.info>
 
-On Thu, Jun 06, 2024 at 12:18:18PM +0200, Thorsten Leemhuis wrote:
-> On 03.06.24 22:03, Mike wrote:
-> > On 29.05.24 11:06, Thorsten Leemhuis wrote:
-> >> Might be a good idea to share it, the developers might want to confirm
-> >> it's really the same bug.
-> > I'm attaching the stacktrace [1] and decodecode [2] at the end, generated
-> > on 6.1.92 vanilla+patch (1.).
-> > [...]
-> > I understand that 6.9-rc5[1] worked fine, but I guess it will take some
-> > time to be
-> > included in Debian stable, so having a patch for 6.1.x will be much
-> > appreciated.
-> > I do not have the time to follow the vanilla (latest) release as is
-> > likely the case for
-> > many other Linux users.
-> > 
-> > Let me know if there's anything else useful I can do for you.
-> > Thank you,
-> 
-> Still no reaction from the bluetooth developers. Guess they are busy
-> and/or do not care about 6.1.y. In that case:
-> 
-> @Greg: do you might have an idea how the 6.1.y commit a13f316e90fdb1
-> ("Bluetooth: hci_conn: Consolidate code for aborting connections") might
-> cause this or if it's missing some per-requisite? If not I wonder if
-> reverting that patch from 6.1.y might be the best move to resolve this
-> regression. Mike earlier in
-> https://lore.kernel.org/all/c947e600-e126-43ea-9530-0389206bef5e@gmail.com/
-> confirmed that this fixed the problem in tests. Jeremy (who started the
-> thread and afaics has the same problem) did not reply.
+Hello Iulia Tanasescu,
 
-How was this reverted?  I get a bunch of conflicts as this commit was
-added as a dependency of a patch later in the series.
+Commit fbdc4bc47268 ("Bluetooth: ISO: Use defer setup to separate PA
+sync and BIG sync") from Aug 17, 2023 (linux-next), leads to the
+following Smatch static checker warning:
 
-So if this wants to be reverted from 6.1.y, can someone send me the
-revert that has been tested to work?
+	net/bluetooth/iso.c:1364 iso_sock_recvmsg()
+	error: we previously assumed 'pi->conn->hcon' could be null (see line 1359)
 
-thanks,
+net/bluetooth/iso.c
+    1347 static int iso_sock_recvmsg(struct socket *sock, struct msghdr *msg,
+    1348                             size_t len, int flags)
+    1349 {
+    1350         struct sock *sk = sock->sk;
+    1351         struct iso_pinfo *pi = iso_pi(sk);
+    1352 
+    1353         BT_DBG("sk %p", sk);
+    1354 
+    1355         if (test_and_clear_bit(BT_SK_DEFER_SETUP, &bt_sk(sk)->flags)) {
+    1356                 lock_sock(sk);
+    1357                 switch (sk->sk_state) {
+    1358                 case BT_CONNECT2:
+    1359                         if (pi->conn->hcon &&
+                                     ^^^^^^^^^^^^^^
+If ->hcon is NULL
 
-greg k-h
+    1360                             test_bit(HCI_CONN_PA_SYNC, &pi->conn->hcon->flags)) {
+    1361                                 iso_conn_big_sync(sk);
+    1362                                 sk->sk_state = BT_LISTEN;
+    1363                         } else {
+--> 1364                                 iso_conn_defer_accept(pi->conn->hcon);
+                                                               ^^^^^^^^^^^^^^
+then we're toast
+
+    1365                                 sk->sk_state = BT_CONFIG;
+    1366                         }
+    1367                         release_sock(sk);
+    1368                         return 0;
+    1369                 case BT_CONNECTED:
+    1370                         if (test_bit(BT_SK_PA_SYNC, &iso_pi(sk)->flags)) {
+
+regards,
+dan carpenter
