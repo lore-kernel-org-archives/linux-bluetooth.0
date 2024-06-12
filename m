@@ -1,220 +1,159 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out203-205-221-173.mail.qq.com (out203-205-221-173.mail.qq.com [203.205.221.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28BA77D3FA;
-	Tue, 11 Jun 2024 22:56:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B93B7382;
+	Wed, 12 Jun 2024 00:45:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.205.221.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718146605; cv=none; b=jl6Wog2WKVPFVebTUjEDfuLOCep4ZO8zPPA+rf8m9dqfd/G4liAHhToG8AFhJp8s1HSPsP66zMbFkG2fUrIBdbmxyitzlD5fscmfvU6qhR+yfSxvti1sq0ylVDBML2ACUo0K9LCea3SHWNySuWzb7zI0R1EoMtjl5i3N9ha4+UQ=
+	t=1718153158; cv=none; b=V80c0b3+jtCPPhdpXRDnmGu7nVbAFzx22sd0dwXXby+UMR81UrB9GakqvCulrWH7q0ojz+NrPWciUqnDUdccrQnZtd5M5wsMTcqne571cs4aokN1bwA/NYx+fOGc3RtCdz+2Ihf4rPCdO1zXWW8FM2DPLc+Iyx/AvEt4tYBewpo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718146605; c=relaxed/simple;
-	bh=4jBM6mXHjYlJoMIZWueS89ZlNO+AUiWEJRKWxa04gKk=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To; b=rKOimdtNyca/DoKvpEkzL/vcAYcRQ+fOWgjNoQKrRFqGl2/DcA4RSEOktHiIIZJmZt5qSMSpW8AwDm5Aek1m5ZS5t3S8wWl5Aj/M6qNYrRSj1spaXKzKW9Iorsb53c3zCVnXLDe2NueUUczZ7t7FiOKR29DpRo5VPdSfIyemf5c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jC/lBgZD; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1718153158; c=relaxed/simple;
+	bh=QvpkNZxNf+bFjGv98ZVz7V6Y9MPJqzMeA/NpE+cqGHE=;
+	h=Message-ID:From:To:Cc:Subject:Date:In-Reply-To:References:
+	 MIME-Version; b=ftaMSPsuVlFfDuufMWjlxqH5znMizlnf/KBketpwDDLI9DWlxVIAjjIVqD1dqf6/8cPdgtOP3EfHL58vhEKkYow+WI6OZ1Q/meUQ7AeZp+zA7vBAmxtVUgaP6hAwf+5Vs6WM1TgkZTqwivwNDn+rZmNS1C5lmUvYcbhGpsG0Njk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com; spf=pass smtp.mailfrom=qq.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=uVZqYDKo; arc=none smtp.client-ip=203.205.221.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jC/lBgZD"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 61873C2BD10;
-	Tue, 11 Jun 2024 22:56:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718146604;
-	bh=4jBM6mXHjYlJoMIZWueS89ZlNO+AUiWEJRKWxa04gKk=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:From;
-	b=jC/lBgZD6SkKl7787/66Mot1OAxtctUITyf4UXOQ2JVSa8o2lpp+iWq8ogS7UENCo
-	 yqzTumDF8tEtMA5L412KbnAWTlEICUYUaB6WQxi/iZq3KK051i9I3hdCqNPejgIY4h
-	 Ke9p24cUfRX+tKJ4QPj74HGoZDGWa82+//qPfAT/wSsLNiBhD00oQF6em+0sTCo9Ey
-	 T00111RDYHGIANzLOKvQl9jG1tiRKNY+avJse/GePnxuyh/FbgNapR/wc4e5yK42i4
-	 A9QSPKjwn8ZsN2uOR8Yxm/hvF/Rk0wTUKHu9VUqckeSElV62zzJn/RrNGm/MKg0ARp
-	 fgy3tmBrEJCJw==
-Date: Tue, 11 Jun 2024 17:56:43 -0500
-From: Bjorn Helgaas <helgaas@kernel.org>
-To: Bartosz Golaszewski <brgl@bgdev.pl>
-Cc: Liam Girdwood <lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Balakrishna Godavarthi <quic_bgodavar@quicinc.com>,
-	Rocky Liao <quic_rjliao@quicinc.com>, Kalle Valo <kvalo@kernel.org>,
-	Jeff Johnson <jjohnson@kernel.org>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Konrad Dybcio <konrad.dybcio@linaro.org>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Srini Kandagatla <srinivas.kandagatla@linaro.org>,
-	Elliot Berman <quic_eberman@quicinc.com>,
-	Caleb Connolly <caleb.connolly@linaro.org>,
-	Neil Armstrong <neil.armstrong@linaro.org>,
-	Dmitry Baryshkov <dmitry.baryshkov@linaro.org>,
-	Alex Elder <elder@kernel.org>, linux-arm-msm@vger.kernel.org,
-	linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-	linux-wireless@vger.kernel.org, ath11k@lists.infradead.org,
-	Jeff Johnson <quic_jjohnson@quicinc.com>,
-	ath12k@lists.infradead.org, linux-pm@vger.kernel.org,
-	linux-pci@vger.kernel.org,
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
-	kernel@quicinc.com, Amit Pundir <amit.pundir@linaro.org>
-Subject: Re: [PATCH v8 16/17] PCI/pwrctl: add a PCI power control driver for
- power sequenced devices
-Message-ID: <20240611225643.GA1005995@bhelgaas>
+	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="uVZqYDKo"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
+	t=1718153146; bh=yaOB0WImsjwMeHU3xsRZ8tLXGhxiCvU4i19eY9tIWLk=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=uVZqYDKoWj0M+t9HTrwsMbLgEnFD41htSq4Wh9jv0aZ2QItbfjN04Po2a4wgA8hPY
+	 NZtqcg+1MzhsxiY62p2OecS0+TpPxMtoIXI61/3itcIRVflDX8WRArk1O3zBJk9hER
+	 7xFHPg4JEs3B93RMqGsrY6FXymXJUaKQ0boXJj38=
+Received: from pek-lxu-l1.wrs.com ([111.198.228.153])
+	by newxmesmtplogicsvrszb9-1.qq.com (NewEsmtp) with SMTP
+	id 8540D485; Wed, 12 Jun 2024 08:33:20 +0800
+X-QQ-mid: xmsmtpt1718152400t34ok1r3k
+Message-ID: <tencent_BD1DCF8F0DE1A5918DC69228DD91DDBE9907@qq.com>
+X-QQ-XMAILINFO: NUygYfydBsqczLxmdSG/DSQARvh5gSVrbRbiqSTeEHu60ddjYPpYonCah6M8R2
+	 FJqEzr9OGd5mUmLIeIDv1sBE7ch3Y8kkHj4qV4QrOTb0ggZNDzKbWuPAS9RIp3eUfweONbcQxg+R
+	 Sr+haabgyuoAOumT9y0+kDMAqWBURB1d4VTHWG2xQi9a+9n/KIaNs2V3rn9Z4fmv06X5jtyJzguP
+	 2qQpwrN2Oyp2GMr55TW2bKWXFpADqwTtxmPfG9xVfKSJxNJcQfgcY/ejejOJpcr1oX2ZNPvJEu/6
+	 PUG8f3QIzKZ3PMSJyEBqKU8LycnzoQsardQMDwV5nDwEYq0ToNS50UnfowXzQF8Gm9Ub4JJ6p1E8
+	 9gCNXsVhXdxi+k8QP/KCV9f/CoQYAinz4sZ2M5evwVrFbrPfRmGkzV8e2fNrQ0cJBHpc9aYWv6W0
+	 VZHngSXRXWjmj+hEK4fURvEQkHQBe30+1ctYd1H2n1KkQi9613mb5qiz3hXWM8Ujekw2Fm/u7pcI
+	 G7tZx6nMFPUjBI+qsOhEMhvPlP8yErM+cJocTrhLomdN6zLXNNMBmLxulm98BXd8M0zgogg0bb+R
+	 F999IV4HdImGAYSXwfROC8x7F/1KOvMPifTuEYTGWT/19FCQsdWFmDEWkGO8f/2xcW/gKez0aFlx
+	 O0M2j6g6VZ4KjVhheH88KAXHAcLKtye13m+PV0y7fxap2UgW1MFByupwNRIfM9THm5mlomFALmHk
+	 E/cmB8a+/EqGZ1NbbJSqdaIwVDD19zkthyzIMoGJ8LYMzdEG/m5yQppmHaLXd3zqRactJaGn/niK
+	 /fwV1aCCckl30Cya/fQLB0YofAZWaoEIgGu51i0888djamz7DRxivaoagUKxnDNZeWZS2SJYkLDt
+	 bHTHWsYnz1D8XdK5SjOx4J0BbkDDZ40JirygFAtQn6rHcmEVzD+2Iiw/PoF+VpUKU2au/tBvPK1W
+	 0itXMDSKU=
+X-QQ-XMRINFO: Mp0Kj//9VHAxr69bL5MkOOs=
+From: Edward Adam Davis <eadavis@qq.com>
+To: luiz.dentz@gmail.com
+Cc: eadavis@qq.com,
+	johan.hedberg@gmail.com,
+	linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	marcel@holtmann.org,
+	syzbot+b7f6f8c9303466e16c8a@syzkaller.appspotmail.com,
+	syzkaller-bugs@googlegroups.com
+Subject: Re: [PATCH] bluetooth/l2cap: sync sock recv cb and release
+Date: Wed, 12 Jun 2024 08:33:20 +0800
+X-OQ-MSGID: <20240612003319.2141768-2-eadavis@qq.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <CABBYNZKArASNApkJPvJn8C4HE0y5aZy0X2ZrOjjdrsDhBO+7rQ@mail.gmail.com>
+References: <CABBYNZKArASNApkJPvJn8C4HE0y5aZy0X2ZrOjjdrsDhBO+7rQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240528-pwrseq-v8-16-d354d52b763c@linaro.org>
+Content-Transfer-Encoding: 8bit
 
-On Tue, May 28, 2024 at 09:03:24PM +0200, Bartosz Golaszewski wrote:
-> From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-> 
-> Add a PCI power control driver that's capable of correctly powering up
-> devices using the power sequencing subsystem. The first users of this
-> driver are the ath11k module on QCA6390 and ath12k on WCN7850.
-> 
-> Tested-by: Amit Pundir <amit.pundir@linaro.org>
-> Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+Hi Luiz Augusto von Dentz,
 
-With s/add/Add/ in subject,
+On Tue, 11 Jun 2024 15:24:52 -0400, Luiz Augusto von Dentz wrote:
+> > The problem occurs between the system call to close the sock and hci_rx_work,
+> > where the former releases the sock and the latter accesses it without lock protection.
+> >
+> >            CPU0                       CPU1
+> >            ----                       ----
+> >            sock_close                 hci_rx_work
+> >            l2cap_sock_release         hci_acldata_packet
+> >            l2cap_sock_kill            l2cap_recv_frame
+> >            sk_free                    l2cap_conless_channel
+> >                                       l2cap_sock_recv_cb
+> >
+> > If hci_rx_work processes the data that needs to be received before the sock is
+> > closed, then everything is normal; Otherwise, the work thread may access the
+> > released sock when receiving data.
+> >
+> > Add a chan mutex in the rx callback of the sock to achieve synchronization between
+> > the sock release and recv cb.
+> >
+> > Reported-and-tested-by: syzbot+b7f6f8c9303466e16c8a@syzkaller.appspotmail.com
+> > Signed-off-by: Edward Adam Davis <eadavis@qq.com>
+> > ---
+> >  net/bluetooth/l2cap_sock.c | 20 +++++++++++++++++---
+> >  1 file changed, 17 insertions(+), 3 deletions(-)
+> >
+> > diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+> > index 6db60946c627..f3e9236293e1 100644
+> > --- a/net/bluetooth/l2cap_sock.c
+> > +++ b/net/bluetooth/l2cap_sock.c
+> > @@ -1413,6 +1413,8 @@ static int l2cap_sock_release(struct socket *sock)
+> >         l2cap_chan_hold(chan);
+> >         l2cap_chan_lock(chan);
+> >
+> > +       if (refcount_read(&sk->sk_refcnt) == 1)
+> > +               chan->data = NULL;
+> 
+> Might be a good idea to add some comment on why checking for refcount
+> == 1 is the right thing to do here, or perhaps we can always assign
+> chan->data to NULL, instead of that perhaps we could have it done in
+> l2cap_sock_kill?
+In this case, it is possible to always set chan->data to NULL, but I think a
+better approach would be to release sock in l2cap_sock_kill when the reference
+count of the sock is 1. Previously, it was mentioned that setting chan->data to
+NULL is more rigorous.
+And chan->data is bound one-on-one to the sock, if the sock is not released,
+I can't confirm whether setting chan->data to NULL will affect the operation of
+the sock on other paths.
+> 
+> >         sock_orphan(sk);
+> >         l2cap_sock_kill(sk);
+> >
+> > @@ -1481,12 +1483,22 @@ static struct l2cap_chan *l2cap_sock_new_connection_cb(struct l2cap_chan *chan)
+> >
+> >  static int l2cap_sock_recv_cb(struct l2cap_chan *chan, struct sk_buff *skb)
+> >  {
+> > -       struct sock *sk = chan->data;
+> > -       struct l2cap_pinfo *pi = l2cap_pi(sk);
+> > +       struct sock *sk;
+> > +       struct l2cap_pinfo *pi;
+> >         int err;
+> >
+> > -       lock_sock(sk);
+> > +       l2cap_chan_hold(chan);
+> > +       l2cap_chan_lock(chan);
+> > +       sk = chan->data;
+> > +
+> > +       if (!sk) {
+> > +               l2cap_chan_unlock(chan);
+> > +               l2cap_chan_put(chan);
+> > +               return -ENXIO;
+> > +       }
+> >
+> > +       pi = l2cap_pi(sk);
+> > +       lock_sock(sk);
+> >         if (chan->mode == L2CAP_MODE_ERTM && !list_empty(&pi->rx_busy)) {
+> >                 err = -ENOMEM;
+> >                 goto done;
+> > @@ -1535,6 +1547,8 @@ static int l2cap_sock_recv_cb(struct l2cap_chan *chan, struct sk_buff *skb)
+> >
+> >  done:
+> >         release_sock(sk);
+> > +       l2cap_chan_unlock(chan);
+> > +       l2cap_chan_put(chan);
+> >
+> >         return err;
+> >  }
 
-Acked-by: Bjorn Helgaas <bhelgaas@google.com>
+--
+Edward
 
-> ---
->  drivers/pci/pwrctl/Kconfig             |  9 ++++
->  drivers/pci/pwrctl/Makefile            |  2 +
->  drivers/pci/pwrctl/pci-pwrctl-pwrseq.c | 89 ++++++++++++++++++++++++++++++++++
->  3 files changed, 100 insertions(+)
-> 
-> diff --git a/drivers/pci/pwrctl/Kconfig b/drivers/pci/pwrctl/Kconfig
-> index 96195395af69..f1b824955d4b 100644
-> --- a/drivers/pci/pwrctl/Kconfig
-> +++ b/drivers/pci/pwrctl/Kconfig
-> @@ -5,4 +5,13 @@ menu "PCI Power control drivers"
->  config PCI_PWRCTL
->  	tristate
->  
-> +config PCI_PWRCTL_PWRSEQ
-> +	tristate "PCI Power Control driver using the Power Sequencing subsystem"
-> +	select POWER_SEQUENCING
-> +	select PCI_PWRCTL
-> +	default m if ((ATH11K_PCI || ATH12K) && ARCH_QCOM)
-> +	help
-> +	  Enable support for the PCI power control driver for device
-> +	  drivers using the Power Sequencing subsystem.
-> +
->  endmenu
-> diff --git a/drivers/pci/pwrctl/Makefile b/drivers/pci/pwrctl/Makefile
-> index 52ae0640ef7b..d308aae4800c 100644
-> --- a/drivers/pci/pwrctl/Makefile
-> +++ b/drivers/pci/pwrctl/Makefile
-> @@ -2,3 +2,5 @@
->  
->  obj-$(CONFIG_PCI_PWRCTL)		+= pci-pwrctl-core.o
->  pci-pwrctl-core-y			:= core.o
-> +
-> +obj-$(CONFIG_PCI_PWRCTL_PWRSEQ)		+= pci-pwrctl-pwrseq.o
-> diff --git a/drivers/pci/pwrctl/pci-pwrctl-pwrseq.c b/drivers/pci/pwrctl/pci-pwrctl-pwrseq.c
-> new file mode 100644
-> index 000000000000..c7a113a76c0c
-> --- /dev/null
-> +++ b/drivers/pci/pwrctl/pci-pwrctl-pwrseq.c
-> @@ -0,0 +1,89 @@
-> +// SPDX-License-Identifier: GPL-2.0-only
-> +/*
-> + * Copyright (C) 2024 Linaro Ltd.
-> + */
-> +
-> +#include <linux/device.h>
-> +#include <linux/mod_devicetable.h>
-> +#include <linux/module.h>
-> +#include <linux/of.h>
-> +#include <linux/pci-pwrctl.h>
-> +#include <linux/platform_device.h>
-> +#include <linux/pwrseq/consumer.h>
-> +#include <linux/slab.h>
-> +#include <linux/types.h>
-> +
-> +struct pci_pwrctl_pwrseq_data {
-> +	struct pci_pwrctl ctx;
-> +	struct pwrseq_desc *pwrseq;
-> +};
-> +
-> +static void devm_pci_pwrctl_pwrseq_power_off(void *data)
-> +{
-> +	struct pwrseq_desc *pwrseq = data;
-> +
-> +	pwrseq_power_off(pwrseq);
-> +}
-> +
-> +static int pci_pwrctl_pwrseq_probe(struct platform_device *pdev)
-> +{
-> +	struct pci_pwrctl_pwrseq_data *data;
-> +	struct device *dev = &pdev->dev;
-> +	int ret;
-> +
-> +	data = devm_kzalloc(dev, sizeof(*data), GFP_KERNEL);
-> +	if (!data)
-> +		return -ENOMEM;
-> +
-> +	data->pwrseq = devm_pwrseq_get(dev, of_device_get_match_data(dev));
-> +	if (IS_ERR(data->pwrseq))
-> +		return dev_err_probe(dev, PTR_ERR(data->pwrseq),
-> +				     "Failed to get the power sequencer\n");
-> +
-> +	ret = pwrseq_power_on(data->pwrseq);
-> +	if (ret)
-> +		return dev_err_probe(dev, ret,
-> +				     "Failed to power-on the device\n");
-> +
-> +	ret = devm_add_action_or_reset(dev, devm_pci_pwrctl_pwrseq_power_off,
-> +				       data->pwrseq);
-> +	if (ret)
-> +		return ret;
-> +
-> +	data->ctx.dev = dev;
-> +
-> +	ret = devm_pci_pwrctl_device_set_ready(dev, &data->ctx);
-> +	if (ret)
-> +		return dev_err_probe(dev, ret,
-> +				     "Failed to register the pwrctl wrapper\n");
-> +
-> +	return 0;
-> +}
-> +
-> +static const struct of_device_id pci_pwrctl_pwrseq_of_match[] = {
-> +	{
-> +		/* ATH11K in QCA6390 package. */
-> +		.compatible = "pci17cb,1101",
-> +		.data = "wlan",
-> +	},
-> +	{
-> +		/* ATH12K in WCN7850 package. */
-> +		.compatible = "pci17cb,1107",
-> +		.data = "wlan",
-> +	},
-> +	{ }
-> +};
-> +MODULE_DEVICE_TABLE(of, pci_pwrctl_pwrseq_of_match);
-> +
-> +static struct platform_driver pci_pwrctl_pwrseq_driver = {
-> +	.driver = {
-> +		.name = "pci-pwrctl-pwrseq",
-> +		.of_match_table = pci_pwrctl_pwrseq_of_match,
-> +	},
-> +	.probe = pci_pwrctl_pwrseq_probe,
-> +};
-> +module_platform_driver(pci_pwrctl_pwrseq_driver);
-> +
-> +MODULE_AUTHOR("Bartosz Golaszewski <bartosz.golaszewski@linaro.org>");
-> +MODULE_DESCRIPTION("Generic PCI Power Control module for power sequenced devices");
-> +MODULE_LICENSE("GPL");
-> 
-> -- 
-> 2.43.0
-> 
