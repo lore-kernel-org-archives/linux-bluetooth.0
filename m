@@ -1,63 +1,63 @@
-Received: from mail-yb1-f171.google.com (mail-yb1-f171.google.com [209.85.219.171])
+Received: from mail-qt1-f177.google.com (mail-qt1-f177.google.com [209.85.160.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58731181B99
-	for <linux-bluetooth@vger.kernel.org>; Wed, 12 Jun 2024 16:21:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFF83181BAA
+	for <linux-bluetooth@vger.kernel.org>; Wed, 12 Jun 2024 16:21:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718209273; cv=none; b=FUJcWXEJMBDL+Cja5Mj53k+SeTbon9Rr7EnxLjR/Z5CtVJbEh9l3vdO0pGY6fWl4f24HFh1Ss8JO2FDYPRXi1NJDNBfyAekVx8DmgsXEDmTxFCjJDOuBk9p54Ojj6y4mnWs5UlQGByH8JBDqaqvPeVJxS7IFZq1ewGw21AIQs5w=
+	t=1718209274; cv=none; b=bwUWMrf/VZRwz1pBC2YI3GbBKYBnWlUHUgjsVlZfK5vCgX2I5N+o3X2eIJT6+yH/R24Jq6HaETbYrJCvFK67ySsBDhw5/iERCOkGH3Y9TZMCndAgfSHVAk97nD0CThCTJMgTPgpjJ4CaRd7KosP1yWg28+SbpQ/45e4OjTiH/kg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718209273; c=relaxed/simple;
-	bh=lFYumapa+shRfb/+JcXSXf2dC2O7R/rifcVqYDCU/WQ=;
+	s=arc-20240116; t=1718209274; c=relaxed/simple;
+	bh=aEPWB+cUufzzusud3mld2vXtV3KSH8B0MExdHZC/1Mw=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=VO/xj9cuoycy95f9Hf8o6PuJorsxpZWtZ2Geg1yfiN6kcoPm8LasaP4mtyBhRFtNviUSYSEe2g9E21zETVrKa2sU03R0LAQiaaw1F2Wla15r+OaWxq4Sedpss2ViW1Kioh37ISfNDG4lChwI0dL2VqXF3LwJVGuV2vtYeJ0dpNs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=asymptotic.io; spf=pass smtp.mailfrom=asymptotic.io; dkim=pass (2048-bit key) header.d=asymptotic.io header.i=@asymptotic.io header.b=cJyAn+1w; arc=none smtp.client-ip=209.85.219.171
+	 MIME-Version; b=V3wDEVYMJ6RPdIYsY+qCTr6BVtC578SKIl39MFROtKFN7h/Fr16XkAxFpbFgjkoOa0JKUIfEAFAe2Tluvde6NjhgKINxiZq2PfQ62pY1ukCXdO+YgXuuhA7PoZH1DSW0hF3YGf9UBo/FitLT9Vfi4K+pAdJ6f3NtXonWLFmdsbM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=asymptotic.io; spf=pass smtp.mailfrom=asymptotic.io; dkim=pass (2048-bit key) header.d=asymptotic.io header.i=@asymptotic.io header.b=PM00VY0Z; arc=none smtp.client-ip=209.85.160.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=asymptotic.io
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=asymptotic.io
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=asymptotic.io header.i=@asymptotic.io header.b="cJyAn+1w"
-Received: by mail-yb1-f171.google.com with SMTP id 3f1490d57ef6-dfb05bcc50dso40861276.0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 12 Jun 2024 09:21:09 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=asymptotic.io header.i=@asymptotic.io header.b="PM00VY0Z"
+Received: by mail-qt1-f177.google.com with SMTP id d75a77b69052e-441567d352bso10636211cf.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 12 Jun 2024 09:21:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=asymptotic.io; s=google; t=1718209269; x=1718814069; darn=vger.kernel.org;
+        d=asymptotic.io; s=google; t=1718209270; x=1718814070; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=e+RXWfdWMJvhr5OlgeQnhgjjAbFoBz5WxDfXyKDXyBI=;
-        b=cJyAn+1wqtvR9vs9GPL8rWCHJ9WAPEFcfI/C9gvZF/cw2EmkGlGxUDbbOtYX0TfLUJ
-         /uTWfJCrC7OaCmVIOQGKwm/cSH+WaXTZgIxonjAFmUQlGH5J+Mktc7zzbBo2W+Jc2zwD
-         gDyUqCf6ogOLmhg7R1CsmRGukvjeNCa5WVefBPV/C1dLBuUcWiQpUphic2lBjY7z6VSN
-         ofNkSsyXJOcDtnouXVVz17L+u+UJNhaBhC4bWjeoUAAm6VTkeT/iuV3r7gOXKl2A6Y0y
-         6G/WT4DlB0QSMEHEPnpKkPBjMpFzxA6cWvWQuqn6Xl4uKBceqhWSFHqrsKb6Rnj1sLyT
-         U7YA==
+        bh=7KHeLMJeZER/fDQwHwzfzIu5p4UcS+WwdzUUQSfOyy8=;
+        b=PM00VY0ZVAsXDhaye3ufLEMb4bHQT1aGwY9HpvtWB+y2UqXKo0levlntxFiyEvS9aK
+         XwzIfbqwycXcC9nFYJdjuvWEkppITEYVuhrAb3+gT2pANrSLEHWPO+4yogdyoayTedus
+         V80vbT3xOtGerKTLeIYsnOl6bNBrVfbWpU4WN5kIsTJUxKUagjRiDS9NJ0g+f12U9gRn
+         hQv0H9iQ0TEwjT9ooDWWot/7zfg1OjIBVo4qQACW6vslMRFz79jgAoEo7rnamEng9x8Z
+         2bsLPgoaVtoYwMdS9XUYeA81lfsc6VocQwyWO1yp2dgfA+w+mk/X2q5w1fPVzmpOM+8r
+         7hJQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718209269; x=1718814069;
+        d=1e100.net; s=20230601; t=1718209270; x=1718814070;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=e+RXWfdWMJvhr5OlgeQnhgjjAbFoBz5WxDfXyKDXyBI=;
-        b=HrQwyrsZ0CGugLWBaO6bu2CHAg9p3fnBl1fcA4bGfnGvEQpbVrETLasGJ9o18wTwKC
-         kJOU2DXq6PWCsjNZouKbKLogNlYGHsN0Mu/RQc7JZTfoESszyZ3NoDmaWzgW/xI3nv4p
-         lLqjSFdpv3yl519TZTuWHE/3eDUVs3onjbPDbtAAQTsLLPPBH/O7a0iu4GJqMS98atNN
-         CDXyGGaCI/n8M+qwh7eCkzxOIwHfhATVuIQu1Zz+In7U+p7deBJZKf08iHsoOsZIzbFD
-         D6ye7SFe/YOhdd/chNaiwb06RHgtmw9BEA40e0U+nPzQ79N3X9/9jUZf75S3WpdpHWGd
-         c1XQ==
-X-Gm-Message-State: AOJu0Ywb9mAmgStrj45BhcD/fzgMkbkP8uwPYIdOzPZC2KeZGKVyl1cR
-	cH0mNeCgHbj4AaRe1F4KIIaQxi1WNf+kYX06oXqVY2GGDxD3607bCOZkSjcdZnoq0OXyRDjIgn2
-	d410=
-X-Google-Smtp-Source: AGHT+IEtT3HIT0WtZ9FFq6VazRY4iqwp2p1afNgNjFNZmD0d51gXNhStZUMadXoqluUiW+Ehc0L2XQ==
-X-Received: by 2002:a05:6902:e0f:b0:dfe:3770:7cd1 with SMTP id 3f1490d57ef6-dfe6686e9b7mr2831283276.23.1718209268638;
-        Wed, 12 Jun 2024 09:21:08 -0700 (PDT)
+        bh=7KHeLMJeZER/fDQwHwzfzIu5p4UcS+WwdzUUQSfOyy8=;
+        b=Ynf2OYKaKq5ol5pzMWx8imJcKpp0GC661phsbqZgOVQPYuSxjC1yAzVzErzotqQCa0
+         5IGmIFA7a8aljoJ9I7mU/hEr+fa/iKLoRZ0iTYdoKOFw0pikYbgfd29seo2a5f6pvYHN
+         L/1190vvzRMOj0dUbhWGREK3Q2u4084dKQ7XjiWaOBSXoDVyWVSWAKHm/ihsd1VIEwkU
+         7/Z2J5kFD6zTaLcu6viWF0xWrraclX/fvnpd6jK3cnLojsZxXpiUiUZtMJbvNeDubQt0
+         mrK0v3m6cpvAU5nsYAW7L1IliZCXZflNKo+v/2duCXkZFIorT9nKecQWno5UM3IB9/zX
+         VsPg==
+X-Gm-Message-State: AOJu0Yy3SRxIaLx3tslbayl4BTI0D5mfobKhQAhHDw6sm1f0w7WMYVrQ
+	6Hvs66F/ili7f+1vsyu9x2p5qdPf5c3A4dKhqZg2kztsG4id9rQ/TgqMAo1kJAKoNaRr98aErwv
+	qVHY=
+X-Google-Smtp-Source: AGHT+IFb2WIrNVtte1sMM6pZyskzFzy+AuLo6OFppvas7c1U7RtJnoQY1OdrN/oKCvUqteZXbTe4vw==
+X-Received: by 2002:a05:6214:3f82:b0:6b0:820f:b83b with SMTP id 6a1803df08f44-6b191778fe1mr23946956d6.4.1718209270245;
+        Wed, 12 Jun 2024 09:21:10 -0700 (PDT)
 Received: from andromeda.lan ([70.27.101.40])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6b089aa106csm21899616d6.127.2024.06.12.09.21.07
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6b089aa106csm21899616d6.127.2024.06.12.09.21.09
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 12 Jun 2024 09:21:08 -0700 (PDT)
+        Wed, 12 Jun 2024 09:21:09 -0700 (PDT)
 From: Arun Raghavan <arun@asymptotic.io>
 To: linux-bluetooth@vger.kernel.org
 Cc: Arun Raghavan <arun@asymptotic.io>
-Subject: [PATCH BlueZ,v10 1/3] src/shared: Add initial implementation for an ASHA profile
-Date: Wed, 12 Jun 2024 12:20:39 -0400
-Message-ID: <20240612162041.689679-2-arun@asymptotic.io>
+Subject: [PATCH BlueZ,v10 2/3] profiles/audio: Add an ASHA plugin
+Date: Wed, 12 Jun 2024 12:20:40 -0400
+Message-ID: <20240612162041.689679-3-arun@asymptotic.io>
 X-Mailer: git-send-email 2.45.2
 In-Reply-To: <20240612162041.689679-1-arun@asymptotic.io>
 References: <20240612162041.689679-1-arun@asymptotic.io>
@@ -69,57 +69,63 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This implements the server role for the Audio Streaming for Hearing Aid
-specification[1]. Includes basic ability to probe the ASHA GATT service,
-as well as starting/stopping streaming.
+This exposes the ASHA profile implementation in the previous commit as
+an audio profile.
 
-[1] https://source.android.com/docs/core/connect/bluetooth/asha
+The implementation registers a remote endpoint using a subset of the
+MediaEndpoint1 interface, without any mechanism for setting/selecting a
+configuration, as this is all static in the spec for now. Also exposed
+on connection is a MediaTransport1 object, which can be used to obtain
+an fd to stream to the device.
 
 Resolves: https://github.com/bluez/bluez/issues/481
 ---
- Makefile.am       |   3 +-
- lib/uuid.h        |   3 +
- src/shared/asha.c | 359 ++++++++++++++++++++++++++++++++++++++++++++++
- src/shared/asha.h |  63 ++++++++
- 4 files changed, 427 insertions(+), 1 deletion(-)
- create mode 100644 src/shared/asha.c
- create mode 100644 src/shared/asha.h
+ Makefile.plugins           |   5 +
+ configure.ac               |   4 +
+ profiles/audio/asha.c      | 525 +++++++++++++++++++++++++++++++++++++
+ profiles/audio/asha.h      |  38 +++
+ profiles/audio/media.c     |  30 +++
+ profiles/audio/media.h     |   2 +
+ profiles/audio/transport.c | 201 +++++++++++++-
+ 7 files changed, 803 insertions(+), 2 deletions(-)
+ create mode 100644 profiles/audio/asha.c
+ create mode 100644 profiles/audio/asha.h
 
-diff --git a/Makefile.am b/Makefile.am
-index 8f5d2fb55..0ae721111 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -238,7 +238,8 @@ shared_sources = src/shared/io.h src/shared/timeout.h \
- 			src/shared/bass.h src/shared/bass.c \
- 			src/shared/ccp.h src/shared/ccp.c \
- 			src/shared/lc3.h src/shared/tty.h \
--			src/shared/bap-defs.h
-+			src/shared/bap-defs.h \
-+			src/shared/asha.h src/shared/asha.c
- 
- if READLINE
- shared_sources += src/shared/shell.c src/shared/shell.h
-diff --git a/lib/uuid.h b/lib/uuid.h
-index 8404b287e..479986f06 100644
---- a/lib/uuid.h
-+++ b/lib/uuid.h
-@@ -163,6 +163,9 @@ extern "C" {
- #define BAA_SERVICE					0x1851
- #define BAA_SERVICE_UUID	"00001851-0000-1000-8000-00805f9b34fb"
- 
-+#define ASHA_SERVICE					0xFDF0
-+#define ASHA_PROFILE_UUID	"0000FDF0-0000-1000-8000-00805f9b34fb"
+diff --git a/Makefile.plugins b/Makefile.plugins
+index 4aa2c9c92..44fda4536 100644
+--- a/Makefile.plugins
++++ b/Makefile.plugins
+@@ -147,3 +147,8 @@ if CSIP
+ builtin_modules += csip
+ builtin_sources += profiles/audio/csip.c
+ endif
 +
- #define PAC_CONTEXT					0x2bcd
- #define PAC_SUPPORTED_CONTEXT				0x2bce
++if ASHA
++builtin_modules += asha
++builtin_sources += profiles/audio/asha.h profiles/audio/asha.c
++endif
+diff --git a/configure.ac b/configure.ac
+index ac9de6ec4..1d88daa0b 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -216,6 +216,10 @@ AC_ARG_ENABLE(csip, AS_HELP_STRING([--disable-csip],
+ 		[disable CSIP profile]), [enable_csip=${enableval}])
+ AM_CONDITIONAL(CSIP, test "${enable_csip}" != "no")
  
-diff --git a/src/shared/asha.c b/src/shared/asha.c
++AC_ARG_ENABLE(asha, AS_HELP_STRING([--disable-asha],
++		[disable ASHA support]), [enable_asha=${enableval}])
++AM_CONDITIONAL(ASHA, test "${enable_asha}" != "no")
++
+ AC_ARG_ENABLE(tools, AS_HELP_STRING([--disable-tools],
+ 		[disable Bluetooth tools]), [enable_tools=${enableval}])
+ AM_CONDITIONAL(TOOLS, test "${enable_tools}" != "no")
+diff --git a/profiles/audio/asha.c b/profiles/audio/asha.c
 new file mode 100644
-index 000000000..67f2631cd
+index 000000000..10115b92d
 --- /dev/null
-+++ b/src/shared/asha.c
-@@ -0,0 +1,359 @@
-+// SPDX-License-Identifier: LGPL-2.1-or-later
++++ b/profiles/audio/asha.c
+@@ -0,0 +1,525 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
 +/*
 + *
 + *  BlueZ - Bluetooth protocol stack for Linux
@@ -135,356 +141,522 @@ index 000000000..67f2631cd
 +#include <config.h>
 +#endif
 +
++#define _GNU_SOURCE
++#include <errno.h>
++
 +#include <stdbool.h>
 +#include <stdint.h>
-+#include <stdlib.h>
-+#include <string.h>
++#include <unistd.h>
++#include <sys/socket.h>
 +
++#include <dbus/dbus.h>
++#include <glib.h>
++
++#include "btio/btio.h"
++#include "gdbus/gdbus.h"
 +#include "lib/bluetooth.h"
++#include "lib/l2cap.h"
 +#include "lib/uuid.h"
 +
-+#include "src/shared/util.h"
-+#include "src/shared/att.h"
++#include "src/dbus-common.h"
++#include "src/adapter.h"
++#include "src/device.h"
 +#include "src/log.h"
++#include "src/plugin.h"
++#include "src/profile.h"
++#include "src/service.h"
++#include "src/shared/util.h"
 +
-+#include "src/shared/queue.h"
-+#include "src/shared/gatt-db.h"
-+#include "src/shared/gatt-client.h"
++#include "profiles/audio/asha.h"
++#include "profiles/audio/media.h"
++#include "profiles/audio/transport.h"
 +
-+#include "asha.h"
++#define MEDIA_ENDPOINT_INTERFACE "org.bluez.MediaEndpoint1"
 +
-+/* We use strings instead of uint128_t to maintain readability */
-+#define ASHA_CHRC_READ_ONLY_PROPERTIES_UUID "6333651e-c481-4a3e-9169-7c902aad37bb"
-+#define ASHA_CHRC_AUDIO_CONTROL_POINT_UUID "f0d4de7e-4a88-476c-9d9f-1937b0996cc0"
-+#define ASHA_CHRC_AUDIO_STATUS_UUID "38663f1a-e711-4cac-b641-326b56404837"
-+#define ASHA_CHRC_VOLUME_UUID "00e4ca9e-ab14-41e4-8823-f9e70c7e91df"
-+#define ASHA_CHRC_LE_PSM_OUT_UUID "2d410339-82b6-42aa-b34e-e2e01df8cc1a"
++/* 2 byte SDU length, 1 byte sequence number, and then 20ms of G.722 */
++#define ASHA_MIN_MTU 163
++/* The default of 672 does not work */
++#define ASHA_CONNECTION_MTU 512
 +
-+struct bt_asha *bt_asha_new(void)
-+{
++struct bt_asha_device {
 +	struct bt_asha *asha;
++	struct btd_device *device;
++	struct media_transport *transport;
 +
-+	asha = new0(struct bt_asha, 1);
++	GIOChannel *io;
++	uint16_t imtu, omtu;
 +
-+	return asha;
-+}
++	unsigned int resume_id;
++};
 +
-+void bt_asha_reset(struct bt_asha *asha)
++static char *make_endpoint_path(struct bt_asha_device *asha_dev)
 +{
-+	if (asha->status_notify_id) {
-+		bt_gatt_client_unregister_notify(asha->client,
-+						asha->status_notify_id);
++	char *path;
++	int err;
++
++	err = asprintf(&path, "%s/asha", device_get_path(asha_dev->device));
++	if (err < 0) {
++		error("Could not allocate path for remote %s",
++				device_get_path(asha_dev->device));
++		return NULL;
 +	}
 +
-+	gatt_db_unref(asha->db);
-+	asha->db = NULL;
-+
-+	bt_gatt_client_unref(asha->client);
-+	asha->client = NULL;
-+
-+	asha->psm = 0;
++	return path;
 +}
 +
-+void bt_asha_state_reset(struct bt_asha *asha)
++struct connect_data {
++	struct bt_asha_device *asha_dev;
++	bt_asha_cb_t cb;
++	void *cb_user_data;
++};
++
++static void connect_cb(GIOChannel *io, GError *err, gpointer user_data)
 +{
-+	asha->state = ASHA_STOPPED;
++	struct connect_data *conn_data = user_data;
++	struct bt_asha_device *asha_dev = conn_data->asha_dev;
++	GError *gerr = NULL;
 +
-+	asha->cb = NULL;
-+	asha->cb_user_data = NULL;
-+}
-+
-+void bt_asha_free(struct bt_asha *asha)
-+{
-+	gatt_db_unref(asha->db);
-+	bt_gatt_client_unref(asha->client);
-+	free(asha);
-+}
-+
-+static void asha_acp_sent(bool success, uint8_t err, void *user_data)
-+{
-+	struct bt_asha *asha = user_data;
-+
-+	if (success) {
-+		DBG("AudioControlPoint command successfully sent");
-+	} else {
-+		error("Failed to send AudioControlPoint command: %d", err);
-+
-+		if (asha->cb)
-+			asha->cb(-1, asha->cb_user_data);
-+
-+		bt_asha_state_reset(asha);
++	if (!bt_io_get(io, &gerr,
++				BT_IO_OPT_IMTU, &asha_dev->imtu,
++				BT_IO_OPT_OMTU, &asha_dev->omtu,
++				BT_IO_OPT_INVALID)) {
++		/* Let this be non-fatal? */
++		asha_dev->omtu = ASHA_MIN_MTU;
++		asha_dev->imtu = ASHA_CONNECTION_MTU;
++		error("Could not get L2CAP CoC socket MTU: %s", err->message);
++		g_error_free(gerr);
 +	}
++
++	asha_dev->io = io;
++
++	bt_asha_start(asha_dev->asha, conn_data->cb,
++					conn_data->cb_user_data);
 +}
 +
-+static int asha_send_acp(struct bt_asha *asha, uint8_t *cmd,
-+		unsigned int len, bt_asha_cb_t cb, void *user_data)
++static int asha_connect_socket(struct bt_asha_device *asha_dev,
++					bt_asha_cb_t cb, void *user_data)
 +{
-+	if (!bt_gatt_client_write_value(asha->client, asha->acp_handle, cmd,
-+				len, asha_acp_sent, asha, NULL)) {
-+		error("Error writing ACP command");
++	GError *gerr = NULL;
++	const bdaddr_t *src_addr;
++	struct connect_data *conn_data;
++
++	if (asha_dev->asha->state != ASHA_STOPPED) {
++		error("ASHA device connect failed. Bad state %d",
++							asha_dev->asha->state);
++		return 0;
++	}
++
++	conn_data = g_new0(struct connect_data, 1);
++	conn_data->asha_dev = asha_dev;
++	conn_data->cb = cb;
++	conn_data->cb_user_data = user_data;
++
++	src_addr = btd_adapter_get_address(
++			device_get_adapter(asha_dev->device));
++
++	if (!bt_io_connect(connect_cb, conn_data,
++				g_free, &gerr,
++				BT_IO_OPT_MODE, BT_IO_MODE_LE_FLOWCTL,
++				BT_IO_OPT_SOURCE_TYPE, BDADDR_LE_PUBLIC,
++				BT_IO_OPT_SOURCE_BDADDR, src_addr,
++				BT_IO_OPT_DEST_TYPE, BDADDR_LE_PUBLIC,
++				BT_IO_OPT_DEST_BDADDR,
++				device_get_address(asha_dev->device),
++				BT_IO_OPT_PSM, asha_dev->asha->psm,
++				BT_IO_OPT_OMTU, ASHA_MIN_MTU,
++				BT_IO_OPT_IMTU, ASHA_CONNECTION_MTU,
++				BT_IO_OPT_INVALID)) {
++		error("Could not open L2CAP CoC socket: %s", gerr->message);
++		g_error_free(gerr);
++		goto error;
++	}
++
++	DBG("L2CAP CoC socket is open");
++	return 0;
++
++error:
++	return -1;
++}
++
++unsigned int bt_asha_device_start(struct bt_asha_device *asha_dev,
++					bt_asha_cb_t cb, void *user_data)
++{
++	int ret;
++
++	btd_device_set_conn_param(asha_dev->device,
++			0x0010 /* min interval = 1.25ms intervals => 20ms */,
++			0x0010 /* max interval = 1.25ms intervals => 20ms */,
++			0x000A /* 10 events' latency */,
++			0x0064 /* 1s timeout */);
++
++	ret = asha_connect_socket(asha_dev, cb, user_data);
++
++	if (ret < 0)
++		return 0;
++	else
++		return (++asha_dev->resume_id);
++}
++
++unsigned int bt_asha_device_stop(struct bt_asha_device *asha_dev,
++					bt_asha_cb_t cb, void *user_data)
++{
++	bt_asha_stop(asha_dev->asha, cb, user_data);
++
++	if (asha_dev->io) {
++		g_io_channel_shutdown(asha_dev->io, TRUE, NULL);
++		g_io_channel_unref(asha_dev->io);
++		asha_dev->io = NULL;
++	};
++
++	return asha_dev->resume_id;
++}
++
++void bt_asha_device_state_reset(struct bt_asha_device *asha_dev)
++{
++	if (asha_dev->io) {
++		g_io_channel_shutdown(asha_dev->io, TRUE, NULL);
++		g_io_channel_unref(asha_dev->io);
++		asha_dev->io = NULL;
++	};
++
++	bt_asha_state_reset(asha_dev->asha);
++
++	asha_dev->resume_id = 0;
++}
++
++unsigned int bt_asha_device_device_get_resume_id(
++					struct bt_asha_device *asha_dev)
++{
++	return asha_dev->resume_id;
++}
++
++enum bt_asha_state_t bt_asha_device_get_state(
++					struct bt_asha_device *asha_dev)
++{
++	return asha_dev->asha->state;
++}
++
++uint16_t bt_asha_device_get_render_delay(struct bt_asha_device *asha_dev)
++{
++	return asha_dev->asha->render_delay;
++}
++
++int8_t bt_asha_device_get_volume(struct bt_asha_device *asha_dev)
++{
++	return asha_dev->asha->volume;
++}
++
++bool bt_asha_device_set_volume(struct bt_asha_device *asha_dev, int8_t volume)
++{
++	return bt_asha_set_volume(asha_dev->asha, volume);
++}
++
++int bt_asha_device_get_fd(struct bt_asha_device *asha_dev)
++{
++	return g_io_channel_unix_get_fd(asha_dev->io);
++}
++
++uint16_t bt_asha_device_get_imtu(struct bt_asha_device *asha_dev)
++{
++	return asha_dev->imtu;
++}
++
++uint16_t bt_asha_device_get_omtu(struct bt_asha_device *asha_dev)
++{
++	return asha_dev->omtu;
++}
++
++
++static gboolean get_uuid(const GDBusPropertyTable *property,
++					DBusMessageIter *iter, void *data)
++{
++	const char *uuid;
++
++	uuid = ASHA_PROFILE_UUID;
++
++	dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING, &uuid);
++
++	return TRUE;
++}
++
++static gboolean get_side(const GDBusPropertyTable *property,
++					DBusMessageIter *iter, void *data)
++{
++	struct bt_asha_device *asha_dev = data;
++	const char *side = asha_dev->asha->right_side ? "right" : "left";
++
++	/* Use a string in case we want to support more types in the future */
++	dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING, &side);
++
++	return TRUE;
++}
++
++
++static gboolean get_binaural(const GDBusPropertyTable *property,
++					DBusMessageIter *iter, void *data)
++{
++	struct bt_asha_device *asha_dev = data;
++	dbus_bool_t binaural = asha_dev->asha->binaural;
++
++	dbus_message_iter_append_basic(iter, DBUS_TYPE_BOOLEAN, &binaural);
++
++	return TRUE;
++}
++
++static gboolean get_hisyncid(const GDBusPropertyTable *property,
++					DBusMessageIter *iter, void *data)
++{
++	struct bt_asha_device *asha_dev = data;
++	DBusMessageIter array;
++	uint8_t *hisyncid = asha_dev->asha->hisyncid;
++
++	dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY,
++					DBUS_TYPE_BYTE_AS_STRING, &array);
++
++	dbus_message_iter_append_fixed_array(&array, DBUS_TYPE_BYTE,
++			&hisyncid, sizeof(asha_dev->asha->hisyncid));
++
++	dbus_message_iter_close_container(iter, &array);
++
++	return TRUE;
++}
++
++static gboolean get_codecs(const GDBusPropertyTable *property,
++					DBusMessageIter *iter, void *data)
++{
++	struct bt_asha_device *asha_dev = data;
++	dbus_uint16_t codecs = asha_dev->asha->codec_ids;
++
++	dbus_message_iter_append_basic(iter, DBUS_TYPE_UINT16, &codecs);
++
++	return TRUE;
++}
++
++static gboolean get_device(const GDBusPropertyTable *property,
++					DBusMessageIter *iter, void *data)
++{
++	struct bt_asha_device *asha_dev = data;
++	const char *path;
++
++	path = device_get_path(asha_dev->device);
++
++	dbus_message_iter_append_basic(iter, DBUS_TYPE_OBJECT_PATH, &path);
++
++	return TRUE;
++}
++
++static gboolean get_transport(const GDBusPropertyTable *property,
++					DBusMessageIter *iter, void *data)
++{
++	struct bt_asha_device *asha_dev = data;
++	const char *path;
++
++	path = media_transport_get_path(asha_dev->transport);
++
++	dbus_message_iter_append_basic(iter, DBUS_TYPE_OBJECT_PATH, &path);
++
++	return TRUE;
++}
++
++static int asha_source_device_probe(struct btd_service *service)
++{
++	struct bt_asha_device *asha_dev;
++	struct btd_device *device = btd_service_get_device(service);
++	char addr[18];
++
++	ba2str(device_get_address(device), addr);
++	DBG("Probing ASHA device %s", addr);
++
++	asha_dev = g_new0(struct bt_asha_device, 1);
++
++	asha_dev->device = device;
++	asha_dev->asha = bt_asha_new();
++	asha_dev->io = NULL;
++
++	btd_service_set_user_data(service, asha_dev);
++
++	return 0;
++}
++
++static void asha_source_device_remove(struct btd_service *service)
++{
++	struct bt_asha_device *asha_dev;
++	struct btd_device *device = btd_service_get_device(service);
++	char addr[18];
++
++	ba2str(device_get_address(device), addr);
++	DBG("Removing ASHA device %s", addr);
++
++	asha_dev = btd_service_get_user_data(service);
++	if (!asha_dev) {
++		/* Can this actually happen? */
++		DBG("Not handlihng ASHA profile");
++		return;
++	}
++
++	bt_asha_free(asha_dev->asha);
++	g_free(asha_dev);
++}
++
++static const GDBusMethodTable asha_ep_methods[] = {
++	{ },
++};
++
++static const GDBusPropertyTable asha_ep_properties[] = {
++	{ "UUID", "s", get_uuid, NULL, NULL,
++					G_DBUS_PROPERTY_FLAG_EXPERIMENTAL },
++	{ "Side", "s", get_side, NULL, NULL,
++					G_DBUS_PROPERTY_FLAG_EXPERIMENTAL },
++	{ "Binaural", "b", get_binaural, NULL, NULL,
++					G_DBUS_PROPERTY_FLAG_EXPERIMENTAL },
++	{ "HiSyncId", "ay", get_hisyncid, NULL, NULL,
++					G_DBUS_PROPERTY_FLAG_EXPERIMENTAL },
++	{ "Codecs", "q", get_codecs, NULL, NULL,
++					G_DBUS_PROPERTY_FLAG_EXPERIMENTAL },
++	{ "Device", "o", get_device, NULL, NULL,
++					G_DBUS_PROPERTY_FLAG_EXPERIMENTAL },
++	{ "Transport", "o", get_transport, NULL, NULL,
++					G_DBUS_PROPERTY_FLAG_EXPERIMENTAL },
++	{ }
++};
++
++static void asha_source_endpoint_register(struct bt_asha_device *asha_dev)
++{
++	char *path;
++	const struct media_endpoint *asha_ep;
++
++	path = make_endpoint_path(asha_dev);
++	if (!path)
++		goto error;
++
++	if (g_dbus_register_interface(btd_get_dbus_connection(),
++				path, MEDIA_ENDPOINT_INTERFACE,
++				asha_ep_methods, NULL,
++				asha_ep_properties,
++				asha_dev, NULL) == FALSE) {
++		error("Could not register remote ep %s", path);
++		goto error;
++	}
++
++	asha_ep = media_endpoint_get_asha();
++	asha_dev->transport = media_transport_create(asha_dev->device, path,
++					NULL, 0, (void *) asha_ep, asha_dev);
++
++error:
++	if (path)
++		free(path);
++}
++
++static void asha_source_endpoint_unregister(struct bt_asha_device *asha)
++{
++	char *path;
++
++	path = make_endpoint_path(asha);
++	if (!path)
++		goto error;
++
++	g_dbus_unregister_interface(btd_get_dbus_connection(),
++				path, MEDIA_ENDPOINT_INTERFACE);
++
++	if (asha->transport) {
++		media_transport_destroy(asha->transport);
++		asha->transport = NULL;
++	}
++
++error:
++	if (path)
++		free(path);
++}
++
++static int asha_source_accept(struct btd_service *service)
++{
++	struct btd_device *device = btd_service_get_device(service);
++	struct gatt_db *db = btd_device_get_gatt_db(device);
++	struct bt_gatt_client *client = btd_device_get_gatt_client(device);
++	struct bt_asha_device *asha_dev = btd_service_get_user_data(service);
++	char addr[18];
++
++	ba2str(device_get_address(device), addr);
++	DBG("Accepting ASHA connection on %s", addr);
++
++	if (!asha_dev) {
++		/* Can this actually happen? */
++		DBG("Not handling ASHA profile");
 +		return -1;
 +	}
 +
-+	asha->cb = cb;
-+	asha->cb_user_data = user_data;
++	if (!bt_asha_probe(asha_dev->asha, db, client))
++		return -1;
++
++	asha_source_endpoint_register(asha_dev);
++
++	btd_service_connecting_complete(service, 0);
 +
 +	return 0;
 +}
 +
-+unsigned int bt_asha_start(struct bt_asha *asha, bt_asha_cb_t cb,
-+								void *user_data)
++static int asha_source_disconnect(struct btd_service *service)
 +{
-+	uint8_t acp_start_cmd[] = {
-+		0x01,		/* START */
-+		0x01,		/* G.722, 16 kHz */
-+		0,			/* Unknown media type */
-+		asha->volume,	/* Volume */
-+		0,			/* Other disconnected */
-+	};
-+	int ret;
++	struct btd_device *device = btd_service_get_device(service);
++	struct bt_asha_device *asha_dev = btd_service_get_user_data(service);
++	char addr[18];
 +
-+	if (asha->state != ASHA_STOPPED) {
-+		error("ASHA device start failed. Bad state %d", asha->state);
-+		return 0;
++	ba2str(device_get_address(device), addr);
++	DBG("Disconnecting ASHA on %s", addr);
++
++	if (!asha_dev) {
++		/* Can this actually happen? */
++		DBG("Not handlihng ASHA profile");
++		return -1;
 +	}
 +
-+	ret = asha_send_acp(asha, acp_start_cmd, sizeof(acp_start_cmd), cb,
-+			user_data);
-+	if (ret < 0)
-+		return ret;
++	asha_source_endpoint_unregister(asha_dev);
++	bt_asha_reset(asha_dev->asha);
 +
-+	asha->state = ASHA_STARTING;
++	btd_service_disconnecting_complete(service, 0);
 +
 +	return 0;
 +}
 +
-+unsigned int bt_asha_stop(struct bt_asha *asha, bt_asha_cb_t cb,
-+								void *user_data)
++static struct btd_profile asha_source_profile = {
++	.name		= "asha-source",
++	.priority	= BTD_PROFILE_PRIORITY_MEDIUM,
++	.remote_uuid	= ASHA_PROFILE_UUID,
++	.experimental	= true,
++
++	.device_probe	= asha_source_device_probe,
++	.device_remove	= asha_source_device_remove,
++
++	.auto_connect	= true,
++	.accept		= asha_source_accept,
++	.disconnect	= asha_source_disconnect,
++};
++
++static int asha_init(void)
 +{
-+	uint8_t acp_stop_cmd[] = {
-+		0x02, /* STOP */
-+	};
++	int err;
 +
-+	if (asha->state != ASHA_STARTED)
-+		return 0;
++	err = btd_profile_register(&asha_source_profile);
++	if (err)
++		return err;
 +
-+	asha->state = ASHA_STOPPING;
-+
-+	return asha_send_acp(asha, acp_stop_cmd, sizeof(acp_stop_cmd),
-+								cb, user_data);
++	return 0;
 +}
 +
-+bool bt_asha_set_volume(struct bt_asha *asha, int8_t volume)
++static void asha_exit(void)
 +{
-+	if (!bt_gatt_client_write_without_response(asha->client,
-+						asha->volume_handle, false,
-+						(const uint8_t *)&volume, 1)) {
-+		error("Error writing volume");
-+		return false;
-+	}
-+
-+	asha->volume = volume;
-+	return true;
++	btd_profile_unregister(&asha_source_profile);
 +}
 +
-+static bool uuid_cmp(const char *uuid1, const bt_uuid_t *uuid2)
-+{
-+	bt_uuid_t lhs;
-+
-+	bt_string_to_uuid(&lhs, uuid1);
-+
-+	return bt_uuid_cmp(&lhs, uuid2) == 0;
-+}
-+
-+static void read_psm(bool success,
-+			uint8_t att_ecode,
-+			const uint8_t *value,
-+			uint16_t length,
-+			void *user_data)
-+{
-+	struct bt_asha *asha = user_data;
-+
-+	if (!success) {
-+		DBG("Reading PSM failed with ATT error: %u", att_ecode);
-+		return;
-+	}
-+
-+	if (length != 2) {
-+		DBG("Reading PSM failed: unexpected length %u", length);
-+		return;
-+	}
-+
-+	asha->psm = get_le16(value);
-+
-+	DBG("Got PSM: %u", asha->psm);
-+}
-+
-+static void read_rops(bool success,
-+			uint8_t att_ecode,
-+			const uint8_t *value,
-+			uint16_t length,
-+			void *user_data)
-+{
-+	struct bt_asha *asha = user_data;
-+
-+	if (!success) {
-+		DBG("Reading ROPs failed with ATT error: %u", att_ecode);
-+		return;
-+	}
-+
-+	if (length != 17) {
-+		DBG("Reading ROPs failed: unexpected length %u", length);
-+		return;
-+	}
-+
-+	if (value[0] != 0x01) {
-+		DBG("Unexpected ASHA version: %u", value[0]);
-+		return;
-+	}
-+
-+	/* Device Capabilities */
-+	asha->right_side = (value[1] & 0x1) != 0;
-+	asha->binaural = (value[1] & 0x2) != 0;
-+	asha->csis_supported = (value[1] & 0x4) != 0;
-+	/* HiSyncId: 2 byte company id, 6 byte ID shared by left and right */
-+	memcpy(asha->hisyncid, &value[2], 8);
-+	/* FeatureMap */
-+	asha->coc_streaming_supported = (value[10] & 0x1) != 0;
-+	/* RenderDelay */
-+	asha->render_delay = get_le16(&value[11]);
-+	/* byte 13 & 14 are reserved */
-+	/* Codec IDs */
-+	asha->codec_ids = get_le16(&value[15]);
-+
-+	DBG("Got ROPS: side %u, binaural %u, csis: %u, delay %u, codecs: %u",
-+			asha->right_side, asha->binaural, asha->csis_supported,
-+			asha->render_delay, asha->codec_ids);
-+}
-+
-+static void audio_status_register(uint16_t att_ecode, void *user_data)
-+{
-+	if (att_ecode)
-+		DBG("AudioStatusPoint register failed 0x%04x", att_ecode);
-+	else
-+		DBG("AudioStatusPoint register succeeded");
-+}
-+
-+static void audio_status_notify(uint16_t value_handle, const uint8_t *value,
-+					uint16_t length, void *user_data)
-+{
-+	struct bt_asha *asha = user_data;
-+	uint8_t status = *value;
-+	/* Back these up to survive the reset paths */
-+	bt_asha_cb_t cb = asha->cb;
-+	bt_asha_cb_t cb_user_data = asha->cb_user_data;
-+
-+	if (asha->state == ASHA_STARTING) {
-+		if (status == 0) {
-+			asha->state = ASHA_STARTED;
-+			DBG("ASHA start complete");
-+		} else {
-+			bt_asha_state_reset(asha);
-+			DBG("ASHA start failed");
-+		}
-+	} else if (asha->state == ASHA_STOPPING) {
-+		/* We reset our state, regardless */
-+		bt_asha_state_reset(asha);
-+		DBG("ASHA stop %s", status == 0 ? "complete" : "failed");
-+	}
-+
-+	if (cb) {
-+		cb(status, cb_user_data);
-+		asha->cb = NULL;
-+		asha->cb_user_data = NULL;
-+	}
-+}
-+
-+static void handle_characteristic(struct gatt_db_attribute *attr,
-+								void *user_data)
-+{
-+	struct bt_asha *asha = user_data;
-+	uint16_t value_handle;
-+	bt_uuid_t uuid;
-+	char uuid_str[MAX_LEN_UUID_STR];
-+
-+	if (!gatt_db_attribute_get_char_data(attr, NULL, &value_handle, NULL,
-+								NULL, &uuid)) {
-+		error("Failed to obtain characteristic data");
-+		return;
-+	}
-+
-+	bt_uuid_to_string(&uuid, uuid_str, sizeof(uuid_str));
-+	if (uuid_cmp(ASHA_CHRC_LE_PSM_OUT_UUID, &uuid)) {
-+		DBG("Got chrc %s/0x%x: LE_PSM_ID", uuid_str, value_handle);
-+		if (!bt_gatt_client_read_value(asha->client, value_handle,
-+					read_psm, asha, NULL))
-+			DBG("Failed to send request to read battery level");
-+	} else if (uuid_cmp(ASHA_CHRC_READ_ONLY_PROPERTIES_UUID, &uuid)) {
-+		DBG("Got chrc %s/0x%x: READ_ONLY_PROPERTIES", uuid_str,
-+								value_handle);
-+		if (!bt_gatt_client_read_value(asha->client, value_handle,
-+					read_rops, asha, NULL))
-+			DBG("Failed to send request for readonly properties");
-+	} else if (uuid_cmp(ASHA_CHRC_AUDIO_CONTROL_POINT_UUID, &uuid)) {
-+		DBG("Got chrc %s/0x%x: AUDIO_CONTROL_POINT", uuid_str,
-+								value_handle);
-+		/* Store this for later writes */
-+		asha->acp_handle = value_handle;
-+	} else if (uuid_cmp(ASHA_CHRC_VOLUME_UUID, &uuid)) {
-+		DBG("Got chrc %s/0x%x: VOLUME", uuid_str, value_handle);
-+		/* Store this for later writes */
-+		asha->volume_handle = value_handle;
-+	} else if (uuid_cmp(ASHA_CHRC_AUDIO_STATUS_UUID, &uuid)) {
-+		DBG("Got chrc %s/0x%x: AUDIO_STATUS", uuid_str, value_handle);
-+		asha->status_notify_id =
-+			bt_gatt_client_register_notify(asha->client,
-+				value_handle, audio_status_register,
-+				audio_status_notify, asha, NULL);
-+		if (!asha->status_notify_id)
-+			DBG("Failed to send request to notify AudioStatus");
-+	} else {
-+		DBG("Unsupported characteristic: %s", uuid_str);
-+	}
-+}
-+
-+static void foreach_asha_service(struct gatt_db_attribute *attr,
-+							void *user_data)
-+{
-+	struct bt_asha *asha = user_data;
-+
-+	DBG("Found ASHA GATT service");
-+
-+	asha->attr = attr;
-+	gatt_db_service_set_claimed(attr, true);
-+	gatt_db_service_foreach_char(asha->attr, handle_characteristic, asha);
-+}
-+
-+bool bt_asha_probe(struct bt_asha *asha, struct gatt_db *db,
-+						struct bt_gatt_client *client)
-+{
-+	bt_uuid_t asha_uuid;
-+
-+	asha->db = gatt_db_ref(db);
-+	asha->client = bt_gatt_client_clone(client);
-+
-+	bt_uuid16_create(&asha_uuid, ASHA_SERVICE);
-+	gatt_db_foreach_service(db, &asha_uuid, foreach_asha_service, asha);
-+
-+	if (!asha->attr) {
-+		error("ASHA attribute not found");
-+		bt_asha_reset(asha);
-+		return false;
-+	}
-+
-+	return true;
-+}
-diff --git a/src/shared/asha.h b/src/shared/asha.h
++BLUETOOTH_PLUGIN_DEFINE(asha, VERSION, BLUETOOTH_PLUGIN_PRIORITY_DEFAULT,
++							asha_init, asha_exit)
+diff --git a/profiles/audio/asha.h b/profiles/audio/asha.h
 new file mode 100644
-index 000000000..c2c232fff
+index 000000000..afd23e137
 --- /dev/null
-+++ b/src/shared/asha.h
-@@ -0,0 +1,63 @@
-+// SPDX-License-Identifier: LGPL-2.1-or-later
++++ b/profiles/audio/asha.h
+@@ -0,0 +1,38 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
 +/*
 + *
 + *  BlueZ - Bluetooth protocol stack for Linux
@@ -496,57 +668,376 @@ index 000000000..c2c232fff
 + *
 + */
 +
-+#
-+
 +#include <stdbool.h>
 +#include <stdint.h>
 +
-+enum bt_asha_state_t {
-+	ASHA_STOPPED = 0,
-+	ASHA_STARTING,
-+	ASHA_STARTED,
-+	ASHA_STOPPING,
++#include "src/shared/asha.h"
++
++struct bt_asha_device;
++
++unsigned int bt_asha_device_start(struct bt_asha_device *asha_dev,
++					bt_asha_cb_t cb, void *user_data);
++unsigned int bt_asha_device_stop(struct bt_asha_device *asha_dev,
++					bt_asha_cb_t cb, void *user_data);
++
++void bt_asha_device_state_reset(struct bt_asha_device *asha_dev);
++unsigned int bt_asha_device_device_get_resume_id(
++					struct bt_asha_device *asha_dev);
++
++uint16_t bt_asha_device_get_render_delay(struct bt_asha_device *asha_dev);
++enum bt_asha_state_t bt_asha_device_get_state(
++					struct bt_asha_device *asha_dev);
++
++int bt_asha_device_get_fd(struct bt_asha_device *asha_dev);
++uint16_t bt_asha_device_get_omtu(struct bt_asha_device *asha_dev);
++uint16_t bt_asha_device_get_imtu(struct bt_asha_device *asha_dev);
++
++int8_t bt_asha_device_get_volume(struct bt_asha_device *asha_dev);
++bool bt_asha_device_set_volume(struct bt_asha_device *asha_dev, int8_t volume);
+diff --git a/profiles/audio/media.c b/profiles/audio/media.c
+index 4bbd584de..b5644736a 100644
+--- a/profiles/audio/media.c
++++ b/profiles/audio/media.c
+@@ -38,6 +38,7 @@
+ #include "src/log.h"
+ #include "src/error.h"
+ #include "src/gatt-database.h"
++#include "src/shared/asha.h"
+ #include "src/shared/util.h"
+ #include "src/shared/queue.h"
+ #include "src/shared/att.h"
+@@ -88,6 +89,7 @@ struct endpoint_request {
+ struct media_endpoint {
+ 	struct a2dp_sep		*sep;
+ 	struct bt_bap_pac	*pac;
++	struct bt_asha_device	*asha;
+ 	char			*sender;	/* Endpoint DBus bus id */
+ 	char			*path;		/* Endpoint object path */
+ 	char			*uuid;		/* Endpoint property UUID */
+@@ -1330,6 +1332,12 @@ static bool endpoint_init_broadcast_sink(struct media_endpoint *endpoint,
+ 	return endpoint_init_pac(endpoint, BT_BAP_BCAST_SINK, err);
+ }
+ 
++static bool endpoint_init_asha(struct media_endpoint *endpoint,
++						int *err)
++{
++	return true;
++}
++
+ static bool endpoint_properties_exists(const char *uuid,
+ 						struct btd_device *dev,
+ 						void *user_data)
+@@ -1454,6 +1462,11 @@ static bool experimental_bcast_sink_ep_supported(struct btd_adapter *adapter)
+ 	return g_dbus_get_flags() & G_DBUS_FLAG_ENABLE_EXPERIMENTAL;
+ }
+ 
++static bool experimental_asha_supported(struct btd_adapter *adapter)
++{
++	return g_dbus_get_flags() & G_DBUS_FLAG_ENABLE_EXPERIMENTAL;
++}
++
+ static const struct media_endpoint_init {
+ 	const char *uuid;
+ 	bool (*func)(struct media_endpoint *endpoint, int *err);
+@@ -1471,6 +1484,8 @@ static const struct media_endpoint_init {
+ 			experimental_broadcaster_ep_supported },
+ 	{ BAA_SERVICE_UUID, endpoint_init_broadcast_sink,
+ 			experimental_bcast_sink_ep_supported },
++	{ ASHA_PROFILE_UUID, endpoint_init_asha,
++			experimental_asha_supported },
+ };
+ 
+ static struct media_endpoint *
+@@ -3393,3 +3408,18 @@ bool media_endpoint_is_broadcast(struct media_endpoint *endpoint)
+ 
+ 	return false;
+ }
++
++const struct media_endpoint *media_endpoint_get_asha(void)
++{
++	/*
++	 * Because ASHA does not require the application to register an
++	 * endpoint, we need a minimal media_endpoint for transport creation to
++	 * work, so let's create one
++	 */
++	static struct media_endpoint asha_endpoint =  {
++		.uuid = ASHA_PROFILE_UUID,
++		.codec = 0x2, /* Currently on G.722 is defined by the spec */
++	};
++
++	return &asha_endpoint;
++}
+diff --git a/profiles/audio/media.h b/profiles/audio/media.h
+index 2b579877b..2b2e8e157 100644
+--- a/profiles/audio/media.h
++++ b/profiles/audio/media.h
+@@ -24,3 +24,5 @@ struct btd_adapter *media_endpoint_get_btd_adapter(
+ 					struct media_endpoint *endpoint);
+ bool media_endpoint_is_broadcast(struct media_endpoint *endpoint);
+ int8_t media_player_get_device_volume(struct btd_device *device);
++
++const struct media_endpoint *media_endpoint_get_asha(void);
+diff --git a/profiles/audio/transport.c b/profiles/audio/transport.c
+index 5b11bfeb6..0ce94bae3 100644
+--- a/profiles/audio/transport.c
++++ b/profiles/audio/transport.c
+@@ -37,6 +37,7 @@
+ #include "src/shared/bap.h"
+ #include "src/shared/io.h"
+ 
++#include "asha.h"
+ #include "avdtp.h"
+ #include "media.h"
+ #include "transport.h"
+@@ -115,7 +116,7 @@ struct media_transport {
+ 	char			*path;		/* Transport object path */
+ 	struct btd_device	*device;	/* Transport device */
+ 	struct btd_adapter	*adapter;	/* Transport adapter bcast*/
+-	const char		*remote_endpoint; /* Transport remote SEP */
++	char			*remote_endpoint; /* Transport remote SEP */
+ 	struct media_endpoint	*endpoint;	/* Transport endpoint */
+ 	struct media_owner	*owner;		/* Transport owner */
+ 	uint8_t			*configuration; /* Transport configuration */
+@@ -219,6 +220,9 @@ void media_transport_destroy(struct media_transport *transport)
+ 	g_dbus_unregister_interface(btd_get_dbus_connection(), path,
+ 						MEDIA_TRANSPORT_INTERFACE);
+ 
++	if (transport->remote_endpoint)
++		g_free(transport->remote_endpoint);
++
+ 	g_free(path);
+ }
+ 
+@@ -1199,6 +1203,32 @@ static const GDBusPropertyTable transport_bap_bc_properties[] = {
+ 	{ }
+ };
+ 
++static gboolean get_asha_delay(const GDBusPropertyTable *property,
++					DBusMessageIter *iter, void *data)
++{
++	struct media_transport *transport = data;
++	struct bt_asha_device *asha_dev = transport->data;
++	uint16_t delay;
++
++	// Delay property is in 1/10ths of ms, while ASHA RenderDelay is in ms
++	delay = bt_asha_device_get_render_delay(asha_dev) * 10;
++
++	dbus_message_iter_append_basic(iter, DBUS_TYPE_UINT16, &delay);
++
++	return TRUE;
++}
++
++static const GDBusPropertyTable transport_asha_properties[] = {
++	{ "Device", "o", get_device },
++	{ "Endpoint", "o", get_endpoint, NULL, endpoint_exists },
++	{ "UUID", "s", get_uuid },
++	{ "Codec", "y", get_codec },
++	{ "State", "s", get_state },
++	{ "Delay", "q", get_asha_delay },
++	{ "Volume", "q", get_volume, set_volume, volume_exists },
++	{ }
 +};
 +
-+typedef void (*bt_asha_cb_t)(int status, void *data);
+ static void transport_a2dp_destroy(void *data)
+ {
+ 	struct a2dp_transport *a2dp = data;
+@@ -1716,6 +1746,164 @@ static void *transport_bap_init(struct media_transport *transport, void *stream)
+ 	return bap;
+ }
+ 
++static void asha_transport_sync_state(struct media_transport *transport,
++						struct bt_asha_device *asha_dev)
++{
++	switch (bt_asha_device_get_state(asha_dev)) {
++	case ASHA_STOPPED:
++		transport_set_state(transport, TRANSPORT_STATE_IDLE);
++		break;
++	case ASHA_STARTING:
++		transport_set_state(transport, TRANSPORT_STATE_REQUESTING);
++		break;
++	case ASHA_STARTED:
++		transport_set_state(transport, TRANSPORT_STATE_ACTIVE);
++		break;
++	case ASHA_STOPPING:
++		transport_set_state(transport, TRANSPORT_STATE_SUSPENDING);
++		break;
++	}
++}
 +
-+struct bt_asha {
-+	struct bt_gatt_client *client;
-+	struct gatt_db *db;
-+	struct gatt_db_attribute *attr;
-+	uint16_t acp_handle;
-+	uint16_t volume_handle;
-+	unsigned int status_notify_id;
-+
-+	uint16_t psm;
-+	bool right_side;
-+	bool binaural;
-+	bool csis_supported;
-+	bool coc_streaming_supported;
-+	uint8_t hisyncid[8];
-+	uint16_t render_delay;
-+	uint16_t codec_ids;
-+	int8_t volume;
-+
++static void asha_transport_state_cb(int status, void *user_data)
++{
++	struct media_owner *owner = user_data;
++	struct media_transport *transport = owner->transport;
++	struct bt_asha_device *asha_dev;
 +	enum bt_asha_state_t state;
-+	bt_asha_cb_t cb;
-+	void *cb_user_data;
-+};
 +
-+struct bt_asha *bt_asha_new(void);
-+void bt_asha_reset(struct bt_asha *asha);
-+void bt_asha_state_reset(struct bt_asha *asha);
-+void bt_asha_free(struct bt_asha *asha);
++	if (!transport) {
++		DBG("Lost owner while connecting, bailing");
++		return;
++	}
 +
-+unsigned int bt_asha_start(struct bt_asha *asha, bt_asha_cb_t cb,
-+							void *user_data);
-+unsigned int bt_asha_stop(struct bt_asha *asha, bt_asha_cb_t cb,
-+							void *user_data);
++	asha_dev = transport->data;
++	state = bt_asha_device_get_state(asha_dev);
 +
-+bool bt_asha_set_volume(struct bt_asha *asha, int8_t volume);
++	if (state == ASHA_STARTED) {
++		int fd;
++		uint16_t imtu, omtu;
++		gboolean ret;
 +
-+bool bt_asha_probe(struct bt_asha *asha, struct gatt_db *db,
-+						struct bt_gatt_client *client);
++		fd = bt_asha_device_get_fd(asha_dev);
++		imtu = bt_asha_device_get_imtu(asha_dev);
++		omtu = bt_asha_device_get_omtu(asha_dev);
++
++		media_transport_set_fd(transport, fd, imtu, omtu);
++
++		owner->pending->id = 0;
++		ret = g_dbus_send_reply(btd_get_dbus_connection(),
++				owner->pending->msg,
++				DBUS_TYPE_UNIX_FD, &fd,
++				DBUS_TYPE_UINT16, &imtu,
++				DBUS_TYPE_UINT16, &omtu,
++				DBUS_TYPE_INVALID);
++		if (!ret) {
++			media_transport_remove_owner(transport);
++			return;
++		}
++
++		media_owner_remove(owner);
++	} else if (state == ASHA_STOPPED) {
++		if (owner->pending) {
++			owner->pending->id = 0;
++			media_request_reply(owner->pending, 0);
++			media_owner_remove(owner);
++		}
++
++		media_transport_remove_owner(transport);
++	}
++
++	asha_transport_sync_state(transport, asha_dev);
++}
++
++static guint transport_asha_resume(struct media_transport *transport,
++						struct media_owner *owner)
++{
++	struct bt_asha_device *asha_dev = transport->data;
++	guint ret;
++
++	ret = bt_asha_device_start(asha_dev, asha_transport_state_cb, owner);
++	asha_transport_sync_state(transport, asha_dev);
++
++	return ret > 0 ? ret : 0;
++}
++
++static guint transport_asha_suspend(struct media_transport *transport,
++						struct media_owner *owner)
++{
++	struct bt_asha_device *asha_dev = transport->data;
++	guint ret = 0;
++
++	if (owner) {
++		ret = bt_asha_device_stop(asha_dev, asha_transport_state_cb,
++									owner);
++		asha_transport_sync_state(transport, asha_dev);
++	} else {
++		ret = bt_asha_device_stop(asha_dev, NULL, NULL);
++		/* We won't have a callback to set the final state */
++		transport_set_state(transport, TRANSPORT_STATE_IDLE);
++	}
++
++	return ret;
++}
++
++static void transport_asha_cancel(struct media_transport *transport, guint id)
++{
++	struct bt_asha_device *asha_dev = transport->data;
++	enum bt_asha_state_t state = bt_asha_device_get_state(asha_dev);
++
++	if (id != bt_asha_device_device_get_resume_id(asha_dev)) {
++		/* Not current, ignore */
++		DBG("Ignoring cancel request for id %d", id);
++		return;
++	}
++
++	if (state == ASHA_STARTING || state == ASHA_STARTED) {
++		DBG("Cancel requested, stopping");
++		bt_asha_device_stop(asha_dev, NULL, NULL);
++		/* We won't have a callback to set the final state */
++		transport_set_state(transport, TRANSPORT_STATE_IDLE);
++	} else if (state == ASHA_STOPPING) {
++		DBG("Cancel requested, resetting transport state");
++		/* We already dispatched a stop, just reset our state */
++		bt_asha_device_state_reset(asha_dev);
++		transport_set_state(transport, TRANSPORT_STATE_IDLE);
++	}
++}
++
++static int8_t transport_asha_get_volume(struct media_transport *transport)
++{
++	struct bt_asha_device *asha_dev = transport->data;
++	int8_t volume;
++	int scaled_volume;
++
++	volume = bt_asha_device_get_volume(asha_dev);
++
++	/* Convert -128-0 to 0-127 */
++	scaled_volume = ((((int) volume) + 128) * 127) / 128;
++
++	return scaled_volume;
++}
++
++static int transport_asha_set_volume(struct media_transport *transport,
++								int8_t volume)
++{
++	struct bt_asha_device *asha_dev = transport->data;
++	int scaled_volume;
++
++	/* Convert 0-127 to -128-0 */
++	scaled_volume = ((((int) volume) * 128) / 127) - 128;
++
++	return bt_asha_device_set_volume(asha_dev, scaled_volume) ? 0 : -EIO;
++}
++
++static void *transport_asha_init(struct media_transport *transport, void *data)
++{
++	/* We just store the struct asha_device on the transport */
++	return data;
++}
++
+ #define TRANSPORT_OPS(_uuid, _props, _set_owner, _remove_owner, _init, \
+ 		      _resume, _suspend, _cancel, _set_state, _get_stream, \
+ 		      _get_volume, _set_volume, _destroy) \
+@@ -1757,6 +1945,14 @@ static void *transport_bap_init(struct media_transport *transport, void *stream)
+ #define BAP_BC_OPS(_uuid) \
+ 	BAP_OPS(_uuid, transport_bap_bc_properties, NULL, NULL)
+ 
++#define ASHA_OPS(_uuid) \
++	TRANSPORT_OPS(_uuid, transport_asha_properties, NULL, NULL, \
++			transport_asha_init, \
++			transport_asha_resume, transport_asha_suspend, \
++			transport_asha_cancel, NULL, NULL, \
++			transport_asha_get_volume, transport_asha_set_volume, \
++			NULL)
++
+ static const struct media_transport_ops transport_ops[] = {
+ 	A2DP_OPS(A2DP_SOURCE_UUID, transport_a2dp_src_init,
+ 			transport_a2dp_src_set_volume,
+@@ -1768,6 +1964,7 @@ static const struct media_transport_ops transport_ops[] = {
+ 	BAP_UC_OPS(PAC_SINK_UUID),
+ 	BAP_BC_OPS(BCAA_SERVICE_UUID),
+ 	BAP_BC_OPS(BAA_SERVICE_UUID),
++	ASHA_OPS(ASHA_PROFILE_UUID),
+ };
+ 
+ static const struct media_transport_ops *
+@@ -1805,7 +2002,7 @@ struct media_transport *media_transport_create(struct btd_device *device,
+ 	transport->endpoint = endpoint;
+ 	transport->configuration = util_memdup(configuration, size);
+ 	transport->size = size;
+-	transport->remote_endpoint = remote_endpoint;
++	transport->remote_endpoint = g_strdup(remote_endpoint);
+ 
+ 	if (device)
+ 		transport->path = g_strdup_printf("%s/fd%d",
 -- 
 2.45.2
 
