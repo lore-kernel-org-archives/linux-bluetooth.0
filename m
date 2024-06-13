@@ -1,92 +1,141 @@
-Received: from mail-vs1-f53.google.com (mail-vs1-f53.google.com [209.85.217.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-23.smtp.github.com (out-23.smtp.github.com [192.30.252.206])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53DB1145B26
-	for <linux-bluetooth@vger.kernel.org>; Thu, 13 Jun 2024 17:03:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D6F614A098
+	for <linux-bluetooth@vger.kernel.org>; Thu, 13 Jun 2024 17:36:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.206
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718298198; cv=none; b=N13fL8/NYT1wV2wnjOUqvRIWYLJR68W7bDQFwca9lweuWR+PI8wDN2uzCauTlJxAa2MFFb2Zddreb+nzw7m2Q4BCHhW1pu0YxMBQ1eVu1zl38NFAt2H5MJzLYTp9p+061LNb4HRPdpYWN2IQVZM+9PQ0M9beF1UON7yAqa7xY8k=
+	t=1718300163; cv=none; b=CPmK0xTI1gCPb+Y8v4freuMBzppgVxxxgKH3gP79ryOuj2N0P21ga7ew4b63SNegSuYpT2EUomuEy9T00ukWOY0x7hvS43EuQ7vugDp9l96KG4t6JfrbpqPn+aBDL9T8qJQSjxg1oJ1vQtL6pfb+QrEWU/vXPS1QwSO/0TFBBqI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718298198; c=relaxed/simple;
-	bh=D2mZPYd6QGmiCunRi8u+dVq08lprYnpCkGEGI9yAIis=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=YtZS9WWSV6+PNubH5FoKaqLQnrJHqV4WV1Gk1tOCUtDtTtONkrMVbuMhP3a35q5qAWaPbWy4yMTNFOGQPGyLfW+FkJJxni5FnBZEe/tbQCWGlOrvpC4euvfTcT9HyKZQhAfEiT/eIzDgcE5xf2qB7oU5gzzv2rWkXsty7dCEqZE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ViBR3sRg; arc=none smtp.client-ip=209.85.217.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1718300163; c=relaxed/simple;
+	bh=Ok4RNWSPX0DQbmszGJbHz2xLGx7oU8wqpXvYf7dOzmI=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=cORBQ6ozbiMmCBHrSJk6sOe4aZN3K76mMYeUolCOtUWQ4J5jHXgj2dwqEYVXw/C8IHh48pAithz9BMDDPNeIfj2RQywmUyossRAoTsEt8q73aL+JEB905St+b/NLtOxZbKSen7ZsAzymG/gVnKqcea9brZIzDWyhtpAgbQIFBJ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=CWctTDsv; arc=none smtp.client-ip=192.30.252.206
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ViBR3sRg"
-Received: by mail-vs1-f53.google.com with SMTP id ada2fe7eead31-48c3402e658so474866137.0
-        for <linux-bluetooth@vger.kernel.org>; Thu, 13 Jun 2024 10:03:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1718298195; x=1718902995; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=EGJ/3A8bOUmJ4auKYmUMV2ZxXAA6tDO2TrpE5KSs+fw=;
-        b=ViBR3sRgNVL4tS00/dKlvv1PNqppd5GRx81L0Hl8Hv2r5HqNPVMbtlgjbUREZp/3Gz
-         qQXVtOZ2QFs6ICOYDoEHhT7Qnfxo72R7CssNUlnom5Dm6KpR1m7n1dF8flmtH0YhZJ+u
-         fqobbqmMo0r2OGX1JpFqGbpezzeiYZO+nbXl+TSf3J8Q3ON9JxDYpW6raCJ64Wd1aDMq
-         BrkrNqwKVIpDBbHbo7K3EaioWKE2ozL/OLhhN5nEUOcNqI6n9ptdimem3kOMSyxNkQsk
-         sU21ga13arEStbUEHaHyHHuSww9akQlATPmcwQ4KE+bBTjdMgmpxgpNxQPlvdMbrVl1X
-         rIJg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718298195; x=1718902995;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=EGJ/3A8bOUmJ4auKYmUMV2ZxXAA6tDO2TrpE5KSs+fw=;
-        b=cIN1hhNFFEv0GWcCrFSNwW3tnQatBsxZxNn0q1X8ZcKPe5jJg9xJWJ3JWeC+/GSSVW
-         hK/CYBFhknETKfdIkjcHkaZyDifcyLMWRb8QwnbCh7LFAHSWk/u4hII6EDFdJ4I5lEZ5
-         MIC/cfgy9p6+CKjs52VcVt7cuP5n1Sqv/8s1p1kOJOz52+sv5Z0O7ySR2tfOz5aeCMj0
-         YilSo8n4bgifZiGyjfJUWA9ZKSh4voAH38+uQRo9KisfpKreefKd3u2Sa7KmxcBcHA53
-         h1tnOYQM3Zuqkix9akqtW3kNJwyt3+RaxPE+BdGQDEdXJEMGUXSmSVzHu35Z26Fj7Fe7
-         FglA==
-X-Gm-Message-State: AOJu0YzB2nV+Iy2Kzgvz7DK7t9sC+82MGoTJ0Y1OKGgT4buLbqa948TA
-	MPyqvf3RNZMsHabOOPxOEZG5RnDSQb5UB+SPmLLyVwaKsZzmBJyQCD8Iiw==
-X-Google-Smtp-Source: AGHT+IFxeiz5kJAgBiH4a2rYes9WAMFmUQzjdUA4rI/xzQR9Ekka8SOlnIVe9l2MKj6jApeeUaaEew==
-X-Received: by 2002:a67:e3b2:0:b0:48d:7126:e27e with SMTP id ada2fe7eead31-48dae3ee3e6mr182612137.33.1718298195259;
-        Thu, 13 Jun 2024 10:03:15 -0700 (PDT)
-Received: from lvondent-mobl4.. (syn-107-146-107-067.res.spectrum.com. [107.146.107.67])
-        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-48da43ff4f3sm302855137.18.2024.06.13.10.03.14
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 13 Jun 2024 10:03:14 -0700 (PDT)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="CWctTDsv"
+Received: from github.com (hubbernetes-node-85c6ce3.ac4-iad.github.net [10.52.13.23])
+	by smtp.github.com (Postfix) with ESMTPA id 906255E075C
+	for <linux-bluetooth@vger.kernel.org>; Thu, 13 Jun 2024 10:36:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1718300160;
+	bh=cIsRmaw2POfBE5f5s59C1vUXRd/FwIOvihLkfGUZxqw=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=CWctTDsva+UMLBH4p2Ekl0pa6uhrcLhHTwzJGFd+JTz6gZmyewMzAFFGbXK1Isk34
+	 8Nzg9ebdASgdY5yW4BGk+zqHpGKePd2vnQCJR0BHb9BhACJQyBZFvKMW1UgfGIQPTf
+	 hu1Uufhg6ckQkvWqw28rvdbLPbYpl6WfAopJT62o=
+Date: Thu, 13 Jun 2024 10:36:00 -0700
+From: Arun Raghavan <noreply@github.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v1] device: Fix marking device as temporary
-Date: Thu, 13 Jun 2024 13:03:13 -0400
-Message-ID: <20240613170313.1596181-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.45.2
+Message-ID: <bluez/bluez/push/refs/heads/master/891552-792cff@github.com>
+Subject: [bluez/bluez] 7861c5: client/player: Fix transport.send
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Branch: refs/heads/master
+  Home:   https://github.com/bluez/bluez
+  Commit: 7861c511ca7ecbbf8223aee22a3085d6152799cf
+      https://github.com/bluez/bluez/commit/7861c511ca7ecbbf8223aee22a3085d6152799cf
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2024-06-13 (Thu, 13 Jun 2024)
 
-If bonding has failed but there are other bearers connected don't mark
-the device as temporary.
+  Changed paths:
+    M client/player.c
 
-Fixes: https://github.com/bluez/bluez/issues/856
----
- src/device.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+  Log Message:
+  -----------
+  client/player: Fix transport.send
 
-diff --git a/src/device.c b/src/device.c
-index 5dc1cd0cdbf2..486ffdb4ea8d 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -6428,7 +6428,8 @@ void device_bonding_complete(struct btd_device *device, uint8_t bdaddr_type,
- 		/* Put the device back to the temporary state so that it will be
- 		 * treated as a newly discovered device.
- 		 */
--		if (!device_is_paired(device, bdaddr_type) &&
-+		if (!btd_device_bearer_is_connected(device) &&
-+				!device_is_paired(device, bdaddr_type) &&
- 				!btd_device_is_trusted(device))
- 			btd_device_set_temporary(device, true);
- 
--- 
-2.45.2
+This fixes the usage of getpeername, introduced by 04153538aaf4
+("client/player: Fix using unicast QoS for broadcast"), without
+initializing optlen which causes the following problem:
 
+Unable to send: Operation not permitted (1)
+
+
+  Commit: 8e4bece63ce91f2debc9468a793f2c65e41c5bb2
+      https://github.com/bluez/bluez/commit/8e4bece63ce91f2debc9468a793f2c65e41c5bb2
+  Author: Arun Raghavan <arun@asymptotic.io>
+  Date:   2024-06-13 (Thu, 13 Jun 2024)
+
+  Changed paths:
+    M Makefile.am
+    M lib/uuid.h
+    A src/shared/asha.c
+    A src/shared/asha.h
+
+  Log Message:
+  -----------
+  src/shared: Add initial implementation for an ASHA profile
+
+This implements the server role for the Audio Streaming for Hearing Aid
+specification[1]. Includes basic ability to probe the ASHA GATT service,
+as well as starting/stopping streaming.
+
+[1] https://source.android.com/docs/core/connect/bluetooth/asha
+
+Resolves: https://github.com/bluez/bluez/issues/481
+
+
+  Commit: c26389c466a0e7010acd245adc7a68b5178ca1d8
+      https://github.com/bluez/bluez/commit/c26389c466a0e7010acd245adc7a68b5178ca1d8
+  Author: Arun Raghavan <arun@asymptotic.io>
+  Date:   2024-06-13 (Thu, 13 Jun 2024)
+
+  Changed paths:
+    M Makefile.plugins
+    M configure.ac
+    A profiles/audio/asha.c
+    A profiles/audio/asha.h
+    M profiles/audio/media.c
+    M profiles/audio/media.h
+    M profiles/audio/transport.c
+
+  Log Message:
+  -----------
+  profiles/audio: Add an ASHA plugin
+
+This exposes the ASHA profile implementation in the previous commit as
+an audio profile.
+
+The implementation registers a remote endpoint using a subset of the
+MediaEndpoint1 interface, without any mechanism for setting/selecting a
+configuration, as this is all static in the spec for now. Also exposed
+on connection is a MediaTransport1 object, which can be used to obtain
+an fd to stream to the device.
+
+Resolves: https://github.com/bluez/bluez/issues/481
+
+
+  Commit: 792cffb4992dee18ec4a8f3423c9a3c681c828dd
+      https://github.com/bluez/bluez/commit/792cffb4992dee18ec4a8f3423c9a3c681c828dd
+  Author: Arun Raghavan <arun@asymptotic.io>
+  Date:   2024-06-13 (Thu, 13 Jun 2024)
+
+  Changed paths:
+    A test/simple-asha
+
+  Log Message:
+  -----------
+  test: Add a script to test ASHA
+
+Plays out an audio file to the device. Depends on GStreamer for media
+file reading and decoding (specifically, gstreamer core,
+gst-plugins-base, gst-ffmpeg, and gst-python, or equivalent packages).
+
+Resolves: https://github.com/bluez/bluez/issues/481
+
+
+Compare: https://github.com/bluez/bluez/compare/891552999317...792cffb4992d
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
