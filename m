@@ -1,128 +1,106 @@
-Received: from mail-qt1-f175.google.com (mail-qt1-f175.google.com [209.85.160.175])
+Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6710D186282
-	for <linux-bluetooth@vger.kernel.org>; Fri, 14 Jun 2024 09:35:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 035F9163
+	for <linux-bluetooth@vger.kernel.org>; Fri, 14 Jun 2024 13:30:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718357728; cv=none; b=XoK9ZmziJsxLck1eynNc/3x1ltRnBfWd4jMBUWx/WHnj4RjTrwwVXZCGi77lrZ+Yy8msplg3pwC3UI4OKnBCEkHhnlpwK6t2oeBQb2L9SO5SwpnTaDRRWEqNBxRoO86v39nTqUUWlSl060RsIyD8fV3RUdV43eWrURxuxlK3BJQ=
+	t=1718371861; cv=none; b=CIIq7edtxEqW9b1qDkDIA5H8yJq3yfZlUvBcneBMAqAn1RjNPgZGMvp0slzy8iUfGuAunQ6NRjBZ6js/+CSR0s0bhomIusFf6aImeEQ1titBNC+3OfA4hWMBQOUOGpKyKx7IhZPc/irZIo57RL6807YqVbSTWTnq5uST5kIAvo8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718357728; c=relaxed/simple;
-	bh=Ax6xZpLg68NeYGkt1bQOi8F3upS0zxv9ZzsIxdSxT8k=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=tXSO/rd2FQDfHYNVW+o70nY9e99zzNHc9w3VCDWzyZO3azP0o6y1A+vba98LApq7qA97NBo3D938UrSvXEk52elXa3j/EvGbOLqvBRdzvrtOEF6lNazJuecRO7HDbux+kgX3nTYThJCJAJHRqFIKN9EdtejF8t9gi+hnhmIrAO4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TCzNyDap; arc=none smtp.client-ip=209.85.160.175
+	s=arc-20240116; t=1718371861; c=relaxed/simple;
+	bh=QoB2/bsQhRCClsU7H2QS2vx/BMM46hY3blbo/OSYFd4=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=qokOHkPlSlVlO7WEwdkagfY4gg6xQTNcXZR0nS8VXLP+0bEYPUO0+ExSfJb4ubhmHhde5PlizyLvSt3OYit7z9KQeA3HzHSY0ER9Y6R44RtZX84KcKZ8MTQ27EUpCXgRllriVuX3Zd2B89UtQk/tgnQxqGixmhCdT72rjAqa/94=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HhdAQErJ; arc=none smtp.client-ip=209.85.218.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TCzNyDap"
-Received: by mail-qt1-f175.google.com with SMTP id d75a77b69052e-440530cadc7so12164111cf.0
-        for <linux-bluetooth@vger.kernel.org>; Fri, 14 Jun 2024 02:35:27 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HhdAQErJ"
+Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-a6ef8e62935so291052166b.3
+        for <linux-bluetooth@vger.kernel.org>; Fri, 14 Jun 2024 06:30:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1718357726; x=1718962526; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=etzTSCU1uisr3/ajGaZb/9WUYgpinUNo3lBLbcHVCNA=;
-        b=TCzNyDappgBFrycjnE+oebCLF8HsiDs9jlaViKgGkuo36r6PPB5VPubRKeYp9WyI8k
-         gRSNzmJb1Remh0ARHr1UFQh/o9SdNsWu/Yq8HtcK0P0mpSxKBN/4lwidcZmFeZJcmt0Q
-         sgq+xC3Ku/1FVNYIcuhr1P5k2qwGk+epd0cztDkCgpJppLgb8uqbbxGVDwf62+stkrSg
-         uING0LppWrLy4RjW+Gmh8MBIvFpSQz/n9kulaK3CtewDl6lGTTM6z5i+kFGlVYE+vTRE
-         0cu8Utc81QBf1DaYam8czHn5DOObvHzcz5F7Y+N7uOoJztMRJnceVOLLs0KqKpb6nae5
-         kdaw==
+        d=gmail.com; s=20230601; t=1718371858; x=1718976658; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=IfDZGZUVHFHEc+IMJqQNH7KrutsOoxg205ylIXXBc/Y=;
+        b=HhdAQErJ8er3yjCYbGTbc6SVYFIMWpDd1MYEBHmYHs9EFxtZle612s7bZOtXeKi6Z8
+         Sh8Z/1TKzE3p4PkZUdted8vNUmEyfo9gMOXKpU6PufWIqENBlUsSypqk2zJcOqb0EA4E
+         1GHLRYxPgzSUslBkrBEUYAxCSlV58WpVIENdfDEmVlGHUYL+v2dR1Ff3bQ54dHx4i2nt
+         mwdOJ2jdFQYiTvZ+Sxj7WzfDzz4S72X/iPyRRnUHqFwENOnTJxrBvh1fWkd7Wj4L873A
+         PHoB32nQVaTx7XKWTi6sWRorXumit3cNe96u71keJiszRFDJ3KRC58fFB6PQsPUERUzU
+         qCgg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718357726; x=1718962526;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20230601; t=1718371858; x=1718976658;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=etzTSCU1uisr3/ajGaZb/9WUYgpinUNo3lBLbcHVCNA=;
-        b=IRyAcoSClgVuZqpkKWWnm5rHkPANHDUpate4w2nFKP70Eqt17sJC8Fd/kkLYKKMx8L
-         2rAL2vwBiaCnABcTZu54uYbM79xmUFebiRXmXHHtqmYbB72tM9tLdVF4T456Z6aO86Np
-         CNwUUco9GZL0qWfccgVJSbgM3dnUq+LN46ZtzOsuWG1eihFj4ZE25C7PfU9D4i1Zep9t
-         h0rO22JCJGxXXbdS/Y4qjQjGBTvJnKMxv4NN2c9GJGHFDDj4vykM0k0Owz1j5291LhvR
-         ybc/do9r9nSF5IjofAipLI0Me3LPAGEiSTQjebd1M+3Zj3j4u35wBL+eVBIn1mCDklB7
-         Xsdg==
-X-Gm-Message-State: AOJu0YyZjt1favxv3YYSvRXrd06ATet1NGqAjxMLMCLSEUG9kNZixhv1
-	mtopmOhnnPCWBo8nR+SaN+IbcGjgdD+HbvuDwNhlzncq8pyQVC1u/WPnJg==
-X-Google-Smtp-Source: AGHT+IE2I0n0aV8sG52Zd3QoWzxWgJ+vb/tRLAlBkZnnGXCNR7akOFgKobTkSPru4YWbv7O3dPdEcQ==
-X-Received: by 2002:ac8:5acc:0:b0:43b:7ac:ac79 with SMTP id d75a77b69052e-44216b03086mr16672981cf.21.1718357725872;
-        Fri, 14 Jun 2024 02:35:25 -0700 (PDT)
-Received: from [172.17.0.2] ([40.76.117.198])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-44212edd20bsm10637821cf.57.2024.06.14.02.35.25
+        bh=IfDZGZUVHFHEc+IMJqQNH7KrutsOoxg205ylIXXBc/Y=;
+        b=sKTEGtp16Y4iCpEiX84c/0phPCfuEED0L2ODjNND6Sp/xEyZ8RFeLllcUtF3+A1GGI
+         8S4Zbu7fEIC2MVaBbqv7TZuHZwx/2QP08sbqUPdlfiIPYfwLTJUMkzKx1tpetFt4/Hq5
+         vKddP3hBMUm31MlLmn0AsRQVF6Bs9Lk98a7JRflwET3BK5WgNaBvErT/6gHdWvlkAG2M
+         6fT9nXki4/Xe0iN7P4/eCciYM4r28k+jRJxu9ovvB+rdlgL/q8QV6AoZlk7qJctEx5kS
+         w60c9OLC8aspyhDfISwBjdSW2C4NmLFQJRA2qPZYkB7upCEQ+XX9Ts17NihMOmHZVrwg
+         38WA==
+X-Gm-Message-State: AOJu0YxJzQUVyfhV1muuou9Lw9f7HDt8cShCD+FRHL2eT3y2znq0kq50
+	aFljvZPPE/DE6caLRf3xy2eagTxpDW8AP7xxMXK/eb48t/JQdTUyEk38hQ==
+X-Google-Smtp-Source: AGHT+IHG8YJGhsZ6xQbP0z6JGJucEQMEgFs1bX3Spjapz1SLMD+ZOkoc9s1wqEyNwbc7PFL9rqf0NQ==
+X-Received: by 2002:a50:871a:0:b0:57c:68fd:2bca with SMTP id 4fb4d7f45d1cf-57cbd67fc68mr2356030a12.24.1718371833969;
+        Fri, 14 Jun 2024 06:30:33 -0700 (PDT)
+Received: from raspberrypi.home (46.205.193.11.nat.ftth.dynamic.t-mobile.pl. [46.205.193.11])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-57cb7439646sm2280810a12.88.2024.06.14.06.30.33
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 14 Jun 2024 02:35:25 -0700 (PDT)
-Message-ID: <666c0edd.050a0220.4a944.464e@mx.google.com>
-Date: Fri, 14 Jun 2024 02:35:25 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============5703273134962742065=="
+        Fri, 14 Jun 2024 06:30:33 -0700 (PDT)
+From: Arkadiusz Bokowy <arkadiusz.bokowy@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Arkadiusz Bokowy <arkadiusz.bokowy@gmail.com>
+Subject: [PATCH BlueZ] shared/util: Update SDO defined UUIDs
+Date: Fri, 14 Jun 2024 15:30:24 +0200
+Message-Id: <20240614133024.1299311-1-arkadiusz.bokowy@gmail.com>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, neeraj.sanjaykale@nxp.com
-Subject: RE: Bluetooth: btnxpuart: Update firmware names
-In-Reply-To: <20240614084941.6832-2-neeraj.sanjaykale@nxp.com>
-References: <20240614084941.6832-2-neeraj.sanjaykale@nxp.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 
---===============5703273134962742065==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=861981
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      1.81 seconds
-GitLint                       PASS      0.65 seconds
-SubjectPrefix                 FAIL      0.50 seconds
-BuildKernel                   PASS      29.42 seconds
-CheckAllWarning               PASS      32.42 seconds
-CheckSparse                   PASS      37.90 seconds
-CheckSmatch                   PASS      109.66 seconds
-BuildKernel32                 PASS      28.65 seconds
-TestRunnerSetup               PASS      529.34 seconds
-TestRunner_l2cap-tester       PASS      18.91 seconds
-TestRunner_iso-tester         PASS      33.54 seconds
-TestRunner_bnep-tester        PASS      4.97 seconds
-TestRunner_mgmt-tester        FAIL      115.22 seconds
-TestRunner_rfcomm-tester      PASS      7.70 seconds
-TestRunner_sco-tester         PASS      15.43 seconds
-TestRunner_ioctl-tester       PASS      8.29 seconds
-TestRunner_mesh-tester        PASS      6.08 seconds
-TestRunner_smp-tester         PASS      7.03 seconds
-TestRunner_userchan-tester    PASS      5.53 seconds
-IncrementalBuild              PASS      34.24 seconds
-
-Details
-##############################
-Test: SubjectPrefix - FAIL
-Desc: Check subject contains "Bluetooth" prefix
-Output:
-"Bluetooth: " prefix is not specified in the subject
-##############################
-Test: TestRunner_mgmt-tester - FAIL
-Desc: Run mgmt-tester with test-runner
-Output:
-Total: 492, Passed: 488 (99.2%), Failed: 2, Not Run: 2
-
-Failed Test Cases
-LL Privacy - Add Device 4 (2 Devices to AL)          Failed       0.162 seconds
-LL Privacy - Add Device 6 (RL is full)               Failed       0.198 seconds
-
-
+The list of SDO defined UUIDs taken from section 3.10 of:
+https://www.bluetooth.com/wp-content/uploads/Files/Specification/HTML/Assigned_Numbers/out/en/Assigned_Numbers.pdf
 ---
-Regards,
-Linux Bluetooth
+ src/shared/util.c | 20 +++++++++++++++++---
+ 1 file changed, 17 insertions(+), 3 deletions(-)
 
+diff --git a/src/shared/util.c b/src/shared/util.c
+index ee59b94a0..98bf1a178 100644
+--- a/src/shared/util.c
++++ b/src/shared/util.c
+@@ -1566,9 +1566,23 @@ static const struct {
+ 	{ 0xfd60, "Sercomm Corporation"				},
+ 	{ 0xfd5f, "Oculus VR, LLC"				},
+ 	/* SDO defined */
+-	{ 0xfffc, "AirFuel Alliance"				},
+-	{ 0xfffe, "Alliance for Wireless Power (A4WP)"		},
+-	{ 0xfffd, "Fast IDentity Online Alliance (FIDO)"	},
++	{ 0xfccc, "Wi-Fi Easy Connect Specification Service"	},
++	{ 0xffef, "Wi-Fi Direct Specification Service"		},
++	{ 0xfff0, "Public Key Open Credential (PKOC) Service"	},
++	{ 0xfff1, "ICCE Digital Key Service"			},
++	{ 0xfff2, "Aliro Service"				},
++	{ 0xfff3, "FiRa Consortium Service"			},
++	{ 0xfff4, "FiRa Consortium Service"			},
++	{ 0xfff5, "Car Connectivity Consortium, LLC Service"	},
++	{ 0xfff6, "Matter Profile ID Service"			},
++	{ 0xfff7, "Zigbee Direct Service"			},
++	{ 0xfff8, "Mopria Alliance BLE Service"			},
++	{ 0xfff9, "FIDO2 Secure Client-To-Authenticator Transport Service" },
++	{ 0xfffa, "ASTM Remote ID Service"			},
++	{ 0xfffb, "Direct Thread Commissioning Service"		},
++	{ 0xfffc, "Wireless Power Transfer (WPT) Service"	},
++	{ 0xfffd, "Universal Second Factor Authenticator Service" },
++	{ 0xfffe, "Wireless Power Transfer Service"		},
+ 	{ }
+ };
+ 
+-- 
+2.39.2
 
---===============5703273134962742065==--
