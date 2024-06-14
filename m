@@ -1,232 +1,122 @@
-Received: from inva021.nxp.com (inva021.nxp.com [92.121.34.21])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f181.google.com (mail-qt1-f181.google.com [209.85.160.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B095D1922EE;
-	Fri, 14 Jun 2024 08:51:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=92.121.34.21
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7B8914884B
+	for <linux-bluetooth@vger.kernel.org>; Fri, 14 Jun 2024 08:59:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718355121; cv=none; b=A0qtm9uMe12jzouAuy9Niucl6f6/vJ29zQAMHrOd21kNLvSoeYfKpttA3u6hQaLxUErpkJUW2vA3RQUAedmV7SDVXBKc2iQO3maaImP50LC8PyLPGuIH4z5JWbOpKfD8ep7Fc5HLTo4DWaoqYTuYFdieYa0ebR0bjXucAGvKNr4=
+	t=1718355589; cv=none; b=DY2WYoY/sgK2i5q95o7f2t8TXdzGFbz1sXrWOZbsEqJlkst8r/1zvu0MNryadBBhHZGP8sWpbi1hvTpcMCYNQig8ionYgW2VlpyIBFzcS7EkNse+rL8cIr/2c1MAfyP64vXftePj2SS7vebPD1Zu4yhVWU/VJ4b8arrWXROArHQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718355121; c=relaxed/simple;
-	bh=UdGhpwC++BuA+TWiaIDRyd5nmS4nLUXGnT+sJOJE0xE=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=T/SvRTmX7f8RJT1wCadcTGQ8LKb0kW8yOEiL1VB7ocZWd01waMn8oQuPfyJAWvo2TWApDylZBjm3dPt32EXcgFe4Og+EWo+1H34auTXHJZIaKkvZvyggvnTiv76JdM0xEtbWTcC5LOtpT1RyFwMjFES+PEqIPPnBJaXwtQgtqKI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; arc=none smtp.client-ip=92.121.34.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
-Received: from inva021.nxp.com (localhost [127.0.0.1])
-	by inva021.eu-rdc02.nxp.com (Postfix) with ESMTP id 28B4E20175F;
-	Fri, 14 Jun 2024 10:51:58 +0200 (CEST)
-Received: from aprdc01srsp001v.ap-rdc01.nxp.com (aprdc01srsp001v.ap-rdc01.nxp.com [165.114.16.16])
-	by inva021.eu-rdc02.nxp.com (Postfix) with ESMTP id 57369201776;
-	Fri, 14 Jun 2024 10:51:57 +0200 (CEST)
-Received: from pe-lt8779.in-pnq01.nxp.com (pe-lt8779.in-pnq01.nxp.com [10.17.104.141])
-	by aprdc01srsp001v.ap-rdc01.nxp.com (Postfix) with ESMTP id 9F2811820F59;
-	Fri, 14 Jun 2024 16:51:54 +0800 (+08)
-From: Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>
-To: marcel@holtmann.org,
-	luiz.dentz@gmail.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	robh@kernel.org,
-	krzk+dt@kernel.org,
-	conor+dt@kernel.org
-Cc: linux-bluetooth@vger.kernel.org,
-	netdev@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	amitkumar.karwar@nxp.com,
-	rohit.fule@nxp.com,
-	neeraj.sanjaykale@nxp.com,
-	sherry.sun@nxp.com,
-	ziniu.wang_1@nxp.com,
-	haibo.chen@nxp.com,
-	LnxRevLi@nxp.com
-Subject: [PATCH v4 2/2] Bluetooth: btnxpuart: Update firmware names
-Date: Fri, 14 Jun 2024 14:19:41 +0530
-Message-Id: <20240614084941.6832-3-neeraj.sanjaykale@nxp.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240614084941.6832-1-neeraj.sanjaykale@nxp.com>
-References: <20240614084941.6832-1-neeraj.sanjaykale@nxp.com>
+	s=arc-20240116; t=1718355589; c=relaxed/simple;
+	bh=o7VAZildQik+bgPjk5JwcrhDEgkEDj0a3mXp1aec9L4=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=VTRm2xrOJvN3yaEo1d1jNnklwyufV/iX80+0FRo74W8ic1r8vv0zQ+2VFwjUDLB+tizYffp9I9gGUgZZ8UHylMScYjMXTvIgsiRoX3T4T5ItTSgTBKlamdunag+/FH/bIil5ILE9NIFv4bIfukvXnJYo5xdJ9lKPaeNOXqQxiH4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=W1YBjHNV; arc=none smtp.client-ip=209.85.160.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="W1YBjHNV"
+Received: by mail-qt1-f181.google.com with SMTP id d75a77b69052e-44051a92f37so16261731cf.1
+        for <linux-bluetooth@vger.kernel.org>; Fri, 14 Jun 2024 01:59:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1718355587; x=1718960387; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=DbIBUh0f6/QhleX/nQJ9onNuC8K2/AHwh5GJo4LsYUM=;
+        b=W1YBjHNV6KQrsJqvNu7LoxJsQmDK7XI29ga0Hgt8sI7fY5yomOoL+hVZqscT/H3YSK
+         jmtz9dktPzaJWSKxU14glcTo7rZsHvqBxg7npau7MwoACrh++ZnHhrRtDq8iBp6kJyBD
+         EIwWBk9DSESXbH6vzUvrzglhoJ4QGC96EP5Y/dfn+dn21Qm/zcFYeBx+tuYIC1qp/zIV
+         wfun4Sz5VgKROPTYztHJR9qiEdWePzDGZKVBueqX6RXZjL2nLtnnDu+aegMd7156ZkLA
+         7RIrei5TfDpWY2prg5mUulVPi6plwTTj2AovF+87UdowAU2VLKqsfhlPKgjzpW2X/RJL
+         9x2g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718355587; x=1718960387;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=DbIBUh0f6/QhleX/nQJ9onNuC8K2/AHwh5GJo4LsYUM=;
+        b=RWZM3kHZnbv35/GUtKur6zu9CM7t33cmrMRqPLshvwWGBGWuQtMVSxynafRy50ZYMC
+         dLOuofOT7zcpzLkU59XuLHNYZEvqr2oNksP21r1LN2QRqZA59GCjYafen+D7jgsrQ4Hv
+         A6VK4N9f4M4GqAVQnadKm6MLJ2DO2EREOjbM32FHCDHiq1q914ZAV5l1g86BiMheiPid
+         wspxWshYNvinbwl8Qa3CtTf6iZo+dD9l55GHS3LvxgyEVUcq1whX0FXeQPyQtoZowf2V
+         AVYuRMUjh0G5c/CuArHstA/+iTPhGN/XGLOaMbIAtwA4h4cQL+ES3EvVus2dG+5duRdM
+         Wv/Q==
+X-Gm-Message-State: AOJu0YyISQ7AK/w/5EaqyfOEA22TpX6r2oyvyPJP+UrLZC4/SiHmkYfd
+	ckhGtpkibK2hPip2IGv6sc4380cHKCCRCKf3sBW8Wtft52cVttsXV/OzJw==
+X-Google-Smtp-Source: AGHT+IHEwLb6Nk6JMdYwJ0ql4TwCqwydsZZd0XWtcaF8fXJ/YlWgAKj2oQj0yntRW9RWtzR+FgJJEg==
+X-Received: by 2002:a05:622a:15cd:b0:440:97b5:cb with SMTP id d75a77b69052e-442160b43c5mr37122881cf.32.1718355585964;
+        Fri, 14 Jun 2024 01:59:45 -0700 (PDT)
+Received: from [172.17.0.2] ([172.183.51.251])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-441f859bd18sm14103801cf.51.2024.06.14.01.59.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 14 Jun 2024 01:59:45 -0700 (PDT)
+Message-ID: <666c0681.050a0220.3ac8b.5155@mx.google.com>
+Date: Fri, 14 Jun 2024 01:59:45 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============2854891546215713304=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Virus-Scanned: ClamAV using ClamSMTP
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, neeraj.sanjaykale@nxp.com
+Subject: RE: [v2] Bluetooth: btnxpuart: Enable Power Save feature on startup
+In-Reply-To: <20240614082039.6465-1-neeraj.sanjaykale@nxp.com>
+References: <20240614082039.6465-1-neeraj.sanjaykale@nxp.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-This updates the firmware names of 3 chipsets: w8987, w8997, w9098.
-These changes are been done to standardize chip specific firmware
-file names to be in sync with firmware names of newer chipsets.
+--===============2854891546215713304==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-The naming convention for BT-only files would be as follows:
-For dual-radio WiFi+BT chipsets:
-- <protocol-BT><chip-name>_bt_v<HW-version>.bin
-For tri-radio WiFi+BT+15.4 chipsets:
-- <protocol-BT><protocol-15.4><chip-name>_bt_v<HW-version>.bin
+This is automated email and please do not reply to this email!
 
-To maintain backward compatibility, this commit adds a provision to
-request older firmware file name, if new firmware file name not found in
-/lib/firmware/nxp/.
+Dear submitter,
 
-A new device tree property has been introduced called firmware-name, to
-override the hardcoded firmware names (old and new) in the driver.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=861975
 
-Signed-off-by: Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      1.18 seconds
+GitLint                       PASS      0.29 seconds
+SubjectPrefix                 PASS      0.98 seconds
+BuildKernel                   PASS      30.37 seconds
+CheckAllWarning               PASS      33.05 seconds
+CheckSparse                   PASS      41.71 seconds
+CheckSmatch                   PASS      106.32 seconds
+BuildKernel32                 PASS      29.30 seconds
+TestRunnerSetup               PASS      527.09 seconds
+TestRunner_l2cap-tester       PASS      18.66 seconds
+TestRunner_iso-tester         PASS      33.50 seconds
+TestRunner_bnep-tester        PASS      5.28 seconds
+TestRunner_mgmt-tester        FAIL      112.58 seconds
+TestRunner_rfcomm-tester      PASS      7.56 seconds
+TestRunner_sco-tester         PASS      15.09 seconds
+TestRunner_ioctl-tester       PASS      8.47 seconds
+TestRunner_mesh-tester        PASS      6.10 seconds
+TestRunner_smp-tester         PASS      6.92 seconds
+TestRunner_userchan-tester    PASS      5.18 seconds
+IncrementalBuild              PASS      28.41 seconds
+
+Details
+##############################
+Test: TestRunner_mgmt-tester - FAIL
+Desc: Run mgmt-tester with test-runner
+Output:
+Total: 492, Passed: 489 (99.4%), Failed: 1, Not Run: 2
+
+Failed Test Cases
+LL Privacy - Add Device 7 (AL is full)               Failed       0.197 seconds
+
+
 ---
-v2: Remove "nxp/" from all firmware name definitions to be inline with
-firmware file name read from device tree file. (Krzysztof)
-v4: Request old firmware file name if new firmware file not found, to
-avoid regressions. Added new naming schema in commit message. (Paul Menzel)
----
- drivers/bluetooth/btnxpuart.c | 67 ++++++++++++++++++++++++++---------
- 1 file changed, 50 insertions(+), 17 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/drivers/bluetooth/btnxpuart.c b/drivers/bluetooth/btnxpuart.c
-index ac4408e16369..ab471f1807cb 100644
---- a/drivers/bluetooth/btnxpuart.c
-+++ b/drivers/bluetooth/btnxpuart.c
-@@ -34,16 +34,19 @@
- /* NXP HW err codes */
- #define BTNXPUART_IR_HW_ERR		0xb0
- 
--#define FIRMWARE_W8987		"nxp/uartuart8987_bt.bin"
--#define FIRMWARE_W8997		"nxp/uartuart8997_bt_v4.bin"
--#define FIRMWARE_W9098		"nxp/uartuart9098_bt_v1.bin"
--#define FIRMWARE_IW416		"nxp/uartiw416_bt_v0.bin"
--#define FIRMWARE_IW612		"nxp/uartspi_n61x_v1.bin.se"
--#define FIRMWARE_IW624		"nxp/uartiw624_bt.bin"
--#define FIRMWARE_SECURE_IW624	"nxp/uartiw624_bt.bin.se"
--#define FIRMWARE_AW693		"nxp/uartaw693_bt.bin"
--#define FIRMWARE_SECURE_AW693	"nxp/uartaw693_bt.bin.se"
--#define FIRMWARE_HELPER		"nxp/helper_uart_3000000.bin"
-+#define FIRMWARE_W8987		"uart8987_bt_v0.bin"
-+#define FIRMWARE_W8987_OLD	"uartuart8987_bt.bin"
-+#define FIRMWARE_W8997		"uart8997_bt_v4.bin"
-+#define FIRMWARE_W8997_OLD	"uartuart8997_bt_v4.bin"
-+#define FIRMWARE_W9098		"uart9098_bt_v1.bin"
-+#define FIRMWARE_W9098_OLD	"uartuart9098_bt_v1.bin"
-+#define FIRMWARE_IW416		"uartiw416_bt_v0.bin"
-+#define FIRMWARE_IW612		"uartspi_n61x_v1.bin.se"
-+#define FIRMWARE_IW624		"uartiw624_bt.bin"
-+#define FIRMWARE_SECURE_IW624	"uartiw624_bt.bin.se"
-+#define FIRMWARE_AW693		"uartaw693_bt.bin"
-+#define FIRMWARE_SECURE_AW693	"uartaw693_bt.bin.se"
-+#define FIRMWARE_HELPER		"helper_uart_3000000.bin"
- 
- #define CHIP_ID_W9098		0x5c03
- #define CHIP_ID_IW416		0x7201
-@@ -145,6 +148,7 @@ struct psmode_cmd_payload {
- struct btnxpuart_data {
- 	const char *helper_fw_name;
- 	const char *fw_name;
-+	const char *fw_name_old;
- };
- 
- struct btnxpuart_dev {
-@@ -694,19 +698,30 @@ static bool process_boot_signature(struct btnxpuart_dev *nxpdev)
- 	return is_fw_downloading(nxpdev);
- }
- 
--static int nxp_request_firmware(struct hci_dev *hdev, const char *fw_name)
-+static int nxp_request_firmware(struct hci_dev *hdev, const char *fw_name,
-+				const char *fw_name_old)
- {
- 	struct btnxpuart_dev *nxpdev = hci_get_drvdata(hdev);
-+	const char *fw_name_dt;
- 	int err = 0;
- 
- 	if (!fw_name)
- 		return -ENOENT;
- 
- 	if (!strlen(nxpdev->fw_name)) {
--		snprintf(nxpdev->fw_name, MAX_FW_FILE_NAME_LEN, "%s", fw_name);
-+		if (strcmp(fw_name, FIRMWARE_HELPER) &&
-+		    !device_property_read_string(&nxpdev->serdev->dev,
-+						 "firmware-name",
-+						 &fw_name_dt))
-+			fw_name = fw_name_dt;
-+		snprintf(nxpdev->fw_name, MAX_FW_FILE_NAME_LEN, "nxp/%s", fw_name);
-+		err = request_firmware_direct(&nxpdev->fw, nxpdev->fw_name, &hdev->dev);
-+		if (err < 0 && fw_name_old) {
-+			snprintf(nxpdev->fw_name, MAX_FW_FILE_NAME_LEN, "nxp/%s", fw_name_old);
-+			err = request_firmware_direct(&nxpdev->fw, nxpdev->fw_name, &hdev->dev);
-+		}
- 
- 		bt_dev_info(hdev, "Request Firmware: %s", nxpdev->fw_name);
--		err = request_firmware(&nxpdev->fw, nxpdev->fw_name, &hdev->dev);
- 		if (err < 0) {
- 			bt_dev_err(hdev, "Firmware file %s not found", nxpdev->fw_name);
- 			clear_bit(BTNXPUART_FW_DOWNLOADING, &nxpdev->tx_state);
-@@ -785,10 +800,10 @@ static int nxp_recv_fw_req_v1(struct hci_dev *hdev, struct sk_buff *skb)
- 	}
- 
- 	if (!nxp_data->helper_fw_name || nxpdev->helper_downloaded) {
--		if (nxp_request_firmware(hdev, nxp_data->fw_name))
-+		if (nxp_request_firmware(hdev, nxp_data->fw_name, nxp_data->fw_name_old))
- 			goto free_skb;
- 	} else if (nxp_data->helper_fw_name && !nxpdev->helper_downloaded) {
--		if (nxp_request_firmware(hdev, nxp_data->helper_fw_name))
-+		if (nxp_request_firmware(hdev, nxp_data->helper_fw_name, NULL))
- 			goto free_skb;
- 	}
- 
-@@ -890,10 +905,25 @@ static char *nxp_get_fw_name_from_chipid(struct hci_dev *hdev, u16 chipid,
- 	return fw_name;
- }
- 
-+static char *nxp_get_old_fw_name_from_chipid(struct hci_dev *hdev, u16 chipid,
-+					 u8 loader_ver)
-+{
-+	char *fw_name_old = NULL;
-+
-+	switch (chipid) {
-+	case CHIP_ID_W9098:
-+		fw_name_old = FIRMWARE_W9098_OLD;
-+		break;
-+	}
-+	return fw_name_old;
-+}
-+
- static int nxp_recv_chip_ver_v3(struct hci_dev *hdev, struct sk_buff *skb)
- {
- 	struct v3_start_ind *req = skb_pull_data(skb, sizeof(*req));
- 	struct btnxpuart_dev *nxpdev = hci_get_drvdata(hdev);
-+	const char *fw_name;
-+	const char *fw_name_old;
- 	u16 chip_id;
- 	u8 loader_ver;
- 
-@@ -903,8 +933,9 @@ static int nxp_recv_chip_ver_v3(struct hci_dev *hdev, struct sk_buff *skb)
- 	chip_id = le16_to_cpu(req->chip_id);
- 	loader_ver = req->loader_ver;
- 	bt_dev_info(hdev, "ChipID: %04x, Version: %d", chip_id, loader_ver);
--	if (!nxp_request_firmware(hdev, nxp_get_fw_name_from_chipid(hdev,
--								    chip_id, loader_ver)))
-+	fw_name = nxp_get_fw_name_from_chipid(hdev, chip_id, loader_ver);
-+	fw_name_old = nxp_get_old_fw_name_from_chipid(hdev, chip_id, loader_ver);
-+	if (!nxp_request_firmware(hdev, fw_name, fw_name_old))
- 		nxp_send_ack(NXP_ACK_V3, hdev);
- 
- free_skb:
-@@ -1426,11 +1457,13 @@ static void nxp_serdev_remove(struct serdev_device *serdev)
- static struct btnxpuart_data w8987_data __maybe_unused = {
- 	.helper_fw_name = NULL,
- 	.fw_name = FIRMWARE_W8987,
-+	.fw_name_old = FIRMWARE_W8987_OLD,
- };
- 
- static struct btnxpuart_data w8997_data __maybe_unused = {
- 	.helper_fw_name = FIRMWARE_HELPER,
- 	.fw_name = FIRMWARE_W8997,
-+	.fw_name_old = FIRMWARE_W8997_OLD,
- };
- 
- static const struct of_device_id nxpuart_of_match_table[] __maybe_unused = {
--- 
-2.34.1
 
+--===============2854891546215713304==--
