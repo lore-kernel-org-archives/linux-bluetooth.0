@@ -1,74 +1,66 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-24.smtp.github.com (out-24.smtp.github.com [192.30.252.207])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44EC815FA9C
-	for <linux-bluetooth@vger.kernel.org>; Fri, 14 Jun 2024 15:00:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D635316C878
+	for <linux-bluetooth@vger.kernel.org>; Fri, 14 Jun 2024 15:16:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.207
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718377232; cv=none; b=FZaG8+w2J1awGl4pARc40155jHj/lZM87eiJ00Zq77gJPgEJIpiQPaK+34GHHpLlRnUSvpUJFlfPIH4hIybirlwFuotRij5/sB/rikhXT3Gu7pcEe4qIdjvyYJ56A2m6TJnVEvvSJIis0JWyQKrJPVmNt68ymsbgvhFAMgUdnbc=
+	t=1718378164; cv=none; b=i70KIT29ywFdCTAKucxVKhH+c+VA1ED7rhRUENdxkwWwZiA/xB74j2eoHyxHMHG+iaaYxY4Pc0mCEBsg+B9vG7BGeU7ErCqoJ9U1NaPFLcKdr0+WtC3UJE1/abEFr1dBHOXJdNnjLW1UJWSmBBoSDWhnB+LhiI8HspsFN3k7HBE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718377232; c=relaxed/simple;
-	bh=QXnrKTQNOSkpOoaoAQeyZRaitoRsolNEYqg8dBN4ODs=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=QBzCRsCOIaV+IS3MBj+n4C6DHOPC1+46CjC0nHXhM07PdYOp3OOSgq9osNI0B7JJcN2Oj2F3X5AY9p3I5V9uUYcjcHs4jY+ad3R2uiEm9PeM4q75QxduZxgLfMl54ev+Zx7M8xWjLeXe9nOhTVDupjKValXGiYcUskBDjVJCNus=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Maw327Hy; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1718378164; c=relaxed/simple;
+	bh=YJpvtPacwc+mymxQKpfFqe3MCTol7ptFBv2dgH8Duyk=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=hm1ntFd3kr5tbGvCop+ZS1+urE03EhHcLKI7NjIWcg9+qdZDt11Crs/+Dqm+yuaH21va2afrKmEpXshMRe/xrZc1L4RsKCwY1OVEgifQ0gUta8N391Xw17tNq6jVLvKSmxOVpa8Q2vp6UZQW8DpDY67fw7RxZle8zojn19sKYOY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=VXYwrsOm; arc=none smtp.client-ip=192.30.252.207
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Maw327Hy"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id CE3F8C2BD10;
-	Fri, 14 Jun 2024 15:00:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718377231;
-	bh=QXnrKTQNOSkpOoaoAQeyZRaitoRsolNEYqg8dBN4ODs=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Maw327HyfrvsgjedE3vKBgEfBacyUpGzqb953QhTTlsi4BaOH09QMyMyIVwccKBJa
-	 wtHY71+pFoorn2vHYNzkf4m/R6vv38oZVD2++lL6+sasqyZMNg90gnpplBFrU2oFE6
-	 5ZCSJfN01dapB2QEZF7dC9Nqo1CvoVtzPx5ILiqLyk9RV9fdKA656Na+7hCuZO0Omj
-	 0AszEfMC3mxnjteRPt0KbuZ7zhRDPVI2qE0WJW//vWbgPSB8d0qUSt5rGtObiE/d9x
-	 2Ki8eGvDOiQx2YV3f5v22DYa7Gq3Lh63gJQTni78lPltBUTrirjxTV/M/fPxZLCqNr
-	 2tnIpqz56te4g==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id BC2EBC43616;
-	Fri, 14 Jun 2024 15:00:31 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="VXYwrsOm"
+Received: from github.com (hubbernetes-node-b4e53f7.ac4-iad.github.net [10.52.201.36])
+	by smtp.github.com (Postfix) with ESMTPA id DB301641113
+	for <linux-bluetooth@vger.kernel.org>; Fri, 14 Jun 2024 08:16:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1718378161;
+	bh=d2Q1cr5Z463VZw4aCHReZwZrlYOxrQyozsh/x4Wqqmw=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=VXYwrsOmbRMBJjbucD2iRqJLV9IMcaafDOjZnbUPUN6B9oq9H/ENYndNZ/lT/o+sa
+	 UmyU9B1ST/JH5KaPmQti2M4pebiXBg02IPmLPKrznpgHekFrKUr9gvG7gizrdeN5Z5
+	 T7WgyQQtpe3GVtn/m87F817TaYDEcw4dQ96nhNHY=
+Date: Fri, 14 Jun 2024 08:16:01 -0700
+From: Luiz Augusto von Dentz <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/master/0b0237-48b7f7@github.com>
+Subject: [bluez/bluez] 48b7f7: device: Fix marking device as temporary
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH BlueZ v1] device: Fix marking device as temporary
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <171837723176.23725.12152128225919133175.git-patchwork-notify@kernel.org>
-Date: Fri, 14 Jun 2024 15:00:31 +0000
-References: <20240613170313.1596181-1-luiz.dentz@gmail.com>
-In-Reply-To: <20240613170313.1596181-1-luiz.dentz@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-Hello:
+  Branch: refs/heads/master
+  Home:   https://github.com/bluez/bluez
+  Commit: 48b7f7e5fe53b434f388a8b85cc0996853b3567c
+      https://github.com/bluez/bluez/commit/48b7f7e5fe53b434f388a8b85cc0996853b3567c
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2024-06-14 (Fri, 14 Jun 2024)
 
-This patch was applied to bluetooth/bluez.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+  Changed paths:
+    M src/device.c
 
-On Thu, 13 Jun 2024 13:03:13 -0400 you wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> 
-> If bonding has failed but there are other bearers connected don't mark
-> the device as temporary.
-> 
-> Fixes: https://github.com/bluez/bluez/issues/856
-> 
-> [...]
+  Log Message:
+  -----------
+  device: Fix marking device as temporary
 
-Here is the summary with links:
-  - [BlueZ,v1] device: Fix marking device as temporary
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=48b7f7e5fe53
+If bonding has failed but there are other bearers connected don't mark
+the device as temporary.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+Fixes: https://github.com/bluez/bluez/issues/856
 
 
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
