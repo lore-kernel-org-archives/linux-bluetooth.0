@@ -1,101 +1,132 @@
-Received: from out203-205-251-84.mail.qq.com (unknown [203.205.251.84])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f49.google.com (mail-pj1-f49.google.com [209.85.216.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 897004431;
-	Sun, 16 Jun 2024 13:39:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.205.251.84
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9304719D8B5
+	for <linux-bluetooth@vger.kernel.org>; Sun, 16 Jun 2024 14:33:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718545142; cv=none; b=RsfjgLcCgW35hDcPYZQOgWAFSKp7jo2lNVVwCSChjsBQeIOaYEqrVahTI5+wkkVukO+jcPe7HuE/heCEItrv97za5zWNfL+BaXfP9XUwO36D9kAofzTAGVmECVdpaW1904UHtJzQpfITG1fawB/5l1XkqatQpZXzHNPID38OlGU=
+	t=1718548402; cv=none; b=gzCfmoyBM7IvXcSsh4nQ+iPpT2ey7QIGRMPjk2V/Xlxi6buK+C3bj9RPIZtSWH5AlJkMK3sxhB/VyTnZVCOcOpiOEzN95ufFwRFNZzZk11AhsxqVglC6Bn47/9yRj67Bq2pqiGIe6Bsx3LvEDLypKH0MisfRkINym8sUS9x33lA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718545142; c=relaxed/simple;
-	bh=3DVpCOO3sUTvTy/SKfszK1530ggxWSe9b8tGGARb2eE=;
-	h=Message-ID:From:To:Cc:Subject:Date:In-Reply-To:References:
-	 MIME-Version; b=rhtdE2LLli9HwDBOlzcHbfF/9JN6j48UBQ4NpO82xkE3Jpl/LjnqMlImeKe/NU+Tf6aYtHryxie6Y8tiWHIbwIcChF0NFFtI+PFT/qIepR7fDHPw4ua8YCKeIZOISE7dwzGKl9tKrcrNM02Lhk36CaDE8BBiGNTQztBJflPtXYE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com; spf=pass smtp.mailfrom=qq.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=FL4ZobYk; arc=none smtp.client-ip=203.205.251.84
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
+	s=arc-20240116; t=1718548402; c=relaxed/simple;
+	bh=cLZ9L30jmGZCHtUuUW636C6Vo5SN5u0N9L3vVGKDK88=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=HFq68OJK+MKae/va67ZphyS3mVWkcbI7k3UrhmsAiBPxUFiPlwXaB6vFmcI6NUcSqn5HNsCFUj14wRVR/s40P0pArP+/ixFwkxIHZDFG6eii95gsGgWhjpiyH8Ht1j9tTdJlnnIV0hmeKB1sbuzHkulLpt932MKfHBLkodiMWR8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QyQjgvdx; arc=none smtp.client-ip=209.85.216.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="FL4ZobYk"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
-	t=1718545138; bh=QnGIQhnllw4Z9tBRtiByPGpIGjr4/z5r1mOluJiNIKc=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=FL4ZobYkRn3IDg5qCVYaazkTtnxn2ikAxqfSxFBlRxz8gRDtriypVUV+BdOa0eJuh
-	 f7+7UY73w/FxIz9sVoSza12qFld/TJoeTTPUKypuxRWSSV029sNnaewKaEg4ROwZm3
-	 eRNp1Y5H6P9ElamPT8PldrVafR1Y64IIW9/HP1U4=
-Received: from pek-lxu-l1.wrs.com ([111.198.228.103])
-	by newxmesmtplogicsvrszc13-0.qq.com (NewEsmtp) with SMTP
-	id 5568C83C; Sun, 16 Jun 2024 21:21:22 +0800
-X-QQ-mid: xmsmtpt1718544082t6wi7qken
-Message-ID: <tencent_410DFAA59E0DBA9213DDE8DD9399584FDB07@qq.com>
-X-QQ-XMAILINFO: MQ+wLuVvI2LQAFbobgONXpWjsNwRu9fF9gsTCahQjkKvAw5vuvYvtAbDdCpc1n
-	 752KL98Ykt31N2oK+bYgiHsSO9pdGU6RYuzku6z9bKr0HfaGheffSyElOeErDMrX6qxdboOgAke5
-	 hZBcwFg414xkgBSmup5gPne2s7YqpBzC2+N21G+9hIw+3MaVYbzSST6g0EfPCAsyEZARAGavKWqy
-	 Wqf22pUVhzVusWxc0iJmwbudAnL4SpyJ7EmOM7qqH2ldPxcEssfVtnEPPNndWbIvHUtsFD0TeMKe
-	 aw67mxS+hxdRUp/v5BYRxTW9TuGAdrCEKmoz+gfW5Amv9WS9tMjrOSnCuXS/V+K0b4SDsxpjLMoS
-	 o0nRgUxPglKMQNrlLlfkSn+1Zs8KNLQzZR5hFriZTWB1sY85VdbkSaDAWo0QFY9NP1ewRxOaQDRU
-	 M0HWRCUnLVTk48tU9h9nVbL/g09VLgm3sgTGeZtYqmUak2lysfYDe3yZ10g9+v45igdau5KCmFb1
-	 ovs32GFQ6rf/Aie5xj1GB6eW9VkxNjUycCmYMRnKvfb/32easmNDlH6j9JqQVI74JFCSB4PNR57u
-	 BwGQ/Pnz7CcFevfw5e1JjdyqkY0dynLAeVX28Q1ZCW+DDoiHxlsX/f4g1V5P4qYPPW3NP1Oc00yN
-	 oakO3HWD7M8zBn8r3OEY7wDuS1UNZ1SHbmhpiv6bWfWjF9QL1fgcXIC+up2AHteQJdoCsYnEmdwN
-	 rJyHzOSbAZS1fhAvIeYRCmnAffORv9qnF5Vdt6Vk3D/v52Rz3sFehGTJMhvHhkjN5jnV/pz+aQfv
-	 UM4BHKnSJK9Z1JVhISrIOcbCrZboZShf2A9bbFZEOB4SoHbsU7qjZPa8zdGYnt1D8lCoMzNQbust
-	 XjwyvVVxXW+VXPPCd8jdO1nKzfyWuvHLxQtJSik6u3oua0fdzF9oIqRNmwIytJ9hh10eUNMJVh
-X-QQ-XMRINFO: NS+P29fieYNw95Bth2bWPxk=
-From: Edward Adam Davis <eadavis@qq.com>
-To: bluez.test.bot@gmail.com
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	johan.hedberg@gmail.com,
-	kuba@kernel.org,
-	linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	luiz.dentz@gmail.com,
-	luiz.von.dentz@intel.com,
-	marcel@holtmann.org,
-	netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	syzkaller-bugs@googlegroups.com,
-	william.xuanziyang@huawei.com
-Subject: [PATCH] Bluetooth: handle value is too large should not be used in BIG
-Date: Sun, 16 Jun 2024 21:21:23 +0800
-X-OQ-MSGID: <20240616132122.584063-2-eadavis@qq.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <666ec579.050a0220.39ff8.d4a2@mx.google.com>
-References: <666ec579.050a0220.39ff8.d4a2@mx.google.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QyQjgvdx"
+Received: by mail-pj1-f49.google.com with SMTP id 98e67ed59e1d1-2bfdae7997aso2961768a91.2
+        for <linux-bluetooth@vger.kernel.org>; Sun, 16 Jun 2024 07:33:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1718548401; x=1719153201; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=Bvfb1ND+fuama1hJTcdelK4vdWhTF6vXCYiJKx060vE=;
+        b=QyQjgvdx8h5j4p+V7Vn9/pBEfGd/0sfNXoQzMRh2MAtRgPT25No2xx2fAkiHx9DxuD
+         WKLhE8hzMctbPef6E7jR1yrZFZyjf1Wj1ocmpbCUzkHq7NKVJphTdcsBTFFncO1bX1pn
+         7xXz/UL9zFcmxAtgza1kAqSttmM8lTX3Czf05w343KIXVXbVVQP/GaUzXtAj4e/Wx/Dc
+         rUDpMt9XlraJ3B4PsCQXKORqgrNyCX13Qjc3XR159JIti+llVXTkZBuYBw4fhCQFI8sA
+         ro4c2yq4PSsqy8PhiR0a3bx5h/OsFKFN/iWyQkXFFNFi2R85EOuPVXyQiz6aKtLrmVqt
+         pSqw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718548401; x=1719153201;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Bvfb1ND+fuama1hJTcdelK4vdWhTF6vXCYiJKx060vE=;
+        b=f57VUC/iSu5sKDXkRsorb8ahE/x2R0x58Tq2oL0Cl1n3bjC5n63I2VT6QtybsO4kn2
+         GqUyYeS9SZr7euIItDUI+XmG+WGVq0P4/uz1ugokV1G5rWkRXofHzNB++mhubDeS6MCi
+         k8WtHvNuRyVAYj38uExalK/uGQ+iV5eckpvCJ/RZxctyDikQfQu+i6ckhqLSW3k7o/UJ
+         I57l5FRoQcXjuQht3Tu9HEClq/ZO0i73RhcZGRARIKBVcyQ8GSWYzivAfmq0eK08Ls9+
+         B9oPUFGAQlN+rPmNJhD5Q0GyV8KVtZ1CntSHX1IcbkBcQzef72CQpyISITGM+mwK7FF5
+         MmGw==
+X-Gm-Message-State: AOJu0YwpIaguGleyxo33K87wRRXDC6yhuiYiofQkVkft8RCFo6CIvVoo
+	EGhuBnEJqy4p6VtcMe+hbEjgjIVH/x4+3ERe3Y8XMXOmwPqsjd1EAS/JVw==
+X-Google-Smtp-Source: AGHT+IE49ATEPk6kKttpjR8sLxEIAFR4NMKPfgoHm2pEsk5sGXHCRt+xLBevgLRf0Oq7G69471S2sg==
+X-Received: by 2002:a17:90b:4f4b:b0:2c5:3a5:5e47 with SMTP id 98e67ed59e1d1-2c503a56f03mr2361513a91.13.1718548400491;
+        Sun, 16 Jun 2024 07:33:20 -0700 (PDT)
+Received: from [172.17.0.2] ([13.83.123.179])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2c4c467c6besm7369220a91.52.2024.06.16.07.33.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 16 Jun 2024 07:33:20 -0700 (PDT)
+Message-ID: <666ef7b0.170a0220.1856.4644@mx.google.com>
+Date: Sun, 16 Jun 2024 07:33:20 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============2629514976716591984=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, eadavis@qq.com
+Subject: RE: Bluetooth: handle value is too large should not be used in BIG
+In-Reply-To: <tencent_410DFAA59E0DBA9213DDE8DD9399584FDB07@qq.com>
+References: <tencent_410DFAA59E0DBA9213DDE8DD9399584FDB07@qq.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-hci_le_big_sync_established_evt is necessary to filter out cases where the
-handle value is belone to ida id range, otherwise ida will be erroneously
-released in hci_conn_cleanup.
+--===============2629514976716591984==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Fixes: 181a42edddf5 ("Bluetooth: Make handle of hci_conn be unique")
-Reported-by: syzbot+b2545b087a01a7319474@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=b2545b087a01a7319474
-Signed-off-by: Edward Adam Davis <eadavis@qq.com>
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=862371
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.47 seconds
+GitLint                       PASS      0.19 seconds
+SubjectPrefix                 PASS      0.05 seconds
+BuildKernel                   PASS      30.65 seconds
+CheckAllWarning               PASS      33.08 seconds
+CheckSparse                   WARNING   38.43 seconds
+CheckSmatch                   WARNING   103.85 seconds
+BuildKernel32                 PASS      29.56 seconds
+TestRunnerSetup               PASS      533.58 seconds
+TestRunner_l2cap-tester       PASS      18.51 seconds
+TestRunner_iso-tester         PASS      37.01 seconds
+TestRunner_bnep-tester        PASS      4.80 seconds
+TestRunner_mgmt-tester        FAIL      113.65 seconds
+TestRunner_rfcomm-tester      PASS      7.67 seconds
+TestRunner_sco-tester         PASS      17.04 seconds
+TestRunner_ioctl-tester       PASS      7.94 seconds
+TestRunner_mesh-tester        PASS      5.89 seconds
+TestRunner_smp-tester         PASS      6.91 seconds
+TestRunner_userchan-tester    PASS      5.06 seconds
+IncrementalBuild              PASS      28.50 seconds
+
+Details
+##############################
+Test: CheckSparse - WARNING
+Desc: Run sparse tool with linux kernel
+Output:
+net/bluetooth/hci_event.c: note: in included file (through include/net/bluetooth/hci_core.h):
+##############################
+Test: CheckSmatch - WARNING
+Desc: Run smatch tool with source
+Output:
+net/bluetooth/hci_event.c: note: in included file (through include/net/bluetooth/hci_core.h):
+##############################
+Test: TestRunner_mgmt-tester - FAIL
+Desc: Run mgmt-tester with test-runner
+Output:
+Total: 492, Passed: 489 (99.4%), Failed: 1, Not Run: 2
+
+Failed Test Cases
+LL Privacy - Add Device 5 (2 Devices to RL)          Failed       0.174 seconds
+
+
 ---
- net/bluetooth/hci_event.c | 3 +++
- 1 file changed, 3 insertions(+)
+Regards,
+Linux Bluetooth
 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index a487f9df8145..eb1d5a2c48ee 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -6893,6 +6893,9 @@ static void hci_le_big_sync_established_evt(struct hci_dev *hdev, void *data,
- 
- 		bis = hci_conn_hash_lookup_handle(hdev, handle);
- 		if (!bis) {
-+			if (handle > HCI_CONN_HANDLE_MAX)
-+				continue;
-+
- 			bis = hci_conn_add(hdev, ISO_LINK, BDADDR_ANY,
- 					   HCI_ROLE_SLAVE, handle);
- 			if (IS_ERR(bis))
--- 
-2.43.0
 
+--===============2629514976716591984==--
