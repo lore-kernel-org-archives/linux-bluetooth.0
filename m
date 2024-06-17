@@ -1,113 +1,109 @@
-Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
+Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C7DB79F0
-	for <linux-bluetooth@vger.kernel.org>; Mon, 17 Jun 2024 09:01:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DAB5374D9;
+	Mon, 17 Jun 2024 09:05:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718614870; cv=none; b=q9+ekTemRHno3E3KetjbUqJTVoyJaUp5qfl41jxLzmmZlOmTa+Q2SbuiPnBoCjb5afGKqpB18WXdEOAcEw79Qrd4Sy9Whugwy+Qq844uxmcagyW4Gt0Znx+9zS5vmlrrDkcGEpk3Y+F15++AfOxmNXUcPakYXT+CLGjEukANZfk=
+	t=1718615135; cv=none; b=lA7OFLLVfPeppL6hfb8YvKYQWr75xEwnvktOOAKVq+mvuBAgugvZYByTvzeBu3eZF9cjqmjrXbvTeX6m4qL7ACZn2XNDRdxcIqJ1vh79kLMNlM6I5OuZzGUZT7M0lqr9VV3Ky/FVPRGNEIQuMesoEe2f47/b5hLKdexrQGtTkNs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718614870; c=relaxed/simple;
-	bh=35/CpLKU6EQJxiBqcfxv1zrphXexaLt+in8ttRPNX90=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=YgcnlmT52SaJz82yyrCPE1rsUTT6xcdnwmHtrp19/eQXTPcrP0hEhb2OcqnaQ+BDzaU0YHx4eg1U6TLcz9NkdtOyPJW7tRJ5Jhc+tTur9S5vQtNhb1TxLhCENkClmbL7ITmhYPx2yuKt3/oDKgI8fQxGPElDq3n0asoJVYZmunM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=V2nd8o9e; arc=none smtp.client-ip=209.85.214.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="V2nd8o9e"
-Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-1f6f031549bso36821125ad.3
-        for <linux-bluetooth@vger.kernel.org>; Mon, 17 Jun 2024 02:01:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1718614868; x=1719219668; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=yTYl2/ZQ/xc8gkjCt01pOD+CKrNvdaoiTl2/FOOyVvc=;
-        b=V2nd8o9elpWnzYexHW+CKAu7eLiY1H054dSlgBik1x5U/JYpVNaaIuDn4a4BlGa9VS
-         jtU+Y9CVYDLfbFEtgyVfbmwLENgXaZ67WRMYEOzB6AKlJG8tffmVTvbiUSWuW13167yt
-         EgGsCl4iHw1XuhzN5cuf2YllGvHG+9AEwMoyIhEktHK0uwuU9WwDNNWyK1/YB9km3chv
-         5KLjjpV6rUOkG4IXcHQFN/08iRP5wUJ2KDsyzYUbo4HEudSYdeI92l4G7JV5Z4eEgM8q
-         JKtYry64q6afYAXiKwHFnLEE8Ipoe6bQ9T0OVEFYmNAqKuQypzSTf8ncFgX/g2GVPNkO
-         eHug==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718614868; x=1719219668;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=yTYl2/ZQ/xc8gkjCt01pOD+CKrNvdaoiTl2/FOOyVvc=;
-        b=J8s1ovTevDSNjQICM3VHm/0jTplV2UOuV1VRcUrxDgGMg5F2BArrhr7soun/pfSc58
-         5R+vS7sf/gw/9tBs6hK2dpbhc1MQR1XfDdUiwv50rxhKBjpL+/4DsTgV6rN8qB5CnDo0
-         bJQSR8P5ldbp05B/JgYTd521EGccicGzGerl1Tpj7+2MC7AbDfkVxHs8OdqcJIstD3Hv
-         bhFUCy8sl0sRlb5ejVQWaX1MB8wmz9uHfKN3JrOc7PLBYvlj75kFM30qdunRcWIMlw5p
-         I67TlM2PT9LYKxbqghYyp3KyKUCMSHBDCsKC/4Ln1O6ZPvJJ4FTAE2KEXZnblQRSS510
-         ucdw==
-X-Gm-Message-State: AOJu0YwujXkRJK2mL1HqtMw9YPAxzcWevl7v03muv/kBQHSpX9zfcNOX
-	KTPQ69UvlPB0muGwZVnRi74nMETlmAlsvkKuFj9Ut3W/Lg1rDsiXA+bjRg==
-X-Google-Smtp-Source: AGHT+IEAbrPfHqxSp67i8ardhFXbJo0KVLfgSiPXhIW1BcQp/dKV23CxTodWnxhFaoqq/9hH0W7NUw==
-X-Received: by 2002:a17:903:2341:b0:1f7:42ba:5b1e with SMTP id d9443c01a7336-1f8625da084mr101582705ad.17.1718614867938;
-        Mon, 17 Jun 2024 02:01:07 -0700 (PDT)
-Received: from [172.17.0.2] ([52.225.76.176])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1f855e55c3bsm75332685ad.57.2024.06.17.02.01.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 17 Jun 2024 02:01:07 -0700 (PDT)
-Message-ID: <666ffb53.170a0220.972b1.41c6@mx.google.com>
-Date: Mon, 17 Jun 2024 02:01:07 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============0508875945292572898=="
+	s=arc-20240116; t=1718615135; c=relaxed/simple;
+	bh=Gjd8ir7yyZ2oShg/grTX2eKM4ONXZEbqonMrI8mDU6U=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=czCCQl8W76HHYGBzRIbccHFkVreCJvTSRvAYzVCdS49Aqek7y8PPEDvDgEj9gWq9jiYiKrATkQYJRUuKk7UpidIHjOvLcVruzDwUtwAmnIaiuP60yLQxqIXXTMiOGonJbMxIrlQalOZyd0+U+eJW2jgppaTcPHCLkkQLjrlJ8Os=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=realtek.com; spf=pass smtp.mailfrom=realtek.com; arc=none smtp.client-ip=211.75.126.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=realtek.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realtek.com
+X-SpamFilter-By: ArmorX SpamTrap 5.78 with qID 45H95M1Y03022767, This message is accepted by code: ctloc85258
+Received: from mail.realtek.com (rtexh36506.realtek.com.tw[172.21.6.27])
+	by rtits2.realtek.com.tw (8.15.2/2.95/5.92) with ESMTPS id 45H95M1Y03022767
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 17 Jun 2024 17:05:22 +0800
+Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
+ RTEXH36506.realtek.com.tw (172.21.6.27) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Mon, 17 Jun 2024 17:05:23 +0800
+Received: from localhost.localhost (172.21.132.53) by RTEXMBS04.realtek.com.tw
+ (172.21.6.97) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.35; Mon, 17 Jun
+ 2024 17:05:22 +0800
+From: Hilda Wu <hildawu@realtek.com>
+To: <marcel@holtmann.org>
+CC: <luiz.dentz@gmail.com>, <linux-bluetooth@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <alex_lu@realsil.com.cn>,
+        <max.chou@realtek.com>, <kidman@realtek.com>
+Subject: [PATCH v2] Bluetooth: btusb: Add RTL8852BE device 0489:e125 to device tables
+Date: Mon, 17 Jun 2024 17:05:18 +0800
+Message-ID: <20240617090518.3237642-1-hildawu@realtek.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, hildawu@realtek.com
-Subject: RE: Bluetooth: btusb: Add RTL8852BE device 0489:e125 to device tables
-In-Reply-To: <20240617082101.3237350-1-hildawu@realtek.com>
-References: <20240617082101.3237350-1-hildawu@realtek.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: RTEXH36506.realtek.com.tw (172.21.6.27) To
+ RTEXMBS04.realtek.com.tw (172.21.6.97)
 
---===============0508875945292572898==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Add the support ID 0489:e125 to usb_device_id table for
+Realtek RTL8852B chip.
 
-This is automated email and please do not reply to this email!
+The device info from /sys/kernel/debug/usb/devices as below.
 
-Dear submitter,
+T:  Bus=01 Lev=01 Prnt=01 Port=07 Cnt=03 Dev#=  5 Spd=12   MxCh= 0
+D:  Ver= 1.00 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+P:  Vendor=0489 ProdID=e125 Rev= 0.00
+S:  Manufacturer=Realtek
+S:  Product=Bluetooth Radio
+S:  SerialNumber=00e04c000001
+C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=500mA
+I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
+E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=862506
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      0.57 seconds
-GitLint                       PASS      0.23 seconds
-SubjectPrefix                 PASS      0.07 seconds
-BuildKernel                   PASS      30.60 seconds
-CheckAllWarning               PASS      32.79 seconds
-CheckSparse                   PASS      37.60 seconds
-CheckSmatch                   PASS      103.14 seconds
-BuildKernel32                 PASS      29.08 seconds
-TestRunnerSetup               PASS      523.46 seconds
-TestRunner_l2cap-tester       PASS      18.57 seconds
-TestRunner_iso-tester         PASS      39.05 seconds
-TestRunner_bnep-tester        PASS      4.95 seconds
-TestRunner_mgmt-tester        PASS      109.87 seconds
-TestRunner_rfcomm-tester      PASS      7.89 seconds
-TestRunner_sco-tester         PASS      15.15 seconds
-TestRunner_ioctl-tester       PASS      7.94 seconds
-TestRunner_mesh-tester        PASS      6.05 seconds
-TestRunner_smp-tester         PASS      7.02 seconds
-TestRunner_userchan-tester    PASS      5.12 seconds
-IncrementalBuild              PASS      27.63 seconds
-
-
+Signed-off-by: Hilda Wu <hildawu@realtek.com>
 
 ---
-Regards,
-Linux Bluetooth
+Change in v2:
+ - Add suitable spaces to commit log.
+---
+---
+ drivers/bluetooth/btusb.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 79aefdb3324d..2d7d47f9d007 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -555,6 +555,8 @@ static const struct usb_device_id quirks_table[] = {
+ 						     BTUSB_WIDEBAND_SPEECH },
+ 	{ USB_DEVICE(0x13d3, 0x3572), .driver_info = BTUSB_REALTEK |
+ 						     BTUSB_WIDEBAND_SPEECH },
++	{ USB_DEVICE(0x0489, 0xe125), .driver_info = BTUSB_REALTEK |
++						     BTUSB_WIDEBAND_SPEECH },
+ 
+ 	/* Realtek 8852BT/8852BE-VT Bluetooth devices */
+ 	{ USB_DEVICE(0x0bda, 0x8520), .driver_info = BTUSB_REALTEK |
+-- 
+2.34.1
 
---===============0508875945292572898==--
