@@ -1,80 +1,84 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-21.smtp.github.com (out-21.smtp.github.com [192.30.252.204])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 773D513C3F2;
-	Mon, 17 Jun 2024 14:10:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 015B013DDD4
+	for <linux-bluetooth@vger.kernel.org>; Mon, 17 Jun 2024 14:13:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.204
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718633431; cv=none; b=BZgaa3e/0KbzYDcuy7meQeoRolyvY1yxp9wa/kjNcl9rHFJ9pGaDEluxlsEJq95GkfUQ4KBrTPM06ScXT7NHdSvId3PCVGDf2yRWJFo0yonbrgzJ8AtWYdL/Ap/eocZTfpqJXDkUHqPR0WseBNepcOBYhXBM+EIAThP7Wh3HkiY=
+	t=1718633640; cv=none; b=pMfP9Xf6s+7M86fd1Jb4vn0yIHrwI/Ro3TAv+bCgC+xQNNIVsvYFeXp2lhx7XaRXgXeGw8XdHHAsmbRHX1NOf8WcfyGsD2kfDVwQRjGtoq2pgQbaJlyTymv92EStqG+/B5AvYaGirjAVpZuKJlVv0HLLNgW7tBcqy8NBrFsxy2w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718633431; c=relaxed/simple;
-	bh=ZY0frUm/l/ELazp3keFtHSZU2+jYmNK9nHk3XE/5PDM=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=MLgMl43w/KHY0NmMchjyXIBpKy8BaCt8krxr1AnxpFF4pSDkoq9KyWzOcv/M3Fm7uK/4qgWul0FCmTo+2aUhyrDNkVtBq510H/C34AhVPy4r2jasx38JECuUv6Nk1YrVKXNtONnwM5dlNlVwlxIcYj3CNL1OYPsVGEeddJKKUkk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eeUml2zM; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1718633640; c=relaxed/simple;
+	bh=v2YXdGr85z2uIo/MsvNLSgA8hzP6OH8Ge5tDIM0bD2g=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=VXol5hf7zXytHZoMGl7GbJTf9g5oOUjUTDh7LoXklcjeXXGlQwqcW9oS3zMKBjlGY+1Xg1cmRObQhyh7OTmJ5tB+IwKfkdElry7KDjX0GMdN4reIWUuZrXl9zz3Hz4gfRDVQFoPlib/DEQYgV4HM1LLKTmVuWcl4qBK8HFWxx1g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=Kt2hdMsy; arc=none smtp.client-ip=192.30.252.204
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eeUml2zM"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 1AD6EC4DDF3;
-	Mon, 17 Jun 2024 14:10:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718633431;
-	bh=ZY0frUm/l/ELazp3keFtHSZU2+jYmNK9nHk3XE/5PDM=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=eeUml2zMnU9Tr5usyo/xu22P0H0SOSWbGapAD48Ecn7eOpCgavdMidKMLs0eJS9DY
-	 mL9Uart+1OAdxwAb6t5nIgWaaIGP0z8KEJDhtsm58N6FJiN3tYjHnRREycPY1u1ZE2
-	 qZOleREEQumGu+73JOertCtKUPMelURDh5/yciWo54NHp7yBMPUxKGYWVRD3a6Pc+x
-	 Chd041nW/rl82cKPyZ6gEu82jrx+EjXVvWml44LO8c1sxdVEgmBoUJyc2p1wzJAzwF
-	 ZSt0ODjkQ8Xr7aQhr5M6AT16PCK3VuClD8wQy3TYnxiDsLGnTqk+hDYTJYlL7VS3N3
-	 oCJn4IgFdTHbw==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id EF192C4361B;
-	Mon, 17 Jun 2024 14:10:30 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="Kt2hdMsy"
+Received: from github.com (hubbernetes-node-5da50dd.ac4-iad.github.net [10.52.154.32])
+	by smtp.github.com (Postfix) with ESMTPA id 2A5FE701220
+	for <linux-bluetooth@vger.kernel.org>; Mon, 17 Jun 2024 07:13:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1718633638;
+	bh=PNVeexk7JBAANUoKJMex8uRhHoNFaI4kgzPJhoSabT0=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=Kt2hdMsy0TnAjqUm2xaLcErNDDKaKTdq8G+uh0C+gAxuTJXutfTXMr1XFosU7P3zS
+	 O4xOLAlvF4BbLNzqN80jYARG/5/HRQtJ3zl2zig87OlVW9/9oNLoseb1quhRSQ99Lu
+	 RbobioFYWBZ5iS7CjigaSfJF30Jrz6UR+Xxc+x/g=
+Date: Mon, 17 Jun 2024 07:13:58 -0700
+From: vlad-pruteanu <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/master/48b7f7-7ff745@github.com>
+Subject: [bluez/bluez] 9e496c: shared/util: Update SDO defined UUIDs
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2] Bluetooth: Ignore too large handle values in BIG
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <171863343097.8850.935824555783496146.git-patchwork-notify@kernel.org>
-Date: Mon, 17 Jun 2024 14:10:30 +0000
-References: <tencent_E43E1B2F25E4BA5EBBEC33229E5E1BEB4B08@qq.com>
-In-Reply-To: <tencent_E43E1B2F25E4BA5EBBEC33229E5E1BEB4B08@qq.com>
-To: Edward Adam Davis <eadavis@qq.com>
-Cc: pmenzel@molgen.mpg.de, davem@davemloft.net, edumazet@google.com,
- johan.hedberg@gmail.com, kuba@kernel.org, linux-bluetooth@vger.kernel.org,
- linux-kernel@vger.kernel.org, luiz.dentz@gmail.com, luiz.von.dentz@intel.com,
- marcel@holtmann.org, netdev@vger.kernel.org, pabeni@redhat.com,
- syzkaller-bugs@googlegroups.com, william.xuanziyang@huawei.com
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-Hello:
+  Branch: refs/heads/master
+  Home:   https://github.com/bluez/bluez
+  Commit: 9e496c216f463b8a14d35e2715d796dc84bb339a
+      https://github.com/bluez/bluez/commit/9e496c216f463b8a14d35e2715d796dc84bb339a
+  Author: Arkadiusz Bokowy <arkadiusz.bokowy@gmail.com>
+  Date:   2024-06-17 (Mon, 17 Jun 2024)
 
-This patch was applied to bluetooth/bluetooth-next.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+  Changed paths:
+    M src/shared/util.c
 
-On Mon, 17 Jun 2024 19:09:37 +0800 you wrote:
-> hci_le_big_sync_established_evt is necessary to filter out cases where the
-> handle value is belonging to ida id range, otherwise ida will be erroneously
-> released in hci_conn_cleanup.
-> 
-> Fixes: 181a42edddf5 ("Bluetooth: Make handle of hci_conn be unique")
-> Reported-by: syzbot+b2545b087a01a7319474@syzkaller.appspotmail.com
-> Closes: https://syzkaller.appspot.com/bug?extid=b2545b087a01a7319474
-> Signed-off-by: Edward Adam Davis <eadavis@qq.com>
-> 
-> [...]
+  Log Message:
+  -----------
+  shared/util: Update SDO defined UUIDs
 
-Here is the summary with links:
-  - [v2] Bluetooth: Ignore too large handle values in BIG
-    https://git.kernel.org/bluetooth/bluetooth-next/c/401ad9b792e1
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+The list of SDO defined UUIDs taken from section 3.10 of:
+https://www.bluetooth.com/wp-content/uploads/Files/Specification/HTML/Assigned_Numbers/out/en/Assigned_Numbers.pdf
 
 
+  Commit: 7ff745c2bd0c2656a7022ee11c67c6d8dc8494a6
+      https://github.com/bluez/bluez/commit/7ff745c2bd0c2656a7022ee11c67c6d8dc8494a6
+  Author: Vlad Pruteanu <vlad.pruteanu@nxp.com>
+  Date:   2024-06-17 (Mon, 17 Jun 2024)
+
+  Changed paths:
+    M src/adapter.c
+
+  Log Message:
+  -----------
+  src/adapter: Check if device is connected before clean up
+
+Broadcast sources are currently deleted on the clean up triggered
+by turning scan off. Thix fix prevents the removal of sources to
+which we are synced by also checking if the device that will be
+removed is connected (sources to which we are synced are already
+marked as connected).
+
+
+Compare: https://github.com/bluez/bluez/compare/48b7f7e5fe53...7ff745c2bd0c
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
