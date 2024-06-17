@@ -1,111 +1,103 @@
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16A02187337;
-	Mon, 17 Jun 2024 07:01:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F2E3187339;
+	Mon, 17 Jun 2024 07:14:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718607703; cv=none; b=WfBpzdftJ6neRMZlBZPfAkTHJfnWNyrzkZ/jKP4hbXQ6LI5V9KzTiAhWqb6zihSVwQEoIdeHWF5fHKkCCxkJ3JOfcSheOE3htH3gqVtyFeI5YBXaqE/lcuxGBZxhNLYYDcBRAsVs2NeSCGmoXMx6oID+jOFkRqEa9ZM10D8Y1Mo=
+	t=1718608496; cv=none; b=kmbVy9J/rfCaHDiq6XbMK6h256fBU6IO/F4cIxSKPJMdbpJ6lRUM/tb2KV4m75Ruy8II97PTHw5zXxeur4h+shue15NGFIB1YkVzsQGfrLyy8e4CJEv2lSYDHvCK+IymsoYPwLYuLYCG8cYegaJEDB6l49n4omsKDqzc7IZoF9I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718607703; c=relaxed/simple;
-	bh=Klr9xhZV+I6k2FQesG4sY2yBk1nNGSSVrtAem4YIPz4=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=fsT22vI5EjWxKSJviUnjWu5ov/RZJCa+Mrj1IbYVnR8SuXrMTfizC1LIoJ4sR+ypYL9FRh3D8Som58ErEqEqpKoUYBBoBW64btTaw54oK3E1VLrplPo1hMPLNMd3C5Hgma2+dovsIOJ1Bz3CJKqI5mg3nK/GsM1nqlYBvHPa10I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=jiknG06i; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="jiknG06i"
-Received: from pps.filterd (m0279869.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 45GN0rFc003898;
-	Mon, 17 Jun 2024 07:01:37 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-type:date:from:message-id:mime-version:subject:to; s=
-	qcppdkim1; bh=WmU+f25Abmug8NQIuVhV19e7A10T3q8jZsyCdyPsYG4=; b=ji
-	knG06iJcJm1DWQqEFvc2zoX0rV6fSaCBUKG8shE62QdYpqcVRzDQFHDyFQNb5NDa
-	pH7h8PDtLuT/v2ikp1RD4fIgxRFrlztoWqc/v8BowmdB5dniqGcbAaGu7BJVTyku
-	xa9Jau9Vl29S0srp5cCYUxQJZx4cMceG0zpuXgpNHL31IURrCOJ8MPLrsl0m3eJ3
-	yGoSeCq7uxMGpdHrnUCSaoaof+P2B2m2XrR62v7u+zCHqSPPjrXr14zwXHWha1US
-	Lhd33iQPhQk3i006nIGdosdsiOkWuJtFZfJ8tkMEaG4Bzp47vkc/AjOgsviYsEZF
-	pM2OZDu6Uxg8Ykx34Qww==
-Received: from nalasppmta02.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3ys1y6u0bk-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 17 Jun 2024 07:01:37 +0000 (GMT)
-Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
-	by NALASPPMTA02.qualcomm.com (8.17.1.19/8.17.1.19) with ESMTPS id 45H71af7028423
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 17 Jun 2024 07:01:36 GMT
-Received: from hu-janathot-hyd.qualcomm.com (10.80.80.8) by
- nalasex01a.na.qualcomm.com (10.47.209.196) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.9; Mon, 17 Jun 2024 00:01:33 -0700
-From: Janaki Ramaiah Thota <quic_janathot@quicinc.com>
-To: Marcel Holtmann <marcel@holtmann.org>,
-        Luiz Augusto von Dentz
-	<luiz.dentz@gmail.com>
-CC: <quic_mohamull@quicinc.com>, <quic_hbandi@quicinc.com>,
-        <linux-bluetooth@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: [PATCH v1] Bluetooth: hci_qca: Increase settling time for baudrate change VSC
-Date: Mon, 17 Jun 2024 12:30:39 +0530
-Message-ID: <20240617070039.30824-1-quic_janathot@quicinc.com>
-X-Mailer: git-send-email 2.17.1
+	s=arc-20240116; t=1718608496; c=relaxed/simple;
+	bh=RZ1n7wu/VvC4kGOxlwpcl7vWJ5w1T72u7IRgjXNV3Ik=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=pC67sw9MqUw/zrQQFYOYl1muEaC2OzlryEE04OCKSvZgEKvvEWJWU8TI7KJyGI7NZk4zSpSErV06dhU6MyOyWDdr50g3vH14PtJ/TT+4cTDAe97syu44Tvx7ccUMJMPSN7EvipjRR5BhpoNOIaUgSPo2eYbrjtr7nhUUj+5dBz0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
+Received: from [192.168.0.53] (ip5f5aeabd.dynamic.kabel-deutschland.de [95.90.234.189])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id E1DC461E5FE07;
+	Mon, 17 Jun 2024 09:14:39 +0200 (CEST)
+Message-ID: <80ca0fd6-b666-4e84-a3eb-d3f6d9bfdc05@molgen.mpg.de>
+Date: Mon, 17 Jun 2024 09:14:39 +0200
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nalasex01a.na.qualcomm.com (10.47.209.196)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: NcExvQ2p5c1vLvDKhQn5usjxX87fbp-h
-X-Proofpoint-ORIG-GUID: NcExvQ2p5c1vLvDKhQn5usjxX87fbp-h
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-06-17_05,2024-06-14_03,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- adultscore=0 impostorscore=0 mlxscore=0 bulkscore=0 clxscore=1011
- lowpriorityscore=0 spamscore=0 mlxlogscore=887 suspectscore=0 phishscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2405170001 definitions=main-2406170050
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v1] Bluetooth: hci_qca: Increase settling time for
+ baudrate change VSC
+To: Janaki Ramaiah Thota <quic_janathot@quicinc.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>, quic_mohamull@quicinc.com,
+ quic_hbandi@quicinc.com, linux-bluetooth@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20240617070039.30824-1-quic_janathot@quicinc.com>
+Content-Language: en-US
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <20240617070039.30824-1-quic_janathot@quicinc.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-This change is done to align the settling time and
-synchronization for baudrate VSC for WCN6750.
+Dear Janaki,
 
-In logging disabled builds and few devices
-baudrate change and flow control is taking time
-so increasing the wait time to controller and uart
-to handle baudrate change request properly.
 
-Signed-off-by: Janaki Ramaiah Thota <quic_janathot@quicinc.com>
----
- drivers/bluetooth/hci_qca.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+Thank you for your patch. Please be more specific in the summary/title:
 
-diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-index 0c9c9ee56592..667687835306 100644
---- a/drivers/bluetooth/hci_qca.c
-+++ b/drivers/bluetooth/hci_qca.c
-@@ -1356,12 +1356,15 @@ static int qca_set_baudrate(struct hci_dev *hdev, uint8_t baudrate)
- 	case QCA_WCN3990:
- 	case QCA_WCN3991:
- 	case QCA_WCN3998:
--	case QCA_WCN6750:
- 	case QCA_WCN6855:
- 	case QCA_WCN7850:
- 		usleep_range(1000, 10000);
- 		break;
- 
-+	case QCA_WCN6750:
-+		msleep(30);
-+		break;
-+
- 	default:
- 		msleep(300);
- 	}
--- 
-The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum,
-a Linux Foundation Collaborative Project
+> Increase settling time for baudrate change VSC to 30 ms
 
+
+Am 17.06.24 um 09:00 schrieb Janaki Ramaiah Thota:
+> This change is done to align the settling time and
+> synchronization for baudrate VSC for WCN6750.
+> 
+> In logging disabled builds and few devices
+> baudrate change and flow control is taking time
+> so increasing the wait time to controller and uart
+> to handle baudrate change request properly.
+
+Is the 30 ms documented in some datasheet?
+
+Please use 75 characters per line.
+
+Please document the test system.
+
+> Signed-off-by: Janaki Ramaiah Thota <quic_janathot@quicinc.com>
+> ---
+>   drivers/bluetooth/hci_qca.c | 5 ++++-
+>   1 file changed, 4 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+> index 0c9c9ee56592..667687835306 100644
+> --- a/drivers/bluetooth/hci_qca.c
+> +++ b/drivers/bluetooth/hci_qca.c
+> @@ -1356,12 +1356,15 @@ static int qca_set_baudrate(struct hci_dev *hdev, uint8_t baudrate)
+>   	case QCA_WCN3990:
+>   	case QCA_WCN3991:
+>   	case QCA_WCN3998:
+> -	case QCA_WCN6750:
+>   	case QCA_WCN6855:
+>   	case QCA_WCN7850:
+>   		usleep_range(1000, 10000);
+>   		break;
+>   
+> +	case QCA_WCN6750:
+> +		msleep(30);
+
+Why not usleep_range?
+
+> +		break;
+> +
+>   	default:
+>   		msleep(300);
+>   	}
+
+
+Kind regards,
+
+Paul
