@@ -1,33 +1,33 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28F3F198E98
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A595198E9E
 	for <linux-bluetooth@vger.kernel.org>; Mon, 17 Jun 2024 19:10:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718651433; cv=none; b=qLyLWdRxcTs2UU3SK5UtF6Tk75z1KJ4tOko4xdnR15NofrNsxEtZcn/7kUxaF/MBWUHRburwSpjOB5YxkRBZJ3ZvNoeMX1uVJDx/s/Ryb97Qfnk/KCYm8A/O9wTDT18nYMtJrwyAkbaCx0OW/By6oJTEhfoS0WrzMcw31sFutZw=
+	t=1718651433; cv=none; b=FnE0a4umte1DgmKpdrQX6QOB6AB747glATBa0rXHFVzBXA7tEmd3+i6qM5hZuQu4TVtU3cXFfN5hsUc9xenBjLGXnihuTMXNwiJY439oB5RUrc3SeXDKHqsRzgWOUp4qMGKQwhEDRMDu3SOEQEEr4AlL53hYzJOWOrLN9SUUosg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1718651433; c=relaxed/simple;
-	bh=R6uaZ/LqJKjNfZA/c0GM9CP7/GT3XkLQDrZM+OUjzeE=;
+	bh=pHQw+gNmbZALWxFaOHC6OlZAvGipYGAnMP26IvQInh8=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=gpE3gkXAHdVOz3x1MeCRyc1kJVxiKVXSn++OSCSy/zyLWcwk/rVnsvSokDFSI69OghiYYIa51UKHuA9+46LB5dF94kHb34E76wpX7dHr6Wx58MetGTz3qoujKcPrP8O9R0BtBo6ZQ+9Q8fIsRvHeyIBnXal3TWfNGPG6cDgIo2o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VZ8USBF+; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=WUVeL/xSzldOk1fwvJPFhwc/h6aBphOCxuCAYqZRhHWHs1vvxGebearccvXhEvzJH4lCR75iRvux+DtSo93hlOYcOosiPhkxrgMlturqvcne6j6FAA6q+VyhfqsjltgVnmCj1FZUbLiP4jXrO+X3nVVQnTqZ+WccDA7fZFOaCJg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FYmDSjYO; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VZ8USBF+"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id B2786C4AF1C;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FYmDSjYO"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id B6E56C4AF1A;
 	Mon, 17 Jun 2024 19:10:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1718651432;
-	bh=R6uaZ/LqJKjNfZA/c0GM9CP7/GT3XkLQDrZM+OUjzeE=;
+	bh=pHQw+gNmbZALWxFaOHC6OlZAvGipYGAnMP26IvQInh8=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=VZ8USBF+jqf+UQgwa8qLm9bg6aEtno0laxoYsKqID6gPQHaZLXtHlPXa5JYWeypyv
-	 kx4WxWLIvfMz5ysiZRQwMEK41jwXlahkwHLTcOMPiGuwqXCQp0vewkktfX1j2f7Fyk
-	 Nu6aacQ5QJ/6MPv35Vd0BBNgasGe3t7AtRXh6N+J1ls/EKDkWHbvn4XZLYOapnc5Y6
-	 RL2qyyOtFVpQOXA6RphEHuIu3uQbSSOG2Nkb6QZDLK6jfY6hABI8I6jMtebdxuCf2z
-	 YE7CdR1ZU44+DHWuCfbSLPwPLwLS75MDTQAjCSf5IQ1FMMyprU9UOAqm7ZBvg0LtEq
-	 eUewD2df7dhuw==
+	b=FYmDSjYOK4IhrnQuL5CxhSZa63XzOhLDChddSk5j5aiQBeiaPtNy3RJxZT7tjT83Q
+	 qb0Y01bckK2t3L4Z1U9lRu05tmNm7NIDARMmy/m9dw+Y1/vIjNvJ++Uo5NQkUHTAga
+	 woy+hsl7jOpjxlMV4237eoNSpfW97V8+0Id3/WtxQpemxegBIEUKVhT4Lsp0ShEW+F
+	 wjFzc6HjakbH1dGiAU4TJtk06ET6Kb25EuBFwTGU1XxPmq7C9UVsNr8hJMgl8owS7k
+	 9DSlld4TV6u1k1W0uVkLMiQkTZXMNil6YQtGfXdKsJHUiMY7rsGaftz0tbZIbAxU6E
+	 IZ63aHj9e3tpg==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id A0F19C4936D;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id A9A8AC4167D;
 	Mon, 17 Jun 2024 19:10:32 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -37,13 +37,14 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH BlueZ] transport: fix crash when freeing transport
+Subject: Re: [PATCH BlueZ v2] shared/bap: make BT_BAP_* direction defines valid
+ bitmasks
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <171865143265.1080.60294571697268947.git-patchwork-notify@kernel.org>
+ <171865143269.1080.8483055150378303739.git-patchwork-notify@kernel.org>
 Date: Mon, 17 Jun 2024 19:10:32 +0000
-References: <ee5b81f6306bb9ac014b02c028d159295acc469a.1718644267.git.pav@iki.fi>
-In-Reply-To: <ee5b81f6306bb9ac014b02c028d159295acc469a.1718644267.git.pav@iki.fi>
+References: <8dded7c01676b68e3042dbd0021e97c198a03b49.1718643571.git.pav@iki.fi>
+In-Reply-To: <8dded7c01676b68e3042dbd0021e97c198a03b49.1718643571.git.pav@iki.fi>
 To: Pauli Virtanen <pav@iki.fi>
 Cc: linux-bluetooth@vger.kernel.org
 
@@ -52,26 +53,21 @@ Hello:
 This patch was applied to bluetooth/bluez.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Mon, 17 Jun 2024 20:11:53 +0300 you wrote:
-> Fix UAF by freeing transport->remote_endpoint in media_transport_free,
-> which also frees the struct (not in destroy after the struct is freed).
+On Mon, 17 Jun 2024 19:59:40 +0300 you wrote:
+> The directions appear to be intended as bitmasks, as
+> bt_bap_stream_io_dir() will bitwise or linked stream directions.
 > 
-> ERROR: AddressSanitizer: heap-use-after-free
-> READ of size 8 at 0x508000022ab8 thread T0
->     #0 0x493624 in media_transport_destroy profiles/audio/transport.c:223
-> ...
-> freed by thread T0 here:
->     #1 0x7fb057d10294 in g_free (/lib64/libglib-2.0.so.0+0x5d294)
->     #2 0x49dd2d in media_transport_free profiles/audio/transport.c:1276
->     #3 0x7e0e99 in remove_interface gdbus/object.c:682
->     #4 0x7e8f40 in g_dbus_unregister_interface gdbus/object.c:1430
->     #5 0x4935a2 in media_transport_destroy profiles/audio/transport.c:220
+> Fix the defines to be separate bits.
+> 
+> Fixes confusion due to BT_BAP_BCAST_SOURCE == BT_BAP_SINK|BT_BAP_SOURCE,
+> which causes e.g. unicast transports to be in PENDING state after QoS
+> although this does not make sense for BAP unicast Client.
 > 
 > [...]
 
 Here is the summary with links:
-  - [BlueZ] transport: fix crash when freeing transport
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=87ad4c66b934
+  - [BlueZ,v2] shared/bap: make BT_BAP_* direction defines valid bitmasks
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=52bda9d45572
 
 You are awesome, thank you!
 -- 
