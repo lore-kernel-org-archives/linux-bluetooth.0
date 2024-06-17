@@ -1,65 +1,58 @@
-Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [185.185.170.37])
+Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25C0716631B
-	for <linux-bluetooth@vger.kernel.org>; Mon, 17 Jun 2024 16:59:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=185.185.170.37
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1478016A93D
+	for <linux-bluetooth@vger.kernel.org>; Mon, 17 Jun 2024 17:11:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=195.140.195.201
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718643594; cv=pass; b=a5LVk4OHPqRThQklBEn2MVBd7l3EVWarMMag3Yk/yp0S+bnX3D/1cb5Kys6O3GuRM0KSCmz14pRm9VsvztjECYLZOKoRrv8NAakZEK/PvnnIg45yxahCmIp133dALYfx68+7AOKSd+VKrUgOejYK2eMsRcrIUcOfqa4WvwtFTqY=
+	t=1718644321; cv=pass; b=id5CJWyZgef8nXYuyDztrRH7obs9tmNTolMc+e19Y/u4THcLjQVPIixIQvLf310wVXa6CAwO7d0HJyjopYtt4cFLt+Lx1fpYp/IK5gYdeSygmZ8X+AJTzRRzZMwEUelMF3vtabAwUVzYWlypab3GDGUA2GblPnlwJ5YAjhbXLjc=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718643594; c=relaxed/simple;
-	bh=sBCZV3xQWlhUAkp4EPssHKjE8mjVM/W0m3L3eoc1sMM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=mTx+VH2hAQLBGO3jq9Bfyi9YHHKSZPjwUTCUtstidWHo7Bq9ialea6DpI7duH/O23tMCTGJoyLJe5qvGIV0N9ccta4syxN3cn5WaD9R61J9S22aZd+qStd7gYs3oLnibsGkVePDK1SWCX7mpG7yIt23KoXgGWJBktTWkfD9l5wg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=Y4A6PhhA; arc=pass smtp.client-ip=185.185.170.37
+	s=arc-20240116; t=1718644321; c=relaxed/simple;
+	bh=B+Ccst78SC9JGCU7eJ1QXYvCy7AfN2tXvM02ihU8hjI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=OM+VXCd+kSe1GvaaP1CiHaGZjeuU7Qz/y5iQZ3FIJKwoADbTXXiO8IX8Ll9ZtApm+2KC1DBJeiTnCDERS+/8XVDWY8/IWnkXBGg1PdojiKDR0ddVTBq+Ftg9fndIYlNz4iJEv5g9AvmXHfNr6qagqi87sgGai44iowGfMN2MH5E=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=XevCgcaR; arc=pass smtp.client-ip=195.140.195.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="Y4A6PhhA"
+	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="XevCgcaR"
 Received: from monolith.lan (unknown [193.138.7.138])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: pav)
-	by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4W2x2F2YwXz49Pyq;
-	Mon, 17 Jun 2024 19:59:49 +0300 (EEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
-	t=1718643589;
+	by meesny.iki.fi (Postfix) with ESMTPSA id 4W2xJD4wvKzyS6;
+	Mon, 17 Jun 2024 20:11:55 +0300 (EEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
+	t=1718644317;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding;
-	bh=9AE2y6Gj7mMGlS+2EZwxrpHi3eWlrWwvC9Utw/42wkM=;
-	b=Y4A6PhhALGhdBrlq5B6Rz7MYCDDk1DoeELroyTgFfU+Ql2K8kCWqGWzAcwUfIiGDUzRVXO
-	ic+fnOUWWbKRcu0Z4SxfXnz16/kOIJfpQTL6NmxhUoHbCK7NI45OmC0GWqiKJ6KsCmZ2Pg
-	v5F9unf4CrH1GSaZ8kqm3xd8WEaNgHsMEZeMxJ/rkQ8th+peH+MflnqK5sD6wnNgfV2M7U
-	3HtBVJrj0R5hAB9bvSc+TAvTOhWei4o7godUd2vg6CyEhfgazVIjfkV/zph7wD07qcZh96
-	T3ginVXKGcAdGdIqefiRaa1G7iDyK8rlsUqJcqahO+lS1bNgV12xH2OCVOzlQw==
-ARC-Seal: i=1; s=lahtoruutu; d=iki.fi; t=1718643589; a=rsa-sha256;
-	cv=none;
-	b=EniMZNAzGHs8Nd/ZebmZlJmibaaUi9stlsd4vxSqwLjJn28d9au56POkiNLDCfqypULlKA
-	GWaGxTybGZWCbkMJ/O5nxX5qFaGR926gAR0e6C576NJ9IF0NUezFS6JgfroXIqTQai/qy0
-	rUkVM6ezZEMQSNLEnrbLKdbYpSJLvKZGQuYSyM6Ffw0dhTPKz9+S2GAIoTIUCq398eIrmx
-	NEwawYnh+GpYE2Iztl9ym/Ioc/1kcaRhCv2ilOyFwrZduKjVQM+3/1TQVSIZexZVz3y+Rs
-	M21ySvX/bNWNC7YjvffAOcONAGV5zS4UcjWoXchePMHJaUVc7ZtTSMis/DNkjg==
+	bh=kavpnbwg9Rz7IwjOzIRyFE+xqzhGs427j0LdVSM7deo=;
+	b=XevCgcaRTwKKFZoHkKFcToCqnL30nClhrfclc8b88qwC/b5rtf8UCkjoCijVyZjM9ASo96
+	ftwuVwetA0TiJ/pkOL5w8ZSGwAC3f5bLNfdCly9A/dX+aZv50ussKZmybshQW+0xKq2maZ
+	pOIGg5i6xfBol1e3JDv32p3C+3/1/jY=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
+	s=meesny; t=1718644317;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=kavpnbwg9Rz7IwjOzIRyFE+xqzhGs427j0LdVSM7deo=;
+	b=GCh25QlobMle2qOQdPYbr4SBZNEUjv/c9oxnbcSaJmn79YQXYlM+iu0oPtVurHc04m6hRE
+	r1RjzGkYEibIdx27PIUKCLxFi2yhdVbsAqhYPSyP/eDbqO/U42IxFAyMZd9pqqBEIFvFjR
+	I9/xVAcDBMzUs4Lc4PfR8K/2RdBxqdA=
 ARC-Authentication-Results: i=1;
 	ORIGINATING;
 	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=lahtoruutu; t=1718643589;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=9AE2y6Gj7mMGlS+2EZwxrpHi3eWlrWwvC9Utw/42wkM=;
-	b=VgcHsDx5hfCmqJbP9mKVSANlhKWj1e6uLLwhtvimhmXisL5xiQ7IbWlucMaPfZMpZS0FrX
-	d3Cmck899F5noaetbzQmZljbUH+hTbMpAYkqzRzFKrUuDdLIX7ugGN4qw8XyCCqFqtQ1yP
-	r36DjxiQzyrZe6Dkjg5uy4kF8bNcTbVE2/f5YFdSR086ToJaAe1/69PeBLKz3cWXd4Qgfl
-	wUSYHYaFVfq+kdnydG1E+hFSDP5Eu+g1CJ8HIKeXziaw+i0MCNn8Cz2IKt9EMLC5NXoFOX
-	vOqu+wZTd1jHpH4HoHbd8vU9Jb2AyO3sSTcGjwE8RuSQTWoPX0w17Nj6KQIG2g==
+ARC-Seal: i=1; s=meesny; d=iki.fi; t=1718644317; a=rsa-sha256; cv=none;
+	b=Yvf9vzair7L7wy4QfKIGKT8uIa6rl3Gv4EeWyiRXnApQUBKTgvT7ARzFRDkFhE+6vuEK1p
+	44u9pvXAP+WYRtN6UlpDN8my4d79famiaBn7jjraEKfD7oOFi9oJaEM6MrXWg2U5drZbLa
+	5COSbHES48YqgrzhmswQV6SRST7VMUQ=
 From: Pauli Virtanen <pav@iki.fi>
 To: linux-bluetooth@vger.kernel.org
 Cc: Pauli Virtanen <pav@iki.fi>
-Subject: [PATCH BlueZ v2] shared/bap: make BT_BAP_* direction defines valid bitmasks
-Date: Mon, 17 Jun 2024 19:59:40 +0300
-Message-ID: <8dded7c01676b68e3042dbd0021e97c198a03b49.1718643571.git.pav@iki.fi>
+Subject: [PATCH BlueZ] transport: fix crash when freeing transport
+Date: Mon, 17 Jun 2024 20:11:53 +0300
+Message-ID: <ee5b81f6306bb9ac014b02c028d159295acc469a.1718644267.git.pav@iki.fi>
 X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -69,41 +62,45 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The directions appear to be intended as bitmasks, as
-bt_bap_stream_io_dir() will bitwise or linked stream directions.
+Fix UAF by freeing transport->remote_endpoint in media_transport_free,
+which also frees the struct (not in destroy after the struct is freed).
 
-Fix the defines to be separate bits.
-
-Fixes confusion due to BT_BAP_BCAST_SOURCE == BT_BAP_SINK|BT_BAP_SOURCE,
-which causes e.g. unicast transports to be in PENDING state after QoS
-although this does not make sense for BAP unicast Client.
+ERROR: AddressSanitizer: heap-use-after-free
+READ of size 8 at 0x508000022ab8 thread T0
+    #0 0x493624 in media_transport_destroy profiles/audio/transport.c:223
+...
+freed by thread T0 here:
+    #1 0x7fb057d10294 in g_free (/lib64/libglib-2.0.so.0+0x5d294)
+    #2 0x49dd2d in media_transport_free profiles/audio/transport.c:1276
+    #3 0x7e0e99 in remove_interface gdbus/object.c:682
+    #4 0x7e8f40 in g_dbus_unregister_interface gdbus/object.c:1430
+    #5 0x4935a2 in media_transport_destroy profiles/audio/transport.c:220
 ---
+ profiles/audio/transport.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
 
-Notes:
-    v2: use BIT macro
-
- src/shared/bap-defs.h | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
-
-diff --git a/src/shared/bap-defs.h b/src/shared/bap-defs.h
-index 2467e816f..27fefa34f 100644
---- a/src/shared/bap-defs.h
-+++ b/src/shared/bap-defs.h
-@@ -15,10 +15,10 @@
- #define __packed __attribute__((packed))
- #endif
+diff --git a/profiles/audio/transport.c b/profiles/audio/transport.c
+index 0ce94bae3..922911cf3 100644
+--- a/profiles/audio/transport.c
++++ b/profiles/audio/transport.c
+@@ -220,9 +220,6 @@ void media_transport_destroy(struct media_transport *transport)
+ 	g_dbus_unregister_interface(btd_get_dbus_connection(), path,
+ 						MEDIA_TRANSPORT_INTERFACE);
  
--#define BT_BAP_SINK			0x01
--#define	BT_BAP_SOURCE			0x02
--#define	BT_BAP_BCAST_SOURCE		0x03
--#define	BT_BAP_BCAST_SINK		0x04
-+#define BT_BAP_SINK			BIT(0)
-+#define	BT_BAP_SOURCE			BIT(1)
-+#define	BT_BAP_BCAST_SOURCE		BIT(2)
-+#define	BT_BAP_BCAST_SINK		BIT(3)
+-	if (transport->remote_endpoint)
+-		g_free(transport->remote_endpoint);
+-
+ 	g_free(path);
+ }
  
- #define BT_BAP_STREAM_TYPE_UCAST	0x01
- #define	BT_BAP_STREAM_TYPE_BCAST	0x02
+@@ -1271,6 +1268,7 @@ static void media_transport_free(void *data)
+ 	if (transport->ops && transport->ops->destroy)
+ 		transport->ops->destroy(transport->data);
+ 
++	g_free(transport->remote_endpoint);
+ 	g_free(transport->configuration);
+ 	g_free(transport->path);
+ 	g_free(transport);
 -- 
 2.45.2
 
