@@ -1,98 +1,163 @@
-Received: from out-17.smtp.github.com (out-17.smtp.github.com [192.30.252.200])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f207.google.com (mail-il1-f207.google.com [209.85.166.207])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04D69167DAC
-	for <linux-bluetooth@vger.kernel.org>; Mon, 17 Jun 2024 19:11:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A55F116A94F
+	for <linux-bluetooth@vger.kernel.org>; Mon, 17 Jun 2024 20:36:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.207
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718651487; cv=none; b=TzpeeYfLrHM1MICa4gvzsrJ19CCGjODNtbiRcl7ADbX7NygM/jt3OZOOLElJFxqZ9rLqCSMASzsMR6Sj5CrOZGSZpUkrVe7HNMSXsWsJYafMLi8p0hUvkirZpi1uZxpNA4MdmnK1N93b/59NI/JjVb9bwZpQ9VfsV5OvqWmXhhY=
+	t=1718656585; cv=none; b=dd3pWIvinbkPwQF8/0m67R59GWS+atsGh9AVE90uZfuGmPvlORgSo9KUaULe9jlnsbgR53+IwV5p5FD7I2/vhY4EKZ+MOkfCeZJyhjefPAOc791Uo4Q1BjZjcJby6oRV9TmX+W2PJv5QkbQ3p0qv2eo/iUF3cwXyn1T7mOH+FRQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718651487; c=relaxed/simple;
-	bh=byne2ai/NtTF5JBw7jJFcy9DJxVsq8oAmt4ky0YMfxc=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=GSc8kMaxbWTL6BzrhdlA2gYdHrMvYkWd2jNeVF+xvrLgeVVN8ERv99hfMw9goEDzBjL+KzD0MdP/Yj+YvA7ZjOjtoOtxc6em9FkPEtIZSw/rSnfJuXH4aNR7MvHURokHMT1+joofhPcnUek7oQhYZ2JmTytsqlTVeCD0cwpLdR8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=I8AcLRRu; arc=none smtp.client-ip=192.30.252.200
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="I8AcLRRu"
-Received: from github.com (hubbernetes-node-6e64cb7.va3-iad.github.net [10.48.201.118])
-	by smtp.github.com (Postfix) with ESMTPA id 0AA9D4E1040
-	for <linux-bluetooth@vger.kernel.org>; Mon, 17 Jun 2024 12:11:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1718651485;
-	bh=e2hH81VS1EVjyAxVRMUsj95511H+0GUw/yYb1y/Jx80=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=I8AcLRRuYF3TGXJMptLoD7sJ9AqUPYAPpx1uB1O0/vwxccVmA12+R6yi1ci5ylMvO
-	 9Zx3sVO6D4fxe6xyFOR/7gfJRz3XLY2448iIu5NsMjxpCk+bpDANZR3RRBZ9SIColK
-	 Db7HP/kAN8ZM/mp8/VXya31vVe1eHeI4DOs3KDc0=
-Date: Mon, 17 Jun 2024 12:11:25 -0700
-From: Pauli Virtanen <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/master/7ff745-52bda9@github.com>
-Subject: [bluez/bluez] 87ad4c: transport: fix crash when freeing transport
+	s=arc-20240116; t=1718656585; c=relaxed/simple;
+	bh=8kX08lsI6DAbj5XPvQSGYHXhD+DjTeYX6hUFBZtIc8U=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=Qc73gxv6fzxBWuDzJoZWjW9VlRMiV7zJ8Aw53M4gEycJlPuu95j6IBrZaYCyb4pE9jPsE+cwtlmaZa19N2isEwiOZdJipKC2NDbiaGqgK/6cEA2MYWaQo8LENjbypoPupskkeWXURgRbUPI4S+vp0/hvfAS1oc9fdC92yumJdsY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.207
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f207.google.com with SMTP id e9e14a558f8ab-3737b6fc28fso48312265ab.0
+        for <linux-bluetooth@vger.kernel.org>; Mon, 17 Jun 2024 13:36:23 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718656583; x=1719261383;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=wX1r7CLXDYCEQWJyieHWqqtaA+523qbeQjBU002Sr4w=;
+        b=MK7NDpmg2DNptG8sUa17aRy9gpGbS/yv9ZYKFV5f2zKRCpd7NX4zC0r7MbarWF77mL
+         2RK8h9GPm8TzN7Swrg/CFHLtw2l2RxIPre9ZZq6zRZyC50xXSwJoHPUpUBdzWA0eQLHn
+         RGN48H2VA/LGE1Rzs3cppIUN5VV8fg/kACy23eLEt65A61ofX64HGmKXwty81YQqb8h3
+         Qw3SgLA7YpCKcejek6sG4TOSi9EdCB0b8z+LcOdrWDmpHdKkd+wTDGwO1trkmUU8fOkc
+         bevItyU865DQlnWfJ74MQ0vvONoIm84J7ggWiUAqrfeg+ZLY+T4fb5LgJQSorjcTg8yR
+         /v2A==
+X-Forwarded-Encrypted: i=1; AJvYcCVERcmru6w7QQJ+EiD6VgXGkxdoZBJKS1F791gmeU8ieZMLvolMRwGlFQ3+Qy+gusGqMbjKlJZUlGSRCYzYY7jXSlE8hPpMW870jzl+OioL
+X-Gm-Message-State: AOJu0Yx45DIrLPNZpooiPXBDgAy7WCtIZ6nrBa2F7LwwGYOq4ByuuFD4
+	m7Li/cXa+VmIJrjkQfaizmgN4xRyNLl/9WKKMOw/W8Jks6gVphGADI9K8OMpt/fr3dgqaEeQ9uA
+	BD2p9RAKAbRJO+Jwj8ddhFVdgxPc2n0Ay7mFnhqt/feUPKeXXPJQ+9V4=
+X-Google-Smtp-Source: AGHT+IGEvQav40DBte2FS9A+z0Y04K8p7GENwcMixFV2O/20HFF1NnTMDmyGbpnfdiVAsKwS/sE3bRUrifgmYtdPpi9sEImX1GXS
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+X-Received: by 2002:a05:6e02:b47:b0:373:8d04:28b2 with SMTP id
+ e9e14a558f8ab-37609379cdfmr441165ab.0.1718656582810; Mon, 17 Jun 2024
+ 13:36:22 -0700 (PDT)
+Date: Mon, 17 Jun 2024 13:36:22 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000001c0dc8061b1bebf0@google.com>
+Subject: [syzbot] [bluetooth?] general protection fault in l2cap_publish_rx_avail
+From: syzbot <syzbot+49092daf3dd0a57f9e73@syzkaller.appspotmail.com>
+To: johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, luiz.dentz@gmail.com, marcel@holtmann.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-  Branch: refs/heads/master
-  Home:   https://github.com/bluez/bluez
-  Commit: 87ad4c66b934b1280bc8843589856313ef1bc912
-      https://github.com/bluez/bluez/commit/87ad4c66b934b1280bc8843589856313ef1bc912
-  Author: Pauli Virtanen <pav@iki.fi>
-  Date:   2024-06-17 (Mon, 17 Jun 2024)
+Hello,
 
-  Changed paths:
-    M profiles/audio/transport.c
+syzbot found the following issue on:
 
-  Log Message:
-  -----------
-  transport: fix crash when freeing transport
+HEAD commit:    2ccbdf43d5e7 Merge tag 'for-linus' of git://git.kernel.org..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=1154f6da980000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=b8786f381e62940f
+dashboard link: https://syzkaller.appspot.com/bug?extid=49092daf3dd0a57f9e73
+compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
 
-Fix UAF by freeing transport->remote_endpoint in media_transport_free,
-which also frees the struct (not in destroy after the struct is freed).
+Unfortunately, I don't have any reproducer for this issue yet.
 
-ERROR: AddressSanitizer: heap-use-after-free
-READ of size 8 at 0x508000022ab8 thread T0
-    #0 0x493624 in media_transport_destroy profiles/audio/transport.c:223
-...
-freed by thread T0 here:
-    #1 0x7fb057d10294 in g_free (/lib64/libglib-2.0.so.0+0x5d294)
-    #2 0x49dd2d in media_transport_free profiles/audio/transport.c:1276
-    #3 0x7e0e99 in remove_interface gdbus/object.c:682
-    #4 0x7e8f40 in g_dbus_unregister_interface gdbus/object.c:1430
-    #5 0x4935a2 in media_transport_destroy profiles/audio/transport.c:220
+Downloadable assets:
+disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/7bc7510fe41f/non_bootable_disk-2ccbdf43.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/c40c1cd990d2/vmlinux-2ccbdf43.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/a2a94050804e/bzImage-2ccbdf43.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+49092daf3dd0a57f9e73@syzkaller.appspotmail.com
+
+Oops: general protection fault, probably for non-canonical address 0xdffffc000000002e: 0000 [#1] PREEMPT SMP KASAN NOPTI
+KASAN: null-ptr-deref in range [0x0000000000000170-0x0000000000000177]
+CPU: 0 PID: 5233 Comm: kworker/u33:3 Not tainted 6.10.0-rc3-syzkaller-00044-g2ccbdf43d5e7 #0
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
+Workqueue: hci2 hci_rx_work
+RIP: 0010:l2cap_publish_rx_avail+0x4f/0x1c0 net/bluetooth/l2cap_sock.c:1137
+Code: 03 80 3c 02 00 0f 85 86 01 00 00 48 8b ab a0 04 00 00 48 b8 00 00 00 00 00 fc ff df 48 8d bd 74 01 00 00 48 89 fa 48 c1 ea 03 <0f> b6 14 02 48 89 f8 83 e0 07 83 c0 03 38 d0 7c 08 84 d2 0f 85 3a
+RSP: 0018:ffffc90003967978 EFLAGS: 00010207
+RAX: dffffc0000000000 RBX: ffff888025e47000 RCX: ffffc90021bc3000
+RDX: 000000000000002e RSI: ffffffff89e760be RDI: 0000000000000174
+RBP: 0000000000000000 R08: 0000000000000001 R09: 0000000000000000
+R10: 0000000000000001 R11: ffffffff93943408 R12: ffff888025e42000
+R13: ffff8880285b72c0 R14: ffff888025e4702e R15: ffff8880285b72c0
+FS:  0000000000000000(0000) GS:ffff88806b000000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000001b32345000 CR3: 0000000029c30000 CR4: 0000000000352ef0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ l2cap_sock_recv_cb+0x104/0x3d0 net/bluetooth/l2cap_sock.c:1509
+ l2cap_conless_channel net/bluetooth/l2cap_core.c:6780 [inline]
+ l2cap_recv_frame+0x20cb/0xa190 net/bluetooth/l2cap_core.c:6833
+ l2cap_recv_acldata+0x9ac/0xb60 net/bluetooth/l2cap_core.c:7516
+ hci_acldata_packet net/bluetooth/hci_core.c:3842 [inline]
+ hci_rx_work+0xaa7/0x1610 net/bluetooth/hci_core.c:4079
+ process_one_work+0x9fb/0x1b60 kernel/workqueue.c:3231
+ process_scheduled_works kernel/workqueue.c:3312 [inline]
+ worker_thread+0x6c8/0xf70 kernel/workqueue.c:3393
+ kthread+0x2c1/0x3a0 kernel/kthread.c:389
+ ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
+ </TASK>
+Modules linked in:
+---[ end trace 0000000000000000 ]---
+RIP: 0010:l2cap_publish_rx_avail+0x4f/0x1c0 net/bluetooth/l2cap_sock.c:1137
+Code: 03 80 3c 02 00 0f 85 86 01 00 00 48 8b ab a0 04 00 00 48 b8 00 00 00 00 00 fc ff df 48 8d bd 74 01 00 00 48 89 fa 48 c1 ea 03 <0f> b6 14 02 48 89 f8 83 e0 07 83 c0 03 38 d0 7c 08 84 d2 0f 85 3a
+RSP: 0018:ffffc90003967978 EFLAGS: 00010207
+RAX: dffffc0000000000 RBX: ffff888025e47000 RCX: ffffc90021bc3000
+RDX: 000000000000002e RSI: ffffffff89e760be RDI: 0000000000000174
+RBP: 0000000000000000 R08: 0000000000000001 R09: 0000000000000000
+R10: 0000000000000001 R11: ffffffff93943408 R12: ffff888025e42000
+R13: ffff8880285b72c0 R14: ffff888025e4702e R15: ffff8880285b72c0
+FS:  0000000000000000(0000) GS:ffff88806b000000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000001b32345000 CR3: 0000000045a0a000 CR4: 0000000000352ef0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+----------------
+Code disassembly (best guess):
+   0:	03 80 3c 02 00 0f    	add    0xf00023c(%rax),%eax
+   6:	85 86 01 00 00 48    	test   %eax,0x48000001(%rsi)
+   c:	8b ab a0 04 00 00    	mov    0x4a0(%rbx),%ebp
+  12:	48 b8 00 00 00 00 00 	movabs $0xdffffc0000000000,%rax
+  19:	fc ff df
+  1c:	48 8d bd 74 01 00 00 	lea    0x174(%rbp),%rdi
+  23:	48 89 fa             	mov    %rdi,%rdx
+  26:	48 c1 ea 03          	shr    $0x3,%rdx
+* 2a:	0f b6 14 02          	movzbl (%rdx,%rax,1),%edx <-- trapping instruction
+  2e:	48 89 f8             	mov    %rdi,%rax
+  31:	83 e0 07             	and    $0x7,%eax
+  34:	83 c0 03             	add    $0x3,%eax
+  37:	38 d0                	cmp    %dl,%al
+  39:	7c 08                	jl     0x43
+  3b:	84 d2                	test   %dl,%dl
+  3d:	0f                   	.byte 0xf
+  3e:	85 3a                	test   %edi,(%rdx)
 
 
-  Commit: 52bda9d45572ab4629bf2f686616c0398f489dad
-      https://github.com/bluez/bluez/commit/52bda9d45572ab4629bf2f686616c0398f489dad
-  Author: Pauli Virtanen <pav@iki.fi>
-  Date:   2024-06-17 (Mon, 17 Jun 2024)
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-  Changed paths:
-    M src/shared/bap-defs.h
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
-  Log Message:
-  -----------
-  shared/bap: make BT_BAP_* direction defines valid bitmasks
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
 
-The directions appear to be intended as bitmasks, as
-bt_bap_stream_io_dir() will bitwise or linked stream directions.
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
 
-Fix the defines to be separate bits.
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
 
-Fixes confusion due to BT_BAP_BCAST_SOURCE == BT_BAP_SINK|BT_BAP_SOURCE,
-which causes e.g. unicast transports to be in PENDING state after QoS
-although this does not make sense for BAP unicast Client.
-
-
-Compare: https://github.com/bluez/bluez/compare/7ff745c2bd0c...52bda9d45572
-
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
+If you want to undo deduplication, reply with:
+#syz undup
