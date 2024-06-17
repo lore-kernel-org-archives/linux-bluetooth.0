@@ -1,104 +1,122 @@
-Received: from out203-205-221-245.mail.qq.com (out203-205-221-245.mail.qq.com [203.205.221.245])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oi1-f169.google.com (mail-oi1-f169.google.com [209.85.167.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2ADFF288BD;
-	Mon, 17 Jun 2024 11:22:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.205.221.245
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1CDF191461
+	for <linux-bluetooth@vger.kernel.org>; Mon, 17 Jun 2024 11:33:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718623333; cv=none; b=OMgnOMNVTPBD2dR59IF/sJwv3oDIsCnTwtyOCGLodWhcyJS9G9Ye36k/89ue4S2dm6sxNwkEgY1EDm+IAEn4mXCFsWOnwJIW0oeCuXb+RJpY/ZhOZV12KUUI6DUPWQ9pxqcK/ZbFqWLV4FGVS4eCFJ3CmT5HTH73OXWRc95qS0E=
+	t=1718623994; cv=none; b=ro/deRnapP2g/yoOkzvfjLjKIAeLEzu92YmRtxZ8egpZ7ADxdgZ+W+l4J8DMF67L0KWM1UJwvgqRwMJM+tS+Ds6lsWjDsQjFyGnXoupx7P6eEaoInPAh8OLDTcgt80jln5Z+z0qlJtft+H/ay9BKqrplJaJqAcqrP9zt71Wtoek=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718623333; c=relaxed/simple;
-	bh=kOUjN3ObfB6MLRRhdOU0QbtDh6rZCZ9HITVr7rHgu/g=;
-	h=Message-ID:From:To:Cc:Subject:Date:In-Reply-To:References:
-	 MIME-Version; b=J7R7TbMQrZQk8ODw0YjJtRvHcvnwBP95EDaIOOUsc0bbJBsoLAT5wvmFQxGnBZAVJGNgyHB1+eEVEMqMfNxmQmWt2fexp8/QFVIPSeHaBbNJzPr1h/RYPvrmOS23jjUm/pgdE5InomXuA5+Q+OGaFFGNhtO+s8NRk5WGcghV8CU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com; spf=pass smtp.mailfrom=qq.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=Oe8BvrVk; arc=none smtp.client-ip=203.205.221.245
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
+	s=arc-20240116; t=1718623994; c=relaxed/simple;
+	bh=zBP6dqNNfz12pS0Ue76Q5ZDXvyehS0DhtzQ6Yft3sLA=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=FtYkxexJaz94xubsHkqbma8fJRSOcXxfb+1i7N8v18WjlmmY67Y/nggUoq7511Hi9/5KqBpgKAa5Z/z+egqazhSbfCP3TixniiKGdlWovS9RQNyGFfNwCemkZCjmt8BPrMtfpRprnmoenX7bb+UaepOzM60e0oPmS9qA8Kt6iFM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IFEbxo3s; arc=none smtp.client-ip=209.85.167.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="Oe8BvrVk"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
-	t=1718623328; bh=DVWXar9wxRAjzh+tMMvxBN7PqOspNp1LhCSb77WTeOE=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=Oe8BvrVkPulLLBdyoU9WHQplA+25+ijy7l27v61GoqrzTPV1GKayHTVXGZbersUe2
-	 gzwSGDt7rEf+de40x9EcdGo8GpUZiUw1eYqFcNJxVQO2hgHJZJKhuPlEb0wrNqDFb0
-	 kZ7Nj3gPeev38EaIAatM8e11ckbdWS/VyBFFxaZQ=
-Received: from pek-lxu-l1.wrs.com ([111.198.228.103])
-	by newxmesmtplogicsvrszb9-0.qq.com (NewEsmtp) with SMTP
-	id 2643043B; Mon, 17 Jun 2024 19:09:36 +0800
-X-QQ-mid: xmsmtpt1718622576t2neii6fc
-Message-ID: <tencent_E43E1B2F25E4BA5EBBEC33229E5E1BEB4B08@qq.com>
-X-QQ-XMAILINFO: MtZ4zLDUQmWf8BIMzYOceNuUXz0sD/09go9XgjcxS12/HumOM82xhfVcQxJ5BU
-	 av21b70FilkRFVUZVupHiRn2LjQcKtaMbuR5pmCpdXC7cvFhr8pPiiP5Nob8dFI7v/eqfhWRhZt7
-	 pmne4yS9TIM+NpNrTEDVrmS+I8xP8ZFT6Nv31TJa+vb5uzgx/aFRNxgqNDN6wgpAyhcu6mydJ2CJ
-	 bVoqj5F0nkizt67JE34L5dbso7buUId4JYOeKF+/vY/EXfIMHHPbpGB4UHzeTmlgqGqv1jToKfeA
-	 DaCRoanCA+MrVTnoMTh4zY90TkkpLhoK8KjoHPsm/vEYGf3gGia/yJjY+wEFfZJMtMdnD+SZVV+J
-	 r8UvRCiBBKa1XuxT/ZtWtEgeojW1TwRCYx94WwOYcCUqdYIGqWuhqLDWsXrmMGJuhS5ELB+9Iwfh
-	 JpGmQo3rmJ/r566SCBogXYJ9DeF3fTnTghuP2xhRzsPFybRkBbHCQC/EwCgDMI1bmr2Wwgu5b1DN
-	 j1Iw2gqLN8vQ0Q145BL5G5tcQ/t63YZKkgX5MCOshaxv3mEDyvWrMOZCf7nBg8ipo6CHDsysVjYf
-	 z1jJ3Cp7BiszyqhJ9pIL+GEsbqpRYJJ7Ps4C4ipK/2I2R9XkFVKYQgbopZ4YZAVr+PcNhWdy1GWb
-	 Fh9llGFvvqXGW9jEGOCZv/Jrvcefu2xkNewRrf+/pQJZHKDh6XJfmdVtzjQT5X60xZJaDA75oMRr
-	 rP21m/mnyFuqfJJEiq6JraU1hTBkEuP4tBxVEu7WE30zO7nbJK4Z0UHeuvUvNzex5+O/O0/qmwHa
-	 OoZ2qx+F7SPnECx6CrY5yPfgPS4zCxMK8JdkKkvnLDIxDngCT4tieFY6o1TjtIEdwIubw+4M376u
-	 7qdfCaH7fOdkU3hKSxiAoCkcMgWC3fp+zIOpgwTaCY86VKxYKi6ekGkojKcBmv+yUnup54HBinD+
-	 9rvt28BIBjQCiFSPrTfA==
-X-QQ-XMRINFO: OD9hHCdaPRBwq3WW+NvGbIU=
-From: Edward Adam Davis <eadavis@qq.com>
-To: pmenzel@molgen.mpg.de
-Cc: davem@davemloft.net,
-	eadavis@qq.com,
-	edumazet@google.com,
-	johan.hedberg@gmail.com,
-	kuba@kernel.org,
-	linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	luiz.dentz@gmail.com,
-	luiz.von.dentz@intel.com,
-	marcel@holtmann.org,
-	netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	syzkaller-bugs@googlegroups.com,
-	william.xuanziyang@huawei.com
-Subject: [PATCH v2] Bluetooth: Ignore too large handle values in BIG
-Date: Mon, 17 Jun 2024 19:09:37 +0800
-X-OQ-MSGID: <20240617110936.669544-2-eadavis@qq.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <f3ae861f-d030-47c6-9eec-5a197b875e0b@molgen.mpg.de>
-References: <f3ae861f-d030-47c6-9eec-5a197b875e0b@molgen.mpg.de>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IFEbxo3s"
+Received: by mail-oi1-f169.google.com with SMTP id 5614622812f47-3d227b1f4f0so2322865b6e.3
+        for <linux-bluetooth@vger.kernel.org>; Mon, 17 Jun 2024 04:33:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1718623991; x=1719228791; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=OPUNcyytnHGkwvCuzvOW8AWdrSFrNGblfrgBgtNjSCE=;
+        b=IFEbxo3saVdlJ2aXhR/9dpnsncDeeMqpBLtLd0OHPFyluPTBBES/2xm+eWiD2Jiin0
+         gNSffm2Iy/r8nvhyS9x0o1Y+oUe8wbfZEXrLgbXLdQrwdOGyrQLe5iRYFH9Qk/eBscHA
+         bi85DbwIQhtxSntYk8RDmlHGt1BlW6kYf9RJgAgvewo0h98bZMd9q8WxL4WjHEsXMRhn
+         IR20Ia7TQdr5x4NBYju2CQm4e7flNO+SySJ4848HEuS9wVCAcqkwjdQJZWKRKcWbitVN
+         TXBKKhsfYaQEE6y8pPH2UTW90tu48zJbLD8DiN+oct2l4X1Z1kLzTjAmddFVFKAuTMQb
+         lxaw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718623991; x=1719228791;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=OPUNcyytnHGkwvCuzvOW8AWdrSFrNGblfrgBgtNjSCE=;
+        b=dLQqL2ORed+ug8BuQXPdubNUGHD1RxyUvmQvbONEqYUYNon72yUICpsHPeNnyG69F8
+         ynsihftTWTLMGVAVTNNZavlcLEsbRhcaJeotDVtx/p6NhDsmTVn+TI26CHGXWYW4bn9X
+         RCW+jEQlqUmME8cBxfmSBcFioICLLk6PWrd1GVdKha9P+DivXP8zgTthEgRWkHyRm8eR
+         iQYJoVBaPUdedJeYfVXkx5UToX6icGPINJ71U5rwvOoefONvvg4fvCntntDaeNQbia3r
+         3L0k4sHnChRNV+tl3ZbXQ/sbgTJUnrms54T1ZUQPQmm3fhAGClpXnAkkGw3RUISGjY8q
+         thAA==
+X-Gm-Message-State: AOJu0YxZRGsVqKI3wOtdR07bqVmlEu8nx4/weqH1tc80vX/qWuwMmSdy
+	4yyBjBkNf689C1939UErxXE1iWbcxLL/4/VmtGNly+hFkX+8WjidGLwyqg==
+X-Google-Smtp-Source: AGHT+IFJjxHY1eAyiKo8Tq0Ev8zxIP0WD13nrw0HZ4mTjxWm1S/Dq4rgFgXS1TPIt3e+9EfUGFUSiA==
+X-Received: by 2002:a05:6358:718d:b0:18d:6fba:d2f8 with SMTP id e5c5f4694b2df-19fa9de7051mr1211893055d.13.1718623991359;
+        Mon, 17 Jun 2024 04:33:11 -0700 (PDT)
+Received: from [172.17.0.2] ([20.172.28.131])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-6fedcf3567csm6457556a12.16.2024.06.17.04.33.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 17 Jun 2024 04:33:11 -0700 (PDT)
+Message-ID: <66701ef7.630a0220.180c0.0fc9@mx.google.com>
+Date: Mon, 17 Jun 2024 04:33:11 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============3918175018730488083=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, hildawu@realtek.com
+Subject: RE: Bluetooth: btrtl: Set MSFT_EXT_ADDRESS_FILTER quirk for RTL8852B
+In-Reply-To: <20240617105020.3246015-1-hildawu@realtek.com>
+References: <20240617105020.3246015-1-hildawu@realtek.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-hci_le_big_sync_established_evt is necessary to filter out cases where the
-handle value is belonging to ida id range, otherwise ida will be erroneously
-released in hci_conn_cleanup.
+--===============3918175018730488083==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Fixes: 181a42edddf5 ("Bluetooth: Make handle of hci_conn be unique")
-Reported-by: syzbot+b2545b087a01a7319474@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=b2545b087a01a7319474
-Signed-off-by: Edward Adam Davis <eadavis@qq.com>
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=862570
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.52 seconds
+GitLint                       PASS      0.24 seconds
+SubjectPrefix                 PASS      0.08 seconds
+BuildKernel                   PASS      29.71 seconds
+CheckAllWarning               PASS      33.77 seconds
+CheckSparse                   PASS      38.63 seconds
+CheckSmatch                   PASS      102.31 seconds
+BuildKernel32                 PASS      30.54 seconds
+TestRunnerSetup               PASS      524.16 seconds
+TestRunner_l2cap-tester       PASS      18.87 seconds
+TestRunner_iso-tester         FAIL      32.99 seconds
+TestRunner_bnep-tester        PASS      5.05 seconds
+TestRunner_mgmt-tester        PASS      112.10 seconds
+TestRunner_rfcomm-tester      PASS      7.41 seconds
+TestRunner_sco-tester         PASS      17.08 seconds
+TestRunner_ioctl-tester       PASS      7.94 seconds
+TestRunner_mesh-tester        PASS      6.27 seconds
+TestRunner_smp-tester         PASS      6.98 seconds
+TestRunner_userchan-tester    PASS      5.02 seconds
+IncrementalBuild              PASS      30.26 seconds
+
+Details
+##############################
+Test: TestRunner_iso-tester - FAIL
+Desc: Run iso-tester with test-runner
+Output:
+Total: 122, Passed: 117 (95.9%), Failed: 1, Not Run: 4
+
+Failed Test Cases
+ISO Connect Suspend - Success                        Failed       4.169 seconds
+
+
 ---
- net/bluetooth/hci_event.c | 4 +++
- 1 file changed, 4 insertions(+)
+Regards,
+Linux Bluetooth
 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index a487f9df8145..3966fbc38df9 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -6893,6 +6893,10 @@ static void hci_le_big_sync_established_evt(struct hci_dev *hdev, void *data,
- 
- 		bis = hci_conn_hash_lookup_handle(hdev, handle);
- 		if (!bis) {
-+			if (handle > HCI_CONN_HANDLE_MAX) {
-+				bt_dev_dbg(hdev, "ignore too large handle %u", handle);
-+				continue;
-+			}
- 			bis = hci_conn_add(hdev, ISO_LINK, BDADDR_ANY,
- 					   HCI_ROLE_SLAVE, handle);
- 			if (IS_ERR(bis))
--- 
-2.43.0
 
+--===============3918175018730488083==--
