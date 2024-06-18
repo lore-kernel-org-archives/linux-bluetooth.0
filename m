@@ -1,43 +1,59 @@
-Received: from forward205b.mail.yandex.net (forward205b.mail.yandex.net [178.154.239.152])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ua1-f48.google.com (mail-ua1-f48.google.com [209.85.222.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 004BB1BF50
-	for <linux-bluetooth@vger.kernel.org>; Tue, 18 Jun 2024 19:06:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.154.239.152
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 467CA16DC13
+	for <linux-bluetooth@vger.kernel.org>; Tue, 18 Jun 2024 19:59:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718737621; cv=none; b=ZFKT1N9yK1d1MeG3YWC6oSdERlfhOos0pg3Ofib+I2sQeKntMJrgAkcMTjpZHwP2NOBPb2U/r330PdVOTrj10Exb1eDtOgvVCjVBFZL33xoSjTNiI31b2pBM8gzfA2JUL3qKTu4fYNsktrUPw/GK6UfDk1aHPkPl63mse5EPl88=
+	t=1718740759; cv=none; b=BrH+w0Z1vQW7Mwkp/hyaqgRWnCXDZXLvuLOUuVHbDvNAIgy7Jpd+I3st0YGivSCHooXdRwNVMpwh1BjRAlEKvBmyL8c+8mWx/cuqwgqHyqMNQ7lk6R93ScUe+zoUZFLzBv5j4XshgArC3TKaJwucb9CoVoyx4TeKSqE68vW/S80=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718737621; c=relaxed/simple;
-	bh=aUeh61bxbfIK/Jv5b+Bk7RfUTa3kqTcqNBi9cAKmhn4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=MS/yGf1rtJEcKj7TaZuxWRn++IdGkoX1hIQ+sU9sGk+dwAF2kjDjRtKCtCybDSvg/CCynV0J/4q8fe3zjimywdhROmU9x+zVEtwRiIP7tuc5uEbga5YUwPBzHrJJHk9eSE1UGfP9n22VFuwy6xMc77P9eEo4zs3uZ6Yotc7FOVA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru; spf=pass smtp.mailfrom=yandex.ru; dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b=w3MaYI4Q; arc=none smtp.client-ip=178.154.239.152
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yandex.ru
+	s=arc-20240116; t=1718740759; c=relaxed/simple;
+	bh=KPRO9K8znTLH4N++Pw9KtOdVsqL9gLZ4JCCu8wTDLnc=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=eLSIpm9pQH86BWgi3DWrw2fwjzH3OoiO+JZgb3KDogMPfBubKDTl3eoSatJ6lAroGIYCQbiya6Ry99ZmXzWWjtHGg6TvgNWGOfYHnFeef4gH5prO6xbRNL1LaHQRmdEtK2NoKaJsMsMw7IMyq7vwMYj0wGO1vaWXNpTtsUmcTM4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=THNwagTb; arc=none smtp.client-ip=209.85.222.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b="w3MaYI4Q"
-Received: from forward103c.mail.yandex.net (forward103c.mail.yandex.net [IPv6:2a02:6b8:c03:500:1:45:d181:d103])
-	by forward205b.mail.yandex.net (Yandex) with ESMTPS id 08A0965D66
-	for <linux-bluetooth@vger.kernel.org>; Tue, 18 Jun 2024 21:59:44 +0300 (MSK)
-Received: from mail-nwsmtp-smtp-production-main-60.sas.yp-c.yandex.net (mail-nwsmtp-smtp-production-main-60.sas.yp-c.yandex.net [IPv6:2a02:6b8:c23:489e:0:640:3c5c:0])
-	by forward103c.mail.yandex.net (Yandex) with ESMTPS id BC07960916;
-	Tue, 18 Jun 2024 21:59:35 +0300 (MSK)
-Received: by mail-nwsmtp-smtp-production-main-60.sas.yp-c.yandex.net (smtp/Yandex) with ESMTPSA id ZxNGPCMd8mI0-64uTbmc8;
-	Tue, 18 Jun 2024 21:59:35 +0300
-X-Yandex-Fwd: 1
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex.ru; s=mail;
-	t=1718737175; bh=3hAiIMW9n9ySVBijyfm4E4eXKV6/XaGObAAFvtGxPaE=;
-	h=Message-ID:Date:Cc:Subject:To:From;
-	b=w3MaYI4Q3pnfvp0cgsb3jrl3UN9LddnzqvwdO/vJUeXg8qZPqB9Q0qPduIcl4MAMh
-	 buiZP8yeoNiL5/rx5/EixDiszW2m9tdoNd1VL6YRivw9muYeYzZgNSplrDGCrMWzw2
-	 xsesyu5BFvKorCpvW1Jnkf2C5Hr6Sh80I1lA4Il4=
-Authentication-Results: mail-nwsmtp-smtp-production-main-60.sas.yp-c.yandex.net; dkim=pass header.i=@yandex.ru
-From: Dmitry Antipov <dmantipov@yandex.ru>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	Dmitry Antipov <dmantipov@yandex.ru>
-Subject: [PATCH] Bluetooth: hci_core, hci_sync: cleanup struct discovery_state
-Date: Tue, 18 Jun 2024 21:59:32 +0300
-Message-ID: <20240618185932.49963-1-dmantipov@yandex.ru>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="THNwagTb"
+Received: by mail-ua1-f48.google.com with SMTP id a1e0cc1a2514c-80d6c63af28so2221554241.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 18 Jun 2024 12:59:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1718740756; x=1719345556; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=sUChMKBl7Uk/LYywKjq7tFinr/EaniquZ+qsBJhKnyU=;
+        b=THNwagTb//KmviyDZY+bbMAb8ngwyq/jz4+B4Mxg6JlaxKuW3JTov6+j6EN0yRx6Br
+         Om+IieMwwcrOwkpvqkQWe6bxwczXWKqI6CsqGatZFw/pBBggTzCMWBJozfaEzQq0WPLy
+         9f0bRVrsWkGSc61AlXZp8SlpGoiGXNMv76lF9cU7YBVT8pF4c2azvxDqi/R9U8Z1/3Ih
+         gh4c5PVTKfq8grECAnzsW3bJv4TSnMW2VzIeljNM4tYOqvR0jawbMksOS7HmjvGAGAke
+         ZPZ+ciF5Gcbs8glYQ3ZiW67kdlWXW1h+JMMZf/8hLYOjPEDQ2ReHe2zMx1oU8fgjvvXI
+         CTBA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718740756; x=1719345556;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=sUChMKBl7Uk/LYywKjq7tFinr/EaniquZ+qsBJhKnyU=;
+        b=veEdhdRf4OVH4dwKGYMv40h6PMkPlTf+ETAc/s1yup2/QqKtv58aoICspU8/F2zx30
+         scorH2TGAQ2O/UUyyIoxsDEYrQS5bf1iq3thif1RkQP2qjd5evDGSedcjFL+07uVkMjj
+         DM+hSyuTbeHvtLD2NPohanVfmhLarnhFdNBXrMgNAdGnGvC0KLBIjxIW/HyGJ7jnNDv8
+         2QKsIlw8jtD/Otxl1Ckl/Qgs98N13gX2PvP4MEWA6cA66QuexEvXhxhKnJ66FYd80sl0
+         T5Aj8QrNnnLXh5Z01OhMrwzRh/dhR9PbpVBNvqAOwau3NPQ/QqiFNTIbSTD5QdT+CC3j
+         GdRA==
+X-Gm-Message-State: AOJu0YxnKfMfAI4GwuCHoewy/9UvkQ4Z5QLsFQ0ApvMov2m/OFEfD7s0
+	FF8B3A5tIGMlpAtL/ZyUA48WwzuXy5MfTQIhtkT2B6fD2MOlPHS+NqGFMw==
+X-Google-Smtp-Source: AGHT+IHXpQY+8GrkkKWafrl9+C/SSccwNGxMQItaRRcWHC1G+/BdfaGttJLimx8ya1Xw+ojlwMx3XA==
+X-Received: by 2002:a05:6122:4121:b0:4de:847a:3647 with SMTP id 71dfb90a1353d-4ef277801a6mr1018480e0c.11.1718740756394;
+        Tue, 18 Jun 2024 12:59:16 -0700 (PDT)
+Received: from lvondent-mobl4.. (syn-107-146-107-067.res.spectrum.com. [107.146.107.67])
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-4ed3fcb1a3bsm1770092e0c.24.2024.06.18.12.59.15
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 18 Jun 2024 12:59:15 -0700 (PDT)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ v1] gas: Fix reading attributes on every connection
+Date: Tue, 18 Jun 2024 15:59:14 -0400
+Message-ID: <20240618195914.2470373-1-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -47,53 +63,41 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-After commit 78db544b5d27 ("Bluetooth: hci_core: Remove le_restart_scan
-work"), 'scan_start' and 'scan_duration' of 'struct discovery_state'
-are still initialized but actually unused. So remove the aforementioned
-fields and adjust 'hci_discovery_filter_clear()' and 'le_scan_disable()'
-accordingly. Compile tested only.
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Signed-off-by: Dmitry Antipov <dmantipov@yandex.ru>
+Attributes only need to be read once after that they will be persisted
+by the core so there is no need to keep reading them on every
+reconnection.
 ---
- include/net/bluetooth/hci_core.h | 4 ----
- net/bluetooth/hci_sync.c         | 2 --
- 2 files changed, 6 deletions(-)
+ profiles/gap/gas.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index c43716edf205..b15f51ae3bfd 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -91,8 +91,6 @@ struct discovery_state {
- 	s8			rssi;
- 	u16			uuid_count;
- 	u8			(*uuids)[16];
--	unsigned long		scan_start;
--	unsigned long		scan_duration;
- 	unsigned long		name_resolve_timeout;
- };
- 
-@@ -890,8 +888,6 @@ static inline void hci_discovery_filter_clear(struct hci_dev *hdev)
- 	hdev->discovery.uuid_count = 0;
- 	kfree(hdev->discovery.uuids);
- 	hdev->discovery.uuids = NULL;
--	hdev->discovery.scan_start = 0;
--	hdev->discovery.scan_duration = 0;
- }
- 
- bool hci_discovery_active(struct hci_dev *hdev);
-diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-index a8a7d2b36870..d126b4ef4e0b 100644
---- a/net/bluetooth/hci_sync.c
-+++ b/net/bluetooth/hci_sync.c
-@@ -358,8 +358,6 @@ static void le_scan_disable(struct work_struct *work)
- 		goto _return;
+diff --git a/profiles/gap/gas.c b/profiles/gap/gas.c
+index dbe5f003bfba..08aaf19cb332 100644
+--- a/profiles/gap/gas.c
++++ b/profiles/gap/gas.c
+@@ -342,6 +342,10 @@ static int gap_accept(struct btd_service *service)
+ 		goto _finish;
  	}
  
--	hdev->discovery.scan_start = 0;
++	/* Check if attribute already has been discovered */
++	if (gas->attr)
++		goto _finish;
++
+ 	gas->db = gatt_db_ref(db);
+ 	gas->client = bt_gatt_client_clone(client);
+ 
+@@ -364,10 +368,6 @@ _finish:
+ 
+ static int gap_disconnect(struct btd_service *service)
+ {
+-	struct gas *gas = btd_service_get_user_data(service);
 -
- 	/* If we were running LE only scan, change discovery state. If
- 	 * we were running both LE and BR/EDR inquiry simultaneously,
- 	 * and BR/EDR inquiry is already finished, stop discovery,
+-	gas_reset(gas);
+-
+ 	btd_service_disconnecting_complete(service, 0);
+ 
+ 	return 0;
 -- 
 2.45.2
 
