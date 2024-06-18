@@ -1,95 +1,99 @@
-Received: from mail-oi1-f174.google.com (mail-oi1-f174.google.com [209.85.167.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from forward205b.mail.yandex.net (forward205b.mail.yandex.net [178.154.239.152])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4487E74070
-	for <linux-bluetooth@vger.kernel.org>; Tue, 18 Jun 2024 16:40:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 004BB1BF50
+	for <linux-bluetooth@vger.kernel.org>; Tue, 18 Jun 2024 19:06:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.154.239.152
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718728843; cv=none; b=sNRJhoYElXzGybhIkT8JWHpUu/V2rUu62OqcGmaohl/NdAiAyOybcIthFFnt5JxQTiweah4n3AS9vsQMEUmYHy5Nnp8pcRLtHc7sTNjjenw5LJn86aQlKIOmDJSWbaYc//Yp9unjP0zZZDOjuMC45qKm6LY7O1/E5RiDmFffwBY=
+	t=1718737621; cv=none; b=ZFKT1N9yK1d1MeG3YWC6oSdERlfhOos0pg3Ofib+I2sQeKntMJrgAkcMTjpZHwP2NOBPb2U/r330PdVOTrj10Exb1eDtOgvVCjVBFZL33xoSjTNiI31b2pBM8gzfA2JUL3qKTu4fYNsktrUPw/GK6UfDk1aHPkPl63mse5EPl88=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718728843; c=relaxed/simple;
-	bh=Q/8tGUqFiJvufvwTawjat9Udob7S+I+e/fBBwxQhefI=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=X/6ncBsjJwgot9Ej3tEcUF/q7lI7IyOlA32TFH4CxOUNTXDEa4hqyOnMlkB5FPC+83qMc8+T5RWo7/00M6xpiL93Vd3k+jgBH9IzIm/9o1KsZOjorZ6I0YvLjBOYE/oMaxxK7aGbh3GyH78fN4sfkmt/FshRlUYG14koMaKsV44=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TdBbl0EK; arc=none smtp.client-ip=209.85.167.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1718737621; c=relaxed/simple;
+	bh=aUeh61bxbfIK/Jv5b+Bk7RfUTa3kqTcqNBi9cAKmhn4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=MS/yGf1rtJEcKj7TaZuxWRn++IdGkoX1hIQ+sU9sGk+dwAF2kjDjRtKCtCybDSvg/CCynV0J/4q8fe3zjimywdhROmU9x+zVEtwRiIP7tuc5uEbga5YUwPBzHrJJHk9eSE1UGfP9n22VFuwy6xMc77P9eEo4zs3uZ6Yotc7FOVA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru; spf=pass smtp.mailfrom=yandex.ru; dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b=w3MaYI4Q; arc=none smtp.client-ip=178.154.239.152
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yandex.ru
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TdBbl0EK"
-Received: by mail-oi1-f174.google.com with SMTP id 5614622812f47-3d35f1dfda2so1710462b6e.3
-        for <linux-bluetooth@vger.kernel.org>; Tue, 18 Jun 2024 09:40:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1718728839; x=1719333639; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=Q/8tGUqFiJvufvwTawjat9Udob7S+I+e/fBBwxQhefI=;
-        b=TdBbl0EKn+/z9BcBrYlRPaLG/xEjxHQG0gMe3Z+OIu7OCcgOHYf1iPw2Uzho8st65R
-         GXLuQuTNvGKU1ATcnTrHDcmYebBWcSESTcTbRtnzpusgt4xXUk+nCBzgB36wItvmfapL
-         QpW4K2cwA2JGOx0+4s+0xm2sVaX3uiBqrVornp7kHb34YYj6jLGoQNvGZUHpJ3/5Z1Eq
-         sGX4OUlabJRuySprY3MSKy7ftk66s6iyoopC2Ur+NlPyC2ju9G2lzO6BeycSPYUIY2cU
-         nT7L5E1kPUZMXtAn0oHsCymjh0ex1zVxEt/jzVdyataJTuJDd7I8eOYbIn00AtruJcLh
-         B2iw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718728839; x=1719333639;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Q/8tGUqFiJvufvwTawjat9Udob7S+I+e/fBBwxQhefI=;
-        b=N3K5gfZOB11gDb1XR8NTR9ha1JsfZ/fcGwAdCk4BAWFmGTwO+z14xJy13ABWZGhJdN
-         NK4lOPXFb77C30aINRXEJqXFPFVv1qr7ptjjavv7EAbVoT3m8ye6yIVv5vboWiBb1wB9
-         B07fXKs8G408j2P/gdLf8xQ6N5h6HU8Z/4/cD/a/ryngi35mED18iKhT2/LdhGFBiUAl
-         i6UtQomoEiBTGEI5oRzb3ZK4nwHUbJXgrCfbbip98UrWQGqXu5y2LXhZ22BVFQUl2Mqc
-         +PoJ8zUmozMzebWabQsqId2WR5Iom80iqPgZcClEpWOgaYHFWWZb4rZ6I/PU8AFzBy9Q
-         Sc5g==
-X-Gm-Message-State: AOJu0YyPa02kO6Hj3jxh723MepAEliHW35Ubrns90cI0rO2x2n4Cy/ew
-	3U0b5h1ZBJqKvE6n8ddrYxAmgxZSzh6Ih19TgnAbPctpUNNjBH/3lkvZ/A==
-X-Google-Smtp-Source: AGHT+IFL2kvqAXAXjIZN33ES6OQhus/7ypsZl9elQNABGfZ/IvU9UzJPMMoY8jKEwlriJtLGVGwagg==
-X-Received: by 2002:a05:6808:bc5:b0:3d2:250e:470e with SMTP id 5614622812f47-3d51b9e3750mr379068b6e.18.1718728839047;
-        Tue, 18 Jun 2024 09:40:39 -0700 (PDT)
-Received: from [172.17.0.2] ([172.183.91.56])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-798abe6bb2esm529425185a.135.2024.06.18.09.40.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 18 Jun 2024 09:40:38 -0700 (PDT)
-Message-ID: <6671b886.050a0220.24140.096e@mx.google.com>
-Date: Tue, 18 Jun 2024 09:40:38 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============5292582517039113609=="
+	dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b="w3MaYI4Q"
+Received: from forward103c.mail.yandex.net (forward103c.mail.yandex.net [IPv6:2a02:6b8:c03:500:1:45:d181:d103])
+	by forward205b.mail.yandex.net (Yandex) with ESMTPS id 08A0965D66
+	for <linux-bluetooth@vger.kernel.org>; Tue, 18 Jun 2024 21:59:44 +0300 (MSK)
+Received: from mail-nwsmtp-smtp-production-main-60.sas.yp-c.yandex.net (mail-nwsmtp-smtp-production-main-60.sas.yp-c.yandex.net [IPv6:2a02:6b8:c23:489e:0:640:3c5c:0])
+	by forward103c.mail.yandex.net (Yandex) with ESMTPS id BC07960916;
+	Tue, 18 Jun 2024 21:59:35 +0300 (MSK)
+Received: by mail-nwsmtp-smtp-production-main-60.sas.yp-c.yandex.net (smtp/Yandex) with ESMTPSA id ZxNGPCMd8mI0-64uTbmc8;
+	Tue, 18 Jun 2024 21:59:35 +0300
+X-Yandex-Fwd: 1
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex.ru; s=mail;
+	t=1718737175; bh=3hAiIMW9n9ySVBijyfm4E4eXKV6/XaGObAAFvtGxPaE=;
+	h=Message-ID:Date:Cc:Subject:To:From;
+	b=w3MaYI4Q3pnfvp0cgsb3jrl3UN9LddnzqvwdO/vJUeXg8qZPqB9Q0qPduIcl4MAMh
+	 buiZP8yeoNiL5/rx5/EixDiszW2m9tdoNd1VL6YRivw9muYeYzZgNSplrDGCrMWzw2
+	 xsesyu5BFvKorCpvW1Jnkf2C5Hr6Sh80I1lA4Il4=
+Authentication-Results: mail-nwsmtp-smtp-production-main-60.sas.yp-c.yandex.net; dkim=pass header.i=@yandex.ru
+From: Dmitry Antipov <dmantipov@yandex.ru>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	Dmitry Antipov <dmantipov@yandex.ru>
+Subject: [PATCH] Bluetooth: hci_core, hci_sync: cleanup struct discovery_state
+Date: Tue, 18 Jun 2024 21:59:32 +0300
+Message-ID: <20240618185932.49963-1-dmantipov@yandex.ru>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, meartzheast877@gmail.com
-Subject: RE: Patch
-In-Reply-To: <CAFSktxaxM1KFViQUpr6SQV54=MpdPWOZpb41vTRk1UHtLfv9fw@mail.gmail.com>
-References: <CAFSktxaxM1KFViQUpr6SQV54=MpdPWOZpb41vTRk1UHtLfv9fw@mail.gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 
---===============5292582517039113609==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+After commit 78db544b5d27 ("Bluetooth: hci_core: Remove le_restart_scan
+work"), 'scan_start' and 'scan_duration' of 'struct discovery_state'
+are still initialized but actually unused. So remove the aforementioned
+fields and adjust 'hci_discovery_filter_clear()' and 'le_scan_disable()'
+accordingly. Compile tested only.
 
-This is an automated email and please do not reply to this email.
-
-Dear Submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
-
------ Output -----
-
-error: patch failed: client/player.c:5142
-error: client/player.c: patch does not apply
-hint: Use 'git am --show-current-patch' to see the failed patch
-
-Please resolve the issue and submit the patches again.
-
-
+Signed-off-by: Dmitry Antipov <dmantipov@yandex.ru>
 ---
-Regards,
-Linux Bluetooth
+ include/net/bluetooth/hci_core.h | 4 ----
+ net/bluetooth/hci_sync.c         | 2 --
+ 2 files changed, 6 deletions(-)
 
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index c43716edf205..b15f51ae3bfd 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -91,8 +91,6 @@ struct discovery_state {
+ 	s8			rssi;
+ 	u16			uuid_count;
+ 	u8			(*uuids)[16];
+-	unsigned long		scan_start;
+-	unsigned long		scan_duration;
+ 	unsigned long		name_resolve_timeout;
+ };
+ 
+@@ -890,8 +888,6 @@ static inline void hci_discovery_filter_clear(struct hci_dev *hdev)
+ 	hdev->discovery.uuid_count = 0;
+ 	kfree(hdev->discovery.uuids);
+ 	hdev->discovery.uuids = NULL;
+-	hdev->discovery.scan_start = 0;
+-	hdev->discovery.scan_duration = 0;
+ }
+ 
+ bool hci_discovery_active(struct hci_dev *hdev);
+diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+index a8a7d2b36870..d126b4ef4e0b 100644
+--- a/net/bluetooth/hci_sync.c
++++ b/net/bluetooth/hci_sync.c
+@@ -358,8 +358,6 @@ static void le_scan_disable(struct work_struct *work)
+ 		goto _return;
+ 	}
+ 
+-	hdev->discovery.scan_start = 0;
+-
+ 	/* If we were running LE only scan, change discovery state. If
+ 	 * we were running both LE and BR/EDR inquiry simultaneously,
+ 	 * and BR/EDR inquiry is already finished, stop discovery,
+-- 
+2.45.2
 
---===============5292582517039113609==--
