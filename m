@@ -1,168 +1,282 @@
-Received: from EUR04-VI1-obe.outbound.protection.outlook.com (mail-vi1eur04on2089.outbound.protection.outlook.com [40.107.8.89])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0299B811FB
-	for <linux-bluetooth@vger.kernel.org>; Wed, 19 Jun 2024 09:51:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.8.89
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718790708; cv=fail; b=fc63p9usnt7wVAfFc/t322ViZXTclGzjxlGk8AO7qzRMnjbqBy2+l+2z7cVRhaLWXKRklS4jFJEbcD8ZYno6VneaXWywfgUMTJ5i/zkBYvAePA1J8cCEDt+jPVBGiP5UDta0bfTEkpxNXsn7jn7eQRHKtiI6kvJ9iCE92lv+uSU=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718790708; c=relaxed/simple;
-	bh=yDlmxS09/l5uDb7pfYgZ1rC3RHoOA95XGziZF0zgAdY=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=BpyQJf4NMSMEpb0g6uvFFW3qWp8IoWJa8k7tbD1XBX3bqR1z5EqGJD+gvnTWfHXwNa1MJul/GgKMEcx2tAnmOXsNkoWPoh4xDDX+ysWuBk/7DNwhPWTRwe3zYaO9cmonLPkumYog+A1sYq6a9KulrWe3CywQq3G6ZO/YJY76R84=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b=hioodjih; arc=fail smtp.client-ip=40.107.8.89
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 228DE811E7
+	for <linux-bluetooth@vger.kernel.org>; Wed, 19 Jun 2024 09:55:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1718790922; cv=none; b=YlKntfztp5yjpLnYwC9ODa8KyWfo4jthbCreuPMlaZV3ZVJz0oKGoAHZCyGFOE7jxatVZNDKptQqcwdt3it/KJ3y412APq5Iyi73zxulBxZLaPFAN3SIWTuND8TmigZ1fIcshY5U4IrQQ+w0hO2HJbG96kLXt5e1iJfF70aGfBc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1718790922; c=relaxed/simple;
+	bh=GD1Zhw5MBQeCNEG84zzu1wlZymB4jmQbBCM0dT5fpA8=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=GSbaG8pVl6hKhkPpgi/CPnvggrFn9YB9EMlda/To25Ng2scPlnzgA9AKwskO5ygWTX7yd6E5nFdBdKnmyqQ6xPFkMLfWtdLMYT5q6JG4hrBZFnFEzC7NAAlLih/RHBiNYp4uZiT4KmzX8CVuh22858H7VH46YQOljM5honaaVKs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=K4OnFb7X; arc=none smtp.client-ip=198.175.65.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="hioodjih"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ROjSvV1qdf5YF1uCzE6a/Q5DzPGAtpnh3oo2hVGYm4I0oTompXDM7lPYc9+NnXBd5ChY8kpuC9DDTUa8llhmqAeq9oq0olOsSUoU5HehhV7twckSLEriuDLty0ZST4Bn8x6awiKL/e78WvxCB8ZHUET77c9u2OyXCktqhl/Wm0GLB4vLir1o5YxjGVPMmqCLkB38eet095OL8JfHSvIf1ox1QqXPYM6nixKUrc8f5LiLEBIiqmQBHSVKgyJha1c1PU7OnB5Ms1WRYAscRM0ks0qdD/R/kgPXzLQro8g6LJV122pPQnQLBYSlhI/KprQAnJ38V0rESuhvY+49U2totg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=orspnGQE3Sxv0lPkv1d/eagWlZEIkXyV3Uodp7BbpVg=;
- b=QT/+5kYDDBHddCVVZvHcOJWtUA4SpHd/oeFnkfb3BBhQO2OMSiFCoLzzIen3yv9LnIfE1w3xmo0cMR4TvjtfeM6/UVVZSkD2LiDz3L1nfU4Yhf/14SZEZl8WrgdKmUm8NL6RGsz9niHBOrQXCncjcxZN3VkfxdJs4nXX/PwwR6TolufQHSwpfBfJG5KBvXkOSbevHAI9/iR7e8eyNH4a1pPzuOuBuntPDDLDxgOxR0/FEHgARGBjuYxqcIITP64AczGZ7tkldlwVQpzoCLl+8+PWb0HO12bfV44vdWom90tQuth12zDgBSD9ZJMRaCiyZ+/H7i2GHxf/QHjS2po/Bw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=orspnGQE3Sxv0lPkv1d/eagWlZEIkXyV3Uodp7BbpVg=;
- b=hioodjihX0MRq9WhoUgCI2QhNAa6aWd69t619ljcNVA64NMo9iW9MemUBl96H3Uzu7OmP0p+kLKP9A069NIZoY6DjzKW5lENua0jpndHWt19e3ii1t2SGyblnFt2Nw9xz4yQz4yY6l1NG8GTnKY7376tMivjHWLjLQyPvQWFJsQ=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from VI1PR04MB5389.eurprd04.prod.outlook.com (2603:10a6:803:d8::12)
- by AM7PR04MB7093.eurprd04.prod.outlook.com (2603:10a6:20b:11d::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7677.30; Wed, 19 Jun
- 2024 09:51:43 +0000
-Received: from VI1PR04MB5389.eurprd04.prod.outlook.com
- ([fe80::2dc5:1126:ca5b:bf27]) by VI1PR04MB5389.eurprd04.prod.outlook.com
- ([fe80::2dc5:1126:ca5b:bf27%5]) with mapi id 15.20.7677.030; Wed, 19 Jun 2024
- 09:51:43 +0000
-From: Vlad Pruteanu <vlad.pruteanu@nxp.com>
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="K4OnFb7X"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1718790920; x=1750326920;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=GD1Zhw5MBQeCNEG84zzu1wlZymB4jmQbBCM0dT5fpA8=;
+  b=K4OnFb7X0bYsXk2Ii61QgezKVs/YiRdlSwm9XYcERetHXVXeWlvtY9KS
+   tYk3u+OyTG8k5n9Q4/2pLAd2ImD4//VKx9xkf4qyFq4qbezuC+XGacHbK
+   Jc0EQPQDB+ATgSK2gmO3GJZ+WzDOcOtdSvKJySqWnjpKFW31FFxH0s038
+   WU164AVdemoOTLG/rHtJltD/xLIwtsgHeJ9hBXCWxMSZMpLhn9YjfwttM
+   qD2qdRx/XRSYOxjaq6ydKpE8ta+mzfzfTJH2N+htS0svmZ02ddhwK0+Gs
+   ncYmsgAE+6otqrYkwDqGAfMZi4Ahzo3Dvmy6AigeVxSAdLFr6lhIwlL12
+   Q==;
+X-CSE-ConnectionGUID: Iz8kxDzjQVecwmt6OnDI3w==
+X-CSE-MsgGUID: 3vdad21MS3+WV1wBG9Qiow==
+X-IronPort-AV: E=McAfee;i="6700,10204,11107"; a="15837806"
+X-IronPort-AV: E=Sophos;i="6.08,250,1712646000"; 
+   d="scan'208,223";a="15837806"
+Received: from orviesa002.jf.intel.com ([10.64.159.142])
+  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Jun 2024 02:55:20 -0700
+X-CSE-ConnectionGUID: JB1ZUDnBTNiHP1xnqfxUEg==
+X-CSE-MsgGUID: k37nefqTRwuNTmdIzW49mg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.08,250,1712646000"; 
+   d="scan'208,223";a="72605809"
+Received: from intel-lenovo-legion-y540-15irh-pg0.iind.intel.com ([10.224.186.95])
+  by orviesa002.jf.intel.com with ESMTP; 19 Jun 2024 02:55:18 -0700
+From: Kiran K <kiran.k@intel.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: mihai-octavian.urzica@nxp.com,
-	iulia.tanasescu@nxp.com,
-	andrei.istodorescu@nxp.com,
-	luiz.dentz@gmail.com,
-	Vlad Pruteanu <vlad.pruteanu@nxp.com>
-Subject: [PATCH BlueZ v2 2/2] bap: Use util_iov_new when setting bcode
-Date: Wed, 19 Jun 2024 12:51:19 +0300
-Message-Id: <20240619095119.167652-3-vlad.pruteanu@nxp.com>
+Cc: ravishankar.srivatsa@intel.com,
+	chethan.tumkur.narayan@intel.com,
+	chandrashekar.devegowda@intel.com,
+	vijay.satija@intel.com,
+	Kiran K <kiran.k@intel.com>
+Subject: [PATCH v1] Bluetooth: btintel: Add firmware ID to firmware name
+Date: Wed, 19 Jun 2024 15:39:33 +0530
+Message-Id: <20240619100933.2054286-1-kiran.k@intel.com>
 X-Mailer: git-send-email 2.40.1
-In-Reply-To: <20240619095119.167652-1-vlad.pruteanu@nxp.com>
-References: <20240619095119.167652-1-vlad.pruteanu@nxp.com>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: MI1P293CA0016.ITAP293.PROD.OUTLOOK.COM (2603:10a6:290:3::8)
- To VI1PR04MB5389.eurprd04.prod.outlook.com (2603:10a6:803:d8::12)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: VI1PR04MB5389:EE_|AM7PR04MB7093:EE_
-X-MS-Office365-Filtering-Correlation-Id: 25358681-58ce-4370-631a-08dc90456d14
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230037|52116011|366013|376011|1800799021|38350700011;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?RbaaHSIZj+yDkxSfc0YVSo41RJCZkrP7joWB+21/h3bleD5J9wAXjMNK8GAC?=
- =?us-ascii?Q?7BcswHa0qf8HMFfSIvbB2MJrKFG2p3CVJsI/NO0PLBeIo2+7SmvE5GukMrLC?=
- =?us-ascii?Q?oy7Lf+e+O2VUCHyY63rvccheGG6eiZy29wQr1ZwOoyCSY8Nzlyme7eqj1pbp?=
- =?us-ascii?Q?uqjXCPRPA4N50xutOlVoTz1T5rTUGTyYK0uVKNwKvE/+vt+fAmDwfof9BxBn?=
- =?us-ascii?Q?9+/9fGvhG4GbVLZcUNiP+oMXYHm5hVscloqhAaRw1Eb40mYPjjaVxMuYRcIF?=
- =?us-ascii?Q?6yM/1oYe2ms+yo/jcCeoX880aHpe4JKMeCysqH9vcFKz7vXisJje/bbWk8Zk?=
- =?us-ascii?Q?Q1+9sGiJBGXPasJQDcp9SnXJs4SJiVIsAxutFNM/jyqQij1jc4dFpAf2XIG6?=
- =?us-ascii?Q?JwF53KLTayvr4b3/TP8y3q2Fd35VE+FQXZYJHfgmwTV5TneV4W7QisVLP0dw?=
- =?us-ascii?Q?fFh1ONOLOm0Gl35x40i6AwV2khp0xEdGxGhIRPEn3Vx+gGdFSPVUvHmHJ8dG?=
- =?us-ascii?Q?pJswEMgDRyVvtF1bXx2oflwDRsMvirZo+Gm4lAvX3X7iJvjUpvVZa+N65IXl?=
- =?us-ascii?Q?9T5ZYaoxeu0EUJUGUkyp23+6V4SzS5YoquZsJ1jAV2ixu1rk/KWx+4D+JnBJ?=
- =?us-ascii?Q?oWrw/u3FtdW1eEkP1rB38d0e+1s/dZePhMQrMAauvH2zVkTWqDBiXAkwR+9a?=
- =?us-ascii?Q?HkIs5pn5EwHGHqNuVsOIs4pRJw7aq4nKyA1gBJ2oZuuPBsVOr6NbxpSGN/AW?=
- =?us-ascii?Q?mBxmkryFPHakikJqjaN7Qdh33OtXlDTBq8pzEq7JpkKFA9Udz/xNPo3KRtHV?=
- =?us-ascii?Q?OUFh+RmVa6lAj2mAfYZLrjdk3FbRG3J92EClGDMTYjlS4QRgqqpWMaFQk9nB?=
- =?us-ascii?Q?BdASWc8VAqJKwI7RxJV0aO7pGFM3LgkO/KQGIHoLWALmnbbi8r2gJzHhar5O?=
- =?us-ascii?Q?yOUUFyIEChfu4ZfVLdytGtMPzKaYeOd6xA23R6BYXCILtUofpyg/9EUOM8Ti?=
- =?us-ascii?Q?XX184oh5W87F7qQ4ddsEeQum6q8CDH3K42vMjlAtQJgyYIBPrxAcmBN8hamK?=
- =?us-ascii?Q?crrghx5tLktD/U16fzyKLLdTEGFMWeqUgWAUiQ9H2F6jRpn4dgwUIfExPtk1?=
- =?us-ascii?Q?VwMnyTqLAIyHKyuMh8tU14cYHBDmtKR1QM9P9ugupDlG1SR8c14m2Bb8sL3q?=
- =?us-ascii?Q?Xg3gL/kB2zc87vk0UFjNuX0IMTi4vWkHMqW8HNBhTRBeXrONdyFXC+aYe1CM?=
- =?us-ascii?Q?DyPgWCORwARLCMHxK/BdbGCBQtc/2MzV6NP9zgjj1kcIyNom9JPpcEUQiYF3?=
- =?us-ascii?Q?kMmLlfECRoPCbEqRC1fYtMxNIeBIAQX9Jh/esZ1xmVfQhwTWlX6rmr2gNcFJ?=
- =?us-ascii?Q?N+hlBZg=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:VI1PR04MB5389.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230037)(52116011)(366013)(376011)(1800799021)(38350700011);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?91M5pmDx/HZT/BY3lG0iHrx9TDgCjFouguS2jj0pdK7seC4huGCLfMYQJNDY?=
- =?us-ascii?Q?wy3MUzUdtBP5EmIKZw+wu+JxzC5IPNJ3+bchBkwVDtD2JUMJwS+L3X5PkSyz?=
- =?us-ascii?Q?X3o/3AHebJe8ge4ADJRNR+7yFEhEDhqZr6bMmlwSlvg4K+GHizHnr3Cl6Eht?=
- =?us-ascii?Q?QMr91pqpHTBHn47YhbFR55bvhIT7VNYy8E2uRp2BJlPkbsIEfI/7lZiifpHO?=
- =?us-ascii?Q?U20r0PntBP9OZzC2Plw3kDoaemsCLhvr++FwYRCx/l2mEEZw58X1FKZh7iaV?=
- =?us-ascii?Q?3xIYOmKq/VidSJFQ/8G1IgVKLQ93jEmM1n7x3RP8DevQoLClCO9etTMUDdgQ?=
- =?us-ascii?Q?pZ4DGZQFtnBQBfjngMatdsdKp9Wp829MpO8cSOuHh2DpIdv+77Wt3BNoCtRf?=
- =?us-ascii?Q?fZ5gnQCyPR2BM3YJjtitakavxHEpKgmoXnzSRDPFSnpt2fyS4kGfWFB03VaH?=
- =?us-ascii?Q?B65G4+WkF2qdsoCHOJfx8QtFbOpGV0srycpQ4C+vORACBJz5qOXy5LB0UjQZ?=
- =?us-ascii?Q?ZqgrBOvN8R/49g8GlVeRre49AfIxrG+Rih/4XQ+fAi7IibZdxq5a+75r2D+8?=
- =?us-ascii?Q?Tk0TrdB+tHXn1n39sdsS3NMqVz25D5+xPialeWHSuufr7+Vvv24HD8GT6lKl?=
- =?us-ascii?Q?n09zaSe1byf/hhxMsiqwx/FEkVeXYxLsDP2SES5vHBUGvwoQg1SrmzPAcx9T?=
- =?us-ascii?Q?cLimcpsKIvMfnITzvQiVQ0f6FgZaorUriVFIxN+1CEL0ucSre/gFrCznGjMs?=
- =?us-ascii?Q?02Cp9rYGeaqUa9yis9OdwsOAWo/cnyKrEE9bkAY3MLQNLneZYeCjekKENiwL?=
- =?us-ascii?Q?lQ/708w+y5tiJTgTeBZDKSxJvOFdStta+I42j4y80Lih6zr7/+1KoFOYzLKj?=
- =?us-ascii?Q?kbrJzh6mvVc8UCMvV1aml9dNH4RghHahAkV8pwo1tpXji1GyPZ67gJljx8AN?=
- =?us-ascii?Q?5i+YH4yAeCONtXraKnV4Evi6aUyVVO7pq1sW7jPBtk4nUD7Qw1WLlIanblmU?=
- =?us-ascii?Q?TGbnUW1W6iYiww4Rd1kOGAoAAA51Q08QIRp1y+3zWatorctB7iUkxIHoXUg3?=
- =?us-ascii?Q?TAKn4WdMGQK1dXDzLwxfugRFWvlTgqg08i3QLQgxFSXLmKEzbkEqpv8qTymx?=
- =?us-ascii?Q?RmS44+q14/DqYB7ny/t4LN2XWRIZfHpV/zWjr2aijf93T8krRhwLiS2XXK2T?=
- =?us-ascii?Q?FVF0WI7uC6g234CD2a+nHPYCTN3nxu+leK9NRoa3AgV5SDpSXBsC1fjcRXPR?=
- =?us-ascii?Q?7/mwWY9IHvdkxStPZcsK91hJVdFu3TyF1z5NclUqzXAveugRdOL2LVCgFgAf?=
- =?us-ascii?Q?xa7nnEfscm4CQ3y2htCJZrI02BrgOWXATBK4WY6nSdEUt6lPSXq2evrPc4IJ?=
- =?us-ascii?Q?B80yarcw9wLWrG1969hG84n+VyvKR5cs7VPqLyrolE0vNfphgleXTQTtsyHW?=
- =?us-ascii?Q?ddzip8UL3O19dQcN/MfJa36jLfMUibXh8UfzuAQv510RWUhLkNpFOQ6BtHP0?=
- =?us-ascii?Q?5+jf2YhYtps+lcKDVRcgeeFzzeELjxYQnVSNQZg3WWjeDAXgr63+KANHxeXP?=
- =?us-ascii?Q?WXG8dDDLfbapKcN1Mt3tbVR0+MmI9csK8wuMRqRx?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 25358681-58ce-4370-631a-08dc90456d14
-X-MS-Exchange-CrossTenant-AuthSource: VI1PR04MB5389.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Jun 2024 09:51:43.8415
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 9JkcKWtUA0bYQKOTxGjSfmGFSN2GntnCZvZ2+5sGWzZmodmD3DVwZmDHZVCf17zWgVl5cby98bQ0OGQVtHu9SA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR04MB7093
+Content-Transfer-Encoding: 8bit
 
-Currently the broadcast code is set without memory being allocated
-for it resulting in segmentation fault. This fixes the issue by using
-the newly created util_iov_new that allocates the memory before
-setting it.
+From BlazarI onwards, driver shall append the firmware ID (usually
+represents transport type) while constructing the firmware name.
+Firmware ID is returned on Intel Read Version command.
+
+The new firmware file name for operational image and ddc file shall be,
+ibt-<cnvi_top type+cnvi_top step>-<cnvr_top type+cnvr_top step-fw_id>.[sfi|ddc]
+
+dmesg snippet from BlazarI pcie  product:
+
+......
+
+[17.098858] Bluetooth: hci0: Found device firmware: intel/ibt-0190-0291-pci.sfi
+[17.098871] Bluetooth: hci0: Boot Address: 0x10000800
+[17.098872] Bluetooth: hci0: Firmware Version: 214-25.24
+[17.158229] Bluetooth: BNEP (Ethernet Emulation) ver 1.3
+[17.158236] Bluetooth: BNEP filters: protocol multicast
+[17.158241] Bluetooth: BNEP socket layer initialized
+[17.468789] Bluetooth: hci0: Waiting for firmware download to complete
+[17.468793] Bluetooth: hci0: Firmware loaded in 361262 usecs
+[17.468872] Bluetooth: hci0: Waiting for device to boot
+[17.504148] Bluetooth: hci0: Device booted in 34512 usecs
+[17.504148] Bluetooth: hci0: Malformed MSFT vendor event: 0x02
+[17.504682] Bluetooth: hci0: Found Intel DDC parameters: intel/ibt-0190-0291-pci.ddc
+[17.505380] Bluetooth: hci0: Applying Intel DDC parameters completed
+[17.505622] Bluetooth: hci0: Firmware timestamp 2024.25 buildtype 3 build 64726
+[17.505624] Bluetooth: hci0: Firmware SHA1: 0x9f4adddc
+[17.505838] Bluetooth: hci0: Fseq status: Success (0x00)
+[17.505839] Bluetooth: hci0: Fseq executed: 00.00.04.183
+[17.505840] Bluetooth: hci0: Fseq BT Top: 00.00.04.183
+
+dmesg snippet from BlazarI usb product:
+
+.......
+
+[14.212072] Bluetooth: hci0: Found device firmware: intel/ibt-0190-0291-usb.sfi
+[14.212091] Bluetooth: hci0: Boot Address: 0x10000800
+[14.212093] Bluetooth: hci0: Firmware Version: 79-21.24
+[14.262125] Bluetooth: BNEP (Ethernet Emulation) ver 1.3
+[14.262129] Bluetooth: BNEP filters: protocol multicast
+[14.262133] Bluetooth: BNEP socket layer initialized
+[15.865421] Bluetooth: hci0: Waiting for firmware download to complete
+[15.865991] Bluetooth: hci0: Firmware loaded in 1615150 usecs
+[15.866017] Bluetooth: hci0: Waiting for device to boot
+[15.899934] Bluetooth: hci0: Malformed MSFT vendor event: 0x02
+[15.899942] Bluetooth: hci0: Device booted in 33139 usecs
+[15.900172] Bluetooth: hci0: Found Intel DDC parameters: intel/ibt-0190-0291-usb.ddc
+[15.901928] Bluetooth: hci0: Applying Intel DDC parameters completed
+[15.904993] Bluetooth: hci0: Firmware timestamp 2024.21 buildtype 3 build 63311
+[15.904996] Bluetooth: hci0: Firmware SHA1: 0x8b217cf7
+[15.908929] Bluetooth: hci0: Fseq status: Success (0x00)
+[15.908934] Bluetooth: hci0: Fseq executed: 00.00.04.180
+[15.908935] Bluetooth: hci0: Fseq BT Top: 00.00.04.180
+
+Signed-off-by: Kiran K <kiran.k@intel.com>
 ---
- profiles/audio/bap.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+ drivers/bluetooth/btintel.c | 88 ++++++++++++++++++++++++++++---------
+ drivers/bluetooth/btintel.h |  6 ++-
+ 2 files changed, 73 insertions(+), 21 deletions(-)
 
-diff --git a/profiles/audio/bap.c b/profiles/audio/bap.c
-index 53e7b3e34..e82a25382 100644
---- a/profiles/audio/bap.c
-+++ b/profiles/audio/bap.c
-@@ -1042,9 +1042,8 @@ static void create_stream_for_bis(struct bap_data *bap_data,
- 	setup->qos.bcast.framing = qos->bcast.framing;
- 	setup->qos.bcast.encryption = qos->bcast.encryption;
- 	if (setup->qos.bcast.encryption)
--		util_iov_append(setup->qos.bcast.bcode,
--				qos->bcast.bcode,
--				sizeof(qos->bcast.bcode));
-+		setup->qos.bcast.bcode = util_iov_new(qos->bcast.bcode,
-+						sizeof(qos->bcast.bcode));
- 	setup->qos.bcast.options = qos->bcast.options;
- 	setup->qos.bcast.skip = qos->bcast.skip;
- 	setup->qos.bcast.sync_timeout = qos->bcast.sync_timeout;
+diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
+index ff33e1aa2929..5d735391545a 100644
+--- a/drivers/bluetooth/btintel.c
++++ b/drivers/bluetooth/btintel.c
+@@ -631,6 +631,10 @@ int btintel_parse_version_tlv(struct hci_dev *hdev,
+ 		case INTEL_TLV_GIT_SHA1:
+ 			version->git_sha1 = get_unaligned_le32(tlv->val);
+ 			break;
++		case INTEL_TLV_FW_ID:
++			snprintf(version->fw_id, sizeof(version->fw_id),
++				 "%s", tlv->val);
++			break;
+ 		default:
+ 			/* Ignore rest of information */
+ 			break;
+@@ -2133,30 +2137,61 @@ static void btintel_get_fw_name_tlv(const struct intel_version_tlv *ver,
+ 				    const char *suffix)
+ {
+ 	const char *format;
+-	/* The firmware file name for new generation controllers will be
+-	 * ibt-<cnvi_top type+cnvi_top step>-<cnvr_top type+cnvr_top step>
+-	 */
+-	switch (ver->cnvi_top & 0xfff) {
++	u32 cnvi, cnvr;
++
++	cnvi = INTEL_CNVX_TOP_PACK_SWAB(INTEL_CNVX_TOP_TYPE(ver->cnvi_top),
++					INTEL_CNVX_TOP_STEP(ver->cnvi_top));
++
++	cnvr = INTEL_CNVX_TOP_PACK_SWAB(INTEL_CNVX_TOP_TYPE(ver->cnvr_top),
++					INTEL_CNVX_TOP_STEP(ver->cnvr_top));
++
+ 	/* Only Blazar  product supports downloading of intermediate loader
+ 	 * image
+ 	 */
+-	case BTINTEL_CNVI_BLAZARI:
+-		if (ver->img_type == BTINTEL_IMG_BOOTLOADER)
++	if ((ver->cnvi_top & 0xfff) >= BTINTEL_CNVI_BLAZARI) {
++		u8 zero[BTINTEL_FWID_MAXLEN];
++
++		if (ver->img_type == BTINTEL_IMG_BOOTLOADER) {
+ 			format = "intel/ibt-%04x-%04x-iml.%s";
+-		else
+-			format = "intel/ibt-%04x-%04x.%s";
+-		break;
+-	default:
+-			format = "intel/ibt-%04x-%04x.%s";
+-		break;
++			snprintf(fw_name, len, format, cnvi, cnvr, suffix);
++			return;
++		}
++
++		memset(zero, 0, sizeof(zero));
++
++		/* ibt-<cnvi_top type+cnvi_top step>-<cnvr_top type+cnvr_top step-fw_id> */
++		if (memcmp(ver->fw_id, zero, sizeof(zero))) {
++			format = "intel/ibt-%04x-%04x-%s.%s";
++			snprintf(fw_name, len, format, cnvi, cnvr,
++				 ver->fw_id, suffix);
++			return;
++		}
++		/* If firmware id is not present, fallback to legacy naming
++		 * convention
++		 */
+ 	}
++	/* Fallback to legacy naming convention for other controllers
++	 * ibt-<cnvi_top type+cnvi_top step>-<cnvr_top type+cnvr_top step>
++	 */
++	format = "intel/ibt-%04x-%04x.%s";
++	snprintf(fw_name, len, format, cnvi, cnvr, suffix);
++}
++
++static void btintel_get_iml_tlv(const struct intel_version_tlv *ver,
++				char *fw_name, size_t len,
++				const char *suffix)
++{
++	const char *format;
++	u32 cnvi, cnvr;
++
++	cnvi = INTEL_CNVX_TOP_PACK_SWAB(INTEL_CNVX_TOP_TYPE(ver->cnvi_top),
++					INTEL_CNVX_TOP_STEP(ver->cnvi_top));
+ 
+-	snprintf(fw_name, len, format,
+-		 INTEL_CNVX_TOP_PACK_SWAB(INTEL_CNVX_TOP_TYPE(ver->cnvi_top),
+-					  INTEL_CNVX_TOP_STEP(ver->cnvi_top)),
+-		 INTEL_CNVX_TOP_PACK_SWAB(INTEL_CNVX_TOP_TYPE(ver->cnvr_top),
+-					  INTEL_CNVX_TOP_STEP(ver->cnvr_top)),
+-		 suffix);
++	cnvr = INTEL_CNVX_TOP_PACK_SWAB(INTEL_CNVX_TOP_TYPE(ver->cnvr_top),
++					INTEL_CNVX_TOP_STEP(ver->cnvr_top));
++
++	format = "intel/ibt-%04x-%04x-iml.%s";
++	snprintf(fw_name, len, format, cnvi, cnvr, suffix);
+ }
+ 
+ static int btintel_prepare_fw_download_tlv(struct hci_dev *hdev,
+@@ -2164,7 +2199,7 @@ static int btintel_prepare_fw_download_tlv(struct hci_dev *hdev,
+ 					   u32 *boot_param)
+ {
+ 	const struct firmware *fw;
+-	char fwname[64];
++	char fwname[128];
+ 	int err;
+ 	ktime_t calltime;
+ 
+@@ -2199,7 +2234,20 @@ static int btintel_prepare_fw_download_tlv(struct hci_dev *hdev,
+ 		}
+ 	}
+ 
+-	btintel_get_fw_name_tlv(ver, fwname, sizeof(fwname), "sfi");
++	if (ver->img_type == BTINTEL_IMG_OP) {
++		/* Controller running OP image. In case of FW downgrade,
++		 * FWID TLV may not be present and driver may attempt to load
++		 * firmware image which doesn't exist. Lets compare the version
++		 * of IML image
++		 */
++		if ((ver->cnvi_top & 0xfff) >= BTINTEL_CNVI_BLAZARI)
++			btintel_get_iml_tlv(ver, fwname, sizeof(fwname), "sfi");
++		else
++			btintel_get_fw_name_tlv(ver, fwname, sizeof(fwname), "sfi");
++	} else {
++		btintel_get_fw_name_tlv(ver, fwname, sizeof(fwname), "sfi");
++	}
++
+ 	err = firmware_request_nowarn(&fw, fwname, &hdev->dev);
+ 	if (err < 0) {
+ 		if (!btintel_test_flag(hdev, INTEL_BOOTLOADER)) {
+diff --git a/drivers/bluetooth/btintel.h b/drivers/bluetooth/btintel.h
+index 9dbad1a7c47c..aa70e4c27416 100644
+--- a/drivers/bluetooth/btintel.h
++++ b/drivers/bluetooth/btintel.h
+@@ -42,7 +42,8 @@ enum {
+ 	INTEL_TLV_SBE_TYPE,
+ 	INTEL_TLV_OTP_BDADDR,
+ 	INTEL_TLV_UNLOCKED_STATE,
+-	INTEL_TLV_GIT_SHA1
++	INTEL_TLV_GIT_SHA1,
++	INTEL_TLV_FW_ID = 0x50
+ };
+ 
+ struct intel_tlv {
+@@ -57,6 +58,8 @@ struct intel_tlv {
+ #define BTINTEL_IMG_IML			0x02	/* Intermediate image */
+ #define BTINTEL_IMG_OP			0x03	/* Operational image */
+ 
++#define BTINTEL_FWID_MAXLEN 64
++
+ struct intel_version_tlv {
+ 	u32	cnvi_top;
+ 	u32	cnvr_top;
+@@ -77,6 +80,7 @@ struct intel_version_tlv {
+ 	u8	limited_cce;
+ 	u8	sbe_type;
+ 	u32	git_sha1;
++	u8	fw_id[BTINTEL_FWID_MAXLEN];
+ 	bdaddr_t otp_bd_addr;
+ };
+ 
 -- 
 2.40.1
 
