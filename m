@@ -1,112 +1,131 @@
-Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
+Received: from mail-oo1-f44.google.com (mail-oo1-f44.google.com [209.85.161.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 719C213E034
-	for <linux-bluetooth@vger.kernel.org>; Wed, 19 Jun 2024 12:04:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F06F13DDC9
+	for <linux-bluetooth@vger.kernel.org>; Wed, 19 Jun 2024 12:07:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718798684; cv=none; b=WlCdeZSaI0sVmkH5jUadyyhdit7a6RR+pQAZH4ixZ9EhE5kedpIqocXo+RQ9Ej+0EUjlFmAzYANI/mYQijjHKcxJFboTPQZYX3OaIwL6mX/+6M2kxjMADMA7Oc/jR2I9spSBWKesP/I7FDL6iypB9hBUAEYzfWfvrkMPtTwIGHE=
+	t=1718798830; cv=none; b=VpauJ10j3lABsaZMUypL5ZGjrGOj10qdRV1R/KTQMDNou4z6KKRL97/39Mhn2Nt2qhezVJ3ZpFHRAT3BLAiL/8c5QZISeOfboKMAwq5dL2rfmnNlT9l6wZpRL2vluScbXJonoheBuNdooDykd7ve+zcCoopBrsCbyIhIFH9TgTo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718798684; c=relaxed/simple;
-	bh=zUMYWZyOwxd54E5QCfXgl4+x+El5GgiuzbBzYO0TouU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=nrDTlVzi3QwViDtKfExQBtm7zrjiOo4ZmDuF/PY1cMx2uR88LfCsR2TpSVlatUxm68xQnELKEVvww706zW3ZpAxxwc3OG4ia6fkSqxrYGHJvdOUc+ob3P69fgfbR4BZ0Vauhgez1DAM0cE0nVpmGqehfsy+TX421FLEB3Hwvywg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=softeq.com; spf=pass smtp.mailfrom=softeq.com; dkim=pass (1024-bit key) header.d=softeq.com header.i=@softeq.com header.b=vADONvGL; arc=none smtp.client-ip=209.85.208.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=softeq.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=softeq.com
+	s=arc-20240116; t=1718798830; c=relaxed/simple;
+	bh=cyTFl68Zubi+DpRIB47DxXnU7QLS9LHEeo8OAqSFb5s=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=nLTKRdxo4voa4o8K6Ftlqv1prshw9XnBbFmoPjzoLeBwFcPVkE60WL+0McKWiSY2JQhKw73Ine+ddb7I7CWLOBemUUouAPGTrECkD9oyPIXk3S1+/zzg1i307Bd8nYU+ZDHc0VBjPhYpwD6MStSpnGoPJp5dMBA+ih1jslcT7oI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JGzuk/nu; arc=none smtp.client-ip=209.85.161.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=softeq.com header.i=@softeq.com header.b="vADONvGL"
-Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-57c68682d1aso7510189a12.3
-        for <linux-bluetooth@vger.kernel.org>; Wed, 19 Jun 2024 05:04:42 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JGzuk/nu"
+Received: by mail-oo1-f44.google.com with SMTP id 006d021491bc7-5b9706c84e5so3744108eaf.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 19 Jun 2024 05:07:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=softeq.com; s=google; t=1718798680; x=1719403480; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=0g01fuQ/egb0KsfwVElzInDADskQN0NVK6D3DFRl3S0=;
-        b=vADONvGLfDbk1BK2I+VtptZpoWLQUYQ3lMEva+smk4vEt7LyCWruqocW2a//+OpFaM
-         c0Mc6Zq6Gz1N2FQO35VOCZVW+i2zbgLoo22n9uMpm1tGOveclSrFRTdC/2Z/29xry3tr
-         HUI0rZr7ClKpqH3iAg6CQC+fDQy6R8hSTo0po=
+        d=gmail.com; s=20230601; t=1718798828; x=1719403628; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=oer+a1l0AD8uIZdtQU2ZOcs//EUlgDYnuxOSX8e97jM=;
+        b=JGzuk/nuXqjYNveWcTkIxEiz0iETQl4t6Z26b09dNAriIwcC89UltAMAniQxQzVCXJ
+         c7BgI77bHE+zZ3ozz6HCqkeIjQvhSSdpRPMlO5mCXWoXcVTqWvw/aZ1EP5DrxrwQ+PqE
+         DxsmEm7iIWzQiuz90x6XYq7ZnEFJq0CXgzDHmtbx6rn0jFJ23pUOkEEKrWxwxH5jfL5p
+         0fUAfNOudylE4OCNZjY+YVnHNwVSm71+CsQzRUHCNzOYyABysi3gRUIt5wOLx+ElbPM5
+         0iqOTvXnXb0WhsAPK5pps8RO7fNMXEFP2P90c61P1GF+ktdc/aAFJAamlbjdvCYa9R8Q
+         5Nkg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718798680; x=1719403480;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=0g01fuQ/egb0KsfwVElzInDADskQN0NVK6D3DFRl3S0=;
-        b=Itt4Vwku3mFqk3sI4pCzqxy7m9Zh01dWrEblqEMSqj5l4xql6v4RWdGo2EgHJLUpwo
-         gPYcV6rjsuHClJa17E0OsnXzn3j0AO32RozbBlj7CYdXseM8EhLT6zMI9D63iuVjuv6p
-         rqJNCjIm+WRJEMrUME1eGWDPkvTWFvCvq4DR24qCS6YDcD2hdteFMYjjLDF1L3FCODPH
-         usKmaMk8amHSMNsm3BlJbiMAok1E6kkOd9kfpOJtarpGyIOv8WG7kNQi+1o17JpZtUtB
-         3tP/7DlRh68MEpcUuh9oEN4FMgLeBJpvrzK3dlpPdViqjBdMYwq+JsHDj1v49elzawIe
-         caqg==
-X-Gm-Message-State: AOJu0YyE4g2unbSTUSug+Cs82CzYT0V4U+ti9Hzmc+Gn2vhctNQZObWT
-	AvzGu8hk0h4IfIjRsFsJp40/5MsbipAP4bcO4W282oBFAkzbE15bkF/9UG3MwDt4PKvWkjEk/Cl
-	5
-X-Google-Smtp-Source: AGHT+IGjl8NsWTHmefFwtpXWmMPb3Tc6GdJK6AzYnhm7TuuXZ9iJRmb71zpOyQukdpdXyzs4zNqvrA==
-X-Received: by 2002:a50:c358:0:b0:57c:7486:3f7d with SMTP id 4fb4d7f45d1cf-57d07e66a64mr1315344a12.19.1718798680164;
-        Wed, 19 Jun 2024 05:04:40 -0700 (PDT)
-Received: from localhost.localdomain ([212.59.15.122])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-57d0d9c3b7fsm406365a12.55.2024.06.19.05.04.39
+        d=1e100.net; s=20230601; t=1718798828; x=1719403628;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=oer+a1l0AD8uIZdtQU2ZOcs//EUlgDYnuxOSX8e97jM=;
+        b=pQY9r8jkUzpM8liE+hQlszbsC1SOxEasTP9X9Kn8Gzws9h/lxoquu+1sEiVK2VWvkA
+         H3ZvW7GysqKzSNfJ+0vS2a3P8A/MDujo/9M4wgSzzftjhexXNXMQ4QoUBsTPzfM9DVxk
+         FA2/Zz6Caj60Jsy5oTGq4AIaI5+MzGQT6V8sVatpjhcK6NYIfcd1ygxs08IcC223JFAX
+         s5xvWy6A76aQsklxItXSrOdeOsFEcWc3MKdt4vQvVG3fAv0mpTrbbFCxzTy+55BGz402
+         /jdg7saRyDycs+LHtlhmnunhYmGE51oX4ST6CNk1gPAD0IvqLo3dfu8cymRkvyXlew24
+         EOdA==
+X-Gm-Message-State: AOJu0Yykj3pCJSvsZcdKWLwql1EioMa8v0C+nXGOXczs8AKG89xn3ZKt
+	qUJ9uozYzOUYORayR2kwhoxdD6DgDtIELUJ3XxkZjW1W12sEHfOlHFc2AQ==
+X-Google-Smtp-Source: AGHT+IEo7TqwXGZNwmTzq6Bn0oWwuFLOaOdiqYee/FlmpwVfBZWwp3J50i4+3Rd3FCXbsw0EyrAY1Q==
+X-Received: by 2002:a4a:804f:0:b0:5ba:ffcb:c760 with SMTP id 006d021491bc7-5c1adc049d3mr2411949eaf.5.1718798827939;
+        Wed, 19 Jun 2024 05:07:07 -0700 (PDT)
+Received: from [172.17.0.2] ([20.55.86.186])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6b2a5eb498bsm76747096d6.76.2024.06.19.05.07.07
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 19 Jun 2024 05:04:39 -0700 (PDT)
-From: Yauhen Kharuzhy <yauhen.kharuzhy@softeq.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Yauhen Kharuzhy <yauhen.kharuzhy@softeq.com>
-Subject: [PATCH BlueZ v2 2/2] mcp: Implement Next Track and Previous Track commands
-Date: Wed, 19 Jun 2024 15:04:33 +0300
-Message-ID: <20240619120433.3666313-2-yauhen.kharuzhy@softeq.com>
-X-Mailer: git-send-email 2.45.1
-In-Reply-To: <20240619120433.3666313-1-yauhen.kharuzhy@softeq.com>
-References: <20240619120433.3666313-1-yauhen.kharuzhy@softeq.com>
+        Wed, 19 Jun 2024 05:07:07 -0700 (PDT)
+Message-ID: <6672c9eb.050a0220.d24dc.868c@mx.google.com>
+Date: Wed, 19 Jun 2024 05:07:07 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============4400845777731887347=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, vlad.pruteanu@nxp.com
+Subject: RE: bap: Allocate memory for broadcast code
+In-Reply-To: <20240619095119.167652-2-vlad.pruteanu@nxp.com>
+References: <20240619095119.167652-2-vlad.pruteanu@nxp.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Add implementation of Next/Previous Track commands to the audio/mcp profile.
+--===============4400845777731887347==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-It is used by the Bluetooth media control widget in KDE, for example.
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=863362
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.95 seconds
+GitLint                       PASS      0.67 seconds
+BuildEll                      PASS      24.51 seconds
+BluezMake                     PASS      1675.31 seconds
+MakeCheck                     PASS      13.64 seconds
+MakeDistcheck                 PASS      176.61 seconds
+CheckValgrind                 PASS      250.75 seconds
+CheckSmatch                   PASS      352.42 seconds
+bluezmakeextell               PASS      119.14 seconds
+IncrementalBuild              PASS      2986.68 seconds
+ScanBuild                     WARNING   1020.79 seconds
+
+Details
+##############################
+Test: ScanBuild - WARNING
+Desc: Run Scan Build
+Output:
+In file included from tools/mesh-gatt/crypto.c:32:
+./src/shared/util.h:240:9: warning: 1st function call argument is an uninitialized value
+        return be32_to_cpu(get_unaligned((const uint32_t *) ptr));
+               ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+./src/shared/util.h:33:26: note: expanded from macro 'be32_to_cpu'
+#define be32_to_cpu(val) bswap_32(val)
+                         ^~~~~~~~~~~~~
+/usr/include/byteswap.h:34:21: note: expanded from macro 'bswap_32'
+#define bswap_32(x) __bswap_32 (x)
+                    ^~~~~~~~~~~~~~
+In file included from tools/mesh-gatt/crypto.c:32:
+./src/shared/util.h:250:9: warning: 1st function call argument is an uninitialized value
+        return be64_to_cpu(get_unaligned((const uint64_t *) ptr));
+               ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+./src/shared/util.h:34:26: note: expanded from macro 'be64_to_cpu'
+#define be64_to_cpu(val) bswap_64(val)
+                         ^~~~~~~~~~~~~
+/usr/include/byteswap.h:37:21: note: expanded from macro 'bswap_64'
+#define bswap_64(x) __bswap_64 (x)
+                    ^~~~~~~~~~~~~~
+2 warnings generated.
+
+
+
 ---
- profiles/audio/mcp.c | 18 ++++++++++++++++--
- 1 file changed, 16 insertions(+), 2 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/profiles/audio/mcp.c b/profiles/audio/mcp.c
-index b410b3d2a..8d1b7588e 100644
---- a/profiles/audio/mcp.c
-+++ b/profiles/audio/mcp.c
-@@ -224,13 +224,27 @@ static int ct_stop(struct media_player *mp, void *user_data)
- 	return bt_mcp_stop(mcp);
- }
- 
-+static int ct_next(struct media_player *mp, void *user_data)
-+{
-+	struct bt_mcp *mcp = user_data;
-+
-+	return bt_mcp_next_track(mcp);
-+}
-+
-+static int ct_previous(struct media_player *mp, void *user_data)
-+{
-+	struct bt_mcp *mcp = user_data;
-+
-+	return bt_mcp_previous_track(mcp);
-+}
-+
- static const struct media_player_callback ct_cbs = {
- 	.set_setting	= NULL,
- 	.play		= &ct_play,
- 	.pause		= &ct_pause,
- 	.stop		= &ct_stop,
--	.next		= NULL,
--	.previous	= NULL,
-+	.next		= &ct_next,
-+	.previous	= &ct_previous,
- 	.fast_forward	= NULL,
- 	.rewind		= NULL,
- 	.press		= NULL,
--- 
-2.45.1
 
+--===============4400845777731887347==--
