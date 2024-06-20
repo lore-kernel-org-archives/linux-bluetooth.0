@@ -1,684 +1,254 @@
-Received: from mail-lj1-f174.google.com (mail-lj1-f174.google.com [209.85.208.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E47D31E48B
-	for <linux-bluetooth@vger.kernel.org>; Thu, 20 Jun 2024 14:27:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 726DB1ACE94;
+	Thu, 20 Jun 2024 14:30:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718893682; cv=none; b=rxSDWb+3rhEKiI6mXf6vQofvpsPC/r7RDlgphPMrST/Wd0WzCF8suJKyqyhCBSPER72DqEPCmh6kT4ikLYCdA3Sj+HlOPHc9NkTOZ+j2O7GLY5M9OuWvEqHQcWJ/ffXAKNfj+JKyT1RRn8DIRIVFAx8cdk5oTOB7oTp+NqZeMcI=
+	t=1718893815; cv=none; b=Z+K/RLD9L7iLzU4scI2YX82aLg+CtFiwvOEm5ZMdO5Le5MgDm+nUyLotzKyEfdPy/FhYk6Wo7snvK+vfVuPU26J2BJANL068mB7BR1vf13XImiibk1LqkgmijRQurbSYbs/k8m1M/xvNon4kXg+wIDcXFZQ3l2vNJCIDPjy7kSM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718893682; c=relaxed/simple;
-	bh=83Q/BKXWIZ+aMKVrwui4ZV/hJV5CIa1d9oLKU5XhlhM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=IaSv3/Jvhz9C0uz6IrG6tgBO2Xj0QH7iPnIJlmeXnp1kV7B5heVGJnBqHg2N6uQGGSY+xZwI+LogzPTZvkyoclDTJplJD1FislgkQuvgY5MC/5xVd16h18kwTt1h5RDdnlZiHoRexl9pakwYVIqcP7GUtAEh+zm1chDZquYmwtE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bG/q+/8H; arc=none smtp.client-ip=209.85.208.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1718893815; c=relaxed/simple;
+	bh=CB0GfU5+WRIGYKX3xpnEIAeKadPq26rv8xPeG4YddIw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=gkdcJm9J//IolwNqLp7j4ZOboeDqytzggc/muKh89omk5ONBCcQj7ltWAFHANEUJ09UZPtyGJBoAHG9N3C66ajtBQ/jmX075RnCMAnI9dPbbA7zAdSe6tzGj8+pKO7p1ypGBD60Y5mEoSkvn9LfszMFcz5r8deVg4Va1m+3l/6E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ptwCBJjj; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bG/q+/8H"
-Received: by mail-lj1-f174.google.com with SMTP id 38308e7fff4ca-2ebeefb9a7fso11056281fa.0
-        for <linux-bluetooth@vger.kernel.org>; Thu, 20 Jun 2024 07:27:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1718893678; x=1719498478; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=z2S7XfuI678Rd0rpos2fDT+zEMw9InpOFOiBjrGjuAw=;
-        b=bG/q+/8HIQVh6B5SwmmK8Qqy2IzxmAZedM0PLhjTnW6ujFxMi7/cwxj1Z/p7hRAxeA
-         DXeuhcaJGBW4Sts0EBVcg08qH10KF7gsgFBaoNEp39RdVlpId0D6Vgnk3N8pH/+4d+AL
-         FtWtEv6B9aw6mRBKurwYRsznXrS6+w6Z7ZvHspDT9RbUKDqEePdLBezCqcASnBDZau7I
-         ACtVK1On1pmKFWoQwrr320Blv++YfTHPZEkmROYIJRhhVsmH8OWUN+gnDTox7v/ceneS
-         oRXj+gBm9X7HHPVgLoxpVbBHW2XIUr72YpLiImhPOpJcvr0Kkr6Pc8d8foMr2HoKl2ko
-         IwvQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718893678; x=1719498478;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=z2S7XfuI678Rd0rpos2fDT+zEMw9InpOFOiBjrGjuAw=;
-        b=VnnncNFvIYHg8/dlwVIrui6fgLlGEpbVdcOoQHoHocfbPHJViyFWPhnSI44zqkjU+k
-         jnJ+/LcMknZf9lpUTMA29Uy57nA1SCSmwZKaJGfTXpQhI+JZZeFspPDW5TUxUzHzGHjB
-         bcYPWEZGd4Tn8PlRYjKs4nRu2rn9JsMkpCldcJ+F/fv4LE8PzgZzutfcKcoMliXO4yJJ
-         ZLdgobY9lE5mO57wT9uD5tH1NNmZsp60dvnfaApU9ZLuyJAl6W+EMDNZmgBzTB1F9byl
-         yRfUQbii+JCmbjIUyjepDdeK9PA0kaZGS/RU7EXyN8Fbtd1SNiGU+Ko/8Xl4z+giOdDg
-         w8pw==
-X-Forwarded-Encrypted: i=1; AJvYcCWDckGPJYqtQQNrNJEcI6hb2kQmypDPtF1Z3++Xzs6fkaoSEhrzqiFAh1tjonaywGjgWccCftyPhqB4K4+dcJNeTuGWNeJ2m0vvtc5eZicy
-X-Gm-Message-State: AOJu0YxWFjHhqtQ4uYhI+IM5RKRCf0GVdkQlI+Ge4nV+VPfHvir9FR8f
-	FYFovi8OyB3BQ6gp3g+PE+qkVuY7rH2EqguNU7bv6IBfdwIaLxZlVP9yw11Dli8RoK4qWQWy3Qw
-	ny/2nGJBR85fuWbYmJoDyp4PAitU=
-X-Google-Smtp-Source: AGHT+IEl85AqcOhDrbrFmFHO9I5gFlRS8bMTIFoYdJNPzTsez5t2ySEaNksUm75edFthEyu+f5fRkna2sOWOkxRlRKw=
-X-Received: by 2002:a2e:9257:0:b0:2ec:1c95:ff02 with SMTP id
- 38308e7fff4ca-2ec3ce7cf49mr36982031fa.7.1718893677800; Thu, 20 Jun 2024
- 07:27:57 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ptwCBJjj"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 74523C2BD10;
+	Thu, 20 Jun 2024 14:30:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1718893814;
+	bh=CB0GfU5+WRIGYKX3xpnEIAeKadPq26rv8xPeG4YddIw=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=ptwCBJjjCoTf0NzrLBidJt/G48pusMeozirAqpkLd+rdk1yO3dNNTfILnOZxbNjka
+	 UdkJyocoAQD4/PZzVXaJoNnihizBOnbf6uZoFFscYseHRY+DCw9yAkARKiwkOka53a
+	 G09HHJNlbnnlgWgmNOGv+VUIURvYOXuxJTVdJwlZQ9spKzD4YGtWt7bySJxqEZ36J7
+	 XWpwt0tLBRNddqr6FgT9DIdQlfJaxXpuDeJjPC6bKt1wFU3p4AnFJQ+Ash+Eqj1JXb
+	 hsiWoS3/9tKHIu0ELtHwlBGlHSqQm2Ff9jdrE88pHUEh1nfTU1XQh9ssqGwegZFVz1
+	 sgneK8K5QL+mA==
+Message-ID: <5267ecb3-6380-4c70-a0ae-5830679d2935@kernel.org>
+Date: Thu, 20 Jun 2024 16:30:09 +0200
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CABBYNZL5zp9+ieeVCSsaWQFVw_7qMM21yPNSjH1wV-ANV6Fd8A@mail.gmail.com>
- <20240620142229.21889-1-iulia.tanasescu@nxp.com>
-In-Reply-To: <20240620142229.21889-1-iulia.tanasescu@nxp.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Thu, 20 Jun 2024 10:27:45 -0400
-Message-ID: <CABBYNZL8PmQAzSQHLZH5DT77KoyZOQgAdsHw=1xSK6kiH5Q1LA@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 2/2] test-bap: Add Broadcast Source STR MBIS tests
-To: Iulia Tanasescu <iulia.tanasescu@nxp.com>
-Cc: andrei.istodorescu@nxp.com, claudia.rosu@nxp.com, 
-	linux-bluetooth@vger.kernel.org, mihai-octavian.urzica@nxp.com, 
-	vlad.pruteanu@nxp.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [GIT PULL] Immutable tag between the Bluetooth and pwrseq
+ branches for v6.11-rc1
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+ Bartosz Golaszewski <brgl@bgdev.pl>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, linux-bluetooth@vger.kernel.org,
+ netdev@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org,
+ Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+References: <20240612075829.18241-1-brgl@bgdev.pl>
+ <CABBYNZLrwgj848w97GP+ijybt-yU8yMNnW5UWhb2y5Zq6b5H9A@mail.gmail.com>
+ <CAMRc=Mdb31YGUUXRWACnx55JawayFaRjEPYSdjOCMrYr5xDYag@mail.gmail.com>
+ <CABBYNZLPv3zk_UX67yPetQKWiQ-g+Dv9ZjZydhwG3jfaeV+48w@mail.gmail.com>
+ <CAMRc=Mdsw5c_BDwUwP2Ss4Bogz-d+waZVd8LLaZ5oyc9dWS2Qg@mail.gmail.com>
+ <CAMRc=Mf2koxQH8Pw--6g5O3FTFn_qcyfwTVQjUqxwJ5qW1nzjw@mail.gmail.com>
+ <CABBYNZ+7SrLSDeCLF0WDM01prRgAEHMD=9mhu5MfWOuGwoAkNQ@mail.gmail.com>
+ <CAMRc=MdozeAzWJCSrDdxVBZ=fwP2yn_j-KZaTDT2Dp7YjKP8-g@mail.gmail.com>
+ <CABBYNZKA7-PAODStTZO33KfHOrGmZHjbEQcP+DKq-CVNwEce4w@mail.gmail.com>
+ <CABBYNZ+x-HPCEwQVPONr6pF-Kvss=gJxqdosNGUfFFQDLz75DA@mail.gmail.com>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=krzk@kernel.org; keydata=
+ xsFNBFVDQq4BEAC6KeLOfFsAvFMBsrCrJ2bCalhPv5+KQF2PS2+iwZI8BpRZoV+Bd5kWvN79
+ cFgcqTTuNHjAvxtUG8pQgGTHAObYs6xeYJtjUH0ZX6ndJ33FJYf5V3yXqqjcZ30FgHzJCFUu
+ JMp7PSyMPzpUXfU12yfcRYVEMQrmplNZssmYhiTeVicuOOypWugZKVLGNm0IweVCaZ/DJDIH
+ gNbpvVwjcKYrx85m9cBVEBUGaQP6AT7qlVCkrf50v8bofSIyVa2xmubbAwwFA1oxoOusjPIE
+ J3iadrwpFvsZjF5uHAKS+7wHLoW9hVzOnLbX6ajk5Hf8Pb1m+VH/E8bPBNNYKkfTtypTDUCj
+ NYcd27tjnXfG+SDs/EXNUAIRefCyvaRG7oRYF3Ec+2RgQDRnmmjCjoQNbFrJvJkFHlPeHaeS
+ BosGY+XWKydnmsfY7SSnjAzLUGAFhLd/XDVpb1Een2XucPpKvt9ORF+48gy12FA5GduRLhQU
+ vK4tU7ojoem/G23PcowM1CwPurC8sAVsQb9KmwTGh7rVz3ks3w/zfGBy3+WmLg++C2Wct6nM
+ Pd8/6CBVjEWqD06/RjI2AnjIq5fSEH/BIfXXfC68nMp9BZoy3So4ZsbOlBmtAPvMYX6U8VwD
+ TNeBxJu5Ex0Izf1NV9CzC3nNaFUYOY8KfN01X5SExAoVTr09ewARAQABzSVLcnp5c3p0b2Yg
+ S296bG93c2tpIDxrcnprQGtlcm5lbC5vcmc+wsGVBBMBCgA/AhsDBgsJCAcDAgYVCAIJCgsE
+ FgIDAQIeAQIXgBYhBJvQfg4MUfjVlne3VBuTQ307QWKbBQJgPO8PBQkUX63hAAoJEBuTQ307
+ QWKbBn8P+QFxwl7pDsAKR1InemMAmuykCHl+XgC0LDqrsWhAH5TYeTVXGSyDsuZjHvj+FRP+
+ gZaEIYSw2Yf0e91U9HXo3RYhEwSmxUQ4Fjhc9qAwGKVPQf6YuQ5yy6pzI8brcKmHHOGrB3tP
+ /MODPt81M1zpograAC2WTDzkICfHKj8LpXp45PylD99J9q0Y+gb04CG5/wXs+1hJy/dz0tYy
+ iua4nCuSRbxnSHKBS5vvjosWWjWQXsRKd+zzXp6kfRHHpzJkhRwF6ArXi4XnQ+REnoTfM5Fk
+ VmVmSQ3yFKKePEzoIriT1b2sXO0g5QXOAvFqB65LZjXG9jGJoVG6ZJrUV1MVK8vamKoVbUEe
+ 0NlLl/tX96HLowHHoKhxEsbFzGzKiFLh7hyboTpy2whdonkDxpnv/H8wE9M3VW/fPgnL2nPe
+ xaBLqyHxy9hA9JrZvxg3IQ61x7rtBWBUQPmEaK0azW+l3ysiNpBhISkZrsW3ZUdknWu87nh6
+ eTB7mR7xBcVxnomxWwJI4B0wuMwCPdgbV6YDUKCuSgRMUEiVry10xd9KLypR9Vfyn1AhROrq
+ AubRPVeJBf9zR5UW1trJNfwVt3XmbHX50HCcHdEdCKiT9O+FiEcahIaWh9lihvO0ci0TtVGZ
+ MCEtaCE80Q3Ma9RdHYB3uVF930jwquplFLNF+IBCn5JRzsFNBFVDXDQBEADNkrQYSREUL4D3
+ Gws46JEoZ9HEQOKtkrwjrzlw/tCmqVzERRPvz2Xg8n7+HRCrgqnodIYoUh5WsU84N03KlLue
+ MNsWLJBvBaubYN4JuJIdRr4dS4oyF1/fQAQPHh8Thpiz0SAZFx6iWKB7Qrz3OrGCjTPcW6ei
+ OMheesVS5hxietSmlin+SilmIAPZHx7n242u6kdHOh+/SyLImKn/dh9RzatVpUKbv34eP1wA
+ GldWsRxbf3WP9pFNObSzI/Bo3kA89Xx2rO2roC+Gq4LeHvo7ptzcLcrqaHUAcZ3CgFG88CnA
+ 6z6lBZn0WyewEcPOPdcUB2Q7D/NiUY+HDiV99rAYPJztjeTrBSTnHeSBPb+qn5ZZGQwIdUW9
+ YegxWKvXXHTwB5eMzo/RB6vffwqcnHDoe0q7VgzRRZJwpi6aMIXLfeWZ5Wrwaw2zldFuO4Dt
+ 91pFzBSOIpeMtfgb/Pfe/a1WJ/GgaIRIBE+NUqckM+3zJHGmVPqJP/h2Iwv6nw8U+7Yyl6gU
+ BLHFTg2hYnLFJI4Xjg+AX1hHFVKmvl3VBHIsBv0oDcsQWXqY+NaFahT0lRPjYtrTa1v3tem/
+ JoFzZ4B0p27K+qQCF2R96hVvuEyjzBmdq2esyE6zIqftdo4MOJho8uctOiWbwNNq2U9pPWmu
+ 4vXVFBYIGmpyNPYzRm0QPwARAQABwsF8BBgBCgAmAhsMFiEEm9B+DgxR+NWWd7dUG5NDfTtB
+ YpsFAmA872oFCRRflLYACgkQG5NDfTtBYpvScw/9GrqBrVLuJoJ52qBBKUBDo4E+5fU1bjt0
+ Gv0nh/hNJuecuRY6aemU6HOPNc2t8QHMSvwbSF+Vp9ZkOvrM36yUOufctoqON+wXrliEY0J4
+ ksR89ZILRRAold9Mh0YDqEJc1HmuxYLJ7lnbLYH1oui8bLbMBM8S2Uo9RKqV2GROLi44enVt
+ vdrDvo+CxKj2K+d4cleCNiz5qbTxPUW/cgkwG0lJc4I4sso7l4XMDKn95c7JtNsuzqKvhEVS
+ oic5by3fbUnuI0cemeizF4QdtX2uQxrP7RwHFBd+YUia7zCcz0//rv6FZmAxWZGy5arNl6Vm
+ lQqNo7/Poh8WWfRS+xegBxc6hBXahpyUKphAKYkah+m+I0QToCfnGKnPqyYIMDEHCS/RfqA5
+ t8F+O56+oyLBAeWX7XcmyM6TGeVfb+OZVMJnZzK0s2VYAuI0Rl87FBFYgULdgqKV7R7WHzwD
+ uZwJCLykjad45hsWcOGk3OcaAGQS6NDlfhM6O9aYNwGL6tGt/6BkRikNOs7VDEa4/HlbaSJo
+ 7FgndGw1kWmkeL6oQh7wBvYll2buKod4qYntmNKEicoHGU+x91Gcan8mCoqhJkbqrL7+nXG2
+ 5Q/GS5M9RFWS+nYyJh+c3OcfKqVcZQNANItt7+ULzdNJuhvTRRdC3g9hmCEuNSr+CLMdnRBY fv0=
+In-Reply-To: <CABBYNZ+x-HPCEwQVPONr6pF-Kvss=gJxqdosNGUfFFQDLz75DA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-Hi Iulia,
+On 20/06/2024 16:20, Luiz Augusto von Dentz wrote:
+> Hi,
+> 
+> On Thu, Jun 20, 2024 at 10:16 AM Luiz Augusto von Dentz
+> <luiz.dentz@gmail.com> wrote:
+>>
+>> Hi Bartosz,
+>>
+>> On Wed, Jun 19, 2024 at 3:40 PM Bartosz Golaszewski <brgl@bgdev.pl> wrote:
+>>>
+>>> On Wed, Jun 19, 2024 at 8:59 PM Luiz Augusto von Dentz
+>>> <luiz.dentz@gmail.com> wrote:
+>>>>
+>>>> Hi Bartosz,
+>>>>
+>>>> On Wed, Jun 19, 2024 at 3:35 AM Bartosz Golaszewski <brgl@bgdev.pl> wrote:
+>>>>>
+>>>>> On Wed, Jun 12, 2024 at 5:00 PM Bartosz Golaszewski <brgl@bgdev.pl> wrote:
+>>>>>>
+>>>>>> On Wed, Jun 12, 2024 at 4:54 PM Luiz Augusto von Dentz
+>>>>>> <luiz.dentz@gmail.com> wrote:
+>>>>>>>
+>>>>>>> Hi Bartosz,
+>>>>>>>
+>>>>>>> On Wed, Jun 12, 2024 at 10:45 AM Bartosz Golaszewski <brgl@bgdev.pl> wrote:
+>>>>>>>>
+>>>>>>>> On Wed, Jun 12, 2024 at 4:43 PM Luiz Augusto von Dentz
+>>>>>>>> <luiz.dentz@gmail.com> wrote:
+>>>>>>>>>
+>>>>>>>>> Hi Bartosz,
+>>>>>>>>>
+>>>>>>>>> On Wed, Jun 12, 2024 at 3:59 AM Bartosz Golaszewski <brgl@bgdev.pl> wrote:
+>>>>>>>>>>
+>>>>>>>>>> From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+>>>>>>>>>>
+>>>>>>>>>> Hi Marcel, Luiz,
+>>>>>>>>>>
+>>>>>>>>>> Please pull the following power sequencing changes into the Bluetooth tree
+>>>>>>>>>> before applying the hci_qca patches I sent separately.
+>>>>>>>>>>
+>>>>>>>>>> Link: https://lore.kernel.org/linux-kernel/20240605174713.GA767261@bhelgaas/T/
+>>>>>>>>>>
+>>>>>>>>>> The following changes since commit 83a7eefedc9b56fe7bfeff13b6c7356688ffa670:
+>>>>>>>>>>
+>>>>>>>>>>   Linux 6.10-rc3 (2024-06-09 14:19:43 -0700)
+>>>>>>>>>>
+>>>>>>>>>> are available in the Git repository at:
+>>>>>>>>>>
+>>>>>>>>>>   git://git.kernel.org/pub/scm/linux/kernel/git/brgl/linux.git tags/pwrseq-initial-for-v6.11
+>>>>>>>>>>
+>>>>>>>>>> for you to fetch changes up to 2f1630f437dff20d02e4b3f07e836f42869128dd:
+>>>>>>>>>>
+>>>>>>>>>>   power: pwrseq: add a driver for the PMU module on the QCom WCN chipsets (2024-06-12 09:20:13 +0200)
+>>>>>>>>>>
+>>>>>>>>>> ----------------------------------------------------------------
+>>>>>>>>>> Initial implementation of the power sequencing subsystem for linux v6.11
+>>>>>>>>>>
+>>>>>>>>>> ----------------------------------------------------------------
+>>>>>>>>>> Bartosz Golaszewski (2):
+>>>>>>>>>>       power: sequencing: implement the pwrseq core
+>>>>>>>>>>       power: pwrseq: add a driver for the PMU module on the QCom WCN chipsets
+>>>>>>>>>
+>>>>>>>>> Is this intended to go via bluetooth-next or it is just because it is
+>>>>>>>>> a dependency of another set? You could perhaps send another set
+>>>>>>>>> including these changes to avoid having CI failing to compile.
+>>>>>>>>>
+>>>>>>>>
+>>>>>>>> No, the pwrseq stuff is intended to go through its own pwrseq tree
+>>>>>>>> hence the PR. We cannot have these commits in next twice.
+>>>>>>>
+>>>>>>> Not following you here, why can't we have these commits on different
+>>>>>>> next trees? If that is the case how can we apply the bluetooth
+>>>>>>> specific ones without causing build regressions?
+>>>>>>>
+>>>>>>
+>>>>>> We can't have the same commits twice with different hashes in next
+>>>>>> because Stephen Rothwell will yell at us both.
+>>>>>>
+>>>>>> Just pull the tag I provided and then apply the Bluetooth specific
+>>>>>> changes I sent on top of it. When sending to Linus Torvalds/David
+>>>>>> Miller (not sure how your tree gets upstream) mention that you pulled
+>>>>>> in the pwrseq changes in your PR cover letter.
+>>>>
+>>>> By pull the tag you mean using merge commits to merge the trees and
+>>>> not rebase, doesn't that lock us down to only doing merge commits
+>>>> rather than rebases later on? I have never used merge commits before.
+>>>> There is some documentation around it that suggests not to use merges:
+>>>>
+>>>> 'While merges from downstream are common and unremarkable, merges from
+>>>> other trees tend to be a red flag when it comes time to push a branch
+>>>> upstream. Such merges need to be carefully thought about and well
+>>>> justified, or there’s a good chance that a subsequent pull request
+>>>> will be rejected.'
+>>>> https://docs.kernel.org/maintainer/rebasing-and-merging.html#merging-from-sibling-or-upstream-trees
+>>>>
+>>>> But then looking forward in that documentation it says:
+>>>>
+>>>> 'Another reason for doing merges of upstream or another subsystem tree
+>>>> is to resolve dependencies. These dependency issues do happen at
+>>>> times, and sometimes a cross-merge with another tree is the best way
+>>>> to resolve them; as always, in such situations, the merge commit
+>>>> should explain why the merge has been done. Take a moment to do it
+>>>> right; people will read those changelogs.'
+>>>>
+>>>> So I guess that is the reason we want to merge the trees, but what I'm
+>>>> really looking forward to is for the 'proper' commands and commit
+>>>> message to use to make sure we don't have problems in the future.
+>>>>
+>>>
+>>> You shouldn't really need to rebase your branch very often anyway.
+>>> This is really for special cases. But even then you can always use:
+>>> `git rebase --rebase-merges` to keep the merge commits.
+>>>
+>>> The commands you want to run are:
+>>>
+>>> git pull git://git.kernel.org/pub/scm/linux/kernel/git/brgl/linux.git
+>>> tags/pwrseq-initial-for-v6.11
+>>> git am or b4 shazam on the patches targeting the Bluetooth subsystem
+>>> git push
+>>
+>> Not quite working for me:
+>>
+>> From git://git.kernel.org/pub/scm/linux/kernel/git/brgl/linux
+>>  * tag                         pwrseq-initial-for-v6.11 -> FETCH_HEAD
+>> hint: You have divergent branches and need to specify how to reconcile them.
+>> hint: You can do so by running one of the following commands sometime before
+>> hint: your next pull:
+>> hint:
+>> hint:   git config pull.rebase false  # merge
+>> hint:   git config pull.rebase true   # rebase
+>> hint:   git config pull.ff only       # fast-forward only
+>> hint:
+>> hint: You can replace "git config" with "git config --global" to set a default
+>> hint: preference for all repositories. You can also pass --rebase, --no-rebase,
+>> hint: or --ff-only on the command line to override the configured default per
+>> hint: invocation.
+>> fatal: Need to specify how to reconcile divergent branches.
+>>
+>> Perhaps I need to configure pull.rebase to be false?
+> 
+> Looks like I just needed -no-ff, will be pushing it after it finishes compiling.
 
-On Thu, Jun 20, 2024 at 10:22=E2=80=AFAM Iulia Tanasescu
-<iulia.tanasescu@nxp.com> wrote:
->
-> Hi Luiz,
->
-> > -----Original Message-----
-> > From: Iulia Tanasescu
-> > Sent: Monday, June 10, 2024 10:24 AM
-> > To: luiz.dentz@gmail.com
-> > Cc: Andrei Istodorescu <andrei.istodorescu@nxp.com>; Claudia Cristina
-> > Draghicescu <claudia.rosu@nxp.com>; Iulia Tanasescu
-> > <iulia.tanasescu@nxp.com>; linux-bluetooth@vger.kernel.org; Mihai-
-> > Octavian Urzica <mihai-octavian.urzica@nxp.com>; Vlad Pruteanu
-> > <vlad.pruteanu@nxp.com>
-> > Subject: Re: [PATCH BlueZ 2/2] test-bap: Add Broadcast Source STR MBIS
-> > tests
-> >
-> > Hi Luiz,
-> >
-> > > -----Original Message-----
-> > > From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-> > > Sent: Thursday, June 6, 2024 11:29 PM
-> > > To: Iulia Tanasescu <iulia.tanasescu@nxp.com>
-> > > Cc: linux-bluetooth@vger.kernel.org; Claudia Cristina Draghicescu
-> > > <claudia.rosu@nxp.com>; Mihai-Octavian Urzica <mihai-
-> > > octavian.urzica@nxp.com>; Vlad Pruteanu <vlad.pruteanu@nxp.com>;
-> > > Andrei Istodorescu <andrei.istodorescu@nxp.com>
-> > > Subject: Re: [PATCH BlueZ 2/2] test-bap: Add Broadcast Source STR MBI=
-S
-> > > tests
-> > >
-> > > Hi Iulia,
-> > >
-> > > On Thu, Jun 6, 2024 at 6:26 AM Iulia Tanasescu
-> > > <iulia.tanasescu@nxp.com>
-> > > wrote:
-> > > >
-> > > > 4.14.3 Broadcast Audio Stream with Multiple BISes - Source
-> > > >
-> > > >      Test Purpose:
-> > > >      Verify that a Broadcast Source IUT can stream multiple
-> > > >      BISes to a Broadcast Sink.
-> > > >
-> > > >      Test Case Configuration:
-> > > >      BAP/BSRC/STR/BV-18-C [BSRC, Multiple BISes, LC3 8_1]
-> > > >      BAP/BSRC/STR/BV-19-C [BSRC, Multiple BISes, LC3 8_2]
-> > > >      BAP/BSRC/STR/BV-20-C [BSRC, Multiple BISes, LC3 16_1]
-> > > >      BAP/BSRC/STR/BV-21-C [BSRC, Multiple BISes, LC3 16_2]
-> > > >      BAP/BSRC/STR/BV-22-C [BSRC, Multiple BISes, LC3 24_1]
-> > > >      BAP/BSRC/STR/BV-23-C [BSRC, Multiple BISes, LC3 24_2]
-> > > >      BAP/BSRC/STR/BV-24-C [BSRC, Multiple BISes, LC3 32_1]
-> > > >      BAP/BSRC/STR/BV-25-C [BSRC, Multiple BISes, LC3 32_2]
-> > > >      BAP/BSRC/STR/BV-26-C [BSRC, Multiple BISes, LC3 44.1_1]
-> > > >      BAP/BSRC/STR/BV-27-C [BSRC, Multiple BISes, LC3 44.1_2]
-> > > >      BAP/BSRC/STR/BV-28-C [BSRC, Multiple BISes, LC3 48_1]
-> > > >      BAP/BSRC/STR/BV-29-C [BSRC, Multiple BISes, LC3 48_2]
-> > > >      BAP/BSRC/STR/BV-30-C [BSRC, Multiple BISes, LC3 48_3]
-> > > >      BAP/BSRC/STR/BV-31-C [BSRC, Multiple BISes, LC3 48_4]
-> > > >      BAP/BSRC/STR/BV-32-C [BSRC, Multiple BISes, LC3 48_5]
-> > > >      BAP/BSRC/STR/BV-33-C [BSRC, Multiple BISes, LC3 48_6]
-> > > >      BAP/BSRC/STR/BV-34-C [BSRC, Multiple BISes, VS]
-> > > >
-> > > >      Pass verdict:
-> > > >      If the Codec ID is LC3, the IUT sends encoded LC3 audio
-> > > >      data in BIS Data PDUs on each synchronized BIS.
-> > > >
-> > > >      If the Codec ID is a vendor-specific Codec ID, the IUT
-> > > >      sends BIS Data PDUs on each synchronized BIS. The parameters
-> > > >      included in the Codec_Specific_Configuration data are as
-> > > >      defined in TSPX_VS_Codec_Specific_Configuration.
-> > > >
-> > > >      If the Codec ID is LC3, each parameter included in
-> > > >      Codec_Specific_Configuration data is formatted in an LTV
-> > > >      structure with the length, type, and value specified in
-> > > >      Table 4.83.
-> > > >
-> > > > Test Summary
-> > > > ------------
-> > > > BAP/BSRC/STR/BV-18-C [BSRC, Multiple BISes, LC3 8_1] Passed
-> > > > BAP/BSRC/STR/BV-19-C [BSRC, Multiple BISes, LC3 8_2] Passed
-> > > > BAP/BSRC/STR/BV-20-C [BSRC, Multiple BISes, LC3 16_1] Passed
-> > > > BAP/BSRC/STR/BV-21-C [BSRC, Multiple BISes, LC3 16_2] Passed
-> > > > BAP/BSRC/STR/BV-22-C [BSRC, Multiple BISes, LC3 24_1] Passed
-> > > > BAP/BSRC/STR/BV-23-C [BSRC, Multiple BISes, LC3 24_2] Passed
-> > > > BAP/BSRC/STR/BV-24-C [BSRC, Multiple BISes, LC3 32_1] Passed
-> > > > BAP/BSRC/STR/BV-25-C [BSRC, Multiple BISes, LC3 32_2] Passed
-> > > > BAP/BSRC/STR/BV-26-C [BSRC, Multiple BISes, LC3 44.1_1] Passed
-> > > > BAP/BSRC/STR/BV-27-C [BSRC, Multiple BISes, LC3 44.1_2] Passed
-> > > > BAP/BSRC/STR/BV-28-C [BSRC, Multiple BISes, LC3 48_1] Passed
-> > > > BAP/BSRC/STR/BV-29-C [BSRC, Multiple BISes, LC3 48_2] Passed
-> > > > BAP/BSRC/STR/BV-30-C [BSRC, Multiple BISes, LC3 48_3] Passed
-> > > > BAP/BSRC/STR/BV-31-C [BSRC, Multiple BISes, LC3 48_4] Passed
-> > > > BAP/BSRC/STR/BV-32-C [BSRC, Multiple BISes, LC3 48_5] Passed
-> > > > BAP/BSRC/STR/BV-33-C [BSRC, Multiple BISes, LC3 48_6] Passed
-> > > > BAP/BSRC/STR/BV-34-C [BSRC, Multiple BISes, VS]      Passed
-> > > > ---
-> > > >  unit/test-bap.c | 354
-> > > > ++++++++++++++++++++++++++++++++++++++++++++++--
-> > > >  1 file changed, 346 insertions(+), 8 deletions(-)
-> > > >
-> > > > diff --git a/unit/test-bap.c b/unit/test-bap.c index
-> > > > c37f7676f..30c223d16 100644
-> > > > --- a/unit/test-bap.c
-> > > > +++ b/unit/test-bap.c
-> > > > @@ -6972,27 +6972,86 @@ static void test_bsnk_str(void)
-> > > >                 NULL, test_bcast, &cfg_bsnk_str_vs_mbis, IOV_NULL);
-> > > > }
-> > > >
-> > > > +static void stream_count_config(void *data, void *user_data) {
-> > > > +       struct bt_bap_stream *stream =3D data;
-> > > > +       uint8_t *streams =3D user_data;
-> > > > +
-> > > > +       if (bt_bap_stream_get_state(stream) =3D=3D
-> > > BT_BAP_STREAM_STATE_CONFIG)
-> > > > +               (*streams)++;
-> > > > +}
-> > > > +
-> > > > +static void stream_count_enabling(void *data, void *user_data) {
-> > > > +       struct bt_bap_stream *stream =3D data;
-> > > > +       uint8_t *streams =3D user_data;
-> > > > +
-> > > > +       if (bt_bap_stream_get_state(stream) =3D=3D
-> > > BT_BAP_STREAM_STATE_ENABLING)
-> > > > +               (*streams)++;
-> > > > +}
-> > > > +
-> > > > +static void stream_enable(void *data, void *user_data) {
-> > > > +       struct bt_bap_stream *stream =3D data;
-> > > > +
-> > > > +       bt_bap_stream_enable(stream, true, NULL, NULL, NULL); }
-> > > > +
-> > > > +static void stream_start(void *data, void *user_data) {
-> > > > +       struct bt_bap_stream *stream =3D data;
-> > > > +
-> > > > +       bt_bap_stream_start(stream, NULL, NULL); }
-> > > > +
-> > > >  static void bsrc_state_str(struct bt_bap_stream *stream, uint8_t
-> > old_state,
-> > > >                                 uint8_t new_state, void *user_data)=
-  {
-> > > >         struct test_data *data =3D user_data;
-> > > > +       uint8_t streams =3D 0;
-> > > >
-> > > >         switch (new_state) {
-> > > >         case BT_BAP_STREAM_STATE_CONFIG:
-> > > > -               bt_bap_stream_enable(stream, true, NULL, NULL, NULL=
-);
-> > > > +               queue_foreach(data->streams, stream_count_config,
-> > > > + &streams);
-> > > > +
-> > > > +               if (streams =3D=3D data->cfg->streams)
-> > > > +                       /* After all streams have transitioned to C=
-ONFIG
-> > > > +                        * state, enable each one.
-> > > > +                        */
-> > > > +                       queue_foreach(data->streams, stream_enable,
-> > > > + NULL);
-> > > >                 break;
-> > > >         case BT_BAP_STREAM_STATE_ENABLING:
-> > > > -               data->base =3D bt_bap_stream_get_base(stream);
-> > > > +               queue_foreach(data->streams, stream_count_enabling,
-> > > &streams);
-> > > >
-> > > > -               g_assert(data->base);
-> > > > -               g_assert(data->base->iov_len =3D=3D data->cfg->base=
-.iov_len);
-> > > > -               g_assert(memcmp(data->base->iov_base, data->cfg-
-> > > >base.iov_base,
-> > > > -                               data->base->iov_len) =3D=3D 0);
-> > > > +               if (streams =3D=3D 1) {
-> > > > +                       /* After the first stream has transitioned =
-to ENABLING
-> > > > +                        * state, bt_bap_stream_get_base will gener=
-ate the
-> > > > +                        * BASE from all previously configured stre=
-ams.
-> > > > +                        */
-> > > > +                       data->base =3D bt_bap_stream_get_base(strea=
-m);
-> > > > +
-> > > > +                       g_assert(data->base);
-> > > > +                       g_assert(data->base->iov_len =3D=3D
-> > > > +                                       data->cfg->base.iov_len);
-> > > > +                       g_assert(memcmp(data->base->iov_base,
-> > > > +                                       data->cfg->base.iov_base,
-> > > > +                                       data->base->iov_len) =3D=3D=
- 0);
-> > > > +               }
-> > > >
-> > > > -               bt_bap_stream_start(stream, NULL, NULL);
-> > > > +               if (streams =3D=3D data->cfg->streams)
-> > > > +                       /* After all streams have transitioned to E=
-NABLING
-> > > > +                        * state, start each one.
-> > > > +                        */
-> > > > +                       queue_foreach(data->streams, stream_start,
-> > > > + NULL);
-> > > >                 break;
-> > > >         case BT_BAP_STREAM_STATE_STREAMING:
-> > > > -               tester_test_passed();
-> > > > +               queue_foreach(data->streams, stream_count_streaming=
-,
-> > > &streams);
-> > > > +
-> > > > +               if (streams =3D=3D data->cfg->streams)
-> > > > +                       /* Test is completed after all streams have=
- transitioned
-> > > > +                        * to STREAMING state.
-> > > > +                        */
-> > > > +                       tester_test_passed();
-> > > >                 break;
-> > > >         }
-> > > >  }
-> > > > @@ -7225,9 +7284,288 @@ static void test_bsrc_str_1b(void)
-> > > >                 NULL, test_bcast, &cfg_bsrc_str_vs, IOV_NULL);  }
-> > > >
-> > > > +#define BASE_LC3_8_1_MBIS \
-> > > > +       BASE_LC3(40000, 1, 2, LC3_CFG_8_1, 0x00, 0x01, 0x00, 0x02,
-> > > > +0x00)
-> > >
-> > > I wonder if we couldn't define these as part of lc3.h, in fact the
-> > > LC3_CFG looks awful similar to LC3_CONFIG from lc3.h, so perhaps we
-> > > could do just s/LC3_CFG/LC3_CONFIG and add something like LC3_BASE
-> > for
-> > > example then rename the existing LC3_BASE to LC3_TYPE(_id), anyway I
-> > > can probably do that myself later after merging this just wanted to
-> > > check first if you thought about that already.
-> >
-> > I added LC3_CFG because LC3_CONFIG from lc3.h defines a iovec struct,
-> > while I needed some byte array to include in BASE_LC3. But I do think i=
-t
-> > would be useful to add the BASE defines to lc3.h, and they could be use=
-d
-> > for iso-tester as well.
-> >
->
-> Should I update this patch to move the BASE defines in lc3.h? Or should
-> it be done in a separate patch?
+Ah, so there was a tag. You miss proper config option... Well, I am
+surprised you do not have default pull.rebase set. How did you manage to
+pull anything from anyone? Git requires it since some time.
 
-Yes, please move the BASE defines to lc3.h.
+Best regards,
+Krzysztof
 
-> > >
-> > > > +static struct test_config cfg_bsrc_str_8_1_mbis =3D {
-> > > > +       .cc =3D LC3_CONFIG_8_1,
-> > > > +       .qos =3D LC3_QOS_8_1_1_B,
-> > > > +       .base =3D UTIL_IOV_INIT(BASE_LC3_8_1_MBIS),
-> > > > +       .src =3D true,
-> > > > +       .state_func =3D bsrc_state_str,
-> > > > +       .streams =3D 2,
-> > > > +};
-> > > > +
-> > > > +#define BASE_LC3_8_2_MBIS \
-> > > > +       BASE_LC3(40000, 1, 2, LC3_CFG_8_2, 0x00, 0x01, 0x00, 0x02,
-> > > > +0x00)
-> > > > +
-> > > > +static struct test_config cfg_bsrc_str_8_2_mbis =3D {
-> > > > +       .cc =3D LC3_CONFIG_8_2,
-> > > > +       .qos =3D LC3_QOS_8_2_1_B,
-> > > > +       .base =3D UTIL_IOV_INIT(BASE_LC3_8_2_MBIS),
-> > > > +       .src =3D true,
-> > > > +       .state_func =3D bsrc_state_str,
-> > > > +       .streams =3D 2,
-> > > > +};
-> > > > +
-> > > > +#define BASE_LC3_16_1_MBIS \
-> > > > +       BASE_LC3(40000, 1, 2, LC3_CFG_16_1, 0x00, 0x01, 0x00, 0x02,
-> > > > +0x00)
-> > > > +
-> > > > +static struct test_config cfg_bsrc_str_16_1_mbis =3D {
-> > > > +       .cc =3D LC3_CONFIG_16_1,
-> > > > +       .qos =3D LC3_QOS_16_1_1_B,
-> > > > +       .base =3D UTIL_IOV_INIT(BASE_LC3_16_1_MBIS),
-> > > > +       .src =3D true,
-> > > > +       .state_func =3D bsrc_state_str,
-> > > > +       .streams =3D 2,
-> > > > +};
-> > > > +
-> > > > +#define BASE_LC3_16_2_MBIS \
-> > > > +       BASE_LC3(40000, 1, 2, LC3_CFG_16_2, 0x00, 0x01, 0x00, 0x02,
-> > > > +0x00)
-> > > > +
-> > > > +static struct test_config cfg_bsrc_str_16_2_mbis =3D {
-> > > > +       .cc =3D LC3_CONFIG_16_2,
-> > > > +       .qos =3D LC3_QOS_16_2_1_B,
-> > > > +       .base =3D UTIL_IOV_INIT(BASE_LC3_16_2_MBIS),
-> > > > +       .src =3D true,
-> > > > +       .state_func =3D bsrc_state_str,
-> > > > +       .streams =3D 2,
-> > > > +};
-> > > > +
-> > > > +#define BASE_LC3_24_1_MBIS \
-> > > > +       BASE_LC3(40000, 1, 2, LC3_CFG_24_1, 0x00, 0x01, 0x00, 0x02,
-> > > > +0x00)
-> > > > +
-> > > > +static struct test_config cfg_bsrc_str_24_1_mbis =3D {
-> > > > +       .cc =3D LC3_CONFIG_24_1,
-> > > > +       .qos =3D LC3_QOS_24_1_1_B,
-> > > > +       .base =3D UTIL_IOV_INIT(BASE_LC3_24_1_MBIS),
-> > > > +       .src =3D true,
-> > > > +       .state_func =3D bsrc_state_str,
-> > > > +       .streams =3D 2,
-> > > > +};
-> > > > +
-> > > > +#define BASE_LC3_24_2_MBIS \
-> > > > +       BASE_LC3(40000, 1, 2, LC3_CFG_24_2, 0x00, 0x01, 0x00, 0x02,
-> > > > +0x00)
-> > > > +
-> > > > +static struct test_config cfg_bsrc_str_24_2_mbis =3D {
-> > > > +       .cc =3D LC3_CONFIG_24_2,
-> > > > +       .qos =3D LC3_QOS_24_2_1_B,
-> > > > +       .base =3D UTIL_IOV_INIT(BASE_LC3_24_2_MBIS),
-> > > > +       .src =3D true,
-> > > > +       .state_func =3D bsrc_state_str,
-> > > > +       .streams =3D 2,
-> > > > +};
-> > > > +
-> > > > +#define BASE_LC3_32_1_MBIS \
-> > > > +       BASE_LC3(40000, 1, 2, LC3_CFG_32_1, 0x00, 0x01, 0x00, 0x02,
-> > > > +0x00)
-> > > > +
-> > > > +static struct test_config cfg_bsrc_str_32_1_mbis =3D {
-> > > > +       .cc =3D LC3_CONFIG_32_1,
-> > > > +       .qos =3D LC3_QOS_32_1_1_B,
-> > > > +       .base =3D UTIL_IOV_INIT(BASE_LC3_32_1_MBIS),
-> > > > +       .src =3D true,
-> > > > +       .state_func =3D bsrc_state_str,
-> > > > +       .streams =3D 2,
-> > > > +};
-> > > > +
-> > > > +#define BASE_LC3_32_2_MBIS \
-> > > > +       BASE_LC3(40000, 1, 2, LC3_CFG_32_2, 0x00, 0x01, 0x00, 0x02,
-> > > > +0x00)
-> > > > +
-> > > > +static struct test_config cfg_bsrc_str_32_2_mbis =3D {
-> > > > +       .cc =3D LC3_CONFIG_32_2,
-> > > > +       .qos =3D LC3_QOS_32_2_1_B,
-> > > > +       .base =3D UTIL_IOV_INIT(BASE_LC3_32_2_MBIS),
-> > > > +       .src =3D true,
-> > > > +       .state_func =3D bsrc_state_str,
-> > > > +       .streams =3D 2,
-> > > > +};
-> > > > +
-> > > > +#define BASE_LC3_44_1_MBIS \
-> > > > +       BASE_LC3(40000, 1, 2, LC3_CFG_44_1, 0x00, 0x01, 0x00, 0x02,
-> > > > +0x00)
-> > > > +
-> > > > +static struct test_config cfg_bsrc_str_44_1_mbis =3D {
-> > > > +       .cc =3D LC3_CONFIG_44_1,
-> > > > +       .qos =3D LC3_QOS_44_1_1_B,
-> > > > +       .base =3D UTIL_IOV_INIT(BASE_LC3_44_1_MBIS),
-> > > > +       .src =3D true,
-> > > > +       .state_func =3D bsrc_state_str,
-> > > > +       .streams =3D 2,
-> > > > +};
-> > > > +
-> > > > +#define BASE_LC3_44_2_MBIS \
-> > > > +       BASE_LC3(40000, 1, 2, LC3_CFG_44_2, 0x00, 0x01, 0x00, 0x02,
-> > > > +0x00)
-> > > > +
-> > > > +static struct test_config cfg_bsrc_str_44_2_mbis =3D {
-> > > > +       .cc =3D LC3_CONFIG_44_2,
-> > > > +       .qos =3D LC3_QOS_44_2_1_B,
-> > > > +       .base =3D UTIL_IOV_INIT(BASE_LC3_44_2_MBIS),
-> > > > +       .src =3D true,
-> > > > +       .state_func =3D bsrc_state_str,
-> > > > +       .streams =3D 2,
-> > > > +};
-> > > > +
-> > > > +#define BASE_LC3_48_1_MBIS \
-> > > > +       BASE_LC3(40000, 1, 2, LC3_CFG_48_1, 0x00, 0x01, 0x00, 0x02,
-> > > > +0x00)
-> > > > +
-> > > > +static struct test_config cfg_bsrc_str_48_1_mbis =3D {
-> > > > +       .cc =3D LC3_CONFIG_48_1,
-> > > > +       .qos =3D LC3_QOS_48_1_1_B,
-> > > > +       .base =3D UTIL_IOV_INIT(BASE_LC3_48_1_MBIS),
-> > > > +       .src =3D true,
-> > > > +       .state_func =3D bsrc_state_str,
-> > > > +       .streams =3D 2,
-> > > > +};
-> > > > +
-> > > > +#define BASE_LC3_48_2_MBIS \
-> > > > +       BASE_LC3(40000, 1, 2, LC3_CFG_48_2, 0x00, 0x01, 0x00, 0x02,
-> > > > +0x00)
-> > > > +
-> > > > +static struct test_config cfg_bsrc_str_48_2_mbis =3D {
-> > > > +       .cc =3D LC3_CONFIG_48_2,
-> > > > +       .qos =3D LC3_QOS_48_2_1_B,
-> > > > +       .base =3D UTIL_IOV_INIT(BASE_LC3_48_2_MBIS),
-> > > > +       .src =3D true,
-> > > > +       .state_func =3D bsrc_state_str,
-> > > > +       .streams =3D 2,
-> > > > +};
-> > > > +
-> > > > +#define BASE_LC3_48_3_MBIS \
-> > > > +       BASE_LC3(40000, 1, 2, LC3_CFG_48_3, 0x00, 0x01, 0x00, 0x02,
-> > > > +0x00)
-> > > > +
-> > > > +static struct test_config cfg_bsrc_str_48_3_mbis =3D {
-> > > > +       .cc =3D LC3_CONFIG_48_3,
-> > > > +       .qos =3D LC3_QOS_48_3_1_B,
-> > > > +       .base =3D UTIL_IOV_INIT(BASE_LC3_48_3_MBIS),
-> > > > +       .src =3D true,
-> > > > +       .state_func =3D bsrc_state_str,
-> > > > +       .streams =3D 2,
-> > > > +};
-> > > > +
-> > > > +#define BASE_LC3_48_4_MBIS \
-> > > > +       BASE_LC3(40000, 1, 2, LC3_CFG_48_4, 0x00, 0x01, 0x00, 0x02,
-> > > > +0x00)
-> > > > +
-> > > > +static struct test_config cfg_bsrc_str_48_4_mbis =3D {
-> > > > +       .cc =3D LC3_CONFIG_48_4,
-> > > > +       .qos =3D LC3_QOS_48_4_1_B,
-> > > > +       .base =3D UTIL_IOV_INIT(BASE_LC3_48_4_MBIS),
-> > > > +       .src =3D true,
-> > > > +       .state_func =3D bsrc_state_str,
-> > > > +       .streams =3D 2,
-> > > > +};
-> > > > +
-> > > > +#define BASE_LC3_48_5_MBIS \
-> > > > +       BASE_LC3(40000, 1, 2, LC3_CFG_48_5, 0x00, 0x01, 0x00, 0x02,
-> > > > +0x00)
-> > > > +
-> > > > +static struct test_config cfg_bsrc_str_48_5_mbis =3D {
-> > > > +       .cc =3D LC3_CONFIG_48_5,
-> > > > +       .qos =3D LC3_QOS_48_5_1_B,
-> > > > +       .base =3D UTIL_IOV_INIT(BASE_LC3_48_5_MBIS),
-> > > > +       .src =3D true,
-> > > > +       .state_func =3D bsrc_state_str,
-> > > > +       .streams =3D 2,
-> > > > +};
-> > > > +
-> > > > +#define BASE_LC3_48_6_MBIS \
-> > > > +       BASE_LC3(40000, 1, 2, LC3_CFG_48_6, 0x00, 0x01, 0x00, 0x02,
-> > > > +0x00)
-> > > > +
-> > > > +static struct test_config cfg_bsrc_str_48_6_mbis =3D {
-> > > > +       .cc =3D LC3_CONFIG_48_6,
-> > > > +       .qos =3D LC3_QOS_48_6_1_B,
-> > > > +       .base =3D UTIL_IOV_INIT(BASE_LC3_48_6_MBIS),
-> > > > +       .src =3D true,
-> > > > +       .state_func =3D bsrc_state_str,
-> > > > +       .streams =3D 2,
-> > > > +};
-> > > > +
-> > > > +#define BASE_VS_MBIS \
-> > > > +       BASE(40000, 1, 2, 0xFF, 0x00, 0x00, 0x00, 0x00, \
-> > > > +       VS_CFG, 0x00, 0x01, 0x00, 0x02, 0x00)
-> > > > +
-> > > > +static struct test_config cfg_bsrc_str_vs_mbis =3D {
-> > > > +       .cc =3D UTIL_IOV_INIT(VS_CC),
-> > > > +       .qos =3D QOS_BCAST,
-> > > > +       .base =3D UTIL_IOV_INIT(BASE_VS_MBIS),
-> > > > +       .src =3D true,
-> > > > +       .state_func =3D bsrc_state_str,
-> > > > +       .vs =3D true,
-> > > > +       .streams =3D 2,
-> > > > +};
-> > > > +
-> > > > +/* Test Purpose:
-> > > > + * Verify that a Broadcast Source IUT can stream multiple BISes to
-> > > > + * a Broadcast Sink. The verification is performed for each set of
-> > > > + * parameters in turn, as specified in Table 4.82.
-> > > > + *
-> > > > + * Pass verdict:
-> > > > + * If the Codec ID is LC3, the IUT sends encoded LC3 audio data in
-> > > > + * BIS Data PDUs on each synchronized BIS.
-> > > > + *
-> > > > + * If the Codec ID is a vendor-specific Codec ID, the IUT sends BI=
-S
-> > > > + * Data PDUs on each synchronized BIS. The parameters included in
-> > > > +the
-> > > > + * Codec_Specific_Configuration data are as defined in
-> > > > + * TSPX_VS_Codec_Specific_Configuration.
-> > > > + *
-> > > > + * If the Codec ID is LC3, each parameter included in
-> > > > + * Codec_Specific_Configuration data is formatted in an LTV
-> > > > +structure
-> > > > + * with the length, type, and value specified in Table 4.83.
-> > > > + */
-> > > > +static void test_bsrc_str_2b(void)
-> > > > +{
-> > > > +       define_test("BAP/BSRC/STR/BV-18-C [BSRC, Multiple BISes, LC=
-3
-> > 8_1]",
-> > > > +               NULL, test_bcast, &cfg_bsrc_str_8_1_mbis, IOV_NULL)=
-;
-> > > > +
-> > > > +       define_test("BAP/BSRC/STR/BV-19-C [BSRC, Multiple BISes, LC=
-3
-> > 8_2]",
-> > > > +               NULL, test_bcast, &cfg_bsrc_str_8_2_mbis, IOV_NULL)=
-;
-> > > > +
-> > > > +       define_test("BAP/BSRC/STR/BV-20-C [BSRC, Multiple BISes, LC=
-3
-> > > 16_1]",
-> > > > +               NULL, test_bcast, &cfg_bsrc_str_16_1_mbis,
-> > > > + IOV_NULL);
-> > > > +
-> > > > +       define_test("BAP/BSRC/STR/BV-21-C [BSRC, Multiple BISes, LC=
-3
-> > > 16_2]",
-> > > > +               NULL, test_bcast, &cfg_bsrc_str_16_2_mbis,
-> > > > + IOV_NULL);
-> > > > +
-> > > > +       define_test("BAP/BSRC/STR/BV-22-C [BSRC, Multiple BISes, LC=
-3
-> > > 24_1]",
-> > > > +               NULL, test_bcast, &cfg_bsrc_str_24_1_mbis,
-> > > > + IOV_NULL);
-> > > > +
-> > > > +       define_test("BAP/BSRC/STR/BV-23-C [BSRC, Multiple BISes, LC=
-3
-> > > 24_2]",
-> > > > +               NULL, test_bcast, &cfg_bsrc_str_24_2_mbis,
-> > > > + IOV_NULL);
-> > > > +
-> > > > +       define_test("BAP/BSRC/STR/BV-24-C [BSRC, Multiple BISes, LC=
-3
-> > > 32_1]",
-> > > > +               NULL, test_bcast, &cfg_bsrc_str_32_1_mbis,
-> > > > + IOV_NULL);
-> > > > +
-> > > > +       define_test("BAP/BSRC/STR/BV-25-C [BSRC, Multiple BISes, LC=
-3
-> > > 32_2]",
-> > > > +               NULL, test_bcast, &cfg_bsrc_str_32_2_mbis,
-> > > > + IOV_NULL);
-> > > > +
-> > > > +       define_test("BAP/BSRC/STR/BV-26-C [BSRC, Multiple BISes, LC=
-3
-> > > 44.1_1]",
-> > > > +               NULL, test_bcast, &cfg_bsrc_str_44_1_mbis,
-> > > > + IOV_NULL);
-> > > > +
-> > > > +       define_test("BAP/BSRC/STR/BV-27-C [BSRC, Multiple BISes, LC=
-3
-> > > 44.1_2]",
-> > > > +               NULL, test_bcast, &cfg_bsrc_str_44_2_mbis,
-> > > > + IOV_NULL);
-> > > > +
-> > > > +       define_test("BAP/BSRC/STR/BV-28-C [BSRC, Multiple BISes, LC=
-3
-> > > 48_1]",
-> > > > +               NULL, test_bcast, &cfg_bsrc_str_48_1_mbis,
-> > > > + IOV_NULL);
-> > > > +
-> > > > +       define_test("BAP/BSRC/STR/BV-29-C [BSRC, Multiple BISes, LC=
-3
-> > > 48_2]",
-> > > > +               NULL, test_bcast, &cfg_bsrc_str_48_2_mbis,
-> > > > + IOV_NULL);
-> > > > +
-> > > > +       define_test("BAP/BSRC/STR/BV-30-C [BSRC, Multiple BISes, LC=
-3
-> > > 48_3]",
-> > > > +               NULL, test_bcast, &cfg_bsrc_str_48_3_mbis,
-> > > > + IOV_NULL);
-> > > > +
-> > > > +       define_test("BAP/BSRC/STR/BV-31-C [BSRC, Multiple BISes, LC=
-3
-> > > 48_4]",
-> > > > +               NULL, test_bcast, &cfg_bsrc_str_48_4_mbis,
-> > > > + IOV_NULL);
-> > > > +
-> > > > +       define_test("BAP/BSRC/STR/BV-32-C [BSRC, Multiple BISes, LC=
-3
-> > > 48_5]",
-> > > > +               NULL, test_bcast, &cfg_bsrc_str_48_5_mbis,
-> > > > + IOV_NULL);
-> > > > +
-> > > > +       define_test("BAP/BSRC/STR/BV-33-C [BSRC, Multiple BISes, LC=
-3
-> > > 48_6]",
-> > > > +               NULL, test_bcast, &cfg_bsrc_str_48_6_mbis,
-> > > > + IOV_NULL);
-> > > > +
-> > > > +       define_test("BAP/BSRC/STR/BV-34-C [BSRC, Multiple BISes, VS=
-]",
-> > > > +               NULL, test_bcast, &cfg_bsrc_str_vs_mbis, IOV_NULL);
-> > > > +}
-> > > > +
-> > > >  static void test_bsrc_str(void)
-> > > >  {
-> > > >         test_bsrc_str_1b();
-> > > > +       test_bsrc_str_2b();
-> > > >  }
-> > > >
-> > > >  int main(int argc, char *argv[])
-> > > > --
-> > > > 2.39.2
-> > > >
-> > >
-> > >
-> > > --
-> > > Luiz Augusto von Dentz
-> >
-> >
-> > Regards,
-> > Iulia
->
-> Regards,
-> Iulia
-
-
-
---=20
-Luiz Augusto von Dentz
