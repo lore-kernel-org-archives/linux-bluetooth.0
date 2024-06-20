@@ -1,140 +1,105 @@
-Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED93555882
-	for <linux-bluetooth@vger.kernel.org>; Thu, 20 Jun 2024 20:40:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 148337D086
+	for <linux-bluetooth@vger.kernel.org>; Thu, 20 Jun 2024 21:13:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718916048; cv=none; b=If+zjZpTwt+pMM3WL06XQ0l94+JHMT7A6vUaPgrxejc1V9n89DgjWi9uI5iA4OZ6eysfinzl1IoS4mmNbhGiD3ukVfXKwS2/NLPaXQk8o+Qxp9WHlbjuogNogCGWa8UEsCHJxaW27xUi4ZhaukKxK2sd0WuXt81v/d0UJGi8Qqc=
+	t=1718918000; cv=none; b=BI6S7xxnGDxqJS+fRFqICUssb/fcT/vqkTKWWjyNvmpEEoV5vWqBV67V0kfQYVBJ/Jf9ghHHNR/v3VID8p5ffQbPu/x6/YMioU1NM0/NtApOwIhpJNpJynLZubo6XzSe43GOkau6D4HLanJlCCj/CSYDJoSz80Do5k8UwTHlFV0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718916048; c=relaxed/simple;
-	bh=xe0CLiytQL+w07wMVqUc1rJS0v+e/Ti6ErqFWmVCp7I=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=hLlRNmUatKa1jDIGif8cpt/BKGfDXZL22uimRnEGXDIi/vU2Mug21F59AgmkA/SsOcWwTt0j7SRYi/OKJG2xs7J+UAaug6AVUg6lh3LN7oWTxBKO244BUZ3mjgMG0hrWYavwW9fGtCqpEpJBTJ6J4KB2OHZjsVXQReMc4ylk5g8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=KnhDjc38; arc=none smtp.client-ip=209.85.208.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
+	s=arc-20240116; t=1718918000; c=relaxed/simple;
+	bh=8ckDeIxAwnzo5kRakgUnDyZQGTgneYjyqoyhQm7BZlM=;
+	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=SokufXG1UElAhcQV1lGyvpQEpDv+Oeqw4DGPuc2UKhTcilXcg7ukfSUBva1I5QIraB5QXp28DkZ6p5tcGgBpM/OI0sUqfkMaQxYNVRjrUKouHJ9ar3PrvitkbTUwXbWYMxhz9sPfHXdiBSMGUNM2vToXic+7En45gLLeNcngpy8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZZv6aMpq; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="KnhDjc38"
-Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-57d10354955so1388129a12.1
-        for <linux-bluetooth@vger.kernel.org>; Thu, 20 Jun 2024 13:40:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google; t=1718916045; x=1719520845; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=w6VZWpwlG7GhpGptpxtkhZuBw3s+vrw3bJ0KsbwAf6c=;
-        b=KnhDjc38pTnh1vODx4rSFLL2ouR2qAWI2bIp4EQ3BTtcJ2dLPfuHvLWGQeUlI7iNpb
-         CG/p6HC0RDdFWs957Bthgi23bV62a2QEXhUFogtXrsNX0051wWkkiK0+8bnRa7mtJFay
-         n1URar7VZFZfzzXjv583b/ItfT43svIRaMPCw=
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZZv6aMpq"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1718917997;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=cASqOGhIIyq9NA4K7ASzMtw6E21NLw3jkPS/f6pzdOY=;
+	b=ZZv6aMpqv9hmuK1S1fAMAo3fZeCKEkSm5VHeYEhLY2TQHc6eax5WhVZfEZyt+qAWYvlP4j
+	IbKgqA3TjgRTE0Dj7HZXjXM9rbIh9jM8b5siIdEUnR8VLL3qgM60CZrIRYwY3Y6s4GKdPB
+	jIwXyEHryUfBZ7mu4YDUK/UrQ8L+i9I=
+Received: from mail-oa1-f71.google.com (mail-oa1-f71.google.com
+ [209.85.160.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-85-TkgPJy8pMfSdQ4Zijp9kRw-1; Thu, 20 Jun 2024 17:13:16 -0400
+X-MC-Unique: TkgPJy8pMfSdQ4Zijp9kRw-1
+Received: by mail-oa1-f71.google.com with SMTP id 586e51a60fabf-25ca2237198so1674737fac.1
+        for <linux-bluetooth@vger.kernel.org>; Thu, 20 Jun 2024 14:13:16 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718916045; x=1719520845;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=w6VZWpwlG7GhpGptpxtkhZuBw3s+vrw3bJ0KsbwAf6c=;
-        b=V3Sc7VzCHg5995SLekeNROORvIhAB+WCNuNMpWoWLuYQ79PG9VEko2wq7aBHUA8vdK
-         jkPSHyTlVTA4XVs4UYEcgpH9Dy/KLbAtAfNAtOT8CiF0OPUKtDKWhBeL8qz1A8EmCcwz
-         Peki2lmE5NaetI+fWmWLjs7BrWCeylxrBTmvpPrQqg4/YhKXIgxRX0Bk20931dOAfVR5
-         mqKX9gNe8Z5kukg60dHuAqG2SmAec6Y184iPPy5g1pHBffgCG80vWsv8TI9dlju4fUsf
-         gkS03nN68FmSwaAReAFxcUFDJqfGh0Izaj25BxlsA2QEB9Xgj/yYwxfg1nJZv+ARZhSc
-         gnMw==
-X-Forwarded-Encrypted: i=1; AJvYcCX07G4f35NzBAZVz7meVorfcvwUJJneVttdNPZ1/NdSsG1TfObkIYu51kvASiGO1lqprBN9IWCAEWQSnFMcZ9gnRcGKqM/itso6iclGXH1W
-X-Gm-Message-State: AOJu0Ywn/vu4e1qjD2nCaxmANJDAmhTPJaALYmeCQBIxq/oUHTCw97G3
-	ltwsZft9RCWsq36EfnLhchwMA7r9ffbDVJFhxJukvsiI14IHmo788JXlv10jF2t0ZFq/Nhu/+eE
-	SoXB+JpnM
-X-Google-Smtp-Source: AGHT+IFo47mKT4HbnD3dBlGm7uMZ4YisBsdzCIqCSlDulx3WmAmIjnMgX3BdTa733VAf5so3fh/zug==
-X-Received: by 2002:a50:9b54:0:b0:57d:692:33ee with SMTP id 4fb4d7f45d1cf-57d07edd67emr3402194a12.36.1718916045232;
-        Thu, 20 Jun 2024 13:40:45 -0700 (PDT)
-Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com. [209.85.128.41])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-57d303dcf83sm6660a12.9.2024.06.20.13.40.44
+        d=1e100.net; s=20230601; t=1718917995; x=1719522795;
+        h=content-transfer-encoding:mime-version:user-agent:references
+         :in-reply-to:date:to:from:subject:message-id:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=cASqOGhIIyq9NA4K7ASzMtw6E21NLw3jkPS/f6pzdOY=;
+        b=NKn87zynFighvXSSeh8XzSE0i+ustODUb2rd0oVpSPG7hipvB1Pj8iCt8JAkjDvw06
+         YmvsXE31s36h/+r8MzPZQ+Pmsw4mA4xdwfrVR+0A2FKH/1aGCLLYyvDlVg+Kd+p8O3tn
+         Eena9eIxwqtUl+1ZyVjmd1kDDBajJszrPmmkR1Om7YKh/OCYVynuS196tzB9rWUBMrH0
+         pZdXXkxYZ7XR9hfc5oz3dYSiGpEtzxT1ucrgpiHl0ARatAv2ruB8G3h+FIljxFvz4E/N
+         lqrtpFopsXkmlCSzVvuOckHPDmu7LcwrSX4siBn9xNicQqu0DKcH/i5J/jDsGtSV4G8i
+         tWpQ==
+X-Gm-Message-State: AOJu0YxSGXTW5f4Gc6cE0rkCzgA52Zv/xi5yZ9BrA0LRQJMKmmR+8JRD
+	Et2Vg5ALT+PRl9rwv2bT5mgKlBavMIMLZD/2IIC0isE9m3tiyIyZOu+euNsP07mhP6AsrK1f1Hu
+	ARaL5OniVMhhnsH/zuo7lpQ0YzUxU/UNGTtXfdnbpA/okBW8dnCBafL0GF67JtskN1wqYXcPkpl
+	wL+KvQvp2jEr+uTucBkcuEw4w+RDRdLf2R651TA3uZY3WjSuyWLQ==
+X-Received: by 2002:a05:6870:fba1:b0:254:cfd7:4f91 with SMTP id 586e51a60fabf-25c94e018d4mr7904453fac.45.1718917995301;
+        Thu, 20 Jun 2024 14:13:15 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFozNsvchZL7zItAC6fhL4TY7+1tkQigSWOzls2Kn8uzWgE3C2479hbUP65dhtrOlsS3JJv1g==
+X-Received: by 2002:a05:6870:fba1:b0:254:cfd7:4f91 with SMTP id 586e51a60fabf-25c94e018d4mr7904429fac.45.1718917994686;
+        Thu, 20 Jun 2024 14:13:14 -0700 (PDT)
+Received: from starship ([2607:fea8:fc01:7b7f:6adb:55ff:feaa:b156])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-79bce89b332sm12572585a.4.2024.06.20.14.13.14
         for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 20 Jun 2024 13:40:44 -0700 (PDT)
-Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-424720e73e0so13335175e9.0
-        for <linux-bluetooth@vger.kernel.org>; Thu, 20 Jun 2024 13:40:44 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCV4hFm1U2R2cRCL/hXuD2PhRK7c650gfitHDtAxJ+/rKiPlagAz6yCzzM00cQKAc/5a1I0BpAYM37qQSKbsG6/uu+xnBhbQzc3ZJ0pG94rf
-X-Received: by 2002:a17:906:1348:b0:a6e:2a67:7899 with SMTP id
- a640c23a62f3a-a6fab63aaabmr312193466b.35.1718915542284; Thu, 20 Jun 2024
- 13:32:22 -0700 (PDT)
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 20 Jun 2024 14:13:14 -0700 (PDT)
+Message-ID: <69649c8fa57ad7609a0c5eee513a1de772794df1.camel@redhat.com>
+Subject: Re: Suport for 33fa:0010 - BARROT Bluetooth 5.4 USB adapter
+From: Maxim Levitsky <mlevitsk@redhat.com>
+To: linux-bluetooth@vger.kernel.org
+Date: Thu, 20 Jun 2024 17:13:13 -0400
+In-Reply-To: <8bfdefacc2b609b7d4fc3808f29250e197f72182.camel@redhat.com>
+References: <8bfdefacc2b609b7d4fc3808f29250e197f72182.camel@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240620175703.605111-1-yury.norov@gmail.com> <CAHk-=wiUTXC452qbypG3jW6XCZGfc8d-iehSavxn5JkQ=sv0zA@mail.gmail.com>
- <ZnR1tQN01kN97G_F@yury-ThinkPad> <CAHk-=wjv-DkukaKb7f04WezyPjRERp=xfxv34j5fA8cDQ_JudA@mail.gmail.com>
- <ZnSPBFW5wL0D0b86@yury-ThinkPad>
-In-Reply-To: <ZnSPBFW5wL0D0b86@yury-ThinkPad>
-From: Linus Torvalds <torvalds@linux-foundation.org>
-Date: Thu, 20 Jun 2024 13:32:05 -0700
-X-Gmail-Original-Message-ID: <CAHk-=wi2R7-jyoOw27Svf1PmfDFQgBWVAH3DP5CXO+JF-BeFZA@mail.gmail.com>
-Message-ID: <CAHk-=wi2R7-jyoOw27Svf1PmfDFQgBWVAH3DP5CXO+JF-BeFZA@mail.gmail.com>
-Subject: Re: [PATCH v4 00/40] lib/find: add atomic find_bit() primitives
-To: Yury Norov <yury.norov@gmail.com>
-Cc: linux-kernel@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
-	"H. Peter Anvin" <hpa@zytor.com>, "James E.J. Bottomley" <jejb@linux.ibm.com>, 
-	"K. Y. Srinivasan" <kys@microsoft.com>, "Md. Haris Iqbal" <haris.iqbal@ionos.com>, 
-	Akinobu Mita <akinobu.mita@gmail.com>, Andrew Morton <akpm@linux-foundation.org>, 
-	Bjorn Andersson <andersson@kernel.org>, Borislav Petkov <bp@alien8.de>, Chaitanya Kulkarni <kch@nvidia.com>, 
-	Christian Brauner <brauner@kernel.org>, Damien Le Moal <damien.lemoal@opensource.wdc.com>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, David Disseldorp <ddiss@suse.de>, 
-	Edward Cree <ecree.xilinx@gmail.com>, Eric Dumazet <edumazet@google.com>, 
-	Fenghua Yu <fenghua.yu@intel.com>, Geert Uytterhoeven <geert@linux-m68k.org>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Gregory Greenman <gregory.greenman@intel.com>, 
-	Hans Verkuil <hverkuil@xs4all.nl>, Hans de Goede <hdegoede@redhat.com>, 
-	Hugh Dickins <hughd@google.com>, Ingo Molnar <mingo@redhat.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Jaroslav Kysela <perex@perex.cz>, Jason Gunthorpe <jgg@ziepe.ca>, Jens Axboe <axboe@kernel.dk>, 
-	Jiri Pirko <jiri@resnulli.us>, Jiri Slaby <jirislaby@kernel.org>, Kalle Valo <kvalo@kernel.org>, 
-	Karsten Graul <kgraul@linux.ibm.com>, Karsten Keil <isdn@linux-pingi.de>, 
-	Kees Cook <keescook@chromium.org>, Leon Romanovsky <leon@kernel.org>, 
-	Mark Rutland <mark.rutland@arm.com>, Martin Habets <habetsm.xilinx@gmail.com>, 
-	Mauro Carvalho Chehab <mchehab@kernel.org>, Michael Ellerman <mpe@ellerman.id.au>, Michal Simek <monstr@monstr.eu>, 
-	Nicholas Piggin <npiggin@gmail.com>, Oliver Neukum <oneukum@suse.com>, Paolo Abeni <pabeni@redhat.com>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Peter Zijlstra <peterz@infradead.org>, 
-	Ping-Ke Shih <pkshih@realtek.com>, Rich Felker <dalias@libc.org>, Rob Herring <robh@kernel.org>, 
-	Robin Murphy <robin.murphy@arm.com>, Sean Christopherson <seanjc@google.com>, 
-	Shuai Xue <xueshuai@linux.alibaba.com>, Stanislaw Gruszka <stf_xl@wp.pl>, 
-	Steven Rostedt <rostedt@goodmis.org>, Thomas Bogendoerfer <tsbogend@alpha.franken.de>, 
-	Thomas Gleixner <tglx@linutronix.de>, Valentin Schneider <vschneid@redhat.com>, 
-	Vitaly Kuznetsov <vkuznets@redhat.com>, Wenjia Zhang <wenjia@linux.ibm.com>, 
-	Will Deacon <will@kernel.org>, Yoshinori Sato <ysato@users.sourceforge.jp>, 
-	GR-QLogic-Storage-Upstream@marvell.com, alsa-devel@alsa-project.org, 
-	ath10k@lists.infradead.org, dmaengine@vger.kernel.org, iommu@lists.linux.dev, 
-	kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	linux-arm-msm@vger.kernel.org, linux-block@vger.kernel.org, 
-	linux-bluetooth@vger.kernel.org, linux-hyperv@vger.kernel.org, 
-	linux-m68k@lists.linux-m68k.org, linux-media@vger.kernel.org, 
-	linux-mips@vger.kernel.org, linux-net-drivers@amd.com, 
-	linux-pci@vger.kernel.org, linux-rdma@vger.kernel.org, 
-	linux-s390@vger.kernel.org, linux-scsi@vger.kernel.org, 
-	linux-serial@vger.kernel.org, linux-sh@vger.kernel.org, 
-	linux-sound@vger.kernel.org, linux-usb@vger.kernel.org, 
-	linux-wireless@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
-	mpi3mr-linuxdrv.pdl@broadcom.com, netdev@vger.kernel.org, 
-	sparclinux@vger.kernel.org, x86@kernel.org, 
-	Alexey Klimov <alexey.klimov@linaro.org>, Bart Van Assche <bvanassche@acm.org>, Jan Kara <jack@suse.cz>, 
-	Matthew Wilcox <willy@infradead.org>, Mirsad Todorovac <mirsad.todorovac@alu.unizg.hr>, 
-	Rasmus Villemoes <linux@rasmusvillemoes.dk>, Sergey Shtylyov <s.shtylyov@omp.ru>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
 
-On Thu, 20 Jun 2024 at 13:20, Yury Norov <yury.norov@gmail.com> wrote:
->
-> FORCE_NR_CPUS helped to generate a better code for me back then. I'll
-> check again against the current kernel.
+On Sun, 2024-06-16 at 20:43 -0400, Maxim Levitsky wrote:
+> Hi!
+> 
+> Mistakenly I bought this adapter (UGREEN bluetooth 5.4 adapter).
+> 
+> Looks like it is not supported under Linux:
+> 
+> https://forums.opensuse.org/t/bluetooth-5-4-usb-stick-connected-on-a-desktop-computer-with-opensuse-15-5-with-kde-not-working/173916/31
+> 
+> However I see that windows uses stock drivers for this device.
+> 
+> What do you think is needed to make this adapter work in Linux? I didn't notice windows downloading firmware for it,
+> since it just started to work out of box.
 
-Of _course_ it generates better code.
+Any update?
 
-But when "better code" is a source of bugs, and isn't actually useful
-in general, it's not better, is it.
+Best regards,
+	Maxim Levitsky
 
-> The 5d272dd1b343 is wrong. Limiting FORCE_NR_CPUS to UP case makes no
-> sense because in UP case nr_cpu_ids is already a compile-time macro:
+> 
+> Best regards,
+> 	Maxim Levitsky
+> 
+> 
+> 
 
-Yury, I'm very aware. That was obviously intentional. the whole point
-of the commit is to just disable the the whole thing as useless and
-problematic.
 
-I could have just ripped it out entirely. I ended up doing a one-liner instead.
-
-                Linus
