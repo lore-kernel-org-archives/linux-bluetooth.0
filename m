@@ -1,126 +1,120 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f175.google.com (mail-lj1-f175.google.com [209.85.208.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D3141ACE9C;
-	Thu, 20 Jun 2024 14:35:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CBFD42ABA;
+	Thu, 20 Jun 2024 14:44:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718894122; cv=none; b=kS4EJjQ+Yvjprseh0NyryC5uuRxy6rCkQR7YwFdYNKisltomrcxmKNgDL450AhB918Sv4ltm7XEsdxhB5osMaHexvXJWu4lRPI4M05W08RD7IIgmhQMAJxQA9ylwKaQ4k4w0yYoYhiNXdXlFVEuAFwHw1Dg48nZeQ0yAy+Qydj8=
+	t=1718894690; cv=none; b=GHf0V2BGcmH7jSMA1AKX+IjDniwWQXkL9+ZvPMAZiEum96xi9u+H2elH2J2z/e8fz7jZs0o9j3xl5uQaheaCNn/8sxXWhdkF660LNWYGltWBRJS5WOAlmanEXjIQGslyceTRatGaJpf4OBhucw9UKKxJOHRxj3jUQE4diD96SHc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718894122; c=relaxed/simple;
-	bh=npqeh05ryDsyIjjm50F0c9LzhQy62vbv2Gkiq4GYZ/0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=mqJO3AwzoI9fQHzYIC/pihYwRf/RTIGwRdEcaiua3bczp4AoI9KHVPTym2KAMRCW6itmOCPriBxHzkJ0Pd13xxHmUm2F2e9FffhhHpCBzFphOisruFkp0h6flVv+fufM+GpQUzKSJfE5VJF4UTBuMtWEYnzmab0PqORydbpykpo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pWw+JMX/; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1718894690; c=relaxed/simple;
+	bh=8iQO6Emy2tRVwzuEDA/kchE+iTXyfAsBpVBTDwQk+20=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=hplbC0UUBL3/tin7r6Dpp2qSmdAOoUvjjA5H+SNuUQilZyycM3bZvWvOe5O2jo9PqXX87wuTjiHXNJhF3TtoIwWUk4az453AKe6fvE1YzrIa9fF+paDu9F1SyGONyPU4NYh4cFLELLx7rYRFh6HXfgG4ucYGizqzmsGOrQMMdY0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=g+w2N4id; arc=none smtp.client-ip=209.85.208.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pWw+JMX/"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C5D83C2BD10;
-	Thu, 20 Jun 2024 14:35:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718894122;
-	bh=npqeh05ryDsyIjjm50F0c9LzhQy62vbv2Gkiq4GYZ/0=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=pWw+JMX/pZBbZERiMYq8jt3mLMHCNeyw2n+rsNU8yzEc1RmCWw7SL5IklwlwDvLyy
-	 CcpvEsCvzu/nuxvROzR45QPxqjZ5WRnuTE9Dv/2lc7T0+nx/tbSl4O9bFlDXVJrgyw
-	 nwuTpvrvfzG9UNGZloYjIX90dsxygDKlOq1MgyKy28fg3pzxGc1RC2iGsjWetEoHzX
-	 9ogBU6Je4NnmbnXz/Y8Eb15JTQ6RddyLShb/mu7w617r9GdQh4fFVIFVgeJiUlYe70
-	 /N7Sfisn8kBZj0nYGRkRJrQS/HL3p1xCyPUOlmHzvCdypvawyYWLwFQHsQoIi7oLV6
-	 GxTNCa6u5JOiA==
-Message-ID: <8d6af7e2-76f8-4daa-a751-a1abe29af103@kernel.org>
-Date: Thu, 20 Jun 2024 16:35:16 +0200
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="g+w2N4id"
+Received: by mail-lj1-f175.google.com with SMTP id 38308e7fff4ca-2eaafda3b5cso10445211fa.3;
+        Thu, 20 Jun 2024 07:44:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1718894686; x=1719499486; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=6LKx+R33v9q2HX/fanb0Z4m7vD2boYqK/YJS3URbx8w=;
+        b=g+w2N4idUT2fjibYIvPzATzVGv+EesjbgxcSouwmvwa2soD9yX1Th5JM+jkt5Vx9P/
+         6Dk/lwUcT3DV1KUQAtoLmJPOGfKhazv0C2EQngwzL0/NttgvubYuRJuVn4Dwk/ByPEqN
+         ISVEA1le0aOn/IilW1IpFPZZ0CUaDuEBjRLwqnqpkHJccxJhrTbhTtoD6KwjIiV8MiVO
+         YoqJb1kJQShMXc6vyadp51iHNPrwj2sa+zkfxeWLn39s3+65tEQmLgo/I+5NvTGIto3j
+         OPk568TVUw/jUpi8UHOcuS/o3oZNj07M8pNYcMzb9GCX/mJlfm4D/cUVRGMWy/cHV7/6
+         u7QQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718894686; x=1719499486;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=6LKx+R33v9q2HX/fanb0Z4m7vD2boYqK/YJS3URbx8w=;
+        b=SJy2xO3iR/iWu4LpMRYfLdoZkm9+dQVnVcvuKiCao0A9tiBw6Q6XfaU3c8eqjY2L5D
+         ZYIbfY0SH5dwctqtG9hT6o7PY5mMJHfSqhLD5EYMdcQJWb5/cyvd8XmwrlFsAOFrDhFg
+         LBUn+cM1s8USgVFQdUH1obbR0Jx4AYJcUCUfjmSeydfRTaTN/7UuJ7nL2//PKLMyjGpF
+         qCbAMom1HCtBOkEOpx3DuWAggdJLXiR/1oPHfMVjfAQ+IBncvKxnNw3toBtpuoInhut0
+         eUGDexXzSZ7EBx6iBZpH1Z6n3QyBfdUCUlF6bi8GtypZmvhQpGZsdpsUaydTayLiWNmE
+         YpZg==
+X-Forwarded-Encrypted: i=1; AJvYcCVEvuG6LThhci4Kr4Xg1BGI+hs2Kdp+Ys8disLiVDvzfzWdofNaAbx5M22Te+jjrK/RnMlAzVENotiqqhxcfr4/cVm7U79kmy/HZwXA5bQc1DSjHc8rx8W5tdLsObc8f+BV8v8CTdaAvl0dQvHSKYBu81O3hmZ5FkWla3ewPTb7gLqJfmQbhgGfZrU2T/j7nnFBzFd8MSXK0O1XWQ+bph3OWA==
+X-Gm-Message-State: AOJu0Yxiq/3NabxVTzi8VayyY5jUk2PD2iTbc4FlQ0OwvkS+4YtBQH+U
+	R6boXMMuqbmanpCxjaXkcskHnTTOc7gH4UyO0OWdsEmjruoFTUSk9+akrWWcSu7GBbnctyR7GP8
+	XhoYpx/kg11kXoNN/t6wqfy+7qBhPaA==
+X-Google-Smtp-Source: AGHT+IFGt5VFR6NbS7vC8yOPohi01Zz2iGk0PJPFzYYvy0RDy+DrDiBt0qqDTV3QQD7ZUMTNRB5WaHWxcskX5F6+xKY=
+X-Received: by 2002:a2e:8086:0:b0:2eb:ed3a:9c65 with SMTP id
+ 38308e7fff4ca-2ec3ceb6b04mr34150741fa.15.1718894686390; Thu, 20 Jun 2024
+ 07:44:46 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
+References: <20240612075829.18241-1-brgl@bgdev.pl> <171889385052.4585.15983645082672209436.git-patchwork-notify@kernel.org>
+ <8d6af7e2-76f8-4daa-a751-a1abe29af103@kernel.org>
+In-Reply-To: <8d6af7e2-76f8-4daa-a751-a1abe29af103@kernel.org>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Thu, 20 Jun 2024 10:44:33 -0400
+Message-ID: <CABBYNZJ5z91HExR-dkwrEPoF1pEGbkAP0X6tpftEGz-kd7vdsw@mail.gmail.com>
 Subject: Re: [GIT PULL] Immutable tag between the Bluetooth and pwrseq
  branches for v6.11-rc1
-To: patchwork-bot+bluetooth@kernel.org, Bartosz Golaszewski <brgl@bgdev.pl>,
- luiz.dentz@gmail.com
-Cc: marcel@holtmann.org, krzk+dt@kernel.org, linux-bluetooth@vger.kernel.org,
- netdev@vger.kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, bartosz.golaszewski@linaro.org
-References: <20240612075829.18241-1-brgl@bgdev.pl>
- <171889385052.4585.15983645082672209436.git-patchwork-notify@kernel.org>
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 fv0=
-In-Reply-To: <171889385052.4585.15983645082672209436.git-patchwork-notify@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+To: Krzysztof Kozlowski <krzk@kernel.org>
+Cc: patchwork-bot+bluetooth@kernel.org, Bartosz Golaszewski <brgl@bgdev.pl>, marcel@holtmann.org, 
+	krzk+dt@kernel.org, linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org, 
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	bartosz.golaszewski@linaro.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 20/06/2024 16:30, patchwork-bot+bluetooth@kernel.org wrote:
-> Hello:
-> 
-> This pull request was applied to bluetooth/bluetooth-next.git (master)
-> by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
-> 
-> On Wed, 12 Jun 2024 09:58:29 +0200 you wrote:
->> From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
->>
->> Hi Marcel, Luiz,
->>
->> Please pull the following power sequencing changes into the Bluetooth tree
->> before applying the hci_qca patches I sent separately.
->>
->> [...]
-> 
-> Here is the summary with links:
->   - [GIT,PULL] Immutable tag between the Bluetooth and pwrseq branches for v6.11-rc1
->     https://git.kernel.org/bluetooth/bluetooth-next/c/4c318a2187f8
+Hi Krzysztof,
+
+On Thu, Jun 20, 2024 at 10:35=E2=80=AFAM Krzysztof Kozlowski <krzk@kernel.o=
+rg> wrote:
+>
+> On 20/06/2024 16:30, patchwork-bot+bluetooth@kernel.org wrote:
+> > Hello:
+> >
+> > This pull request was applied to bluetooth/bluetooth-next.git (master)
+> > by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+> >
+> > On Wed, 12 Jun 2024 09:58:29 +0200 you wrote:
+> >> From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+> >>
+> >> Hi Marcel, Luiz,
+> >>
+> >> Please pull the following power sequencing changes into the Bluetooth =
+tree
+> >> before applying the hci_qca patches I sent separately.
+> >>
+> >> [...]
+> >
+> > Here is the summary with links:
+> >   - [GIT,PULL] Immutable tag between the Bluetooth and pwrseq branches =
+for v6.11-rc1
+> >     https://git.kernel.org/bluetooth/bluetooth-next/c/4c318a2187f8
+>
+>
+> Luiz,
+>
+> This pulls looks wrong. Are you sure you have correct base? The diffstat
+> suggests you are merging into rc2, not rc3. This will be confusing in
+> merge commit. It is much safer, including possible feedback from Linus,
+> if you use exactly the same base.
+
+So you are saying I need to rebase? I usually only rebase when it
+comes the time to do a pull-request using net-next as a base since
+that is where bluetooth-next normally lands.
+
+> Best regards,
+> Krzysztof
+>
 
 
-Luiz,
-
-This pulls looks wrong. Are you sure you have correct base? The diffstat
-suggests you are merging into rc2, not rc3. This will be confusing in
-merge commit. It is much safer, including possible feedback from Linus,
-if you use exactly the same base.
-
-Best regards,
-Krzysztof
-
+--=20
+Luiz Augusto von Dentz
