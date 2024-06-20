@@ -1,120 +1,224 @@
-Received: from mail-lj1-f175.google.com (mail-lj1-f175.google.com [209.85.208.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CBFD42ABA;
-	Thu, 20 Jun 2024 14:44:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECAF41AE869
+	for <linux-bluetooth@vger.kernel.org>; Thu, 20 Jun 2024 14:52:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718894690; cv=none; b=GHf0V2BGcmH7jSMA1AKX+IjDniwWQXkL9+ZvPMAZiEum96xi9u+H2elH2J2z/e8fz7jZs0o9j3xl5uQaheaCNn/8sxXWhdkF660LNWYGltWBRJS5WOAlmanEXjIQGslyceTRatGaJpf4OBhucw9UKKxJOHRxj3jUQE4diD96SHc=
+	t=1718895136; cv=none; b=lU8RlqYKfue6nymhar17SmWGeUgTGHMwVLDn/6gZvqaD/9lsYHFjJrkH4GmnqSbblZnZcDdL/ISamtKRCUki9KGxa8UPJFsFcJrwITPFnhYzSfwgOIEX0GnSqm6nXFiQrB6LatNlFSU1TBRvvoOp1oDyOe+fatiWCZOQVef0d8Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718894690; c=relaxed/simple;
-	bh=8iQO6Emy2tRVwzuEDA/kchE+iTXyfAsBpVBTDwQk+20=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=hplbC0UUBL3/tin7r6Dpp2qSmdAOoUvjjA5H+SNuUQilZyycM3bZvWvOe5O2jo9PqXX87wuTjiHXNJhF3TtoIwWUk4az453AKe6fvE1YzrIa9fF+paDu9F1SyGONyPU4NYh4cFLELLx7rYRFh6HXfgG4ucYGizqzmsGOrQMMdY0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=g+w2N4id; arc=none smtp.client-ip=209.85.208.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1718895136; c=relaxed/simple;
+	bh=R3VE8vdrAuyn/0OkeY8ZInSecUeKr44wwZO6xSBfJZU=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=SGbSKSqkwyRe9T0sleLXFY/3lNSUm7w1JqeyKcMe3wDPfWNFZumISdvz06YeW+N90mO+0neTt6eDJI4LIwFGnFpb+66l1B77iGUWla59xhNV0ZG1ZWZyUSvl1/kvMXW+0r5zqMclnYCo5sfUBAI7gZAytYrdGr6yiGT26AguGK4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=hTTlPXtK; arc=none smtp.client-ip=192.198.163.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="g+w2N4id"
-Received: by mail-lj1-f175.google.com with SMTP id 38308e7fff4ca-2eaafda3b5cso10445211fa.3;
-        Thu, 20 Jun 2024 07:44:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1718894686; x=1719499486; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=6LKx+R33v9q2HX/fanb0Z4m7vD2boYqK/YJS3URbx8w=;
-        b=g+w2N4idUT2fjibYIvPzATzVGv+EesjbgxcSouwmvwa2soD9yX1Th5JM+jkt5Vx9P/
-         6Dk/lwUcT3DV1KUQAtoLmJPOGfKhazv0C2EQngwzL0/NttgvubYuRJuVn4Dwk/ByPEqN
-         ISVEA1le0aOn/IilW1IpFPZZ0CUaDuEBjRLwqnqpkHJccxJhrTbhTtoD6KwjIiV8MiVO
-         YoqJb1kJQShMXc6vyadp51iHNPrwj2sa+zkfxeWLn39s3+65tEQmLgo/I+5NvTGIto3j
-         OPk568TVUw/jUpi8UHOcuS/o3oZNj07M8pNYcMzb9GCX/mJlfm4D/cUVRGMWy/cHV7/6
-         u7QQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718894686; x=1719499486;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=6LKx+R33v9q2HX/fanb0Z4m7vD2boYqK/YJS3URbx8w=;
-        b=SJy2xO3iR/iWu4LpMRYfLdoZkm9+dQVnVcvuKiCao0A9tiBw6Q6XfaU3c8eqjY2L5D
-         ZYIbfY0SH5dwctqtG9hT6o7PY5mMJHfSqhLD5EYMdcQJWb5/cyvd8XmwrlFsAOFrDhFg
-         LBUn+cM1s8USgVFQdUH1obbR0Jx4AYJcUCUfjmSeydfRTaTN/7UuJ7nL2//PKLMyjGpF
-         qCbAMom1HCtBOkEOpx3DuWAggdJLXiR/1oPHfMVjfAQ+IBncvKxnNw3toBtpuoInhut0
-         eUGDexXzSZ7EBx6iBZpH1Z6n3QyBfdUCUlF6bi8GtypZmvhQpGZsdpsUaydTayLiWNmE
-         YpZg==
-X-Forwarded-Encrypted: i=1; AJvYcCVEvuG6LThhci4Kr4Xg1BGI+hs2Kdp+Ys8disLiVDvzfzWdofNaAbx5M22Te+jjrK/RnMlAzVENotiqqhxcfr4/cVm7U79kmy/HZwXA5bQc1DSjHc8rx8W5tdLsObc8f+BV8v8CTdaAvl0dQvHSKYBu81O3hmZ5FkWla3ewPTb7gLqJfmQbhgGfZrU2T/j7nnFBzFd8MSXK0O1XWQ+bph3OWA==
-X-Gm-Message-State: AOJu0Yxiq/3NabxVTzi8VayyY5jUk2PD2iTbc4FlQ0OwvkS+4YtBQH+U
-	R6boXMMuqbmanpCxjaXkcskHnTTOc7gH4UyO0OWdsEmjruoFTUSk9+akrWWcSu7GBbnctyR7GP8
-	XhoYpx/kg11kXoNN/t6wqfy+7qBhPaA==
-X-Google-Smtp-Source: AGHT+IFGt5VFR6NbS7vC8yOPohi01Zz2iGk0PJPFzYYvy0RDy+DrDiBt0qqDTV3QQD7ZUMTNRB5WaHWxcskX5F6+xKY=
-X-Received: by 2002:a2e:8086:0:b0:2eb:ed3a:9c65 with SMTP id
- 38308e7fff4ca-2ec3ceb6b04mr34150741fa.15.1718894686390; Thu, 20 Jun 2024
- 07:44:46 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="hTTlPXtK"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1718895135; x=1750431135;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=R3VE8vdrAuyn/0OkeY8ZInSecUeKr44wwZO6xSBfJZU=;
+  b=hTTlPXtKcy51AtF9h8nqvG6WhCPND3qdD/2lvJEzwoRJf7xVIUJftKci
+   i0gdi9zGk1v3+PDDXWUbre1V4IrMWzEUI2kmyWqM40Q6SjMK2jj+LPEO6
+   GL90W9GwHYnN0w1nE/AyhXnZtJCSiR0CUTtUm1NTZ86C0zi1FvwxA0Z4S
+   5WCQ9LmdVhAXGWgIrn/aJgKffJNWiKptwcpU1ZZU+lnGIGCOjv1qKP9YA
+   mroMbt4hS2492x36HvRxl6SKLktrM5VB3uP0DdJIhOt8yq4tAcvyZTdzD
+   oTfsXZ5N5wsToKjhAIShaLZZ0ctTfWGXdX0VYdPVifS7zI3b1Zp3jyNwz
+   Q==;
+X-CSE-ConnectionGUID: IJoDBijHTFiDBihHdFOlqw==
+X-CSE-MsgGUID: 0TalmbvXQIe/XVuFMlSFYQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11108"; a="26565847"
+X-IronPort-AV: E=Sophos;i="6.08,252,1712646000"; 
+   d="scan'208";a="26565847"
+Received: from fmviesa009.fm.intel.com ([10.60.135.149])
+  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Jun 2024 07:52:14 -0700
+X-CSE-ConnectionGUID: 0wqUXeBRTZ6x5Pok06ai4Q==
+X-CSE-MsgGUID: T5bO642uTXWvuJzac8eBOQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.08,252,1712646000"; 
+   d="scan'208";a="42353556"
+Received: from intel-lenovo-legion-y540-15irh-pg0.iind.intel.com ([10.224.186.95])
+  by fmviesa009.fm.intel.com with ESMTP; 20 Jun 2024 07:52:12 -0700
+From: Kiran K <kiran.k@intel.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: ravishankar.srivatsa@intel.com,
+	chethan.tumkur.narayan@intel.com,
+	chandrashekar.devegowda@intel.com,
+	vijay.satija@intel.com,
+	Kiran K <kiran.k@intel.com>
+Subject: [PATCH v1] Bluetooth: btintel: Allow lowering of drive strength of BRI
+Date: Thu, 20 Jun 2024 20:36:35 +0530
+Message-Id: <20240620150635.2119398-1-kiran.k@intel.com>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240612075829.18241-1-brgl@bgdev.pl> <171889385052.4585.15983645082672209436.git-patchwork-notify@kernel.org>
- <8d6af7e2-76f8-4daa-a751-a1abe29af103@kernel.org>
-In-Reply-To: <8d6af7e2-76f8-4daa-a751-a1abe29af103@kernel.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Thu, 20 Jun 2024 10:44:33 -0400
-Message-ID: <CABBYNZJ5z91HExR-dkwrEPoF1pEGbkAP0X6tpftEGz-kd7vdsw@mail.gmail.com>
-Subject: Re: [GIT PULL] Immutable tag between the Bluetooth and pwrseq
- branches for v6.11-rc1
-To: Krzysztof Kozlowski <krzk@kernel.org>
-Cc: patchwork-bot+bluetooth@kernel.org, Bartosz Golaszewski <brgl@bgdev.pl>, marcel@holtmann.org, 
-	krzk+dt@kernel.org, linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org, 
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	bartosz.golaszewski@linaro.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-Hi Krzysztof,
+BRI (Bluetooth Radio Interface) traffic from CNVr to CNVi was found
+causing cross talk step errors to WiFi. As a workaround, driver needs to
+reduce the drive strength of BRI. During *setup*, driver reads the drive
+strength value from efi variable and passes it controller via vendor
+specific command with opcode 0xfc0a.
 
-On Thu, Jun 20, 2024 at 10:35=E2=80=AFAM Krzysztof Kozlowski <krzk@kernel.o=
-rg> wrote:
->
-> On 20/06/2024 16:30, patchwork-bot+bluetooth@kernel.org wrote:
-> > Hello:
-> >
-> > This pull request was applied to bluetooth/bluetooth-next.git (master)
-> > by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
-> >
-> > On Wed, 12 Jun 2024 09:58:29 +0200 you wrote:
-> >> From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-> >>
-> >> Hi Marcel, Luiz,
-> >>
-> >> Please pull the following power sequencing changes into the Bluetooth =
-tree
-> >> before applying the hci_qca patches I sent separately.
-> >>
-> >> [...]
-> >
-> > Here is the summary with links:
-> >   - [GIT,PULL] Immutable tag between the Bluetooth and pwrseq branches =
-for v6.11-rc1
-> >     https://git.kernel.org/bluetooth/bluetooth-next/c/4c318a2187f8
->
->
-> Luiz,
->
-> This pulls looks wrong. Are you sure you have correct base? The diffstat
-> suggests you are merging into rc2, not rc3. This will be confusing in
-> merge commit. It is much safer, including possible feedback from Linus,
-> if you use exactly the same base.
+Signed-off-by: Kiran K <kiran.k@intel.com>
+---
+ drivers/bluetooth/btintel.c | 115 ++++++++++++++++++++++++++++++++++++
+ 1 file changed, 115 insertions(+)
 
-So you are saying I need to rebase? I usually only rebase when it
-comes the time to do a pull-request using net-next as a base since
-that is where bluetooth-next normally lands.
+diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
+index 5d735391545a..1d6586b30c8d 100644
+--- a/drivers/bluetooth/btintel.c
++++ b/drivers/bluetooth/btintel.c
+@@ -12,6 +12,8 @@
+ #include <linux/acpi.h>
+ #include <acpi/acpi_bus.h>
+ #include <asm/unaligned.h>
++#include <linux/efi.h>
++
+ 
+ #include <net/bluetooth/bluetooth.h>
+ #include <net/bluetooth/hci_core.h>
+@@ -49,6 +51,39 @@ static const guid_t btintel_guid_dsm =
+ 	GUID_INIT(0xaa10f4e0, 0x81ac, 0x4233,
+ 		  0xab, 0xf6, 0x3b, 0x2a, 0xc5, 0x0e, 0x28, 0xd9);
+ 
++static void *btintel_uefi_get_variable(efi_char16_t *name, efi_guid_t *guid)
++{
++#if defined(CONFIG_EFI)
++	void *data;
++	efi_status_t status;
++	size_t data_size = 0;
++
++	if (!efi_rt_services_supported(EFI_RT_SUPPORTED_GET_VARIABLE))
++		return ERR_PTR(-EOPNOTSUPP);
++
++	status = efi.get_variable(name, guid, NULL, &data_size, NULL);
++
++	if (status != EFI_BUFFER_TOO_SMALL || !data_size)
++		return ERR_PTR(-EIO);
++
++	data = kmalloc(data_size, GFP_KERNEL);
++
++	if (!data)
++		return ERR_PTR(-ENOMEM);
++
++	status = efi.get_variable(name, guid, NULL, &data_size, data);
++
++	if (status != EFI_SUCCESS) {
++		kfree(data);
++		return ERR_PTR(-ENXIO);
++	}
++
++	return data;
++#else
++	return ERR_PTR(-EOPNOTSUPP);
++#endif
++}
++
+ int btintel_check_bdaddr(struct hci_dev *hdev)
+ {
+ 	struct hci_rp_read_bd_addr *bda;
+@@ -2615,6 +2650,80 @@ static u8 btintel_classify_pkt_type(struct hci_dev *hdev, struct sk_buff *skb)
+ 	return hci_skb_pkt_type(skb);
+ }
+ 
++static int btintel_set_dsbr(struct hci_dev *hdev, struct intel_version_tlv *ver)
++{
++	struct btintel_dsbr_cmd {
++		u8 enable;
++		u8 dsbr;
++	} __packed;
++
++	struct btintel_dsbr {
++		u8 header;
++		u32 dsbr;
++	} __packed;
++
++	struct btintel_dsbr *dsbr;
++	struct btintel_dsbr_cmd cmd;
++	struct sk_buff *skb;
++	u8 status;
++	efi_guid_t guid = EFI_GUID(0xe65d8884, 0xd4af, 0x4b20, 0x8d, 0x03,
++				   0x77, 0x2e, 0xcc, 0x3d, 0xa5, 0x31);
++
++	memset(&cmd, 0, sizeof(cmd));
++	dsbr = btintel_uefi_get_variable(L"UefiCnvCommonDSBR", &guid);
++	if (IS_ERR(dsbr)) {
++		/* If efi variable is not present, driver still needs to send
++		 * 0xfc0a command with default values
++		 */
++		bt_dev_dbg(hdev, "Error reading efi DSBR (%ld)",
++			   PTR_ERR(dsbr));
++		dsbr = NULL;
++	}
++
++	if (dsbr) {
++		/* bit0: 0 - Use firmware default value
++		 *       1 - Override firmware value
++		 * bit3:1 - Reserved
++		 * bit7:4 - DSBR override values
++		 * bt31:7 - Reserved
++		 */
++		cmd.enable = dsbr->dsbr & BIT(0);
++		if (cmd.enable)
++			cmd.dsbr = dsbr->dsbr >> 4 & 0xF;
++		kfree(dsbr);
++	}
++
++	bt_dev_info(hdev, "dsbr: enabled: 0x%2.2x value: 0x%2.2x", cmd.enable,
++		    cmd.dsbr);
++
++	skb = __hci_cmd_sync(hdev, 0xfc0a, sizeof(cmd), &cmd,  HCI_CMD_TIMEOUT);
++	if (IS_ERR(skb)) {
++		bt_dev_err(hdev, "Failed to send Intel DSBR command (%ld)",
++			   PTR_ERR(skb));
++		return -bt_to_errno(PTR_ERR(skb));
++	}
++
++	status = skb->data[0];
++	kfree_skb(skb);
++
++	if (status) {
++		bt_dev_err(hdev, "Set DSBR failed 0x%2.2x", status);
++		return -bt_to_errno(status);
++	}
++	return 0;
++}
++
++static int btintel_apply_dsbr(struct hci_dev *hdev,
++			      struct intel_version_tlv *ver)
++{
++	/* For BlazarI + B0 step, DSBR command needs to be sent just after
++	 * downloading IML firmware
++	 */
++	return ver->img_type == BTINTEL_IMG_IML &&
++		((ver->cnvi_top & 0xfff) == BTINTEL_CNVI_BLAZARI) &&
++		INTEL_CNVX_TOP_STEP(ver->cnvi_top) == 0x01;
++}
++
+ int btintel_bootloader_setup_tlv(struct hci_dev *hdev,
+ 				 struct intel_version_tlv *ver)
+ {
+@@ -2649,6 +2758,12 @@ int btintel_bootloader_setup_tlv(struct hci_dev *hdev,
+ 	if (err)
+ 		return err;
+ 
++	if (btintel_apply_dsbr(hdev, ver)) {
++		err = btintel_set_dsbr(hdev, ver);
++		if (err)
++			return err;
++	}
++
+ 	/* If image type returned is BTINTEL_IMG_IML, then controller supports
+ 	 * intermediae loader image
+ 	 */
+-- 
+2.40.1
 
-> Best regards,
-> Krzysztof
->
-
-
---=20
-Luiz Augusto von Dentz
