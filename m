@@ -1,105 +1,120 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 148337D086
-	for <linux-bluetooth@vger.kernel.org>; Thu, 20 Jun 2024 21:13:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14C8D3987D
+	for <linux-bluetooth@vger.kernel.org>; Thu, 20 Jun 2024 23:46:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718918000; cv=none; b=BI6S7xxnGDxqJS+fRFqICUssb/fcT/vqkTKWWjyNvmpEEoV5vWqBV67V0kfQYVBJ/Jf9ghHHNR/v3VID8p5ffQbPu/x6/YMioU1NM0/NtApOwIhpJNpJynLZubo6XzSe43GOkau6D4HLanJlCCj/CSYDJoSz80Do5k8UwTHlFV0=
+	t=1718927197; cv=none; b=II0aHDbSW8VL/OR517qBkRPkDFu+hrFBN4xZoecUh0v7D5pKe585DM8J53pU5wZdr+vY9p2K5eAwCj6BoHlSx2lHk5GkcKZL7WKnNaPY3/duJsK7VRh8C4SdU8cZN97BRcWHgtVlcDtJ4k7LLvzxdT/ACqcnnkUW0Av/xxzncrQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718918000; c=relaxed/simple;
-	bh=8ckDeIxAwnzo5kRakgUnDyZQGTgneYjyqoyhQm7BZlM=;
-	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=SokufXG1UElAhcQV1lGyvpQEpDv+Oeqw4DGPuc2UKhTcilXcg7ukfSUBva1I5QIraB5QXp28DkZ6p5tcGgBpM/OI0sUqfkMaQxYNVRjrUKouHJ9ar3PrvitkbTUwXbWYMxhz9sPfHXdiBSMGUNM2vToXic+7En45gLLeNcngpy8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZZv6aMpq; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1718927197; c=relaxed/simple;
+	bh=2bpWyHIZOsgubBVePt47OHtU+kJ8Myxt9Kt0c50kCT4=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=dxoZuqR/sYm5lFN6RuuegfDhtnoOY+X40XPvLoOUOmoybeYp3Yihx/eheP/VADLlrhnk8Keiyj99fQThA7Nw+5Qp0CTx/1TnApN31hwitDDXRQ5t3vmVlnWtTTVABtS5psOVfEGy98u/UI238ZcMRckBecD6g+2xheqJKqUdebQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=jj3K2/k6; arc=none smtp.client-ip=198.175.65.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZZv6aMpq"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1718917997;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=cASqOGhIIyq9NA4K7ASzMtw6E21NLw3jkPS/f6pzdOY=;
-	b=ZZv6aMpqv9hmuK1S1fAMAo3fZeCKEkSm5VHeYEhLY2TQHc6eax5WhVZfEZyt+qAWYvlP4j
-	IbKgqA3TjgRTE0Dj7HZXjXM9rbIh9jM8b5siIdEUnR8VLL3qgM60CZrIRYwY3Y6s4GKdPB
-	jIwXyEHryUfBZ7mu4YDUK/UrQ8L+i9I=
-Received: from mail-oa1-f71.google.com (mail-oa1-f71.google.com
- [209.85.160.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-85-TkgPJy8pMfSdQ4Zijp9kRw-1; Thu, 20 Jun 2024 17:13:16 -0400
-X-MC-Unique: TkgPJy8pMfSdQ4Zijp9kRw-1
-Received: by mail-oa1-f71.google.com with SMTP id 586e51a60fabf-25ca2237198so1674737fac.1
-        for <linux-bluetooth@vger.kernel.org>; Thu, 20 Jun 2024 14:13:16 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718917995; x=1719522795;
-        h=content-transfer-encoding:mime-version:user-agent:references
-         :in-reply-to:date:to:from:subject:message-id:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=cASqOGhIIyq9NA4K7ASzMtw6E21NLw3jkPS/f6pzdOY=;
-        b=NKn87zynFighvXSSeh8XzSE0i+ustODUb2rd0oVpSPG7hipvB1Pj8iCt8JAkjDvw06
-         YmvsXE31s36h/+r8MzPZQ+Pmsw4mA4xdwfrVR+0A2FKH/1aGCLLYyvDlVg+Kd+p8O3tn
-         Eena9eIxwqtUl+1ZyVjmd1kDDBajJszrPmmkR1Om7YKh/OCYVynuS196tzB9rWUBMrH0
-         pZdXXkxYZ7XR9hfc5oz3dYSiGpEtzxT1ucrgpiHl0ARatAv2ruB8G3h+FIljxFvz4E/N
-         lqrtpFopsXkmlCSzVvuOckHPDmu7LcwrSX4siBn9xNicQqu0DKcH/i5J/jDsGtSV4G8i
-         tWpQ==
-X-Gm-Message-State: AOJu0YxSGXTW5f4Gc6cE0rkCzgA52Zv/xi5yZ9BrA0LRQJMKmmR+8JRD
-	Et2Vg5ALT+PRl9rwv2bT5mgKlBavMIMLZD/2IIC0isE9m3tiyIyZOu+euNsP07mhP6AsrK1f1Hu
-	ARaL5OniVMhhnsH/zuo7lpQ0YzUxU/UNGTtXfdnbpA/okBW8dnCBafL0GF67JtskN1wqYXcPkpl
-	wL+KvQvp2jEr+uTucBkcuEw4w+RDRdLf2R651TA3uZY3WjSuyWLQ==
-X-Received: by 2002:a05:6870:fba1:b0:254:cfd7:4f91 with SMTP id 586e51a60fabf-25c94e018d4mr7904453fac.45.1718917995301;
-        Thu, 20 Jun 2024 14:13:15 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFozNsvchZL7zItAC6fhL4TY7+1tkQigSWOzls2Kn8uzWgE3C2479hbUP65dhtrOlsS3JJv1g==
-X-Received: by 2002:a05:6870:fba1:b0:254:cfd7:4f91 with SMTP id 586e51a60fabf-25c94e018d4mr7904429fac.45.1718917994686;
-        Thu, 20 Jun 2024 14:13:14 -0700 (PDT)
-Received: from starship ([2607:fea8:fc01:7b7f:6adb:55ff:feaa:b156])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-79bce89b332sm12572585a.4.2024.06.20.14.13.14
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 20 Jun 2024 14:13:14 -0700 (PDT)
-Message-ID: <69649c8fa57ad7609a0c5eee513a1de772794df1.camel@redhat.com>
-Subject: Re: Suport for 33fa:0010 - BARROT Bluetooth 5.4 USB adapter
-From: Maxim Levitsky <mlevitsk@redhat.com>
-To: linux-bluetooth@vger.kernel.org
-Date: Thu, 20 Jun 2024 17:13:13 -0400
-In-Reply-To: <8bfdefacc2b609b7d4fc3808f29250e197f72182.camel@redhat.com>
-References: <8bfdefacc2b609b7d4fc3808f29250e197f72182.camel@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="jj3K2/k6"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1718927195; x=1750463195;
+  h=date:from:to:cc:subject:message-id:mime-version;
+  bh=2bpWyHIZOsgubBVePt47OHtU+kJ8Myxt9Kt0c50kCT4=;
+  b=jj3K2/k6M4ZZVRamMu1xx8SYx1tDNxZYP9c91XgPr0/h0q16Eam0STXm
+   dS7wutUnwWlswuKBL9GwXA0Mk0evQgs9Dh0H0zc/BNpBxlVe6xXBQKKXJ
+   8NQR4t4EYUZ54rJ5VYTBIk+6LU3SGG/OoABQdHQIyeaegJYX1/bcC3/Q3
+   HW/KacolukruewO4dDqqADYUCn8eMsamThWnrEEQM58homimHZd/fy9ot
+   WMR8xOXTfRxzO2iotAxHoW3jx/6N1yyURZdwqZQ83qTJY8V+Kz7ifSlAv
+   tuA6OjSRXCKDEkdgidi6cXprZtVBo8qYj+UYnAl62xlsUkM+oVPZdGXka
+   g==;
+X-CSE-ConnectionGUID: MgcvLwo+SJGxpx25iUbZVA==
+X-CSE-MsgGUID: OkL+goLxTCK5ce2KWlMwLQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11109"; a="15771442"
+X-IronPort-AV: E=Sophos;i="6.08,253,1712646000"; 
+   d="scan'208";a="15771442"
+Received: from fmviesa002.fm.intel.com ([10.60.135.142])
+  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Jun 2024 16:46:35 -0700
+X-CSE-ConnectionGUID: btvds8KaRZCUDcyrrR0QDQ==
+X-CSE-MsgGUID: FQGSAHy5SGioMGLmMk9zOg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.08,253,1712646000"; 
+   d="scan'208";a="65654087"
+Received: from lkp-server01.sh.intel.com (HELO 68891e0c336b) ([10.239.97.150])
+  by fmviesa002.fm.intel.com with ESMTP; 20 Jun 2024 16:46:33 -0700
+Received: from kbuild by 68891e0c336b with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1sKRU6-00081m-2V;
+	Thu, 20 Jun 2024 23:46:30 +0000
+Date: Fri, 21 Jun 2024 07:46:07 +0800
+From: kernel test robot <lkp@intel.com>
+To: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+Cc: oe-kbuild-all@lists.linux.dev, linux-bluetooth@vger.kernel.org,
+	Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
+	Krzysztof Kozlowski <krzk@kernel.org>
+Subject: [bluetooth-next:master 14/15]
+ arch/arm64/boot/dts/qcom/qrb5165-rb5.dtb: bluetooth: 'vddrfacmn-supply' is a
+ required property
+Message-ID: <202406210706.WvRRDs6P-lkp@intel.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-On Sun, 2024-06-16 at 20:43 -0400, Maxim Levitsky wrote:
-> Hi!
-> 
-> Mistakenly I bought this adapter (UGREEN bluetooth 5.4 adapter).
-> 
-> Looks like it is not supported under Linux:
-> 
-> https://forums.opensuse.org/t/bluetooth-5-4-usb-stick-connected-on-a-desktop-computer-with-opensuse-15-5-with-kde-not-working/173916/31
-> 
-> However I see that windows uses stock drivers for this device.
-> 
-> What do you think is needed to make this adapter work in Linux? I didn't notice windows downloading firmware for it,
-> since it just started to work out of box.
+tree:   https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
+head:   4029dba6b6f105e052272bed37bc82f0ce3e0de3
+commit: 251180e6dba54e9bc83b2e85680c536e7ae02219 [14/15] dt-bindings: net: bluetooth: qualcomm: describe regulators for QCA6390
+config: arm64-randconfig-051-20240620 (https://download.01.org/0day-ci/archive/20240621/202406210706.WvRRDs6P-lkp@intel.com/config)
+compiler: clang version 19.0.0git (https://github.com/llvm/llvm-project ad79a14c9e5ec4a369eed4adf567c22cc029863f)
+dtschema version: 2024.6.dev1+g833054f
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240621/202406210706.WvRRDs6P-lkp@intel.com/reproduce)
 
-Any update?
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202406210706.WvRRDs6P-lkp@intel.com/
 
-Best regards,
-	Maxim Levitsky
+dtcheck warnings: (new ones prefixed by >>)
+   arch/arm64/boot/dts/qcom/sm8250.dtsi:4837.27-4908.6: Warning (avoid_unnecessary_addr_size): /soc@0/display-subsystem@ae00000/dsi@ae94000: unnecessary #address-cells/#size-cells without "ranges" or child "reg" property
+   arch/arm64/boot/dts/qcom/sm8250.dtsi:4929.27-4981.6: Warning (avoid_unnecessary_addr_size): /soc@0/display-subsystem@ae00000/dsi@ae96000: unnecessary #address-cells/#size-cells without "ranges" or child "reg" property
+   arch/arm64/boot/dts/qcom/pm8150b.dtsi:165.9-180.4: Warning (avoid_unnecessary_addr_size): /soc@0/spmi@c440000/pmic@3: unnecessary #address-cells/#size-cells without "ranges" or child "reg" property
+   arch/arm64/boot/dts/qcom/qrb5165-rb5.dtb: bluetooth: 'vddpmu-supply', 'vddrfa0p9-supply', 'vddrfa1p3-supply' do not match any of the regexes: 'pinctrl-[0-9]+'
+   	from schema $id: http://devicetree.org/schemas/net/bluetooth/qualcomm-bluetooth.yaml#
+>> arch/arm64/boot/dts/qcom/qrb5165-rb5.dtb: bluetooth: 'vddrfacmn-supply' is a required property
+   	from schema $id: http://devicetree.org/schemas/net/bluetooth/qualcomm-bluetooth.yaml#
+>> arch/arm64/boot/dts/qcom/qrb5165-rb5.dtb: bluetooth: 'vddbtcmx-supply' is a required property
+   	from schema $id: http://devicetree.org/schemas/net/bluetooth/qualcomm-bluetooth.yaml#
+>> arch/arm64/boot/dts/qcom/qrb5165-rb5.dtb: bluetooth: 'vddrfa0p8-supply' is a required property
+   	from schema $id: http://devicetree.org/schemas/net/bluetooth/qualcomm-bluetooth.yaml#
+>> arch/arm64/boot/dts/qcom/qrb5165-rb5.dtb: bluetooth: 'vddrfa1p2-supply' is a required property
+   	from schema $id: http://devicetree.org/schemas/net/bluetooth/qualcomm-bluetooth.yaml#
+>> arch/arm64/boot/dts/qcom/qrb5165-rb5.dtb: bluetooth: 'vddrfa1p7-supply' is a required property
+   	from schema $id: http://devicetree.org/schemas/net/bluetooth/qualcomm-bluetooth.yaml#
+   arch/arm64/boot/dts/qcom/qrb5165-rb5.dtb: phy@1d87000: 'power-domains' is a required property
+   	from schema $id: http://devicetree.org/schemas/phy/qcom,sc8280xp-qmp-ufs-phy.yaml#
+--
+   arch/arm64/boot/dts/qcom/sm8250.dtsi:4837.27-4908.6: Warning (avoid_unnecessary_addr_size): /soc@0/display-subsystem@ae00000/dsi@ae94000: unnecessary #address-cells/#size-cells without "ranges" or child "reg" property
+   arch/arm64/boot/dts/qcom/sm8250.dtsi:4929.27-4981.6: Warning (avoid_unnecessary_addr_size): /soc@0/display-subsystem@ae00000/dsi@ae96000: unnecessary #address-cells/#size-cells without "ranges" or child "reg" property
+   arch/arm64/boot/dts/qcom/pm8150b.dtsi:165.9-180.4: Warning (avoid_unnecessary_addr_size): /soc@0/spmi@c440000/pmic@3: unnecessary #address-cells/#size-cells without "ranges" or child "reg" property
+   arch/arm64/boot/dts/qcom/qrb5165-rb5-vision-mezzanine.dtb: bluetooth: 'vddpmu-supply', 'vddrfa0p9-supply', 'vddrfa1p3-supply' do not match any of the regexes: 'pinctrl-[0-9]+'
+   	from schema $id: http://devicetree.org/schemas/net/bluetooth/qualcomm-bluetooth.yaml#
+>> arch/arm64/boot/dts/qcom/qrb5165-rb5-vision-mezzanine.dtb: bluetooth: 'vddrfacmn-supply' is a required property
+   	from schema $id: http://devicetree.org/schemas/net/bluetooth/qualcomm-bluetooth.yaml#
+>> arch/arm64/boot/dts/qcom/qrb5165-rb5-vision-mezzanine.dtb: bluetooth: 'vddbtcmx-supply' is a required property
+   	from schema $id: http://devicetree.org/schemas/net/bluetooth/qualcomm-bluetooth.yaml#
+>> arch/arm64/boot/dts/qcom/qrb5165-rb5-vision-mezzanine.dtb: bluetooth: 'vddrfa0p8-supply' is a required property
+   	from schema $id: http://devicetree.org/schemas/net/bluetooth/qualcomm-bluetooth.yaml#
+>> arch/arm64/boot/dts/qcom/qrb5165-rb5-vision-mezzanine.dtb: bluetooth: 'vddrfa1p2-supply' is a required property
+   	from schema $id: http://devicetree.org/schemas/net/bluetooth/qualcomm-bluetooth.yaml#
+>> arch/arm64/boot/dts/qcom/qrb5165-rb5-vision-mezzanine.dtb: bluetooth: 'vddrfa1p7-supply' is a required property
+   	from schema $id: http://devicetree.org/schemas/net/bluetooth/qualcomm-bluetooth.yaml#
+   arch/arm64/boot/dts/qcom/qrb5165-rb5-vision-mezzanine.dtb: phy@1d87000: 'power-domains' is a required property
+   	from schema $id: http://devicetree.org/schemas/phy/qcom,sc8280xp-qmp-ufs-phy.yaml#
 
-> 
-> Best regards,
-> 	Maxim Levitsky
-> 
-> 
-> 
-
-
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
