@@ -1,142 +1,257 @@
-Received: from mail-yw1-f170.google.com (mail-yw1-f170.google.com [209.85.128.170])
+Received: from mail-lj1-f178.google.com (mail-lj1-f178.google.com [209.85.208.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F34C31AE875
-	for <linux-bluetooth@vger.kernel.org>; Thu, 20 Jun 2024 14:52:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 571571AE086
+	for <linux-bluetooth@vger.kernel.org>; Thu, 20 Jun 2024 15:10:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718895180; cv=none; b=rRVL9UmieFitzqu/jdDFRPoPtgBQTapiQ8iLhnvSsGtc577JjBFOpV1hzrdw8hXfkUXsLANtjtF1yv1FbHewuK89Nn/WsNiv6Hr/+g8lpCAGUNkqnvpMKpq9d0wc2va/hQgWQVbZukFghMkZb9oPeggd+SPOgHJsPq9Z8mJHqlU=
+	t=1718896256; cv=none; b=cDOE0C/RiZtUlJBLeCu4MXjfpQaN2cua59Z0m9dxUy+MJSKe+fJM5Nvt5yz2owmsqMgTw3sHxua5QjJ6OpzFDEJ7yvGDMjndCeDMRb4i0R7wS4vfbN5QggHOnz8HFkvOCi3vkRwaSwOQwlINPouE8icLUeF0qyg7PAMp6mq7PAc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718895180; c=relaxed/simple;
-	bh=cOjlLG7J6uNFSBufcYc1U6uO2TdqNqn9wVWkYk95jjo=;
+	s=arc-20240116; t=1718896256; c=relaxed/simple;
+	bh=jLtRHAoJTMJT1UQLvRetjwlkY79An8E3lIAr+utztT8=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=M7C8HzC5mD/wIZ2qI6aN01+Z7eGs2nwfHHJm1u53RraXt+XWwSFzE4bujkKp3W9pcli6g86mBHB7zXHZqAiC78ozveIE7pcE3vzS4FS/LhjgpdpkXyFb8XccnTa+9BJluQHrzOWGlyrIzMDHfNh0Szu9lDUO245aASnWcQpa0ZE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=Mj4qRAQJ; arc=none smtp.client-ip=209.85.128.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	 To:Cc:Content-Type; b=pLq++lNZa4dMscqWxu2GsDQIGQdTB2PygjwRJuzXxHWVjBY2Lyt/tx4QtyuvWRl6G9baKsWAAv+vFLJ1i/d462K2hvMpgyCGJzDs2FQclNXa2qW4b3H33Nj2RtiaZbqZO0eE/66PpzYiNMd7DXw79lYJrx5iGdcsLT/z+HxtHJs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Aik7g5ko; arc=none smtp.client-ip=209.85.208.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Mj4qRAQJ"
-Received: by mail-yw1-f170.google.com with SMTP id 00721157ae682-62fe76c0a61so17012607b3.0
-        for <linux-bluetooth@vger.kernel.org>; Thu, 20 Jun 2024 07:52:58 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Aik7g5ko"
+Received: by mail-lj1-f178.google.com with SMTP id 38308e7fff4ca-2ebec2f11b7so10786531fa.2
+        for <linux-bluetooth@vger.kernel.org>; Thu, 20 Jun 2024 08:10:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1718895178; x=1719499978; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1718896252; x=1719501052; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=qCNEYn05yS9gykrfyaJDjrazGTz47gbZUOuJaEqz7AQ=;
-        b=Mj4qRAQJ2Wx5lLhhpLxAQFkU3cYGQB2F6Hum+kp+9EhQTIRbkIt6eMTyMUPKeaqnTv
-         0Dd0hxRQpRJ0ayAaZFEWNqJKf+v+6czaYyhkSKePJBD0erUSKj5ENB5otFFOMYnxeMTe
-         SxsMkigkfuVbHFswgLVP+91M9n89kGcDi3MgN3vUwqm0jho665jzA2zxEX2BaEv8IHNs
-         Kn5QkS2DFyISLU8KfPYx9lBxByYvfdPwEmqU04PjFL0Cff4CWv4/dGZPlacA0zVoEvbo
-         hxH51qFUSAlIbgWay8sdMtxzKzyPFt3ZWMb3kdp53iz8E1C1O1hdYmAe2kgxN/TSMXlO
-         En0w==
+        bh=1Bchqe4mUPSa01zAXk79qs3AYCxtywGajmvCX9HFkjs=;
+        b=Aik7g5ko+wTK9hXYaQrN7UCI9NFqMxoqyGhP74at3FzwCIM2xM41Pha7KgQPjTG4bE
+         hb/ow16oGmbWWLkjpJXQgvuY1IBbkoaJ5fAPqNBJIK7kEgR+H/iF5jS5gSQ0XGG4iKIz
+         GP8Ddu3GhQ5mis3qVXWrCp8FZWrqSmFjrOjTH001sOjH2MlqdKDMCYTIEGUMsOriM9T0
+         w7uuzOyD/UHpP6kaOZ+cT8LZ+FW/GhTlVgtS8gY3+cx+isJZ8YJp0njO30uytjfqydIa
+         pu1aGZCsUnt97mTspAowi+V8PNOXK0CDJxRGKf+9gDeF6Xxh9ory0KEzj1CSfJpfLKWh
+         Gqfw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718895178; x=1719499978;
+        d=1e100.net; s=20230601; t=1718896252; x=1719501052;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=qCNEYn05yS9gykrfyaJDjrazGTz47gbZUOuJaEqz7AQ=;
-        b=tY6tI26Y4Uv5nkIhwYjggR3jj6g30rcZ3125tCD1VTPtrueTszlHaOyS36Shplq0dx
-         te88YCULxou0+4ug9DW9dBZ5lA8tRTQH7lg9c43+kNZJb1XJcP6YPkpA0SXW47RXYUxi
-         t/FVXbBdWRTZBxrDoKdF4qNk1EIO6lIkzQeunMnYBr+A8Z2cjxCQcxTKOJkLHNybgK8Q
-         6VOMKsJfP67DNx6T6rhdVAx/z9a+LHiH8lMS9F1jcMkWz1E9BBiVw7+elia7iVIE73ME
-         oBa5ZzUqff4Up4qHQrciidvWTvZBK/oxhPRN3kJUsdoJ18FV8XgfbI2iogTt2qzciWHi
-         wAig==
-X-Forwarded-Encrypted: i=1; AJvYcCVlVCuLTTGVopeM7cfIHrBIe+Z3D23Q8btheV1keMiMx/FRNgLofDlbDu4QozTwsHxPB6bO7Kn+EFburD8jt759JIDJRvI6hX/r7QY2Qxjy
-X-Gm-Message-State: AOJu0YxdOZh34Scu4SnlIzXE9IQQTuhN3Xs3+F2Cx4b5k7g4eV7B5Mnx
-	c/MPdrvG3yWrj5PqU4MjatUkVI21drmXNE/wJSLs0IRSPgKg5OztXp3tpDugp9WeZJ9iz5azLy2
-	q4hxRQxnzy8zKRBFS7KLjWpiYpSThHC7KkBil6g==
-X-Google-Smtp-Source: AGHT+IF40pdsLHGJGXsUitmodarquEe+C+A7BtlyIVzKzW3fRxNf20I0BvEb3GK+3HmTvwvssyu3em+pUpOJ1efXyLE=
-X-Received: by 2002:a81:e30d:0:b0:61b:e61e:8988 with SMTP id
- 00721157ae682-63949fecfc4mr58602707b3.18.1718895177927; Thu, 20 Jun 2024
- 07:52:57 -0700 (PDT)
+        bh=1Bchqe4mUPSa01zAXk79qs3AYCxtywGajmvCX9HFkjs=;
+        b=ed07uqTtzkFAUhCIsSNSiHNg/QeCBz/3knlcr2JreBjS6z5I3cqDQ8ySVypS7CfgES
+         30kEN7oIF7aisM7NAoyOQ5JOZu6398QHb8zWZuXXOGSDvFWz4XwsmX7Gg4jhybbcvC6Z
+         8+9uvAHmCzl4y95cVNBH4QCHszpVE7jE+L4Hs6xqM1qh3q2Jepr3/YKGLVA6ay2r7K12
+         ACk+hEbOnU9UGMuW8hYUmXvHVuljMc5wXUMeiFdEI6aWuYJR/9K50JsHCnVo2ti6MJNO
+         ZSGUGL6wN8YVFQ7bXbDGwtQfGZ6NM2muGzo56/HxGXalkygP/2RH5RCaLq9VSdKwhAW9
+         IlRw==
+X-Gm-Message-State: AOJu0Yx56OXmCrXgFW32XDWdujZAngIGWYhFhz/9Z3aWUWy/A4o9Mb+D
+	24IlDuGnY2qu63Pn0IQZWhAnDmKRA+OGA89LvgTWD/2rXX70VBBhAVWsS6fJDMGxn9xwTtc6Alr
+	+UFiDpupuIFoPBOPiyDHV7gbxizMrSw==
+X-Google-Smtp-Source: AGHT+IGzVKnY52xBe8q4cWD9FGLYuYrrlFVSt3scjmkQMdTaY1Euu3/DxmAFy/bbvtwotxpHCqA77/25Bbkd8qchj+0=
+X-Received: by 2002:a2e:b0d5:0:b0:2eb:eb8b:738 with SMTP id
+ 38308e7fff4ca-2ec3cecc2ecmr35912161fa.29.1718896252305; Thu, 20 Jun 2024
+ 08:10:52 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240612075829.18241-1-brgl@bgdev.pl> <171889385052.4585.15983645082672209436.git-patchwork-notify@kernel.org>
- <8d6af7e2-76f8-4daa-a751-a1abe29af103@kernel.org> <CABBYNZJ5z91HExR-dkwrEPoF1pEGbkAP0X6tpftEGz-kd7vdsw@mail.gmail.com>
-In-Reply-To: <CABBYNZJ5z91HExR-dkwrEPoF1pEGbkAP0X6tpftEGz-kd7vdsw@mail.gmail.com>
-From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-Date: Thu, 20 Jun 2024 16:52:46 +0200
-Message-ID: <CACMJSevy9w9L3c9fmbZcwO2BdmtJiQmHBTqJSiSXUs-fcmEqAQ@mail.gmail.com>
-Subject: Re: [GIT PULL] Immutable tag between the Bluetooth and pwrseq
- branches for v6.11-rc1
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Krzysztof Kozlowski <krzk@kernel.org>, patchwork-bot+bluetooth@kernel.org, 
-	Bartosz Golaszewski <brgl@bgdev.pl>, marcel@holtmann.org, krzk+dt@kernel.org, 
-	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org, 
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20240620150635.2119398-1-kiran.k@intel.com>
+In-Reply-To: <20240620150635.2119398-1-kiran.k@intel.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Thu, 20 Jun 2024 11:10:39 -0400
+Message-ID: <CABBYNZJ1wxgEU0xQvtYc+gr1U886DpbTDJUGhszjY_5ifEuRXA@mail.gmail.com>
+Subject: Re: [PATCH v1] Bluetooth: btintel: Allow lowering of drive strength
+ of BRI
+To: Kiran K <kiran.k@intel.com>
+Cc: linux-bluetooth@vger.kernel.org, ravishankar.srivatsa@intel.com, 
+	chethan.tumkur.narayan@intel.com, chandrashekar.devegowda@intel.com, 
+	vijay.satija@intel.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, 20 Jun 2024 at 16:44, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
->
-> Hi Krzysztof,
->
-> On Thu, Jun 20, 2024 at 10:35=E2=80=AFAM Krzysztof Kozlowski <krzk@kernel=
-.org> wrote:
-> >
-> > On 20/06/2024 16:30, patchwork-bot+bluetooth@kernel.org wrote:
-> > > Hello:
-> > >
-> > > This pull request was applied to bluetooth/bluetooth-next.git (master=
-)
-> > > by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
-> > >
-> > > On Wed, 12 Jun 2024 09:58:29 +0200 you wrote:
-> > >> From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-> > >>
-> > >> Hi Marcel, Luiz,
-> > >>
-> > >> Please pull the following power sequencing changes into the Bluetoot=
-h tree
-> > >> before applying the hci_qca patches I sent separately.
-> > >>
-> > >> [...]
-> > >
-> > > Here is the summary with links:
-> > >   - [GIT,PULL] Immutable tag between the Bluetooth and pwrseq branche=
-s for v6.11-rc1
-> > >     https://git.kernel.org/bluetooth/bluetooth-next/c/4c318a2187f8
-> >
-> >
-> > Luiz,
-> >
-> > This pulls looks wrong. Are you sure you have correct base? The diffsta=
-t
-> > suggests you are merging into rc2, not rc3. This will be confusing in
-> > merge commit. It is much safer, including possible feedback from Linus,
-> > if you use exactly the same base.
->
-> So you are saying I need to rebase? I usually only rebase when it
-> comes the time to do a pull-request using net-next as a base since
-> that is where bluetooth-next normally lands.
->
+Hi Kiran,
 
-Technically you're all set - you pulled rc3 together with my tag. But
-if you pulled rc3 separately and then my tag, the merge commit for the
-latter would look much cleaner.
-
-And for the record: you don't need to rebase anything. Does net-next
-require you to? That would be weird. I assume they also are based on
-one of the RC tags. You almost never should rebase on top of an rc,
-instead you merge it into your branch and send the PR starting from
-the latest rc tag. Git is smart and will figure it out. You may be
-afraid you'll "lose" some commits because you will not see it in the
-immediate git log. That's true, they will be buried underneath the
-pile of Merge commits from upstream, but worry not: git will always
-find all commits missing from upstream when you do `git request-pull`.
-
-Bart
-
-> > Best regards,
-> > Krzysztof
-> >
+On Thu, Jun 20, 2024 at 10:52=E2=80=AFAM Kiran K <kiran.k@intel.com> wrote:
 >
+> BRI (Bluetooth Radio Interface) traffic from CNVr to CNVi was found
+> causing cross talk step errors to WiFi. As a workaround, driver needs to
+> reduce the drive strength of BRI. During *setup*, driver reads the drive
+> strength value from efi variable and passes it controller via vendor
+> specific command with opcode 0xfc0a.
 >
+> Signed-off-by: Kiran K <kiran.k@intel.com>
+> ---
+>  drivers/bluetooth/btintel.c | 115 ++++++++++++++++++++++++++++++++++++
+>  1 file changed, 115 insertions(+)
+>
+> diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
+> index 5d735391545a..1d6586b30c8d 100644
+> --- a/drivers/bluetooth/btintel.c
+> +++ b/drivers/bluetooth/btintel.c
+> @@ -12,6 +12,8 @@
+>  #include <linux/acpi.h>
+>  #include <acpi/acpi_bus.h>
+>  #include <asm/unaligned.h>
+> +#include <linux/efi.h>
+> +
+>
+>  #include <net/bluetooth/bluetooth.h>
+>  #include <net/bluetooth/hci_core.h>
+> @@ -49,6 +51,39 @@ static const guid_t btintel_guid_dsm =3D
+>         GUID_INIT(0xaa10f4e0, 0x81ac, 0x4233,
+>                   0xab, 0xf6, 0x3b, 0x2a, 0xc5, 0x0e, 0x28, 0xd9);
+>
+> +static void *btintel_uefi_get_variable(efi_char16_t *name, efi_guid_t *g=
+uid)
+> +{
+> +#if defined(CONFIG_EFI)
+
+iirc IS_ENABLED is normally preferred over #if defined, well except if
+you have undefined symbols but that usually indicates the APIs have
+not been done with usage of IS_ENABLED in mind.
+
+> +       void *data;
+> +       efi_status_t status;
+> +       size_t data_size =3D 0;
+> +
+> +       if (!efi_rt_services_supported(EFI_RT_SUPPORTED_GET_VARIABLE))
+> +               return ERR_PTR(-EOPNOTSUPP);
+> +
+> +       status =3D efi.get_variable(name, guid, NULL, &data_size, NULL);
+> +
+> +       if (status !=3D EFI_BUFFER_TOO_SMALL || !data_size)
+> +               return ERR_PTR(-EIO);
+> +
+> +       data =3D kmalloc(data_size, GFP_KERNEL);
+> +
+> +       if (!data)
+> +               return ERR_PTR(-ENOMEM);
+> +
+> +       status =3D efi.get_variable(name, guid, NULL, &data_size, data);
+> +
+> +       if (status !=3D EFI_SUCCESS) {
+> +               kfree(data);
+> +               return ERR_PTR(-ENXIO);
+> +       }
+> +
+> +       return data;
+> +#else
+> +       return ERR_PTR(-EOPNOTSUPP);
+> +#endif
+> +}
+> +
+>  int btintel_check_bdaddr(struct hci_dev *hdev)
+>  {
+>         struct hci_rp_read_bd_addr *bda;
+> @@ -2615,6 +2650,80 @@ static u8 btintel_classify_pkt_type(struct hci_dev=
+ *hdev, struct sk_buff *skb)
+>         return hci_skb_pkt_type(skb);
+>  }
+>
+> +static int btintel_set_dsbr(struct hci_dev *hdev, struct intel_version_t=
+lv *ver)
+> +{
+> +       struct btintel_dsbr_cmd {
+> +               u8 enable;
+> +               u8 dsbr;
+> +       } __packed;
+> +
+> +       struct btintel_dsbr {
+> +               u8 header;
+> +               u32 dsbr;
+> +       } __packed;
+> +
+> +       struct btintel_dsbr *dsbr;
+> +       struct btintel_dsbr_cmd cmd;
+> +       struct sk_buff *skb;
+> +       u8 status;
+> +       efi_guid_t guid =3D EFI_GUID(0xe65d8884, 0xd4af, 0x4b20, 0x8d, 0x=
+03,
+> +                                  0x77, 0x2e, 0xcc, 0x3d, 0xa5, 0x31);
+> +
+> +       memset(&cmd, 0, sizeof(cmd));
+> +       dsbr =3D btintel_uefi_get_variable(L"UefiCnvCommonDSBR", &guid);
+> +       if (IS_ERR(dsbr)) {
+> +               /* If efi variable is not present, driver still needs to =
+send
+> +                * 0xfc0a command with default values
+> +                */
+> +               bt_dev_dbg(hdev, "Error reading efi DSBR (%ld)",
+> +                          PTR_ERR(dsbr));
+> +               dsbr =3D NULL;
+> +       }
+> +
+> +       if (dsbr) {
+> +               /* bit0: 0 - Use firmware default value
+> +                *       1 - Override firmware value
+> +                * bit3:1 - Reserved
+> +                * bit7:4 - DSBR override values
+> +                * bt31:7 - Reserved
+> +                */
+> +               cmd.enable =3D dsbr->dsbr & BIT(0);
+> +               if (cmd.enable)
+> +                       cmd.dsbr =3D dsbr->dsbr >> 4 & 0xF;
+> +               kfree(dsbr);
+> +       }
+> +
+> +       bt_dev_info(hdev, "dsbr: enabled: 0x%2.2x value: 0x%2.2x", cmd.en=
+able,
+> +                   cmd.dsbr);
+> +
+> +       skb =3D __hci_cmd_sync(hdev, 0xfc0a, sizeof(cmd), &cmd,  HCI_CMD_=
+TIMEOUT);
+> +       if (IS_ERR(skb)) {
+> +               bt_dev_err(hdev, "Failed to send Intel DSBR command (%ld)=
+",
+> +                          PTR_ERR(skb));
+> +               return -bt_to_errno(PTR_ERR(skb));
+> +       }
+> +
+> +       status =3D skb->data[0];
+> +       kfree_skb(skb);
+> +
+> +       if (status) {
+> +               bt_dev_err(hdev, "Set DSBR failed 0x%2.2x", status);
+> +               return -bt_to_errno(status);
+> +       }
+> +       return 0;
+> +}
+> +
+> +static int btintel_apply_dsbr(struct hci_dev *hdev,
+> +                             struct intel_version_tlv *ver)
+> +{
+> +       /* For BlazarI + B0 step, DSBR command needs to be sent just afte=
+r
+> +        * downloading IML firmware
+> +        */
+> +       return ver->img_type =3D=3D BTINTEL_IMG_IML &&
+> +               ((ver->cnvi_top & 0xfff) =3D=3D BTINTEL_CNVI_BLAZARI) &&
+> +               INTEL_CNVX_TOP_STEP(ver->cnvi_top) =3D=3D 0x01;
+> +}
+> +
+>  int btintel_bootloader_setup_tlv(struct hci_dev *hdev,
+>                                  struct intel_version_tlv *ver)
+>  {
+> @@ -2649,6 +2758,12 @@ int btintel_bootloader_setup_tlv(struct hci_dev *h=
+dev,
+>         if (err)
+>                 return err;
+>
+> +       if (btintel_apply_dsbr(hdev, ver)) {
+> +               err =3D btintel_set_dsbr(hdev, ver);
+> +               if (err)
+> +                       return err;
+> +       }
+> +
+>         /* If image type returned is BTINTEL_IMG_IML, then controller sup=
+ports
+>          * intermediae loader image
+>          */
 > --
-> Luiz Augusto von Dentz
+> 2.40.1
+>
+>
+
+
+--=20
+Luiz Augusto von Dentz
