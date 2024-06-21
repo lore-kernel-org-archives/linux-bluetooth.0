@@ -1,175 +1,129 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out203-205-221-235.mail.qq.com (out203-205-221-235.mail.qq.com [203.205.221.235])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F075C40856;
-	Fri, 21 Jun 2024 14:51:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A63DE2940F;
+	Fri, 21 Jun 2024 14:53:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.205.221.235
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718981498; cv=none; b=u+noky3VHdYlZ77RaXbEz/hbW5nrhY9NSdyu4FfWoL1UhSTZsDWXfnXfM1TIg+eCMLNOB64h574lBf1zXAAdmmkkeqyUo9MCpIqlVqC0p4DAkv5wa0uWnQSY2k3L7eVpZfX+dg16EFfLZy6zkdsE6lKkUEP8/aHP1/8uC6GYcCk=
+	t=1718981614; cv=none; b=DsJFxBsNo1hL9KJQJc76aZH7wUfin0DGCrr5qKrxcsvAO1o6AxhG8520F9o104HxegnEhRbhpCGpkocHchSSUHFijFfr3zRlGQNLKiSLcZ+b2VDpvlklAU28ECLOZOncVsu5C+T7bUEhtCdJPKp2pggozavXkeTxWKE1hP2hESw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718981498; c=relaxed/simple;
-	bh=PWBnsEgyaL0bjk7qBCzE5I/+8Xv0QHE5d/sqa4h1zPc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=k++Pn9bpFKbzto85Ho5xM5wuoa746scS7Y/FMfKkHKc7s0lL+rFolKaLOBvLCe6807rlkilSljcy5de5mNHygaltm/esTjhX2KlWwTQmlmTH0cRSislU3YmTPg6v3TdMLYFRut3Of1b7jG9QCQvAs9YHbr5Ukghaaf1q1mE0/WQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NRkhnmnS; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1718981614; c=relaxed/simple;
+	bh=Mx6dgVm7zvxMqJKaAF6ajtL8qQ23avXiryh6wLs6fkQ=;
+	h=Message-ID:From:To:Cc:Subject:Date:In-Reply-To:References:
+	 MIME-Version; b=C+isUQUwQBaEiwZnka85kHcQBwxFqzx58IYQqWH0cHGxJ9KSGhN03MlDnN27c4Tv+DD1uX0rI2B30nUPxj7hdMTTj7DyBdH5MLpfb9gvYm2W6XkM1lufE44ch9QFNh0mYHWI4yZf9r015qjZGy/wYitp2+bhtZ7O7mvcsQH0sPM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com; spf=pass smtp.mailfrom=qq.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=h8fRXHvb; arc=none smtp.client-ip=203.205.221.235
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NRkhnmnS"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 99A0BC2BBFC;
-	Fri, 21 Jun 2024 14:51:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718981497;
-	bh=PWBnsEgyaL0bjk7qBCzE5I/+8Xv0QHE5d/sqa4h1zPc=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=NRkhnmnS6CfFLtlnO3HtF8upTistPGil7dXFYtmncde0D1Gtbfe8a2SsWApXco8Om
-	 Q0hvJNHMoeAOtJfuS+E0pJ9nAH0fgcWpePytj88zHlL2zTKxbzDyKzrkTlA0aFtXTQ
-	 nMxozbWi5Z0sOvywYttURAhhmFjVxbZcIKkitWBlOTzQWHGu5cjaug4VIkcmuCJHgD
-	 +M276skqav2Deq6H0hI6X6Brscw/7iDN7IyWfhqaV8Wy5kqA9q/V6GGTWFbevW9aYE
-	 6Wm+013DCA9nAR/oqtM10UROLPOf8NPGcJsNW4xtWVaPXINaJIZsh5phpoVDggNang
-	 tIvAu8Pm8q7fw==
-Message-ID: <47d156dc-0b80-4e87-9fba-4232ee8235b9@kernel.org>
-Date: Fri, 21 Jun 2024 16:51:20 +0200
+	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="h8fRXHvb"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
+	t=1718981602; bh=yrEHKGjDKt8ixCB7ppttczBEgFxHHq0Bjh5xMq23SLE=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=h8fRXHvbKAvwuLMZYEC8QRRk+GBavV7d+6PQ4avFLiLEIxRBZsca5r50P0KgR0FFj
+	 hhIB2ErA4uQ8SePoDBN9bXKE+sidR0TBdd45BjIlxZAEPy05kb9N5+7mYZG1pgAEn5
+	 pN/nO7lOzhx0fu6Cvt0OuKy6prjQvD4kJXwcMNso=
+Received: from pek-lxu-l1.wrs.com ([111.198.228.103])
+	by newxmesmtplogicsvrszb9-1.qq.com (NewEsmtp) with SMTP
+	id B41950D4; Fri, 21 Jun 2024 22:45:01 +0800
+X-QQ-mid: xmsmtpt1718981101txvlk5cbc
+Message-ID: <tencent_8AF62ECF8CADE7DB86DA52DE864289872E06@qq.com>
+X-QQ-XMAILINFO: M0PjjqbLT90wOnsn7kdF1t9MzzqNu2WTDONPqYYLQbXtuBedKivw1ZqAkENd5X
+	 XL1Nigu1IxNQ/K1yyDQMsuNnKrvKJmQlbFAE/QfW1dfjigcP7lXe3sM/vT+4IKeA1Pmk4WmAurYo
+	 cEkTJUxUUWknMs7BqNUycEuY8f4n7qerwMCsNbftsGwXX4YxE17XH9iWJpFG+mcW2/KqB+y47h7/
+	 g+raCYeh/P+vgrtllZ/FhVyqeC2qDYdTJ0rUURO2Sj7x4dTni4Hl6Vc0PkQr0ae8NFXC/U0jHzjD
+	 Q5d7fvyHN+ON6MO+rZZAcxkI5OSlrIK14BmgSFgxqVP7bgML48hgCSPw7roFodi54TXNgVANgY13
+	 mYH6SlLQKcE9c6mnTRD8m3OhBWyLrHkUPrNU+/LFY5O4aTpoiLmRwex59kWLw6f8FIGupvALyYgh
+	 uCJ81Gt+qCTmDv7PskDBWkimUIHH+tQ6hRqL8j9gqpEzsOxpPxYX6bDkAyls+uCqLVLg/AuzadVo
+	 sN/cb9wMEKZyuhpmHYsnYm4Jsv5newTAj5J1TSE5MJjjj01id9cSOJwKITEG1Etax5/WvEfkOsv1
+	 81R7nEQAGkZyRzEjWGWqaq0/oIWghUYj8w3KdtNbUnnkUPfuI/31S1oxI2VpC+d+WlWznYmK46Te
+	 MaV+3L/CkRCEqHZhHuOTjA3GEEjfkzevbIIYysK0iOev+IOwqG8ZcmkEARxDzileZ+KSWg8kT6kp
+	 xy4zgeZ0DZa19ZRtxij9cwaHq3fvNvNdHige0c08nlvSEarWARdJD4JE1n0lSwDBhmeiu9MALVzh
+	 OTbcF7OHAIZgzbUt7fm9k0mZ/G0hKkSr2ExDbUhGDweMo+kn33CaklfkvYNyF/qhylNjGNBvgkPD
+	 THjjLOFG/T10SC4b0df9w3AbEnAxm/MvS149qynTourv5jU+pdSiGDqXLN4zFu79BgMhrWJW7K4z
+	 KbHl0AMR0=
+X-QQ-XMRINFO: OWPUhxQsoeAVDbp3OJHYyFg=
+From: Edward Adam Davis <eadavis@qq.com>
+To: luiz.dentz@gmail.com
+Cc: eadavis@qq.com,
+	johan.hedberg@gmail.com,
+	linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	marcel@holtmann.org,
+	syzbot+b7f6f8c9303466e16c8a@syzkaller.appspotmail.com,
+	syzkaller-bugs@googlegroups.com
+Subject: Re: [PATCH] bluetooth/l2cap: sync sock recv cb and release
+Date: Fri, 21 Jun 2024 22:45:02 +0800
+X-OQ-MSGID: <20240621144501.2680696-2-eadavis@qq.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <CABBYNZLu-wAu6cdyDVim=bP+0Ld-P=YvENO=fa6r=rdY4UqukQ@mail.gmail.com>
+References: <CABBYNZLu-wAu6cdyDVim=bP+0Ld-P=YvENO=fa6r=rdY4UqukQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v9 0/2] pwrseq: introduce the subsystem and first driver
-To: Lk Sii <lk_sii@163.com>, Bartosz Golaszewski <brgl@bgdev.pl>
-Cc: patchwork-bot+bluetooth@kernel.org, marcel@holtmann.org,
- luiz.dentz@gmail.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, robh@kernel.org,
- krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org, kvalo@kernel.org,
- andersson@kernel.org, konrad.dybcio@linaro.org, lgirdwood@gmail.com,
- broonie@kernel.org, catalin.marinas@arm.com, will@kernel.org,
- bhelgaas@google.com, saravanak@google.com, geert+renesas@glider.be,
- arnd@arndb.de, neil.armstrong@linaro.org, m.szyprowski@samsung.com,
- elder@linaro.org, srinivas.kandagatla@linaro.org,
- gregkh@linuxfoundation.org, abel.vesa@linaro.org, mani@kernel.org,
- lukas@wunner.de, dmitry.baryshkov@linaro.org, amit.pundir@linaro.org,
- wuxilin123@gmail.com, linux-bluetooth@vger.kernel.org,
- netdev@vger.kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org,
- linux-arm-msm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-pci@vger.kernel.org, linux-pm@vger.kernel.org,
- bartosz.golaszewski@linaro.org
-References: <20240605123850.24857-1-brgl@bgdev.pl>
- <171889385036.4585.6482250630135606154.git-patchwork-notify@kernel.org>
- <0b144517-4cc5-4c23-be57-d6f5323690ec@163.com>
- <CAMRc=Mf2C4ywa+wQ6pcq5RtehQD00dDhzvS6sDcD8tAn=UypUA@mail.gmail.com>
- <33c7587b-83a4-4be7-b00a-d30874df8c22@163.com>
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 fv0=
-In-Reply-To: <33c7587b-83a4-4be7-b00a-d30874df8c22@163.com>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-On 21/06/2024 11:04, Lk Sii wrote:
-> On 2024/6/21 14:36, Bartosz Golaszewski wrote:
->> On Fri, Jun 21, 2024 at 3:14 AM Lk Sii <lk_sii@163.com> wrote:
->>>
->>>
->>>
->>> On 2024/6/20 22:30, patchwork-bot+bluetooth@kernel.org wrote:
->>>> Hello:
->>>>
->>>> This series was applied to bluetooth/bluetooth-next.git (master)
->>>> by Bartosz Golaszewski <bartosz.golaszewski@linaro.org>:
->>>>
->>> Hi luiz,
->>>
->>> i am curious why Bartosz is able to merge his changes into bluetooth
->>> development tree bluetooth-next directly.
->>>
->>
->> This conversation is getting progressively worse...
->>
->>> 1)
->>> his changes should belong to *POWER* scope instead of *Bluetooth*
->>> obviously, however, there are *NOT* any SOB tag from either power and
->>> bluetooth maintainer. these changes currently only have below Acked-by
->>> and Signed-off-by tags:
->>>
->>> Acked-by: Krzysztof Kozlowski <krzk@kernel.org>
->>> Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
->>>
->>
->> It's a new subsystem that has been discussed and reviewed for months
->> and thoroughly tested. Please refer to the cover letter under v8
->> linked in this thread. It's not related to power-management or
->> power-supply, it's its own thing but IMO the best place to put it is
->> under drivers/power/. And I will maintain it.
->>
->>> 2)
->>> his changes have not merged into linus mainline tree yet.
->>>
->>
->> This is why they are in next! They are scheduled to go in during the
->> upcoming merge window. But since changes belong in multiple trees, we
->> need a cross-tree merge.
->>
->>> 3)
->>> perhaps, it is safer to pull his changes from linus mainline tree when
->>> merged than to merge into bluetooth-next firstly.
->>>
->>
->> It's not safer at all, why would spending less time in next be safer?
->>
-> it seems this patch serial(new subsystem) does not depend on bluetooth
-> and also does not belong to bluetooth subsystem, but have been contained
-> by tip of bluetooth tree.
+Hi Luiz Augusto von Dentz,
+
+On Thu, 20 Jun 2024 12:53:19 -0400, Luiz Augusto von Dentz wrote:
+> >         release_sock(sk);
+> > +       l2cap_chan_unlock(chan);
+> > +       l2cap_chan_put(chan);
+> >
+> >         return err;
+> >  }
+> > --
+> > 2.43.0
 > 
-> why not follow below merging produce?
-> 1) you send this patch serials to Linus to merge within linus mainline tree
-> 2) luiz then pull your changes from linus mainline tree.
+> Looks like this was never really tested properly:
+> 
+> ============================================
+> WARNING: possible recursive locking detected
+> 6.10.0-rc3-g4029dba6b6f1 #6823 Not tainted
+> --------------------------------------------
+> kworker/u5:0/35 is trying to acquire lock:
+> ffff888002ec2510 (&chan->lock#2/1){+.+.}-{3:3}, at:
+> l2cap_sock_recv_cb+0x44/0x1e0
+> 
+> but task is already holding lock:
+> ffff888002ec2510 (&chan->lock#2/1){+.+.}-{3:3}, at:
+> l2cap_get_chan_by_scid+0xaf/0xd0
+> 
+> other info that might help us debug this:
+>  Possible unsafe locking scenario:
+> 
+>        CPU0
+>        ----
+>   lock(&chan->lock#2/1);
+>   lock(&chan->lock#2/1);
+> 
+>  *** DEADLOCK ***
+> 
+>  May be due to missing lock nesting notation
+> 
+> 3 locks held by kworker/u5:0/35:
+>  #0: ffff888002b8a940 ((wq_completion)hci0#2){+.+.}-{0:0}, at:
+> process_one_work+0x750/0x930
+>  #1: ffff888002c67dd0 ((work_completion)(&hdev->rx_work)){+.+.}-{0:0},
+> at: process_one_work+0x44e/0x930
+>  #2: ffff888002ec2510 (&chan->lock#2/1){+.+.}-{3:3}, at:
+> l2cap_get_chan_by_scid+0xaf/0xd0
+> 
+> l2cap_sock_recv_cb is assumed to be called with the chan_lock held so
+> perhaps we can just do:
+> 
+>        sk = chan->data;
+>        if (!sk)
+>                return -ENXIO;
 
-This is not how Linux kernel development works. Read process documents
-before interfering with people's work.
+If the release occurs after this judgment, the same problem will still occur. 
+Recv and release must be synchronized using locks, which can be solved by
+adding new lock.
 
-Best regards,
-Krzysztof
+Can you provide a reproduction program for the AA lock mentioned above?
+
+--
+Edward
 
