@@ -1,106 +1,193 @@
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f45.google.com (mail-lf1-f45.google.com [209.85.167.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0BA51EA80
-	for <linux-bluetooth@vger.kernel.org>; Fri, 21 Jun 2024 13:21:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A89A715575B
+	for <linux-bluetooth@vger.kernel.org>; Fri, 21 Jun 2024 13:23:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718976082; cv=none; b=WDOaaHv/pVPZom1S7qy1jeArtiKLkquVG93UJGUQNmhnUU3u7ZiCKm7y8v0ZzD7OeW4RI2JCB6OnxlMpuq/wwBgf2M0QYATceEIUfLbwa3fLW7Lr0lry0mUHBMJ+vjST+EP6ImNTkKWpiwVoseWYQq5I/RmXzr3pOgWqmnlSIT0=
+	t=1718976232; cv=none; b=Lw8VOWNBmpoqWt6GfLY4pcOTjxinMHMDZY/H+ewTo5sZcyjKDq+se0X81KDbMwNE5xSEIvbsVMsPG0+hGjX1tw2NsAlE+RYEBF7Itzg/HM5dOE5ZaMKzHSB40a/9vIjY2o9LzY8rD8dhYVAClnaWWw1QddRFSG+jRgeO/pWlVtM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718976082; c=relaxed/simple;
-	bh=iLlULdSttMZirJccFkJuglVwzxGOKhoGgJYd8ERmz/Q=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=OAgauobwe+oeEdMsRsUrDA6ZDrxC8kb41BdaxtaCnrnf26BlAH9K80uspKMHkQQ0vCws9PUWMril4ANMw0hUk1GbO59s+R+Q8WVWDTmpxu3a33wpvc9KSGtqOVLnlul5CXkYIMvxDqMAcyP/RbLLb27Sgt3ei0kh46qhJiQsCkQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from [141.14.220.45] (g45.guest.molgen.mpg.de [141.14.220.45])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 61D2561E5FE05;
-	Fri, 21 Jun 2024 15:21:09 +0200 (CEST)
-Message-ID: <4b62895f-4244-43ae-8b05-22c2f93e24a9@molgen.mpg.de>
-Date: Fri, 21 Jun 2024 15:21:08 +0200
+	s=arc-20240116; t=1718976232; c=relaxed/simple;
+	bh=wQtusHT7PTHfNhISON3c4fk/0f68+/Mcm3emwcz0W2Q=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=WDfeIABeboG2lKWiHoP6HiZeXLUVDs3DFv6VIjVon0VXjfk8wcY0LJh578ELKwoGONa/r+i+bnRm2jhCbAFjMFVBUDzO5mczkUA7uAezFqOoSK8g3+nruZqkGiEh2Wapoqbabd8jv6lspGy5iOJNy3XRNlBTL6EwCunlzmFLsGM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=bjtyj2p4; arc=none smtp.client-ip=209.85.167.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="bjtyj2p4"
+Received: by mail-lf1-f45.google.com with SMTP id 2adb3069b0e04-52cd87277d8so494160e87.2
+        for <linux-bluetooth@vger.kernel.org>; Fri, 21 Jun 2024 06:23:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1718976229; x=1719581029; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Lh6DHy5f3eoMV1E961uZI87Rq1n/gY0n/fr9bCAQrdo=;
+        b=bjtyj2p4U32GeMDYPSUWmtE2chTbi1v+y5UfIGQC9LEUpC/OkUlilX5eOFlWPjKkF2
+         qGe2Q+8jPSNTYIRSXG62GOsDi+9yNmRjVL1O4136JvCl8YCVbSJmMiDn0iyE48QF+noj
+         pNXmYpbCubSyKA/c8TV0D4sg1tw2fB1XAG0PChFXO1DR863DYtqrGl/uIFqlLVSpw2XD
+         7wFFJ7AJdLdvFSUYayx5g+q8kYUwqmnSx6u+f8T3NdMv42+yEaRWhWiWs0NZcPQwrJ9z
+         0gunHamNuRjqeEvfoiC00FK96wfDMMJUaAV0APR2FVMtD2VMV69wLgtapdkgfAKz6Ry2
+         jacQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718976229; x=1719581029;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Lh6DHy5f3eoMV1E961uZI87Rq1n/gY0n/fr9bCAQrdo=;
+        b=mcoUfehiKlLtVDbntkw2QueMRhYTT4V3x1FTA7gj9clZbmLEa8C5usll24mXt0ynPk
+         IDA+wbz86ewSgPNPKzbqQxlDZujnbXqcXzzYefONYRtbquiUfN4Al0Fkjh9BqonB5hIg
+         rg92PgjGAfQznyvGiiDqqEe0UDWrGKnQBVaQaurADAWtGp+pY9bGHN5gOe5idjZ7wW00
+         0QI0tiA9voHT6UAZlnlKZVVjdNQp18FtCZMabrE5S4WvU8cAJTBjtMYR3uGGwf2iesU0
+         83/v45ASuGZf5vnVawcEFh9CaJ7oE8LTg+YWEtV7Al2FpL7+DKQtQuyRKuI7schEmqdK
+         /Olw==
+X-Forwarded-Encrypted: i=1; AJvYcCXJEHiYMNXDeDTcuJFMIIUETlbERiM5jF1yJVbXdV6H16fi8rd1KXR34ckcU3BgL95rTXGWtI9QWe9IPQgOH6qUqNLNsnSvxHPU+HOcTPFk
+X-Gm-Message-State: AOJu0YwG/8zhHLpSCow6yqfDfw0NVAS3E9eWp5/YutegbDzJ9Ngh/1os
+	zquSfjfsVxhE3RvK23d5bonaybzGGnd/iOT4OUtaYVbSdoHmA1VuE7vW9YRxmz6VLoMbn1uR5gX
+	O1VTotpl3jlI0XhAb9AM4DDK0b0j+c7MaC7IJkw==
+X-Google-Smtp-Source: AGHT+IG5Y1gn2ekPnM1m7JqqJu9Ttsj5bBzwQpCQM5QC3ClAcEetDkpxMFp8GreL0i+Q2R/FLHudf9Yf2q2tQ+uH6IQ=
+X-Received: by 2002:ac2:5e91:0:b0:52c:b199:940b with SMTP id
+ 2adb3069b0e04-52ccaa62a3emr5131441e87.32.1718976228569; Fri, 21 Jun 2024
+ 06:23:48 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] Bluetooth: hci_core: cleanup struct hci_dev
-To: Dmitry Antipov <dmantipov@yandex.ru>
-Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
- linux-bluetooth@vger.kernel.org
-References: <20240621130155.314280-1-dmantipov@yandex.ru>
-Content-Language: en-US
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <20240621130155.314280-1-dmantipov@yandex.ru>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20240605123850.24857-1-brgl@bgdev.pl> <171889385036.4585.6482250630135606154.git-patchwork-notify@kernel.org>
+ <0b144517-4cc5-4c23-be57-d6f5323690ec@163.com> <CAMRc=Mf2C4ywa+wQ6pcq5RtehQD00dDhzvS6sDcD8tAn=UypUA@mail.gmail.com>
+ <33c7587b-83a4-4be7-b00a-d30874df8c22@163.com>
+In-Reply-To: <33c7587b-83a4-4be7-b00a-d30874df8c22@163.com>
+From: Bartosz Golaszewski <brgl@bgdev.pl>
+Date: Fri, 21 Jun 2024 15:23:37 +0200
+Message-ID: <CAMRc=Me8h-L6mbmOfHce9FF8Koh4_fp=cWAeWrQAj-ukxBOL2g@mail.gmail.com>
+Subject: Re: [PATCH v9 0/2] pwrseq: introduce the subsystem and first driver
+To: Lk Sii <lk_sii@163.com>, marcel@holtmann.org, luiz.dentz@gmail.com
+Cc: patchwork-bot+bluetooth@kernel.org, davem@davemloft.net, 
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, robh@kernel.org, 
+	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org, kvalo@kernel.org, 
+	andersson@kernel.org, konrad.dybcio@linaro.org, lgirdwood@gmail.com, 
+	broonie@kernel.org, catalin.marinas@arm.com, will@kernel.org, 
+	bhelgaas@google.com, saravanak@google.com, geert+renesas@glider.be, 
+	arnd@arndb.de, neil.armstrong@linaro.org, m.szyprowski@samsung.com, 
+	elder@linaro.org, srinivas.kandagatla@linaro.org, gregkh@linuxfoundation.org, 
+	abel.vesa@linaro.org, mani@kernel.org, lukas@wunner.de, 
+	dmitry.baryshkov@linaro.org, amit.pundir@linaro.org, wuxilin123@gmail.com, 
+	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org, 
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-wireless@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, linux-pci@vger.kernel.org, 
+	linux-pm@vger.kernel.org, bartosz.golaszewski@linaro.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Dear Dmitry,
+On Fri, Jun 21, 2024 at 11:04=E2=80=AFAM Lk Sii <lk_sii@163.com> wrote:
+>
+> On 2024/6/21 14:36, Bartosz Golaszewski wrote:
+> > On Fri, Jun 21, 2024 at 3:14=E2=80=AFAM Lk Sii <lk_sii@163.com> wrote:
+> >>
+> >>
+> >>
+> >> On 2024/6/20 22:30, patchwork-bot+bluetooth@kernel.org wrote:
+> >>> Hello:
+> >>>
+> >>> This series was applied to bluetooth/bluetooth-next.git (master)
+> >>> by Bartosz Golaszewski <bartosz.golaszewski@linaro.org>:
+> >>>
+> >> Hi luiz,
+> >>
+> >> i am curious why Bartosz is able to merge his changes into bluetooth
+> >> development tree bluetooth-next directly.
+> >>
+> >
+> > This conversation is getting progressively worse...
+> >
+> >> 1)
+> >> his changes should belong to *POWER* scope instead of *Bluetooth*
+> >> obviously, however, there are *NOT* any SOB tag from either power and
+> >> bluetooth maintainer. these changes currently only have below Acked-by
+> >> and Signed-off-by tags:
+> >>
+> >> Acked-by: Krzysztof Kozlowski <krzk@kernel.org>
+> >> Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+> >>
+> >
+> > It's a new subsystem that has been discussed and reviewed for months
+> > and thoroughly tested. Please refer to the cover letter under v8
+> > linked in this thread. It's not related to power-management or
+> > power-supply, it's its own thing but IMO the best place to put it is
+> > under drivers/power/. And I will maintain it.
+> >
+> >> 2)
+> >> his changes have not merged into linus mainline tree yet.
+> >>
+> >
+> > This is why they are in next! They are scheduled to go in during the
+> > upcoming merge window. But since changes belong in multiple trees, we
+> > need a cross-tree merge.
+> >
+> >> 3)
+> >> perhaps, it is safer to pull his changes from linus mainline tree when
+> >> merged than to merge into bluetooth-next firstly.
+> >>
+> >
+> > It's not safer at all, why would spending less time in next be safer?
+> >
+> it seems this patch serial(new subsystem) does not depend on bluetooth
+> and also does not belong to bluetooth subsystem, but have been contained
+> by tip of bluetooth tree.
+>
 
+It's the other way around: bluetooth changes (namely the hci_qca
+driver) depend on the power sequencing changes.
 
-Thank you for the patch. Two minor comments. The verb *clean up* is 
-spelled with a space:
+> why not follow below merging produce?
+> 1) you send this patch serials to Linus to merge within linus mainline tr=
+ee
+> 2) luiz then pull your changes from linus mainline tree.
+>
 
-> Bluetooth: hci_core: Clean up struct hci_dev
+I explained this in my previous email. Why would you want these
+changes to needlessly wait for another release cycle? It makes no
+sense. It's just a regular cross-tree merge like hundreds that are
+performed every release.
 
+> >>> On Wed,  5 Jun 2024 14:38:48 +0200 you wrote:
+> >>>> From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+> >>>>
+> >>>> Hi!
+> >>>>
+> >>>> These are the power sequencing patches sent separately after some
+> >>>> improvements suggested by Bjorn Helgaas. I intend to pick them up in=
+to a
+> >>>> new branch and maintain the subsystem from now on. I then plan to
+> >>>> provide an immutable tag to the Bluetooth and PCI subsystems so that=
+ the
+> >>>> rest of the C changes can be applied. This new branch will then be
+> >>>> directly sent to Linus Torvalds for the next merge window.
+> >>>>
+> >>>> [...]
+> >>>
+> >>> Here is the summary with links:
+> >>>   - [v9,1/2] power: sequencing: implement the pwrseq core
+> >>>     https://git.kernel.org/bluetooth/bluetooth-next/c/249ebf3f65f8
+> >>>   - [v9,2/2] power: pwrseq: add a driver for the PMU module on the QC=
+om WCN chipsets
+> >>>     https://git.kernel.org/bluetooth/bluetooth-next/c/2f1630f437df
+> >>>
+> >>> You are awesome, thank you!
+> >>
+> >
+> > Why are you top-posting anyway?
+> >
+> it is caused by my bad mail client settings. thanks for reminder.
+> > Bart
+>
 
-Am 21.06.24 um 15:01 schrieb Dmitry Antipov:
-> Remove unused and set but otherwise unused 'discovery_old_state'
-> and 'sco_last_tx' members of 'struct hci_dev'. The first one is
-> a leftover after commit 182ee45da083 ("Bluetooth: hci_sync: Rework
-> hci_suspend_notifier"); the second one is originated from ancient
-> 2.4.19 and I was unable to find any actual use since that.
+Luiz, Marcel: Am I wasting my time with this person? Is this another
+Markus Elfring and I unknowingly got pulled into a nonsensical
+argument?
 
-Add a Fixes: tag?
-
-> Signed-off-by: Dmitry Antipov <dmantipov@yandex.ru>
-> ---
->   include/net/bluetooth/hci_core.h | 2 --
->   net/bluetooth/hci_sync.c         | 1 -
->   2 files changed, 3 deletions(-)
-> 
-> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-> index eaeaf3dc07aa..31020891fc68 100644
-> --- a/include/net/bluetooth/hci_core.h
-> +++ b/include/net/bluetooth/hci_core.h
-> @@ -476,7 +476,6 @@ struct hci_dev {
->   	unsigned int	iso_pkts;
->   
->   	unsigned long	acl_last_tx;
-> -	unsigned long	sco_last_tx;
->   	unsigned long	le_last_tx;
->   
->   	__u8		le_tx_def_phys;
-> @@ -528,7 +527,6 @@ struct hci_dev {
->   
->   	struct discovery_state	discovery;
->   
-> -	int			discovery_old_state;
->   	bool			discovery_paused;
->   	int			advertising_old_state;
->   	bool			advertising_paused;
-> diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-> index eff648853ae1..511e995f17e0 100644
-> --- a/net/bluetooth/hci_sync.c
-> +++ b/net/bluetooth/hci_sync.c
-> @@ -5840,7 +5840,6 @@ static int hci_pause_discovery_sync(struct hci_dev *hdev)
->   		return err;
->   
->   	hdev->discovery_paused = true;
-> -	hdev->discovery_old_state = old_state;
->   	hci_discovery_set_state(hdev, DISCOVERY_STOPPED);
->   
->   	return 0;
-
-Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
-
-
-Kind regards,
-
-Paul
+Bart
