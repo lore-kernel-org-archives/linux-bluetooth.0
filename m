@@ -1,343 +1,152 @@
-Received: from mail-lj1-f169.google.com (mail-lj1-f169.google.com [209.85.208.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20E5A1D55D
-	for <linux-bluetooth@vger.kernel.org>; Fri, 21 Jun 2024 13:41:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DC543B1A3;
+	Fri, 21 Jun 2024 14:50:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718977270; cv=none; b=qC/kly/oXMl0c4Hg293U75CRxQaZ1QZPnjoNy+fnTfUFdY7S48vnOGKTutX4p3TU4sJ7Z9HXJ4w4mZ/s3U9rNeZwaL+7QtTFAiqLKkQBoXJJBn5aJjo/SBXErDcZFap9H7Mp6N0AUTTr1cy0461ceS4+5REIkvBzwAEnFeiC64E=
+	t=1718981426; cv=none; b=JQEBueDKbdbuDzf3pm0ecTTMi+sn6mhvIc4SGESdh6YQJR4RWqHPiu1BMezzXkR7VYHiJiLBz+1tP8ZQuJaeN93yoaBwCCxfNW0IAm/QJdUfSdVq3Yfsw/O/vGoLcdZ3cm3yUsvNJ5DqG/xd61Obz8priyrOZs99PmdJQzBf17U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718977270; c=relaxed/simple;
-	bh=vEM7Eq/8t8RtB+hQ9Mj2jh+hL1e/MfykMflGe+mbWuQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=JPLWWKFu0h65GQ+QQyn8Ohy+3LMyXUviktUnK60TlDqDWlfcMfvp+fOnWLlWSxUVaK8iKUi2vkPlrjkug2zKG0iDLR6+xMuOmI4BsgFhHxTlazhTYNUQZVrjmwUItHnsFpPh1zVnLpcTsVcGmoKaUnVVw/lSWtT46ws8OXuF0Lw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IzbFG1cq; arc=none smtp.client-ip=209.85.208.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1718981426; c=relaxed/simple;
+	bh=+Hg6tFbWZcI7vg/2hhjDAn/2mNvc4EHGH1umCCb8vc0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=qNUa11o7WyFTs20ZEPO6HdwC3X+f8Ctpx0jBbD9ZbV+oQ49RFGn6Y0I+wKYH4YICmnsy7b688G6aqqFzs6okDDhWpI+5yZgVIwFrMpsSZm/STtgDCGMprjskb8ZUuIpT6aX3ccc8qHl47OM1osM2AoDxszdcdtMOrVST+n8DUtQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=asyfs0c+; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IzbFG1cq"
-Received: by mail-lj1-f169.google.com with SMTP id 38308e7fff4ca-2ec17eb4493so28725531fa.2
-        for <linux-bluetooth@vger.kernel.org>; Fri, 21 Jun 2024 06:41:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1718977266; x=1719582066; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=A+fLGjUorxE9ykH/fcUDYxB4BUMleuygZBcL4sL75To=;
-        b=IzbFG1cqYAmIJwjnehnlQFglX0K0r3cyD9PVN4VYI6sgFT+JqNgOxurS5YQh5aa3S3
-         Wkqt4vkPwbnVpL8WOs0TDOKP98nlRIF0Q0H8BRo5mEQNIg6I2Jo7TelECu/Md1ZdML0F
-         le+WtbwuQn+UJpRXtcBtKdsysJIHLCJY/BY9oIAOBRURoyv0oxfqBqZm5PShzCeCkW2y
-         z00rlgfiW+v2yuWp0cZEZ1dgjYZZ3RiQkcntl7ExYavbaJJzVAvRDUcF3qTVzRQ/eGF1
-         xnAr94+unH0slBYN20EA+T3gAmvog2zj2gYZ183Tc2Q+a7ARe2nb4JYZ1WMRjI5k/UwQ
-         edJQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718977266; x=1719582066;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=A+fLGjUorxE9ykH/fcUDYxB4BUMleuygZBcL4sL75To=;
-        b=hKaOM6Y1GoP4MMgpf0PVjIk73OjZIi8SIo6A8SpO0dRQyWm6c32UcKfa9kuANDlpaz
-         TDEnc+YoVej+wr2FA/s8x+oMp2LlolrUtbQqs2NjTBNDmQEuxV/AUlXit2GoXqH/lxxV
-         x8QVv+RAU2t33prROwfl+Uvrb1sjXeH0QKgbAfI2enRJa8wX9reZrvz1Gp6/oMlvfHw5
-         gFjcFnO2dLBvCEthToxTYxEM4iiCt+wfTprHnn4sT50q5wE7wHCkqlcYjCmSFzjFyUJp
-         2ziapeSW2c2fi0gIZtlp/oGBL21bkTDtttkCcit9FuqTzaSD9H9/dYwEm0WmKXI+gecc
-         PzRw==
-X-Forwarded-Encrypted: i=1; AJvYcCUFfRPrIpGyzXfzK77dE5vXq8xuCViMkuikiXHQOFbwpHfcbfy43w74GMLzD/tp81hmPeDmV1iK7qOuPlGSEPkxDYF2LP7OctUgsIPeI9wY
-X-Gm-Message-State: AOJu0YwUYE7bIDOQBoEQ3zMz6FXlmXcIe875SndoIzNOW71+AP6eRTop
-	WjiDEkhnkDmOCbVYLgxA1IzIVI9motkTWTh6WChUqfeNInwkHF/LRJ9m31Wf+EfpvQhogC7Yoep
-	pyxasnBdei+lp3j36LNkvp/HLxmYSOFgy
-X-Google-Smtp-Source: AGHT+IGRuxfOf3764xWJtmyerYV4XkR6c01TqDa9La21Tuwk3lxU5oW9jkRd4yleMlZj9xTKhA/TgyimAXN4okRvJrc=
-X-Received: by 2002:a2e:b01a:0:b0:2ec:5258:e889 with SMTP id
- 38308e7fff4ca-2ec5258ea0cmr4331551fa.46.1718977265796; Fri, 21 Jun 2024
- 06:41:05 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="asyfs0c+"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9711CC2BBFC;
+	Fri, 21 Jun 2024 14:50:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1718981425;
+	bh=+Hg6tFbWZcI7vg/2hhjDAn/2mNvc4EHGH1umCCb8vc0=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=asyfs0c+RaqaVr8+fvcHF6fQIhU4CeXKsnJpoO06uRr8LMEx9XEuII0h+021Voi31
+	 t2rfFAV5QWhT2vFxEJsFkKXMy2RJlCedJLMbIgBLGqMLrWAVg/GohHB4kCHPQRqUip
+	 RShrQ7qbnBeJz5Wfqm8yr9D92dniRaKbc++qsHMmytWx58hksPj5Gw3/3tGYrNcAuM
+	 QEjI4IW3pb7PJjm/pGWgVcsIOVoNbx6eNQkAzxCcZW5+sSdX2kFV00JNCPw4UMIjXl
+	 jF9774ZFHOH2FjfPdyZ5Q6tnR7pcLuYWR+0/FQYnMfZiQm708WZlvvnZA8oHH8JZPl
+	 IrEAR8gNlUVcA==
+Message-ID: <5952f4ef-8615-4aa5-9ff6-3bee63750712@kernel.org>
+Date: Fri, 21 Jun 2024 16:50:06 +0200
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CABBYNZJh1Maz1ZyG7+N-Xux7c3hbx_YqEinCO_z=tMvpRxU+dA@mail.gmail.com>
- <20240621131026.5814-1-iulia.tanasescu@nxp.com>
-In-Reply-To: <20240621131026.5814-1-iulia.tanasescu@nxp.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Fri, 21 Jun 2024 09:40:52 -0400
-Message-ID: <CABBYNZKf4hysErxwCH9GsR+aQnLVQOTuK8szv_EhRLL_BX=k8w@mail.gmail.com>
-Subject: Re: [PATCH RFC,BlueZ] doc: Add initial MediaSetup rst
-To: Iulia Tanasescu <iulia.tanasescu@nxp.com>
-Cc: andrei.istodorescu@nxp.com, claudia.rosu@nxp.com, 
-	linux-bluetooth@vger.kernel.org, mihai-octavian.urzica@nxp.com, 
-	vlad.pruteanu@nxp.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v9 0/2] pwrseq: introduce the subsystem and first driver
+To: Lk Sii <lk_sii@163.com>, patchwork-bot+bluetooth@kernel.org,
+ Bartosz Golaszewski <brgl@bgdev.pl>
+Cc: marcel@holtmann.org, luiz.dentz@gmail.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, robh@kernel.org,
+ krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org, kvalo@kernel.org,
+ andersson@kernel.org, konrad.dybcio@linaro.org, lgirdwood@gmail.com,
+ broonie@kernel.org, catalin.marinas@arm.com, will@kernel.org,
+ bhelgaas@google.com, saravanak@google.com, geert+renesas@glider.be,
+ arnd@arndb.de, neil.armstrong@linaro.org, m.szyprowski@samsung.com,
+ elder@linaro.org, srinivas.kandagatla@linaro.org,
+ gregkh@linuxfoundation.org, abel.vesa@linaro.org, mani@kernel.org,
+ lukas@wunner.de, dmitry.baryshkov@linaro.org, amit.pundir@linaro.org,
+ wuxilin123@gmail.com, linux-bluetooth@vger.kernel.org,
+ netdev@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org,
+ linux-arm-msm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-pci@vger.kernel.org, linux-pm@vger.kernel.org,
+ bartosz.golaszewski@linaro.org
+References: <20240605123850.24857-1-brgl@bgdev.pl>
+ <171889385036.4585.6482250630135606154.git-patchwork-notify@kernel.org>
+ <0b144517-4cc5-4c23-be57-d6f5323690ec@163.com>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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 fv0=
+In-Reply-To: <0b144517-4cc5-4c23-be57-d6f5323690ec@163.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hi Iulia,
+On 21/06/2024 03:14, Lk Sii wrote:
+> 
+> 
+> On 2024/6/20 22:30, patchwork-bot+bluetooth@kernel.org wrote:
+>> Hello:
+>>
+>> This series was applied to bluetooth/bluetooth-next.git (master)
+>> by Bartosz Golaszewski <bartosz.golaszewski@linaro.org>:
+>>
+> Hi luiz,
+> 
+> i am curious why Bartosz is able to merge his changes into bluetooth
+> development tree bluetooth-next directly.
+> 
+> 1)
+> his changes should belong to *POWER* scope instead of *Bluetooth*
+> obviously, however, there are *NOT* any SOB tag from either power and
+> bluetooth maintainer. these changes currently only have below Acked-by
+> and Signed-off-by tags:
 
-On Fri, Jun 21, 2024 at 9:10=E2=80=AFAM Iulia Tanasescu <iulia.tanasescu@nx=
-p.com> wrote:
->
-> Hi Luiz,
->
-> > -----Original Message-----
-> > From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-> > Sent: Wednesday, June 19, 2024 5:53 PM
-> > To: Iulia Tanasescu <iulia.tanasescu@nxp.com>
-> > Cc: linux-bluetooth@vger.kernel.org; Claudia Cristina Draghicescu
-> > <claudia.rosu@nxp.com>; Mihai-Octavian Urzica <mihai-
-> > octavian.urzica@nxp.com>; Vlad Pruteanu <vlad.pruteanu@nxp.com>; Andrei
-> > Istodorescu <andrei.istodorescu@nxp.com>
-> > Subject: Re: [PATCH RFC,BlueZ] doc: Add initial MediaSetup rst
-> >
-> > Hi Iulia,
-> >
-> > On Wed, Jun 19, 2024 at 7:35 AM Iulia Tanasescu <iulia.tanasescu@nxp.co=
-m>
-> > wrote:
-> > >
-> > > This proposes a new D-Bus API to be used by the BAP Broadcast
-> > > Assistant role.
-> > >
-> > > The BAP Broadcast Assistant is a Master device that can have multiple
-> > > connections with BAP Scan Delegators. The Broadcast Assistant has the
-> > > UI to start scanning, enumerate Broadacast Sources, allow the user to
-> > > select a desired Source and send the stream information to one of the
-> > > peers. If the selected stream is encrypted and the peer requires a
-> > > Broadcast Code to decrypt the stream, the user should issue a command=
- to
-> > send the code.
-> > >
-> > > A new D-Bus API is necessary to allow the BAP Broadcast Assistant
-> > > implementation in BlueZ to communicate with a top level UI process.
-> > >
-> > > The Broadcast Assistant in BlueZ should register a D-Bus object for
-> > > each scanned BIS that matches the Audio capabilities of a peer. Each
-> > > object should be linked with the stream and the peer device that
-> > > matches the stream capabilities.
-> > >
-> > > The top level process should detect these objects and display the
-> > > information to the user. The user can issue commands to select an
-> > > object or to provide the Broadcast Code for an object.
-> > >
-> > > More information on the proposed design can be found here:
-> > > https://gith/
-> > >
-> > ub.com%2Forgs%2Fbluez%2Fdiscussions%2F822&data=3D05%7C02%7Ciulia.tana
-> > ses
-> > >
-> > cu%40nxp.com%7Cc4b5189ccea94198202d08dc906f805b%7C686ea1d3bc2b
-> > 4c6fa92c
-> > >
-> > d99c5c301635%7C0%7C0%7C638544055766136877%7CUnknown%7CTWFp
-> > bGZsb3d8eyJW
-> > >
-> > IjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C0
-> > %7C%
-> > >
-> > 7C%7C&sdata=3Dw8yqp2HZQqouwJTFALZVB9Z32st0a3GTKm3w1TcHg10%3D&res
-> > erved=3D0
-> > > ---
-> > >  Makefile.am                  |  6 ++---
-> > >  doc/org.bluez.MediaSetup.rst | 45
-> > > ++++++++++++++++++++++++++++++++++++
-> > >  2 files changed, 48 insertions(+), 3 deletions(-)  create mode 10064=
-4
-> > > doc/org.bluez.MediaSetup.rst
-> > >
-> > > diff --git a/Makefile.am b/Makefile.am index 0ae721111..217e7d2e4
-> > > 100644
-> > > --- a/Makefile.am
-> > > +++ b/Makefile.am
-> > > @@ -362,7 +362,7 @@ man_MANS +=3D doc/org.bluez.Adapter.5
-> > > doc/org.bluez.Device.5 \  man_MANS +=3D doc/org.bluez.Media.5
-> > doc/org.bluez.MediaControl.5 \
-> > >                 doc/org.bluez.MediaPlayer.5 doc/org.bluez.MediaFolder=
-.5 \
-> > >                 doc/org.bluez.MediaItem.5 doc/org.bluez.MediaEndpoint=
-.5 \
-> > > -               doc/org.bluez.MediaTransport.5
-> > > +               doc/org.bluez.MediaTransport.5
-> > > + doc/org.bluez.MediaSetup.5
-> > >  man_MANS +=3D doc/org.bluez.GattManager.5 doc/org.bluez.GattProfile.=
-5 \
-> > >                 doc/org.bluez.GattService.5 \
-> > >                 doc/org.bluez.GattCharacteristic.5 \ @@ -395,7 +395,7
-> > > @@ manual_pages +=3D doc/org.bluez.Adapter.5 doc/org.bluez.Device.5 \
-> > > manual_pages +=3D doc/org.bluez.Media.5 doc/org.bluez.MediaControl.5 =
-\
-> > >                 doc/org.bluez.MediaPlayer.5 doc/org.bluez.MediaFolder=
-.5 \
-> > >                 doc/org.bluez.MediaItem.5 doc/org.bluez.MediaEndpoint=
-.5 \
-> > > -               doc/org.bluez.MediaTransport.5
-> > > +               doc/org.bluez.MediaTransport.5
-> > > + doc/org.bluez.MediaSetup.5
-> > >  manual_pages +=3D doc/org.bluez.GattManager.5 doc/org.bluez.GattProf=
-ile.5 \
-> > >                 doc/org.bluez.GattService.5 \
-> > >                 doc/org.bluez.GattCharacteristic.5 \ @@ -475,7 +475,7
-> > > @@ EXTRA_DIST +=3D doc/org.bluez.Adapter.rst doc/org.bluez.Device.rst=
- \
-> > > EXTRA_DIST +=3D doc/org.bluez.Media.rst doc/org.bluez.MediaControl.rs=
-t \
-> > >                 doc/org.bluez.MediaPlayer.rst doc/org.bluez.MediaFold=
-er.rst \
-> > >                 doc/org.bluez.MediaItem.rst doc/org.bluez.MediaEndpoi=
-nt.rst \
-> > > -               doc/org.bluez.MediaTransport.rst
-> > > +               doc/org.bluez.MediaTransport.rst
-> > > + doc/org.bluez.MediaSetup.rst
-> > >
-> > >  EXTRA_DIST +=3D doc/org.bluez.GattManager.rst doc/org.bluez.GattProf=
-ile.rst\
-> > >                 doc/org.bluez.GattService.rst \ diff --git
-> > > a/doc/org.bluez.MediaSetup.rst b/doc/org.bluez.MediaSetup.rst new fil=
-e
-> > > mode 100644 index 000000000..7463d7cfb
-> > > --- /dev/null
-> > > +++ b/doc/org.bluez.MediaSetup.rst
-> > > @@ -0,0 +1,45 @@
-> > > +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D
-> > > +org.bluez.MediaSetup
-> > > +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D
-> >
-> > Let's use MediaAssistant as name:
-> > https://github.c/
-> > om%2Forgs%2Fbluez%2Fdiscussions%2F822%23discussioncomment-
-> > 9818645&data=3D05%7C02%7Ciulia.tanasescu%40nxp.com%7Cc4b5189ccea941
-> > 98202d08dc906f805b%7C686ea1d3bc2b4c6fa92cd99c5c301635%7C0%7C0%
-> > 7C638544055766147461%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjA
-> > wMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C0%7C%7C%7C
-> > &sdata=3DjHOPPf1bg8SpRg4N3AP33ozX51GGUslWid9JObkRzFw%3D&reserved=3D
-> > 0
-> >
-> > > +
-> > > +-------------------------------------------
-> > > +BlueZ D-Bus MediaSetup API documentation
-> > > +-------------------------------------------
-> > > +
-> > > +:Version: BlueZ
-> > > +:Date: June 2024
-> > > +:Manual section: 5
-> > > +:Manual group: Linux System Administration
-> > > +
-> > > +Interface
-> > > +=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> > > +
-> > > +:Service:      org.bluez
-> > > +:Interface:    org.bluez.MediaSetup1
-> > > +:Object path:
-> > > +/org/bluez/{hci0,hci1,...}/src_XX_XX_XX_XX_XX_XX/dev_YY_YY_YY_YY_YY_=
-Y
-> > > +Y/bisZ
-> > > +
-> > > +Methods
-> > > +-------
-> > > +
-> > > +void Select()
-> > > +````````````````````````````````````````````````````````
-> >
-> > How about using Push as the method name here?
-> >
-> > > +
-> > > +       Send stream information to the remote device.
-> > > +
-> > > +void SetBcode(array{byte} broadcast_code)
-> > > +`````````````````````````````````````````````````````````
-> > > +
-> > > +       Send Broadcast_Code to the remote device.
-> >
-> > Hmm, I wonder if it wouldn't be better to just have a dictionary that y=
-ou can
-> > pass to the Push method.
->
-> So you're suggesting instead of having a separate method for setting the
-> Broadcast_Code, we can provide it through the Push method if the stream
-> is encrypted? I think this can work, but we will need another MediaAssist=
-ant
-> property to indicate stream information, maybe a "QoS" property like
-> MediaTransport is implementing.
->
-> So when calling Push from bluetoothctl, we can read the QoS property and
-> if the stream is encrypted, we can display a prompt for the user to enter
-> the Broadcast_Code.
+You are trolling us or what?
 
-Yep, I think we will need QoS properties anyway if we don't have a
-transport to refer to, otherwise bluetoothctl would not be able to
-list the stream configuration.
+That's a cross tree pull request.
 
-> >
-> > > +Properties
-> > > +----------
-> > > +
-> > > +string State [readonly]
-> > > +```````````````````````
-> > > +
-> > > +       Indicates the state of the setup. Possible values are:
-> > > +
-> > > +       :"idle": setup created
-> > > +       :"pending": setup selected
-> > > +       :"requesting": remote device requires Broadcast_Code
-> > > +       :"active": remote device started receiving stream
-> >
-> > We might want to add a property that refers to the MediaTransport objec=
-t, that
-> > way the application can tell what is the BIS configuration from the tra=
-nsport and
-> > we don't need to duplicate them here. The lifetime of MediaAssistant sh=
-all be
-> > the same as the MediaTransport object it refers to, so if the transport=
- is
-> > removed/free so is its MediaAssistant object, we may want to document t=
-his
-> > though because the Device object could persist if they are not temporar=
-y but the
-> > MediaTransport objects for broadcasters are normally considered tempora=
-ry as
-> > they are not paired/bonded.
->
-> I think most use cases do not require a Broadcast Assistant to enumerate
-> MediaTransports, so I don't think the objects can be linked:
-> https://github.com/orgs/bluez/discussions/822#discussioncomment-9839217
+> 
+> Acked-by: Krzysztof Kozlowski <krzk@kernel.org>
+> Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+> 
+> 2)
+> his changes have not merged into linus mainline tree yet.
 
-Fair point.
+Do you understand the concept of merge windows?
 
-> But even if MediaTransports and MediaAssistants would coexist on a Broadc=
-ast
-> Assistant, they refer to different things: MediaTransports refer to strea=
-ms
-> that the local device is trying to receive, while MediaAssistants refer t=
-o
-> streams that peer Scan Delegators are trying to receive.
->
-> As I see it, the "State" of a MediaAssistant allows the user to know the
-> stream state on the peer: For example, if the user calls the "Push" metho=
-d on
-> a MediaAssistant, the BASS Client in BlueZ adds the stream information on=
- the
-> peer, and then the BASS Client receives a notification that the peer
-> successfully acquired the stream, then the MediaAssistant goes to "active=
-"
-> state.
+> 
+> 3)
+> perhaps, it is safer to pull his changes from linus mainline tree when
+> merged than to merge into bluetooth-next firstly.
 
-Fair enough, we just need to make sure the clients have enough
-information to decide on what to Push thus it is probably a good idea
-to have QoS property as well.
-
-> >
-> > > \ No newline at end of file
-> > > --
-> > > 2.39.2
-> > >
-> >
-> >
-> > --
-> > Luiz Augusto von Dentz
->
-> Regards,
-> Iulia
+You are joking, right?
 
 
+Best regards,
+Krzysztof
 
---=20
-Luiz Augusto von Dentz
