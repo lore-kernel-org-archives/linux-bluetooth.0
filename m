@@ -1,127 +1,155 @@
-Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com [209.85.210.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2DD216B3B9
-	for <linux-bluetooth@vger.kernel.org>; Fri, 21 Jun 2024 08:42:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.181
+Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.3])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA2181C02;
+	Fri, 21 Jun 2024 09:05:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.3
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718959347; cv=none; b=kI4ruzaogirG0ACV8gch2hGO+dQipHlsFUnn2kEKqpkXjURMEsGnfL8oVlnM40/14xJroUKXzD1a52njfUjUVB0ZJNT0Cqoil11l542TlpUKFMUhuEwsiLCEGSZS+yuvqc5sKMxZJFdKVx5hWcn4UEpTMUEhcQypfng0eBW4biQ=
+	t=1718960739; cv=none; b=hXnh2d5+7WmW4K0azgH7LZicVIHJgbu3lscEna+ty0d3XO2kzvpr95rGeEPmMQAEBtN9iKey1zhj9LXoPmLGBL+d2FbfnvI3h/tXtMa5kOniOrjjFsEDSnk0KLyHazhGJ/5BmE3rY7yIR1idaXt15tkRWf0IKTeJVvF9YBJsZLQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718959347; c=relaxed/simple;
-	bh=jkh3UqC/6/ogaQwMHNtz5LijkemPgjBO4i1SpBM1ihk=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=n1+bVFKH4k5EgdyyfieQs549dypepANFG7zDz/cRA4NvKqS2hXS9l1VMFVddWkgwyzlKakr8s6T95ze4Vi4TpUfk7QzSY3aM8Pk7ygtLl9w/gt/1pr7IAIHs0GQzS7yBZePCar+mx/19vIEXe+n4dqb5+lNKE/98oavDkA3ubjM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=U+Bsl39N; arc=none smtp.client-ip=209.85.210.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1718960739; c=relaxed/simple;
+	bh=u3vsruWw3m6yWhKiI6k/Bp6Kz8w7AjrzmFbFuOLhVYk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=d3KcjybfRXq1d05YzNrV7oWNbkWgLEj/TuiodzasvSHGks1opNoISRV9RaUThRXTOCgksuTxzrOPFjBdcr4WemLoA1Rn9RPcVW9hwt8Ijanyl9nXzkeICY/fFraqxX7+2N2mOkHfeWMPiznIMFlEv5Xp4M9b4bIJEGyPM9O15yM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=XSVkVAVA; arc=none smtp.client-ip=220.197.31.3
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="U+Bsl39N"
-Received: by mail-pf1-f181.google.com with SMTP id d2e1a72fcca58-7061d37dc9bso1527994b3a.2
-        for <linux-bluetooth@vger.kernel.org>; Fri, 21 Jun 2024 01:42:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1718959345; x=1719564145; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=9tufYeU4tYmdje5HuaJ4rUGe1Nz2xRV6rPgJ+Pm7Zng=;
-        b=U+Bsl39NyTv41rGzRSkUdm16R20IOmbrMdrohgVg+WZmL3kLE5NIXnXdG6U6DOf1+X
-         kb3f4PAno73yXHI5pfEUOQ0TedcydrQ8Sw1tn5lccIrz54Kg5jE5MaupzXEi5n7vwOhR
-         Ng9qGxQq+sgceZFAyJgLwpfpv/WngLBZFS7l+ld6tBGFHVbIKQSpIQN0oqgRNHr74yO2
-         UuE/r2ffoH3oFme0bMK1Bs2JBwDzCeq2sWFnAa/bQm+1JCdBdz2gPOiBMY5SXTNUCA+w
-         UFK+9qnYeI9mWdf9liDbbpee1ilHVITTKZ8XJc+3ZzZI/gMi2rpafz2lkeIgG5oZG0zp
-         xMiQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718959345; x=1719564145;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=9tufYeU4tYmdje5HuaJ4rUGe1Nz2xRV6rPgJ+Pm7Zng=;
-        b=SLQVJGSCMh1mWosXDwFkxyXkMMcWavulj+lJndXrv5FqHcS9x96yQDYoQNYRdzMiZI
-         EY99x1+v7OKUpeBGyuRMgpTLWZjeaQsLbaHjVjQTxdN6q3BwxeDtcgYvwKGDG+sakTot
-         ufvRTulh3aBMUG+hw/7B26CPt6rl/Xug+KMvI3C2RedT7mHfdSEwUFDDGJR+WOEkXKVy
-         jEenrgeNsFX4kagHhchIoN8BXloUKFjyMyLXOIHARGQ7PdetFk5qOSnkJSGp3V0zKESi
-         ClkTWj69qWl0Gtm1R4OUMwuom5+9Fu2odNq2GZyhArbFreVh8eqPAWjgOJJwzsXudJoi
-         XvEg==
-X-Gm-Message-State: AOJu0YybQpYIHc17YE8xw4BxEjw1PfNQafQs8oH6qrWHH//0WrmA2Jml
-	aROqSlgBts1awjX41TJapl5N9IuOjPFL61YEMwX/s2y7ImYPUS+Q84LtcA==
-X-Google-Smtp-Source: AGHT+IGpbbmvcSyLYk03X23PuP2kBgqwYL161a714f1ostL8Y9E3uy8a/8G0yZfr8U97H8tpkB56GA==
-X-Received: by 2002:a05:6a20:12d4:b0:1b5:d36a:5d68 with SMTP id adf61e73a8af0-1bcbb41737dmr10041005637.15.1718959344543;
-        Fri, 21 Jun 2024 01:42:24 -0700 (PDT)
-Received: from [172.17.0.2] ([13.83.123.147])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1f9eb323ac5sm9088795ad.107.2024.06.21.01.42.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 21 Jun 2024 01:42:04 -0700 (PDT)
-Message-ID: <66753cdc.170a0220.b3f2b.2211@mx.google.com>
-Date: Fri, 21 Jun 2024 01:42:04 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============7842750499740078592=="
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="XSVkVAVA"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=Message-ID:Date:MIME-Version:Subject:From:
+	Content-Type; bh=+JO4ER5bv9lk/4SoTsJyJX99aDmjGIgbmbYr1Bo8tQk=;
+	b=XSVkVAVAsNqJ+96Z02pJ31GaBFNz9YN//CbiAY3xSDXlzW9DZRGpWkfLE6D4t6
+	dY01mCKPdLNTRImIVZmlHRr2T4mAsCiZU1wET095pPdbUMdnFIB4fzTj6ORn8he6
+	RwFAJ91fUibN1xiEzWdCOrk51MvJGOB/qS+XfaX2POMzY=
+Received: from [192.168.1.26] (unknown [183.195.6.47])
+	by gzga-smtp-mta-g3-4 (Coremail) with SMTP id _____wDn1xgVQnVmlNLkEg--.36559S2;
+	Fri, 21 Jun 2024 17:04:23 +0800 (CST)
+Message-ID: <33c7587b-83a4-4be7-b00a-d30874df8c22@163.com>
+Date: Fri, 21 Jun 2024 17:04:21 +0800
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, sarveshwar.bajaj@nxp.com
-Subject: RE: Fix null pointer dereference in util_ltv_foreach
-In-Reply-To: <20240621064342.33664-2-sarveshwar.bajaj@nxp.com>
-References: <20240621064342.33664-2-sarveshwar.bajaj@nxp.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v9 0/2] pwrseq: introduce the subsystem and first driver
+To: Bartosz Golaszewski <brgl@bgdev.pl>
+Cc: patchwork-bot+bluetooth@kernel.org, marcel@holtmann.org,
+ luiz.dentz@gmail.com, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, robh@kernel.org,
+ krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org, kvalo@kernel.org,
+ andersson@kernel.org, konrad.dybcio@linaro.org, lgirdwood@gmail.com,
+ broonie@kernel.org, catalin.marinas@arm.com, will@kernel.org,
+ bhelgaas@google.com, saravanak@google.com, geert+renesas@glider.be,
+ arnd@arndb.de, neil.armstrong@linaro.org, m.szyprowski@samsung.com,
+ elder@linaro.org, srinivas.kandagatla@linaro.org,
+ gregkh@linuxfoundation.org, abel.vesa@linaro.org, mani@kernel.org,
+ lukas@wunner.de, dmitry.baryshkov@linaro.org, amit.pundir@linaro.org,
+ wuxilin123@gmail.com, linux-bluetooth@vger.kernel.org,
+ netdev@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org,
+ linux-arm-msm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-pci@vger.kernel.org, linux-pm@vger.kernel.org,
+ bartosz.golaszewski@linaro.org
+References: <20240605123850.24857-1-brgl@bgdev.pl>
+ <171889385036.4585.6482250630135606154.git-patchwork-notify@kernel.org>
+ <0b144517-4cc5-4c23-be57-d6f5323690ec@163.com>
+ <CAMRc=Mf2C4ywa+wQ6pcq5RtehQD00dDhzvS6sDcD8tAn=UypUA@mail.gmail.com>
+Content-Language: en-US
+From: Lk Sii <lk_sii@163.com>
+In-Reply-To: <CAMRc=Mf2C4ywa+wQ6pcq5RtehQD00dDhzvS6sDcD8tAn=UypUA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:_____wDn1xgVQnVmlNLkEg--.36559S2
+X-Coremail-Antispam: 1Uf129KBjvJXoWxXrW7tr1rWw15KrW8XFy3CFg_yoW5CFW5pF
+	W3G3Z0kF4UJr18AF1jgw1fZFy2qw47Xw1fur1Dt3s8ZF90gr18tr1Sy34F9ry7urWI9r18
+	tFWjyrySgw48urDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x0zRWmhrUUUUU=
+X-CM-SenderInfo: 5onb2xrl6rljoofrz/1tbiExoFNWXAlu3dLwAAsV
 
---===============7842750499740078592==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+On 2024/6/21 14:36, Bartosz Golaszewski wrote:
+> On Fri, Jun 21, 2024 at 3:14 AM Lk Sii <lk_sii@163.com> wrote:
+>>
+>>
+>>
+>> On 2024/6/20 22:30, patchwork-bot+bluetooth@kernel.org wrote:
+>>> Hello:
+>>>
+>>> This series was applied to bluetooth/bluetooth-next.git (master)
+>>> by Bartosz Golaszewski <bartosz.golaszewski@linaro.org>:
+>>>
+>> Hi luiz,
+>>
+>> i am curious why Bartosz is able to merge his changes into bluetooth
+>> development tree bluetooth-next directly.
+>>
+> 
+> This conversation is getting progressively worse...
+> 
+>> 1)
+>> his changes should belong to *POWER* scope instead of *Bluetooth*
+>> obviously, however, there are *NOT* any SOB tag from either power and
+>> bluetooth maintainer. these changes currently only have below Acked-by
+>> and Signed-off-by tags:
+>>
+>> Acked-by: Krzysztof Kozlowski <krzk@kernel.org>
+>> Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+>>
+> 
+> It's a new subsystem that has been discussed and reviewed for months
+> and thoroughly tested. Please refer to the cover letter under v8
+> linked in this thread. It's not related to power-management or
+> power-supply, it's its own thing but IMO the best place to put it is
+> under drivers/power/. And I will maintain it.
+> 
+>> 2)
+>> his changes have not merged into linus mainline tree yet.
+>>
+> 
+> This is why they are in next! They are scheduled to go in during the
+> upcoming merge window. But since changes belong in multiple trees, we
+> need a cross-tree merge.
+> 
+>> 3)
+>> perhaps, it is safer to pull his changes from linus mainline tree when
+>> merged than to merge into bluetooth-next firstly.
+>>
+> 
+> It's not safer at all, why would spending less time in next be safer?
+> 
+it seems this patch serial(new subsystem) does not depend on bluetooth
+and also does not belong to bluetooth subsystem, but have been contained
+by tip of bluetooth tree.
 
-This is automated email and please do not reply to this email!
+why not follow below merging produce?
+1) you send this patch serials to Linus to merge within linus mainline tree
+2) luiz then pull your changes from linus mainline tree.
 
-Dear submitter,
+>>> On Wed,  5 Jun 2024 14:38:48 +0200 you wrote:
+>>>> From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+>>>>
+>>>> Hi!
+>>>>
+>>>> These are the power sequencing patches sent separately after some
+>>>> improvements suggested by Bjorn Helgaas. I intend to pick them up into a
+>>>> new branch and maintain the subsystem from now on. I then plan to
+>>>> provide an immutable tag to the Bluetooth and PCI subsystems so that the
+>>>> rest of the C changes can be applied. This new branch will then be
+>>>> directly sent to Linus Torvalds for the next merge window.
+>>>>
+>>>> [...]
+>>>
+>>> Here is the summary with links:
+>>>   - [v9,1/2] power: sequencing: implement the pwrseq core
+>>>     https://git.kernel.org/bluetooth/bluetooth-next/c/249ebf3f65f8
+>>>   - [v9,2/2] power: pwrseq: add a driver for the PMU module on the QCom WCN chipsets
+>>>     https://git.kernel.org/bluetooth/bluetooth-next/c/2f1630f437df
+>>>
+>>> You are awesome, thank you!
+>>
+> 
+> Why are you top-posting anyway?
+> 
+it is caused by my bad mail client settings. thanks for reminder.
+> Bart
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=864148
-
----Test result---
-
-Test Summary:
-CheckPatch                    FAIL      0.66 seconds
-GitLint                       PASS      2.24 seconds
-BuildEll                      PASS      25.04 seconds
-BluezMake                     PASS      1707.63 seconds
-MakeCheck                     PASS      13.21 seconds
-MakeDistcheck                 PASS      180.96 seconds
-CheckValgrind                 PASS      253.15 seconds
-CheckSmatch                   PASS      353.64 seconds
-bluezmakeextell               PASS      120.74 seconds
-IncrementalBuild              PASS      1463.62 seconds
-ScanBuild                     PASS      1013.43 seconds
-
-Details
-##############################
-Test: CheckPatch - FAIL
-Desc: Run checkpatch.pl script
-Output:
-[BlueZ,v2,1/1] shared/util: Fix null pointer dereference in util_ltv_foreach()
-WARNING:COMMIT_LOG_LONG_LINE: Possible unwrapped commit description (prefer a maximum 75 chars per line)
-#111: 
-In the existing code, iov.iov_base is initialized with (void *) data,assuming
-
-/github/workspace/src/src/13706903.patch total: 0 errors, 1 warnings, 8 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/src/13706903.patch has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============7842750499740078592==--
