@@ -1,107 +1,166 @@
-Received: from out162-62-58-216.mail.qq.com (out162-62-58-216.mail.qq.com [162.62.58.216])
+Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [185.185.170.37])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BCBB1C14;
-	Sun, 23 Jun 2024 09:11:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.62.58.216
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719133920; cv=none; b=LvQxAE+50SHXcBmfLQj0cTsSL1kPujYk9I0YoPEa/InCtlymmK3jAntiZ67murg1fQoS+5WG3k1B6Xta8bJEE4dlVFYwaJcPT3Daw3mQb3lwBNc5eMcMjz8k+a8S+3v7c1Y21jLqeeAew8ap+J4F3kNoNWGDr94bGgHePdxy9Ss=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719133920; c=relaxed/simple;
-	bh=9PpbKR6w3Iu2ALPSmk5bOIP7zdMirW30x7ODlfnmSI8=;
-	h=Message-ID:From:To:Cc:Subject:Date:In-Reply-To:References:
-	 MIME-Version; b=tE4traCK2z8c2FCsJc8DSS7gJ1Xdb6ywbtC5ZCDZBJmYb30FPvWe6glI80gZYfLVHY4b6q6E0r6on4QR5yLX34bAblGENyqEFKk6tG14Bg3ss0TTwJuAUwrvug/jTxMpqRxUsodqU61FQX3tj8dftS1fvuyOSo9yHltPtEXsteo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com; spf=pass smtp.mailfrom=qq.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=XMoYSk8i; arc=none smtp.client-ip=162.62.58.216
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3F5C23CE
+	for <linux-bluetooth@vger.kernel.org>; Sun, 23 Jun 2024 10:30:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=185.185.170.37
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1719138657; cv=pass; b=A1dTPrt7dzZRpt/XaoBT+1BRHflQbsXzFC9hTDVpTmR88vjB9E7pBkd6dIYWfuw3t4M8vMOr9lNYh1YeWK5efkxJVhSDXAxC0zdwDR6VLlvTxKDNieerBPmwkZFzvnH/t77yvR/8MQzQG4xyO5lBHMoRKpEloPi0+sGbpsRJNrQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1719138657; c=relaxed/simple;
+	bh=zZnHwD60P7WdPggLWo7zW1sPEAiYdKD2XL8OL3nMSTI=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=dCtOKB/pBA9dnDUKAf3knzux02AlTjgE1SKLYScpXpDYHK3jqi5XO40c7fbfg98eh2q35QG1mkRG9kEsMePcoaa1TsPGiJwG1SpYyC3r57wVWC818vLYqfJzXDyqKJeC/QsyJDXKMi+xGkBHGOZrn0COul05/5Fu8nf6ceJcmUo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=i39IQKzf; arc=pass smtp.client-ip=185.185.170.37
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="XMoYSk8i"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
-	t=1719133605; bh=F2Y5FsltYYu6RBm0fojOKhVSeGmbWVg+5v1x+DrOyMY=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=XMoYSk8iu3/RNxcMdfNBfFRB1kwcXEPY4lAmYbF4VVJ3sAUZYayfJchXF6Dzx/DTH
-	 0qK8W1b0Av2QMRIH9jJMz0NS3MFclj5yqN1GiGp4YcXA4LLfEQILFv8PWBWk9I4w1P
-	 rMxA/OgG5PB59Aa9UT6/z6JFwZQblBxjhc4rM4fI=
-Received: from pek-lxu-l1.wrs.com ([111.198.228.103])
-	by newxmesmtplogicsvrsza29-0.qq.com (NewEsmtp) with SMTP
-	id 1AA9C83B; Sun, 23 Jun 2024 17:06:42 +0800
-X-QQ-mid: xmsmtpt1719133602t9vru0epp
-Message-ID: <tencent_70F452CB86430990EEC56EEB4CBB27D40606@qq.com>
-X-QQ-XMAILINFO: OQhZ3T0tjf0aplMQ3N6eZX3MWPmIvMrZA1q+KMlXuKsOZwU/nFV7zxH6hgAzxw
-	 3vPyeYKRQYf0CEzPOfkpQAtDS2+1WQQN8tw5+OUZb5sQBDBOuA3oLWoIfgnciNXm5zlxAeFJKmu+
-	 0gP+bpEYfbE81+9BY4Z7kP65yj1ehRiK9o0a13/V4MVCa9oKWcdMSE45uJ+5bGZYJ0elnskSAkZW
-	 d3I3wVN3VMUWTKQDCnqZZTfrHV+yADfYgQhd3NBDY1wpwRzGBonZFHlMN7Qokw04Ie2xdJUDnLxg
-	 GB90md7/x7tplrRnnqs2ycuECMjL5N9HBNrE3lWhGd59mvKNIc9FXojbQFgm1IY2b/5AQLpIJjHe
-	 l0DdXD+TaYUXXsBAjbG1y9Ob1JaGNNiwu8Vzm0uwfP0P8EwUurxesKfXr1kNy8LkCD5Po8QXkNyO
-	 L/9Aor7uo5BibW6sCIF2Dw7xLyrGwdvcV0GQjst+b3x5+ExhQtsYFzS6NzNFg5pHU18in4h7z+4v
-	 xq8CPmR2hIVv/DBTOMCTyLax6zGDVIHfcCnaMLq5wPjty9RrW/83m1xrYG8hU3AEYPt5NGmzqedg
-	 JPpNEqbhGiaO0UOBNYg0PV9XlccMaqnOyaOpdBiX4eGBsvAZV0bQohL2vI6TeX7gfsGUSnSQ40kX
-	 CjCc3YRWkIFJmhdqQbI6zdPyLJb7ENhM9tvTLCQC0xGnOMy00dTh9busVBIJLC72uJiAA+9W0K9J
-	 wKwJ/kNuX0HAjHJDnNERxKnAnz4U69YiXuCya+Mc90Ay9zB6fM+HcWS1w58b6PQ2hK2tWMq3kt4j
-	 mijuL5zq7V5h11YNrsm+mzt6Z89z7SXfsVm39keKNVvmYnhKrlLiFmd7nGmIL/jzp6seLAfTdF7p
-	 FquJYffUZpKrxImja3wy7CD21gIpJ1lgpeRDaDFRUjjGGU/DqXwXedvVkYvdiXCpeGflZcsjWK
-X-QQ-XMRINFO: NyFYKkN4Ny6FSmKK/uo/jdU=
-From: Edward Adam Davis <eadavis@qq.com>
-To: syzbot+35ebc808442df6420eae@syzkaller.appspotmail.com
-Cc: johan.hedberg@gmail.com,
-	linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	luiz.dentz@gmail.com,
-	marcel@holtmann.org,
-	syzkaller-bugs@googlegroups.com
-Subject: [PATCH] Bluetooth: fix double free in hci_req_sync_complete
-Date: Sun, 23 Jun 2024 17:06:43 +0800
-X-OQ-MSGID: <20240623090642.3753697-2-eadavis@qq.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <00000000000033a6e8061b3c6d4a@google.com>
+	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="i39IQKzf"
+Received: from monolith.lan (91-152-121-138.elisa-laajakaista.fi [91.152.121.138])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pav@iki.fi)
+	by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4W6S6f4QbGz49Qn7;
+	Sun, 23 Jun 2024 13:30:50 +0300 (EEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
+	t=1719138650;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=77DpmaX65YJ5tBxvrHzr3R+vVPbzThoESe+OM9vHJvE=;
+	b=i39IQKzfrUCocL9GlqrgyNCdmFp1fDbzXD8RR3kL2mEYj1suK0gpQFOgIOQVt+0AFzzoLp
+	hoM96a3iumvH4VBC3MFVTZLwEfeE2a+X/PmbOMm+MxFVyoVTXyFIbRI5ml60WbnrSTk9fE
+	XRSdFWALyZjAvhUStOI3usIPGtyqlDP+YRwKQLormJr/M5XScdLgnlyaDDsc+cjAEMC0i3
+	TvTfkDteXC4y0QHSY52fpwSYUrt89N0/LQlidEgORqWZgk+SNY+jXVYlYQTvB4gGi5jJAm
+	8JDH7WkXzf5a4WOZ2522hDkUt7Xvy/LrsYcZF2jyceFmDS6sEKLNdActGpbqTQ==
+ARC-Seal: i=1; s=lahtoruutu; d=iki.fi; t=1719138650; a=rsa-sha256;
+	cv=none;
+	b=n/u+r+GVC/sMJN3Agkbn54BwORQgxQTedIqM0gOJiis1ow/aUhF6fBTD0SJWwjew216y6n
+	hAISovVNZdb4GFmLYzHGJoLB7DqRSYlyRVHxwwM0arDCGjcmgJ7iHsWpfgV/SYsbHVMYgs
+	z23r9zAOyzLMhPqfdHVmM11BHAT/khcMXGdcffHuIX2jRF2D2mDQTClYS/dlG24d2SG5cR
+	fS0f5cYtZD8QBRKOwV+EvrBMyi60eUjHEgZywcbJ3/rdCbgMwkYp45JOE4NO7irgArMpiT
+	0WEudGc2QcYtOSGyltmK754UHcpm/XP4W+fGl9GHOGkSCeFgt8ILEhxWgXJi7A==
+ARC-Authentication-Results: i=1;
+	ORIGINATING;
+	auth=pass smtp.auth=pav@iki.fi smtp.mailfrom=pav@iki.fi
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
+	s=lahtoruutu; t=1719138650;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=77DpmaX65YJ5tBxvrHzr3R+vVPbzThoESe+OM9vHJvE=;
+	b=stPjwxCL9AGkMrhTc18+eTS/ouG4HOMP6zllGKmVKO5ylj2pzuCqq5GNqkvh4j2P6jH1WU
+	6ev0zGTt5BXdKheQjAu71PmBKLavrJSBya2TDOq+PhWPPqPSPxwymB7m3N+jBZYklur4Rc
+	gWCvGiwt/bkTodSAp43BBizmI0eFu4/bBoIv8EmBVxHtIF281uKDCSk4bc4Zk7A7MAaxMF
+	ZkmYy79X8BSCzYXiDsfYoI4qtOy0ybUGU/Nsy75X0NTvC/3DLeIYKxzSuAEO2GFWZ4yotl
+	kJKIBs0dLjiaEmPMjKpXdOLF9JPPOCQh9iSQDGJCWAseKx2K27+3ZE1/52dc7w==
+Message-ID: <181de5a745458f349b93b05a51438d3608046c49.camel@iki.fi>
+Subject: Re: [PATCH] Bluetooth: fix double free in hci_req_sync_complete
+From: Pauli Virtanen <pav@iki.fi>
+To: Edward Adam Davis <eadavis@qq.com>, 
+	syzbot+35ebc808442df6420eae@syzkaller.appspotmail.com
+Cc: linux-bluetooth@vger.kernel.org, syzkaller-bugs@googlegroups.com
+Date: Sun, 23 Jun 2024 13:30:50 +0300
+In-Reply-To: <tencent_70F452CB86430990EEC56EEB4CBB27D40606@qq.com>
 References: <00000000000033a6e8061b3c6d4a@google.com>
+	 <tencent_70F452CB86430990EEC56EEB4CBB27D40606@qq.com>
+Autocrypt: addr=pav@iki.fi; prefer-encrypt=mutual;
+ keydata=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
+ bzyGkKh2h8XdrYhtDjw9LmrprPQ==
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.52.2 (3.52.2-1.fc40) 
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 
-Look at the following situation:
+Hi,
 
-cpu1                       cpu2
-====                       ====
-                           sock_ioctl
-                           sock_do_ioctl
-                           hci_sock_ioctl
-hci_rx_work                hci_dev_cmd
-hci_event_packet           hci_req_sync
-req_complete_skb           __hci_req_sync
-hci_req_sync_complete
+su, 2024-06-23 kello 17:06 +0800, Edward Adam Davis kirjoitti:
+> Look at the following situation:
+>=20
+> cpu1                       cpu2
+> =3D=3D=3D=3D                       =3D=3D=3D=3D
+>                            sock_ioctl
+>                            sock_do_ioctl
+>                            hci_sock_ioctl
+> hci_rx_work                hci_dev_cmd
+> hci_event_packet           hci_req_sync
+> req_complete_skb           __hci_req_sync
+> hci_req_sync_complete
+>=20
+> If hci_rx_work executes before __hci_req_sync releases req_skb, everythin=
+g
+> is normal, otherwise it will result in double free of req_skb.
+>=20
+> Adding NULL check of req_skb before releasing it can avoid double free.
 
-If hci_rx_work executes before __hci_req_sync releases req_skb, everything
-is normal, otherwise it will result in double free of req_skb.
+Do you understand why?
 
-Adding NULL check of req_skb before releasing it can avoid double free.
+kfree_skb(NULL) is allowed, so this is logically a no-op.
 
-Fixes: 45d355a926ab ("Bluetooth: Fix memory leak in hci_req_sync_complete()")
-Reported-and-tested-by: syzbot+35ebc808442df6420eae@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=35ebc808442df6420eae
-Signed-off-by: Edward Adam Davis <eadavis@qq.com>
----
- net/bluetooth/hci_request.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+Probably it perturbs the timings so syzkaller repro no longer hits the
+race window, ie doesn't fix the issue.
 
-diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
-index efea25eb56ce..3862fa6bb288 100644
---- a/net/bluetooth/hci_request.c
-+++ b/net/bluetooth/hci_request.c
-@@ -106,7 +106,8 @@ void hci_req_sync_complete(struct hci_dev *hdev, u8 result, u16 opcode,
- 		hdev->req_result = result;
- 		hdev->req_status = HCI_REQ_DONE;
- 		if (skb) {
--			kfree_skb(hdev->req_skb);
-+			if (hdev->req_skb)
-+				kfree_skb(hdev->req_skb);
- 			hdev->req_skb = skb_get(skb);
- 		}
- 		wake_up_interruptible(&hdev->req_wait_q);
--- 
-2.43.0
+> Fixes: 45d355a926ab ("Bluetooth: Fix memory leak in hci_req_sync_complete=
+()")
+> Reported-and-tested-by: syzbot+35ebc808442df6420eae@syzkaller.appspotmail=
+.com
+> Closes: https://syzkaller.appspot.com/bug?extid=3D35ebc808442df6420eae
+> Signed-off-by: Edward Adam Davis <eadavis@qq.com>
+> ---
+>  net/bluetooth/hci_request.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
+> index efea25eb56ce..3862fa6bb288 100644
+> --- a/net/bluetooth/hci_request.c
+> +++ b/net/bluetooth/hci_request.c
+> @@ -106,7 +106,8 @@ void hci_req_sync_complete(struct hci_dev *hdev, u8 r=
+esult, u16 opcode,
+>  		hdev->req_result =3D result;
+>  		hdev->req_status =3D HCI_REQ_DONE;
+>  		if (skb) {
+> -			kfree_skb(hdev->req_skb);
+> +			if (hdev->req_skb)
+> +				kfree_skb(hdev->req_skb);
+>  			hdev->req_skb =3D skb_get(skb);
+>  		}
+>  		wake_up_interruptible(&hdev->req_wait_q);
 
