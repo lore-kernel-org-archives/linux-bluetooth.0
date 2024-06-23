@@ -1,38 +1,60 @@
-Received: from smtpbgau2.qq.com (smtpbgau2.qq.com [54.206.34.216])
+Received: from out162-62-58-216.mail.qq.com (out162-62-58-216.mail.qq.com [162.62.58.216])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E650F65F;
-	Sat, 22 Jun 2024 04:10:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.206.34.216
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BCBB1C14;
+	Sun, 23 Jun 2024 09:11:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.62.58.216
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719029452; cv=none; b=c1GYt51zUxAjdcT4gzGIH5Zw8FhrxTv6uEcEB58xzSz3CQm8g2KImIhayisfgFTaOfCevhhb5c+DwlzcdfOrPQaWwbjw3DawMaJTaQU2rUZTyRp1GCQSceJFUmmSoadWrmrAAaxYYwdRPr/FtN7wtZj0wB6Ret3HxlBVrA9fRMc=
+	t=1719133920; cv=none; b=LvQxAE+50SHXcBmfLQj0cTsSL1kPujYk9I0YoPEa/InCtlymmK3jAntiZ67murg1fQoS+5WG3k1B6Xta8bJEE4dlVFYwaJcPT3Daw3mQb3lwBNc5eMcMjz8k+a8S+3v7c1Y21jLqeeAew8ap+J4F3kNoNWGDr94bGgHePdxy9Ss=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719029452; c=relaxed/simple;
-	bh=/Uw969J/90Il85SGwclxp+h2QlvO603qGKU5S8rIlhk=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=DVsa3OkQWL/k29mR5yAp8haxCUhXK5gix33MrrHxMG4B4RiXlcKFg9BDXwA/W6FBjbX/3etl1wlTvXB7Cl5RRoSWWASzXDV0fWLMgigIfsNf1E1I1TLH8szXtkGmaVOXjIBdwBPf45z9nEk70rfltHXycNa7UO5dsexveMoRnEc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=uniontech.com; spf=pass smtp.mailfrom=uniontech.com; arc=none smtp.client-ip=54.206.34.216
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=uniontech.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniontech.com
-X-QQ-mid: bizesmtpip3t1719029407tbkgdbd
-X-QQ-Originating-IP: jObT9AboPPC/nlEkW4COyy9DNU2ew9vP9pEZTGsYM7I=
-Received: from 192.168.5.25 ( [255.167.206.11])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Sat, 22 Jun 2024 12:10:05 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 1
-X-BIZMAIL-ID: 10863426470243849919
-From: WangYuli <wangyuli@uniontech.com>
-To: wangyuli@uniontech.com,
-	guanwentao@uniontech.com,
-	marcel@holtmann.org,
-	luiz.dentz@gmail.com
-Cc: linux-bluetooth@vger.kernel.org,
+	s=arc-20240116; t=1719133920; c=relaxed/simple;
+	bh=9PpbKR6w3Iu2ALPSmk5bOIP7zdMirW30x7ODlfnmSI8=;
+	h=Message-ID:From:To:Cc:Subject:Date:In-Reply-To:References:
+	 MIME-Version; b=tE4traCK2z8c2FCsJc8DSS7gJ1Xdb6ywbtC5ZCDZBJmYb30FPvWe6glI80gZYfLVHY4b6q6E0r6on4QR5yLX34bAblGENyqEFKk6tG14Bg3ss0TTwJuAUwrvug/jTxMpqRxUsodqU61FQX3tj8dftS1fvuyOSo9yHltPtEXsteo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com; spf=pass smtp.mailfrom=qq.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=XMoYSk8i; arc=none smtp.client-ip=162.62.58.216
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="XMoYSk8i"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
+	t=1719133605; bh=F2Y5FsltYYu6RBm0fojOKhVSeGmbWVg+5v1x+DrOyMY=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=XMoYSk8iu3/RNxcMdfNBfFRB1kwcXEPY4lAmYbF4VVJ3sAUZYayfJchXF6Dzx/DTH
+	 0qK8W1b0Av2QMRIH9jJMz0NS3MFclj5yqN1GiGp4YcXA4LLfEQILFv8PWBWk9I4w1P
+	 rMxA/OgG5PB59Aa9UT6/z6JFwZQblBxjhc4rM4fI=
+Received: from pek-lxu-l1.wrs.com ([111.198.228.103])
+	by newxmesmtplogicsvrsza29-0.qq.com (NewEsmtp) with SMTP
+	id 1AA9C83B; Sun, 23 Jun 2024 17:06:42 +0800
+X-QQ-mid: xmsmtpt1719133602t9vru0epp
+Message-ID: <tencent_70F452CB86430990EEC56EEB4CBB27D40606@qq.com>
+X-QQ-XMAILINFO: OQhZ3T0tjf0aplMQ3N6eZX3MWPmIvMrZA1q+KMlXuKsOZwU/nFV7zxH6hgAzxw
+	 3vPyeYKRQYf0CEzPOfkpQAtDS2+1WQQN8tw5+OUZb5sQBDBOuA3oLWoIfgnciNXm5zlxAeFJKmu+
+	 0gP+bpEYfbE81+9BY4Z7kP65yj1ehRiK9o0a13/V4MVCa9oKWcdMSE45uJ+5bGZYJ0elnskSAkZW
+	 d3I3wVN3VMUWTKQDCnqZZTfrHV+yADfYgQhd3NBDY1wpwRzGBonZFHlMN7Qokw04Ie2xdJUDnLxg
+	 GB90md7/x7tplrRnnqs2ycuECMjL5N9HBNrE3lWhGd59mvKNIc9FXojbQFgm1IY2b/5AQLpIJjHe
+	 l0DdXD+TaYUXXsBAjbG1y9Ob1JaGNNiwu8Vzm0uwfP0P8EwUurxesKfXr1kNy8LkCD5Po8QXkNyO
+	 L/9Aor7uo5BibW6sCIF2Dw7xLyrGwdvcV0GQjst+b3x5+ExhQtsYFzS6NzNFg5pHU18in4h7z+4v
+	 xq8CPmR2hIVv/DBTOMCTyLax6zGDVIHfcCnaMLq5wPjty9RrW/83m1xrYG8hU3AEYPt5NGmzqedg
+	 JPpNEqbhGiaO0UOBNYg0PV9XlccMaqnOyaOpdBiX4eGBsvAZV0bQohL2vI6TeX7gfsGUSnSQ40kX
+	 CjCc3YRWkIFJmhdqQbI6zdPyLJb7ENhM9tvTLCQC0xGnOMy00dTh9busVBIJLC72uJiAA+9W0K9J
+	 wKwJ/kNuX0HAjHJDnNERxKnAnz4U69YiXuCya+Mc90Ay9zB6fM+HcWS1w58b6PQ2hK2tWMq3kt4j
+	 mijuL5zq7V5h11YNrsm+mzt6Z89z7SXfsVm39keKNVvmYnhKrlLiFmd7nGmIL/jzp6seLAfTdF7p
+	 FquJYffUZpKrxImja3wy7CD21gIpJ1lgpeRDaDFRUjjGGU/DqXwXedvVkYvdiXCpeGflZcsjWK
+X-QQ-XMRINFO: NyFYKkN4Ny6FSmKK/uo/jdU=
+From: Edward Adam Davis <eadavis@qq.com>
+To: syzbot+35ebc808442df6420eae@syzkaller.appspotmail.com
+Cc: johan.hedberg@gmail.com,
+	linux-bluetooth@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: [PATCH v2] Bluetooth: btusb: Add Realtek RTL8852BE support ID 0x13d3:0x3591
-Date: Sat, 22 Jun 2024 12:09:59 +0800
-Message-ID: <632363CB00A11519+20240622040959.7567-1-wangyuli@uniontech.com>
-X-Mailer: git-send-email 2.45.2
+	luiz.dentz@gmail.com,
+	marcel@holtmann.org,
+	syzkaller-bugs@googlegroups.com
+Subject: [PATCH] Bluetooth: fix double free in hci_req_sync_complete
+Date: Sun, 23 Jun 2024 17:06:43 +0800
+X-OQ-MSGID: <20240623090642.3753697-2-eadavis@qq.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <00000000000033a6e8061b3c6d4a@google.com>
+References: <00000000000033a6e8061b3c6d4a@google.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -40,64 +62,46 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: bizesmtpip:uniontech.com:qybglogicsvrgz:qybglogicsvrgz8a-1
 
-Add the support ID(0x13d3, 0x3591) to usb_device_id table for
-Realtek RTL8852BE.
+Look at the following situation:
 
-The device table is as follows:
+cpu1                       cpu2
+====                       ====
+                           sock_ioctl
+                           sock_do_ioctl
+                           hci_sock_ioctl
+hci_rx_work                hci_dev_cmd
+hci_event_packet           hci_req_sync
+req_complete_skb           __hci_req_sync
+hci_req_sync_complete
 
-T:  Bus=01 Lev=02 Prnt=03 Port=00 Cnt=01 Dev#=  5 Spd=12   MxCh= 0
-D:  Ver= 1.00 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-P:  Vendor=13d3 ProdID=3591 Rev= 0.00
-S:  Manufacturer=Realtek
-S:  Product=Bluetooth Radio
-S:  SerialNumber=00e04c000001
-C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=500mA
-I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
-E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+If hci_rx_work executes before __hci_req_sync releases req_skb, everything
+is normal, otherwise it will result in double free of req_skb.
 
-Cc: stable@vger.kernel.org
-Signed-off-by: Wentao Guan <guanwentao@uniontech.com>
-Signed-off-by: WangYuli <wangyuli@uniontech.com>
+Adding NULL check of req_skb before releasing it can avoid double free.
+
+Fixes: 45d355a926ab ("Bluetooth: Fix memory leak in hci_req_sync_complete()")
+Reported-and-tested-by: syzbot+35ebc808442df6420eae@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=35ebc808442df6420eae
+Signed-off-by: Edward Adam Davis <eadavis@qq.com>
 ---
- drivers/bluetooth/btusb.c | 2 ++
- 1 file changed, 2 insertions(+)
+ net/bluetooth/hci_request.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 2d7d47f9d007..2d5c971a59ad 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -555,6 +555,8 @@ static const struct usb_device_id quirks_table[] = {
- 						     BTUSB_WIDEBAND_SPEECH },
- 	{ USB_DEVICE(0x13d3, 0x3572), .driver_info = BTUSB_REALTEK |
- 						     BTUSB_WIDEBAND_SPEECH },
-+	{ USB_DEVICE(0x13d3, 0x3591), .driver_info = BTUSB_REALTEK |
-+						     BTUSB_WIDEBAND_SPEECH },
- 	{ USB_DEVICE(0x0489, 0xe125), .driver_info = BTUSB_REALTEK |
- 						     BTUSB_WIDEBAND_SPEECH },
- 
+diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
+index efea25eb56ce..3862fa6bb288 100644
+--- a/net/bluetooth/hci_request.c
++++ b/net/bluetooth/hci_request.c
+@@ -106,7 +106,8 @@ void hci_req_sync_complete(struct hci_dev *hdev, u8 result, u16 opcode,
+ 		hdev->req_result = result;
+ 		hdev->req_status = HCI_REQ_DONE;
+ 		if (skb) {
+-			kfree_skb(hdev->req_skb);
++			if (hdev->req_skb)
++				kfree_skb(hdev->req_skb);
+ 			hdev->req_skb = skb_get(skb);
+ 		}
+ 		wake_up_interruptible(&hdev->req_wait_q);
 -- 
-2.45.2
+2.43.0
 
