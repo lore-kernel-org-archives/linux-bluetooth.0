@@ -1,142 +1,153 @@
-Received: from mail-qv1-f42.google.com (mail-qv1-f42.google.com [209.85.219.42])
+Received: from mail-lj1-f182.google.com (mail-lj1-f182.google.com [209.85.208.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CF465A4D5
-	for <linux-bluetooth@vger.kernel.org>; Mon, 24 Jun 2024 08:44:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C0D913C901;
+	Mon, 24 Jun 2024 13:36:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719218647; cv=none; b=QOlcL4zxZSXWrn+ETp4to4MMYSx5zE7c/aLdFyJthdwslzA90TBwHXEqh2KmaTfePkjtqIE0eqyxuiQtMPbfjwzmQk+jryKBo01bKbEPiz3BG1DJG7ECfZV412XOJaIfGbvUcsXGUACs9lst62MUa9O24lbHo0q3l+VgzeKJbak=
+	t=1719236190; cv=none; b=NucQgQr9+7l3qyCctOICzS0shIm30V+TtOLDMYaMMvJJZ5UghLpeY7MlmlwIX5Qh/ckJzvmtD43oDwA6i7yzXfnEq7AZVVewY4UDAkzzrCPYMUiOxHOqk1NynbBrT6eQCP0wZuQ2IiGGw6/LYVZ0lBmqHaqUlXWfcasTW8ujArQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719218647; c=relaxed/simple;
-	bh=ZHx99obghUydesmgclHuKXKEZ4ScP1VP6w6DVkArr68=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=dJgNTf/TkZNWs6eYOTYecbQAmqh6LeDuIiezO8G3qdicOg3pLi1Vn7Wx7NlGuFJaRkmuDZPx9avKYDYdWp3NGQ1uODdWZbXTGhyI3V/71r0f/Uhv6KKHvXDogudYdetRHRgCttsM/Fn+hxe6pWk+58IppBHQmAQ3d71km13n07E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kNgmo8pg; arc=none smtp.client-ip=209.85.219.42
+	s=arc-20240116; t=1719236190; c=relaxed/simple;
+	bh=JTAp4UDEJHPEUUuCOnG+SgNv3EYBtS5fA24Vtxjriqg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=QWhPTUBs+rLMZ/GMyB3brFEw9iQ+MVFaYQF3DeClqZ9EdrtMtGKoT1MOi9JptTF29SRpGAUeySuYqGcmeiZUV/3V2u3tGKvwLkfWYNGST6AdEmpxYIlSjnsTe+2hs2Jky33oOnDRB4JNZsZJL9Qm4kI6sojDkY7NJfE/s2X2kso=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dFqTwqd4; arc=none smtp.client-ip=209.85.208.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kNgmo8pg"
-Received: by mail-qv1-f42.google.com with SMTP id 6a1803df08f44-6b42574830fso17684316d6.2
-        for <linux-bluetooth@vger.kernel.org>; Mon, 24 Jun 2024 01:44:05 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dFqTwqd4"
+Received: by mail-lj1-f182.google.com with SMTP id 38308e7fff4ca-2ec59193468so12915591fa.1;
+        Mon, 24 Jun 2024 06:36:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1719218645; x=1719823445; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=K+u+kIATQXJWGePVxhaVu0Xttg2r9a+10PXLfqt0MP0=;
-        b=kNgmo8pg2DVkrT3hNG5BnVWAd5hD8igDc3zCeqclXEWu172536Thmgx/abmZhxBnNC
-         qh9RDQXlYnZIS/lJpDwhdbatttlkQeQRREoD/o3plIWiKmtZuiZDuWUCpfwg0em+qsgm
-         V+nFG9Z8R1zPVar1R1vjMM9knXUaxnZisorZM4ESjmTdTZ2qncm8MVUaEN+DYZl1v0Um
-         jLUllFt1DV98MgO9K0KJjDE6bYQko3Vrcq0cSjnqGcS93SrKA86SlN77mN2j7ze8/iH5
-         w55WkGOhaHReECQb1QExco3LyKcioXBTt1rZH6Odg35zJTkc8CDFPFcm7zyOyZxLCOBR
-         MnXg==
+        d=gmail.com; s=20230601; t=1719236187; x=1719840987; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=NkZfvD4PLKsiwgfdlYx63vmiI9ZpjsrWjgZ3Pa3uCRM=;
+        b=dFqTwqd4jSKQNklK+FcenazlXRxCLiHvL+LFIFK8FNoFsVMYMnlttCRDcFPw0OiGZu
+         Svfo9R0IkNzFCRq1SXLdpNY5Mlg6hoQcMnUVn+DkXjtOu3yEcg+4oAqWMgdtDcu0Hi9e
+         GFLkZ90XOWP1Suc6943/P5wfpeHp8edHo9rCgw7yn4DT/PTUCwsPAz4brrAGw9hoCjPw
+         zm/FAnt5nR1YZ0DZxL6uqVXdlhfDd5t4ikyks19FnM4TveptQVyob9bQIVB8DrLQsTiA
+         tEjDcgkjgg2Ht2hsrqvnbMoiCU/SoavYo1juE79frbQkMior/inXkLpNDxo+GSCQmliI
+         A3UQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719218645; x=1719823445;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=K+u+kIATQXJWGePVxhaVu0Xttg2r9a+10PXLfqt0MP0=;
-        b=juHYcZtSy2C603PxImezTHLHUm5DSWYfUMTk45u9+V4wqkLTVsDNd6xH0BRJjmgfs9
-         rv5mw0VponpVcivMQdh1oVHLfh8Pnrg9UM0XBNhO9dku1mzulUyyV1ESFyOlp5barlcG
-         UKYOo6MRM3Ud6/AR7ZFZiCoqvUpP6ilczEb8Hl0MmiaLw+v0L3uDFEevgTCwt0vhSWNS
-         az12GaAbzRbvIYAklbEkXq8yH1++GXNC5i7lEvNi6MLTb3e+NaasDvDgDoRJr2ka8vya
-         2pnD1jihhQIotW1mxTq+egDbBx+tvQvgrDl6DSAi95dn/VYMn4Qf7BSiTrKqXdySLirD
-         wQjQ==
-X-Gm-Message-State: AOJu0YzVArqo29NoJgN+BleGiI3XPgre8tYVCy8BI2GsYJAFsS4KKTq+
-	ZY4KcKXfwQSY1vC4E7UIRym3VXnHodXJypyf7OsyC1l6OLiKmR61QUitjQ==
-X-Google-Smtp-Source: AGHT+IEQe8oJiE3mlnJsjg1NKWUEzvzfhJkTLYE4KWI+LL2AEgEactOIFpT6glDaI06hEKoMOd4iNw==
-X-Received: by 2002:a0c:c50a:0:b0:6b0:5fd6:c737 with SMTP id 6a1803df08f44-6b5409bf278mr41373946d6.20.1719218644666;
-        Mon, 24 Jun 2024 01:44:04 -0700 (PDT)
-Received: from [172.17.0.2] ([172.183.147.195])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6b51ed4bd10sm31957986d6.57.2024.06.24.01.44.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 24 Jun 2024 01:44:04 -0700 (PDT)
-Message-ID: <667931d4.050a0220.a284f.947b@mx.google.com>
-Date: Mon, 24 Jun 2024 01:44:04 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============0019773483561186911=="
+        d=1e100.net; s=20230601; t=1719236187; x=1719840987;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=NkZfvD4PLKsiwgfdlYx63vmiI9ZpjsrWjgZ3Pa3uCRM=;
+        b=bN2xNsWEvtMHDNLQftA4rukLGcKuccBAWYMLmDGl2r2xLw9wozqsl9QOL2NGrgVR/+
+         FGzdtN7nOUq/zZJXs80Pwqa+sZKf5rksgLGEa8xXtWTTBfbsBAgxxmtUKPhBuIzQh9nN
+         sB7305WI/OQqNtdbXyVet7BFhx3Soms9qt+fDUUlTQuT+AD7Jgo9udbsL2jzOgHWj5ye
+         ZGFcTUzndqSK8nWacrG9S8jviN7JkeIPPdo1KH9HyiAgV6j7/EE5KOPLJWXCiRE4+E+h
+         WX0liytNDKVrqllHSPc+/8GzhQ+VWONFBZnPtxqSkdA97cdsH99/gdMaSxzcTyJcqkb7
+         NUjQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUgfheLeLEzfRx6r29/M6CyPuBnRaXGo5881OzgFvA2tBPxjGFBrSAPe/zi0EMNigeyewOIRG5/DL3F2uEuKagfxuQ7GKT6Hd7qziyRsY0sUzhzQPBblOOX5lJ1fywL3zL78ktVJ7TQExUNv82g
+X-Gm-Message-State: AOJu0Yy7XXfkXo07d5ohWTC9XtXTTqNZJ7HB4OHQC4cD6Q4pYt/n3w5G
+	5xyUcM6KyXprh0OkgRfAsEr3LKTVMwXVI9qH8cl2nGHH2A7Axo7C/8BnEYQWtDXYdVz7uc4bJ1B
+	vlSK1uxcVv6p+q8ruJjFmtltilTo=
+X-Google-Smtp-Source: AGHT+IE5BhcwNkSy/BtWPFiSKhg8DTn5SsxUV8uT+6cD8wWYGnIALqe1+2Sy7766l3SzLQhiaN0ZMN7I4LwytBUgKqI=
+X-Received: by 2002:a2e:99cb:0:b0:2ec:4408:56ac with SMTP id
+ 38308e7fff4ca-2ec56c96be3mr13900391fa.17.1719236186875; Mon, 24 Jun 2024
+ 06:36:26 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, quic_amisjain@quicinc.com
-Subject: RE: [v1] Bluetooth : Update the mas session structure
-In-Reply-To: <20240624063627.22705-1-quic_amisjain@quicinc.com>
-References: <20240624063627.22705-1-quic_amisjain@quicinc.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+References: <CABBYNZLu-wAu6cdyDVim=bP+0Ld-P=YvENO=fa6r=rdY4UqukQ@mail.gmail.com>
+ <tencent_832C796CAC95F0E9A2EC6ECF00798E6DCC0A@qq.com>
+In-Reply-To: <tencent_832C796CAC95F0E9A2EC6ECF00798E6DCC0A@qq.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Mon, 24 Jun 2024 09:36:14 -0400
+Message-ID: <CABBYNZ+_sEiu-4790zY7pH7-AOi7L2Da0AFeD8W+_bSjTrXENQ@mail.gmail.com>
+Subject: Re: [PATCH] bluetooth/l2cap: sync sock recv cb and release
+To: Edward Adam Davis <eadavis@qq.com>
+Cc: johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, marcel@holtmann.org, 
+	syzbot+b7f6f8c9303466e16c8a@syzkaller.appspotmail.com, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
---===============0019773483561186911==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi Edward,
 
-This is automated email and please do not reply to this email!
+On Fri, Jun 21, 2024 at 11:46=E2=80=AFPM Edward Adam Davis <eadavis@qq.com>=
+ wrote:
+>
+> Hi Luiz Augusto von Dentz,
+>
+> On Thu, 20 Jun 2024 12:53:19 -0400, Luiz Augusto von Dentz wrote:
+> > >         release_sock(sk);
+> > > +       l2cap_chan_unlock(chan);
+> > > +       l2cap_chan_put(chan);
+> > >
+> > >         return err;
+> > >  }
+> > > --
+> > > 2.43.0
+> >
+> > Looks like this was never really tested properly:
+> >
+> > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> > WARNING: possible recursive locking detected
+> > 6.10.0-rc3-g4029dba6b6f1 #6823 Not tainted
+> > --------------------------------------------
+> > kworker/u5:0/35 is trying to acquire lock:
+> > ffff888002ec2510 (&chan->lock#2/1){+.+.}-{3:3}, at:
+> > l2cap_sock_recv_cb+0x44/0x1e0
+> >
+> > but task is already holding lock:
+> > ffff888002ec2510 (&chan->lock#2/1){+.+.}-{3:3}, at:
+> > l2cap_get_chan_by_scid+0xaf/0xd0
+> >
+> > other info that might help us debug this:
+> >  Possible unsafe locking scenario:
+> >
+> >        CPU0
+> >        ----
+> >   lock(&chan->lock#2/1);
+> >   lock(&chan->lock#2/1);
+> >
+> >  *** DEADLOCK ***
+> >
+> >  May be due to missing lock nesting notation
+> >
+> > 3 locks held by kworker/u5:0/35:
+> >  #0: ffff888002b8a940 ((wq_completion)hci0#2){+.+.}-{0:0}, at:
+> > process_one_work+0x750/0x930
+> >  #1: ffff888002c67dd0 ((work_completion)(&hdev->rx_work)){+.+.}-{0:0},
+> > at: process_one_work+0x44e/0x930
+> >  #2: ffff888002ec2510 (&chan->lock#2/1){+.+.}-{3:3}, at:
+> > l2cap_get_chan_by_scid+0xaf/0xd0
+> >
+> > l2cap_sock_recv_cb is assumed to be called with the chan_lock held so
+> > perhaps we can just do:
+> >
+> >        sk =3D chan->data;
+> >        if (!sk)
+> >                return -ENXIO;
+>
+> If the release occurs after this judgment, the same problem will still oc=
+cur.
+> Recv and release must be synchronized using locks, which can be solved by
+> adding new lock.
+>
+> Please use the new patch https://syzkaller.appspot.com/text?tag=3DPatch&x=
+=3D15d2c48e980000, I have tested in
+> https://syzkaller.appspot.com/bug?extid=3Db7f6f8c9303466e16c8a
 
-Dear submitter,
+Hmm, why don't we just fix l2cap_conless_channel? Btw,
+l2cap_conless_channel is normally not used by any profiles thus why
+there isn't any CI covering it, on the other hand l2cap_data_channel
+is used by 99% of the profiles.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=864750
-
----Test result---
-
-Test Summary:
-CheckPatch                    FAIL      0.64 seconds
-GitLint                       FAIL      0.46 seconds
-BuildEll                      PASS      25.47 seconds
-BluezMake                     PASS      1668.39 seconds
-MakeCheck                     PASS      13.04 seconds
-MakeDistcheck                 PASS      184.98 seconds
-CheckValgrind                 PASS      260.17 seconds
-CheckSmatch                   PASS      369.87 seconds
-bluezmakeextell               PASS      125.46 seconds
-IncrementalBuild              PASS      1529.93 seconds
-ScanBuild                     PASS      1098.93 seconds
-
-Details
-##############################
-Test: CheckPatch - FAIL
-Desc: Run checkpatch.pl script
-Output:
-[v1] Bluetooth : Update the mas session structure
-WARNING:COMMIT_LOG_LONG_LINE: Possible unwrapped commit description (prefer a maximum 75 chars per line)
-#94: 
-Update the 'mas_session' structure such that manager_emit_transfer_property(os->service_data, "Size")
-
-WARNING:TYPO_SPELLING: 'tranfer' may be misspelled - perhaps 'transfer'?
-#98: 
-As there is no new tranfer registered during mas connect, hence setting the path to NULL
-                   ^^^^^^^
-
-/github/workspace/src/src/13709034.patch total: 0 errors, 2 warnings, 22 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/src/13709034.patch has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+> --
+> Edward
+>
 
 
-##############################
-Test: GitLint - FAIL
-Desc: Run gitlint
-Output:
-[v1] Bluetooth : Update the mas session structure
-
-WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
-3: B1 Line exceeds max length (101>80): "Update the 'mas_session' structure such that manager_emit_transfer_property(os->service_data, "Size")"
-4: B1 Line exceeds max length (104>80): "will get the proper structure in arguments as expected like structure 'obex_transfer' and transfer->path"
-7: B1 Line exceeds max length (88>80): "As there is no new tranfer registered during mas connect, hence setting the path to NULL"
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============0019773483561186911==--
+--=20
+Luiz Augusto von Dentz
