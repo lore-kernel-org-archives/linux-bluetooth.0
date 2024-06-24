@@ -1,103 +1,115 @@
-Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B148183089
-	for <linux-bluetooth@vger.kernel.org>; Sun, 23 Jun 2024 17:13:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72B903BBEA
+	for <linux-bluetooth@vger.kernel.org>; Mon, 24 Jun 2024 06:36:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719162842; cv=none; b=PitYQnYgZo8AIR/C83lbILBNBBIsxOZOb2GSrEaqs3cTK7zXoUnEmkq0teWUUGh+bFYCy5iTO5r7BmUU1QAXZo5KIHJFd/6CRJFA+JT/BjHnilAzbgivIH8PwZbFCvJEK5o+QdkKbOYDTx/QgX23rGY4K3LwCFTLxcJrGSl6Tl8=
+	t=1719211012; cv=none; b=OStvWIcZUISAWOXhGkr0IgLVQ/EW3EawUnINg7/jucoGxXK+Y6mECiRFOBUS0DTm+dadcU/T9zSnj0K8NcNPeGJeG6vfG1VzchGG+I1gZVqXg39IRn9U0+v3nageqfC/BTdsYk7vdPWR1QZRua6QBD2GBVP7ldnel3DdXFENH+M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719162842; c=relaxed/simple;
-	bh=wwJ/x5XQ4O8z0BMXu0cwRhaztroWtvuR6Gh0bMKRKps=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=kBX//oUhE29gbktByMb151Rqk9hbhTU8u2XxC44itINdB1FnK8jeSq1mgt8aajAhWavf8vPhrs+oJ7uZ98OrK+WHDzcTsq2IgfhUrVJ93OoZV5pZKoK/A04/2pj9g6Jt6qbsVpnI5QleooPOeUt7uubK1O4849qcNA0mmwiYeOc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=xJiiseiW; arc=none smtp.client-ip=209.85.221.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	s=arc-20240116; t=1719211012; c=relaxed/simple;
+	bh=oijnihKwuJT3tr30MBmubxxP3bLVeP31JcDdPJqsIZM=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=DMVcBZ7W+XbnWN6MP8TSdO0GIcbZwEsezvh2xKN79tDpWzNNMQREnouCW8BOg6H1WQVOikEjSjrwqGf7+JTB2otRmABYNNRrLnfaCbNwmUOpXEBfTYYW2pcJmgtRQO7C8BGDW24CIuVVsoEF9r4nTSVpQaT/mhnNI2e/CcBRBVI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=UwIox/rH; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="xJiiseiW"
-Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-3621ac606e1so2680343f8f.1
-        for <linux-bluetooth@vger.kernel.org>; Sun, 23 Jun 2024 10:13:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1719162838; x=1719767638; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=a/zZtNnC/KzVU1jMIJC4/FDxQCHloTtcrOBctLMG5CU=;
-        b=xJiiseiWNVKavH3Mrg54iyLYF/TMIKS9UfXdZBuD6AcQ/Io03eL99ZtTvjDV1c3ECU
-         R9dFET+miJaly6QGrc56QHc7YqkU4ffWjZmIiHmDnvVNSeFGWZZic3swGVDherPMAfhc
-         BQa18djriw2gowvMYN8BQGfRzdwAqihDthODHuEUBGIxFjovOLZBnFvmG4h/l3keW5nx
-         vGyAt1kHicr+VHYBzNI+B9FesOWpNqHBH6bkjfk3vvNBRGhRs6PFu7zXBcjby9nb+H2i
-         n/ojCLdr4OxprKRlEoHvJZd3PcyaPSNu1D0VCl2PepJSmJlaNp2zY3HaCUk8eTVwFfIh
-         cyUw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719162838; x=1719767638;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=a/zZtNnC/KzVU1jMIJC4/FDxQCHloTtcrOBctLMG5CU=;
-        b=ubK5XH6+mP3vBnX3S8PvHjD8AZGvpaAnWGo3u9GS+xXYOXSVfXlKD1nwiLvIgX/oAz
-         Hs9Ue7zrxoNDLYXIOJdRAqWz6XGw+6finFmcixqyVKMaA2jixo2H5puUxO+MCwQU7QAE
-         XRvZq6Wy14DQ95e+I8YJ8U+3Vq6/dS+O3S7L7y2bpPgT1Lel/nTUnbL+yc6FjlHfZFWn
-         nmYGTXy/gAUqW7hjfJhqMaAPjSfTjFzbCt7peiK4XTFNlaU9P9yFs0cP/47LMseIC0Ns
-         xP2YXYI/5t3FFYqASTnmdezE81rJl5e8AR8c030EJ2BihLZ7IKZMoOr4Y2JTKo6FgtHa
-         B4PQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVQuNB9pbV9U4VJsy0DADRF45UuNelpci3AA0mbC2LuQYbJO77FLKc1CKNKTeajtuACxgoQ+Of6SruHnRU16SYt6T5njVLkm1KKpEYVQOL+
-X-Gm-Message-State: AOJu0YwFvOG+GkRfkWk7jK6uJNCJCgYBJFGmfoSNXiokWN+c2MDTR2A3
-	GEv7ZXnctSC03aTCHMUqS25oTBNHF5HvYltNcsdFf2d7kBOW/tCHNXoSIIMA4WA=
-X-Google-Smtp-Source: AGHT+IEsXcCBagsv8tL9AutPCA7iuhEkYPNHkSumgoYjzJz2RJ7sKny+qlwrzaHOmWv3pbnNRkCa6A==
-X-Received: by 2002:a5d:68cd:0:b0:360:38a6:6bd8 with SMTP id ffacd0b85a97d-366e3686fa8mr2576414f8f.20.1719162838394;
-        Sun, 23 Jun 2024 10:13:58 -0700 (PDT)
-Received: from krzk-bin.. ([178.197.219.137])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-366383f6769sm7908377f8f.5.2024.06.23.10.13.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 23 Jun 2024 10:13:57 -0700 (PDT)
-From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
-	linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Subject: [PATCH] Bluetooth: hci: fix build when POWER_SEQUENCING=m
-Date: Sun, 23 Jun 2024 19:13:52 +0200
-Message-ID: <20240623171352.305053-1-krzysztof.kozlowski@linaro.org>
-X-Mailer: git-send-email 2.43.0
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="UwIox/rH"
+Received: from pps.filterd (m0279867.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 45NLwlq2018992
+	for <linux-bluetooth@vger.kernel.org>; Mon, 24 Jun 2024 06:36:50 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-type:date:from:message-id:mime-version:subject:to; s=
+	qcppdkim1; bh=xyXJwTJ4a8hmn5nsi6AbA8FMRE4l/nAWPW6odwsHTJk=; b=Uw
+	Iox/rHr8pAm/RlylnbQgH63eU7PTEvrI+3GctODJ9OBulabrl4YPu5uMZOqRkl9j
+	qbZNSnGuixMaxNhOWfLjqSP/po6AkyIf79SVzjgEbRDbBmq5AJGTVgWCcl4bfiPZ
+	Y3fR3tXWvyib9xd1NEH918QJKchgNahtOsetp9r6Jp5rGokjR4HEtyLz2O//SS8T
+	F2MCroU9sVALqIMgbVh9ySSCXca/gMiC4Frj25kvYnPfq+JwO5sWkX1X4mBwZYV5
+	ELeJs5Ig3wZAEJxsVYpdDyPyEyyEFYsXIcaCrRX9KXJ0nQ6JUQOlyqQJmoNo+vFn
+	VxRCAhF1+hHSHSK7YD1w==
+Received: from nasanppmta01.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3ywmaeu20n-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <linux-bluetooth@vger.kernel.org>; Mon, 24 Jun 2024 06:36:50 +0000 (GMT)
+Received: from nasanex01c.na.qualcomm.com (nasanex01c.na.qualcomm.com [10.45.79.139])
+	by NASANPPMTA01.qualcomm.com (8.17.1.19/8.17.1.19) with ESMTPS id 45O6an59030036
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <linux-bluetooth@vger.kernel.org>; Mon, 24 Jun 2024 06:36:49 GMT
+Received: from hu-amisjain-hyd.qualcomm.com (10.80.80.8) by
+ nasanex01c.na.qualcomm.com (10.45.79.139) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.9; Sun, 23 Jun 2024 23:36:47 -0700
+From: Amisha Jain <quic_amisjain@quicinc.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: <quic_mohamull@quicinc.com>, <quic_hbandi@quicinc.com>,
+        <quic_anubhavg@quicinc.com>
+Subject: [PATCH v1] Bluetooth : Update the mas session structure
+Date: Mon, 24 Jun 2024 12:06:27 +0530
+Message-ID: <20240624063627.22705-1-quic_amisjain@quicinc.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nasanex01c.na.qualcomm.com (10.45.79.139)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: _d_QS0bO87in1CO1i6jRXVQ_3XfQh4tx
+X-Proofpoint-GUID: _d_QS0bO87in1CO1i6jRXVQ_3XfQh4tx
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-06-24_06,2024-06-21_01,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
+ suspectscore=0 spamscore=0 bulkscore=0 phishscore=0 malwarescore=0
+ clxscore=1011 mlxscore=0 lowpriorityscore=0 priorityscore=1501
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.19.0-2406140001 definitions=main-2406240052
 
-BT_HCIUART_QCA, which is a bool and an HCI UART component, uses now
-power sequencing, so we need to be sure BT_HCIUART_QCA=y and
-POWER_SEQUENCING=m cannot happen:
+Update the 'mas_session' structure such that manager_emit_transfer_property(os->service_data, "Size")
+will get the proper structure in arguments as expected like structure 'obex_transfer' and transfer->path
+won't be populated with inappropriate value.
 
-  /usr/bin/aarch64-linux-gnu-ld: drivers/bluetooth/hci_qca.o: in function `qca_serdev_probe':
-  drivers/bluetooth/hci_qca.c:2401:(.text+0xc48): undefined reference to `devm_pwrseq_get'
-  /usr/bin/aarch64-linux-gnu-ld: drivers/bluetooth/hci_qca.o: in function `qca_power_shutdown':
-  drivers/bluetooth/hci_qca.c:2192:(.text+0x29e8): undefined reference to `pwrseq_power_off'
-  /usr/bin/aarch64-linux-gnu-ld: drivers/bluetooth/hci_qca.o: in function `qca_power_on':
-  drivers/bluetooth/hci_qca.c:1808:(.text+0x3390): undefined reference to `pwrseq_power_on'
+As there is no new tranfer registered during mas connect, hence setting the path to NULL
+to avoid invoking the g_dbus_emit_property_changed() property.
 
-Fixes: 4029dba6b6f1 ("Bluetooth: qca: use the power sequencer for QCA6390")
-Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Signed-off-by: Amisha Jain <quic_amisjain@quicinc.com>
 ---
- drivers/bluetooth/Kconfig | 1 +
- 1 file changed, 1 insertion(+)
+ obexd/plugins/mas.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/bluetooth/Kconfig b/drivers/bluetooth/Kconfig
-index 87484f5de8e3..90a94a111e67 100644
---- a/drivers/bluetooth/Kconfig
-+++ b/drivers/bluetooth/Kconfig
-@@ -105,6 +105,7 @@ config BT_HCIUART
- 	tristate "HCI UART driver"
- 	depends on SERIAL_DEV_BUS || !SERIAL_DEV_BUS
- 	depends on NVMEM || !NVMEM
-+	depends on POWER_SEQUENCING || !POWER_SEQUENCING
- 	depends on TTY
- 	help
- 	  Bluetooth HCI UART driver.
+diff --git a/obexd/plugins/mas.c b/obexd/plugins/mas.c
+index 10b972d65..71bf12ad3 100644
+--- a/obexd/plugins/mas.c
++++ b/obexd/plugins/mas.c
+@@ -51,6 +51,8 @@
+ #define ML_BODY_END "</MAP-msg-listing>"
+ 
+ struct mas_session {
++	uint8_t notification_status;
++	char *path;
+ 	struct mas_request *request;
+ 	void *backend_data;
+ 	gboolean finished;
+@@ -59,7 +61,6 @@ struct mas_session {
+ 	GObexApparam *inparams;
+ 	GObexApparam *outparams;
+ 	gboolean ap_sent;
+-	uint8_t notification_status;
+ };
+ 
+ static const uint8_t MAS_TARGET[TARGET_SIZE] = {
+@@ -125,6 +126,7 @@ static void *mas_connect(struct obex_session *os, int *err)
+ 		goto failed;
+ 
+ 	manager_register_session(os);
++	mas->path = NULL;
+ 
+ 	return mas;
+ 
 -- 
-2.43.0
+2.17.1
 
