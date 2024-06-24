@@ -1,65 +1,60 @@
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
+Received: from mail-ua1-f54.google.com (mail-ua1-f54.google.com [209.85.222.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C72C5381C2
-	for <linux-bluetooth@vger.kernel.org>; Mon, 24 Jun 2024 19:45:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2D3C1A0707
+	for <linux-bluetooth@vger.kernel.org>; Mon, 24 Jun 2024 20:13:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719258331; cv=none; b=YLgH5WdytSmTVb3N8p47XhR4RQTwkmFZeDvCAv660bDScg9Mice6TwQ8Arfser2/M86U87ziQobNoCqcwaRTzz6rucm51m0I5FRf8e+p5kVQaaCxujNT21MH40G2TqNwgRxd8lIaR8uUmcEVhCmgJCcRp+YCcad8CqrX6d3O+3A=
+	t=1719260009; cv=none; b=MK07dqMdp9Nb/OGAipEPyNQQfhyW1PI04GVgD/gLkB6mIwKnQ06eOiPajzVtF8whKUCWLPujJcYXfNUDkhSORtpJbOMHBps2Emq8MsYP0IFrLqq1VXkA6QiHLWnr0fYPHsjEr1WPOoXXFgZ3L8u8aEvmHPDCkq8j2T24yWXNVKw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719258331; c=relaxed/simple;
-	bh=HfwFbWNaiNRg8TyHYnd3L0KeFcsIMwGZDXWebHcn3SI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=MXuhq7RWI7pv3f+c+kMyQJM2D1tTbLV0dfu3EHt0uXe3nxauIvf9v3TNlWS8FqhX3irpSqOfvggQ/DcIBnyoCP50+0U2959QDsGrEy74TFL5JpDEOzo7ONzmz+Zry1AobzvT2I2FtiNLDTSNU+wIsCOFKQJjMwriIQXFBZ7b6KA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=2ansTsJZ; arc=none smtp.client-ip=209.85.128.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
+	s=arc-20240116; t=1719260009; c=relaxed/simple;
+	bh=L3mNlZkdGp4QGU+YY9UbIILi68g4Uk4HBcMd/Ji79OY=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=IQ0haj39xEx0HVzoG3pVBcTBeVtOsIb9LoumyZxt+jkfnvsacla+igYrx+CVXYarNFhRWfICVMou0xmLM6tPgUtneTydb/RPvujEf5iKu5DeUKI/6+PzuQqozQxBrpcUtf1f/lL/1WsH+ed/T80XlRK1aWEyL5Eug3VB0QKxaH8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LARtFxpK; arc=none smtp.client-ip=209.85.222.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="2ansTsJZ"
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-421d32fda86so52274845e9.0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 24 Jun 2024 12:45:29 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LARtFxpK"
+Received: by mail-ua1-f54.google.com with SMTP id a1e0cc1a2514c-80d64c817a7so1288646241.3
+        for <linux-bluetooth@vger.kernel.org>; Mon, 24 Jun 2024 13:13:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1719258328; x=1719863128; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=zHNCUGtS2GKKPWqaEddKMqmnF0GyncsWrVdaPJ8EJoM=;
-        b=2ansTsJZAmrRCKMiVrPhX7rTZBtv5X8QCTIDSfpMdUzS1v5uFuO6xNAfrJaiRTmVnA
-         HEhFaSN5ZcK9bkPi3MRoWYxB4I4m/+mkIdtr4aXMlFb+mJAjbgip+W7z0uFF48U1FFw7
-         N7Hw57tPM4BvrjDkeLVXmDLYKjoHYOR8ApwQOM5W3bagejl4lammBj6gtqAItLyyRwHr
-         7oiwNUuk69UY6QxkFuT8g5XEL1EGT7KSSJi25H43FEUZ2JqUNsd878qBMw8mCeCm5s7X
-         p6mPOltCSWCzEerrT1oydGZjaUIhzvMuJ34U5MWwN8ztgcpSrMulGj14Z3k0IzDA8VE6
-         jAdA==
+        d=gmail.com; s=20230601; t=1719260006; x=1719864806; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=PmPLEWtYyCRhz6ou8dHEQKAhNbJiKUURPjD3otgPpMM=;
+        b=LARtFxpKZZ2ZWrBhzbaVjKz0GjthrMCGOnajzB/0Is/UlF+PeFvVUMCqKZLq2ssZWh
+         AfxwtH/WVmXBDIDG/qQQ5/K/LSimPnytyBvdB2+EVu/2VRdFVtECYjZR93azyF1PUXc3
+         oo39DiMiW1F0xuQ0tmzAruCmGY/Tk1PawIVDPV3DweJgSGlv6n5Wu/N9lZj6b4LDvFVf
+         pxS21ThXwsLSMAKY/bEot+gPgkbJW4tbdPEFZpIXwCY8gmm7RVAeZVFspH1Z0D57dILy
+         MR7ujEhjcj/XUIu6QPTL/urvad7fgTKO4MUOEhIZp3DcABDqcAYUp12y3xLWC7ubBumq
+         s2YQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719258328; x=1719863128;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=zHNCUGtS2GKKPWqaEddKMqmnF0GyncsWrVdaPJ8EJoM=;
-        b=OSsAEOGTE18+3s2EUNmB0UuVn2b3DgMqawLxWn5Rt59SoRuiLIz10faxbEBZu/xWi9
-         P7skf7AXd7WUiIN6uv8tux5KfBO9M3aQzyK3ncAON/sPDmHEYIfRrZaL2VtrmkoKAXHU
-         WyxZKm6gDvzKP+gjHWlcYaxi8DoqrPuECqFwgSokCWAk/Vy+HcStRy6Imfovb5yo5Fa7
-         WYJTrP4P6wxynT601r7+qcDxW/m0oEXNdQ4VNbmb24TLHfpm0Jv0NjxgAnMxPL3IYq0o
-         bg4ei+SogEiAkDW/PgY0qFhKBzPxBM38kKzMqs/6KBWoV2pZWJAsEBkH+YhFTZdw4jQ1
-         EyTQ==
-X-Gm-Message-State: AOJu0Yw86MLYDcBUq92ZBgiT1QDT6AKsO0KYJd/MauC8b2+BdNFX3WS4
-	aOZ84Znr5296xBpE2rvBMnOYq3dR+JnKm2P4g1X5cGnFWHWIvrVl0fqFsYbwyZU=
-X-Google-Smtp-Source: AGHT+IHHn6x1AxgTsnp5UO9F48QMyqsVVY2g6fOphzXTLGr96mHa6mvLaKWJAyIwfqC6JKPXW8LTFA==
-X-Received: by 2002:a05:600c:791:b0:422:683b:df31 with SMTP id 5b1f17b1804b1-4248cc1792emr46281025e9.7.1719258328100;
-        Mon, 24 Jun 2024 12:45:28 -0700 (PDT)
-Received: from brgl-uxlite.home ([2a01:cb1d:dc:7e00:b80e:a46a:7fb3:4e3a])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42480bcab9bsm154626745e9.11.2024.06.24.12.45.27
+        d=1e100.net; s=20230601; t=1719260006; x=1719864806;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=PmPLEWtYyCRhz6ou8dHEQKAhNbJiKUURPjD3otgPpMM=;
+        b=OZ1unOgctWE93/LA2nrepncrPxv0C19ymljwi9Z3bnDO85U/Ejfp2oRf0Eg42u/u9e
+         1spxGdL3QMnG32DBisaVo/C/Halcy1n+/AD+H9XI4eFcHKQYiEjTbWRF1Spc9BTSFpk/
+         AqHNC0ResmLiT8jO87nBsmtloSz7IaNgmY03foORSZNcOrK8U27TZ0/zaeuvg64uEVlr
+         3lSNH4/x4IgbWf1dny8aVF/J+bRMdVLERMHrLDYQAhCyeTG6hJxvX9CVuslApFHWLqSE
+         BxApr0FsyDE+fWPz2/5krbrpFYoWMUndPCVolX4HtKJl1J0HVXoT4p+I4prusU5l7idH
+         /tUg==
+X-Gm-Message-State: AOJu0YwErMwYWpUuMDFD4QhbLACm9I/BNLJgx7MA3geTxFSgWipMtx87
+	pSYe+yEi1MheWhKOzLWL42BkIluSO18rquPQoHHfEpo65YgWwWvPvPQbTvid6FA=
+X-Google-Smtp-Source: AGHT+IEtWjyveNIzGy90yQRdBZsu069LG7VujxBK+XcA4g9rS6XjA7YDXN29cpmM68GpbCl6vyvn/g==
+X-Received: by 2002:a67:f349:0:b0:48f:417e:a03b with SMTP id ada2fe7eead31-48f52b1fea5mr5444285137.28.1719260006035;
+        Mon, 24 Jun 2024 13:13:26 -0700 (PDT)
+Received: from lvondent-mobl4.. (syn-107-146-107-067.res.spectrum.com. [107.146.107.67])
+        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-48f51d72ac1sm917481137.4.2024.06.24.13.13.24
+        for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 24 Jun 2024 12:45:27 -0700 (PDT)
-From: Bartosz Golaszewski <brgl@bgdev.pl>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
-	Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
-Subject: [PATCH] Bluetooth: qca: don't disable power management for QCA6390
-Date: Mon, 24 Jun 2024 21:45:18 +0200
-Message-ID: <20240624194518.37458-1-brgl@bgdev.pl>
-X-Mailer: git-send-email 2.43.0
+        Mon, 24 Jun 2024 13:13:25 -0700 (PDT)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ v1] hog-lib: Fix passing wrong parameters to bt_uhid_get_report_reply
+Date: Mon, 24 Jun 2024 16:13:24 -0400
+Message-ID: <20240624201324.3891633-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -68,40 +63,30 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-We unnecessarily fallthrough the case for QCA6390 when initializing the
-device and hit the condition where - due to the lack of the enable-gpio
-- we disable power management despite using the power sequencer. We don't
-need to look for clocks on this model so it makes more sense to just
-register the hci device and break the switch.
+The parameters of bt_uhid_get_report_reply are number followed by
+status, not status followed by number, so the order needs to be
+swapped.
 
-Reported-by: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
-Fixes: 4029dba6b6f1 ("Bluetooth: qca: use the power sequencer for QCA6390")
-Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+Fixes: https://github.com/bluez/bluez/issues/880
 ---
- drivers/bluetooth/hci_qca.c | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
+ profiles/input/hog-lib.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-index 2b31f3dc33a9..bc6a49ba26f9 100644
---- a/drivers/bluetooth/hci_qca.c
-+++ b/drivers/bluetooth/hci_qca.c
-@@ -2402,7 +2402,13 @@ static int qca_serdev_probe(struct serdev_device *serdev)
- 							   "bluetooth");
- 		if (IS_ERR(qcadev->bt_power->pwrseq))
- 			return PTR_ERR(qcadev->bt_power->pwrseq);
--		fallthrough;
-+
-+		err = hci_uart_register_device(&qcadev->serdev_hu, &qca_proto);
-+		if (err) {
-+			BT_ERR("qca6390 serdev registration failed");
-+			return err;
-+		}
-+		break;
+diff --git a/profiles/input/hog-lib.c b/profiles/input/hog-lib.c
+index 67a0e832dc98..1b4aca07486b 100644
+--- a/profiles/input/hog-lib.c
++++ b/profiles/input/hog-lib.c
+@@ -904,7 +904,7 @@ static void report_reply(struct bt_hog *hog, uint8_t status, uint8_t id,
  
- 	default:
- 		qcadev->bt_en = devm_gpiod_get_optional(&serdev->dev, "enable",
+ 	hog->getrep_att = 0;
+ 
+-	err = bt_uhid_get_report_reply(hog->uhid, hog->getrep_id, status, id,
++	err = bt_uhid_get_report_reply(hog->uhid, hog->getrep_id, id, status,
+ 					data, len);
+ 	if (err < 0)
+ 		error("bt_uhid_get_report_reply: %s", strerror(-err));
 -- 
-2.43.0
+2.45.2
 
