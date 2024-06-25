@@ -1,46 +1,46 @@
 Received: from EUR03-VI1-obe.outbound.protection.outlook.com (mail-vi1eur03on2046.outbound.protection.outlook.com [40.107.103.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E4CE146A9D
-	for <linux-bluetooth@vger.kernel.org>; Tue, 25 Jun 2024 07:27:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79302146A9B
+	for <linux-bluetooth@vger.kernel.org>; Tue, 25 Jun 2024 07:27:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.103.46
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719300455; cv=fail; b=SRSC/eMfa/UbL+4vS1/X+54mQ4EZPVcWd1dGVEcW2oT8Rw8lR60CyHdkzHJXMZd/GI6+gSHaz//kEQJvNVLsUepmfjR/Ou+Jj62EmEnaQABpNMWKHTpvQT8v8q1q+hGqYgWNFBRYQZ1LOywEMNo4WYN0dNrJhuM5hzJDgcivsMs=
+	t=1719300457; cv=fail; b=M8kaavmOU6ECsz9/gwXkdtFwRQPFaYn1Ve4xU0t0Ie15nTNJ7Boq9FPtjM22miULl9GB+6f0yK3aeKriakv5v5qv4TtpwGoCGzKVqVYi19VdvM4Eql/sAVgUvdycfxx/PHRo9D5/2xjzp+5cnhgEsMnHT0ky0ViSyjRdNw/ehT4=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719300455; c=relaxed/simple;
-	bh=gwfpp9sxHDiUvLKmL9FVbsAhzovsKhIwr8Hj24Y9icg=;
+	s=arc-20240116; t=1719300457; c=relaxed/simple;
+	bh=R03emi2npQ/n9BN4+32VMWAZCDN+jSnpaVTL4vHGu7w=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=dAh9LDlkCcZz9LwhrIorpH6+5q2DwxtejGZkYxLVHRvcz9K9JCbq+T641dRFEp4O0DVpXXr6q0VSdV1w1lNwR9MojODwDB4rmbQc3ENWMTXHvbuMY6p+HxyK4gEztBCEXCaE1L2TSAwa/aBuy3v38JNU90ToOckITkqE/1dqkc4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b=mak5tfpI; arc=fail smtp.client-ip=40.107.103.46
+	 Content-Type:MIME-Version; b=Nb9CTinlwFK5Sbr/WF3eZvxwd7pJK+5PoD0WpMekeIjqnhZCQ3McmVnHViKwlvtknN1OLcleEd6JDebEPo6093rhKTutp78HoVKI5qTq0cR6wYgAsLVx8hGW3RhoqYtBzFlqzC29ezfJ50PuXHS+wgWjnbmTOrj0MBT8WbOLB68=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b=BFRoJNsw; arc=fail smtp.client-ip=40.107.103.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="mak5tfpI"
+	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="BFRoJNsw"
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=MiQjqCbSyBeXtXhDzc0+3bB2wSSTxNsUGnp0/qjgNOQypBCr3lPQBqzeFLtMT3bNWBZlMuWSM2jw2aVYklP8wja8bWAGJRrsp5ZflH9jcv2fFcGYFlrCWz8gtT9yy3ETbpIpkBJuXrc8xIh5BWwjfQepIWV3Bu9p8fR3e29AT8Uip1xSMNhtpTEHe8ypbhvv5ych8XLEB0Cld5wpksS+L9ByPztYUtXH4mpnW+asLktAHy720OvN9wDemD+A9sEOLcFTQTNJkm+M+5ziPqWHpnf+31vua0AGPjzScjKvOOH3QYrbpr1bZnGcpLBN5Cgx5YrD0b3sCnvbxq6akzoIPg==
+ b=NfLgqUkw6cNiVURWrHaRBc3zmzdYH5nmpM2H2Z6KX8lrbbGtEysPpgRfTGSTWKqJIvLRQ08V2eVYYC5Ph4NHWCD9d9QwUwbjR0lIlAZRFsyBbCBtdEmGGdEiECXDRyPoBLHjoSZiYKrhD5fopjn09/O6Uq08e+aptH47lIorLbazSy3vPB1yzcb7jOYyeTfdwn5v/qUk4aW3TMWurQLScbLNIEd0RlA43W8g/B3DnWMqIQbwKLb4NLFdZciJWOSqKPcw9sUfJiAyRIorkLcfZDzFxNZyw9gxcRP/IvS7QMbLgW7/m2qK8g1xIz1Rf1U2wVLwpXmZCw4WuVJ55Qh5TA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=LYJH4tc9GlenC8hERXSm58H0qSTkORS5W0Nvet+JFd4=;
- b=gfU/bNxfUANHGWJVh+L6L7fWsQgJA3Krf1gmT3kA1AbwbmZDsXjGic7rD78MxyH3QJa8Jv8oMkMKoxCuOqWh+TNBdq+QU3vuINpGL0bTwc6SfA7TfJZf0sEgnNO8OVTFc8SviRzxaRmNTI6ZzWFrdcbANxQfM0GDcIP2fpZq4h2IhV7a/ncyp1MlLUlXNbznE09JqEWQShWkgRgLNfLkZ+PzQBbPpRyQs9PCW/dRhESLePY9Z8e//iMdtBK3u/Rsq5mEWa95voSfXJtp+HnEw2qoFLgC4jBSARPLOphY1hXLIH7RsYbVDETRS7oVbV3WUVfGviYekQdTcVqWVRg5gA==
+ bh=pYgMK2At+kR0dnCGqhhs5xIw7Z29uvGARpQ65kqeC2g=;
+ b=mFDrOFpAYoXes6kL/Hx7HNBei1KL176ZU7LSABfi2+y/qr5PuSXUbD7JHPQCGUH2bbXy61M1Cl1Z56yAmQPX/6aJtv8tr+J8bc4t7B1v5bvguFeqPfuAxzd/Hz99YrGzNoMK2p/mTHq03ppL52jbRcOQniuWXcQcIEK/FwFsn7TExHC+DCmD6c+0NrukDkf3HSFfE+mDJDMu0GMOtDj/B95ZDrcT+Uxxck6NkofZ8zFS9aSQpxHrhy8B9NY1XWT8CMjUgFRzXrYDMRjvruwOEsnFpf1tmQ1ozWRFg24sXoIX/+TkSQQ+ND2HDgz32pbTfM4xD6PxOKQNUQikqPNI4A==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
  header.d=nxp.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=LYJH4tc9GlenC8hERXSm58H0qSTkORS5W0Nvet+JFd4=;
- b=mak5tfpIN2W1zU4IP7uIRDX/ZoaFIKDesMM4nQcVmpi2hNqE+pbm6ZisTt6a3JT6RMD8IXSn4TBX+P4lwPP/Ncnue+6fwub+9CekEXD9yXb8ESbGtjd2CaY0eoIh0RPNEG/jZ+/aZPNVjMpQEcYkbZfVhNIJhARzzpbMfpnjtX0=
+ bh=pYgMK2At+kR0dnCGqhhs5xIw7Z29uvGARpQ65kqeC2g=;
+ b=BFRoJNswnXbD56F2mcy4yD+bN52r5L+cLRvknR0o5KA/ysfoqEuI7YQz7uo41gXjbNu5qp57CTD/hvGCmy2Us4+OHIBh6oZyhIjUNsbiUtfPs0eWhkqSNl5s1SAVSAMJNMIy3AN0N7xF70/2guFRHFR0euZctkuXoQoCrTs0SzU=
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=nxp.com;
 Received: from AS8PR04MB8898.eurprd04.prod.outlook.com (2603:10a6:20b:42d::15)
  by DU4PR04MB10362.eurprd04.prod.outlook.com (2603:10a6:10:563::9) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7698.30; Tue, 25 Jun
- 2024 07:27:30 +0000
+ 2024 07:27:32 +0000
 Received: from AS8PR04MB8898.eurprd04.prod.outlook.com
  ([fe80::5e22:869c:33c:9654]) by AS8PR04MB8898.eurprd04.prod.outlook.com
  ([fe80::5e22:869c:33c:9654%5]) with mapi id 15.20.7698.025; Tue, 25 Jun 2024
- 07:27:30 +0000
+ 07:27:32 +0000
 From: Iulia Tanasescu <iulia.tanasescu@nxp.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: claudia.rosu@nxp.com,
@@ -49,16 +49,16 @@ Cc: claudia.rosu@nxp.com,
 	andrei.istodorescu@nxp.com,
 	luiz.dentz@gmail.com,
 	Iulia Tanasescu <iulia.tanasescu@nxp.com>
-Subject: [PATCH BlueZ v2 4/5] shared/lc3: Add defines for BASE with multiple BISes
-Date: Tue, 25 Jun 2024 10:27:10 +0300
-Message-Id: <20240625072711.7011-5-iulia.tanasescu@nxp.com>
+Subject: [PATCH BlueZ v2 5/5] test-bap: Add Broadcast Source STR MBIS tests
+Date: Tue, 25 Jun 2024 10:27:11 +0300
+Message-Id: <20240625072711.7011-6-iulia.tanasescu@nxp.com>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20240625072711.7011-1-iulia.tanasescu@nxp.com>
 References: <20240625072711.7011-1-iulia.tanasescu@nxp.com>
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: AS4P190CA0026.EURP190.PROD.OUTLOOK.COM
- (2603:10a6:20b:5d0::13) To AS8PR04MB8898.eurprd04.prod.outlook.com
+X-ClientProxiedBy: AS4P190CA0030.EURP190.PROD.OUTLOOK.COM
+ (2603:10a6:20b:5d0::20) To AS8PR04MB8898.eurprd04.prod.outlook.com
  (2603:10a6:20b:42d::15)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -68,147 +68,476 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: AS8PR04MB8898:EE_|DU4PR04MB10362:EE_
-X-MS-Office365-Filtering-Correlation-Id: ab2e3459-9f01-4ced-d9d9-08dc94e84575
+X-MS-Office365-Filtering-Correlation-Id: f8ab12d0-54f0-4e8e-809c-08dc94e84722
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;ARA:13230037|1800799021|376011|366013;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?P97M2li+3LfSbAkmWx/zHkRq3hi98+UA42npM1N8JAGMHphL8lpR6NNk0Tyu?=
- =?us-ascii?Q?riGFXgW96E9OsYuzWFq2+yJOoHKGb6vhKOrklJTTaxfnxyOwL9qwFojy+cHj?=
- =?us-ascii?Q?wib8qdIlN1bnS0Bmc75iRhcR5PysH976dhIBctMeept6Ft3n2L8KurxdsyQL?=
- =?us-ascii?Q?tCiCzfLuZ3YDh/gPcUVd8Hrd84ff/hNlV8at34+hpM7ZoCcn1mJaCZrf4DEg?=
- =?us-ascii?Q?SxxaO6yfdhjMcKbkM6X5Hlr+CL8TbsXtDnerrAsVrdvpvXBZ/Ltsjz9noPFO?=
- =?us-ascii?Q?dPNU4FTxxcrMlv+iCsUuTHmzt2KhHoqLYnb9JU0AHK2GspY8ItnQtDUFNtL7?=
- =?us-ascii?Q?4IFJXGolgjbBayA5dzpTMea91+BpuaV+j3N3Lu6vfyVJFBmks3nrn7oY3gcD?=
- =?us-ascii?Q?krPUzi38kiHbN0meRJK60yJxeKBQskOTFDyN8Cg0XWUaNjxvR7a/Wohtn6cw?=
- =?us-ascii?Q?6Z31g8Fv87k4LC+geLCzfmI31VelIp5Qcp6SF6Hb5PKWOAq6GCyccnAKA6yt?=
- =?us-ascii?Q?v1ZZ5p0LUo4wYlBzBhIoyMgRNiYRFJP8mnLtT3P6AriZEMbR7hOFTmIB/gr1?=
- =?us-ascii?Q?BqODqCbCFmhAOUY5r+rEh7Q7DSSXuNfuRSbe7GNn5pxyxMCL85ziBWvmvSt5?=
- =?us-ascii?Q?2ztppU+p9LlOnOYyUyr8hmCMfOa7r6BuAREUZjnDalTCufvo/Zk7VA2IyzNg?=
- =?us-ascii?Q?gGK27T6Lu+1P5UJs/hbN2d2B/U1UmSovbDi7jbpZM5EiFXtFVLSDJwjN7BG8?=
- =?us-ascii?Q?wRyNR0QMcqFvCaDNDy6vujpgLptm3Qg+dKjSM9PAAUmnYl7AOKWXLv2RHBXj?=
- =?us-ascii?Q?UHYyF9Jfne3Gr4oT2O/K3FwgkQ8oEw55kv+zheFHSsMtkltgKnybJP3qemb5?=
- =?us-ascii?Q?+BdelvFfEvZzWlaWt2eB54Rel74UjPGaeKSh5+p6QN9EM+NkAkSC6hZOjHrG?=
- =?us-ascii?Q?kswFokZij/tR+rbgWaMpH7yRH4Qa7srZv8tiPEsdfGCbjsfeL6Di97xy8SJ6?=
- =?us-ascii?Q?cD/wC0ddHN5HoZWTu0jWK9tObuyi0b3dqjN2/Z1fq8xoDf0Cev6wuBJz3rmw?=
- =?us-ascii?Q?flQooKtD5I7F04qXn2MKBQYv1TFdDLMMnSpAleP7ghHT0OtO1V1pKix3qapB?=
- =?us-ascii?Q?UaRP3l+naQBzml2OXzTg85xIXpX5YSiKPUn9l2tGB4CXbW6h0WC/Kq1ZeNEg?=
- =?us-ascii?Q?MPCvbRxLlpp4BhMaDF1AbrkxsqTY9eiT5ETEDTWsvk3hhVrKQzhOfBssz6fD?=
- =?us-ascii?Q?gwV+C+qrId1D5IKbheyenTTW5FneWrKYEAJZ+9N+HnfSu7xrOQm14Bo+SLi1?=
- =?us-ascii?Q?Df+3UbxUML3M2Eqs+SX7EfFk?=
+	=?us-ascii?Q?lTvaS8cOVKpy59a0Sh/LAREdQbpXgqfPWtYRTRMqlhTVZDO5x0VZS8DO7hMY?=
+ =?us-ascii?Q?WvYvifPnn6vGmx4j/2/oEJg5ExrlDDcFHpHfV/bj3PRL2KDZj2UeRUOkXGV6?=
+ =?us-ascii?Q?0eJlJfp3bIDk6KuoUq0ooNHgVdv1L19yj2zwBqcDSNGDjAB7MACN2U/5vWKf?=
+ =?us-ascii?Q?qMIAR66WmAthY+mO66k9CAurx8Yglak7oXarelB9wo/pzyP+Pvl8NR33QgBg?=
+ =?us-ascii?Q?MfYeXR2zUA0MrMqmNpS2moKb7B+m6EtETziwDECPRBXE4O7N3wyH99TvUwH1?=
+ =?us-ascii?Q?PjxzWGm4ObV0XU1Dsx/bbI1TVbHyoMBpl2vQngY7/7eG00rxM9iqIJuf9sCa?=
+ =?us-ascii?Q?h8qTiZRK+ujpes7MSkuAH99fvdAGAauLajKZmI/VgB8GlBixN8PfPl3hnqYT?=
+ =?us-ascii?Q?WomGPfpqzS+tSAkP7YW62rxPuMxuCnwpUicoqgzwlV90+OsYgk59YvbiowCh?=
+ =?us-ascii?Q?dBN/34Fhhl2V3pz79Xm0D3SazjYoqcLHyzRLetWHTcN7hSL2e4Sho30fuYmS?=
+ =?us-ascii?Q?mEcFHVOGYtvnYsFciepFs2bGf9DRC176os1685c9oiahyRFsVrvmOWjMvA5Q?=
+ =?us-ascii?Q?QN+qylFQ/owwHgQWr1VzOosq27n4wvrV7umwKLHLLobbmIbOClM4RRPLToZN?=
+ =?us-ascii?Q?y3H8O84YZoIZr724IDOtMEWqpFUzucBaGonLQQnROtS/GJgV/BSY+Ee/PRyQ?=
+ =?us-ascii?Q?LVT5xcFbmO4D+h8ZRu83PfB4VKtxMaNVXwNO5JLw1XTZgpHJvCqowA3Q5D0j?=
+ =?us-ascii?Q?t9ZcCMTH/5NjE11Te5v/wG0VjhEBdrdGg3bNCqrWddhAtwL0ROtjP+pOmDuk?=
+ =?us-ascii?Q?cI3HuC3psWjYwSlaqtVzqKpaxqb9VeqGspykgUMLBaOLne0Km32yQCtLCQP/?=
+ =?us-ascii?Q?9ivLTvcrW41Dwuds/1XwU4eL394Bq1WJYAaV174y5pHzZMQwWn9gXlpCQ1oi?=
+ =?us-ascii?Q?TY8Lb1QDT/2q67WWHP7dBEAI35cZX4pIoHvJy30NQX2xaki9+N9cGCWDUKBs?=
+ =?us-ascii?Q?436d1JgO0806MFVN4Pdic5WT585vJPljjbH0PDYFOm3934tZOsMrZ0nwFjk4?=
+ =?us-ascii?Q?W5PmkBZtA7LTXkJ+cCylWrP5JQpdXlvtHcdwdDUA0S9EVpMhqXFMEQOq1RNc?=
+ =?us-ascii?Q?GGEheRSQUA1o2swpKTgL3XklIni+BvsBeSnTB7r3RNXhbcP4w1DOrO8FrtIu?=
+ =?us-ascii?Q?X26ndgAue0hvsy0zH5CvPh8LaSnLeYRsLCeee70OyfwQb91wyMw7B51xpKWc?=
+ =?us-ascii?Q?p318ALUz2QexduvYI5FRRPqbGDINSaniMzr340FWoGw7ErJPokbOY3SRss3Z?=
+ =?us-ascii?Q?9lMWzrp9CsNJi+nn5EmW2Rc2?=
 X-Forefront-Antispam-Report:
 	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AS8PR04MB8898.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230037)(1800799021)(376011)(366013);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?NOS8iA8Z7MXGHSpkWjewEiNKGXnSwx7PWj7Z1myAN2kB9IkmCxloVpnKWgQx?=
- =?us-ascii?Q?FmefjlCwWcTpqokosKhGOcp1dbV90IYAgTIoj9y4lEbZEOLJW8k69fIrd3Ts?=
- =?us-ascii?Q?66/wtIVXa7SiOmREmb3TZtgzjVOzA+YGqnayYHe4MYoXVy7acUjD/lBrcCbd?=
- =?us-ascii?Q?A2L1wDAN2zlKt39fbBoHOpyGA/ZDJkG6N8lN33F0/MHe20lwoWssNSx33BNr?=
- =?us-ascii?Q?uqk/Y6p1qNGm2YEj7rr9OU/Lgd2SfGnimqgSmTSWWoQT4Owl3DxCNRWpxYxm?=
- =?us-ascii?Q?8B5J86ed/xmzVGuu7/dpB0M63NCgLgm9pkVlLqdOkvg+JmnM6jyPnu4fDsuB?=
- =?us-ascii?Q?hk/PY8ZWfLXwam6jb8T17fJNHwuZC2G28cluo2XWOx0UfLW/wOC/tZGZKJJf?=
- =?us-ascii?Q?sqVDJwwaO10MwU+bRz79Cn+0CZFMLEoI+hofEDBUNsw+acIOG/E+7wT1XInf?=
- =?us-ascii?Q?UJqf0uK6JjU4dueMjbWplFPOidoLSfp2YzaruL6cEcr5HlCrdDQgcb5FjSwS?=
- =?us-ascii?Q?ZzjVIKIsT/8jksXWb5S5MIKJmfdV5DstVS3syoASncfb7xrrTwMGnF0gJcD7?=
- =?us-ascii?Q?2v2w/fCaCGz6myNXcbmYroOE6r1xBv4WztZO+bvhjRtz7RHh4lzgjHdM0QFE?=
- =?us-ascii?Q?btabFMLxlRl2hv63E9T6MRd6hudYzVkEep/AAhiEcBVFfZRFE+QtRwFi2BVw?=
- =?us-ascii?Q?SG53rBrz88tTvRHBsUTgKZsVC8bY9TBkPcJY5qcqtnQl6F9/+6VXK0qup4jX?=
- =?us-ascii?Q?MuCX5kOUVraLQHIxKW88TCjfS95PvK1k+HCql7VYfcN6RbzePYtGRhg/OYWJ?=
- =?us-ascii?Q?OWStwYYj9GimLfP6lYDZ0sgVDDbMl9iKsi6Mw9uU/MRF7NtiV/jYbsG4NBSf?=
- =?us-ascii?Q?OX8hwN35HSCWsWN5IuSh+KOL0+t+U/X23fW+ARwGs0TF4v0Sb7tEFelLoUF0?=
- =?us-ascii?Q?z2ZV36aoFB7xi4+QP66aF7hJBvUrj1Ye09zIjYjOeVtlFDvcXnhuBfy6Fl8E?=
- =?us-ascii?Q?oOAqyrXwWc7rEQe5wlXpPyfFrkMmn3nL4IYSatJI1czpoF6ifMqYkyOATYP6?=
- =?us-ascii?Q?mN0y4SLA+xLS0e+2eQIEqIhC1uK9yhaft4bc0Vmhu8Bx725r/7YZR87SpgqR?=
- =?us-ascii?Q?G+dzmutWTcMODXP/bzErGZMBtg8FbwjMMQB/ienZsPQwGVGhyV4UURP6BxQ9?=
- =?us-ascii?Q?52lU2A+TlCIk9hGhn+rIqf1lOVi/uxEXcX3YSZoJd+NqxQzmoS4h1wX9jWpr?=
- =?us-ascii?Q?Qxcb/hsXLdki+O5zJmeeFTYHtiPquVtdXx0zQTi8SyAaktq+BsVy6awD7F1w?=
- =?us-ascii?Q?dIunZPfzLNQqu8K+pA+OdWYTbgV3J9V5krWR641wnbh/S50gcAS+rhW7Nttu?=
- =?us-ascii?Q?ywSD9nfYfDRSByM757VF0bIrIDobCccWOpbMRPcuHDQpNGf4ty7WUgzJjBcY?=
- =?us-ascii?Q?nobMesW85wbU3nlu2cFtfXqzrrHUICiV4s0sfJoXTeGCKHXhUExhCegZ0haD?=
- =?us-ascii?Q?K6WqGvVMnwvqTrQG0vvs1OA35+eWmSNVxc485JR+m5CBtzkgbZrOcpvDv6CT?=
- =?us-ascii?Q?rmq/cI92TSh7YQuvkNrFmsb1hQPrQVUfzG6N2A4tCWW6V1vm/Ux4G9msQqUE?=
- =?us-ascii?Q?oQ=3D=3D?=
+	=?us-ascii?Q?rmxtBGObFJ/t+R9/a8CvD2xLuiojxUQg0/NeJBfQomEP2A8yaKCnmT+Xxtby?=
+ =?us-ascii?Q?yIgplR44Tyjm+M1cud+N1qrHyKbCBe3wHseks+Bo7mdALJmczE0ZWcEOUKvA?=
+ =?us-ascii?Q?jsYLXjkkTr3lKvL7ADsLmtXybJcHgq53RndxE6PE/dC+W6py8eKcjemkaAbX?=
+ =?us-ascii?Q?RYneW+fHayI0uw3qphkIPTVm1Sj5hC6bQdb+/hHL5O2TRUGJ7ahu31pF531O?=
+ =?us-ascii?Q?Wwu6G/f9dUKjfNDMg9RU0585Nzq4acSc0WyLfRcqAnFBe/gdIiWjdoEiAEq7?=
+ =?us-ascii?Q?mMUYjUsYWFZuQ7A2/07nMdc7cL/iWVpmUOJvIReUwDLYBLSip+mKu/W28uMg?=
+ =?us-ascii?Q?RWAWJ+2a9536bCRhCLfnSdLULdoNv9gQch2rdy6241gXloOpFHwZ8F2G1MCg?=
+ =?us-ascii?Q?2GnzkDZX/PpX4sG62fX8tiaGR/jq/t91Ern9g4UlCDUKVJj84JQ8BYzz+LAt?=
+ =?us-ascii?Q?bx/PFchFjj/TGlW3Ai9uTJk3yrIovygO8tjVvqTTCJcsfxYVeNHOnXnzVIae?=
+ =?us-ascii?Q?I4zRbqTcLxQ0OQ127z940AZ2PZyq890T7+Q558/kq+9p9TM/TMR4cP4czLgF?=
+ =?us-ascii?Q?wfDEzqDkziAGKOFymhL9R2EyA6WvBNJM9bqN+3D7lmJyunf3xAB8mSp8OEHf?=
+ =?us-ascii?Q?EyfMqn+MM/3fbLHbkaCcvh3uR+oIO3rnkhcY/u7lMHXjhKu+nnGGQ58OJMJ5?=
+ =?us-ascii?Q?w+CnV8KnA+6NfMbnS55bV8VCZSxxq/r4s/rIEqxbD3/CUJhZhf3QpY2GhZaD?=
+ =?us-ascii?Q?OWhepIIeIwpM3jcEHZH8F1p9IAq9Kad+wBvGCBArYGTOsY6uzFR8pi093/eU?=
+ =?us-ascii?Q?iILPXCHOFXD1YYvMzGdD4y57n7sWbgafRXXScaY25op8n+xSQVVtnqF7/Thh?=
+ =?us-ascii?Q?h/eLSdWh0ap2s9hFzNH0dOHlrQhB/UrvFmtyL1EiQsn249cT7LkZZCxhUgIN?=
+ =?us-ascii?Q?KSPg9Qu9duNl8zLdfsm7QnPpK5tKvagFn2YBTm8jlyUADznZCOJz8JYI39yg?=
+ =?us-ascii?Q?1z8nBCpSb6rgzDxv3rfs4pEmdOSo+K5YLl0uOFr7NceTEGcAS2/E+rNiMAW+?=
+ =?us-ascii?Q?vBUJsnxqf5sHa+MxKToChbaT7MaIN57X767xLLKbcfC7l/wJG87JyP6EgE/d?=
+ =?us-ascii?Q?foV95HbpTrhKkxBraiE6kC5Y0N/cOOqlxE//q1YWZgTcmJ1jsUGiv6FikTZD?=
+ =?us-ascii?Q?gWcxJTMZ88T2BzMWsKSIRKEr5VquOVz9jV7gtfC6oyZA+ttoZaS9RORqRdBD?=
+ =?us-ascii?Q?5lMrfrY5RX0CvrR7dhX3Lu+V+cTzgN+Va3DrSA8M7BDZ3cNgFB9PYIflFBtg?=
+ =?us-ascii?Q?6gL+MJ1N3M9L4OAHczxBEm7h80leQxYCUcBy54yBnMqZQkN2Uzk5zPkMxvoC?=
+ =?us-ascii?Q?dor5T+RGY6sCY9B/5eiL43NN1cZ1hT6bF/7S5Ph2R6YAVlqRefkpJ5xIPWRv?=
+ =?us-ascii?Q?AUcxDvRwAx/d5eeT4zWeTL80Sxn5FDFjU6JewUA84sHyzgHzRwuveqaI1K6i?=
+ =?us-ascii?Q?6CKa9/m7w0lY45toa7eZyNzoxcvVaE8CzaDiFIIzKXj37HeLnxoWtU+46Rnw?=
+ =?us-ascii?Q?5P2UtIZcBEnhVaJnJga8NpvHjH9Kn6oaw0d7wE1dVNxKCgadrrwjegi0X09O?=
+ =?us-ascii?Q?cA=3D=3D?=
 X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: ab2e3459-9f01-4ced-d9d9-08dc94e84575
+X-MS-Exchange-CrossTenant-Network-Message-Id: f8ab12d0-54f0-4e8e-809c-08dc94e84722
 X-MS-Exchange-CrossTenant-AuthSource: AS8PR04MB8898.eurprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Jun 2024 07:27:29.9541
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Jun 2024 07:27:32.8189
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: rHffy3FliBQxl7Bt4GVhyHFNjVsGmm9hGkWKa03QMM3VO3AH2j0peYr39LGrtfhGcYnpOPDPj7jzYUJMj5750Q==
+X-MS-Exchange-CrossTenant-UserPrincipalName: hO1LutAL1m6r0PHj3VeRG8x4XeVAr81zBzbe9uwqyHw1ZJyWU+1DnJx79+v741XGUwAX3GuszR3rirQ5zJCh1g==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: DU4PR04MB10362
 
-This adds defines for BASE configurations with multiple BISes.
----
- src/shared/lc3.h | 53 ++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 53 insertions(+)
+4.14.3 Broadcast Audio Stream with Multiple BISes - Source
 
-diff --git a/src/shared/lc3.h b/src/shared/lc3.h
-index 944f574b0..e7a9277ec 100644
---- a/src/shared/lc3.h
-+++ b/src/shared/lc3.h
-@@ -425,6 +425,59 @@
- 		0xFF, 0x00, 0x00, 0x00, 0x00, \
- 		_cc, 0x00, 0x01, 0x00)
+     Test Purpose:
+     Verify that a Broadcast Source IUT can stream multiple
+     BISes to a Broadcast Sink.
+
+     Test Case Configuration:
+     BAP/BSRC/STR/BV-18-C [BSRC, Multiple BISes, LC3 8_1]
+     BAP/BSRC/STR/BV-19-C [BSRC, Multiple BISes, LC3 8_2]
+     BAP/BSRC/STR/BV-20-C [BSRC, Multiple BISes, LC3 16_1]
+     BAP/BSRC/STR/BV-21-C [BSRC, Multiple BISes, LC3 16_2]
+     BAP/BSRC/STR/BV-22-C [BSRC, Multiple BISes, LC3 24_1]
+     BAP/BSRC/STR/BV-23-C [BSRC, Multiple BISes, LC3 24_2]
+     BAP/BSRC/STR/BV-24-C [BSRC, Multiple BISes, LC3 32_1]
+     BAP/BSRC/STR/BV-25-C [BSRC, Multiple BISes, LC3 32_2]
+     BAP/BSRC/STR/BV-26-C [BSRC, Multiple BISes, LC3 44.1_1]
+     BAP/BSRC/STR/BV-27-C [BSRC, Multiple BISes, LC3 44.1_2]
+     BAP/BSRC/STR/BV-28-C [BSRC, Multiple BISes, LC3 48_1]
+     BAP/BSRC/STR/BV-29-C [BSRC, Multiple BISes, LC3 48_2]
+     BAP/BSRC/STR/BV-30-C [BSRC, Multiple BISes, LC3 48_3]
+     BAP/BSRC/STR/BV-31-C [BSRC, Multiple BISes, LC3 48_4]
+     BAP/BSRC/STR/BV-32-C [BSRC, Multiple BISes, LC3 48_5]
+     BAP/BSRC/STR/BV-33-C [BSRC, Multiple BISes, LC3 48_6]
+     BAP/BSRC/STR/BV-34-C [BSRC, Multiple BISes, VS]
+
+     Pass verdict:
+     If the Codec ID is LC3, the IUT sends encoded LC3 audio
+     data in BIS Data PDUs on each synchronized BIS.
+
+     If the Codec ID is a vendor-specific Codec ID, the IUT
+     sends BIS Data PDUs on each synchronized BIS. The parameters
+     included in the Codec_Specific_Configuration data are as
+     defined in TSPX_VS_Codec_Specific_Configuration.
+
+     If the Codec ID is LC3, each parameter included in
+     Codec_Specific_Configuration data is formatted in an LTV
+     structure with the length, type, and value specified in
+     Table 4.83.
+
+Test Summary
+------------
+BAP/BSRC/STR/BV-18-C [BSRC, Multiple BISes, LC3 8_1] Passed
+BAP/BSRC/STR/BV-19-C [BSRC, Multiple BISes, LC3 8_2] Passed
+BAP/BSRC/STR/BV-20-C [BSRC, Multiple BISes, LC3 16_1] Passed
+BAP/BSRC/STR/BV-21-C [BSRC, Multiple BISes, LC3 16_2] Passed
+BAP/BSRC/STR/BV-22-C [BSRC, Multiple BISes, LC3 24_1] Passed
+BAP/BSRC/STR/BV-23-C [BSRC, Multiple BISes, LC3 24_2] Passed
+BAP/BSRC/STR/BV-24-C [BSRC, Multiple BISes, LC3 32_1] Passed
+BAP/BSRC/STR/BV-25-C [BSRC, Multiple BISes, LC3 32_2] Passed
+BAP/BSRC/STR/BV-26-C [BSRC, Multiple BISes, LC3 44.1_1] Passed
+BAP/BSRC/STR/BV-27-C [BSRC, Multiple BISes, LC3 44.1_2] Passed
+BAP/BSRC/STR/BV-28-C [BSRC, Multiple BISes, LC3 48_1] Passed
+BAP/BSRC/STR/BV-29-C [BSRC, Multiple BISes, LC3 48_2] Passed
+BAP/BSRC/STR/BV-30-C [BSRC, Multiple BISes, LC3 48_3] Passed
+BAP/BSRC/STR/BV-31-C [BSRC, Multiple BISes, LC3 48_4] Passed
+BAP/BSRC/STR/BV-32-C [BSRC, Multiple BISes, LC3 48_5] Passed
+BAP/BSRC/STR/BV-33-C [BSRC, Multiple BISes, LC3 48_6] Passed
+BAP/BSRC/STR/BV-34-C [BSRC, Multiple BISes, VS]      Passed
+---
+ unit/test-bap.c | 302 ++++++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 294 insertions(+), 8 deletions(-)
+
+diff --git a/unit/test-bap.c b/unit/test-bap.c
+index 9b75cfc80..9dd7a45e8 100644
+--- a/unit/test-bap.c
++++ b/unit/test-bap.c
+@@ -6825,27 +6825,86 @@ static void test_bsnk_str(void)
+ 		NULL, test_bcast, &cfg_bsnk_str_vs_mbis, IOV_NULL);
+ }
  
-+#define BASE_LC3_8_1_MBIS \
-+	BASE_LC3(40000, 1, 2, LC3_CFG_8_1, 0x00, 0x01, 0x00, 0x02, 0x00)
++static void stream_count_config(void *data, void *user_data)
++{
++	struct bt_bap_stream *stream = data;
++	uint8_t *streams = user_data;
 +
-+#define BASE_LC3_8_2_MBIS \
-+	BASE_LC3(40000, 1, 2, LC3_CFG_8_2, 0x00, 0x01, 0x00, 0x02, 0x00)
++	if (bt_bap_stream_get_state(stream) == BT_BAP_STREAM_STATE_CONFIG)
++		(*streams)++;
++}
 +
-+#define BASE_LC3_16_1_MBIS \
-+	BASE_LC3(40000, 1, 2, LC3_CFG_16_1, 0x00, 0x01, 0x00, 0x02, 0x00)
++static void stream_count_enabling(void *data, void *user_data)
++{
++	struct bt_bap_stream *stream = data;
++	uint8_t *streams = user_data;
 +
-+#define BASE_LC3_16_2_MBIS \
-+	BASE_LC3(40000, 1, 2, LC3_CFG_16_2, 0x00, 0x01, 0x00, 0x02, 0x00)
++	if (bt_bap_stream_get_state(stream) == BT_BAP_STREAM_STATE_ENABLING)
++		(*streams)++;
++}
 +
-+#define BASE_LC3_24_1_MBIS \
-+	BASE_LC3(40000, 1, 2, LC3_CFG_24_1, 0x00, 0x01, 0x00, 0x02, 0x00)
++static void stream_enable(void *data, void *user_data)
++{
++	struct bt_bap_stream *stream = data;
 +
-+#define BASE_LC3_24_2_MBIS \
-+	BASE_LC3(40000, 1, 2, LC3_CFG_24_2, 0x00, 0x01, 0x00, 0x02, 0x00)
++	bt_bap_stream_enable(stream, true, NULL, NULL, NULL);
++}
 +
-+#define BASE_LC3_32_1_MBIS \
-+	BASE_LC3(40000, 1, 2, LC3_CFG_32_1, 0x00, 0x01, 0x00, 0x02, 0x00)
++static void stream_start(void *data, void *user_data)
++{
++	struct bt_bap_stream *stream = data;
 +
-+#define BASE_LC3_32_2_MBIS \
-+	BASE_LC3(40000, 1, 2, LC3_CFG_32_2, 0x00, 0x01, 0x00, 0x02, 0x00)
++	bt_bap_stream_start(stream, NULL, NULL);
++}
 +
-+#define BASE_LC3_44_1_MBIS \
-+	BASE_LC3(40000, 1, 2, LC3_CFG_44_1, 0x00, 0x01, 0x00, 0x02, 0x00)
-+
-+#define BASE_LC3_44_2_MBIS \
-+	BASE_LC3(40000, 1, 2, LC3_CFG_44_2, 0x00, 0x01, 0x00, 0x02, 0x00)
-+
-+#define BASE_LC3_48_1_MBIS \
-+	BASE_LC3(40000, 1, 2, LC3_CFG_48_1, 0x00, 0x01, 0x00, 0x02, 0x00)
-+
-+#define BASE_LC3_48_2_MBIS \
-+	BASE_LC3(40000, 1, 2, LC3_CFG_48_2, 0x00, 0x01, 0x00, 0x02, 0x00)
-+
-+#define BASE_LC3_48_3_MBIS \
-+	BASE_LC3(40000, 1, 2, LC3_CFG_48_3, 0x00, 0x01, 0x00, 0x02, 0x00)
-+
-+#define BASE_LC3_48_4_MBIS \
-+	BASE_LC3(40000, 1, 2, LC3_CFG_48_4, 0x00, 0x01, 0x00, 0x02, 0x00)
-+
-+#define BASE_LC3_48_5_MBIS \
-+	BASE_LC3(40000, 1, 2, LC3_CFG_48_5, 0x00, 0x01, 0x00, 0x02, 0x00)
-+
-+#define BASE_LC3_48_6_MBIS \
-+	BASE_LC3(40000, 1, 2, LC3_CFG_48_6, 0x00, 0x01, 0x00, 0x02, 0x00)
-+
-+#define BASE_VS_MBIS(_cc) \
-+	BASE(40000, 1, 2, \
-+		0xFF, 0x00, 0x00, 0x00, 0x00, \
-+		_cc, 0x00, 0x01, 0x00, 0x02, 0x00)
-+
- #define LC3_QOS_UNFRAMED	0x00
- #define LC3_QOS_FRAMED		0x01
+ static void bsrc_state_str(struct bt_bap_stream *stream, uint8_t old_state,
+ 				uint8_t new_state, void *user_data)
+ {
+ 	struct test_data *data = user_data;
++	uint8_t streams = 0;
  
+ 	switch (new_state) {
+ 	case BT_BAP_STREAM_STATE_CONFIG:
+-		bt_bap_stream_enable(stream, true, NULL, NULL, NULL);
++		queue_foreach(data->streams, stream_count_config, &streams);
++
++		if (streams == data->cfg->streams)
++			/* After all streams have transitioned to CONFIG
++			 * state, enable each one.
++			 */
++			queue_foreach(data->streams, stream_enable, NULL);
+ 		break;
+ 	case BT_BAP_STREAM_STATE_ENABLING:
+-		data->base = bt_bap_stream_get_base(stream);
++		queue_foreach(data->streams, stream_count_enabling, &streams);
+ 
+-		g_assert(data->base);
+-		g_assert(data->base->iov_len == data->cfg->base.iov_len);
+-		g_assert(memcmp(data->base->iov_base, data->cfg->base.iov_base,
+-				data->base->iov_len) == 0);
++		if (streams == 1) {
++			/* After the first stream has transitioned to ENABLING
++			 * state, bt_bap_stream_get_base will generate the
++			 * BASE from all previously configured streams.
++			 */
++			data->base = bt_bap_stream_get_base(stream);
++
++			g_assert(data->base);
++			g_assert(data->base->iov_len ==
++					data->cfg->base.iov_len);
++			g_assert(memcmp(data->base->iov_base,
++					data->cfg->base.iov_base,
++					data->base->iov_len) == 0);
++		}
+ 
+-		bt_bap_stream_start(stream, NULL, NULL);
++		if (streams == data->cfg->streams)
++			/* After all streams have transitioned to ENABLING
++			 * state, start each one.
++			 */
++			queue_foreach(data->streams, stream_start, NULL);
+ 		break;
+ 	case BT_BAP_STREAM_STATE_STREAMING:
+-		tester_test_passed();
++		queue_foreach(data->streams, stream_count_streaming, &streams);
++
++		if (streams == data->cfg->streams)
++			/* Test is completed after all streams have transitioned
++			 * to STREAMING state.
++			 */
++			tester_test_passed();
+ 		break;
+ 	}
+ }
+@@ -7078,9 +7137,236 @@ static void test_bsrc_str_1b(void)
+ 		NULL, test_bcast, &cfg_bsrc_str_vs, IOV_NULL);
+ }
+ 
++static struct test_config cfg_bsrc_str_8_1_mbis = {
++	.cc = LC3_CONFIG_8_1,
++	.qos = LC3_QOS_8_1_1_B,
++	.base = UTIL_IOV_INIT(BASE_LC3_8_1_MBIS),
++	.src = true,
++	.state_func = bsrc_state_str,
++	.streams = 2,
++};
++
++static struct test_config cfg_bsrc_str_8_2_mbis = {
++	.cc = LC3_CONFIG_8_2,
++	.qos = LC3_QOS_8_2_1_B,
++	.base = UTIL_IOV_INIT(BASE_LC3_8_2_MBIS),
++	.src = true,
++	.state_func = bsrc_state_str,
++	.streams = 2,
++};
++
++static struct test_config cfg_bsrc_str_16_1_mbis = {
++	.cc = LC3_CONFIG_16_1,
++	.qos = LC3_QOS_16_1_1_B,
++	.base = UTIL_IOV_INIT(BASE_LC3_16_1_MBIS),
++	.src = true,
++	.state_func = bsrc_state_str,
++	.streams = 2,
++};
++
++static struct test_config cfg_bsrc_str_16_2_mbis = {
++	.cc = LC3_CONFIG_16_2,
++	.qos = LC3_QOS_16_2_1_B,
++	.base = UTIL_IOV_INIT(BASE_LC3_16_2_MBIS),
++	.src = true,
++	.state_func = bsrc_state_str,
++	.streams = 2,
++};
++
++static struct test_config cfg_bsrc_str_24_1_mbis = {
++	.cc = LC3_CONFIG_24_1,
++	.qos = LC3_QOS_24_1_1_B,
++	.base = UTIL_IOV_INIT(BASE_LC3_24_1_MBIS),
++	.src = true,
++	.state_func = bsrc_state_str,
++	.streams = 2,
++};
++
++static struct test_config cfg_bsrc_str_24_2_mbis = {
++	.cc = LC3_CONFIG_24_2,
++	.qos = LC3_QOS_24_2_1_B,
++	.base = UTIL_IOV_INIT(BASE_LC3_24_2_MBIS),
++	.src = true,
++	.state_func = bsrc_state_str,
++	.streams = 2,
++};
++
++static struct test_config cfg_bsrc_str_32_1_mbis = {
++	.cc = LC3_CONFIG_32_1,
++	.qos = LC3_QOS_32_1_1_B,
++	.base = UTIL_IOV_INIT(BASE_LC3_32_1_MBIS),
++	.src = true,
++	.state_func = bsrc_state_str,
++	.streams = 2,
++};
++
++static struct test_config cfg_bsrc_str_32_2_mbis = {
++	.cc = LC3_CONFIG_32_2,
++	.qos = LC3_QOS_32_2_1_B,
++	.base = UTIL_IOV_INIT(BASE_LC3_32_2_MBIS),
++	.src = true,
++	.state_func = bsrc_state_str,
++	.streams = 2,
++};
++
++static struct test_config cfg_bsrc_str_44_1_mbis = {
++	.cc = LC3_CONFIG_44_1,
++	.qos = LC3_QOS_44_1_1_B,
++	.base = UTIL_IOV_INIT(BASE_LC3_44_1_MBIS),
++	.src = true,
++	.state_func = bsrc_state_str,
++	.streams = 2,
++};
++
++static struct test_config cfg_bsrc_str_44_2_mbis = {
++	.cc = LC3_CONFIG_44_2,
++	.qos = LC3_QOS_44_2_1_B,
++	.base = UTIL_IOV_INIT(BASE_LC3_44_2_MBIS),
++	.src = true,
++	.state_func = bsrc_state_str,
++	.streams = 2,
++};
++
++static struct test_config cfg_bsrc_str_48_1_mbis = {
++	.cc = LC3_CONFIG_48_1,
++	.qos = LC3_QOS_48_1_1_B,
++	.base = UTIL_IOV_INIT(BASE_LC3_48_1_MBIS),
++	.src = true,
++	.state_func = bsrc_state_str,
++	.streams = 2,
++};
++
++static struct test_config cfg_bsrc_str_48_2_mbis = {
++	.cc = LC3_CONFIG_48_2,
++	.qos = LC3_QOS_48_2_1_B,
++	.base = UTIL_IOV_INIT(BASE_LC3_48_2_MBIS),
++	.src = true,
++	.state_func = bsrc_state_str,
++	.streams = 2,
++};
++
++static struct test_config cfg_bsrc_str_48_3_mbis = {
++	.cc = LC3_CONFIG_48_3,
++	.qos = LC3_QOS_48_3_1_B,
++	.base = UTIL_IOV_INIT(BASE_LC3_48_3_MBIS),
++	.src = true,
++	.state_func = bsrc_state_str,
++	.streams = 2,
++};
++
++static struct test_config cfg_bsrc_str_48_4_mbis = {
++	.cc = LC3_CONFIG_48_4,
++	.qos = LC3_QOS_48_4_1_B,
++	.base = UTIL_IOV_INIT(BASE_LC3_48_4_MBIS),
++	.src = true,
++	.state_func = bsrc_state_str,
++	.streams = 2,
++};
++
++static struct test_config cfg_bsrc_str_48_5_mbis = {
++	.cc = LC3_CONFIG_48_5,
++	.qos = LC3_QOS_48_5_1_B,
++	.base = UTIL_IOV_INIT(BASE_LC3_48_5_MBIS),
++	.src = true,
++	.state_func = bsrc_state_str,
++	.streams = 2,
++};
++
++static struct test_config cfg_bsrc_str_48_6_mbis = {
++	.cc = LC3_CONFIG_48_6,
++	.qos = LC3_QOS_48_6_1_B,
++	.base = UTIL_IOV_INIT(BASE_LC3_48_6_MBIS),
++	.src = true,
++	.state_func = bsrc_state_str,
++	.streams = 2,
++};
++
++static struct test_config cfg_bsrc_str_vs_mbis = {
++	.cc = UTIL_IOV_INIT(VS_CC),
++	.qos = QOS_BCAST,
++	.base = UTIL_IOV_INIT(BASE_VS_MBIS(VS_CFG)),
++	.src = true,
++	.state_func = bsrc_state_str,
++	.vs = true,
++	.streams = 2,
++};
++
++/* Test Purpose:
++ * Verify that a Broadcast Source IUT can stream multiple BISes to
++ * a Broadcast Sink. The verification is performed for each set of
++ * parameters in turn, as specified in Table 4.82.
++ *
++ * Pass verdict:
++ * If the Codec ID is LC3, the IUT sends encoded LC3 audio data in
++ * BIS Data PDUs on each synchronized BIS.
++ *
++ * If the Codec ID is a vendor-specific Codec ID, the IUT sends BIS
++ * Data PDUs on each synchronized BIS. The parameters included in the
++ * Codec_Specific_Configuration data are as defined in
++ * TSPX_VS_Codec_Specific_Configuration.
++ *
++ * If the Codec ID is LC3, each parameter included in
++ * Codec_Specific_Configuration data is formatted in an LTV structure
++ * with the length, type, and value specified in Table 4.83.
++ */
++static void test_bsrc_str_2b(void)
++{
++	define_test("BAP/BSRC/STR/BV-18-C [BSRC, Multiple BISes, LC3 8_1]",
++		NULL, test_bcast, &cfg_bsrc_str_8_1_mbis, IOV_NULL);
++
++	define_test("BAP/BSRC/STR/BV-19-C [BSRC, Multiple BISes, LC3 8_2]",
++		NULL, test_bcast, &cfg_bsrc_str_8_2_mbis, IOV_NULL);
++
++	define_test("BAP/BSRC/STR/BV-20-C [BSRC, Multiple BISes, LC3 16_1]",
++		NULL, test_bcast, &cfg_bsrc_str_16_1_mbis, IOV_NULL);
++
++	define_test("BAP/BSRC/STR/BV-21-C [BSRC, Multiple BISes, LC3 16_2]",
++		NULL, test_bcast, &cfg_bsrc_str_16_2_mbis, IOV_NULL);
++
++	define_test("BAP/BSRC/STR/BV-22-C [BSRC, Multiple BISes, LC3 24_1]",
++		NULL, test_bcast, &cfg_bsrc_str_24_1_mbis, IOV_NULL);
++
++	define_test("BAP/BSRC/STR/BV-23-C [BSRC, Multiple BISes, LC3 24_2]",
++		NULL, test_bcast, &cfg_bsrc_str_24_2_mbis, IOV_NULL);
++
++	define_test("BAP/BSRC/STR/BV-24-C [BSRC, Multiple BISes, LC3 32_1]",
++		NULL, test_bcast, &cfg_bsrc_str_32_1_mbis, IOV_NULL);
++
++	define_test("BAP/BSRC/STR/BV-25-C [BSRC, Multiple BISes, LC3 32_2]",
++		NULL, test_bcast, &cfg_bsrc_str_32_2_mbis, IOV_NULL);
++
++	define_test("BAP/BSRC/STR/BV-26-C [BSRC, Multiple BISes, LC3 44.1_1]",
++		NULL, test_bcast, &cfg_bsrc_str_44_1_mbis, IOV_NULL);
++
++	define_test("BAP/BSRC/STR/BV-27-C [BSRC, Multiple BISes, LC3 44.1_2]",
++		NULL, test_bcast, &cfg_bsrc_str_44_2_mbis, IOV_NULL);
++
++	define_test("BAP/BSRC/STR/BV-28-C [BSRC, Multiple BISes, LC3 48_1]",
++		NULL, test_bcast, &cfg_bsrc_str_48_1_mbis, IOV_NULL);
++
++	define_test("BAP/BSRC/STR/BV-29-C [BSRC, Multiple BISes, LC3 48_2]",
++		NULL, test_bcast, &cfg_bsrc_str_48_2_mbis, IOV_NULL);
++
++	define_test("BAP/BSRC/STR/BV-30-C [BSRC, Multiple BISes, LC3 48_3]",
++		NULL, test_bcast, &cfg_bsrc_str_48_3_mbis, IOV_NULL);
++
++	define_test("BAP/BSRC/STR/BV-31-C [BSRC, Multiple BISes, LC3 48_4]",
++		NULL, test_bcast, &cfg_bsrc_str_48_4_mbis, IOV_NULL);
++
++	define_test("BAP/BSRC/STR/BV-32-C [BSRC, Multiple BISes, LC3 48_5]",
++		NULL, test_bcast, &cfg_bsrc_str_48_5_mbis, IOV_NULL);
++
++	define_test("BAP/BSRC/STR/BV-33-C [BSRC, Multiple BISes, LC3 48_6]",
++		NULL, test_bcast, &cfg_bsrc_str_48_6_mbis, IOV_NULL);
++
++	define_test("BAP/BSRC/STR/BV-34-C [BSRC, Multiple BISes, VS]",
++		NULL, test_bcast, &cfg_bsrc_str_vs_mbis, IOV_NULL);
++}
++
+ static void test_bsrc_str(void)
+ {
+ 	test_bsrc_str_1b();
++	test_bsrc_str_2b();
+ }
+ 
+ int main(int argc, char *argv[])
 -- 
 2.39.2
 
