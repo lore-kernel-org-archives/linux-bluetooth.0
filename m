@@ -1,68 +1,130 @@
-Received: from out-26.smtp.github.com (out-26.smtp.github.com [192.30.252.209])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f176.google.com (mail-lj1-f176.google.com [209.85.208.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A934C156646
-	for <linux-bluetooth@vger.kernel.org>; Tue, 25 Jun 2024 12:52:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.209
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5378D17C98
+	for <linux-bluetooth@vger.kernel.org>; Tue, 25 Jun 2024 13:50:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719319949; cv=none; b=iniYcR7bHhWF12bh6vzzdE+hdO4avsK13I6L9CF1z0zO7miNTWfLY/8Ex50Jm4OnO9qqEe0gIc3mLm3b+jBaVTWqm+mHqp+ESkPwU9RUewpaKR5b85L3clVFxCxRKl7O8xiG+S3QUzA5seBlGRgJIOTsHr7D/BaKYVvkU+EAJ1I=
+	t=1719323407; cv=none; b=Z8EyXcTermqkQ3t/J0pPcIgKVHAAtQcF8dWzQdWiAu8u0iEhz45ekHONDhZhblH4E83UJaSfIV3iGDgeMnvxkgOxQxPFbEiIwdzKXaOGJKS/wtGGAwm8aTDBIgx9YjLKb/deCiTPEdhUAwTtVw1OBgDGoFUbUIjjnsont1YAmpM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719319949; c=relaxed/simple;
-	bh=GDNjbSjT8bGx6O5Nc74+6BXMdGllq0AXtkRO9rpaFXQ=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=SeVDmCFZ3FhiTa/Ph5cr1FgbcDflWMUhHZo1U90YlDWrnuQQL3F88sP2NyEgorGS0SyENNmghKn2gS27bewXDxwnyKGHgaEWAiPuljDelGEN0tQhgMwSE7ifti6W8Lg+wrY+PSwSbdhD94ptN/GldoiKo3YqGWzXJWkPLfaBR5A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=J3+o4bij; arc=none smtp.client-ip=192.30.252.209
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1719323407; c=relaxed/simple;
+	bh=lPkR57PaUJiozhuNqHBvDwUcbcDx6dgY1VlLL75ZBds=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=EMVGd3dR/erDywT/COdAAY/1VB02KgZ4KYC3CHKuXDsbBOS6HFIfclACP75Ujq3sHfOfWUJ47gGWD7q8N7bZvYTU+bw5AeII0GRIR1HctACcGHv+/T2vvCm/yjajk7JOdWegEZN3gpxZyHIHH0kA41JhW3GnWYlxlZPn9XVU290=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CpIOYdnd; arc=none smtp.client-ip=209.85.208.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="J3+o4bij"
-Received: from github.com (hubbernetes-node-5a2bf5c.ash1-iad.github.net [10.56.128.54])
-	by smtp.github.com (Postfix) with ESMTPA id CECB1601280
-	for <linux-bluetooth@vger.kernel.org>; Tue, 25 Jun 2024 05:52:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1719319947;
-	bh=QNm7tOw2+F23NO0eivK75xbVXgBRGy1B3DLTyWPJ8fo=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=J3+o4bijuxoXFIkmHEvWphsKOtmcx+m3ZutP+Nl3nzuBt54U4W3u4DvBMl9TKONFX
-	 4o9F9F7/GpV/N+kHJ9CNYO7F6ex6EQscz7+qqPj/a0A4iTIuEuc1D19XruxERSkB3S
-	 PSwidurTZ8x6pEfdNe2pkr/ZuGpscHrzljbEDwqc=
-Date: Tue, 25 Jun 2024 05:52:27 -0700
-From: Luiz Augusto von Dentz <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/master/2bd25c-5ebaea@github.com>
-Subject: [bluez/bluez] 5ebaea: hog-lib: Fix passing wrong parameters to
- bt_uhid_g...
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CpIOYdnd"
+Received: by mail-lj1-f176.google.com with SMTP id 38308e7fff4ca-2ec61eeed8eso24523891fa.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 25 Jun 2024 06:50:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1719323404; x=1719928204; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=x58qO/tK3eO4BJzDJbXsHqtuIx6wnD4Fqs7aw59Rias=;
+        b=CpIOYdndhq/ESvsiPQL/1fH7cEPUMgjksV0WSQ/uzZ/O1lG+bmXMwr8ZlIONV7wzv1
+         Wa50yHxsg7S0BbEC1RubEu+7f1FC0hNeIXnWtHlt9lxgziQc0z5S/FoIucmue0lxoFUU
+         f9bt8aMqdFnXmo+Hc4hhNtC7QANwFJeCoyFiJd0xOYpMJd00vNDxp2uJwQ2hO7eNwYRk
+         MhsaaL2lfU33kDlx7vf5aYpcEDZ4Zl3cGDWEG7MIkcwtE3LRLGGQKJ3sON78zgC7+d3Q
+         Or5GxROIoQueH4fdComyEHDn9dCYYKDOpg9oko9tHa+/amAxZpP2TRdA3pzZAw51AIEr
+         MC1Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1719323404; x=1719928204;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=x58qO/tK3eO4BJzDJbXsHqtuIx6wnD4Fqs7aw59Rias=;
+        b=CTx1J5i6j30Rrib81+4vmI2BTtHwltZoNPREiKB7fFZI/UYV57icgI8EsLNtdGjm5N
+         GxxwQRdZ4T+2ICFlZ645rsguK4C9l3WBwtHn4sGUkTarRSLD4xoZfpLQavoDSSq9jvd7
+         J/D43Oj+Gs8b5gsCRMWCrBRsARtruTb7j0chFnYAfTKgKmEI4p856KvE40/lG25Y5YTc
+         ZHjIpjijHyyPp1bMzfbA3QwzIAFKW6GBm1SeZBqIZxXqEofoCnV80ehWRSxprdt4qQsO
+         y4Gc06DoEMUJt2vtwG2Xz/PFw4ifkVF3omKizn4E5jN9Ib+hkQx+2ZWhKlPZ2Z1aOhy/
+         usLQ==
+X-Gm-Message-State: AOJu0YxZ3WoXJvLg08K2m4JbgwYrh2xmoG+PwnDtnVqp/wXfRRT0ckv0
+	zii3B4oaGLw0n7P++Eit/B4lvCSb7vwczjr9p86Zvvl3DSvWRmZUNTbdflq6A5uuUPQNzwj4uNn
+	yGOqRPWsLvNpi42vrAxhcKdU7aoNFyZpf4Bg=
+X-Google-Smtp-Source: AGHT+IFXWWTZze1xrrGW/NzJOEwEW/DHUC1wr75ULTicznAztfNcpViH6c1Apum1jw6klvu4rmLbRMaNJVh3kEF9aaE=
+X-Received: by 2002:a2e:720b:0:b0:2ec:4096:4bc6 with SMTP id
+ 38308e7fff4ca-2ec5b318000mr43258811fa.7.1719323404080; Tue, 25 Jun 2024
+ 06:50:04 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+References: <20240625063533.30536-1-quic_amisjain@quicinc.com>
+In-Reply-To: <20240625063533.30536-1-quic_amisjain@quicinc.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Tue, 25 Jun 2024 09:49:51 -0400
+Message-ID: <CABBYNZJXjxL8_ZB6k6Paa3rg5b7nu08==NZzo73a85XcQwy5fg@mail.gmail.com>
+Subject: Re: [PATCH v2] Bluetooth : Update the mas session structure
+To: Amisha Jain <quic_amisjain@quicinc.com>
+Cc: linux-bluetooth@vger.kernel.org, quic_mohamull@quicinc.com, 
+	quic_hbandi@quicinc.com, quic_anubhavg@quicinc.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-  Branch: refs/heads/master
-  Home:   https://github.com/bluez/bluez
-  Commit: 5ebaeab4164f80539904b9a520d9b7a8307e06e2
-      https://github.com/bluez/bluez/commit/5ebaeab4164f80539904b9a520d9b7a8307e06e2
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2024-06-24 (Mon, 24 Jun 2024)
+Hi Amisha,
 
-  Changed paths:
-    M profiles/input/hog-lib.c
+On Tue, Jun 25, 2024 at 2:36=E2=80=AFAM Amisha Jain <quic_amisjain@quicinc.=
+com> wrote:
+>
+> Update the 'mas_session' structure such that
+> manager_emit_transfer_property(os->service_data, "Size")
+> will get the proper structure in arguments as
+> expected like structure 'obex_transfer' and transfer->path
+> won't be populated with inappropriate value.
+>
+> As there is no new transfer registered during mas connect,
+> hence setting the path to NULL to avoid invoking the
+> g_dbus_emit_property_changed() property.
+>
+> Signed-off-by: Amisha Jain <quic_amisjain@quicinc.com>
+> ---
+>  obexd/plugins/mas.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
+>
+> diff --git a/obexd/plugins/mas.c b/obexd/plugins/mas.c
+> index 10b972d65..71bf12ad3 100644
+> --- a/obexd/plugins/mas.c
+> +++ b/obexd/plugins/mas.c
+> @@ -51,6 +51,8 @@
+>  #define ML_BODY_END "</MAP-msg-listing>"
+>
+>  struct mas_session {
+> +       uint8_t notification_status;
+> +       char *path;
+>         struct mas_request *request;
+>         void *backend_data;
+>         gboolean finished;
+> @@ -59,7 +61,6 @@ struct mas_session {
+>         GObexApparam *inparams;
+>         GObexApparam *outparams;
+>         gboolean ap_sent;
+> -       uint8_t notification_status;
+>  };
+>
+>  static const uint8_t MAS_TARGET[TARGET_SIZE] =3D {
+> @@ -125,6 +126,7 @@ static void *mas_connect(struct obex_session *os, int=
+ *err)
+>                 goto failed;
+>
+>         manager_register_session(os);
+> +       mas->path =3D NULL;
 
-  Log Message:
-  -----------
-  hog-lib: Fix passing wrong parameters to bt_uhid_get_report_reply
+There is something missing here, you introduce a new field and set it
+to NULL but you never use it?
 
-The parameters of bt_uhid_get_report_reply are number followed by
-status, not status followed by number, so the order needs to be
-swapped.
+>         return mas;
+>
+> --
+> 2.17.1
+>
+>
 
-Fixes: https://github.com/bluez/bluez/issues/880
 
-
-
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
+--=20
+Luiz Augusto von Dentz
