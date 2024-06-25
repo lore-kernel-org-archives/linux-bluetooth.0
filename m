@@ -1,55 +1,55 @@
-Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
+Received: from mail-yw1-f182.google.com (mail-yw1-f182.google.com [209.85.128.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23EB9143C67
-	for <linux-bluetooth@vger.kernel.org>; Tue, 25 Jun 2024 08:50:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D4551474D4
+	for <linux-bluetooth@vger.kernel.org>; Tue, 25 Jun 2024 08:55:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719305417; cv=none; b=oQyVL+kSdfXrnnmyWx4f7ABh8a16whqzGlIcyXmj+aPryiNvMjK0Q6MxeNHy/EzRBhded0+x6yE+x/iJ1ZSYjE+x1x0CC3WWUU7Wp5C1dBSUuGbZraPJ6/WH3J4OiWAR8WmN5gZepCRFDFShmR2VyfLgDwSrLaNK0R6s12yxQcs=
+	t=1719305731; cv=none; b=u6gbkCjhm/SiWttTWJNMq9bw2fSAWpunC7Mz4LsaQ1dGeEwPTgZXxUtJFleys9v2pCIbmNjfoRhZveTMR1mRItQfL2QbG2pSC5czepYXFgXN0h3t89M6jRFfUWdfEKR2YPFD92XCZ/ty1cG6bpv9Hu7QAUvYAMdEGuqADPMDS/U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719305417; c=relaxed/simple;
-	bh=K928MGnZ+PjaLzHLPDP9/9l4mTcymRGUKsFIfW80nj0=;
+	s=arc-20240116; t=1719305731; c=relaxed/simple;
+	bh=SH4aPTnlaAYgonWlc8AMhuTyD0/8JxTo055Gu9yTdMg=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=PHWGeaCALywMNqVjAkrshe9OAodRr8TAL64eEPUw+HILbXeHG88JYohkCiBbV0VsPEcEQNgvNGN4175s2a4k8xrzbXxpKtfBWP4UoviP0AvIo7iimXgQoWI+3BbBUBX8TZF/NUDWmeD+koPZ3tXppxzQN6nPXpL9TRotMhdeb44=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=jy+gPuMe; arc=none smtp.client-ip=209.85.210.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
+	 To:Cc:Content-Type; b=DeFW95GiJHJk+qFsG6U76g/JttjcL7vKen+hA05boa86UD89GfmrhW5GcJma4PO0oi5UnohsSQpakW5MatT8+iNMoFrg+PM/gEgGJKTqSmhlmah2vwQ5kzb8vU0cL8RgVPYoI85+tx4Ji6Xn310sGL/u8HaoxLghOUtdhZi+Wmc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=hUSH+T+Y; arc=none smtp.client-ip=209.85.128.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="jy+gPuMe"
-Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-7066463c841so2113674b3a.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 25 Jun 2024 01:50:15 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="hUSH+T+Y"
+Received: by mail-yw1-f182.google.com with SMTP id 00721157ae682-643efaf0786so20565557b3.1
+        for <linux-bluetooth@vger.kernel.org>; Tue, 25 Jun 2024 01:55:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1719305415; x=1719910215; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1719305729; x=1719910529; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=K928MGnZ+PjaLzHLPDP9/9l4mTcymRGUKsFIfW80nj0=;
-        b=jy+gPuMerNtFCZewrxSBcGOXmWUKDlR6erzPh8blFqFrtzjoDs8Gaa/Eb+2zzBdUjx
-         NV1q2yYl4keF+hCFb4NfNUPC2shwOhXstDXwUiuabC1sanVmg/eScCrc5crivgpfO3DD
-         6q9QtxsA2A0Qpz56ZPA80dA3nbhEk9kiQGmqQIKkK36Qr6I8BM0ovK7s7DZRohli9i7J
-         nTaM+oNRlUYKX00dnEt9iNNFBfeNMFOBbfc1iZQ6mQzDlW1pCMl3RuvJZmLMq6D6CO7c
-         ncMqdrY+yH0UFNIV5FGdJShPg7u0RhdObSZCiWVH8hG7Tg0w3Hb7XwN0u+vI6AvN4EOi
-         YuyA==
+        bh=SH4aPTnlaAYgonWlc8AMhuTyD0/8JxTo055Gu9yTdMg=;
+        b=hUSH+T+Y58BtGoJQhTkdjeyXSND42CJKfsR1j7DPc8E68yv+496v2eb4un7xUMPjzc
+         tWKTwnxlTHkOHuHKcSqgPVaqeYyM/GGk7Xv9LrlZ8ustDr84BeDU64Y/0UnN5wwEnaib
+         j980+sksfDzpqbey2uQzzkI7cPf1RGFU9x6Ud9qiXqy4yVVHb9weR+Z29niRxZxAsM9n
+         rHK83Fn18tgIOSvVuUUe7VegIG+7/sddNAdbqkFpF5WaNxMF29frcNhz1DtmQnZJHPHo
+         AkCP7d69dI4Tv3H8OUnHt2ZiZL1p3F5g+96LdO1k906e5EkbkWK+9MFqI9qT1M72Lsda
+         IffA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719305415; x=1719910215;
+        d=1e100.net; s=20230601; t=1719305729; x=1719910529;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=K928MGnZ+PjaLzHLPDP9/9l4mTcymRGUKsFIfW80nj0=;
-        b=aZquDPinRcuFA0AiNPbVEy9iZgOsZ+PXt+uqkk56ndt/0IolyoSANX3o5MdL1x/nZ3
-         khE5mCgkb4fiAuZhEA00H+wJuOXwLP65XTSedZOVFVOwZt+F1nuiGwEq7jyUy00Ptdtn
-         yDnOMJSvfhI9s1uXNKV3sbKOPEjGrHSXQsdIIKOE9DP4kxSwbPDkn/bX56MZPaD+b5bI
-         LwYD3SwcN6OlN+z75FJSLBWjQFPEQXa94o6B+/qGIBT20kjxsUIvVVn5iLAuNgrMvORI
-         uOdkmsYxg9rK989iZObQ9nENX8YUT4djJJAyXuQPBTbCK3ERqvEEwC49khy8QmVl1hJr
-         P2ew==
-X-Forwarded-Encrypted: i=1; AJvYcCWnH7WqaON+TLL04EE9ce6s3SZo8sYmCfACYjkKUIxvSwKIp9GATd4Y9gYNDzGTB5Xs3aQFMaEblfDiQaDHHFhjVpJs6UQD8AFsTmD6Xcnr
-X-Gm-Message-State: AOJu0YwROk9q34Jd5ZsJNmL2qOK+62cY3qCCKxAcnPvSas6+3ikRIUMw
-	Owcy1Zpb6V0XWanEIc9rt/0G1x8/hhrn4+SsS5vIgtD5SBUdQsXK9SmsgtZd6f2lyYcppsFI9hu
-	Asc7VcrFdH23BlAkF8JoUrbbxqNHuo0W/C/OWqkOAUX8NngLm
-X-Google-Smtp-Source: AGHT+IGxy8QyMvcw1+/Aoy8XRE8HcZMjuOCDtdp7FQmo+RVPhWwYnuL8Yg1nPrRC+yDhUbYdwhD3QkFV54cdkTtZHzU=
-X-Received: by 2002:a05:6a20:8422:b0:1b5:8552:3922 with SMTP id
- adf61e73a8af0-1bcf7e32860mr7662957637.3.1719305415296; Tue, 25 Jun 2024
- 01:50:15 -0700 (PDT)
+        bh=SH4aPTnlaAYgonWlc8AMhuTyD0/8JxTo055Gu9yTdMg=;
+        b=beBm/7yz14woXNjSdEU0BafkZOYe4pkJ0SzOL3rZ3WJkkSTkY3lsXBmme8fPWtAR5n
+         plK1zZq7d/NfQtM02uxzO7jcVmnA/d/NrXqifWv1JDLz3Gcjim76Sx9El3WHyLzw4Xeh
+         cO6FNKfolWeEgsMh3NpeLD95fGagtbRn68t9xBkg7yyvTVTZ+aLyexlyTc47WzAHVc9l
+         VyZARgYTxhHE8gG+ivuPsLo+1CFbIcqEWdROFbgBFk28j5OnLDiAXVRhaTzQBRsAL3ID
+         +xI0knD9OCTYdpKfjKFxW/5KKAY0u20fklYEt/adhwiUjVlbw+DWMSFqQSzoaSjCh9IC
+         0Nsw==
+X-Forwarded-Encrypted: i=1; AJvYcCXIDnHI6p53Mls3aDnI7WceiTnffHXOMKKQmkYxDiKH9+yZf9t43jKomqSAeBaHWY8FWewM2RCsTmpL6uMskWBE6NBtUeByZZhegFK7fZWG
+X-Gm-Message-State: AOJu0YzgYi7YUIMMSrMf8V05iMvTN5HiieMiaz7QE0D/4d4Ibdy85PqH
+	xMDQ+jmG5LZ8B/oJnJcgqX3VqFywItvSs5NANa9ziaxAdSg7jEEPZUaO+Uth+P1t9KLLPOdFC5c
+	OA6J7P1OEd50PzYazkSrByNv2hiiu9ZUfVzTT/A==
+X-Google-Smtp-Source: AGHT+IE2fiY7Br3ex/7BAQtI2a+Y/rx5p/TZN7J3haCZToE3U9rlFaeHmgWC3DsztqmV+KnD1SaNV3qAYy3Vk3TOMmw=
+X-Received: by 2002:a05:6902:243:b0:de4:828:b73c with SMTP id
+ 3f1490d57ef6-e03010eea58mr6447948276.54.1719305728939; Tue, 25 Jun 2024
+ 01:55:28 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -59,45 +59,54 @@ MIME-Version: 1.0
 References: <20240624194518.37458-1-brgl@bgdev.pl> <CAA8EJppMPeYrPH+ssDMnf6UwHRdKQetpY3PotGvR-cc2vE68AQ@mail.gmail.com>
  <CAMRc=MeYy8MgBVbwmrR1Rd9oQMz1tUb+uL4eFJWTL7EOsRXxjg@mail.gmail.com>
  <CAA8EJpqz7wPSyn0ybDWKwBKkp+rWVPbTgjbKuG6VHWm24MCusA@mail.gmail.com>
- <CAMRc=McZ+hrXyNESmf4pFX9+uDnc4AKsuO9X8AJsVgCfQVLd9Q@mail.gmail.com> <CAA8EJpo2_3zSYEfyQ0VwSs9AkeXUpcVRGB+LaRAhA=_SWjrhtQ@mail.gmail.com>
-In-Reply-To: <CAA8EJpo2_3zSYEfyQ0VwSs9AkeXUpcVRGB+LaRAhA=_SWjrhtQ@mail.gmail.com>
-From: Bartosz Golaszewski <brgl@bgdev.pl>
-Date: Tue, 25 Jun 2024 10:50:01 +0200
-Message-ID: <CAMRc=McPZKYoxWYJ3U35CXYbBdwYBuemBwBC-qA5hhpqqTYBjg@mail.gmail.com>
+ <CAMRc=McZ+hrXyNESmf4pFX9+uDnc4AKsuO9X8AJsVgCfQVLd9Q@mail.gmail.com>
+ <CAA8EJpo2_3zSYEfyQ0VwSs9AkeXUpcVRGB+LaRAhA=_SWjrhtQ@mail.gmail.com> <CAMRc=McPZKYoxWYJ3U35CXYbBdwYBuemBwBC-qA5hhpqqTYBjg@mail.gmail.com>
+In-Reply-To: <CAMRc=McPZKYoxWYJ3U35CXYbBdwYBuemBwBC-qA5hhpqqTYBjg@mail.gmail.com>
+From: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
+Date: Tue, 25 Jun 2024 11:55:17 +0300
+Message-ID: <CAA8EJpoEUyBmi5_Zb0m0TVYi1BAMuqNfdDL7rdsTK6rxjsGpVQ@mail.gmail.com>
 Subject: Re: [PATCH] Bluetooth: qca: don't disable power management for QCA6390
-To: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
+To: Bartosz Golaszewski <brgl@bgdev.pl>
 Cc: Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
 	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
 	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Jun 25, 2024 at 9:47=E2=80=AFAM Dmitry Baryshkov
-<dmitry.baryshkov@linaro.org> wrote:
+On Tue, 25 Jun 2024 at 11:50, Bartosz Golaszewski <brgl@bgdev.pl> wrote:
 >
-> On Tue, 25 Jun 2024 at 10:46, Bartosz Golaszewski <brgl@bgdev.pl> wrote:
+> On Tue, Jun 25, 2024 at 9:47=E2=80=AFAM Dmitry Baryshkov
+> <dmitry.baryshkov@linaro.org> wrote:
 > >
-> > On Mon, Jun 24, 2024 at 11:20=E2=80=AFPM Dmitry Baryshkov
-> > <dmitry.baryshkov@linaro.org> wrote:
+> > On Tue, 25 Jun 2024 at 10:46, Bartosz Golaszewski <brgl@bgdev.pl> wrote=
+:
 > > >
+> > > On Mon, Jun 24, 2024 at 11:20=E2=80=AFPM Dmitry Baryshkov
+> > > <dmitry.baryshkov@linaro.org> wrote:
 > > > >
-> > > > Neither of these has clocks that need to be driven by linux. The on=
-ly
-> > > > user of QCA6390 Bluetooth in mainline is RB5. Bindings didn't exist
-> > > > before so no commitment was ever made.
+> > > > >
+> > > > > Neither of these has clocks that need to be driven by linux. The =
+only
+> > > > > user of QCA6390 Bluetooth in mainline is RB5. Bindings didn't exi=
+st
+> > > > > before so no commitment was ever made.
+> > > >
+> > > > This might make some laptop users unhappy.
 > > >
-> > > This might make some laptop users unhappy.
+> > > Like I said: without upstreamed DT bindings, we have never made any
+> > > commitment about the device properties. I doubt anyone will complain
+> > > though, I haven't seen any DT with QCA6390 with clock properties yet.
+> > > I wouldn't stress it for now.
 > >
-> > Like I said: without upstreamed DT bindings, we have never made any
-> > commitment about the device properties. I doubt anyone will complain
-> > though, I haven't seen any DT with QCA6390 with clock properties yet.
-> > I wouldn't stress it for now.
+> > I was thinking about x86 laptops / M.2 cards. I'll see if I can locate =
+one.
+> >
 >
-> I was thinking about x86 laptops / M.2 cards. I'll see if I can locate on=
-e.
->
+> I don't get it, how could they ever get the clocks property without it
+> being defined in firmware?
 
-I don't get it, how could they ever get the clocks property without it
-being defined in firmware?
+The clock and bt_en are optional.
 
-Bart
+--=20
+With best wishes
+Dmitry
