@@ -1,59 +1,55 @@
-Received: from mail-lj1-f176.google.com (mail-lj1-f176.google.com [209.85.208.176])
+Received: from mail-yw1-f170.google.com (mail-yw1-f170.google.com [209.85.128.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEEE9146588
-	for <linux-bluetooth@vger.kernel.org>; Tue, 25 Jun 2024 06:50:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27B33145B20
+	for <linux-bluetooth@vger.kernel.org>; Tue, 25 Jun 2024 06:57:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719298245; cv=none; b=sPsl7FaoxEkBjs25ZerU6jRG12gKgTyzC6kjKHynArIFvZv+O8+WW3MkzEVrgzaYNulgtylz/ijxNMBCQ4a3nk/vxBJcdlq5C30u1zRCx1jnE4oEvzc7+zsR6yQtrraBHVJF+zG4efNlGUy87/08VLb3OqE77kfimk7+wc0aHq0=
+	t=1719298646; cv=none; b=SBzsXtKBKqmqOfdXcwty2cL1Dgz/GVXYsliuVKQd6tmMSlFoUiPRP1A/SkM1/0vWkGy9/6aOM72rUbpwb4OM0RzCLBQclQr4sdE3YLF1bJcWp5nIDZ+C2DNr51YFJd7Z6jgW6zzXxC7LNAj+sZrvgaxLy5X4MFlFG2yvue5dg2M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719298245; c=relaxed/simple;
-	bh=Ak42HIwgeEH4DyPlzeg42twhBvMY328BsqJJAvJ56z8=;
-	h=From:In-Reply-To:MIME-Version:References:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=bbO2IXq/m9zr0OZtt0nCIOF+M+9npyVzK4dBWCJzu6axDcfQAfHVC9kgz1r5WwoG5+5WgFOivjq32C0UAQbXe6dmQCd5ztqtB3/pY9x3pfycnhrdsj/EUvQCnpqsKRj7fiWhkxrN/JrzmLIkW51b49StkbGg3bHYfId7ONfUGRM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=fgR7uXqJ; arc=none smtp.client-ip=209.85.208.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
+	s=arc-20240116; t=1719298646; c=relaxed/simple;
+	bh=9bwQGGR/wyIdfMAsvGQ9dzDTbZwlGTht+mu4n+QPefg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=WPRl5FE+8xAWqM4we79CJ0LmryV1Ga2nGlmwy99lPVZ08Oj9r1rMSVGKEBVjQMQ/ws0y/b4aoGxWnlLPWSyq83xpnHRLZBSKssYwgoUylGuhaJEPDJqoPgFTPkUEKgPGDPdx9kzir1xtK6Z8iNDH3ihw0UZ47mfGf92lhSzwlSw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=Ppy5c9v3; arc=none smtp.client-ip=209.85.128.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="fgR7uXqJ"
-Received: by mail-lj1-f176.google.com with SMTP id 38308e7fff4ca-2e72224c395so56363401fa.3
-        for <linux-bluetooth@vger.kernel.org>; Mon, 24 Jun 2024 23:50:43 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Ppy5c9v3"
+Received: by mail-yw1-f170.google.com with SMTP id 00721157ae682-63174692a02so47896087b3.0
+        for <linux-bluetooth@vger.kernel.org>; Mon, 24 Jun 2024 23:57:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1719298242; x=1719903042; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:references
-         :mime-version:in-reply-to:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=TyOWEJ3RHrELUq33jeWpDKHaK+Gt6P4Gj6fOnObAdFU=;
-        b=fgR7uXqJjY0jzd4k8JYUNDfPpqzQtr/vBHE1FTyVKVTsMJurKUzUzwSflnT0d7pl7P
-         F0hCbsOZO1NKyQ01wjwbVIIz1gi7yJ5a9/soxRUQhSRVmUhhoiwGaP0YQAMWZv6fGOuv
-         2p2nxnnh3uITGSUA63MQPMuI3kxrFu4/FU3hfRLDBQzE6Rg56VuXJO1Cn4n30JnWgRoh
-         OSHLxzd0fZWYvZA9KgcbzIiN0R/ae1V+mQJMFSOX7EtLNH94TIgrqWS4OuaLeMesB4T/
-         +RpNc2nNzlt1Ezqgv5qC6wqS1aEXY35yh5c5nEzx8JIljsCNAnnxlyM+5KsdMG+Cc009
-         RXxA==
+        d=linaro.org; s=google; t=1719298644; x=1719903444; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=rDmIfuJcogCN48ne3+t+LsUj7I8L6ToirSOH5B1KCCI=;
+        b=Ppy5c9v3UDf7dNKdkMc5NtogPQkRL5tKCY+76M0n48wyds0x41+35aG5s6QgbjEGwk
+         9CA2qdHLx7tEXmwHFORWItwR5boD7bbtuFpXFrBxJs0R3rVUAK208zCpzxNd7HVpKetn
+         Mn9gvw5NOuCUDMxyKbBfr0vHIWLB238YTy0Rn2ZcUn9LeO2IVWaCfWYNAUKYMbWfqqx7
+         l1jpSgeSQ/ym191DPmz+P5CdcmN6o+dUwljB4YixrVI5QKjebsvPzOD2uwVvlDbs0c0A
+         EiX6MqWlSfpxR0pADmnStBVXFm3dEVuhxp0JtOFEkAa9tjyynJ4KuaTOrlo3O7fQMjzi
+         Afww==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719298242; x=1719903042;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:references
-         :mime-version:in-reply-to:from:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=TyOWEJ3RHrELUq33jeWpDKHaK+Gt6P4Gj6fOnObAdFU=;
-        b=iv6K53sn2EcatO6ZFlLHx9yszvBrLG4cEQB+6xJueKp9blrTJtVD98m8osCLq+X5mi
-         ylQo+Pwjf/0VVnWkV8nuFIEaZqfonn9fvzXXALt+idAjyBZsyrHRUhbXLUgGEaNYdTrl
-         YM08WcjGrgZEmnDOQOqFpjAznM43mkkfB5YM7Cg3WdCYIS4/CdtnEhUxu41VfM/txkHg
-         seMqteHA4xNmDjzhG1AiQKmewUVil7z1BV2GjraDSmtL8NzeZRn8z0UvLeLJ45cVwVHv
-         thw+0oSa3R35ioiTMtHhszbKb8SYQSZ0RZniwtrRZpfg+tZqnA7shPWiy4Ci4csv35/R
-         FTEQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVThp3ZZEe5eIabGi2HyAqbswuETpLomatvavJYZY4jrjOO2NXJt1oK1LIWDBNgeNqkwy1BSGp7dlJBdMYHqB6IJdMhcDSpri89ulPEUj5S
-X-Gm-Message-State: AOJu0Yy0+GUmcNOIdQYo8eHnXNOIH5Tflm4T7qXlKUy6YPyp6W9kNWV/
-	xE6cE0sk1Onr010WrUFGsJkfKlYZrsDAFTotaj+wH6EkL/68b34axM2J2g82BNAAbqPdUdnsONQ
-	d2Fuow9/qwiSFdusE+9/Mpo+Wqpk3bD5xhlBl0w==
-X-Google-Smtp-Source: AGHT+IGMKuOXH6xILN8PhK7FRckdDUIeSH0949RCCJGULK07SEfVSyU2Yf41ezKCYinzxxTPtsijiHjooK3Q3WrTV9E=
-X-Received: by 2002:a2e:b1ca:0:b0:2ec:5258:e890 with SMTP id
- 38308e7fff4ca-2ec5b2e90b3mr36514221fa.44.1719298241674; Mon, 24 Jun 2024
- 23:50:41 -0700 (PDT)
-Received: from 969154062570 named unknown by gmailapi.google.com with
- HTTPREST; Mon, 24 Jun 2024 23:50:40 -0700
-From: Bartosz Golaszewski <brgl@bgdev.pl>
-In-Reply-To: <CAA8EJpqz7wPSyn0ybDWKwBKkp+rWVPbTgjbKuG6VHWm24MCusA@mail.gmail.com>
+        d=1e100.net; s=20230601; t=1719298644; x=1719903444;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=rDmIfuJcogCN48ne3+t+LsUj7I8L6ToirSOH5B1KCCI=;
+        b=RDnfnXbODWwr5wY1cx8sosCLl6EovHrhJdLMHgb6BuTozvppwIQMUf3x+rhVbHfSPw
+         6Wv36q9P7CKgXx/paTfvMoaFP45noTqyHiaLwEyn3hOhsqGu5Ch1XT4ACoRmM4m5Nzqj
+         v04+Pb7TSMG5RFYVWv1UM+2aoLzdi5SqEQYwqUD7zE/4eOIuCgccmmIAaPMKPgf+yMxb
+         tdrwdUmEJ574Z/Q2DWfImmwXtO1QT6LEQCohG8FrxbbeEfY7NUbl8TP1ShNrBri8CQrZ
+         K0oJ8wzbXVw7CLP2c6aCJJIeHT8Y42kz0cUfrWXO4bjeyMlcJZPytHfR5wwhNVJhvFC8
+         UUbQ==
+X-Forwarded-Encrypted: i=1; AJvYcCW0m3GfAFxFD+JMEnLNCFW7uXPWFTIrrDtvx8ZGH2RkLH993mh1QMH83IwcZ0W8/sRUC7M9WOrOA11VcIUEgLdIoU7UuqAMSLpeIN+afYGx
+X-Gm-Message-State: AOJu0YzoaOqJIKgvNLhX318Zh9KWsy/fiwD+MpAP/UyuGXEVcudzN3YE
+	0LwUpu3K4uUlGaXLvgtMq7X6pPCmjwHka4xd0zYFXHMOvREgamWFWZ7r+h+iDHTsDOy0R9eNfhe
+	DJ9Y1MCII07VGrNawptgJ7b1mrV2RicFktXTdLg==
+X-Google-Smtp-Source: AGHT+IGripGlc3e99ZcQ7A/cB5i8DPUq0WPOuQjyoddclsAtiju4Lk8yaZqQa5u8RSMpSSF6OCkcO3tGgbtiw1qoIu8=
+X-Received: by 2002:a25:a029:0:b0:dfb:812:af06 with SMTP id
+ 3f1490d57ef6-e0300eef36bmr6622618276.10.1719298644096; Mon, 24 Jun 2024
+ 23:57:24 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -61,143 +57,99 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 References: <20240624194518.37458-1-brgl@bgdev.pl> <CAA8EJppMPeYrPH+ssDMnf6UwHRdKQetpY3PotGvR-cc2vE68AQ@mail.gmail.com>
- <CAMRc=MeYy8MgBVbwmrR1Rd9oQMz1tUb+uL4eFJWTL7EOsRXxjg@mail.gmail.com> <CAA8EJpqz7wPSyn0ybDWKwBKkp+rWVPbTgjbKuG6VHWm24MCusA@mail.gmail.com>
-Date: Mon, 24 Jun 2024 23:50:40 -0700
-Message-ID: <CAMRc=MeX6crenUhC1dqp08W+ss5YksUaaemr4PFFM95SHeED2g@mail.gmail.com>
+ <CAMRc=MeYy8MgBVbwmrR1Rd9oQMz1tUb+uL4eFJWTL7EOsRXxjg@mail.gmail.com>
+ <CAA8EJpqz7wPSyn0ybDWKwBKkp+rWVPbTgjbKuG6VHWm24MCusA@mail.gmail.com> <CAMRc=MeX6crenUhC1dqp08W+ss5YksUaaemr4PFFM95SHeED2g@mail.gmail.com>
+In-Reply-To: <CAMRc=MeX6crenUhC1dqp08W+ss5YksUaaemr4PFFM95SHeED2g@mail.gmail.com>
+From: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
+Date: Tue, 25 Jun 2024 09:57:11 +0300
+Message-ID: <CAA8EJpr3OPi=EhpfXWghFoF0rgYwuZ8Xw-EzybOzqzftq-GhaA@mail.gmail.com>
 Subject: Re: [PATCH] Bluetooth: qca: don't disable power management for QCA6390
-To: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
+To: Bartosz Golaszewski <brgl@bgdev.pl>
 Cc: Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
 	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>, Bartosz Golaszewski <brgl@bgdev.pl>
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, 24 Jun 2024 23:19:55 +0200, Dmitry Baryshkov
-<dmitry.baryshkov@linaro.org> said:
-> On Mon, 24 Jun 2024 at 23:47, Bartosz Golaszewski <brgl@bgdev.pl> wrote:
->>
->> On Mon, Jun 24, 2024 at 10:17=E2=80=AFPM Dmitry Baryshkov
->> <dmitry.baryshkov@linaro.org> wrote:
->> >
->> > On Mon, 24 Jun 2024 at 22:45, Bartosz Golaszewski <brgl@bgdev.pl> wrot=
-e:
->> > >
->> > > From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
->> > >
->> > > We unnecessarily fallthrough the case for QCA6390 when initializing =
-the
->> > > device and hit the condition where - due to the lack of the enable-g=
-pio
->> > > - we disable power management despite using the power sequencer. We =
-don't
->> > > need to look for clocks on this model so it makes more sense to just
->> > > register the hci device and break the switch.
->> > >
->> > > Reported-by: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
->> > > Fixes: 4029dba6b6f1 ("Bluetooth: qca: use the power sequencer for QC=
-A6390")
->> > > Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
->> >
->> > Is this going to break the QCA6390 as present on M.2 / PCIe cards? Or
->> > the older DT which didn't have pwrseq entries?
->> >
->>
->> Neither of these has clocks that need to be driven by linux. The only
->> user of QCA6390 Bluetooth in mainline is RB5. Bindings didn't exist
->> before so no commitment was ever made.
+On Tue, 25 Jun 2024 at 09:50, Bartosz Golaszewski <brgl@bgdev.pl> wrote:
 >
-> This might make some laptop users unhappy. But anyway, restarting the
-> hci0 now gives:
+> On Mon, 24 Jun 2024 23:19:55 +0200, Dmitry Baryshkov
+> <dmitry.baryshkov@linaro.org> said:
+> > On Mon, 24 Jun 2024 at 23:47, Bartosz Golaszewski <brgl@bgdev.pl> wrote=
+:
+> >>
+> >> On Mon, Jun 24, 2024 at 10:17=E2=80=AFPM Dmitry Baryshkov
+> >> <dmitry.baryshkov@linaro.org> wrote:
+> >> >
+> >> > On Mon, 24 Jun 2024 at 22:45, Bartosz Golaszewski <brgl@bgdev.pl> wr=
+ote:
+> >> > >
+> >> > > From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+> >> > >
+> >> > > We unnecessarily fallthrough the case for QCA6390 when initializin=
+g the
+> >> > > device and hit the condition where - due to the lack of the enable=
+-gpio
+> >> > > - we disable power management despite using the power sequencer. W=
+e don't
+> >> > > need to look for clocks on this model so it makes more sense to ju=
+st
+> >> > > register the hci device and break the switch.
+> >> > >
+> >> > > Reported-by: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
+> >> > > Fixes: 4029dba6b6f1 ("Bluetooth: qca: use the power sequencer for =
+QCA6390")
+> >> > > Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org=
 >
-> [   24.387344] Bluetooth: hci0: setting up ROME/QCA6390
-> [   24.387439] qcom_geni_serial 998000.serial: serial engine reports 0
-> RX bytes in!
-> [   24.554349] qcom_geni_serial 998000.serial: serial engine reports 0
-> RX bytes in!
-> [   24.562056] arm-smmu 15000000.iommu: Unhandled context fault:
-> fsr=3D0x402, iova=3D0xfffd1080, fsynr=3D0x750013, cbfrsynra=3D0x5a3, cb=
+> >> >
+> >> > Is this going to break the QCA6390 as present on M.2 / PCIe cards? O=
+r
+> >> > the older DT which didn't have pwrseq entries?
+> >> >
+> >>
+> >> Neither of these has clocks that need to be driven by linux. The only
+> >> user of QCA6390 Bluetooth in mainline is RB5. Bindings didn't exist
+> >> before so no commitment was ever made.
+> >
+> > This might make some laptop users unhappy. But anyway, restarting the
+> > hci0 now gives:
+> >
+> > [   24.387344] Bluetooth: hci0: setting up ROME/QCA6390
+> > [   24.387439] qcom_geni_serial 998000.serial: serial engine reports 0
+> > RX bytes in!
+> > [   24.554349] qcom_geni_serial 998000.serial: serial engine reports 0
+> > RX bytes in!
+> > [   24.562056] arm-smmu 15000000.iommu: Unhandled context fault:
+> > fsr=3D0x402, iova=3D0xfffd1080, fsynr=3D0x750013, cbfrsynra=3D0x5a3, cb=
 =3D3
-> [   26.914225] Bluetooth: hci0: command 0xfc00 tx timeout
-> [   35.042619] Bluetooth: hci0: Reading QCA version information failed (-=
-110)
-> [   35.049721] Bluetooth: hci0: Retry BT power ON:0
-> [   37.539492] Bluetooth: hci0: command 0xfc00 tx timeout
-> [   45.539519] Bluetooth: hci0: Reading QCA version information failed (-=
-110)
-> [   45.546667] Bluetooth: hci0: Retry BT power ON:1
-> [   48.035863] Bluetooth: hci0: command 0xfc00 tx timeout
-> [   56.034783] Bluetooth: hci0: Reading QCA version information failed (-=
-110)
-> [   56.041901] Bluetooth: hci0: Retry BT power ON:2
-> [   58.532174] Bluetooth: hci0: command 0xfc00 tx timeout
-> [   66.531928] Bluetooth: hci0: Reading QCA version information failed (-=
-110)
+> > [   26.914225] Bluetooth: hci0: command 0xfc00 tx timeout
+> > [   35.042619] Bluetooth: hci0: Reading QCA version information failed =
+(-110)
+> > [   35.049721] Bluetooth: hci0: Retry BT power ON:0
+> > [   37.539492] Bluetooth: hci0: command 0xfc00 tx timeout
+> > [   45.539519] Bluetooth: hci0: Reading QCA version information failed =
+(-110)
+> > [   45.546667] Bluetooth: hci0: Retry BT power ON:1
+> > [   48.035863] Bluetooth: hci0: command 0xfc00 tx timeout
+> > [   56.034783] Bluetooth: hci0: Reading QCA version information failed =
+(-110)
+> > [   56.041901] Bluetooth: hci0: Retry BT power ON:2
+> > [   58.532174] Bluetooth: hci0: command 0xfc00 tx timeout
+> > [   66.531928] Bluetooth: hci0: Reading QCA version information failed =
+(-110)
+> >
+> >
 >
->
+> How do you reproduce it because it works fine for me:
 
-How do you reproduce it because it works fine for me:
+Hmm, most likely I had a dirty kernel version somewhere. With the
+current linux-next it works for me too.
 
-root@qcom-armv8a:~# btmgmt --index 0 public-addr 00:11:22:33:44:55
-[  429.096397] Bluetooth: MGMT ver 1.23
-hci0 Set Public Address complete, options:
-[  429.102024] Bluetooth: hci0: setting up ROME/QCA6390
-root@qcom-armv8a:~# [  429.184052] Bluetooth: Received
-HCI_IBS_WAKE_ACK in tx state 0
-[  429.497264] Bluetooth: hci0: QCA Product ID   :0x00000010
-[  429.502854] Bluetooth: hci0: QCA SOC Version  :0x400a0200
-[  429.508412] Bluetooth: hci0: QCA ROM Version  :0x00000200
-[  429.513974] Bluetooth: hci0: QCA Patch Version:0x00000d2b
-[  429.519533] Bluetooth: hci0: QCA controller version 0x02000200
-[  429.525534] Bluetooth: hci0: QCA Downloading qca/htbtfw20.tlv
-[  430.449793] Bluetooth: hci0: QCA Downloading qca/htnv20.bin
+Acked-by: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
+Tested-by: Dmitry Baryshkov <dmitry.baryshkov@linaro.org> # RB5
 
-root@qcom-armv8a:~# [  430.689052] Bluetooth: hci0: QCA setup on UART
-is completed
-[  430.752854] NET: Registered PF_ALG protocol family
+Thank you!
 
-root@qcom-armv8a:~#
-root@qcom-armv8a:~# hciconfig hci0 up
-[  437.505116] Bluetooth: hci0: setting up ROME/QCA6390
-[  437.586969] Bluetooth: Received HCI_IBS_WAKE_ACK in tx state 0
-[  437.912683] Bluetooth: hci0: QCA Product ID   :0x00000010
-[  437.918286] Bluetooth: hci0: QCA SOC Version  :0x400a0200
-[  437.923890] Bluetooth: hci0: QCA ROM Version  :0x00000200
-[  437.929613] Bluetooth: hci0: QCA Patch Version:0x00000d2b
-[  437.935184] Bluetooth: hci0: QCA controller version 0x02000200
-[  437.941207] Bluetooth: hci0: QCA Downloading qca/htbtfw20.tlv
-[  438.918868] Bluetooth: hci0: QCA Downloading qca/htnv20.bin
-[  439.158671] Bluetooth: hci0: QCA setup on UART is completed
-root@qcom-armv8a:~#
-root@qcom-armv8a:~#
-root@qcom-armv8a:~# hciconfig hci0 down
-root@qcom-armv8a:~#
-root@qcom-armv8a:~# cat /sys/kernel/debug/pwrseq
-pwrseq.0:
-  targets:
-    target: [bluetooth] (target unit: [bluetooth-enable])
-    target: [wlan] (target unit: [wlan-enable])
-  units:
-    unit: [regulators-enable] - enable count: 1
-    unit: [clock-enable] - enable count: 1
-    unit: [bluetooth-enable] - enable count: 0
-      dependencies:
-        [regulators-enable]
-        [clock-enable]
-    unit: [wlan-enable] - enable count: 1
-      dependencies:
-        [regulators-enable]
-        [clock-enable]
-root@qcom-armv8a:~#
-root@qcom-armv8a:~# hciconfig hci0 up
-[  454.407376] Bluetooth: hci0: setting up ROME/QCA6390
-[  454.485238] Bluetooth: Received HCI_IBS_WAKE_ACK in tx state 0
-[  454.813289] Bluetooth: hci0: QCA Product ID   :0x00000010
-[  454.818892] Bluetooth: hci0: QCA SOC Version  :0x400a0200
-[  454.824461] Bluetooth: hci0: QCA ROM Version  :0x00000200
-[  454.830035] Bluetooth: hci0: QCA Patch Version:0x00000d2b
-[  454.835599] Bluetooth: hci0: QCA controller version 0x02000200
-[  454.841651] Bluetooth: hci0: QCA Downloading qca/htbtfw20.tlv
-[  455.773967] Bluetooth: hci0: QCA Downloading qca/htnv20.bin
-[  456.011213] Bluetooth: hci0: QCA setup on UART is completed
-
-Bart
+--=20
+With best wishes
+Dmitry
