@@ -1,130 +1,90 @@
-Received: from mail-lj1-f176.google.com (mail-lj1-f176.google.com [209.85.208.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5378D17C98
-	for <linux-bluetooth@vger.kernel.org>; Tue, 25 Jun 2024 13:50:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF8DB1684AC
+	for <linux-bluetooth@vger.kernel.org>; Tue, 25 Jun 2024 14:10:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719323407; cv=none; b=Z8EyXcTermqkQ3t/J0pPcIgKVHAAtQcF8dWzQdWiAu8u0iEhz45ekHONDhZhblH4E83UJaSfIV3iGDgeMnvxkgOxQxPFbEiIwdzKXaOGJKS/wtGGAwm8aTDBIgx9YjLKb/deCiTPEdhUAwTtVw1OBgDGoFUbUIjjnsont1YAmpM=
+	t=1719324631; cv=none; b=CpK7jHJj/v7szn8XHYVVqAOmZx/dwwNy293eUWlcYUF1XFmM9Mfu0ayZenvEcme04tCpoPKsajDWK/TLVKSPMfiIhWXSzzECRxnFgwmo4HXRIcG0FhNcVPsiS6RVZmZVBbpavmw5DLtlet+HdHCCMSlBGfzrtq30L9YrLPGrR9E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719323407; c=relaxed/simple;
-	bh=lPkR57PaUJiozhuNqHBvDwUcbcDx6dgY1VlLL75ZBds=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=EMVGd3dR/erDywT/COdAAY/1VB02KgZ4KYC3CHKuXDsbBOS6HFIfclACP75Ujq3sHfOfWUJ47gGWD7q8N7bZvYTU+bw5AeII0GRIR1HctACcGHv+/T2vvCm/yjajk7JOdWegEZN3gpxZyHIHH0kA41JhW3GnWYlxlZPn9XVU290=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CpIOYdnd; arc=none smtp.client-ip=209.85.208.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1719324631; c=relaxed/simple;
+	bh=CvRKjdk7I5S2zueOg/GFhzLJp6ABbrB8PkfGPPVhZFA=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=pdmbMrnTfetRuo3B0aD+EzBbbDdSWmyzBFElz0FLX+s19IzhfxKWCjg9c2Od+IWmgmwL4OX71yxxMMiiZcG407vhAtBALpcijC9xhFdQNiC/QvAbFKPzIfDWtvDRIG7ibfokjjaeLMInStU7tlsZn2eQd88IHgrnLGFFquq/MJ4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Neu9FBza; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CpIOYdnd"
-Received: by mail-lj1-f176.google.com with SMTP id 38308e7fff4ca-2ec61eeed8eso24523891fa.0
-        for <linux-bluetooth@vger.kernel.org>; Tue, 25 Jun 2024 06:50:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1719323404; x=1719928204; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=x58qO/tK3eO4BJzDJbXsHqtuIx6wnD4Fqs7aw59Rias=;
-        b=CpIOYdndhq/ESvsiPQL/1fH7cEPUMgjksV0WSQ/uzZ/O1lG+bmXMwr8ZlIONV7wzv1
-         Wa50yHxsg7S0BbEC1RubEu+7f1FC0hNeIXnWtHlt9lxgziQc0z5S/FoIucmue0lxoFUU
-         f9bt8aMqdFnXmo+Hc4hhNtC7QANwFJeCoyFiJd0xOYpMJd00vNDxp2uJwQ2hO7eNwYRk
-         MhsaaL2lfU33kDlx7vf5aYpcEDZ4Zl3cGDWEG7MIkcwtE3LRLGGQKJ3sON78zgC7+d3Q
-         Or5GxROIoQueH4fdComyEHDn9dCYYKDOpg9oko9tHa+/amAxZpP2TRdA3pzZAw51AIEr
-         MC1Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719323404; x=1719928204;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=x58qO/tK3eO4BJzDJbXsHqtuIx6wnD4Fqs7aw59Rias=;
-        b=CTx1J5i6j30Rrib81+4vmI2BTtHwltZoNPREiKB7fFZI/UYV57icgI8EsLNtdGjm5N
-         GxxwQRdZ4T+2ICFlZ645rsguK4C9l3WBwtHn4sGUkTarRSLD4xoZfpLQavoDSSq9jvd7
-         J/D43Oj+Gs8b5gsCRMWCrBRsARtruTb7j0chFnYAfTKgKmEI4p856KvE40/lG25Y5YTc
-         ZHjIpjijHyyPp1bMzfbA3QwzIAFKW6GBm1SeZBqIZxXqEofoCnV80ehWRSxprdt4qQsO
-         y4Gc06DoEMUJt2vtwG2Xz/PFw4ifkVF3omKizn4E5jN9Ib+hkQx+2ZWhKlPZ2Z1aOhy/
-         usLQ==
-X-Gm-Message-State: AOJu0YxZ3WoXJvLg08K2m4JbgwYrh2xmoG+PwnDtnVqp/wXfRRT0ckv0
-	zii3B4oaGLw0n7P++Eit/B4lvCSb7vwczjr9p86Zvvl3DSvWRmZUNTbdflq6A5uuUPQNzwj4uNn
-	yGOqRPWsLvNpi42vrAxhcKdU7aoNFyZpf4Bg=
-X-Google-Smtp-Source: AGHT+IFXWWTZze1xrrGW/NzJOEwEW/DHUC1wr75ULTicznAztfNcpViH6c1Apum1jw6klvu4rmLbRMaNJVh3kEF9aaE=
-X-Received: by 2002:a2e:720b:0:b0:2ec:4096:4bc6 with SMTP id
- 38308e7fff4ca-2ec5b318000mr43258811fa.7.1719323404080; Tue, 25 Jun 2024
- 06:50:04 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Neu9FBza"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id C5F86C4AF09;
+	Tue, 25 Jun 2024 14:10:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1719324630;
+	bh=CvRKjdk7I5S2zueOg/GFhzLJp6ABbrB8PkfGPPVhZFA=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=Neu9FBzauezs04/11vPlHSnD/yWnZ/aOEpWk1K16dPvF4+A66APb5bb8einXKsqZT
+	 77Ch25YRqLM3aVwAH+pC641D9YYV+vWpu3T7X2IL6VVciZOisLRXRiGdFu21QGV42W
+	 Zoe64oQykYPK4OeZRtcttmYHm7oJIXJ90s/BFRBx17t/aDPFHrjtFZvTNOYA0/sWUd
+	 YH1V23b9mT3GZ9EDnDXU26JnjOyNyMHyu0C82s2hS+hNkhG4fAic97x5JqAsV6WBwD
+	 AMso+jv/syDVHgtQSHDe/XKdPRdFuT7JBu5Fp7Mqx3mbzBwILK3aoYRGgjIwQ3mNr1
+	 nwiuMrHXQLwOw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id B5E3FC54BD4;
+	Tue, 25 Jun 2024 14:10:30 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240625063533.30536-1-quic_amisjain@quicinc.com>
-In-Reply-To: <20240625063533.30536-1-quic_amisjain@quicinc.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Tue, 25 Jun 2024 09:49:51 -0400
-Message-ID: <CABBYNZJXjxL8_ZB6k6Paa3rg5b7nu08==NZzo73a85XcQwy5fg@mail.gmail.com>
-Subject: Re: [PATCH v2] Bluetooth : Update the mas session structure
-To: Amisha Jain <quic_amisjain@quicinc.com>
-Cc: linux-bluetooth@vger.kernel.org, quic_mohamull@quicinc.com, 
-	quic_hbandi@quicinc.com, quic_anubhavg@quicinc.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH BlueZ v2 0/5] test-bap: Add Broadcast Source STR MBIS tests
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <171932463074.10330.6321243292711464221.git-patchwork-notify@kernel.org>
+Date: Tue, 25 Jun 2024 14:10:30 +0000
+References: <20240625072711.7011-1-iulia.tanasescu@nxp.com>
+In-Reply-To: <20240625072711.7011-1-iulia.tanasescu@nxp.com>
+To: Iulia Tanasescu <iulia.tanasescu@nxp.com>
+Cc: linux-bluetooth@vger.kernel.org, claudia.rosu@nxp.com,
+ mihai-octavian.urzica@nxp.com, vlad.pruteanu@nxp.com,
+ andrei.istodorescu@nxp.com, luiz.dentz@gmail.com
 
-Hi Amisha,
+Hello:
 
-On Tue, Jun 25, 2024 at 2:36=E2=80=AFAM Amisha Jain <quic_amisjain@quicinc.=
-com> wrote:
->
-> Update the 'mas_session' structure such that
-> manager_emit_transfer_property(os->service_data, "Size")
-> will get the proper structure in arguments as
-> expected like structure 'obex_transfer' and transfer->path
-> won't be populated with inappropriate value.
->
-> As there is no new transfer registered during mas connect,
-> hence setting the path to NULL to avoid invoking the
-> g_dbus_emit_property_changed() property.
->
-> Signed-off-by: Amisha Jain <quic_amisjain@quicinc.com>
-> ---
->  obexd/plugins/mas.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
->
-> diff --git a/obexd/plugins/mas.c b/obexd/plugins/mas.c
-> index 10b972d65..71bf12ad3 100644
-> --- a/obexd/plugins/mas.c
-> +++ b/obexd/plugins/mas.c
-> @@ -51,6 +51,8 @@
->  #define ML_BODY_END "</MAP-msg-listing>"
->
->  struct mas_session {
-> +       uint8_t notification_status;
-> +       char *path;
->         struct mas_request *request;
->         void *backend_data;
->         gboolean finished;
-> @@ -59,7 +61,6 @@ struct mas_session {
->         GObexApparam *inparams;
->         GObexApparam *outparams;
->         gboolean ap_sent;
-> -       uint8_t notification_status;
->  };
->
->  static const uint8_t MAS_TARGET[TARGET_SIZE] =3D {
-> @@ -125,6 +126,7 @@ static void *mas_connect(struct obex_session *os, int=
- *err)
->                 goto failed;
->
->         manager_register_session(os);
-> +       mas->path =3D NULL;
+This series was applied to bluetooth/bluez.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-There is something missing here, you introduce a new field and set it
-to NULL but you never use it?
+On Tue, 25 Jun 2024 10:27:06 +0300 you wrote:
+> This patch adds BAP unit tests for Broadcast Source streaming with
+> multiple BISes (4.14.3 Broadcast Audio Stream with Multiple BISes -
+> Source - page 184).
+> 
+> This also moves the BASE defines from test-bap to lc3.h.
+> 
+> Iulia Tanasescu (5):
+>   shared/lc3: Rename LC3_BASE
+>   test-bap: Move BASE defines to lc3.h
+>   test-bap: Add support to config multiple bsrc streams
+>   shared/lc3: Add defines for BASE with multiple BISes
+>   test-bap: Add Broadcast Source STR MBIS tests
+> 
+> [...]
 
->         return mas;
->
-> --
-> 2.17.1
->
->
+Here is the summary with links:
+  - [BlueZ,v2,1/5] shared/lc3: Rename LC3_BASE
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=13da92529954
+  - [BlueZ,v2,2/5] test-bap: Move BASE defines to lc3.h
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=98013b74e5b1
+  - [BlueZ,v2,3/5] test-bap: Add support to config multiple bsrc streams
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=409251a95b6f
+  - [BlueZ,v2,4/5] shared/lc3: Add defines for BASE with multiple BISes
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=4571cdba13a3
+  - [BlueZ,v2,5/5] test-bap: Add Broadcast Source STR MBIS tests
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=944909f2b2c8
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
---=20
-Luiz Augusto von Dentz
