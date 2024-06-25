@@ -1,132 +1,149 @@
-Received: from mail-yw1-f170.google.com (mail-yw1-f170.google.com [209.85.128.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out203-205-221-205.mail.qq.com (out203-205-221-205.mail.qq.com [203.205.221.205])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AAB21494D5
-	for <linux-bluetooth@vger.kernel.org>; Tue, 25 Jun 2024 09:02:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D679146A67;
+	Tue, 25 Jun 2024 10:20:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.205.221.205
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719306168; cv=none; b=uq/461si6fh/34yUgZec/B1ZEoYUI4k+4Az3Aqn6Z/zIX1949+FG14CoxjbOHgq/1VxrQzKjxdADKbeYFcNVYUIB4IBCRKoPY+tL+DxLwVYYkjwS2wEE41B1l6Saf2Fw4S3Ny4LRddf+/m9UFK9R/9GQbCeBBKr7dy9XUNVg4Fw=
+	t=1719310830; cv=none; b=iK0Xx6xEbN0qpHo9vYJJ5uakhMtxeqgSQR8GJdqhtgutbkWmXA1dq/b5XyNyMNrwPNtdF43fMkH4lxrM1fUUihS4vA8J2KhfRuzP5qWtU2QSBzL/yq49RSRXxiebgSdY7LqHd7fjAwJJH71cI0rDXBpAjo7jV+GcCPNuNl+XRwE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719306168; c=relaxed/simple;
-	bh=yT8QD2Zo4xkXl7H8UekyuXd6Q8sBG9tL1IiWvZvo0bI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=d09MSeIkxMpevWtMcT5Sa9DQOtgfsbbHbsJLwEhKUXuM19JDC2Xd3Q3/CXIrNTWnklHJ4e2pkVfoU8C2TsiQmonEsEwrWVSVEENuJ8/J99Uo20gBScAviDe5JheA2XhQ9e5wis4sC0ZKbQoYFkdbRMCVjsPsPi5bxAtv7R65X7M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=LosvER7u; arc=none smtp.client-ip=209.85.128.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	s=arc-20240116; t=1719310830; c=relaxed/simple;
+	bh=mrkCbUN4T0q6BoY0m/gooEG5R4amkIb+uH8GJY8h6fQ=;
+	h=Message-ID:From:To:Cc:Subject:Date:In-Reply-To:References:
+	 MIME-Version; b=SpXBliQ/569xYTkUqs2RNrCVb/xbffFlqCZrx/FHcXQqYMCAWw9LWpGQy/KHXzwR+rUMnJgE35z5cdLRS+XwJg/KjvSAcmTz9rq9DeHRO9r8ufuCZcUFwhoA8zwW9ji8cuztMKjndGCzXxjQCwE1VKcEqVmirgoHQn1G5ucpV/4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com; spf=pass smtp.mailfrom=qq.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=zqNYzLUW; arc=none smtp.client-ip=203.205.221.205
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="LosvER7u"
-Received: by mail-yw1-f170.google.com with SMTP id 00721157ae682-632750bf73bso47137087b3.2
-        for <linux-bluetooth@vger.kernel.org>; Tue, 25 Jun 2024 02:02:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1719306165; x=1719910965; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=yT8QD2Zo4xkXl7H8UekyuXd6Q8sBG9tL1IiWvZvo0bI=;
-        b=LosvER7uqM/jjzwWEjQR5+3mw4H9o4keTvYuFqSY9cl8up22TX/mumQ9DwNZWbpQGx
-         rWjnGya812iqnv2HQ9COeKnYJaQi8UBGj1UeJe5QeQWO0batiGFqM74cRPWEu/qIq782
-         isGpOGFNkKEf5kmVCtunPu+okJCKwpqCv2IrdUvQdsU9FYRiO0STFhK7QtOuhrvLvrdo
-         JlwIph9+gwW7xMPM4qX+62BX3D1C5P/korJ4IrZCfu3AFFiBCAAoVepqMV5PGcVW0Zk4
-         K6Co44/i7zd3W4XFlApSYlWrUpQBr7KJzjD1UlohMSQZxDWMLKr9yBsqhCeMYLhDvGQR
-         klZg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719306165; x=1719910965;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=yT8QD2Zo4xkXl7H8UekyuXd6Q8sBG9tL1IiWvZvo0bI=;
-        b=LYj3HQ/E61jxEOL6CrG8SvsGrxwevIFFH2cMTMMT1+DvcaAn+gGRUIGtAD9J23Pg+b
-         Ns/RKSVuFNKGoDKeXriQqQzp/uIBHxMM2y7dzeDTOJjRQ74wd74uesP0ApMkrJXOuo0m
-         dAe6IAks6SiqVZgXH/+1UyCx+3hR2WvNYbwnUNJzmm9UwVYhnlocdicohB3TPsa5q/E0
-         b8Y4PAKoD61OgKGkIGpg8grsOkLg7LJUKA1boPW3Lh3cZmG+JqlF8wopmT/NHwaamFIN
-         FwK+6mhH3xWQbxWT0bC/wWbdkBDCCeSrtATEA9Svw6voIE/FZUNSskibqraeRoHyDiNg
-         JHCQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVnbkvnFAJhzvSYYtnrscgoG44sub7yIkIsiQ4k2uyUHBhRqQKNrgsl8tOqB7o5o/xw3PQTe09Ap86SOB62IYmL0LpR8vnq5m9FpxUc/dap
-X-Gm-Message-State: AOJu0Ywym1pQTiYfKsDk1JWXpkhPVQFGv6G+AP2BCPY+u+IovdIItLRR
-	fJt7Tont+O8AUNtcXCeybxYJwECczHks2qHU2LRE7xCK2m0+WtHFIQuC/d8wq176DYOBTXCI20B
-	T3V1qkENXsidWIYQK2c3tpcgC4CtIjvzo2T5EWg==
-X-Google-Smtp-Source: AGHT+IGvK0khc1MSipVybrvG4s+cHxUW3NeLtGzA5nPqp5KK3n2hM5TcfKFwBXOaaFVt5XBuyzRxRVgY9lyq86OIz3o=
-X-Received: by 2002:a05:690c:d8a:b0:627:972f:baba with SMTP id
- 00721157ae682-643aae70b44mr90173987b3.31.1719306165115; Tue, 25 Jun 2024
- 02:02:45 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="zqNYzLUW"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
+	t=1719310519; bh=NZOSPeiPAVveuWbrnAInxDlcsoHJ6JgaucOMtYnKhwA=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=zqNYzLUWj88NKtIKPLkX0Nn3dCD1RObpt623bS4HnUgR+lLG5anw3fBbcglABS6RB
+	 9g/a4rBlf1vLpg/D/Z+t5G3uib2jIe7po55uHgfOoKqt0Xv+feLvPXvuA9+GWinG3Q
+	 zGzy3G4KhLGUXK1f1JO6+aT4/qNYm7Rxr/Lo7jZQ=
+Received: from pek-lxu-l1.wrs.com ([111.198.228.103])
+	by newxmesmtplogicsvrszc5-2.qq.com (NewEsmtp) with SMTP
+	id 30EA185C; Tue, 25 Jun 2024 18:12:14 +0800
+X-QQ-mid: xmsmtpt1719310334tv296kjyp
+Message-ID: <tencent_CFD37DA36B4965E3A7C45E7770776C86DB05@qq.com>
+X-QQ-XMAILINFO: MtZ4zLDUQmWf8BIMzYOceNsyYxmg35httaPj3YYnwhHxtvnQssNEIax9AzBl3i
+	 43lZ3m5xTxQQ20u2+uvs+jEHKbqQrtTGvEob8aycLQrF+xKJPSq1nCEkNzD9rqxIMujpEBm5/Zb3
+	 SWi0kiBnC5mTGjrp+Q3GvMCX7eZ/IhmO1kOk/P8zu9bgjcnTFDczGiEzQjht2pdOPjqralUE+N0B
+	 dZ4ho/u3iylVHlMxoF6Uvq8QU/DxnPBnVOeJ6onPpzkW1TJj3J3IE0/0tPOuWxvgNiztavUH2FiS
+	 fMGeIYVz7upsm86hgDDNapcQn3RR85ipvBUTsDvd+JyyFQzj9qP8MJkMBwjJoRwDIEpV1s7oldiL
+	 c4TEeuGjrm/8BUrk7mm2zkR4hYpPPibvAgP0aW02NnNjxgzoeQwHOUZNdBcPQiZ/knxlxacljlcj
+	 eVwUx4NAjgj86d6r74lEQLECHkCFYMzHFr+jQ1SPmc4KdYHa+SMHAyCmU7hUOTFHxwfRdEgE2JVq
+	 P31DCe+BePQUW6yu4l9jpl6DyRwg5P2iMANnSjok34w84l/RaLp/Ee4yYpc3QCVgjmfkEfuIR5M5
+	 V5BEofSxgDplfEWQuQ9nRIHcjoDt/0gOliRBE0842Ki9lMfIpQrFg9Jvr4gkPPyXvpDHNFKw4XtP
+	 NNX9lyL3FMHG7079UCdFGA44DlnBIzWuXKjKnyh4jMAJDvYXOSUMSpWmleo27WmrUH0zuY5RM/aO
+	 BDcR0K8SIypwhhd5ay63y9ROqqirTongh2qPjrd8Tmimwj4OoPvHT1m7ozSxb2YAdctSw/TDSeOZ
+	 p+rhIAQvCJExBW0OdRdJHoaTAVJtKU531rkNrxS/u57hZpPgI0zqXWYPnGBJM1JaDXt7xFKeaHyb
+	 1jGZUho3+1VtMtfvhqeSHvfaqaAEduT/UGIqYTly1rVyLFZK2Mryqlin76NylQVpg7GzNbRaVovQ
+	 22LGyacIq4hDQ4fslQdw==
+X-QQ-XMRINFO: NI4Ajvh11aEj8Xl/2s1/T8w=
+From: Edward Adam Davis <eadavis@qq.com>
+To: luiz.dentz@gmail.com
+Cc: eadavis@qq.com,
+	johan.hedberg@gmail.com,
+	linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	marcel@holtmann.org,
+	syzbot+b7f6f8c9303466e16c8a@syzkaller.appspotmail.com,
+	syzkaller-bugs@googlegroups.com
+Subject: [PATCH V3] Bluetooth/l2cap: sync sock recv cb and release
+Date: Tue, 25 Jun 2024 18:12:15 +0800
+X-OQ-MSGID: <20240625101214.598651-2-eadavis@qq.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <CABBYNZL5xiNDzDa3JJiwx2D-qpmA8Y3RBVWLetZ0fd4jURpN7g@mail.gmail.com>
+References: <CABBYNZL5xiNDzDa3JJiwx2D-qpmA8Y3RBVWLetZ0fd4jURpN7g@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240624194518.37458-1-brgl@bgdev.pl> <CAA8EJppMPeYrPH+ssDMnf6UwHRdKQetpY3PotGvR-cc2vE68AQ@mail.gmail.com>
- <CAMRc=MeYy8MgBVbwmrR1Rd9oQMz1tUb+uL4eFJWTL7EOsRXxjg@mail.gmail.com>
- <CAA8EJpqz7wPSyn0ybDWKwBKkp+rWVPbTgjbKuG6VHWm24MCusA@mail.gmail.com>
- <CAMRc=McZ+hrXyNESmf4pFX9+uDnc4AKsuO9X8AJsVgCfQVLd9Q@mail.gmail.com>
- <CAA8EJpo2_3zSYEfyQ0VwSs9AkeXUpcVRGB+LaRAhA=_SWjrhtQ@mail.gmail.com>
- <CAMRc=McPZKYoxWYJ3U35CXYbBdwYBuemBwBC-qA5hhpqqTYBjg@mail.gmail.com>
- <CAA8EJpoEUyBmi5_Zb0m0TVYi1BAMuqNfdDL7rdsTK6rxjsGpVQ@mail.gmail.com> <CAMRc=MdAek=vLqMzdYb1yk+BtbBW=Vd=s-Fw1mxPF+sMwzZ_kA@mail.gmail.com>
-In-Reply-To: <CAMRc=MdAek=vLqMzdYb1yk+BtbBW=Vd=s-Fw1mxPF+sMwzZ_kA@mail.gmail.com>
-From: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
-Date: Tue, 25 Jun 2024 12:02:33 +0300
-Message-ID: <CAA8EJpqXEAL-EzGJqJXbJv4z8w4M7Fr61mH_dcHqWgiPZHbNNg@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: qca: don't disable power management for QCA6390
-To: Bartosz Golaszewski <brgl@bgdev.pl>
-Cc: Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Tue, 25 Jun 2024 at 12:01, Bartosz Golaszewski <brgl@bgdev.pl> wrote:
->
-> On Tue, Jun 25, 2024 at 10:55=E2=80=AFAM Dmitry Baryshkov
-> <dmitry.baryshkov@linaro.org> wrote:
-> >
-> > On Tue, 25 Jun 2024 at 11:50, Bartosz Golaszewski <brgl@bgdev.pl> wrote=
-:
-> > >
-> > > On Tue, Jun 25, 2024 at 9:47=E2=80=AFAM Dmitry Baryshkov
-> > > <dmitry.baryshkov@linaro.org> wrote:
-> > > >
-> > > > On Tue, 25 Jun 2024 at 10:46, Bartosz Golaszewski <brgl@bgdev.pl> w=
-rote:
-> > > > >
-> > > > > On Mon, Jun 24, 2024 at 11:20=E2=80=AFPM Dmitry Baryshkov
-> > > > > <dmitry.baryshkov@linaro.org> wrote:
-> > > > > >
-> > > > > > >
-> > > > > > > Neither of these has clocks that need to be driven by linux. =
-The only
-> > > > > > > user of QCA6390 Bluetooth in mainline is RB5. Bindings didn't=
- exist
-> > > > > > > before so no commitment was ever made.
-> > > > > >
-> > > > > > This might make some laptop users unhappy.
-> > > > >
-> > > > > Like I said: without upstreamed DT bindings, we have never made a=
-ny
-> > > > > commitment about the device properties. I doubt anyone will compl=
-ain
-> > > > > though, I haven't seen any DT with QCA6390 with clock properties =
-yet.
-> > > > > I wouldn't stress it for now.
-> > > >
-> > > > I was thinking about x86 laptops / M.2 cards. I'll see if I can loc=
-ate one.
-> > > >
-> > >
-> > > I don't get it, how could they ever get the clocks property without i=
-t
-> > > being defined in firmware?
-> >
-> > The clock and bt_en are optional.
-> >
->
-> But you're worrying that the lack of this optional clock for QCA6390
-> will break it on some M.2 card? That cannot happen, can it? If it's on
-> an M.2 card then it would never be described in ACPI.
-> clk_get_optional() will always return NULL.
+The problem occurs between the system call to close the sock and hci_rx_work,
+where the former releases the sock and the latter accesses it without lock protection.
 
-Ack, thank you for the explanation.
+           CPU0                       CPU1
+           ----                       ----
+           sock_close                 hci_rx_work
+	   l2cap_sock_release         hci_acldata_packet
+	   l2cap_sock_kill            l2cap_recv_frame
+	   sk_free                    l2cap_conless_channel
+	                              l2cap_sock_recv_cb
 
---=20
-With best wishes
-Dmitry
+If hci_rx_work processes the data that needs to be received before the sock is
+closed, then everything is normal; Otherwise, the work thread may access the
+released sock when receiving data.
+
+Add a chan lock in the l2cap_conless_channel of the sock to achieve sync
+between the sock release and recv cb.
+
+Sock is dead, so set chan data to NULL, avoid others use invalid sock pointer.
+
+Reported-by: syzbot+b7f6f8c9303466e16c8a@syzkaller.appspotmail.com
+Signed-off-by: Edward Adam Davis <eadavis@qq.com>
+---
+ net/bluetooth/l2cap_core.c |  3 +++
+ net/bluetooth/l2cap_sock.c | 13 +++++++++++--
+ 2 files changed, 14 insertions(+), 2 deletions(-)
+
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index aed025734d04..35a9534eb62d 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -6771,10 +6771,13 @@ static void l2cap_conless_channel(struct l2cap_conn *conn, __le16 psm,
+ 	bacpy(&bt_cb(skb)->l2cap.bdaddr, &hcon->dst);
+ 	bt_cb(skb)->l2cap.psm = psm;
+ 
++	l2cap_chan_lock(chan);
+ 	if (!chan->ops->recv(chan, skb)) {
++		l2cap_chan_unlock(chan);
+ 		l2cap_chan_put(chan);
+ 		return;
+ 	}
++	l2cap_chan_unlock(chan);
+ 
+ drop:
+ 	l2cap_chan_put(chan);
+diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+index 6db60946c627..25091fb992a7 100644
+--- a/net/bluetooth/l2cap_sock.c
++++ b/net/bluetooth/l2cap_sock.c
+@@ -1239,6 +1239,10 @@ static void l2cap_sock_kill(struct sock *sk)
+ 
+ 	BT_DBG("sk %p state %s", sk, state_to_string(sk->sk_state));
+ 
++	/* Sock is dead, so set chan data to NULL, avoid other task use invalid
++	 * sock pointer.
++	 */
++	l2cap_pi(sk)->chan->data = NULL;
+ 	/* Kill poor orphan */
+ 
+ 	l2cap_chan_put(l2cap_pi(sk)->chan);
+@@ -1481,11 +1485,16 @@ static struct l2cap_chan *l2cap_sock_new_connection_cb(struct l2cap_chan *chan)
+ 
+ static int l2cap_sock_recv_cb(struct l2cap_chan *chan, struct sk_buff *skb)
+ {
+-	struct sock *sk = chan->data;
+-	struct l2cap_pinfo *pi = l2cap_pi(sk);
++	struct sock *sk;
++	struct l2cap_pinfo *pi;
+ 	int err;
+ 
++	if (!chan->data)
++		return -ENXIO;
++
++	sk = chan->data;
+ 	lock_sock(sk);
++	pi = l2cap_pi(sk);
+ 
+ 	if (chan->mode == L2CAP_MODE_ERTM && !list_empty(&pi->rx_busy)) {
+ 		err = -ENOMEM;
+-- 
+2.43.0
+
