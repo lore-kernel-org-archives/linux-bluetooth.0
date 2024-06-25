@@ -1,62 +1,64 @@
-Received: from out203-205-221-205.mail.qq.com (out203-205-221-205.mail.qq.com [203.205.221.205])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f196.google.com (mail-pl1-f196.google.com [209.85.214.196])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D679146A67;
-	Tue, 25 Jun 2024 10:20:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.205.221.205
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F532149DEF
+	for <linux-bluetooth@vger.kernel.org>; Tue, 25 Jun 2024 10:21:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.196
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719310830; cv=none; b=iK0Xx6xEbN0qpHo9vYJJ5uakhMtxeqgSQR8GJdqhtgutbkWmXA1dq/b5XyNyMNrwPNtdF43fMkH4lxrM1fUUihS4vA8J2KhfRuzP5qWtU2QSBzL/yq49RSRXxiebgSdY7LqHd7fjAwJJH71cI0rDXBpAjo7jV+GcCPNuNl+XRwE=
+	t=1719310917; cv=none; b=YVAx7SMafTxXHuq73wj1YSNkJ1Igofmk35ImyZUFF2fTtd3SXL2iDX5NR4B5NKLqMJ+djFDcBe5KJu+/pNf1nIEz475i+l8LXt/RuAO42afhekqJhiKILev4AgzXkLfdxO4eCR2EwLKjMmFm1cHs0nLF1uSkiDsljNavAXWII9I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719310830; c=relaxed/simple;
-	bh=mrkCbUN4T0q6BoY0m/gooEG5R4amkIb+uH8GJY8h6fQ=;
-	h=Message-ID:From:To:Cc:Subject:Date:In-Reply-To:References:
-	 MIME-Version; b=SpXBliQ/569xYTkUqs2RNrCVb/xbffFlqCZrx/FHcXQqYMCAWw9LWpGQy/KHXzwR+rUMnJgE35z5cdLRS+XwJg/KjvSAcmTz9rq9DeHRO9r8ufuCZcUFwhoA8zwW9ji8cuztMKjndGCzXxjQCwE1VKcEqVmirgoHQn1G5ucpV/4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com; spf=pass smtp.mailfrom=qq.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=zqNYzLUW; arc=none smtp.client-ip=203.205.221.205
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
+	s=arc-20240116; t=1719310917; c=relaxed/simple;
+	bh=7eV+FC8D6zjFgWnptjlUDQlEzJ1ee9CaqujklxBCwc8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=F/pGtbEbU6EGkubLgOxnUCrNSmE/GJKoovCVEHjOZsOzn7/PMy0IFs/bDaKCixG7tljMrkJfClUu6j9IgX105bxPmYV+Z+ElO0FCYbBqIzWCmsYCsVlmuILrp+WYYvn07p/RZT6zDfurSE2dq8dy7129WjSYp8B3XYAn7h9evK8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=L/DsslZ1; arc=none smtp.client-ip=209.85.214.196
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="zqNYzLUW"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
-	t=1719310519; bh=NZOSPeiPAVveuWbrnAInxDlcsoHJ6JgaucOMtYnKhwA=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=zqNYzLUWj88NKtIKPLkX0Nn3dCD1RObpt623bS4HnUgR+lLG5anw3fBbcglABS6RB
-	 9g/a4rBlf1vLpg/D/Z+t5G3uib2jIe7po55uHgfOoKqt0Xv+feLvPXvuA9+GWinG3Q
-	 zGzy3G4KhLGUXK1f1JO6+aT4/qNYm7Rxr/Lo7jZQ=
-Received: from pek-lxu-l1.wrs.com ([111.198.228.103])
-	by newxmesmtplogicsvrszc5-2.qq.com (NewEsmtp) with SMTP
-	id 30EA185C; Tue, 25 Jun 2024 18:12:14 +0800
-X-QQ-mid: xmsmtpt1719310334tv296kjyp
-Message-ID: <tencent_CFD37DA36B4965E3A7C45E7770776C86DB05@qq.com>
-X-QQ-XMAILINFO: MtZ4zLDUQmWf8BIMzYOceNsyYxmg35httaPj3YYnwhHxtvnQssNEIax9AzBl3i
-	 43lZ3m5xTxQQ20u2+uvs+jEHKbqQrtTGvEob8aycLQrF+xKJPSq1nCEkNzD9rqxIMujpEBm5/Zb3
-	 SWi0kiBnC5mTGjrp+Q3GvMCX7eZ/IhmO1kOk/P8zu9bgjcnTFDczGiEzQjht2pdOPjqralUE+N0B
-	 dZ4ho/u3iylVHlMxoF6Uvq8QU/DxnPBnVOeJ6onPpzkW1TJj3J3IE0/0tPOuWxvgNiztavUH2FiS
-	 fMGeIYVz7upsm86hgDDNapcQn3RR85ipvBUTsDvd+JyyFQzj9qP8MJkMBwjJoRwDIEpV1s7oldiL
-	 c4TEeuGjrm/8BUrk7mm2zkR4hYpPPibvAgP0aW02NnNjxgzoeQwHOUZNdBcPQiZ/knxlxacljlcj
-	 eVwUx4NAjgj86d6r74lEQLECHkCFYMzHFr+jQ1SPmc4KdYHa+SMHAyCmU7hUOTFHxwfRdEgE2JVq
-	 P31DCe+BePQUW6yu4l9jpl6DyRwg5P2iMANnSjok34w84l/RaLp/Ee4yYpc3QCVgjmfkEfuIR5M5
-	 V5BEofSxgDplfEWQuQ9nRIHcjoDt/0gOliRBE0842Ki9lMfIpQrFg9Jvr4gkPPyXvpDHNFKw4XtP
-	 NNX9lyL3FMHG7079UCdFGA44DlnBIzWuXKjKnyh4jMAJDvYXOSUMSpWmleo27WmrUH0zuY5RM/aO
-	 BDcR0K8SIypwhhd5ay63y9ROqqirTongh2qPjrd8Tmimwj4OoPvHT1m7ozSxb2YAdctSw/TDSeOZ
-	 p+rhIAQvCJExBW0OdRdJHoaTAVJtKU531rkNrxS/u57hZpPgI0zqXWYPnGBJM1JaDXt7xFKeaHyb
-	 1jGZUho3+1VtMtfvhqeSHvfaqaAEduT/UGIqYTly1rVyLFZK2Mryqlin76NylQVpg7GzNbRaVovQ
-	 22LGyacIq4hDQ4fslQdw==
-X-QQ-XMRINFO: NI4Ajvh11aEj8Xl/2s1/T8w=
-From: Edward Adam Davis <eadavis@qq.com>
-To: luiz.dentz@gmail.com
-Cc: eadavis@qq.com,
-	johan.hedberg@gmail.com,
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="L/DsslZ1"
+Received: by mail-pl1-f196.google.com with SMTP id d9443c01a7336-1f70c457823so37358465ad.3
+        for <linux-bluetooth@vger.kernel.org>; Tue, 25 Jun 2024 03:21:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1719310915; x=1719915715; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=+VjACVZoPp7eN7kJksXj5MfvnAImL5JxKUjwBijavO4=;
+        b=L/DsslZ1xJ/RcgZWEc4OFvYGI9wRjWwxXzhejYpuLjnS7POewgUElXfrxZntPaE5PR
+         Ja3ClYsYtcgZ2UkoK0N5VbfR64dV/slOPgJerqFKlo2IhArYLZ/sAOoHUAK3wP4gOSlB
+         H/qSzk0q5H8BZy+UeSGvfJiem4mYTBKsDUhbM=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1719310915; x=1719915715;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=+VjACVZoPp7eN7kJksXj5MfvnAImL5JxKUjwBijavO4=;
+        b=egv78hzXT19xnHH0A6CqziwtUBykjUoObzJAKqQkoNe5+aqPGIYTlgsxbA1YUL3nsA
+         8p/tjtcuHZNwsf2GzvONShp5W+PwY0/cLkdSNKkY7BJOaahtx/RienouYk4TwCfTa65f
+         MoZTZXuuTJhXxCiGpylFSIyy1153vzdXbvQ9Fqs5VIutV3WfFnW7Y9iSDLpeTrHIDyNr
+         5H1XWwAg/9MemHlkfPdg248tBGiojGawcp9+PSw0NvG1LChekUKMiVN0JXha9CiEDGE5
+         cImTdHoKP6kieD+CQjo+hqpPN4fSvvjisW0PNqpgckUN6ReSwVY7mgVju7gaiQnDhv9j
+         MXqA==
+X-Forwarded-Encrypted: i=1; AJvYcCXUtrMN3O13unzZ6gBrGPW2gJwCzjMMDChF8haGc2YGuHRuIGnf/Vx9CdcadNT0lRisFXzJvaQuAmpTnVtTzMso8fmd1Rs0T5QAEa7OuCFd
+X-Gm-Message-State: AOJu0YwXK3KpTuLOklBXpsPZwrRNSu8VImV23M31zaiMTzY8wgq6E+2h
+	PGpRMc39RmxnSR5XhBksrlycBL4YYMA8pQvc11nYMZRoJ+XoAdpD5srCm/8Wkg==
+X-Google-Smtp-Source: AGHT+IGncBwvYK00pVmw01gvxPmXxXQ/V/u6BoVJ3vRhjdCIb8ngRmdVTYU+9aqp9QEJNIvJV3icOw==
+X-Received: by 2002:a17:902:d50b:b0:1f7:4ff:d03 with SMTP id d9443c01a7336-1fa23f4a0e0mr73386365ad.67.1719310915385;
+        Tue, 25 Jun 2024 03:21:55 -0700 (PDT)
+Received: from wenstp920.tpe.corp.google.com ([2401:fa00:1:10:ea5a:67dd:bd1e:edef])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1f9eb328f57sm77590855ad.110.2024.06.25.03.21.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 25 Jun 2024 03:21:54 -0700 (PDT)
+From: Chen-Yu Tsai <wenst@chromium.org>
+To: Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Chen-Yu Tsai <wenst@chromium.org>,
 	linux-bluetooth@vger.kernel.org,
+	linux-mediatek@lists.infradead.org,
 	linux-kernel@vger.kernel.org,
-	marcel@holtmann.org,
-	syzbot+b7f6f8c9303466e16c8a@syzkaller.appspotmail.com,
-	syzkaller-bugs@googlegroups.com
-Subject: [PATCH V3] Bluetooth/l2cap: sync sock recv cb and release
-Date: Tue, 25 Jun 2024 18:12:15 +0800
-X-OQ-MSGID: <20240625101214.598651-2-eadavis@qq.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <CABBYNZL5xiNDzDa3JJiwx2D-qpmA8Y3RBVWLetZ0fd4jURpN7g@mail.gmail.com>
-References: <CABBYNZL5xiNDzDa3JJiwx2D-qpmA8Y3RBVWLetZ0fd4jURpN7g@mail.gmail.com>
+	Sean Wang <sean.wang@kernel.org>
+Subject: [PATCH] Bluetooth: btmtksdio: Lookup device node only as fallback
+Date: Tue, 25 Jun 2024 18:21:45 +0800
+Message-ID: <20240625102147.3496597-1-wenst@chromium.org>
+X-Mailer: git-send-email 2.45.2.741.gdbec12cfda-goog
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -65,85 +67,64 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The problem occurs between the system call to close the sock and hci_rx_work,
-where the former releases the sock and the latter accesses it without lock protection.
+If the device tree is properly written, the SDIO function device node
+should be correctly defined, and the mmc core in Linux should correctly
+tie it to the device being probed.
 
-           CPU0                       CPU1
-           ----                       ----
-           sock_close                 hci_rx_work
-	   l2cap_sock_release         hci_acldata_packet
-	   l2cap_sock_kill            l2cap_recv_frame
-	   sk_free                    l2cap_conless_channel
-	                              l2cap_sock_recv_cb
+Only fall back to searching for the device node by compatible if the
+original device node tied to the device is incorrect, as seen in older
+device trees.
 
-If hci_rx_work processes the data that needs to be received before the sock is
-closed, then everything is normal; Otherwise, the work thread may access the
-released sock when receiving data.
-
-Add a chan lock in the l2cap_conless_channel of the sock to achieve sync
-between the sock release and recv cb.
-
-Sock is dead, so set chan data to NULL, avoid others use invalid sock pointer.
-
-Reported-by: syzbot+b7f6f8c9303466e16c8a@syzkaller.appspotmail.com
-Signed-off-by: Edward Adam Davis <eadavis@qq.com>
+Signed-off-by: Chen-Yu Tsai <wenst@chromium.org>
 ---
- net/bluetooth/l2cap_core.c |  3 +++
- net/bluetooth/l2cap_sock.c | 13 +++++++++++--
- 2 files changed, 14 insertions(+), 2 deletions(-)
+This follows up on the MT7921S bluetooth binding and DT fixup patches [1].
+This should not be backported.
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index aed025734d04..35a9534eb62d 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -6771,10 +6771,13 @@ static void l2cap_conless_channel(struct l2cap_conn *conn, __le16 psm,
- 	bacpy(&bt_cb(skb)->l2cap.bdaddr, &hcon->dst);
- 	bt_cb(skb)->l2cap.psm = psm;
- 
-+	l2cap_chan_lock(chan);
- 	if (!chan->ops->recv(chan, skb)) {
-+		l2cap_chan_unlock(chan);
- 		l2cap_chan_put(chan);
- 		return;
- 	}
-+	l2cap_chan_unlock(chan);
- 
- drop:
- 	l2cap_chan_put(chan);
-diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-index 6db60946c627..25091fb992a7 100644
---- a/net/bluetooth/l2cap_sock.c
-+++ b/net/bluetooth/l2cap_sock.c
-@@ -1239,6 +1239,10 @@ static void l2cap_sock_kill(struct sock *sk)
- 
- 	BT_DBG("sk %p state %s", sk, state_to_string(sk->sk_state));
- 
-+	/* Sock is dead, so set chan data to NULL, avoid other task use invalid
-+	 * sock pointer.
-+	 */
-+	l2cap_pi(sk)->chan->data = NULL;
- 	/* Kill poor orphan */
- 
- 	l2cap_chan_put(l2cap_pi(sk)->chan);
-@@ -1481,11 +1485,16 @@ static struct l2cap_chan *l2cap_sock_new_connection_cb(struct l2cap_chan *chan)
- 
- static int l2cap_sock_recv_cb(struct l2cap_chan *chan, struct sk_buff *skb)
+[1] https://lore.kernel.org/linux-bluetooth/20240412073046.1192744-1-wenst@chromium.org/
+
+ drivers/bluetooth/btmtksdio.c | 17 +++++++++++++++--
+ 1 file changed, 15 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/bluetooth/btmtksdio.c b/drivers/bluetooth/btmtksdio.c
+index b4e560a17aa6..d81fa8dacb4e 100644
+--- a/drivers/bluetooth/btmtksdio.c
++++ b/drivers/bluetooth/btmtksdio.c
+@@ -1330,6 +1330,8 @@ static int btmtksdio_probe(struct sdio_func *func,
  {
--	struct sock *sk = chan->data;
--	struct l2cap_pinfo *pi = l2cap_pi(sk);
-+	struct sock *sk;
-+	struct l2cap_pinfo *pi;
+ 	struct btmtksdio_dev *bdev;
+ 	struct hci_dev *hdev;
++	struct device_node *old_node;
++	bool restore_node;
  	int err;
  
-+	if (!chan->data)
-+		return -ENXIO;
-+
-+	sk = chan->data;
- 	lock_sock(sk);
-+	pi = l2cap_pi(sk);
+ 	bdev = devm_kzalloc(&func->dev, sizeof(*bdev), GFP_KERNEL);
+@@ -1413,13 +1415,24 @@ static int btmtksdio_probe(struct sdio_func *func,
+ 	if (err)
+ 		bt_dev_err(hdev, "failed to initialize device wakeup");
  
- 	if (chan->mode == L2CAP_MODE_ERTM && !list_empty(&pi->rx_busy)) {
- 		err = -ENOMEM;
+-	bdev->dev->of_node = of_find_compatible_node(NULL, NULL,
+-						     "mediatek,mt7921s-bluetooth");
++	restore_node = false;
++	if (!of_device_is_compatible(bdev->dev->of_node, "mediatek,mt7921s-bluetooth")) {
++		restore_node = true;
++		old_node = bdev->dev->of_node;
++		bdev->dev->of_node = of_find_compatible_node(NULL, NULL,
++							     "mediatek,mt7921s-bluetooth");
++	}
++
+ 	bdev->reset = devm_gpiod_get_optional(bdev->dev, "reset",
+ 					      GPIOD_OUT_LOW);
+ 	if (IS_ERR(bdev->reset))
+ 		err = PTR_ERR(bdev->reset);
+ 
++	if (restore_node) {
++		of_node_put(bdev->dev->of_node);
++		bdev->dev->of_node = old_node;
++	}
++
+ 	return err;
+ }
+ 
 -- 
-2.43.0
+2.45.2.741.gdbec12cfda-goog
 
