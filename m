@@ -1,118 +1,203 @@
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f176.google.com (mail-lj1-f176.google.com [209.85.208.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CAB41CFB6
-	for <linux-bluetooth@vger.kernel.org>; Tue, 25 Jun 2024 06:36:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEEE9146588
+	for <linux-bluetooth@vger.kernel.org>; Tue, 25 Jun 2024 06:50:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719297367; cv=none; b=NwUJ8Lk8FlUtmN98iLDUYxwS7lSnOde8bjlLfRaixr4hqwYZNot92cApTfBFBslLix3UlLY1+9I2gyBRHSrCSQZvMr1edvav5Q8bHhnN95z8JYVEJZLvR8xnqptY6NUZ80HYDUbbgnDmVXzlV61AyQAw3mLq/4UtHvWaychwNoA=
+	t=1719298245; cv=none; b=sPsl7FaoxEkBjs25ZerU6jRG12gKgTyzC6kjKHynArIFvZv+O8+WW3MkzEVrgzaYNulgtylz/ijxNMBCQ4a3nk/vxBJcdlq5C30u1zRCx1jnE4oEvzc7+zsR6yQtrraBHVJF+zG4efNlGUy87/08VLb3OqE77kfimk7+wc0aHq0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719297367; c=relaxed/simple;
-	bh=0AYK0hkvjTabxPYRFX7ETdPe819Duf6ITIvky/gP/pQ=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=HYM6hMz3vE/+k/Z5tCYQDgL+pFN/7cjq70DpacQ2AWLGDhdo+PDzwG8onp4xylkUI2r7vWNlGdR8sT2oI62pABd0JrQ9cCyuTOgZCgMQ8uhPJKSO5w+JTq1RvpA1j+p8QjduQvu3rYm8IQTgonKOc2TqJ4UV2YXiPtP9rTY0A/k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=jCBXWdt7; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+	s=arc-20240116; t=1719298245; c=relaxed/simple;
+	bh=Ak42HIwgeEH4DyPlzeg42twhBvMY328BsqJJAvJ56z8=;
+	h=From:In-Reply-To:MIME-Version:References:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=bbO2IXq/m9zr0OZtt0nCIOF+M+9npyVzK4dBWCJzu6axDcfQAfHVC9kgz1r5WwoG5+5WgFOivjq32C0UAQbXe6dmQCd5ztqtB3/pY9x3pfycnhrdsj/EUvQCnpqsKRj7fiWhkxrN/JrzmLIkW51b49StkbGg3bHYfId7ONfUGRM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=fgR7uXqJ; arc=none smtp.client-ip=209.85.208.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="jCBXWdt7"
-Received: from pps.filterd (m0279864.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 45OIkYaQ023773
-	for <linux-bluetooth@vger.kernel.org>; Tue, 25 Jun 2024 06:36:01 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-type:date:from:message-id:mime-version:subject:to; s=
-	qcppdkim1; bh=FIMId5XhZGltfVu7JzpvBlzHfY5AFJm0gB4zah5HRjI=; b=jC
-	BXWdt7Wo8+JxmVfQVAW7hXrbezIf1dz1e7RDMG5YTofhxBLHgz7VqS1yO/y5Y1mi
-	McFsUebE+H5NxHY5/pfEV5F5JvjiZRgY+t8+s2KwpfdCBbqtMaMoX9Qnalve+XbE
-	LerT62+P7VZ7kUnLkXto/dz9WwjqvIhuMBo3fpdC3X+yQaDQtfeAe1/EscSJxudr
-	K+CtlSwHPHwkf5po06WFJGBa607GvDurR4aGoKura1eb2GEpRrOAigl+opWD78IA
-	AytrL0N5t7tTR10SjX6IOal99qxjwEcvJm/PxwH+NOk5TiBJ4Vfg/dV6E/zvy3aw
-	tBiOPInVI8wzd47T99Pw==
-Received: from nasanppmta05.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3ywqshnnkj-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <linux-bluetooth@vger.kernel.org>; Tue, 25 Jun 2024 06:36:01 +0000 (GMT)
-Received: from nasanex01c.na.qualcomm.com (nasanex01c.na.qualcomm.com [10.45.79.139])
-	by NASANPPMTA05.qualcomm.com (8.17.1.19/8.17.1.19) with ESMTPS id 45P6a13d025514
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <linux-bluetooth@vger.kernel.org>; Tue, 25 Jun 2024 06:36:01 GMT
-Received: from hu-amisjain-hyd.qualcomm.com (10.80.80.8) by
- nasanex01c.na.qualcomm.com (10.45.79.139) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.9; Mon, 24 Jun 2024 23:35:59 -0700
-From: Amisha Jain <quic_amisjain@quicinc.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: <quic_mohamull@quicinc.com>, <quic_hbandi@quicinc.com>,
-        <quic_anubhavg@quicinc.com>
-Subject: [PATCH v2] Bluetooth : Update the mas session structure
-Date: Tue, 25 Jun 2024 12:05:33 +0530
-Message-ID: <20240625063533.30536-1-quic_amisjain@quicinc.com>
-X-Mailer: git-send-email 2.17.1
+	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="fgR7uXqJ"
+Received: by mail-lj1-f176.google.com with SMTP id 38308e7fff4ca-2e72224c395so56363401fa.3
+        for <linux-bluetooth@vger.kernel.org>; Mon, 24 Jun 2024 23:50:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1719298242; x=1719903042; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:references
+         :mime-version:in-reply-to:from:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=TyOWEJ3RHrELUq33jeWpDKHaK+Gt6P4Gj6fOnObAdFU=;
+        b=fgR7uXqJjY0jzd4k8JYUNDfPpqzQtr/vBHE1FTyVKVTsMJurKUzUzwSflnT0d7pl7P
+         F0hCbsOZO1NKyQ01wjwbVIIz1gi7yJ5a9/soxRUQhSRVmUhhoiwGaP0YQAMWZv6fGOuv
+         2p2nxnnh3uITGSUA63MQPMuI3kxrFu4/FU3hfRLDBQzE6Rg56VuXJO1Cn4n30JnWgRoh
+         OSHLxzd0fZWYvZA9KgcbzIiN0R/ae1V+mQJMFSOX7EtLNH94TIgrqWS4OuaLeMesB4T/
+         +RpNc2nNzlt1Ezqgv5qC6wqS1aEXY35yh5c5nEzx8JIljsCNAnnxlyM+5KsdMG+Cc009
+         RXxA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1719298242; x=1719903042;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:references
+         :mime-version:in-reply-to:from:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=TyOWEJ3RHrELUq33jeWpDKHaK+Gt6P4Gj6fOnObAdFU=;
+        b=iv6K53sn2EcatO6ZFlLHx9yszvBrLG4cEQB+6xJueKp9blrTJtVD98m8osCLq+X5mi
+         ylQo+Pwjf/0VVnWkV8nuFIEaZqfonn9fvzXXALt+idAjyBZsyrHRUhbXLUgGEaNYdTrl
+         YM08WcjGrgZEmnDOQOqFpjAznM43mkkfB5YM7Cg3WdCYIS4/CdtnEhUxu41VfM/txkHg
+         seMqteHA4xNmDjzhG1AiQKmewUVil7z1BV2GjraDSmtL8NzeZRn8z0UvLeLJ45cVwVHv
+         thw+0oSa3R35ioiTMtHhszbKb8SYQSZ0RZniwtrRZpfg+tZqnA7shPWiy4Ci4csv35/R
+         FTEQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVThp3ZZEe5eIabGi2HyAqbswuETpLomatvavJYZY4jrjOO2NXJt1oK1LIWDBNgeNqkwy1BSGp7dlJBdMYHqB6IJdMhcDSpri89ulPEUj5S
+X-Gm-Message-State: AOJu0Yy0+GUmcNOIdQYo8eHnXNOIH5Tflm4T7qXlKUy6YPyp6W9kNWV/
+	xE6cE0sk1Onr010WrUFGsJkfKlYZrsDAFTotaj+wH6EkL/68b34axM2J2g82BNAAbqPdUdnsONQ
+	d2Fuow9/qwiSFdusE+9/Mpo+Wqpk3bD5xhlBl0w==
+X-Google-Smtp-Source: AGHT+IGMKuOXH6xILN8PhK7FRckdDUIeSH0949RCCJGULK07SEfVSyU2Yf41ezKCYinzxxTPtsijiHjooK3Q3WrTV9E=
+X-Received: by 2002:a2e:b1ca:0:b0:2ec:5258:e890 with SMTP id
+ 38308e7fff4ca-2ec5b2e90b3mr36514221fa.44.1719298241674; Mon, 24 Jun 2024
+ 23:50:41 -0700 (PDT)
+Received: from 969154062570 named unknown by gmailapi.google.com with
+ HTTPREST; Mon, 24 Jun 2024 23:50:40 -0700
+From: Bartosz Golaszewski <brgl@bgdev.pl>
+In-Reply-To: <CAA8EJpqz7wPSyn0ybDWKwBKkp+rWVPbTgjbKuG6VHWm24MCusA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nasanex01c.na.qualcomm.com (10.45.79.139)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: rpc9DJHBIbV25fj7vIQOIEF7d2VjWvY9
-X-Proofpoint-GUID: rpc9DJHBIbV25fj7vIQOIEF7d2VjWvY9
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-06-25_03,2024-06-24_01,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 clxscore=1015
- bulkscore=0 phishscore=0 suspectscore=0 lowpriorityscore=0 malwarescore=0
- mlxscore=0 impostorscore=0 mlxlogscore=999 priorityscore=1501 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2406140001
- definitions=main-2406250049
+References: <20240624194518.37458-1-brgl@bgdev.pl> <CAA8EJppMPeYrPH+ssDMnf6UwHRdKQetpY3PotGvR-cc2vE68AQ@mail.gmail.com>
+ <CAMRc=MeYy8MgBVbwmrR1Rd9oQMz1tUb+uL4eFJWTL7EOsRXxjg@mail.gmail.com> <CAA8EJpqz7wPSyn0ybDWKwBKkp+rWVPbTgjbKuG6VHWm24MCusA@mail.gmail.com>
+Date: Mon, 24 Jun 2024 23:50:40 -0700
+Message-ID: <CAMRc=MeX6crenUhC1dqp08W+ss5YksUaaemr4PFFM95SHeED2g@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: qca: don't disable power management for QCA6390
+To: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
+Cc: Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>, Bartosz Golaszewski <brgl@bgdev.pl>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Update the 'mas_session' structure such that
-manager_emit_transfer_property(os->service_data, "Size")
-will get the proper structure in arguments as
-expected like structure 'obex_transfer' and transfer->path
-won't be populated with inappropriate value.
+On Mon, 24 Jun 2024 23:19:55 +0200, Dmitry Baryshkov
+<dmitry.baryshkov@linaro.org> said:
+> On Mon, 24 Jun 2024 at 23:47, Bartosz Golaszewski <brgl@bgdev.pl> wrote:
+>>
+>> On Mon, Jun 24, 2024 at 10:17=E2=80=AFPM Dmitry Baryshkov
+>> <dmitry.baryshkov@linaro.org> wrote:
+>> >
+>> > On Mon, 24 Jun 2024 at 22:45, Bartosz Golaszewski <brgl@bgdev.pl> wrot=
+e:
+>> > >
+>> > > From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+>> > >
+>> > > We unnecessarily fallthrough the case for QCA6390 when initializing =
+the
+>> > > device and hit the condition where - due to the lack of the enable-g=
+pio
+>> > > - we disable power management despite using the power sequencer. We =
+don't
+>> > > need to look for clocks on this model so it makes more sense to just
+>> > > register the hci device and break the switch.
+>> > >
+>> > > Reported-by: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
+>> > > Fixes: 4029dba6b6f1 ("Bluetooth: qca: use the power sequencer for QC=
+A6390")
+>> > > Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+>> >
+>> > Is this going to break the QCA6390 as present on M.2 / PCIe cards? Or
+>> > the older DT which didn't have pwrseq entries?
+>> >
+>>
+>> Neither of these has clocks that need to be driven by linux. The only
+>> user of QCA6390 Bluetooth in mainline is RB5. Bindings didn't exist
+>> before so no commitment was ever made.
+>
+> This might make some laptop users unhappy. But anyway, restarting the
+> hci0 now gives:
+>
+> [   24.387344] Bluetooth: hci0: setting up ROME/QCA6390
+> [   24.387439] qcom_geni_serial 998000.serial: serial engine reports 0
+> RX bytes in!
+> [   24.554349] qcom_geni_serial 998000.serial: serial engine reports 0
+> RX bytes in!
+> [   24.562056] arm-smmu 15000000.iommu: Unhandled context fault:
+> fsr=3D0x402, iova=3D0xfffd1080, fsynr=3D0x750013, cbfrsynra=3D0x5a3, cb=
+=3D3
+> [   26.914225] Bluetooth: hci0: command 0xfc00 tx timeout
+> [   35.042619] Bluetooth: hci0: Reading QCA version information failed (-=
+110)
+> [   35.049721] Bluetooth: hci0: Retry BT power ON:0
+> [   37.539492] Bluetooth: hci0: command 0xfc00 tx timeout
+> [   45.539519] Bluetooth: hci0: Reading QCA version information failed (-=
+110)
+> [   45.546667] Bluetooth: hci0: Retry BT power ON:1
+> [   48.035863] Bluetooth: hci0: command 0xfc00 tx timeout
+> [   56.034783] Bluetooth: hci0: Reading QCA version information failed (-=
+110)
+> [   56.041901] Bluetooth: hci0: Retry BT power ON:2
+> [   58.532174] Bluetooth: hci0: command 0xfc00 tx timeout
+> [   66.531928] Bluetooth: hci0: Reading QCA version information failed (-=
+110)
+>
+>
 
-As there is no new transfer registered during mas connect,
-hence setting the path to NULL to avoid invoking the
-g_dbus_emit_property_changed() property.
+How do you reproduce it because it works fine for me:
 
-Signed-off-by: Amisha Jain <quic_amisjain@quicinc.com>
----
- obexd/plugins/mas.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+root@qcom-armv8a:~# btmgmt --index 0 public-addr 00:11:22:33:44:55
+[  429.096397] Bluetooth: MGMT ver 1.23
+hci0 Set Public Address complete, options:
+[  429.102024] Bluetooth: hci0: setting up ROME/QCA6390
+root@qcom-armv8a:~# [  429.184052] Bluetooth: Received
+HCI_IBS_WAKE_ACK in tx state 0
+[  429.497264] Bluetooth: hci0: QCA Product ID   :0x00000010
+[  429.502854] Bluetooth: hci0: QCA SOC Version  :0x400a0200
+[  429.508412] Bluetooth: hci0: QCA ROM Version  :0x00000200
+[  429.513974] Bluetooth: hci0: QCA Patch Version:0x00000d2b
+[  429.519533] Bluetooth: hci0: QCA controller version 0x02000200
+[  429.525534] Bluetooth: hci0: QCA Downloading qca/htbtfw20.tlv
+[  430.449793] Bluetooth: hci0: QCA Downloading qca/htnv20.bin
 
-diff --git a/obexd/plugins/mas.c b/obexd/plugins/mas.c
-index 10b972d65..71bf12ad3 100644
---- a/obexd/plugins/mas.c
-+++ b/obexd/plugins/mas.c
-@@ -51,6 +51,8 @@
- #define ML_BODY_END "</MAP-msg-listing>"
- 
- struct mas_session {
-+	uint8_t notification_status;
-+	char *path;
- 	struct mas_request *request;
- 	void *backend_data;
- 	gboolean finished;
-@@ -59,7 +61,6 @@ struct mas_session {
- 	GObexApparam *inparams;
- 	GObexApparam *outparams;
- 	gboolean ap_sent;
--	uint8_t notification_status;
- };
- 
- static const uint8_t MAS_TARGET[TARGET_SIZE] = {
-@@ -125,6 +126,7 @@ static void *mas_connect(struct obex_session *os, int *err)
- 		goto failed;
- 
- 	manager_register_session(os);
-+	mas->path = NULL;
- 
- 	return mas;
- 
--- 
-2.17.1
+root@qcom-armv8a:~# [  430.689052] Bluetooth: hci0: QCA setup on UART
+is completed
+[  430.752854] NET: Registered PF_ALG protocol family
 
+root@qcom-armv8a:~#
+root@qcom-armv8a:~# hciconfig hci0 up
+[  437.505116] Bluetooth: hci0: setting up ROME/QCA6390
+[  437.586969] Bluetooth: Received HCI_IBS_WAKE_ACK in tx state 0
+[  437.912683] Bluetooth: hci0: QCA Product ID   :0x00000010
+[  437.918286] Bluetooth: hci0: QCA SOC Version  :0x400a0200
+[  437.923890] Bluetooth: hci0: QCA ROM Version  :0x00000200
+[  437.929613] Bluetooth: hci0: QCA Patch Version:0x00000d2b
+[  437.935184] Bluetooth: hci0: QCA controller version 0x02000200
+[  437.941207] Bluetooth: hci0: QCA Downloading qca/htbtfw20.tlv
+[  438.918868] Bluetooth: hci0: QCA Downloading qca/htnv20.bin
+[  439.158671] Bluetooth: hci0: QCA setup on UART is completed
+root@qcom-armv8a:~#
+root@qcom-armv8a:~#
+root@qcom-armv8a:~# hciconfig hci0 down
+root@qcom-armv8a:~#
+root@qcom-armv8a:~# cat /sys/kernel/debug/pwrseq
+pwrseq.0:
+  targets:
+    target: [bluetooth] (target unit: [bluetooth-enable])
+    target: [wlan] (target unit: [wlan-enable])
+  units:
+    unit: [regulators-enable] - enable count: 1
+    unit: [clock-enable] - enable count: 1
+    unit: [bluetooth-enable] - enable count: 0
+      dependencies:
+        [regulators-enable]
+        [clock-enable]
+    unit: [wlan-enable] - enable count: 1
+      dependencies:
+        [regulators-enable]
+        [clock-enable]
+root@qcom-armv8a:~#
+root@qcom-armv8a:~# hciconfig hci0 up
+[  454.407376] Bluetooth: hci0: setting up ROME/QCA6390
+[  454.485238] Bluetooth: Received HCI_IBS_WAKE_ACK in tx state 0
+[  454.813289] Bluetooth: hci0: QCA Product ID   :0x00000010
+[  454.818892] Bluetooth: hci0: QCA SOC Version  :0x400a0200
+[  454.824461] Bluetooth: hci0: QCA ROM Version  :0x00000200
+[  454.830035] Bluetooth: hci0: QCA Patch Version:0x00000d2b
+[  454.835599] Bluetooth: hci0: QCA controller version 0x02000200
+[  454.841651] Bluetooth: hci0: QCA Downloading qca/htbtfw20.tlv
+[  455.773967] Bluetooth: hci0: QCA Downloading qca/htnv20.bin
+[  456.011213] Bluetooth: hci0: QCA setup on UART is completed
+
+Bart
