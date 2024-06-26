@@ -1,238 +1,287 @@
-Received: from mail-io1-f78.google.com (mail-io1-f78.google.com [209.85.166.78])
+Received: from mail-lj1-f175.google.com (mail-lj1-f175.google.com [209.85.208.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 974A3181BB1
-	for <linux-bluetooth@vger.kernel.org>; Wed, 26 Jun 2024 13:29:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.78
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF21317D37E
+	for <linux-bluetooth@vger.kernel.org>; Wed, 26 Jun 2024 14:03:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719408564; cv=none; b=iecom8QBhoDeXpSCqpbwkP8T3csSfAvWjG9jsBvPtSK9g7VxFoAczy2UnAzoZ34qwts4YzshZiVrFwiMo6ehkMF1U6pmRa/UrIdT7Eda5AP+g98EFHKdWVSOG2OQmf5oTknJwNm6gwGpCitCFqc7Y/tV4QAFzVXVcYycuIRgRec=
+	t=1719410601; cv=none; b=Ibo/0RBaoZOBdXSjOz2g7XPhvhZaFGcrOIQ3aBfaM8052QZu4IJQ/xNB6V2IYoUBg39wi/xXV9hKYedclpw7+mhjqwFD6qGS4GjFJTpvsTd3CWy+e+dJBqWQjZNRPVwr1glSBkUvPYJHxbLTDW9Ow7ddEgXR78/XXjN4gDcPLAc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719408564; c=relaxed/simple;
-	bh=xn504NGNG0kxNXRZnfYlpS74WmBzmR5XEQDopqL45lA=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=r0LrSkuXxPqUZxmuWwlR7N/YXRrVyooTYI2weFlbnuhPf9GhV5sguQ3iCvGVRRFVLb2dHa+5QQvQeVxcAClPZNQOcu0GcsMSI+DRejgqSIsakbavM6kqdJyR73Bd/tWRA2+E7rdaUUDVoJ5e4VQbQJWAI2H6wX+AfKOnEgv/W6o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.78
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f78.google.com with SMTP id ca18e2360f4ac-7f38e9f1f06so846782239f.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 26 Jun 2024 06:29:22 -0700 (PDT)
+	s=arc-20240116; t=1719410601; c=relaxed/simple;
+	bh=S8KTamZUhjFtvA1OOEfb29lrmZ8AB9/t7RqztKL6cIo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ZwOZ2ZFl+id4b/iuqhAMeDez2OFije6DxdBFcMDct5AY5kIxbt/vl4RK9UDHLctGU6Qu/HS21F3gM8kbxYCboN+9zP/hy+o4Qf5W75gO+M1PIEsrR9ZdzXIjcmUOeeK5wFv504xoVwsnozmlH8URU/IZVhvQ54NT8E/yXqe0vvo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Xe7jkIbv; arc=none smtp.client-ip=209.85.208.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Xe7jkIbv"
+Received: by mail-lj1-f175.google.com with SMTP id 38308e7fff4ca-2ebe785b234so74332271fa.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 26 Jun 2024 07:03:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1719410598; x=1720015398; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=5YClcim1OgiIHm5IBVLd2fK3Jz+I4Z1jnOdLg3fPAsI=;
+        b=Xe7jkIbvvzjrKpSCermPeYEaoKQtOmoa+BkdmF6ToGblJ7+ntthhkidgqFRonYiyPg
+         bhy8pDiphYPSCWAkX1Sp+Bnz0M6meDyzo9swbW0seuHtsPHnE+gbbVQCw2V++2SB2Bcg
+         Hfo+UHVtLEc6geFRV6tQZtYA9VrvYZcfPxYkH50jBdZXC91BYVWdvuGAzB16egFb7j7Q
+         Oc5OxoJdTIQ062f46BqEuaQS7CfIziyVfioV8HAyG/2QxoYenrydl+DIXwGG3FLoq8AS
+         JuR/X/h1XhGBYJX+jUB7laj0z7bdaYgY/bq+BqKwf2ErQC+0oUw4lxo6GlU/wE62JTM4
+         47fw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719408562; x=1720013362;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=JGaEcmynSOXaEflC66T6hHmKgzOiTH3W9YWU2vZC/yk=;
-        b=qgJSUY5jft3LtQOmUsPzV+MgPGwZvWVWU4tBBX936kVJ7iqNf6QfEFwZoymzbeEme3
-         2BWzkFbZwqXbqvYD0vE53Me82Rw8/1QRocrPJnTFpBvpa5uYs8VXWrWijx/vH4Z4hMd4
-         1pOV0imtB/zZBsPyjLhyUkOER55+dJaJJxz46uYWs+fq8CND6YpqVASss8VH4YWgEeIb
-         TZYehaFZ8PqVb/+hfR10/JFboT80M1hOrvpGoU3fhkMferBCWerCqKtvS5QArrejEmSP
-         uTBPrPPJcHb83KmKSsYf+8fLTZMS8F3VaWvqR/dubGFQMTICsUxy6Yo5DfuSNN9F9DWu
-         tjBQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUEoEDtGI+6p8POYvaOnxjDiS91kw9SBcRf+wvKNgBPrqT4Ec+qkskOPILas05PWutuNcqo5dltV2Z1POAPLRBDV0NrpBmUzKXPgrGJZL5X
-X-Gm-Message-State: AOJu0YxH3v5fkcxT9NNB6h/qqWyvD8QikgkYWOiT6q/NFhvu6bICTP+F
-	YCIGj5DXlYNSFPa/zv2Df6svU96LPe9x2IMfPGYg/DkqfaZ+NWUPPoqju2EYqNXnHAGh54t7icZ
-	qeVtlaycjSCx0W/7+F0Mmo90rFvmydPxyvJB0T+X/bU6YCRkkHPIn6p4=
-X-Google-Smtp-Source: AGHT+IFK6tEb7xGZa3FsEiesXHsG5oYPksDyJRvr6+CtFcrjW/n6T/oLMxJ9ti0EXVeyNhwTVrapnbMrsrkqBjKBd4JHNNLZLyYQ
+        d=1e100.net; s=20230601; t=1719410598; x=1720015398;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=5YClcim1OgiIHm5IBVLd2fK3Jz+I4Z1jnOdLg3fPAsI=;
+        b=sYHVP1QfuLZEk0OOS84zqtb4yGkW74psqQ6/YPIAkaRr3OXWm0AwiEDJ3Fouk+1WnB
+         qd6fl20jsXKfMn/nmnKSKAIvVgJrv0mBNqjGkUV0zUT3htoQ6JyGh6LnTVtbPcG/5gLZ
+         DM2kLZ9ENlVXQbqkR0QSdGmR2nxit19r4gi0SVU6dns5WoaIiQ01TzgVaEhJTeTMQnS9
+         w7Yk7mSF8/frRm4gjPyKq3mwd1cqqMhp05JTuajQfxT7RmqLNZbZoICDals0Z+ALqWQ5
+         7xvWY4hYIhgo/HOJqbp5bB0NGx5MyNhqf+q6wOVqaCcnarFemzCmRcP7v8GnuVQlkIyF
+         eXaw==
+X-Gm-Message-State: AOJu0YwLifrk96Q3+6QbqRSGWPIyFAfr9Uj4UJb4+P1qycnZHjCS1U2s
+	9UDFHqPKENqVxUQZFQB9pbOFaCvfSGuNqx/w4Lap13sbTwa3YBi3e1d1zlqVY5yzpzaDQlYXNz7
+	OJVuQ9cET3cL5XXv/eBLeAC87dgE=
+X-Google-Smtp-Source: AGHT+IHCk6m2shGQ0cky7oRGQ9F4CSqH0avgLBNdpyLdJUPseTVTF1tANrToSKGRYHhfYbJgDWLn5GJfPKgtGP8zixc=
+X-Received: by 2002:a2e:3e13:0:b0:2ec:5685:f05f with SMTP id
+ 38308e7fff4ca-2ec5938a771mr74176311fa.49.1719410597890; Wed, 26 Jun 2024
+ 07:03:17 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1a26:b0:375:88ec:8111 with SMTP id
- e9e14a558f8ab-3763e068f94mr10698315ab.3.1719408561765; Wed, 26 Jun 2024
- 06:29:21 -0700 (PDT)
-Date: Wed, 26 Jun 2024 06:29:21 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000008c4e52061bcb0014@google.com>
-Subject: [syzbot] [bluetooth?] KASAN: slab-use-after-free Read in hci_chan_sent
-From: syzbot <syzbot+330fbb52cab59274c69c@syzkaller.appspotmail.com>
-To: johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, luiz.dentz@gmail.com, marcel@holtmann.org, 
-	syzkaller-bugs@googlegroups.com
+References: <CAH4xE45xkoHOY6kgYLf=HVVrMPrgqDZzRfEwGi3Ozi1MW4e+dg@mail.gmail.com>
+In-Reply-To: <CAH4xE45xkoHOY6kgYLf=HVVrMPrgqDZzRfEwGi3Ozi1MW4e+dg@mail.gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Wed, 26 Jun 2024 10:03:05 -0400
+Message-ID: <CABBYNZ+aOGdnHTXdHuViagH+9JAFJOuZ=uN-eMcqTD1wPdK56A@mail.gmail.com>
+Subject: Re: [bug report] GATT server crash after client disconnect (UAF)
+To: =?UTF-8?Q?K=C3=A9vin_Courdesses?= <kevin.courdesses@beacon.bio>
+Cc: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hello,
+Hi Kevin,
 
-syzbot found the following issue on:
+On Wed, Jun 26, 2024 at 6:58=E2=80=AFAM K=C3=A9vin Courdesses
+<kevin.courdesses@beacon.bio> wrote:
+>
+> Hello,
+>
+> We detected a spurious crash of `bluetoothd` in our embedded system,
+> acting as a GATT server. The system is running the latest BlueZ
+> release (5.76).
+>
+> I traced the problem to a use-after-free (UAF) error, sometimes
+> triggered when a device disconnects while a characteristic read or
+> write is still being processed. Below are relevant debug and Valgrind
+> traces.
+>
+> ----
+> bluetoothd[167]: src/shared/gatt-server.c:handle_read_req() Read Req -
+> handle: 0x0014
+> bluetoothd[167]: src/shared/gatt-server.c:read_complete_cb() Read
+> Complete: err 0
+> bluetoothd[167]: src/shared/att.c:can_read_data() (chan 0x53bd198) ATT
+> PDU received: 0x0a
+> bluetoothd[167]: src/shared/gatt-server.c:handle_read_req() Read Req -
+> handle: 0x002e
+> bluetoothd[167]: src/shared/mgmt.c:can_read_data() [0x0000] event 0x000c
+> bluetoothd[167]: src/adapter.c:dev_disconnected() Device
+> 48:A4:72:79:82:D5 disconnected, reason 3
+> bluetoothd[167]: src/adapter.c:adapter_remove_connection()
+> bluetoothd[167]: plugins/policy.c:disconnect_cb() reason 3
+> bluetoothd[167]: src/adapter.c:bonding_attempt_complete() hci0 bdaddr
+> 48:A4:72:79:82:D5 type 1 status 0xe
+> bluetoothd[167]: src/device.c:device_bonding_complete() bonding (nil)
+> status 0x0e
+> bluetoothd[167]: src/device.c:btd_device_set_temporary() temporary 1
+> bluetoothd[167]: src/device.c:device_bonding_failed() status 14
+> bluetoothd[167]: src/adapter.c:resume_discovery()
+> bluetoothd[167]: src/shared/att.c:disconnect_cb() Channel 0x53bd198
+> disconnected: Connection reset by peer
+> bluetoothd[167]: src/device.c:att_disconnected_cb()
+> bluetoothd[167]: src/device.c:att_disconnected_cb() Connection reset
+> by peer (104)
+> bluetoothd[167]: src/service.c:change_state() 0x53faa80: device
+> 48:A4:72:79:82:D5 profile gap-profile state changed: connected ->
+> disconnecting (0)
+> bluetoothd[167]: src/service.c:change_state() 0x53faa80: device
+> 48:A4:72:79:82:D5 profile gap-profile state changed: disconnecting ->
+> disconnected (0)
+> bluetoothd[167]: src/service.c:change_state() 0x54017a8: device
+> 48:A4:72:79:82:D5 profile deviceinfo state changed: connected ->
+> disconnecting (0)
+> bluetoothd[167]: src/service.c:change_state() 0x54017a8: device
+> 48:A4:72:79:82:D5 profile deviceinfo state changed: disconnecting ->
+> disconnected (0)
+> bluetoothd[167]: src/gatt-client.c:btd_gatt_client_disconnected()
+> Device disconnected. Cleaning up.
+> bluetoothd[167]: src/device.c:att_disconnected_cb() Automatic
+> connection disabled
+> bluetoothd[167]: src/gatt-database.c:btd_gatt_database_att_disconnected()
+> bluetoothd[167]: src/gatt-database.c:att_disconnected()
+> bluetoothd[167]: attrib/gattrib.c:g_attrib_unref() 0x53bd140: g_attrib_un=
+ref=3D0
+> bluetoothd[167]: src/gatt-database.c:read_reply_cb() Pending read was
+> canceled when object got removed
+> bluetoothd[167]: src/shared/gatt-server.c:read_complete_cb() Read
+> Complete: err -110
+> =3D=3D167=3D=3D Invalid read of size 4
+> =3D=3D167=3D=3D    at 0x8277C: bt_att_chan_send_error_rsp (in
+> /usr/libexec/bluetooth/bluetoothd)
+> =3D=3D167=3D=3D  Address 0x53bd198 is 0 bytes inside a block of size 44 f=
+ree'd
+> =3D=3D167=3D=3D    at 0x482F350: free (vg_replace_malloc.c:538)
+> =3D=3D167=3D=3D    by 0x8320F: disconnect_cb (in /usr/libexec/bluetooth/b=
+luetoothd)
+> =3D=3D167=3D=3D  Block was alloc'd at
+> =3D=3D167=3D=3D    at 0x482DE08: malloc (vg_replace_malloc.c:307)
+> =3D=3D167=3D=3D    by 0x7BDD3: util_malloc (in /usr/libexec/bluetooth/blu=
+etoothd)
+> =3D=3D167=3D=3D
+> [cropped, valgrind complains a lot after this]
+> ----
+>
+> These logs illustrate that the problem occurs soon after
+> `read_complete_cb` is executed, in `bt_att_chan_send_error_rsp`.
+>
+> src/shared/gatt-server.c
+>      904 static void read_complete_cb(struct gatt_db_attribute *attr, int=
+ err,
+>      905                     const uint8_t *value, size_t len,
+>      906                     void *user_data)
+>      907 {
+>      908     struct async_read_op *op =3D user_data;
+>      909     struct bt_gatt_server *server =3D op->server;
+>      910     uint8_t rsp_opcode;
+>      911     uint16_t mtu;
+>      912     uint16_t handle;
+>      913
+>      914     DBG(server, "Read Complete: err %d", err);
+>      915
+>      916     mtu =3D bt_att_get_mtu(server->att);
+>      917     handle =3D gatt_db_attribute_get_handle(attr);
+>      918
+>      919     if (err) {
+>      920         bt_att_chan_send_error_rsp(op->chan, op->opcode, handle,=
+ err);
+>      921         async_read_op_destroy(op);
+>      922         return;
+>      923     }
+>
+> However, at this point, `op->chan` has already been freed by a `disconnec=
+t_cb`.
+>
+> I'm not familiar with the BlueZ code base and I don't know the
+> idiomatic way to fix this issue. I'd say `bt_att_chan_send_error_rsp`
+> should only be called if `op->chan` is still allocated. The following
+> patch attempts to implement a solution. It's probably not the right
+> way to do it, but this seemingly fixes the issue on our side.
 
-HEAD commit:    234cb065ad82 Add linux-next specific files for 20240605
-git tree:       linux-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=17d51564980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=fc762e458631913
-dashboard link: https://syzkaller.appspot.com/bug?extid=330fbb52cab59274c69c
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+If we get to this point perhaps the op is being cleaned up so we might
+need to set the op->chan to NULL or properly reference it at op
+creation so it is not freed until the op is freed.
 
-Unfortunately, I don't have any reproducer for this issue yet.
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/f0492dc0386a/disk-234cb065.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/490224339088/vmlinux-234cb065.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/5843c0673606/bzImage-234cb065.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+330fbb52cab59274c69c@syzkaller.appspotmail.com
-
-==================================================================
-BUG: KASAN: slab-use-after-free in hci_chan_sent+0x67d/0xaf0 net/bluetooth/hci_core.c:3548
-Read of size 8 at addr ffff88801e8a9018 by task kworker/u9:0/53
-
-CPU: 1 PID: 53 Comm: kworker/u9:0 Tainted: G        W          6.10.0-rc2-next-20240605-syzkaller #0
-Tainted: [W]=WARN
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 04/02/2024
-Workqueue: hci1 hci_tx_work
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:91 [inline]
- dump_stack_lvl+0x241/0x360 lib/dump_stack.c:117
- print_address_description mm/kasan/report.c:377 [inline]
- print_report+0x169/0x550 mm/kasan/report.c:488
- kasan_report+0x143/0x180 mm/kasan/report.c:601
- hci_chan_sent+0x67d/0xaf0 net/bluetooth/hci_core.c:3548
- hci_sched_acl_pkt net/bluetooth/hci_core.c:3685 [inline]
- hci_sched_acl net/bluetooth/hci_core.c:3725 [inline]
- hci_tx_work+0x5c2/0x1590 net/bluetooth/hci_core.c:3818
- process_one_work kernel/workqueue.c:3248 [inline]
- process_scheduled_works+0xa2c/0x1830 kernel/workqueue.c:3329
- worker_thread+0x86d/0xd50 kernel/workqueue.c:3409
- kthread+0x2f0/0x390 kernel/kthread.c:389
- ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
- </TASK>
-
-Allocated by task 5127:
- kasan_save_stack mm/kasan/common.c:47 [inline]
- kasan_save_track+0x3f/0x80 mm/kasan/common.c:68
- poison_kmalloc_redzone mm/kasan/common.c:370 [inline]
- __kasan_kmalloc+0x98/0xb0 mm/kasan/common.c:387
- kasan_kmalloc include/linux/kasan.h:211 [inline]
- __kmalloc_cache_noprof+0x19c/0x2c0 mm/slub.c:4153
- kmalloc_noprof include/linux/slab.h:660 [inline]
- kzalloc_noprof include/linux/slab.h:778 [inline]
- hci_chan_create+0xc8/0x310 net/bluetooth/hci_conn.c:2724
- l2cap_conn_add+0x69/0x8e0 net/bluetooth/l2cap_core.c:6860
- l2cap_connect_cfm+0x136/0x1220 net/bluetooth/l2cap_core.c:7241
- hci_connect_cfm include/net/bluetooth/hci_core.h:1971 [inline]
- hci_remote_features_evt+0x536/0xaf0 net/bluetooth/hci_event.c:3721
- hci_event_func net/bluetooth/hci_event.c:7424 [inline]
- hci_event_packet+0xac0/0x1540 net/bluetooth/hci_event.c:7476
- hci_rx_work+0x3e8/0xca0 net/bluetooth/hci_core.c:4087
- process_one_work kernel/workqueue.c:3248 [inline]
- process_scheduled_works+0xa2c/0x1830 kernel/workqueue.c:3329
- worker_thread+0x86d/0xd50 kernel/workqueue.c:3409
- kthread+0x2f0/0x390 kernel/kthread.c:389
- ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
-
-Freed by task 5122:
- kasan_save_stack mm/kasan/common.c:47 [inline]
- kasan_save_track+0x3f/0x80 mm/kasan/common.c:68
- kasan_save_free_info+0x40/0x50 mm/kasan/generic.c:579
- poison_slab_object+0xe0/0x150 mm/kasan/common.c:240
- __kasan_slab_free+0x37/0x60 mm/kasan/common.c:256
- kasan_slab_free include/linux/kasan.h:184 [inline]
- slab_free_hook mm/slub.c:2196 [inline]
- slab_free mm/slub.c:4437 [inline]
- kfree+0x149/0x360 mm/slub.c:4558
- l2cap_conn_del+0x4eb/0x680 net/bluetooth/l2cap_core.c:1795
- l2cap_connect_cfm+0x11f/0x1220 net/bluetooth/l2cap_core.c:7237
- hci_connect_cfm include/net/bluetooth/hci_core.h:1971 [inline]
- hci_conn_failed+0x1f6/0x340 net/bluetooth/hci_conn.c:1257
- hci_abort_conn_sync+0x583/0xde0 net/bluetooth/hci_sync.c:5450
- hci_cmd_sync_work+0x22b/0x400 net/bluetooth/hci_sync.c:310
- process_one_work kernel/workqueue.c:3248 [inline]
- process_scheduled_works+0xa2c/0x1830 kernel/workqueue.c:3329
- worker_thread+0x86d/0xd50 kernel/workqueue.c:3409
- kthread+0x2f0/0x390 kernel/kthread.c:389
- ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
-
-The buggy address belongs to the object at ffff88801e8a9000
- which belongs to the cache kmalloc-128 of size 128
-The buggy address is located 24 bytes inside of
- freed 128-byte region [ffff88801e8a9000, ffff88801e8a9080)
-
-The buggy address belongs to the physical page:
-page: refcount:1 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x1e8a9
-flags: 0xfff00000000000(node=0|zone=1|lastcpupid=0x7ff)
-page_type: 0xfdffffff(slab)
-raw: 00fff00000000000 ffff888015041a00 ffffea00006aa9c0 dead000000000004
-raw: 0000000000000000 0000000000100010 00000001fdffffff 0000000000000000
-page dumped because: kasan: bad access detected
-page_owner tracks the page as allocated
-page last allocated via order 0, migratetype Unmovable, gfp_mask 0x52cc0(GFP_KERNEL|__GFP_NOWARN|__GFP_NORETRY|__GFP_COMP), pid 4548, tgid 4548 (udevd), ts 39552199694, free_ts 39550682804
- set_page_owner include/linux/page_owner.h:32 [inline]
- post_alloc_hook+0x1f3/0x230 mm/page_alloc.c:1470
- prep_new_page mm/page_alloc.c:1478 [inline]
- get_page_from_freelist+0x2cbd/0x2d70 mm/page_alloc.c:3457
- __alloc_pages_noprof+0x256/0x6c0 mm/page_alloc.c:4715
- __alloc_pages_node_noprof include/linux/gfp.h:269 [inline]
- alloc_pages_node_noprof include/linux/gfp.h:296 [inline]
- alloc_slab_page+0x5f/0x120 mm/slub.c:2265
- allocate_slab+0x5a/0x2f0 mm/slub.c:2428
- new_slab mm/slub.c:2481 [inline]
- ___slab_alloc+0xcd1/0x14b0 mm/slub.c:3667
- __slab_alloc+0x58/0xa0 mm/slub.c:3757
- __slab_alloc_node mm/slub.c:3810 [inline]
- slab_alloc_node mm/slub.c:3989 [inline]
- __kmalloc_cache_noprof+0x1d5/0x2c0 mm/slub.c:4148
- kmalloc_noprof include/linux/slab.h:660 [inline]
- kzalloc_noprof include/linux/slab.h:778 [inline]
- kernfs_get_open_node fs/kernfs/file.c:525 [inline]
- kernfs_fop_open+0x829/0xd10 fs/kernfs/file.c:700
- do_dentry_open+0x95a/0x1720 fs/open.c:959
- do_open fs/namei.c:3654 [inline]
- path_openat+0x289f/0x3280 fs/namei.c:3811
- do_filp_open+0x235/0x490 fs/namei.c:3838
- do_sys_openat2+0x13e/0x1d0 fs/open.c:1409
- do_sys_open fs/open.c:1424 [inline]
- __do_sys_openat fs/open.c:1440 [inline]
- __se_sys_openat fs/open.c:1435 [inline]
- __x64_sys_openat+0x247/0x2a0 fs/open.c:1435
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-page last free pid 4545 tgid 4545 stack trace:
- reset_page_owner include/linux/page_owner.h:25 [inline]
- free_pages_prepare mm/page_alloc.c:1089 [inline]
- free_unref_page+0xd22/0xea0 mm/page_alloc.c:2621
- rcu_do_batch kernel/rcu/tree.c:2564 [inline]
- rcu_core+0xafd/0x1830 kernel/rcu/tree.c:2838
- handle_softirqs+0x2c4/0x970 kernel/softirq.c:554
- __do_softirq kernel/softirq.c:588 [inline]
- invoke_softirq kernel/softirq.c:428 [inline]
- __irq_exit_rcu+0xf4/0x1c0 kernel/softirq.c:637
- irq_exit_rcu+0x9/0x30 kernel/softirq.c:649
- instr_sysvec_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1043 [inline]
- sysvec_apic_timer_interrupt+0xa6/0xc0 arch/x86/kernel/apic/apic.c:1043
- asm_sysvec_apic_timer_interrupt+0x1a/0x20 arch/x86/include/asm/idtentry.h:702
-
-Memory state around the buggy address:
- ffff88801e8a8f00: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
- ffff88801e8a8f80: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
->ffff88801e8a9000: fa fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-                            ^
- ffff88801e8a9080: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
- ffff88801e8a9100: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-==================================================================
+> -----
+> diff --git a/src/shared/att.c b/src/shared/att.c
+> index 485ef07..baef0cc 100644
+> --- a/src/shared/att.c
+> +++ b/src/shared/att.c
+> @@ -2068,3 +2068,11 @@ done:
+>
+>         return true;
+>  }
+> +
+> +struct queue *bt_att_get_chans(struct bt_att *att)
+> +{
+> +       if (!att)
+> +               return NULL;
+> +
+> +       return att->chans;
+> +}
+> \ No newline at end of file
+> diff --git a/src/shared/att.h b/src/shared/att.h
+> index 6fd7863..98f91e1 100644
+> --- a/src/shared/att.h
+> +++ b/src/shared/att.h
+> @@ -111,3 +111,5 @@ bool bt_att_set_remote_key(struct bt_att *att,
+> uint8_t sign_key[16],
+>                         bt_att_counter_func_t func, void *user_data);
+>  bool bt_att_has_crypto(struct bt_att *att);
+>  bool bt_att_set_retry(struct bt_att *att, unsigned int id, bool retry);
+> +
+> +struct queue *bt_att_get_chans(struct bt_att *att);
+> \ No newline at end of file
+> diff --git a/src/shared/gatt-server.c b/src/shared/gatt-server.c
+> index 0e399ce..ca9af59 100644
+> --- a/src/shared/gatt-server.c
+> +++ b/src/shared/gatt-server.c
+> @@ -790,7 +790,21 @@ static void write_complete_cb(struct
+> gatt_db_attribute *attr, int err,
+>         handle =3D gatt_db_attribute_get_handle(attr);
+>
+>         if (err)
+> -               bt_att_chan_send_error_rsp(op->chan, op->opcode, handle, =
+err);
+> +       {
+> +               // Only call bt_att_chan_send_error_rsp if the channel
+> +               // is still valid
+> +               struct bt_att *att =3D bt_gatt_server_get_att(server);
+> +               struct queue *chans =3D bt_att_get_chans(att);
+> +               const struct queue_entry *entry;
+> +               for (entry =3D queue_get_entries(chans); entry; entry =3D
+> entry->next)
+> +               {
+> +                       if (entry->data =3D=3D op->chan)
+> +                       {
+> +                               bt_att_chan_send_error_rsp(op->chan,
+> op->opcode, handle, err);
+> +                               break;
+> +                       }
+> +               }
+> +       }
+>         else
+>                 bt_att_chan_send_rsp(op->chan, BT_ATT_OP_WRITE_RSP, NULL,=
+ 0);
+>
+> @@ -917,7 +931,19 @@ static void read_complete_cb(struct
+> gatt_db_attribute *attr, int err,
+>         handle =3D gatt_db_attribute_get_handle(attr);
+>
+>         if (err) {
+> -               bt_att_chan_send_error_rsp(op->chan, op->opcode, handle, =
+err);
+> +               // Only call bt_att_chan_send_error_rsp if the channel
+> +               // is still valid
+> +               struct bt_att *att =3D bt_gatt_server_get_att(server);
+> +               struct queue *chans =3D bt_att_get_chans(att);
+> +               const struct queue_entry *entry;
+> +               for (entry =3D queue_get_entries(chans); entry; entry =3D
+> entry->next)
+> +               {
+> +                       if (entry->data =3D=3D op->chan)
+> +                       {
+> +                               bt_att_chan_send_error_rsp(op->chan,
+> op->opcode, handle, err);
+> +                               break;
+> +                       }
+> +               }
+>                 async_read_op_destroy(op);
+>                 return;
+>         }
+> -----
+>
+> Regards,
+>
+> K=C3=A9vin
+>
 
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+--=20
+Luiz Augusto von Dentz
