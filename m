@@ -1,94 +1,67 @@
-Received: from mail-ot1-f48.google.com (mail-ot1-f48.google.com [209.85.210.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4FAA17D356
-	for <linux-bluetooth@vger.kernel.org>; Wed, 26 Jun 2024 11:12:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9198B15FA71
+	for <linux-bluetooth@vger.kernel.org>; Wed, 26 Jun 2024 12:26:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719400381; cv=none; b=js21gLXBi/7eqKhH2hHH1KxEkdso6v9Hg97+NzzmjNxCoC+G05tWt1JAxlfAgu5VLgbAA1sFaKCdIO5md1y/LL3kbp8QJfz70X8ap5KC9bEGJssyaNATHawWMxTSHLp8t96K6jaX6+nrwG0myPmAivvw+Wb9Ejj1N6zOvsdgsj8=
+	t=1719404790; cv=none; b=kSbS0GZHx5MElQKwQfQvQjDd5ATbR+6K7ZMnuesdtor6L6R1DeFeh7i6dUqZ7Kjjn0JcXT2v5fjirZGdh72w0VRrN9sFKT/hrxMXcyZJxZrHXyNHX/8IskjLzJHPaoAwY9IObrge9S851gskK+/t5aiCmL+pK8OC2MYSdBU/5MU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719400381; c=relaxed/simple;
-	bh=ueq9slypc2sY6GiJnwF5qk4jYm/9eOlKGv0CpEaXszY=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=DYmy++E0PHSdEiJin6eEPUHgmByLPMKPA8kbl9XF8xOySFU/puC+TXiU2Wr5KNAGazI81aQ19AtixNg1Mc6gmxxbH59ShpNJ+BOh2z9lftkzL42QBc9UEV9DTN3hSdEpKqszPU78zhvJlRSduC6Ap/bLkHFT18tx2IKzDPUw9us=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QfhxGTuZ; arc=none smtp.client-ip=209.85.210.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QfhxGTuZ"
-Received: by mail-ot1-f48.google.com with SMTP id 46e09a7af769-6f9398390fcso2165909a34.3
-        for <linux-bluetooth@vger.kernel.org>; Wed, 26 Jun 2024 04:12:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1719400379; x=1720005179; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=ueq9slypc2sY6GiJnwF5qk4jYm/9eOlKGv0CpEaXszY=;
-        b=QfhxGTuZejMK9rhx6ysPUG2P1cas92r0qhv2kCUG/biPb0WeRP6CSENGlkA6Dcce7P
-         hBJ8OaLgqwXDovKXiVf7cutpP4O7B6fm9K78dl5vSs5QDSPmDBRLljPsHCQ51o7D5u0F
-         mM7n5KgoAFqnwGedQqc3HgicqJtfsnm/u7EJvtRu0tZt012tHHDrx1kFH240LYiVYt5X
-         DuZOahrZ1H3HZPQ8qZW/zo+tpXoTfgQTNqWjp9Oi73M/sm0u5G++IWOxjikswqVkB3NY
-         0xWeW4BCDbK19q1mvItiEWWjxebNyUgt0KKvHVyMGET2jOt6bK1B9KKo4JfXaK29Uk01
-         PwMw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719400379; x=1720005179;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ueq9slypc2sY6GiJnwF5qk4jYm/9eOlKGv0CpEaXszY=;
-        b=PDVuf+pj5QHWLJvkifQYjK5BfRO7BBYRwxtPUCkadbzXyIwaXC/abnrG0b3uoixmXi
-         BHZcyCZuXZTiOBg8WIxQkNHNI5jmDI33PPYx6+AjrDnpC1AQG6AA3Jonnu9agV11BQxw
-         2ioxf2PJbfPVsyBNF2FTxQb5yNpbIzY3C5Fr1faSM9tBPuuE629JE8TCqh06lCg9GGr0
-         Ra3a5VisgBRmKLAq6kO+vjDWn5ZfBuJ6eUNY+2QNs2i7eG4DKVIYeRG+DV5n7TvpPAba
-         7P+hkRvi7RVpF9w5zm5CUkc6rGVjpQ6yfPEr6U2qUCixBjFil4HwweY2H/wKJmYJ5+hc
-         kB1Q==
-X-Gm-Message-State: AOJu0Yz1vaRbRy6VLbnqc0OLMK2GnInOcyGgw9zrswn2EVMsXbYMJ2PZ
-	H6vpvwtUGzWqhcJqSdn8rwFVlGCbdA7gia841iseC7EGPAjfeqhV4ml+Vg==
-X-Google-Smtp-Source: AGHT+IEORcAfpynO80g3BjDzAdrfsXGYV2w4QRZzccwzM9sj83rdW1B7HB2hvQcYGPpAhntpoTfWIg==
-X-Received: by 2002:a9d:6b0e:0:b0:6f9:923d:f2ea with SMTP id 46e09a7af769-700b124a9ffmr10290604a34.25.1719400378584;
-        Wed, 26 Jun 2024 04:12:58 -0700 (PDT)
-Received: from [172.17.0.2] ([172.190.111.194])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6b51ed6dca8sm53135146d6.63.2024.06.26.04.12.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 26 Jun 2024 04:12:58 -0700 (PDT)
-Message-ID: <667bf7ba.050a0220.a82d2.1720@mx.google.com>
-Date: Wed, 26 Jun 2024 04:12:58 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============9097359295295953853=="
+	s=arc-20240116; t=1719404790; c=relaxed/simple;
+	bh=O4eRPR5v/ccrHHvwPALhm0ME1IheVvmRQBJN2ZxnJnM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=lgYZxVyKbykNBJG4SVIDlMDm1CH03RjphW3Mc/pD7Dp9Ke3oZvEr7W+5VSNNkXmHYzqDfWqrCVP/XBlwyM1AKEd0/jRQfLOrKHKTSZx2tXge2muHPdZHzZlgpngh9XKTuzKAu1gZR7ZbbP/pd3/Bxe4uiexTcgXM7P2WyZAa1Wk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
+Received: from [141.14.220.45] (g45.guest.molgen.mpg.de [141.14.220.45])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 434FD61E5FE07;
+	Wed, 26 Jun 2024 14:26:10 +0200 (CEST)
+Message-ID: <390bb99a-55ce-4a97-b268-93ce62bedbac@molgen.mpg.de>
+Date: Wed, 26 Jun 2024 14:26:09 +0200
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, kevin.courdesses@beacon.bio
-Subject: RE: [bug,report] GATT server crash after client disconnect (UAF)
-In-Reply-To: <CAH4xE45xkoHOY6kgYLf=HVVrMPrgqDZzRfEwGi3Ozi1MW4e+dg@mail.gmail.com>
-References: <CAH4xE45xkoHOY6kgYLf=HVVrMPrgqDZzRfEwGi3Ozi1MW4e+dg@mail.gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3] Bluetooth: btintel: Allow lowering of drive strength
+ of BRI
+To: Kiran K <kiran.k@intel.com>
+Cc: ravishankar.srivatsa@intel.com, chethan.tumkur.narayan@intel.com,
+ chandrashekar.devegowda@intel.com, vijay.satija@intel.com,
+ linux-bluetooth@vger.kernel.org
+References: <20240626092801.2343844-1-kiran.k@intel.com>
+Content-Language: en-US
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <20240626092801.2343844-1-kiran.k@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
---===============9097359295295953853==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-
-This is an automated email and please do not reply to this email.
-
-Dear Submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
-
------ Output -----
-
-error: corrupt patch at line 22
-hint: Use 'git am --show-current-patch' to see the failed patch
-
-Please resolve the issue and submit the patches again.
+Dear Kiran,
 
 
----
-Regards,
-Linux Bluetooth
+Thank you for the patch.
+
+Am 26.06.24 um 11:28 schrieb Kiran K:
+> BRI (Bluetooth Radio Interface) traffic from CNVr to CNVi was found
+> causing cross talk step errors to WiFi. As a workaround, driver needs to
+> reduce the drive strength of BRI. During *setup*, driver reads the drive
+> strength value from efi variable and passes it to the controller via vendor
+> specific command with opcode 0xfc0a.
+
+I am still surprised this is done via an EFI variable. Could you please 
+add a reference to section in the UEFI(?) specification? Hopefully that 
+explains who is supposed to set the variable.
+
+[…]
 
 
---===============9097359295295953853==--
+Kind regards,
+
+Paul
