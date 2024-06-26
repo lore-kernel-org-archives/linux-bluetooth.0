@@ -1,199 +1,107 @@
-Received: from mail-vs1-f43.google.com (mail-vs1-f43.google.com [209.85.217.43])
+Received: from mail-io1-f69.google.com (mail-io1-f69.google.com [209.85.166.69])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75D4B18A946
-	for <linux-bluetooth@vger.kernel.org>; Wed, 26 Jun 2024 15:02:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D86A18F2F0
+	for <linux-bluetooth@vger.kernel.org>; Wed, 26 Jun 2024 16:44:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.69
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719414161; cv=none; b=RiJvrRqZANoOIRNPmGTAe6cxsd5WM6A9C1AOysfqUb0k9ciKxYcLqiJdyToRSUAP/rOCeZGnE3J1jpcU5Lk4loFtJJ8/YkWFSanywS6Z6V5ghk/ud9xWjNyHYXz5VTA4fZjAwTjfYfDrRV5yIaKRxt7j7pCI70byNHdFuGOS4n8=
+	t=1719420248; cv=none; b=mYOcQ5b5E47GC7soMwJvVJJIyTEHGavJM7D6/Qy2G9sPSl+j1xhYrqinqX9ujirVg7c1e+scd3kw6ruNZymzrPuIGElu10Jz4t+Y26Sy3xSuSsEMkm5aahXoCS1SrfBPQmlMmq4KfOmMVTe1Q5wvPUKgzvtyMEyW2wGzB2sDetA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719414161; c=relaxed/simple;
-	bh=JvRCmKudBZp8osyME6STdiyD9IPied7S/MLT0sqQwpA=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Benm9eEY/HwAO1xB9pilTvdySYwZj+Qid2sEhDgGFnB2MV1ZurfXgD2zFNRgyRNCqocWy8QwWkP06ZtRHVt1w2c0Qd/t9NTZ4A+Wm4XZtDaBkfNHABbLYHNoiaUsX/5woFF+Vm3JapzqRV+2ewqtPWD+mj9b7+jBiW4jtO4UITY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=B5Fa9ymO; arc=none smtp.client-ip=209.85.217.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="B5Fa9ymO"
-Received: by mail-vs1-f43.google.com with SMTP id ada2fe7eead31-48f68565fe0so961022137.3
-        for <linux-bluetooth@vger.kernel.org>; Wed, 26 Jun 2024 08:02:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1719414157; x=1720018957; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=udenrX245c88FgPuipcNos5kkd8VDEbmhpRG68qOaoo=;
-        b=B5Fa9ymOQ4TRadnTR68ACAyeOeS+7LpitrEkfXLBczYIP3gBuSA/mRxNqdnVtu+buh
-         qezuI9mX1zxJAzJCC3xH7eMBjlUOBEoQRLV1o8XQXYMRDHYrJaJyD/qNB7sWwKs5eRyW
-         Bl7elA2Ai0UOoIeyqS5TGf04d0TNx/LjdZlbBq7iQlMytmd3Ah/X8eGCPbJRt4g0Kev0
-         NP4dpiYdDU3f8FlODcumzW+xT3+dGp+YTUjd5VpkJfkV7HaW3CBhSZpWMwxb3yZ1Hv7Y
-         V5KyUAJo+//7shYH041jJKTAgSWlXLJYf8hyOGxWOruwsN9LmOpiwIoX5VR+4xucxVzw
-         7+JQ==
+	s=arc-20240116; t=1719420248; c=relaxed/simple;
+	bh=i2HhrJu+f00NMOiApxp2TBALSE/2IGKOYZHtHhvVe9c=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=pL1+Osqd994wA0fLsTvXige+daONWFGHzATH88hKTSoR0webrK/q3vj39YfamEvtWxxKoGnZC/qgC/+01aT3A5hPz2OAL0biRMutRlU0MkJiLWge2WNs3PrkSch40qcayVOCqI+lLTUHjOvoO4TW7ulhBPGCXZcMtSimlro/P9Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.69
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f69.google.com with SMTP id ca18e2360f4ac-7eb1d659c76so944817439f.0
+        for <linux-bluetooth@vger.kernel.org>; Wed, 26 Jun 2024 09:44:06 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719414157; x=1720018957;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=udenrX245c88FgPuipcNos5kkd8VDEbmhpRG68qOaoo=;
-        b=W0MyKeyEDdpZ3fic9a4L5Q5NrIEpambp2y0PKxNLQBxO5bYUgd7ftH4xSyL59Or3Ph
-         /hkmO3GJ7XdG2QSpS+5/XwQU/ebJI1v6BrAXRb5G4UA8TB2u/0fVrvHOU7gG5E5eXp+X
-         xjtHpcjDv1nmwoPeQNgK8erbRGSnnIVcDejs+X2+jdUdafRjM0SgF6RowEL2Jc4LUf0U
-         eZlNxDAPkzOcAkpRefpfJCbgW5jaddKkbDjNM0l4jxGaVvohDlVBXFwSRJYjrtHatxaA
-         7PZa+BKCRVs1om80/MRTVUSUcBDjYNI8wcSZAogOjSmLttc6aCvaIXgoewbc0hmZxG9+
-         aNqQ==
-X-Gm-Message-State: AOJu0YzwLSItylgS/A+gXjYUb88dz8+btOcGl5Nty9asYA7SWAbZJqfH
-	oVybeiDks47LjEKBJpoUY6PUdadhuEm4xvtr9WSVVZE6Mub9V37lgZyB4w==
-X-Google-Smtp-Source: AGHT+IEhpfejsu3sKqpvp8AesYkIVs1cSG3AHXg88tLi0LTMykwbfWRzzstHVxWjWh8o5ADPeJi2OA==
-X-Received: by 2002:a05:6102:41a8:b0:48f:3c66:5347 with SMTP id ada2fe7eead31-48f52a43d43mr12956491137.9.1719414157449;
-        Wed, 26 Jun 2024 08:02:37 -0700 (PDT)
-Received: from lvondent-mobl4.. (syn-107-146-107-067.res.spectrum.com. [107.146.107.67])
-        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-48f5cd3cf91sm1203746137.13.2024.06.26.08.02.35
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 26 Jun 2024 08:02:36 -0700 (PDT)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v1 3/3] l2cap-tester: Add tests for multiple data packets over LE
-Date: Wed, 26 Jun 2024 11:02:29 -0400
-Message-ID: <20240626150229.103047-3-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.45.2
-In-Reply-To: <20240626150229.103047-1-luiz.dentz@gmail.com>
-References: <20240626150229.103047-1-luiz.dentz@gmail.com>
+        d=1e100.net; s=20230601; t=1719420245; x=1720025045;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=0gpscJH4jSbJKWt3h1G8JLIQGkiNocoueoaYePHWuPs=;
+        b=dbVQ7ahdKGSDqx9pQUkYRWuLUZgB3QMDmgypRuI3Yai3Phlj6E0m5ZJhVzMXyFdLoq
+         A7a7TN1pcNbHlfCeIJo6oM4hj2nnJ99F+7RWCZixo7i4Bn1Upwb0jgbQIdwgzBMqxiKL
+         dosap9y8yKaSr8UFWxFQgDrfVzejhd5VKfOzOv26d7E1C4yiH3UXZ0tIyCtbKl1TIpf1
+         tH3byLOXqBSu27yvUISVIBr3x2iL9PVUA3HwYpu+oNdfR6lAMhCHLoALENPmXm2gTVFI
+         /PX/+LPZYRI4/u5/bzEg9g774rvnZp/XkTU1jiOZ/FoyZtQg4gHSjTt+bGsYBbf3FG8t
+         rOiA==
+X-Gm-Message-State: AOJu0YzvdKow8pkV7wSmcaE7Nz2fM0A+h/s7TIaA1CmwrXTmNZCrzpQ5
+	CUblEjSGZhVkQvAlV3xa5JoOjVXB9z4SE1DnZI6kBG4i7Lf/P1vF7Pq+WJtuVEZtuJeuQ0TfZdj
+	opWLoNFa21GWqLQbavyzLG0AW/sqZeIPp45VbQrYgbsfnOyw3JY/Rvr0=
+X-Google-Smtp-Source: AGHT+IGyfXq3VobGnQcA3fF0g9Hu3/ixTAGpM8s9AlCUJsAuBqvHBgf4zBFJ6jVp9GIlKvTZYQBbbsQymEiCEK+BuziYaL7S+PFZ
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-Received: by 2002:a05:6602:1503:b0:7eb:d640:263 with SMTP id
+ ca18e2360f4ac-7f3a4f758bfmr19109439f.3.1719420243586; Wed, 26 Jun 2024
+ 09:44:03 -0700 (PDT)
+Date: Wed, 26 Jun 2024 09:44:03 -0700
+In-Reply-To: <a6eb3c4e-411f-4fbf-a85c-f3435170341d@rowland.harvard.edu>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000d6c39d061bcdb82c@google.com>
+Subject: Re: [syzbot] [usb?] [bluetooth?] WARNING in btusb_submit_intr_urb/usb_submit_urb
+From: syzbot <syzbot+8693a0bb9c10b554272a@syzkaller.appspotmail.com>
+To: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-usb@vger.kernel.org, luiz.dentz@gmail.com, marcel@holtmann.org, 
+	stern@rowland.harvard.edu, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hello,
 
-This adds the following tests which cover the TX/RX of multiple
-packets (up to 32K) over LE credit based flow control:
+syzbot has tested the proposed patch but the reproducer is still triggering an issue:
+WARNING in btusb_submit_intr_urb/usb_submit_urb
 
-L2CAP LE Client - Read 32k Success
-L2CAP LE Client - Write 32k Success
----
- tools/l2cap-tester.c | 66 ++++++++++++++++++++++++++++++++++++++++----
- 1 file changed, 61 insertions(+), 5 deletions(-)
+btusb 1-1:0.0: Pipe 404d8280 ep ffff8880234bee00
+usb 1-1: Error pipe 404d8280 ep ffff8880234beea0 epaddr 8b
+------------[ cut here ]------------
+usb 1-1: BOGUS urb xfer, pipe 1 != type 3
+WARNING: CPU: 1 PID: 53 at drivers/usb/core/urb.c:507 usb_submit_urb+0xbfa/0x17e0 drivers/usb/core/urb.c:506
+Modules linked in:
+CPU: 1 PID: 53 Comm: kworker/u9:0 Not tainted 6.10.0-rc4-syzkaller-00164-g66cc544fd75c-dirty #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 06/07/2024
+Workqueue: hci1 hci_power_on
+RIP: 0010:usb_submit_urb+0xbfa/0x17e0 drivers/usb/core/urb.c:506
+Code: f0 48 c1 e8 03 0f b6 04 18 84 c0 0f 85 8c 08 00 00 45 8b 06 48 c7 c7 c0 90 6d 8c 48 8b 34 24 4c 89 fa 89 e9 e8 a7 99 3c fa 90 <0f> 0b 90 90 45 89 e6 4c 89 f7 48 c7 c6 b0 4b f2 8e e8 10 6f 7a fa
+RSP: 0018:ffffc90000bd77a0 EFLAGS: 00010246
+RAX: 7b355395d6059e00 RBX: dffffc0000000000 RCX: ffff8880157d5a00
+RDX: 0000000000000000 RSI: 0000000000000001 RDI: 0000000000000000
+RBP: 0000000000000001 R08: ffffffff81585822 R09: 1ffff9200017ae94
+R10: dffffc0000000000 R11: fffff5200017ae95 R12: 0000000000000002
+R13: ffff888018acd300 R14: ffffffff8c6d8e68 R15: ffff888023a90c60
+FS:  0000000000000000(0000) GS:ffff8880b9500000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 000055da0d81ae28 CR3: 000000000e132000 CR4: 00000000003506f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ btusb_submit_intr_urb+0x4a2/0x890 drivers/bluetooth/btusb.c:1410
+ btusb_open+0x1a1/0x770 drivers/bluetooth/btusb.c:1866
+ hci_dev_open_sync+0x2cc/0x2b40 net/bluetooth/hci_sync.c:4889
+ hci_dev_do_open net/bluetooth/hci_core.c:485 [inline]
+ hci_power_on+0x1c7/0x6b0 net/bluetooth/hci_core.c:1012
+ process_one_work kernel/workqueue.c:3231 [inline]
+ process_scheduled_works+0xa2c/0x1830 kernel/workqueue.c:3312
+ worker_thread+0x86d/0xd70 kernel/workqueue.c:3393
+ kthread+0x2f0/0x390 kernel/kthread.c:389
+ ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
+ </TASK>
 
-diff --git a/tools/l2cap-tester.c b/tools/l2cap-tester.c
-index b6b879407115..e1487bc7fd75 100644
---- a/tools/l2cap-tester.c
-+++ b/tools/l2cap-tester.c
-@@ -58,6 +58,9 @@ struct l2cap_data {
- 	uint16_t server_psm;
- 	uint16_t cid;
- 	uint8_t mode;
-+	uint16_t mtu;
-+	uint16_t mps;
-+	uint16_t credits;
- 	int expect_err;
- 	int timeout;
- 
-@@ -545,6 +548,22 @@ static const struct l2cap_data le_client_connect_read_success_test = {
- 	.data_len = sizeof(l2_data),
- };
- 
-+static const struct l2cap_data le_client_connect_read_32k_success_test = {
-+	.client_psm = 0x0080,
-+	.server_psm = 0x0080,
-+	.mtu = 672,
-+	.mps = 251,
-+	/* Given enough credits to complete the transfer without waiting for
-+	 * more credits.
-+	 * credits = round_up(data size / mtu) * round_up(mtu / mps)
-+	 * credits = 49 * 3
-+	 * credits = 147
-+	 */
-+	.credits = 147,
-+	.read_data = l2_data_32k,
-+	.data_len = sizeof(l2_data_32k),
-+};
-+
- static const struct l2cap_data le_client_connect_write_success_test = {
- 	.client_psm = 0x0080,
- 	.server_psm = 0x0080,
-@@ -552,6 +571,22 @@ static const struct l2cap_data le_client_connect_write_success_test = {
- 	.data_len = sizeof(l2_data),
- };
- 
-+static const struct l2cap_data le_client_connect_write_32k_success_test = {
-+	.client_psm = 0x0080,
-+	.server_psm = 0x0080,
-+	.mtu = 672,
-+	.mps = 251,
-+	/* Given enough credits to complete the transfer without waiting for
-+	 * more credits.
-+	 * credits = round_up(data size / mtu) * round_up(mtu / mps)
-+	 * credits = 49 * 3
-+	 * credits = 147
-+	 */
-+	.credits = 147,
-+	.write_data = l2_data_32k,
-+	.data_len = sizeof(l2_data_32k),
-+};
-+
- static const struct l2cap_data le_client_connect_tx_timestamping_test = {
- 	.client_psm = 0x0080,
- 	.server_psm = 0x0080,
-@@ -1278,6 +1313,10 @@ static bool check_mtu(struct test_data *data, int sk)
- 					strerror(errno), errno);
- 			return false;
- 		}
-+
-+		/* Take SDU len into account */
-+		data->l2o.imtu -= 2;
-+		data->l2o.omtu -= 2;
- 	} else {
- 		/* For non-LE CoC enabled kernels we need to fall back to
- 		 * L2CAP_OPTIONS, so test support for it as well */
-@@ -1673,9 +1712,20 @@ static void test_connect(const void *test_data)
- 		if (l2data->shut_sock_wr)
- 			host_disconnect_cb = client_l2cap_disconnect_cb;
- 
--		bthost_add_l2cap_server(bthost, l2data->server_psm,
--					host_connect_cb, host_disconnect_cb,
--					data);
-+		if (l2data->mtu || l2data->mps || l2data->credits)
-+			bthost_add_l2cap_server_custom(bthost,
-+							l2data->server_psm,
-+							l2data->mtu,
-+							l2data->mps,
-+							l2data->credits,
-+							host_connect_cb,
-+							host_disconnect_cb,
-+							data);
-+		else
-+			bthost_add_l2cap_server(bthost, l2data->server_psm,
-+							host_connect_cb,
-+							host_disconnect_cb,
-+							data);
- 	}
- 
- 	if (l2data->direct_advertising)
-@@ -2534,11 +2584,17 @@ int main(int argc, char *argv[])
- 				&le_client_connect_timeout_test_1,
- 				setup_powered_client, test_connect_timeout);
- 	test_l2cap_le("L2CAP LE Client - Read Success",
--					&le_client_connect_read_success_test,
--					setup_powered_client, test_connect);
-+				&le_client_connect_read_success_test,
-+				setup_powered_client, test_connect);
-+	test_l2cap_le("L2CAP LE Client - Read 32k Success",
-+				&le_client_connect_read_32k_success_test,
-+				setup_powered_client, test_connect);
- 	test_l2cap_le("L2CAP LE Client - Write Success",
- 				&le_client_connect_write_success_test,
- 				setup_powered_client, test_connect);
-+	test_l2cap_le("L2CAP LE Client - Write 32k Success",
-+				&le_client_connect_write_32k_success_test,
-+				setup_powered_client, test_connect);
- 	test_l2cap_le("L2CAP LE Client - TX Timestamping",
- 				&le_client_connect_tx_timestamping_test,
- 				setup_powered_client, test_connect);
--- 
-2.45.2
+
+Tested on:
+
+commit:         66cc544f Merge tag 'dmaengine-fix-6.10' of git://git.k..
+git tree:       git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
+console output: https://syzkaller.appspot.com/x/log.txt?x=1503e301980000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=3f7b9f99610e0e87
+dashboard link: https://syzkaller.appspot.com/bug?extid=8693a0bb9c10b554272a
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+patch:          https://syzkaller.appspot.com/x/patch.diff?x=13ec9e82980000
 
