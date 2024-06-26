@@ -1,79 +1,98 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68324192B7C;
-	Wed, 26 Jun 2024 20:00:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from netrider.rowland.org (netrider.rowland.org [192.131.102.5])
+	by smtp.subspace.kernel.org (Postfix) with SMTP id 3C5DF192B74
+	for <linux-bluetooth@vger.kernel.org>; Wed, 26 Jun 2024 20:12:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.131.102.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719432033; cv=none; b=N07bB8CiBDYJdtw+w+qHFPDdkcCSpzVuWh9cSsBmt1LQzRl9jR74X5QbKtJrc7tW1pUSpm1fvXMMdv6D1pRYzSP3/ex3cs7eFI3UxBcR9yX/2CMsvMx98Aa1zcx3slewu/r1bQS2ey8HwYf4hQjOaI3eTfJflFfuthYG65Vz9/A=
+	t=1719432781; cv=none; b=DaIStpiZUZig5z7T79MGNx0NAjupkxFaoaQuxhjTVJ5HioSXDVGw37Tu3R9Hy3c9GybYCdoE4Me8h4majhdzAk0+2oz8W7jcdw3fAyE2McKiG8EVa8LM6OO18xT59GWUWlsbnNkB+00xYbLOUyY3Pz3gQyuZkghhZfTAa9pHPog=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719432033; c=relaxed/simple;
-	bh=mcPceM2ui1haddXRh5PWmmKeAntT9I0J6EU+0osdCd8=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=REhUeqg3DoDrf8I87m0H8s39hTbJVXNk9TIif9xjRO5f2eHWFDqKcZ4Duzi2u24yLpwUbSKNc85XOPH2+wNMFG7NnlTAs5/P2dLa038Rg5iFCN/YcqefXNbwbCjbPWlfRQbj8uCd79nvSYALehOa7n5oFPO8/0iDNIPGksPlkqU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZMwUhmlN; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZMwUhmlN"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id D6780C4AF0B;
-	Wed, 26 Jun 2024 20:00:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1719432032;
-	bh=mcPceM2ui1haddXRh5PWmmKeAntT9I0J6EU+0osdCd8=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=ZMwUhmlN0JV0AYHHUbmJBLyGazXmFOtPPwNURFEWm8rB7D3BiOT8UR46FCy+iI0/r
-	 4aeFXeIkgMidso7VrEBCBttDy+qwCh1kost51K5uPiLYkvAmbXM8kWU8smMwU9nYCq
-	 0HxWk8TIJIjE6fP1OKIrJZjvxq5qruUCITNC/76yKmnz9v0y3PZu3pAgZLXX7LI+gG
-	 voQNCp6mET2YT/w960nfL7AYA4kGlh8k32Ck1BxWHMo7VOClrzY2FEem8VYYaxJTJw
-	 zbADbzgjrJNe6JZoA/uAFYFCPsXQo8NYdu9EjhKrmE3tN0ckwATyigSK6JsmGH/qGt
-	 87Pz1Fw7S0H8A==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id C8404C433A2;
-	Wed, 26 Jun 2024 20:00:32 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1719432781; c=relaxed/simple;
+	bh=FkxG7fRF+wMVcAc0Q5SWjOgn88PKXvdKEXGjxxZg/II=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=r5O++1KZatrJBVY+NKqB4jodhwq4Zy0sPw7U3pckrA0XT24QZw0t293lEQYnwDlrvW+1hjfRHbLkpTXJIiOvgEP1tlPYTawOQ9r5xc+jK7f7TLOSRO763mN8Oc1dNt2jYBkB9hZYgxGYXHW/V5xifDSFUl9Ihkv1lj9JxYPobKY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=rowland.harvard.edu; spf=pass smtp.mailfrom=netrider.rowland.org; arc=none smtp.client-ip=192.131.102.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=rowland.harvard.edu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netrider.rowland.org
+Received: (qmail 716269 invoked by uid 1000); 26 Jun 2024 16:12:58 -0400
+Date: Wed, 26 Jun 2024 16:12:58 -0400
+From: Alan Stern <stern@rowland.harvard.edu>
+To: syzbot <syzbot+8693a0bb9c10b554272a@syzkaller.appspotmail.com>
+Cc: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+  linux-usb@vger.kernel.org, luiz.dentz@gmail.com, marcel@holtmann.org,
+  syzkaller-bugs@googlegroups.com
+Subject: Re: [syzbot] [usb?] [bluetooth?] WARNING in
+ btusb_submit_intr_urb/usb_submit_urb
+Message-ID: <f3ab10ab-38e0-4856-9d89-3b5409da0e55@rowland.harvard.edu>
+References: <6d1f6bcc-2918-48cd-bbb3-e8cca46622a1@rowland.harvard.edu>
+ <00000000000077d198061bcf30f1@google.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] Bluetooth: hci: fix build when POWER_SEQUENCING=m
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <171943203281.19782.10216983993886224168.git-patchwork-notify@kernel.org>
-Date: Wed, 26 Jun 2024 20:00:32 +0000
-References: <20240623171352.305053-1-krzysztof.kozlowski@linaro.org>
-In-Reply-To: <20240623171352.305053-1-krzysztof.kozlowski@linaro.org>
-To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Cc: marcel@holtmann.org, luiz.dentz@gmail.com, bartosz.golaszewski@linaro.org,
- linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <00000000000077d198061bcf30f1@google.com>
 
-Hello:
-
-This patch was applied to bluetooth/bluetooth-next.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
-
-On Sun, 23 Jun 2024 19:13:52 +0200 you wrote:
-> BT_HCIUART_QCA, which is a bool and an HCI UART component, uses now
-> power sequencing, so we need to be sure BT_HCIUART_QCA=y and
-> POWER_SEQUENCING=m cannot happen:
+On Wed, Jun 26, 2024 at 11:29:05AM -0700, syzbot wrote:
+> Hello,
 > 
->   /usr/bin/aarch64-linux-gnu-ld: drivers/bluetooth/hci_qca.o: in function `qca_serdev_probe':
->   drivers/bluetooth/hci_qca.c:2401:(.text+0xc48): undefined reference to `devm_pwrseq_get'
->   /usr/bin/aarch64-linux-gnu-ld: drivers/bluetooth/hci_qca.o: in function `qca_power_shutdown':
->   drivers/bluetooth/hci_qca.c:2192:(.text+0x29e8): undefined reference to `pwrseq_power_off'
->   /usr/bin/aarch64-linux-gnu-ld: drivers/bluetooth/hci_qca.o: in function `qca_power_on':
->   drivers/bluetooth/hci_qca.c:1808:(.text+0x3390): undefined reference to `pwrseq_power_on'
+> syzbot has tested the proposed patch and the reproducer did not trigger any issue:
 > 
-> [...]
+> Reported-and-tested-by: syzbot+8693a0bb9c10b554272a@syzkaller.appspotmail.com
+> 
+> Tested on:
+> 
+> commit:         66cc544f Merge tag 'dmaengine-fix-6.10' of git://git.k..
+> git tree:       git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
+> console output: https://syzkaller.appspot.com/x/log.txt?x=15a59299980000
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=3f7b9f99610e0e87
+> dashboard link: https://syzkaller.appspot.com/bug?extid=8693a0bb9c10b554272a
+> compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+> patch:          https://syzkaller.appspot.com/x/patch.diff?x=169b3789980000
+> 
+> Note: testing is done by a robot and is best-effort only.
 
-Here is the summary with links:
-  - Bluetooth: hci: fix build when POWER_SEQUENCING=m
-    https://git.kernel.org/bluetooth/bluetooth-next/c/f4938cba3734
+Somewhat different approach.  Let's see if this works.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+Alan Stern
 
+#syz test: upstream 66cc544fd75c
+
+Index: usb-devel/drivers/usb/core/config.c
+===================================================================
+--- usb-devel.orig/drivers/usb/core/config.c
++++ usb-devel/drivers/usb/core/config.c
+@@ -291,6 +291,19 @@ static int usb_parse_endpoint(struct dev
+ 	if (ifp->desc.bNumEndpoints >= num_ep)
+ 		goto skip_to_next_endpoint_or_interface_descriptor;
+ 
++	/* Save a copy of the descriptor and use it instead of the original */
++	endpoint = &ifp->endpoint[ifp->desc.bNumEndpoints];
++	memcpy(&endpoint->desc, d, n);
++	d = &endpoint->desc;
++
++	i = d->bEndpointAddress &
++			(USB_ENDPOINT_DIR_MASK | USB_ENDPOINT_NUMBER_MASK);
++	if (i != d->bEndpointAddress) {
++		dev_notice(ddev, "config %d interface %d altsetting %d has an endpoint descriptor with address 0x%X, changing to 0x%X\n",
++		    cfgno, inum, asnum, d->bEndpointAddress, i);
++		endpoint->desc.bEndpointAddress = i;
++	}
++
+ 	/* Check for duplicate endpoint addresses */
+ 	if (config_endpoint_is_duplicate(config, inum, asnum, d)) {
+ 		dev_notice(ddev, "config %d interface %d altsetting %d has a duplicate endpoint with address 0x%X, skipping\n",
+@@ -308,10 +321,8 @@ static int usb_parse_endpoint(struct dev
+ 		}
+ 	}
+ 
+-	endpoint = &ifp->endpoint[ifp->desc.bNumEndpoints];
++	/* Accept this endpoint */
+ 	++ifp->desc.bNumEndpoints;
+-
+-	memcpy(&endpoint->desc, d, n);
+ 	INIT_LIST_HEAD(&endpoint->urb_list);
+ 
+ 	/*
 
