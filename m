@@ -1,148 +1,133 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f207.google.com (mail-il1-f207.google.com [209.85.166.207])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70BD41862
-	for <linux-bluetooth@vger.kernel.org>; Wed, 26 Jun 2024 00:19:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B6D6C2E9
+	for <linux-bluetooth@vger.kernel.org>; Wed, 26 Jun 2024 01:30:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.207
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719361198; cv=none; b=ARFZ/T2/fSv2L+eDLsfi+x1HBofmnIQI3HYdYPGrwOdeYkHE2GlFDUhUg/zko4bjagTx5e0txFhxSu2MMtG6rp3rhUtrpNBt4Ib6vsl1TjQmPVshrYy+ec0YNAs0Zco2WZ0AFGOTkGVNv/im9Xx3mlqrIUcM8jrBLtzMoFYJD0c=
+	t=1719365424; cv=none; b=PbxqIt7T/AxyoxSHZaHPIx2t8Xrwrvbz+TlLzX6XlZaCqDtiookgiATIgHuoY0/f/85DQf3qS3y+V420DA4Rx0vo3p9gPnKPK3CaGO+L5lBqTJG0MGFWdMp7e8DHrotlqNWl1qwA9giP9rgjPbqi8y5w/oVdioWPGFHlZo6FE5c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719361198; c=relaxed/simple;
-	bh=LAwZpy3+qHkbeq9PeG40wpWmYPLEMz8RHsNqK/BorGA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nz/v7fwGJaI+f1e6Cf6BsMu921mxtE5gLmPh2U7PFNTic2U44KcDPM87SBpKOgUE8eRhaotDu02wamM4BWJCQYrzPVzTECvt0cjNcAjrylbOLNcinwPgXwgSsCa3RDCC8qJsgI1lkvsote/LRf5U4Y2eLEkjoTUpHDVk9Rwp1ls=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=VrgMaEp7; arc=none smtp.client-ip=198.175.65.20
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="VrgMaEp7"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1719361197; x=1750897197;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=LAwZpy3+qHkbeq9PeG40wpWmYPLEMz8RHsNqK/BorGA=;
-  b=VrgMaEp72NoqRaCin4hc9jGHjLcsQA3wunal+89jMe4dg8KRu1Lu8OlR
-   gXRHv0oa2XLMZBHWrmuwBtfqLaxy0Z1FZlJQOgONYol9R7YAE9nuN0bxa
-   1Sgjonh5Pj+U295oXaqmMwt3l80hn/lkOonYan7/dYg4MNr481sMDuNSG
-   RnACTs1wWvhuDLF+UgO3/OcuZuMRpU8d9vMHTfxwO+tl8l78y/AzC/fsr
-   fdFDq9cd8GdIBZhs+2z/1OacX5lY/qGdA0RNPRwyAO/tYxCbf9isMG3Hb
-   fb/u1Age9tIK62FJE7E9l6WUCfBOFAsYpitVG2X10conXwco4ASIl3PBI
-   g==;
-X-CSE-ConnectionGUID: b1YZLCaZSD2Fp3/OjeoY4g==
-X-CSE-MsgGUID: UddL9iDDTvGRd8gCzi31+w==
-X-IronPort-AV: E=McAfee;i="6700,10204,11114"; a="16233150"
-X-IronPort-AV: E=Sophos;i="6.08,265,1712646000"; 
-   d="scan'208";a="16233150"
-Received: from fmviesa003.fm.intel.com ([10.60.135.143])
-  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jun 2024 17:19:57 -0700
-X-CSE-ConnectionGUID: OmMYyxwxTtaphR/2m1b0oQ==
-X-CSE-MsgGUID: A4LbpmDfSEqtuUuO+S2UMg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.08,265,1712646000"; 
-   d="scan'208";a="48201436"
-Received: from lkp-server01.sh.intel.com (HELO 68891e0c336b) ([10.239.97.150])
-  by fmviesa003.fm.intel.com with ESMTP; 25 Jun 2024 17:19:52 -0700
-Received: from kbuild by 68891e0c336b with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1sMGO7-000EpK-2t;
-	Wed, 26 Jun 2024 00:19:51 +0000
-Date: Wed, 26 Jun 2024 08:19:11 +0800
-From: kernel test robot <lkp@intel.com>
-To: Kiran K <kiran.k@intel.com>, linux-bluetooth@vger.kernel.org
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	ravishankar.srivatsa@intel.com, chethan.tumkur.narayan@intel.com,
-	chandrashekar.devegowda@intel.com, vijay.satija@intel.com,
-	Kiran K <kiran.k@intel.com>
-Subject: Re: [PATCH v2] Bluetooth: btintel: Allow lowering of drive strength
- of BRI
-Message-ID: <202406260704.ZkFL5RKp-lkp@intel.com>
-References: <20240621064419.2185652-1-kiran.k@intel.com>
+	s=arc-20240116; t=1719365424; c=relaxed/simple;
+	bh=p2zkOZD+8+T1dAuryaMFbTjK8h6djut6lMgkrePaOWk=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=MpOhbymq40qUxDKzauk1mFY2TH/SvWCSNbDJFPSqrQ7HUBpGVm5dj25C6oZ8VteLefXZpwlMWQuieow2kUv4cOn/O7ZddlkGQItuZJQuFzVo0SXLwOntPhv3u6WoUYthkA+TvNQ+YZ9TG7tUZZa8PJonmHnwOmmIezgsq+BHkRU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.207
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f207.google.com with SMTP id e9e14a558f8ab-375d2ddeffbso87756375ab.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 25 Jun 2024 18:30:23 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1719365422; x=1719970222;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=D/LozekO3Rawr7o5vm0SBlhMDQbth1dTopz64bhOVSI=;
+        b=nk1agcAbP1XpcMnKX/C193FIAEaymkBUM7A39Q3yNkah77aOdwwbG4LEN8hUyl6D3c
+         vDrdmnsNy7d9Y+hgKYWOI2gF9Hb8WmQDCmk7NE1jEoe2SwtbWo9jhnYsVPoCk6/Qqo7g
+         +IiWhlvnQm1NcPXGordgYmjsYUeMWcyjrkv9b4bQv36s8bmjFA2vDnYjrdRMlnEa82YP
+         7klgXWfxZBk6NMgG2hkquB62d3Xyay4jxoV6jxf9cGYwIqlb5M7OulYYf/D2UoCsr8rI
+         HjbS+Hg/j/ZOJAweTtSjL5uxYJ3rqbM9lRoUDBrhLKV2xNxvEEKtBj2kOEM2xtEkhKnv
+         T/eA==
+X-Gm-Message-State: AOJu0YzoQgt9eZzeyS3nlAhI9Apjx2esNVZBLqVkRaaXKEWvGONBfO9q
+	E+/GvBSj9Ie7jnOf9/K96lNApxNHBah8hY8UiX2zy7W05gPEtyDaMfZqYzkS1KoJYohk8cT9n2R
+	h37oMHGTLF0Z0PpRqzAO+dQNP4PwHstFxMRiVdo2e6fhKCrHDN9PMFytnZg==
+X-Google-Smtp-Source: AGHT+IGI0fxQLvY8mOI7xe2da3Qu72XrkZlHdyAcx9r1eo2GONZMZz+PZXMIgaS/ogLXtWRbNiZ05Z6ireQSysqwJwVWsSTUJRnL
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240621064419.2185652-1-kiran.k@intel.com>
+X-Received: by 2002:a05:6e02:184f:b0:376:42a0:b2e7 with SMTP id
+ e9e14a558f8ab-37642a0b586mr7471625ab.4.1719365422380; Tue, 25 Jun 2024
+ 18:30:22 -0700 (PDT)
+Date: Tue, 25 Jun 2024 18:30:22 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000003d868e061bc0f554@google.com>
+Subject: [syzbot] [usb?] [bluetooth?] WARNING in btusb_submit_intr_urb/usb_submit_urb
+From: syzbot <syzbot+8693a0bb9c10b554272a@syzkaller.appspotmail.com>
+To: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-usb@vger.kernel.org, luiz.dentz@gmail.com, marcel@holtmann.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-Hi Kiran,
+Hello,
 
-kernel test robot noticed the following build errors:
+syzbot found the following issue on:
 
-[auto build test ERROR on bluetooth-next/master]
-[also build test ERROR on next-20240625]
-[cannot apply to bluetooth/master linus/master v6.10-rc5]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+HEAD commit:    66cc544fd75c Merge tag 'dmaengine-fix-6.10' of git://git.k..
+git tree:       upstream
+console+strace: https://syzkaller.appspot.com/x/log.txt?x=14280161980000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=3f7b9f99610e0e87
+dashboard link: https://syzkaller.appspot.com/bug?extid=8693a0bb9c10b554272a
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=16f59c82980000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=12b955b6980000
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Kiran-K/Bluetooth-btintel-Allow-lowering-of-drive-strength-of-BRI/20240625-161151
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
-patch link:    https://lore.kernel.org/r/20240621064419.2185652-1-kiran.k%40intel.com
-patch subject: [PATCH v2] Bluetooth: btintel: Allow lowering of drive strength of BRI
-config: i386-buildonly-randconfig-001-20240626 (https://download.01.org/0day-ci/archive/20240626/202406260704.ZkFL5RKp-lkp@intel.com/config)
-compiler: clang version 18.1.5 (https://github.com/llvm/llvm-project 617a15a9eac96088ae5e9134248d8236e34b91b1)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240626/202406260704.ZkFL5RKp-lkp@intel.com/reproduce)
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/b4d37fd1f3c8/disk-66cc544f.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/04c8b576cea2/vmlinux-66cc544f.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/05e217dc3c31/bzImage-66cc544f.xz
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202406260704.ZkFL5RKp-lkp@intel.com/
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+8693a0bb9c10b554272a@syzkaller.appspotmail.com
 
-All errors (new ones prefixed by >>):
+------------[ cut here ]------------
+usb 1-1: BOGUS urb xfer, pipe 1 != type 3
+WARNING: CPU: 0 PID: 4491 at drivers/usb/core/urb.c:504 usb_submit_urb+0xc4e/0x18c0 drivers/usb/core/urb.c:503
+Modules linked in:
+CPU: 0 PID: 4491 Comm: kworker/u9:1 Not tainted 6.10.0-rc4-syzkaller-00164-g66cc544fd75c #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 06/07/2024
+Workqueue: hci0 hci_power_on
+RIP: 0010:usb_submit_urb+0xc4e/0x18c0 drivers/usb/core/urb.c:503
+Code: f8 48 c1 e8 03 0f b6 04 18 84 c0 0f 85 b1 08 00 00 45 8b 07 48 c7 c7 40 90 6d 8c 48 8b 34 24 4c 89 e2 89 e9 e8 23 9a 3c fa 90 <0f> 0b 90 90 48 8b 5c 24 30 41 89 dc 4c 89 e7 48 c7 c6 b0 4b f2 8e
+RSP: 0018:ffffc9000d817798 EFLAGS: 00010246
+RAX: 6d750bdfc6b7f400 RBX: dffffc0000000000 RCX: ffff888030053c00
+RDX: 0000000000000000 RSI: 0000000000000001 RDI: 0000000000000000
+RBP: 0000000000000001 R08: ffffffff81585822 R09: fffffbfff1c39994
+R10: dffffc0000000000 R11: fffffbfff1c39994 R12: ffff88801c2e7560
+R13: ffff88801a2af400 R14: 0000000000000001 R15: ffffffff8c6d8e28
+FS:  0000000000000000(0000) GS:ffff8880b9400000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000559f0e1c6bd8 CR3: 000000002e10e000 CR4: 00000000003506f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ btusb_submit_intr_urb+0x3dd/0x7b0 drivers/bluetooth/btusb.c:1409
+ btusb_open+0x1a1/0x770 drivers/bluetooth/btusb.c:1865
+ hci_dev_open_sync+0x2cc/0x2b40 net/bluetooth/hci_sync.c:4889
+ hci_dev_do_open net/bluetooth/hci_core.c:485 [inline]
+ hci_power_on+0x1c7/0x6b0 net/bluetooth/hci_core.c:1012
+ process_one_work kernel/workqueue.c:3231 [inline]
+ process_scheduled_works+0xa2c/0x1830 kernel/workqueue.c:3312
+ worker_thread+0x86d/0xd70 kernel/workqueue.c:3393
+ kthread+0x2f0/0x390 kernel/kthread.c:389
+ ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
+ </TASK>
 
->> drivers/bluetooth/btintel.c:66:46: error: incompatible pointer types passing 'size_t *' (aka 'unsigned int *') to parameter of type 'unsigned long *' [-Werror,-Wincompatible-pointer-types]
-      66 |         status = efi.get_variable(name, guid, NULL, &data_size, NULL);
-         |                                                     ^~~~~~~~~~
-   drivers/bluetooth/btintel.c:76:46: error: incompatible pointer types passing 'size_t *' (aka 'unsigned int *') to parameter of type 'unsigned long *' [-Werror,-Wincompatible-pointer-types]
-      76 |         status = efi.get_variable(name, guid, NULL, &data_size, data);
-         |                                                     ^~~~~~~~~~
-   2 errors generated.
 
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-vim +66 drivers/bluetooth/btintel.c
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
-    49	
-    50	static const guid_t btintel_guid_dsm =
-    51		GUID_INIT(0xaa10f4e0, 0x81ac, 0x4233,
-    52			  0xab, 0xf6, 0x3b, 0x2a, 0xc5, 0x0e, 0x28, 0xd9);
-    53	
-    54	static void *btintel_uefi_get_variable(efi_char16_t *name, efi_guid_t *guid)
-    55	{
-    56		void *data;
-    57		efi_status_t status;
-    58		size_t data_size = 0;
-    59	
-    60		if (!IS_ENABLED(CONFIG_EFI))
-    61			return ERR_PTR(-EOPNOTSUPP);
-    62	
-    63		if (!efi_rt_services_supported(EFI_RT_SUPPORTED_GET_VARIABLE))
-    64			return ERR_PTR(-EOPNOTSUPP);
-    65	
-  > 66		status = efi.get_variable(name, guid, NULL, &data_size, NULL);
-    67	
-    68		if (status != EFI_BUFFER_TOO_SMALL || !data_size)
-    69			return ERR_PTR(-EIO);
-    70	
-    71		data = kmalloc(data_size, GFP_KERNEL);
-    72	
-    73		if (!data)
-    74			return ERR_PTR(-ENOMEM);
-    75	
-    76		status = efi.get_variable(name, guid, NULL, &data_size, data);
-    77	
-    78		if (status != EFI_SUCCESS) {
-    79			kfree(data);
-    80			return ERR_PTR(-ENXIO);
-    81		}
-    82	
-    83		return data;
-    84	}
-    85	
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
