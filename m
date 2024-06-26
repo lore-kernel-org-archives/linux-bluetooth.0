@@ -1,62 +1,62 @@
-Received: from mail-vs1-f41.google.com (mail-vs1-f41.google.com [209.85.217.41])
+Received: from mail-vs1-f43.google.com (mail-vs1-f43.google.com [209.85.217.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B59E18A92A
-	for <linux-bluetooth@vger.kernel.org>; Wed, 26 Jun 2024 15:02:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75D4B18A946
+	for <linux-bluetooth@vger.kernel.org>; Wed, 26 Jun 2024 15:02:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719414158; cv=none; b=PwnK+Iy7u2blRd3yYxUlXmiket/iXsBmVxxSp/YLTjFUdnnUfKNCyzJDKE1nP+JLVsAg7uYZJMofwUHVwZE2s9Er+VKnMbWR27MURv40h0e303U+Gy1XWrrZ/1K8vgeNHMBM7LZQSsWJfBwEpbNxtbYLsdJp4lKKKm4/kzld6ts=
+	t=1719414161; cv=none; b=RiJvrRqZANoOIRNPmGTAe6cxsd5WM6A9C1AOysfqUb0k9ciKxYcLqiJdyToRSUAP/rOCeZGnE3J1jpcU5Lk4loFtJJ8/YkWFSanywS6Z6V5ghk/ud9xWjNyHYXz5VTA4fZjAwTjfYfDrRV5yIaKRxt7j7pCI70byNHdFuGOS4n8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719414158; c=relaxed/simple;
-	bh=WwqX7L15Fq+c1Q5yx3SsPTgWNleoDr+ubLQXUolgqDM=;
+	s=arc-20240116; t=1719414161; c=relaxed/simple;
+	bh=JvRCmKudBZp8osyME6STdiyD9IPied7S/MLT0sqQwpA=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=pRBCoaUNqzXd7vkX4vsgrTpfvQS4Yl7Z4+47PgZcRFoHnUe+lcZhEYQNpy5DpN7BzxZI8Hq4ZCjiVQ0e4Q3LQHckoitlvSn3RGy9TUo13NUEbt/v4HsUPgMoNgwDmZL9Otn8Ytl+E61jyRCNb4VxUTqOhM5GfdftOZCRTLn75fY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=el3u6PB7; arc=none smtp.client-ip=209.85.217.41
+	 MIME-Version; b=Benm9eEY/HwAO1xB9pilTvdySYwZj+Qid2sEhDgGFnB2MV1ZurfXgD2zFNRgyRNCqocWy8QwWkP06ZtRHVt1w2c0Qd/t9NTZ4A+Wm4XZtDaBkfNHABbLYHNoiaUsX/5woFF+Vm3JapzqRV+2ewqtPWD+mj9b7+jBiW4jtO4UITY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=B5Fa9ymO; arc=none smtp.client-ip=209.85.217.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="el3u6PB7"
-Received: by mail-vs1-f41.google.com with SMTP id ada2fe7eead31-48f4cef1ea5so1266133137.3
-        for <linux-bluetooth@vger.kernel.org>; Wed, 26 Jun 2024 08:02:37 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="B5Fa9ymO"
+Received: by mail-vs1-f43.google.com with SMTP id ada2fe7eead31-48f68565fe0so961022137.3
+        for <linux-bluetooth@vger.kernel.org>; Wed, 26 Jun 2024 08:02:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1719414156; x=1720018956; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1719414157; x=1720018957; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=m5isFdIVM8mV96ILq2nIbsSV5yhFrRvXtbiyDi/DtQs=;
-        b=el3u6PB7Xg+rxbF5KrDousVRfrYkPkw+932taZcrJHfKVBTwr4ZLP0MzBefr2W6cDu
-         DdeajIiD1OWq3JEaBz4HPQGDui8F4ebreET0u2Pinz1C83sQp/GY3oOIOk9Orp/PYWb7
-         +6Wx+UkgGCxoOz8KNw3JZiLn0obot+bU7PcMsNkMx9yYP8KpEZlQP6ivX+d4zWVF84Sw
-         jJas8lPeuCzFrzc/gyHZdwNv+4ZDBhd2xvwszDlHrzmGYNuWaRmhDImUIaqQYcAKaNAl
-         /jcuPT2YTcLa3qRyq2WyZozfrN40fkBVY9hrD+FUw5xc+hpY0ijnK5/cyZnxHGwkyoYj
-         0nIw==
+        bh=udenrX245c88FgPuipcNos5kkd8VDEbmhpRG68qOaoo=;
+        b=B5Fa9ymOQ4TRadnTR68ACAyeOeS+7LpitrEkfXLBczYIP3gBuSA/mRxNqdnVtu+buh
+         qezuI9mX1zxJAzJCC3xH7eMBjlUOBEoQRLV1o8XQXYMRDHYrJaJyD/qNB7sWwKs5eRyW
+         Bl7elA2Ai0UOoIeyqS5TGf04d0TNx/LjdZlbBq7iQlMytmd3Ah/X8eGCPbJRt4g0Kev0
+         NP4dpiYdDU3f8FlODcumzW+xT3+dGp+YTUjd5VpkJfkV7HaW3CBhSZpWMwxb3yZ1Hv7Y
+         V5KyUAJo+//7shYH041jJKTAgSWlXLJYf8hyOGxWOruwsN9LmOpiwIoX5VR+4xucxVzw
+         7+JQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719414156; x=1720018956;
+        d=1e100.net; s=20230601; t=1719414157; x=1720018957;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=m5isFdIVM8mV96ILq2nIbsSV5yhFrRvXtbiyDi/DtQs=;
-        b=RdqsLAH0LKr1zTvIN9i6LPkRCRPS6Mqje99TWI1rIKarJKBXGTYjRZSk+8Ut4h0rZn
-         Y5cSTnXYZURjWA/6NSmtUHpzsj+kzFjnC5YvENiI7If4x7B4hDlhUkbRykd8qYqRobVr
-         3LNY0qNjuG+UPEE8VhDS/YhVyy/nk7L/flViHdCMD8jYaH4T5/br1u5xEgoT2Zi15mUx
-         xOsj6teli0WVbKK145qRY+aM1yW18QlB9rpLl4RyscjHFVoliOSjwQ+RaoA/jtLhJ9Kl
-         z1/RC9G1K2dqqMSgxHcr9ud2YTpmf2igu5m58Yque5+G3jGs8nX8gc9xorj1pgv3uGqs
-         9xRQ==
-X-Gm-Message-State: AOJu0YyAczJK31oSA+2pR6rzWHW5DCQPLcvL2isalFCOWUD/nXM7YcuL
-	yvn+/4+Doa9bJWSY0c7bx1KUcETroOCbTD4qAaJpt+4YRgknxFEH65Q66w==
-X-Google-Smtp-Source: AGHT+IGquN/1t8k4txln6F4unFLILtsndab42OjVvMjhctXLFXW7v+wa+jAJAZd6RLpmjwLWbZQu4A==
-X-Received: by 2002:a67:bd0f:0:b0:48f:3930:4a82 with SMTP id ada2fe7eead31-48f4f09f918mr8984423137.23.1719414155519;
-        Wed, 26 Jun 2024 08:02:35 -0700 (PDT)
+        bh=udenrX245c88FgPuipcNos5kkd8VDEbmhpRG68qOaoo=;
+        b=W0MyKeyEDdpZ3fic9a4L5Q5NrIEpambp2y0PKxNLQBxO5bYUgd7ftH4xSyL59Or3Ph
+         /hkmO3GJ7XdG2QSpS+5/XwQU/ebJI1v6BrAXRb5G4UA8TB2u/0fVrvHOU7gG5E5eXp+X
+         xjtHpcjDv1nmwoPeQNgK8erbRGSnnIVcDejs+X2+jdUdafRjM0SgF6RowEL2Jc4LUf0U
+         eZlNxDAPkzOcAkpRefpfJCbgW5jaddKkbDjNM0l4jxGaVvohDlVBXFwSRJYjrtHatxaA
+         7PZa+BKCRVs1om80/MRTVUSUcBDjYNI8wcSZAogOjSmLttc6aCvaIXgoewbc0hmZxG9+
+         aNqQ==
+X-Gm-Message-State: AOJu0YzwLSItylgS/A+gXjYUb88dz8+btOcGl5Nty9asYA7SWAbZJqfH
+	oVybeiDks47LjEKBJpoUY6PUdadhuEm4xvtr9WSVVZE6Mub9V37lgZyB4w==
+X-Google-Smtp-Source: AGHT+IEhpfejsu3sKqpvp8AesYkIVs1cSG3AHXg88tLi0LTMykwbfWRzzstHVxWjWh8o5ADPeJi2OA==
+X-Received: by 2002:a05:6102:41a8:b0:48f:3c66:5347 with SMTP id ada2fe7eead31-48f52a43d43mr12956491137.9.1719414157449;
+        Wed, 26 Jun 2024 08:02:37 -0700 (PDT)
 Received: from lvondent-mobl4.. (syn-107-146-107-067.res.spectrum.com. [107.146.107.67])
-        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-48f5cd3cf91sm1203746137.13.2024.06.26.08.02.33
+        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-48f5cd3cf91sm1203746137.13.2024.06.26.08.02.35
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 26 Jun 2024 08:02:33 -0700 (PDT)
+        Wed, 26 Jun 2024 08:02:36 -0700 (PDT)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v1 2/3] bthost: Introduce bthost_add_l2cap_server_custom
-Date: Wed, 26 Jun 2024 11:02:28 -0400
-Message-ID: <20240626150229.103047-2-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v1 3/3] l2cap-tester: Add tests for multiple data packets over LE
+Date: Wed, 26 Jun 2024 11:02:29 -0400
+Message-ID: <20240626150229.103047-3-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.45.2
 In-Reply-To: <20240626150229.103047-1-luiz.dentz@gmail.com>
 References: <20240626150229.103047-1-luiz.dentz@gmail.com>
@@ -70,99 +70,130 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This introduces bthost_add_l2cap_server_custom which can be used to
-define custom values for MTU, MPS and credits.
----
- emulator/bthost.c | 29 ++++++++++++++++++++++-------
- emulator/bthost.h |  5 +++++
- 2 files changed, 27 insertions(+), 7 deletions(-)
+This adds the following tests which cover the TX/RX of multiple
+packets (up to 32K) over LE credit based flow control:
 
-diff --git a/emulator/bthost.c b/emulator/bthost.c
-index d69e3d34ea3c..cc9bf7240531 100644
---- a/emulator/bthost.c
-+++ b/emulator/bthost.c
-@@ -195,6 +195,9 @@ struct l2cap_pending_req {
- 
- struct l2cap_conn_cb_data {
- 	uint16_t psm;
+L2CAP LE Client - Read 32k Success
+L2CAP LE Client - Write 32k Success
+---
+ tools/l2cap-tester.c | 66 ++++++++++++++++++++++++++++++++++++++++----
+ 1 file changed, 61 insertions(+), 5 deletions(-)
+
+diff --git a/tools/l2cap-tester.c b/tools/l2cap-tester.c
+index b6b879407115..e1487bc7fd75 100644
+--- a/tools/l2cap-tester.c
++++ b/tools/l2cap-tester.c
+@@ -58,6 +58,9 @@ struct l2cap_data {
+ 	uint16_t server_psm;
+ 	uint16_t cid;
+ 	uint8_t mode;
 +	uint16_t mtu;
 +	uint16_t mps;
 +	uint16_t credits;
- 	bthost_l2cap_connect_cb func;
- 	bthost_l2cap_disconnect_cb disconn_func;
- 	void *user_data;
-@@ -2164,14 +2167,13 @@ static bool l2cap_le_conn_req(struct bthost *bthost, struct btconn *conn,
+ 	int expect_err;
+ 	int timeout;
  
- 	memset(&rsp, 0, sizeof(rsp));
+@@ -545,6 +548,22 @@ static const struct l2cap_data le_client_connect_read_success_test = {
+ 	.data_len = sizeof(l2_data),
+ };
  
--	rsp.mtu = 23;
--	rsp.mps = 23;
--	rsp.credits = 1;
--
- 	cb_data = bthost_find_l2cap_cb_by_psm(bthost, psm);
--	if (cb_data)
-+	if (cb_data) {
- 		rsp.dcid = cpu_to_le16(conn->next_cid++);
--	else
-+		rsp.mtu = cpu_to_le16(cb_data->mtu) ? : cpu_to_le16(23);
-+		rsp.mps = cpu_to_le16(cb_data->mps) ? : cpu_to_le16(23);
-+		rsp.credits = cpu_to_le16(cb_data->credits) ? : cpu_to_le16(1);
-+	} else
- 		rsp.result = cpu_to_le16(0x0002); /* PSM Not Supported */
- 
- 	l2cap_sig_send(bthost, conn, BT_L2CAP_PDU_LE_CONN_RSP, ident, &rsp,
-@@ -3511,7 +3513,8 @@ uint64_t bthost_conn_get_fixed_chan(struct bthost *bthost, uint16_t handle)
- 	return conn->fixed_chan;
- }
- 
--void bthost_add_l2cap_server(struct bthost *bthost, uint16_t psm,
-+void bthost_add_l2cap_server_custom(struct bthost *bthost, uint16_t psm,
-+				uint16_t mtu, uint16_t mps, uint16_t credits,
- 				bthost_l2cap_connect_cb func,
- 				bthost_l2cap_disconnect_cb disconn_func,
- 				void *user_data)
-@@ -3523,6 +3526,9 @@ void bthost_add_l2cap_server(struct bthost *bthost, uint16_t psm,
- 		return;
- 
- 	data->psm = psm;
-+	data->mtu = mtu;
-+	data->mps = mps;
-+	data->credits = credits;
- 	data->user_data = user_data;
- 	data->func = func;
- 	data->disconn_func = disconn_func;
-@@ -3531,6 +3537,15 @@ void bthost_add_l2cap_server(struct bthost *bthost, uint16_t psm,
- 	bthost->new_l2cap_conn_data = data;
- }
- 
-+void bthost_add_l2cap_server(struct bthost *bthost, uint16_t psm,
-+				bthost_l2cap_connect_cb func,
-+				bthost_l2cap_disconnect_cb disconn_func,
-+				void *user_data)
-+{
-+	bthost_add_l2cap_server_custom(bthost, psm, 0, 0, 0, func,
-+					disconn_func, user_data);
-+}
++static const struct l2cap_data le_client_connect_read_32k_success_test = {
++	.client_psm = 0x0080,
++	.server_psm = 0x0080,
++	.mtu = 672,
++	.mps = 251,
++	/* Given enough credits to complete the transfer without waiting for
++	 * more credits.
++	 * credits = round_up(data size / mtu) * round_up(mtu / mps)
++	 * credits = 49 * 3
++	 * credits = 147
++	 */
++	.credits = 147,
++	.read_data = l2_data_32k,
++	.data_len = sizeof(l2_data_32k),
++};
 +
- void bthost_set_sc_support(struct bthost *bthost, bool enable)
- {
- 	struct bt_hci_cmd_write_secure_conn_support cmd;
-diff --git a/emulator/bthost.h b/emulator/bthost.h
-index 0c488e32afd0..2c5b0d5164cc 100644
---- a/emulator/bthost.h
-+++ b/emulator/bthost.h
-@@ -136,6 +136,11 @@ void bthost_add_l2cap_server(struct bthost *bthost, uint16_t psm,
- 				bthost_l2cap_connect_cb func,
- 				bthost_l2cap_disconnect_cb disconn_func,
- 				void *user_data);
-+void bthost_add_l2cap_server_custom(struct bthost *bthost, uint16_t psm,
-+				uint16_t mtu, uint16_t mps, uint16_t credits,
-+				bthost_l2cap_connect_cb func,
-+				bthost_l2cap_disconnect_cb disconn_func,
-+				void *user_data);
+ static const struct l2cap_data le_client_connect_write_success_test = {
+ 	.client_psm = 0x0080,
+ 	.server_psm = 0x0080,
+@@ -552,6 +571,22 @@ static const struct l2cap_data le_client_connect_write_success_test = {
+ 	.data_len = sizeof(l2_data),
+ };
  
- void bthost_set_sc_support(struct bthost *bthost, bool enable);
++static const struct l2cap_data le_client_connect_write_32k_success_test = {
++	.client_psm = 0x0080,
++	.server_psm = 0x0080,
++	.mtu = 672,
++	.mps = 251,
++	/* Given enough credits to complete the transfer without waiting for
++	 * more credits.
++	 * credits = round_up(data size / mtu) * round_up(mtu / mps)
++	 * credits = 49 * 3
++	 * credits = 147
++	 */
++	.credits = 147,
++	.write_data = l2_data_32k,
++	.data_len = sizeof(l2_data_32k),
++};
++
+ static const struct l2cap_data le_client_connect_tx_timestamping_test = {
+ 	.client_psm = 0x0080,
+ 	.server_psm = 0x0080,
+@@ -1278,6 +1313,10 @@ static bool check_mtu(struct test_data *data, int sk)
+ 					strerror(errno), errno);
+ 			return false;
+ 		}
++
++		/* Take SDU len into account */
++		data->l2o.imtu -= 2;
++		data->l2o.omtu -= 2;
+ 	} else {
+ 		/* For non-LE CoC enabled kernels we need to fall back to
+ 		 * L2CAP_OPTIONS, so test support for it as well */
+@@ -1673,9 +1712,20 @@ static void test_connect(const void *test_data)
+ 		if (l2data->shut_sock_wr)
+ 			host_disconnect_cb = client_l2cap_disconnect_cb;
  
+-		bthost_add_l2cap_server(bthost, l2data->server_psm,
+-					host_connect_cb, host_disconnect_cb,
+-					data);
++		if (l2data->mtu || l2data->mps || l2data->credits)
++			bthost_add_l2cap_server_custom(bthost,
++							l2data->server_psm,
++							l2data->mtu,
++							l2data->mps,
++							l2data->credits,
++							host_connect_cb,
++							host_disconnect_cb,
++							data);
++		else
++			bthost_add_l2cap_server(bthost, l2data->server_psm,
++							host_connect_cb,
++							host_disconnect_cb,
++							data);
+ 	}
+ 
+ 	if (l2data->direct_advertising)
+@@ -2534,11 +2584,17 @@ int main(int argc, char *argv[])
+ 				&le_client_connect_timeout_test_1,
+ 				setup_powered_client, test_connect_timeout);
+ 	test_l2cap_le("L2CAP LE Client - Read Success",
+-					&le_client_connect_read_success_test,
+-					setup_powered_client, test_connect);
++				&le_client_connect_read_success_test,
++				setup_powered_client, test_connect);
++	test_l2cap_le("L2CAP LE Client - Read 32k Success",
++				&le_client_connect_read_32k_success_test,
++				setup_powered_client, test_connect);
+ 	test_l2cap_le("L2CAP LE Client - Write Success",
+ 				&le_client_connect_write_success_test,
+ 				setup_powered_client, test_connect);
++	test_l2cap_le("L2CAP LE Client - Write 32k Success",
++				&le_client_connect_write_32k_success_test,
++				setup_powered_client, test_connect);
+ 	test_l2cap_le("L2CAP LE Client - TX Timestamping",
+ 				&le_client_connect_tx_timestamping_test,
+ 				setup_powered_client, test_connect);
 -- 
 2.45.2
 
