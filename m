@@ -1,228 +1,268 @@
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 423F338D
-	for <linux-bluetooth@vger.kernel.org>; Wed, 26 Jun 2024 06:10:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B8B3170859
+	for <linux-bluetooth@vger.kernel.org>; Wed, 26 Jun 2024 09:13:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719382257; cv=none; b=o3vFEeNnaHJBWHZLK/ASTB/fltnUMgLkj+nUekhc7FbAfNxrvok0Gk7hjo3xCgQiXYOh7a68LGfxUjI25HD1id5JV5yVOSQRgnpbihJ2/0jdVozjzWYYMhq4MkIBsF8H9qb/bGr95b8AOAFb/v/zcVs8cwO2w/Nyat2Q18wXmuc=
+	t=1719393217; cv=none; b=VGsoxQ/vjEwy2PX0zS/nB4FSvcQ965jyNH4Q6CzRnteeookglxdLDR0ZiMHr94qWazsscedLG2BUsFUwe16jd40plf2vABb+PBru9KYtfxmNMjZof59zpPtRYbNNIVKNeyvAFjruEE8KEFacnAHJD6OTgctaQ01kYTyXzB3fQjU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719382257; c=relaxed/simple;
-	bh=PMPUs+9Kfuj23F1Ez1A7GWH4uRhOKcMmdcOgmCFXxHE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=E8ZrPhjLjII5OhItxPwOOicEKpjF7unLmYB+dLeB0bv90MVgpr7yR6HuFf169gNL9iDY8M2BpEKa4MRCjGTrOI6FMdAzc1zYBdH6kO38RYcnkUd0o0JRp9zI5ZXSOoxkkwyEICv28wkFSBkwN5HdaLPUr9kjHE2wf2AR9NmAyS0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=WuXV1xZA; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+	s=arc-20240116; t=1719393217; c=relaxed/simple;
+	bh=KXkxf1O5aCrOk5mSB9jTOa9ISWrYHjNvBI8sGRLPEMk=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=FI6OFr/xM80kyi//1tYXwlfJomI6v2wU1RqR6YJjw7Nmcm5+NekL2iqVm6naAvWhZUYU3If0v/G0Z+3/UT+xACV+NIkv41ecezFPEWOY40dPDuLphMzFOhc2CEDpa9sFkipKLZGEmQupKZz5W5VYQGpWFAXD9ncb7pSv1jVR0BM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=kABdRKxU; arc=none smtp.client-ip=192.198.163.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="WuXV1xZA"
-Received: from pps.filterd (m0279862.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 45PKKcU3020437;
-	Wed, 26 Jun 2024 06:10:51 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	0HqQQx0aKpVjFetL7sPGfvwuzOCVX4nANx/gCVKcPuM=; b=WuXV1xZAfxy24BL0
-	kWGoP2q6AH7MC8Qiyj40RtV2Vylh26EpgH/D0WxQTL02bw99XekYPnELsPnlBQdI
-	PFw0BZj9ekze8xrO+6z2XM3AijtrdKq0ifi6WqQlaEggzF5TJWoWP7U/dkS7BkaO
-	SDoph/Bbrav97zinaVXbm8vwmeWgQrAs0qbDTz4ltSpkThOusEaAlGA79N0g1pXw
-	lzI3RfOWS+8vRkKm2ngMRqK0fBsiI7M9X8gN3kmjsQBHL24R8wMO/i5x99kQ9vH9
-	qBHxX4jsZpaekNGE2LTzm1b+RlHYiNx+KCfIOmv3wvbzPw7Z9+gmfMiC5RhkbYRw
-	uypF1w==
-Received: from nasanppmta02.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3ywqcegpau-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 26 Jun 2024 06:10:51 +0000 (GMT)
-Received: from nasanex01c.na.qualcomm.com (nasanex01c.na.qualcomm.com [10.45.79.139])
-	by NASANPPMTA02.qualcomm.com (8.17.1.19/8.17.1.19) with ESMTPS id 45Q6Aou7005912
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 26 Jun 2024 06:10:50 GMT
-Received: from [10.216.34.141] (10.80.80.8) by nasanex01c.na.qualcomm.com
- (10.45.79.139) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Tue, 25 Jun
- 2024 23:10:48 -0700
-Message-ID: <8ae5c6f5-e005-42d9-ad5b-ea53a978a85a@quicinc.com>
-Date: Wed, 26 Jun 2024 11:40:12 +0530
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="kABdRKxU"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1719393215; x=1750929215;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=KXkxf1O5aCrOk5mSB9jTOa9ISWrYHjNvBI8sGRLPEMk=;
+  b=kABdRKxUSvPns4BAAiucF8fMqPYaF4ZdBO66BAqGgNePBssfVVk6RhoB
+   EqGB9eIvUPXnEStGtLy1MnOajOrVxbWQXAyuHrLBTk/pE+g3YJqYWRJNx
+   TH6FFMem8ZFK/OUUMoKha88o/q5i7N3NmfThZ7GnGNOHTgTvrP7h0dyzM
+   tmJWD+FAPq4uEhebuEolOyShLhVVaVzPN2z+BWh40x975CRb9pBnk/v5p
+   9kE4yaY41ydq19Lqwd4nmY1el1jNSTLK3XS3Phr2sSSQviEGgCqVJ+2YN
+   YpYnJ3NzTA5T+27kGjySC9NePG0rFvdVyAVHvu13mgkOYlmujD+FArKgH
+   A==;
+X-CSE-ConnectionGUID: jrsCU/L1TLSq4jN4xZMqNw==
+X-CSE-MsgGUID: 7MtXxye6SYmMMkG0grl7oQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11114"; a="16678196"
+X-IronPort-AV: E=Sophos;i="6.08,266,1712646000"; 
+   d="scan'208";a="16678196"
+Received: from fmviesa010.fm.intel.com ([10.60.135.150])
+  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jun 2024 02:13:35 -0700
+X-CSE-ConnectionGUID: Z/6E51H5QAqqAnfQZ9NXhA==
+X-CSE-MsgGUID: 0nrD5mlUTDWUqCO1rHMdZg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.08,266,1712646000"; 
+   d="scan'208";a="44029962"
+Received: from intel-lenovo-legion-y540-15irh-pg0.iind.intel.com ([10.224.186.95])
+  by fmviesa010.fm.intel.com with ESMTP; 26 Jun 2024 02:13:33 -0700
+From: Kiran K <kiran.k@intel.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: ravishankar.srivatsa@intel.com,
+	chethan.tumkur.narayan@intel.com,
+	chandrashekar.devegowda@intel.com,
+	vijay.satija@intel.com,
+	Kiran K <kiran.k@intel.com>
+Subject: [PATCH v3] Bluetooth: btintel: Allow lowering of drive strength of BRI
+Date: Wed, 26 Jun 2024 14:58:01 +0530
+Message-Id: <20240626092801.2343844-1-kiran.k@intel.com>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2] Bluetooth : Update the mas session structure
-To: Pauli Virtanen <pav@iki.fi>, <linux-bluetooth@vger.kernel.org>
-CC: <quic_mohamull@quicinc.com>, <quic_hbandi@quicinc.com>,
-        <quic_anubhavg@quicinc.com>
-References: <20240625063533.30536-1-quic_amisjain@quicinc.com>
- <dac1d55c940b3a9afb971263c8195e765e77c598.camel@iki.fi>
-Content-Language: en-US
-From: Amisha Jain <quic_amisjain@quicinc.com>
-In-Reply-To: <dac1d55c940b3a9afb971263c8195e765e77c598.camel@iki.fi>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nasanex01c.na.qualcomm.com (10.45.79.139)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: DTzC83GHvU7tRblXWbI6TGmEMBbEpeAV
-X-Proofpoint-ORIG-GUID: DTzC83GHvU7tRblXWbI6TGmEMBbEpeAV
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-06-26_03,2024-06-25_01,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 clxscore=1011
- mlxscore=0 lowpriorityscore=0 bulkscore=0 phishscore=0 spamscore=0
- suspectscore=0 priorityscore=1501 malwarescore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2406140001 definitions=main-2406260047
+Content-Transfer-Encoding: 8bit
 
-Hi,
+BRI (Bluetooth Radio Interface) traffic from CNVr to CNVi was found
+causing cross talk step errors to WiFi. As a workaround, driver needs to
+reduce the drive strength of BRI. During *setup*, driver reads the drive
+strength value from efi variable and passes it to the controller via vendor
+specific command with opcode 0xfc0a.
 
-Correct! The problem here is manager_emit_transfer_property() is 
-expecting the structure of type 'obex_transfer' and we are passing the 
-structure of session type which will be type mismatch and inappropriate 
-values will be populated in further calls in code. Hence property "Size" 
-will never emit on console(obexctl) as it is not set properly and might 
-cause crash/disconnection.
+dmesg:
+.....
+[16.767459] Bluetooth: hci0: Found device firmware: intel/ibt-0190-0291-iml.sfi
+[16.767464] Bluetooth: hci0: Boot Address: 0x30099000
+[16.767464] Bluetooth: hci0: Firmware Version: 9-25.24
+[16.825418] Bluetooth: hci0: Waiting for firmware download to complete
+[16.825421] Bluetooth: hci0: Firmware loaded in 56600 usecs
+[16.825463] Bluetooth: hci0: Waiting for device to boot
+[16.827510] Bluetooth: hci0: Malformed MSFT vendor event: 0x02
+[16.827529] Bluetooth: hci0: Device booted in 2053 usecs
+[16.827707] Bluetooth: hci0: dsbr: enabled: 0x01 value: 0x0f
+[16.830179] Bluetooth: hci0: Found device firmware: intel/ibt-0190-0291-pci.sfi
+[16.830188] Bluetooth: hci0: Boot Address: 0x10000800
+[16.830189] Bluetooth: hci0: Firmware Version: 9-25.24
+[16.928308] Bluetooth: BNEP (Ethernet Emulation) ver 1.3
+[16.928311] Bluetooth: BNEP filters: protocol multicast
+[16.928315] Bluetooth: BNEP socket layer initialized
+[17.333292] Bluetooth: hci0: Waiting for firmware download to complete
+[17.333313] Bluetooth: hci0: Firmware loaded in 491339 usecs
+[17.333353] Bluetooth: hci0: Waiting for device to boot
+[17.368741] Bluetooth: hci0: Device booted in 34585 usecs
+[17.368742] Bluetooth: hci0: Malformed MSFT vendor event: 0x02
+[17.368942] Bluetooth: hci0: Found Intel DDC parameters: intel/ibt-0190-0291-pci.ddc
+[17.369199] Bluetooth: hci0: Applying Intel DDC parameters completed
+[17.369447] Bluetooth: hci0: Firmware timestamp 2024.25 buildtype 3 build 64777
+[17.369448] Bluetooth: hci0: Firmware SHA1: 0xc33eb15f
+[17.369648] Bluetooth: hci0: Fseq status: Success (0x00)
+[17.369649] Bluetooth: hci0: Fseq executed: 00.00.04.183
+[17.369650] Bluetooth: hci0: Fseq BT Top: 00.00.04.183
+[17.408366] Bluetooth: MGMT ver 1.23
+[17.408415] Bluetooth: ISO socket layer initialized
+[17.434375] Bluetooth: RFCOMM TTY layer initialized
+[17.434385] Bluetooth: RFCOMM socket layer initialized
+[17.434389] Bluetooth: RFCOMM ver 1.11
 
- > diff --git a/obexd/src/obex.c b/obexd/src/obex.c
- > index a4bae857f..ed219d3e7 100644
- > --- a/obexd/src/obex.c
- > +++ b/obexd/src/obex.c
- > @@ -779,6 +779,9 @@ int obex_put_stream_start(struct obex_session 
-*os, const char *filename)
- >                  return err;
- >          }
- >
- > +       if (os->size != OBJECT_SIZE_DELETE && os->size != 
-OBJECT_SIZE_UNKNOWN)
- > +               manager_emit_transfer_property(os->service_data, "Size");
- > +
- >          os->path = g_strdup(filename);
- >
+Signed-off-by: Kiran K <kiran.k@intel.com>
+---
+ drivers/bluetooth/btintel.c | 117 ++++++++++++++++++++++++++++++++++++
+ 1 file changed, 117 insertions(+)
 
+diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
+index 5d735391545a..fb9d4221ccd6 100644
+--- a/drivers/bluetooth/btintel.c
++++ b/drivers/bluetooth/btintel.c
+@@ -12,6 +12,8 @@
+ #include <linux/acpi.h>
+ #include <acpi/acpi_bus.h>
+ #include <asm/unaligned.h>
++#include <linux/efi.h>
++
+ 
+ #include <net/bluetooth/bluetooth.h>
+ #include <net/bluetooth/hci_core.h>
+@@ -26,6 +28,8 @@
+ #define ECDSA_OFFSET		644
+ #define ECDSA_HEADER_LEN	320
+ 
++#define BTINTEL_EFI_DRBR	L"UefiCnvCommonDSBR"
++
+ enum {
+ 	DSM_SET_WDISABLE2_DELAY = 1,
+ 	DSM_SET_RESET_METHOD = 3,
+@@ -49,6 +53,38 @@ static const guid_t btintel_guid_dsm =
+ 	GUID_INIT(0xaa10f4e0, 0x81ac, 0x4233,
+ 		  0xab, 0xf6, 0x3b, 0x2a, 0xc5, 0x0e, 0x28, 0xd9);
+ 
++static void *btintel_uefi_get_variable(efi_char16_t *name, efi_guid_t *guid)
++{
++	void *data;
++	efi_status_t status;
++	unsigned long data_size = 0;
++
++	if (!IS_ENABLED(CONFIG_EFI))
++		return ERR_PTR(-EOPNOTSUPP);
++
++	if (!efi_rt_services_supported(EFI_RT_SUPPORTED_GET_VARIABLE))
++		return ERR_PTR(-EOPNOTSUPP);
++
++	status = efi.get_variable(name, guid, NULL, &data_size, NULL);
++
++	if (status != EFI_BUFFER_TOO_SMALL || !data_size)
++		return ERR_PTR(-EIO);
++
++	data = kmalloc(data_size, GFP_KERNEL);
++
++	if (!data)
++		return ERR_PTR(-ENOMEM);
++
++	status = efi.get_variable(name, guid, NULL, &data_size, data);
++
++	if (status != EFI_SUCCESS) {
++		kfree(data);
++		return ERR_PTR(-ENXIO);
++	}
++
++	return data;
++}
++
+ int btintel_check_bdaddr(struct hci_dev *hdev)
+ {
+ 	struct hci_rp_read_bd_addr *bda;
+@@ -2615,6 +2651,80 @@ static u8 btintel_classify_pkt_type(struct hci_dev *hdev, struct sk_buff *skb)
+ 	return hci_skb_pkt_type(skb);
+ }
+ 
++static int btintel_set_dsbr(struct hci_dev *hdev, struct intel_version_tlv *ver)
++{
++	struct btintel_dsbr_cmd {
++		u8 enable;
++		u8 dsbr;
++	} __packed;
++
++	struct btintel_dsbr {
++		u8 header;
++		u32 dsbr;
++	} __packed;
++
++	struct btintel_dsbr *dsbr;
++	struct btintel_dsbr_cmd cmd;
++	struct sk_buff *skb;
++	u8 status;
++	efi_guid_t guid = EFI_GUID(0xe65d8884, 0xd4af, 0x4b20, 0x8d, 0x03,
++				   0x77, 0x2e, 0xcc, 0x3d, 0xa5, 0x31);
++
++	memset(&cmd, 0, sizeof(cmd));
++	dsbr = btintel_uefi_get_variable(BTINTEL_EFI_DRBR, &guid);
++	if (IS_ERR(dsbr)) {
++		/* If efi variable is not present, driver still needs to send
++		 * 0xfc0a command with default values
++		 */
++		bt_dev_dbg(hdev, "Error reading efi: %ls DSBR (%ld)",
++			   BTINTEL_EFI_DRBR, PTR_ERR(dsbr));
++		dsbr = NULL;
++	}
++
++	if (dsbr) {
++		/* bit0: 0 - Use firmware default value
++		 *       1 - Override firmware value
++		 * bit3:1 - Reserved
++		 * bit7:4 - DSBR override values
++		 * bt31:7 - Reserved
++		 */
++		cmd.enable = dsbr->dsbr & BIT(0);
++		if (cmd.enable)
++			cmd.dsbr = dsbr->dsbr >> 4 & 0xF;
++		kfree(dsbr);
++	}
++
++	bt_dev_info(hdev, "dsbr: enabled: 0x%2.2x value: 0x%2.2x", cmd.enable,
++		    cmd.dsbr);
++
++	skb = __hci_cmd_sync(hdev, 0xfc0a, sizeof(cmd), &cmd,  HCI_CMD_TIMEOUT);
++	if (IS_ERR(skb)) {
++		bt_dev_err(hdev, "Failed to send Intel DSBR command (%ld)",
++			   PTR_ERR(skb));
++		return -bt_to_errno(PTR_ERR(skb));
++	}
++
++	status = skb->data[0];
++	kfree_skb(skb);
++
++	if (status) {
++		bt_dev_err(hdev, "Set DSBR failed 0x%2.2x", status);
++		return -bt_to_errno(status);
++	}
++	return 0;
++}
++
++static int btintel_apply_dsbr(struct hci_dev *hdev,
++			      struct intel_version_tlv *ver)
++{
++	/* For BlazarI + B0 step, DSBR command needs to be sent just after
++	 * downloading IML firmware
++	 */
++	return ver->img_type == BTINTEL_IMG_IML &&
++		((ver->cnvi_top & 0xfff) == BTINTEL_CNVI_BLAZARI) &&
++		INTEL_CNVX_TOP_STEP(ver->cnvi_top) == 0x01;
++}
++
+ int btintel_bootloader_setup_tlv(struct hci_dev *hdev,
+ 				 struct intel_version_tlv *ver)
+ {
+@@ -2649,6 +2759,13 @@ int btintel_bootloader_setup_tlv(struct hci_dev *hdev,
+ 	if (err)
+ 		return err;
+ 
++	if (btintel_apply_dsbr(hdev, ver)) {
++		/* set drive strength BRI response */
++		err = btintel_set_dsbr(hdev, ver);
++		if (err)
++			return err;
++	}
++
+ 	/* If image type returned is BTINTEL_IMG_IML, then controller supports
+ 	 * intermediae loader image
+ 	 */
+-- 
+2.40.1
 
-One way to resolve this issue is to add the additional field in 
-'mas_session' so it can cast to struct 'obex_transfer'. We are adding 
-new field 'char *path' as only transfer->path will be invoked and passed 
-further.
-
-void manager_emit_transfer_property(struct obex_transfer *transfer,
-								char *name)
-{
-	if (!transfer->path)
-		return;
-
-	g_dbus_emit_property_changed(connection, transfer->path,
-					TRANSFER_INTERFACE, name);
-}
-
- >> Signed-off-by: Amisha Jain <quic_amisjain@quicinc.com>
- >> ---
- >>   obexd/plugins/mas.c | 4 +++-
- >>   1 file changed, 3 insertions(+), 1 deletion(-)
- >>
- >> diff --git a/obexd/plugins/mas.c b/obexd/plugins/mas.c
- >> index 10b972d65..71bf12ad3 100644
- >> --- a/obexd/plugins/mas.c
- >> +++ b/obexd/plugins/mas.c
- >> @@ -51,6 +51,8 @@
- >>   #define ML_BODY_END "</MAP-msg-listing>"
- >>
- >>   struct mas_session {
- >> +	uint8_t notification_status;
- >> +	char *path;
- >>   	struct mas_request *request;
- >>   	void *backend_data;
- >>   	gboolean finished;
- >> @@ -59,7 +61,6 @@ struct mas_session {
- >>   	GObexApparam *inparams;
- >>   	GObexApparam *outparams;
- >>   	gboolean ap_sent;
- >> -	uint8_t notification_status;
- >>   };
- >>
- >>   static const uint8_t MAS_TARGET[TARGET_SIZE] = {
- >> @@ -125,6 +126,7 @@ static void *mas_connect(struct obex_session 
-*os, int *err)
- >>   		goto failed;
- >>
- >>   	manager_register_session(os);
- >> +	mas->path = NULL;
- >
-
-There is no transfer already registered for mas during connection, so 
-setting the path to NULL.
-
-On 6/25/2024 9:09 PM, Pauli Virtanen wrote:
-> Hi,
-> 
-> ti, 2024-06-25 kello 12:05 +0530, Amisha Jain kirjoitti:
->> Update the 'mas_session' structure such that
->> manager_emit_transfer_property(os->service_data, "Size")
->> will get the proper structure in arguments as
->> expected like structure 'obex_transfer' and transfer->path
->> won't be populated with inappropriate value.
->>
->> As there is no new transfer registered during mas connect,
->> hence setting the path to NULL to avoid invoking the
->> g_dbus_emit_property_changed() property.
->>
->> Signed-off-by: Amisha Jain <quic_amisjain@quicinc.com>
->> ---
->>   obexd/plugins/mas.c | 4 +++-
->>   1 file changed, 3 insertions(+), 1 deletion(-)
->>
->> diff --git a/obexd/plugins/mas.c b/obexd/plugins/mas.c
->> index 10b972d65..71bf12ad3 100644
->> --- a/obexd/plugins/mas.c
->> +++ b/obexd/plugins/mas.c
->> @@ -51,6 +51,8 @@
->>   #define ML_BODY_END "</MAP-msg-listing>"
->>   
->>   struct mas_session {
->> +	uint8_t notification_status;
->> +	char *path;
->>   	struct mas_request *request;
->>   	void *backend_data;
->>   	gboolean finished;
->> @@ -59,7 +61,6 @@ struct mas_session {
->>   	GObexApparam *inparams;
->>   	GObexApparam *outparams;
->>   	gboolean ap_sent;
->> -	uint8_t notification_status;
->>   };
->>   
->>   static const uint8_t MAS_TARGET[TARGET_SIZE] = {
->> @@ -125,6 +126,7 @@ static void *mas_connect(struct obex_session *os, int *err)
->>   		goto failed;
->>   
->>   	manager_register_session(os);
->> +	mas->path = NULL;
-> 
-> Maybe the problem here is that the change in commit bb160515185e
-> ("obexd: Emit Size property of transfer after open()") is not right?
-> 
-> diff --git a/obexd/src/obex.c b/obexd/src/obex.c
-> index a4bae857f..ed219d3e7 100644
-> --- a/obexd/src/obex.c
-> +++ b/obexd/src/obex.c
-> @@ -779,6 +779,9 @@ int obex_put_stream_start(struct obex_session *os, const char *filename)
->                  return err;
->          }
->   
-> +       if (os->size != OBJECT_SIZE_DELETE && os->size != OBJECT_SIZE_UNKNOWN)
-> +               manager_emit_transfer_property(os->service_data, "Size");
-> +
->          os->path = g_strdup(filename);
-> 
-> This casts os->service_data to obex_transfer which IIUC does not work
-> for most the plugins, as it's the session struct.
-> 
-> Maybe plugins can emit the transfer property change in their open()
-> callback, for the plugins where it makes sense?
-> 
->>   
->>   	return mas;
->>   
-> 
