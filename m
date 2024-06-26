@@ -1,61 +1,62 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFBFE149DF8
-	for <linux-bluetooth@vger.kernel.org>; Tue, 25 Jun 2024 22:41:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70BD41862
+	for <linux-bluetooth@vger.kernel.org>; Wed, 26 Jun 2024 00:19:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719355266; cv=none; b=LAnicbpGJcJRVOh5jYu1uzQyjVSjk/TGf7xoQz8/nlbyz16yCq/qGOvd+TGFfOnFK1tUsDVsGHttiNVm2MLXJhhE2fOxDO7vC+O6zeQpgOVukYChZj8eZ1O3ud3PLoHIBGiwi38s33oN1+ahMRdOavh7AfoWJg5EVqAJ4oDEzs0=
+	t=1719361198; cv=none; b=ARFZ/T2/fSv2L+eDLsfi+x1HBofmnIQI3HYdYPGrwOdeYkHE2GlFDUhUg/zko4bjagTx5e0txFhxSu2MMtG6rp3rhUtrpNBt4Ib6vsl1TjQmPVshrYy+ec0YNAs0Zco2WZ0AFGOTkGVNv/im9Xx3mlqrIUcM8jrBLtzMoFYJD0c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719355266; c=relaxed/simple;
-	bh=IkUPtooW7PIn5Eng5K+5TVL9JdofpoMiwShwsxi88MI=;
+	s=arc-20240116; t=1719361198; c=relaxed/simple;
+	bh=LAwZpy3+qHkbeq9PeG40wpWmYPLEMz8RHsNqK/BorGA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BfQH2Gho1Rtacm+/AM/8y39I2nkiU0CWEFOqpGgYJgODUiv62XCUfkilhK5ynqOcz45dFcnm2Ncy6yzyM38f68CLHQ/orJoJU5crKJa2P/B20woisShhXZyk7TIicDfrYfqN8zhItGmN4ru6hkkgFXNYYjohKpMR/AeVfa/iBBI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=hi2lVoKf; arc=none smtp.client-ip=198.175.65.10
+	 Content-Type:Content-Disposition:In-Reply-To; b=nz/v7fwGJaI+f1e6Cf6BsMu921mxtE5gLmPh2U7PFNTic2U44KcDPM87SBpKOgUE8eRhaotDu02wamM4BWJCQYrzPVzTECvt0cjNcAjrylbOLNcinwPgXwgSsCa3RDCC8qJsgI1lkvsote/LRf5U4Y2eLEkjoTUpHDVk9Rwp1ls=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=VrgMaEp7; arc=none smtp.client-ip=198.175.65.20
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="hi2lVoKf"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="VrgMaEp7"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1719355264; x=1750891264;
+  t=1719361197; x=1750897197;
   h=date:from:to:cc:subject:message-id:references:
    mime-version:in-reply-to;
-  bh=IkUPtooW7PIn5Eng5K+5TVL9JdofpoMiwShwsxi88MI=;
-  b=hi2lVoKfD77ZXyf5QTt4k5UynWT+DlxcarcdZFtYiwYtpYAhoPMme8P1
-   xXYgVcU9LHRuX+Ju2V/G4g1+j7/MR5GK7GCVy42HhDET8DvDlgd+pYshF
-   Gx7KJ4ShmoVIZd5XCF+z1Ya9YRmz8mKjjD/f9hBfzuhnG0BSx/kEevO/q
-   9V3NQ8IBkhqL2ngOeeED6FjSTULFnmX/prYkGFwjNN4m1YdfAuBNI1Yba
-   g+SZlt4NRQ1iSQB93Ns3h84MggArhbnBuTT6e17B2g7LR09NZWJvZ5cx9
-   AiIOY9gZIBjEQbg1vYi360iPWvGXrbWUvT6oGw+eZTRxSyl6yQtpv07wH
-   w==;
-X-CSE-ConnectionGUID: 2OZ5vWsuQAWmT+LyZHFX0w==
-X-CSE-MsgGUID: HYHtxLpWRJGqH0GR4BE78w==
-X-IronPort-AV: E=McAfee;i="6700,10204,11114"; a="33858374"
+  bh=LAwZpy3+qHkbeq9PeG40wpWmYPLEMz8RHsNqK/BorGA=;
+  b=VrgMaEp72NoqRaCin4hc9jGHjLcsQA3wunal+89jMe4dg8KRu1Lu8OlR
+   gXRHv0oa2XLMZBHWrmuwBtfqLaxy0Z1FZlJQOgONYol9R7YAE9nuN0bxa
+   1Sgjonh5Pj+U295oXaqmMwt3l80hn/lkOonYan7/dYg4MNr481sMDuNSG
+   RnACTs1wWvhuDLF+UgO3/OcuZuMRpU8d9vMHTfxwO+tl8l78y/AzC/fsr
+   fdFDq9cd8GdIBZhs+2z/1OacX5lY/qGdA0RNPRwyAO/tYxCbf9isMG3Hb
+   fb/u1Age9tIK62FJE7E9l6WUCfBOFAsYpitVG2X10conXwco4ASIl3PBI
+   g==;
+X-CSE-ConnectionGUID: b1YZLCaZSD2Fp3/OjeoY4g==
+X-CSE-MsgGUID: UddL9iDDTvGRd8gCzi31+w==
+X-IronPort-AV: E=McAfee;i="6700,10204,11114"; a="16233150"
 X-IronPort-AV: E=Sophos;i="6.08,265,1712646000"; 
-   d="scan'208";a="33858374"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jun 2024 15:41:03 -0700
-X-CSE-ConnectionGUID: Ko//HmK9S9e0+x5Mkn4vNw==
-X-CSE-MsgGUID: oI2S5gr5S7elevzA56k/aw==
+   d="scan'208";a="16233150"
+Received: from fmviesa003.fm.intel.com ([10.60.135.143])
+  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jun 2024 17:19:57 -0700
+X-CSE-ConnectionGUID: OmMYyxwxTtaphR/2m1b0oQ==
+X-CSE-MsgGUID: A4LbpmDfSEqtuUuO+S2UMg==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.08,265,1712646000"; 
-   d="scan'208";a="81335706"
+   d="scan'208";a="48201436"
 Received: from lkp-server01.sh.intel.com (HELO 68891e0c336b) ([10.239.97.150])
-  by orviesa001.jf.intel.com with ESMTP; 25 Jun 2024 15:41:02 -0700
+  by fmviesa003.fm.intel.com with ESMTP; 25 Jun 2024 17:19:52 -0700
 Received: from kbuild by 68891e0c336b with local (Exim 4.96)
 	(envelope-from <lkp@intel.com>)
-	id 1sMEqR-000EmI-0z;
-	Tue, 25 Jun 2024 22:40:59 +0000
-Date: Wed, 26 Jun 2024 06:40:41 +0800
+	id 1sMGO7-000EpK-2t;
+	Wed, 26 Jun 2024 00:19:51 +0000
+Date: Wed, 26 Jun 2024 08:19:11 +0800
 From: kernel test robot <lkp@intel.com>
 To: Kiran K <kiran.k@intel.com>, linux-bluetooth@vger.kernel.org
-Cc: oe-kbuild-all@lists.linux.dev, ravishankar.srivatsa@intel.com,
-	chethan.tumkur.narayan@intel.com, chandrashekar.devegowda@intel.com,
-	vijay.satija@intel.com, Kiran K <kiran.k@intel.com>
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	ravishankar.srivatsa@intel.com, chethan.tumkur.narayan@intel.com,
+	chandrashekar.devegowda@intel.com, vijay.satija@intel.com,
+	Kiran K <kiran.k@intel.com>
 Subject: Re: [PATCH v2] Bluetooth: btintel: Allow lowering of drive strength
  of BRI
-Message-ID: <202406260659.fzB4yn3X-lkp@intel.com>
+Message-ID: <202406260704.ZkFL5RKp-lkp@intel.com>
 References: <20240621064419.2185652-1-kiran.k@intel.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -82,31 +83,24 @@ url:    https://github.com/intel-lab-lkp/linux/commits/Kiran-K/Bluetooth-btintel
 base:   https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
 patch link:    https://lore.kernel.org/r/20240621064419.2185652-1-kiran.k%40intel.com
 patch subject: [PATCH v2] Bluetooth: btintel: Allow lowering of drive strength of BRI
-config: m68k-allmodconfig (https://download.01.org/0day-ci/archive/20240626/202406260659.fzB4yn3X-lkp@intel.com/config)
-compiler: m68k-linux-gcc (GCC) 13.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240626/202406260659.fzB4yn3X-lkp@intel.com/reproduce)
+config: i386-buildonly-randconfig-001-20240626 (https://download.01.org/0day-ci/archive/20240626/202406260704.ZkFL5RKp-lkp@intel.com/config)
+compiler: clang version 18.1.5 (https://github.com/llvm/llvm-project 617a15a9eac96088ae5e9134248d8236e34b91b1)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240626/202406260704.ZkFL5RKp-lkp@intel.com/reproduce)
 
 If you fix the issue in a separate patch/commit (i.e. not just a new version of
 the same patch/commit), kindly add following tags
 | Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202406260659.fzB4yn3X-lkp@intel.com/
+| Closes: https://lore.kernel.org/oe-kbuild-all/202406260704.ZkFL5RKp-lkp@intel.com/
 
 All errors (new ones prefixed by >>):
 
-   drivers/bluetooth/btintel.c: In function 'btintel_uefi_get_variable':
->> drivers/bluetooth/btintel.c:66:53: error: passing argument 4 of 'efi.get_variable' from incompatible pointer type [-Werror=incompatible-pointer-types]
+>> drivers/bluetooth/btintel.c:66:46: error: incompatible pointer types passing 'size_t *' (aka 'unsigned int *') to parameter of type 'unsigned long *' [-Werror,-Wincompatible-pointer-types]
       66 |         status = efi.get_variable(name, guid, NULL, &data_size, NULL);
          |                                                     ^~~~~~~~~~
-         |                                                     |
-         |                                                     size_t * {aka unsigned int *}
-   drivers/bluetooth/btintel.c:66:53: note: expected 'long unsigned int *' but argument is of type 'size_t *' {aka 'unsigned int *'}
-   drivers/bluetooth/btintel.c:76:53: error: passing argument 4 of 'efi.get_variable' from incompatible pointer type [-Werror=incompatible-pointer-types]
+   drivers/bluetooth/btintel.c:76:46: error: incompatible pointer types passing 'size_t *' (aka 'unsigned int *') to parameter of type 'unsigned long *' [-Werror,-Wincompatible-pointer-types]
       76 |         status = efi.get_variable(name, guid, NULL, &data_size, data);
          |                                                     ^~~~~~~~~~
-         |                                                     |
-         |                                                     size_t * {aka unsigned int *}
-   drivers/bluetooth/btintel.c:76:53: note: expected 'long unsigned int *' but argument is of type 'size_t *' {aka 'unsigned int *'}
-   cc1: some warnings being treated as errors
+   2 errors generated.
 
 
 vim +66 drivers/bluetooth/btintel.c
