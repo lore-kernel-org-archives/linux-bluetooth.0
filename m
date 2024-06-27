@@ -1,113 +1,103 @@
-Received: from mail-qk1-f175.google.com (mail-qk1-f175.google.com [209.85.222.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D410149009
-	for <linux-bluetooth@vger.kernel.org>; Thu, 27 Jun 2024 12:07:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B34515688D
+	for <linux-bluetooth@vger.kernel.org>; Thu, 27 Jun 2024 12:40:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719490045; cv=none; b=BH1QH/FT2crE7bcNy7uYRYVxDrJVnrZa1gYby8fsvxiBSso92zw0RV5/gsVT66iptnntxSgMFCk3cUQ7F2yRDnoUxW/sgKEBVmGYcEaqpSTb+7U/YKa9sRDsPZWqNGk3ryEIHbLuuxutnkxELGmotAh1nBipZK1SCxyjxgr61u0=
+	t=1719492194; cv=none; b=q0POznqbgxkB5l4WfyjErmUQB6pmQ4j9vkmTCvsjC0pnpDctA3zy19rRPkkY9jGYB6ZaO8Ufl9I8bwiQEbYYHjrTgwppBpWSNZsVTb7aMBYIYFyscz960GTteYLLZxZbNJOSXC+vskIIAuo/z1lWk/d4e8qPA5VzSeYa+Y+Hu6k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719490045; c=relaxed/simple;
-	bh=AzpjIg/FWWT1STPKP0uKBfOJ6osVshEDMCbQeRv1xv0=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=hU1KSvfOXINvqeEvuJ7S4McdpdZIDM3xfyu1I6opzEJRCeWWQqqZRIab+GB9Uh6duMUMt26dscSPgCDEbK6LMc/XYYeZab884+QA16mQnMjRQNQoGOHmng5HtqDp5e56zJE2wjhwxAcTYcbnKW0x1n3tr/NTLv4biaCYXCiCFt4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZZq16BRG; arc=none smtp.client-ip=209.85.222.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZZq16BRG"
-Received: by mail-qk1-f175.google.com with SMTP id af79cd13be357-79c0c19ff02so282482185a.1
-        for <linux-bluetooth@vger.kernel.org>; Thu, 27 Jun 2024 05:07:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1719490043; x=1720094843; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=X+7p3GmpmvliKq5Xas/flFMj5XHx32/MJ8JesU0zJ4E=;
-        b=ZZq16BRGbht2jzz1q3EOXsHDc0HJmQQnKus9V3I1lWqAuE9bhD9/+RFDUX5MamnQIv
-         OAzpH6+l8zJFX5EgqPxHDliTzjvUBavAgIK52pDM38Y1z/F55Xi+Hv0FMZy6ZC9jUN03
-         a2eH0U3RHonXPOxVyfcX8SanM2giTd2u2qugxfSPPbelj/RPHt81uYn5be+T5Ce3/wVO
-         jLE8LXk+3PNS6gw6UwA8OnSEn9b+mTVO9Ugza6zD2LvXOK3pyGcpKKvjY/w5OWFIcOJd
-         heR5DwNolb/rFoB0ahvidXU6pWdHRtevQ2MuDHSCqVPrBYkekJ2VN7kgSEVjPLoo4Cl+
-         KGfg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719490043; x=1720094843;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=X+7p3GmpmvliKq5Xas/flFMj5XHx32/MJ8JesU0zJ4E=;
-        b=YWxDULoyUwqyey7Z9/8GEqfNm49NrHH9Ruwh8Kjw9gh+cSvTf+wEqjk0jFEkt0IP57
-         NQHM9P44buXW1fUQTVqdgfElJRzg/YamaRcCB9M7AgWOA1ajZoa1PqyKnBQGr67Sw356
-         qQMi1CF1/mILASsCyif/u8P55RuwDUWsnp5Ohj3/9LHy584VnLtNF9kJBJ3HbRxA2MQP
-         F59pZDgLnmbySDZo2vDCTJpkDI2DilmZ6VU7cWpVqcch8ruf1DhwXFsjKo0Ltd3hcjn4
-         L2FM0bgnQYPhSDLtNUi0gSNWJCzx8K9IyuR3SD4BD0RAEhMpWybMqXMg5VErpxu0OkMX
-         m3CQ==
-X-Gm-Message-State: AOJu0Yx7zuil46ZEtGng0olbUb3TVbUNvBh3bAq4kuEumaoa+tx1Tots
-	/sLaY2jU3kNuIz3GRarzgk24zUGBUuYgoO/x2WehmlGhSFjp8R4ki7EcHA==
-X-Google-Smtp-Source: AGHT+IHZlP5FSEYF24m48t+2sJ5J0OAMdZkMn34tr3IodVvxXwQ24IR6pJgRBtN40n9b0uPBLvOFug==
-X-Received: by 2002:a05:620a:4407:b0:795:548e:aeb5 with SMTP id af79cd13be357-79be6d51af7mr1560325785a.30.1719490042935;
-        Thu, 27 Jun 2024 05:07:22 -0700 (PDT)
-Received: from [172.17.0.2] ([172.183.52.221])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-79d5c82f4a1sm48907385a.55.2024.06.27.05.07.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 27 Jun 2024 05:07:22 -0700 (PDT)
-Message-ID: <667d55fa.050a0220.820f.17d4@mx.google.com>
-Date: Thu, 27 Jun 2024 05:07:22 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============8085935160168669696=="
+	s=arc-20240116; t=1719492194; c=relaxed/simple;
+	bh=+nJk9AskrUM/xWoXuKPnNKth7awwK3+00TL/kDvs0wM=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=kNl5YnrFuB7BWe5mIRj68HAsImpbJmZL5NillcGyboJyYFv73bMYSJvJsIDiNU/dSsMd+C7THuVe2u2+k2ZEa4J6Be0MmR740QN4qM9hqyFtDmCOY1z7nFIBrQyI0JKaVY93QO3vrYtJmLz5rM6EPEZBbjmCQ6Jp3pGSCm1OCC4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
+Received: from localhost.localdomain (84.18.99.27) by msexch01.omp.ru
+ (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Thu, 27 Jun
+ 2024 15:39:49 +0300
+From: Roman Smirnov <r.smirnov@omp.ru>
+To: <linux-bluetooth@vger.kernel.org>
+CC: Roman Smirnov <r.smirnov@omp.ru>
+Subject: [PATCH BlueZ v2] plugins/sixaxis: add NULL check in setup_device()
+Date: Thu, 27 Jun 2024 15:39:02 +0300
+Message-ID: <20240627123935.67784-1-r.smirnov@omp.ru>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, r.smirnov@omp.ru
-Subject: RE: [BlueZ] plugins/sixaxis: add NULL check in setup_device()
-In-Reply-To: <20240627103022.51199-1-r.smirnov@omp.ru>
-References: <20240627103022.51199-1-r.smirnov@omp.ru>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
+ (10.188.4.12)
+X-KSE-ServerInfo: msexch01.omp.ru, 9
+X-KSE-AntiSpam-Interceptor-Info: scan successful
+X-KSE-AntiSpam-Version: 6.1.0, Database issued on: 06/27/2024 12:17:40
+X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
+X-KSE-AntiSpam-Method: none
+X-KSE-AntiSpam-Rate: 19
+X-KSE-AntiSpam-Info: Lua profiles 186185 [Jun 27 2024]
+X-KSE-AntiSpam-Info: Version: 6.1.0.4
+X-KSE-AntiSpam-Info: Envelope from: r.smirnov@omp.ru
+X-KSE-AntiSpam-Info: LuaCore: 21 0.3.21
+ ebee5449fc125b2da45f1a6a6bc2c5c0c3ad0e05
+X-KSE-AntiSpam-Info: {rep_avail}
+X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
+X-KSE-AntiSpam-Info: {SMTP from is not routable}
+X-KSE-AntiSpam-Info: {Found in DNSBL: 84.18.99.27 in (user) dbl.spamhaus.org}
+X-KSE-AntiSpam-Info:
+	d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2;omp.ru:7.1.1
+X-KSE-AntiSpam-Info: ApMailHostAddress: 84.18.99.27
+X-KSE-AntiSpam-Info: {DNS response errors}
+X-KSE-AntiSpam-Info: Rate: 19
+X-KSE-AntiSpam-Info: Status: not_detected
+X-KSE-AntiSpam-Info: Method: none
+X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
+ smtp.mailfrom=omp.ru;dkim=none
+X-KSE-Antiphishing-Info: Clean
+X-KSE-Antiphishing-ScanningType: Heuristic
+X-KSE-Antiphishing-Method: None
+X-KSE-Antiphishing-Bases: 06/27/2024 12:21:00
+X-KSE-Antivirus-Interceptor-Info: scan successful
+X-KSE-Antivirus-Info: Clean, bases: 6/27/2024 11:06:00 AM
+X-KSE-Attachment-Filter-Triggered-Rules: Clean
+X-KSE-Attachment-Filter-Triggered-Filters: Clean
+X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
---===============8085935160168669696==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+btd_adapter_get_device() may return NULL on the next call stack:
 
-This is automated email and please do not reply to this email!
+btd_adapter_get_device()
+    adapter_create_device()
+        device_create()
+            device_new()
+                g_try_malloc0()
 
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=866086
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      0.38 seconds
-GitLint                       FAIL      0.48 seconds
-BuildEll                      PASS      24.64 seconds
-BluezMake                     PASS      1721.32 seconds
-MakeCheck                     PASS      13.36 seconds
-MakeDistcheck                 PASS      177.71 seconds
-CheckValgrind                 PASS      254.35 seconds
-CheckSmatch                   PASS      356.74 seconds
-bluezmakeextell               PASS      124.26 seconds
-IncrementalBuild              PASS      1565.98 seconds
-ScanBuild                     PASS      988.32 seconds
-
-Details
-##############################
-Test: GitLint - FAIL
-Desc: Run gitlint
-Output:
-[BlueZ] plugins/sixaxis: add NULL check in setup_device()
-
-WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
-8: B3 Line contains hard tab characters (\t): "	    device_new()"
-
-
+It is necessary to prevent this to avoid dereferencing a null
+pointer further.
 ---
-Regards,
-Linux Bluetooth
+ plugins/sixaxis.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
+diff --git a/plugins/sixaxis.c b/plugins/sixaxis.c
+index 544ab399a..3e69f1dd2 100644
+--- a/plugins/sixaxis.c
++++ b/plugins/sixaxis.c
+@@ -346,6 +346,11 @@ static bool setup_device(int fd, const char *sysfs_path,
+ 
+ 	device = btd_adapter_get_device(adapter, &device_bdaddr, BDADDR_BREDR);
+ 
++	if (!device) {
++		error("sixaxis: unable to set up a new device");
++		return false;
++	}
++
+ 	info("sixaxis: setting up new device");
+ 
+ 	btd_device_device_set_name(device, cp->name);
+-- 
+2.43.0
 
---===============8085935160168669696==--
