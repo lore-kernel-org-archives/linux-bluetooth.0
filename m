@@ -1,95 +1,146 @@
-Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
+Received: from mail-qv1-f45.google.com (mail-qv1-f45.google.com [209.85.219.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0063613E41F
-	for <linux-bluetooth@vger.kernel.org>; Thu, 27 Jun 2024 13:32:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4652B13E41F
+	for <linux-bluetooth@vger.kernel.org>; Thu, 27 Jun 2024 13:37:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719495193; cv=none; b=JHSpGb6FXf/EeVif6wMHfDjTg1+bjqH5k4cN9m/5fPVJOqtHxZNu07ODQEZUZQ3R0mgrXt01SzkpEwsZClINItmTmiolAKw6MHK31sKSf9BvlGK+9iOHX7B/Bsui+u59BuRQHuxB1rSdlyrP/8UnlQOvM5Sfdi+/nBRWHTp2lvE=
+	t=1719495476; cv=none; b=EpB8KUWaVyize3xY8FBy5RmAoLDLcVYCojFmEndQcASL7B7vp9ERLn995xVVmKAFOO1lGcICDQvPUrPCxnNl1qCRspiZRuabhS61RsKx+wrBYOTqKQpBO9braLIdt/ry8DJ4Q052uxG9KNokaDFCsZVffP373CK3I6mivBTaHHg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719495193; c=relaxed/simple;
-	bh=7G2hrrPMMw5bbR7AzoVcHXPv53oWserdCVFaNHcsEUg=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=tFKxKKZgiIUyTHgYjNk4tC4Nt/O5ETyFWSzZPMoU4aZPMqLQDE/CQEHUkw7BtzFOHzAUZDxKazSrD2udkgBKY+dVCJzHUWZtVm2BsK6VixaJuFCDI/2ltCffutvEAIkOm6AudFwNwgHllRmmpDFmZchT4HV0+2sRstfZLUuVlic=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
-Received: from localhost.localdomain (84.18.99.27) by msexch01.omp.ru
- (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Thu, 27 Jun
- 2024 16:32:37 +0300
-From: Roman Smirnov <r.smirnov@omp.ru>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Roman Smirnov <r.smirnov@omp.ru>
-Subject: [PATCH BlueZ v1] health/mcap: fix memory leak in mcap_create_mcl()
-Date: Thu, 27 Jun 2024 16:32:21 +0300
-Message-ID: <20240627133222.82707-1-r.smirnov@omp.ru>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1719495476; c=relaxed/simple;
+	bh=sl6AaS1XDFw9NmFumr4f1yxXpdgaLtykkCx8Nbt+MEo=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=ltyWO2u0Cu6gMCn5L26srP8FBTLau2/mN5FV7ngPUq0jJgCKGMwroOSnyr32HIkeNnFmGnpbinniod1LKQJoOzYjT2go9rBeHAsXPPzQMaun8VG4TcU+9b0lBjSSZh2bjl/H0BXEJd/UviLd9pxQwkgXwR93PZVlG1XlT4L+Q0A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BNrTtWgv; arc=none smtp.client-ip=209.85.219.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BNrTtWgv"
+Received: by mail-qv1-f45.google.com with SMTP id 6a1803df08f44-6b4fdf56903so30638846d6.1
+        for <linux-bluetooth@vger.kernel.org>; Thu, 27 Jun 2024 06:37:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1719495474; x=1720100274; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=bADqJWKk7U6gunkH9w0Haaxt/5Y5zH9T+7j3JYMk9kU=;
+        b=BNrTtWgv1w4FZa2oMvpbrhLDfoDBohp5zXsbI6pLB4tnNWzuXNqYfqz4zetak4ZcuK
+         3lIT3jAN2gV8fgfJywGPFPwqbuz3LMOcY3s/3h4JXAu2xCb3PTYCVVbo7nSADDXX/jRN
+         Xf2DFCj1qCyi5dHcvB8hI+kdVgFw5mi8NDtPGhbr7SkY9pBdz5qxLp4/j9upbnK/TKrR
+         m1gt47Zjnn6Mmgc/PXmr5XB9QfGeChzFWmV6iOB9w5ABjP35kM/xZUAXWQyxpBTNFNdz
+         UeZogtQxaXkYBnfNlJ1zaAX+5u6UKmPc0863bJz5oJeQoLbCuCsz86rH5bc8pw2LxgZB
+         01PA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1719495474; x=1720100274;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=bADqJWKk7U6gunkH9w0Haaxt/5Y5zH9T+7j3JYMk9kU=;
+        b=KK46bmqCsaGPdRzy39NfT8IvH0OGTsUELWxFMqyRCbTwjPxCp87FZn/RGG+08XDVPL
+         X8w/3M1b5+37hXfQJJzWQF14Z5gJO7Xic/UKD9s9XuLypDiokJqeEDYbxvj/3rxa9dtP
+         lJ2cJBmQ+C3+N7x+5piEgEWxcZxTmJwe/2tu43gescKnZdUEVkjZwEKQOotTDGCLpI7P
+         pKrBCh9y+eSXNlTm7zjPgo8Ye+0l2sh7NrRTSqexMF3EuKc1hgOSWbi13jHdrtqYDY8z
+         P/XpNl4qTuyfR0UQR7OUX9vbK9oa68G4Fw+A+mkZ2WoZCw8f1dvba1UFoUyw/KcnHokf
+         8NNw==
+X-Gm-Message-State: AOJu0YwTYiYobNDG62miacDRORwHOqQdRvJNIpHZGeJgYSO3mXkKAAcl
+	gE0wjjLNXJvigchBg1SPY+TVP3AX3kv6hwLs2dYK4iVqRfYS4jIHh99Yng==
+X-Google-Smtp-Source: AGHT+IGmyRhtOUW0WKvD+1KpW8o/BzFwMO3AjIV77eFHCfGSdmE9g6B6prYIgNF/bmZdFs5w3BuNKg==
+X-Received: by 2002:ad4:5849:0:b0:6b0:89ac:ad3a with SMTP id 6a1803df08f44-6b540aabc06mr139326896d6.59.1719495474093;
+        Thu, 27 Jun 2024 06:37:54 -0700 (PDT)
+Received: from [172.17.0.2] ([20.75.95.195])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6b59247f95asm5211676d6.38.2024.06.27.06.37.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 27 Jun 2024 06:37:53 -0700 (PDT)
+Message-ID: <667d6b31.050a0220.7ed12.1e15@mx.google.com>
+Date: Thu, 27 Jun 2024 06:37:53 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============2929530530787121449=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
- (10.188.4.12)
-X-KSE-ServerInfo: msexch01.omp.ru, 9
-X-KSE-AntiSpam-Interceptor-Info: scan successful
-X-KSE-AntiSpam-Version: 6.1.0, Database issued on: 06/27/2024 13:21:33
-X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
-X-KSE-AntiSpam-Method: none
-X-KSE-AntiSpam-Rate: 19
-X-KSE-AntiSpam-Info: Lua profiles 186190 [Jun 27 2024]
-X-KSE-AntiSpam-Info: Version: 6.1.0.4
-X-KSE-AntiSpam-Info: Envelope from: r.smirnov@omp.ru
-X-KSE-AntiSpam-Info: LuaCore: 21 0.3.21
- ebee5449fc125b2da45f1a6a6bc2c5c0c3ad0e05
-X-KSE-AntiSpam-Info: {rep_avail}
-X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
-X-KSE-AntiSpam-Info: {SMTP from is not routable}
-X-KSE-AntiSpam-Info:
-	d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2;omp.ru:7.1.1
-X-KSE-AntiSpam-Info: ApMailHostAddress: 84.18.99.27
-X-KSE-AntiSpam-Info: {DNS response errors}
-X-KSE-AntiSpam-Info: Rate: 19
-X-KSE-AntiSpam-Info: Status: not_detected
-X-KSE-AntiSpam-Info: Method: none
-X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
- smtp.mailfrom=omp.ru;dkim=none
-X-KSE-Antiphishing-Info: Clean
-X-KSE-Antiphishing-ScanningType: Heuristic
-X-KSE-Antiphishing-Method: None
-X-KSE-Antiphishing-Bases: 06/27/2024 13:25:00
-X-KSE-Antivirus-Interceptor-Info: scan successful
-X-KSE-Antivirus-Info: Clean, bases: 6/27/2024 11:06:00 AM
-X-KSE-Attachment-Filter-Triggered-Rules: Clean
-X-KSE-Attachment-Filter-Triggered-Filters: Clean
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, kiran.k@intel.com
+Subject: RE: [v1] Bluetooth: btintel: Fix the sfi name for BlazarU
+In-Reply-To: <20240627130639.2744811-1-kiran.k@intel.com>
+References: <20240627130639.2744811-1-kiran.k@intel.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-set_default_cb() can allocate memory for mcl->cb but it does
-not free mcl->cb before exiting the function.
+--===============2929530530787121449==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Add freeing mcl->cb before exiting the function.
+This is automated email and please do not reply to this email!
 
-Found by Linux Verification Center (linuxtesting.org) with the SVACE
-static analysis tool.
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=866149
+
+---Test result---
+
+Test Summary:
+CheckPatch                    FAIL      1.04 seconds
+GitLint                       FAIL      0.53 seconds
+SubjectPrefix                 PASS      0.11 seconds
+BuildKernel                   PASS      30.75 seconds
+CheckAllWarning               PASS      34.54 seconds
+CheckSparse                   PASS      40.47 seconds
+CheckSmatch                   PASS      107.02 seconds
+BuildKernel32                 PASS      30.03 seconds
+TestRunnerSetup               PASS      552.27 seconds
+TestRunner_l2cap-tester       PASS      19.00 seconds
+TestRunner_iso-tester         PASS      40.20 seconds
+TestRunner_bnep-tester        PASS      5.06 seconds
+TestRunner_mgmt-tester        PASS      129.26 seconds
+TestRunner_rfcomm-tester      PASS      7.62 seconds
+TestRunner_sco-tester         PASS      15.20 seconds
+TestRunner_ioctl-tester       PASS      8.12 seconds
+TestRunner_mesh-tester        PASS      6.11 seconds
+TestRunner_smp-tester         PASS      7.17 seconds
+TestRunner_userchan-tester    PASS      5.10 seconds
+IncrementalBuild              PASS      29.22 seconds
+
+Details
+##############################
+Test: CheckPatch - FAIL
+Desc: Run checkpatch.pl script
+Output:
+[v1] Bluetooth: btintel: Fix the sfi name for BlazarU
+WARNING: Reported-by: should be immediately followed by Closes: with a URL to the report
+#93: 
+Reported-by: Tsigan, Vladislav <vladislav.tsigan@intel.com>
+Signed-off-by: Kiran K <kiran.k@intel.com>
+
+total: 0 errors, 1 warnings, 16 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/src/13714333.patch has style problems, please review.
+
+NOTE: Ignored message types: UNKNOWN_COMMIT_ID
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+##############################
+Test: GitLint - FAIL
+Desc: Run gitlint
+Output:
+[v1] Bluetooth: btintel: Fix the sfi name for BlazarU
+
+WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
+10: B1 Line exceeds max length (82>80): "[146.111839] Bluetooth: hci0: Bootloader timestamp 2022.18 buildtype 1 build 16362"
+12: B1 Line exceeds max length (97>80): "[146.112204] Bluetooth: hci0: Failed to load Intel firmware file intel/ibt-0291-0291-iml.sfi (-2)"
+
+
 ---
- profiles/health/mcap.c | 1 +
- 1 file changed, 1 insertion(+)
+Regards,
+Linux Bluetooth
 
-diff --git a/profiles/health/mcap.c b/profiles/health/mcap.c
-index 5d2bac3d9..b544b9a0a 100644
---- a/profiles/health/mcap.c
-+++ b/profiles/health/mcap.c
-@@ -1907,6 +1907,7 @@ gboolean mcap_create_mcl(struct mcap_instance *mi,
- 		set_default_cb(mcl);
- 		if (util_getrandom(&val, sizeof(val), 0) < 0) {
- 			mcap_instance_unref(mcl->mi);
-+			g_free(mcl->cb);
- 			g_free(mcl);
- 			return FALSE;
- 		}
--- 
-2.43.0
 
+--===============2929530530787121449==--
