@@ -1,110 +1,129 @@
-Received: from mail-qk1-f171.google.com (mail-qk1-f171.google.com [209.85.222.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73DDD19754D
-	for <linux-bluetooth@vger.kernel.org>; Thu, 27 Jun 2024 16:40:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 933D7199EA1;
+	Thu, 27 Jun 2024 16:56:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719506438; cv=none; b=fxHFBPVrptfoG/evuNPIezim+p6Q3tp+STce5xSYpvbvKn37NVGBaB8E3Q+K4dcluiT4MV1jHrghFwsZzNYt8cjgKPxYb9beBqS/okpRiAqJWmzrGwcUmolSuITswJPu4abrm7veqiAQEKjPcY49voCzc7tI6oro7VwyMeWj5IQ=
+	t=1719507375; cv=none; b=dWRx3VR6F/IUY0i8aeLyoy1sDd/vEIdIc7YbSBxwfYPDWA9kW8xwQhWQZ9JlDuiIEd2ymTTRgXm3bX8pfwGK+a7NFykSIYWwu/GLqC0Iwwok+z5oE6rezvnv50EkTY0NGonW7pnvWooMdjguQKzlWTf1ZVPZgR22alENXbnh76Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719506438; c=relaxed/simple;
-	bh=0UutwxHtUXPY1nBPt2xMB5hcl9ZvZHl0z1hnPLMhkl0=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=NMupep0ex22RMfjhH+ifUgF2Nlq+cuzahCkOLx2cgruhV2Y/c2kpm2KYrsj0joLd+qxxd4DQkdJigWp7Z5BwK2q03zMHLMeAQhF+QVoTRCGkqCEieGmfraS/a/fChrMp4ik5LfVftd9Gog5/lHq6+aJgdJX+f3Mlz5XJBVoGAMM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=M4puVg3J; arc=none smtp.client-ip=209.85.222.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1719507375; c=relaxed/simple;
+	bh=tXnUP+Q4ipMZHMdFaly9rDmGwdmTVd9/H6CA/PJ6e9g=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=lsUQAo2t+V+dJ+Q5lPq4QYJ7EEKEDj6mDnvsIGCdN+E4LaRaawj+Dx7J7wKpY/M3K3NnKtVYBG76Dr3K6/b6eXuz4faxXmzwcDowspMzqdlH6TmQY+WJ6qmlT6b/EEzBC0iHlsBWFNvSupS73biczZBy89W94nsoqmTaoEMj6yk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=mrSchKrs; arc=none smtp.client-ip=192.198.163.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="M4puVg3J"
-Received: by mail-qk1-f171.google.com with SMTP id af79cd13be357-79c10f03a94so173703385a.1
-        for <linux-bluetooth@vger.kernel.org>; Thu, 27 Jun 2024 09:40:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1719506436; x=1720111236; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=wScH/IbvZG/TZ8wYKhA6TWn16TnOzHGzinJq+x5rvqA=;
-        b=M4puVg3J3UbkSbwF21WG5eOWsnW1P+5mXSshTIHXih5Mno+pat4ah62R5DdJHpyDz/
-         0qT4aUEB5QAJ1a4s0u33IeSlAMB/PrxvXRmITTT8T9gIFm4ve8j4+pwohlrgrCjcVPDh
-         ElihN4nxfhEkI3vYs1qMHfC98BFLEGLt+wTL7PKCG3S+PRV2gi5ZEJTdXasAQ5uGDTvh
-         j4Xp8kLe0D2ztraDKi/Lm6+fdm4S4zn38qxN+GIr8OiauV+59uqpay6fks4tSybJwWLR
-         DbjDxnoWPtwbFmUMdyVU+5Zj0tzeJaPk4J8x1O7VCpSvClIxx++ennIUnpMOoPytqpIW
-         5EQw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719506436; x=1720111236;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=wScH/IbvZG/TZ8wYKhA6TWn16TnOzHGzinJq+x5rvqA=;
-        b=XtaoXwse0JYveQT62bVvpwJkhhb/pHO1tjB5c3lm1OYZXrzOmc2t6op6h1h5CGWS0T
-         GP9PiEBk8go3uyNK8hj4IsAiCCNEXM6E2ivzCqWeL+g6UPzRuW1lfHnMP0XDoNrCHJNP
-         PRzl+B5w4tOIlqGmym7j9hJsTeaXlhG+35qhp+KGKX9e/c7ylubeXhGNKpnJQ4WJ4Gu7
-         9zWuuuZVWBjkjPfz+zSvs8UyNKdQ4RapQ9UZ8Z64s4jDu6grY1dxPIOT59P7T8pjYKur
-         RroXt1waR8zij8BqOI73ezZePlaAm4lHZR/BhobWowuL1SImp1x75pduoHG8oENtAOUv
-         CAHA==
-X-Gm-Message-State: AOJu0Yw3hQUt/O99/f2PrOnEQR7HvMyccbph1AXi7pmsZKiZj7Ya1DEJ
-	ZSYxdMcAOG/DG8XOZSBNcUbvDnYhZt3Vp7gSq4QCLW6Se/gPC11KOIkOdQ==
-X-Google-Smtp-Source: AGHT+IEd25zeJIlUWF5HVO98WNf1NhD6HPr1KMyBUCW4Nogjl/gOgoFkSsRJUThdqgeCaDZqvO6xGw==
-X-Received: by 2002:a05:620a:b05:b0:795:59ed:21e3 with SMTP id af79cd13be357-79d5cfc4756mr295836585a.3.1719506436173;
-        Thu, 27 Jun 2024 09:40:36 -0700 (PDT)
-Received: from [172.17.0.2] ([20.55.214.244])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-79d5c8add59sm70242885a.83.2024.06.27.09.40.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 27 Jun 2024 09:40:35 -0700 (PDT)
-Message-ID: <667d9603.050a0220.e236f.385f@mx.google.com>
-Date: Thu, 27 Jun 2024 09:40:35 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============7085960274503952428=="
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="mrSchKrs"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1719507374; x=1751043374;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=tXnUP+Q4ipMZHMdFaly9rDmGwdmTVd9/H6CA/PJ6e9g=;
+  b=mrSchKrshCwg0tvfnXSiLQrW+w0X5whGQDwyswMKSkfp2QD8RmQ7UqbB
+   86AHxZyrh9UKFipL/Z3je6Hy7X/XZSz4quKAq13o/iqcPZFg2S6+ORLrP
+   fRyURy5VH6IjMyEWR9du06xMb7Shl5bE9mmyLP5MBz4lRam4osMPXFLU2
+   L40ZHYvB0INs3mx7WNg2dqtxgb1V9vLtNrwXgOJ9szHSodK1n1TGiztqL
+   +fMEs1lDPLtnn/BAdXBdmwHrs4IoPdRb615nA428Lot6ZhR3I4nQc9Cb5
+   zJdmMsujT0TYpOW4Iq4azXu5sBN0pLolJWulNU4V0U2OOqDRiKTPls5Pj
+   g==;
+X-CSE-ConnectionGUID: AIPFVc2LSqSYKSt/uo6WkA==
+X-CSE-MsgGUID: YP9FTKJlTruLykeNJ9cgbQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11116"; a="12286788"
+X-IronPort-AV: E=Sophos;i="6.09,166,1716274800"; 
+   d="scan'208";a="12286788"
+Received: from orviesa008.jf.intel.com ([10.64.159.148])
+  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Jun 2024 09:56:13 -0700
+X-CSE-ConnectionGUID: bsmEuNJtTamAJkDBSbSqeA==
+X-CSE-MsgGUID: dLAGV4qcSZK0xnMWNIgGbQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.09,166,1716274800"; 
+   d="scan'208";a="45202273"
+Received: from lkp-server01.sh.intel.com (HELO 68891e0c336b) ([10.239.97.150])
+  by orviesa008.jf.intel.com with ESMTP; 27 Jun 2024 09:56:10 -0700
+Received: from kbuild by 68891e0c336b with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1sMsPn-000GMk-1E;
+	Thu, 27 Jun 2024 16:56:07 +0000
+Date: Fri, 28 Jun 2024 00:55:54 +0800
+From: kernel test robot <lkp@intel.com>
+To: Chris Lu <chris.lu@mediatek.com>, Marcel Holtmann <marcel@holtmann.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	Luiz Von Dentz <luiz.dentz@gmail.com>
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	Sean Wang <sean.wang@mediatek.com>,
+	Aaron Hou <aaron.hou@mediatek.com>,
+	Steve Lee <steve.lee@mediatek.com>,
+	linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+	linux-kernel <linux-kernel@vger.kernel.org>,
+	linux-mediatek <linux-mediatek@lists.infradead.org>,
+	Chris Lu <chris.lu@mediatek.com>
+Subject: Re: [PATCH v5 8/8] Bluetooth: btusb: mediatek: add ISO data
+ transmission functions
+Message-ID: <202406280003.brf5D1qt-lkp@intel.com>
+References: <20240626025329.26424-9-chris.lu@mediatek.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, r.smirnov@omp.ru
-Subject: RE: [BlueZ,v1] gatt-server: fix memory leak in bt_gatt_server_send_notification()
-In-Reply-To: <20240627150917.85755-1-r.smirnov@omp.ru>
-References: <20240627150917.85755-1-r.smirnov@omp.ru>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240626025329.26424-9-chris.lu@mediatek.com>
 
---===============7085960274503952428==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi Chris,
 
-This is automated email and please do not reply to this email!
+kernel test robot noticed the following build errors:
 
-Dear submitter,
+[auto build test ERROR on bluetooth-next/master]
+[also build test ERROR on next-20240626]
+[cannot apply to bluetooth/master linus/master v6.10-rc5]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=866206
+url:    https://github.com/intel-lab-lkp/linux/commits/Chris-Lu/Bluetooth-btusb-mediatek-remove-the-unnecessary-goto-tag/20240626-114003
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
+patch link:    https://lore.kernel.org/r/20240626025329.26424-9-chris.lu%40mediatek.com
+patch subject: [PATCH v5 8/8] Bluetooth: btusb: mediatek: add ISO data transmission functions
+config: i386-buildonly-randconfig-003-20240627 (https://download.01.org/0day-ci/archive/20240628/202406280003.brf5D1qt-lkp@intel.com/config)
+compiler: clang version 18.1.5 (https://github.com/llvm/llvm-project 617a15a9eac96088ae5e9134248d8236e34b91b1)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240628/202406280003.brf5D1qt-lkp@intel.com/reproduce)
 
----Test result---
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202406280003.brf5D1qt-lkp@intel.com/
 
-Test Summary:
-CheckPatch                    PASS      0.44 seconds
-GitLint                       PASS      0.33 seconds
-BuildEll                      PASS      24.60 seconds
-BluezMake                     PASS      1669.13 seconds
-MakeCheck                     PASS      13.04 seconds
-MakeDistcheck                 PASS      177.63 seconds
-CheckValgrind                 PASS      252.82 seconds
-CheckSmatch                   WARNING   353.79 seconds
-bluezmakeextell               PASS      120.50 seconds
-IncrementalBuild              PASS      1414.90 seconds
-ScanBuild                     PASS      1002.35 seconds
+All errors (new ones prefixed by >>):
 
-Details
-##############################
-Test: CheckSmatch - WARNING
-Desc: Run smatch tool with source
-Output:
-src/shared/gatt-server.c:278:25: warning: Variable length array is used.src/shared/gatt-server.c:621:25: warning: Variable length array is used.src/shared/gatt-server.c:720:25: warning: Variable length array is used.src/shared/gatt-server.c:278:25: warning: Variable length array is used.src/shared/gatt-server.c:621:25: warning: Variable length array is used.src/shared/gatt-server.c:720:25: warning: Variable length array is used.src/shared/gatt-server.c:278:25: warning: Variable length array is used.src/shared/gatt-server.c:621:25: warning: Variable length array is used.src/shared/gatt-server.c:720:25: warning: Variable length array is used.
-
-
----
-Regards,
-Linux Bluetooth
+   In file included from drivers/bluetooth/btusb.c:28:
+>> drivers/bluetooth/btmtk.h:274:17: error: incompatible integer to pointer conversion passing 'int' to parameter of type 'const void *' [-Wint-conversion]
+     274 |         return PTR_ERR(-EOPNOTSUPP);
+         |                        ^~~~~~~~~~~
+   include/linux/err.h:49:61: note: passing argument to parameter 'ptr' here
+      49 | static inline long __must_check PTR_ERR(__force const void *ptr)
+         |                                                             ^
+   In file included from drivers/bluetooth/btusb.c:28:
+>> drivers/bluetooth/btmtk.h:274:9: error: incompatible integer to pointer conversion returning 'long' from a function with result type 'struct urb *' [-Wint-conversion]
+     274 |         return PTR_ERR(-EOPNOTSUPP);
+         |                ^~~~~~~~~~~~~~~~~~~~
+   2 errors generated.
 
 
---===============7085960274503952428==--
+vim +274 drivers/bluetooth/btmtk.h
+
+   270	
+   271	static struct urb *alloc_mtk_intr_urb(struct hci_dev *hdev, struct sk_buff *skb,
+   272					      usb_complete_t tx_complete)
+   273	{
+ > 274		return PTR_ERR(-EOPNOTSUPP);
+   275	}
+   276	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
