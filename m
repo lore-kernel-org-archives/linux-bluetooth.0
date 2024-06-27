@@ -1,264 +1,110 @@
-Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [185.185.170.37])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f171.google.com (mail-qk1-f171.google.com [209.85.222.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA3F315278F
-	for <linux-bluetooth@vger.kernel.org>; Thu, 27 Jun 2024 16:24:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=185.185.170.37
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719505471; cv=pass; b=tguw7J5ptAabC0nQkWYToFZTepoIZ6OdGxKuQfaleUWaZNhPZZnmhf585+SlHyoBq7Mc04pWNgdn3VdvmErZtxOgSJDTUY8UulrJ49/YHfqwcVyvw0hv/CgaGeZ0sEt5fLweP3w0554uvPVF+OciRw+3xHkNi6vFkSknDYsBYFs=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719505471; c=relaxed/simple;
-	bh=JKWL0b+4+zUJp50SxLPqCKQocpcTlmLk8vychdPT2c0=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=ssiqThwaTUqwFks49u2v/V6NUU4Ac3PQwT+jrTOeUz1licbTBz5F3QPSvCED1qul8F4ZD89iYjn67bfDt2SfNLcN43eAy4VMtoFdSsil4N1q4OcTrQrDVGwdg8bovpP5/4WYJeI+YZFtN8bU+skrbtPjGjeoPXYb1aCxsHSZmuM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=R7gWEkAe; arc=pass smtp.client-ip=185.185.170.37
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73DDD19754D
+	for <linux-bluetooth@vger.kernel.org>; Thu, 27 Jun 2024 16:40:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.171
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1719506438; cv=none; b=fxHFBPVrptfoG/evuNPIezim+p6Q3tp+STce5xSYpvbvKn37NVGBaB8E3Q+K4dcluiT4MV1jHrghFwsZzNYt8cjgKPxYb9beBqS/okpRiAqJWmzrGwcUmolSuITswJPu4abrm7veqiAQEKjPcY49voCzc7tI6oro7VwyMeWj5IQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1719506438; c=relaxed/simple;
+	bh=0UutwxHtUXPY1nBPt2xMB5hcl9ZvZHl0z1hnPLMhkl0=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=NMupep0ex22RMfjhH+ifUgF2Nlq+cuzahCkOLx2cgruhV2Y/c2kpm2KYrsj0joLd+qxxd4DQkdJigWp7Z5BwK2q03zMHLMeAQhF+QVoTRCGkqCEieGmfraS/a/fChrMp4ik5LfVftd9Gog5/lHq6+aJgdJX+f3Mlz5XJBVoGAMM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=M4puVg3J; arc=none smtp.client-ip=209.85.222.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="R7gWEkAe"
-Received: from monolith.lan (91-152-121-138.elisa-laajakaista.fi [91.152.121.138])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pav@iki.fi)
-	by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4W93ml1xj9z49Q0G;
-	Thu, 27 Jun 2024 19:24:23 +0300 (EEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
-	t=1719505463;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=opWHvHCmLINEUApkjQSpJJVQW65eNZQW6DxdX3+uiOI=;
-	b=R7gWEkAef538/W3XGSDhukUOZEDHJMIHNznM/jus2/sca+DMBH5coO1gdoNKMyoSB9rVWL
-	RxtGRMlLXDQH/rEr8e4UzdZTwsoadyB6DHPwoNcLwKE3+5wJktX4AfJFi3ZEWQyok+y9iZ
-	tjAnBRXNkUBnwp7jiBvy/hFpEvovw4Sd4u92dNgBHVQRSHK7vCVLjxNA96Dh6DzhBfeLVK
-	AbNKXKgWIpDoE49Dca3o5IEYTIREjTQ2jJAM2+EvgM1T8Rf1LLPWhmyAdTCIUC7fte/ZCx
-	qq3PDIsWkuDFW2PkE/M5vzL7JukNZ2BhDgoGAQObo7wjGJw57k35TuC+Wx9aYA==
-ARC-Seal: i=1; s=lahtoruutu; d=iki.fi; t=1719505463; a=rsa-sha256;
-	cv=none;
-	b=gcZ1jO0+14fGqbsh5x+hcW5P3Ml6w69jmaiuRCuK8ZbZ2xSN67rAYXfsBSXFx+6yAwH7cF
-	Wkrup0T+GYZN4F9vEFuWQ9dThzr82vk538u4PmM46vVD9i4zYmH8fkL/uHeeqpIyK9XVuF
-	Mvt2Dfz1JJxOBmyN/Pq1wezJPiVeQbzNCwIH1jZssWXiRUjvAg4A+Cugs8i3af2EQ2up8E
-	K0wtY6iBOKxnY+ShiQH3TDYIFuSCprTg4PRugPEskUAniISz9hbLGK1yeUDh9zMYRosbcq
-	3qIPSMG/wrJgTsRbX+TA4RETOP0FYaJ2bdq0CZbsMyO9oklGRATOJCT8sYWbvQ==
-ARC-Authentication-Results: i=1;
-	ORIGINATING;
-	auth=pass smtp.auth=pav@iki.fi smtp.mailfrom=pav@iki.fi
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=lahtoruutu; t=1719505463;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=opWHvHCmLINEUApkjQSpJJVQW65eNZQW6DxdX3+uiOI=;
-	b=lb2tiX5xvkF1wn0Dob98xeyK8x8k28gp27hJFgftFZMxYKxwNQSnTQo5ZNbZWwiohrGM9t
-	5LX3ZqRRPnKIeyX3eOQHdELqFayATE/TiPN68I6t9Y3xfSMrxAKifBHpKGRaESF2LNKrcS
-	9LHHGD/mmCniq0ysaHbZyDiiN1H9uLjHVZnEui2TC7h+1hrzCI571pTkZXUTCAGCgt37OU
-	aKk/bZDsHTvPWgA9drbsLz30dR5HqWH4mVsgR/1NLVyM6aaXgOPzyxdfBPa/GCxlcDjMwI
-	G/w5u1RkM4awjcD4hJEXAg2NNc6CgvLaC27A1/FlKgGq642w5qDhYf9g2agYug==
-Message-ID: <93bef84b37237fcc9fac8d7e7a80bd640f01d064.camel@iki.fi>
-Subject: Re: [PATCH v2] Bluetooth : Update the mas session structure
-From: Pauli Virtanen <pav@iki.fi>
-To: Amisha Jain <quic_amisjain@quicinc.com>, linux-bluetooth@vger.kernel.org
-Cc: quic_mohamull@quicinc.com, quic_hbandi@quicinc.com, 
-	quic_anubhavg@quicinc.com
-Date: Thu, 27 Jun 2024 19:24:23 +0300
-In-Reply-To: <8ae5c6f5-e005-42d9-ad5b-ea53a978a85a@quicinc.com>
-References: <20240625063533.30536-1-quic_amisjain@quicinc.com>
-	 <dac1d55c940b3a9afb971263c8195e765e77c598.camel@iki.fi>
-	 <8ae5c6f5-e005-42d9-ad5b-ea53a978a85a@quicinc.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.52.2 (3.52.2-1.fc40) 
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="M4puVg3J"
+Received: by mail-qk1-f171.google.com with SMTP id af79cd13be357-79c10f03a94so173703385a.1
+        for <linux-bluetooth@vger.kernel.org>; Thu, 27 Jun 2024 09:40:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1719506436; x=1720111236; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=wScH/IbvZG/TZ8wYKhA6TWn16TnOzHGzinJq+x5rvqA=;
+        b=M4puVg3J3UbkSbwF21WG5eOWsnW1P+5mXSshTIHXih5Mno+pat4ah62R5DdJHpyDz/
+         0qT4aUEB5QAJ1a4s0u33IeSlAMB/PrxvXRmITTT8T9gIFm4ve8j4+pwohlrgrCjcVPDh
+         ElihN4nxfhEkI3vYs1qMHfC98BFLEGLt+wTL7PKCG3S+PRV2gi5ZEJTdXasAQ5uGDTvh
+         j4Xp8kLe0D2ztraDKi/Lm6+fdm4S4zn38qxN+GIr8OiauV+59uqpay6fks4tSybJwWLR
+         DbjDxnoWPtwbFmUMdyVU+5Zj0tzeJaPk4J8x1O7VCpSvClIxx++ennIUnpMOoPytqpIW
+         5EQw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1719506436; x=1720111236;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=wScH/IbvZG/TZ8wYKhA6TWn16TnOzHGzinJq+x5rvqA=;
+        b=XtaoXwse0JYveQT62bVvpwJkhhb/pHO1tjB5c3lm1OYZXrzOmc2t6op6h1h5CGWS0T
+         GP9PiEBk8go3uyNK8hj4IsAiCCNEXM6E2ivzCqWeL+g6UPzRuW1lfHnMP0XDoNrCHJNP
+         PRzl+B5w4tOIlqGmym7j9hJsTeaXlhG+35qhp+KGKX9e/c7ylubeXhGNKpnJQ4WJ4Gu7
+         9zWuuuZVWBjkjPfz+zSvs8UyNKdQ4RapQ9UZ8Z64s4jDu6grY1dxPIOT59P7T8pjYKur
+         RroXt1waR8zij8BqOI73ezZePlaAm4lHZR/BhobWowuL1SImp1x75pduoHG8oENtAOUv
+         CAHA==
+X-Gm-Message-State: AOJu0Yw3hQUt/O99/f2PrOnEQR7HvMyccbph1AXi7pmsZKiZj7Ya1DEJ
+	ZSYxdMcAOG/DG8XOZSBNcUbvDnYhZt3Vp7gSq4QCLW6Se/gPC11KOIkOdQ==
+X-Google-Smtp-Source: AGHT+IEd25zeJIlUWF5HVO98WNf1NhD6HPr1KMyBUCW4Nogjl/gOgoFkSsRJUThdqgeCaDZqvO6xGw==
+X-Received: by 2002:a05:620a:b05:b0:795:59ed:21e3 with SMTP id af79cd13be357-79d5cfc4756mr295836585a.3.1719506436173;
+        Thu, 27 Jun 2024 09:40:36 -0700 (PDT)
+Received: from [172.17.0.2] ([20.55.214.244])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-79d5c8add59sm70242885a.83.2024.06.27.09.40.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 27 Jun 2024 09:40:35 -0700 (PDT)
+Message-ID: <667d9603.050a0220.e236f.385f@mx.google.com>
+Date: Thu, 27 Jun 2024 09:40:35 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============7085960274503952428=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, r.smirnov@omp.ru
+Subject: RE: [BlueZ,v1] gatt-server: fix memory leak in bt_gatt_server_send_notification()
+In-Reply-To: <20240627150917.85755-1-r.smirnov@omp.ru>
+References: <20240627150917.85755-1-r.smirnov@omp.ru>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Hi,
+--===============7085960274503952428==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-ke, 2024-06-26 kello 11:40 +0530, Amisha Jain kirjoitti:
-> Hi,
->=20
-> Correct! The problem here is manager_emit_transfer_property() is=20
-> expecting the structure of type 'obex_transfer' and we are passing the=
-=20
-> structure of session type which will be type mismatch and inappropriate=
-=20
-> values will be populated in further calls in code. Hence property "Size"=
-=20
-> will never emit on console(obexctl) as it is not set properly and might=
-=20
-> cause crash/disconnection.
->=20
->  > diff --git a/obexd/src/obex.c b/obexd/src/obex.c
->  > index a4bae857f..ed219d3e7 100644
->  > --- a/obexd/src/obex.c
->  > +++ b/obexd/src/obex.c
->  > @@ -779,6 +779,9 @@ int obex_put_stream_start(struct obex_session=20
-> *os, const char *filename)
->  >                  return err;
->  >          }
->  >
->  > +       if (os->size !=3D OBJECT_SIZE_DELETE && os->size !=3D=20
-> OBJECT_SIZE_UNKNOWN)
->  > +               manager_emit_transfer_property(os->service_data, "Size=
-");
->  > +
->  >          os->path =3D g_strdup(filename);
->  >
->=20
->=20
-> One way to resolve this issue is to add the additional field in=20
-> 'mas_session' so it can cast to struct 'obex_transfer'. We are adding=20
-> new field 'char *path' as only transfer->path will be invoked and passed=
-=20
-> further.
+This is automated email and please do not reply to this email!
 
-Yes, thank you for clarification.
+Dear submitter,
 
-Although I'm not BlueZ maintainer, I think relying on type punning
-mas_session and obex_transfer by adding fields so that their memory
-representation is partly the same is not very good practice. Other
-plugins like ftp.c seem also have similar issue.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=866206
 
-One could consider some ways to avoid doing this, e.g. move the
+---Test result---
 
-        if (os->size !=3D OBJECT_SIZE_DELETE && os->size !=3D OBJECT_SIZE_U=
-NKNOWN)
-                manager_emit_transfer_property(os->service_data, "Size");
+Test Summary:
+CheckPatch                    PASS      0.44 seconds
+GitLint                       PASS      0.33 seconds
+BuildEll                      PASS      24.60 seconds
+BluezMake                     PASS      1669.13 seconds
+MakeCheck                     PASS      13.04 seconds
+MakeDistcheck                 PASS      177.63 seconds
+CheckValgrind                 PASS      252.82 seconds
+CheckSmatch                   WARNING   353.79 seconds
+bluezmakeextell               PASS      120.50 seconds
+IncrementalBuild              PASS      1414.90 seconds
+ScanBuild                     PASS      1002.35 seconds
 
-after each call to obex_put_stream_start in plugins/*.c
-client/mns.c.=C2=A0For plugins where there's no transfer, it maybe can be
-omitted.
+Details
+##############################
+Test: CheckSmatch - WARNING
+Desc: Run smatch tool with source
+Output:
+src/shared/gatt-server.c:278:25: warning: Variable length array is used.src/shared/gatt-server.c:621:25: warning: Variable length array is used.src/shared/gatt-server.c:720:25: warning: Variable length array is used.src/shared/gatt-server.c:278:25: warning: Variable length array is used.src/shared/gatt-server.c:621:25: warning: Variable length array is used.src/shared/gatt-server.c:720:25: warning: Variable length array is used.src/shared/gatt-server.c:278:25: warning: Variable length array is used.src/shared/gatt-server.c:621:25: warning: Variable length array is used.src/shared/gatt-server.c:720:25: warning: Variable length array is used.
 
->=20
-> void manager_emit_transfer_property(struct obex_transfer *transfer,
-> 								char *name)
-> {
-> 	if (!transfer->path)
-> 		return;
->=20
-> 	g_dbus_emit_property_changed(connection, transfer->path,
-> 					TRANSFER_INTERFACE, name);
-> }
->=20
->  >> Signed-off-by: Amisha Jain <quic_amisjain@quicinc.com>
->  >> ---
->  >>   obexd/plugins/mas.c | 4 +++-
->  >>   1 file changed, 3 insertions(+), 1 deletion(-)
->  >>
->  >> diff --git a/obexd/plugins/mas.c b/obexd/plugins/mas.c
->  >> index 10b972d65..71bf12ad3 100644
->  >> --- a/obexd/plugins/mas.c
->  >> +++ b/obexd/plugins/mas.c
->  >> @@ -51,6 +51,8 @@
->  >>   #define ML_BODY_END "</MAP-msg-listing>"
->  >>
->  >>   struct mas_session {
->  >> +	uint8_t notification_status;
->  >> +	char *path;
->  >>   	struct mas_request *request;
->  >>   	void *backend_data;
->  >>   	gboolean finished;
->  >> @@ -59,7 +61,6 @@ struct mas_session {
->  >>   	GObexApparam *inparams;
->  >>   	GObexApparam *outparams;
->  >>   	gboolean ap_sent;
->  >> -	uint8_t notification_status;
->  >>   };
->  >>
->  >>   static const uint8_t MAS_TARGET[TARGET_SIZE] =3D {
->  >> @@ -125,6 +126,7 @@ static void *mas_connect(struct obex_session=20
-> *os, int *err)
->  >>   		goto failed;
->  >>
->  >>   	manager_register_session(os);
->  >> +	mas->path =3D NULL;
->  >
->=20
-> There is no transfer already registered for mas during connection, so=20
-> setting the path to NULL.
->=20
-> On 6/25/2024 9:09 PM, Pauli Virtanen wrote:
-> > Hi,
-> >=20
-> > ti, 2024-06-25 kello 12:05 +0530, Amisha Jain kirjoitti:
-> > > Update the 'mas_session' structure such that
-> > > manager_emit_transfer_property(os->service_data, "Size")
-> > > will get the proper structure in arguments as
-> > > expected like structure 'obex_transfer' and transfer->path
-> > > won't be populated with inappropriate value.
-> > >=20
-> > > As there is no new transfer registered during mas connect,
-> > > hence setting the path to NULL to avoid invoking the
-> > > g_dbus_emit_property_changed() property.
-> > >=20
-> > > Signed-off-by: Amisha Jain <quic_amisjain@quicinc.com>
-> > > ---
-> > >   obexd/plugins/mas.c | 4 +++-
-> > >   1 file changed, 3 insertions(+), 1 deletion(-)
-> > >=20
-> > > diff --git a/obexd/plugins/mas.c b/obexd/plugins/mas.c
-> > > index 10b972d65..71bf12ad3 100644
-> > > --- a/obexd/plugins/mas.c
-> > > +++ b/obexd/plugins/mas.c
-> > > @@ -51,6 +51,8 @@
-> > >   #define ML_BODY_END "</MAP-msg-listing>"
-> > >  =20
-> > >   struct mas_session {
-> > > +	uint8_t notification_status;
-> > > +	char *path;
-> > >   	struct mas_request *request;
-> > >   	void *backend_data;
-> > >   	gboolean finished;
-> > > @@ -59,7 +61,6 @@ struct mas_session {
-> > >   	GObexApparam *inparams;
-> > >   	GObexApparam *outparams;
-> > >   	gboolean ap_sent;
-> > > -	uint8_t notification_status;
-> > >   };
-> > >  =20
-> > >   static const uint8_t MAS_TARGET[TARGET_SIZE] =3D {
-> > > @@ -125,6 +126,7 @@ static void *mas_connect(struct obex_session *os,=
- int *err)
-> > >   		goto failed;
-> > >  =20
-> > >   	manager_register_session(os);
-> > > +	mas->path =3D NULL;
-> >=20
-> > Maybe the problem here is that the change in commit bb160515185e
-> > ("obexd: Emit Size property of transfer after open()") is not right?
-> >=20
-> > diff --git a/obexd/src/obex.c b/obexd/src/obex.c
-> > index a4bae857f..ed219d3e7 100644
-> > --- a/obexd/src/obex.c
-> > +++ b/obexd/src/obex.c
-> > @@ -779,6 +779,9 @@ int obex_put_stream_start(struct obex_session *os, =
-const char *filename)
-> >                  return err;
-> >          }
-> >  =20
-> > +       if (os->size !=3D OBJECT_SIZE_DELETE && os->size !=3D OBJECT_SI=
-ZE_UNKNOWN)
-> > +               manager_emit_transfer_property(os->service_data, "Size"=
-);
-> > +
-> >          os->path =3D g_strdup(filename);
-> >=20
-> > This casts os->service_data to obex_transfer which IIUC does not work
-> > for most the plugins, as it's the session struct.
-> >=20
-> > Maybe plugins can emit the transfer property change in their open()
-> > callback, for the plugins where it makes sense?
-> >=20
-> > >  =20
-> > >   	return mas;
-> > >  =20
-> >=20
 
---=20
-Pauli Virtanen
+---
+Regards,
+Linux Bluetooth
+
+
+--===============7085960274503952428==--
