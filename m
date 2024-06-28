@@ -1,29 +1,35 @@
-Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E964618C31
-	for <linux-bluetooth@vger.kernel.org>; Fri, 28 Jun 2024 15:04:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9BA01C2323
+	for <linux-bluetooth@vger.kernel.org>; Fri, 28 Jun 2024 15:10:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719587098; cv=none; b=DPISHXZ7GrV8YAcKAWS9rXUwXQ3x2w8a8MNu5FdOatTd9bW9UsULfkSCOMob/rc2CMVAuLvBokYYMz2OgD0/wITLc6pNjTMuWR1dJ9XEYSNQxe23Q5jxUlxGxik33KI8OwvDzWBqvRcmoOGxfAi4NVNen8D6TvzgopznjslC2/c=
+	t=1719587430; cv=none; b=ScAp4qkQvfe2j07YRuoMGDdBFHruj3tb9efXOfELEWnbhcPRVXM8KRcXg/Bbj78C9rmxKfG3Qp6KhS7DlAXyeMp8Hl3CCxNt+FQccGtuvT3yxHEXuYVq0Q3Y3q9UB7DOTnuOhDehtBPCeEPfI8IS3mwgDI2N+0JR/Z72fT50nrM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719587098; c=relaxed/simple;
-	bh=dwrDTtAcIH94ba3oHAsaKT2gNaI0wcYuD02Rdx13ktQ=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=mLwDlq3RxFYKVWX9tWOg8r8C6nUJkUuwTNYsHhYyaCL+DTrLy9J8hWb6Fc9yD3kwl0Cafru7QX142m2ZznZy75hoLcU6YfY94ddDRx5x050WwEcUnwK10YCoMigxYHDxURbh8lH+01YNjzIn3G8lXsP5azRkHkfFL0gah3cOXjs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
-Received: from localhost.localdomain (84.18.99.27) by msexch01.omp.ru
- (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Fri, 28 Jun
- 2024 18:04:44 +0300
-From: Roman Smirnov <r.smirnov@omp.ru>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Roman Smirnov <r.smirnov@omp.ru>
-Subject: [PATCH BlueZ v1] avdtp: add NULL check to avdtp_has_stream()
-Date: Fri, 28 Jun 2024 18:04:12 +0300
-Message-ID: <20240628150418.563987-1-r.smirnov@omp.ru>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1719587430; c=relaxed/simple;
+	bh=IIU+R2vJ3lKb4B0qMr/vG7XzyJOO2+RCGZ958RbVLNI=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=pyYDjLI8iCYwpFk/f4OBLVN56lUVHQBVn1qzYN3GfPMPFzLY6TrrFr0nGDMPyz/rXgogy4lIPQQOGo1HgfNxDgQNpvQqL9jx6AqogmWskZFAWzTjpjdMsT3DpLxTX0zIK1UcXVARv6ll6Kn9Hvworri9RfTGmO1eA7oIsTy7YkM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=haF91B8d; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="haF91B8d"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 5F59FC4AF0C;
+	Fri, 28 Jun 2024 15:10:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1719587430;
+	bh=IIU+R2vJ3lKb4B0qMr/vG7XzyJOO2+RCGZ958RbVLNI=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=haF91B8dNzQ/JmE7x/FnBDoXEPoWjpLPWD6n4EtjbOjvwlzlEy3f2NyjzzzE7wx1t
+	 otef27R1DyGmuApvKfKSIpYrwIxyqocygbTOLRj/v4ld4h6fgd1XXvIxEXP0zylc3F
+	 t7kSBe4eIVN4KGKL+Hzw4R9/JGFgFUD3f6EI2QQk+5+kevwJ+w9SKPC7OI47/1JwzM
+	 QA5UC3TiqM+Leco4pJg2O17kjNNc1Wm51OZf4G/yPF66sk4KlPKT17d77nz8wgGF7c
+	 j/5cQBlJy8wKh+tL9Vrajd7gNim8LP7Ej2p2r9TQI+3BRA0blLHIiKH7bd9w0Ycfn2
+	 pqPT6f1Yf+1MQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 4AA36C43338;
+	Fri, 28 Jun 2024 15:10:30 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -31,61 +37,37 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
- (10.188.4.12)
-X-KSE-ServerInfo: msexch01.omp.ru, 9
-X-KSE-AntiSpam-Interceptor-Info: scan successful
-X-KSE-AntiSpam-Version: 6.1.0, Database issued on: 06/28/2024 14:06:52
-X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
-X-KSE-AntiSpam-Method: none
-X-KSE-AntiSpam-Rate: 0
-X-KSE-AntiSpam-Info: Lua profiles 186212 [Jun 28 2024]
-X-KSE-AntiSpam-Info: Version: 6.1.0.4
-X-KSE-AntiSpam-Info: Envelope from: r.smirnov@omp.ru
-X-KSE-AntiSpam-Info: LuaCore: 21 0.3.21
- ebee5449fc125b2da45f1a6a6bc2c5c0c3ad0e05
-X-KSE-AntiSpam-Info: {rep_avail}
-X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
-X-KSE-AntiSpam-Info:
-	127.0.0.199:7.1.2;omp.ru:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1
-X-KSE-AntiSpam-Info: ApMailHostAddress: 84.18.99.27
-X-KSE-AntiSpam-Info: Rate: 0
-X-KSE-AntiSpam-Info: Status: not_detected
-X-KSE-AntiSpam-Info: Method: none
-X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
- smtp.mailfrom=omp.ru;dkim=none
-X-KSE-Antiphishing-Info: Clean
-X-KSE-Antiphishing-ScanningType: Heuristic
-X-KSE-Antiphishing-Method: None
-X-KSE-Antiphishing-Bases: 06/28/2024 14:10:00
-X-KSE-Antivirus-Interceptor-Info: scan successful
-X-KSE-Antivirus-Info: Clean, bases: 6/28/2024 1:26:00 PM
-X-KSE-Attachment-Filter-Triggered-Rules: Clean
-X-KSE-Attachment-Filter-Triggered-Filters: Clean
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
+Subject: Re: [PATCH BlueZ v1] l2test: replace sprintf() with snprintf() in
+ recv_mode()
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <171958743030.13318.17743473473022679453.git-patchwork-notify@kernel.org>
+Date: Fri, 28 Jun 2024 15:10:30 +0000
+References: <20240628130142.549979-1-r.smirnov@omp.ru>
+In-Reply-To: <20240628130142.549979-1-r.smirnov@omp.ru>
+To: Roman Smirnov <r.smirnov@omp.ru>
+Cc: linux-bluetooth@vger.kernel.org
 
-Make avdtp_has_stream() safe for passing NULL pointers.
+Hello:
 
-Found with the SVACE static analysis tool.
----
- profiles/audio/avdtp.c | 3 +++
- 1 file changed, 3 insertions(+)
+This patch was applied to bluetooth/bluez.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-diff --git a/profiles/audio/avdtp.c b/profiles/audio/avdtp.c
-index 3667e0840..913298319 100644
---- a/profiles/audio/avdtp.c
-+++ b/profiles/audio/avdtp.c
-@@ -3918,6 +3918,9 @@ struct btd_device *avdtp_get_device(struct avdtp *session)
- 
- gboolean avdtp_has_stream(struct avdtp *session, struct avdtp_stream *stream)
- {
-+	if (!session)
-+		return FALSE;
-+
- 	return g_slist_find(session->streams, stream) ? TRUE : FALSE;
- }
- 
+On Fri, 28 Jun 2024 16:01:41 +0300 you wrote:
+> Use snprintf() instead of sprintf() to avoid buffer overflow.
+> 
+> Found with the SVACE static analysis tool
+> ---
+>  tools/l2test.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+
+Here is the summary with links:
+  - [BlueZ,v1] l2test: replace sprintf() with snprintf() in recv_mode()
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=0bd3d1505e3a
+
+You are awesome, thank you!
 -- 
-2.43.0
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
