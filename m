@@ -1,58 +1,58 @@
-Received: from mail-il1-f171.google.com (mail-il1-f171.google.com [209.85.166.171])
+Received: from mail-oi1-f172.google.com (mail-oi1-f172.google.com [209.85.167.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6CE113FD9C
-	for <linux-bluetooth@vger.kernel.org>; Fri, 28 Jun 2024 09:45:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE14E1C683
+	for <linux-bluetooth@vger.kernel.org>; Fri, 28 Jun 2024 09:47:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719567902; cv=none; b=orZXJPEC8cqHdgiH1IKnBruGkjSkHcxjO2Q126Aw4Zgdh8L6BZPEN/ybXx3q0WRqZezI8cyJ7Ou8Z4N/+WdXfK2UXVrpmyxRFVVkXSMyC6USRg3VCVUGX/dTgGRZGwfI+9CDDu2tWHHEPmtcM7oP3FICUVFBJakXnOW0yLPQEb8=
+	t=1719568029; cv=none; b=s9F1SvPHhKcFnMtWBYtwJsgnXXsPpI/uIURZG4ZsSTjMmgk6mGZFvL1ppLXIBA4OF6iTMmxFD5j98G+r/Z9M4rCYfR594F9ddJ3HKmfZbdeHgdYUF34kvZ5Q0dKtCoi4FvjYP8SizxP1IZE7NKa/hd08ckhqXk9iAVOiFeq4vng=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719567902; c=relaxed/simple;
-	bh=3njgp0rrxoVPIiDlfrTAbO/tnzmxsDylz7g1PQKzT2M=;
+	s=arc-20240116; t=1719568029; c=relaxed/simple;
+	bh=5itl+lkY6EP5bHTDxrULV78rC4ysfqX2g7f09+s0DL4=;
 	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=pIFcqPRtGReL1yTcQbX1sT1/TsZaGkkI8HGzjVBCAPoHvA6bww/RXmZZ0X8s14ItDupEM25E4Co2GB8GYUb6LbvapXTOq028nDS8r9q27Yqf49JeBU4VyOjDjogUa7c/rnQczjav8cdtqCJH1SMsTwd5l3vIOiAeUcaBqsF3YUY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aHmK12K4; arc=none smtp.client-ip=209.85.166.171
+	 In-Reply-To:References; b=Ig266z37VEig/2uKZdTvKD0p2Ef1Z0XPdLtVxYrn3UXA8ShnkLkQxuwPvqCte7HuQefTJzdm7RLh8CTzEt9bySLrrmmDARnyZ//I6B3MOdcfa1JvNFlv7vNvKoNO2PnoAcsYLnQW6WSWGJqHYaHGa3M9HWh2yp7dtc9tYTQhL6g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DFlyxdFS; arc=none smtp.client-ip=209.85.167.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aHmK12K4"
-Received: by mail-il1-f171.google.com with SMTP id e9e14a558f8ab-3762c172d93so1770325ab.0
-        for <linux-bluetooth@vger.kernel.org>; Fri, 28 Jun 2024 02:45:00 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DFlyxdFS"
+Received: by mail-oi1-f172.google.com with SMTP id 5614622812f47-3d5eed9c62eso244555b6e.2
+        for <linux-bluetooth@vger.kernel.org>; Fri, 28 Jun 2024 02:47:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1719567899; x=1720172699; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1719568027; x=1720172827; darn=vger.kernel.org;
         h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
          :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=C78hCiCWudjek9M4J1BQjJHAZ6d9iP0aRgim/pcscTc=;
-        b=aHmK12K4kle7FGqWoBN9YTGU+5No5ZFIKwgP9Y6+YNBFgVs2RskBZ5NNXehXWvrtRq
-         Hz/EA9eacVN8WtQRhP1pPJzn07EE7yCVoqB7tLoVWMiIJ/nCIGRYA0G0PHQn4SiQsAmT
-         Tz6ypWUZYv+9wWBrxGBwsN6h27zRlXZxpPJS64gIP1V6gMM0gbAtAy0lSJJOZDz0i7Ou
-         MFt18gge6FJtzfMIUbZJRaZMu7E/m+0NyM4IPWk+pm58AeVjcbxLvULUEir68aZlZUse
-         OP5uUqn31diAcE0hACRj82kmKnwu5onoLntL/tnN9zc9UTQ7N2Ragd8V/Vj+riguAez7
-         5yRg==
+        bh=Z7cJVdQBCK1r6yK30LvPOt4NYupcXvNV71+i7IczAQc=;
+        b=DFlyxdFS35qbMgjt2nDjoaSQU/fL2saekZTbUrWGNC0LkIF252qihjICXF0MAcvXXu
+         7070J66kp/goTV6vDPHyWSVOWNqJEbm2z4QL39ySlvvHLr0fkxksHsLkrqTzC2diF0NC
+         YTANtb6k5zch6uSzCh05wfEgoOMC0kjrL6srmVrG/mvkODD9PAJxe/i48gN7Bc7GUkgy
+         gey8nrX9f74OaXXIaVZideC9VJJ3hJRoUvJh76JWh76RuPOE/yC8Rqyg2L+JT40Q44JG
+         6h5Vbw9bvZlRd1hvYrxG/Q+P2xpuU87892IL+at8WjGrEs3qeA5+eNXQrpRkRWDAlvI8
+         BtOw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719567899; x=1720172699;
+        d=1e100.net; s=20230601; t=1719568027; x=1720172827;
         h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
          :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=C78hCiCWudjek9M4J1BQjJHAZ6d9iP0aRgim/pcscTc=;
-        b=Rw8v11v/Tkt9s7zmTEGp8j6jhmQhSG1ZXhHeEwmwW3ROkfNE8TuJilcPm+Txqzp5Vz
-         toRMBcvnXC9UJEI9uHwRCixH1+Sx9PVv0WquSG00KUdJ7rESvY5n76BpcTqZnGQx5AlO
-         8ua30bQmxi6i51wuJc235Gh9UgWNYWysxB8FXbBb2mPZVmVWhzeHJ/UBIESRbR0ZWuhh
-         zrgaPq4rA3UgWVGqw9IgHJY4W3B61l1oJvv0XqKDKRVm76C4Ahib8mlLquItOf+Fo9ET
-         tHAq6Q+tkrJzXKJaEcCDmcB2WIwidGPo0s3hwlNPj4s1v0VA1zssKPYuW2kJLxRfAgtd
-         BOkw==
-X-Gm-Message-State: AOJu0YyVH6h/z5H/Z++iov3EfDuzMo0YhF9PEzS2K1ag12HPyKUW7CNN
-	jxaGVXb+k0NY26S/lFSt9Efr12hayV0m99U4kFkNcsmQ+nT0KTOEvU3/+Q==
-X-Google-Smtp-Source: AGHT+IFoYM3k2gljerhsltaRbGUne8FwmOkTIqo08NkVMcgbhYCnO7ZLNkZKYlJ4Ojbltj/tNi1Alw==
-X-Received: by 2002:a05:6e02:1d1c:b0:375:da94:e46b with SMTP id e9e14a558f8ab-3763f5ab591mr201850005ab.5.1719567899616;
-        Fri, 28 Jun 2024 02:44:59 -0700 (PDT)
-Received: from [172.17.0.2] ([20.172.25.73])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-72c69b53e3dsm999991a12.9.2024.06.28.02.44.59
+        bh=Z7cJVdQBCK1r6yK30LvPOt4NYupcXvNV71+i7IczAQc=;
+        b=M/U7qiRxdOcPQLfWkE9MCQx7aswYEY5L3dh2+IgL4IOZ4FJT0W+g6Og2V/Af/bH99M
+         KxCGycWR62wUwiOtmAeIEYj7tfIgScmiBq1RoLP+OizEDrF1zrTaETZB/3dNPLnewkC7
+         ykdIxA0IM9hFzMELR37SsLG3zb1nTS779NNwkLF53xZEix+nUIPbW+8MLMd4GAbIQK8U
+         amiJGHaOHr5yAf7GsIacAH3blDfmzQZnI9zl0xiU+Gbg1wBU5T3G8GkFJXT+tzUL/Ekg
+         kkchmGLYRL1h3aEMH/jghFx1zPmCZm+4hWAXC5WkyVza6yU4seCHKn6TmF76uZVjpXU8
+         E6QA==
+X-Gm-Message-State: AOJu0YxFvgOjEThQpka0s+XNxzJETaj1hI0BIgn1CrZkl/t6Tci4yXL/
+	g2Z69JcJiXYo/45jdIxadVBafK7g9NxgfD6B7Lw4JxqPrAB/hSFbh3gLWg==
+X-Google-Smtp-Source: AGHT+IE0LCr7ypW2g57j5vL6VGeeULrqYyR4Fxh/jVRRMAasepLKU+tO6dkuIt3btErcUnoYAPpNiA==
+X-Received: by 2002:a05:6808:1a01:b0:3d5:60b4:74e with SMTP id 5614622812f47-3d560b40cb6mr10433344b6e.27.1719568026588;
+        Fri, 28 Jun 2024 02:47:06 -0700 (PDT)
+Received: from [172.17.0.2] ([13.88.100.228])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-70803fc8b5csm1146938b3a.130.2024.06.28.02.47.05
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 28 Jun 2024 02:44:59 -0700 (PDT)
-Message-ID: <667e861b.630a0220.54de6.3149@mx.google.com>
-Date: Fri, 28 Jun 2024 02:44:59 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============0912401835064636588=="
+        Fri, 28 Jun 2024 02:47:06 -0700 (PDT)
+Message-ID: <667e869a.050a0220.acd7e.33a0@mx.google.com>
+Date: Fri, 28 Jun 2024 02:47:06 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============5613731164243082315=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -61,12 +61,12 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 From: bluez.test.bot@gmail.com
 To: linux-bluetooth@vger.kernel.org, r.smirnov@omp.ru
-Subject: RE: [BlueZ,v1] bass: add NULL check to bass_bcast_src_free()
-In-Reply-To: <20240628073542.20896-1-r.smirnov@omp.ru>
-References: <20240628073542.20896-1-r.smirnov@omp.ru>
+Subject: RE: [BlueZ,v2] gatt-server: fix memory leak in bt_gatt_server_send_notification()
+In-Reply-To: <20240628075719.42796-1-r.smirnov@omp.ru>
+References: <20240628075719.42796-1-r.smirnov@omp.ru>
 Reply-To: linux-bluetooth@vger.kernel.org
 
---===============0912401835064636588==
+--===============5613731164243082315==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -77,23 +77,29 @@ Dear submitter,
 
 Thank you for submitting the patches to the linux bluetooth mailing list.
 This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=866446
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=866451
 
 ---Test result---
 
 Test Summary:
-CheckPatch                    PASS      0.30 seconds
-GitLint                       PASS      0.22 seconds
-BuildEll                      PASS      24.28 seconds
-BluezMake                     PASS      1675.34 seconds
-MakeCheck                     PASS      13.67 seconds
-MakeDistcheck                 PASS      183.04 seconds
-CheckValgrind                 PASS      257.89 seconds
-CheckSmatch                   PASS      360.58 seconds
-bluezmakeextell               PASS      123.47 seconds
-IncrementalBuild              PASS      1527.30 seconds
-ScanBuild                     PASS      1038.10 seconds
+CheckPatch                    PASS      0.26 seconds
+GitLint                       PASS      0.20 seconds
+BuildEll                      PASS      25.21 seconds
+BluezMake                     PASS      1761.46 seconds
+MakeCheck                     PASS      13.72 seconds
+MakeDistcheck                 PASS      191.98 seconds
+CheckValgrind                 PASS      263.42 seconds
+CheckSmatch                   WARNING   365.33 seconds
+bluezmakeextell               PASS      125.57 seconds
+IncrementalBuild              PASS      1546.59 seconds
+ScanBuild                     PASS      1033.94 seconds
 
+Details
+##############################
+Test: CheckSmatch - WARNING
+Desc: Run smatch tool with source
+Output:
+src/shared/gatt-server.c:278:25: warning: Variable length array is used.src/shared/gatt-server.c:621:25: warning: Variable length array is used.src/shared/gatt-server.c:720:25: warning: Variable length array is used.src/shared/gatt-server.c:278:25: warning: Variable length array is used.src/shared/gatt-server.c:621:25: warning: Variable length array is used.src/shared/gatt-server.c:720:25: warning: Variable length array is used.src/shared/gatt-server.c:278:25: warning: Variable length array is used.src/shared/gatt-server.c:621:25: warning: Variable length array is used.src/shared/gatt-server.c:720:25: warning: Variable length array is used.
 
 
 ---
@@ -101,4 +107,4 @@ Regards,
 Linux Bluetooth
 
 
---===============0912401835064636588==--
+--===============5613731164243082315==--
