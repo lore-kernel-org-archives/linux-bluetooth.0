@@ -1,35 +1,64 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ua1-f41.google.com (mail-ua1-f41.google.com [209.85.222.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A9AA1E532;
-	Fri, 28 Jun 2024 18:23:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2401F3BBC5;
+	Fri, 28 Jun 2024 18:46:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719598994; cv=none; b=LyvsFVGRvkhNLqo7A4D4jMuvqGydAFL51FqkUTxAypeWTuOsaMqALgYgsDKhkaQ9bzxPsvm4yiKkcHV4NZ3EsoawOeTL+JjQPw6WNmjizHsbeWV8YAiZGRS84q6+adtcR5qgZwRSiLDbAJIv+x6wiS+2SHU+RlSU1faZ2u2TY2g=
+	t=1719600418; cv=none; b=pzwQshA2f+LOmFjx8ufPjDgIB6obnrkJxN2GM6j1BIvc7z8W9iJpwwbL/rwDcOYUoLULLlNnnReZ/sorlPd1+UIAXE5+vZYd7cWc0nbhDxP6ezlG4AZFwVIVaJ9WAmAGVcZ+3RrADozN6nSTAOcIyUS2z/Ed7X2FXxeJALU6FTk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719598994; c=relaxed/simple;
-	bh=cb+WMxhhWTVOUFDmRnkqtfo3qZmA4hA8QTbiIA68f5o=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=awyPwvmUTNa4dgkIh8iTIwWAFsgoxtkMqgVeV94gcRBZwkJetjvibT7ndcDC2oIxb+BXQokumBszaoAa1X8YgWzkknQ1GOg4F6zqHHe4LlWrkUCSAU9PZXjZT7xlMkIK8s/r8GrlgfIuzYg2mTYI7K0SwoU3eKTAKxzpTOSU01Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AcxSceGu; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1719600418; c=relaxed/simple;
+	bh=hunj8a+Tp+D5s1II1M+FHGnR1Kh/janCLfAz5w//S74=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=pU6BRA/Hlc8RY5oA7D+H2pHsePVyz8Ea51vk2sdCUKm4yHdqZEbftUfQ98e9jpg8iInTqXVSrMhYN6i/pgiVTgxOdvsmMwR3S6D5ddImrj1GQ60xhlbdl/KV5Bt4/g6nfZSyn6Ah1xqhh+mfSKxPN+Wsdce6ZmvMKUJtHhVYLJ4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NnY7mQwa; arc=none smtp.client-ip=209.85.222.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AcxSceGu"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 0A3F3C32786;
-	Fri, 28 Jun 2024 18:23:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1719598994;
-	bh=cb+WMxhhWTVOUFDmRnkqtfo3qZmA4hA8QTbiIA68f5o=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=AcxSceGu7L5XdsxF1/H+vDN69Np0bgoLh3iRplpaBdQA2NlqvJtVbwCUQxPlE3/k3
-	 xlS9kRtssxDu4rkXRWZ9cSW1BrHJ5RiILa2b5Wff8OKw4TbByHcYXn65TdtaYYaMe/
-	 07kpwp3oq2C9KMTDUxFY73wssKY9P54E5rSF+NbZZgd/epB04Wu3q6rPv+pRLWbrhO
-	 6/MNNpq60pnpDa3CBKhmDkErtRLXVKRlQ39VPGmkgV5Ltce2xtAI2pLXszArMtCfnT
-	 ODq1dogkS2+OaIelCgynZhW00Ap/rcAfKNXo+oDz82EjrqYIDieHRsuZdPvkVb0AO/
-	 Xy2xPts8PggPQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id EC5E7C4332E;
-	Fri, 28 Jun 2024 18:23:13 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NnY7mQwa"
+Received: by mail-ua1-f41.google.com with SMTP id a1e0cc1a2514c-80fe3073421so196522241.1;
+        Fri, 28 Jun 2024 11:46:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1719600416; x=1720205216; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Yi0OfaU/kpG7N8w7UTRGv9TXQ/s1Ls1tYcV0AC/Kj0s=;
+        b=NnY7mQwaBKOuJgbvBiwinW9UDZk5nJNQ5uGztguS19sZ70wKqC3RLiH409PGk8royd
+         xjXi4O7BtQGNkOOUa/zFxGfm/3uXr7Cxeo9GvKril5AKU1WijEZyicFBNPlqTQ4BetLH
+         wFIKbbfOFaMVjTW19iCoIzGZqoV7RarWug7PkgKZHkv6RTq4xi4C8oqMYqVmBHYXTfma
+         eJkxar0VSD6JfDU6ae1QE0Rw11B4QKnnjgFtjCKaJoIgoHxNz0TPEOADS15frrUCupru
+         0F8NTJw44O1T8Yn8jpktjDYK4F4l65jHBNJY2mHb4oOX5DUb8g71AuQl+Ky4sLBbAn0P
+         8Xww==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1719600416; x=1720205216;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Yi0OfaU/kpG7N8w7UTRGv9TXQ/s1Ls1tYcV0AC/Kj0s=;
+        b=YdoSOkLyyagHBlc5gEBQ3H59x75p4b/VbOojSEZRKaBT3mAd5mqe7B8a54HfFnlpQX
+         2PcnRHNR5ER226bu57bH+Oj9kBhjBQjP8vrmrkOb/YpuXzOyxrxEzcYmzEW47Ymr9nCq
+         aff076XNHCesWzHtlU0Vdi14GsAv3hqk7FcnDKBL9/sSVHAJgZvdiB1s4IW09yPWkZVn
+         AF/ieiIcUJCu3oJnuo5Z+cZU5f9nT11EowJIlcIIELAOFsyOl4H4rPA7POBRZ+PWUOOr
+         4fUlCAJ8Lxh39WP0iyXlBofDWo4httXJKgdAB9h/08wR9O3l57Ip1G87rIzJgAB/pO6M
+         sJoQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXUVFQ/5TmGlDTT51lL2jN7PV+sPpNS0q3OnELpHiq5+ZZpRv970iKb7UMJgOXxIi6MYXgVJHxG9mCwEal/cjk6ggNzXH/C
+X-Gm-Message-State: AOJu0YxrHmfbsOBm6S0wRks1tZcFNh7br9iqJKoyu7bl0MqS+IApEMJV
+	KWBOJByNZFQrKKZJAvv6tMimllzIc/6sTFuJJE++6LLDywkKVaiZ
+X-Google-Smtp-Source: AGHT+IHPotUct+drIjj4jp0GaXPTWdoP01uaTwNGdhE/JJRz1xCmlxIOHB6NIWAd9M+Suejw0LQ9cA==
+X-Received: by 2002:a05:6122:46a3:b0:4ec:f402:a849 with SMTP id 71dfb90a1353d-4ef6643904emr19831953e0c.16.1719600415782;
+        Fri, 28 Jun 2024 11:46:55 -0700 (PDT)
+Received: from lvondent-mobl4.. (syn-107-146-107-067.res.spectrum.com. [107.146.107.67])
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-4f29e6a6fe7sm75947e0c.17.2024.06.28.11.46.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 28 Jun 2024 11:46:54 -0700 (PDT)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: davem@davemloft.net,
+	kuba@kernel.org
+Cc: linux-bluetooth@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: pull request: bluetooth 2024-06-28
+Date: Fri, 28 Jun 2024 14:46:53 -0400
+Message-ID: <20240628184653.699252-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -37,64 +66,77 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] USB: class: cdc-wdm: Fix CPU lockup caused by excessive log
- messages
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <171959899396.26186.528799806468905607.git-patchwork-notify@kernel.org>
-Date: Fri, 28 Jun 2024 18:23:13 +0000
-References: <29855215-52f5-4385-b058-91f42c2bee18@rowland.harvard.edu>
-In-Reply-To: <29855215-52f5-4385-b058-91f42c2bee18@rowland.harvard.edu>
-To: Alan Stern <stern@rowland.harvard.edu>
-Cc: gregkh@linuxfoundation.org,
- syzbot+1b2abad17596ad03dcff@syzkaller.appspotmail.com,
- syzbot+5f996b83575ef4058638@syzkaller.appspotmail.com,
- johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-usb@vger.kernel.org,
- luiz.dentz@gmail.com, marcel@holtmann.org, syzkaller-bugs@googlegroups.com
 
-Hello:
+The following changes since commit dc6be0b73f4f55ab6d49fa55dbce299cf9fa2788:
 
-This patch was applied to bluetooth/bluetooth-next.git (master)
-by Greg Kroah-Hartman <gregkh@linuxfoundation.org>:
+  Merge tag 'ieee802154-for-net-2024-06-27' of git://git.kernel.org/pub/scm/linux/kernel/git/wpan/wpan into main (2024-06-28 13:10:12 +0100)
 
-On Thu, 13 Jun 2024 21:30:43 -0400 you wrote:
-> The syzbot fuzzer found that the interrupt-URB completion callback in
-> the cdc-wdm driver was taking too long, and the driver's immediate
-> resubmission of interrupt URBs with -EPROTO status combined with the
-> dummy-hcd emulation to cause a CPU lockup:
-> 
-> 
-> cdc_wdm 1-1:1.0: nonzero urb status received: -71
-> cdc_wdm 1-1:1.0: wdm_int_callback - 0 bytes
-> watchdog: BUG: soft lockup - CPU#0 stuck for 26s! [syz-executor782:6625]
-> CPU#0 Utilization every 4s during lockup:
-> 	#1:  98% system,	  0% softirq,	  3% hardirq,	  0% idle
-> 	#2:  98% system,	  0% softirq,	  3% hardirq,	  0% idle
-> 	#3:  98% system,	  0% softirq,	  3% hardirq,	  0% idle
-> 	#4:  98% system,	  0% softirq,	  3% hardirq,	  0% idle
-> 	#5:  98% system,	  1% softirq,	  3% hardirq,	  0% idle
-> Modules linked in:
-> irq event stamp: 73096
-> hardirqs last  enabled at (73095): [<ffff80008037bc00>] console_emit_next_record kernel/printk/printk.c:2935 [inline]
-> hardirqs last  enabled at (73095): [<ffff80008037bc00>] console_flush_all+0x650/0xb74 kernel/printk/printk.c:2994
-> hardirqs last disabled at (73096): [<ffff80008af10b00>] __el1_irq arch/arm64/kernel/entry-common.c:533 [inline]
-> hardirqs last disabled at (73096): [<ffff80008af10b00>] el1_interrupt+0x24/0x68 arch/arm64/kernel/entry-common.c:551
-> softirqs last  enabled at (73048): [<ffff8000801ea530>] softirq_handle_end kernel/softirq.c:400 [inline]
-> softirqs last  enabled at (73048): [<ffff8000801ea530>] handle_softirqs+0xa60/0xc34 kernel/softirq.c:582
-> softirqs last disabled at (73043): [<ffff800080020de8>] __do_softirq+0x14/0x20 kernel/softirq.c:588
-> CPU: 0 PID: 6625 Comm: syz-executor782 Tainted: G        W          6.10.0-rc2-syzkaller-g8867bbd4a056 #0
-> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 04/02/2024
-> 
-> [...]
+are available in the Git repository at:
 
-Here is the summary with links:
-  - USB: class: cdc-wdm: Fix CPU lockup caused by excessive log messages
-    https://git.kernel.org/bluetooth/bluetooth-next/c/22f008128625
+  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2024-06-28
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+for you to fetch changes up to f1a8f402f13f94263cf349216c257b2985100927:
 
+  Bluetooth: L2CAP: Fix deadlock (2024-06-28 14:32:02 -0400)
 
+----------------------------------------------------------------
+bluetooth pull request for net:
+
+ - Ignore too large handle values in BIG
+ - L2CAP: sync sock recv cb and release
+ - hci_bcm4377: Fix msgid release
+ - ISO: Check socket flag instead of hcon
+ - hci_event: Fix setting of unicast qos interval
+ - hci: disallow setting handle bigger than HCI_CONN_HANDLE_MAX
+ - Add quirk to ignore reserved PHY bits in LE Extended Adv Report
+ - hci_core: cancel all works upon hci_unregister_dev
+ - btintel_pcie: Fix REVERSE_INULL issue reported by coverity
+ - qca: Fix BT enable failure again for QCA6390 after warm reboot
+
+----------------------------------------------------------------
+Edward Adam Davis (2):
+      Bluetooth: Ignore too large handle values in BIG
+      bluetooth/l2cap: sync sock recv cb and release
+
+Hector Martin (1):
+      Bluetooth: hci_bcm4377: Fix msgid release
+
+Iulia Tanasescu (1):
+      Bluetooth: ISO: Check socket flag instead of hcon
+
+Luiz Augusto von Dentz (2):
+      Bluetooth: hci_event: Fix setting of unicast qos interval
+      Bluetooth: L2CAP: Fix deadlock
+
+Neeraj Sanjay Kale (1):
+      Bluetooth: btnxpuart: Enable Power Save feature on startup
+
+Pavel Skripkin (1):
+      bluetooth/hci: disallow setting handle bigger than HCI_CONN_HANDLE_MAX
+
+Sven Peter (1):
+      Bluetooth: Add quirk to ignore reserved PHY bits in LE Extended Adv Report
+
+Tetsuo Handa (1):
+      Bluetooth: hci_core: cancel all works upon hci_unregister_dev()
+
+Vijay Satija (1):
+      Bluetooth: btintel_pcie: Fix REVERSE_INULL issue reported by coverity
+
+Zijun Hu (1):
+      Bluetooth: qca: Fix BT enable failure again for QCA6390 after warm reboot
+
+ drivers/bluetooth/btintel_pcie.c |  2 +-
+ drivers/bluetooth/btnxpuart.c    |  2 +-
+ drivers/bluetooth/hci_bcm4377.c  | 10 +++++-
+ drivers/bluetooth/hci_qca.c      | 18 ++++++++--
+ include/net/bluetooth/hci.h      | 11 ++++++
+ include/net/bluetooth/hci_sync.h |  2 ++
+ net/bluetooth/hci_conn.c         | 15 ++++++--
+ net/bluetooth/hci_core.c         | 76 ++++++++++++----------------------------
+ net/bluetooth/hci_event.c        | 33 +++++++++++++++--
+ net/bluetooth/hci_sync.c         | 13 +++++++
+ net/bluetooth/iso.c              |  3 +-
+ net/bluetooth/l2cap_core.c       |  3 ++
+ net/bluetooth/l2cap_sock.c       | 14 ++++++--
+ 13 files changed, 131 insertions(+), 71 deletions(-)
