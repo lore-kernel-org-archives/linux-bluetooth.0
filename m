@@ -1,110 +1,92 @@
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3C321103
-	for <linux-bluetooth@vger.kernel.org>; Fri, 28 Jun 2024 10:17:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EE3414A60A
+	for <linux-bluetooth@vger.kernel.org>; Fri, 28 Jun 2024 10:31:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719569876; cv=none; b=qGg8wvjSWFSpnXM3NM2AsLm6ar45UwjALk/2pHczCORlQFPe49yw/cuewdRxyCULib73YZmOXrsLJGV3QdZVaBIG4FR19LcwY3wQEaxEEH0/v2YGzHPnOnv687JJkgErIwsOXEi8+/+hSvG6S3z4D9L1mx15U2RHcj/vn+mbnuA=
+	t=1719570689; cv=none; b=X/Z6mLQaXePZRDhTi2+UvUvOfZ+1X46hQpSw3e7WVJtbxbCIV70aqG4IAF67gHsmX48BuEhBiGkS//b13ABP47qvQW56wlMZbuAL6wUqWgfcv95Eg757ZSXF6gjeXeQWAP8K1+/NfcqTFWuDHxvTp3r/d6qK5Z6TtwFE95/Babo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719569876; c=relaxed/simple;
-	bh=i2cr2ua9vfUbYNixw0XRjRc+n7rfMAx/eSCk7lsSqm0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=iFJk3z8+D91omSuCAUSdfzfsXox42hfx7k//T9Kjif89ImoWbeAMn61Zd1ElGUXTCU4w1z2hb0ZoPzuxp6lnf8kdxHKwUtJDPcBxqEXDU7vLEBZUG9w3jDrSMI0xwyBNN+M7TR/jvpo0pHAvuPrimxzGKmpn87n73iIKfGzRu3Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from [141.14.220.45] (g45.guest.molgen.mpg.de [141.14.220.45])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 675D561E5FE35;
-	Fri, 28 Jun 2024 12:17:11 +0200 (CEST)
-Message-ID: <a1857259-79e7-46d5-92e2-08ba41f79eb6@molgen.mpg.de>
-Date: Fri, 28 Jun 2024 12:17:11 +0200
+	s=arc-20240116; t=1719570689; c=relaxed/simple;
+	bh=IN9LzcGhAKkiLkoTjv3Ge/Z3M1bUjmTOM3AryIG3Mm8=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=HDvY/G0NoebvBTLbBOOcMYqbEE3RtPXSi0uVW0X8oq5OZf5s96yboARXcr/Lmea0j9krWv7xjxsQj8shWqLhH/Cd1K7xw/xBlfvY2ghjWv2Gjs7byHoPxFD13AGBXqWAS8vrhaF7R/tuJ3DhgDKY9jJnqPQFM74CgXb8K6LfhtQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
+Received: from localhost.localdomain (84.18.99.27) by msexch01.omp.ru
+ (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Fri, 28 Jun
+ 2024 13:31:05 +0300
+From: Roman Smirnov <r.smirnov@omp.ru>
+To: <linux-bluetooth@vger.kernel.org>
+CC: Roman Smirnov <r.smirnov@omp.ru>
+Subject: [PATCH BlueZ v1] core: add NULL check to adapter_service_remove()
+Date: Fri, 28 Jun 2024 13:30:49 +0300
+Message-ID: <20240628103050.535719-1-r.smirnov@omp.ru>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3] Bluetooth: btintel: Allow lowering of drive strength
- of BRI
-To: Kiran K <kiran.k@intel.com>
-Cc: Ravishankar Srivatsa <ravishankar.srivatsa@intel.com>,
- Chethan Tumkur Narayan <chethan.tumkur.narayan@intel.com>,
- Chandrashekar Devegowda <chandrashekar.devegowda@intel.com>,
- Vijay Satija <vijay.satija@intel.com>, linux-bluetooth@vger.kernel.org,
- Guenter Roeck <linux@roeck-us.net>, Archie Pusaka <apusaka@chromium.org>,
- Doug Anderson <dianders@chromium.org>
-References: <20240626092801.2343844-1-kiran.k@intel.com>
- <390bb99a-55ce-4a97-b268-93ce62bedbac@molgen.mpg.de>
- <PH0PR11MB7585AD51482CA4FC1F1035A9F5D72@PH0PR11MB7585.namprd11.prod.outlook.com>
- <5a5027f2-dbe0-41c6-abdd-c1ac9605cfd2@molgen.mpg.de>
- <PH0PR11MB758565928C5A66E618BF38EDF5D02@PH0PR11MB7585.namprd11.prod.outlook.com>
-Content-Language: en-US
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <PH0PR11MB758565928C5A66E618BF38EDF5D02@PH0PR11MB7585.namprd11.prod.outlook.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
+ (10.188.4.12)
+X-KSE-ServerInfo: msexch01.omp.ru, 9
+X-KSE-AntiSpam-Interceptor-Info: scan successful
+X-KSE-AntiSpam-Version: 6.1.0, Database issued on: 06/28/2024 10:15:33
+X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
+X-KSE-AntiSpam-Method: none
+X-KSE-AntiSpam-Rate: 19
+X-KSE-AntiSpam-Info: Lua profiles 186206 [Jun 28 2024]
+X-KSE-AntiSpam-Info: Version: 6.1.0.4
+X-KSE-AntiSpam-Info: Envelope from: r.smirnov@omp.ru
+X-KSE-AntiSpam-Info: LuaCore: 21 0.3.21
+ ebee5449fc125b2da45f1a6a6bc2c5c0c3ad0e05
+X-KSE-AntiSpam-Info: {rep_avail}
+X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
+X-KSE-AntiSpam-Info: {SMTP from is not routable}
+X-KSE-AntiSpam-Info:
+	d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2;omp.ru:7.1.1
+X-KSE-AntiSpam-Info: ApMailHostAddress: 84.18.99.27
+X-KSE-AntiSpam-Info: {DNS response errors}
+X-KSE-AntiSpam-Info: Rate: 19
+X-KSE-AntiSpam-Info: Status: not_detected
+X-KSE-AntiSpam-Info: Method: none
+X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
+ smtp.mailfrom=omp.ru;dkim=none
+X-KSE-Antiphishing-Info: Clean
+X-KSE-Antiphishing-ScanningType: Heuristic
+X-KSE-Antiphishing-Method: None
+X-KSE-Antiphishing-Bases: 06/28/2024 10:19:00
+X-KSE-Antivirus-Interceptor-Info: scan successful
+X-KSE-Antivirus-Info: Clean, bases: 6/28/2024 9:01:00 AM
+X-KSE-Attachment-Filter-Triggered-Rules: Clean
+X-KSE-Attachment-Filter-Triggered-Filters: Clean
+X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
-[Cc: +Guenter to get a Chromium person in the loop]
+Make adapter_service_remove() safe for passing NULL pointers.
+---
+ src/adapter.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-Dear Kiran,
+diff --git a/src/adapter.c b/src/adapter.c
+index bdc5bf920..57e4dcd54 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -1349,6 +1349,10 @@ int adapter_service_add(struct btd_adapter *adapter, sdp_record_t *rec)
+ void adapter_service_remove(struct btd_adapter *adapter, uint32_t handle)
+ {
+ 	sdp_record_t *rec;
++
++	if (!adapter)
++		return;
++
+ 	/*
+ 	 * If the controller does not support BR/EDR operation,
+ 	 * there is no point in trying to remote SDP records.
+-- 
+2.43.0
 
-
-Thank you for your reply.
-
-
-Am 28.06.24 um 11:37 schrieb K, Kiran:
-
-[…]
-
->> Am 27.06.24 um 03:03 schrieb K, Kiran:
->>
->>>> -----Original Message-----
->>>> From: Paul Menzel <pmenzel@molgen.mpg.de>
->>>> Sent: Wednesday, June 26, 2024 5:56 PM
->>
->> […]
->>
->>>> Am 26.06.24 um 11:28 schrieb Kiran K:
->>>>> BRI (Bluetooth Radio Interface) traffic from CNVr to CNVi was found
->>>>> causing cross talk step errors to WiFi. As a workaround, driver
->>>>> needs to reduce the drive strength of BRI. During *setup*, driver
->>>>> reads the drive strength value from efi variable and passes it to
->>>>> the controller via vendor specific command with opcode 0xfc0a.
->>>>
->>>> I am still surprised this is done via an EFI variable. Could you
->>>> please add a reference to section in the UEFI(?) specification?
->>>> Hopefully that explains who is supposed to set the variable.
->>>
->>> "UefiCnvCommonDSBR" efi  variable would be created by OEMs.
->>
->> Isn’t that approach fundamentally broken? How do the OEMs know, what
->> variable to set. It needs to be standardized somewhere (name and allowed
->> values). Also, there are non-UEFI firmwares, like coreboot based, used, for
->> example, with Google Chromebooks. Lastly, users can manipulate UEFI
->> variables to my knowledge.
-> 
-> Intel shares the information about the UEFI variables to customers
-> (via confidential documents). OEMs may modify these variables based
-> on the platform / re-work / BT NIC etc. Also these variables are
-> locked in BIOS, so I believe its not possible to modify these values
-> later.
-> 
-> For non-UEFI firmwares, driver would fetch the data from BIOS from
-> ACPI table.
-
-Why can’t ACPI tables be used for all? I strongly oppose to add such an 
-undocumented feature to the Linux kernel. Intel should oppose the 
-current practice.
-
-> Currently we don’t have requirement to support coreboot.
-> I would submit patches for the same if it comes in future :)
-
-Kind regards,
-
-Paul
