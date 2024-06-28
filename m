@@ -1,110 +1,91 @@
-Received: from mail-oi1-f172.google.com (mail-oi1-f172.google.com [209.85.167.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtpbgeu2.qq.com (smtpbgeu2.qq.com [18.194.254.142])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE14E1C683
-	for <linux-bluetooth@vger.kernel.org>; Fri, 28 Jun 2024 09:47:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EC375024E
+	for <linux-bluetooth@vger.kernel.org>; Fri, 28 Jun 2024 10:14:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.194.254.142
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719568029; cv=none; b=s9F1SvPHhKcFnMtWBYtwJsgnXXsPpI/uIURZG4ZsSTjMmgk6mGZFvL1ppLXIBA4OF6iTMmxFD5j98G+r/Z9M4rCYfR594F9ddJ3HKmfZbdeHgdYUF34kvZ5Q0dKtCoi4FvjYP8SizxP1IZE7NKa/hd08ckhqXk9iAVOiFeq4vng=
+	t=1719569662; cv=none; b=drmtfvSSJvhONqotWyYfSIUJtWuM7+gAEbAw4WdLx+QiFrbLTtEAXJOdhF4D1iv/ldtOqXONxWe44uDSIosMZa5L+HpnXUnreqTJxvwYKWIakSkcvcfWhzLlRgK4moVRe70tecMkyNxWRF0fGx6iKRvaqGbl5B05XkPT8nux83k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719568029; c=relaxed/simple;
-	bh=5itl+lkY6EP5bHTDxrULV78rC4ysfqX2g7f09+s0DL4=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=Ig266z37VEig/2uKZdTvKD0p2Ef1Z0XPdLtVxYrn3UXA8ShnkLkQxuwPvqCte7HuQefTJzdm7RLh8CTzEt9bySLrrmmDARnyZ//I6B3MOdcfa1JvNFlv7vNvKoNO2PnoAcsYLnQW6WSWGJqHYaHGa3M9HWh2yp7dtc9tYTQhL6g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DFlyxdFS; arc=none smtp.client-ip=209.85.167.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DFlyxdFS"
-Received: by mail-oi1-f172.google.com with SMTP id 5614622812f47-3d5eed9c62eso244555b6e.2
-        for <linux-bluetooth@vger.kernel.org>; Fri, 28 Jun 2024 02:47:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1719568027; x=1720172827; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=Z7cJVdQBCK1r6yK30LvPOt4NYupcXvNV71+i7IczAQc=;
-        b=DFlyxdFS35qbMgjt2nDjoaSQU/fL2saekZTbUrWGNC0LkIF252qihjICXF0MAcvXXu
-         7070J66kp/goTV6vDPHyWSVOWNqJEbm2z4QL39ySlvvHLr0fkxksHsLkrqTzC2diF0NC
-         YTANtb6k5zch6uSzCh05wfEgoOMC0kjrL6srmVrG/mvkODD9PAJxe/i48gN7Bc7GUkgy
-         gey8nrX9f74OaXXIaVZideC9VJJ3hJRoUvJh76JWh76RuPOE/yC8Rqyg2L+JT40Q44JG
-         6h5Vbw9bvZlRd1hvYrxG/Q+P2xpuU87892IL+at8WjGrEs3qeA5+eNXQrpRkRWDAlvI8
-         BtOw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719568027; x=1720172827;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Z7cJVdQBCK1r6yK30LvPOt4NYupcXvNV71+i7IczAQc=;
-        b=M/U7qiRxdOcPQLfWkE9MCQx7aswYEY5L3dh2+IgL4IOZ4FJT0W+g6Og2V/Af/bH99M
-         KxCGycWR62wUwiOtmAeIEYj7tfIgScmiBq1RoLP+OizEDrF1zrTaETZB/3dNPLnewkC7
-         ykdIxA0IM9hFzMELR37SsLG3zb1nTS779NNwkLF53xZEix+nUIPbW+8MLMd4GAbIQK8U
-         amiJGHaOHr5yAf7GsIacAH3blDfmzQZnI9zl0xiU+Gbg1wBU5T3G8GkFJXT+tzUL/Ekg
-         kkchmGLYRL1h3aEMH/jghFx1zPmCZm+4hWAXC5WkyVza6yU4seCHKn6TmF76uZVjpXU8
-         E6QA==
-X-Gm-Message-State: AOJu0YxFvgOjEThQpka0s+XNxzJETaj1hI0BIgn1CrZkl/t6Tci4yXL/
-	g2Z69JcJiXYo/45jdIxadVBafK7g9NxgfD6B7Lw4JxqPrAB/hSFbh3gLWg==
-X-Google-Smtp-Source: AGHT+IE0LCr7ypW2g57j5vL6VGeeULrqYyR4Fxh/jVRRMAasepLKU+tO6dkuIt3btErcUnoYAPpNiA==
-X-Received: by 2002:a05:6808:1a01:b0:3d5:60b4:74e with SMTP id 5614622812f47-3d560b40cb6mr10433344b6e.27.1719568026588;
-        Fri, 28 Jun 2024 02:47:06 -0700 (PDT)
-Received: from [172.17.0.2] ([13.88.100.228])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-70803fc8b5csm1146938b3a.130.2024.06.28.02.47.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 28 Jun 2024 02:47:06 -0700 (PDT)
-Message-ID: <667e869a.050a0220.acd7e.33a0@mx.google.com>
-Date: Fri, 28 Jun 2024 02:47:06 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============5613731164243082315=="
+	s=arc-20240116; t=1719569662; c=relaxed/simple;
+	bh=jCffkjUbybQRxJV27LiKk/svy8XGBwo5nd1AR0hlHiA=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=uQKUkcTCMn4W3kN/SWKXWvEF8E37s6d8pTWcD4QasjJercRgA0QBDYXMxK/XaryjxZnMt/S1V7RNxo247qwa/RXT0sgN7NqmyJqguPjR8sE4XzmswSp2h97JpL7S/aqFcdLNmSH0pH0zAOQ8Pg6o7TKe42YJE7QAAeoJ8TP0iWc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=uniontech.com; spf=pass smtp.mailfrom=uniontech.com; arc=none smtp.client-ip=18.194.254.142
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=uniontech.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniontech.com
+X-QQ-mid: bizesmtpsz10t1719569645tl7fin
+X-QQ-Originating-IP: Y0ZgNjIZseLHMdQrSLArJlgjhRxDC9EnhZOqAzPAelY=
+Received: from localhost.localdomain ( [113.57.152.160])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Fri, 28 Jun 2024 18:13:54 +0800 (CST)
+X-QQ-SSF: 0000000000000000000000000000000
+X-QQ-GoodBg: 1
+X-BIZMAIL-ID: 6547517565520991816
+From: Chengyi Zhao <zhaochengyi@uniontech.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Chengyi Zhao <zhaochengyi@uniontech.com>
+Subject: [PATCH] adapter: Add retry when bonding device returns connection failure
+Date: Fri, 28 Jun 2024 18:13:48 +0800
+Message-Id: <20240628101348.16820-1-zhaochengyi@uniontech.com>
+X-Mailer: git-send-email 2.20.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, r.smirnov@omp.ru
-Subject: RE: [BlueZ,v2] gatt-server: fix memory leak in bt_gatt_server_send_notification()
-In-Reply-To: <20240628075719.42796-1-r.smirnov@omp.ru>
-References: <20240628075719.42796-1-r.smirnov@omp.ru>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
+X-QQ-SENDSIZE: 520
+Feedback-ID: bizesmtpsz:uniontech.com:qybglogicsvrsz:qybglogicsvrsz3a-0
 
---===============5613731164243082315==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+When a user initiates pairing with a BLE Bluetooth mouse,
+MGMT_STATUS_CONNECT_FAILED(0x04) is returned with a low
+probability, resulting in pairing failure. To improve
+user experience, retry bonding is performed when
+MGMT_STATUS_CONNECT_FAILED is returned.
 
-This is automated email and please do not reply to this email!
+log:
+bluetoothd[1539]: src/adapter.c:pair_device_complete() Connect Failed (0x04)
+bluetoothd[1539]: src/adapter.c:bonding_attempt_complete() hci0 bdaddr DD:EC:0F:57:A9:2E type 2 status 0x4
+bluetoothd[1539]: src/device.c:device_bonding_complete() bonding 0x5591f87230 status 0x04
+bluetoothd[1539]: src/device.c:btd_device_set_temporary() temporary 1
+bluetoothd[1539]: src/device.c:device_bonding_failed() status 4
 
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=866451
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      0.26 seconds
-GitLint                       PASS      0.20 seconds
-BuildEll                      PASS      25.21 seconds
-BluezMake                     PASS      1761.46 seconds
-MakeCheck                     PASS      13.72 seconds
-MakeDistcheck                 PASS      191.98 seconds
-CheckValgrind                 PASS      263.42 seconds
-CheckSmatch                   WARNING   365.33 seconds
-bluezmakeextell               PASS      125.57 seconds
-IncrementalBuild              PASS      1546.59 seconds
-ScanBuild                     PASS      1033.94 seconds
-
-Details
-##############################
-Test: CheckSmatch - WARNING
-Desc: Run smatch tool with source
-Output:
-src/shared/gatt-server.c:278:25: warning: Variable length array is used.src/shared/gatt-server.c:621:25: warning: Variable length array is used.src/shared/gatt-server.c:720:25: warning: Variable length array is used.src/shared/gatt-server.c:278:25: warning: Variable length array is used.src/shared/gatt-server.c:621:25: warning: Variable length array is used.src/shared/gatt-server.c:720:25: warning: Variable length array is used.src/shared/gatt-server.c:278:25: warning: Variable length array is used.src/shared/gatt-server.c:621:25: warning: Variable length array is used.src/shared/gatt-server.c:720:25: warning: Variable length array is used.
-
-
+HCI package:
+Frame 2969: 7 bytes on wire (56 bits), 7 bytes captured (56 bits)
+Bluetooth
+Bluetooth HCI H4
+Bluetooth HCI Event - Disconnect Complete
+    Event Code: Disconnect Complete (0x05)
+    Parameter Total Length: 4
+    Status: Success (0x00)
+    Connection Handle: 0x0040
+    Reason: Connection Failed to be Established (0x3e)
 ---
-Regards,
-Linux Bluetooth
+ src/adapter.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
+diff --git a/src/adapter.c b/src/adapter.c
+index bdc5bf920..ca5eb077c 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -8367,6 +8367,16 @@ static void bonding_attempt_complete(struct btd_adapter *adapter,
+ 		}
+ 	}
+ 
++	if (status == MGMT_STATUS_CONNECT_FAILED) {
++		if (device != NULL) {
++
++			DBG("status is 0x%x, retry it.", status);
++
++			if (device_bonding_attempt_retry(device) == 0)
++				return;
++		}
++	}
++
+ 	/* Ignore disconnects during retry. */
+ 	if (status == MGMT_STATUS_DISCONNECTED &&
+ 					device && device_is_retrying(device))
+-- 
+2.20.1
 
---===============5613731164243082315==--
