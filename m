@@ -1,106 +1,135 @@
-Received: from mail-lj1-f172.google.com (mail-lj1-f172.google.com [209.85.208.172])
+Received: from mail-lj1-f182.google.com (mail-lj1-f182.google.com [209.85.208.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40CDE1E89A
-	for <linux-bluetooth@vger.kernel.org>; Fri, 28 Jun 2024 13:56:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 515111E889
+	for <linux-bluetooth@vger.kernel.org>; Fri, 28 Jun 2024 14:01:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719582965; cv=none; b=bX/phA+7MpZwgvzlGE6JRDACWEQ9+/86Lhop9DbARQIlYllrVtsZFh/KmPtSbIi1s+67O3kuxe/rHS7OBBRpw2+yjf3QYeKOusBp41hC2CyFbXwff5xmLmnZ4H6WHNfFRniOidExMn3OzRnzTgx0TUINKB542tz6a1CxERsi/ZM=
+	t=1719583261; cv=none; b=k4ApQGnBubhuCaB9SDJKOcF5XYSRBkQexqwuI79SYSretO87JxT5l5D0znLeM0Vih35PbBXpUrfqji7TJrDBMVUBG+xle/Yw9nkht0r10YKibKEen5Tht+LKgepP5M5csKE5EvSUwSuoQYD3tw/NLIWAfqtgAYmIlDZ/WOGUSBE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719582965; c=relaxed/simple;
-	bh=2WT6XO0V62MZedmd71IZ+mxpC+L7m74Vxbs1h0u0TrE=;
+	s=arc-20240116; t=1719583261; c=relaxed/simple;
+	bh=HYVhYt9CYD6kEHG66C7T+RSvk4gN5sKU7Hae6U/CgzQ=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=TZ3jOEK+GAasHObfZyjpFqIGqjL/eAPKkYQZut7B7X5Eg/6A9TkZb/eXhWs0c7c1bxIefZ5BzCEGIJ8UVkyW7xP+kUWFQuxDcfdetrs4yjoou/T/iRZnyRuiZn1NbAgHU2o3QafFElCOHvy3xVNjl5yMtunzTW7jphNBSg8BYDg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=S8A12mWM; arc=none smtp.client-ip=209.85.208.172
+	 To:Cc:Content-Type; b=o/zzslycr/3wIzJcSDEy2Eacr6M4nL8KR1Xc/A3QVzQ82KgRxo10qMLc6gK6EcbmJD27u9S7tNk9X3NHKsmAZShOGcixOGUjSVY6v/vfKAK3WvUKUPy/Z9hB3hBfKzhdi0O0eXD42HJA81gSpGu8RZhVVCV7XOOfoA/sQbrw8Q4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VxWztP8X; arc=none smtp.client-ip=209.85.208.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="S8A12mWM"
-Received: by mail-lj1-f172.google.com with SMTP id 38308e7fff4ca-2ebe40673d8so7899151fa.3
-        for <linux-bluetooth@vger.kernel.org>; Fri, 28 Jun 2024 06:56:03 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VxWztP8X"
+Received: by mail-lj1-f182.google.com with SMTP id 38308e7fff4ca-2ec0f3b9cfeso7522451fa.0
+        for <linux-bluetooth@vger.kernel.org>; Fri, 28 Jun 2024 07:01:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1719582962; x=1720187762; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1719583258; x=1720188058; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=HtnFPmGPWjcm6svwIxp2RkM5bbn94pbHMyCJWCEVaYg=;
-        b=S8A12mWMIQPb7e7UPdJepveVoE0lP9+srefsVYdwJKUaSa7WqdFDBA1CufcXljci+w
-         eUfiJAJAeRRTv6ImOo1F3n70/1Hz1hda7+0PtyvXQdaqwfV8Z2vOIqfbOxmUXu3z6/1Z
-         ULnhJIAFZArXMfAjiAiVA/sbgAGSw5ym4O14BCv8nGdLgyseoiu7kKFVRyKq5dAd12mB
-         7uZplqEDVRcAI7vmuj7yxA2PcaLoFtVCjCMc9pPANdd4KOm3962P6vAknaPVXWttsnpu
-         0K95SzabDEQCpC+RyvOIVIkOOeEEP9y7betbLDylDTTp3I1XlUejiRLZPKvoUbLUwywY
-         ypdQ==
+        bh=XiReLN0IDkDIPMMJcL2I03RV15tWZLpz7OA3fdYz2o4=;
+        b=VxWztP8XzrsM7mLWd5Y2r8G/wCMsL6zgNCalD47Fz2DCn4tcb0Ig7SXM4o+L1D0RTa
+         8ZvhMTF2vBuDPINxQe7Fck/yRwu9Mbj5RhyE+Zc4bBoivGbvgAboT0uOmtdjEHAgbBrn
+         gCjLKhocJxcNFUGmRpFfU5uElLMH6doRwtdCQEhHM1cUaIyRPeE+H1gfmrBNoeWQUSXP
+         wqMgrU++E/2wixqn1IMDK9EaDJ4r6Wd4aJL36rsG+ncCsExa+MZK1cLJmsdi0h0yIeDx
+         RUxZtw9T/WRHXI0hcJSG6LwQgcSrI3Pd/vrguZIfdipAk9Pnife4BpOGwyrfQkdVW0NQ
+         OELw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719582962; x=1720187762;
+        d=1e100.net; s=20230601; t=1719583258; x=1720188058;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=HtnFPmGPWjcm6svwIxp2RkM5bbn94pbHMyCJWCEVaYg=;
-        b=rHRro/U6w68bF4gRbdy5P/WzuCizvxfVVbarFSN7ON9SjZx0midzCesIolnN0cc/bL
-         eaWR8De3SAdT/5okAAPMb3BPL+qCcA6GGEbUEpfYPVa5GgtKm9H1Tv1uzx8OGGFZD/tp
-         pTwwEMtGmd8HI4OAm+yDQ1nuNtp4vIG3gTjfANPcQZhi4zRwCUeVZPyTaPVnzC2eapMg
-         1eVCz9TauU1iC+YAHQLh3fkWjdw1TJROLQ6RAl9VFjnf45RczMpiO2LVmBisdFNTQ/sO
-         R2ZPCyLOo2PNYAOzbXbLpVG211bwnFNFvLSZEClpseMggR9bz1EbPo/GVWXqexA5n453
-         O41Q==
-X-Gm-Message-State: AOJu0Yw/D7sj4TOVGt5N+eIaCRsLzce0sYDzUUofwhK9DdBD2fVZkyCf
-	XZrnOuBqy5Pc9hqtuenUp4zLz5pc4M4ib/73Rl6PO+zCkLJXJcmA9bJDvd/QjtVsffyBJ44UKnS
-	A9s43FRCmADQzobCgoD0qcI1SLGU3XQ==
-X-Google-Smtp-Source: AGHT+IGeLqJ7lJsTaWryrjP6jgT26xqCvHoRQGKmbZqmVVOaDKfLCHpmIiA2C4Oc2cMbAW+zciWGX+8ERgyagndJAao=
-X-Received: by 2002:a05:651c:211d:b0:2ec:5dfc:a64e with SMTP id
- 38308e7fff4ca-2ec5dfca6demr122412301fa.0.1719582962038; Fri, 28 Jun 2024
- 06:56:02 -0700 (PDT)
+        bh=XiReLN0IDkDIPMMJcL2I03RV15tWZLpz7OA3fdYz2o4=;
+        b=dYpNlIgQiT/DVeW7TNvPaLTADyi8oZJwYRoXLSRNG8/citijhNbVzKxacRHUzSjiU7
+         k0oWN5wjN4ZKp2HTuzzMc48wFLOjnnhFDddM3qxi/oNOOBsGIR6n7n/OFldPdFOJbb+O
+         QSWbbGT5ZMURcVPg0YNIu6HFkk5GaTWodGcIhS6ZKkGtRg0Al2xoe+F1TX3X7NWk5w9V
+         5iNwOLjfLJG7ykXi8Ot9S3X6tISEchZssL9yIaZab9xmGBvx2npN6TJD3/xwQvNZ3XH6
+         Mh84kUaoz3BzL4938M7CuaQub9RzdBP1q/nihp1Cpi/7TsgE1bTr4o+HmYfQaGgfPQZz
+         zCuQ==
+X-Gm-Message-State: AOJu0YwFiwxJ+ZjENRVG29GBH1nfJOQom3a+GpHhoGRV7ubS4I6/G2wj
+	zw59/13y3KdzbBZroVrWIU4FO7aYkOvH9WlDkNnF9gS9UmRAIq4+KfSa6lKx9fvs8WH/mNyVuiu
+	yasqhFcqMaFgEgiaCEFCvz8aiX2fi6Q==
+X-Google-Smtp-Source: AGHT+IHznJh8RgvLBGIXWFR4hHrLXx2WUztf33qMcUkpK7h6RF3jZ2TIn1/Qlii/neh78IP6SUfH7sJeszC/5TEmE1s=
+X-Received: by 2002:a2e:9cd4:0:b0:2ec:520d:f1dd with SMTP id
+ 38308e7fff4ca-2ec593be843mr99192821fa.3.1719583258283; Fri, 28 Jun 2024
+ 07:00:58 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240628105521.540629-1-r.smirnov@omp.ru>
-In-Reply-To: <20240628105521.540629-1-r.smirnov@omp.ru>
+References: <20240628101348.16820-1-zhaochengyi@uniontech.com>
+In-Reply-To: <20240628101348.16820-1-zhaochengyi@uniontech.com>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Fri, 28 Jun 2024 09:55:49 -0400
-Message-ID: <CABBYNZLSBmyT9+XBHH_hftfCXSAB8XKvmsSUsobUEu0NM=fL=w@mail.gmail.com>
-Subject: Re: [PATCH BlueZ v1] a2dp: add NULL check to a2dp_reconfig()
-To: Roman Smirnov <r.smirnov@omp.ru>
+Date: Fri, 28 Jun 2024 10:00:45 -0400
+Message-ID: <CABBYNZKCymZyj2qXwrTYCPuWf4SAEKehcPsA6+CEL-TBxzLNBg@mail.gmail.com>
+Subject: Re: [PATCH] adapter: Add retry when bonding device returns connection failure
+To: Chengyi Zhao <zhaochengyi@uniontech.com>
 Cc: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi Roman,
+Hi Chengyi,
 
-On Fri, Jun 28, 2024 at 6:56=E2=80=AFAM Roman Smirnov <r.smirnov@omp.ru> wr=
-ote:
+On Fri, Jun 28, 2024 at 6:15=E2=80=AFAM Chengyi Zhao <zhaochengyi@uniontech=
+.com> wrote:
 >
-> Add chan->session check for NULL before dereferencing.
+> When a user initiates pairing with a BLE Bluetooth mouse,
+> MGMT_STATUS_CONNECT_FAILED(0x04) is returned with a low
+> probability, resulting in pairing failure. To improve
+> user experience, retry bonding is performed when
+> MGMT_STATUS_CONNECT_FAILED is returned.
 >
-> Found by Linux Verification Center (linuxtesting.org) with the SVACE
-> static analysis tool.
+> log:
+> bluetoothd[1539]: src/adapter.c:pair_device_complete() Connect Failed (0x=
+04)
+> bluetoothd[1539]: src/adapter.c:bonding_attempt_complete() hci0 bdaddr DD=
+:EC:0F:57:A9:2E type 2 status 0x4
+> bluetoothd[1539]: src/device.c:device_bonding_complete() bonding 0x5591f8=
+7230 status 0x04
+> bluetoothd[1539]: src/device.c:btd_device_set_temporary() temporary 1
+> bluetoothd[1539]: src/device.c:device_bonding_failed() status 4
+>
+> HCI package:
+> Frame 2969: 7 bytes on wire (56 bits), 7 bytes captured (56 bits)
+> Bluetooth
+> Bluetooth HCI H4
+> Bluetooth HCI Event - Disconnect Complete
+>     Event Code: Disconnect Complete (0x05)
+>     Parameter Total Length: 4
+>     Status: Success (0x00)
+>     Connection Handle: 0x0040
+>     Reason: Connection Failed to be Established (0x3e)
 > ---
->  profiles/audio/a2dp.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
+>  src/adapter.c | 10 ++++++++++
+>  1 file changed, 10 insertions(+)
 >
-> diff --git a/profiles/audio/a2dp.c b/profiles/audio/a2dp.c
-> index a3c294bc3..3f9deb9f8 100644
-> --- a/profiles/audio/a2dp.c
-> +++ b/profiles/audio/a2dp.c
-> @@ -1893,7 +1893,8 @@ static int a2dp_reconfig(struct a2dp_channel *chan,=
- const char *sender,
->                         }
+> diff --git a/src/adapter.c b/src/adapter.c
+> index bdc5bf920..ca5eb077c 100644
+> --- a/src/adapter.c
+> +++ b/src/adapter.c
+> @@ -8367,6 +8367,16 @@ static void bonding_attempt_complete(struct btd_ad=
+apter *adapter,
+>                 }
+>         }
 >
->                         /* Check if stream is for the channel */
-> -                       if (!avdtp_has_stream(chan->session, tmp->stream)=
+> +       if (status =3D=3D MGMT_STATUS_CONNECT_FAILED) {
+> +               if (device !=3D NULL) {
+> +
+> +                       DBG("status is 0x%x, retry it.", status);
+> +
+> +                       if (device_bonding_attempt_retry(device) =3D=3D 0=
 )
-> +                       if (!chan->session ||
-> +                               !avdtp_has_stream(chan->session, tmp->str=
-eam))
->                                 continue;
+> +                               return;
+> +               }
+> +       }
 
-Move the check for !session inside avdtp_has_stream.
+There is already an if statement to handle retrying, not sure why you
+didn't modify it?
 
->                         err =3D avdtp_close(chan->session, tmp->stream, F=
-ALSE);
+>         /* Ignore disconnects during retry. */
+>         if (status =3D=3D MGMT_STATUS_DISCONNECTED &&
+>                                         device && device_is_retrying(devi=
+ce))
 > --
-> 2.43.0
+> 2.20.1
 >
 >
 
