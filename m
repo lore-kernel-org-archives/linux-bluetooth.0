@@ -1,123 +1,92 @@
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C60013DDC9
-	for <linux-bluetooth@vger.kernel.org>; Fri, 28 Jun 2024 07:24:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 148361420A8
+	for <linux-bluetooth@vger.kernel.org>; Fri, 28 Jun 2024 07:48:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719559456; cv=none; b=sJr0ESnUjMl/ZPskF9ts9X9AhF9pChOokQkImkHdCaIL7kaVkrXYXT/TDd2KBX10EPfsfyZb7O4hOp4dzMI5siVUtOZVYaU4aAJ1cZkRiv5TMqvJM2zSKLhyshvb/Mn+x/RnIpE7EZIRexZPozBb+NNZMbwFJH87MO3wWQB7XLo=
+	t=1719560910; cv=none; b=h6cpHc30Q0QNt4Z7MH4ObnaoQ7GsXNDY5wEv3SI3gR7OzE1jRGWZekLKpB2X/34LAagkb+HJjj6RepyjOGaxzjbJOKOICQ20BmTMiXaXZV8n5uHxAJyokZr/4reH3TU51iobExwkmZNj/yUwIEq8N3B1A7xKrTbwi9pNDCwIlr8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719559456; c=relaxed/simple;
-	bh=nkapJ87y0CPOaFwC3JdAX0Xkt2UUA85Gh+FZukzfnN8=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=CAWjaYZBR4Zu11i0TAoFzJTjSmO6z3tHp3mMh5/mP0aedupBEok7Q7VD2agfrobpgIW+ahH5AJwGoUE5Vbm9sCRj0UGFBxcBjltoeq56exqhHUb6dSbmNskreMZsbbPCx+rAYpnyuNa/G0AmoKZh3Z+Boh1YB+CtDkcwtWvcYLI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=mlMBXhvf; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="mlMBXhvf"
-Received: from pps.filterd (m0279871.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 45S4wEm8031934;
-	Fri, 28 Jun 2024 07:24:12 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:message-id
-	:mime-version:subject:to; s=qcppdkim1; bh=7iDJytP4QfdX4g6oFMIYf5
-	i8JhryGkjonj7yFENxq1I=; b=mlMBXhvfnuTMJFenCj2JVgiODIhRYLSteNHBUb
-	O14oWeg/EwvU1U4W77zNd/K9ytF7V4u7ecBX5tJvk249efYKIAEmnQ29kLMz7d8I
-	3DsktQWgNsc3auk2mU6lN55HQ36hBf3rMcVHlL/fVDZHjo23qbo+g9i/K3dUAubX
-	3xyCjZU7/I71m03/dsEGglX68HnOzCBZOZVXun4Hgzr73fYkH5ySQCQbCoVp8lBU
-	UpmXUbWfQf63rHRcauQ/xcvZRwAF5MYKggoGU85cKU69yeW+xhwoRi8i0+0qPQcJ
-	+X8M4tytFs8o3zOfxeOaWmDaN2TOO1LfjWbMdhQYPrv5euuQ==
-Received: from nalasppmta03.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 401pm589w5-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 28 Jun 2024 07:24:12 +0000 (GMT)
-Received: from nalasex01b.na.qualcomm.com (nalasex01b.na.qualcomm.com [10.47.209.197])
-	by NALASPPMTA03.qualcomm.com (8.17.1.19/8.17.1.19) with ESMTPS id 45S7OBj9007714
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 28 Jun 2024 07:24:11 GMT
-Received: from hu-prathm-hyd.qualcomm.com (10.80.80.8) by
- nalasex01b.na.qualcomm.com (10.47.209.197) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.9; Fri, 28 Jun 2024 00:24:08 -0700
-From: <quic_prathm@quicinc.com>
+	s=arc-20240116; t=1719560910; c=relaxed/simple;
+	bh=+i3gqne2mi/6lu6jUTxae/9ibE3KYRLolVZdMO5A6CU=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=IkVNb9TGHIidxVkQz1KEO7DJykTGw+CrvP9BcXAJacFGkXLBIpfbTO5ujFEQCsErj9ZDeiDnCFmehBybpkpRI/yhyOVqdZ+fizIspYXR5pYHNgOFwgH47QN+oo7g8ltnw0QePWNycpl32gF4rkyHPHx5PqLVcD0MFgq/EuLs/Iw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
+Received: from localhost.localdomain (84.18.99.27) by msexch01.omp.ru
+ (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Fri, 28 Jun
+ 2024 10:48:02 +0300
+From: Roman Smirnov <r.smirnov@omp.ru>
 To: <linux-bluetooth@vger.kernel.org>
-CC: <luiz.dentz@gmail.com>, <quic_mohamull@quicinc.com>,
-        <quic_hbandi@quicinc.com>, <quic_anubhavg@quicinc.com>
-Subject: [PATCH v1] Added BREDR not supported bit in AD Flag when discoverable is off
-Date: Fri, 28 Jun 2024 12:53:42 +0530
-Message-ID: <20240628072342.2256-1-quic_prathm@quicinc.com>
-X-Mailer: git-send-email 2.17.1
+CC: Roman Smirnov <r.smirnov@omp.ru>
+Subject: [PATCH BlueZ v1] core: add NULL check to adapter_service_remove()
+Date: Fri, 28 Jun 2024 10:47:49 +0300
+Message-ID: <20240628074750.35992-1-r.smirnov@omp.ru>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="y"
 Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nalasex01b.na.qualcomm.com (10.47.209.197)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: YWlrbfq1blN8PqWOUKn-kDMDYkix89Nb
-X-Proofpoint-ORIG-GUID: YWlrbfq1blN8PqWOUKn-kDMDYkix89Nb
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-06-28_03,2024-06-28_01,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999 mlxscore=0
- priorityscore=1501 phishscore=0 adultscore=0 suspectscore=0 spamscore=0
- malwarescore=0 lowpriorityscore=0 bulkscore=0 impostorscore=0
- clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2406140001 definitions=main-2406280053
+Content-Type: text/plain
+X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
+ (10.188.4.12)
+X-KSE-ServerInfo: msexch01.omp.ru, 9
+X-KSE-AntiSpam-Interceptor-Info: scan successful
+X-KSE-AntiSpam-Version: 6.1.0, Database issued on: 06/28/2024 07:32:36
+X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
+X-KSE-AntiSpam-Method: none
+X-KSE-AntiSpam-Rate: 19
+X-KSE-AntiSpam-Info: Lua profiles 186203 [Jun 28 2024]
+X-KSE-AntiSpam-Info: Version: 6.1.0.4
+X-KSE-AntiSpam-Info: Envelope from: r.smirnov@omp.ru
+X-KSE-AntiSpam-Info: LuaCore: 21 0.3.21
+ ebee5449fc125b2da45f1a6a6bc2c5c0c3ad0e05
+X-KSE-AntiSpam-Info: {rep_avail}
+X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
+X-KSE-AntiSpam-Info: {SMTP from is not routable}
+X-KSE-AntiSpam-Info:
+	d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2;omp.ru:7.1.1
+X-KSE-AntiSpam-Info: ApMailHostAddress: 84.18.99.27
+X-KSE-AntiSpam-Info: {DNS response errors}
+X-KSE-AntiSpam-Info: Rate: 19
+X-KSE-AntiSpam-Info: Status: not_detected
+X-KSE-AntiSpam-Info: Method: none
+X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
+ smtp.mailfrom=omp.ru;dkim=none
+X-KSE-Antiphishing-Info: Clean
+X-KSE-Antiphishing-ScanningType: Heuristic
+X-KSE-Antiphishing-Method: None
+X-KSE-Antiphishing-Bases: 06/28/2024 07:36:00
+X-KSE-Antivirus-Interceptor-Info: scan successful
+X-KSE-Antivirus-Info: Clean, bases: 6/28/2024 4:47:00 AM
+X-KSE-Attachment-Filter-Triggered-Rules: Clean
+X-KSE-Attachment-Filter-Triggered-Filters: Clean
+X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
-From: Prathibha Madugonde <quic_prathm@quicinc.com>
-
-Fix for GAP/DISC/NONM/BV-02-C
-As per GAP.TS.p44 test spec
-IUT does not contain General Discoverable mode and Limited Discoverable
-mode in the AD Type Flag. IUT shall send AD Type Flag to PASS the test
-case, thus added BR/EDR not supported bit in the AD Type Flag when
-discoverable is off.
-
-Signed-off-by: Prathibha Madugonde <quic_prathm@quicinc.com>
+Make adapter_service_remove() safe for passing NULL pointers.
 ---
- src/advertising.c | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
+ src/adapter.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/src/advertising.c b/src/advertising.c
-index 5d373e088..9857ceceb 100644
---- a/src/advertising.c
-+++ b/src/advertising.c
-@@ -1444,6 +1444,7 @@ static DBusMessage *parse_advertisement(struct btd_adv_client *client)
+diff --git a/src/adapter.c b/src/adapter.c
+index bdc5bf920..57e4dcd54 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -1349,6 +1349,10 @@ int adapter_service_add(struct btd_adapter *adapter, sdp_record_t *rec)
+ void adapter_service_remove(struct btd_adapter *adapter, uint32_t handle)
  {
- 	struct adv_parser *parser;
- 	int err;
-+	uint8_t flags;
- 
- 	for (parser = parsers; parser && parser->name; parser++) {
- 		DBusMessageIter iter;
-@@ -1499,6 +1500,21 @@ static DBusMessage *parse_advertisement(struct btd_adv_client *client)
- 		goto fail;
- 	}
- 
-+	if (!btd_adapter_get_discoverable(client->manager->adapter)) {
-+		/* GAP.TS.p44 Test Spec GAP/DISC/NONM/BV-02-C
-+		 * page 158:
-+		 * IUT does not contain
-+		 * ‘LE General Discoverable Mode’ flag or the
-+		 * ‘LE Limited Discoverable Mode’ flag in the Flags AD Type
-+		 * But AD Flag Type should be there for the test case to
-+		 * PASS. Thus BR/EDR Not Supported BIT shall be included
-+		 * in the AD Type flag.
-+		 */
-+		flags = bt_ad_get_flags(client->data);
-+		flags |= BT_AD_FLAG_NO_BREDR;
-+		bt_ad_add_flags(client->data, &flags, 1);
-+	}
+ 	sdp_record_t *rec;
++	
++	if (!adapter)
++		return;
 +
- 	err = refresh_advertisement(client, add_adv_callback);
- 
- 	if (!err)
+ 	/*
+ 	 * If the controller does not support BR/EDR operation,
+ 	 * there is no point in trying to remote SDP records.
 -- 
-2.17.1
+2.43.0
 
