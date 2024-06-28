@@ -1,60 +1,65 @@
-Received: from mail-ua1-f44.google.com (mail-ua1-f44.google.com [209.85.222.44])
+Received: from mail-vs1-f44.google.com (mail-vs1-f44.google.com [209.85.217.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB2E5D2E5
-	for <linux-bluetooth@vger.kernel.org>; Fri, 28 Jun 2024 16:47:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A97C1C9ED9
+	for <linux-bluetooth@vger.kernel.org>; Fri, 28 Jun 2024 16:47:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719593227; cv=none; b=NG9GOCKory1hLKCIERyqSCsE/ZQ+hLmnwhqgfW5JvyT0Iw2bHe4aqBskvj50wecKPN1ZEmWWMg/eCXaHa4RFj8upVAYQ6vgen3ddTBkKQPRssaW4py2AncZ9ShzGhyqjRaXMQ54SuY6R/tOCy/v9UJ3je/TQJXzzchI1zATrb8s=
+	t=1719593229; cv=none; b=ieCJGOzLGNiORb8EgqiouNrZGIFVFptHHMltko8Le3cH7A5cVxAstGAV1j57R0Zfo5nzmgVuxjEYPd+LlSj8Cs296NxGlvbIWojwX3pLb+kRORNt5d8CPD6yZYnZa51Gd5QCQkqCuqfkHWrTqQ8UtjsiCXapqoq68zVQ27NnIbA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719593227; c=relaxed/simple;
-	bh=p20ejLKdvCU/3URq16KIqjJK83eX1LezeXiC8IDLNb0=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=DFc+u6fBB83SXU0/GDcBS37dAlqC1MJiAEKhoKh4unjSGsJTA20xCIhr/tvP6ajZvmzG0vQUrtrEmaOZy4yN66nWMUzfnz9jCwfElR9mDhpAVQA3TSCUKrIM33hDFlOtNTFtptDs8QUF54vGPEuCyj8Cc5ilBfP+sH0hDma9las=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=anyGeQlS; arc=none smtp.client-ip=209.85.222.44
+	s=arc-20240116; t=1719593229; c=relaxed/simple;
+	bh=fMZFZ4SGSQxcOUSIYYOLwFZxOsqlMxEP7zWe9E0XG4k=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=H3up+cBisUTZD01TYRmt8G2rm+2MevXL+pRjbn/ilaMr+SMFf/RGsvAelU2xMWS4IPCxJroqabGueIAvwsToM4+E5cvJapQYyoWGZT6qKQQwV53tPEtXxjfovDgsvLvwvyAN5iyJJMof2OIhDsXZBsOSdxkL13xFYKhrcOiTAFk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hn6ivYk/; arc=none smtp.client-ip=209.85.217.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="anyGeQlS"
-Received: by mail-ua1-f44.google.com with SMTP id a1e0cc1a2514c-80f6525a0c2so254691241.1
-        for <linux-bluetooth@vger.kernel.org>; Fri, 28 Jun 2024 09:47:05 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hn6ivYk/"
+Received: by mail-vs1-f44.google.com with SMTP id ada2fe7eead31-48f96299046so317683137.2
+        for <linux-bluetooth@vger.kernel.org>; Fri, 28 Jun 2024 09:47:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1719593224; x=1720198024; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=TRD5dLdGtkO/Gix7WtjHG2m2ijNexEx8WM/0tlXfUVM=;
-        b=anyGeQlSbbJh7Ebx1FPtPYi+69g6ukyP7Pf6QSKXmhJNczCPHmmCqD0ogfbjzIN8Q/
-         u3edwoy2Y2Doz8kSrbFoO7DajczhqX9rP71JYqrCglDlEbml4pCQRWoAbHn1H4vhNNI7
-         VoDH6x/FxT89iBxCjO1qwjPiuJ0PHIZqbbcqxEvwH0OcOVawRI7JVjczwqzFanDegdu7
-         dO4AgaSLyk7xEUmnezV+NCG9ZUzu3eGmj5LB1lRdEqYB+pTJ7+4WO2M2GTFdOEQQsJ4/
-         jJXwKCwdkBJjIZZ8vphKRU16FoKqn/d/JsDjuF0RBzNv2/jf0ZzaQdUeYKnkPkvpDCm/
-         c7PA==
+        d=gmail.com; s=20230601; t=1719593226; x=1720198026; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=QjFdzzq+qCCDquDoPp7hm7JIC9/jrQWFcKwCJrWETHM=;
+        b=hn6ivYk/iVGmUBk3ZiYrnP9Io126Pw4tN16RQYHqFDjUHdtLnIgrBX6qUx1es4SK5s
+         nOjDisbaT8WXoagRpH+svb9k1aWlgzDXTZoMEqaMh2D6bqV3fBxrgx9Y3pNKV+Id3xAb
+         +94YjA5e6NLDhA9OAP+HOCCFVIw+87xB4G1djyOliP9hjqa7IU5cykNACLRf7n021IWi
+         7Z0KOEGhxDnpwwTiUYhO7JUazqSD+02Jh4jabn5RcVwR5Yli/PkCGoDs3o/R62R9/mQX
+         dt803GLKHaOnhFGwMttj9dRhvXGmwFxAg2/cIw7dILrDmz5yE3i0gxQczGGDoyUCFQt6
+         j+xw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719593224; x=1720198024;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=TRD5dLdGtkO/Gix7WtjHG2m2ijNexEx8WM/0tlXfUVM=;
-        b=slxsDBUYtFfrkrSPqe6TmzpjVqnnwtnoSHa3cQTsVj75u4JISk5bCH3J711II/4H7V
-         conrVs1dh1JVO5GRSaR0ezQe6CQ9Tu+L1j2ohod70uo99Zb/+gHP6dB9CsSg9okvCtF3
-         oIyS4Uwz8lpqO5pNjhibr1DcOQfWmMDiAcG08x1jxmNrelRU8j1tsgYRQlzzd7CvJxxB
-         jz3QpOc+FQ1SVZPUp8M7E27PjABg3hOsRjUp/+ghCqoufi32fzxxuYljtDJXlzYn1RqG
-         le1XR8Isr4J6n8kiTEfZ5VOls+u+JoJNOqxgH8p37+ugy0/FPAHcWR0WIl9FO9fHDdzm
-         R9kg==
-X-Gm-Message-State: AOJu0YydSGjxjnWU05OdDPfxajsSmJb9Fx/oq5G6rwioReCdrewt1TB5
-	UwYgpVbpejxcYAvFfrFNT0SZKuiVCTnDC34Os0EftUI/6wAzJTVXicms9g==
-X-Google-Smtp-Source: AGHT+IGBTfxCADuqO0LZ/P5EBFSjK9J+45qet43HCBPKjYx66WFIyFLvZYUrdDTv3oi/cOzvuPQc0w==
-X-Received: by 2002:a05:6102:2255:b0:48d:a159:dd80 with SMTP id ada2fe7eead31-48f4efecd1dmr17737408137.12.1719593223793;
-        Fri, 28 Jun 2024 09:47:03 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1719593226; x=1720198026;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=QjFdzzq+qCCDquDoPp7hm7JIC9/jrQWFcKwCJrWETHM=;
+        b=qoomW1TThEgADfIRBx3jYe2wfTgFXQWpg35FYJn+5OwskBx1d/T/71sq/bEsP1fap2
+         aJEzeNzjgdVGi8CYEHFy0jNQ86Ws8TSaO0GKsh97jEq/1Qy2p5/0GXgnifYPg0KC9jzr
+         GQLCF+gM5/HedcxXHPlHXeU74Lwd4vIOlfqwf2351KihkqEJjrX8Bt6jle8+tZLCV8TR
+         0XsJ0USaq/TMsm3hY0V40DYuC/XVJrw+JZplSgTHkCqxCLS0qX8EVstr59JooZTm1/Fe
+         EQ+Gslw7Zpsfz8SP+x8HHNtHfh4Zx/tsL0zKyKgm3ayFTRF4ISZ9mSTIy8zs0AVk8FNd
+         qClA==
+X-Gm-Message-State: AOJu0YyJlNqUroBcpVXS68gXhj0WnlWH4NTIcLy/3olDfkzLh4maGDbn
+	Tsy9v91Ujlj6K95XUChcbTHBQUTwCCqC1apFZF91vk6MiQcWTXFymUS+sQ==
+X-Google-Smtp-Source: AGHT+IGTosclt8FLQvUYcF6gbG6XrobYQe2Zw/8kODPGzpu+HtxZiMeLslRSGBhcyEJ0vF8/l53Ofg==
+X-Received: by 2002:a05:6102:3557:b0:48f:9586:551 with SMTP id ada2fe7eead31-48f958607b7mr4987983137.4.1719593225622;
+        Fri, 28 Jun 2024 09:47:05 -0700 (PDT)
 Received: from lvondent-mobl4.. (syn-107-146-107-067.res.spectrum.com. [107.146.107.67])
-        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-80fdda531b8sm273373241.16.2024.06.28.09.47.02
+        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-80fdda531b8sm273373241.16.2024.06.28.09.47.03
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 28 Jun 2024 09:47:03 -0700 (PDT)
+        Fri, 28 Jun 2024 09:47:04 -0700 (PDT)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v2 1/2] org.bluez.LEAdvertisement: Promote experimental properties to stable
-Date: Fri, 28 Jun 2024 12:47:00 -0400
-Message-ID: <20240628164701.626148-1-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v2 2/2] advertising: Promote experimental properties to stable
+Date: Fri, 28 Jun 2024 12:47:01 -0400
+Message-ID: <20240628164701.626148-2-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.45.2
+In-Reply-To: <20240628164701.626148-1-luiz.dentz@gmail.com>
+References: <20240628164701.626148-1-luiz.dentz@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -68,126 +73,69 @@ From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 This promotes experimental properties to stable since they have been in
 use for quite a while without any changes.
 ---
- doc/org.bluez.LEAdvertisement.rst      | 28 +++++++++++++-------------
- doc/org.bluez.LEAdvertisingManager.rst | 12 +++++------
- 2 files changed, 20 insertions(+), 20 deletions(-)
+ src/advertising.c | 21 +++------------------
+ 1 file changed, 3 insertions(+), 18 deletions(-)
 
-diff --git a/doc/org.bluez.LEAdvertisement.rst b/doc/org.bluez.LEAdvertisement.rst
-index 4609bde74a5e..d3f9cc480470 100644
---- a/doc/org.bluez.LEAdvertisement.rst
-+++ b/doc/org.bluez.LEAdvertisement.rst
-@@ -83,8 +83,8 @@ dict ServiceData
- 	Service Data elements to include. The keys are the UUID to associate
- 	with the data.
+diff --git a/src/advertising.c b/src/advertising.c
+index 5d373e0884b1..dce79bbb51c0 100644
+--- a/src/advertising.c
++++ b/src/advertising.c
+@@ -1129,10 +1129,6 @@ static bool parse_min_interval(DBusMessageIter *iter,
+ {
+ 	uint32_t min_interval_ms;
  
--dict Data [Experimental]
--````````````````````````
-+dict Data
-+`````````
+-	/* Only consider this property if experimental setting is applied */
+-	if (!(g_dbus_get_flags() & G_DBUS_FLAG_ENABLE_EXPERIMENTAL))
+-		return true;
+-
+ 	if (!iter) {
+ 		client->min_interval = 0;
+ 		return false;
+@@ -1162,10 +1158,6 @@ static bool parse_max_interval(DBusMessageIter *iter,
+ {
+ 	uint32_t max_interval_ms;
  
- 	Advertising Data to include. Key is the advertising type and value is
- 	the data as byte array.
-@@ -101,8 +101,8 @@ dict Data [Experimental]
- 		<Transport Discovery> <Organization Flags...>
- 		0x26                   0x01         0x01...
+-	/* Only consider this property if experimental setting is applied */
+-	if (!(g_dbus_get_flags() & G_DBUS_FLAG_ENABLE_EXPERIMENTAL))
+-		return true;
+-
+ 	if (!iter) {
+ 		client->max_interval = 0;
+ 		return false;
+@@ -1195,10 +1187,6 @@ static bool parse_tx_power(DBusMessageIter *iter,
+ {
+ 	int16_t val;
  
--bool Discoverable [Experimental]
--````````````````````````````````
-+bool Discoverable
-+`````````````````
+-	/* Only consider this property if experimental setting is applied */
+-	if (!(g_dbus_get_flags() & G_DBUS_FLAG_ENABLE_EXPERIMENTAL))
+-		return true;
+-
+ 	if (!iter) {
+ 		client->tx_power = ADV_TX_POWER_NO_PREFERENCE;
+ 		return false;
+@@ -1841,10 +1829,8 @@ static const GDBusPropertyTable properties[] = {
+ 	{ "SupportedIncludes", "as", get_supported_includes, NULL, NULL },
+ 	{ "SupportedSecondaryChannels", "as", get_supported_secondary, NULL,
+ 							secondary_exists },
+-	{ "SupportedFeatures", "as", get_supported_features, NULL, NULL,
+-					G_DBUS_PROPERTY_FLAG_EXPERIMENTAL},
+-	{ "SupportedCapabilities", "a{sv}", get_supported_cap, NULL, NULL,
+-					G_DBUS_PROPERTY_FLAG_EXPERIMENTAL},
++	{ "SupportedFeatures", "as", get_supported_features, NULL, NULL },
++	{ "SupportedCapabilities", "a{sv}", get_supported_cap, NULL, NULL },
+ 	{ }
+ };
  
- 	Advertise as general discoverable. When present this will override
- 	adapter Discoverable property.
-@@ -110,8 +110,8 @@ bool Discoverable [Experimental]
- 	Note: This property shall not be set when **Type** is set to
- 	"broadcast".
- 
--uint16 DiscoverableTimeout [Experimental]
--`````````````````````````````````````````
-+uint16 DiscoverableTimeout
-+``````````````````````````
- 
- 	The discoverable timeout in seconds. A value of zero means that the
- 	timeout is disabled and it will stay in discoverable/limited mode
-@@ -158,8 +158,8 @@ uint16_t Timeout
- 	Timeout of the advertisement in seconds. This defines the lifetime of
- 	the advertisement.
- 
--string SecondaryChannel [Experimental]
--``````````````````````````````````````
-+string SecondaryChannel
-+```````````````````````
- 
- 	Secondary channel to be used. Primary channel is always set to "1M"
- 	except when "Coded" is set.
-@@ -170,24 +170,24 @@ string SecondaryChannel [Experimental]
- 	:"2M":
- 	:"Coded":
- 
--uint32 MinInterval [Experimental]
--`````````````````````````````````
-+uint32 MinInterval
-+``````````````````
- 
- 	Minimum advertising interval to be used by the advertising set, in
- 	milliseconds. Acceptable values are in the range [20ms, 10,485s].
- 	If the provided MinInterval is larger than the provided MaxInterval,
- 	the registration will return failure.
- 
--uint32 MaxInterval [Experimental]
--`````````````````````````````````
-+uint32 MaxInterval
-+``````````````````
- 
- 	Maximum advertising interval to be used by the advertising set, in
- 	milliseconds. Acceptable values are in the range [20ms, 10,485s]. If the
- 	provided MinInterval is larger than the provided MaxInterval, the
- 	registration will return failure.
- 
--int16 TxPower [Experimental]
--````````````````````````````
-+int16 TxPower
-+`````````````
- 
- 	Requested transmission power of this advertising set. The provided value
- 	is used only if the "CanSetTxPower" feature is enabled on the
-diff --git a/doc/org.bluez.LEAdvertisingManager.rst b/doc/org.bluez.LEAdvertisingManager.rst
-index b9d5cafc6ff3..7f6359dff1f8 100644
---- a/doc/org.bluez.LEAdvertisingManager.rst
-+++ b/doc/org.bluez.LEAdvertisingManager.rst
-@@ -89,8 +89,8 @@ array{string} SupportedIncludes [readonly]
- 	:"local-name":
- 	:"rsi":
- 
--array{string} SupportedSecondaryChannels [readonly, Experimental]
--`````````````````````````````````````````````````````````````````
-+array{string} SupportedSecondaryChannels [readonly]
-+```````````````````````````````````````````````````
- 
- 	List of supported Secondary channels. Secondary channels can be used to
- 	advertise with the corresponding PHY.
-@@ -101,8 +101,8 @@ array{string} SupportedSecondaryChannels [readonly, Experimental]
- 	:"2M":
- 	:"Coded":
- 
--dict SupportedCapabilities [readonly, Experimental]
--```````````````````````````````````````````````````
-+dict SupportedCapabilities [readonly]
-+`````````````````````````````````````
- 
- 	Enumerates Advertising-related controller capabilities useful to the
- 	client.
-@@ -125,8 +125,8 @@ dict SupportedCapabilities [readonly, Experimental]
- 
- 		Max advertising tx power (dBm)
- 
--array{string} SupportedFeatures [readonly,optional,Experimental]
--````````````````````````````````````````````````````````````````
-+array{string} SupportedFeatures [readonly,optional]
-+```````````````````````````````````````````````````
- 
- 	List of supported platform features. If no features are available on
- 	the platform, the SupportedFeatures array will be empty.
+@@ -1998,8 +1984,7 @@ static struct btd_adv_manager *manager_create(struct btd_adapter *adapter,
+ 	/* Query controller capabilities. This will be used to display valid
+ 	 * advertising tx power range to the client.
+ 	 */
+-	if (g_dbus_get_flags() & G_DBUS_FLAG_ENABLE_EXPERIMENTAL &&
+-			btd_has_kernel_features(KERNEL_HAS_CONTROLLER_CAP_CMD))
++	if (btd_has_kernel_features(KERNEL_HAS_CONTROLLER_CAP_CMD))
+ 		mgmt_send(manager->mgmt, MGMT_OP_READ_CONTROLLER_CAP,
+ 			manager->mgmt_index, 0, NULL,
+ 			read_controller_cap_complete, manager, NULL);
 -- 
 2.45.2
 
