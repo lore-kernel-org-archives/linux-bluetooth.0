@@ -1,142 +1,113 @@
-Received: from mail-ua1-f41.google.com (mail-ua1-f41.google.com [209.85.222.41])
+Received: from mail-qk1-f180.google.com (mail-qk1-f180.google.com [209.85.222.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2401F3BBC5;
-	Fri, 28 Jun 2024 18:46:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2350762EB
+	for <linux-bluetooth@vger.kernel.org>; Fri, 28 Jun 2024 19:16:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719600418; cv=none; b=pzwQshA2f+LOmFjx8ufPjDgIB6obnrkJxN2GM6j1BIvc7z8W9iJpwwbL/rwDcOYUoLULLlNnnReZ/sorlPd1+UIAXE5+vZYd7cWc0nbhDxP6ezlG4AZFwVIVaJ9WAmAGVcZ+3RrADozN6nSTAOcIyUS2z/Ed7X2FXxeJALU6FTk=
+	t=1719602197; cv=none; b=QMSj+fl25Oo4ENga9pdCSY2UCyiaHENwF1IR4SpIQjrABjeTr2T1jSQUIfyrhqf/p2Nqx8Rzu9qFUsGOBJL9ImKo+NllXlDFWbmyZR+W4iyWzUG90P4wCoUdY9y6jQ1RKG2eUW+DB+LS0KN6igm4ZZSynwF1ez9z1qjJHAFGdUE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719600418; c=relaxed/simple;
-	bh=hunj8a+Tp+D5s1II1M+FHGnR1Kh/janCLfAz5w//S74=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=pU6BRA/Hlc8RY5oA7D+H2pHsePVyz8Ea51vk2sdCUKm4yHdqZEbftUfQ98e9jpg8iInTqXVSrMhYN6i/pgiVTgxOdvsmMwR3S6D5ddImrj1GQ60xhlbdl/KV5Bt4/g6nfZSyn6Ah1xqhh+mfSKxPN+Wsdce6ZmvMKUJtHhVYLJ4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NnY7mQwa; arc=none smtp.client-ip=209.85.222.41
+	s=arc-20240116; t=1719602197; c=relaxed/simple;
+	bh=iIYjNYvgbx0rYOp8Ly2SI0d9ZW6CJ4nD1yk2zJKZDBk=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=qrBz8uzmxOkqQOlOk0T2RRcuHGqoZ88lp1994qwk3sMblXcN2gDNwfzsbaHl8vvRBz5lKEUSfXSSvES1/aPT4ox/gMuThlnlNCKhH6qWlv7gAQQgQfJY0AmK/GdfNHGv2cQgTUL5K2M2rnlRMS3a8cq1gQuAvWzO4Ro9qkGTOPU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QBMInEWc; arc=none smtp.client-ip=209.85.222.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NnY7mQwa"
-Received: by mail-ua1-f41.google.com with SMTP id a1e0cc1a2514c-80fe3073421so196522241.1;
-        Fri, 28 Jun 2024 11:46:56 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QBMInEWc"
+Received: by mail-qk1-f180.google.com with SMTP id af79cd13be357-79bb8dc530cso77757885a.0
+        for <linux-bluetooth@vger.kernel.org>; Fri, 28 Jun 2024 12:16:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1719600416; x=1720205216; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Yi0OfaU/kpG7N8w7UTRGv9TXQ/s1Ls1tYcV0AC/Kj0s=;
-        b=NnY7mQwaBKOuJgbvBiwinW9UDZk5nJNQ5uGztguS19sZ70wKqC3RLiH409PGk8royd
-         xjXi4O7BtQGNkOOUa/zFxGfm/3uXr7Cxeo9GvKril5AKU1WijEZyicFBNPlqTQ4BetLH
-         wFIKbbfOFaMVjTW19iCoIzGZqoV7RarWug7PkgKZHkv6RTq4xi4C8oqMYqVmBHYXTfma
-         eJkxar0VSD6JfDU6ae1QE0Rw11B4QKnnjgFtjCKaJoIgoHxNz0TPEOADS15frrUCupru
-         0F8NTJw44O1T8Yn8jpktjDYK4F4l65jHBNJY2mHb4oOX5DUb8g71AuQl+Ky4sLBbAn0P
-         8Xww==
+        d=gmail.com; s=20230601; t=1719602194; x=1720206994; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=T06GZZIP5lqDYLOeuCar8gORbrEdBPr4XLGPKFATy5I=;
+        b=QBMInEWc+yJMDU7xGoVfM3KhBwV5lcv58a3fs3DNU2FCQ8H0vGgFbe0K8GO2WZMRtu
+         8piyBc8Od8zXuIfO0YEki8hbp/RGtinTj+N82fiSoIza0bGsAITtwPLW72T3RAzU2ufV
+         DwaY51Pm49hZC0+iUxnw1kjMfjEA4aQ9gkQHdztDZQkicwDY5mGrKIBFO8dSckP5srPM
+         Sts5Gb3f8OjxQb8cRCXIu0V4vnEyMSvG8kO5HtwyMierVOkE0vcDFFcC28SdaJc3sk+8
+         IDZfgwlQfRtOpBpzG/MR8fCbNyqtK/aFEk/cqqbVbcrJEhoP2PvagYT/BSdEaTSuPyFZ
+         n8ZQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719600416; x=1720205216;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20230601; t=1719602194; x=1720206994;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=Yi0OfaU/kpG7N8w7UTRGv9TXQ/s1Ls1tYcV0AC/Kj0s=;
-        b=YdoSOkLyyagHBlc5gEBQ3H59x75p4b/VbOojSEZRKaBT3mAd5mqe7B8a54HfFnlpQX
-         2PcnRHNR5ER226bu57bH+Oj9kBhjBQjP8vrmrkOb/YpuXzOyxrxEzcYmzEW47Ymr9nCq
-         aff076XNHCesWzHtlU0Vdi14GsAv3hqk7FcnDKBL9/sSVHAJgZvdiB1s4IW09yPWkZVn
-         AF/ieiIcUJCu3oJnuo5Z+cZU5f9nT11EowJIlcIIELAOFsyOl4H4rPA7POBRZ+PWUOOr
-         4fUlCAJ8Lxh39WP0iyXlBofDWo4httXJKgdAB9h/08wR9O3l57Ip1G87rIzJgAB/pO6M
-         sJoQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXUVFQ/5TmGlDTT51lL2jN7PV+sPpNS0q3OnELpHiq5+ZZpRv970iKb7UMJgOXxIi6MYXgVJHxG9mCwEal/cjk6ggNzXH/C
-X-Gm-Message-State: AOJu0YxrHmfbsOBm6S0wRks1tZcFNh7br9iqJKoyu7bl0MqS+IApEMJV
-	KWBOJByNZFQrKKZJAvv6tMimllzIc/6sTFuJJE++6LLDywkKVaiZ
-X-Google-Smtp-Source: AGHT+IHPotUct+drIjj4jp0GaXPTWdoP01uaTwNGdhE/JJRz1xCmlxIOHB6NIWAd9M+Suejw0LQ9cA==
-X-Received: by 2002:a05:6122:46a3:b0:4ec:f402:a849 with SMTP id 71dfb90a1353d-4ef6643904emr19831953e0c.16.1719600415782;
-        Fri, 28 Jun 2024 11:46:55 -0700 (PDT)
-Received: from lvondent-mobl4.. (syn-107-146-107-067.res.spectrum.com. [107.146.107.67])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-4f29e6a6fe7sm75947e0c.17.2024.06.28.11.46.54
+        bh=T06GZZIP5lqDYLOeuCar8gORbrEdBPr4XLGPKFATy5I=;
+        b=vZBxrsUmfm1+4RXXXhsriQMMYEQrJnXDrTrwGU6WiP2Ojvm2bt9CmtK6i394F0/+IJ
+         D3Lv6DGyL5d0RKsVO7De4nBgODakzN3VDEzOT6TbBwU15P4Sl0jCKae0pBRVFrDiDfmN
+         L+pHeXa+5Y9JrHLNxu/WFNeZ0m21JDA4JXIj1+rFrM3imfnqJz0yfF8ApPksZlSsYnnx
+         WKAHhLqgjtdXBkW22NtoiBPgPQdUaxubQG4F/GrgRuQW7XLuje57TRqPzoM7bweP4bJX
+         tFy++3j9BXMuan5NYPnGXTWeQ4uGDMODLLj/xRyYI2NmDogxW3Ui4sqFC4TR+P7eseZ+
+         n7PA==
+X-Gm-Message-State: AOJu0YzXlWz0DL0hw0ZFHa1M+BhHtd9pEZnfQ7PKHr+8S8VI+meHwnpW
+	ME4+Ghtcw//r1RZScz5xjiBT7yZkLY3S+wZFhU34rruxUFxZp3zdyzgcMQ==
+X-Google-Smtp-Source: AGHT+IGM5ovGQIIHNag5I3mlezwLA4azUsXHnJdOzhLnrwn9Gm1asTo7Bb908pQzD1l9vAAafSDqCA==
+X-Received: by 2002:a05:620a:24d0:b0:795:579c:f609 with SMTP id af79cd13be357-79d6ba69f7cmr465680985a.19.1719602194562;
+        Fri, 28 Jun 2024 12:16:34 -0700 (PDT)
+Received: from [172.17.0.2] ([20.102.46.208])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-79d69295cb3sm98041985a.55.2024.06.28.12.16.34
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 28 Jun 2024 11:46:54 -0700 (PDT)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: davem@davemloft.net,
-	kuba@kernel.org
-Cc: linux-bluetooth@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: pull request: bluetooth 2024-06-28
-Date: Fri, 28 Jun 2024 14:46:53 -0400
-Message-ID: <20240628184653.699252-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.45.2
+        Fri, 28 Jun 2024 12:16:34 -0700 (PDT)
+Message-ID: <667f0c12.050a0220.300df.5288@mx.google.com>
+Date: Fri, 28 Jun 2024 12:16:34 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============9019845343593559192=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [BlueZ,v2,1/2] org.bluez.LEAdvertisement: Promote experimental properties to stable
+In-Reply-To: <20240628164701.626148-1-luiz.dentz@gmail.com>
+References: <20240628164701.626148-1-luiz.dentz@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-The following changes since commit dc6be0b73f4f55ab6d49fa55dbce299cf9fa2788:
+--===============9019845343593559192==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-  Merge tag 'ieee802154-for-net-2024-06-27' of git://git.kernel.org/pub/scm/linux/kernel/git/wpan/wpan into main (2024-06-28 13:10:12 +0100)
+This is automated email and please do not reply to this email!
 
-are available in the Git repository at:
+Dear submitter,
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2024-06-28
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=866685
 
-for you to fetch changes up to f1a8f402f13f94263cf349216c257b2985100927:
+---Test result---
 
-  Bluetooth: L2CAP: Fix deadlock (2024-06-28 14:32:02 -0400)
+Test Summary:
+CheckPatch                    PASS      3.46 seconds
+GitLint                       FAIL      1.02 seconds
+BuildEll                      PASS      24.75 seconds
+BluezMake                     PASS      1650.38 seconds
+MakeCheck                     PASS      13.34 seconds
+MakeDistcheck                 PASS      176.89 seconds
+CheckValgrind                 PASS      250.18 seconds
+CheckSmatch                   PASS      350.63 seconds
+bluezmakeextell               PASS      119.05 seconds
+IncrementalBuild              PASS      2992.84 seconds
+ScanBuild                     PASS      996.19 seconds
 
-----------------------------------------------------------------
-bluetooth pull request for net:
+Details
+##############################
+Test: GitLint - FAIL
+Desc: Run gitlint
+Output:
+[BlueZ,v2,1/2] org.bluez.LEAdvertisement: Promote experimental properties to stable
 
- - Ignore too large handle values in BIG
- - L2CAP: sync sock recv cb and release
- - hci_bcm4377: Fix msgid release
- - ISO: Check socket flag instead of hcon
- - hci_event: Fix setting of unicast qos interval
- - hci: disallow setting handle bigger than HCI_CONN_HANDLE_MAX
- - Add quirk to ignore reserved PHY bits in LE Extended Adv Report
- - hci_core: cancel all works upon hci_unregister_dev
- - btintel_pcie: Fix REVERSE_INULL issue reported by coverity
- - qca: Fix BT enable failure again for QCA6390 after warm reboot
+WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
+1: T1 Title exceeds max length (83>80): "[BlueZ,v2,1/2] org.bluez.LEAdvertisement: Promote experimental properties to stable"
 
-----------------------------------------------------------------
-Edward Adam Davis (2):
-      Bluetooth: Ignore too large handle values in BIG
-      bluetooth/l2cap: sync sock recv cb and release
 
-Hector Martin (1):
-      Bluetooth: hci_bcm4377: Fix msgid release
+---
+Regards,
+Linux Bluetooth
 
-Iulia Tanasescu (1):
-      Bluetooth: ISO: Check socket flag instead of hcon
 
-Luiz Augusto von Dentz (2):
-      Bluetooth: hci_event: Fix setting of unicast qos interval
-      Bluetooth: L2CAP: Fix deadlock
-
-Neeraj Sanjay Kale (1):
-      Bluetooth: btnxpuart: Enable Power Save feature on startup
-
-Pavel Skripkin (1):
-      bluetooth/hci: disallow setting handle bigger than HCI_CONN_HANDLE_MAX
-
-Sven Peter (1):
-      Bluetooth: Add quirk to ignore reserved PHY bits in LE Extended Adv Report
-
-Tetsuo Handa (1):
-      Bluetooth: hci_core: cancel all works upon hci_unregister_dev()
-
-Vijay Satija (1):
-      Bluetooth: btintel_pcie: Fix REVERSE_INULL issue reported by coverity
-
-Zijun Hu (1):
-      Bluetooth: qca: Fix BT enable failure again for QCA6390 after warm reboot
-
- drivers/bluetooth/btintel_pcie.c |  2 +-
- drivers/bluetooth/btnxpuart.c    |  2 +-
- drivers/bluetooth/hci_bcm4377.c  | 10 +++++-
- drivers/bluetooth/hci_qca.c      | 18 ++++++++--
- include/net/bluetooth/hci.h      | 11 ++++++
- include/net/bluetooth/hci_sync.h |  2 ++
- net/bluetooth/hci_conn.c         | 15 ++++++--
- net/bluetooth/hci_core.c         | 76 ++++++++++++----------------------------
- net/bluetooth/hci_event.c        | 33 +++++++++++++++--
- net/bluetooth/hci_sync.c         | 13 +++++++
- net/bluetooth/iso.c              |  3 +-
- net/bluetooth/l2cap_core.c       |  3 ++
- net/bluetooth/l2cap_sock.c       | 14 ++++++--
- 13 files changed, 131 insertions(+), 71 deletions(-)
+--===============9019845343593559192==--
