@@ -1,104 +1,182 @@
-Received: from mail-qv1-f52.google.com (mail-qv1-f52.google.com [209.85.219.52])
+Received: from mail-ot1-f49.google.com (mail-ot1-f49.google.com [209.85.210.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B46BB1E517
-	for <linux-bluetooth@vger.kernel.org>; Fri, 28 Jun 2024 14:19:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63DA41E517
+	for <linux-bluetooth@vger.kernel.org>; Fri, 28 Jun 2024 14:21:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719584367; cv=none; b=W4QZuH7BVfxD9LdTknfo2kgH0Z3aTaObXvxpqT1I+frJrgJpbp/vclsR1LdZdGnrXbafGgbv5aYo1U549vrHFsSom6ZD20SxqbaBqJdt7rlzqH3bYZ5v3fEzY8CNA3ovGdF4yiP8dPBXfi2B6C2jPT0qTd4Vu+l1Nj4IecBwR90=
+	t=1719584477; cv=none; b=bFo7ahEo4eNa7aB7MicKve94naHenn6YHCk84vKU05qUnpWoh5rmj0Y/3oZu6P28gRfYOCQUM80VD15WStqYwNWrgQziuLHtYMdZwn/rY8ePDNqhCmsOK093jVFDoWeZJHZlpIZgSVkdC1Fkz82z6JX9MJ/8Npdbuq6dH5TrKoU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719584367; c=relaxed/simple;
-	bh=YvH8ezR0BYjzTGoKJvAyVKN6aDd7ckmgVeHQ1DSHWHA=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=XrzfE/R6XLkCieHKlRZJeBZsCVJZjBI5xQYxpvjI1BHMy3ChituGQrcBcBRlqjt/6YNoRwTL0isiATf5dlEfEex7nttmpwpo8tHH/RK/cbleOP1/C/OGLWSFKAdVXY3mO52Xw+HdyZ+f2aAn49bSMcc1Oa/C8hlkVSfm7uw0KvI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bHcUTmP4; arc=none smtp.client-ip=209.85.219.52
+	s=arc-20240116; t=1719584477; c=relaxed/simple;
+	bh=oXSCItITuFksxzqCDmAly1kV5TPcN/AGMkWyYKmvzy4=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=JaWkMoMqyKQuSOZb4KFOvOTSNE0O48kn3tVlKg+CRQ57oGImZNhTAhnnQOndEluwa8SEcRCEX00xl8uITh1gNVqqbo05/P3bFNWQM/+1SgNjbRUumwKMx/818G48SpP2oOeqbent23aPzkk7YyqrZenqcgS0eScG/CumVZdSO6k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dWQ9TKEM; arc=none smtp.client-ip=209.85.210.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bHcUTmP4"
-Received: by mail-qv1-f52.google.com with SMTP id 6a1803df08f44-6b5052defa6so3822816d6.3
-        for <linux-bluetooth@vger.kernel.org>; Fri, 28 Jun 2024 07:19:25 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dWQ9TKEM"
+Received: by mail-ot1-f49.google.com with SMTP id 46e09a7af769-700cbdd90fbso391766a34.0
+        for <linux-bluetooth@vger.kernel.org>; Fri, 28 Jun 2024 07:21:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1719584364; x=1720189164; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=OTiS3RU5Okg+njluug0qfY6rribqZlWnw6Lio8y49n8=;
-        b=bHcUTmP4BqIw7vlFoLya9/pej3+qXkgd1hEazqLbV4dmR2R+IBL0b16k8kRw6JGWna
-         UgMjsZ+4l0JCpx77UuXgIzI3EbAkc8DQ9AR4zql+2dwRMknf/tWaPpda3X2atSBQJzy1
-         jOpMSb0q5d7eX9diAXD5X534ovsgaGs3z8M6ffBOhlitNbtGPoLiVS7xoethddtmV8RK
-         jqEyBAk55sZUqMrjyi8wrhitlAgGhM4/QZblgGtrntGzecY1k63QnOzVE1a4xpcXCp+s
-         XcMXlamY+pVzC1lQyLwlBqX/w46IOUCE9WuowSr+jE2HeE63cfSOeoC5Gzhjlzt2MP4g
-         RnNA==
+        d=gmail.com; s=20230601; t=1719584475; x=1720189275; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=ufRtBc5ri5Cu55SSolDDR/J5P4Jer9hVehG4WUdaqHo=;
+        b=dWQ9TKEMMJxn+isut9V66sVa7Q2CPnkOm6pAiPtW3fVoplFtU2hP6yJWxFPAEUP7/3
+         fSJ37C1WG/WZOzknBZ80MRKobGGoonGTvTQqDNDtC04S0FVzqfp+yrdL17XUZB+9RQ62
+         ltRJDf3XN7SX1KeLLiirlOxhLkf99Hc/kxPkwpTknFM6UPVs0HfeITVLzgd6YQPEIrSE
+         GGvcEgeybJbDc7I7aHalpaCMzvxWQ2WFZDvXBgSpHfHxz5guLFa9ON+NkOmGpAHb3xha
+         /I68tkV4aAcBCRiB4+S1LxtOO+T0VqhpKC0kOtWuieKyYS5VwE+MeLONno2Gf5vSiORR
+         y90A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719584364; x=1720189164;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=OTiS3RU5Okg+njluug0qfY6rribqZlWnw6Lio8y49n8=;
-        b=dGFCREL3Y5asymqVSSgUi/DHt2yg/Hf7wBeJI7eQMD9p6xV9+teh2T8cfH4irkgxnY
-         syq4+ORBigwBtURW62cVV9pCRGisxbhb/DVCv/Q8gv54CD+YIkuoOJcGF8nY0Jr5hwj1
-         MWyfk9cN1HWhVvj3t1nIpMFLM95HKasqlDY2XcPS4BnBMJ0Sf8Al5hqNXkEqVxIHEItW
-         EgKoFuTG+XoaNNFiy4nrj1JiTMv+QCpdGDgxgcSCYO4Rpo7ZrjxAEfsFFsfAvQw6hBsb
-         cFU39DMK06kzwS/n5pRDaFA1zE+s7C79dgtsdhvsiqILpv4e3G6J7QyMCLt0CyaIOF9O
-         ue0Q==
-X-Gm-Message-State: AOJu0YxZmjWcOKM80mjWXfqtSlbdX7cJHtLmL+epH92EhnZh5RoxHxod
-	9LQ0GgpxoB36aTxVrQVcNF0Co2X9G+zQhQDsbf5nhYcCYmJbBzS2H5BzRIZd
-X-Google-Smtp-Source: AGHT+IFHuJeqCLzn2Kp/QJ2M5QsYZOBOqN1Nb+4uyNKOvlhyKvmGxmHr517svHunGZ08mM5SHJH86w==
-X-Received: by 2002:a05:6214:3011:b0:6b5:a4f6:daa2 with SMTP id 6a1803df08f44-6b5a4f6dba8mr23558406d6.17.1719584364477;
-        Fri, 28 Jun 2024 07:19:24 -0700 (PDT)
-Received: from [172.17.0.2] ([68.154.28.115])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6b59e5f2653sm8092126d6.76.2024.06.28.07.19.23
+        d=1e100.net; s=20230601; t=1719584475; x=1720189275;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ufRtBc5ri5Cu55SSolDDR/J5P4Jer9hVehG4WUdaqHo=;
+        b=TqnINO71hCjHzTr9WqA3xZASgsHfLkU9GxT1KJlY2WEKv/SpEFQ/DE3Nb8unUALLEU
+         urLabxXzOXyl3znHVIp33DF8Rd7MhUAUpu35aeOOjG77krSZjbouYk+9L1YtXnrVLMSa
+         AdT8DNO7LtxOS+Anu8AU7APfRBN5yxqK93g7Sb6GsFmbXK+QXI3BnfKHSvPAlfryF8M2
+         02RI6L3gaFdB7qzScFYaLAFu4lYfoLJACBMRFqjXkqV+2UiAtpDzG00jOKwLlP6hwWJ+
+         qQNqlpifMysOnC42q38p4L0SOuiyIY5hkwEGuvMCpEp99m214Kza1H6lwYDCzSLu268q
+         31OA==
+X-Gm-Message-State: AOJu0YzhcQiZpb7/y59TOgufKGzHErwHTemdoAeitZslg6TZD09BoFKl
+	g1T0wT2PyMfIvqkBRRBZkpPlubYD9VLjNhq6ZqBcK+H+h1gsEwjZ8w72jQ==
+X-Google-Smtp-Source: AGHT+IGk4fvMluRj72Ttyz7Py/2O4wDpR2IwHnKGeTeNm+J5W0GWRmZX5pkfqqnwxAW7ZI9rIsaRMQ==
+X-Received: by 2002:a9d:4d16:0:b0:701:ef44:e69d with SMTP id 46e09a7af769-701ef44e764mr7456992a34.11.1719584474680;
+        Fri, 28 Jun 2024 07:21:14 -0700 (PDT)
+Received: from lvondent-mobl4.. (syn-107-146-107-067.res.spectrum.com. [107.146.107.67])
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-4f29225aba4sm271599e0c.35.2024.06.28.07.21.13
+        for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 28 Jun 2024 07:19:24 -0700 (PDT)
-Message-ID: <667ec66c.050a0220.28f14.3cc3@mx.google.com>
-Date: Fri, 28 Jun 2024 07:19:24 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============1237734174181656767=="
+        Fri, 28 Jun 2024 07:21:13 -0700 (PDT)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ v1 1/2] org.bluez.LEAdvertisement: Promote experimental properties to stable
+Date: Fri, 28 Jun 2024 10:21:11 -0400
+Message-ID: <20240628142112.575748-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, r.smirnov@omp.ru
-Subject: RE: [BlueZ,v1] mcp: replace sprintf() with snprintf() in cb_track_duration()
-In-Reply-To: <20240628123647.547516-1-r.smirnov@omp.ru>
-References: <20240628123647.547516-1-r.smirnov@omp.ru>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 
---===============1237734174181656767==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=866571
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      0.45 seconds
-GitLint                       PASS      0.32 seconds
-BuildEll                      PASS      24.55 seconds
-BluezMake                     PASS      1716.48 seconds
-MakeCheck                     PASS      13.29 seconds
-MakeDistcheck                 PASS      179.65 seconds
-CheckValgrind                 PASS      251.46 seconds
-CheckSmatch                   PASS      353.87 seconds
-bluezmakeextell               PASS      120.00 seconds
-IncrementalBuild              PASS      1449.13 seconds
-ScanBuild                     PASS      1003.14 seconds
-
-
-
+This promotes experimental properties to stable since they have been in
+use for quite a while without any changes.
 ---
-Regards,
-Linux Bluetooth
+ doc/org.bluez.LEAdvertisement.rst      | 28 +++++++++++++-------------
+ doc/org.bluez.LEAdvertisingManager.rst |  8 ++++----
+ 2 files changed, 18 insertions(+), 18 deletions(-)
 
+diff --git a/doc/org.bluez.LEAdvertisement.rst b/doc/org.bluez.LEAdvertisement.rst
+index 4609bde74a5e..d3f9cc480470 100644
+--- a/doc/org.bluez.LEAdvertisement.rst
++++ b/doc/org.bluez.LEAdvertisement.rst
+@@ -83,8 +83,8 @@ dict ServiceData
+ 	Service Data elements to include. The keys are the UUID to associate
+ 	with the data.
+ 
+-dict Data [Experimental]
+-````````````````````````
++dict Data
++`````````
+ 
+ 	Advertising Data to include. Key is the advertising type and value is
+ 	the data as byte array.
+@@ -101,8 +101,8 @@ dict Data [Experimental]
+ 		<Transport Discovery> <Organization Flags...>
+ 		0x26                   0x01         0x01...
+ 
+-bool Discoverable [Experimental]
+-````````````````````````````````
++bool Discoverable
++`````````````````
+ 
+ 	Advertise as general discoverable. When present this will override
+ 	adapter Discoverable property.
+@@ -110,8 +110,8 @@ bool Discoverable [Experimental]
+ 	Note: This property shall not be set when **Type** is set to
+ 	"broadcast".
+ 
+-uint16 DiscoverableTimeout [Experimental]
+-`````````````````````````````````````````
++uint16 DiscoverableTimeout
++``````````````````````````
+ 
+ 	The discoverable timeout in seconds. A value of zero means that the
+ 	timeout is disabled and it will stay in discoverable/limited mode
+@@ -158,8 +158,8 @@ uint16_t Timeout
+ 	Timeout of the advertisement in seconds. This defines the lifetime of
+ 	the advertisement.
+ 
+-string SecondaryChannel [Experimental]
+-``````````````````````````````````````
++string SecondaryChannel
++```````````````````````
+ 
+ 	Secondary channel to be used. Primary channel is always set to "1M"
+ 	except when "Coded" is set.
+@@ -170,24 +170,24 @@ string SecondaryChannel [Experimental]
+ 	:"2M":
+ 	:"Coded":
+ 
+-uint32 MinInterval [Experimental]
+-`````````````````````````````````
++uint32 MinInterval
++``````````````````
+ 
+ 	Minimum advertising interval to be used by the advertising set, in
+ 	milliseconds. Acceptable values are in the range [20ms, 10,485s].
+ 	If the provided MinInterval is larger than the provided MaxInterval,
+ 	the registration will return failure.
+ 
+-uint32 MaxInterval [Experimental]
+-`````````````````````````````````
++uint32 MaxInterval
++``````````````````
+ 
+ 	Maximum advertising interval to be used by the advertising set, in
+ 	milliseconds. Acceptable values are in the range [20ms, 10,485s]. If the
+ 	provided MinInterval is larger than the provided MaxInterval, the
+ 	registration will return failure.
+ 
+-int16 TxPower [Experimental]
+-````````````````````````````
++int16 TxPower
++`````````````
+ 
+ 	Requested transmission power of this advertising set. The provided value
+ 	is used only if the "CanSetTxPower" feature is enabled on the
+diff --git a/doc/org.bluez.LEAdvertisingManager.rst b/doc/org.bluez.LEAdvertisingManager.rst
+index b9d5cafc6ff3..713c9f6a5b97 100644
+--- a/doc/org.bluez.LEAdvertisingManager.rst
++++ b/doc/org.bluez.LEAdvertisingManager.rst
+@@ -101,8 +101,8 @@ array{string} SupportedSecondaryChannels [readonly, Experimental]
+ 	:"2M":
+ 	:"Coded":
+ 
+-dict SupportedCapabilities [readonly, Experimental]
+-```````````````````````````````````````````````````
++dict SupportedCapabilities [readonly]
++`````````````````````````````````````
+ 
+ 	Enumerates Advertising-related controller capabilities useful to the
+ 	client.
+@@ -125,8 +125,8 @@ dict SupportedCapabilities [readonly, Experimental]
+ 
+ 		Max advertising tx power (dBm)
+ 
+-array{string} SupportedFeatures [readonly,optional,Experimental]
+-````````````````````````````````````````````````````````````````
++array{string} SupportedFeatures [readonly,optional]
++```````````````````````````````````````````````````
+ 
+ 	List of supported platform features. If no features are available on
+ 	the platform, the SupportedFeatures array will be empty.
+-- 
+2.45.2
 
---===============1237734174181656767==--
