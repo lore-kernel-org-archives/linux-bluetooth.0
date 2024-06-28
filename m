@@ -1,90 +1,134 @@
-Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
+Received: from mail-lj1-f175.google.com (mail-lj1-f175.google.com [209.85.208.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42532B653
-	for <linux-bluetooth@vger.kernel.org>; Fri, 28 Jun 2024 13:16:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BB74154434;
+	Fri, 28 Jun 2024 13:29:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719580580; cv=none; b=AjLYqu1wvv2afGfp2nqc+sAJRZarWCbgSlbNMXx6DSYoWuZfDlxPgSjh2nIM3RGcd6bUf5UxpOsbuC+XKTeiuTgp37Y+S0pBqfNAGOuSVsjv+QSHfsqlUTeTMrjGkJdQoJYpHnUcN1fUH6xnMe0PlkbmYMfSHNWuCXrwj1zhi9E=
+	t=1719581353; cv=none; b=OlWerCTJBbe0Q7QPTIpKYaZ7Q5SCvC6+QoMxkY3IYl/Qzhqgjloij9PszAhhBBtD9yvdkP7PAStzsxFuCIF7QZi6DyMfDpDG+Ec3JfWk18sJUSWKDOCk6gooJRIt+RbpB9XMuS5Okda0pKWnLYMdDl45yWiSKSjoKjwl869i0Q0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719580580; c=relaxed/simple;
-	bh=/JTBww3FKtOBoKCfUWHXoH/cBXyWaqX4iFp/SZ/L3Qk=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=LegZDP1HU2+eyfwllg8Ms+z5cCcQsLOOYBmeyPnC3joKUPog3eYkRMrnbOBAI/Dn7qDaJo5saLOA7Sbg1XP7Nlh0qK/eIXKXhooMe0rDBKlRF6kdkTfwVZpErUySgW81F1OVhH03bbUYVLMS312f7UmAPmmyRtw4TTD+vaXWd+4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
-Received: from localhost.localdomain (84.18.99.27) by msexch01.omp.ru
- (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Fri, 28 Jun
- 2024 16:16:13 +0300
-From: Roman Smirnov <r.smirnov@omp.ru>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Roman Smirnov <r.smirnov@omp.ru>
-Subject: [PATCH BlueZ v1] rctest: replace sprintf() with snprintf() in recv_mode()
-Date: Fri, 28 Jun 2024 16:15:30 +0300
-Message-ID: <20240628131531.551699-1-r.smirnov@omp.ru>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1719581353; c=relaxed/simple;
+	bh=Lc6l2/suYh/8owAfwDc3cf7pFTnDrHUk9tT9n0HgEPM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=W4Ueu3G+oqog42lbDHEQ3LEY2LsX9Add+Yzcw0UiIZEmqjYZm5a8qp8q4aXfad8Q7KYdIz+zFqa1lJKuZKCaTkm0XJfZ7Ku0cUqWP1IVXhoBCin9zzqsTCKlwzCmfHz2cdMEHNIyV9tb/TfGiUwDA0Lj+fI6VM1EgG5MfwRq5pI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gr6Iykrv; arc=none smtp.client-ip=209.85.208.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gr6Iykrv"
+Received: by mail-lj1-f175.google.com with SMTP id 38308e7fff4ca-2ec61eeed8eso7145151fa.0;
+        Fri, 28 Jun 2024 06:29:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1719581350; x=1720186150; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=NoLep4S3UcvnGp6wqXMtpI5TwIz2e/ZcFj9ydxYz5G8=;
+        b=gr6IykrvqLL5XB2s7R3fX+ReMtiQYJDxqzeLMmjUIJlt/51ZgiSkLsg6pc8C9LHOUq
+         c3I0SYJADcpEjeZqP3ez0bKeS48b2MbgF3xYq27PcKXz9ArxGwjI89y1Hyv+PQPoQJM7
+         CEzWncV6dHYPglOlCHwwRozzBX/mK8TIjzZzwnZr1JkOcAwlazpspRi68uo9ObtBDwtl
+         UafDjMP7/zUMdTsJKQQbfkw5y2CF0k6XcnbfUQwXFeyxWPH1KEN6aJ9nXsa1OYbWCQk/
+         AHr7++KsogQCYRYPwCT9vU5rq0FfvDIrfgd+DNuJb25DTl1RXtfhF2S7U79Ft8f0mAEG
+         l28Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1719581350; x=1720186150;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=NoLep4S3UcvnGp6wqXMtpI5TwIz2e/ZcFj9ydxYz5G8=;
+        b=C1gVM9OxJPdb7giro8kpVLuZOYwjD1ol88cQL35ED94c3qTDyCzGbhj+MgC5jHBEWz
+         0rN11syhVpReoMrUB7pIVUY3AYclzKhsGcLys62ZpiiRClNOFyTeCeebcpaulpTHWR/I
+         kzpSiuhJCNjOwfqbZoHe71tYgsQS7vj13Yr6noalOdVgGKmCv6cm6RJNLWxAAdNviF13
+         /xZy6mVRWj9KIuRi/kS+Eij7JJ9LsfZcwODTAOe6pcXAu+d3nCQQEpp7lDSMn2rTSvCL
+         9+/pk0VAO+XaDHZm0G2v18OaV3aCFGK7JK8MdmiLO+hSjx83Sc+UReebECXipYhOaG1g
+         tWRw==
+X-Forwarded-Encrypted: i=1; AJvYcCULTulA8Dh+cO76lVKDahKSldRTL/ek8qq+Xt4unx1VwthlWULbTffP0tGpi29VfMcFKmZ58MiSXIs6GjUe3LFdCE0IIb00UnY7aXknEBfHqqFK/OEFdhkTPmWu/8qcNI6Ohx8hZQQwyT0LSYzq
+X-Gm-Message-State: AOJu0Yxh/V5141OvRn+lcm/3SnHNfzatTh5tlgCc3pIavZkNRfqOJ51H
+	BM9FA1+m40MITNbWLP1V2xdeQ1QGPthqJBK0xcNR5D9LV/G8LvOhrhscBfSifOlSTnDC+/t9YOv
+	Ml1ASSpGisfxGQFDsyoDeYqPXhEBXaw==
+X-Google-Smtp-Source: AGHT+IG7MmmejUEBrt5++vrrPtZziSncIEJp2cy0JvgDXcibMqrZN4iMHcblJqmq+Leke7USKmRXFj4Rv/xnCQk/toA=
+X-Received: by 2002:a05:651c:1581:b0:2ee:493f:d5be with SMTP id
+ 38308e7fff4ca-2ee493fd616mr44273101fa.3.1719581349725; Fri, 28 Jun 2024
+ 06:29:09 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
- (10.188.4.12)
-X-KSE-ServerInfo: msexch01.omp.ru, 9
-X-KSE-AntiSpam-Interceptor-Info: scan successful
-X-KSE-AntiSpam-Version: 6.1.0, Database issued on: 06/28/2024 12:58:53
-X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
-X-KSE-AntiSpam-Method: none
-X-KSE-AntiSpam-Rate: 0
-X-KSE-AntiSpam-Info: Lua profiles 186210 [Jun 28 2024]
-X-KSE-AntiSpam-Info: Version: 6.1.0.4
-X-KSE-AntiSpam-Info: Envelope from: r.smirnov@omp.ru
-X-KSE-AntiSpam-Info: LuaCore: 21 0.3.21
- ebee5449fc125b2da45f1a6a6bc2c5c0c3ad0e05
-X-KSE-AntiSpam-Info: {rep_avail}
-X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
-X-KSE-AntiSpam-Info:
-	d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;omp.ru:7.1.1;127.0.0.199:7.1.2
-X-KSE-AntiSpam-Info: ApMailHostAddress: 84.18.99.27
-X-KSE-AntiSpam-Info: Rate: 0
-X-KSE-AntiSpam-Info: Status: not_detected
-X-KSE-AntiSpam-Info: Method: none
-X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
- smtp.mailfrom=omp.ru;dkim=none
-X-KSE-Antiphishing-Info: Clean
-X-KSE-Antiphishing-ScanningType: Heuristic
-X-KSE-Antiphishing-Method: None
-X-KSE-Antiphishing-Bases: 06/28/2024 13:02:00
-X-KSE-Antivirus-Interceptor-Info: scan successful
-X-KSE-Antivirus-Info: Clean, bases: 6/28/2024 11:03:00 AM
-X-KSE-Attachment-Filter-Triggered-Rules: Clean
-X-KSE-Attachment-Filter-Triggered-Filters: Clean
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
+References: <20240524013127.434500-1-nobuaki.tsunashima@infineon.com>
+ <CABBYNZ+yvQL0KBagUXtzrBUFmFxp-ek_5aFDJNVyUKsA-xJ-Zg@mail.gmail.com> <f7a5e281c48b4232a4ba74022dd3f83a@infineon.com>
+In-Reply-To: <f7a5e281c48b4232a4ba74022dd3f83a@infineon.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Fri, 28 Jun 2024 09:28:57 -0400
+Message-ID: <CABBYNZKjUY2XVf2yu95ECggZb1xJ0SAneKqMNSnAGGfgRTs02g@mail.gmail.com>
+Subject: Re: [PATCH v4] Bluetooth: btbcm: Apply HCI_QUIRK_BROKEN_READ_TRANSMIT_POWER
+ to CYW4373
+To: Nobuaki.Tsunashima@infineon.com
+Cc: marcel@holtmann.org, linux-bluetooth@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Use snprintf() instead of sprintf() to avoid buffer overflow.
+Hi,
 
-Found with the SVACE static analysis tool.
----
- tools/rctest.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+On Sun, May 26, 2024 at 9:59=E2=80=AFPM <Nobuaki.Tsunashima@infineon.com> w=
+rote:
+>
+> Hi Luiz,
+>
+> Thanks for your review.
+>
+> >>  static int btbcm_read_info(struct hci_dev *hdev)  {
+> >>         struct sk_buff *skb;
+> >> +       u8 chip_id;
+> >> +       u16 baseline;
+> >>
+> >>         /* Read Verbose Config Version Info */
+> >>         skb =3D btbcm_read_verbose_config(hdev);
+> >>         if (IS_ERR(skb))
+> >>                 return PTR_ERR(skb);
+> >> -
+> >> +       chip_id =3D skb->data[1];
+> >> +       baseline =3D skb->data[3] | (skb->data[4] << 8);
+> >
+> >This is not really safe, you shouldn't attempt to access skb->data witho=
+ut first checking skb->len, actually it would be much better that >you woul=
+d use skb_pull_data which does skb->len check before pulling data.
+>
+> I think it could be safe because its length is checked inside btbcm_read_=
+verbose_config() as below.
+> Please let me know if further checking is needed.
+>
+> >>>
+> static struct sk_buff *btbcm_read_verbose_config(struct hci_dev *hdev)
+> {
+>         struct sk_buff *skb;
+>
+>         skb =3D __hci_cmd_sync(hdev, 0xfc79, 0, NULL, HCI_INIT_TIMEOUT);
+>         if (IS_ERR(skb)) {
+>                 bt_dev_err(hdev, "BCM: Read verbose config info failed (%=
+ld)",
+>                            PTR_ERR(skb));
+>                 return skb;
+>         }
+>
+>         if (skb->len !=3D 7) {
+>                 bt_dev_err(hdev, "BCM: Verbose config length mismatch");
+>                 kfree_skb(skb);
+>                 return ERR_PTR(-EIO);
+>         }
+>
+>         return skb;
+> }
+> <<<
 
-diff --git a/tools/rctest.c b/tools/rctest.c
-index ff91eb2f1..e39d313eb 100644
---- a/tools/rctest.c
-+++ b/tools/rctest.c
-@@ -500,7 +500,7 @@ static void recv_mode(int sk)
- 					timestamp = 0;
- 					memset(ts, 0, sizeof(ts));
- 				} else {
--					sprintf(ts, "[%lld.%lld] ",
-+					snprintf(ts, sizeof(ts), "[%lld.%lld] ",
- 							(long long)tv.tv_sec,
- 							(long long)tv.tv_usec);
- 				}
--- 
-2.43.0
+Ok, but I still consider reworking these to use skb_pull_data.
 
+> Best Regards,
+> Nobuaki Tsunashima
+>
+
+
+--=20
+Luiz Augusto von Dentz
