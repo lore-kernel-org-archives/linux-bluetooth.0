@@ -1,83 +1,77 @@
-Received: from out-23.smtp.github.com (out-23.smtp.github.com [192.30.252.206])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AF4C1E4A4
-	for <linux-bluetooth@vger.kernel.org>; Fri, 28 Jun 2024 19:36:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.206
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90EF174077
+	for <linux-bluetooth@vger.kernel.org>; Fri, 28 Jun 2024 19:40:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719603415; cv=none; b=i5hKM0Tvhdm1IOFHZoIv4PbxQNfYJn4LHz2HstlMjZ5LU5oza41+KRhdEwqPOfFNaeJz8smHD5yqoJkA1B+ENNnCMkZRRRhjEz8VIaQc7ghVSm1Hu88xua1hGeylXDjcGwuh4m/+T2kt7lRXATIaBVTDXzyTpTh0EnOtKuWIda8=
+	t=1719603629; cv=none; b=oMsT7WY4DSdfEPjVnr7LVAij6IiRPvwnM5Ve/XEkR0KOPqNFJ0S2YcTwVwGZh6+cSNyexsVXbF6QurDuX6aPDIhn2raK1vfwDRUEaeFaI6tx4Oky36rfYKf+QBBlByRLn0ka0YB3dv0b4BQeIK9yUrZxhqiiBNkQnug2LS357JM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719603415; c=relaxed/simple;
-	bh=MQErH4tC5cXz8Eac9ZRYG6w3dy6UZbTfqj2SPH1JT/M=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=mGPbTHbD4eJxq3S2HgrKWC6bbsgEYhjf4kgiB745dBmI6YElh7SK78g/NCgqpbCJUmzHNV9ZezbsgWH3YDAz7NqR6htwoisq/RwsVTll465u3PVUtwhixbqv6QerJWhFDDsxzV1tyzaziQkOuMZde8eD441Tkq8AGkU1sVBJ/fk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=jSId0gPc; arc=none smtp.client-ip=192.30.252.206
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1719603629; c=relaxed/simple;
+	bh=Blp120lvGVY4rVtvbtb1QTJQFlTqSHXAdcF4q5Ya5jU=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=rA+Gnn/ZkAhtnejPV6AP05Rp64dfJwoP+5GoJBANWli8Zh/Tcjqp0sO56kr0EvK5Mo/o51kNRlygk07w57IDFrhxk5J/hZ+E4MglEGN9rDpwV97ibQelOGg6A/dnGha8TnZJ3KKONQuOuszmI1Fi32M8nDhiH8ZpocctV+JvlhM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pMnsJapy; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="jSId0gPc"
-Received: from github.com (hubbernetes-node-3827642.ac4-iad.github.net [10.52.152.37])
-	by smtp.github.com (Postfix) with ESMTPA id A7EAE5E09F8
-	for <linux-bluetooth@vger.kernel.org>; Fri, 28 Jun 2024 12:36:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1719603413;
-	bh=pED1U7g8rfLFWl+ieXf/ipm18pcZhWAxN8oDGWDCJUk=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=jSId0gPcSwmAuiRPdZy0TYoTqdbalB0NxusHh2OTCx+FYkMJKLcGRQUs2TnaG6hPD
-	 n67bbvtm/aVd9dJglHiP4u2t9xnbDqRlOGr9SkPIkSCWB4HOlkTbQ2Ge4Pj1UigHeR
-	 D+B4Gf67kYpgh8KqRLD33zalCRXH3rpQGz9w7/aE=
-Date: Fri, 28 Jun 2024 12:36:53 -0700
-From: Luiz Augusto von Dentz <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/master/0ddcfa-7e0282@github.com>
-Subject: [bluez/bluez] 1a5125: org.bluez.LEAdvertisement: Promote experimental
- pr...
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pMnsJapy"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 22421C2BD10;
+	Fri, 28 Jun 2024 19:40:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1719603629;
+	bh=Blp120lvGVY4rVtvbtb1QTJQFlTqSHXAdcF4q5Ya5jU=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=pMnsJapylVBmmhTLP6cmGqdDbthnahwSqPeSQIaBrGPOA02zzEnMoYidkJ2Yvvh+M
+	 +i3mWKILR7XOPjQSHIL9kFj93JBfCerWeDEKHEd7fBnuOXchei5TwDZhj6QbtZM57u
+	 56Iri4wfoCUXUKlMYcIrCI6gGrA0UUYeZtms400KR/tavhV98X5Dpu7w/UjQ9olrhh
+	 BXT71ROpZrP2pCfKQxuRuhabRAJLizFCHTOcTBUId2jwr9igTIrHhLrRsRwg+eJccs
+	 SxIJhNktaYyYPMqkYO+ktmzTEodlCxN7c2lEYZFLr5MIZSdudktXMRYZPPgRXYQBhm
+	 +Lj96F/S75wkw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 13046C43335;
+	Fri, 28 Jun 2024 19:40:29 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH BlueZ v2 1/2] org.bluez.LEAdvertisement: Promote experimental
+ properties to stable
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <171960362907.5711.10238816554127935779.git-patchwork-notify@kernel.org>
+Date: Fri, 28 Jun 2024 19:40:29 +0000
+References: <20240628164701.626148-1-luiz.dentz@gmail.com>
+In-Reply-To: <20240628164701.626148-1-luiz.dentz@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
 
-  Branch: refs/heads/master
-  Home:   https://github.com/bluez/bluez
-  Commit: 1a51250a7ea53d3a7729c9b49d42a712205d569d
-      https://github.com/bluez/bluez/commit/1a51250a7ea53d3a7729c9b49d42a712205d569d
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2024-06-28 (Fri, 28 Jun 2024)
+Hello:
 
-  Changed paths:
-    M doc/org.bluez.LEAdvertisement.rst
-    M doc/org.bluez.LEAdvertisingManager.rst
+This series was applied to bluetooth/bluez.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-  Log Message:
-  -----------
-  org.bluez.LEAdvertisement: Promote experimental properties to stable
+On Fri, 28 Jun 2024 12:47:00 -0400 you wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> 
+> This promotes experimental properties to stable since they have been in
+> use for quite a while without any changes.
+> ---
+>  doc/org.bluez.LEAdvertisement.rst      | 28 +++++++++++++-------------
+>  doc/org.bluez.LEAdvertisingManager.rst | 12 +++++------
+>  2 files changed, 20 insertions(+), 20 deletions(-)
 
-This promotes experimental properties to stable since they have been in
-use for quite a while without any changes.
+Here is the summary with links:
+  - [BlueZ,v2,1/2] org.bluez.LEAdvertisement: Promote experimental properties to stable
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=1a51250a7ea5
+  - [BlueZ,v2,2/2] advertising: Promote experimental properties to stable
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=7e028287ae1a
 
-
-  Commit: 7e028287ae1a94b47093cfb328645ae1c74a2ea7
-      https://github.com/bluez/bluez/commit/7e028287ae1a94b47093cfb328645ae1c74a2ea7
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2024-06-28 (Fri, 28 Jun 2024)
-
-  Changed paths:
-    M src/advertising.c
-
-  Log Message:
-  -----------
-  advertising: Promote experimental properties to stable
-
-This promotes experimental properties to stable since they have been in
-use for quite a while without any changes.
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
-Compare: https://github.com/bluez/bluez/compare/0ddcfaeafad6...7e028287ae1a
-
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
