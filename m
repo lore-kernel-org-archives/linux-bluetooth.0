@@ -1,121 +1,104 @@
-Received: from wfhigh5-smtp.messagingengine.com (wfhigh5-smtp.messagingengine.com [64.147.123.156])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f41.google.com (mail-qv1-f41.google.com [209.85.219.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01862BA34
-	for <linux-bluetooth@vger.kernel.org>; Sat, 29 Jun 2024 20:16:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=64.147.123.156
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D0DE2594
+	for <linux-bluetooth@vger.kernel.org>; Sat, 29 Jun 2024 22:03:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719692206; cv=none; b=fhs3NP8Eb/Fdb0waagCJlJ94/+BK0H7+tNBHgIl+wK2nZRSqj+CohniceHupwCK1s7cdfLHpGkXa2Rz8lwDGKZKU5sQpCvp5uGYNYji8X5ENRvGOFyCd/lAnekO6KpUmG7FtP1CE9GFX+TtphPc2b+NC8hvCbZm+nC8ectPyVlc=
+	t=1719698602; cv=none; b=Ne4qGwA9VdcNM2oBAs7iaZQOUqU77lfAYzKLoriLvjgAjrSFqT86ePFxsGfgQ78ngpFz3S5G9MkUujMjbvnr/fmhz28GjMUky+g/cdN2K2Lkr8ydZIQDvCQfI2VhwTJssHF3/pTC+j8gzXkOl9EJ3nQ7JnoiPlW/DuqXHLIiJ3c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719692206; c=relaxed/simple;
-	bh=7RV5JUzTYXgZaEJCGf7sGVcCqiDZCdo4o5BE42LUfzI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ZQ3GIlPlrRhpQ6UE/HBLW23Gka0ITKG5r4I0gWjR/nnPR8FbJzVYBJefzYQFspsIEvoiGbX+q5pYbfdAudtNI9nogLchnf+7NGQvVHeVub19Cxt69w3DwVvtPYp400O2sRFgUm7b+tQMqFQpuMtqwNtSvr3S0LCwYlCYGdVW6XQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=arnavion.dev; spf=pass smtp.mailfrom=arnavion.dev; dkim=pass (2048-bit key) header.d=arnavion.dev header.i=@arnavion.dev header.b=bCtGHoRI; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=IEm36UcF; arc=none smtp.client-ip=64.147.123.156
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=arnavion.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arnavion.dev
+	s=arc-20240116; t=1719698602; c=relaxed/simple;
+	bh=Q8gv2/CMLQ14KKV6UXQ/nY0d3V0aTK6uAaypFS1eE4U=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=kMQwpYz8i6EwVOzyMJAhZgmE5gBAD2312AZtHsq+vn9HmLhcJZX6434nBYeJF/9g7Ztaoa8CHqGjiF98NwQJpfJwo7N2SDUir6m1XX8GaZIlXPFdLaKX4Ku+7/lYxkWQyKjfpTnnsVMM9DXoGr3Y9fx4zwzAAk02lgmAEIaI1Jw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mPDd5Bmw; arc=none smtp.client-ip=209.85.219.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arnavion.dev header.i=@arnavion.dev header.b="bCtGHoRI";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="IEm36UcF"
-Received: from compute6.internal (compute6.nyi.internal [10.202.2.47])
-	by mailfhigh.west.internal (Postfix) with ESMTP id 186A61800093;
-	Sat, 29 Jun 2024 16:16:44 -0400 (EDT)
-Received: from mailfrontend2 ([10.202.2.163])
-  by compute6.internal (MEProxy); Sat, 29 Jun 2024 16:16:44 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arnavion.dev; h=
-	cc:cc:content-transfer-encoding:content-type:date:date:from:from
-	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
-	:to; s=fm3; t=1719692203; x=1719778603; bh=m5MvGOya7irprl8mmO4X+
-	CNRsMA0LMH1rbnnrRR47tg=; b=bCtGHoRIjwgpVsl9sjEvDKMeue0yQ3Y+Rpid3
-	w/t6+VpWmuH5OKYWFyBbpCq85oTK0aYAEbgvl7LcSqq7WqxMCUtiKZG5jc0HZFOK
-	zjr+etotypAWLl6peCTb7CEsWyuS2zluOcUHexWLi3cvVm90S9mSp0vibrrX5Ac/
-	tTYe+l+hdW3fGUFZmddasnG4tzq0Ydoimhp9KDOwjvnGZAuEJThX6tVCvShOK/lW
-	bc/5AelVaWnQ+tSghySaXGUUTwY0YNR8gaiwJMUlTOqQf4/7lfPDhyTeluxsj3fF
-	BLeDIdSPiHGDb65DQMY9vJYRlWblm/W04Jx4EHipbIjPoZeXQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:date:date:feedback-id:feedback-id:from:from
-	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
-	fm2; t=1719692203; x=1719778603; bh=m5MvGOya7irprl8mmO4X+CNRsMA0
-	LMH1rbnnrRR47tg=; b=IEm36UcFOt/wjos/aKaun/ORcppp2W4tO7i3rBhVcJ2U
-	2Odr6ziBKLqDZR5uvo4qBubXR01iwE1KtI/9cT2br/ttc2GTcL6ZmI+dG3Bu831I
-	PKzLOdO4sbRVvxeR2nOHV1tMLWDeGs/nnsBcRfSjkYQobiAqMloU6GJV0GTqy7gE
-	9J1lsPdeuRtx4veJZQauP77/PvLLTN586xMgNtkv+QbiwHnmLO/Y+cIpvvGd3uEA
-	Y4fum4j5cf4dMQEzc1T7WCbHxtBFApBC02+knJPwOkzRBFvxeyoMGFBofP5nSOTw
-	BP0clsuTNgwQ6LbjOsop+zplDWz6Pbao3ezFAoa67w==
-X-ME-Sender: <xms:q2uAZryWMU3zutXwVBhJ8bU0aQOKgN5l8ZfVv-idP6zEmqmVVpiF1g>
-    <xme:q2uAZjQy0LAArcp19QT0H60KJ2cN6pqXCi1ZFgd2gk335V36pyvhoQmLYDttBqvrN
-    Xevvv2Lavj8XmdWcrY>
-X-ME-Received: <xmr:q2uAZlVwEK0O33Pn9WzAySkSUZg5TVOKUzgYZ-ZQX24s70jKjDzEo8w>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeftddrtdelgddugeekucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucenucfjughrpefhvfevufffkffoggfgsedtkeertd
-    ertddtnecuhfhrohhmpeetrhhnrghvucfuihhnghhhuceomhgvsegrrhhnrghvihhonhdr
-    uggvvheqnecuggftrfgrthhtvghrnhepjeevkeeugfetieekvdejfeelgfegkeegjeetvd
-    eiheejgefgfedttdevhfffhfelnecuffhomhgrihhnpehgihhthhhusgdrtghomhenucev
-    lhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehmvgesrghrnh
-    grvhhiohhnrdguvghv
-X-ME-Proxy: <xmx:q2uAZlieK_5UDhhIa9uZdaP_HqTpwCv5ZbUXpe6A8_qX-fKKPi3DuA>
-    <xmx:q2uAZtA_Oe4G1_Y06Oyf2LQcK81Ip279137u7iTZ2ZkrUCJucW-K3g>
-    <xmx:q2uAZuKnW5Lp6PQZfieqxb7wII9bXtVtHa_SxjHrUHcvSnppuWYwyA>
-    <xmx:q2uAZsAY0dwbmU8pxVbRjTD_nJRPIvHwt4l-cwZbMLnPjlpT7vhKkw>
-    <xmx:q2uAZgN33mnIf3AkgaqOjpOV757l-xHjKo9lknW4JFQikGPkDfwFmZJq>
-Feedback-ID: i31c1461b:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Sat,
- 29 Jun 2024 16:16:43 -0400 (EDT)
-From: Arnav Singh <me@arnavion.dev>
-To: linux-bluetooth@vger.kernel.org
-Cc: Arnav Singh <me@arnavion.dev>
-Subject: [PATCH BlueZ] policy: Fix AutoEnable default when main.conf doesn't exist
-Date: Sat, 29 Jun 2024 13:16:32 -0700
-Message-ID: <20240629201632.1356542-1-me@arnavion.dev>
-X-Mailer: git-send-email 2.45.2
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mPDd5Bmw"
+Received: by mail-qv1-f41.google.com with SMTP id 6a1803df08f44-6b4f7541d7eso9119886d6.0
+        for <linux-bluetooth@vger.kernel.org>; Sat, 29 Jun 2024 15:03:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1719698599; x=1720303399; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=yBLAiMDPJ2hfYGSd8mKUzPnOrYPfYOBoi0OImf4Lb8I=;
+        b=mPDd5BmwOth/VJ30SIRp3c4J6jw3zty6+pjsvV3jZEra9qVQY2pXM6sVEjUnujlWsv
+         dyV7W2n7/NdzMiukZ4CZ8HKdDLsIzA84LQrjwPVlRH//ocNTr7Drh+L4b44wyGNSZlM5
+         EbFEGUMXgRwhXxE4Pn5s3GVpolDC9seVm5EBnfWOZT3/QUlz4xmJNnRlPz8lBLVydqZv
+         wN2j5TLB5mUK7HWqN4yV1ELxAdd97hpys/+3m+6coBzECc0yjKVhUYieqoRANJA5n7sG
+         MhFOXQkAJdUG+w3XwZfsLSET9P2ebyPU/vTtWQYKqEF5kZz7rjGodsnRyAECENOG/WY0
+         K+ew==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1719698599; x=1720303399;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=yBLAiMDPJ2hfYGSd8mKUzPnOrYPfYOBoi0OImf4Lb8I=;
+        b=YaLN676Y73l1HiNLr3MOOcyN0E7PH2y8kkYKt16WlcKYBgB+C5LU6sYkfqz5PHn6he
+         BEk6QDUo5GcS9tZIh9QxOxN5zzO3EeBfKnlB6/bSE12Jm33XjVBls+jf3jeJwNK2XvjZ
+         BoisvXXM1nRoz3Tkck/o6JcGRSq6o8PuCGL+nCtFKifee67V25qtBLIwVCCCGMVtLiDG
+         CpgZIadeo8FjJ2tAZbLLQr0hymACgr9Lue0F8fQeWxpuF6MOf75Y3r+Xmi6X2j7R6yHO
+         XCKXWR1V2i/1cg6Wyss3bCjjTxyfcmwz0KCtHLCE6kI/M8SaZmNXB+uGbMW27+iqSici
+         flSg==
+X-Gm-Message-State: AOJu0YwDjiVuYyEB2H9WD8ygaFzxg+L8VTSiHqjnFWaamc8PUhXHlkeI
+	FqwsVSJjavaKdGJ7hmzqFyHU5D+n5g2HLSiX1lqkr4MAb+W/nJcusrCDhg==
+X-Google-Smtp-Source: AGHT+IGWowFuxuWze+HLjs4jQSgEfWkDhuZLIpCOeV7BYrFFdzNHFcVnt2hmczRPbVLNsAxUpbfwpQ==
+X-Received: by 2002:ad4:5e8a:0:b0:6b2:d51c:f5b3 with SMTP id 6a1803df08f44-6b5b70a1491mr25621576d6.18.1719698599368;
+        Sat, 29 Jun 2024 15:03:19 -0700 (PDT)
+Received: from [172.17.0.2] ([40.67.133.159])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6b59e576915sm19835746d6.58.2024.06.29.15.03.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 29 Jun 2024 15:03:19 -0700 (PDT)
+Message-ID: <668084a7.050a0220.db00a.95b4@mx.google.com>
+Date: Sat, 29 Jun 2024 15:03:19 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============0409674048999848637=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, me@arnavion.dev
+Subject: RE: [BlueZ] policy: Fix AutoEnable default when main.conf doesn't exist
+In-Reply-To: <20240629201632.1356542-1-me@arnavion.dev>
+References: <20240629201632.1356542-1-me@arnavion.dev>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-180cf09933b2d8eb03972c8638063429fe5fece5 changed the default to true
-if the config file did not set it, but it still remained false if
-the config file did not exist at all. This change fixes that.
+--===============0409674048999848637==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Fixes: https://github.com/bluez/bluez/issues/886
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=866862
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.46 seconds
+GitLint                       PASS      0.69 seconds
+BuildEll                      PASS      25.27 seconds
+BluezMake                     PASS      1642.43 seconds
+MakeCheck                     PASS      13.64 seconds
+MakeDistcheck                 PASS      192.64 seconds
+CheckValgrind                 PASS      251.68 seconds
+CheckSmatch                   PASS      354.58 seconds
+bluezmakeextell               PASS      119.82 seconds
+IncrementalBuild              PASS      1548.90 seconds
+ScanBuild                     PASS      994.67 seconds
+
+
+
 ---
- plugins/policy.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/plugins/policy.c b/plugins/policy.c
-index 0bbdbfc88..9a449da61 100644
---- a/plugins/policy.c
-+++ b/plugins/policy.c
-@@ -74,6 +74,7 @@ static GSList *reconnects = NULL;
- static unsigned int service_id = 0;
- static GSList *devices = NULL;
- 
-+static const bool default_auto_enable = true;
- static bool auto_enable = false;
- 
- struct policy_data {
-@@ -858,6 +859,7 @@ static int policy_init(void)
- 						sizeof(*reconnect_intervals);
- 		reconnect_intervals = util_memdup(default_intervals,
- 						sizeof(default_intervals));
-+		auto_enable = default_auto_enable;
- 		goto done;
- 	}
- 
-@@ -895,7 +897,7 @@ static int policy_init(void)
- 								&gerr);
- 	if (gerr) {
- 		g_clear_error(&gerr);
--		auto_enable = true;
-+		auto_enable = default_auto_enable;
- 	}
- 
- 	resume_delay = g_key_file_get_integer(
--- 
-2.45.2
 
+--===============0409674048999848637==--
