@@ -1,123 +1,121 @@
-Received: from mail-vs1-f51.google.com (mail-vs1-f51.google.com [209.85.217.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from wfhigh5-smtp.messagingengine.com (wfhigh5-smtp.messagingengine.com [64.147.123.156])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C6E512FF91
-	for <linux-bluetooth@vger.kernel.org>; Sat, 29 Jun 2024 17:57:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01862BA34
+	for <linux-bluetooth@vger.kernel.org>; Sat, 29 Jun 2024 20:16:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=64.147.123.156
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719683827; cv=none; b=mprigyVpRiuBYPGxG4YCOBkL+rKZvQ4GGbuoaqxTuBbYnko38r01/SE2Uh1lFzp18WRKSAQZoDs/p43y1wAne6U+5L5RiWMv3Bcrs0h4LvZoXh1r1ArhsNbQluaennfrCHwbVyD7H4UA2Q2ea29pvjok6RY5uEfZSdmxo9tubao=
+	t=1719692206; cv=none; b=fhs3NP8Eb/Fdb0waagCJlJ94/+BK0H7+tNBHgIl+wK2nZRSqj+CohniceHupwCK1s7cdfLHpGkXa2Rz8lwDGKZKU5sQpCvp5uGYNYji8X5ENRvGOFyCd/lAnekO6KpUmG7FtP1CE9GFX+TtphPc2b+NC8hvCbZm+nC8ectPyVlc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719683827; c=relaxed/simple;
-	bh=H4ZjMqLPJD/w5Zjc6z/8/ttyRLPUHtMFCSPq/iSXiZo=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=JDCe9+1rf8BFQbdXusDh9QjvjZAcl6NCUSXus3Mny1wgDEoGO7THh/Ql0Z2+Tq7NFfrC+zTrwBi47Y8cRW7jdmuS8ecICmL1oLweTLI7Rl2ETgiZAx0F/2Q4sHfEvnZvC2RWBBhV76jPO0mGNxUQm9Nk1FPV9JNjs1K2HuKCdUY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=B0T3bxTJ; arc=none smtp.client-ip=209.85.217.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1719692206; c=relaxed/simple;
+	bh=7RV5JUzTYXgZaEJCGf7sGVcCqiDZCdo4o5BE42LUfzI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ZQ3GIlPlrRhpQ6UE/HBLW23Gka0ITKG5r4I0gWjR/nnPR8FbJzVYBJefzYQFspsIEvoiGbX+q5pYbfdAudtNI9nogLchnf+7NGQvVHeVub19Cxt69w3DwVvtPYp400O2sRFgUm7b+tQMqFQpuMtqwNtSvr3S0LCwYlCYGdVW6XQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=arnavion.dev; spf=pass smtp.mailfrom=arnavion.dev; dkim=pass (2048-bit key) header.d=arnavion.dev header.i=@arnavion.dev header.b=bCtGHoRI; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=IEm36UcF; arc=none smtp.client-ip=64.147.123.156
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=arnavion.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arnavion.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="B0T3bxTJ"
-Received: by mail-vs1-f51.google.com with SMTP id ada2fe7eead31-48f550b29d7so479902137.1
-        for <linux-bluetooth@vger.kernel.org>; Sat, 29 Jun 2024 10:57:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1719683825; x=1720288625; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=8tPZWBRAuobMCAUJBABPmA/in7SJsiUCYJL2dQW94vE=;
-        b=B0T3bxTJFKsj/k3ZvwCo84BTZcLNynP2b0OLZPesFUn/gfsZve85QqL+HjUtIwYs5I
-         WNEFcJq/fY1KLqJHX8EkSLlq1zxG5G9XK7Ea8ZT9RDEIrTzolKxAvRSDtI6nSxfOLq3t
-         1u99HzbKAnSPeYTn1c7ju2naIyMys67BmAqS/x1C6//+m8+cPpUnfukKz6eNnnFxTm8d
-         TB9E244SjE8Kgec4vwPd48XRQ8i/3qJiu0ZwDAkujCOObF8iYXBZQaqsnraA2JWQnzMf
-         pMrIsG553mZiSOhEAyhWXka4yFC0Z67310brH04d63GHoZw97FM4jFVcpIw0TvkvqiIg
-         PKkA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719683825; x=1720288625;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=8tPZWBRAuobMCAUJBABPmA/in7SJsiUCYJL2dQW94vE=;
-        b=ZD1rzHMs26txwJHiM2YXVbwqQDTVb3bSZJ3pbflcoXWJouGW2KuntlpVVTAAbCNJsa
-         9JSAYi185lUx+S3SnJeCYHl0VOtt1dDmMZrdpt8eu7c3wL14Xnjo9GJWsKVYliHg7AkB
-         UHVI7Rqs+DkpDRP6cqSAyviRPvUDo5EcVlFFUddz2YJ6nwm+VDp/3mRaHi0p0ROaZ1h9
-         hddgfsIM0jLBASwc79Hqo8LTyJlBahv7HfqOlVZA60+Y2Cp6rs5ChJU0XuwnrIzTf3fh
-         8wrPapQU7hqelcvUev/MlL/WFaAzFlF7M0DMil7aWY4TjGdBH93K/DHcgUtvMVQPxXfV
-         lvqg==
-X-Gm-Message-State: AOJu0YyDlyE3C62Jpy4yTweLPomy22kf1OnUgImdPek93lUVny2U79/J
-	1KykiOBOVHPMZtqPXifIiqA9wxnw6XZcH4TwWfwMPaJeSNgejEN/CsL8BchD
-X-Google-Smtp-Source: AGHT+IEN4bX9kMRPqXNatGf8M81Baw6jtfBllXT8Fx0TEdMuywgy9nSuMzJ+/jPBXSjTb7Kfn7U6/A==
-X-Received: by 2002:a67:fe49:0:b0:48f:6009:a924 with SMTP id ada2fe7eead31-48faf0c64e4mr1667107137.17.1719683824811;
-        Sat, 29 Jun 2024 10:57:04 -0700 (PDT)
-Received: from [172.17.0.2] ([52.167.124.176])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-79d69298fd5sm180005985a.64.2024.06.29.10.57.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 29 Jun 2024 10:57:04 -0700 (PDT)
-Message-ID: <66804af0.050a0220.b7c8a.81e6@mx.google.com>
-Date: Sat, 29 Jun 2024 10:57:04 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============1296855440404969788=="
+	dkim=pass (2048-bit key) header.d=arnavion.dev header.i=@arnavion.dev header.b="bCtGHoRI";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="IEm36UcF"
+Received: from compute6.internal (compute6.nyi.internal [10.202.2.47])
+	by mailfhigh.west.internal (Postfix) with ESMTP id 186A61800093;
+	Sat, 29 Jun 2024 16:16:44 -0400 (EDT)
+Received: from mailfrontend2 ([10.202.2.163])
+  by compute6.internal (MEProxy); Sat, 29 Jun 2024 16:16:44 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arnavion.dev; h=
+	cc:cc:content-transfer-encoding:content-type:date:date:from:from
+	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
+	:to; s=fm3; t=1719692203; x=1719778603; bh=m5MvGOya7irprl8mmO4X+
+	CNRsMA0LMH1rbnnrRR47tg=; b=bCtGHoRIjwgpVsl9sjEvDKMeue0yQ3Y+Rpid3
+	w/t6+VpWmuH5OKYWFyBbpCq85oTK0aYAEbgvl7LcSqq7WqxMCUtiKZG5jc0HZFOK
+	zjr+etotypAWLl6peCTb7CEsWyuS2zluOcUHexWLi3cvVm90S9mSp0vibrrX5Ac/
+	tTYe+l+hdW3fGUFZmddasnG4tzq0Ydoimhp9KDOwjvnGZAuEJThX6tVCvShOK/lW
+	bc/5AelVaWnQ+tSghySaXGUUTwY0YNR8gaiwJMUlTOqQf4/7lfPDhyTeluxsj3fF
+	BLeDIdSPiHGDb65DQMY9vJYRlWblm/W04Jx4EHipbIjPoZeXQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:date:date:feedback-id:feedback-id:from:from
+	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
+	fm2; t=1719692203; x=1719778603; bh=m5MvGOya7irprl8mmO4X+CNRsMA0
+	LMH1rbnnrRR47tg=; b=IEm36UcFOt/wjos/aKaun/ORcppp2W4tO7i3rBhVcJ2U
+	2Odr6ziBKLqDZR5uvo4qBubXR01iwE1KtI/9cT2br/ttc2GTcL6ZmI+dG3Bu831I
+	PKzLOdO4sbRVvxeR2nOHV1tMLWDeGs/nnsBcRfSjkYQobiAqMloU6GJV0GTqy7gE
+	9J1lsPdeuRtx4veJZQauP77/PvLLTN586xMgNtkv+QbiwHnmLO/Y+cIpvvGd3uEA
+	Y4fum4j5cf4dMQEzc1T7WCbHxtBFApBC02+knJPwOkzRBFvxeyoMGFBofP5nSOTw
+	BP0clsuTNgwQ6LbjOsop+zplDWz6Pbao3ezFAoa67w==
+X-ME-Sender: <xms:q2uAZryWMU3zutXwVBhJ8bU0aQOKgN5l8ZfVv-idP6zEmqmVVpiF1g>
+    <xme:q2uAZjQy0LAArcp19QT0H60KJ2cN6pqXCi1ZFgd2gk335V36pyvhoQmLYDttBqvrN
+    Xevvv2Lavj8XmdWcrY>
+X-ME-Received: <xmr:q2uAZlVwEK0O33Pn9WzAySkSUZg5TVOKUzgYZ-ZQX24s70jKjDzEo8w>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeftddrtdelgddugeekucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+    uceurghilhhouhhtmecufedttdenucenucfjughrpefhvfevufffkffoggfgsedtkeertd
+    ertddtnecuhfhrohhmpeetrhhnrghvucfuihhnghhhuceomhgvsegrrhhnrghvihhonhdr
+    uggvvheqnecuggftrfgrthhtvghrnhepjeevkeeugfetieekvdejfeelgfegkeegjeetvd
+    eiheejgefgfedttdevhfffhfelnecuffhomhgrihhnpehgihhthhhusgdrtghomhenucev
+    lhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehmvgesrghrnh
+    grvhhiohhnrdguvghv
+X-ME-Proxy: <xmx:q2uAZlieK_5UDhhIa9uZdaP_HqTpwCv5ZbUXpe6A8_qX-fKKPi3DuA>
+    <xmx:q2uAZtA_Oe4G1_Y06Oyf2LQcK81Ip279137u7iTZ2ZkrUCJucW-K3g>
+    <xmx:q2uAZuKnW5Lp6PQZfieqxb7wII9bXtVtHa_SxjHrUHcvSnppuWYwyA>
+    <xmx:q2uAZsAY0dwbmU8pxVbRjTD_nJRPIvHwt4l-cwZbMLnPjlpT7vhKkw>
+    <xmx:q2uAZgN33mnIf3AkgaqOjpOV757l-xHjKo9lknW4JFQikGPkDfwFmZJq>
+Feedback-ID: i31c1461b:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Sat,
+ 29 Jun 2024 16:16:43 -0400 (EDT)
+From: Arnav Singh <me@arnavion.dev>
+To: linux-bluetooth@vger.kernel.org
+Cc: Arnav Singh <me@arnavion.dev>
+Subject: [PATCH BlueZ] policy: Fix AutoEnable default when main.conf doesn't exist
+Date: Sat, 29 Jun 2024 13:16:32 -0700
+Message-ID: <20240629201632.1356542-1-me@arnavion.dev>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, marex@denx.de
-Subject: RE: [bluetooth-next] Bluetooth: hci_bcm: Configure sleep mode on RPM suspend/resume
-In-Reply-To: <20240629172235.29901-1-marex@denx.de>
-References: <20240629172235.29901-1-marex@denx.de>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 
---===============1296855440404969788==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+180cf09933b2d8eb03972c8638063429fe5fece5 changed the default to true
+if the config file did not set it, but it still remained false if
+the config file did not exist at all. This change fixes that.
 
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=866844
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      0.70 seconds
-GitLint                       PASS      0.33 seconds
-SubjectPrefix                 PASS      0.14 seconds
-BuildKernel                   PASS      28.77 seconds
-CheckAllWarning               PASS      31.02 seconds
-CheckSparse                   PASS      36.35 seconds
-CheckSmatch                   PASS      99.34 seconds
-BuildKernel32                 PASS      30.39 seconds
-TestRunnerSetup               PASS      504.07 seconds
-TestRunner_l2cap-tester       PASS      19.65 seconds
-TestRunner_iso-tester         FAIL      42.46 seconds
-TestRunner_bnep-tester        PASS      4.64 seconds
-TestRunner_mgmt-tester        PASS      110.15 seconds
-TestRunner_rfcomm-tester      PASS      7.21 seconds
-TestRunner_sco-tester         PASS      14.80 seconds
-TestRunner_ioctl-tester       PASS      7.61 seconds
-TestRunner_mesh-tester        PASS      10.21 seconds
-TestRunner_smp-tester         PASS      6.67 seconds
-TestRunner_userchan-tester    PASS      4.88 seconds
-IncrementalBuild              PASS      26.91 seconds
-
-Details
-##############################
-Test: TestRunner_iso-tester - FAIL
-Desc: Run iso-tester with test-runner
-Output:
-Total: 122, Passed: 116 (95.1%), Failed: 2, Not Run: 4
-
-Failed Test Cases
-ISO Connect Suspend - Success                        Failed       6.185 seconds
-ISO Connect2 Suspend - Success                       Failed       6.233 seconds
-
-
+Fixes: https://github.com/bluez/bluez/issues/886
 ---
-Regards,
-Linux Bluetooth
+ plugins/policy.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
+diff --git a/plugins/policy.c b/plugins/policy.c
+index 0bbdbfc88..9a449da61 100644
+--- a/plugins/policy.c
++++ b/plugins/policy.c
+@@ -74,6 +74,7 @@ static GSList *reconnects = NULL;
+ static unsigned int service_id = 0;
+ static GSList *devices = NULL;
+ 
++static const bool default_auto_enable = true;
+ static bool auto_enable = false;
+ 
+ struct policy_data {
+@@ -858,6 +859,7 @@ static int policy_init(void)
+ 						sizeof(*reconnect_intervals);
+ 		reconnect_intervals = util_memdup(default_intervals,
+ 						sizeof(default_intervals));
++		auto_enable = default_auto_enable;
+ 		goto done;
+ 	}
+ 
+@@ -895,7 +897,7 @@ static int policy_init(void)
+ 								&gerr);
+ 	if (gerr) {
+ 		g_clear_error(&gerr);
+-		auto_enable = true;
++		auto_enable = default_auto_enable;
+ 	}
+ 
+ 	resume_delay = g_key_file_get_integer(
+-- 
+2.45.2
 
---===============1296855440404969788==--
