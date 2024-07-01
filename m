@@ -1,293 +1,178 @@
-Received: from mail-lj1-f176.google.com (mail-lj1-f176.google.com [209.85.208.176])
+Received: from mail-lj1-f173.google.com (mail-lj1-f173.google.com [209.85.208.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56BFC15EFB0
-	for <linux-bluetooth@vger.kernel.org>; Mon,  1 Jul 2024 13:59:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 161E6167288
+	for <linux-bluetooth@vger.kernel.org>; Mon,  1 Jul 2024 14:10:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719842374; cv=none; b=oMkmmgmnzDQ/nLp2KOAn5XxVSnw4IJuBwBGOb8Ax96e8MruhdCTMukqtc4pYmy/lwLlpzUxaXq5qv9LS2gxvN49c+lwfE7GE0tY8vPSfAPBBNpaIilQdTAUf3a1sVp1ulJO0EP5ws8ZCMmVuKNZSYTdS4CkU96GYtwzTIrXIqUU=
+	t=1719843052; cv=none; b=CT3NmYpQYZI5pDKIC0m1Fp3elEao2JwNEWNDQ5FoMKXVKuJZupnI2jyzlxmhXZA1UULm6C/tDr5/GKey9L/KFBVfbf9C1oH6SaOt4ucnnc1Nv91fvkCBwtpMOP2H/6x2lxJKu3UJyO2cSzQEEJkUnTKs2HQIx6rr9f8pkthZfS0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719842374; c=relaxed/simple;
-	bh=/uVdAWuKbDTEiHyLzCYv9wfkJM35ipJVq+DD+ASU57U=;
+	s=arc-20240116; t=1719843052; c=relaxed/simple;
+	bh=U2TwBnP8suGUiR860t4bd7SvpCg1OZLgZSZy3Igmmv4=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=LbNZpbiOCSeRwpzRbX1eSTGIgO6jDApso6ZLBZnXIiSDASpWyhyelPnv03kKYfE6HrlZUN3XTJylVYZChvwMTo2QgmbU/fu/raVBgmSySQ3CqgXq0moKIvjwQCnuZtIntqE7p2fquMFod0+LOy4zQ/MfV+kXUq6fGw4TQeWiRro=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RkZJeCbY; arc=none smtp.client-ip=209.85.208.176
+	 To:Cc:Content-Type; b=PFcKrTf5IRvBb7gP7RH/Z3y2M1uVsXSpG226qj0WpRoFFL+rcua+QONR4B1erlrEan4dezzY34N/zAGcz0ciDrkWA2GQ+QxDTobqSd1ywKvoMI1/XBAELFQ4vaOqesiLZ/DKweIPa8bHCdAyFMftsfFBkVe5E2ngf8J2btR4LTY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=A1C7dxWd; arc=none smtp.client-ip=209.85.208.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RkZJeCbY"
-Received: by mail-lj1-f176.google.com with SMTP id 38308e7fff4ca-2eaae2a6dc1so39788711fa.0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 01 Jul 2024 06:59:30 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="A1C7dxWd"
+Received: by mail-lj1-f173.google.com with SMTP id 38308e7fff4ca-2ed5ac077f5so36217931fa.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 01 Jul 2024 07:10:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1719842369; x=1720447169; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1719843049; x=1720447849; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=xd5UE+sv90IaGID7cz/aqdBGuAqFEHugikMJlMeOz4Y=;
-        b=RkZJeCbYIXVffqGdMb3GcAB7nuCVed3JLJIw5v8PSW2EECSzWkIT1Ox0mQi/XxF1ZQ
-         Nz6tn3s2TFnu3oC82iNZ5547/xubEa0Kde4YE4VlecjGGQU9Punf1MxZGYoRm6mW5DPi
-         szUkS1FOjdk026VlK7RdXc/0mcBaR9/oidCIiOyd4Godps5af0WaiYduhy4MbaOF7Td0
-         v/XGZwig+8L0PBYRVBwyAz5y8Fi9AqFaVVKOrbuu/hoGwLVLNDGs1b02YpmdICHDfi81
-         9iWhtFxzvDwRFLQNaBECwmD8BTASJ+Bwylst9UZWUJ7fJn0+swvDhAdvdl2knc6/uqlx
-         rnSg==
+        bh=BkGmwhGtXK/kQusY3fnpAU2R2fYKjxvbZo6Lv3neKiM=;
+        b=A1C7dxWdZ1khbqoagAreFei1SGwrrB3t9/+wMFHvvAwTZmXurjbCiz2UpRQICvDGBT
+         58JGEUc0V14tZS/n2sUb6z9IjfZTvkPYQaYPV1JZB70B3Inm2NBhnOaCCqXEfXy/QDzx
+         fa7u00/t9cyPIbLikQGST+dhFs/31ko4xmub2ZRpRzHSXxVrUa12PiS0d8tu1KZKMbWV
+         hUeb83Kxe8Lkms8IRJOX9mbQFZrnmpdnb98siH6UOrchi8iPoCh35Q8XwHrlD6SU5Xe3
+         CpwyuaLMRw/u00oJjL7q5JRY38qj0BvHvIu2OZFwISnpz8iZdK4Jh4+5AaRLrzeeI+1L
+         CrGw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719842369; x=1720447169;
+        d=1e100.net; s=20230601; t=1719843049; x=1720447849;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=xd5UE+sv90IaGID7cz/aqdBGuAqFEHugikMJlMeOz4Y=;
-        b=KZ3BIamuAUurjHBZyTWJnnXmtDTCq5ZAk/NXLxA0zE7u1dTXCpRw+i0oSHY2lJcuaN
-         +Q9CIsJrvYl2Opc8qabAWU67F/HNN4N5jYnrEcP5uow+q1zqMpeYfKJiJY9YWy5gXM/u
-         Y5ZD3kjwukM/uqkmSgK29VAgv/71pddR68oWIj5aZqyKus6kRh1Clg/dv70I6idB8qUM
-         xVOVMuHRu3nRpWXNJc0jddiB1FH7zDMn38Z5XOs1EZu6zqb3233l3l4V8t/Mlj1ujYGb
-         OSz6XhDic2zNj39paw367Nlsi9tKSnFWTZqN2lr7lqYZQWdlU9v8NiEngVYMM36PN0Bn
-         Kc6w==
-X-Gm-Message-State: AOJu0YyPtO4cligi3Hi0POWCT9rKTuPusl+aly1Be0xU45199f/t7P2B
-	DqXK7PGdpLbrvOnEydGBZ+lqlUON2TS9vBqKungn4Hwksw0DriQkZXfn7gjLdRKwYUlIKabjsRw
-	gZ/UgliVcXrbLKYPRG6zU14jdpC0=
-X-Google-Smtp-Source: AGHT+IFiU+ZLuSX4Gf8C6Vk2G4geALDzDj3OAJCgs080zxYPnXtx0QKbIqksxY6OYGYlsde/A4CpPispgxCzCK02dQo=
-X-Received: by 2002:a2e:b816:0:b0:2ec:4bb7:d7f6 with SMTP id
- 38308e7fff4ca-2ee5e37ff9emr42306281fa.7.1719842369028; Mon, 01 Jul 2024
- 06:59:29 -0700 (PDT)
+        bh=BkGmwhGtXK/kQusY3fnpAU2R2fYKjxvbZo6Lv3neKiM=;
+        b=vnxNNl+9DPMFbgkEc4smZWCsDV/mxvqGKKL3PBJloXUF2ENYER7wP36qHxZZdwh9wf
+         y2k2EUwBtfI0Rr35Bk+GBNg/6bp1Ow2I8ZSebK3LqQ3er45cHWjOBOM/R0FB5OkGPjUQ
+         FvQcY42E65poKni22fOnc+H8+uQfl8W8h6LM7F2ss8/nk7b754y7bK35HoCricAUeA9o
+         68OvB0vaPSZQFNkppLQ4XVUy2O+I3opcG/i/cQXQxON/meAz3QZXDvc92aQa6+jsekpa
+         j2jq6bOpR8OWQJ+C5oi22vZnyqnLNS5AmFqFkU+7bQg7dYA7/svrkc9dhIluu4TdUePD
+         aMhQ==
+X-Gm-Message-State: AOJu0YwQBLtcdw7zIlFMt5rkSsxOS0hmm3WsqyBQ4BkGD/8m7japP8NH
+	rPdjd2+TuXwWRbS+D4mqHxU/UuwH80pDbvwUdqkMiGiyiep9u2+34nmEGxuCX4zyWm+KpmNo4qZ
+	oJ8ZCtZz0QxgplUPI7rXPCd3l7Wo=
+X-Google-Smtp-Source: AGHT+IGaynqAvCbj+Xq5+OB21dDQ1+gvjUwwG4zZOqauqTQEu/Gs/YVNnEoOJgwkz6uUzn7JnaJL/m0sAqvV1eBavy4=
+X-Received: by 2002:a05:651c:503:b0:2ec:5128:184c with SMTP id
+ 38308e7fff4ca-2ee5e3595f1mr40491081fa.11.1719843048985; Mon, 01 Jul 2024
+ 07:10:48 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240624144911.3817479-1-luiz.dentz@gmail.com> <a9609dd3d0cb3b8c3fd387efe8a81eddc821be0f.camel@iki.fi>
-In-Reply-To: <a9609dd3d0cb3b8c3fd387efe8a81eddc821be0f.camel@iki.fi>
+References: <20240628072342.2256-1-quic_prathm@quicinc.com>
+ <CABBYNZJ7RfPu61tt7R-nrUfZX1DnSY73KS84p9QiyTW7WDpfXQ@mail.gmail.com> <5e3186e5-0ec3-41e2-985e-f2609a4a9fd5@quicinc.com>
+In-Reply-To: <5e3186e5-0ec3-41e2-985e-f2609a4a9fd5@quicinc.com>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 1 Jul 2024 09:59:16 -0400
-Message-ID: <CABBYNZKYX5S7SbcHZcx2UeoV_u80bxS6y68mDhpxvROnTeP_Uw@mail.gmail.com>
-Subject: Re: [PATCH v1] Bluetooth: Fix double free in hci_req_sync_complete
-To: Pauli Virtanen <pav@iki.fi>
-Cc: linux-bluetooth@vger.kernel.org
+Date: Mon, 1 Jul 2024 10:10:36 -0400
+Message-ID: <CABBYNZKmqjZ_1oQTrF7+EB=tzv5AfAjQ9jUAw4Nf1NOXPjMHEg@mail.gmail.com>
+Subject: Re: [PATCH v1] Added BREDR not supported bit in AD Flag when
+ discoverable is off
+To: Prathibha Madugonde <quic_prathm@quicinc.com>
+Cc: linux-bluetooth@vger.kernel.org, quic_mohamull@quicinc.com, 
+	quic_hbandi@quicinc.com, quic_anubhavg@quicinc.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi Pauli,
+Hi,
 
-On Sat, Jun 29, 2024 at 6:07=E2=80=AFAM Pauli Virtanen <pav@iki.fi> wrote:
+On Mon, Jul 1, 2024 at 7:03=E2=80=AFAM Prathibha Madugonde
+<quic_prathm@quicinc.com> wrote:
 >
-> Hi Luiz,
 >
-> ma, 2024-06-24 kello 10:49 -0400, Luiz Augusto von Dentz kirjoitti:
-> > From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> >
-> > This fixes the following race:
-> >
-> > cpu1                       cpu2
-> > =3D=3D=3D=3D                       =3D=3D=3D=3D
-> >                            sock_ioctl
-> >                            sock_do_ioctl
-> >                            hci_sock_ioctl
-> > hci_rx_work                hci_dev_cmd
-> > hci_event_packet           hci_req_sync
-> > req_complete_skb           __hci_req_sync
-> > hci_req_sync_complete
-> >
-> > If hci_rx_work executes before __hci_req_sync releases req_skb, everyth=
-ing
-> > is normal, otherwise it will result in double free of req_skb.
-> >
-> > This replaces the usage of hci_req_sync with hci_cmd_sync_status.
-> >
-> > Fixes: 45d355a926ab ("Bluetooth: Fix memory leak in hci_req_sync_comple=
-te()")
-> > Reported-and-tested-by: syzbot+35ebc808442df6420eae@syzkaller.appspotma=
-il.com
-> > Closes: https://syzkaller.appspot.com/bug?extid=3D35ebc808442df6420eae
-> > Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> > ---
-> >  include/net/bluetooth/hci_sync.h |  2 +
-> >  net/bluetooth/hci_core.c         | 72 ++++++++------------------------
-> >  net/bluetooth/hci_sync.c         | 13 ++++++
-> >  3 files changed, 33 insertions(+), 54 deletions(-)
-> >
-> > diff --git a/include/net/bluetooth/hci_sync.h b/include/net/bluetooth/h=
-ci_sync.h
-> > index b49057bbdf23..20168732f20e 100644
-> > --- a/include/net/bluetooth/hci_sync.h
-> > +++ b/include/net/bluetooth/hci_sync.h
-> > @@ -38,6 +38,8 @@ int __hci_cmd_sync_status(struct hci_dev *hdev, u16 o=
-pcode, u32 plen,
-> >  int __hci_cmd_sync_status_sk(struct hci_dev *hdev, u16 opcode, u32 ple=
-n,
-> >                            const void *param, u8 event, u32 timeout,
-> >                            struct sock *sk);
-> > +int hci_cmd_sync_status(struct hci_dev *hdev, u16 opcode, u32 plen,
-> > +                     const void *param, u32 timeout);
 >
-> In this patch, this function is unused?
+> On 6/28/2024 7:08 PM, Luiz Augusto von Dentz wrote:
+> > Hi,
+> >
+> > On Fri, Jun 28, 2024 at 3:24=E2=80=AFAM <quic_prathm@quicinc.com> wrote=
+:
+> >>
+> >> From: Prathibha Madugonde <quic_prathm@quicinc.com>
+> >>
+> >> Fix for GAP/DISC/NONM/BV-02-C
+> >> As per GAP.TS.p44 test spec
+> >> IUT does not contain General Discoverable mode and Limited Discoverabl=
+e
+> >> mode in the AD Type Flag. IUT shall send AD Type Flag to PASS the test
+> >> case, thus added BR/EDR not supported bit in the AD Type Flag when
+> >> discoverable is off.
+> >>
+> >> Signed-off-by: Prathibha Madugonde <quic_prathm@quicinc.com>
+> >> ---
+> >>   src/advertising.c | 16 ++++++++++++++++
+> >>   1 file changed, 16 insertions(+)
+> >>
+> >> diff --git a/src/advertising.c b/src/advertising.c
+> >> index 5d373e088..9857ceceb 100644
+> >> --- a/src/advertising.c
+> >> +++ b/src/advertising.c
+> >> @@ -1444,6 +1444,7 @@ static DBusMessage *parse_advertisement(struct b=
+td_adv_client *client)
+> >>   {
+> >>          struct adv_parser *parser;
+> >>          int err;
+> >> +       uint8_t flags;
+> >>
+> >>          for (parser =3D parsers; parser && parser->name; parser++) {
+> >>                  DBusMessageIter iter;
+> >> @@ -1499,6 +1500,21 @@ static DBusMessage *parse_advertisement(struct =
+btd_adv_client *client)
+> >>                  goto fail;
+> >>          }
+> >>
+> >> +       if (!btd_adapter_get_discoverable(client->manager->adapter)) {
+> >> +               /* GAP.TS.p44 Test Spec GAP/DISC/NONM/BV-02-C
+> >> +                * page 158:
+> >> +                * IUT does not contain
+> >> +                * =E2=80=98LE General Discoverable Mode=E2=80=99 flag=
+ or the
+> >> +                * =E2=80=98LE Limited Discoverable Mode=E2=80=99 flag=
+ in the Flags AD Type
+> >> +                * But AD Flag Type should be there for the test case =
+to
+> >> +                * PASS. Thus BR/EDR Not Supported BIT shall be includ=
+ed
+> >> +                * in the AD Type flag.
+> >> +                */
+> >> +               flags =3D bt_ad_get_flags(client->data);
+> >> +               flags |=3D BT_AD_FLAG_NO_BREDR;
+> >> +               bt_ad_add_flags(client->data, &flags, 1);
+> >> +       }
+> >
+> > I think we would be much better off using broadcaster role for such a
+> > test case or does it require to be connectable? Anyway I don't think
+> > there is a requirement to disable BR/EDR when not discoverable, so if
+> > we really need to pass specific flags then perhaps it would be better
+> > to create a Flags property so clients can set themselves.
+> >
+> Hi,
+> This particular test case require IUT to be in connectable. There is
+> already code snippet to disable BR/EDR when adapter is not discoverable
+> in the set_flags() like below.
+>         /* Set BR/EDR Not Supported if adapter is not discoverable but
+>          * the instance is.
+>          */
+>         if ((flags & (BT_AD_FLAG_GENERAL | BT_AD_FLAG_LIMITED)) &&
+>                         !btd_adapter_get_discoverable(client->manager->ad=
+apter))
+>                 flags |=3D BT_AD_FLAG_NO_BREDR;
 >
-> >
-> >  void hci_cmd_sync_init(struct hci_dev *hdev);
-> >  void hci_cmd_sync_clear(struct hci_dev *hdev);
-> > diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-> > index d541cbb991eb..144e85ebfbdb 100644
-> > --- a/net/bluetooth/hci_core.c
-> > +++ b/net/bluetooth/hci_core.c
-> > @@ -63,50 +63,6 @@ DEFINE_MUTEX(hci_cb_list_lock);
-> >  /* HCI ID Numbering */
-> >  static DEFINE_IDA(hci_index_ida);
-> >
-> > -static int hci_scan_req(struct hci_request *req, unsigned long opt)
-> > -{
-> > -     __u8 scan =3D opt;
-> > -
-> > -     BT_DBG("%s %x", req->hdev->name, scan);
-> > -
-> > -     /* Inquiry and Page scans */
-> > -     hci_req_add(req, HCI_OP_WRITE_SCAN_ENABLE, 1, &scan);
-> > -     return 0;
-> > -}
-> > -
-> > -static int hci_auth_req(struct hci_request *req, unsigned long opt)
-> > -{
-> > -     __u8 auth =3D opt;
-> > -
-> > -     BT_DBG("%s %x", req->hdev->name, auth);
-> > -
-> > -     /* Authentication */
-> > -     hci_req_add(req, HCI_OP_WRITE_AUTH_ENABLE, 1, &auth);
-> > -     return 0;
-> > -}
-> > -
-> > -static int hci_encrypt_req(struct hci_request *req, unsigned long opt)
-> > -{
-> > -     __u8 encrypt =3D opt;
-> > -
-> > -     BT_DBG("%s %x", req->hdev->name, encrypt);
-> > -
-> > -     /* Encryption */
-> > -     hci_req_add(req, HCI_OP_WRITE_ENCRYPT_MODE, 1, &encrypt);
-> > -     return 0;
-> > -}
-> > -
-> > -static int hci_linkpol_req(struct hci_request *req, unsigned long opt)
-> > -{
-> > -     __le16 policy =3D cpu_to_le16(opt);
-> > -
-> > -     BT_DBG("%s %x", req->hdev->name, policy);
-> > -
-> > -     /* Default link policy */
-> > -     hci_req_add(req, HCI_OP_WRITE_DEF_LINK_POLICY, 2, &policy);
-> > -     return 0;
-> > -}
-> > -
-> >  /* Get HCI device by index.
-> >   * Device is held on return. */
-> >  struct hci_dev *hci_dev_get(int index)
-> > @@ -735,6 +691,7 @@ int hci_dev_cmd(unsigned int cmd, void __user *arg)
-> >  {
-> >       struct hci_dev *hdev;
-> >       struct hci_dev_req dr;
-> > +     __le16 policy;
-> >       int err =3D 0;
-> >
-> >       if (copy_from_user(&dr, arg, sizeof(dr)))
-> > @@ -761,8 +718,8 @@ int hci_dev_cmd(unsigned int cmd, void __user *arg)
-> >
-> >       switch (cmd) {
-> >       case HCISETAUTH:
-> > -             err =3D hci_req_sync(hdev, hci_auth_req, dr.dev_opt,
-> > -                                HCI_INIT_TIMEOUT, NULL);
-> > +             err =3D __hci_cmd_sync_status(hdev, HCI_OP_WRITE_AUTH_ENA=
-BLE,
-> > +                                         1, &dr.dev_opt, HCI_CMD_TIMEO=
-UT);
->
-> These probably were intended to use hci_cmd_sync_status that has the
-> locking?
+> Hence using the same logic. Currently AD flags(BT_AD_FLAG_LIMITED,
+> BT_AD_FLAG_GENERAL & BT_AD_FLAG_NO_BREDR) is managed based on properties
+> discoverable, discoverable timeout and adapter discoverable.
 
-Yep, looks like I used the wrong version, I will need to fix that,
-thanks for spotting it.
+Oh, in that case why didn't you change that statement? Anyway, the PTS
+requiring the use of flags is rather unconventional here but I think
+it should be fine not marking BR/EDR support if it is not
+discoverable.
 
-> >               break;
-> >
-> >       case HCISETENCRYPT:
-> > @@ -773,19 +730,23 @@ int hci_dev_cmd(unsigned int cmd, void __user *ar=
-g)
-> >
-> >               if (!test_bit(HCI_AUTH, &hdev->flags)) {
-> >                       /* Auth must be enabled first */
-> > -                     err =3D hci_req_sync(hdev, hci_auth_req, dr.dev_o=
-pt,
-> > -                                        HCI_INIT_TIMEOUT, NULL);
-> > +                     err =3D __hci_cmd_sync_status(hdev,
-> > +                                                 HCI_OP_WRITE_AUTH_ENA=
-BLE,
-> > +                                                 1, &dr.dev_opt,
-> > +                                                 HCI_CMD_TIMEOUT);
-> >                       if (err)
-> >                               break;
-> >               }
-> >
-> > -             err =3D hci_req_sync(hdev, hci_encrypt_req, dr.dev_opt,
-> > -                                HCI_INIT_TIMEOUT, NULL);
-> > +             err =3D __hci_cmd_sync_status(hdev, HCI_OP_WRITE_ENCRYPT_=
-MODE,
-> > +                                         1, &dr.dev_opt,
-> > +                                         HCI_CMD_TIMEOUT);
-> >               break;
-> >
-> >       case HCISETSCAN:
-> > -             err =3D hci_req_sync(hdev, hci_scan_req, dr.dev_opt,
-> > -                                HCI_INIT_TIMEOUT, NULL);
-> > +             err =3D __hci_cmd_sync_status(hdev, HCI_OP_WRITE_SCAN_ENA=
-BLE,
-> > +                                         1, &dr.dev_opt,
-> > +                                         HCI_CMD_TIMEOUT);
-> >
-> >               /* Ensure that the connectable and discoverable states
-> >                * get correctly modified as this was a non-mgmt change.
-> > @@ -795,8 +756,11 @@ int hci_dev_cmd(unsigned int cmd, void __user *arg=
-)
-> >               break;
-> >
-> >       case HCISETLINKPOL:
-> > -             err =3D hci_req_sync(hdev, hci_linkpol_req, dr.dev_opt,
-> > -                                HCI_INIT_TIMEOUT, NULL);
-> > +             policy =3D cpu_to_le16(dr.dev_opt);
-> > +
-> > +             err =3D __hci_cmd_sync_status(hdev, HCI_OP_WRITE_DEF_LINK=
-_POLICY,
-> > +                                         2, &policy,
-> > +                                         HCI_CMD_TIMEOUT);
-> >               break;
-> >
-> >       case HCISETLINKMODE:
-> > diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-> > index eff648853ae1..ccad43f10415 100644
-> > --- a/net/bluetooth/hci_sync.c
-> > +++ b/net/bluetooth/hci_sync.c
-> > @@ -280,6 +280,19 @@ int __hci_cmd_sync_status(struct hci_dev *hdev, u1=
-6 opcode, u32 plen,
-> >  }
-> >  EXPORT_SYMBOL(__hci_cmd_sync_status);
-> >
-> > +int hci_cmd_sync_status(struct hci_dev *hdev, u16 opcode, u32 plen,
-> > +                     const void *param, u32 timeout)
-> > +{
-> > +     int err;
-> > +
-> > +     hci_req_sync_lock(hdev);
-> > +     err =3D __hci_cmd_sync_status(hdev, opcode, plen, param, timeout)=
-;
-> > +     hci_req_sync_unlock(hdev);
-> > +
-> > +     return err;
-> > +}
-> > +EXPORT_SYMBOL(hci_cmd_sync_status);
-> > +
-> >  static void hci_cmd_sync_work(struct work_struct *work)
-> >  {
-> >       struct hci_dev *hdev =3D container_of(work, struct hci_dev, cmd_s=
-ync_work);
->
 > --
-> Pauli Virtanen
+> Prathibha Madugonde
+>
+>
+> >>          err =3D refresh_advertisement(client, add_adv_callback);
+> >>
+> >>          if (!err)
+> >> --
+> >> 2.17.1
+> >>
+> >
+> >
 
 
 
