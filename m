@@ -1,109 +1,295 @@
-Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
+Received: from mail-lj1-f176.google.com (mail-lj1-f176.google.com [209.85.208.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFFAD1EEF8
-	for <linux-bluetooth@vger.kernel.org>; Mon,  1 Jul 2024 13:46:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56BFC15EFB0
+	for <linux-bluetooth@vger.kernel.org>; Mon,  1 Jul 2024 13:59:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719841583; cv=none; b=IzwPtZ4J8bUoHUf0VvMPMQ7VGs+y1S/6DWOKyKvXf+4wGl9GTlGI4zbDit18vv76NmBXYjirbY4MKyWv7Sw6ytcy9vX+D5YCGwTBp9R7Z/k6VTQt+0qegVEae0JUw5mdv+PF7MPytjKEOSFJi11gmFblbmx9UhJ6OdMWXGXIUUM=
+	t=1719842374; cv=none; b=oMkmmgmnzDQ/nLp2KOAn5XxVSnw4IJuBwBGOb8Ax96e8MruhdCTMukqtc4pYmy/lwLlpzUxaXq5qv9LS2gxvN49c+lwfE7GE0tY8vPSfAPBBNpaIilQdTAUf3a1sVp1ulJO0EP5ws8ZCMmVuKNZSYTdS4CkU96GYtwzTIrXIqUU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719841583; c=relaxed/simple;
-	bh=MJoWyrFP4p4vwY7z7tmq87iUFxiltsAq8UuB6jk2D4Q=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=fla/0ALseo1ccEOK8XO1vyISV4cbiqYqURDZtZodP0JznbCIXZqjgDI7t6Xyen5+lPvkXweoKR3P4BY8AQlo26IYJe5lLp+mgcU94Pw4YxOANnm+UFLiC2dcC9+0S+2443RCaqmtmpHiHXDo6d+V+A0rjRam0POJYFUiwzGQiQY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
-Received: from inp1wst083.omp.ru (81.22.207.138) by msexch01.omp.ru
- (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Mon, 1 Jul
- 2024 16:46:02 +0300
-From: Roman Smirnov <r.smirnov@omp.ru>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Roman Smirnov <r.smirnov@omp.ru>
-Subject: [PATCH BlueZ v1] shared/shell: add a check for NULL in bt_shell_init()
-Date: Mon, 1 Jul 2024 16:44:01 +0300
-Message-ID: <20240701134401.205121-1-r.smirnov@omp.ru>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1719842374; c=relaxed/simple;
+	bh=/uVdAWuKbDTEiHyLzCYv9wfkJM35ipJVq+DD+ASU57U=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=LbNZpbiOCSeRwpzRbX1eSTGIgO6jDApso6ZLBZnXIiSDASpWyhyelPnv03kKYfE6HrlZUN3XTJylVYZChvwMTo2QgmbU/fu/raVBgmSySQ3CqgXq0moKIvjwQCnuZtIntqE7p2fquMFod0+LOy4zQ/MfV+kXUq6fGw4TQeWiRro=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RkZJeCbY; arc=none smtp.client-ip=209.85.208.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RkZJeCbY"
+Received: by mail-lj1-f176.google.com with SMTP id 38308e7fff4ca-2eaae2a6dc1so39788711fa.0
+        for <linux-bluetooth@vger.kernel.org>; Mon, 01 Jul 2024 06:59:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1719842369; x=1720447169; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=xd5UE+sv90IaGID7cz/aqdBGuAqFEHugikMJlMeOz4Y=;
+        b=RkZJeCbYIXVffqGdMb3GcAB7nuCVed3JLJIw5v8PSW2EECSzWkIT1Ox0mQi/XxF1ZQ
+         Nz6tn3s2TFnu3oC82iNZ5547/xubEa0Kde4YE4VlecjGGQU9Punf1MxZGYoRm6mW5DPi
+         szUkS1FOjdk026VlK7RdXc/0mcBaR9/oidCIiOyd4Godps5af0WaiYduhy4MbaOF7Td0
+         v/XGZwig+8L0PBYRVBwyAz5y8Fi9AqFaVVKOrbuu/hoGwLVLNDGs1b02YpmdICHDfi81
+         9iWhtFxzvDwRFLQNaBECwmD8BTASJ+Bwylst9UZWUJ7fJn0+swvDhAdvdl2knc6/uqlx
+         rnSg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1719842369; x=1720447169;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=xd5UE+sv90IaGID7cz/aqdBGuAqFEHugikMJlMeOz4Y=;
+        b=KZ3BIamuAUurjHBZyTWJnnXmtDTCq5ZAk/NXLxA0zE7u1dTXCpRw+i0oSHY2lJcuaN
+         +Q9CIsJrvYl2Opc8qabAWU67F/HNN4N5jYnrEcP5uow+q1zqMpeYfKJiJY9YWy5gXM/u
+         Y5ZD3kjwukM/uqkmSgK29VAgv/71pddR68oWIj5aZqyKus6kRh1Clg/dv70I6idB8qUM
+         xVOVMuHRu3nRpWXNJc0jddiB1FH7zDMn38Z5XOs1EZu6zqb3233l3l4V8t/Mlj1ujYGb
+         OSz6XhDic2zNj39paw367Nlsi9tKSnFWTZqN2lr7lqYZQWdlU9v8NiEngVYMM36PN0Bn
+         Kc6w==
+X-Gm-Message-State: AOJu0YyPtO4cligi3Hi0POWCT9rKTuPusl+aly1Be0xU45199f/t7P2B
+	DqXK7PGdpLbrvOnEydGBZ+lqlUON2TS9vBqKungn4Hwksw0DriQkZXfn7gjLdRKwYUlIKabjsRw
+	gZ/UgliVcXrbLKYPRG6zU14jdpC0=
+X-Google-Smtp-Source: AGHT+IFiU+ZLuSX4Gf8C6Vk2G4geALDzDj3OAJCgs080zxYPnXtx0QKbIqksxY6OYGYlsde/A4CpPispgxCzCK02dQo=
+X-Received: by 2002:a2e:b816:0:b0:2ec:4bb7:d7f6 with SMTP id
+ 38308e7fff4ca-2ee5e37ff9emr42306281fa.7.1719842369028; Mon, 01 Jul 2024
+ 06:59:29 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
- (10.188.4.12)
-X-KSE-ServerInfo: msexch01.omp.ru, 9
-X-KSE-AntiSpam-Interceptor-Info: scan successful
-X-KSE-AntiSpam-Version: 6.1.0, Database issued on: 07/01/2024 13:28:53
-X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
-X-KSE-AntiSpam-Method: none
-X-KSE-AntiSpam-Rate: 19
-X-KSE-AntiSpam-Info: Lua profiles 186242 [Jul 01 2024]
-X-KSE-AntiSpam-Info: Version: 6.1.0.4
-X-KSE-AntiSpam-Info: Envelope from: r.smirnov@omp.ru
-X-KSE-AntiSpam-Info: LuaCore: 21 0.3.21
- ebee5449fc125b2da45f1a6a6bc2c5c0c3ad0e05
-X-KSE-AntiSpam-Info: {rep_avail}
-X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
-X-KSE-AntiSpam-Info: {SMTP from is not routable}
-X-KSE-AntiSpam-Info: {Found in DNSBL: 81.22.207.138 in (user)
- b.barracudacentral.org}
-X-KSE-AntiSpam-Info:
-	omp.ru:7.1.1;inp1wst083.omp.ru:7.1.1;81.22.207.138:7.1.2;127.0.0.199:7.1.2;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1
-X-KSE-AntiSpam-Info: ApMailHostAddress: 81.22.207.138
-X-KSE-AntiSpam-Info: {DNS response errors}
-X-KSE-AntiSpam-Info: Rate: 19
-X-KSE-AntiSpam-Info: Status: not_detected
-X-KSE-AntiSpam-Info: Method: none
-X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
- smtp.mailfrom=omp.ru;dkim=none
-X-KSE-Antiphishing-Info: Clean
-X-KSE-Antiphishing-ScanningType: Heuristic
-X-KSE-Antiphishing-Method: None
-X-KSE-Antiphishing-Bases: 07/01/2024 13:33:00
-X-KSE-Antivirus-Interceptor-Info: scan successful
-X-KSE-Antivirus-Info: Clean, bases: 7/1/2024 11:16:00 AM
-X-KSE-Attachment-Filter-Triggered-Rules: Clean
-X-KSE-Attachment-Filter-Triggered-Filters: Clean
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
+References: <20240624144911.3817479-1-luiz.dentz@gmail.com> <a9609dd3d0cb3b8c3fd387efe8a81eddc821be0f.camel@iki.fi>
+In-Reply-To: <a9609dd3d0cb3b8c3fd387efe8a81eddc821be0f.camel@iki.fi>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Mon, 1 Jul 2024 09:59:16 -0400
+Message-ID: <CABBYNZKYX5S7SbcHZcx2UeoV_u80bxS6y68mDhpxvROnTeP_Uw@mail.gmail.com>
+Subject: Re: [PATCH v1] Bluetooth: Fix double free in hci_req_sync_complete
+To: Pauli Virtanen <pav@iki.fi>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-The opt variable is checked for NULL at the beginning of
-the function. It is necessary to add a check to prevent null
-pointer dereferencing.
+Hi Pauli,
 
-Found with the SVACE static analysis tool.
----
- src/shared/shell.c | 14 ++++++++------
- 1 file changed, 8 insertions(+), 6 deletions(-)
+On Sat, Jun 29, 2024 at 6:07=E2=80=AFAM Pauli Virtanen <pav@iki.fi> wrote:
+>
+> Hi Luiz,
+>
+> ma, 2024-06-24 kello 10:49 -0400, Luiz Augusto von Dentz kirjoitti:
+> > From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> >
+> > This fixes the following race:
+> >
+> > cpu1                       cpu2
+> > =3D=3D=3D=3D                       =3D=3D=3D=3D
+> >                            sock_ioctl
+> >                            sock_do_ioctl
+> >                            hci_sock_ioctl
+> > hci_rx_work                hci_dev_cmd
+> > hci_event_packet           hci_req_sync
+> > req_complete_skb           __hci_req_sync
+> > hci_req_sync_complete
+> >
+> > If hci_rx_work executes before __hci_req_sync releases req_skb, everyth=
+ing
+> > is normal, otherwise it will result in double free of req_skb.
+> >
+> > This replaces the usage of hci_req_sync with hci_cmd_sync_status.
+> >
+> > Fixes: 45d355a926ab ("Bluetooth: Fix memory leak in hci_req_sync_comple=
+te()")
+> > Reported-and-tested-by: syzbot+35ebc808442df6420eae@syzkaller.appspotma=
+il.com
+> > Closes: https://syzkaller.appspot.com/bug?extid=3D35ebc808442df6420eae
+> > Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> > ---
+> >  include/net/bluetooth/hci_sync.h |  2 +
+> >  net/bluetooth/hci_core.c         | 72 ++++++++------------------------
+> >  net/bluetooth/hci_sync.c         | 13 ++++++
+> >  3 files changed, 33 insertions(+), 54 deletions(-)
+> >
+> > diff --git a/include/net/bluetooth/hci_sync.h b/include/net/bluetooth/h=
+ci_sync.h
+> > index b49057bbdf23..20168732f20e 100644
+> > --- a/include/net/bluetooth/hci_sync.h
+> > +++ b/include/net/bluetooth/hci_sync.h
+> > @@ -38,6 +38,8 @@ int __hci_cmd_sync_status(struct hci_dev *hdev, u16 o=
+pcode, u32 plen,
+> >  int __hci_cmd_sync_status_sk(struct hci_dev *hdev, u16 opcode, u32 ple=
+n,
+> >                            const void *param, u8 event, u32 timeout,
+> >                            struct sock *sk);
+> > +int hci_cmd_sync_status(struct hci_dev *hdev, u16 opcode, u32 plen,
+> > +                     const void *param, u32 timeout);
+>
+> In this patch, this function is unused?
+>
+> >
+> >  void hci_cmd_sync_init(struct hci_dev *hdev);
+> >  void hci_cmd_sync_clear(struct hci_dev *hdev);
+> > diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+> > index d541cbb991eb..144e85ebfbdb 100644
+> > --- a/net/bluetooth/hci_core.c
+> > +++ b/net/bluetooth/hci_core.c
+> > @@ -63,50 +63,6 @@ DEFINE_MUTEX(hci_cb_list_lock);
+> >  /* HCI ID Numbering */
+> >  static DEFINE_IDA(hci_index_ida);
+> >
+> > -static int hci_scan_req(struct hci_request *req, unsigned long opt)
+> > -{
+> > -     __u8 scan =3D opt;
+> > -
+> > -     BT_DBG("%s %x", req->hdev->name, scan);
+> > -
+> > -     /* Inquiry and Page scans */
+> > -     hci_req_add(req, HCI_OP_WRITE_SCAN_ENABLE, 1, &scan);
+> > -     return 0;
+> > -}
+> > -
+> > -static int hci_auth_req(struct hci_request *req, unsigned long opt)
+> > -{
+> > -     __u8 auth =3D opt;
+> > -
+> > -     BT_DBG("%s %x", req->hdev->name, auth);
+> > -
+> > -     /* Authentication */
+> > -     hci_req_add(req, HCI_OP_WRITE_AUTH_ENABLE, 1, &auth);
+> > -     return 0;
+> > -}
+> > -
+> > -static int hci_encrypt_req(struct hci_request *req, unsigned long opt)
+> > -{
+> > -     __u8 encrypt =3D opt;
+> > -
+> > -     BT_DBG("%s %x", req->hdev->name, encrypt);
+> > -
+> > -     /* Encryption */
+> > -     hci_req_add(req, HCI_OP_WRITE_ENCRYPT_MODE, 1, &encrypt);
+> > -     return 0;
+> > -}
+> > -
+> > -static int hci_linkpol_req(struct hci_request *req, unsigned long opt)
+> > -{
+> > -     __le16 policy =3D cpu_to_le16(opt);
+> > -
+> > -     BT_DBG("%s %x", req->hdev->name, policy);
+> > -
+> > -     /* Default link policy */
+> > -     hci_req_add(req, HCI_OP_WRITE_DEF_LINK_POLICY, 2, &policy);
+> > -     return 0;
+> > -}
+> > -
+> >  /* Get HCI device by index.
+> >   * Device is held on return. */
+> >  struct hci_dev *hci_dev_get(int index)
+> > @@ -735,6 +691,7 @@ int hci_dev_cmd(unsigned int cmd, void __user *arg)
+> >  {
+> >       struct hci_dev *hdev;
+> >       struct hci_dev_req dr;
+> > +     __le16 policy;
+> >       int err =3D 0;
+> >
+> >       if (copy_from_user(&dr, arg, sizeof(dr)))
+> > @@ -761,8 +718,8 @@ int hci_dev_cmd(unsigned int cmd, void __user *arg)
+> >
+> >       switch (cmd) {
+> >       case HCISETAUTH:
+> > -             err =3D hci_req_sync(hdev, hci_auth_req, dr.dev_opt,
+> > -                                HCI_INIT_TIMEOUT, NULL);
+> > +             err =3D __hci_cmd_sync_status(hdev, HCI_OP_WRITE_AUTH_ENA=
+BLE,
+> > +                                         1, &dr.dev_opt, HCI_CMD_TIMEO=
+UT);
+>
+> These probably were intended to use hci_cmd_sync_status that has the
+> locking?
 
-diff --git a/src/shared/shell.c b/src/shared/shell.c
-index f3f7bab9a..2ecc41bf3 100644
---- a/src/shared/shell.c
-+++ b/src/shared/shell.c
-@@ -1328,13 +1328,15 @@ void bt_shell_init(int argc, char **argv, const struct bt_shell_opt *opt)
- 				}
- 			}
- 
--			if (c != opt->options[index - offset].val) {
--				usage(argc, argv, opt);
--				exit(EXIT_SUCCESS);
--				return;
--			}
-+			if (opt) {
-+				if (c != opt->options[index - offset].val) {
-+					usage(argc, argv, opt);
-+					exit(EXIT_SUCCESS);
-+					return;
-+				}
- 
--			*opt->optarg[index - offset] = optarg ? : "";
-+				*opt->optarg[index - offset] = optarg ? : "";
-+			}
- 		}
- 
- 		index = -1;
--- 
-2.34.1
+Yep, looks like I used the wrong version, I will need to fix that,
+thanks for spotting it.
 
+> >               break;
+> >
+> >       case HCISETENCRYPT:
+> > @@ -773,19 +730,23 @@ int hci_dev_cmd(unsigned int cmd, void __user *ar=
+g)
+> >
+> >               if (!test_bit(HCI_AUTH, &hdev->flags)) {
+> >                       /* Auth must be enabled first */
+> > -                     err =3D hci_req_sync(hdev, hci_auth_req, dr.dev_o=
+pt,
+> > -                                        HCI_INIT_TIMEOUT, NULL);
+> > +                     err =3D __hci_cmd_sync_status(hdev,
+> > +                                                 HCI_OP_WRITE_AUTH_ENA=
+BLE,
+> > +                                                 1, &dr.dev_opt,
+> > +                                                 HCI_CMD_TIMEOUT);
+> >                       if (err)
+> >                               break;
+> >               }
+> >
+> > -             err =3D hci_req_sync(hdev, hci_encrypt_req, dr.dev_opt,
+> > -                                HCI_INIT_TIMEOUT, NULL);
+> > +             err =3D __hci_cmd_sync_status(hdev, HCI_OP_WRITE_ENCRYPT_=
+MODE,
+> > +                                         1, &dr.dev_opt,
+> > +                                         HCI_CMD_TIMEOUT);
+> >               break;
+> >
+> >       case HCISETSCAN:
+> > -             err =3D hci_req_sync(hdev, hci_scan_req, dr.dev_opt,
+> > -                                HCI_INIT_TIMEOUT, NULL);
+> > +             err =3D __hci_cmd_sync_status(hdev, HCI_OP_WRITE_SCAN_ENA=
+BLE,
+> > +                                         1, &dr.dev_opt,
+> > +                                         HCI_CMD_TIMEOUT);
+> >
+> >               /* Ensure that the connectable and discoverable states
+> >                * get correctly modified as this was a non-mgmt change.
+> > @@ -795,8 +756,11 @@ int hci_dev_cmd(unsigned int cmd, void __user *arg=
+)
+> >               break;
+> >
+> >       case HCISETLINKPOL:
+> > -             err =3D hci_req_sync(hdev, hci_linkpol_req, dr.dev_opt,
+> > -                                HCI_INIT_TIMEOUT, NULL);
+> > +             policy =3D cpu_to_le16(dr.dev_opt);
+> > +
+> > +             err =3D __hci_cmd_sync_status(hdev, HCI_OP_WRITE_DEF_LINK=
+_POLICY,
+> > +                                         2, &policy,
+> > +                                         HCI_CMD_TIMEOUT);
+> >               break;
+> >
+> >       case HCISETLINKMODE:
+> > diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+> > index eff648853ae1..ccad43f10415 100644
+> > --- a/net/bluetooth/hci_sync.c
+> > +++ b/net/bluetooth/hci_sync.c
+> > @@ -280,6 +280,19 @@ int __hci_cmd_sync_status(struct hci_dev *hdev, u1=
+6 opcode, u32 plen,
+> >  }
+> >  EXPORT_SYMBOL(__hci_cmd_sync_status);
+> >
+> > +int hci_cmd_sync_status(struct hci_dev *hdev, u16 opcode, u32 plen,
+> > +                     const void *param, u32 timeout)
+> > +{
+> > +     int err;
+> > +
+> > +     hci_req_sync_lock(hdev);
+> > +     err =3D __hci_cmd_sync_status(hdev, opcode, plen, param, timeout)=
+;
+> > +     hci_req_sync_unlock(hdev);
+> > +
+> > +     return err;
+> > +}
+> > +EXPORT_SYMBOL(hci_cmd_sync_status);
+> > +
+> >  static void hci_cmd_sync_work(struct work_struct *work)
+> >  {
+> >       struct hci_dev *hdev =3D container_of(work, struct hci_dev, cmd_s=
+ync_work);
+>
+> --
+> Pauli Virtanen
+
+
+
+--=20
+Luiz Augusto von Dentz
