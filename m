@@ -1,1180 +1,158 @@
-Received: from mail-ua1-f52.google.com (mail-ua1-f52.google.com [209.85.222.52])
+Received: from mail-ot1-f51.google.com (mail-ot1-f51.google.com [209.85.210.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D06384A32
-	for <linux-bluetooth@vger.kernel.org>; Mon,  1 Jul 2024 21:15:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37ECA172760
+	for <linux-bluetooth@vger.kernel.org>; Mon,  1 Jul 2024 21:58:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719868554; cv=none; b=AxNag5sPlRygtm2gkSuFtk5kxbgxQBI4g0eaOy29yfkvv/83EHC5zirP+ZPbSZkNQt3dhzmdkDwY49uc9i75h2ALy2Ek2Dvta6fZY8r2Cyvc8KVu948XVSsKc7K44Kuo1VurigbexiXj3ofblYgJxJdv4oAe7dbYqZKgQiiHSpE=
+	t=1719871132; cv=none; b=s1RZR57rq1TE204/d3OYPOLLbcRPdtkhNGQmUE3VwsFZL4Ko2DlTq9GsX2SvCTAfHg+eBg7fcPVipy41p9oNyWritWIXtLTfog9o82FuZ/ip5dbhbeeKmuzBqrHcC7/6Y+qhxBn+icG2y+on2DT8lGcETPkRd+mjzxJjb4CggcM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719868554; c=relaxed/simple;
-	bh=2lSi99FmS4zK2K+uEQjyMHOceYEMfjx15RwrexuF3DQ=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=FtmJb9R83f4J6lmJaVXOc2Y+1YJFFxLxvDAI3f71FRZkDZjoaBdpkjZeuzvYm7wrAYM7bVn5WyiAUQ9nJI1klQbbsdJ2IFoTZiRggqlib3jPPfg0k5k8rGgD5myPwSt98g/gb3HhtcZMcriLmrO5Al2HTWPYyOwXROSCQJN+9k8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Oukfj33P; arc=none smtp.client-ip=209.85.222.52
+	s=arc-20240116; t=1719871132; c=relaxed/simple;
+	bh=+VDvwBMaJzvPucR5pQBlmc2GEdV/J6mRFmZxC90NxZs=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=fr1/pDNZ/FJBRxfRJt8s1p7yuwfntumsvW7eAQMJdq/fszbGjAZLJKzy+K/Py7HN+Ohgo28vxSTvUSf31Z2VBk5upZTz12A+8zg3sbdqS7RycYSvV8CJI8KhjhYvu/Qnj1b9oBjUUBESwyfVhvFlQg4hQN5LtlZdlE4VD9rEQ60=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MFX3kuwr; arc=none smtp.client-ip=209.85.210.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Oukfj33P"
-Received: by mail-ua1-f52.google.com with SMTP id a1e0cc1a2514c-80f599697c1so767532241.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 01 Jul 2024 14:15:51 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MFX3kuwr"
+Received: by mail-ot1-f51.google.com with SMTP id 46e09a7af769-70211abf4cbso1146105a34.3
+        for <linux-bluetooth@vger.kernel.org>; Mon, 01 Jul 2024 14:58:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1719868549; x=1720473349; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=MQDDH/LLVa3TPdocmNyPD1oMBHiMgUUSoATC+h3sS0s=;
-        b=Oukfj33PtEEA8r0K+/YJlrrTX3x+LGOry9dSaRWIAssQaHZzojAFNX8KiYOk3hphhF
-         pj1nh6n0hcjI7mMVQopfAcLbhxRackAD3b+e2ameAPZITBOdn0+luuRnSIYTSWdxDp8S
-         QHhVk8ihtX58JkKjJ/R0upu+l6wLHwPY6q3GrZuUnCoMNnOqNSyTHJteiqFYaC1Clntk
-         rMezVvIZAPLxDHWh0DwrSvj0tAIVq8bDfZjNw2E1oGtQpAVjraYNvOabUNQRmYWxsy8G
-         r/OKsYvrBydqAfXr+mZs1mGvfbMV3uov7B//i3Geayh+L3BINn4kz/TREyJrjYMbLefs
-         pGig==
+        d=gmail.com; s=20230601; t=1719871130; x=1720475930; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=+VDvwBMaJzvPucR5pQBlmc2GEdV/J6mRFmZxC90NxZs=;
+        b=MFX3kuwr9kNj1/yDTEUrjpTsE7w1YmRVjN634rrMZmDPJF2QBcao3GQ92maXJTOZ1j
+         4HaPwglTVgMn1goL4tAS4vV3+cOGP7nF+i1xyxqnzw6GvRPjWvuKNtoRfu4z0a36FjOz
+         cSAd1EUGs5SxNICaIkhtEaal6h8B9xzfWL/FtuyJao59HCqW9OxTM8OxP5RrKfcFBpp7
+         F7PqJ3/GZoiMX8RvnfP+vaNmpzLbmR/3gfEMJNMmApUeClYj6UaVlfGHvNESZQ6VyjjO
+         io1kKIWjBMk4c1r4Xy/KYA5u6XEDDKrtPEO/IgMfRow1ESgvMznqHAl7NCNSCRmxHDAl
+         MJpg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719868549; x=1720473349;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=MQDDH/LLVa3TPdocmNyPD1oMBHiMgUUSoATC+h3sS0s=;
-        b=R//GM0NfeT1WdLvsiqy5UAemAk5GBER+ob+CKU981tf8qVN3hO3FGwWq4ku3Ld+uWg
-         knXQzpdhSUFcSk0oDAAay7aiqCZ9Kzi4AUyNo7qO41L4tL41FLRc7krce8mXza04RI8W
-         ILoQ3O3i96LMAibUw4kp2fImNMxCIMuy8Uke5gDefoGuVB4jwBxmOaJSt/HuaH5g9DqQ
-         s5SoQCMvAPsTbINyIxQ+fUglcpcUpLfmP9bNgQv0CHaHBkI9Z4B9s0f5MDHQo6oism5F
-         wBBrNj/9QoZt0IN8TuPXPDepVcmNgO8oYQrxc9U06I7YOz6AmD2TuNgSyV3JR511Cm3F
-         LAfw==
-X-Gm-Message-State: AOJu0YxcFuqHBRTPcF1OjYFOKSjI9b8u92t8G9xU6CSShqzH5ypAwSUu
-	lFnka8xADRV8ihdUDi4MbAdG1PgXTNWSQe2D6++o9Aw+kQKGX/fOae+L/Q==
-X-Google-Smtp-Source: AGHT+IFkcR85NL91litXANMiAy0jGaC4I1r+OZ+VQK/19agQ8ZCIwDnhHKkIypj861I9ehSZwi3fxQ==
-X-Received: by 2002:a05:6122:4b14:b0:4ec:f183:c9a8 with SMTP id 71dfb90a1353d-4f2a568209bmr7233018e0c.9.1719868549212;
-        Mon, 01 Jul 2024 14:15:49 -0700 (PDT)
-Received: from lvondent-mobl4.. (syn-107-146-107-067.res.spectrum.com. [107.146.107.67])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-4f292271514sm1144827e0c.51.2024.07.01.14.15.47
-        for <linux-bluetooth@vger.kernel.org>
+        d=1e100.net; s=20230601; t=1719871130; x=1720475930;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=+VDvwBMaJzvPucR5pQBlmc2GEdV/J6mRFmZxC90NxZs=;
+        b=nVsYGI8a432wi6t5N09lJE/areJ2/tnDUWf2MNTkTNuv0r6PEbENM/2pZ5vbAhzTuy
+         BHLX57NdvH/VdAYLWpBagfP/i507lg/9hnpwfZOMD+5bCRIaSbo4G3w6PwVtcxkfKXsO
+         6nbVJv/fa4wy4IiRpkE+BPz0sVw+OT6tzGfRIgQXI5VYR2ovawflpw+zd04D3e9JIJ03
+         hI7X1q53JEo0U+cHhpM7Z1acsI4QKmy99gKitobJwFKFN7B7NbF79xJuTBzLR+Op6D0E
+         byg8gWIO7NmtoamZuaPj1YnDv80bJ8tIkq862Ib2KZG98i2sZxqebJ7PpAEColrWQiKd
+         4SQQ==
+X-Gm-Message-State: AOJu0YxNY0QhuTuFbiQEo9uGOELNi4Kr51xM3rZ+NPwCP1G+HkzZM3VJ
+	UOo547/jLqtetr5vQrMvfIv2e1nmO6I5Q3Ey2RWR5aMievvfLTmVsfkx8A==
+X-Google-Smtp-Source: AGHT+IG2f4nw1vI5/W7nmkvcyOkXUmCeCJZeurEofT1/OUS6AmdnhwxAKXpxQFbZFQm+FGRV+dDEuA==
+X-Received: by 2002:a9d:7491:0:b0:701:f368:c54 with SMTP id 46e09a7af769-70207686f04mr7276014a34.26.1719871129862;
+        Mon, 01 Jul 2024 14:58:49 -0700 (PDT)
+Received: from [172.17.0.2] ([172.183.106.51])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-79d69260065sm389436385a.5.2024.07.01.14.58.49
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 01 Jul 2024 14:15:48 -0700 (PDT)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v1 5/5] Bluetooth: Remove hci_request.{c,h}
-Date: Mon,  1 Jul 2024 17:15:38 -0400
-Message-ID: <20240701211538.1420913-5-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.45.2
-In-Reply-To: <20240701211538.1420913-1-luiz.dentz@gmail.com>
-References: <20240701211538.1420913-1-luiz.dentz@gmail.com>
+        Mon, 01 Jul 2024 14:58:49 -0700 (PDT)
+Message-ID: <66832699.050a0220.6be26.fc8a@mx.google.com>
+Date: Mon, 01 Jul 2024 14:58:49 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============3731094880704115870=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [v1,1/5] Bluetooth: hci_core: Remove usage of hci_req_sync
+In-Reply-To: <20240701211538.1420913-1-luiz.dentz@gmail.com>
+References: <20240701211538.1420913-1-luiz.dentz@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+--===============3731094880704115870==
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
 
-This removes hci_request.{c,h} since it shall no longer be used.
+VGhpcyBpcyBhdXRvbWF0ZWQgZW1haWwgYW5kIHBsZWFzZSBkbyBub3QgcmVwbHkgdG8gdGhpcyBl
+bWFpbCEKCkRlYXIgc3VibWl0dGVyLAoKVGhhbmsgeW91IGZvciBzdWJtaXR0aW5nIHRoZSBwYXRj
+aGVzIHRvIHRoZSBsaW51eCBibHVldG9vdGggbWFpbGluZyBsaXN0LgpUaGlzIGlzIGEgQ0kgdGVz
+dCByZXN1bHRzIHdpdGggeW91ciBwYXRjaCBzZXJpZXM6ClBXIExpbms6aHR0cHM6Ly9wYXRjaHdv
+cmsua2VybmVsLm9yZy9wcm9qZWN0L2JsdWV0b290aC9saXN0Lz9zZXJpZXM9ODY3Mjk5CgotLS1U
+ZXN0IHJlc3VsdC0tLQoKVGVzdCBTdW1tYXJ5OgpDaGVja1BhdGNoICAgICAgICAgICAgICAgICAg
+ICBGQUlMICAgICAgNi41NiBzZWNvbmRzCkdpdExpbnQgICAgICAgICAgICAgICAgICAgICAgIFBB
+U1MgICAgICAxLjQxIHNlY29uZHMKU3ViamVjdFByZWZpeCAgICAgICAgICAgICAgICAgUEFTUyAg
+ICAgIDAuNTIgc2Vjb25kcwpCdWlsZEtlcm5lbCAgICAgICAgICAgICAgICAgICBQQVNTICAgICAg
+MzAuNDAgc2Vjb25kcwpDaGVja0FsbFdhcm5pbmcgICAgICAgICAgICAgICBXQVJOSU5HICAgMzMu
+Mzggc2Vjb25kcwpDaGVja1NwYXJzZSAgICAgICAgICAgICAgICAgICBXQVJOSU5HICAgMzkuMDQg
+c2Vjb25kcwpDaGVja1NtYXRjaCAgICAgICAgICAgICAgICAgICBXQVJOSU5HICAgMTAzLjE0IHNl
+Y29uZHMKQnVpbGRLZXJuZWwzMiAgICAgICAgICAgICAgICAgUEFTUyAgICAgIDI5LjQxIHNlY29u
+ZHMKVGVzdFJ1bm5lclNldHVwICAgICAgICAgICAgICAgUEFTUyAgICAgIDU0Mi4wMyBzZWNvbmRz
+ClRlc3RSdW5uZXJfbDJjYXAtdGVzdGVyICAgICAgIFBBU1MgICAgICAyMC41OSBzZWNvbmRzClRl
+c3RSdW5uZXJfaXNvLXRlc3RlciAgICAgICAgIFBBU1MgICAgICA0Mi4wMSBzZWNvbmRzClRlc3RS
+dW5uZXJfYm5lcC10ZXN0ZXIgICAgICAgIFBBU1MgICAgICA0Ljg2IHNlY29uZHMKVGVzdFJ1bm5l
+cl9tZ210LXRlc3RlciAgICAgICAgRkFJTCAgICAgIDExNi4yNSBzZWNvbmRzClRlc3RSdW5uZXJf
+cmZjb21tLXRlc3RlciAgICAgIFBBU1MgICAgICA3LjgzIHNlY29uZHMKVGVzdFJ1bm5lcl9zY28t
+dGVzdGVyICAgICAgICAgUEFTUyAgICAgIDE1LjEyIHNlY29uZHMKVGVzdFJ1bm5lcl9pb2N0bC10
+ZXN0ZXIgICAgICAgUEFTUyAgICAgIDguMDUgc2Vjb25kcwpUZXN0UnVubmVyX21lc2gtdGVzdGVy
+ICAgICAgICBQQVNTICAgICAgNi4wMCBzZWNvbmRzClRlc3RSdW5uZXJfc21wLXRlc3RlciAgICAg
+ICAgIFBBU1MgICAgICA3LjM1IHNlY29uZHMKVGVzdFJ1bm5lcl91c2VyY2hhbi10ZXN0ZXIgICAg
+UEFTUyAgICAgIDUuMTUgc2Vjb25kcwpJbmNyZW1lbnRhbEJ1aWxkICAgICAgICAgICAgICBGQUlM
+ICAgICAgNzUuMjQgc2Vjb25kcwoKRGV0YWlscwojIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMj
+IyMKVGVzdDogQ2hlY2tQYXRjaCAtIEZBSUwKRGVzYzogUnVuIGNoZWNrcGF0Y2gucGwgc2NyaXB0
+Ck91dHB1dDoKW3YxLDUvNV0gQmx1ZXRvb3RoOiBSZW1vdmUgaGNpX3JlcXVlc3Que2MsaH0KV0FS
+TklORzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBu
+ZWVkIHVwZGF0aW5nPwojMTkyOiAKZGVsZXRlZCBmaWxlIG1vZGUgMTAwNjQ0Cgp0b3RhbDogMCBl
+cnJvcnMsIDEgd2FybmluZ3MsIDAgY2hlY2tzLCA2MSBsaW5lcyBjaGVja2VkCgpOT1RFOiBGb3Ig
+c29tZSBvZiB0aGUgcmVwb3J0ZWQgZGVmZWN0cywgY2hlY2twYXRjaCBtYXkgYmUgYWJsZSB0bwog
+ICAgICBtZWNoYW5pY2FsbHkgY29udmVydCB0byB0aGUgdHlwaWNhbCBzdHlsZSB1c2luZyAtLWZp
+eCBvciAtLWZpeC1pbnBsYWNlLgoKL2dpdGh1Yi93b3Jrc3BhY2Uvc3JjL3NyYy8xMzcxODY0Ny5w
+YXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuCgpOT1RFOiBJZ25vcmVkIG1l
+c3NhZ2UgdHlwZXM6IFVOS05PV05fQ09NTUlUX0lECgpOT1RFOiBJZiBhbnkgb2YgdGhlIGVycm9y
+cyBhcmUgZmFsc2UgcG9zaXRpdmVzLCBwbGVhc2UgcmVwb3J0CiAgICAgIHRoZW0gdG8gdGhlIG1h
+aW50YWluZXIsIHNlZSBDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKCiMjIyMjIyMjIyMjIyMj
+IyMjIyMjIyMjIyMjIyMjIwpUZXN0OiBDaGVja0FsbFdhcm5pbmcgLSBXQVJOSU5HCkRlc2M6IFJ1
+biBsaW51eCBrZXJuZWwgd2l0aCBhbGwgd2FybmluZyBlbmFibGVkCk91dHB1dDoKbmV0L2JsdWV0
+b290aC9oY2lfY29yZS5jOiBJbiBmdW5jdGlvbiDigJhoY2lfaW5xdWlyeeKAmTpuZXQvYmx1ZXRv
+b3RoL2hjaV9jb3JlLmM6MzIwOjc6IHdhcm5pbmc6IHZhcmlhYmxlIOKAmHRpbWVv4oCZIHNldCBi
+dXQgbm90IHVzZWQgWy1XdW51c2VkLWJ1dC1zZXQtdmFyaWFibGVdICAzMjAgfCAgbG9uZyB0aW1l
+bzsgICAgICB8ICAgICAgIF5+fn5+bmV0L2JsdWV0b290aC9oY2lfY29yZS5jOiBJbiBmdW5jdGlv
+biDigJhoY2lfaW5xdWlyeeKAmTpuZXQvYmx1ZXRvb3RoL2hjaV9jb3JlLmM6MzIwOjc6IHdhcm5p
+bmc6IHZhcmlhYmxlIOKAmHRpbWVv4oCZIHNldCBidXQgbm90IHVzZWQgWy1XdW51c2VkLWJ1dC1z
+ZXQtdmFyaWFibGVdICAzMjAgfCAgbG9uZyB0aW1lbzsgICAgICB8ICAgICAgIF5+fn5+bmV0L2Js
+dWV0b290aC9oY2lfY29yZS5jOiBJbiBmdW5jdGlvbiDigJhoY2lfaW5xdWlyeeKAmTpuZXQvYmx1
+ZXRvb3RoL2hjaV9jb3JlLmM6MzIwOjc6IHdhcm5pbmc6IHZhcmlhYmxlIOKAmHRpbWVv4oCZIHNl
+dCBidXQgbm90IHVzZWQgWy1XdW51c2VkLWJ1dC1zZXQtdmFyaWFibGVdICAzMjAgfCAgbG9uZyB0
+aW1lbzsgICAgICB8ICAgICAgIF5+fn5+bmV0L2JsdWV0b290aC9oY2lfY29yZS5jOiBJbiBmdW5j
+dGlvbiDigJhoY2lfaW5xdWlyeeKAmTpuZXQvYmx1ZXRvb3RoL2hjaV9jb3JlLmM6MzIwOjc6IHdh
+cm5pbmc6IHZhcmlhYmxlIOKAmHRpbWVv4oCZIHNldCBidXQgbm90IHVzZWQgWy1XdW51c2VkLWJ1
+dC1zZXQtdmFyaWFibGVdICAzMjAgfCAgbG9uZyB0aW1lbzsgICAgICB8ICAgICAgIF5+fn5+CiMj
+IyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIwpUZXN0OiBDaGVja1NwYXJzZSAtIFdBUk5JTkcK
+RGVzYzogUnVuIHNwYXJzZSB0b29sIHdpdGggbGludXgga2VybmVsCk91dHB1dDoKbmV0L2JsdWV0
+b290aC9oY2lfZXZlbnQuYzogbm90ZTogaW4gaW5jbHVkZWQgZmlsZSAodGhyb3VnaCBpbmNsdWRl
+L25ldC9ibHVldG9vdGgvaGNpX2NvcmUuaCk6CiMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMj
+IwpUZXN0OiBDaGVja1NtYXRjaCAtIFdBUk5JTkcKRGVzYzogUnVuIHNtYXRjaCB0b29sIHdpdGgg
+c291cmNlCk91dHB1dDoKbmV0L2JsdWV0b290aC9oY2lfZXZlbnQuYzogbm90ZTogaW4gaW5jbHVk
+ZWQgZmlsZSAodGhyb3VnaCBpbmNsdWRlL25ldC9ibHVldG9vdGgvaGNpX2NvcmUuaCk6CiMjIyMj
+IyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIwpUZXN0OiBUZXN0UnVubmVyX21nbXQtdGVzdGVyIC0g
+RkFJTApEZXNjOiBSdW4gbWdtdC10ZXN0ZXIgd2l0aCB0ZXN0LXJ1bm5lcgpPdXRwdXQ6ClRvdGFs
+OiA0OTIsIFBhc3NlZDogNDg5ICg5OS40JSksIEZhaWxlZDogMSwgTm90IFJ1bjogMgoKRmFpbGVk
+IFRlc3QgQ2FzZXMKTEwgUHJpdmFjeSAtIEFkZCBEZXZpY2UgNCAoMiBEZXZpY2VzIHRvIEFMKSAg
+ICAgICAgICBGYWlsZWQgICAgICAgMC4xNjggc2Vjb25kcwojIyMjIyMjIyMjIyMjIyMjIyMjIyMj
+IyMjIyMjIyMKVGVzdDogSW5jcmVtZW50YWxCdWlsZCAtIEZBSUwKRGVzYzogSW5jcmVtZW50YWwg
+YnVpbGQgd2l0aCB0aGUgcGF0Y2hlcyBpbiB0aGUgc2VyaWVzCk91dHB1dDoKW3YxLDQvNV0gQmx1
+ZXRvb3RoOiBoY2lfc3luYzogUmVtb3ZlIHJlbWFpbmluZyBkZXBlbmRlbmNpZXMgb2YgaGNpX3Jl
+cXVlc3QKCkluIGZpbGUgaW5jbHVkZWQgZnJvbSBuZXQvYmx1ZXRvb3RoL2hjaV9jb3JlLmM6NDM6
+Cm5ldC9ibHVldG9vdGgvaGNpX3JlcXVlc3QuaDozMjo4OiBlcnJvcjogcmVkZWZpbml0aW9uIG9m
+IOKAmHN0cnVjdCBoY2lfcmVxdWVzdOKAmQogICAzMiB8IHN0cnVjdCBoY2lfcmVxdWVzdCB7CiAg
+ICAgIHwgICAgICAgIF5+fn5+fn5+fn5+CkluIGZpbGUgaW5jbHVkZWQgZnJvbSAuL2luY2x1ZGUv
+bmV0L2JsdWV0b290aC9oY2lfY29yZS5oOjM0LAogICAgICAgICAgICAgICAgIGZyb20gbmV0L2Js
+dWV0b290aC9oY2lfY29yZS5jOjM5OgouL2luY2x1ZGUvbmV0L2JsdWV0b290aC9oY2lfc3luYy5o
+OjE4Ojg6IG5vdGU6IG9yaWdpbmFsbHkgZGVmaW5lZCBoZXJlCiAgIDE4IHwgc3RydWN0IGhjaV9y
+ZXF1ZXN0IHsKICAgICAgfCAgICAgICAgXn5+fn5+fn5+fn4KbWFrZVs0XTogKioqIFtzY3JpcHRz
+L01ha2VmaWxlLmJ1aWxkOjI0NDogbmV0L2JsdWV0b290aC9oY2lfY29yZS5vXSBFcnJvciAxCm1h
+a2VbM106ICoqKiBbc2NyaXB0cy9NYWtlZmlsZS5idWlsZDo0ODU6IG5ldC9ibHVldG9vdGhdIEVy
+cm9yIDIKbWFrZVsyXTogKioqIFtzY3JpcHRzL01ha2VmaWxlLmJ1aWxkOjQ4NTogbmV0XSBFcnJv
+ciAyCm1ha2VbMl06ICoqKiBXYWl0aW5nIGZvciB1bmZpbmlzaGVkIGpvYnMuLi4uCm1ha2VbMV06
+ICoqKiBbL2dpdGh1Yi93b3Jrc3BhY2Uvc3JjL3NyYy9NYWtlZmlsZToxOTM0OiAuXSBFcnJvciAy
+Cm1ha2U6ICoqKiBbTWFrZWZpbGU6MjQwOiBfX3N1Yi1tYWtlXSBFcnJvciAyCgoKLS0tClJlZ2Fy
+ZHMsCkxpbnV4IEJsdWV0b290aAoK
 
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
----
- include/net/bluetooth/bluetooth.h |   4 +
- net/bluetooth/Makefile            |   3 +-
- net/bluetooth/hci_conn.c          |   1 -
- net/bluetooth/hci_core.c          |   1 -
- net/bluetooth/hci_debugfs.c       |   1 -
- net/bluetooth/hci_event.c         |   1 -
- net/bluetooth/hci_request.c       | 903 ------------------------------
- net/bluetooth/hci_request.h       |  71 ---
- net/bluetooth/mgmt.c              |   1 -
- net/bluetooth/msft.c              |   1 -
- 10 files changed, 5 insertions(+), 982 deletions(-)
- delete mode 100644 net/bluetooth/hci_request.c
- delete mode 100644 net/bluetooth/hci_request.h
-
-diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
-index b3228bd6cd6b..5d655e109b2c 100644
---- a/include/net/bluetooth/bluetooth.h
-+++ b/include/net/bluetooth/bluetooth.h
-@@ -441,6 +441,10 @@ typedef void (*hci_req_complete_t)(struct hci_dev *hdev, u8 status, u16 opcode);
- typedef void (*hci_req_complete_skb_t)(struct hci_dev *hdev, u8 status,
- 				       u16 opcode, struct sk_buff *skb);
- 
-+void hci_req_cmd_complete(struct hci_dev *hdev, u16 opcode, u8 status,
-+			  hci_req_complete_t *req_complete,
-+			  hci_req_complete_skb_t *req_complete_skb);
-+
- #define HCI_REQ_START	BIT(0)
- #define HCI_REQ_SKB	BIT(1)
- 
-diff --git a/net/bluetooth/Makefile b/net/bluetooth/Makefile
-index 628d448d78be..5a3835b7dfcd 100644
---- a/net/bluetooth/Makefile
-+++ b/net/bluetooth/Makefile
-@@ -14,8 +14,7 @@ bluetooth_6lowpan-y := 6lowpan.o
- 
- bluetooth-y := af_bluetooth.o hci_core.o hci_conn.o hci_event.o mgmt.o \
- 	hci_sock.o hci_sysfs.o l2cap_core.o l2cap_sock.o smp.o lib.o \
--	ecdh_helper.o hci_request.o mgmt_util.o mgmt_config.o hci_codec.o \
--	eir.o hci_sync.o
-+	ecdh_helper.o mgmt_util.o mgmt_config.o hci_codec.o eir.o hci_sync.o
- 
- bluetooth-$(CONFIG_DEV_COREDUMP) += coredump.o
- 
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index 080053a85b4d..8e48ccd2af30 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -34,7 +34,6 @@
- #include <net/bluetooth/iso.h>
- #include <net/bluetooth/mgmt.h>
- 
--#include "hci_request.h"
- #include "smp.h"
- #include "eir.h"
- 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index d00eded9c4b6..45cd57d28cb5 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -40,7 +40,6 @@
- #include <net/bluetooth/l2cap.h>
- #include <net/bluetooth/mgmt.h>
- 
--#include "hci_request.h"
- #include "hci_debugfs.h"
- #include "smp.h"
- #include "leds.h"
-diff --git a/net/bluetooth/hci_debugfs.c b/net/bluetooth/hci_debugfs.c
-index ce3ff2fa72e5..f625074d1f00 100644
---- a/net/bluetooth/hci_debugfs.c
-+++ b/net/bluetooth/hci_debugfs.c
-@@ -28,7 +28,6 @@
- #include <net/bluetooth/hci_core.h>
- 
- #include "smp.h"
--#include "hci_request.h"
- #include "hci_debugfs.h"
- 
- #define DEFINE_QUIRK_ATTRIBUTE(__name, __quirk)				      \
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 4611a67d7dcc..dce8035ca799 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -33,7 +33,6 @@
- #include <net/bluetooth/hci_core.h>
- #include <net/bluetooth/mgmt.h>
- 
--#include "hci_request.h"
- #include "hci_debugfs.h"
- #include "hci_codec.h"
- #include "smp.h"
-diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
-deleted file mode 100644
-index efea25eb56ce..000000000000
---- a/net/bluetooth/hci_request.c
-+++ /dev/null
-@@ -1,903 +0,0 @@
--/*
--   BlueZ - Bluetooth protocol stack for Linux
--
--   Copyright (C) 2014 Intel Corporation
--
--   This program is free software; you can redistribute it and/or modify
--   it under the terms of the GNU General Public License version 2 as
--   published by the Free Software Foundation;
--
--   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
--   OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
--   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT OF THIRD PARTY RIGHTS.
--   IN NO EVENT SHALL THE COPYRIGHT HOLDER(S) AND AUTHOR(S) BE LIABLE FOR ANY
--   CLAIM, OR ANY SPECIAL INDIRECT OR CONSEQUENTIAL DAMAGES, OR ANY DAMAGES
--   WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
--   ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
--   OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
--
--   ALL LIABILITY, INCLUDING LIABILITY FOR INFRINGEMENT OF ANY PATENTS,
--   COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS, RELATING TO USE OF THIS
--   SOFTWARE IS DISCLAIMED.
--*/
--
--#include <linux/sched/signal.h>
--
--#include <net/bluetooth/bluetooth.h>
--#include <net/bluetooth/hci_core.h>
--#include <net/bluetooth/mgmt.h>
--
--#include "smp.h"
--#include "hci_request.h"
--#include "msft.h"
--#include "eir.h"
--
--void hci_req_init(struct hci_request *req, struct hci_dev *hdev)
--{
--	skb_queue_head_init(&req->cmd_q);
--	req->hdev = hdev;
--	req->err = 0;
--}
--
--void hci_req_purge(struct hci_request *req)
--{
--	skb_queue_purge(&req->cmd_q);
--}
--
--bool hci_req_status_pend(struct hci_dev *hdev)
--{
--	return hdev->req_status == HCI_REQ_PEND;
--}
--
--static int req_run(struct hci_request *req, hci_req_complete_t complete,
--		   hci_req_complete_skb_t complete_skb)
--{
--	struct hci_dev *hdev = req->hdev;
--	struct sk_buff *skb;
--	unsigned long flags;
--
--	bt_dev_dbg(hdev, "length %u", skb_queue_len(&req->cmd_q));
--
--	/* If an error occurred during request building, remove all HCI
--	 * commands queued on the HCI request queue.
--	 */
--	if (req->err) {
--		skb_queue_purge(&req->cmd_q);
--		return req->err;
--	}
--
--	/* Do not allow empty requests */
--	if (skb_queue_empty(&req->cmd_q))
--		return -ENODATA;
--
--	skb = skb_peek_tail(&req->cmd_q);
--	if (complete) {
--		bt_cb(skb)->hci.req_complete = complete;
--	} else if (complete_skb) {
--		bt_cb(skb)->hci.req_complete_skb = complete_skb;
--		bt_cb(skb)->hci.req_flags |= HCI_REQ_SKB;
--	}
--
--	spin_lock_irqsave(&hdev->cmd_q.lock, flags);
--	skb_queue_splice_tail(&req->cmd_q, &hdev->cmd_q);
--	spin_unlock_irqrestore(&hdev->cmd_q.lock, flags);
--
--	queue_work(hdev->workqueue, &hdev->cmd_work);
--
--	return 0;
--}
--
--int hci_req_run(struct hci_request *req, hci_req_complete_t complete)
--{
--	return req_run(req, complete, NULL);
--}
--
--int hci_req_run_skb(struct hci_request *req, hci_req_complete_skb_t complete)
--{
--	return req_run(req, NULL, complete);
--}
--
--void hci_req_sync_complete(struct hci_dev *hdev, u8 result, u16 opcode,
--			   struct sk_buff *skb)
--{
--	bt_dev_dbg(hdev, "result 0x%2.2x", result);
--
--	if (hdev->req_status == HCI_REQ_PEND) {
--		hdev->req_result = result;
--		hdev->req_status = HCI_REQ_DONE;
--		if (skb) {
--			kfree_skb(hdev->req_skb);
--			hdev->req_skb = skb_get(skb);
--		}
--		wake_up_interruptible(&hdev->req_wait_q);
--	}
--}
--
--/* Execute request and wait for completion. */
--int __hci_req_sync(struct hci_dev *hdev, int (*func)(struct hci_request *req,
--						     unsigned long opt),
--		   unsigned long opt, u32 timeout, u8 *hci_status)
--{
--	struct hci_request req;
--	int err = 0;
--
--	bt_dev_dbg(hdev, "start");
--
--	hci_req_init(&req, hdev);
--
--	hdev->req_status = HCI_REQ_PEND;
--
--	err = func(&req, opt);
--	if (err) {
--		if (hci_status)
--			*hci_status = HCI_ERROR_UNSPECIFIED;
--		return err;
--	}
--
--	err = hci_req_run_skb(&req, hci_req_sync_complete);
--	if (err < 0) {
--		hdev->req_status = 0;
--
--		/* ENODATA means the HCI request command queue is empty.
--		 * This can happen when a request with conditionals doesn't
--		 * trigger any commands to be sent. This is normal behavior
--		 * and should not trigger an error return.
--		 */
--		if (err == -ENODATA) {
--			if (hci_status)
--				*hci_status = 0;
--			return 0;
--		}
--
--		if (hci_status)
--			*hci_status = HCI_ERROR_UNSPECIFIED;
--
--		return err;
--	}
--
--	err = wait_event_interruptible_timeout(hdev->req_wait_q,
--			hdev->req_status != HCI_REQ_PEND, timeout);
--
--	if (err == -ERESTARTSYS)
--		return -EINTR;
--
--	switch (hdev->req_status) {
--	case HCI_REQ_DONE:
--		err = -bt_to_errno(hdev->req_result);
--		if (hci_status)
--			*hci_status = hdev->req_result;
--		break;
--
--	case HCI_REQ_CANCELED:
--		err = -hdev->req_result;
--		if (hci_status)
--			*hci_status = HCI_ERROR_UNSPECIFIED;
--		break;
--
--	default:
--		err = -ETIMEDOUT;
--		if (hci_status)
--			*hci_status = HCI_ERROR_UNSPECIFIED;
--		break;
--	}
--
--	kfree_skb(hdev->req_skb);
--	hdev->req_skb = NULL;
--	hdev->req_status = hdev->req_result = 0;
--
--	bt_dev_dbg(hdev, "end: err %d", err);
--
--	return err;
--}
--
--int hci_req_sync(struct hci_dev *hdev, int (*req)(struct hci_request *req,
--						  unsigned long opt),
--		 unsigned long opt, u32 timeout, u8 *hci_status)
--{
--	int ret;
--
--	/* Serialize all requests */
--	hci_req_sync_lock(hdev);
--	/* check the state after obtaing the lock to protect the HCI_UP
--	 * against any races from hci_dev_do_close when the controller
--	 * gets removed.
--	 */
--	if (test_bit(HCI_UP, &hdev->flags))
--		ret = __hci_req_sync(hdev, req, opt, timeout, hci_status);
--	else
--		ret = -ENETDOWN;
--	hci_req_sync_unlock(hdev);
--
--	return ret;
--}
--
--struct sk_buff *hci_prepare_cmd(struct hci_dev *hdev, u16 opcode, u32 plen,
--				const void *param)
--{
--	int len = HCI_COMMAND_HDR_SIZE + plen;
--	struct hci_command_hdr *hdr;
--	struct sk_buff *skb;
--
--	skb = bt_skb_alloc(len, GFP_ATOMIC);
--	if (!skb)
--		return NULL;
--
--	hdr = skb_put(skb, HCI_COMMAND_HDR_SIZE);
--	hdr->opcode = cpu_to_le16(opcode);
--	hdr->plen   = plen;
--
--	if (plen)
--		skb_put_data(skb, param, plen);
--
--	bt_dev_dbg(hdev, "skb len %d", skb->len);
--
--	hci_skb_pkt_type(skb) = HCI_COMMAND_PKT;
--	hci_skb_opcode(skb) = opcode;
--
--	return skb;
--}
--
--/* Queue a command to an asynchronous HCI request */
--void hci_req_add_ev(struct hci_request *req, u16 opcode, u32 plen,
--		    const void *param, u8 event)
--{
--	struct hci_dev *hdev = req->hdev;
--	struct sk_buff *skb;
--
--	bt_dev_dbg(hdev, "opcode 0x%4.4x plen %d", opcode, plen);
--
--	/* If an error occurred during request building, there is no point in
--	 * queueing the HCI command. We can simply return.
--	 */
--	if (req->err)
--		return;
--
--	skb = hci_prepare_cmd(hdev, opcode, plen, param);
--	if (!skb) {
--		bt_dev_err(hdev, "no memory for command (opcode 0x%4.4x)",
--			   opcode);
--		req->err = -ENOMEM;
--		return;
--	}
--
--	if (skb_queue_empty(&req->cmd_q))
--		bt_cb(skb)->hci.req_flags |= HCI_REQ_START;
--
--	hci_skb_event(skb) = event;
--
--	skb_queue_tail(&req->cmd_q, skb);
--}
--
--void hci_req_add(struct hci_request *req, u16 opcode, u32 plen,
--		 const void *param)
--{
--	bt_dev_dbg(req->hdev, "HCI_REQ-0x%4.4x", opcode);
--	hci_req_add_ev(req, opcode, plen, param, 0);
--}
--
--static void start_interleave_scan(struct hci_dev *hdev)
--{
--	hdev->interleave_scan_state = INTERLEAVE_SCAN_NO_FILTER;
--	queue_delayed_work(hdev->req_workqueue,
--			   &hdev->interleave_scan, 0);
--}
--
--static bool is_interleave_scanning(struct hci_dev *hdev)
--{
--	return hdev->interleave_scan_state != INTERLEAVE_SCAN_NONE;
--}
--
--static void cancel_interleave_scan(struct hci_dev *hdev)
--{
--	bt_dev_dbg(hdev, "cancelling interleave scan");
--
--	cancel_delayed_work_sync(&hdev->interleave_scan);
--
--	hdev->interleave_scan_state = INTERLEAVE_SCAN_NONE;
--}
--
--/* Return true if interleave_scan wasn't started until exiting this function,
-- * otherwise, return false
-- */
--static bool __hci_update_interleaved_scan(struct hci_dev *hdev)
--{
--	/* Do interleaved scan only if all of the following are true:
--	 * - There is at least one ADV monitor
--	 * - At least one pending LE connection or one device to be scanned for
--	 * - Monitor offloading is not supported
--	 * If so, we should alternate between allowlist scan and one without
--	 * any filters to save power.
--	 */
--	bool use_interleaving = hci_is_adv_monitoring(hdev) &&
--				!(list_empty(&hdev->pend_le_conns) &&
--				  list_empty(&hdev->pend_le_reports)) &&
--				hci_get_adv_monitor_offload_ext(hdev) ==
--				    HCI_ADV_MONITOR_EXT_NONE;
--	bool is_interleaving = is_interleave_scanning(hdev);
--
--	if (use_interleaving && !is_interleaving) {
--		start_interleave_scan(hdev);
--		bt_dev_dbg(hdev, "starting interleave scan");
--		return true;
--	}
--
--	if (!use_interleaving && is_interleaving)
--		cancel_interleave_scan(hdev);
--
--	return false;
--}
--
--void hci_req_add_le_scan_disable(struct hci_request *req, bool rpa_le_conn)
--{
--	struct hci_dev *hdev = req->hdev;
--
--	if (hdev->scanning_paused) {
--		bt_dev_dbg(hdev, "Scanning is paused for suspend");
--		return;
--	}
--
--	if (use_ext_scan(hdev)) {
--		struct hci_cp_le_set_ext_scan_enable cp;
--
--		memset(&cp, 0, sizeof(cp));
--		cp.enable = LE_SCAN_DISABLE;
--		hci_req_add(req, HCI_OP_LE_SET_EXT_SCAN_ENABLE, sizeof(cp),
--			    &cp);
--	} else {
--		struct hci_cp_le_set_scan_enable cp;
--
--		memset(&cp, 0, sizeof(cp));
--		cp.enable = LE_SCAN_DISABLE;
--		hci_req_add(req, HCI_OP_LE_SET_SCAN_ENABLE, sizeof(cp), &cp);
--	}
--
--	/* Disable address resolution */
--	if (hci_dev_test_flag(hdev, HCI_LL_RPA_RESOLUTION) && !rpa_le_conn) {
--		__u8 enable = 0x00;
--
--		hci_req_add(req, HCI_OP_LE_SET_ADDR_RESOLV_ENABLE, 1, &enable);
--	}
--}
--
--static void del_from_accept_list(struct hci_request *req, bdaddr_t *bdaddr,
--				 u8 bdaddr_type)
--{
--	struct hci_cp_le_del_from_accept_list cp;
--
--	cp.bdaddr_type = bdaddr_type;
--	bacpy(&cp.bdaddr, bdaddr);
--
--	bt_dev_dbg(req->hdev, "Remove %pMR (0x%x) from accept list", &cp.bdaddr,
--		   cp.bdaddr_type);
--	hci_req_add(req, HCI_OP_LE_DEL_FROM_ACCEPT_LIST, sizeof(cp), &cp);
--
--	if (use_ll_privacy(req->hdev)) {
--		struct smp_irk *irk;
--
--		irk = hci_find_irk_by_addr(req->hdev, bdaddr, bdaddr_type);
--		if (irk) {
--			struct hci_cp_le_del_from_resolv_list cp;
--
--			cp.bdaddr_type = bdaddr_type;
--			bacpy(&cp.bdaddr, bdaddr);
--
--			hci_req_add(req, HCI_OP_LE_DEL_FROM_RESOLV_LIST,
--				    sizeof(cp), &cp);
--		}
--	}
--}
--
--/* Adds connection to accept list if needed. On error, returns -1. */
--static int add_to_accept_list(struct hci_request *req,
--			      struct hci_conn_params *params, u8 *num_entries,
--			      bool allow_rpa)
--{
--	struct hci_cp_le_add_to_accept_list cp;
--	struct hci_dev *hdev = req->hdev;
--
--	/* Already in accept list */
--	if (hci_bdaddr_list_lookup(&hdev->le_accept_list, &params->addr,
--				   params->addr_type))
--		return 0;
--
--	/* Select filter policy to accept all advertising */
--	if (*num_entries >= hdev->le_accept_list_size)
--		return -1;
--
--	/* Accept list can not be used with RPAs */
--	if (!allow_rpa &&
--	    !hci_dev_test_flag(hdev, HCI_ENABLE_LL_PRIVACY) &&
--	    hci_find_irk_by_addr(hdev, &params->addr, params->addr_type)) {
--		return -1;
--	}
--
--	/* During suspend, only wakeable devices can be in accept list */
--	if (hdev->suspended &&
--	    !(params->flags & HCI_CONN_FLAG_REMOTE_WAKEUP))
--		return 0;
--
--	*num_entries += 1;
--	cp.bdaddr_type = params->addr_type;
--	bacpy(&cp.bdaddr, &params->addr);
--
--	bt_dev_dbg(hdev, "Add %pMR (0x%x) to accept list", &cp.bdaddr,
--		   cp.bdaddr_type);
--	hci_req_add(req, HCI_OP_LE_ADD_TO_ACCEPT_LIST, sizeof(cp), &cp);
--
--	if (use_ll_privacy(hdev)) {
--		struct smp_irk *irk;
--
--		irk = hci_find_irk_by_addr(hdev, &params->addr,
--					   params->addr_type);
--		if (irk) {
--			struct hci_cp_le_add_to_resolv_list cp;
--
--			cp.bdaddr_type = params->addr_type;
--			bacpy(&cp.bdaddr, &params->addr);
--			memcpy(cp.peer_irk, irk->val, 16);
--
--			if (hci_dev_test_flag(hdev, HCI_PRIVACY))
--				memcpy(cp.local_irk, hdev->irk, 16);
--			else
--				memset(cp.local_irk, 0, 16);
--
--			hci_req_add(req, HCI_OP_LE_ADD_TO_RESOLV_LIST,
--				    sizeof(cp), &cp);
--		}
--	}
--
--	return 0;
--}
--
--static u8 update_accept_list(struct hci_request *req)
--{
--	struct hci_dev *hdev = req->hdev;
--	struct hci_conn_params *params;
--	struct bdaddr_list *b;
--	u8 num_entries = 0;
--	bool pend_conn, pend_report;
--	/* We allow usage of accept list even with RPAs in suspend. In the worst
--	 * case, we won't be able to wake from devices that use the privacy1.2
--	 * features. Additionally, once we support privacy1.2 and IRK
--	 * offloading, we can update this to also check for those conditions.
--	 */
--	bool allow_rpa = hdev->suspended;
--
--	if (use_ll_privacy(hdev))
--		allow_rpa = true;
--
--	/* Go through the current accept list programmed into the
--	 * controller one by one and check if that address is still
--	 * in the list of pending connections or list of devices to
--	 * report. If not present in either list, then queue the
--	 * command to remove it from the controller.
--	 */
--	list_for_each_entry(b, &hdev->le_accept_list, list) {
--		pend_conn = hci_pend_le_action_lookup(&hdev->pend_le_conns,
--						      &b->bdaddr,
--						      b->bdaddr_type);
--		pend_report = hci_pend_le_action_lookup(&hdev->pend_le_reports,
--							&b->bdaddr,
--							b->bdaddr_type);
--
--		/* If the device is not likely to connect or report,
--		 * remove it from the accept list.
--		 */
--		if (!pend_conn && !pend_report) {
--			del_from_accept_list(req, &b->bdaddr, b->bdaddr_type);
--			continue;
--		}
--
--		/* Accept list can not be used with RPAs */
--		if (!allow_rpa &&
--		    !hci_dev_test_flag(hdev, HCI_ENABLE_LL_PRIVACY) &&
--		    hci_find_irk_by_addr(hdev, &b->bdaddr, b->bdaddr_type)) {
--			return 0x00;
--		}
--
--		num_entries++;
--	}
--
--	/* Since all no longer valid accept list entries have been
--	 * removed, walk through the list of pending connections
--	 * and ensure that any new device gets programmed into
--	 * the controller.
--	 *
--	 * If the list of the devices is larger than the list of
--	 * available accept list entries in the controller, then
--	 * just abort and return filer policy value to not use the
--	 * accept list.
--	 */
--	list_for_each_entry(params, &hdev->pend_le_conns, action) {
--		if (add_to_accept_list(req, params, &num_entries, allow_rpa))
--			return 0x00;
--	}
--
--	/* After adding all new pending connections, walk through
--	 * the list of pending reports and also add these to the
--	 * accept list if there is still space. Abort if space runs out.
--	 */
--	list_for_each_entry(params, &hdev->pend_le_reports, action) {
--		if (add_to_accept_list(req, params, &num_entries, allow_rpa))
--			return 0x00;
--	}
--
--	/* Use the allowlist unless the following conditions are all true:
--	 * - We are not currently suspending
--	 * - There are 1 or more ADV monitors registered and it's not offloaded
--	 * - Interleaved scanning is not currently using the allowlist
--	 */
--	if (!idr_is_empty(&hdev->adv_monitors_idr) && !hdev->suspended &&
--	    hci_get_adv_monitor_offload_ext(hdev) == HCI_ADV_MONITOR_EXT_NONE &&
--	    hdev->interleave_scan_state != INTERLEAVE_SCAN_ALLOWLIST)
--		return 0x00;
--
--	/* Select filter policy to use accept list */
--	return 0x01;
--}
--
--static bool scan_use_rpa(struct hci_dev *hdev)
--{
--	return hci_dev_test_flag(hdev, HCI_PRIVACY);
--}
--
--static void hci_req_start_scan(struct hci_request *req, u8 type, u16 interval,
--			       u16 window, u8 own_addr_type, u8 filter_policy,
--			       bool filter_dup, bool addr_resolv)
--{
--	struct hci_dev *hdev = req->hdev;
--
--	if (hdev->scanning_paused) {
--		bt_dev_dbg(hdev, "Scanning is paused for suspend");
--		return;
--	}
--
--	if (use_ll_privacy(hdev) && addr_resolv) {
--		u8 enable = 0x01;
--
--		hci_req_add(req, HCI_OP_LE_SET_ADDR_RESOLV_ENABLE, 1, &enable);
--	}
--
--	/* Use ext scanning if set ext scan param and ext scan enable is
--	 * supported
--	 */
--	if (use_ext_scan(hdev)) {
--		struct hci_cp_le_set_ext_scan_params *ext_param_cp;
--		struct hci_cp_le_set_ext_scan_enable ext_enable_cp;
--		struct hci_cp_le_scan_phy_params *phy_params;
--		u8 data[sizeof(*ext_param_cp) + sizeof(*phy_params) * 2];
--		u32 plen;
--
--		ext_param_cp = (void *)data;
--		phy_params = (void *)ext_param_cp->data;
--
--		memset(ext_param_cp, 0, sizeof(*ext_param_cp));
--		ext_param_cp->own_addr_type = own_addr_type;
--		ext_param_cp->filter_policy = filter_policy;
--
--		plen = sizeof(*ext_param_cp);
--
--		if (scan_1m(hdev) || scan_2m(hdev)) {
--			ext_param_cp->scanning_phys |= LE_SCAN_PHY_1M;
--
--			memset(phy_params, 0, sizeof(*phy_params));
--			phy_params->type = type;
--			phy_params->interval = cpu_to_le16(interval);
--			phy_params->window = cpu_to_le16(window);
--
--			plen += sizeof(*phy_params);
--			phy_params++;
--		}
--
--		if (scan_coded(hdev)) {
--			ext_param_cp->scanning_phys |= LE_SCAN_PHY_CODED;
--
--			memset(phy_params, 0, sizeof(*phy_params));
--			phy_params->type = type;
--			phy_params->interval = cpu_to_le16(interval);
--			phy_params->window = cpu_to_le16(window);
--
--			plen += sizeof(*phy_params);
--			phy_params++;
--		}
--
--		hci_req_add(req, HCI_OP_LE_SET_EXT_SCAN_PARAMS,
--			    plen, ext_param_cp);
--
--		memset(&ext_enable_cp, 0, sizeof(ext_enable_cp));
--		ext_enable_cp.enable = LE_SCAN_ENABLE;
--		ext_enable_cp.filter_dup = filter_dup;
--
--		hci_req_add(req, HCI_OP_LE_SET_EXT_SCAN_ENABLE,
--			    sizeof(ext_enable_cp), &ext_enable_cp);
--	} else {
--		struct hci_cp_le_set_scan_param param_cp;
--		struct hci_cp_le_set_scan_enable enable_cp;
--
--		memset(&param_cp, 0, sizeof(param_cp));
--		param_cp.type = type;
--		param_cp.interval = cpu_to_le16(interval);
--		param_cp.window = cpu_to_le16(window);
--		param_cp.own_address_type = own_addr_type;
--		param_cp.filter_policy = filter_policy;
--		hci_req_add(req, HCI_OP_LE_SET_SCAN_PARAM, sizeof(param_cp),
--			    &param_cp);
--
--		memset(&enable_cp, 0, sizeof(enable_cp));
--		enable_cp.enable = LE_SCAN_ENABLE;
--		enable_cp.filter_dup = filter_dup;
--		hci_req_add(req, HCI_OP_LE_SET_SCAN_ENABLE, sizeof(enable_cp),
--			    &enable_cp);
--	}
--}
--
--static void set_random_addr(struct hci_request *req, bdaddr_t *rpa);
--static int hci_update_random_address(struct hci_request *req,
--				     bool require_privacy, bool use_rpa,
--				     u8 *own_addr_type)
--{
--	struct hci_dev *hdev = req->hdev;
--	int err;
--
--	/* If privacy is enabled use a resolvable private address. If
--	 * current RPA has expired or there is something else than
--	 * the current RPA in use, then generate a new one.
--	 */
--	if (use_rpa) {
--		/* If Controller supports LL Privacy use own address type is
--		 * 0x03
--		 */
--		if (use_ll_privacy(hdev))
--			*own_addr_type = ADDR_LE_DEV_RANDOM_RESOLVED;
--		else
--			*own_addr_type = ADDR_LE_DEV_RANDOM;
--
--		if (rpa_valid(hdev))
--			return 0;
--
--		err = smp_generate_rpa(hdev, hdev->irk, &hdev->rpa);
--		if (err < 0) {
--			bt_dev_err(hdev, "failed to generate new RPA");
--			return err;
--		}
--
--		set_random_addr(req, &hdev->rpa);
--
--		return 0;
--	}
--
--	/* In case of required privacy without resolvable private address,
--	 * use an non-resolvable private address. This is useful for active
--	 * scanning and non-connectable advertising.
--	 */
--	if (require_privacy) {
--		bdaddr_t nrpa;
--
--		while (true) {
--			/* The non-resolvable private address is generated
--			 * from random six bytes with the two most significant
--			 * bits cleared.
--			 */
--			get_random_bytes(&nrpa, 6);
--			nrpa.b[5] &= 0x3f;
--
--			/* The non-resolvable private address shall not be
--			 * equal to the public address.
--			 */
--			if (bacmp(&hdev->bdaddr, &nrpa))
--				break;
--		}
--
--		*own_addr_type = ADDR_LE_DEV_RANDOM;
--		set_random_addr(req, &nrpa);
--		return 0;
--	}
--
--	/* If forcing static address is in use or there is no public
--	 * address use the static address as random address (but skip
--	 * the HCI command if the current random address is already the
--	 * static one.
--	 *
--	 * In case BR/EDR has been disabled on a dual-mode controller
--	 * and a static address has been configured, then use that
--	 * address instead of the public BR/EDR address.
--	 */
--	if (hci_dev_test_flag(hdev, HCI_FORCE_STATIC_ADDR) ||
--	    !bacmp(&hdev->bdaddr, BDADDR_ANY) ||
--	    (!hci_dev_test_flag(hdev, HCI_BREDR_ENABLED) &&
--	     bacmp(&hdev->static_addr, BDADDR_ANY))) {
--		*own_addr_type = ADDR_LE_DEV_RANDOM;
--		if (bacmp(&hdev->static_addr, &hdev->random_addr))
--			hci_req_add(req, HCI_OP_LE_SET_RANDOM_ADDR, 6,
--				    &hdev->static_addr);
--		return 0;
--	}
--
--	/* Neither privacy nor static address is being used so use a
--	 * public address.
--	 */
--	*own_addr_type = ADDR_LE_DEV_PUBLIC;
--
--	return 0;
--}
--
--/* Ensure to call hci_req_add_le_scan_disable() first to disable the
-- * controller based address resolution to be able to reconfigure
-- * resolving list.
-- */
--void hci_req_add_le_passive_scan(struct hci_request *req)
--{
--	struct hci_dev *hdev = req->hdev;
--	u8 own_addr_type;
--	u8 filter_policy;
--	u16 window, interval;
--	/* Default is to enable duplicates filter */
--	u8 filter_dup = LE_SCAN_FILTER_DUP_ENABLE;
--	/* Background scanning should run with address resolution */
--	bool addr_resolv = true;
--
--	if (hdev->scanning_paused) {
--		bt_dev_dbg(hdev, "Scanning is paused for suspend");
--		return;
--	}
--
--	/* Set require_privacy to false since no SCAN_REQ are send
--	 * during passive scanning. Not using an non-resolvable address
--	 * here is important so that peer devices using direct
--	 * advertising with our address will be correctly reported
--	 * by the controller.
--	 */
--	if (hci_update_random_address(req, false, scan_use_rpa(hdev),
--				      &own_addr_type))
--		return;
--
--	if (hdev->enable_advmon_interleave_scan &&
--	    __hci_update_interleaved_scan(hdev))
--		return;
--
--	bt_dev_dbg(hdev, "interleave state %d", hdev->interleave_scan_state);
--	/* Adding or removing entries from the accept list must
--	 * happen before enabling scanning. The controller does
--	 * not allow accept list modification while scanning.
--	 */
--	filter_policy = update_accept_list(req);
--
--	/* When the controller is using random resolvable addresses and
--	 * with that having LE privacy enabled, then controllers with
--	 * Extended Scanner Filter Policies support can now enable support
--	 * for handling directed advertising.
--	 *
--	 * So instead of using filter polices 0x00 (no accept list)
--	 * and 0x01 (accept list enabled) use the new filter policies
--	 * 0x02 (no accept list) and 0x03 (accept list enabled).
--	 */
--	if (hci_dev_test_flag(hdev, HCI_PRIVACY) &&
--	    (hdev->le_features[0] & HCI_LE_EXT_SCAN_POLICY))
--		filter_policy |= 0x02;
--
--	if (hdev->suspended) {
--		window = hdev->le_scan_window_suspend;
--		interval = hdev->le_scan_int_suspend;
--	} else if (hci_is_le_conn_scanning(hdev)) {
--		window = hdev->le_scan_window_connect;
--		interval = hdev->le_scan_int_connect;
--	} else if (hci_is_adv_monitoring(hdev)) {
--		window = hdev->le_scan_window_adv_monitor;
--		interval = hdev->le_scan_int_adv_monitor;
--
--		/* Disable duplicates filter when scanning for advertisement
--		 * monitor for the following reasons.
--		 *
--		 * For HW pattern filtering (ex. MSFT), Realtek and Qualcomm
--		 * controllers ignore RSSI_Sampling_Period when the duplicates
--		 * filter is enabled.
--		 *
--		 * For SW pattern filtering, when we're not doing interleaved
--		 * scanning, it is necessary to disable duplicates filter,
--		 * otherwise hosts can only receive one advertisement and it's
--		 * impossible to know if a peer is still in range.
--		 */
--		filter_dup = LE_SCAN_FILTER_DUP_DISABLE;
--	} else {
--		window = hdev->le_scan_window;
--		interval = hdev->le_scan_interval;
--	}
--
--	bt_dev_dbg(hdev, "LE passive scan with accept list = %d",
--		   filter_policy);
--	hci_req_start_scan(req, LE_SCAN_PASSIVE, interval, window,
--			   own_addr_type, filter_policy, filter_dup,
--			   addr_resolv);
--}
--
--static int hci_req_add_le_interleaved_scan(struct hci_request *req,
--					   unsigned long opt)
--{
--	struct hci_dev *hdev = req->hdev;
--	int ret = 0;
--
--	hci_dev_lock(hdev);
--
--	if (hci_dev_test_flag(hdev, HCI_LE_SCAN))
--		hci_req_add_le_scan_disable(req, false);
--	hci_req_add_le_passive_scan(req);
--
--	switch (hdev->interleave_scan_state) {
--	case INTERLEAVE_SCAN_ALLOWLIST:
--		bt_dev_dbg(hdev, "next state: allowlist");
--		hdev->interleave_scan_state = INTERLEAVE_SCAN_NO_FILTER;
--		break;
--	case INTERLEAVE_SCAN_NO_FILTER:
--		bt_dev_dbg(hdev, "next state: no filter");
--		hdev->interleave_scan_state = INTERLEAVE_SCAN_ALLOWLIST;
--		break;
--	case INTERLEAVE_SCAN_NONE:
--		BT_ERR("unexpected error");
--		ret = -1;
--	}
--
--	hci_dev_unlock(hdev);
--
--	return ret;
--}
--
--static void interleave_scan_work(struct work_struct *work)
--{
--	struct hci_dev *hdev = container_of(work, struct hci_dev,
--					    interleave_scan.work);
--	u8 status;
--	unsigned long timeout;
--
--	if (hdev->interleave_scan_state == INTERLEAVE_SCAN_ALLOWLIST) {
--		timeout = msecs_to_jiffies(hdev->advmon_allowlist_duration);
--	} else if (hdev->interleave_scan_state == INTERLEAVE_SCAN_NO_FILTER) {
--		timeout = msecs_to_jiffies(hdev->advmon_no_filter_duration);
--	} else {
--		bt_dev_err(hdev, "unexpected error");
--		return;
--	}
--
--	hci_req_sync(hdev, hci_req_add_le_interleaved_scan, 0,
--		     HCI_CMD_TIMEOUT, &status);
--
--	/* Don't continue interleaving if it was canceled */
--	if (is_interleave_scanning(hdev))
--		queue_delayed_work(hdev->req_workqueue,
--				   &hdev->interleave_scan, timeout);
--}
--
--static void set_random_addr(struct hci_request *req, bdaddr_t *rpa)
--{
--	struct hci_dev *hdev = req->hdev;
--
--	/* If we're advertising or initiating an LE connection we can't
--	 * go ahead and change the random address at this time. This is
--	 * because the eventual initiator address used for the
--	 * subsequently created connection will be undefined (some
--	 * controllers use the new address and others the one we had
--	 * when the operation started).
--	 *
--	 * In this kind of scenario skip the update and let the random
--	 * address be updated at the next cycle.
--	 */
--	if (hci_dev_test_flag(hdev, HCI_LE_ADV) ||
--	    hci_lookup_le_connect(hdev)) {
--		bt_dev_dbg(hdev, "Deferring random address update");
--		hci_dev_set_flag(hdev, HCI_RPA_EXPIRED);
--		return;
--	}
--
--	hci_req_add(req, HCI_OP_LE_SET_RANDOM_ADDR, 6, rpa);
--}
--
--void hci_request_setup(struct hci_dev *hdev)
--{
--	INIT_DELAYED_WORK(&hdev->interleave_scan, interleave_scan_work);
--}
--
--void hci_request_cancel_all(struct hci_dev *hdev)
--{
--	hci_cmd_sync_cancel_sync(hdev, ENODEV);
--
--	cancel_interleave_scan(hdev);
--}
-diff --git a/net/bluetooth/hci_request.h b/net/bluetooth/hci_request.h
-deleted file mode 100644
-index c91f2838f542..000000000000
---- a/net/bluetooth/hci_request.h
-+++ /dev/null
-@@ -1,71 +0,0 @@
--/*
--   BlueZ - Bluetooth protocol stack for Linux
--   Copyright (C) 2014 Intel Corporation
--
--   This program is free software; you can redistribute it and/or modify
--   it under the terms of the GNU General Public License version 2 as
--   published by the Free Software Foundation;
--
--   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
--   OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
--   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT OF THIRD PARTY RIGHTS.
--   IN NO EVENT SHALL THE COPYRIGHT HOLDER(S) AND AUTHOR(S) BE LIABLE FOR ANY
--   CLAIM, OR ANY SPECIAL INDIRECT OR CONSEQUENTIAL DAMAGES, OR ANY DAMAGES
--   WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
--   ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
--   OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
--
--   ALL LIABILITY, INCLUDING LIABILITY FOR INFRINGEMENT OF ANY PATENTS,
--   COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS, RELATING TO USE OF THIS
--   SOFTWARE IS DISCLAIMED.
--*/
--
--#include <asm/unaligned.h>
--
--#define HCI_REQ_DONE	  0
--#define HCI_REQ_PEND	  1
--#define HCI_REQ_CANCELED  2
--
--#define hci_req_sync_lock(hdev)   mutex_lock(&hdev->req_lock)
--#define hci_req_sync_unlock(hdev) mutex_unlock(&hdev->req_lock)
--
--struct hci_request {
--	struct hci_dev		*hdev;
--	struct sk_buff_head	cmd_q;
--
--	/* If something goes wrong when building the HCI request, the error
--	 * value is stored in this field.
--	 */
--	int			err;
--};
--
--void hci_req_init(struct hci_request *req, struct hci_dev *hdev);
--void hci_req_purge(struct hci_request *req);
--bool hci_req_status_pend(struct hci_dev *hdev);
--int hci_req_run(struct hci_request *req, hci_req_complete_t complete);
--int hci_req_run_skb(struct hci_request *req, hci_req_complete_skb_t complete);
--void hci_req_sync_complete(struct hci_dev *hdev, u8 result, u16 opcode,
--			   struct sk_buff *skb);
--void hci_req_add(struct hci_request *req, u16 opcode, u32 plen,
--		 const void *param);
--void hci_req_add_ev(struct hci_request *req, u16 opcode, u32 plen,
--		    const void *param, u8 event);
--void hci_req_cmd_complete(struct hci_dev *hdev, u16 opcode, u8 status,
--			  hci_req_complete_t *req_complete,
--			  hci_req_complete_skb_t *req_complete_skb);
--
--int hci_req_sync(struct hci_dev *hdev, int (*req)(struct hci_request *req,
--						  unsigned long opt),
--		 unsigned long opt, u32 timeout, u8 *hci_status);
--int __hci_req_sync(struct hci_dev *hdev, int (*func)(struct hci_request *req,
--						     unsigned long opt),
--		   unsigned long opt, u32 timeout, u8 *hci_status);
--
--struct sk_buff *hci_prepare_cmd(struct hci_dev *hdev, u16 opcode, u32 plen,
--				const void *param);
--
--void hci_req_add_le_scan_disable(struct hci_request *req, bool rpa_le_conn);
--void hci_req_add_le_passive_scan(struct hci_request *req);
--
--void hci_request_setup(struct hci_dev *hdev);
--void hci_request_cancel_all(struct hci_dev *hdev);
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 3ab1558ff391..40d4887c7f79 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -33,7 +33,6 @@
- #include <net/bluetooth/l2cap.h>
- #include <net/bluetooth/mgmt.h>
- 
--#include "hci_request.h"
- #include "smp.h"
- #include "mgmt_util.h"
- #include "mgmt_config.h"
-diff --git a/net/bluetooth/msft.c b/net/bluetooth/msft.c
-index d039683d3bdd..5a8ccc491b14 100644
---- a/net/bluetooth/msft.c
-+++ b/net/bluetooth/msft.c
-@@ -7,7 +7,6 @@
- #include <net/bluetooth/hci_core.h>
- #include <net/bluetooth/mgmt.h>
- 
--#include "hci_request.h"
- #include "mgmt_util.h"
- #include "msft.h"
- 
--- 
-2.45.2
-
+--===============3731094880704115870==--
