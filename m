@@ -1,60 +1,65 @@
 Received: from mail-vk1-f177.google.com (mail-vk1-f177.google.com [209.85.221.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E57492BB05
-	for <linux-bluetooth@vger.kernel.org>; Mon,  1 Jul 2024 21:15:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6298437708
+	for <linux-bluetooth@vger.kernel.org>; Mon,  1 Jul 2024 21:15:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719868544; cv=none; b=D93ecz3lgNoWzLN8R/p4axHTTQq1+2Hw5qhvFQFmTU1i9Y6ci3RUD5EaC/4SqmgvOaazGrAKui6ZWCcxk5qSBAgedrqTdx/qlWt8KocqwAOjRkd4PHzI/WRvMsWYFNuzr4V1KvbNZuFE6IShhL8fxM8gmNu/cyLwNseoZpXw1/o=
+	t=1719868547; cv=none; b=k7VtCsdFy6SdHzfjZAkZ3R0EPSfRzwgzhPi0CkLoweg0SVK0C2+1V5sV3MBqxrgloVLWP5IUPXfz1p8k+EkzvdP03przG8+drmtYWmkRbuGTf4wtLmh0uAqC3XzXrm6i0eCuTVXt2500bJGoiBSLOfQ/SMzkwe9GVAg4ojpJSD4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719868544; c=relaxed/simple;
-	bh=BTdVhi+4ji5HBNhNdD3NEqMCJ58L6Q9038sIO1ZWzX8=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=WzoErj8aG0jb0RiAEUpWwcbYI6DEORArqPNsE9TolGIU+6XmpnfX1XLbCjQGKKOChq73h1Gyj/mMz/Fw6eeV/nGvoRSxS0w9ZsBc0KSXOTs8q7FrVgzUkRCwq1L/k2vZolmpKy42PINY9ZGILIxd3sh24ILUpJBxcIJ5VzSJexI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Jcia+ich; arc=none smtp.client-ip=209.85.221.177
+	s=arc-20240116; t=1719868547; c=relaxed/simple;
+	bh=JLRXG9LVSLuUNy2F0GMsZUv8E2r3RV+oSqPBHaxRI0E=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=rby7ekQ2F5Q7Upj06iBZoTsBaqIHhPpjCLO0pAOz/aqr8rMIipUxlNSfrpx3BtZs+EIZTg8SXSHtVfHgYbuJxJRoBEaliwpwHwnUUFht1dsHfVRVBHIFC9BZJCwezTqmy+Ea3R7p1LeDmd9dztdX8NaPfgIoxB3h3Yb4HH2OEok=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SBv/cUYM; arc=none smtp.client-ip=209.85.221.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Jcia+ich"
-Received: by mail-vk1-f177.google.com with SMTP id 71dfb90a1353d-4f284e7bb99so2150095e0c.0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 01 Jul 2024 14:15:42 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SBv/cUYM"
+Received: by mail-vk1-f177.google.com with SMTP id 71dfb90a1353d-4ef76f04977so1207819e0c.2
+        for <linux-bluetooth@vger.kernel.org>; Mon, 01 Jul 2024 14:15:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1719868541; x=1720473341; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=t7541zxrkeuJYcIdiyRNLcbk7/HyjD+qsEPC4LS0OA0=;
-        b=Jcia+ichuwjp/3Wh7dt90LtsrmCT9b0j4/FdDxrx0f3gQ9PEdaTY+QQQ7vj+Oc58l1
-         sD53t5wZqE0Akylu1n5My6d9EoLhnTL7ZuP71N9d5p1P38tHyUiDRjjFAZDJ0+UTgS7J
-         oWJfVuGvVZHAENgCmn5xtarv9/jfC5kHYIG8FPCHKBOYoZuyvoMU3krIj15BOCKNS2fQ
-         zMHSmcNmBQcXgs7M8HUSxguTLiC7g1gRUk2iM6m/t+nG5XtEPaUjNWAEFPo8hw79yPZ6
-         kq8F3lgZP04eonq/e/TstJWrl8crfVLP3Gv0lwgIS/0wnFTmjxJLdNDqiJAw/V4IpNky
-         xeBQ==
+        d=gmail.com; s=20230601; t=1719868544; x=1720473344; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=mfbipm9DmgdNAzJD1K22aCdtDiv3jVM/nAKl/yajcU0=;
+        b=SBv/cUYM8zPfBvHUluVV6dWNdIcRK2EWKaAZKPyp/jbG0NPvW79t+GbPQNIqtsugVu
+         TFAK9cDPeAFN7dGptDLmT7JGxAjWaz38j56sbDjlddQ/IHZqZ6fX3PCx9SuU6R5k4oJ4
+         JmVB/+cQIU4YJpDFsfijYXaArG7uh43hnH92YVSwpFP6W9dYYXeKIUsL8JLv/W7Dt5SB
+         tZErR1SxTUszsGMBSjLedisd2jrJWpnJ61ULEsAwzp/s6W9TApaAXkfQIRF//dLGuCOt
+         MnZgKOAuTvfv6E1eQmIwYPDRHwrgPyxLcsc+hGQ7vqhC/ItqAp7ZFZFUHgFuoUWIClxD
+         NtDg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719868541; x=1720473341;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=t7541zxrkeuJYcIdiyRNLcbk7/HyjD+qsEPC4LS0OA0=;
-        b=hJIFGRWy6x8C+uhytnOympB6AagKAudYTfhAETQqZTltuvfJyIJLsFwY0xZiShlGMP
-         5dvkfTB6LSMIeLVmeEtGSOwK9dcvHh4uHzm5C8gvRTbLCOfdXuHa1U5OCl4oq6J8ncx1
-         c65fROa1+uSiWHrW0XTcZhCzHOFSlN8VlJ2Pu68FGAP3Y2QGWQVkrxmbedGuRJ8FrO66
-         EqSvAeQk718LmJnZfL6EHfu/pE1zNh5uvRWxqf0yGavPKU8qhNUgCCTHo9KTtMcRGKk2
-         2fsv2XAdSPM4bXSGCRhYlOZy3U8jN7IGxjNa9L/3y93il8EylZP6LxH8HOv2gjtVHvGT
-         WIgg==
-X-Gm-Message-State: AOJu0Yw8hvNeCjJ9opmBuHjp2qzQZl8M/8ZInFoXfjogAje8yVl+jw43
-	WEXRYu6MyUE4u2P/i5d4LZLyMaDVk+D8+7jr2TZUHK4ilzsxnWe2EoacJQ==
-X-Google-Smtp-Source: AGHT+IE1hVMHivQtT8oVoC+qopoElLqUoEabOjgjZnNAhgQzURelGBlDNxMFOMQJZ8YjzuAzNMR8qw==
-X-Received: by 2002:ac5:cce6:0:b0:4eb:ddd:4b95 with SMTP id 71dfb90a1353d-4f295c44eb1mr6782340e0c.0.1719868540467;
-        Mon, 01 Jul 2024 14:15:40 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1719868544; x=1720473344;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=mfbipm9DmgdNAzJD1K22aCdtDiv3jVM/nAKl/yajcU0=;
+        b=p7Rj0dntqixZIOB7rPzfE8OfGRmJ33lWrqjv2uZgvw0h8Ptn/lRT6J1nMght4reB9/
+         vxRC3kSW2vuKMSio6ZsHHl4Uz0IXkABFngPXVDOZFKwhAiC2aJ+vzCj9XmuMBSb9NP8E
+         TOzXkj0hj5DEOttz8UxLyZU/JOOlahjvz6DNr3BGmXANEH6LIbJhl9bfcyBAPTluBVxm
+         JW2iR1VWWpYO6IY1RrVbc+KEMU8ARHanEjt3BpgYS0+MCD4QKQ6gL7YPd9EHqL0wJMTS
+         DptTYHIb02ht8NqIWTCZFR0lpHH3HYwZwSz8lJw/kRlUzgTiFIpJFdD5CfyF66iViImw
+         QPrA==
+X-Gm-Message-State: AOJu0Yz8LcDCTFEfaSJ4vvQrk9izBYa3vqsmAKRagDGqU6kl3IfB4L/K
+	jYxsYpMOB7kyl5D19YN5uxKhCKT0dW564lwnlASV2FseMpuCl++qlLYWHg==
+X-Google-Smtp-Source: AGHT+IERLeNOOC/e9dbn+hY4HSX9j7XehPFmmc19M6SbAYNHDMsCAQ+O2HrLR6KEniiPEjVYbonZCQ==
+X-Received: by 2002:a05:6122:4d1c:b0:4ef:5947:3fe5 with SMTP id 71dfb90a1353d-4f2a566eebbmr7936552e0c.3.1719868542978;
+        Mon, 01 Jul 2024 14:15:42 -0700 (PDT)
 Received: from lvondent-mobl4.. (syn-107-146-107-067.res.spectrum.com. [107.146.107.67])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-4f292271514sm1144827e0c.51.2024.07.01.14.15.39
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-4f292271514sm1144827e0c.51.2024.07.01.14.15.40
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 01 Jul 2024 14:15:39 -0700 (PDT)
+        Mon, 01 Jul 2024 14:15:40 -0700 (PDT)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v1 1/5] Bluetooth: hci_core: Remove usage of hci_req_sync
-Date: Mon,  1 Jul 2024 17:15:34 -0400
-Message-ID: <20240701211538.1420913-1-luiz.dentz@gmail.com>
+Subject: [PATCH v1 2/5] Bluetooth: hci_core: Don't use hci_prepare_cmd
+Date: Mon,  1 Jul 2024 17:15:35 -0400
+Message-ID: <20240701211538.1420913-2-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.45.2
+In-Reply-To: <20240701211538.1420913-1-luiz.dentz@gmail.com>
+References: <20240701211538.1420913-1-luiz.dentz@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -65,124 +70,70 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-hci_request functions are considered deprecated so this replaces the
-usage of hci_req_sync with hci_inquiry_sync.
+This replaces the instance of hci_prepare_cmd with hci_cmd_sync_alloc
+since the former is part of hci_request.c which is considered
+deprecated.
 
 Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 ---
- include/net/bluetooth/hci_sync.h |  2 ++
- net/bluetooth/hci_core.c         | 26 ++++----------------------
- net/bluetooth/hci_sync.c         | 10 +++++-----
- 3 files changed, 11 insertions(+), 27 deletions(-)
+ include/net/bluetooth/hci_sync.h | 4 ++++
+ net/bluetooth/hci_core.c         | 4 ++--
+ net/bluetooth/hci_sync.c         | 5 ++---
+ 3 files changed, 8 insertions(+), 5 deletions(-)
 
 diff --git a/include/net/bluetooth/hci_sync.h b/include/net/bluetooth/hci_sync.h
-index 20168732f20e..620e6014beb2 100644
+index 620e6014beb2..a8d88247ac89 100644
 --- a/include/net/bluetooth/hci_sync.h
 +++ b/include/net/bluetooth/hci_sync.h
-@@ -131,6 +131,8 @@ int hci_update_discoverable(struct hci_dev *hdev);
+@@ -20,6 +20,10 @@ struct hci_cmd_sync_work_entry {
+ };
  
- int hci_update_connectable_sync(struct hci_dev *hdev);
- 
-+int hci_inquiry_sync(struct hci_dev *hdev, u8 length, u8 num_rsp);
+ struct adv_info;
 +
- int hci_start_discovery_sync(struct hci_dev *hdev);
- int hci_stop_discovery_sync(struct hci_dev *hdev);
- 
++struct sk_buff *hci_cmd_sync_alloc(struct hci_dev *hdev, u16 opcode, u32 plen,
++				   const void *param, struct sock *sk);
++
+ /* Function with sync suffix shall not be called with hdev->lock held as they
+  * wait the command to complete and in the meantime an event could be received
+  * which could attempt to acquire hdev->lock causing a deadlock.
 diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index db9b9bb7d74d..ff60c3617ebd 100644
+index ff60c3617ebd..1e8e84017e1e 100644
 --- a/net/bluetooth/hci_core.c
 +++ b/net/bluetooth/hci_core.c
-@@ -312,26 +312,6 @@ static int inquiry_cache_dump(struct hci_dev *hdev, int num, __u8 *buf)
- 	return copied;
- }
+@@ -3057,7 +3057,7 @@ int hci_send_cmd(struct hci_dev *hdev, __u16 opcode, __u32 plen,
  
--static int hci_inq_req(struct hci_request *req, unsigned long opt)
--{
--	struct hci_inquiry_req *ir = (struct hci_inquiry_req *) opt;
--	struct hci_dev *hdev = req->hdev;
--	struct hci_cp_inquiry cp;
--
--	BT_DBG("%s", hdev->name);
--
--	if (test_bit(HCI_INQUIRY, &hdev->flags))
--		return 0;
--
--	/* Start Inquiry */
--	memcpy(&cp.lap, &ir->lap, 3);
--	cp.length  = ir->length;
--	cp.num_rsp = ir->num_rsp;
--	hci_req_add(req, HCI_OP_INQUIRY, sizeof(cp), &cp);
--
--	return 0;
--}
--
- int hci_inquiry(void __user *arg)
- {
- 	__u8 __user *ptr = arg;
-@@ -380,8 +360,10 @@ int hci_inquiry(void __user *arg)
- 	timeo = ir.length * msecs_to_jiffies(2000);
+ 	BT_DBG("%s opcode 0x%4.4x plen %d", hdev->name, opcode, plen);
  
- 	if (do_inquiry) {
--		err = hci_req_sync(hdev, hci_inq_req, (unsigned long) &ir,
--				   timeo, NULL);
-+		hci_req_sync_lock(hdev);
-+		err = hci_inquiry_sync(hdev, ir.length, ir.num_rsp);
-+		hci_req_sync_unlock(hdev);
-+
- 		if (err < 0)
- 			goto done;
+-	skb = hci_prepare_cmd(hdev, opcode, plen, param);
++	skb = hci_cmd_sync_alloc(hdev, opcode, plen, param, NULL);
+ 	if (!skb) {
+ 		bt_dev_err(hdev, "no memory for command");
+ 		return -ENOMEM;
+@@ -3092,7 +3092,7 @@ int __hci_cmd_send(struct hci_dev *hdev, u16 opcode, u32 plen,
+ 		return -EINVAL;
+ 	}
  
+-	skb = hci_prepare_cmd(hdev, opcode, plen, param);
++	skb = hci_cmd_sync_alloc(hdev, opcode, plen, param, NULL);
+ 	if (!skb) {
+ 		bt_dev_err(hdev, "no memory for command (opcode 0x%4.4x)",
+ 			   opcode);
 diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-index 76b283b8e90d..46b394842a27 100644
+index 46b394842a27..0c8888448d3c 100644
 --- a/net/bluetooth/hci_sync.c
 +++ b/net/bluetooth/hci_sync.c
-@@ -347,10 +347,9 @@ static int scan_disable_sync(struct hci_dev *hdev, void *data)
- 	return hci_scan_disable_sync(hdev);
+@@ -49,9 +49,8 @@ static void hci_cmd_sync_complete(struct hci_dev *hdev, u8 result, u16 opcode,
+ 	wake_up_interruptible(&hdev->req_wait_q);
  }
  
--static int hci_inquiry_sync(struct hci_dev *hdev, u8 length);
- static int interleaved_inquiry_sync(struct hci_dev *hdev, void *data)
+-static struct sk_buff *hci_cmd_sync_alloc(struct hci_dev *hdev, u16 opcode,
+-					  u32 plen, const void *param,
+-					  struct sock *sk)
++struct sk_buff *hci_cmd_sync_alloc(struct hci_dev *hdev, u16 opcode, u32 plen,
++				   const void *param, struct sock *sk)
  {
--	return hci_inquiry_sync(hdev, DISCOV_INTERLEAVED_INQUIRY_LEN);
-+	return hci_inquiry_sync(hdev, DISCOV_INTERLEAVED_INQUIRY_LEN, 0);
- }
- 
- static void le_scan_disable(struct work_struct *work)
-@@ -5662,7 +5661,7 @@ int hci_update_connectable_sync(struct hci_dev *hdev)
- 	return hci_update_passive_scan_sync(hdev);
- }
- 
--static int hci_inquiry_sync(struct hci_dev *hdev, u8 length)
-+int hci_inquiry_sync(struct hci_dev *hdev, u8 length, u8 num_rsp)
- {
- 	const u8 giac[3] = { 0x33, 0x8b, 0x9e };
- 	const u8 liac[3] = { 0x00, 0x8b, 0x9e };
-@@ -5685,6 +5684,7 @@ static int hci_inquiry_sync(struct hci_dev *hdev, u8 length)
- 		memcpy(&cp.lap, giac, sizeof(cp.lap));
- 
- 	cp.length = length;
-+	cp.num_rsp = num_rsp;
- 
- 	return __hci_cmd_sync_status(hdev, HCI_OP_INQUIRY,
- 				     sizeof(cp), &cp, HCI_CMD_TIMEOUT);
-@@ -5771,7 +5771,7 @@ static int hci_start_interleaved_discovery_sync(struct hci_dev *hdev)
- 	if (err)
- 		return err;
- 
--	return hci_inquiry_sync(hdev, DISCOV_BREDR_INQUIRY_LEN);
-+	return hci_inquiry_sync(hdev, DISCOV_BREDR_INQUIRY_LEN, 0);
- }
- 
- int hci_start_discovery_sync(struct hci_dev *hdev)
-@@ -5783,7 +5783,7 @@ int hci_start_discovery_sync(struct hci_dev *hdev)
- 
- 	switch (hdev->discovery.type) {
- 	case DISCOV_TYPE_BREDR:
--		return hci_inquiry_sync(hdev, DISCOV_BREDR_INQUIRY_LEN);
-+		return hci_inquiry_sync(hdev, DISCOV_BREDR_INQUIRY_LEN, 0);
- 	case DISCOV_TYPE_INTERLEAVED:
- 		/* When running simultaneous discovery, the LE scanning time
- 		 * should occupy the whole discovery time sine BR/EDR inquiry
+ 	int len = HCI_COMMAND_HDR_SIZE + plen;
+ 	struct hci_command_hdr *hdr;
 -- 
 2.45.2
 
