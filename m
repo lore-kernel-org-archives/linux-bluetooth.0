@@ -1,245 +1,110 @@
-Received: from mail-lj1-f175.google.com (mail-lj1-f175.google.com [209.85.208.175])
+Received: from mail-qv1-f42.google.com (mail-qv1-f42.google.com [209.85.219.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5032D16EB5E
-	for <linux-bluetooth@vger.kernel.org>; Mon,  1 Jul 2024 15:04:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9BCD16D4C7
+	for <linux-bluetooth@vger.kernel.org>; Mon,  1 Jul 2024 15:42:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719846260; cv=none; b=gGJWWDL+UuOKRIerWVp5Uy+lAPDqHb2kwr336cmR5GD+uorohi8tsL5e1ldUN6RA7lJEoxZQID/D+OxH3tVojOATHA8slv3AxkLoswj+FTuzCfJ/UqjntiJ0TFtmjr/Ti/2Z6V+oO6GgPmuCqN+qQXKnYBYZvMn0/8q0sivENcg=
+	t=1719848573; cv=none; b=X9Gjl32Q3fmYYvw23v2BA4CxBsHK+uNz21JNNbptv+RCy5k+9kegcFKSpkRj6VhYPJg5wAJKdLuMi/d8tV9Zw8yGFLkAtWuUcFrC8ortM7HU9GOFTolpQtfVeIjsdZ8Qxpvd4O/K+tL4TwqnovLzy81MsbVj40kqJS4bs3zrxss=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719846260; c=relaxed/simple;
-	bh=FT7mSZPteWkUwioNpHe1hvw/jip1u1Gu9JN4DWCsbYk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=V/622McXubRU/arRdVWFAa/CHeEUgs20XHYX2vk7ckTYUJBDTZ6+xGdDpb7plv+BZelte+z9/P7JZ6RGgN716FbnK/vvU3tkQ1raFxeq5z8mwXTg6/3i5sUpjbrenM7Z5WyN0eI/tHXQGAyDV9N8K+qukO7rklD0NuZgJb8niU0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gVsjCOV9; arc=none smtp.client-ip=209.85.208.175
+	s=arc-20240116; t=1719848573; c=relaxed/simple;
+	bh=Xyk5u6OMZLzGixgZJCauLS6vEIrhOR345kBCrcFPRO0=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=fmqsbm2umMIIufbmzt+lrDQS0XDxojSRRJ+RDAHd2vginJYsBqnr1IwdMHvXTsZh2qrNpF8DgucPjlne/633CYEGNHPzodWNugELGuI+htuKnUhDB2jjTNP1FoARj4jM87F6iAqvHDFITUad20GG+4+yIP8ucErU2KqFm2PUkMw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DabPU4R0; arc=none smtp.client-ip=209.85.219.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gVsjCOV9"
-Received: by mail-lj1-f175.google.com with SMTP id 38308e7fff4ca-2ebe0a81dc8so42096241fa.2
-        for <linux-bluetooth@vger.kernel.org>; Mon, 01 Jul 2024 08:04:18 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DabPU4R0"
+Received: by mail-qv1-f42.google.com with SMTP id 6a1803df08f44-6b5932383e0so34165046d6.0
+        for <linux-bluetooth@vger.kernel.org>; Mon, 01 Jul 2024 08:42:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1719846256; x=1720451056; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=dolRartDVncLOu7qchiZBbMqO17xnTkRHIByLzWjsxE=;
-        b=gVsjCOV9YaZgx9lWUaf1NU9uWsuQSqZVD5cOjWySkMm923iARugpxvOjBaDbYTP/4M
-         rxteVuhY8bapG8Pb6f57p/5Zg6AkE2s0pPDZiB7B/TELALWhUTjzNGEC7B1/BjooZXeV
-         nAX8Yz/fuBBLHVKfB+p7mrSFdnVn7bLz+wKFkmjTph84BgSSIRH9ZaQOIrLudW/HsYiN
-         rxZM+IqJSohfWSaAX1xP+RAe0uXngrle6hpGWj9Kegb489aEI2iwJBXNvgZtiU4X198P
-         clMV4IF7Zvc0C+H7E5+ty/EfapnxAXGPtqsDoh+Vz+NzF1x+cyvAiLvbzB7WiIRXxMKZ
-         aVeA==
+        d=gmail.com; s=20230601; t=1719848571; x=1720453371; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=g0pJWTKBzhcfeeFZqO98GKHX+Ttes0oqIWUFto4MIAY=;
+        b=DabPU4R0O5RKGATmWeitpTt5LcD8Etj2DjiZBlH4BXg8gjzUfXv+Jj2e/+TykJBFTO
+         2ZGYiTW1+BgASC45JGfXMbxwTqnKbMoPrmuk19JVUC9BwyMIy/SZXWCEfDEm2Opf4RrP
+         lPNjKjKL65AfZlP+gbaegX+Nh2CzOqul82o5YqKfSa6exESs3TQSl1Q8paeaF6hAUtlB
+         F9W1N8iuCfH3DCn9XUyZwqnH6ogFZgP8s+RCPsZbo34ag0Wgj52gBSR/GTwg08Lj8gU8
+         C9/s9l7jam9olvR6Gw8VVIMsRSXqP9ZbbUwF4N/iktajMo67bMNeD69mkI+u2WaK5gCc
+         lqMQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719846256; x=1720451056;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=dolRartDVncLOu7qchiZBbMqO17xnTkRHIByLzWjsxE=;
-        b=sR9jH3lNIY6SW1whd/uyRquf0BehbkOxLHGiP1R2UC7BJSPpQBWcAjLpmaPs/ADqO5
-         j65ete+QRlEk7UkiAXfFjRpi1n+dqE36moV5/j8xK3dQ/ZRO77QHFOAroyJN1DIeYtwp
-         yFNikJO6faLXq0gsAlMnuwaemlnMNZj7OFmSAiaINpJpn9mzytQY2rcyS680ExGL3PW3
-         WIAgNW7CWZhDSPSLaeAMU3blbvp8OBmoubkVdGib2IM3+kjo0ieNp5dhtA0ft38sgRt/
-         kqA/YKYefIfducGCNf1+iombhY88fLaMJl4hcQINGFnieeCLntn0WlTbUoLLtw0S1mhF
-         SNoA==
-X-Gm-Message-State: AOJu0YwVZChyEAVQSCdV0y/sd+NiA2LZ6+ovT8Z3Q6NaPqwa8r8uhII5
-	0uCEiRxoM0IhRXKLjoONADLqZVUgYFBbimefLul4rUFc1EgXZHlTC801P6F0b3772hcDp4Ab/qZ
-	LFK2b1ptr/D4cTu3XNO2zU4NTPos6wQ==
-X-Google-Smtp-Source: AGHT+IE5koZ0ScJwN19tCOGMo1YV3oLWDsu7T+CtdUSLzKGXjEycvJBfoshQmkRmpUtK4KfvSKvI1IDd8i0yEJDw3uM=
-X-Received: by 2002:a05:651c:2127:b0:2ee:594d:f54b with SMTP id
- 38308e7fff4ca-2ee5e6f7781mr47605321fa.47.1719846256341; Mon, 01 Jul 2024
- 08:04:16 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1719848571; x=1720453371;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=g0pJWTKBzhcfeeFZqO98GKHX+Ttes0oqIWUFto4MIAY=;
+        b=a1C/M40HdeLmTiGZv83XFphS2JdrGsonqE7SCqt+o4xVFn8iH0ZNIwR2B+4u/5VvzW
+         z66Yv2LqnLAd6KQBXO618v1ZhMdf3OUWdcz1LrgCA59qRSayGkqMujA5nJTEImHZ5wvZ
+         gEN9ZsRX+YE/sMU7xr0QpQX6psT5QC6KmMsOdFm0D2v9p3KJS3x3dVMAR3nVU82Si5MD
+         HSDyb5j4Nrvu6U0S24C+sZDn0GDy6s1IZCIPxrDZyoQDN/qbF6moEn5XfGy7XTgeX0qX
+         P1fxRfO0tAh50I3ziM3O96ec9O+1QRCcmXTA3ayoAxPTSJ9TmKnTARAqX7Ri1oLBFOIS
+         W1mA==
+X-Gm-Message-State: AOJu0YwgqBWkyj2dizQGYC4ym7DOljMbgsuOSWlc4eGIAv/kmOfGGUcG
+	oD7XolYkl8qCvMDRp7r6KtT2FdW9t15/0iKDdIqlWBGtAJd0HLwEjV30Zg==
+X-Google-Smtp-Source: AGHT+IHtSD1WUBkvbfrttOZmeb9ugZFIywqxUFIK3y3dXsb/ssQMoGpSYnPmiNBtuYQHYjfhCmglkA==
+X-Received: by 2002:ad4:5744:0:b0:6b5:1897:f00e with SMTP id 6a1803df08f44-6b5a54361a6mr183153276d6.17.1719848570795;
+        Mon, 01 Jul 2024 08:42:50 -0700 (PDT)
+Received: from [172.17.0.2] ([20.102.199.109])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6b59e609b9asm33917136d6.106.2024.07.01.08.42.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 01 Jul 2024 08:42:50 -0700 (PDT)
+Message-ID: <6682ce7a.050a0220.5275d.dda2@mx.google.com>
+Date: Mon, 01 Jul 2024 08:42:50 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============2885498988373741733=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240701143135.45677-1-iulia.tanasescu@nxp.com> <20240701143135.45677-2-iulia.tanasescu@nxp.com>
-In-Reply-To: <20240701143135.45677-2-iulia.tanasescu@nxp.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 1 Jul 2024 11:04:04 -0400
-Message-ID: <CABBYNZJU-EeScD+zBes7xhRzM7FBwyXcNh4g-HqV9RBv80nbZQ@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 1/1] doc: Add initial MediaAssistant rst
-To: Iulia Tanasescu <iulia.tanasescu@nxp.com>
-Cc: linux-bluetooth@vger.kernel.org, claudia.rosu@nxp.com, 
-	mihai-octavian.urzica@nxp.com, vlad.pruteanu@nxp.com, 
-	andrei.istodorescu@nxp.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, r.smirnov@omp.ru
+Subject: RE: [BlueZ,v1] shared/shell: add a check for NULL in bt_shell_init()
+In-Reply-To: <20240701134401.205121-1-r.smirnov@omp.ru>
+References: <20240701134401.205121-1-r.smirnov@omp.ru>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Hi Iulia,
+--===============2885498988373741733==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-On Mon, Jul 1, 2024 at 10:31=E2=80=AFAM Iulia Tanasescu <iulia.tanasescu@nx=
-p.com> wrote:
->
-> This adds initial documentation for the MediaAssistant D-Bus API, to
-> be used by a Broadcast Assistant application to interract with the
-> BlueZ implementation (BASS Client).
-> ---
->  Makefile.am                      |  6 +-
->  doc/org.bluez.MediaAssistant.rst | 97 ++++++++++++++++++++++++++++++++
->  2 files changed, 100 insertions(+), 3 deletions(-)
->  create mode 100644 doc/org.bluez.MediaAssistant.rst
->
-> diff --git a/Makefile.am b/Makefile.am
-> index 0ae721111..46a8cfb49 100644
-> --- a/Makefile.am
-> +++ b/Makefile.am
-> @@ -362,7 +362,7 @@ man_MANS +=3D doc/org.bluez.Adapter.5 doc/org.bluez.D=
-evice.5 \
->  man_MANS +=3D doc/org.bluez.Media.5 doc/org.bluez.MediaControl.5 \
->                 doc/org.bluez.MediaPlayer.5 doc/org.bluez.MediaFolder.5 \
->                 doc/org.bluez.MediaItem.5 doc/org.bluez.MediaEndpoint.5 \
-> -               doc/org.bluez.MediaTransport.5
-> +               doc/org.bluez.MediaTransport.5 doc/org.bluez.MediaAssista=
-nt.5
->  man_MANS +=3D doc/org.bluez.GattManager.5 doc/org.bluez.GattProfile.5 \
->                 doc/org.bluez.GattService.5 \
->                 doc/org.bluez.GattCharacteristic.5 \
-> @@ -395,7 +395,7 @@ manual_pages +=3D doc/org.bluez.Adapter.5 doc/org.blu=
-ez.Device.5 \
->  manual_pages +=3D doc/org.bluez.Media.5 doc/org.bluez.MediaControl.5 \
->                 doc/org.bluez.MediaPlayer.5 doc/org.bluez.MediaFolder.5 \
->                 doc/org.bluez.MediaItem.5 doc/org.bluez.MediaEndpoint.5 \
-> -               doc/org.bluez.MediaTransport.5
-> +               doc/org.bluez.MediaTransport.5 doc/org.bluez.MediaAssista=
-nt.5
->  manual_pages +=3D doc/org.bluez.GattManager.5 doc/org.bluez.GattProfile.=
-5 \
->                 doc/org.bluez.GattService.5 \
->                 doc/org.bluez.GattCharacteristic.5 \
-> @@ -475,7 +475,7 @@ EXTRA_DIST +=3D doc/org.bluez.Adapter.rst doc/org.blu=
-ez.Device.rst \
->  EXTRA_DIST +=3D doc/org.bluez.Media.rst doc/org.bluez.MediaControl.rst \
->                 doc/org.bluez.MediaPlayer.rst doc/org.bluez.MediaFolder.r=
-st \
->                 doc/org.bluez.MediaItem.rst doc/org.bluez.MediaEndpoint.r=
-st \
-> -               doc/org.bluez.MediaTransport.rst
-> +               doc/org.bluez.MediaTransport.rst doc/org.bluez.MediaAssis=
-tant.rst
->
->  EXTRA_DIST +=3D doc/org.bluez.GattManager.rst doc/org.bluez.GattProfile.=
-rst\
->                 doc/org.bluez.GattService.rst \
-> diff --git a/doc/org.bluez.MediaAssistant.rst b/doc/org.bluez.MediaAssist=
-ant.rst
-> new file mode 100644
-> index 000000000..a6fdef393
-> --- /dev/null
-> +++ b/doc/org.bluez.MediaAssistant.rst
-> @@ -0,0 +1,97 @@
-> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> +org.bluez.MediaAssistant
-> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> +
-> +--------------------------------------------
-> +BlueZ D-Bus MediaAssistant API documentation
-> +--------------------------------------------
-> +
-> +:Version: BlueZ
-> +:Date: June 2024
-> +:Manual section: 5
-> +:Manual group: Linux System Administration
-> +
-> +Interface
-> +=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> +
-> +:Service:      org.bluez
-> +:Interface:    org.bluez.MediaAssistant1
-> +:Object path:  /org/bluez/{hci0,hci1,...}/src_XX_XX_XX_XX_XX_XX/dev_YY_Y=
-Y_YY_YY_YY_YY/bisZ
-> +
-> +Methods
-> +-------
-> +
-> +void Push(array{byte} Broadcast_Code)
-> +````````````````````````````````````````````````````````
-> +
-> +       Send stream information to the remote device. If the stream
-> +       is unencrypted, the Broadcast_Code is set to 0. Otherwise,
-> +       it contains the key to decrypt the stream.
+This is automated email and please do not reply to this email!
 
-I'd make the Push take a QoS dictionary, that way if one can overwrite
-the discovered QoS property if it needs to and in case the user
-doesn't enter any value then we can assume it wants to use the same
-value as in the QoS property.
+Dear submitter,
 
-> +
-> +Properties
-> +----------
-> +
-> +string State [readonly]
-> +```````````````````````
-> +
-> +       Indicates the state of the assistant object. Possible values are:
-> +
-> +       :"idle": assistant object was created for the stream
-> +       :"pending": assistant object was pushed (stream information was s=
-ent to the peer)
-> +       :"requesting": remote device requires Broadcast_Code
-> +       :"active": remote device started receiving stream
-> +
-> +dict QoS [readonly, ISO only, experimental]
-> +`````````````````````````````````````````````````````
-> +
-> +       Indicates QoS capabilities.
-> +
-> +       Values:
-> +
-> +       :byte BIG:
-> +
-> +               Indicates BIG id.
-> +
-> +       :byte Encryption:
-> +
-> +               Indicates whether the stream is encrypted.
-> +
-> +       :array{byte} BCode
-> +
-> +               Indicates Broadcast_Code to decrypt stream.
-> +
-> +       :byte Options:
-> +
-> +               Indicates configured broadcast options.
-> +
-> +       :uint16 Skip:
-> +
-> +               Indicates configured broadcast skip.
-> +
-> +       :byte SyncTimeout:
-> +
-> +               Indicates configured broadcast sync timeout.
-> +
-> +       :byte SyncType:
-> +
-> +               Indicates configured broadcast sync CTE type.
-> +
-> +       :byte MSE:
-> +
-> +               Indicates configured broadcast MSE.
-> +
-> +       :uint16 Timeout:
-> +
-> +               Indicates configured broadcast timeout.
-> +
-> +       :uint32 Interval:
-> +
-> +               Indicates configured ISO interval (us).
-> +
-> +       :uint16 Latency:
-> +
-> +               Indicates configured transport latency (ms).
-> +
-> +       :uint16 SDU:
-> +
-> +               Indicates configured maximum SDU.
-> \ No newline at end of file
-> --
-> 2.39.2
->
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=867152
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.42 seconds
+GitLint                       PASS      0.28 seconds
+BuildEll                      PASS      25.26 seconds
+BluezMake                     PASS      1808.72 seconds
+MakeCheck                     PASS      13.37 seconds
+MakeDistcheck                 PASS      183.37 seconds
+CheckValgrind                 PASS      255.21 seconds
+CheckSmatch                   WARNING   359.93 seconds
+bluezmakeextell               PASS      121.69 seconds
+IncrementalBuild              PASS      1522.89 seconds
+ScanBuild                     PASS      997.55 seconds
+
+Details
+##############################
+Test: CheckSmatch - WARNING
+Desc: Run smatch tool with source
+Output:
+src/shared/shell.c: note: in included file (through /usr/include/readline/readline.h):src/shared/shell.c: note: in included file (through /usr/include/readline/readline.h):src/shared/shell.c: note: in included file (through /usr/include/readline/readline.h):
 
 
---=20
-Luiz Augusto von Dentz
+---
+Regards,
+Linux Bluetooth
+
+
+--===============2885498988373741733==--
