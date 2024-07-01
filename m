@@ -1,227 +1,122 @@
-Received: from mail-lj1-f178.google.com (mail-lj1-f178.google.com [209.85.208.178])
+Received: from mail-qk1-f174.google.com (mail-qk1-f174.google.com [209.85.222.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB3FC16D9CC
-	for <linux-bluetooth@vger.kernel.org>; Mon,  1 Jul 2024 16:20:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B663433A2
+	for <linux-bluetooth@vger.kernel.org>; Mon,  1 Jul 2024 16:36:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719850805; cv=none; b=s4NsJs4yQYZBh9C3OOr7YeKlYVaSZDMXNk9qEWFsbgfuKX8fMA7rBh8OKuHxwZ75Of1+UHR9Y7lU/oImBtFIBOHOQXNyZ6Rs3KbQLG7NNV6FYh4jayuQUPWW7lUAuRCUuI5bTawj+pkdJI34fpO9oLzOmw7HqUiu9ZF7yMkQ2jE=
+	t=1719851815; cv=none; b=T/miili2xyDvdvVFwrgG09FJy5iFu53ARtRnoe1dMggzZ+K15VaJxnNygQXX8py6GCtwCuBvlWctJ4/Znxq2qWH3ElxA5uHrFyYAMs8+YxyXYjcpbOclzttkC7jsOv36OwTKR6PPmDSDppic2ZxAVc0/ACgq7G/eMwyqfHfea8Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719850805; c=relaxed/simple;
-	bh=XZOLFpPvxdQ1RmoszPptqKB/oo+hPa+WYSBIGmXMwuI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=nWJb7+HmoY9HJLgTu6uHgRAnp17Duclxy6hTMuOtBdHCGthxkR3qY8alHd6Lwi6RMTZMqgY1q8lvKSZitSOX7Xh84TZrlNWiQ/3+Jfx2j2IFp9mY881EVNaJz59Eyuw6n8qqhj8ItV73lpbUwEr7pfTJfM0mR+vHUgO1pA84dRM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AJhLIhkf; arc=none smtp.client-ip=209.85.208.178
+	s=arc-20240116; t=1719851815; c=relaxed/simple;
+	bh=8fG2yen92F80Q9HZtpvTfmk8dOE0x+4WLH3Awb2WqMg=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=lZKDw7K0fPUP/iEYl2q76oc6tf1cayRSywrvZJL/qEVJS1yjwfNXJ+SdD+SjetcBpsupqd8fy3LvnZ8kSrraOdgnqQ78WldJT/mG23akePnNJXg8XEdA7CnMEw1NRE5CoEfXXnEdUz7k1HBZd8p9yxR1UOQ8h4dj+tdGrMr03rk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IBkSmEys; arc=none smtp.client-ip=209.85.222.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AJhLIhkf"
-Received: by mail-lj1-f178.google.com with SMTP id 38308e7fff4ca-2ec595d0acbso39137451fa.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 01 Jul 2024 09:20:03 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IBkSmEys"
+Received: by mail-qk1-f174.google.com with SMTP id af79cd13be357-79c06a06a8eso208624085a.0
+        for <linux-bluetooth@vger.kernel.org>; Mon, 01 Jul 2024 09:36:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1719850802; x=1720455602; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=V4pEMZ25bvtzjDWXm4vBpQ4CsvcuqGbCTGpa9TltDIM=;
-        b=AJhLIhkfpZYqw+W64HB8b4cZCpA6R8sYG2rDTRTvdJFgW5gPcB5azwlnxDH/ejLKxp
-         YQF8GsMPKycrdWVoDdd76jKHh9UV1aqailRLkcbB0xgM7Q2l0BGKfg/x6GlVPxrZg3TP
-         Iyx4tFvf25Y34XQZClwZUijbp7NNRd9PdANlGlKzewvgVKH3X86BSC8DQBdtZUqwYZIR
-         lUQhz/0zgv1romimYewRbrCQEHY5Z4SKB6CsF6fyTH5u0XPIQkKlXThA5nJ51J/4fSdQ
-         DDZaMA8XZVGvEILY9axGeaPdO+Ep+aMJUYCw6i+IgkOn1r4DMAU/d21W/zcFbvCHNLji
-         rvJg==
+        d=gmail.com; s=20230601; t=1719851813; x=1720456613; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=3f0ubUvJN8w5HsOtmkYWQRuPwOiaYHXcLcVYf+AaPcU=;
+        b=IBkSmEysIepg4HLRxYqaTJghrgfFSRKp55DQPOgi/0GxyZ2m4IHFjZGnvt5H1Y9up2
+         Zbz6tEdUbutZR1e/HSPSYIRyIiZ+wu9W5lpGPry3bcv+50xmRVUwBaRaUpy/usRuvNPc
+         qk81DHNrKyYzChG2NKRryhG2zLFiJ3mBtW3dM/PM6O17Rinr53a392ZH9Q1JcOglojm9
+         AN9dBxMO89a9sbCkEP4Yhb8ebAsbgj0Z3ShIDmXcnPIf0h557cV8BWEXDeiVYKbXpDXA
+         4nRSYTqBSNRd0L2T5uvwFKXSmcxrRgENID5eY+NuXPXlh1pCVnNUeJdrlm42KWdnhMBU
+         qejA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719850802; x=1720455602;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=V4pEMZ25bvtzjDWXm4vBpQ4CsvcuqGbCTGpa9TltDIM=;
-        b=rXNSo1VmAeku0iCZ+5+ZRji+SrNPn1s4Mj2C+z7p26dwbc0CRxL94mk2IyRBt2TL8L
-         gWfyGm1RT8M7jf/0c7axc8FwfvJWZbPSCARiUdzjPY9Oe0q9EyPhTpFtdYW71Fi7HrVD
-         fgA3BohKxjtu3kXSWzSdyccOm+AeKuQX357Os9G4etGqRyWZnRdw9LvjA0X0z06N583z
-         /IZFxlJK5OP9v/G7MBCnNUEBF3xydvc/0yp+NipLNilqleTjtaoAzrMU75zZqS13WdbD
-         dkqBmmDfLwptOmSrhDIz5rqxBhv6rUePvc4HM9l6I1mE7+hZMDiJwLLug3LZwr6vX03F
-         MgPA==
-X-Gm-Message-State: AOJu0Yz8QFSGf6a2U3WnG20yMXrV47LKwd8yVEtlGPtnE6B/zrGlcDVR
-	4Vb63oCH+ZoYdi9Qbs7nORX9Us1ocP0aQNUyAd1dNp+BhZWubOUcVTdv2vL+m8lEJbsiPV2bcu5
-	Pk1i5+yxCqqc5mqyCiTzjo2DrHMSxUov6
-X-Google-Smtp-Source: AGHT+IEx84jFU9OGD4VDx3W3hZOADBN9lsf6zSgcEI7hGTI4TyTeYj6FmH9+ga8/FLXaR7D5a+Sw8OtVsa61PcDcnkU=
-X-Received: by 2002:a05:651c:2203:b0:2ee:4623:93e with SMTP id
- 38308e7fff4ca-2ee5e393f39mr59488621fa.20.1719850801536; Mon, 01 Jul 2024
- 09:20:01 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1719851813; x=1720456613;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=3f0ubUvJN8w5HsOtmkYWQRuPwOiaYHXcLcVYf+AaPcU=;
+        b=fHeGU2RXjqbPlo/6f3vSvPBVo8aCI2lOCKj+9KHe4JwjK5GdZM373jxD5sUQJHhbBN
+         h/g8q0RcM6XjpPxpLCCAk2KqEbNl+rKpTdoyNQX9I8ZYTTATJe3ngJxRgDjlWjd9ysqP
+         XfS6Vr0cSqOZFspC5ehTZuPvSiqDdPk1Af4obbVNhjPpOuIRlb9Y/nRqc3rDq34Omwwo
+         PyIQkTCDuhXDLEWH4b9Ysmid9XChlY3wZthE3RWLSBkKmSbntHAGs7Q2U2PCZVuDxVnH
+         15tuWeOnsKCQtJ9AmHi0auq0tSCockOrdzVI69u58uIYJTK8BxX1b2v0OocFM/qXLngD
+         8j0g==
+X-Gm-Message-State: AOJu0YzJPdRIg9ED+K3mxgtXedTSGu7fhRQBSRsyoqLSA1Ll8GoWrVfU
+	15JotMk9+qecTUOTDcJ7pOMSYxHaDDSgqfVIlq/rVbLUs1O0fQ4yUWHQcQ==
+X-Google-Smtp-Source: AGHT+IFLqohYpRJBJrNQgAdAgaCLz3j1i927b30l41vr2dfStn+VpoyJf68h9Wj/5EnsKSxvgYJ7YA==
+X-Received: by 2002:a05:620a:4624:b0:79d:772b:3f0b with SMTP id af79cd13be357-79d7b9f21d5mr768464585a.37.1719851813285;
+        Mon, 01 Jul 2024 09:36:53 -0700 (PDT)
+Received: from [172.17.0.2] ([172.200.58.67])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-79d6925f58esm362779385a.12.2024.07.01.09.36.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 01 Jul 2024 09:36:53 -0700 (PDT)
+Message-ID: <6682db25.050a0220.aa60c.e746@mx.google.com>
+Date: Mon, 01 Jul 2024 09:36:53 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============6936739602153972143=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240701101243.2902-1-zhaochengyi@uniontech.com>
-In-Reply-To: <20240701101243.2902-1-zhaochengyi@uniontech.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 1 Jul 2024 12:19:48 -0400
-Message-ID: <CABBYNZK8ZvoHCQjo=rj7yt-0omZ8zgTFOueCvL5KoghhY_1nwA@mail.gmail.com>
-Subject: Re: [PATCH] adapter: Add retry when bonding device returns connection failure
-To: Chengyi Zhao <zhaochengyi@uniontech.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [v1] Bluetooth: Fix usage of __hci_cmd_sync_status
+In-Reply-To: <20240701161100.1317685-1-luiz.dentz@gmail.com>
+References: <20240701161100.1317685-1-luiz.dentz@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Hi,
+--===============6936739602153972143==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-On Mon, Jul 1, 2024 at 6:13=E2=80=AFAM Chengyi Zhao <zhaochengyi@uniontech.=
-com> wrote:
->
-> When a user initiates pairing with a BLE Bluetooth mouse,
-> MGMT_STATUS_CONNECT_FAILED(0x04) is returned with a low
-> probability, resulting in pairing failure. To improve
-> user experience, retry bonding is performed when
-> MGMT_STATUS_CONNECT_FAILED is returned.
->
-> Just retry once when MGMT_STATUS_CONNECT_FAILED occurs
-> because this status may be continuously returned.
->
-> Debug log:
-> bluetoothd[1539]: src/adapter.c:pair_device_complete() Connect Failed
-> (0x04)
-> bluetoothd[1539]: src/adapter.c:bonding_attempt_complete() hci0 bdaddr
-> DD:EC:0F:57:A9:2E type 2 status 0x4
-> bluetoothd[1539]: src/device.c:device_bonding_complete() bonding
-> 0x5591f87230 status 0x04
-> bluetoothd[1539]: src/device.c:btd_device_set_temporary() temporary 1
-> bluetoothd[1539]: src/device.c:device_bonding_failed() status 4
->
-> HCI package:
-> Frame 2969: 7 bytes on wire (56 bits), 7 bytes captured (56 bits)
-> Bluetooth
-> Bluetooth HCI H4
-> Bluetooth HCI Event - Disconnect Complete
-> Event Code: Disconnect Complete (0x05)
-> Parameter Total Length: 4
-> Status: Success (0x00)
-> Connection Handle: 0x0040
-> Reason: Connection Failed to be Established (0x3e)
-> ---
->  src/adapter.c |  4 ++++
->  src/device.c  | 24 ++++++++++++++++++++++++
->  src/device.h  |  2 ++
->  3 files changed, 30 insertions(+)
->
-> diff --git a/src/adapter.c b/src/adapter.c
-> index bb49a1eca..574fa7665 100644
-> --- a/src/adapter.c
-> +++ b/src/adapter.c
-> @@ -8371,6 +8371,10 @@ static void bonding_attempt_complete(struct btd_ad=
-apter *adapter,
->                 }
->         }
->
-> +       /* Retry once when status is MGMT_STATUS_CONNECT_FAILED */
-> +       if (device && device_bonding_check_connection(device, status))
-> +               return;
-> +
->         /* Ignore disconnects during retry. */
->         if (status =3D=3D MGMT_STATUS_DISCONNECTED &&
->                                         device && device_is_retrying(devi=
-ce))
-> diff --git a/src/device.c b/src/device.c
-> index 097b1fbba..12fabbff1 100644
-> --- a/src/device.c
-> +++ b/src/device.c
-> @@ -290,6 +290,8 @@ struct btd_device {
->         time_t          name_resolve_failed_time;
->
->         int8_t          volume;
-> +
-> +       uint8_t bonding_status;
->  };
->
->  static const uint16_t uuid_list[] =3D {
-> @@ -6559,6 +6561,28 @@ bool device_remove_svc_complete_callback(struct bt=
-d_device *dev,
->         return false;
->  }
->
-> +gboolean device_bonding_check_connection(struct btd_device *device,
-> +                                                               uint8_t s=
-tatus)
-> +{
-> +       if (status =3D=3D MGMT_STATUS_CONNECT_FAILED) {
-> +
-> +               if (device->bonding_status !=3D MGMT_STATUS_CONNECT_FAILE=
-D) {
-> +                       device->bonding_status =3D MGMT_STATUS_CONNECT_FA=
-ILED;
-> +
-> +                       DBG("status is 0x%x, retry once.", status);
-> +
-> +                       if (device_bonding_attempt_retry(device) =3D=3D 0=
-)
-> +                               return TRUE;
-> +               }
-> +       } else {
-> +               device->bonding_status =3D status;
-> +
-> +               DBG("device->bonding_status is 0x%x.", device->bonding_st=
-atus);
-> +       }
-> +
-> +       return FALSE;
-> +}
-> +
->  gboolean device_is_bonding(struct btd_device *device, const char *sender=
-)
->  {
->         struct bonding_req *bonding =3D device->bonding;
-> diff --git a/src/device.h b/src/device.h
-> index 0794f92d0..7c269cc4d 100644
-> --- a/src/device.h
-> +++ b/src/device.h
-> @@ -111,6 +111,8 @@ uint8_t btd_device_get_bdaddr_type(struct btd_device =
-*dev);
->  bool device_is_retrying(struct btd_device *device);
->  void device_bonding_complete(struct btd_device *device, uint8_t bdaddr_t=
-ype,
->                                                         uint8_t status);
-> +gboolean device_bonding_check_connection(struct btd_device *device,
-> +                                                       uint8_t status);
->  gboolean device_is_bonding(struct btd_device *device, const char *sender=
-);
->  void device_bonding_attempt_failed(struct btd_device *device, uint8_t st=
-atus);
->  void device_bonding_failed(struct btd_device *device, uint8_t status);
-> --
-> 2.20.1
+This is automated email and please do not reply to this email!
 
-Here is what Ive actually had in mind:
+Dear submitter,
 
-diff --git a/src/adapter.c b/src/adapter.c
-index bb49a1ecad23..f1cc4f2ed25a 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -8363,12 +8363,17 @@ static void bonding_attempt_complete(struct
-btd_adapter *adapter,
-        else
-                device =3D btd_adapter_find_device(adapter, bdaddr, addr_ty=
-pe);
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=867201
 
--       if (status =3D=3D MGMT_STATUS_AUTH_FAILED && adapter->pincode_reque=
-sted) {
--               /* On faliure, issue a bonding_retry if possible. */
-+       switch (status) {
-+       case MGMT_STATUS_AUTH_FAILED:
-+               if (!adapter->pincode_requested)
-+                       break;
-+       /* fall through */
-+       case MGMT_STATUS_CONNECT_FAILED:
-                if (device !=3D NULL) {
-                        if (device_bonding_attempt_retry(device) =3D=3D 0)
-                                return;
-                }
-+               break;
-        }
+---Test result---
 
-        /* Ignore disconnects during retry. */
+Test Summary:
+CheckPatch                    PASS      0.68 seconds
+GitLint                       PASS      0.32 seconds
+SubjectPrefix                 PASS      0.12 seconds
+BuildKernel                   PASS      29.86 seconds
+CheckAllWarning               PASS      32.68 seconds
+CheckSparse                   PASS      38.01 seconds
+CheckSmatch                   PASS      104.31 seconds
+BuildKernel32                 PASS      29.11 seconds
+TestRunnerSetup               PASS      528.53 seconds
+TestRunner_l2cap-tester       PASS      26.19 seconds
+TestRunner_iso-tester         PASS      34.75 seconds
+TestRunner_bnep-tester        PASS      4.91 seconds
+TestRunner_mgmt-tester        PASS      110.25 seconds
+TestRunner_rfcomm-tester      PASS      7.47 seconds
+TestRunner_sco-tester         PASS      15.10 seconds
+TestRunner_ioctl-tester       PASS      7.94 seconds
+TestRunner_mesh-tester        FAIL      6.10 seconds
+TestRunner_smp-tester         PASS      7.00 seconds
+TestRunner_userchan-tester    PASS      5.09 seconds
+IncrementalBuild              PASS      28.19 seconds
+
+Details
+##############################
+Test: TestRunner_mesh-tester - FAIL
+Desc: Run mesh-tester with test-runner
+Output:
+Total: 10, Passed: 9 (90.0%), Failed: 1, Not Run: 0
+
+Failed Test Cases
+Mesh - Send cancel - 2                               Failed       0.095 seconds
 
 
---=20
-Luiz Augusto von Dentz
+---
+Regards,
+Linux Bluetooth
+
+
+--===============6936739602153972143==--
