@@ -1,62 +1,62 @@
-Received: from mail-ua1-f51.google.com (mail-ua1-f51.google.com [209.85.222.51])
+Received: from mail-ua1-f49.google.com (mail-ua1-f49.google.com [209.85.222.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A38C585298
-	for <linux-bluetooth@vger.kernel.org>; Tue,  2 Jul 2024 19:12:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AECC85298
+	for <linux-bluetooth@vger.kernel.org>; Tue,  2 Jul 2024 19:12:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719947525; cv=none; b=j5ZYoVtY4yzEcd9kx/aPoGXyGt24r+E4mi+sX858trX2gGmmYX3X2AqLC5y73/CxtBzpYCcYls9qKi7X/gYiUHGKeQpZyJYEdv1AosbTmElkOXnxrD1/jpwu1H/ffxnae2bzskKxLSeaHBs2WWkqmnFxM4pAR27SNEqr7+cWJ2M=
+	t=1719947527; cv=none; b=RyyoJBcvknB4P2yIX+AhNclS7M6ZWmhxuvZG2tVW52UJMdJHIHawk2PmqO5YCyWkoeUWZlp65MvfU5KGHev6Y6zEYH5yYyRtInJmnogBb2tRrml7GO1rqxI2r7/1rCi4E5rEhewvOErxksk3deuOaJ2Ng+nbht6aUV/HOd+u1To=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719947525; c=relaxed/simple;
-	bh=kySyDIvh0tkOm7W/K8T7x+WnGXGOtMh+VYoXf/frOEg=;
+	s=arc-20240116; t=1719947527; c=relaxed/simple;
+	bh=6mW99Ta0ycy+Z6PRTSeHWVTaX6Hpn6ijx/Mn24elF4M=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=tbCp+4XAVg1tdMGIim9X+uHfr56xqN6s7bd73FN8o5927G0nqS67+AERL1qBMkUnUQft6uUqnEmhi3vwqxhkjvo4SO4bVWV6Ny4b4GAVU3Ih1tMCGJ+//g2QAAWak76BMjvkjnTd0HAUzgVZ9NOIUqyawnuCZuSUZcfm04l+aT0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kYNS8Jkn; arc=none smtp.client-ip=209.85.222.51
+	 MIME-Version; b=ZBM3ANsb1zxsKwoZb5ohvBE5T13S40iCJ+wXK4lq6cST2gKO+lf+37ccS5DT4Mi2XsFwx+7w65/GVLOvDk20AT9G9cnTNCqQiMjtfYxVyIkF55LzQx49zMA9N3g1zCQNd8sCS0EpYDQ2v3qG715g9nbO+KnEwayCvNU7szNRPsU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MocGogO/; arc=none smtp.client-ip=209.85.222.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kYNS8Jkn"
-Received: by mail-ua1-f51.google.com with SMTP id a1e0cc1a2514c-80b76c5de79so1182505241.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 02 Jul 2024 12:12:03 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MocGogO/"
+Received: by mail-ua1-f49.google.com with SMTP id a1e0cc1a2514c-80fe89eaa4dso1855450241.1
+        for <linux-bluetooth@vger.kernel.org>; Tue, 02 Jul 2024 12:12:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1719947521; x=1720552321; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1719947524; x=1720552324; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=5i2rioZdxIGMEaGcJQ0WuxK8KC6brQA6zqkeyjDE3Uw=;
-        b=kYNS8Jknkw3/6QskDxOPV85oFBvxPOPa3eW4omQuF8fwJdH/vAe8Gaqj3WE2DPdskh
-         fOdVSDIlzZ9omtyZ/wP/r1BAVNZATAajO9q9pc3O9Xk0GNKN6scu/km0b3SkXJcmBH7n
-         kOQzjJytdpt0yTbfQ/EbTGL3e/P9Y7heAWoLM/udMvAzlhvtWTbMVkvC4wxlv3Sv0JOj
-         +ycyFRef4ZT301Vj9zddq4BFJbmsbC/G/9zSdgTiF7PvgjHGcsx3zPaqRCX02wqMnU2V
-         Jewy5pBFuSLmI+t9xjdaj+9AcJltzNhn8WEhhpmyDXT5WxsuA0UTEMuah1jmP/jx7OyT
-         Ipaw==
+        bh=Hhzy2cKs3k8K5O/je7DzKpGuvnT4IygNAttt2HgJDJE=;
+        b=MocGogO/4zYB8Z+2imbkZKEhx5qlU16JW6xE7u9IZKx2QRQfqlZ9pNB7EpJ5gIXezK
+         op5VgOPahU6XkVlJeZIpg57oI0FEbq8RJsFTG51Bj7QaYFMIzfnuYYxdquLH5u0bZftf
+         wIOHe+PYoD0q7pxJspDT8B8PGeQD6HeYu1CIyZnK10b5ZF5Kyb2EZ5Qk8N7XkgjCJMT4
+         kr1K+ChRRI0PHkGwmFrVb27vE0KuKmq5oCsNlv2PVgZ+S57vwLWwikZc9XRvMoLmcsPW
+         AqmFVfDKnjS0O0dQX8H9Jn1cIHMrP+5Vc+siq0DUz8Uv8gKN5Wqjn3vQTEM4Weqk+v3O
+         NJdA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719947521; x=1720552321;
+        d=1e100.net; s=20230601; t=1719947524; x=1720552324;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=5i2rioZdxIGMEaGcJQ0WuxK8KC6brQA6zqkeyjDE3Uw=;
-        b=Ezx/5eC9upaLWBgCUC/OXICuM6J3O7tIDwgg5/M5ZwfT/hrOyYQmkNEBL7NvCMU7YO
-         NIrp9bBB06bpp+zhDzLV/za1nMKryCGCAuYaSsLdz+6fc7utLOcrS+uiLtkDa28yrAwH
-         yTCM4Dk3m+yRpI5urYRRbuo59qYoTWrlIMQaS+IGJDCMT/+oCvvmKeVSvSxmw0QzkIQy
-         jgVsM01O1upCCzDMgSaT6FKg94CbtT55e/nPr+9US0+qaa6SXE4C+j9RXHRgdT6bB2Ja
-         in48NAZxlxbr7+c24v46ldijRsnoAe23HBq7dD1Y+Bnwe8B5Mbr8Hxbsrf/QPzH3rPz2
-         8y4w==
-X-Gm-Message-State: AOJu0YzWDgEI1icpW9/ZZ0QDJj0C1mKMQzRUAjxEl0eaUSDN5tZzldDR
-	mvBx4caUI5sP75WE/by9AScD4rRbEsg833d8ETJPUq04WT538FHAqw5y6w==
-X-Google-Smtp-Source: AGHT+IG1TQO9p1Pfmn6G3r5Tbr9+xAeE86bFK+GOnx5hyHDmJrK5PiTUjXYx2ucMdvjpRKwOoBDaXQ==
-X-Received: by 2002:a05:6122:4014:b0:4ef:5e3f:599a with SMTP id 71dfb90a1353d-4f2a572cdd2mr10182697e0c.14.1719947521419;
-        Tue, 02 Jul 2024 12:12:01 -0700 (PDT)
+        bh=Hhzy2cKs3k8K5O/je7DzKpGuvnT4IygNAttt2HgJDJE=;
+        b=VZNz+rHr78VPbrl0jkAv16Fm00+4tybQ5r1C9zP5sxsOwBcTPbWbRb+oCUjyjUz1Wq
+         nIm6czPkm6fc4RpmqXVDj3TIqcryzjjDEdDV4fqyhfh5OeufogXvMblv5m8ljQuToJ/r
+         mSpZBDlcUUQqdu2zbjY/aJ7A+fZY8otdrnCnXRhKG21MJDBSF7NP6F8a1NTf0bJDfAzK
+         IVqhz7a7SNUwV94zdrS2NOhq8Y6z6SEiY+Oik8Lm9yTuFmgJ5763bz/pOs3jwGT5XlTU
+         iBaD3gpfMHVa30OE61Iu/BQEB2vs9ynDeQUzLHddiXohoBLRc7F+r8cwiyz2z3FVyva+
+         m2nA==
+X-Gm-Message-State: AOJu0YwSYjgAIPJ9uvjzOVJEK2xkiDyUC7Aap8KQEMI8U6HF6LD35XE3
+	SYdufXavo7lU0xCvl5yEkIqc+ZDicPS8UoZrrAXVYAZrgjfbahwO5w0xtg==
+X-Google-Smtp-Source: AGHT+IF5TA32PK99QONY5KnrxISKs25Cb3YejxfaTIrjEtzRciNl83n+iwQrU5lxTokj0pgQ/ox7yw==
+X-Received: by 2002:a1f:ca46:0:b0:4ef:5707:ae78 with SMTP id 71dfb90a1353d-4f295e72584mr7950437e0c.4.1719947523668;
+        Tue, 02 Jul 2024 12:12:03 -0700 (PDT)
 Received: from lvondent-mobl4.. (syn-107-146-107-067.res.spectrum.com. [107.146.107.67])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-4f292259618sm1383232e0c.37.2024.07.02.12.11.59
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-4f292259618sm1383232e0c.37.2024.07.02.12.12.01
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 02 Jul 2024 12:11:59 -0700 (PDT)
+        Tue, 02 Jul 2024 12:12:01 -0700 (PDT)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 2/5] Bluetooth: hci_core: Don't use hci_prepare_cmd
-Date: Tue,  2 Jul 2024 15:11:54 -0400
-Message-ID: <20240702191157.1722089-2-luiz.dentz@gmail.com>
+Subject: [PATCH v2 3/5] Bluetooth: hci_sync: Move handling of interleave_scan
+Date: Tue,  2 Jul 2024 15:11:55 -0400
+Message-ID: <20240702191157.1722089-3-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.45.2
 In-Reply-To: <20240702191157.1722089-1-luiz.dentz@gmail.com>
 References: <20240702191157.1722089-1-luiz.dentz@gmail.com>
@@ -70,70 +70,114 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This replaces the instance of hci_prepare_cmd with hci_cmd_sync_alloc
-since the former is part of hci_request.c which is considered
-deprecated.
+This moves handling of interleave_scan work to hci_sync.c since
+hci_request.c is deprecated.
 
 Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 ---
- include/net/bluetooth/hci_sync.h | 4 ++++
- net/bluetooth/hci_core.c         | 4 ++--
- net/bluetooth/hci_sync.c         | 5 ++---
- 3 files changed, 8 insertions(+), 5 deletions(-)
+ net/bluetooth/hci_core.c |  3 +--
+ net/bluetooth/hci_sync.c | 53 ++++++++++++++++++++++++++++++++++++----
+ 2 files changed, 49 insertions(+), 7 deletions(-)
 
-diff --git a/include/net/bluetooth/hci_sync.h b/include/net/bluetooth/hci_sync.h
-index 620e6014beb2..a8d88247ac89 100644
---- a/include/net/bluetooth/hci_sync.h
-+++ b/include/net/bluetooth/hci_sync.h
-@@ -20,6 +20,10 @@ struct hci_cmd_sync_work_entry {
- };
- 
- struct adv_info;
-+
-+struct sk_buff *hci_cmd_sync_alloc(struct hci_dev *hdev, u16 opcode, u32 plen,
-+				   const void *param, struct sock *sk);
-+
- /* Function with sync suffix shall not be called with hdev->lock held as they
-  * wait the command to complete and in the meantime an event could be received
-  * which could attempt to acquire hdev->lock causing a deadlock.
 diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index cce755a84ea7..9bdd3e1f8cfc 100644
+index 9bdd3e1f8cfc..fc0424ae551e 100644
 --- a/net/bluetooth/hci_core.c
 +++ b/net/bluetooth/hci_core.c
-@@ -3054,7 +3054,7 @@ int hci_send_cmd(struct hci_dev *hdev, __u16 opcode, __u32 plen,
+@@ -2552,7 +2552,6 @@ struct hci_dev *hci_alloc_dev_priv(int sizeof_priv)
+ 	INIT_DELAYED_WORK(&hdev->ncmd_timer, hci_ncmd_timeout);
  
- 	BT_DBG("%s opcode 0x%4.4x plen %d", hdev->name, opcode, plen);
+ 	hci_devcd_setup(hdev);
+-	hci_request_setup(hdev);
  
--	skb = hci_prepare_cmd(hdev, opcode, plen, param);
-+	skb = hci_cmd_sync_alloc(hdev, opcode, plen, param, NULL);
- 	if (!skb) {
- 		bt_dev_err(hdev, "no memory for command");
- 		return -ENOMEM;
-@@ -3089,7 +3089,7 @@ int __hci_cmd_send(struct hci_dev *hdev, u16 opcode, u32 plen,
- 		return -EINVAL;
+ 	hci_init_sysfs(hdev);
+ 	discovery_init(hdev);
+@@ -4074,7 +4073,7 @@ static void hci_send_cmd_sync(struct hci_dev *hdev, struct sk_buff *skb)
+ 		return;
  	}
  
--	skb = hci_prepare_cmd(hdev, opcode, plen, param);
-+	skb = hci_cmd_sync_alloc(hdev, opcode, plen, param, NULL);
- 	if (!skb) {
- 		bt_dev_err(hdev, "no memory for command (opcode 0x%4.4x)",
- 			   opcode);
+-	if (hci_req_status_pend(hdev) &&
++	if (hdev->req_status == HCI_REQ_PEND &&
+ 	    !hci_dev_test_and_set_flag(hdev, HCI_CMD_PENDING)) {
+ 		kfree_skb(hdev->req_skb);
+ 		hdev->req_skb = skb_clone(hdev->sent_cmd, GFP_KERNEL);
 diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-index 46b394842a27..0c8888448d3c 100644
+index 0c8888448d3c..63548c4cc1ac 100644
 --- a/net/bluetooth/hci_sync.c
 +++ b/net/bluetooth/hci_sync.c
-@@ -49,9 +49,8 @@ static void hci_cmd_sync_complete(struct hci_dev *hdev, u8 result, u16 opcode,
- 	wake_up_interruptible(&hdev->req_wait_q);
+@@ -566,6 +566,53 @@ static void adv_timeout_expire(struct work_struct *work)
+ 	hci_dev_unlock(hdev);
  }
  
--static struct sk_buff *hci_cmd_sync_alloc(struct hci_dev *hdev, u16 opcode,
--					  u32 plen, const void *param,
--					  struct sock *sk)
-+struct sk_buff *hci_cmd_sync_alloc(struct hci_dev *hdev, u16 opcode, u32 plen,
-+				   const void *param, struct sock *sk)
++static bool is_interleave_scanning(struct hci_dev *hdev)
++{
++	return hdev->interleave_scan_state != INTERLEAVE_SCAN_NONE;
++}
++
++static int hci_passive_scan_sync(struct hci_dev *hdev);
++
++static void interleave_scan_work(struct work_struct *work)
++{
++	struct hci_dev *hdev = container_of(work, struct hci_dev,
++					    interleave_scan.work);
++	unsigned long timeout;
++
++	if (hdev->interleave_scan_state == INTERLEAVE_SCAN_ALLOWLIST) {
++		timeout = msecs_to_jiffies(hdev->advmon_allowlist_duration);
++	} else if (hdev->interleave_scan_state == INTERLEAVE_SCAN_NO_FILTER) {
++		timeout = msecs_to_jiffies(hdev->advmon_no_filter_duration);
++	} else {
++		bt_dev_err(hdev, "unexpected error");
++		return;
++	}
++
++	hci_passive_scan_sync(hdev);
++
++	hci_dev_lock(hdev);
++
++	switch (hdev->interleave_scan_state) {
++	case INTERLEAVE_SCAN_ALLOWLIST:
++		bt_dev_dbg(hdev, "next state: allowlist");
++		hdev->interleave_scan_state = INTERLEAVE_SCAN_NO_FILTER;
++		break;
++	case INTERLEAVE_SCAN_NO_FILTER:
++		bt_dev_dbg(hdev, "next state: no filter");
++		hdev->interleave_scan_state = INTERLEAVE_SCAN_ALLOWLIST;
++		break;
++	case INTERLEAVE_SCAN_NONE:
++		bt_dev_err(hdev, "unexpected error");
++	}
++
++	hci_dev_unlock(hdev);
++
++	/* Don't continue interleaving if it was canceled */
++	if (is_interleave_scanning(hdev))
++		queue_delayed_work(hdev->req_workqueue,
++				   &hdev->interleave_scan, timeout);
++}
++
+ void hci_cmd_sync_init(struct hci_dev *hdev)
  {
- 	int len = HCI_COMMAND_HDR_SIZE + plen;
- 	struct hci_command_hdr *hdr;
+ 	INIT_WORK(&hdev->cmd_sync_work, hci_cmd_sync_work);
+@@ -577,6 +624,7 @@ void hci_cmd_sync_init(struct hci_dev *hdev)
+ 	INIT_WORK(&hdev->reenable_adv_work, reenable_adv);
+ 	INIT_DELAYED_WORK(&hdev->le_scan_disable, le_scan_disable);
+ 	INIT_DELAYED_WORK(&hdev->adv_instance_expire, adv_timeout_expire);
++	INIT_DELAYED_WORK(&hdev->interleave_scan, interleave_scan_work);
+ }
+ 
+ static void _hci_cmd_sync_cancel_entry(struct hci_dev *hdev,
+@@ -2110,11 +2158,6 @@ static void hci_start_interleave_scan(struct hci_dev *hdev)
+ 			   &hdev->interleave_scan, 0);
+ }
+ 
+-static bool is_interleave_scanning(struct hci_dev *hdev)
+-{
+-	return hdev->interleave_scan_state != INTERLEAVE_SCAN_NONE;
+-}
+-
+ static void cancel_interleave_scan(struct hci_dev *hdev)
+ {
+ 	bt_dev_dbg(hdev, "cancelling interleave scan");
 -- 
 2.45.2
 
