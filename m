@@ -1,113 +1,63 @@
-Received: from mail-qk1-f176.google.com (mail-qk1-f176.google.com [209.85.222.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [217.70.183.193])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E76FBE7F
-	for <linux-bluetooth@vger.kernel.org>; Tue,  2 Jul 2024 14:23:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1BA986AFA
+	for <linux-bluetooth@vger.kernel.org>; Tue,  2 Jul 2024 14:24:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.193
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719930184; cv=none; b=LhjBuwikxcKaqVjM59T2WMxbgGTxTBs8Y57bW6NxN8JLTGoG/YOCRorw+LGul/xZ3QcCyE4e0gqa1bkVOcjZcS2TOuJcqenkb4xJ1lFbCvcT3Kyx4bLYfjm/1Hoo6B9xBJfq0KRmlI/eeHBYk2xOfxx54iFUfPQ03ohviILYxVg=
+	t=1719930287; cv=none; b=GlfJ5xrZwiA8ESEEloivRhnHQ7IWWqkGxV5qenk3m0762Q8gGGSnZdo1KL5tkgTAIBd3Y/0teljflHydrcGDILJ8bDb/o86Xm1qfE5WuVux39Gy0YxVJdcAWLVp1h4117PPYyPbPQ72od5APWYFkVizeV8LCbu0nF9lJnHcEF00=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719930184; c=relaxed/simple;
-	bh=yUTz+6rJaQ7zK/bD4BiSQiQsuCLOec8aisXyHwErbdQ=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=aNHbn8Dl2VVEVRjIXCe4q6p3zY78Fm+UmIBP3bCyP22VQTr0lZKfDNmVZ4aDFsFBOWjpsXKmHX1+8AqJoh30oluRTGw2MfmbBZZ3lqoloWRJ5dU07z9UgsC+RcDzCj8Ra5itzrGa5NpJUi1yJbox0f1MCSPJC20KG9Yu1Wowz4U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kD8Jr0Y3; arc=none smtp.client-ip=209.85.222.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kD8Jr0Y3"
-Received: by mail-qk1-f176.google.com with SMTP id af79cd13be357-79c05313ec8so227698985a.3
-        for <linux-bluetooth@vger.kernel.org>; Tue, 02 Jul 2024 07:23:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1719930182; x=1720534982; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=1f3pDY3+4ZPpsN3o7rVAG22QXNzif58nrIaXK5wKHGE=;
-        b=kD8Jr0Y3oybD28ymwfc4qxUoawOh2M9J+NunEidNchaJ6T6K+dIE+LCxXFDWp6rXIp
-         dSr8uVygfI7ihomHLj1IwX7Ehy/2aZUklpqfWEc2+tWZAN7Y10AcWNH/58k1uGTDzz/D
-         ENScQoIDdi+pZcbheztimX474AzLgvmYdlsU+NPhP8TtajKWU7Di2kDUCOP273gj9bCt
-         LwNm/uE+NZR2rp2qbxWzFPc5iiVDekJ07BOgWZ2g9TvCJPeSNltBip2/BrKGhRnsi6En
-         XWjK+5EG5ZZNnIVwUBhYG77o+x/HyWAX6OWnQnQUklUKKcdl88E97ZaXkNOtzCVzgMPJ
-         fmTQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719930182; x=1720534982;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=1f3pDY3+4ZPpsN3o7rVAG22QXNzif58nrIaXK5wKHGE=;
-        b=xGG7neOpPti+zdN/qNygdwghkQp9mrbmjmx4xi7g4hQ0XCwmY91inmaawE8SmirwGa
-         NptHAlwfZEP2Xz8W/Q0g+PTsdrI7lVta4X0AqZwdv8PAADO7hiS9nSD90fOmTGd9q28g
-         V8jnPhc8aj54/krjp5DEtD84NMz406QLbuvdS//pFmM+L0DZaoLNxFmrW04GpcbyRwRX
-         sqQff/Z6XR4vSFrG/SxF6XpOEJ/EbnNoSvSZSHWrrlxHa9IHs6u7o/7l4oxMzy1DL7ZF
-         stqIu6N1jmd1TZ1NNJ29kW7i5HAQ4mZ1lo7w1I3VpEBqpM1+ToIQCjMI+VVFSEfRs91+
-         +Tnw==
-X-Gm-Message-State: AOJu0Yw8mNSm87mJGO9MqTWDQ50Zu8opi5/U9OIyZrt5JE2/zhxqRj5R
-	2YuEvhDcnC2+VH3quNiMFQVpK+HLYK1j75qvRGrjod3X3Z1znz35+OUZVQ==
-X-Google-Smtp-Source: AGHT+IHSK8ehi3Gyh794e7ZL75mQIXanQsdsFRkoHnTHOXmO5Fq1NaCDdc/5Lo0tFk8p4VcQE1q4rw==
-X-Received: by 2002:a05:620a:11b6:b0:79d:7179:f908 with SMTP id af79cd13be357-79d7baa6fd3mr1014328485a.73.1719930181945;
-        Tue, 02 Jul 2024 07:23:01 -0700 (PDT)
-Received: from [172.17.0.2] ([172.183.79.0])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-79d6925f583sm463230485a.3.2024.07.02.07.23.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 02 Jul 2024 07:23:01 -0700 (PDT)
-Message-ID: <66840d45.050a0220.1a96d.1c29@mx.google.com>
-Date: Tue, 02 Jul 2024 07:23:01 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============1102472909641013110=="
+	s=arc-20240116; t=1719930287; c=relaxed/simple;
+	bh=pY7IJnJvVtfhOHUjSuNMaMdEr0cl9pK5yH1g0maw10k=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=i0Pkyexp/v3EZe+46BmMkN1LhQP7Ig87JBdl6YTjBw/119K+TeEls0s7RxXd9JvXz/8h1uEB2D51m3IpwEo7p3M6tlju72vqHCvLQCrdJzMTpTZLAaKJF7B1AVCrcU6luSxg+ANnHsG/H53H8+5PQ452ACwFXoubqKScpdsNqlE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.183.193
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hadess.net
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 7A34124000A;
+	Tue,  2 Jul 2024 14:24:37 +0000 (UTC)
+From: Bastien Nocera <hadess@hadess.net>
+To: linux-bluetooth@vger.kernel.org
+Cc: Bastien Nocera <hadess@hadess.net>
+Subject: [BlueZ resend 0/9] Fix a number of static analysis issues #4
+Date: Tue,  2 Jul 2024 16:23:32 +0200
+Message-ID: <20240702142436.833138-1-hadess@hadess.net>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, r.smirnov@omp.ru
-Subject: RE: [BlueZ,v1] client/player: add return value check of io_get_fd() to transport_timer_read()
-In-Reply-To: <20240702122717.77746-1-r.smirnov@omp.ru>
-References: <20240702122717.77746-1-r.smirnov@omp.ru>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
+X-GND-Sasl: hadess@hadess.net
 
---===============1102472909641013110==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+"main: Simplify parse_config_string()" is a repeat. If you don't want
+the patch, please let me know and I'll carry it downstream.
 
-This is automated email and please do not reply to this email!
+More fixes incoming, please review carefully, thanks!
 
-Dear submitter,
+Re-sent with the correct prefix
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=867534
+Bastien Nocera (9):
+  main: Simplify parse_config_string()
+  avdtp: Fix manipulating struct as an array
+  mesh: Avoid accessing array out-of-bounds
+  obexd: Fix possible memleak
+  obexd: Fix memory leak in entry struct
+  obexd: Fix leak in backup_object struct
+  health/mcap: Fix memory leak in mcl struct
+  sdp: Fix memory leak in sdp_data_alloc*()
+  sdp: Check memory allocation in sdp_copy_seq()
 
----Test result---
+ lib/sdp.c                      | 13 ++++++++--
+ mesh/prov-initiator.c          |  9 +++++--
+ obexd/plugins/messages-dummy.c | 12 ++++++++-
+ obexd/plugins/pcsuite.c        |  1 +
+ profiles/audio/avdtp.c         | 45 +++++++++++++++++-----------------
+ profiles/health/mcap.c         |  1 +
+ src/main.c                     | 19 +++++++-------
+ 7 files changed, 64 insertions(+), 36 deletions(-)
 
-Test Summary:
-CheckPatch                    PASS      0.63 seconds
-GitLint                       FAIL      0.57 seconds
-BuildEll                      PASS      25.82 seconds
-BluezMake                     PASS      1808.41 seconds
-MakeCheck                     PASS      13.61 seconds
-MakeDistcheck                 PASS      186.19 seconds
-CheckValgrind                 PASS      259.70 seconds
-CheckSmatch                   PASS      365.23 seconds
-bluezmakeextell               PASS      126.11 seconds
-IncrementalBuild              PASS      1566.74 seconds
-ScanBuild                     PASS      1063.75 seconds
+-- 
+2.45.2
 
-Details
-##############################
-Test: GitLint - FAIL
-Desc: Run gitlint
-Output:
-[BlueZ,v1] client/player: add return value check of io_get_fd() to transport_timer_read()
-
-WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
-1: T1 Title exceeds max length (89>80): "[BlueZ,v1] client/player: add return value check of io_get_fd() to transport_timer_read()"
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============1102472909641013110==--
