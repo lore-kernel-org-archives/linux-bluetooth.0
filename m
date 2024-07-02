@@ -1,97 +1,134 @@
-Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE28C15216E
-	for <linux-bluetooth@vger.kernel.org>; Tue,  2 Jul 2024 09:01:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62A1114D703
+	for <linux-bluetooth@vger.kernel.org>; Tue,  2 Jul 2024 09:35:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719910903; cv=none; b=SreIYWEGIKfFjuGeUgyLWSnddS2adzY9b/2FS+C4ONur4o7Awv7k0SQFMAFRKs3aprWu/bECCMT90cuWIr66k5ckcyve0vMAQvVp+U+5rVjiG+InYTEJwk5EjXhtSPnuA4+7xuMKS5HmJI1ogUBLIQ47L6fw2MVovv+3tcQH+nk=
+	t=1719912950; cv=none; b=dtV1EX/mOgybhBvYGYd0LeDpqKQ35tFW2rZq4RgFNxqRYG6nJuH8iwTD46Q3gdq+a0yneDIVCBXLScsGaK9dA4AD+LqAWTxaU+gRhAANWYMyA5CeiXPr1f2DgaSubiK7Qk48Q8hbGdJD/LU0H2lMqwSMqFTmBxthAZD3Y3PdkSY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719910903; c=relaxed/simple;
-	bh=r7CjFWBCLSDo4URMdBgxqvPT8WLRAZpopr2aTTJ3dIk=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Cq4J4DaajXmxGwWDmpEHqTLQboBcAGA/Ea47JSykJN6GJc1xbnK1BQfS/dhw+M+8FTti4BkvPUBoRZyi6lfBXqmSy57ntHED42FqKeRGav2Jir2TFWSpLV2YLhEbgOAoTeYGr9PWjFgqyb+NZAIVFvsCmcF8EzacCr8CRpfbRvc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
-Received: from inp1wst083.omp.ru (81.22.207.138) by msexch01.omp.ru
- (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Tue, 2 Jul
- 2024 12:01:32 +0300
-From: Roman Smirnov <r.smirnov@omp.ru>
+	s=arc-20240116; t=1719912950; c=relaxed/simple;
+	bh=TfeygqpfV9gcIgOV9aTqSpdjwORKMHd1IivGtWTPRww=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Aiwj2VmGH1AHLPZ0obs05HUOfIK86z8ZpNaifFowCbQqeejyXACxRgtZ3HnW0nykOd0Q5/NpIWsJ0uMUSIhUAbHVgKNExauu1n24RWbN5ZmWT6qZa+aRwXeWXZVvLPrMNjj18cVoXJS1RHOV/LnM7OPzoCSe1qBMQTEt+T4vsBc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=nsCA6Xel; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="nsCA6Xel"
+Received: from pps.filterd (m0279862.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4628nYng010897
+	for <linux-bluetooth@vger.kernel.org>; Tue, 2 Jul 2024 09:35:48 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-type:date:from:message-id:mime-version:subject:to; s=
+	qcppdkim1; bh=9rBaxdoDcWLEhSA8bc51i3khqasm0fRDmX0K7XlO5MY=; b=ns
+	CA6XeleUMBwYJp70zCvSWcMCRaOMYxzyNZ9kfj9YvMG1mjt8dfn9JDOGppEMbJQW
+	oEUr7+rycjLS5uMdmyMWDvngPWuUJfKGUvWN/vqMZDyPo2YLqRVdC188THusV0ri
+	nFo6Dvazhgkdv+bheOumE6F7vvMj00+JB79X5I9LhgRJLvKlQ/nkG7LQLJPWO3tG
+	RgR4LmxS9LKzSxTjZh2a7bO517+lBwdKssNbtNB+zAzEOykLkFO+cI3g2Qff3mil
+	qIdMjZFY3q1YNr/TpRGE9zJyEa57oiGGTSRaNf6dki5ZE6Q0bSR56jMqlnAtxoCZ
+	OQndAcX/owLtIssb0n9g==
+Received: from nasanppmta04.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 403kj8v61u-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <linux-bluetooth@vger.kernel.org>; Tue, 02 Jul 2024 09:35:48 +0000 (GMT)
+Received: from nasanex01c.na.qualcomm.com (nasanex01c.na.qualcomm.com [10.45.79.139])
+	by NASANPPMTA04.qualcomm.com (8.17.1.19/8.17.1.19) with ESMTPS id 4629ZlGP003228
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <linux-bluetooth@vger.kernel.org>; Tue, 2 Jul 2024 09:35:47 GMT
+Received: from hu-amisjain-hyd.qualcomm.com (10.80.80.8) by
+ nasanex01c.na.qualcomm.com (10.45.79.139) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.9; Tue, 2 Jul 2024 02:35:45 -0700
+From: Amisha Jain <quic_amisjain@quicinc.com>
 To: <linux-bluetooth@vger.kernel.org>
-CC: Roman Smirnov <r.smirnov@omp.ru>
-Subject: [PATCH BlueZ v2] shared/csip: add NULL checks to foreach_csis_service()
-Date: Tue, 2 Jul 2024 12:01:20 +0300
-Message-ID: <20240702090120.33631-1-r.smirnov@omp.ru>
-X-Mailer: git-send-email 2.34.1
+CC: <quic_mohamull@quicinc.com>, <quic_hbandi@quicinc.com>,
+        <quic_anubhavg@quicinc.com>
+Subject: [PATCH BlueZ v4] obex: Move size emit signal to plugins instead of obex.c
+Date: Tue, 2 Jul 2024 15:05:23 +0530
+Message-ID: <20240702093523.12158-1-quic_amisjain@quicinc.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
- (10.188.4.12)
-X-KSE-ServerInfo: msexch01.omp.ru, 9
-X-KSE-AntiSpam-Interceptor-Info: scan successful
-X-KSE-AntiSpam-Version: 6.1.0, Database issued on: 07/02/2024 08:39:34
-X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
-X-KSE-AntiSpam-Method: none
-X-KSE-AntiSpam-Rate: 19
-X-KSE-AntiSpam-Info: Lua profiles 186271 [Jul 02 2024]
-X-KSE-AntiSpam-Info: Version: 6.1.0.4
-X-KSE-AntiSpam-Info: Envelope from: r.smirnov@omp.ru
-X-KSE-AntiSpam-Info: LuaCore: 21 0.3.21
- ebee5449fc125b2da45f1a6a6bc2c5c0c3ad0e05
-X-KSE-AntiSpam-Info: {rep_avail}
-X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
-X-KSE-AntiSpam-Info: {SMTP from is not routable}
-X-KSE-AntiSpam-Info: {Found in DNSBL: 81.22.207.138 in (user)
- b.barracudacentral.org}
-X-KSE-AntiSpam-Info:
-	81.22.207.138:7.1.2;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;omp.ru:7.1.1;127.0.0.199:7.1.2;inp1wst083.omp.ru:7.1.1
-X-KSE-AntiSpam-Info: ApMailHostAddress: 81.22.207.138
-X-KSE-AntiSpam-Info: {DNS response errors}
-X-KSE-AntiSpam-Info: Rate: 19
-X-KSE-AntiSpam-Info: Status: not_detected
-X-KSE-AntiSpam-Info: Method: none
-X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
- smtp.mailfrom=omp.ru;dkim=none
-X-KSE-Antiphishing-Info: Clean
-X-KSE-Antiphishing-ScanningType: Heuristic
-X-KSE-Antiphishing-Method: None
-X-KSE-Antiphishing-Bases: 07/02/2024 08:44:00
-X-KSE-Antivirus-Interceptor-Info: scan successful
-X-KSE-Antivirus-Info: Clean, bases: 7/2/2024 7:20:00 AM
-X-KSE-Attachment-Filter-Triggered-Rules: Clean
-X-KSE-Attachment-Filter-Triggered-Filters: Clean
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nasanex01c.na.qualcomm.com (10.45.79.139)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: pZORwO-UdhUqdrsVcYsoKYpe0gjmsSez
+X-Proofpoint-ORIG-GUID: pZORwO-UdhUqdrsVcYsoKYpe0gjmsSez
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-07-02_06,2024-07-02_02,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ bulkscore=0 suspectscore=0 impostorscore=0 malwarescore=0 phishscore=0
+ adultscore=0 clxscore=1015 mlxscore=0 mlxlogscore=937 lowpriorityscore=0
+ spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2406140001 definitions=main-2407020072
 
-Make foreach_csis_service() safe for passing NULL pointers.
+Instead of emitting the property "Size" from obex_put_stream_start(),
+Call the function manager_emit_transfer_property() from plugins/*.c
+wherever plugin has transfer object present.
+Remove the code from obex.c which is generic for all profiles.
 
-Found with the SVACE static analysis tool.
+This change resolves the type mismatch issue when calling the
+manager_emit_transfer_property from obex.c. We are passing
+'os->service_data' of plugin session type but the
+manager_emit_transfer_property() expects the 'obex_transfer'
+type, therefore size is not set properly and might cause
+crash/disconnection.
+
 ---
- V1 -> V2: added check for attr
+ obexd/plugins/ftp.c | 3 +++
+ obexd/plugins/opp.c | 3 +++
+ obexd/src/obex.c    | 3 ---
+ 3 files changed, 6 insertions(+), 3 deletions(-)
 
- src/shared/csip.c | 3 +++
- 1 file changed, 3 insertions(+)
-
-diff --git a/src/shared/csip.c b/src/shared/csip.c
-index 87b4590d9..9a734e7d6 100644
---- a/src/shared/csip.c
-+++ b/src/shared/csip.c
-@@ -611,6 +611,9 @@ static void foreach_csis_service(struct gatt_db_attribute *attr,
- 	struct bt_csip *csip = user_data;
- 	struct bt_csis *csis = csip_get_csis(csip);
+diff --git a/obexd/plugins/ftp.c b/obexd/plugins/ftp.c
+index 874fe2b8b..9e52e397d 100644
+--- a/obexd/plugins/ftp.c
++++ b/obexd/plugins/ftp.c
+@@ -175,6 +175,9 @@ int ftp_chkput(struct obex_session *os, void *user_data)
  
-+	if (!csis || !attr)
-+		return;
+ 	ret = obex_put_stream_start(os, path);
+ 
++	if (obex_get_size(os) != OBJECT_SIZE_DELETE && obex_get_size(os) != OBJECT_SIZE_UNKNOWN)
++		manager_emit_transfer_property(ftp->transfer, "Size");
 +
- 	csis->service = attr;
+ 	if (ret == 0)
+ 		manager_emit_transfer_started(ftp->transfer);
  
- 	gatt_db_service_set_claimed(attr, true);
+diff --git a/obexd/plugins/opp.c b/obexd/plugins/opp.c
+index 777f5f8ed..4b621373c 100644
+--- a/obexd/plugins/opp.c
++++ b/obexd/plugins/opp.c
+@@ -87,6 +87,9 @@ skip_auth:
+ 
+ 	err = obex_put_stream_start(os, path);
+ 
++	if (obex_get_size(os) != OBJECT_SIZE_DELETE && obex_get_size(os) != OBJECT_SIZE_UNKNOWN)
++		manager_emit_transfer_property(user_data, "Size");
++
+ 	g_free(path);
+ 
+ 	if (err < 0)
+diff --git a/obexd/src/obex.c b/obexd/src/obex.c
+index 98d6245a4..370bfac9e 100644
+--- a/obexd/src/obex.c
++++ b/obexd/src/obex.c
+@@ -716,9 +716,6 @@ int obex_put_stream_start(struct obex_session *os, const char *filename)
+ 		return err;
+ 	}
+ 
+-	if (os->size != OBJECT_SIZE_DELETE && os->size != OBJECT_SIZE_UNKNOWN)
+-		manager_emit_transfer_property(os->service_data, "Size");
+-
+ 	os->path = g_strdup(filename);
+ 
+ 	return 0;
 -- 
-2.34.1
+2.17.1
 
