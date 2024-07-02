@@ -1,86 +1,135 @@
-Received: from smtpbgbr2.qq.com (smtpbgbr2.qq.com [54.207.22.56])
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D76388F72
-	for <linux-bluetooth@vger.kernel.org>; Tue,  2 Jul 2024 03:10:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.207.22.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A92D372
+	for <linux-bluetooth@vger.kernel.org>; Tue,  2 Jul 2024 07:11:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719889864; cv=none; b=cIGk1MyMk7FIVVFTdBExE47ZO+MOgc/dc4xAHPwVHL60DJGx7TEk2x7NmDr2XjjmGqdf/WJJs9gWs/eYCMzXitagc01nWxa4hWH1rXb5WheAc9R7fGW4MsglSUo+OIJ8WVaFZWagZ0p368bHxtBgjnJIcaGXS7Ko5ArDatC2ADI=
+	t=1719904286; cv=none; b=UMuapO9cwY1OCLWliucEjrI0bgN7jxViqe99RhBMHPug4P5+jdBGhMDbXe4NDxmvxYonhZdAfCCHVdGC0cM56vzO2ir0JiCQsqkPP1VUBuYtSE/6X53CTRVaHemgS+3mI4ZUacOTRCqPYJRnHTL/lB+f5eEHhhfLDGe+Z0UTCzw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719889864; c=relaxed/simple;
-	bh=Uzlot6OPtNOIjSfWyTQT9t285PdHs5jYUa5Bj68yenE=;
-	h=From:To:Cc:Subject:Mime-Version:Content-Type:Date:Message-ID:
-	 References:In-Reply-To; b=RbhNXYifujpPXiBGQgJdGHWTTE7MuUfIEGcXqZ3JkMTozBRmTpNZViF432oZ5/lwynMznify8clVHYHK+9GTe4tnF1xB8Twd4z6K+tgzf+u5QRvytLW/OcHZaWcr9kwVZAjxcRI3ivpSyqX+hZjq3XBbut1xCzPF59cXaZQ0usY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=uniontech.com; spf=pass smtp.mailfrom=uniontech.com; arc=none smtp.client-ip=54.207.22.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=uniontech.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniontech.com
-X-QQ-GoodBg: 2
-X-QQ-SSF: 00400000000000F0
-X-QQ-XMRINFO: MSVp+SPm3vtS1Vd6Y4Mggwc=
-X-QQ-FEAT: zT6n3Y95oi2VLOR4A2F4qRNnyoM1S0cB9SDuRFEx6jA9d8tIWuUQ+7Lb4KjTU
-	Obxn6eXUrG6W9L42PKVsSK06AeAvPHfyFfcKHv3Vk/iASSN/VyCrPympndumc0I6EsVE92d
-	O0X9tE3R1ixN000TVB3jibhNufU7u8zy5aRyybCSq6vtJ7RkRjGU4M5qFKb8e9OAcb7iHdZ
-	2kWNKZJBfnbjB+xqJuNFeuGUt1P1jYFKf8Mbls4+/bufOWvFzfGYL97BbadUGqNGUlIxzGb
-	q8DD+NFq054jr2XDRqN4aNsIYs4rZK+QU9M/+1AKyrKmypBqtF7VtopkRdrIrjCt2Sz0lIs
-	IiiJxbsTd7vvIGcB2L9v+duftdT1zAe7VAj3R258sNLwvem2H1Qaaq884dny6pf3HZMRF8f
-X-QQ-BUSINESS-ORIGIN: 2
-X-QQ-Originating-IP: z2plQ/6RjyLe1UiH2WZjt090KNGkeSI8DVMR7ztFMAc=
-X-QQ-STYLE: 
-X-QQ-mid: maileng7t1719889848t591575
-From: "=?utf-8?B?6LW15oiQ5LmJ?=" <zhaochengyi@uniontech.com>
-To: "=?utf-8?B?THVpeiBBdWd1c3RvIHZvbiBEZW50eg==?=" <luiz.dentz@gmail.com>
-Cc: "=?utf-8?B?bGludXgtYmx1ZXRvb3Ro?=" <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH] adapter: Add retry when bonding device returns connection failure
+	s=arc-20240116; t=1719904286; c=relaxed/simple;
+	bh=fC2Va9/jjN3mhDLCvvwDKzFVFVOGDcAwGEQXOfjAspo=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=VikFJn9xQK6YOPd2jGSzw5x2YsFKKM2RWidh0FSVPE9dSx2NRqbbQZb1avsMski+VLFPXUFXcvqgsX2ZQO4olt5+OUXW/5dNwgfaqtlRie4Rlny6jB82yh276Uwl5MgTrzosBhYvk2NtqjLSBln/tF9Cbr2lkGvrEeMLa/p0XqU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=lqikcQ1H; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="lqikcQ1H"
+Received: from pps.filterd (m0279863.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 461KPoOX022292
+	for <linux-bluetooth@vger.kernel.org>; Tue, 2 Jul 2024 07:11:24 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-type:date:from:message-id:mime-version:subject:to; s=
+	qcppdkim1; bh=ZeZuw5GKLA9qW3BVpQPDC+l0juJbx6EWE1midChE4E4=; b=lq
+	ikcQ1HdtMn5Gbhs/XEOzLPsN0vliko6p666rXqgEDljmnwuL1ycVYl2LlNfKJ97M
+	0kVtcz/wk7eWAh1cJKXT7m4H/EYbg5jYZR1cDWLSjfYIfcS60yoy6Mq1OwDdeCTK
+	ATTfJ3+nRfA8PMgbVCk3fRj4ZGr1jg0ar/zy7F+7BD1iZJz7kbMsMlopoBg5Aagl
+	FZMUxtE5Nzu20HxIbo8ac0davUN40BJ+PW1NPqXe3l1IkRloO2KvDbJ/MAlFi2QN
+	W08qgXP8i6vid9x+2YCEPh3cCxhUb7RcqCcX4wk7++Ia3IiKdV5vmXI2+TQFGm8q
+	+t4rq3vRkZqiUL7J/RJQ==
+Received: from nasanppmta02.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 402ag2ece9-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <linux-bluetooth@vger.kernel.org>; Tue, 02 Jul 2024 07:11:24 +0000 (GMT)
+Received: from nasanex01c.na.qualcomm.com (nasanex01c.na.qualcomm.com [10.45.79.139])
+	by NASANPPMTA02.qualcomm.com (8.17.1.19/8.17.1.19) with ESMTPS id 4627BNYi028916
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <linux-bluetooth@vger.kernel.org>; Tue, 2 Jul 2024 07:11:23 GMT
+Received: from hu-amisjain-hyd.qualcomm.com (10.80.80.8) by
+ nasanex01c.na.qualcomm.com (10.45.79.139) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.9; Tue, 2 Jul 2024 00:11:21 -0700
+From: Amisha Jain <quic_amisjain@quicinc.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: <quic_mohamull@quicinc.com>, <quic_hbandi@quicinc.com>,
+        <quic_anubhavg@quicinc.com>
+Subject: [PATCH v3] Bluetooth: No need to update the mas plugin
+Date: Tue, 2 Jul 2024 12:41:03 +0530
+Message-ID: <20240702071103.24986-1-quic_amisjain@quicinc.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
-	charset="utf-8"
-Content-Transfer-Encoding: base64
-Date: Tue, 2 Jul 2024 11:10:48 +0800
-X-Priority: 3
-Message-ID: <tencent_479A3EDC37E92B2C642695B1@qq.com>
-X-QQ-MIME: TCMime 1.0 by Tencent
-X-Mailer: QQMail 2.x
-X-QQ-Mailer: QQMail 2.x
-References: <20240701101243.2902-1-zhaochengyi@uniontech.com>
-	<CABBYNZK8ZvoHCQjo=rj7yt-0omZ8zgTFOueCvL5KoghhY_1nwA@mail.gmail.com>
-	<tencent_1A76F7A01B286AA77BEC7DAE@qq.com>
-In-Reply-To: <tencent_1A76F7A01B286AA77BEC7DAE@qq.com>
-X-QQ-ReplyHash: 2285007281
-X-BIZMAIL-ID: 14305346098413274524
-X-QQ-SENDSIZE: 520
-Received: from qq.com (unknown [127.0.0.1])
-	by smtp.qq.com (ESMTP) with SMTP
-	id ; Tue, 02 Jul 2024 11:10:50 +0800 (CST)
-Feedback-ID: maileng:uniontech.com:qybglogicsvrgz:qybglogicsvrgz8a-1
+MIME-Version: 1.0
+Content-Type: text/plain
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nasanex01c.na.qualcomm.com (10.45.79.139)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: _eNgelIbmlwi-J7x-IrJvxjn9Joy57TO
+X-Proofpoint-GUID: _eNgelIbmlwi-J7x-IrJvxjn9Joy57TO
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-07-02_02,2024-07-02_02,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 clxscore=1015
+ malwarescore=0 phishscore=0 impostorscore=0 mlxlogscore=937 bulkscore=0
+ spamscore=0 priorityscore=1501 suspectscore=0 adultscore=0
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2406140001 definitions=main-2407020053
 
-SGksDQoNCj4gSGVyZSBpcyB3aGF0IEl2ZSBhY3R1YWxseSBoYWQgaW4gbWluZDoNCj4NCj4g
-ZGlmZiAtLWdpdCBhL3NyYy9hZGFwdGVyLmMgYi9zcmMvYWRhcHRlci5jDQo+IGluZGV4IGJi
-NDlhMWVjYWQyMy4uZjFjYzRmMmVkMjVhIDEwMDY0NA0KPiAtLS0gYS9zcmMvYWRhcHRlci5j
-DQo+ICsrKyBiL3NyYy9hZGFwdGVyLmMNCj4gQEAgLTgzNjMsMTIgKzgzNjMsMTcgQEAgc3Rh
-dGljIHZvaWQgYm9uZGluZ19hdHRlbXB0X2NvbXBsZXRlKHN0cnVjdA0KPiBidGRfYWRhcHRl
-ciAqYWRhcHRlciwNCj4gICAgICAgICBlbHNlDQo+ICAgICAgICAgICAgICAgICBkZXZpY2Ug
-PSBidGRfYWRhcHRlcl9maW5kX2RldmljZShhZGFwdGVyLCBiZGFkZHIsIGFkZHJfdHlwZSk7
-DQo+DQo+IC0gICAgICAgaWYgKHN0YXR1cyA9PSBNR01UX1NUQVRVU19BVVRIX0ZBSUxFRCAm
-JiBhZGFwdGVyLT5waW5jb2RlX3JlcXVlc3RlZCkgew0KPiAtICAgICAgICAgICAgICAgLyog
-T24gZmFsaXVyZSwgaXNzdWUgYSBib25kaW5nX3JldHJ5IGlmIHBvc3NpYmxlLiAqLw0KPiAr
-ICAgICAgIHN3aXRjaCAoc3RhdHVzKSB7DQo+ICsgICAgICAgY2FzZSBNR01UX1NUQVRVU19B
-VVRIX0ZBSUxFRDoNCj4gKyAgICAgICAgICAgICAgIGlmICghYWRhcHRlci0+cGluY29kZV9y
-ZXF1ZXN0ZWQpDQo+ICsgICAgICAgICAgICAgICAgICAgICAgIGJyZWFrOw0KPiArICAgICAg
-IC8qIGZhbGwgdGhyb3VnaCAqLw0KPiArICAgICAgIGNhc2UgTUdNVF9TVEFUVVNfQ09OTkVD
-VF9GQUlMRUQ6DQo+ICAgICAgICAgICAgICAgICBpZiAoZGV2aWNlICE9IE5VTEwpIHsNCj4g
-ICAgICAgICAgICAgICAgICAgICAgICAgaWYgKGRldmljZV9ib25kaW5nX2F0dGVtcHRfcmV0
-cnkoZGV2aWNlKSA9PSAwKQ0KPiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHJl
-dHVybjsNCj4gICAgICAgICAgICAgICAgIH0NCj4gKyAgICAgICAgICAgICAgIGJyZWFrOw0K
-PiAgICAgICAgIH0NCj4NCj4gICAgICAgICAvKiBJZ25vcmUgZGlzY29ubmVjdHMgZHVyaW5n
-IHJldHJ5LiAqLw0KDQpHcmVhdCwgSSB0aGluayB5b3UgYXJlIHJpZ2h0IGlmIGtlcm5lbCBk
-b2VzIG5vdCBjb250aW51ZSB0byByZXR1cm4gTUdNVF9TVEFUVVNfQ09OTkVDVF9GQUlMRUQg
-c3RhdHVzLg0KDQpNeSBpZGVhIGlzIHRvIHJldHJ5IG9ubHkgb25jZSBhZnRlciByZXR1cm5p
-bmcgTUdNVF9TVEFUVVNfQ09OTkVDVF9GQUlMRUQsDQppdCBjYW4gYXZvaWQgcmVwZWF0ZWQg
-cmV0cnkgd2hlbiBjb250aW51aW5nIHRvIHJldHVybiBNR01UX1NUQVRVU19DT05ORUNUX0ZB
-SUxFRC4NCg0KQ2hlZXJzLA0KQ2hlbmd5aQ==
+Instead of emitting the property "Size" from obex_put_stream_start(),
+Call the function manager_emit_transfer_property() from plugins/*.c
+wherever plugin has transfer object present.
+Remove the code from obex.c which is generic for all profiles.
+
+This change resolves the type mismatch issue when calling the
+manager_emit_transfer_property from obex.c. We are passing
+'os->service_data' of plugin session type but the
+manager_emit_transfer_property() expects the 'obex_transfer'
+type, therefore size is not set properly and might cause
+crash/disconnection.
+
+Signed-off-by: Amisha Jain <quic_amisjain@quicinc.com>
+---
+ obexd/plugins/ftp.c | 3 +++
+ obexd/plugins/opp.c | 3 +++
+ obexd/src/obex.c    | 3 ---
+ 3 files changed, 6 insertions(+), 3 deletions(-)
+
+diff --git a/obexd/plugins/ftp.c b/obexd/plugins/ftp.c
+index 874fe2b8b..9e52e397d 100644
+--- a/obexd/plugins/ftp.c
++++ b/obexd/plugins/ftp.c
+@@ -175,6 +175,9 @@ int ftp_chkput(struct obex_session *os, void *user_data)
+ 
+ 	ret = obex_put_stream_start(os, path);
+ 
++	if (obex_get_size(os) != OBJECT_SIZE_DELETE && obex_get_size(os) != OBJECT_SIZE_UNKNOWN)
++		manager_emit_transfer_property(ftp->transfer, "Size");
++
+ 	if (ret == 0)
+ 		manager_emit_transfer_started(ftp->transfer);
+ 
+diff --git a/obexd/plugins/opp.c b/obexd/plugins/opp.c
+index 777f5f8ed..4b621373c 100644
+--- a/obexd/plugins/opp.c
++++ b/obexd/plugins/opp.c
+@@ -87,6 +87,9 @@ skip_auth:
+ 
+ 	err = obex_put_stream_start(os, path);
+ 
++	if (obex_get_size(os) != OBJECT_SIZE_DELETE && obex_get_size(os) != OBJECT_SIZE_UNKNOWN)
++		manager_emit_transfer_property(user_data, "Size");
++
+ 	g_free(path);
+ 
+ 	if (err < 0)
+diff --git a/obexd/src/obex.c b/obexd/src/obex.c
+index 98d6245a4..370bfac9e 100644
+--- a/obexd/src/obex.c
++++ b/obexd/src/obex.c
+@@ -716,9 +716,6 @@ int obex_put_stream_start(struct obex_session *os, const char *filename)
+ 		return err;
+ 	}
+ 
+-	if (os->size != OBJECT_SIZE_DELETE && os->size != OBJECT_SIZE_UNKNOWN)
+-		manager_emit_transfer_property(os->service_data, "Size");
+-
+ 	os->path = g_strdup(filename);
+ 
+ 	return 0;
+-- 
+2.17.1
 
