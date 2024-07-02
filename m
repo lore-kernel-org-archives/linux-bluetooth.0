@@ -1,96 +1,95 @@
-Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6793D12FB16
-	for <linux-bluetooth@vger.kernel.org>; Tue,  2 Jul 2024 07:14:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E09D954FB5
+	for <linux-bluetooth@vger.kernel.org>; Tue,  2 Jul 2024 07:40:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719904486; cv=none; b=nhR0iWz7RLAJwk/0jzZEC+An9PAIWI3hzMpT1HaSlJv/hQCjRTV7MfYM0LSm4NTcbKP9KZIgVjYvF6LxgeOYLSMQPwWPLwPUxCAx3/8Tv7QTr3+VhxdeDIsDKTSr88Wp1X1z7oguo5gJJ32nGbqFn6S8hneYLQZ46fROo0Mqp00=
+	t=1719906030; cv=none; b=j91r+a0nt2T/IRuASfH3+sR8XLIb/qIzskJ1eZ6pr5axj7IKbt1SrthgIIOsHTlBAmqk3MuFjDHdTU5avCRQXRctrVFtOL/S6bzwlOU+Xkxy9U1yKI40iPiOVdVPodxERImczEpRvCb9Dt5oJSZo3Vdeh4WiLzOw+19YjEmDKAo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719904486; c=relaxed/simple;
-	bh=72aZpUXAEFeF61fOHBk99xAI3iKkujAmYuf+ivf5VXE=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=IES/3A1TS+O8NWlGh9sw2qqS7dSn+rG28FvDKxiAGE5VRwG+O0oVknnY6G6ifijQwu070LlAEPx4+JjkU94EljIBLyhLWA64Ts5c+rPBIwnO/PcNPZj2BCSm13HIgQfQB+Bwu3KE7Db7IGnbOodz5HJv2Y2+joYLE2F5MHNk9cY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BKbQz0TZ; arc=none smtp.client-ip=209.85.210.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BKbQz0TZ"
-Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-70abb539f41so1708763b3a.2
-        for <linux-bluetooth@vger.kernel.org>; Tue, 02 Jul 2024 00:14:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1719904484; x=1720509284; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=72aZpUXAEFeF61fOHBk99xAI3iKkujAmYuf+ivf5VXE=;
-        b=BKbQz0TZ2pYfL7xkllWwgv6I9BDyEzo2BN6ehEKqxemYPQ6jptWaMEijmx5d9l7/6+
-         zFvdvauBDKtrX9U558JKkeegVKZ1IkHFbv8mKtmChCc9ACp74GiWGXtZuf16fHZR3qol
-         YgvBG7rDyLJqLDqcB4BL2wkY4EbR+gVM0EWIYm9ti14vFYAf8lxdgQS8lHXiNPAJZJdS
-         FVcLOlCyCkPyhbF8J+SS7/v0/2inDg6O7hhOeON0LqZQPk6mFzglpGyExl58C6t3QP1b
-         nFHYsTe6PTKj8iwK99lShcRda3Q3fMvk0cvfhVOlwc/ZUiSPHfWuaZYwYlOOau+UIlZ8
-         hyig==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719904484; x=1720509284;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=72aZpUXAEFeF61fOHBk99xAI3iKkujAmYuf+ivf5VXE=;
-        b=KC4DbWTqIKTb/uR178GUpN9k7Q8A6qCubemgUtOQpzh11Ycoxy21UahRzY184+fPOq
-         3Idu7TwxdNNMPWd2/uY6nKh+k253wPVqxWZEwzMgtyo8nGK2LBoKJxkHBuySanwS4suE
-         CN6F+ucyR/ptUl657W52nW80++y+M1mFvJX3mtMqTU0zirne0nVswlVuawTs9Gvo5hHB
-         fhhvvQ+Qapp0BvUNPfEIb+0YiK3pR97ENLPnaQxa/AGGB/EmR5tmYex7gVLfA1BoChWr
-         1geeyIC4yUSDHeC3Jo9CUO/IhchZsO9uj2BhvPpCnFqtJ8Q6OdokyKmyK8FBEV5RJ4/d
-         7IYA==
-X-Gm-Message-State: AOJu0Yx1APq2hvn1EaJITGdHoC4kCgkfIhibq5bKFbUjzVoZMzcytArH
-	4pJOHxLPxMGsG4N72htgoEBFEarte/HBnC/7Mo1gYA2F7WNf79s36r/6LQ==
-X-Google-Smtp-Source: AGHT+IFhbnxVGb3HaldXQyCWNj+MPaKVheP5jWcmTflX17TObsy4NebDvdFV8H+Y8JfW7E1KVYcaUg==
-X-Received: by 2002:a05:6a20:3cab:b0:1b6:d9fa:8be with SMTP id adf61e73a8af0-1bef621461fmr10916166637.40.1719904484411;
-        Tue, 02 Jul 2024 00:14:44 -0700 (PDT)
-Received: from [172.17.0.2] ([52.234.36.41])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1fac10d153bsm76364665ad.40.2024.07.02.00.14.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 02 Jul 2024 00:14:44 -0700 (PDT)
-Message-ID: <6683a8e4.170a0220.99c2.9132@mx.google.com>
-Date: Tue, 02 Jul 2024 00:14:44 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============3351346785224710997=="
+	s=arc-20240116; t=1719906030; c=relaxed/simple;
+	bh=8V08I3dh9nZnpxBGZeM+i/sUFVNaq69SJKCkKFH3bx0=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=UsMvoxBJdYSFbNxuEnbQnK51rZrG4f4I/s5OQQSGoLr/UH/J6n8R/2nhJbc2zw4+geqbWYwLGriVNNnMxDVKgJeB7TtqtaEXA0NcSh7rNBanRyXL53PdcMfb8g+vUYIQgEtw6ySJiM4ltg/pys2lS/OMpis0fAY/dk+KSHrAgLY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
+Received: from inp1wst083.omp.ru (81.22.207.138) by msexch01.omp.ru
+ (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Tue, 2 Jul
+ 2024 10:40:11 +0300
+From: Roman Smirnov <r.smirnov@omp.ru>
+To: <linux-bluetooth@vger.kernel.org>
+CC: Roman Smirnov <r.smirnov@omp.ru>
+Subject: [PATCH BlueZ v1] audio/a2dp: add NULL checks to find_remote_sep()
+Date: Tue, 2 Jul 2024 10:39:55 +0300
+Message-ID: <20240702073955.10962-1-r.smirnov@omp.ru>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, quic_amisjain@quicinc.com
-Subject: RE: [v3] Bluetooth: No need to update the mas plugin
-In-Reply-To: <20240702071103.24986-1-quic_amisjain@quicinc.com>
-References: <20240702071103.24986-1-quic_amisjain@quicinc.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
+ (10.188.4.12)
+X-KSE-ServerInfo: msexch01.omp.ru, 9
+X-KSE-AntiSpam-Interceptor-Info: scan successful
+X-KSE-AntiSpam-Version: 6.1.0, Database issued on: 07/02/2024 07:22:28
+X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
+X-KSE-AntiSpam-Method: none
+X-KSE-AntiSpam-Rate: 19
+X-KSE-AntiSpam-Info: Lua profiles 186267 [Jul 02 2024]
+X-KSE-AntiSpam-Info: Version: 6.1.0.4
+X-KSE-AntiSpam-Info: Envelope from: r.smirnov@omp.ru
+X-KSE-AntiSpam-Info: LuaCore: 21 0.3.21
+ ebee5449fc125b2da45f1a6a6bc2c5c0c3ad0e05
+X-KSE-AntiSpam-Info: {rep_avail}
+X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
+X-KSE-AntiSpam-Info: {SMTP from is not routable}
+X-KSE-AntiSpam-Info: {Found in DNSBL: 81.22.207.138 in (user)
+ b.barracudacentral.org}
+X-KSE-AntiSpam-Info:
+	omp.ru:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2;81.22.207.138:7.1.2;inp1wst083.omp.ru:7.1.1
+X-KSE-AntiSpam-Info: ApMailHostAddress: 81.22.207.138
+X-KSE-AntiSpam-Info: {DNS response errors}
+X-KSE-AntiSpam-Info: Rate: 19
+X-KSE-AntiSpam-Info: Status: not_detected
+X-KSE-AntiSpam-Info: Method: none
+X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
+ smtp.mailfrom=omp.ru;dkim=none
+X-KSE-Antiphishing-Info: Clean
+X-KSE-Antiphishing-ScanningType: Heuristic
+X-KSE-Antiphishing-Method: None
+X-KSE-Antiphishing-Bases: 07/02/2024 07:27:00
+X-KSE-Antivirus-Interceptor-Info: scan successful
+X-KSE-Antivirus-Info: Clean, bases: 7/2/2024 5:02:00 AM
+X-KSE-Attachment-Filter-Triggered-Rules: Clean
+X-KSE-Attachment-Filter-Triggered-Filters: Clean
+X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
---===============3351346785224710997==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Make find_remote_sep() safe for passing NULL pointers.
 
-This is an automated email and please do not reply to this email.
-
-Dear Submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
-
------ Output -----
-
-error: obexd/plugins/ftp.c: does not exist in index
-error: obexd/plugins/opp.c: does not exist in index
-error: obexd/src/obex.c: does not exist in index
-hint: Use 'git am --show-current-patch' to see the failed patch
-
-Please resolve the issue and submit the patches again.
-
-
+Found with the SVACE static analysis tool.
 ---
-Regards,
-Linux Bluetooth
+ profiles/audio/a2dp.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
+diff --git a/profiles/audio/a2dp.c b/profiles/audio/a2dp.c
+index a3c294bc3..43da38051 100644
+--- a/profiles/audio/a2dp.c
++++ b/profiles/audio/a2dp.c
+@@ -1327,6 +1327,9 @@ static struct a2dp_remote_sep *find_remote_sep(struct a2dp_channel *chan,
+ {
+ 	struct avdtp_remote_sep *rsep;
+ 
++	if (!chan || !sep)
++		return NULL;
++
+ 	rsep = avdtp_find_remote_sep(chan->session, sep->lsep);
+ 
+ 	return queue_find(chan->seps, match_remote_sep, rsep);
+-- 
+2.34.1
 
---===============3351346785224710997==--
