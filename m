@@ -1,104 +1,122 @@
-Received: from mail-oi1-f176.google.com (mail-oi1-f176.google.com [209.85.167.176])
+Received: from mail-lj1-f173.google.com (mail-lj1-f173.google.com [209.85.208.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C8A716131A
-	for <linux-bluetooth@vger.kernel.org>; Tue,  2 Jul 2024 15:46:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB15A178381
+	for <linux-bluetooth@vger.kernel.org>; Tue,  2 Jul 2024 17:17:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719935203; cv=none; b=JPJ8/4lZiafoEOm9DPt+eIxJKFzCI1gnlQuDoelBldMJzQogT7FKoftZVWMSsBHnVtw4SrHN0DiMD7CgjAA8vfmO9EadhYwjbkP25tBD5AgGOECEU+GsqOj/x5afoOvAITfgObsKJj1R6D2euLGGaglM72zoJPl6NlYH2MMewtA=
+	t=1719940639; cv=none; b=jhvZWtfS0PRwRKhCx9N1A6+0TWhUvu/+K3AFz/RCMchfZDOeu1oXBM4SRTZlztu+66MO5KjjnGDcgWTHKlJTbtsziPeqR5iY0banxrTH5QExZsVCJZmhUAr+SMqKUDuo/L//p0mC+xEtBEZpJGz5XWd3Cp3DRv3dxvi8X7l11oU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719935203; c=relaxed/simple;
-	bh=TZDQI87V70AfVTPoVPKoj+Zc88N7h4OnJxu57UuTzL4=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=gJYFASPSjPZSHjSMf2b6bCKeQkK7EWThpW9TbG5j0vPL1gXcysLyDAZIG7G3c+ldHbbWRHkunkDbvUV6rSL7GYGkDEWrhop4GMjQP4MFuaR8uiAqCXGqNXWO4IxZQ8HyHQqtMTdu3JOF1NefPiDZaBjgoCjGslGWwXO5oWcEZ50=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TSZzxlnq; arc=none smtp.client-ip=209.85.167.176
+	s=arc-20240116; t=1719940639; c=relaxed/simple;
+	bh=AOr76nH0YpCkPTyrnS1upKuHjNtmC81YlhymAft8bj0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ktZbAD6j2BHBtzxWA2537zavOIxcl6sTKwb/+D0Psc8xGWG74PMPa+7rE+phsWrI45swNlPSmwfBULvs8Mzx8x7wKmfB1n8/Dh580mNvHP/zPfVkJQ0jaRdeGNYy1V/lRJ9TK0EFmfJp5R3UkP7CzQsl9rfnTap270MJ1RlWqgE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MrZDx74+; arc=none smtp.client-ip=209.85.208.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TSZzxlnq"
-Received: by mail-oi1-f176.google.com with SMTP id 5614622812f47-3d564919cd6so2593024b6e.2
-        for <linux-bluetooth@vger.kernel.org>; Tue, 02 Jul 2024 08:46:42 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MrZDx74+"
+Received: by mail-lj1-f173.google.com with SMTP id 38308e7fff4ca-2ebe6495aedso48041901fa.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 02 Jul 2024 10:17:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1719935201; x=1720540001; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=m2HNg1kDtGAI3Vd6RG/TAW+woB1WFlMLukyOvKLc0p0=;
-        b=TSZzxlnqdQoBJDacdozleCYSUy2cnYvMBoZRqdni3c5dYh2jg6NwLEjQVCtbPty2Xd
-         LJOZt8ZywFJp7m069NxC8IYgFGxb9NRoNBsdxawZO++hdZ2ZhG2nkhsuoXPPLgB4re9T
-         ophQb6k3XNbgAFp+mI3ZUXj85E5BBrbxGs6Gx6cMTuv+eMFdjkFcx69fm19Mrj85YbTC
-         +veGaMQYDT20uBSwkqVnlnqOUvB8aaladAeZdIi85eH8IcF16TcWAxjDlJISyQAp88mF
-         FrAmrDKa7oBBGZieLDdeEeuIFDDI3U76pLdvdj5wnELgltc2SZPDiQXrgtCEv6ieqJGS
-         DZXg==
+        d=gmail.com; s=20230601; t=1719940636; x=1720545436; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=EpaWApTn4/DjJPxnM+MjYO0iZ34UIVfItX0XiiFtt+M=;
+        b=MrZDx74+vzqTlQMz3NadL5ZPzwKL967GOuGNYBKnhafj7KU3Fp0SOydr6iKW7L65mq
+         wgzLF24aAqPgOwOP5kG2Mw7fzjROh5XuHMODuEQVVRfGqyqzNCaRNS671+AIwV7xKLQ2
+         I7upOd/UAD0NClDO5AKcbiwnBuT6rdR76VVNV1y4hrQUmzzXZ7d3Z0HO/NpSAPEdDyhs
+         T2AtT23C4FPaHX8JoF3S6P7TIsRKBfIZVDasZjW0TL77Qt4s7CQSpWJO4i7A5yk9ff5f
+         e6z+SplkfpFHhlApwCNA1xLMTVXGknd3Qp+Aotg1w6p/JTKAiVkhy1JlFcSo+68HkrHJ
+         MYzQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719935201; x=1720540001;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=m2HNg1kDtGAI3Vd6RG/TAW+woB1WFlMLukyOvKLc0p0=;
-        b=jfn6DhTfTpNG1NFD2mVHj41SQmYX5R6mO5PayJ03ILPdiiYEQwSiGK5JPVZQCTC1d5
-         bcvDXVUxzbnL77I+KnbGh3ckkLvhSM6Stnd0vSzAATb842seY0JGEo3eX38AXpkgQz3i
-         03rg9TZNql47mu+QWKX4fdvSE7RzTnryfi/8vumv6jn5BWhtC69qmR3q2d984AODcdNo
-         nVHjgDw38veUsGacikDTjTpMHJG8B9nSnbUR7PDACAm+ypWU0RVz8pn0XBRfBBBBI0wI
-         GEI2kRTNoznWOz57XZrTzDVYg/scXJBJGq9PuYXBBNEuXQrlQB5zr3IZvYJyeKw8Xy5j
-         e0gA==
-X-Gm-Message-State: AOJu0YwAJv89NwxD6nhA3IhSIz9qa6/Hn4hp9XoX33Z964X4tdYtnkKS
-	/wD0VK+zRoNatk6M+GjsyZEgzM6eEv59LoAxrkm+j6xg3Agy+e5x0SpQzw==
-X-Google-Smtp-Source: AGHT+IFQ3mpuCDzGns6V0cjyug71SlSo5svRJliKGPcKig0tuWGL5CkZ27p+6M3iegrsLS9rzofdgA==
-X-Received: by 2002:a05:6808:221a:b0:3d6:2dd6:2a6 with SMTP id 5614622812f47-3d6b30f46bbmr10714071b6e.7.1719935200270;
-        Tue, 02 Jul 2024 08:46:40 -0700 (PDT)
-Received: from [172.17.0.2] ([13.90.174.193])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6b59e57645asm44936246d6.57.2024.07.02.08.46.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 02 Jul 2024 08:46:40 -0700 (PDT)
-Message-ID: <668420e0.050a0220.29347.2117@mx.google.com>
-Date: Tue, 02 Jul 2024 08:46:40 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============2418131682234605688=="
+        d=1e100.net; s=20230601; t=1719940636; x=1720545436;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=EpaWApTn4/DjJPxnM+MjYO0iZ34UIVfItX0XiiFtt+M=;
+        b=EjHyZLA508YJm4ff2JjuTwdrkj7PgaxRPPWh+BYZqE8+uWcosKXajDZWYXFDnpyCZS
+         6Z8YZyUjrghOn5D4Mg9oDm/f/5sA3OuO6/Yz+PK95tJe2ylEhZ7K2yAFezUm5ZQYkqtI
+         iEkxbLo6TnSgvvLuVUgJ2pr1urpz3MNm8Bzw9d+Yl0CXaqgD3hekkIp3xoXy+EZHfNfn
+         0OF0ddkBWk+RiH45Y0dHQXuypMb6KWJypr84h/VOx0sQqf0RlbC8aEuCPGSUAp7A3sis
+         sQ4r28zVsZKvlLrQYG4+1ziL6N1h09f5OPvyyhoG2d9LSD2JWMoyf9RHpLT7wTFY4Hcs
+         OfUQ==
+X-Gm-Message-State: AOJu0YznKzYBhLECLHmK91TKOZtRozDxLv1H88G8liK9u2yg06a2Cj5i
+	9fQhZPYEUQUBfJbaNPS4ADW9AxECk6WsvJBL5nf5hh46s+DZwarz9SGnumPC8Px74iJOpOFUAAL
+	dkJ7vre2iQctBi2oBV50MgI0omgA=
+X-Google-Smtp-Source: AGHT+IEXuP7L9K6OrCEg5edRrjUDwoj9FGHsnlRbiC7GBL8pwmuJy73vGh0AEkyhXaZyC+dfftwZH2ve3X2MebW5pXA=
+X-Received: by 2002:a05:651c:2112:b0:2ec:50dc:af8d with SMTP id
+ 38308e7fff4ca-2ee5e3920d3mr64892741fa.12.1719940635592; Tue, 02 Jul 2024
+ 10:17:15 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, r.smirnov@omp.ru
-Subject: RE: [BlueZ,v1] gatt: add return value check of io_get_fd() to sock_io_send()
-In-Reply-To: <20240702134106.102024-1-r.smirnov@omp.ru>
-References: <20240702134106.102024-1-r.smirnov@omp.ru>
-Reply-To: linux-bluetooth@vger.kernel.org
+References: <Wz8HSZhvOzF1mcJnF44ilQFAE_utAwvRXYILQZzH_sGhEV4tGHH0duomsVNwj5aa-OzSJFCU1ZqbCZkbtqzGXJbUmVbwMgLjVqx9BmhJI3s=@proton.me>
+In-Reply-To: <Wz8HSZhvOzF1mcJnF44ilQFAE_utAwvRXYILQZzH_sGhEV4tGHH0duomsVNwj5aa-OzSJFCU1ZqbCZkbtqzGXJbUmVbwMgLjVqx9BmhJI3s=@proton.me>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Tue, 2 Jul 2024 13:17:01 -0400
+Message-ID: <CABBYNZ+yC=Z5PDK2nmegZFXGsJuu2S4y8ho6fMcQdb4xK4LKVQ@mail.gmail.com>
+Subject: Re: Issue with Logitech MX5500 (recurring)
+To: lexicdark@proton.me
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
---===============2418131682234605688==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi Alex,
 
-This is automated email and please do not reply to this email!
+On Tue, Jul 2, 2024 at 9:25=E2=80=AFAM <lexicdark@proton.me> wrote:
+>
+> Solution requested:  Please remove the entries for the logitech MX5500 in=
+ /lib/udev/rules.d/97-hid2hci.rules again (and please don't put them back i=
+n later)
+> This issue now keeps coming back every time a bluez update is pushed. And=
+ it has been going on since I have had it and reported to the Debian forums=
+ several times (but that has been useless, at best). It had been removed fr=
+om configs. about a decade ago then it regressed when someone put it back.
+> Any self respecting Logitech MX5500 user wouldn't install bluez unless th=
+ey had to (for other devices).
+> If I edit out the c71[bc] entries for the 046d device and the keyboard an=
+d mouse work again. These devices never have (and likely never will) work w=
+ith this forced mode switch. The devices only appear to work in the raw mod=
+e.  hid2hci --method=3Dlogitech-hid only stops the device from working beca=
+use the hardware doesn't actually support it (supplementary: likely a too e=
+arly BT implementation, it has it's own bluetooth usb device which is to ta=
+lk with the mouse and keyboard but it seems you can't use it with other dev=
+ices, and the mouse and keyboard don't work with other BT dongles, at least=
+ as far as I have tried).
+>
+> lsusb
+> Bus 007 Device 004: ID 046d:c71c Logitech, Inc. Logitech BT Mini-Receiver
+> Bus 007 Device 003: ID 046d:c71b Logitech, Inc. Logitech BT Mini-Receiver
+> Bus 007 Device 005: ID 046d:c709 Logitech, Inc. BT Mini-Receiver (HCI mod=
+e)/lib/udev/rules.d/97-hid2hci.rules
+> first two are mouse and keyboard, c709 is the dongle.
 
-Dear submitter,
+Are you talking about the following rules:
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=867565
+# Logitech devices
+KERNEL=3D=3D"hiddev*", ATTRS{idVendor}=3D=3D"046d",
+ATTRS{idProduct}=3D=3D"c70[345abce]|c71[34bc]", \
+  RUN+=3D"hid2hci --method=3Dlogitech-hid --devpath=3D%p"
 
----Test result---
+I don't know who came up with these rules but it definitely hasn't
+changed in a long long time:
 
-Test Summary:
-CheckPatch                    PASS      0.51 seconds
-GitLint                       PASS      0.36 seconds
-BuildEll                      PASS      25.58 seconds
-BluezMake                     PASS      1814.43 seconds
-MakeCheck                     PASS      12.99 seconds
-MakeDistcheck                 PASS      184.08 seconds
-CheckValgrind                 PASS      261.93 seconds
-CheckSmatch                   PASS      361.97 seconds
-bluezmakeextell               PASS      126.68 seconds
-IncrementalBuild              PASS      1686.86 seconds
-ScanBuild                     PASS      1056.50 seconds
+commit 7ca701a6120778fb65905f02305963b79ff6d8de
+Author: Marcel Holtmann <marcel@holtmann.org>
+Date:   Mon Dec 10 22:56:05 2012 +0100
 
+    build: Put hid2hci udev rules next to the source code
 
-
----
-Regards,
-Linux Bluetooth
+>
+> Thanks,
+> Alex
+>
 
 
---===============2418131682234605688==--
+--=20
+Luiz Augusto von Dentz
