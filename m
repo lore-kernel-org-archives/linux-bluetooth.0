@@ -1,95 +1,83 @@
-Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
+Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [217.70.183.196])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D1E484D39
-	for <linux-bluetooth@vger.kernel.org>; Tue,  2 Jul 2024 08:49:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C7BB55C1A
+	for <linux-bluetooth@vger.kernel.org>; Tue,  2 Jul 2024 08:53:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.196
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719910180; cv=none; b=GFizRuzeJe0WRGlyvN6BjsdAByHHSY7yD9hCt3sz+Ls2vqH+7y1ZgY1MgJ9dN3DT+92Q2MlQK22HL7plPDA8H6tGDXJVFduEIytIWWR5Mke2YuaKRNqVkg1ILUK8S3e1mF+vNwOob6MUIXaCCpvC1N+c2CRA8hkNuHYhK/a0FZg=
+	t=1719910404; cv=none; b=H9YH9ALKFuG+8UCrvWbw9GljyH6PjheWnenlKDzhuysMxMmHXzlnuJQa2b/6Zx21E8JkV5TtgJqXgpLLu8RK3RehnF9TpM/ZtILgFpuEx9KgmM7S4Ug/AzEj5cDOn/KaI6RMWxDt9E975N6oKNpiZD1IfdUMuPeOVegTI0ZJ1UE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719910180; c=relaxed/simple;
-	bh=yxHJAxI1xcuUjnH3XbuP0imHf7olPqOYYY4oMSVlroQ=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=pzC7LjhRcW30Gz2OlhM4WQrL2xlBmtfMCACLXQsh7i1xmWp9Eapdz8YI+eKIEcnB99TcaRoLZLmRZCtoPM7dZCLoJLOwuN/ZOMNvE2StvFa6NVNpKHpiMqz82WHYxcuKNq6yO5kZV+jf80lQsOEhfTmoKY9+XEJE4YV29A1Qn9Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
-Received: from inp1wst083.omp.ru (81.22.207.138) by msexch01.omp.ru
- (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Tue, 2 Jul
- 2024 11:49:25 +0300
-From: Roman Smirnov <r.smirnov@omp.ru>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Roman Smirnov <r.smirnov@omp.ru>
-Subject: [PATCH BlueZ v1] shared/vcp: add NULL checks to foreach_vocs_service()
-Date: Tue, 2 Jul 2024 11:49:07 +0300
-Message-ID: <20240702084907.26066-1-r.smirnov@omp.ru>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1719910404; c=relaxed/simple;
+	bh=6n5RDWmRQuoj91gup8D+puR4xQRPspEoKI7vKoC0C3g=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=lr6oT6xk5ozKSaeJfUqWPeh32HjhWFGJk/giRC3VLTQ9cIXXZhEs0RwoeC05MGhfJG7la4PXOnhD/InROGqTXN+xvAL13kIhH1CgNQrxizVGgMwmYIO+ZKoij9hH/ZLZHjtbbBhqLzNCpzXYieqq0r/+Aech6yCPkUBoZBPd6ik=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.183.196
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hadess.net
+Received: by mail.gandi.net (Postfix) with ESMTPSA id B4BFEE000C;
+	Tue,  2 Jul 2024 08:53:20 +0000 (UTC)
+Message-ID: <25466726f9dab96e00823ebceeb1916497097ffe.camel@hadess.net>
+Subject: Re: [BlueZ 9/9] avdtp: Fix manipulating struct as an array
+From: Bastien Nocera <hadess@hadess.net>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Pauli Virtanen <pav@iki.fi>, linux-bluetooth@vger.kernel.org
+Date: Tue, 02 Jul 2024 10:53:20 +0200
+In-Reply-To: <CABBYNZJB5kYZd5=jEz6sC5TOe9EMphMDBkKgHGjpTf_AH8fXdQ@mail.gmail.com>
+References: <20240530150057.444585-1-hadess@hadess.net>
+	 <20240530150057.444585-10-hadess@hadess.net>
+	 <8c979897beeb8316616bb7c15f60093be177577c.camel@iki.fi>
+	 <727c93065d8d1e56e9fcd5b5bed724d63dfbe871.camel@hadess.net>
+	 <CABBYNZJB5kYZd5=jEz6sC5TOe9EMphMDBkKgHGjpTf_AH8fXdQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: base64
+User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
- (10.188.4.12)
-X-KSE-ServerInfo: msexch01.omp.ru, 9
-X-KSE-AntiSpam-Interceptor-Info: scan successful
-X-KSE-AntiSpam-Version: 6.1.0, Database issued on: 07/02/2024 08:30:59
-X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
-X-KSE-AntiSpam-Method: none
-X-KSE-AntiSpam-Rate: 19
-X-KSE-AntiSpam-Info: Lua profiles 186271 [Jul 02 2024]
-X-KSE-AntiSpam-Info: Version: 6.1.0.4
-X-KSE-AntiSpam-Info: Envelope from: r.smirnov@omp.ru
-X-KSE-AntiSpam-Info: LuaCore: 21 0.3.21
- ebee5449fc125b2da45f1a6a6bc2c5c0c3ad0e05
-X-KSE-AntiSpam-Info: {rep_avail}
-X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
-X-KSE-AntiSpam-Info: {SMTP from is not routable}
-X-KSE-AntiSpam-Info: {Found in DNSBL: 81.22.207.138 in (user)
- b.barracudacentral.org}
-X-KSE-AntiSpam-Info:
-	127.0.0.199:7.1.2;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;inp1wst083.omp.ru:7.1.1;omp.ru:7.1.1;81.22.207.138:7.1.2
-X-KSE-AntiSpam-Info: ApMailHostAddress: 81.22.207.138
-X-KSE-AntiSpam-Info: {DNS response errors}
-X-KSE-AntiSpam-Info: Rate: 19
-X-KSE-AntiSpam-Info: Status: not_detected
-X-KSE-AntiSpam-Info: Method: none
-X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
- smtp.mailfrom=omp.ru;dkim=none
-X-KSE-Antiphishing-Info: Clean
-X-KSE-Antiphishing-ScanningType: Heuristic
-X-KSE-Antiphishing-Method: None
-X-KSE-Antiphishing-Bases: 07/02/2024 08:34:00
-X-KSE-Antivirus-Interceptor-Info: scan successful
-X-KSE-Antivirus-Info: Clean, bases: 7/2/2024 7:20:00 AM
-X-KSE-Attachment-Filter-Triggered-Rules: Clean
-X-KSE-Attachment-Filter-Triggered-Filters: Clean
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
+X-GND-Sasl: hadess@hadess.net
 
-Make foreach_vocs_service() safe for passing NULL pointers.
-
-Found with the SVACE static analysis tool.
----
- src/shared/vcp.c | 3 +++
- 1 file changed, 3 insertions(+)
-
-diff --git a/src/shared/vcp.c b/src/shared/vcp.c
-index b7e17e448..06264a241 100644
---- a/src/shared/vcp.c
-+++ b/src/shared/vcp.c
-@@ -2701,6 +2701,9 @@ static void foreach_vocs_service(struct gatt_db_attribute *attr,
- 	struct bt_vcp *vcp = user_data;
- 	struct bt_vocs *vocs = vcp_get_vocs(vcp);
- 
-+	if (!vocs || !attr)
-+		return;
-+
- 	vocs->service = attr;
- 
- 	gatt_db_service_set_claimed(attr, true);
--- 
-2.34.1
+T24gTW9uLCAyMDI0LTA2LTAzIGF0IDE1OjE5IC0wNDAwLCBMdWl6IEF1Z3VzdG8gdm9uIERlbnR6
+IHdyb3RlOgo+IEhpIEJhc3RpZW4sCj4gCj4gT24gRnJpLCBNYXkgMzEsIDIwMjQgYXQgMTE6NTHi
+gK9BTSBCYXN0aWVuIE5vY2VyYSA8aGFkZXNzQGhhZGVzcy5uZXQ+Cj4gd3JvdGU6Cj4gPiAKPiA+
+IE9uIFRodSwgMjAyNC0wNS0zMCBhdCAxOTo1NyArMDMwMCwgUGF1bGkgVmlydGFuZW4gd3JvdGU6
+Cj4gPiA+IEhpLAo+ID4gPiAKPiA+ID4gdG8sIDIwMjQtMDUtMzAga2VsbG8gMTY6NTggKzAyMDAs
+IEJhc3RpZW4gTm9jZXJhIGtpcmpvaXR0aToKPiA+ID4gPiBEb24ndCBtYW5pcHVsYXRlIHRoZSAi
+cmVxIiBzdHJ1Y3RzIGFzIGlmIHRoZXkgd2VyZSBmbGF0IGFycmF5cywKPiA+ID4gPiBzdGF0aWMK
+PiA+ID4gPiBhbmFseXNpcyBhbmQgaHVtYW5zIGFyZSBib3RoIGVxdWFsbHkgY29uZnVzZWQgYnkg
+dGhpcyBraW5kIG9mCj4gPiA+ID4gdXNhZ2UuCj4gPiA+IAo+ID4gPiBzdHJ1Y3Qgc3RhcnRfcmVx
+IHsKPiA+ID4gwqDCoMKgwqDCoCB1bmlvbiB7Cj4gPiA+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgIHN0cnVjdCBzZWlkIHJlcXVpcmVkWzFdOwo+ID4gPiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoCBzdHJ1Y3Qgc2VpZCBzZWlkc1swXTsKPiA+ID4gwqDCoMKgwqDCoCB9Owo+ID4gPiB9IF9f
+YXR0cmlidXRlX18gKChwYWNrZWQpKTsKPiA+ID4gCj4gPiA+IGFuZCBhY2Nlc3Mgb25seSB2aWEg
+cmVxLT5zZWlkcz8KPiA+IAo+ID4gVGhhdCdzIGEgZ29vZCBpZGVhLCBJJ2xsIGdpdmUgaXQgYSB0
+cnkuCj4gPiAKPiA+ID4gPHNuaXA+Cj4gPiA+ID4gKyNkZWZpbmUKPiA+ID4gPiBSRVFfR0VUX05U
+SF9TRUlEKHgpwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgXAo+ID4gPiA+ICvCoMKgIHN0YXRpYyBz
+dHJ1Y3Qgc2VpZAo+ID4gPiA+ICrCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgXAo+ID4gPiA+
+ICvCoMKgIHgjI19yZXFfZ2V0X250aF9zZWlkKHN0cnVjdCB4IyNfcmVxICpyZXEsIGludCBjb3Vu
+dCwgaW50Cj4gPiA+ID4gaSnCoCBcCj4gPiA+ID4gK8KgwqAgewo+ID4gPiA+IMKgwqDCoCBcCj4g
+PiA+ID4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgIGlmIChjb3VudCA9PSAwIHx8IGkgPj0KPiA+ID4g
+PiBjb3VudCnCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgIFwKPiA+ID4gPiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+IHJldHVybgo+ID4gPiA+IE5VTEw7wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBcCj4gPiA+ID4gK8KgwqDC
+oMKgwqDCoMKgwqDCoMKgIGlmIChpID09Cj4gPiA+ID4gMSnCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgIFwKPiA+ID4gPiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHJldHVy
+biAmcmVxLQo+ID4gPiA+ID4gZmlyc3Rfc2VpZDvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgIFwKPiA+ID4gPiArwqDCoMKgwqDCoMKgwqDCoMKgwqAgcmV0dXJu
+ICZyZXEtCj4gPiA+ID4gPiBvdGhlcl9zZWlkc1tpXTvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgXAo+ID4gPiAKPiA+ID4gKGkgPT0gMCkgYW5k
+IFtpIC0gMV0/Cj4gPiAKPiA+ICpmYWNlcGFsbSoKPiA+IAo+ID4gWWVzLCB0aGlzIHdpbGwgbmVl
+ZCBhIHYyLCB0aGFua3MgZm9yIHNwb3R0aW5nIHRoYXQuCj4gCj4gSXZlIGFwcGxpZWQgdGhlIHNl
+dCBleGNlcHQgZm9yIHRoaXMgb25lLCBwbGVhc2UgcmVzZW5kIG9uY2UgeW91IGFyZQo+IGRvbmUg
+d2l0aCB0aGUgc3VnZ2VzdGVkIGNoYW5nZXMuCgpJJ3ZlIHJlZG9uZSB0aGlzIHBhdGNoLCBpdCdz
+IG5vdyBpbjoKaHR0cHM6Ly9wYXRjaHdvcmsua2VybmVsLm9yZy9wcm9qZWN0L2JsdWV0b290aC9s
+aXN0Lz9zZXJpZXM9ODY3NDQ4Cmh0dHBzOi8vbG9yZS5rZXJuZWwub3JnL2xpbnV4LWJsdWV0b290
+aC8yMDI0MDcwMjA4NDkwMC43NzM2MjAtMy1oYWRlc3NAaGFkZXNzLm5ldC9ULyN1CgpUaGFua3Mg
+dG8gUGF1bGkgZm9yIHRoZSBoZWxwLgoKPiAKCg==
 
