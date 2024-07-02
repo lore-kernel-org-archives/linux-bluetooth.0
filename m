@@ -1,27 +1,27 @@
 Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [217.70.183.196])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 111AC146D65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D911984D39
 	for <linux-bluetooth@vger.kernel.org>; Tue,  2 Jul 2024 08:49:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.196
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719910150; cv=none; b=Ux1n9pFUZBed6DMGSmd2eqRbHEzAxNjMVKfrLrKxIo/h1tCs7CwSzdyPUR5uxcCdcwQuai9NvIFDm43Mh/KC9WZEhTCIumvAEV5yJR8UKzhPkSFNC2TH2QXyOE3OyFVgdCgAYQGonYFYgZEEt8bhe4+PstwPVvSLVQcKdT3Wm4I=
+	t=1719910150; cv=none; b=WityVT/Y3zWEBhTOpJMlplZo4JA7Cv4uHSLwZEWcYxtIF5MoSKyOLsKMQ23vKFCOwAr790YpEeIbrkSDacm3ANGqB99DgRD8787oE50wgjFUDsylGaH2Jg6W0uNoTnadVv0udDHO1i2zqBkpUh2wi3csghOe5a2AvUbGTA9fvC0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1719910150; c=relaxed/simple;
-	bh=SygPxPvYyqAKNBGu+ImyRhBldapxXCSzpjOLb0s9Gxo=;
+	bh=nxQmHvj5d+IOf5OrJz12+hosL98o57kQzrHPM1hlJc8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=FnsxDaEB7ENSr76/QIyjFIqqb8TLgMle1CZTkCrq1yD5R7bVWYPxNxGxO6ufCchzqzeCSeaeR7LQKPQ14eR10yRHWzkuPYMtk668VdT3kchlF/c/KXgPIF0oZjMD3zzly5u20ab4IDB8FRPa80gpUpid8Y5/XotBZ8MjjxXTDzI=
+	 MIME-Version; b=II5PXwjCtx5/Q2XO2qUglhfT4b2cVnl+DW0TJN02533xh0FpQ1Dr674MEarjaRh6v6WCbLx9pWJnl2HkVikPThSYimNpXmU0/goqU7tNXSZZHHFHT84O0aF50Y3qx9vUr78T+SDSlJomrt1xkYXG2S5lqlUTdlrrG9I6fkWF9B0=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.183.196
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hadess.net
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 28257E0004;
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 6F3A6E0007;
 	Tue,  2 Jul 2024 08:49:01 +0000 (UTC)
 From: Bastien Nocera <hadess@hadess.net>
 To: linux-bluetooth@vger.kernel.org
 Cc: Bastien Nocera <hadess@hadess.net>
-Subject: [PATCH 1/9] main: Simplify parse_config_string()
-Date: Tue,  2 Jul 2024 10:47:16 +0200
-Message-ID: <20240702084900.773620-2-hadess@hadess.net>
+Subject: [PATCH 2/9] avdtp: Fix manipulating struct as an array
+Date: Tue,  2 Jul 2024 10:47:17 +0200
+Message-ID: <20240702084900.773620-3-hadess@hadess.net>
 X-Mailer: git-send-email 2.45.2
 In-Reply-To: <20240702084900.773620-1-hadess@hadess.net>
 References: <20240702084900.773620-1-hadess@hadess.net>
@@ -34,76 +34,169 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-GND-Sasl: hadess@hadess.net
 
-The memory management done by parse_config_string() was quite
-complicated, as it expected to be able to free the value in the return
-variable if it was already allocated.
+Don't manipulate the "req" structs as if they were flat arrays, static
+analysis and humans are both equally confused by this kind of usage.
 
-That particular behaviour was only used for a single variable which was
-set to its default value during startup and might be overwritten after
-this function call.
+Error: ARRAY_VS_SINGLETON (CWE-119): [#def26] [important]
+bluez-5.76/profiles/audio/avdtp.c:1675:2: address_of: Taking address with "&start->first_seid" yields a singleton pointer.
+bluez-5.76/profiles/audio/avdtp.c:1675:2: assign: Assigning: "seid" = "&start->first_seid".
+bluez-5.76/profiles/audio/avdtp.c:1679:25: ptr_arith: Using "seid" as an array.  This might corrupt or misinterpret adjacent memory locations.
+1677|           int i;
+1678|
+1679|->         for (i = 0; i < count; i++, seid++) {
+1680|                   if (seid->seid == id) {
+1681|                           req->collided = TRUE;
 
-Use an intermediate variable to check whether we need to free
-btd_opts.name and simplify parse_config_string().
+Error: ARRAY_VS_SINGLETON (CWE-119): [#def27] [important]
+bluez-5.76/profiles/audio/avdtp.c:1690:2: address_of: Taking address with "&suspend->first_seid" yields a singleton pointer.
+bluez-5.76/profiles/audio/avdtp.c:1690:2: assign: Assigning: "seid" = "&suspend->first_seid".
+bluez-5.76/profiles/audio/avdtp.c:1694:25: ptr_arith: Using "seid" as an array.  This might corrupt or misinterpret adjacent memory locations.
+1692|		int i;
+1693|
+1694|->		for (i = 0; i < count; i++, seid++) {
+1695|			if (seid->seid == id) {
+1696|				req->collided = TRUE;
 
-Error: RESOURCE_LEAK (CWE-772): [#def39] [important]
-bluez-5.75/src/main.c:425:2: alloc_fn: Storage is returned from allocation function "g_key_file_get_string".
-bluez-5.75/src/main.c:425:2: var_assign: Assigning: "tmp" = storage returned from "g_key_file_get_string(config, group, key, &err)".
-bluez-5.75/src/main.c:433:2: noescape: Assuming resource "tmp" is not freed or pointed-to as ellipsis argument to "btd_debug".
-bluez-5.75/src/main.c:440:2: leaked_storage: Variable "tmp" going out of scope leaks the storage it points to.
-438|	}
-439|
-440|->	return true;
-441|   }
-442|
+Error: ARRAY_VS_SINGLETON (CWE-119): [#def28] [important]
+bluez-5.76/profiles/audio/avdtp.c:1799:2: address_of: Taking address with "&req->first_seid" yields a singleton pointer.
+bluez-5.76/profiles/audio/avdtp.c:1799:2: assign: Assigning: "seid" = "&req->first_seid".
+bluez-5.76/profiles/audio/avdtp.c:1801:30: ptr_arith: Using "seid" as an array.  This might corrupt or misinterpret adjacent memory locations.
+1799|		seid = &req->first_seid;
+1800|
+1801|->		for (i = 0; i < seid_count; i++, seid++) {
+1802|			failed_seid = seid->seid;
+1803|
+
+Error: ARRAY_VS_SINGLETON (CWE-119): [#def29] [important]
+bluez-5.76/profiles/audio/avdtp.c:1912:2: address_of: Taking address with "&req->first_seid" yields a singleton pointer.
+bluez-5.76/profiles/audio/avdtp.c:1912:2: assign: Assigning: "seid" = "&req->first_seid".
+bluez-5.76/profiles/audio/avdtp.c:1914:30: ptr_arith: Using "seid" as an array.  This might corrupt or misinterpret adjacent memory locations.
+1912|		seid = &req->first_seid;
+1913|
+1914|->	for (i = 0; i < seid_count; i++, seid++) {
+1915|			failed_seid = seid->seid;
+1916|
 ---
- src/main.c | 19 ++++++++++---------
- 1 file changed, 10 insertions(+), 9 deletions(-)
+ profiles/audio/avdtp.c | 45 +++++++++++++++++++++---------------------
+ 1 file changed, 23 insertions(+), 22 deletions(-)
 
-diff --git a/src/main.c b/src/main.c
-index 62453bffaf57..9db8d7000490 100644
---- a/src/main.c
-+++ b/src/main.c
-@@ -420,9 +420,10 @@ static bool parse_config_string(GKeyFile *config, const char *group,
- 					const char *key, char **val)
- {
- 	GError *err = NULL;
--	char *tmp;
+diff --git a/profiles/audio/avdtp.c b/profiles/audio/avdtp.c
+index 3667e08400dd..45d1b120b760 100644
+--- a/profiles/audio/avdtp.c
++++ b/profiles/audio/avdtp.c
+@@ -184,13 +184,17 @@ struct getcap_resp {
+ } __attribute__ ((packed));
  
--	tmp = g_key_file_get_string(config, group, key, &err);
-+	g_return_val_if_fail(val, false);
-+
-+	*val = g_key_file_get_string(config, group, key, &err);
- 	if (err) {
- 		if (err->code != G_KEY_FILE_ERROR_KEY_NOT_FOUND)
- 			DBG("%s", err->message);
-@@ -430,12 +431,7 @@ static bool parse_config_string(GKeyFile *config, const char *group,
- 		return false;
+ struct start_req {
+-	struct seid first_seid;
+-	struct seid other_seids[0];
++	union {
++		struct seid required[1];
++		struct seid seids[0];
++	};
+ } __attribute__ ((packed));
+ 
+ struct suspend_req {
+-	struct seid first_seid;
+-	struct seid other_seids[0];
++	union {
++		struct seid required[1];
++		struct seid seids[0];
++	};
+ } __attribute__ ((packed));
+ 
+ struct seid_rej {
+@@ -1672,12 +1676,12 @@ static void check_seid_collision(struct pending_req *req, uint8_t id)
+ static void check_start_collision(struct pending_req *req, uint8_t id)
+ {
+ 	struct start_req *start = req->data;
+-	struct seid *seid = &start->first_seid;
+ 	int count = 1 + req->data_size - sizeof(struct start_req);
+ 	int i;
+ 
+-	for (i = 0; i < count; i++, seid++) {
+-		if (seid->seid == id) {
++	for (i = 0; i < count; i++) {
++		struct seid seid = start->seids[i];
++		if (seid.seid == id) {
+ 			req->collided = TRUE;
+ 			return;
+ 		}
+@@ -1687,12 +1691,12 @@ static void check_start_collision(struct pending_req *req, uint8_t id)
+ static void check_suspend_collision(struct pending_req *req, uint8_t id)
+ {
+ 	struct suspend_req *suspend = req->data;
+-	struct seid *seid = &suspend->first_seid;
+ 	int count = 1 + req->data_size - sizeof(struct suspend_req);
+ 	int i;
+ 
+-	for (i = 0; i < count; i++, seid++) {
+-		if (seid->seid == id) {
++	for (i = 0; i < count; i++) {
++		struct seid seid = suspend->seids[i];
++		if (seid.seid == id) {
+ 			req->collided = TRUE;
+ 			return;
+ 		}
+@@ -1785,7 +1789,6 @@ static gboolean avdtp_start_cmd(struct avdtp *session, uint8_t transaction,
+ 	struct avdtp_local_sep *sep;
+ 	struct avdtp_stream *stream;
+ 	struct stream_rej rej;
+-	struct seid *seid;
+ 	uint8_t err, failed_seid;
+ 	int seid_count, i;
+ 
+@@ -1796,12 +1799,12 @@ static gboolean avdtp_start_cmd(struct avdtp *session, uint8_t transaction,
+ 
+ 	seid_count = 1 + size - sizeof(struct start_req);
+ 
+-	seid = &req->first_seid;
++	for (i = 0; i < seid_count; i++) {
++		struct seid seid = req->seids[i];
+ 
+-	for (i = 0; i < seid_count; i++, seid++) {
+-		failed_seid = seid->seid;
++		failed_seid = seid.seid;
+ 
+-		sep = find_local_sep_by_seid(session, seid->seid);
++		sep = find_local_sep_by_seid(session, seid.seid);
+ 		if (!sep || !sep->stream) {
+ 			err = AVDTP_BAD_ACP_SEID;
+ 			goto failed;
+@@ -1898,7 +1901,6 @@ static gboolean avdtp_suspend_cmd(struct avdtp *session, uint8_t transaction,
+ 	struct avdtp_local_sep *sep;
+ 	struct avdtp_stream *stream;
+ 	struct stream_rej rej;
+-	struct seid *seid;
+ 	uint8_t err, failed_seid;
+ 	int seid_count, i;
+ 
+@@ -1909,12 +1911,11 @@ static gboolean avdtp_suspend_cmd(struct avdtp *session, uint8_t transaction,
+ 
+ 	seid_count = 1 + size - sizeof(struct suspend_req);
+ 
+-	seid = &req->first_seid;
++	for (i = 0; i < seid_count; i++) {
++		struct seid seid = req->seids[i];
++		failed_seid = seid.seid;
+ 
+-	for (i = 0; i < seid_count; i++, seid++) {
+-		failed_seid = seid->seid;
+-
+-		sep = find_local_sep_by_seid(session, seid->seid);
++		sep = find_local_sep_by_seid(session, seid.seid);
+ 		if (!sep || !sep->stream) {
+ 			err = AVDTP_BAD_ACP_SEID;
+ 			goto failed;
+@@ -3663,7 +3664,7 @@ int avdtp_start(struct avdtp *session, struct avdtp_stream *stream)
  	}
  
--	DBG("%s.%s = %s", group, key, tmp);
--
--	if (val) {
--		g_free(*val);
--		*val = tmp;
--	}
-+	DBG("%s.%s = %s", group, key, *val);
+ 	memset(&req, 0, sizeof(req));
+-	req.first_seid.seid = stream->rseid;
++	req.required->seid = stream->rseid;
  
- 	return true;
- }
-@@ -1004,7 +1000,12 @@ static void parse_secure_conns(GKeyFile *config)
- 
- static void parse_general(GKeyFile *config)
- {
--	parse_config_string(config, "General", "Name", &btd_opts.name);
-+	char *str = NULL;
-+
-+	if (parse_config_string(config, "General", "Name", &str)) {
-+		g_free(btd_opts.name);
-+		btd_opts.name = str;
-+	}
- 	parse_config_hex(config, "General", "Class", &btd_opts.class);
- 	parse_config_u32(config, "General", "DiscoverableTimeout",
- 						&btd_opts.discovto,
+ 	ret = send_request(session, FALSE, stream, AVDTP_START,
+ 							&req, sizeof(req));
 -- 
 2.45.2
 
