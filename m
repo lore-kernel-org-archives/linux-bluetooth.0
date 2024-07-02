@@ -1,27 +1,27 @@
 Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [217.70.183.193])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 906E21B583E
-	for <linux-bluetooth@vger.kernel.org>; Tue,  2 Jul 2024 14:24:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DB221BA062
+	for <linux-bluetooth@vger.kernel.org>; Tue,  2 Jul 2024 14:24:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.193
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719930288; cv=none; b=VWz+n0tFq3hFYirMKkU5IgF+c5rYQvlohO8NtP2r5j1QDQC/Z45N0j920S/hJ7TqMob7SWKmDQDZpsb7YYRVl/KMK2QVnkAMvJgg0ry8OJgUh/5FaMATL9Z4B5ERByEydRlkPFaZSIMVIiLOHodjoIF3EWadBzLQ1XiQOARqKYc=
+	t=1719930288; cv=none; b=Z0+zx/+N78aH+dqq1qisxRVkgm3cvIIF9xvKGPVsAQRiZjy9CoCuWPZ6hdJk8vTOWUmThklhrNQTJnVoVsHinC35LKgnY6HKcJrVY3gSa+64ZY5NkvcAAWorkhKSdBbH/8I+6547Q1dAsboUZF8pFaZBPwhRjb5So3QhQYMzP9g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1719930288; c=relaxed/simple;
-	bh=SygPxPvYyqAKNBGu+ImyRhBldapxXCSzpjOLb0s9Gxo=;
+	bh=Ou0kGDa50CgH9PnCyq7XPN19GakFWGQO/fwUzDZK+Yg=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=GE6Oe4kLetHl4bF5g0ovvbbQgkhRPWsuGDsNlR0XOnJSPOoiHLrfwNy0AzGw9YimjgQcPEtKCnE9r2R1/Kbz9lBPBTXZWrplxzzhYcfe2LlNMeI51+OvBY/G8ydocP1TiPHBLaP0hY3nfH8/5bFVUi7wZZNxO76ZGEFY7ywTmh0=
+	 MIME-Version; b=cKBnmmjkQ+QGV+oMIVTe7l2ZcnQIguj58Why9HbVZzw+oA8z/KiPsnaC5wHQCZyRma5QYNsWdkTJk6N9tSXVPx/YUZZ8LR6SoZc4E0yBfNxB24SLcTXffRcK0UdOWJgfYtgaoNGShVc/HJrH62bG3lnnd3tmMF9s+C5xM6x6JpQ=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.183.193
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hadess.net
-Received: by mail.gandi.net (Postfix) with ESMTPSA id BA57624000C;
-	Tue,  2 Jul 2024 14:24:37 +0000 (UTC)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 95A5E24000E;
+	Tue,  2 Jul 2024 14:24:38 +0000 (UTC)
 From: Bastien Nocera <hadess@hadess.net>
 To: linux-bluetooth@vger.kernel.org
 Cc: Bastien Nocera <hadess@hadess.net>
-Subject: [BlueZ resend 1/9] main: Simplify parse_config_string()
-Date: Tue,  2 Jul 2024 16:23:33 +0200
-Message-ID: <20240702142436.833138-2-hadess@hadess.net>
+Subject: [BlueZ resend 4/9] obexd: Fix possible memleak
+Date: Tue,  2 Jul 2024 16:23:36 +0200
+Message-ID: <20240702142436.833138-5-hadess@hadess.net>
 X-Mailer: git-send-email 2.45.2
 In-Reply-To: <20240702142436.833138-1-hadess@hadess.net>
 References: <20240702142436.833138-1-hadess@hadess.net>
@@ -34,76 +34,143 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-GND-Sasl: hadess@hadess.net
 
-The memory management done by parse_config_string() was quite
-complicated, as it expected to be able to free the value in the return
-variable if it was already allocated.
+Fix possible resource leak if a attribute is repeated, overriding the
+original value.
 
-That particular behaviour was only used for a single variable which was
-set to its default value during startup and might be overwritten after
-this function call.
+Error: RESOURCE_LEAK (CWE-772): [#def28] [important]
+bluez-5.76/obexd/plugins/messages-dummy.c:362:4: alloc_fn: Storage is returned from allocation function "g_strdup_inline".
+bluez-5.76/obexd/plugins/messages-dummy.c:362:4: var_assign: Assigning: "entry->handle" = storage returned from "g_strdup_inline(values[i])".
+bluez-5.76/obexd/plugins/messages-dummy.c:362:4: overwrite_var: Overwriting "entry->handle" in "entry->handle = g_strdup_inline(values[i])" leaks the storage that "entry->handle" points to.
+360|	for (i = 0 ; names[i]; ++i) {
+361|		if (g_strcmp0(names[i], "handle") == 0) {
+362|->			entry->handle = g_strdup(values[i]);
+363|			mld->size++;
+364|			continue;
 
-Use an intermediate variable to check whether we need to free
-btd_opts.name and simplify parse_config_string().
+Error: RESOURCE_LEAK (CWE-772): [#def29] [important]
+bluez-5.76/obexd/plugins/messages-dummy.c:367:4: alloc_fn: Storage is returned from allocation function "g_strdup_inline".
+bluez-5.76/obexd/plugins/messages-dummy.c:367:4: var_assign: Assigning: "entry->attachment_size" = storage returned from "g_strdup_inline(values[i])".
+bluez-5.76/obexd/plugins/messages-dummy.c:367:4: overwrite_var: Overwriting "entry->attachment_size" in "entry->attachment_size = g_strdup_inline(values[i])" leaks the storage that "entry->attachment_size" points to.
+365|		}
+366|		if (g_strcmp0(names[i], "attachment_size") == 0) {
+367|->			entry->attachment_size = g_strdup(values[i]);
+368|			continue;
+369|		}
 
-Error: RESOURCE_LEAK (CWE-772): [#def39] [important]
-bluez-5.75/src/main.c:425:2: alloc_fn: Storage is returned from allocation function "g_key_file_get_string".
-bluez-5.75/src/main.c:425:2: var_assign: Assigning: "tmp" = storage returned from "g_key_file_get_string(config, group, key, &err)".
-bluez-5.75/src/main.c:433:2: noescape: Assuming resource "tmp" is not freed or pointed-to as ellipsis argument to "btd_debug".
-bluez-5.75/src/main.c:440:2: leaked_storage: Variable "tmp" going out of scope leaks the storage it points to.
-438|	}
-439|
-440|->	return true;
-441|   }
-442|
+Error: RESOURCE_LEAK (CWE-772): [#def30] [important]
+bluez-5.76/obexd/plugins/messages-dummy.c:371:4: alloc_fn: Storage is returned from allocation function "g_strdup_inline".
+bluez-5.76/obexd/plugins/messages-dummy.c:371:4: var_assign: Assigning: "entry->datetime" = storage returned from "g_strdup_inline(values[i])".
+bluez-5.76/obexd/plugins/messages-dummy.c:371:4: overwrite_var: Overwriting "entry->datetime" in "entry->datetime = g_strdup_inline(values[i])" leaks the storage that "entry->datetime" points to.
+369|		}
+370|		if (g_strcmp0(names[i], "datetime") == 0) {
+371|->			entry->datetime = g_strdup(values[i]);
+372|			continue;
+373|		}
+
+Error: RESOURCE_LEAK (CWE-772): [#def31] [important]
+bluez-5.76/obexd/plugins/messages-dummy.c:375:4: alloc_fn: Storage is returned from allocation function "g_strdup_inline".
+bluez-5.76/obexd/plugins/messages-dummy.c:375:4: var_assign: Assigning: "entry->subject" = storage returned from "g_strdup_inline(values[i])".
+bluez-5.76/obexd/plugins/messages-dummy.c:375:4: overwrite_var: Overwriting "entry->subject" in "entry->subject = g_strdup_inline(values[i])" leaks the storage that "entry->subject" points to.
+373|		}
+374|		if (g_strcmp0(names[i], "subject") == 0) {
+375|->			entry->subject = g_strdup(values[i]);
+376|			continue;
+377|		}
+
+Error: RESOURCE_LEAK (CWE-772): [#def32] [important]
+bluez-5.76/obexd/plugins/messages-dummy.c:379:4: alloc_fn: Storage is returned from allocation function "g_strdup_inline".
+bluez-5.76/obexd/plugins/messages-dummy.c:379:4: var_assign: Assigning: "entry->recipient_addressing" = storage returned from "g_strdup_inline(values[i])".
+bluez-5.76/obexd/plugins/messages-dummy.c:379:4: overwrite_var: Overwriting "entry->recipient_addressing" in "entry->recipient_addressing = g_strdup_inline(values[i])" leaks the storage that "entry->recipient_addressing" points to.
+377|		}
+378|		if (g_strcmp0(names[i], "recipient_addressing") == 0) {
+379|->			entry->recipient_addressing = g_strdup(values[i]);
+380|			continue;
+381|		}
+
+Error: RESOURCE_LEAK (CWE-772): [#def33] [important]
+bluez-5.76/obexd/plugins/messages-dummy.c:383:4: alloc_fn: Storage is returned from allocation function "g_strdup_inline".
+bluez-5.76/obexd/plugins/messages-dummy.c:383:4: var_assign: Assigning: "entry->sender_addressing" = storage returned from "g_strdup_inline(values[i])".
+bluez-5.76/obexd/plugins/messages-dummy.c:383:4: overwrite_var: Overwriting "entry->sender_addressing" in "entry->sender_addressing = g_strdup_inline(values[i])" leaks the storage that "entry->sender_addressing" points to.
+381|		}
+382|		if (g_strcmp0(names[i], "sender_addressing") == 0) {
+383|->			entry->sender_addressing = g_strdup(values[i]);
+384|			continue;
+385|		}
+
+Error: RESOURCE_LEAK (CWE-772): [#def34] [important]
+bluez-5.76/obexd/plugins/messages-dummy.c:387:4: alloc_fn: Storage is returned from allocation function "g_strdup_inline".
+bluez-5.76/obexd/plugins/messages-dummy.c:387:4: var_assign: Assigning: "entry->type" = storage returned from "g_strdup_inline(values[i])".
+bluez-5.76/obexd/plugins/messages-dummy.c:387:4: overwrite_var: Overwriting "entry->type" in "entry->type = g_strdup_inline(values[i])" leaks the storage that "entry->type" points to.
+385|		}
+386|		if (g_strcmp0(names[i], "type") == 0) {
+387|->			entry->type = g_strdup(values[i]);
+388|			continue;
+389|		}
+
+Error: RESOURCE_LEAK (CWE-772): [#def35] [important]
+bluez-5.76/obexd/plugins/messages-dummy.c:391:4: alloc_fn: Storage is returned from allocation function "g_strdup_inline".
+bluez-5.76/obexd/plugins/messages-dummy.c:391:4: var_assign: Assigning: "entry->reception_status" = storage returned from "g_strdup_inline(values[i])".
+bluez-5.76/obexd/plugins/messages-dummy.c:391:4: overwrite_var: Overwriting "entry->reception_status" in "entry->reception_status = g_strdup_inline(values[i])" leaks the storage that "entry->reception_status" points to.
+389|		}
+390|		if (g_strcmp0(names[i], "reception_status") == 0)
+391|->			entry->reception_status = g_strdup(values[i]);
+392|	}
+393|
 ---
- src/main.c | 19 ++++++++++---------
- 1 file changed, 10 insertions(+), 9 deletions(-)
+ obexd/plugins/messages-dummy.c | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
 
-diff --git a/src/main.c b/src/main.c
-index 62453bffaf57..9db8d7000490 100644
---- a/src/main.c
-+++ b/src/main.c
-@@ -420,9 +420,10 @@ static bool parse_config_string(GKeyFile *config, const char *group,
- 					const char *key, char **val)
- {
- 	GError *err = NULL;
--	char *tmp;
+diff --git a/obexd/plugins/messages-dummy.c b/obexd/plugins/messages-dummy.c
+index e37b52df6266..92378dab4b20 100644
+--- a/obexd/plugins/messages-dummy.c
++++ b/obexd/plugins/messages-dummy.c
+@@ -359,36 +359,45 @@ static void msg_element(GMarkupParseContext *ctxt, const char *element,
  
--	tmp = g_key_file_get_string(config, group, key, &err);
-+	g_return_val_if_fail(val, false);
-+
-+	*val = g_key_file_get_string(config, group, key, &err);
- 	if (err) {
- 		if (err->code != G_KEY_FILE_ERROR_KEY_NOT_FOUND)
- 			DBG("%s", err->message);
-@@ -430,12 +431,7 @@ static bool parse_config_string(GKeyFile *config, const char *group,
- 		return false;
+ 	for (i = 0 ; names[i]; ++i) {
+ 		if (g_strcmp0(names[i], "handle") == 0) {
++			g_free(entry->handle);
+ 			entry->handle = g_strdup(values[i]);
+ 			mld->size++;
+ 			continue;
+ 		}
+ 		if (g_strcmp0(names[i], "attachment_size") == 0) {
++			g_free(entry->attachment_size);
+ 			entry->attachment_size = g_strdup(values[i]);
+ 			continue;
+ 		}
+ 		if (g_strcmp0(names[i], "datetime") == 0) {
++			g_free(entry->datetime);
+ 			entry->datetime = g_strdup(values[i]);
+ 			continue;
+ 		}
+ 		if (g_strcmp0(names[i], "subject") == 0) {
++			g_free(entry->subject);
+ 			entry->subject = g_strdup(values[i]);
+ 			continue;
+ 		}
+ 		if (g_strcmp0(names[i], "recipient_addressing") == 0) {
++			g_free(entry->recipient_addressing);
+ 			entry->recipient_addressing = g_strdup(values[i]);
+ 			continue;
+ 		}
+ 		if (g_strcmp0(names[i], "sender_addressing") == 0) {
++			g_free(entry->sender_addressing);
+ 			entry->sender_addressing = g_strdup(values[i]);
+ 			continue;
+ 		}
+ 		if (g_strcmp0(names[i], "type") == 0) {
++			g_free(entry->type);
+ 			entry->type = g_strdup(values[i]);
+ 			continue;
+ 		}
+-		if (g_strcmp0(names[i], "reception_status") == 0)
++		if (g_strcmp0(names[i], "reception_status") == 0) {
++			g_free(entry->reception_status);
+ 			entry->reception_status = g_strdup(values[i]);
++		}
  	}
  
--	DBG("%s.%s = %s", group, key, tmp);
--
--	if (val) {
--		g_free(*val);
--		*val = tmp;
--	}
-+	DBG("%s.%s = %s", group, key, *val);
- 
- 	return true;
- }
-@@ -1004,7 +1000,12 @@ static void parse_secure_conns(GKeyFile *config)
- 
- static void parse_general(GKeyFile *config)
- {
--	parse_config_string(config, "General", "Name", &btd_opts.name);
-+	char *str = NULL;
-+
-+	if (parse_config_string(config, "General", "Name", &str)) {
-+		g_free(btd_opts.name);
-+		btd_opts.name = str;
-+	}
- 	parse_config_hex(config, "General", "Class", &btd_opts.class);
- 	parse_config_u32(config, "General", "DiscoverableTimeout",
- 						&btd_opts.discovto,
+ 	if (mld->size > mld->offset)
 -- 
 2.45.2
 
