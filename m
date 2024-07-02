@@ -1,166 +1,110 @@
-Received: from mail-lj1-f177.google.com (mail-lj1-f177.google.com [209.85.208.177])
+Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B1991BA86B
-	for <linux-bluetooth@vger.kernel.org>; Tue,  2 Jul 2024 15:08:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5012E1BB69C
+	for <linux-bluetooth@vger.kernel.org>; Tue,  2 Jul 2024 15:40:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719932912; cv=none; b=BPMVNGg+Ljz/FEeFoXpoppo3ad0XIEJPlwFqi4IbDocSunQuh0brfmw/kG06NVFDBKyqJw7NEUNy9OQdVR5jkU0kg9ZG2gid9YW/I6UdCBLB6UMChO0RrtNo+EQ3nEDox4uorcH46zONVPOOSV6B4XvF1m3CabPbhnTYmaQgfMg=
+	t=1719934810; cv=none; b=YDvz5PiXKwVyazVweDxRlzSs0toIB+dDR7gxu4vg7ElAeLOHc9wmVb+01Ub4BbwlQoZbPVHCQuZ0ABpUAAGQVI0SUdyONjrjq4l8S8lAL6FotQmBTLYs3VNBeFGcoatbbKiZTnOyVD3M/DtwnHBS4bsyy04xF0xTlEfofLbk190=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719932912; c=relaxed/simple;
-	bh=Mfq8gy1QfNr0ZF4yIoduPwALRGvQ8JEt4YMWTI/Zu84=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=iiXxXECmxhCl8js4WBXXHT4/oJsVot3PQI7YyhJcec7CQxbUFtB2lbYavdAd3woqKHRBp1Eia0uFX3b0/+qHAz35n+HQmBj2G4zCdHm7nBS3j8HGyxXnZ1UQO41jae9r4NR7llTrHybWh2H45Gxa7A0+WL7QbS8bNXHoy46uFLM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Hy2Hyqup; arc=none smtp.client-ip=209.85.208.177
+	s=arc-20240116; t=1719934810; c=relaxed/simple;
+	bh=5esw8oq1nm1/2cRxgPqzksc5o68xE45Oib12DT7y7ZI=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=chsAMfDyQ3yw777KQegNVnmpBIcR6C+UhE2s+q9eLyYEaSrEPyAcvwbtt1RnR1nksoXaxfO6wQi4oRAEGJgLBtjsjRZGmZPcUaMA2QidwbOWRFj68gFbl1mkIlmD7aDBteVThuWn6ibGc2u0D6gvTg9CyKk9YskQZzJUEHV1CQo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GFBlAbO0; arc=none smtp.client-ip=209.85.210.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Hy2Hyqup"
-Received: by mail-lj1-f177.google.com with SMTP id 38308e7fff4ca-2ec50a5e230so43411811fa.0
-        for <linux-bluetooth@vger.kernel.org>; Tue, 02 Jul 2024 08:08:30 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GFBlAbO0"
+Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-7065e2fe7d9so3365999b3a.3
+        for <linux-bluetooth@vger.kernel.org>; Tue, 02 Jul 2024 08:40:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1719932908; x=1720537708; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=diJ+CY4VyP21agB20fhWI903D0EUTuima93xT9+2/hk=;
-        b=Hy2HyqupwSjb4uG8DyMCiKTkNee6048e9p1gGe7pFe4vOKDPz9CKnh0iNYsy4SHhny
-         DqSxUReKet7gQKVh8Vai5qWN+OXHGmliyEq9pDygqZWyFk0HPkmKF60aehKb6uq7S+Ky
-         CyjvINsxmSbCYZJoElYI/XFOaT0vgsq+ZVio7nCMJJwsjBOTxLPRuCg1ma03Uv7dqchW
-         MzjfFXDBcLsCe8vyKAKgPM2AkNNlPFKpVPXlsKhLUhjCCXPaw0cWVLl21esgnVryIkjW
-         3LVHlN057cPcXBCz4vOogACk/lZhYE7s4wrVBOjM/eUTQtATbessROLg8T00E6z2KLGp
-         MQ0Q==
+        d=gmail.com; s=20230601; t=1719934808; x=1720539608; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=SOAQ1X0UmZSxC0eWy0qsRGB2+RRQywBtotqEmk32gdo=;
+        b=GFBlAbO0zw+XW/jGVsUvJdum0QWgh1OpiujRYp+7EUOpsbYznciTUOhrkxaT/kMIS9
+         5Ph1wvXHF6quC6yKQw5I/ZbD8bwFeXKaw4G+9a1FVMPgN23B5Iv/2cXpLSzVqQgS7b/c
+         BWFxUmKEUZakT7pqvhWBt3FjeFIAvcUGqOoQn2IB/WfCwRHyg4Lzts12RRgcCAqp1+Hv
+         qOm3pkn9q7NQLunIUbW1cPY86m1UxjJKlMx6ETfjvSPQO2MdFsHOLQoVouBLkOPl8ieJ
+         4lDpBmWOgndoNe5JgwrXx7iuO2CLHroBKhEUnrAsQaKAtvmwe3HZT9kuMbYibBtRNWfd
+         FKog==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719932908; x=1720537708;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=diJ+CY4VyP21agB20fhWI903D0EUTuima93xT9+2/hk=;
-        b=E3zwdET+36OxsSYeQU9ZYFOZ0NyPN4cf2qHm1ZvhPkwJGx8SDvVDwXXv8P28l067a1
-         TPazW0RHIA2aNOsgdvH9VzWRoC5ckh5OfHs1Zu0TFffRqRHHK3xvy1A8TxPFeDZldSkx
-         RDzwRENEynIxfH5u5AanRYVA5oqC0V3ocRWISbDNzOZZC02DHe9fScKJxXqo3iGcdPln
-         eWyVZQXJ4ZDPBeaf9FqNjwChddgHjDjGk5z6tI5S7OQwmlxe3k0rcY6neqgkMBfMau0g
-         XS2ceKgolZXxtRREDuhSdhAJwFYHCY4SuwpQPXwb2N5KhQ5jzlzyzExGQFtEOYXqNWCf
-         zGCg==
-X-Gm-Message-State: AOJu0YxrANjsG7wIG/NQakTeWPGVjxZD2+ywJQ3TCdvVvtK3qj4AeY+r
-	oyfHxQ5WwhbtBFonX1EBcKT49rJ08DKr5kmhiLgGmBOc6wO2AJKShzNJ+ABsEw2K0Nr7KIqlhUf
-	v6VzlQSujvPogLVidiU7xito/9R7uKQ==
-X-Google-Smtp-Source: AGHT+IGhbvTnNR1YkIZWPGM+JxJkS9qk24ljqNTCYJIj6NwlD8jBFesfNsh+3E6SHvLZlM7XdwZXOOaHvAj8ty5vEpY=
-X-Received: by 2002:a05:651c:b21:b0:2ee:4ab4:f752 with SMTP id
- 38308e7fff4ca-2ee5e6cd8d4mr65181441fa.49.1719932908025; Tue, 02 Jul 2024
- 08:08:28 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1719934808; x=1720539608;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=SOAQ1X0UmZSxC0eWy0qsRGB2+RRQywBtotqEmk32gdo=;
+        b=mTlgx854OpuOW9YJk60BrA+TsytPt+1HuXNPQUpsIn8p7D7gNQrW+hK0qhR/ez3Div
+         rq9d/rbu8tYP7/zMyVgJ89GTZ1tPBHNimuQ0E277jLY7gOtXPiBFGJtpT9oax5ILS+Bc
+         wT+DBwsi5Qx4uWQEjy8nCnE8rVcsP2kxjh4mo59WO2yb1lv2gZbdapJQq1D5tJ4JCHJF
+         tTRLAk/6p7dE1sgAZ5RidE/p8pizQkLrU3fILaXS/RqorsNuhnaMJSObmc2q4ZLm8LpI
+         HAqtlOb6WehzuMMBh8PCIhTddug1ntdF/JuG7agLzdHz/H+mSzTHDSRzyUIDRtZ5A0tp
+         zfyQ==
+X-Gm-Message-State: AOJu0YzS5W0WDw32O8Ui8lDchDWU4SJQZAc8jTqneo7OHdsy0cPLkRDM
+	ARBNdS7gb2P5bMMuDis3YqBUgXChr3uNChdVHw2jTbNvttTO34okGyGH+w==
+X-Google-Smtp-Source: AGHT+IFeJ5nj5sito6FSrhcQnyU50dYJTSsgBqEMNIdtkZrdNS0DDMWsco2q0erKR8MhuTyFfEvAyg==
+X-Received: by 2002:a05:6a00:1744:b0:704:23dc:6473 with SMTP id d2e1a72fcca58-70aaaf35102mr12766463b3a.30.1719934808482;
+        Tue, 02 Jul 2024 08:40:08 -0700 (PDT)
+Received: from [172.17.0.2] ([52.238.27.211])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-70801e635aasm8965266b3a.17.2024.07.02.08.40.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 02 Jul 2024 08:40:08 -0700 (PDT)
+Message-ID: <66841f58.050a0220.61e65.00a9@mx.google.com>
+Date: Tue, 02 Jul 2024 08:40:08 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============0426871431734395052=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240702142436.833138-1-hadess@hadess.net> <20240702142436.833138-2-hadess@hadess.net>
-In-Reply-To: <20240702142436.833138-2-hadess@hadess.net>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Tue, 2 Jul 2024 11:08:15 -0400
-Message-ID: <CABBYNZLu+kU0C63F_+GPj8k99t78HKU+aX46Y2sJB_dVQxuJ3A@mail.gmail.com>
-Subject: Re: [BlueZ resend 1/9] main: Simplify parse_config_string()
-To: Bastien Nocera <hadess@hadess.net>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, r.smirnov@omp.ru
+Subject: RE: [BlueZ,v1] shared/shell: add return value check of io_get_fd() to input_read()
+In-Reply-To: <20240702140313.107131-1-r.smirnov@omp.ru>
+References: <20240702140313.107131-1-r.smirnov@omp.ru>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Hi Bastien,
+--===============0426871431734395052==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-On Tue, Jul 2, 2024 at 10:25=E2=80=AFAM Bastien Nocera <hadess@hadess.net> =
-wrote:
->
-> The memory management done by parse_config_string() was quite
-> complicated, as it expected to be able to free the value in the return
-> variable if it was already allocated.
->
-> That particular behaviour was only used for a single variable which was
-> set to its default value during startup and might be overwritten after
-> this function call.
->
-> Use an intermediate variable to check whether we need to free
-> btd_opts.name and simplify parse_config_string().
->
-> Error: RESOURCE_LEAK (CWE-772): [#def39] [important]
-> bluez-5.75/src/main.c:425:2: alloc_fn: Storage is returned from allocatio=
-n function "g_key_file_get_string".
-> bluez-5.75/src/main.c:425:2: var_assign: Assigning: "tmp" =3D storage ret=
-urned from "g_key_file_get_string(config, group, key, &err)".
-> bluez-5.75/src/main.c:433:2: noescape: Assuming resource "tmp" is not fre=
-ed or pointed-to as ellipsis argument to "btd_debug".
-> bluez-5.75/src/main.c:440:2: leaked_storage: Variable "tmp" going out of =
-scope leaks the storage it points to.
-> 438|    }
-> 439|
-> 440|->  return true;
-> 441|   }
-> 442|
-> ---
->  src/main.c | 19 ++++++++++---------
->  1 file changed, 10 insertions(+), 9 deletions(-)
->
-> diff --git a/src/main.c b/src/main.c
-> index 62453bffaf57..9db8d7000490 100644
-> --- a/src/main.c
-> +++ b/src/main.c
-> @@ -420,9 +420,10 @@ static bool parse_config_string(GKeyFile *config, co=
-nst char *group,
->                                         const char *key, char **val)
->  {
->         GError *err =3D NULL;
-> -       char *tmp;
->
-> -       tmp =3D g_key_file_get_string(config, group, key, &err);
-> +       g_return_val_if_fail(val, false);
+This is automated email and please do not reply to this email!
 
-Nah, let's just use if (!val) return false as we normally do.
+Dear submitter,
 
-> +
-> +       *val =3D g_key_file_get_string(config, group, key, &err);
->         if (err) {
->                 if (err->code !=3D G_KEY_FILE_ERROR_KEY_NOT_FOUND)
->                         DBG("%s", err->message);
-> @@ -430,12 +431,7 @@ static bool parse_config_string(GKeyFile *config, co=
-nst char *group,
->                 return false;
->         }
->
-> -       DBG("%s.%s =3D %s", group, key, tmp);
-> -
-> -       if (val) {
-> -               g_free(*val);
-> -               *val =3D tmp;
-> -       }
-> +       DBG("%s.%s =3D %s", group, key, *val);
->
->         return true;
->  }
-> @@ -1004,7 +1000,12 @@ static void parse_secure_conns(GKeyFile *config)
->
->  static void parse_general(GKeyFile *config)
->  {
-> -       parse_config_string(config, "General", "Name", &btd_opts.name);
-> +       char *str =3D NULL;
-> +
-> +       if (parse_config_string(config, "General", "Name", &str)) {
-> +               g_free(btd_opts.name);
-> +               btd_opts.name =3D str;
-> +       }
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=867571
 
-Yeah, I skip this on purpose, I don't quite like the idea that we have
-to do this for 1 specific entry, perhaps the better option is to
-incorporate the default values into the table table so we avoid having
-this problem of having to free like this.
+---Test result---
 
->         parse_config_hex(config, "General", "Class", &btd_opts.class);
->         parse_config_u32(config, "General", "DiscoverableTimeout",
->                                                 &btd_opts.discovto,
-> --
-> 2.45.2
->
->
+Test Summary:
+CheckPatch                    PASS      0.26 seconds
+GitLint                       PASS      0.19 seconds
+BuildEll                      PASS      24.82 seconds
+BluezMake                     PASS      1728.14 seconds
+MakeCheck                     PASS      13.76 seconds
+MakeDistcheck                 PASS      177.84 seconds
+CheckValgrind                 PASS      252.10 seconds
+CheckSmatch                   WARNING   358.33 seconds
+bluezmakeextell               PASS      119.41 seconds
+IncrementalBuild              PASS      1461.06 seconds
+ScanBuild                     PASS      1001.32 seconds
+
+Details
+##############################
+Test: CheckSmatch - WARNING
+Desc: Run smatch tool with source
+Output:
+src/shared/shell.c: note: in included file (through /usr/include/readline/readline.h):src/shared/shell.c: note: in included file (through /usr/include/readline/readline.h):src/shared/shell.c: note: in included file (through /usr/include/readline/readline.h):
 
 
---=20
-Luiz Augusto von Dentz
+---
+Regards,
+Linux Bluetooth
+
+
+--===============0426871431734395052==--
