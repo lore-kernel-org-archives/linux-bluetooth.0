@@ -1,27 +1,30 @@
 Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [217.70.183.193])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1BA986AFA
-	for <linux-bluetooth@vger.kernel.org>; Tue,  2 Jul 2024 14:24:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E3321B5831
+	for <linux-bluetooth@vger.kernel.org>; Tue,  2 Jul 2024 14:24:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.193
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719930287; cv=none; b=GlfJ5xrZwiA8ESEEloivRhnHQ7IWWqkGxV5qenk3m0762Q8gGGSnZdo1KL5tkgTAIBd3Y/0teljflHydrcGDILJ8bDb/o86Xm1qfE5WuVux39Gy0YxVJdcAWLVp1h4117PPYyPbPQ72od5APWYFkVizeV8LCbu0nF9lJnHcEF00=
+	t=1719930287; cv=none; b=mQCd2HWYi/IaSN5NvzkqYQEs3GujPJsWW6HFUsbMQrERwH1o3qzus+P4NGm5rF7I0d7aHWXt8ULlPRVrFTM7m+cEjdeCEkUHQ+FqTn+P0Fz6rCrS3QzYW77vP0axB6C6ttoakKbwE0vbUco3fDI2ZAJ+yZmYpJRbo/ikX6PQiRU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1719930287; c=relaxed/simple;
-	bh=pY7IJnJvVtfhOHUjSuNMaMdEr0cl9pK5yH1g0maw10k=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=i0Pkyexp/v3EZe+46BmMkN1LhQP7Ig87JBdl6YTjBw/119K+TeEls0s7RxXd9JvXz/8h1uEB2D51m3IpwEo7p3M6tlju72vqHCvLQCrdJzMTpTZLAaKJF7B1AVCrcU6luSxg+ANnHsG/H53H8+5PQ452ACwFXoubqKScpdsNqlE=
+	bh=ib/BkXoy0+vwgqUindMB+HL0wQHRNyQmquiFjwvdr24=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=X+We+CB1Wew8VheA/awzzb0BaVZ8FVaKehIWaheomIUHr8plUu1Hz9Izj7QgIZRpfFCjO485cOPQTlb2gUQCM1WWJI5jTkG1hZmH5EfuWJcGudmgTvpUiP3wcYNtUw+cCNMYGmrcQvE7lRccfYTfrbRagrVXts796qOYMZq4Je0=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.183.193
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hadess.net
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 7A34124000A;
-	Tue,  2 Jul 2024 14:24:37 +0000 (UTC)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 51D9C240006;
+	Tue,  2 Jul 2024 14:24:38 +0000 (UTC)
 From: Bastien Nocera <hadess@hadess.net>
 To: linux-bluetooth@vger.kernel.org
 Cc: Bastien Nocera <hadess@hadess.net>
-Subject: [BlueZ resend 0/9] Fix a number of static analysis issues #4
-Date: Tue,  2 Jul 2024 16:23:32 +0200
-Message-ID: <20240702142436.833138-1-hadess@hadess.net>
+Subject: [BlueZ resend 3/9] mesh: Avoid accessing array out-of-bounds
+Date: Tue,  2 Jul 2024 16:23:35 +0200
+Message-ID: <20240702142436.833138-4-hadess@hadess.net>
 X-Mailer: git-send-email 2.45.2
+In-Reply-To: <20240702142436.833138-1-hadess@hadess.net>
+References: <20240702142436.833138-1-hadess@hadess.net>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -31,33 +34,42 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-GND-Sasl: hadess@hadess.net
 
-"main: Simplify parse_config_string()" is a repeat. If you don't want
-the patch, please let me know and I'll carry it downstream.
+We would boundary check the expected_pdu_size array based on the value
+of type, but would still access it out-of-bounds for the debug message.
+Split off the invalid type check into its own message to avoid this.
 
-More fixes incoming, please review carefully, thanks!
+Error: OVERRUN (CWE-119): [#def23] [important]
+bluez-5.76/mesh/prov-initiator.c:676:2: cond_at_least: Checking "type >= 10UL" implies that "type" is at least 10 on the true branch.
+bluez-5.76/mesh/prov-initiator.c:678:3: overrun-local: Overrunning array "expected_pdu_size" of 10 2-byte elements at element index 10 (byte offset 21) using index "type" (which evaluates to 10).
+676|	if (type >= L_ARRAY_SIZE(expected_pdu_size) ||
+677|					len != expected_pdu_size[type]) {
+678|->		l_error("Expected PDU size %d, Got %d (type: %2.2x)",
+679|			expected_pdu_size[type], len, type);
+680|		fail_code[1] = PROV_ERR_INVALID_FORMAT;
+---
+ mesh/prov-initiator.c | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
 
-Re-sent with the correct prefix
-
-Bastien Nocera (9):
-  main: Simplify parse_config_string()
-  avdtp: Fix manipulating struct as an array
-  mesh: Avoid accessing array out-of-bounds
-  obexd: Fix possible memleak
-  obexd: Fix memory leak in entry struct
-  obexd: Fix leak in backup_object struct
-  health/mcap: Fix memory leak in mcl struct
-  sdp: Fix memory leak in sdp_data_alloc*()
-  sdp: Check memory allocation in sdp_copy_seq()
-
- lib/sdp.c                      | 13 ++++++++--
- mesh/prov-initiator.c          |  9 +++++--
- obexd/plugins/messages-dummy.c | 12 ++++++++-
- obexd/plugins/pcsuite.c        |  1 +
- profiles/audio/avdtp.c         | 45 +++++++++++++++++-----------------
- profiles/health/mcap.c         |  1 +
- src/main.c                     | 19 +++++++-------
- 7 files changed, 64 insertions(+), 36 deletions(-)
-
+diff --git a/mesh/prov-initiator.c b/mesh/prov-initiator.c
+index 653f3ae3e1c2..e353d23865ef 100644
+--- a/mesh/prov-initiator.c
++++ b/mesh/prov-initiator.c
+@@ -673,8 +673,13 @@ static void int_prov_rx(void *user_data, const void *dptr, uint16_t len)
+ 		goto failure;
+ 	}
+ 
+-	if (type >= L_ARRAY_SIZE(expected_pdu_size) ||
+-					len != expected_pdu_size[type]) {
++	if (type >= L_ARRAY_SIZE(expected_pdu_size)) {
++		l_error("Invalid PDU type %2.2x", type);
++		fail_code[1] = PROV_ERR_INVALID_FORMAT;
++		goto failure;
++	}
++
++	if (len != expected_pdu_size[type]) {
+ 		l_error("Expected PDU size %d, Got %d (type: %2.2x)",
+ 			expected_pdu_size[type], len, type);
+ 		fail_code[1] = PROV_ERR_INVALID_FORMAT;
 -- 
 2.45.2
 
