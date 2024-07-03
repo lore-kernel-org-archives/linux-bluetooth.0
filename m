@@ -1,497 +1,216 @@
-Received: from out-20.smtp.github.com (out-20.smtp.github.com [192.30.252.203])
+Received: from mout.gmx.net (mout.gmx.net [212.227.17.22])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2E2C180A99
-	for <linux-bluetooth@vger.kernel.org>; Wed,  3 Jul 2024 15:15:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.203
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D43C417995
+	for <linux-bluetooth@vger.kernel.org>; Wed,  3 Jul 2024 16:38:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.17.22
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720019709; cv=none; b=YWiiaX8RMk8PQYZR3wCE4rV1Le0UbRj73CyE5yMOpsxc00UTYZ4ecADuj1f4t8rkDPYyJ7xRoY3KrUYrBcpIcHKikf1PxeJOC9vhZ0TZLx/aqh60QNA/6dhab0IqwvOlLD6HU3WhT0IUCdQOJWMT5xYMgVyhGdDUgraa0EkXkj0=
+	t=1720024732; cv=none; b=gwaFi0hqswxfZwtb/Vd/pEv5rC7B7wtk7fHKXTKe0hLCNwqrA0YzMPFUfsX7fpWeLp8HICu3+wgxDRQd9HKpMuZ7czd1xq1cu2hANtaZouwlaXPcCvNb+ND2DdTI9QUKq5G/Ga2j6oreABZZkyI+XnWteBEkgXTef4aaDHi+JGQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720019709; c=relaxed/simple;
-	bh=WgxsLb2cI2VGSUgFIGCMUma6A5FH+ZAhFLLmYhxJp48=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=cvU0R2NkhJxHPr/PPFcIM4uBrFkmwGxUdXEz6n6DqC2n/UReFmRQGroKMzVvXhx7Nr4nR+E8JkhetUNAZdw5IWjhqsvAcBaguuv9GaV9v3199uflFcVbtSoUPxnxPln77atfsLYyN1xHQQ7R7ZfSz8FpS7WC4xDg5A83/S6ce9A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=KNp8N3fh; arc=none smtp.client-ip=192.30.252.203
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1720024732; c=relaxed/simple;
+	bh=CuNZ0J/2SBOyapzgdg3QGnBnSa05WmAQ66ITyqONEtQ=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
+	 In-Reply-To:Content-Type; b=n41XHBpe68qFldb5w0/nakxxu1R4XjuMvIPMwgLtTyWl3Y9j6yGHWw67hqJdJfRUMFJytnDGclhCWjS5sDX3PYa5YCdpz7CZDXg52l58ROMcsCUV1RIKZA4wVgStPW1sJJspnoO4jyEgLcX9nciy4xHWoY7hh3pTaqFkPPca6yQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.li; spf=pass smtp.mailfrom=gmx.li; dkim=pass (2048-bit key) header.d=gmx.li header.i=usul@gmx.li header.b=t8Zhv05o; arc=none smtp.client-ip=212.227.17.22
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.li
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmx.li
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="KNp8N3fh"
-Received: from github.com (hubbernetes-node-5b0aef3.va3-iad.github.net [10.48.142.39])
-	by smtp.github.com (Postfix) with ESMTPA id B6F818C0A70
-	for <linux-bluetooth@vger.kernel.org>; Wed,  3 Jul 2024 08:15:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1720019706;
-	bh=rNRjQjb7Z1qmuO2eQr8G8Rqrh4/gBUv2pEnzJ38j/GU=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=KNp8N3fhykFe5FymbXv4QYguPWiiZDSc+aekwIYL2/pHoio4ItwkE4md5e8F8S2pT
-	 ZsKpVXpmfEN5Ovtc9VA8e+nuLSQbU9334i+pzwVg8/7q/NWSK/9zl90ak1Oc04SqjJ
-	 bhyuPfufQ/XNnZN6Bob3iUSqsCeLQi53DUDLga+g=
-Date: Wed, 03 Jul 2024 08:15:06 -0700
-From: BluezTestBot <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/master/be0b08-176cf2@github.com>
-Subject: [bluez/bluez] 7c896d: avdtp: Fix manipulating struct as an array
+	dkim=pass (2048-bit key) header.d=gmx.li header.i=usul@gmx.li header.b="t8Zhv05o"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmx.li;
+	s=s31663417; t=1720024727; x=1720629527; i=usul@gmx.li;
+	bh=6D6OBLYE5zKT6FKQNSi1Yx9FHtRzI+AYA++euGcigHM=;
+	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:From:Subject:To:
+	 Cc:References:In-Reply-To:Content-Type:Content-Transfer-Encoding:
+	 cc:content-transfer-encoding:content-type:date:from:message-id:
+	 mime-version:reply-to:subject:to;
+	b=t8Zhv05opoaLRb+rMVd7had4F/oKL4DTUydMVsuzxwJ7aXTTydLGnmqNGBHzJqZ2
+	 AsXuh3nwH8cVgiEESudy6TaXaCR2Sdm/tyHimdp4r6xwvrZqdyRwoHlhBLteNA/J+
+	 WZ53abIA762LZSAQTLIaGToYwTsNHc7emvYiI7mwYB/Vq/VkXjduqE1tbJB+3+/7H
+	 PyYgT+bgl/A5vPbjzxCcrPhVN+/rNHluzaOBGMUF0HK404yNlLCjaoWC5n5+el6CW
+	 e4jUGJ53hMffLrCrQSGrNzmzMBvvIWw8o8HfPDuaAyPqXAGY+dVhQwHcS03PC/bST
+	 hNllVKG1gdjNVXj3tA==
+X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
+Received: from [127.0.0.1] ([37.4.249.3]) by mail.gmx.net (mrgmx104
+ [212.227.17.168]) with ESMTPSA (Nemesis) id 1N8obG-1sK6m90uXO-017eGK; Wed, 03
+ Jul 2024 18:38:47 +0200
+Message-ID: <c0b60ec6-08ef-4391-856d-14f60f33af9e@gmx.li>
+Date: Wed, 3 Jul 2024 18:38:46 +0200
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
-
-  Branch: refs/heads/master
-  Home:   https://github.com/bluez/bluez
-  Commit: 7c896d7b73cbad2e073fccfb7ddb765f8468602c
-      https://github.com/bluez/bluez/commit/7c896d7b73cbad2e073fccfb7ddb765f8468602c
-  Author: Bastien Nocera <hadess@hadess.net>
-  Date:   2024-07-03 (Wed, 03 Jul 2024)
-
-  Changed paths:
-    M profiles/audio/avdtp.c
-
-  Log Message:
-  -----------
-  avdtp: Fix manipulating struct as an array
-
-Don't manipulate the "req" structs as if they were flat arrays, static
-analysis and humans are both equally confused by this kind of usage.
-
-Error: ARRAY_VS_SINGLETON (CWE-119): [#def26] [important]
-profiles/audio/avdtp.c:1675:2: address_of: Taking address with "&start->first_seid" yields a singleton pointer.
-profiles/audio/avdtp.c:1675:2: assign: Assigning: "seid" = "&start->first_seid".
-profiles/audio/avdtp.c:1679:25: ptr_arith: Using "seid" as an array.  This might corrupt or misinterpret adjacent memory locations.
-1677|           int i;
-1678|
-1679|->         for (i = 0; i < count; i++, seid++) {
-1680|                   if (seid->seid == id) {
-1681|                           req->collided = TRUE;
-
-Error: ARRAY_VS_SINGLETON (CWE-119): [#def27] [important]
-profiles/audio/avdtp.c:1690:2: address_of: Taking address with "&suspend->first_seid" yields a singleton pointer.
-profiles/audio/avdtp.c:1690:2: assign: Assigning: "seid" = "&suspend->first_seid".
-profiles/audio/avdtp.c:1694:25: ptr_arith: Using "seid" as an array.  This might corrupt or misinterpret adjacent memory locations.
-1692|		int i;
-1693|
-1694|->		for (i = 0; i < count; i++, seid++) {
-1695|			if (seid->seid == id) {
-1696|				req->collided = TRUE;
-
-Error: ARRAY_VS_SINGLETON (CWE-119): [#def28] [important]
-profiles/audio/avdtp.c:1799:2: address_of: Taking address with "&req->first_seid" yields a singleton pointer.
-profiles/audio/avdtp.c:1799:2: assign: Assigning: "seid" = "&req->first_seid".
-profiles/audio/avdtp.c:1801:30: ptr_arith: Using "seid" as an array.  This might corrupt or misinterpret adjacent memory locations.
-1799|		seid = &req->first_seid;
-1800|
-1801|->		for (i = 0; i < seid_count; i++, seid++) {
-1802|			failed_seid = seid->seid;
-1803|
-
-Error: ARRAY_VS_SINGLETON (CWE-119): [#def29] [important]
-profiles/audio/avdtp.c:1912:2: address_of: Taking address with "&req->first_seid" yields a singleton pointer.
-profiles/audio/avdtp.c:1912:2: assign: Assigning: "seid" = "&req->first_seid".
-profiles/audio/avdtp.c:1914:30: ptr_arith: Using "seid" as an array.  This might corrupt or misinterpret adjacent memory locations.
-1912|		seid = &req->first_seid;
-1913|
-1914|->	for (i = 0; i < seid_count; i++, seid++) {
-1915|			failed_seid = seid->seid;
-1916|
-
-
-  Commit: 3f1b3c624a9600f73ebb8f31c9533467b8b32584
-      https://github.com/bluez/bluez/commit/3f1b3c624a9600f73ebb8f31c9533467b8b32584
-  Author: Bastien Nocera <hadess@hadess.net>
-  Date:   2024-07-03 (Wed, 03 Jul 2024)
-
-  Changed paths:
-    M mesh/prov-initiator.c
-
-  Log Message:
-  -----------
-  mesh: Avoid accessing array out-of-bounds
-
-We would boundary check the expected_pdu_size array based on the value
-of type, but would still access it out-of-bounds for the debug message.
-Split off the invalid type check into its own message to avoid this.
-
-Error: OVERRUN (CWE-119): [#def23] [important]
-mesh/prov-initiator.c:676:2: cond_at_least: Checking "type >= 10UL" implies that "type" is at least 10 on the true branch.
-mesh/prov-initiator.c:678:3: overrun-local: Overrunning array "expected_pdu_size" of 10 2-byte elements at element index 10 (byte offset 21) using index "type" (which evaluates to 10).
-676|	if (type >= L_ARRAY_SIZE(expected_pdu_size) ||
-677|					len != expected_pdu_size[type]) {
-678|->		l_error("Expected PDU size %d, Got %d (type: %2.2x)",
-679|			expected_pdu_size[type], len, type);
-680|		fail_code[1] = PROV_ERR_INVALID_FORMAT;
-
-
-  Commit: 99750d2acd9deba2870932ecaa8050263b9dc8de
-      https://github.com/bluez/bluez/commit/99750d2acd9deba2870932ecaa8050263b9dc8de
-  Author: Bastien Nocera <hadess@hadess.net>
-  Date:   2024-07-03 (Wed, 03 Jul 2024)
-
-  Changed paths:
-    M obexd/plugins/messages-dummy.c
-
-  Log Message:
-  -----------
-  obexd: Fix possible memleak
-
-Fix possible resource leak if a attribute is repeated, overriding the
-original value.
-
-Error: RESOURCE_LEAK (CWE-772): [#def28] [important]
-obexd/plugins/messages-dummy.c:362:4: alloc_fn: Storage is returned from allocation function "g_strdup_inline".
-obexd/plugins/messages-dummy.c:362:4: var_assign: Assigning: "entry->handle" = storage returned from "g_strdup_inline(values[i])".
-obexd/plugins/messages-dummy.c:362:4: overwrite_var: Overwriting "entry->handle" in "entry->handle = g_strdup_inline(values[i])" leaks the storage that "entry->handle" points to.
-360|	for (i = 0 ; names[i]; ++i) {
-361|		if (g_strcmp0(names[i], "handle") == 0) {
-362|->			entry->handle = g_strdup(values[i]);
-363|			mld->size++;
-364|			continue;
-
-Error: RESOURCE_LEAK (CWE-772): [#def29] [important]
-obexd/plugins/messages-dummy.c:367:4: alloc_fn: Storage is returned from allocation function "g_strdup_inline".
-obexd/plugins/messages-dummy.c:367:4: var_assign: Assigning: "entry->attachment_size" = storage returned from "g_strdup_inline(values[i])".
-obexd/plugins/messages-dummy.c:367:4: overwrite_var: Overwriting "entry->attachment_size" in "entry->attachment_size = g_strdup_inline(values[i])" leaks the storage that "entry->attachment_size" points to.
-365|		}
-366|		if (g_strcmp0(names[i], "attachment_size") == 0) {
-367|->			entry->attachment_size = g_strdup(values[i]);
-368|			continue;
-369|		}
-
-Error: RESOURCE_LEAK (CWE-772): [#def30] [important]
-obexd/plugins/messages-dummy.c:371:4: alloc_fn: Storage is returned from allocation function "g_strdup_inline".
-obexd/plugins/messages-dummy.c:371:4: var_assign: Assigning: "entry->datetime" = storage returned from "g_strdup_inline(values[i])".
-obexd/plugins/messages-dummy.c:371:4: overwrite_var: Overwriting "entry->datetime" in "entry->datetime = g_strdup_inline(values[i])" leaks the storage that "entry->datetime" points to.
-369|		}
-370|		if (g_strcmp0(names[i], "datetime") == 0) {
-371|->			entry->datetime = g_strdup(values[i]);
-372|			continue;
-373|		}
-
-Error: RESOURCE_LEAK (CWE-772): [#def31] [important]
-obexd/plugins/messages-dummy.c:375:4: alloc_fn: Storage is returned from allocation function "g_strdup_inline".
-obexd/plugins/messages-dummy.c:375:4: var_assign: Assigning: "entry->subject" = storage returned from "g_strdup_inline(values[i])".
-obexd/plugins/messages-dummy.c:375:4: overwrite_var: Overwriting "entry->subject" in "entry->subject = g_strdup_inline(values[i])" leaks the storage that "entry->subject" points to.
-373|		}
-374|		if (g_strcmp0(names[i], "subject") == 0) {
-375|->			entry->subject = g_strdup(values[i]);
-376|			continue;
-377|		}
-
-Error: RESOURCE_LEAK (CWE-772): [#def32] [important]
-obexd/plugins/messages-dummy.c:379:4: alloc_fn: Storage is returned from allocation function "g_strdup_inline".
-obexd/plugins/messages-dummy.c:379:4: var_assign: Assigning: "entry->recipient_addressing" = storage returned from "g_strdup_inline(values[i])".
-obexd/plugins/messages-dummy.c:379:4: overwrite_var: Overwriting "entry->recipient_addressing" in "entry->recipient_addressing = g_strdup_inline(values[i])" leaks the storage that "entry->recipient_addressing" points to.
-377|		}
-378|		if (g_strcmp0(names[i], "recipient_addressing") == 0) {
-379|->			entry->recipient_addressing = g_strdup(values[i]);
-380|			continue;
-381|		}
-
-Error: RESOURCE_LEAK (CWE-772): [#def33] [important]
-obexd/plugins/messages-dummy.c:383:4: alloc_fn: Storage is returned from allocation function "g_strdup_inline".
-obexd/plugins/messages-dummy.c:383:4: var_assign: Assigning: "entry->sender_addressing" = storage returned from "g_strdup_inline(values[i])".
-obexd/plugins/messages-dummy.c:383:4: overwrite_var: Overwriting "entry->sender_addressing" in "entry->sender_addressing = g_strdup_inline(values[i])" leaks the storage that "entry->sender_addressing" points to.
-381|		}
-382|		if (g_strcmp0(names[i], "sender_addressing") == 0) {
-383|->			entry->sender_addressing = g_strdup(values[i]);
-384|			continue;
-385|		}
-
-Error: RESOURCE_LEAK (CWE-772): [#def34] [important]
-obexd/plugins/messages-dummy.c:387:4: alloc_fn: Storage is returned from allocation function "g_strdup_inline".
-obexd/plugins/messages-dummy.c:387:4: var_assign: Assigning: "entry->type" = storage returned from "g_strdup_inline(values[i])".
-obexd/plugins/messages-dummy.c:387:4: overwrite_var: Overwriting "entry->type" in "entry->type = g_strdup_inline(values[i])" leaks the storage that "entry->type" points to.
-385|		}
-386|		if (g_strcmp0(names[i], "type") == 0) {
-387|->			entry->type = g_strdup(values[i]);
-388|			continue;
-389|		}
-
-Error: RESOURCE_LEAK (CWE-772): [#def35] [important]
-obexd/plugins/messages-dummy.c:391:4: alloc_fn: Storage is returned from allocation function "g_strdup_inline".
-obexd/plugins/messages-dummy.c:391:4: var_assign: Assigning: "entry->reception_status" = storage returned from "g_strdup_inline(values[i])".
-obexd/plugins/messages-dummy.c:391:4: overwrite_var: Overwriting "entry->reception_status" in "entry->reception_status = g_strdup_inline(values[i])" leaks the storage that "entry->reception_status" points to.
-389|		}
-390|		if (g_strcmp0(names[i], "reception_status") == 0)
-391|->			entry->reception_status = g_strdup(values[i]);
-392|	}
-393|
-
-
-  Commit: 4b3fe69df7c77043d8f4b39a34431e4ef19c2071
-      https://github.com/bluez/bluez/commit/4b3fe69df7c77043d8f4b39a34431e4ef19c2071
-  Author: Bastien Nocera <hadess@hadess.net>
-  Date:   2024-07-03 (Wed, 03 Jul 2024)
-
-  Changed paths:
-    M obexd/plugins/messages-dummy.c
-
-  Log Message:
-  -----------
-  obexd: Fix memory leak in entry struct
-
-recipient_addressing was never freed.
-
-Error: RESOURCE_LEAK (CWE-772): [#def36] [important]
-obexd/plugins/messages-dummy.c:379:4: alloc_fn: Storage is returned from allocation function "g_strdup_inline".
-obexd/plugins/messages-dummy.c:379:4: var_assign: Assigning: "entry->recipient_addressing" = storage returned from "g_strdup_inline(values[i])".
-obexd/plugins/messages-dummy.c:404:2: leaked_storage: Freeing "entry" without freeing its pointer field "recipient_addressing" leaks the storage that "recipient_addressing" points to.
-402|	g_free(entry->attachment_size);
-403|	g_free(entry->handle);
-404|->	g_free(entry);
-405|   }
-406|
-
-
-  Commit: 5475aba84edcafe5f7d2043262a780312ceef27a
-      https://github.com/bluez/bluez/commit/5475aba84edcafe5f7d2043262a780312ceef27a
-  Author: Bastien Nocera <hadess@hadess.net>
-  Date:   2024-07-03 (Wed, 03 Jul 2024)
-
-  Changed paths:
-    M obexd/plugins/pcsuite.c
-
-  Log Message:
-  -----------
-  obexd: Fix leak in backup_object struct
-
-Error: RESOURCE_LEAK (CWE-772): [#def37] [important]
-obexd/plugins/pcsuite.c:370:2: alloc_fn: Storage is returned from allocation function "g_path_get_basename".
-obexd/plugins/pcsuite.c:370:2: var_assign: Assigning: "obj->cmd" = storage returned from "g_path_get_basename(name)".
-obexd/plugins/pcsuite.c:379:3: leaked_storage: Freeing "obj" without freeing its pointer field "cmd" leaks the storage that "cmd" points to.
-377|
-378|	if (send_backup_dbus_message("open", obj, size) == FALSE) {
-379|->		g_free(obj);
-380|		obj = NULL;
-381|	}
-
-
-  Commit: d79e429a9fc3c37b3a25fcde474c242d8b094bcc
-      https://github.com/bluez/bluez/commit/d79e429a9fc3c37b3a25fcde474c242d8b094bcc
-  Author: Bastien Nocera <hadess@hadess.net>
-  Date:   2024-07-03 (Wed, 03 Jul 2024)
-
-  Changed paths:
-    M profiles/health/mcap.c
-
-  Log Message:
-  -----------
-  health/mcap: Fix memory leak in mcl struct
-
-Error: RESOURCE_LEAK (CWE-772): [#def40] [important]
-profiles/health/mcap.c:2052:3: alloc_arg: "set_default_cb" allocates memory that is stored into "mcl->cb".
-profiles/health/mcap.c:2055:4: leaked_storage: Freeing "mcl" without freeing its pointer field "cb" leaks the storage that "cb" points to.
-2053|			if (util_getrandom(&val, sizeof(val), 0) < 0) {
-2054|				mcap_instance_unref(mcl->mi);
-2055|->				g_free(mcl);
-2056|				goto drop;
-2057|			}
-
-
-  Commit: 5dcc52a486f27867bdb685a39e10fadc9e6afa6f
-      https://github.com/bluez/bluez/commit/5dcc52a486f27867bdb685a39e10fadc9e6afa6f
-  Author: Bastien Nocera <hadess@hadess.net>
-  Date:   2024-07-03 (Wed, 03 Jul 2024)
-
-  Changed paths:
-    M lib/sdp.c
-
-  Log Message:
-  -----------
-  sdp: Fix memory leak in sdp_data_alloc*()
-
-Make sure to free already allocated memory if we run out of memory
-before the end of the loop.
-
-Error: RESOURCE_LEAK (CWE-772): [#def8] [important]
-lib/sdp.c:542:4: alloc_fn: Storage is returned from allocation function "sdp_data_alloc".
-lib/sdp.c:542:4: var_assign: Assigning: "data" = storage returned from "sdp_data_alloc(dtd, values[i])".
-lib/sdp.c:550:4: var_assign: Assigning: "seq" = "data".
-lib/sdp.c:552:3: var_assign: Assigning: "curr" = "data".
-lib/sdp.c:553:2: out_of_scope: Variable "data" goes out of scope.
-lib/sdp.c:552:3: overwrite_var: Overwriting "curr" in "curr = data".
-lib/sdp.c:545:4: leaked_storage: Variable "seq" going out of scope leaks the storage it points to.
-543|
-544|		if (!data)
-545|->			return NULL;
-546|
-547|		if (curr)
-
-
-  Commit: 1707a836223093de92f7911ca703ba9fa99e44b4
-      https://github.com/bluez/bluez/commit/1707a836223093de92f7911ca703ba9fa99e44b4
-  Author: Bastien Nocera <hadess@hadess.net>
-  Date:   2024-07-03 (Wed, 03 Jul 2024)
-
-  Changed paths:
-    M lib/sdp.c
-
-  Log Message:
-  -----------
-  sdp: Check memory allocation in sdp_copy_seq()
-
-Fix a potential null-dereference if sdp_data_alloc_with_length() fails,
-as is done in other similar functions.
-
-
-  Commit: 922a8a8bd4949b073e6423a0f0d59bb273d88014
-      https://github.com/bluez/bluez/commit/922a8a8bd4949b073e6423a0f0d59bb273d88014
-  Author: Roman Smirnov <r.smirnov@omp.ru>
-  Date:   2024-07-03 (Wed, 03 Jul 2024)
-
-  Changed paths:
-    M profiles/audio/a2dp.c
-
-  Log Message:
-  -----------
-  audio/a2dp: add NULL checks to find_remote_sep()
-
-Make find_remote_sep() safe for passing NULL pointers.
-
-Found with the SVACE static analysis tool.
-
-
-  Commit: 537f96a28399ad9a4140801575b384c8c5716bba
-      https://github.com/bluez/bluez/commit/537f96a28399ad9a4140801575b384c8c5716bba
-  Author: Roman Smirnov <r.smirnov@omp.ru>
-  Date:   2024-07-03 (Wed, 03 Jul 2024)
-
-  Changed paths:
-    M client/player.c
-
-  Log Message:
-  -----------
-  client/player: add return value check of io_get_fd() to transport_timer_read()
-
-It is necessary to add a return value check.
-
-Found with the SVACE static analysis tool.
-
-
-  Commit: 605e078556d0a23b60e9a65b5db20334a544e738
-      https://github.com/bluez/bluez/commit/605e078556d0a23b60e9a65b5db20334a544e738
-  Author: Roman Smirnov <r.smirnov@omp.ru>
-  Date:   2024-07-03 (Wed, 03 Jul 2024)
-
-  Changed paths:
-    M src/gatt-client.c
-
-  Log Message:
-  -----------
-  core/gatt: add return value check of io_get_fd() to sock_read()
-
-It is necessary to add a return value check.
-
-Found with the SVACE static analysis tool.
-
-
-  Commit: d36983e032e98545c3d90154b1d94605c73170c2
-      https://github.com/bluez/bluez/commit/d36983e032e98545c3d90154b1d94605c73170c2
-  Author: Roman Smirnov <r.smirnov@omp.ru>
-  Date:   2024-07-03 (Wed, 03 Jul 2024)
-
-  Changed paths:
-    M src/gatt-database.c
-
-  Log Message:
-  -----------
-  gatt: add return value check of io_get_fd() to sock_io_read()
-
-It is necessary to add a return value check.
-
-Found with the SVACE static analysis tool.
-
-
-  Commit: 1b961b9e15c6de1cf96de29ed16d0008b9c64c5d
-      https://github.com/bluez/bluez/commit/1b961b9e15c6de1cf96de29ed16d0008b9c64c5d
-  Author: Roman Smirnov <r.smirnov@omp.ru>
-  Date:   2024-07-03 (Wed, 03 Jul 2024)
-
-  Changed paths:
-    M src/shared/bap.c
-
-  Log Message:
-  -----------
-  shared/bap: move checks for NULL before dereferencing
-
-It is necessary to prevent dereferencing of NULL pointers.
-
-Found with the SVACE static analysis tool.
-
-
-  Commit: 8a22c17bc9960772a1baab310a7cc0a60ab4763e
-      https://github.com/bluez/bluez/commit/8a22c17bc9960772a1baab310a7cc0a60ab4763e
-  Author: Roman Smirnov <r.smirnov@omp.ru>
-  Date:   2024-07-03 (Wed, 03 Jul 2024)
-
-  Changed paths:
-    M src/shared/bap.c
-
-  Log Message:
-  -----------
-  shared/bap: prevent dereferencing of NULL pointers in ascs_ase_read()
-
-If the user_data argument is NULL, a NULL pointer will
-be dereferenced. It is necessary to prevent this case.
-
-Found with the SVACE static analysis tool.
-
-
-  Commit: 5f0002cc90997d14083e54a91c1f45134b7905a0
-      https://github.com/bluez/bluez/commit/5f0002cc90997d14083e54a91c1f45134b7905a0
-  Author: Roman Smirnov <r.smirnov@omp.ru>
-  Date:   2024-07-03 (Wed, 03 Jul 2024)
-
-  Changed paths:
-    M src/shared/csip.c
-
-  Log Message:
-  -----------
-  shared/csip: add NULL check to foreach_csis_service()
-
-It is necessary to prevent dereferencing of a NULL pointer.
-
-Found with the SVACE static analysis tool.
-
-
-  Commit: ee46e92bdef44e85cf4d6b10e08d56a2aa7706be
-      https://github.com/bluez/bluez/commit/ee46e92bdef44e85cf4d6b10e08d56a2aa7706be
-  Author: Roman Smirnov <r.smirnov@omp.ru>
-  Date:   2024-07-03 (Wed, 03 Jul 2024)
-
-  Changed paths:
-    M src/shared/shell.c
-
-  Log Message:
-  -----------
-  shared/shell: add return value check of io_get_fd() to input_read()
-
-It is necessary to add a return value check.
-
-Found with the SVACE static analysis tool.
-
-
-  Commit: 176cf2e12a289f9f94666e188c79fa6cc1ff249b
-      https://github.com/bluez/bluez/commit/176cf2e12a289f9f94666e188c79fa6cc1ff249b
-  Author: Roman Smirnov <r.smirnov@omp.ru>
-  Date:   2024-07-03 (Wed, 03 Jul 2024)
-
-  Changed paths:
-    M src/shared/vcp.c
-
-  Log Message:
-  -----------
-  shared/vcp: add NULL checks to foreach_vocs_service()
-
-Make foreach_vocs_service() safe for passing NULL pointers.
-
-Found with the SVACE static analysis tool.
-
-
-Compare: https://github.com/bluez/bluez/compare/be0b08770e92...176cf2e12a28
-
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+From: =?UTF-8?Q?Jonas_=C3=96zbay?= <usul@gmx.li>
+Subject: Re: [bug report] Reproducible pairing loss after reboot / Mediatek
+ RZ616 [partly resolved / probably not a Bluez bug]
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+References: <4cb7ecc4-2bf0-4403-a995-7ca3817be4cc@gmx.li>
+ <CABBYNZK2xgDZ-bkxE6L-5Yt9x3PDKT_swDpN1=HAD9PC_6QpVA@mail.gmail.com>
+Content-Language: de-DE
+Autocrypt: addr=usul@gmx.li; keydata=
+ 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
+In-Reply-To: <CABBYNZK2xgDZ-bkxE6L-5Yt9x3PDKT_swDpN1=HAD9PC_6QpVA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:0nS5QB0WqskQ/heuOdbousVCXFeZeOTV0tsr/hai3fY7dk4LsHc
+ V4r1rtOm+SRXF7/YJleXmNjl4KrtwxWRrlCUrJCgPb6DfZPsUaio0SCmMzWZy+O70v1bLB9
+ 58eUGkyZc6+VTZes+y9VzqpYx1ksiI7/usWUpnu2X7vG+dbb/n+BonMyIXNz027dOjIIziZ
+ I8GKpF6b3kQ7Uwg05u4Tw==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:I1XvLxUeXvM=;ADsrwoOH5oCeqgddwa/Rt0Ru58I
+ wgOTaCj/xBT1aOHT6mR9HftyrBibp1x1chlKzKTx5DPBHXSz8JhdldVTT3lSpBS7Xdia5LgEy
+ pH0u/Kyvbqqq01ooRIu4JaEszaNV8Hy3H4QhwKsKuyXa6pdh+fX8uKp5VZ9LXYjtbgx+pi6iD
+ SzdFhKfG7UbAOFfmAQDsuym82gJ2WyMri9hGpZiadPTyYGgZHyhv+mBIDj++p+ka+OO0HlXot
+ o+DtpLVzP44AiOHgr6KRDXVkeilk21FMbdfQQ4isRl5XffJj9RPHR6HCeAzV9meZOZV6ZtgFd
+ x1mY1wVRqh0SV7tC3/UKqOZoj2tzMFQwMPNXTv5IxvNY9vKJEJE222sS7iwQ23qwInCuZzOLx
+ VrR8z4y98bITq8wKW1jKZNiFJI1DypMinjXAN+DF7YU6HSU2o4jbwbc8PiNCPG9RKdT3WsSs0
+ IVddUSimgVvw7NbhrILBNh6jOkGXJD7MLFPwfv0Qae8t6bXHSzFHFerDFo6Xe9uDS9RlWzph4
+ K3mkhKZrqrGBYEzYMyx2AaUEtiDeAMJwLRehBFZIf1wgDeJX+be0a6EjRkCb7I5qE1VWmpQF1
+ 4ZqMtEgYawrfUqpoQkabR65uZKQNyk+g0LEH0hF7ssnZOTwirSttNVpeP3MappOXk78FUNUjq
+ 86y6bQkV1G4NZIhkVaql9Z7LjY7ZNYfp530P48OSSweopxfKPuePAhl/DlqogAOiR62Bmjpsv
+ foYwWt3lfgIa4TgbVuLS3E6g/uxPYIJ1YcIEPuU5PnbsuFSTCLLxbjgTY547fKqgTGs6Q5Xxx
+ Ng6NHmLUy0L0tj1Rslb9N+XjCDwldJh7QwkMLUEg6FXUY=
+
+Hi Luiz,
+
+Luiz Augusto von Dentz:
+> Hi Jonas,
+>
+> On Wed, Jul 3, 2024 at 5:01=E2=80=AFAM Jonas =C3=96zbay <usul@gmx.li> wr=
+ote:
+>>
+>> Hello Bluetooth List,
+>>
+>> this is a first post here as I found no other place to report bugs. Ple=
+ase forgive if I do not report according to the expected format or missed =
+any additional information and point me to the respective guidelines - tha=
+nk you!
+>>
+>> =3D=3DProblem summary:=3D=3D
+>> Bluetooth pairing with a mouse is lost after system reboot. The pairing=
+ has to be removed and a new pairing initiated for being able to use the m=
+ouse again.
+>>
+>> =3D=3DSystem specifications:=3D=3D
+>> Framework Laptop 16 (Batch 7)
+>> CPU: Ryzen 7 7840HS
+>> GPU: AMD RX 7700S
+>> WiFi/BT controller: Mediatek RZ616
+>> Linux Kernel: 6.9.7-200.fc40.x86_64
+>> Distro: Fedora 40
+>> Bluez version: 5.76-1.fc40
+>> Peripheral device: Cherry Gentix BT
+>>
+>> =3D=3DReproduction steps:=3D=3D
+>> 1) Pair the Bluetooth mouse via GUI or bluetoothctl
+>> 2) The mouse will now work as expected
+>> 3) Reboot the system
+>> 4) The mouse does not work, the GUI might switch between "connected/dis=
+connected"
+>> 5) start btmon
+>> 6) clicking the left mouse button produced the attached btmon log
+>
+> Weird, it is doing a pairing request right away:
+>
+> < ACL Data TX: Handle 512 flags 0x00 dlen 11
+>
+> #11 [hci0] 2.185573
+>        SMP: Pairing Request (0x01) len 6
+>          IO capability: NoInputNoOutput (0x03)
+>          OOB data: Authentication data not present (0x00)
+>          Authentication requirement: No bonding, No MITM, SC, No
+> Keypresses, CT2 (0x28)
+>          Max encryption key size: 16
+>          Initiator key distribution: <none> (0x08)
+>          Responder key distribution: IdKey LinkKey (0x0a)
+>
+> But it is doing No bonding, so perhaps that is the real problem here
+> since that indicates to bluetoothd not to store the keys. The No
+> Bonding is controlled by HCI_BONDABLE flag which is set by
+> MGMT_OP_SET_BONDABLE which by default is false but is automatically
+> set to true once a pairing agent is registered, try reproducing this
+> with bluetoothctl and if you are not able to this must be gnome/fedora
+> not registering an agent.
+>
+>> Sometimes btmon also displays the following errors after MGMT Event: De=
+vice disconnected (sorry, console cut them, could not capture to file):
+>> bluetoothd[2974]: =3D profiles/input/hog-lib.c:proto_mode_read_cb() Pro=
+tocol Mode characteristic read failed: Request attribute has encountered a=
+n...   14.720255
+>> bluetoothd[2974]: =3D profiles/input/hog-lib.c:report_reference_cb() Re=
+ad Report Reference descriptor failed: Request attribute has encountered a=
+n...   14.720368
+>> bluetoothd[2974]: =3D profiles/input/hog-lib.c:report_reference_cb() Re=
+ad Report Reference descriptor failed: Request attribute has encountered a=
+n...   14.720401
+>> bluetoothd[2974]: =3D profiles/input/hog-lib.c:info_read_cb() HID Infor=
+mation read failed: Request attribute has encountered an unlikely error   =
+       14.720616
+>> bluetoothd[2974]: =3D profiles/deviceinfo/deviceinfo.c:read_pnpid_cb() =
+Error reading PNP_ID value: Request attribute has encountered an unlikely =
+er..   14.720675
+>>
+>> =3D=3DAdditional Information:=3D=3D
+>> The mouse also sometimes stops working suddenly. In this case it might =
+come back after a few seconds, but sometimes I have to use "systemctl rest=
+art bluetooth" which re-enables the mouse. This might be a different probl=
+em though. I have no way to reproduce this well so I also could not produc=
+e a log file yet.
+>>
+>> Please tell me if I can provide any additional information. Thank you f=
+or your work on this piece of software! :)
+>>
+>> Cheers,
+>>    Jonas
+
+Thank you very much for the extremely quick reply!
+After pairing the device with bluetoothctl it finally reconnects after reb=
+oot.
+I have some basic knowledge of C/C++ - where would I start looking for in =
+the GNOME sources? Any specific function calls I could search for to have =
+a starting point? I have no idea about how the UI would call things from t=
+he bluetooth system ...
