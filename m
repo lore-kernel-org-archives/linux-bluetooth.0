@@ -1,104 +1,137 @@
-Received: from mail-qk1-f177.google.com (mail-qk1-f177.google.com [209.85.222.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail-4322.protonmail.ch (mail-4322.protonmail.ch [185.70.43.22])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4E0B13DDA3
-	for <linux-bluetooth@vger.kernel.org>; Wed,  3 Jul 2024 09:43:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D47913D2B7
+	for <linux-bluetooth@vger.kernel.org>; Wed,  3 Jul 2024 10:08:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.70.43.22
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719999801; cv=none; b=NBfCZwAnbLM5o6dl6u4TE/3xWevCY9AtDFLAiPXyFav5kr0ANl+/IVna/k6ipQMKR3p2dRqZSbp1i9rRTjDECsXb5sT5JusXAR/p+NuA/gz0E9j22zpo4FM+E91cB/VM2l4eFUV1QDuVjRWz8kC22Rvfr+ota/xl9YtzhjbCYgo=
+	t=1720001295; cv=none; b=tzprC04WnN6PJ0UB1WZBWFH8qfsVr9JaIbvISSH0aNWKOqPeE9wZSeIPqUVZ/Xtm6yiCOYIOOM1QfYJdJAV5JcaLHrbC/JajIMf7BJaQhl56kpQXjrOzObvM4p+iqh31rWjlC9yW9ZqtjNUtBFCusdK8ulT4RnbWpVDOrbg6c+8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719999801; c=relaxed/simple;
-	bh=PLzSuXUU+TsqYJvfP2j7Z+0nwEHvSjsGRcwxQm8/trc=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=aZh8+59vc4q75ALh7at5iqgQwxwB6K/15gNkoH2V2WkDKcXUpGl0gCCJk6FxDB+zTj3SCqtNXEmFei/wKsGtX6F/hwUjnoqja8lc+rwz0UNknBzISgNosvquzLGZlOFnJpU6RYk5PJHNynpv2o0qGjFfzEWIorDoh8w1f5gu7BQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NtrYmPzt; arc=none smtp.client-ip=209.85.222.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1720001295; c=relaxed/simple;
+	bh=dhgfDzIxE+i/XMK1Gmz9JVriNuS7opZTj5zjKeJ+KKk=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=PVy/V0m9vNCZobmQPlRucp65zlxfBbozysgn2uJo4/G4r9QdHbwXeCsH/UXT4++MYh9lPV9WgEcJLJfoBAkrsMxMkvUF4syR7Fza5X6TLBDX3ewA4brgULtoob3nDCKRgDQX0ftvUL8Zjq8gkLU3hKRkzpiSdpFztRm+k+Eou5k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me; spf=pass smtp.mailfrom=proton.me; dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b=Lg3YHXtt; arc=none smtp.client-ip=185.70.43.22
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=proton.me
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NtrYmPzt"
-Received: by mail-qk1-f177.google.com with SMTP id af79cd13be357-79c10f03a94so34534985a.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 03 Jul 2024 02:43:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1719999798; x=1720604598; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=3NhC1j26I7olR2ak+kF7m/hTQeVWvw0t3rvv51U3QZg=;
-        b=NtrYmPzt5AW5kzKbxxnJvhxlk9/vQSaIQWqaen1W0ixB5kcoaKlAu0aALHk5Y7F0md
-         a/CZNUPDS66S8+ulItYF5bK/YRyLVlSUqvhZ8DKItxTPwmyZiDORD+s85M0b5u7l3Nho
-         Xu2RFKcKvX3NSSxLtT6PFWleQD7mRVHDJOO//nHu4XrYycqG2BVssg0K+OJ61mzwk5+C
-         v0XPkUgtcot5OopLOo//yVpXXngaLWrVo+XwtC8iUc1S/5NoHbZhJbJIUUfuQXQO0EH/
-         DDPl4DgdWA6anu2Qp/9WSoSsZWnwfhWxmtxqH5p91X2z3e8aN1fZELDPiPfxglMWfZTG
-         nKQg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719999798; x=1720604598;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=3NhC1j26I7olR2ak+kF7m/hTQeVWvw0t3rvv51U3QZg=;
-        b=IRylNkegXsf7RHvkQLdo+kzujNy4LpvfanpY+boVdYWOLhbTS1ln4mYIPBJWjXRR7H
-         HIlP/GF6HLEZk8YkxMN+IolDJx8jfZ55UUP7c6cJSdZPSo8bgX6LR6il8gxmFTTxiJEp
-         Pybi26NSdDZy7721W2QwHugww3Ll/9Dd1tfF9bVVRaalL41r5UgjN75dikULUZes7AZU
-         AFY25m3q/+yjn+nDF7sp7x5x/D01jl7S6CdWNMhY8fZRSVGMH0l8Rj/XhcZQfOrbe5Nv
-         QtZW9DgiassyA+AJxnt+rs0d++qt9g/fAjXukTuUl57rtmnGYLNZueu+U32pmpY/DPR+
-         UT1Q==
-X-Gm-Message-State: AOJu0Yy+8HCTvgySY09s4CwlHWeruvoQfSupOxxJq+EbuemgOCocPlvt
-	dE82DHOLN1uz/oNx5rpNmclqHJvIg++c+58s1qNevBl9B1zyXri49gy6cQ==
-X-Google-Smtp-Source: AGHT+IFSJ4goSxfQ7U2so2QB9MIWePD2t7pZG18YlUREQl+KSVSShcdnfSV02BFYrOxfZMBHC4Fyyw==
-X-Received: by 2002:a05:620a:8116:b0:79c:c3d:9c22 with SMTP id af79cd13be357-79ee314a45fmr160440385a.8.1719999798431;
-        Wed, 03 Jul 2024 02:43:18 -0700 (PDT)
-Received: from [172.17.0.2] ([74.249.21.246])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-79d69303cf7sm548190585a.110.2024.07.03.02.43.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 03 Jul 2024 02:43:18 -0700 (PDT)
-Message-ID: <66851d36.050a0220.fc915.5522@mx.google.com>
-Date: Wed, 03 Jul 2024 02:43:18 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============0936133638692037385=="
+	dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b="Lg3YHXtt"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
+	s=protonmail; t=1720001284; x=1720260484;
+	bh=dhgfDzIxE+i/XMK1Gmz9JVriNuS7opZTj5zjKeJ+KKk=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
+	 Message-ID:BIMI-Selector;
+	b=Lg3YHXttu7qlsynmdwud6W7jSMlJP+1eY0fH1xDtnCWSTXiks6re7sXVZdybEDU/F
+	 JHsTZhRL+gUXkMmWpd9jhSFcViwQbMdw5H7UDGvvWO5Exk4gzRhlRymDWovEDj0Fxx
+	 /kXoTOTULCNhPLxsIBRyegm0XgHNzRbjcmnZ85Hw7bUcO67k0ZQWkbRLVOQ0iDm4eN
+	 kVQn0xvuKR2ppAcqwPH6Swgk0N2r2DK9ULBVperpgnFuK9eS/z+GrSE1fdRgl7hVOP
+	 4pDo9uItU/SV5JZY6yCb4Hql+J2W0GRyhHdRzYTXDLEKiJHgpntMfyZednDZv1ha/4
+	 yekX0OcyM9I1w==
+Date: Wed, 03 Jul 2024 10:08:02 +0000
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+From: lexicdark@proton.me
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: Issue with Logitech MX5500 (recurring)
+Message-ID: <4HxYDsPdpKNJlPLO7_HWiFNMkeowb4hT1AZZKMHNdPLOne8ZkjZIsl5oRz7pjVUo7-Yxzxa56nNu2R0B-doPaKmuyJDOaLJrXcxHhs9o14M=@proton.me>
+In-Reply-To: <CABBYNZ+yC=Z5PDK2nmegZFXGsJuu2S4y8ho6fMcQdb4xK4LKVQ@mail.gmail.com>
+References: <Wz8HSZhvOzF1mcJnF44ilQFAE_utAwvRXYILQZzH_sGhEV4tGHH0duomsVNwj5aa-OzSJFCU1ZqbCZkbtqzGXJbUmVbwMgLjVqx9BmhJI3s=@proton.me> <CABBYNZ+yC=Z5PDK2nmegZFXGsJuu2S4y8ho6fMcQdb4xK4LKVQ@mail.gmail.com>
+Feedback-ID: 102303237:user:proton
+X-Pm-Message-ID: 6ab7611721be65f79427b95646575634131c7ba5
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, quic_prathm@quicinc.com
-Subject: RE: [v3] Set BREDR not supported bit in AD Flag when discoverable is off
-In-Reply-To: <20240703073712.32149-1-quic_prathm@quicinc.com>
-References: <20240703073712.32149-1-quic_prathm@quicinc.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
---===============0936133638692037385==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Luiz, thanks for having a go.
 
-This is automated email and please do not reply to this email!
+what you say is correct:
+from the recent package update that file was reinstalled as:-
+KERNEL=3D=3D"hiddev*", ATTRS{idVendor}=3D=3D"046d", ATTRS{idProduct}=3D=3D"=
+c70[345abce]|c71[3bc]", \
+ RUN+=3D"hid2hci --method=3Dlogitech-hid --devpath=3D%p"
 
-Dear submitter,
+And I have changed it to:
+KERNEL=3D=3D"hiddev*", ATTRS{idVendor}=3D=3D"046d", ATTRS{idProduct}=3D=3D"=
+c70[345abce]|c71[3]", \
+ RUN+=3D"hid2hci --method=3Dlogitech-hid --devpath=3D%p"
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=867869
+which works again.
 
----Test result---
+This has been wrong for quite some time (many years) but was correct at som=
+e stage prior (distant past) but I believe it was put back in when the --me=
+thod=3Dlogitech-hid switch was added (incorrectly). That switch does not wo=
+rk for this device.
 
-Test Summary:
-CheckPatch                    PASS      0.45 seconds
-GitLint                       PASS      0.48 seconds
-BuildEll                      PASS      24.68 seconds
-BluezMake                     PASS      1669.35 seconds
-MakeCheck                     PASS      13.64 seconds
-MakeDistcheck                 PASS      177.63 seconds
-CheckValgrind                 PASS      252.73 seconds
-CheckSmatch                   PASS      353.20 seconds
-bluezmakeextell               PASS      120.02 seconds
-IncrementalBuild              PASS      1409.33 seconds
-ScanBuild                     PASS      1015.35 seconds
+As previously mentioned I have been on the Debian forums several times but =
+it has been effectively ignored. So have been working around it ever since =
+I installed bluez package for other things. The recent update gave me the i=
+mpetus to give this another go more directly.
 
+Alex
 
+On Wednesday, July 3rd, 2024 at 03:17, Luiz Augusto von Dentz <luiz.dentz@g=
+mail.com> wrote:
 
----
-Regards,
-Linux Bluetooth
-
-
---===============0936133638692037385==--
+> Hi Alex,
+>=20
+> On Tue, Jul 2, 2024 at 9:25=E2=80=AFAM lexicdark@proton.me wrote:
+>=20
+> > Solution requested: Please remove the entries for the logitech MX5500 i=
+n /lib/udev/rules.d/97-hid2hci.rules again (and please don't put them back =
+in later)
+> > This issue now keeps coming back every time a bluez update is pushed. A=
+nd it has been going on since I have had it and reported to the Debian foru=
+ms several times (but that has been useless, at best). It had been removed =
+from configs. about a decade ago then it regressed when someone put it back=
+.
+> > Any self respecting Logitech MX5500 user wouldn't install bluez unless =
+they had to (for other devices).
+> > If I edit out the c71[bc] entries for the 046d device and the keyboard =
+and mouse work again. These devices never have (and likely never will) work=
+ with this forced mode switch. The devices only appear to work in the raw m=
+ode. hid2hci --method=3Dlogitech-hid only stops the device from working bec=
+ause the hardware doesn't actually support it (supplementary: likely a too =
+early BT implementation, it has it's own bluetooth usb device which is to t=
+alk with the mouse and keyboard but it seems you can't use it with other de=
+vices, and the mouse and keyboard don't work with other BT dongles, at leas=
+t as far as I have tried).
+> >=20
+> > lsusb
+> > Bus 007 Device 004: ID 046d:c71c Logitech, Inc. Logitech BT Mini-Receiv=
+er
+> > Bus 007 Device 003: ID 046d:c71b Logitech, Inc. Logitech BT Mini-Receiv=
+er
+> > Bus 007 Device 005: ID 046d:c709 Logitech, Inc. BT Mini-Receiver (HCI m=
+ode)/lib/udev/rules.d/97-hid2hci.rules
+> > first two are mouse and keyboard, c709 is the dongle.
+>=20
+>=20
+> Are you talking about the following rules:
+>=20
+> # Logitech devices
+> KERNEL=3D=3D"hiddev*", ATTRS{idVendor}=3D=3D"046d",
+> ATTRS{idProduct}=3D=3D"c70[345abce]|c71[34bc]", \
+> RUN+=3D"hid2hci --method=3Dlogitech-hid --devpath=3D%p"
+>=20
+> I don't know who came up with these rules but it definitely hasn't
+> changed in a long long time:
+>=20
+> commit 7ca701a6120778fb65905f02305963b79ff6d8de
+> Author: Marcel Holtmann marcel@holtmann.org
+>=20
+> Date: Mon Dec 10 22:56:05 2012 +0100
+>=20
+> build: Put hid2hci udev rules next to the source code
+>=20
+> > Thanks,
+> > Alex
+>=20
+>=20
+>=20
+> --
+> Luiz Augusto von Dentz
