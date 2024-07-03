@@ -1,33 +1,33 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F36C17FAB6
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6D201802CC
 	for <linux-bluetooth@vger.kernel.org>; Wed,  3 Jul 2024 15:10:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720019433; cv=none; b=NLXQbhCPmjqzOrcmadp0lz7L4c+bYp7aZcAsYQJKSDZnykUlqgykHAY9sDQIhCSgt/cXE/K5wHzQAUcflNENpu9+dpHIpBXF3tYHzaeEMZGJc+TPgOkC1tOHQj37ZDBJx1ALj2kaOW5qqDZ1j73ZoYeZAKO4puJLHH/uTWgoTsY=
+	t=1720019433; cv=none; b=VkjmBJRAWhSnPYvzN5HrNzT4/HgbBLIcaR13qfiNVzy8gvlphDLL3NtyNsrPYkd2tzfIojzEiq20YwRZOjVR0+QOWZcclzC7kMi7AFcNzHXyMzwgIwFdMc8ivScGBP/fCo7kIirUJV4thNuPjehoCviiTdGd6/f8bPME7TWgClY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1720019433; c=relaxed/simple;
-	bh=3DnkE7GxIbJ6lXTmI8k59oyqUIfcMrtoVXImW+dOCdo=;
+	bh=Sny3+dazXOQvttaIPHmU6BNav5vKo0/BRQ1KxDoppY4=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=iX8ifl85T9DL/q7W6jASD6mZtMsmR5v0ksmY6oJ2uQvi0SILwe6tPGsW6rVGuuDCV44AginxsSHGQjyCOnbzbYA+GMyOZGTWzULBNBPSoaFGPMjesSviQWWdRolxmRJEO1XAjtIXm3bQ9LucogcYC1YKfH7etvSRwPcqQJEvz4s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NLY8NdIA; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=e+F+4JvhfD1q+/oTipQMlRupuQ4FZMzQj17FxwawjWG8s6RoToT2JXQzSFTyL4caxwqMwE2a2ZcsXLzZzPedgMI4HAm5uvozWUsW9a15MyT+OxuOkJI1A35SuXCp2Snnk2Q7iUi901gV7pagAFcXwInatfENawSBTPE371ffy9Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Sa02ic3p; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NLY8NdIA"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 8361FC2BD10;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Sa02ic3p"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 705E5C4AF11;
 	Wed,  3 Jul 2024 15:10:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1720019433;
-	bh=3DnkE7GxIbJ6lXTmI8k59oyqUIfcMrtoVXImW+dOCdo=;
+	bh=Sny3+dazXOQvttaIPHmU6BNav5vKo0/BRQ1KxDoppY4=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=NLY8NdIAdnJEBg7Qlql5TIFdWaIsAnhjYTwcJnEV4utkGbFv8GBLR5FtNBxu/UMAK
-	 4/wk/dzcf5L21zkktuLvVdq+4+X5ot3w74myAW5e/vronDTTa/1WdUN4u67KQCIzfZ
-	 gTwZWSCc3hGZvmKWI8isi6CWJQsxlg/XWSNR3lko+RnJz83VJdBhO/u5XImwunXrGH
-	 w1MHNkVezyD+Ka9zRZrpF6Tzl5PWFmXJWZfHRt5d9j+BivqoWTL4MoFWY9KeMb5SSr
-	 nUCbCKXYga0Kalr6GndPO1JZCriYnaB5QuugqB3MDKCDVG75laAT6QJkEA+FQJhZaL
-	 CthbWa4gdXMLw==
+	b=Sa02ic3pooLYqfdiDlMaeTMoyZW5JVLS/exQdrPLO1B8eniI/0+x7ACPWXKMG6hNC
+	 rx+NOZ0FOvh22oiJzjL0pvGQ2B9tOMQNQPEC0+5SVbX+yUIU+B4JSDrJ0hX3EkDifX
+	 BDQ3CqS7w9YxgVIbVRxJvDVI2a1d7KtGHvR5yNIJFpyB9agEqcwdstgrMIxIBKqmGO
+	 EZWLhgZWXsX3+psIb/LsT2dLUf03gMQFFA5UcrOhUSnzIbsZ+2udDKhJUaxxyFFcQQ
+	 4DbWGwW0fQ6Dk9LgclOzEVfCeTUmEa+TcHbjDVDnHW2GsoxvwZz2sdj8FDPzEQf4o2
+	 hBN2V3bBIfwFQ==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 78415C43446;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 64E03C433A2;
 	Wed,  3 Jul 2024 15:10:33 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -37,14 +37,14 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH BlueZ v1] shared/vcp: add NULL checks to
- foreach_vocs_service()
+Subject: Re: [PATCH BlueZ v1] client/player: add return value check of io_get_fd()
+ to transport_timer_read()
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <172001943348.18626.10927362074373630661.git-patchwork-notify@kernel.org>
+ <172001943340.18626.8769477963899790782.git-patchwork-notify@kernel.org>
 Date: Wed, 03 Jul 2024 15:10:33 +0000
-References: <20240702084907.26066-1-r.smirnov@omp.ru>
-In-Reply-To: <20240702084907.26066-1-r.smirnov@omp.ru>
+References: <20240702122717.77746-1-r.smirnov@omp.ru>
+In-Reply-To: <20240702122717.77746-1-r.smirnov@omp.ru>
 To: Roman Smirnov <r.smirnov@omp.ru>
 Cc: linux-bluetooth@vger.kernel.org
 
@@ -53,17 +53,17 @@ Hello:
 This patch was applied to bluetooth/bluez.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Tue, 2 Jul 2024 11:49:07 +0300 you wrote:
-> Make foreach_vocs_service() safe for passing NULL pointers.
+On Tue, 2 Jul 2024 15:27:17 +0300 you wrote:
+> It is necessary to add a return value check.
 > 
 > Found with the SVACE static analysis tool.
 > ---
->  src/shared/vcp.c | 3 +++
->  1 file changed, 3 insertions(+)
+>  client/player.c | 5 +++++
+>  1 file changed, 5 insertions(+)
 
 Here is the summary with links:
-  - [BlueZ,v1] shared/vcp: add NULL checks to foreach_vocs_service()
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=176cf2e12a28
+  - [BlueZ,v1] client/player: add return value check of io_get_fd() to transport_timer_read()
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=537f96a28399
 
 You are awesome, thank you!
 -- 
