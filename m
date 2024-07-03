@@ -1,132 +1,138 @@
-Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EF5E13D88C
-	for <linux-bluetooth@vger.kernel.org>; Wed,  3 Jul 2024 09:23:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E1D51755B
+	for <linux-bluetooth@vger.kernel.org>; Wed,  3 Jul 2024 09:31:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719998628; cv=none; b=TQPJq8mvSMlc3gEaKiCQcUuQ5oUL+IbxTyatw7jGkRUNZ7WtS5A3zgR1/MQqZ8NxB1wNSxVBsuO1dsmAzyK849w7kAAmKfRxULcftyMymPEX1f5gnETCCkieD/keH1o4aUzR2QIOfg2Lrarz8AT3OljZYoE8YsaHpn1/zU3GDPk=
+	t=1719999113; cv=none; b=sghIpvmom3v6rPgbvVJXl3MovXywY3tziN029q7XBlIAE4irEEqIMiXJOtHQQgwyw7Lg5QDhWqSeVFjcvp+dXzRfJhO+TGzW4vPoCjWNKC7rx9yyz05nCoZqTW1Zz0BNVPyrwJ08eJWjlwOFSZIl3i7WZgsqWXwY8xyZrVrs5J8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719998628; c=relaxed/simple;
-	bh=de1/xUbv0RTOuFbeW3qO2uPAtPqMRsKt3Ldqi5H2gUU=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=PTQUhqAyCbO/cPiCYKIPasGMlHnVItLpmIsJ+gWCI8F2NYu+31laOiBEkWuR14HR+KSPXCv9Gp5NxLUbnf9KC8QL5/TQnDlDLvcWYcPzEoyeKRHOJ894luCP+uKbUki88ZcEqj5LsDn1sXpb9SkNO3wmfRsX0PwSV3xXAEj+FtU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
-Received: from localhost.localdomain (217.23.187.157) by msexch01.omp.ru
- (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Wed, 3 Jul
- 2024 12:23:35 +0300
-From: Roman Smirnov <r.smirnov@omp.ru>
+	s=arc-20240116; t=1719999113; c=relaxed/simple;
+	bh=vHRIvy5b3muMS2zWZPSx6gg5P38gv8FbEKZjguYtnhw=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=p5WVyGYNhnJkH4p4Ke+qilsDoJg3dYIALBNCcRrNl+v/FXDBEB0qUX0X/5ob5G7kcTR6i3FmEw01ou36YZ+ZeBC+5m6gwbxDMLEJhZqk+Hs5/ssTSrEFU7zpAeOaKrItPbzJU6XNfpYAwuYCMdcvIFUxpicCHtbGrhT+DYbqugM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=V6+MUZz/; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="V6+MUZz/"
+Received: from pps.filterd (m0279862.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4632An3b028769
+	for <linux-bluetooth@vger.kernel.org>; Wed, 3 Jul 2024 09:31:51 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-type:date:from:message-id:mime-version:subject:to; s=
+	qcppdkim1; bh=eR9Sht51ZI5VCcfWIHMCZlTjZp9kVvcGUjo2k8s340U=; b=V6
+	+MUZz/vtl8Lvo0EEQ3hxibuJYGYXwIYA8KMHXcX4ecJBCHt033kfrbu5Jxy4dqdw
+	MdPtPvyHPSNedWPH3PScJJCzYOlBEwBR2eQpXWfXjmj/jHETldGjva0TDezKrocE
+	gA8YZySn5LtPoUbESQZmVCP1r94Kaq4Mq8whbwAkQ7QhWUMmLELlT3kyoXfbOsfT
+	reBAESYg0AZdmBseuVp4U27mYTL/EDThvH2XqXzFeMuDrdN5YIa9Qh2hlD5UqRUN
+	Ql+Auq6daCnS94vU6hATsQWgs/xMJvfhpFa5eDYP0F4iK71jW8CEWyV69CVRvikp
+	p1h0Jr8tHuE+wdebhELQ==
+Received: from nasanppmta01.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 404kctjmkd-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <linux-bluetooth@vger.kernel.org>; Wed, 03 Jul 2024 09:31:51 +0000 (GMT)
+Received: from nasanex01c.na.qualcomm.com (nasanex01c.na.qualcomm.com [10.45.79.139])
+	by NASANPPMTA01.qualcomm.com (8.17.1.19/8.17.1.19) with ESMTPS id 4639VoIH020839
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <linux-bluetooth@vger.kernel.org>; Wed, 3 Jul 2024 09:31:50 GMT
+Received: from hu-amisjain-hyd.qualcomm.com (10.80.80.8) by
+ nasanex01c.na.qualcomm.com (10.45.79.139) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.9; Wed, 3 Jul 2024 02:31:48 -0700
+From: Amisha Jain <quic_amisjain@quicinc.com>
 To: <linux-bluetooth@vger.kernel.org>
-CC: Roman Smirnov <r.smirnov@omp.ru>
-Subject: [PATCH BlueZ v1] shared/bap: move checks for NULL before dereferencing
-Date: Wed, 3 Jul 2024 12:23:22 +0300
-Message-ID: <20240703092322.16659-1-r.smirnov@omp.ru>
-X-Mailer: git-send-email 2.43.0
+CC: <quic_mohamull@quicinc.com>, <quic_hbandi@quicinc.com>,
+        <quic_anubhavg@quicinc.com>
+Subject: [PATCH BlueZ v5] obex: Move size emit signal to plugins instead of obex.c
+Date: Wed, 3 Jul 2024 15:01:33 +0530
+Message-ID: <20240703093133.9423-1-quic_amisjain@quicinc.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
- (10.188.4.12)
-X-KSE-ServerInfo: msexch01.omp.ru, 9
-X-KSE-AntiSpam-Interceptor-Info: scan successful
-X-KSE-AntiSpam-Version: 6.1.0, Database issued on: 07/03/2024 08:57:23
-X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
-X-KSE-AntiSpam-Method: none
-X-KSE-AntiSpam-Rate: 59
-X-KSE-AntiSpam-Info: Lua profiles 186300 [Jul 03 2024]
-X-KSE-AntiSpam-Info: Version: 6.1.0.4
-X-KSE-AntiSpam-Info: Envelope from: r.smirnov@omp.ru
-X-KSE-AntiSpam-Info: LuaCore: 21 0.3.21
- ebee5449fc125b2da45f1a6a6bc2c5c0c3ad0e05
-X-KSE-AntiSpam-Info: {rep_avail}
-X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
-X-KSE-AntiSpam-Info: {relay has no DNS name}
-X-KSE-AntiSpam-Info: {SMTP from is not routable}
-X-KSE-AntiSpam-Info: {Found in DNSBL: 217.23.187.157 in (user)
- b.barracudacentral.org}
-X-KSE-AntiSpam-Info: {Found in DNSBL: 217.23.187.157 in (user)
- dbl.spamhaus.org}
-X-KSE-AntiSpam-Info:
-	omp.ru:7.1.1;127.0.0.199:7.1.2;217.23.187.157:7.1.2;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1
-X-KSE-AntiSpam-Info: ApMailHostAddress: 217.23.187.157
-X-KSE-AntiSpam-Info: {DNS response errors}
-X-KSE-AntiSpam-Info: Rate: 59
-X-KSE-AntiSpam-Info: Status: not_detected
-X-KSE-AntiSpam-Info: Method: none
-X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
- smtp.mailfrom=omp.ru;dkim=none
-X-KSE-Antiphishing-Info: Clean
-X-KSE-Antiphishing-ScanningType: Heuristic
-X-KSE-Antiphishing-Method: None
-X-KSE-Antiphishing-Bases: 07/03/2024 09:00:00
-X-KSE-Antivirus-Interceptor-Info: scan successful
-X-KSE-Antivirus-Info: Clean, bases: 7/3/2024 6:47:00 AM
-X-KSE-Attachment-Filter-Triggered-Rules: Clean
-X-KSE-Attachment-Filter-Triggered-Filters: Clean
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nasanex01c.na.qualcomm.com (10.45.79.139)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: DuA9jrzcYM6uK4x2Cvo-6Sb6JQktu5zh
+X-Proofpoint-ORIG-GUID: DuA9jrzcYM6uK4x2Cvo-6Sb6JQktu5zh
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-07-03_05,2024-07-02_02,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 adultscore=0
+ bulkscore=0 mlxlogscore=971 priorityscore=1501 impostorscore=0
+ suspectscore=0 mlxscore=0 lowpriorityscore=0 clxscore=1015 malwarescore=0
+ spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2406140001 definitions=main-2407030070
 
-It is necessary to prevent dereferencing of NULL pointers.
+Instead of emitting the property "Size" from obex_put_stream_start(),
+Call the function manager_emit_transfer_property() from plugins/*.c
+wherever plugin has transfer object present.
+Remove the code from obex.c which is generic for all profiles.
 
-Found with the SVACE static analysis tool.
+This change resolves the type mismatch issue when calling the
+manager_emit_transfer_property from obex.c. We are passing
+'os->service_data' of plugin session type but the
+manager_emit_transfer_property() expects the 'obex_transfer'
+type, therefore size is not set properly and might cause
+crash/disconnection.
+
 ---
- src/shared/bap.c | 12 +++++++-----
- 1 file changed, 7 insertions(+), 5 deletions(-)
+ obexd/plugins/ftp.c | 5 +++++
+ obexd/plugins/opp.c | 5 +++++
+ obexd/src/obex.c    | 3 ---
+ 3 files changed, 10 insertions(+), 3 deletions(-)
 
-diff --git a/src/shared/bap.c b/src/shared/bap.c
-index ec54da341..defeeb635 100644
---- a/src/shared/bap.c
-+++ b/src/shared/bap.c
-@@ -1870,11 +1870,11 @@ static unsigned int bap_ucast_disable(struct bt_bap_stream *stream,
+diff --git a/obexd/plugins/ftp.c b/obexd/plugins/ftp.c
+index 874fe2b8b..127bb9aaf 100644
+--- a/obexd/plugins/ftp.c
++++ b/obexd/plugins/ftp.c
+@@ -175,6 +175,11 @@ int ftp_chkput(struct obex_session *os, void *user_data)
  
- static uint8_t stream_stop(struct bt_bap_stream *stream, struct iovec *rsp)
- {
--	DBG(stream->bap, "stream %p", stream);
+ 	ret = obex_put_stream_start(os, path);
+ 
++	if (obex_get_size(os) != OBJECT_SIZE_DELETE &&
++				obex_get_size(os) != OBJECT_SIZE_UNKNOWN) {
++		manager_emit_transfer_property(ftp->transfer, "Size");
++	}
++
+ 	if (ret == 0)
+ 		manager_emit_transfer_started(ftp->transfer);
+ 
+diff --git a/obexd/plugins/opp.c b/obexd/plugins/opp.c
+index 777f5f8ed..74b2f805b 100644
+--- a/obexd/plugins/opp.c
++++ b/obexd/plugins/opp.c
+@@ -87,6 +87,11 @@ skip_auth:
+ 
+ 	err = obex_put_stream_start(os, path);
+ 
++	if (obex_get_size(os) != OBJECT_SIZE_DELETE &&
++				obex_get_size(os) != OBJECT_SIZE_UNKNOWN) {
++		manager_emit_transfer_property(user_data, "Size");
++	}
++
+ 	g_free(path);
+ 
+ 	if (err < 0)
+diff --git a/obexd/src/obex.c b/obexd/src/obex.c
+index 98d6245a4..370bfac9e 100644
+--- a/obexd/src/obex.c
++++ b/obexd/src/obex.c
+@@ -716,9 +716,6 @@ int obex_put_stream_start(struct obex_session *os, const char *filename)
+ 		return err;
+ 	}
+ 
+-	if (os->size != OBJECT_SIZE_DELETE && os->size != OBJECT_SIZE_UNKNOWN)
+-		manager_emit_transfer_property(os->service_data, "Size");
 -
- 	if (!stream)
- 		return 0;
+ 	os->path = g_strdup(filename);
  
-+	DBG(stream->bap, "stream %p", stream);
-+
- 	ascs_ase_rsp_success(rsp, stream->ep->id);
- 
- 	stream_set_state(stream, BT_BAP_STREAM_STATE_QOS);
-@@ -2751,12 +2751,12 @@ static uint8_t ascs_start(struct bt_ascs *ascs, struct bt_bap *bap,
- 
- static uint8_t stream_disable(struct bt_bap_stream *stream, struct iovec *rsp)
- {
--	DBG(stream->bap, "stream %p", stream);
--
- 	if (!stream || stream->ep->state == BT_BAP_STREAM_STATE_QOS ||
- 			stream->ep->state == BT_BAP_STREAM_STATE_IDLE)
- 		return 0;
- 
-+	DBG(stream->bap, "stream %p", stream);
-+
- 	ascs_ase_rsp_success(rsp, stream->ep->id);
- 
- 	/* Sink can autonomously transit to QOS while source needs to go to
-@@ -5830,11 +5830,13 @@ int bt_bap_stream_cancel(struct bt_bap_stream *stream, unsigned int id)
- int bt_bap_stream_io_link(struct bt_bap_stream *stream,
- 				struct bt_bap_stream *link)
- {
--	struct bt_bap *bap = stream->bap;
-+	struct bt_bap *bap;
- 
- 	if (!stream || !link || stream == link)
- 		return -EINVAL;
- 
-+	bap = stream->bap;
-+
- 	if (stream->link || link->link)
- 		return -EALREADY;
- 
+ 	return 0;
 -- 
-2.43.0
+2.17.1
 
