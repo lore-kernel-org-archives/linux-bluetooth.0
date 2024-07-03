@@ -1,120 +1,132 @@
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75A0713B5AD
-	for <linux-bluetooth@vger.kernel.org>; Wed,  3 Jul 2024 09:06:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EF5E13D88C
+	for <linux-bluetooth@vger.kernel.org>; Wed,  3 Jul 2024 09:23:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719997580; cv=none; b=UeEK/osNIbUUvbiHHc3d4Y/sLhQp0Cn0JIHYlU1VnezEmlEzHESNCIws4caNJi4w8QzXY/8tqKlXeQQ3hKaS89WUjLCC7t2rIW3ymX+jNaOwuInHI88MrcTeW38uh61ZipSHvOg6TrBdXD0egUw5yFRRVNSS6MWcfSEu1sxIQmQ=
+	t=1719998628; cv=none; b=TQPJq8mvSMlc3gEaKiCQcUuQ5oUL+IbxTyatw7jGkRUNZ7WtS5A3zgR1/MQqZ8NxB1wNSxVBsuO1dsmAzyK849w7kAAmKfRxULcftyMymPEX1f5gnETCCkieD/keH1o4aUzR2QIOfg2Lrarz8AT3OljZYoE8YsaHpn1/zU3GDPk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719997580; c=relaxed/simple;
-	bh=Ozweiy9X2dQRVzZkNtxWdK/B55awqyIx0kPi1gM9ctg=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=q/iG3R3yuEd4+QS3weEnxVVHtM0U1SVm+dWZ1FoE5mUv+PTEbOUh9tNZujqKPFg2rnOAdXg1dTzGQxp9hW25Y4ktCEXlY/BCpD60G28unDV/AseaMeVoCkZ+C1ZpIddW7kdE98XEK7R2uzQPc6jdCOLz2eFfjSgL+l63LtGvagE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=k0/QGbVB; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="k0/QGbVB"
-Received: from pps.filterd (m0279871.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4637rjE1003062;
-	Wed, 3 Jul 2024 09:06:08 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-type:date:from:message-id:mime-version:subject:to; s=
-	qcppdkim1; bh=nDp/uLGCqjbcbY8xYziMaraRyA8y5LBlSe9GKWfjw8M=; b=k0
-	/QGbVBd75iP1ZS6X3ZtdLS96alddDH7c1UaEhzhnXxw6rqBNqoRXRcZvLwrSAGpn
-	EjkSiX2/d4xLH7Ir+j/MQQLXQaG2Y7Oz2S6YhjXDDU5hBbV9Q8TS955nMxRpY32t
-	wxZMgNyl2tTK+2wH56qsteNOCkycb4abin/mFMtSMtjogMlwOvvgscwV5OYLM370
-	MxsG0D6/pVphnUju62TpDUVFiBMrN5PUKrARawlX7KRE74Y3lHzJpVVcz+HXJ6ax
-	uU3rfOzCIC1nkUaV04EeFGy/a5LjAbU3jEC0G1gmvmAVwlVjz70w75vd3L/sm02/
-	jDcAANcxPK8YrvDdvQKw==
-Received: from nalasppmta05.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4029uxg9fq-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 03 Jul 2024 09:06:08 +0000 (GMT)
-Received: from nalasex01b.na.qualcomm.com (nalasex01b.na.qualcomm.com [10.47.209.197])
-	by NALASPPMTA05.qualcomm.com (8.17.1.19/8.17.1.19) with ESMTPS id 463967cL007211
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 3 Jul 2024 09:06:07 GMT
-Received: from hu-prathm-hyd.qualcomm.com (10.80.80.8) by
- nalasex01b.na.qualcomm.com (10.47.209.197) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.9; Wed, 3 Jul 2024 02:06:04 -0700
-From: <quic_prathm@quicinc.com>
+	s=arc-20240116; t=1719998628; c=relaxed/simple;
+	bh=de1/xUbv0RTOuFbeW3qO2uPAtPqMRsKt3Ldqi5H2gUU=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=PTQUhqAyCbO/cPiCYKIPasGMlHnVItLpmIsJ+gWCI8F2NYu+31laOiBEkWuR14HR+KSPXCv9Gp5NxLUbnf9KC8QL5/TQnDlDLvcWYcPzEoyeKRHOJ894luCP+uKbUki88ZcEqj5LsDn1sXpb9SkNO3wmfRsX0PwSV3xXAEj+FtU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
+Received: from localhost.localdomain (217.23.187.157) by msexch01.omp.ru
+ (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Wed, 3 Jul
+ 2024 12:23:35 +0300
+From: Roman Smirnov <r.smirnov@omp.ru>
 To: <linux-bluetooth@vger.kernel.org>
-CC: <pmenzel@molgen.mpg.de>, <luiz.dentz@gmail.com>,
-        <quic_mohamull@quicinc.com>, <quic_hbandi@quicinc.com>,
-        <quic_anubhavg@quicinc.com>
-Subject: [PATCH BlueZ] Set BREDR not supported bit in AD Flag when discoverable is off
-Date: Wed, 3 Jul 2024 14:35:49 +0530
-Message-ID: <20240703090549.6702-1-quic_prathm@quicinc.com>
-X-Mailer: git-send-email 2.17.1
+CC: Roman Smirnov <r.smirnov@omp.ru>
+Subject: [PATCH BlueZ v1] shared/bap: move checks for NULL before dereferencing
+Date: Wed, 3 Jul 2024 12:23:22 +0300
+Message-ID: <20240703092322.16659-1-r.smirnov@omp.ru>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nalasex01b.na.qualcomm.com (10.47.209.197)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: wE74rUvCgKI68eey4hCPt5mxW2RdXzeZ
-X-Proofpoint-ORIG-GUID: wE74rUvCgKI68eey4hCPt5mxW2RdXzeZ
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-07-03_05,2024-07-02_02,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999
- priorityscore=1501 impostorscore=0 bulkscore=0 spamscore=0 mlxscore=0
- clxscore=1015 phishscore=0 malwarescore=0 adultscore=0 lowpriorityscore=0
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2406140001 definitions=main-2407030067
+X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
+ (10.188.4.12)
+X-KSE-ServerInfo: msexch01.omp.ru, 9
+X-KSE-AntiSpam-Interceptor-Info: scan successful
+X-KSE-AntiSpam-Version: 6.1.0, Database issued on: 07/03/2024 08:57:23
+X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
+X-KSE-AntiSpam-Method: none
+X-KSE-AntiSpam-Rate: 59
+X-KSE-AntiSpam-Info: Lua profiles 186300 [Jul 03 2024]
+X-KSE-AntiSpam-Info: Version: 6.1.0.4
+X-KSE-AntiSpam-Info: Envelope from: r.smirnov@omp.ru
+X-KSE-AntiSpam-Info: LuaCore: 21 0.3.21
+ ebee5449fc125b2da45f1a6a6bc2c5c0c3ad0e05
+X-KSE-AntiSpam-Info: {rep_avail}
+X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
+X-KSE-AntiSpam-Info: {relay has no DNS name}
+X-KSE-AntiSpam-Info: {SMTP from is not routable}
+X-KSE-AntiSpam-Info: {Found in DNSBL: 217.23.187.157 in (user)
+ b.barracudacentral.org}
+X-KSE-AntiSpam-Info: {Found in DNSBL: 217.23.187.157 in (user)
+ dbl.spamhaus.org}
+X-KSE-AntiSpam-Info:
+	omp.ru:7.1.1;127.0.0.199:7.1.2;217.23.187.157:7.1.2;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1
+X-KSE-AntiSpam-Info: ApMailHostAddress: 217.23.187.157
+X-KSE-AntiSpam-Info: {DNS response errors}
+X-KSE-AntiSpam-Info: Rate: 59
+X-KSE-AntiSpam-Info: Status: not_detected
+X-KSE-AntiSpam-Info: Method: none
+X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
+ smtp.mailfrom=omp.ru;dkim=none
+X-KSE-Antiphishing-Info: Clean
+X-KSE-Antiphishing-ScanningType: Heuristic
+X-KSE-Antiphishing-Method: None
+X-KSE-Antiphishing-Bases: 07/03/2024 09:00:00
+X-KSE-Antivirus-Interceptor-Info: scan successful
+X-KSE-Antivirus-Info: Clean, bases: 7/3/2024 6:47:00 AM
+X-KSE-Attachment-Filter-Triggered-Rules: Clean
+X-KSE-Attachment-Filter-Triggered-Filters: Clean
+X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
-From: Prathibha Madugonde <quic_prathm@quicinc.com>
+It is necessary to prevent dereferencing of NULL pointers.
 
-Fix for GAP/DISC/NONM/BV-02-C
-As per GAP.TS.p44 test spec
-IUT does not contain General Discoverable mode and Limited Discoverable
-mode in the AD Type Flag. IUT shall send AD Type Flag to PASS the test
-case, thus set BR/EDR not supported bit in the AD Type Flag when
-discoverable is off.
-
-Test steps:
-From DUT, bluetoothctl go to menu advertise
-set discoverable to off and then advertise on.
-In AD Flags BR/EDR not supported BIT shall be set.
-
+Found with the SVACE static analysis tool.
 ---
- src/advertising.c | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
+ src/shared/bap.c | 12 +++++++-----
+ 1 file changed, 7 insertions(+), 5 deletions(-)
 
-diff --git a/src/advertising.c b/src/advertising.c
-index 5d373e088..e73191c2c 100644
---- a/src/advertising.c
-+++ b/src/advertising.c
-@@ -734,8 +734,7 @@ static bool set_flags(struct btd_adv_client *client, uint8_t flags)
- 	/* Set BR/EDR Not Supported if adapter is not discoverable but the
- 	 * instance is.
- 	 */
--	if ((flags & (BT_AD_FLAG_GENERAL | BT_AD_FLAG_LIMITED)) &&
--			!btd_adapter_get_discoverable(client->manager->adapter))
-+	if (!btd_adapter_get_discoverable(client->manager->adapter))
- 		flags |= BT_AD_FLAG_NO_BREDR;
+diff --git a/src/shared/bap.c b/src/shared/bap.c
+index ec54da341..defeeb635 100644
+--- a/src/shared/bap.c
++++ b/src/shared/bap.c
+@@ -1870,11 +1870,11 @@ static unsigned int bap_ucast_disable(struct bt_bap_stream *stream,
  
- 	if (!bt_ad_add_flags(client->data, &flags, 1))
-@@ -1499,6 +1498,12 @@ static DBusMessage *parse_advertisement(struct btd_adv_client *client)
- 		goto fail;
- 	}
+ static uint8_t stream_stop(struct bt_bap_stream *stream, struct iovec *rsp)
+ {
+-	DBG(stream->bap, "stream %p", stream);
+-
+ 	if (!stream)
+ 		return 0;
  
-+	/* GAP.TS.p44 Test Spec GAP/DISC/NONM/BV-02-C
-+	 * BR/EDR Not Supported BIT shall be included
-+	 * in the AD Type flag.
-+	 */
-+	set_flags(client, bt_ad_get_flags(client->data));
++	DBG(stream->bap, "stream %p", stream);
 +
- 	err = refresh_advertisement(client, add_adv_callback);
+ 	ascs_ase_rsp_success(rsp, stream->ep->id);
  
- 	if (!err)
+ 	stream_set_state(stream, BT_BAP_STREAM_STATE_QOS);
+@@ -2751,12 +2751,12 @@ static uint8_t ascs_start(struct bt_ascs *ascs, struct bt_bap *bap,
+ 
+ static uint8_t stream_disable(struct bt_bap_stream *stream, struct iovec *rsp)
+ {
+-	DBG(stream->bap, "stream %p", stream);
+-
+ 	if (!stream || stream->ep->state == BT_BAP_STREAM_STATE_QOS ||
+ 			stream->ep->state == BT_BAP_STREAM_STATE_IDLE)
+ 		return 0;
+ 
++	DBG(stream->bap, "stream %p", stream);
++
+ 	ascs_ase_rsp_success(rsp, stream->ep->id);
+ 
+ 	/* Sink can autonomously transit to QOS while source needs to go to
+@@ -5830,11 +5830,13 @@ int bt_bap_stream_cancel(struct bt_bap_stream *stream, unsigned int id)
+ int bt_bap_stream_io_link(struct bt_bap_stream *stream,
+ 				struct bt_bap_stream *link)
+ {
+-	struct bt_bap *bap = stream->bap;
++	struct bt_bap *bap;
+ 
+ 	if (!stream || !link || stream == link)
+ 		return -EINVAL;
+ 
++	bap = stream->bap;
++
+ 	if (stream->link || link->link)
+ 		return -EALREADY;
+ 
 -- 
-2.17.1
+2.43.0
 
