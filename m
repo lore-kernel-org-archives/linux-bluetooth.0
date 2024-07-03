@@ -1,139 +1,130 @@
-Received: from mail-io1-f69.google.com (mail-io1-f69.google.com [209.85.166.69])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtpbgau2.qq.com (smtpbgau2.qq.com [54.206.34.216])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19BA9138E
-	for <linux-bluetooth@vger.kernel.org>; Wed,  3 Jul 2024 01:47:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.69
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7D591DA31A
+	for <linux-bluetooth@vger.kernel.org>; Wed,  3 Jul 2024 02:49:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.206.34.216
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719971245; cv=none; b=lvJpbMVIiN4Gxsdjeat9QqmhHH7YNgrWBvo8D70tZ1DIg1NppnzsYa72REPCmPPAclxH8KY9NxnQQSoidZ2mGs7ricqY1dqi4osX0vUtoHSwzBPEeDR1pS8MOtH4j3Y3Yc3lF/Gga+uTH9VY5nAm+D8ddwQWMBhznwDAyQUdVQs=
+	t=1719974963; cv=none; b=Yt9tsTi60xzbxHjD9dVMpGnWVI1Bfj2Mxhp/wI0hbJt9Nfx/3rhUtxY0JnyP3BGh58hnSM5CgPsm6lxwYhjymNx7myynco8Cm7598Sfxz4nLx8ffCgi3Klnl92Bs3cM/E4Qv5+D9gzBMlG3SqHU6KkOpN+bZ9PWTpyFzgpZdwus=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719971245; c=relaxed/simple;
-	bh=u61DftUVQz151WIDun9uwfuzS1FTADIk6nzI9CWYOCk=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=BYXo4YHn7kgV4l/IrbGz5YBJe3XO6uxFk42O4DBDu6iON8CAjUqKXYNz6fEwnGd5PRy8jkM0mjxrNk1mnJoaGDL3ea21UykOTBxf0xEB44NOE6wNDIURxslHgLNQoyDnZr/lg0E5hRQCR1UY/Z6YAyRcJB+jbVEhh7FyXikXRz4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.69
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f69.google.com with SMTP id ca18e2360f4ac-7f3ccfec801so488924839f.3
-        for <linux-bluetooth@vger.kernel.org>; Tue, 02 Jul 2024 18:47:23 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719971243; x=1720576043;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=jkeba/dbYPdpJ4NO4L1/wnos1F3m3o/DJjhyoISgjSQ=;
-        b=pvRVsmnaPxgga7oqNM97fJHOD6vz2xTo+Rlam0GcZIuTeXUeeYsfK2LZIrxqdzQMt6
-         cTiXSsM95b59IULHXIsh8GxPkGrPn8BJZSkKP3NXeK5hfGUFFF06qDJokNOIVERjKlyc
-         t8ePRLc9KwRQrgxLQokotwZj69yMCjzu4ZCoo9HtTlkFH1oXEdlA+l8het2OCu2tRmG2
-         ykiJ5b37llLQWQ6MsTvdyGkXMrHlNr2JsbOT4TQjpABYkGSUR+oOERzghz6E8g5K0R9a
-         /8FV0Rsy77NNoqQeNnIyLeLEOpQ44ZdoBMg9l1sq0fBPuYnmRfCpdTyU1HjmRC64Ch5Z
-         fRtQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVTOGipArvMoT2XFvwDTCkfU9fTXa6mNHiKeuiwjUgreCSj7z7qnLce3GNWqHSRS9sMxSgYIZEi/NoaqLAzTUhWkgQhQNxL+4flItlKNWFK
-X-Gm-Message-State: AOJu0YzHs1tuHR6yhcZGhP8Yj2vNkOC5uso0pi44yHezO7Ga+irTrr2M
-	fW+73DswEePAfBuNhtN04upt+FshSlU5q2CwhNBS8EKLd0Fa8BDLBHBhEdYoGZKhVJahZ5aknVm
-	aAqnJsanqs0F0lpDjqGTAiH8NVMt2iUKiU6tMfiWcJf6cXHwtSl9iSpY=
-X-Google-Smtp-Source: AGHT+IGvAF21Ecy0r7MRL8sozef9gZaW+C1fiytyb0JJtI6NzIzJMNezSSTlDTSDgbzg605XJRi8lmC4cCYDAEh1ubvsjfClG7Aa
+	s=arc-20240116; t=1719974963; c=relaxed/simple;
+	bh=XQsLNaXEeDpcLKomuQmacwfiPy+MhpCiMgaXEN1DDyk=;
+	h=From:To:Cc:Subject:Mime-Version:Content-Type:Date:Message-ID:
+	 References:In-Reply-To; b=Vcc/WC1ofNHnHukREC+QuacNKqOYh8Bwn9f0gFEvf17xLHYi5gNAB8zbaix4arz78j27FEYARIcrfCq38/w8iForfuj7c/TBY7YdSdeTEXv/7Vl+AFGlWyTGnYtBUuPVP8dmFBbo8WQTBlXjnONYUI137f69jmoZR9XTCID+qtw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=uniontech.com; spf=pass smtp.mailfrom=uniontech.com; arc=none smtp.client-ip=54.206.34.216
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=uniontech.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniontech.com
+X-QQ-GoodBg: 2
+X-QQ-SSF: 00400000000000F0
+X-QQ-XMRINFO: Mp0Kj//9VHAxr69bL5MkOOs=
+X-QQ-FEAT: swyrzWPvyR3q469vCwOgsHbG0zZ38z0y9X3FEhzDB0dkSXj61K8yNOc+glH9n
+	J8yAQitRSx3sLhXweTHI3OspIzVzBH0vWk4I+a94YPdXWJX0j7lc2sCvlKO0DfqKlH9aA/P
+	GjiOCRLkFrvrLUTTXurbcdj+G8Last0kPyJAo1jYGfhsZp2qJ6YqFDi6he9dWOiW322pB6/
+	28/D3NQtekRvJZA4erKhwLhR/c2fYWvuk3VEx3Bu2zRW9Tvwvg4bI1ocfCWWkSwLz5BIa6E
+	PEtL9L59EXJk903TTDOSHMYzEChYchfcpBQuGe8QbNrpfaodKnpnj8I2cPLBDfVmF7dJMBq
+	Cjy7WkNE7zHnOAMt7gzNbikJwwwF7hmavaviBjbNkPbPJraHfDHYLYhERMMLzYnD4RHG1Ua
+X-QQ-BUSINESS-ORIGIN: 2
+X-QQ-Originating-IP: VOzOUrgu60X5xBfeuhpM/+u79E7+c5qYqh8bH26IBqM=
+X-QQ-STYLE: 
+X-QQ-mid: maileng7t1719974938t3451142
+From: "=?utf-8?B?6LW15oiQ5LmJ?=" <zhaochengyi@uniontech.com>
+To: "=?utf-8?B?THVpeiBBdWd1c3RvIHZvbiBEZW50eg==?=" <luiz.dentz@gmail.com>
+Cc: "=?utf-8?B?bGludXgtYmx1ZXRvb3Ro?=" <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH] adapter: Add retry when bonding device returns connection failure
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-Received: by 2002:a05:6638:2389:b0:4b9:e5b4:67fd with SMTP id
- 8926c6da1cb9f-4bbb6ec54d2mr581759173.1.1719971243327; Tue, 02 Jul 2024
- 18:47:23 -0700 (PDT)
-Date: Tue, 02 Jul 2024 18:47:23 -0700
-In-Reply-To: <0000000000004a975c0613c7f382@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000fb901b061c4e0282@google.com>
-Subject: Re: [syzbot] [bluetooth?] possible deadlock in touch_wq_lockdep_map
-From: syzbot <syzbot+91dbdfecdd3287734d8e@syzkaller.appspotmail.com>
-To: johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, luiz.dentz@gmail.com, marcel@holtmann.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Type: text/plain;
+	charset="utf-8"
+Content-Transfer-Encoding: base64
+Date: Wed, 3 Jul 2024 10:48:58 +0800
+X-Priority: 3
+Message-ID: <tencent_63CAEF895EA655526B870939@qq.com>
+X-QQ-MIME: TCMime 1.0 by Tencent
+X-Mailer: QQMail 2.x
+X-QQ-Mailer: QQMail 2.x
+References: <20240701101243.2902-1-zhaochengyi@uniontech.com>
+	<CABBYNZK8ZvoHCQjo=rj7yt-0omZ8zgTFOueCvL5KoghhY_1nwA@mail.gmail.com>
+In-Reply-To: <CABBYNZK8ZvoHCQjo=rj7yt-0omZ8zgTFOueCvL5KoghhY_1nwA@mail.gmail.com>
+X-QQ-ReplyHash: 2263558599
+X-BIZMAIL-ID: 11084438353323583116
+X-QQ-SENDSIZE: 520
+Received: from qq.com (unknown [127.0.0.1])
+	by smtp.qq.com (ESMTP) with SMTP
+	id ; Wed, 03 Jul 2024 10:49:00 +0800 (CST)
+Feedback-ID: maileng:uniontech.com:qybglogicsvrgz:qybglogicsvrgz8a-1
 
-syzbot has found a reproducer for the following issue on:
+SGkgZ3V5cywNCg0KSSB3b3VsZCBsaWtlIHRvIGFzayBpZiB0aGUgcGF0Y2ggSSBzdWJtaXR0
+ZWQgaXMgdmFsdWFibGUuIA0KTWF5YmUgaXRzIGVmZmVjdCBpcyB3ZWFrLCBidXQgZG8geW91
+IGFncmVlIHRvIG1lcmdlIGl0PyBUaGFua3MuDQoNCj4NCj5XaGVuIGEgdXNlciBpbml0aWF0
+ZXMgcGFpcmluZyB3aXRoIGEgQkxFIEJsdWV0b290aCBtb3VzZSwNCj5NR01UX1NUQVRVU19D
+T05ORUNUX0ZBSUxFRCgweDA0KSBpcyByZXR1cm5lZCB3aXRoIGEgbG93DQo+cHJvYmFiaWxp
+dHksIHJlc3VsdGluZyBpbiBwYWlyaW5nIGZhaWx1cmUuIFRvIGltcHJvdmUNCj51c2VyIGV4
+cGVyaWVuY2UsIHJldHJ5IGJvbmRpbmcgaXMgcGVyZm9ybWVkIHdoZW4NCj5NR01UX1NUQVRV
+U19DT05ORUNUX0ZBSUxFRCBpcyByZXR1cm5lZC4NCj4NCj5KdXN0IHJldHJ5IG9uY2Ugd2hl
+biBNR01UX1NUQVRVU19DT05ORUNUX0ZBSUxFRCBvY2N1cnMNCj5iZWNhdXNlIHRoaXMgc3Rh
+dHVzIG1heSBiZSBjb250aW51b3VzbHkgcmV0dXJuZWQuDQo+DQo+RGVidWcgbG9nOg0KPmJs
+dWV0b290aGRbMTUzOV06IHNyYy9hZGFwdGVyLmM6cGFpcl9kZXZpY2VfY29tcGxldGUoKSBD
+b25uZWN0IEZhaWxlZA0KPigweDA0KQ0KPmJsdWV0b290aGRbMTUzOV06IHNyYy9hZGFwdGVy
+LmM6Ym9uZGluZ19hdHRlbXB0X2NvbXBsZXRlKCkgaGNpMCBiZGFkZHINCj5ERDpFQzowRjo1
+NzpBOToyRSB0eXBlIDIgc3RhdHVzIDB4NA0KPmJsdWV0b290aGRbMTUzOV06IHNyYy9kZXZp
+Y2UuYzpkZXZpY2VfYm9uZGluZ19jb21wbGV0ZSgpIGJvbmRpbmcNCj4weDU1OTFmODcyMzAg
+c3RhdHVzIDB4MDQNCj5ibHVldG9vdGhkWzE1MzldOiBzcmMvZGV2aWNlLmM6YnRkX2Rldmlj
+ZV9zZXRfdGVtcG9yYXJ5KCkgdGVtcG9yYXJ5IDENCj5ibHVldG9vdGhkWzE1MzldOiBzcmMv
+ZGV2aWNlLmM6ZGV2aWNlX2JvbmRpbmdfZmFpbGVkKCkgc3RhdHVzIDQNCj4NCj5IQ0kgcGFj
+a2FnZToNCj5GcmFtZSAyOTY5OiA3IGJ5dGVzIG9uIHdpcmUgKDU2IGJpdHMpLCA3IGJ5dGVz
+IGNhcHR1cmVkICg1NiBiaXRzKQ0KPkJsdWV0b290aA0KPkJsdWV0b290aCBIQ0kgSDQNCj5C
+bHVldG9vdGggSENJIEV2ZW50IC0gRGlzY29ubmVjdCBDb21wbGV0ZQ0KPkV2ZW50IENvZGU6
+IERpc2Nvbm5lY3QgQ29tcGxldGUgKDB4MDUpDQo+UGFyYW1ldGVyIFRvdGFsIExlbmd0aDog
+NA0KPlN0YXR1czogU3VjY2VzcyAoMHgwMCkNCj5Db25uZWN0aW9uIEhhbmRsZTogMHgwMDQw
+DQo+UmVhc29uOiBDb25uZWN0aW9uIEZhaWxlZCB0byBiZSBFc3RhYmxpc2hlZCAoMHgzZSkN
+Cj4tLS0NCj4gc3JjL2FkYXB0ZXIuYyB8ICA0ICsrKysNCj4gc3JjL2RldmljZS5jICB8IDI0
+ICsrKysrKysrKysrKysrKysrKysrKysrKw0KPiBzcmMvZGV2aWNlLmggIHwgIDIgKysNCj4g
+MyBmaWxlcyBjaGFuZ2VkLCAzMCBpbnNlcnRpb25zKCspDQo+DQo+ZGlmZiAtLWdpdCBhL3Ny
+Yy9hZGFwdGVyLmMgYi9zcmMvYWRhcHRlci5jDQo+aW5kZXggYmI0OWExZWNhLi41NzRmYTc2
+NjUgMTAwNjQ0DQo+LS0tIGEvc3JjL2FkYXB0ZXIuYw0KPisrKyBiL3NyYy9hZGFwdGVyLmMN
+Cj5AQCAtODM3MSw2ICs4MzcxLDEwIEBAIHN0YXRpYyB2b2lkIGJvbmRpbmdfYXR0ZW1wdF9j
+b21wbGV0ZShzdHJ1Y3QgYnRkX2FkYXB0ZXIgKmFkYXB0ZXIsDQo+IAl9DQo+IAl9DQo+IA0K
+PisJLyogUmV0cnkgb25jZSB3aGVuIHN0YXR1cyBpcyBNR01UX1NUQVRVU19DT05ORUNUX0ZB
+SUxFRCAqLw0KPisJaWYgKGRldmljZSAmJiBkZXZpY2VfYm9uZGluZ19jaGVja19jb25uZWN0
+aW9uKGRldmljZSwgc3RhdHVzKSkNCj4rCXJldHVybjsNCj4rDQo+IAkvKiBJZ25vcmUgZGlz
+Y29ubmVjdHMgZHVyaW5nIHJldHJ5LiAqLw0KPiAJaWYgKHN0YXR1cyA9PSBNR01UX1NUQVRV
+U19ESVNDT05ORUNURUQgJiYNCj4gCWRldmljZSAmJiBkZXZpY2VfaXNfcmV0cnlpbmcoZGV2
+aWNlKSkNCj5kaWZmIC0tZ2l0IGEvc3JjL2RldmljZS5jIGIvc3JjL2RldmljZS5jDQo+aW5k
+ZXggMDk3YjFmYmJhLi4xMmZhYmJmZjEgMTAwNjQ0DQo+LS0tIGEvc3JjL2RldmljZS5jDQo+
+KysrIGIvc3JjL2RldmljZS5jDQo+QEAgLTI5MCw2ICsyOTAsOCBAQCBzdHJ1Y3QgYnRkX2Rl
+dmljZSB7DQo+IAl0aW1lX3QJbmFtZV9yZXNvbHZlX2ZhaWxlZF90aW1lOw0KPiANCj4gCWlu
+dDhfdAl2b2x1bWU7DQo+Kw0KPisJdWludDhfdCBib25kaW5nX3N0YXR1czsNCj4gfTsNCj4g
+DQo+IHN0YXRpYyBjb25zdCB1aW50MTZfdCB1dWlkX2xpc3RbXSA9IHsNCj5AQCAtNjU1OSw2
+ICs2NTYxLDI4IEBAIGJvb2wgZGV2aWNlX3JlbW92ZV9zdmNfY29tcGxldGVfY2FsbGJhY2so
+c3RydWN0IGJ0ZF9kZXZpY2UgKmRldiwNCj4gCXJldHVybiBmYWxzZTsNCj4gfQ0KPiANCj4r
+Z2Jvb2xlYW4gZGV2aWNlX2JvbmRpbmdfY2hlY2tfY29ubmVjdGlvbihzdHJ1Y3QgYnRkX2Rl
+dmljZSAqZGV2aWNlLA0KPisJdWludDhfdCBzdGF0dXMpDQo+K3sNCj4rCWlmIChzdGF0dXMg
+PT0gTUdNVF9TVEFUVVNfQ09OTkVDVF9GQUlMRUQpIHsNCj4rDQo+KwlpZiAoZGV2aWNlLT5i
+b25kaW5nX3N0YXR1cyAhPSBNR01UX1NUQVRVU19DT05ORUNUX0ZBSUxFRCkgew0KPisJZGV2
+aWNlLT5ib25kaW5nX3N0YXR1cyA9IE1HTVRfU1RBVFVTX0NPTk5FQ1RfRkFJTEVEOw0KPisN
+Cj4rCURCRygic3RhdHVzIGlzIDB4JXgsIHJldHJ5IG9uY2UuIiwgc3RhdHVzKTsNCj4rDQo+
+KwlpZiAoZGV2aWNlX2JvbmRpbmdfYXR0ZW1wdF9yZXRyeShkZXZpY2UpID09IDApDQo+Kwly
+ZXR1cm4gVFJVRTsNCj4rCX0NCj4rCX0gZWxzZSB7DQo+KwlkZXZpY2UtPmJvbmRpbmdfc3Rh
+dHVzID0gc3RhdHVzOw0KPisNCj4rCURCRygiZGV2aWNlLT5ib25kaW5nX3N0YXR1cyBpcyAw
+eCV4LiIsIGRldmljZS0+Ym9uZGluZ19zdGF0dXMpOw0KPisJfQ0KPisNCj4rCXJldHVybiBG
+QUxTRTsNCj4rfQ0KPisNCj4gZ2Jvb2xlYW4gZGV2aWNlX2lzX2JvbmRpbmcoc3RydWN0IGJ0
+ZF9kZXZpY2UgKmRldmljZSwgY29uc3QgY2hhciAqc2VuZGVyKQ0KPiB7DQo+IAlzdHJ1Y3Qg
+Ym9uZGluZ19yZXEgKmJvbmRpbmcgPSBkZXZpY2UtPmJvbmRpbmc7DQo+ZGlmZiAtLWdpdCBh
+L3NyYy9kZXZpY2UuaCBiL3NyYy9kZXZpY2UuaA0KPmluZGV4IDA3OTRmOTJkMC4uN2MyNjlj
+YzRkIDEwMDY0NA0KPi0tLSBhL3NyYy9kZXZpY2UuaA0KPisrKyBiL3NyYy9kZXZpY2UuaA0K
+PkBAIC0xMTEsNiArMTExLDggQEAgdWludDhfdCBidGRfZGV2aWNlX2dldF9iZGFkZHJfdHlw
+ZShzdHJ1Y3QgYnRkX2RldmljZSAqZGV2KTsNCj4gYm9vbCBkZXZpY2VfaXNfcmV0cnlpbmco
+c3RydWN0IGJ0ZF9kZXZpY2UgKmRldmljZSk7DQo+IHZvaWQgZGV2aWNlX2JvbmRpbmdfY29t
+cGxldGUoc3RydWN0IGJ0ZF9kZXZpY2UgKmRldmljZSwgdWludDhfdCBiZGFkZHJfdHlwZSwN
+Cj4gCXVpbnQ4X3Qgc3RhdHVzKTsNCj4rZ2Jvb2xlYW4gZGV2aWNlX2JvbmRpbmdfY2hlY2tf
+Y29ubmVjdGlvbihzdHJ1Y3QgYnRkX2RldmljZSAqZGV2aWNlLA0KPisJdWludDhfdCBzdGF0
+dXMpOw0KPiBnYm9vbGVhbiBkZXZpY2VfaXNfYm9uZGluZyhzdHJ1Y3QgYnRkX2RldmljZSAq
+ZGV2aWNlLCBjb25zdCBjaGFyICpzZW5kZXIpOw0KPiB2b2lkIGRldmljZV9ib25kaW5nX2F0
+dGVtcHRfZmFpbGVkKHN0cnVjdCBidGRfZGV2aWNlICpkZXZpY2UsIHVpbnQ4X3Qgc3RhdHVz
+KTsNCj4gdm9pZCBkZXZpY2VfYm9uZGluZ19mYWlsZWQoc3RydWN0IGJ0ZF9kZXZpY2UgKmRl
+dmljZSwgdWludDhfdCBzdGF0dXMpOw0KDQpDaGVlcnMsDQpDaGVuZ3lp
 
-HEAD commit:    734610514cb0 Merge tag 'erofs-for-6.10-rc7-fixes' of git:/..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=151ea512980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=de2d4dc103148cd6
-dashboard link: https://syzkaller.appspot.com/bug?extid=91dbdfecdd3287734d8e
-compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1424d281980000
-
-Downloadable assets:
-disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/7bc7510fe41f/non_bootable_disk-73461051.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/d390d5c7156f/vmlinux-73461051.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/b56ef48ffa7e/bzImage-73461051.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+91dbdfecdd3287734d8e@syzkaller.appspotmail.com
-
-Bluetooth: hci0: hardware error 0x20
-Bluetooth: hci0: Opcode 0x0c03 failed: -110
-============================================
-WARNING: possible recursive locking detected
-6.10.0-rc6-syzkaller-00055-g734610514cb0 #0 Not tainted
---------------------------------------------
-kworker/u33:1/4633 is trying to acquire lock:
-ffff88802b9cc148 ((wq_completion)hci0){+.+.}-{0:0}, at: touch_wq_lockdep_map+0x6e/0x120 kernel/workqueue.c:3895
-
-but task is already holding lock:
-ffff88802b9cc148 ((wq_completion)hci0){+.+.}-{0:0}, at: process_one_work+0x1277/0x1b40 kernel/workqueue.c:3223
-
-other info that might help us debug this:
- Possible unsafe locking scenario:
-
-       CPU0
-       ----
-  lock((wq_completion)hci0);
-  lock((wq_completion)hci0);
-
- *** DEADLOCK ***
-
- May be due to missing lock nesting notation
-
-2 locks held by kworker/u33:1/4633:
- #0: ffff88802b9cc148 ((wq_completion)hci0){+.+.}-{0:0}, at: process_one_work+0x1277/0x1b40 kernel/workqueue.c:3223
- #1: ffffc90025177d80 ((work_completion)(&hdev->error_reset)){+.+.}-{0:0}, at: process_one_work+0x921/0x1b40 kernel/workqueue.c:3224
-
-stack backtrace:
-CPU: 2 PID: 4633 Comm: kworker/u33:1 Not tainted 6.10.0-rc6-syzkaller-00055-g734610514cb0 #0
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
-Workqueue: hci0 hci_error_reset
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:88 [inline]
- dump_stack_lvl+0x116/0x1f0 lib/dump_stack.c:114
- check_deadlock kernel/locking/lockdep.c:3062 [inline]
- validate_chain kernel/locking/lockdep.c:3856 [inline]
- __lock_acquire+0x20e6/0x3b30 kernel/locking/lockdep.c:5137
- lock_acquire kernel/locking/lockdep.c:5754 [inline]
- lock_acquire+0x1b1/0x560 kernel/locking/lockdep.c:5719
- touch_wq_lockdep_map+0x78/0x120 kernel/workqueue.c:3895
- __flush_workqueue+0x129/0x1200 kernel/workqueue.c:3937
- drain_workqueue+0x18f/0x3d0 kernel/workqueue.c:4101
- destroy_workqueue+0xc2/0xaa0 kernel/workqueue.c:5817
- hci_release_dev+0x14e/0x660 net/bluetooth/hci_core.c:2795
- bt_host_release+0x6a/0xb0 net/bluetooth/hci_sysfs.c:94
- device_release+0xa1/0x240 drivers/base/core.c:2581
- kobject_cleanup lib/kobject.c:689 [inline]
- kobject_release lib/kobject.c:720 [inline]
- kref_put include/linux/kref.h:65 [inline]
- kobject_put+0x1fa/0x5b0 lib/kobject.c:737
- put_device+0x1f/0x30 drivers/base/core.c:3787
- process_one_work+0x9c5/0x1b40 kernel/workqueue.c:3248
- process_scheduled_works kernel/workqueue.c:3329 [inline]
- worker_thread+0x6c8/0xf30 kernel/workqueue.c:3409
- kthread+0x2c1/0x3a0 kernel/kthread.c:389
- ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
- </TASK>
-
-
----
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
