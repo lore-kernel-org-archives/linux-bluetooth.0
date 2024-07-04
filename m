@@ -1,29 +1,29 @@
 Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E16CE1A4F2B
-	for <linux-bluetooth@vger.kernel.org>; Thu,  4 Jul 2024 09:08:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25F5F1AAE13
+	for <linux-bluetooth@vger.kernel.org>; Thu,  4 Jul 2024 09:08:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720084110; cv=none; b=X7djPY3oJhVUoqVT+Ngmkz9QLpjZcFoMta6Nx1MhE69OUAxvDfzNGk6qnE4kyhVKbn/oGi+KZG/j7odP3CoBJUpBQ5xeVp0xjglD0zRKp4NIsOGT721X7dSRU1bvDBvdX/5o4GxS9WipPEMknwOtzgN7d9II9qMw7bsj0DJ1wUM=
+	t=1720084114; cv=none; b=Ww5OWkRzCAa7bInCA06TU277Z2VoWpZTW0U6UD4mKP2lSE10DzUAmUm5IYMOkXLtDkhl/oLVTSCHoSyfyek4K2yrXkn3SGGZbrhoHY7RqrBlyZewFJBiA42Fd88SR3B1bnDr5N3UPeJB6nTCh+IDy+uVlxe2qkRQfM68A0DiC0w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720084110; c=relaxed/simple;
-	bh=xmE/3st/WNbHueSfgiZvWHYu5FfznyOA/5J+X25kIHM=;
+	s=arc-20240116; t=1720084114; c=relaxed/simple;
+	bh=/c7CEkmFqGVQZhkNfLm+JuaS2sTOodLQ0BydY6Xak14=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=hUH9JV1APp7MWrF6zNKSOHzi5K2QWcY/JVhwd9RppsAXG5uP9H9yJzbGMWCjJQzUOYF4XXReO9pq/CV/2TnU0hSULvxp5Kf1LYaL/OANyPgWLRUbGw1nPZxLKjL4r2P5s8OQEyQDTW0z44AOmP+6u+bZ7MIS46X4nV+Y9UwqvoY=
+	 MIME-Version:Content-Type; b=kYNA+XmnKe55xnGwKeeMUt4UztaVhGb87Qp5ysIZYtiLukdvo9mmsi9anAvNURQzTbq7D5KlxRa+QaSlP+asuK82ir4JE0FmtzwROugWuc6RN7S8zKwkUFZgaNHNrsLX19oYRE+rSV5gGD0XDolC9AdZkMxlGCNbaycIBjqbN88=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
 Received: from localhost.localdomain (217.23.187.157) by msexch01.omp.ru
  (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Thu, 4 Jul
- 2024 12:08:17 +0300
+ 2024 12:08:20 +0300
 From: Roman Smirnov <r.smirnov@omp.ru>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Roman Smirnov <r.smirnov@omp.ru>
-Subject: [PATCH BlueZ v2 1/3] shared/vcp: prevent dereferencing of NULL pointers
-Date: Thu, 4 Jul 2024 12:07:52 +0300
-Message-ID: <20240704090756.31351-2-r.smirnov@omp.ru>
+Subject: [PATCH BlueZ v2 2/3] client/player: fix the order of args in cmd_register_endpoint()
+Date: Thu, 4 Jul 2024 12:07:53 +0300
+Message-ID: <20240704090756.31351-3-r.smirnov@omp.ru>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240704090756.31351-1-r.smirnov@omp.ru>
 References: <20240704090756.31351-1-r.smirnov@omp.ru>
@@ -56,15 +56,12 @@ X-KSE-AntiSpam-Info: {Found in DNSBL: 217.23.187.157 in (user)
  b.barracudacentral.org}
 X-KSE-AntiSpam-Info:
 	127.0.0.199:7.1.2;omp.ru:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;217.23.187.157:7.1.2
-X-KSE-AntiSpam-Info: FromAlignment: s
-X-KSE-AntiSpam-Info: {rdns complete}
-X-KSE-AntiSpam-Info: {fromrtbl complete}
 X-KSE-AntiSpam-Info: ApMailHostAddress: 217.23.187.157
 X-KSE-AntiSpam-Info: {DNS response errors}
 X-KSE-AntiSpam-Info: Rate: 59
 X-KSE-AntiSpam-Info: Status: not_detected
 X-KSE-AntiSpam-Info: Method: none
-X-KSE-AntiSpam-Info: Auth:dmarc=none header.from=omp.ru;spf=none
+X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
  smtp.mailfrom=omp.ru;dkim=none
 X-KSE-Antiphishing-Info: Clean
 X-KSE-Antiphishing-ScanningType: Heuristic
@@ -76,53 +73,27 @@ X-KSE-Attachment-Filter-Triggered-Rules: Clean
 X-KSE-Attachment-Filter-Triggered-Filters: Clean
 X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
-Using util_memdup() will terminate the program if memory
-allocation fails.
+Based on the function prototype, ep->cid and ep->vid should be swapped.
 
 Found with the SVACE static analysis tool.
 ---
- V1 -> V2: util_memdup() is used instead of checking for NULL
- src/shared/vcp.c | 20 ++++----------------
- 1 file changed, 4 insertions(+), 16 deletions(-)
+ V1 -> V2: the patch header is now shorter
+ client/player.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/src/shared/vcp.c b/src/shared/vcp.c
-index 06264a241..4597bebf6 100644
---- a/src/shared/vcp.c
-+++ b/src/shared/vcp.c
-@@ -2127,14 +2127,8 @@ static void read_vocs_audio_descriptor(struct bt_vcp *vcp, bool success,
- 		return;
- 	}
+diff --git a/client/player.c b/client/player.c
+index 0d031e4b0..2569b38e9 100644
+--- a/client/player.c
++++ b/client/player.c
+@@ -3388,7 +3388,7 @@ static void cmd_register_endpoint(int argc, char *argv[])
  
--	vocs_ao_dec_r = malloc(length+1);
--	memset(vocs_ao_dec_r, 0, length+1);
--	memcpy(vocs_ao_dec_r, value, length);
--
--	if (!vocs_ao_dec_r) {
--		DBG(vcp, "Unable to get VOCS Audio Descriptor");
--		return;
--	}
-+	vocs_ao_dec_r = util_memdup(value, length + 1);
-+	memset(vocs_ao_dec_r + length, 0, 1);
- 
- 	DBG(vcp, "VOCS Audio Descriptor: %s", vocs_ao_dec_r);
- 	free(vocs_ao_dec_r);
-@@ -2531,14 +2525,8 @@ static void read_aics_audio_ip_description(struct bt_vcp *vcp, bool success,
- 		return;
- 	}
- 
--	ip_descrptn = malloc(length+1);
--	memset(ip_descrptn, 0, length+1);
--	memcpy(ip_descrptn, value, length);
--
--	if (!ip_descrptn) {
--		DBG(vcp, "Unable to get Audio Input Description");
--		return;
--	}
-+	ip_descrptn = util_memdup(value, length + 1);
-+	memset(ip_descrptn + length, 0, 1);
- 
- 	DBG(vcp, "Audio Input Description: %s", ip_descrptn);
- 	free(ip_descrptn);
+ 	if (strrchr(argv[2], ':')) {
+ 		ep->codec = 0xff;
+-		parse_vendor_codec(argv[2], &ep->cid, &ep->vid);
++		parse_vendor_codec(argv[2], &ep->vid, &ep->cid);
+ 		ep->preset = new0(struct preset, 1);
+ 		ep->preset->custom.name = strdup("custom");
+ 		ep->preset->default_preset = &ep->preset->custom;
 -- 
 2.43.0
 
