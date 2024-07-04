@@ -1,123 +1,98 @@
-Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [217.70.183.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 695B51ABC25
-	for <linux-bluetooth@vger.kernel.org>; Thu,  4 Jul 2024 13:58:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FC621AED49
+	for <linux-bluetooth@vger.kernel.org>; Thu,  4 Jul 2024 14:03:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720101505; cv=none; b=Rqf/VEMr6gJ1jTMcxvW1CuQPOkiom90yMJ0sBif9cYEER+CSTabwcUiTizkFJBZ254UOBcMFyyyMRXdslWs/1IlOOkEhy8innyXF2q3CgKJZjPO9dxEk6IbwVkHKzBOQfd8cHidSJIaTPe/VqsfweOBaLpJbeOyS12PJcp7Jyuo=
+	t=1720101830; cv=none; b=c5ArIw6k6VS8d0/yPKjaSnFKbnmHp165Ir0GKR3RQMxIJJXjN9c6/JxKAaPIB6l4Wd2k+d+lqq5dCL9QOEoXtyoxVoig5iyHxv0/RrhiuRAS5huq7BpfgIN2br6Uuf32pco8gJWoJOm68McZsCc/sJAnBXNrO8PTHGLKJDTrphg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720101505; c=relaxed/simple;
-	bh=iXl28YcXmHwAX3wfj7h4ifBDlLKN3Y//UYhLlOnqvX8=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=n4bBestFB2AozYBOTK/k74BEuLz/egFpgsuTw/uDqrw9v+GEnO2MNrJbe9gFuIASNRmCwV5YGcOSqEkBqH7H4AnRgF+ewD4sq7WInHqtiBYGVmFJ5YTa5h3P5FUZXNuSmclu89qS91nuNwccB1cbH1gCsxtc/Ih0D56ur/PflXQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eUSiwplU; arc=none smtp.client-ip=209.85.214.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eUSiwplU"
-Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-1fb3cf78fcaso2561985ad.1
-        for <linux-bluetooth@vger.kernel.org>; Thu, 04 Jul 2024 06:58:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1720101503; x=1720706303; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=ciFNniCuu29H2taSF/Hpp5/l1afxBcoqHHBwsSUfvSc=;
-        b=eUSiwplU3DZwbpo/lMEnihf1HCf27pj0NC/mkUNO8QC8GiRY+GWL3Nabi0M7DeIHkN
-         92lqiqUfAuDMoBhOfr2yquRzv9uS43IdB2SUAiOgnGqLFOlA81dGncgobd9XyZiKTvWf
-         bO8AoZxafo1mTBES6kMb3cxS4mUm++Mmlcn6prtHlWpp2BxZmaJtiwpwuOfpyogab3ba
-         5vMhD4fsl31rHB+mYZhyKDhNgHnsD0Y1P3NynkhVKeDHs+gBHODPltrknUKN7wseEIPF
-         uG/neNMpcbSxwMbKlyXHbN/kQxv4d3sVLOI7WS/v9nF4elz+X3Ub1nar/Qsh30NqQuEz
-         RCQQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720101503; x=1720706303;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ciFNniCuu29H2taSF/Hpp5/l1afxBcoqHHBwsSUfvSc=;
-        b=fQsyEFFNQsIo4VGjru/2IHWfImcT9qtqekRkw6vqXLYjCb/ttsY2NDF2caIUM0MNNU
-         jXujku/RUqi5LbsPuCc2OCgy+EmcpqFCd3ZfcuqkVc2wUTX/n+JvyORlTg+yFaKoDyW+
-         ZJn/jXM2g18WuQ1LY0sB51bNJOzzYXAed9OQT1cMyPpnx41BsxA9i/WPinM7mwhKWVSk
-         lTzBVqOPXNCi67nL+Q6Bw78kViYw0A9jssbNrxBBqmC3BLLtlfQ9Cokl85F2sqjkmZjA
-         MMD5zjhbyUuG2IFvl79aSOOp9mg284+ox02jyiZH9kLYf4gOPfNlcd02bKSpL48KDykT
-         3DtQ==
-X-Gm-Message-State: AOJu0YxmJxh4lc1HqPJbnNwEKexHckd6CsW1zRc+PGa4BKXSkST8E9W3
-	/tJP4gebtxiiOaP4SYpOcxW8OtQ5Kd5U3m1WMHc+YdCE26fzjLr7oCOhzg==
-X-Google-Smtp-Source: AGHT+IE68myQJWuatp9/8ynmtEpAcOHBi0oDa6p/1AH6IVdRMYRvHMXbkazyQkzUENWuv35kxdV0Qg==
-X-Received: by 2002:a17:903:230a:b0:1fb:438a:5e5c with SMTP id d9443c01a7336-1fb438a78cfmr1891735ad.43.1720101503427;
-        Thu, 04 Jul 2024 06:58:23 -0700 (PDT)
-Received: from [172.17.0.2] ([52.238.28.68])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1fac1535e9asm122836685ad.158.2024.07.04.06.58.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 04 Jul 2024 06:58:23 -0700 (PDT)
-Message-ID: <6686aa7f.170a0220.8497.ca38@mx.google.com>
-Date: Thu, 04 Jul 2024 06:58:23 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============0529721336903388287=="
+	s=arc-20240116; t=1720101830; c=relaxed/simple;
+	bh=0I9Bz70gT826G6ZdYTShnJSKZukvCAk6r/lZDm6eaNU=;
+	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=SPu3uIRPyOOx7pXGMe3bzzrIE/dmbKzgM4iBIUAPRugD1coeV9qVZm3/zbBXIReKPxgIEuaZxhhk1n2NDlQgoEeDDh+ik0XEebqZFZpkTdDaytu0gGtqqAGmjXltGQyr0tOmb0uKWN3TWxmzKRFh/08st0EHsLSijZ1KpHcuVDk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.183.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hadess.net
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 8D6F31BF210;
+	Thu,  4 Jul 2024 14:03:46 +0000 (UTC)
+Message-ID: <86b5a90fef7eb8c440a9ea0ad5aac7be66fb7fe8.camel@hadess.net>
+Subject: Re: [BlueZ 01/12] gatt-server: Don't allocate negative data
+From: Bastien Nocera <hadess@hadess.net>
+To: Pauli Virtanen <pav@iki.fi>, linux-bluetooth@vger.kernel.org
+Date: Thu, 04 Jul 2024 16:03:46 +0200
+In-Reply-To: <1d92694f4c71324970862724d693c45c423f94ae.camel@iki.fi>
+References: <20240704102617.1132337-1-hadess@hadess.net>
+	 <20240704102617.1132337-2-hadess@hadess.net>
+	 <1d92694f4c71324970862724d693c45c423f94ae.camel@iki.fi>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, neeraj.sanjaykale@nxp.com
-Subject: RE: [v1,1/2] Bluetooth: btnxpuart: Add support for AW693 A1 chipset
-In-Reply-To: <20240704132058.716164-1-neeraj.sanjaykale@nxp.com>
-References: <20240704132058.716164-1-neeraj.sanjaykale@nxp.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+X-GND-Sasl: hadess@hadess.net
 
---===============0529721336903388287==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+On Thu, 2024-07-04 at 15:25 +0300, Pauli Virtanen wrote:
+> Hi,
+>=20
+> to, 2024-07-04 kello 12:24 +0200, Bastien Nocera kirjoitti:
+> > Set a lower-bound to the data MTU to avoid allocating -1 elements
+> > if
+> > bt_att_get_mtu() returns zero.
+> >=20
+> > Error: OVERRUN (CWE-119): [#def36] [important]
+> > bluez-5.76/src/shared/gatt-server.c:1121:2: zero_return: Function
+> > call "bt_att_get_mtu(server->att)" returns 0.
+> > bluez-5.76/src/shared/gatt-server.c:1121:2: assignment: Assigning:
+> > "data->mtu" =3D "bt_att_get_mtu(server->att)". The value of "data-
+> > >mtu" is now 0.
+> > bluez-5.76/src/shared/gatt-server.c:1123:19: assignment: Assigning:
+> > "__n" =3D "(size_t)(data->mtu - 1UL)". The value of "__n" is now
+> > 18446744073709551615.
+> > bluez-5.76/src/shared/gatt-server.c:1123:19: assignment: Assigning:
+> > "__s" =3D "1UL".
+> > bluez-5.76/src/shared/gatt-server.c:1123:19: overrun-buffer-arg:
+> > Calling "memset" with "__p" and "__n * __s" is suspicious because
+> > of the very large index, 18446744073709551615. The index may be due
+> > to a negative parameter being interpreted as unsigned. [Note: The
+> > source code implementation of the function has been overridden by a
+> > builtin model.]
+> > 1121|		data->mtu =3D bt_att_get_mtu(server->att);
+> > 1122|		data->length =3D 0;
+> > 1123|->		data->rsp_data =3D new0(uint8_t, data->mtu - 1);
+> > 1124|
+> > 1125|		return data;
+> > ---
+> > =C2=A0src/shared/gatt-server.c | 2 +-
+> > =C2=A01 file changed, 1 insertion(+), 1 deletion(-)
+> >=20
+> > diff --git a/src/shared/gatt-server.c b/src/shared/gatt-server.c
+> > index 3a53d5dfde6b..c587553d655d 100644
+> > --- a/src/shared/gatt-server.c
+> > +++ b/src/shared/gatt-server.c
+> > @@ -1118,7 +1118,7 @@ static struct read_mult_data
+> > *read_mult_data_new(struct bt_gatt_server *server,
+> > =C2=A0	data->server =3D server;
+> > =C2=A0	data->num_handles =3D num_handles;
+> > =C2=A0	data->cur_handle =3D 0;
+> > -	data->mtu =3D bt_att_get_mtu(server->att);
+> > +	data->mtu =3D MAX(bt_att_get_mtu(server->att),
+> > BT_ATT_DEFAULT_LE_MTU);
+>=20
+> Is this correct, probably MTU less than default are valid?
 
-This is automated email and please do not reply to this email!
+This is the same code as in bt_gatt_server_new().
 
-Dear submitter,
+>=20
+> > =C2=A0	data->length =3D 0;
+> > =C2=A0	data->rsp_data =3D new0(uint8_t, data->mtu - 1);
+> > =C2=A0
+>=20
+> Might be better to instead: MAX(data->mtu, 1) - 1
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=868459
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      0.96 seconds
-GitLint                       PASS      0.39 seconds
-SubjectPrefix                 PASS      0.11 seconds
-BuildKernel                   PASS      31.41 seconds
-CheckAllWarning               PASS      33.73 seconds
-CheckSparse                   PASS      39.61 seconds
-CheckSmatch                   PASS      105.93 seconds
-BuildKernel32                 PASS      29.86 seconds
-TestRunnerSetup               PASS      546.30 seconds
-TestRunner_l2cap-tester       PASS      20.41 seconds
-TestRunner_iso-tester         PASS      35.91 seconds
-TestRunner_bnep-tester        PASS      4.93 seconds
-TestRunner_mgmt-tester        FAIL      116.37 seconds
-TestRunner_rfcomm-tester      PASS      8.46 seconds
-TestRunner_sco-tester         PASS      15.21 seconds
-TestRunner_ioctl-tester       PASS      8.06 seconds
-TestRunner_mesh-tester        PASS      6.07 seconds
-TestRunner_smp-tester         PASS      7.00 seconds
-TestRunner_userchan-tester    PASS      5.08 seconds
-IncrementalBuild              PASS      33.04 seconds
-
-Details
-##############################
-Test: TestRunner_mgmt-tester - FAIL
-Desc: Run mgmt-tester with test-runner
-Output:
-Total: 492, Passed: 488 (99.2%), Failed: 2, Not Run: 2
-
-Failed Test Cases
-LL Privacy - Add Device 5 (2 Devices to RL)          Failed       0.176 seconds
-LL Privacy - Add Device 7 (AL is full)               Failed       0.203 seconds
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============0529721336903388287==--
+I'd be fine with either, if somebody knows that particular part of the
+code better than I do...
