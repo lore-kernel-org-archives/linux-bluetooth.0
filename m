@@ -1,29 +1,32 @@
 Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E98839FC1
-	for <linux-bluetooth@vger.kernel.org>; Thu,  4 Jul 2024 18:08:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7929D6F065
+	for <linux-bluetooth@vger.kernel.org>; Thu,  4 Jul 2024 18:08:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720116506; cv=none; b=r0HhczomM5Jk8ABfFe3hT0oR1o2CddRT4crjB/58JgniQGRZik+DaAytlhyWiLpQFobXiopzl85IMvxSPLWNO2BVsGgMjHcMghwUDev+6SYvyNNlCHqCggJgND2A34jf8XdFXXFsXIKnDRIuvRmWw94Bbi7MbhKXkxeD8Nku5UY=
+	t=1720116511; cv=none; b=pb2UEziUHoPAdQZTHua3toUEbNUxsby6NAgIH+EjX4sb4mIVlzH5GO2nV5RBr1hCrbk+EzVi6dl+RHhWqITfyYPg26LD79fNy9PoqzzR8TcqUuyAdG5Zl6b/wTqbL83SpSpOhxy9wk0Z1dycm9b8xPkopp6PvFZplGI4j+PGGNQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720116506; c=relaxed/simple;
-	bh=wVRI0gFVv4nu17bAi7JQiPkl5ngp/fkV/rWRAGRz4yg=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=l1z6A2waW7wuYsv8Y+NuYGQk4eQ1YofO9XyGm8AulgAMNFX0NuL35fozOrMGrPumm9np2IcSYLYqUuFvMTAWZ3T0lBa/m8ngX+0kCu/tThhaeQF2plE8jVMFuo8rL6q6paNE2jQweegrevml+fjyh9zfELWbn0uUkiKO2JCK/MU=
+	s=arc-20240116; t=1720116511; c=relaxed/simple;
+	bh=LzRbPu8K8HIKwD8TXFkDExufstzLFgvReiHkczJ8wYg=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ZWV5hgWSAjsxmwYiboe2XfzG3bll9qhenqfkye251a4kh0TcX+JkuR+fuSmuboUFf4vPuxi9da9ugVX/u09iy5CsRZrjAMnkIKmiQpZkayA05nTa94Hl5S20bPuKfMSHHxuQ2tqih2FayR9/WPbbPcFLuai60LKeP+NG5fmpgU8=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
 Received: from localhost.localdomain (217.23.187.157) by msexch01.omp.ru
  (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Thu, 4 Jul
- 2024 21:08:10 +0300
+ 2024 21:08:15 +0300
 From: Roman Smirnov <r.smirnov@omp.ru>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Roman Smirnov <r.smirnov@omp.ru>
-Subject: [PATCH BlueZ v1 0/5] fix errors found by SVACE static analyzer #2 
-Date: Thu, 4 Jul 2024 21:07:45 +0300
-Message-ID: <20240704180752.94264-1-r.smirnov@omp.ru>
+Subject: [PATCH BlueZ v1 1/5] obexd: add NULL checks to file_stat_line()
+Date: Thu, 4 Jul 2024 21:07:46 +0300
+Message-ID: <20240704180752.94264-2-r.smirnov@omp.ru>
 X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20240704180752.94264-1-r.smirnov@omp.ru>
+References: <20240704180752.94264-1-r.smirnov@omp.ru>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -55,12 +58,15 @@ X-KSE-AntiSpam-Info: {Found in DNSBL: 217.23.187.157 in (user)
  dbl.spamhaus.org}
 X-KSE-AntiSpam-Info:
 	d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;omp.ru:7.1.1;127.0.0.199:7.1.2;217.23.187.157:7.1.2
+X-KSE-AntiSpam-Info: FromAlignment: s
+X-KSE-AntiSpam-Info: {rdns complete}
+X-KSE-AntiSpam-Info: {fromrtbl complete}
 X-KSE-AntiSpam-Info: ApMailHostAddress: 217.23.187.157
 X-KSE-AntiSpam-Info: {DNS response errors}
 X-KSE-AntiSpam-Info: Rate: 59
 X-KSE-AntiSpam-Info: Status: not_detected
 X-KSE-AntiSpam-Info: Method: none
-X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
+X-KSE-AntiSpam-Info: Auth:dmarc=none header.from=omp.ru;spf=none
  smtp.mailfrom=omp.ru;dkim=none
 X-KSE-Antiphishing-Info: Clean
 X-KSE-Antiphishing-ScanningType: Heuristic
@@ -72,22 +78,46 @@ X-KSE-Attachment-Filter-Triggered-Rules: Clean
 X-KSE-Attachment-Filter-Triggered-Filters: Clean
 X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
-Several bug fixes.
+gmtime() may return NULL. It is necessary to prevent
+dereferencing of a NULL pointer.
 
-Roman Smirnov (5):
-  obexd: add NULL checks to file_stat_line()
-  shared/shell: prevent integer overflow in bt_shell_init()
-  tools/isotest: limit the maximum possible data_size
-  tools/rctest: limit the maximum possible data_size
-  settings: add NULL checks to gatt_db_load()
-
+Found with the SVACE static analysis tool.
+---
  obexd/plugins/filesystem.c | 14 +++++++++++---
- src/settings.c             |  4 ++--
- src/shared/shell.c         |  2 +-
- tools/isotest.c            |  4 +++-
- tools/rctest.c             |  5 ++++-
- 5 files changed, 21 insertions(+), 8 deletions(-)
+ 1 file changed, 11 insertions(+), 3 deletions(-)
 
+diff --git a/obexd/plugins/filesystem.c b/obexd/plugins/filesystem.c
+index 4887a0b8a..a57b25a83 100644
+--- a/obexd/plugins/filesystem.c
++++ b/obexd/plugins/filesystem.c
+@@ -113,6 +113,7 @@ static char *file_stat_line(char *filename, struct stat *fstat,
+ {
+ 	char perm[51], atime[18], ctime[18], mtime[18];
+ 	char *escaped, *ret = NULL;
++	struct tm a_gmtime, c_gmtime, m_gmtime;
+ 
+ 	snprintf(perm, 50, "user-perm=\"%s%s%s\" group-perm=\"%s%s%s\" "
+ 			"other-perm=\"%s%s%s\"",
+@@ -126,9 +127,16 @@ static char *file_stat_line(char *filename, struct stat *fstat,
+ 			(fstat->st_mode & 0002 ? "W" : ""),
+ 			(dstat->st_mode & 0002 ? "D" : ""));
+ 
+-	strftime(atime, 17, "%Y%m%dT%H%M%SZ", gmtime(&fstat->st_atime));
+-	strftime(ctime, 17, "%Y%m%dT%H%M%SZ", gmtime(&fstat->st_ctime));
+-	strftime(mtime, 17, "%Y%m%dT%H%M%SZ", gmtime(&fstat->st_mtime));
++	if (!gmtime_r(&fstat->st_atime, &a_gmtime) ||
++			!gmtime_r(&fstat->st_ctime, &c_gmtime) ||
++			!gmtime_r(&fstat->st_mtime, &m_gmtime)) {
++		error("gmtime_r() returned NULL");
++		return ret;
++	}
++
++	strftime(atime, 17, "%Y%m%dT%H%M%SZ", &a_gmtime);
++	strftime(ctime, 17, "%Y%m%dT%H%M%SZ", &c_gmtime);
++	strftime(mtime, 17, "%Y%m%dT%H%M%SZ", &m_gmtime);
+ 
+ 	escaped = g_markup_escape_text(filename, -1);
+ 
 -- 
 2.43.0
 
