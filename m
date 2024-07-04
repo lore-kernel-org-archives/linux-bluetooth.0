@@ -1,104 +1,109 @@
-Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from inva021.nxp.com (inva021.nxp.com [92.121.34.21])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2CCD846F
-	for <linux-bluetooth@vger.kernel.org>; Thu,  4 Jul 2024 12:41:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E88867E9;
+	Thu,  4 Jul 2024 13:00:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=92.121.34.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720096899; cv=none; b=knmqQcAOlsm1QRa5/dMVZhCsqnzEmmsQ7YbtU0tfrS+gMCpF60uHeBK6Zjth9EYpOT5TbR9gePiFLairrdh1tOu6O6I92NxDK8x9Y3be4jG0zyglyoW+TZt40b73MKCFBwOgG0vdXNoCIE2Onh1Pv9rW5gcqsnotJftRAP2jKoU=
+	t=1720098049; cv=none; b=ptX4K0XhIxiOdjHCgh4NN3hYePbChXs2t5pN2CoRgIZd5whF/XPf6a+Zwlz9NtpyX7FB/oFx0ogOoOE0sguQHCgnlktnGl6rHi7/xGITkDpcTbQgXqBGKxFSYiKvW9Yy+QgvU7wI+haInflTX6DSU1m0Wrym3joG9InJzIVdR1M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720096899; c=relaxed/simple;
-	bh=gCHt8RHSPYNS6NKONWNGaS/w6kwBIHIz1W3Rps/dIPI=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=L5XsqkHb4SppEWO3wLRManzalZyE0WIhY303c5v7NqCyB3eBOyaO7vdiGQg6WgGPUj2xolNomdDHtBfllH5DJAoYeImHX24g5WWQ5hw+fzxq2zEb+PGzt/ErVh8xKUZ8MKGr3GELi2g+EIkWugNT/H2n6Nr/eV5KmCZ5Y0fM9u4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YYI2Ma6u; arc=none smtp.client-ip=209.85.214.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YYI2Ma6u"
-Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-1f70c457823so2962595ad.3
-        for <linux-bluetooth@vger.kernel.org>; Thu, 04 Jul 2024 05:41:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1720096897; x=1720701697; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZQbJzgTDBMCbbI2g7TIuC6vLyDQNpRmtXn4O1GDPF7k=;
-        b=YYI2Ma6uBdrOnwCi0z6rHRoIXPPtsDIWPF5SOOYjbI+DPTVW0H++Dd4MeIV940sTbd
-         raUgWRAZGBqSFMprcnAwmaI0EB0licQT+pQe/2gHVHGoYtcrsR5IK8Ax4qE23HibiLEp
-         S9Gbs2VWgLdM50++Im2RjY7mw56c+MQthLvQ/AntU8BsxEHFBrUNmRd4bh3u4yw2A9AE
-         0Cbzi5Wh+VI1WX68jVO3+ZWuOrBmvcLrkwEUs/4FAQk7tfArKOYW/Spz+aqpoEipKA4C
-         NzqO4y97C+2KhQK+aqqliJMZP8tpLwrXZnIsukXGQNsVdAqp1y97I4A2orpl6dOrxGm7
-         QUSg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720096897; x=1720701697;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ZQbJzgTDBMCbbI2g7TIuC6vLyDQNpRmtXn4O1GDPF7k=;
-        b=kspaEYARpuCwKYwcSu/+f2bQo17ztjJladLoEdNfMbyN40TtCjJTh6zgi5RbVupkuh
-         mIBXzvZR4NMy2sHCU6K3/nCbP/sCxPSxFVukGtyAvP4aFnTHta7is3ORHocrmYL1ocrY
-         BWSFwiK24IyLSPfCnk848yDFmuDw50C+98kIdwjRfoA6XahOukz734qFgoCxaUXlX7dL
-         r1rDs5CwM2X2thB7G31R+zWIwPTHQIVUTwRksqKdAe0s8f0sZOuppDepIClFaFS7aRT/
-         NoyuklTAATy6UvqOC2Rryl8o6lPFb9ZHVc3lWcFXYNXAe0qyjDDj/Ev1RBsmww7KNacd
-         DIjA==
-X-Gm-Message-State: AOJu0YzY3TmvfIvax6qWRmC13Ns+6IVdL3VdFqSOynarvHNUAz1C1jCr
-	n6lQhIq+Cu0Hn3yYfvxM4DhrpJGZrvu8ue1fHvNg96SPJqBnUYYRMiAp2Q==
-X-Google-Smtp-Source: AGHT+IEpNzrWZucTps8CfQ8hOF3+YfJoH1XdTGAScgtxQH6N1f687l5GvZ2xf6CVka6BO6TyXDyNQw==
-X-Received: by 2002:a17:902:e892:b0:1fb:2318:d157 with SMTP id d9443c01a7336-1fb33df606bmr12147345ad.9.1720096896928;
-        Thu, 04 Jul 2024 05:41:36 -0700 (PDT)
-Received: from [172.17.0.2] ([13.88.100.239])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1fac10d1b61sm122029675ad.57.2024.07.04.05.41.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 04 Jul 2024 05:41:36 -0700 (PDT)
-Message-ID: <66869880.170a0220.876da.c47e@mx.google.com>
-Date: Thu, 04 Jul 2024 05:41:36 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============3070850849891686089=="
+	s=arc-20240116; t=1720098049; c=relaxed/simple;
+	bh=6iEPaEZmh+B842HzffrRpZPpysqpM05orObQ1SfKGdk=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=BpDPFC/jMoxqySN7IQYiJBnLA7JAp2fBx1aG1VEOUC7SksxI7A/gMtiaQma5u6fbDwdE6tHTsMFPRMVlZB0Q+HREs7gm49TznXrPreQo5UVak8MqpiZOPjYubPpfeKNm0ii4rOsjwzNSMahu1P9BgH3A/UHwh5Ec/gyA/vcYcjE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; arc=none smtp.client-ip=92.121.34.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+Received: from inva021.nxp.com (localhost [127.0.0.1])
+	by inva021.eu-rdc02.nxp.com (Postfix) with ESMTP id 71E4A2013AD;
+	Thu,  4 Jul 2024 15:00:40 +0200 (CEST)
+Received: from aprdc01srsp001v.ap-rdc01.nxp.com (aprdc01srsp001v.ap-rdc01.nxp.com [165.114.16.16])
+	by inva021.eu-rdc02.nxp.com (Postfix) with ESMTP id 42EBD2013B7;
+	Thu,  4 Jul 2024 15:00:40 +0200 (CEST)
+Received: from pe-lt8779.in-pnq01.nxp.com (pe-lt8779.in-pnq01.nxp.com [10.17.104.141])
+	by aprdc01srsp001v.ap-rdc01.nxp.com (Postfix) with ESMTP id BAA13180222B;
+	Thu,  4 Jul 2024 21:00:38 +0800 (+08)
+From: Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>
+To: marcel@holtmann.org,
+	luiz.dentz@gmail.com
+Cc: linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	amitkumar.karwar@nxp.com,
+	rohit.fule@nxp.com,
+	neeraj.sanjaykale@nxp.com,
+	sherry.sun@nxp.com,
+	ziniu.wang_1@nxp.com,
+	haibo.chen@nxp.com,
+	LnxRevLi@nxp.com
+Subject: [PATCH v1] Bluetooth: btnxpuart: Add system suspend and resume handlers
+Date: Thu,  4 Jul 2024 18:28:26 +0530
+Message-Id: <20240704125826.715387-1-neeraj.sanjaykale@nxp.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, r.smirnov@omp.ru
-Subject: RE: [BlueZ,v2] client/player: add error code handling to transport_recv()
-In-Reply-To: <20240704104928.43336-1-r.smirnov@omp.ru>
-References: <20240704104928.43336-1-r.smirnov@omp.ru>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
+X-Virus-Scanned: ClamAV using ClamSMTP
 
---===============3070850849891686089==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+This adds handling for system suspend and resume. While the host enters
+suspend state, the driver will drive the chip into low power state.
 
-This is automated email and please do not reply to this email!
+Similarly when system is resuming, the driver will wake up the chip.
 
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=868404
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      0.26 seconds
-GitLint                       PASS      0.19 seconds
-BuildEll                      PASS      24.36 seconds
-BluezMake                     PASS      1651.77 seconds
-MakeCheck                     PASS      12.94 seconds
-MakeDistcheck                 PASS      180.39 seconds
-CheckValgrind                 PASS      255.77 seconds
-CheckSmatch                   PASS      360.05 seconds
-bluezmakeextell               PASS      120.85 seconds
-IncrementalBuild              PASS      1441.50 seconds
-ScanBuild                     PASS      1030.93 seconds
-
-
-
+Signed-off-by: Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>
 ---
-Regards,
-Linux Bluetooth
+ drivers/bluetooth/btnxpuart.c | 23 +++++++++++++++++++++++
+ 1 file changed, 23 insertions(+)
 
+diff --git a/drivers/bluetooth/btnxpuart.c b/drivers/bluetooth/btnxpuart.c
+index da18fd4f54f3..acd360fcc3b8 100644
+--- a/drivers/bluetooth/btnxpuart.c
++++ b/drivers/bluetooth/btnxpuart.c
+@@ -1498,6 +1498,24 @@ static void nxp_serdev_remove(struct serdev_device *serdev)
+ 	hci_free_dev(hdev);
+ }
+ 
++static int nxp_suspend(struct device *dev)
++{
++	struct btnxpuart_dev *nxpdev = dev_get_drvdata(dev);
++	struct ps_data *psdata = &nxpdev->psdata;
++
++	ps_control(psdata->hdev, PS_STATE_SLEEP);
++	return 0;
++}
++
++static int nxp_resume(struct device *dev)
++{
++	struct btnxpuart_dev *nxpdev = dev_get_drvdata(dev);
++	struct ps_data *psdata = &nxpdev->psdata;
++
++	ps_control(data->hdev, PS_STATE_AWAKE);
++	return 0;
++}
++
+ static struct btnxpuart_data w8987_data __maybe_unused = {
+ 	.helper_fw_name = NULL,
+ 	.fw_name = FIRMWARE_W8987,
+@@ -1517,12 +1535,17 @@ static const struct of_device_id nxpuart_of_match_table[] __maybe_unused = {
+ };
+ MODULE_DEVICE_TABLE(of, nxpuart_of_match_table);
+ 
++static const struct dev_pm_ops nxp_pm_ops = {
++	SET_SYSTEM_SLEEP_PM_OPS(nxp_suspend, nxp_resume)
++};
++
+ static struct serdev_device_driver nxp_serdev_driver = {
+ 	.probe = nxp_serdev_probe,
+ 	.remove = nxp_serdev_remove,
+ 	.driver = {
+ 		.name = "btnxpuart",
+ 		.of_match_table = of_match_ptr(nxpuart_of_match_table),
++		.pm = &nxp_pm_ops,
+ 	},
+ };
+ 
+-- 
+2.34.1
 
---===============3070850849891686089==--
