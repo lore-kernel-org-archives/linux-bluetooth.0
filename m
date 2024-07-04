@@ -1,113 +1,102 @@
-Received: from mail-qv1-f41.google.com (mail-qv1-f41.google.com [209.85.219.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 251BA1A0732
-	for <linux-bluetooth@vger.kernel.org>; Thu,  4 Jul 2024 06:39:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 876A11822E2
+	for <linux-bluetooth@vger.kernel.org>; Thu,  4 Jul 2024 07:48:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720075173; cv=none; b=OfHJ0jJShzTjl6UgHCXJep6amzgj+QkeM+BJE4nWWKAwvady6ZWObGqhikoLxcRHdJFEvhT/ce6X3qkgCFdCJVFZSUQGAB/BgEO4Dp2rARWQVhK1iaBLyDqPC0buuqT0K09WQxhOT36BaYfgfFrnHLv9VWwAydApjXNYpM1BWBc=
+	t=1720079314; cv=none; b=plQdT5dC+smpbW4beRU36V7aIGztg4E5KvIa63Ac8gW3f8YGVRkjWWuTC43TgDWaqq94hGl+EPsCMwD/9TWpjIy5LmDTzf+3+jNeTGmwQ/jHd1pFayIcUvGV/u1LlwubYuY9UZc+QmkFW17C6I7ujIA1plyRQMMliU67erYRxiI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720075173; c=relaxed/simple;
-	bh=ilKVY0CIsYRRUT3GNHs4VbyIVZEs1vIGg/AI7bkTlQs=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=AuPVr/7yv6gzO/rtVndKzeFgxZjISgpysG4ov24AhK0c6hTnTKoi/aPSGsaYTrv8kqsPqMlOYD90C9GVnQuvjOljU0PLxpEA9ho7sjpbiGcuQO7F/NH822I1J4SC3hLdvMc2b6teL5XSd5J/UPONUpAPq9R12oz4Yespf2fK6WI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HaQymTDn; arc=none smtp.client-ip=209.85.219.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HaQymTDn"
-Received: by mail-qv1-f41.google.com with SMTP id 6a1803df08f44-6b5e0d881a1so10992976d6.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 03 Jul 2024 23:39:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1720075171; x=1720679971; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=QC878+ilsTJeJwlug1db2T2kn7QBeDJ8oSRN0KtRKHs=;
-        b=HaQymTDnW+dzQR4Eey16QV4jZo1fHGntPO/it+ii0egPYwo2r1mCnce/9mqUNW0buo
-         lXr0/jZCLu43QsoJboThUFxkrr6aLPAzzWamBnmw00j4E8CSUZxKcayozW2fJZRytvK2
-         VICrZwdfpoeBbFacwpzuushg5BxAH/YDnMsWRBz6LWipr7F1YvugXzFJSRjUrTMUaaKY
-         Kr8AW52M6zoHhP2oJO6tux7/5UO5PzPVNP7xPxNWW495y7pnsh1w8ZUdg6o3HZ665Wa6
-         PCYQqmqtzpHxI3/KYw87wjcPEMoEV4z1jSHz3TXDK16pS/h5UK9mjf1HMH4HVM8hxIAF
-         PogA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720075171; x=1720679971;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=QC878+ilsTJeJwlug1db2T2kn7QBeDJ8oSRN0KtRKHs=;
-        b=dHzOy1uCHTWzOipcTKpxPe2SbZIc0gX3UB+UCCJDi5+nRXrzQk6WIoAU0VsFTiVikZ
-         QVrDOtej5zEE6nFw+H3sG0aaw+Qvh3LyVosS1dRcBcdCer6gR0Qj6sVL1CMsm0iWnFUC
-         a0oeHmTDYim/WpmcKsgrtTtie2uHNeYLsUp+32dlGAByy+9lYA3eT4qncSVcb32P+z3m
-         W3kaOLx5Idz8mDSW1K8a6tBsNFg8t7kL5eudLESTwuRQghO+vWDxmZaE3phWPUyUBxjH
-         sEcxM6eJ2dXyzWIv0wcfoQqToPRQRlmQLrnFzxjkQIf+Kp5eoGrDWhvrQa1Robh8dKZ7
-         36JQ==
-X-Gm-Message-State: AOJu0YwjVNx/1UJi6un1fh5v39UBopkrng3QCreJvNt73GZ+FHQEPgoS
-	zHhAWejwWMqXhDw1m8YOLPJxUleVuLJ99qSDAW6abrtlI0Mlx3ZcXgGozw==
-X-Google-Smtp-Source: AGHT+IGVy3Uv9c+ep96Wjb4ZjhdrKRlcItxfOpB+TjNjdTO0pYN0Dev1XzNx6gUfdGBd+vTQL1Og0w==
-X-Received: by 2002:a05:6214:f09:b0:6b4:e21c:d46f with SMTP id 6a1803df08f44-6b5ee63d9c9mr6238396d6.27.1720075171096;
-        Wed, 03 Jul 2024 23:39:31 -0700 (PDT)
-Received: from [172.17.0.2] ([20.109.38.150])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6b59e613de7sm61593406d6.118.2024.07.03.23.39.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 03 Jul 2024 23:39:30 -0700 (PDT)
-Message-ID: <668643a2.050a0220.5b478.a622@mx.google.com>
-Date: Wed, 03 Jul 2024 23:39:30 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============3351978780714020473=="
+	s=arc-20240116; t=1720079314; c=relaxed/simple;
+	bh=t2GUE0g6cDIds+77Ts9uSujdjNTOYN+AFOptOnG9SIo=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=RGkExy4I8QY4YmVMZEqWtZ/dJ+g7HsEQLqS3iEpahw48dYWCmqYpBcLwGX6XMUZyg/mrKt7gPpV853Oy4oNL8VTWuwXR3ADxmr1c8M0/ekyFwhxspAyV7KNqCFCl/4Uaqu4cImLIrIKO6UsqHqo8ztC1BhXdTTyCpunNcAM4h/I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
+Received: from localhost.localdomain (217.23.187.157) by msexch01.omp.ru
+ (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Thu, 4 Jul
+ 2024 10:48:12 +0300
+From: Roman Smirnov <r.smirnov@omp.ru>
+To: <linux-bluetooth@vger.kernel.org>
+CC: Roman Smirnov <r.smirnov@omp.ru>
+Subject: [PATCH BlueZ v2] client/player: add error code handling to transport_recv()
+Date: Thu, 4 Jul 2024 10:47:58 +0300
+Message-ID: <20240704074759.15844-1-r.smirnov@omp.ru>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, chris.lu@mediatek.com
-Subject: RE: Bluetooth: btmtk: MediaTek ISO data transmission support
-In-Reply-To: <20240704060116.16600-2-chris.lu@mediatek.com>
-References: <20240704060116.16600-2-chris.lu@mediatek.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
+ (10.188.4.12)
+X-KSE-ServerInfo: msexch01.omp.ru, 9
+X-KSE-AntiSpam-Interceptor-Info: scan successful
+X-KSE-AntiSpam-Version: 6.1.0, Database issued on: 07/04/2024 07:17:12
+X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
+X-KSE-AntiSpam-Method: none
+X-KSE-AntiSpam-Rate: 59
+X-KSE-AntiSpam-Info: Lua profiles 186319 [Jul 04 2024]
+X-KSE-AntiSpam-Info: Version: 6.1.0.4
+X-KSE-AntiSpam-Info: Envelope from: r.smirnov@omp.ru
+X-KSE-AntiSpam-Info: LuaCore: 21 0.3.21
+ ebee5449fc125b2da45f1a6a6bc2c5c0c3ad0e05
+X-KSE-AntiSpam-Info: {rep_avail}
+X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
+X-KSE-AntiSpam-Info: {relay has no DNS name}
+X-KSE-AntiSpam-Info: {SMTP from is not routable}
+X-KSE-AntiSpam-Info: {Found in DNSBL: 217.23.187.157 in (user)
+ dbl.spamhaus.org}
+X-KSE-AntiSpam-Info:
+	omp.ru:7.1.1;127.0.0.199:7.1.2;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;217.23.187.157:7.1.2
+X-KSE-AntiSpam-Info: ApMailHostAddress: 217.23.187.157
+X-KSE-AntiSpam-Info: {DNS response errors}
+X-KSE-AntiSpam-Info: Rate: 59
+X-KSE-AntiSpam-Info: Status: not_detected
+X-KSE-AntiSpam-Info: Method: none
+X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
+ smtp.mailfrom=omp.ru;dkim=none
+X-KSE-Antiphishing-Info: Clean
+X-KSE-Antiphishing-ScanningType: Heuristic
+X-KSE-Antiphishing-Method: None
+X-KSE-Antiphishing-Bases: 07/04/2024 07:26:00
+X-KSE-Antivirus-Interceptor-Info: scan successful
+X-KSE-Antivirus-Info: Clean, bases: 7/4/2024 4:38:00 AM
+X-KSE-Attachment-Filter-Triggered-Rules: Clean
+X-KSE-Attachment-Filter-Triggered-Filters: Clean
+X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
---===============3351978780714020473==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+It is necessary to add return value check as in sock_send().
 
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=868302
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      8.26 seconds
-GitLint                       PASS      2.58 seconds
-SubjectPrefix                 PASS      0.99 seconds
-BuildKernel                   PASS      30.28 seconds
-CheckAllWarning               PASS      32.33 seconds
-CheckSparse                   PASS      39.03 seconds
-CheckSmatch                   PASS      104.20 seconds
-BuildKernel32                 PASS      28.58 seconds
-TestRunnerSetup               PASS      522.48 seconds
-TestRunner_l2cap-tester       PASS      20.23 seconds
-TestRunner_iso-tester         PASS      32.98 seconds
-TestRunner_bnep-tester        PASS      4.86 seconds
-TestRunner_mgmt-tester        PASS      114.02 seconds
-TestRunner_rfcomm-tester      PASS      7.47 seconds
-TestRunner_sco-tester         PASS      15.07 seconds
-TestRunner_ioctl-tester       PASS      7.91 seconds
-TestRunner_mesh-tester        PASS      7.91 seconds
-TestRunner_smp-tester         PASS      6.92 seconds
-TestRunner_userchan-tester    PASS      5.03 seconds
-IncrementalBuild              PASS      67.83 seconds
-
-
-
+Found with the SVACE static analysis tool.
 ---
-Regards,
-Linux Bluetooth
+ V1 -> V2: the name of the patch has been shortened 
+ client/player.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
+diff --git a/client/player.c b/client/player.c
+index 0d031e4b0..1340a7584 100644
+--- a/client/player.c
++++ b/client/player.c
+@@ -4514,7 +4514,13 @@ static bool transport_recv(struct io *io, void *user_data)
+ 	uint8_t buf[1024];
+ 	int ret, len;
+ 
+-	ret = read(io_get_fd(io), buf, sizeof(buf));
++	ret = io_get_fd(io);
++	if (ret < 0) {
++		bt_shell_printf("io_get_fd() returned %d\n", ret);
++		return true;
++	}
++
++	ret = read(ret, buf, sizeof(buf));
+ 	if (ret < 0) {
+ 		bt_shell_printf("Failed to read: %s (%d)\n", strerror(errno),
+ 								-errno);
+-- 
+2.43.0
 
---===============3351978780714020473==--
