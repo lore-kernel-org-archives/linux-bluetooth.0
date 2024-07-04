@@ -1,97 +1,147 @@
-Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
+Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 316C81AB91A
-	for <linux-bluetooth@vger.kernel.org>; Thu,  4 Jul 2024 10:50:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7D4F1AB524
+	for <linux-bluetooth@vger.kernel.org>; Thu,  4 Jul 2024 11:36:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720090254; cv=none; b=L2s9MKk7iAt6YQN/OGv1QMA4HVBOPNjdCml1zhjFwBC0D7QMcV+ItLnG2hNiaZsmcUjBzoBNKMQMbooRJ0GSI93bxdXn19TQ3+R+N00kJ7jGL3HbnuyIdSAZ0Re8bUG8YuBRynjargmzVbIB2hCXe25zKpv9LKBOpFI0ufVNmVE=
+	t=1720092996; cv=none; b=BdZNnn6deSHHPwpGo03GcI/5/Uq2nu6URaMP30aQDdw/Ss98b+p+0+kXcRXJrV8SgKbMoqFLq3WeOgJnq86Tr8aw50N9kFfBAj8vtPizPE45ggHzgcVzYuzz5CUXKKOA+GuyXPBwe43Ba8J0Hr4iTaIRKrmD9Y7rLd96VwwXMnE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720090254; c=relaxed/simple;
-	bh=AXaDPxyKm+nwXRh7sUnLSHMtrm8Nf1GYI3h4JSGrtBs=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=ehQNPf9/sR/jft2jSUyeIGTzI6T9T5vG2JlnyBxaMT4c5lAfBPCwifELYWjuLOO1BBfpK3cs/nZRbEguXjpdqhnkavmPZYfKnZN6wLK4ogaxq0BXfODYh0gPv/Y75eqb5ICECmWt6xP9GhPw9fuKDPZvZDviHtE10uP+5SlQbZg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
-Received: from localhost.localdomain (217.23.187.157) by msexch01.omp.ru
- (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Thu, 4 Jul
- 2024 13:49:40 +0300
-From: Roman Smirnov <r.smirnov@omp.ru>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Roman Smirnov <r.smirnov@omp.ru>
-Subject: [PATCH BlueZ v2] client/player: add error code handling to transport_recv()
-Date: Thu, 4 Jul 2024 13:49:26 +0300
-Message-ID: <20240704104928.43336-1-r.smirnov@omp.ru>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1720092996; c=relaxed/simple;
+	bh=WaZi87/PBxvQ43xwKxbvhiSYp0ywxoWv6MqvP1RpTLE=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=BrMMiYKH/5h1MMuUa23DyQNuuUZtH6U+6GEW1kg3LDCBqCunTeQbBBgZLHsGrAj34GolabfcfEZ3ZJd6tf/ulNLJWLiE/PyRdxhsz6LpOSzGHVXVQ54s4CI8s2Gg/EHTfJCJ36pJA/QHMpixBuLRKPqFfnjvrNrWfHxRPbbBwik=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=k5m+AviY; arc=none smtp.client-ip=209.85.210.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="k5m+AviY"
+Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-70af81e8439so444058b3a.0
+        for <linux-bluetooth@vger.kernel.org>; Thu, 04 Jul 2024 04:36:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1720092994; x=1720697794; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=nI3MHZOyiieTL8k+OM5WLLeXPSFp/Q15AY+4mYXGPbk=;
+        b=k5m+AviYaVrFJFtKSmaM0GICAY7sMOUD6lVRkoVxYSq4WRW7vER8usjZ4GjK8B7Sa8
+         vEEsAaYlj8dgo/TUh8BixmhOPeZC3AHOS/6cVykhxyWeN97jjXRsuVNu/F4xdPAFjgMJ
+         RAxOD6Urhum4Ou/2Qcj6OYLS1HZPYIBNCWe9kyaiaoZ6nVV9svs/iMIJ00Ev6YE6XEWw
+         O0kwA1wFgv/B0uzHdyZ2WS91ItVtqcJRW3eB/N/DZKu8E3QmSK+GNOFGRqPLxW87e2UM
+         xgADgx5W8g/qV5SrWQRxWdBU/JAJuOwTbu1Vjbkx0pgxnLdZ124M2UCwKTQsR7xKQHoX
+         Tc2g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1720092994; x=1720697794;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=nI3MHZOyiieTL8k+OM5WLLeXPSFp/Q15AY+4mYXGPbk=;
+        b=Tl7XcacWcyIjP8+kbmx0aXsbRRj6yZj4uVrJVLg/5q7jSMDD5AAuwLBVNy319iBQMT
+         gTUtQu1WWuYTAyzhYA/j4CpZ3T68r3/MqMthTeRVNWPa1LP9kyOVYh45hdbpHZ1I5SMU
+         eQE2GV5OJDf9T0lMWTEE4vjarjkMUNI2c6Ys7ULvgN2f0UZlEY1yBtvowDHUAg+3OgzW
+         esxO5wqfLuJ6yShvnA7BpZSXTkwW3Cfub+Pb1Df5h9RXUDb07gwzL3Dxc9veMtqGO6n2
+         oCJR54KlsHFL8WRh4Nv9CzwEMOgznaVjsMDzWkE2gzbifAXtZHE8LdHkwTxnXujAWW+g
+         X0cQ==
+X-Gm-Message-State: AOJu0YxuEuEnktjpHIqWs/ACepRikjvbRwKS8IMgV14wXylxH2TFG10C
+	0w8nHPkD5X8Ndj/rA1nanLpPQpwHOnc7wkQ/uLAphrWsDADoeJiIiZYRMA==
+X-Google-Smtp-Source: AGHT+IHmOHafqBzKV76vbVKDVQ0ZkPedSAkevtp0u2gfBbIETLzPH/6ToeA1KigUu0D/EOGiugctWA==
+X-Received: by 2002:a05:6a00:1898:b0:70b:152:331 with SMTP id d2e1a72fcca58-70b015208e0mr1398516b3a.21.1720092975912;
+        Thu, 04 Jul 2024 04:36:15 -0700 (PDT)
+Received: from [172.17.0.2] ([13.83.1.209])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-72c6c9e0ee3sm9490590a12.60.2024.07.04.04.36.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 04 Jul 2024 04:36:15 -0700 (PDT)
+Message-ID: <6686892f.630a0220.5de6d.34c2@mx.google.com>
+Date: Thu, 04 Jul 2024 04:36:15 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============8060588988181790973=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
- (10.188.4.12)
-X-KSE-ServerInfo: msexch01.omp.ru, 9
-X-KSE-AntiSpam-Interceptor-Info: scan successful
-X-KSE-AntiSpam-Version: 6.1.0, Database issued on: 07/04/2024 10:26:30
-X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
-X-KSE-AntiSpam-Method: none
-X-KSE-AntiSpam-Rate: 0
-X-KSE-AntiSpam-Info: Lua profiles 186325 [Jul 04 2024]
-X-KSE-AntiSpam-Info: Version: 6.1.0.4
-X-KSE-AntiSpam-Info: Envelope from: r.smirnov@omp.ru
-X-KSE-AntiSpam-Info: LuaCore: 21 0.3.21
- ebee5449fc125b2da45f1a6a6bc2c5c0c3ad0e05
-X-KSE-AntiSpam-Info: {rep_avail}
-X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
-X-KSE-AntiSpam-Info:
-	d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;omp.ru:7.1.1;127.0.0.199:7.1.2;217.23.187.157:7.1.2
-X-KSE-AntiSpam-Info: ApMailHostAddress: 217.23.187.157
-X-KSE-AntiSpam-Info: Rate: 0
-X-KSE-AntiSpam-Info: Status: not_detected
-X-KSE-AntiSpam-Info: Method: none
-X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
- smtp.mailfrom=omp.ru;dkim=none
-X-KSE-Antiphishing-Info: Clean
-X-KSE-Antiphishing-ScanningType: Heuristic
-X-KSE-Antiphishing-Method: None
-X-KSE-Antiphishing-Bases: 07/04/2024 10:30:00
-X-KSE-Antivirus-Interceptor-Info: scan successful
-X-KSE-Antivirus-Info: Clean, bases: 7/4/2024 8:45:00 AM
-X-KSE-Attachment-Filter-Triggered-Rules: Clean
-X-KSE-Attachment-Filter-Triggered-Filters: Clean
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, r.smirnov@omp.ru
+Subject: RE: fix errors found by SVACE static analyzer
+In-Reply-To: <20240704090756.31351-2-r.smirnov@omp.ru>
+References: <20240704090756.31351-2-r.smirnov@omp.ru>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-It is necessary to add return value check as in sock_send().
+--===============8060588988181790973==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Found with the SVACE static analysis tool.
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=868373
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.77 seconds
+GitLint                       PASS      0.59 seconds
+BuildEll                      PASS      24.78 seconds
+BluezMake                     PASS      1695.19 seconds
+MakeCheck                     PASS      13.40 seconds
+MakeDistcheck                 PASS      177.22 seconds
+CheckValgrind                 PASS      252.90 seconds
+CheckSmatch                   PASS      357.48 seconds
+bluezmakeextell               PASS      120.68 seconds
+IncrementalBuild              PASS      4657.50 seconds
+ScanBuild                     WARNING   1080.72 seconds
+
+Details
+##############################
+Test: ScanBuild - WARNING
+Desc: Run Scan Build
+Output:
+src/shared/gatt-client.c:451:21: warning: Use of memory after it is freed
+        gatt_db_unregister(op->client->db, op->db_id);
+                           ^~~~~~~~~~
+src/shared/gatt-client.c:696:2: warning: Use of memory after it is freed
+        discovery_op_complete(op, false, att_ecode);
+        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/shared/gatt-client.c:996:2: warning: Use of memory after it is freed
+        discovery_op_complete(op, success, att_ecode);
+        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/shared/gatt-client.c:1102:2: warning: Use of memory after it is freed
+        discovery_op_complete(op, success, att_ecode);
+        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/shared/gatt-client.c:1296:2: warning: Use of memory after it is freed
+        discovery_op_complete(op, success, att_ecode);
+        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/shared/gatt-client.c:1361:2: warning: Use of memory after it is freed
+        discovery_op_complete(op, success, att_ecode);
+        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/shared/gatt-client.c:1636:6: warning: Use of memory after it is freed
+        if (read_db_hash(op)) {
+            ^~~~~~~~~~~~~~~~
+src/shared/gatt-client.c:1641:2: warning: Use of memory after it is freed
+        discover_all(op);
+        ^~~~~~~~~~~~~~~~
+src/shared/gatt-client.c:2145:6: warning: Use of memory after it is freed
+        if (read_db_hash(op)) {
+            ^~~~~~~~~~~~~~~~
+src/shared/gatt-client.c:2153:8: warning: Use of memory after it is freed
+                                                        discovery_op_ref(op),
+                                                        ^~~~~~~~~~~~~~~~~~~~
+src/shared/gatt-client.c:3242:2: warning: Use of memory after it is freed
+        complete_write_long_op(req, success, 0, false);
+        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/shared/gatt-client.c:3264:2: warning: Use of memory after it is freed
+        request_unref(req);
+        ^~~~~~~~~~~~~~~~~~
+12 warnings generated.
+
+
+
 ---
- V1 -> V2: the name of the patch has been shortened
- client/player.c | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/client/player.c b/client/player.c
-index 0d031e4b0..1340a7584 100644
---- a/client/player.c
-+++ b/client/player.c
-@@ -4514,7 +4514,13 @@ static bool transport_recv(struct io *io, void *user_data)
- 	uint8_t buf[1024];
- 	int ret, len;
- 
--	ret = read(io_get_fd(io), buf, sizeof(buf));
-+	ret = io_get_fd(io);
-+	if (ret < 0) {
-+		bt_shell_printf("io_get_fd() returned %d\n", ret);
-+		return true;
-+	}
-+
-+	ret = read(ret, buf, sizeof(buf));
- 	if (ret < 0) {
- 		bt_shell_printf("Failed to read: %s (%d)\n", strerror(errno),
- 								-errno);
--- 
-2.43.0
 
+--===============8060588988181790973==--
