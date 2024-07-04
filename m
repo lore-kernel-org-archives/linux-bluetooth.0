@@ -1,155 +1,104 @@
-Received: from meesny.iki.fi (meesny.iki.fi [195.140.195.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EC0C14B078
-	for <linux-bluetooth@vger.kernel.org>; Thu,  4 Jul 2024 12:25:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=195.140.195.201
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720095930; cv=pass; b=u2XIjUua8eBb71Wadb4Wa1jtlOKr7l21ra06yWFGYlX2D3+3+eAY0oJMkwwXavxgum3HwpBmQHop9qsdmyryeEsmPvhSzvszLpYtboCA2v/wNWhR8q4ErORaieLifm8C4zNLaIPN5QUhNyNWOzdci3Qp1qKxDzDA3FdjEYEoDyo=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720095930; c=relaxed/simple;
-	bh=jSXzIYplBxaIPl+fC2a0K+WFckM2GJBn00sQ3wHfVvY=;
-	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=dXvjotw3ykxkOT8SgYCl/xFJchOgKf+oJBL4mMOylqEo3nS42ibopf8c2pFwejS/B/vfmnsXURCZyfSnEg3her2Oi2tFZk6eq7H14fEaBACQN89lLvQzxQYWcOpJ2HCvCeflZQtaArVTeGdSG6IsPMBSXp+i2y7301OY12B5Mes=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b=rH0RoQTi; arc=pass smtp.client-ip=195.140.195.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2CCD846F
+	for <linux-bluetooth@vger.kernel.org>; Thu,  4 Jul 2024 12:41:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1720096899; cv=none; b=knmqQcAOlsm1QRa5/dMVZhCsqnzEmmsQ7YbtU0tfrS+gMCpF60uHeBK6Zjth9EYpOT5TbR9gePiFLairrdh1tOu6O6I92NxDK8x9Y3be4jG0zyglyoW+TZt40b73MKCFBwOgG0vdXNoCIE2Onh1Pv9rW5gcqsnotJftRAP2jKoU=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1720096899; c=relaxed/simple;
+	bh=gCHt8RHSPYNS6NKONWNGaS/w6kwBIHIz1W3Rps/dIPI=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=L5XsqkHb4SppEWO3wLRManzalZyE0WIhY303c5v7NqCyB3eBOyaO7vdiGQg6WgGPUj2xolNomdDHtBfllH5DJAoYeImHX24g5WWQ5hw+fzxq2zEb+PGzt/ErVh8xKUZ8MKGr3GELi2g+EIkWugNT/H2n6Nr/eV5KmCZ5Y0fM9u4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YYI2Ma6u; arc=none smtp.client-ip=209.85.214.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=iki.fi header.i=@iki.fi header.b="rH0RoQTi"
-Received: from monolith.lan (91-152-121-138.elisa-laajakaista.fi [91.152.121.138])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pav@iki.fi)
-	by meesny.iki.fi (Postfix) with ESMTPSA id 4WFG7b1WWlzySG;
-	Thu,  4 Jul 2024 15:25:15 +0300 (EEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
-	t=1720095917;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=ygO+GB4lfaDBAdl9Pnx9XfPe8jBkYzQb6Flz3TsHJ5k=;
-	b=rH0RoQTi0xCsfIFTqUuNoE67vVL9WPr5o+S9bqF7te5tNgSiIFEGd2qf+zq9ddHrdRpw45
-	MgQxbNHYUrtTbDfZAMKbbrOHeSANMwX1s43zLXGcAopMOuy8T1kC9E6cJdNWaudkiGo+wC
-	RiJzzpNbcxw71l1uN9Hfb4bM7nHvhxg=
-ARC-Seal: i=1; s=meesny; d=iki.fi; t=1720095917; a=rsa-sha256; cv=none;
-	b=akKxpma2rB7sB7WGRL4vUlcOA6qkOaLRIy6Vq/aB2/mX+w+j3/yj09UkAXnQKblaaJ4pqq
-	+PxJGZrTH8HC1eQrmyVI4mWmpqpNuKFSCyOxOp2VrgKymfIZJzpTJxFhvA/d8zy5MC6Iz4
-	Oa0sF2/G9ANMlYcTXAa3ziwG4ge+bFM=
-ARC-Authentication-Results: i=1;
-	ORIGINATING;
-	auth=pass smtp.auth=pav@iki.fi smtp.mailfrom=pav@iki.fi
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=meesny; t=1720095917;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=ygO+GB4lfaDBAdl9Pnx9XfPe8jBkYzQb6Flz3TsHJ5k=;
-	b=sD3+7a9yzSIYxzwB9QysmwsbTRuCar+GLCGDRd5TzA8PuLOVbRalcb+WGT0tnGKQEpj7bq
-	8QOfv7qKSGTeqN1OaD2WVSdJvws4vdAtIX7N5v0LGrthPGmd5M8jR5vvM+iabSUx8DqFdd
-	93Aijdacc+CwWxgVAgrfzcuk0d4qOKs=
-Message-ID: <1d92694f4c71324970862724d693c45c423f94ae.camel@iki.fi>
-Subject: Re: [BlueZ 01/12] gatt-server: Don't allocate negative data
-From: Pauli Virtanen <pav@iki.fi>
-To: Bastien Nocera <hadess@hadess.net>, linux-bluetooth@vger.kernel.org
-Date: Thu, 04 Jul 2024 15:25:14 +0300
-In-Reply-To: <20240704102617.1132337-2-hadess@hadess.net>
-References: <20240704102617.1132337-1-hadess@hadess.net>
-	 <20240704102617.1132337-2-hadess@hadess.net>
-Autocrypt: addr=pav@iki.fi; prefer-encrypt=mutual;
- keydata=mQINBGX+qmEBEACt7O4iYRbX80B2OV+LbX06Mj1Wd67SVWwq2sAlI+6fK1YWbFu5jOWFy
- ShFCRGmwyzNvkVpK7cu/XOOhwt2URcy6DY3zhmd5gChz/t/NDHGBTezCh8rSO9DsIl1w9nNEbghUl
- cYmEvIhQjHH3vv2HCOKxSZES/6NXkskByXtkPVP8prHPNl1FHIO0JVVL7/psmWFP/eeB66eAcwIgd
- aUeWsA9+/AwcjqJV2pa1kblWjfZZw4TxrBgCB72dC7FAYs94ebUmNg3dyv8PQq63EnC8TAUTyph+M
- cnQiCPz6chp7XHVQdeaxSfcCEsOJaHlS+CtdUHiGYxN4mewPm5JwM1C7PW6QBPIpx6XFvtvMfG+Ny
- +AZ/jZtXxHmrGEJ5sz5YfqucDV8bMcNgnbFzFWxvVklafpP80O/4VkEZ8Og09kvDBdB6MAhr71b3O
- n+dE0S83rEiJs4v64/CG8FQ8B9K2p9HE55Iu3AyovR6jKajAi/iMKR/x4KoSq9Jgj9ZI3g86voWxM
- 4735WC8h7vnhFSA8qKRhsbvlNlMplPjq0f9kVLg9cyNzRQBVrNcH6zGMhkMqbSvCTR5I1kY4SfU4f
- QqRF1Ai5f9Q9D8ExKb6fy7ct8aDUZ69Ms9N+XmqEL8C3+AAYod1XaXk9/hdTQ1Dhb51VPXAMWTICB
- dXi5z7be6KALQARAQABtCZQYXVsaSBWaXJ0YW5lbiA8cGF1bGkudmlydGFuZW5AaWtpLmZpPokCWg
- QTAQgARAIbAwUJEswDAAULCQgHAgIiAgYVCgkICwIEFgIDAQIeBwIXgBYhBGrOSfUCZNEJOswAnOS
- aCbhLOrBPBQJl/qsDAhkBAAoJEOSaCbhLOrBPB/oP/1j6A7hlzheRhqcj+6sk+OgZZ+5eX7mBomyr
- 76G+m/3RhPGlKbDxKTWtBZaIDKg2c0Q6yC1TegtxQ2EUD4kk7wKoHKj8dKbR29uS3OvURQR1guCo2
- /5kzQQVxQwhIoMdHJYF0aYNQgdA+ZJL09lDz+JC89xvup3spxbKYc9Iq6vxVLbVbjF9Uv/ncAC4Bs
- g1MQoMowhKsxwN5VlUdjqPZ6uGebZyC+gX6YWUHpPWcHQ1TxCD8TtqTbFU3Ltd3AYl7d8ygMNBEe3
- T7DV2GjBI06Xqdhydhz2G5bWPM0JSodNDE/m6MrmoKSEG0xTNkH2w3TWWD4o1snte9406az0YOwkk
- xDq9LxEVoeg6POceQG9UdcsKiiAJQXu/I0iUprkybRUkUj+3oTJQECcdfL1QtkuJBh+IParSF14/j
- Xojwnf7tE5rm7QvMWWSiSRewro1vaXjgGyhKNyJ+HCCgp5mw+ch7KaDHtg0fG48yJgKNpjkzGWfLQ
- BNXqtd8VYn1mCM3YM7qdtf9bsgjQqpvFiAh7jYGrhYr7geRjary1hTc8WwrxAxaxGvo4xZ1XYps3u
- ayy5dGHdiddk5KJ4iMTLSLH3Rucl19966COQeCwDvFMjkNZx5ExHshWCV5W7+xX/2nIkKUfwXRKfK
- dsVTL03FG0YvY/8A98EMbvlf4TnpyyaytBtQYXVsaSBWaXJ0YW5lbiA8cGF2QGlraS5maT6JAlcEE
- wEIAEEWIQRqzkn1AmTRCTrMAJzkmgm4SzqwTwUCZf6qYQIbAwUJEswDAAULCQgHAgIiAgYVCgkICw
- IEFgIDAQIeBwIXgAAKCRDkmgm4SzqwTxYZD/9hfC+CaihOESMcTKHoK9JLkO34YC0t8u3JAyetIz3
- Z9ek42FU8fpf58vbpKUIR6POdiANmKLjeBlT0D3mHW2ta90O1s711NlA1yaaoUw7s4RJb09W2Votb
- G02pDu2qhupD1GNpufArm3mOcYDJt0Rhh9DkTR2WQ9SzfnfzapjxmRQtMzkrH0GWX5OPv368IzfbJ
- S1fw79TXmRx/DqyHg+7/bvqeA3ZFCnuC/HQST72ncuQA9wFbrg3ZVOPAjqrjesEOFFL4RSaT0JasS
- XdcxCbAu9WNrHbtRZu2jo7n4UkQ7F133zKH4B0SD5IclLgK6Zc92gnHylGEPtOFpij/zCRdZw20VH
- xrPO4eI5Za4iRpnKhCbL85zHE0f8pDaBLD9L56UuTVdRvB6cKncL4T6JmTR6wbH+J+s4L3OLjsyx2
- LfEcVEh+xFsW87YQgVY7Mm1q+O94P2soUqjU3KslSxgbX5BghY2yDcDMNlfnZ3SdeRNbssgT28PAk
- 5q9AmX/5YyNbexOCyYKZ9TLcAJJ1QLrHGoZaAIaR72K/kmVxy0oqdtAkvCQw4j2DCQDR0lQXsH2bl
- WTSfNIdSZd4pMxXHFF5iQbh+uReDc8rISNOFMAZcIMd+9jRNCbyGcoFiLa52yNGOLo7Im+CIlmZEt
- bzyGkKh2h8XdrYhtDjw9LmrprPQ==
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.52.3 (3.52.3-1.fc40) 
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YYI2Ma6u"
+Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-1f70c457823so2962595ad.3
+        for <linux-bluetooth@vger.kernel.org>; Thu, 04 Jul 2024 05:41:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1720096897; x=1720701697; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=ZQbJzgTDBMCbbI2g7TIuC6vLyDQNpRmtXn4O1GDPF7k=;
+        b=YYI2Ma6uBdrOnwCi0z6rHRoIXPPtsDIWPF5SOOYjbI+DPTVW0H++Dd4MeIV940sTbd
+         raUgWRAZGBqSFMprcnAwmaI0EB0licQT+pQe/2gHVHGoYtcrsR5IK8Ax4qE23HibiLEp
+         S9Gbs2VWgLdM50++Im2RjY7mw56c+MQthLvQ/AntU8BsxEHFBrUNmRd4bh3u4yw2A9AE
+         0Cbzi5Wh+VI1WX68jVO3+ZWuOrBmvcLrkwEUs/4FAQk7tfArKOYW/Spz+aqpoEipKA4C
+         NzqO4y97C+2KhQK+aqqliJMZP8tpLwrXZnIsukXGQNsVdAqp1y97I4A2orpl6dOrxGm7
+         QUSg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1720096897; x=1720701697;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ZQbJzgTDBMCbbI2g7TIuC6vLyDQNpRmtXn4O1GDPF7k=;
+        b=kspaEYARpuCwKYwcSu/+f2bQo17ztjJladLoEdNfMbyN40TtCjJTh6zgi5RbVupkuh
+         mIBXzvZR4NMy2sHCU6K3/nCbP/sCxPSxFVukGtyAvP4aFnTHta7is3ORHocrmYL1ocrY
+         BWSFwiK24IyLSPfCnk848yDFmuDw50C+98kIdwjRfoA6XahOukz734qFgoCxaUXlX7dL
+         r1rDs5CwM2X2thB7G31R+zWIwPTHQIVUTwRksqKdAe0s8f0sZOuppDepIClFaFS7aRT/
+         NoyuklTAATy6UvqOC2Rryl8o6lPFb9ZHVc3lWcFXYNXAe0qyjDDj/Ev1RBsmww7KNacd
+         DIjA==
+X-Gm-Message-State: AOJu0YzY3TmvfIvax6qWRmC13Ns+6IVdL3VdFqSOynarvHNUAz1C1jCr
+	n6lQhIq+Cu0Hn3yYfvxM4DhrpJGZrvu8ue1fHvNg96SPJqBnUYYRMiAp2Q==
+X-Google-Smtp-Source: AGHT+IEpNzrWZucTps8CfQ8hOF3+YfJoH1XdTGAScgtxQH6N1f687l5GvZ2xf6CVka6BO6TyXDyNQw==
+X-Received: by 2002:a17:902:e892:b0:1fb:2318:d157 with SMTP id d9443c01a7336-1fb33df606bmr12147345ad.9.1720096896928;
+        Thu, 04 Jul 2024 05:41:36 -0700 (PDT)
+Received: from [172.17.0.2] ([13.88.100.239])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1fac10d1b61sm122029675ad.57.2024.07.04.05.41.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 04 Jul 2024 05:41:36 -0700 (PDT)
+Message-ID: <66869880.170a0220.876da.c47e@mx.google.com>
+Date: Thu, 04 Jul 2024 05:41:36 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============3070850849891686089=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, r.smirnov@omp.ru
+Subject: RE: [BlueZ,v2] client/player: add error code handling to transport_recv()
+In-Reply-To: <20240704104928.43336-1-r.smirnov@omp.ru>
+References: <20240704104928.43336-1-r.smirnov@omp.ru>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Hi,
+--===============3070850849891686089==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-to, 2024-07-04 kello 12:24 +0200, Bastien Nocera kirjoitti:
-> Set a lower-bound to the data MTU to avoid allocating -1 elements if
-> bt_att_get_mtu() returns zero.
->=20
-> Error: OVERRUN (CWE-119): [#def36] [important]
-> bluez-5.76/src/shared/gatt-server.c:1121:2: zero_return: Function call "b=
-t_att_get_mtu(server->att)" returns 0.
-> bluez-5.76/src/shared/gatt-server.c:1121:2: assignment: Assigning: "data-=
->mtu" =3D "bt_att_get_mtu(server->att)". The value of "data->mtu" is now 0.
-> bluez-5.76/src/shared/gatt-server.c:1123:19: assignment: Assigning: "__n"=
- =3D "(size_t)(data->mtu - 1UL)". The value of "__n" is now 184467440737095=
-51615.
-> bluez-5.76/src/shared/gatt-server.c:1123:19: assignment: Assigning: "__s"=
- =3D "1UL".
-> bluez-5.76/src/shared/gatt-server.c:1123:19: overrun-buffer-arg: Calling =
-"memset" with "__p" and "__n * __s" is suspicious because of the very large=
- index, 18446744073709551615. The index may be due to a negative parameter =
-being interpreted as unsigned. [Note: The source code implementation of the=
- function has been overridden by a builtin model.]
-> 1121|		data->mtu =3D bt_att_get_mtu(server->att);
-> 1122|		data->length =3D 0;
-> 1123|->		data->rsp_data =3D new0(uint8_t, data->mtu - 1);
-> 1124|
-> 1125|		return data;
-> ---
->  src/shared/gatt-server.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->=20
-> diff --git a/src/shared/gatt-server.c b/src/shared/gatt-server.c
-> index 3a53d5dfde6b..c587553d655d 100644
-> --- a/src/shared/gatt-server.c
-> +++ b/src/shared/gatt-server.c
-> @@ -1118,7 +1118,7 @@ static struct read_mult_data *read_mult_data_new(st=
-ruct bt_gatt_server *server,
->  	data->server =3D server;
->  	data->num_handles =3D num_handles;
->  	data->cur_handle =3D 0;
-> -	data->mtu =3D bt_att_get_mtu(server->att);
-> +	data->mtu =3D MAX(bt_att_get_mtu(server->att), BT_ATT_DEFAULT_LE_MTU);
+This is automated email and please do not reply to this email!
 
-Is this correct, probably MTU less than default are valid?
+Dear submitter,
 
->  	data->length =3D 0;
->  	data->rsp_data =3D new0(uint8_t, data->mtu - 1);
-> =20
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=868404
 
-Might be better to instead: MAX(data->mtu, 1) - 1
+---Test result---
 
---=20
-Pauli Virtanen
+Test Summary:
+CheckPatch                    PASS      0.26 seconds
+GitLint                       PASS      0.19 seconds
+BuildEll                      PASS      24.36 seconds
+BluezMake                     PASS      1651.77 seconds
+MakeCheck                     PASS      12.94 seconds
+MakeDistcheck                 PASS      180.39 seconds
+CheckValgrind                 PASS      255.77 seconds
+CheckSmatch                   PASS      360.05 seconds
+bluezmakeextell               PASS      120.85 seconds
+IncrementalBuild              PASS      1441.50 seconds
+ScanBuild                     PASS      1030.93 seconds
+
+
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============3070850849891686089==--
