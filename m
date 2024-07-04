@@ -1,100 +1,113 @@
-Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
+Received: from mail-qt1-f178.google.com (mail-qt1-f178.google.com [209.85.160.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 748081AAE2A
-	for <linux-bluetooth@vger.kernel.org>; Thu,  4 Jul 2024 09:08:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0933518A93F
+	for <linux-bluetooth@vger.kernel.org>; Thu,  4 Jul 2024 09:52:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720084117; cv=none; b=tRzlHlKh/3q+R9dz5zE0HuQfFOdRGSKrnRIu+myed1sXLJeEwt7SNP4sqFmvuOgdIsxUnYZjCNo0h0DCDf1EqZTHiqxGRWHGA0UBX5maZZ/f/ba1afRDGYo2/q3tdAO8dYeIXlQOuENM1AYKuoKHFxWbCocN9ecj/t1XHljo7T4=
+	t=1720086746; cv=none; b=nCMn6NaJvzbdsOd4QvK0q1cwYuvE8K/SbEqR4ZUL2aBolQ7dN0cW77SLMZsaZFYhvjxxZUMvMMHGTjx3a9kBZDcTmlrEbHR2Zor7usfIsRKgktNe1gDIUmwJN+sFCQFjEWHgfwm3Ay3uTcae8Gcq8PfBfi30Z9BYNMwxlCYzlFM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720084117; c=relaxed/simple;
-	bh=Inx2ANl8sO5OHMInul2DFbY6yHQoPg5iri8wt9C8dGE=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=AQlpLtgZ2XJg7iN4zZ/s3NvAU3r68vBAieb1nHlSvuVLutkDX8OKKVKlUb7AJUCenKzx/TEvmCjRlvsWMgdsMLrnlUcclkWm6hXusAZxB/N4jydgRyQ6Cq5YkW5UcIzM4GHSr8vfz30D202Y+uK6EJShD9o+ezRnXgdQlBj77I4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
-Received: from localhost.localdomain (217.23.187.157) by msexch01.omp.ru
- (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Thu, 4 Jul
- 2024 12:08:26 +0300
-From: Roman Smirnov <r.smirnov@omp.ru>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Roman Smirnov <r.smirnov@omp.ru>
-Subject: [PATCH BlueZ v2 3/3] shared/gatt-client: add NULL check to discover_secondary_cb()
-Date: Thu, 4 Jul 2024 12:07:54 +0300
-Message-ID: <20240704090756.31351-4-r.smirnov@omp.ru>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240704090756.31351-1-r.smirnov@omp.ru>
-References: <20240704090756.31351-1-r.smirnov@omp.ru>
+	s=arc-20240116; t=1720086746; c=relaxed/simple;
+	bh=YPjW8vzhN4k02S3k2VlT4q3agyhFgFUUFSwXwX2XOVs=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=TGQZUPwW2MdfJyDJEfO+wencA9ERXCTnKVhOrUHkq6n/9AqayGTZ26ZScoNhLcQOZtKVFFzLXFg+7my6nIDQ39YJG1JtDCoQbDkBzJ/iMet9YFehoU6vEEOKO2VyUcKLaRjAAtSOyIxrKa6Vn22jSCB0BllX5MA2xsfBn+AY1sE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=F2KXjOfP; arc=none smtp.client-ip=209.85.160.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="F2KXjOfP"
+Received: by mail-qt1-f178.google.com with SMTP id d75a77b69052e-447bfa828f9so2299901cf.3
+        for <linux-bluetooth@vger.kernel.org>; Thu, 04 Jul 2024 02:52:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1720086744; x=1720691544; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=7X5/dMN3qvoKIXMR/Vh5ndY61qnHBLQwdYZUludv2bc=;
+        b=F2KXjOfPDEkva8cfFt8GqIQcI/4ks9mYqa56qaPNSg6tizbXYM96QqVlPwsclvX5xe
+         M4+dG9NiXlxBOp4wU8pWiEzMVlP2AxQGhwtLlImoc98QuXNGAenqpsALExSNbWNZ2byS
+         VfoBL5xYWvyPZOVZiw1HFzsv4yzmKzfbmqFRFhnQ4QL+x52zEYVGKJ0JFtg1ka/SB90k
+         RC/fP5MmWPJyUVyrty5unINrFQDK3hJmBqzFJs9GiBp4tcqeEphWiPFA9XRX6T+EWpMy
+         ZTwu4DyjkKhrtS1N0PjQJsK7IUObFiFeSP9NsyCxW9V7XhOM54WedkAO0EypbKoCfILL
+         0xFQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1720086744; x=1720691544;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=7X5/dMN3qvoKIXMR/Vh5ndY61qnHBLQwdYZUludv2bc=;
+        b=P0j+bHmT4136L8L0AuuJ7gIdQpyCpX29DXc2FcrG/tpfY9IPeMpjqkbbPVO6IX5nbs
+         8HNMh2dVVbmfrH+VXEIZsIE2C0s+Ek1Et+qIq/GT/hO6AmBbMntHpUK00q7nD3G7hv67
+         oVoaKz2Z7KwVfp4O32Xilr9FMDZ+VEESVNzl6BcL1xWLi9Kimo2i7Tio9hHV0MpC+6gG
+         QnHgSQvUfa/Ab1tvMcNyJSx65CuACjwdkxOT34xbBR0TaeLjROGwFUq9+Pp1vYGPte+r
+         lRgqdHf+ZnN/6DNMi9AZ/EORJG3uPfPDmHQiPn44SRMBVPPPMBwja6OjdhxGK3nR4mY3
+         PsQg==
+X-Gm-Message-State: AOJu0Yx1VYz7mCysRJ4IbtqEnttmqhArtfYOZMJe2Ufe9zs2ZBfUmqHv
+	at+O91BX7BAoz5mnqqJOMW+Bmm6XxzTwpmCPNMAqXgV18Wlhy9JTLUPRoQ==
+X-Google-Smtp-Source: AGHT+IGm9vVDU7sFJGAGgtI3suu4J/ppaNLmaZydAat3P1tmyzMOD/CoAGCf4Ov5zr6dMbPHVo0hKg==
+X-Received: by 2002:ac8:7c53:0:b0:444:f877:18aa with SMTP id d75a77b69052e-447cbf89bbfmr14623231cf.60.1720086743619;
+        Thu, 04 Jul 2024 02:52:23 -0700 (PDT)
+Received: from [172.17.0.2] ([20.81.46.176])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-44651404042sm59154971cf.30.2024.07.04.02.52.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 04 Jul 2024 02:52:23 -0700 (PDT)
+Message-ID: <668670d7.050a0220.36da7.8ff4@mx.google.com>
+Date: Thu, 04 Jul 2024 02:52:23 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============1147091522354830415=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
- (10.188.4.12)
-X-KSE-ServerInfo: msexch01.omp.ru, 9
-X-KSE-AntiSpam-Interceptor-Info: scan successful
-X-KSE-AntiSpam-Version: 6.1.0, Database issued on: 07/04/2024 08:52:56
-X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
-X-KSE-AntiSpam-Method: none
-X-KSE-AntiSpam-Rate: 59
-X-KSE-AntiSpam-Info: Lua profiles 186322 [Jul 04 2024]
-X-KSE-AntiSpam-Info: Version: 6.1.0.4
-X-KSE-AntiSpam-Info: Envelope from: r.smirnov@omp.ru
-X-KSE-AntiSpam-Info: LuaCore: 21 0.3.21
- ebee5449fc125b2da45f1a6a6bc2c5c0c3ad0e05
-X-KSE-AntiSpam-Info: {rep_avail}
-X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
-X-KSE-AntiSpam-Info: {relay has no DNS name}
-X-KSE-AntiSpam-Info: {SMTP from is not routable}
-X-KSE-AntiSpam-Info: {Found in DNSBL: 217.23.187.157 in (user)
- b.barracudacentral.org}
-X-KSE-AntiSpam-Info:
-	127.0.0.199:7.1.2;omp.ru:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;217.23.187.157:7.1.2
-X-KSE-AntiSpam-Info: ApMailHostAddress: 217.23.187.157
-X-KSE-AntiSpam-Info: {DNS response errors}
-X-KSE-AntiSpam-Info: Rate: 59
-X-KSE-AntiSpam-Info: Status: not_detected
-X-KSE-AntiSpam-Info: Method: none
-X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
- smtp.mailfrom=omp.ru;dkim=none
-X-KSE-Antiphishing-Info: Clean
-X-KSE-Antiphishing-ScanningType: Heuristic
-X-KSE-Antiphishing-Method: None
-X-KSE-Antiphishing-Bases: 07/04/2024 08:56:00
-X-KSE-Antivirus-Interceptor-Info: scan successful
-X-KSE-Antivirus-Info: Clean, bases: 7/4/2024 6:00:00 AM
-X-KSE-Attachment-Filter-Triggered-Rules: Clean
-X-KSE-Attachment-Filter-Triggered-Filters: Clean
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, r.smirnov@omp.ru
+Subject: RE: [BlueZ,v2] client/player: add error code handling to transport_recv()
+In-Reply-To: <20240704074759.15844-1-r.smirnov@omp.ru>
+References: <20240704074759.15844-1-r.smirnov@omp.ru>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-It is necessary to prevent dereferencing of a NULL pointer.
+--===============1147091522354830415==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Found with the SVACE static analysis tool.
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=868334
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.45 seconds
+GitLint                       FAIL      0.49 seconds
+BuildEll                      PASS      25.33 seconds
+BluezMake                     PASS      1897.59 seconds
+MakeCheck                     PASS      13.34 seconds
+MakeDistcheck                 PASS      180.67 seconds
+CheckValgrind                 PASS      253.61 seconds
+CheckSmatch                   PASS      359.52 seconds
+bluezmakeextell               PASS      127.39 seconds
+IncrementalBuild              PASS      1666.22 seconds
+ScanBuild                     PASS      1035.74 seconds
+
+Details
+##############################
+Test: GitLint - FAIL
+Desc: Run gitlint
+Output:
+[BlueZ,v2] client/player: add error code handling to transport_recv()
+
+WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
+7: B2 Line has trailing whitespace: " V1 -> V2: the name of the patch has been shortened "
+
+
 ---
- src/shared/gatt-client.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
-index 8e4ae7e5e..8b0362503 100644
---- a/src/shared/gatt-client.c
-+++ b/src/shared/gatt-client.c
-@@ -1276,7 +1276,9 @@ next:
- 
- 	range = queue_peek_head(op->discov_ranges);
- 
--	client->discovery_req = bt_gatt_discover_included_services(client->att,
-+	if (range)
-+		client->discovery_req = bt_gatt_discover_included_services(
-+							client->att,
- 							range->start,
- 							range->end,
- 							discover_incl_cb,
--- 
-2.43.0
 
+--===============1147091522354830415==--
