@@ -1,98 +1,103 @@
-Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [217.70.183.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f174.google.com (mail-lj1-f174.google.com [209.85.208.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FC621AED49
-	for <linux-bluetooth@vger.kernel.org>; Thu,  4 Jul 2024 14:03:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 577DC1AEFEA
+	for <linux-bluetooth@vger.kernel.org>; Thu,  4 Jul 2024 14:17:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720101830; cv=none; b=c5ArIw6k6VS8d0/yPKjaSnFKbnmHp165Ir0GKR3RQMxIJJXjN9c6/JxKAaPIB6l4Wd2k+d+lqq5dCL9QOEoXtyoxVoig5iyHxv0/RrhiuRAS5huq7BpfgIN2br6Uuf32pco8gJWoJOm68McZsCc/sJAnBXNrO8PTHGLKJDTrphg=
+	t=1720102670; cv=none; b=aScKfbXA/T3zC7ZaCf4k/ZWqVhj7poP2w6C0yTj2336h9xENQEEsR2yjoSc9HTmY37lrJlIiAiyl9Inq6t/2jhnhXg4MqoZptoYVqQjgklMdX9on4nEVuKRH7LkMCpoX9ziOi04tOvshNSz2/G+7otKiAAN6XcMQyYBaAeglnDY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720101830; c=relaxed/simple;
-	bh=0I9Bz70gT826G6ZdYTShnJSKZukvCAk6r/lZDm6eaNU=;
-	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=SPu3uIRPyOOx7pXGMe3bzzrIE/dmbKzgM4iBIUAPRugD1coeV9qVZm3/zbBXIReKPxgIEuaZxhhk1n2NDlQgoEeDDh+ik0XEebqZFZpkTdDaytu0gGtqqAGmjXltGQyr0tOmb0uKWN3TWxmzKRFh/08st0EHsLSijZ1KpHcuVDk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.183.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hadess.net
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 8D6F31BF210;
-	Thu,  4 Jul 2024 14:03:46 +0000 (UTC)
-Message-ID: <86b5a90fef7eb8c440a9ea0ad5aac7be66fb7fe8.camel@hadess.net>
-Subject: Re: [BlueZ 01/12] gatt-server: Don't allocate negative data
-From: Bastien Nocera <hadess@hadess.net>
-To: Pauli Virtanen <pav@iki.fi>, linux-bluetooth@vger.kernel.org
-Date: Thu, 04 Jul 2024 16:03:46 +0200
-In-Reply-To: <1d92694f4c71324970862724d693c45c423f94ae.camel@iki.fi>
-References: <20240704102617.1132337-1-hadess@hadess.net>
-	 <20240704102617.1132337-2-hadess@hadess.net>
-	 <1d92694f4c71324970862724d693c45c423f94ae.camel@iki.fi>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
+	s=arc-20240116; t=1720102670; c=relaxed/simple;
+	bh=ePv5ADr2Hp9tuVYkJoExoEuPx5XqczraIs0xQMX2AMM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=PcWUka0ZmV8odDxSAWdeFxP5HALghW4UkGO3PrOOr+1WTocRUlCZNiW2eaN1P9TCZBoEsVJgKeg74y1BOyc3sIed+OrbWNhn0qPJKY6sxyx6A+/IvTdaxvh3+MsvA6+YRIChGUCCIzAs7dXxi3/V2pgoa79H+bhiU3GhSaFJJRY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ewIET4Rx; arc=none smtp.client-ip=209.85.208.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ewIET4Rx"
+Received: by mail-lj1-f174.google.com with SMTP id 38308e7fff4ca-2ec5fad1984so8932621fa.0
+        for <linux-bluetooth@vger.kernel.org>; Thu, 04 Jul 2024 07:17:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1720102666; x=1720707466; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ePv5ADr2Hp9tuVYkJoExoEuPx5XqczraIs0xQMX2AMM=;
+        b=ewIET4RxL9VDCrGUhEniO2irsZXUsxfZJzslIHMsvVVvtsoxw16fkLtSXrZY3pWUvQ
+         Scl8IM/XXjYq5AFHdHZVqdMt5MYjLTIBj5FQIQEQNvfI+TbAoUX+bpVnm1/gUoWnztM0
+         RH7y3y3kZTTsYb/es/q0Xe5JHNX+SMfHerMlUgs967WgNuSl2n7lH7hDDF4CG1cHV4O+
+         UDr5nOvgl9fbwbfiYMwolk1NpXuSCOyr3NfJdHJnf/mqb3FkPKzulLhrk8RG8nUE/fau
+         04fnGGYKx+RpXgUrCl8h39Gdp8oQL2NYEYYcJNKMiVQKdgOq0zMsnt0nxeeqTLr1zVUY
+         oxfw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1720102666; x=1720707466;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ePv5ADr2Hp9tuVYkJoExoEuPx5XqczraIs0xQMX2AMM=;
+        b=nkiUpjK1MvCAj5GpAscNTwUE6p4Rclr+TUW9jnAUSC41dWz7KyPhINZepVbVotJSuE
+         uz4E8weXeeitzWx4R0Pqdsm3vsd3w1Pb4ZSmV4yRbQmgopJgg2ey7RXwIEw6XaDqrbld
+         wnoFEGR47FlXDkz3c/6VhGImxLdbfTxoqQxjLGngWJZ12YCd7zoV9oGJQFaCwYyz6bHJ
+         41XYmwI/zmnBCshW7Svc+LZbPxaejoQ3Y4SfiY92HeWQlEfQXinYgB5cUjXPs22NMLX9
+         pPRjpDA4jEHapGyavj2QFX0ktOi1kn4BX4r90ttfPybXMJgfZp7D2cp1avb0eXTXolUV
+         O5zg==
+X-Forwarded-Encrypted: i=1; AJvYcCVQWD1pu7mF+gAn6Yke9DaMW7yIU3qpVXAcjPjCrB6+hZ9bln/Y+svauNXnWI9mwx2NKvvotP36EF1GLUYUpkitC/tVr9NYfabZkgSYm97Q
+X-Gm-Message-State: AOJu0YzIsamQV+fwKLzquB68X8W6lIjqFP44/+T6h60CikOXLsNtCQyr
+	aQ/MMsrJej8Uav/ngLLAbchaE8OxeF9QwcduqwWvPbIfa6jSxUeyuIQkKgoNih2DcwzCIiK+A2S
+	pBtAQgn2YlUOiLXcwMI/9bK2MG5hjEg==
+X-Google-Smtp-Source: AGHT+IHey+p5n66ZuChSZ1DeKeGGZ99IhbcpvtM+8I8yejKawy1X7cLGBC9FymgYVeaNkGMBD2aTJzu/KEEaV7g3pSw=
+X-Received: by 2002:a2e:6e11:0:b0:2ee:8d05:db2 with SMTP id
+ 38308e7fff4ca-2ee8eda81b9mr13549451fa.29.1720102665988; Thu, 04 Jul 2024
+ 07:17:45 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-GND-Sasl: hadess@hadess.net
+References: <4cb7ecc4-2bf0-4403-a995-7ca3817be4cc@gmx.li> <CABBYNZK2xgDZ-bkxE6L-5Yt9x3PDKT_swDpN1=HAD9PC_6QpVA@mail.gmail.com>
+ <c0b60ec6-08ef-4391-856d-14f60f33af9e@gmx.li> <CABBYNZLrATLZaE756Guu9K3nGxGc3aVzSuxOiLw9icsO5+QXww@mail.gmail.com>
+ <d7c41cc6422da3e024280c055661833411c6e847.camel@hadess.net>
+In-Reply-To: <d7c41cc6422da3e024280c055661833411c6e847.camel@hadess.net>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Thu, 4 Jul 2024 10:17:32 -0400
+Message-ID: <CABBYNZLkQh-Lb9P-ZwDgXkQJPpxVSRE0wTEFGEG6nUQ9HQkboA@mail.gmail.com>
+Subject: Re: [bug report] Reproducible pairing loss after reboot / Mediatek
+ RZ616 [partly resolved / probably not a Bluez bug]
+To: Bastien Nocera <hadess@hadess.net>
+Cc: =?UTF-8?B?Sm9uYXMgw5Z6YmF5?= <usul@gmx.li>, 
+	linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, 2024-07-04 at 15:25 +0300, Pauli Virtanen wrote:
-> Hi,
->=20
-> to, 2024-07-04 kello 12:24 +0200, Bastien Nocera kirjoitti:
-> > Set a lower-bound to the data MTU to avoid allocating -1 elements
-> > if
-> > bt_att_get_mtu() returns zero.
-> >=20
-> > Error: OVERRUN (CWE-119): [#def36] [important]
-> > bluez-5.76/src/shared/gatt-server.c:1121:2: zero_return: Function
-> > call "bt_att_get_mtu(server->att)" returns 0.
-> > bluez-5.76/src/shared/gatt-server.c:1121:2: assignment: Assigning:
-> > "data->mtu" =3D "bt_att_get_mtu(server->att)". The value of "data-
-> > >mtu" is now 0.
-> > bluez-5.76/src/shared/gatt-server.c:1123:19: assignment: Assigning:
-> > "__n" =3D "(size_t)(data->mtu - 1UL)". The value of "__n" is now
-> > 18446744073709551615.
-> > bluez-5.76/src/shared/gatt-server.c:1123:19: assignment: Assigning:
-> > "__s" =3D "1UL".
-> > bluez-5.76/src/shared/gatt-server.c:1123:19: overrun-buffer-arg:
-> > Calling "memset" with "__p" and "__n * __s" is suspicious because
-> > of the very large index, 18446744073709551615. The index may be due
-> > to a negative parameter being interpreted as unsigned. [Note: The
-> > source code implementation of the function has been overridden by a
-> > builtin model.]
-> > 1121|		data->mtu =3D bt_att_get_mtu(server->att);
-> > 1122|		data->length =3D 0;
-> > 1123|->		data->rsp_data =3D new0(uint8_t, data->mtu - 1);
-> > 1124|
-> > 1125|		return data;
-> > ---
-> > =C2=A0src/shared/gatt-server.c | 2 +-
-> > =C2=A01 file changed, 1 insertion(+), 1 deletion(-)
-> >=20
-> > diff --git a/src/shared/gatt-server.c b/src/shared/gatt-server.c
-> > index 3a53d5dfde6b..c587553d655d 100644
-> > --- a/src/shared/gatt-server.c
-> > +++ b/src/shared/gatt-server.c
-> > @@ -1118,7 +1118,7 @@ static struct read_mult_data
-> > *read_mult_data_new(struct bt_gatt_server *server,
-> > =C2=A0	data->server =3D server;
-> > =C2=A0	data->num_handles =3D num_handles;
-> > =C2=A0	data->cur_handle =3D 0;
-> > -	data->mtu =3D bt_att_get_mtu(server->att);
-> > +	data->mtu =3D MAX(bt_att_get_mtu(server->att),
-> > BT_ATT_DEFAULT_LE_MTU);
->=20
-> Is this correct, probably MTU less than default are valid?
+Hi Bastien,
 
-This is the same code as in bt_gatt_server_new().
+On Thu, Jul 4, 2024 at 4:20=E2=80=AFAM Bastien Nocera <hadess@hadess.net> w=
+rote:
+>
+> On Wed, 2024-07-03 at 13:31 -0400, Luiz Augusto von Dentz wrote:
+> > <snip>
+> > @Bastien Nocera do you happen to know why gnome not register a
+> > pairing
+> > agent? Ive seem quite a few reports of things not working after
+> > rebooting lately which hints to No-bonding pairing happening or
+> > perhaps fedora uses main.conf:AlwaysPairable?
+>
+> There hasn't been a pairing agent in GNOME outside the Bluetooth
+> Settings panel for more than 10 years.
+>
+> I've never seen this being a problem before.
+>
+> Fedora uses the main.conf shipped by bluez with no changes (except
+> AutoEnable to true, which does nothing as it's already the default):
+> https://src.fedoraproject.org/rpms/bluez/blob/rawhide/f/bluez.spec#_196
 
->=20
-> > =C2=A0	data->length =3D 0;
-> > =C2=A0	data->rsp_data =3D new0(uint8_t, data->mtu - 1);
-> > =C2=A0
->=20
-> Might be better to instead: MAX(data->mtu, 1) - 1
+Hmm, so if you got a incoming pairing request there is nothing to
+respond to authentication? Well even in that case it doesn't explain
+why there was no agent while setting up a new device, or perhaps that
+is not how setting up new devices works nowadays? Jonas, did you use
+the gnome setting panel to set it up or did you use something else?
 
-I'd be fine with either, if somebody knows that particular part of the
-code better than I do...
+--=20
+Luiz Augusto von Dentz
