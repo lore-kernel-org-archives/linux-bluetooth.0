@@ -1,122 +1,226 @@
-Received: from mail-pg1-f180.google.com (mail-pg1-f180.google.com [209.85.215.180])
+Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06F4513791C
-	for <linux-bluetooth@vger.kernel.org>; Thu,  4 Jul 2024 18:45:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFD913219F
+	for <linux-bluetooth@vger.kernel.org>; Thu,  4 Jul 2024 19:01:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720118743; cv=none; b=eQOBN8Exqi9OM1wOQ5GftMQhKSWBh8B3gghxcoSUywR6ubJZMF2Jl0cuPNXO8LtwKDtQTk1F0C6jlMMNiKu0BKxhYokU2/SAUKCfe5ECWwnIjqb8q6MZvMYc/voE4Mj7ojWfnDyixmolzJ5n0vZcNMOc9atnr5++zvLvLu4xun0=
+	t=1720119684; cv=none; b=tDsNBMU5lxW4F6d4MCnxxB1ckbBjNUzpfgou5tyruffBeniIHw9qHAdKztQQe2hxJBYu9qH/vexa9w7p4nID7QFqs8Rf44r79dcNDv7etnUOccyVCMbQ9TmM28/WDSPxH8pOy3kMg8gINaIJrXmtUH65N3+Om4zR35wUNir5/EA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720118743; c=relaxed/simple;
-	bh=8yU0WSJm8B6j+o1CpIqBXWhcd7VuCLjaAaIoca84+hw=;
-	h=Content-Type:From:Mime-Version:Subject:Date:Message-Id:References:
-	 Cc:In-Reply-To:To; b=D1gpRT5q4GomXFCX8FTzNuj0VydR8Ege9zhbMAGdFWyxG7ZXOzNnr001sQDrbB0VhmgJFZG06OaP7Fugmw0gP1NGMok9iAvK/8pqIWUJLYUDcxl1H9YlUQiPmWE8lMSVTZionmivGqodilZJcOenJraPgHlNvpCD2J3PRDscxV4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=er9pVdFR; arc=none smtp.client-ip=209.85.215.180
+	s=arc-20240116; t=1720119684; c=relaxed/simple;
+	bh=JxmPYbeBYec02f6bI8s0R5Xn1vNgOnatS4RQEMli3lo=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=iFcqvjLK/kj9GxxSEJUhjuK9PxbWnHQd2BvTPUIxdYP76cy1EoOloII0ks5R0n3O7MemZSs0oiwjovKXgV1ThnxkMx08CXEgCe1XrAMyIbBglz5hZT6gXGPQsfQxk/dcnCiDRBcqpcCRmx/zx2zOaYB0F8F7fFpE29GIWHO/kOA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gBVaKQRm; arc=none smtp.client-ip=209.85.214.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="er9pVdFR"
-Received: by mail-pg1-f180.google.com with SMTP id 41be03b00d2f7-7594c490b04so597441a12.3
-        for <linux-bluetooth@vger.kernel.org>; Thu, 04 Jul 2024 11:45:41 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gBVaKQRm"
+Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-1f9fb3ca81bso5569275ad.3
+        for <linux-bluetooth@vger.kernel.org>; Thu, 04 Jul 2024 12:01:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1720118741; x=1720723541; darn=vger.kernel.org;
-        h=to:in-reply-to:cc:references:message-id:date:subject:mime-version
-         :from:content-transfer-encoding:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=U6/+QKSxwwG+u3NDCNmTXkZFX5Z7TV2L+ouSwYKU4cg=;
-        b=er9pVdFRA3Xt262R/NEVFpTO3UyXzJDFCeXODyKp3PUG1On6vviVr128/hy0wQs1ST
-         0aZrQZKZ8qZeHs2K3BzGw0tJXUXuB+OdbfdmuZBVOJALRYHkYVZW6UslPNzYTMHb2zpE
-         N1s9Ak1KlVeTcmB0GaEFPSfvDQriUn5WzBPes+8fUDzf6fUaQVlNMCisJeyUMbTaCTdl
-         +LQhMRUiAji55LsZ3V9CupYVz4BwQd3etmfzBTXNirPJXJ1kbHHWyavqKAq9oHovdBOs
-         G+ChDO4em6GeXFFmqw044T/Yj5hnuO2dhqn2Z+kxSpiRtkfhBsROaGvqDYeLlK3CD1yR
-         YDEg==
+        d=gmail.com; s=20230601; t=1720119682; x=1720724482; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=JxmPYbeBYec02f6bI8s0R5Xn1vNgOnatS4RQEMli3lo=;
+        b=gBVaKQRmCc6yq6P9RPKmts2Ll5jkKhjSsLUAFOUZYNX7KPXggvg1JAF060z1PU1gVn
+         Nsp2hjryz4TGkAP1GMpXcGI3emF8nl56BC9wcVTcNmlIDwnZbW8ImVR/vWWnFv/izrAo
+         alD4JxoXBS5U6rVRLdFr3/vtCTf79ECV3z/YNd89Tvw6KfJdoE1ZaaMh8VxwtRNGzQUF
+         4jGlEC4YIZ7rPcx0SArUcv8RzF+meZtt5+z/BXK+Vd0djZvNmznQifWQKrXTybU47Zt6
+         1k1CHY9LVitLycIqJNBEmSKambN+5URkUDASdu9V1fa2TfaPUoQo7zmey/5/WZjpDA1U
+         sBTw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720118741; x=1720723541;
-        h=to:in-reply-to:cc:references:message-id:date:subject:mime-version
-         :from:content-transfer-encoding:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=U6/+QKSxwwG+u3NDCNmTXkZFX5Z7TV2L+ouSwYKU4cg=;
-        b=adbM9OLzjzwY3xLtndLCSg2kFpWQ0+q1tFyqsdJ0xukabr0eg6vcHi0EsaWzFiZKSZ
-         pbExEqL5xGIJ02OQ8XBjU/1yH2u2V7R5dEENRg98M5PkiR2WGMrHABgYWMma2I0ooq1a
-         02643l/+Jz8/Uy0i+nqT7jsdC6xUF/BvalUw09ocbP3CtBIq+5FLULo4bPDprrtytSZA
-         3tVmBjXP5GB9USKXMLVIW0XIeGblx2updGNeB2CwKLnRaoNIzxaMkQFpSAJ9YBxL6Log
-         +ht2GZchsbdFlyAYA/KnadCPkVXzzOK044uOMVRRLALZgkXQbFSYGPm/QsNqzyFE/hdq
-         +2oA==
-X-Gm-Message-State: AOJu0YwVVhvN5LakQXcG6RDCueFvbKMrR01gy0EVXcifLgsc5vG/wjtH
-	6/cZ3xhiAj+1C4am53OpM8WNQKcTBN1I7mFcPBURO5YOb/luefvjM5rrwMoG
-X-Google-Smtp-Source: AGHT+IFB8m4QjUtOPLZtRYl3c+/BI/UB2Ervp4j4xOmWGoFkx41XQLHsSxUTHB0dAj/5xTTN6EPRbw==
-X-Received: by 2002:a05:6a20:2d29:b0:1bd:24f9:1124 with SMTP id adf61e73a8af0-1c0cc88ed6dmr3089402637.27.1720118741129;
-        Thu, 04 Jul 2024 11:45:41 -0700 (PDT)
-Received: from smtpclient.apple (97-113-165-148.tukw.qwest.net. [97.113.165.148])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2c99a94e83dsm1871041a91.7.2024.07.04.11.45.40
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 04 Jul 2024 11:45:40 -0700 (PDT)
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-From: Brian Gix <bggixx@gmail.com>
+        d=1e100.net; s=20230601; t=1720119682; x=1720724482;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=JxmPYbeBYec02f6bI8s0R5Xn1vNgOnatS4RQEMli3lo=;
+        b=El44Vh/9j98gb0nOtPOoZXbyQqgLZ3sn0ApXTZ3cZi8Y3BWHq1Zx4tsPRi64+6Oj53
+         hYrLQuddRdTujaHzu5GZvDO3++wfIfdjvBOc4ipFm26Nyy0FHsZYAHE+PtRvMVzE9aNE
+         ia0A7CTcFN2zKuzJwwZ9PUqDBOl04A5gf99jWEmyJ27K0GtP6m2xC5VCqOvdrMhRyJez
+         5dYaUYyesmPcFYElErWPQaXvQiesn2NjLCv4drRdF1SM4+bhmEgNgLo5ReJQLlPB7Iyu
+         uF+0h8xy9a1eI+OoGUwcVPjiMbA3CPjJcR/FxotDxAXrJ1tkId6dIQG6JMPT677LVv97
+         E6xw==
+X-Gm-Message-State: AOJu0YzQdtdUsqhtHtOSfwe38FGuMfrhMJaQJw4giO4peEO18sLOa6Bm
+	fLruIzSc7SweinAZfEpY+wxz7yvG6HYBl8GWJlhcewowb5x+XfXEVQ5d7g==
+X-Google-Smtp-Source: AGHT+IGIkPlG5UdRwPQy5QjC+1lEXLkesEE+KmdnhanpHgFA5w2IFJxQ8iuQJ7g3CH+pBVSqTu33pQ==
+X-Received: by 2002:a17:90a:6007:b0:2c9:98bb:b9fb with SMTP id 98e67ed59e1d1-2c99c5418fbmr1899665a91.10.1720119681517;
+        Thu, 04 Jul 2024 12:01:21 -0700 (PDT)
+Received: from [172.17.0.2] ([52.234.38.74])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2c99a98ac94sm1872729a91.33.2024.07.04.12.01.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 04 Jul 2024 12:01:21 -0700 (PDT)
+Message-ID: <6686f181.170a0220.36386.4696@mx.google.com>
+Date: Thu, 04 Jul 2024 12:01:21 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============6055408919361835249=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (1.0)
-Subject: Re: [BlueZ 11/12] tools/mesh: Fix integer overflow due to cast operation
-Date: Thu, 4 Jul 2024 11:45:30 -0700
-Message-Id: <C7C313BA-2B8A-4638-81E8-80ED55CE07B6@gmail.com>
-References: <20240704102617.1132337-12-hadess@hadess.net>
-Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20240704102617.1132337-12-hadess@hadess.net>
-To: Bastien Nocera <hadess@hadess.net>
-X-Mailer: iPhone Mail (21F90)
+MIME-Version: 1.0
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, r.smirnov@omp.ru
+Subject: RE: fix errors found by SVACE static analyzer #2
+In-Reply-To: <20240704180752.94264-2-r.smirnov@omp.ru>
+References: <20240704180752.94264-2-r.smirnov@omp.ru>
+Reply-To: linux-bluetooth@vger.kernel.org
 
+--===============6055408919361835249==
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
 
-> On Jul 4, 2024, at 3:27=E2=80=AFAM, Bastien Nocera <hadess@hadess.net> wro=
-te:
->=20
-> =EF=BB=BFError: INTEGER_OVERFLOW (CWE-190): [#def29] [important]
-> bluez-5.76/tools/mesh/mesh-db.c:551:3: cast_overflow: Truncation due to ca=
-st operation on "ele_cnt" from 32 to 8 bits.
-> bluez-5.76/tools/mesh/mesh-db.c:551:3: overflow_sink: "ele_cnt", which mig=
-ht have overflowed, is passed to "remote_add_node((uint8_t const *)uuid, uni=
-cast, ele_cnt, key_idx)".
-> 549|            continue;
-> 550|
-> 551|->        remote_add_node((const uint8_t *)uuid, unicast, ele_cnt,
-> 552|                                key_idx);
-> 553|        for (j =3D 1; j < key_cnt; j++) {
-> ---
-> tools/mesh/mesh-db.c | 6 ++----
-> 1 file changed, 2 insertions(+), 4 deletions(-)
->=20
-> diff --git a/tools/mesh/mesh-db.c b/tools/mesh/mesh-db.c
-> index 1d047691d240..abcc09d523a5 100644
-> --- a/tools/mesh/mesh-db.c
-> +++ b/tools/mesh/mesh-db.c
-> @@ -503,7 +503,8 @@ static void load_remotes(json_object *jcfg)
->        uint8_t uuid[16];
->        uint16_t unicast, key_idx;
->        const char *str;
-> -        int ele_cnt, key_cnt;
-> +        uint8_t ele_cnt;
-> +        int key_cnt;
->        int j;
->=20
->        jnode =3D json_object_array_get_idx(jnodes, i);
-> @@ -533,9 +534,6 @@ static void load_remotes(json_object *jcfg)
->=20
->        ele_cnt =3D json_object_array_length(jarray);
->=20
-> -        if (ele_cnt > MAX_ELE_COUNT)
-> -            continue;
-> -
+VGhpcyBpcyBhdXRvbWF0ZWQgZW1haWwgYW5kIHBsZWFzZSBkbyBub3QgcmVwbHkgdG8gdGhpcyBl
+bWFpbCEKCkRlYXIgc3VibWl0dGVyLAoKVGhhbmsgeW91IGZvciBzdWJtaXR0aW5nIHRoZSBwYXRj
+aGVzIHRvIHRoZSBsaW51eCBibHVldG9vdGggbWFpbGluZyBsaXN0LgpUaGlzIGlzIGEgQ0kgdGVz
+dCByZXN1bHRzIHdpdGggeW91ciBwYXRjaCBzZXJpZXM6ClBXIExpbms6aHR0cHM6Ly9wYXRjaHdv
+cmsua2VybmVsLm9yZy9wcm9qZWN0L2JsdWV0b290aC9saXN0Lz9zZXJpZXM9ODY4NTYzCgotLS1U
+ZXN0IHJlc3VsdC0tLQoKVGVzdCBTdW1tYXJ5OgpDaGVja1BhdGNoICAgICAgICAgICAgICAgICAg
+ICBQQVNTICAgICAgMS40MSBzZWNvbmRzCkdpdExpbnQgICAgICAgICAgICAgICAgICAgICAgIFBB
+U1MgICAgICAwLjk2IHNlY29uZHMKQnVpbGRFbGwgICAgICAgICAgICAgICAgICAgICAgUEFTUyAg
+ICAgIDI0Ljk0IHNlY29uZHMKQmx1ZXpNYWtlICAgICAgICAgICAgICAgICAgICAgRkFJTCAgICAg
+IDIwLjA4IHNlY29uZHMKTWFrZUNoZWNrICAgICAgICAgICAgICAgICAgICAgRkFJTCAgICAgIDM3
+Ljg3IHNlY29uZHMKTWFrZURpc3RjaGVjayAgICAgICAgICAgICAgICAgUEFTUyAgICAgIDE3OS41
+MCBzZWNvbmRzCkNoZWNrVmFsZ3JpbmQgICAgICAgICAgICAgICAgIEZBSUwgICAgICAxNi45MSBz
+ZWNvbmRzCkNoZWNrU21hdGNoICAgICAgICAgICAgICAgICAgIEZBSUwgICAgICAyNS45MSBzZWNv
+bmRzCmJsdWV6bWFrZWV4dGVsbCAgICAgICAgICAgICAgIEZBSUwgICAgICAxNC44MiBzZWNvbmRz
+CkluY3JlbWVudGFsQnVpbGQgICAgICAgICAgICAgIEZBSUwgICAgICAxNjMyLjIzIHNlY29uZHMK
+U2NhbkJ1aWxkICAgICAgICAgICAgICAgICAgICAgRkFJTCAgICAgIDU1NC4yNyBzZWNvbmRzCgpE
+ZXRhaWxzCiMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIwpUZXN0OiBCbHVlek1ha2UgLSBG
+QUlMCkRlc2M6IEJ1aWxkIEJsdWVaCk91dHB1dDoKCnNyYy9zaGFyZWQvc2hlbGwuYzogSW4gZnVu
+Y3Rpb24g4oCYYnRfc2hlbGxfaW5pdOKAmToKc3JjL3NoYXJlZC9zaGVsbC5jOjEzMzY6MjE6IGVy
+cm9yOiBjb21wYXJpc29uIG9mIGludGVnZXIgZXhwcmVzc2lvbnMgb2YgZGlmZmVyZW50IHNpZ25l
+ZG5lc3M6IOKAmGludOKAmSBhbmQg4oCYc2l6ZV904oCZIHtha2Eg4oCYbG9uZyB1bnNpZ25lZCBp
+bnTigJl9IFstV2Vycm9yPXNpZ24tY29tcGFyZV0KIDEzMzYgfCAgICBpZiAob3B0ICYmIGluZGV4
+ID49IG9mZnNldCkgewogICAgICB8ICAgICAgICAgICAgICAgICAgICAgXn4KY2MxOiBhbGwgd2Fy
+bmluZ3MgYmVpbmcgdHJlYXRlZCBhcyBlcnJvcnMKbWFrZVsxXTogKioqIFtNYWtlZmlsZTo4Njgw
+OiBzcmMvc2hhcmVkL2xpYnNoYXJlZF9tYWlubG9vcF9sYS1zaGVsbC5sb10gRXJyb3IgMQptYWtl
+WzFdOiAqKiogV2FpdGluZyBmb3IgdW5maW5pc2hlZCBqb2JzLi4uLgptYWtlOiAqKiogW01ha2Vm
+aWxlOjQ2NjY6IGFsbF0gRXJyb3IgMgojIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMKVGVz
+dDogTWFrZUNoZWNrIC0gRkFJTApEZXNjOiBSdW4gQmx1ZXogTWFrZSBDaGVjawpPdXRwdXQ6Cgpz
+cmMvc2hhcmVkL3NoZWxsLmM6IEluIGZ1bmN0aW9uIOKAmGJ0X3NoZWxsX2luaXTigJk6CnNyYy9z
+aGFyZWQvc2hlbGwuYzoxMzM2OjIxOiBlcnJvcjogY29tcGFyaXNvbiBvZiBpbnRlZ2VyIGV4cHJl
+c3Npb25zIG9mIGRpZmZlcmVudCBzaWduZWRuZXNzOiDigJhpbnTigJkgYW5kIOKAmHNpemVfdOKA
+mSB7YWthIOKAmGxvbmcgdW5zaWduZWQgaW504oCZfSBbLVdlcnJvcj1zaWduLWNvbXBhcmVdCiAx
+MzM2IHwgICAgaWYgKG9wdCAmJiBpbmRleCA+PSBvZmZzZXQpIHsKICAgICAgfCAgICAgICAgICAg
+ICAgICAgICAgIF5+CmNjMTogYWxsIHdhcm5pbmdzIGJlaW5nIHRyZWF0ZWQgYXMgZXJyb3JzCm1h
+a2VbMV06ICoqKiBbTWFrZWZpbGU6ODQzNTogc3JjL3NoYXJlZC9saWJzaGFyZWRfZ2xpYl9sYS1z
+aGVsbC5sb10gRXJyb3IgMQptYWtlOiAqKiogW01ha2VmaWxlOjEyMjkyOiBjaGVja10gRXJyb3Ig
+MgojIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMKVGVzdDogQ2hlY2tWYWxncmluZCAtIEZB
+SUwKRGVzYzogUnVuIEJsdWV6IE1ha2UgQ2hlY2sgd2l0aCBWYWxncmluZApPdXRwdXQ6CgpzcmMv
+c2hhcmVkL3NoZWxsLmM6IEluIGZ1bmN0aW9uIOKAmGJ0X3NoZWxsX2luaXTigJk6CnNyYy9zaGFy
+ZWQvc2hlbGwuYzoxMzM2OjIxOiBlcnJvcjogY29tcGFyaXNvbiBvZiBpbnRlZ2VyIGV4cHJlc3Np
+b25zIG9mIGRpZmZlcmVudCBzaWduZWRuZXNzOiDigJhpbnTigJkgYW5kIOKAmHNpemVfdOKAmSB7
+YWthIOKAmGxvbmcgdW5zaWduZWQgaW504oCZfSBbLVdlcnJvcj1zaWduLWNvbXBhcmVdCiAxMzM2
+IHwgICAgaWYgKG9wdCAmJiBpbmRleCA+PSBvZmZzZXQpIHsKICAgICAgfCAgICAgICAgICAgICAg
+ICAgICAgIF5+CmNjMTogYWxsIHdhcm5pbmdzIGJlaW5nIHRyZWF0ZWQgYXMgZXJyb3JzCm1ha2Vb
+MV06ICoqKiBbTWFrZWZpbGU6ODY4MDogc3JjL3NoYXJlZC9saWJzaGFyZWRfbWFpbmxvb3BfbGEt
+c2hlbGwubG9dIEVycm9yIDEKbWFrZVsxXTogKioqIFdhaXRpbmcgZm9yIHVuZmluaXNoZWQgam9i
+cy4uLi4KbWFrZTogKioqIFtNYWtlZmlsZToxMjI5MjogY2hlY2tdIEVycm9yIDIKIyMjIyMjIyMj
+IyMjIyMjIyMjIyMjIyMjIyMjIyMjClRlc3Q6IENoZWNrU21hdGNoIC0gRkFJTApEZXNjOiBSdW4g
+c21hdGNoIHRvb2wgd2l0aCBzb3VyY2UKT3V0cHV0OgoKc3JjL3NoYXJlZC9jcnlwdG8uYzoyNzE6
+MjE6IHdhcm5pbmc6IFZhcmlhYmxlIGxlbmd0aCBhcnJheSBpcyB1c2VkLgpzcmMvc2hhcmVkL2Ny
+eXB0by5jOjI3MjoyMzogd2FybmluZzogVmFyaWFibGUgbGVuZ3RoIGFycmF5IGlzIHVzZWQuCnNy
+Yy9zaGFyZWQvZ2F0dC1oZWxwZXJzLmM6NzY4OjMxOiB3YXJuaW5nOiBWYXJpYWJsZSBsZW5ndGgg
+YXJyYXkgaXMgdXNlZC4Kc3JjL3NoYXJlZC9nYXR0LWhlbHBlcnMuYzo4MzA6MzE6IHdhcm5pbmc6
+IFZhcmlhYmxlIGxlbmd0aCBhcnJheSBpcyB1c2VkLgpzcmMvc2hhcmVkL2dhdHQtaGVscGVycy5j
+OjEzMjM6MzE6IHdhcm5pbmc6IFZhcmlhYmxlIGxlbmd0aCBhcnJheSBpcyB1c2VkLgpzcmMvc2hh
+cmVkL2dhdHQtaGVscGVycy5jOjEzNTQ6MjM6IHdhcm5pbmc6IFZhcmlhYmxlIGxlbmd0aCBhcnJh
+eSBpcyB1c2VkLgpzcmMvc2hhcmVkL2dhdHQtc2VydmVyLmM6Mjc4OjI1OiB3YXJuaW5nOiBWYXJp
+YWJsZSBsZW5ndGggYXJyYXkgaXMgdXNlZC4Kc3JjL3NoYXJlZC9nYXR0LXNlcnZlci5jOjYyMToy
+NTogd2FybmluZzogVmFyaWFibGUgbGVuZ3RoIGFycmF5IGlzIHVzZWQuCnNyYy9zaGFyZWQvZ2F0
+dC1zZXJ2ZXIuYzo3MjA6MjU6IHdhcm5pbmc6IFZhcmlhYmxlIGxlbmd0aCBhcnJheSBpcyB1c2Vk
+LgpzcmMvc2hhcmVkL2JhcC5jOjI4NjoyNTogd2FybmluZzogYXJyYXkgb2YgZmxleGlibGUgc3Ry
+dWN0dXJlcwpzcmMvc2hhcmVkL2JhcC5jOiBub3RlOiBpbiBpbmNsdWRlZCBmaWxlOgouL3NyYy9z
+aGFyZWQvYXNjcy5oOjg4OjI1OiB3YXJuaW5nOiBhcnJheSBvZiBmbGV4aWJsZSBzdHJ1Y3R1cmVz
+CnNyYy9zaGFyZWQvc2hlbGwuYzogbm90ZTogaW4gaW5jbHVkZWQgZmlsZSAodGhyb3VnaCAvdXNy
+L2luY2x1ZGUvcmVhZGxpbmUvcmVhZGxpbmUuaCk6Ci91c3IvaW5jbHVkZS9yZWFkbGluZS9ybHR5
+cGVkZWZzLmg6MzU6MjM6IHdhcm5pbmc6IG5vbi1BTlNJIGZ1bmN0aW9uIGRlY2xhcmF0aW9uIG9m
+IGZ1bmN0aW9uICdGdW5jdGlvbicKL3Vzci9pbmNsdWRlL3JlYWRsaW5lL3JsdHlwZWRlZnMuaDoz
+NjoyNTogd2FybmluZzogbm9uLUFOU0kgZnVuY3Rpb24gZGVjbGFyYXRpb24gb2YgZnVuY3Rpb24g
+J1ZGdW5jdGlvbicKL3Vzci9pbmNsdWRlL3JlYWRsaW5lL3JsdHlwZWRlZnMuaDozNzoyNzogd2Fy
+bmluZzogbm9uLUFOU0kgZnVuY3Rpb24gZGVjbGFyYXRpb24gb2YgZnVuY3Rpb24gJ0NQRnVuY3Rp
+b24nCi91c3IvaW5jbHVkZS9yZWFkbGluZS9ybHR5cGVkZWZzLmg6Mzg6Mjk6IHdhcm5pbmc6IG5v
+bi1BTlNJIGZ1bmN0aW9uIGRlY2xhcmF0aW9uIG9mIGZ1bmN0aW9uICdDUFBGdW5jdGlvbicKc3Jj
+L3NoYXJlZC9zaGVsbC5jOiBJbiBmdW5jdGlvbiDigJhidF9zaGVsbF9pbml04oCZOgpzcmMvc2hh
+cmVkL3NoZWxsLmM6MTMzNjoyMTogZXJyb3I6IGNvbXBhcmlzb24gb2YgaW50ZWdlciBleHByZXNz
+aW9ucyBvZiBkaWZmZXJlbnQgc2lnbmVkbmVzczog4oCYaW504oCZIGFuZCDigJhzaXplX3TigJkg
+e2FrYSDigJhsb25nIHVuc2lnbmVkIGludOKAmX0gWy1XZXJyb3I9c2lnbi1jb21wYXJlXQogMTMz
+NiB8ICAgIGlmIChvcHQgJiYgaW5kZXggPj0gb2Zmc2V0KSB7CiAgICAgIHwgICAgICAgICAgICAg
+ICAgICAgICBefgpjYzE6IGFsbCB3YXJuaW5ncyBiZWluZyB0cmVhdGVkIGFzIGVycm9ycwptYWtl
+WzFdOiAqKiogW01ha2VmaWxlOjg2ODA6IHNyYy9zaGFyZWQvbGlic2hhcmVkX21haW5sb29wX2xh
+LXNoZWxsLmxvXSBFcnJvciAxCm1ha2VbMV06ICoqKiBXYWl0aW5nIGZvciB1bmZpbmlzaGVkIGpv
+YnMuLi4uCm1ha2U6ICoqKiBbTWFrZWZpbGU6NDY2NjogYWxsXSBFcnJvciAyCiMjIyMjIyMjIyMj
+IyMjIyMjIyMjIyMjIyMjIyMjIwpUZXN0OiBibHVlem1ha2VleHRlbGwgLSBGQUlMCkRlc2M6IEJ1
+aWxkIEJsdWV6IHdpdGggRXh0ZXJuYWwgRUxMCk91dHB1dDoKCnNyYy9zaGFyZWQvc2hlbGwuYzog
+SW4gZnVuY3Rpb24g4oCYYnRfc2hlbGxfaW5pdOKAmToKc3JjL3NoYXJlZC9zaGVsbC5jOjEzMzY6
+MjE6IGVycm9yOiBjb21wYXJpc29uIG9mIGludGVnZXIgZXhwcmVzc2lvbnMgb2YgZGlmZmVyZW50
+IHNpZ25lZG5lc3M6IOKAmGludOKAmSBhbmQg4oCYc2l6ZV904oCZIHtha2Eg4oCYbG9uZyB1bnNp
+Z25lZCBpbnTigJl9IFstV2Vycm9yPXNpZ24tY29tcGFyZV0KIDEzMzYgfCAgICBpZiAob3B0ICYm
+IGluZGV4ID49IG9mZnNldCkgewogICAgICB8ICAgICAgICAgICAgICAgICAgICAgXn4KY2MxOiBh
+bGwgd2FybmluZ3MgYmVpbmcgdHJlYXRlZCBhcyBlcnJvcnMKbWFrZVsxXTogKioqIFtNYWtlZmls
+ZTo4NjgwOiBzcmMvc2hhcmVkL2xpYnNoYXJlZF9tYWlubG9vcF9sYS1zaGVsbC5sb10gRXJyb3Ig
+MQptYWtlWzFdOiAqKiogV2FpdGluZyBmb3IgdW5maW5pc2hlZCBqb2JzLi4uLgptYWtlOiAqKiog
+W01ha2VmaWxlOjQ2NjY6IGFsbF0gRXJyb3IgMgojIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMj
+IyMKVGVzdDogSW5jcmVtZW50YWxCdWlsZCAtIEZBSUwKRGVzYzogSW5jcmVtZW50YWwgYnVpbGQg
+d2l0aCB0aGUgcGF0Y2hlcyBpbiB0aGUgc2VyaWVzCk91dHB1dDoKW0JsdWVaLHYxLDIvNV0gc2hh
+cmVkL3NoZWxsOiBwcmV2ZW50IGludGVnZXIgb3ZlcmZsb3cgaW4gYnRfc2hlbGxfaW5pdCgpCgpz
+cmMvc2hhcmVkL3NoZWxsLmM6IEluIGZ1bmN0aW9uIOKAmGJ0X3NoZWxsX2luaXTigJk6CnNyYy9z
+aGFyZWQvc2hlbGwuYzoxMzM2OjIxOiBlcnJvcjogY29tcGFyaXNvbiBvZiBpbnRlZ2VyIGV4cHJl
+c3Npb25zIG9mIGRpZmZlcmVudCBzaWduZWRuZXNzOiDigJhpbnTigJkgYW5kIOKAmHNpemVfdOKA
+mSB7YWthIOKAmGxvbmcgdW5zaWduZWQgaW504oCZfSBbLVdlcnJvcj1zaWduLWNvbXBhcmVdCiAx
+MzM2IHwgICAgaWYgKG9wdCAmJiBpbmRleCA+PSBvZmZzZXQpIHsKICAgICAgfCAgICAgICAgICAg
+ICAgICAgICAgIF5+CmNjMTogYWxsIHdhcm5pbmdzIGJlaW5nIHRyZWF0ZWQgYXMgZXJyb3JzCm1h
+a2VbMV06ICoqKiBbTWFrZWZpbGU6ODY4MDogc3JjL3NoYXJlZC9saWJzaGFyZWRfbWFpbmxvb3Bf
+bGEtc2hlbGwubG9dIEVycm9yIDEKbWFrZVsxXTogKioqIFdhaXRpbmcgZm9yIHVuZmluaXNoZWQg
+am9icy4uLi4KbWFrZTogKioqIFtNYWtlZmlsZTo0NjY2OiBhbGxdIEVycm9yIDIKIyMjIyMjIyMj
+IyMjIyMjIyMjIyMjIyMjIyMjIyMjClRlc3Q6IFNjYW5CdWlsZCAtIEZBSUwKRGVzYzogUnVuIFNj
+YW4gQnVpbGQKT3V0cHV0OgoKc3JjL3NoYXJlZC9nYXR0LWNsaWVudC5jOjQ1MToyMTogd2Fybmlu
+ZzogVXNlIG9mIG1lbW9yeSBhZnRlciBpdCBpcyBmcmVlZAogICAgICAgIGdhdHRfZGJfdW5yZWdp
+c3RlcihvcC0+Y2xpZW50LT5kYiwgb3AtPmRiX2lkKTsKICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgXn5+fn5+fn5+fgpzcmMvc2hhcmVkL2dhdHQtY2xpZW50LmM6Njk2OjI6IHdhcm5pbmc6IFVz
+ZSBvZiBtZW1vcnkgYWZ0ZXIgaXQgaXMgZnJlZWQKICAgICAgICBkaXNjb3Zlcnlfb3BfY29tcGxl
+dGUob3AsIGZhbHNlLCBhdHRfZWNvZGUpOwogICAgICAgIF5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+
+fn5+fn5+fn5+fn5+fn5+fn5+fn4Kc3JjL3NoYXJlZC9nYXR0LWNsaWVudC5jOjk5NjoyOiB3YXJu
+aW5nOiBVc2Ugb2YgbWVtb3J5IGFmdGVyIGl0IGlzIGZyZWVkCiAgICAgICAgZGlzY292ZXJ5X29w
+X2NvbXBsZXRlKG9wLCBzdWNjZXNzLCBhdHRfZWNvZGUpOwogICAgICAgIF5+fn5+fn5+fn5+fn5+
+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fgpzcmMvc2hhcmVkL2dhdHQtY2xpZW50LmM6
+MTEwMjoyOiB3YXJuaW5nOiBVc2Ugb2YgbWVtb3J5IGFmdGVyIGl0IGlzIGZyZWVkCiAgICAgICAg
+ZGlzY292ZXJ5X29wX2NvbXBsZXRlKG9wLCBzdWNjZXNzLCBhdHRfZWNvZGUpOwogICAgICAgIF5+
+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fgpzcmMvc2hhcmVkL2dh
+dHQtY2xpZW50LmM6MTI5NDoyOiB3YXJuaW5nOiBVc2Ugb2YgbWVtb3J5IGFmdGVyIGl0IGlzIGZy
+ZWVkCiAgICAgICAgZGlzY292ZXJ5X29wX2NvbXBsZXRlKG9wLCBzdWNjZXNzLCBhdHRfZWNvZGUp
+OwogICAgICAgIF5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fgpz
+cmMvc2hhcmVkL2dhdHQtY2xpZW50LmM6MTM1OToyOiB3YXJuaW5nOiBVc2Ugb2YgbWVtb3J5IGFm
+dGVyIGl0IGlzIGZyZWVkCiAgICAgICAgZGlzY292ZXJ5X29wX2NvbXBsZXRlKG9wLCBzdWNjZXNz
+LCBhdHRfZWNvZGUpOwogICAgICAgIF5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+
+fn5+fn5+fn5+fgpzcmMvc2hhcmVkL2dhdHQtY2xpZW50LmM6MTYzNDo2OiB3YXJuaW5nOiBVc2Ug
+b2YgbWVtb3J5IGFmdGVyIGl0IGlzIGZyZWVkCiAgICAgICAgaWYgKHJlYWRfZGJfaGFzaChvcCkp
+IHsKICAgICAgICAgICAgXn5+fn5+fn5+fn5+fn5+fgpzcmMvc2hhcmVkL2dhdHQtY2xpZW50LmM6
+MTYzOToyOiB3YXJuaW5nOiBVc2Ugb2YgbWVtb3J5IGFmdGVyIGl0IGlzIGZyZWVkCiAgICAgICAg
+ZGlzY292ZXJfYWxsKG9wKTsKICAgICAgICBefn5+fn5+fn5+fn5+fn5+CnNyYy9zaGFyZWQvZ2F0
+dC1jbGllbnQuYzoyMTQzOjY6IHdhcm5pbmc6IFVzZSBvZiBtZW1vcnkgYWZ0ZXIgaXQgaXMgZnJl
+ZWQKICAgICAgICBpZiAocmVhZF9kYl9oYXNoKG9wKSkgewogICAgICAgICAgICBefn5+fn5+fn5+
+fn5+fn5+CnNyYy9zaGFyZWQvZ2F0dC1jbGllbnQuYzoyMTUxOjg6IHdhcm5pbmc6IFVzZSBvZiBt
+ZW1vcnkgYWZ0ZXIgaXQgaXMgZnJlZWQKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICBkaXNjb3Zlcnlfb3BfcmVmKG9wKSwKICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBefn5+fn5+fn5+fn5+
+fn5+fn5+fgpzcmMvc2hhcmVkL2dhdHQtY2xpZW50LmM6MzI0MDoyOiB3YXJuaW5nOiBVc2Ugb2Yg
+bWVtb3J5IGFmdGVyIGl0IGlzIGZyZWVkCiAgICAgICAgY29tcGxldGVfd3JpdGVfbG9uZ19vcChy
+ZXEsIHN1Y2Nlc3MsIDAsIGZhbHNlKTsKICAgICAgICBefn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+
+fn5+fn5+fn5+fn5+fn5+fn5+fn5+CnNyYy9zaGFyZWQvZ2F0dC1jbGllbnQuYzozMjYyOjI6IHdh
+cm5pbmc6IFVzZSBvZiBtZW1vcnkgYWZ0ZXIgaXQgaXMgZnJlZWQKICAgICAgICByZXF1ZXN0X3Vu
+cmVmKHJlcSk7CiAgICAgICAgXn5+fn5+fn5+fn5+fn5+fn5+CjEyIHdhcm5pbmdzIGdlbmVyYXRl
+ZC4Kc3JjL3NoYXJlZC9zaGVsbC5jOiBJbiBmdW5jdGlvbiDigJhidF9zaGVsbF9pbml04oCZOgpz
+cmMvc2hhcmVkL3NoZWxsLmM6MTMzNjoyMTogZXJyb3I6IGNvbXBhcmlzb24gb2YgaW50ZWdlciBl
+eHByZXNzaW9ucyBvZiBkaWZmZXJlbnQgc2lnbmVkbmVzczog4oCYaW504oCZIGFuZCDigJhzaXpl
+X3TigJkge2FrYSDigJhsb25nIHVuc2lnbmVkIGludOKAmX0gWy1XZXJyb3I9c2lnbi1jb21wYXJl
+XQogMTMzNiB8ICAgIGlmIChvcHQgJiYgaW5kZXggPj0gb2Zmc2V0KSB7CiAgICAgIHwgICAgICAg
+ICAgICAgICAgICAgICBefgpjYzE6IGFsbCB3YXJuaW5ncyBiZWluZyB0cmVhdGVkIGFzIGVycm9y
+cwptYWtlWzFdOiAqKiogW01ha2VmaWxlOjg2ODA6IHNyYy9zaGFyZWQvbGlic2hhcmVkX21haW5s
+b29wX2xhLXNoZWxsLmxvXSBFcnJvciAxCm1ha2VbMV06ICoqKiBXYWl0aW5nIGZvciB1bmZpbmlz
+aGVkIGpvYnMuLi4uCm1ha2U6ICoqKiBbTWFrZWZpbGU6NDY2NjogYWxsXSBFcnJvciAyCgoKLS0t
+ClJlZ2FyZHMsCkxpbnV4IEJsdWV0b290aAoK
 
-What happens if the json file is corrupted and there are more than 255 eleme=
-nts in the array?
-
->        json_object_object_get_ex(jnode, "netKeys", &jarray);
->        if (!jarray || json_object_get_type(jarray) !=3D json_type_array)
->            continue;
-> --
-> 2.45.2
->=20
->=20
+--===============6055408919361835249==--
