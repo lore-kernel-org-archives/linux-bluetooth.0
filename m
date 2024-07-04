@@ -1,99 +1,59 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from relay7-d.mail.gandi.net (relay7-d.mail.gandi.net [217.70.183.200])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38977FC02
-	for <linux-bluetooth@vger.kernel.org>; Thu,  4 Jul 2024 07:51:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75A031A3BB0
+	for <linux-bluetooth@vger.kernel.org>; Thu,  4 Jul 2024 08:20:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.200
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720079487; cv=none; b=OiMQ+epeclc8QsijsXzXcgCd8ZXDfzEStfBAykmb7dVtl+ghEoCO+f6Aq5nxVajcOqjr/qu7ny3+hCvLgOw9slN4ZYFp5AuOmK+LgzKxty47LbIgplIbmByPgaIc44PUyQyTKJPBrhWlGXSX05sVQIoqZK1zjdMcE5FjbgYpA6s=
+	t=1720081208; cv=none; b=oJeR6olQJvZK2zt8O40KZKFlEXD5/1k3FYsdj7feyoE+qPFh7O1Lx63/LpYzZJH/udohtT7ZMRhLybVk7Hdt3KS6ZL5/3wKa+38xsSqeeDZIVI8mt0SFcvXsVuKIOPx2wH57+IyU/7coycm6/TqQcx4mKwZN5p81+2a736aaihQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720079487; c=relaxed/simple;
-	bh=bAEmwS1D9YtTYK2QRhabApQjU9QylwrZ1bfvFLtiGFg=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=ZssjmrliwP/pFEfOapppBAlgkQMjsftJlIPZuCnYBC8nnk6/X0M65rgAY5K23cb4lCU0uYYlVWvupQ60DMGWcyYYRKKU+K+1RHWbZc6cBj4owz/ApFJOJI3Cz7zwDD0gqGkNS/FUiT5jSzb/EdolMqrd5/+ohyKRL9mVp+8uXUQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=J8GkA4bz; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="J8GkA4bz"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id AEF12C32786
-	for <linux-bluetooth@vger.kernel.org>; Thu,  4 Jul 2024 07:51:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1720079486;
-	bh=bAEmwS1D9YtTYK2QRhabApQjU9QylwrZ1bfvFLtiGFg=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=J8GkA4bzSnLeB61yvcSb/30Rw2GDa6YcJ7iEOOMj9ynVEecJ6mN2/VJ7ai/SinPa8
-	 ve4iBxdg5EF8ehaJAXkgAMtg8UxVO6j2fQ03Cv2s6/7uZCLBU5bccICi1USdvUMlhF
-	 +yNLjZT5N0ds6DjFfPFog73wWuG06lx44nkT6dTBljy/3NHWzER2+9TLb9dYnZnYQS
-	 k009/PZsi4NVFLEeloVbYi4HKZ0k+c02fjfiLTuq3EMEFRrEiW4Q8EPINp4Kgz9Jmx
-	 jrIbdDdLuAcM7v9l5621KmotyeZNIVzkCVZys7NQIE4Xn8J0u5l1MO2tC0AS6FFG61
-	 fzEzc4E4Exyyw==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id A2F94C53B50; Thu,  4 Jul 2024 07:51:26 +0000 (UTC)
-From: bugzilla-daemon@kernel.org
-To: linux-bluetooth@vger.kernel.org
-Subject: [Bug 219003] "Bluetooth: hci0: corrupted SCO packet" on W800BT on
- kernel 6.9.7
-Date: Thu, 04 Jul 2024 07:51:26 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: regressions@leemhuis.info
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P3
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: cc
-Message-ID: <bug-219003-62941-bRJice6Stb@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-219003-62941@https.bugzilla.kernel.org/>
-References: <bug-219003-62941@https.bugzilla.kernel.org/>
+	s=arc-20240116; t=1720081208; c=relaxed/simple;
+	bh=ktr3Ivhr+PI1sj8NgM36iawQcE/mCylj63pWN7LDSaY=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=EZF1Nf3TpB+TsMKN5tyt9oAgyJBkVD0QiZCd6HeV++MGemzMsy/+Zzbwwc6Z35ntkMCa+zuJHnpJVLoPohY/pxQLZILHF96/6RRvrqPcLfw/UoqpVedv8GmcW8jJKeMf1gOrVgxkUsQ2fKk05DJ8X6+sc7JtLZrw1XOXdMIAZgs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.183.200
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hadess.net
+Received: by mail.gandi.net (Postfix) with ESMTPSA id B7E9B20005;
+	Thu,  4 Jul 2024 08:20:04 +0000 (UTC)
+Message-ID: <d7c41cc6422da3e024280c055661833411c6e847.camel@hadess.net>
+Subject: Re: [bug report] Reproducible pairing loss after reboot / Mediatek
+ RZ616 [partly resolved / probably not a Bluez bug]
+From: Bastien Nocera <hadess@hadess.net>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Jonas
+	=?ISO-8859-1?Q?=D6zbay?=
+	 <usul@gmx.li>
+Cc: linux-bluetooth@vger.kernel.org
+Date: Thu, 04 Jul 2024 10:20:04 +0200
+In-Reply-To: <CABBYNZLrATLZaE756Guu9K3nGxGc3aVzSuxOiLw9icsO5+QXww@mail.gmail.com>
+References: <4cb7ecc4-2bf0-4403-a995-7ca3817be4cc@gmx.li>
+	 <CABBYNZK2xgDZ-bkxE6L-5Yt9x3PDKT_swDpN1=HAD9PC_6QpVA@mail.gmail.com>
+	 <c0b60ec6-08ef-4391-856d-14f60f33af9e@gmx.li>
+	 <CABBYNZLrATLZaE756Guu9K3nGxGc3aVzSuxOiLw9icsO5+QXww@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+X-GND-Sasl: hadess@hadess.net
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D219003
+On Wed, 2024-07-03 at 13:31 -0400, Luiz Augusto von Dentz wrote:
+> <snip>
+> @Bastien Nocera do you happen to know why gnome not register a
+> pairing
+> agent? Ive seem quite a few reports of things not working after
+> rebooting lately which hints to No-bonding pairing happening or
+> perhaps fedora uses main.conf:AlwaysPairable?
 
-The Linux kernel's regression tracker (Thorsten Leemhuis) (regressions@leem=
-huis.info) changed:
+There hasn't been a pairing agent in GNOME outside the Bluetooth
+Settings panel for more than 10 years.
 
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-                 CC|                            |regressions@leemhuis.info
+I've never seen this being a problem before.
 
---- Comment #1 from The Linux kernel's regression tracker (Thorsten Leemhui=
-s) (regressions@leemhuis.info) ---
-A few notes from a bystander:
-
-* please attached a dmesg from a kernel where this problem occurs, ideally =
-with
-the latest 6.10-rc version or newer
-
-* no developer might look into this, unless you bisect which change causes =
-the
-problem, as then someone is obliged to fix it
-(https://docs.kernel.org/admin-guide/verify-bugs-and-bisect-regressions.htm=
-l )
-
-* not sure, the bluetooth developers might not even see this report (search=
- for
-bugzilla on
-https://linux-regtracking.leemhuis.info/post/frequent-reasons-why-linux-ker=
-nel-bug-reports-are-ignored/
-for details)
-
---=20
-You may reply to this email to add a comment.
-
-You are receiving this mail because:
-You are the assignee for the bug.=
+Fedora uses the main.conf shipped by bluez with no changes (except=20
+AutoEnable to true, which does nothing as it's already the default):
+https://src.fedoraproject.org/rpms/bluez/blob/rawhide/f/bluez.spec#_196
