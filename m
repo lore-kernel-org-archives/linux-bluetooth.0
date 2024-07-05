@@ -1,316 +1,104 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f181.google.com (mail-yb1-f181.google.com [209.85.219.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BC311474B2;
-	Fri,  5 Jul 2024 09:34:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40E2814831F
+	for <linux-bluetooth@vger.kernel.org>; Fri,  5 Jul 2024 09:43:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720172049; cv=none; b=OQMzQE6Wyt26+PxpCFWIvV0ddPxkIJvhXZ8jEKKf26sPskQnCe0v/hyScFI1CmQWjO7cZu9Aaz/fbdmCN85426SevH5X1Dpgara6N/Y4IDrr758k4bS+I00yn25DqGjrSKvo5ejsGnHfVTRUtzYWVRC0pXfhk/pAthgEQnJ+6bk=
+	t=1720172586; cv=none; b=QmqIDqgYOAiRu1lKk1WiFVHy8Zv5X2M6dn7XuhQewK7B2qWrv/IBu8yFJ8LvwJDc+P1Qj2QOnq26bXDzv5mGQbhGLKN1wm18x3yDjUCOiMV+p1hIWCTGv74WRDAvZdd9Z8pJMwNn7EDK17UMTxaIphihAz50RzOzFLG/2nlvV7w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720172049; c=relaxed/simple;
-	bh=c+/9TaMyp6MyuX8Wr7bK7QL2QMpx1isbVHGUwpIW0ic=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kCziqOSY40qsJcvjdN0ckU+wVjFeNtLc8pb+L5A9bV2Wv6U2gSCzBt1mGdxwZoFp8KkV2+dCNGCoAWgtQdCCsaKjrxXuC/bLgETDHBegVqnpB5f8LP7aW5nPrWi6EKdl7ZXJ0FfTwPkZ77DNIPVdtl0Rg7TV7nCR0HKdFGNMn3s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=VxtQMEtk; arc=none smtp.client-ip=198.175.65.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1720172586; c=relaxed/simple;
+	bh=Vv6Y+NLf4r7Vou9DczILKVx7oX4izF24o+Hadtz2njU=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=px4Uf1tPKQYErYOrT29TRNnTSKk8CPThLU1xfmesxL08c3PDhs3oF8UCaGXoKA3Ir7Rim85erMAOxZ7tupUAZR7BNZ8lzsJhNS9Qf/J2bPYsFCzAytFvcyBDrDEX+/jfHMPtEPammW35hnbN0nnNPGjaRNQH11CoexVfctsauS4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=j3CJ69la; arc=none smtp.client-ip=209.85.219.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="VxtQMEtk"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1720172046; x=1751708046;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=c+/9TaMyp6MyuX8Wr7bK7QL2QMpx1isbVHGUwpIW0ic=;
-  b=VxtQMEtkC82Po8DukXrO4OkJ63iMJi7ilsF+ZSPYUADtvq+EOt2u28hW
-   AF6/k1DDooZVt9TopNmj9XI4iAaa4xfz7pvDSejewPyD6D65bsFvQNeGd
-   aB/yXyF/U+XcWS3d0+LiCIUe9x9xQeu8BuQnVqYSP6sMy/DT45gg1Pgn+
-   +v27HPGVncl60ZDI0vhBy2ZKKawPsgjlTnP1I1e6N3P/IzV21rrjDGmel
-   XOBpsXTJSBopsHyJvWaQ0VizCOiVYnLcv7ELafuyg4+BZ7i+JfsAwNeQ/
-   o+a+mT/7KLrHEGE8Y8rYfynHvdUuXx1UPmqGQ7DAsn+FFHT3UYH6EMJKK
-   g==;
-X-CSE-ConnectionGUID: k7SQzChfSleiHnDn8lxqxg==
-X-CSE-MsgGUID: xF6TcstPRc6PmIA7tzf6cg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11123"; a="21224691"
-X-IronPort-AV: E=Sophos;i="6.09,184,1716274800"; 
-   d="scan'208";a="21224691"
-Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Jul 2024 02:34:05 -0700
-X-CSE-ConnectionGUID: GhJ2rfenSPCXvTq4mxu6Ag==
-X-CSE-MsgGUID: zGEf5IsMTg20uHLTYraSSA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.09,184,1716274800"; 
-   d="scan'208";a="47475112"
-Received: from lkp-server01.sh.intel.com (HELO 68891e0c336b) ([10.239.97.150])
-  by orviesa007.jf.intel.com with ESMTP; 05 Jul 2024 02:34:02 -0700
-Received: from kbuild by 68891e0c336b with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1sPfKJ-000SC0-2g;
-	Fri, 05 Jul 2024 09:33:59 +0000
-Date: Fri, 5 Jul 2024 17:33:34 +0800
-From: kernel test robot <lkp@intel.com>
-To: Chris Lu <chris.lu@mediatek.com>, Marcel Holtmann <marcel@holtmann.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	Luiz Von Dentz <luiz.dentz@gmail.com>
-Cc: oe-kbuild-all@lists.linux.dev, Sean Wang <sean.wang@mediatek.com>,
-	Aaron Hou <aaron.hou@mediatek.com>,
-	Steve Lee <steve.lee@mediatek.com>,
-	linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-	linux-kernel <linux-kernel@vger.kernel.org>,
-	linux-mediatek <linux-mediatek@lists.infradead.org>,
-	Chris Lu <chris.lu@mediatek.com>
-Subject: Re: [PATCH v7 5/8] Bluetooth: btmtk: move btusb_mtk_hci_wmt_sync to
- btmtk.c
-Message-ID: <202407051720.d1FTJg6H-lkp@intel.com>
-References: <20240704060116.16600-6-chris.lu@mediatek.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="j3CJ69la"
+Received: by mail-yb1-f181.google.com with SMTP id 3f1490d57ef6-e036105251eso1455525276.0
+        for <linux-bluetooth@vger.kernel.org>; Fri, 05 Jul 2024 02:43:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1720172584; x=1720777384; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=OvALuKvqBVhRllYV8OCOy2awQSA4Bdv9zRDdUyL1isA=;
+        b=j3CJ69laJqTqoxlUBD3IHx0u7U7IQClQu9E5edtQxm4V5/9yyIcMCVB2IyPrdjL+YX
+         GOFoazcODnF7ngkKFO/wdw0Pa/agdZU8F+ziHVHTegpDGgW4ZyJ0knLcjRGF0qDFVMCM
+         1VymTt1kUCPeQKp3645kfj3f8r4UJLywTdmzSAgfHYwsQKBUTdLgbMyFbcGK05tybnNI
+         5rwWqCdROL7aW9Iu/NNitopqdWMbWff6o9jMY6uqnWF1yOC95zrf0NnJVn8kdnn58vaC
+         G5KoqUDRIr8ZpBWXIOmYc2bmzDVHG+iPTOSThxMB2moWRb6sdAMbNQ1CRDpul4JbSCPy
+         toKQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1720172584; x=1720777384;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=OvALuKvqBVhRllYV8OCOy2awQSA4Bdv9zRDdUyL1isA=;
+        b=LsoNDMarAFAbpe2p9BuQBcAYgWMeH7zWqoUltjqx9x54Lwo+BhRQPdgDCTS0aHbUe7
+         0BM07vqrrGKjFxNet5Wg/Om7SyvlkmyClfSq+IDaDq9p2vBvmVb1/csDnvtIVs58wtoK
+         2TSXk8Q1Y7bAm1pNJmXWSteq0g7eaE7FtGoFwged/bQoBo8JHvKnZdacIAgWv8kLO5Ts
+         ZVngwq99MoW1MX/08mzhY+HUhOBmEj23nrbaKV6sCfHWfbTkQnu+pWGWNauunqTfGWbH
+         EIjF+Tk0AxIQBpR5gB89KsF/W0GKbsiwMEcdohDmkO9M++RX1mBYF37KsHa0NiNQ0XMj
+         IUTQ==
+X-Gm-Message-State: AOJu0YxiMsKsyI0PUqL/WEFa3KAp3c6m7+eFQtG3YOINproiF23yPpNE
+	deCkI30CrBu5V46vsM/5qlzWEEU7QVaB9RlinOUlhUeasildKaMJEFSUBA==
+X-Google-Smtp-Source: AGHT+IHOVyPIgi0AcQ/ZkHQBed0MeJ6YzjAX6UrZaia/hF31WYN9x2eqvPFfyC9H/LTGRxnXeeBHQw==
+X-Received: by 2002:a05:6902:100d:b0:e03:428d:9da2 with SMTP id 3f1490d57ef6-e03c18e31f7mr4740010276.13.1720172584139;
+        Fri, 05 Jul 2024 02:43:04 -0700 (PDT)
+Received: from [172.17.0.2] ([20.172.5.37])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-72c6b48e198sm9223733a12.51.2024.07.05.02.43.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 05 Jul 2024 02:43:03 -0700 (PDT)
+Message-ID: <6687c027.650a0220.a532d.f36c@mx.google.com>
+Date: Fri, 05 Jul 2024 02:43:03 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============2291368523329364998=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240704060116.16600-6-chris.lu@mediatek.com>
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, quic_prathm@quicinc.com
+Subject: RE: [BlueZ] Set BREDR not supported bit in AD Flag when discoverable is off
+In-Reply-To: <20240705073720.13504-1-quic_prathm@quicinc.com>
+References: <20240705073720.13504-1-quic_prathm@quicinc.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Hi Chris,
+--===============2291368523329364998==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-kernel test robot noticed the following build errors:
+This is automated email and please do not reply to this email!
 
-[auto build test ERROR on bluetooth-next/master]
-[also build test ERROR on next-20240703]
-[cannot apply to bluetooth/master linus/master v6.10-rc6]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+Dear submitter,
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Chris-Lu/Bluetooth-btusb-mediatek-remove-the-unnecessary-goto-tag/20240705-043833
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
-patch link:    https://lore.kernel.org/r/20240704060116.16600-6-chris.lu%40mediatek.com
-patch subject: [PATCH v7 5/8] Bluetooth: btmtk: move btusb_mtk_hci_wmt_sync to btmtk.c
-config: x86_64-randconfig-161-20240705 (https://download.01.org/0day-ci/archive/20240705/202407051720.d1FTJg6H-lkp@intel.com/config)
-compiler: gcc-7 (Ubuntu 7.5.0-6ubuntu2) 7.5.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240705/202407051720.d1FTJg6H-lkp@intel.com/reproduce)
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=868660
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202407051720.d1FTJg6H-lkp@intel.com/
+---Test result---
 
-All errors (new ones prefixed by >>):
-
-   ld: drivers/bluetooth/btmtk.o: in function `btmtk_usb_wmt_recv':
-   drivers/bluetooth/btmtk.c:503:(.text+0xacf): undefined reference to `usb_anchor_urb'
-   ld: drivers/bluetooth/btmtk.c:504:(.text+0xadc): undefined reference to `usb_submit_urb'
-   ld: drivers/bluetooth/btmtk.c:513:(.text+0xc61): undefined reference to `usb_unanchor_urb'
-   ld: drivers/bluetooth/btmtk.o: in function `btmtk_usb_hci_wmt_sync':
-   drivers/bluetooth/btmtk.c:605:(.text+0xda5): undefined reference to `usb_autopm_get_interface'
-   ld: drivers/bluetooth/btmtk.o: in function `btmtk_usb_submit_wmt_recv_urb':
-   drivers/bluetooth/btmtk.c:526:(.text+0xe04): undefined reference to `usb_alloc_urb'
-   ld: drivers/bluetooth/btmtk.c:556:(.text+0xefe): undefined reference to `usb_anchor_urb'
-   ld: drivers/bluetooth/btmtk.c:557:(.text+0xf0b): undefined reference to `usb_submit_urb'
-   ld: drivers/bluetooth/btmtk.c:565:(.text+0xf23): undefined reference to `usb_free_urb'
-   ld: drivers/bluetooth/btmtk.o: in function `btmtk_usb_hci_wmt_sync':
->> drivers/bluetooth/btmtk.c:620:(.text+0xf2f): undefined reference to `usb_autopm_put_interface'
-   ld: drivers/bluetooth/btmtk.o: in function `btmtk_usb_submit_wmt_recv_urb':
->> drivers/bluetooth/btmtk.c:562:(.text+0x1030): undefined reference to `usb_unanchor_urb'
-   ld: drivers/bluetooth/btmtk.c:565:(.text+0x1038): undefined reference to `usb_free_urb'
-   ld: drivers/bluetooth/btmtk.o: in function `btmtk_usb_hci_wmt_sync':
-   drivers/bluetooth/btmtk.c:620:(.text+0x1044): undefined reference to `usb_autopm_put_interface'
-   ld: drivers/bluetooth/btmtk.c:613:(.text+0x1062): undefined reference to `usb_autopm_put_interface'
-   ld: drivers/bluetooth/btmtk.c:620:(.text+0x11c6): undefined reference to `usb_autopm_put_interface'
-   ld: drivers/bluetooth/btmtk.o: in function `btmtk_usb_submit_wmt_recv_urb':
->> drivers/bluetooth/btmtk.c:545:(.text+0x1288): undefined reference to `usb_free_urb'
-   ld: drivers/bluetooth/btmtk.o: in function `btmtk_usb_hci_wmt_sync':
-   drivers/bluetooth/btmtk.c:620:(.text+0x1294): undefined reference to `usb_autopm_put_interface'
+Test Summary:
+CheckPatch                    PASS      0.32 seconds
+GitLint                       PASS      0.22 seconds
+BuildEll                      PASS      24.57 seconds
+BluezMake                     PASS      1659.26 seconds
+MakeCheck                     PASS      13.14 seconds
+MakeDistcheck                 PASS      176.97 seconds
+CheckValgrind                 PASS      251.17 seconds
+CheckSmatch                   PASS      353.55 seconds
+bluezmakeextell               PASS      119.49 seconds
+IncrementalBuild              PASS      1447.26 seconds
+ScanBuild                     PASS      1008.32 seconds
 
 
-vim +620 drivers/bluetooth/btmtk.c
 
-   516	
-   517	static int btmtk_usb_submit_wmt_recv_urb(struct hci_dev *hdev)
-   518	{
-   519		struct btmtk_data *data = hci_get_priv(hdev);
-   520		struct usb_ctrlrequest *dr;
-   521		unsigned char *buf;
-   522		int err, size = 64;
-   523		unsigned int pipe;
-   524		struct urb *urb;
-   525	
-   526		urb = usb_alloc_urb(0, GFP_KERNEL);
-   527		if (!urb)
-   528			return -ENOMEM;
-   529	
-   530		dr = kmalloc(sizeof(*dr), GFP_KERNEL);
-   531		if (!dr) {
-   532			usb_free_urb(urb);
-   533			return -ENOMEM;
-   534		}
-   535	
-   536		dr->bRequestType = USB_TYPE_VENDOR | USB_DIR_IN;
-   537		dr->bRequest     = 1;
-   538		dr->wIndex       = cpu_to_le16(0);
-   539		dr->wValue       = cpu_to_le16(48);
-   540		dr->wLength      = cpu_to_le16(size);
-   541	
-   542		buf = kmalloc(size, GFP_KERNEL);
-   543		if (!buf) {
-   544			kfree(dr);
- > 545			usb_free_urb(urb);
-   546			return -ENOMEM;
-   547		}
-   548	
-   549		pipe = usb_rcvctrlpipe(data->udev, 0);
-   550	
-   551		usb_fill_control_urb(urb, data->udev, pipe, (void *)dr,
-   552				     buf, size, btmtk_usb_wmt_recv, hdev);
-   553	
-   554		urb->transfer_flags |= URB_FREE_BUFFER;
-   555	
-   556		usb_anchor_urb(urb, data->ctrl_anchor);
-   557		err = usb_submit_urb(urb, GFP_KERNEL);
-   558		if (err < 0) {
-   559			if (err != -EPERM && err != -ENODEV)
-   560				bt_dev_err(hdev, "urb %p submission failed (%d)",
-   561					   urb, -err);
- > 562			usb_unanchor_urb(urb);
-   563		}
-   564	
-   565		usb_free_urb(urb);
-   566	
-   567		return err;
-   568	}
-   569	
-   570	int btmtk_usb_hci_wmt_sync(struct hci_dev *hdev,
-   571				   struct btmtk_hci_wmt_params *wmt_params)
-   572	{
-   573		struct btmtk_data *data = hci_get_priv(hdev);
-   574		struct btmtk_hci_wmt_evt_funcc *wmt_evt_funcc;
-   575		u32 hlen, status = BTMTK_WMT_INVALID;
-   576		struct btmtk_hci_wmt_evt *wmt_evt;
-   577		struct btmtk_hci_wmt_cmd *wc;
-   578		struct btmtk_wmt_hdr *hdr;
-   579		int err;
-   580	
-   581		/* Send the WMT command and wait until the WMT event returns */
-   582		hlen = sizeof(*hdr) + wmt_params->dlen;
-   583		if (hlen > 255)
-   584			return -EINVAL;
-   585	
-   586		wc = kzalloc(hlen, GFP_KERNEL);
-   587		if (!wc)
-   588			return -ENOMEM;
-   589	
-   590		hdr = &wc->hdr;
-   591		hdr->dir = 1;
-   592		hdr->op = wmt_params->op;
-   593		hdr->dlen = cpu_to_le16(wmt_params->dlen + 1);
-   594		hdr->flag = wmt_params->flag;
-   595		memcpy(wc->data, wmt_params->data, wmt_params->dlen);
-   596	
-   597		set_bit(BTMTK_TX_WAIT_VND_EVT, &data->flags);
-   598	
-   599		/* WMT cmd/event doesn't follow up the generic HCI cmd/event handling,
-   600		 * it needs constantly polling control pipe until the host received the
-   601		 * WMT event, thus, we should require to specifically acquire PM counter
-   602		 * on the USB to prevent the interface from entering auto suspended
-   603		 * while WMT cmd/event in progress.
-   604		 */
-   605		err = usb_autopm_get_interface(data->intf);
-   606		if (err < 0)
-   607			goto err_free_wc;
-   608	
-   609		err = __hci_cmd_send(hdev, 0xfc6f, hlen, wc);
-   610	
-   611		if (err < 0) {
-   612			clear_bit(BTMTK_TX_WAIT_VND_EVT, &data->flags);
-   613			usb_autopm_put_interface(data->intf);
-   614			goto err_free_wc;
-   615		}
-   616	
-   617		/* Submit control IN URB on demand to process the WMT event */
-   618		err = btmtk_usb_submit_wmt_recv_urb(hdev);
-   619	
- > 620		usb_autopm_put_interface(data->intf);
-   621	
-   622		if (err < 0)
-   623			goto err_free_wc;
-   624	
-   625		/* The vendor specific WMT commands are all answered by a vendor
-   626		 * specific event and will have the Command Status or Command
-   627		 * Complete as with usual HCI command flow control.
-   628		 *
-   629		 * After sending the command, wait for BTUSB_TX_WAIT_VND_EVT
-   630		 * state to be cleared. The driver specific event receive routine
-   631		 * will clear that state and with that indicate completion of the
-   632		 * WMT command.
-   633		 */
-   634		err = wait_on_bit_timeout(&data->flags, BTMTK_TX_WAIT_VND_EVT,
-   635					  TASK_INTERRUPTIBLE, HCI_INIT_TIMEOUT);
-   636		if (err == -EINTR) {
-   637			bt_dev_err(hdev, "Execution of wmt command interrupted");
-   638			clear_bit(BTMTK_TX_WAIT_VND_EVT, &data->flags);
-   639			goto err_free_wc;
-   640		}
-   641	
-   642		if (err) {
-   643			bt_dev_err(hdev, "Execution of wmt command timed out");
-   644			clear_bit(BTMTK_TX_WAIT_VND_EVT, &data->flags);
-   645			err = -ETIMEDOUT;
-   646			goto err_free_wc;
-   647		}
-   648	
-   649		if (data->evt_skb == NULL)
-   650			goto err_free_wc;
-   651	
-   652		/* Parse and handle the return WMT event */
-   653		wmt_evt = (struct btmtk_hci_wmt_evt *)data->evt_skb->data;
-   654		if (wmt_evt->whdr.op != hdr->op) {
-   655			bt_dev_err(hdev, "Wrong op received %d expected %d",
-   656				   wmt_evt->whdr.op, hdr->op);
-   657			err = -EIO;
-   658			goto err_free_skb;
-   659		}
-   660	
-   661		switch (wmt_evt->whdr.op) {
-   662		case BTMTK_WMT_SEMAPHORE:
-   663			if (wmt_evt->whdr.flag == 2)
-   664				status = BTMTK_WMT_PATCH_UNDONE;
-   665			else
-   666				status = BTMTK_WMT_PATCH_DONE;
-   667			break;
-   668		case BTMTK_WMT_FUNC_CTRL:
-   669			wmt_evt_funcc = (struct btmtk_hci_wmt_evt_funcc *)wmt_evt;
-   670			if (be16_to_cpu(wmt_evt_funcc->status) == 0x404)
-   671				status = BTMTK_WMT_ON_DONE;
-   672			else if (be16_to_cpu(wmt_evt_funcc->status) == 0x420)
-   673				status = BTMTK_WMT_ON_PROGRESS;
-   674			else
-   675				status = BTMTK_WMT_ON_UNDONE;
-   676			break;
-   677		case BTMTK_WMT_PATCH_DWNLD:
-   678			if (wmt_evt->whdr.flag == 2)
-   679				status = BTMTK_WMT_PATCH_DONE;
-   680			else if (wmt_evt->whdr.flag == 1)
-   681				status = BTMTK_WMT_PATCH_PROGRESS;
-   682			else
-   683				status = BTMTK_WMT_PATCH_UNDONE;
-   684			break;
-   685		}
-   686	
-   687		if (wmt_params->status)
-   688			*wmt_params->status = status;
-   689	
-   690	err_free_skb:
-   691		kfree_skb(data->evt_skb);
-   692		data->evt_skb = NULL;
-   693	err_free_wc:
-   694		kfree(wc);
-   695		return err;
-   696	}
-   697	EXPORT_SYMBOL_GPL(btmtk_usb_hci_wmt_sync);
-   698	
+---
+Regards,
+Linux Bluetooth
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+
+--===============2291368523329364998==--
