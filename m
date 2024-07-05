@@ -1,146 +1,101 @@
-Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
+Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9141B1482F3
-	for <linux-bluetooth@vger.kernel.org>; Fri,  5 Jul 2024 11:36:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0C13146A96
+	for <linux-bluetooth@vger.kernel.org>; Fri,  5 Jul 2024 11:40:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720179398; cv=none; b=nbRxAEZGpyIqhY7nxu8TzX8ZJBM6DtD1axTv49xXY3wXFlXJrWFjF0bp4RteVSRWXkgm6IT5z/CO8KajkHs0fv5ncsNmS6cw92H41Yl0FmCldq/7ML+Kc7P28Y8DFZ9NpCaf41vMBrgPzKgbs/6jsxcgSIWzppH3Qj3hvHfzgyg=
+	t=1720179656; cv=none; b=AcWidG7u2yL7Nt1yKp6rRMS19sEXa2hh6oR8GESLjXzIu/hKpY0XGyLmWXCL6ZJoQcLEIenORutoCo3zCtN8hCGoJkUDeBxYBhb63VRBhoSsvyat3mm99/a6my2b3vzB/4H6AGfgFYC5fSifdpBjly1SMvUwiO4YSzl+tfbQw80=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720179398; c=relaxed/simple;
-	bh=riMN+cbrD/mqU9EvHWHhYWsxbYk0tJV2YaPAqNhHgBo=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=jsQLthaT9p8DhmBVeyguOLadMoF9fmjplXUWCRjxqEaU68ZZaISXtSfTKM9zhKuSRYNClAx0GQnzWVbYpJXYhv0ucW3CbecYT0taJuXwBMvj0U/gE/A3lnAgIxAba2XZMRddMK6YlF78Qbry1pSbyuervmC04I5bEAh7XHlIhfI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mgYy3U4f; arc=none smtp.client-ip=209.85.214.171
+	s=arc-20240116; t=1720179656; c=relaxed/simple;
+	bh=bu8e5ynP8GhvsXyXYYlTTq5t5322WnEBdEM9r61teyU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=XU1LTIA/NJQIPr3mbV682qqqBYemXVzUgUWwkyynl1oSMkHkOOzzUXoVSE+LOeqCBXgvlXCzqJ/ai7h+w0oR+7GWpkKZtkQyMIv3zQIuK7wKBDQqIJ/ol2uDWg1VPL0b03Z5C6LR4FKwpI4s14SVf1tSmHWo9MSJ9VlyhoC4Ydw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=J06St853; arc=none smtp.client-ip=209.85.208.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mgYy3U4f"
-Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-1faad2f1967so18684155ad.0
-        for <linux-bluetooth@vger.kernel.org>; Fri, 05 Jul 2024 04:36:37 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="J06St853"
+Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-58b447c51bfso2017245a12.2
+        for <linux-bluetooth@vger.kernel.org>; Fri, 05 Jul 2024 04:40:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1720179397; x=1720784197; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=BlRfDEie0Yb4xdRVTeoRPZdVodoJ5OlLSIhHBtQXRQA=;
-        b=mgYy3U4fYl9oEY/mlI7T7MkZXzBgbTotTtXTwoSKEeAnrxkuxZHSDWxAD4Er0WiZCo
-         QYrJ+JQbg/iNgKDu5ETAEOakQOI4QvvS6J5D3gBPljqwps65ZH0Rr6mY9/nM3GqJbHoC
-         oRR/xKb5ETjMipep6fqUx9xzS0LngQ4LrCE6/8Ig/h1GCsWm0XyFXtmk8CaS0ZiIvwrL
-         UGd3ytpr2t4x0yFsgquW6cJ1I+B8Iw9mRoijiWO6Ac1A1lXCu6G9Sz+vIobv33QEhLyj
-         EToqqRsItuuAoXjoa8J6YhRF1U6OXzceTpEch/DvWihhxgPNStzgh26e47w+5+tawKpG
-         T01Q==
+        d=gmail.com; s=20230601; t=1720179653; x=1720784453; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=zwctzJoSxwnBvDVuL4LjMKarRieR39diL23web6GE5Y=;
+        b=J06St853hLyioEeixqEEXCTKTAwl5TTBy+goPrtomyUw+UqnqvfGxe2SDrddNB/b24
+         8uSt/26Ilq5NRe0DezUaP1c6WIu60BmUgHQYxSKN/uHlAUXFBOvT3/ID2937hB4OpLyu
+         6Z8eUt6M0HtOkTxJcTL5zsiXGfwEfQxkD4JZp0iRoku85VP/scqHAL/Zo5/D4ETF32pR
+         QUB4JX/1ksw/kUYqbpjIZiHwGvWtZMiHRB8ch1aC/xkXaIU201vpdsY+OHyBKkTcZRBU
+         qefisJHLny0O/p23iKFUnaom56aeylHnuDYJcAtXrKuHsjwgxrNxCSm3W1UxWilhFOnt
+         Uu0g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720179397; x=1720784197;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20230601; t=1720179653; x=1720784453;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=BlRfDEie0Yb4xdRVTeoRPZdVodoJ5OlLSIhHBtQXRQA=;
-        b=xQvOFNFBFewyvUeA39CoUh4ZQhQH1J3TCj3Az1mjShUX3R+bifwk7mLr4eHqG3FaI9
-         DK8bPufb256byxv4cHwELZoIWFYXAW6PSZ1J8Uv/xne69qHz0SbZtp385kEyeikVsVXF
-         5cayXYNM1ag6p+ZDO9KCXGtTsRUMee79fLDXVq27uW14cH4pnF8LyFPWUm/qaNncfNYf
-         GyamBBylUhBtxUl45lmWjT/SdG9ZchgWsEUMCwqMk8y7QenaQpzpNlcwGPgLrSokTQ3b
-         rwPjGIrC+JLzo8T6T5kIKoiyv+hn330pu7CEKQJKa0qAbl2HPn4IE6XX1FbvostCf63x
-         1l/w==
-X-Gm-Message-State: AOJu0YyK+GHwVQNJnRs1Wh/qGlO0hVvJdX1L+AnLUc6gNymOYAY+sFR5
-	99MKsHwbK9cSahlsetldU+l47PYQEE4XJg7qtzu7N9dMY57EWkfSGZ5THQ==
-X-Google-Smtp-Source: AGHT+IHMyeDluwKk/KEOJUmJQD2EIb9Lo/xdh0cSt7kgOMfJMyBon1NRujt9TF6NyFgWYvP+dMstoA==
-X-Received: by 2002:a17:902:d486:b0:1fb:4b87:6e88 with SMTP id d9443c01a7336-1fb4b877074mr21823805ad.29.1720179396556;
-        Fri, 05 Jul 2024 04:36:36 -0700 (PDT)
-Received: from [172.17.0.2] ([13.88.100.227])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1fb24fbd598sm39821095ad.199.2024.07.05.04.36.35
+        bh=zwctzJoSxwnBvDVuL4LjMKarRieR39diL23web6GE5Y=;
+        b=sYKWc0APEBggYk/FW+zXszFeLaUrnFrksauiB/pENLlRpMJ+xT187Kdxrf2W9JJfbl
+         AjY7uFfA3ykF9ym5PXQzvd3ada8AzhbukylTxrSPM6ajR+fTyVyrA+LorsSYBhSY5wue
+         hKNyEk7SsVx43mQiyOdM889JKRm4lYWJGWBySRX6JXiD+cjxj7dac7oyynOReaSQaagk
+         cJa1Tq57XyIX3yidkL3/GB3dJR6yzChvjR0lGCn5BM3hiBUGbZEE80EBI3/f2VnFNX7c
+         jIPqujmUlxzE+PxVhgUaj9Is/cg8UCOZdsv5AIyhaEAGf8+NIEETsMyCSTTx8wuDIIa4
+         CtlQ==
+X-Gm-Message-State: AOJu0YxsnR4X6GOqpy5d98m+PAwntMchDvHPRslvUi4CiRTWq3P73epe
+	0e0R7J/kd2oRn4G3YbbZWwtgU0U5sWpGb2mLa+dkE60M90dD+ICVH8WirQ==
+X-Google-Smtp-Source: AGHT+IEOMGDqHkMuM8ygc5/2PZ0L0hgMS8XC8M1QDk+1zXnL07Fy4ZAtvE4UURrphk3YV0TZ8K50qQ==
+X-Received: by 2002:a05:6402:40c8:b0:58b:d7f2:eef3 with SMTP id 4fb4d7f45d1cf-58e5965a9femr3235401a12.12.1720179652823;
+        Fri, 05 Jul 2024 04:40:52 -0700 (PDT)
+Received: from Firmware-Linux-VM.nox.noxmedical.com ([213.181.99.234])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-58bffed021esm4320575a12.89.2024.07.05.04.40.52
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 05 Jul 2024 04:36:36 -0700 (PDT)
-Message-ID: <6687dac4.170a0220.4a916.d92a@mx.google.com>
-Date: Fri, 05 Jul 2024 04:36:36 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============8756257372777745351=="
+        Fri, 05 Jul 2024 04:40:52 -0700 (PDT)
+From: =?UTF-8?q?Gu=C3=B0ni=20M=C3=A1r=20Gilbert?= <gudni.m.g@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: =?UTF-8?q?Gu=C3=B0ni=20M=C3=A1r=20Gilbert?= <gudni.m.g@gmail.com>
+Subject: [PATCH BlueZ] configure.ac: Fix --disable-cups
+Date: Fri,  5 Jul 2024 11:40:44 +0000
+Message-ID: <20240705114044.553551-1-gudni.m.g@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, r.smirnov@omp.ru
-Subject: RE: fix error found by SVACE static analyzer #2
-In-Reply-To: <20240705075709.26809-2-r.smirnov@omp.ru>
-References: <20240705075709.26809-2-r.smirnov@omp.ru>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 
---===============8756257372777745351==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+or else we get:
+  configure: error: conditional "CUPS_SERVERBIN" was never defined.
+  Usually this means the macro was only invoked conditionally.
 
-This is automated email and please do not reply to this email!
+Fixes: https://github.com/bluez/bluez/issues/773
 
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=868674
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      1.30 seconds
-GitLint                       PASS      0.96 seconds
-BuildEll                      PASS      24.63 seconds
-BluezMake                     PASS      1738.36 seconds
-MakeCheck                     PASS      13.42 seconds
-MakeDistcheck                 PASS      178.63 seconds
-CheckValgrind                 PASS      254.80 seconds
-CheckSmatch                   WARNING   355.35 seconds
-bluezmakeextell               PASS      120.21 seconds
-IncrementalBuild              PASS      8162.11 seconds
-ScanBuild                     WARNING   1011.55 seconds
-
-Details
-##############################
-Test: CheckSmatch - WARNING
-Desc: Run smatch tool with source
-Output:
-src/shared/shell.c: note: in included file (through /usr/include/readline/readline.h):src/shared/shell.c: note: in included file (through /usr/include/readline/readline.h):src/shared/shell.c: note: in included file (through /usr/include/readline/readline.h):tools/rctest.c:627:33: warning: non-ANSI function declaration of function 'automated_send_recv'
-##############################
-Test: ScanBuild - WARNING
-Desc: Run Scan Build
-Output:
-tools/rctest.c:747:9: warning: Null pointer passed to 1st parameter expecting 'nonnull'
-                        if (!strncasecmp(optarg, "hci", 3))
-                             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-tools/rctest.c:759:9: warning: Null pointer passed to 1st parameter expecting 'nonnull'
-                        if (!strncasecmp(optarg, "hci", 3))
-                             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-tools/rctest.c:766:14: warning: Null pointer passed to 1st parameter expecting 'nonnull'
-                        channel = atoi(optarg);
-                                  ^~~~~~~~~~~~
-tools/rctest.c:770:9: warning: Null pointer passed to 1st parameter expecting 'nonnull'
-                        if (!strcasecmp(optarg, "spp"))
-                             ^~~~~~~~~~~~~~~~~~~~~~~~~
-tools/rctest.c:795:13: warning: Null pointer passed to 1st parameter expecting 'nonnull'
-                        linger = atoi(optarg);
-                                 ^~~~~~~~~~~~
-tools/rctest.c:799:18: warning: Null pointer passed to 1st parameter expecting 'nonnull'
-                        defer_setup = atoi(optarg);
-                                      ^~~~~~~~~~~~
-tools/rctest.c:811:17: warning: Null pointer passed to 1st parameter expecting 'nonnull'
-                        num_frames = atoi(optarg);
-                                     ^~~~~~~~~~~~
-tools/rctest.c:815:12: warning: Null pointer passed to 1st parameter expecting 'nonnull'
-                        count = atoi(optarg);
-                                ^~~~~~~~~~~~
-tools/rctest.c:819:12: warning: Null pointer passed to 1st parameter expecting 'nonnull'
-                        delay = atoi(optarg) * 1000;
-                                ^~~~~~~~~~~~
-tools/rctest.c:823:15: warning: Null pointer passed to 1st parameter expecting 'nonnull'
-                        priority = atoi(optarg);
-                                   ^~~~~~~~~~~~
-10 warnings generated.
-
-
-
+Credits go to Lars Wendler
 ---
-Regards,
-Linux Bluetooth
+ configure.ac | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
+diff --git a/configure.ac b/configure.ac
+index 1d88daa0b..5619edf4b 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -253,12 +253,12 @@ AM_CONDITIONAL(CUPS, test "${enable_cups}" != "no")
+ if (test "${enable_cups}" != "no"); then
+ 	AC_MSG_CHECKING([cups directory])
+ 	cups_serverbin=`$PKG_CONFIG cups --variable=cups_serverbin`
+-	AM_CONDITIONAL(CUPS_SERVERBIN, test "${cups_serverbin}" != "")
+-	if (test "${cups_serverbin}" != ""); then
+-		AC_SUBST(CUPS_SERVERBIN, ${cups_serverbin})
+-	fi
+ 	AC_MSG_RESULT([${cups_serverbin}])
+ fi
++AM_CONDITIONAL(CUPS_SERVERBIN, test "${cups_serverbin}" != "")
++AS_IF([test "${cups_serverbin}" != ""],[
++	AC_SUBST(CUPS_SERVERBIN, ${cups_serverbin})
++])
+ 
+ AC_ARG_ENABLE(mesh, AS_HELP_STRING([--enable-mesh],
+ 		[enable Mesh profile support]), [enable_mesh=${enableval}])
+-- 
+2.43.0
 
---===============8756257372777745351==--
