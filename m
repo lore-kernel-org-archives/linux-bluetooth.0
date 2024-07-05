@@ -1,143 +1,112 @@
-Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
+Received: from inva020.nxp.com (inva020.nxp.com [92.121.34.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB3F6171BB
-	for <linux-bluetooth@vger.kernel.org>; Fri,  5 Jul 2024 06:48:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 510E0143C53;
+	Fri,  5 Jul 2024 07:00:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=92.121.34.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720162126; cv=none; b=UUouihWnld25HoOABbBh6ut8HIAAsAk0iOc4aySzhaHw5lKa1oCoE1BxvRaXYMTb6Rx+k+ZnAeelE0fMrFvxp40MpVVDtGHzB8DMmyWoGUMs2jUEYDd6S49hUqDWos6SMO3mBe/OmA8+YfNjWtzm8fIPOBAD0IP+C4W7u7QDR2Q=
+	t=1720162838; cv=none; b=A32lHsmdeDf07DAxafviH7Y0JzCCq+sC0z7IKBzBKT1pMt4H0t2JNPgLx2g0hpqxIuV8G8Cr2pTwrnR/Uev4kVtJsZIsjSoZDpstnP/z6JhMYpcvLfx28i0QeKnuAR026YW5snDSCa1Ralpq/ZVLBKlCDxbsxNMzX7b66nHPYRo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720162126; c=relaxed/simple;
-	bh=8WPaNE/nwmG3JCqIFH5UMoWnIbp0wi15ApGDkmK70x8=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=ZRi7j0Dt+7RUnwcf2aI4vSsgbYpxcWlcFw3b0/MuYNSJ2rKCzrQJg7geFW89fGQ4DxuDNJdsz0OUTr5/NYe4Ujp4NAk2YhqaRJttDPHI1aLmcge6PDFWKqlAkueWaVTCVLW42usDCt/KveYFEhgCwvK7mUnz+oBkCTFkFD6fj48=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.183.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hadess.net
-Received: by mail.gandi.net (Postfix) with ESMTPSA id C3E4560004;
-	Fri,  5 Jul 2024 06:48:39 +0000 (UTC)
-Message-ID: <3a1457cc1df3d322dbd134cc826ec6c4398e4186.camel@hadess.net>
-Subject: Re: [BlueZ 03/12] shared/shell: Free memory allocated by wordexp()
-From: Bastien Nocera <hadess@hadess.net>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Date: Fri, 05 Jul 2024 08:48:39 +0200
-In-Reply-To: <CABBYNZJSFjPb4OegXS6ynXGPitmRUVdydW=h=qHfzFXcj9Yo7g@mail.gmail.com>
-References: <20240704102617.1132337-1-hadess@hadess.net>
-	 <20240704102617.1132337-4-hadess@hadess.net>
-	 <CABBYNZJSFjPb4OegXS6ynXGPitmRUVdydW=h=qHfzFXcj9Yo7g@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: base64
-User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
+	s=arc-20240116; t=1720162838; c=relaxed/simple;
+	bh=bOFk8R3sjMWU0W/yovems56xZAEkgJVdHq4/eiNM8gE=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=HkE5wAoESZcgWMlndoh00n4u5UReBPk+Ahv3pKJeHbmkVp8Szq7CpHbx3XDjS7asG6asp4fg3jQwKjY/0yAMrbGXQlXOTJTTj9wcHACSf6lMaUwygh0rJzZSB7+R8Sq3Z3Z5XeVlY1j5bhyDu/WFMWbv4g+8J1s5tE9w4YTS7iM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; arc=none smtp.client-ip=92.121.34.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+Received: from inva020.nxp.com (localhost [127.0.0.1])
+	by inva020.eu-rdc02.nxp.com (Postfix) with ESMTP id 962E11A051D;
+	Fri,  5 Jul 2024 09:00:35 +0200 (CEST)
+Received: from aprdc01srsp001v.ap-rdc01.nxp.com (aprdc01srsp001v.ap-rdc01.nxp.com [165.114.16.16])
+	by inva020.eu-rdc02.nxp.com (Postfix) with ESMTP id 4D1E61A0516;
+	Fri,  5 Jul 2024 09:00:35 +0200 (CEST)
+Received: from pe-lt8779.in-pnq01.nxp.com (pe-lt8779.in-pnq01.nxp.com [10.17.104.141])
+	by aprdc01srsp001v.ap-rdc01.nxp.com (Postfix) with ESMTP id C43A5180222B;
+	Fri,  5 Jul 2024 15:00:33 +0800 (+08)
+From: Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>
+To: marcel@holtmann.org,
+	luiz.dentz@gmail.com
+Cc: linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	amitkumar.karwar@nxp.com,
+	rohit.fule@nxp.com,
+	neeraj.sanjaykale@nxp.com,
+	sherry.sun@nxp.com,
+	ziniu.wang_1@nxp.com,
+	haibo.chen@nxp.com,
+	LnxRevLi@nxp.com
+Subject: [PATCH v2] Bluetooth: btnxpuart: Add system suspend and resume handlers
+Date: Fri,  5 Jul 2024 12:28:26 +0530
+Message-Id: <20240705065826.782059-1-neeraj.sanjaykale@nxp.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-GND-Sasl: hadess@hadess.net
+Content-Transfer-Encoding: 8bit
+X-Virus-Scanned: ClamAV using ClamSMTP
 
-T24gVGh1LCAyMDI0LTA3LTA0IGF0IDIxOjI2IC0wNDAwLCBMdWl6IEF1Z3VzdG8gdm9uIERlbnR6
-IHdyb3RlOgo+IEhpIEJhc3RpZW4sCj4gCj4gT24gVGh1LCBKdWwgNCwgMjAyNCBhdCA2OjMz4oCv
-QU0gQmFzdGllbiBOb2NlcmEgPGhhZGVzc0BoYWRlc3MubmV0Pgo+IHdyb3RlOgo+ID4gCj4gPiBF
-cnJvcjogUkVTT1VSQ0VfTEVBSyAoQ1dFLTc3Mik6IFsjZGVmNDBdIFtpbXBvcnRhbnRdCj4gPiBi
-bHVlei01Ljc2L3NyYy9zaGFyZWQvc2hlbGwuYzoxMTEzOjM6IGFsbG9jX2FyZzogIndvcmRleHAi
-Cj4gPiBhbGxvY2F0ZXMgbWVtb3J5IHRoYXQgaXMgc3RvcmVkIGludG8gIncud2Vfd29yZHYiLgo+
-ID4gYmx1ZXotNS43Ni9zcmMvc2hhcmVkL3NoZWxsLmM6MTExNDo0OiBsZWFrZWRfc3RvcmFnZTog
-VmFyaWFibGUgInciCj4gPiBnb2luZyBvdXQgb2Ygc2NvcGUgbGVha3MgdGhlIHN0b3JhZ2UgIncu
-d2Vfd29yZHYiIHBvaW50cyB0by4KPiA+IDExMTJ8Cj4gPiAxMTEzfMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoCBpZiAod29yZGV4cChybF9saW5lX2J1ZmZlciwgJncsCj4gPiBX
-UkRFX05PQ01EKSkKPiA+IDExMTR8LT7CoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqAgcmV0dXJuIE5VTEw7Cj4gCj4gRGVyciwgdGhpcyBpcyBOT0NNRCBoYXMg
-YmVlbiBmb3VuZC4uLgoKU3RpbGwgbmVlZHMgcGFyc2luZyAqc2hydWcqCgo+IAo+ID4gMTExNXwK
-PiA+IDExMTZ8wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIG1hdGNoZXMgPSBt
-ZW51X2NvbXBsZXRpb24oZGVmYXVsdF9tZW51LAo+ID4gdGV4dCwgdy53ZV93b3JkYywKPiA+IAo+
-ID4gRXJyb3I6IFJFU09VUkNFX0xFQUsgKENXRS03NzIpOiBbI2RlZjQyXSBbaW1wb3J0YW50XQo+
-ID4gYmx1ZXotNS43Ni9zcmMvc2hhcmVkL3NoZWxsLmM6MTQxMjoyOiBhbGxvY19hcmc6ICJ3b3Jk
-ZXhwIgo+ID4gYWxsb2NhdGVzIG1lbW9yeSB0aGF0IGlzIHN0b3JlZCBpbnRvICJ3LndlX3dvcmR2
-Ii4KPiA+IGJsdWV6LTUuNzYvc3JjL3NoYXJlZC9zaGVsbC5jOjE0MTU6MzogbGVha2VkX3N0b3Jh
-Z2U6IFZhcmlhYmxlICJ3Igo+ID4gZ29pbmcgb3V0IG9mIHNjb3BlIGxlYWtzIHRoZSBzdG9yYWdl
-ICJ3LndlX3dvcmR2IiBwb2ludHMgdG8uCj4gPiAxNDEzfMKgwqDCoMKgwqDCoMKgwqDCoMKgIHN3
-aXRjaCAoZXJyKSB7Cj4gPiAxNDE0fMKgwqDCoMKgwqDCoMKgwqDCoMKgIGNhc2UgV1JERV9CQURD
-SEFSOgo+ID4gMTQxNXwtPsKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHJldHVybiAt
-RUJBRE1TRzsKPiA+IDE0MTZ8wqDCoMKgwqDCoMKgwqDCoMKgwqAgY2FzZSBXUkRFX0JBRFZBTDoK
-PiA+IDE0MTd8wqDCoMKgwqDCoMKgwqDCoMKgwqAgY2FzZSBXUkRFX1NZTlRBWDoKPiAKPiBPaywg
-YnV0IHdoZXJlIGluIHRoZSBkb2N1bWVudGF0aW9uIG9mIHdvcmRleHAgaXQgaXMgc2F5aW5nIHRo
-YXQKPiB3ZV93b3JkdiBpcyBsZWZ0IHdpdGggYW55dGhpbmcgYWxsb2NhdGVkIGlmIGl0IGZhaWxz
-PyBJdmUgYXNzdW1lZCBpZgo+IGl0IHJldHVybnMgYW4gZXJyb3Igbm8gYXJndW1lbnQgaGFzIGJl
-ZW4gcHJvY2Vzc2VkLCBvdGhlcndpc2UgdGhpcyBpcwo+IHNvcnQgb2YgbWlzbGVhZGluZyBhbmQg
-dGhlIGVycm9ycyBzaGFsbCBiZSByZXR1cm5lZCBieSBpbmRleCBvZiB0aGUKPiB3b3JkLgoKVGhl
-cmUncyBub3RoaW5nIHNheXMgaXQgZnJlZXMgd29yZHYgb24gZXJyb3IsIGFuZCB0aGUgY29kZSBz
-aG93cyBpdApkb2Vzbid0OgpodHRwczovL3NvdXJjZXdhcmUub3JnL2dpdC8/cD1nbGliYy5naXQ7
-YT1ibG9iO2Y9cG9zaXgvd29yZGV4cC5jO2g9YTczNjJlZjMxYjA1MjgwMDAxZTk2MWMzYTYzMGU5
-NTMxMTBiNzM5NztoYj1IRUFEI2wyMjAzCgo+ID4gRXJyb3I6IFJFU09VUkNFX0xFQUsgKENXRS03
-NzIpOiBbI2RlZjQzXSBbaW1wb3J0YW50XQo+ID4gYmx1ZXotNS43Ni9zcmMvc2hhcmVkL3NoZWxs
-LmM6MTQxMjoyOiBhbGxvY19hcmc6ICJ3b3JkZXhwIgo+ID4gYWxsb2NhdGVzIG1lbW9yeSB0aGF0
-IGlzIHN0b3JlZCBpbnRvICJ3LndlX3dvcmR2Ii4KPiA+IGJsdWV6LTUuNzYvc3JjL3NoYXJlZC9z
-aGVsbC5jOjE0MTg6MzogbGVha2VkX3N0b3JhZ2U6IFZhcmlhYmxlICJ3Igo+ID4gZ29pbmcgb3V0
-IG9mIHNjb3BlIGxlYWtzIHRoZSBzdG9yYWdlICJ3LndlX3dvcmR2IiBwb2ludHMgdG8uCj4gPiAx
-NDE2fMKgwqDCoMKgwqDCoMKgwqDCoMKgIGNhc2UgV1JERV9CQURWQUw6Cj4gPiAxNDE3fMKgwqDC
-oMKgwqDCoMKgwqDCoMKgIGNhc2UgV1JERV9TWU5UQVg6Cj4gPiAxNDE4fC0+wqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqAgcmV0dXJuIC1FSU5WQUw7Cj4gPiAxNDE5fMKgwqDCoMKgwqDC
-oMKgwqDCoMKgIGNhc2UgV1JERV9OT1NQQUNFOgo+ID4gMTQyMHzCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqAgcmV0dXJuIC1FTk9NRU07Cj4gPiAKPiA+IEVycm9yOiBSRVNPVVJD
-RV9MRUFLIChDV0UtNzcyKTogWyNkZWY0NF0gW2ltcG9ydGFudF0KPiA+IGJsdWV6LTUuNzYvc3Jj
-L3NoYXJlZC9zaGVsbC5jOjE0MTI6MjogYWxsb2NfYXJnOiAid29yZGV4cCIKPiA+IGFsbG9jYXRl
-cyBtZW1vcnkgdGhhdCBpcyBzdG9yZWQgaW50byAidy53ZV93b3JkdiIuCj4gPiBibHVlei01Ljc2
-L3NyYy9zaGFyZWQvc2hlbGwuYzoxNDIwOjM6IGxlYWtlZF9zdG9yYWdlOiBWYXJpYWJsZSAidyIK
-PiA+IGdvaW5nIG91dCBvZiBzY29wZSBsZWFrcyB0aGUgc3RvcmFnZSAidy53ZV93b3JkdiIgcG9p
-bnRzIHRvLgo+ID4gMTQxOHzCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgcmV0
-dXJuIC1FSU5WQUw7Cj4gPiAxNDE5fMKgwqDCoMKgwqDCoMKgwqDCoMKgIGNhc2UgV1JERV9OT1NQ
-QUNFOgo+ID4gMTQyMHwtPsKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHJldHVybiAt
-RU5PTUVNOwo+ID4gMTQyMXzCoMKgwqDCoMKgwqDCoMKgwqDCoCBjYXNlIFdSREVfQ01EU1VCOgo+
-ID4gMTQyMnzCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgaWYgKHdvcmRleHAo
-aW5wdXQsICZ3LCAwKSkKPiA+IAo+ID4gRXJyb3I6IFJFU09VUkNFX0xFQUsgKENXRS03NzIpOiBb
-I2RlZjQ1XSBbaW1wb3J0YW50XQo+ID4gYmx1ZXotNS43Ni9zcmMvc2hhcmVkL3NoZWxsLmM6MTQy
-MjozOiBhbGxvY19hcmc6ICJ3b3JkZXhwIgo+ID4gYWxsb2NhdGVzIG1lbW9yeSB0aGF0IGlzIHN0
-b3JlZCBpbnRvICJ3LndlX3dvcmR2Ii4KPiA+IGJsdWV6LTUuNzYvc3JjL3NoYXJlZC9zaGVsbC5j
-OjE0MjM6NDogbGVha2VkX3N0b3JhZ2U6IFZhcmlhYmxlICJ3Igo+ID4gZ29pbmcgb3V0IG9mIHNj
-b3BlIGxlYWtzIHRoZSBzdG9yYWdlICJ3LndlX3dvcmR2IiBwb2ludHMgdG8uCj4gPiAxNDIxfMKg
-wqDCoMKgwqDCoMKgwqDCoMKgIGNhc2UgV1JERV9DTURTVUI6Cj4gPiAxNDIyfMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBpZiAod29yZGV4cChpbnB1dCwgJncsIDApKQo+ID4g
-MTQyM3wtPsKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBy
-ZXR1cm4gLUVOT0VYRUM7Cj4gPiAxNDI0fMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoCBicmVhazsKPiA+IDE0MjV8wqDCoMKgwqDCoMKgwqDCoMKgwqAgfTsKPiA+IC0tLQo+ID4g
-wqBzcmMvc2hhcmVkL3NoZWxsLmMgfCAxMSArKysrKysrKystLQo+ID4gwqAxIGZpbGUgY2hhbmdl
-ZCwgOSBpbnNlcnRpb25zKCspLCAyIGRlbGV0aW9ucygtKQo+ID4gCj4gPiBkaWZmIC0tZ2l0IGEv
-c3JjL3NoYXJlZC9zaGVsbC5jIGIvc3JjL3NoYXJlZC9zaGVsbC5jCj4gPiBpbmRleCA4NzhiZTE0
-MGMzMzYuLmMwOWQ0MWVlNTRkZiAxMDA2NDQKPiA+IC0tLSBhL3NyYy9zaGFyZWQvc2hlbGwuYwo+
-ID4gKysrIGIvc3JjL3NoYXJlZC9zaGVsbC5jCj4gPiBAQCAtMTExNyw4ICsxMTE3LDEwIEBAIHN0
-YXRpYyBjaGFyICoqc2hlbGxfY29tcGxldGlvbihjb25zdCBjaGFyCj4gPiAqdGV4dCwgaW50IHN0
-YXJ0LCBpbnQgZW5kKQo+ID4gwqDCoMKgwqDCoMKgwqAgaWYgKHN0YXJ0ID4gMCkgewo+ID4gwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHdvcmRleHBfdCB3Owo+ID4gCj4gPiAtwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBpZiAod29yZGV4cChybF9saW5lX2J1ZmZlciwgJncsIFdS
-REVfTk9DTUQpKQo+ID4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgaWYgKHdvcmRleHAo
-cmxfbGluZV9idWZmZXIsICZ3LCBXUkRFX05PQ01EKSkgewo+ID4gK8KgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHdvcmRmcmVlKCZ3KTsKPiA+IMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgcmV0dXJuIE5VTEw7Cj4gPiArwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCB9Cj4gPiAKPiA+IMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoCBtYXRjaGVzID0gbWVudV9jb21wbGV0aW9uKGRlZmF1bHRfbWVudSwgdGV4dCwK
-PiA+IHcud2Vfd29yZGMsCj4gPiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoAo+ID4gdy53ZV93b3JkdlswXSk7Cj4gPiBAQCAtMTQyMSwxNSArMTQy
-MywyMCBAQCBpbnQgYnRfc2hlbGxfZXhlYyhjb25zdCBjaGFyICppbnB1dCkKPiA+IMKgwqDCoMKg
-wqDCoMKgIGVyciA9IHdvcmRleHAoaW5wdXQsICZ3LCBXUkRFX05PQ01EKTsKPiA+IMKgwqDCoMKg
-wqDCoMKgIHN3aXRjaCAoZXJyKSB7Cj4gPiDCoMKgwqDCoMKgwqDCoCBjYXNlIFdSREVfQkFEQ0hB
-UjoKPiA+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHdvcmRmcmVlKCZ3KTsKPiA+IMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCByZXR1cm4gLUVCQURNU0c7Cj4gPiDCoMKgwqDC
-oMKgwqDCoCBjYXNlIFdSREVfQkFEVkFMOgo+ID4gwqDCoMKgwqDCoMKgwqAgY2FzZSBXUkRFX1NZ
-TlRBWDoKPiA+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHdvcmRmcmVlKCZ3KTsKPiA+
-IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCByZXR1cm4gLUVJTlZBTDsKPiA+IMKgwqDC
-oMKgwqDCoMKgIGNhc2UgV1JERV9OT1NQQUNFOgo+ID4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqAgd29yZGZyZWUoJncpOwo+ID4gwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHJl
-dHVybiAtRU5PTUVNOwo+ID4gwqDCoMKgwqDCoMKgwqAgY2FzZSBXUkRFX0NNRFNVQjoKPiA+IC3C
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIGlmICh3b3JkZXhwKGlucHV0LCAmdywgMCkpCj4g
-PiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBpZiAod29yZGV4cChpbnB1dCwgJncsIDAp
-KSB7Cj4gPiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgd29y
-ZGZyZWUoJncpOwo+ID4gwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoCByZXR1cm4gLUVOT0VYRUM7Cj4gPiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCB9
-Cj4gPiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgYnJlYWs7Cj4gPiDCoMKgwqDCoMKg
-wqDCoCB9Owo+IAo+IElmIHdlIHJlYWxseSBuZWVkIHRvIGNhbGwgd29yZGZyZWUgcmVnYXJkbGVz
-cyB0aGVuIEknZCBwcm9iYWJseSBoYXZlCj4gYQo+IGZ1bmN0aW9uIHRoYXQgd3JhcHMgd29yZGV4
-cCBhbmQgYXV0b21hdGljYWxseSBkb2VzIHdvcmRmcmVlIG9uIGVycm9yLgoKT0suCgo+IAoK
+This adds handling for system suspend and resume. While the host enters
+suspend state, the driver will drive the chip into low power state.
+
+Similarly when system is resuming, the driver will wake up the chip.
+
+Signed-off-by: Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>
+---
+v2: Rename new suspend/resume function names to nxp_serdev_suspend and
+nxp_serdev_resume. (Luke Wang)
+---
+ drivers/bluetooth/btnxpuart.c | 23 +++++++++++++++++++++++
+ 1 file changed, 23 insertions(+)
+
+diff --git a/drivers/bluetooth/btnxpuart.c b/drivers/bluetooth/btnxpuart.c
+index da18fd4f54f3..c5b40bba6bfa 100644
+--- a/drivers/bluetooth/btnxpuart.c
++++ b/drivers/bluetooth/btnxpuart.c
+@@ -1498,6 +1498,24 @@ static void nxp_serdev_remove(struct serdev_device *serdev)
+ 	hci_free_dev(hdev);
+ }
+ 
++static int nxp_serdev_suspend(struct device *dev)
++{
++	struct btnxpuart_dev *nxpdev = dev_get_drvdata(dev);
++	struct ps_data *psdata = &nxpdev->psdata;
++
++	ps_control(psdata->hdev, PS_STATE_SLEEP);
++	return 0;
++}
++
++static int nxp_serdev_resume(struct device *dev)
++{
++	struct btnxpuart_dev *nxpdev = dev_get_drvdata(dev);
++	struct ps_data *psdata = &nxpdev->psdata;
++
++	ps_control(data->hdev, PS_STATE_AWAKE);
++	return 0;
++}
++
+ static struct btnxpuart_data w8987_data __maybe_unused = {
+ 	.helper_fw_name = NULL,
+ 	.fw_name = FIRMWARE_W8987,
+@@ -1517,12 +1535,17 @@ static const struct of_device_id nxpuart_of_match_table[] __maybe_unused = {
+ };
+ MODULE_DEVICE_TABLE(of, nxpuart_of_match_table);
+ 
++static const struct dev_pm_ops nxp_pm_ops = {
++	SET_SYSTEM_SLEEP_PM_OPS(nxp_serdev_suspend, nxp_serdev_resume)
++};
++
+ static struct serdev_device_driver nxp_serdev_driver = {
+ 	.probe = nxp_serdev_probe,
+ 	.remove = nxp_serdev_remove,
+ 	.driver = {
+ 		.name = "btnxpuart",
+ 		.of_match_table = of_match_ptr(nxpuart_of_match_table),
++		.pm = &nxp_pm_ops,
+ 	},
+ };
+ 
+-- 
+2.34.1
 
