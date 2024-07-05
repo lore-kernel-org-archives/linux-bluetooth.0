@@ -1,116 +1,135 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C262E1448C6
-	for <linux-bluetooth@vger.kernel.org>; Fri,  5 Jul 2024 10:15:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E577A148FF7
+	for <linux-bluetooth@vger.kernel.org>; Fri,  5 Jul 2024 10:41:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720174514; cv=none; b=FnlpGoj0YNgB/v/AxzEOdmDvNQlKSI/2MXesvVGXejQRtYP4eTjoJ9QJnaC6yTpGgxQ4V/XlthdtREZNkE7eUxZOz/mg9vDifDmmy2FCsKivTFZIngV0UywmZknPo+6klftdDoxa02+0frfBznsiQzlT9UfrknvP5MwnjReIHHk=
+	t=1720176101; cv=none; b=L4deDEw4/XMn21fSsc4+akx3GA4dBAsI8sW/3oX4g0NednMTI9cfaKgub9PrfNtpEpXAsq7drhw9Zf3lGniIa5jyaAWSqvKNKUbrqVzJzi4cO8jvXZ/4I4nSs2OSGuQMGU1fztcF3RU+5LztIfHFW8UIOBCrVPBX8BrDCkN+hHk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720174514; c=relaxed/simple;
-	bh=d/UsotZrvcUPvhrdiqNH64u9/P7kp6lr/oygVhWMIRM=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=HtAIXSRy5Eba8AJ2qIKKecE4hqJaAnajJlgpMLJQwLth+DCtTH1BD4sx5LeVzExOWUJWirT7t75o68T+VSnQvMRk5BziXyvnMjO3/c6tqnQ0vJ5YM3W2uc+ZY14rbKSy2uvcA2aYqH/hfC0OIbdYt7UekgI03VdaYkd2ZUET9Ik=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ZnAAuACx; arc=none smtp.client-ip=198.175.65.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1720176101; c=relaxed/simple;
+	bh=OPvD2BjLIC91RxQvxlsasYxQZrcG3Rkyo26U+37/+PA=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=L4hggluuDQHM5ak1nqQDU4UwmeGPfcFPEo1MfzRfgq7yzrXmh5jeBWYhqknrz4AvNHqX8gws4TkjGCXSkvP5kWTjRCa9TaKRH3LYuw3u61zciNuV8pKMU/UsnteFq8VK0Z+IG0BB/uBeLWaJLZxrM+zRg9hMddXzu3+amAn0ZD0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XQvJLdkP; arc=none smtp.client-ip=209.85.214.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ZnAAuACx"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1720174513; x=1751710513;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=d/UsotZrvcUPvhrdiqNH64u9/P7kp6lr/oygVhWMIRM=;
-  b=ZnAAuACxHDG6FaLKSf8TXlg5tp/lPQWzNPn17LH5jWH0jYQy1gePLZ4Q
-   e3Dj9J2+UVUue7dOIhKzGLH8eG7f+vlKgL5B7mAn9mdszsJT/Cc3CYl1i
-   YPqHzBxyZWShifSz6l6xDFZbPLkTB/3uzHuTL0sSFAM4zuCrEzKuYHsHb
-   mRJYRsXdPx3cM2tRFIt6/wBJycOXYtEuCe3iuQwAzoBcW5w3Wm9BtGZZD
-   c0LuJTZ2B7VW8VEWOo6ZU9LIP7zPraNOFPF2IFeAyBNSaZ0Sa7XxI/N6W
-   Pwjn82iv8pd3FbtrTwhw4tBJUA7g6T6PJyBu8hKeqMKx9XWGiGb69gwJG
-   g==;
-X-CSE-ConnectionGUID: AXU8HEVtSpuJ6eV0yc8nnw==
-X-CSE-MsgGUID: Mwr199OiRc2LCkRHRueaaw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11123"; a="17415168"
-X-IronPort-AV: E=Sophos;i="6.09,184,1716274800"; 
-   d="scan'208";a="17415168"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Jul 2024 03:15:13 -0700
-X-CSE-ConnectionGUID: HsGLU78DQ+yLq0w3DGDVuQ==
-X-CSE-MsgGUID: KZaLSg7nS7idFTpYuHYdEg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.09,184,1716274800"; 
-   d="scan'208";a="84389959"
-Received: from intel-lenovo-legion-y540-15irh-pg0.iind.intel.com ([10.224.186.95])
-  by orviesa001.jf.intel.com with ESMTP; 05 Jul 2024 03:15:10 -0700
-From: Kiran K <kiran.k@intel.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: ravishankar.srivatsa@intel.com,
-	chethan.tumkur.narayan@intel.com,
-	Kiran K <kiran.k@intel.com>
-Subject: [PATCH v1 2/2] Bluetooth: btintel: Add support for Whale Peak2
-Date: Fri,  5 Jul 2024 15:59:23 +0530
-Message-Id: <20240705102923.3512817-2-kiran.k@intel.com>
-X-Mailer: git-send-email 2.40.1
-In-Reply-To: <20240705102923.3512817-1-kiran.k@intel.com>
-References: <20240705102923.3512817-1-kiran.k@intel.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XQvJLdkP"
+Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-1fb3e9e32ffso6241905ad.0
+        for <linux-bluetooth@vger.kernel.org>; Fri, 05 Jul 2024 03:41:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1720176099; x=1720780899; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=JhHWAElPpkRTVgFy5wlbfnSPuyzDVV/+VtLsrc6ZwRw=;
+        b=XQvJLdkPml4/BqY8jbUMvkoRUYwhOAcHHpZheglDhMznO5yDIFxj1sD+aIf66ITeAM
+         1lTRtxG1HL6lR3fImZ5SbUCRDDYMTat+GAFz7N1sc2KYY/UrNEZebdZaf/6OXl6hMSw5
+         66gmQsHbaAT0V0JQqkrQLqzQTSAvhAZefDMFHVslW2oFgW68Fsd9gGFk9ZVl2IK+EF6J
+         93+8tEnLt+qiSsFFeixjRPWzTkQUJIDLHi2gUTOCnJvuAYiCQidDxZS9eIiMVjX80XvT
+         pUyXVxq1R2ZRg8+2796LmHC1FW6MNP6YsbAP0+TJc4LG8zWcgMsjGYgO5kOybjxwb38X
+         Mx7g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1720176099; x=1720780899;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=JhHWAElPpkRTVgFy5wlbfnSPuyzDVV/+VtLsrc6ZwRw=;
+        b=nMKTFCquAQVPoXYA/lwFIVl/QHg5g0J5tqpKiWNWSCSRp7o7mi7Cn3IQIqWaN9gh10
+         qgTx0tkm4SClKtLyxCO9fFYu+fO5bKS8lMt9FxTyRiizr4jTCW7IfxRCn021FiZqE5Dg
+         oCSf0e/GSvEsWoOBF/Ts+ZKxw6pRs4At7WGHaYeyJMI2ETGL3Wr2+nWGYrF3HtJJMUup
+         z4lUj0/SeQ5rJrIBzrO76sUiU5JzHWmSR/ohKifbTQ0ppQH1oOBWARRJdfQU46stppA8
+         0vBmbzRvDp458cUmvgJVwpmHMmyaWU53ODae30k2MnxbZ9rCmMN1kmEUTJcb9n2/m46g
+         f/RA==
+X-Gm-Message-State: AOJu0YxafO3VnAxmusKoJJM5u4avqEEemz4GD+SjdBSIdAQ5p+BLLLLN
+	uB+RIl6nlT0L19jsOiS7iX43y6pJjafG+HdyInz2bI2pLB2P2ElR+8s+UQ==
+X-Google-Smtp-Source: AGHT+IGeSD/dguKNX7xW+R9hIE6F36yuTTqUMLJblB8YMVnqNS6eGoYnzUM2pSg2CI2ISY5QTEIu3Q==
+X-Received: by 2002:a17:902:f693:b0:1f9:f217:83d with SMTP id d9443c01a7336-1fb33e1639cmr36423715ad.2.1720176098858;
+        Fri, 05 Jul 2024 03:41:38 -0700 (PDT)
+Received: from [172.17.0.2] ([52.238.27.213])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1fb167dd71esm49696175ad.238.2024.07.05.03.41.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 05 Jul 2024 03:41:38 -0700 (PDT)
+Message-ID: <6687cde2.170a0220.5c11b.fea5@mx.google.com>
+Date: Fri, 05 Jul 2024 03:41:38 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============7573835314581750782=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, gudni.m.g@gmail.com
+Subject: RE: [BlueZ] configure.ac: Fix --disable-cups
+In-Reply-To: <20240705084216.552838-1-gudni.m.g@gmail.com>
+References: <20240705084216.552838-1-gudni.m.g@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-from /sys/kernel/debug/usb/devices:
+--===============7573835314581750782==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-T:  Bus=03 Lev=01 Prnt=01 Port=09 Cnt=02 Dev#=  3 Spd=12   MxCh= 0
-D:  Ver= 2.00 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-P:  Vendor=8087 ProdID=0039 Rev= 0.00
-C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
-I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=81(I) Atr=03(Int.) MxPS=  64 Ivl=1ms
-E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-I:  If#= 1 Alt= 6 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  63 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  63 Ivl=1ms
+This is automated email and please do not reply to this email!
 
-Signed-off-by: Kiran K <kiran.k@intel.com>
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=868696
+
+---Test result---
+
+Test Summary:
+CheckPatch                    FAIL      0.47 seconds
+GitLint                       FAIL      0.42 seconds
+BuildEll                      PASS      24.45 seconds
+BluezMake                     PASS      1678.89 seconds
+MakeCheck                     PASS      13.38 seconds
+MakeDistcheck                 PASS      176.21 seconds
+CheckValgrind                 PASS      250.49 seconds
+CheckSmatch                   PASS      352.15 seconds
+bluezmakeextell               PASS      118.63 seconds
+IncrementalBuild              PASS      1428.30 seconds
+ScanBuild                     PASS      988.91 seconds
+
+Details
+##############################
+Test: CheckPatch - FAIL
+Desc: Run checkpatch.pl script
+Output:
+[BlueZ] configure.ac: Fix --disable-cups
+WARNING:COMMIT_LOG_LONG_LINE: Possible unwrapped commit description (prefer a maximum 75 chars per line)
+#97: 
+https://lore.kernel.org/linux-bluetooth/20240416052603.4373-2-polynomial-c@gmx.de/
+
+/github/workspace/src/src/13724551.patch total: 0 errors, 1 warnings, 16 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/src/13724551.patch has style problems, please review.
+
+NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+##############################
+Test: GitLint - FAIL
+Desc: Run gitlint
+Output:
+[BlueZ] configure.ac: Fix --disable-cups
+
+WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
+9: B1 Line exceeds max length (82>80): "https://lore.kernel.org/linux-bluetooth/20240416052603.4373-2-polynomial-c@gmx.de/"
+
+
 ---
- drivers/bluetooth/btusb.c | 1 +
- 1 file changed, 1 insertion(+)
+Regards,
+Linux Bluetooth
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 2d5c971a59ad..2a153115bc84 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -479,6 +479,7 @@ static const struct usb_device_id quirks_table[] = {
- 	{ USB_DEVICE(0x8087, 0x0036), .driver_info = BTUSB_INTEL_COMBINED },
- 	{ USB_DEVICE(0x8087, 0x0037), .driver_info = BTUSB_INTEL_COMBINED },
- 	{ USB_DEVICE(0x8087, 0x0038), .driver_info = BTUSB_INTEL_COMBINED },
-+	{ USB_DEVICE(0x8087, 0x0039), .driver_info = BTUSB_INTEL_COMBINED },
- 	{ USB_DEVICE(0x8087, 0x07da), .driver_info = BTUSB_CSR },
- 	{ USB_DEVICE(0x8087, 0x07dc), .driver_info = BTUSB_INTEL_COMBINED |
- 						     BTUSB_INTEL_NO_WBS_SUPPORT |
--- 
-2.40.1
 
+--===============7573835314581750782==--
