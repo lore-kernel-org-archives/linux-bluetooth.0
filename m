@@ -1,101 +1,146 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 459A3149E14;
-	Fri,  5 Jul 2024 11:20:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9141B1482F3
+	for <linux-bluetooth@vger.kernel.org>; Fri,  5 Jul 2024 11:36:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720178459; cv=none; b=FZZWyV7cMs8/v3y8W+Mf8qsdf7CUoyvhiLX7PAqttMVp0bkJLFTvDZe4GJ96gy1hN5xcyPwMzKgdVt2S+uUwPxiAd3CsYS9iBq7qV5fAovCfl7gDS/Gk0rkYz4bmsT2ZvhFE7IpXXgoDrfTGkFPs+dXPSendYi1DmA4xzJ789Wg=
+	t=1720179398; cv=none; b=nbRxAEZGpyIqhY7nxu8TzX8ZJBM6DtD1axTv49xXY3wXFlXJrWFjF0bp4RteVSRWXkgm6IT5z/CO8KajkHs0fv5ncsNmS6cw92H41Yl0FmCldq/7ML+Kc7P28Y8DFZ9NpCaf41vMBrgPzKgbs/6jsxcgSIWzppH3Qj3hvHfzgyg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720178459; c=relaxed/simple;
-	bh=2lziA+/6JKSgfq9RoAqeOwVB85rk+sMBHVFJcgBRrhg=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=c3J+Yq5p/Hy3Jj5JZ45DjpOBIlziGVy2srXuzHdN4wuikY1WDC+ahWDKwHGMA/O9aNtiErZYFSyo0PUEjJOeGmuu4TSdR0oJ59+AGnYGUPIImVQ6w+jB4wrTVXarBH4lYYWwxsDTsewCFUPtW6eocbWaGLDm26OHbKovdCrts0s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aOxhoovT; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1720179398; c=relaxed/simple;
+	bh=riMN+cbrD/mqU9EvHWHhYWsxbYk0tJV2YaPAqNhHgBo=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=jsQLthaT9p8DhmBVeyguOLadMoF9fmjplXUWCRjxqEaU68ZZaISXtSfTKM9zhKuSRYNClAx0GQnzWVbYpJXYhv0ucW3CbecYT0taJuXwBMvj0U/gE/A3lnAgIxAba2XZMRddMK6YlF78Qbry1pSbyuervmC04I5bEAh7XHlIhfI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mgYy3U4f; arc=none smtp.client-ip=209.85.214.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aOxhoovT"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id A2088C4AF1C;
-	Fri,  5 Jul 2024 11:20:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1720178458;
-	bh=2lziA+/6JKSgfq9RoAqeOwVB85rk+sMBHVFJcgBRrhg=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
-	b=aOxhoovTpToa7QO+/LQxmShtHJLAhrBy4EJ/FyepHQSLXTgZmjPPHnMZ7uCmFQbL7
-	 S4iKDyuukdXxQBKHvW9mwbDgqMX/aKXW9V/EF8WqFbf5mmoRYKYkeDzgUZJiEBRqtd
-	 sLKQPdk40PqOaNjGLstomU37mxf3pRWsyfS2w+b+K0Gf/k/KR7Ksz3+GWvoKfjkVk4
-	 czFkFo/BLbnTRD3suP//ybioOkkjX4S+3HFDxS5/Lkmo6er68s7X/4U2hgz4jz4xVR
-	 Q92hzAJYUUuD59+8KYSkLHe6sRtyS/yrHr81kngGLVuVKHCRSEHHA36z8t/NVYczUq
-	 Q7vo8qpplz2SQ==
-Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 99164C30658;
-	Fri,  5 Jul 2024 11:20:58 +0000 (UTC)
-From: Yang Li via B4 Relay <devnull+yang.li.amlogic.com@kernel.org>
-Date: Fri, 05 Jul 2024 19:20:47 +0800
-Subject: [PATCH 4/4] MAINTAINERS: Add an entry for Amlogic HCI UART
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mgYy3U4f"
+Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-1faad2f1967so18684155ad.0
+        for <linux-bluetooth@vger.kernel.org>; Fri, 05 Jul 2024 04:36:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1720179397; x=1720784197; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=BlRfDEie0Yb4xdRVTeoRPZdVodoJ5OlLSIhHBtQXRQA=;
+        b=mgYy3U4fYl9oEY/mlI7T7MkZXzBgbTotTtXTwoSKEeAnrxkuxZHSDWxAD4Er0WiZCo
+         QYrJ+JQbg/iNgKDu5ETAEOakQOI4QvvS6J5D3gBPljqwps65ZH0Rr6mY9/nM3GqJbHoC
+         oRR/xKb5ETjMipep6fqUx9xzS0LngQ4LrCE6/8Ig/h1GCsWm0XyFXtmk8CaS0ZiIvwrL
+         UGd3ytpr2t4x0yFsgquW6cJ1I+B8Iw9mRoijiWO6Ac1A1lXCu6G9Sz+vIobv33QEhLyj
+         EToqqRsItuuAoXjoa8J6YhRF1U6OXzceTpEch/DvWihhxgPNStzgh26e47w+5+tawKpG
+         T01Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1720179397; x=1720784197;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=BlRfDEie0Yb4xdRVTeoRPZdVodoJ5OlLSIhHBtQXRQA=;
+        b=xQvOFNFBFewyvUeA39CoUh4ZQhQH1J3TCj3Az1mjShUX3R+bifwk7mLr4eHqG3FaI9
+         DK8bPufb256byxv4cHwELZoIWFYXAW6PSZ1J8Uv/xne69qHz0SbZtp385kEyeikVsVXF
+         5cayXYNM1ag6p+ZDO9KCXGtTsRUMee79fLDXVq27uW14cH4pnF8LyFPWUm/qaNncfNYf
+         GyamBBylUhBtxUl45lmWjT/SdG9ZchgWsEUMCwqMk8y7QenaQpzpNlcwGPgLrSokTQ3b
+         rwPjGIrC+JLzo8T6T5kIKoiyv+hn330pu7CEKQJKa0qAbl2HPn4IE6XX1FbvostCf63x
+         1l/w==
+X-Gm-Message-State: AOJu0YyK+GHwVQNJnRs1Wh/qGlO0hVvJdX1L+AnLUc6gNymOYAY+sFR5
+	99MKsHwbK9cSahlsetldU+l47PYQEE4XJg7qtzu7N9dMY57EWkfSGZ5THQ==
+X-Google-Smtp-Source: AGHT+IHMyeDluwKk/KEOJUmJQD2EIb9Lo/xdh0cSt7kgOMfJMyBon1NRujt9TF6NyFgWYvP+dMstoA==
+X-Received: by 2002:a17:902:d486:b0:1fb:4b87:6e88 with SMTP id d9443c01a7336-1fb4b877074mr21823805ad.29.1720179396556;
+        Fri, 05 Jul 2024 04:36:36 -0700 (PDT)
+Received: from [172.17.0.2] ([13.88.100.227])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1fb24fbd598sm39821095ad.199.2024.07.05.04.36.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 05 Jul 2024 04:36:36 -0700 (PDT)
+Message-ID: <6687dac4.170a0220.4a916.d92a@mx.google.com>
+Date: Fri, 05 Jul 2024 04:36:36 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============8756257372777745351=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, r.smirnov@omp.ru
+Subject: RE: fix error found by SVACE static analyzer #2
+In-Reply-To: <20240705075709.26809-2-r.smirnov@omp.ru>
+References: <20240705075709.26809-2-r.smirnov@omp.ru>
+Reply-To: linux-bluetooth@vger.kernel.org
+
+--===============8756257372777745351==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
-Message-Id: <20240705-btaml-v1-4-7f1538f98cef@amlogic.com>
-References: <20240705-btaml-v1-0-7f1538f98cef@amlogic.com>
-In-Reply-To: <20240705-btaml-v1-0-7f1538f98cef@amlogic.com>
-To: Marcel Holtmann <marcel@holtmann.org>, 
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
- Conor Dooley <conor+dt@kernel.org>, 
- Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>
-Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org, 
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
- linux-arm-kernel@lists.infradead.org, Yang Li <yang.li@amlogic.com>
-X-Mailer: b4 0.13-dev-f0463
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1720178456; l=791;
- i=yang.li@amlogic.com; s=20240418; h=from:subject:message-id;
- bh=6p3yKY36l4948ddX8ZSkIlVHnk6qkn9A/zzKu777K74=;
- b=Ed7f/l9Xlg5GkNfTRh8J13KkPIycQeC2NgSckQjHhjTH/Y3uWKotFhN3wov3NdBahWbrMVZyg
- 75upTDaX0koBeQHlSe1OyWlp8GW4djERI79GjmWdXegcqIa0lTlRKjh
-X-Developer-Key: i=yang.li@amlogic.com; a=ed25519;
- pk=86OaNWMr3XECW9HGNhkJ4HdR2eYA5SEAegQ3td2UCCs=
-X-Endpoint-Received: by B4 Relay for yang.li@amlogic.com/20240418 with
- auth_id=180
-X-Original-From: Yang Li <yang.li@amlogic.com>
-Reply-To: yang.li@amlogic.com
 
-From: Yang Li <yang.li@amlogic.com>
+This is automated email and please do not reply to this email!
 
-Add Amlogic Bluetooth driver and driver document.
+Dear submitter,
 
-Signed-off-by: Yang Li <yang.li@amlogic.com>
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=868674
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      1.30 seconds
+GitLint                       PASS      0.96 seconds
+BuildEll                      PASS      24.63 seconds
+BluezMake                     PASS      1738.36 seconds
+MakeCheck                     PASS      13.42 seconds
+MakeDistcheck                 PASS      178.63 seconds
+CheckValgrind                 PASS      254.80 seconds
+CheckSmatch                   WARNING   355.35 seconds
+bluezmakeextell               PASS      120.21 seconds
+IncrementalBuild              PASS      8162.11 seconds
+ScanBuild                     WARNING   1011.55 seconds
+
+Details
+##############################
+Test: CheckSmatch - WARNING
+Desc: Run smatch tool with source
+Output:
+src/shared/shell.c: note: in included file (through /usr/include/readline/readline.h):src/shared/shell.c: note: in included file (through /usr/include/readline/readline.h):src/shared/shell.c: note: in included file (through /usr/include/readline/readline.h):tools/rctest.c:627:33: warning: non-ANSI function declaration of function 'automated_send_recv'
+##############################
+Test: ScanBuild - WARNING
+Desc: Run Scan Build
+Output:
+tools/rctest.c:747:9: warning: Null pointer passed to 1st parameter expecting 'nonnull'
+                        if (!strncasecmp(optarg, "hci", 3))
+                             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+tools/rctest.c:759:9: warning: Null pointer passed to 1st parameter expecting 'nonnull'
+                        if (!strncasecmp(optarg, "hci", 3))
+                             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+tools/rctest.c:766:14: warning: Null pointer passed to 1st parameter expecting 'nonnull'
+                        channel = atoi(optarg);
+                                  ^~~~~~~~~~~~
+tools/rctest.c:770:9: warning: Null pointer passed to 1st parameter expecting 'nonnull'
+                        if (!strcasecmp(optarg, "spp"))
+                             ^~~~~~~~~~~~~~~~~~~~~~~~~
+tools/rctest.c:795:13: warning: Null pointer passed to 1st parameter expecting 'nonnull'
+                        linger = atoi(optarg);
+                                 ^~~~~~~~~~~~
+tools/rctest.c:799:18: warning: Null pointer passed to 1st parameter expecting 'nonnull'
+                        defer_setup = atoi(optarg);
+                                      ^~~~~~~~~~~~
+tools/rctest.c:811:17: warning: Null pointer passed to 1st parameter expecting 'nonnull'
+                        num_frames = atoi(optarg);
+                                     ^~~~~~~~~~~~
+tools/rctest.c:815:12: warning: Null pointer passed to 1st parameter expecting 'nonnull'
+                        count = atoi(optarg);
+                                ^~~~~~~~~~~~
+tools/rctest.c:819:12: warning: Null pointer passed to 1st parameter expecting 'nonnull'
+                        delay = atoi(optarg) * 1000;
+                                ^~~~~~~~~~~~
+tools/rctest.c:823:15: warning: Null pointer passed to 1st parameter expecting 'nonnull'
+                        priority = atoi(optarg);
+                                   ^~~~~~~~~~~~
+10 warnings generated.
+
+
+
 ---
- MAINTAINERS | 8 ++++++++
- 1 file changed, 8 insertions(+)
-
-diff --git a/MAINTAINERS b/MAINTAINERS
-index cd3277a98cfe..b81089290930 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -1140,6 +1140,14 @@ S:	Supported
- F:	arch/arm64/boot/dts/amd/amd-seattle-xgbe*.dtsi
- F:	drivers/net/ethernet/amd/xgbe/
- 
-+AMLOGIC BLUETOOTH DRIVER
-+M:	Yang Li <yang.li@amlogic.com>
-+L:	linux-bluetooth@vger.kernel.org
-+S:	Maintained
-+W:	http://www.amlogic.com
-+F:	Documentation/devicetree/bindings/net/bluetooth/amlogic,w155s2-bt.yaml
-+F:	drivers/bluetooth/hci_aml.c
-+
- AMLOGIC DDR PMU DRIVER
- M:	Jiucheng Xu <jiucheng.xu@amlogic.com>
- L:	linux-amlogic@lists.infradead.org
-
--- 
-2.42.0
+Regards,
+Linux Bluetooth
 
 
+--===============8756257372777745351==--
