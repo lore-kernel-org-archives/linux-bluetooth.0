@@ -1,35 +1,56 @@
-Received: from smtpbgeu2.qq.com (smtpbgeu2.qq.com [18.194.254.142])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28E9513A252;
-	Fri,  5 Jul 2024 10:01:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.194.254.142
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 216281482E4
+	for <linux-bluetooth@vger.kernel.org>; Fri,  5 Jul 2024 10:15:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720173696; cv=none; b=JP3qTl3CqNuEUudrPIRQKYMizjTtk10TmQFrdLtwoV6ZV7xe036pd3IlAfMQP/y584acxTe1OOw4S4lztREQVKt0KVByeSpNmZHIv6Jot/pIm5jWw7WXLoGsyxeuWIB1lBIVQQZvRUtGzjhTQgV9ms9uc36775Ux2V/kfQcuoZc=
+	t=1720174505; cv=none; b=Po5UkhCivj6SgjbUVUWXSlY6dXSqgVAfhEcWIuMewcrRCYcG4f2t3Fcq2ocwa5sg9g9n9Dj7NFU+jo9hGj/csPXd8sY4U5+rj9uh+c4LFTu/1n5fUZjNlyLVNAq02QuH5YxXZsrnRDuWso7k73DQoyI3zZcQZztjOfUNqVcBVyc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720173696; c=relaxed/simple;
-	bh=8ggn2Gtnn/u2RvU2sioDLfNnICoKxTU5C3l1Z6azTC0=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=J1VJ6HumIz/NZxrlJYAt2X+20VYbIO0s5ys3R8A7YlMztY7IiUBZV/stNFrhTSuELzQof4jVwV/vN93Fn3biuIGg/NMPPenKcHuWCyt72nYJOY9CgkKQAH3DL3YNAcuuRUP619OG8MBWi6OB+H6HKIhEGb4Y32zygFJqvHOw6VE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=uniontech.com; spf=pass smtp.mailfrom=uniontech.com; arc=none smtp.client-ip=18.194.254.142
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=uniontech.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniontech.com
-X-QQ-mid: bizesmtpsz4t1720173669twdmk4r
-X-QQ-Originating-IP: ZFWWM7NHnITK1MzzQCRyJIo0W03FFO1hJRONed26+oA=
-Received: from localhost.localdomain ( [113.57.152.160])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Fri, 05 Jul 2024 18:01:08 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 1
-X-BIZMAIL-ID: 15895109735684369604
-From: Wentao Guan <guanwentao@uniontech.com>
-To: stable@vger.kernel.org
-Cc: linux-bluetooth@vger.kernel.org,
-	guanwentao@uniontech.com,
-	Jaganath Kanakkassery <jaganath.k.os@gmail.com>
-Subject: [PATCH 4.19] Bluetooth: Fix incorrect pointer arithmatic in ext_adv_report_evt
-Date: Fri,  5 Jul 2024 18:01:06 +0800
-Message-Id: <20240705100106.25403-1-guanwentao@uniontech.com>
-X-Mailer: git-send-email 2.20.1
+	s=arc-20240116; t=1720174505; c=relaxed/simple;
+	bh=fOLMnX/L+VJiMhGOrZalmRILcxMWvY1UCyDMl2MU/FE=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=uPspaNmgc7nsGWVXD/iRhvH/3BqwrkGfWeio/noLn6CBGUINOAkEgjKfvxfT33XKS+Rz4kjWZTt19TY3SAdSV28jVSduhNm/jMXuYujfxJGCxkh1qTOdsbffpiqWHpg2lMtfcDdVC1zAud98b/SWCyJ/C2NwAEPPshK140aWAtg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=EWCKcoCY; arc=none smtp.client-ip=198.175.65.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="EWCKcoCY"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1720174504; x=1751710504;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=fOLMnX/L+VJiMhGOrZalmRILcxMWvY1UCyDMl2MU/FE=;
+  b=EWCKcoCY1mPQEkezudDNru/yci3EOhp1DWA3J/Gg3cDOj1qU2O6KgHa9
+   2sXnMbW7E5u9mwNUi6lsV0Y4Fu0hTkqCS3aX5czYpJxm7TWOi6t/k0daw
+   EtkAoJg7viH+6hd4WGh8T1DthHWzagx/bgUppppcgzVwJiUaKnP+Tha4/
+   R5f1SOz0kDpQegZsETlUq8y0arTUVEXGrRnjNHV6+DYUugYeFTs0HTpsR
+   Fb2JcOmS3zicp2XXmZR9SW8tj9nHvQYkEZYyoqr2aOLO0q1MGY4V+WVmM
+   Og1OKEpza2+9yGJ8t2uWvnxaP65TJVo3TeUSbA8yqdUa3UE01sbNl2R7M
+   w==;
+X-CSE-ConnectionGUID: Koz1nraYQB+mtnZsjXfNVw==
+X-CSE-MsgGUID: ifsRPaClQVayDi0a2P6NBA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11123"; a="17415122"
+X-IronPort-AV: E=Sophos;i="6.09,184,1716274800"; 
+   d="scan'208";a="17415122"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Jul 2024 03:15:03 -0700
+X-CSE-ConnectionGUID: JynmyeAST9S5b/3EpQrdUg==
+X-CSE-MsgGUID: wY0vFnOlQeaeeO25/L4Mdg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.09,184,1716274800"; 
+   d="scan'208";a="84389883"
+Received: from intel-lenovo-legion-y540-15irh-pg0.iind.intel.com ([10.224.186.95])
+  by orviesa001.jf.intel.com with ESMTP; 05 Jul 2024 03:15:01 -0700
+From: Kiran K <kiran.k@intel.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: ravishankar.srivatsa@intel.com,
+	chethan.tumkur.narayan@intel.com,
+	Kiran K <kiran.k@intel.com>
+Subject: [PATCH v1 1/2] Bluetooth: btintel: Add support for BlazarU core
+Date: Fri,  5 Jul 2024 15:59:22 +0530
+Message-Id: <20240705102923.3512817-1-kiran.k@intel.com>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -37,43 +58,42 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: bizesmtpsz:uniontech.com:qybglogicsvrsz:qybglogicsvrsz4a-1
 
-From: Jaganath Kanakkassery <jaganath.k.os@gmail.com>
+Add support for BlazarU core (CNVi).
 
-Please apply the upstream commit:
-commit cd9151b618da ("Bluetooth: Fix incorrect pointer arithmatic in ext_adv_report_evt")
- 
-Solved kernel BT Err  "Bluetooth: Unknown advertising packet type: 0x100"
-
--------------------------------------------------------------------------
-
-In ext_adv_report_event rssi comes before data (not after data as
-in legacy adv_report_evt) so "+ 1" is not required in the ptr arithmatic
-to point to next report.
-
-Cc: stable@vger.kernel.org # 4.19-
-Signed-off-by: Jaganath Kanakkassery <jaganath.kanakkassery@intel.com>
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
-Signed-off-by: Wentao Guan <guanwentao@uniontech.com>
+Signed-off-by: Kiran K <kiran.k@intel.com>
 ---
- net/bluetooth/hci_event.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/bluetooth/btintel.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 3e7badb3ac2d..4f972c9e9dbe 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -5402,7 +5402,7 @@ static void hci_le_ext_adv_report_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 					   ev->data, ev->length);
- 		}
- 
--		ptr += sizeof(*ev) + ev->length + 1;
-+		ptr += sizeof(*ev) + ev->length;
- 	}
- 
- 	hci_dev_unlock(hdev);
+diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
+index 54bfe2ffe1d2..e7a612504ab1 100644
+--- a/drivers/bluetooth/btintel.c
++++ b/drivers/bluetooth/btintel.c
+@@ -472,6 +472,7 @@ int btintel_version_info_tlv(struct hci_dev *hdev,
+ 	case 0x19:	/* Slr-F */
+ 	case 0x1b:      /* Mgr */
+ 	case 0x1c:	/* Gale Peak (GaP) */
++	case 0x1d:	/* BlazarU (BzrU) */
+ 	case 0x1e:	/* BlazarI (Bzr) */
+ 		break;
+ 	default:
+@@ -2718,6 +2719,7 @@ void btintel_set_msft_opcode(struct hci_dev *hdev, u8 hw_variant)
+ 	case 0x19:
+ 	case 0x1b:
+ 	case 0x1c:
++	case 0x1d:
+ 	case 0x1e:
+ 		hci_set_msft_opcode(hdev, 0xFC1E);
+ 		break;
+@@ -3063,6 +3065,7 @@ static int btintel_setup_combined(struct hci_dev *hdev)
+ 	case 0x17:
+ 	case 0x19:
+ 	case 0x1b:
++	case 0x1d:
+ 	case 0x1e:
+ 		/* Display version information of TLV type */
+ 		btintel_version_info_tlv(hdev, &ver_tlv);
 -- 
-2.20.1
+2.40.1
 
