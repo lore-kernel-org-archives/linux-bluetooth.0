@@ -1,27 +1,27 @@
 Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96271145FE0
-	for <linux-bluetooth@vger.kernel.org>; Fri,  5 Jul 2024 08:59:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5786B145FF8
+	for <linux-bluetooth@vger.kernel.org>; Fri,  5 Jul 2024 08:59:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720169987; cv=none; b=JeGl62AGe6/K3HDxeVt0n1BEi1Djc4aAAQY2RImHE6M/nTX4fowyj6CCltCmKVizA2RW2HI2IaZtM5O1GA5kmqnKOxTR/3/uBBCgUK8yrPYgMzQ1kZN9exxtIkzmqUj9IUhTVhNdA/pUBZy4/zuXTx6OuUGB95a4FhUzNNsuJjE=
+	t=1720169987; cv=none; b=B5H5oyuQTq0KEDyLch1j5+lDRH86CfyMRIiH4qV6BOhpGsVLL2T3xGZIw78fVkwD9rxBC02XnaYTiOpeNhBmF8vgkUQMetltx8XqgS74D3dAuXU+q0DEgLgM6UWDdIb9gXnqn+vXyZB3vLBjjmrkyomodk573A433TQAHDE13X0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1720169987; c=relaxed/simple;
-	bh=lvIg2+dDecXMydPp3QRxG42uiS2BVeRFzszFwjtEl44=;
+	bh=E0SSEybmdjBxLSSaKZC832oxacklCxLzNzdU7QbqVes=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=qClbhdsgoIggcQ8gMKz59vf9TiC8xS4CIgPiOdOcLGfd+Drs1nwKfmwMoPkRlC6kxcFq8uDdUl7mYjd2HhfL6f2pcZQFrNKSngi8p8PXfyWzoIYHLh6RZnQZt/79Hxmin8XZzyLnSF+vlYjkSVOrEOvcaMVTDVAldGw/oDu95cs=
+	 MIME-Version; b=Tb9AHVaEC4NPBBldE3ISO9GSU/aesw3YHGHWTMb1s22PsvNcf1rN+xDR1muG+oSLAxFguAWAeJNOOGkdyaEls2dmZomO+8aIvPheFJCmMjmxITMNMX3D8Ha5VB8+BcNZOdFV248WJKvDBmhUS7SU0IdswZotEAneH3iS4JStjd8=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.183.195
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hadess.net
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 06CF860005;
-	Fri,  5 Jul 2024 08:59:36 +0000 (UTC)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id E4C9860012;
+	Fri,  5 Jul 2024 08:59:37 +0000 (UTC)
 From: Bastien Nocera <hadess@hadess.net>
 To: linux-bluetooth@vger.kernel.org
 Cc: Bastien Nocera <hadess@hadess.net>
-Subject: [BlueZ v2 04/11] btsnoop: Fix possible negative memcpy length
-Date: Fri,  5 Jul 2024 10:57:32 +0200
-Message-ID: <20240705085935.1255725-5-hadess@hadess.net>
+Subject: [BlueZ v2 07/11] emulator: Fix integer truncation warnings
+Date: Fri,  5 Jul 2024 10:57:35 +0200
+Message-ID: <20240705085935.1255725-8-hadess@hadess.net>
 X-Mailer: git-send-email 2.45.2
 In-Reply-To: <20240705085935.1255725-1-hadess@hadess.net>
 References: <20240705085935.1255725-1-hadess@hadess.net>
@@ -34,51 +34,92 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-GND-Sasl: hadess@hadess.net
 
-Error: INTEGER_OVERFLOW (CWE-190): [#def41] [important]
-bluez-5.76/tools/btsnoop.c:438:2: tainted_data_return: Called function "read(fd, buf, toread)", and a possible return value may be less than zero.
-bluez-5.76/tools/btsnoop.c:438:2: assign: Assigning: "len" = "read(fd, buf, toread)".
-bluez-5.76/tools/btsnoop.c:473:4: overflow: The cast of "len - 9L", which is potentially negative, to an unsigned type could result in an overflow.
-471|			/* next 4 bytes are data len and cid */
-472|			current_cid = buf[8] << 8 | buf[7];
-473|->			memcpy(pdu_buf, buf + 9, len - 9);
-474|			pdu_len = len - 9;
-475|		} else if (acl_flags & 0x01) {
+Error: INTEGER_OVERFLOW (CWE-190): [#def1] [important]
+bluez-5.76/emulator/amp.c:693:2: cast_overflow: Truncation due to cast operation on "(remain_assoc_len > 248) ? 248 : remain_assoc_len" from 32 to 16 bits.
+bluez-5.76/emulator/amp.c:693:2: overflow_assign: "fragment_len" is assigned from "(remain_assoc_len > 248) ? 248 : remain_assoc_len".
+bluez-5.76/emulator/amp.c:698:2: overflow_sink: "fragment_len", which might have overflowed, is passed to "memcpy(rsp.assoc_fragment, amp->local_assoc + len_so_far, fragment_len)". [Note: The source code implementation of the function has been overridden by a builtin model.]
+696|	rsp.phy_handle = cmd->phy_handle;
+697|	rsp.remain_assoc_len = cpu_to_le16(remain_assoc_len);
+698|->	memcpy(rsp.assoc_fragment, amp->local_assoc + len_so_far,
+699|							fragment_len);
+700|
 
-Error: INTEGER_OVERFLOW (CWE-190): [#def42] [important]
-bluez-5.76/tools/btsnoop.c:438:2: tainted_data_return: Called function "read(fd, buf, toread)", and a possible return value may be less than zero.
-bluez-5.76/tools/btsnoop.c:438:2: assign: Assigning: "len" = "read(fd, buf, toread)".
-bluez-5.76/tools/btsnoop.c:476:4: overflow: The cast of "len - 5L", which is potentially negative, to an unsigned type could result in an overflow.
-474|			pdu_len = len - 9;
-475|		} else if (acl_flags & 0x01) {
-476|->			memcpy(pdu_buf + pdu_len, buf + 5, len - 5);
-477|			pdu_len += len - 5;
-478|		}
+Error: INTEGER_OVERFLOW (CWE-190): [#def2] [important]
+bluez-5.76/emulator/amp.c:701:2: cast_overflow: Truncation due to cast operation on "4 + fragment_len" from 32 to 8 bits.
+bluez-5.76/emulator/amp.c:701:2: overflow_sink: "4 + fragment_len", which might have overflowed, is passed to "cmd_complete(amp, 5130, &rsp, 4 + fragment_len)".
+699|							fragment_len);
+700|
+701|->	cmd_complete(amp, BT_HCI_CMD_READ_LOCAL_AMP_ASSOC,
+702|						&rsp, 4 + fragment_len);
+703|   }
+
+Error: INTEGER_OVERFLOW (CWE-190): [#def4] [important]
+bluez-5.76/emulator/bthost.c:3309:3: cast_overflow: Truncation due to cast operation on "len - offset" from 32 to 8 bits.
+bluez-5.76/emulator/bthost.c:3309:3: overflow_assign: "cp->data_len" is assigned from "len - offset".
+bluez-5.76/emulator/bthost.c:3317:2: overflow_sink: "cp->data_len", which might have overflowed, is passed to "memcpy(cp->data, data + offset, cp->data_len)". [Note: The source code implementation of the function has been overridden by a builtin model.]
+3315|		}
+3316|
+3317|->		memcpy(cp->data, data + offset, cp->data_len);
+3318|
+3319|		send_command(bthost, BT_HCI_CMD_LE_SET_PA_DATA, buf,
 ---
- tools/btsnoop.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ emulator/amp.c    | 3 ++-
+ emulator/bthost.c | 8 +++++---
+ 2 files changed, 7 insertions(+), 4 deletions(-)
 
-diff --git a/tools/btsnoop.c b/tools/btsnoop.c
-index efaa45db41dd..0bd28b65b6e1 100644
---- a/tools/btsnoop.c
-+++ b/tools/btsnoop.c
-@@ -448,7 +448,7 @@ next_packet:
- 		acl_flags = buf[2] >> 4;
+diff --git a/emulator/amp.c b/emulator/amp.c
+index 49d2df7b39df..6daf00189f3a 100644
+--- a/emulator/amp.c
++++ b/emulator/amp.c
+@@ -680,7 +680,8 @@ static void cmd_read_local_amp_assoc(struct bt_amp *amp,
+ {
+ 	const struct bt_hci_cmd_read_local_amp_assoc *cmd = data;
+ 	struct bt_hci_rsp_read_local_amp_assoc rsp;
+-	uint16_t len_so_far, remain_assoc_len, fragment_len;
++	uint16_t len_so_far, remain_assoc_len;
++	size_t fragment_len;
  
- 		/* use only packet with ACL start flag */
--		if (acl_flags & 0x02) {
-+		if ((acl_flags & 0x02) && len > 9) {
- 			if (current_cid == 0x0040 && pdu_len > 0) {
- 				int i;
- 				if (!pdu_first)
-@@ -472,7 +472,7 @@ next_packet:
- 			current_cid = buf[8] << 8 | buf[7];
- 			memcpy(pdu_buf, buf + 9, len - 9);
- 			pdu_len = len - 9;
--		} else if (acl_flags & 0x01) {
-+		} else if ((acl_flags & 0x01) && len > 5) {
- 			memcpy(pdu_buf + pdu_len, buf + 5, len - 5);
- 			pdu_len += len - 5;
- 		}
+ 	if (cmd->phy_handle != amp->phy_handle) {
+ 		cmd_status(amp, BT_HCI_ERR_INVALID_PARAMETERS,
+diff --git a/emulator/bthost.c b/emulator/bthost.c
+index cc9bf7240531..95160506d0c4 100644
+--- a/emulator/bthost.c
++++ b/emulator/bthost.c
+@@ -3290,6 +3290,7 @@ static void set_pa_data(struct bthost *bthost, const uint8_t *data,
+ {
+ 	struct bt_hci_cmd_le_set_pa_data *cp;
+ 	uint8_t buf[sizeof(*cp) + BT_PA_MAX_DATA_LEN];
++	size_t data_len;
+ 
+ 	cp = (void *)buf;
+ 
+@@ -3299,14 +3300,14 @@ static void set_pa_data(struct bthost *bthost, const uint8_t *data,
+ 	cp->handle = 1;
+ 
+ 	if (len - offset > BT_PA_MAX_DATA_LEN) {
+-		cp->data_len = BT_PA_MAX_DATA_LEN;
++		data_len = BT_PA_MAX_DATA_LEN;
+ 
+ 		if (!offset)
+ 			cp->operation = 0x01;
+ 		else
+ 			cp->operation = 0x00;
+ 	} else {
+-		cp->data_len = len - offset;
++		data_len = len - offset;
+ 
+ 		if (!offset)
+ 			cp->operation = 0x03;
+@@ -3314,7 +3315,8 @@ static void set_pa_data(struct bthost *bthost, const uint8_t *data,
+ 			cp->operation = 0x02;
+ 	}
+ 
+-	memcpy(cp->data, data + offset, cp->data_len);
++	memcpy(cp->data, data + offset, data_len);
++	cp->data_len = data_len;
+ 
+ 	send_command(bthost, BT_HCI_CMD_LE_SET_PA_DATA, buf,
+ 					sizeof(*cp) + cp->data_len);
 -- 
 2.45.2
 
