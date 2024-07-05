@@ -1,186 +1,206 @@
-Received: from mail-lj1-f169.google.com (mail-lj1-f169.google.com [209.85.208.169])
+Received: from mail-lj1-f176.google.com (mail-lj1-f176.google.com [209.85.208.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFF693FEC
-	for <linux-bluetooth@vger.kernel.org>; Fri,  5 Jul 2024 01:26:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A79A7ECF;
+	Fri,  5 Jul 2024 01:34:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720142804; cv=none; b=GTO43VMl1QY5tPv0anz4k9+UHS8LQuNFo/M5/xe8hMWJOgO7nr1no45sFKXUnzfF5m8NMpVjmIRKrDZ74MXABLNSc4g+9SKOWMLeMPcnKbFdyupFrruGBzlJs1D/36cOWgokC+oXKxa1Jq96KVRugkPZXtiUJnjUoFAmsPN6Uj0=
+	t=1720143269; cv=none; b=Bz0ilDa/f01vO7iZ/C9ZTB/kBGCeCjlsYeUAyFTFdnEV5OetUjF9FU8+jhSOSx+J+2myroZHB2KLuwrXSJOg5lX4mMP3NsuISvaun6O9dyFLB4yEj2szm4JX6O0wNHdf5cbiSHr+FltCRV7u3lMt5MoWVmv1z0CJri19RroI8XE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720142804; c=relaxed/simple;
-	bh=UTde1XQrKn+ZgV+0DgrOjfwPeigw6CbdwqPx4hkFbh0=;
+	s=arc-20240116; t=1720143269; c=relaxed/simple;
+	bh=CkmYUB+Wb0PVAVfXRxDHlsvFmu+OM+8wtTiAsHFpwPE=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=T45697n/wvsMhGxGI7OS+JmiCxeP+9Z2qiHxAfrhh0d4Fbf0Cbp8k6O1I3UysbeH4CdZ10u3Ss7M5nAnzfCB+5yDtXWituBBgUIAJPFLXFyr9iOLAF+t7T5sm/DkvFqdQVxTugdka1Z5nX44ANKLrqD3D3VlgXsUEbAi5ODejHM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Y60bYUpi; arc=none smtp.client-ip=209.85.208.169
+	 To:Cc:Content-Type; b=R6O84KnJK8vjyiYwDIXLI+4ODv1iZbmZSAzoJ8OFFowBQ1IbeZ0RylHcuw3F5Ql8qOuCTP8QepayL1ZtjdF3KtFY/ZoVIRQaYJYAF6ibnuiwU9WbZnrr87g7fh8Jrm6jjooIszybTyhx5NTz6uju/JGCclhrQsUgeYBWXEPwF0I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TIOR+9Xc; arc=none smtp.client-ip=209.85.208.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Y60bYUpi"
-Received: by mail-lj1-f169.google.com with SMTP id 38308e7fff4ca-2ebe40673e8so14939461fa.3
-        for <linux-bluetooth@vger.kernel.org>; Thu, 04 Jul 2024 18:26:42 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TIOR+9Xc"
+Received: by mail-lj1-f176.google.com with SMTP id 38308e7fff4ca-2ee4ab4076bso18116051fa.0;
+        Thu, 04 Jul 2024 18:34:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1720142801; x=1720747601; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1720143266; x=1720748066; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=LLhRwgrjrIdu7lUe46Zo69IBGq3MxC5JguoCDUbRe7U=;
-        b=Y60bYUpilelCLGMyMAIjgYbpRu2GTIFWbgTS6AKEWYi/QOsdL6jV82qLqk9Kvhneb5
-         YDtfLxy7K+U29K4N8S4xeccTY4NwZork71EX+XsIS+cNuvTw4uv4GxWUwXzAkgkBZBVq
-         NxKvDjN5d0pJeiuho6yYu9Azfbm3Q64v9xqrAYTDihzhdJeD2jyBiL6jvZUxVwcepiir
-         T/sWYD3sIAPCMu0kUrhHb8mYeQrxWHZnwIXBo8sn7ph1bdzsq5zN5ljYAER3ZFcJg8TF
-         0yqdW1BNLHKDe0obVGIg2yXnKBMmJiDBSwcbJfJ3WWojvsSVO0AkekHlQDpJzd/7kqx8
-         aihw==
+        bh=wnvA9qdYRI8IFnTgozQAGatw1H+Gapz2OYIN09IDyec=;
+        b=TIOR+9XcTvJMWfGT8E9Ux9W/+WNW9hWdEbY2NxmEiz6LuLMvaRh9vMyyCG39eEumGb
+         Oy3SW56FKP9+XCGjG5sqW5d3t+ZNYWDig4tmr5KOChuiS4fZKk/OJohhbowPvAS08liE
+         P1k7hoBrTCxTnQMdkXc1jpWxGYtOkJ9DdR66eBgXIi9oywj2oRdX9g9023WAh9SoZfX1
+         b1GfACKBwuUYQLUY/brPr5COGCmS8fsv3pd66P8TxyE5O7OEdD8vm0S2wlM7b1/I/2rM
+         2O5tK7lPFx22r7Usrs6hmtS2ajiG7F/aN2bfl3g+3Mgg9xjM/w5lDVjnu8cf8te7ayry
+         kLFg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720142801; x=1720747601;
+        d=1e100.net; s=20230601; t=1720143266; x=1720748066;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=LLhRwgrjrIdu7lUe46Zo69IBGq3MxC5JguoCDUbRe7U=;
-        b=NTKfhqSPohhoZosxliRf+CnWd238iGol3GDHCylYTZzFBwUEW94EkESL7F77QouQ+v
-         HmTbk7vhfvNp3gil1R7AdoJtGMjUp/7984a3PbbLw0u8B07Rh0H5uiZi39MhiGCSDYUD
-         WCFQqsKAN8XrYyCA6wbQtumOfzumkqd54KPnTLbfkQfeOalIVvYQ9CcsI4HriTIlHJTc
-         BdI33ZN4WLxIzZFW2WHHDFKS0HXE4izkWVHVHkt06eD5dfCCp1QAn2aXYWiqd64i9cCA
-         ZE+LOuoaUrGHL+USe9uC/U0oGq1JKA8BVEj7Z4l5WljGhCv8Gx66tFZjL+QRk7d3DphY
-         lwDQ==
-X-Gm-Message-State: AOJu0Yx7/be5ThuVl3r95BcCFaIKYeQk+J8dM1ql/PPeSEe3tYOF2GJe
-	pztvYAwiWnitnwjabNjM4DVoxdANHs+RenYzB10gv3IH00j1jhRrVb+VNxVyK9ItinwSqp6J8Ge
-	muVMPf9o6renGSPV67dV5ruR3ewDoFg==
-X-Google-Smtp-Source: AGHT+IEXNT/NDgQf2Lx+kUgy+VfbymDxY5ZkWs9+vIC3I3qhg7GQ00uCzZeA9zgI9T0FhSR55gvK/d1hfoQWXpPIp5U=
-X-Received: by 2002:a2e:b3ce:0:b0:2ec:522f:6443 with SMTP id
- 38308e7fff4ca-2ee8ee01a78mr20032871fa.33.1720142800461; Thu, 04 Jul 2024
- 18:26:40 -0700 (PDT)
+        bh=wnvA9qdYRI8IFnTgozQAGatw1H+Gapz2OYIN09IDyec=;
+        b=b3XGz53n6+kwQhYdCHK54srLIiJUa5n77Sct93hcj5dx9+RTgjXns2MvdE+PPKDy23
+         1Xrxo2CH32RvtWrCZAcbahFDpRDmXQQva8P5DZrwpO425jzTFLYTejmJ4cGDhm4T8gFc
+         zv2vxx0xdH/qvmwGwL6uPbfBMDrP3GooKRCxi2IBfU638/HjVPIzF4RjXAnXz9RB0bVI
+         2fLC3mXCkoE/dppl8mXl2UxG1ej2RNpL+MQwZGozwvh/7Xli6UhV37/KEPD9LYh+sqaD
+         kPdMsFGgBCmNoYpsM/31GbwDavL3xKQDsBM0TVyQHkJC22fdZlFGcCCdzzKxY5XEz6Gi
+         yX5g==
+X-Forwarded-Encrypted: i=1; AJvYcCVzjplzDPta4ruSHlSGOhrBJTj/fWFhAl3WvRxnx/eHl87WzfEe+AUt3tMJUROwZ9naJIju3GLxgsiRE7taD+UFzOBi48qvAJB1BbphDBhXjTWjUWZHUtsOlj+YP1pIn0eJZHA8Ij/0WrFMUHaI
+X-Gm-Message-State: AOJu0YzbJK+4zp1ERlIfLxRMxieWyKLSSUBYWVBPK3IEC8Pxi0woFgh8
+	WmiEgp6nYcAJANXr9692ooUJpiAqvsWtdOOKLbVwcMGD3Nd2B/Wp/cTzF597V2i2yHuqcSvy/CM
+	PRA+N5OKufiHr2V+b/V06u20yjrs=
+X-Google-Smtp-Source: AGHT+IE4vKywFszF27KWciwCz3YLJq1WM+m0xB8siGXi2m2TTkznG5lADS5x5zLGA2oCtnl87N3iz7FaIsYNhTUfhGk=
+X-Received: by 2002:a2e:3506:0:b0:2ec:266:f59e with SMTP id
+ 38308e7fff4ca-2ee8f309a57mr8880561fa.24.1720143265433; Thu, 04 Jul 2024
+ 18:34:25 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240704102617.1132337-1-hadess@hadess.net> <20240704102617.1132337-4-hadess@hadess.net>
-In-Reply-To: <20240704102617.1132337-4-hadess@hadess.net>
+References: <20240705011525.402650-1-nobuaki.tsunashima@infineon.com>
+In-Reply-To: <20240705011525.402650-1-nobuaki.tsunashima@infineon.com>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Thu, 4 Jul 2024 21:26:25 -0400
-Message-ID: <CABBYNZJSFjPb4OegXS6ynXGPitmRUVdydW=h=qHfzFXcj9Yo7g@mail.gmail.com>
-Subject: Re: [BlueZ 03/12] shared/shell: Free memory allocated by wordexp()
-To: Bastien Nocera <hadess@hadess.net>
-Cc: linux-bluetooth@vger.kernel.org
+Date: Thu, 4 Jul 2024 21:34:10 -0400
+Message-ID: <CABBYNZLo2P5VLFJ0XahNyh8CeOAA6rg1WTWpMx3WRqhYby3uOQ@mail.gmail.com>
+Subject: Re: [PATCH v5] Bluetooth: btbcm: Apply HCI_QUIRK_BROKEN_READ_TRANSMIT_POWER
+ to CYW4373
+To: Nobuaki Tsunashima <nobuaki.tsunashima@infineon.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi Bastien,
+Hi Nobuaki,
 
-On Thu, Jul 4, 2024 at 6:33=E2=80=AFAM Bastien Nocera <hadess@hadess.net> w=
-rote:
+On Thu, Jul 4, 2024 at 9:16=E2=80=AFPM Nobuaki Tsunashima
+<nobuaki.tsunashima@infineon.com> wrote:
 >
-> Error: RESOURCE_LEAK (CWE-772): [#def40] [important]
-> bluez-5.76/src/shared/shell.c:1113:3: alloc_arg: "wordexp" allocates memo=
-ry that is stored into "w.we_wordv".
-> bluez-5.76/src/shared/shell.c:1114:4: leaked_storage: Variable "w" going =
-out of scope leaks the storage "w.we_wordv" points to.
-> 1112|
-> 1113|                   if (wordexp(rl_line_buffer, &w, WRDE_NOCMD))
-> 1114|->                         return NULL;
-
-Derr, this is NOCMD has been found...
-
-> 1115|
-> 1116|                   matches =3D menu_completion(default_menu, text, w=
-.we_wordc,
+> From: Nobuaki Tsunashima <Nobuaki.Tsunashima@infineon.com>
 >
-> Error: RESOURCE_LEAK (CWE-772): [#def42] [important]
-> bluez-5.76/src/shared/shell.c:1412:2: alloc_arg: "wordexp" allocates memo=
-ry that is stored into "w.we_wordv".
-> bluez-5.76/src/shared/shell.c:1415:3: leaked_storage: Variable "w" going =
-out of scope leaks the storage "w.we_wordv" points to.
-> 1413|           switch (err) {
-> 1414|           case WRDE_BADCHAR:
-> 1415|->                 return -EBADMSG;
-> 1416|           case WRDE_BADVAL:
-> 1417|           case WRDE_SYNTAX:
-
-Ok, but where in the documentation of wordexp it is saying that
-we_wordv is left with anything allocated if it fails? Ive assumed if
-it returns an error no argument has been processed, otherwise this is
-sort of misleading and the errors shall be returned by index of the
-word.
-
-> Error: RESOURCE_LEAK (CWE-772): [#def43] [important]
-> bluez-5.76/src/shared/shell.c:1412:2: alloc_arg: "wordexp" allocates memo=
-ry that is stored into "w.we_wordv".
-> bluez-5.76/src/shared/shell.c:1418:3: leaked_storage: Variable "w" going =
-out of scope leaks the storage "w.we_wordv" points to.
-> 1416|           case WRDE_BADVAL:
-> 1417|           case WRDE_SYNTAX:
-> 1418|->                 return -EINVAL;
-> 1419|           case WRDE_NOSPACE:
-> 1420|                   return -ENOMEM;
+> CYW4373 ROM FW has an issue that it claims LE_Read_Transmit_Power command
+> as supported in a response of Read_Local_Supported_Command command but
+> rejects the LE_Read_Transmit_Power command with "Unknown HCI Command"
+> status. Because Bluetooth driver of kernel 5.11 added sending the
+> LE_Read_Transmit_Power command in initialize phase, hci up fails due to t=
+he
+> issue.
 >
-> Error: RESOURCE_LEAK (CWE-772): [#def44] [important]
-> bluez-5.76/src/shared/shell.c:1412:2: alloc_arg: "wordexp" allocates memo=
-ry that is stored into "w.we_wordv".
-> bluez-5.76/src/shared/shell.c:1420:3: leaked_storage: Variable "w" going =
-out of scope leaks the storage "w.we_wordv" points to.
-> 1418|                   return -EINVAL;
-> 1419|           case WRDE_NOSPACE:
-> 1420|->                 return -ENOMEM;
-> 1421|           case WRDE_CMDSUB:
-> 1422|                   if (wordexp(input, &w, 0))
+> Especially in USB i/f case, it would be difficult to download patch FW th=
+at
+> includes its fix unless hci is up.
 >
-> Error: RESOURCE_LEAK (CWE-772): [#def45] [important]
-> bluez-5.76/src/shared/shell.c:1422:3: alloc_arg: "wordexp" allocates memo=
-ry that is stored into "w.we_wordv".
-> bluez-5.76/src/shared/shell.c:1423:4: leaked_storage: Variable "w" going =
-out of scope leaks the storage "w.we_wordv" points to.
-> 1421|           case WRDE_CMDSUB:
-> 1422|                   if (wordexp(input, &w, 0))
-> 1423|->                         return -ENOEXEC;
-> 1424|                   break;
-> 1425|           };
+> The driver already contains infrastructure to apply the quirk for the
+> issue, but currently it only supports DMI based matching. Add support to
+> match by chip id and baseline FW version to detect CYW4373 ROM FW build
+> in generic system.
+>
+> Fixes: 7c395ea521e6 ("Bluetooth: Query LE tx power on startup")
+> Signed-off-by: Nobuaki Tsunashima <Nobuaki.Tsunashima@infineon.com>
 > ---
->  src/shared/shell.c | 11 +++++++++--
->  1 file changed, 9 insertions(+), 2 deletions(-)
+> V4 -> V5: Use skb_pull_data() to access skb->data as safer manner.
+> V3 -> V4: Fix a few coding style warnings and refine comments for clarify=
+.
+> V2 -> V3: Fix a few coding style warnings and change the subject as more =
+specific.
+> V1 -> V2: Fix several coding style warnings.
 >
-> diff --git a/src/shared/shell.c b/src/shared/shell.c
-> index 878be140c336..c09d41ee54df 100644
-> --- a/src/shared/shell.c
-> +++ b/src/shared/shell.c
-> @@ -1117,8 +1117,10 @@ static char **shell_completion(const char *text, i=
-nt start, int end)
->         if (start > 0) {
->                 wordexp_t w;
+>  drivers/bluetooth/btbcm.c | 41 +++++++++++++++++++++++++++++++++++++--
+>  drivers/bluetooth/btusb.c |  4 ++++
+>  2 files changed, 43 insertions(+), 2 deletions(-)
 >
-> -               if (wordexp(rl_line_buffer, &w, WRDE_NOCMD))
-> +               if (wordexp(rl_line_buffer, &w, WRDE_NOCMD)) {
-> +                       wordfree(&w);
->                         return NULL;
-> +               }
+> diff --git a/drivers/bluetooth/btbcm.c b/drivers/bluetooth/btbcm.c
+> index 0a5445ac5e1b..dd7262a8dc8e 100644
+> --- a/drivers/bluetooth/btbcm.c
+> +++ b/drivers/bluetooth/btbcm.c
+> @@ -437,16 +437,53 @@ static const struct dmi_system_id disable_broken_re=
+ad_transmit_power[] =3D {
+>         { }
+>  };
 >
->                 matches =3D menu_completion(default_menu, text, w.we_word=
-c,
->                                                         w.we_wordv[0]);
-> @@ -1421,15 +1423,20 @@ int bt_shell_exec(const char *input)
->         err =3D wordexp(input, &w, WRDE_NOCMD);
->         switch (err) {
->         case WRDE_BADCHAR:
-> +               wordfree(&w);
->                 return -EBADMSG;
->         case WRDE_BADVAL:
->         case WRDE_SYNTAX:
-> +               wordfree(&w);
->                 return -EINVAL;
->         case WRDE_NOSPACE:
-> +               wordfree(&w);
->                 return -ENOMEM;
->         case WRDE_CMDSUB:
-> -               if (wordexp(input, &w, 0))
-> +               if (wordexp(input, &w, 0)) {
-> +                       wordfree(&w);
->                         return -ENOEXEC;
-> +               }
->                 break;
->         };
+> +struct bcm_chip_version_table {
+> +       u8 chip_id;                     /* Chip ID */
+> +       u16 baseline;           /* Baseline version of patch FW */
+> +};
+> +#define BCM_ROMFW_BASELINE_NUM 0xFFFF
+> +static const struct bcm_chip_version_table disable_broken_read_transmit_=
+power_by_chip_ver[] =3D {
+> +       { 0x87, BCM_ROMFW_BASELINE_NUM }                /* CYW4373/4373E =
+*/
+> +};
 
-If we really need to call wordfree regardless then I'd probably have a
-function that wraps wordexp and automatically does wordfree on error.
+Can we have a little less verbose names? e.g. broken_read_tx_power and
+btbcm_broken_read_tx_power sounds a lot better imo.
+
+> +static bool btbcm_is_disable_broken_read_tx_power_by_chip_ver(u8 chip_id=
+, u16 baseline)
+> +{
+> +       int i;
+> +       size_t table_size =3D ARRAY_SIZE(disable_broken_read_transmit_pow=
+er_by_chip_ver);
+> +       const struct bcm_chip_version_table *entry =3D
+> +                                               &disable_broken_read_tran=
+smit_power_by_chip_ver[0];
+> +
+> +       for (i =3D 0 ; i < table_size ; i++, entry++)     {
+> +               if ((chip_id =3D=3D entry->chip_id) && (baseline =3D=3D e=
+ntry->baseline))
+> +                       return true;
+> +       }
+> +
+> +       return false;
+> +}
+> +
+>  static int btbcm_read_info(struct hci_dev *hdev)
+>  {
+>         struct sk_buff *skb;
+> +       u8 *chip_id;
+> +       u16 *baseline;
+>
+>         /* Read Verbose Config Version Info */
+>         skb =3D btbcm_read_verbose_config(hdev);
+>         if (IS_ERR(skb))
+>                 return PTR_ERR(skb);
+> -
+> -       bt_dev_info(hdev, "BCM: chip id %u", skb->data[1]);
+> +       skb_pull_data(skb, 1);
+> +       chip_id =3D skb_pull_data(skb, sizeof(*chip_id));
+> +       skb_pull_data(skb, 1);
+> +       baseline =3D skb_pull_data(skb, sizeof(*baseline));
+> +
+> +       if (chip_id) {
+> +               bt_dev_info(hdev, "BCM: chip id %u", *chip_id);
+> +
+> +               if (baseline) {
+> +                       /* Check Chip ID and disable broken Read LE Min/M=
+ax Tx Power */
+> +                       if (btbcm_is_disable_broken_read_tx_power_by_chip=
+_ver(*chip_id, *baseline))
+> +                               set_bit(HCI_QUIRK_BROKEN_READ_TRANSMIT_PO=
+WER, &hdev->quirks);
+> +               }
+> +       }
+>         kfree_skb(skb);
+>
+>         return 0;
+> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+> index d31edad7a056..52561c8d8828 100644
+> --- a/drivers/bluetooth/btusb.c
+> +++ b/drivers/bluetooth/btusb.c
+> @@ -142,6 +142,10 @@ static const struct usb_device_id btusb_table[] =3D =
+{
+>         { USB_VENDOR_AND_INTERFACE_INFO(0x04ca, 0xff, 0x01, 0x01),
+>           .driver_info =3D BTUSB_BCM_PATCHRAM },
+>
+> +       /* Cypress devices with vendor specific id */
+> +       { USB_VENDOR_AND_INTERFACE_INFO(0x04b4, 0xff, 0x01, 0x01),
+> +         .driver_info =3D BTUSB_BCM_PATCHRAM },
+> +
+>         /* Broadcom devices with vendor specific id */
+>         { USB_VENDOR_AND_INTERFACE_INFO(0x0a5c, 0xff, 0x01, 0x01),
+>           .driver_info =3D BTUSB_BCM_PATCHRAM },
+> --
+> 2.25.1
+>
+
 
 --=20
 Luiz Augusto von Dentz
