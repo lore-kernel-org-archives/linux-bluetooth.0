@@ -1,122 +1,124 @@
-Received: from mail-qv1-f43.google.com (mail-qv1-f43.google.com [209.85.219.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 236CA4D11B
-	for <linux-bluetooth@vger.kernel.org>; Fri,  5 Jul 2024 02:24:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00FB713ADA
+	for <linux-bluetooth@vger.kernel.org>; Fri,  5 Jul 2024 05:37:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720146299; cv=none; b=ZMw79OtWCl0DipU78QjHcg2tkDBeqlzi0eaQ0Bmprn+ya+7S9fFEwFHBoZ6bB4bmcv4c5lB/L/DLjHKHOlsrgaeVzyhyS5gT8EoR3ZCQUwzUTv6WZBGw6P6L2TbMEeFpZ94gQizSwvgO4u1ZuvgMlipv86JyIf5RWpYi9sPGdrE=
+	t=1720157861; cv=none; b=mA4BkuxRSSmGHuTAeUPmBAkQ1inOq72mGAHCPlYPgAgWtJ3yyAm4P7w9PvjE47SLg0JdPky8rKN+lWvK4tnV7grPijNgvfV4giRU5Tmg5Jzkv375/08KdbxWdiKfNJdaWAKDKcKRQDRc2n7jvUYmSTaFV690hC24Dix2jo42KBM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720146299; c=relaxed/simple;
-	bh=QEDHhQWCMdwYyqLQao5M6FLXrLgZIfn28oazzCmyN9Y=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=VQtclH0QET+Hr0VtpumvZGGUCa80XbVPcCF8OifhJXEZHTcLxSNN0phR4hmGSBnRCSBvHcZkZbaKXPmCgOhEnW0DNoAQ1yKbJwCaNEbJ7ihr2INIwMYJnXBeV5rUOPHhdObSazCHQtDxfrjuiitCtRIc+G75DNkQ6A4bn0xkWlQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EAAfZf8T; arc=none smtp.client-ip=209.85.219.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1720157861; c=relaxed/simple;
+	bh=zUaDClbwqcWhgeSg8xjgjdkP0TUW4jRtDn92wu87FY4=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=tSdBjyBnwpy022iDfo7mcQdVaPJ2kX0iqTrNeGZXLMwXFyuj1dgoWmLCj12L0hQF0Hfq3aELstB2iMqSV/EhIs8tbQ2R/zvHDNuZfvWcmiD0SKqu/G2ToGnz5V8JxR/mdCckwvXhGkTktR5NjnmytZZKzdYXmrJ1Qd4R00sTvlk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=fBDlEk2Q; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EAAfZf8T"
-Received: by mail-qv1-f43.google.com with SMTP id 6a1803df08f44-6b5eb69e04cso6952506d6.1
-        for <linux-bluetooth@vger.kernel.org>; Thu, 04 Jul 2024 19:24:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1720146297; x=1720751097; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=lumMmO8pKb1HNfCHgZ0BVvI0o1O2h1Ym2CwD/OUHMIY=;
-        b=EAAfZf8TNO9ohw2ILQFsO28BnAXAsWr1m8LrbhF+NCVgruVBANreUmhHPMV7/GN7J9
-         jYw8eUJtL1xeMcItbfEabb0WKzmmr2Ks/tpVL1JuEpPqZYlyCo3lpR/A5KkpZwsUiGFQ
-         HtAt6L/qNvI9h8kpeN5hcG3UROFYpQJ6p6UsKtQBdX8V9aNUjbwkFrzZY3rIYFfD4vLQ
-         ib9dRYIvqPhlfIL97il3vMJQuqZarKezAruupOGz26LCY/4MzsM2fitQvr3/s/sLHPe7
-         tWqZ6zNPDtXjaqV7JWr4ae1q0J9PTtIMXn5kIcBoa8lKnWnXv0tbgRKSwq0S86YA35wm
-         6m8g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720146297; x=1720751097;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=lumMmO8pKb1HNfCHgZ0BVvI0o1O2h1Ym2CwD/OUHMIY=;
-        b=C3jDKSTz1aTvQrus4vFDPvIrY1gexmAW7M9x1IDhDh2r7YWELLE85lP+HNZg8wjKRa
-         H0AOi8ZCBx+WP0sHqBwMK+cW5LGFrhpXqcoeD49pkwpjUdBwuwEcMj0lbt+Ru0cgBkX7
-         zrs2y5sbVw/ssRthNhKGph+YzCATUJOoXkj5pRCRovVz3Lk0AWPfyuRjzwjZAmxKjrHk
-         cTe9j/a8YEaRGgucCWvT/t9O+cBZr7g6Q87cjXxqgyTgcmqfKTtRToGusG148A5HV7tU
-         C9gFnN0TJ1kLOH6kJE4yC5QE0myP19cV+wBSTNOgeZ1esuafEzuKuG7SSFoO87Fvx7Dt
-         eWqw==
-X-Gm-Message-State: AOJu0YxmAEhmqv6dqdTsGrsuHDrqi5yVp6yCBXjQknQBIWS5NPOHiqnU
-	MCwQ2+kFcrfbpeYmz4/vebTiZRJQshUhP8RCy+6OOJ0sy6rNVqDIUzNC/A==
-X-Google-Smtp-Source: AGHT+IE5723s5SiArwpQKcBR5bDi5/8QkpIFIW5LGkqJPyj4DvDYeDhxM0YxLiB8tRcJFoEa7jImCw==
-X-Received: by 2002:a05:6214:2b0e:b0:6b5:420:bffc with SMTP id 6a1803df08f44-6b5ecfd65e2mr31336826d6.29.1720146296892;
-        Thu, 04 Jul 2024 19:24:56 -0700 (PDT)
-Received: from [172.17.0.2] ([172.190.111.242])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-44651408a27sm65156341cf.25.2024.07.04.19.24.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 04 Jul 2024 19:24:56 -0700 (PDT)
-Message-ID: <66875978.c80a0220.13411.aae4@mx.google.com>
-Date: Thu, 04 Jul 2024 19:24:56 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============0196393285344029867=="
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="fBDlEk2Q"
+Received: from pps.filterd (m0279865.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 464Nvut3020292;
+	Fri, 5 Jul 2024 05:37:27 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-type:date:from:message-id:mime-version:subject:to; s=
+	qcppdkim1; bh=yBdvZuMkUZQ/U6UzQB72QyHuiyh30T4AcicOkOsaCP8=; b=fB
+	DlEk2Qxn3gRF0AboFS6PwuYLjWvTH8WKxn6q9+HlSa0W+h8t2m8FZF2rWWf0TqDO
+	P36Q+u4lrFXRnjgllqGlBYx+3OLa8UF8wvoxTsVW3hGLTbL9ZAPAYU73OfFugjCG
+	FIybFQcW2fMZcrc+I1CUnrBfxKgMVKEBsm0DnegHU1FSL3/GwjmVsw5MzASG+d3N
+	PCRX+3yUwmpVerAQ3IJ9+8OxSPHJO4I+yfzCMSujNayNU1OxiLrg749zTt5EehgC
+	Z1kTsrG6RBIukYlSuJ9Y7kyMNAF3yUWGcgab89uESZOMbA2dbQSwb2w9Nj1jZ2kz
+	oeboqgiv76sBZM6XFxEg==
+Received: from nalasppmta05.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 404yr9d6xg-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 05 Jul 2024 05:37:27 +0000 (GMT)
+Received: from nalasex01b.na.qualcomm.com (nalasex01b.na.qualcomm.com [10.47.209.197])
+	by NALASPPMTA05.qualcomm.com (8.17.1.19/8.17.1.19) with ESMTPS id 4655bQD6021264
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 5 Jul 2024 05:37:26 GMT
+Received: from hu-prathm-hyd.qualcomm.com (10.80.80.8) by
+ nalasex01b.na.qualcomm.com (10.47.209.197) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.9; Thu, 4 Jul 2024 22:37:24 -0700
+From: <quic_prathm@quicinc.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: <pmenzel@molgen.mpg.de>, <luiz.dentz@gmail.com>,
+        <quic_mohamull@quicinc.com>, <quic_hbandi@quicinc.com>,
+        <quic_anubhavg@quicinc.com>
+Subject: [PATCH BlueZ] Set BREDR not supported bit in AD Flag when discoverable is off
+Date: Fri, 5 Jul 2024 11:07:04 +0530
+Message-ID: <20240705053704.21991-1-quic_prathm@quicinc.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, Nobuaki.Tsunashima@infineon.com
-Subject: RE: [v5] Bluetooth: btbcm: Apply HCI_QUIRK_BROKEN_READ_TRANSMIT_POWER to CYW4373
-In-Reply-To: <20240705011525.402650-1-nobuaki.tsunashima@infineon.com>
-References: <20240705011525.402650-1-nobuaki.tsunashima@infineon.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nalasex01b.na.qualcomm.com (10.47.209.197)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: 4tflY5vr-Kq13vA6xLAMJR05y-WqHDNL
+X-Proofpoint-ORIG-GUID: 4tflY5vr-Kq13vA6xLAMJR05y-WqHDNL
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-07-05_02,2024-07-03_01,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 clxscore=1015
+ bulkscore=0 impostorscore=0 malwarescore=0 spamscore=0 mlxscore=0
+ mlxlogscore=999 adultscore=0 lowpriorityscore=0 priorityscore=1501
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2406140001 definitions=main-2407050039
 
---===============0196393285344029867==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+From: Prathibha Madugonde <quic_prathm@quicinc.com>
 
-This is automated email and please do not reply to this email!
+Fix for GAP/DISC/NONM/BV-02-C
+As per GAP.TS.p44 test spec
+IUT does not contain General Discoverable mode and Limited Discoverable
+mode in the AD Type Flag. IUT shall send AD Type Flag to PASS the test
+case, thus set BR/EDR not supported bit in the AD Type Flag when
+discoverable is off.
 
-Dear submitter,
+client/advertising.c : Allowing discoverable property to list in the 
+parsing function when discoverable is off.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=868600
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      0.95 seconds
-GitLint                       FAIL      0.50 seconds
-SubjectPrefix                 PASS      0.22 seconds
-BuildKernel                   PASS      29.73 seconds
-CheckAllWarning               PASS      32.67 seconds
-CheckSparse                   PASS      38.10 seconds
-CheckSmatch                   PASS      107.93 seconds
-BuildKernel32                 PASS      36.90 seconds
-TestRunnerSetup               PASS      527.27 seconds
-TestRunner_l2cap-tester       PASS      22.11 seconds
-TestRunner_iso-tester         PASS      37.77 seconds
-TestRunner_bnep-tester        PASS      4.86 seconds
-TestRunner_mgmt-tester        PASS      112.17 seconds
-TestRunner_rfcomm-tester      PASS      7.53 seconds
-TestRunner_sco-tester         PASS      23.65 seconds
-TestRunner_ioctl-tester       PASS      8.17 seconds
-TestRunner_mesh-tester        PASS      6.05 seconds
-TestRunner_smp-tester         PASS      7.04 seconds
-TestRunner_userchan-tester    PASS      5.06 seconds
-IncrementalBuild              PASS      28.16 seconds
-
-Details
-##############################
-Test: GitLint - FAIL
-Desc: Run gitlint
-Output:
-[v5] Bluetooth: btbcm: Apply HCI_QUIRK_BROKEN_READ_TRANSMIT_POWER to CYW4373
-
-WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
-24: B1 Line exceeds max length (82>80): "V2 -> V3: Fix a few coding style warnings and change the subject as more specific."
-
+Test steps:
+From DUT, bluetoothctl go to menu advertise
+set discoverable to off and then advertise on.
+In AD Flags BR/EDR not supported BIT shall be set.
 
 ---
-Regards,
-Linux Bluetooth
+ client/advertising.c | 2 +-
+ src/advertising.c    | 3 +--
+ 2 files changed, 2 insertions(+), 3 deletions(-)
 
+diff --git a/client/advertising.c b/client/advertising.c
+index a9b865a65..a09802af7 100644
+--- a/client/advertising.c
++++ b/client/advertising.c
+@@ -498,7 +498,7 @@ static const GDBusPropertyTable ad_props[] = {
+ 	{ "ManufacturerData", "a{qv}", get_manufacturer_data, NULL,
+ 						manufacturer_data_exists },
+ 	{ "Data", "a{yv}", get_data, NULL, data_exists },
+-	{ "Discoverable", "b", get_discoverable, NULL, discoverable_exists },
++	{ "Discoverable", "b", get_discoverable, NULL, NULL },
+ 	{ "DiscoverableTimeout", "q", get_discoverable_timeout, NULL,
+ 						discoverable_timeout_exists },
+ 	{ "Includes", "as", get_includes, NULL, includes_exists },
+diff --git a/src/advertising.c b/src/advertising.c
+index 5d373e088..af3ed2b93 100644
+--- a/src/advertising.c
++++ b/src/advertising.c
+@@ -734,8 +734,7 @@ static bool set_flags(struct btd_adv_client *client, uint8_t flags)
+ 	/* Set BR/EDR Not Supported if adapter is not discoverable but the
+ 	 * instance is.
+ 	 */
+-	if ((flags & (BT_AD_FLAG_GENERAL | BT_AD_FLAG_LIMITED)) &&
+-			!btd_adapter_get_discoverable(client->manager->adapter))
++	if (!btd_adapter_get_discoverable(client->manager->adapter))
+ 		flags |= BT_AD_FLAG_NO_BREDR;
+ 
+ 	if (!bt_ad_add_flags(client->data, &flags, 1))
+-- 
+2.17.1
 
---===============0196393285344029867==--
