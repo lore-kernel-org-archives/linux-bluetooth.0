@@ -1,32 +1,61 @@
-Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
+Received: from mail-ej1-f44.google.com (mail-ej1-f44.google.com [209.85.218.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EFEE1459F3
-	for <linux-bluetooth@vger.kernel.org>; Fri,  5 Jul 2024 07:58:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67B04A48
+	for <linux-bluetooth@vger.kernel.org>; Fri,  5 Jul 2024 08:42:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720166323; cv=none; b=qM0Ur47zwk1IwE0+E9UgD54Sk3gsmkYtPunmyvsmeDNH5U4MU146CLgzWLemBK8F1FPMJNAkJaJC5ZsJPzgId/FIYpf0U16nfYbWrPE/aS8snZl+Dzb9+D9A8ReE6hWGQigpOcxCVd0J2GeQZwgwYB8NXrX6/r/5p3NtVD3MSQ8=
+	t=1720168945; cv=none; b=OPll16POovDwmWn7iWtJe7ktr4oDyvsFbAuW4sBhW80zqxW4brdv2YCfcD6XRpcnWMDjSIt1JxLufFAcDaRKzgNYwzCrq7gZ6xdh8GOcgVve9PJUFgoOz+ZVk0nHEsiD5Uo1erssrcVvzaZRI1zjy9C+Vmzf5JvRJFHD2bUOTvI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720166323; c=relaxed/simple;
-	bh=3hgKPuZroGIk/19JjsZQZp88S/OU/j51aTYzL9tF2RI=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=lopw6FP8Olza9caKBNGI6GciGVyZnGda1tECM6wZknhWJoO5yETupdu98YAVHxmip4I7JH8jaUFpTrA0f21ifVJOXgppuc2PWiOqiei+PBPLjKJ/HDFb5fIq0kng9jX6JRwsbmgPiOh1vaIYWC+bTLmBtSOlFzEuoCeNRno0W8I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
-Received: from localhost.localdomain (217.23.187.157) by msexch01.omp.ru
- (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Fri, 5 Jul
- 2024 10:58:07 +0300
-From: Roman Smirnov <r.smirnov@omp.ru>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Roman Smirnov <r.smirnov@omp.ru>
-Subject: [PATCH BlueZ v2 5/5] settings: add NULL checks to gatt_db_load()
-Date: Fri, 5 Jul 2024 10:57:07 +0300
-Message-ID: <20240705075709.26809-6-r.smirnov@omp.ru>
+	s=arc-20240116; t=1720168945; c=relaxed/simple;
+	bh=tNUedDh8w3V/7eQmQIX2iHmHwldmcdPvXAL0fhbucbQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=rw2e0OT6+3bg5CO3UiSo6Z7Q7ib/ads7m/IJxvbtdZhnp9VSQA6sPmarzQ+W2YYnbBSla/IH7gCLW6hrEBWMUSkLRj6EU/EZgojaQDVKDC5S8uYUu6+ixBXNLf6NjxpErgUZ6W6PzDsMJwV7sXJi1bjQ9FHoqAI/B5kqseH7o24=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KqFb0u6M; arc=none smtp.client-ip=209.85.218.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KqFb0u6M"
+Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-a77b550128dso174438966b.0
+        for <linux-bluetooth@vger.kernel.org>; Fri, 05 Jul 2024 01:42:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1720168942; x=1720773742; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=zXbJqA9xAL70XxQpzdHVKi9L3eBoP7el5Xhunp2Z0DE=;
+        b=KqFb0u6MnnqFyyT/xTRDICWVEkXp0NVNQ6YX69QNXJw+ocNK6Ogq5V9lM0RJmfUNR2
+         7o2MfJ/wqlsvydF3OxoyooU//WXFx0je5/5hqd94shzEZK4v3GF28q0UJbJZCtw/kAzv
+         J85lcFcnZbvPm47jhuyizkZzLmiJ/yWfuWnRxOw/VlWlMLhklRzzKkorw4Du3VHMc0sQ
+         J6lYyeu2fCTl0cl+YnyODamJLX+7g7YGYbjYyJDSy7sO1cVmpkGGB1bbx/a+4+DMeJW2
+         7zk1pPPg2nMu+1jT3h2jf1sE/EaY5J7JchUNjgAAHfQu/WoYERSkxnIC3wapsvEq/uw3
+         nbYw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1720168942; x=1720773742;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=zXbJqA9xAL70XxQpzdHVKi9L3eBoP7el5Xhunp2Z0DE=;
+        b=K8OwUq+af13/dkQcdX6dV/oRAq52RDOeuGANicjFNud4lgz9wHUnE+FPPA3siKg0kF
+         3CUeKHorv9gMU7dx5XYciw5SAOlj07Ld/mGhK1Ny9SmzqE579+g4cjTyoz1xbxYH4zCv
+         TujGMOvmSFAR3JVBfn+hOx7y6qmyY0x2skyiuCs4L5Ot+Vw18HuTXlrdwToLz6d9qAt7
+         fyC1KsErfWknilRxv23JPWvKCXLlabi7/tB4qlmGT/inTeQDI/CEQMDu8Zp3ifA9ZIYI
+         DJobdNa7Hp8eu3Hcanu5Q7/M4iWXFVISnhbhXQ9287CPPZDQ1INDjyie3EoNamuy4fOW
+         bhKA==
+X-Gm-Message-State: AOJu0YzgsYJeLNmSyC1G5yvcP7wFA6tXdcBGXyaoovvM2HxRhA+MR/o/
+	92IaCWMBBsIvNPt6g/+vXEenXE+gzKNEyryrHbHGmBws+4P4aFZhm/8t1g==
+X-Google-Smtp-Source: AGHT+IFodk1/Iviu+PY0xpz+DAA9UKgeRS1WGl/+dvRm+yoHtd2OXWCQk8kwVaNooKAJyUPjksyeng==
+X-Received: by 2002:a17:906:3b8e:b0:a72:4676:4f8 with SMTP id a640c23a62f3a-a77ba70d755mr226158966b.62.1720168942218;
+        Fri, 05 Jul 2024 01:42:22 -0700 (PDT)
+Received: from Firmware-Linux-VM.nox.noxmedical.com ([213.181.99.234])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a77cc9466bcsm35826366b.183.2024.07.05.01.42.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 05 Jul 2024 01:42:21 -0700 (PDT)
+From: =?UTF-8?q?Gu=C3=B0ni=20M=C3=A1r=20Gilbert?= <gudni.m.g@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: =?UTF-8?q?Gu=C3=B0ni=20M=C3=A1r=20Gilbert?= <gudni.m.g@gmail.com>
+Subject: [PATCH BlueZ] configure.ac: Fix --disable-cups
+Date: Fri,  5 Jul 2024 08:42:16 +0000
+Message-ID: <20240705084216.552838-1-gudni.m.g@gmail.com>
 X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240705075709.26809-1-r.smirnov@omp.ru>
-References: <20240705075709.26809-1-r.smirnov@omp.ru>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -34,69 +63,40 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
- (10.188.4.12)
-X-KSE-ServerInfo: msexch01.omp.ru, 9
-X-KSE-AntiSpam-Interceptor-Info: scan successful
-X-KSE-AntiSpam-Version: 6.1.0, Database issued on: 07/05/2024 07:27:52
-X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
-X-KSE-AntiSpam-Method: none
-X-KSE-AntiSpam-Rate: 0
-X-KSE-AntiSpam-Info: Lua profiles 186342 [Jul 05 2024]
-X-KSE-AntiSpam-Info: Version: 6.1.0.4
-X-KSE-AntiSpam-Info: Envelope from: r.smirnov@omp.ru
-X-KSE-AntiSpam-Info: LuaCore: 21 0.3.21
- ebee5449fc125b2da45f1a6a6bc2c5c0c3ad0e05
-X-KSE-AntiSpam-Info: {rep_avail}
-X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
-X-KSE-AntiSpam-Info:
-	217.23.187.157:7.1.2;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;omp.ru:7.1.1;127.0.0.199:7.1.2
-X-KSE-AntiSpam-Info: ApMailHostAddress: 217.23.187.157
-X-KSE-AntiSpam-Info: Rate: 0
-X-KSE-AntiSpam-Info: Status: not_detected
-X-KSE-AntiSpam-Info: Method: none
-X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
- smtp.mailfrom=omp.ru;dkim=none
-X-KSE-Antiphishing-Info: Clean
-X-KSE-Antiphishing-ScanningType: Heuristic
-X-KSE-Antiphishing-Method: None
-X-KSE-Antiphishing-Bases: 07/05/2024 07:32:00
-X-KSE-Antivirus-Interceptor-Info: scan successful
-X-KSE-Antivirus-Info: Clean, bases: 7/5/2024 4:11:00 AM
-X-KSE-Attachment-Filter-Triggered-Rules: Clean
-X-KSE-Attachment-Filter-Triggered-Filters: Clean
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
-It is necessary to prevent dereferencing of null pointers.
+or else we get:
+  configure: error: conditional "CUPS_SERVERBIN" was never defined.
+  Usually this means the macro was only invoked conditionally.
 
-Found with the SVACE static analysis tool.
+Fixes: https://github.com/bluez/bluez/issues/773
+
+Credits go to Lars Wendler <polynomial-c@...>, See upstream patch:
+https://lore.kernel.org/linux-bluetooth/20240416052603.4373-2-polynomial-c@gmx.de/
 ---
- src/settings.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ configure.ac | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/src/settings.c b/src/settings.c
-index 996eaacd3..b61e694f1 100644
---- a/src/settings.c
-+++ b/src/settings.c
-@@ -232,7 +232,7 @@ static int gatt_db_load(struct gatt_db *db, GKeyFile *key_file, char **keys)
- 		value = g_key_file_get_string(key_file, "Attributes", *handle,
- 									NULL);
+diff --git a/configure.ac b/configure.ac
+index 1d88daa0b..5619edf4b 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -253,12 +253,12 @@ AM_CONDITIONAL(CUPS, test "${enable_cups}" != "no")
+ if (test "${enable_cups}" != "no"); then
+ 	AC_MSG_CHECKING([cups directory])
+ 	cups_serverbin=`$PKG_CONFIG cups --variable=cups_serverbin`
+-	AM_CONDITIONAL(CUPS_SERVERBIN, test "${cups_serverbin}" != "")
+-	if (test "${cups_serverbin}" != ""); then
+-		AC_SUBST(CUPS_SERVERBIN, ${cups_serverbin})
+-	fi
+ 	AC_MSG_RESULT([${cups_serverbin}])
+ fi
++AM_CONDITIONAL(CUPS_SERVERBIN, test "${cups_serverbin}" != "")
++AS_IF([test "${cups_serverbin}" != ""],[
++	AC_SUBST(CUPS_SERVERBIN, ${cups_serverbin})
++])
  
--		if (sscanf(value, "%[^:]:", type) != 1) {
-+		if (!value || sscanf(value, "%[^:]:", type) != 1) {
- 			g_free(value);
- 			return -EIO;
- 		}
-@@ -255,7 +255,7 @@ static int gatt_db_load(struct gatt_db *db, GKeyFile *key_file, char **keys)
- 		value = g_key_file_get_string(key_file, "Attributes", *handle,
- 									NULL);
- 
--		if (sscanf(value, "%[^:]:", type) != 1) {
-+		if (!value || sscanf(value, "%[^:]:", type) != 1) {
- 			g_free(value);
- 			return -EIO;
- 		}
+ AC_ARG_ENABLE(mesh, AS_HELP_STRING([--enable-mesh],
+ 		[enable Mesh profile support]), [enable_mesh=${enableval}])
 -- 
 2.43.0
 
