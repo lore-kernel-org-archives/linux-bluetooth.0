@@ -1,99 +1,95 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f170.google.com (mail-qk1-f170.google.com [209.85.222.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 216281482E4
-	for <linux-bluetooth@vger.kernel.org>; Fri,  5 Jul 2024 10:15:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E21821474A8
+	for <linux-bluetooth@vger.kernel.org>; Fri,  5 Jul 2024 10:15:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720174505; cv=none; b=Po5UkhCivj6SgjbUVUWXSlY6dXSqgVAfhEcWIuMewcrRCYcG4f2t3Fcq2ocwa5sg9g9n9Dj7NFU+jo9hGj/csPXd8sY4U5+rj9uh+c4LFTu/1n5fUZjNlyLVNAq02QuH5YxXZsrnRDuWso7k73DQoyI3zZcQZztjOfUNqVcBVyc=
+	t=1720174507; cv=none; b=nvS1TINfwXgidrHEVYw3buTexP//H0qQ6VDLWuSakWK2KuEI4q9oHbUinfqEwL+cgNIjiDFgdVF7zL+bgLd0YNxaw3Ena2QSsegFj3GmoTWLXJJtlyH4gkOai+Q6xDMeqexZSb3Mfp/wLtJh15FCNLZNDWv+nsihr4mObNjkaiA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720174505; c=relaxed/simple;
-	bh=fOLMnX/L+VJiMhGOrZalmRILcxMWvY1UCyDMl2MU/FE=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=uPspaNmgc7nsGWVXD/iRhvH/3BqwrkGfWeio/noLn6CBGUINOAkEgjKfvxfT33XKS+Rz4kjWZTt19TY3SAdSV28jVSduhNm/jMXuYujfxJGCxkh1qTOdsbffpiqWHpg2lMtfcDdVC1zAud98b/SWCyJ/C2NwAEPPshK140aWAtg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=EWCKcoCY; arc=none smtp.client-ip=198.175.65.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1720174507; c=relaxed/simple;
+	bh=Ebe+yjSQd3ytHdQOB09O1N9l8lTKPaL1EGOvdLWpcvY=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=plyBckjeD4EC4vJdkpZXQaXa1E6Un5Y0vx+fY9mmuN89sgtr/+kJgRqdCZa8g1dcfmqok915Hnnz2POp2FgZmcoFM+fKZQ8xE8g3FNMpHFrEOfpKyB3GzzPFWiKYHWlMiG6+3T8S5IhEWe/AAb3OQikd1d9pVY4IWec26OkfxyE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lynp6w6k; arc=none smtp.client-ip=209.85.222.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="EWCKcoCY"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1720174504; x=1751710504;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=fOLMnX/L+VJiMhGOrZalmRILcxMWvY1UCyDMl2MU/FE=;
-  b=EWCKcoCY1mPQEkezudDNru/yci3EOhp1DWA3J/Gg3cDOj1qU2O6KgHa9
-   2sXnMbW7E5u9mwNUi6lsV0Y4Fu0hTkqCS3aX5czYpJxm7TWOi6t/k0daw
-   EtkAoJg7viH+6hd4WGh8T1DthHWzagx/bgUppppcgzVwJiUaKnP+Tha4/
-   R5f1SOz0kDpQegZsETlUq8y0arTUVEXGrRnjNHV6+DYUugYeFTs0HTpsR
-   Fb2JcOmS3zicp2XXmZR9SW8tj9nHvQYkEZYyoqr2aOLO0q1MGY4V+WVmM
-   Og1OKEpza2+9yGJ8t2uWvnxaP65TJVo3TeUSbA8yqdUa3UE01sbNl2R7M
-   w==;
-X-CSE-ConnectionGUID: Koz1nraYQB+mtnZsjXfNVw==
-X-CSE-MsgGUID: ifsRPaClQVayDi0a2P6NBA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11123"; a="17415122"
-X-IronPort-AV: E=Sophos;i="6.09,184,1716274800"; 
-   d="scan'208";a="17415122"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Jul 2024 03:15:03 -0700
-X-CSE-ConnectionGUID: JynmyeAST9S5b/3EpQrdUg==
-X-CSE-MsgGUID: wY0vFnOlQeaeeO25/L4Mdg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.09,184,1716274800"; 
-   d="scan'208";a="84389883"
-Received: from intel-lenovo-legion-y540-15irh-pg0.iind.intel.com ([10.224.186.95])
-  by orviesa001.jf.intel.com with ESMTP; 05 Jul 2024 03:15:01 -0700
-From: Kiran K <kiran.k@intel.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: ravishankar.srivatsa@intel.com,
-	chethan.tumkur.narayan@intel.com,
-	Kiran K <kiran.k@intel.com>
-Subject: [PATCH v1 1/2] Bluetooth: btintel: Add support for BlazarU core
-Date: Fri,  5 Jul 2024 15:59:22 +0530
-Message-Id: <20240705102923.3512817-1-kiran.k@intel.com>
-X-Mailer: git-send-email 2.40.1
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lynp6w6k"
+Received: by mail-qk1-f170.google.com with SMTP id af79cd13be357-79c0e7ec66dso108049585a.1
+        for <linux-bluetooth@vger.kernel.org>; Fri, 05 Jul 2024 03:15:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1720174504; x=1720779304; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=Ebe+yjSQd3ytHdQOB09O1N9l8lTKPaL1EGOvdLWpcvY=;
+        b=lynp6w6k6ItG8JEUZcDt7fYt6mfVCNxXO12s9fm2arxbrekJ5N3qKMXf2z+ZJJbXDA
+         iAD8bGCzFaSHl8ktSfmQCR/xGIPAxppKh34vSn0xIOGObrzrJJJDqOVdsGVz/fySJz1y
+         WEeLIlxKtMi/+QKB3BrZaa6MQI0pnfvc6qTYoZd7zDy61dcPL6LjIoM4Kmx4TjaITlPq
+         JUYkm/x2sKpbVrMiYHX9d1GV3vRkb2a64kntM62TP4+hM9S8AZ26cYEzoa9n5x+rPBKC
+         wJQrYski5NpzCRtNA57R4W6Bh9tftTTmczG6FWzbckbuaHHvjEde1T77R+S9eO8fvIju
+         Tk3w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1720174504; x=1720779304;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Ebe+yjSQd3ytHdQOB09O1N9l8lTKPaL1EGOvdLWpcvY=;
+        b=pQUkcFIqdmr2hN/cEAKwdBxBa4V4hhY4RhSEsj8rzqRo8P1oIJOWNaHDxQIodOJiu7
+         g7gJ+7/QSuoJ35HX69klxR/BTcVFFiako4l3Ha5049iWMjndN9O839Uj+W4WlQUUVM2u
+         nk8nIc2hM5e2HKJ9enpOZh1QvASLe6JMdJw8N7GD+NdDSO/PrNwwcqzD76w6MkKRXX0t
+         wdES14s5LTSeoPpEQxRapZDm3iocrGRV/bkf0hdYMZXBMNkJn1si16G5xyrBE7CsKVXk
+         Ak3F6Y7Y0o0s/DrietVtOKWXRXN+J81vaJYHWqJwjmS0i/WVIbQd+bpSER1vopQUo7+a
+         FZZg==
+X-Gm-Message-State: AOJu0YwmS8bOmH8N7Lwvwi1oUXNMQF0DJZM68p1wKkkYFdqEJk8nI7wg
+	l13AMh+fsnQ4Kl7SRZCQ9F60fAF44c0lNXKrIRh8mQzDRxWjaVBqYkYqrg==
+X-Google-Smtp-Source: AGHT+IHDJbWY7EAePyGuaXGC6GYwGLIw1n3dCPk7e4d4TT+yR7SXX6rNicA0KVb74qDM7592sXK9Qw==
+X-Received: by 2002:a05:620a:6113:b0:79d:93a7:8c36 with SMTP id af79cd13be357-79eee1dfbd8mr420889885a.45.1720174504341;
+        Fri, 05 Jul 2024 03:15:04 -0700 (PDT)
+Received: from [172.17.0.2] ([20.55.47.96])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6b5bfcce25esm51526576d6.78.2024.07.05.03.15.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 05 Jul 2024 03:15:04 -0700 (PDT)
+Message-ID: <6687c7a8.050a0220.f29b7.33d1@mx.google.com>
+Date: Fri, 05 Jul 2024 03:15:04 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============6985061534781963563=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, guanwentao@uniontech.com
+Subject: RE: [4.19] Bluetooth: Fix incorrect pointer arithmatic in ext_adv_report_evt
+In-Reply-To: <20240705100106.25403-1-guanwentao@uniontech.com>
+References: <20240705100106.25403-1-guanwentao@uniontech.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Add support for BlazarU core (CNVi).
+--===============6985061534781963563==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Signed-off-by: Kiran K <kiran.k@intel.com>
+This is an automated email and please do not reply to this email.
+
+Dear Submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
+
+----- Output -----
+
+error: patch failed: net/bluetooth/hci_event.c:5402
+error: net/bluetooth/hci_event.c: patch does not apply
+hint: Use 'git am --show-current-patch' to see the failed patch
+
+Please resolve the issue and submit the patches again.
+
+
 ---
- drivers/bluetooth/btintel.c | 3 +++
- 1 file changed, 3 insertions(+)
+Regards,
+Linux Bluetooth
 
-diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
-index 54bfe2ffe1d2..e7a612504ab1 100644
---- a/drivers/bluetooth/btintel.c
-+++ b/drivers/bluetooth/btintel.c
-@@ -472,6 +472,7 @@ int btintel_version_info_tlv(struct hci_dev *hdev,
- 	case 0x19:	/* Slr-F */
- 	case 0x1b:      /* Mgr */
- 	case 0x1c:	/* Gale Peak (GaP) */
-+	case 0x1d:	/* BlazarU (BzrU) */
- 	case 0x1e:	/* BlazarI (Bzr) */
- 		break;
- 	default:
-@@ -2718,6 +2719,7 @@ void btintel_set_msft_opcode(struct hci_dev *hdev, u8 hw_variant)
- 	case 0x19:
- 	case 0x1b:
- 	case 0x1c:
-+	case 0x1d:
- 	case 0x1e:
- 		hci_set_msft_opcode(hdev, 0xFC1E);
- 		break;
-@@ -3063,6 +3065,7 @@ static int btintel_setup_combined(struct hci_dev *hdev)
- 	case 0x17:
- 	case 0x19:
- 	case 0x1b:
-+	case 0x1d:
- 	case 0x1e:
- 		/* Display version information of TLV type */
- 		btintel_version_info_tlv(hdev, &ver_tlv);
--- 
-2.40.1
 
+--===============6985061534781963563==--
