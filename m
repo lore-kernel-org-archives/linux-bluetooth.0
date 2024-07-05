@@ -1,130 +1,167 @@
-Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [217.70.183.193])
+Received: from smtp14.infineon.com (smtp14.infineon.com [217.10.52.160])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97B3B137C36
-	for <linux-bluetooth@vger.kernel.org>; Thu,  4 Jul 2024 19:51:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.193
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13D8E18AF4;
+	Fri,  5 Jul 2024 01:17:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.10.52.160
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720122668; cv=none; b=bAplTyMhKOgowT31Y29jy++i73XOWc5TkZ8lhLMxMcVx9MuTDvpqEZLr+Ey9ZA1QBcJHkeZ+yG1JfAgpWo5+WeA0ZmaseapGq4dgnj/MwKfEiYaRLHBv8IRS65pR5Xk1oW+5PjMExOg75uQLWhvV1JKgOEUZ7+xZjpieq1UvWQ4=
+	t=1720142275; cv=none; b=BEXLguezQ/bOcVWhnJXI3BDvCRxAy5GZYaCpDAuZ5hdrFJeGVgHaP7wlNTb7s97g0pBphJkPWHlXbyVKOHpgRbDZ8QJhH8t3Nzgm7z4+15pW7cUURixUpUiaRb64MiqatkGOZKBNETRhP5nh3NzJE9BoWlQUz3Y6Rx4Alhyl5Ko=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720122668; c=relaxed/simple;
-	bh=XlgxD1X0rlIvgIMCdaQlP7wqPfXR6DrEEwa4ADkGg6g=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=BtUdlkgIro/nUGyaHgUM6vbLuGrhpFaOvouoZlw3pJWg2c5QcI9G7jDXfoxkp35MHmzK5vmQpjK9VsoIqDfQRLB9AgROGEwaOJQniKLA/bKRIAP4HQp4AgOL2/9LzFkrFZ5c7+uP3c/kugtbPTDzEiMy4w+vH9sbUWCLIHgol0c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.183.193
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hadess.net
-Received: by mail.gandi.net (Postfix) with ESMTPSA id C9608240002;
-	Thu,  4 Jul 2024 19:51:03 +0000 (UTC)
-Message-ID: <0b647d8fd3fd6e3ccf748bcdacfd4b89f5098ae0.camel@hadess.net>
-Subject: Re: [BlueZ 11/12] tools/mesh: Fix integer overflow due to cast
- operation
-From: Bastien Nocera <hadess@hadess.net>
-To: Brian Gix <bggixx@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Date: Thu, 04 Jul 2024 21:51:03 +0200
-In-Reply-To: <C7C313BA-2B8A-4638-81E8-80ED55CE07B6@gmail.com>
-References: <20240704102617.1132337-12-hadess@hadess.net>
-	 <C7C313BA-2B8A-4638-81E8-80ED55CE07B6@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
+	s=arc-20240116; t=1720142275; c=relaxed/simple;
+	bh=y4LbcGBtRHdit0evNdZStkLEJxRXjkVaG3CvHx65cKQ=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=t3nzlL6xh5hNkK3ZtIRVE6wLl1C+Gfnqqasza3jOvaC3aOABaworAmR8nuM0oZODjxNtqRz6itYIUU2MSH836O5+KtLIfMe0ZIjlXER1fuRRX/juZqWPRM8883lk6N1LuIeBnhjdAhFrBKR35DBHVoPqUhySszXrMex2tZWRREQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infineon.com; spf=pass smtp.mailfrom=infineon.com; dkim=pass (1024-bit key) header.d=infineon.com header.i=@infineon.com header.b=Sw6BO4qX; arc=none smtp.client-ip=217.10.52.160
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infineon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=infineon.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=infineon.com header.i=@infineon.com header.b="Sw6BO4qX"
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=infineon.com; i=@infineon.com; q=dns/txt; s=IFXMAIL;
+  t=1720142274; x=1751678274;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=y4LbcGBtRHdit0evNdZStkLEJxRXjkVaG3CvHx65cKQ=;
+  b=Sw6BO4qXvSfal5jx5b2pzov1yFMvMKOBDq6JShO/T5w6+0uH2a10/aA/
+   pbIKwWYB7T2zeyqgxE0F5ObmPtHynU8kN3/M4YhvQLWr48wIDP00eyURh
+   rIkVhIGvLIX1sht7x4FKjaE2bZGO60qxOodAvgRTskL+m6MzNyCWD14Sm
+   w=;
+X-IronPort-AV: E=McAfee;i="6700,10204,11123"; a="55502456"
+X-IronPort-AV: E=Sophos;i="6.09,183,1716242400"; 
+   d="scan'208";a="55502456"
+Received: from unknown (HELO MUCSE805.infineon.com) ([172.23.29.31])
+  by smtp14.infineon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Jul 2024 03:16:41 +0200
+Received: from MUCSE832.infineon.com (172.23.7.104) by MUCSE805.infineon.com
+ (172.23.29.31) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1258.34; Fri, 5 Jul
+ 2024 03:16:40 +0200
+Received: from icw-osk-deskmini.osa.infineon.com (10.161.6.196) by
+ MUCSE832.infineon.com (172.23.7.104) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.34; Fri, 5 Jul 2024 03:16:37 +0200
+From: Nobuaki Tsunashima <nobuaki.tsunashima@infineon.com>
+To: Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz
+	<luiz.dentz@gmail.com>
+CC: <linux-bluetooth@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	"Nobuaki Tsunashima" <Nobuaki.Tsunashima@infineon.com>
+Subject: [PATCH v5] Bluetooth: btbcm: Apply HCI_QUIRK_BROKEN_READ_TRANSMIT_POWER to CYW4373
+Date: Fri, 5 Jul 2024 10:15:25 +0900
+Message-ID: <20240705011525.402650-1-nobuaki.tsunashima@infineon.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-GND-Sasl: hadess@hadess.net
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: MUCSE801.infineon.com (172.23.29.27) To
+ MUCSE832.infineon.com (172.23.7.104)
 
-On Thu, 2024-07-04 at 11:45 -0700, Brian Gix wrote:
->=20
-> > On Jul 4, 2024, at 3:27=E2=80=AFAM, Bastien Nocera <hadess@hadess.net>
-> > wrote:
-> >=20
-> > =EF=BB=BFError: INTEGER_OVERFLOW (CWE-190): [#def29] [important]
-> > bluez-5.76/tools/mesh/mesh-db.c:551:3: cast_overflow: Truncation
-> > due to cast operation on "ele_cnt" from 32 to 8 bits.
-> > bluez-5.76/tools/mesh/mesh-db.c:551:3: overflow_sink: "ele_cnt",
-> > which might have overflowed, is passed to "remote_add_node((uint8_t
-> > const *)uuid, unicast, ele_cnt, key_idx)".
-> > 549|=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =
-continue;
-> > 550|
-> > 551|->=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 remote_add_node((const=
- uint8_t *)uuid, unicast,
-> > ele_cnt,
-> > 552|=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 key_idx);
-> > 553|=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 for (j =3D 1; j < key_cn=
-t; j++) {
-> > ---
-> > tools/mesh/mesh-db.c | 6 ++----
-> > 1 file changed, 2 insertions(+), 4 deletions(-)
-> >=20
-> > diff --git a/tools/mesh/mesh-db.c b/tools/mesh/mesh-db.c
-> > index 1d047691d240..abcc09d523a5 100644
-> > --- a/tools/mesh/mesh-db.c
-> > +++ b/tools/mesh/mesh-db.c
-> > @@ -503,7 +503,8 @@ static void load_remotes(json_object *jcfg)
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 uint8_t uuid[16];
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 uint16_t unicast, key_idx;
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 const char *str;
-> > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 int ele_cnt, key_cnt;
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 uint8_t ele_cnt;
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 int key_cnt;
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 int j;
-> >=20
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 jnode =3D json_object_array_get_id=
-x(jnodes, i);
-> > @@ -533,9 +534,6 @@ static void load_remotes(json_object *jcfg)
-> >=20
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ele_cnt =3D json_object_array_leng=
-th(jarray);
-> >=20
-> > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (ele_cnt > MAX_ELE_COUNT=
-)
-> > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 con=
-tinue;
-> > -
->=20
-> What happens if the json file is corrupted and there are more than
-> 255 elements in the array?
+From: Nobuaki Tsunashima <Nobuaki.Tsunashima@infineon.com>
 
-ele_cnt is a uint8_t, so it will wrap around.
+CYW4373 ROM FW has an issue that it claims LE_Read_Transmit_Power command
+as supported in a response of Read_Local_Supported_Command command but
+rejects the LE_Read_Transmit_Power command with "Unknown HCI Command"
+status. Because Bluetooth driver of kernel 5.11 added sending the
+LE_Read_Transmit_Power command in initialize phase, hci up fails due to the
+issue.
 
-We could add that if you preferred (I checked, and the array length is
-cached):
+Especially in USB i/f case, it would be difficult to download patch FW that
+includes its fix unless hci is up.
 
-diff --git a/tools/mesh/mesh-db.c b/tools/mesh/mesh-db.c
-index abcc09d523a5..4c74e874986c 100644
---- a/tools/mesh/mesh-db.c
-+++ b/tools/mesh/mesh-db.c
-@@ -529,7 +529,8 @@ static void load_remotes(json_object *jcfg)
-                        continue;
-=20
-                json_object_object_get_ex(jnode, "elements", &jarray);
--               if (!jarray || json_object_get_type(jarray) !=3D json_type_=
-array)
-+               if (!jarray || json_object_get_type(jarray) !=3D json_type_=
-array ||
-+                   json_object_array_length(jarray) > MAX_ELE_COUNT)
-                        continue;
-=20
-                ele_cnt =3D json_object_array_length(jarray);
+The driver already contains infrastructure to apply the quirk for the
+issue, but currently it only supports DMI based matching. Add support to
+match by chip id and baseline FW version to detect CYW4373 ROM FW build
+in generic system.
 
+Fixes: 7c395ea521e6 ("Bluetooth: Query LE tx power on startup")
+Signed-off-by: Nobuaki Tsunashima <Nobuaki.Tsunashima@infineon.com>
+---
+V4 -> V5: Use skb_pull_data() to access skb->data as safer manner.
+V3 -> V4: Fix a few coding style warnings and refine comments for clarify.
+V2 -> V3: Fix a few coding style warnings and change the subject as more specific.
+V1 -> V2: Fix several coding style warnings.
 
+ drivers/bluetooth/btbcm.c | 41 +++++++++++++++++++++++++++++++++++++--
+ drivers/bluetooth/btusb.c |  4 ++++
+ 2 files changed, 43 insertions(+), 2 deletions(-)
 
->=20
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 json_object_object_get_ex(jnode, "=
-netKeys", &jarray);
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (!jarray || json_object_get_typ=
-e(jarray) !=3D
-> > json_type_array)
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 continue;
-> > --
-> > 2.45.2
-> >=20
-> >=20
+diff --git a/drivers/bluetooth/btbcm.c b/drivers/bluetooth/btbcm.c
+index 0a5445ac5e1b..dd7262a8dc8e 100644
+--- a/drivers/bluetooth/btbcm.c
++++ b/drivers/bluetooth/btbcm.c
+@@ -437,16 +437,53 @@ static const struct dmi_system_id disable_broken_read_transmit_power[] = {
+ 	{ }
+ };
+ 
++struct bcm_chip_version_table {
++	u8 chip_id;			/* Chip ID */
++	u16 baseline;		/* Baseline version of patch FW */
++};
++#define BCM_ROMFW_BASELINE_NUM	0xFFFF
++static const struct bcm_chip_version_table disable_broken_read_transmit_power_by_chip_ver[] = {
++	{ 0x87, BCM_ROMFW_BASELINE_NUM }		/* CYW4373/4373E */
++};
++static bool btbcm_is_disable_broken_read_tx_power_by_chip_ver(u8 chip_id, u16 baseline)
++{
++	int i;
++	size_t table_size = ARRAY_SIZE(disable_broken_read_transmit_power_by_chip_ver);
++	const struct bcm_chip_version_table *entry =
++						&disable_broken_read_transmit_power_by_chip_ver[0];
++
++	for (i = 0 ; i < table_size ; i++, entry++)	{
++		if ((chip_id == entry->chip_id) && (baseline == entry->baseline))
++			return true;
++	}
++
++	return false;
++}
++
+ static int btbcm_read_info(struct hci_dev *hdev)
+ {
+ 	struct sk_buff *skb;
++	u8 *chip_id;
++	u16 *baseline;
+ 
+ 	/* Read Verbose Config Version Info */
+ 	skb = btbcm_read_verbose_config(hdev);
+ 	if (IS_ERR(skb))
+ 		return PTR_ERR(skb);
+-
+-	bt_dev_info(hdev, "BCM: chip id %u", skb->data[1]);
++	skb_pull_data(skb, 1);
++	chip_id = skb_pull_data(skb, sizeof(*chip_id));
++	skb_pull_data(skb, 1);
++	baseline = skb_pull_data(skb, sizeof(*baseline));
++
++	if (chip_id) {
++		bt_dev_info(hdev, "BCM: chip id %u", *chip_id);
++
++		if (baseline) {
++			/* Check Chip ID and disable broken Read LE Min/Max Tx Power */
++			if (btbcm_is_disable_broken_read_tx_power_by_chip_ver(*chip_id, *baseline))
++				set_bit(HCI_QUIRK_BROKEN_READ_TRANSMIT_POWER, &hdev->quirks);
++		}
++	}
+ 	kfree_skb(skb);
+ 
+ 	return 0;
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index d31edad7a056..52561c8d8828 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -142,6 +142,10 @@ static const struct usb_device_id btusb_table[] = {
+ 	{ USB_VENDOR_AND_INTERFACE_INFO(0x04ca, 0xff, 0x01, 0x01),
+ 	  .driver_info = BTUSB_BCM_PATCHRAM },
+ 
++	/* Cypress devices with vendor specific id */
++	{ USB_VENDOR_AND_INTERFACE_INFO(0x04b4, 0xff, 0x01, 0x01),
++	  .driver_info = BTUSB_BCM_PATCHRAM },
++
+ 	/* Broadcom devices with vendor specific id */
+ 	{ USB_VENDOR_AND_INTERFACE_INFO(0x0a5c, 0xff, 0x01, 0x01),
+ 	  .driver_info = BTUSB_BCM_PATCHRAM },
+-- 
+2.25.1
 
