@@ -1,144 +1,102 @@
-Received: from mail-qk1-f169.google.com (mail-qk1-f169.google.com [209.85.222.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mout.web.de (mout.web.de [212.227.15.4])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 388231C687
-	for <linux-bluetooth@vger.kernel.org>; Sat,  6 Jul 2024 23:33:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C38DE7FF;
+	Sun,  7 Jul 2024 08:45:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720308789; cv=none; b=EWWKtlOlu8huc66Sh7wqa0JulItcaFdtTT1OYfT1YANQhTE/SOdftCPY8gBKo55KmJf5suYR917Pm7Fs9+pqFi73ublijbDjqmC0G+KC+hdkX/9BD//hxRTBw6jBtg+9RZp8PHNeyEjzcXznipui1v5WMfviJdr0RSJ3vFzYFOc=
+	t=1720341947; cv=none; b=S25AeSOv8OauIcMdgCv5Or+kO3HGz7+dQ73URCijG2nXF1muIXxZkuzef9ETVG8EeRfQ0qw1kegvJrdpig2o79VjfCqLP2qMTDRsXjQqsUJX/l2x8OdhCK3aVcg1Mir3jSwkUiltrEnSNnnRnqK+KQWvb7NIpFjsH7xtciCDSP8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720308789; c=relaxed/simple;
-	bh=q0Hqu7kiSGgikxhL1HA5AGdSLKBve/HksUdMBFB1Dw0=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=iOjM4zH6k0g7jMx3lqHlX16/nIEgPSrLgYVwH2QIOSpwrLLuXDv02sKCtOVVY1jjre2K6/aJMbbrVZSCfrWOe0fmb5EU6kD/kB73NOd4NxXwsCKs06LIqgR9yrcS9Cabm8sVZxNPa2vfK/K9qF6pMf8uQjwxKIOwTDYtf4O6QE4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VV+N+SdV; arc=none smtp.client-ip=209.85.222.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1720341947; c=relaxed/simple;
+	bh=CyTzhOxBQthFyGXcVW6Ge9YgHiZ1vJTkQ/bVRvaHHaM=;
+	h=Message-ID:Date:MIME-Version:To:Cc:References:Subject:From:
+	 In-Reply-To:Content-Type; b=jrsQeQy5Gwhxvz0KtXOhzKoCj3kvLAqlA8BPA/hdOWru40v30GkLbTKkPaTc3HX8vkaGcazBQejdiyee4TFzZf/jI44/nd5zm3hC0B1DnMSGIvW/9dgJMjiPWyi14EXexxdqr1o7zG995BNFUwKXn/s47a1LcYbTmEiqU4cs9Jc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=eadWUsw7; arc=none smtp.client-ip=212.227.15.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VV+N+SdV"
-Received: by mail-qk1-f169.google.com with SMTP id af79cd13be357-79c06169e9cso195623085a.3
-        for <linux-bluetooth@vger.kernel.org>; Sat, 06 Jul 2024 16:33:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1720308787; x=1720913587; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=h39tmj1l9hfdnMGVDVTyVYfgopeipS9QL8tBHJDkmHE=;
-        b=VV+N+SdVUHkgALJ5W3ZrFXw9dEhsGeLzoQ65xde8jchqSXDy2CtUHqbzslwmJ6hBAQ
-         Y57ZO9PcadeSShOD0l7QAA3KHCiL6dseiOQR4NDS4UJhw8ICDsIVPAIq+y3WJojMoZZu
-         cVcp5tQ1kQPVjJbRkjX9M2ybJGy/a6JLi+yu49AAT0iFgZIingLHJwNDQbQRZBSCoyIj
-         7VudaQS73XD4bvDksJoqToXeYi32Engx1PF78u+3S62lUI5SKZWfbGswxzLvfJbGt/NH
-         TIPF4jP6wJnn/w7Zt2Y2MgkLkaS9Xu2UjSkb7eRE3MdZFwsdtV7Di8tT78t1qfm/0pTV
-         Mu9A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720308787; x=1720913587;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=h39tmj1l9hfdnMGVDVTyVYfgopeipS9QL8tBHJDkmHE=;
-        b=b27YRtvk+7Axt0Dx3qejxMMX2qCoHIhehSA84JlBJCKMdmDnHT4aagwvDW0XOWsD8r
-         jK4CiP1cmBN6y+RcMxqPdT8I/30AmfbLmt7pmp6leFjQ9qGLDHo3YoGIGX0xgbaPXDXj
-         U+DTxjfpMEyyIRp8b9ALY85V3otNGBDBbpuTy7I+YACVRYP+IN+XKuI232U1Zp+HprDX
-         3RU9U7f192vXWvwkCg1AUunIzhavGEulDHdjaE33Ckf3VgGDnBcTiHL+SX8zvRt1BmR/
-         kIRzti6ZTpNKCsMc5TeAug1caY8muiQIKT8p2fRVqX4RheSeGNSJx+jUlLtMg+oOHhD8
-         kNmA==
-X-Gm-Message-State: AOJu0Yxpg8AgUgg6kS1QJnYvE2I1bJARRu83ej9HGwC9PC0OhuQqP0bO
-	ldApfRM4ZIQKbZNUnvaR51fLTyd2NobpxzJrZGKhkSjxC7FH+XijOSgOBQ==
-X-Google-Smtp-Source: AGHT+IEz83Aw2BdOlf//PWF8m01a1nKX6sRgHtmsmRXpqMJmDgAE2FlxjyGc3quTgdhwmnXJV/+urA==
-X-Received: by 2002:a05:620a:3883:b0:79e:f75d:e8bf with SMTP id af79cd13be357-79ef75decc5mr549147785a.42.1720308786917;
-        Sat, 06 Jul 2024 16:33:06 -0700 (PDT)
-Received: from [172.17.0.2] ([172.183.132.31])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-79d890e99d4sm700873785a.43.2024.07.06.16.33.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 06 Jul 2024 16:33:06 -0700 (PDT)
-Message-ID: <6689d432.050a0220.192f5.a2d7@mx.google.com>
-Date: Sat, 06 Jul 2024 16:33:06 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============5892960737396286551=="
+	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="eadWUsw7"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
+	s=s29768273; t=1720341933; x=1720946733; i=markus.elfring@web.de;
+	bh=CyTzhOxBQthFyGXcVW6Ge9YgHiZ1vJTkQ/bVRvaHHaM=;
+	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:To:Cc:References:
+	 Subject:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:
+	 cc:content-transfer-encoding:content-type:date:from:message-id:
+	 mime-version:reply-to:subject:to;
+	b=eadWUsw7y7YOwkSdVRTHKXyD4L8okP2qS7lgfnVcwRqQJqj/5AhEPv40d1DrLoEI
+	 8tsnlWeBD5ZFS+osbWTWAfiBdl+ZB9v8fWBy4eSBuNhrdLlBFjp9uMY9vblggQyHI
+	 g21LdhVc7fXc/3+JCqQjOR5tEhxGHU4/6pCQ1fflOLRiO9l4xvcEtq4kmQckAutUi
+	 sbrvTtTp59d4Rex/AtR2d37kWxLuCGsqd4Aq4NQI0UXW8kOKLVsiVBGkbmRINaXYa
+	 VGEtjU+eFNe+7JpA5xwDXxeUaI8D0XCKN9FQMF06Tlp9lskNWxgnif2nZeQTTBzRW
+	 uj7mZ5RWraVrH2VG3A==
+X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
+Received: from [192.168.178.21] ([94.31.91.95]) by smtp.web.de (mrweb005
+ [213.165.67.108]) with ESMTPSA (Nemesis) id 1MhWop-1rvQUg1It1-00opnh; Sun, 07
+ Jul 2024 10:45:33 +0200
+Message-ID: <8b24a50c-ac43-473c-80fd-185ee806b5f2@web.de>
+Date: Sun, 7 Jul 2024 10:45:03 +0200
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, iam@sung-woo.kim
-Subject: RE: [v2] Bluetooth: hci: fix null-ptr-deref in hci_read_supported_codecs
-In-Reply-To: <20240706225124.1247944-1-iam@sung-woo.kim>
+User-Agent: Mozilla Thunderbird
+To: Sungwoo Kim <iam@sung-woo.kim>, linux-bluetooth@vger.kernel.org,
+ Johan Hedberg <johan.hedberg@gmail.com>,
+ Luiz Von Dentz <luiz.dentz@gmail.com>, Marcel Holtmann <marcel@holtmann.org>
+Cc: LKML <linux-kernel@vger.kernel.org>, "Dave (Jing) Tian"
+ <daveti@purdue.edu>, Hui Peng <benquike@gmail.com>
 References: <20240706225124.1247944-1-iam@sung-woo.kim>
-Reply-To: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v2] Bluetooth: hci: fix null-ptr-deref in
+ hci_read_supported_codecs
+Content-Language: en-GB
+From: Markus Elfring <Markus.Elfring@web.de>
+In-Reply-To: <20240706225124.1247944-1-iam@sung-woo.kim>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:/OKP/kB0LAmfffMhCRcvGRVdMSFXzQ52i23cPJFJn+XAfU8SzJ8
+ 2ZQaoCXiwmgGvtPLdY8g9kjL0wtTM5p5vVWgQjHowNmiMBxV4XXRwSdSB3ItarIwegOIClF
+ tSJ8/ZuE1NFmIgvRci5VsTFBmg//V5xGGD647yWw5podxTw9EibUb/c4dXfcLrT+439aXnN
+ w8HGMS3QisHS+e64VKb1Q==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:Y1clwikdP70=;PQCF2KiXkStkpGaj/vHKAOZ8oxb
+ EtmBOfhTXhbbHKNq9PgRY2vuf5J1kVWwi27/Q1PEPTQ002LOE6CZojUnKsX/alLXEatk85jr0
+ YkZLdH+ScdyOK02eSf2rxeFjEhQERrlrWZN20BZsIKGGrDB5sYVc5JhMDuZn9jMykhEwJ7JQR
+ hv9+52J7bcOB4Ryg2DCM7OWFRbgiuTLvcgx0p18hy/gAbnj7k6Dp7dnlNwhIul9esvexU0lPP
+ oXrn+XHC7qny3pg/l7MIYIQlqC7vqRotMwh326qHyZHtrGj604VnfoN4KaPIW7lv/NoQcIMIS
+ X6Yo/SGWv+a8sYnIe7hGZo3p5iYozUEnYVNyrf4KxLUYY8u44xd9SAoAJblR66+YpO1bnzZ1b
+ 8RqfbpKga5M8AJBOA2WcmWyr+G3vmu1q9J3TIrQXwJHtbuWLLN8Jv1mpH7EZYnyaVBGb6Ibmf
+ dYSFhhMPg19s6rODTpY1cDKrUwLcPTFyElFXoPKZF5HyHHPRhjq4bPgQ3qcHZyfUHaAwJUopC
+ rKwsRPQbC7DhpCebjkG7Y4ulVAT2TPvOz7Xd8U9737UW1aN1S9k2xxN+AL/QKvEOySVMx227c
+ L+zb58hqQ3+gNZG9aVMr4b9KTAb/NrpkHv6f8E8i7ge8wjWKzTPYo2IkVUi121KqWaX1oSsHU
+ CTwktJRXnaGjG7PU6gwwIUAoCIH1LSYzuyyOtlDgH/F+s9K2GTUpa5g4fRdkq+U4k6en0QLvx
+ HmnLIpxL/WRTatA+RC1Plzb4uQOBuIGizM/w/p+q6ka4WonDHSDWiA1Lrjetuu2FGY96U+EiS
+ oZ85y7gzoE6+EF2yfNC2+PnDFkNaj+HHcH2fPxxO5n9HY=
 
---===============5892960737396286551==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=869029
-
----Test result---
-
-Test Summary:
-CheckPatch                    FAIL      0.85 seconds
-GitLint                       FAIL      0.47 seconds
-SubjectPrefix                 PASS      0.10 seconds
-BuildKernel                   PASS      30.03 seconds
-CheckAllWarning               PASS      32.33 seconds
-CheckSparse                   PASS      37.80 seconds
-CheckSmatch                   PASS      102.95 seconds
-BuildKernel32                 PASS      28.77 seconds
-TestRunnerSetup               PASS      524.00 seconds
-TestRunner_l2cap-tester       PASS      20.16 seconds
-TestRunner_iso-tester         PASS      32.93 seconds
-TestRunner_bnep-tester        PASS      4.83 seconds
-TestRunner_mgmt-tester        PASS      114.05 seconds
-TestRunner_rfcomm-tester      PASS      7.37 seconds
-TestRunner_sco-tester         PASS      15.05 seconds
-TestRunner_ioctl-tester       PASS      7.93 seconds
-TestRunner_mesh-tester        PASS      5.99 seconds
-TestRunner_smp-tester         PASS      6.95 seconds
-TestRunner_userchan-tester    PASS      5.03 seconds
-IncrementalBuild              PASS      27.85 seconds
-
-Details
-##############################
-Test: CheckPatch - FAIL
-Desc: Run checkpatch.pl script
-Output:
-[v2] Bluetooth: hci: fix null-ptr-deref in hci_read_supported_codecs
-WARNING: Prefer a maximum 75 chars per line (possible unwrapped commit description?)
-#86: 
-CPU: 1 PID: 2000 Comm: kworker/u9:5 Not tainted 6.9.0-ga6bcb805883c-dirty #10
-
-total: 0 errors, 1 warnings, 0 checks, 36 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/src/13725924.patch has style problems, please review.
-
-NOTE: Ignored message types: UNKNOWN_COMMIT_ID
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+Please put email addresses for recipients not only into the message field =
+=E2=80=9CCc=E2=80=9D.
 
 
-##############################
-Test: GitLint - FAIL
-Desc: Run gitlint
-Output:
-[v2] Bluetooth: hci: fix null-ptr-deref in hci_read_supported_codecs
+=E2=80=A6
+> Fix __hci_cmd_sync_sk() to not return NULL.
+>
+> KASAN: null-ptr-deref in range [0x0000000000000070-0x0000000000000077]
+=E2=80=A6
 
-WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
-12: B1 Line exceeds max length (199>80): "Code: 08 48 89 ef e8 b8 c1 8f fd 48 8b 75 00 e9 96 00 00 00 49 89 c6 48 ba 00 00 00 00 00 fc ff df 4c 8d 60 70 4c 89 e3 48 c1 eb 03 <0f> b6 04 13 84 c0 0f 85 82 06 00 00 41 83 3c 24 02 77 0a e8 bf 78"
+How do you think about to use a summary phrase like
+=E2=80=9CPrevent null pointer dereference in hci_read_supported_codecs()=
+=E2=80=9D?
 
 
----
+=E2=80=A6
+> Fixes: abfeea476c68 ("Bluetooth: hci_sync: Convert MGMT_OP_START_DISCOVE=
+RY")
+=E2=80=A6
+
+Would you like to add a =E2=80=9Cstable tag=E2=80=9D accordingly?
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/Do=
+cumentation/process/stable-kernel-rules.rst?h=3Dv6.10-rc6#n34
+
 Regards,
-Linux Bluetooth
-
-
---===============5892960737396286551==--
+Markus
