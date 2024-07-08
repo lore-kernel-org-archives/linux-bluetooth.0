@@ -1,105 +1,351 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-28.smtp.github.com (out-28.smtp.github.com [192.30.252.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F13113FD69
-	for <linux-bluetooth@vger.kernel.org>; Mon,  8 Jul 2024 14:50:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BD271E4A6
+	for <linux-bluetooth@vger.kernel.org>; Mon,  8 Jul 2024 15:15:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720450232; cv=none; b=oLCws+t7LnDGvq057QY6Nkh34Bho+qXSQQfh1avEGdC0S9DQ/yHd0Ga2eutz+G2pIUyUQWR7IH9En5dDSXwLhEiYVymAsIazmxY8Kx9NDYDQw43YGfazMNVNEkDrAyww4k/bqPB3XBXiMqunU2n9LNOm7Ws7cAsGmtqRvjUvrcg=
+	t=1720451729; cv=none; b=HN05Wpf7hhT6vtiqNYrpndPg9xsXLnYeHQRIpsY9jdnD2CzX37lvCxCsri1j7uYBZEPK/dCJ3HmlnDjfJ7NYJRgKd44O+iz8Y8qWarYOcUq/RM/RBJ6bLJcguuplCt/8kes8IeLs7ZB5JQpStSgaGyDYG/DIrrUwQ9y5WNtGIlM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720450232; c=relaxed/simple;
-	bh=eYrAuriSoMqpfaLEQWBhRAQr6WrfFRMcsfbPcAaEmmI=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=hasKmFoVDNMeCyzx11i/iYESuYi781LlT9uFcbiTbPxAwxX7NArabb6cxPMB75x5DjhavXPf2o0iEyRDFHbiEYq0Jmtz1dnm7ekUOUaEglkPn9y+G1ZxwEShh2L4fM8LA/Pv4lj/1kzW5ktsTyA428CL1QvahzQU5NakITGxKNw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=H4Jerc1v; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1720451729; c=relaxed/simple;
+	bh=umI2qRw2sNRT7HWWTnHs/eoemRq08JoyKSLIpi48WZ8=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=EwkXdf0glyWQ/K0HswwRw+57heSjXto8JV8hukZy5ljZ5GAHVUAhbiISQqo/WPhaSEXnlpWZCryZ0tTRWlK6CXtUi6OggUfHCFuVX3sn8sbbJtIUgi4mk16g8YwVgC7MQ9A3sRv/dvFCV4M7EykbgPoumP0xtEAeKFNVwtddqso=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=Ht/AQ8qX; arc=none smtp.client-ip=192.30.252.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="H4Jerc1v"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id C1A42C4AF0A;
-	Mon,  8 Jul 2024 14:50:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1720450231;
-	bh=eYrAuriSoMqpfaLEQWBhRAQr6WrfFRMcsfbPcAaEmmI=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=H4Jerc1vowZsUaQqfoQzCcVuhct6/rCKlPCGAiEpOKCzLWHQ2cC9n0wWbMwlCgZwm
-	 TA5MjDhF9VQGpAX51ewxACUdkvpLvUKyBOZX2lYDTr0vvnDplRNe4TcvPORjanU9jV
-	 xYCWAK5P11vxbk0mCJeTL8zzH+x0TuMQgM1K+18tUbEUd+j2xg/F4jzj0XT/6zeXqW
-	 arsqjRPZvnXRQmbFRPHFSSOVXqzCeSZzCDxwOonsaQmooHwgk0CY3CiioWB022ObK4
-	 dt3Ye09LnVPC7izP5853PzJx7JhF/D/8dS7Wd01f2t2hSLkvY+mUByWDsjgq6VH1mg
-	 Vk/sYWkzGmmBg==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id AB128C433E9;
-	Mon,  8 Jul 2024 14:50:31 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="Ht/AQ8qX"
+Received: from github.com (hubbernetes-node-dbc1788.ash1-iad.github.net [10.56.166.39])
+	by smtp.github.com (Postfix) with ESMTPA id 845866C112F
+	for <linux-bluetooth@vger.kernel.org>; Mon,  8 Jul 2024 08:15:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1720451724;
+	bh=bgAqthJry1hMLN0Hujt0g+GLHNeQyCrYtZAjgQeDaIs=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=Ht/AQ8qXF5nhhQg7USA6dveMvHzgfTxRacGwYx3sdlzh9JIf7WsnQMyuk9dGsnYon
+	 khLBIUne7GrGs8VGxBhX8yKCQOWCHQIsHSenvDMaFQCaBE5Ey7QrLwshINAGeStG9g
+	 P5MIVq7lbbb0bZCy94yLqnBSEM1sdPMRhGYAZHCs=
+Date: Mon, 08 Jul 2024 08:15:24 -0700
+From: BluezTestBot <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/master/176cf2-804696@github.com>
+Subject: [bluez/bluez] 243384: shared/shell: Fix fd leak if -s is passed
+ multiple...
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [BlueZ v2 00/11] Fix a number of static analysis issues #5
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <172045023168.5742.15061982471514672720.git-patchwork-notify@kernel.org>
-Date: Mon, 08 Jul 2024 14:50:31 +0000
-References: <20240705085935.1255725-1-hadess@hadess.net>
-In-Reply-To: <20240705085935.1255725-1-hadess@hadess.net>
-To: Bastien Nocera <hadess@hadess.net>
-Cc: linux-bluetooth@vger.kernel.org
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-Hello:
+  Branch: refs/heads/master
+  Home:   https://github.com/bluez/bluez
+  Commit: 2433842ea33bcb80a9c157cbac472efedae8c8d4
+      https://github.com/bluez/bluez/commit/2433842ea33bcb80a9c157cbac472efedae8c8d4
+  Author: Bastien Nocera <hadess@hadess.net>
+  Date:   2024-07-08 (Mon, 08 Jul 2024)
 
-This series was applied to bluetooth/bluez.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+  Changed paths:
+    M src/shared/shell.c
 
-On Fri,  5 Jul 2024 10:57:28 +0200 you wrote:
-> Fixed review comments in:
-> gatt-server: Don't allocate negative data
-> shared/shell: Free memory allocated by wordexp()
-> tools/mesh: Fix integer overflow due to cast operation
-> 
-> Bastien Nocera (11):
->   gatt-server: Don't allocate negative data
->   shared/shell: Free memory allocated by wordexp()
->   shared/shell: Fix fd leak if -s is passed multiple times
->   btsnoop: Fix possible negative memcpy length
->   sdp: Fix possible null dereference
->   sdp: Fix mismatched int casting
->   emulator: Fix integer truncation warnings
->   gatt-server: Fix integer overflow due to cast operation
->   mesh: Fix integer overflow due to cast operation
->   tools/mesh: Fix integer overflow due to cast operation
->   unit/ringbuf: Fix ineffective guard due to signedness
-> 
-> [...]
+  Log Message:
+  -----------
+  shared/shell: Fix fd leak if -s is passed multiple times
 
-Here is the summary with links:
-  - [BlueZ,v2,01/11] gatt-server: Don't allocate negative data
-    (no matching commit)
-  - [BlueZ,v2,02/11] shared/shell: Free memory allocated by wordexp()
-    (no matching commit)
-  - [BlueZ,v2,03/11] shared/shell: Fix fd leak if -s is passed multiple times
-    (no matching commit)
-  - [BlueZ,v2,04/11] btsnoop: Fix possible negative memcpy length
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=8de21f74c5f3
-  - [BlueZ,v2,05/11] sdp: Fix possible null dereference
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=0de4b9f71eb9
-  - [BlueZ,v2,06/11] sdp: Fix mismatched int casting
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=0b52ecca60ea
-  - [BlueZ,v2,07/11] emulator: Fix integer truncation warnings
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=1d73dc6a1a9a
-  - [BlueZ,v2,08/11] gatt-server: Fix integer overflow due to cast operation
-    (no matching commit)
-  - [BlueZ,v2,09/11] mesh: Fix integer overflow due to cast operation
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=249d2120bd90
-  - [BlueZ,v2,10/11] tools/mesh: Fix integer overflow due to cast operation
-    (no matching commit)
-  - [BlueZ,v2,11/11] unit/ringbuf: Fix ineffective guard due to signedness
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=c44a2a233d1b
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+Error: RESOURCE_LEAK (CWE-772): [#def37] [important]
+src/shared/shell.c:1305:5: open_fn: Returning handle opened by "open". [Note: The source code implementation of the function has been overridden by a user model.]
+src/shared/shell.c:1305:5: var_assign: Assigning: "data.init_fd" = handle returned from "open(optarg, 0)".
+src/shared/shell.c:1305:5: overwrite_var: Overwriting handle "data.init_fd" in "data.init_fd = open(optarg, 0)" leaks the handle.
+1303|			case 's':
+1304|				if (optarg)
+1305|->					data.init_fd = open(optarg, O_RDONLY);
+1306|				if (data.init_fd < 0)
+1307|					printf("Unable to open %s: %s (%d)\n", optarg,
 
 
+  Commit: 8de21f74c5f309bdb3872293db23b5a0f20ae163
+      https://github.com/bluez/bluez/commit/8de21f74c5f309bdb3872293db23b5a0f20ae163
+  Author: Bastien Nocera <hadess@hadess.net>
+  Date:   2024-07-08 (Mon, 08 Jul 2024)
+
+  Changed paths:
+    M tools/btsnoop.c
+
+  Log Message:
+  -----------
+  btsnoop: Fix possible negative memcpy length
+
+Error: INTEGER_OVERFLOW (CWE-190): [#def41] [important]
+tools/btsnoop.c:438:2: tainted_data_return: Called function "read(fd, buf, toread)", and a possible return value may be less than zero.
+tools/btsnoop.c:438:2: assign: Assigning: "len" = "read(fd, buf, toread)".
+tools/btsnoop.c:473:4: overflow: The cast of "len - 9L", which is potentially negative, to an unsigned type could result in an overflow.
+471|			/* next 4 bytes are data len and cid */
+472|			current_cid = buf[8] << 8 | buf[7];
+473|->			memcpy(pdu_buf, buf + 9, len - 9);
+474|			pdu_len = len - 9;
+475|		} else if (acl_flags & 0x01) {
+
+Error: INTEGER_OVERFLOW (CWE-190): [#def42] [important]
+tools/btsnoop.c:438:2: tainted_data_return: Called function "read(fd, buf, toread)", and a possible return value may be less than zero.
+tools/btsnoop.c:438:2: assign: Assigning: "len" = "read(fd, buf, toread)".
+tools/btsnoop.c:476:4: overflow: The cast of "len - 5L", which is potentially negative, to an unsigned type could result in an overflow.
+474|			pdu_len = len - 9;
+475|		} else if (acl_flags & 0x01) {
+476|->			memcpy(pdu_buf + pdu_len, buf + 5, len - 5);
+477|			pdu_len += len - 5;
+478|		}
+
+
+  Commit: 0de4b9f71eb9e01ee972755cf3444592706356c7
+      https://github.com/bluez/bluez/commit/0de4b9f71eb9e01ee972755cf3444592706356c7
+  Author: Bastien Nocera <hadess@hadess.net>
+  Date:   2024-07-08 (Mon, 08 Jul 2024)
+
+  Changed paths:
+    M lib/sdp.c
+
+  Log Message:
+  -----------
+  sdp: Fix possible null dereference
+
+From the BlueZ scanbot:
+lib/sdp.c:586:12: warning: Access to field 'attrId' results in a dereference of a null pointer (loaded from variable 'd')
+        d->attrId = attr;
+        ~         ^
+lib/sdp.c:967:10: warning: Access to field 'dtd' results in a dereference of a null pointer (loaded from variable 'd')
+        switch (d->dtd) {
+                ^~~~~~
+
+
+  Commit: 0b52ecca60ea2002a3b3236f32543210e92c0e95
+      https://github.com/bluez/bluez/commit/0b52ecca60ea2002a3b3236f32543210e92c0e95
+  Author: Bastien Nocera <hadess@hadess.net>
+  Date:   2024-07-08 (Mon, 08 Jul 2024)
+
+  Changed paths:
+    M lib/sdp.c
+
+  Log Message:
+  -----------
+  sdp: Fix mismatched int casting
+
+
+  Commit: 1d73dc6a1a9a7a83dc77e547b0d639cea8b2d903
+      https://github.com/bluez/bluez/commit/1d73dc6a1a9a7a83dc77e547b0d639cea8b2d903
+  Author: Bastien Nocera <hadess@hadess.net>
+  Date:   2024-07-08 (Mon, 08 Jul 2024)
+
+  Changed paths:
+    M emulator/amp.c
+    M emulator/bthost.c
+
+  Log Message:
+  -----------
+  emulator: Fix integer truncation warnings
+
+Error: INTEGER_OVERFLOW (CWE-190): [#def1] [important]
+emulator/amp.c:693:2: cast_overflow: Truncation due to cast operation on "(remain_assoc_len > 248) ? 248 : remain_assoc_len" from 32 to 16 bits.
+emulator/amp.c:693:2: overflow_assign: "fragment_len" is assigned from "(remain_assoc_len > 248) ? 248 : remain_assoc_len".
+emulator/amp.c:698:2: overflow_sink: "fragment_len", which might have overflowed, is passed to "memcpy(rsp.assoc_fragment, amp->local_assoc + len_so_far, fragment_len)". [Note: The source code implementation of the function has been overridden by a builtin model.]
+696|	rsp.phy_handle = cmd->phy_handle;
+697|	rsp.remain_assoc_len = cpu_to_le16(remain_assoc_len);
+698|->	memcpy(rsp.assoc_fragment, amp->local_assoc + len_so_far,
+699|							fragment_len);
+700|
+
+Error: INTEGER_OVERFLOW (CWE-190): [#def2] [important]
+emulator/amp.c:701:2: cast_overflow: Truncation due to cast operation on "4 + fragment_len" from 32 to 8 bits.
+emulator/amp.c:701:2: overflow_sink: "4 + fragment_len", which might have overflowed, is passed to "cmd_complete(amp, 5130, &rsp, 4 + fragment_len)".
+699|							fragment_len);
+700|
+701|->	cmd_complete(amp, BT_HCI_CMD_READ_LOCAL_AMP_ASSOC,
+702|						&rsp, 4 + fragment_len);
+703|   }
+
+Error: INTEGER_OVERFLOW (CWE-190): [#def4] [important]
+emulator/bthost.c:3309:3: cast_overflow: Truncation due to cast operation on "len - offset" from 32 to 8 bits.
+emulator/bthost.c:3309:3: overflow_assign: "cp->data_len" is assigned from "len - offset".
+emulator/bthost.c:3317:2: overflow_sink: "cp->data_len", which might have overflowed, is passed to "memcpy(cp->data, data + offset, cp->data_len)". [Note: The source code implementation of the function has been overridden by a builtin model.]
+3315|		}
+3316|
+3317|->		memcpy(cp->data, data + offset, cp->data_len);
+3318|
+3319|		send_command(bthost, BT_HCI_CMD_LE_SET_PA_DATA, buf,
+
+
+  Commit: 249d2120bd904c5f6db2138a3412822c9ded1dfb
+      https://github.com/bluez/bluez/commit/249d2120bd904c5f6db2138a3412822c9ded1dfb
+  Author: Bastien Nocera <hadess@hadess.net>
+  Date:   2024-07-08 (Mon, 08 Jul 2024)
+
+  Changed paths:
+    M mesh/pb-adv.c
+
+  Log Message:
+  -----------
+  mesh: Fix integer overflow due to cast operation
+
+Error: INTEGER_OVERFLOW (CWE-190): [#def15] [important]
+mesh/pb-adv.c:174:4: cast_overflow: Truncation due to cast operation on "size - consumed" from 32 to 8 bits.
+mesh/pb-adv.c:174:4: overflow_assign: "seg_size" is assigned from "size - consumed".
+mesh/pb-adv.c:177:3: overflow_sink: "seg_size", which might have overflowed, is passed to "memcpy(buf + 7, data + consumed, seg_size)". [Note: The source code implementation of the function has been overridden by a builtin model.]
+175|
+176|		buf[6] = (i << 2) | 0x02;
+177|->		memcpy(buf + 7, data + consumed, seg_size);
+178|
+179|		pb_adv_send(session, MESH_IO_TX_COUNT_UNLIMITED, 500,
+
+Error: INTEGER_OVERFLOW (CWE-190): [#def16] [important]
+mesh/pb-adv.c:179:3: cast_overflow: Truncation due to cast operation on "seg_size + 7" from 32 to 16 bits.
+mesh/pb-adv.c:179:3: overflow_sink: "seg_size + 7", which might have overflowed, is passed to "pb_adv_send(session, 0, 500, buf, seg_size + 7)".
+177|		memcpy(buf + 7, data + consumed, seg_size);
+178|
+179|->		pb_adv_send(session, MESH_IO_TX_COUNT_UNLIMITED, 500,
+180|							buf, seg_size + 7);
+
+
+  Commit: 9b346513cc35c83da332c4b6ebd65b4674178a26
+      https://github.com/bluez/bluez/commit/9b346513cc35c83da332c4b6ebd65b4674178a26
+  Author: Bastien Nocera <hadess@hadess.net>
+  Date:   2024-07-08 (Mon, 08 Jul 2024)
+
+  Changed paths:
+    M tools/mesh/mesh-db.c
+
+  Log Message:
+  -----------
+  tools/mesh: Fix integer overflow due to cast operation
+
+Error: INTEGER_OVERFLOW (CWE-190): [#def29] [important]
+tools/mesh/mesh-db.c:551:3: cast_overflow: Truncation due to cast operation on "ele_cnt" from 32 to 8 bits.
+tools/mesh/mesh-db.c:551:3: overflow_sink: "ele_cnt", which might have overflowed, is passed to "remote_add_node((uint8_t const *)uuid, unicast, ele_cnt, key_idx)".
+549|			continue;
+550|
+551|->		remote_add_node((const uint8_t *)uuid, unicast, ele_cnt,
+552|								key_idx);
+553|		for (j = 1; j < key_cnt; j++) {
+
+
+  Commit: c44a2a233d1b1873a7d4a9085c8d6bd61835bfac
+      https://github.com/bluez/bluez/commit/c44a2a233d1b1873a7d4a9085c8d6bd61835bfac
+  Author: Bastien Nocera <hadess@hadess.net>
+  Date:   2024-07-08 (Mon, 08 Jul 2024)
+
+  Changed paths:
+    M src/shared/ringbuf.c
+
+  Log Message:
+  -----------
+  unit/ringbuf: Fix ineffective guard due to signedness
+
+"len - end > 0" can never be false because "end" is unsigned, so the
+whole left handside of the expression is unsigned, so always positive.
+
+Error: INTEGER_OVERFLOW (CWE-190): [#def22] [important]
+src/shared/ringbuf.c:240:2: ineffective_check: The check "len - end > 0UL", which appears to be a guard against integer overflow, is not a useful guard because it is either always true, or never true. This taints "len".
+src/shared/ringbuf.c:242:3: overflow: The expression "len - end" might be negative, but is used in a context that treats it as unsigned.
+src/shared/ringbuf.c:242:3: overflow_sink: "len - end", which might be negative, is passed to "memcpy(ringbuf->buffer, str + end, len - end)". [Note: The source code implementation of the function has been overridden by a builtin model.]
+240|	if (len - end > 0) {
+241|		/* Put the remainder of string at the beginning */
+242|->		memcpy(ringbuf->buffer, str + end, len - end);
+243|
+244|		if (ringbuf->in_tracing)
+
+
+  Commit: 0fda2dd545fc0c2d879db729ab3be22e88be7072
+      https://github.com/bluez/bluez/commit/0fda2dd545fc0c2d879db729ab3be22e88be7072
+  Author: Roman Smirnov <r.smirnov@omp.ru>
+  Date:   2024-07-08 (Mon, 08 Jul 2024)
+
+  Changed paths:
+    M obexd/plugins/filesystem.c
+
+  Log Message:
+  -----------
+  obexd: add NULL checks to file_stat_line()
+
+gmtime() may return NULL. It is necessary to prevent
+dereferencing of a NULL pointer.
+
+Found with the SVACE static analysis tool.
+
+
+  Commit: 85d98aecd6a9504cb51a4bd4f8b37cc11a0057f8
+      https://github.com/bluez/bluez/commit/85d98aecd6a9504cb51a4bd4f8b37cc11a0057f8
+  Author: Roman Smirnov <r.smirnov@omp.ru>
+  Date:   2024-07-08 (Mon, 08 Jul 2024)
+
+  Changed paths:
+    M src/shared/shell.c
+
+  Log Message:
+  -----------
+  shared/shell: prevent integer overflow in bt_shell_init()
+
+An integer overflow will occur if index < offest. It is necessary
+to prevent this case.
+
+Found with the SVACE static analysis tool.
+
+
+  Commit: c389209ce4554fd8fdd3ca99ea6f73435a056c57
+      https://github.com/bluez/bluez/commit/c389209ce4554fd8fdd3ca99ea6f73435a056c57
+  Author: Roman Smirnov <r.smirnov@omp.ru>
+  Date:   2024-07-08 (Mon, 08 Jul 2024)
+
+  Changed paths:
+    M tools/isotest.c
+
+  Log Message:
+  -----------
+  tools/isotest: limit the maximum possible data_size
+
+It is necessary to prevent the possibility of allocating
+a large amount of memory.
+
+Found with the SVACE static analysis tool.
+
+
+  Commit: 8e495f00cded86496ad5c32e7a3cf902a8bdbe82
+      https://github.com/bluez/bluez/commit/8e495f00cded86496ad5c32e7a3cf902a8bdbe82
+  Author: Roman Smirnov <r.smirnov@omp.ru>
+  Date:   2024-07-08 (Mon, 08 Jul 2024)
+
+  Changed paths:
+    M tools/rctest.c
+
+  Log Message:
+  -----------
+  tools/rctest: limit the maximum possible data_size
+
+It is necessary to prevent the possibility of allocating
+a large amount of memory.
+
+Found with the SVACE static analysis tool.
+
+
+  Commit: 804696dee79515e2001ec445ae218d7b42887c37
+      https://github.com/bluez/bluez/commit/804696dee79515e2001ec445ae218d7b42887c37
+  Author: Roman Smirnov <r.smirnov@omp.ru>
+  Date:   2024-07-08 (Mon, 08 Jul 2024)
+
+  Changed paths:
+    M src/settings.c
+
+  Log Message:
+  -----------
+  settings: add NULL checks to gatt_db_load()
+
+It is necessary to prevent dereferencing of null pointers.
+
+Found with the SVACE static analysis tool.
+
+
+Compare: https://github.com/bluez/bluez/compare/176cf2e12a28...804696dee795
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
