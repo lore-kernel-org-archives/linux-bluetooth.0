@@ -1,120 +1,106 @@
-Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
+Received: from mail-vk1-f181.google.com (mail-vk1-f181.google.com [209.85.221.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E0CE143881
-	for <linux-bluetooth@vger.kernel.org>; Mon,  8 Jul 2024 16:41:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8331AD55
+	for <linux-bluetooth@vger.kernel.org>; Mon,  8 Jul 2024 17:26:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720456874; cv=none; b=RyoRnF4g9rm93ZW45xuHSMXmzp8LxSdrlBaWs7AtPw3TrXWpMCPFlNDqHjF0zQeSNNSVtgXjmqk7DwGU9pFg/NhaTi5TQgpFhMQyNiy1lp2MiUXGeTNXRKauSnQJcfvOGWQAAvApKZtXyGb/TKZrw30vjuIitFrTwHsMmSNX1FE=
+	t=1720459615; cv=none; b=u0GGhZcFP+5yZ1eLDzQa4gItRoGYEzwg/nNUiQjSVcGw7lO0EmM8KWq43S4svai3+ZrFWm27oC4T5w3VBPhBeYSPfS7b6J862McgOjuPlCb5gPqZDAGWdNrYXlOhqmtn3gKk/Mw8KPGlsvCFWZKf/VjjIEcfG505UIRdRpPtsI8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720456874; c=relaxed/simple;
-	bh=mGy9fdJqdDtPeEyFasqUgRSqSSR1kKvu+fnkUh/lS58=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=to6SwCJ+zZlHPdMPejOew/l22BFx3qPmlLe6RnG8+OG8pG0p2s+aJ7070/I13XDSYyKSUYFdUOtKYhUKHKdz7Yg3zQS1ue9YQyzUKixZPVxDAWM/BMWH5pl0Ri0jnqv+4pyzH6XB1gcTTxvz4iDhwL+Hc/hENL+nfRlBC+zbhEs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eQIzk5n0; arc=none smtp.client-ip=209.85.214.169
+	s=arc-20240116; t=1720459615; c=relaxed/simple;
+	bh=R0lliba53OCAxwb9nCj+TtFDa2cxFlpIKm7MJGNipfA=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=OrvJv2kOJhERUThWrk2ANy+nw/NPgjR8fZ39vI++GdLtH6IBS+d5WbrmJnBrGvQYl0L+z/NFP8hEowzGxZuduDJhUGeJXKKptuJl5IhsYsoH58PXeZlAeBBcBhdXBYZ5tPDLbup4WGT1KwKeeagnGRvR6FrJBKz4XPWLjbIF768=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hgM34In2; arc=none smtp.client-ip=209.85.221.181
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eQIzk5n0"
-Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-1fb64d627b0so8190795ad.0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 08 Jul 2024 09:41:13 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hgM34In2"
+Received: by mail-vk1-f181.google.com with SMTP id 71dfb90a1353d-4f2faade55dso1058631e0c.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 08 Jul 2024 10:26:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1720456872; x=1721061672; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=Tlz0hnqM8T1fn3Cplk7tbkScMh5cu+NJOgfJgMvTxi8=;
-        b=eQIzk5n0oQ09AM4B/AWN2hR/OAqAt/+R6HkTB55mNkKjS3FYCTk7Kz3EsQvL6CUUDf
-         l7OjrVbGo/2A62q11FAoBoc5OQ+/RkqEQd3whP6NZ3DFbesPjJZnKWl6gu3tVjPtNi0H
-         Nlid48kh9Vty1F7V6XyS4kIvhegehysGghjJKQ3VAjIoWkQiEs5y0n5+Dxe/GRS5ESDd
-         mpY7qlKCe+flhkXSXBZm6koKirEu4PoPwKrEAgtAho/L5h3Z/35plLdSrrhhrizl7qzC
-         nLVUjSjQ2kx8rDcO1lowqZUoMGJv9lgMsdFfyPJfWSKTSKbFP5mDUC5AApDPhtOARhIl
-         ukPA==
+        d=gmail.com; s=20230601; t=1720459612; x=1721064412; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=To33v0mOFKh3KXvqbt4cvoIr4v8E7Pa9yXvGm/Nj+VQ=;
+        b=hgM34In2zs9z9tTMIs17naDyO07pegG4Zb2ewlTMRXHScS/JxbYMTSU++qdouHsiqO
+         6OJfFLJZutvKM9fH8oZAPVLWWjS2snqbMtMXp7InrDT3LIHOISGfxola0oNWmrSkSm7H
+         0mh6NQf6RQ4kydeoVzikn+RbP9E2Kd5hleWi/hFMPiMXCFYYY0VxFqUiUxCe7df7dO39
+         fgvZwZCp8CfTbGAL5yvEmj0F7tDCw5HQ36FYwCwpzysM1INGKzkG0Kax7x5J6qwiojUV
+         joJ/D3fHuVQdkIgarUL7bTIBVsDPdag6Uoxl4D6QW9OyJZbxTRANmcFQGuOq1ClXRgL5
+         RVgw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720456872; x=1721061672;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Tlz0hnqM8T1fn3Cplk7tbkScMh5cu+NJOgfJgMvTxi8=;
-        b=B7Hw+7t0dp/tW0/dqVMdxgFE2AT/x/j64e1YGpjxe/alI6/lcl5Hc3L9s6tGTnzPUg
-         XX2mLJEQII1br1u0G7ROLDTCcT/jtAgAFRTKip3i8tlpAOHLuQJdChFxVf9US3R5haQ5
-         5cn5UEw9rLAaA5K0SYdsbGjaOEFJk7o9UlYl0Qv2VcKA8Hd3xe+c5RK+Vd6NaONwzJ6K
-         Y/59S9Pk0xAAkToGcQu8mLOOSFrBTHt5LxJ/g/dEV9Tk1I1F4dSj5+rySTsCIx1uXAju
-         UoPUIYo/xcvcM0wtsL5++LVmJs3SOiW0hSKSCOuaqlLOS5Wo981vnvVdG5NrrOiplGiQ
-         82Pw==
-X-Gm-Message-State: AOJu0YxmHtWEJ8CAo5QS6igzbyVni4s6ArajuXYjdErRSDP7I15ebNhr
-	DxC6gL13IdGsLIEpwdPHmImUZ1GoutUVXN5jGFUDX/Jne6fZ0DC5t86ajg==
-X-Google-Smtp-Source: AGHT+IFghEWIknysVK0x4BHm1Ps/X1FLA331zwYm+eWLB62o4D7pRVqStdGcKrE4PLT8lxMz6g17KA==
-X-Received: by 2002:a17:903:1252:b0:1f9:a8ce:3375 with SMTP id d9443c01a7336-1fbb6ea4187mr462675ad.50.1720456872285;
-        Mon, 08 Jul 2024 09:41:12 -0700 (PDT)
-Received: from [172.17.0.2] ([52.234.36.37])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1fbb6a0fc62sm812455ad.40.2024.07.08.09.41.11
+        d=1e100.net; s=20230601; t=1720459612; x=1721064412;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=To33v0mOFKh3KXvqbt4cvoIr4v8E7Pa9yXvGm/Nj+VQ=;
+        b=cmF2E6NP3J0EM/c63ykb34hb4GhAdcc2cP1A5GXRa6+pAUnCrPoSo6fNXv+w0Y24Sd
+         c2kbwQON77/MsQL13/csDNnWcatHaqFyDQGf11ILonUQwMFzPu0u7+HIihB2e1YDxoB+
+         UAtsOo1k8cLT3zoB10tyBf9TH1czb0+hVFH+0QSpZ54er+R9cSyef0PcrK/gEMRdTF4j
+         vxUp/DoeXmfSEJ1h334WZHJP1bcO9mRZujimgNb8RvMl45tG0KFRwFcXXOoZ1Bh+y9rf
+         yxrQ9kAgSjt2veqxRecZnesMT6T8I2MRl9qwt15vGXsnFH9ald0W39AErm4Ib1kIPT7e
+         4XiQ==
+X-Gm-Message-State: AOJu0YwXTCMtnULx9Vv3ov5ukorWD7bT2rtT8wcetZ+DrTSO8oxvwD9f
+	zW+RsH1rnlpTN7wLnPhdtXqbsPptNJq3ut0qCMtGeK+vmyM5kqq5SOb/HA==
+X-Google-Smtp-Source: AGHT+IG/7puQkdFkEl437WdxelBJ1IadSoVE9q6OvWagFut0bO052lwgDI+HgkTNW0bc4EnWsLZyHw==
+X-Received: by 2002:a05:6122:4781:b0:4f2:f139:b2dc with SMTP id 71dfb90a1353d-4f33f2d4462mr243743e0c.8.1720459612064;
+        Mon, 08 Jul 2024 10:26:52 -0700 (PDT)
+Received: from lvondent-mobl4.. (syn-107-146-107-067.res.spectrum.com. [107.146.107.67])
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-4f33d9ed261sm55017e0c.7.2024.07.08.10.26.50
+        for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 08 Jul 2024 09:41:11 -0700 (PDT)
-Message-ID: <668c16a7.170a0220.68661.06f0@mx.google.com>
-Date: Mon, 08 Jul 2024 09:41:11 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============5493678894964072366=="
+        Mon, 08 Jul 2024 10:26:51 -0700 (PDT)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH v1] Bluetooth: btusb: Don't fail external suspend requests
+Date: Mon,  8 Jul 2024 13:26:50 -0400
+Message-ID: <20240708172650.2752501-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [BlueZ,v1] shared/gatt-server: Fix not using correct MTU for responses
-In-Reply-To: <20240708152823.2726052-1-luiz.dentz@gmail.com>
-References: <20240708152823.2726052-1-luiz.dentz@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 
---===============5493678894964072366==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This is automated email and please do not reply to this email!
+Commit 4e0a1d8b0675
+("Bluetooth: btusb: Don't suspend when there are connections")
+introduces a check for connections to prevent auto-suspend but that
+actually ignored the fact the .suspend callback can be called for
+external suspend requests which
+Documentation/driver-api/usb/power-management.rst states the following:
 
-Dear submitter,
+ 'External suspend calls should never be allowed to fail in this way,
+ only autosuspend calls.  The driver can tell them apart by applying
+ the :c:func:`PMSG_IS_AUTO` macro to the message argument to the
+ ``suspend`` method; it will return True for internal PM events
+ (autosuspend) and False for external PM events.'
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=869329
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      0.32 seconds
-GitLint                       PASS      0.18 seconds
-BuildEll                      PASS      24.65 seconds
-BluezMake                     PASS      1673.25 seconds
-MakeCheck                     PASS      13.07 seconds
-MakeDistcheck                 PASS      178.50 seconds
-CheckValgrind                 PASS      253.43 seconds
-CheckSmatch                   WARNING   375.14 seconds
-bluezmakeextell               PASS      119.80 seconds
-IncrementalBuild              PENDING   60.41 seconds
-ScanBuild                     PENDING   1085.53 seconds
-
-Details
-##############################
-Test: CheckSmatch - WARNING
-Desc: Run smatch tool with source
-Output:
-src/shared/gatt-server.c:278:25: warning: Variable length array is used.src/shared/gatt-server.c:618:25: warning: Variable length array is used.src/shared/gatt-server.c:716:25: warning: Variable length array is used.src/shared/gatt-server.c:278:25: warning: Variable length array is used.src/shared/gatt-server.c:618:25: warning: Variable length array is used.src/shared/gatt-server.c:716:25: warning: Variable length array is used.src/shared/gatt-server.c:278:25: warning: Variable length array is used.src/shared/gatt-server.c:618:25: warning: Variable length array is used.src/shared/gatt-server.c:716:25: warning: Variable length array is used.
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
-
-##############################
-Test: ScanBuild - PENDING
-Desc: Run Scan Build
-Output:
-
-
-
+Fixes: 4e0a1d8b0675 ("Bluetooth: btusb: Don't suspend when there are connections")
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 ---
-Regards,
-Linux Bluetooth
+ drivers/bluetooth/btusb.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 2d5c971a59ad..bbd75ba9874a 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -4700,8 +4700,10 @@ static int btusb_suspend(struct usb_interface *intf, pm_message_t message)
+ 
+ 	BT_DBG("intf %p", intf);
+ 
+-	/* Don't suspend if there are connections */
+-	if (hci_conn_count(data->hdev))
++	/* Don't auto-suspend if there are connections as external suspend calls
++	 * should never be allowed to fail.
++	 */
++	if (PMSG_IS_AUTO(message) && hci_conn_count(data->hdev))
+ 		return -EBUSY;
+ 
+ 	if (data->suspend_count++)
+-- 
+2.45.2
 
---===============5493678894964072366==--
