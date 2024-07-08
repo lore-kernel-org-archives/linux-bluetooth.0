@@ -1,60 +1,60 @@
-Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
+Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0C3F77107
-	for <linux-bluetooth@vger.kernel.org>; Mon,  8 Jul 2024 09:39:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17A8878C75
+	for <linux-bluetooth@vger.kernel.org>; Mon,  8 Jul 2024 09:39:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720431587; cv=none; b=CP2hHWFVcNCurMFLtNgU8N40oN+ByJUPLSUzjHYBmhecXw4IaiAu5MrDmMrSL98n7auhF4jgekrgwrNweki6QANzOXwmedAkVVPnUh7LqBXcp5Wn8szFDQsgaoOUdMlJxz3yn06ttktBsN8ydsTpuUlaKOOk+EvWXAQPhKNaqjE=
+	t=1720431588; cv=none; b=sLcfyUzRkdvRWtWJpDruG4NiaA1NcSTTs6PAY17VojLRthvMd5gMQmyhXLvtxPZoebzZchRtJQ+uVUPHm6JcXJ05xJibsA7LeWo9Ms0HjO6IBKOxd4PDuaIIWB5MWUDlumbCh5VjU79annIjRqqNvI3sa/HnoNa+qhvCLKQ+q7g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720431587; c=relaxed/simple;
-	bh=ZpEMlVZ4lz7kxOh8aB5yAX/5R2qrMqEaJCUro3Wh5Hc=;
+	s=arc-20240116; t=1720431588; c=relaxed/simple;
+	bh=6hB3boGnbTQnL6lEU/7bN5fHksatP5uYEjX7EZDxwfI=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=Id/exeGpp7nLUhN/JszIRgAvbHpmd3AkbYQUd1ucpqqqACKVfX14FzOdjPt17My0VwEI20b+gOHJP+YjXMB5dM47GuUYQXOManYExxzmCPKr+G1Ex3+G2z4HwjvhW8NNV5n8rux80nSDAdYNhC9Vw2niCvi/JWNXWg9LOaWxPVA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=dtz8Sp5I; arc=none smtp.client-ip=209.85.221.51
+	 In-Reply-To:To:Cc; b=lvEF/TUqOa0bbEL5RBev2DX5zbnq2BEy2JXAV6qh5prSJ8hZy/v2INV0FR0ZJPqb8gqGlet56yp1Ja8uxrNSNGTz+BUPPSmAjLyQP1BIvHsT4vQG1Bg4GNEWeV9C5VP48ubWCocQAyLoJw4RI0c+P4AnpFla7xuomSHhu+H9HRg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=SErDOH9d; arc=none smtp.client-ip=209.85.221.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="dtz8Sp5I"
-Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-367963ea053so3157614f8f.2
-        for <linux-bluetooth@vger.kernel.org>; Mon, 08 Jul 2024 02:39:45 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="SErDOH9d"
+Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-367a3d1a378so2382381f8f.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 08 Jul 2024 02:39:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1720431584; x=1721036384; darn=vger.kernel.org;
+        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1720431585; x=1721036385; darn=vger.kernel.org;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=+wMk/+AGyNt4bDxpLcLZIFlxLQBN4IY/9GGT45s9v7Q=;
-        b=dtz8Sp5Iw0nqkHiWFrqt/9gcEvFcd2G55nyW/N5Bhjhixp1LU47ZPHeT2vSw2xS/xP
-         XkGP0WQlS234aHIHiX41nVkAVoyJWDhcNvDhDPie+EJROCN+JdkcgGYYvarWTzfVDf/n
-         YXKSKkvy5mNdWdhVEqAy8qoSW8nq2UiBOFzqed98PYKEEZoK+/k/i64MgOkPD+CkeBoO
-         Idj9nXtQ4O7RN7rkeYn6dMf0Bc1sDhykCnQmy1dEPpLCWFUrvj12bKfZhkI6bJY3yreK
-         oLI2UV3dIxoECwLdvFZP4163mIiJkdnSswVVMb2oi3bUK7Z8ezdayuMqNBwQMZXax/qb
-         Povw==
+        bh=lbzSJeNQsSW6BDY22LhQfP18YhdOxJT9Cx9nfUVGoF0=;
+        b=SErDOH9dJVo1snJXjQ4awuMor3ZwH588foZC6wCspgnF5jNw1RkegMRF0D6kDMcUPV
+         jyrAVX+Zrkd2unJ2YrytJJDqZjPag/rj244eUUOJT6DW27h3TE48PbLV+fWNuRCyiVOj
+         ob2Dnphh8T+m5akCySz2I3As+Oq5IkpnSREJZosf8nADE5Nj/3pzWUk4s6Kb/X6Zk/m3
+         skJQo3zZWMRQsVGWBRivPaDymZYjE+qmlJFTq/rjJgADvq/xfq8oGc+MEjvUzC7S1bAq
+         WhrpbG82xVrzyc2m0J/VBbffaHcNqoO5L8Cl0PNv98MwDT4fZNjUlm0RjaQO5cY9L0Dt
+         1+lQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720431584; x=1721036384;
+        d=1e100.net; s=20230601; t=1720431585; x=1721036385;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=+wMk/+AGyNt4bDxpLcLZIFlxLQBN4IY/9GGT45s9v7Q=;
-        b=jRAPtuzTcxOemj1+Mb4yao4lf6s5bRvYK0XjeJBIhlxatI12CIMO5M2zx/I3m9JJOf
-         zL+WYLkX711GzMtB3+J50xYOcr4/Lx2dQyehVP/VQHJcqub8wceV/JV66zxIUdV5te6v
-         b7SNArUhFK+IhXZ1uKpVH4j54nnLprc6wsPSE1l+UuGg2jLDfu/i7H7jbrjZCeIUCL1/
-         YIgyJsBzCbhcXH79dJZl9YPsNICn0nh38VG00cgpYQvYkbfwjOEWJXaS14PEpkjboV0S
-         wUOnwDcA88G2x1nFDxknam5ozIHOPYJBaxMgb/6qNdSspG28E+yGSdqDq3+hCbRiXcYm
-         NFOg==
-X-Gm-Message-State: AOJu0Yx7Wmf/Qh7Ax34QoeghBS0MhjhOvw08bmCOAoh2nsYOwH/s6XvY
-	M5q4y5H7gn8wpYD3RiXobEeI8vEjR2hZl+/0Fj/lAoL6jF+HlBcJIdRczhcHn5A=
-X-Google-Smtp-Source: AGHT+IFcyUpprfbmsd5SYROkiNYBfnZ+6x0Sv34fVe2UaJqaxlr+YqcvmIOx8jSykFbG7IGRdR9Pbg==
-X-Received: by 2002:a5d:4b0b:0:b0:367:8e68:4472 with SMTP id ffacd0b85a97d-3679dd3182bmr9827109f8f.34.1720431584099;
-        Mon, 08 Jul 2024 02:39:44 -0700 (PDT)
+        bh=lbzSJeNQsSW6BDY22LhQfP18YhdOxJT9Cx9nfUVGoF0=;
+        b=ZqiXlXjxYCZ/9qAeXwIbSM6CDOCL4ui28B9AV+KBzCTNmlhn2LOQsJp6+j1VlNI36P
+         TWacr42qqQENeRpEKKu8tgU4hbddmZcnOXdvVonatvQWwZqHQVGeLjNHNMn9vzNua0sG
+         f5GRJz3MQZUavpYi+OgQOuiJyxKOdj29eoCRkUfmOCdyB1TrI1I2Uf9TN/EwhzzcrWtV
+         xbTwWkb6RH41eV8E5wO+zVGnYy5zRnubWz6FixfPOKSFR5e2AbLPCN5oktP/dZldOzNw
+         v232QQkxXKVea1yeZ7/ZzlAaH3zXYj9cyXlvsPWcvi+0k7vH6tAo+4qWFfZRccr00tPt
+         JslA==
+X-Gm-Message-State: AOJu0YyDwsf6/bIuOln5oicWTIHVV6uKUiqe2FzNZCquJGBlrfR0I+GA
+	wOO3fx5aOFxpee1BG4Aae7oioIQ5j09Ls9hq5KoVVT8kU0LWJA3e1dVbH/my68g=
+X-Google-Smtp-Source: AGHT+IEl5qRkNTOR4GKajTLHbuSJY6ozJEojGR7Z4SW7a5Wkxcjsc3iN6S+tnPTQJhl+YGt6K2OtbQ==
+X-Received: by 2002:adf:f54d:0:b0:367:9d4e:8861 with SMTP id ffacd0b85a97d-3679dd71bcbmr9010272f8f.57.1720431585653;
+        Mon, 08 Jul 2024 02:39:45 -0700 (PDT)
 Received: from [127.0.1.1] ([2a01:cb1d:dc:7e00:a2a3:9ebc:2cb5:a86a])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-36789fd7a0esm15457779f8f.104.2024.07.08.02.39.42
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-36789fd7a0esm15457779f8f.104.2024.07.08.02.39.44
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 08 Jul 2024 02:39:43 -0700 (PDT)
+        Mon, 08 Jul 2024 02:39:44 -0700 (PDT)
 From: Bartosz Golaszewski <brgl@bgdev.pl>
-Date: Mon, 08 Jul 2024 11:39:26 +0200
-Subject: [PATCH v2 3/6] Bluetooth: hci_qca: unduplicate calls to
- hci_uart_register_device()
+Date: Mon, 08 Jul 2024 11:39:27 +0200
+Subject: [PATCH v2 4/6] Bluetooth: hci_qca: make pwrseq calls the default
+ if available
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -63,7 +63,7 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20240708-hci_qca_refactor-v2-3-b6e83b3d1ca5@linaro.org>
+Message-Id: <20240708-hci_qca_refactor-v2-4-b6e83b3d1ca5@linaro.org>
 References: <20240708-hci_qca_refactor-v2-0-b6e83b3d1ca5@linaro.org>
 In-Reply-To: <20240708-hci_qca_refactor-v2-0-b6e83b3d1ca5@linaro.org>
 To: Marcel Holtmann <marcel@holtmann.org>, 
@@ -81,83 +81,98 @@ Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
  linux-arm-msm@vger.kernel.org, 
  Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
 X-Mailer: b4 0.13.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1766;
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2211;
  i=bartosz.golaszewski@linaro.org; h=from:subject:message-id;
- bh=52wmj4Bj2obnZ36+fvA6vsWMlR99Bm4H2IDTt7Bh4Aw=;
- b=owEBbQKS/ZANAwAKARGnLqAUcddyAcsmYgBmi7PZzYUeTfB4CnDDPW26QWC+bYtdw//QtmPD7
- T2u7KLvnrOJAjMEAAEKAB0WIQQWnetsC8PEYBPSx58Rpy6gFHHXcgUCZouz2QAKCRARpy6gFHHX
- ckWgD/4pDxMWHk08ljr00ikxuNLyLsxizZQccuDw+iM1mSLUIMKKDrrBFBxLdQg7ILxZt+p5oGp
- MLoNOwPremYIpMOh3BtarmOZrPiqNUcqSgymEUWxnXEP4B7Sl/BxGs56M/aPLH+ln76za8gm5F0
- sLSqHf3xTOG8ZEGYkG1of5Zv1CXWysfWJguzVbXjQ0k5jjLmq3iyTDdx0iPgvPXMfAHJylhis38
- wFo98KI6p6ik2vcXyTFHtyjh/HxjS6bivWISyVh6lCTHXDbUEzBSECUoyrjIw/82EsKQrOAPmu/
- kLKeHb4XCh5IaeWYwICAxNPp9JhaQUgHgX138mMwHBkmyRhfB61OL6RASplOjjmvf70eTe/1HaX
- YKXWC1UQPisiI9NpiGcJbJOQ0dVRgKojgoSxVZMZ9QNY1iWAKEwMD2iitQwi8Wq35idjKCG1wef
- fSrJWdO5es0HJmfDgIAULpPdVZKLT5fF97lLlZqG7zro0IU7PoE4WlDkOs2f0jbRsX+k2J7kNbY
- 2RqH9Dqp69P36jiRv9PXxKCE4AewFYg7MWfEsO/tOoG+XGlxpoWn0woREU0ho5UKipwP/TiIuBi
- grRgh2Q/9viEQ68NKDbQaCGp3q562PyCGauMf8XynRGE+jPjQB8HWBsixhCKXIlJUMSpeMML721
- HaxSBHOUrqAjbuw==
+ bh=YUOv7wdZyiorabeRdWnlp2V5SHpY845uYUMmcejkano=;
+ b=owEBbQKS/ZANAwAKARGnLqAUcddyAcsmYgBmi7PZ+RB40ZQyBS0g7HDgQEYZ0qXBtWMNjrW6/
+ BwvdXImwQ2JAjMEAAEKAB0WIQQWnetsC8PEYBPSx58Rpy6gFHHXcgUCZouz2QAKCRARpy6gFHHX
+ cpQJD/9Ngt5Jfe6naIv44FYy15H41iRbjOXcidq3MvaDfyb/X0LWq95WSyWjOIdCtJwLmxfEcDz
+ LiXuGwQ7SMBm+JTBH0MXVFwPeKfEHoG1EywmXIaEU54tf8A58j+jJj7s6IrBCOpmV7ewzeNzLPm
+ DSAut5BbZqCKq2ptP/FdM8ANKK+ybUrpebilbEt3nfj+tBLTPMOW+4DwmdY7Tpty/2NMjr4O+9I
+ oJHbPKjYWhrwpQlsNkkO0Pc3kVUI0OeIUnawbIpmcyKMBbKu3j6o/QnxjpgbV4iLPPYuoOsDppt
+ u9En7oeNFDIC8tbNFMdcdxUphEyOJIno+RTzXZCdWxaq6nAqFuqHp8wLV5QBfYllE8zuriBdm7W
+ 3dbFaRxL6bsiO79QZ4B1PDFjM4UOwyom8dKg9fsA7Ct7PEK1+KawolMlxnSMirM+ziWoZGqsPn6
+ 8zTEq/r0Y60dhBFp+WepiQnvjVbH3pnY2oQ4gGhFPTpSzrcDLWA6Gpcw3/4/aK0CaseIgBh6JRy
+ DgbWmRuvyzTH67hrv0OQ+ocnqqA3Iz0uk19FRnoKOBGiedOsgdM9tJueY59erz7TS8wiaxyENtD
+ wq/HP2vKSkuTEyMvdmVPVOocURtsmnLEtytQIE5R4+rKEZRxT+33KxzQGjPET9ggzgPoSOU7Mbs
+ qWKNEHqNLKoErtA==
 X-Developer-Key: i=bartosz.golaszewski@linaro.org; a=openpgp;
  fpr=169DEB6C0BC3C46013D2C79F11A72EA01471D772
 
 From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
 
-Now that all three branches of the switch end up doing the same thing,
-we can move the call to hci_uart_register_device() past it and unify the
-error message.
+If the device has a power sequencing handle, use it first. Otherwise
+fall back to whatever code already exists.
 
 Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
 ---
- drivers/bluetooth/hci_qca.c | 23 ++++++-----------------
- 1 file changed, 6 insertions(+), 17 deletions(-)
+ drivers/bluetooth/hci_qca.c | 24 +++++++++++++-----------
+ 1 file changed, 13 insertions(+), 11 deletions(-)
 
 diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-index a34c663e337c..48e1b67577be 100644
+index 48e1b67577be..9d9553552ee1 100644
 --- a/drivers/bluetooth/hci_qca.c
 +++ b/drivers/bluetooth/hci_qca.c
-@@ -2396,12 +2396,6 @@ static int qca_serdev_probe(struct serdev_device *serdev)
- 			dev_err(&serdev->dev, "failed to acquire clk\n");
- 			return PTR_ERR(qcadev->susclk);
- 		}
+@@ -1718,6 +1718,7 @@ static int qca_regulator_init(struct hci_uart *hu)
+ 	 * off the voltage regulator.
+ 	 */
+ 	qcadev = serdev_device_get_drvdata(hu->serdev);
++
+ 	if (!qcadev->bt_power->vregs_on) {
+ 		serdev_device_close(hu->serdev);
+ 		ret = qca_regulator_enable(qcadev);
+@@ -1800,18 +1801,8 @@ static int qca_power_on(struct hci_dev *hdev)
+ 	case QCA_WCN6750:
+ 	case QCA_WCN6855:
+ 	case QCA_WCN7850:
+-		ret = qca_regulator_init(hu);
+-		break;
 -
--		err = hci_uart_register_device(&qcadev->serdev_hu, &qca_proto);
--		if (err) {
--			BT_ERR("wcn3990 serdev registration failed");
--			return err;
--		}
- 		break;
- 
  	case QCA_QCA6390:
-@@ -2409,12 +2403,6 @@ static int qca_serdev_probe(struct serdev_device *serdev)
- 							   "bluetooth");
- 		if (IS_ERR(qcadev->bt_power->pwrseq))
- 			return PTR_ERR(qcadev->bt_power->pwrseq);
+-		qcadev = serdev_device_get_drvdata(hu->serdev);
+-		ret = pwrseq_power_on(qcadev->bt_power->pwrseq);
+-		if (ret)
+-			return ret;
 -
--		err = hci_uart_register_device(&qcadev->serdev_hu, &qca_proto);
--		if (err) {
--			BT_ERR("qca6390 serdev registration failed");
--			return err;
--		}
+-		ret = qca_port_reopen(hu);
+-		if (ret)
+-			return ret;
++		ret = qca_regulator_init(hu);
  		break;
  
  	default:
-@@ -2447,11 +2435,12 @@ static int qca_serdev_probe(struct serdev_device *serdev)
- 		if (err)
- 			return err;
+@@ -2149,6 +2140,7 @@ static void qca_power_shutdown(struct hci_uart *hu)
+ 	unsigned long flags;
+ 	enum qca_btsoc_type soc_type = qca_soc_type(hu);
+ 	bool sw_ctrl_state;
++	struct qca_power *power;
  
--		err = hci_uart_register_device(&qcadev->serdev_hu, &qca_proto);
--		if (err) {
--			BT_ERR("Rome serdev registration failed");
--			return err;
--		}
-+	}
-+	
-+	err = hci_uart_register_device(&qcadev->serdev_hu, &qca_proto);
-+	if (err) {
-+		BT_ERR("serdev registration failed");
-+		return err;
- 	}
+ 	/* From this point we go into power off state. But serial port is
+ 	 * still open, stop queueing the IBS data and flush all the buffered
+@@ -2166,6 +2158,13 @@ static void qca_power_shutdown(struct hci_uart *hu)
+ 		return;
  
- 	hdev = qcadev->serdev_hu.hdev;
+ 	qcadev = serdev_device_get_drvdata(hu->serdev);
++	power = qcadev->bt_power;
++
++	if (power->pwrseq) {
++		pwrseq_power_off(power->pwrseq);
++		set_bit(QCA_BT_OFF, &qca->flags);
++		return;
++        }
+ 
+ 	switch (soc_type) {
+ 	case QCA_WCN3988:
+@@ -2227,6 +2226,9 @@ static int qca_regulator_enable(struct qca_serdev *qcadev)
+ 	struct qca_power *power = qcadev->bt_power;
+ 	int ret;
+ 
++	if (power->pwrseq)
++		return pwrseq_power_on(power->pwrseq);
++
+ 	/* Already enabled */
+ 	if (power->vregs_on)
+ 		return 0;
 
 -- 
 2.43.0
