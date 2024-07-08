@@ -1,33 +1,33 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F0E313F45F
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F13113FD69
 	for <linux-bluetooth@vger.kernel.org>; Mon,  8 Jul 2024 14:50:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720450232; cv=none; b=U9WY++pc8QEP+tQPuA5NG7aEUJtMOAtRf8Tp9IMSEhIrAu3KRu5WVMJx4iPaVaY4lS6XEqzIR58vESHOsA3TdZ/e3OlIJ5A5hHuT4NKC7yhy8UMLrrWBOCTR91+UbkKC2w1Bo6IH1ztJG/XkRIjHQ3EvVjkUZ0fT0yI//5X0q9Y=
+	t=1720450232; cv=none; b=oLCws+t7LnDGvq057QY6Nkh34Bho+qXSQQfh1avEGdC0S9DQ/yHd0Ga2eutz+G2pIUyUQWR7IH9En5dDSXwLhEiYVymAsIazmxY8Kx9NDYDQw43YGfazMNVNEkDrAyww4k/bqPB3XBXiMqunU2n9LNOm7Ws7cAsGmtqRvjUvrcg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1720450232; c=relaxed/simple;
-	bh=6DrZP65XbJK31wksWcMeLQ0puBPVjOgIoJTPP/PP1Fg=;
+	bh=eYrAuriSoMqpfaLEQWBhRAQr6WrfFRMcsfbPcAaEmmI=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=NQ68Ceynt1ZQPjMtJ4AWcqcyWn0vEjfZ+ltJI3DQuXyd/1CJ7dShzt25InVarUJx3t8kdGUrMcDCHF3GBJYTG6ED3467aormdfaK51j/gt/ic7RkfZe0wgAK8qPoBVCNj023nyKCzOHSofEVQAZk28DsLJAVqRwR651671quGN8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pCW9UT2K; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=hasKmFoVDNMeCyzx11i/iYESuYi781LlT9uFcbiTbPxAwxX7NArabb6cxPMB75x5DjhavXPf2o0iEyRDFHbiEYq0Jmtz1dnm7ekUOUaEglkPn9y+G1ZxwEShh2L4fM8LA/Pv4lj/1kzW5ktsTyA428CL1QvahzQU5NakITGxKNw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=H4Jerc1v; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pCW9UT2K"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id C3B07C4AF0C;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="H4Jerc1v"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id C1A42C4AF0A;
 	Mon,  8 Jul 2024 14:50:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1720450231;
-	bh=6DrZP65XbJK31wksWcMeLQ0puBPVjOgIoJTPP/PP1Fg=;
+	bh=eYrAuriSoMqpfaLEQWBhRAQr6WrfFRMcsfbPcAaEmmI=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=pCW9UT2KwIpd9gYTE5gVE/0harptYN0+4JmwJnPdlaODw9epFtc/rwBDMPOt+C4Bp
-	 Qr3fNquVS7Opw0d28JYVxrFnsRNu7nsR1WWm/nUlUQGFlBRhFSxNBy9G5Pvr5TMw+r
-	 14ghkU8PToyMVQ+gaQLLAkCM7TvP/uafbwwaCWQMkvk7+QE7SuL26Ie7pevXu0Kkg3
-	 J+IhE5bgJ0HjtljoxLYhCqDpFkPXnf31C1BvueBhN7+Tee8c4sVqxVyzW+DcyaJYyq
-	 TuKwJNFJ2PyIycK3X51ZOQmdvPPzuTiaiNBezm5PP0eoQ2/Gf4h99VCal5OT9KQhxD
-	 n/P261RC6Ke5g==
+	b=H4Jerc1vowZsUaQqfoQzCcVuhct6/rCKlPCGAiEpOKCzLWHQ2cC9n0wWbMwlCgZwm
+	 TA5MjDhF9VQGpAX51ewxACUdkvpLvUKyBOZX2lYDTr0vvnDplRNe4TcvPORjanU9jV
+	 xYCWAK5P11vxbk0mCJeTL8zzH+x0TuMQgM1K+18tUbEUd+j2xg/F4jzj0XT/6zeXqW
+	 arsqjRPZvnXRQmbFRPHFSSOVXqzCeSZzCDxwOonsaQmooHwgk0CY3CiioWB022ObK4
+	 dt3Ye09LnVPC7izP5853PzJx7JhF/D/8dS7Wd01f2t2hSLkvY+mUByWDsjgq6VH1mg
+	 Vk/sYWkzGmmBg==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id B0F6DDF3716;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id AB128C433E9;
 	Mon,  8 Jul 2024 14:50:31 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -37,14 +37,14 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH BlueZ v1 0/5] fix errors found by SVACE static analyzer #2 
+Subject: Re: [BlueZ v2 00/11] Fix a number of static analysis issues #5
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <172045023172.5742.10118758304712401185.git-patchwork-notify@kernel.org>
+ <172045023168.5742.15061982471514672720.git-patchwork-notify@kernel.org>
 Date: Mon, 08 Jul 2024 14:50:31 +0000
-References: <20240704180752.94264-1-r.smirnov@omp.ru>
-In-Reply-To: <20240704180752.94264-1-r.smirnov@omp.ru>
-To: Roman Smirnov <r.smirnov@omp.ru>
+References: <20240705085935.1255725-1-hadess@hadess.net>
+In-Reply-To: <20240705085935.1255725-1-hadess@hadess.net>
+To: Bastien Nocera <hadess@hadess.net>
 Cc: linux-bluetooth@vger.kernel.org
 
 Hello:
@@ -52,29 +52,50 @@ Hello:
 This series was applied to bluetooth/bluez.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Thu, 4 Jul 2024 21:07:45 +0300 you wrote:
-> Several bug fixes.
+On Fri,  5 Jul 2024 10:57:28 +0200 you wrote:
+> Fixed review comments in:
+> gatt-server: Don't allocate negative data
+> shared/shell: Free memory allocated by wordexp()
+> tools/mesh: Fix integer overflow due to cast operation
 > 
-> Roman Smirnov (5):
->   obexd: add NULL checks to file_stat_line()
->   shared/shell: prevent integer overflow in bt_shell_init()
->   tools/isotest: limit the maximum possible data_size
->   tools/rctest: limit the maximum possible data_size
->   settings: add NULL checks to gatt_db_load()
+> Bastien Nocera (11):
+>   gatt-server: Don't allocate negative data
+>   shared/shell: Free memory allocated by wordexp()
+>   shared/shell: Fix fd leak if -s is passed multiple times
+>   btsnoop: Fix possible negative memcpy length
+>   sdp: Fix possible null dereference
+>   sdp: Fix mismatched int casting
+>   emulator: Fix integer truncation warnings
+>   gatt-server: Fix integer overflow due to cast operation
+>   mesh: Fix integer overflow due to cast operation
+>   tools/mesh: Fix integer overflow due to cast operation
+>   unit/ringbuf: Fix ineffective guard due to signedness
 > 
 > [...]
 
 Here is the summary with links:
-  - [BlueZ,v1,1/5] obexd: add NULL checks to file_stat_line()
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=0fda2dd545fc
-  - [BlueZ,v1,2/5] shared/shell: prevent integer overflow in bt_shell_init()
+  - [BlueZ,v2,01/11] gatt-server: Don't allocate negative data
     (no matching commit)
-  - [BlueZ,v1,3/5] tools/isotest: limit the maximum possible data_size
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=c389209ce455
-  - [BlueZ,v1,4/5] tools/rctest: limit the maximum possible data_size
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=8e495f00cded
-  - [BlueZ,v1,5/5] settings: add NULL checks to gatt_db_load()
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=804696dee795
+  - [BlueZ,v2,02/11] shared/shell: Free memory allocated by wordexp()
+    (no matching commit)
+  - [BlueZ,v2,03/11] shared/shell: Fix fd leak if -s is passed multiple times
+    (no matching commit)
+  - [BlueZ,v2,04/11] btsnoop: Fix possible negative memcpy length
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=8de21f74c5f3
+  - [BlueZ,v2,05/11] sdp: Fix possible null dereference
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=0de4b9f71eb9
+  - [BlueZ,v2,06/11] sdp: Fix mismatched int casting
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=0b52ecca60ea
+  - [BlueZ,v2,07/11] emulator: Fix integer truncation warnings
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=1d73dc6a1a9a
+  - [BlueZ,v2,08/11] gatt-server: Fix integer overflow due to cast operation
+    (no matching commit)
+  - [BlueZ,v2,09/11] mesh: Fix integer overflow due to cast operation
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=249d2120bd90
+  - [BlueZ,v2,10/11] tools/mesh: Fix integer overflow due to cast operation
+    (no matching commit)
+  - [BlueZ,v2,11/11] unit/ringbuf: Fix ineffective guard due to signedness
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=c44a2a233d1b
 
 You are awesome, thank you!
 -- 
