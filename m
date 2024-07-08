@@ -1,174 +1,150 @@
-Received: from mail-ej1-f44.google.com (mail-ej1-f44.google.com [209.85.218.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CFA937141
-	for <linux-bluetooth@vger.kernel.org>; Sun,  7 Jul 2024 16:50:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85D35376F5
+	for <linux-bluetooth@vger.kernel.org>; Mon,  8 Jul 2024 06:30:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720371042; cv=none; b=epm78WSAo8D/vxF7pBffjmfcvrJE3Gj8aTMpHS9AQW+VN94Tp4e9S7lCqqcUzlKwRXma7CjguLOtWXx4CSSCnY47bGcecpe1wUbRoWqthYTZdzUH1NYuGv5vr9/Fw5eHeGMxeXQzPe4aShUuHBxNNVHbHW5HVikpidWFSaYdhdo=
+	t=1720420240; cv=none; b=OzhCYJPaXKkga1BrKpLaloraLXGCH/efLqEJc5fC0n4QuZE1a4DoFUaSbKYQYvcyPxNMdeW+dHxoPVxjk6AeN+FHTndRL1aR33UpYkL5Ff5J04b5L6/ONQ2k47RiHpH4/uGckPvy4EJoQVHuw1IU6FzSLy8u+V9MoOPThxUgP28=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720371042; c=relaxed/simple;
-	bh=oNPqD/Y4tBYDQEM1KgmJpS4rtH5kQbCYwBubv0qtR2s=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=Ii2Nrn9WtHYgSOtDiW9LuFeld/WHz2PXjFaxEwia2ps25/XJv80jMNgtu/9qAUUHxPUJB7CLm8C4sLJ5bBc4lKBMhpumLepgEjhnLXdxCdO2K986fyIGYCN8PQ/j82l5o+KIUSmggOBsSSMR+9zPgO/+xkDg9IKENDvPNxPiH68=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dEPPqL12; arc=none smtp.client-ip=209.85.218.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1720420240; c=relaxed/simple;
+	bh=3vpFrdEigbBA+1O/BO0Qm1es5FRfrLbofwTWeF6iifo=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:CC:References:
+	 In-Reply-To:Content-Type; b=HhLoHMDXPdyJu3VA8AvYcwD9vX1qleujESElmKsCCWGRWwaU+p/ISXYnCBWAoFRugdbRXbWNm1fgzG9UNq5II5AFf9fgWT8wG+HxQoZaWDHaQonbt6SiWNdFATkpvBUfZXDXXBdpmvZ78ookJQ8P8uwKEOtIIUJUSCDWOcfUGe8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=ZVGYPV/U; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dEPPqL12"
-Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-a77e5929033so116901566b.0
-        for <linux-bluetooth@vger.kernel.org>; Sun, 07 Jul 2024 09:50:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1720371039; x=1720975839; darn=vger.kernel.org;
-        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=0dKYs+74Zq7cK3RyE8IxiF4wk3/5Y16clgqYV2WSSM4=;
-        b=dEPPqL12S0HP/+MvlYUiyV3kKYN7s+98N9QKK8CHZiWvPvo1w/8JO98jtLrc9dHv/Q
-         Zki3PPWUXsZ8grwFPm1NwqHawoIN/nr1p3lHEOMBslCoQw+fOL4ifTE/RK5Ywg5AbDcc
-         5D7V68m1LRTPWO5sXV7gGq/8zXBfU4a7cj7MM3WEYGUxs5k3kaAZSCZpvlMRFb/dnRDC
-         F6PaKtse8jHqdgor3Lw21umyPdggMlbh6kjYVCWgg3kwc7Mu6l+PFCxRpQCdkHSMFgy+
-         8UHN1GAtR/B/M/t3RQXX/xWYYLnW5ipTFhlumF7cmgVjQyNYQkQUGFQ7cEvg6bRNKSgC
-         FBaw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720371039; x=1720975839;
-        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=0dKYs+74Zq7cK3RyE8IxiF4wk3/5Y16clgqYV2WSSM4=;
-        b=JQ+gsgVh3tPrZHqekxUIN0i9dXK3cot71ZJRbEqPJAvsgRy6Ptogl+Ii/CG4A9C0UD
-         zRFfvDRS7Fnp64rGm9MotLpL9eZzh6F2BKnvufyiIEJAT7EdPI7L8evookNwhP+BnyUB
-         Lr4AT0qed63gpPP7TidpSMrSQM56VQxWNjUOuPflVlDa05ZdNYmZMNSVRWKv5gHQQh0i
-         Cr5kwRh9b9OkGQLxdPx7GxiApMc01KAS6OaiYfrzJ6xgH1jt7u9YkcGhXwOLPnXloUxi
-         iMIx8mepV12YsmMSju9Qv3ShRO2+CPnf+eR1/p2/lPQHP8D7yOv4XyKGm/gLqPxghzpN
-         qF+Q==
-X-Gm-Message-State: AOJu0YymBXFE91pB8giVluel4VkLfBUYWK4GVHBYFuExvyFteuxsNgda
-	bYXNf+/ji0EOQy98/AG31v5TeqlYxoVVUB2/mQ+CSZpA64/GTK4ALbZmSOIaWQ/c38fhvzFjitb
-	DzDX0jp3p0XwBKE6lywN6jIR7oNVXdFzY
-X-Google-Smtp-Source: AGHT+IHzWTCjRh2V+m2azUVGTIVB9OouHFd5E/yaA409xbBK1MjnJhGksmOu5LRwdJVaWfXGIwUEHaXUpd9u9DuD+Ro=
-X-Received: by 2002:a17:906:6c8a:b0:a77:e391:c10e with SMTP id
- a640c23a62f3a-a77e391c1b1mr222545366b.59.1720371038901; Sun, 07 Jul 2024
- 09:50:38 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="ZVGYPV/U"
+Received: from pps.filterd (m0279863.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4682G7nR016208
+	for <linux-bluetooth@vger.kernel.org>; Mon, 8 Jul 2024 06:30:32 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	5bLDS1EvjOBUkpS89Z54qxQbG20Sh04eKEUD8ykR2Nk=; b=ZVGYPV/UqM28wDh7
+	VkjzIkZsHTZlb+Vd4D/f3htF2bPcZLNPS/4JyahcatJSMg1bewl29UQsvyZ6w21+
+	0RbBVlG/WUVL3tFoOfaxEyV+FIjD4b6BFN7vTu3GYox+euZGE2Z2NpcxbUaUmYed
+	Ik0lfBLgumKHPAHgNv3n2oDURHIWSyIO0ZkrExZOFxP1uoaUxAS9b/6N0rCRPo4p
+	7DraWkQgELJ4sb3DHdugFsKXo2n9Ep0zguvoEiVOJN5RBcffgLLPlKZTzEyFqnZW
+	QjWqVppOW3WaOe0jBFNjHczZUvzcWNAmlvXtXNz6z8Ce6s1tCf0yuE1lVn6cymqW
+	lDSqmQ==
+Received: from nasanppmta02.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 406x512s0p-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <linux-bluetooth@vger.kernel.org>; Mon, 08 Jul 2024 06:30:32 +0000 (GMT)
+Received: from nasanex01c.na.qualcomm.com (nasanex01c.na.qualcomm.com [10.45.79.139])
+	by NASANPPMTA02.qualcomm.com (8.17.1.19/8.17.1.19) with ESMTPS id 4686UVhj016181
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <linux-bluetooth@vger.kernel.org>; Mon, 8 Jul 2024 06:30:31 GMT
+Received: from [10.218.28.94] (10.80.80.8) by nasanex01c.na.qualcomm.com
+ (10.45.79.139) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Sun, 7 Jul 2024
+ 23:30:29 -0700
+Message-ID: <655fe5fa-30f1-4b30-83ab-3c55cb1db3ea@quicinc.com>
+Date: Mon, 8 Jul 2024 12:00:26 +0530
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Patrice Duroux <patrice.duroux@gmail.com>
-Date: Sun, 7 Jul 2024 18:50:27 +0200
-Message-ID: <CAGKjw9+40dSve_4u5RgUQUVXykESDsQ5kktOFN-EV-6o5NnUKQ@mail.gmail.com>
-Subject: no longer able to connect to a Plantronics headset
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH BlueZ v5] obex: Move size emit signal to plugins instead
+ of obex.c
+From: Amisha Jain <quic_amisjain@quicinc.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: <quic_mohamull@quicinc.com>, <quic_hbandi@quicinc.com>,
+        <quic_anubhavg@quicinc.com>
+References: <20240703093133.9423-1-quic_amisjain@quicinc.com>
+Content-Language: en-US
+In-Reply-To: <20240703093133.9423-1-quic_amisjain@quicinc.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nasanex01c.na.qualcomm.com (10.45.79.139)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: ffj2YSfg2iVaguPWL5Jr68lQtP9kwQz0
+X-Proofpoint-ORIG-GUID: ffj2YSfg2iVaguPWL5Jr68lQtP9kwQz0
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-07-08_02,2024-07-05_01,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 adultscore=0
+ suspectscore=0 impostorscore=0 mlxlogscore=999 mlxscore=0 bulkscore=0
+ priorityscore=1501 malwarescore=0 lowpriorityscore=0 phishscore=0
+ spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2406140001 definitions=main-2407080049
 
-Hi,
+Hi Team,
+Please review the below the change.
+Do comment for any concerns.
 
-In the past (same laptop and headset) it has worked but it is no more
-working after upgrading my current system (more details to follow).
-The device scanning is able to list a lot of devices in my environment
-but not the desired one and finally I used btmon to get more output.
+Thanks,
+Amisha
 
-Any help would be appreciated.
-
-Regards,
-Patrice
-
---
-$ uname -a
-Linux kos-moceratops 6.9.7-amd64 #1 SMP PREEMPT_DYNAMIC Debian 6.9.7-1
-(2024-06-27) x86_64 GNU/Linux
-
-$ sudo dmesg | grep -i blue
-[   11.381833] Bluetooth: Core ver 2.22
-[   11.381853] NET: Registered PF_BLUETOOTH protocol family
-[   11.381854] Bluetooth: HCI device and connection manager initialized
-[   11.381857] Bluetooth: HCI socket layer initialized
-[   11.381859] Bluetooth: L2CAP socket layer initialized
-[   11.381863] Bluetooth: SCO socket layer initialized
-[   12.124487] Bluetooth: hci0: Bootloader revision 0.3 build 0 week 24 2017
-[   12.125484] Bluetooth: hci0: Device revision is 1
-[   12.125486] Bluetooth: hci0: Secure boot is enabled
-[   12.125487] Bluetooth: hci0: OTP lock is enabled
-[   12.125488] Bluetooth: hci0: API lock is enabled
-[   12.125489] Bluetooth: hci0: Debug lock is disabled
-[   12.125489] Bluetooth: hci0: Minimum firmware build 1 week 10 2014
-[   12.128514] Bluetooth: hci0: Found device firmware: intel/ibt-20-1-3.sfi
-[   12.128580] Bluetooth: hci0: Boot Address: 0x24800
-[   12.128581] Bluetooth: hci0: Firmware Version: 132-3.24
-[   12.194702] Bluetooth: BNEP (Ethernet Emulation) ver 1.3
-[   12.194705] Bluetooth: BNEP filters: protocol multicast
-[   12.194707] Bluetooth: BNEP socket layer initialized
-[   12.311050] Bluetooth: hci0: Failed to send firmware data (-19)
-[   12.311087] Bluetooth: hci0: sending frame failed (-19)
-[   12.311093] Bluetooth: hci0: FW download error recovery failed (-108)
-[   12.311139] Bluetooth: hci0: sending frame failed (-19)
-[   12.311154] Bluetooth: hci0: Reading supported features failed (-19)
-[   12.311157] Bluetooth: hci0: Error reading debug features
-[   12.311158] Bluetooth: hci0: HCI LE Coded PHY feature bit is set,
-but its usage is not supported.
-[12819.555606] Bluetooth: hci0: Bootloader revision 0.3 build 0 week 24 2017
-[12819.556628] Bluetooth: hci0: Device revision is 1
-[12819.556638] Bluetooth: hci0: Secure boot is enabled
-[12819.556641] Bluetooth: hci0: OTP lock is enabled
-[12819.556644] Bluetooth: hci0: API lock is enabled
-[12819.556646] Bluetooth: hci0: Debug lock is disabled
-[12819.556649] Bluetooth: hci0: Minimum firmware build 1 week 10 2014
-[12819.564727] Bluetooth: hci0: Found device firmware: intel/ibt-20-1-3.sfi
-[12819.564776] Bluetooth: hci0: Boot Address: 0x24800
-[12819.564777] Bluetooth: hci0: Firmware Version: 132-3.24
-[12821.811205] Bluetooth: hci0: Waiting for firmware download to complete
-[12821.811547] Bluetooth: hci0: Firmware loaded in 2194161 usecs
-[12821.811732] Bluetooth: hci0: Waiting for device to boot
-[12821.826744] Bluetooth: hci0: Device booted in 14765 usecs
-[12821.827778] Bluetooth: hci0: Found Intel DDC parameters: intel/ibt-20-1-3.ddc
-[12821.829646] Bluetooth: hci0: Applying Intel DDC parameters completed
-[12821.830657] Bluetooth: hci0: Firmware revision 0.3 build 132 week 3 2024
-[12821.832658] Bluetooth: hci0: HCI LE Coded PHY feature bit is set,
-but its usage is not supported.
-[12821.897877] Bluetooth: MGMT ver 1.22
-[12821.927208] Bluetooth: RFCOMM TTY layer initialized
-[12821.927213] Bluetooth: RFCOMM socket layer initialized
-[12821.927215] Bluetooth: RFCOMM ver 1.11
-
-$ sudo btmon
-Bluetooth monitor ver 5.73
-btmon[166569]: = Note: Linux version 6.9.7-amd64 (x86_64)
-
-         0.917019
-btmon[166569]: = Note: Bluetooth subsystem version 2.22
-
-         0.917020
-= New Index: 5C:80:B6:E9:D7:DD (Primary,USB,hci0)
-
-  [hci0] 0.917021
-= Open Index: 5C:80:B6:E9:D7:DD
-
-  [hci0] 0.917021
-= Index Info: 5C:80:B6:E9:D7:DD (Intel Corp.)
-
-  [hci0] 0.917021
-bluetoothd[166074]: @ MGMT Open: bluetoothd (privileged) version 1.22
-
-{0x0001} 0.917022
-> HCI Event: Connect Request (0x04) plen 10                                                                                                 #1 [hci0] 17.029619
-        Address: E4:22:A5:BC:E9:A3 (PLANTRONICS, INC.)
-        Class: 0x240404
-          Major class: Audio/Video (headset, speaker, stereo, video, vcr)
-          Minor class: Wearable Headset Device
-          Rendering (Printing, Speaker)
-          Audio (Speaker, Microphone, Headset)
-        Link type: ACL (0x01)
-< HCI Command: Reject Connection Request (0x01|0x000a) plen 7
-                                                                    #2
-[hci0] 17.029727
-        Address: E4:22:A5:BC:E9:A3 (PLANTRONICS, INC.)
-        Reason: Connection Rejected due to Unacceptable BD_ADDR (0x0f)
-> HCI Event: Command Status (0x0f) plen 4                                                                                                   #3 [hci0] 17.030438
-      Reject Connection Request (0x01|0x000a) ncmd 1
-        Status: Success (0x00)
-> HCI Event: Connect Complete (0x03) plen 11                                                                                                #4 [hci0] 17.112704
-        Status: Connection Rejected due to Unacceptable BD_ADDR (0x0f)
-        Handle: 65535
-        Address: E4:22:A5:BC:E9:A3 (PLANTRONICS, INC.)
-        Link type: ACL (0x01)
-        Encryption: Disabled (0x00)
-
-<... cut repeating the same ...>
+On 7/3/2024 3:01 PM, Amisha Jain wrote:
+> Instead of emitting the property "Size" from obex_put_stream_start(),
+> Call the function manager_emit_transfer_property() from plugins/*.c
+> wherever plugin has transfer object present.
+> Remove the code from obex.c which is generic for all profiles.
+> 
+> This change resolves the type mismatch issue when calling the
+> manager_emit_transfer_property from obex.c. We are passing
+> 'os->service_data' of plugin session type but the
+> manager_emit_transfer_property() expects the 'obex_transfer'
+> type, therefore size is not set properly and might cause
+> crash/disconnection.
+> 
+> ---
+>   obexd/plugins/ftp.c | 5 +++++
+>   obexd/plugins/opp.c | 5 +++++
+>   obexd/src/obex.c    | 3 ---
+>   3 files changed, 10 insertions(+), 3 deletions(-)
+> 
+> diff --git a/obexd/plugins/ftp.c b/obexd/plugins/ftp.c
+> index 874fe2b8b..127bb9aaf 100644
+> --- a/obexd/plugins/ftp.c
+> +++ b/obexd/plugins/ftp.c
+> @@ -175,6 +175,11 @@ int ftp_chkput(struct obex_session *os, void *user_data)
+>   
+>   	ret = obex_put_stream_start(os, path);
+>   
+> +	if (obex_get_size(os) != OBJECT_SIZE_DELETE &&
+> +				obex_get_size(os) != OBJECT_SIZE_UNKNOWN) {
+> +		manager_emit_transfer_property(ftp->transfer, "Size");
+> +	}
+> +
+>   	if (ret == 0)
+>   		manager_emit_transfer_started(ftp->transfer);
+>   
+> diff --git a/obexd/plugins/opp.c b/obexd/plugins/opp.c
+> index 777f5f8ed..74b2f805b 100644
+> --- a/obexd/plugins/opp.c
+> +++ b/obexd/plugins/opp.c
+> @@ -87,6 +87,11 @@ skip_auth:
+>   
+>   	err = obex_put_stream_start(os, path);
+>   
+> +	if (obex_get_size(os) != OBJECT_SIZE_DELETE &&
+> +				obex_get_size(os) != OBJECT_SIZE_UNKNOWN) {
+> +		manager_emit_transfer_property(user_data, "Size");
+> +	}
+> +
+>   	g_free(path);
+>   
+>   	if (err < 0)
+> diff --git a/obexd/src/obex.c b/obexd/src/obex.c
+> index 98d6245a4..370bfac9e 100644
+> --- a/obexd/src/obex.c
+> +++ b/obexd/src/obex.c
+> @@ -716,9 +716,6 @@ int obex_put_stream_start(struct obex_session *os, const char *filename)
+>   		return err;
+>   	}
+>   
+> -	if (os->size != OBJECT_SIZE_DELETE && os->size != OBJECT_SIZE_UNKNOWN)
+> -		manager_emit_transfer_property(os->service_data, "Size");
+> -
+>   	os->path = g_strdup(filename);
+>   
+>   	return 0;
