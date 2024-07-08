@@ -1,127 +1,84 @@
-Received: from mail-lj1-f177.google.com (mail-lj1-f177.google.com [209.85.208.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2ECB13C663
-	for <linux-bluetooth@vger.kernel.org>; Mon,  8 Jul 2024 14:45:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 314BE140363
+	for <linux-bluetooth@vger.kernel.org>; Mon,  8 Jul 2024 14:50:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720449914; cv=none; b=eN+xgPbfLeG6CeK7ynXkFYHqei6+kiu4WzHxb2sn1GDADVg6bNKDLNLvZHR+F6MBoiN/TJ+AqcN7IrUNjs5NUShW/ZLJ2bGoaOiyae5ywUtSqe0qYyuey1OGWXEKmi47mj4nqzw9rR82K9rKPgy+19eUj90AMuzmWNe7LJvyf0g=
+	t=1720450232; cv=none; b=FQAk7814JWQh4Mw7efJW7fnzD0iMLi7WQJtUHpu+HAnRDPAOVEnrpOCsA+dinGTC1cXhKQZCdQURFbzt9Az6QkpCYw0X8gO+BmaVmJN4y6gmXrUU3UkVmuvHM6aaiJF+RSJsskFN5jDABzXGiUVeOhJ4miSr679ETqOM2RgszYQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720449914; c=relaxed/simple;
-	bh=oF09ZgiYJv6kVhB2FbeukHX/6UBdFR5W+X1HqqV+t/c=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=MtyVeAXeMEA+R/wV6GgVtIau4CndCZhbvowxfBTZWqNFKoJTLhFxAQqZt5rWzFUlvzz2gcMqybNhbPryPUW/dSv2muD5eQZ6KAxKqSfHm7JNpzn5FwdqRn0HI0nCOU16SOJaigH5LoGBgPPhBAxvEbT3oAah/eUUeNGaNsTp8CA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=f6VFEoBD; arc=none smtp.client-ip=209.85.208.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1720450232; c=relaxed/simple;
+	bh=no/K6dn+3PRQmQh++fqtN2x1D1YExPXyNLKw6y4v25Y=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=htOaNS9Y3hBM8rnqbnZXM4fV0Km7PX2uGBM5cU6RQ0ags5qruu/oMTIAXKzjMGkv3NW0EN1VwnaEy/KI8GbrAgvdAFBzuUE0OKmr25mB7mQUHKjvsJGEEsI8MbY2FuMNhXFAIVHN5q+6k80ff3I4h8+bCRk39Zta/kUNCpKtyCQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=t6h12Rms; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="f6VFEoBD"
-Received: by mail-lj1-f177.google.com with SMTP id 38308e7fff4ca-2ee7a1ad286so41965511fa.2
-        for <linux-bluetooth@vger.kernel.org>; Mon, 08 Jul 2024 07:45:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1720449911; x=1721054711; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=2TG6bY8rbK8fpvQpcTXR5O9hURdykldAFVHwWpK/D0I=;
-        b=f6VFEoBDgcXve2/nhIaNgMFko9DIhMikYOQI/uj8eFtfp7qrO4fQzrSO28FpbTLNez
-         3gPj0kjh5MC6ZwVRqwP5cgkVu2HMDJEcqhwYVsdPrz8PEFn+HfmAL5RRu5Wtd7Q6Ki6w
-         VKbfiaeOnYwdIQhZrQbO6dUpjamxDS/Ge/H6hAAfoKqizAEXOMwq69M/81koKqbIO+Oz
-         5wuxSNJxyHLlTCePZNdQLLikIssAnicmFPpdx6h6/aJQpDBaXGRenstv1zj5AfEdQ3gS
-         wGbMxZuuBPaBDRJUfTolb3UtBkSNR93k68IzMpjZ+i9E/UYhESGeWSWcif5oM3oOTsd2
-         qEpQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720449911; x=1721054711;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=2TG6bY8rbK8fpvQpcTXR5O9hURdykldAFVHwWpK/D0I=;
-        b=MBVREHHShGlsTMFQCErcOqh2k/P+mirob03Zzk98AWQmVIwYfibHISPkSZ3wWfaR1f
-         3kDZ8ppra6v7404rfg7XVWQN1hVR++e8gmLbam23vvHCLVLR1xnFJ4vYBQ8G8zEet1vL
-         Tpb9c3D5HoNQvfRJsFGZMfTE+99T658Ei3upjkKM4DUHI4cPp2nkBHnTFPaP6zDcYeaR
-         AT6DhPlFCes9XN+kljpkOvF+gbkJ67Fd0tT1DkEA6y55gfzSiYxksfwC0YRi9ZnUiWz8
-         zcRvYJWxDDwcVTVBxXfHzmKie4JA3LLk+hRXen7t+N8limaG8cGE2/razvpyOsk32u9D
-         3ikg==
-X-Gm-Message-State: AOJu0YwlhfgC3bOfvAL8gexpVs5nBgXzrY8xUQVj7erWIFuKNIe5B8Ql
-	gwUWIwVbVNFeI5IFRfd4fbfTM72bCaHF7vp5KRj3H+MlAB2/d8uADH6Bvvi92mLh/3WZ+/JbMxB
-	5x193RAn4TSbls/3YOuBegcApIKQ=
-X-Google-Smtp-Source: AGHT+IF12ulAJBh9SXswhDOHJJx3yKLpSg6wEPtkTbqLb65sm1imBxHxXxO6VX5ojD8XMC/fTiV6edVDHlzEPCv9hT4=
-X-Received: by 2002:a2e:6e11:0:b0:2ee:8d05:db2 with SMTP id
- 38308e7fff4ca-2ee8eda81b9mr89052501fa.29.1720449910676; Mon, 08 Jul 2024
- 07:45:10 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="t6h12Rms"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id C8842C32786;
+	Mon,  8 Jul 2024 14:50:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1720450231;
+	bh=no/K6dn+3PRQmQh++fqtN2x1D1YExPXyNLKw6y4v25Y=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=t6h12Rmsny0j4Wm7tvf6pocxtSN4MO7Ky8vSaa0g1D+sMPRqmL62mDQksUpCZ//O1
+	 EE0MBWESH2NO2ssM8JvpNrwYyc4z795baNGk6PndvZ76QJGMSolDpwXNhIllmTQySR
+	 N959Y/WW443esoyHx4NWWalpMxcLogivdTaV6dSSegM1Tei4FZ68D4OKCZCcphHSEN
+	 M2i6QOD+cygxKlNV2zB2aBGha0aSq0mAMKbW/Gyh2H8gBKVdgcf22gEud66/as5T1u
+	 HMkjrmz7E0X0IcTVB++UCFZDaFf9jvpFncA6FjyvlCNb9h/qJf1iR0SMVVcon9YIls
+	 xK2ilIMfQRQJw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id B6A0FDF3714;
+	Mon,  8 Jul 2024 14:50:31 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240705085935.1255725-1-hadess@hadess.net> <20240705085935.1255725-2-hadess@hadess.net>
-In-Reply-To: <20240705085935.1255725-2-hadess@hadess.net>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 8 Jul 2024 10:44:58 -0400
-Message-ID: <CABBYNZ+dDvU4nUeCU+9VNfynmQ1iajp=SkD_oFf4F8wxWqsh9g@mail.gmail.com>
-Subject: Re: [BlueZ v2 01/11] gatt-server: Don't allocate negative data
-To: Bastien Nocera <hadess@hadess.net>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH BlueZ v2 0/5] fix error found by SVACE static analyzer #2
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <172045023174.5742.4150345566884002104.git-patchwork-notify@kernel.org>
+Date: Mon, 08 Jul 2024 14:50:31 +0000
+References: <20240705075709.26809-1-r.smirnov@omp.ru>
+In-Reply-To: <20240705075709.26809-1-r.smirnov@omp.ru>
+To: Roman Smirnov <r.smirnov@omp.ru>
 Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-Hi Bastien,
+Hello:
 
-On Fri, Jul 5, 2024 at 5:00=E2=80=AFAM Bastien Nocera <hadess@hadess.net> w=
-rote:
->
-> Set a lower-bound to the data MTU to avoid allocating -1 elements if
-> bt_att_get_mtu() returns zero.
->
-> Error: OVERRUN (CWE-119): [#def36] [important]
-> bluez-5.76/src/shared/gatt-server.c:1121:2: zero_return: Function call "b=
-t_att_get_mtu(server->att)" returns 0.
-> bluez-5.76/src/shared/gatt-server.c:1121:2: assignment: Assigning: "data-=
->mtu" =3D "bt_att_get_mtu(server->att)". The value of "data->mtu" is now 0.
+This series was applied to bluetooth/bluez.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-We are disconnected or have an invalid bt_att instance if
-bt_att_get_mtu returns 0 so it is probably pointless to attempt to
-send any response if that is the case.
+On Fri, 5 Jul 2024 10:57:02 +0300 you wrote:
+> Several bug fixes.
+> 
+> Roman Smirnov (5):
+>   obexd: add NULL checks to file_stat_line()
+>   shared/shell: prevent integer overflow in bt_shell_init()
+>   tools/isotest: limit the maximum possible data_size
+>   tools/rctest: limit the maximum possible data_size
+>   settings: add NULL checks to gatt_db_load()
+> 
+> [...]
 
-> bluez-5.76/src/shared/gatt-server.c:1123:19: assignment: Assigning: "__n"=
- =3D "(size_t)(data->mtu - 1UL)". The value of "__n" is now 184467440737095=
-51615.
-> bluez-5.76/src/shared/gatt-server.c:1123:19: assignment: Assigning: "__s"=
- =3D "1UL".
-> bluez-5.76/src/shared/gatt-server.c:1123:19: overrun-buffer-arg: Calling =
-"memset" with "__p" and "__n * __s" is suspicious because of the very large=
- index, 18446744073709551615. The index may be due to a negative parameter =
-being interpreted as unsigned. [Note: The source code implementation of the=
- function has been overridden by a builtin model.]
-> 1121|           data->mtu =3D bt_att_get_mtu(server->att);
-> 1122|           data->length =3D 0;
-> 1123|->         data->rsp_data =3D new0(uint8_t, data->mtu - 1);
-> 1124|
-> 1125|           return data;
-> ---
->  src/shared/gatt-server.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/src/shared/gatt-server.c b/src/shared/gatt-server.c
-> index 3a53d5dfde6b..66e370d1fe3d 100644
-> --- a/src/shared/gatt-server.c
-> +++ b/src/shared/gatt-server.c
-> @@ -1120,7 +1120,7 @@ static struct read_mult_data *read_mult_data_new(st=
-ruct bt_gatt_server *server,
->         data->cur_handle =3D 0;
->         data->mtu =3D bt_att_get_mtu(server->att);
->         data->length =3D 0;
-> -       data->rsp_data =3D new0(uint8_t, data->mtu - 1);
-> +       data->rsp_data =3D new0(uint8_t, MAX(data->mtu, 1) - 1);
->
->         return data;
->  }
-> --
-> 2.45.2
->
->
+Here is the summary with links:
+  - [BlueZ,v2,1/5] obexd: add NULL checks to file_stat_line()
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=0fda2dd545fc
+  - [BlueZ,v2,2/5] shared/shell: prevent integer overflow in bt_shell_init()
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=85d98aecd6a9
+  - [BlueZ,v2,3/5] tools/isotest: limit the maximum possible data_size
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=c389209ce455
+  - [BlueZ,v2,4/5] tools/rctest: limit the maximum possible data_size
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=8e495f00cded
+  - [BlueZ,v2,5/5] settings: add NULL checks to gatt_db_load()
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=804696dee795
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
---=20
-Luiz Augusto von Dentz
