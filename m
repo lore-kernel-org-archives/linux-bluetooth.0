@@ -1,138 +1,165 @@
-Received: from out-22.smtp.github.com (out-22.smtp.github.com [192.30.252.205])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f170.google.com (mail-lj1-f170.google.com [209.85.208.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F1171DFCF
-	for <linux-bluetooth@vger.kernel.org>; Tue,  9 Jul 2024 19:11:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.205
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13E1F150981
+	for <linux-bluetooth@vger.kernel.org>; Tue,  9 Jul 2024 20:33:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720552287; cv=none; b=u7bNUW6QKZNokormIsoNw2Z/dzvwR+0JhOiP9mBhuqbI8QFjKMRykbWN3IMa5TFTQcmFWZx61+G0Nhtuw5jp7nzVm+wx7dXD4bJsnZTbknX+LhA7/kS2sbLMcAStxBZ2wykXzhpacA7h5cA4oqgqWka68q3duKZaie4BGB89qbU=
+	t=1720557238; cv=none; b=kc6xEu4bNwX0JLEFBHHMdIL2QUx2TG+My6qokYdIpjDVR2iHTl0EWnigKR52acQoh6QvFeJs2/94+n/8rsKc9Wxq/78cIrAkKNszal6yliVUXqPk8MjoOS1Rd/ihm9StlUje51xmwWV8lwPGDQeoqGgU9oTiCmo8ILUVW5fGHjc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720552287; c=relaxed/simple;
-	bh=+RGOVH+3+B4oHPH/Wu+3ue5KUNGiiDCqxTxO8D4c7m8=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=lB4hq9lq2AG8icjPrAjPPcetCZobsmZJZDGHQUXEHT/zHSNmbMuPVd3z1gAAC7XIkoGU+B8dlIZQFiInjbie0tlOKu2UTme2MWDBD5Ouio39DPGxb+TK1IG3RLrWPqn+v6bZp0ZdaNWuJ4oZfl2tjcOsYQlF0YeLAra6LB9C/lo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=FteuFP15; arc=none smtp.client-ip=192.30.252.205
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1720557238; c=relaxed/simple;
+	bh=OL1WJt5P8XK3wOWC1l1XUG6L7TiOtom60QY9yoLileM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=rkrtBJMae68+FptBBlFCFXoIjrpBCZfd0X2bSDaThOEBwXz2GkXm93oBqtx0vKjUYxKKRJQtgD07unvLse9SfoFPMN77Bll7PckEpkVfqSIwH3IkuK7H9EFHC3RLFy+IZYhlOEzWI3NDNr0gmmi6vIPKM9UrXyuWQUN4qs/FixY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cr/xQH+k; arc=none smtp.client-ip=209.85.208.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="FteuFP15"
-Received: from github.com (hubbernetes-node-3d3a7bc.ac4-iad.github.net [10.52.153.33])
-	by smtp.github.com (Postfix) with ESMTPA id 0A76F5E0C70
-	for <linux-bluetooth@vger.kernel.org>; Tue,  9 Jul 2024 12:11:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1720552284;
-	bh=+kearqplcRNCtHqrCAByGlwkH8TDytQKDHc2j4XL79U=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=FteuFP15mURMilulo6GsuEpqrUhyWdX52l3y5tCY+yvkdzJUiESUtGj7n9HJHq5Vt
-	 GY9/MfAqHFZThbHzOk1UJ8nxd5oA/EMP1iuCiyuvQoo82BrWnIiOTgSumy0/Vr8j2i
-	 GDnsdxqkaklB9+AHOK5Sprw0DQsL8O1gRJGcotWU=
-Date: Tue, 09 Jul 2024 12:11:24 -0700
-From: BluezTestBot <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/master/34aca9-4ca662@github.com>
-Subject: [bluez/bluez] 2748c6: bap: Wait for BIG Info report event before
- creatin...
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cr/xQH+k"
+Received: by mail-lj1-f170.google.com with SMTP id 38308e7fff4ca-2ee4ae13aabso56522291fa.2
+        for <linux-bluetooth@vger.kernel.org>; Tue, 09 Jul 2024 13:33:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1720557235; x=1721162035; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=NvaheOfQKcTUEbWUXRhCIe8SrRk4TyoGsOvVD1RP8gU=;
+        b=cr/xQH+knjFu1CoZaMKiqE9f1ldg/u2RjopdW23TXAdzIwJLbx71FbH8NQSiwaZpxx
+         OGIlCv3d1PPOmYTYFlB1yxbXsN05TwTj5Aj9vNlVrI4BrNWSgTIlEGxrQPAJzXNgEWl6
+         w5RjYHmLuUzqrdMBmxQe9DMCMM12m+6xr+hHvqRWgdxucgtY7Hl2kuPLHrkaZDCVbuHw
+         EKKCA8A7NffxGPHbmMYgCnyPSndM7E+moEeagL2EsepNQcCSe8/oZK5IoP2upsWcgSRh
+         NeS29CtSVgpMiObuhKNvbtyJw2fP0GgL1B6YDqaIDEaJndEXFgbFm1TJBBDJIbkQFizK
+         9G8w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1720557235; x=1721162035;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=NvaheOfQKcTUEbWUXRhCIe8SrRk4TyoGsOvVD1RP8gU=;
+        b=t6SC9XeDk6YD5eiPPLoZKGCSlYHHSrogWpxZx1Ww92acgWRlnBC998JZfXpcdsQswE
+         iQsjF8lZ4le6Ekw+PX4Aekeqj3mZkM729zu8q3cPAVfqaKOqsrZ9owDJ0GxvZ7GCamEk
+         h/lGbkzL/5YvSyA9xqAMWBaYhprZ4Eu+SfXnPbsWrsUMrNjaenXq+gnlBLwEPZ0WFtao
+         muJ0ynwTKm3UhDCW1VJKeLAE/wN0if4RV6MC0YgjgGduB7KIRztuco9W3vVz9f4jfqAR
+         Ffl5Yj/rgPM9PvlgfnSIwy5dBn4sGh8WRHONZNqJK6CBTvpy2p/cm1+wgfm1W2eSUs7H
+         6C4Q==
+X-Gm-Message-State: AOJu0YztDfiQ7FuAaTA0a+dB9JK/1gvgd38gmXnjAk1KpRyxSzyfM6tQ
+	P87qkwfFbJAlsCpdk5tDIWCv+w82Jn+3T4lctSpuCJqANPkwGRxpjDe+H1i3Yzlbci4UljeuW5y
+	igmJ3AYnqi+/MdwY3GxM5ssIXS0b2mYIi
+X-Google-Smtp-Source: AGHT+IFB4+H7R8tAzGpwyg+GusWsCF+eORx4E6zR4RNmdSM/iLdgSSWNDxziWolrnAA82/0goHCbxWov7Dns1+5mzos=
+X-Received: by 2002:a2e:9482:0:b0:2ec:56b9:259f with SMTP id
+ 38308e7fff4ca-2eeb319134dmr22341471fa.48.1720557234841; Tue, 09 Jul 2024
+ 13:33:54 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+References: <SN4PR19MB5421B1226EA92B735CADEA44E4C82@SN4PR19MB5421.namprd19.prod.outlook.com>
+ <SN4PR19MB54215EF3B4E7380A21387D2EE4DB2@SN4PR19MB5421.namprd19.prod.outlook.com>
+In-Reply-To: <SN4PR19MB54215EF3B4E7380A21387D2EE4DB2@SN4PR19MB5421.namprd19.prod.outlook.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Tue, 9 Jul 2024 16:33:40 -0400
+Message-ID: <CABBYNZ+8ca5f6nWG3D3x8mL3g=57Z0pogQP-+ww_aQuC0R1DWw@mail.gmail.com>
+Subject: Re: [PATCH] ATT: Error (0x01) - Error: Unlikely error (14) Prepare
+ Write req (0x16)
+To: "Ramsay, Trey" <Trey.Ramsay@dell.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-  Branch: refs/heads/master
-  Home:   https://github.com/bluez/bluez
-  Commit: 2748c60a2c6b1b090a7507fdd23865a598129d61
-      https://github.com/bluez/bluez/commit/2748c60a2c6b1b090a7507fdd23865a598129d61
-  Author: Vlad Pruteanu <vlad.pruteanu@nxp.com>
-  Date:   2024-07-09 (Tue, 09 Jul 2024)
+Hi Trey,
 
-  Changed paths:
-    M profiles/audio/bap.c
+On Tue, Jul 9, 2024 at 1:34=E2=80=AFPM Ramsay, Trey <Trey.Ramsay@dell.com> =
+wrote:
+>
+> Bluez Maintainers,
+> Here is a fix for attribute writes not working in src/shared/gatt-db.c. T=
+he prep_write_complete_cb was not getting called. The attrib->write_func co=
+de block should not be called when len is 0
+>
+> commit 5a9baa10d4fde7ca8ab88ecd68e17671c33cb587 (HEAD -> gat-db, master)
+> Author: Trey_Ramsay <trey_ramsay@dell.com>
+> Date:   Fri May 31 15:39:27 2024 -0500
+>
+>     shared/gatt-db: Prepare Write req error BT_ATT_ERROR_UNLIKELY
+>
+>     Fixes Prepare Write req error: BT_ATT_ERROR_UNLIKELY
+>
+>         ATT: Error (0x01)
+>           Error: Unlikely error (14)
+>           Prepare Write req (0x16) on handle 0x0069
+>
+>     The prep_write_complete_cb was not getting called
+>     The attrib->write_func code block does not need to be called when len=
+ is 0
 
-  Log Message:
-  -----------
-  bap: Wait for BIG Info report event before creating streams
+This doesn't sound quite right, 0 length still needs to be passed to
+the attribute to confirm since we don't know if it could be a
+procedure or not. Can you explain what attribute is being written and
+if it could be due to the application not responding and the procedure
+timing out (e.g. write_timeout is called?), perhaps if you can paste a
+btmon trace as well that could help checking what attribute it is
+trying to use prepare write.
 
-This makes it so that stream for each BIS is created after BIG
-Info report is received. This ensures that when the stream is
-created the encryption field is correctly set.
-
-
-  Commit: aa6063aa66954ac8321211145d1ae6b434b2555c
-      https://github.com/bluez/bluez/commit/aa6063aa66954ac8321211145d1ae6b434b2555c
-  Author: Roman Smirnov <r.smirnov@omp.ru>
-  Date:   2024-07-09 (Tue, 09 Jul 2024)
-
-  Changed paths:
-    M profiles/health/mcap.c
-
-  Log Message:
-  -----------
-  health: mcap: add checks for NULL mcap_notify_error()
-
-It is necessary to prevent dereferencing of NULL pointers.
-
-Found with the SVACE static analysis tool.
-
-
-  Commit: 11dcc9bf0dba61c83269fb3cf234579d6f9ef192
-      https://github.com/bluez/bluez/commit/11dcc9bf0dba61c83269fb3cf234579d6f9ef192
-  Author: Roman Smirnov <r.smirnov@omp.ru>
-  Date:   2024-07-09 (Tue, 09 Jul 2024)
-
-  Changed paths:
-    M src/shared/micp.c
-    M src/shared/vcp.c
-
-  Log Message:
-  -----------
-  shared: prevent dereferencing of NULL pointers
-
-It is necessary to add checks for NULL before dereferencing pointers.
-
-Found with the SVACE static analysis tool.
-
-
-  Commit: 755091581336dd6b6a710e599da9e1e52037851a
-      https://github.com/bluez/bluez/commit/755091581336dd6b6a710e599da9e1e52037851a
-  Author: Roman Smirnov <r.smirnov@omp.ru>
-  Date:   2024-07-09 (Tue, 09 Jul 2024)
-
-  Changed paths:
-    M src/settings.c
-
-  Log Message:
-  -----------
-  settings: limit string size in load_service()
-
-It is necessary to prevent buffer overflow by limiting
-the maximum string length.
-
-Found with the SVACE static analysis tool.
-
-
-  Commit: 4ca662fcea1604e937bde1bddd5de2c50bcb6e00
-      https://github.com/bluez/bluez/commit/4ca662fcea1604e937bde1bddd5de2c50bcb6e00
-  Author: Roman Smirnov <r.smirnov@omp.ru>
-  Date:   2024-07-09 (Tue, 09 Jul 2024)
-
-  Changed paths:
-    M src/settings.c
-
-  Log Message:
-  -----------
-  settings: limit string size in gatt_db_load()
-
-It is necessary to prevent buffer overflow by limiting
-the maximum string length.
-
-Found with the SVACE static analysis tool.
+> diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
+> index 2c8e7d31e..678aef4cf 100644
+> --- a/src/shared/gatt-db.c
+> +++ b/src/shared/gatt-db.c
+> @@ -2127,6 +2127,10 @@ bool gatt_db_attribute_write(struct gatt_db_attrib=
+ute *attrib, uint16_t offset,
+>      if (!attrib || (!func && attrib->write_func))
+>          return false;
+>
+> +    /* Nothing to write just skip */
+> +    if (len =3D=3D 0)
+> +        goto done;
+> +
+>      if (attrib->write_func) {
+>          struct pending_write *p;
+>
+> @@ -2162,10 +2166,6 @@ bool gatt_db_attribute_write(struct gatt_db_attrib=
+ute *attrib, uint16_t offset,
+>          return true;
+>      }
+>
+> -    /* Nothing to write just skip */
+> -    if (len =3D=3D 0)
+> -        goto done;
+> -
+>      /* For values stored in db allocate on demand */
+>      if (!attrib->value || offset >=3D attrib->value_len ||
+>                  len > (unsigned) (attrib->value_len - offset)) {
+>
+>
+>
+> -----Original Message-----
+> From: Ramsay, Trey <Trey.Ramsay@dell.com>
+> Sent: Thursday, June 20, 2024 1:58 PM
+> To: linux-bluetooth@vger.kernel.org
+> Subject: [PATCH] ATT: Error (0x01) - Error: Unlikely error (14) Prepare W=
+rite req (0x16)
+>
+>
+> Bluez Maintainers
+> Here is a fix for attribute writes not working in src/shared/gatt-db.c
+>
+> https://urldefense.com/v3/__https://github.com/tramsay/bluez-tramsay/comm=
+it/246bc960629dff34e744c728f048e9f50f1a005d__;!!LpKI!jkJYamzU8bOdd1qt-sWpj6=
+gy1YwS30UyamHLUJj9Uy0UecrB6QxvCdSWFAUH7Dvq2wVJqu1C5jjoX5amywJH$ [github[.]c=
+om]
+>
+> shared/gatt-db: Prepare Write req error BT_ATT_ERROR_UNLIKELY Fixes Prepa=
+re Write req error: BT_ATT_ERROR_UNLIKELY
+>
+>     ATT: Error (0x01)
+>       Error: Unlikely error (14)
+>       Prepare Write req (0x16) on handle 0x0069
+>
+> The prep_write_complete_cb was not getting called The attrib->write_func =
+code block should not be called when len is 0
+>
 
 
-Compare: https://github.com/bluez/bluez/compare/34aca9a4fbcf...4ca662fcea16
-
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
+--=20
+Luiz Augusto von Dentz
