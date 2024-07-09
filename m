@@ -1,60 +1,60 @@
-Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
+Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8647615FCED
-	for <linux-bluetooth@vger.kernel.org>; Tue,  9 Jul 2024 12:19:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72D06156243
+	for <linux-bluetooth@vger.kernel.org>; Tue,  9 Jul 2024 12:19:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720527542; cv=none; b=sHDVIU2zuYzW7r3EwEJWTDNLdXLX9y5U9+6aq+4hutEo6d1M5hAJDovZ+0A3lmjl+0TPzVarH8piJwo9l/gSTIzFhJ2xUD0m1jTvY7lDo947ymjuZgET/0Y07EB2rPGsLGIzjat8i2UP62/BkE+uZQU5jgSTfUnHs9PfHRo083M=
+	t=1720527543; cv=none; b=YhErUPOP0pP64Bqhhx9mQdZnaCbJeDQodeWI24kffxt27xLvcAKsObeOzwsBwRMRK91wZ5SYr3c434imMHnYXxLES/CG4SS+CsuVPZaEu8/bJ4kKOMKb7/e3HSo/WFTg869xjZ1biZ99XHjb99/Khc6HCR8PPAJlBBR7SkwrzhA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720527542; c=relaxed/simple;
-	bh=n8IBlhPoA/qgk+fNyg4rQ99SOZqrqxt6zskITPsCtAo=;
+	s=arc-20240116; t=1720527543; c=relaxed/simple;
+	bh=x+REoia1SPVixROvzFdazwCRh5mhW9XzZbQzMlPar2M=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=SUdImppQI3++N3aRniC8NpVA3HIf1qkzJMoPKAGW6LyBHwQdyv7Q/uuqCVaut5yuVbsFdheAeAPoQqNMpnVb167W5ziYjGWquBFxnrH3wrxlTJALy/HcYbutE+GjW/tOiuhkkkWvKPxJFTFsjstJnxNs1Dj3CFD8pvpshiTrs5s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=c4DzXZ4M; arc=none smtp.client-ip=209.85.221.44
+	 In-Reply-To:To:Cc; b=bpvV7Grz8NACcmPgGhBi3/Cm1Bkfb+6fmlgeIgCEGhkVZkgHoTmo5p9/XF6IuQXlVSmhFos606hHzENDoRTKJaktfxwBdmwNAg9VdA4IgGGHa5jIZHL3TaWn/cuo9jPTsgIf+LlAoioWfYBSn7nvYZbskyXFiZmRAcEzDGWIf5s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=NnQQW1n6; arc=none smtp.client-ip=209.85.221.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="c4DzXZ4M"
-Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-36796aee597so3361244f8f.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 09 Jul 2024 05:19:00 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="NnQQW1n6"
+Received: by mail-wr1-f43.google.com with SMTP id ffacd0b85a97d-36796a9b636so3486628f8f.2
+        for <linux-bluetooth@vger.kernel.org>; Tue, 09 Jul 2024 05:19:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1720527539; x=1721132339; darn=vger.kernel.org;
+        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1720527540; x=1721132340; darn=vger.kernel.org;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=KBgx4nxMez8W2SjWNK7CrGe10S5aZxdnZ2lslTHcnEM=;
-        b=c4DzXZ4MAXww+Lcko7MebYNE9Yx6/2kVhpuEVg3PHG1DrXCq1Ae9R/ZAsJi7nh3fGG
-         ZZoBscRzi1238IY+yJUpoKqhpjIlIo6roo7Oqp8Fag8YKGbSBJ5a0XAMlgUZ5+HL3jjw
-         sfCHcnCcMkxEsp2Mxol8rSgdbutJS2JbCkyJbSLRMlAOKV4fRpYdljeLYlYhP1zXEhPK
-         na+iH9TJntJhQtSYpen8AIK4bW1IdgfqPT7r7ZW1904idWsBMYInEbvcikYGSH2ke5Nc
-         zp3JK/+bcxA8exgYGovfpQVaI2dod8e0dEhvwLHlGxedyKSo7j2GcMPODMbEgbGS41pb
-         4Lhw==
+        bh=Xo8BvOJHNg5KkElAnqbJxKoNs4vF5XqhPo69/tFmIJc=;
+        b=NnQQW1n6lrU1To2/YO9s/SMpDvU8qx3SBKrdmP9Ul5r/30DL+p7S+2xeDgr3WohOdp
+         pIKVUE62Gua8ln+HYZPzpB5yGHwSyXB0KB2op3nW6/EDMWmtX+2+BAKWBQhGLi/AdjM/
+         xWTsSQjyQwx6ovBk9v1R7fTeoIkgdK0NOQcYpyE/a5ZJr/Dccvy46LVr+jKHobrc1VRt
+         ypQMssYDILV/D/rKuHAtjLcaXy+vh5/DrSBR3kKN+Tp1UPtolN/PTPC3NRun7e+Jp13O
+         6rsCAuASbw+8wr4HzAigLicXsdL8VCilBbtdF/PJEc6/9rB9uLWR9GneOpFPwWSr1bWQ
+         kPtg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720527539; x=1721132339;
+        d=1e100.net; s=20230601; t=1720527540; x=1721132340;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=KBgx4nxMez8W2SjWNK7CrGe10S5aZxdnZ2lslTHcnEM=;
-        b=U2gXf4ZMPqUBnTTbB9d5lATukvfk9lkbl0HKApREcgdrBZ/8u97Pf9w2GWlZwtcLQO
-         tBoW1E5LpD9dS50BH45UtkmTlvPhcVnqx85aqdPGv/tR5aOkKZxYhhIOAS6VtTA+B2T8
-         hGrONWPlb93uCgsY78KZ1XPerH6O91MatPduLbVA38esN2L/CXxXwlBiOsnixZJafY+Q
-         dcRCmLkve+Cm6reQ6+f77ZWYXuaOibyf4nKc64tZpRh0YE16+30Hfq1CGyXW1YqmFVJw
-         SPKVM642fUqbpqSQ0eEePIEy7/QAi6tZMxk3XYdWeaK9pfsgKXUfR5B4Fwqhs5HrqYqs
-         utLQ==
-X-Gm-Message-State: AOJu0Yxp4G8q2pHbjPvuwsQPeDhU2X5rEc4crA6Y/xYhb10jG7tvLkSx
-	3W/7/3tjervuYEgZ5bsNQO7y5jnpXdV4IEVMLmwGHteGeeAeE0Ecus6x1FeceUc=
-X-Google-Smtp-Source: AGHT+IFnvGSyQk+JwuP1pJ1NJhpsMH0jooyRjnJvbTEQ0UsiMwwndrWdEVaXsrZzWiPykoSpg196CQ==
-X-Received: by 2002:a05:6000:178c:b0:366:eadc:6ca4 with SMTP id ffacd0b85a97d-367cea8f92bmr1809396f8f.29.1720527538916;
-        Tue, 09 Jul 2024 05:18:58 -0700 (PDT)
+        bh=Xo8BvOJHNg5KkElAnqbJxKoNs4vF5XqhPo69/tFmIJc=;
+        b=L7QMolIxBVBiS5i/WqbvTHwpbr5uQZgnme3357HcLK/Zu+KFD1uJ8Fz8EqgmddpUW0
+         q10ClqObZCx7cGC6sBTxqKXUXzGbw/CbwIbF9oHDkbRwEAn4h+auAUiIjCPe8KA7xLv3
+         2dmk21k0GtOgjzSXY7VLVVJZU8k6mKq5yQZSm4a7IhWWkKpV6+D/U6AIk6Ym+MzQjpWt
+         0tD6XfMYcQMcEv6SMl+RWVsDIEn8byAj0zkz5NuvAxOr+bBFsQTmqODhZE52nyhBISsi
+         7PGim1F+9Uu7O/OxfqZ3RqF9qwiamMhZ5XllQGm/zNhnOTzEkrlTZ+dEGS5jA3tv6wTQ
+         5lqQ==
+X-Gm-Message-State: AOJu0YwmyytRLZd5Z1PDPZEbYLAB/U2eIYFzcCNEInsNi78toJ5km7kJ
+	ibNEUEZGU4YpMOZBIAP1LlyJYiQBvcOkpLNRNmSdoTvifSA4axhJGEEVJDleBzM=
+X-Google-Smtp-Source: AGHT+IHlYFU3VnCeKhs6de8k08lOqiraDKQwIwTkroWp04T47sikkaBz+RY4PASboELzd9n8rzAl5A==
+X-Received: by 2002:adf:ee4f:0:b0:367:8a68:e749 with SMTP id ffacd0b85a97d-367cea964ecmr1963236f8f.37.1720527539879;
+        Tue, 09 Jul 2024 05:18:59 -0700 (PDT)
 Received: from [127.0.1.1] ([2a01:cb1d:dc:7e00:c270:70c:8581:7be])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-367cdfa06d3sm2390574f8f.75.2024.07.09.05.18.57
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-367cdfa06d3sm2390574f8f.75.2024.07.09.05.18.59
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 09 Jul 2024 05:18:58 -0700 (PDT)
+        Tue, 09 Jul 2024 05:18:59 -0700 (PDT)
 From: Bartosz Golaszewski <brgl@bgdev.pl>
-Date: Tue, 09 Jul 2024 14:18:36 +0200
-Subject: [PATCH v3 5/6] Bluetooth: hci_qca: use the power sequencer for
- wcn7850 and wcn6855
+Date: Tue, 09 Jul 2024 14:18:37 +0200
+Subject: [PATCH v3 6/6] arm64: dts: qcom: sm8650-qrd: use the PMU to power
+ up bluetooth
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -63,7 +63,7 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20240709-hci_qca_refactor-v3-5-5f48ca001fed@linaro.org>
+Message-Id: <20240709-hci_qca_refactor-v3-6-5f48ca001fed@linaro.org>
 References: <20240709-hci_qca_refactor-v3-0-5f48ca001fed@linaro.org>
 In-Reply-To: <20240709-hci_qca_refactor-v3-0-5f48ca001fed@linaro.org>
 To: Marcel Holtmann <marcel@holtmann.org>, 
@@ -81,78 +81,85 @@ Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
  linux-arm-msm@vger.kernel.org, 
  Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
 X-Mailer: b4 0.13.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1940;
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1973;
  i=bartosz.golaszewski@linaro.org; h=from:subject:message-id;
- bh=aMM3yb5DV2sqwmZi3WupHB7UhA28/Enh8+8N3IKgp+o=;
- b=owEBbQKS/ZANAwAKARGnLqAUcddyAcsmYgBmjSqpN7GRC30B/SHjFyGW5VYELyVeElFf0sklh
- /R0EWxhMSmJAjMEAAEKAB0WIQQWnetsC8PEYBPSx58Rpy6gFHHXcgUCZo0qqQAKCRARpy6gFHHX
- cudiEADQlewK0sjcqdn9ajDRDxg8P9BDth8RsMC/BZlWszh3+aXaf4Lwm5RbDrCFWpMxHu0seWr
- 1g6ebFYtgySiLKS/qW3XmSHWkvnsmYZ5aB1DI6Tc+26ZvRcax/97E/u53rX71qXmndeNBqSjOhT
- /g5Ks016FHICaaZf0b5Qc9Xe6EyNB21fculjeUOvR0H0UDbal/+Y1TaoKlGk9/g0g5zsfv0bEsv
- Eukc+paFTCvnkizHCnwRccaiQ7u7aez4XIDSggaOiPlB0fpgPEWBss9vgm3XJ/3/jv9O89xQWio
- roOh9Guc4SkSFOfxxD2GUfkwNymsNoYMChCVke0ZFfc/R2GC8aYdoGi173S5aHYqxyo1ADxKUzs
- xbfdyt7c+nQWItlZhXW+mj24l0o7KCBtgzMs13tUhJ8ePfIbZ/aCFZZrql+ikgv4w9k6DRgG7Jo
- wBC0gtdaedHggxCzbplodpYTqhfi3xJOOZGeXZAKQqA8Iq8ZbXjvzDXrySI4pREyI2hLD/CCwqA
- B0taUSyT3QhVGI5PLfVWvx26Y5C44pU1tSF6dxiCpS9YV2Rjoe5Jag0UxSRehUOcjSQXJhoQRas
- DrgJ/klF0OPNk+jPzsqt1ch/L89aAdwg+42Xz81XtAGm15klggSrzszJnB1RHxtIyP70TnfyCKf
- wxvc3L5FGtfy6GA==
+ bh=kdQldVCRGhnIPxVPu3DpUjVdb4CujtCOUfjhf5GMlEY=;
+ b=owEBbQKS/ZANAwAKARGnLqAUcddyAcsmYgBmjSqqrGtnMnAwMYYIYS3zS2YrAF26znEBpNGGj
+ DaLl2ycXvaJAjMEAAEKAB0WIQQWnetsC8PEYBPSx58Rpy6gFHHXcgUCZo0qqgAKCRARpy6gFHHX
+ csZFD/4mFXxIGvpO9UdR4a8zv+U66aV35atlSCS46BTY4R9DAA2wbTBOmuuEpgoXXIGFgF0+x3s
+ Auiizip378OXGWWE34jpq1bstjoFf0anC/YhjiQFAiycAWmUdRjlOyGeTYdAk/qFmOitnvEe3ag
+ oBLLy3CiJKSnsxl8Twwp50kQFsULpw/3A/Aj54aviu1awBYHC+Ht9I8vxecLXbn7ZDDFH7+nQTY
+ ylHAhmhcIkg6VonJk9XSgv2xNEJPcZcmdb9x9FlM7e1zz8HVqto6E17vgdWsAL6O0NAu+D78awD
+ xqjjDKamHNEVfsUp7plAmsPNPl9xUe8NQcQgPihRQlrL4wuhkeFncM85sVKL9sYHPgBy7poG88p
+ DD1AraUu51VWNULs7gPZ9pDqB5l2S9TddeOlvG2hBDEyeFvAh06d3M2X8epMXNyicRJ9aZ2G7iG
+ Cdb0LeqMuTe6GZlq2Ukey+djfoEIqtRNKEIiL0XLw9PLP9uEm1Pu8IwSKsTDja+wYUh/dxAgRIY
+ yk1f/R/nPikrXOKIs7Ad1FsTn3hMG7Sm7hqAn7fa4jnP4Kg3foFBpKwlmOXc28tYF9bcStt6ZY5
+ wgFgjK+7YeLAbIWm7DYAWEuQWpUc1ZyDNlbzNu0HG0XbfqtK/zImkEH7qVrahTYPBXhE05AWqHg
+ J4deYfbuLPfa9Vg==
 X-Developer-Key: i=bartosz.golaszewski@linaro.org; a=openpgp;
  fpr=169DEB6C0BC3C46013D2C79F11A72EA01471D772
 
 From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
 
-In preparation for using the power sequencing subsystem on sm8650 boards
-and X13s laptop let's make pwrseq the default for wcn7850 and wcn6855.
-
-Both these models require an enable GPIO so we can safely assume that if
-the property is not there, then we should try to get the power
-sequencer. Due to how the pwrseq lookup works - checking the provider at
-run-time - we cannot really do it the other way around as we'd get stuck
-forever on -EPROBE_DEFER.
-
-If the relevant OF node does have the 'enable-gpios' property, we
-fallback to the existing code for backward compatibility with older DTs.
+Change the HW model in sm8650-qrd.dts to a one closer to reality - where
+the WLAN and Bluetooth modules of the WCN7850 are powered by the PMU
+inside the package.
 
 Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
 ---
- drivers/bluetooth/hci_qca.c | 19 +++++++++++++++++--
- 1 file changed, 17 insertions(+), 2 deletions(-)
+ arch/arm64/boot/dts/qcom/sm8650-qrd.dts | 28 +++++++++-------------------
+ 1 file changed, 9 insertions(+), 19 deletions(-)
 
-diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-index 49588072589e..030153d468bf 100644
---- a/drivers/bluetooth/hci_qca.c
-+++ b/drivers/bluetooth/hci_qca.c
-@@ -2354,13 +2354,28 @@ static int qca_serdev_probe(struct serdev_device *serdev)
- 	}
+diff --git a/arch/arm64/boot/dts/qcom/sm8650-qrd.dts b/arch/arm64/boot/dts/qcom/sm8650-qrd.dts
+index b0d7927b708f..8ca0d28eba9b 100644
+--- a/arch/arm64/boot/dts/qcom/sm8650-qrd.dts
++++ b/arch/arm64/boot/dts/qcom/sm8650-qrd.dts
+@@ -208,13 +208,10 @@ wcn7850-pmu {
+ 		compatible = "qcom,wcn7850-pmu";
  
- 	switch (qcadev->btsoc_type) {
-+	case QCA_WCN6855:
-+	case QCA_WCN7850:
-+		if (!device_property_present(&serdev->dev, "enable-gpios")) {
-+			/*
-+			 * Backward compatibility with old DT sources. If the
-+			 * node doesn't have the 'enable-gpios' property then
-+			 * let's use the power sequencer. Otherwise, let's
-+			 * drive everything outselves.
-+			 */
-+			qcadev->bt_power->pwrseq = devm_pwrseq_get(&serdev->dev,
-+								   "bluetooth");
-+			if (IS_ERR(qcadev->bt_power->pwrseq))
-+				return PTR_ERR(qcadev->bt_power->pwrseq);
-+
-+			break;
-+		}
-+		fallthrough;
- 	case QCA_WCN3988:
- 	case QCA_WCN3990:
- 	case QCA_WCN3991:
- 	case QCA_WCN3998:
- 	case QCA_WCN6750:
--	case QCA_WCN6855:
--	case QCA_WCN7850:
- 		qcadev->bt_power->dev = &serdev->dev;
- 		err = qca_init_regulators(qcadev->bt_power, data->vregs,
- 					  data->num_vregs);
+ 		pinctrl-names = "default";
+-		pinctrl-0 = <&wlan_en>;
++		pinctrl-0 = <&wlan_en>, <&bt_default>;
+ 
+ 		wlan-enable-gpios = <&tlmm 16 GPIO_ACTIVE_HIGH>;
+-		/*
+-		 * TODO Add bt-enable-gpios once the Bluetooth driver is
+-		 * converted to using the power sequencer.
+-		 */
++		bt-enable-gpios = <&tlmm 17 GPIO_ACTIVE_HIGH>;
+ 
+ 		vdd-supply = <&vreg_s4i_0p85>;
+ 		vddio-supply = <&vreg_l15b_1p8>;
+@@ -1255,22 +1252,15 @@ &uart14 {
+ 	bluetooth {
+ 		compatible = "qcom,wcn7850-bt";
+ 
+-		clocks = <&rpmhcc RPMH_RF_CLK1>;
+-
+-		vddio-supply = <&vreg_l3c_1p2>;
+-		vddaon-supply = <&vreg_l15b_1p8>;
+-		vdddig-supply = <&vreg_s3c_0p9>;
+-		vddrfa0p8-supply = <&vreg_s3c_0p9>;
+-		vddrfa1p2-supply = <&vreg_s1c_1p2>;
+-		vddrfa1p9-supply = <&vreg_s6c_1p8>;
++		vddrfacmn-supply = <&vreg_pmu_rfa_cmn>;
++		vddaon-supply = <&vreg_pmu_aon_0p59>;
++		vddwlcx-supply = <&vreg_pmu_wlcx_0p8>;
++		vddwlmx-supply = <&vreg_pmu_wlmx_0p85>;
++		vddrfa0p8-supply = <&vreg_pmu_rfa_0p8>;
++		vddrfa1p2-supply = <&vreg_pmu_rfa_1p2>;
++		vddrfa1p8-supply = <&vreg_pmu_rfa_1p8>;
+ 
+ 		max-speed = <3200000>;
+-
+-		enable-gpios = <&tlmm 17 GPIO_ACTIVE_HIGH>;
+-		swctrl-gpios = <&tlmm 18 GPIO_ACTIVE_HIGH>;
+-
+-		pinctrl-0 = <&bt_default>;
+-		pinctrl-names = "default";
+ 	};
+ };
+ 
 
 -- 
 2.43.0
