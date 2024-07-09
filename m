@@ -1,33 +1,33 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DCA21B86D8
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C4E51DFCF
 	for <linux-bluetooth@vger.kernel.org>; Tue,  9 Jul 2024 19:03:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720551782; cv=none; b=cbT7OYkAzf6iQd4RYkKMuYBX+r0RvErnXy7kJRWJCUgakWVWrS8ac4nKA64ocGdiucK/rhZMXcK6aKzJAXMffLQomhgU6wvE0BP4KmOJoTMMBYhtz0C4m9tjavv1LrIkoAXrXWNt5Bsd/YuRxsVhMyiT6HQGUc18towzulcccCA=
+	t=1720551782; cv=none; b=DrEuwaz1obs3lJNTsuM9SGbKSw2ugp1l8SyzXha62zXJB+UdcaXBhp6nfATntmfZxfugTxbr7/bKSabG+4zpiR9JHuF9ErMtPue/1DMFLmTyKvAWSfTK2I/bVjZ/sfEYeh0CJwvrzEPKcfXuC8W2qflgcZgPKJ6f2nEOAJgFiws=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1720551782; c=relaxed/simple;
-	bh=lItXaG64kxCEMk5zqy/cEN5R8jy8udFCPQPNo5QUxqs=;
+	bh=i8AqnSkrm9riXFQla+1hFWg4F8gixk5UAWYK/d31cLk=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=cA4VGHkAjFP5A9P0GXdzPM6mqXtRahxHIzcoF5IwtvbGhNqVZJsFegdrD0GeJfPGb7WiRbVx/s0UQF9OYh8zZTrFYSFKZCT/pDXOkOTfbOeIbNJl7j/nkmIESZ4pjmT7KAFutWzAbowDrGzq3wniSyE2TKVPANHMsLW31H1zr/M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hxIIrfzf; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=IbNYIuTnbeCDoyVYxLOHEDLhjn3uqo4h/ZS9n6BdIFeNveBtuk/jOp0n1posw7OVuqRT+V44HxrgdMKBycpbmQDRhYH/XxGFbiItjPtkJfF0lDPumocIF3Q5HoKGCGCXYK/x2/Xh5w4t2zni+snG5itng5tuShufSklT4FqFNUE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rlGREkD3; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hxIIrfzf"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 2A3DBC32782;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rlGREkD3"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 2449EC32786;
 	Tue,  9 Jul 2024 19:03:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1720551782;
-	bh=lItXaG64kxCEMk5zqy/cEN5R8jy8udFCPQPNo5QUxqs=;
+	bh=i8AqnSkrm9riXFQla+1hFWg4F8gixk5UAWYK/d31cLk=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=hxIIrfzf/Dx2ql16O4OTVC8T5ueaGRcbo1vSJE+HGW4gVnmPqmjPPZIKeLsmVEm6q
-	 2bED+7A4xUeV8L2OtnDXjddvezazyWmnhBNEaW2E2Of3Wm5n9EcsaHIOJCrbK7XXV8
-	 m96M0W1PDYz7W7UOQ0RiAbBzAEA3GX32Z6Ux7I0h3/i9Xhzpa5/4nHHKFs5Ma/DXcr
-	 qpNHf2VFTBoxv3OOg4L+deGLQaxOVt1GSuOdOUjxpZMnUQhUHfDK/LYjK60AvVGeHn
-	 JUFilj0TLGYS4e36Rz8ZHbWohe5Ntf0SpQyQ+JS5mTgrN0Y4/YvBtVAPXf8P5lnPrs
-	 mKpBVDS2WDhCw==
+	b=rlGREkD3PYGUk2hJyvrNhnt32JeUWrzXCQoDUsWnuCDqstTpTCEmR0lXNOjYMq8p0
+	 9laA1AYCeze9oJMr/uDqxkHOPDM4rH5h9aU2VyjmPJDja6MQSFv3KOXGHNXRO0qK9u
+	 Flxn/OfwEml8xbd4udOiKGHGkpKhE6xuhTIl5EEa25DbRPNbzLqYohuthhs/Cdkwb2
+	 YBp19u7tDUWzICcAqdxKv5KwLLrkWRbd/GmnZK76788UTNIv4xsWw8G9mIAPAOnC88
+	 ULmmz1qTWFmNJEtMuzTgGLyFUq34yg8uqg3GaLncU48YcLY2jMF/IqJxUrnoIP5AG+
+	 Oy2QpjQsMHCCg==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 0485EC4332D;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 116E9C4332C;
 	Tue,  9 Jul 2024 19:03:02 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -37,36 +37,41 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH BlueZ 0/1] bap: Wait for BIG Info report event before creating
- streams
+Subject: Re: [PATCH BlueZ v2 0/4] fix errors found by SVACE static analyzer #3
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <172055178201.32169.12599597951238542702.git-patchwork-notify@kernel.org>
+ <172055178206.32169.6195426319508636656.git-patchwork-notify@kernel.org>
 Date: Tue, 09 Jul 2024 19:03:02 +0000
-References: <20240709085903.125001-1-vlad.pruteanu@nxp.com>
-In-Reply-To: <20240709085903.125001-1-vlad.pruteanu@nxp.com>
-To: Vlad Pruteanu <vlad.pruteanu@nxp.com>
-Cc: linux-bluetooth@vger.kernel.org, mihai-octavian.urzica@nxp.com,
- iulia.tanasescu@nxp.com, andrei.istodorescu@nxp.com, luiz.dentz@gmail.com
+References: <20240709143503.12142-1-r.smirnov@omp.ru>
+In-Reply-To: <20240709143503.12142-1-r.smirnov@omp.ru>
+To: Roman Smirnov <r.smirnov@omp.ru>
+Cc: linux-bluetooth@vger.kernel.org
 
 Hello:
 
-This patch was applied to bluetooth/bluez.git (master)
+This series was applied to bluetooth/bluez.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Tue,  9 Jul 2024 11:59:02 +0300 you wrote:
-> This makes it so that stream for each BIS is created after BIG
-> Info report is received. This ensures that when the stream is
-> created the encryption field is correctly set.
+On Tue, 9 Jul 2024 17:34:59 +0300 you wrote:
+> Several bug fixes.
 > 
-> Vlad Pruteanu (1):
->   bap: Wait for BIG Info report event before creating streams
+> Roman Smirnov (4):
+>   health: mcap: add checks for NULL mcap_notify_error()
+>   shared: prevent dereferencing of NULL pointers
+>   settings: limit string size in load_service()
+>   settings: limit string size in gatt_db_load()
 > 
 > [...]
 
 Here is the summary with links:
-  - [BlueZ,1/1] bap: Wait for BIG Info report event before creating streams
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=2748c60a2c6b
+  - [BlueZ,v2,1/4] health: mcap: add checks for NULL mcap_notify_error()
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=aa6063aa6695
+  - [BlueZ,v2,2/4] shared: prevent dereferencing of NULL pointers
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=11dcc9bf0dba
+  - [BlueZ,v2,3/4] settings: limit string size in load_service()
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=755091581336
+  - [BlueZ,v2,4/4] settings: limit string size in gatt_db_load()
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=4ca662fcea16
 
 You are awesome, thank you!
 -- 
