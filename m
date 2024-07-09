@@ -1,60 +1,60 @@
 Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09B401586FE
-	for <linux-bluetooth@vger.kernel.org>; Tue,  9 Jul 2024 12:18:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A095A158D92
+	for <linux-bluetooth@vger.kernel.org>; Tue,  9 Jul 2024 12:18:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720527537; cv=none; b=fwLTCrFI5X/LVjenpBO8M/DKaeYKyOqcJvWKhOHIST7IkhtbfaUhdSiWMXbI2GqDEgMnb655sUd3U6mCT/pEZF+JwS8CHwQDrDhpVKeVdsHTzmGSOLrqERv3DLHlE2xM8IhJk6HmXFWwao3ko3ZLqcwRemAXDSmSm19ktvIVxAY=
+	t=1720527538; cv=none; b=osWylZeCoKFkjZAz5m1mD7fgm82Lr1kyci3TUH/2wPrGtXPGp2CGnYgzkFYHzFk8E801LSjtlEYI6X6BBLnNGr44/LV0Y1rTJv8Iil7AXZpS0TQpbsbOVTgTHsH4QszhQGEaAe+xpKD/8QQwcnm+CUgUUkqyRmUpf1w5c3f6O8s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720527537; c=relaxed/simple;
-	bh=lnpdHivpa0ZtGALVGMDdo0DO3IUBtoV7QZSuwbPAAcw=;
+	s=arc-20240116; t=1720527538; c=relaxed/simple;
+	bh=2y7nb7ol5yHvIHYnEo8Rlt1vj2/K7xBwxKBJztod+d4=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=o4VP/4TnWF337eGNIOhgmOmgehl9AhpyHxxpZ6FFnhRO8DI2NKhwt00RqRj9RUROOz/BrkdD/ZyI2Jbb21k/37UGcDjuum4FYLjLavWOKssvnrgn6ZEDzboNU5s8Dj2twUEA8gUOLewLHU7qYKQdGWQVBTPV9QGAXlLQh6d31y8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=N6xXcfQ9; arc=none smtp.client-ip=209.85.128.41
+	 In-Reply-To:To:Cc; b=K6roar9xjs+ZnsYHtjcwkCJzmYpXOvxBZ2A1dJ/atm0w9q8yCW5sE7EGTgJSMT1oQ/TlPJy0DBQWkaVY3ncgf/MGheIvYLS+C0aQJQws+6vX3IMifr15/1pqe6ZLdjW69oMhfUujPnTmMpOD6EK4H/7iHnX/XTN3DY/jRPOebSA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=m2zmY/Vf; arc=none smtp.client-ip=209.85.128.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="N6xXcfQ9"
-Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-4266eda81c5so11175815e9.0
-        for <linux-bluetooth@vger.kernel.org>; Tue, 09 Jul 2024 05:18:53 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="m2zmY/Vf"
+Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-4257d5fc9b7so43134695e9.2
+        for <linux-bluetooth@vger.kernel.org>; Tue, 09 Jul 2024 05:18:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1720527532; x=1721132332; darn=vger.kernel.org;
+        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1720527534; x=1721132334; darn=vger.kernel.org;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=ECapj6dpkD5GtOAKeD+vFFeZbzC5454tZ0kmlaK792w=;
-        b=N6xXcfQ9VgD+IdV7SnG+2KEG9lmpCcRSWDWbbGoZhN+R97IntWOhHBtuMxrRwDL6X7
-         zWo1uVq/NmiZ4jLLIoNfJO2afKQFJ+iHug8aIkjGDPM7hRcT3thxapjJuzdnG/IQVIAA
-         gD/7eMpgw4De27pP0LpanbK+K/dajC0DdZRYHv0Ya8uocC/gotAVlgOr4f7f6aRt/+dv
-         ZpOo7YyZNUhrGkVpbsCBAVlUk8eu3UOHBupJF73O/fgNwIXcVsY3UmzQwC51z/r/sICE
-         L9ytw2YipSzYDOcxLgQSyE1LREE1bOjJNQVjBhZpFlGMB+vehU1NVdUwzb5eTsiDzxtg
-         MSlw==
+        bh=e+dtNPqMpO1JSuQuP+EiUeVQ86+1hBOBnH1yWFrsboA=;
+        b=m2zmY/VfbQb8Da632sYuUKUceRoCFEHGX5DH7rCXI2OvW3ecX8A0rHGu9szD+vbatR
+         nMpJXuGUPUnlyFDc8D7HsPOlNzA1TqEoF6du542Y8VSD7oBX+ixN8MXCCsYfX0a+vGMO
+         WkwFnGGbFH8AjIh+UM8cYAUEhFJH0GeCsLl2hzP7Yw89h6VXs58iM8/xE1uUcJ/qSkL9
+         6K3rO07AE3gaePVmIuKAksvAJnfLt/w41n/1O97h2hGOETpGM6hbnXqn5d9qA3wbS7mN
+         PO6bA51x2pcsO8NRpERb64HfFHOrsafd1cXw1aTwoxplXXZP+ZUz5TeHm+jd1bwggLkB
+         53Ew==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720527532; x=1721132332;
+        d=1e100.net; s=20230601; t=1720527534; x=1721132334;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=ECapj6dpkD5GtOAKeD+vFFeZbzC5454tZ0kmlaK792w=;
-        b=Q89W9a/QUhdcG8eDx+Hb/s9vVXkA0WrFRGkKdI3UtxDsl6imza+uU1tD9FfQkHw1N/
-         z2aMjrC1gj+aeM6wvMVgLZH1OLhhiNe6lJgzt3i9k2INOFKzXDqaY6dVmgr7ADWjWRax
-         Ijp/yuu6ciQGcx0ncjyVgnt+sSVB2kp7PT+Dz/M9TxzOpct+jjhqbV3W3mpvADvxt/17
-         a/CufruvkbJj5LyPQccUlQEFX0vQXXGBG7NwRDPz9Vk2WAqTo7Rz6JAfnPW/eZeLYaOt
-         mr0qfT29nhUwuBAPw3nMiK1gY9YJ0Y8uIfLhtpD8vITpmwOVu0DHvnRlabDGhnl/KEz5
-         VfxA==
-X-Gm-Message-State: AOJu0YwBpe9eD0wkf0v2QBBWF0Oo2IPb1eHys1JEUKb6nhpcaCHjUQBb
-	9fYE0hihcYe6mPv7G764B7qbCuFYAa11Udf4SQccFZee2rCZFxr43g8t301z0wo=
-X-Google-Smtp-Source: AGHT+IE5mNsJaZb0W9u7LKm5OLhrFNxxTQBmvoTQP7JiqV1MDRP/RpbcW8CS0+XL8gBe1CLKg4GSjA==
-X-Received: by 2002:a05:6000:a8f:b0:366:f74f:abf0 with SMTP id ffacd0b85a97d-367cea67d3cmr2104598f8f.16.1720527532299;
-        Tue, 09 Jul 2024 05:18:52 -0700 (PDT)
+        bh=e+dtNPqMpO1JSuQuP+EiUeVQ86+1hBOBnH1yWFrsboA=;
+        b=m1wBMr7XlPDSTliPwfIgxpkBzrtQRPf5ICaOgml97WiIvxxXHmYsw4cw9L7xqcScDL
+         3I7LqDUYQgadqUhWf4VB0AiQp/ywFhp4PPhk9yVTgGC/cDYw6Mh8u6BqLpXrmTIY+pEq
+         YxTB4j9km1rOhF580muJi3LYVTAwyg0lwMkLUUdYPHmbNEfmY2uS/HFjVqKbYfpNJdj4
+         NMsQdkdALSIOim85Y5xzcg9aUhFTzQVT6kG8yofZ46hf4WGk70VqMw1NEiDUKKRzXwCH
+         60kYp6NrmBfAjj/jW4PkCdr30OSvqdLj57S0DE8XmoAWs4HuJkIDN/m/3B+53/pRhhU4
+         Y8LA==
+X-Gm-Message-State: AOJu0Yycjuw3mZT4j5+pF+FKQF4dQUE5DY8V7jLPy49clPygw1a1Rema
+	RuRzYw5PbjQBqtYufg7KOiqxupORgT/pscuY4A+C6ofhlCjXK8cmzFSrx1KLIFA=
+X-Google-Smtp-Source: AGHT+IFweA1issX/4HQiTqhohofCoOEZBVGTbbhnNOb+nxx592TLdaUnqZj+a67Ky6K+2Dl2ZpPX3g==
+X-Received: by 2002:a5d:664a:0:b0:367:9c0b:374a with SMTP id ffacd0b85a97d-367ceadc925mr2014606f8f.65.1720527534081;
+        Tue, 09 Jul 2024 05:18:54 -0700 (PDT)
 Received: from [127.0.1.1] ([2a01:cb1d:dc:7e00:c270:70c:8581:7be])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-367cdfa06d3sm2390574f8f.75.2024.07.09.05.18.51
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-367cdfa06d3sm2390574f8f.75.2024.07.09.05.18.52
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 09 Jul 2024 05:18:51 -0700 (PDT)
+        Tue, 09 Jul 2024 05:18:52 -0700 (PDT)
 From: Bartosz Golaszewski <brgl@bgdev.pl>
-Date: Tue, 09 Jul 2024 14:18:32 +0200
-Subject: [PATCH v3 1/6] dt-bindings: bluetooth: qualcomm: describe the
- inputs from PMU for wcn7850
+Date: Tue, 09 Jul 2024 14:18:33 +0200
+Subject: [PATCH v3 2/6] Bluetooth: hci_qca: schedule a devm action for
+ disabling the clock
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -63,7 +63,7 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20240709-hci_qca_refactor-v3-1-5f48ca001fed@linaro.org>
+Message-Id: <20240709-hci_qca_refactor-v3-2-5f48ca001fed@linaro.org>
 References: <20240709-hci_qca_refactor-v3-0-5f48ca001fed@linaro.org>
 In-Reply-To: <20240709-hci_qca_refactor-v3-0-5f48ca001fed@linaro.org>
 To: Marcel Holtmann <marcel@holtmann.org>, 
@@ -81,81 +81,93 @@ Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
  linux-arm-msm@vger.kernel.org, 
  Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
 X-Mailer: b4 0.13.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1853;
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2033;
  i=bartosz.golaszewski@linaro.org; h=from:subject:message-id;
- bh=MP5aeVc3EiqpKpqEdBQnkaD+MInTgWkpRAZc9/j+Em8=;
- b=owEBbQKS/ZANAwAKARGnLqAUcddyAcsmYgBmjSqpWv/nrTEkdQaChA3flySvrHZnmrx7Ws0zy
- IJPfBGwGLqJAjMEAAEKAB0WIQQWnetsC8PEYBPSx58Rpy6gFHHXcgUCZo0qqQAKCRARpy6gFHHX
- cn77EACz9PrZC35c1YhRqZA+3b5QXDtGC1GtgOVx3UJpazSph8qUSv7pcXYHsI2RS7k4TdgHSum
- DsUUWT1NilZCdk7mkGSgoIQQCqJYowKje1KslgAXkeGuZilyje/Sv3t4qn7Kr7Bquq4p/4w3KoL
- G5lIPeOpp1DpELrUMo9MGBqLDe/7wWxFtppqSPmTRQSv+oABg7PyJ1jdOMqDej/UtaAmjDXU+De
- gLwopBSq1VNNx/izKVm0uGilkB97nxOAzs/syt5Tg8BCQv5s3JuAr/bAirj1KiVSN7qzZcHOO3o
- NpE51mOEMM+v1h/pfpDYEzVagULIAq1k+/wfYXS5/TQd7SaHSyqmZ3MU+6Ia5/7Q0PHdIejOdXs
- CbRwZmRwO4NQ+NhjfXjmX2UmOmTlIBHGEu+cY+aBon6Nky1KixW+5WoSS2xus2BtKENpZ8XjOQH
- XI0KuEGa/Z24I5hfZr1HDash+29eJ5zi8ah8t5hczhSQ2iPiC2vXgWGeGtpUZ9UMylXI6CjEMKb
- vmvcCS/2+LGtW2Yj9hxybDBUyesHvAfWc6Y+GZc3D9CWXXIE5Dp1eziotyMYV/QXFrMV56MHx/N
- B6sOmnEptb2j6a8WBwxNOl8u0EFOaiJ841FPGrsbtCqSpMtkBbKlDMTlZG5viqflKfkt+hQcaY/
- HNTWRwMQK1tuBEA==
+ bh=y4oPN0IOC//w7yzibHNZfMLbBW/mUsBkavbOtcL9zSQ=;
+ b=owEBbQKS/ZANAwAKARGnLqAUcddyAcsmYgBmjSqpJCae7x7FrVb9GKhCI8aiIZDqi6smv/2Oy
+ TCnRJhiqvCJAjMEAAEKAB0WIQQWnetsC8PEYBPSx58Rpy6gFHHXcgUCZo0qqQAKCRARpy6gFHHX
+ cn2YEADO+QDT3FIWf4bzh+JPwSy0rMQN4XWAUz37lis0Ug0ZO6xI7H8vZUipwOWWYPZWNtVVY6h
+ lzMS8dQ177QIiwrQ7GutREK8L2R34RJ54q8WxNp44UR0DwByxg8TGXPQPlXmIZiFcSUnfASKXIe
+ G6bVpTwZ+YQ9T6GTkWhxP4AAIlpq++B4mJOugt2sTo3OAJ/aPCeElG0Z21F3yFHSc4KLKMityxj
+ BimREouOxh87iddSK8y9iTxwcoYKfgvjPU0OvHHz4SJTAuwJywGUByvBmF0oa0bNHGHGDgfdm0U
+ Fw4gUoiMhyKzO3Xe1k3el0LwV19VwoPjCjiSNfpcAs0UvhgCBEsmMoXQseb4ZUcpiYuaikPXc6I
+ VBrO3TiEg76J1XkdyWMEwCEfUBw/6gYKXR/gBxlHKv/x0yfsfma9QOnYSlxUVn4XhdrcXTiC+u3
+ Vd4B2NNfgnvEpOkRzoI2WP1ZbeNqoxjCITI0MvxkGloLMIvlc9epbCMm0XRYoqHAcPsBKlHuSYt
+ k5dzq2UNXt8W1gtKcUo5ieMZf13yCK5dqYnbEuR8Q8s2Hok3FV2Ifwc6eoZAUVOEFjYV/xWkpGq
+ zBPIGlKwZ1lzT2wJ9NHTAQ/RzT1lsrPCaacCAaCVmMLiTXhHT606QL+qQ9U7cI858JMjnwweneC
+ r1X2H6DXfBNPTow==
 X-Developer-Key: i=bartosz.golaszewski@linaro.org; a=openpgp;
  fpr=169DEB6C0BC3C46013D2C79F11A72EA01471D772
 
 From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
 
-Drop the inputs from the host and instead expect the Bluetooth node to
-consume the outputs of the internal PMU. This model is closer to reality
-than how we represent it now.
+In preparation for unduplicating the hci_uart registration code,
+schedule a devres action for disabling the SUSCLK rather than doing it
+manually.
+
+We cannot really use devm_clk_get_enabled() as we also set the rate
+before enabling the clock. While this should in theory work, I don't
+want to risk breaking existing users. One solution for the future is to
+add devm_clk_get_enabled_with_rate() to the clock framework.
 
 Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
 ---
- .../bindings/net/bluetooth/qualcomm-bluetooth.yaml     | 18 +++++++++++++-----
- 1 file changed, 13 insertions(+), 5 deletions(-)
+ drivers/bluetooth/hci_qca.c | 23 +++++++++++++++--------
+ 1 file changed, 15 insertions(+), 8 deletions(-)
 
-diff --git a/Documentation/devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml b/Documentation/devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml
-index 48ac9f10ef05..68c5ed111417 100644
---- a/Documentation/devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml
-+++ b/Documentation/devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml
-@@ -77,6 +77,9 @@ properties:
-   vddrfa1p7-supply:
-     description: VDD_RFA_1P7 supply regulator handle
+diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+index bc6a49ba26f9..ace920261aa4 100644
+--- a/drivers/bluetooth/hci_qca.c
++++ b/drivers/bluetooth/hci_qca.c
+@@ -2295,6 +2295,13 @@ static int qca_init_regulators(struct qca_power *qca,
+ 	return 0;
+ }
  
-+  vddrfa1p8-supply:
-+    description: VDD_RFA_1P8 supply regulator handle
++static void qca_clk_disable_unprepare(void *data)
++{
++	struct clk *clk = data;
 +
-   vddrfa1p2-supply:
-     description: VDD_RFA_1P2 supply regulator handle
- 
-@@ -89,6 +92,12 @@ properties:
-   vddasd-supply:
-     description: VDD_ASD supply regulator handle
- 
-+  vddwlcx-supply:
-+    description: VDD_WLCX supply regulator handle
++	clk_disable_unprepare(clk);
++}
 +
-+  vddwlmx-supply:
-+    description: VDD_WLMX supply regulator handle
-+
-   max-speed:
-     description: see Documentation/devicetree/bindings/serial/serial.yaml
+ static int qca_serdev_probe(struct serdev_device *serdev)
+ {
+ 	struct qca_serdev *qcadev;
+@@ -2434,10 +2441,15 @@ static int qca_serdev_probe(struct serdev_device *serdev)
+ 		if (err)
+ 			return err;
  
-@@ -179,14 +188,13 @@ allOf:
-               - qcom,wcn7850-bt
-     then:
-       required:
--        - enable-gpios
--        - swctrl-gpios
--        - vddio-supply
-+        - vddrfacmn-supply
-         - vddaon-supply
--        - vdddig-supply
-+        - vddwlcx-supply
-+        - vddwlmx-supply
-         - vddrfa0p8-supply
-         - vddrfa1p2-supply
--        - vddrfa1p9-supply
-+        - vddrfa1p8-supply
-   - if:
-       properties:
-         compatible:
++		err = devm_add_action_or_reset(&serdev->dev,
++					       qca_clk_disable_unprepare,
++					       qcadev->susclk);
++		if (err)
++			return err;
++
+ 		err = hci_uart_register_device(&qcadev->serdev_hu, &qca_proto);
+ 		if (err) {
+ 			BT_ERR("Rome serdev registration failed");
+-			clk_disable_unprepare(qcadev->susclk);
+ 			return err;
+ 		}
+ 	}
+@@ -2477,15 +2489,10 @@ static void qca_serdev_remove(struct serdev_device *serdev)
+ 	case QCA_WCN6750:
+ 	case QCA_WCN6855:
+ 	case QCA_WCN7850:
+-		if (power->vregs_on) {
++		if (power->vregs_on)
+ 			qca_power_shutdown(&qcadev->serdev_hu);
+-			break;
+-		}
+-		fallthrough;
+-
++		break;
+ 	default:
+-		if (qcadev->susclk)
+-			clk_disable_unprepare(qcadev->susclk);
+ 	}
+ 
+ 	hci_uart_unregister_device(&qcadev->serdev_hu);
 
 -- 
 2.43.0
