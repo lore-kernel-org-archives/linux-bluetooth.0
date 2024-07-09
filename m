@@ -1,104 +1,76 @@
-Received: from mail-pj1-f46.google.com (mail-pj1-f46.google.com [209.85.216.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 667B51B86E8
-	for <linux-bluetooth@vger.kernel.org>; Tue,  9 Jul 2024 18:03:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DCA21B86D8
+	for <linux-bluetooth@vger.kernel.org>; Tue,  9 Jul 2024 19:03:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720548235; cv=none; b=ein6wVvw6wj3CkSiALOdvqy/dviIBnbd2vO3Psddy7UZkzD14nUGA+eD7qgkkLn50qGeyRQnV1P9jAbZW+b7l8FbUyogFcAqLTOr0PnlMsEOMsQDZvYaeuXaWM56oc0HqK/QbHSETuOs8MIXTGCjPAYb3joX3qniZ4gMqKGQXFY=
+	t=1720551782; cv=none; b=cbT7OYkAzf6iQd4RYkKMuYBX+r0RvErnXy7kJRWJCUgakWVWrS8ac4nKA64ocGdiucK/rhZMXcK6aKzJAXMffLQomhgU6wvE0BP4KmOJoTMMBYhtz0C4m9tjavv1LrIkoAXrXWNt5Bsd/YuRxsVhMyiT6HQGUc18towzulcccCA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720548235; c=relaxed/simple;
-	bh=laBmacV5zGVRAo8w/Copc7Kyh01xYchpEk09X0TUBqE=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=RRiCpndm/RtNUDXIPuD8dxJrfUitiKKYk/QtWL/cQZg4G5gLHGhuh+bMrGfi/yhIsFIayHEw6xzHJ0pgqazLyvPZivhxQQGgfgWA1zz0+vhcIGlvntDgIBIdhQcZEDfQjtKM4dztuqh+fVBKEWn8n69HABVNvbhh3Y6P02J59bw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Rtyyr18j; arc=none smtp.client-ip=209.85.216.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1720551782; c=relaxed/simple;
+	bh=lItXaG64kxCEMk5zqy/cEN5R8jy8udFCPQPNo5QUxqs=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=cA4VGHkAjFP5A9P0GXdzPM6mqXtRahxHIzcoF5IwtvbGhNqVZJsFegdrD0GeJfPGb7WiRbVx/s0UQF9OYh8zZTrFYSFKZCT/pDXOkOTfbOeIbNJl7j/nkmIESZ4pjmT7KAFutWzAbowDrGzq3wniSyE2TKVPANHMsLW31H1zr/M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hxIIrfzf; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Rtyyr18j"
-Received: by mail-pj1-f46.google.com with SMTP id 98e67ed59e1d1-2bfdae7997aso3319739a91.2
-        for <linux-bluetooth@vger.kernel.org>; Tue, 09 Jul 2024 11:03:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1720548233; x=1721153033; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=bdr1AC1mB6EZc9YWRAJeR/Qsv2HAwq+Gjdc4z592inY=;
-        b=Rtyyr18j5HoPpRk6t1eSPj1BZpfsHVuvjw26C1qojqq533lq6E4Vum8TqWcPxRfsgd
-         LiziafQquXr3LI0Igq8VIYFhpjcalgmyljmz1i8xOCLiy1FMN4UdofAc9AFgsPSL+zeC
-         o5DkHh2rTnbav6I6VFHz2fuLG80fgttHvA0UaVHMhihXJ8D0hl10QNTNz+qlAYpvmVu0
-         Wha5enPjw/P9GMjUX8ev5rRC2e8J/98eoGiIBvbL3pxzaW0TV2NBFI0rppwvnY59oxU6
-         piMGrrvt1ucYpdFrGk1j7QoVJ40mzZkpImuJM6nNoFFcNLT7TV9eARsxu21aFGRqZYVM
-         PUyw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720548233; x=1721153033;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=bdr1AC1mB6EZc9YWRAJeR/Qsv2HAwq+Gjdc4z592inY=;
-        b=m6S5cuap7ZVpYF5cQuRRK9Wm0sBjl8kjPzTiJ/hhXNuWr9jKp8eKyETOxoGhS9EF+n
-         UjMk1GvOh4SEdvrwH9LUWjDezn9NKEKh7t+V7T3VyAyG0+7pT4MefTkqTX3Dy1w262RW
-         WXSup3np7reUFh5HJ6vBjsBN4ZBi3uS3serlwoOFyE3hvnfjWg00KKktw86/8FuRhu+R
-         f6xYxOjMS/MIv71/CSLsAre3/OcQeAi972dCmx6oJ957XBUIrFbuYIb25PlTLxoqK/3X
-         0v3OE+h2wOKDaiZIzVdYG3xqlgoY+lZiMWWdOc3RWiBeB5+Goll77biJKI6S95WSyUMy
-         Afwg==
-X-Gm-Message-State: AOJu0Yw6dYKsbaKdTXL8cPD2df7AxVerrugVQkx8EhgvKICLrAl4OZXC
-	dpttKO+eHQt+pMTLBBVnGVrqJi3eOV2L8CBGy/nb3n0UTrG+N/NX9zCKjA==
-X-Google-Smtp-Source: AGHT+IExx60kaXyMCgwLoBpAFgIswYYj3wNsBeSUUBqFN2+hkCCcxH2EUvkmwwasv7Se8yUR7AKYhw==
-X-Received: by 2002:a17:90a:d24f:b0:2c9:8c34:9754 with SMTP id 98e67ed59e1d1-2ca35c7be35mr2875038a91.21.1720548233199;
-        Tue, 09 Jul 2024 11:03:53 -0700 (PDT)
-Received: from [172.17.0.2] ([20.172.5.82])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2ca353cc6cfsm2222972a91.54.2024.07.09.11.03.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 09 Jul 2024 11:03:52 -0700 (PDT)
-Message-ID: <668d7b88.170a0220.b3e0a.cf27@mx.google.com>
-Date: Tue, 09 Jul 2024 11:03:52 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============7888894521532163339=="
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hxIIrfzf"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 2A3DBC32782;
+	Tue,  9 Jul 2024 19:03:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1720551782;
+	bh=lItXaG64kxCEMk5zqy/cEN5R8jy8udFCPQPNo5QUxqs=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=hxIIrfzf/Dx2ql16O4OTVC8T5ueaGRcbo1vSJE+HGW4gVnmPqmjPPZIKeLsmVEm6q
+	 2bED+7A4xUeV8L2OtnDXjddvezazyWmnhBNEaW2E2Of3Wm5n9EcsaHIOJCrbK7XXV8
+	 m96M0W1PDYz7W7UOQ0RiAbBzAEA3GX32Z6Ux7I0h3/i9Xhzpa5/4nHHKFs5Ma/DXcr
+	 qpNHf2VFTBoxv3OOg4L+deGLQaxOVt1GSuOdOUjxpZMnUQhUHfDK/LYjK60AvVGeHn
+	 JUFilj0TLGYS4e36Rz8ZHbWohe5Ntf0SpQyQ+JS5mTgrN0Y4/YvBtVAPXf8P5lnPrs
+	 mKpBVDS2WDhCw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 0485EC4332D;
+	Tue,  9 Jul 2024 19:03:02 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, r.smirnov@omp.ru
-Subject: RE: fix errors found by SVACE static analyzer #3
-In-Reply-To: <20240709143503.12142-2-r.smirnov@omp.ru>
-References: <20240709143503.12142-2-r.smirnov@omp.ru>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH BlueZ 0/1] bap: Wait for BIG Info report event before creating
+ streams
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <172055178201.32169.12599597951238542702.git-patchwork-notify@kernel.org>
+Date: Tue, 09 Jul 2024 19:03:02 +0000
+References: <20240709085903.125001-1-vlad.pruteanu@nxp.com>
+In-Reply-To: <20240709085903.125001-1-vlad.pruteanu@nxp.com>
+To: Vlad Pruteanu <vlad.pruteanu@nxp.com>
+Cc: linux-bluetooth@vger.kernel.org, mihai-octavian.urzica@nxp.com,
+ iulia.tanasescu@nxp.com, andrei.istodorescu@nxp.com, luiz.dentz@gmail.com
 
---===============7888894521532163339==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hello:
 
-This is automated email and please do not reply to this email!
+This patch was applied to bluetooth/bluez.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-Dear submitter,
+On Tue,  9 Jul 2024 11:59:02 +0300 you wrote:
+> This makes it so that stream for each BIS is created after BIG
+> Info report is received. This ensures that when the stream is
+> created the encryption field is correctly set.
+> 
+> Vlad Pruteanu (1):
+>   bap: Wait for BIG Info report event before creating streams
+> 
+> [...]
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=869742
+Here is the summary with links:
+  - [BlueZ,1/1] bap: Wait for BIG Info report event before creating streams
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=2748c60a2c6b
 
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      1.32 seconds
-GitLint                       PASS      1.88 seconds
-BuildEll                      PASS      25.18 seconds
-BluezMake                     PASS      1713.50 seconds
-MakeCheck                     PASS      13.36 seconds
-MakeDistcheck                 PASS      180.35 seconds
-CheckValgrind                 PASS      255.85 seconds
-CheckSmatch                   PASS      358.51 seconds
-bluezmakeextell               PASS      120.61 seconds
-IncrementalBuild              PASS      4642.11 seconds
-ScanBuild                     PASS      1036.55 seconds
-
-
-
----
-Regards,
-Linux Bluetooth
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
---===============7888894521532163339==--
