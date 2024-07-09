@@ -1,16 +1,16 @@
 Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C51619D8B4
-	for <linux-bluetooth@vger.kernel.org>; Tue,  9 Jul 2024 14:35:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB53019D89D
+	for <linux-bluetooth@vger.kernel.org>; Tue,  9 Jul 2024 14:35:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720535749; cv=none; b=FI9LCWMPSdRz6nRUF0cre9kJsZ+1/rwEpgUyGZUVgfgt7IM8yPJ92jbXM1VlI0hMPh42EC14oSs6Opatj6FyW2FTS1c/ljlFbUUJTqh5/d9OVlAly26yLvsaURakF4BvIPj6+f6LmSmc7Psh0h6Z5T1FxlS/FS0/537cFEE0xVU=
+	t=1720535752; cv=none; b=g8dT2WmHVo20rxW4m6fuRV4k8xeL0hRIXyzjYqWLKBwGiAKcuC12ngVEQac+S1/v7UP8uMnkulX/trzMcJNk/Oa16uuNeaTs1GGA7rpI12aqmW+crqRufOXlRl8im66y0qtn6n/xfjIpZue0FeTePJj3ISadYPxVngcopx5NYsA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720535749; c=relaxed/simple;
-	bh=0ejBL7ZSc7gA/IcHRXJCCK5EfVVRFcFEnRVWsUP1gqk=;
+	s=arc-20240116; t=1720535752; c=relaxed/simple;
+	bh=zbITHsIUUE0Ji1/YBq0mag53WJ4gNvYQz7iddUlO4lk=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Ll5j2QWftyXcqRITcXV/q9nG9oqdWDsVGiFoX0FhiZKvUG5BdIaoA8Ihf+8pesuh9bbMCKwfs9n0G0M797p5GRynBMaeDXdpjTq3XJSwJYmKm1C6PqCnRhKH8ZqSJA+VjOuRYKW61E4NEcsBguvbMSikppaZmD3RhEIsjrAzyfs=
+	 MIME-Version:Content-Type; b=md8BCbvlqWpK0vJkfohik8l4A+xjxIFVAUWa+fDrbVSsFI+RATe7aP2Ktt1dBvRy7hdUl4294IXN9IUzrfAlDo6XYHBdmDHAM8uwZEHfiYj4EPakHJi/pFYP6zIFbIsmzE2N34kBLy04WhNOPMkHH3IdV2adu7Qh8LfG6z/75pQ=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
@@ -21,9 +21,9 @@ Received: from inp1wst083.omp.ru (81.22.207.138) by msexch01.omp.ru
 From: Roman Smirnov <r.smirnov@omp.ru>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Roman Smirnov <r.smirnov@omp.ru>
-Subject: [PATCH BlueZ v2 2/4] shared: prevent dereferencing of NULL pointers
-Date: Tue, 9 Jul 2024 17:35:01 +0300
-Message-ID: <20240709143503.12142-3-r.smirnov@omp.ru>
+Subject: [PATCH BlueZ v2 3/4] settings: limit string size in load_service()
+Date: Tue, 9 Jul 2024 17:35:02 +0300
+Message-ID: <20240709143503.12142-4-r.smirnov@omp.ru>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240709143503.12142-1-r.smirnov@omp.ru>
 References: <20240709143503.12142-1-r.smirnov@omp.ru>
@@ -68,66 +68,28 @@ X-KSE-Attachment-Filter-Triggered-Rules: Clean
 X-KSE-Attachment-Filter-Triggered-Filters: Clean
 X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
-It is necessary to add checks for NULL before dereferencing pointers.
+It is necessary to prevent buffer overflow by limiting
+the maximum string length.
 
 Found with the SVACE static analysis tool.
 ---
- src/shared/micp.c |  4 ++++
- src/shared/vcp.c  | 12 ++++++++++++
- 2 files changed, 16 insertions(+)
+ V1 -> V2: use "%36s[^:]" instead of calculating the string length
+ src/settings.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/src/shared/micp.c b/src/shared/micp.c
-index b82bd92de..1c34e9d00 100644
---- a/src/shared/micp.c
-+++ b/src/shared/micp.c
-@@ -398,6 +398,10 @@ static void mics_mute_write(struct gatt_db_attribute *attrib,
+diff --git a/src/settings.c b/src/settings.c
+index b61e694f1..643a083db 100644
+--- a/src/settings.c
++++ b/src/settings.c
+@@ -193,7 +193,7 @@ static int load_service(struct gatt_db *db, char *handle, char *value)
+ 		return -EIO;
  	}
  
- 	micp_op = iov_pull_mem(&iov, sizeof(*micp_op));
-+	if (!micp_op) {
-+		DBG(micp, "iov_pull_mem() returned NULL");
-+		goto respond;
-+	}
- 
- 	if ((*micp_op == MICS_DISABLED) || (*micp_op != MICS_NOT_MUTED
- 		&& *micp_op != MICS_MUTED)) {
-diff --git a/src/shared/vcp.c b/src/shared/vcp.c
-index 06264a241..602d46dc1 100644
---- a/src/shared/vcp.c
-+++ b/src/shared/vcp.c
-@@ -925,6 +925,10 @@ static void vcs_cp_write(struct gatt_db_attribute *attrib,
+-	if (sscanf(value, "%[^:]:%04hx:%36s", type, &end, uuid_str) != 3) {
++	if (sscanf(value, "%36[^:]:%04hx:%36s", type, &end, uuid_str) != 3) {
+ 		DBG("Failed to parse value: %s", value);
+ 		return -EIO;
  	}
- 
- 	vcp_op = iov_pull_mem(&iov, sizeof(*vcp_op));
-+	if (!vcp_op) {
-+		DBG(vcp, "iov_pull_mem() returned NULL");
-+		goto respond;
-+	}
- 
- 	for (handler = vcp_handlers; handler && handler->str; handler++) {
- 		if (handler->op != *vcp_op)
-@@ -985,6 +989,10 @@ static void vocs_cp_write(struct gatt_db_attribute *attrib,
- 	}
- 
- 	vcp_op = iov_pull_mem(&iov, sizeof(*vcp_op));
-+	if (!vcp_op) {
-+		DBG(vcp, "iov_pull_mem() returned NULL");
-+		goto respond;
-+	}
- 
- 	for (handler = vocp_handlers; handler && handler->str; handler++) {
- 		if (handler->op != *vcp_op)
-@@ -1517,6 +1525,10 @@ static void aics_ip_cp_write(struct gatt_db_attribute *attrib,
- 	}
- 
- 	aics_op = iov_pull_mem(&iov, sizeof(*aics_op));
-+	if (!aics_op) {
-+		DBG(vcp, "iov_pull_mem() returned NULL");
-+		goto respond;
-+	}
- 
- 	for (handler = aics_handlers; handler && handler->str; handler++) {
- 		if (handler->op != *aics_op)
 -- 
 2.34.1
 
