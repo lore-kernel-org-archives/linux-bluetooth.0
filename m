@@ -1,29 +1,29 @@
 Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A88319D8A9
-	for <linux-bluetooth@vger.kernel.org>; Tue,  9 Jul 2024 14:35:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C51619D8B4
+	for <linux-bluetooth@vger.kernel.org>; Tue,  9 Jul 2024 14:35:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720535741; cv=none; b=tUHOPyrlby2Me794Ht/YHQFqIYiq7SrPZ0SfpKRBumhjuNKOrocpl64eFTtbLy77a8wT7bU/rux8VHCCb04GCgoY5vaUF6YEIulzzYpCQ2zCmalHWFQSKrvm08lGKvc+QrfgDTnr7XhuA2B1VHBmXXh4m/Ds29gB9aklMSoDn4w=
+	t=1720535749; cv=none; b=FI9LCWMPSdRz6nRUF0cre9kJsZ+1/rwEpgUyGZUVgfgt7IM8yPJ92jbXM1VlI0hMPh42EC14oSs6Opatj6FyW2FTS1c/ljlFbUUJTqh5/d9OVlAly26yLvsaURakF4BvIPj6+f6LmSmc7Psh0h6Z5T1FxlS/FS0/537cFEE0xVU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720535741; c=relaxed/simple;
-	bh=vhrdcBVQZoZrccPSJiEm7syXScooPKEPuKqw+PcZYsQ=;
+	s=arc-20240116; t=1720535749; c=relaxed/simple;
+	bh=0ejBL7ZSc7gA/IcHRXJCCK5EfVVRFcFEnRVWsUP1gqk=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=til+EKupZWNPwmRIp/6QlY3kmGAXw4AftHNDnuGrv+JCXks16dYSVocq1KCny1SDGQvjLpkwbtptXjrN887TLUBVPfMEk0IDZBPR6t9AOTA361MqUyq6yXThuXuhYYv5ABWOgCoPTHmXbWZjqw8NOCbve/BqM8dXrB545VgQ360=
+	 MIME-Version:Content-Type; b=Ll5j2QWftyXcqRITcXV/q9nG9oqdWDsVGiFoX0FhiZKvUG5BdIaoA8Ihf+8pesuh9bbMCKwfs9n0G0M797p5GRynBMaeDXdpjTq3XJSwJYmKm1C6PqCnRhKH8ZqSJA+VjOuRYKW61E4NEcsBguvbMSikppaZmD3RhEIsjrAzyfs=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
 Received: from inp1wst083.omp.ru (81.22.207.138) by msexch01.omp.ru
  (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Tue, 9 Jul
- 2024 17:35:22 +0300
+ 2024 17:35:23 +0300
 From: Roman Smirnov <r.smirnov@omp.ru>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Roman Smirnov <r.smirnov@omp.ru>
-Subject: [PATCH BlueZ v2 1/4] health: mcap: add checks for NULL mcap_notify_error()
-Date: Tue, 9 Jul 2024 17:35:00 +0300
-Message-ID: <20240709143503.12142-2-r.smirnov@omp.ru>
+Subject: [PATCH BlueZ v2 2/4] shared: prevent dereferencing of NULL pointers
+Date: Tue, 9 Jul 2024 17:35:01 +0300
+Message-ID: <20240709143503.12142-3-r.smirnov@omp.ru>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240709143503.12142-1-r.smirnov@omp.ru>
 References: <20240709143503.12142-1-r.smirnov@omp.ru>
@@ -68,47 +68,66 @@ X-KSE-Attachment-Filter-Triggered-Rules: Clean
 X-KSE-Attachment-Filter-Triggered-Filters: Clean
 X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
-It is necessary to prevent dereferencing of NULL pointers.
+It is necessary to add checks for NULL before dereferencing pointers.
 
 Found with the SVACE static analysis tool.
 ---
- profiles/health/mcap.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
+ src/shared/micp.c |  4 ++++
+ src/shared/vcp.c  | 12 ++++++++++++
+ 2 files changed, 16 insertions(+)
 
-diff --git a/profiles/health/mcap.c b/profiles/health/mcap.c
-index 7eceaa88a..2e4214a69 100644
---- a/profiles/health/mcap.c
-+++ b/profiles/health/mcap.c
-@@ -336,6 +336,9 @@ static void mcap_notify_error(struct mcap_mcl *mcl, GError *err)
- 	case MCAP_MD_CREATE_MDL_REQ:
- 		st = MDL_WAITING;
- 		l = g_slist_find_custom(mcl->mdls, &st, cmp_mdl_state);
-+		if (!l)
-+			return;
-+
- 		mdl = l->data;
- 		mcl->mdls = g_slist_remove(mcl->mdls, mdl);
- 		mcap_mdl_unref(mdl);
-@@ -345,6 +348,9 @@ static void mcap_notify_error(struct mcap_mcl *mcl, GError *err)
- 	case MCAP_MD_ABORT_MDL_REQ:
- 		st = MDL_WAITING;
- 		l = g_slist_find_custom(mcl->mdls, &st, cmp_mdl_state);
-+		if (!l)
-+			return;
-+
- 		shutdown_mdl(l->data);
- 		update_mcl_state(mcl);
- 		con->cb.notify(err, con->user_data);
-@@ -362,6 +368,9 @@ static void mcap_notify_error(struct mcap_mcl *mcl, GError *err)
- 	case MCAP_MD_RECONNECT_MDL_REQ:
- 		st = MDL_WAITING;
- 		l = g_slist_find_custom(mcl->mdls, &st, cmp_mdl_state);
-+		if (!l)
-+			return;
-+
- 		shutdown_mdl(l->data);
- 		update_mcl_state(mcl);
- 		con->cb.op(NULL, err, con->user_data);
+diff --git a/src/shared/micp.c b/src/shared/micp.c
+index b82bd92de..1c34e9d00 100644
+--- a/src/shared/micp.c
++++ b/src/shared/micp.c
+@@ -398,6 +398,10 @@ static void mics_mute_write(struct gatt_db_attribute *attrib,
+ 	}
+ 
+ 	micp_op = iov_pull_mem(&iov, sizeof(*micp_op));
++	if (!micp_op) {
++		DBG(micp, "iov_pull_mem() returned NULL");
++		goto respond;
++	}
+ 
+ 	if ((*micp_op == MICS_DISABLED) || (*micp_op != MICS_NOT_MUTED
+ 		&& *micp_op != MICS_MUTED)) {
+diff --git a/src/shared/vcp.c b/src/shared/vcp.c
+index 06264a241..602d46dc1 100644
+--- a/src/shared/vcp.c
++++ b/src/shared/vcp.c
+@@ -925,6 +925,10 @@ static void vcs_cp_write(struct gatt_db_attribute *attrib,
+ 	}
+ 
+ 	vcp_op = iov_pull_mem(&iov, sizeof(*vcp_op));
++	if (!vcp_op) {
++		DBG(vcp, "iov_pull_mem() returned NULL");
++		goto respond;
++	}
+ 
+ 	for (handler = vcp_handlers; handler && handler->str; handler++) {
+ 		if (handler->op != *vcp_op)
+@@ -985,6 +989,10 @@ static void vocs_cp_write(struct gatt_db_attribute *attrib,
+ 	}
+ 
+ 	vcp_op = iov_pull_mem(&iov, sizeof(*vcp_op));
++	if (!vcp_op) {
++		DBG(vcp, "iov_pull_mem() returned NULL");
++		goto respond;
++	}
+ 
+ 	for (handler = vocp_handlers; handler && handler->str; handler++) {
+ 		if (handler->op != *vcp_op)
+@@ -1517,6 +1525,10 @@ static void aics_ip_cp_write(struct gatt_db_attribute *attrib,
+ 	}
+ 
+ 	aics_op = iov_pull_mem(&iov, sizeof(*aics_op));
++	if (!aics_op) {
++		DBG(vcp, "iov_pull_mem() returned NULL");
++		goto respond;
++	}
+ 
+ 	for (handler = aics_handlers; handler && handler->str; handler++) {
+ 		if (handler->op != *aics_op)
 -- 
 2.34.1
 
