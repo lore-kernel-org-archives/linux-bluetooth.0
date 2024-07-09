@@ -1,15 +1,16 @@
 Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40B6D19D89D
-	for <linux-bluetooth@vger.kernel.org>; Tue,  9 Jul 2024 14:35:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A88319D8A9
+	for <linux-bluetooth@vger.kernel.org>; Tue,  9 Jul 2024 14:35:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720535733; cv=none; b=bCppqNlygqe4NptoIpT4E3h1yaShX20jVWdYvhU39S/oSVIv7UB16NRw6+yu+FwkW/v265sjjx8+GAv35rdtg/D/eDQD0zF+SSW9GpnffLdOkkbCqorUpDhFAy+2vb7pECQaNNJzzpKGI+77vAgeF4vv4SeQZE9K7NL1f02Yf/I=
+	t=1720535741; cv=none; b=tUHOPyrlby2Me794Ht/YHQFqIYiq7SrPZ0SfpKRBumhjuNKOrocpl64eFTtbLy77a8wT7bU/rux8VHCCb04GCgoY5vaUF6YEIulzzYpCQ2zCmalHWFQSKrvm08lGKvc+QrfgDTnr7XhuA2B1VHBmXXh4m/Ds29gB9aklMSoDn4w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720535733; c=relaxed/simple;
-	bh=P7rod23LGcko/95mA41ZVb08qOedxJx9FMyU+3ZT3ac=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=OOQeNK/epvphJP14hU/xYNdBimBgE0jg5aGCcfcYMQon+sCUq9Aytj4G6XR8AgT6ZbXn+Al7VuWXxGSIXfb1HHKI5kXIAKazN/cJgl6wKWOe3tCUFtdIRK9rYqF6IpEwW9xNZkFM1nZnR2oUxCEDBPCZbRg3aoyF9lsb9rDhgpA=
+	s=arc-20240116; t=1720535741; c=relaxed/simple;
+	bh=vhrdcBVQZoZrccPSJiEm7syXScooPKEPuKqw+PcZYsQ=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=til+EKupZWNPwmRIp/6QlY3kmGAXw4AftHNDnuGrv+JCXks16dYSVocq1KCny1SDGQvjLpkwbtptXjrN887TLUBVPfMEk0IDZBPR6t9AOTA361MqUyq6yXThuXuhYYv5ABWOgCoPTHmXbWZjqw8NOCbve/BqM8dXrB545VgQ360=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
@@ -20,10 +21,12 @@ Received: from inp1wst083.omp.ru (81.22.207.138) by msexch01.omp.ru
 From: Roman Smirnov <r.smirnov@omp.ru>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Roman Smirnov <r.smirnov@omp.ru>
-Subject: [PATCH BlueZ v2 0/4] fix errors found by SVACE static analyzer #3
-Date: Tue, 9 Jul 2024 17:34:59 +0300
-Message-ID: <20240709143503.12142-1-r.smirnov@omp.ru>
+Subject: [PATCH BlueZ v2 1/4] health: mcap: add checks for NULL mcap_notify_error()
+Date: Tue, 9 Jul 2024 17:35:00 +0300
+Message-ID: <20240709143503.12142-2-r.smirnov@omp.ru>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20240709143503.12142-1-r.smirnov@omp.ru>
+References: <20240709143503.12142-1-r.smirnov@omp.ru>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -65,20 +68,47 @@ X-KSE-Attachment-Filter-Triggered-Rules: Clean
 X-KSE-Attachment-Filter-Triggered-Filters: Clean
 X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
-Several bug fixes.
+It is necessary to prevent dereferencing of NULL pointers.
 
-Roman Smirnov (4):
-  health: mcap: add checks for NULL mcap_notify_error()
-  shared: prevent dereferencing of NULL pointers
-  settings: limit string size in load_service()
-  settings: limit string size in gatt_db_load()
+Found with the SVACE static analysis tool.
+---
+ profiles/health/mcap.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
- profiles/health/mcap.c |  9 +++++++++
- src/settings.c         |  6 +++---
- src/shared/micp.c      |  4 ++++
- src/shared/vcp.c       | 12 ++++++++++++
- 4 files changed, 28 insertions(+), 3 deletions(-)
-
+diff --git a/profiles/health/mcap.c b/profiles/health/mcap.c
+index 7eceaa88a..2e4214a69 100644
+--- a/profiles/health/mcap.c
++++ b/profiles/health/mcap.c
+@@ -336,6 +336,9 @@ static void mcap_notify_error(struct mcap_mcl *mcl, GError *err)
+ 	case MCAP_MD_CREATE_MDL_REQ:
+ 		st = MDL_WAITING;
+ 		l = g_slist_find_custom(mcl->mdls, &st, cmp_mdl_state);
++		if (!l)
++			return;
++
+ 		mdl = l->data;
+ 		mcl->mdls = g_slist_remove(mcl->mdls, mdl);
+ 		mcap_mdl_unref(mdl);
+@@ -345,6 +348,9 @@ static void mcap_notify_error(struct mcap_mcl *mcl, GError *err)
+ 	case MCAP_MD_ABORT_MDL_REQ:
+ 		st = MDL_WAITING;
+ 		l = g_slist_find_custom(mcl->mdls, &st, cmp_mdl_state);
++		if (!l)
++			return;
++
+ 		shutdown_mdl(l->data);
+ 		update_mcl_state(mcl);
+ 		con->cb.notify(err, con->user_data);
+@@ -362,6 +368,9 @@ static void mcap_notify_error(struct mcap_mcl *mcl, GError *err)
+ 	case MCAP_MD_RECONNECT_MDL_REQ:
+ 		st = MDL_WAITING;
+ 		l = g_slist_find_custom(mcl->mdls, &st, cmp_mdl_state);
++		if (!l)
++			return;
++
+ 		shutdown_mdl(l->data);
+ 		update_mcl_state(mcl);
+ 		con->cb.op(NULL, err, con->user_data);
 -- 
 2.34.1
 
