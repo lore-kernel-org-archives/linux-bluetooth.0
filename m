@@ -1,165 +1,112 @@
-Received: from mail-lj1-f170.google.com (mail-lj1-f170.google.com [209.85.208.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13E1F150981
-	for <linux-bluetooth@vger.kernel.org>; Tue,  9 Jul 2024 20:33:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A2CE1B86D4
+	for <linux-bluetooth@vger.kernel.org>; Tue,  9 Jul 2024 21:44:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720557238; cv=none; b=kc6xEu4bNwX0JLEFBHHMdIL2QUx2TG+My6qokYdIpjDVR2iHTl0EWnigKR52acQoh6QvFeJs2/94+n/8rsKc9Wxq/78cIrAkKNszal6yliVUXqPk8MjoOS1Rd/ihm9StlUje51xmwWV8lwPGDQeoqGgU9oTiCmo8ILUVW5fGHjc=
+	t=1720561491; cv=none; b=qTB3LSxIlZPCM+5n4BNJFtlTeQPnsVwxQk94dThEItTwewK3a3HngfbTZfo+FvIzzzedRXXNAyV7Sp0QAe5v1oFhbghtCPxo5gQHUF3vPtIdlUpLeMSS4ARMroMB2DsriTPUTDZ2y7HC+MlMYAwyYvkf+yBI+ACjmT66Du01cYw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720557238; c=relaxed/simple;
-	bh=OL1WJt5P8XK3wOWC1l1XUG6L7TiOtom60QY9yoLileM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=rkrtBJMae68+FptBBlFCFXoIjrpBCZfd0X2bSDaThOEBwXz2GkXm93oBqtx0vKjUYxKKRJQtgD07unvLse9SfoFPMN77Bll7PckEpkVfqSIwH3IkuK7H9EFHC3RLFy+IZYhlOEzWI3NDNr0gmmi6vIPKM9UrXyuWQUN4qs/FixY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cr/xQH+k; arc=none smtp.client-ip=209.85.208.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1720561491; c=relaxed/simple;
+	bh=63izeCz53G078iWXEXL7eFAOgiVSv0mEufcjVf+3teg=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=hJBB819//t+bmwxPqdk0z2BlTa8XwRVOgSddg9GVZslU1XoEGZoz+GXepFfMDaXJM/qA7oKh1KP3XUOA6I1Z4iZs0c7gfTw2gVQsm+rRg2ge8TERv3FwnrIXt/3PCL0z/E+9fEV04wGB5Q486eMunf2LUjJSA6AGL/MOaAbjY+8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=JkXwipeu; arc=none smtp.client-ip=198.175.65.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cr/xQH+k"
-Received: by mail-lj1-f170.google.com with SMTP id 38308e7fff4ca-2ee4ae13aabso56522291fa.2
-        for <linux-bluetooth@vger.kernel.org>; Tue, 09 Jul 2024 13:33:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1720557235; x=1721162035; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=NvaheOfQKcTUEbWUXRhCIe8SrRk4TyoGsOvVD1RP8gU=;
-        b=cr/xQH+knjFu1CoZaMKiqE9f1ldg/u2RjopdW23TXAdzIwJLbx71FbH8NQSiwaZpxx
-         OGIlCv3d1PPOmYTYFlB1yxbXsN05TwTj5Aj9vNlVrI4BrNWSgTIlEGxrQPAJzXNgEWl6
-         w5RjYHmLuUzqrdMBmxQe9DMCMM12m+6xr+hHvqRWgdxucgtY7Hl2kuPLHrkaZDCVbuHw
-         EKKCA8A7NffxGPHbmMYgCnyPSndM7E+moEeagL2EsepNQcCSe8/oZK5IoP2upsWcgSRh
-         NeS29CtSVgpMiObuhKNvbtyJw2fP0GgL1B6YDqaIDEaJndEXFgbFm1TJBBDJIbkQFizK
-         9G8w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720557235; x=1721162035;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=NvaheOfQKcTUEbWUXRhCIe8SrRk4TyoGsOvVD1RP8gU=;
-        b=t6SC9XeDk6YD5eiPPLoZKGCSlYHHSrogWpxZx1Ww92acgWRlnBC998JZfXpcdsQswE
-         iQsjF8lZ4le6Ekw+PX4Aekeqj3mZkM729zu8q3cPAVfqaKOqsrZ9owDJ0GxvZ7GCamEk
-         h/lGbkzL/5YvSyA9xqAMWBaYhprZ4Eu+SfXnPbsWrsUMrNjaenXq+gnlBLwEPZ0WFtao
-         muJ0ynwTKm3UhDCW1VJKeLAE/wN0if4RV6MC0YgjgGduB7KIRztuco9W3vVz9f4jfqAR
-         Ffl5Yj/rgPM9PvlgfnSIwy5dBn4sGh8WRHONZNqJK6CBTvpy2p/cm1+wgfm1W2eSUs7H
-         6C4Q==
-X-Gm-Message-State: AOJu0YztDfiQ7FuAaTA0a+dB9JK/1gvgd38gmXnjAk1KpRyxSzyfM6tQ
-	P87qkwfFbJAlsCpdk5tDIWCv+w82Jn+3T4lctSpuCJqANPkwGRxpjDe+H1i3Yzlbci4UljeuW5y
-	igmJ3AYnqi+/MdwY3GxM5ssIXS0b2mYIi
-X-Google-Smtp-Source: AGHT+IFB4+H7R8tAzGpwyg+GusWsCF+eORx4E6zR4RNmdSM/iLdgSSWNDxziWolrnAA82/0goHCbxWov7Dns1+5mzos=
-X-Received: by 2002:a2e:9482:0:b0:2ec:56b9:259f with SMTP id
- 38308e7fff4ca-2eeb319134dmr22341471fa.48.1720557234841; Tue, 09 Jul 2024
- 13:33:54 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="JkXwipeu"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1720561490; x=1752097490;
+  h=date:from:to:cc:subject:message-id:mime-version;
+  bh=63izeCz53G078iWXEXL7eFAOgiVSv0mEufcjVf+3teg=;
+  b=JkXwipeu1bgLNnjDcO3Ru136Sxj+EuXgBNau0S3xETuid3CxI3whcQM9
+   87I5jcgf4/5GE7T2BhCTBp9s+3AxBQ+6qVag5gar7q8SwuLN8mAvYhli8
+   DVM3q11XL8+ITNzPGu6OpauDR573ZrpQ7wPpDow2ay1Sk9Ca015iw5+w+
+   hqw5aBt6CRPTEH4eaErOK83A+lXJRTfOlfEC85xSeBPBb+EK4zhb9Z38C
+   7/rt9MG+0MmGZ39Bu9PnPgis2uHHN3G3wYdXM6uV+1anKUGyTmVwNC2Fy
+   MAU/IIiDrSJGrLhL1NQtjx8AveOTmadq/aisFQRVlJ5aPCYxrdRhJpsy5
+   g==;
+X-CSE-ConnectionGUID: L7g9lpz2SfqFK45HBKF0RA==
+X-CSE-MsgGUID: QuaZs4+1T0KIIQQ0zhHJuw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11128"; a="21619296"
+X-IronPort-AV: E=Sophos;i="6.09,196,1716274800"; 
+   d="scan'208";a="21619296"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jul 2024 14:44:31 -0700
+X-CSE-ConnectionGUID: bt27X9HKQAWpWt4KeuNtEQ==
+X-CSE-MsgGUID: /dYkPFVIQ6CuMUFbFksp3Q==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.09,196,1716274800"; 
+   d="scan'208";a="79149867"
+Received: from lkp-server01.sh.intel.com (HELO 68891e0c336b) ([10.239.97.150])
+  by fmviesa001.fm.intel.com with ESMTP; 09 Jul 2024 14:44:29 -0700
+Received: from kbuild by 68891e0c336b with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1sRIdP-000X8w-10;
+	Tue, 09 Jul 2024 21:44:27 +0000
+Date: Wed, 10 Jul 2024 05:44:21 +0800
+From: kernel test robot <lkp@intel.com>
+To: Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>
+Cc: oe-kbuild-all@lists.linux.dev, linux-bluetooth@vger.kernel.org,
+	Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Subject: [bluetooth-next:master 76/76] drivers/bluetooth/btnxpuart.c:1534:12:
+ warning: 'nxp_serdev_resume' defined but not used
+Message-ID: <202407100518.06Xxq5PK-lkp@intel.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <SN4PR19MB5421B1226EA92B735CADEA44E4C82@SN4PR19MB5421.namprd19.prod.outlook.com>
- <SN4PR19MB54215EF3B4E7380A21387D2EE4DB2@SN4PR19MB5421.namprd19.prod.outlook.com>
-In-Reply-To: <SN4PR19MB54215EF3B4E7380A21387D2EE4DB2@SN4PR19MB5421.namprd19.prod.outlook.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Tue, 9 Jul 2024 16:33:40 -0400
-Message-ID: <CABBYNZ+8ca5f6nWG3D3x8mL3g=57Z0pogQP-+ww_aQuC0R1DWw@mail.gmail.com>
-Subject: Re: [PATCH] ATT: Error (0x01) - Error: Unlikely error (14) Prepare
- Write req (0x16)
-To: "Ramsay, Trey" <Trey.Ramsay@dell.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Hi Trey,
+tree:   https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
+head:   c6052c312e85011cd31237804900013f63420403
+commit: c6052c312e85011cd31237804900013f63420403 [76/76] Bluetooth: btnxpuart: Add system suspend and resume handlers
+config: sh-allmodconfig (https://download.01.org/0day-ci/archive/20240710/202407100518.06Xxq5PK-lkp@intel.com/config)
+compiler: sh4-linux-gcc (GCC) 13.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240710/202407100518.06Xxq5PK-lkp@intel.com/reproduce)
 
-On Tue, Jul 9, 2024 at 1:34=E2=80=AFPM Ramsay, Trey <Trey.Ramsay@dell.com> =
-wrote:
->
-> Bluez Maintainers,
-> Here is a fix for attribute writes not working in src/shared/gatt-db.c. T=
-he prep_write_complete_cb was not getting called. The attrib->write_func co=
-de block should not be called when len is 0
->
-> commit 5a9baa10d4fde7ca8ab88ecd68e17671c33cb587 (HEAD -> gat-db, master)
-> Author: Trey_Ramsay <trey_ramsay@dell.com>
-> Date:   Fri May 31 15:39:27 2024 -0500
->
->     shared/gatt-db: Prepare Write req error BT_ATT_ERROR_UNLIKELY
->
->     Fixes Prepare Write req error: BT_ATT_ERROR_UNLIKELY
->
->         ATT: Error (0x01)
->           Error: Unlikely error (14)
->           Prepare Write req (0x16) on handle 0x0069
->
->     The prep_write_complete_cb was not getting called
->     The attrib->write_func code block does not need to be called when len=
- is 0
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202407100518.06Xxq5PK-lkp@intel.com/
 
-This doesn't sound quite right, 0 length still needs to be passed to
-the attribute to confirm since we don't know if it could be a
-procedure or not. Can you explain what attribute is being written and
-if it could be due to the application not responding and the procedure
-timing out (e.g. write_timeout is called?), perhaps if you can paste a
-btmon trace as well that could help checking what attribute it is
-trying to use prepare write.
+All warnings (new ones prefixed by >>):
 
-> diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
-> index 2c8e7d31e..678aef4cf 100644
-> --- a/src/shared/gatt-db.c
-> +++ b/src/shared/gatt-db.c
-> @@ -2127,6 +2127,10 @@ bool gatt_db_attribute_write(struct gatt_db_attrib=
-ute *attrib, uint16_t offset,
->      if (!attrib || (!func && attrib->write_func))
->          return false;
->
-> +    /* Nothing to write just skip */
-> +    if (len =3D=3D 0)
-> +        goto done;
-> +
->      if (attrib->write_func) {
->          struct pending_write *p;
->
-> @@ -2162,10 +2166,6 @@ bool gatt_db_attribute_write(struct gatt_db_attrib=
-ute *attrib, uint16_t offset,
->          return true;
->      }
->
-> -    /* Nothing to write just skip */
-> -    if (len =3D=3D 0)
-> -        goto done;
-> -
->      /* For values stored in db allocate on demand */
->      if (!attrib->value || offset >=3D attrib->value_len ||
->                  len > (unsigned) (attrib->value_len - offset)) {
->
->
->
-> -----Original Message-----
-> From: Ramsay, Trey <Trey.Ramsay@dell.com>
-> Sent: Thursday, June 20, 2024 1:58 PM
-> To: linux-bluetooth@vger.kernel.org
-> Subject: [PATCH] ATT: Error (0x01) - Error: Unlikely error (14) Prepare W=
-rite req (0x16)
->
->
-> Bluez Maintainers
-> Here is a fix for attribute writes not working in src/shared/gatt-db.c
->
-> https://urldefense.com/v3/__https://github.com/tramsay/bluez-tramsay/comm=
-it/246bc960629dff34e744c728f048e9f50f1a005d__;!!LpKI!jkJYamzU8bOdd1qt-sWpj6=
-gy1YwS30UyamHLUJj9Uy0UecrB6QxvCdSWFAUH7Dvq2wVJqu1C5jjoX5amywJH$ [github[.]c=
-om]
->
-> shared/gatt-db: Prepare Write req error BT_ATT_ERROR_UNLIKELY Fixes Prepa=
-re Write req error: BT_ATT_ERROR_UNLIKELY
->
->     ATT: Error (0x01)
->       Error: Unlikely error (14)
->       Prepare Write req (0x16) on handle 0x0069
->
-> The prep_write_complete_cb was not getting called The attrib->write_func =
-code block should not be called when len is 0
->
+>> drivers/bluetooth/btnxpuart.c:1534:12: warning: 'nxp_serdev_resume' defined but not used [-Wunused-function]
+    1534 | static int nxp_serdev_resume(struct device *dev)
+         |            ^~~~~~~~~~~~~~~~~
+>> drivers/bluetooth/btnxpuart.c:1525:12: warning: 'nxp_serdev_suspend' defined but not used [-Wunused-function]
+    1525 | static int nxp_serdev_suspend(struct device *dev)
+         |            ^~~~~~~~~~~~~~~~~~
 
 
---=20
-Luiz Augusto von Dentz
+vim +/nxp_serdev_resume +1534 drivers/bluetooth/btnxpuart.c
+
+  1524	
+> 1525	static int nxp_serdev_suspend(struct device *dev)
+  1526	{
+  1527		struct btnxpuart_dev *nxpdev = dev_get_drvdata(dev);
+  1528		struct ps_data *psdata = &nxpdev->psdata;
+  1529	
+  1530		ps_control(psdata->hdev, PS_STATE_SLEEP);
+  1531		return 0;
+  1532	}
+  1533	
+> 1534	static int nxp_serdev_resume(struct device *dev)
+  1535	{
+  1536		struct btnxpuart_dev *nxpdev = dev_get_drvdata(dev);
+  1537		struct ps_data *psdata = &nxpdev->psdata;
+  1538	
+  1539		ps_control(psdata->hdev, PS_STATE_AWAKE);
+  1540		return 0;
+  1541	}
+  1542	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
