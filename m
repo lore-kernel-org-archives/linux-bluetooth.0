@@ -1,35 +1,29 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAAEE193459;
-	Wed, 10 Jul 2024 14:10:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E812E19149A
+	for <linux-bluetooth@vger.kernel.org>; Wed, 10 Jul 2024 14:16:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720620631; cv=none; b=ZuJnTBUhc4HSgIMyjoFSWNi0FaeFoSkG+0YWhyKoI4gqovAnRDUsluipkQYNRDFFULt1Z0uo+lZoRqV1RoUhiFNRDZE7qpnRT+4hHERHBNUAbwtpZiCzRp9RTTQANNVcGdKciHXjB3So7uMoeutMqhoVgfRsbF0zKux4XrFNTG8=
+	t=1720621017; cv=none; b=EzxD8tLfDCmrMk/kuXOsjW6rmXf4PZ18l3/u86vKKC4xR6tW+nJ5ndKE45LTcMaA0ooo4o3s/rv5gqiwUNKT1G/7/UvpQ1ZMhCA9iy5FRDah6rW+HsquLtt6qYScn8FVc4S3mm9m8UDNnAwmObgggMY7ALYvdhoDPhlDqP0MTac=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720620631; c=relaxed/simple;
-	bh=2eKmmnMtBeoN42PJzxHkZzXIdXnivrGPQNFR3kqUCgo=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=h5GxOmpnGxxCHMuGcrVtXF4d3H7QuN8zg4JdzxSyB6PoCYnW5YW66afatcVCFMx/MWqm6icsk07VcQBDzJ7t4BiRlgFBLeLtjyus9on+yMoSHPyNWgv2QpHoyQd2x/F934cMydpetnnje0YqzP+rO8N3VW3yaV9lEe5DSDtmhSM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KZKZG5Ar; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KZKZG5Ar"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 66818C32781;
-	Wed, 10 Jul 2024 14:10:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1720620631;
-	bh=2eKmmnMtBeoN42PJzxHkZzXIdXnivrGPQNFR3kqUCgo=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=KZKZG5Ar4HsSko0GDS7NrAmFQyToKD64BQSuf+r+sQAG5hMJ0JyWOWuem/3fzSB5w
-	 r08ktdzzNGyLIgBDOtW35vkJhAYY1MpHES7X4PqKasLy8tXz2Baqi2Ui//3GY2ZhRY
-	 KvG+vcO+tr/vpmkUxZlrkW7oXdgaUbjZrS9T9Fk8/Uc9am0K6jVv2K0Vt9FbZFba2d
-	 IBGA+ywwWbU/pDkjbvORx4pLol5IxQZPslxylE8/fbc5o2D5UG7MlEMfcXiAdia0cl
-	 sm9oNSnRSX7+Iq6aMs6CMAng2GmtRUQ59LXG0/udJDL0rz+dlIKe6KdW54cZ3uUNTC
-	 unuPrID4eHBNQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 552C0C433E9;
-	Wed, 10 Jul 2024 14:10:31 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1720621017; c=relaxed/simple;
+	bh=zxlw8uCu3CW7c36o4nAO05DfYZJ29Nh21cGHVD8LWSM=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=KStjLptRcV48snT4fOovlB6G0LWxkifxpo+7ijjgnYBcOY8HV3lueN4LxhRh3IapychaJBmGXiy86gvs0GmRgKRNPdbBsL+HkfFuob949jw2BrA10p4Iz7AyIhaop0eNnsJBxvkdUPDd0w+4NRsUupfZohvtmb+GUoqJH85c934=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
+Received: from localhost.localdomain (178.205.55.202) by msexch01.omp.ru
+ (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Wed, 10 Jul
+ 2024 17:16:35 +0300
+From: Roman Smirnov <r.smirnov@omp.ru>
+To: <linux-bluetooth@vger.kernel.org>
+CC: Roman Smirnov <r.smirnov@omp.ru>
+Subject: [PATCH BlueZ v3 resend 0/6] fix errors found by SVACE static analyzer #1
+Date: Wed, 10 Jul 2024 17:16:13 +0300
+Message-ID: <20240710141621.64394-1-r.smirnov@omp.ru>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -37,42 +31,63 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2] Bluetooth: btnxpuart: Fix warnings for suspend and resume
- functions
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <172062063134.6722.14353003118029390627.git-patchwork-notify@kernel.org>
-Date: Wed, 10 Jul 2024 14:10:31 +0000
-References: <20240710123426.935122-1-neeraj.sanjaykale@nxp.com>
-In-Reply-To: <20240710123426.935122-1-neeraj.sanjaykale@nxp.com>
-To: Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>
-Cc: marcel@holtmann.org, luiz.dentz@gmail.com,
- linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
- amitkumar.karwar@nxp.com, rohit.fule@nxp.com, sherry.sun@nxp.com,
- ziniu.wang_1@nxp.com, haibo.chen@nxp.com, LnxRevLi@nxp.com
+Content-Type: text/plain
+X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
+ (10.188.4.12)
+X-KSE-ServerInfo: msexch01.omp.ru, 9
+X-KSE-AntiSpam-Interceptor-Info: scan successful
+X-KSE-AntiSpam-Version: 6.1.0, Database issued on: 07/10/2024 13:54:49
+X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
+X-KSE-AntiSpam-Method: none
+X-KSE-AntiSpam-Rate: 0
+X-KSE-AntiSpam-Info: Lua profiles 186438 [Jul 10 2024]
+X-KSE-AntiSpam-Info: Version: 6.1.0.4
+X-KSE-AntiSpam-Info: Envelope from: r.smirnov@omp.ru
+X-KSE-AntiSpam-Info: LuaCore: 24 0.3.24
+ 186c4d603b899ccfd4883d230c53f273b80e467f
+X-KSE-AntiSpam-Info: {rep_avail}
+X-KSE-AntiSpam-Info: {Tracking_uf_ne_domains}
+X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
+X-KSE-AntiSpam-Info:
+	omp.ru:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2;lore.kernel.org:7.1.1
+X-KSE-AntiSpam-Info: ApMailHostAddress: 178.205.55.202
+X-KSE-AntiSpam-Info: Rate: 0
+X-KSE-AntiSpam-Info: Status: not_detected
+X-KSE-AntiSpam-Info: Method: none
+X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
+ smtp.mailfrom=omp.ru;dkim=none
+X-KSE-Antiphishing-Info: Clean
+X-KSE-Antiphishing-ScanningType: Heuristic
+X-KSE-Antiphishing-Method: None
+X-KSE-Antiphishing-Bases: 07/10/2024 14:00:00
+X-KSE-Antivirus-Interceptor-Info: scan successful
+X-KSE-Antivirus-Info: Clean, bases: 7/10/2024 12:34:00 PM
+X-KSE-Attachment-Filter-Triggered-Rules: Clean
+X-KSE-Attachment-Filter-Triggered-Filters: Clean
+X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
-Hello:
+Several bug fixes.
 
-This patch was applied to bluetooth/bluetooth-next.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+Previous emails:
+https://lore.kernel.org/linux-bluetooth/20240702085508.30513-1-r.smirnov@omp.ru/
+https://lore.kernel.org/linux-bluetooth/20240702134106.102024-1-r.smirnov@omp.ru/
+https://lore.kernel.org/linux-bluetooth/20240704090756.31351-1-r.smirnov@omp.ru/
+https://lore.kernel.org/linux-bluetooth/20240704104928.43336-1-r.smirnov@omp.ru/
 
-On Wed, 10 Jul 2024 18:04:26 +0530 you wrote:
-> This fixes the warnings 'nxp_serdev_resume' and 'nxp_serdev_suspend'
-> defined but not used.
-> 
-> Signed-off-by: Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>
-> Reported-by: kernel test robot <lkp@intel.com>
-> Closes: https://lore.kernel.org/oe-kbuild-all/202407100518.06Xxq5PK-lkp@intel.com/
-> 
-> [...]
+Roman Smirnov (6):
+  gatt: add a check to sock_io_send()
+  shared/vcp: add NULL checks to foreach_aics_service()
+  client/player: add error code handling to transport_recv()
+  shared/vcp: prevent dereferencing of NULL pointers
+  player: fix the order of args in cmd_register_endpoint()
+  gatt-client: add NULL check to discover_secondary_cb()
 
-Here is the summary with links:
-  - [v2] Bluetooth: btnxpuart: Fix warnings for suspend and resume functions
-    https://git.kernel.org/bluetooth/bluetooth-next/c/d752881e4cd2
+ client/player.c          | 10 ++++++++--
+ src/gatt-database.c      |  9 ++++++++-
+ src/shared/gatt-client.c |  4 +++-
+ src/shared/vcp.c         | 23 +++++++----------------
+ 4 files changed, 26 insertions(+), 20 deletions(-)
 
-You are awesome, thank you!
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.43.0
 
