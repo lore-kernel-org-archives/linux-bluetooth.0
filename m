@@ -1,59 +1,60 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A2CE1B86D4
-	for <linux-bluetooth@vger.kernel.org>; Tue,  9 Jul 2024 21:44:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9399853363
+	for <linux-bluetooth@vger.kernel.org>; Wed, 10 Jul 2024 06:47:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720561491; cv=none; b=qTB3LSxIlZPCM+5n4BNJFtlTeQPnsVwxQk94dThEItTwewK3a3HngfbTZfo+FvIzzzedRXXNAyV7Sp0QAe5v1oFhbghtCPxo5gQHUF3vPtIdlUpLeMSS4ARMroMB2DsriTPUTDZ2y7HC+MlMYAwyYvkf+yBI+ACjmT66Du01cYw=
+	t=1720594040; cv=none; b=WzE6FIXqPcdUQMG0OcqJajmum6lpZ/djzaSCeN4cQdNK4Pe44FybaFGJ/Zj72wIzBE4LfbyZdFYf4XNZBF43pQsh+puG63SGukakmhKfozIJ1EHKKJUJK2I2pGfVPlVNDdxKAKVqua+6tzu+jcF+1b/gljDv8nYlKN4PEYg45ag=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720561491; c=relaxed/simple;
-	bh=63izeCz53G078iWXEXL7eFAOgiVSv0mEufcjVf+3teg=;
+	s=arc-20240116; t=1720594040; c=relaxed/simple;
+	bh=K9xu/9TxrKY8Z2qnYYHnwqm5GCbALUUBSc81ZhnI8Ek=;
 	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=hJBB819//t+bmwxPqdk0z2BlTa8XwRVOgSddg9GVZslU1XoEGZoz+GXepFfMDaXJM/qA7oKh1KP3XUOA6I1Z4iZs0c7gfTw2gVQsm+rRg2ge8TERv3FwnrIXt/3PCL0z/E+9fEV04wGB5Q486eMunf2LUjJSA6AGL/MOaAbjY+8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=JkXwipeu; arc=none smtp.client-ip=198.175.65.15
+	 Content-Disposition; b=WZ21+8wNUcXNE0TkyBi8Uv4lIuyoPFOl0Fovb1WV4WFS1Ky2kwLMHKJBXtpJti4hrkEd7Dtair4ZtKh7A+lwF9pfEz/uRmZ8INYWK1bjL8utoN5DKOTSRiQGKIPylfMJe2G+KCmkPx3wQgpUTBIQxFlaLHHkLRFdeRAE3qCu+5c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=jGb+J5By; arc=none smtp.client-ip=192.198.163.19
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="JkXwipeu"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="jGb+J5By"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1720561490; x=1752097490;
+  t=1720594039; x=1752130039;
   h=date:from:to:cc:subject:message-id:mime-version;
-  bh=63izeCz53G078iWXEXL7eFAOgiVSv0mEufcjVf+3teg=;
-  b=JkXwipeu1bgLNnjDcO3Ru136Sxj+EuXgBNau0S3xETuid3CxI3whcQM9
-   87I5jcgf4/5GE7T2BhCTBp9s+3AxBQ+6qVag5gar7q8SwuLN8mAvYhli8
-   DVM3q11XL8+ITNzPGu6OpauDR573ZrpQ7wPpDow2ay1Sk9Ca015iw5+w+
-   hqw5aBt6CRPTEH4eaErOK83A+lXJRTfOlfEC85xSeBPBb+EK4zhb9Z38C
-   7/rt9MG+0MmGZ39Bu9PnPgis2uHHN3G3wYdXM6uV+1anKUGyTmVwNC2Fy
-   MAU/IIiDrSJGrLhL1NQtjx8AveOTmadq/aisFQRVlJ5aPCYxrdRhJpsy5
-   g==;
-X-CSE-ConnectionGUID: L7g9lpz2SfqFK45HBKF0RA==
-X-CSE-MsgGUID: QuaZs4+1T0KIIQQ0zhHJuw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11128"; a="21619296"
-X-IronPort-AV: E=Sophos;i="6.09,196,1716274800"; 
-   d="scan'208";a="21619296"
-Received: from fmviesa001.fm.intel.com ([10.60.135.141])
-  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jul 2024 14:44:31 -0700
-X-CSE-ConnectionGUID: bt27X9HKQAWpWt4KeuNtEQ==
-X-CSE-MsgGUID: /dYkPFVIQ6CuMUFbFksp3Q==
+  bh=K9xu/9TxrKY8Z2qnYYHnwqm5GCbALUUBSc81ZhnI8Ek=;
+  b=jGb+J5By7RJ8UWjApztvqMeoAhOY3HEhUspWVbAYjfZyKXb0eoxZiznG
+   71cSx691eQH8i76V+PwtOzqYotWDeh/K8zRT7Tf8YYNK4h5baPnXOHUrU
+   SqIF12O8FyW4rUx0Xofp7EJwCIuGUe/1A0twtehPvJ4suXAAujxEHILS1
+   sg+6uVM4+lLcilNGsO0RIUS4rmCukAD+3hegZcIdZyXZTkzPH1JBLY+q8
+   Fw1x9FVjO8Dv+xt55finBvrRysyV1WojZE4GqCKVur549jc3UPGM1t9ZZ
+   mzYZh6NFgW3lYhwvxNsgHul/yQ9mSdRu0ruI5xFrYgq4g7MmYNlCJE3aS
+   A==;
+X-CSE-ConnectionGUID: hyO9LPmRTVOmeZgjFWCg5Q==
+X-CSE-MsgGUID: 2aLir/WURJGYFdQzuHBiGg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11128"; a="17592804"
+X-IronPort-AV: E=Sophos;i="6.09,197,1716274800"; 
+   d="scan'208";a="17592804"
+Received: from fmviesa004.fm.intel.com ([10.60.135.144])
+  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jul 2024 23:47:18 -0700
+X-CSE-ConnectionGUID: pVmkoOA0TlSYO+un3Kw2Cw==
+X-CSE-MsgGUID: XslqL9j8To2iDu0BBzXDsw==
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.09,196,1716274800"; 
-   d="scan'208";a="79149867"
+X-IronPort-AV: E=Sophos;i="6.09,197,1716274800"; 
+   d="scan'208";a="52703750"
 Received: from lkp-server01.sh.intel.com (HELO 68891e0c336b) ([10.239.97.150])
-  by fmviesa001.fm.intel.com with ESMTP; 09 Jul 2024 14:44:29 -0700
+  by fmviesa004.fm.intel.com with ESMTP; 09 Jul 2024 23:47:16 -0700
 Received: from kbuild by 68891e0c336b with local (Exim 4.96)
 	(envelope-from <lkp@intel.com>)
-	id 1sRIdP-000X8w-10;
-	Tue, 09 Jul 2024 21:44:27 +0000
-Date: Wed, 10 Jul 2024 05:44:21 +0800
+	id 1sRR6g-000XYY-2A;
+	Wed, 10 Jul 2024 06:47:14 +0000
+Date: Wed, 10 Jul 2024 14:46:20 +0800
 From: kernel test robot <lkp@intel.com>
-To: Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>
+To: Chris Lu <chris.lu@mediatek.com>
 Cc: oe-kbuild-all@lists.linux.dev, linux-bluetooth@vger.kernel.org,
-	Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Subject: [bluetooth-next:master 76/76] drivers/bluetooth/btnxpuart.c:1534:12:
- warning: 'nxp_serdev_resume' defined but not used
-Message-ID: <202407100518.06Xxq5PK-lkp@intel.com>
+	Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
+	Sean Wang <sean.wang@mediatek.com>
+Subject: [bluetooth-next:master 69/76] alpha-linux-ld:
+ drivers/bluetooth/btmtk.c:787:undefined reference to `usb_control_msg'
+Message-ID: <202407101459.c9PTRDH1-lkp@intel.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -65,47 +66,49 @@ Content-Disposition: inline
 
 tree:   https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
 head:   c6052c312e85011cd31237804900013f63420403
-commit: c6052c312e85011cd31237804900013f63420403 [76/76] Bluetooth: btnxpuart: Add system suspend and resume handlers
-config: sh-allmodconfig (https://download.01.org/0day-ci/archive/20240710/202407100518.06Xxq5PK-lkp@intel.com/config)
-compiler: sh4-linux-gcc (GCC) 13.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240710/202407100518.06Xxq5PK-lkp@intel.com/reproduce)
+commit: 314f1c00d267185dfeadc44bee5c7494603720ba [69/76] Bluetooth: btmtk: move btusb_mtk_[setup, shutdown] to btmtk.c
+config: alpha-randconfig-c032-20221023 (https://download.01.org/0day-ci/archive/20240710/202407101459.c9PTRDH1-lkp@intel.com/config)
+compiler: alpha-linux-gcc (GCC) 13.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240710/202407101459.c9PTRDH1-lkp@intel.com/reproduce)
 
 If you fix the issue in a separate patch/commit (i.e. not just a new version of
 the same patch/commit), kindly add following tags
 | Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202407100518.06Xxq5PK-lkp@intel.com/
+| Closes: https://lore.kernel.org/oe-kbuild-all/202407101459.c9PTRDH1-lkp@intel.com/
 
-All warnings (new ones prefixed by >>):
+All errors (new ones prefixed by >>):
 
->> drivers/bluetooth/btnxpuart.c:1534:12: warning: 'nxp_serdev_resume' defined but not used [-Wunused-function]
-    1534 | static int nxp_serdev_resume(struct device *dev)
-         |            ^~~~~~~~~~~~~~~~~
->> drivers/bluetooth/btnxpuart.c:1525:12: warning: 'nxp_serdev_suspend' defined but not used [-Wunused-function]
-    1525 | static int nxp_serdev_suspend(struct device *dev)
-         |            ^~~~~~~~~~~~~~~~~~
-
-
-vim +/nxp_serdev_resume +1534 drivers/bluetooth/btnxpuart.c
-
-  1524	
-> 1525	static int nxp_serdev_suspend(struct device *dev)
-  1526	{
-  1527		struct btnxpuart_dev *nxpdev = dev_get_drvdata(dev);
-  1528		struct ps_data *psdata = &nxpdev->psdata;
-  1529	
-  1530		ps_control(psdata->hdev, PS_STATE_SLEEP);
-  1531		return 0;
-  1532	}
-  1533	
-> 1534	static int nxp_serdev_resume(struct device *dev)
-  1535	{
-  1536		struct btnxpuart_dev *nxpdev = dev_get_drvdata(dev);
-  1537		struct ps_data *psdata = &nxpdev->psdata;
-  1538	
-  1539		ps_control(psdata->hdev, PS_STATE_AWAKE);
-  1540		return 0;
-  1541	}
-  1542	
+   alpha-linux-ld: drivers/bluetooth/btmtk.o: in function `btmtk_usb_submit_wmt_recv_urb':
+   drivers/bluetooth/btmtk.c:528:(.text+0xd7c): undefined reference to `usb_alloc_urb'
+   alpha-linux-ld: drivers/bluetooth/btmtk.c:528:(.text+0xda0): undefined reference to `usb_alloc_urb'
+   alpha-linux-ld: drivers/bluetooth/btmtk.c:558:(.text+0xe2c): undefined reference to `usb_anchor_urb'
+   alpha-linux-ld: drivers/bluetooth/btmtk.c:558:(.text+0xe78): undefined reference to `usb_anchor_urb'
+   alpha-linux-ld: drivers/bluetooth/btmtk.c:559:(.text+0xe88): undefined reference to `usb_submit_urb'
+   alpha-linux-ld: drivers/bluetooth/btmtk.c:559:(.text+0xe90): undefined reference to `usb_submit_urb'
+   alpha-linux-ld: drivers/bluetooth/btmtk.c:567:(.text+0xea8): undefined reference to `usb_free_urb'
+   alpha-linux-ld: drivers/bluetooth/btmtk.c:567:(.text+0xeb0): undefined reference to `usb_free_urb'
+   alpha-linux-ld: drivers/bluetooth/btmtk.c:564:(.text+0xf58): undefined reference to `usb_unanchor_urb'
+   alpha-linux-ld: drivers/bluetooth/btmtk.c:564:(.text+0xf60): undefined reference to `usb_unanchor_urb'
+   alpha-linux-ld: drivers/bluetooth/btmtk.c:547:(.text+0xf98): undefined reference to `usb_free_urb'
+   alpha-linux-ld: drivers/bluetooth/btmtk.c:547:(.text+0xf9c): undefined reference to `usb_free_urb'
+   alpha-linux-ld: drivers/bluetooth/btmtk.c:534:(.text+0xfb0): undefined reference to `usb_free_urb'
+   alpha-linux-ld: drivers/bluetooth/btmtk.c:534:(.text+0xfbc): undefined reference to `usb_free_urb'
+   alpha-linux-ld: drivers/bluetooth/btmtk.o: in function `btmtk_usb_wmt_recv':
+   drivers/bluetooth/btmtk.c:505:(.text+0x12d0): undefined reference to `usb_anchor_urb'
+   alpha-linux-ld: drivers/bluetooth/btmtk.c:505:(.text+0x12d8): undefined reference to `usb_anchor_urb'
+   alpha-linux-ld: drivers/bluetooth/btmtk.c:506:(.text+0x12e8): undefined reference to `usb_submit_urb'
+   alpha-linux-ld: drivers/bluetooth/btmtk.c:506:(.text+0x12f0): undefined reference to `usb_submit_urb'
+   alpha-linux-ld: drivers/bluetooth/btmtk.c:515:(.text+0x1520): undefined reference to `usb_unanchor_urb'
+   alpha-linux-ld: drivers/bluetooth/btmtk.c:515:(.text+0x1528): undefined reference to `usb_unanchor_urb'
+   alpha-linux-ld: drivers/bluetooth/btmtk.o: in function `btmtk_usb_reg_read':
+   drivers/bluetooth/btmtk.c:787:(.text+0x16c0): undefined reference to `usb_control_msg'
+>> alpha-linux-ld: drivers/bluetooth/btmtk.c:787:(.text+0x1700): undefined reference to `usb_control_msg'
+   alpha-linux-ld: drivers/bluetooth/btmtk.o: in function `btmtk_usb_uhw_reg_write':
+   drivers/bluetooth/btmtk.c:735:(.text+0x1d4c): undefined reference to `usb_control_msg'
+   alpha-linux-ld: drivers/bluetooth/btmtk.c:735:(.text+0x1d80): undefined reference to `usb_control_msg'
+   alpha-linux-ld: drivers/bluetooth/btmtk.o: in function `btmtk_usb_uhw_reg_read':
+   drivers/bluetooth/btmtk.c:758:(.text+0x1eb0): undefined reference to `usb_control_msg'
+   alpha-linux-ld: drivers/bluetooth/btmtk.o:drivers/bluetooth/btmtk.c:758: more undefined references to `usb_control_msg' follow
 
 -- 
 0-DAY CI Kernel Test Service
