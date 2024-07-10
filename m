@@ -1,110 +1,275 @@
-Received: from mail-qv1-f48.google.com (mail-qv1-f48.google.com [209.85.219.48])
+Received: from mail-lf1-f48.google.com (mail-lf1-f48.google.com [209.85.167.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E25CB4F1E2
-	for <linux-bluetooth@vger.kernel.org>; Wed, 10 Jul 2024 20:08:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3D5682C7E
+	for <linux-bluetooth@vger.kernel.org>; Wed, 10 Jul 2024 20:27:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720642137; cv=none; b=YNcwMIomzRsUh1WOJeHU1C/ebAOAA/E3Kk4zhbu+wIr3beV52kXOR7riz7KYUmbd6jbb3Al5/hFZgYtS71/78Hh9fFfqaiTUViqiNRJFtaL2lCLK/ISuD3+hD6D/pwVaJkBytNSxrHg6uW3WP6jA4AunnLAhtAETaq6xAnMF5ME=
+	t=1720643249; cv=none; b=BbcCrUA3n5eTl87MotLi5wRkeaJmeIUwkbLX6UGr2D0Q7Zgu+/GAVLY7p46gP0ToFLjTfqIFIk/8J+2C6YwMVU8Huewlg9f3gyFyRoTgAWr0vuPDr1yyhYOPDgfcIKWbkOAX86sqmguuJV8x+tvmOqguA3PCVa+rky/kYpEOH70=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720642137; c=relaxed/simple;
-	bh=aVCp91vHVaKSr4j3Vl106sLAuhucrrWRTshxXZIE1QQ=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=X3ALOeek3iZAoGXI2e1IkuzY8ucYAtypB9cNvsW6qPzj0mUn5T0dLtBxU27qitIdoKEuvx0U9x575BxRJ3bEnIgr3j/oS68G3v0Ron3F3+VR9CJtx0TyCJiwdlloYcRYnSJutMSSyv9xqskBMKMvCP1VObSAdHIi/kE+6GfOUc8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OlaDWaUR; arc=none smtp.client-ip=209.85.219.48
+	s=arc-20240116; t=1720643249; c=relaxed/simple;
+	bh=4CPKnLv5YGeKV42vHmGmzaFvl7qLCE7lhfJsxy0sWpc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:Cc:From:
+	 In-Reply-To:Content-Type; b=r2H1svVxnoohLeCfOM3xkPkSySJWu7LdYSTXYSlqLYOTuWMhRmJyaSsRvpPIedoOEk99sPuHhmNhBxhCnDkjhJn0cEOiwfgKgyxD9dbXqw3dU3xm2QZdBiCvXhRp3x4YMGHK0z3SGaYPB8nNOo33nlKtyxTgqNwVpX3YoYeMCwE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=d7Smvtg5; arc=none smtp.client-ip=209.85.167.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OlaDWaUR"
-Received: by mail-qv1-f48.google.com with SMTP id 6a1803df08f44-6b5e0d881a1so9831676d6.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 10 Jul 2024 13:08:55 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="d7Smvtg5"
+Received: by mail-lf1-f48.google.com with SMTP id 2adb3069b0e04-52ea16b429dso995144e87.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 10 Jul 2024 13:27:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1720642135; x=1721246935; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=z1XxS7h9MI35X3fF9TAHNhWkf8JM4N55d0dd8oNSvS4=;
-        b=OlaDWaURtwEa4P0KidFiLI87oFux2yJnCO9ands86RroTWoIgssn86CN+kf88mAf/w
-         U3Ha6KKRgMXhjUSFtGkgaSJWSrVZ/aXndWygXSwTSP/AMZVjZxA9nbe7sYVy6CHmcOKJ
-         8L94+D6IaznOE8b8TcGQYt4BvnmPDfxX7iLpIzDnJ9wL45M2VT0mYw8hSVNYPFGcPMw8
-         mKWMkMbZGVr0XcVz0hNhFXNObXJLaY8HOkrQQ5DmG6EYSbnLggavjkYbDiWkeuPXiM6y
-         gjG2qe6ubeglfZqy639qqO/15JDBYae0NB3wQ2skqBotXNnitMxMmQCg0m2rxq8Cf0Wt
-         o50w==
+        d=gmail.com; s=20230601; t=1720643246; x=1721248046; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:cc:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=3lUsxMnu7tSnbBvVgV2fGBrAra0PztjJb9lEOIvE5Xc=;
+        b=d7Smvtg5ujUe520Ahpg53sIirlmMDk8bB3dLWhW8K7yd2Fsw7ncxoVih7cHwHx9EOU
+         iaXK0ngyvOigBwaX9NApGsEa0xYKvFEKEwUHTU113DY3UuX6TDAKY3OdGgEO4/0uwekb
+         9qJ2lBoG9hNqFcmNRghEFlMMA6GHrDkHT63Dn8Ri2LXta5Wq+cCozW07JsUX9fCe2/G/
+         Pgac0Y93qtjbIL+6jTSMUNEzmbqgVZkzwdOXit/0zZGkLvGVGeiHusWy9bJAAzyEVpWh
+         fzlliJ6wGlgJdL9lDDEUqgWcrDpPnVFOej3JXti1McsJbeCaQt9JLNiEI37caUswPzON
+         cjZw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720642135; x=1721246935;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=z1XxS7h9MI35X3fF9TAHNhWkf8JM4N55d0dd8oNSvS4=;
-        b=DggdQJlLlB0eF3lgsmcjhocD/7ouNcH4coB/axGnkinBQ7gX+CWzkyf7WelFvt0smC
-         6KiH2Ps5a1UL7tCfIEKaTuae+X8kq6/qYJCSc1u41bLIVTI74UJgBjyns1vegw8P60Pi
-         ZCVp9bT3cPI4GMEqb9YdQT+yjFSfNF0q7maRYfBVZFJlQ5f1H9tx927FVYFVpRNSTtSQ
-         TioBr/gj2F+STjcRTUMYxIRaTpaNpbk+MY+wpFJocB0P+l2dNZGrIYC9tASgmn4oBzCs
-         rI0SEKN/uDw81hIf6P3juHWJfi1rpelwp3fZh7CHYVD6LFkrNFLyzdm4jo/UwZnMsycX
-         yACg==
-X-Gm-Message-State: AOJu0YwisSdqFGHk51gpInI+8EUl/O6HWtdpFYQYttwPlRrxenP6qIcL
-	0+Vtl+2tqcSJwF8EoQsym2K4cgda7bbwT5krz1KlvovpJckuY94FmQSZwQ==
-X-Google-Smtp-Source: AGHT+IHwG/t9taSfsVhK4mFiinJkn0AHTQ+ucYzxxqdyjDGXggBjy8hxov8kEUCsotESFr2zRKogWQ==
-X-Received: by 2002:a0c:cc13:0:b0:6af:c2ec:3313 with SMTP id 6a1803df08f44-6b74afdc203mr12157556d6.26.1720642134667;
-        Wed, 10 Jul 2024 13:08:54 -0700 (PDT)
-Received: from [172.17.0.2] ([20.161.78.11])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6b61ba8f11csm19415286d6.104.2024.07.10.13.08.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 10 Jul 2024 13:08:54 -0700 (PDT)
-Message-ID: <668eea56.050a0220.4aad7.8c87@mx.google.com>
-Date: Wed, 10 Jul 2024 13:08:54 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============7049120593871633810=="
+        d=1e100.net; s=20230601; t=1720643246; x=1721248046;
+        h=content-transfer-encoding:in-reply-to:from:cc:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=3lUsxMnu7tSnbBvVgV2fGBrAra0PztjJb9lEOIvE5Xc=;
+        b=H0LjESqIklWEg9ESl1irpBXdkg/QmkwpcpjDAUrDL4oJDum+HDMrk1HRJ/6m4kRX3K
+         79tVrzEhnjnaAvamEMvYjdaSxKpcW2wnXhelWtCkKSAJDgXTGeGfYsawFt4m/3tUIbfR
+         JziFPNvh95a9UQKJ53bhqVNljr0nByDjC4bQX9xDxsZYpKyHRYGienhw2hZWBUvvndnH
+         82ns7rcAANQ9jiAwUvnD5cO1sqJOQiIlNGfNW2eTxSkn9xisqOxkQs815QqxlN94X3ry
+         eNwQN9H0bD3ypHfrZ/PEeadrRQGytALILSctWerylyZVbtnDi+mHlyPKL3ETEiowG5tT
+         GWlQ==
+X-Gm-Message-State: AOJu0YwJHYXAib3mysfLag6ZSrbj+sJRzRIZ551tBWIpeHb2Aks5CvvG
+	/Bc96wki1BUciIw1JlTxT/wLKTqbLciSJzNHrAFq4LgAHDdQ1uEVQrL18e1qNLyk25wd
+X-Google-Smtp-Source: AGHT+IEdIRNPHtQO82VrqWDJl7KG/k7pw3Fl4/n57vCq7+G9jOA8lBp6JcuUfnX5mqzbzl2pw3LwrQ==
+X-Received: by 2002:ac2:4c56:0:b0:52c:8978:af11 with SMTP id 2adb3069b0e04-52ec3d122d7mr218964e87.4.1720643245369;
+        Wed, 10 Jul 2024 13:27:25 -0700 (PDT)
+Received: from [192.168.82.219] ([188.162.5.3])
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-52eb8e347bdsm766381e87.27.2024.07.10.13.27.23
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 10 Jul 2024 13:27:24 -0700 (PDT)
+Message-ID: <d622f591-f9ef-4ec7-a71b-a803c409caa7@gmail.com>
+Date: Thu, 11 Jul 2024 03:27:22 +0700
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, rahul@sandhuservices.dev
-Subject: RE: [BlueZ,v3] tools/hex2hcd: fix musl compatibility
-In-Reply-To: <20240710183006.26549-1-rahul@sandhuservices.dev>
-References: <20240710183006.26549-1-rahul@sandhuservices.dev>
-Reply-To: linux-bluetooth@vger.kernel.org
+User-Agent: Mozilla Thunderbird
+Subject: Re: abandoned patches for ATS2851
+To: linux-bluetooth@vger.kernel.org
+References: <b00b4f66-1aba-4182-bae2-01f37eb1c34b@gmail.com>
+ <CACk7upyANXexe1e9Zbtajqpo+ujmzJGUpciEEy7kNANTnQUbcg@mail.gmail.com>
+Content-Language: ru, en-GB
+Cc: raul.cheleguini@gmail.com, luiz.dentz@gmail.com, johan.hedberg@gmail.com,
+ marcel@holtmann.org
+From: =?UTF-8?B?0JTQsNC90LjQuw==?= <danstiv404@gmail.com>
+In-Reply-To: <CACk7upyANXexe1e9Zbtajqpo+ujmzJGUpciEEy7kNANTnQUbcg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
---===============7049120593871633810==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hello!
 
-This is automated email and please do not reply to this email!
+I have applied all patches, now I can establish a connection, but after 
+a while the following happens:
 
-Dear submitter,
+< HCI Command: LE Create Connect.. (0x08|0x000d) plen 25  #156 [hci0] 
+13.247617
+         Scan interval: 60.000 msec (0x0060)
+         Scan window: 60.000 msec (0x0060)
+         Filter policy: Accept list is not used (0x00)
+         Peer address type: Random (0x01)
+         Peer address: E8:42:26:5C:0F:07 (Static)
+         Own address type: Public (0x00)
+         Min connection interval: 30.00 msec (0x0018)
+         Max connection interval: 50.00 msec (0x0028)
+         Connection latency: 0 (0x0000)
+         Supervision timeout: 420 msec (0x002a)
+         Min connection length: 0.000 msec (0x0000)
+         Max connection length: 0.000 msec (0x0000)
+ > HCI Event: Command Status (0x0f) plen 4                 #157 [hci0] 
+13.249522
+       LE Create Connection (0x08|0x000d) ncmd 1
+         Status: Success (0x00)
+ > HCI Event: LE Meta Event (0x3e) plen 19                 #158 [hci0] 
+13.353869
+       LE Connection Complete (0x01)
+         Status: Success (0x00)
+         Handle: 1536
+         Role: Central (0x00)
+         Peer address type: Random (0x01)
+         Peer address: E8:42:26:5C:0F:07 (Static)
+         Connection interval: 52.50 msec (0x002a)
+         Connection latency: 0 (0x0000)
+         Supervision timeout: 420 msec (0x002a)
+         Central clock accuracy: 0x01
+@ MGMT Event: Device Connected (0x000b) plen 40       {0x0001} [hci0] 
+13.354007
+         LE Address: E8:42:26:5C:0F:07 (Static)
+         Flags: 0x00000008
+           Connection Locally Initiated
+         Data length: 27
+         Name (complete): RFS-KKL002
+         Flags: 0x06
+           LE General Discoverable Mode
+           BR/EDR Not Supported
+         Company: Transenergooil AG (450)
+           Data: 4000070f5c2642e8
+...
+...
+< HCI Command: LE Create Connecti.. (0x08|0x000e) plen 0  #217 [hci0] 
+17.268019
+ > HCI Event: Command Status (0x0f) plen 4                 #218 [hci0] 
+17.269377
+       LE Create Connection Cancel (0x08|0x000e) ncmd 1
+         Status: Command Disallowed (0x0c)
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=870206
 
----Test result---
+I'm trying to connect a smart kettle to the home assistant, after the 
+connection is established, data is exchanged (several thousand log lines).
 
-Test Summary:
-CheckPatch                    PASS      0.48 seconds
-GitLint                       PASS      0.33 seconds
-BuildEll                      PASS      25.03 seconds
-BluezMake                     PASS      1762.86 seconds
-MakeCheck                     PASS      13.34 seconds
-MakeDistcheck                 PASS      179.83 seconds
-CheckValgrind                 PASS      254.74 seconds
-CheckSmatch                   WARNING   360.47 seconds
-bluezmakeextell               PASS      120.97 seconds
-IncrementalBuild              PASS      1489.59 seconds
-ScanBuild                     PASS      1014.26 seconds
+After receiving Command Disallowed, the exchange continues, control of 
+the kettle remains available.
 
-Details
-##############################
-Test: CheckSmatch - WARNING
-Desc: Run smatch tool with source
-Output:
-tools/hex2hcd.c:135:26: warning: Variable length array is used.
+Is this a critical issue? Can it be fixed? Does it need to be fixed?
 
+In any case, I believe that an adapter that works at least somewhat is 
+better than one that doesn't work at all, and probably patches should be 
+merged.
 
----
-Regards,
-Linux Bluetooth
-
-
---===============7049120593871633810==--
+22.05.2024 3:55, Raul Cheleguini пишет:
+> On Mon, May 13, 2024 at 2:14 PM Данил <danstiv404@gmail.com> wrote:
+>> Hello!
+>> I encountered a problem with a USB bluetooth adapter which probably uses
+>> an ATS2851.
+>> I'm not 100% sure about this, but the symptoms match the problem
+>> described in the patch.
+>>
+>> Here are the patches I found.
+>> 1. It seems to have been applied.
+>> https://lore.kernel.org/linux-bluetooth/168150781825.20001.4973139468540739153.git-patchwork-notify@kernel.org/T/#t
+>>
+>> 2. It seems it was not applied.
+>> https://lore.kernel.org/linux-bluetooth/20230323135804.3962783-1-raul.cheleguini@gmail.com/T/#t
+>>
+>> 3. It seems it was not applied.
+>> https://patchwork.kernel.org/project/bluetooth/patch/20230426184017.2051211-1-raul.cheleguini@gmail.com/#25314789
+>>
+>> Patches 2 and 3 were not applied, as I understand, due to some minor
+>> problems with code formatting, is it possible to complete the process of
+>> applying them?
+>>
+>> Here is some information about the device:
+>>
+>> dmesg
+>> [    0.000000] Linux version 6.6.13+bpo-rt-amd64
+>> (debian-kernel@lists.debian.org) (gcc-12 (Debian 12.2.0-14) 12.2.0, GNU
+>> ld (GNU Binutils for Debian) 2.40) #1 SMP PREEMPT_RT Debian
+>> 6.6.13-1~bpo12+1 (2024-02-15)
+>> [    0.000000] Command line:
+>> BOOT_IMAGE=/boot/vmlinuz-6.6.13+bpo-rt-amd64
+>> root=UUID=b9338182-ab4b-48cb-b492-60e7ed340018 ro
+>> systemd.unified_cgroup_hierarchy=false quiet reboot=pci
+>> ...
+>> [  110.420763] usb 1-2: new full-speed USB device number 2 using uhci_hcd
+>> [  110.609798] usb 1-2: New USB device found, idVendor=10d7,
+>> idProduct=b012, bcdDevice=88.91
+>> [  110.609814] usb 1-2: New USB device strings: Mfr=1, Product=2,
+>> SerialNumber=3
+>> [  110.609820] usb 1-2: Product: general adapter
+>> [  110.609824] usb 1-2: Manufacturer: Actions
+>> [  110.609829] usb 1-2: SerialNumber: ACTIONS1234
+>> [  110.614223] Bluetooth: hci1: HCI Read Default Erroneous Data
+>> Reporting command is advertised, but not supported.
+>> [  110.614245] Bluetooth: hci1: HCI Read Transmit Power Level command is
+>> advertised, but not supported.
+>> [  110.614252] Bluetooth: hci1: HCI LE Set Random Private Address
+>> Timeout command is advertised, but not supported.
+>> [  110.666673] Bluetooth: MGMT ver 1.22
+>>
+>> lsusb -v
+>> ...
+>> Bus 001 Device 002: ID 10d7:b012 Actions general adapter
+>> Device Descriptor:
+>>     bLength                18
+>>     bDescriptorType         1
+>>     bcdUSB               2.00
+>>     bDeviceClass          224 Wireless
+>>     bDeviceSubClass         1 Radio Frequency
+>>     bDeviceProtocol         1 Bluetooth
+>>     bMaxPacketSize0        64
+>>     idVendor           0x10d7
+>>     idProduct          0xb012
+>>     bcdDevice           88.91
+>>     iManufacturer           1 Actions
+>>     iProduct                2 general adapter
+>>     iSerial                 3 ACTIONS1234
+>>     bNumConfigurations      1
+>> ...
+>>
+>> btmon
+>> ...
+>> < HCI Command: LE Extended Create Connection (0x08|0x0043) plen 58 #48
+>> [hci0] 2.000505
+>>           Filter policy: Accept list is not used (0x00)
+>>           Own address type: Public (0x00)
+>>           Peer address type: Random (0x01)
+>>           Peer address: E8:42:26:5C:0F:07 (Static)
+>>           Initiating PHYs: 0x07
+>>           Entry 0: LE 1M
+>>             Scan interval: 60.000 msec (0x0060)
+>>             Scan window: 60.000 msec (0x0060)
+>>             Min connection interval: 30.00 msec (0x0018)
+>>             Max connection interval: 50.00 msec (0x0028)
+>>             Connection latency: 0 (0x0000)
+>>             Supervision timeout: 420 msec (0x002a)
+>>             Min connection length: 0.000 msec (0x0000)
+>>             Max connection length: 0.000 msec (0x0000)
+>>           Entry 1: LE 2M
+>>             Scan interval: 60.000 msec (0x0060)
+>>             Scan window: 60.000 msec (0x0060)
+>>             Min connection interval: 30.00 msec (0x0018)
+>>             Max connection interval: 50.00 msec (0x0028)
+>>             Connection latency: 0 (0x0000)
+>>             Supervision timeout: 420 msec (0x002a)
+>>             Min connection length: 0.000 msec (0x0000)
+>>             Max connection length: 0.000 msec (0x0000)
+>>           Entry 2: LE Coded
+>>             Scan interval: 60.000 msec (0x0060)
+>>             Scan window: 60.000 msec (0x0060)
+>>             Min connection interval: 30.00 msec (0x0018)
+>>             Max connection interval: 50.00 msec (0x0028)
+>>             Connection latency: 0 (0x0000)
+>>             Supervision timeout: 420 msec (0x002a)
+>>             Min connection length: 0.000 msec (0x0000)
+>>             Max connection length: 0.000 msec (0x0000)
+>>   > HCI Event: Command Status (0x0f) plen 4 #49 [hci0] 2.001242
+>>         LE Extended Create Connection (0x08|0x0043) ncmd 1
+>>           Status: Unknown HCI Command (0x01)
+>> ...
+>> The adapter supports le, I was able to connect to a le device from
+>> windows 11.
+>>
+> Hello,
+>
+> To provide some context on the patches.
+>
+> With all patches applied locally I managed to pair my Logitech mouse and use it,
+> but the solution I don't feel is ideal, there were errors and other devices
+> might not pair well.
+>
+> At the time I asked the datasheet for this adapter to multiple vendors, without
+> success. I extensively researched forums, pdf repositories, and I did not find
+> relevant documentation.
+>
+> One thing that I noticed watching the HCI dumps of a pairing process in Windows
+> and Linux is that, in Linux the dump is chaotic and parallel. In other hand, the
+> dump in Windows is organized and more serialized. I don't know if I missed
+> something related to this at that time.
+>
+> Anyways, my debug setup for this is disassembled right now, if anyone is willing
+> to resume and progress this issue is more than welcomed.
