@@ -1,29 +1,29 @@
 Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AA9319149A
-	for <linux-bluetooth@vger.kernel.org>; Wed, 10 Jul 2024 14:16:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCC99193461
+	for <linux-bluetooth@vger.kernel.org>; Wed, 10 Jul 2024 14:17:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720621022; cv=none; b=CNVeKa6EIUDpEnOABOtohOJaaZdpYMwQWgOV/HX+b0VReQeuGbc80YXBX9z+5wBDdeYMryVzPTpOMdeaLr0UUAySoeJzqWUo9YQD4dpJPILu4d/X9kAC6h4ZX+mH9TVYo4yuOA5/Kss+NeC5Pj8sl4jtF3nXf3ngRj09FPvXk4E=
+	t=1720621032; cv=none; b=BROXLme/ufgxtXPwDerPPJ8V355tUPicNth9AofFhLUIiYpLEBIwnVdT8bnLkvvXkZsIM4dRwvlgyxVFouc/Q4swp5vmzKvCvfCo7hW6Ow2zqO+EC5+n63LaK4rBVyqfEfW5rzm7xEcT3i1ALjKnbiGRrYGNokAjjeDFxjQnrEM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720621022; c=relaxed/simple;
-	bh=X2qylBZT9BN9u2EfJAE1ZxkzNPzM0HpM48nU9tgCGco=;
+	s=arc-20240116; t=1720621032; c=relaxed/simple;
+	bh=xDhD6rhNbfYh49WZqioIipK1sKM6rRbpT3dbvss9wTc=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=arfMH1tGrhROAHDqghxnD3SAZFaHpEM9bDi2ECm7tuYTvO408UI6bgTJI9OrCQTLqEZyoYP9vGCdT7i50x8acsDZctt8AVKorXsDQPRVE/LzAOhESK4zKsXcJ/zWwVYBzeKjrCdnuHRlI9qLP4CUFnyIoZmKiWJ1q8T9w+mtyRs=
+	 MIME-Version:Content-Type; b=a1kCGuEppKwmmNM96p/TAoSvSnPikAGKgQL3HBjIrIjS5D78bjDti7dmlu2d8Y0oLCwnJWmU4fCH/8bb9Ws/0u6OXO7gp1JzzFRKlZq+jGnflIMANij7wjN99INz7y0xrXPlhldVBwv0ThpFI7fjaaazNKtGeLSEdd5Qs7MDW0o=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
 Received: from localhost.localdomain (178.205.55.202) by msexch01.omp.ru
  (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Wed, 10 Jul
- 2024 17:16:36 +0300
+ 2024 17:16:37 +0300
 From: Roman Smirnov <r.smirnov@omp.ru>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Roman Smirnov <r.smirnov@omp.ru>
-Subject: [PATCH BlueZ v3 resend 1/6] gatt: add a check to sock_io_send()
-Date: Wed, 10 Jul 2024 17:16:14 +0300
-Message-ID: <20240710141621.64394-2-r.smirnov@omp.ru>
+Subject: [PATCH BlueZ v3 resend 2/6] shared/vcp: add NULL checks to foreach_aics_service()
+Date: Wed, 10 Jul 2024 17:16:15 +0300
+Message-ID: <20240710141621.64394-3-r.smirnov@omp.ru>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240710141621.64394-1-r.smirnov@omp.ru>
 References: <20240710141621.64394-1-r.smirnov@omp.ru>
@@ -68,41 +68,27 @@ X-KSE-Attachment-Filter-Triggered-Rules: Clean
 X-KSE-Attachment-Filter-Triggered-Filters: Clean
 X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
-It is necessary to add a return value check.
+Make foreach_aics_service() safe for passing NULL pointers.
 
 Found with the SVACE static analysis tool.
 ---
- V1 -> V3: the patch name has been shortened
- src/gatt-database.c | 9 ++++++++-
- 1 file changed, 8 insertions(+), 1 deletion(-)
+ src/shared/vcp.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/src/gatt-database.c b/src/gatt-database.c
-index 8472aac59..6c84b085c 100644
---- a/src/gatt-database.c
-+++ b/src/gatt-database.c
-@@ -2630,6 +2630,7 @@ static int sock_io_send(struct io *io, const void *data, size_t len)
- {
- 	struct msghdr msg;
- 	struct iovec iov;
-+	int fd;
+diff --git a/src/shared/vcp.c b/src/shared/vcp.c
+index 602d46dc1..43ef1d186 100644
+--- a/src/shared/vcp.c
++++ b/src/shared/vcp.c
+@@ -2729,6 +2729,9 @@ static void foreach_aics_service(struct gatt_db_attribute *attr,
+ 	struct bt_vcp *vcp = user_data;
+ 	struct bt_aics *aics = vcp_get_aics(vcp);
  
- 	iov.iov_base = (void *) data;
- 	iov.iov_len = len;
-@@ -2638,7 +2639,13 @@ static int sock_io_send(struct io *io, const void *data, size_t len)
- 	msg.msg_iov = &iov;
- 	msg.msg_iovlen = 1;
- 
--	return sendmsg(io_get_fd(io), &msg, MSG_NOSIGNAL);
-+	fd = io_get_fd(io);
-+	if (fd < 0) {
-+		error("io_get_fd() returned %d\n", fd);
-+		return fd;
-+	}
++	if (!aics || !attr)
++		return;
 +
-+	return sendmsg(fd, &msg, MSG_NOSIGNAL);
- }
+ 	aics->service = attr;
  
- static void att_disconnect_cb(int err, void *user_data)
+ 	gatt_db_service_set_claimed(attr, true);
 -- 
 2.43.0
 
