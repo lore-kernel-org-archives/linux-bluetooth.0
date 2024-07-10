@@ -1,149 +1,164 @@
-Received: from mailgw02.mediatek.com (unknown [210.61.82.184])
+Received: from DU2PR03CU002.outbound.protection.outlook.com (mail-northeuropeazon11012049.outbound.protection.outlook.com [52.101.66.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD9CB83A0D;
-	Wed, 10 Jul 2024 07:38:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.61.82.184
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720597125; cv=none; b=CxUCZyE33xtQ5N2fYQH01UQkWoXKi3KDXQOhvbtL3/AY8Z0NNSw5dtPeaChP3T+jrKotRp0r8YAcds9bBQNAr23LfphcV8lOzdFALExHYtG110J0/FK8slgPu/94ymVEFPXQ/j40ba7I4no3gcZ0nGd5XyKhOCSFdPsgzsSggKk=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720597125; c=relaxed/simple;
-	bh=p37UAUNUsUJN0YgOa0VEOZL/K037gFMz9T9TMFx2Enw=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Kwfbg/oGze/rbuyffHgUadTsc6RPwaBqSv5kjQFxRUiC0vX85N+Yf13vBjgNK+htZ+b0Qg3SXnOf8YqJnxHJGIR89ekt65kbUvWn9gmBQ9yM9UbP2mIOUYsF9DMGQZZTpo9XWy0b770StCymisTHLFaG4YU//fZ2vlvXvT9i5Fo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com; spf=pass smtp.mailfrom=mediatek.com; dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b=Tmpgs1ij; arc=none smtp.client-ip=210.61.82.184
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mediatek.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E18F025757
+	for <linux-bluetooth@vger.kernel.org>; Wed, 10 Jul 2024 08:13:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.66.49
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1720599240; cv=fail; b=H/bWR87GM9QgteWg9do9E4KWAP16g6gBUQSsUQO4CFV8eW4lUSAchGJtCRuiNw6YQZvPJAehgNGHj9kY8TQPr0Edq2GkTbq96fU9IfKz4zuSvXK6mxjCbq4YK0NY+KRGmCSi2W4gPLHF0ejay7ubQ8ZmwQcctdDuotmBpPEYg2I=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1720599240; c=relaxed/simple;
+	bh=DSHs+NcBt3wXZi19ZDNBV2eIwHafT5jB+XGXNXQWbMc=;
+	h=From:To:Cc:Subject:Date:Message-Id:Content-Type:MIME-Version; b=Pk2DHJd/S18ipmieInmI3zeCWcVjNEkmgL1aUpWSlVxs4cnHiQD7uHbPHLTAfF6Ez/dYf9vC1C7ip2XO6xqU4JTYR9NOeTHXeQV2lrvO0xK3u4GgSk0nBfHzaoEdGVdO8ymlnosUkybysXw/mAqxrUEZy7aUCPPbCLiOBbJYl1w=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b=gEqcJerH; arc=fail smtp.client-ip=52.101.66.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b="Tmpgs1ij"
-X-UUID: 68a813fe3e8f11ef87684b57767b52b1-20240710
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
-	h=Content-Type:MIME-Version:Message-ID:Date:Subject:CC:To:From; bh=mvSw0YCcP6OkaKMinb0d5io/X3LmFsIcP7XhTzkLI/c=;
-	b=Tmpgs1ijDkccsmszzkw+X3d4HdfbngcDEraO9w7+VF++5p8Gd4h4HRmF/3nR474RZgQkJfi856M5LXxSoVJ8R1BO2E/5469ci2QkCvtbtgNifP8iK/+BaLk5PmzPzTZjoLxp1vSvisaKt0Q7ngRV3/BYaw2DWccj6JMvakkFFEw=;
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.1.40,REQID:b6c99462-9bf0-44fe-8237-a00c4fdeba69,IP:0,U
-	RL:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
-	release,TS:0
-X-CID-META: VersionHash:ba885a6,CLOUDID:5be24ed1-436f-4604-ad9d-558fa44a3bbe,B
-	ulkID:nil,BulkQuantity:0,Recheck:0,SF:102,TC:nil,Content:0,EDM:-3,IP:nil,U
-	RL:11|1,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES
-	:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
-X-CID-BVR: 0
-X-CID-BAS: 0,_,0,_
-X-CID-FACTOR: TF_CID_SPAM_SNR,TF_CID_SPAM_ULN
-X-UUID: 68a813fe3e8f11ef87684b57767b52b1-20240710
-Received: from mtkmbs13n2.mediatek.inc [(172.21.101.108)] by mailgw02.mediatek.com
-	(envelope-from <chris.lu@mediatek.com>)
-	(Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
-	with ESMTP id 1630659267; Wed, 10 Jul 2024 15:38:32 +0800
-Received: from mtkmbs11n1.mediatek.inc (172.21.101.185) by
- mtkmbs10n2.mediatek.inc (172.21.101.183) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.26; Wed, 10 Jul 2024 15:38:33 +0800
-Received: from mtksdccf07.mediatek.inc (172.21.84.99) by
- mtkmbs11n1.mediatek.inc (172.21.101.73) with Microsoft SMTP Server id
- 15.2.1118.26 via Frontend Transport; Wed, 10 Jul 2024 15:38:33 +0800
-From: Chris Lu <chris.lu@mediatek.com>
-To: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg
-	<johan.hedberg@gmail.com>, Luiz Von Dentz <luiz.dentz@gmail.com>
-CC: Sean Wang <sean.wang@mediatek.com>, Aaron Hou <aaron.hou@mediatek.com>,
-	Steve Lee <steve.lee@mediatek.com>, linux-bluetooth
-	<linux-bluetooth@vger.kernel.org>, linux-kernel
-	<linux-kernel@vger.kernel.org>, linux-mediatek
-	<linux-mediatek@lists.infradead.org>, Chris Lu <chris.lu@mediatek.com>
-Subject: [PATCH] Bluetooth: btmtk: Fix btmtk.c undefined reference build error
-Date: Wed, 10 Jul 2024 15:38:32 +0800
-Message-ID: <20240710073832.4381-1-chris.lu@mediatek.com>
-X-Mailer: git-send-email 2.18.0
+	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="gEqcJerH"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=CZiOsN2Dj9xq+cqMQz82heRwru5W5zv+TU9wdPlfKzi8Flt2z5DihCKO36m++1wvJ0WmMbFrlNQJmGxo8FV6w0shHL61IJMwcZzxFJAeTaQFicSeM9CLG6tUSdKwkWD+vIB3Ks+SWJGQaIymAauteB2rXuzUbbISTjZ77z+SOdkWZz3+en1whGBwu+TUBlmslE36MvdJ3LZAEtDHA6focwZw8JlENsU6+++xysBLQTZI4u6/j8CXPrqkGmPDdKcNDQSaKYU1qG6TRjvR0WFbePGxjd5uSOQeaeTYNXqSv9mIBeQ1m4/28TCwPWosdZBdyycD6OJxpqJ3vQBUe22vcg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=9/w1C9TSM7ScPdKwSQZNej3wrKzruBSvU1/6cK/45+s=;
+ b=X+eYmGVeu7rCUQ7dlpu3xojtMrjyH0E822EXFYosnEfZhWgbr4WUPT72U1itWp8Ei4eSsoLnWbT3qkpaiXqcKboC4w3jF1uH84bf0EBpmKkqytLNCGDnx80Ca6//0sQb3yhLHcEQtAW9rmkI0INzIIIRILqzW++yAhmM7RIAgig0bHJ5uWA9ICwtQMypO+Lo/44zE6C9S/FNIr446O4Vq53/k9xQ6l5zgNGirdRkWooRUp01/oYOd5grYUcaWGzfF1Kh/0/mAsEe5332D08vLL9Q/g5wEjC/LPD+3a492P3J+mHHI90FF8ScTMCw9qIbdD6eSwJf88HVrJoNStJezA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=9/w1C9TSM7ScPdKwSQZNej3wrKzruBSvU1/6cK/45+s=;
+ b=gEqcJerHFXs0ouho7noZD9o+xNladRdPQw4tpmDIq5EhynvNHNjisi/y3o1fDa2jG3f1lb+/AcBAS1XsKKW2BD18lgX6Y1RTIL2OwWphq3GW1qLBH9p4pypp8QAPXD3OUca9zB0PgNOSJS7lJbFeXEhc8jYU3brni0vT1yT6B/w=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from GV1PR04MB9088.eurprd04.prod.outlook.com (2603:10a6:150:23::20)
+ by PAXPR04MB8864.eurprd04.prod.outlook.com (2603:10a6:102:20f::6) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7762.20; Wed, 10 Jul
+ 2024 08:13:55 +0000
+Received: from GV1PR04MB9088.eurprd04.prod.outlook.com
+ ([fe80::8775:dba3:39ac:3277]) by GV1PR04MB9088.eurprd04.prod.outlook.com
+ ([fe80::8775:dba3:39ac:3277%4]) with mapi id 15.20.7741.033; Wed, 10 Jul 2024
+ 08:13:55 +0000
+From: Vlad Pruteanu <vlad.pruteanu@nxp.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: mihai-octavian.urzica@nxp.com,
+	iulia.tanasescu@nxp.com,
+	andrei.istodorescu@nxp.com,
+	luiz.dentz@gmail.com,
+	Vlad Pruteanu <vlad.pruteanu@nxp.com>
+Subject: [PATCH BlueZ 0/3] Add transport.select method
+Date: Wed, 10 Jul 2024 11:13:35 +0300
+Message-Id: <20240710081338.17262-1-vlad.pruteanu@nxp.com>
+X-Mailer: git-send-email 2.40.1
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: ZR0P278CA0212.CHEP278.PROD.OUTLOOK.COM
+ (2603:10a6:910:6a::27) To GV1PR04MB9088.eurprd04.prod.outlook.com
+ (2603:10a6:150:23::20)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-TM-AS-Product-Ver: SMEX-14.0.0.3152-9.1.1006-23728.005
-X-TM-AS-Result: No-10--12.091700-8.000000
-X-TMASE-MatchedRID: IL7zMc1rB96iwkztVCsqbzl6J+7ealtWvtVce6w5+K8sfFlFugSGUDAx
-	/Q55TgrfZW9aUrh/vYDSwA55kcDk3Pww9Stut6YHmNvbnzNu6oL4qCLIu0mtICz+5QCTrE/sI6q
-	q9xPsXYiTFmqgSxbocNnFK+oGmxAsIzPPScfZfh+gx+na8dyT1fqtWPv3hAK2Cjo47SvV0k1Xvy
-	lpgLr3gMrdT5sfS91sBFQhScLIoJdAW3ODyfm3/gwfhKwa9GwDftnnpG0AB3VdhPmPvbogbKPFj
-	JEFr+olwXCBO/GKkVqOhzOa6g8KrUWRK7Bl4Dml/FhLcV2i0H//0q3VBjI4L5bjsrNE7+gtGl94
-	w95vR5c=
-X-TM-AS-User-Approved-Sender: No
-X-TM-AS-User-Blocked-Sender: No
-X-TMASE-Result: 10--12.091700-8.000000
-X-TMASE-Version: SMEX-14.0.0.3152-9.1.1006-23728.005
-X-TM-SNTS-SMTP: 5E7C9090678A3D3D1A6745644C61EEA5F16F33400E3FA696709DF94C7AE55AC22000:8
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: GV1PR04MB9088:EE_|PAXPR04MB8864:EE_
+X-MS-Office365-Filtering-Correlation-Id: e10bd63e-e95a-4a2f-eb96-08dca0b83da4
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|366016|1800799024|376014|52116014|38350700014;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?ahcAEkdS0vah2xLgaFIBWjKxE+N6iTFqPFow9nfCOlAPeeU9RYK/HPEukQdl?=
+ =?us-ascii?Q?sormHl98U5UU0/dBW3H7p1qmRNNK8TChywjAAPg16EF90To2FaVXobdj4Sva?=
+ =?us-ascii?Q?ZKlxZmSCCKGQ3VCglKaE74DVCLsKE0mYnI6j0kwUu2DQF04yGwa6NHMvq3uP?=
+ =?us-ascii?Q?2B+88/gP/q5EznuoGeE+SMGG9AL+WlFDeFZlIXOt6MPxNhYz/4D+uZEwkkDT?=
+ =?us-ascii?Q?AhtwkW+TLHKYAzWCGXtBghqeRWveIfBhTYmtbO6nefSPnMITvT/dgmiEh3yh?=
+ =?us-ascii?Q?/MVpinzs68x0+fzPYj3HYp8MNttVL+EIcK3XCFdJeML92Z6r6jHtMGwMyQOD?=
+ =?us-ascii?Q?kgNMU+RorL4SWSMu+aehJWz9C4W1CjEI1H9qh+q41glgTU33qhnF6NC13djY?=
+ =?us-ascii?Q?Vv3YbD4PJQ8egi2Mhe63Lf92TILAg+BQi2gsmkRGuCQzMmqLmHr0TWOQiCv1?=
+ =?us-ascii?Q?n9mY/OFHUg/9iAUpb9IKfeHqT38+9yw9A+S0QKwxEM+SLQiQ1j93VMViy1wb?=
+ =?us-ascii?Q?zipF+FGDGNXjvtHoXn03TYUpdKCaxU92TsZJKUfsGOckNIB9+QtdudjzSAnE?=
+ =?us-ascii?Q?53uokgc8CwADe5KKv9hn9OV+jR+m6rf2Ib8FKS7gTkQXdGRdnAovqOHBAIOE?=
+ =?us-ascii?Q?nr7dYzUBbW8iMY0TfB1jsJoi2QgKNSJFsbYPBzX0NZKjxB+B3smE8nVrXMq+?=
+ =?us-ascii?Q?Q97cBtrWa5nY/pWZJHc5LQFNlqwoiftzIXQMzHLVd+kjXkHrEIxkLLvSr9JZ?=
+ =?us-ascii?Q?wBwtYfMdxas929eH6Gr5mygDWHLoCCeai3bp9XiiVoqFbMuxLtlQ850hev3c?=
+ =?us-ascii?Q?to8/4IDKpaRy8fzxtTX141Tu+PWvAwSjVx2Q45ybeEilGjwajoL8mZ8uNflQ?=
+ =?us-ascii?Q?Zh/UlWxCyGpVjCEG+JjSjACmI+0+B8PiZyMlyTnY6wLf3LA7gyf2saIhIFd7?=
+ =?us-ascii?Q?SyNoQ4IISFG3ZFixhJo7TMiuuYbTcD0C7UdeTiWKIGZu9Z85AMgZIGlgD3y0?=
+ =?us-ascii?Q?QPcAzcYz5ACrTWphgTdaywztEz7cu9W7jzwvIbgro77PTOe5Gu+cpx2XS22a?=
+ =?us-ascii?Q?kpNCeQU0ESXDlYk5oRiSr/7XnRPbZNoZCZgEDphu1S29RGiccEN+CSBzwqGV?=
+ =?us-ascii?Q?StHJ2rmrVRL71+DPiFnjzAjRWc/iOrs5yLkYlaxDxki1oF1pkW6kH3hk/4dF?=
+ =?us-ascii?Q?bRgoA8xj5XdRYvCScEu2BsFEwJ+axTFkQ4+7oH2U19JG6LoESEAJvKfuVjXe?=
+ =?us-ascii?Q?IW8XYsdkGf2uMiByWTCuGvP3HDgOyf211yO/N/4mvUVuRXKgS2TJ6j1bPajM?=
+ =?us-ascii?Q?JJ5AnzQ6ywx8aya2d7uLYcogt0g9gEMiRFtdqAXKVAZqv77KpNN5E356G1N5?=
+ =?us-ascii?Q?rzdSx039fGJFDxvnJNLY00nBUoF9ClcVqPRqU/PeRQ73expF+Q=3D=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:GV1PR04MB9088.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(52116014)(38350700014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?+uBqv5+HAUUwWLG3b5An+McWm8HDYzVmJCDsJI6ywXsFJJX5D44Qlpa6CpmJ?=
+ =?us-ascii?Q?LxF9vwq6KTXYEXkX9um6AT2yIG+dmx/ntpQnkj3ghQoYQlhdfMQyDofeFvGd?=
+ =?us-ascii?Q?yG8tPSdqX+A5ErP2JlWE4p9qgZTH5KqilBL3mRYRJV2I9R+z8aSCSbJIpeQk?=
+ =?us-ascii?Q?VDg7jzlx1QyhmQMtU/zhvbJd55dnBgNQdiO0d2ZBtS7YvaZ+rU6dPjHhFMrS?=
+ =?us-ascii?Q?b2gmmZIarrfM2CaEi3WIMW7fL4i0xJdqHQlFXPqp5ordYe00CdZhwRZqeX8M?=
+ =?us-ascii?Q?nkakNqYwgbCHOYnez9/98QacyUFSj/TBVJEcOmcou3AfJnRcx48nbWqTeccO?=
+ =?us-ascii?Q?CHs0De499FeQA7z5YNQs+4wVAPMOcn+vdGSJ0ZMjn6I7avwMo3jTiRe/6cKY?=
+ =?us-ascii?Q?NMQwAZeO7QPfxdc0YGBTKv0ItUfPcaXw/ClwJ+EuJi6gEe9LKbpR6F2R4VAU?=
+ =?us-ascii?Q?GV04XJnT9Ib8zzp0tfigD1x018hmdhtFBPKKrqNE0mKHSYRr1WGOT2TX0+ec?=
+ =?us-ascii?Q?C0i9n3BvGDhhgLyTkD9WwaViAvx9599mNAroaD4pu9uZw0Cn0x9PjYKevLTe?=
+ =?us-ascii?Q?js8Y6XuhNM3PLrZFQwOEl7EqbgPRocd489NI1o05udlSp/Ol/ikjU00tAFOQ?=
+ =?us-ascii?Q?DrUHkzV4zRQA7FKWpOp0IwRU26YB/6nP4RZZzjAniVqeUOZCQ2BLJd46aReD?=
+ =?us-ascii?Q?xvKbC4EyOvhBUYP6On0toDGksnsk6OmJ+0vaa80m2QJqrE32kbldsvoYqJoM?=
+ =?us-ascii?Q?tHT1TZGvPjn1QETjNBZh51s4zHg6V6vOm9yQQulZQDSbVIf/pvpZXtdW2aSh?=
+ =?us-ascii?Q?NAFPoHguKGalz2APVLtUbAb1pxWd7iqJvn3lV/QXRKogkYtTJ1KpEWcMVnCe?=
+ =?us-ascii?Q?hijCEiIEADJjm3eenEmSyFlD9dWzpKDy4AKVOXMLe2b2avRNW3w70hsYtgK6?=
+ =?us-ascii?Q?UviddUMlH3WX+cy9FAmXIOCBhplaUlRNiNEQhnNgLaSZfDMarCL3uFg3BYI5?=
+ =?us-ascii?Q?9W9FfppNDGAncJw1qoxMZCKtTN+2ezSINaF2j6df/KM98KLzzkxcZQyD85sI?=
+ =?us-ascii?Q?fvgC3pJcMvbfAHIagdsTNWjPtoB87ZcjuXsfo7rJ9Q11OMYzS+EaKJlZZsGo?=
+ =?us-ascii?Q?UYsYxa1nCshW2bAy67dwoW9PssfaTsxKwvyoSpYbFNcmvc97NRFnbGYJsPOc?=
+ =?us-ascii?Q?vj6UAz2s0beNroZz/DYPC7cRQjhGsPQY8Gf3tHP8G6+Wo1vmi9tycWV679Ss?=
+ =?us-ascii?Q?hyI0gTHkqSPco3guOShf/TnX74VO/b2y2U7IPdSyWV6R7Lxt7ZvsFWHiygUf?=
+ =?us-ascii?Q?4gqTQsINoj70eM2PTFJKUPTCtZDQzbdKK4Mj6KvNR5H4LBCDsCEtOwi+vJeg?=
+ =?us-ascii?Q?lRKHNQjYD3fZPGAKtcuVxQZRdANCd7IdqWHngFKNx8dw2elfTOOOQmX3ZpRl?=
+ =?us-ascii?Q?TL9hQZNr70jYMOPflyV3EYyaMLLIPyoz7SXIIHAM+GLxhGKWl/F0hbj0poty?=
+ =?us-ascii?Q?Xtt2Qs2kNc7LkdN1hBkQT1rFYSceoyIEhUbxvuiMUpt3nRCzcr0PIxcDMDbC?=
+ =?us-ascii?Q?sLmo2j638amtf/yu0oCj+o8rI9COG5LDel92wg4K?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: e10bd63e-e95a-4a2f-eb96-08dca0b83da4
+X-MS-Exchange-CrossTenant-AuthSource: GV1PR04MB9088.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Jul 2024 08:13:55.3192
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: LavMUMUip6j+OJuiIg9MBZH/9DH41AGOhD8m+xdkZmd0zY69SBKy9Fw1VA27BOF0PJFTX7LYRn1XRr2EkF7qKw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PAXPR04MB8864
 
-MediaTek move some usb interface related function to btmtk.c which
-may cause build failed if BT USB Kconfig wasn't enabled.
-Fix undefined reference by adding config check.
+This series adds a new "select" method that can be called by
+the user on the broadcast sink side, to select the stream for
+which synchronization is desired. This is achieved by changing
+the states flow so that transport are not set to pending automatically
+anymore. Instead, the transport must first be selected by the user,
+which will update it's state from idle to pending. Any pending
+transport will be acquired by PipeWire.
 
-Fixes: 39a9e1c69e74 Bluetooth: btmtk: move btusb_mtk_hci_wmt_sync to btmtk.c
-Reported-by: kernel test robot <lkp@intel.com>
-Closes: https://lore.kernel.org/oe-kbuild-all/202407091928.AH0aGZnx-lkp@intel.com/
-Signed-off-by: Chris Lu <chris.lu@mediatek.com>
----
- drivers/bluetooth/btmtk.c | 2 ++
- drivers/bluetooth/btmtk.h | 4 ++++
- 2 files changed, 6 insertions(+)
+Furthermore, this method will be used for setting the broadcast code
+of a stream on the sink side. If the encryption flag is set, the
+transport.select call in bluetoothctl will prompt the user to enter
+the code
 
-diff --git a/drivers/bluetooth/btmtk.c b/drivers/bluetooth/btmtk.c
-index b7c348687a77..9789296ad4f6 100644
---- a/drivers/bluetooth/btmtk.c
-+++ b/drivers/bluetooth/btmtk.c
-@@ -437,6 +437,7 @@ int btmtk_process_coredump(struct hci_dev *hdev, struct sk_buff *skb)
- }
- EXPORT_SYMBOL_GPL(btmtk_process_coredump);
- 
-+#if IS_ENABLED(CONFIG_BT_HCIBTUSB_MTK)
- static void btmtk_usb_wmt_recv(struct urb *urb)
- {
- 	struct hci_dev *hdev = urb->context;
-@@ -1487,6 +1488,7 @@ int btmtk_usb_shutdown(struct hci_dev *hdev)
- 	return 0;
- }
- EXPORT_SYMBOL_GPL(btmtk_usb_shutdown);
-+#endif
- 
- MODULE_AUTHOR("Sean Wang <sean.wang@mediatek.com>");
- MODULE_AUTHOR("Mark Chen <mark-yw.chen@mediatek.com>");
-diff --git a/drivers/bluetooth/btmtk.h b/drivers/bluetooth/btmtk.h
-index 453ed5131a37..890dbe9beff8 100644
---- a/drivers/bluetooth/btmtk.h
-+++ b/drivers/bluetooth/btmtk.h
-@@ -165,6 +165,7 @@ struct btmtk_data {
- 	btmtk_reset_sync_func_t reset_sync;
- 	struct btmtk_coredump_info cd_info;
- 
-+#if IS_ENABLED(CONFIG_BT_HCIBTUSB_MTK)
- 	struct usb_device *udev;
- 	struct usb_interface *intf;
- 	struct usb_anchor *ctrl_anchor;
-@@ -177,6 +178,7 @@ struct btmtk_data {
- 
- 	/* spinlock for ISO data transmission */
- 	spinlock_t isorxlock;
-+#endif
- };
- 
- typedef int (*wmt_cmd_sync_func_t)(struct hci_dev *,
-@@ -202,6 +204,7 @@ int btmtk_process_coredump(struct hci_dev *hdev, struct sk_buff *skb);
- void btmtk_fw_get_filename(char *buf, size_t size, u32 dev_id, u32 fw_ver,
- 			   u32 fw_flavor);
- 
-+#if IS_ENABLED(CONFIG_BT_HCIBTUSB_MTK)
- int btmtk_usb_subsys_reset(struct hci_dev *hdev, u32 dev_id);
- 
- int btmtk_usb_recv_acl(struct hci_dev *hdev, struct sk_buff *skb);
-@@ -216,6 +219,7 @@ int btmtk_usb_suspend(struct hci_dev *hdev);
- int btmtk_usb_setup(struct hci_dev *hdev);
- 
- int btmtk_usb_shutdown(struct hci_dev *hdev);
-+#endif
- #else
- 
- static inline int btmtk_set_bdaddr(struct hci_dev *hdev,
+Vlad Pruteanu (3):
+  transport: Add "select" method
+  client/player: Expose transport "select" method to the user
+  transport: Broadcast sink: wait for user to select transport
+
+ client/player.c            | 52 ++++++++++++++++++++++++++++++++++++++
+ profiles/audio/transport.c | 29 ++++++++++++++++++---
+ 2 files changed, 77 insertions(+), 4 deletions(-)
+
 -- 
-2.18.0
+2.40.1
 
