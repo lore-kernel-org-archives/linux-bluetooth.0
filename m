@@ -1,16 +1,16 @@
 Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0145D190489
-	for <linux-bluetooth@vger.kernel.org>; Wed, 10 Jul 2024 11:32:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85E59190063
+	for <linux-bluetooth@vger.kernel.org>; Wed, 10 Jul 2024 11:32:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720611172; cv=none; b=HbEkGhWsCVYQQgR/knICOyLB7HDmz7+rnwbhOkhOq3/iAm9tIHr1l0W5htbpUz3iVt4Sk5EbjhjG4q6Dp6L8LzZM08KgTmnMKEckGgZaIyKmhvzUmdIxOGgT3NCBbLjSjF5DsbRzBBXmcPhQmS8PzkkyX+2r2AhzTRjKXlEuheo=
+	t=1720611176; cv=none; b=k2P8xf9K1rUdW2wqqn5+XU8sgx8ZF7S5eYdHS1pSR4QY/PJ+W5vM8UYR81Ayt2zEgIrAMV0oCYHN5uBQV4U9xgCrhMTGIEo0hTv73Scm9FylZ8Pehg3SKfktJEJ3qVocemCrsYSfcYXmOlUa/B2QFNUMOp1CMs9K5SgxzNO+M+c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720611172; c=relaxed/simple;
-	bh=bCdYLR8J8Hysl/lq5/LJ8/Q9PHPh+ksg0OuwtfWccsA=;
+	s=arc-20240116; t=1720611176; c=relaxed/simple;
+	bh=0A8n2EfQhuir56WvjBAaaMXw5Y4gU0mc57ejp+DI+vA=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=EYt4wYSoerHAuJVleJcgs0YqaWl2lbCeoiZmzXRZgW1qwOBNGHrLLizA3HaXK/MSen0kLma65g+Txq2dB7EA6AxE8MeGUR5ry87EEOuAS9JxcJJuh7w44OcBY9Pq7WBEWLtTku1vARFI9BDHy7yuAriyA4jj0JGE45VrvvX/OaU=
+	 MIME-Version:Content-Type; b=Ymp8i3PmO0U3VKcyOBUm+u7oLXveeb9EoUwzVwRWrF12Cwb0eYSVhw+TyNLH0QOnbyY+/t18QcqEVodUKJ2m2/tgNLC7Y6PF56bC7VUUXD7j0DDveomYNbXDmHrFDO3XZ2I9/YP15VwhAtnMzkum5QTwt53J3FRSc/K4JZpVCJE=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
@@ -21,9 +21,9 @@ Received: from localhost.localdomain (178.205.55.202) by msexch01.omp.ru
 From: Roman Smirnov <r.smirnov@omp.ru>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Roman Smirnov <r.smirnov@omp.ru>
-Subject: [PATCH BlueZ v2 resend 5/6] client/player: fix the order of args in cmd_register_endpoint()
-Date: Wed, 10 Jul 2024 14:31:48 +0300
-Message-ID: <20240710113151.49296-6-r.smirnov@omp.ru>
+Subject: [PATCH BlueZ v2 resend 6/6] shared/gatt-client: add NULL check to discover_secondary_cb()
+Date: Wed, 10 Jul 2024 14:31:49 +0300
+Message-ID: <20240710113151.49296-7-r.smirnov@omp.ru>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240710113151.49296-1-r.smirnov@omp.ru>
 References: <20240710113151.49296-1-r.smirnov@omp.ru>
@@ -68,26 +68,28 @@ X-KSE-Attachment-Filter-Triggered-Rules: Clean
 X-KSE-Attachment-Filter-Triggered-Filters: Clean
 X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
-Based on the function prototype, ep->cid and ep->vid should be swapped.
+It is necessary to prevent dereferencing of a NULL pointer.
 
 Found with the SVACE static analysis tool.
 ---
- client/player.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ src/shared/gatt-client.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/client/player.c b/client/player.c
-index de4491b53..2480ed64b 100644
---- a/client/player.c
-+++ b/client/player.c
-@@ -3388,7 +3388,7 @@ static void cmd_register_endpoint(int argc, char *argv[])
+diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
+index b48d739fc..9db3f5211 100644
+--- a/src/shared/gatt-client.c
++++ b/src/shared/gatt-client.c
+@@ -1276,7 +1276,9 @@ next:
  
- 	if (strrchr(argv[2], ':')) {
- 		ep->codec = 0xff;
--		parse_vendor_codec(argv[2], &ep->cid, &ep->vid);
-+		parse_vendor_codec(argv[2], &ep->vid, &ep->cid);
- 		ep->preset = new0(struct preset, 1);
- 		ep->preset->custom.name = strdup("custom");
- 		ep->preset->default_preset = &ep->preset->custom;
+ 	range = queue_peek_head(op->discov_ranges);
+ 
+-	client->discovery_req = bt_gatt_discover_included_services(client->att,
++	if (range)
++		client->discovery_req = bt_gatt_discover_included_services(
++							client->att,
+ 							range->start,
+ 							range->end,
+ 							discover_incl_cb,
 -- 
 2.43.0
 
