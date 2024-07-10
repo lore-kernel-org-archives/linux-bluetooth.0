@@ -1,72 +1,85 @@
-Received: from mail-4317.proton.ch (mail-4317.proton.ch [185.70.43.17])
+Received: from inva021.nxp.com (inva021.nxp.com [92.121.34.21])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4B231E871
-	for <linux-bluetooth@vger.kernel.org>; Wed, 10 Jul 2024 12:30:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.70.43.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 704D0128369;
+	Wed, 10 Jul 2024 12:36:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=92.121.34.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720614613; cv=none; b=pn6HTAdyTBh0uuJc7Ibg9Vb3kAImf6pjBjgeY6RguE/21I9rzx45JSRLFV5duHamt6GazCYDusCe2ST/sAwz1sp+0+vQgvj0oU61tkha88BkBo4rHrUPnqRiAqFUp6acALdF7JykXBvPGLz8nOTvVDANE8Nb2f0ZSn8NJzsOGhc=
+	t=1720614998; cv=none; b=etRW88U6x65/U4UKTNUk/94h1lBlP+UYm47j4eNq4JNvbDVoBeWj2oDVNAArJIy5qCv3IMU5V0Ml3sUWMSoIPqaRDiKGCLDkCfpZJjW+FU6FM5AL1fIeyzZYECGoR09ZMaNcXuJsaS1xe/noRCnMcqrjICB1mTpyiAbW5Uh0gXA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720614613; c=relaxed/simple;
-	bh=wOJt7BsIInf81sHOpJriDhBinELtxiJ+orKYomu64Vk=;
-	h=Date:To:From:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=W5Lsb7DHqUulTSERR33537+WcAzhN25xcu7y3TTQHc+bKKL3CcZ2dUTmC0VaV33uTCiHnFUE+D5xzP/2PZqJ1cDHXdCSbpbYtP4EuSd5img3pvr2dxA2RzvKQYW0d4vhW4bpxmhyabK2DyUpN4LoEuO6UVFy5Xi9pyp6tlgGWd8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sandhuservices.dev; spf=pass smtp.mailfrom=sandhuservices.dev; arc=none smtp.client-ip=185.70.43.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sandhuservices.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sandhuservices.dev
-Date: Wed, 10 Jul 2024 12:30:00 +0000
-To: linux-bluetooth@vger.kernel.org
-From: Rahul Sandhu <rahul@sandhuservices.dev>
-Cc: Rahul Sandhu <rahul@sandhuservices.dev>
-Subject: [PATCH] tools/hex2hcd: fix musl compatibility
-Message-ID: <20240710123002.5639-1-rahul@sandhuservices.dev>
-Feedback-ID: 82291650:user:proton
-X-Pm-Message-ID: 40db816fc8017c6b18c4d5eacd1836234e6f7d89
+	s=arc-20240116; t=1720614998; c=relaxed/simple;
+	bh=It3imBc3BM6SehI+VEHWR2OIlg/DcDnLWTXrkGkSGLQ=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=FUCJv8QwOCX2J9Fdidg/xbsZG5uvNrn9fKmqNCL4VeUIpFUul5CjSZMyJFMivXenmwRmnCoDcqTYtenVyoDZdYNqQsk0y2Hh0WnLiC/MEtZZ5WDk/Hi9bLYOAZysth5Y4kx7gFJpY84hOHuobIxYbcaW/yI6EAVbbUWv9kVqLXQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; arc=none smtp.client-ip=92.121.34.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+Received: from inva021.nxp.com (localhost [127.0.0.1])
+	by inva021.eu-rdc02.nxp.com (Postfix) with ESMTP id 4B4392006AD;
+	Wed, 10 Jul 2024 14:36:29 +0200 (CEST)
+Received: from aprdc01srsp001v.ap-rdc01.nxp.com (aprdc01srsp001v.ap-rdc01.nxp.com [165.114.16.16])
+	by inva021.eu-rdc02.nxp.com (Postfix) with ESMTP id 12D04200E34;
+	Wed, 10 Jul 2024 14:36:29 +0200 (CEST)
+Received: from pe-lt8779.in-pnq01.nxp.com (pe-lt8779.in-pnq01.nxp.com [10.17.104.141])
+	by aprdc01srsp001v.ap-rdc01.nxp.com (Postfix) with ESMTP id 9D1C1183487B;
+	Wed, 10 Jul 2024 20:36:27 +0800 (+08)
+From: Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>
+To: marcel@holtmann.org,
+	luiz.dentz@gmail.com
+Cc: linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	amitkumar.karwar@nxp.com,
+	rohit.fule@nxp.com,
+	neeraj.sanjaykale@nxp.com,
+	sherry.sun@nxp.com,
+	ziniu.wang_1@nxp.com,
+	haibo.chen@nxp.com,
+	LnxRevLi@nxp.com
+Subject: [PATCH v2] Bluetooth: btnxpuart: Fix warnings for suspend and resume functions
+Date: Wed, 10 Jul 2024 18:04:26 +0530
+Message-Id: <20240710123426.935122-1-neeraj.sanjaykale@nxp.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Virus-Scanned: ClamAV using ClamSMTP
 
-The call to basename() relies on a GNU extension
-to take a const char * vs a char *. Let's define
-a trivial helper function to ensure compatibility
-with musl.
+This fixes the warnings 'nxp_serdev_resume' and 'nxp_serdev_suspend'
+defined but not used.
 
-Downstream gentoo bug: https://bugs.gentoo.org/926344
-Fixes: #843
+Signed-off-by: Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>
+Reported-by: kernel test robot <lkp@intel.com>
+Closes: https://lore.kernel.org/oe-kbuild-all/202407100518.06Xxq5PK-lkp@intel.com/
 ---
- tools/hex2hcd.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+v2: Rebase master, fix conflict due to copy-paste error from previous
+patch (bluez.test.bot)
+---
+ drivers/bluetooth/btnxpuart.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/tools/hex2hcd.c b/tools/hex2hcd.c
-index e6dca5a81..42c95b759 100644
---- a/tools/hex2hcd.c
-+++ b/tools/hex2hcd.c
-@@ -285,6 +285,11 @@ static void ver_parse_file(const char *pathname)
- =09prev->next =3D ver;
+diff --git a/drivers/bluetooth/btnxpuart.c b/drivers/bluetooth/btnxpuart.c
+index f75b24bd3045..31d3dd90b672 100644
+--- a/drivers/bluetooth/btnxpuart.c
++++ b/drivers/bluetooth/btnxpuart.c
+@@ -1522,6 +1522,7 @@ static void nxp_serdev_remove(struct serdev_device *serdev)
+ 	hci_free_dev(hdev);
  }
-=20
-+static const char *helper_basename(const char *path) {
-+  const char *base =3D strrchr(path, '/');
-+  return base ? base + 1 : path;
-+}
-+
- static void ver_parse_entry(const char *pathname)
+ 
++#ifdef CONFIG_PM_SLEEP
+ static int nxp_serdev_suspend(struct device *dev)
  {
- =09struct stat st;
-@@ -302,7 +307,7 @@ static void ver_parse_entry(const char *pathname)
- =09}
-=20
- =09if (S_ISREG(st.st_mode)) {
--=09=09ver_parse_file(basename(pathname));
-+=09=09ver_parse_file(helper_basename(pathname));
- =09=09goto done;
- =09}
-=20
---=20
-2.45.2
-
+ 	struct btnxpuart_dev *nxpdev = dev_get_drvdata(dev);
+@@ -1539,6 +1540,7 @@ static int nxp_serdev_resume(struct device *dev)
+ 	ps_control(psdata->hdev, PS_STATE_AWAKE);
+ 	return 0;
+ }
++#endif
+ 
+ static struct btnxpuart_data w8987_data __maybe_unused = {
+ 	.helper_fw_name = NULL,
+-- 
+2.34.1
 
