@@ -1,152 +1,91 @@
-Received: from mail-oi1-f173.google.com (mail-oi1-f173.google.com [209.85.167.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B06C9195FE0
-	for <linux-bluetooth@vger.kernel.org>; Wed, 10 Jul 2024 18:39:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EA6315E88;
+	Wed, 10 Jul 2024 19:50:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720636777; cv=none; b=sQbHUqX0X3Nn+SbdwMqLAuDDhq2Tw90IFk3HfB/bZnGjix5Xj8HxWMIDTOqqHTS6yuXgUUmnDa6yO9uEWjcS8eI7od9mfqGxuwFbKY5KybPlwcxSYqFP96Le/Ji2/GphDLgUXJydfKzXIR6IuNTKgpcBKn1uEYTlN9SDLzdCoaQ=
+	t=1720641035; cv=none; b=O1NJA75MMMnR8rgbiCTG6FKxBSoi2ApwLhnULmzigAIbN+LVyFoqumIxLyGbvOkI5E+Ms9a8CnoWNkjaNxpE+SkdO1SDQOfUiF2G0qODNwxR3snuCTlfIHzeZQcZZHns8mMGfXfPhA76RLNnKZW0iG4/UwRs9eqsCe8ncxBOkbE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720636777; c=relaxed/simple;
-	bh=aPr2FIbzUWaB+Q4K69owc7LdrFzr33PxUGuqt36+NHw=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=h/CN4MXonY2faN10emCYPrQbRWF44UXp+5grI27hRxNqUN8cBEaOHFOEae3ME3UnJ3siGLuLFZXIcRKefhJ5gqV2Wts6w10hTdToYGnLlDCX6Twlifxt3E7sqRYlRhElvIhI9nuk9UJig+ynMFC0UR/ydy4EX3WMWAYZq4ZNLKI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PHjtpEtC; arc=none smtp.client-ip=209.85.167.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1720641035; c=relaxed/simple;
+	bh=xihsmeAWmOXJW0TEj1iF/9CEInbgkYEYZIMDRf7/TMA=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=d2GjEDh8Fjl5Q1JJlnifH8KO46OgoFELi4tC9byoDfNjMpYzHojhTDi+qMbFRehvvs4kzx0+CslGXeLSUaY4rhXxiibZ6gTzJB4kYyg7KLuHeiraOrBMkkp1CUK4/NGec39FE3hcZ0eMcv/ZVOTFVAhh4jnV/oIjt5rnVosTxNY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Sb9rO8xJ; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PHjtpEtC"
-Received: by mail-oi1-f173.google.com with SMTP id 5614622812f47-3d92d1a5222so79484b6e.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 10 Jul 2024 11:39:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1720636774; x=1721241574; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZN6mp9jA8iSU8fqvwCRZbMeA48Z2xrn8kvX7LyZ2tXI=;
-        b=PHjtpEtCaE6oDDQUeaiGzAN/RdLJb5dbWeIDkYhg6PjuH1AmGrghXK5qvsZnK0yVtL
-         rykW6BeE2Q1jj5JrU3899gn8uKyagAFNlzif+yKSDM04EsNo/Cq1VJCZv4KWtxxVRj3J
-         +H9betDA8V9Z92Bugf8c1aAqkS2+3IzzcXTyrgixEUN0zkoySWTwIkgjAgVTcp75q9Q7
-         c5s0qQ3RJ4CFYiOCXxVEct2qPzZPuiJiPZkO8LKoS4yv6jfLHmiUfdHRtbP9Tx4myNKG
-         8h9+KjKOmWc1x11e5j6ZMSO6v7E2b0C86qib1XJWK3cxQd1POmik2vEtZzo/oe/9xJcH
-         vZTw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720636774; x=1721241574;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ZN6mp9jA8iSU8fqvwCRZbMeA48Z2xrn8kvX7LyZ2tXI=;
-        b=udthtpI6uV1D6uifi8siiozz3v8VslPptPntzTzMPF3UxbOF8BkorcmBj/nkQIpqwS
-         j1vCEpp9838m+TTYm5EdgY5GM/H4LVa55uHEsnZpJ69ndfe4xLADU9ZpLFYmLSh94Tcl
-         FAo1caOhHTHq6Oi0jeCDccxXpyvbM7ZQgJSoCyaZ9AqRk1UO1JFWKrO9aoUSMDUIbFIW
-         Bi3CnR3gQrN8OLw1fYBfIIue3SHV+HOvJhogJ7dYVpWnlZNeVG/XBSAV6ddrGdhzg9eU
-         fc3EdchOI3fFOwNVzn/FCsex/zLrSgupVr54zqaLUPm1jyfBUnsOJ2nsXdluxTsOKSgp
-         ATdQ==
-X-Gm-Message-State: AOJu0Ywcz8AQyJ+sHs3e/a+fn66vKPvWKeqSZ5+0NVFSaGMx4Ql7pFVc
-	oqGeDoskM00XblUisVORdQtDgCpkdvSQCdIEPM1wXq6f6hcyZF5sj9KENg==
-X-Google-Smtp-Source: AGHT+IE5pbycKFfDAagnWUDJHDufNwlINZGz25NodEq3H6vWzpD/BF2gGP9lG+k0K4sdAWus9y9AUw==
-X-Received: by 2002:a05:6808:19a5:b0:3d5:1f50:188b with SMTP id 5614622812f47-3d93c01e103mr6278812b6e.23.1720636774448;
-        Wed, 10 Jul 2024 11:39:34 -0700 (PDT)
-Received: from [172.17.0.2] ([20.49.55.105])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-447f9bf918csm22623551cf.84.2024.07.10.11.39.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 10 Jul 2024 11:39:34 -0700 (PDT)
-Message-ID: <668ed566.c80a0220.3d4e.9fd6@mx.google.com>
-Date: Wed, 10 Jul 2024 11:39:34 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============0723780359180074776=="
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Sb9rO8xJ"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id D4CB7C4AF0D;
+	Wed, 10 Jul 2024 19:50:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1720641034;
+	bh=xihsmeAWmOXJW0TEj1iF/9CEInbgkYEYZIMDRf7/TMA=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=Sb9rO8xJAUR8kNxOjj2HYw1jog4jC1IbJUlPgzGwTcUCYX6/rSOD7FjLhcjpin5y1
+	 YMUOTErXKxgr9wsihtzojt4pwdMb6XSucltspyo7KKJupEAR1sDtoBIXj7gbWqKZTR
+	 FRnz3zolywukR2t1NrViHp2Y5PDAw4Ig/ggTquwBOUGf5bQKs9gczVtKP0uR/BsyA3
+	 IsMyKNrQ7lr/Urj7OLKX7dAXZeQWO0s18gZjNKWpqtwVQBOtTHfnaEGkH9avIz9xsw
+	 LVz+Vlj2Mob/7ZGnDhVPyMREE4K3YZ1Xkp/qBT7kxng+y0JOkAoRtXaWNg9UGZQOTc
+	 GiCOCnfZoUlNQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id C419AC4332E;
+	Wed, 10 Jul 2024 19:50:34 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, nathan@kernel.org
-Subject: RE: [bluetooth-next] Bluetooth: btmtk: Mark all stub functions as inline
-In-Reply-To: <20240710-btmtk-add-missing-inline-to-stubs-v1-1-ba33143ee148@kernel.org>
-References: <20240710-btmtk-add-missing-inline-to-stubs-v1-1-ba33143ee148@kernel.org>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v3 0/6] Bluetooth: hci_qca: use the power sequencer for
+ wcn7850
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <172064103479.11923.11962118903624442308.git-patchwork-notify@kernel.org>
+Date: Wed, 10 Jul 2024 19:50:34 +0000
+References: <20240709-hci_qca_refactor-v3-0-5f48ca001fed@linaro.org>
+In-Reply-To: <20240709-hci_qca_refactor-v3-0-5f48ca001fed@linaro.org>
+To: Bartosz Golaszewski <brgl@bgdev.pl>
+Cc: marcel@holtmann.org, luiz.dentz@gmail.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, robh@kernel.org,
+ krzk+dt@kernel.org, conor+dt@kernel.org, quic_bgodavar@quicinc.com,
+ quic_rjliao@quicinc.com, andersson@kernel.org, konrad.dybcio@linaro.org,
+ linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-arm-msm@vger.kernel.org, bartosz.golaszewski@linaro.org
 
---===============0723780359180074776==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hello:
 
-This is automated email and please do not reply to this email!
+This series was applied to bluetooth/bluetooth-next.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-Dear submitter,
+On Tue, 09 Jul 2024 14:18:31 +0200 you wrote:
+> The following series extend the usage of the power sequencing subsystem
+> in the hci_qca driver.
+> 
+> The end goal is to convert the entire driver to be exclusively pwrseq-based
+> and simplify it in the process. However due to a large number of users we
+> need to be careful and consider every case separately.
+> 
+> [...]
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=870196
+Here is the summary with links:
+  - [v3,1/6] dt-bindings: bluetooth: qualcomm: describe the inputs from PMU for wcn7850
+    https://git.kernel.org/bluetooth/bluetooth-next/c/e1c54afa8526
+  - [v3,2/6] Bluetooth: hci_qca: schedule a devm action for disabling the clock
+    https://git.kernel.org/bluetooth/bluetooth-next/c/a887c8dede8e
+  - [v3,3/6] Bluetooth: hci_qca: unduplicate calls to hci_uart_register_device()
+    https://git.kernel.org/bluetooth/bluetooth-next/c/cdd10964f76f
+  - [v3,4/6] Bluetooth: hci_qca: make pwrseq calls the default if available
+    https://git.kernel.org/bluetooth/bluetooth-next/c/958a33c3f9fc
+  - [v3,5/6] Bluetooth: hci_qca: use the power sequencer for wcn7850 and wcn6855
+    https://git.kernel.org/bluetooth/bluetooth-next/c/4fa54d8731ec
+  - [v3,6/6] arm64: dts: qcom: sm8650-qrd: use the PMU to power up bluetooth
+    (no matching commit)
 
----Test result---
-
-Test Summary:
-CheckPatch                    FAIL      0.94 seconds
-GitLint                       FAIL      0.51 seconds
-SubjectPrefix                 PASS      0.13 seconds
-BuildKernel                   PASS      29.74 seconds
-CheckAllWarning               PASS      32.05 seconds
-CheckSparse                   PASS      37.44 seconds
-CheckSmatch                   PASS      102.44 seconds
-BuildKernel32                 PASS      28.64 seconds
-TestRunnerSetup               PASS      523.92 seconds
-TestRunner_l2cap-tester       PASS      23.87 seconds
-TestRunner_iso-tester         PASS      30.35 seconds
-TestRunner_bnep-tester        PASS      4.75 seconds
-TestRunner_mgmt-tester        PASS      112.49 seconds
-TestRunner_rfcomm-tester      PASS      7.41 seconds
-TestRunner_sco-tester         PASS      17.03 seconds
-TestRunner_ioctl-tester       PASS      7.83 seconds
-TestRunner_mesh-tester        PASS      5.94 seconds
-TestRunner_smp-tester         PASS      6.91 seconds
-TestRunner_userchan-tester    PASS      5.17 seconds
-IncrementalBuild              PASS      27.66 seconds
-
-Details
-##############################
-Test: CheckPatch - FAIL
-Desc: Run checkpatch.pl script
-Output:
-[bluetooth-next] Bluetooth: btmtk: Mark all stub functions as inline
-WARNING: Prefer a maximum 75 chars per line (possible unwrapped commit description?)
-#79: 
-    254 | static void btmtk_fw_get_filename(char *buf, size_t size, u32 dev_id,
-
-total: 0 errors, 1 warnings, 91 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/src/13729552.patch has style problems, please review.
-
-NOTE: Ignored message types: UNKNOWN_COMMIT_ID
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
-##############################
-Test: GitLint - FAIL
-Desc: Run gitlint
-Output:
-[bluetooth-next] Bluetooth: btmtk: Mark all stub functions as inline
-
-WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
-8: B1 Line exceeds max length (109>80): "  drivers/bluetooth/btmtk.h:254:13: warning: 'btmtk_fw_get_filename' defined but not used [-Wunused-function]"
-11: B1 Line exceeds max length (110>80): "  drivers/bluetooth/btmtk.h:249:12: warning: 'btmtk_process_coredump' defined but not used [-Wunused-function]"
-12: B1 Line exceeds max length (86>80): "    249 | static int btmtk_process_coredump(struct hci_dev *hdev, struct sk_buff *skb)"
-14: B1 Line exceeds max length (111>80): "  drivers/bluetooth/btmtk.h:243:12: warning: 'btmtk_register_coredump' defined but not used [-Wunused-function]"
-15: B1 Line exceeds max length (84>80): "    243 | static int btmtk_register_coredump(struct hci_dev *hdev, const char *name,"
-17: B1 Line exceeds max length (108>80): "  drivers/bluetooth/btmtk.h:233:12: warning: 'btmtk_setup_firmware' defined but not used [-Wunused-function]"
-18: B1 Line exceeds max length (83>80): "    233 | static int btmtk_setup_firmware(struct hci_dev *hdev, const char *fwname,"
-20: B1 Line exceeds max length (113>80): "  drivers/bluetooth/btmtk.h:227:12: warning: 'btmtk_setup_firmware_79xx' defined but not used [-Wunused-function]"
-21: B1 Line exceeds max length (88>80): "    227 | static int btmtk_setup_firmware_79xx(struct hci_dev *hdev, const char *fwname,"
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============0723780359180074776==--
