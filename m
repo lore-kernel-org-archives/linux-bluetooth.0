@@ -1,29 +1,29 @@
 Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E43617D412
-	for <linux-bluetooth@vger.kernel.org>; Wed, 10 Jul 2024 11:32:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3F9E190488
+	for <linux-bluetooth@vger.kernel.org>; Wed, 10 Jul 2024 11:32:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720611158; cv=none; b=nv1jrPGBKT5QjnQmYQz2t/qoATBxuMJlZOQLMuC+LaQ4bgPNV+qtW0x4dQdsVBjrmd63Fg6hVOD7CK1EA0PrgzuMpu5Vums4kre0nqz0VDZDW9zp+EKdvmbNtTfxgRZhHz74F7AnpwCBxxIckRbYWld/X7YktbqYDK6+0n1H8UA=
+	t=1720611163; cv=none; b=qLIUVFKijVUiyACbkR+4f1eP+kH0wPGpGRWJmRgEDFKc7t+4ZnfTfUWmR0pnDa7VtFDZKVEtFKP4ZqLM2xvhkDcYchRkBRMzta++VZ8AeWrAGGaa2/E0ENz2rfBlI/dlu/CSP7eaJpIVTpQ/3y1jn2IUcZTBgds/5Oe2EtIr/kc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720611158; c=relaxed/simple;
-	bh=xDhD6rhNbfYh49WZqioIipK1sKM6rRbpT3dbvss9wTc=;
+	s=arc-20240116; t=1720611163; c=relaxed/simple;
+	bh=Sj8vOmG/nlhPA7GYAopFv0d/Viay7aD5jIun98YUdGY=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Sl5AYugUwjD/1VmEIe4ipuO/sWa9C8tpIZZqM7Z7I5DxHUtphkdkoy+ryjncZh3yO7UW/sxKUn9NgrcAk0dRRVf88OSZXe9rpw4r8rY7OH6A/jtBaJsY1gWfMHSJ9uYKJk8h1GDJObcjvkSTC6Y0Tq7tsD7DWirBYUYMXnpi0CI=
+	 MIME-Version:Content-Type; b=QLtq0S8TDYAg5Kqz2XFC8amUVow41T0STTF+xQNYA2WZFyr5Dshk5hrBh9h3TnuKeucUuUWu43RwMfvOCngVuj3bhaqFM2RDSQCxCoOS70srr5jhbXsZGYjzaAzm1ZmmFXJgC4F327uB5G2y5gnB95737Udvj7LgnLvWvImPzS4=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
 Received: from localhost.localdomain (178.205.55.202) by msexch01.omp.ru
  (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Wed, 10 Jul
- 2024 14:32:20 +0300
+ 2024 14:32:21 +0300
 From: Roman Smirnov <r.smirnov@omp.ru>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Roman Smirnov <r.smirnov@omp.ru>
-Subject: [PATCH BlueZ v2 resend 2/6] shared/vcp: add NULL checks to foreach_aics_service()
-Date: Wed, 10 Jul 2024 14:31:45 +0300
-Message-ID: <20240710113151.49296-3-r.smirnov@omp.ru>
+Subject: [PATCH BlueZ v2 resend 3/6] client/player: add error code handling to transport_recv()
+Date: Wed, 10 Jul 2024 14:31:46 +0300
+Message-ID: <20240710113151.49296-4-r.smirnov@omp.ru>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240710113151.49296-1-r.smirnov@omp.ru>
 References: <20240710113151.49296-1-r.smirnov@omp.ru>
@@ -68,27 +68,32 @@ X-KSE-Attachment-Filter-Triggered-Rules: Clean
 X-KSE-Attachment-Filter-Triggered-Filters: Clean
 X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
-Make foreach_aics_service() safe for passing NULL pointers.
+It is necessary to add return value check as in sock_send().
 
 Found with the SVACE static analysis tool.
 ---
- src/shared/vcp.c | 3 +++
- 1 file changed, 3 insertions(+)
+ client/player.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
-diff --git a/src/shared/vcp.c b/src/shared/vcp.c
-index 602d46dc1..43ef1d186 100644
---- a/src/shared/vcp.c
-+++ b/src/shared/vcp.c
-@@ -2729,6 +2729,9 @@ static void foreach_aics_service(struct gatt_db_attribute *attr,
- 	struct bt_vcp *vcp = user_data;
- 	struct bt_aics *aics = vcp_get_aics(vcp);
+diff --git a/client/player.c b/client/player.c
+index 584fc5e81..de4491b53 100644
+--- a/client/player.c
++++ b/client/player.c
+@@ -4514,7 +4514,13 @@ static bool transport_recv(struct io *io, void *user_data)
+ 	uint8_t buf[1024];
+ 	int ret, len;
  
-+	if (!aics || !attr)
-+		return;
+-	ret = read(io_get_fd(io), buf, sizeof(buf));
++	ret = io_get_fd(io);
++	if (ret < 0) {
++		bt_shell_printf("io_get_fd() returned %d\n", ret);
++		return true;
++	}
 +
- 	aics->service = attr;
- 
- 	gatt_db_service_set_claimed(attr, true);
++	ret = read(ret, buf, sizeof(buf));
+ 	if (ret < 0) {
+ 		bt_shell_printf("Failed to read: %s (%d)\n", strerror(errno),
+ 								-errno);
 -- 
 2.43.0
 
