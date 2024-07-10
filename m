@@ -1,95 +1,72 @@
-Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail-4317.proton.ch (mail-4317.proton.ch [185.70.43.17])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E760E848E
-	for <linux-bluetooth@vger.kernel.org>; Wed, 10 Jul 2024 12:23:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4B231E871
+	for <linux-bluetooth@vger.kernel.org>; Wed, 10 Jul 2024 12:30:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.70.43.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720614226; cv=none; b=Sky3yIFyMDUL+1ydl6q38RaI+Lpbd2iEYjoQ+87d6mREh6Ckg2FkDjiW6DI+25rCxDFTV7jcloWvpp/RO+n/h0of7ccbHRjrECMBXlFDepoRyMTodJ1WT8LinSK9NgjUMu2JKISWXoJ0KvJcQf4gcC7JLOq9J+rSMQsOX5LiOU8=
+	t=1720614613; cv=none; b=pn6HTAdyTBh0uuJc7Ibg9Vb3kAImf6pjBjgeY6RguE/21I9rzx45JSRLFV5duHamt6GazCYDusCe2ST/sAwz1sp+0+vQgvj0oU61tkha88BkBo4rHrUPnqRiAqFUp6acALdF7JykXBvPGLz8nOTvVDANE8Nb2f0ZSn8NJzsOGhc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720614226; c=relaxed/simple;
-	bh=e6xbi+ToNVOX0OpnSNcGI41WULkSTx0aqsDnnvfA+/w=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=OMVsyLMzeU5NpYYKTqGxBNPYqzqcf6oA4PF+fJU4kt+AiEiGY76Cg3kjjqfxqshZp5EXN8e1mp1wYvpKfjoQ+n2VslXemRzScc4IvFGnvCV/bdcNkBtLtrWh0MvYLydJdo741cyCQxLYL3P5RnThlYffBHDaRkHLO7maiAbJsD4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FCgQHUrX; arc=none smtp.client-ip=209.85.210.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FCgQHUrX"
-Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-70b3c0a00f2so1898307b3a.3
-        for <linux-bluetooth@vger.kernel.org>; Wed, 10 Jul 2024 05:23:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1720614224; x=1721219024; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=e6xbi+ToNVOX0OpnSNcGI41WULkSTx0aqsDnnvfA+/w=;
-        b=FCgQHUrXOpHifyGJrj8A/O0wLKpz/WD5gylZAyuM/Wq588A2UT0Vqj4JO7ZRmFkjr0
-         uqY8zJGcp/OIBzus0WIDkrGKiDvbtfANvdLCZ+ZzFeAznzBbCXiKsvE6cR5ziAGoZF50
-         VYFr1rflcjbrwbjrM1sMxnu9embmSr4Ttlawj4wHkpqrUC2AfJZdgZCMSYe88wD1KoIp
-         0VJ6oGJM7YUIJYssG6wyW7jViPnzEbLpOkTyxKpNQxdHM1o6VqdJuIu8OCQAVLb6Ff3F
-         b8fj0hi+BK2MtZnAxlePxH9g2jYmmskUBixSU0sd8GBCEu5bugsyNu7viL+gohN0iQ3p
-         qk+g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720614224; x=1721219024;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=e6xbi+ToNVOX0OpnSNcGI41WULkSTx0aqsDnnvfA+/w=;
-        b=lHkrsDx7AydxVdyZtAKY7sEeH0RMRhUONXt0RtsyhlV+36Z/pUgyelpqTrK0Mzv2/u
-         JoEBBE+4X4QLfZ6HaupgUwiIGLsS8BxskDdNv3GOEqbYZmDTQpZsaUfTZLcDCRwwJdth
-         F6lKXbXEG5Zz3AVDzX+q3pDQ3qsl2tTXe9AqGP5Qd4BDkKWztvQJqjHYZ3eo82HWgfa6
-         flWYiDUfvl2fCwKtrHTxIMKgY5jK3Km9L+HlLMZ/gJpRD6w6PabqT5N8WtWUepfZZ7kL
-         8o9gFHaNd7AB0FpcMGVXFtIV9UvHn5MIgWWW5qdSYogK6vnQvGUlpG/1z7AUFn18e31w
-         3R/g==
-X-Gm-Message-State: AOJu0Yxr6Fai0+RYCK481gnhKqQSyo8EWZ9ZGixV0ZO65QpPS+DPxI5Y
-	HaZ4iiSYIR5jAWblt3rkEQHui6KK8jiUg01+IfJtZVaqElwaZ0fxeS7sFQ==
-X-Google-Smtp-Source: AGHT+IEI3+KOb2cwOPH7qG8KPajROPjCTzqWl1vPOAwPbhgd82WLm031GjmmL3Ui5T8n5LiAn0vI6w==
-X-Received: by 2002:a05:6a21:1690:b0:1c0:e322:e8c5 with SMTP id adf61e73a8af0-1c29821b544mr5319160637.26.1720614223988;
-        Wed, 10 Jul 2024 05:23:43 -0700 (PDT)
-Received: from [172.17.0.2] ([4.242.240.141])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2ca352bfe4esm3635016a91.43.2024.07.10.05.23.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 10 Jul 2024 05:23:43 -0700 (PDT)
-Message-ID: <668e7d4f.170a0220.ee62a.0548@mx.google.com>
-Date: Wed, 10 Jul 2024 05:23:43 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============2103985407280751623=="
+	s=arc-20240116; t=1720614613; c=relaxed/simple;
+	bh=wOJt7BsIInf81sHOpJriDhBinELtxiJ+orKYomu64Vk=;
+	h=Date:To:From:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=W5Lsb7DHqUulTSERR33537+WcAzhN25xcu7y3TTQHc+bKKL3CcZ2dUTmC0VaV33uTCiHnFUE+D5xzP/2PZqJ1cDHXdCSbpbYtP4EuSd5img3pvr2dxA2RzvKQYW0d4vhW4bpxmhyabK2DyUpN4LoEuO6UVFy5Xi9pyp6tlgGWd8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sandhuservices.dev; spf=pass smtp.mailfrom=sandhuservices.dev; arc=none smtp.client-ip=185.70.43.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sandhuservices.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sandhuservices.dev
+Date: Wed, 10 Jul 2024 12:30:00 +0000
+To: linux-bluetooth@vger.kernel.org
+From: Rahul Sandhu <rahul@sandhuservices.dev>
+Cc: Rahul Sandhu <rahul@sandhuservices.dev>
+Subject: [PATCH] tools/hex2hcd: fix musl compatibility
+Message-ID: <20240710123002.5639-1-rahul@sandhuservices.dev>
+Feedback-ID: 82291650:user:proton
+X-Pm-Message-ID: 40db816fc8017c6b18c4d5eacd1836234e6f7d89
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, neeraj.sanjaykale@nxp.com
-Subject: RE: [v1] Bluetooth: btnxpuart: Fix warnings for suspend and resume functions
-In-Reply-To: <20240710121558.934069-1-neeraj.sanjaykale@nxp.com>
-References: <20240710121558.934069-1-neeraj.sanjaykale@nxp.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
---===============2103985407280751623==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+The call to basename() relies on a GNU extension
+to take a const char * vs a char *. Let's define
+a trivial helper function to ensure compatibility
+with musl.
 
-This is an automated email and please do not reply to this email.
-
-Dear Submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
-
------ Output -----
-
-error: patch failed: drivers/bluetooth/btnxpuart.c:1515
-error: drivers/bluetooth/btnxpuart.c: patch does not apply
-hint: Use 'git am --show-current-patch' to see the failed patch
-
-Please resolve the issue and submit the patches again.
-
-
+Downstream gentoo bug: https://bugs.gentoo.org/926344
+Fixes: #843
 ---
-Regards,
-Linux Bluetooth
+ tools/hex2hcd.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/tools/hex2hcd.c b/tools/hex2hcd.c
+index e6dca5a81..42c95b759 100644
+--- a/tools/hex2hcd.c
++++ b/tools/hex2hcd.c
+@@ -285,6 +285,11 @@ static void ver_parse_file(const char *pathname)
+ =09prev->next =3D ver;
+ }
+=20
++static const char *helper_basename(const char *path) {
++  const char *base =3D strrchr(path, '/');
++  return base ? base + 1 : path;
++}
++
+ static void ver_parse_entry(const char *pathname)
+ {
+ =09struct stat st;
+@@ -302,7 +307,7 @@ static void ver_parse_entry(const char *pathname)
+ =09}
+=20
+ =09if (S_ISREG(st.st_mode)) {
+-=09=09ver_parse_file(basename(pathname));
++=09=09ver_parse_file(helper_basename(pathname));
+ =09=09goto done;
+ =09}
+=20
+--=20
+2.45.2
 
 
---===============2103985407280751623==--
