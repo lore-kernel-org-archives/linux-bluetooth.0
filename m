@@ -1,119 +1,150 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
+Received: from mailgw02.mediatek.com (unknown [210.61.82.184])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA28B17C205
-	for <linux-bluetooth@vger.kernel.org>; Wed, 10 Jul 2024 09:04:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF3DB84A5B;
+	Wed, 10 Jul 2024 09:26:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.61.82.184
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720602266; cv=none; b=UemfZ33d3bYtnxCmzPCLbocj9UOGDiKkceS5cCR7gBg7emTCskhpNY/LT/aotFDxnMwwxfuW6jVN6hpkUjqtU4u5g1HMR1m8PqPd5ko/PjuV4alLZSqaZ645Boz4qUwFlDgLKkRtrNOfP3NLKIXtbSaEGNApL/YDb7NF+6zDypM=
+	t=1720603585; cv=none; b=uum8kLrhK/GHl7192uA9A6bE/3NnF7knzvJDkERShpp/3fGgM3F7627jtTGUYuimd/g7iCcSbO8NeFFqW4WE5D+EYaAoPzh7Kr4cZG2jNFtuCBSwcv67Zhwh8l5i2EdC4kpCDkkvTw9MtCB3+yCufrIxoS+Qqj2/AEcPplwTFDI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720602266; c=relaxed/simple;
-	bh=7ckFKilvgUPRik/YHqQhF77xUfFYyERQAt6doyodLY8=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=F5fFHl92Z3X8L4kHrLiEatIujSCedusK7PVONZFtLBBcO2Q738gsytyngoYUuwEvG49d1WCYiG9a/osWZmHftlky/At2iadIJ/2Ar1qeGI+i5AD5VzXFPPVcK/ledGuN5GzchkkdQIM4KVoP6f7enxhBIQFQFgddT/Ru4xaTvyA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=efwKJjya; arc=none smtp.client-ip=192.198.163.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1720603585; c=relaxed/simple;
+	bh=1zElswsvJ3pJJN6VbPn+rOgECvzW/EETLvmAKoGVLuA=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=XbHSPeB9/H7871PFO9wDYcBV/PT3eL+8mMLO2GFgTfAK93Rv1f+GKODZDQSz4nZDp/froImXa17Ag7KpQDWSpHuR705h2ijPjfHAiTATiwiUJAzN7Amij0UOeIDSWDG3YL2DAWqMIybcK6mrcwTQU6bT43UsctInofbTqRfkCDg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com; spf=pass smtp.mailfrom=mediatek.com; dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b=faewIIti; arc=none smtp.client-ip=210.61.82.184
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mediatek.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="efwKJjya"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1720602264; x=1752138264;
-  h=date:from:to:cc:subject:message-id:mime-version;
-  bh=7ckFKilvgUPRik/YHqQhF77xUfFYyERQAt6doyodLY8=;
-  b=efwKJjyaCs5tM814T9fXyDoqjvUj3Xlt967nBegOvAfnVElp0MptFq62
-   wJMNptjut6cqFfYHA7RxchRz8tC0nLztJN6Wk6gU+53NjeS4PR3+9z8Uh
-   SAVZ4DPFGt9OpHEP6v+1D7Zmehcek34aTOOdrRQGcYhqOss/gntzxsd1s
-   fNyDDI+KZ2Yu+t/Ibd3yRsIDbxOE+JXDHEH4aTQd0kcvWaZjhHlZzGInL
-   3QdvYQU4aA6ZCM7kvCRa67CRiRzK3BDa4fHyCxIoS4najtNvWuw+W5JYl
-   QYBesAgHzFrehKSj4tPbX7V4mD6hHyM/yWafR+PJJXzuZRnml30RLZbr8
-   A==;
-X-CSE-ConnectionGUID: 7Z/xFqqCTcemD2rRs0+OqQ==
-X-CSE-MsgGUID: 021i72AgSaS3Iu+Fa0F+QQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11128"; a="17608366"
-X-IronPort-AV: E=Sophos;i="6.09,197,1716274800"; 
-   d="scan'208";a="17608366"
-Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jul 2024 02:04:23 -0700
-X-CSE-ConnectionGUID: s7le77dOTW6r7HsgZj3BrQ==
-X-CSE-MsgGUID: RDATyD+DTBONMrzY43y1BQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.09,197,1716274800"; 
-   d="scan'208";a="48031631"
-Received: from lkp-server01.sh.intel.com (HELO 68891e0c336b) ([10.239.97.150])
-  by fmviesa007.fm.intel.com with ESMTP; 10 Jul 2024 02:04:21 -0700
-Received: from kbuild by 68891e0c336b with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1sRTFL-000Xfi-2i;
-	Wed, 10 Jul 2024 09:04:19 +0000
-Date: Wed, 10 Jul 2024 17:03:45 +0800
-From: kernel test robot <lkp@intel.com>
-To: Chris Lu <chris.lu@mediatek.com>
-Cc: oe-kbuild-all@lists.linux.dev, linux-bluetooth@vger.kernel.org,
-	Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
-	Sean Wang <sean.wang@mediatek.com>
-Subject: [bluetooth-next:master 70/76] xtensa-linux-ld: btmtk.c:undefined
- reference to `usb_disable_autosuspend'
-Message-ID: <202407101633.wEKPo5yr-lkp@intel.com>
+	dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b="faewIIti"
+X-UUID: 7386eb9c3e9e11ef87684b57767b52b1-20240710
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
+	h=Content-Type:MIME-Version:Message-ID:Date:Subject:CC:To:From; bh=5JQ5bL4uRYPelWxEtL/T3yFSFEnrFbUa7wxiQo1QJ1Q=;
+	b=faewIItifotUUTQ87g8hRaU+6aNxhAB84yvqUfuRVWEJISzaFBCmgSjPUqvJ4JBTmfPRBeKIrRA5mQkRJq1gYM9DTG0Wv0H4RQvCst84KohsiXcQ/Fb2m3naq42TtgWu0Brsjx8/qyEU00xHgHzkzNWp3SEkTO2k+gwwpGphXYo=;
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.1.40,REQID:caa6c047-9202-4507-976c-1b1bc9897b53,IP:0,U
+	RL:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
+	release,TS:0
+X-CID-META: VersionHash:ba885a6,CLOUDID:c10e4a0d-46b0-425a-97d3-4623fe284021,B
+	ulkID:nil,BulkQuantity:0,Recheck:0,SF:102,TC:nil,Content:0,EDM:-3,IP:nil,U
+	RL:11|1,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES
+	:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
+X-CID-BVR: 0
+X-CID-BAS: 0,_,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR,TF_CID_SPAM_ULN
+X-UUID: 7386eb9c3e9e11ef87684b57767b52b1-20240710
+Received: from mtkmbs14n2.mediatek.inc [(172.21.101.76)] by mailgw02.mediatek.com
+	(envelope-from <chris.lu@mediatek.com>)
+	(Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
+	with ESMTP id 1161178547; Wed, 10 Jul 2024 17:26:13 +0800
+Received: from mtkmbs13n2.mediatek.inc (172.21.101.108) by
+ MTKMBS09N2.mediatek.inc (172.21.101.94) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.26; Wed, 10 Jul 2024 02:26:15 -0700
+Received: from mtksdccf07.mediatek.inc (172.21.84.99) by
+ mtkmbs13n2.mediatek.inc (172.21.101.73) with Microsoft SMTP Server id
+ 15.2.1118.26 via Frontend Transport; Wed, 10 Jul 2024 17:26:15 +0800
+From: Chris Lu <chris.lu@mediatek.com>
+To: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg
+	<johan.hedberg@gmail.com>, Luiz Von Dentz <luiz.dentz@gmail.com>
+CC: Sean Wang <sean.wang@mediatek.com>, Aaron Hou <aaron.hou@mediatek.com>,
+	Steve Lee <steve.lee@mediatek.com>, linux-bluetooth
+	<linux-bluetooth@vger.kernel.org>, linux-kernel
+	<linux-kernel@vger.kernel.org>, linux-mediatek
+	<linux-mediatek@lists.infradead.org>, Chris Lu <chris.lu@mediatek.com>
+Subject: [PATCH v2] Bluetooth: btmtk: Fix btmtk.c undefined reference build error
+Date: Wed, 10 Jul 2024 17:26:14 +0800
+Message-ID: <20240710092614.7297-1-chris.lu@mediatek.com>
+X-Mailer: git-send-email 2.18.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Content-Type: text/plain
 
-tree:   https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
-head:   c6052c312e85011cd31237804900013f63420403
-commit: 91d0ac304edffdf78012b6b57b6f94d8cf95a07f [70/76] Bluetooth: btmtk: move btusb_recv_acl_mtk to btmtk.c
-config: xtensa-randconfig-c031-20230322 (https://download.01.org/0day-ci/archive/20240710/202407101633.wEKPo5yr-lkp@intel.com/config)
-compiler: xtensa-linux-gcc (GCC) 13.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240710/202407101633.wEKPo5yr-lkp@intel.com/reproduce)
+MediaTek move some usb interface related function to btmtk.c which
+may cause build failed if BT USB Kconfig wasn't enabled.
+Fix undefined reference by adding config check.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202407101633.wEKPo5yr-lkp@intel.com/
+btmtk.c:(.text+0x89c): undefined reference to `usb_alloc_urb'
+btmtk.c:(.text+0x8e3): undefined reference to `usb_free_urb'
+btmtk.c:(.text+0x956): undefined reference to `usb_free_urb'
+btmtk.c:(.text+0xa0e): undefined reference to `usb_anchor_urb'
+btmtk.c:(.text+0xb43): undefined reference to `usb_autopm_get_interface'
+btmtk.c:(.text+0xb7e): undefined reference to `usb_autopm_put_interface'
+btmtk.c:(.text+0xf70): undefined reference to `usb_disable_autosuspend'
+btmtk.c:(.text+0x133a): undefined reference to `usb_control_msg'
 
-All errors (new ones prefixed by >>):
+Fixes: 39a9e1c69e74 ("Bluetooth: btmtk: move btusb_mtk_hci_wmt_sync to btmtk.c")
+Reported-by: kernel test robot <lkp@intel.com>
+Closes: https://lore.kernel.org/oe-kbuild-all/202407091928.AH0aGZnx-lkp@intel.com/
+Co-developed-by: Sean Wang <sean.wang@mediatek.com>
+Signed-off-by: Sean Wang <sean.wang@mediatek.com>
+Signed-off-by: Chris Lu <chris.lu@mediatek.com>
+---
+Change from v1 to v2:
+-fix and update commit message warning
+---
+ drivers/bluetooth/btmtk.c | 2 ++
+ drivers/bluetooth/btmtk.h | 4 ++++
+ 2 files changed, 6 insertions(+)
 
-   xtensa-linux-ld: drivers/bluetooth/btmtk.o: in function `btmtk_set_bdaddr':
-   btmtk.c:(.text+0x89c): undefined reference to `usb_alloc_urb'
-   xtensa-linux-ld: btmtk.c:(.text+0x8a0): undefined reference to `usb_free_urb'
-   xtensa-linux-ld: btmtk.c:(.text+0x8a4): undefined reference to `usb_anchor_urb'
-   xtensa-linux-ld: btmtk.c:(.text+0x8a8): undefined reference to `usb_submit_urb'
-   xtensa-linux-ld: btmtk.c:(.text+0x8ac): undefined reference to `usb_unanchor_urb'
-   xtensa-linux-ld: btmtk.c:(.text+0x8b8): undefined reference to `usb_alloc_urb'
-   xtensa-linux-ld: drivers/bluetooth/btmtk.o: in function `btmtk_reset_sync':
-   btmtk.c:(.text+0x8e3): undefined reference to `usb_free_urb'
-   xtensa-linux-ld: drivers/bluetooth/btmtk.o: in function `btmtk_coredump_notify':
-   btmtk.c:(.text+0x956): undefined reference to `usb_free_urb'
-   xtensa-linux-ld: drivers/bluetooth/btmtk.o: in function `btmtk_coredump':
-   btmtk.c:(.text+0xa0e): undefined reference to `usb_anchor_urb'
-   xtensa-linux-ld: btmtk.c:(.text+0xa1a): undefined reference to `usb_submit_urb'
-   xtensa-linux-ld: btmtk.c:(.text+0xa50): undefined reference to `usb_unanchor_urb'
-   xtensa-linux-ld: btmtk.c:(.text+0xa58): undefined reference to `usb_free_urb'
-   xtensa-linux-ld: btmtk.c:(.text+0xa70): undefined reference to `usb_autopm_get_interface'
-   xtensa-linux-ld: btmtk.c:(.text+0xa74): undefined reference to `usb_autopm_put_interface'
-   xtensa-linux-ld: drivers/bluetooth/btmtk.o: in function `btmtk_usb_submit_wmt_recv_urb':
-   btmtk.c:(.text+0xb43): undefined reference to `usb_autopm_get_interface'
-   xtensa-linux-ld: btmtk.c:(.text+0xb7e): undefined reference to `usb_autopm_put_interface'
-   xtensa-linux-ld: btmtk.c:(.text+0xb9b): undefined reference to `usb_autopm_put_interface'
-   xtensa-linux-ld: drivers/bluetooth/btmtk.o: in function `btmtk_usb_hci_wmt_sync':
-   btmtk.c:(.text+0xf70): undefined reference to `usb_disable_autosuspend'
->> xtensa-linux-ld: btmtk.c:(.text+0xfcf): undefined reference to `usb_disable_autosuspend'
-   xtensa-linux-ld: drivers/bluetooth/btmtk.o: in function `btmtk_process_coredump':
-   btmtk.c:(.text+0x127b): undefined reference to `usb_anchor_urb'
-   xtensa-linux-ld: btmtk.c:(.text+0x1286): undefined reference to `usb_submit_urb'
-   xtensa-linux-ld: btmtk.c:(.text+0x12cf): undefined reference to `usb_unanchor_urb'
-   xtensa-linux-ld: btmtk.c:(.text+0x12d8): undefined reference to `usb_control_msg'
-   xtensa-linux-ld: drivers/bluetooth/btmtk.o: in function `btmtk_usb_recv_acl':
-   btmtk.c:(.text+0x133a): undefined reference to `usb_control_msg'
-   xtensa-linux-ld: btmtk.c:(.text+0x13f0): undefined reference to `usb_control_msg'
-   xtensa-linux-ld: drivers/bluetooth/btmtk.o: in function `btmtk_usb_wmt_recv':
-   btmtk.c:(.text+0x149c): undefined reference to `usb_control_msg'
-
+diff --git a/drivers/bluetooth/btmtk.c b/drivers/bluetooth/btmtk.c
+index b7c348687a77..9789296ad4f6 100644
+--- a/drivers/bluetooth/btmtk.c
++++ b/drivers/bluetooth/btmtk.c
+@@ -437,6 +437,7 @@ int btmtk_process_coredump(struct hci_dev *hdev, struct sk_buff *skb)
+ }
+ EXPORT_SYMBOL_GPL(btmtk_process_coredump);
+ 
++#if IS_ENABLED(CONFIG_BT_HCIBTUSB_MTK)
+ static void btmtk_usb_wmt_recv(struct urb *urb)
+ {
+ 	struct hci_dev *hdev = urb->context;
+@@ -1487,6 +1488,7 @@ int btmtk_usb_shutdown(struct hci_dev *hdev)
+ 	return 0;
+ }
+ EXPORT_SYMBOL_GPL(btmtk_usb_shutdown);
++#endif
+ 
+ MODULE_AUTHOR("Sean Wang <sean.wang@mediatek.com>");
+ MODULE_AUTHOR("Mark Chen <mark-yw.chen@mediatek.com>");
+diff --git a/drivers/bluetooth/btmtk.h b/drivers/bluetooth/btmtk.h
+index 453ed5131a37..890dbe9beff8 100644
+--- a/drivers/bluetooth/btmtk.h
++++ b/drivers/bluetooth/btmtk.h
+@@ -165,6 +165,7 @@ struct btmtk_data {
+ 	btmtk_reset_sync_func_t reset_sync;
+ 	struct btmtk_coredump_info cd_info;
+ 
++#if IS_ENABLED(CONFIG_BT_HCIBTUSB_MTK)
+ 	struct usb_device *udev;
+ 	struct usb_interface *intf;
+ 	struct usb_anchor *ctrl_anchor;
+@@ -177,6 +178,7 @@ struct btmtk_data {
+ 
+ 	/* spinlock for ISO data transmission */
+ 	spinlock_t isorxlock;
++#endif
+ };
+ 
+ typedef int (*wmt_cmd_sync_func_t)(struct hci_dev *,
+@@ -202,6 +204,7 @@ int btmtk_process_coredump(struct hci_dev *hdev, struct sk_buff *skb);
+ void btmtk_fw_get_filename(char *buf, size_t size, u32 dev_id, u32 fw_ver,
+ 			   u32 fw_flavor);
+ 
++#if IS_ENABLED(CONFIG_BT_HCIBTUSB_MTK)
+ int btmtk_usb_subsys_reset(struct hci_dev *hdev, u32 dev_id);
+ 
+ int btmtk_usb_recv_acl(struct hci_dev *hdev, struct sk_buff *skb);
+@@ -216,6 +219,7 @@ int btmtk_usb_suspend(struct hci_dev *hdev);
+ int btmtk_usb_setup(struct hci_dev *hdev);
+ 
+ int btmtk_usb_shutdown(struct hci_dev *hdev);
++#endif
+ #else
+ 
+ static inline int btmtk_set_bdaddr(struct hci_dev *hdev,
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+2.18.0
+
