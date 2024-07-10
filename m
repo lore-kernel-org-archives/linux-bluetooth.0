@@ -1,82 +1,165 @@
-Received: from inva020.nxp.com (inva020.nxp.com [92.121.34.13])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f178.google.com (mail-pg1-f178.google.com [209.85.215.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 749AC19046D;
-	Wed, 10 Jul 2024 12:18:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=92.121.34.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB231190074;
+	Wed, 10 Jul 2024 12:20:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720613886; cv=none; b=SoeQvah4krY1B6FZbcIPpuHnmAxQp7KlfxL4n/75BHKM+nU9MdDZjHNo1kHXtE3iwnpmh0uZIjncWGqkbW0QndgWThQSUXRIVjN2yqbe5828Fi7mKEAtWPrAH2FdxtRE+uPgnWVVRuRayTFY6fwZyI3EsueOKvNqgPhmGXDQR+c=
+	t=1720614034; cv=none; b=KA0p6tQaIve206YIlNFlK9UnfeAehwQIB4aVxUpfFT0HaiczyLbGYKsXQf0lwcwTN6K0EyxR/yBLOQBMjgg2gMMjvLwyqz6CU44iMPFOdGEjkhJoPMs+FvEsfbTF2dLHbiXkvgaIOUaXGDccPEeV1T8ZPdMqfn5O2gHQ9l/M5c4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720613886; c=relaxed/simple;
-	bh=Mc4FARdR6+L13bQllZJqIjgHsR+un/Qjk1ZSnQGsfk4=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=SjFR6SMNGO7S/nqXWN+Ns59B2Wjh0womqDCH4MXwrBFVGy8r8zMfvpUzw2kEV6faE7M7HU0PSH1l/KrvzrGCtIL4BhX6aNK8XIXVm1XjmvfInIhv+MEhe7JERnPrgWF1M0r+xjIApE8MuNKijLRcjjUL69ZJA9XDtXD9RJwpOS8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; arc=none smtp.client-ip=92.121.34.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
-Received: from inva020.nxp.com (localhost [127.0.0.1])
-	by inva020.eu-rdc02.nxp.com (Postfix) with ESMTP id BFEF01A066F;
-	Wed, 10 Jul 2024 14:18:02 +0200 (CEST)
-Received: from aprdc01srsp001v.ap-rdc01.nxp.com (aprdc01srsp001v.ap-rdc01.nxp.com [165.114.16.16])
-	by inva020.eu-rdc02.nxp.com (Postfix) with ESMTP id 92A961A14B5;
-	Wed, 10 Jul 2024 14:18:02 +0200 (CEST)
-Received: from pe-lt8779.in-pnq01.nxp.com (pe-lt8779.in-pnq01.nxp.com [10.17.104.141])
-	by aprdc01srsp001v.ap-rdc01.nxp.com (Postfix) with ESMTP id 1B3821820F77;
-	Wed, 10 Jul 2024 20:18:01 +0800 (+08)
-From: Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>
-To: marcel@holtmann.org,
-	luiz.dentz@gmail.com
-Cc: linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	amitkumar.karwar@nxp.com,
-	rohit.fule@nxp.com,
-	neeraj.sanjaykale@nxp.com,
-	sherry.sun@nxp.com,
-	ziniu.wang_1@nxp.com,
-	haibo.chen@nxp.com,
-	LnxRevLi@nxp.com
-Subject: [PATCH v1] Bluetooth: btnxpuart: Fix warnings for suspend and resume functions
-Date: Wed, 10 Jul 2024 17:45:58 +0530
-Message-Id: <20240710121558.934069-1-neeraj.sanjaykale@nxp.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1720614034; c=relaxed/simple;
+	bh=GA97M7Skw6Z5xG4aEkaYhA7E0iwKejxbW3njXe0jTeI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=YrJXBqw9+11N44OCjYRLric7rZ6MTDxOl/0DIgSsMJ/i5skEhiu6S62SxKkQ0IcZmpGhAUg4nv5PI+0AFFvBHDk/on23u4GDB4ycQowQOL+MfWkUqAPUKTZcvhqEvPvqbX0/ANLiVd9V053AoIp9zh4szPHd2GyCJgeXG+SOeR4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HUIDmKWH; arc=none smtp.client-ip=209.85.215.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HUIDmKWH"
+Received: by mail-pg1-f178.google.com with SMTP id 41be03b00d2f7-75ee39f1ffbso4457394a12.2;
+        Wed, 10 Jul 2024 05:20:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1720614032; x=1721218832; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=HvQpnoDjoDpI50LV+48+mtvnut3O6+hbvKZt5JaS7n4=;
+        b=HUIDmKWHwk3diVKR5lzbZp1zZE+B8gXw8fUG5nwRHMRIxiT/zRLeH5StFoRHp0L7HL
+         TdOilam82W+CPFBlEmxdKHAfRMLHpLhOz/64KmZgfo2sQMRgWrTPzneuSDaASsbqbs7G
+         IPogOKsWBttjt9N5IR1DKmGo0DETx+PRgjqVV5aXmMTOy2+e29AZKAvEzKm8zIldpK6R
+         KmPDhgjdXP7Z9SVVWWIDPARYCcXqZ9m0oOiLgjUyyHhoclOx1erzdnbh6KPk0BnuO7iX
+         eJSK4voT5frQhUeFuu/SGYoQ6XFwWHEF+ymbBe7pBS7gi0rxWqZmd4uaS9NC7b2pQYjB
+         Zumg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1720614032; x=1721218832;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=HvQpnoDjoDpI50LV+48+mtvnut3O6+hbvKZt5JaS7n4=;
+        b=hgIjqejQ885gglBQUgJ+V4eWAEgcEkpGR0159BNmIbei6GHj4AtqCKSL1airNa2ZdY
+         pPwjk8aJQbJwmJNSUzTzLa0srHSccgkCg/yC8zQqGqrM6MmaP+feT4lan8mrswtAYxSU
+         9Sf7jgzRp33dS9MJnN7Nnwovb/fiWyZks6NKhroicusomyzhe1wGgxjbY993+9ePEvth
+         Kku5Rl7Zm1o38vLTqYS1SsCGNdi8TG0y7RLZ0ciVizqDeg1VULQeupn1DUYnTQWV3eB3
+         Do9YDIlWuUgAuRtJLjfXiVhE3uhG6BFUtAiyTCF/0FN4tHLvtTbtX7aTPHC9kUw4cRbz
+         6Lgw==
+X-Forwarded-Encrypted: i=1; AJvYcCWDutMDeScy+Rjg0N4clIXrgBvhtZFsIIxgMF7cj4s1RT6lK055+a9vtYkt2fwo2dhio1yMe+XhI5905d84M3bVAIgHqKjBn+Nh8cvNzeqf6MCKqzRGKJVejfOD8P4R4W0BsdrPSAO+KPQpvkPn
+X-Gm-Message-State: AOJu0YwIvdp63G0LCcp3g4dP00KKb9CgzoqfoMgRhJzjrt9Ltk98Fgkw
+	HM351zYUtnwQU+kf2wn0Qi7K/bnXlqNWovKh9DcxW2ucZ4FWU2RmWPjrwGAuDOcTW9950RjYOtA
+	mdBpPha5c3E3kb+z8qXo0DknyFEInvw==
+X-Google-Smtp-Source: AGHT+IFGd8/NaTt8bBK3q51jUrH0J0reuzi+z80yAos5DxqdigxYXohUYHVvXxa+g72Kmjli7ngIw45bHloBrJGAaPc=
+X-Received: by 2002:a05:6a20:7fa4:b0:1c0:dd3d:ef3a with SMTP id
+ adf61e73a8af0-1c29824acaemr6326902637.29.1720614031912; Wed, 10 Jul 2024
+ 05:20:31 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Virus-Scanned: ClamAV using ClamSMTP
+References: <20240710073832.4381-1-chris.lu@mediatek.com>
+In-Reply-To: <20240710073832.4381-1-chris.lu@mediatek.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Wed, 10 Jul 2024 08:20:17 -0400
+Message-ID: <CABBYNZLOn4pAnx70afymGWR=XRzeO4WshaX2Swew9GGp6CRnvw@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: btmtk: Fix btmtk.c undefined reference build error
+To: Chris Lu <chris.lu@mediatek.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg <johan.hedberg@gmail.com>, 
+	Sean Wang <sean.wang@mediatek.com>, Aaron Hou <aaron.hou@mediatek.com>, 
+	Steve Lee <steve.lee@mediatek.com>, linux-bluetooth <linux-bluetooth@vger.kernel.org>, 
+	linux-kernel <linux-kernel@vger.kernel.org>, 
+	linux-mediatek <linux-mediatek@lists.infradead.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-This fixes the warnings 'nxp_serdev_resume' and 'nxp_serdev_suspend'
-defined but not used.
+Hi Chris,
 
-Signed-off-by: Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>
-Reported-by: kernel test robot <lkp@intel.com>
-Closes: https://lore.kernel.org/oe-kbuild-all/202407100518.06Xxq5PK-lkp@intel.com/
----
- drivers/bluetooth/btnxpuart.c | 2 ++
- 1 file changed, 2 insertions(+)
+On Wed, Jul 10, 2024 at 3:38=E2=80=AFAM Chris Lu <chris.lu@mediatek.com> wr=
+ote:
+>
+> MediaTek move some usb interface related function to btmtk.c which
+> may cause build failed if BT USB Kconfig wasn't enabled.
+> Fix undefined reference by adding config check.
+>
+> Fixes: 39a9e1c69e74 Bluetooth: btmtk: move btusb_mtk_hci_wmt_sync to btmt=
+k.c
+> Reported-by: kernel test robot <lkp@intel.com>
+> Closes: https://lore.kernel.org/oe-kbuild-all/202407091928.AH0aGZnx-lkp@i=
+ntel.com/
+> Signed-off-by: Chris Lu <chris.lu@mediatek.com>
+> ---
+>  drivers/bluetooth/btmtk.c | 2 ++
+>  drivers/bluetooth/btmtk.h | 4 ++++
+>  2 files changed, 6 insertions(+)
+>
+> diff --git a/drivers/bluetooth/btmtk.c b/drivers/bluetooth/btmtk.c
+> index b7c348687a77..9789296ad4f6 100644
+> --- a/drivers/bluetooth/btmtk.c
+> +++ b/drivers/bluetooth/btmtk.c
+> @@ -437,6 +437,7 @@ int btmtk_process_coredump(struct hci_dev *hdev, stru=
+ct sk_buff *skb)
+>  }
+>  EXPORT_SYMBOL_GPL(btmtk_process_coredump);
+>
+> +#if IS_ENABLED(CONFIG_BT_HCIBTUSB_MTK)
+>  static void btmtk_usb_wmt_recv(struct urb *urb)
+>  {
+>         struct hci_dev *hdev =3D urb->context;
+> @@ -1487,6 +1488,7 @@ int btmtk_usb_shutdown(struct hci_dev *hdev)
+>         return 0;
+>  }
+>  EXPORT_SYMBOL_GPL(btmtk_usb_shutdown);
+> +#endif
+>
+>  MODULE_AUTHOR("Sean Wang <sean.wang@mediatek.com>");
+>  MODULE_AUTHOR("Mark Chen <mark-yw.chen@mediatek.com>");
+> diff --git a/drivers/bluetooth/btmtk.h b/drivers/bluetooth/btmtk.h
+> index 453ed5131a37..890dbe9beff8 100644
+> --- a/drivers/bluetooth/btmtk.h
+> +++ b/drivers/bluetooth/btmtk.h
+> @@ -165,6 +165,7 @@ struct btmtk_data {
+>         btmtk_reset_sync_func_t reset_sync;
+>         struct btmtk_coredump_info cd_info;
+>
+> +#if IS_ENABLED(CONFIG_BT_HCIBTUSB_MTK)
+>         struct usb_device *udev;
+>         struct usb_interface *intf;
+>         struct usb_anchor *ctrl_anchor;
+> @@ -177,6 +178,7 @@ struct btmtk_data {
+>
+>         /* spinlock for ISO data transmission */
+>         spinlock_t isorxlock;
+> +#endif
 
-diff --git a/drivers/bluetooth/btnxpuart.c b/drivers/bluetooth/btnxpuart.c
-index c5b40bba6bfa..b9b5032480b1 100644
---- a/drivers/bluetooth/btnxpuart.c
-+++ b/drivers/bluetooth/btnxpuart.c
-@@ -1498,6 +1498,7 @@ static void nxp_serdev_remove(struct serdev_device *serdev)
- 	hci_free_dev(hdev);
- }
- 
-+#ifdef CONFIG_PM_SLEEP
- static int nxp_serdev_suspend(struct device *dev)
- {
- 	struct btnxpuart_dev *nxpdev = dev_get_drvdata(dev);
-@@ -1515,6 +1516,7 @@ static int nxp_serdev_resume(struct device *dev)
- 	ps_control(data->hdev, PS_STATE_AWAKE);
- 	return 0;
- }
-+#endif
- 
- static struct btnxpuart_data w8987_data __maybe_unused = {
- 	.helper_fw_name = NULL,
--- 
-2.34.1
+If I recall this correctly it is not a good practice to use #if inside
+structs as it would change its overall size, memory layout, etc, and
+it also makes it difficult to use if (IS_DEFINED) and let the compiler
+eliminate dead code instead of using the preprocessor like you doing.
 
+>  };
+>
+>  typedef int (*wmt_cmd_sync_func_t)(struct hci_dev *,
+> @@ -202,6 +204,7 @@ int btmtk_process_coredump(struct hci_dev *hdev, stru=
+ct sk_buff *skb);
+>  void btmtk_fw_get_filename(char *buf, size_t size, u32 dev_id, u32 fw_ve=
+r,
+>                            u32 fw_flavor);
+>
+> +#if IS_ENABLED(CONFIG_BT_HCIBTUSB_MTK)
+>  int btmtk_usb_subsys_reset(struct hci_dev *hdev, u32 dev_id);
+>
+>  int btmtk_usb_recv_acl(struct hci_dev *hdev, struct sk_buff *skb);
+> @@ -216,6 +219,7 @@ int btmtk_usb_suspend(struct hci_dev *hdev);
+>  int btmtk_usb_setup(struct hci_dev *hdev);
+>
+>  int btmtk_usb_shutdown(struct hci_dev *hdev);
+> +#endif
+>  #else
+>
+>  static inline int btmtk_set_bdaddr(struct hci_dev *hdev,
+> --
+> 2.18.0
+>
+
+
+--=20
+Luiz Augusto von Dentz
