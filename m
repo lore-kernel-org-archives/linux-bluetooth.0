@@ -1,29 +1,29 @@
 Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7867D193464
-	for <linux-bluetooth@vger.kernel.org>; Wed, 10 Jul 2024 14:17:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4891F193447
+	for <linux-bluetooth@vger.kernel.org>; Wed, 10 Jul 2024 14:17:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720621048; cv=none; b=szgDO65XBNZ5Kt/6izryVscHXyFFEPlb7dxeKi+y7wul36uPtqahpIyfDr11BHOhzji7DF2/mvoJtAjyNKxplzhsJ0d2+hKrMb5rhXhWfhqiA84TclXxEmBjmPo090Wife0Y3gBjiAjX6UULoNshTj8VCfwlos83au2oEK1ZiS8=
+	t=1720621053; cv=none; b=j3l275094tTn5ebhYD+xSP1CzX4XnFqcyhUWfQV1Y47hRFCmi3Defh/jzcLFahRnM9KfZgPOXwSEidnI+bnj1/IvMmferDygDV0qR304tK4dOzdTtj2oZH5SGvJXo+Js1d0aTtpqkIbFptN2uTaR4rNGoa3rmVNGik5eXl2NtSQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720621048; c=relaxed/simple;
-	bh=lbw2WXsXRPsNT/bVt3lXhVCgOtg+RehsBWVnvkYM8Ns=;
+	s=arc-20240116; t=1720621053; c=relaxed/simple;
+	bh=mafEJKnDZ7DA5KRnp0IGO8xmOH14m+HVbGvj9DHXA3I=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=X8Oueecvi1PxvGC9sIBH3yTqLkMfnkba5Grw3xO8Tw6zlp3QmEywMmP7QLGzSnmIuEYx3jpvihm6sAgTHQlg72TaVFDyxgHgz4LA0+7KzwN+5Ai81+dssPQPgpE6l9dT71G366ujbAk7aN46q5z5Zc6/oR1a/fkuKXKWnQG36oM=
+	 MIME-Version:Content-Type; b=HYZDu+YcyZ8MhAymcuPkWTtpIV5ya3NzMW7qHrFMtuQy77+WuAPM02cDaGBDnz8+/CUn8tsH40g05Erx/XxgAKBLWokChalfKljQsB+uGS1NBI7ySgcn+Wn2INGsFu0/3etttbOHjckFhUR+qj5XVetMjii1ut7O9rm1BnqRBpI=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
 Received: from localhost.localdomain (178.205.55.202) by msexch01.omp.ru
  (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Wed, 10 Jul
- 2024 17:16:39 +0300
+ 2024 17:16:40 +0300
 From: Roman Smirnov <r.smirnov@omp.ru>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Roman Smirnov <r.smirnov@omp.ru>
-Subject: [PATCH BlueZ v3 resend 5/6] player: fix the order of args in cmd_register_endpoint()
-Date: Wed, 10 Jul 2024 17:16:18 +0300
-Message-ID: <20240710141621.64394-6-r.smirnov@omp.ru>
+Subject: [PATCH BlueZ v3 resend 6/6] gatt-client: add NULL check to discover_secondary_cb()
+Date: Wed, 10 Jul 2024 17:16:19 +0300
+Message-ID: <20240710141621.64394-7-r.smirnov@omp.ru>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240710141621.64394-1-r.smirnov@omp.ru>
 References: <20240710141621.64394-1-r.smirnov@omp.ru>
@@ -68,27 +68,29 @@ X-KSE-Attachment-Filter-Triggered-Rules: Clean
 X-KSE-Attachment-Filter-Triggered-Filters: Clean
 X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
-Based on the function prototype, ep->cid and ep->vid should be swapped.
+It is necessary to prevent dereferencing of a NULL pointer.
 
 Found with the SVACE static analysis tool.
 ---
  V1 -> V3: the patch name has been shortened
- client/player.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ src/shared/gatt-client.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/client/player.c b/client/player.c
-index de4491b53..2480ed64b 100644
---- a/client/player.c
-+++ b/client/player.c
-@@ -3388,7 +3388,7 @@ static void cmd_register_endpoint(int argc, char *argv[])
+diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
+index b48d739fc..9db3f5211 100644
+--- a/src/shared/gatt-client.c
++++ b/src/shared/gatt-client.c
+@@ -1276,7 +1276,9 @@ next:
  
- 	if (strrchr(argv[2], ':')) {
- 		ep->codec = 0xff;
--		parse_vendor_codec(argv[2], &ep->cid, &ep->vid);
-+		parse_vendor_codec(argv[2], &ep->vid, &ep->cid);
- 		ep->preset = new0(struct preset, 1);
- 		ep->preset->custom.name = strdup("custom");
- 		ep->preset->default_preset = &ep->preset->custom;
+ 	range = queue_peek_head(op->discov_ranges);
+ 
+-	client->discovery_req = bt_gatt_discover_included_services(client->att,
++	if (range)
++		client->discovery_req = bt_gatt_discover_included_services(
++							client->att,
+ 							range->start,
+ 							range->end,
+ 							discover_incl_cb,
 -- 
 2.43.0
 
