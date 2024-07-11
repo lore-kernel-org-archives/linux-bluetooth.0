@@ -1,402 +1,387 @@
-Received: from mx0a-00154904.pphosted.com (mx0a-00154904.pphosted.com [148.163.133.20])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f180.google.com (mail-lj1-f180.google.com [209.85.208.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 422DE20317
-	for <linux-bluetooth@vger.kernel.org>; Thu, 11 Jul 2024 17:17:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=148.163.133.20
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720718283; cv=fail; b=oo//hrHPgUtmJiETNxvpXgQsX9RzpH+4HTznL8t8xfdxSyi8tJ+PWtoyTeHOlM5TlvVyIhEptTkOwT78gfgX1aI/8PJoOKXm7SeGaW1+mCEArzz9eHx4o+hHXE0yILLcJ9WO7VBKqF0oPt95koJ/HigAYqlm9lTPokMWT8OCGQ8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720718283; c=relaxed/simple;
-	bh=xGFTrIgFANAQ+WFGCcZfw6iakwiWnOalJxGzkBERp2A=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=MPR2JEc+vQijOO8melKy5sJju4R2tvOxxAkMm6auJt36IG/+qIAyaYvsDBMNZRRzMICe7jypHKY7OhazU/nmaxe2K3dgOLKaORdVQ36aDZyYz+T6HqrZbHyk47qEYwWj1cIQQ2LJ3hUdNvdoRleEIjTLSc+nYl7rgodpUNEn7qo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=dell.com; spf=pass smtp.mailfrom=dell.com; dkim=pass (2048-bit key) header.d=dell.com header.i=@dell.com header.b=GVPwgZfP; arc=fail smtp.client-ip=148.163.133.20
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=dell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=dell.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12F3A16D33F
+	for <linux-bluetooth@vger.kernel.org>; Thu, 11 Jul 2024 18:09:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.180
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1720721389; cv=none; b=Ha3HD/H5STVSj2wlDTsD4HzDoz+52lnPROBo3skVC3Fepbpzrt4DdVTv15PPGwmbTF6FKMNgRUJiX51fjp1k7GmKyOVDiOCTwLyeLTZruB+0LGO8tR1eXOxvDQkIzeVN7T7vQqyr8Qbb65gXPhbx/gc5PhdWfOanmSsz/fiWKeM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1720721389; c=relaxed/simple;
+	bh=m38Fmjt3/oXtF8FCJTJlkcX4xSTqCYSDuPDQpXPeI0s=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=o1GDNrhtb/YeT6HT6wFNsDambtO9lZdNoldgm/z716RR2p/nyemXc7Wx6RRZpynokAm3Rq6LWhqf3JAT+jSS8PKSj43HhbaUEPhXbI976a+oU/mzZafDS+3cubK91FCPEYX6WGmg59E8XcHdVr5t4y4KLU2a/dsOqMo1sIL8Et0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=I6nsVzE3; arc=none smtp.client-ip=209.85.208.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=dell.com header.i=@dell.com header.b="GVPwgZfP"
-Received: from pps.filterd (m0170393.ppops.net [127.0.0.1])
-	by mx0a-00154904.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 46BD8GgJ012814;
-	Thu, 11 Jul 2024 13:17:52 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=dell.com; h=from
-	:to:cc:subject:date:message-id:references:in-reply-to
-	:content-type:content-transfer-encoding:mime-version; s=
-	smtpout1; bh=xGFTrIgFANAQ+WFGCcZfw6iakwiWnOalJxGzkBERp2A=; b=GVP
-	wgZfPCIRQNJbFY1wYXH1TDpk01d7ZjXLFaCFYAVoXQ7nQmnUvuu+yO7e5t25olfL
-	8WviQprJPVNrO/IUHnk7RkkBnsfx6c6n8x+5wEQmEctdyUtGGb61UiNZaJnhGWn1
-	214vArFFPzxciDJktK95z8x6sCGGzKuahy0UlEliw9olalbFigkKdNrYB+PAHJXk
-	dHcEu8KqV/q/Pfdwml0swgvRNsYZZ6NuZnkpu+AUzsh1R86VBch8xj4tuiCjXs/2
-	4eOc469KKP2+693rJhnyM+02kZgE4CFW09lzAptyeTy/nZNb8pxeufKnH8cd5nND
-	yYG0OpsMEfSpXCwhJZQ==
-Received: from mx0b-00154901.pphosted.com (mx0b-00154901.pphosted.com [67.231.157.37])
-	by mx0a-00154904.pphosted.com (PPS) with ESMTPS id 40718f8c39-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 11 Jul 2024 13:17:52 -0400 (EDT)
-Received: from pps.filterd (m0144104.ppops.net [127.0.0.1])
-	by mx0b-00154901.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 46BGrOHN008314;
-	Thu, 11 Jul 2024 13:17:51 -0400
-Received: from nam12-bn8-obe.outbound.protection.outlook.com (mail-bn8nam12lp2170.outbound.protection.outlook.com [104.47.55.170])
-	by mx0b-00154901.pphosted.com (PPS) with ESMTPS id 40ads4xk8w-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 11 Jul 2024 13:17:50 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=NKtJEKvfRDcSlSq/SFYpdfWNT32bqbAhhi8/+9jz1tTl5FBgevXpjM3GJLKLYj4sBpj5Oq4clQQZ3RKSiD9MzkHd/dLXeoVkyDDrSAzzRs2DI5/rRgd1fCrPzZmASUQ5o1FfAybdeJN2+L0qFTGPhpMWFxi1prT6+xfk9981We6ia82pc05QRWNgRSGMzJUVeQ+pvdksqJUUPhOYa3gGYmuAtPYfx5v+a0B2+bxiuKd3hLR+zlMcXqHrloBCmwhUHy48L9f8+pRkj2SZnOzQ9UW0MDRg021kIsFaxp2gSl1zPiBwoj6bPb+FUGOI8dj+z3x+NnDk/rGyuUKbmyJQxw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=xGFTrIgFANAQ+WFGCcZfw6iakwiWnOalJxGzkBERp2A=;
- b=rxKPEfwxmYX+03NegQoUA2E+iSnj1tY/AuCq2tp0aoSxeYjg0MDKJ7jiK0bPMKcSfzzqcbTInOri+M5PFc9WT83rePA8asOMlhGiZo5bxRJhj7QqA9Dt5YHABEX2ML+rPTRhUbV7208eRr/SCLoqgdKh4ZDeDtBczhNMeVAG8BSxCaWP/ZvPaqi4UlIhVtIrRoALl2mqn+b/+pIPiz+IH2vniTe4NhtZ2aogEKYN03MK0pV3/aN+WhqVO8uDygi2HatkDUTk/QP6YaaPCuvUuTtHYze5ZTnwngH9B65oQId9SQdGVaWm+UuEFjDCWgJku3SWKabbIasMyRRd14/LlA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=dell.com; dmarc=pass action=none header.from=dell.com;
- dkim=pass header.d=dell.com; arc=none
-Received: from SN4PR19MB5421.namprd19.prod.outlook.com (2603:10b6:806:20c::7)
- by SA0PR19MB6908.namprd19.prod.outlook.com (2603:10b6:806:2d5::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7762.23; Thu, 11 Jul
- 2024 17:17:46 +0000
-Received: from SN4PR19MB5421.namprd19.prod.outlook.com
- ([fe80::237c:614c:8f0b:ae83]) by SN4PR19MB5421.namprd19.prod.outlook.com
- ([fe80::237c:614c:8f0b:ae83%4]) with mapi id 15.20.7762.020; Thu, 11 Jul 2024
- 17:17:46 +0000
-From: "Ramsay, Trey" <Trey.Ramsay@dell.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: RE: [PATCH] ATT: Error (0x01) - Error: Unlikely error (14) Prepare
- Write req (0x16)
-Thread-Topic: [PATCH] ATT: Error (0x01) - Error: Unlikely error (14) Prepare
- Write req (0x16)
-Thread-Index: AQHa0j9b0zaQeN00PEyxcrJ2hKNEr7HwXB7wgAAbcQCAAUmRIA==
-Date: Thu, 11 Jul 2024 17:17:45 +0000
-Message-ID: 
- <SN4PR19MB5421EA5BEB05EFAC63160576E4A52@SN4PR19MB5421.namprd19.prod.outlook.com>
-References: 
- <SN4PR19MB5421B1226EA92B735CADEA44E4C82@SN4PR19MB5421.namprd19.prod.outlook.com>
- <SN4PR19MB54215EF3B4E7380A21387D2EE4DB2@SN4PR19MB5421.namprd19.prod.outlook.com>
- <CABBYNZ+8ca5f6nWG3D3x8mL3g=57Z0pogQP-+ww_aQuC0R1DWw@mail.gmail.com>
- <SN4PR19MB54214DD841A41FB8C01DDFC9E4A42@SN4PR19MB5421.namprd19.prod.outlook.com>
- <CABBYNZJpG3ioCK9Skqx7_ki3TrqF+Z0GecApPF6Crv+D+J3hDA@mail.gmail.com>
-In-Reply-To: 
- <CABBYNZJpG3ioCK9Skqx7_ki3TrqF+Z0GecApPF6Crv+D+J3hDA@mail.gmail.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-msip_labels: 
- MSIP_Label_dad3be33-4108-4738-9e07-d8656a181486_ActionId=0459145f-cf3f-49b3-8746-fac1929d0228;MSIP_Label_dad3be33-4108-4738-9e07-d8656a181486_ContentBits=0;MSIP_Label_dad3be33-4108-4738-9e07-d8656a181486_Enabled=true;MSIP_Label_dad3be33-4108-4738-9e07-d8656a181486_Method=Privileged;MSIP_Label_dad3be33-4108-4738-9e07-d8656a181486_Name=Public
- No Visual
- Label;MSIP_Label_dad3be33-4108-4738-9e07-d8656a181486_SetDate=2024-07-11T17:16:51Z;MSIP_Label_dad3be33-4108-4738-9e07-d8656a181486_SiteId=945c199a-83a2-4e80-9f8c-5a91be5752dd;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: SN4PR19MB5421:EE_|SA0PR19MB6908:EE_
-x-ms-office365-filtering-correlation-id: d3b6b1cf-7d81-4298-bbaf-08dca1cd61bb
-x-exotenant: 2khUwGVqB6N9v58KS13ncyUmMJd8q4
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|376014|1800799024|366016|38070700018;
-x-microsoft-antispam-message-info: 
- =?utf-8?B?bUdDUnlZOGMzb1ZFU2ZpQ2FtYVQydkNKNDh5aFdMa2Rkem0xcTNHOHdqQ2pk?=
- =?utf-8?B?QXBwYng4ZmUwSXkwUDBhc094MEUra3ZxeFJkU3R6RDQ4ajVPeFFTMk4yVXdO?=
- =?utf-8?B?NnREQzYzTXl3dHlxWnA0dXJHUEdrOGZsYTlNb05ON1dNaWUyVXRVTmtQQWp4?=
- =?utf-8?B?MURxSHo3UDRTV0dQNGkrbERxMWFZR1JMZU1nWXREUG1hMWtHVy9HZFpCaWhK?=
- =?utf-8?B?Z1FXallTeHVTVWx4cHRqeXlCOVVJME1WUlhKcnZ1NmxaOWVhSXJuYXZqTjBJ?=
- =?utf-8?B?TzZEV1haT3RUcWZQdjBvK0h2UWZ5ZmZmUU1rTE1vTHZPWWJXRjFMcFVuTXha?=
- =?utf-8?B?MCtuWkJ1Ty9idFpBREc1L1YwbmlocWREZXU4bDlWVVdOaGhjbENlQmxlaFY5?=
- =?utf-8?B?ak04WklMalF0Q0pacXNaQkliNHM3LzhsMjhxZmVWUWRvZXRTOFFxN3pGcU5M?=
- =?utf-8?B?ekpSSmpiS0w5TTN1SDE1S1VaYVlVejhEWnpLbVJHdVowM2NwVXVyMW9RZDlt?=
- =?utf-8?B?aGNUelJFeWlBMTVBNnpUKzRrNzYwNDFkOUwxRllldk1YNWZVYWllVFpiMGFG?=
- =?utf-8?B?elBNeG54a0xZSTlSWXBFdjhNRTJiM3ZlK1J3cWNaQzFEL09wYnc4elRMWUhx?=
- =?utf-8?B?SmdqK1FVekNMQXkzV3FEc3BBbEY3dks3WTVVOTRHWmc2cjlML01RbU80blVS?=
- =?utf-8?B?aC9PNjNJS21QVDZSbmFieDlwTnVVRDF4RjFaQzlNdVRUbkJCcnZSa2JHdWNk?=
- =?utf-8?B?a0dPb1U2a0tsMEduT2RodjJvM2FORnVxTmVNTStCVXl4OWpLZkFLT2xQKzFl?=
- =?utf-8?B?QjFiVGx5UzJraVZHSUNkZDl2dkJXQkx1Mko5K1pqTFgvYjNNR3RVbnJDY3cy?=
- =?utf-8?B?ZjFLMjBLcVNid2Q3ekJWNzlKM212MklCVTQ5bEZwYXRVNGpPNStEeGc4QXRS?=
- =?utf-8?B?R1hjWm8xWlVBN3NSTU9CQmJlMTdwMGEyZDc4RmIxK0xiVkw1RHpNdDB0THRX?=
- =?utf-8?B?aEpPalV4cFMvdlZObVRvU3EyS3hIM2VYSU1JYTBZd2ZRTUVuS0NxRVBIQjZ2?=
- =?utf-8?B?elU0T3RyQ3h3ejkvajRVZC9Ibkpzc2pHZGhlM2tlUVZGUFd1bkxZMURFVGIw?=
- =?utf-8?B?UmJLSWN4N1BKWmY1YmVsKzBYYXV5Y0RsaXpab2tBUmNHdkZiUlJ1UlJxdVlU?=
- =?utf-8?B?TXhVV21CWmthQUF2ZWF0K2VacjAraHBkM25YWXB2YU9UR1VZSHFnay9BOHpT?=
- =?utf-8?B?U3RibHVabG9FaFdmSmpCSnlua3ZlRlpyWStPV3ZodDI3aTJZVjg5ajJYWlZU?=
- =?utf-8?B?YXBUeHFwdkx4L0J6SWJRQmVkeVdqWGQrbU5McjF1eW5NT0g5WnJhc2pSRlVa?=
- =?utf-8?B?VVJSOHBGY1V3MisvV3ZVUnNZNm1sTytoWHRDWEViUEZic1lYV1VMWE81bjh1?=
- =?utf-8?B?SWdrZzNIRmhyQ3hNbnZ5M3pKL0J3SWJDaHRmSTNTZ1dHOXd5aEJDbENhMkxN?=
- =?utf-8?B?QUxuZ0RlL2tqcFN0OTdhUmR0NDdWTWNEV2hYcUQ4c095WGhSTWlCeTRveUNx?=
- =?utf-8?B?a3dIUDdtUFE0Uk5XMk9HK1BzTmM3WXluN1hON1kzMkhhci9nNG1WRGlLbHhM?=
- =?utf-8?B?TXo1Y2ZEckZnbWxIY0YwUlg1Zld6dDRzRTd2YmxNZHhIZUFYMmdrdkpRWld1?=
- =?utf-8?B?OU5ET2VDNW1wbU9Rd3kzdVNveXc4NW9VVkhleFgyWFNIQ2YxUFlOMzBvYWFy?=
- =?utf-8?B?M2lmS0VvNWZta0VEN0xYM2c4Uy9PWUFlWUJsOEQ4dG4zYzBGU01YaHp0UFJR?=
- =?utf-8?Q?oMiH+QfhuzJva4A2A6Z6sqzHAssWeWIPUfLuQ=3D?=
-x-forefront-antispam-report: 
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN4PR19MB5421.namprd19.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: 
- =?utf-8?B?VFkzNFFyYTg1alcvSnFSZTFwdDRLK3VGU3huZGsvOXN6Nmg5emhHUXNBM1FJ?=
- =?utf-8?B?eWJUUlBEVk4rT3czRWVCN3JqY09VZkRVRTFIS21JOHh0S293YVZ1VTBNY25p?=
- =?utf-8?B?aXhHZjhKbkFocllLZnBqSXYwb3B0enVRZEdYUUhqcU43cnlBNUdXNS90bGZO?=
- =?utf-8?B?T1BBRklSSm5LUUM1NE9hZStZTXFkNWpyamZTRWNFTEJXMzU5ck4wTGcvTTla?=
- =?utf-8?B?QURUVWY5NFBvNE1RWDFKbmVMMVlPYjFzRlRLc2JZemhqekZiK1gvcklaeUtw?=
- =?utf-8?B?L3U3bFdnOVpwNGFwSDJLVEpLcTM3ZU8xMEFMdTJIQzVNUTRkLzR1cXhhNkVJ?=
- =?utf-8?B?YzJLdjU0NlMvOVdlWjFZY05mWjVBTk1tN2g0SEpqSXZ1UFNJTnZmajVvSDcx?=
- =?utf-8?B?L1I1U0JNNWF4Z3luYThGYnB6Y3AyNk4rNWlkb3crYURVMmlTZlBrdGE5RjQ0?=
- =?utf-8?B?Mlo0NnR4VjhKOEs1dklVMU5zd0wyY0FmVEpQSDdncHpjbHlycitpVGltVnVU?=
- =?utf-8?B?MkN1OGFQU2pMZTVEczNIYVVnaUFmZTFrcXJ6Ly92UUl6cVpaS1JXc0hUK3hp?=
- =?utf-8?B?VE5EYXFuSUttdmgveVNMNWUvcXdzYUNLYlN6Wk5kR0RFWjRJSnJFUElRd3BX?=
- =?utf-8?B?NXVwVjF1OXhSdjNFNlBSMFJBaDRyUHE1SFpLMlJGMDJ4RjFYT255c01nYk9S?=
- =?utf-8?B?TTJ1andBV0QyQmRPMjZZcUtMTk5zNUx2cDlhNlppMWIwMVpyczVHRmVkYkFY?=
- =?utf-8?B?RzFUS1NhSTZ5MXN1b1JMeVR6S3ZseEsxUGtUZFJOdi9VejN2OU56WVd2Q0lE?=
- =?utf-8?B?eGZ4dTc4YUZ1TDNWd2ptV2prVzRpNHcwbHRSdTA2M3FwYWZlY2RWM2UyWkE2?=
- =?utf-8?B?cVdWTHFyclV5aGxDaGMvbXRzdTdjS3g4NmY1cUpodlhRRDZ3eXI3UXBiNzg3?=
- =?utf-8?B?Yy96WXR3TU5FdzNjSTZmcmd4WFZmYnlLaVhQZEkvK0dRb3ZUTW5pcnpJZGRX?=
- =?utf-8?B?V3NwdlJrbHV4VzdLZHhuR0hqM0JCTmVzZzJJbVpUVUYrbmpMWGpieWxrWU1O?=
- =?utf-8?B?ZUZKa2wrVnRLY2ZLQ2d0Y2gyS1NhYXFhYzFhQytKc3JqbnhXbzVrcFZLVE9M?=
- =?utf-8?B?bDVJSGFlcVcxRkRlM2VJaStUWTBUR0x6dm5hWGc4SlFla3psaTdXdjZ3REJ6?=
- =?utf-8?B?UHlacmlPVEZBdXpWSDBQbG94SVRGeUlKQ2NxUEIwNkxEdGdPTWpoQk5IdDNu?=
- =?utf-8?B?YXZOOUU4aVRPRjk1ZDNaZG9qVmpRM3B4WCt3YkpHdWF0U0R4TWNLMURQRzRV?=
- =?utf-8?B?MENjRnlnWFJQaEZodkFOQTlRR1dkbG5aMUh2aXRPN2JDK0lWWElBdjNHdlZ3?=
- =?utf-8?B?WVcra1p0N3JBcHNWUVBvZ3crdmovZ1E2b3FFZ1ZPUElvS2EzVXB3Vlc1eGRO?=
- =?utf-8?B?L3pwdTF2VWxDcWQrNzhOTFpLamd4QXdUemtvUWN6UDNPV0g4R05Qa0xnUW9v?=
- =?utf-8?B?QnRkMTRQa0I0VzByMnpPT0VjTW5Pdy8rRWNUakJxUjRub0pERHVwelhHQmFr?=
- =?utf-8?B?Y3BUWVFld1RTWGFORWxUUStKdG9Hd3hrSjJtSWxoUk54eGdyK2hhVnp1YlUy?=
- =?utf-8?B?YUdoQXV4YnhvMGpqc1NqT3AxalQwdUZTTjgyOWN4ejVzYTVKc1NoNjYvZ1hD?=
- =?utf-8?B?REhpcnVmT2plWFVqcUlQQTBtc2s1VktXSjZLa0tBdTRRV0VId1Z0emdWbW5j?=
- =?utf-8?B?Q2RwZEE1SEt1ZzF3eUMrdkNtejF0ekEwbnRKeTk3TTNHZCtBWnVzOWhBdEdh?=
- =?utf-8?B?N3QrR2hlUGtBQ3BFMktNeDl4aVJwbTdLa1Y1SjF1MnNHWHVmemgvcVZFSDJq?=
- =?utf-8?B?bnR5TUZJa2pFWDdiVlQ3a0xWVFZZS1g2b3N5STRpWjdEVER3Z2RVQzkzN3Mr?=
- =?utf-8?B?NGtiUnJmQ21FbjMvU3lrZnpHUzkyKzVHaXZ5cDgyRDlOcEJVVTV3Wk5sTWZC?=
- =?utf-8?B?L1BkbDlON1RQNWVQVkx3enc1aDVHNXkyVnlVUVpJYkw0TGxkKysrdnZHTitl?=
- =?utf-8?B?QWFPWHZZNzdjVTZqZzdCZDVMemZDSU5uRTBCcVN6MkM0cXRCNXVHM1l1VFp1?=
- =?utf-8?Q?9Qlsi/relnZvfVWkjUqXIt/DJ?=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="I6nsVzE3"
+Received: by mail-lj1-f180.google.com with SMTP id 38308e7fff4ca-2ee9b1b422fso19553301fa.0
+        for <linux-bluetooth@vger.kernel.org>; Thu, 11 Jul 2024 11:09:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1720721385; x=1721326185; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=BZVxyQycBD1A1wrK0DC42eHmm9uBnAbHdG+yQWSNpkw=;
+        b=I6nsVzE3SA2XJTvjnFsHmJhtWYH67mvqzCcoNe8Fw+N3pVP8ch7shRzu5KP1qcJeqQ
+         jN4+9EwypILHeJJHlJrFvS/2+4fECPj7BywLA/FQA03J9db9jnYYbnz8c2ZIluNV/LXq
+         +Cf/yO5Fqjqc6F1dkwhFeCjbAzv4ZmaNQKymi0meTpp3IQqd1j0nPNp5xdwuUWCqSxjn
+         HgaJUMB6XI99IFsMyOPjjl9OVGXG/GCJnodVcIgGhzFgmjIr0CkLSmz0tO1cjK3vxcdn
+         n12plFvlQoz5XFX/1BngwSj640+g60owoUIkr9eA/rNx4WPg/RR2X0anTAZo+aMXj+HW
+         5XcA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1720721385; x=1721326185;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=BZVxyQycBD1A1wrK0DC42eHmm9uBnAbHdG+yQWSNpkw=;
+        b=MHaqGTPxXt+G0iB8MvSXNYjNIUKNgGVY7fS1Gvc8AXDM2DblYWdLmWm2tJcekG7tqu
+         vZ0i9LSGvO2KF6avKAc6zeWG+GcAKBWMoNnVnUrA88zvHsASPiD/vvBpJbr/sg0dggAg
+         M+wAkKWGwmrWb46IJkQJr+ZGuSfK4inGP04xHs6udUkMMra90lZ2gQdPZ4eeprGq17vj
+         kD/yuNR7fBxx0ouXKqiYzSt7mhdgo0cZXK28qCWe1Gj+GyGXOQzMYpS+L7CdXtGvu7kV
+         WMc4RxlOlEw2YiBDt9Vt2Inez2HGNlN8yRBtkhsJguYcob+hgQ5QdjsdbiONi9OUOJsO
+         Bvow==
+X-Gm-Message-State: AOJu0YyHWXO7oKp7HDNiAQqWQ+bPti9TrE08tzjW2Uh6EKeMnil7XUYl
+	caQvY4U4gaOoc/CJcSvxYbnEKweK1Jto9JxX2BMhb1MqIG6JYvnkiKkr1KoP94D/d+aAj26eIKS
+	QaLRihuHEQPlylXor6s6oQ9ze+bYgQBFU
+X-Google-Smtp-Source: AGHT+IEvkwp0JyH8Vlpbs9uCrw8eEUjToNOcOQwXnqvLa2zdYP5ijwDIy4n6uRJedlxBmF3HqV0RLTssKQBVMyhUh7c=
+X-Received: by 2002:a2e:30a:0:b0:2eb:ec25:b759 with SMTP id
+ 38308e7fff4ca-2eed29c303bmr1239851fa.3.1720721384669; Thu, 11 Jul 2024
+ 11:09:44 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: Dell.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SN4PR19MB5421.namprd19.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: d3b6b1cf-7d81-4298-bbaf-08dca1cd61bb
-X-MS-Exchange-CrossTenant-originalarrivaltime: 11 Jul 2024 17:17:45.9477
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 945c199a-83a2-4e80-9f8c-5a91be5752dd
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: lZQVmoLfGsxn4emcNIwCG3MNrO8bpOo43+n5RvTVlkBT+nEGuoPKZJMpEpgvv1gdcSsakbBrPCCPNALpLfRlFw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR19MB6908
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-07-11_12,2024-07-11_01,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 adultscore=0
- mlxscore=0 malwarescore=0 phishscore=0 mlxlogscore=999 priorityscore=1501
- suspectscore=0 lowpriorityscore=0 spamscore=0 bulkscore=0 impostorscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2406180000
- definitions=main-2407110120
-X-Proofpoint-GUID: cM8YM-P_8tu4MIR6QtqNC_zrsq1ewlUL
-X-Proofpoint-ORIG-GUID: cM8YM-P_8tu4MIR6QtqNC_zrsq1ewlUL
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 clxscore=1015
- spamscore=0 phishscore=0 impostorscore=0 bulkscore=0 priorityscore=1501
- mlxlogscore=999 mlxscore=0 adultscore=0 lowpriorityscore=0 suspectscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2406140001
- definitions=main-2407110121
+References: <SN4PR19MB5421B1226EA92B735CADEA44E4C82@SN4PR19MB5421.namprd19.prod.outlook.com>
+ <SN4PR19MB54215EF3B4E7380A21387D2EE4DB2@SN4PR19MB5421.namprd19.prod.outlook.com>
+ <CABBYNZ+8ca5f6nWG3D3x8mL3g=57Z0pogQP-+ww_aQuC0R1DWw@mail.gmail.com>
+ <SN4PR19MB54214DD841A41FB8C01DDFC9E4A42@SN4PR19MB5421.namprd19.prod.outlook.com>
+ <CABBYNZJpG3ioCK9Skqx7_ki3TrqF+Z0GecApPF6Crv+D+J3hDA@mail.gmail.com> <SN4PR19MB5421EA5BEB05EFAC63160576E4A52@SN4PR19MB5421.namprd19.prod.outlook.com>
+In-Reply-To: <SN4PR19MB5421EA5BEB05EFAC63160576E4A52@SN4PR19MB5421.namprd19.prod.outlook.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Thu, 11 Jul 2024 14:09:32 -0400
+Message-ID: <CABBYNZJXfviR-5FND4LxMtdwDL1y-_iRkEJsrp+PkyVk+g=BNw@mail.gmail.com>
+Subject: Re: [PATCH] ATT: Error (0x01) - Error: Unlikely error (14) Prepare
+ Write req (0x16)
+To: "Ramsay, Trey" <Trey.Ramsay@dell.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-SGkgTHVpeiwNCkNvcnJlY3QsIHRoZSByZXF1ZXN0IGlzIHRpbWluZyBvdXQuICBUaGUgcHJvYmxl
-bSBpcyAicHJlcF93cml0ZV9jb21wbGV0ZV9jYiIgaXMgbmV2ZXIgZ2V0dGluZyBjYWxsZWQgYWZ0
-ZXIgdGhlICJwcmVwX3dyaXRlX2NiIiBpcyBjYWxsZWQuICBUaGUgcHJlcF93cml0ZV9jb21wbGV0
-ZV9jYiBpcyByZXNwb25zaWJsZSBmb3Igc2VuZGluZyB0aGUgcmVzcG9uc2UgQlRfQVRUX09QX1BS
-RVBfV1JJVEVfUlNQIGJhY2suICBUaGUgcGF0Y2ggSSBwcm92aWRlZCBmaXhlcyB0aGUgY29kZSBz
-byB0aGF0IHByZXBfd3JpdGVfY29tcGxldGVfY2IgIHdpbGwgZ2V0IGNhbGxlZCBhbmQgdGhlIHJl
-c3BvbnNlIGlzIHNlbnQgYmFjay4gICBTb3JyeSwgSSBoYWQgZGVidWdnZWQgdGhpcyBpc3N1ZSBh
-IHF1aXRlIGEgd2hpbGUgYWdvIHVzaW5nIGJsdWV6IDUuNTUgYW5kIDUuNjYgYW5kIG5vdGljZWQg
-dGhlIHNhbWUgaXNzdWUgaW4gdGhlIG1hc3RlciBicmFuY2guICBXZSBoYXZlIGJlZW4gdXNpbmcg
-dGhlIHBhdGNoIGFuZCBpdCBoYXMgcmVzb2x2ZWQgdGhlIGlzc3VlLg0KDQpUaGFua3MsDQpUcmV5
-DQoNCi0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQpGcm9tOiBMdWl6IEF1Z3VzdG8gdm9uIERl
-bnR6IDxsdWl6LmRlbnR6QGdtYWlsLmNvbT4gDQpTZW50OiBXZWRuZXNkYXksIEp1bHkgMTAsIDIw
-MjQgNDoxNCBQTQ0KVG86IFJhbXNheSwgVHJleSA8VHJleV9SYW1zYXlARGVsbC5jb20+DQpDYzog
-bGludXgtYmx1ZXRvb3RoQHZnZXIua2VybmVsLm9yZw0KU3ViamVjdDogUmU6IFtQQVRDSF0gQVRU
-OiBFcnJvciAoMHgwMSkgLSBFcnJvcjogVW5saWtlbHkgZXJyb3IgKDE0KSBQcmVwYXJlIFdyaXRl
-IHJlcSAoMHgxNikNCg0KDQpbRVhURVJOQUwgRU1BSUxdIA0KDQpIaSBUcmV5LA0KDQpPbiBXZWQs
-IEp1bCAxMCwgMjAyNCBhdCAzOjU14oCvUE0gUmFtc2F5LCBUcmV5IDxUcmV5LlJhbXNheUBkZWxs
-LmNvbT4gd3JvdGU6DQo+DQo+IEhpIEx1aXMsDQo+IEl0IGlzIGEgUHJlcGFyZSBXcml0ZSBSZXF1
-ZXN0IGJ1dCBwcmVwX3dyaXRlX2NvbXBsZXRlX2NiIGlzIG5ldmVyIGdldHRpbmcgY2FsbGVkLiBJ
-biBnYXR0X2RiX2F0dHJpYnV0ZV93cml0ZSwgdGhlIHByZXBfd3JpdGVfY29tcGxldGVfY2IgZnVu
-Y3Rpb24gaXMgbm90IGdldHRpbmcgY2FsbGVkIHNpbmNlICJhdHRyaWJlLT53cml0ZV9mdW5jIiBp
-cyBub3QgbnVsbCBhbmQgdGhlIGZ1bmN0aW9uIHdpbGwgcmV0dXJuICJUcnVlIi4gIFRoZSBwcmVw
-X3dyaXRlX2NvbXBsZXRlX2NiIGlzIHN1cHBvc2VkIHRvIGdldCBjYWxsZWQgYWZ0ZXIgImdvdG8g
-ZG9uZTsiIGJ1dCBpdCdzIG5vdCBnZXR0aW5nIGNhbGxlZC4gIFRoZSBwcmVwX3dyaXRlX2NvbXBs
-ZXRlX2NiIGlzIGFzc2lnbmVkIHRvICJmdW5jIi4gICAgVGhlIHBhdGNoIGNoZWNrcyB0byBzZWUg
-aWYgbGVuIGlzIDAgYW5kIHdpbGwgZ290byBkb25lIHdoaWNoIHdpbGwgY2FsbCBwcmVwX3dyaXRl
-X2NvbXBsZXRlX2NiLg0KDQpXZWxsIGlmIGl0IHJldHVybnMgdHJ1ZSB0aGVuIGl0IHNob3VsZCBu
-b3QgcmV0dXJuIHVubGlrZWx5Og0KDQogICAgc3RhdHVzID0gZ2F0dF9kYl9hdHRyaWJ1dGVfd3Jp
-dGUoYXR0ciwgb2Zmc2V0LCBOVUxMLCAwLA0KICAgICAgICAgICAgICAgICAgICAgICAgQlRfQVRU
-X09QX1BSRVBfV1JJVEVfUkVRLA0KICAgICAgICAgICAgICAgICAgICAgICAgc2VydmVyLT5hdHQs
-DQogICAgICAgICAgICAgICAgICAgICAgICBwcmVwX3dyaXRlX2NvbXBsZXRlX2NiLCBwd2NkKTsN
-Cg0KICAgIGlmIChzdGF0dXMpDQogICAgICAgIHJldHVybjsNCg0KICAgIGVjb2RlID0gQlRfQVRU
-X0VSUk9SX1VOTElLRUxZOw0KDQplcnJvcjoNCiAgICBidF9hdHRfY2hhbl9zZW5kX2Vycm9yX3Jz
-cChjaGFuLCBvcGNvZGUsIGhhbmRsZSwgZWNvZGUpOw0KDQo+DQo+ID4gQUNMIGRhdGE6IGhhbmRs
-ZSAwIGZsYWdzIDB4MDEgZGxlbiAzDQo+ICAgICBBVFQ6IFByZXBhcmUgV3JpdGUgcmVxICgweDE2
-KQ0KPiAgICAgICBhdHRyIGhhbmRsZSAweDAwNjksIHZhbHVlIG9mZnNldCAweDAwMDANCj4gICAg
-ICAgcGFydCBhdHRyIHZhbHVlICAweDgwIDB4MDIgMHgwMCAweDAxIDB4YWEgMHhkMyAweDgxIDB4
-NTEgMHg1NCANCj4gMHg1YiAweGVhIDB4YWYgMHg2OCAweDBkIDB4ZWIgMHhlNiAweDExIDB4MmQg
-MHg2MyAweGIxIDB4OGUgMHhiZCAweGM0IA0KPiAweDYzIDB4OGYgMHhmNiAweGI2IDB4MTAgMHg2
-MyAweGI1IDB4NTQgMHgzZiAweDM2IDB4MTkgMHg0MSAweDViIDB4MjUgDQo+IDB4Y2QgMHhhNyAw
-eGU1IDB4OWQgMHhjNyAweDcxIDB4MjYgMHgzMyAweDdjIDB4ZTggMHgwZSAweDY3IDB4ZDggMHg5
-YSANCj4gMHgwYSAweGI1IDB4ZTUgMHgyNCAweDg3IDB4MmQgMHhjYyAweDAwIDB4YTkgMHhjOCAw
-eGI4IDB4OTUgMHg3NiAweDc1IA0KPiAweDlmIDB4NzkgMHgxZiAweDk0IDB4ZTQgMHhkOSAweGJl
-IDB4YWIgMHgyMiAweGEzIDB4MzMgMHgxOCAweDI4IDB4NTcgDQo+IDB4MjYgMHhhZSAweDZkIDB4
-MGEgMHg5YiAweDYzIDB4ZWIgMHgxMCAweGYzIDB4YjUgMHhlYSAweDY0IDB4NGEgMHg4MSANCj4g
-MHg1NSAweGUwIDB4YTkgMHg0MyAweDhjIDB4ODcgMHhiNCAweDMyIDB4MWMgMHg3OSAweGQ2IDB4
-MzQgMHg5NyAweGZmIA0KPiAweGFlIDB4NzEgMHgxZSAweDUwIDB4N2MgMHhiNiAweDcyIDB4N2Ig
-MHg0OSAweDQ0IDB4ZWYgMHhmZSAweGUyIDB4NDAgDQo+IDB4YzcgMHgzZSAweDVlIDB4NDIgMHg5
-YiAweGNhIDB4YTQgMHg2MSAweDY2IDB4NzIgMHgwYSAweDFkIDB4NWMgMHhiMCANCj4gMHhkYiAw
-eGExIDB4YmIgMHhmNyAweGI2IDB4MjcgMHhhMCAweDY3IDB4ZGUgMHg2OSAweGQ5IDB4NjcgMHhh
-NyAweDA5IA0KPiAweDU4IDB4NzEgMHgzNyAweDk5IDB4OTUgMHg1YyAweDVkIDB4MTAgMHg0ZCAw
-eGVkIDB4MmYgMHhlMiAweDg1IDB4NmMgDQo+IDB4MDMgMHg2MCAweDgwIDB4NjcgMHgyNSAweDFi
-IDB4MzMgMHgwMiAweDUzIDB4YmUgMHg2NyAweGRiIDB4ZDQgMHgyYSANCj4gMHg5ZSAweDhkIDB4
-ODIgMHhlMiAweDlkIDB4YzQgMHg4NiAweDA4IDB4ODQgMHgyYyAweGJmIDB4YTUgMHhjNSAweGQz
-IA0KPiAweDk5IDB4ZjEgMHgwMiAweDA5IDB4ODAgMHgwYyAweGM1IDB4ZjkgMHg5OSAweDA2IDB4
-MjAgMHgwMSAweDc1IDB4ZGIgDQo+IDB4MGMgMHgxMSAweDgxIDB4ODcgMHgwNCAweDRkIDB4ZjAg
-MHhjYyAweGY3IDB4MjcgMHg4NSAweGNkIDB4MjIgMHg4NCANCj4gMHg4NSAweDA0IDB4YjMgMHhh
-MiAweGE5IDB4Y2MgMHhlOSAweDI3IDB4OGIgMHg2NyAweDAyIDB4MWIgMHhlMCAweDhjIA0KPiAw
-eGQ3IDB4OGYgMHg1MSAweDNhIDB4YTYgMHgwYyAweDIzIDB4YTAgMHgwOSAweDJiIDB4NGMgMHhi
-MCAweDgwIDB4MzQgDQo+IDB4ZjkgMHg2MSAweGFhIDB4NzIgMHg5MCAweDNhIDB4NWUgMHhiNyAw
-eDExIDB4YWYgMHhjMyAweGNkIDB4NzggMHg0ZiANCj4gMHhiNiAweDFiIDB4YmIgMHhiNCAweGIy
-IDB4NDIgMHg5ZiAweDg3IDB4YWQgMHhmNiAweGExIDB4YWUgMHhkZCAweGRlIA0KPiAweDM4IDB4
-MDkgMHg3YSAweGM1IDB4N2MgMHhiZCAweDk4IDB4ODkgMHhhZSAweDQ5IDB4OTggMHhlNyAweGFl
-IDB4OTIgDQo+IDB4MjggMHg0NSAweDVhIDB4YmMgMHgzMCAweDUzIDB4ZTUgMHhjMSAweDU2IDB4
-YjMgMHg5ZiAweDU2IDB4N2IgMHhhMSANCj4gMHgwMiAweGNkIDB4YzIgMHgyNSAweDJhIDB4YjIg
-MHhjNSAweGM5IDB4MzUgMHhlYyAweGE3IDB4MjYgMHg3OSAweDk3IA0KPiAweDJlIDB4OTYgMHg5
-NyAweDNlIDB4NWIgMHg4ZiAweGM3IDB4MmYgMHhhOCAweDM5IDB4NzAgMHhiMSAweDIyIDB4NWIg
-DQo+IDB4MmMgMHgxNSAweDQxIDB4ZWMgMHg2YiAweGM0IDB4MWUgMHgyZCAweGMwIDB4NDcgMHg3
-NSAweDQyIDB4MDEgMHg0MCANCj4gMHhjNSAweDE3IDB4NjkgMHhmNCAweDBhIDB4Y2QgMHg3ZSAw
-eDYyIDB4MjUgMHhlYyAweDFmIDB4N2MgMHhhZSAweDdiIA0KPiAweGY5IDB4MWUgMHg5ZiAweDk4
-IDB4YmQgMHhjNyAweGMzIDB4NDQgMHg0YyAweGUyIDB4MGEgMHg4YyAweGJlIDB4ZWIgDQo+IDB4
-MWUgMHhhZSAweDdiIDB4YmMgMHg0OSAweGZhIDB4N2QgMHhhMyAweGRmIDB4YjIgMHhjMCAweDY5
-IDB4ZjcgMHg1NyANCj4gMHg2YiAweDZmIDB4ZTcgMHgyZSAweDNjIDB4OTAgMHgwYSAweDE2IDB4
-ZTggMHgwMyAweDBkIDB4ZjEgMHg5YyAweDRjIA0KPiAweGEzIDB4NGIgMHhjZiAweDZkIDB4YzMg
-MHg0YSAweDY5IDB4MjUgMHhjNSAweGY2IDB4OWMgMHg0YiAweGIzIDB4NzcgDQo+IDB4NjcgMHg3
-YiAweDAwIDB4YmIgMHgxZiAweGNkIDB4NTkgMHhiMCAweGU5IDB4ZjYgMHhiZSAweGEzIDB4NDEg
-MHhkMSANCj4gMHgyYyAweDFmIDB4MDkgMHg2YiAweDRlIDB4NTIgMHgwMSAweDBjIDB4ZTEgMHgy
-MCAweDZjIDB4NzYgMHhmZCAweGM5IA0KPiAweGI5IDB4YjQgMHhkOCAweGRmIDB4Y2IgMHhhYyAw
-eDc3IDB4NjUgMHhjZCAweDk4IDB4ZTkgMHg2NiAweDZjIDB4YzggDQo+IDB4OGYgMHhmYyAweGVm
-IDB4N2UgMHg0OCAweDlmIDB4YzggMHhkNiAweDljIDB4NzIgMHhhYyAweDQ0IDB4YTMgMHg2NyAN
-Cj4gMHhhMyAweDZhIDB4ZTMgMHhkZSAweDNhIDB4ZDUgMHgyMSAweDk0IDB4MjkgMHg5NCAweDNk
-IDB4N2IgMHg4OCAweDI5IA0KPiAweGMzIDB4YzIgMHg3ZSAweDgyIDB4OWQgMHhlNyAweDAwIDB4
-N2MgMHg5NiAweDI4IDB4MWQgMHgyMCAweGY4IDB4ODEgDQo+IDB4MDIgMHg3YyAweGMyIDB4YjIg
-MHhmYSAweDQzIDB4OTAgMHg2ZQ0KDQpUaGF0IGRvZXNuJ3Qgc2VlbSBsaWtlIGEgemVybyBsZW5n
-dGgsIHdoYXQgQmx1ZVogdmVyc2lvbiBpcyB0aGlzIGJ0dz8NCg0KPiA8IEFDTCBkYXRhOiBoYW5k
-bGUgMCBmbGFncyAweDAwIGRsZW4gOQ0KPiAgICAgQVRUOiBFcnJvciAoMHgwMSkNCj4gICAgICAg
-RXJyb3I6IFVubGlrZWx5IGVycm9yICgxNCkNCj4gICAgICAgUHJlcGFyZSBXcml0ZSByZXEgKDB4
-MTYpIG9uIGhhbmRsZSAweDAwNjkNCg0KQ2hlY2sgd2hhdCB0aW1lIGRvZXMgdGhpcyBlcnJvciBp
-cyBnZW5lcmF0ZWQsIHNpbmNlIHRoaXMgd2VsbCBiZToNCg0Kc3RhdGljIGJvb2wgd3JpdGVfdGlt
-ZW91dCh2b2lkICp1c2VyX2RhdGEpIHsNCiAgICBzdHJ1Y3QgcGVuZGluZ193cml0ZSAqcCA9IHVz
-ZXJfZGF0YTsNCg0KICAgIHAtPnRpbWVvdXRfaWQgPSAwOw0KDQogICAgcXVldWVfcmVtb3ZlKHAt
-PmF0dHJpYi0+cGVuZGluZ193cml0ZXMsIHApOw0KDQogICAgcGVuZGluZ193cml0ZV9yZXN1bHQo
-cCwgLUVUSU1FRE9VVCk7DQoNCiAgICByZXR1cm4gZmFsc2U7DQp9DQoNClRoZSAtRVRJTUVPVVQg
-d291bGQgYmUgY29udmVydGVkIHRvOg0KDQpzdGF0aWMgdWludDhfdCBhdHRfZWNvZGVfZnJvbV9l
-cnJvcihpbnQgZXJyKSB7DQogICAgLyoNCiAgICAgKiBJZiB0aGUgZXJyb3IgZml0cyBpbiBhIHNp
-bmdsZSBieXRlLCB0cmVhdCBpdCBhcyBhbiBBVFQgcHJvdG9jb2wNCiAgICAgKiBlcnJvciBhcyBp
-cy4gU2luY2UgIjAiIGlzIG5vdCBhIHZhbGlkIEFUVCBwcm90b2NvbCBlcnJvciBjb2RlLCB3ZSBt
-YXANCiAgICAgKiB0aGF0IHRvIFVOTElLRUxZIGJlbG93Lg0KICAgICAqLw0KICAgIGlmIChlcnIg
-PiAwICYmIGVyciA8IFVJTlQ4X01BWCkNCiAgICAgICAgcmV0dXJuIGVycjsNCg0KICAgIC8qDQog
-ICAgICogU2luY2Ugd2UgYWxsb3cgVU5JWCBlcnJub3MsIG1hcCB0aGVtIHRvIGFwcHJvcHJpYXRl
-IEFUVCBwcm90b2NvbA0KICAgICAqIGFuZCAiQ29tbW9uIFByb2ZpbGUgYW5kIFNlcnZpY2UiIGVy
-cm9yIGNvZGVzLg0KICAgICAqLw0KICAgIHN3aXRjaCAoZXJyKSB7DQogICAgY2FzZSAtRU5PRU5U
-Og0KICAgICAgICByZXR1cm4gQlRfQVRUX0VSUk9SX0lOVkFMSURfSEFORExFOw0KICAgIGNhc2Ug
-LUVOT01FTToNCiAgICAgICAgcmV0dXJuIEJUX0FUVF9FUlJPUl9JTlNVRkZJQ0lFTlRfUkVTT1VS
-Q0VTOw0KICAgIGNhc2UgLUVBTFJFQURZOg0KICAgICAgICByZXR1cm4gQlRfRVJST1JfQUxSRUFE
-WV9JTl9QUk9HUkVTUzsNCiAgICBjYXNlIC1FT1ZFUkZMT1c6DQogICAgICAgIHJldHVybiBCVF9F
-UlJPUl9PVVRfT0ZfUkFOR0U7DQogICAgfQ0KDQogICAgcmV0dXJuIEJUX0FUVF9FUlJPUl9VTkxJ
-S0VMWTsNCn0NCg0KU28gb24gd3JpdGVfdGltZW91dCBpdCB3b3VsZCBhbHNvIGdlbmVyYXRlIHRo
-ZSB1bmxpa2VseSBlcnJvci4NCg0KTm90ZSB0aGF0IG5vcm1hbGx5IHByZXBhcmUgd3JpdGUgZG9u
-J3QgbmVlZCBhdXRob3JpemF0aW9uLCBidXQgcGVyaGFwcyB5b3UgaGF2ZSBhbiBhcHBsaWNhdGlv
-biBzZXR0aW5nICdhdXRob3JpemUnOg0KDQpodHRwczovL3VybGRlZmVuc2UuY29tL3YzL19faHR0
-cHM6Ly9naXRodWIuY29tL2JsdWV6L2JsdWV6L2Jsb2IvbWFzdGVyL2RvYy9vcmcuYmx1ZXouR2F0
-dENoYXJhY3RlcmlzdGljLnJzdCphcnJheXN0cmluZy1mbGFncy1yZWFkLW9ubHlfXztJdyEhTHBL
-SSFtT0FYbXVsMEViTl83STJSNmVkaXpBdTRUVzRIMEJNdDVzNkVETWhwajIzQXA4eEZ0VjVCUmpN
-SnRwcVZGY1ZJWlFuYnRCZEdOczBVeUF3WDE3OCQgW2dpdGh1YlsuXWNvbV0sIHdoaWNoIG1lYW5z
-IHRoZSBmb2xsb3dpbmcgY29kZSB3b3VsZCBleGVjdXRlOg0KDQogICAgaWYgKG9wY29kZSA9PSBC
-VF9BVFRfT1BfUFJFUF9XUklURV9SRVEpIHsNCiAgICAgICAgaWYgKCFidGRfZGV2aWNlX2lzX3Ry
-dXN0ZWQoZGV2aWNlKSAmJiAhZGVzYy0+cHJlcF9hdXRob3JpemVkICYmDQogICAgICAgICAgICAg
-ICAgICAgICAgICBkZXNjLT5yZXFfcHJlcF9hdXRob3JpemF0aW9uKQ0KICAgICAgICAgICAgc2Vu
-ZF93cml0ZShhdHQsIGF0dHJpYiwgZGVzYy0+cHJveHksDQogICAgICAgICAgICAgICAgICAgIGRl
-c2MtPnBlbmRpbmdfd3JpdGVzLCBpZCwgdmFsdWUsIGxlbiwNCiAgICAgICAgICAgICAgICAgICAg
-b2Zmc2V0LCBmYWxzZSwgdHJ1ZSk7DQogICAgICAgIGVsc2UNCiAgICAgICAgICAgIGdhdHRfZGJf
-YXR0cmlidXRlX3dyaXRlX3Jlc3VsdChhdHRyaWIsIGlkLCAwKTsNCg0KICAgICAgICByZXR1cm47
-DQogICAgfQ0KDQpZb3UgY2FuIGFsc28gdHJ5IGFkZGluZyBwYXNzaW5nIC10IC1wIGRlYnVnIHRv
-IGJ0bW9uIHNvIGl0IGxvZ3MgdGhlIGRlYnVnIG1lc3NhZ2VzIGZyb20gYmx1ZXRvb3RoZCBhbmQg
-aW5jbHVkZSB0aW1pbmcgaW5mb3JtYXRpb24uDQoNCj4gPiBIQ0kgRXZlbnQ6IE51bWJlciBvZiBD
-b21wbGV0ZWQgUGFja2V0cyAoMHgxMykgcGxlbiA1DQo+ICAgICBoYW5kbGUgMCBwYWNrZXRzIDEN
-Cj4gPiBBQ0wgZGF0YTogaGFuZGxlIDAgZmxhZ3MgMHgwMiBkbGVuIDYNCj4gICAgIEFUVDogRXhl
-YyBXcml0ZSByZXEgKDB4MTgpDQo+ICAgICAgIGNhbmNlbCBhbGwgcHJlcGFyZWQgd3JpdGVzICgw
-eDAwKSA8IEFDTCBkYXRhOiBoYW5kbGUgMCBmbGFncyANCj4gMHgwMCBkbGVuIDUNCj4gICAgIEFU
-VDogRXhlYyBXcml0ZSByZXNwICgweDE5KQ0KPiA+IEhDSSBFdmVudDogTnVtYmVyIG9mIENvbXBs
-ZXRlZCBQYWNrZXRzICgweDEzKSBwbGVuIDUNCj4gICAgIGhhbmRsZSAwIHBhY2tldHMgMQ0KPg0K
-PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBMdWl6IEF1Z3VzdG8gdm9uIERl
-bnR6IDxsdWl6LmRlbnR6QGdtYWlsLmNvbT4NCj4gU2VudDogVHVlc2RheSwgSnVseSA5LCAyMDI0
-IDM6MzQgUE0NCj4gVG86IFJhbXNheSwgVHJleSA8VHJleV9SYW1zYXlARGVsbC5jb20+DQo+IENj
-OiBsaW51eC1ibHVldG9vdGhAdmdlci5rZXJuZWwub3JnDQo+IFN1YmplY3Q6IFJlOiBbUEFUQ0hd
-IEFUVDogRXJyb3IgKDB4MDEpIC0gRXJyb3I6IFVubGlrZWx5IGVycm9yICgxNCkgDQo+IFByZXBh
-cmUgV3JpdGUgcmVxICgweDE2KQ0KPg0KPg0KPiBbRVhURVJOQUwgRU1BSUxdDQo+DQo+IEhpIFRy
-ZXksDQo+DQo+IE9uIFR1ZSwgSnVsIDksIDIwMjQgYXQgMTozNOKAr1BNIFJhbXNheSwgVHJleSA8
-VHJleS5SYW1zYXlAZGVsbC5jb20+IHdyb3RlOg0KPiA+DQo+ID4gQmx1ZXogTWFpbnRhaW5lcnMs
-DQo+ID4gSGVyZSBpcyBhIGZpeCBmb3IgYXR0cmlidXRlIHdyaXRlcyBub3Qgd29ya2luZyBpbiAN
-Cj4gPiBzcmMvc2hhcmVkL2dhdHQtZGIuYy4gVGhlIHByZXBfd3JpdGVfY29tcGxldGVfY2Igd2Fz
-IG5vdCBnZXR0aW5nIA0KPiA+IGNhbGxlZC4gVGhlIGF0dHJpYi0+d3JpdGVfZnVuYyBjb2RlIGJs
-b2NrIHNob3VsZCBub3QgYmUgY2FsbGVkIHdoZW4gDQo+ID4gbGVuIGlzIDANCj4gPg0KPiA+IGNv
-bW1pdCA1YTliYWExMGQ0ZmRlN2NhOGFiODhlY2Q2OGUxNzY3MWMzM2NiNTg3IChIRUFEIC0+IGdh
-dC1kYiwNCj4gPiBtYXN0ZXIpDQo+ID4gQXV0aG9yOiBUcmV5X1JhbXNheSA8dHJleV9yYW1zYXlA
-ZGVsbC5jb20+DQo+ID4gRGF0ZTogICBGcmkgTWF5IDMxIDE1OjM5OjI3IDIwMjQgLTA1MDANCj4g
-Pg0KPiA+ICAgICBzaGFyZWQvZ2F0dC1kYjogUHJlcGFyZSBXcml0ZSByZXEgZXJyb3IgQlRfQVRU
-X0VSUk9SX1VOTElLRUxZDQo+ID4NCj4gPiAgICAgRml4ZXMgUHJlcGFyZSBXcml0ZSByZXEgZXJy
-b3I6IEJUX0FUVF9FUlJPUl9VTkxJS0VMWQ0KPiA+DQo+ID4gICAgICAgICBBVFQ6IEVycm9yICgw
-eDAxKQ0KPiA+ICAgICAgICAgICBFcnJvcjogVW5saWtlbHkgZXJyb3IgKDE0KQ0KPiA+ICAgICAg
-ICAgICBQcmVwYXJlIFdyaXRlIHJlcSAoMHgxNikgb24gaGFuZGxlIDB4MDA2OQ0KPiA+DQo+ID4g
-ICAgIFRoZSBwcmVwX3dyaXRlX2NvbXBsZXRlX2NiIHdhcyBub3QgZ2V0dGluZyBjYWxsZWQNCj4g
-PiAgICAgVGhlIGF0dHJpYi0+d3JpdGVfZnVuYyBjb2RlIGJsb2NrIGRvZXMgbm90IG5lZWQgdG8g
-YmUgY2FsbGVkIA0KPiA+IHdoZW4gbGVuIGlzIDANCj4NCj4gVGhpcyBkb2Vzbid0IHNvdW5kIHF1
-aXRlIHJpZ2h0LCAwIGxlbmd0aCBzdGlsbCBuZWVkcyB0byBiZSBwYXNzZWQgdG8gdGhlIGF0dHJp
-YnV0ZSB0byBjb25maXJtIHNpbmNlIHdlIGRvbid0IGtub3cgaWYgaXQgY291bGQgYmUgYSBwcm9j
-ZWR1cmUgb3Igbm90LiBDYW4geW91IGV4cGxhaW4gd2hhdCBhdHRyaWJ1dGUgaXMgYmVpbmcgd3Jp
-dHRlbiBhbmQgaWYgaXQgY291bGQgYmUgZHVlIHRvIHRoZSBhcHBsaWNhdGlvbiBub3QgcmVzcG9u
-ZGluZyBhbmQgdGhlIHByb2NlZHVyZSB0aW1pbmcgb3V0IChlLmcuIHdyaXRlX3RpbWVvdXQgaXMg
-Y2FsbGVkPyksIHBlcmhhcHMgaWYgeW91IGNhbiBwYXN0ZSBhIGJ0bW9uIHRyYWNlIGFzIHdlbGwg
-dGhhdCBjb3VsZCBoZWxwIGNoZWNraW5nIHdoYXQgYXR0cmlidXRlIGl0IGlzIHRyeWluZyB0byB1
-c2UgcHJlcGFyZSB3cml0ZS4NCj4NCj4gPiBkaWZmIC0tZ2l0IGEvc3JjL3NoYXJlZC9nYXR0LWRi
-LmMgYi9zcmMvc2hhcmVkL2dhdHQtZGIuYyBpbmRleCANCj4gPiAyYzhlN2QzMWUuLjY3OGFlZjRj
-ZiAxMDA2NDQNCj4gPiAtLS0gYS9zcmMvc2hhcmVkL2dhdHQtZGIuYw0KPiA+ICsrKyBiL3NyYy9z
-aGFyZWQvZ2F0dC1kYi5jDQo+ID4gQEAgLTIxMjcsNiArMjEyNywxMCBAQCBib29sIGdhdHRfZGJf
-YXR0cmlidXRlX3dyaXRlKHN0cnVjdCBnYXR0X2RiX2F0dHJpYnV0ZSAqYXR0cmliLCB1aW50MTZf
-dCBvZmZzZXQsDQo+ID4gICAgICBpZiAoIWF0dHJpYiB8fCAoIWZ1bmMgJiYgYXR0cmliLT53cml0
-ZV9mdW5jKSkNCj4gPiAgICAgICAgICByZXR1cm4gZmFsc2U7DQo+ID4NCj4gPiArICAgIC8qIE5v
-dGhpbmcgdG8gd3JpdGUganVzdCBza2lwICovDQo+ID4gKyAgICBpZiAobGVuID09IDApDQo+ID4g
-KyAgICAgICAgZ290byBkb25lOw0KPiA+ICsNCj4gPiAgICAgIGlmIChhdHRyaWItPndyaXRlX2Z1
-bmMpIHsNCj4gPiAgICAgICAgICBzdHJ1Y3QgcGVuZGluZ193cml0ZSAqcDsNCj4gPg0KPiA+IEBA
-IC0yMTYyLDEwICsyMTY2LDYgQEAgYm9vbCBnYXR0X2RiX2F0dHJpYnV0ZV93cml0ZShzdHJ1Y3Qg
-Z2F0dF9kYl9hdHRyaWJ1dGUgKmF0dHJpYiwgdWludDE2X3Qgb2Zmc2V0LA0KPiA+ICAgICAgICAg
-IHJldHVybiB0cnVlOw0KPiA+ICAgICAgfQ0KPiA+DQo+ID4gLSAgICAvKiBOb3RoaW5nIHRvIHdy
-aXRlIGp1c3Qgc2tpcCAqLw0KPiA+IC0gICAgaWYgKGxlbiA9PSAwKQ0KPiA+IC0gICAgICAgIGdv
-dG8gZG9uZTsNCj4gPiAtDQo+ID4gICAgICAvKiBGb3IgdmFsdWVzIHN0b3JlZCBpbiBkYiBhbGxv
-Y2F0ZSBvbiBkZW1hbmQgKi8NCj4gPiAgICAgIGlmICghYXR0cmliLT52YWx1ZSB8fCBvZmZzZXQg
-Pj0gYXR0cmliLT52YWx1ZV9sZW4gfHwNCj4gPiAgICAgICAgICAgICAgICAgIGxlbiA+ICh1bnNp
-Z25lZCkgKGF0dHJpYi0+dmFsdWVfbGVuIC0gb2Zmc2V0KSkgew0KPiA+DQo+ID4NCj4gPg0KPiA+
-IC0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQo+ID4gRnJvbTogUmFtc2F5LCBUcmV5IDxUcmV5
-LlJhbXNheUBkZWxsLmNvbT4NCj4gPiBTZW50OiBUaHVyc2RheSwgSnVuZSAyMCwgMjAyNCAxOjU4
-IFBNDQo+ID4gVG86IGxpbnV4LWJsdWV0b290aEB2Z2VyLmtlcm5lbC5vcmcNCj4gPiBTdWJqZWN0
-OiBbUEFUQ0hdIEFUVDogRXJyb3IgKDB4MDEpIC0gRXJyb3I6IFVubGlrZWx5IGVycm9yICgxNCkg
-DQo+ID4gUHJlcGFyZSBXcml0ZSByZXEgKDB4MTYpDQo+ID4NCj4gPg0KPiA+IEJsdWV6IE1haW50
-YWluZXJzDQo+ID4gSGVyZSBpcyBhIGZpeCBmb3IgYXR0cmlidXRlIHdyaXRlcyBub3Qgd29ya2lu
-ZyBpbiANCj4gPiBzcmMvc2hhcmVkL2dhdHQtZGIuYw0KPiA+DQo+ID4gaHR0cHM6Ly91cmxkZWZl
-bnNlLmNvbS92My9fX2h0dHBzOi8vZ2l0aHViLmNvbS90cmFtc2F5L2JsdWV6LXRyYW1zYXkNCj4g
-PiAvYw0KPiA+IG9tbWl0LzI0NmJjOTYwNjI5ZGZmMzRlNzQ0YzcyOGYwNDhlOWY1MGYxYTAwNWRf
-XzshIUxwS0khamtKWWFtelU4Yk9kDQo+ID4gZDEgDQo+ID4gcXQtc1dwajZneTFZd1MzMFV5YW1I
-TFVKajlVeTBVZWNyQjZReHZDZFNXRkFVSDdEdnEyd1ZKcXUxQzVqam9YNWFteXcNCj4gPiBKSA0K
-PiA+ICQgW2dpdGh1YlsuXWNvbV0NCj4gPg0KPiA+IHNoYXJlZC9nYXR0LWRiOiBQcmVwYXJlIFdy
-aXRlIHJlcSBlcnJvciBCVF9BVFRfRVJST1JfVU5MSUtFTFkgRml4ZXMgDQo+ID4gUHJlcGFyZSBX
-cml0ZSByZXEgZXJyb3I6IEJUX0FUVF9FUlJPUl9VTkxJS0VMWQ0KPiA+DQo+ID4gICAgIEFUVDog
-RXJyb3IgKDB4MDEpDQo+ID4gICAgICAgRXJyb3I6IFVubGlrZWx5IGVycm9yICgxNCkNCj4gPiAg
-ICAgICBQcmVwYXJlIFdyaXRlIHJlcSAoMHgxNikgb24gaGFuZGxlIDB4MDA2OQ0KPiA+DQo+ID4g
-VGhlIHByZXBfd3JpdGVfY29tcGxldGVfY2Igd2FzIG5vdCBnZXR0aW5nIGNhbGxlZCBUaGUNCj4g
-PiBhdHRyaWItPndyaXRlX2Z1bmMgY29kZSBibG9jayBzaG91bGQgbm90IGJlIGNhbGxlZCB3aGVu
-IGxlbiBpcyAwDQo+ID4NCj4NCj4NCj4gLS0NCj4gTHVpeiBBdWd1c3RvIHZvbiBEZW50eg0KPg0K
-DQoNCi0tDQpMdWl6IEF1Z3VzdG8gdm9uIERlbnR6DQo=
+Hi Trey,
+
+On Thu, Jul 11, 2024 at 1:17=E2=80=AFPM Ramsay, Trey <Trey.Ramsay@dell.com>=
+ wrote:
+>
+> Hi Luiz,
+> Correct, the request is timing out.  The problem is "prep_write_complete_=
+cb" is never getting called after the "prep_write_cb" is called.  The prep_=
+write_complete_cb is responsible for sending the response BT_ATT_OP_PREP_WR=
+ITE_RSP back.  The patch I provided fixes the code so that prep_write_compl=
+ete_cb  will get called and the response is sent back.   Sorry, I had debug=
+ged this issue a quite a while ago using bluez 5.55 and 5.66 and noticed th=
+e same issue in the master branch.  We have been using the patch and it has=
+ resolved the issue.
+
+Well your patch is more of a workaround and in case the issue is
+really the application setting 'authorize' flag the prepare write will
+need to be authorized even if they are of 0 length, so it is a nack
+from my side. If you think the application is responding properly then
+the problem is somewhere else and in that case we probably need to
+debug the code path it is taking.
+
+> Thanks,
+> Trey
+>
+> -----Original Message-----
+> From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+> Sent: Wednesday, July 10, 2024 4:14 PM
+> To: Ramsay, Trey <Trey_Ramsay@Dell.com>
+> Cc: linux-bluetooth@vger.kernel.org
+> Subject: Re: [PATCH] ATT: Error (0x01) - Error: Unlikely error (14) Prepa=
+re Write req (0x16)
+>
+>
+> [EXTERNAL EMAIL]
+>
+> Hi Trey,
+>
+> On Wed, Jul 10, 2024 at 3:55=E2=80=AFPM Ramsay, Trey <Trey.Ramsay@dell.co=
+m> wrote:
+> >
+> > Hi Luis,
+> > It is a Prepare Write Request but prep_write_complete_cb is never getti=
+ng called. In gatt_db_attribute_write, the prep_write_complete_cb function =
+is not getting called since "attribe->write_func" is not null and the funct=
+ion will return "True".  The prep_write_complete_cb is supposed to get call=
+ed after "goto done;" but it's not getting called.  The prep_write_complete=
+_cb is assigned to "func".    The patch checks to see if len is 0 and will =
+goto done which will call prep_write_complete_cb.
+>
+> Well if it returns true then it should not return unlikely:
+>
+>     status =3D gatt_db_attribute_write(attr, offset, NULL, 0,
+>                         BT_ATT_OP_PREP_WRITE_REQ,
+>                         server->att,
+>                         prep_write_complete_cb, pwcd);
+>
+>     if (status)
+>         return;
+>
+>     ecode =3D BT_ATT_ERROR_UNLIKELY;
+>
+> error:
+>     bt_att_chan_send_error_rsp(chan, opcode, handle, ecode);
+>
+> >
+> > > ACL data: handle 0 flags 0x01 dlen 3
+> >     ATT: Prepare Write req (0x16)
+> >       attr handle 0x0069, value offset 0x0000
+> >       part attr value  0x80 0x02 0x00 0x01 0xaa 0xd3 0x81 0x51 0x54
+> > 0x5b 0xea 0xaf 0x68 0x0d 0xeb 0xe6 0x11 0x2d 0x63 0xb1 0x8e 0xbd 0xc4
+> > 0x63 0x8f 0xf6 0xb6 0x10 0x63 0xb5 0x54 0x3f 0x36 0x19 0x41 0x5b 0x25
+> > 0xcd 0xa7 0xe5 0x9d 0xc7 0x71 0x26 0x33 0x7c 0xe8 0x0e 0x67 0xd8 0x9a
+> > 0x0a 0xb5 0xe5 0x24 0x87 0x2d 0xcc 0x00 0xa9 0xc8 0xb8 0x95 0x76 0x75
+> > 0x9f 0x79 0x1f 0x94 0xe4 0xd9 0xbe 0xab 0x22 0xa3 0x33 0x18 0x28 0x57
+> > 0x26 0xae 0x6d 0x0a 0x9b 0x63 0xeb 0x10 0xf3 0xb5 0xea 0x64 0x4a 0x81
+> > 0x55 0xe0 0xa9 0x43 0x8c 0x87 0xb4 0x32 0x1c 0x79 0xd6 0x34 0x97 0xff
+> > 0xae 0x71 0x1e 0x50 0x7c 0xb6 0x72 0x7b 0x49 0x44 0xef 0xfe 0xe2 0x40
+> > 0xc7 0x3e 0x5e 0x42 0x9b 0xca 0xa4 0x61 0x66 0x72 0x0a 0x1d 0x5c 0xb0
+> > 0xdb 0xa1 0xbb 0xf7 0xb6 0x27 0xa0 0x67 0xde 0x69 0xd9 0x67 0xa7 0x09
+> > 0x58 0x71 0x37 0x99 0x95 0x5c 0x5d 0x10 0x4d 0xed 0x2f 0xe2 0x85 0x6c
+> > 0x03 0x60 0x80 0x67 0x25 0x1b 0x33 0x02 0x53 0xbe 0x67 0xdb 0xd4 0x2a
+> > 0x9e 0x8d 0x82 0xe2 0x9d 0xc4 0x86 0x08 0x84 0x2c 0xbf 0xa5 0xc5 0xd3
+> > 0x99 0xf1 0x02 0x09 0x80 0x0c 0xc5 0xf9 0x99 0x06 0x20 0x01 0x75 0xdb
+> > 0x0c 0x11 0x81 0x87 0x04 0x4d 0xf0 0xcc 0xf7 0x27 0x85 0xcd 0x22 0x84
+> > 0x85 0x04 0xb3 0xa2 0xa9 0xcc 0xe9 0x27 0x8b 0x67 0x02 0x1b 0xe0 0x8c
+> > 0xd7 0x8f 0x51 0x3a 0xa6 0x0c 0x23 0xa0 0x09 0x2b 0x4c 0xb0 0x80 0x34
+> > 0xf9 0x61 0xaa 0x72 0x90 0x3a 0x5e 0xb7 0x11 0xaf 0xc3 0xcd 0x78 0x4f
+> > 0xb6 0x1b 0xbb 0xb4 0xb2 0x42 0x9f 0x87 0xad 0xf6 0xa1 0xae 0xdd 0xde
+> > 0x38 0x09 0x7a 0xc5 0x7c 0xbd 0x98 0x89 0xae 0x49 0x98 0xe7 0xae 0x92
+> > 0x28 0x45 0x5a 0xbc 0x30 0x53 0xe5 0xc1 0x56 0xb3 0x9f 0x56 0x7b 0xa1
+> > 0x02 0xcd 0xc2 0x25 0x2a 0xb2 0xc5 0xc9 0x35 0xec 0xa7 0x26 0x79 0x97
+> > 0x2e 0x96 0x97 0x3e 0x5b 0x8f 0xc7 0x2f 0xa8 0x39 0x70 0xb1 0x22 0x5b
+> > 0x2c 0x15 0x41 0xec 0x6b 0xc4 0x1e 0x2d 0xc0 0x47 0x75 0x42 0x01 0x40
+> > 0xc5 0x17 0x69 0xf4 0x0a 0xcd 0x7e 0x62 0x25 0xec 0x1f 0x7c 0xae 0x7b
+> > 0xf9 0x1e 0x9f 0x98 0xbd 0xc7 0xc3 0x44 0x4c 0xe2 0x0a 0x8c 0xbe 0xeb
+> > 0x1e 0xae 0x7b 0xbc 0x49 0xfa 0x7d 0xa3 0xdf 0xb2 0xc0 0x69 0xf7 0x57
+> > 0x6b 0x6f 0xe7 0x2e 0x3c 0x90 0x0a 0x16 0xe8 0x03 0x0d 0xf1 0x9c 0x4c
+> > 0xa3 0x4b 0xcf 0x6d 0xc3 0x4a 0x69 0x25 0xc5 0xf6 0x9c 0x4b 0xb3 0x77
+> > 0x67 0x7b 0x00 0xbb 0x1f 0xcd 0x59 0xb0 0xe9 0xf6 0xbe 0xa3 0x41 0xd1
+> > 0x2c 0x1f 0x09 0x6b 0x4e 0x52 0x01 0x0c 0xe1 0x20 0x6c 0x76 0xfd 0xc9
+> > 0xb9 0xb4 0xd8 0xdf 0xcb 0xac 0x77 0x65 0xcd 0x98 0xe9 0x66 0x6c 0xc8
+> > 0x8f 0xfc 0xef 0x7e 0x48 0x9f 0xc8 0xd6 0x9c 0x72 0xac 0x44 0xa3 0x67
+> > 0xa3 0x6a 0xe3 0xde 0x3a 0xd5 0x21 0x94 0x29 0x94 0x3d 0x7b 0x88 0x29
+> > 0xc3 0xc2 0x7e 0x82 0x9d 0xe7 0x00 0x7c 0x96 0x28 0x1d 0x20 0xf8 0x81
+> > 0x02 0x7c 0xc2 0xb2 0xfa 0x43 0x90 0x6e
+>
+> That doesn't seem like a zero length, what BlueZ version is this btw?
+>
+> > < ACL data: handle 0 flags 0x00 dlen 9
+> >     ATT: Error (0x01)
+> >       Error: Unlikely error (14)
+> >       Prepare Write req (0x16) on handle 0x0069
+>
+> Check what time does this error is generated, since this well be:
+>
+> static bool write_timeout(void *user_data) {
+>     struct pending_write *p =3D user_data;
+>
+>     p->timeout_id =3D 0;
+>
+>     queue_remove(p->attrib->pending_writes, p);
+>
+>     pending_write_result(p, -ETIMEDOUT);
+>
+>     return false;
+> }
+>
+> The -ETIMEOUT would be converted to:
+>
+> static uint8_t att_ecode_from_error(int err) {
+>     /*
+>      * If the error fits in a single byte, treat it as an ATT protocol
+>      * error as is. Since "0" is not a valid ATT protocol error code, we =
+map
+>      * that to UNLIKELY below.
+>      */
+>     if (err > 0 && err < UINT8_MAX)
+>         return err;
+>
+>     /*
+>      * Since we allow UNIX errnos, map them to appropriate ATT protocol
+>      * and "Common Profile and Service" error codes.
+>      */
+>     switch (err) {
+>     case -ENOENT:
+>         return BT_ATT_ERROR_INVALID_HANDLE;
+>     case -ENOMEM:
+>         return BT_ATT_ERROR_INSUFFICIENT_RESOURCES;
+>     case -EALREADY:
+>         return BT_ERROR_ALREADY_IN_PROGRESS;
+>     case -EOVERFLOW:
+>         return BT_ERROR_OUT_OF_RANGE;
+>     }
+>
+>     return BT_ATT_ERROR_UNLIKELY;
+> }
+>
+> So on write_timeout it would also generate the unlikely error.
+>
+> Note that normally prepare write don't need authorization, but perhaps yo=
+u have an application setting 'authorize':
+>
+> https://urldefense.com/v3/__https://github.com/bluez/bluez/blob/master/do=
+c/org.bluez.GattCharacteristic.rst*arraystring-flags-read-only__;Iw!!LpKI!m=
+OAXmul0EbN_7I2R6edizAu4TW4H0BMt5s6EDMhpj23Ap8xFtV5BRjMJtpqVFcVIZQnbtBdGNs0U=
+yAwX178$ [github[.]com], which means the following code would execute:
+>
+>     if (opcode =3D=3D BT_ATT_OP_PREP_WRITE_REQ) {
+>         if (!btd_device_is_trusted(device) && !desc->prep_authorized &&
+>                         desc->req_prep_authorization)
+>             send_write(att, attrib, desc->proxy,
+>                     desc->pending_writes, id, value, len,
+>                     offset, false, true);
+>         else
+>             gatt_db_attribute_write_result(attrib, id, 0);
+>
+>         return;
+>     }
+>
+> You can also try adding passing -t -p debug to btmon so it logs the debug=
+ messages from bluetoothd and include timing information.
+>
+> > > HCI Event: Number of Completed Packets (0x13) plen 5
+> >     handle 0 packets 1
+> > > ACL data: handle 0 flags 0x02 dlen 6
+> >     ATT: Exec Write req (0x18)
+> >       cancel all prepared writes (0x00) < ACL data: handle 0 flags
+> > 0x00 dlen 5
+> >     ATT: Exec Write resp (0x19)
+> > > HCI Event: Number of Completed Packets (0x13) plen 5
+> >     handle 0 packets 1
+> >
+> > -----Original Message-----
+> > From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+> > Sent: Tuesday, July 9, 2024 3:34 PM
+> > To: Ramsay, Trey <Trey_Ramsay@Dell.com>
+> > Cc: linux-bluetooth@vger.kernel.org
+> > Subject: Re: [PATCH] ATT: Error (0x01) - Error: Unlikely error (14)
+> > Prepare Write req (0x16)
+> >
+> >
+> > [EXTERNAL EMAIL]
+> >
+> > Hi Trey,
+> >
+> > On Tue, Jul 9, 2024 at 1:34=E2=80=AFPM Ramsay, Trey <Trey.Ramsay@dell.c=
+om> wrote:
+> > >
+> > > Bluez Maintainers,
+> > > Here is a fix for attribute writes not working in
+> > > src/shared/gatt-db.c. The prep_write_complete_cb was not getting
+> > > called. The attrib->write_func code block should not be called when
+> > > len is 0
+> > >
+> > > commit 5a9baa10d4fde7ca8ab88ecd68e17671c33cb587 (HEAD -> gat-db,
+> > > master)
+> > > Author: Trey_Ramsay <trey_ramsay@dell.com>
+> > > Date:   Fri May 31 15:39:27 2024 -0500
+> > >
+> > >     shared/gatt-db: Prepare Write req error BT_ATT_ERROR_UNLIKELY
+> > >
+> > >     Fixes Prepare Write req error: BT_ATT_ERROR_UNLIKELY
+> > >
+> > >         ATT: Error (0x01)
+> > >           Error: Unlikely error (14)
+> > >           Prepare Write req (0x16) on handle 0x0069
+> > >
+> > >     The prep_write_complete_cb was not getting called
+> > >     The attrib->write_func code block does not need to be called
+> > > when len is 0
+> >
+> > This doesn't sound quite right, 0 length still needs to be passed to th=
+e attribute to confirm since we don't know if it could be a procedure or no=
+t. Can you explain what attribute is being written and if it could be due t=
+o the application not responding and the procedure timing out (e.g. write_t=
+imeout is called?), perhaps if you can paste a btmon trace as well that cou=
+ld help checking what attribute it is trying to use prepare write.
+> >
+> > > diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c index
+> > > 2c8e7d31e..678aef4cf 100644
+> > > --- a/src/shared/gatt-db.c
+> > > +++ b/src/shared/gatt-db.c
+> > > @@ -2127,6 +2127,10 @@ bool gatt_db_attribute_write(struct gatt_db_at=
+tribute *attrib, uint16_t offset,
+> > >      if (!attrib || (!func && attrib->write_func))
+> > >          return false;
+> > >
+> > > +    /* Nothing to write just skip */
+> > > +    if (len =3D=3D 0)
+> > > +        goto done;
+> > > +
+> > >      if (attrib->write_func) {
+> > >          struct pending_write *p;
+> > >
+> > > @@ -2162,10 +2166,6 @@ bool gatt_db_attribute_write(struct gatt_db_at=
+tribute *attrib, uint16_t offset,
+> > >          return true;
+> > >      }
+> > >
+> > > -    /* Nothing to write just skip */
+> > > -    if (len =3D=3D 0)
+> > > -        goto done;
+> > > -
+> > >      /* For values stored in db allocate on demand */
+> > >      if (!attrib->value || offset >=3D attrib->value_len ||
+> > >                  len > (unsigned) (attrib->value_len - offset)) {
+> > >
+> > >
+> > >
+> > > -----Original Message-----
+> > > From: Ramsay, Trey <Trey.Ramsay@dell.com>
+> > > Sent: Thursday, June 20, 2024 1:58 PM
+> > > To: linux-bluetooth@vger.kernel.org
+> > > Subject: [PATCH] ATT: Error (0x01) - Error: Unlikely error (14)
+> > > Prepare Write req (0x16)
+> > >
+> > >
+> > > Bluez Maintainers
+> > > Here is a fix for attribute writes not working in
+> > > src/shared/gatt-db.c
+> > >
+> > > https://urldefense.com/v3/__https://github.com/tramsay/bluez-tramsay
+> > > /c
+> > > ommit/246bc960629dff34e744c728f048e9f50f1a005d__;!!LpKI!jkJYamzU8bOd
+> > > d1
+> > > qt-sWpj6gy1YwS30UyamHLUJj9Uy0UecrB6QxvCdSWFAUH7Dvq2wVJqu1C5jjoX5amyw
+> > > JH
+> > > $ [github[.]com]
+> > >
+> > > shared/gatt-db: Prepare Write req error BT_ATT_ERROR_UNLIKELY Fixes
+> > > Prepare Write req error: BT_ATT_ERROR_UNLIKELY
+> > >
+> > >     ATT: Error (0x01)
+> > >       Error: Unlikely error (14)
+> > >       Prepare Write req (0x16) on handle 0x0069
+> > >
+> > > The prep_write_complete_cb was not getting called The
+> > > attrib->write_func code block should not be called when len is 0
+> > >
+> >
+> >
+> > --
+> > Luiz Augusto von Dentz
+> >
+>
+>
+> --
+> Luiz Augusto von Dentz
+
+
+
+--=20
+Luiz Augusto von Dentz
