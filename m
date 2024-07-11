@@ -1,201 +1,145 @@
-Received: from mail-io1-f69.google.com (mail-io1-f69.google.com [209.85.166.69])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mailgw02.mediatek.com (unknown [210.61.82.184])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84D5714C583
-	for <linux-bluetooth@vger.kernel.org>; Wed, 10 Jul 2024 23:45:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.69
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A0943211;
+	Thu, 11 Jul 2024 00:38:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.61.82.184
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720655122; cv=none; b=UNgEuXe/9aKq3UYZlKmit8/Y9ZTOX38uRUIDnVK5CFuQmVBTPoAoPRUHSyguXvqusPoNPtRCgW4Q7CNEQWuC0+S3CW5TfrNX8y2gP4MhrYsecyVsg2ylU6CkFFZ+yp7xgpznyIqzeGM2uy/P4dI+sW7eD8O/KHAn9oomJryzTxg=
+	t=1720658294; cv=none; b=nefm4IvfLqfKjbyppEbcHcU+iKmobWEgCgkFMPaELhV7yVZ8lkHVJ75lkLjs89k5RnemyQXGg49Eu0gcLJSQX+HrkMJ6pnbHkAiH70FS5EzUYmf4DlXUzTgKyx0wgpt6RoW24a1PAZ7kXrtpRJNTfI/6vgKkQF7o8V6YSp2IpkQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720655122; c=relaxed/simple;
-	bh=ppd6gWks0aUEmhroV6/A0palDKJ5Nb1FUPca03Afuqg=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=rHYwMkmAQZDpiznEVzyIMPbkiM1j9022xM52UNWLO3ofrPVWL4Z+Jhgf1E94GlrD7za8vGWV+KBVBviNruXlpMwsuyni61SGV3b+UykNEYME0AuI7aYNXvr5o1ElqPyKs2gMxyJ8aNP0dr7nRStha4YvUWFXh8oRHTg+edgPuGg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.69
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f69.google.com with SMTP id ca18e2360f4ac-7fdfb3333e5so32609639f.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 10 Jul 2024 16:45:20 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720655119; x=1721259919;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=q/dRzecO4TXDSgIVqu9c62mv7YdSRVfiDzRyV5wH5tw=;
-        b=Sea03D9YCFkHTlteX59Fdzgb0S23d1TIBPjQNVBVM1sqwINyf3XNCsrHzWOMb7SI2Z
-         lLee4A43Xf/aVxY1sdLfZO8n0DWqjToET8Aqhj0vby6qBtacEN/MeO7FjMTKPoTM1CVa
-         69s3DKFX3/wU67EaIitp8QeL9dvmdtvcq+FqF7lwtg41lQkMFrHzn9HnL4LCJVOjUbC3
-         nPOPNQl8OzniTBJorEeTY1oKWg3Gau/r+j2fYUSLBKv3C0kYa+lPCR4r2HcegiRaXBfd
-         E689maIzUvvmSuryHw85j/xs1Gqd0g1SAE+5+xGRsuTYOdt2Mzs2lUYGaZgxGwHN5X2o
-         Z2mw==
-X-Forwarded-Encrypted: i=1; AJvYcCWoa1LhO0Zs/pSBeAmJRr45vCpclpgAEvLUCzqj6q/06wTW+yn3t/VuYJy6VKejIsIBR8N3ld3z+GgTRr+dPgGO6vRZ66mtYdFBnYThwziM
-X-Gm-Message-State: AOJu0Yyhyqz0TTleufAoK6nzxSVaaaGK2MN28xXum/Lp0XGU7/z3ixdQ
-	l5WMr/HjRG7p+6UNrQBJwDS2VUiaSst9cCofjkFYghF3uK1/LTltlWNHhmg6s/N7E7+rvEoI6a3
-	C+Z9Is/iQmWMtDIhq+924xezLclUrLU0kSLCBl/DRC1/Y4Vw4Oh4ExwU=
-X-Google-Smtp-Source: AGHT+IGwWFUwyrJeI0U0jvO8sayv9TBTSx9h3lH4d/F2Orezba9DpEgW1Z6mlwU8xCdMCdR4euTEyZF8+jG6uuDiBK7HkyBN/0m8
+	s=arc-20240116; t=1720658294; c=relaxed/simple;
+	bh=0nWqyYjYOZlnn07aEGHTbCBAfQartVHJY/JwVu8Ykww=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=AWZgZVMWWrzY0MQ5rnrWVu30yneSlSqQ9wfEzrUsmz56bK6cKIHhqGKE1J2BbqnER4NdU0se3QhVwKeJwRXEPcNPRrc6N25pG3UqdkX+bakWObOsgGBkGHX2G/tqBGUCAXX5UYZniCeY9KkFrEZZVLPCTXFlKYoHE06AXWWVzBA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com; spf=pass smtp.mailfrom=mediatek.com; dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b=O4XljNBk; arc=none smtp.client-ip=210.61.82.184
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mediatek.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b="O4XljNBk"
+X-UUID: d4de513a3f1d11ef87684b57767b52b1-20240711
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
+	h=Content-Type:MIME-Version:Message-ID:Date:Subject:CC:To:From; bh=4ifJT5fUayNFbF/d8Vs6tcLVSXEDZGqDZXqqzL0+y4k=;
+	b=O4XljNBk1JAmJ5k8aZPte08FLnnouljTbbUtSRjWa82K2PGo4S0MbGfLALJaU7rEjBuJ8IrjdSBWupkfSxL9NxYEGdMLforNpeO5elS0ujPp5Rc3nU/qmY7XQYxyAJwwZEWEOogz1lkE1hPw/AUrDt8G++X8nerkbhfWWCNK6OU=;
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.1.40,REQID:f9a140aa-b8e3-41a8-be23-778ec873a65b,IP:0,U
+	RL:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
+	release,TS:0
+X-CID-META: VersionHash:ba885a6,CLOUDID:ae9532d5-0d68-4615-a20f-01d7bd41f0bb,B
+	ulkID:nil,BulkQuantity:0,Recheck:0,SF:102,TC:nil,Content:0,EDM:-3,IP:nil,U
+	RL:11|1,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES
+	:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
+X-CID-BVR: 0
+X-CID-BAS: 0,_,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR,TF_CID_SPAM_ULN
+X-UUID: d4de513a3f1d11ef87684b57767b52b1-20240711
+Received: from mtkmbs13n2.mediatek.inc [(172.21.101.108)] by mailgw02.mediatek.com
+	(envelope-from <chris.lu@mediatek.com>)
+	(Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
+	with ESMTP id 1173769964; Thu, 11 Jul 2024 08:38:02 +0800
+Received: from mtkmbs11n1.mediatek.inc (172.21.101.185) by
+ mtkmbs10n1.mediatek.inc (172.21.101.34) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.26; Thu, 11 Jul 2024 08:38:01 +0800
+Received: from mtksdccf07.mediatek.inc (172.21.84.99) by
+ mtkmbs11n1.mediatek.inc (172.21.101.73) with Microsoft SMTP Server id
+ 15.2.1118.26 via Frontend Transport; Thu, 11 Jul 2024 08:38:01 +0800
+From: Chris Lu <chris.lu@mediatek.com>
+To: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg
+	<johan.hedberg@gmail.com>, Luiz Von Dentz <luiz.dentz@gmail.com>
+CC: Sean Wang <sean.wang@mediatek.com>, Aaron Hou <aaron.hou@mediatek.com>,
+	Steve Lee <steve.lee@mediatek.com>, linux-bluetooth
+	<linux-bluetooth@vger.kernel.org>, linux-kernel
+	<linux-kernel@vger.kernel.org>, linux-mediatek
+	<linux-mediatek@lists.infradead.org>, Chris Lu <chris.lu@mediatek.com>
+Subject: [PATCH v3] Bluetooth: btmtk: Fix btmtk.c undefined reference build error
+Date: Thu, 11 Jul 2024 08:37:59 +0800
+Message-ID: <20240711003759.18644-1-chris.lu@mediatek.com>
+X-Mailer: git-send-email 2.18.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6638:1693:b0:4c0:9a3e:c259 with SMTP id
- 8926c6da1cb9f-4c0b2b8f692mr504474173.5.1720655119626; Wed, 10 Jul 2024
- 16:45:19 -0700 (PDT)
-Date: Wed, 10 Jul 2024 16:45:19 -0700
-In-Reply-To: <00000000000031fb62061cc4c118@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000002fcc8d061ced3d52@google.com>
-Subject: Re: [syzbot] [bluetooth?] BUG: workqueue leaked atomic, lock or RCU: kworker/u9:NUM[NUM]
-From: syzbot <syzbot+733a96463546d3026b60@syzkaller.appspotmail.com>
-To: johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, luiz.dentz@gmail.com, marcel@holtmann.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain
+X-TM-AS-Product-Ver: SMEX-14.0.0.3152-9.1.1006-23728.005
+X-TM-AS-Result: No-10--10.944500-8.000000
+X-TMASE-MatchedRID: wjXr8BNNQ6iiwkztVCsqbzl6J+7ealtWvtVce6w5+K8sfFlFugSGUAOi
+	VFpF7nSJ37TMydxZ0/vc7gUppY5koqcgTP4t5UFTI0cHLI6lhgIoUVkB7ifJnmHtZs6e3ZMHAJY
+	y/fBIuxLTUnxbEiZ30zAYnDoLfAffAef6h21z2pAflhDI6DvVlkyQ5fRSh2656T1ArrMwNVq6h8
+	11TFv4c3ZaxeQSvArMSQv+FB+NQDofbciQjfRltRn0UD4GU5IqQBnqdxuJ5SAUtdRZTmEaIcJfR
+	ix8rcI6dR3E5cRxwyiN6fDbnTu0nx8TzIzimOwPbdTuPa9VRGvEQdG7H66TyH4gKq42LRYk/H0g
+	76nIVo3es9jlDCKhVe+7jUpl//joxAyCzWH1zgN+3BndfXUhXQ==
+X-TM-AS-User-Approved-Sender: No
+X-TM-AS-User-Blocked-Sender: No
+X-TMASE-Result: 10--10.944500-8.000000
+X-TMASE-Version: SMEX-14.0.0.3152-9.1.1006-23728.005
+X-TM-SNTS-SMTP: 0EF1E6A077C4CC8F187001CEDDA52C4E625076B535373DA94F3692C0A2D61C212000:8
 
-syzbot has found a reproducer for the following issue on:
+MediaTek moved some usb interface related function to btmtk.c which
+may cause build failed if BT USB Kconfig wasn't enabled.
+Fix undefined reference by adding config check.
 
-HEAD commit:    ef445d1539dd Merge remote-tracking branches 'origin/arm64-..
-git tree:       git://git.kernel.org/pub/scm/linux/kernel/git/arm64/linux.git for-kernelci
-console output: https://syzkaller.appspot.com/x/log.txt?x=1544df69980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=79a49b0b9ffd6585
-dashboard link: https://syzkaller.appspot.com/bug?extid=733a96463546d3026b60
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-userspace arch: arm64
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=13768021980000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=176e2c7e980000
+btmtk.c:(.text+0x89c): undefined reference to `usb_alloc_urb'
+btmtk.c:(.text+0x8e3): undefined reference to `usb_free_urb'
+btmtk.c:(.text+0x956): undefined reference to `usb_free_urb'
+btmtk.c:(.text+0xa0e): undefined reference to `usb_anchor_urb'
+btmtk.c:(.text+0xb43): undefined reference to `usb_autopm_get_interface'
+btmtk.c:(.text+0xb7e): undefined reference to `usb_autopm_put_interface'
+btmtk.c:(.text+0xf70): undefined reference to `usb_disable_autosuspend'
+btmtk.c:(.text+0x133a): undefined reference to `usb_control_msg'
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/76e73f830dca/disk-ef445d15.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/d54cbf6f6ee2/vmlinux-ef445d15.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/9240e4c79dfc/Image-ef445d15.gz.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+733a96463546d3026b60@syzkaller.appspotmail.com
-
-BUG: workqueue leaked atomic, lock or RCU: kworker/u9:0[52]
-     preempt=0x00000000 lock=0->1 RCU=0->0 workfn=hci_rx_work
-1 lock held by kworker/u9:0/52:
- #0: ffff0000d9876518 (&chan->lock/1){+.+.}-{3:3}, at: l2cap_chan_lock include/net/bluetooth/l2cap.h:827 [inline]
- #0: ffff0000d9876518 (&chan->lock/1){+.+.}-{3:3}, at: l2cap_conless_channel net/bluetooth/l2cap_core.c:6764 [inline]
- #0: ffff0000d9876518 (&chan->lock/1){+.+.}-{3:3}, at: l2cap_recv_frame+0x610/0xc934 net/bluetooth/l2cap_core.c:6830
-CPU: 1 PID: 52 Comm: kworker/u9:0 Not tainted 6.10.0-rc7-syzkaller-gef445d1539dd #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 06/07/2024
-Workqueue: hci0 hci_rx_work
-Call trace:
- dump_backtrace+0x1b8/0x1e4 arch/arm64/kernel/stacktrace.c:317
- show_stack+0x2c/0x3c arch/arm64/kernel/stacktrace.c:324
- __dump_stack lib/dump_stack.c:88 [inline]
- dump_stack_lvl+0xe4/0x150 lib/dump_stack.c:114
- dump_stack+0x1c/0x28 lib/dump_stack.c:123
- process_one_work+0xdc0/0x15b8 kernel/workqueue.c:3269
- process_scheduled_works kernel/workqueue.c:3329 [inline]
- worker_thread+0x938/0xecc kernel/workqueue.c:3409
- kthread+0x288/0x310 kernel/kthread.c:389
- ret_from_fork+0x10/0x20 arch/arm64/kernel/entry.S:860
-
-======================================================
-WARNING: possible circular locking dependency detected
-6.10.0-rc7-syzkaller-gef445d1539dd #0 Not tainted
-------------------------------------------------------
-kworker/u9:0/52 is trying to acquire lock:
-ffff0000d385e948 ((wq_completion)hci0#2){+.+.}-{0:0}, at: process_one_work+0x624/0x15b8 kernel/workqueue.c:3222
-
-but task is already holding lock:
-ffff0000d9876518 (&chan->lock/1){+.+.}-{3:3}, at: l2cap_chan_lock include/net/bluetooth/l2cap.h:827 [inline]
-ffff0000d9876518 (&chan->lock/1){+.+.}-{3:3}, at: l2cap_conless_channel net/bluetooth/l2cap_core.c:6764 [inline]
-ffff0000d9876518 (&chan->lock/1){+.+.}-{3:3}, at: l2cap_recv_frame+0x610/0xc934 net/bluetooth/l2cap_core.c:6830
-
-which lock already depends on the new lock.
-
-
-the existing dependency chain (in reverse order) is:
-
--> #1 (&chan->lock/1){+.+.}-{3:3}:
-       __lock_release kernel/locking/lockdep.c:5468 [inline]
-       lock_release+0x334/0x9b8 kernel/locking/lockdep.c:5774
-       process_one_work+0x8a0/0x15b8 kernel/workqueue.c:3255
-       process_scheduled_works kernel/workqueue.c:3329 [inline]
-       worker_thread+0x938/0xecc kernel/workqueue.c:3409
-       kthread+0x288/0x310 kernel/kthread.c:389
-       ret_from_fork+0x10/0x20 arch/arm64/kernel/entry.S:860
-
--> #0 ((wq_completion)hci0#2){+.+.}-{0:0}:
-       check_prev_add kernel/locking/lockdep.c:3134 [inline]
-       check_prevs_add kernel/locking/lockdep.c:3253 [inline]
-       validate_chain kernel/locking/lockdep.c:3869 [inline]
-       __lock_acquire+0x3384/0x763c kernel/locking/lockdep.c:5137
-       lock_acquire+0x240/0x728 kernel/locking/lockdep.c:5754
-       process_one_work+0x668/0x15b8 kernel/workqueue.c:3223
-       process_scheduled_works kernel/workqueue.c:3329 [inline]
-       worker_thread+0x938/0xecc kernel/workqueue.c:3409
-       kthread+0x288/0x310 kernel/kthread.c:389
-       ret_from_fork+0x10/0x20 arch/arm64/kernel/entry.S:860
-
-other info that might help us debug this:
-
- Possible unsafe locking scenario:
-
-       CPU0                    CPU1
-       ----                    ----
-  lock(&chan->lock/1);
-                               lock((wq_completion)hci0#2);
-                               lock(&chan->lock/1);
-  lock((wq_completion)hci0#2);
-
- *** DEADLOCK ***
-
-1 lock held by kworker/u9:0/52:
- #0: ffff0000d9876518 (&chan->lock/1){+.+.}-{3:3}, at: l2cap_chan_lock include/net/bluetooth/l2cap.h:827 [inline]
- #0: ffff0000d9876518 (&chan->lock/1){+.+.}-{3:3}, at: l2cap_conless_channel net/bluetooth/l2cap_core.c:6764 [inline]
- #0: ffff0000d9876518 (&chan->lock/1){+.+.}-{3:3}, at: l2cap_recv_frame+0x610/0xc934 net/bluetooth/l2cap_core.c:6830
-
-stack backtrace:
-CPU: 1 PID: 52 Comm: kworker/u9:0 Not tainted 6.10.0-rc7-syzkaller-gef445d1539dd #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 06/07/2024
-Workqueue: hci0 hci_cmd_timeout
-Call trace:
- dump_backtrace+0x1b8/0x1e4 arch/arm64/kernel/stacktrace.c:317
- show_stack+0x2c/0x3c arch/arm64/kernel/stacktrace.c:324
- __dump_stack lib/dump_stack.c:88 [inline]
- dump_stack_lvl+0xe4/0x150 lib/dump_stack.c:114
- dump_stack+0x1c/0x28 lib/dump_stack.c:123
- print_circular_bug+0x150/0x1b8 kernel/locking/lockdep.c:2060
- check_noncircular+0x310/0x404 kernel/locking/lockdep.c:2187
- check_prev_add kernel/locking/lockdep.c:3134 [inline]
- check_prevs_add kernel/locking/lockdep.c:3253 [inline]
- validate_chain kernel/locking/lockdep.c:3869 [inline]
- __lock_acquire+0x3384/0x763c kernel/locking/lockdep.c:5137
- lock_acquire+0x240/0x728 kernel/locking/lockdep.c:5754
- process_one_work+0x668/0x15b8 kernel/workqueue.c:3223
- process_scheduled_works kernel/workqueue.c:3329 [inline]
- worker_thread+0x938/0xecc kernel/workqueue.c:3409
- kthread+0x288/0x310 kernel/kthread.c:389
- ret_from_fork+0x10/0x20 arch/arm64/kernel/entry.S:860
-Bluetooth: hci0: command tx timeout
-BUG: workqueue leaked atomic, lock or RCU: kworker/u9:0[52]
-     preempt=0x00000000 lock=1->0 RCU=0->0 workfn=hci_cmd_timeout
-INFO: lockdep is turned off.
-CPU: 1 PID: 52 Comm: kworker/u9:0 Not tainted 6.10.0-rc7-syzkaller-gef445d1539dd #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 06/07/2024
-Workqueue: hci0 hci_cmd_timeout
-Call trace:
- dump_backtrace+0x1b8/0x1e4 arch/arm64/kernel/stacktrace.c:317
- show_stack+0x2c/0x3c arch/arm64/kernel/stacktrace.c:324
- __dump_stack lib/dump_stack.c:88 [inline]
- dump_stack_lvl+0xe4/0x150 lib/dump_stack.c:114
- dump_stack+0x1c/0x28 lib/dump_stack.c:123
- process_one_work+0xdc0/0x15b8 kernel/workqueue.c:3269
- process_scheduled_works kernel/workqueue.c:3329 [inline]
- worker_thread+0x938/0xecc kernel/workqueue.c:3409
- kthread+0x288/0x310 kernel/kthread.c:389
- ret_from_fork+0x10/0x20 arch/arm64/kernel/entry.S:860
-Bluetooth: hci0: command tx timeout
-Bluetooth: hci0: command tx timeout
-Bluetooth: hci0: command tx timeout
-
-
+Fixes: 39a9e1c69e74 ("Bluetooth: btmtk: move btusb_mtk_hci_wmt_sync to btmtk.c")
+Reported-by: kernel test robot <lkp@intel.com>
+Closes: https://lore.kernel.org/oe-kbuild-all/202407091928.AH0aGZnx-lkp@intel.com/
+Signed-off-by: Chris Lu <chris.lu@mediatek.com>
 ---
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
+Change from v2 to v3:
+-remove #if in structure in case error causes with certain compilier
+---
+ drivers/bluetooth/btmtk.c | 2 ++
+ drivers/bluetooth/btmtk.h | 2 ++
+ 2 files changed, 4 insertions(+)
+
+diff --git a/drivers/bluetooth/btmtk.c b/drivers/bluetooth/btmtk.c
+index b7c348687a77..9789296ad4f6 100644
+--- a/drivers/bluetooth/btmtk.c
++++ b/drivers/bluetooth/btmtk.c
+@@ -437,6 +437,7 @@ int btmtk_process_coredump(struct hci_dev *hdev, struct sk_buff *skb)
+ }
+ EXPORT_SYMBOL_GPL(btmtk_process_coredump);
+ 
++#if IS_ENABLED(CONFIG_BT_HCIBTUSB_MTK)
+ static void btmtk_usb_wmt_recv(struct urb *urb)
+ {
+ 	struct hci_dev *hdev = urb->context;
+@@ -1487,6 +1488,7 @@ int btmtk_usb_shutdown(struct hci_dev *hdev)
+ 	return 0;
+ }
+ EXPORT_SYMBOL_GPL(btmtk_usb_shutdown);
++#endif
+ 
+ MODULE_AUTHOR("Sean Wang <sean.wang@mediatek.com>");
+ MODULE_AUTHOR("Mark Chen <mark-yw.chen@mediatek.com>");
+diff --git a/drivers/bluetooth/btmtk.h b/drivers/bluetooth/btmtk.h
+index 453ed5131a37..6bb59f4096b7 100644
+--- a/drivers/bluetooth/btmtk.h
++++ b/drivers/bluetooth/btmtk.h
+@@ -202,6 +202,7 @@ int btmtk_process_coredump(struct hci_dev *hdev, struct sk_buff *skb);
+ void btmtk_fw_get_filename(char *buf, size_t size, u32 dev_id, u32 fw_ver,
+ 			   u32 fw_flavor);
+ 
++#if IS_ENABLED(CONFIG_BT_HCIBTUSB_MTK)
+ int btmtk_usb_subsys_reset(struct hci_dev *hdev, u32 dev_id);
+ 
+ int btmtk_usb_recv_acl(struct hci_dev *hdev, struct sk_buff *skb);
+@@ -216,6 +217,7 @@ int btmtk_usb_suspend(struct hci_dev *hdev);
+ int btmtk_usb_setup(struct hci_dev *hdev);
+ 
+ int btmtk_usb_shutdown(struct hci_dev *hdev);
++#endif
+ #else
+ 
+ static inline int btmtk_set_bdaddr(struct hci_dev *hdev,
+-- 
+2.18.0
+
