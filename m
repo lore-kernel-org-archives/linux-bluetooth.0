@@ -1,217 +1,192 @@
-Received: from mail-lf1-f51.google.com (mail-lf1-f51.google.com [209.85.167.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from APC01-PSA-obe.outbound.protection.outlook.com (mail-psaapc01on2139.outbound.protection.outlook.com [40.107.255.139])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0D038BFC
-	for <linux-bluetooth@vger.kernel.org>; Thu, 11 Jul 2024 20:53:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.51
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720731192; cv=none; b=BfRxIyqfzwX8wCfVX36H8Y3GhoJo5SlVEhoYE/diUY+UGqj2W/LzI0J5NGx3RxGDE7zLbEy2YQbG8ELR1A12ArfyGYBCwr2hccQE22FvAVCDuPgZeG7XQTjo4E2GcsTB8+7cihvagf5tOw9TT+qYOqOIzX7ed0gf/cWeg9j3bGM=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720731192; c=relaxed/simple;
-	bh=xjzRGa8baFYM8UEedXdMZT2dNjfJHS8i0cFe6zph3oA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=YlT/ZxMdPWA89VZcMn962jntjx3bX4URoY76SNVlb4LYe56nqYCJivDdxBhx+ZPYhmwgys/qGuoAF8c7f+5C1EccYxAtEFtnIc9aQoEbLEC1EWTCMZ7AyAqva3OY8bGFwBA0eCHEowRCoFvl5uOvYWZdHI4UmPxgP2ffO7tMcjY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aRt0V5M4; arc=none smtp.client-ip=209.85.167.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22E73D512;
+	Fri, 12 Jul 2024 11:14:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.255.139
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1720782871; cv=fail; b=AibDxtE+NWX93tTiYgKhulKX+am864m7ifii6aDMOEwzNOnS36DILVklalMWPD2lLPKieFfQAoHjT4xkJ9ncwY2BYFXQ/ETFpRwDu6kp2rPQI3HZH/1i7WajKFQcNUQ4uXW69jWEN2hN1dUzTj6D4qrzQlpmZuaSjJwfzgrYFJA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1720782871; c=relaxed/simple;
+	bh=HxDc4h54mW+o2EtXbXSYLa44u3wgTvEPo4mGVPdXSN8=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=dCDU9SFg8qTKsIa8bNbL5Bm6n7MvVTSM3Z0R/M657D1SC01U6CyOoCTUngDhSP77TTmT3jFvk4qoFANNn0HFxLwGz2ia7vKg6BsDcTRxdgTukmJ2Fd4kBuB064/7TA9EhoZr9TZW7ixT3O1qOvnLXA4A0nehJ9rKe6ysj3YGi70=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=amlogic.com; spf=pass smtp.mailfrom=amlogic.com; dkim=pass (2048-bit key) header.d=amlogic.com header.i=@amlogic.com header.b=p4oz08pI; arc=fail smtp.client-ip=40.107.255.139
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=amlogic.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amlogic.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aRt0V5M4"
-Received: by mail-lf1-f51.google.com with SMTP id 2adb3069b0e04-52ea79e689eso1782078e87.1
-        for <linux-bluetooth@vger.kernel.org>; Thu, 11 Jul 2024 13:53:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1720731189; x=1721335989; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=niC+DEoE5Wzwp+zRNrF6U5NtHFUsAopY4KHW49sxNyA=;
-        b=aRt0V5M4PAzEkpnhNhleavR7pT7XPCDriYdYA3vXZ4hs6EAOBBQQcMLEob73PcTLQ+
-         0m4EYpCTX3nxjfTj4pkXB87iPFD3fBqkXC23127ZjXZLOx9wJ0/znRPkNK3fYWCuRa0X
-         EAh0G6egofuh0egO+nNzJS6QX7z8/yw3GnUcf3otAiMv3ktPI5j6ruh1dSd2GTW07OQG
-         Sw20+mFD9Ma11Q8sJf7XdlF+78TPr+NvdxncJieTUzMrWcaJWUAWaeWMtL5d8N8LpPiw
-         lJR1D//7ASQcF/2IKJD8JPkt0uMHAXlnk34xkmknKVhkEL3mEvVkznHCBa0vqWfsUOyC
-         LR4g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720731189; x=1721335989;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=niC+DEoE5Wzwp+zRNrF6U5NtHFUsAopY4KHW49sxNyA=;
-        b=FJGV0NYdxTPrDQIRkwa4lLQnfBNeAXENaVTaiHr8acNUcmX+SIWx9f0FI39jkuavX6
-         iELDBHcgiAeYrmlkp+jwEOL7xueNDFSRe8FEAujb3ezkcTJfEjTmY527mzkUmBvhpNvp
-         MV5JFBVoHLOB33axNDYY3D36sNVUhrkucIWEedxL6I+JnB1h3PKUC9Dh+ioQZ5K0fTAg
-         c0qgKn1xn79V6rP1B8dCvRLb4aY0XtPhJpvzKFP3mW6mSmqtwwrAIeeMo3pz+9l164Ix
-         hnd2qhHrjSCfTLIfg3mYQ5uATHK7R54FqjGBi5e6iMmAJVoVshS4DGAu7LIHbDGB/a42
-         Ph6w==
-X-Gm-Message-State: AOJu0Yzs7x5p/kPldGT0TFren+3ZEO0yD5B6WVWC2VV1GQlptngjixyA
-	pch831Z13MI7JCdafvLOFVA1X1bUTvQqQaUs+M8dcUt40vKs6lt4BITlzJcG2pOefznTlNxOmh+
-	oHcUdabGDIXLwWI/j0t/evCTinjM5f9+B1Ws=
-X-Google-Smtp-Source: AGHT+IGZmhSDTHDBBs4ox0X0jGEMH4XOxtwpyO3BkO0Xr6InDUlPueFhoDkowDdOqpFlGSF7nb5y9qA3tVYiJmpm3Ww=
-X-Received: by 2002:a2e:7304:0:b0:2ee:8777:f86e with SMTP id
- 38308e7fff4ca-2eeb30e3d4fmr78818481fa.14.1720731188460; Thu, 11 Jul 2024
- 13:53:08 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=amlogic.com header.i=@amlogic.com header.b="p4oz08pI"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=cZzUz5ceCA8a1fhj8QCJtJU6qQll4NmAEC+QrqYZ1xsN1RzkmmSe9NDSnV7CBIMWFm3AJoabQ9kDeBbENVzhWrcGmun0+kvIuR/+uZ/9T8WxABPSI+Y2T4/39VO5ZuxC+a7EctYbvrDtXZFAQBoDABoej0Meo6OajyMlwVXomjynbvl6uVzRdEHw3ocmSPlD+2KkgnKkxpEKlNNTMSzP8DHi+aaFfbe17QBouIHbT4TsLZL0Wf8i2uMKzEav+IS1reqxTqY1dl1lpLJzuUcDLUVYtPsuAE1Bn0ffVPbKMJgrMWUYOaLLhbzZprXBUYvWjdM9GCeW2tHqs6MgdpTs4w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=vTl8aIA+tp//BrUX7fM9Th//vUWlCclcRDVfE00hbuk=;
+ b=IUmyK0cPfoQg+bpXmml4497hFIPiIgQ7I3rtEHkl4Cx4n//nS7c2a5Y/D2UzFJB1rg3RUI20wVq99wlOZbffmFHN5QP/YaDG/reumJE5IaM+ekL18i7g1KqHMGmN6i/K7Vg+ENbE637H9/ePzUzlfP+Me4YTlDuZiJlQ+mhheOGnioEuroVROj5dcOI3s8pORk3GmnfFpkwqsNJRWzl7Wlusk6OvYpR2RUbIUhd17yfUHC2S0i+rjYgsG8laf1ggiH9DZYkAZIejLNTsbOU5neI2g92/v7+EPRde9zXpgeTg3WMQ7gZgCpedxD1QmQg2IN80OWAtvCW4ekfLqkxF7w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amlogic.com; dmarc=pass action=none header.from=amlogic.com;
+ dkim=pass header.d=amlogic.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amlogic.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=vTl8aIA+tp//BrUX7fM9Th//vUWlCclcRDVfE00hbuk=;
+ b=p4oz08pIx1LifzmVpp/am6frbeoju8vCG4OEeHbkBow142CAbuz0FLHGiBhNzHNJMjme4fzRzSiHv89zFCOWJnGhCA39TyLY5C+Uvy+EzfBSQAZlQ2xhYsARyTQxgVouDTILSLiKAJdTAGKC9VFGDOc7pjkLUje1/6CAZdfsTsoLbQKSCHweq3e1TimDU4R+3wGGsyyF2QW0DRZolxmTsr/eVz+QiFzAVvQH218HpH1Vv4BOJFqxhr0yNztaOisGQXlpA3uwj3cGjGiz1ub5BXjKhq5jIcENJRHSyM1vDdJriC4hpqhQWdduitf0A5lyzsoUbq32hBTKQsH+/vvTRg==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amlogic.com;
+Received: from JH0PR03MB7468.apcprd03.prod.outlook.com (2603:1096:990:16::12)
+ by TYZPR03MB8282.apcprd03.prod.outlook.com (2603:1096:405:21::9) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7762.22; Fri, 12 Jul
+ 2024 11:14:24 +0000
+Received: from JH0PR03MB7468.apcprd03.prod.outlook.com
+ ([fe80::4128:9446:1a0f:11fd]) by JH0PR03MB7468.apcprd03.prod.outlook.com
+ ([fe80::4128:9446:1a0f:11fd%6]) with mapi id 15.20.7741.033; Fri, 12 Jul 2024
+ 11:14:24 +0000
+Message-ID: <338eb673-0716-407d-99de-ec1ba6502d01@amlogic.com>
+Date: Fri, 12 Jul 2024 19:13:59 +0800
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 3/4] arm64: defconfig: Enable hci_uart for Amlogic
+ Bluetooth
+To: Krzysztof Kozlowski <krzk@kernel.org>,
+ Marcel Holtmann <marcel@holtmann.org>,
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+ Conor Dooley <conor+dt@kernel.org>, Catalin Marinas
+ <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>
+Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org
+References: <20240705-btaml-v1-0-7f1538f98cef@amlogic.com>
+ <20240705-btaml-v1-3-7f1538f98cef@amlogic.com>
+ <98f3e5d2-f0bc-46b8-8560-e732dcbe8532@kernel.org>
+ <5b59045f-feba-443d-b90e-5b070e14e154@amlogic.com>
+ <e5f639a5-d16e-4213-a369-8f9b2988ecd4@kernel.org>
+From: Yang Li <yang.li@amlogic.com>
+In-Reply-To: <e5f639a5-d16e-4213-a369-8f9b2988ecd4@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: SI2P153CA0017.APCP153.PROD.OUTLOOK.COM
+ (2603:1096:4:140::10) To JH0PR03MB7468.apcprd03.prod.outlook.com
+ (2603:1096:990:16::12)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <SN4PR19MB5421B1226EA92B735CADEA44E4C82@SN4PR19MB5421.namprd19.prod.outlook.com>
- <SN4PR19MB54215EF3B4E7380A21387D2EE4DB2@SN4PR19MB5421.namprd19.prod.outlook.com>
- <CABBYNZ+8ca5f6nWG3D3x8mL3g=57Z0pogQP-+ww_aQuC0R1DWw@mail.gmail.com>
- <SN4PR19MB54214DD841A41FB8C01DDFC9E4A42@SN4PR19MB5421.namprd19.prod.outlook.com>
- <CABBYNZJpG3ioCK9Skqx7_ki3TrqF+Z0GecApPF6Crv+D+J3hDA@mail.gmail.com>
- <SN4PR19MB5421EA5BEB05EFAC63160576E4A52@SN4PR19MB5421.namprd19.prod.outlook.com>
- <CABBYNZJXfviR-5FND4LxMtdwDL1y-_iRkEJsrp+PkyVk+g=BNw@mail.gmail.com> <SN4PR19MB542196B1C79E5262A2F578FBE4A52@SN4PR19MB5421.namprd19.prod.outlook.com>
-In-Reply-To: <SN4PR19MB542196B1C79E5262A2F578FBE4A52@SN4PR19MB5421.namprd19.prod.outlook.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Thu, 11 Jul 2024 16:52:56 -0400
-Message-ID: <CABBYNZLzgTLqHcKfmOaPUKMkcPXsBeWxbTTfH1V+Dkm-Kvwwog@mail.gmail.com>
-Subject: Re: [PATCH] ATT: Error (0x01) - Error: Unlikely error (14) Prepare
- Write req (0x16)
-To: "Ramsay, Trey" <Trey.Ramsay@dell.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: JH0PR03MB7468:EE_|TYZPR03MB8282:EE_
+X-MS-Office365-Filtering-Correlation-Id: 9febb003-9879-4c5e-979f-08dca263c98f
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|7416014|366016|376014|1800799024|921020;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?akcvRVJmNkNFZUJDTE9hM25jNTVCYUJGMUhmSVAyY0VVRzdicE5Bd1R1ZGc0?=
+ =?utf-8?B?aWVCcWt6NFRJaVlSRFFnUU5yeFozNjBIcWpRZFQvUURJSEkwVHo0TnhOd0pY?=
+ =?utf-8?B?ZXdOeWJ2QStMKzVmTFZUUVoyRC8yZDR3anJmQjFEamgxTG9BcW80ZWVsck1L?=
+ =?utf-8?B?WEhDeU5zSVJHNVdxNlNjQ3AvN3ZxUncrc0hhdy9XU2ozdFVTdndlYXAwQWdY?=
+ =?utf-8?B?ZU53RzFxYXRzdEgrb3JMWnMvNmV1VE5pb01UYUhwVkYvV2xHWjkxM0FOajRV?=
+ =?utf-8?B?azlTVVlYUHhwd0R6S1RhMXB6UzEvdlFVSFhyZ0p3V2pCZTZxWFdFR29QeEtZ?=
+ =?utf-8?B?dzlRUktmS3JobmRVWGhSKzlOSGV2MjNvSmpBYkU0RTlteVRPYndHWTdHWkpZ?=
+ =?utf-8?B?cGdINm1mMkpNVkZEZXVZeEIrWU5rRDdGWVllSkNaS0tSdFZuUXg5TVdlcUtr?=
+ =?utf-8?B?T1diZjh2SUJKZ0hLU0dEQWlETmRRdnh2NTlVeWpya3Y1TGY3VFhwLzR3WjVQ?=
+ =?utf-8?B?d3AvWlRxVnNERzV3QVJRdDluTHF3UGRjRHhnWnRhS0FVYVYxZ1NXWW1KREdj?=
+ =?utf-8?B?REhsNjlsbWxvRkF6Q2JQNDJYR0M0anI1ZjFxSTI4OEo5TmtQS3l6M1FkeEJC?=
+ =?utf-8?B?RFhwSnE3dm9vdDlTbWJiVnhOL0dReWcvS25ZNnBkN1l0WUdsN3VuMitJWHJn?=
+ =?utf-8?B?STFwMjUzakdMVExzUnR5ZDI4dDJFQXliK3BCZytLcFljbEZ1SGttUWpEMEg3?=
+ =?utf-8?B?K3U4UDRVZXRSRUJUNCswOWdpR3VvVkdKR0IxSVJhVDVVejdMUlFCT2FSMjVz?=
+ =?utf-8?B?UEdFZzJ2alU3b0hFcTE5RXh0a1JKd2grS2N2cG9odmhDaDZsczJMa0RGK1FJ?=
+ =?utf-8?B?bzlNdHpXbW1CV0ZIdGlWNVcyZzRYVnVPclNUUjlIQ1g2eWhvYUhoMjBqNkFL?=
+ =?utf-8?B?b2JrYUVLQzh1ck1aaFVYL3IwMnFOQ0orZUFTZFJmWFdZb21HSW93b3NPZVJ3?=
+ =?utf-8?B?My9Ob3hBRnZlS1NHRTU1L2tzT0szbnJkUlNudGs3d1ZQaFBlOVhtanRMNURD?=
+ =?utf-8?B?OUt4VWkxOUNWRXpWR29HOXk4bEFRTDBxU2s1djI4ODYraTdwQzlSNTk3V1dB?=
+ =?utf-8?B?Wk93SnZGT0VPeTEva3dGdldQTm5HdmdIdWhKaC8wTXdYY0RMRDcrbzV0Rlp6?=
+ =?utf-8?B?UFd5TXNsc3R6NFhYL29UazBnV3NrSTUzUEZCd3VJcEtjNU5tc1V4MzBZU3ds?=
+ =?utf-8?B?a1hxanpGcHp5TThuR0xBOXpVeFV4RHFldGxtNm1nY0Ixc3pKbjJLOXFWc1hC?=
+ =?utf-8?B?V2hwVGlVVHdLRHBiN3YyVCtlTEMvZ2xMMTA5WC85Sk8rdzFNNlRGaXRiT2Q3?=
+ =?utf-8?B?aERFZUVneGxYL3JzNmQ1eTJ1a1dHMENZUUFjeUhhMVEvSjRpVzRZblA4bHBI?=
+ =?utf-8?B?NDA2VzREbngyNytDR2lSZzJRYmZFbTZiaFlpZHdxc3dKWUhyUjdFaitUQ3VJ?=
+ =?utf-8?B?M3F1UWgxQWZVcmFhZXExU1FrNnQvSUdJbzBpd1VYMVhpU1htZ1BLcWdUcW53?=
+ =?utf-8?B?bFJmUk1xWm5Sak1DODdCRDdVa2VDOWszMVYyNEc4L3hLa0lzQ0JMcjUwTzJZ?=
+ =?utf-8?B?V3VzQitqZ1VZcUtwdjlMUXZ2bU9Bakd3L3NmSkw5ODNkeFlMNnh6NVlPWXds?=
+ =?utf-8?B?RDJOUFkzMVZURmNDaXBtdWUyWXNlOHIyL1g0dzhEQkczdkdOMXRsVlhtZU50?=
+ =?utf-8?B?TzhDN09URVBpOFdGem9pNS9PeTZxd3BGVVp1NUg5ZmFCeklZbFhGL3R3L3dn?=
+ =?utf-8?B?cXpsQ01pRDRURERSVngxWERiNWhsbEY3TVFicTlQUjVsNkRaQ0ZEcE1UL3F2?=
+ =?utf-8?Q?MAmzTvu1SC+QS?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:JH0PR03MB7468.apcprd03.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(366016)(376014)(1800799024)(921020);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?RkUzYnB0TU9JcTIzVVE0K0ZQMlB1N1psVUdBNUI5WTRtRGNYOUxTUTVxbFlW?=
+ =?utf-8?B?YmJOREovdkppTVZ0c3Z1d0tFN29EZDFGMWVWVHdFUVpaSWhad2RHd1FKTjAw?=
+ =?utf-8?B?Z053NkVRcFFrN0RnaVZHbURTRDJqZVNXUDQ1M2g5TDJwbXFrV3Y4TGdNd1RY?=
+ =?utf-8?B?UGhtS1U5TVlNQVB0NXVMNWw4RDRxYzNpOFZ5cExhRkhUMXJNc3BCeUw5akNw?=
+ =?utf-8?B?eVdPbnRHUENnTmdQNVhoQS9UeFhzUSt6MmxuUEJkbEVrOWJsN09oOWcwSC90?=
+ =?utf-8?B?c1VDZy82azIxR0pKR2FlVWtOQjU4OXJMWU1WOE9kb04yajhiRlFrYmFITEk1?=
+ =?utf-8?B?MkJ1U2pqWWNqUUFuaG50bndBYUhRckxOMHAwbUNIdm9Zem1XOGFsNUFmdE5q?=
+ =?utf-8?B?Q0xLY2hkd2lkUGdEdmdEeVJXNWNxY3EyRm5MRWljbEl3SGhTa0JlVE1lL1My?=
+ =?utf-8?B?TExjWEVJa3VkODdnUXEyaW5MS0lvUHVLWDZCbzF5ejRWTmtGZndQU1lXZDdX?=
+ =?utf-8?B?emRYOUJPVHRoUis2UzI5ZHljcFpRa3lYSzEwU2xZMEV2MGVMYjBCdkE0TDZV?=
+ =?utf-8?B?UDh4NVpsOUpLTWlmOE43VzdPTEdGQUg5RVQ4Y2RiOSt4Sk1KNmZGY1Iralgy?=
+ =?utf-8?B?a1prcWlpS0U2d0NuUFpFS0tEOGwwMGxBck1KL0pxbURqWjJRZERabmxDbmZs?=
+ =?utf-8?B?dzFjYmFFMkd2ajk3dHVFSkZYSnJwamZxbllpalEyYzVnSm1ONmVWRm11cVhG?=
+ =?utf-8?B?MC9Ycm5QRlgwYkZpUW16RHNZODdsT3UxcTVBS3Z5bUJ2NElhcmdHTlorcEtO?=
+ =?utf-8?B?cWFoT3VBRHltVjRCWGVYV09UMm9ra3NkRzRHTmFIbVFYRmlyWDdTRG9JV3JL?=
+ =?utf-8?B?M3RPV0hDUnpJWC9QZnlRR3NhNU1Pd2ppb1h3VXhUN3dVck81ZG5YazQ5SEU0?=
+ =?utf-8?B?aFBtZjhOUHJLdkRlTGNBR1FGbkROVFdQcGtYNndzY281bS9mZ2VjNWtQdjhE?=
+ =?utf-8?B?WWhhQW1la2huVmR1aXI4UnJOM2duUmZyU2kvOWdBd01nQzhkaStkMVlZWUZy?=
+ =?utf-8?B?TmU0Q2lPV3FzZWFTWWR3OCtqa2ZxWjA2d2xCdGtOS01RVGZSanBLOS85YVVZ?=
+ =?utf-8?B?cm5zVHhzMno5N3BTWitvVEpuWE1ZSlhtYXd2NC9wSXNCNDhNYXZiVVF2WFpo?=
+ =?utf-8?B?S2xPdGE2QW5EM3J5TDM5YlU0ZmpxdS9WVEZXV01oYisxM0hKK1lOZmxQdW9h?=
+ =?utf-8?B?RDhTQXhOQkhHSDgrKyt5WmsvTktsU3REdXBEbXliSXBQOXk3Y2IwY0dwTFNC?=
+ =?utf-8?B?YzdqREVVSEZibTA5bm5vbzRTQXYzd2hUQjhJbTVRbC9NeEFXMzFMTmxFSTNi?=
+ =?utf-8?B?Rm9wejBURkEyVW52TEFXSmI4VytSQzdUb0pqR0xMZmtqSytSK1ZaKzhsWldR?=
+ =?utf-8?B?UlVxZWo3aG1tZ0xCRmY2azZSV2p2TjkwNGpOaTgwTGFoYmREeUV5c3lWelRP?=
+ =?utf-8?B?am1wQUhadFpPNFlxYytDTVVxZFIyMUNTUXZLRmNCelVtSGsrb2ZoTzhmWVVy?=
+ =?utf-8?B?M2hHRTlZbEgwaHFOUmhEeW10d1JYazBFazc3RXJuTXYzdmgrbU1LeG11cFM3?=
+ =?utf-8?B?MVhSQ1E1Mm9KN0t6OTJuK2dzTnl1MzRmSVczRXRlM3AyY1BncFdxaFlTV0g2?=
+ =?utf-8?B?S01LRVkzODEwa0NUc1NDQ211Z3U1VWNVSE1kY1lraDRDZFcxWGdOOUhRaFYr?=
+ =?utf-8?B?UlhVYXd1RW5hc1JHQVM2NHFFNjVsbG5QN0NhTU9OdTVEQzZlenNMYlppSlZi?=
+ =?utf-8?B?UnQ3UDJOMzVGaTMycmJmaklnenBOa1cxQ2tBNHVGMTRrTVlHcTZjWXJndHdM?=
+ =?utf-8?B?QXNBallzeGtjSXpuOFpBUzB0M09KcE16NjhlZVBGZzJKdW9xaElHdHV1YkhT?=
+ =?utf-8?B?dE1lQm56Y1I5c2hZb2lVUXFYQzhiR1VqRkpyZXhJK2c5NHNCL0d1MmNrM2Fz?=
+ =?utf-8?B?OUZpNWh1OTZFRkJCUlB0T09sVlh0aTJ5OXVZd1pEeUZlSkhwNE40THVMN1dp?=
+ =?utf-8?B?K1hSSlZENTZoTXE0LzZVKzFJS2IxM3hHazQvQ1hFVDZIVjUzc3pEZmtnQ3Mz?=
+ =?utf-8?Q?2EtS8ZooeazhLSViSrEVO8lIr?=
+X-OriginatorOrg: amlogic.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9febb003-9879-4c5e-979f-08dca263c98f
+X-MS-Exchange-CrossTenant-AuthSource: JH0PR03MB7468.apcprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Jul 2024 11:14:24.7808
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0df2add9-25ca-4b3a-acb4-c99ddf0b1114
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: Qu9rvbwpD2RHFHTFvHUcgTcJtYLzF0VWSseHPPhZEZHcRqI2PzL1wGCrTdj9XY17ozWBSZeaI6vc7EircLTIGw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: TYZPR03MB8282
 
-Hi Trey,
+Hi,
 
-On Thu, Jul 11, 2024 at 4:14=E2=80=AFPM Ramsay, Trey <Trey.Ramsay@dell.com>=
- wrote:
->
-> Thanks Luiz,
-> Maybe I don't understand. In bluez 5.39, prep_write_cb would send BT_ATT_=
-OP_PREP_WRITE_RSP at the end of the function.  In the new code, prep_write_=
-complete_cb is supposed to send BT_ATT_OP_PREP_WRITE_RSP  but prep_write_co=
-mplete_cb  is never called from gatt_db_attribute_write.  Who is supposed t=
-o send the BT_ATT_OP_PREP_WRITE_RSP since prep_write_complete_cb  is not ge=
-tting called?  With the patch, prep_write_complete_cb will get called.
->
->
-> From Bluez 5.39
-> static void prep_write_cb(uint8_t opcode, const void *pdu,
->                                         uint16_t length, void *user_data)
-> {
->         struct bt_gatt_server *server =3D user_data;
->         uint16_t handle =3D 0;
->         uint16_t offset;
->         struct gatt_db_attribute *attr;
->         uint8_t ecode;
->
->         if (length < 4) {
->                 ecode =3D BT_ATT_ERROR_INVALID_PDU;
->                 goto error;
->         }
->
->         if (queue_length(server->prep_queue) >=3D server->max_prep_queue_=
-len) {
->                 ecode =3D BT_ATT_ERROR_PREPARE_QUEUE_FULL;
->                 goto error;
->         }
->
->         handle =3D get_le16(pdu);
->         offset =3D get_le16(pdu + 2);
->
->         attr =3D gatt_db_get_attribute(server->db, handle);
->         if (!attr) {
->                 ecode =3D BT_ATT_ERROR_INVALID_HANDLE;
->                 goto error;
->         }
->
->         util_debug(server->debug_callback, server->debug_data,
->                                 "Prep Write Req - handle: 0x%04x", handle=
-);
->
->         ecode =3D check_permissions(server, attr, BT_ATT_PERM_WRITE |
->                                                 BT_ATT_PERM_WRITE_AUTHEN =
-|
->                                                 BT_ATT_PERM_WRITE_ENCRYPT=
-);
->         if (ecode)
->                 goto error;
->
->         if (!store_prep_data(server, handle, offset, length - 4,
->                                                 &((uint8_t *) pdu)[4])) {
->                 ecode =3D BT_ATT_ERROR_INSUFFICIENT_RESOURCES;
->                 goto error;
->         }
->
->         bt_att_send(server->att, BT_ATT_OP_PREP_WRITE_RSP, pdu, length, N=
-ULL,     <------------------------- Response is sent
->                                                                 NULL, NUL=
-L);
->         return;
->
-> error:
->         bt_att_send_error_rsp(server->att, opcode, handle, ecode);
-> }
->
->
-> -------------------------------------------------------------------------=
--------------------------------------------------------------
-> In Bluez master, the response is sent from prep_write_complete_cb but the=
- call back is never called since gatt_db_attribute_write returns True befor=
-e func is executed which is the function pointer to prep_write_complete_cb
-> static void prep_write_complete_cb(struct gatt_db_attribute *attr, int er=
-r,
->                                                                 void *use=
-r_data)
-> {
->         struct prep_write_complete_data *pwcd =3D user_data;
->         uint16_t handle =3D 0;
->         uint16_t offset;
->
->         handle =3D get_le16(pwcd->pdu);
->
->         if (err) {
->                 bt_att_chan_send_error_rsp(pwcd->chan, BT_ATT_OP_PREP_WRI=
-TE_REQ,
->                                                                 handle, e=
-rr);
->                 free(pwcd->pdu);
->                 free(pwcd);
->
->                 return;
->         }
->
->         offset =3D get_le16(pwcd->pdu + 2);
->
->         if (!store_prep_data(pwcd->server, handle, offset, pwcd->length -=
- 4,
->                                                 &((uint8_t *) pwcd->pdu)[=
-4]))
->                 bt_att_chan_send_error_rsp(pwcd->chan, BT_ATT_OP_PREP_WRI=
-TE_RSP,
->                                         handle,
->                                         BT_ATT_ERROR_INSUFFICIENT_RESOURC=
-ES);
->
->         bt_att_chan_send_rsp(pwcd->chan, BT_ATT_OP_PREP_WRITE_RSP, pwcd->=
-pdu,  <-------------- Response is sent
->                                                                 pwcd->len=
-gth);
->
->         free(pwcd->pdu);
->         free(pwcd);
-> }
+On 2024/7/11 20:19, Krzysztof Kozlowski wrote:
+> On 11/07/2024 13:40, Yang Li wrote:
+>>       arm64: defconfig: enable Amlogic bluetooth relevant drivers as modules
+>>
+>>       CONFIG_BT_HCIUART_AML is the Bluetooth driver that enables support
+>> for Amlogic chips, including W155S2, W265S1, W265P1, and W265S2.
+> This still does not answer why we would like to have it in defconfig,
+> e.g. which mainline board uses it or benefits from it.
 
-It might be because of:
+Well, I understand.
 
-commit 1ebfc68ff53ea5ed5cb424df151bf413c7ffe9be
-Author: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@codecoup.pl>
-Date:   Mon May 28 10:20:52 2018 +0200
+I plan to submit this patch after the mainline board is ready for 
+contributions.
 
-    shared/gatt-server: Request authorization for prepare writes
+Thanks！
 
-    This patch adds gatt-server possibility to request authorization from
-    application if needed and previously wasn't authorized. Authorization i=
-s
-    requested by sending message with set prepare write authorization reqes=
-t
-    to client.
-
-Anyway we are talking about ancient changes here, what exactly is the
-attribute you are trying to use the so called long write procedure
-btw? Is that using bluetoothctl to register it or is some other
-application involved? Or is this some PTS test case that requires
-authorization? If you use bluetoothctl for that it might be prompting
-to authorize the request.
+>
+> Best regards,
+> Krzysztof
+>
