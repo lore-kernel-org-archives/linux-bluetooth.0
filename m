@@ -1,122 +1,60 @@
-Received: from mail-lf1-f46.google.com (mail-lf1-f46.google.com [209.85.167.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D239E1E4B2;
-	Mon, 15 Jul 2024 14:00:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D19E418C35B;
+	Mon, 15 Jul 2024 14:01:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721052014; cv=none; b=kXipbIevG5gyHpKpxLW318CqztdGc32uaDzd8xJ4Rgd7ypH91qIhUyDUScOe5aLVNoysZ63BNPuCNnW9ja31a+/3t3rKrR8SagwMhe6tKQ8CvXFGUrYrzKzLUzDmqZC4eiBjpGS8sFNOAEgPvMffF53XYQlDVI5atNzf4A8hxCA=
+	t=1721052094; cv=none; b=pp/g4aWat2kgjzwLbAnCxGO+wnwYvDPGvc8NYjXvGQxQGRgS15gSNAJpj0SuZxIxsQUT+fTK7+hPyBmG6PdgtFvb+xL73KmmVcu29CMZDGYNgoIIKzoYLYUXagkJlegz4CmbUYcthP0sr0rqM3dgz91DDYa4mvM/sUeXRSrLCY8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721052014; c=relaxed/simple;
-	bh=cYNMMXJNQ6K3pYS1CyeAn7PQPp0dduaDhVBQ9o9mykI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=HjaSxo4KHGw8kLX0DzUIZiE+cG8CbXl44mBe7Q7Px6EUytWGwKfJGG4YyNaLNYoNgf8BY3zxxfosCSOpkGubxF1Ker0Z+LfGT/mP3PPWQHlB2EFpc2h/PCnfxKBnWI6NR5859tWg/C+R5N9GTkxKrrSiAT3yi67kuItVl0Z+R34=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lGWqLs9s; arc=none smtp.client-ip=209.85.167.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1721052094; c=relaxed/simple;
+	bh=TeIlN+pxRlMLbfTJ9SKGctyyYOJ1QdfFvrULVFnZ00Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=jpByUmh6HyOJhNNaBDowI0IWHvH+ebQeOBzRV/gdxCvyqZEngGFY16CjVcUhU77qnGquOy3fXwDvAUttzLnnNMGkTmnDXdAgvM9Jq4Injp63KEeRTtzu5oBl1z3zUCjO69J+iQzZJTjnSWrroLJz5MbWkx4MMxx0n/9WXwUTKG0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tpQn2xuh; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lGWqLs9s"
-Received: by mail-lf1-f46.google.com with SMTP id 2adb3069b0e04-52e9a550e9fso5256264e87.0;
-        Mon, 15 Jul 2024 07:00:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1721052011; x=1721656811; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Bn4G4brw9udnRBDw/Bbw9ySIPLm1PcS3eVqaufETezI=;
-        b=lGWqLs9snjnA4fI3xCZg+bSyq/CVBbac17CvVN2vtpbyCvQyz1i8X9VYAeGFn1S9IV
-         WHsBqC3BYoR0plZHGv94YXhiPaarJuztVURCyPseckv/FxvE6jojhGiVuTZ9lgLT79oJ
-         8csUaf9cITPJPeKLwvaPJdUxDqPWR0CQ2r2RrlFLse/DdE6NgaoGSj88uR0eLAQmjSwU
-         u+qkm8NyVvJ6Hf3vB0INp7/Z8NfKH1Ymtc/5eEPH6LXUESf/Y+HdVeA2gOHelwFV/vpb
-         oCJsoOZXlID8ToN7meAefjDDZrzsr4dfKviKunct+ukbGFlChpCjvORxbvC/2u3zuNCE
-         774g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721052011; x=1721656811;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Bn4G4brw9udnRBDw/Bbw9ySIPLm1PcS3eVqaufETezI=;
-        b=XPmsCFt0FoO4ov4TjVRcjXGktCrF6jM1q8Zt6nDyK8LHRazq7LYiYyPkq1UMjhbCg0
-         IpDkqfYhQ6AHYD4yskFfEDH6Zp1/qWhz0oebZFbIENoa4LH0obPHfztLCfu95kgxNQAl
-         zFpvrmfqWMRS9YOGYVl+cBALhR+PajoHBQSaQd6nz2+9q5b7MmoC0Iezk3+FpGWZauUl
-         5CMGZMT2XyF+WD7j1kkI4BZzLtHYCsSvZKjQakh2aKkTZ4v67KUpUk4YPuxo4HQmRmgm
-         O7Vh7d/qrysye1jS3ETn6DvSrRtKlWdPgfqBOxB72NSXq1hjNPh54l/5fBTD+CsxWNka
-         /t1Q==
-X-Forwarded-Encrypted: i=1; AJvYcCVYzWT/NcqxS0cOH+maL0BCLKeD19Q0ZU/6gWYF2dt3ExLoHaszTWMbBaEiNjNgjOPYdrakzjzU1dcua9l9EyXlJonf6gbjFyGpoEVzfPjyOIhmxY9t+P08M3gFSuDYz2+jXydMMJDz
-X-Gm-Message-State: AOJu0Yx4/+ZEmiGdlYaKWPJ40VF4xud1VVmrXtgYqeLA1Fcd3bYsw7Yt
-	ggfVeSUyklSKivruAVw/8PpBBwbiuJn7GYIiAS8/D9rruukRIlJbqwZSBiJdcPdP2/BW7px6v3k
-	8WACcpx6TAOZ0lmyzgsJDmrn/zaw=
-X-Google-Smtp-Source: AGHT+IElEmWXblvhI4xeOFveXJji2/Q6Oxj2vUS8hwteYcCZLorKtw8RXhKgzNXyNoU8G/jGWY1lBqUW8XF5lVqHsyg=
-X-Received: by 2002:a05:6512:3baa:b0:52c:9820:5e52 with SMTP id
- 2adb3069b0e04-52ecb6a2f34mr3000406e87.27.1721052010664; Mon, 15 Jul 2024
- 07:00:10 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tpQn2xuh"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 36098C32782;
+	Mon, 15 Jul 2024 14:01:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1721052094;
+	bh=TeIlN+pxRlMLbfTJ9SKGctyyYOJ1QdfFvrULVFnZ00Y=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=tpQn2xuhwUr+2Ai9lxYrNnE0arz2Y+mtQrLlJgyW9w2DxvSK8mJ2idLGZ2LB2ThVy
+	 2dg9sc0KOZg+VbZMZJRxafb98csGAJxTgYJUYxGgS5mHiowMq40wNdT1XxybocCfvb
+	 mzde4yqq9OLNfnIRAt83e4j+ifKJZfrJXuY62w0OWkb80JzHhWTtAbYGw0gxSMos7d
+	 aZqgsKtdtkh9hVX6x59i1pwtlcmO7bw4tw3+C2wN8wsEFfkvGx5S69imlwqubh6mPh
+	 v5289ktKncsEo0pw1R+p409djZ1TXYeh5GwT6ee4/0iiAArSfb0r0O5nZ1cn16dqCx
+	 gVVENvftmFGAQ==
+Date: Mon, 15 Jul 2024 07:01:33 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>, davem@davemloft.net,
+ linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: pull request: bluetooth-next 2024-07-14
+Message-ID: <20240715070133.63140316@kernel.org>
+In-Reply-To: <CACMJSes7rBOWFWxOaXZt70++XwDBTNr3E4R9KTZx+HA0ZQFG9Q@mail.gmail.com>
+References: <20240715015726.240980-1-luiz.dentz@gmail.com>
+	<20240715064939.644536f3@kernel.org>
+	<CACMJSes7rBOWFWxOaXZt70++XwDBTNr3E4R9KTZx+HA0ZQFG9Q@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240715015726.240980-1-luiz.dentz@gmail.com> <20240715064939.644536f3@kernel.org>
- <CACMJSes7rBOWFWxOaXZt70++XwDBTNr3E4R9KTZx+HA0ZQFG9Q@mail.gmail.com>
-In-Reply-To: <CACMJSes7rBOWFWxOaXZt70++XwDBTNr3E4R9KTZx+HA0ZQFG9Q@mail.gmail.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 15 Jul 2024 09:59:57 -0400
-Message-ID: <CABBYNZKudJ=7F2px9DYcqgpfEJX7n1+p4ASsH24VwELSMt8X4w@mail.gmail.com>
-Subject: Re: pull request: bluetooth-next 2024-07-14
-To: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-Cc: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net, linux-bluetooth@vger.kernel.org, 
-	netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hi Bartosz,
-
-On Mon, Jul 15, 2024 at 9:56=E2=80=AFAM Bartosz Golaszewski
-<bartosz.golaszewski@linaro.org> wrote:
->
-> On Mon, 15 Jul 2024 at 15:49, Jakub Kicinski <kuba@kernel.org> wrote:
-> >
-> > On Sun, 14 Jul 2024 21:57:25 -0400 Luiz Augusto von Dentz wrote:
-> > >  - qca: use the power sequencer for QCA6390
-> >
-> > Something suspicious here, I thought Bartosz sent a PR but the commits
-> > appear with Luiz as committer (and lack Luiz's SoB):
-> >
-> > Commit ead30f3a1bae ("power: pwrseq: add a driver for the PMU module on=
- the QCom WCN chipsets") committer Signed-off-by missing
-> >         author email:    bartosz.golaszewski@linaro.org
-> >         committer email: luiz.von.dentz@intel.com
-> >         Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.=
-org>
-> >
-> > Commit e6491bb4ba98 ("power: sequencing: implement the pwrseq core")
-> >         committer Signed-off-by missing
-> >         author email:    bartosz.golaszewski@linaro.org
-> >         committer email: luiz.von.dentz@intel.com
-> >         Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.=
-org>
-> >
-> > Is this expected? Any conflicts due to this we need to tell Linus about=
-?
->
+On Mon, 15 Jul 2024 15:55:56 +0200 Bartosz Golaszewski wrote:
 > Luiz pulled the immutable branch I provided (on which my PR to Linus
 > is based) but I no longer see the Merge commit in the bluetooth-next
 > tree[1]. Most likely a bad rebase.
->
+> 
 > Luiz: please make sure to let Linus (or whomever your upstream is)
 > know about this. I'm afraid there's not much we can do now, the
 > commits will appear twice in mainline. :(
 
-My bad, didn't you send a separate pull request though? I assumed it
-is already in net-next, but apparently it is not, doesn't git skip if
-already applied?
-
-> Bart
->
-> [1] https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-n=
-ext.git/log/
-
-
-
---=20
-Luiz Augusto von Dentz
+If Luiz does rebases, maybe he could rebase, drop the patches and
+re-pull again? Or, you know, re-pull in the middle of a rebase
+so that build doesn't break. Should be pretty.. doable.. ?
