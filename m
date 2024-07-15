@@ -1,268 +1,95 @@
-Received: from mail-vs1-f41.google.com (mail-vs1-f41.google.com [209.85.217.41])
+Received: from mail-qv1-f41.google.com (mail-qv1-f41.google.com [209.85.219.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3951D4C6D;
-	Mon, 15 Jul 2024 01:57:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F038D79C4
+	for <linux-bluetooth@vger.kernel.org>; Mon, 15 Jul 2024 02:20:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721008651; cv=none; b=C5B1WI7rbTZ+PnMLLZP+7TS96G8BQOJUk73+XHfQ10C36p3wSAyZuoyFffAJ1VEMAeJulH4jpwaf/4k4xTbo/bKGy6tqC7yaVWDAtKXR6Gxu3/C1mCOXerGbalBnzdZ1RAmhA+ALpkHvH+Oxdh9DRSXaWSpxKLkUBhzy+uTM58Y=
+	t=1721010022; cv=none; b=nBvdNWa12pjQJJlOd9m2feWroXtPUJZ+OlVUvHQdVpspkFTwzEFORTupGsdcFi7U1z7IsR/10Au8yYbls4oVmUiTWO4mZzr+NkEuDJoo+TRFVY9Kk2YHfPhBrNDsGqUpkJkaATYFalxZLfRDn734IcF0FnZT4kuyOwEtkhL1OIs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721008651; c=relaxed/simple;
-	bh=OuNxg4SyisqoYTpugBkifogfp8+FMkicttf8xlU8Lds=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=tOQcNRISJNtZ/yDS2dbxrMRse0gVXcjY5UB1WP6mZAt4uWFoEMCGGwuNpTMwozfe9A+Dwr+F+d3UUt76H7Brx1TStASC0zcN82PCHBlXO4hieYtLdc1zGRoNOR5MIfVZ4UrEHnefwdYCmeuUqpLiHWOdeEYrvSz5wEbwTB29ha0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JL8cuBf2; arc=none smtp.client-ip=209.85.217.41
+	s=arc-20240116; t=1721010022; c=relaxed/simple;
+	bh=niw5kQhL5FQ64ZDudfitWO0ZNK+Wac8SWIQteKsKnKM=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=TEGLBVeQJcr4UMN1qIr5zNlbL/mWVAxv4mue32QNf135Dg9gP2bkMR52xHG4AuuvOftHGOAExmZ0cIIKI/Gg1nagNN/Z7LDOhZpjajuKIjDiGHwXEZuu64haKlGN/4U7tvPQ+ogD3o6EnSO/Etdj+K0hHVsf8GyVXYUoT9wOdOo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fuPijDh3; arc=none smtp.client-ip=209.85.219.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JL8cuBf2"
-Received: by mail-vs1-f41.google.com with SMTP id ada2fe7eead31-48febcc8819so1234540137.3;
-        Sun, 14 Jul 2024 18:57:29 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fuPijDh3"
+Received: by mail-qv1-f41.google.com with SMTP id 6a1803df08f44-6b760dc7e08so10370746d6.3
+        for <linux-bluetooth@vger.kernel.org>; Sun, 14 Jul 2024 19:20:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1721008649; x=1721613449; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=s1bzw4N4ihQbEQvCrglGZq3E25cCoWxIrrSdLILtAzg=;
-        b=JL8cuBf2I7/uD5IngMgxsHyeQU9QYIr+UG9cRZJ/cZvYcXntQZDeXNddhacR3/lWJh
-         u6Prz5gBf6eP7yDgNbVaeMXuvpxblf5ZtBmlvAAgp8yEZkWZTrXVaMYY8dh0wWrHC3Kk
-         zCNbBZwO7/aOsCNQYAyyERRGKlIjvorR5ZODmpNnuV3Q2uSgswgRZMAhji7dUuspQ8PB
-         W0/Ab8VZPCJ9Tzh33NKLj8S+bvMuxCrLUIYS9FXJ3dHHEywREAWlvCp1nK1ET3cP18mJ
-         xMsV8NaLwhvsdqUMcfT1Y0klprn4UKL/3DXlEa3DESyCR4NSYYTjysOJtHH4+KXKvRGj
-         /OJQ==
+        d=gmail.com; s=20230601; t=1721010020; x=1721614820; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=niw5kQhL5FQ64ZDudfitWO0ZNK+Wac8SWIQteKsKnKM=;
+        b=fuPijDh3/m8cckXazPz7KpptmHmlnAbWe17fUAuczvHWlcYxFZS5007/+NwmtUIf/L
+         mpIj+CzrywGDw3Pv/j8y2sCK2xtQinpSSMMZXfp19SN4+DFTfLZW2X0kHr8BdfGWxD08
+         TS0yn182LS1XLNCTd15PTTCSGUadPgTBeozCwhVQywwXP0OzdbwJMkg5uAu47dHC6mP5
+         HT/Am7uOz7HNVo5JT6NAcnqW+L6aa7XDk0gxGVZ2yS3vCkrpmbrf/k2pMFTapYlgirxy
+         +Ju8Q+D0q16PjH+GbvcfWBKQv3HJHQGjDr7bsysbfHoW3DMPhXAYGwuiw0cgOrY59Nyu
+         /L4A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721008649; x=1721613449;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20230601; t=1721010020; x=1721614820;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=s1bzw4N4ihQbEQvCrglGZq3E25cCoWxIrrSdLILtAzg=;
-        b=OgeJEfi7Mg61CeWfMd1UkT6TF51t6FpeFErwKCrsszspJ+AMLju8roWtJRgS+13oEa
-         E5lmysw0UAE4zez7ELP8fUin8GDFxT+qU6mwErwvQnAVlA5YkI+n0sDl1jiiPyQktdnH
-         VfVKs39sqLq1Cf3rBrjMr48dxbE3MREuHk/y5Xk7aIe+nHzlmwXQD3uaEvstSUI76t12
-         9gNvoX7Avf1Y9d3HQK6ZtQ2ukOC2UYlcVy7nFkpi2QIv7VMEWQwMcWKrJtb9e9v8c/83
-         +JtDfLyxJBc8iuFC4cb0dfa/QHAkiWbbLuxzEs9c2gUibyerpvsZsSj3UxE3oxJv6qq8
-         qeCw==
-X-Forwarded-Encrypted: i=1; AJvYcCXRtpnao0jQLFM/kw+QnjqA4cLfolH4HwLqu1kcIbaYVW0WWfv02RjScldkwCmOvhF5Zs23lg2SU+tAiUhRPi3ysCOw0VYP
-X-Gm-Message-State: AOJu0Yzh6hZw4kY33IPxfsqc0ihge7MBNOBLSgurHdhIAp0AqFB1fAtu
-	rJVgYEGWvUgj7p1EqZQbXTDQLa/BEyem40TjzS5Nj+x+p8dTQ0pA
-X-Google-Smtp-Source: AGHT+IHt0uacfBwrPc0cra6ePddk8HgJfo1UyW6Mcy5gQ2aQUsW+sgKUafiDOycg8U3F05aIs9SCQQ==
-X-Received: by 2002:a05:6102:419f:b0:48f:df2c:6d65 with SMTP id ada2fe7eead31-49032103aaamr21732816137.6.1721008648881;
-        Sun, 14 Jul 2024 18:57:28 -0700 (PDT)
-Received: from lvondent-mobl4.. (syn-107-146-107-067.res.spectrum.com. [107.146.107.67])
-        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-81503304136sm616475241.29.2024.07.14.18.57.27
+        bh=niw5kQhL5FQ64ZDudfitWO0ZNK+Wac8SWIQteKsKnKM=;
+        b=VdW1hZyG+39bymBjo9oUpdNdup5eMbviUI35leP7a30CgzsRceZ13l1vC3aadNcw/U
+         gcV6MqPlWL+XQVwgPX4+XLeTGXjfmJEOZ/00H4WOudjHdhKAK1QeZ5EVG/lTUcC33CS2
+         OVRCoWIXtsnaE3mrkzMpq5X7aompzzmqHf2mG/yaZv6CTorJWb7X7zePNF5+qMHrq0/y
+         nwO520H9VkPBK/9WYeKUngXOVVd97K4OnAt52Xy5fw4MpCjVH4Cih6vwMioyUInh0KN4
+         VtDbocgFf0g+Fxk5qq26eD+6vC1P9G6VUjTIOfdOLVS3fx68uNCpOggDZFTyrmgWxIQa
+         ZzVg==
+X-Gm-Message-State: AOJu0YwkW8ovZtAos+nv/V5A6otZD01Y9apCOoN66Z7EvhsFR6Tme7Qp
+	80LhqZF8hLG3/js5HKDhKzdyE/sL1u0SG1hw4BFRS7qCrl7o2ZwObO7G5Q==
+X-Google-Smtp-Source: AGHT+IGlPgNfS+EvUNh1ofd/UyvTzAFvGliA+6EFs20T8wa+YbfAqbXVwF1WZv4o7mnu7T6vTkHZyA==
+X-Received: by 2002:a05:6214:2a8b:b0:6b5:e3ae:d8e3 with SMTP id 6a1803df08f44-6b61c1c5190mr238869876d6.51.1721010019824;
+        Sun, 14 Jul 2024 19:20:19 -0700 (PDT)
+Received: from [172.17.0.2] ([20.84.127.108])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6b76198db00sm17405236d6.58.2024.07.14.19.20.19
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 14 Jul 2024 18:57:28 -0700 (PDT)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: davem@davemloft.net,
-	kuba@kernel.org
-Cc: linux-bluetooth@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: pull request: bluetooth-next 2024-07-14
-Date: Sun, 14 Jul 2024 21:57:25 -0400
-Message-ID: <20240715015726.240980-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.45.2
+        Sun, 14 Jul 2024 19:20:19 -0700 (PDT)
+Message-ID: <66948763.050a0220.bedd7.4a99@mx.google.com>
+Date: Sun, 14 Jul 2024 19:20:19 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============4776150270363497109=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [v2] Bluetooth: hci_qca: Fix build error
+In-Reply-To: <20240715015109.239742-2-luiz.dentz@gmail.com>
+References: <20240715015109.239742-2-luiz.dentz@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-The following changes since commit ecb1e1dcb7b5d68828c13ab3f99e399b4ec0c350:
+--===============4776150270363497109==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-  Merge branch 'introduce-en7581-ethernet-support' (2024-07-14 07:46:55 -0700)
+This is an automated email and please do not reply to this email.
 
-are available in the Git repository at:
+Dear Submitter,
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git tags/for-net-next-2024-07-14
+Thank you for submitting the patches to the linux bluetooth mailing list.
+While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
 
-for you to fetch changes up to f624ec7b1d32b427ee820d8e824c636c859351e0:
+----- Output -----
 
-  Bluetooth: btmtk: Mark all stub functions as inline (2024-07-14 21:39:22 -0400)
+error: patch failed: drivers/bluetooth/hci_qca.c:2499
+error: drivers/bluetooth/hci_qca.c: patch does not apply
+hint: Use 'git am --show-current-patch' to see the failed patch
 
-----------------------------------------------------------------
-bluetooth-next pull request for net-next:
+Please resolve the issue and submit the patches again.
 
- - qca: use the power sequencer for QCA6390
- - btusb: mediatek: add ISO data transmission functions
- - hci_bcm4377: Add BCM4388 support
- - btintel: Add support for BlazarU core
- - btintel: Add support for Whale Peak2
- - btnxpuart: Add support for AW693 A1 chipset
- - btnxpuart: Add support for IW615 chipset
- - btusb: Add Realtek RTL8852BE support ID 0x13d3:0x3591
 
-----------------------------------------------------------------
-Bartosz Golaszewski (10):
-      power: sequencing: implement the pwrseq core
-      power: pwrseq: add a driver for the PMU module on the QCom WCN chipsets
-      dt-bindings: net: bluetooth: qualcomm: describe regulators for QCA6390
-      Bluetooth: qca: use the power sequencer for QCA6390
-      Bluetooth: qca: don't disable power management for QCA6390
-      dt-bindings: bluetooth: qualcomm: describe the inputs from PMU for wcn7850
-      Bluetooth: hci_qca: schedule a devm action for disabling the clock
-      Bluetooth: hci_qca: unduplicate calls to hci_uart_register_device()
-      Bluetooth: hci_qca: make pwrseq calls the default if available
-      Bluetooth: hci_qca: use the power sequencer for wcn7850 and wcn6855
+---
+Regards,
+Linux Bluetooth
 
-Chris Lu (8):
-      Bluetooth: btusb: mediatek: remove the unnecessary goto tag
-      Bluetooth: btusb: mediatek: return error for failed reg access
-      Bluetooth: btmtk: rename btmediatek_data
-      Bluetooth: btusb: add callback function in btusb suspend/resume
-      Bluetooth: btmtk: move btusb_mtk_hci_wmt_sync to btmtk.c
-      Bluetooth: btmtk: move btusb_mtk_[setup, shutdown] to btmtk.c
-      Bluetooth: btmtk: move btusb_recv_acl_mtk to btmtk.c
-      Bluetooth: btusb: mediatek: add ISO data transmission functions
 
-Dan Carpenter (1):
-      Bluetooth: MGMT: Uninitialized variable in load_conn_param()
-
-Dmitry Antipov (2):
-      Bluetooth: hci_core, hci_sync: cleanup struct discovery_state
-      Bluetooth: hci_core: cleanup struct hci_dev
-
-Dr. David Alan Gilbert (2):
-      Bluetooth/nokia: Remove unused struct 'hci_nokia_radio_hdr'
-      Bluetooth: iso: remove unused struct 'iso_list_data'
-
-Erick Archer (5):
-      Bluetooth: hci_core: Prefer struct_size over open coded arithmetic
-      Bluetooth: hci_core: Prefer array indexing over pointer arithmetic
-      tty: rfcomm: prefer struct_size over open coded arithmetic
-      tty: rfcomm: prefer array indexing over pointer arithmetic
-      Bluetooth: Use sizeof(*pointer) instead of sizeof(type)
-
-Hao Qin (3):
-      Bluetooth: btusb: mediatek: refactor the function btusb_mtk_reset
-      Bluetooth: btusb: mediatek: reset the controller before downloading the fw
-      Bluetooth: btusb: mediatek: add MT7922 subsystem reset
-
-Hector Martin (2):
-      Bluetooth: hci_bcm4377: Increase boot timeout
-      Bluetooth: hci_bcm4377: Add BCM4388 support
-
-Hilda Wu (1):
-      Bluetooth: btusb: Add RTL8852BE device 0489:e125 to device tables
-
-Iulia Tanasescu (1):
-      Bluetooth: hci_event: Set QoS encryption from BIGInfo report
-
-Kiran K (7):
-      Bluetooth: btintel: Refactor btintel_set_ppag()
-      Bluetooth: btintel_pcie: Print Firmware Sequencer information
-      Bluetooth: btintel_pcie: Fix irq leak
-      Bluetooth: btintel: Add firmware ID to firmware name
-      Bluetooth: btintel: Fix the sfi name for BlazarU
-      Bluetooth: btintel: Add support for BlazarU core
-      Bluetooth: btintel: Add support for Whale Peak2
-
-Krzysztof Kozlowski (1):
-      Bluetooth: hci: fix build when POWER_SEQUENCING=m
-
-Luiz Augusto von Dentz (8):
-      Bluetooth: MGMT: Make MGMT_OP_LOAD_CONN_PARAM update existing connection
-      Bluetooth: Fix usage of __hci_cmd_sync_status
-      Bluetooth: hci_core: Remove usage of hci_req_sync
-      Bluetooth: hci_core: Don't use hci_prepare_cmd
-      Bluetooth: hci_sync: Move handling of interleave_scan
-      Bluetooth: hci_sync: Remove remaining dependencies of hci_request
-      Bluetooth: Remove hci_request.{c,h}
-      Bluetooth: hci_qca: Fix build error
-
-Luke Wang (1):
-      Bluetooth: btnxpuart: Shutdown timer and prevent rearming when driver unloading
-
-Nathan Chancellor (1):
-      Bluetooth: btmtk: Mark all stub functions as inline
-
-Neeraj Sanjay Kale (10):
-      Bluetooth: btnxpuart: Fix Null pointer dereference in btnxpuart_flush()
-      Bluetooth: btnxpuart: Enable status prints for firmware download
-      Bluetooth: btnxpuart: Handle FW Download Abort scenario
-      dt-bindings: net: bluetooth: nxp: Add firmware-name property
-      Bluetooth: btnxpuart: Update firmware names
-      Bluetooth: btnxpuart: Add handling for boot-signature timeout errors
-      Bluetooth: btnxpuart: Add support for AW693 A1 chipset
-      Bluetooth: btnxpuart: Add support for IW615 chipset
-      Bluetooth: btnxpuart: Add system suspend and resume handlers
-      Bluetooth: btnxpuart: Fix warnings for suspend and resume functions
-
-Paul Menzel (1):
-      Bluetooth: btintel: Fix spelling of *intermediate* in comment
-
-Rafał Miłecki (1):
-      dt-bindings: net: bluetooth: convert MT7622 Bluetooth to the json-schema
-
-Sean Wang (2):
-      Bluetooth: btmtk: add the function to get the fw name
-      Bluetooth: btmtk: apply the common btmtk_fw_get_filename
-
-Sven Peter (1):
-      Bluetooth: hci_bcm4377: Use correct unit for timeouts
-
-Thorsten Blum (1):
-      Bluetooth: btintel_pcie: Remove unnecessary memset(0) calls
-
-WangYuli (1):
-      Bluetooth: btusb: Add Realtek RTL8852BE support ID 0x13d3:0x3591
-
-Ying Hsu (1):
-      Bluetooth: Add vendor-specific packet classification for ISO data
-
- .../net/bluetooth/mediatek,mt7622-bluetooth.yaml   |   51 +
- .../bindings/net/bluetooth/nxp,88w8987-bt.yaml     |    4 +
- .../bindings/net/bluetooth/qualcomm-bluetooth.yaml |   35 +-
- .../devicetree/bindings/net/mediatek-bluetooth.txt |   36 -
- MAINTAINERS                                        |    8 +
- drivers/bluetooth/Kconfig                          |    7 +-
- drivers/bluetooth/btintel.c                        |  240 +++--
- drivers/bluetooth/btintel.h                        |   11 +-
- drivers/bluetooth/btintel_pcie.c                   |   10 +-
- drivers/bluetooth/btmtk.c                          | 1085 ++++++++++++++++++-
- drivers/bluetooth/btmtk.h                          |  118 ++-
- drivers/bluetooth/btmtksdio.c                      |    4 +
- drivers/bluetooth/btmtkuart.c                      |    1 +
- drivers/bluetooth/btnxpuart.c                      |  242 ++++-
- drivers/bluetooth/btrtl.c                          |    2 +-
- drivers/bluetooth/btusb.c                          |  735 ++-----------
- drivers/bluetooth/hci_bcm4377.c                    |   66 +-
- drivers/bluetooth/hci_ldisc.c                      |    2 +-
- drivers/bluetooth/hci_nokia.c                      |    5 -
- drivers/bluetooth/hci_qca.c                        |  133 ++-
- drivers/bluetooth/hci_vhci.c                       |    2 +-
- drivers/power/Kconfig                              |    1 +
- drivers/power/Makefile                             |    1 +
- drivers/power/sequencing/Kconfig                   |   29 +
- drivers/power/sequencing/Makefile                  |    6 +
- drivers/power/sequencing/core.c                    | 1105 ++++++++++++++++++++
- drivers/power/sequencing/pwrseq-qcom-wcn.c         |  336 ++++++
- include/linux/pwrseq/consumer.h                    |   56 +
- include/linux/pwrseq/provider.h                    |   75 ++
- include/net/bluetooth/bluetooth.h                  |    4 +
- include/net/bluetooth/hci_core.h                   |    7 +-
- include/net/bluetooth/hci_sock.h                   |    2 +-
- include/net/bluetooth/hci_sync.h                   |   26 +
- include/net/bluetooth/rfcomm.h                     |    2 +-
- net/bluetooth/Makefile                             |    3 +-
- net/bluetooth/hci_conn.c                           |    1 -
- net/bluetooth/hci_core.c                           |   95 +-
- net/bluetooth/hci_debugfs.c                        |    1 -
- net/bluetooth/hci_event.c                          |    3 +-
- net/bluetooth/hci_request.c                        |  903 ----------------
- net/bluetooth/hci_request.h                        |   71 --
- net/bluetooth/hci_sync.c                           |  103 +-
- net/bluetooth/iso.c                                |    5 -
- net/bluetooth/mgmt.c                               |   51 +-
- net/bluetooth/msft.c                               |    1 -
- net/bluetooth/rfcomm/tty.c                         |   23 +-
- 46 files changed, 3693 insertions(+), 2014 deletions(-)
- create mode 100644 Documentation/devicetree/bindings/net/bluetooth/mediatek,mt7622-bluetooth.yaml
- create mode 100644 drivers/power/sequencing/Kconfig
- create mode 100644 drivers/power/sequencing/Makefile
- create mode 100644 drivers/power/sequencing/core.c
- create mode 100644 drivers/power/sequencing/pwrseq-qcom-wcn.c
- create mode 100644 include/linux/pwrseq/consumer.h
- create mode 100644 include/linux/pwrseq/provider.h
- delete mode 100644 net/bluetooth/hci_request.c
- delete mode 100644 net/bluetooth/hci_request.h
+--===============4776150270363497109==--
