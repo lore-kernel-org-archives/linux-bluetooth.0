@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7264A1E528
-	for <linux-bluetooth@vger.kernel.org>; Mon, 15 Jul 2024 15:20:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA2AF10A24;
+	Mon, 15 Jul 2024 15:50:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721056833; cv=none; b=eA7LefHw+uFHAf8O+o6C4vgbj9qJoF+xx7MqXSNgvtgvgWKOlqWsa2Z/iZRgmY6So6+vmglot5EajXxOoG1XMFny5UZzx51wtO5UH3d8o7YV64AZGGMIcCFkMLKK9iDgZMWp410mGsb64qtisWzAw9DQwP+5uSBpylLFrS+mvE0=
+	t=1721058638; cv=none; b=RnPuqWb/q9T+ce2LLVnCWxBBFyS344IjGBjEqibwek+FjF3ZbwhiWKouiWOZPHApmAJ4GL2qw+ZlqiA4TuPRLjcxBorgYXTVythBjj4IxECWDjqItvF8WrU/hEplnZkyOaDQtTq8w756Knnv+O6PuPlRud02VGMT6EtYwNm8J+E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721056833; c=relaxed/simple;
-	bh=kDK6cjgciObMBR4CH632wumzmpQC96ESTLeaBSEe3hU=;
+	s=arc-20240116; t=1721058638; c=relaxed/simple;
+	bh=QssDV5F/1+NqZXTi1/6udd41BVsS8TRv09WruBusyuw=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=mw/vj2bQagrpaQxpvw66prvwf5wcLdumJSl4fsk7KwUcCTN9F1yrHrAKGyTm0rrx5Nnhk/khWeCi40Mm7A122ZsIM3S3zmXv4D2MbwAnxp2muJB/oxJqslZp3KAWVMfbW0BJfba+4laCzP3Y10BzsSXve5h1bzJwfHCtaCYkfQA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RfZYweOi; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=otGCDRGO7kAVke6MkPtGMTFDqVHTqkHg/wyV8nWbYRbuqN9JMVkML02qwL4Jt38nHoEbhGCBUIpDtO+jV+TXsDdOkQm+elj4bsgEMHgPWm1cw9QeDcHkBxFfYn2emvspaVvcBmVRjYlzSqyLliDKRu3iIn9bVkFhMmk+v2llbe8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NFiYflHn; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RfZYweOi"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id D7411C4AF0E;
-	Mon, 15 Jul 2024 15:20:32 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NFiYflHn"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 75813C4AF12;
+	Mon, 15 Jul 2024 15:50:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1721056832;
-	bh=kDK6cjgciObMBR4CH632wumzmpQC96ESTLeaBSEe3hU=;
+	s=k20201202; t=1721058637;
+	bh=QssDV5F/1+NqZXTi1/6udd41BVsS8TRv09WruBusyuw=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=RfZYweOirCs+rva6MoZRev5uJ70ICAUzYknlDcUmT6wAdOq/MOJ/XzuQoxYzv1l2A
-	 OU9f1WXdw4QY/4/nL4/ytME/+KSO9DeoYWy0f0tfioHa7aXfAeyF2JTebok0PkJhU0
-	 aJM0x1FrS2TM0tFJSHzLPMmvQgRA0QAlAxYbcxG2kpXkDWY70Urkk/BGmXUTJiPpyv
-	 a7NCx/j3DdnkCxDSZFp1MxTE6wcFk2SuFBM7IXqwS8bPuYxOgHrQMQ3S+4NRh3jCiH
-	 1NV9zC0NcgEVFi9RkxgQuMJySQgVyvK021xb7E2bCixa5/JIYWjbJPuF7lsMk07WUU
-	 brTkVFPJ+ggzQ==
+	b=NFiYflHnSKyaBcS2UJhvHYNPwFANYviTqwuV2mfURnWlCck9mL4Q9rJSkyBB7G2rN
+	 cxQgibfRxbzrN9x/X3Gh7V3YKESNd3Ss/mMjJ1/RwtI0t0RzrouTIpGHZhPb0K3Lvm
+	 K9fhvuSYi17hL1xxaugFXY87FtGVctfnt9GeU4ZWUA/d9hbudl9LwMz0RgCMVaJ51G
+	 r9YKnBmrWnF7+pHO269hRvUouA+mFdrYCkgAzhrIFVbOJfygobVR5CPtrHWloQogez
+	 GgFOx6RPGD+bK55eZmsIUkuu0SbyY8WcUOp8U44n9TZIYdToWWnEug1fZqIQ6qsOhB
+	 /RIWMefJtGCAg==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id C3BF9C43443;
-	Mon, 15 Jul 2024 15:20:32 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 6460BC433E9;
+	Mon, 15 Jul 2024 15:50:37 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -37,40 +37,36 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH BlueZ v1] shared/bap: Fix ASE notification order
-From: patchwork-bot+bluetooth@kernel.org
+Subject: Re: pull request: bluetooth-next 2024-07-15
+From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <172105683279.9943.13390261019644217441.git-patchwork-notify@kernel.org>
-Date: Mon, 15 Jul 2024 15:20:32 +0000
-References: <20240712193820.3945762-1-luiz.dentz@gmail.com>
-In-Reply-To: <20240712193820.3945762-1-luiz.dentz@gmail.com>
+ <172105863740.27506.12607157949653999686.git-patchwork-notify@kernel.org>
+Date: Mon, 15 Jul 2024 15:50:37 +0000
+References: <20240715142543.303944-1-luiz.dentz@gmail.com>
+In-Reply-To: <20240715142543.303944-1-luiz.dentz@gmail.com>
 To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
+Cc: davem@davemloft.net, kuba@kernel.org, linux-bluetooth@vger.kernel.org,
+ netdev@vger.kernel.org
 
 Hello:
 
-This patch was applied to bluetooth/bluez.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+This pull request was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-On Fri, 12 Jul 2024 15:38:20 -0400 you wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+On Mon, 15 Jul 2024 10:25:42 -0400 you wrote:
+> The following changes since commit ecb1e1dcb7b5d68828c13ab3f99e399b4ec0c350:
 > 
-> When processing a CP operation the CP shall be notified ahead of
-> the ASE itself:
+>   Merge branch 'introduce-en7581-ethernet-support' (2024-07-14 07:46:55 -0700)
 > 
->   'If the server successfully completes a client-initiated ASE Control
->   operation for an ASE, the server shall send a notification of the ASE
->   Control Point characteristic value formatted as defined in Table 4.7.
->   The server shall then perform the behavior defined in Section 5.1
->   through Section 5.8 for that ASE Control operation and send
->   notifications of any ASE characteristic values written during that
->   ASE Control operation.'
+> are available in the Git repository at:
+> 
+>   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git tags/for-net-next-2024-07-15
 > 
 > [...]
 
 Here is the summary with links:
-  - [BlueZ,v1] shared/bap: Fix ASE notification order
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=73266377b018
+  - pull request: bluetooth-next 2024-07-15
+    https://git.kernel.org/netdev/net-next/c/cd9b6f4795e7
 
 You are awesome, thank you!
 -- 
