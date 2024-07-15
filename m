@@ -1,55 +1,54 @@
-Received: from mail-pj1-f53.google.com (mail-pj1-f53.google.com [209.85.216.53])
+Received: from mail-yw1-f182.google.com (mail-yw1-f182.google.com [209.85.128.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51FBD18E76D;
-	Mon, 15 Jul 2024 14:10:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F35F18E749
+	for <linux-bluetooth@vger.kernel.org>; Mon, 15 Jul 2024 14:16:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721052617; cv=none; b=oru8Wm4pZvgiPH/8l3ahXbdkLuF0YtyFHpmjG4ZDVMAM39z5S06UFExDzG2QUjgnu9JV69/2T5b4s0i7c436x/vO7Xq6x1/02FYkULNyZSfdvom3d24TjASgE6d4pFU/OXZqttjmoFcZiNNTr5w09nONUdeRaPEb/vRW9xYm5o4=
+	t=1721052967; cv=none; b=R7ph+cg89b8Ll3mkDw1xlSXyZAFzJYIjppvFkdk8/qESsXzqaO74OQkPKCuqRkG/u/nUAPAZYTQhi9zNkFIB7NjpFhnE3lIxg93r70E9dxO999EoTI0Ax1IEcGEtnpeNNE7xwybfyNZDUEVSYJDNzhib0u9IVvCoSNashc1PjfU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721052617; c=relaxed/simple;
-	bh=u5b0ub2VwLry+AXt7LnUxK290f3uLSPjW34khDg5Msg=;
+	s=arc-20240116; t=1721052967; c=relaxed/simple;
+	bh=zPrpwQlL2crmjNa4smp42LfL5xsAOvhXZdKXxy3/kok=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=StrvqmM3a/0ygnGxQQYBSjWhtbXzQyUuHEVj5HgxAXFTIHpkb933xHOxcMKZnbtpVOvbCawT/Fs0mGBnIiYy3XoPP7Iai0Y7yEw9jR2ppaWjKlcV8nJ4dodY8C8jTck7nN/PpK2auwBaY+rFEMtPIYmAwAjianY3sNps4B4URcI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GRXkSC9t; arc=none smtp.client-ip=209.85.216.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	 To:Cc:Content-Type; b=DSWhW19ILLslURMlTxNxC/N4hsEFY0sh4TfyRmtpRWmp7+uNkkK7gkMRCtFuRRV2K5PT4AsndEAMEiYdF4hHBG+A7hZLjmEmHa0mbORDvS3YVNgnT8Pj3QMMn9YpU6v9kgbGu2J2j2OmrJpq1UpRtYZA/b0G1D8NxbaKzbVTki8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=raBh8GWe; arc=none smtp.client-ip=209.85.128.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GRXkSC9t"
-Received: by mail-pj1-f53.google.com with SMTP id 98e67ed59e1d1-2c96f037145so3529155a91.3;
-        Mon, 15 Jul 2024 07:10:16 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="raBh8GWe"
+Received: by mail-yw1-f182.google.com with SMTP id 00721157ae682-66108213e88so11720917b3.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 15 Jul 2024 07:16:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1721052615; x=1721657415; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=u5b0ub2VwLry+AXt7LnUxK290f3uLSPjW34khDg5Msg=;
-        b=GRXkSC9tLC9okJ1c11Cd8alEoYfSmY6FlJ00UZoeom8InwRLM9uhBBQucMM0Hdst23
-         xDVO868cDGZma+3xZmiCG0n0z4Cpc4awnI+SyjUabXNdCr7L5kHOTZmfv1TaEpdFwmN8
-         B4AlFyN3J14uhaebE/Sy6HZjA0J6dubbPvLGo7U+EGirQZVVKXVVSlfZmw6c1A9kAE49
-         JuMq+UMSmFjw5/+WtS9ZmdlplKEd6VHAgTrHV8Hd8+lwkSyPwz7R1QioWcMBF519pr4E
-         UxUI0g61+dK8Op5Qa0OxdUz79jq4cIEG5gYkKFaJwGuicn6iTC+zCEtlpgroDzX1576k
-         1vDA==
+        d=linaro.org; s=google; t=1721052960; x=1721657760; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=zPrpwQlL2crmjNa4smp42LfL5xsAOvhXZdKXxy3/kok=;
+        b=raBh8GWeDzPOe1Sf7/OA3W/diJOEBNaYEAIoWdVRYZHHbPW1+kvl6LSaSpeL48JV6G
+         mi6AGA5Yy/ctGWqR2Dx+EY/Ux4Lz23RE2Cs/jxXZoCKJQIF8ZHSkRS2Bx2fapzeCUuZy
+         eOlfPeT4RKlWBTQrFtOFKZrdz7e0P/Dm/sO+DB3nf2Jx5LB7AN0atnFG1EeKK+bbQI1R
+         0nnX09NjI1y2Lha2g6wyyIa4stoD+KLkZLtiZ69ojELTRUSnxBxPGa6CD6qZyoo9w5k6
+         mnlR60Fw5oJtJ2QCXXV0Kwq1AK93HBHttF8aar6eUnVjkzs8BqYthM5xQoSgsE8+I50F
+         J37g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721052615; x=1721657415;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=u5b0ub2VwLry+AXt7LnUxK290f3uLSPjW34khDg5Msg=;
-        b=wzYJ6DPaT8nZaJdAh/6YrECilMLcoEa3cguKtoIh4emK6HZOHkfivSH/eqfOWy0Kv1
-         xxpJDYoDE2qmcpRHauhbtnCOlDQ8UCXmKk2Y2JxrYCXdQUCmUHehZUMUNcorU+FW2275
-         6ZbDI/DZNwwTMzeXkOI9mLXO1QF+2YHpSjnt90c+66sDxNS+8w/OJAKy19D+fgZMwGc9
-         N9ELNt4vi9jfQMIjD5e9hGkN6WF2OyBFlk8rZBAZofb8R2CCuRQSnLmgEdJrT9+xbHXK
-         Zb2NU4Q1OZZhX5W2Y8f+1Q/fkq5+wYlHUjotKJmU5FTSrBr3Gwjxs2PoFjYTWPaIa22G
-         k4Aw==
-X-Forwarded-Encrypted: i=1; AJvYcCWwJpeHZvlOrbb2b858LhrKi8XytAa5HCLgjWwIO1DfvT92VTwL5EiA3XmKbjTPyuhfLTQOigkOKpwIbLfm+W9kSI8zAGJr7kSptJmNvfEJU+JoSQ4vqMpM2RbhqfetHtV0Rgcc0n2D
-X-Gm-Message-State: AOJu0YyoO2LChNOLINKKybYtwJjSi4PW6ku/qiGjn+kO8civcHUWexgm
-	YPAyTtDXzci/ybxTqKVAM/Mo7qZoGX/i4skHnlebRcfAD1tRr4gkVUxxZ46RJOTPTP8MDfTTDzW
-	d9TLQwNWRdACoRZlkoGRO44ZHSmo=
-X-Google-Smtp-Source: AGHT+IEx/KlnqJy9Xt5PK/eBX6iSAtkD4hLoxq/wXnNwnE/BOmkr78SurHONH8cJ0Bs5pQmXGIle2t6wgLlqLx/csko=
-X-Received: by 2002:a17:90b:1989:b0:2c9:7aa6:e15d with SMTP id
- 98e67ed59e1d1-2ca35c304d2mr16025754a91.20.1721052615466; Mon, 15 Jul 2024
- 07:10:15 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1721052960; x=1721657760;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=zPrpwQlL2crmjNa4smp42LfL5xsAOvhXZdKXxy3/kok=;
+        b=rHRpBXuMjwsEeKGiL5gce1N+LlBZSfUAUoyz+HdxW1DOEtAuvRhQapBngr2ezyBqVQ
+         bXuYL9551QLR87b5+OJVFUx/Lqm/kT02Uyl5JbDAGQCEWcn0PJdZlH8CmpPfMQaz1I++
+         hrkpInb4pX+QIR6SAC5s+gH4ZDr2s24XJeSYBILr8ID1jSQ6Bx+21RkuxSJRxd7eq3cR
+         4n1gqWEsuN0UHE0rd4ewIL8zwPrOUL2e63ohWp1pgajA8YiXE+mvjMvnImz+JcFmuujR
+         8FjzTL230oJvcsGcZ2tP5byP9HNpWxdZ951z2eA0xtRKDwVqpQJhTN299/zDT85FAxoZ
+         grHg==
+X-Forwarded-Encrypted: i=1; AJvYcCUHUKko/HLfbMc0Xhbk8UEJJYz9vOv3pFpU7rnKhUoKaxVUyTDMTKzFOEsEBAJXkZsZvpl16LSdaSRt/Mt2d3iAmik79//FlcIteYgCwi7Y
+X-Gm-Message-State: AOJu0Ywzy5LKfXpcLqXET1f2vIGUgVoXzRdJZ8io6+ep8H/NXykGz6hF
+	xa4t2KD4TFdRzFACxIGUM46OmnPJONHMmHPqcULinutNAar+OR2kxmM1ioOnoKSnunjJm2eULtP
+	kFPIpaBOsEZNXpIc3E735wX1RfPKW5/5rEm58tA==
+X-Google-Smtp-Source: AGHT+IHb+gxnONbxy8xXZCJ33d+B6X9hNWCDsDZDbco0SUpBCc4PyUSEL4qETxb9/3bZVvm7kgJWWoBjZ4eb5yfwpaQ=
+X-Received: by 2002:a0d:fc82:0:b0:65f:9f0f:7912 with SMTP id
+ 00721157ae682-65f9f0f793amr74093307b3.20.1721052960083; Mon, 15 Jul 2024
+ 07:16:00 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -57,47 +56,33 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 References: <20240715015726.240980-1-luiz.dentz@gmail.com> <20240715064939.644536f3@kernel.org>
- <CACMJSes7rBOWFWxOaXZt70++XwDBTNr3E4R9KTZx+HA0ZQFG9Q@mail.gmail.com>
- <CABBYNZKudJ=7F2px9DYcqgpfEJX7n1+p4ASsH24VwELSMt8X4w@mail.gmail.com> <20240715070555.64c2773c@kernel.org>
-In-Reply-To: <20240715070555.64c2773c@kernel.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 15 Jul 2024 10:10:01 -0400
-Message-ID: <CABBYNZLAEmadeQPn3WNcqeCrozDJWM=aHYApvhn+2MSYV-7NTQ@mail.gmail.com>
+ <CACMJSes7rBOWFWxOaXZt70++XwDBTNr3E4R9KTZx+HA0ZQFG9Q@mail.gmail.com> <20240715070133.63140316@kernel.org>
+In-Reply-To: <20240715070133.63140316@kernel.org>
+From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+Date: Mon, 15 Jul 2024 16:15:49 +0200
+Message-ID: <CACMJSestJBr=yXgEXDrZj8djZP6G7udOjCgUpwZhgfowgQGbww@mail.gmail.com>
 Subject: Re: pull request: bluetooth-next 2024-07-14
 To: Jakub Kicinski <kuba@kernel.org>
-Cc: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>, davem@davemloft.net, 
+Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>, davem@davemloft.net, 
 	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-Hi Jakub,
-
-On Mon, Jul 15, 2024 at 10:05=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> w=
-rote:
+On Mon, 15 Jul 2024 at 16:01, Jakub Kicinski <kuba@kernel.org> wrote:
 >
-> On Mon, 15 Jul 2024 09:59:57 -0400 Luiz Augusto von Dentz wrote:
-> > > Luiz pulled the immutable branch I provided (on which my PR to Linus
-> > > is based) but I no longer see the Merge commit in the bluetooth-next
-> > > tree[1]. Most likely a bad rebase.
-> > >
-> > > Luiz: please make sure to let Linus (or whomever your upstream is)
-> > > know about this. I'm afraid there's not much we can do now, the
-> > > commits will appear twice in mainline. :(
+> On Mon, 15 Jul 2024 15:55:56 +0200 Bartosz Golaszewski wrote:
+> > Luiz pulled the immutable branch I provided (on which my PR to Linus
+> > is based) but I no longer see the Merge commit in the bluetooth-next
+> > tree[1]. Most likely a bad rebase.
 > >
-> > My bad, didn't you send a separate pull request though? I assumed it
-> > is already in net-next,
+> > Luiz: please make sure to let Linus (or whomever your upstream is)
+> > know about this. I'm afraid there's not much we can do now, the
+> > commits will appear twice in mainline. :(
 >
-> unless we pull it ourselves we only get overall linux-next material
-> during the merge window
->
-> > but apparently it is not, doesn't git skip if already applied?
->
-> Sort of.. it may be clever enough to not show a conflict but it doesn't
-> fully skip, both will appear in history (somewhat confusingly).
-> It's better to rebase back into order, if you can.
+> If Luiz does rebases, maybe he could rebase, drop the patches and
+> re-pull again? Or, you know, re-pull in the middle of a rebase
+> so that build doesn't break. Should be pretty.. doable.. ?
 
-Ok, then let me rebase and do a git pull again so it appears as a
-merge rather than individual commits.
+Oh, I thought this already went upstream to net-next? If not, then
+sure, Luiz can rebuild his tree.
 
---=20
-Luiz Augusto von Dentz
+Bart
