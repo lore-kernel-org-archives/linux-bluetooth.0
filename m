@@ -1,113 +1,104 @@
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f170.google.com (mail-qk1-f170.google.com [209.85.222.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC69C19FA9F
-	for <linux-bluetooth@vger.kernel.org>; Tue, 16 Jul 2024 15:57:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91A0D19F487
+	for <linux-bluetooth@vger.kernel.org>; Tue, 16 Jul 2024 16:38:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721145452; cv=none; b=O1jkL+ya/bcJ0O0rKzSjadPu73GOTI11hyado6edDfZYrKDxzgR3plpH0/1XbPW1sRwBUXk0usLvbHbELnjoQTGik5cVDFHGb4pJbH27xKtM9NH6kxn1tNgkW3M7N9hOYgAd4R7Qs/A1Xewue/2e7YY8bGFv6U58eCA51/eJekI=
+	t=1721147883; cv=none; b=HfBkraEXVHK582JHxWwxLy56nZl7A2m+VBVrhTXa/UQj5p3AG3PkcLHT2eQ5X/9HrPM80x/pymjUqaghAwBG4RXXoNQ7dN41b9cbpEGc7dMWnawiwnx7FWKhUgb6NKXWyiKWdpigZlpV6zAmC5+lnhFN73cBy+z1tkESKtyiAks=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721145452; c=relaxed/simple;
-	bh=6BLzLB+GG2joEMn+yeyuC3I97EKhKWJsTvKNGXJbQQM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:Cc:
-	 In-Reply-To:Content-Type; b=uxpM2dl86F7QX4FOP31/ujnYzQjTcyDzMDgcpZFkMggvggIpXun9wRrRLBMYbbuJaD7XWDbsPMBxCxQtmU1eGIsmJ/w4MqFLKyV1vqMYacLZc8GxKA8T6a5jmS5AZ2krv55sNGlTYrzhWNYIunMFIGBC0O2GuOFslnYJyNSSats=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from [192.168.0.5] (ip5f5af178.dynamic.kabel-deutschland.de [95.90.241.120])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 402B661E5FE05;
-	Tue, 16 Jul 2024 17:57:17 +0200 (CEST)
-Message-ID: <ef3fef97-d090-4fa4-8053-58125e7c030e@molgen.mpg.de>
-Date: Tue, 16 Jul 2024 17:57:16 +0200
+	s=arc-20240116; t=1721147883; c=relaxed/simple;
+	bh=RpcPERkgibU81bHaUob6QB406IDZtxsU08XcDuRvNSc=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=no4sfB84AtEyy1Hj8niCyO/XYCbIxECxM8A6ap0PZ+oiT+lZ+oOgTw8Y8Ydzy+pMXxmMTEFEPt9q3DmWM1RMkN2erW/Mgqlvl6aayDdatUTDgrbpDZiPuQTwAU7/5YgSD+tiSm1DlzuJaeBFAK5y6UC5Qyd5FJf471bnXrJ4ohQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=D8eqMQXj; arc=none smtp.client-ip=209.85.222.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="D8eqMQXj"
+Received: by mail-qk1-f170.google.com with SMTP id af79cd13be357-79ef93865afso341850785a.1
+        for <linux-bluetooth@vger.kernel.org>; Tue, 16 Jul 2024 09:38:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1721147880; x=1721752680; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=O48VkzHTalBmREWDsqc4aXjAe9aycq0gPR5n7XUMFPM=;
+        b=D8eqMQXjkuyNrhQJKQNN8rVXUaiPbqpcatWPHwFWgiHKfeaSFlMxwthgq1L4mMp5ya
+         eowDVImBYrMXAJRYONC3jtyxzUkyjJjdzxuBK5DGWz2dlZLVW0haHGlwFRBWcMLRe2yF
+         tNUpb+APV/CZaYA9OfOcGTVzrnSCMFTDDWmjk3tXT+fpYBRjrX8NU5cFTjOGmsA9scjq
+         7nLsb6vl4cdao3EcB9ktraJFtp99isZJyZBCWcVxfIknJL0+eB0e8NbAN1xdOumKCqlY
+         IB2aIYyPuLhf9OeJD/2nX0ExrnzCkFC4QgDA7S5KNIPfJtXML7/MqLIjz/Kp3Yw9LtmC
+         cfcQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1721147880; x=1721752680;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=O48VkzHTalBmREWDsqc4aXjAe9aycq0gPR5n7XUMFPM=;
+        b=XD1NkuE+pfYvfOmYeOdhD0w22cmPVXL74JM+CGB9Wr9ejGTUyZF41ox89DO4b5Gtpp
+         Jz0sshEtH8L56kyuzlu9jmvCWGyLsBc6oAdgmlwbQSvZbGKa6yI7Wf7gxeF1F+F2Xh7F
+         gaTxlP98oZGDUGuHG8AYZZ2lfodc0KKzEY1RU+gL/7ocwKlCL3pqefRLNTVZT0i1GvRO
+         Ua1oxgfcrzZBOkyNXyUiMa5LRZ2Ls1uJ+vq4gcQzRW/IAoOhTGNekhrSgDo2CR4Oj8mE
+         bZKcXyf2YbRcOhwUrT0BdUU4AVGbe4gIzaPVB8Hn7/TaPqouXHAJSD+novj2pWUQA3Bn
+         SsWw==
+X-Gm-Message-State: AOJu0Yz1XMf730zxqkbok19CxYjw3whntRFoF4Hfkeo5/pU6lK5bUNQI
+	Hy+6zGIAgWm8ls4lWqvcpNkar6gkJ7esu6HpUNoFbfPp/Vd+vKlzU3VpAg==
+X-Google-Smtp-Source: AGHT+IHp+LE42Lvw/cPmevFq2IkNYxdii/l/+pcCKb6UMmB2W/nJTFNbsQDp02fgthulkmZYMjWniQ==
+X-Received: by 2002:a05:6214:268e:b0:6b5:7ee:1d79 with SMTP id 6a1803df08f44-6b77f50d0f5mr31095886d6.26.1721147880339;
+        Tue, 16 Jul 2024 09:38:00 -0700 (PDT)
+Received: from [172.17.0.2] ([40.76.119.132])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6b761a580b5sm32556746d6.127.2024.07.16.09.38.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 16 Jul 2024 09:38:00 -0700 (PDT)
+Message-ID: <6696a1e8.050a0220.c3fda.e6ab@mx.google.com>
+Date: Tue, 16 Jul 2024 09:38:00 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============2764207302399959260=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2] Bluetooth: hci_sync: Fix suspending with wrong filter
- policy
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-References: <20240716150126.512727-1-luiz.dentz@gmail.com>
-Content-Language: en-US
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-Cc: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20240716150126.512727-1-luiz.dentz@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, kiran.k@intel.com
+Subject: RE: [v1] monitor/intel: Add decoding of Intel Read Version event fields
+In-Reply-To: <20240716145354.3900742-1-kiran.k@intel.com>
+References: <20240716145354.3900742-1-kiran.k@intel.com>
+Reply-To: linux-bluetooth@vger.kernel.org
+
+--===============2764207302399959260==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
 
-Dear Luiz,
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=871704
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.48 seconds
+GitLint                       PASS      0.33 seconds
+BuildEll                      PASS      24.67 seconds
+BluezMake                     PASS      1642.17 seconds
+MakeCheck                     PASS      13.41 seconds
+MakeDistcheck                 PASS      180.34 seconds
+CheckValgrind                 PASS      253.05 seconds
+CheckSmatch                   PASS      354.59 seconds
+bluezmakeextell               PASS      119.96 seconds
+IncrementalBuild              PASS      1444.64 seconds
+ScanBuild                     PASS      999.47 seconds
 
 
-Thank you for the patch. Four minor comments.
 
-Am 16.07.24 um 17:01 schrieb Luiz Augusto von Dentz:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> 
-> When suspending the scan filter policy cannot be 0x00 (no acceptlist)
-> since that means the host has to process every advertisement report
-> waking up the system, so this attempts to check if hdev is marked as
-> suspended and if the resulting filter policy would be 0x00 (no
-> acceptlist) then skip passive scanning if thre no devices in the
-
-there are
-
-> acceptlist otherwise reset the filter policy to 0x01 so the acceptlist
-> is used since the devices programmed there can still wakeup be system.
-
-wake the system up?
-
-> Fixes: 182ee45da083 ("Bluetooth: hci_sync: Rework hci_suspend_notifier")
-> Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> ---
->   net/bluetooth/hci_sync.c | 21 +++++++++++++++++++++
->   1 file changed, 21 insertions(+)
-> 
-> diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-> index cd2ed16da8a4..a31d39a821f4 100644
-> --- a/net/bluetooth/hci_sync.c
-> +++ b/net/bluetooth/hci_sync.c
-> @@ -2976,6 +2976,27 @@ static int hci_passive_scan_sync(struct hci_dev *hdev)
->   	 */
->   	filter_policy = hci_update_accept_list_sync(hdev);
->   
-> +	/* If suspended and filter_policy set to 0x00 (no acceptlist) then
-> +	 * passive scanning cannot be started since that would require the host
-> +	 * to be woken up to process the reports.
-> +	 */
-> +	if (hdev->suspended && !filter_policy) {
-> +		/* Check if accept list is empty then there is no need to scan
-> +		 * while suspended.
-> +		 */
-> +		if (list_empty(&hdev->le_accept_list))
-> +			return 0;
-> +
-> +		/* If there are devices is the accept_list that means some
-
-i*n* the
-
-> +		 * devices could not be programmed which in non-suspended case
-> +		 * means filter_policy needs to be set to 0x00 so the host needs
-> +		 * to filter, but since this is treating suspended case we
-> +		 * can ignore device needing host to filter to allow devices in
-> +		 * the acceptlist to be able to wakeup the system.
-
-to wake up
-
-> +		 */
-> +		filter_policy = 0x01;
-> +	}
-> +
->   	/* When the controller is using random resolvable addresses and
->   	 * with that having LE privacy enabled, then controllers with
->   	 * Extended Scanner Filter Policies support can now enable support
+---
+Regards,
+Linux Bluetooth
 
 
-Kind regards,
-
-Paul
+--===============2764207302399959260==--
