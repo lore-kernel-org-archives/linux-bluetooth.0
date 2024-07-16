@@ -1,48 +1,48 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E7E41A01BF;
-	Tue, 16 Jul 2024 14:25:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 310441A38CA;
+	Tue, 16 Jul 2024 14:27:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721139942; cv=none; b=IdmoHgrtGJbuQL74bb/5hsl50Y228Zm8ko3JKoS2aThAUisabSpe5i8TeZdLdj4FoLgOvCK2CSAHDnmsYIQERpzw4AcSrC8gsXvK5x3WizXdvbMHL/21kTmuWuQ4HsL0p12iqn4mFh57X9eicCx8x5dJGOtky/WHARiTQWSAOQo=
+	t=1721140049; cv=none; b=VACEJ2GrUq8beCRjoCAqSfn05e5GnAzZ5FibXcMBvjQJcpnDIwn4zoBcPO1dKD2wubU1XfsRsTJrTmZ4/ky5OoJ7q76ZmeSzTGV0Ehn4+LB4qBqPMWhAIdXzj45HCewqxjDxP28v2R1IcmFpUAX4qUTp+hOPR+KEp/P6IpfqxPI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721139942; c=relaxed/simple;
-	bh=blrVXDEK7quFM1ljWZZCF+v5P3B1qo7c70vCTCo6/y8=;
+	s=arc-20240116; t=1721140049; c=relaxed/simple;
+	bh=3W1wUoGGs1BquKcz6HkntueG/jrF+IRZb3GT9f1M2K4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=I9ZKSstPWD48JB6pbcmma1gRxpXHZEVreYiVfVMxKEmuaTbmRQ8oymXj0J7HqY1oh2gXNF5k3teEjK2NqopgevylDY8+dbjMUKWh44mwUEEjd6Tgu3HzaQw5hkBm/ghoONq5y0NSPhyYwuzGxhTk9DoB36ofK2ysSXpanuryV9Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kHj4BRsM; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=DdreR14+XQSlBYNOuXXoAQBXZs0a0SrOAu8+scBS0bwBvxMoeSTOwIEbXyVOobgT0F7ZPzgnx95edxLKTyytxV6V9wB/zE4Ls7Ys3Dy+Yi4Y+SDfCKd3zZ00DXmqfb7WdeCeQBKRy2/UFhku40774Ujon0/ZPaW4Ok6jCaRmwA0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NtpENPCb; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kHj4BRsM"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6831CC4AF0D;
-	Tue, 16 Jul 2024 14:25:40 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NtpENPCb"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BF0B3C4AF09;
+	Tue, 16 Jul 2024 14:27:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1721139942;
-	bh=blrVXDEK7quFM1ljWZZCF+v5P3B1qo7c70vCTCo6/y8=;
+	s=k20201202; t=1721140049;
+	bh=3W1wUoGGs1BquKcz6HkntueG/jrF+IRZb3GT9f1M2K4=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=kHj4BRsMK3L5ORGnYyzNiBUST01ueo2qjeIeT4g6ZkWqAcmLy2JDNpgRf8WBrhf8d
-	 /HjwRXUXqxnW4aYBCNB2k+LlosytZMdULfc46Sju7N7t2Nik+iOIKZXOygK6NseBdZ
-	 qy4suq8ndsqM9ESN9eco3RzkOPvACl7NpuGwVCeBsAZPN2Ifwdk/TPLs25lBWJbp7B
-	 T1+d9Ic9FbEx5O50iNYvdY314SL983sn1nqueKv6qYrA3B+NptfblK0q3y5ATMfQKn
-	 k1A0WBg7T/o+MZAZZVQwOhCdyGcYe6kaw5anwHRs9avTpx+yI1ufbHZvqLojvjDUPP
-	 qjYvVPoZ6p6JQ==
+	b=NtpENPCbGQ3tSbuzIRFTyMFA2OF3onIN/EOa5ObUC+tacLQIeeF18bR5L+Hge9zeq
+	 usverx4r+SYtX81zwvhP/1LWU8GuokemQDgmtvsHFtogWVCKBVG7+gB0AQWBkbjKN7
+	 ZQndtAwLtoojQqw1r/YhyQ7sCzvU0Txi3JSxLEiXqOkoxwcZ5RetW7dNGWyiIXfG68
+	 sz081TdKATEnBV096ev8oOMZTxh03Vg4Uw56jO+Z21f6gDa/Ubipjvg+oSoDEVdl9o
+	 rnTNaMDrobGJZnXZauyPycwdgypwuknPWlZ75Neavkvv4adPt3Ynr0TQ6OTe50gQHH
+	 i4V+kyR5foVgQ==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Edward Adam Davis <eadavis@qq.com>,
-	syzbot+b7f6f8c9303466e16c8a@syzkaller.appspotmail.com,
+Cc: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>,
+	syzbot <syzbot+da0a9c9721e36db712e8@syzkaller.appspotmail.com>,
 	Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
 	Sasha Levin <sashal@kernel.org>,
 	marcel@holtmann.org,
 	johan.hedberg@gmail.com,
 	luiz.dentz@gmail.com,
 	linux-bluetooth@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.9 09/22] bluetooth/l2cap: sync sock recv cb and release
-Date: Tue, 16 Jul 2024 10:24:16 -0400
-Message-ID: <20240716142519.2712487-9-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.6 06/18] Bluetooth: hci_core: cancel all works upon hci_unregister_dev()
+Date: Tue, 16 Jul 2024 10:26:41 -0400
+Message-ID: <20240716142713.2712998-6-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240716142519.2712487-1-sashal@kernel.org>
-References: <20240716142519.2712487-1-sashal@kernel.org>
+In-Reply-To: <20240716142713.2712998-1-sashal@kernel.org>
+References: <20240716142713.2712998-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -51,94 +51,55 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.9.9
+X-stable-base: Linux 6.6.40
 Content-Transfer-Encoding: 8bit
 
-From: Edward Adam Davis <eadavis@qq.com>
+From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
 
-[ Upstream commit 89e856e124f9ae548572c56b1b70c2255705f8fe ]
+[ Upstream commit 0d151a103775dd9645c78c97f77d6e2a5298d913 ]
 
-The problem occurs between the system call to close the sock and hci_rx_work,
-where the former releases the sock and the latter accesses it without lock protection.
+syzbot is reporting that calling hci_release_dev() from hci_error_reset()
+due to hci_dev_put() from hci_error_reset() can cause deadlock at
+destroy_workqueue(), for hci_error_reset() is called from
+hdev->req_workqueue which destroy_workqueue() needs to flush.
 
-           CPU0                       CPU1
-           ----                       ----
-           sock_close                 hci_rx_work
-	   l2cap_sock_release         hci_acldata_packet
-	   l2cap_sock_kill            l2cap_recv_frame
-	   sk_free                    l2cap_conless_channel
-	                              l2cap_sock_recv_cb
+We need to make sure that hdev->{rx_work,cmd_work,tx_work} which are
+queued into hdev->workqueue and hdev->{power_on,error_reset} which are
+queued into hdev->req_workqueue are no longer running by the moment
 
-If hci_rx_work processes the data that needs to be received before the sock is
-closed, then everything is normal; Otherwise, the work thread may access the
-released sock when receiving data.
+       destroy_workqueue(hdev->workqueue);
+       destroy_workqueue(hdev->req_workqueue);
 
-Add a chan mutex in the rx callback of the sock to achieve synchronization between
-the sock release and recv cb.
+are called from hci_release_dev().
 
-Sock is dead, so set chan data to NULL, avoid others use invalid sock pointer.
+Call cancel_work_sync() on these work items from hci_unregister_dev()
+as soon as hdev->list is removed from hci_dev_list.
 
-Reported-and-tested-by: syzbot+b7f6f8c9303466e16c8a@syzkaller.appspotmail.com
-Signed-off-by: Edward Adam Davis <eadavis@qq.com>
+Reported-by: syzbot <syzbot+da0a9c9721e36db712e8@syzkaller.appspotmail.com>
+Closes: https://syzkaller.appspot.com/bug?extid=da0a9c9721e36db712e8
+Signed-off-by: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
 Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- net/bluetooth/l2cap_sock.c | 25 ++++++++++++++++++++++---
- 1 file changed, 22 insertions(+), 3 deletions(-)
+ net/bluetooth/hci_core.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-index 8645461d45e81..64827e553d638 100644
---- a/net/bluetooth/l2cap_sock.c
-+++ b/net/bluetooth/l2cap_sock.c
-@@ -1239,6 +1239,10 @@ static void l2cap_sock_kill(struct sock *sk)
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 3817d6369f0cc..b4d5b7200ff9c 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -2704,7 +2704,11 @@ void hci_unregister_dev(struct hci_dev *hdev)
+ 	list_del(&hdev->list);
+ 	write_unlock(&hci_dev_list_lock);
  
- 	BT_DBG("sk %p state %s", sk, state_to_string(sk->sk_state));
++	cancel_work_sync(&hdev->rx_work);
++	cancel_work_sync(&hdev->cmd_work);
++	cancel_work_sync(&hdev->tx_work);
+ 	cancel_work_sync(&hdev->power_on);
++	cancel_work_sync(&hdev->error_reset);
  
-+	/* Sock is dead, so set chan data to NULL, avoid other task use invalid
-+	 * sock pointer.
-+	 */
-+	l2cap_pi(sk)->chan->data = NULL;
- 	/* Kill poor orphan */
+ 	hci_cmd_sync_clear(hdev);
  
- 	l2cap_chan_put(l2cap_pi(sk)->chan);
-@@ -1481,12 +1485,25 @@ static struct l2cap_chan *l2cap_sock_new_connection_cb(struct l2cap_chan *chan)
- 
- static int l2cap_sock_recv_cb(struct l2cap_chan *chan, struct sk_buff *skb)
- {
--	struct sock *sk = chan->data;
--	struct l2cap_pinfo *pi = l2cap_pi(sk);
-+	struct sock *sk;
-+	struct l2cap_pinfo *pi;
- 	int err;
- 
--	lock_sock(sk);
-+	/* To avoid race with sock_release, a chan lock needs to be added here
-+	 * to synchronize the sock.
-+	 */
-+	l2cap_chan_hold(chan);
-+	l2cap_chan_lock(chan);
-+	sk = chan->data;
- 
-+	if (!sk) {
-+		l2cap_chan_unlock(chan);
-+		l2cap_chan_put(chan);
-+		return -ENXIO;
-+	}
-+
-+	pi = l2cap_pi(sk);
-+	lock_sock(sk);
- 	if (chan->mode == L2CAP_MODE_ERTM && !list_empty(&pi->rx_busy)) {
- 		err = -ENOMEM;
- 		goto done;
-@@ -1535,6 +1552,8 @@ static int l2cap_sock_recv_cb(struct l2cap_chan *chan, struct sk_buff *skb)
- 
- done:
- 	release_sock(sk);
-+	l2cap_chan_unlock(chan);
-+	l2cap_chan_put(chan);
- 
- 	return err;
- }
 -- 
 2.43.0
 
