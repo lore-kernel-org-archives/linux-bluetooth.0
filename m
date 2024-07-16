@@ -1,56 +1,60 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ua1-f45.google.com (mail-ua1-f45.google.com [209.85.222.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C72019E7EC
-	for <linux-bluetooth@vger.kernel.org>; Tue, 16 Jul 2024 14:39:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C383E1E861
+	for <linux-bluetooth@vger.kernel.org>; Tue, 16 Jul 2024 15:01:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721140774; cv=none; b=pk5Br1eEWixwd3Kf5b1QPIyvmhjT/yOS3FwgSat5s0s+d0Sa32pm1+FHyZOxrliWDphiVIjAHZpLbU44cXh9MBTOVkeRO2eIlX5M8b2HK2KOCz5MCyeQBZJ7MpNHPuTJYiv4nW2FuEsCnkbFCDtlPE6Cj778FssA8GRlfWp0cXM=
+	t=1721142094; cv=none; b=OcyXb4MUSnpgXvranL7LiMqs4YOEGR1c7RVlk45ciRNk8y+L9zxCbRbksrLAAk01cIga3YgAoCxCcKoCKsjzMSIYjUB84LDIzDrxEGmW4+8DwpRJcSnYjR9tS9193p4aDdwPuGck0a5a3Jm8F6tPY1L4tSg8zDsKXbam+q7PQwM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721140774; c=relaxed/simple;
-	bh=isCjv8oqYY90+gM2vrdlvmoFvcNhrHtQ7qNhi2LXmws=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=M9f0aYmRB0S8iN8iMP3uzZoGFZJEEEG4hOhiq8QJD+5iGZ1pv0JstxPFUB1542iBbGlzJbfr9RWelqZQ4ZpA7LmZcevXng7O0N6hmG6hBfAHAkBSHWcFyn0mpYdBila2GmNw2G2LMBD9TthS9x6ysjqFkvD/S9nEdSoPlBtVzr8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=gNulv7TM; arc=none smtp.client-ip=198.175.65.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1721142094; c=relaxed/simple;
+	bh=m30GmcIqSvUNR/IaCpHLBjkCsm8K0SHD3uDs9D6LszY=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=Ptjr2oUXctfmFnurFMMN/tpu2aSI4brgNqxn/gxfuGiElb8l96XzIDZ4KTJilQtCy6JPJlh6r7CPhJ0+IuEZCgO3TlYh/lveZilfdhdGkj2p8fdh7tPulAnc32qJZpwxUxRmKJMg99NvT9vTOe4VeKT22ob7Rt5xt5rOy6pC3JY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=O5y0rk2t; arc=none smtp.client-ip=209.85.222.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="gNulv7TM"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1721140772; x=1752676772;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=isCjv8oqYY90+gM2vrdlvmoFvcNhrHtQ7qNhi2LXmws=;
-  b=gNulv7TMYFF+IikjV0w1WMD6AYmbNshBh6ln9DpIeNEOSLSiYjDGptsJ
-   WYgjJ7m2C1XgsKwpqya4jR/4bt3b7jvimTY9v/fnXPN9uINhzsKuHevJE
-   ofK1nZo3+5U4mchrPwj3L9ZaOz3ji/mwnyswTE+2Bbmh+Rp50HcptA1UM
-   GBuQDcGBFrsQAVzawz5gpqBLfcEJc+uu495Swf6ZugS11Jn5Lar2yXxZq
-   SYWQYar62BSj8sFvbKIie1qvk0bQJ84pL7wQf2E/Js/plNdS9pmH7vLou
-   zQYvru1FTx3+i5YRLUAjhIMqlHfP2syDlUWVgKLsXz0QL9VngTQPdoC2F
-   w==;
-X-CSE-ConnectionGUID: 2Kjfcp7sRxOQX/RHnJaj4Q==
-X-CSE-MsgGUID: xD5l1R4hSoO8WWWF6jXd9A==
-X-IronPort-AV: E=McAfee;i="6700,10204,11135"; a="22346080"
-X-IronPort-AV: E=Sophos;i="6.09,211,1716274800"; 
-   d="scan'208";a="22346080"
-Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jul 2024 07:39:32 -0700
-X-CSE-ConnectionGUID: v83Y+olwT3idADPUS64+Fw==
-X-CSE-MsgGUID: yLjO4uivQ/2uH+ODoE6bAQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.09,211,1716274800"; 
-   d="scan'208";a="49868252"
-Received: from intel-lenovo-legion-y540-15irh-pg0.iind.intel.com ([10.224.186.95])
-  by fmviesa007.fm.intel.com with ESMTP; 16 Jul 2024 07:39:30 -0700
-From: Kiran K <kiran.k@intel.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="O5y0rk2t"
+Received: by mail-ua1-f45.google.com with SMTP id a1e0cc1a2514c-81f01f88e8eso24241241.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 16 Jul 2024 08:01:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1721142090; x=1721746890; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=KRtHzmuOfZHmYnEL0fk5FhfvcfETgoqcEp0llGUSGlU=;
+        b=O5y0rk2teEC59DrtPQVL/aemZyfgwygPs+oUyIax/5FgduPtQgs4/dIEgL+MI0Jczn
+         n5GaY1O3AQl4HPRDIPWKtSHT1dk6q6iJ5pSkdTcqx+vFyTV3kzTw7xjnzWepqXnZV7JR
+         l1HSwXuybaF4IUlIUG9Tck7Qp+NbW2oYXskMbw3Fy0LhpWRWe+mBZQ7Hi8/H4FB1gZwv
+         Abj0GPy6DazIksOjEBYjZtFOwwbYLqQPJiE7BEzpC+WwTaSs+CAPBSb3eTPCoSWDS23h
+         KT1qO9UlnMd00nPukfXa1wT3Gz0QnTW86tbXOTGU05sJ7tIUR/8eRt4leYCugbe1RXs4
+         8/iQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1721142090; x=1721746890;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=KRtHzmuOfZHmYnEL0fk5FhfvcfETgoqcEp0llGUSGlU=;
+        b=XMyluRlB9G54m52VmdZZQfovakoWxNRoD7wZJkb1cUNXdflRGm/Lk4oYOGgUiCHEpm
+         z8ooXMPJO+nfWwLDmvzg8m5NtONk0KS014iebvS6S2bkn1rbEh4kSrESn1F7wBFtDoDu
+         3dgMuEHsrjItapH0WJq3VI6HX6sm0o2UayHd4DwpeFDCjUzUSQ1uwcLVvyOyIV27jvWH
+         OEp05L883MxszrddGu3OxjXepKhz4m/pUZD4jJG2+Y6smeUkXpfH7V7q1pi2FHG7fFy9
+         WB+hMAMqxwIsNPvXpL1oZel9d3QazD8m6Z+/q0qSn4dqkmX75GCnCw0rskE4tMpJGzNH
+         fL6g==
+X-Gm-Message-State: AOJu0YyRdJ9RcUpKUmpXiEtY42qD2nMIkiLU4lERajysrdd8Ql/vUdoK
+	qsIkRXnS/g3tp8aSy0cPPJZcgg3JzXd0hig0JoEbAXJnnroflTpE8xDjPw==
+X-Google-Smtp-Source: AGHT+IE8vtgw1ZdStk/E0ku1xiTUq2c/B4pXjJXmrDE26dW9QroU6QkNRI+b0DDYaG6b2GX3GImV3w==
+X-Received: by 2002:a05:6122:3d07:b0:4ef:53ad:97bd with SMTP id 71dfb90a1353d-4f4d6f061f7mr1352989e0c.3.1721142089714;
+        Tue, 16 Jul 2024 08:01:29 -0700 (PDT)
+Received: from lvondent-mobl4.. (syn-107-146-107-067.res.spectrum.com. [107.146.107.67])
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-4f4d6eee6e9sm102226e0c.2.2024.07.16.08.01.28
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 16 Jul 2024 08:01:28 -0700 (PDT)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: ravishankar.srivatsa@intel.com,
-	chethan.tumkur.narayan@intel.com,
-	Kiran K <kiran.k@intel.com>
-Subject: [PATCH v1] monitor/intel: Add decoding of Intel Read Version event fields
-Date: Tue, 16 Jul 2024 20:23:54 +0530
-Message-Id: <20240716145354.3900742-1-kiran.k@intel.com>
-X-Mailer: git-send-email 2.40.1
+Subject: [PATCH v2] Bluetooth: hci_sync: Fix suspending with wrong filter policy
+Date: Tue, 16 Jul 2024 11:01:26 -0400
+Message-ID: <20240716150126.512727-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -59,90 +63,54 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add decoding of Image type, Firmware SHA1 and Firmware ID fields.
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-snoop traces:
+When suspending the scan filter policy cannot be 0x00 (no acceptlist)
+since that means the host has to process every advertisement report
+waking up the system, so this attempts to check if hdev is marked as
+suspended and if the resulting filter policy would be 0x00 (no
+acceptlist) then skip passive scanning if thre no devices in the
+acceptlist otherwise reset the filter policy to 0x01 so the acceptlist
+is used since the devices programmed there can still wakeup be system.
 
-< HCI Command: Intel Read Version (0x3f|0x0005) plen 1
-        Requested Type:
-          All Supported Types(0xff)
-> HCI Event: Command Complete (0x0e) plen 126
-      Intel Read Version (0x3f|0x0005) ncmd 32
-        Status: Success (0x00)
-        CNVi TOP(16): 0x01080900
-        CNVr TOP(17): 0x02001910
-        CNVi BT(18): 0x001e3700
-        CNVr OTP(21): 0x0432
-        Device Rev ID(22): 0x0000
-        USB VID(23): 0x8087
-        USB PID(24): 0x0037
-        Image Type(28): Intermediate loader(0x02)
-        Time Stamp(29): 24-27
-        Build Type(30): 0x03
-        Build Num(31): 0x00010060
-        OTP Patch Version(39): 0x00
-        Secure Boot(40): Enabled(1)
-        Key From Header(41): Disabled(0)
-        OTP Lock(42): Disabled(0)
-        API Lock(43): Enabled(1)
-        Debug Lock(44): Disabled(0)
-        Minimum FW(45): 1-10.2014
-        Limited CCE(46): Disabled(0)
-        SBE Type(47): 0x01
-        OTP BDADDR: DC:97:BA:54:1F:72 (OUI DC-97-BA)
-        Unlocked State(49): Disabled(0)
-        Firmware SHA1(50): 0xe4a9801b
-        Unknown Type(51):
-        00 00 00 00
-        Unknown Type(54):
-        02
-        Unknown Type(56):
-        01
-        Unknown Type(57):
-        01 00
-        Unknown Type(58):
-        05 00
-        Firmware ID(80): usb
+Fixes: 182ee45da083 ("Bluetooth: hci_sync: Rework hci_suspend_notifier")
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 ---
- monitor/intel.c | 11 +++++++++++
- 1 file changed, 11 insertions(+)
+ net/bluetooth/hci_sync.c | 21 +++++++++++++++++++++
+ 1 file changed, 21 insertions(+)
 
-diff --git a/monitor/intel.c b/monitor/intel.c
-index 0de864d8a41e..dbfd06317bea 100644
---- a/monitor/intel.c
-+++ b/monitor/intel.c
-@@ -205,6 +205,9 @@ static void print_version_tlv_img_type(const struct intel_version_tlv *tlv,
- 	case 0x01:
- 		str = "Bootloader";
- 		break;
-+	case 0x02:
-+		str = "Intermediate loader";
-+		break;
- 	case 0x03:
- 		str = "Firmware";
- 		break;
-@@ -252,6 +255,12 @@ static void print_version_tlv_mfg(const struct intel_version_tlv *tlv,
- 						bt_compidtostr(mfg_id), mfg_id);
- }
+diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+index cd2ed16da8a4..a31d39a821f4 100644
+--- a/net/bluetooth/hci_sync.c
++++ b/net/bluetooth/hci_sync.c
+@@ -2976,6 +2976,27 @@ static int hci_passive_scan_sync(struct hci_dev *hdev)
+ 	 */
+ 	filter_policy = hci_update_accept_list_sync(hdev);
  
-+static void print_version_tlv_fw_id(const struct intel_version_tlv *tlv,
-+				    const char *type_str)
-+{
-+	print_field("%s(%u): %s", type_str, tlv->type, tlv->val);
-+}
++	/* If suspended and filter_policy set to 0x00 (no acceptlist) then
++	 * passive scanning cannot be started since that would require the host
++	 * to be woken up to process the reports.
++	 */
++	if (hdev->suspended && !filter_policy) {
++		/* Check if accept list is empty then there is no need to scan
++		 * while suspended.
++		 */
++		if (list_empty(&hdev->le_accept_list))
++			return 0;
 +
- static const struct intel_version_tlv_desc {
- 	uint8_t type;
- 	const char *type_str;
-@@ -291,6 +300,8 @@ static const struct intel_version_tlv_desc {
- 	{ 47, "SBE Type", print_version_tlv_u8 },
- 	{ 48, "OTP BDADDR", print_version_tlv_otp_bdaddr },
- 	{ 49, "Unlocked State", print_version_tlv_enabled },
-+	{ 50, "Firmware SHA1", print_version_tlv_u32},
-+	{ 80, "Firmware ID", print_version_tlv_fw_id},
- 	{ 0, NULL, NULL },
- };
- 
++		/* If there are devices is the accept_list that means some
++		 * devices could not be programmed which in non-suspended case
++		 * means filter_policy needs to be set to 0x00 so the host needs
++		 * to filter, but since this is treating suspended case we
++		 * can ignore device needing host to filter to allow devices in
++		 * the acceptlist to be able to wakeup the system.
++		 */
++		filter_policy = 0x01;
++	}
++
+ 	/* When the controller is using random resolvable addresses and
+ 	 * with that having LE privacy enabled, then controllers with
+ 	 * Extended Scanner Filter Policies support can now enable support
 -- 
-2.40.1
+2.45.2
 
