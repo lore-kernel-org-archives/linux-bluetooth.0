@@ -1,310 +1,164 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f52.google.com (mail-lf1-f52.google.com [209.85.167.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7E5A1BC39
-	for <linux-bluetooth@vger.kernel.org>; Wed, 17 Jul 2024 08:38:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 836FD11CA1
+	for <linux-bluetooth@vger.kernel.org>; Wed, 17 Jul 2024 12:17:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721205485; cv=none; b=C8SGqPm/PM0CrG3vPBPsKyn+XLp4w5EaHZtB49xXo3rn33r8jot9Dl1phiTzXSmBKFk6oL4oE9QCSyhuYfcKkpa0vLskJPKa1kqDKW1xG2ZREL0XBut1RQXnalxWTg+wEm9KNlbD2xFBWpWgABa5llU5scoaIo2T0LTbDa3WVrI=
+	t=1721218639; cv=none; b=i9DHlW5q56mIsF5Snyw4A6dpEyqgtWX9UAfBh8dTyPGVB/LQSsTKqpKO56UjcR4KOVYNB+cwshRtpHzPMqEF+ik0I4N/9sHJoZS7O3jHUNqNaiqoFuSu562oQRC5HIy4ehz47E7UVz2p3F2cGJAVN5m4WiluamkW69XRG56w6oE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721205485; c=relaxed/simple;
-	bh=vymAvaXabtHVbciZLPNrJpCkcdBnqiIuX10qyb9XI28=;
-	h=Date:From:To:Cc:Subject:Message-ID; b=KMSmSvEBsfHdVhimp85oC0PdCQ9chr55dA9VXBreey3Rg368vo+ySjLEwDPaKobT+Vwp72ln4CNzxyaQ0AIiaDhWCHFF9tWuc5RH7FA/PbBC6yaLt4Di7lLXiJW26C69KiKTbqoNmJJMPqJJphu8p2XYkiFDvp4KGwb4E3g/k5g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=bopRBrw4; arc=none smtp.client-ip=198.175.65.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1721218639; c=relaxed/simple;
+	bh=qRzRu4Dd+qO4O2uPECPMRSbLfaIGR1Lzyj+5bvwd7oI=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=qZAazyaduYxD1/5SCxq7tczr7uKC/IRZ5qhPQeJtkg2BIFzos8+LwkjvC+H72UbyF8jJUn7Tk2NC5Ci3ly0B0I2x4Kd9zE5y8VRW2jGvrPNJS09/1ojK77ri5hoH+I7j8qTP+WTdsYf8O+7eVUGPttc2Z6vc2HqCbYMV+faEne4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=softeq.com; spf=pass smtp.mailfrom=softeq.com; dkim=pass (1024-bit key) header.d=softeq.com header.i=@softeq.com header.b=ueGYjyr+; arc=none smtp.client-ip=209.85.167.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=softeq.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=softeq.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="bopRBrw4"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1721205483; x=1752741483;
-  h=date:from:to:cc:subject:message-id;
-  bh=vymAvaXabtHVbciZLPNrJpCkcdBnqiIuX10qyb9XI28=;
-  b=bopRBrw4NOwShmY51/EGml8yZdZ98H/n9iLL4PJlJqxWqQGlAKcl7OhM
-   CAjtapsxFUkxZWecWfD01GDvW+bBygLvn5FfdEQwUoEzsUbPVvEHX2jYZ
-   hpbyMRIdWr+4HuU86RglGbLfC6CPQMW+YCxfhf6yUdYk5WCnrBbFWqVA5
-   3m1vAv+6knu/zeUyugUvf9VtlrsbSNvHGTsFPYfgoO2eutVe4M/OjGIKt
-   FbaqSTFrwwpkslQQL+6DUm1o6/UTVde0h8VRF6EPS75LCb//9Qk5FYSaB
-   u/uv6DO+baUlNHee0gF66oeGLPu5eKt0srMvM2O1RjCBMvXUjUrZI02Mx
-   w==;
-X-CSE-ConnectionGUID: jjdFVN6HQKWsS8847VsIEg==
-X-CSE-MsgGUID: rMAe4wHtTOWIUirwIoej6Q==
-X-IronPort-AV: E=McAfee;i="6700,10204,11135"; a="29277415"
-X-IronPort-AV: E=Sophos;i="6.09,214,1716274800"; 
-   d="scan'208";a="29277415"
-Received: from fmviesa003.fm.intel.com ([10.60.135.143])
-  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jul 2024 01:38:03 -0700
-X-CSE-ConnectionGUID: hzeZEMjqR6SjBXCmQ4Td+Q==
-X-CSE-MsgGUID: 90DNkYMSTrOvNvvtcu98JA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.09,214,1716274800"; 
-   d="scan'208";a="54505488"
-Received: from lkp-server01.sh.intel.com (HELO 68891e0c336b) ([10.239.97.150])
-  by fmviesa003.fm.intel.com with ESMTP; 17 Jul 2024 01:38:02 -0700
-Received: from kbuild by 68891e0c336b with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1sU0Ah-000g9b-1N;
-	Wed, 17 Jul 2024 08:37:59 +0000
-Date: Wed, 17 Jul 2024 16:37:11 +0800
-From: kernel test robot <lkp@intel.com>
-To: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: [bluetooth-next:master] BUILD REGRESSION
- 0c9b6e2f7742d52437d477f4ed045fa0b4d55f44
-Message-ID: <202407171605.Q76xieqE-lkp@intel.com>
-User-Agent: s-nail v14.9.24
+	dkim=pass (1024-bit key) header.d=softeq.com header.i=@softeq.com header.b="ueGYjyr+"
+Received: by mail-lf1-f52.google.com with SMTP id 2adb3069b0e04-52e9a550e9fso788250e87.0
+        for <linux-bluetooth@vger.kernel.org>; Wed, 17 Jul 2024 05:17:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=softeq.com; s=google; t=1721218635; x=1721823435; darn=vger.kernel.org;
+        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=n14dUx85KPbri5I4Yb8fwOOzOiRso1F34VUE6Cy7T2k=;
+        b=ueGYjyr+fidjKs7Js7O6puFKKuCB5b2HTyfOWJw2b9PHE+8TwAyq4Zt9GlkX6ilY6E
+         COFF2GSOjbkwkZN+19/vOEe/fs590rAxKK80tLTFNxocqxpGfVmX6xFw54X5RiQAtuX6
+         FYCEg6xHDraE8v6h/g7xzVVo36tMAwJf8U3fg=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1721218635; x=1721823435;
+        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=n14dUx85KPbri5I4Yb8fwOOzOiRso1F34VUE6Cy7T2k=;
+        b=ElREsej1Pc2ZmGwFyKDwrJTUFYnWPJdFqc3ma7XmYPc4DZaxCQDtD3B78Q35sn+qaP
+         QcmgMSCyn9x0/kdVbRynrBf5+YYwUlYg7c4k41n2seGYnGcxoYvasHo0JEFMpYhBOnar
+         wwTGVWo5VX5VaZTOAJoFfVY49nq4U5CAN4ycvvoHP/7IrRIG2F1nNA+SvGNdDrQDv6Tv
+         lRaeUMSAResU1z/L21Su6Cs3aKz2LuaGq1bdYduFZTWimpvscao1Vv6YWasVP3/COwju
+         GlgKQ2MqOxZItKYWs7MKpAne/RYMnqaMFDos16dTpMZyXFa/cdoGIjXYhZgWPpmT4dIt
+         bzjw==
+X-Gm-Message-State: AOJu0Yw/lxuBQrZMavv3SCwYmdXHfsowDjQzuhaikOoGhoI/eeHJdW4p
+	Qm/tO8e7j7iVOe7P75i+8qIXiINi6sm8rJr94HmrZNbjdgZ44iQFD/nTPjQOoi+jPnIrHDdOzIy
+	Y5cuXXdJ3xSkU4SluXpkbGJiD79ukUQEdTBaPaylcYUR5xzp2MGncow==
+X-Google-Smtp-Source: AGHT+IGcVZBkc0oP+fuXWdn//j4akFDN6JzGgTj6v6EDZFhdvFHNMG4vW6HZOtw4c4NZOFv6aSIFEE61nlLFc2/nJ6Y=
+X-Received: by 2002:a05:6512:3188:b0:52c:8b11:80cf with SMTP id
+ 2adb3069b0e04-52edf8b704fmr1536031e87.8.1721218634695; Wed, 17 Jul 2024
+ 05:17:14 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+From: Yauhen Kharuzhy <yauhen.kharuzhy@softeq.com>
+Date: Wed, 17 Jul 2024 15:17:03 +0300
+Message-ID: <CACJudGOw+d7pkwMg4szUw8WChDQJH6g9wDN72aL_Wkcy66ZAhA@mail.gmail.com>
+Subject: Repeated bonding after deleting a bonding info from client
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
-branch HEAD: 0c9b6e2f7742d52437d477f4ed045fa0b4d55f44  Bluetooth: btmtk: Fix kernel crash when entering btmtk_usb_suspend
+Hi,
 
-Error/Warning: (recently discovered and may have been fixed)
+I am implementing the Linux-based device controlled by BLE (so, my
+device is peripheral and uses linux 6.6.20/bluez 5.73 stack onboard).
+To pair with it I set up an agent with NoIO capability (the device has
+no controls available for the user). When I enable pairable mode and
+try to send a pair request from the client (a mobile phone, nRF
+connect app), all works as expected. But if I remove pairing at the
+phone side and try to re-establish bonding, the bluez refuses it with
+'auth failed' (0x5) status in the log.
 
-ERROR: modpost: "usb_control_msg" [drivers/bluetooth/btmtk.ko] undefined!
-btmtk.c:(.text+0x8a4): relocation truncated to fit: R_NIOS2_CALL26 against `usb_alloc_urb'
-btmtk.c:(.text+0x8a4): undefined reference to `usb_alloc_urb'
-btmtk.c:(.text+0x8d4): relocation truncated to fit: R_NIOS2_CALL26 against `usb_free_urb'
-btmtk.c:(.text+0x970): relocation truncated to fit: R_NIOS2_CALL26 against `usb_anchor_urb'
-btmtk.c:(.text+0x97c): relocation truncated to fit: R_NIOS2_CALL26 against `usb_submit_urb'
-btmtk.c:(.text+0x9c4): relocation truncated to fit: R_NIOS2_CALL26 against `usb_unanchor_urb'
-btmtk.c:(.text+0xc74): undefined reference to `usb_anchor_urb'
-include/asm-generic/unaligned.h:47:(.text+0xbde): undefined reference to `usb_control_msg'
-include/linux/fortify-string.h:233:(.text+0x1cbe): undefined reference to `usb_set_interface'
-mipsel-linux-ld: drivers/bluetooth/btmtk.c:(.text+0x2be8): undefined reference to `usb_kill_anchored_urbs'
-nios2-linux-ld: btmtk.c:(.text+0x8d4): undefined reference to `usb_free_urb'
-nios2-linux-ld: btmtk.c:(.text+0x970): undefined reference to `usb_anchor_urb'
-nios2-linux-ld: btmtk.c:(.text+0x97c): undefined reference to `usb_submit_urb'
-nios2-linux-ld: btmtk.c:(.text+0x9c4): undefined reference to `usb_unanchor_urb'
-powerpc-linux-ld: drivers/bluetooth/btmtk.c:1147:(.text.btmtk_intr_complete+0x1a4): undefined reference to `usb_submit_urb'
-powerpc-linux-ld: drivers/bluetooth/btmtk.c:1157:(.text.btmtk_intr_complete+0x230): undefined reference to `usb_unanchor_urb'
-powerpc-linux-ld: drivers/bluetooth/btmtk.c:1181:(.text.btmtk_submit_intr_urb+0x80): undefined reference to `usb_free_urb'
-powerpc-linux-ld: drivers/bluetooth/btmtk.c:1195:(.text.btmtk_submit_intr_urb+0x128): undefined reference to `usb_anchor_urb'
-powerpc-linux-ld: drivers/bluetooth/btmtk.c:1197:(.text.btmtk_submit_intr_urb+0x134): undefined reference to `usb_submit_urb'
-powerpc-linux-ld: drivers/bluetooth/btmtk.c:1202:(.text.btmtk_submit_intr_urb+0x17c): undefined reference to `usb_unanchor_urb'
-riscv32-linux-ld: btmtk.c:(.text+0x279a): undefined reference to `usb_kill_anchored_urbs'
-riscv32-linux-ld: drivers/bluetooth/btmtk.c:84:(.text+0x1bd0): undefined reference to `usb_kill_anchored_urbs'
-riscv32-linux-ld: include/linux/skbuff.h:2718:(.text+0x175e): undefined reference to `usb_submit_urb'
-riscv64-linux-ld: include/linux/usb.h:1974:(.text+0xc4e): undefined reference to `usb_control_msg'
+As I understand, it is expected behavior because the bluez has old
+bonding information and tries to use it instead of rewriting by new
+one.Is it possible to automatically override old bonding info in such
+a case and accept this pairing request? Looks like bluez service
+doesn't send any information via D-Bus in this situation.
 
-Error/Warning ids grouped by kconfigs:
+Bluetoothd log fragment is below:
 
-recent_errors
-|-- arm-randconfig-003-20240717
-|   |-- ERROR:usb_alloc_urb-drivers-bluetooth-btmtk.ko-undefined
-|   |-- ERROR:usb_anchor_urb-drivers-bluetooth-btmtk.ko-undefined
-|   |-- ERROR:usb_free_urb-drivers-bluetooth-btmtk.ko-undefined
-|   `-- ERROR:usb_submit_urb-drivers-bluetooth-btmtk.ko-undefined
-|-- arm64-randconfig-051-20240717
-|   |-- arch-arm64-boot-dts-qcom-qrb5165-rb5-vision-mezzanine.dtb:bluetooth:vddbtcmx-supply-is-a-required-property
-|   |-- arch-arm64-boot-dts-qcom-qrb5165-rb5-vision-mezzanine.dtb:bluetooth:vddrfa0p8-supply-is-a-required-property
-|   |-- arch-arm64-boot-dts-qcom-qrb5165-rb5-vision-mezzanine.dtb:bluetooth:vddrfa1p2-supply-is-a-required-property
-|   |-- arch-arm64-boot-dts-qcom-qrb5165-rb5-vision-mezzanine.dtb:bluetooth:vddrfa1p7-supply-is-a-required-property
-|   |-- arch-arm64-boot-dts-qcom-qrb5165-rb5-vision-mezzanine.dtb:bluetooth:vddrfacmn-supply-is-a-required-property
-|   |-- arch-arm64-boot-dts-qcom-qrb5165-rb5.dtb:bluetooth:vddbtcmx-supply-is-a-required-property
-|   |-- arch-arm64-boot-dts-qcom-qrb5165-rb5.dtb:bluetooth:vddrfa0p8-supply-is-a-required-property
-|   |-- arch-arm64-boot-dts-qcom-qrb5165-rb5.dtb:bluetooth:vddrfa1p2-supply-is-a-required-property
-|   |-- arch-arm64-boot-dts-qcom-qrb5165-rb5.dtb:bluetooth:vddrfa1p7-supply-is-a-required-property
-|   |-- arch-arm64-boot-dts-qcom-qrb5165-rb5.dtb:bluetooth:vddrfacmn-supply-is-a-required-property
-|   |-- arch-arm64-boot-dts-qcom-sm8650-qrd.dtb:bluetooth:vddrfa1p8-supply-is-a-required-property
-|   |-- arch-arm64-boot-dts-qcom-sm8650-qrd.dtb:bluetooth:vddrfacmn-supply-is-a-required-property
-|   |-- arch-arm64-boot-dts-qcom-sm8650-qrd.dtb:bluetooth:vddwlcx-supply-is-a-required-property
-|   `-- arch-arm64-boot-dts-qcom-sm8650-qrd.dtb:bluetooth:vddwlmx-supply-is-a-required-property
-|-- i386-randconfig-006-20240716
-|   `-- ERROR:usb_control_msg-drivers-bluetooth-btmtk.ko-undefined
-|-- i386-randconfig-011-20240717
-|   |-- ERROR:usb_alloc_urb-drivers-bluetooth-btmtk.ko-undefined
-|   |-- ERROR:usb_anchor_urb-drivers-bluetooth-btmtk.ko-undefined
-|   |-- ERROR:usb_control_msg-drivers-bluetooth-btmtk.ko-undefined
-|   |-- ERROR:usb_free_urb-drivers-bluetooth-btmtk.ko-undefined
-|   `-- ERROR:usb_submit_urb-drivers-bluetooth-btmtk.ko-undefined
-|-- mips-randconfig-r006-20230804
-|   `-- mipsel-linux-ld:drivers-bluetooth-btmtk.c:(.text):undefined-reference-to-usb_kill_anchored_urbs
-|-- nios2-randconfig-001-20240717
-|   |-- btmtk.c:(.text):relocation-truncated-to-fit:R_NIOS2_CALL26-against-usb_alloc_urb
-|   |-- btmtk.c:(.text):relocation-truncated-to-fit:R_NIOS2_CALL26-against-usb_anchor_urb
-|   |-- btmtk.c:(.text):relocation-truncated-to-fit:R_NIOS2_CALL26-against-usb_free_urb
-|   |-- btmtk.c:(.text):relocation-truncated-to-fit:R_NIOS2_CALL26-against-usb_submit_urb
-|   |-- btmtk.c:(.text):relocation-truncated-to-fit:R_NIOS2_CALL26-against-usb_unanchor_urb
-|   |-- btmtk.c:(.text):undefined-reference-to-usb_alloc_urb
-|   |-- btmtk.c:(.text):undefined-reference-to-usb_anchor_urb
-|   |-- nios2-linux-ld:btmtk.c:(.text):undefined-reference-to-usb_anchor_urb
-|   |-- nios2-linux-ld:btmtk.c:(.text):undefined-reference-to-usb_free_urb
-|   |-- nios2-linux-ld:btmtk.c:(.text):undefined-reference-to-usb_submit_urb
-|   `-- nios2-linux-ld:btmtk.c:(.text):undefined-reference-to-usb_unanchor_urb
-|-- powerpc-buildonly-randconfig-r004-20220420
-|   |-- powerpc-linux-ld:drivers-bluetooth-btmtk.c:(.text.btmtk_intr_complete):undefined-reference-to-usb_submit_urb
-|   |-- powerpc-linux-ld:drivers-bluetooth-btmtk.c:(.text.btmtk_intr_complete):undefined-reference-to-usb_unanchor_urb
-|   |-- powerpc-linux-ld:drivers-bluetooth-btmtk.c:(.text.btmtk_submit_intr_urb):undefined-reference-to-usb_anchor_urb
-|   |-- powerpc-linux-ld:drivers-bluetooth-btmtk.c:(.text.btmtk_submit_intr_urb):undefined-reference-to-usb_free_urb
-|   |-- powerpc-linux-ld:drivers-bluetooth-btmtk.c:(.text.btmtk_submit_intr_urb):undefined-reference-to-usb_submit_urb
-|   `-- powerpc-linux-ld:drivers-bluetooth-btmtk.c:(.text.btmtk_submit_intr_urb):undefined-reference-to-usb_unanchor_urb
-|-- riscv-buildonly-randconfig-r003-20220819
-|   `-- riscv32-linux-ld:btmtk.c:(.text):undefined-reference-to-usb_kill_anchored_urbs
-|-- riscv-randconfig-p002-20221104
-|   |-- include-asm-generic-unaligned.h:(.text):undefined-reference-to-usb_control_msg
-|   |-- riscv32-linux-ld:drivers-bluetooth-btmtk.c:(.text):undefined-reference-to-usb_kill_anchored_urbs
-|   `-- riscv32-linux-ld:include-linux-skbuff.h:(.text):undefined-reference-to-usb_submit_urb
-`-- riscv-randconfig-r022-20230727
-    |-- include-linux-fortify-string.h:(.text):undefined-reference-to-usb_set_interface
-    `-- riscv64-linux-ld:include-linux-usb.h:(.text):undefined-reference-to-usb_control_msg
-
-elapsed time: 735m
-
-configs tested: 146
-configs skipped: 4
-
-tested configs:
-alpha                             allnoconfig   gcc-13.2.0
-alpha                            allyesconfig   gcc-13.3.0
-alpha                               defconfig   gcc-13.2.0
-arc                              allmodconfig   gcc-13.2.0
-arc                               allnoconfig   gcc-13.2.0
-arc                              allyesconfig   gcc-13.2.0
-arc                      axs103_smp_defconfig   gcc-13.2.0
-arc                                 defconfig   gcc-13.2.0
-arc                     haps_hs_smp_defconfig   gcc-13.2.0
-arc                            hsdk_defconfig   gcc-13.2.0
-arc                    vdk_hs38_smp_defconfig   gcc-13.2.0
-arm                              allmodconfig   gcc-13.2.0
-arm                              allmodconfig   gcc-14.1.0
-arm                               allnoconfig   gcc-13.2.0
-arm                              allyesconfig   gcc-13.2.0
-arm                              allyesconfig   gcc-14.1.0
-arm                                 defconfig   gcc-13.2.0
-arm                        mvebu_v7_defconfig   gcc-13.2.0
-arm                        neponset_defconfig   gcc-13.2.0
-arm                           omap1_defconfig   gcc-13.2.0
-arm                           sama7_defconfig   gcc-13.2.0
-arm64                            allmodconfig   clang-19
-arm64                            allmodconfig   gcc-13.2.0
-arm64                             allnoconfig   gcc-13.2.0
-arm64                               defconfig   gcc-13.2.0
-csky                             alldefconfig   gcc-13.2.0
-csky                              allnoconfig   gcc-13.2.0
-csky                                defconfig   gcc-13.2.0
-hexagon                          allmodconfig   clang-19
-hexagon                          allyesconfig   clang-19
-i386                             allmodconfig   clang-18
-i386                             allmodconfig   gcc-13
-i386                              allnoconfig   clang-18
-i386                              allnoconfig   gcc-13
-i386                             allyesconfig   clang-18
-i386                             allyesconfig   gcc-13
-i386         buildonly-randconfig-001-20240717   clang-18
-i386         buildonly-randconfig-002-20240717   clang-18
-i386         buildonly-randconfig-003-20240717   clang-18
-i386         buildonly-randconfig-004-20240717   clang-18
-i386         buildonly-randconfig-005-20240717   clang-18
-i386         buildonly-randconfig-006-20240717   clang-18
-i386                                defconfig   clang-18
-i386                  randconfig-001-20240717   clang-18
-i386                  randconfig-002-20240717   clang-18
-i386                  randconfig-003-20240717   clang-18
-i386                  randconfig-004-20240717   clang-18
-i386                  randconfig-005-20240717   clang-18
-i386                  randconfig-006-20240717   clang-18
-i386                  randconfig-011-20240717   clang-18
-i386                  randconfig-012-20240717   clang-18
-i386                  randconfig-013-20240717   clang-18
-i386                  randconfig-014-20240717   clang-18
-i386                  randconfig-015-20240717   clang-18
-i386                  randconfig-016-20240717   clang-18
-loongarch                        allmodconfig   gcc-14.1.0
-loongarch                         allnoconfig   gcc-13.2.0
-loongarch                           defconfig   gcc-13.2.0
-m68k                             allmodconfig   gcc-14.1.0
-m68k                              allnoconfig   gcc-13.2.0
-m68k                             allyesconfig   gcc-14.1.0
-m68k                                defconfig   gcc-13.2.0
-microblaze                       allmodconfig   gcc-14.1.0
-microblaze                        allnoconfig   gcc-13.2.0
-microblaze                       allyesconfig   gcc-14.1.0
-microblaze                          defconfig   gcc-13.2.0
-mips                              allnoconfig   gcc-13.2.0
-nios2                         10m50_defconfig   gcc-13.2.0
-nios2                             allnoconfig   gcc-13.2.0
-nios2                               defconfig   gcc-13.2.0
-openrisc                          allnoconfig   gcc-14.1.0
-openrisc                         allyesconfig   gcc-14.1.0
-openrisc                            defconfig   gcc-14.1.0
-parisc                           allmodconfig   gcc-14.1.0
-parisc                            allnoconfig   gcc-14.1.0
-parisc                           allyesconfig   gcc-14.1.0
-parisc                              defconfig   gcc-14.1.0
-parisc64                            defconfig   gcc-13.2.0
-powerpc                          allmodconfig   gcc-14.1.0
-powerpc                           allnoconfig   gcc-14.1.0
-powerpc                          allyesconfig   clang-19
-powerpc                          allyesconfig   gcc-14.1.0
-powerpc                   currituck_defconfig   gcc-13.2.0
-powerpc                    ge_imp3a_defconfig   gcc-13.2.0
-powerpc                   lite5200b_defconfig   gcc-13.2.0
-powerpc                     mpc512x_defconfig   gcc-13.2.0
-powerpc                 mpc834x_itx_defconfig   gcc-13.2.0
-powerpc               mpc834x_itxgp_defconfig   gcc-13.2.0
-riscv                            allmodconfig   clang-19
-riscv                            allmodconfig   gcc-14.1.0
-riscv                             allnoconfig   gcc-14.1.0
-riscv                            allyesconfig   clang-19
-riscv                            allyesconfig   gcc-14.1.0
-riscv                               defconfig   gcc-14.1.0
-s390                             allmodconfig   clang-19
-s390                              allnoconfig   clang-19
-s390                              allnoconfig   gcc-14.1.0
-s390                             allyesconfig   clang-19
-s390                             allyesconfig   gcc-14.1.0
-s390                                defconfig   gcc-14.1.0
-sh                               allmodconfig   gcc-14.1.0
-sh                                allnoconfig   gcc-13.2.0
-sh                               allyesconfig   gcc-14.1.0
-sh                                  defconfig   gcc-14.1.0
-sparc                            allmodconfig   gcc-14.1.0
-sparc64                             defconfig   gcc-14.1.0
-um                               allmodconfig   clang-19
-um                               allmodconfig   gcc-13.3.0
-um                                allnoconfig   clang-17
-um                                allnoconfig   gcc-14.1.0
-um                               allyesconfig   gcc-13
-um                               allyesconfig   gcc-13.3.0
-um                                  defconfig   gcc-14.1.0
-um                             i386_defconfig   gcc-14.1.0
-um                           x86_64_defconfig   gcc-14.1.0
-x86_64                            allnoconfig   clang-18
-x86_64                           allyesconfig   clang-18
-x86_64       buildonly-randconfig-001-20240717   gcc-13
-x86_64       buildonly-randconfig-002-20240717   gcc-13
-x86_64       buildonly-randconfig-003-20240717   gcc-13
-x86_64       buildonly-randconfig-004-20240717   gcc-13
-x86_64       buildonly-randconfig-005-20240717   gcc-13
-x86_64       buildonly-randconfig-006-20240717   gcc-13
-x86_64                              defconfig   clang-18
-x86_64                              defconfig   gcc-13
-x86_64                randconfig-001-20240717   gcc-13
-x86_64                randconfig-002-20240717   gcc-13
-x86_64                randconfig-003-20240717   gcc-13
-x86_64                randconfig-004-20240717   gcc-13
-x86_64                randconfig-005-20240717   gcc-13
-x86_64                randconfig-006-20240717   gcc-13
-x86_64                randconfig-011-20240717   gcc-13
-x86_64                randconfig-012-20240717   gcc-13
-x86_64                randconfig-013-20240717   gcc-13
-x86_64                randconfig-014-20240717   gcc-13
-x86_64                randconfig-015-20240717   gcc-13
-x86_64                randconfig-016-20240717   gcc-13
-x86_64                randconfig-071-20240717   gcc-13
-x86_64                randconfig-072-20240717   gcc-13
-x86_64                randconfig-073-20240717   gcc-13
-x86_64                randconfig-074-20240717   gcc-13
-x86_64                randconfig-075-20240717   gcc-13
-x86_64                randconfig-076-20240717   gcc-13
-x86_64                          rhel-8.3-rust   clang-18
-xtensa                            allnoconfig   gcc-13.2.0
-xtensa                       common_defconfig   gcc-13.2.0
+Jul 17 15:12:08 raspberry bluetoothd[735]:
+src/shared/mgmt.c:can_read_data() [0x0000] event 0x000b
+Jul 17 15:12:08 raspberry bluetoothd[735]:
+src/adapter.c:connected_callback() hci0 device F0:39:65:2A:5D:F4
+connected eir_len 0
+Jul 17 15:12:08 raspberry bluetoothd[735]:
+src/gatt-database.c:connect_cb() New incoming LE ATT connection
+Jul 17 15:12:08 raspberry bluetoothd[735]:
+src/device.c:device_attach_att() Elevating security level since LTK is
+available
+Jul 17 15:12:08 raspberry bluetoothd[735]:
+attrib/gattrib.c:g_attrib_ref() 0x55556e447e30: g_attrib_ref=1
+Jul 17 15:12:08 raspberry bluetoothd[735]: src/device.c:load_gatt_db()
+Restoring F0:39:65:2A:5D:F4 gatt database from file
+Jul 17 15:12:08 raspberry bluetoothd[735]:
+src/settings.c:btd_settings_gatt_db_load() Unable to load key file
+from /var/lib/bluetooth/2C:CF:67:43:20:E3/cache/F0:39:65:2A:5D:F4: (No
+such file or directory)
+Jul 17 15:12:08 raspberry bluetoothd[735]:
+src/device.c:gatt_client_init() Reverse service discovery disabled:
+skipping GATT client
+...
+Jul 17 15:12:11 raspberry bluetoothd[735]:
+src/shared/mgmt.c:can_read_data() [0x0000] event 0x000f
+Jul 17 15:12:11 raspberry bluetoothd[735]:
+src/adapter.c:user_confirm_request_callback() hci0 F0:39:65:2A:5D:F4
+confirm_hint 1
+Jul 17 15:12:11 raspberry bluetoothd[735]:
+src/adapter.c:btd_adapter_confirm_reply() hci0 addr F0:39:65:2A:5D:F4
+success 0
+Jul 17 15:12:11 raspberry bluetoothd[735]:
+src/shared/mgmt.c:send_request() [0x0000] command 0x001d
+Jul 17 15:12:11 raspberry bluetoothd[735]:
+src/shared/mgmt.c:can_read_data() [0x0000] event 0x0011
+Jul 17 15:12:11 raspberry bluetoothd[735]:
+src/adapter.c:bonding_attempt_complete() hci0 bdaddr F0:39:65:2A:5D:F4
+type 1 status 0x5
+Jul 17 15:12:11 raspberry bluetoothd[735]:
+src/device.c:device_bonding_complete() bonding (nil) status 0x05
+Jul 17 15:12:11 raspberry bluetoothd[735]:
+src/device.c:device_bonding_failed() status 5
+Jul 17 15:12:11 raspberry bluetoothd[735]: src/adapter.c:resume_discovery()
+Jul 17 15:12:11 raspberry bluetoothd[735]:
+src/shared/mgmt.c:can_read_data() [0x0000] command 0x001d complete:
+0x00
+Jul 17 15:12:12 raspberry bluetoothd[735]:
+src/device.c:device_remove() Removing device
+/org/bluez/hci0/dev_6F_6F_75_1D_A8_AC
+Jul 17 15:12:12 raspberry bluetoothd[735]:
+src/device.c:btd_device_unref() Freeing device
+/org/bluez/hci0/dev_6F_6F_75_1D_A8_AC
+Jul 17 15:12:12 raspberry bluetoothd[735]: src/device.c:device_free()
+0x55556e447410
+Jul 17 15:12:14 raspberry bluetoothd[735]:
+src/shared/mgmt.c:can_read_data() [0x0000] event 0x000c
+Jul 17 15:12:14 raspberry bluetoothd[735]:
+src/adapter.c:dev_disconnected() Device F0:39:65:2A:5D:F4
+disconnected, reason 3
+Jul 17 15:12:14 raspberry bluetoothd[735]:
+src/adapter.c:adapter_remove_connection()
+Jul 17 15:12:14 raspberry bluetoothd[735]:
+plugins/policy.c:disconnect_cb() reason 3
+Jul 17 15:12:14 raspberry bluetoothd[735]:
+src/adapter.c:bonding_attempt_complete() hci0 bdaddr F0:39:65:2A:5D:F4
+type 1 status 0xe
+Jul 17 15:12:14 raspberry bluetoothd[735]:
+src/device.c:device_bonding_complete() bonding (nil) status 0x0e
+Jul 17 15:12:14 raspberry bluetoothd[735]:
+src/device.c:device_bonding_failed() status 14
+Jul 17 15:12:14 raspberry bluetoothd[735]: src/adapter.c:resume_discovery()
+Jul 17 15:12:14 raspberry bluetoothd[735]:
+src/shared/att.c:disconnect_cb() Channel 0x55556e447e90 disconnected:
+Connection reset by peer
+Jul 17 15:12:14 raspberry bluetoothd[735]: src/device.c:att_disconnected_cb()
+Jul 17 15:12:14 raspberry bluetoothd[735]:
+src/device.c:att_disconnected_cb() Connection reset by peer (104)
+Jul 17 15:12:14 raspberry bluetoothd[735]:
+src/device.c:att_disconnected_cb() Automatic connection disabled
+Jul 17 15:12:14 raspberry bluetoothd[735]:
+src/gatt-database.c:btd_gatt_database_att_disconnected()
+Jul 17 15:12:14 raspberry bluetoothd[735]:
+src/gatt-database.c:att_disconnected()
+Jul 17 15:12:14 raspberry bluetoothd[735]:
+attrib/gattrib.c:g_attrib_unref() 0x55556e447e30: g_attrib_unref=0
 
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Yauhen Kharuzhy
