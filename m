@@ -1,78 +1,103 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0622E208BA
-	for <linux-bluetooth@vger.kernel.org>; Wed, 17 Jul 2024 20:00:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAE93763EE;
+	Thu, 18 Jul 2024 07:42:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721246450; cv=none; b=AHKf/qZi3gC/CQH5Pj+fSvKpD7pX2vp3wBdFW7UQU561oOuE4SP4YOAOxlEJUuocDekPrj/S1Cydbj93aBC4Ad4pWZHGp+ZXyLi2YgqqA9822+BDOMKHeGyhYJgLAr6j/i25MaD1LynxmV/nhgS7Df9Gt1wKZPtOiYi7FmqiQ/w=
+	t=1721288577; cv=none; b=iTd7GS7irmvWwNK27N3iQ1sNA3zHpUhoFDAPtRNKiku/EtS3QbDihJajfliO3KUclqQFyHHbssBQsYSHxkcpA0qb7gODKEtkz0ZlN0UVaNXDx7zIP2VcDjSHWzK/pNYpA5FbLc4QtpC9NgWrEIZfo8sOj3GklsGH/uLJRajY3RI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721246450; c=relaxed/simple;
-	bh=b7gtm5vfvXAqzm9pqjsaPSPlr+hbpm2FKV6xFEnflL0=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=srX5aBps/KYJq4Qyn/gIv6gzUS3wnmEVXtQJjgYasBwOd6B3zsRBWVmTWXVJYpGWg+L7ngoBX+QYdWtO4EhppramS69U9zkyoDMfJFHoYveu8VDYrz3giq0/YENpfRCdU4ypXkT4jzjnkrtqDQ05vAoiy7PTDVVXPAYzCt30ONc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bPVYE8W4; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1721288577; c=relaxed/simple;
+	bh=McKO7a2Y9X5UuWrJvOXo6XzO6tf+ZBq08Na/c5RO+zI=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=bPmS/kS19zb8sJA/+7GnePasxW8PRlW+ZrH0RnjhGScrDLrG8AJ9TC8AkUNKOVGCTBzPAq39SHIwhM9HDDOqKNh6UTHp/rSD7ICk9KcoOOVh4hoOXLJlncKO5OlMvd6DuwUQDe3UV9q32bACVUjsb54eK822ny+lWOAzUkBTrKc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iyYL68MF; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bPVYE8W4"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 94158C4AF0B;
-	Wed, 17 Jul 2024 20:00:49 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iyYL68MF"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 2DCE6C116B1;
+	Thu, 18 Jul 2024 07:42:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1721246449;
-	bh=b7gtm5vfvXAqzm9pqjsaPSPlr+hbpm2FKV6xFEnflL0=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=bPVYE8W4T8ohZq73wWXEG3O1H1UWmUoe/F0E+7dioopMY5JXC3wkFh3DGOKJCfr0B
-	 5lYmj16506PsAbWKTqaETHZxbE7albsDwvqTj6KG7yirXJl84pzejOYN2KCd51NM20
-	 Rd2knisTXoxFhF0SCFdHfo8ARb05Ah0L47OQp8Qz0+CGTxyqpFAdI1Mj7yDmTZHFeq
-	 z+4bbLEFNuhqdYFebfJX7qKlkDuB+LV2R23QNY1sZsFFobYplmUCU87IJMSntZmTWT
-	 M3OQHYZ8QRDZNJtbxGAMQqHnVvJgGw30ijae86dalnLjo6v2wqBOp0YmnHBSZXE2oY
-	 d0Ic7LVeFHjZw==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 8B083C4332D;
-	Wed, 17 Jul 2024 20:00:49 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1721288577;
+	bh=McKO7a2Y9X5UuWrJvOXo6XzO6tf+ZBq08Na/c5RO+zI=;
+	h=From:Subject:Date:To:Cc:Reply-To:From;
+	b=iyYL68MF1S0LvsDrkCN9wdDVBzCz2X7MmT06y2MuWP9GsgLALmO7ebL4j6YKA0n/y
+	 XGZ89Xf7C0C73EL9NzJoJ5gHF0Q9GJAczDX/AwSGQQHYrxGzK4wUEHNVrtkrIgy8av
+	 Nrh2wegio2YIk/WURHdmmZHjamf7JyvYaOBtC/q7eM4b3UPXhCbSsERMrMWdX6l+Fm
+	 JQEybTVxLrBJMCfjrWwB+tPd2/LpCUqKBrPG+yFuraEW2ettzpWRuB8s3M13YCcZjW
+	 LCmZRkFgxDXs9uABRyv9jgpVoN+MhnJl37LnHEhAF1V4Mx3XIYPfC9Bvg8Jtn5NplI
+	 GhhTSuH1+no1A==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E186C3DA49;
+	Thu, 18 Jul 2024 07:42:57 +0000 (UTC)
+From: Yang Li via B4 Relay <devnull+yang.li.amlogic.com@kernel.org>
+Subject: [PATCH v2 0/3] Add support for Amlogic HCI UART
+Date: Thu, 18 Jul 2024 15:42:18 +0800
+Message-Id: <20240718-btaml-v2-0-1392b2e21183@amlogic.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2] Bluetooth: hci_sync: Fix suspending with wrong filter
- policy
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <172124644956.29564.11708078781870404249.git-patchwork-notify@kernel.org>
-Date: Wed, 17 Jul 2024 20:00:49 +0000
-References: <20240716150126.512727-1-luiz.dentz@gmail.com>
-In-Reply-To: <20240716150126.512727-1-luiz.dentz@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAFrHmGYC/y3MQQ7CIBRF0a00fywGkAZw5D5MB0Ch/YktBhqia
+ di7WB3el5ezQ/YJfYZrt0PyBTPGtQU/deBms06e4NgaOOWCCqaI3czyIEGP0jItuTAW2veZfMD
+ X4dyH1jPmLab3wRb2XX+CpP1fKIxQIgPrLypo5Xy4tTVO6M4uLjDUWj+mDLEinAAAAA==
+To: Marcel Holtmann <marcel@holtmann.org>, 
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+ Conor Dooley <conor+dt@kernel.org>, 
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>
+Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org, 
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ linux-arm-kernel@lists.infradead.org, Yang Li <yang.li@amlogic.com>, 
+ Ye He <ye.he@amlogic.com>
+X-Mailer: b4 0.13-dev-f0463
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1721288574; l=1309;
+ i=yang.li@amlogic.com; s=20240418; h=from:subject:message-id;
+ bh=McKO7a2Y9X5UuWrJvOXo6XzO6tf+ZBq08Na/c5RO+zI=;
+ b=yaEHvInkvweHp4KULgQoWMx2FfK9VIzp24xUAWtkczpAXykd9ulVlbDUQyyItoTFFdlqpTF+R
+ 3LBUXfXOZtFBO1nMiiSc+rH13F9K6ssqRZO7fZnUFROqioIQsgUg1xr
+X-Developer-Key: i=yang.li@amlogic.com; a=ed25519;
+ pk=86OaNWMr3XECW9HGNhkJ4HdR2eYA5SEAegQ3td2UCCs=
+X-Endpoint-Received: by B4 Relay for yang.li@amlogic.com/20240418 with
+ auth_id=180
+X-Original-From: Yang Li <yang.li@amlogic.com>
+Reply-To: yang.li@amlogic.com
 
-Hello:
+Add support for Amlogic HCI UART, including dt-binding,
+and Amlogic Bluetooth driver.
 
-This patch was applied to bluetooth/bluetooth-next.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+Signed-off-by: Yang Li <yang.li@amlogic.com>
+---
+Changes in v2:
+- Introduce a regulator for powering up the Bluetooth chip instead of power sequencing.
+- Use the GPIO Consumer API to manipulate the GPIO pins instead of the legacy API.
+- Minor fixes.
+- Link to v1: https://lore.kernel.org/r/20240705-btaml-v1-0-7f1538f98cef@amlogic.com
 
-On Tue, 16 Jul 2024 11:01:26 -0400 you wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> 
-> When suspending the scan filter policy cannot be 0x00 (no acceptlist)
-> since that means the host has to process every advertisement report
-> waking up the system, so this attempts to check if hdev is marked as
-> suspended and if the resulting filter policy would be 0x00 (no
-> acceptlist) then skip passive scanning if thre no devices in the
-> acceptlist otherwise reset the filter policy to 0x01 so the acceptlist
-> is used since the devices programmed there can still wakeup be system.
-> 
-> [...]
+---
+Yang Li (3):
+      dt-bindings: net: bluetooth: Add support for Amlogic Bluetooth
+      Bluetooth: hci_uart: Add support for Amlogic HCI UART
+      MAINTAINERS: Add an entry for Amlogic HCI UART (M: Yang Li)
 
-Here is the summary with links:
-  - [v2] Bluetooth: hci_sync: Fix suspending with wrong filter policy
-    https://git.kernel.org/bluetooth/bluetooth-next/c/54dd4796336d
+ .../bindings/net/bluetooth/amlogic,w155s2-bt.yaml  |  66 ++
+ MAINTAINERS                                        |   7 +
+ drivers/bluetooth/Kconfig                          |  12 +
+ drivers/bluetooth/Makefile                         |   1 +
+ drivers/bluetooth/hci_aml.c                        | 772 +++++++++++++++++++++
+ drivers/bluetooth/hci_ldisc.c                      |   8 +-
+ drivers/bluetooth/hci_uart.h                       |   8 +-
+ 7 files changed, 871 insertions(+), 3 deletions(-)
+---
+base-commit: 54dd4796336de8ce5cbf344db837f9b8448ebcf8
+change-id: 20240418-btaml-f9d7b19724ab
 
-You are awesome, thank you!
+Best regards,
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+Yang Li <yang.li@amlogic.com>
 
 
