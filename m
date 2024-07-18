@@ -1,191 +1,207 @@
-Received: from mail-vs1-f44.google.com (mail-vs1-f44.google.com [209.85.217.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88A3B74E26
-	for <linux-bluetooth@vger.kernel.org>; Thu, 18 Jul 2024 08:38:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93B8412D745;
+	Thu, 18 Jul 2024 11:41:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721291928; cv=none; b=ZzOpjbHlYSplx8E2rvYA+j9x1hchLTBgM2PzA2pX2dSBnpcbI/CgdcYKYxOoLNZmalswRhSXMqYuRST5ttsua1m63oGMOb33Yap/cdNjhPH+MONMEaFkFAQ3YZ7RayjdV+UqCeBEQbpzGzVtnGiGmbnbeGUbgV5NCY3qHVGEyyI=
+	t=1721302867; cv=none; b=oRArKdbMp31YxLrff2tP13csTRIoGW3im8yBnhq3QzyBcb4ROZH69ho56etPzrYtaqVz9yTupcZVXFRBvmEZj6XR/8f3gZy9ky+zPeoaR7f+p9K6DdXn9AZFQ4EiJkxctORvzrDHRV3EI5DyGmY6swsKu2YO156OUDZh/CEfoKw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721291928; c=relaxed/simple;
-	bh=nJ0B6qVEVYuce0BoMABNrUJoJHXvRiYy2b9943lC3jo=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=rpUAXBE2OaKgQrIn7DrnYI91SaUgdOBuuOAEfDzhEO/Au25VbQLSDbQoKAZZFZrNaVeGRwALw+6rw7Yl8K9a646t93CNl+4ohORF9arM8cispnV8RG0i1/AVEerF4wLNbSf7gvl7scQUTpu6jXWF4VUCnRLA/H9+ugRW+tDkXtY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=D+GMdjgw; arc=none smtp.client-ip=209.85.217.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1721302867; c=relaxed/simple;
+	bh=DLfE2xWxXuAKnjor6litn0ZHyZYgkG1Fn2AU+O3HdPY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ePBQkmuqZvYbC/VMs0fRLm31xBouD0leu00PSdsPz+lfYTnzN7TziZjeW/h/vugUr/SPpQRTqd4heYcQHmKKBfqn3SP8HIcmzYhlGAXciQUrmzbrIdqEG6+iBn6fcQRfzfWMmXUDeoHnRn7Ef/yOd0GxbgktawzA1S4ipgfZeyU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MwMexBtI; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="D+GMdjgw"
-Received: by mail-vs1-f44.google.com with SMTP id ada2fe7eead31-48ffd139a9cso195710137.0
-        for <linux-bluetooth@vger.kernel.org>; Thu, 18 Jul 2024 01:38:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1721291925; x=1721896725; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=jk+V7GLZyssKBgU50CKLRyPpnG76qFxGLn4GTIMbpOo=;
-        b=D+GMdjgwWRihwioZAxBnRqyb98d2PJnrUEu6rzNjST7/+8INY1FVk+yHezbemZUujD
-         kx4uShgcXVtoeBfDAkn/sYuvAF5dggqQNYFLR1+WP4bBKf2oIEWdIkgZELas6Bf/aGf8
-         fleuhArtacvtI6vaYUXVSaKA0twK31i7gwzPdqey7LCmcZ4zamSI69h7UI1F3vBhZxVe
-         CKxDyTgct3aFvkujHDSsVTxoS7Lyr+LdES79kQNDp4PI5tctItY+9iH1SPtAue2xUaTG
-         iiV2rNzpn09OuCFYA8WxwvIqQLFsmUU8cdDn+6PjHQWiWHbKom/0xI0wYV46XPoDy/VZ
-         66Eg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721291925; x=1721896725;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=jk+V7GLZyssKBgU50CKLRyPpnG76qFxGLn4GTIMbpOo=;
-        b=FyS4EDhPSE16u+gJFz1Rv+IhIFdmmrwYkmBxrqUd+/H5l8owZoz/iG8mPKzjMcEoAM
-         s07gWBAXRWDg6g93hl2zckqV/RvTdN7wcsUZtRsh570aZnFyxRICIvldOGP/AR3OOcHC
-         ogHPXM+xYzC9OFs/rRhk1ESP+KAKcpXE1fnMrkUoXXOKsVzoGRQIC+pzdvoNtFC+yQdu
-         PW9uGcZcG/uX/2j29VxyQ9dbiMXFm5ixGN8noLk9n0x6TvifzOWxv/3UJP+W0XPsoJNP
-         lhh3xP3iU7D6nUrKH42oLZG+m+JbpbX565tfoaycSYE26DcUk3jOTIjfvmHD0CWjWjum
-         T/Bg==
-X-Gm-Message-State: AOJu0YyuVdNlMR+ffCvpYDhkRBiZRob8IMhYsxj/HiknP2cTYXh0JTER
-	RiNPA/zjltEJH44aBCihhG2JZRsJLsl1sqjrIcorR9u5roVvtn8HRIcNuA==
-X-Google-Smtp-Source: AGHT+IF2dhq23XIIs3vrQCMuDspMNd34+IocPmXJZfEuT4IAs5B33cUGPEgPc0Vx8vGZ4X+5MRlTXg==
-X-Received: by 2002:a05:6102:8014:b0:48f:bbf3:b8b5 with SMTP id ada2fe7eead31-4915986a8afmr5708181137.7.1721291925099;
-        Thu, 18 Jul 2024 01:38:45 -0700 (PDT)
-Received: from [172.17.0.2] ([20.81.46.179])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-44f96a238a0sm350041cf.55.2024.07.18.01.38.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 18 Jul 2024 01:38:44 -0700 (PDT)
-Message-ID: <6698d494.c80a0220.32ffa.010d@mx.google.com>
-Date: Thu, 18 Jul 2024 01:38:44 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============8921137989227291009=="
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MwMexBtI"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E425DC116B1;
+	Thu, 18 Jul 2024 11:41:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1721302867;
+	bh=DLfE2xWxXuAKnjor6litn0ZHyZYgkG1Fn2AU+O3HdPY=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=MwMexBtI4sSqlgF86D9iVOE+SvzC9XrPo3oAFgSUuu37Wagh9ba6YjNElyhuxgwaA
+	 DZewPR00gKFOWaCAq0/Ak54Lt58q+Ix4de1GSYTfo5E+cmGL/oNInRPF6TcVZslpBJ
+	 TeXh9vR/xW5zKkg279eclHMYR8x1qkjkjbnBTZ8+qrXK+R6LTKKexFy0m3VJNBUjI+
+	 fH44jCxYGuvnixlZrxwThK9BV6hiRE8K1/i3IIev/zAnW0URAriJlSdxUP9efWmay7
+	 cw7UBW+Ux6ju5k0/7yg7IQbVHH/6A992BCuKeYX0/U7wQ80i/+gBEhmV35EY4JTDZ3
+	 L8faX8rUqwBGA==
+Message-ID: <18f1301f-6d93-4645-b6d9-e4ccd103ff5d@kernel.org>
+Date: Thu, 18 Jul 2024 13:40:59 +0200
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, devnull+yang.li.amlogic.com@kernel.org
-Subject: RE: Add support for Amlogic HCI UART
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 1/3] dt-bindings: net: bluetooth: Add support for
+ Amlogic Bluetooth
+To: yang.li@amlogic.com, Marcel Holtmann <marcel@holtmann.org>,
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+ Conor Dooley <conor+dt@kernel.org>, Catalin Marinas
+ <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>
+Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org
+References: <20240718-btaml-v2-0-1392b2e21183@amlogic.com>
+ <20240718-btaml-v2-1-1392b2e21183@amlogic.com>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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 fv0=
 In-Reply-To: <20240718-btaml-v2-1-1392b2e21183@amlogic.com>
-References: <20240718-btaml-v2-1-1392b2e21183@amlogic.com>
-Reply-To: linux-bluetooth@vger.kernel.org
-
---===============8921137989227291009==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-This is automated email and please do not reply to this email!
+On 18/07/2024 09:42, Yang Li via B4 Relay wrote:
+> From: Yang Li <yang.li@amlogic.com>
+> 
+> Add binding document for Amlogic Bluetooth chipsets attached over UART.
+> 
+> Signed-off-by: Yang Li <yang.li@amlogic.com>
+> ---
+>  .../bindings/net/bluetooth/amlogic,w155s2-bt.yaml  | 66 ++++++++++++++++++++++
+>  1 file changed, 66 insertions(+)
+> 
+> diff --git a/Documentation/devicetree/bindings/net/bluetooth/amlogic,w155s2-bt.yaml b/Documentation/devicetree/bindings/net/bluetooth/amlogic,w155s2-bt.yaml
+> new file mode 100644
+> index 000000000000..2e433d5692ff
+> --- /dev/null
+> +++ b/Documentation/devicetree/bindings/net/bluetooth/amlogic,w155s2-bt.yaml
+> @@ -0,0 +1,66 @@
+> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+> +# Copyright (C) 2024 Amlogic, Inc. All rights reserved
+> +%YAML 1.2
+> +---
+> +$id: http://devicetree.org/schemas/net/bluetooth/amlogic,w155s2-bt.yaml#
+> +$schema: http://devicetree.org/meta-schemas/core.yaml#
+> +
+> +title: Amlogic Bluetooth chips
+> +
+> +description:
+> +  This binding describes UART-attached Amlogic bluetooth chips.
 
-Dear submitter,
+<form letter>
+This is a friendly reminder during the review process.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=872164
+It seems my or other reviewer's previous comments were not fully
+addressed. Maybe the feedback got lost between the quotes, maybe you
+just forgot to apply it. Please go back to the previous discussion and
+either implement all requested changes or keep discussing them.
 
----Test result---
-
-Test Summary:
-CheckPatch                    FAIL      3.75 seconds
-GitLint                       PASS      0.97 seconds
-SubjectPrefix                 FAIL      0.59 seconds
-BuildKernel                   PASS      30.89 seconds
-CheckAllWarning               PASS      32.22 seconds
-CheckSparse                   PASS      37.88 seconds
-CheckSmatch                   PASS      102.54 seconds
-BuildKernel32                 PASS      28.77 seconds
-TestRunnerSetup               PASS      526.54 seconds
-TestRunner_l2cap-tester       PASS      20.09 seconds
-TestRunner_iso-tester         FAIL      35.18 seconds
-TestRunner_bnep-tester        PASS      4.87 seconds
-TestRunner_mgmt-tester        FAIL      118.20 seconds
-TestRunner_rfcomm-tester      PASS      7.56 seconds
-TestRunner_sco-tester         PASS      51.38 seconds
-TestRunner_ioctl-tester       PASS      7.97 seconds
-TestRunner_mesh-tester        PASS      6.00 seconds
-TestRunner_smp-tester         PASS      6.94 seconds
-TestRunner_userchan-tester    PASS      5.06 seconds
-IncrementalBuild              PASS      40.47 seconds
-
-Details
-##############################
-Test: CheckPatch - FAIL
-Desc: Run checkpatch.pl script
-Output:
-[v2,1/3] dt-bindings: net: bluetooth: Add support for Amlogic Bluetooth
-WARNING: added, moved or deleted file(s), does MAINTAINERS need updating?
-#93: 
-new file mode 100644
-
-total: 0 errors, 1 warnings, 66 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/src/13736148.patch has style problems, please review.
-
-NOTE: Ignored message types: UNKNOWN_COMMIT_ID
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+Thank you.
+</form letter>
 
 
-[v2,2/3] Bluetooth: hci_uart: Add support for Amlogic HCI UART
-WARNING: please write a help paragraph that fully describes the config symbol
-#110: FILE: drivers/bluetooth/Kconfig:277:
-+config BT_HCIUART_AML
-+	bool "Amlogic protocol support"
-+	depends on BT_HCIUART
-+	depends on BT_HCIUART_SERDEV
-+	select BT_HCIUART_H4
-+	select FW_LOADER
-+	help
-+	  The Amlogic protocol support enables Bluetooth HCI over serial
-+	  port interface for Amlogic Bluetooth controllers.
-+
-+	  Say Y here to compile support for HCI AML protocol.
-+
+> +
+> +maintainers:
+> +  - Yang Li <yang.li@amlogic.com>
+> +
+> +properties:
+> +  compatible:
+> +    oneOf:
+> +      - const: amlogic,w155s2-bt
+> +      - items:
+> +          - enum:
+> +              - amlogic,w265s1-bt
+> +              - amlogic,w265p1-bt
+> +              - amlogic,w265s2-bt
+> +          - const: amlogic,w155s2-bt
+> +
+> +  bt-enable-gpios:
 
-WARNING: added, moved or deleted file(s), does MAINTAINERS need updating?
-#136: 
-new file mode 100644
+enable-gpios
 
-total: 0 errors, 2 warnings, 838 lines checked
+> +    maxItems: 1
+> +    description: gpio specifier used to enable BT
 
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
+Drop, redundant.
 
-/github/workspace/src/src/13736147.patch has style problems, please review.
+> +
+> +  bt-supply:
 
-NOTE: Ignored message types: UNKNOWN_COMMIT_ID
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+It's called "bt" in schematics or datasheet? Feels unusual. Please list
+all the pins if you claim that's a real name.
 
 
-##############################
-Test: SubjectPrefix - FAIL
-Desc: Check subject contains "Bluetooth" prefix
-Output:
-"Bluetooth: " prefix is not specified in the subject
-"Bluetooth: " prefix is not specified in the subject
-##############################
-Test: TestRunner_iso-tester - FAIL
-Desc: Run iso-tester with test-runner
-Output:
-Total: 122, Passed: 117 (95.9%), Failed: 1, Not Run: 4
 
-Failed Test Cases
-ISO Connect2 Suspend - Success                       Failed       6.236 seconds
-##############################
-Test: TestRunner_mgmt-tester - FAIL
-Desc: Run mgmt-tester with test-runner
-Output:
-Total: 492, Passed: 489 (99.4%), Failed: 1, Not Run: 2
+> +    description: bluetooth chip 3.3V supply regulator handle
+> +
+> +  clocks:
+> +    maxItems: 1
+> +    description: clock provided to the controller (32.768KHz)
+> +
+> +  antenna-number:
+> +    default: 1
+> +    description: device supports up to two antennas
 
-Failed Test Cases
-Pairing Acceptor - SMP over BR/EDR 1                 Timed out    2.712 seconds
+Keep it consistent - either descriptions are the last property or
+somewhere else. Usually the last.
+
+> +    $ref: /schemas/types.yaml#/definitions/uint32
+
+And what does it mean? What happens if BT uses antenna number 2, not 1?
+What is connected to the other antenna? It really feels useless to say
+which antenna is connected to hardware.
+
+> +
+> +  firmware-name:
+> +    description: specify the path of firmware bin to load
+
+Missing maxItems
+
+> +    $ref: /schemas/types.yaml#/definitions/string-array
+
+That's redundant, drop.
+
+> +
 
 
----
-Regards,
-Linux Bluetooth
+Best regards,
+Krzysztof
 
-
---===============8921137989227291009==--
