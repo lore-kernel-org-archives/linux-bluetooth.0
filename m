@@ -1,33 +1,33 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93B8412D745;
-	Thu, 18 Jul 2024 11:41:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC37F12D745;
+	Thu, 18 Jul 2024 11:43:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721302867; cv=none; b=oRArKdbMp31YxLrff2tP13csTRIoGW3im8yBnhq3QzyBcb4ROZH69ho56etPzrYtaqVz9yTupcZVXFRBvmEZj6XR/8f3gZy9ky+zPeoaR7f+p9K6DdXn9AZFQ4EiJkxctORvzrDHRV3EI5DyGmY6swsKu2YO156OUDZh/CEfoKw=
+	t=1721303010; cv=none; b=btG/0pLfi8+hvKpEC9IAWO0MSdf+/L/P5NLTlLoyEQKwoUzQEPH7cpwtSNNtst2OXpubjKiMX6xFJRJeR8ldE2m/6s2oLyBeeR35QCbg00tfnGyJCa7D1QWflcrNiuldC1P8qz9Hmz238B9N3KM0aTgRTTqZ0mlapa7VXGwDUC8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721302867; c=relaxed/simple;
-	bh=DLfE2xWxXuAKnjor6litn0ZHyZYgkG1Fn2AU+O3HdPY=;
+	s=arc-20240116; t=1721303010; c=relaxed/simple;
+	bh=jN0/QurY8fbFswlF/Vv0nFoI4mAtvJrRlJFEDkk6bX8=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ePBQkmuqZvYbC/VMs0fRLm31xBouD0leu00PSdsPz+lfYTnzN7TziZjeW/h/vugUr/SPpQRTqd4heYcQHmKKBfqn3SP8HIcmzYhlGAXciQUrmzbrIdqEG6+iBn6fcQRfzfWMmXUDeoHnRn7Ef/yOd0GxbgktawzA1S4ipgfZeyU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MwMexBtI; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:Content-Type; b=FrdMxOx5sxy/4j3KTsWh/sirLQipqF7Rg2U/0uBFK3EYK5YajZfctG78kbpChHIN4NhByMrptetQ4bOp2AqcDUfsrnIZGLIBvGi1z2YOCtZrejoCrkukafA/lq3q1mA3DvPP96FIawaRlKab8MG3P5npmfScYhP7tnxpSEKjO98=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lAfW+tvC; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MwMexBtI"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E425DC116B1;
-	Thu, 18 Jul 2024 11:41:01 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lAfW+tvC"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5C3B0C116B1;
+	Thu, 18 Jul 2024 11:43:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1721302867;
-	bh=DLfE2xWxXuAKnjor6litn0ZHyZYgkG1Fn2AU+O3HdPY=;
+	s=k20201202; t=1721303010;
+	bh=jN0/QurY8fbFswlF/Vv0nFoI4mAtvJrRlJFEDkk6bX8=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=MwMexBtI4sSqlgF86D9iVOE+SvzC9XrPo3oAFgSUuu37Wagh9ba6YjNElyhuxgwaA
-	 DZewPR00gKFOWaCAq0/Ak54Lt58q+Ix4de1GSYTfo5E+cmGL/oNInRPF6TcVZslpBJ
-	 TeXh9vR/xW5zKkg279eclHMYR8x1qkjkjbnBTZ8+qrXK+R6LTKKexFy0m3VJNBUjI+
-	 fH44jCxYGuvnixlZrxwThK9BV6hiRE8K1/i3IIev/zAnW0URAriJlSdxUP9efWmay7
-	 cw7UBW+Ux6ju5k0/7yg7IQbVHH/6A992BCuKeYX0/U7wQ80i/+gBEhmV35EY4JTDZ3
-	 L8faX8rUqwBGA==
-Message-ID: <18f1301f-6d93-4645-b6d9-e4ccd103ff5d@kernel.org>
-Date: Thu, 18 Jul 2024 13:40:59 +0200
+	b=lAfW+tvCfa3JP+FrxJXhWYJj/LTTmufGlc6D6HSYzib5Il/kih4AgRVfhUMz65rad
+	 v5Mz2kaF6e1fOguxqjaHtAoUMMc4A6iqfgkJ/gsxMXkCzTCdyWxlKzdR5hIX7Lc3z9
+	 +Lp1U3SMCAKpQhf4DgvVUKo2uEqDTLvUjn0bQUsWroTAyEukwzUrbspqbzlC6VVxxw
+	 BrxrlXmR97/9iSjZFrNi1cQxtWErFg382ewK4NgmkaXApoFSjNsQ27aKY5S1RsZ/nu
+	 kcu2QkjfHjwduBVkCJQVof2MiXKw9XJVo8PeY0BnMvTBVsHg7JgU6eIEm65YWO8HTp
+	 GTxpPkTQL8GJw==
+Message-ID: <0bfeee6a-a425-4892-a062-5ef91db305a3@kernel.org>
+Date: Thu, 18 Jul 2024 13:43:21 +0200
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -35,8 +35,8 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 1/3] dt-bindings: net: bluetooth: Add support for
- Amlogic Bluetooth
+Subject: Re: [PATCH v2 2/3] Bluetooth: hci_uart: Add support for Amlogic HCI
+ UART
 To: yang.li@amlogic.com, Marcel Holtmann <marcel@holtmann.org>,
  Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
  "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
@@ -46,9 +46,9 @@ To: yang.li@amlogic.com, Marcel Holtmann <marcel@holtmann.org>,
  <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>
 Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
  devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org
+ linux-arm-kernel@lists.infradead.org, Ye He <ye.he@amlogic.com>
 References: <20240718-btaml-v2-0-1392b2e21183@amlogic.com>
- <20240718-btaml-v2-1-1392b2e21183@amlogic.com>
+ <20240718-btaml-v2-2-1392b2e21183@amlogic.com>
 From: Krzysztof Kozlowski <krzk@kernel.org>
 Content-Language: en-US
 Autocrypt: addr=krzk@kernel.org; keydata=
@@ -94,112 +94,96 @@ Autocrypt: addr=krzk@kernel.org; keydata=
  uZwJCLykjad45hsWcOGk3OcaAGQS6NDlfhM6O9aYNwGL6tGt/6BkRikNOs7VDEa4/HlbaSJo
  7FgndGw1kWmkeL6oQh7wBvYll2buKod4qYntmNKEicoHGU+x91Gcan8mCoqhJkbqrL7+nXG2
  5Q/GS5M9RFWS+nYyJh+c3OcfKqVcZQNANItt7+ULzdNJuhvTRRdC3g9hmCEuNSr+CLMdnRBY fv0=
-In-Reply-To: <20240718-btaml-v2-1-1392b2e21183@amlogic.com>
+In-Reply-To: <20240718-btaml-v2-2-1392b2e21183@amlogic.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 On 18/07/2024 09:42, Yang Li via B4 Relay wrote:
 > From: Yang Li <yang.li@amlogic.com>
 > 
-> Add binding document for Amlogic Bluetooth chipsets attached over UART.
+> This patch introduces support for Amlogic Bluetooth controller over
+> UART. In order to send the final firmware at full speed. It is a pretty
+> straight forward H4 driver with exception of actually having it's own
+> setup address configuration.
 > 
-> Signed-off-by: Yang Li <yang.li@amlogic.com>
-> ---
->  .../bindings/net/bluetooth/amlogic,w155s2-bt.yaml  | 66 ++++++++++++++++++++++
->  1 file changed, 66 insertions(+)
-> 
-> diff --git a/Documentation/devicetree/bindings/net/bluetooth/amlogic,w155s2-bt.yaml b/Documentation/devicetree/bindings/net/bluetooth/amlogic,w155s2-bt.yaml
-> new file mode 100644
-> index 000000000000..2e433d5692ff
-> --- /dev/null
-> +++ b/Documentation/devicetree/bindings/net/bluetooth/amlogic,w155s2-bt.yaml
-> @@ -0,0 +1,66 @@
-> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-> +# Copyright (C) 2024 Amlogic, Inc. All rights reserved
-> +%YAML 1.2
-> +---
-> +$id: http://devicetree.org/schemas/net/bluetooth/amlogic,w155s2-bt.yaml#
-> +$schema: http://devicetree.org/meta-schemas/core.yaml#
+
+...
+
+> +static int aml_parse_dt(struct aml_serdev *amldev)
+> +{
+> +	struct device *pdev = amldev->dev;
 > +
-> +title: Amlogic Bluetooth chips
+> +	amldev->bt_en_gpio = devm_gpiod_get(pdev, "bt-enable",
+> +					GPIOD_OUT_LOW);
+> +	if (IS_ERR(amldev->bt_en_gpio)) {
+> +		dev_err(pdev, "Failed to acquire bt-enable gpios");
+> +		return PTR_ERR(amldev->bt_en_gpio);
+> +	}
 > +
-> +description:
-> +  This binding describes UART-attached Amlogic bluetooth chips.
-
-<form letter>
-This is a friendly reminder during the review process.
-
-It seems my or other reviewer's previous comments were not fully
-addressed. Maybe the feedback got lost between the quotes, maybe you
-just forgot to apply it. Please go back to the previous discussion and
-either implement all requested changes or keep discussing them.
-
-Thank you.
-</form letter>
-
-
+> +	if (device_property_read_string(pdev, "firmware-name",
+> +					&amldev->firmware_name)) {
+> +		dev_err(pdev, "Failed to acquire firmware path");
+> +		return -ENODEV;
+> +	}
 > +
-> +maintainers:
-> +  - Yang Li <yang.li@amlogic.com>
+> +	amldev->bt_supply = devm_regulator_get(pdev, "bt");
+> +	if (IS_ERR(amldev->bt_supply)) {
+> +		dev_err(pdev, "Failed to acquire regulator");
+> +		return PTR_ERR(amldev->bt_supply);
+> +	}
 > +
-> +properties:
-> +  compatible:
-> +    oneOf:
-> +      - const: amlogic,w155s2-bt
-> +      - items:
-> +          - enum:
-> +              - amlogic,w265s1-bt
-> +              - amlogic,w265p1-bt
-> +              - amlogic,w265s2-bt
-> +          - const: amlogic,w155s2-bt
+> +	amldev->lpo_clk = devm_clk_get(pdev, NULL);
+> +	if (IS_ERR(amldev->lpo_clk)) {
+> +		dev_err(pdev, "Failed to acquire clock source");
+> +		return PTR_ERR(amldev->lpo_clk);
+> +	}
 > +
-> +  bt-enable-gpios:
-
-enable-gpios
-
-> +    maxItems: 1
-> +    description: gpio specifier used to enable BT
-
-Drop, redundant.
-
+> +	/* get rf config parameter */
+> +	if (device_property_read_u32(pdev, "antenna-number",
+> +				&amldev->ant_number)) {
+> +		dev_info(pdev, "No antenna-number, using default value");
+> +		amldev->ant_number = 1;
+> +	}
 > +
-> +  bt-supply:
-
-It's called "bt" in schematics or datasheet? Feels unusual. Please list
-all the pins if you claim that's a real name.
-
-
-
-> +    description: bluetooth chip 3.3V supply regulator handle
+> +	return 0;
+> +}
 > +
-> +  clocks:
-> +    maxItems: 1
-> +    description: clock provided to the controller (32.768KHz)
+> +static int aml_power_on(struct aml_serdev *amldev)
+> +{
+> +	int err;
 > +
-> +  antenna-number:
-> +    default: 1
-> +    description: device supports up to two antennas
+> +	if (!IS_ERR(amldev->bt_supply)) {
 
-Keep it consistent - either descriptions are the last property or
-somewhere else. Usually the last.
+How is IS_ERR possible?
 
-> +    $ref: /schemas/types.yaml#/definitions/uint32
-
-And what does it mean? What happens if BT uses antenna number 2, not 1?
-What is connected to the other antenna? It really feels useless to say
-which antenna is connected to hardware.
-
+> +		err = regulator_enable(amldev->bt_supply);
+> +		if (err) {
+> +			dev_err(amldev->dev, "Failed to enable regulator: (%d)", err);
+> +			return err;
+> +		}
+> +	}
 > +
-> +  firmware-name:
-> +    description: specify the path of firmware bin to load
+> +	if (!IS_ERR(amldev->lpo_clk)) {
 
-Missing maxItems
+How is IS_ERR possible?
 
-> +    $ref: /schemas/types.yaml#/definitions/string-array
-
-That's redundant, drop.
-
+> +		err = clk_prepare_enable(amldev->lpo_clk);
+> +		if (err) {
+> +			dev_err(amldev->dev, "Failed to enable lpo clock: (%d)", err);
+> +			return err;
+> +		}
+> +	}
 > +
+> +	if (!IS_ERR(amldev->bt_en_gpio))
+
+How is IS_ERR possible?
+
+> +		gpiod_set_value_cansleep(amldev->bt_en_gpio, 1);
+> +
+> +	/* wait 100ms for bluetooth controller power on  */
+> +	msleep(100);
+> +	return 0;
+> +}
 
 
 Best regards,
