@@ -1,551 +1,414 @@
-Received: from mail-lj1-f172.google.com (mail-lj1-f172.google.com [209.85.208.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-20.smtp.github.com (out-20.smtp.github.com [192.30.252.203])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 644FD145FEB;
-	Thu, 18 Jul 2024 19:02:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A68EB14534C
+	for <linux-bluetooth@vger.kernel.org>; Thu, 18 Jul 2024 19:07:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.203
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721329335; cv=none; b=YypNugSNOMfsctckNVKHTtrOQ7IZyMXkBOeEoMWRXtIb5gGxz8ZQSRHbqt2ppvnWvqgwKEppW0gPncNU0X69570eMGWJHkmnhlZmei5EX1fYmbbdiSkgq5WTEdADQF5RRZiR9hdleE9FZ824tGU7S3pXNdS1a7iT+0IkiOvok/M=
+	t=1721329670; cv=none; b=l5tPbsW84RKqo5Dum74IHKWLpQJHVjvin4MtYEtn5eVeLdoXU5Xn6b1DTFUryluBBVvmw+8RZ8xDr1Wv9ZXYZzuilq2u+Ybv6oUhKfwkIXcMKImfY6s2XYnDSMgr8Wbv+uPHlxN++5iV+HQZ4txI6fE71k/EERmzDEMPadSC+oo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721329335; c=relaxed/simple;
-	bh=Vf1c6MHXAJAakEAk2zVgC8sGSfMOwrNISy4mAhGlqrM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=buZpO9ypcy7a/j5nfKsS33XzggI74PkNgVE1Pmq/xf6B+51QwhAU4qEXRj8Vf/KZsMs4URBFzChvXblIYi3hbwOX8GyB7SIgYLOP3dn0a0cfSJ05yFn8+xW0vxL2gs1TdnxpeQ08j8/pmW40FQZeVe4RAy/8KiO65ib3AAfBuDY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VE+nBl7J; arc=none smtp.client-ip=209.85.208.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1721329670; c=relaxed/simple;
+	bh=FF3W7nQOW+d3Y0qqnbUXE5Z+KudmjGj5n/zrfQq0uAE=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=Z/7VkGdXsl8As8txMcpYqLaVFaAzyDmHLNF14bCZBd4Qol6grkmwwGBOxJWtkNlBkkmB9C/mcC4fGi3yNCwNZTR6HG79S1jfVoWhEn1/kQdM5nQsGNeAIwBahGRFgKoGBpgIhnUtWGOUk+/xmeOvAoWL/nxLibWFZqgflYpD8iM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=CFaFqRAo; arc=none smtp.client-ip=192.30.252.203
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VE+nBl7J"
-Received: by mail-lj1-f172.google.com with SMTP id 38308e7fff4ca-2ee910d6a9eso9459731fa.1;
-        Thu, 18 Jul 2024 12:02:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1721329331; x=1721934131; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=icxl/F0Cf5QfVAp4CrQNZhkUGgwo/Lr9s4sG0v2Z9sM=;
-        b=VE+nBl7JCTBp0Dp1H/06PEmrouZKa/uPUmTNwvCLFoaVWMh8p5OkRZtE9UNEOw6Qt8
-         KY2hr09IY1odePOcV6QM9joo21IM9/nwc0WUCTK6h3LIO1k5MRHOIxsGibJSaXNjZFwF
-         GlFMs4986PySkaNU6MWpCWdVk+8yq0+dsoJExaJNJLE1KUWlKo8i25ZNThcvnkbf0zQc
-         Wja9oIqct56sD6SJ90iulmZ8vksBBc2XyNjROmXzZ1sDGuAOsl7oxSKyrO5o98etIrQJ
-         GOEB3/xGl5gArYAjNkvSpP8+3fGAeaFwadV+uY5n5/H3m3gPqiJFkDGvSjyKYjVP+A9Q
-         K19g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721329331; x=1721934131;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=icxl/F0Cf5QfVAp4CrQNZhkUGgwo/Lr9s4sG0v2Z9sM=;
-        b=CCMXk2QtetTygGwQnuLy7GUuRp1utPW/a1ZexzOvouEB1V/MYqADMSt0PRo5fcSzvY
-         BUpPweE4YcIMyawghT/xtuEe4MDJwcLl/5IJp0KFeBKbUQvmh1Ui76PkgEd+FhQOJhs7
-         oX4kpH5ssSPcwoX3bw1kvQXOkdL9ifWmHHb+Yre9qewVm/wbgCF/mziot0L6tW7sd0CC
-         GOUBDdJfrvSX3h9faFesbVyxNE62elELSQzpzffulJtiMbqELLTkt1Cq5g23sgP+s8AW
-         N4EfVq4d1uu3kXK+JoBmzwTjTmHA1hM+0CI/ZWjAi9TRcthy/X0yKm6N1pYlQC9OLUpR
-         DtBQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXYdrijuGYLZQIcXiDlIXpWuY7AZ8PK/M6KDkqEyuW6jTzjIjRxlkFYiXrK5kpQTGSFdjMr+cHDu7E60hpY6QNVD+9uNjTeLuuHDHLhSDs06ztMCWp3qr9jyUrwY8q+8IV7jIm3aNlYpXS5S8Ef0lRRhN/xy6cjOThapfRQ9rWhYBlGlQtrZYRrG+YN84kHRjTblyUYLjDZWbG+nh9zvxYZjw==
-X-Gm-Message-State: AOJu0YyLKAEeJ6a1vJmoNHryjDTRAB/IOP8r2WaTn148XwLooeZXPH0n
-	fyPZURYI9pKs4AVI/zO+BLhzBV6XYsL381vtLRI/Yw272g38xOkzhvuRUemfhFJY4FgIZmziO64
-	s8zd3G8QD0dWWsXX+7GHyuDWENvQ=
-X-Google-Smtp-Source: AGHT+IE9F74H2W0XQVBrzikCeMeh9SfLqX8XmBzc8W/oBXIwVnRCzmuMYabb1TiTsCMHOBY+VNPq63/l2v/A6/UzGc8=
-X-Received: by 2002:a2e:3517:0:b0:2ee:7a95:1819 with SMTP id
- 38308e7fff4ca-2ef065cf29fmr8404901fa.25.1721329331086; Thu, 18 Jul 2024
- 12:02:11 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="CFaFqRAo"
+Received: from github.com (hubbernetes-node-c9ad705.va3-iad.github.net [10.48.137.13])
+	by smtp.github.com (Postfix) with ESMTPA id B31EF8C06DC
+	for <linux-bluetooth@vger.kernel.org>; Thu, 18 Jul 2024 12:07:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1721329667;
+	bh=eFeY8Ub9rCAKueaPGaqO4HIRyNIIQMn1m3mTusgD28Q=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=CFaFqRAoNDTQGPbucBW4/GfRqgdtAOxuITTUNTjXS8WlqbCSjrrwQtWfiMcj3n93h
+	 2IXvD7cJVREBl7cmCal2OGq5kzsrvDOHGoQbJ6HCwL8XBQ5u/LRFNQIqEfK//85qo6
+	 +AbvaqfxlnFDgkeX3aiDL8bbQOiFXKu6PnBtK4Vo=
+Date: Thu, 18 Jul 2024 12:07:47 -0700
+From: iulia-tanasescu <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/master/9cc587-a3f997@github.com>
+Subject: [bluez/bluez] 732663: shared/bap: Fix ASE notification order
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20240718-btaml-v2-0-1392b2e21183@amlogic.com> <20240718-btaml-v2-2-1392b2e21183@amlogic.com>
- <BY3PR18MB47078CCD43FD8B1DB6D9AE78A0AC2@BY3PR18MB4707.namprd18.prod.outlook.com>
-In-Reply-To: <BY3PR18MB47078CCD43FD8B1DB6D9AE78A0AC2@BY3PR18MB4707.namprd18.prod.outlook.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Thu, 18 Jul 2024 15:01:58 -0400
-Message-ID: <CABBYNZKO_02eBmDDKN2ReviM+SpEzozYPbohjBPjYtf1MqAzuQ@mail.gmail.com>
-Subject: Re: [PATCH v2 2/3] Bluetooth: hci_uart: Add support for Amlogic HCI UART
-To: Sai Krishna Gajula <saikrishnag@marvell.com>
-Cc: "yang.li@amlogic.com" <yang.li@amlogic.com>, Marcel Holtmann <marcel@holtmann.org>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>, 
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
-	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, Ye He <ye.he@amlogic.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-Hi Sai,
+  Branch: refs/heads/master
+  Home:   https://github.com/bluez/bluez
+  Commit: 73266377b0185c56c921b8cece257df428612d73
+      https://github.com/bluez/bluez/commit/73266377b0185c56c921b8cece257df428612d73
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2024-07-15 (Mon, 15 Jul 2024)
 
-On Thu, Jul 18, 2024 at 2:43=E2=80=AFPM Sai Krishna Gajula
-<saikrishnag@marvell.com> wrote:
->
->
-> > -----Original Message-----
-> > From: Yang Li via B4 Relay <devnull+yang.li.amlogic.com@kernel.org>
-> > Sent: Thursday, July 18, 2024 1:12 PM
-> > To: Marcel Holtmann <marcel@holtmann.org>; Luiz Augusto von Dentz
-> > <luiz.dentz@gmail.com>; David S. Miller <davem@davemloft.net>; Eric
-> > Dumazet <edumazet@google.com>; Jakub Kicinski <kuba@kernel.org>; Paolo
-> > Abeni <pabeni@redhat.com>; Rob Herring <robh@kernel.org>; Krzysztof
-> > Kozlowski <krzk+dt@kernel.org>; Conor Dooley <conor+dt@kernel.org>;
-> > Catalin Marinas <catalin.marinas@arm.com>; Will Deacon <will@kernel.org=
->
-> > Cc: linux-bluetooth@vger.kernel.org; netdev@vger.kernel.org;
-> > devicetree@vger.kernel.org; linux-kernel@vger.kernel.org; linux-arm-
-> > kernel@lists.infradead.org; Yang Li <yang.li@amlogic.com>; Ye He
-> > <ye.he@amlogic.com>
-> > Subject: [PATCH v2 2/3] Bluetooth: hci_uart: Add support for
-> > Amlogic HCI UART
-> >
-> > From: Yang Li <yang.=E2=80=8Ali@=E2=80=8Aamlogic.=E2=80=8Acom> This pat=
-ch introduces support for
-> > Amlogic Bluetooth controller over UART. In order to send the final firm=
-ware at
-> > full speed. It is a pretty straight forward H4 driver with exception of=
- actually
-> > having
-> > From: Yang Li <yang.li@amlogic.com>
-> >
-> > This patch introduces support for Amlogic Bluetooth controller over UAR=
-T. In
-> > order to send the final firmware at full speed. It is a pretty straight=
- forward H4
-> > driver with exception of actually having it's own setup address configu=
-ration.
-> >
-> > Co-developed-by: Ye He <ye.he@amlogic.com>
-> > Signed-off-by: Ye He <ye.he@amlogic.com>
-> > Signed-off-by: Yang Li <yang.li@amlogic.com>
-> > ---
-> >  drivers/bluetooth/Kconfig     |  12 +
-> >  drivers/bluetooth/Makefile    |   1 +
-> >  drivers/bluetooth/hci_aml.c   | 772
-> > ++++++++++++++++++++++++++++++++++++++++++
-> >  drivers/bluetooth/hci_ldisc.c |   8 +-
-> >  drivers/bluetooth/hci_uart.h  |   8 +-
-> >  5 files changed, 798 insertions(+), 3 deletions(-)
-> >
-> > diff --git a/drivers/bluetooth/Kconfig b/drivers/bluetooth/Kconfig inde=
-x
-> > 90a94a111e67..d9ff7a64d032 100644
-> > --- a/drivers/bluetooth/Kconfig
-> > +++ b/drivers/bluetooth/Kconfig
-> > @@ -274,6 +274,18 @@ config BT_HCIUART_MRVL
-> >
-> >         Say Y here to compile support for HCI MRVL protocol.
-> >
-> > +config BT_HCIUART_AML
-> > +     bool "Amlogic protocol support"
-> > +     depends on BT_HCIUART
-> > +     depends on BT_HCIUART_SERDEV
-> > +     select BT_HCIUART_H4
-> > +     select FW_LOADER
-> > +     help
-> > +       The Amlogic protocol support enables Bluetooth HCI over serial
-> > +       port interface for Amlogic Bluetooth controllers.
-> > +
-> > +       Say Y here to compile support for HCI AML protocol.
-> > +
-> >  config BT_HCIBCM203X
-> >       tristate "HCI BCM203x USB driver"
-> >       depends on USB
-> > diff --git a/drivers/bluetooth/Makefile b/drivers/bluetooth/Makefile in=
-dex
-> > 0730d6684d1a..81856512ddd0 100644
-> > --- a/drivers/bluetooth/Makefile
-> > +++ b/drivers/bluetooth/Makefile
-> > @@ -51,4 +51,5 @@ hci_uart-$(CONFIG_BT_HCIUART_BCM)   +=3D hci_bcm.o
-> >  hci_uart-$(CONFIG_BT_HCIUART_QCA)    +=3D hci_qca.o
-> >  hci_uart-$(CONFIG_BT_HCIUART_AG6XX)  +=3D hci_ag6xx.o
-> >  hci_uart-$(CONFIG_BT_HCIUART_MRVL)   +=3D hci_mrvl.o
-> > +hci_uart-$(CONFIG_BT_HCIUART_AML)    +=3D hci_aml.o
-> >  hci_uart-objs                                :=3D $(hci_uart-y)
-> > diff --git a/drivers/bluetooth/hci_aml.c b/drivers/bluetooth/hci_aml.c =
-new file
-> > mode 100644 index 000000000000..575b6361dad6
-> > --- /dev/null
-> > +++ b/drivers/bluetooth/hci_aml.c
-> > @@ -0,0 +1,772 @@
-> > +// SPDX-License-Identifier: (GPL-2.0-only OR MIT)
-> > +/*
-> > + * Copyright (C) 2024 Amlogic, Inc. All rights reserved  */
-> > +
-> > +#include <linux/kernel.h>
-> > +#include <linux/delay.h>
-> > +#include <linux/device.h>
-> > +#include <linux/property.h>
->
-> ......
->
-> > + * op_code |      op_len           | op_addr | parameter   |
-> > + * --------|-----------------------|---------|-------------|
-> > + *   2B    | 1B len(addr+param)    |    4B   |  len(param) |
-> > + */
-> > +static int aml_send_tci_cmd(struct hci_dev *hdev, u16 op_code, u32
-> > op_addr,
-> > +                         u32 *param, u32 param_len)
-> > +{
-> > +     struct sk_buff *skb =3D NULL;
-> > +     struct aml_tci_rsp *rsp =3D NULL;
-> > +     u8 *buf =3D NULL;
-> > +     u32 buf_len =3D 0;
-> > +     int err =3D 0;
->
-> Please consider using reverse xmas tree order - longest line to shortest =
-- for local variable declarations in Networking code.
+  Changed paths:
+    M src/shared/bap.c
 
-First time I'm hearing about this, is that just for the sake of readability=
-?
+  Log Message:
+  -----------
+  shared/bap: Fix ASE notification order
 
->
-> > +
-> > +     buf_len =3D sizeof(op_addr) + param_len;
-> > +     buf =3D kmalloc(buf_len, GFP_KERNEL);
-> > +     if (!buf) {
-> > +             err =3D -ENOMEM;
-> > +             goto exit;
-> > +     }
-> > +
-> > +     memcpy(buf, &op_addr, sizeof(op_addr));
-> > +     if (param && param_len > 0)
-> > +             memcpy(buf + sizeof(op_addr), param, param_len);
-> > +
-> > +     skb =3D __hci_cmd_sync_ev(hdev, op_code, buf_len, buf,
-> > +                             HCI_EV_CMD_COMPLETE,
-> > HCI_INIT_TIMEOUT);
-> > +     if (IS_ERR(skb)) {
-> > +             err =3D PTR_ERR(skb);
-> > +             skb =3D NULL;
->
-> Better to capture the error before nullifying skb, like below
->         err =3D PTR_ERR(skb);
->         skb =3D NULL;  // Nullify after capturing the error
+When processing a CP operation the CP shall be notified ahead of
+the ASE itself:
 
-That is exactly what he is doing, and actually it seems to only be
-doing that because it later calls kfree_skb.
+  'If the server successfully completes a client-initiated ASE Control
+  operation for an ASE, the server shall send a notification of the ASE
+  Control Point characteristic value formatted as defined in Table 4.7.
+  The server shall then perform the behavior defined in Section 5.1
+  through Section 5.8 for that ASE Control operation and send
+  notifications of any ASE characteristic values written during that
+  ASE Control operation.'
 
-> > +             bt_dev_err(hdev, "Failed to send TCI cmd:(%d)", err);
-> > +             goto exit;
-> > +     }
-> > +
-> > +     rsp =3D (struct aml_tci_rsp *)(skb->data);
+So this delays the processing of notifications of ASE states so the CP
+responses always appears first in the notification e.g:
 
-This code is not safe, you need to check if skb->len because trying to
-access skb->data, anyway you are probably much better off using
-skb_pull_data instead.
-
-> > +     if (rsp->opcode !=3D op_code || rsp->status !=3D 0x00) {
-> > +             bt_dev_err(hdev, "send TCI cmd(0x%04X),
-> > response(0x%04X):(%d)",
-> > +                    op_code, rsp->opcode, rsp->status);
-> > +             err =3D -EINVAL;
-> > +             goto exit;
-> > +     }
-> > +
-> > +exit:
-> > +     kfree(buf);
-> > +     kfree_skb(skb);
-> > +     return err;
-> > +}
-> > +
-> > +static int aml_update_chip_baudrate(struct hci_dev *hdev, u32 baud) {
-> > +     u32 value;
-> > +
-> > +     value =3D ((AML_UART_CLK_SOURCE / baud) - 1) & 0x0FFF;
-> > +     value |=3D AML_UART_XMIT_EN | AML_UART_RECV_EN |
-> > +AML_UART_TIMEOUT_INT_EN;
-> > +
-> > +     return aml_send_tci_cmd(hdev, AML_TCI_CMD_UPDATE_BAUDRATE,
-> > +                               AML_OP_UART_MODE, &value,
-> > sizeof(value)); }
-> > +
-> > +static int aml_start_chip(struct hci_dev *hdev) {
-> > +     u32 value =3D 0;
-> > +     int ret;
-> > +
-> > +     value =3D AML_MM_CTR_HARD_TRAS_EN;
-> > +     ret =3D aml_send_tci_cmd(hdev, AML_TCI_CMD_WRITE,
-> > +                            AML_OP_MEM_HARD_TRANS_EN,
-> > +                            &value, sizeof(value));
-> > +     if (ret)
-> > +             return ret;
-> > +
-> > +     /* controller hardware reset. */
-> > +     value =3D AML_CTR_CPU_RESET | AML_CTR_MAC_RESET |
-> > AML_CTR_PHY_RESET;
-> > +     ret =3D aml_send_tci_cmd(hdev, AML_TCI_CMD_HARDWARE_RESET,
-> > +                            AML_OP_HARDWARE_RST,
-> > +                            &value, sizeof(value));
-> > +     return ret;
-> > +}
-> > +
-> > +static int aml_send_firmware_segment(struct hci_dev *hdev,
-> > +                                  u8 fw_type,
-> > +                                  u8 *seg,
-> > +                                  u32 seg_size,
-> > +                                  u32 offset)
-> > +{
-> > +     u32 op_addr =3D 0;
-> > +
-> > +     if (fw_type =3D=3D FW_ICCM)
-> > +             op_addr =3D AML_OP_ICCM_RAM_BASE  + offset;
-> > +     else if (fw_type =3D=3D FW_DCCM)
-> > +             op_addr =3D AML_OP_DCCM_RAM_BASE + offset;
-> > +
-> > +     return aml_send_tci_cmd(hdev, AML_TCI_CMD_DOWNLOAD_BT_FW,
-> > +                          op_addr, (u32 *)seg, seg_size); }
-> > +
-> > +static int aml_send_firmware(struct hci_dev *hdev, u8 fw_type,
-> > +                          u8 *fw, u32 fw_size, u32 offset) {
-> > +     u32 seg_size =3D 0;
-> > +     u32 seg_off =3D 0;
-> > +
-> > +     if (fw_size > AML_FIRMWARE_MAX_SIZE) {
-> > +             bt_dev_err(hdev, "fw_size error, fw_size:%d, max_size: 51=
-2K",
-> > +                    fw_size);
-> > +             return -EINVAL;
-> > +     }
-> > +     while (fw_size > 0) {
-> > +             seg_size =3D (fw_size > AML_FIRMWARE_OPERATION_SIZE) ?
-> > +                        AML_FIRMWARE_OPERATION_SIZE : fw_size;
-> > +             if (aml_send_firmware_segment(hdev, fw_type, (fw +
-> > seg_off),
-> > +                                           seg_size, offset)) {
-> > +                     bt_dev_err(hdev, "Failed send firmware, type:%d,
-> > offset:0x%x",
-> > +                            fw_type, offset);
-> > +                     return -EINVAL;
-> > +             }
-> > +             seg_off +=3D seg_size;
-> > +             fw_size -=3D seg_size;
-> > +             offset +=3D seg_size;
-> > +     }
-> > +     return 0;
-> > +}
-> > +
-> > +static int aml_download_firmware(struct hci_dev *hdev, const char
-> > +*fw_name) {
-> > +     struct hci_uart *hu =3D hci_get_drvdata(hdev);
-> > +     struct aml_serdev *amldev =3D serdev_device_get_drvdata(hu-
-> > >serdev);
-> > +     const struct firmware *firmware =3D NULL;
-> > +     struct aml_fw_len *fw_len =3D NULL;
-> > +     u8 *iccm_start =3D NULL, *dccm_start =3D NULL;
-> > +     u32 iccm_len, dccm_len;
-> > +     u32 value =3D 0;
-> > +     int ret =3D 0;
-> > +
->
-> Please consider using reverse xmas tree order - longest line to shortest =
-- for local variable declarations in Networking code.
->
-> > +     /* Enable firmware download event. */
-> > +     value =3D AML_EVT_EN;
-> > +     ret =3D aml_send_tci_cmd(hdev, AML_TCI_CMD_WRITE,
-> > +                            AML_OP_EVT_ENABLE,
-> > +                            &value, sizeof(value));
-> > +     if (ret)
-> > +             goto exit;
-> > +
-> > +     /* RAM power on */
-> > +     value =3D AML_RAM_POWER_ON;
-> > +     ret =3D aml_send_tci_cmd(hdev, AML_TCI_CMD_WRITE,
-> > +                            AML_OP_RAM_POWER_CTR,
-> > +                            &value, sizeof(value));
-> > +     if (ret)
-> > +             goto exit;
-> > +
-> > +     /* Check RAM power status */
-> > +     ret =3D aml_send_tci_cmd(hdev, AML_TCI_CMD_READ,
-> > +                            AML_OP_RAM_POWER_CTR, NULL, 0);
-> > +     if (ret)
-> > +             goto exit;
-> > +
-> > +     ret =3D request_firmware(&firmware, fw_name, &hdev->dev);
-> > +     if (ret < 0) {
-> > +             bt_dev_err(hdev, "Failed to load <%s>:(%d)", fw_name, ret=
-);
-> > +             goto exit;
-> > +     }
-> > +
-> > +     fw_len =3D (struct aml_fw_len *)firmware->data;
-> > +
-> > +     /* Download ICCM */
-> > +     iccm_start =3D (u8 *)(firmware->data) + sizeof(struct aml_fw_len)
-> > +                     + amldev->aml_dev_data->iccm_offset;
-> > +     iccm_len =3D fw_len->iccm_len - amldev->aml_dev_data->iccm_offset=
-;
-> > +     ret =3D aml_send_firmware(hdev, FW_ICCM, iccm_start, iccm_len,
-> > +                             amldev->aml_dev_data->iccm_offset);
-> > +     if (ret) {
-> > +             bt_dev_err(hdev, "Failed to send FW_ICCM (%d)", ret);
-> > +             goto exit;
-> > +     }
-> > +
-> > +     /* Download DCCM */
-> > +     dccm_start =3D (u8 *)(firmware->data) + sizeof(struct aml_fw_len)=
- +
-> > fw_len->iccm_len;
-> > +     dccm_len =3D fw_len->dccm_len;
-> > +     ret =3D aml_send_firmware(hdev, FW_DCCM, dccm_start, dccm_len,
-> > +                             amldev->aml_dev_data->dccm_offset);
-> > +     if (ret) {
-> > +             bt_dev_err(hdev, "Failed to send FW_DCCM (%d)", ret);
-> > +             goto exit;
-> > +     }
-> > +
-> > +     /* Disable firmware download event. */
-> > +     value =3D 0;
-> > +     ret =3D aml_send_tci_cmd(hdev, AML_TCI_CMD_WRITE,
-> > +                            AML_OP_EVT_ENABLE,
-> > +                            &value, sizeof(value));
-> > +     if (ret)
-> > +             goto exit;
-> > +
-> > +exit:
-> > +     if (firmware)
-> > +             release_firmware(firmware);
-> > +     return ret;
-> > +}
-> > +
-> > +static int aml_send_reset(struct hci_dev *hdev) {
-> > +     struct sk_buff *skb;
-> > +     int err;
-> > +
-> > +     skb =3D __hci_cmd_sync_ev(hdev, HCI_OP_RESET, 0, NULL,
-> > +                             HCI_EV_CMD_COMPLETE,
-> > HCI_INIT_TIMEOUT);
-> > +     if (IS_ERR(skb)) {
-> > +             err =3D PTR_ERR(skb);
-> > +             bt_dev_err(hdev, "Failed to send hci reset cmd(%d)", err)=
-;
-> > +             return err;
-> > +     }
-> > +
-> > +     kfree_skb(skb);
-> > +     return 0;
-> > +}
-> > +
-> > +static int aml_dump_fw_version(struct hci_dev *hdev) {
-> > +     struct sk_buff *skb;
-> > +     struct aml_tci_rsp *rsp =3D NULL;
-> > +     u8 value[6] =3D {0};
-> > +     u8 *fw_ver =3D NULL;
-> > +     int err =3D 0;
-> > +
->
-> Please consider using reverse xmas tree order - longest line to shortest =
-- for local variable declarations in Networking code.
->
-> > +     skb =3D __hci_cmd_sync_ev(hdev, AML_BT_HCI_VENDOR_CMD,
-> > sizeof(value), value,
-> > +                             HCI_EV_CMD_COMPLETE,
-> > HCI_INIT_TIMEOUT);
-> > +     if (IS_ERR(skb)) {
-> > +             skb =3D NULL;
-> > +             err =3D PTR_ERR(skb);
-> > +             bt_dev_err(hdev, "Failed get fw version:(%d)", err);
-> > +             goto exit;
-> > +     }
-> > +
-> > +     rsp =3D (struct aml_tci_rsp *)(skb->data);
-> > +     if (rsp->opcode !=3D AML_BT_HCI_VENDOR_CMD || rsp->status !=3D
-> > 0x00) {
-> > +             bt_dev_err(hdev, "dump version, error response
-> > (0x%04X):(%d)",
-> > +                    rsp->opcode, rsp->status);
-> > +             err =3D -EINVAL;
-> > +             goto exit;
-> > +     }
-> > +
-> > +     fw_ver =3D skb->data + AML_EVT_HEAD_SIZE;
-> > +     bt_dev_info(hdev, "fw_version: date =3D %02x.%02x, number =3D
-> > 0x%02x%02x",
-> > +             *(fw_ver + 1), *fw_ver, *(fw_ver + 3), *(fw_ver + 2));
-> > +
-> > +exit:
-> > +     kfree_skb(skb);
-> > +     return err;
-> > +}
-> > +
-> > +static int aml_set_bdaddr(struct hci_dev *hdev, const bdaddr_t *bdaddr=
-)
-> > +{
-> > +     struct sk_buff *skb;
-> > +     struct aml_tci_rsp *rsp =3D NULL;
-> > +     int err =3D 0;
-> > +
->
-> Please consider using reverse xmas tree order - longest line to shortest =
-- for local variable declarations in Networking code.
->
-> > +     bt_dev_info(hdev, "set bdaddr (%pM)", bdaddr);
-> > +     skb =3D __hci_cmd_sync_ev(hdev, AML_BT_HCI_VENDOR_CMD,
-> > +                             sizeof(bdaddr_t), bdaddr,
-> > +                             HCI_EV_CMD_COMPLETE,
-> > HCI_INIT_TIMEOUT);
-> > +     if (IS_ERR(skb)) {
-> > +             skb =3D NULL;
-> > +             err =3D PTR_ERR(skb);
->
-> Same here to capture error before making skb null.
-
-Ok, this is really the wrong order and will overwrite the error, that
-said replacing goto exit with return PTR_ERR(skb) would be enough here
-since there is nothing else that needs to be cleanup.
-
-> > +             bt_dev_err(hdev, "Failed to set bdaddr:(%d)", err);
-> > +             goto exit;
-> > +     }
-> > +
-> > +     rsp =3D (struct aml_tci_rsp *)(skb->data);
-> > +     if (rsp->opcode !=3D AML_BT_HCI_VENDOR_CMD || rsp->status !=3D
-> > 0x00) {
-> > +             bt_dev_err(hdev, "error response (0x%x):(%d)", rsp->opcod=
-e,
-> > rsp->status);
-> > +             err =3D -EINVAL;
-> > +             goto exit;
-> > +     }
-> > +
-> > +exit:
-> > +     kfree_skb(skb);
-> > +     return err;
-> > +}
-> > +
-> > +static int aml_check_bdaddr(struct hci_dev *hdev) {
->
-> .......
->
-> > +
-> > +static int aml_close(struct hci_uart *hu) {
-> > +     struct aml_data *aml_data =3D hu->priv;
-> > +     struct aml_serdev *amldev =3D serdev_device_get_drvdata(hu-
-> > >serdev);
->
-> Please consider using reverse xmas tree order - longest line to shortest =
-- for local variable declarations in Networking code.
->
-> > +
-> > +     if (hu->serdev)
-> > +             serdev_device_close(hu->serdev);
-> > +
-> > +     skb_queue_purge(&aml_data->txq);
-> > +     kfree_skb(aml_data->rx_skb);
-> > +     kfree(aml_data);
-> > +
-> > +     hu->priv =3D NULL;
-> > +
-> > +     return aml_power_off(amldev);
-> > +}
->
-> .......
->
+> ACL Data RX: Handle 42 flags 0x02 dlen 59
+      ATT: Handle Multiple Value Notification (0x23) len 54
+        Length: 0x0008
+        Handle: 0x0036 Type: ASE Control Point (0x2bc6)
+          Data[8]: 0202030000010000
+            Opcode: QoS Configuration (0x02)
+            Number of ASE(s): 2
+            ASE: #0
+            ASE ID: 0x03
+            ASE Response Code: Success (0x00)
+            ASE Response Reason: None (0x00)
+            ASE: #1
+            ASE ID: 0x01
+            ASE Response Code: Success (0x00)
+            ASE Response Reason: None (0x00)
+        Length: 0x0011
+        Handle: 0x0030 Type: Source ASE (0x2bc5)
+          Data[17]: 0302000010270000022800020a00409c00
+            ASE ID: 3
+            State: QoS Configured (0x02)
+            CIG ID: 0x00
+            CIS ID: 0x00
+            SDU Interval: 10000 usec
+            Framing: Unframed (0x00)
+            PHY: 0x02
+            LE 2M PHY (0x02)
+            Max SDU: 40
+            RTN: 2
+            Max Transport Latency: 10
+            Presentation Delay: 40000 us
+        Length: 0x0011
+        Handle: 0x002a Type: Sink ASE (0x2bc4)
+          Data[17]: 0102000010270000025000020a00409c00
+            ASE ID: 1
+            State: QoS Configured (0x02)
+            CIG ID: 0x00
+            CIS ID: 0x00
+            SDU Interval: 10000 usec
+            Framing: Unframed (0x00)
+            PHY: 0x02
+            LE 2M PHY (0x02)
+            Max SDU: 80
+            RTN: 2
+            Max Transport Latency: 10
+            Presentation Delay: 40000 us
 
 
---=20
-Luiz Augusto von Dentz
+  Commit: 025f07ec0d0ebfb5e83c07d2918a6c01b0ae49a6
+      https://github.com/bluez/bluez/commit/025f07ec0d0ebfb5e83c07d2918a6c01b0ae49a6
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2024-07-18 (Thu, 18 Jul 2024)
+
+  Changed paths:
+    M client/player.c
+
+  Log Message:
+  -----------
+  client/player: Add support for name custom presets
+
+This adds support for naming custom presets instead of always having
+just one "custom" codec preset which needs to be overwriten everytime
+a new set of settings needs to be entered.
+
+
+  Commit: 957c956112cc2bba528fe8df4a0a21d221a617ca
+      https://github.com/bluez/bluez/commit/957c956112cc2bba528fe8df4a0a21d221a617ca
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2024-07-18 (Thu, 18 Jul 2024)
+
+  Changed paths:
+    M client/player.c
+
+  Log Message:
+  -----------
+  client/player: Fix printing errors when transport->filename is not set
+
+If transport->filename is not set don't attempt to write to the
+transport->fd.
+
+
+  Commit: 0bad3d5cbea84b24d53e86de7c419e893bb19a93
+      https://github.com/bluez/bluez/commit/0bad3d5cbea84b24d53e86de7c419e893bb19a93
+  Author: Iulia Tanasescu <iulia.tanasescu@nxp.com>
+  Date:   2024-07-18 (Thu, 18 Jul 2024)
+
+  Changed paths:
+    M profiles/audio/bap.c
+
+  Log Message:
+  -----------
+  bap: Fix crash in bap_bcast_remove
+
+This adds a check for the PA request dequeued in bap_bcast_remove,
+to avoid accessing a member within a NULL pointer.
+
+
+  Commit: caa4202a7ee3423211733f7883641c77666dfbbf
+      https://github.com/bluez/bluez/commit/caa4202a7ee3423211733f7883641c77666dfbbf
+  Author: Iulia Tanasescu <iulia.tanasescu@nxp.com>
+  Date:   2024-07-18 (Thu, 18 Jul 2024)
+
+  Changed paths:
+    M src/shared/bap.c
+    M src/shared/bap.h
+
+  Log Message:
+  -----------
+  shared/bap: Add separate API to merge caps
+
+This moves the logic to merge L2 and L3 capabilities discovered
+inside a BASE structure in a public API.
+
+
+  Commit: 679349fbc9f2eaf4216cca0ca45f25e4d2829c9d
+      https://github.com/bluez/bluez/commit/679349fbc9f2eaf4216cca0ca45f25e4d2829c9d
+  Author: Iulia Tanasescu <iulia.tanasescu@nxp.com>
+  Date:   2024-07-18 (Thu, 18 Jul 2024)
+
+  Changed paths:
+    M profiles/audio/bap.c
+    M src/shared/bap.c
+    M src/shared/bap.h
+    M unit/test-bap.c
+
+  Log Message:
+  -----------
+  shared/bap: Update bt_bap_verify_bis to receive caps
+
+This updates bt_bap_verify_bis to receive the already merged L2 and L3
+capabilities, instead of computing it internally.
+
+
+  Commit: bbcf4891cd46f53e35761db808155dc0fb89b175
+      https://github.com/bluez/bluez/commit/bbcf4891cd46f53e35761db808155dc0fb89b175
+  Author: Iulia Tanasescu <iulia.tanasescu@nxp.com>
+  Date:   2024-07-18 (Thu, 18 Jul 2024)
+
+  Changed paths:
+    M profiles/audio/bap.c
+    M src/shared/bap.c
+    M src/shared/bap.h
+    M unit/test-bap.c
+
+  Log Message:
+  -----------
+  shared/bap: Remove unused param from bt_bap_verify_bis
+
+This removes the codec parameter from bt_bap_verify_bis,
+since it is not used.
+
+
+  Commit: 662aee4357f8975763280fec0e6cd35b2082200d
+      https://github.com/bluez/bluez/commit/662aee4357f8975763280fec0e6cd35b2082200d
+  Author: Iulia Tanasescu <iulia.tanasescu@nxp.com>
+  Date:   2024-07-18 (Thu, 18 Jul 2024)
+
+  Changed paths:
+    M src/shared/bap.c
+
+  Log Message:
+  -----------
+  shared/bap: Allow checking bis caps against peer caps
+
+A BAP Broadcast Assistant needs to match stream capabilities with
+capabilities discovered in the Sink PAC characteristic on the peer.
+
+This updates bt_bap_verify_bis to check the provided stream capabilities
+against local or remote capabilities, depending on the bap structure
+provided:
+
+If the device is acting as a BAP Broadcast Sink and the bap session was
+created after scanning a Broadcast Source, the stream caps will be matched
+with the local broadcast sink PAC.
+
+If the device is acting as a Broadcast Assistant and the bap session is a
+client session with a BAP Scan Delegator, the stream caps will be matched
+with the PAC records populated in the rdb at service discovery.
+
+
+  Commit: 2c98c478863ee9e213a4129f0f4fee2b16b678da
+      https://github.com/bluez/bluez/commit/2c98c478863ee9e213a4129f0f4fee2b16b678da
+  Author: Iulia Tanasescu <iulia.tanasescu@nxp.com>
+  Date:   2024-07-18 (Thu, 18 Jul 2024)
+
+  Changed paths:
+    M src/shared/bap.c
+
+  Log Message:
+  -----------
+  shared/bap: Append bcast sink pacs to Sink PAC char
+
+It is mandatory for a BAP Broadcast Sink to support the PACS Server role.
+The Sink PAC characteristic should contain PAC records that expose
+supported audio capabilities for receiving both unicast and broadcast
+streams.
+
+A BAP Broadcast Assistant acting as a GATT Client needs to discover the
+Sink PAC characteristic on the BAP Scan Delegator peer (BAP Broadcast
+Sink), in order to discover supported capabilities for receiving streams.
+
+This commit updates the callback for handling read requests for the Sink
+PAC characteristic, to also append Broadcast Sink pac structures to the
+read response.
+
+
+  Commit: f163913488106929081026c56c236800aa6f8269
+      https://github.com/bluez/bluez/commit/f163913488106929081026c56c236800aa6f8269
+  Author: Iulia Tanasescu <iulia.tanasescu@nxp.com>
+  Date:   2024-07-18 (Thu, 18 Jul 2024)
+
+  Changed paths:
+    M Makefile.plugins
+    M profiles/audio/bap.c
+    A profiles/audio/bap.h
+
+  Log Message:
+  -----------
+  bap: Add API to get bt_bap matching device
+
+This adds a public BAP API to obtain a reference to the bt_bap session
+with a peer device.
+
+
+  Commit: 88bf423eb525655e15890bdca84d9acb5afab122
+      https://github.com/bluez/bluez/commit/88bf423eb525655e15890bdca84d9acb5afab122
+  Author: Iulia Tanasescu <iulia.tanasescu@nxp.com>
+  Date:   2024-07-18 (Thu, 18 Jul 2024)
+
+  Changed paths:
+    M src/shared/bass.c
+    M src/shared/bass.h
+
+  Log Message:
+  -----------
+  shared/bass: Add API to get GATT client reference
+
+Some use cases require the BASS plugin to differentiate between client and
+server BASS sessions - for example, the BAP Broadcast Assistant role only
+considers client BASS sessions.
+
+This adds a BASS API to obtain a reference to the bt_gatt_client structure
+attached to the bt_bass session.
+
+
+  Commit: 77e4c0976c0d342e45f0ad1b485efd7e60863e30
+      https://github.com/bluez/bluez/commit/77e4c0976c0d342e45f0ad1b485efd7e60863e30
+  Author: Iulia Tanasescu <iulia.tanasescu@nxp.com>
+  Date:   2024-07-18 (Thu, 18 Jul 2024)
+
+  Changed paths:
+    M Makefile.plugins
+    M profiles/audio/bass.c
+    A profiles/audio/bass.h
+
+  Log Message:
+  -----------
+  bass: Register MediaAssistant objects
+
+This adds an initial implementation of the BAP Broadcast Assistant role
+in the BASS plugin, by introducing the MediaAssistant DBus object.
+
+The BAP plugin implements the callback to probe Broadcast Sources and
+parse the BASE. This commit adds 2 BASS APIs, that will be called by the
+BAP plugin to notify BISes discovered in the BASE of a broadcaster to
+BASS, or to inform the BASS plugin that a broadcaster has been removed.
+
+For each BASS client session, the BASS plugin checks BIS caps against
+the peer caps, and registers a MediaAssistant object for each match.
+
+
+  Commit: 22779f0bce61cfd5cd72f4e2c199aaa385067248
+      https://github.com/bluez/bluez/commit/22779f0bce61cfd5cd72f4e2c199aaa385067248
+  Author: Iulia Tanasescu <iulia.tanasescu@nxp.com>
+  Date:   2024-07-18 (Thu, 18 Jul 2024)
+
+  Changed paths:
+    M profiles/audio/bap.c
+
+  Log Message:
+  -----------
+  bap: Notify scanned BISes to BASS
+
+This updates the BAP implementation to also notify the BASS plugin about
+scanned broadcast streams, or when a scanned broadcaster is removed. This
+is needed for the BAP Broadcast Assistant role - the BASS plugin registers
+MediaAssistant objects for each detected stream that matches the audio
+capabilities of peer Scan Delegator devices.
+
+
+  Commit: a3f9970f7a8b62b426e7a00303ddb66acb79aadd
+      https://github.com/bluez/bluez/commit/a3f9970f7a8b62b426e7a00303ddb66acb79aadd
+  Author: Iulia Tanasescu <iulia.tanasescu@nxp.com>
+  Date:   2024-07-18 (Thu, 18 Jul 2024)
+
+  Changed paths:
+    M Makefile.tools
+    A client/assistant.c
+    A client/assistant.h
+    M client/main.c
+
+  Log Message:
+  -----------
+  client: Add assistant submenu
+
+This adds the initial implementation for the assistant menu in
+bluetoothctl, to detect and print MediaAssistant objects.
+
+The current BAP Broadcast Assistant implementation can be tested
+by running bluetoothctl, connecting to a BASS Server, scanning
+a Broadcast Source that is streaming a number of BISes with
+audio capabilities matching the capabilities of the peer device,
+and noticing the MediaAssistant objects being created:
+
+client/bluetoothctl
+[bluetooth]# [CHG] Controller 00:60:37:31:7E:3F Pairable: yes
+[bluetooth]# AdvertisementMonitor path registered
+[bluetooth]# scan on
+[bluetooth]# [NEW] Device 00:60:37:94:A6:A3 00-60-37-94-A6-A3
+[bluetooth]# connect 00:60:37:94:A6:A3
+Attempting to connect to 00:60:37:94:A6:A3
+[CHG] Device 00:60:37:94:A6:A3 Connected: yes
+[00-60-37-94-A6-A3]# Connection successful
+[00-60-37-94-A6-A3]# [NEW] Device 15:65:78:B6:52:F6 15-65-78-B6-52-F6
+[00-60-37-94-A6-A3]# [NEW] Assistant
+       /org/bluez/hci0/src_15_65_78_B6_52_F6/dev_00_60_37_94_A6_A3/bis1
+[00-60-37-94-A6-A3]# [NEW] Assistant
+       /org/bluez/hci0/src_15_65_78_B6_52_F6/dev_00_60_37_94_A6_A3/bis2
+[00-60-37-94-A6-A3]# scan off
+[00-60-37-94-A6-A3]# Diovery stopped
+[00-60-37-94-A6-A3]# disconnect
+Attempting to disconnect from 00:60:37:94:A6:A3
+[00-60-37-94-A6-A3]# Successful disconnected
+[CHG] Device 00:60:37:94:A6:A3 Connected: no
+[bluetooth]# [DEL] Assistant
+       /org/bluez/hci0/src_15_65_78_B6_52_F6/dev_00_60_37_94_A6_A3/bis1
+[bluetooth]# [DEL] Assistant
+       /org/bluez/hci0/src_15_65_78_B6_52_F6/dev_00_60_37_94_A6_A3/bis2
+
+
+Compare: https://github.com/bluez/bluez/compare/9cc587947b6a...a3f9970f7a8b
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
