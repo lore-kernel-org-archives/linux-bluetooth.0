@@ -1,257 +1,145 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f52.google.com (mail-qv1-f52.google.com [209.85.219.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F64F142915
-	for <linux-bluetooth@vger.kernel.org>; Thu, 18 Jul 2024 14:33:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E309F140394
+	for <linux-bluetooth@vger.kernel.org>; Thu, 18 Jul 2024 14:35:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721313224; cv=none; b=SisrcXPB4DqXQHbePBymkQY43hoyvfUlLGnborsbS7ug+Pccq5ISd5mV1f02hjUAULQ2Du0YNz7laJY4lbs0rLd3uCnXnWHsYrMtCmaLPyL8JIJvuqzOyZomorcoZ1Uw980codNFtVCbwIfxZm3mE18yRlqpUu4mMQl0W0t4sEg=
+	t=1721313334; cv=none; b=HmNBODhNuSWOBdvGwS/HyrcTXBzinPMztCkZnhm978522pbkaHWBaYqYRd7b9fqh00acTGUgPlhaVp/2mEsC3Cfc3pZ0//Icir963e9D220CegiWBN7mplvY/YxljkQxRFzZyk3ofg1UYLb3VaK8pT2N9GJrJmtGLPrfL0Iqql0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721313224; c=relaxed/simple;
-	bh=iUK4CoYR8nAeSo+GaJQBQHMmw1hUjJ/FgnCJdgidDEc=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=iVXJn2JL2xJoCLtYWXuBatR9j640UIR5/QhRehZq2vMe6xzwM1Y5q9KWO4352u4LgSTVpgurKWzYUT0C9B7ZLD7tpJ9wJeH1TA9aZZznzU/whvqGHfivVTK6quyf1O3zpJSVVorxfcoHiNOplp0MJPMCeXGb6pOeNDkLrozY+Q0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=HS9+fn9T; arc=none smtp.client-ip=198.175.65.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1721313334; c=relaxed/simple;
+	bh=hU/9hHEfEwptl4+SoQGGYmCq9cR0KXaOji7oqKiuI1A=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=BheHSOnZViAJCZIZBVCHEr3e9jP1Gmb832faGcVQS7rka6OitHcT1fkcVOa3wLyHZmJTYMuuC1UX775N874b33BUhNU6ua8ivjtwFexgQEDdq698q5WItRuqSdr6cjObFxOYalQCdpqe3ylh2L3U5UFrOS0/8gvowBJGnupdcaY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=L+K+bXwn; arc=none smtp.client-ip=209.85.219.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="HS9+fn9T"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1721313223; x=1752849223;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=iUK4CoYR8nAeSo+GaJQBQHMmw1hUjJ/FgnCJdgidDEc=;
-  b=HS9+fn9TLOpqZc4fviQaK0t1NKfzyygrVX1EREoNSnAejglPu/AGA34o
-   H6OJsmpnLxWLd4tZU6hqFFMeGmST+AieiAdIZmMnBlYDEDuk6nNDYWOkG
-   Fb6FE28t3e+kWdAdL6ehqWB0XbhpgF9nV+4dGASOecwVgiv9mdZI2+PAB
-   w5Nx6+HwOIrOmsoeM/K3pM9l6IMlatzdoqFGJghlCaS3Vsp8NM4fGzKX8
-   vISWQinAHoEhbACK6NhTqCZN+WT2zYaCuu6UDJWnGy3CMGcOUR1UCuLmU
-   Q7kemFMhKZv4LNFOGc9KoLD31ph8tXEs/eDYIiOV/NREZHj8XdS4yYOUA
-   w==;
-X-CSE-ConnectionGUID: Wm7ex5ugTxuJeQd7g+vE5Q==
-X-CSE-MsgGUID: s7xqACQZQHK9QvKXIvzeHg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11137"; a="41403893"
-X-IronPort-AV: E=Sophos;i="6.09,218,1716274800"; 
-   d="scan'208";a="41403893"
-Received: from fmviesa001.fm.intel.com ([10.60.135.141])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Jul 2024 07:33:43 -0700
-X-CSE-ConnectionGUID: jE7VsPb6Q8Ckczvynhohyg==
-X-CSE-MsgGUID: A8wfk/xUQE6H7BXhAXJuRA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.09,218,1716274800"; 
-   d="scan'208";a="81802856"
-Received: from intel-lenovo-legion-y540-15irh-pg0.iind.intel.com ([10.224.186.95])
-  by fmviesa001.fm.intel.com with ESMTP; 18 Jul 2024 07:33:39 -0700
-From: Kiran K <kiran.k@intel.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: ravishankar.srivatsa@intel.com,
-	chethan.tumkur.narayan@intel.com,
-	chandrashekar.devegowda@intel.com,
-	vijay.satija@intel.com,
-	pmenzel@molgen.mpg.de,
-	Kiran K <kiran.k@intel.com>
-Subject: [PATCH v5] Bluetooth: btintel: Allow configuring drive strength of BRI
-Date: Thu, 18 Jul 2024 20:18:04 +0530
-Message-Id: <20240718144804.3953833-1-kiran.k@intel.com>
-X-Mailer: git-send-email 2.40.1
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="L+K+bXwn"
+Received: by mail-qv1-f52.google.com with SMTP id 6a1803df08f44-6b7a3b75133so2907166d6.2
+        for <linux-bluetooth@vger.kernel.org>; Thu, 18 Jul 2024 07:35:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1721313332; x=1721918132; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=dZlfLcORaD5t7zMhommF1oFsDBg/Dlqse0uj49UzRlM=;
+        b=L+K+bXwn7q85FHXnsoq9hAKvpK9WV43VUSGQR1OarXbPb0ui/wAw/7zb5vi3OD3KtH
+         UUSeKMYlK8+Nx0W2RXDYy+7nf0xKGU2RzJIzA+b8pC7CzSe77dSRhSYUiaFVz1KWzqJl
+         UqXtjH4cz2VsYFZyKAwsf1a/bPo4e5trr6mBdzh5zyP1m+vuy1WZK546VdzveZBWbBVe
+         EmWqkLRXS0389e1DFiBwFg2++1PXstgF6NKVcf9S1AD7tFKnaCn57UnzrE5BdLPC8fDM
+         hNg0yutuaPMnWhudVrRlFuCNCqffbeGeW+xtHSM9RwqT1vZsPGAiWP46ubY4jcpmEEsg
+         KHnQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1721313332; x=1721918132;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=dZlfLcORaD5t7zMhommF1oFsDBg/Dlqse0uj49UzRlM=;
+        b=SqhkRBxP9IvDyrbntzyAcmEKu+hWX7TwGSoKVL1Yqh8+1n1CFPk5BjjwYMS/+5HQHh
+         GGoV83vMNdK3DVsxbM0Zl1lzdhbUnwvzTcAd4eaP5An8hN7DVxIdAfvDGg0be0Vpley2
+         Bw8HXMbi0eRQMtByUOsAqvTeKHzFM16mwxiFlUZA6j1gHDMv9DvxtzZ+UVRPKsZstWBg
+         QtGI2ntJtWHnUmCK3hjuuQHSZGypbykFYl93n1fg2WgozkYzj5aiHsBZzVNFgKjN1vx4
+         AQIDcQjDJi0X+9Yt9gDRwh5HMiMr8KfW3sGIexjUJ7197obdEjI+YV3x3vv9FmMx+fs1
+         mGog==
+X-Gm-Message-State: AOJu0YxCdpRrtrmnYqtQv5mxBxIfJXcNLwSaFTWPITzk3rJ4uvkoBQNt
+	p/a/Y+BDG0mgy/9tpP480Vn/hu/g4Rb+m6aMRLmOAuXXCjIiaJ724dZDMA==
+X-Google-Smtp-Source: AGHT+IEmjuzKMcl3TlJZT08+/5ld9mVI9iqXhQC+G3i3qO1C2nKELGJJgpiu/q44qDDWdviawE2yqg==
+X-Received: by 2002:ad4:5fc9:0:b0:6b7:a4dc:e243 with SMTP id 6a1803df08f44-6b7a4dce559mr10176346d6.15.1721313331508;
+        Thu, 18 Jul 2024 07:35:31 -0700 (PDT)
+Received: from [172.17.0.2] ([172.200.199.165])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6b79c609bbesm8559346d6.99.2024.07.18.07.35.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 18 Jul 2024 07:35:31 -0700 (PDT)
+Message-ID: <66992833.050a0220.4957c.348d@mx.google.com>
+Date: Thu, 18 Jul 2024 07:35:31 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============4855436098914058693=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, kiran.k@intel.com
+Subject: RE: [v4] Bluetooth: btintel: Allow configuring drive strength of BRI
+In-Reply-To: <20240718135655.3948028-1-kiran.k@intel.com>
+References: <20240718135655.3948028-1-kiran.k@intel.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-BRI (Bluetooth Radio Interface) traffic from CNVr to CNVi was found causing
-cross talk step errors to WiFi. To avoid this potential issue OEM platforms
-can replace BRI resistor to adjust the BRI response line drive strength.
-During the *setup*, driver reads the drive strength value from uefi
-variable and passes it to the controller via vendor specific command with
-opcode 0xfc0a.
+--===============4855436098914058693==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-dmesg:
+This is automated email and please do not reply to this email!
 
-..
-[21.982720] Bluetooth: hci0: Bootloader timestamp 2023.33 buildtype 1 build 45995
-[21.984250] Bluetooth: hci0: Found device firmware: intel/ibt-0190-0291-iml.sfi
-[21.984255] Bluetooth: hci0: Boot Address: 0x30099000
-[21.984256] Bluetooth: hci0: Firmware Version: 160-24.24
-[22.011501] Bluetooth: hci0: Waiting for firmware download to complete
-[22.011518] Bluetooth: hci0: Firmware loaded in 26624 usecs
-[22.011584] Bluetooth: hci0: Waiting for device to boot
-[22.013546] Bluetooth: hci0: Malformed MSFT vendor event: 0x02
-[22.013552] Bluetooth: hci0: Device booted in 1967 usecs
-...
-[22.013792] Bluetooth: hci0: dsbr: enable: 0x01 value: 0x0b
-...
-[22.015027] Bluetooth: hci0: Found device firmware: intel/ibt-0190-0291.sfi
-[22.015041] Bluetooth: hci0: Boot Address: 0x10000800
-[22.015043] Bluetooth: hci0: Firmware Version: 160-24.24
-[22.395821] Bluetooth: BNEP (Ethernet Emulation) ver 1.3
-[22.395828] Bluetooth: BNEP filters: protocol multicast
-...
+Dear submitter,
 
-Signed-off-by: Kiran K <kiran.k@intel.com>
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=872275
+
+---Test result---
+
+Test Summary:
+CheckPatch                    FAIL      0.96 seconds
+GitLint                       FAIL      0.56 seconds
+SubjectPrefix                 PASS      0.13 seconds
+BuildKernel                   PASS      30.28 seconds
+CheckAllWarning               PASS      32.81 seconds
+CheckSparse                   PASS      38.42 seconds
+CheckSmatch                   PASS      102.39 seconds
+BuildKernel32                 PASS      28.65 seconds
+TestRunnerSetup               PASS      524.54 seconds
+TestRunner_l2cap-tester       PASS      22.03 seconds
+TestRunner_iso-tester         PASS      121.95 seconds
+TestRunner_bnep-tester        PASS      4.89 seconds
+TestRunner_mgmt-tester        PASS      113.87 seconds
+TestRunner_rfcomm-tester      PASS      7.52 seconds
+TestRunner_sco-tester         PASS      16.09 seconds
+TestRunner_ioctl-tester       PASS      7.96 seconds
+TestRunner_mesh-tester        PASS      6.12 seconds
+TestRunner_smp-tester         PASS      7.03 seconds
+TestRunner_userchan-tester    PASS      5.12 seconds
+IncrementalBuild              PASS      28.08 seconds
+
+Details
+##############################
+Test: CheckPatch - FAIL
+Desc: Run checkpatch.pl script
+Output:
+[v4] Bluetooth: btintel: Allow configuring drive strength of BRI
+ERROR: Remove Gerrit Change-Id's before submitting upstream
+#113: 
+Change-Id: Ia51d0d86b980fcca1b12247ed8fe9ae9d2b06307
+
+total: 1 errors, 0 warnings, 148 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/src/13736562.patch has style problems, please review.
+
+NOTE: Ignored message types: UNKNOWN_COMMIT_ID
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+##############################
+Test: GitLint - FAIL
+Desc: Run gitlint
+Output:
+[v4] Bluetooth: btintel: Allow configuring drive strength of BRI
+
+WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
+13: B1 Line exceeds max length (81>80): "[21.982720] Bluetooth: hci0: Bootloader timestamp 2023.33 buildtype 1 build 45995"
+34: B1 Line exceeds max length (82>80): "Reviewed-on: https://gerritwcs.ir.intel.com/c/bcp_linux-bt_drv_kernel-5_3/+/117825"
+
+
 ---
- drivers/bluetooth/btintel.c | 124 ++++++++++++++++++++++++++++++++++++
- 1 file changed, 124 insertions(+)
+Regards,
+Linux Bluetooth
 
-diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
-index 2ebc970e6573..cef74fd1271d 100644
---- a/drivers/bluetooth/btintel.c
-+++ b/drivers/bluetooth/btintel.c
-@@ -12,6 +12,7 @@
- #include <linux/acpi.h>
- #include <acpi/acpi_bus.h>
- #include <asm/unaligned.h>
-+#include <linux/efi.h>
- 
- #include <net/bluetooth/bluetooth.h>
- #include <net/bluetooth/hci_core.h>
-@@ -26,6 +27,8 @@
- #define ECDSA_OFFSET		644
- #define ECDSA_HEADER_LEN	320
- 
-+#define BTINTEL_EFI_DSBR	L"UefiCnvCommonDSBR"
-+
- enum {
- 	DSM_SET_WDISABLE2_DELAY = 1,
- 	DSM_SET_RESET_METHOD = 3,
-@@ -2616,6 +2619,120 @@ static u8 btintel_classify_pkt_type(struct hci_dev *hdev, struct sk_buff *skb)
- 	return hci_skb_pkt_type(skb);
- }
- 
-+/*
-+ * UefiCnvCommonDSBR UEFI variable provides information from the OEM platforms
-+ * if they have replaced the BRI (Bluetooth Radio Interface) resistor to
-+ * overcome the potential STEP errors on their designs. Based on the
-+ * configauration, bluetooth firmware shall adjust the BRI response line drive
-+ * strength. The below structure represents DSBR data.
-+ * struct {
-+ *	u8 header;
-+ *	u32 dsbr;
-+ * } __packed;
-+ *
-+ * header - defines revision number of the structure
-+ * dsbr - defines drive strength BRI response
-+ *	bit0
-+ *		0 - instructs bluetooth firmware to use default values
-+ *		1 - instructs bluetooth firmware to override default values
-+ *	bit3:1
-+ *		Reserved
-+ *	bit7:4
-+ *		DSBR override values (only if bit0 is set. Default value is 0xF
-+ *	bit31:7
-+ *		Reserved
-+ * Expected values for dsbr field:
-+ *	1. 0xF1 - indicates that the resistor on board is 33 Ohm
-+ *	2. 0x00 or 0xB1 - indicates that the resistor on board is 10 Ohm
-+ *	3. Non existing UEFI variable or invalid (none of the above) - indicates
-+ *	   that the resistor on board is 10 Ohm
-+ * Even if uefi variable is not present, driver shall send 0xfc0a command to
-+ * firmware to use default values.
-+ *
-+ */
-+static int btintel_uefi_get_dsbr(u32 *dsbr_var)
-+{
-+	struct btintel_dsbr {
-+		u8 header;
-+		u32 dsbr;
-+	} __packed data;
-+
-+	efi_status_t status;
-+	unsigned long data_size = 0;
-+	efi_guid_t guid = EFI_GUID(0xe65d8884, 0xd4af, 0x4b20, 0x8d, 0x03,
-+				   0x77, 0x2e, 0xcc, 0x3d, 0xa5, 0x31);
-+
-+	if (!IS_ENABLED(CONFIG_EFI))
-+		return -EOPNOTSUPP;
-+
-+	if (!efi_rt_services_supported(EFI_RT_SUPPORTED_GET_VARIABLE))
-+		return -EOPNOTSUPP;
-+
-+	status = efi.get_variable(BTINTEL_EFI_DSBR, &guid, NULL, &data_size,
-+				  NULL);
-+
-+	if (status != EFI_BUFFER_TOO_SMALL || !data_size)
-+		return -EIO;
-+
-+	status = efi.get_variable(BTINTEL_EFI_DSBR, &guid, NULL, &data_size,
-+				  &data);
-+
-+	if (status != EFI_SUCCESS)
-+		return -ENXIO;
-+
-+	*dsbr_var = data.dsbr;
-+	return 0;
-+}
-+
-+static int btintel_set_dsbr(struct hci_dev *hdev, struct intel_version_tlv *ver)
-+{
-+	struct btintel_dsbr_cmd {
-+		u8 enable;
-+		u8 dsbr;
-+	} __packed;
-+
-+	struct btintel_dsbr_cmd cmd;
-+	struct sk_buff *skb;
-+	u8 status;
-+	u32 dsbr;
-+	bool apply_dsbr;
-+	int err;
-+
-+	/* DSBR command needs to be sent for BlazarI + B0 step product after
-+	 * downloading IML image.
-+	 */
-+	apply_dsbr = (ver->img_type == BTINTEL_IMG_IML &&
-+		((ver->cnvi_top & 0xfff) == BTINTEL_CNVI_BLAZARI) &&
-+		INTEL_CNVX_TOP_STEP(ver->cnvi_top) == 0x01);
-+
-+	if (!apply_dsbr)
-+		return 0;
-+
-+	dsbr = 0;
-+	err = btintel_uefi_get_dsbr(&dsbr);
-+	if (err < 0)
-+		bt_dev_dbg(hdev, "Error reading efi: %ls  (%d)",
-+			   BTINTEL_EFI_DSBR, err);
-+
-+	cmd.enable = dsbr & BIT(0);
-+	cmd.dsbr = dsbr >> 4 & 0xF;
-+
-+	bt_dev_info(hdev, "dsbr: enable: 0x%2.2x value: 0x%2.2x", cmd.enable,
-+		    cmd.dsbr);
-+
-+	skb = __hci_cmd_sync(hdev, 0xfc0a, sizeof(cmd), &cmd,  HCI_CMD_TIMEOUT);
-+	if (IS_ERR(skb))
-+		return -bt_to_errno(PTR_ERR(skb));
-+
-+	status = skb->data[0];
-+	kfree_skb(skb);
-+
-+	if (status)
-+		return -bt_to_errno(status);
-+
-+	return 0;
-+}
-+
- int btintel_bootloader_setup_tlv(struct hci_dev *hdev,
- 				 struct intel_version_tlv *ver)
- {
-@@ -2650,6 +2767,13 @@ int btintel_bootloader_setup_tlv(struct hci_dev *hdev,
- 	if (err)
- 		return err;
- 
-+	/* set drive strength of BRI response */
-+	err = btintel_set_dsbr(hdev, ver);
-+	if (err) {
-+		bt_dev_err(hdev, "Failed to send dsbr command (%d)", err);
-+		return err;
-+	}
-+
- 	/* If image type returned is BTINTEL_IMG_IML, then controller supports
- 	 * intermediate loader image
- 	 */
--- 
-2.40.1
 
+--===============4855436098914058693==--
