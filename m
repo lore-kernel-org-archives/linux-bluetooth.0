@@ -1,112 +1,136 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vs1-f42.google.com (mail-vs1-f42.google.com [209.85.217.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC30E29A1;
-	Fri, 19 Jul 2024 10:06:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CFFF82D72
+	for <linux-bluetooth@vger.kernel.org>; Fri, 19 Jul 2024 10:34:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721383561; cv=none; b=avIAvCS/wZy/bzf8nydYPa4BOdhZrV4/yQBUNlHXoe84WSZ+OKPygIsoY2KWbGii6VtXEwZK+EfDnn2aakLsQeU+g8nJiffbekJwMs1IRcIJXE49sww/4OzIVZ5k4JOAki7BAczOACey9GGOOZdOoRYYggC1l9AC6e6Rxy1jeGg=
+	t=1721385267; cv=none; b=VxPAUkNqZa4q8vtr2mS9MhynhbnQ8FU0keNtPeQvuXAhyXPPtGrzoXYkC7m9uZA7o26WE90xwJw9Y+kCeOC+qI0Utb/fVmpASyc3/t3osE3/bbQvzCJkD7CRIA/sPVP7jl8jKEfFpJF7wcdF3yIyVCwbD58Dfnua31km8cu/RUM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721383561; c=relaxed/simple;
-	bh=sINWgXxddUzYRyDAErofwiMxBkh6XLtJM46yfDgg1vQ=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=CVDIQnk5LEbayML71+b0WM1utlDSbqgMTmgMnRd8jruTsBYA6BQIAbYwtmdpxrG5Zb5y+DMzH7Wkx9/yWwrAq6gPtQetjVqEFRAEa4iJOPkCf2bzuYXBme+Q2fNcvq61Vftp/T9dnXJW0rCdSrfgttvOUUK8qmwyjQPaoYPipGA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rLJEqbF7; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1721385267; c=relaxed/simple;
+	bh=PMSyVEk+g5zqHKXu9mN80pmjqvWrId9Bl3JxYPQGM9I=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=rGRgRs+cjAN2LyfmIuMN8XnR6eWFUEXzefuHWZV7/1ukm+9IgJj6xTsSf8jX8xZmsx0f30y1/wHKjphgOTlm3aqjIAmDaEf8xnkga7WZZiXwb71QuZ78BVfIGAch9CZx10l2mcmzX5gfO2buBwvTRj2WwhnGQ5RK/TJp2oma/KI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NLVnRP4j; arc=none smtp.client-ip=209.85.217.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rLJEqbF7"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 64EC6C4AF0A;
-	Fri, 19 Jul 2024 10:05:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1721383560;
-	bh=sINWgXxddUzYRyDAErofwiMxBkh6XLtJM46yfDgg1vQ=;
-	h=From:To:Cc:Subject:Date:From;
-	b=rLJEqbF7yRdgk3+DvdhBj0jFTmQH5lU4E6NnWFT8Xn4RiQrzAYWYSvQQ5TTPWzU87
-	 KvLfofiV3SwTPEHCXXNWAK8+FI5PQQwQZN0KlxCdmk+KY0XfixtrUYRkR7iLtwIzkY
-	 KDAwSz/N8oJVcKvc/oZaE0eufN+QqAP2k3AEqKEl7XwuWxaSQOcRIpOrHiDYy5kbjD
-	 Wv+/+fp4HX8N/KqCgbogF2RYX8/Oca8rjRlLj4xZzjzkXl8Z9WbzjDzEce7WSf1U64
-	 niy6ly2P7gNixlrbMPvdBZGDLtBo6Sv1w+89+jif75ZymxalL6hVm6nGvywrMykCo0
-	 0J6JwddhXXKfw==
-From: Arnd Bergmann <arnd@kernel.org>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Sean Wang <sean.wang@mediatek.com>
-Cc: Arnd Bergmann <arnd@arndb.de>,
-	Sven Peter <sven@svenpeter.dev>,
-	Tedd Ho-Jeong An <tedd.an@intel.com>,
-	Hector Martin <marcan@marcan.st>,
-	Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
-	Niklas Schnelle <schnelle@linux.ibm.com>,
-	linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Subject: [PATCH] Bluetooth: btmtk: add USB dependencies
-Date: Fri, 19 Jul 2024 12:05:45 +0200
-Message-Id: <20240719100554.4183635-1-arnd@kernel.org>
-X-Mailer: git-send-email 2.39.2
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NLVnRP4j"
+Received: by mail-vs1-f42.google.com with SMTP id ada2fe7eead31-48febcc8819so595826137.3
+        for <linux-bluetooth@vger.kernel.org>; Fri, 19 Jul 2024 03:34:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1721385264; x=1721990064; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=n/OaaQ8SwOHoCes9Y7wyVFDyBHKeEVgD9+YEnJ3KM34=;
+        b=NLVnRP4jcfXH7ceNnDUARnASHLqtr+w2cZdF9vhqynWcXrMVzZnz/C6I2+xxAngepH
+         BgaIgFsvfHHPPua95So0rBgLkEiLDc+Wf9twzaaHsqAQdW1ktedQkR/SOtHGIFdVQpyZ
+         Da3iEztnk4mF3L7PeqG9YrKT7VfN7YL//rol94yD+GGGH/vC+7t/7PpmKFWAQZnd/ga4
+         KWaIG9VA6S0xd15uzfCm1pTAcVHe4L/VBH2xSWICg6BImIUed8aVYiuGPNA5S6lA79r5
+         83wPiW8dJ5pLc74xPWwTLIdpI42DNGe64JXURByH1HnPMQZy9htrACGy2PRQBNUJ23+5
+         IgKQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1721385264; x=1721990064;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=n/OaaQ8SwOHoCes9Y7wyVFDyBHKeEVgD9+YEnJ3KM34=;
+        b=tj8wkHDMkXklNpyOc9LPi8YfJt84auwnFg2LUQP4Qs962FwyjiTpedv/wOdNG/xazx
+         J9zu/zNBi87+KTDuAu52lN78S4G2bnB43MNigx4fZuHQEP+4DU/ImuPR35eSrA5t7tQw
+         CJw5n54Cz4aghoYldnSu3gsf/ktHnvJfwLdJkDVYhFsToiXQFpN5Rxr4NQ7Y7ek3SAUw
+         QGFl4UpY0kCOgBBwFfZnI1aFy8qmPCXm8y9JTIFnUi+/gMdLZwcbOxK1PEYXydpE0Y3m
+         piLn/5hl3XQWhWw+WmUVrgHELNhwF35YySa2d2jmchM+8V4KRgxV7IMsjPRIxRJ0EvqS
+         QvUg==
+X-Gm-Message-State: AOJu0YwfYD+sJPmyeBg6PBHb4KsNCnB9FWbEwHn/is/KEnjmg3FhA0fW
+	7suSkBy6Z0a3JIwIz3QXUSKIVruvwf9TZf/aAxpCxc6uXn0DcEL4hjn9Aw==
+X-Google-Smtp-Source: AGHT+IGDRf+JNifeVrtYwdieUJQfZJYULNi6x9W5HnF6yVsyP5nb04F+VDpDXX3fgFq9FizMw6h9kQ==
+X-Received: by 2002:a05:6102:f98:b0:48f:db5c:d598 with SMTP id ada2fe7eead31-4915982bedcmr9687022137.2.1721385264012;
+        Fri, 19 Jul 2024 03:34:24 -0700 (PDT)
+Received: from [172.17.0.2] ([20.83.175.80])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6b7acb0b0aesm4671816d6.140.2024.07.19.03.34.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 19 Jul 2024 03:34:23 -0700 (PDT)
+Message-ID: <669a412f.050a0220.578d.1469@mx.google.com>
+Date: Fri, 19 Jul 2024 03:34:23 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============3415855717385437818=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, arnd@kernel.org
+Subject: RE: Bluetooth: btmtk: add USB dependencies
+In-Reply-To: <20240719100554.4183635-1-arnd@kernel.org>
+References: <20240719100554.4183635-1-arnd@kernel.org>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-From: Arnd Bergmann <arnd@arndb.de>
+--===============3415855717385437818==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-The mediatek bluetooth drivers have a common portion that is now used for
-all front-ends (usb, sdio, uart) but that internally relies on USB
-interface functions:
+This is automated email and please do not reply to this email!
 
-ERROR: modpost: "usb_alloc_urb" [drivers/bluetooth/btmtk.ko] undefined!
-ERROR: modpost: "usb_anchor_urb" [drivers/bluetooth/btmtk.ko] undefined!
-ERROR: modpost: "usb_submit_urb" [drivers/bluetooth/btmtk.ko] undefined!
-ERROR: modpost: "usb_free_urb" [drivers/bluetooth/btmtk.ko] undefined!
-ERROR: modpost: "usb_unanchor_urb" [drivers/bluetooth/btmtk.ko] undefined!
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=872493
+
+---Test result---
+
+Test Summary:
+CheckPatch                    FAIL      0.88 seconds
+GitLint                       PASS      0.31 seconds
+SubjectPrefix                 PASS      0.12 seconds
+BuildKernel                   PASS      29.64 seconds
+CheckAllWarning               PASS      32.00 seconds
+CheckSparse                   PASS      37.68 seconds
+CheckSmatch                   PASS      101.93 seconds
+BuildKernel32                 PASS      28.50 seconds
+TestRunnerSetup               PASS      525.23 seconds
+TestRunner_l2cap-tester       PASS      22.27 seconds
+TestRunner_iso-tester         PASS      32.67 seconds
+TestRunner_bnep-tester        PASS      4.85 seconds
+TestRunner_mgmt-tester        PASS      113.03 seconds
+TestRunner_rfcomm-tester      PASS      7.46 seconds
+TestRunner_sco-tester         PASS      15.01 seconds
+TestRunner_ioctl-tester       PASS      7.97 seconds
+TestRunner_mesh-tester        PASS      5.99 seconds
+TestRunner_smp-tester         PASS      6.95 seconds
+TestRunner_userchan-tester    PASS      5.07 seconds
+IncrementalBuild              PASS      27.55 seconds
+
+Details
+##############################
+Test: CheckPatch - FAIL
+Desc: Run checkpatch.pl script
+Output:
+Bluetooth: btmtk: add USB dependencies
+WARNING: Prefer a maximum 75 chars per line (possible unwrapped commit description?)
+#79: 
 ERROR: modpost: "usb_kill_anchored_urbs" [drivers/bluetooth/btmtk.ko] undefined!
-ERROR: modpost: "usb_set_interface" [drivers/bluetooth/btmtk.ko] undefined!
-ERROR: modpost: "usb_control_msg" [drivers/bluetooth/btmtk.ko] undefined!
 
-It would be possible to split this up further, but in practice anything
-that uses this driver will have USB enabled anyway and it only matters
-for build testing, so just go with a much stricter dependency.
+total: 0 errors, 1 warnings, 21 lines checked
 
-Fixes: f5c3f98946e3 ("Bluetooth: btmtkuart: rely on BT_MTK module")
-Fixes: 3a722044aacf ("Bluetooth: btmtksido: rely on BT_MTK module")
-Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/src/13737152.patch has style problems, please review.
+
+NOTE: Ignored message types: UNKNOWN_COMMIT_ID
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+
+
 ---
- drivers/bluetooth/Kconfig | 3 +++
- 1 file changed, 3 insertions(+)
+Regards,
+Linux Bluetooth
 
-diff --git a/drivers/bluetooth/Kconfig b/drivers/bluetooth/Kconfig
-index 44a2de58337b..2894a345562c 100644
---- a/drivers/bluetooth/Kconfig
-+++ b/drivers/bluetooth/Kconfig
-@@ -21,6 +21,7 @@ config BT_QCA
- 
- config BT_MTK
- 	tristate
-+	depends on USB
- 	select FW_LOADER
- 
- config BT_HCIBTUSB
-@@ -413,6 +414,7 @@ config BT_ATH3K
- config BT_MTKSDIO
- 	tristate "MediaTek HCI SDIO driver"
- 	depends on MMC
-+	depends on USB
- 	select BT_MTK
- 	help
- 	  MediaTek Bluetooth HCI SDIO driver.
-@@ -425,6 +427,7 @@ config BT_MTKSDIO
- config BT_MTKUART
- 	tristate "MediaTek HCI UART driver"
- 	depends on SERIAL_DEV_BUS
-+	depends on USB
- 	select BT_MTK
- 	help
- 	  MediaTek Bluetooth HCI UART driver.
--- 
-2.39.2
 
+--===============3415855717385437818==--
