@@ -1,112 +1,293 @@
-Received: from fhigh2-smtp.messagingengine.com (fhigh2-smtp.messagingengine.com [103.168.172.153])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vs1-f42.google.com (mail-vs1-f42.google.com [209.85.217.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DFF32F34;
-	Fri, 19 Jul 2024 15:21:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.153
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 003234174C
+	for <linux-bluetooth@vger.kernel.org>; Fri, 19 Jul 2024 20:07:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721402505; cv=none; b=aWYQWzFjNHVPgJEyZoMGW90LP65FVAuKCQKztDaS4eCWbrWxpKzmei0G4AU72f2AYZyAKgZ9JwRcpVSTiEc8+AIbTo1pqjX4eO/vAOgbYSn4y1gRhZc/EQWItmpZ6/styvst1wHTwLY5ajE2cOj2pdbf6DAHOsUxRm7kuD/d5+0=
+	t=1721419642; cv=none; b=Q1gLPWmH9lnumFwSL5vPnNZEvZoGDZqK9ZGHwf4qH5ZMBZOyiDSs3BjGFwGenSoqSImeNUcLPa1OjwXDo8V31TJ3DqTkFl+z6AdLOHO5QmknpHpdoZLY6t4SbvkSYS7mj6KHkX8SQNQE3X0J2nkiyRuiUiZTuzqiNRTDtuwMAQ4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721402505; c=relaxed/simple;
-	bh=hfKd/PizTdrNl/aXmZO+kt0ni0BZee4+daNXJr58+6o=;
-	h=MIME-Version:Message-Id:In-Reply-To:References:Date:From:To:Cc:
-	 Subject:Content-Type; b=RDc91ERP5wcj52kBJGPAqXFjvMZ5fpD5+4MWzRbS1lupe1KJzHwSRMt7a5wO4ARJJFD81NWVJsqXI9nMI1RWXsnHQbqHouhhu0AmivEMe+F7qpGc+ARUUUHMjFZdtTVsukuto2ZUJ3vGJcjeQ1t+/yO9nvrKFKkDtunLYq/aYuM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=mi/qsxgn; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=YXGrk/7a; arc=none smtp.client-ip=103.168.172.153
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
+	s=arc-20240116; t=1721419642; c=relaxed/simple;
+	bh=Je79lj6ELy/1/ZTuJAUGVJGkPLH0h7skGdBXUY6Xsa4=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=kuICsWc6pyk4m2MdiCIa8i0kwkWrtlB9pf2dvotO5bvSmUeM3kKJz9J2dBZvV2YX5a3IEOXwT+WRUaonvmaQg0ykh1WSvdlVw2U0rQFrCPb+guPPFW98YjjELe3+otv7dRWzidIIsb7XDZV7iwYBdfogOVI6E8WUX40XooQ/isc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gJA0cIMm; arc=none smtp.client-ip=209.85.217.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="mi/qsxgn";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="YXGrk/7a"
-Received: from compute6.internal (compute6.nyi.internal [10.202.2.47])
-	by mailfhigh.nyi.internal (Postfix) with ESMTP id 38C13114021C;
-	Fri, 19 Jul 2024 11:21:43 -0400 (EDT)
-Received: from imap51 ([10.202.2.101])
-  by compute6.internal (MEProxy); Fri, 19 Jul 2024 11:21:43 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
-	:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm2; t=1721402503;
-	 x=1721488903; bh=s+PzQcEGeZO72mJxLzVW32ROjmZ1iVcPKvrWAwSV2OQ=; b=
-	mi/qsxgnCXB+X5PlvJW2HoxMK6iujYQNBbYtxNFzebj/cyUrmAGm6Q9+l9nx/5SE
-	oo0jY3ypsJtMGVPZEpVpN31rmTd4nR04EWzNg8rFXIjC4YVmw/1/wXzDOzvgLBkg
-	UdBLQG7cZt7EgpWX/OYbbcU65XJn2E9GZ5nDoFcE9+ddjzn/3i9OhRIS9fKftDjA
-	FxJBVKaOlJZpYunUDejQo9+TcNi6ueXrRHYnK+7ck5f0by8DifPhifMBHltA7nYu
-	jPNvYlooPZWqoQh+yCtwv5A2EgIF+z+l1JmDlIiL0fQMfZkT7Gbkmfd31ux4N+KL
-	wefESr56pISi1mGpOyv0Ww==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1721402503; x=
-	1721488903; bh=s+PzQcEGeZO72mJxLzVW32ROjmZ1iVcPKvrWAwSV2OQ=; b=Y
-	XGrk/7aTnFZ+EZuy5agZQcH6DWudmBU1IvyPvmYWbzl22ETonHux1PYpqmQzPOkK
-	ThD7JTRvy4XXUBgExLj2qhOftENXm82nW23qJKQjtf9W8QhWbpus+wpadANkFeVH
-	cYrVqkgpXMzd8NDF8KZkaoojvdmFCuPTya4SVvY6TXNEta+iGQ5hXX1iUdik6gY/
-	qB/S4UsrAJo5csZ3I2ijB3kz10zJ8JnrtBABsdVH79YBMnPfUu9iYSvAECfj4cL9
-	blqIOwbYSpsqucUgOQrubdSfQ6qr2IMukjFaE1dK1rQ8l+CYgYdEHJclTGInLIsm
-	SGzPstvT0tBMBU/xZgeUw==
-X-ME-Sender: <xms:hoSaZmyhWqc-Ik-4xAvo11PPfGYmQr4prnvdDltyYlso31zSttRQwg>
-    <xme:hoSaZiTfI27ws5hDnT9-VJONajKJ11qjZHqQlwzwPs0UPXh183uev7W6Q7QFr2_H3
-    4MThR4ehiO_dMzvCWo>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeftddrhedugdekkecutefuodetggdotefrodftvf
-    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
-    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
-    fjughrpefofgggkfgjfhffhffvvefutgfgsehtqhertderreejnecuhfhrohhmpedftehr
-    nhguuceuvghrghhmrghnnhdfuceorghrnhgusegrrhhnuggsrdguvgeqnecuggftrfgrth
-    htvghrnhepgfekueelgeeigefhudduledtkeefffejueelheelfedutedttdfgveeufeef
-    ieegnecuffhomhgrihhnpehkvghrnhgvlhdrohhrghenucevlhhushhtvghrufhiiigvpe
-    dtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegrrhhnugesrghrnhgusgdruggv
-X-ME-Proxy: <xmx:hoSaZoWyUAQAt7AwZD7hEr-HGwUz_6RhrsmPFS_LPWTZAHPTOc-INA>
-    <xmx:hoSaZsjsPoTE7qHxdTIznvIDOH8vAATrRcf8a6gcNlWy4xummeRe4Q>
-    <xmx:hoSaZoBFKsyFd3eqjw9JAj8CoT-QjkpFJDVgoERkc_fkAxb787bHoA>
-    <xmx:hoSaZtIzV3unhl-YENBJtjdDOu-0-aReAdWLxPvs3afoWE6u09nh4A>
-    <xmx:h4SaZgbK0E-cfIssxqqBF5O9Y5ZFVoL-omwzUK_avZ-b-GRPWFJl5WKk>
-Feedback-ID: i56a14606:Fastmail
-Received: by mailuser.nyi.internal (Postfix, from userid 501)
-	id 0CE24B6008D; Fri, 19 Jul 2024 11:21:41 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
-User-Agent: Cyrus-JMAP/3.11.0-alpha0-568-g843fbadbe-fm-20240701.003-g843fbadb
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gJA0cIMm"
+Received: by mail-vs1-f42.google.com with SMTP id ada2fe7eead31-48fe9381454so1715718137.1
+        for <linux-bluetooth@vger.kernel.org>; Fri, 19 Jul 2024 13:07:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1721419639; x=1722024439; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=7Ej7KE1cjQE0tn2Kfv1YeBpmNe5KlH9/Drmd04lhvwA=;
+        b=gJA0cIMmxj1HS2o8J5T/pwZLphNTIWjgXUlXW36rhFK4k0+hJvl8oOJAzX0u8laGzd
+         QBpdT8xcJkavx4spM8HVwrN6yfuPMchf9Xk/at7v/GJoeE39zbBrR9Vejn82ZI2mkBiW
+         du+3wfeiAUnoVi8+W7lo58+1cROihw+6m38yOETBuvgHugHY4Z0cxHSP7/T/XYmhgVtE
+         Hrdb0v6vQbmJPAqHr5dbaFVkDhJUZU3WrpLFCA/qRUXFnCTiaHPP7xc40QC8d/XnjJ4P
+         umkIYU6JS2BzEiwT1AYcPwg+4DIlGl678iwIxznfYd/FrHQ2cSoacmQEtjUDYPGml15Z
+         yQSQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1721419639; x=1722024439;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=7Ej7KE1cjQE0tn2Kfv1YeBpmNe5KlH9/Drmd04lhvwA=;
+        b=DPIjJR44fQbrfAuzcjupQQ780X4KWplhiklmJ5HupWCToeOd9bxDI7XGyBMmKCy1/H
+         amcVqOsIS/mho7YoHzS9wZfFMDaevMZED4x02a6n5m7XZMoArH6E/m+07SDY4GZ3/2gr
+         81v+Zcvande92YO4QSh0zbhqYhil22e1uczscMtP/8XcmjiyhNNvn1XxSB44N9nmXnhp
+         bbHOiNw1PZYn+qpU9Sk/l+cH881roikiVB5fL1i4/uU8u/kKCsvWAwI71dgT5q8zfIh0
+         BVqaeXxNgRzX9EdJyDVyFJ3yFVlZC88tPD86TyyiqUtWw7p8FZo7RbDAW1f1kwG7g6+N
+         v47g==
+X-Gm-Message-State: AOJu0YxNqQtKCUH8DGbIYR/oWm90VytP0fEvlqiWaPo7VP4n/Q5HcbY0
+	W3u5C2fEQ4y9qS2CL4Wwvd/O9s8VCr0Ix8ZDT2hrToCTtO7XAzOMthYMHA==
+X-Google-Smtp-Source: AGHT+IHOpgq+QH6zq73cG+r+2b3zIQfFwpiBSO2emchC0SazRbOjsVrtsas2yFLVPUrhY04rcG7ejw==
+X-Received: by 2002:a05:6102:579a:b0:48f:41ec:b0bc with SMTP id ada2fe7eead31-49284249942mr1026453137.4.1721419638821;
+        Fri, 19 Jul 2024 13:07:18 -0700 (PDT)
+Received: from lvondent-mobl4.. (syn-107-146-107-067.res.spectrum.com. [107.146.107.67])
+        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-49279293662sm305755137.20.2024.07.19.13.07.17
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 19 Jul 2024 13:07:18 -0700 (PDT)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [RFC BlueZ v1 1/2] main.conf: Add LE.CentralAddressResolution option
+Date: Fri, 19 Jul 2024 16:07:15 -0400
+Message-ID: <20240719200716.1557861-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-Id: <9facdbd7-66e5-4756-85c4-ededc55942e2@app.fastmail.com>
-In-Reply-To: 
- <CABBYNZKFD7axR5ZSGJL7mn=_mKufGnxopUeeZhL+AL40jWQjzQ@mail.gmail.com>
-References: <20240719100554.4183635-1-arnd@kernel.org>
- <CABBYNZKFD7axR5ZSGJL7mn=_mKufGnxopUeeZhL+AL40jWQjzQ@mail.gmail.com>
-Date: Fri, 19 Jul 2024 17:21:21 +0200
-From: "Arnd Bergmann" <arnd@arndb.de>
-To: "Luiz Augusto von Dentz" <luiz.dentz@gmail.com>,
- "Arnd Bergmann" <arnd@kernel.org>
-Cc: "Marcel Holtmann" <marcel@holtmann.org>,
- "Matthias Brugger" <matthias.bgg@gmail.com>,
- "AngeloGioacchino Del Regno" <angelogioacchino.delregno@collabora.com>,
- "Sean Wang" <sean.wang@mediatek.com>, "Sven Peter" <sven@svenpeter.dev>,
- "Tedd Ho-Jeong An" <tedd.an@intel.com>, "Hector Martin" <marcan@marcan.st>,
- "Krzysztof Kozlowski" <krzysztof.kozlowski@linaro.org>,
- "Niklas Schnelle" <schnelle@linux.ibm.com>, linux-bluetooth@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-mediatek@lists.infradead.org
-Subject: Re: [PATCH] Bluetooth: btmtk: add USB dependencies
-Content-Type: text/plain;charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Fri, Jul 19, 2024, at 17:08, Luiz Augusto von Dentz wrote:
-> On Fri, Jul 19, 2024 at 6:06=E2=80=AFAM Arnd Bergmann <arnd@kernel.org=
-> wrote:
->
-> Thanks for the fix, but we went with a different one:
-> https://patchwork.kernel.org/project/bluetooth/patch/20240719033019.26=
-767-1-chris.lu@mediatek.com/
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-I thought about doing that at first, but I believe this is still
-broken for a configuration with CONFIG_USB=3Dm, CONFIG_BT_HCIBTUSB=3Dm,
-CONFIG_MMC=3Dy, CONFIG_BT_MTKSDIO=3Dy. I haven't tried this, but I
-think this should result in a CONFIG_BT_MTK=3Dy with the common
-module being built-in but unable to link against the USB module.
+This adds CentralAddressResolution option to LE group which controls the
+GATT attribute of the same name using the new MGMT Device Flag with the
+fallback to LL Privacy experimental UUID.
+---
+ lib/mgmt.h          |  1 +
+ src/adapter.c       |  6 ++++++
+ src/btd.h           |  2 ++
+ src/device.c        | 23 ++++++++++++++++++++++-
+ src/device.h        |  2 ++
+ src/gatt-database.c | 12 +++++++++++-
+ src/main.c          | 23 +++++++++++++++++++++--
+ src/main.conf       |  6 ++++++
+ 8 files changed, 71 insertions(+), 4 deletions(-)
 
-      Arnd
+diff --git a/lib/mgmt.h b/lib/mgmt.h
+index 8f92b77315e3..6cd3b7397e18 100644
+--- a/lib/mgmt.h
++++ b/lib/mgmt.h
+@@ -678,6 +678,7 @@ struct mgmt_rp_get_device_flags {
+ 
+ #define DEVICE_FLAG_REMOTE_WAKEUP	BIT(0)
+ #define DEVICE_FLAG_DEVICE_PRIVACY	BIT(1)
++#define DEVICE_FLAG_ADDRESS_RESOLUTION	BIT(2)
+ 
+ #define MGMT_OP_SET_DEVICE_FLAGS	0x0050
+ #define MGMT_SET_DEVICE_FLAGS_SIZE	11
+diff --git a/src/adapter.c b/src/adapter.c
+index 85ddfc16568f..265c3f0edfbc 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -5696,6 +5696,12 @@ void adapter_set_device_flags(struct btd_adapter *adapter,
+ 	if (btd_opts.device_privacy && !(flags & DEVICE_FLAG_DEVICE_PRIVACY))
+ 		flags |= DEVICE_FLAG_DEVICE_PRIVACY & supported & ~pending;
+ 
++	/* Set Address Resolution if it has not been set the flag yet. */
++	if (btd_opts.defaults.le.addr_resolution &&
++			device_address_is_private(device) &&
++			!(flags & DEVICE_FLAG_ADDRESS_RESOLUTION))
++		flags |= DEVICE_FLAG_ADDRESS_RESOLUTION & supported & ~pending;
++
+ 	bdaddr = device_get_address(device);
+ 	bdaddr_type = btd_device_get_bdaddr_type(device);
+ 
+diff --git a/src/btd.h b/src/btd.h
+index 383bd7c19600..b9c7647ef277 100644
+--- a/src/btd.h
++++ b/src/btd.h
+@@ -59,6 +59,8 @@ struct btd_br_defaults {
+ };
+ 
+ struct btd_le_defaults {
++	uint8_t		addr_resolution;
++
+ 	uint16_t	min_adv_interval;
+ 	uint16_t	max_adv_interval;
+ 	uint16_t	adv_rotation_interval;
+diff --git a/src/device.c b/src/device.c
+index a1dc0750ca41..063e32fe01b6 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -547,7 +547,7 @@ static gboolean store_device_info_cb(gpointer user_data)
+ 	return FALSE;
+ }
+ 
+-static bool device_address_is_private(struct btd_device *dev)
++bool device_address_is_private(struct btd_device *dev)
+ {
+ 	if (dev->bdaddr_type != BDADDR_LE_RANDOM)
+ 		return false;
+@@ -7234,6 +7234,27 @@ void btd_device_set_pnpid(struct btd_device *device, uint16_t source,
+ 	store_device_info(device);
+ }
+ 
++bool btd_device_flags_enabled(struct btd_device *dev, uint32_t flags)
++{
++	const char *ll_privacy = "15c0a148-c273-11ea-b3de-0242ac130004";
++
++	if (!dev)
++		return false;
++
++	if (dev->current_flags & flags)
++		return true;
++
++	/* For backward compatibility check for LL Privacy experimental UUID
++	 * since that shall be equivalent to DEVICE_FLAG_ADDRESS_RESOLUTION on
++	 * older kernels.
++	 */
++	if ((flags & DEVICE_FLAG_ADDRESS_RESOLUTION) &&
++			btd_kernel_experimental_enabled(ll_privacy))
++		return true;
++
++	return false;
++}
++
+ uint32_t btd_device_get_current_flags(struct btd_device *dev)
+ {
+ 	return dev->current_flags;
+diff --git a/src/device.h b/src/device.h
+index 3742f6028040..36895db087ac 100644
+--- a/src/device.h
++++ b/src/device.h
+@@ -28,6 +28,7 @@ bool device_name_known(struct btd_device *device);
+ bool device_is_name_resolve_allowed(struct btd_device *device);
+ void device_name_resolve_fail(struct btd_device *device);
+ void device_set_class(struct btd_device *device, uint32_t class);
++bool device_address_is_private(struct btd_device *dev);
+ void device_set_rpa(struct btd_device *device, bool value);
+ void device_update_addr(struct btd_device *device, const bdaddr_t *bdaddr,
+ 							uint8_t bdaddr_type);
+@@ -189,6 +190,7 @@ struct btd_service *btd_device_get_service(struct btd_device *dev,
+ int device_discover_services(struct btd_device *device);
+ int btd_device_connect_services(struct btd_device *dev, GSList *services);
+ 
++bool btd_device_flags_enabled(struct btd_device *dev, uint32_t flags);
+ uint32_t btd_device_get_current_flags(struct btd_device *dev);
+ uint32_t btd_device_get_supported_flags(struct btd_device *dev);
+ uint32_t btd_device_get_pending_flags(struct btd_device *dev);
+diff --git a/src/gatt-database.c b/src/gatt-database.c
+index 6c84b085ca29..92dc15641b9e 100644
+--- a/src/gatt-database.c
++++ b/src/gatt-database.c
+@@ -21,6 +21,7 @@
+ #include "lib/sdp.h"
+ #include "lib/sdp_lib.h"
+ #include "lib/uuid.h"
++#include "lib/mgmt.h"
+ #include "btio/btio.h"
+ #include "gdbus/gdbus.h"
+ #include "src/shared/util.h"
+@@ -737,10 +738,19 @@ static void gap_car_read_cb(struct gatt_db_attribute *attrib,
+ 					uint8_t opcode, struct bt_att *att,
+ 					void *user_data)
+ {
+-	uint8_t value = 0x01;
++	uint8_t value = 0x00;
+ 
+ 	DBG("GAP Central Address Resolution read request\n");
+ 
++	if (btd_opts.defaults.le.addr_resolution) {
++		struct btd_device *device;
++
++		device = btd_adapter_find_device_by_fd(bt_att_get_fd(att));
++		if (device)
++			value = btd_device_flags_enabled(device,
++					DEVICE_FLAG_ADDRESS_RESOLUTION);
++	}
++
+ 	gatt_db_attribute_read_result(attrib, id, 0, &value, sizeof(value));
+ }
+ 
+diff --git a/src/main.c b/src/main.c
+index 62453bffaf57..01fef7052108 100644
+--- a/src/main.c
++++ b/src/main.c
+@@ -108,6 +108,7 @@ static const char *br_options[] = {
+ };
+ 
+ static const char *le_options[] = {
++	"CentralAddressResolution",
+ 	"MinAdvertisementInterval",
+ 	"MaxAdvertisementInterval",
+ 	"MultiAdvertisementRotationInterval",
+@@ -573,6 +574,11 @@ static void parse_br_config(GKeyFile *config)
+ static void parse_le_config(GKeyFile *config)
+ {
+ 	static const struct config_param params[] = {
++		{ "CentralAddressResolution",
++		  &btd_opts.defaults.le.addr_resolution,
++		  sizeof(btd_opts.defaults.le.addr_resolution),
++		  0,
++		  1},
+ 		{ "MinAdvertisementInterval",
+ 		  &btd_opts.defaults.le.min_adv_interval,
+ 		  sizeof(btd_opts.defaults.le.min_adv_interval),
+@@ -700,9 +706,21 @@ static bool match_experimental(const void *data, const void *match_data)
+ bool btd_kernel_experimental_enabled(const char *uuid)
+ {
+ 	if (!btd_opts.kernel)
+-		false;
++		goto done;
+ 
+-	return queue_find(btd_opts.kernel, match_experimental, uuid);
++	if (queue_find(btd_opts.kernel, match_experimental, uuid))
++		return true;
++
++done:
++	/* For backward compatibility set LL Privacy as enabled if
++	 * CentralAddressResolution has been set so old kernel LL Privacy is
++	 * enabled.
++	 */
++	if (!strcmp(uuid, "15c0a148-c273-11ea-b3de-0242ac130004") &&
++			btd_opts.defaults.le.addr_resolution)
++		return true;
++
++	return false;
+ }
+ 
+ static const char *valid_uuids[] = {
+@@ -1186,6 +1204,7 @@ static void init_defaults(void)
+ 	btd_opts.defaults.num_entries = 0;
+ 	btd_opts.defaults.br.page_scan_type = 0xFFFF;
+ 	btd_opts.defaults.br.scan_type = 0xFFFF;
++	btd_opts.defaults.le.addr_resolution = 0x01;
+ 	btd_opts.defaults.le.enable_advmon_interleave_scan = 0xFF;
+ 
+ 	if (sscanf(VERSION, "%hhu.%hhu", &major, &minor) != 2)
+diff --git a/src/main.conf b/src/main.conf
+index 82040b3fa33f..601cc61f7a26 100644
+--- a/src/main.conf
++++ b/src/main.conf
+@@ -178,6 +178,12 @@
+ #MaxSniffInterval=
+ 
+ [LE]
++# Enable/Disable Central Address Resolution.
++# 0: disable
++# 1: enable
++# Defaults to 1
++#CentralAddressResolution = 1
++
+ # The following values are used to load default adapter parameters for LE.
+ # BlueZ loads the values into the kernel before the adapter is powered if the
+ # kernel supports the MGMT_LOAD_DEFAULT_PARAMETERS command. If a value isn't
+-- 
+2.45.2
+
