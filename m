@@ -1,103 +1,145 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mailgw01.mediatek.com (unknown [60.244.123.138])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EB2BA20
-	for <linux-bluetooth@vger.kernel.org>; Fri, 19 Jul 2024 02:32:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAC3A15D1;
+	Fri, 19 Jul 2024 03:30:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=60.244.123.138
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721356350; cv=none; b=oLF+jziPjPrtYg3LGSF07ITmWeX2qZTZ/gnBxu1+6YJZqWSm1juZzJLXtb7lUK+W9OS18i6JTyF5e1jnx1Fvmsn3J6ZEFn3vgcMyHMTJFZPk4WzeasYa0hMkx8xyohdQLp7KU/OfhnP8ijWEL2RlP7hB+A9QOoZzAC8inxn+K8c=
+	t=1721359844; cv=none; b=K4l5gwgxuJbO0gYoVgDh0i1QH/UidQU+1M4ZEAjqgMNGLi8lle2bLAgs6ec+XeCSfkO6DVBkXKticj45wEP5kC3jFmwRcUbJj+k9NXxevrTGGR7jXR4VYT1VY/ZL7KugMQgrdOwXofPDbdB3ZLI7/o9K1wxSV48ToIzWPv/YbxI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721356350; c=relaxed/simple;
-	bh=2hp3stz8k0FqTl8D1zsi+SphZFmZRisaPDJVx6jkeHY=;
-	h=From:To:Subject:Date:Message-ID:Content-Type:MIME-Version; b=FS2IsQs97utgf6Xj6ssIar0kqqe3JI2ZDuQ37DwTGrRv0qQ/x7Goi23Pmfsgo5bnlCE6HHEwEhscw3PeqvL2EDaeHH1bt5UaOpArHGrc6o+K3ogGHCxR+1L9O9bczvSg7XQJX1L7JM3UI93uOD7rPuEf8UtMZ2qyYEjgOETKMgI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oW1AaP00; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1721359844; c=relaxed/simple;
+	bh=imF6Kqt9IO3cXDhr+NhX+/hgb54ebsJ68TVqbT/b7KI=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=LxaJFSqUVvsUIWZLrRYlX6/P/ftMiySWPHi3hQeAr8S/0ktspx0GKi6jSmSFcgRxnJp2dBgrQkbgQ9F/h/GU7c+UwdVg37i6Sp1h4nqZlIHcj5gaw2W3DskCzYkXhAwll+zUIGKATvVn37brjHXNw15DiIx/3tAbouR7MheT9kg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com; spf=pass smtp.mailfrom=mediatek.com; dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b=GF7mCB0u; arc=none smtp.client-ip=60.244.123.138
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mediatek.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oW1AaP00"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id C6859C116B1
-	for <linux-bluetooth@vger.kernel.org>; Fri, 19 Jul 2024 02:32:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1721356349;
-	bh=2hp3stz8k0FqTl8D1zsi+SphZFmZRisaPDJVx6jkeHY=;
-	h=From:To:Subject:Date:From;
-	b=oW1AaP00VPJgjS9G1ks7uBR6yCYwV1ypLtEPsZzRLicgoVaIarsw341cyHASeEm4O
-	 KxZs8gH1SRLJPBUE1t+dzzBQxFJliebw2ihyCNzFzEpVy/qIhxfoh8n0IFVv/C3XHb
-	 ADR7ghFdHOQSLi420U98wyiks6edIjtI6KBzKS0xLFEmq9u1YVJN9M8FYvuYiZQT6i
-	 +zsYekH3lGqfl7NtHMKztW9fL40zhi9WJ0ioR7/qz8qE5yFJpJjxGRVVeZniKZFwNA
-	 5wJNqndOujeUHCDTWtQxWP4WOmwiweJ+6o0mXiuEvD1PfQCW0qpBn+8l44H3/t3Ui1
-	 VCTlgv+WzQtPQ==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id B3721C433E5; Fri, 19 Jul 2024 02:32:29 +0000 (UTC)
-From: bugzilla-daemon@kernel.org
-To: linux-bluetooth@vger.kernel.org
-Subject: [Bug 219057] New: dongle bluetooth does't work on linux mint
-Date: Fri, 19 Jul 2024 02:32:29 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: new
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: ricardo.andres.riquelmerios97@gmail.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P3
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: bug_id short_desc product version rep_platform
- op_sys bug_status bug_severity priority component assigned_to reporter
- cf_regression
-Message-ID: <bug-219057-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+	dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b="GF7mCB0u"
+X-UUID: 3df3ba36457f11efb5b96b43b535fdb4-20240719
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
+	h=Content-Type:MIME-Version:Message-ID:Date:Subject:CC:To:From; bh=28l8QKvC3Olgg+dWSr28AdW3OebwY6nJGOCrKM+Reoo=;
+	b=GF7mCB0u7XqBENEJMVoTkmxb/d5K/Qtfw/Nhu1VQ+OFVUZHmAjF4/R1chWxjxNMgUGpA1Si3ZylcgVuyXRO14OdJ6FJMryFzEcjgNG8sucqi5kmgUINZkkb0Bjcvlts0RaFOZUBeoKT6PqYVu3I2+geMtKJLa/Qc84IT/dm1RaE=;
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.1.40,REQID:add49a83-89c2-4a52-9fff-449f0de143e3,IP:0,U
+	RL:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
+	release,TS:0
+X-CID-META: VersionHash:ba885a6,CLOUDID:bc2886d5-0d68-4615-a20f-01d7bd41f0bb,B
+	ulkID:nil,BulkQuantity:0,Recheck:0,SF:102,TC:nil,Content:0,EDM:-3,IP:nil,U
+	RL:11|1,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES
+	:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
+X-CID-BVR: 0
+X-CID-BAS: 0,_,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR,TF_CID_SPAM_ULN
+X-UUID: 3df3ba36457f11efb5b96b43b535fdb4-20240719
+Received: from mtkmbs13n2.mediatek.inc [(172.21.101.108)] by mailgw01.mediatek.com
+	(envelope-from <chris.lu@mediatek.com>)
+	(Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
+	with ESMTP id 1972961238; Fri, 19 Jul 2024 11:30:27 +0800
+Received: from mtkmbs11n2.mediatek.inc (172.21.101.187) by
+ mtkmbs10n2.mediatek.inc (172.21.101.183) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.26; Fri, 19 Jul 2024 11:30:27 +0800
+Received: from mtksdccf07.mediatek.inc (172.21.84.99) by
+ mtkmbs11n2.mediatek.inc (172.21.101.73) with Microsoft SMTP Server id
+ 15.2.1118.26 via Frontend Transport; Fri, 19 Jul 2024 11:30:27 +0800
+From: Chris Lu <chris.lu@mediatek.com>
+To: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg
+	<johan.hedberg@gmail.com>, Luiz Von Dentz <luiz.dentz@gmail.com>
+CC: Sean Wang <sean.wang@mediatek.com>, Aaron Hou <aaron.hou@mediatek.com>,
+	Steve Lee <steve.lee@mediatek.com>, linux-bluetooth
+	<linux-bluetooth@vger.kernel.org>, linux-kernel
+	<linux-kernel@vger.kernel.org>, linux-mediatek
+	<linux-mediatek@lists.infradead.org>, Chris Lu <chris.lu@mediatek.com>
+Subject: [PATCH v4] Bluetooth: btmtk: Fix btmtk.c undefined reference build error
+Date: Fri, 19 Jul 2024 11:30:19 +0800
+Message-ID: <20240719033019.26767-1-chris.lu@mediatek.com>
+X-Mailer: git-send-email 2.18.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain
+X-TM-AS-Product-Ver: SMEX-14.0.0.3152-9.1.1006-23728.005
+X-TM-AS-Result: No-10--11.058100-8.000000
+X-TMASE-MatchedRID: I7rsaQFiURCiwkztVCsqbzl6J+7ealtWvtVce6w5+K8sfFlFugSGUAOi
+	VFpF7nSJ37TMydxZ0/vc7gUppY5koqcgTP4t5UFTI0cHLI6lhgIoUVkB7ifJnmHtZs6e3ZMHAJY
+	y/fBIuxLTUnxbEiZ303MCHJVGredYJBVW14/3QK0D2WXLXdz+AerRJDUyDHkIxKLCLOyCW5DT4r
+	vTUn4TmPx3JZLyUT3kodDxruGyL3fhLW5g057g5Xa57ruHAnHxh+w9Wz/xXDq8NrbzjPvzJ41+2
+	Gy6CZ06vjnLF6gHXQqAMuqetGVetksDkkP3zIjq3QfwsVk0UbtuRXh7bFKB7tp1NhDvqY8dqP6E
+	g/sbYsei8HQVQhN2PDrWGv8jH9iulExlQIQeRG0=
+X-TM-AS-User-Approved-Sender: No
+X-TM-AS-User-Blocked-Sender: No
+X-TMASE-Result: 10--11.058100-8.000000
+X-TMASE-Version: SMEX-14.0.0.3152-9.1.1006-23728.005
+X-TM-SNTS-SMTP: 1B5B1B37C5A8424C95AEBCDFDD4D71ED4D0729E4F5C7754EF717304D376DB58B2000:8
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D219057
+MediaTek moved some usb interface related function to btmtk.c which
+may cause build failed if BT USB Kconfig wasn't enabled.
+Fix undefined reference by adding config check.
 
-            Bug ID: 219057
-           Summary: dongle bluetooth does't work on linux mint
-           Product: Drivers
-           Version: 2.5
-          Hardware: All
-                OS: Linux
-            Status: NEW
-          Severity: normal
-          Priority: P3
-         Component: Bluetooth
-          Assignee: linux-bluetooth@vger.kernel.org
-          Reporter: ricardo.andres.riquelmerios97@gmail.com
-        Regression: No
+btmtk.c:(.text+0x89c): undefined reference to `usb_alloc_urb'
+btmtk.c:(.text+0x8e3): undefined reference to `usb_free_urb'
+btmtk.c:(.text+0x956): undefined reference to `usb_free_urb'
+btmtk.c:(.text+0xa0e): undefined reference to `usb_anchor_urb'
+btmtk.c:(.text+0xb43): undefined reference to `usb_autopm_get_interface'
+btmtk.c:(.text+0xb7e): undefined reference to `usb_autopm_put_interface'
+btmtk.c:(.text+0xf70): undefined reference to `usb_disable_autosuspend'
+btmtk.c:(.text+0x133a): undefined reference to `usb_control_msg'
 
-Hi , I build a pc gaming machine and install linux mint on it and for most =
-the
-thinks works almost perfect except this dougle bluetooth of the brand ugree=
-n ,
-I just buy this device because it said bluetooth 5,4 and when I put the dev=
-ice
-the system recognize as a bt device but when I try to enable blueman , the
-program in seft crash I try this command and give me this error [    9.4287=
-97]
-Bluetooth: hci0: command 0x1005 tx timeout
-[    9.428845] Bluetooth: hci0: Opcode 0x1005 failed: -110
- so.. I don't know can I do now , I try to forums of linux mint , telegram
-about linux mint , discord too and none it can give a awnser , can someone =
-with
-more experience help me please and thanks for give me a little of your time=
- and
-readme
+Fixes: d019930b0049 ("Bluetooth: btmtk: move btusb_mtk_hci_wmt_sync to btmtk.c")
+Reported-by: kernel test robot <lkp@intel.com>
+Closes: https://lore.kernel.org/oe-kbuild-all/202407091928.AH0aGZnx-lkp@intel.com/
+Signed-off-by: Chris Lu <chris.lu@mediatek.com>
+---
+Change from v3 to v4:
+-rebase code base
+---
+ drivers/bluetooth/btmtk.c | 2 ++
+ drivers/bluetooth/btmtk.h | 2 ++
+ 2 files changed, 4 insertions(+)
 
-Ricardo.
+diff --git a/drivers/bluetooth/btmtk.c b/drivers/bluetooth/btmtk.c
+index 191bc6925120..2b7c80043aa2 100644
+--- a/drivers/bluetooth/btmtk.c
++++ b/drivers/bluetooth/btmtk.c
+@@ -437,6 +437,7 @@ int btmtk_process_coredump(struct hci_dev *hdev, struct sk_buff *skb)
+ }
+ EXPORT_SYMBOL_GPL(btmtk_process_coredump);
+ 
++#if IS_ENABLED(CONFIG_BT_HCIBTUSB_MTK)
+ static void btmtk_usb_wmt_recv(struct urb *urb)
+ {
+ 	struct hci_dev *hdev = urb->context;
+@@ -1488,6 +1489,7 @@ int btmtk_usb_shutdown(struct hci_dev *hdev)
+ 	return 0;
+ }
+ EXPORT_SYMBOL_GPL(btmtk_usb_shutdown);
++#endif
+ 
+ MODULE_AUTHOR("Sean Wang <sean.wang@mediatek.com>");
+ MODULE_AUTHOR("Mark Chen <mark-yw.chen@mediatek.com>");
+diff --git a/drivers/bluetooth/btmtk.h b/drivers/bluetooth/btmtk.h
+index 5df7c3296624..6fc69cd8636b 100644
+--- a/drivers/bluetooth/btmtk.h
++++ b/drivers/bluetooth/btmtk.h
+@@ -202,6 +202,7 @@ int btmtk_process_coredump(struct hci_dev *hdev, struct sk_buff *skb);
+ void btmtk_fw_get_filename(char *buf, size_t size, u32 dev_id, u32 fw_ver,
+ 			   u32 fw_flavor);
+ 
++#if IS_ENABLED(CONFIG_BT_HCIBTUSB_MTK)
+ int btmtk_usb_subsys_reset(struct hci_dev *hdev, u32 dev_id);
+ 
+ int btmtk_usb_recv_acl(struct hci_dev *hdev, struct sk_buff *skb);
+@@ -216,6 +217,7 @@ int btmtk_usb_suspend(struct hci_dev *hdev);
+ int btmtk_usb_setup(struct hci_dev *hdev);
+ 
+ int btmtk_usb_shutdown(struct hci_dev *hdev);
++#endif
+ #else
+ 
+ static inline int btmtk_set_bdaddr(struct hci_dev *hdev,
+-- 
+2.18.0
 
---=20
-You may reply to this email to add a comment.
-
-You are receiving this mail because:
-You are the assignee for the bug.=
