@@ -1,310 +1,196 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A9E91DDF6
-	for <linux-bluetooth@vger.kernel.org>; Sat, 20 Jul 2024 16:29:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8983F3D66;
+	Sat, 20 Jul 2024 18:25:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721492977; cv=none; b=KAEMEJGxW5yq78C1CHO72lf3ZlbB1XitESma9z71qBjW1wAQwHYap1Yoe1LQ5ZkPgzjbsPlStDar/Je/cflHcNT2oSpFTSIn4EdFdZ0M0Til0lC4NNaC3N0KhujBOTUEqNBchD90+3DdlsOdRyTVSq5uH2b9Zbmq/1AF/B/gJfY=
+	t=1721499933; cv=none; b=Y5lRZ2yOwF5Mf400ZOhZGO5sgf/SRI7Tb/e5QHAq1C9SMTravSDOSOHK9+Hts4r7AqfRuCJ1xvOQyXfn5EkxK+Qi5X4GjyrZx8m0OIRWfBc7tIensC7cgb4olHVqS8ujArD65R5a8IciRENE6PH2m3eX59NDDrD5ZQkSsyMUpuA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721492977; c=relaxed/simple;
-	bh=jbvv3KchxvRNhQKCtzwwRi++GjeeKR55NSQOvBYLG+o=;
-	h=Date:From:To:Cc:Subject:Message-ID; b=PlrWtX/bZg0iZaXmbfpgbow6IWqlsTvOq8oKO2yGT0jQS9CmBPtgH2StGufbS8yn8UqUkdvU3a8xzdobJso5/Qf17uXop2C6187g2+4Ob+yHaqTUOloc7A+78wK9y3bv3C08Xl49jyBp/eU6KXVRIz6B5YHR5ACe97hTXcA4Ep4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=iNXIhsVu; arc=none smtp.client-ip=198.175.65.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1721499933; c=relaxed/simple;
+	bh=XoPwgzprGDn3+eLd4n5lyqkYKtC39c939dOeKl5SAtM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=uesj96HWnF/mkO+aIuwj6p9/rKxlQ7PBgB6tvvlnIPbZbmSfbqLjfMSBWImNquEMtln5f4dyHNRubVc3QY2Vom4TAzYeGNez6hd4/Ek+yEjADHoq5SJIMhWKj7ufmnl0ZbI2/M7S1wlLC/iF0u1SsWCQ0lnTB0tJr4yPLtHcYyU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cBa+ekli; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="iNXIhsVu"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1721492974; x=1753028974;
-  h=date:from:to:cc:subject:message-id;
-  bh=jbvv3KchxvRNhQKCtzwwRi++GjeeKR55NSQOvBYLG+o=;
-  b=iNXIhsVudFA40mClglNTicMTlTGTsFPKAl/4FSwcLOE3KT3M3ggmwLv7
-   ahoq5kFGkeHjHHeUvBrKL58pyPgRPbapcwrqjhztuYl/JgxM2yh2PUjD3
-   Fy85IK1t0lEBNCGJULXEyiKobGxy1Tcg9dkrUWSZiy6Kf7wbs4JjC4iap
-   b4MzTYlMJfchBDjWlrHqID4MgwlSel5wBnDatE0TLXWNlD7Jech2/uwlt
-   Dx8KddV3d/5jVjKUrS1MuHwkCPg9/dPbUjrQ+rPUsRIeJSjLm1VZBXRij
-   cNSakYgHiivffhCzXAhLUIyj9T+8RCUlYGlwyQW+61Z93fdOTs6JcX3AB
-   g==;
-X-CSE-ConnectionGUID: AOLr/M1ASnKbyEeQnqMbjQ==
-X-CSE-MsgGUID: 57RQ/PZLSz6Vmf9BOIg9IA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11139"; a="18946837"
-X-IronPort-AV: E=Sophos;i="6.09,224,1716274800"; 
-   d="scan'208";a="18946837"
-Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Jul 2024 09:29:34 -0700
-X-CSE-ConnectionGUID: GZ7G0C59Qc2z1syruQBM3w==
-X-CSE-MsgGUID: 3sLooAvwTlekjszm668hWA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.09,224,1716274800"; 
-   d="scan'208";a="51155328"
-Received: from lkp-server01.sh.intel.com (HELO 68891e0c336b) ([10.239.97.150])
-  by fmviesa007.fm.intel.com with ESMTP; 20 Jul 2024 09:29:32 -0700
-Received: from kbuild by 68891e0c336b with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1sVCxe-000jPE-1H;
-	Sat, 20 Jul 2024 16:29:30 +0000
-Date: Sun, 21 Jul 2024 00:28:42 +0800
-From: kernel test robot <lkp@intel.com>
-To: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: [bluetooth-next:master] BUILD REGRESSION
- 52828ea60dfdd05246fc92dedfad1c8bbfa2dd66
-Message-ID: <202407210037.cZBFtL5x-lkp@intel.com>
-User-Agent: s-nail v14.9.24
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cBa+ekli"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2317FC2BD10;
+	Sat, 20 Jul 2024 18:25:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1721499933;
+	bh=XoPwgzprGDn3+eLd4n5lyqkYKtC39c939dOeKl5SAtM=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=cBa+eklitNsi+5X0PT1B8DLx4q07C4cr2pFk0Q0UGBF5v7Vddvgnpl6cHGu3VoqGL
+	 Ms5oTJtEuUSVgILgBnx2jxOGWUdGGo6oa4UnDA+/wYjfpZuyPPFeqjDjd3j54+Uen5
+	 i1NQchfyjre0pgiKvtwfKeYTm7zkRoeVqOTrbc6pWY1qriKzaGv8QCSTMm1YkHFF9l
+	 1RO7aV+bM0u9C0K+SYsnuZqUuZ7eT6VwtDS/XObUqA4hf2IirF4hQry6vWUANe/vvr
+	 aTu6bT5ECGFIYGajhfdgsutsVzPSBrbRKoT0sMeW/Cgh9R73O7xCEFnIcI576vREBT
+	 F+fYiMIyNbNVQ==
+Message-ID: <1582443b-c20a-4e3a-b633-2e7204daf7e0@kernel.org>
+Date: Sat, 20 Jul 2024 20:25:26 +0200
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 1/3] dt-bindings: net: bluetooth: Add support for
+ Amlogic Bluetooth
+To: Yang Li <yang.li@amlogic.com>, Marcel Holtmann <marcel@holtmann.org>,
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+ Conor Dooley <conor+dt@kernel.org>, Catalin Marinas
+ <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>
+Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org
+References: <20240718-btaml-v2-0-1392b2e21183@amlogic.com>
+ <20240718-btaml-v2-1-1392b2e21183@amlogic.com>
+ <18f1301f-6d93-4645-b6d9-e4ccd103ff5d@kernel.org>
+ <30cf7665-ff35-4a1a-ba26-0bbe377512be@amlogic.com>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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 fv0=
+In-Reply-To: <30cf7665-ff35-4a1a-ba26-0bbe377512be@amlogic.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
-branch HEAD: 52828ea60dfdd05246fc92dedfad1c8bbfa2dd66  Bluetooth: btmtk: Fix btmtk.c undefined reference build error
+On 19/07/2024 10:20, Yang Li wrote:
+> Dear Krzysztof
+> 
+> Thanks.
+> 
+> On 2024/7/18 19:40, Krzysztof Kozlowski wrote:
+>> On 18/07/2024 09:42, Yang Li via B4 Relay wrote:
+>>> From: Yang Li <yang.li@amlogic.com>
+>>>
+>>> Add binding document for Amlogic Bluetooth chipsets attached over UART.
+>>>
+>>> Signed-off-by: Yang Li <yang.li@amlogic.com>
+>>> ---
+>>>   .../bindings/net/bluetooth/amlogic,w155s2-bt.yaml  | 66 ++++++++++++++++++++++
+>>>   1 file changed, 66 insertions(+)
+>>>
+>>> diff --git a/Documentation/devicetree/bindings/net/bluetooth/amlogic,w155s2-bt.yaml b/Documentation/devicetree/bindings/net/bluetooth/amlogic,w155s2-bt.yaml
+>>> new file mode 100644
+>>> index 000000000000..2e433d5692ff
+>>> --- /dev/null
+>>> +++ b/Documentation/devicetree/bindings/net/bluetooth/amlogic,w155s2-bt.yaml
+>>> @@ -0,0 +1,66 @@
+>>> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+>>> +# Copyright (C) 2024 Amlogic, Inc. All rights reserved
+>>> +%YAML 1.2
+>>> +---
+>>> +$id: http://devicetree.org/schemas/net/bluetooth/amlogic,w155s2-bt.yaml#
+>>> +$schema: http://devicetree.org/meta-schemas/core.yaml#
+>>> +
+>>> +title: Amlogic Bluetooth chips
+>>> +
+>>> +description:
+>>> +  This binding describes UART-attached Amlogic bluetooth chips.
+>> <form letter>
+>> This is a friendly reminder during the review process.
+>>
+>> It seems my or other reviewer's previous comments were not fully
+>> addressed. Maybe the feedback got lost between the quotes, maybe you
+>> just forgot to apply it. Please go back to the previous discussion and
+>> either implement all requested changes or keep discussing them.
+>>
+>> Thank you.
+>> </form letter>
+> 
+> Apologies for the earlier omission. I have amended the description of the
+> 
+> UART-attached Amlogic Bluetooth chips in the patch:
+> 
+> "This binding describes Amlogic Bluetooth chips connected via UART,
+> 
+> which function as dual-radio devices supporting Wi-Fi and Bluetooth.
+> 
+> It operates on the H4 protocol over a 4-wire UART, with RTS and CTS lines
+> 
+> used for firmware download. It supports Bluetooth and Wi-Fi coexistence."
 
-Error/Warning reports:
+You still say what is the binding which is pointless. Binding is a
+binding... awesome. No, say what the hardware is.
 
-https://lore.kernel.org/oe-kbuild-all/202407200904.hRqT3JKD-lkp@intel.com
-https://lore.kernel.org/oe-kbuild-all/202407200917.Dv9hKccL-lkp@intel.com
 
-Error/Warning: (recently discovered and may have been fixed)
 
-drivers/bluetooth/btusb.c:2705:15: error: implicit declaration of function 'btmtk_usb_subsys_reset' [-Wimplicit-function-declaration]
-drivers/bluetooth/btusb.c:2705:8: error: call to undeclared function 'btmtk_usb_subsys_reset'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
-drivers/bluetooth/btusb.c:2720:21: error: assignment to 'struct urb *' from 'int' makes pointer from integer without a cast [-Wint-conversion]
-drivers/bluetooth/btusb.c:2720:23: error: implicit declaration of function 'alloc_mtk_intr_urb' [-Wimplicit-function-declaration]
-drivers/bluetooth/btusb.c:2720:7: error: incompatible integer to pointer conversion assigning to 'struct urb *' from 'int' [-Wint-conversion]
-drivers/bluetooth/btusb.c:2720:9: error: call to undeclared function 'alloc_mtk_intr_urb'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
-drivers/bluetooth/btusb.c:2749:16: error: implicit declaration of function 'btmtk_usb_setup' [-Wimplicit-function-declaration]
-drivers/bluetooth/btusb.c:2749:9: error: call to undeclared function 'btmtk_usb_setup'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
-drivers/bluetooth/btusb.c:2760:16: error: implicit declaration of function 'btmtk_usb_shutdown'; did you mean 'btusb_mtk_shutdown'? [-Wimplicit-function-declaration]
-drivers/bluetooth/btusb.c:2760:9: error: call to undeclared function 'btmtk_usb_shutdown'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
-drivers/bluetooth/btusb.c:3869:20: error: use of undeclared identifier 'btmtk_usb_recv_acl'; did you mean 'btusb_recv_acl'?
-drivers/bluetooth/btusb.c:3869:34: error: 'btmtk_usb_recv_acl' undeclared (first use in this function); did you mean 'btusb_recv_acl'?
-drivers/bluetooth/btusb.c:3870:19: error: use of undeclared identifier 'btmtk_usb_suspend'
-drivers/bluetooth/btusb.c:3870:33: error: 'btmtk_usb_suspend' undeclared (first use in this function)
-drivers/bluetooth/btusb.c:3871:18: error: use of undeclared identifier 'btmtk_usb_resume'
-drivers/bluetooth/btusb.c:3871:32: error: 'btmtk_usb_resume' undeclared (first use in this function)
+>>
+>>> +    description: bluetooth chip 3.3V supply regulator handle
+>>> +
+>>> +  clocks:
+>>> +    maxItems: 1
+>>> +    description: clock provided to the controller (32.768KHz)
+>>> +
+>>> +  antenna-number:
+>>> +    default: 1
+>>> +    description: device supports up to two antennas
+>> Keep it consistent - either descriptions are the last property or
+>> somewhere else. Usually the last.
+>>
+>>> +    $ref: /schemas/types.yaml#/definitions/uint32
+>> And what does it mean? What happens if BT uses antenna number 2, not 1?
+>> What is connected to the other antenna? It really feels useless to say
+>> which antenna is connected to hardware.
+> 
+> Sorry, the antenna description was incorrect, it should specify whether
+> 
+> Bluetooth and WiFi coexist. I will change it as below:
+> 
+>      aml,work-mode:
+>      type: boolean
+>      description: specifywhether Bluetooth and WiFi coexist.
 
-Error/Warning ids grouped by kconfigs:
+So one device can be used on different boards - some without WiFi
+antenna? But, why in the binding of bluetooth you describe whether there
+is WiFi antenna?
 
-recent_errors
-|-- arm64-randconfig-051-20240720
-|   |-- arch-arm64-boot-dts-qcom-qrb5165-rb5-vision-mezzanine.dtb:bluetooth:vddbtcmx-supply-is-a-required-property
-|   |-- arch-arm64-boot-dts-qcom-qrb5165-rb5-vision-mezzanine.dtb:bluetooth:vddrfa0p8-supply-is-a-required-property
-|   |-- arch-arm64-boot-dts-qcom-qrb5165-rb5-vision-mezzanine.dtb:bluetooth:vddrfa1p2-supply-is-a-required-property
-|   |-- arch-arm64-boot-dts-qcom-qrb5165-rb5-vision-mezzanine.dtb:bluetooth:vddrfa1p7-supply-is-a-required-property
-|   |-- arch-arm64-boot-dts-qcom-qrb5165-rb5-vision-mezzanine.dtb:bluetooth:vddrfacmn-supply-is-a-required-property
-|   |-- arch-arm64-boot-dts-qcom-qrb5165-rb5.dtb:bluetooth:vddbtcmx-supply-is-a-required-property
-|   |-- arch-arm64-boot-dts-qcom-qrb5165-rb5.dtb:bluetooth:vddrfa0p8-supply-is-a-required-property
-|   |-- arch-arm64-boot-dts-qcom-qrb5165-rb5.dtb:bluetooth:vddrfa1p2-supply-is-a-required-property
-|   |-- arch-arm64-boot-dts-qcom-qrb5165-rb5.dtb:bluetooth:vddrfa1p7-supply-is-a-required-property
-|   |-- arch-arm64-boot-dts-qcom-qrb5165-rb5.dtb:bluetooth:vddrfacmn-supply-is-a-required-property
-|   |-- arch-arm64-boot-dts-qcom-sm8650-qrd.dtb:bluetooth:vddrfa1p8-supply-is-a-required-property
-|   |-- arch-arm64-boot-dts-qcom-sm8650-qrd.dtb:bluetooth:vddrfacmn-supply-is-a-required-property
-|   |-- arch-arm64-boot-dts-qcom-sm8650-qrd.dtb:bluetooth:vddwlcx-supply-is-a-required-property
-|   `-- arch-arm64-boot-dts-qcom-sm8650-qrd.dtb:bluetooth:vddwlmx-supply-is-a-required-property
-|-- csky-randconfig-001-20240720
-|   |-- drivers-bluetooth-btusb.c:error:assignment-to-struct-urb-from-int-makes-pointer-from-integer-without-a-cast
-|   |-- drivers-bluetooth-btusb.c:error:btmtk_usb_recv_acl-undeclared-(first-use-in-this-function)
-|   |-- drivers-bluetooth-btusb.c:error:btmtk_usb_resume-undeclared-(first-use-in-this-function)
-|   |-- drivers-bluetooth-btusb.c:error:btmtk_usb_suspend-undeclared-(first-use-in-this-function)
-|   |-- drivers-bluetooth-btusb.c:error:implicit-declaration-of-function-alloc_mtk_intr_urb
-|   |-- drivers-bluetooth-btusb.c:error:implicit-declaration-of-function-btmtk_usb_setup
-|   |-- drivers-bluetooth-btusb.c:error:implicit-declaration-of-function-btmtk_usb_shutdown
-|   `-- drivers-bluetooth-btusb.c:error:implicit-declaration-of-function-btmtk_usb_subsys_reset
-|-- i386-buildonly-randconfig-005-20240720
-|   |-- drivers-bluetooth-btusb.c:error:call-to-undeclared-function-alloc_mtk_intr_urb-ISO-C99-and-later-do-not-support-implicit-function-declarations
-|   |-- drivers-bluetooth-btusb.c:error:call-to-undeclared-function-btmtk_usb_setup-ISO-C99-and-later-do-not-support-implicit-function-declarations
-|   |-- drivers-bluetooth-btusb.c:error:call-to-undeclared-function-btmtk_usb_shutdown-ISO-C99-and-later-do-not-support-implicit-function-declarations
-|   |-- drivers-bluetooth-btusb.c:error:call-to-undeclared-function-btmtk_usb_subsys_reset-ISO-C99-and-later-do-not-support-implicit-function-declarations
-|   |-- drivers-bluetooth-btusb.c:error:incompatible-integer-to-pointer-conversion-assigning-to-struct-urb-from-int
-|   |-- drivers-bluetooth-btusb.c:error:use-of-undeclared-identifier-btmtk_usb_recv_acl
-|   |-- drivers-bluetooth-btusb.c:error:use-of-undeclared-identifier-btmtk_usb_resume
-|   `-- drivers-bluetooth-btusb.c:error:use-of-undeclared-identifier-btmtk_usb_suspend
-`-- mips-randconfig-r111-20240720
-    |-- drivers-bluetooth-btusb.c:error:call-to-undeclared-function-alloc_mtk_intr_urb-ISO-C99-and-later-do-not-support-implicit-function-declarations
-    |-- drivers-bluetooth-btusb.c:error:call-to-undeclared-function-btmtk_usb_setup-ISO-C99-and-later-do-not-support-implicit-function-declarations
-    |-- drivers-bluetooth-btusb.c:error:call-to-undeclared-function-btmtk_usb_shutdown-ISO-C99-and-later-do-not-support-implicit-function-declarations
-    |-- drivers-bluetooth-btusb.c:error:call-to-undeclared-function-btmtk_usb_subsys_reset-ISO-C99-and-later-do-not-support-implicit-function-declarations
-    |-- drivers-bluetooth-btusb.c:error:incompatible-integer-to-pointer-conversion-assigning-to-struct-urb-from-int
-    |-- drivers-bluetooth-btusb.c:error:use-of-undeclared-identifier-btmtk_usb_recv_acl
-    |-- drivers-bluetooth-btusb.c:error:use-of-undeclared-identifier-btmtk_usb_resume
-    `-- drivers-bluetooth-btusb.c:error:use-of-undeclared-identifier-btmtk_usb_suspend
+Best regards,
+Krzysztof
 
-elapsed time: 1449m
-
-configs tested: 166
-configs skipped: 8
-
-tested configs:
-alpha                             allnoconfig   gcc-13.2.0
-alpha                            allyesconfig   gcc-13.3.0
-alpha                               defconfig   gcc-13.2.0
-arc                              allmodconfig   gcc-13.2.0
-arc                               allnoconfig   gcc-13.2.0
-arc                              allyesconfig   gcc-13.2.0
-arc                          axs101_defconfig   gcc-13.2.0
-arc                      axs103_smp_defconfig   gcc-13.2.0
-arc                                 defconfig   gcc-13.2.0
-arc                   randconfig-001-20240720   gcc-13.2.0
-arc                   randconfig-002-20240720   gcc-13.2.0
-arm                              allmodconfig   gcc-13.2.0
-arm                              allmodconfig   gcc-14.1.0
-arm                               allnoconfig   gcc-13.2.0
-arm                              allyesconfig   gcc-13.2.0
-arm                              allyesconfig   gcc-14.1.0
-arm                                 defconfig   gcc-13.2.0
-arm                   randconfig-001-20240720   gcc-13.2.0
-arm                   randconfig-002-20240720   gcc-13.2.0
-arm                   randconfig-003-20240720   gcc-13.2.0
-arm                   randconfig-004-20240720   gcc-13.2.0
-arm                           stm32_defconfig   gcc-13.2.0
-arm64                            allmodconfig   clang-19
-arm64                            allmodconfig   gcc-13.2.0
-arm64                             allnoconfig   gcc-13.2.0
-arm64                               defconfig   gcc-13.2.0
-arm64                 randconfig-001-20240720   gcc-13.2.0
-arm64                 randconfig-002-20240720   gcc-13.2.0
-arm64                 randconfig-003-20240720   gcc-13.2.0
-arm64                 randconfig-004-20240720   gcc-13.2.0
-csky                              allnoconfig   gcc-13.2.0
-csky                                defconfig   gcc-13.2.0
-csky                  randconfig-001-20240720   gcc-13.2.0
-csky                  randconfig-002-20240720   gcc-13.2.0
-hexagon                          allmodconfig   clang-19
-hexagon                          allyesconfig   clang-19
-i386                             allmodconfig   clang-18
-i386                             allmodconfig   gcc-13
-i386                              allnoconfig   clang-18
-i386                              allnoconfig   gcc-13
-i386                             allyesconfig   clang-18
-i386                             allyesconfig   gcc-13
-i386         buildonly-randconfig-001-20240720   clang-18
-i386         buildonly-randconfig-002-20240720   clang-18
-i386         buildonly-randconfig-002-20240720   gcc-13
-i386         buildonly-randconfig-003-20240720   clang-18
-i386         buildonly-randconfig-003-20240720   gcc-13
-i386         buildonly-randconfig-004-20240720   clang-18
-i386         buildonly-randconfig-005-20240720   clang-18
-i386         buildonly-randconfig-006-20240720   clang-18
-i386         buildonly-randconfig-006-20240720   gcc-11
-i386                                defconfig   clang-18
-i386                  randconfig-001-20240720   clang-18
-i386                  randconfig-001-20240720   gcc-7
-i386                  randconfig-002-20240720   clang-18
-i386                  randconfig-003-20240720   clang-18
-i386                  randconfig-004-20240720   clang-18
-i386                  randconfig-005-20240720   clang-18
-i386                  randconfig-005-20240720   gcc-13
-i386                  randconfig-006-20240720   clang-18
-i386                  randconfig-006-20240720   gcc-11
-i386                  randconfig-011-20240720   clang-18
-i386                  randconfig-011-20240720   gcc-13
-i386                  randconfig-012-20240720   clang-18
-i386                  randconfig-012-20240720   gcc-13
-i386                  randconfig-013-20240720   clang-18
-i386                  randconfig-013-20240720   gcc-13
-i386                  randconfig-014-20240720   clang-18
-i386                  randconfig-014-20240720   gcc-13
-i386                  randconfig-015-20240720   clang-18
-i386                  randconfig-015-20240720   gcc-12
-i386                  randconfig-016-20240720   clang-18
-i386                  randconfig-016-20240720   gcc-13
-loongarch                        allmodconfig   gcc-14.1.0
-loongarch                         allnoconfig   gcc-13.2.0
-loongarch                           defconfig   gcc-13.2.0
-loongarch             randconfig-001-20240720   gcc-13.2.0
-loongarch             randconfig-002-20240720   gcc-13.2.0
-m68k                             alldefconfig   gcc-13.2.0
-m68k                             allmodconfig   gcc-14.1.0
-m68k                              allnoconfig   gcc-13.2.0
-m68k                             allyesconfig   gcc-14.1.0
-m68k                                defconfig   gcc-13.2.0
-m68k                       m5249evb_defconfig   gcc-13.2.0
-m68k                        m5407c3_defconfig   gcc-13.2.0
-m68k                        mvme147_defconfig   gcc-13.2.0
-m68k                           sun3_defconfig   gcc-13.2.0
-microblaze                       allmodconfig   gcc-14.1.0
-microblaze                        allnoconfig   gcc-13.2.0
-microblaze                       allyesconfig   gcc-14.1.0
-microblaze                          defconfig   gcc-13.2.0
-mips                              allnoconfig   gcc-13.2.0
-mips                     decstation_defconfig   gcc-13.2.0
-mips                       lemote2f_defconfig   gcc-13.2.0
-mips                          rb532_defconfig   gcc-13.2.0
-nios2                             allnoconfig   gcc-13.2.0
-nios2                               defconfig   gcc-13.2.0
-nios2                 randconfig-001-20240720   gcc-13.2.0
-nios2                 randconfig-002-20240720   gcc-13.2.0
-openrisc                          allnoconfig   gcc-14.1.0
-openrisc                         allyesconfig   gcc-14.1.0
-openrisc                            defconfig   gcc-14.1.0
-parisc                           allmodconfig   gcc-14.1.0
-parisc                            allnoconfig   gcc-14.1.0
-parisc                           allyesconfig   gcc-14.1.0
-parisc                              defconfig   gcc-14.1.0
-parisc                randconfig-001-20240720   gcc-13.2.0
-parisc                randconfig-002-20240720   gcc-13.2.0
-parisc64                            defconfig   gcc-13.2.0
-powerpc                          allmodconfig   gcc-14.1.0
-powerpc                           allnoconfig   gcc-14.1.0
-powerpc                          allyesconfig   gcc-14.1.0
-powerpc                      pmac32_defconfig   gcc-13.2.0
-powerpc                         ps3_defconfig   gcc-13.2.0
-powerpc               randconfig-001-20240720   gcc-13.2.0
-powerpc               randconfig-002-20240720   gcc-13.2.0
-powerpc               randconfig-003-20240720   gcc-13.2.0
-powerpc                     redwood_defconfig   gcc-13.2.0
-powerpc64             randconfig-001-20240720   gcc-13.2.0
-powerpc64             randconfig-002-20240720   gcc-13.2.0
-powerpc64             randconfig-003-20240720   gcc-13.2.0
-riscv                            allmodconfig   gcc-14.1.0
-riscv                             allnoconfig   gcc-14.1.0
-riscv                            allyesconfig   gcc-14.1.0
-riscv                               defconfig   gcc-14.1.0
-riscv                 randconfig-001-20240720   gcc-13.2.0
-riscv                 randconfig-002-20240720   gcc-13.2.0
-s390                             allmodconfig   clang-19
-s390                              allnoconfig   clang-19
-s390                              allnoconfig   gcc-14.1.0
-s390                             allyesconfig   clang-19
-s390                             allyesconfig   gcc-14.1.0
-s390                                defconfig   gcc-14.1.0
-s390                  randconfig-001-20240720   gcc-13.2.0
-s390                  randconfig-002-20240720   gcc-13.2.0
-sh                               allmodconfig   gcc-14.1.0
-sh                                allnoconfig   gcc-13.2.0
-sh                               allyesconfig   gcc-14.1.0
-sh                        apsh4ad0a_defconfig   gcc-13.2.0
-sh                                  defconfig   gcc-14.1.0
-sh                    randconfig-001-20240720   gcc-13.2.0
-sh                    randconfig-002-20240720   gcc-13.2.0
-sparc                            allmodconfig   gcc-14.1.0
-sparc64                             defconfig   gcc-14.1.0
-sparc64               randconfig-001-20240720   gcc-13.2.0
-sparc64               randconfig-002-20240720   gcc-13.2.0
-um                               allmodconfig   clang-19
-um                               allmodconfig   gcc-13.3.0
-um                                allnoconfig   clang-17
-um                                allnoconfig   gcc-14.1.0
-um                               allyesconfig   gcc-13
-um                               allyesconfig   gcc-13.3.0
-um                                  defconfig   gcc-14.1.0
-um                             i386_defconfig   gcc-13.2.0
-um                             i386_defconfig   gcc-14.1.0
-um                    randconfig-001-20240720   gcc-13.2.0
-um                    randconfig-002-20240720   gcc-13.2.0
-um                           x86_64_defconfig   gcc-14.1.0
-x86_64                            allnoconfig   clang-18
-x86_64                           allyesconfig   clang-18
-x86_64                              defconfig   clang-18
-x86_64                              defconfig   gcc-13
-x86_64                          rhel-8.3-rust   clang-18
-xtensa                            allnoconfig   gcc-13.2.0
-xtensa                randconfig-001-20240720   gcc-13.2.0
-xtensa                randconfig-002-20240720   gcc-13.2.0
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
