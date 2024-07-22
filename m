@@ -1,91 +1,142 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f177.google.com (mail-lj1-f177.google.com [209.85.208.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EC5916D4CD;
-	Mon, 22 Jul 2024 12:45:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF49F16D4E1
+	for <linux-bluetooth@vger.kernel.org>; Mon, 22 Jul 2024 14:46:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721652304; cv=none; b=Xf6rgySRwopMjt57tL2LnxGOK/3b8h1/YDkAisYxk3PFlnE1/qm39NauGfKMsBUcDPJgJQpCczvcPa8d8eaRRnnQ2q6IuqNtB3qaCrTY7YWs/kSRVaFnjEuQlYOtZ4BrvGyczEy+HTHfEAGXoquC4rFHC+NltRghX5DdF4etfSU=
+	t=1721659597; cv=none; b=b7dTgWzkuERab++uMu+ESQ+ds2376zpNxwQWDl5G6/c4z0jfqzVtrIdvgB8LRhDe32LYasmaIm+VOPav3Gz3Zm+DNdcVq5QptO66mzbemRo6dZEvpPYpjaiETi7bNMCKHQfaymSq9kF0AjmW34we6z27I5o8uFH0CaSFg4aAJFc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721652304; c=relaxed/simple;
-	bh=EjT18nyc1Ue3ZEwlHId/Esnd1nJePTQiwhKbLphQmzQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XA2Tq1T2zraB90aUS1DEXg4+sRqCYmvneAewOXp8n7xjewIlwCfWIS1qWD9PQQQYWdr4QFUcDuhxneKM6xoC3rgY3f5AVHtcu3fz30FT2RJai/rr1ZfITJ5d07zEWmtzbVNXoOnZnGFBUhcA+pRAbMZYW+SSXU/x6Pyc5YEAqTY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EX/PqwFS; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1721659597; c=relaxed/simple;
+	bh=sSHFJaTuJ+UPDME02bNwAQkR99aAbvESXYt6kirYNy8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=sF0guY1b87Yt9YbQhCWwDDoEJ6MF5BI/KtJ/GBdmeUVVUF8eRx7EpPXbR45mTJpOHh9aLEu0M1wSIL7jIk1umym8TGQ8FC035bR2/CjteM5YOGtUxa1JZgwYrg9QtXOtnqHy/0x/jOhiJY9+jMUV6spE2PM7a7UcM7iwak+Qj58=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WPy2bgDQ; arc=none smtp.client-ip=209.85.208.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EX/PqwFS"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B0B9EC116B1;
-	Mon, 22 Jul 2024 12:45:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1721652303;
-	bh=EjT18nyc1Ue3ZEwlHId/Esnd1nJePTQiwhKbLphQmzQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=EX/PqwFSPjZWBtWkwHOr77fZeLajDuDi3VkYUMNE9HUOPJyCbzt9c999m/reIpxN8
-	 mvj+hnL7YNjVvHni6p9FUblF9A9XyhYPp/gCTOvKIFiXu/QDJiJtG410Xrgwg2IvDe
-	 t1YzIUz6U4B1C4wHAKJbsB7b01bDVyPAmAZZ380B082mp7FKwILUcD+N0PfpnKBln/
-	 HV0CPml4qJLJ4Jmmvxv7W91go6KMSzJHwY64Gu8v5poJty0/olgmEM/dPBazfFEDo7
-	 +/FASxaGXgR8e9VUYg+CnuJquAW6Z6/audhkX7fUNJg1j4DZAnT05sk/9UH/3eO+6p
-	 cyQ3o5thAq/9w==
-Date: Mon, 22 Jul 2024 08:45:02 -0400
-From: Sasha Levin <sashal@kernel.org>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Pauli Virtanen <pav@iki.fi>, linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org, Edward Adam Davis <eadavis@qq.com>,
-	syzbot+b7f6f8c9303466e16c8a@syzkaller.appspotmail.com,
-	Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
-	marcel@holtmann.org, johan.hedberg@gmail.com,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH AUTOSEL 6.9 09/22] bluetooth/l2cap: sync sock recv cb and
- release
-Message-ID: <Zp5UTsmtrmM7MRwW@sashalap>
-References: <20240716142519.2712487-1-sashal@kernel.org>
- <20240716142519.2712487-9-sashal@kernel.org>
- <0d437a3825d2f714b24c032066b43d7b9e73b0e9.camel@iki.fi>
- <CABBYNZLzf2x6cScmjGv2Rxk-i3F9=QKVWosrSEBgmHBdHqOWtg@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WPy2bgDQ"
+Received: by mail-lj1-f177.google.com with SMTP id 38308e7fff4ca-2ef1c12ae23so21959441fa.0
+        for <linux-bluetooth@vger.kernel.org>; Mon, 22 Jul 2024 07:46:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1721659593; x=1722264393; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=2FoRuf7nVirss1OZ5R6gl9bJnRF23LC2lAGIwLmdaco=;
+        b=WPy2bgDQOtI/7uMIcv9pN8kzPWoj1WmmJJLtOzMMBi29LNgIzVWL03CtxfPu07chbe
+         OGhnGhD8ZZvwzJVvQWp4LWWHsGfl//WO6T92195WvcEEZJcLKmgG2cVzaNKYawhrF5Ac
+         8aJ1EF9VVW2O456+cPVCoH2v+z+WrioPwJNgfnMdom8xmMVG1lNrksD9PbAYrqQusP/L
+         77ZgGU49nwNXce30p2gyoivLzwicku2FcCCsIlrGPE1pGx+vyLxmur13LbCR+7xpgTfE
+         hysNpUeVaZUfLyivMTtuCsyu94llvuD7spkmGbDjJROOJjJrmY7qSisG8WWI3Ucl/4iI
+         V0ow==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1721659593; x=1722264393;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=2FoRuf7nVirss1OZ5R6gl9bJnRF23LC2lAGIwLmdaco=;
+        b=eTfaim3x6neVPFppE/Q5D/o6BDYVCfZnjTSEjjwrkHdioZgiaZL05rc9zbsOEYCgfZ
+         t480ViQ+MYLfm4KtQINMK1EMOTb7C1JdGN3SVPKetk/uTOiGQMyBdoG48CyZhmI4GYrm
+         B35wwezi1z8hKHuobyXKjFbVbuTI9BZ0pzLCq+4ABHyJpQ2dssLs5ofIJ/FUUkXEpKpH
+         Sz2TJEQYxN/z5uqFcNCAMvmXclOeB975bU+29EffsXfj2vhsuyJIFydRIM66O54JzQBq
+         2YfutXwgNTRXqoQAqy7B8xuWWIMBCO+O+2iH028Hs2yaOIhk67KpcAsDX98wtN0jQdto
+         zNvQ==
+X-Gm-Message-State: AOJu0YwoQIJ3P+P2y7tKdtm5aXwKcY1+607GpDpO6TnlLft44Paj3zUi
+	2zxmG+iJtDYQmkr1VCsBPAQ6Ruq06rqR0DFOA/Qkg6Nre0s0WAtlYNVmEo3VQf7B52VJnchej9c
+	cSBIKOuPZlAYNH6AwXumf91F2jsxLfnwy
+X-Google-Smtp-Source: AGHT+IFX/f/HKK/UGxVknb0TrxXrNI5uD+E9t5EAnML9rYKG9yNEXiAzPfjvx9QGVWaVxigMuGy9Wj8mvWdoC5eIhiY=
+X-Received: by 2002:a2e:91d2:0:b0:2ef:1d79:cae7 with SMTP id
+ 38308e7fff4ca-2f01ea5569emr324521fa.14.1721659592671; Mon, 22 Jul 2024
+ 07:46:32 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CABBYNZLzf2x6cScmjGv2Rxk-i3F9=QKVWosrSEBgmHBdHqOWtg@mail.gmail.com>
+References: <20240722062216.16090-1-chris.lu@mediatek.com> <669e0451.050a0220.405fe.97b0@mx.google.com>
+In-Reply-To: <669e0451.050a0220.405fe.97b0@mx.google.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Mon, 22 Jul 2024 10:46:19 -0400
+Message-ID: <CABBYNZ+b2A-fbxD7enzchjDjEnR6-5pkhEGCck=O_OaGEi1OaA@mail.gmail.com>
+Subject: Re: Bluetooth: btmtk: Fix function-declaration build error
+To: linux-bluetooth@vger.kernel.org
+Cc: chris.lu@mediatek.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Jul 16, 2024 at 03:06:01PM -0400, Luiz Augusto von Dentz wrote:
->Hi Pauli,
+Hi Chris,
+
+On Mon, Jul 22, 2024 at 3:03=E2=80=AFAM <bluez.test.bot@gmail.com> wrote:
 >
->On Tue, Jul 16, 2024 at 3:00 PM Pauli Virtanen <pav@iki.fi> wrote:
->>
->> Hi,
->>
->> ti, 2024-07-16 kello 10:24 -0400, Sasha Levin kirjoitti:
->> > From: Edward Adam Davis <eadavis@qq.com>
->> >
->> > [ Upstream commit 89e856e124f9ae548572c56b1b70c2255705f8fe ]
->>
->> This one needed an additional fixup that I don't see AUTOSEL picked up,
->> otherwise it results to a worse regression:
->>
->> https://lore.kernel.org/linux-bluetooth/20240624134637.3790278-1-luiz.dentz@gmail.com/
->>
->> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=f1a8f402f13f94263cf349216c257b2985100927
->>
->>
->> Looks like f1a8f402f13f94263cf349216c257b2985100927 also contains other
->> changes not related to this patch, seems like
->> https://lore.kernel.org/linux-bluetooth/20240624144911.3817479-1-luiz.dentz@gmail.com/
->> was squashed.
+> This is automated email and please do not reply to this email!
 >
->Yep, it seems I messed them up while doing the pull-request and 2
->commits were merged together, not sure if we can rebase them now that
->are in Linus tree, anyway for stable it would be better to unmerge
->them if possible.
+> Dear submitter,
+>
+> Thank you for submitting the patches to the linux bluetooth mailing list.
+> This is a CI test results with your patch series:
+> PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=3D872=
+838
 
-We really want to keep patches the same as they are in Linus's tree - it
-doesn't make sense to edit them just for stable.
+We may have to do this instead:
 
--- 
-Thanks,
-Sasha
+https://patchwork.kernel.org/project/bluetooth/list/?series=3D872895
+
+> ---Test result---
+>
+> Test Summary:
+> CheckPatch                    PASS      0.71 seconds
+> GitLint                       FAIL      0.55 seconds
+> SubjectPrefix                 PASS      0.14 seconds
+> BuildKernel                   PASS      29.78 seconds
+> CheckAllWarning               PASS      32.02 seconds
+> CheckSparse                   PASS      37.51 seconds
+> CheckSmatch                   PASS      102.58 seconds
+> BuildKernel32                 PASS      28.60 seconds
+> TestRunnerSetup               PASS      524.54 seconds
+> TestRunner_l2cap-tester       PASS      22.18 seconds
+> TestRunner_iso-tester         FAIL      41.19 seconds
+> TestRunner_bnep-tester        PASS      5.28 seconds
+> TestRunner_mgmt-tester        PASS      114.13 seconds
+> TestRunner_rfcomm-tester      PASS      7.50 seconds
+> TestRunner_sco-tester         PASS      15.10 seconds
+> TestRunner_ioctl-tester       PASS      8.04 seconds
+> TestRunner_mesh-tester        PASS      6.10 seconds
+> TestRunner_smp-tester         PASS      7.00 seconds
+> TestRunner_userchan-tester    PASS      5.03 seconds
+> IncrementalBuild              PASS      27.61 seconds
+>
+> Details
+> ##############################
+> Test: GitLint - FAIL
+> Desc: Run gitlint
+> Output:
+> Bluetooth: btmtk: Fix function-declaration build error
+>
+> WARNING: I3 - ignore-body-lines: gitlint will be switching from using Pyt=
+hon regex 'match' (match beginning) to 'search' (match anywhere) semantics.=
+ Please review your ignore-body-lines.regex option accordingly. To remove t=
+his warning, set general.regex-style-search=3DTrue. More details: https://j=
+orisroovers.github.io/gitlint/configuration/#regex-style-search
+> 21: B1 Line exceeds max length (82>80): "Closes: https://lore.kernel.org/=
+oe-kbuild-all/202407200904.hRqT3JKD-lkp@intel.com/"
+> ##############################
+> Test: TestRunner_iso-tester - FAIL
+> Desc: Run iso-tester with test-runner
+> Output:
+> Total: 122, Passed: 117 (95.9%), Failed: 1, Not Run: 4
+>
+> Failed Test Cases
+> ISO Connect Suspend - Success                        Failed       6.215 s=
+econds
+>
+>
+> ---
+> Regards,
+> Linux Bluetooth
+>
+
+
+--=20
+Luiz Augusto von Dentz
