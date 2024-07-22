@@ -1,179 +1,92 @@
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7C1B11CA0
-	for <linux-bluetooth@vger.kernel.org>; Mon, 22 Jul 2024 08:49:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53B8E21340;
+	Mon, 22 Jul 2024 09:27:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721638161; cv=none; b=aEIMG0ohSqu9etsf4C9Le9OcSODhdnpZWzGN4+uqbb8hZEBzi1dCSLZmIzH/984dgnUeyYBOXyXldo5L8FyjnuZ2J0vL+4ZlyW4fHl159wOXdH2SakgbMtdkyzBMZD4OCrRMYuFhZjoKOZE65MEV/s3rTYfTHY8Z/z2bkxjd6zA=
+	t=1721640462; cv=none; b=eL4vjXlzg7MjMRlU7vPMMtVeIknahpNY20WXbYQiXbUt4aoQ0Affa9Qazp7xUSJicBxSFGo9oA55Lr0BvSf8gK590VRII9uNPunfO22afw90km4WfWOZkro7qtRv8tlHz/B3XDU0nJzmPFmXET1gMCx+7eDP1rW32/pcnIN+SV4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721638161; c=relaxed/simple;
-	bh=9xelEXPI7mEeYo5KxRnlZjYbp2sy2YQGDayWlpjEYDM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=mmn9lIEIsl4K2qOhKLCTFqqrGMCvPnfV/VmHgj54wkxg1nCOwLd8kq3fRt8h/1OkqIuw1UxEyYIqCBCopP3NSk3qzMfu6LIIoIUTujx+Oq13jL7VUA16efSUOuHxMh5GdKcSUxcQcYnKM3WHeGxHcOPk4bytBMwbN26NVOBSs+4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from [192.168.0.53] (ip5f5ae9a6.dynamic.kabel-deutschland.de [95.90.233.166])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id CB46461E5FE06;
-	Mon, 22 Jul 2024 10:48:44 +0200 (CEST)
-Message-ID: <cbdeef3c-081d-4b45-8350-d4edde1287ff@molgen.mpg.de>
-Date: Mon, 22 Jul 2024 10:48:44 +0200
+	s=arc-20240116; t=1721640462; c=relaxed/simple;
+	bh=YDL2QDJFgsrUPVIO83HKDODRmJYD+Y8GkwoGpOeigAU=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=rc1NN9xWUBiWCHCMcOub978lSxv5rTUf/xqmZ4BC+1CT0mQXXRpBpHT0nHGKsvkDAJXIe06BRAy6KuMhWYdbAbi6QRsFs3Lx9dYgAtf+V4q64YARa36nDPv533veW9Cp96ixF8bTxBoneQ44ynCGO4dR97GqmkBUZyN7VxA8mEs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=StRPkGLq; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="StRPkGLq"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 68E66C116B1;
+	Mon, 22 Jul 2024 09:27:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1721640461;
+	bh=YDL2QDJFgsrUPVIO83HKDODRmJYD+Y8GkwoGpOeigAU=;
+	h=From:To:Cc:Subject:Date:From;
+	b=StRPkGLqOtB83vx+W3ktNb4bBaGeu/mEHETNfo3B0v/OM6njm2Bw32L8F6HZbt3a6
+	 j3DzKLEls461IjgDwITqmdAuuheRJkOqPk/MEMVvNDrhUtT60LKclUfdmP8JpAbZJw
+	 PoaCQfH972nqWBxoHSDM78LeP5yf9/v/K6pNa/iF8QCdX2SRoTR1rOo3gc4E/fKPl6
+	 mWwccli7bzH28MTNdvqQSoSwAcxRKwON4I7G2/nZ2x9O1TvCD3QgZGnNGng56SygZj
+	 hISeuP3qNix7aQ4syJRzeOyNmCiKAjxP5+F+QDAxhE4c8Ai9RfjSKODYd7kPO7kZ0i
+	 3/6ND3TgHriUA==
+From: Arnd Bergmann <arnd@kernel.org>
+To: Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Chris Lu <chris.lu@mediatek.com>
+Cc: Arnd Bergmann <arnd@arndb.de>,
+	linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH 1/2] Bluetooth: btmtk: Fix btmtk.c undefined reference build error harder
+Date: Mon, 22 Jul 2024 11:27:05 +0200
+Message-Id: <20240722092735.1109925-1-arnd@kernel.org>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] [BlueZ] adapter: Fix execute "LE Add Device To Resolving
- List" command fail
-To: Clancy Shang <clancy_shang@163.com>
-Cc: linux-bluetooth@vger.kernel.org, Clancy Shang <clancy.shang@quectel.com>
-References: <20240722075626.3050334-1-clancy_shang@163.com>
-Content-Language: en-US
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <20240722075626.3050334-1-clancy_shang@163.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-Dear Clancy,
+From: Arnd Bergmann <arnd@arndb.de>
 
+The previous fix was incomplete as the link failure still persists
+with CONFIG_USB=m when the sdio or serial wrappers for btmtk.c
+are build-in:
 
-Thank you for your patch. Some minor comments.
+btmtk.c:(.text+0x468): undefined reference to `usb_alloc_urb'
+btmtk.c:(.text+0x488): undefined reference to `usb_free_urb'
+btmtk.c:(.text+0x500): undefined reference to `usb_anchor_urb'
+btmtk.c:(.text+0x50a): undefined reference to `usb_submit_urb'
+btmtk.c:(.text+0x92c): undefined reference to `usb_control_msg'
+btmtk.c:(.text+0xa92): undefined reference to `usb_unanchor_urb'
+btmtk.c:(.text+0x11e4): undefined reference to `usb_set_interface'
+btmtk.c:(.text+0x120a): undefined reference to `usb_kill_anchored_urbs'
 
-Am 22.07.24 um 09:56 schrieb clancy_shang@163.com:
-> From: Clancy Shang <clancy.shang@quectel.com>
-> 
-> According to BLUETOOTH CORE SPECIFICATION Version 5.4 | Vol 4, Part E,
+Disallow this configuration.
 
-I’d spell it *Bluetooth Core Specification* [1].
+Fixes: 52828ea60dfd ("Bluetooth: btmtk: Fix btmtk.c undefined reference build error")
+Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+---
+ drivers/bluetooth/Kconfig | 2 ++
+ 1 file changed, 2 insertions(+)
 
-> 7.8.38, If there is an existing entry in the resolving list with the same
+diff --git a/drivers/bluetooth/Kconfig b/drivers/bluetooth/Kconfig
+index 44a2de58337b..082698675849 100644
+--- a/drivers/bluetooth/Kconfig
++++ b/drivers/bluetooth/Kconfig
+@@ -413,6 +413,7 @@ config BT_ATH3K
+ config BT_MTKSDIO
+ 	tristate "MediaTek HCI SDIO driver"
+ 	depends on MMC
++	depends on USB || !BT_HCIBTUSB_MTK
+ 	select BT_MTK
+ 	help
+ 	  MediaTek Bluetooth HCI SDIO driver.
+@@ -425,6 +426,7 @@ config BT_MTKSDIO
+ config BT_MTKUART
+ 	tristate "MediaTek HCI UART driver"
+ 	depends on SERIAL_DEV_BUS
++	depends on USB || !BT_HCIBTUSB_MTK
+ 	select BT_MTK
+ 	help
+ 	  MediaTek Bluetooth HCI UART driver.
+-- 
+2.39.2
 
-I’d spell *If* lowercase.
-
-> non-zero Peer_IRK, the Controller should return the error code Invalid
-> HCI Command Parameters (0x12), so fix it.
-
-You could describe the current situation, so what is returned right now.
-
-Also, it’d be great if you documented the test environment how to 
-reproduce the issue.
-
-[1]: https://www.bluetooth.com/specifications/specs/core54-html/
-
-> Signed-off-by: Clancy Shang <clancy.shang@quectel.com>
-> ---
->   src/adapter.c | 72 +++++++++++++++++++++++++++++++++++++++++++++++++++
->   1 file changed, 72 insertions(+)
-> 
-> diff --git a/src/adapter.c b/src/adapter.c
-> index 85ddfc165..495c9f631 100644
-> --- a/src/adapter.c
-> +++ b/src/adapter.c
-> @@ -8901,6 +8901,76 @@ static void store_irk(struct btd_adapter *adapter, const bdaddr_t *peer,
->   	g_key_file_free(key_file);
->   }
->   
-> +static void delete_exist_irk_from_directory(
-> +						struct btd_adapter *adapter,
-> +						const unsigned char *key)
-> +{
-> +	char dirname[PATH_MAX];
-> +	GError *gerr = NULL;
-> +	DIR *dir;
-> +	struct dirent *entry;
-> +
-> +	create_filename(dirname, PATH_MAX, "/%s",
-> +				btd_adapter_get_storage_dir(adapter));
-> +
-> +	dir = opendir(dirname);
-> +	if (!dir) {
-> +		btd_error(adapter->dev_id,
-> +				"Unable to open adapter storage directory: %s",
-> +								dirname);
-> +		return;
-> +	}
-> +
-> +	while ((entry = readdir(dir)) != NULL) {
-> +		struct btd_device *device;
-> +		char filename[PATH_MAX];
-> +		GKeyFile *key_file;
-> +		struct irk_info *irk_info;
-> +		uint8_t bdaddr_type;
-> +
-> +		if (entry->d_type == DT_UNKNOWN)
-> +			entry->d_type = util_get_dt(dirname, entry->d_name);
-> +
-> +		if (entry->d_type != DT_DIR || bachk(entry->d_name) < 0)
-> +			continue;
-> +
-> +		create_filename(filename, PATH_MAX, "/%s/%s/info",
-> +					btd_adapter_get_storage_dir(adapter),
-> +					entry->d_name);
-> +
-> +		key_file = g_key_file_new();
-> +		if (!g_key_file_load_from_file(
-> +								key_file,
-> +								filename,
-> +								0,
-> +								&gerr)) {
-
-No idea, if it’s my mailer, but the parameters look too much intended.
-
-
-> +			error("Unable to load key file from %s: (%s)",
-> +					filename, gerr->message);
-> +			g_clear_error(&gerr);
-> +		}
-> +
-> +		bdaddr_type = get_le_addr_type(key_file);
-> +
-> +		irk_info = get_irk_info(key_file, entry->d_name, bdaddr_type);
-> +
-> +		if (irk_info) {
-> +			if (!memcmp(irk_info->val, key, 16)) {
-> +				DBG("Has same irk,delete it");
-
-Please add a space after the comma, and maybe also print the value.
-
-> +				device = btd_adapter_find_device(adapter,
-> +							&irk_info->bdaddr,
-> +							irk_info->bdaddr_type);
-> +				if (device)
-> +					btd_adapter_remove_device(adapter,
-> +									device);
-> +			}
-> +		}
-> +		g_key_file_free(key_file);
-> +	}
-> +
-> +	closedir(dir);
-> +
-> +}
-> +
->   static void new_irk_callback(uint16_t index, uint16_t length,
->   					const void *param, void *user_data)
->   {
-> @@ -8950,6 +9020,8 @@ static void new_irk_callback(uint16_t index, uint16_t length,
->   	if (!persistent)
->   		return;
->   
-> +	delete_exist_irk_from_directory(adapter, irk->val);
-
-exist*ing*?
-
-> +
->   	store_irk(adapter, &addr->bdaddr, addr->type, irk->val);
->   
->   	btd_device_set_temporary(device, false);
-
-
-Kind regards,
-
-Paul
