@@ -1,150 +1,146 @@
-Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.3])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2946C2F26
-	for <linux-bluetooth@vger.kernel.org>; Mon, 22 Jul 2024 06:02:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.3
+Received: from mailgw01.mediatek.com (unknown [60.244.123.138])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06B5C4C7D;
+	Mon, 22 Jul 2024 06:22:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=60.244.123.138
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721628183; cv=none; b=GK99U5A/KKRi2Z6T2Z22MRMeo+3C9hUIBwnHcikU26OQd0ScFLhPlp5gMx/ItMtYt4PVfRRGBrFx6vxeY5i0jAP8E3PKX6z8F0P+AcN+kd74bv97Dc9lgaJ/r3LxrUXDu6Z9E9OTVE40ijiG7ZRvOmesrlpLeB44XzTf7WXKQsk=
+	t=1721629365; cv=none; b=ovyJgivRrZ01t686FrW/jVa+y1b5T9qA6QeB/NBCtKnBUoXfddRsM1CsAocYC46SAKQn4VTSiSPOZ84bIfXYkE9NJD4mreiRJbUbmUE3vqhE7qgVDK0OtCURBZHKWLRIHZU0hWCDUVi6cOM/X1K7RyDjzXZb9SmOOqXCi7uU+bM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721628183; c=relaxed/simple;
-	bh=HE1i9GNH1u3ajl/6QEYIaZx9OJOAl4iyFtXRBT51BEc=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Ln5GWpTcYFawfR0xJI/vxkQ0aeTOn6hXS54P6CM0wK0lAYvoGWfHJKie6KcZi64duGijzd60f4YuA6ESQlI1p7Htc/XBpFG2ka2Q0BqWmwVqDakH3jwCKk9jCtZ87VXz1YlkkdAFfQb4nm2A5rtJ9/s+x7bsSUQtkKzyQuOfe04=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=I7XuPomV; arc=none smtp.client-ip=117.135.210.3
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+	s=arc-20240116; t=1721629365; c=relaxed/simple;
+	bh=bNc+q4Zc8RndXEm6FNdap94dUeXfeCVy2oPwT85ZZM0=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=VvIW5wykvb5EMmHrPlkUk770gqMs0mD4Vz4qAXKY/5FL76hU/OVZl+oUaRVSKD07ZigyzJN0nLRUS+/W4cPxW9cFaiC8uvpC1Zd1A0uAPCbWvoh9fJ+/k8TWBh4KBn5ggrSbDHTCxdWX1dwTdy+rpkuOC+stfmdSv4X+8ABY6jc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com; spf=pass smtp.mailfrom=mediatek.com; dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b=Gn4f3PxT; arc=none smtp.client-ip=60.244.123.138
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mediatek.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="I7XuPomV"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:Subject:Date:Message-Id:MIME-Version; bh=cYlg4
-	eMydBBGoiMcoWjQE12Gx2+djgHNyfP3VLK2FoQ=; b=I7XuPomVP3AkGBVERTX/v
-	8C0ft1Rn/Y0xeiDHZtTdIyg/Ll9U3A/tyJHVcQjlFOL29NA9aIa7WI5sp9bD0jGo
-	plQKvOlnmQBDGud8oo9G0Me4s17Qxr+S3EcMDnl/MpiegjCCDuRlvmDehILcYgCd
-	GvpKFCP3Bv/cmO0D0hcEwY=
-Received: from WH-D-007635B.QUECTEL.COM (unknown [223.76.229.213])
-	by gzga-smtp-mta-g1-2 (Coremail) with SMTP id _____wDX30QN9p1mv61+AA--.2467S2;
-	Mon, 22 Jul 2024 14:02:54 +0800 (CST)
-From: clancy_shang@163.com
-To: linux-bluetooth@vger.kernel.org
-Cc: Clancy Shang <clancy.shang@quectel.com>
-Subject: [PATCH] [BlueZ] adapter: Fix execute "LE Add Device To Resolving List" command fail
-Date: Mon, 22 Jul 2024 14:02:51 +0800
-Message-Id: <20240722060251.3042314-1-clancy_shang@163.com>
-X-Mailer: git-send-email 2.25.1
+	dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b="Gn4f3PxT"
+X-UUID: c90e64f247f211efb5b96b43b535fdb4-20240722
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
+	h=Content-Type:MIME-Version:Message-ID:Date:Subject:CC:To:From; bh=bkvgIktChmzkooE5NvOvL26cQeo/bI5bJkOyPX+YUEQ=;
+	b=Gn4f3PxTqaOq/WUPUHaceJAaHs5AFeIOeYvuFtjI4+uaPinobYg4Mon4rVrPDIbMIqU+pCqGJwVFCnYzHnLBrlSCMbZ826OuP85erPuyMqLJczTbQMKI6QGMt6qESJc9KGISsJpgMY8P15MUJblVorcEmMpFRFKkbEW0rvcAV3g=;
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.1.40,REQID:fc9a14e0-da6f-4a34-b900-d253d8a460c4,IP:0,U
+	RL:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
+	release,TS:0
+X-CID-META: VersionHash:ba885a6,CLOUDID:60819fd5-0d68-4615-a20f-01d7bd41f0bb,B
+	ulkID:nil,BulkQuantity:0,Recheck:0,SF:102,TC:nil,Content:0,EDM:-3,IP:nil,U
+	RL:11|1,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES
+	:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
+X-CID-BVR: 0,NGT
+X-CID-BAS: 0,NGT,0,_
+X-CID-FACTOR: TF_CID_SPAM_ULN,TF_CID_SPAM_SNR
+X-UUID: c90e64f247f211efb5b96b43b535fdb4-20240722
+Received: from mtkmbs13n1.mediatek.inc [(172.21.101.193)] by mailgw01.mediatek.com
+	(envelope-from <chris.lu@mediatek.com>)
+	(Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
+	with ESMTP id 1472777845; Mon, 22 Jul 2024 14:22:35 +0800
+Received: from mtkmbs13n1.mediatek.inc (172.21.101.193) by
+ mtkmbs11n2.mediatek.inc (172.21.101.187) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.26; Mon, 22 Jul 2024 14:22:35 +0800
+Received: from mtksdccf07.mediatek.inc (172.21.84.99) by
+ mtkmbs13n1.mediatek.inc (172.21.101.73) with Microsoft SMTP Server id
+ 15.2.1118.26 via Frontend Transport; Mon, 22 Jul 2024 14:22:35 +0800
+From: Chris Lu <chris.lu@mediatek.com>
+To: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg
+	<johan.hedberg@gmail.com>, Luiz Von Dentz <luiz.dentz@gmail.com>
+CC: Sean Wang <sean.wang@mediatek.com>, Aaron Hou <aaron.hou@mediatek.com>,
+	Steve Lee <steve.lee@mediatek.com>, linux-bluetooth
+	<linux-bluetooth@vger.kernel.org>, linux-kernel
+	<linux-kernel@vger.kernel.org>, linux-mediatek
+	<linux-mediatek@lists.infradead.org>, Chris Lu <chris.lu@mediatek.com>
+Subject: [PATCH] Bluetooth: btmtk: Fix function-declaration build error
+Date: Mon, 22 Jul 2024 14:22:16 +0800
+Message-ID: <20240722062216.16090-1-chris.lu@mediatek.com>
+X-Mailer: git-send-email 2.18.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_____wDX30QN9p1mv61+AA--.2467S2
-X-Coremail-Antispam: 1Uf129KBjvJXoWxCF48tFy5uF13KrWfGrW7Jwb_yoW5XFW8pr
-	Z8GF95Kw4Fqr1Igr43ZF43Xry5Cw4kJry5KFZ3W3srKF47WFWjvayfKryIvFyxGwn5X3sx
-	Zan0qa45G3WUGF7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07U8sqZUUUUU=
-X-CM-SenderInfo: xfod0ux1bvxtlqj6il2tof0z/1tbisA8kuGV4KqoWHwAAs3
+Content-Type: text/plain
 
-From: Clancy Shang <clancy.shang@quectel.com>
+Separate out the declaration of usb related function into another
+if/else condition in btmtk.h, avoiding function-declaration issue
+happened when CONFIG_BT_HCIBTUSB was defined but CONFIG_BT_HCIBTUSB_MTK
+wasn't.
 
-According to BLUETOOTH CORE SPECIFICATION Version 5.4 | Vol 4, Part E,
-7.8.38, If there is an existing entry in the resolving list with the same
-non-zero Peer_IRK, the Controller should return the error code Invalid
-HCI Command Parameters (0x12), so fix it.
+'btmtk_usb_subsys_reset';
+ISO C99 and later do not support implicit
+function declarations [-Wimplicit-function-declaration]
+'alloc_mtk_intr_urb';
+ISO C99 and later do not support implicit
+function declarations [-Wimplicit-function-declaration]
+'btmtk_usb_setup';
+ISO C99 and later do not support implicit
+function declarations [-Wimplicit-function-declaration]
+'btmtk_usb_shutdown';ISO C99 and later do not support
+implicit function declarations [-Wimplicit-function-declaration]
 
-Signed-off-by: Clancy Shang <clancy.shang@quectel.com>
+Fixes: 52828ea60dfd ("Bluetooth: btmtk: Fix btmtk.c undefined reference build error")
+Reported-by: kernel test robot <lkp@intel.com>
+Closes: https://lore.kernel.org/oe-kbuild-all/202407200904.hRqT3JKD-lkp@intel.com/
+Signed-off-by: Chris Lu <chris.lu@mediatek.com>
 ---
- src/adapter.c | 72 +++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 72 insertions(+)
+ drivers/bluetooth/btmtk.h | 35 ++++++++++++++++++-----------------
+ 1 file changed, 18 insertions(+), 17 deletions(-)
 
-diff --git a/src/adapter.c b/src/adapter.c
-index 85ddfc165..7c162c749 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -8901,6 +8901,76 @@ static void store_irk(struct btd_adapter *adapter, const bdaddr_t *peer,
- 	g_key_file_free(key_file);
- }
+diff --git a/drivers/bluetooth/btmtk.h b/drivers/bluetooth/btmtk.h
+index 6fc69cd8636b..fcc44800cf29 100644
+--- a/drivers/bluetooth/btmtk.h
++++ b/drivers/bluetooth/btmtk.h
+@@ -201,23 +201,6 @@ int btmtk_process_coredump(struct hci_dev *hdev, struct sk_buff *skb);
  
-+static void delete_exist_irk_from_directory(
-+						struct btd_adapter *adapter,
-+						const unsigned char *key)
-+{
-+	char dirname[PATH_MAX];
-+	GError *gerr = NULL;
-+	DIR *dir;
-+	struct dirent *entry;
-+
-+	create_filename(dirname, PATH_MAX, "/%s",
-+				btd_adapter_get_storage_dir(adapter));
-+
-+	dir = opendir(dirname);
-+	if (!dir) {
-+		btd_error(adapter->dev_id,
-+				"Unable to open adapter storage directory: %s",
-+								dirname);
-+		return;
-+	}
-+
-+	while ((entry = readdir(dir)) != NULL) {
-+		struct btd_device *device;
-+		char filename[PATH_MAX];
-+		GKeyFile *key_file;
-+		struct irk_info *irk_info;
-+		uint8_t bdaddr_type;
-+
-+		if (entry->d_type == DT_UNKNOWN)
-+			entry->d_type = util_get_dt(dirname, entry->d_name);
-+
-+		if (entry->d_type != DT_DIR || bachk(entry->d_name) < 0)
-+			continue;
-+
-+		create_filename(filename, PATH_MAX, "/%s/%s/info",
-+					btd_adapter_get_storage_dir(adapter),
-+					entry->d_name);
-+
-+		key_file = g_key_file_new();
-+		if (!g_key_file_load_from_file(
-+								key_file,
-+								filename,
-+								0,
-+								&gerr)) {
-+			error("Unable to load key file
-+				from %s: (%s)", filename, gerr->message);
-+			g_clear_error(&gerr);
-+		}
-+
-+		bdaddr_type = get_le_addr_type(key_file);
-+
-+		irk_info = get_irk_info(key_file, entry->d_name, bdaddr_type);
-+
-+		if (irk_info) {
-+			if (!memcmp(irk_info->val, key, 16)) {
-+				DBG("Has same irk,delete it");
-+				device = btd_adapter_find_device(adapter,
-+							&irk_info->bdaddr,
-+							irk_info->bdaddr_type);
-+				if (device)
-+					btd_adapter_remove_device(adapter,
-+									device);
-+			}
-+		}
-+		g_key_file_free(key_file);
-+	}
-+
-+	closedir(dir);
-+
-+}
-+
- static void new_irk_callback(uint16_t index, uint16_t length,
- 					const void *param, void *user_data)
+ void btmtk_fw_get_filename(char *buf, size_t size, u32 dev_id, u32 fw_ver,
+ 			   u32 fw_flavor);
+-
+-#if IS_ENABLED(CONFIG_BT_HCIBTUSB_MTK)
+-int btmtk_usb_subsys_reset(struct hci_dev *hdev, u32 dev_id);
+-
+-int btmtk_usb_recv_acl(struct hci_dev *hdev, struct sk_buff *skb);
+-
+-struct urb *alloc_mtk_intr_urb(struct hci_dev *hdev, struct sk_buff *skb,
+-			       usb_complete_t tx_complete);
+-
+-int btmtk_usb_resume(struct hci_dev *hdev);
+-
+-int btmtk_usb_suspend(struct hci_dev *hdev);
+-
+-int btmtk_usb_setup(struct hci_dev *hdev);
+-
+-int btmtk_usb_shutdown(struct hci_dev *hdev);
+-#endif
+ #else
+ 
+ static inline int btmtk_set_bdaddr(struct hci_dev *hdev,
+@@ -259,7 +242,25 @@ static inline void btmtk_fw_get_filename(char *buf, size_t size, u32 dev_id,
+ 					 u32 fw_ver, u32 fw_flavor)
  {
-@@ -8950,6 +9020,8 @@ static void new_irk_callback(uint16_t index, uint16_t length,
- 	if (!persistent)
- 		return;
- 
-+	delete_exist_irk_from_directory(adapter, irk->val);
+ }
++#endif
 +
- 	store_irk(adapter, &addr->bdaddr, addr->type, irk->val);
++/* USB interface related functions */
++#if IS_ENABLED(CONFIG_BT_HCIBTUSB_MTK)
++int btmtk_usb_subsys_reset(struct hci_dev *hdev, u32 dev_id);
++
++int btmtk_usb_recv_acl(struct hci_dev *hdev, struct sk_buff *skb);
++
++struct urb *alloc_mtk_intr_urb(struct hci_dev *hdev, struct sk_buff *skb,
++			       usb_complete_t tx_complete);
  
- 	btd_device_set_temporary(device, false);
++int btmtk_usb_resume(struct hci_dev *hdev);
++
++int btmtk_usb_suspend(struct hci_dev *hdev);
++
++int btmtk_usb_setup(struct hci_dev *hdev);
++
++int btmtk_usb_shutdown(struct hci_dev *hdev);
++#else
+ static inline int btmtk_usb_subsys_reset(struct hci_dev *hdev, u32 dev_id)
+ {
+ 	return -EOPNOTSUPP;
 -- 
-2.25.1
+2.18.0
 
