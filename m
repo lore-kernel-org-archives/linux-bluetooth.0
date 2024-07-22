@@ -1,77 +1,77 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8F3A134B6
-	for <linux-bluetooth@vger.kernel.org>; Mon, 22 Jul 2024 15:46:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9CFF381A4
+	for <linux-bluetooth@vger.kernel.org>; Mon, 22 Jul 2024 20:20:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721663204; cv=none; b=P5wmH6evJkVcVRlTNQoLpJjwU6VE/0aZO/FhbODzZIYCHXnyLpbifxHu71znx02aHpkx77nZkBgP0LALYfRWprcPym202OhTTzWqpzTQjo/fgxB1iCRPbWla4BTwdcHsNdJceKlsDkXIXWVZYAI+97dwf0Cw44lHpS2qUYYxnJA=
+	t=1721679650; cv=none; b=Pk0c4dvBprqLzx7RbarCm7qjV2QE6Vo8u4iiN9+LY5lXh+alsyo3ocCHknDUWi4l5bFZlU+Bnpy9PB2vvFP1vN6Hhh60GdVSd1KeKZPKyTx7jVr2XK4fEz+O02IWTijiHm0we+Ac5H4YGexmnNiMI4oQuRvrmLDfDGOUnNK39kE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721663204; c=relaxed/simple;
-	bh=pShGMNtY4hbvPIbcmjNkGA9YS8I9H2IcEDiK4GA+c+Y=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=OsR9el1YrnoHEJhjHWLQAdK5xiypPCeTSRyhTX1DWp9oZyzTf0dwHAhCIb6IVCXl5SvXqPOGm+gIZy/4vzIuKwPw7EOGaMbMybvB2yy19FawbyVsbHI+sxGyTHpEbeLGTuHA3o9byJo3o//WT1DFKvSm7mCGcNnBpfp5y9QILF8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Yle6r8ip; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1721679650; c=relaxed/simple;
+	bh=6kbwqVdBcd2KYKRpp6F1BuL8Qpi73yeMnJji9j0CN3k=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=U6psfoo9DP1uX/kaCPVIQYN5DYTm05/p5HxDw5vxfBIteD10nazDsnEtUXmer5tN2F98HyvbeMeQk7+171bBRKlHjoWFGF9MACdZB117T6BFMO2q+tCmv5i+yB0e8GN/LQiS33AlGRLfm+rhb6uBI4LUOnMQmL1LClec5Bac5EA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sdlcNsLN; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Yle6r8ip"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 8F931C4AF0B;
-	Mon, 22 Jul 2024 15:46:44 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sdlcNsLN"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 44B4EC4AF0A
+	for <linux-bluetooth@vger.kernel.org>; Mon, 22 Jul 2024 20:20:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1721663204;
-	bh=pShGMNtY4hbvPIbcmjNkGA9YS8I9H2IcEDiK4GA+c+Y=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Yle6r8ipWkYbBl6PtuB0fM6TNYhrbBPEuDLmAaOZdmpVGdRZeXdXFA/2NSnzBE0NZ
-	 Qr1dmlD0Efio/fOgGRnwwrNio8eqFe7rj9aDeRyhu8tQqSNJTb9m250wpxeT6dXCb6
-	 eVYYYZi1yEVxqf63t7Kcv7Q9Z99U2cW11PBKdl+/kALXLk/YPJzbAvItWbElOkZaz/
-	 XNc2Kr66il3vpLWCUcyAVDDHstmKTnWYQQC8sD1k6gtcKwEICUpSibLmqPZu9MtCnB
-	 LYU+ZS8VDwQRnUvm2wH1KmhQa2YA1fzq1gV9c1mpKLgh8ne4zwmJEyINZhQ/OqDVcD
-	 ZFtxNkkLo7fMw==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 7CE94C43443;
-	Mon, 22 Jul 2024 15:46:44 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1721679650;
+	bh=6kbwqVdBcd2KYKRpp6F1BuL8Qpi73yeMnJji9j0CN3k=;
+	h=From:To:Subject:Date:In-Reply-To:References:From;
+	b=sdlcNsLNJz7cO5s8AWUyMWkqge+RftFdv2sIiJGYpZFuX4bApjhlCZLzHR6UOqUAK
+	 6VcSilISW4UDP1PQPxFi4tKnt8PBJDNRivxJElbGHQExD435WVhydyYPoxuNdju4iH
+	 LagFmDX8GAo/3BmQ7iqApR9/ynIIxfiEGwvlSbHkwMX6xxQTGXgZmGq2Y1jcXzTRkO
+	 HWw7ylE81uG+xZDP6Kom2UhsSWuhMWFfg+u4VpL/WbzgZ2jw2vHaSeHUri9LBCkqtj
+	 h/Mfp01JCtL1vf+Fhp0tKnsAbOOh5id4xuJ9O4/T195bmZnYvi+YftAn8+y18Tku5y
+	 usXTbrdTioc/A==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+	id 31F9CC53BB7; Mon, 22 Jul 2024 20:20:50 +0000 (UTC)
+From: bugzilla-daemon@kernel.org
+To: linux-bluetooth@vger.kernel.org
+Subject: [Bug 219057] dongle bluetooth does't work on linux mint
+Date: Mon, 22 Jul 2024 20:20:49 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: aros@gmx.com
+X-Bugzilla-Status: RESOLVED
+X-Bugzilla-Resolution: INVALID
+X-Bugzilla-Priority: P3
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: bug_status resolution
+Message-ID: <bug-219057-62941-RxlqfQcAbD@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-219057-62941@https.bugzilla.kernel.org/>
+References: <bug-219057-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v5] Bluetooth: btintel: Allow configuring drive strength of
- BRI
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <172166320450.31131.13915346153008786408.git-patchwork-notify@kernel.org>
-Date: Mon, 22 Jul 2024 15:46:44 +0000
-References: <20240718144804.3953833-1-kiran.k@intel.com>
-In-Reply-To: <20240718144804.3953833-1-kiran.k@intel.com>
-To: K@ci.codeaurora.org, Kiran <kiran.k@intel.com>
-Cc: linux-bluetooth@vger.kernel.org, ravishankar.srivatsa@intel.com,
- chethan.tumkur.narayan@intel.com, chandrashekar.devegowda@intel.com,
- vijay.satija@intel.com, pmenzel@molgen.mpg.de
 
-Hello:
+https://bugzilla.kernel.org/show_bug.cgi?id=3D219057
 
-This patch was applied to bluetooth/bluetooth-next.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+Artem S. Tashkinov (aros@gmx.com) changed:
 
-On Thu, 18 Jul 2024 20:18:04 +0530 you wrote:
-> BRI (Bluetooth Radio Interface) traffic from CNVr to CNVi was found causing
-> cross talk step errors to WiFi. To avoid this potential issue OEM platforms
-> can replace BRI resistor to adjust the BRI response line drive strength.
-> During the *setup*, driver reads the drive strength value from uefi
-> variable and passes it to the controller via vendor specific command with
-> opcode 0xfc0a.
-> 
-> [...]
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+             Status|NEW                         |RESOLVED
+         Resolution|---                         |INVALID
 
-Here is the summary with links:
-  - [v5] Bluetooth: btintel: Allow configuring drive strength of BRI
-    https://git.kernel.org/bluetooth/bluetooth-next/c/c707097a446c
+--=20
+You may reply to this email to add a comment.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+You are receiving this mail because:
+You are the assignee for the bug.=
