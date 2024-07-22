@@ -1,236 +1,110 @@
-Received: from mail-vs1-f47.google.com (mail-vs1-f47.google.com [209.85.217.47])
+Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D88434CC4
-	for <linux-bluetooth@vger.kernel.org>; Mon, 22 Jul 2024 20:51:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40A53376E7
+	for <linux-bluetooth@vger.kernel.org>; Mon, 22 Jul 2024 23:07:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721681515; cv=none; b=MRjS1WBCoD3iaOOr4wGuSGTzlyTeegtTTckO6jBjt3ShG+dl8UKFTJbleG4DhuA+gVPhABJXMooG1FV0obsau6pKTNUpcAq2yw95yrixIXfFLrrRssrXClxQWKHsMtnzqFUKEsHxBLawsHJAtxM2gQ58vO/mean12NBcNxIo32k=
+	t=1721689676; cv=none; b=aCwVynbBmtTVf8ORRkcTILViN7V1PLZYTAoeizlO9LJpNwDKl7YjjXhtxiA8lzYTR+C98u+KLTVE+2dcxIsoQBxDYcm3wB+8AujQbYZRz8MDPz44/pNl/unslK1KshZAZ2M5ykpzH6daFeg0ufmCAOtRnIBW9yWBQSEWP5cxg60=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721681515; c=relaxed/simple;
-	bh=LJ5/f2UMo4MaytBQxKKBIV05iIVcIQN7qgH3JfI8VqM=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=kNyswXxUWtfPpRXxBLA8b8XOUMwAmmwlGBrTDu81Bd5OMsj+1SM/2ZEZ4yzSeZ2G0SQLy+1XLB8Q5fU6L4HsIehpJhTXJdj7kv9UUbt14DTbRTyBdRxnY/RU5uDE7mpZ7WAiiO+hFtQGDn+HsgPGp4OeN8mB1ccftfJdvWnreH0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QRH78Ljm; arc=none smtp.client-ip=209.85.217.47
+	s=arc-20240116; t=1721689676; c=relaxed/simple;
+	bh=GpKlnQFBDW84ZbUDYlvAWVJXtGDzBEBVmNvbO20LjlI=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=fLtEanYkEENJk3rH9uvuvEAD8VDsHL73U3KFi13Tkz8OFp6N0KvtF/RVP+LAHLu0035L88lby6iHLEjOlNqeqHVzbPpqjt+rG0RPwSm+kcsex8pkkmoTe6PU02GOeUQ08q8jfHCziJlHwlZuQXAPhmf+xgae5p3iIV5DWdtwW44=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QW4XSRcQ; arc=none smtp.client-ip=209.85.214.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QRH78Ljm"
-Received: by mail-vs1-f47.google.com with SMTP id ada2fe7eead31-492959b906eso638756137.0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 22 Jul 2024 13:51:53 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QW4XSRcQ"
+Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-1fd69e44596so1697665ad.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 22 Jul 2024 16:07:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1721681512; x=1722286312; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=3ZmB/diYCDwSKTljthaaRIP6shijD5EXkmxWi90bHm0=;
-        b=QRH78LjmQeqw41gnMmsK2KJXxTXjTOwqJR88A+g01BgUwZ92Knlh3t1j7rPgtbzdvD
-         Hz33UE+NXZnvp2iS7OJgQoQNjSaLzpxEeXPvCTLXYW/v+xuIuPYUjLS6PCXDUZez7GgC
-         Im3xsLnSeECmwfZ2YeCNJ1WVLOEdOzhVy543BvGCnMWV8sJSksl4bquGHgoNCnU5fqKL
-         ujnS/x1EOU//fap9snhjHQ/YVQ4zLO2DUzVneTlNm0DVt4rZ74mYy6iFUAlbkmriWBjn
-         7+4om5vDWXwWl42I87tNxtXvthRM7+MbCLZhrGmOeGsgg5CuRtzzBNMBPFlfMClSGDsV
-         Zx+g==
+        d=gmail.com; s=20230601; t=1721689674; x=1722294474; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=NCCIsO11oOfNujVcRXzsyNE/B6HUg9ToT+yDh6r3WzE=;
+        b=QW4XSRcQ/VlKcnaumg/0zt+n2CAjpYFOg301gpraocTjBcO0UApU+LDMXzHU1X7zt1
+         QY8xqr2fpYDzPtZhlHI1KCjaH5wGq78WOVUssapwQs7M7O5MaXTXezBxR0KSGupvCFmo
+         rENGAIlkSDrW4vFtNmLvwKldQ9tKy8CGerCsCX5H8Pk/rJoD7AdjQNu4fFHAppPFlMQb
+         8OCtDREljH+nUEnnAepNqyT3UoSV9YD2Z77gTOzMY9aqobvQKLodjrXkOnItQSiXc9jB
+         z9cfpd3UygPAGzxntdUW0rY2v29pGYtC3tBvbBLq8WvGx0m8lLJQD/kPu0VdwSwJFsVR
+         ZdRg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721681512; x=1722286312;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=3ZmB/diYCDwSKTljthaaRIP6shijD5EXkmxWi90bHm0=;
-        b=BHcYFc/eopvqyPsZ6PIXspd6S2swFp+/4w6T7vtV9uR/MEazNV5pGRTZTlbfkZq2X7
-         76kcan6WJK114Ln0OFXtLV7a4MtgBubXvIWPNK7FAIbFVWyMZy4gRMgiPz9ggBRxGqDm
-         VwvefJh5QW6QyEO9nPfcAAnCDtX7J48aeNyCS/HeIfKumsW3zHZ0Q6kT3PS7ojGf1/mY
-         Zs3K2bKtnHM2eVPOANQQGE6/SfM5aFZ2caXwJCPYzIByAbU/S3RljjGHlDLIoCcMyBi8
-         W43CaijdpBy1TMb4SnFF1lXNZ17uG6fXkmG7lOjEemICTDRUsca1Wduff4uCoahTxFj+
-         zufg==
-X-Gm-Message-State: AOJu0YyBTxOF8ZoQU8FN8SuH6aU5hY0tMunM3L9g9GGtmShb6wcMNagG
-	ns3LVD91EEM3j7XV5tmJ95/+gXOJUaXS8D9jMVtS1nwA8pZIxx4imQ8nyA==
-X-Google-Smtp-Source: AGHT+IHf5ng4TRPyZKvA06E9i34Zo3SOOPXNAvPR+x5kY5HnXTojsfHJ7qe5+8srIljTLa+xj9S1vQ==
-X-Received: by 2002:a05:6102:5e98:b0:48f:143a:d8e9 with SMTP id ada2fe7eead31-4928ba6cdabmr9051312137.20.1721681512184;
-        Mon, 22 Jul 2024 13:51:52 -0700 (PDT)
-Received: from lvondent-mobl4.. (syn-107-146-107-067.res.spectrum.com. [107.146.107.67])
-        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-4927922bf52sm1946183137.8.2024.07.22.13.51.50
-        for <linux-bluetooth@vger.kernel.org>
+        d=1e100.net; s=20230601; t=1721689674; x=1722294474;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=NCCIsO11oOfNujVcRXzsyNE/B6HUg9ToT+yDh6r3WzE=;
+        b=qcm4UP1A71W+MWYzcEekfTP/hOeE97Ea5eJzQG/8TxyAW8zdiYQH0UOjl/BHtJCzTP
+         Ut/1GkT+hebxIDljBh/2n52sgRGkWunDt6aGcWGJ/uUxK+5JSYpqLxDL4A9ORbd6oS0g
+         0Dr/43fcaah/f+Hd0sY55AzgudVlx2Csr9rCQ9qPq+5kg5ZXQ5FyR/0pjWgb4x6yijnf
+         +gYlHkNmMaNCICucILh2/GVz7MJH7ywnwqpWYbDzPARmXMB8i7RWWh7Clt0zJ1YSA4iC
+         Vq5S/jM8jNS9xKRlRjGVz8BfbIrYb1zbLfY1cDpwRifjg4jHvvtqvaztfF8jGZruPAUL
+         A2dg==
+X-Gm-Message-State: AOJu0YwdsCBqerDm5UMQM6Qn05BUGzOkY5pUmY20YkHhdc9RptpG7qgZ
+	iCAQb8nQBDH+FQk8T/cgcUPDmxD/iam91eMCrQPZZYatfl/PZTETFEFLcQ==
+X-Google-Smtp-Source: AGHT+IESUMr2l4A6S4efZ/qZSKq3Je3V38KNanSyts8qeO+iukdQU4N3+W03Oi7pzo96dmrTDyCH2Q==
+X-Received: by 2002:a17:902:fa84:b0:1fd:a3c4:25eb with SMTP id d9443c01a7336-1fdb952e8a4mr4412465ad.17.1721689674140;
+        Mon, 22 Jul 2024 16:07:54 -0700 (PDT)
+Received: from [172.17.0.2] ([52.159.137.232])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1fd6f25bfc0sm60882785ad.42.2024.07.22.16.07.53
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 22 Jul 2024 13:51:51 -0700 (PDT)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v1 2/2] client/player: Add support to enter alternative preset
-Date: Mon, 22 Jul 2024 16:51:48 -0400
-Message-ID: <20240722205148.2273531-2-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.45.2
-In-Reply-To: <20240722205148.2273531-1-luiz.dentz@gmail.com>
-References: <20240722205148.2273531-1-luiz.dentz@gmail.com>
+        Mon, 22 Jul 2024 16:07:53 -0700 (PDT)
+Message-ID: <669ee649.170a0220.3ad950.04a3@mx.google.com>
+Date: Mon, 22 Jul 2024 16:07:53 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============4261959958492973082=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [BlueZ,v1,1/2] client/player: Set number of channels based on locations
+In-Reply-To: <20240722205148.2273531-1-luiz.dentz@gmail.com>
+References: <20240722205148.2273531-1-luiz.dentz@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+--===============4261959958492973082==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-This adds support for alternative preset to be entered so when auto
-accepting configuration a different preset can be selected following the
-order given to endpoint.presets.
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=873055
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.67 seconds
+GitLint                       PASS      0.43 seconds
+BuildEll                      PASS      24.65 seconds
+BluezMake                     PASS      1682.46 seconds
+MakeCheck                     PASS      13.35 seconds
+MakeDistcheck                 PASS      180.74 seconds
+CheckValgrind                 PASS      254.55 seconds
+CheckSmatch                   WARNING   358.83 seconds
+bluezmakeextell               PASS      120.76 seconds
+IncrementalBuild              PASS      3061.50 seconds
+ScanBuild                     PASS      1051.04 seconds
+
+Details
+##############################
+Test: CheckSmatch - WARNING
+Desc: Run smatch tool with source
+Output:
+src/shared/bap.c:288:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structuressrc/shared/bap.c:288:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structuressrc/shared/bap.c:288:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structures
+
+
 ---
- client/player.c  | 74 ++++++++++++++++++++++++++++++++++++++++++++----
- src/shared/bap.c |  2 +-
- 2 files changed, 70 insertions(+), 6 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/client/player.c b/client/player.c
-index 486629a9add2..640bef92a7ae 100644
---- a/client/player.c
-+++ b/client/player.c
-@@ -1230,7 +1230,10 @@ struct codec_preset {
- 	const struct iovec data;
- 	struct bt_bap_qos qos;
- 	uint8_t target_latency;
-+	uint32_t chan_alloc;
- 	bool custom;
-+	bool alt;
-+	struct codec_preset *alt_preset;
- };
- 
- #define SBC_PRESET(_name, _data) \
-@@ -1969,12 +1972,18 @@ static int parse_chan_alloc(DBusMessageIter *iter, uint32_t *location,
- 			if (*channels)
- 				*channels = __builtin_popcount(*location);
- 			return 0;
-+		} else if (!strcasecmp(key, "Locations")) {
-+			if (var != DBUS_TYPE_UINT32)
-+				return -EINVAL;
-+			dbus_message_iter_get_basic(&value, location);
-+			if (*channels)
-+				*channels = __builtin_popcount(*location);
- 		}
- 
- 		dbus_message_iter_next(iter);
- 	}
- 
--	return -EINVAL;
-+	return *location ? 0 : -EINVAL;
- }
- 
- static DBusMessage *endpoint_select_properties_reply(struct endpoint *ep,
-@@ -2010,6 +2019,24 @@ static DBusMessage *endpoint_select_properties_reply(struct endpoint *ep,
- 			0x05, LC3_CONFIG_CHAN_ALLOC, location & 0xff,
- 			location >> 8, location >> 16, location >> 24
- 		};
-+		uint32_t chan_alloc = 0;
-+
-+		if (preset->chan_alloc & location)
-+			chan_alloc = preset->chan_alloc & location;
-+		else if (preset->alt_preset &&
-+					preset->alt_preset->chan_alloc &
-+					location) {
-+			chan_alloc = preset->alt_preset->chan_alloc & location;
-+			preset = preset->alt_preset;
-+
-+			/* Copy alternate capabilities */
-+			util_iov_free(cfg->caps, 1);
-+			cfg->caps = util_iov_dup(&preset->data, 1);
-+			cfg->target_latency = preset->target_latency;
-+		}
-+
-+		if (chan_alloc)
-+			put_le32(chan_alloc, &chan_alloc_ltv[2]);
- 
- 		util_iov_append(cfg->caps, &chan_alloc_ltv,
- 						sizeof(chan_alloc_ltv));
-@@ -2035,6 +2062,8 @@ static DBusMessage *endpoint_select_properties_reply(struct endpoint *ep,
- 
- 	dbus_message_iter_init_append(reply, &iter);
- 
-+	bt_shell_printf("selecting %s...\n", preset->name);
-+
- 	append_properties(&iter, cfg);
- 
- 	free(cfg);
-@@ -2098,8 +2127,6 @@ static DBusMessage *endpoint_select_properties(DBusConnection *conn,
- 	if (!reply)
- 		return NULL;
- 
--	bt_shell_printf("Auto Accepting using %s...\n", p->name);
--
- 	return reply;
- }
- 
-@@ -4104,13 +4131,38 @@ static void print_presets(struct preset *preset)
- 
- 	for (i = 0; i < preset->num_presets; i++) {
- 		p = &preset->presets[i];
--		bt_shell_printf("%s%s\n", p == preset->default_preset ?
--						"*" : "", p->name);
-+
-+		if (p == preset->default_preset)
-+			bt_shell_printf("*%s\n", p->name);
-+		else if (preset->default_preset &&
-+					p == preset->default_preset->alt_preset)
-+			bt_shell_printf("**%s\n", p->name);
-+		else
-+			bt_shell_printf("%s\n", p->name);
- 	}
- 
- 	queue_foreach(preset->custom, foreach_custom_preset_print, preset);
- }
- 
-+static void custom_chan_alloc(const char *input, void *user_data)
-+{
-+	struct codec_preset *p = user_data;
-+	char *endptr = NULL;
-+
-+	p->chan_alloc = strtol(input, &endptr, 0);
-+	if (!endptr || *endptr != '\0') {
-+		bt_shell_printf("Invalid argument: %s\n", input);
-+		return bt_shell_noninteractive_quit(EXIT_FAILURE);
-+	}
-+
-+	if (p->alt_preset)
-+		bt_shell_prompt_input(p->alt_preset->name,
-+					"Enter Channel Allocation: ",
-+					custom_chan_alloc, p->alt_preset);
-+	else
-+		return bt_shell_noninteractive_quit(EXIT_SUCCESS);
-+}
-+
- static void cmd_presets_endpoint(int argc, char *argv[])
- {
- 	struct preset *preset;
-@@ -4131,8 +4183,20 @@ static void cmd_presets_endpoint(int argc, char *argv[])
- 		preset->default_preset = default_preset;
- 
- 		if (argc > 4) {
-+			struct codec_preset *alt_preset;
- 			struct iovec *iov = (void *)&default_preset->data;
- 
-+			/* Check if and alternative preset was given */
-+			alt_preset = preset_find_name(preset, argv[4]);
-+			if (alt_preset) {
-+				default_preset->alt_preset = alt_preset;
-+				bt_shell_prompt_input(default_preset->name,
-+						"Enter Channel Allocation: ",
-+						custom_chan_alloc,
-+						default_preset);
-+				return;
-+			}
-+
- 			iov->iov_base = str2bytearray(argv[4], &iov->iov_len);
- 			if (!iov->iov_base) {
- 				bt_shell_printf("Invalid configuration %s\n",
-diff --git a/src/shared/bap.c b/src/shared/bap.c
-index 0aa89c2781ba..4bec51011469 100644
---- a/src/shared/bap.c
-+++ b/src/shared/bap.c
-@@ -5420,7 +5420,7 @@ int bt_bap_select(struct bt_bap_pac *lpac, struct bt_bap_pac *rpac,
- 			selected++;
- 
- 			/* Check if there are any channels left to select */
--			map.count &= ~(map.count & rc->count);
-+				map.count &= ~(map.count & rc->count);
- 			/* Check if there are any locations left to select */
- 			map.location &= ~(map.location & rc->location);
- 
--- 
-2.45.2
 
+--===============4261959958492973082==--
