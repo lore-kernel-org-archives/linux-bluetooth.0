@@ -1,41 +1,51 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53B8E21340;
-	Mon, 22 Jul 2024 09:27:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF4A121340;
+	Mon, 22 Jul 2024 09:28:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721640462; cv=none; b=eL4vjXlzg7MjMRlU7vPMMtVeIknahpNY20WXbYQiXbUt4aoQ0Affa9Qazp7xUSJicBxSFGo9oA55Lr0BvSf8gK590VRII9uNPunfO22afw90km4WfWOZkro7qtRv8tlHz/B3XDU0nJzmPFmXET1gMCx+7eDP1rW32/pcnIN+SV4=
+	t=1721640495; cv=none; b=iebfmWui+dlQ3+1eL0Tn38kQEVMAzhxFU38LJlwT0nELQ2qQ84bXvL2LOIrAbt9Jb1CyqDQ/HA62r5h1L+/1XzmRr9xG1AchzYP3IhdyzhsAXKKrDeQmXkqCbm+EoUt3u3sVFNknKk36FYbYN5WN/yh48htJHiF+GzZc6Kj1how=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721640462; c=relaxed/simple;
-	bh=YDL2QDJFgsrUPVIO83HKDODRmJYD+Y8GkwoGpOeigAU=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=rc1NN9xWUBiWCHCMcOub978lSxv5rTUf/xqmZ4BC+1CT0mQXXRpBpHT0nHGKsvkDAJXIe06BRAy6KuMhWYdbAbi6QRsFs3Lx9dYgAtf+V4q64YARa36nDPv533veW9Cp96ixF8bTxBoneQ44ynCGO4dR97GqmkBUZyN7VxA8mEs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=StRPkGLq; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1721640495; c=relaxed/simple;
+	bh=YhOXVRafcMg4tYD9zagl52iqpNlfOz9o9bO6OxtTXIs=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=lLUw8tZafCI2eJHYCQcXG0mpOdTdT+lDVppvKnAcne069fnTht1M2WeNPrHfOf9511kPYJZ7A/kdWXaBkN4DIp2pA+2q/J6rZ4qKH+qme54ZJKMBBH3CRSv36GqhYmXaiBczizSjDGwHS7aHRJsQirsGQ8O2v5lUz9zUEaMK+vE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=th0NqCl/; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="StRPkGLq"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 68E66C116B1;
-	Mon, 22 Jul 2024 09:27:40 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="th0NqCl/"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C6C57C4AF0A;
+	Mon, 22 Jul 2024 09:28:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1721640461;
-	bh=YDL2QDJFgsrUPVIO83HKDODRmJYD+Y8GkwoGpOeigAU=;
-	h=From:To:Cc:Subject:Date:From;
-	b=StRPkGLqOtB83vx+W3ktNb4bBaGeu/mEHETNfo3B0v/OM6njm2Bw32L8F6HZbt3a6
-	 j3DzKLEls461IjgDwITqmdAuuheRJkOqPk/MEMVvNDrhUtT60LKclUfdmP8JpAbZJw
-	 PoaCQfH972nqWBxoHSDM78LeP5yf9/v/K6pNa/iF8QCdX2SRoTR1rOo3gc4E/fKPl6
-	 mWwccli7bzH28MTNdvqQSoSwAcxRKwON4I7G2/nZ2x9O1TvCD3QgZGnNGng56SygZj
-	 hISeuP3qNix7aQ4syJRzeOyNmCiKAjxP5+F+QDAxhE4c8Ai9RfjSKODYd7kPO7kZ0i
-	 3/6ND3TgHriUA==
+	s=k20201202; t=1721640494;
+	bh=YhOXVRafcMg4tYD9zagl52iqpNlfOz9o9bO6OxtTXIs=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=th0NqCl/AHyOVJ+qH5Jn0cTR5xRpXoj9NUd7KC7xwvhbxq9Rlik6WyCrB5BCCyf84
+	 7qbANzTllFk6YVvXXhztKlJZc7JS4uV5z2RuuVPP3nE9+sYTfoNZXFvx/fuoJ6Nlni
+	 CjPex2FUiYGyhHoNf8K2HCTodsf4WYmpyRH+SP0jaoy/gRxGZCFGSX9rH/X+IYZvaG
+	 5r4fhX+inh27tRmsB0SM1jlYuRlEBcgmpSl238IG1MVlSZRXkDH8nQLczN3qR/3a4c
+	 4JRi2rVGmvqFxLwB9kxWrqlOKWzCyYEDDOZ7jBJzhLLerOYECdO5rjBG6GJxPr/NWv
+	 mgtfYEt1L3IJQ==
 From: Arnd Bergmann <arnd@kernel.org>
 To: Marcel Holtmann <marcel@holtmann.org>,
 	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
 	Chris Lu <chris.lu@mediatek.com>
 Cc: Arnd Bergmann <arnd@arndb.de>,
+	Sean Wang <sean.wang@mediatek.com>,
+	Jing Cai <jing.cai@mediatek.com>,
+	Takashi Iwai <tiwai@suse.de>,
+	Peter Tsao <peter.tsao@mediatek.com>,
 	linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH 1/2] Bluetooth: btmtk: Fix btmtk.c undefined reference build error harder
-Date: Mon, 22 Jul 2024 11:27:05 +0200
-Message-Id: <20240722092735.1109925-1-arnd@kernel.org>
+	linux-kernel@vger.kernel.org,
+	linux-mediatek@lists.infradead.org
+Subject: [PATCH 2/2] Bluetooth: btmtk: remove #ifdef around declarations
+Date: Mon, 22 Jul 2024 11:27:06 +0200
+Message-Id: <20240722092735.1109925-2-arnd@kernel.org>
 X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20240722092735.1109925-1-arnd@kernel.org>
+References: <20240722092735.1109925-1-arnd@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -46,47 +56,48 @@ Content-Transfer-Encoding: 8bit
 
 From: Arnd Bergmann <arnd@arndb.de>
 
-The previous fix was incomplete as the link failure still persists
-with CONFIG_USB=m when the sdio or serial wrappers for btmtk.c
-are build-in:
+The caller of these functions in btusb.c is guarded with an
+if(IS_ENABLED()) style check, so dead code is left out, but the
+declarations are still needed at compile time:
 
-btmtk.c:(.text+0x468): undefined reference to `usb_alloc_urb'
-btmtk.c:(.text+0x488): undefined reference to `usb_free_urb'
-btmtk.c:(.text+0x500): undefined reference to `usb_anchor_urb'
-btmtk.c:(.text+0x50a): undefined reference to `usb_submit_urb'
-btmtk.c:(.text+0x92c): undefined reference to `usb_control_msg'
-btmtk.c:(.text+0xa92): undefined reference to `usb_unanchor_urb'
-btmtk.c:(.text+0x11e4): undefined reference to `usb_set_interface'
-btmtk.c:(.text+0x120a): undefined reference to `usb_kill_anchored_urbs'
-
-Disallow this configuration.
+drivers/bluetooth/btusb.c: In function 'btusb_mtk_reset':
+drivers/bluetooth/btusb.c:2705:15: error: implicit declaration of function 'btmtk_usb_subsys_reset' [-Wimplicit-function-declaration]
+ 2705 |         err = btmtk_usb_subsys_reset(hdev, btmtk_data->dev_id);
+      |               ^~~~~~~~~~~~~~~~~~~~~~
+drivers/bluetooth/btusb.c: In function 'btusb_send_frame_mtk':
+drivers/bluetooth/btusb.c:2720:23: error: implicit declaration of function 'alloc_mtk_intr_urb' [-Wimplicit-function-declaration]
+ 2720 |                 urb = alloc_mtk_intr_urb(hdev, skb, btusb_tx_complete);
+      |                       ^~~~~~~~~~~~~~~~~~
+drivers/bluetooth/btusb.c:2720:21: error: assignment to 'struct urb *' from 'int' makes pointer from integer without a cast [-Wint-conversion]
+ 2720 |                 urb = alloc_mtk_intr_urb(hdev, skb, btusb_tx_complete);
+      |                     ^
 
 Fixes: 52828ea60dfd ("Bluetooth: btmtk: Fix btmtk.c undefined reference build error")
 Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 ---
- drivers/bluetooth/Kconfig | 2 ++
- 1 file changed, 2 insertions(+)
+ drivers/bluetooth/btmtk.h | 2 --
+ 1 file changed, 2 deletions(-)
 
-diff --git a/drivers/bluetooth/Kconfig b/drivers/bluetooth/Kconfig
-index 44a2de58337b..082698675849 100644
---- a/drivers/bluetooth/Kconfig
-+++ b/drivers/bluetooth/Kconfig
-@@ -413,6 +413,7 @@ config BT_ATH3K
- config BT_MTKSDIO
- 	tristate "MediaTek HCI SDIO driver"
- 	depends on MMC
-+	depends on USB || !BT_HCIBTUSB_MTK
- 	select BT_MTK
- 	help
- 	  MediaTek Bluetooth HCI SDIO driver.
-@@ -425,6 +426,7 @@ config BT_MTKSDIO
- config BT_MTKUART
- 	tristate "MediaTek HCI UART driver"
- 	depends on SERIAL_DEV_BUS
-+	depends on USB || !BT_HCIBTUSB_MTK
- 	select BT_MTK
- 	help
- 	  MediaTek Bluetooth HCI UART driver.
+diff --git a/drivers/bluetooth/btmtk.h b/drivers/bluetooth/btmtk.h
+index 6fc69cd8636b..5df7c3296624 100644
+--- a/drivers/bluetooth/btmtk.h
++++ b/drivers/bluetooth/btmtk.h
+@@ -202,7 +202,6 @@ int btmtk_process_coredump(struct hci_dev *hdev, struct sk_buff *skb);
+ void btmtk_fw_get_filename(char *buf, size_t size, u32 dev_id, u32 fw_ver,
+ 			   u32 fw_flavor);
+ 
+-#if IS_ENABLED(CONFIG_BT_HCIBTUSB_MTK)
+ int btmtk_usb_subsys_reset(struct hci_dev *hdev, u32 dev_id);
+ 
+ int btmtk_usb_recv_acl(struct hci_dev *hdev, struct sk_buff *skb);
+@@ -217,7 +216,6 @@ int btmtk_usb_suspend(struct hci_dev *hdev);
+ int btmtk_usb_setup(struct hci_dev *hdev);
+ 
+ int btmtk_usb_shutdown(struct hci_dev *hdev);
+-#endif
+ #else
+ 
+ static inline int btmtk_set_bdaddr(struct hci_dev *hdev,
 -- 
 2.39.2
 
