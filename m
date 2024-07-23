@@ -1,193 +1,177 @@
-Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [185.185.170.37])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f179.google.com (mail-pg1-f179.google.com [209.85.215.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 122BC14D431
-	for <linux-bluetooth@vger.kernel.org>; Tue, 23 Jul 2024 17:12:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=185.185.170.37
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721754759; cv=pass; b=KnQsWlAw4XDSFFMjaIdQJks86jFSupEjRoa2UKwXXLfbETLRRyKADo3XACvfISskn2qSN8rHoT/ISPt10P5+KfUiv9pmCmBuoW22Ra6CFy4chJ4/dRyTmEz2iAPtp/SBEtSCF9Sm/bQy1LzSvZXx0n3pqEZvTXaWAQR0lnXczAc=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721754759; c=relaxed/simple;
-	bh=qG83C0wB2xNzHu1Vg7Asn9xOrr43s9phqnsJnLY+1iA=;
-	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=F1mSYFkdAfrjZbfqatmndvXdlK/s2jnoX6J1sXppPMiPg0qE1WNoNze+uxPeUo9zY+JJHgv3BetOzgbKSHE1aSe6+jiz6ep9K7ylClMl+Tj2RQFgCKf5ANj7Wts/oeKiTKi5p6G4bz3q2eknxLLR3eJnC4br2teyFxvsC9LfWvo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=HYdaVjPe; arc=pass smtp.client-ip=185.185.170.37
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B55A214C5A1;
+	Tue, 23 Jul 2024 17:19:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.179
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1721755148; cv=none; b=XYiKZKC4EhlaDDbgm5fLo9cxF+P1E1jhoLMBGigsao1J4qZAnMab7cVqbqMLTNHcJ9Js0lUBVSWsHlLAXDLWCn/5czD0fFWDPkTb4s3bHiVPAJsH9dMqx//w52jvUjy82G7TZvUqh+jbDn3zW5Y66CtW98zXQY0+CUD0GJrGpxI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1721755148; c=relaxed/simple;
+	bh=9s5Vi5MZuDidTPxO2XHs1LBSd+mG/mBJsPBCN5ZhRso=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=HzeaeaGueSpasEqola23ooc8cj62VuivPudlML8eUIxIm+MQ/Z+z8lB/NX3l+eXAoQjAwi1qWPBoRoAHWVxuYhLk30+7EG0+9x0SSwBUOk4iyS9OCgUxantzyKvXZ/gq5yIZ59dNaZwlFRayUfCc37aIb4PwaFhwsYhIIvAqwm4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=T5hiqh9S; arc=none smtp.client-ip=209.85.215.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="HYdaVjPe"
-Received: from monolith.lan (unknown [IPv6:2a0c:f040:0:2790::a02d])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pav@iki.fi)
-	by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4WT3c95XFGz49Q08;
-	Tue, 23 Jul 2024 20:12:25 +0300 (EEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
-	t=1721754746;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=lw1clEPY3GVYsW53sLKIsZxKonyelvIS3NobWLLxR6E=;
-	b=HYdaVjPe3hpi3n+rxqAg9T0CuKRNDZVto3TxjoAY5Prpq11xAlClXG4N1zH+czuQh7EFTC
-	B5eppL8Jx5yfkBPMT+X1SYGtAjt9o6GIA7Pq97HycZnAHNjm6DscXJIOiT7vhMT4Z4ILsN
-	b4gUIAjQHmkiQD/BroE/FEi/sxWGZ/Y7XBXzNWun7j+8pNJMhDuYzy5ToQwl0ZoPwaG+fh
-	fn4Z5Cq+48exBoNXZ4lkonPY7mDKeGp26IJxMtVZOC4m5vYqnvI53MJsmSuuy5vdKsm+MR
-	LaIATAhfJ/SmgRgm/HKGZQrhKuFas6bipHHJ5RyvvTVdLe7NETJ080xPn34I/Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=lahtoruutu; t=1721754746;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=lw1clEPY3GVYsW53sLKIsZxKonyelvIS3NobWLLxR6E=;
-	b=fIoeqUfqHYpOsSi3q6d7f3KbqaMWPBPSxxq5x7ETEsULcnw9WQ6A3xdaTrZn18bH54RxYY
-	a38WuUP3UybzJR51oIrFqQpzesq3Du8FjKP28bOSCObF3bZibzTMzTMIT4DM/YdZo8w20q
-	ik+KPfHncTRD+jLmx5bdB5+FjT8J3Yuzdgb692qD5HkuoEac0bimVpvPg2pnbE/cXukfH3
-	T9EFy+kk8c2tAVr4mnQR8RA6/CSSrl7LBSqboz+niy5Tg2L+rNKpYcYfxSl5Tq3kMMoJQ+
-	93Pd8LzqN7b/rJNEErJREXAebrCk7AMIF7Pn90+/Ixf+d6U7TVXGmma7HqrgZg==
-ARC-Seal: i=1; s=lahtoruutu; d=iki.fi; t=1721754746; a=rsa-sha256;
-	cv=none;
-	b=hgwTFlFD1tMohQ6MyjEZ336owtpcjqpEdx99j4ztYZ7416wyLfqm/9yKZ5iyMl+NuwwzWM
-	GYaKA7DaCa5w36J9yXbl2EnB6XRJXfpIbGJqWGeSnWQiby+qqDsD7WE9nUAvPmgqsUCc+s
-	t2cZ0NQo7YyBbeIVPDa45zIjH9juMX4MnckMmtjiI5F7A+r1sRtlK65TOeaq/Aic0z1jR/
-	46Z/kNitca2RFjFWXvsCpjOcG/pQvGZxZIY7CdELM9fMGw5+F3u3pHqz+R93f8muBVPRMd
-	Igajq+5SrV+gqR8Z7CUsrMu21ggZdiDS92ms80xypTRnHvw+K/UsMWTGrn/rhA==
-ARC-Authentication-Results: i=1;
-	ORIGINATING;
-	auth=pass smtp.auth=pav@iki.fi smtp.mailfrom=pav@iki.fi
-Message-ID: <1ed90b39ad0fab41f1cab18adf12f7d95f9e99d0.camel@iki.fi>
-Subject: Re: [PATCH BlueZ v5] obex: Move size emit signal to plugins instead
- of obex.c
-From: Pauli Virtanen <pav@iki.fi>
-To: Amisha Jain <quic_amisjain@quicinc.com>, linux-bluetooth@vger.kernel.org
-Date: Tue, 23 Jul 2024 20:12:22 +0300
-In-Reply-To: <20240723110514.8598-1-quic_amisjain@quicinc.com>
-References: <20240723110514.8598-1-quic_amisjain@quicinc.com>
-Autocrypt: addr=pav@iki.fi; prefer-encrypt=mutual;
- keydata=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
- bzyGkKh2h8XdrYhtDjw9LmrprPQ==
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.52.3 (3.52.3-1.fc40) 
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="T5hiqh9S"
+Received: by mail-pg1-f179.google.com with SMTP id 41be03b00d2f7-7a23fbb372dso782742a12.0;
+        Tue, 23 Jul 2024 10:19:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1721755146; x=1722359946; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=7PESp8ToMvs18L2DY1lc9MxMw8bEbHV0v8oTGSy6LMk=;
+        b=T5hiqh9ShUZdjARLEpaMLZcI65gRZZ7cAWTcKSNxRQtbIDMTSmqYXvLq1nGuBSR0qI
+         OvHU7/59GYlVs11OPnG1pCxlOloy05ghAXPpjzC4zuR5aALPCdzNxtysEa1NMzYg79/E
+         MEzZOyYa4G9OweW7/k/o3gQSLP51vqI7SlXQBzujzWblYSD/SLDTns7HInZ40I/cpgCB
+         mHywl6qvd3zEsPcPj1BVsFgX1XVwtt4oB0p5xmf6ZxbHf45jmLn4UM6bcrWOCC83aoP8
+         eN+xZekbQ7mEy/btXRxswJo/UhSF3TUwLK4LjuGZaFn61jwjePhJNm79kOBWd2lYs+U/
+         em0w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1721755146; x=1722359946;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=7PESp8ToMvs18L2DY1lc9MxMw8bEbHV0v8oTGSy6LMk=;
+        b=QA45ICRLk8T3bf9v0JD4NFodasYqd/r9t5phXHgBNHheR51/cUSr8Qbn0apZw28yvq
+         INy9e507XX200xnxss2LLL/LOkKewrqaSpMGqtXlRg6kUl+PH3pECVkHuTcxqYq66y+P
+         oCohW/brPdXkUqNdFsPlRFUcuPECEndi9qowLEFaoaiCjzeZ7r3kKSp4gT4EBUyjOsHa
+         wbof0e6fm4OGMGoB3R3a5IUv2Pt/WYugppOLB4+pOI2fwRxoT3NqWWqxiEMa7mr3IQqe
+         7DFy+DWN9wqDAu2qqfRei3VwV38J/W6SJi+whBsmTN8kgsCZUuZVmtoF/pfzh0gN4bXb
+         0BTQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVXz6CoTpb1FvciJFXFTec4VaA6o2y9ZjFkzOtfYhWELn5bm+wPDxOtuGUOVhgNOtBCF+HWk7SZRhczfQPneU0iMuv8BaKZa+ca8Tw9dloauT8sS1kFwTK+L4+rwI1XOh8u435OGR0Oy26ZYB5mQqbNW7pYDv+PfPtv+yCa
+X-Gm-Message-State: AOJu0YwZI+K6JgZRXs/6amygpbtzFhgsixP4IlpWGG2JwN7B5beK0STv
+	iRiq8jSiAudpIriVtrsOEbpsE/fe4rCqBL4RbgpK7mvxxuTse+yB
+X-Google-Smtp-Source: AGHT+IH/x0EB2OW34wSIoGSpIBNCX6QxTmCPilyFpkTLbvSMOGQPUxFAfFsR5aZVR1HBIrLkMPEiAA==
+X-Received: by 2002:a17:90a:7841:b0:2c9:75c6:32dc with SMTP id 98e67ed59e1d1-2cd85c25249mr3762641a91.1.1721755146006;
+        Tue, 23 Jul 2024 10:19:06 -0700 (PDT)
+Received: from localhost.localdomain ([118.32.98.101])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2cb76a5fc6csm10705800a91.0.2024.07.23.10.19.02
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Tue, 23 Jul 2024 10:19:05 -0700 (PDT)
+From: Yunseong Kim <yskelg@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	netdev@vger.kernel.org,
+	stable@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Yeoreum Yun <yeoreum.yun@arm.com>
+Subject: [PATCH] Bluetooth: hci_core: fix suspicious RCU usage in hci_conn_drop()
+Date: Wed, 24 Jul 2024 02:17:57 +0900
+Message-ID: <20240723171756.13755-2-yskelg@gmail.com>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-Hi,
+Protection from the queuing operation is achieved with an RCU read lock
+to avoid calling 'queue_delayed_work()' after 'cancel_delayed_work()',
+but this does not apply to 'hci_conn_drop()'.
 
-ti, 2024-07-23 kello 16:35 +0530, Amisha Jain kirjoitti:
-> Instead of emitting the property "Size" from obex_put_stream_start(),
-> Call the function manager_emit_transfer_property() from plugins/*.c
-> wherever plugin has transfer object present.
-> Remove the code from obex.c which is generic for all profiles.
->=20
-> This change resolves the type mismatch issue when calling the
-> manager_emit_transfer_property from obex.c. We are passing
-> 'os->service_data' of plugin session type but the
-> manager_emit_transfer_property() expects the 'obex_transfer'
-> type, therefore size is not set properly and might cause
-> crash/disconnection.
->=20
-> ---
->  obexd/plugins/ftp.c | 5 +++++
->  obexd/plugins/opp.c | 5 +++++
->  obexd/src/obex.c    | 3 ---
->  3 files changed, 10 insertions(+), 3 deletions(-)
->=20
-> diff --git a/obexd/plugins/ftp.c b/obexd/plugins/ftp.c
-> index 874fe2b8b..127bb9aaf 100644
-> --- a/obexd/plugins/ftp.c
-> +++ b/obexd/plugins/ftp.c
-> @@ -175,6 +175,11 @@ int ftp_chkput(struct obex_session *os, void *user_d=
-ata)
-> =20
->  	ret =3D obex_put_stream_start(os, path);
-> =20
-> +	if (obex_get_size(os) !=3D OBJECT_SIZE_DELETE &&
-> +				obex_get_size(os) !=3D OBJECT_SIZE_UNKNOWN) {
-> +		manager_emit_transfer_property(ftp->transfer, "Size");
-> +	}
+commit deee93d13d38 ("Bluetooth: use hdev->workqueue when queuing
+ hdev->{cmd,ncmd}_timer works")
 
-This probably should check ret =3D=3D 0, to be exactly equivalent to what
-it was before.
+The situation described raises concerns about suspicious RCU usage in a
+corrupted context.
 
-> +
->  	if (ret =3D=3D 0)
->  		manager_emit_transfer_started(ftp->transfer);
-> =20
-> diff --git a/obexd/plugins/opp.c b/obexd/plugins/opp.c
-> index 777f5f8ed..74b2f805b 100644
-> --- a/obexd/plugins/opp.c
-> +++ b/obexd/plugins/opp.c
-> @@ -87,6 +87,11 @@ skip_auth:
-> =20
->  	err =3D obex_put_stream_start(os, path);
-> =20
-> +	if (obex_get_size(os) !=3D OBJECT_SIZE_DELETE &&
-> +				obex_get_size(os) !=3D OBJECT_SIZE_UNKNOWN) {
-> +		manager_emit_transfer_property(user_data, "Size");
-> +	}
-> +
+CPU 1                   CPU 2
+ hci_dev_do_reset()
+  synchronize_rcu()      hci_conn_drop()
+  drain_workqueue()       <-- no RCU read protection during queuing. -->
+                           queue_delayed_work()
 
-Similarly err =3D=3D 0 here.
+It displays a warning message like the following
 
-Based on looking at the code looks otherwise OK, but haven't tested
-this myself in practice.
+Bluetooth: hci0: unexpected cc 0x0c38 length: 249 > 2
+=============================
+WARNING: suspicious RCU usage
+6.10.0-rc6-01340-gf14c0bb78769 #5 Not tainted
+-----------------------------
+net/mac80211/util.c:4000 RCU-list traversed in non-reader section!!
 
->  	g_free(path);
-> =20
->  	if (err < 0)
-> diff --git a/obexd/src/obex.c b/obexd/src/obex.c
-> index 98d6245a4..370bfac9e 100644
-> --- a/obexd/src/obex.c
-> +++ b/obexd/src/obex.c
-> @@ -716,9 +716,6 @@ int obex_put_stream_start(struct obex_session *os, co=
-nst char *filename)
->  		return err;
->  	}
-> =20
-> -	if (os->size !=3D OBJECT_SIZE_DELETE && os->size !=3D OBJECT_SIZE_UNKNO=
-WN)
-> -		manager_emit_transfer_property(os->service_data, "Size");
-> -
->  	os->path =3D g_strdup(filename);
-> =20
->  	return 0;
+other info that might help us debug this:
 
---=20
-Pauli Virtanen
+rcu_scheduler_active = 2, debug_locks = 1
+2 locks held by syz-executor/798:
+ #0: ffff800089a3de50 (rtnl_mutex){+.+.}-{4:4},
+    at: rtnl_lock+0x28/0x40 net/core/rtnetlink.c:79
+
+stack backtrace:
+CPU: 0 PID: 798 Comm: syz-executor Not tainted
+  6.10.0-rc6-01340-gf14c0bb78769 #5
+Hardware name: linux,dummy-virt (DT)
+Call trace:
+ dump_backtrace.part.0+0x1b8/0x1d0 arch/arm64/kernel/stacktrace.c:317
+ dump_backtrace arch/arm64/kernel/stacktrace.c:323 [inline]
+ show_stack+0x34/0x50 arch/arm64/kernel/stacktrace.c:324
+ __dump_stack lib/dump_stack.c:88 [inline]
+ dump_stack_lvl+0xf0/0x170 lib/dump_stack.c:114
+ dump_stack+0x20/0x30 lib/dump_stack.c:123
+ lockdep_rcu_suspicious+0x204/0x2f8 kernel/locking/lockdep.c:6712
+ ieee80211_check_combinations+0x71c/0x828 [mac80211]
+ ieee80211_check_concurrent_iface+0x494/0x700 [mac80211]
+ ieee80211_open+0x140/0x238 [mac80211]
+ __dev_open+0x270/0x498 net/core/dev.c:1474
+ __dev_change_flags+0x47c/0x610 net/core/dev.c:8837
+ dev_change_flags+0x98/0x170 net/core/dev.c:8909
+ devinet_ioctl+0xdf0/0x18d0 net/ipv4/devinet.c:1177
+ inet_ioctl+0x34c/0x388 net/ipv4/af_inet.c:1003
+ sock_do_ioctl+0xe4/0x240 net/socket.c:1222
+ sock_ioctl+0x4cc/0x740 net/socket.c:1341
+ vfs_ioctl fs/ioctl.c:51 [inline]
+ __do_sys_ioctl fs/ioctl.c:907 [inline]
+ __se_sys_ioctl fs/ioctl.c:893 [inline]
+ __arm64_sys_ioctl+0x184/0x218 fs/ioctl.c:893
+ __invoke_syscall arch/arm64/kernel/syscall.c:34 [inline]
+ invoke_syscall+0x90/0x2e8 arch/arm64/kernel/syscall.c:48
+ el0_svc_common.constprop.0+0x200/0x2a8 arch/arm64/kernel/syscall.c:131
+ el0_svc+0x48/0xc0 arch/arm64/kernel/entry-common.c:712
+ el0t_64_sync_handler+0x120/0x130 arch/arm64/kernel/entry-common.c:730
+ el0t_64_sync+0x190/0x198 arch/arm64/kernel/entry.S:598
+
+This patch attempts to fix that issue with the same convention.
+
+Cc: stable@vger.kernel.org # v6.1+
+Fixes: deee93d13d38 ("Bluetooth: use hdev->workqueue when queuing hdev->
+{cmd,ncmd}_timer works")
+Signed-off-by: Yeoreum Yun <yeoreum.yun@arm.com>
+Tested-by: Yunseong Kim <yskelg@gmail.com>
+Signed-off-by: Yunseong Kim <yskelg@gmail.com>
+---
+ include/net/bluetooth/hci_core.h | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
+
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 31020891fc68..111509dc1a23 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -1572,8 +1572,13 @@ static inline void hci_conn_drop(struct hci_conn *conn)
+ 		}
+ 
+ 		cancel_delayed_work(&conn->disc_work);
+-		queue_delayed_work(conn->hdev->workqueue,
+-				   &conn->disc_work, timeo);
++
++		rcu_read_lock();
++		if (!hci_dev_test_flag(conn->hdev, HCI_CMD_DRAIN_WORKQUEUE)) {
++			queue_delayed_work(conn->hdev->workqueue,
++							   &conn->disc_work, timeo);
++		}
++		rcu_read_unlock();
+ 	}
+ }
+ 
+-- 
+2.45.2
+
