@@ -1,110 +1,242 @@
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+Received: from mail-lj1-f180.google.com (mail-lj1-f180.google.com [209.85.208.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40A53376E7
-	for <linux-bluetooth@vger.kernel.org>; Mon, 22 Jul 2024 23:07:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2FCB2F32
+	for <linux-bluetooth@vger.kernel.org>; Tue, 23 Jul 2024 02:55:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721689676; cv=none; b=aCwVynbBmtTVf8ORRkcTILViN7V1PLZYTAoeizlO9LJpNwDKl7YjjXhtxiA8lzYTR+C98u+KLTVE+2dcxIsoQBxDYcm3wB+8AujQbYZRz8MDPz44/pNl/unslK1KshZAZ2M5ykpzH6daFeg0ufmCAOtRnIBW9yWBQSEWP5cxg60=
+	t=1721703326; cv=none; b=Ixf0YV21ZH9A+Ti2E01zVIl4D7SdJhBcnx2wpIsHW0nbObkd9eZWkbYeKVqKif8WsDxZlvcu1vkATQJq9wwfkJaGoQGHukybmdCS9n89/mFmnTPAEeO1vpPByavroz+fH6p8Jp1T2A5P6fJU7gBpvMt6cQfrFp6Z12AOoUNOFAI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721689676; c=relaxed/simple;
-	bh=GpKlnQFBDW84ZbUDYlvAWVJXtGDzBEBVmNvbO20LjlI=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=fLtEanYkEENJk3rH9uvuvEAD8VDsHL73U3KFi13Tkz8OFp6N0KvtF/RVP+LAHLu0035L88lby6iHLEjOlNqeqHVzbPpqjt+rG0RPwSm+kcsex8pkkmoTe6PU02GOeUQ08q8jfHCziJlHwlZuQXAPhmf+xgae5p3iIV5DWdtwW44=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QW4XSRcQ; arc=none smtp.client-ip=209.85.214.180
+	s=arc-20240116; t=1721703326; c=relaxed/simple;
+	bh=TL5y3Zf8KChZH5hQpWV2bCXwWmdaai4dXJnlsQRGtqU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=sVnaGIBBu8c+fa7sxXdArTCMMOw2jLeyeIVIDoEdIOmws4lyDbyJADF23VZ5WAGj/Pr8aq8RLTj6q3OCFunN2LTExvku0gEdT767QVI14jHAHgaCwSZojOoZUJWTnu9AdpAcwEjXm6WuAj9ryhQwjKcsr3tzXtaUbg3msNS/Prw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EWtNqkJl; arc=none smtp.client-ip=209.85.208.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QW4XSRcQ"
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-1fd69e44596so1697665ad.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 22 Jul 2024 16:07:55 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EWtNqkJl"
+Received: by mail-lj1-f180.google.com with SMTP id 38308e7fff4ca-2ef2d96164aso16880551fa.3
+        for <linux-bluetooth@vger.kernel.org>; Mon, 22 Jul 2024 19:55:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1721689674; x=1722294474; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=NCCIsO11oOfNujVcRXzsyNE/B6HUg9ToT+yDh6r3WzE=;
-        b=QW4XSRcQ/VlKcnaumg/0zt+n2CAjpYFOg301gpraocTjBcO0UApU+LDMXzHU1X7zt1
-         QY8xqr2fpYDzPtZhlHI1KCjaH5wGq78WOVUssapwQs7M7O5MaXTXezBxR0KSGupvCFmo
-         rENGAIlkSDrW4vFtNmLvwKldQ9tKy8CGerCsCX5H8Pk/rJoD7AdjQNu4fFHAppPFlMQb
-         8OCtDREljH+nUEnnAepNqyT3UoSV9YD2Z77gTOzMY9aqobvQKLodjrXkOnItQSiXc9jB
-         z9cfpd3UygPAGzxntdUW0rY2v29pGYtC3tBvbBLq8WvGx0m8lLJQD/kPu0VdwSwJFsVR
-         ZdRg==
+        d=gmail.com; s=20230601; t=1721703323; x=1722308123; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=f/kY53in09JwGj5BtNjOJIHgDbr6pNJT6xTIRR6ENSw=;
+        b=EWtNqkJlr6kQlt8JOba5ZQxjpZP28VMCfpdFz7CHShqib+33sN8uXMRyDvOKLDT8O3
+         p7dk+3v7vUU+6chxdATQiuMjBFXb3UMDUD5gsF76diZt1+4G5jfYU4DQtHceBu8mCq2G
+         6bKfG6okH4L7ZRWhbnOOPtASllHA0rVeSvoBIxktEh/Sp3bsQKr5itaLNVSiRiuwH8HO
+         vfO+Ej5rdwkrDCBbwcvLA880ZAZRuaA8Y9IPMJRi1OECRogKVqMYoGIgAOjl+hahj1Al
+         atb7YX1xa3Vht/YtBVBNB/KUXxorISELtzFpl+Fm1Nl9kuNz+GTaTwIcGNdzqU1xGvbG
+         nd0g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721689674; x=1722294474;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=NCCIsO11oOfNujVcRXzsyNE/B6HUg9ToT+yDh6r3WzE=;
-        b=qcm4UP1A71W+MWYzcEekfTP/hOeE97Ea5eJzQG/8TxyAW8zdiYQH0UOjl/BHtJCzTP
-         Ut/1GkT+hebxIDljBh/2n52sgRGkWunDt6aGcWGJ/uUxK+5JSYpqLxDL4A9ORbd6oS0g
-         0Dr/43fcaah/f+Hd0sY55AzgudVlx2Csr9rCQ9qPq+5kg5ZXQ5FyR/0pjWgb4x6yijnf
-         +gYlHkNmMaNCICucILh2/GVz7MJH7ywnwqpWYbDzPARmXMB8i7RWWh7Clt0zJ1YSA4iC
-         Vq5S/jM8jNS9xKRlRjGVz8BfbIrYb1zbLfY1cDpwRifjg4jHvvtqvaztfF8jGZruPAUL
-         A2dg==
-X-Gm-Message-State: AOJu0YwdsCBqerDm5UMQM6Qn05BUGzOkY5pUmY20YkHhdc9RptpG7qgZ
-	iCAQb8nQBDH+FQk8T/cgcUPDmxD/iam91eMCrQPZZYatfl/PZTETFEFLcQ==
-X-Google-Smtp-Source: AGHT+IESUMr2l4A6S4efZ/qZSKq3Je3V38KNanSyts8qeO+iukdQU4N3+W03Oi7pzo96dmrTDyCH2Q==
-X-Received: by 2002:a17:902:fa84:b0:1fd:a3c4:25eb with SMTP id d9443c01a7336-1fdb952e8a4mr4412465ad.17.1721689674140;
-        Mon, 22 Jul 2024 16:07:54 -0700 (PDT)
-Received: from [172.17.0.2] ([52.159.137.232])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1fd6f25bfc0sm60882785ad.42.2024.07.22.16.07.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 22 Jul 2024 16:07:53 -0700 (PDT)
-Message-ID: <669ee649.170a0220.3ad950.04a3@mx.google.com>
-Date: Mon, 22 Jul 2024 16:07:53 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============4261959958492973082=="
+        d=1e100.net; s=20230601; t=1721703323; x=1722308123;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=f/kY53in09JwGj5BtNjOJIHgDbr6pNJT6xTIRR6ENSw=;
+        b=Vh7bJQVBvdPFmRNglBn1kvY1xK4ICEq7aMkVvSlLKYcPsgk+H8glshNZOHSqPNl9aU
+         vccTkKrLFPzsuUsx9d59KfIlXGulsdIa5H+IJ2LIkjTmXI0o70FglQz3lBU0iVLuE3AG
+         oeXZk0GARUAQtnDCVMuHKG6gkGPbw/1ZS7xfl7OFkiPuzLG3T1XN2De8zR/J2fPnyQgm
+         DYKMxg9vEYULtkqhcoLhdujBy81mZTyhbptTT2UfBJrBSmdTrfjuc9l+349h8snVxcuj
+         b6zuk7xpix996qcr/u7qU7xXXzo+qeeNLd/zOgKt/SevujDoyBwrvT8VJ7ecGl4bFGfQ
+         M0vQ==
+X-Gm-Message-State: AOJu0Yz/TRUHUTqryg5/0orSATDxcXcENltD/c/lvM4myGuFdzA+wlUY
+	kHWPfz4BBl83j+RyakcVQb08zh0h0Nni2JVEKhs5TnRa/5sIQ+aC2JsiSDffevmCrv7KfxzfKW5
+	8avp/mohT9XkEvMMNFKeb59klzOM=
+X-Google-Smtp-Source: AGHT+IEHsm7rPm1JlOuZapgduTkETh2MkzfsvzAlX1J0IWE8/fbuYkyWWvkr3U0z0s79tPzvmQ3QziNGOkLMa72SJw4=
+X-Received: by 2002:a05:651c:1052:b0:2ef:2fc9:c8b2 with SMTP id
+ 38308e7fff4ca-2ef2fc9ca5amr30520381fa.37.1721703322634; Mon, 22 Jul 2024
+ 19:55:22 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [BlueZ,v1,1/2] client/player: Set number of channels based on locations
-In-Reply-To: <20240722205148.2273531-1-luiz.dentz@gmail.com>
-References: <20240722205148.2273531-1-luiz.dentz@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+References: <20240722075626.3050334-1-clancy_shang@163.com>
+ <CABBYNZKFEBuW2OeU4uOSfku=-jCnn3oXJENDMBGmkqP-4rybDA@mail.gmail.com> <1c525ed7.13cb.190dd367dda.Coremail.clancy_shang@163.com>
+In-Reply-To: <1c525ed7.13cb.190dd367dda.Coremail.clancy_shang@163.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Mon, 22 Jul 2024 22:55:04 -0400
+Message-ID: <CABBYNZKPF=gOdybx+3y867v5RG=MDUK9p4ONKug5+_P3G+-_Zg@mail.gmail.com>
+Subject: Re: Re: [PATCH] [BlueZ] adapter: Fix execute "LE Add Device To
+ Resolving List" command fail
+To: clancy_shang <clancy_shang@163.com>
+Cc: linux-bluetooth@vger.kernel.org, Clancy Shang <clancy.shang@quectel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
---===============4261959958492973082==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi,
 
-This is automated email and please do not reply to this email!
+On Mon, Jul 22, 2024 at 9:31=E2=80=AFPM clancy_shang <clancy_shang@163.com>=
+ wrote:
+>
+> Hi,
+>
+>
+> I have replied the test steps in another email. the device are the same d=
+eviece which different is the privace statitc address .
+>
+> details as follows:
+>
+>
+>
+>
 
-Dear submitter,
+Ok, how about collecting the HCI with btmon so we can actually check
+other traces as well, from the looks of it this sounds like a kernel
+issue though, where it is attempting to program an IRK already in the
+list.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=873055
+> At 2024-07-22 22:57:18, "Luiz Augusto von Dentz" <luiz.dentz@gmail.com> w=
+rote:
+> >Hi,
+> >
+> >On Mon, Jul 22, 2024 at 3:56=E2=80=AFAM <clancy_shang@163.com> wrote:
+> >>
+> >> From: Clancy Shang <clancy.shang@quectel.com>
+> >>
+> >> According to BLUETOOTH CORE SPECIFICATION Version 5.4 | Vol 4, Part E,
+> >> 7.8.38, If there is an existing entry in the resolving list with the s=
+ame
+> >> non-zero Peer_IRK, the Controller should return the error code Invalid
+> >> HCI Command Parameters (0x12), so fix it.
+> >>
+> >> Signed-off-by: Clancy Shang <clancy.shang@quectel.com>
+> >
+> >Ok, what is really going on? Why is the IRK left behind? Or are there
+> >2 distinct devices with the same IRK? Perhaps the better fix would be
+> >the kernel to detect if there is already the same IRK just ignore it,
+> >since for the purpose of resolving the address that should work, that
+> >said we should have detected if the device has the same IRK then it
+> >shall have the same identity address so something doesn't add up here.
+> >
+> >> ---
+> >>  src/adapter.c | 72 ++++++++++++++++++++++++++++++++++++++++++++++++++=
++
+> >>  1 file changed, 72 insertions(+)
+> >>
+> >> diff --git a/src/adapter.c b/src/adapter.c
+> >> index 85ddfc165..495c9f631 100644
+> >> --- a/src/adapter.c
+> >> +++ b/src/adapter.c
+> >> @@ -8901,6 +8901,76 @@ static void store_irk(struct btd_adapter *adapt=
+er, const bdaddr_t *peer,
+> >>         g_key_file_free(key_file);
+> >>  }
+> >>
+> >> +static void delete_exist_irk_from_directory(
+> >> +                                               struct btd_adapter *ad=
+apter,
+> >> +                                               const unsigned char *k=
+ey)
+> >> +{
+> >> +       char dirname[PATH_MAX];
+> >> +       GError *gerr =3D NULL;
+> >> +       DIR *dir;
+> >> +       struct dirent *entry;
+> >> +
+> >> +       create_filename(dirname, PATH_MAX, "/%s",
+> >> +                               btd_adapter_get_storage_dir(adapter));
+> >> +
+> >> +       dir =3D opendir(dirname);
+> >> +       if (!dir) {
+> >> +               btd_error(adapter->dev_id,
+> >> +                               "Unable to open adapter storage direct=
+ory: %s",
+> >> +                                                               dirnam=
+e);
+> >> +               return;
+> >> +       }
+> >> +
+> >> +       while ((entry =3D readdir(dir)) !=3D NULL) {
+> >> +               struct btd_device *device;
+> >> +               char filename[PATH_MAX];
+> >> +               GKeyFile *key_file;
+> >> +               struct irk_info *irk_info;
+> >> +               uint8_t bdaddr_type;
+> >> +
+> >> +               if (entry->d_type =3D=3D DT_UNKNOWN)
+> >> +                       entry->d_type =3D util_get_dt(dirname, entry->=
+d_name);
+> >> +
+> >> +               if (entry->d_type !=3D DT_DIR || bachk(entry->d_name) =
+< 0)
+> >> +                       continue;
+> >> +
+> >> +               create_filename(filename, PATH_MAX, "/%s/%s/info",
+> >> +                                       btd_adapter_get_storage_dir(ad=
+apter),
+> >> +                                       entry->d_name);
+> >> +
+> >> +               key_file =3D g_key_file_new();
+> >> +               if (!g_key_file_load_from_file(
+> >> +                                                               key_fi=
+le,
+> >> +                                                               filena=
+me,
+> >> +                                                               0,
+> >> +                                                               &gerr)=
+) {
+> >> +                       error("Unable to load key file from %s: (%s)",
+> >> +                                       filename, gerr->message);
+> >> +                       g_clear_error(&gerr);
+> >> +               }
+> >> +
+> >> +               bdaddr_type =3D get_le_addr_type(key_file);
+> >> +
+> >> +               irk_info =3D get_irk_info(key_file, entry->d_name, bda=
+ddr_type);
+> >> +
+> >> +               if (irk_info) {
+> >> +                       if (!memcmp(irk_info->val, key, 16)) {
+> >> +                               DBG("Has same irk,delete it");
+> >> +                               device =3D btd_adapter_find_device(ada=
+pter,
+> >> +                                                       &irk_info->bda=
+ddr,
+> >> +                                                       irk_info->bdad=
+dr_type);
+> >> +                               if (device)
+> >> +                                       btd_adapter_remove_device(adap=
+ter,
+> >> +                                                                     =
+  device);
+> >> +                       }
+> >> +               }
+> >> +               g_key_file_free(key_file);
+> >> +       }
+> >> +
+> >> +       closedir(dir);
+> >> +
+> >> +}
+> >> +
+> >>  static void new_irk_callback(uint16_t index, uint16_t length,
+> >>                                         const void *param, void *user_=
+data)
+> >>  {
+> >> @@ -8950,6 +9020,8 @@ static void new_irk_callback(uint16_t index, uin=
+t16_t length,
+> >>         if (!persistent)
+> >>                 return;
+> >>
+> >> +       delete_exist_irk_from_directory(adapter, irk->val);
+> >> +
+> >>         store_irk(adapter, &addr->bdaddr, addr->type, irk->val);
+> >>
+> >>         btd_device_set_temporary(device, false);
+> >> --
+> >> 2.25.1
+> >>
+> >>
+> >
+> >
+> >--
+> >Luiz Augusto von Dentz
 
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      0.67 seconds
-GitLint                       PASS      0.43 seconds
-BuildEll                      PASS      24.65 seconds
-BluezMake                     PASS      1682.46 seconds
-MakeCheck                     PASS      13.35 seconds
-MakeDistcheck                 PASS      180.74 seconds
-CheckValgrind                 PASS      254.55 seconds
-CheckSmatch                   WARNING   358.83 seconds
-bluezmakeextell               PASS      120.76 seconds
-IncrementalBuild              PASS      3061.50 seconds
-ScanBuild                     PASS      1051.04 seconds
-
-Details
-##############################
-Test: CheckSmatch - WARNING
-Desc: Run smatch tool with source
-Output:
-src/shared/bap.c:288:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structuressrc/shared/bap.c:288:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structuressrc/shared/bap.c:288:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structures
 
 
----
-Regards,
-Linux Bluetooth
-
-
---===============4261959958492973082==--
+--=20
+Luiz Augusto von Dentz
