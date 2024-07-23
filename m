@@ -1,372 +1,193 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
+Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [185.185.170.37])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DDE91DA22
-	for <linux-bluetooth@vger.kernel.org>; Tue, 23 Jul 2024 15:46:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721749603; cv=none; b=naXnkjoR0f/gbzHP8ypg+zxMDqhWKipDD3v3VsVrmJdvfE5/2mLrOEIdfkZAE+FanwuPwGQiZu3TMyulp5ktKJvRHuFYCd914GAPUA3qQO0v2Qq7R/S7/4SCKK1y40si20pMmwM2KbwBCOB44yzwXK3uwagyNQ99105g/3o0grk=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721749603; c=relaxed/simple;
-	bh=YykV1wncQV5qAWzvCQ/stiQ/s0wU9isBsR5kLujKbYw=;
-	h=Date:From:To:Cc:Subject:Message-ID; b=fO4DksQWiPi/b/0W+i08dTEs/TTFda0FtfdolgSMuU6gGOtycTa9EPO8CUEqs+UacGOnJwyeqh8RY7/EBjxO2VFr44BJY+6SzDqfTdGh5moET/sqyhuY5/Dw54umOHr8MqYd3SoNYiOLLQzkPW34OgDQOoGTtpM5UMYW+PfZk+Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=KrxABGJF; arc=none smtp.client-ip=198.175.65.20
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 122BC14D431
+	for <linux-bluetooth@vger.kernel.org>; Tue, 23 Jul 2024 17:12:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=185.185.170.37
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1721754759; cv=pass; b=KnQsWlAw4XDSFFMjaIdQJks86jFSupEjRoa2UKwXXLfbETLRRyKADo3XACvfISskn2qSN8rHoT/ISPt10P5+KfUiv9pmCmBuoW22Ra6CFy4chJ4/dRyTmEz2iAPtp/SBEtSCF9Sm/bQy1LzSvZXx0n3pqEZvTXaWAQR0lnXczAc=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1721754759; c=relaxed/simple;
+	bh=qG83C0wB2xNzHu1Vg7Asn9xOrr43s9phqnsJnLY+1iA=;
+	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=F1mSYFkdAfrjZbfqatmndvXdlK/s2jnoX6J1sXppPMiPg0qE1WNoNze+uxPeUo9zY+JJHgv3BetOzgbKSHE1aSe6+jiz6ep9K7ylClMl+Tj2RQFgCKf5ANj7Wts/oeKiTKi5p6G4bz3q2eknxLLR3eJnC4br2teyFxvsC9LfWvo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=HYdaVjPe; arc=pass smtp.client-ip=185.185.170.37
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="KrxABGJF"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1721749601; x=1753285601;
-  h=date:from:to:cc:subject:message-id;
-  bh=YykV1wncQV5qAWzvCQ/stiQ/s0wU9isBsR5kLujKbYw=;
-  b=KrxABGJFIp9wSWDTpFJYxIS+7/EnH4y+GjcZCn2Q/UlGUO4jxsYDM1jq
-   FvrvLHx8dI1xlYgpyA+8SzZixQ/D3qXdv57HTx8E9ZmEeanS4JasHmQn5
-   hmkTlLTgCWJ0qG6k97XY8rGe61TTbBe3RrnF6Ox8KVqFiKJwk8DKUd/Oy
-   txeQOqTT+a3toNGQb8rTh56pV9Kfd5Q3nB1p8gHsPB7/BWtAISgQiUuej
-   qJG9yKQahVn/poD5/wOJOiyxfht1H8DC4PJBdfMJ7+PLaqXSbUBfwYW+0
-   G99w0IHo01PPbhRSkUqVmYNhfeHxBRpScIft//bdX0hm/Q7yDg5cwuZuN
-   g==;
-X-CSE-ConnectionGUID: PbYcNlq6TcufL655f1r5gQ==
-X-CSE-MsgGUID: ynXDMVZESCGM+aI9Fpo8tg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11142"; a="19193818"
-X-IronPort-AV: E=Sophos;i="6.09,230,1716274800"; 
-   d="scan'208";a="19193818"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Jul 2024 08:46:41 -0700
-X-CSE-ConnectionGUID: Y0A+UXVvSmqsBitXM5Uq7w==
-X-CSE-MsgGUID: tryzIHhNSA+qNxZTXfKSgQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.09,230,1716274800"; 
-   d="scan'208";a="52295643"
-Received: from lkp-server01.sh.intel.com (HELO 68891e0c336b) ([10.239.97.150])
-  by orviesa009.jf.intel.com with ESMTP; 23 Jul 2024 08:46:39 -0700
-Received: from kbuild by 68891e0c336b with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1sWHim-000m4c-35;
-	Tue, 23 Jul 2024 15:46:36 +0000
-Date: Tue, 23 Jul 2024 23:46:15 +0800
-From: kernel test robot <lkp@intel.com>
-To: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: [bluetooth-next:master] BUILD REGRESSION
- c707097a446ce3d284bc9f05736dc4701d2b8168
-Message-ID: <202407232311.FeGJfo4H-lkp@intel.com>
-User-Agent: s-nail v14.9.24
+	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="HYdaVjPe"
+Received: from monolith.lan (unknown [IPv6:2a0c:f040:0:2790::a02d])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pav@iki.fi)
+	by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4WT3c95XFGz49Q08;
+	Tue, 23 Jul 2024 20:12:25 +0300 (EEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
+	t=1721754746;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=lw1clEPY3GVYsW53sLKIsZxKonyelvIS3NobWLLxR6E=;
+	b=HYdaVjPe3hpi3n+rxqAg9T0CuKRNDZVto3TxjoAY5Prpq11xAlClXG4N1zH+czuQh7EFTC
+	B5eppL8Jx5yfkBPMT+X1SYGtAjt9o6GIA7Pq97HycZnAHNjm6DscXJIOiT7vhMT4Z4ILsN
+	b4gUIAjQHmkiQD/BroE/FEi/sxWGZ/Y7XBXzNWun7j+8pNJMhDuYzy5ToQwl0ZoPwaG+fh
+	fn4Z5Cq+48exBoNXZ4lkonPY7mDKeGp26IJxMtVZOC4m5vYqnvI53MJsmSuuy5vdKsm+MR
+	LaIATAhfJ/SmgRgm/HKGZQrhKuFas6bipHHJ5RyvvTVdLe7NETJ080xPn34I/Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
+	s=lahtoruutu; t=1721754746;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=lw1clEPY3GVYsW53sLKIsZxKonyelvIS3NobWLLxR6E=;
+	b=fIoeqUfqHYpOsSi3q6d7f3KbqaMWPBPSxxq5x7ETEsULcnw9WQ6A3xdaTrZn18bH54RxYY
+	a38WuUP3UybzJR51oIrFqQpzesq3Du8FjKP28bOSCObF3bZibzTMzTMIT4DM/YdZo8w20q
+	ik+KPfHncTRD+jLmx5bdB5+FjT8J3Yuzdgb692qD5HkuoEac0bimVpvPg2pnbE/cXukfH3
+	T9EFy+kk8c2tAVr4mnQR8RA6/CSSrl7LBSqboz+niy5Tg2L+rNKpYcYfxSl5Tq3kMMoJQ+
+	93Pd8LzqN7b/rJNEErJREXAebrCk7AMIF7Pn90+/Ixf+d6U7TVXGmma7HqrgZg==
+ARC-Seal: i=1; s=lahtoruutu; d=iki.fi; t=1721754746; a=rsa-sha256;
+	cv=none;
+	b=hgwTFlFD1tMohQ6MyjEZ336owtpcjqpEdx99j4ztYZ7416wyLfqm/9yKZ5iyMl+NuwwzWM
+	GYaKA7DaCa5w36J9yXbl2EnB6XRJXfpIbGJqWGeSnWQiby+qqDsD7WE9nUAvPmgqsUCc+s
+	t2cZ0NQo7YyBbeIVPDa45zIjH9juMX4MnckMmtjiI5F7A+r1sRtlK65TOeaq/Aic0z1jR/
+	46Z/kNitca2RFjFWXvsCpjOcG/pQvGZxZIY7CdELM9fMGw5+F3u3pHqz+R93f8muBVPRMd
+	Igajq+5SrV+gqR8Z7CUsrMu21ggZdiDS92ms80xypTRnHvw+K/UsMWTGrn/rhA==
+ARC-Authentication-Results: i=1;
+	ORIGINATING;
+	auth=pass smtp.auth=pav@iki.fi smtp.mailfrom=pav@iki.fi
+Message-ID: <1ed90b39ad0fab41f1cab18adf12f7d95f9e99d0.camel@iki.fi>
+Subject: Re: [PATCH BlueZ v5] obex: Move size emit signal to plugins instead
+ of obex.c
+From: Pauli Virtanen <pav@iki.fi>
+To: Amisha Jain <quic_amisjain@quicinc.com>, linux-bluetooth@vger.kernel.org
+Date: Tue, 23 Jul 2024 20:12:22 +0300
+In-Reply-To: <20240723110514.8598-1-quic_amisjain@quicinc.com>
+References: <20240723110514.8598-1-quic_amisjain@quicinc.com>
+Autocrypt: addr=pav@iki.fi; prefer-encrypt=mutual;
+ keydata=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
+ bzyGkKh2h8XdrYhtDjw9LmrprPQ==
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.52.3 (3.52.3-1.fc40) 
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
 
-tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
-branch HEAD: c707097a446ce3d284bc9f05736dc4701d2b8168  Bluetooth: btintel: Allow configuring drive strength of BRI
+Hi,
 
-Error/Warning ids grouped by kconfigs:
+ti, 2024-07-23 kello 16:35 +0530, Amisha Jain kirjoitti:
+> Instead of emitting the property "Size" from obex_put_stream_start(),
+> Call the function manager_emit_transfer_property() from plugins/*.c
+> wherever plugin has transfer object present.
+> Remove the code from obex.c which is generic for all profiles.
+>=20
+> This change resolves the type mismatch issue when calling the
+> manager_emit_transfer_property from obex.c. We are passing
+> 'os->service_data' of plugin session type but the
+> manager_emit_transfer_property() expects the 'obex_transfer'
+> type, therefore size is not set properly and might cause
+> crash/disconnection.
+>=20
+> ---
+>  obexd/plugins/ftp.c | 5 +++++
+>  obexd/plugins/opp.c | 5 +++++
+>  obexd/src/obex.c    | 3 ---
+>  3 files changed, 10 insertions(+), 3 deletions(-)
+>=20
+> diff --git a/obexd/plugins/ftp.c b/obexd/plugins/ftp.c
+> index 874fe2b8b..127bb9aaf 100644
+> --- a/obexd/plugins/ftp.c
+> +++ b/obexd/plugins/ftp.c
+> @@ -175,6 +175,11 @@ int ftp_chkput(struct obex_session *os, void *user_d=
+ata)
+> =20
+>  	ret =3D obex_put_stream_start(os, path);
+> =20
+> +	if (obex_get_size(os) !=3D OBJECT_SIZE_DELETE &&
+> +				obex_get_size(os) !=3D OBJECT_SIZE_UNKNOWN) {
+> +		manager_emit_transfer_property(ftp->transfer, "Size");
+> +	}
 
-recent_errors
-|-- arm64-randconfig-051-20240723
-|   |-- arch-arm64-boot-dts-qcom-sm8650-qrd.dtb:bluetooth:vddrfa1p8-supply-is-a-required-property
-|   |-- arch-arm64-boot-dts-qcom-sm8650-qrd.dtb:bluetooth:vddrfacmn-supply-is-a-required-property
-|   |-- arch-arm64-boot-dts-qcom-sm8650-qrd.dtb:bluetooth:vddwlcx-supply-is-a-required-property
-|   `-- arch-arm64-boot-dts-qcom-sm8650-qrd.dtb:bluetooth:vddwlmx-supply-is-a-required-property
-`-- sparc-randconfig-001-20240723
-    |-- (.head.text):relocation-truncated-to-fit:R_SPARC_WDISP22-against-init.text
-    `-- (.init.text):relocation-truncated-to-fit:R_SPARC_WDISP22-against-symbol-leon_smp_cpu_startup-defined-in-.text-section-in-arch-sparc-kernel-trampoline_32.o
+This probably should check ret =3D=3D 0, to be exactly equivalent to what
+it was before.
 
-elapsed time: 1377m
+> +
+>  	if (ret =3D=3D 0)
+>  		manager_emit_transfer_started(ftp->transfer);
+> =20
+> diff --git a/obexd/plugins/opp.c b/obexd/plugins/opp.c
+> index 777f5f8ed..74b2f805b 100644
+> --- a/obexd/plugins/opp.c
+> +++ b/obexd/plugins/opp.c
+> @@ -87,6 +87,11 @@ skip_auth:
+> =20
+>  	err =3D obex_put_stream_start(os, path);
+> =20
+> +	if (obex_get_size(os) !=3D OBJECT_SIZE_DELETE &&
+> +				obex_get_size(os) !=3D OBJECT_SIZE_UNKNOWN) {
+> +		manager_emit_transfer_property(user_data, "Size");
+> +	}
+> +
 
-configs tested: 286
-configs skipped: 8
+Similarly err =3D=3D 0 here.
 
-tested configs:
-alpha                             allnoconfig   gcc-13.2.0
-alpha                             allnoconfig   gcc-13.3.0
-alpha                            allyesconfig   gcc-13.3.0
-alpha                               defconfig   gcc-13.2.0
-alpha                               defconfig   gcc-13.3.0
-arc                              allmodconfig   gcc-13.2.0
-arc                               allnoconfig   gcc-13.2.0
-arc                              allyesconfig   gcc-13.2.0
-arc                          axs101_defconfig   gcc-13.2.0
-arc                                 defconfig   gcc-13.2.0
-arc                   randconfig-001-20240723   gcc-13.2.0
-arc                   randconfig-002-20240723   gcc-13.2.0
-arc                        vdk_hs38_defconfig   gcc-13.2.0
-arm                              allmodconfig   gcc-13.2.0
-arm                              allmodconfig   gcc-14.1.0
-arm                               allnoconfig   clang-19
-arm                               allnoconfig   gcc-13.2.0
-arm                              allyesconfig   gcc-13.2.0
-arm                              allyesconfig   gcc-14.1.0
-arm                         axm55xx_defconfig   clang-19
-arm                          collie_defconfig   gcc-13.2.0
-arm                                 defconfig   clang-14
-arm                                 defconfig   gcc-13.2.0
-arm                         lpc32xx_defconfig   gcc-13.2.0
-arm                            mmp2_defconfig   gcc-14.1.0
-arm                          moxart_defconfig   gcc-13.2.0
-arm                        neponset_defconfig   gcc-13.2.0
-arm                        neponset_defconfig   gcc-14.1.0
-arm                       omap2plus_defconfig   gcc-13.2.0
-arm                   randconfig-001-20240723   gcc-13.2.0
-arm                   randconfig-001-20240723   gcc-14.1.0
-arm                   randconfig-002-20240723   gcc-13.2.0
-arm                   randconfig-002-20240723   gcc-14.1.0
-arm                   randconfig-003-20240723   gcc-13.2.0
-arm                   randconfig-003-20240723   gcc-14.1.0
-arm                   randconfig-004-20240723   clang-19
-arm                   randconfig-004-20240723   gcc-13.2.0
-arm                          sp7021_defconfig   gcc-13.2.0
-arm                        vexpress_defconfig   gcc-13.2.0
-arm64                            alldefconfig   gcc-13.2.0
-arm64                            allmodconfig   clang-19
-arm64                            allmodconfig   gcc-13.2.0
-arm64                             allnoconfig   gcc-13.2.0
-arm64                             allnoconfig   gcc-14.1.0
-arm64                               defconfig   gcc-13.2.0
-arm64                               defconfig   gcc-14.1.0
-arm64                 randconfig-001-20240723   gcc-13.2.0
-arm64                 randconfig-001-20240723   gcc-14.1.0
-arm64                 randconfig-002-20240723   gcc-13.2.0
-arm64                 randconfig-002-20240723   gcc-14.1.0
-arm64                 randconfig-003-20240723   clang-19
-arm64                 randconfig-003-20240723   gcc-13.2.0
-arm64                 randconfig-004-20240723   clang-16
-arm64                 randconfig-004-20240723   gcc-13.2.0
-csky                              allnoconfig   gcc-13.2.0
-csky                              allnoconfig   gcc-14.1.0
-csky                                defconfig   gcc-13.2.0
-csky                                defconfig   gcc-14.1.0
-csky                  randconfig-001-20240723   gcc-13.2.0
-csky                  randconfig-001-20240723   gcc-14.1.0
-csky                  randconfig-002-20240723   gcc-13.2.0
-csky                  randconfig-002-20240723   gcc-14.1.0
-hexagon                          allmodconfig   clang-19
-hexagon                           allnoconfig   clang-19
-hexagon                          allyesconfig   clang-19
-hexagon                             defconfig   clang-19
-hexagon               randconfig-001-20240723   clang-19
-hexagon               randconfig-002-20240723   clang-19
-i386                             allmodconfig   clang-18
-i386                             allmodconfig   gcc-13
-i386                              allnoconfig   clang-18
-i386                              allnoconfig   gcc-13
-i386                             allyesconfig   clang-18
-i386                             allyesconfig   gcc-13
-i386         buildonly-randconfig-001-20240723   gcc-8
-i386         buildonly-randconfig-002-20240723   gcc-8
-i386         buildonly-randconfig-003-20240723   gcc-13
-i386         buildonly-randconfig-003-20240723   gcc-8
-i386         buildonly-randconfig-004-20240723   gcc-12
-i386         buildonly-randconfig-004-20240723   gcc-8
-i386         buildonly-randconfig-005-20240723   clang-18
-i386         buildonly-randconfig-005-20240723   gcc-8
-i386         buildonly-randconfig-006-20240723   clang-18
-i386         buildonly-randconfig-006-20240723   gcc-8
-i386                                defconfig   clang-18
-i386                  randconfig-001-20240723   clang-18
-i386                  randconfig-001-20240723   gcc-8
-i386                  randconfig-002-20240723   gcc-12
-i386                  randconfig-002-20240723   gcc-8
-i386                  randconfig-003-20240723   gcc-13
-i386                  randconfig-003-20240723   gcc-8
-i386                  randconfig-004-20240723   gcc-10
-i386                  randconfig-004-20240723   gcc-8
-i386                  randconfig-005-20240723   gcc-13
-i386                  randconfig-005-20240723   gcc-8
-i386                  randconfig-006-20240723   gcc-13
-i386                  randconfig-006-20240723   gcc-8
-i386                  randconfig-011-20240723   gcc-11
-i386                  randconfig-011-20240723   gcc-8
-i386                  randconfig-012-20240723   clang-18
-i386                  randconfig-012-20240723   gcc-8
-i386                  randconfig-013-20240723   clang-18
-i386                  randconfig-013-20240723   gcc-8
-i386                  randconfig-014-20240723   gcc-7
-i386                  randconfig-014-20240723   gcc-8
-i386                  randconfig-015-20240723   gcc-13
-i386                  randconfig-015-20240723   gcc-8
-i386                  randconfig-016-20240723   clang-18
-i386                  randconfig-016-20240723   gcc-8
-loongarch                        allmodconfig   gcc-14.1.0
-loongarch                         allnoconfig   gcc-13.2.0
-loongarch                         allnoconfig   gcc-14.1.0
-loongarch                           defconfig   gcc-13.2.0
-loongarch                           defconfig   gcc-14.1.0
-loongarch                 loongson3_defconfig   gcc-13.2.0
-loongarch             randconfig-001-20240723   gcc-13.2.0
-loongarch             randconfig-001-20240723   gcc-14.1.0
-loongarch             randconfig-002-20240723   gcc-13.2.0
-loongarch             randconfig-002-20240723   gcc-14.1.0
-m68k                             allmodconfig   gcc-14.1.0
-m68k                              allnoconfig   gcc-13.2.0
-m68k                              allnoconfig   gcc-14.1.0
-m68k                             allyesconfig   gcc-14.1.0
-m68k                          atari_defconfig   gcc-13.2.0
-m68k                                defconfig   gcc-13.2.0
-m68k                                defconfig   gcc-14.1.0
-m68k                       m5475evb_defconfig   gcc-13.2.0
-m68k                            mac_defconfig   gcc-13.2.0
-m68k                        mvme147_defconfig   gcc-13.2.0
-microblaze                       allmodconfig   gcc-14.1.0
-microblaze                        allnoconfig   gcc-13.2.0
-microblaze                        allnoconfig   gcc-14.1.0
-microblaze                       allyesconfig   gcc-14.1.0
-microblaze                          defconfig   gcc-13.2.0
-microblaze                          defconfig   gcc-14.1.0
-microblaze                      mmu_defconfig   gcc-14.1.0
-mips                              allnoconfig   gcc-13.2.0
-mips                              allnoconfig   gcc-14.1.0
-mips                     cu1000-neo_defconfig   gcc-13.2.0
-mips                            gpr_defconfig   clang-19
-mips                           ip28_defconfig   gcc-13.2.0
-mips                     loongson1c_defconfig   gcc-13.2.0
-mips                      maltaaprp_defconfig   clang-14
-mips                        maltaup_defconfig   gcc-13.2.0
-mips                      pic32mzda_defconfig   gcc-13.2.0
-mips                          rb532_defconfig   clang-19
-mips                   sb1250_swarm_defconfig   gcc-14.1.0
-nios2                             allnoconfig   gcc-13.2.0
-nios2                             allnoconfig   gcc-14.1.0
-nios2                               defconfig   gcc-13.2.0
-nios2                               defconfig   gcc-14.1.0
-nios2                 randconfig-001-20240723   gcc-13.2.0
-nios2                 randconfig-001-20240723   gcc-14.1.0
-nios2                 randconfig-002-20240723   gcc-13.2.0
-nios2                 randconfig-002-20240723   gcc-14.1.0
-openrisc                          allnoconfig   gcc-14.1.0
-openrisc                         allyesconfig   gcc-14.1.0
-openrisc                            defconfig   gcc-14.1.0
-parisc                           allmodconfig   gcc-14.1.0
-parisc                            allnoconfig   gcc-14.1.0
-parisc                           allyesconfig   gcc-14.1.0
-parisc                              defconfig   gcc-14.1.0
-parisc                randconfig-001-20240723   gcc-13.2.0
-parisc                randconfig-001-20240723   gcc-14.1.0
-parisc                randconfig-002-20240723   gcc-13.2.0
-parisc                randconfig-002-20240723   gcc-14.1.0
-parisc64                            defconfig   gcc-13.2.0
-parisc64                            defconfig   gcc-14.1.0
-powerpc                          allmodconfig   gcc-14.1.0
-powerpc                           allnoconfig   gcc-14.1.0
-powerpc                          allyesconfig   clang-19
-powerpc                          allyesconfig   gcc-14.1.0
-powerpc                      ep88xc_defconfig   gcc-13.2.0
-powerpc                    ge_imp3a_defconfig   gcc-13.2.0
-powerpc                 mpc8313_rdb_defconfig   gcc-13.2.0
-powerpc                 mpc836x_rdk_defconfig   gcc-13.2.0
-powerpc                 mpc837x_rdb_defconfig   gcc-13.2.0
-powerpc                       ppc64_defconfig   clang-19
-powerpc               randconfig-001-20240723   gcc-13.2.0
-powerpc               randconfig-001-20240723   gcc-14.1.0
-powerpc               randconfig-002-20240723   gcc-13.2.0
-powerpc               randconfig-002-20240723   gcc-14.1.0
-powerpc               randconfig-003-20240723   gcc-13.2.0
-powerpc               randconfig-003-20240723   gcc-14.1.0
-powerpc                     taishan_defconfig   clang-19
-powerpc                     taishan_defconfig   gcc-13.2.0
-powerpc                     tqm5200_defconfig   gcc-14.1.0
-powerpc64             randconfig-001-20240723   gcc-13.2.0
-powerpc64             randconfig-001-20240723   gcc-14.1.0
-powerpc64             randconfig-002-20240723   gcc-13.2.0
-powerpc64             randconfig-002-20240723   gcc-14.1.0
-powerpc64             randconfig-003-20240723   clang-14
-powerpc64             randconfig-003-20240723   gcc-13.2.0
-riscv                            allmodconfig   clang-19
-riscv                            allmodconfig   gcc-14.1.0
-riscv                             allnoconfig   gcc-14.1.0
-riscv                            allyesconfig   clang-19
-riscv                            allyesconfig   gcc-14.1.0
-riscv                               defconfig   gcc-14.1.0
-riscv                    nommu_virt_defconfig   clang-19
-riscv                 randconfig-001-20240723   gcc-13.2.0
-riscv                 randconfig-001-20240723   gcc-14.1.0
-riscv                 randconfig-002-20240723   clang-17
-riscv                 randconfig-002-20240723   gcc-13.2.0
-s390                             allmodconfig   clang-19
-s390                              allnoconfig   clang-19
-s390                              allnoconfig   gcc-14.1.0
-s390                             allyesconfig   clang-19
-s390                             allyesconfig   gcc-14.1.0
-s390                                defconfig   gcc-14.1.0
-s390                  randconfig-001-20240723   clang-19
-s390                  randconfig-001-20240723   gcc-13.2.0
-s390                  randconfig-002-20240723   clang-19
-s390                  randconfig-002-20240723   gcc-13.2.0
-sh                               allmodconfig   gcc-14.1.0
-sh                                allnoconfig   gcc-13.2.0
-sh                                allnoconfig   gcc-14.1.0
-sh                               allyesconfig   gcc-14.1.0
-sh                         ap325rxa_defconfig   gcc-13.2.0
-sh                                  defconfig   gcc-14.1.0
-sh                    randconfig-001-20240723   gcc-13.2.0
-sh                    randconfig-001-20240723   gcc-14.1.0
-sh                    randconfig-002-20240723   gcc-13.2.0
-sh                    randconfig-002-20240723   gcc-14.1.0
-sh                           se7724_defconfig   gcc-13.2.0
-sh                           se7751_defconfig   gcc-13.2.0
-sh                            shmin_defconfig   gcc-13.2.0
-sh                             shx3_defconfig   gcc-13.2.0
-sh                          urquell_defconfig   gcc-14.1.0
-sparc                            allmodconfig   gcc-14.1.0
-sparc                       sparc32_defconfig   gcc-13.2.0
-sparc64                             defconfig   gcc-14.1.0
-sparc64               randconfig-001-20240723   gcc-13.2.0
-sparc64               randconfig-001-20240723   gcc-14.1.0
-sparc64               randconfig-002-20240723   gcc-13.2.0
-sparc64               randconfig-002-20240723   gcc-14.1.0
-um                               allmodconfig   clang-19
-um                               allmodconfig   gcc-13.3.0
-um                                allnoconfig   clang-17
-um                                allnoconfig   gcc-14.1.0
-um                               allyesconfig   gcc-13
-um                               allyesconfig   gcc-13.3.0
-um                                  defconfig   gcc-14.1.0
-um                             i386_defconfig   gcc-14.1.0
-um                    randconfig-001-20240723   gcc-10
-um                    randconfig-001-20240723   gcc-13.2.0
-um                    randconfig-002-20240723   gcc-13.2.0
-um                    randconfig-002-20240723   gcc-8
-um                           x86_64_defconfig   clang-15
-um                           x86_64_defconfig   gcc-14.1.0
-x86_64                            allnoconfig   clang-18
-x86_64                           allyesconfig   clang-18
-x86_64       buildonly-randconfig-001-20240723   gcc-10
-x86_64       buildonly-randconfig-002-20240723   gcc-10
-x86_64       buildonly-randconfig-003-20240723   gcc-10
-x86_64       buildonly-randconfig-004-20240723   gcc-10
-x86_64       buildonly-randconfig-005-20240723   gcc-10
-x86_64       buildonly-randconfig-006-20240723   gcc-10
-x86_64                              defconfig   clang-18
-x86_64                              defconfig   gcc-13
-x86_64                randconfig-001-20240723   gcc-10
-x86_64                randconfig-002-20240723   gcc-10
-x86_64                randconfig-003-20240723   gcc-10
-x86_64                randconfig-004-20240723   gcc-10
-x86_64                randconfig-005-20240723   gcc-10
-x86_64                randconfig-006-20240723   gcc-10
-x86_64                randconfig-011-20240723   gcc-10
-x86_64                randconfig-012-20240723   gcc-10
-x86_64                randconfig-013-20240723   gcc-10
-x86_64                randconfig-014-20240723   gcc-10
-x86_64                randconfig-015-20240723   gcc-10
-x86_64                randconfig-016-20240723   gcc-10
-x86_64                randconfig-071-20240723   gcc-10
-x86_64                randconfig-072-20240723   gcc-10
-x86_64                randconfig-073-20240723   gcc-10
-x86_64                randconfig-074-20240723   gcc-10
-x86_64                randconfig-075-20240723   gcc-10
-x86_64                randconfig-076-20240723   gcc-10
-x86_64                          rhel-8.3-rust   clang-18
-xtensa                            allnoconfig   gcc-13.2.0
-xtensa                            allnoconfig   gcc-14.1.0
-xtensa                randconfig-001-20240723   gcc-13.2.0
-xtensa                randconfig-001-20240723   gcc-14.1.0
-xtensa                randconfig-002-20240723   gcc-13.2.0
-xtensa                randconfig-002-20240723   gcc-14.1.0
-xtensa                         virt_defconfig   gcc-13.2.0
+Based on looking at the code looks otherwise OK, but haven't tested
+this myself in practice.
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+>  	g_free(path);
+> =20
+>  	if (err < 0)
+> diff --git a/obexd/src/obex.c b/obexd/src/obex.c
+> index 98d6245a4..370bfac9e 100644
+> --- a/obexd/src/obex.c
+> +++ b/obexd/src/obex.c
+> @@ -716,9 +716,6 @@ int obex_put_stream_start(struct obex_session *os, co=
+nst char *filename)
+>  		return err;
+>  	}
+> =20
+> -	if (os->size !=3D OBJECT_SIZE_DELETE && os->size !=3D OBJECT_SIZE_UNKNO=
+WN)
+> -		manager_emit_transfer_property(os->service_data, "Size");
+> -
+>  	os->path =3D g_strdup(filename);
+> =20
+>  	return 0;
+
+--=20
+Pauli Virtanen
