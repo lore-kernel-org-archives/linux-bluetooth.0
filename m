@@ -1,134 +1,134 @@
-Received: from mail-yw1-f175.google.com (mail-yw1-f175.google.com [209.85.128.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98E7213B5B9
-	for <linux-bluetooth@vger.kernel.org>; Tue, 23 Jul 2024 10:09:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A8BB13B2B6
+	for <linux-bluetooth@vger.kernel.org>; Tue, 23 Jul 2024 10:40:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721729354; cv=none; b=IdioKq0hXCnLOag4bH1xeRc6nDsyDGDWYMgXFaO7RhhT/TyzUJr4oFbLtl5SPWVXLnH1aEvJrhirU8No8U656MQ63Nxp5Vk8lrheIKvFPfmPAq0DoHLXRQRSua5vzPlZSqcogWjCL3GpGmkIdpWaSkfEuGYJuq85WgdsRx7iDZ8=
+	t=1721731214; cv=none; b=bqRb6I8DG/4iqQvIpP8pQ0O0sSufep5nagIktoS6ani2kBjEnW99o8+HwWhIV3XTCMcTvZ2PqbhxVXaH+WvtME3BkdnsXYlY4AGtweviTiNR1Ol30dTBnwLB/i/GFW7pAN3oqxx2y/jii/vZkvC0FdbKr6UqgdW0mEwpMMBYfxs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721729354; c=relaxed/simple;
-	bh=SDZ4lYx6syPCN9g42AHy1mZ1L8hz3JdQKGG4hMenY5c=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=r2ekWT9N8wAFVJ7kuaxqmI7z2bJoT45EQ+QiFCAVgFkgE/KxC8JRhnWuNBmBU/va1PnCARd4dh9YRLYSVj+X8w4fekaDGh0rxKBqrmDek4Uh0abXlmZB9yaQNsBdWVvXl2etA4v4DH5IzKzmoWiydNng32Mdc09nn6ORZN0LB9Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eIza4S4z; arc=none smtp.client-ip=209.85.128.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eIza4S4z"
-Received: by mail-yw1-f175.google.com with SMTP id 00721157ae682-664ccd158b0so52753757b3.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 23 Jul 2024 03:09:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1721729351; x=1722334151; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=x3sWm5xPoPPPxE7gRPUDMUJ3NscDJ2yTZPd8XPnbvBo=;
-        b=eIza4S4zdI7i9qq9INSD34tB+ZTSGvLAIhC87J6f32WGoIFgbKw37gnFN5KqOlVF/7
-         7iv9vYX9/gpdmIp3w+iQjB3Hr2/ou161ad5udCSp2FpvidL0TCwjT3mXmEYWxGMovz7O
-         50dEAGDOQv0GA4CEDjRBHCrUjH9zxIpr3wApD6De08IwYFPzoTbEJ8LzfDNUsEKmOXLM
-         1ah0BPOl5L5cdduGwA9ECqbUea7zUaGr3jCsf1BQMEsCi1JVoFvwrhLVT7sQjXCK7Qob
-         Cp3WudfDIhzPT2OZzk7hKe9vVE8b1ESCeTnBPVtbbwwJlsVdAI2njhBRuTrTrTYduSI8
-         qfYw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721729351; x=1722334151;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=x3sWm5xPoPPPxE7gRPUDMUJ3NscDJ2yTZPd8XPnbvBo=;
-        b=GC7aWdPrmdNXDs1ZiiVZ3+ygQMBV4XHzps+DA++AQTioKDsOOI1Yl6A/H57cLPhn8S
-         UlByJPNonQuVnHOuwoSNiwe9oJ2wCp3RKFbIDQ0PCmVeBbsR1FoBugpJA75tswRy4rpi
-         Hdm9hhHSGdjrS0YJMU3/PSZv73CJitAm4Sch5coMJsyywR3fSA5sAliqVte+D34AnBI5
-         ejJTkqMb3geFX8fb7MJdhL0DaMcehX/0j+pY4MOMsT3Kl0HDfMWhHV5BKwpSiN1dtOa2
-         RXwGUA0U8w0tuwd5wkpiAO8ie97xaMh7vlfZQPC7pJuULbtqoRKDSWrtp4qMwYce98B0
-         JMfA==
-X-Gm-Message-State: AOJu0Yx43MRE28t2utOrWYjJXDjt/lmRcZX+GSIGtKIxECHAhc6aevQG
-	VtHoz9D7+sfDf1o2n1JOUq/z6iuBp19Z4n45PpJPoVBFaUhH77xwt8ecug==
-X-Google-Smtp-Source: AGHT+IHS9lFHpNIRCXRfnrYaqbnQ4G8nVJQCvdy11ajsjfZjHVdPYZksOiQY8iyCFG5ezLB6HThf3A==
-X-Received: by 2002:a81:b048:0:b0:62a:2a7d:b512 with SMTP id 00721157ae682-66e4bdbd3c5mr28212677b3.10.1721729351529;
-        Tue, 23 Jul 2024 03:09:11 -0700 (PDT)
-Received: from [172.17.0.2] ([172.183.51.71])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-669540bf1d3sm19576297b3.131.2024.07.23.03.09.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 23 Jul 2024 03:09:11 -0700 (PDT)
-Message-ID: <669f8147.050a0220.a1f4b.8496@mx.google.com>
-Date: Tue, 23 Jul 2024 03:09:11 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============8446033070275257311=="
+	s=arc-20240116; t=1721731214; c=relaxed/simple;
+	bh=FhAKlwl7ytdL+2ZuktS/lWlN1t+0MIpregn5n+U+2RI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=AEiwhaJ3oj675Tpl2pmgtTt2mb3v4++R5pCU0LYWcpSxl05eKD5jNBxCCtjszDd4lU56hz7RGlGvL47flbJqJFWcRP/xbu4buDj0fz/SgAp4rGmII3FrT3fROWYMH6/TeOPa0v5Z+vJupHMNe/oxaszZkwbA7iUw+pUUoGujPY8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
+Received: from [141.14.220.45] (g45.guest.molgen.mpg.de [141.14.220.45])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 910B061E5FE01;
+	Tue, 23 Jul 2024 12:40:02 +0200 (CEST)
+Message-ID: <7c427210-24ad-4769-9c11-aaebe9656cec@molgen.mpg.de>
+Date: Tue, 23 Jul 2024 12:40:02 +0200
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, yanceychiew@gmail.com
-Subject: RE: Fix com.bluez.battery1 randomly missing percentage value
-In-Reply-To: <20240723082843.184915-2-YanceyChiew@gmail.com>
-References: <20240723082843.184915-2-YanceyChiew@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
-
---===============8446033070275257311==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] build: obexd: Add system bus support for obexd
+To: quic_dgangire@quicinc.com
+Cc: quic_mohamull@quicinc.com, quic_hbandi@quicinc.com,
+ quic_anubhavg@quicinc.com, linux-bluetooth@vger.kernel.org
+References: <20240723075455.2934376-1-quic_dgangire@quicinc.com>
+Content-Language: en-US
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <20240723075455.2934376-1-quic_dgangire@quicinc.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=873169
-
----Test result---
-
-Test Summary:
-CheckPatch                    FAIL      0.61 seconds
-GitLint                       PASS      0.28 seconds
-BuildEll                      PASS      25.05 seconds
-BluezMake                     PASS      1740.67 seconds
-MakeCheck                     PASS      13.20 seconds
-MakeDistcheck                 PASS      183.61 seconds
-CheckValgrind                 PASS      257.26 seconds
-CheckSmatch                   PASS      359.91 seconds
-bluezmakeextell               PASS      123.45 seconds
-IncrementalBuild              PASS      1527.84 seconds
-ScanBuild                     PASS      1070.18 seconds
-
-Details
-##############################
-Test: CheckPatch - FAIL
-Desc: Run checkpatch.pl script
-Output:
-[BlueZ,1/1] profiles/battery: Fix batt random lose percentage
-ERROR:TRAILING_WHITESPACE: trailing whitespace
-#118: FILE: profiles/battery/battery.c:97:
-+^I$
-
-ERROR:TRAILING_WHITESPACE: trailing whitespace
-#123: FILE: profiles/battery/battery.c:102:
-+^I$
-
-/github/workspace/src/src/13739703.patch total: 2 errors, 0 warnings, 19 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-NOTE: Whitespace errors detected.
-      You may wish to use scripts/cleanpatch or scripts/cleanfile
-
-/github/workspace/src/src/13739703.patch has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+Dear Damodar,
 
 
+Thank you for your patch.
+
+Am 23.07.24 um 09:54 schrieb quic_dgangire@quicinc.com:
+> From: Damodar Reddy GangiReddy <quic_dgangire@quicinc.com>
+
+Is your last named spelled in camel case?
+
+> Currently obexd uses session bus.
+> Distros  where session bus is not supported and still obex profiles
+> are required in that case use system bus instead of session bus
+> which can be configured with new optional feature
+> 
+> Additional optional feature has been added to achieve this
+> with name --enable-use-systembus-for-obexd
+> 
+> steps to configure system bus
+> ./configure --enable-use-systembus-for-obexd
+> 
+> If this optional option is approved  will add other patches
+> on how to use system bus based on this option
+
+This paragraph does not belong into the commit message.
+
+> ---
+>   Makefile.obexd | 14 ++++++++++++++
+>   configure.ac   |  9 +++++++++
+>   2 files changed, 23 insertions(+)
+> 
+> diff --git a/Makefile.obexd b/Makefile.obexd
+> index b7e9f2d33..87432cc37 100644
+> --- a/Makefile.obexd
+> +++ b/Makefile.obexd
+> @@ -2,6 +2,19 @@
+>   if OBEX
+>   
+>   if SYSTEMD
+> +
+> +if USE_SYSTEMBUS_FOR_OBEXD
+> +
+> +systemdsystemunit_DATA += obexd/src/obex.service
+> +dbussystembus_DATA += obexd/src/org.bluez.obex.service
+> +
+> +obexd-add-service-symlink:
+> +	$(LN_S) -f obex.service $(DESTDIR)$(SYSTEMD_SYSTEMUNITDIR)/dbus-org.bluez.obex.service
+> +
+> +obexd-remove-service-symlink:
+> +	rm -f $(DESTDIR)$(SYSTEMD_SYSTEMUNITDIR)/dbus-org.bluez.obex.service
+> +else
+> +
+>   systemduserunitdir = $(SYSTEMD_USERUNITDIR)
+>   systemduserunit_DATA = obexd/src/obex.service
+>   
+> @@ -13,6 +26,7 @@ obexd-add-service-symlink:
+>   
+>   obexd-remove-service-symlink:
+>   	rm -f $(DESTDIR)$(SYSTEMD_USERUNITDIR)/dbus-org.bluez.obex.service
+> +endif
+>   else
+>   obexd-add-service-symlink:
+>   obexd-remove-service-symlink:
+> diff --git a/configure.ac b/configure.ac
+> index d31eb1656..cc9a55f4c 100644
+> --- a/configure.ac
+> +++ b/configure.ac
+> @@ -283,6 +283,15 @@ if (test "${enable_obex}" != "no"); then
+>   fi
+>   AM_CONDITIONAL(OBEX, test "${enable_obex}" != "no")
+>   
+> +AC_ARG_ENABLE(use-systembus-for-obexd, AS_HELP_STRING([--enable-use-systembus-for-obexd],
+> +		[enable systembus for obexd]), [enable_use_systembus_for_obexd=${enableval}])
+> +AM_CONDITIONAL(USE_SYSTEMBUS_FOR_OBEXD, test "${enable_use_systembus_for_obexd}" = "yes")
+> +if (test "${enable_use_systembus_for_obexd}" = "yes"); then
+> +	AC_DEFINE(USE_SYSTEMBUS_FOR_OBEXD, 1, [Define to 1 if you want to use system bus for obexd.])
+> +else
+> +	AC_DEFINE(USE_SYSTEMBUS_FOR_OBEXD, 0, [Define to 0 if you want to use session bus for obexd.])
+> +fi
+> +
+>   AC_ARG_ENABLE(btpclient, AS_HELP_STRING([--enable-btpclient],
+>   		[enable BTP client]), [enable_btpclient=${enableval}])
+>   AM_CONDITIONAL(BTPCLIENT, test "${enable_btpclient}" = "yes")
+
+It would be nice to see the whole picture. Is it just for creating and 
+placing the systemd units in the right place?
 
 
----
-Regards,
-Linux Bluetooth
+Kind regards,
 
-
---===============8446033070275257311==--
+Paul
