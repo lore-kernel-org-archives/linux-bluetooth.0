@@ -1,111 +1,132 @@
-Received: from mail-io1-f70.google.com (mail-io1-f70.google.com [209.85.166.70])
+Received: from mail-io1-f72.google.com (mail-io1-f72.google.com [209.85.166.72])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 375A7158211
-	for <linux-bluetooth@vger.kernel.org>; Wed, 24 Jul 2024 13:18:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.70
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 989FB158D7F
+	for <linux-bluetooth@vger.kernel.org>; Wed, 24 Jul 2024 13:25:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721827103; cv=none; b=KJ1CnoSm3K4/Zm8wLoebJkAqODOOp3t0SGr8h9CALSj2Q9Ai2OCqhB8h25RX5ddBKkWMelWBfIFtMEnwWrL7WbUFgravw645YLHkxXBR7BUfzO2AGRj/LchI3TX0VLHotITVwTQYaYC4zM8GySWs01zzzj6kCqnigaspC0fGd2w=
+	t=1721827524; cv=none; b=l1m5VoGLWFIRd83H9YZj01q1b6KGCino1fWHQ2ykcDSTLFhOQbYiBgKAd/5YmyAASTP4pVn8IS1nJqI8HhCMYpL4KkJvtsnR3SImG9yrNcGa9oKwPL6clZnR/CWMTEEFZuPxKXitCVtT0KWQi1om0x6KHuf09XB9BOzAuLDNc/o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721827103; c=relaxed/simple;
-	bh=F/KOJ3mKSfeOCZQbhXBJmwffOQkcBP+ECPPdb7BJJ7o=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=Uq13Slb1Bi6ErEff4HyufNQBGoTXLRk77wr9H1gKu3FfDxKP8PIkCsAO//xF5gsF/PHTRxJ+XiGBow+cniz6pUIc/081WFzHxOZ/BRVDG+RlHsl4AbNyLL+Ojlqg+LF96UhmVkMLgKRy5jm9Twge9VdbtZ8FjrmCJ78h8VHONE8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.70
+	s=arc-20240116; t=1721827524; c=relaxed/simple;
+	bh=226Pu+LdubcWGNuYRcAyscL3L7yuYh9PPJchhM8cxHY=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=j17PK///ZQvRz/jn/Xnlsr4Z+R7NP/m704dz57E9O7AuDPg37OfHtWBZT/yVWYV1YHJkof/n1D7tDA0dcJiMH/A/K8vaD1ses5mjD3TM5a+2NvY6GtkvG4YP2vFI5YUdVNIHtsDKBJqk56jGsuOB0eZkKUE4/DeFE5NbQKU2CL4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.72
 Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-8152f0c63c4so104334839f.0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 24 Jul 2024 06:18:22 -0700 (PDT)
+Received: by mail-io1-f72.google.com with SMTP id ca18e2360f4ac-807b123d985so1249346539f.0
+        for <linux-bluetooth@vger.kernel.org>; Wed, 24 Jul 2024 06:25:22 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721827101; x=1722431901;
+        d=1e100.net; s=20230601; t=1721827522; x=1722432322;
         h=to:from:subject:message-id:date:mime-version:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=Y9OLYAO0oAZgU3ZQkkdEML/gOHWNdnZu6zW9bwNbKa8=;
-        b=JWOrjaw7cr5oavO4JLr8SOwBfj+jHs5vVdzP3eOjL8G4fbmSwXEtTg8153WF1f89pe
-         3d8mZfYQyPLPFEIgAmic1Fb1gRZjLGYjZZ6CAQw5smVqv8pKbrvnhoQubQgODqDMQxSJ
-         xG4bEzeTbZavs3sMzvDY5tN6ygZi/qFotc5ro1AeCRHVHilPYnUiS/akkSKMJA1sa5Al
-         hsOwMupzydEhCdUVud4AxtqtibTmSqc+BZds/TV4cmjP1fRUDbQDmm21+8h0u3OL9M9i
-         67svLhW2XUFy+DH/ucZI2GVWvOE55FoGJuKPz5QsHx1mFb/8D/LJBztIbUVFLzfpZlI0
-         WZLw==
-X-Forwarded-Encrypted: i=1; AJvYcCWPPOC04Rf2W4kY9Z03PDgYCsw2WW0XAl9kOZR2quC44dMbXdn3/D5DUy5LlakTNcxq0blkE+gb4ydokbJPqD35Jj5sd84S7+hQ8q+PeQyC
-X-Gm-Message-State: AOJu0YyxXdtyizdoxSajoaJUJ3WUq1+7STAERBMHXCDV+8V4C/b1dn2r
-	5SIFo1nPepIZk0EvHWEGx6VmgyxRFcot5/hZmwuN6Nz8mxCNhPbxX2SO6KodNdOIsT4Zdt/CdQs
-	W2Ru3f+n1DpLXsWZP7KFezIP14jKaffynATdIFBqTkQTeCDXGR7ZrCx4=
-X-Google-Smtp-Source: AGHT+IEFttKXpBqlDhq5Hg2s0McqaO3xxn3g7bNmAxNEOOv9JvpkhmiGNGjT1kexde9AqgilxHa1uj7D/vapJukx9BLM6aO38W/q
+        bh=8aJyBqmGjbh6hqusD0fxX8YC/ZQTHXXXfgBMyi26+uw=;
+        b=kCYM9lL/0OZ2Q0HzQVmayS0m7Xy0Hlr5bHZvclyQA8zMTwQ1kHYh57ckYHwz27dZd1
+         Dppid4zfbUr5fwdZB+w5j5JN3jKUzZlq1Rymp1VpAQbkPWyG93FjwxfiAGRHrlvJc0CE
+         pn7APCkpvAM4vm6QJaiLU8V/TVreb0mnvKB38/AoFSY1T/V/pSmUJQ1N34ZIX7PCRQeF
+         G9q/XqIOcLMnvFk1M2s5UcsJfX1vdTFQtz1oAvTb4YYotpaAjdBBgsJ/4b8PB0ipoYwC
+         eyMqdUwmXuK+Rfqu8uLNaDKr9L7YPmC/Z4/NiN97oFs4K+qr6cfL9e2zfEEC+bXSjHY8
+         X2JQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWlsjQQYDL4yk1hPDlAgfRu7AdqHb8oANd8K7DNJu+fZ9WsgPPizRQX+aIEKKEz+OkldfDM+8DiS7yb5bltapbQloWvgGi9I1gYDTXr/BFt
+X-Gm-Message-State: AOJu0Yx3uzAhjJgA4jgbPz7AXLzQ30jPbI+VAT/qGL6GvxiafUT3P74q
+	W+riGcXSU5escacN4Aa/RqsqjpjhG8DZ8xxkToPrP9bYOs8i3F5vkzCnFrn6/3uD4N0aCnzSEVl
+	ju4Z8g2Lr4PPK1cMlWzjJRCBT3ILOTamTd6tHx/wMfER2eYTPkXoeoo4=
+X-Google-Smtp-Source: AGHT+IHVJhxFIMXgDWD/IqpwHOvjeHvWzcgPZ0uFKP2cpcs8NmjpajBKF/ecqh+NCT7tZMr96gr7t/YTYLhmeLal46Y2EtiEWReo
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6638:8625:b0:4b9:ad94:2074 with SMTP id
- 8926c6da1cb9f-4c28fd69265mr94135173.3.1721827101371; Wed, 24 Jul 2024
- 06:18:21 -0700 (PDT)
-Date: Wed, 24 Jul 2024 06:18:21 -0700
+X-Received: by 2002:a05:6638:8507:b0:4b7:c9b5:6765 with SMTP id
+ 8926c6da1cb9f-4c28a4de736mr211626173.5.1721827521811; Wed, 24 Jul 2024
+ 06:25:21 -0700 (PDT)
+Date: Wed, 24 Jul 2024 06:25:21 -0700
 X-Google-Appengine-App-Id: s~syzkaller
 X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000be000d061dfe1c55@google.com>
-Subject: [syzbot] [bluetooth?] KASAN: null-ptr-deref Write in l2cap_sock_resume_cb
-From: syzbot <syzbot+52115a16e7eac723d587@syzkaller.appspotmail.com>
+Message-ID: <000000000000cd69c7061dfe35d2@google.com>
+Subject: [syzbot] [bluetooth?] WARNING: ODEBUG bug in hci_release_dev (2)
+From: syzbot <syzbot+b170dbf55520ebf5969a@syzkaller.appspotmail.com>
 To: johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org, 
 	linux-kernel@vger.kernel.org, luiz.dentz@gmail.com, marcel@holtmann.org, 
-	syzkaller-bugs@googlegroups.com
+	netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
 
 Hello,
 
 syzbot found the following issue on:
 
-HEAD commit:    2c9b3512402e Merge tag 'for-linus' of git://git.kernel.org..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=13550ec3980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=be4129de17851dbe
-dashboard link: https://syzkaller.appspot.com/bug?extid=52115a16e7eac723d587
-compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+HEAD commit:    d7e78951a8b8 Merge tag 'net-6.11-rc0' of git://git.kernel...
+git tree:       net-next
+console output: https://syzkaller.appspot.com/x/log.txt?x=105a2f31980000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=8d1cf7c29e32ce12
+dashboard link: https://syzkaller.appspot.com/bug?extid=b170dbf55520ebf5969a
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
 
 Unfortunately, I don't have any reproducer for this issue yet.
 
 Downloadable assets:
-disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/7bc7510fe41f/non_bootable_disk-2c9b3512.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/105004175f16/vmlinux-2c9b3512.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/4d8a81aaa129/bzImage-2c9b3512.xz
+disk image: https://storage.googleapis.com/syzbot-assets/3c208b51873e/disk-d7e78951.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/adec146cf41c/vmlinux-d7e78951.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/52f09b8f7356/bzImage-d7e78951.xz
 
 IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+52115a16e7eac723d587@syzkaller.appspotmail.com
+Reported-by: syzbot+b170dbf55520ebf5969a@syzkaller.appspotmail.com
 
-Bluetooth: hci2: ISO packet for unknown connection handle 0
-==================================================================
-BUG: KASAN: null-ptr-deref in instrument_atomic_write include/linux/instrumented.h:82 [inline]
-BUG: KASAN: null-ptr-deref in clear_bit include/asm-generic/bitops/instrumented-atomic.h:41 [inline]
-BUG: KASAN: null-ptr-deref in l2cap_sock_resume_cb+0xd0/0x130 net/bluetooth/l2cap_sock.c:1697
-Write of size 8 at addr 0000000000000518 by task kworker/u33:6/5222
-
-CPU: 1 PID: 5222 Comm: kworker/u33:6 Not tainted 6.10.0-syzkaller-11185-g2c9b3512402e #0
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
-Workqueue: hci0 hci_rx_work
+------------[ cut here ]------------
+ODEBUG: free active (active state 0) object: ffff888042b68978 object type: timer_list hint: hci_cmd_timeout+0x0/0x1e0
+WARNING: CPU: 0 PID: 12907 at lib/debugobjects.c:518 debug_print_object+0x17a/0x1f0 lib/debugobjects.c:515
+Modules linked in:
+CPU: 0 PID: 12907 Comm: syz-executor Not tainted 6.10.0-syzkaller-09703-gd7e78951a8b8 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 06/27/2024
+RIP: 0010:debug_print_object+0x17a/0x1f0 lib/debugobjects.c:515
+Code: e8 1b 7f 42 fd 4c 8b 0b 48 c7 c7 c0 72 20 8c 48 8b 74 24 08 48 89 ea 44 89 e1 4d 89 f8 ff 34 24 e8 db 5b 9e fc 48 83 c4 08 90 <0f> 0b 90 90 ff 05 fc 35 f8 0a 48 83 c4 10 5b 41 5c 41 5d 41 5e 41
+RSP: 0018:ffffc9000e6bf838 EFLAGS: 00010282
+RAX: da48afca993a8400 RBX: ffffffff8bccb720 RCX: ffff888030a8da00
+RDX: 0000000000000000 RSI: 0000000000000001 RDI: 0000000000000000
+RBP: ffffffff8c207440 R08: ffffffff815565a2 R09: fffffbfff1c39f60
+R10: dffffc0000000000 R11: fffffbfff1c39f60 R12: 0000000000000000
+R13: ffffffff8c207358 R14: dffffc0000000000 R15: ffff888042b68978
+FS:  0000000000000000(0000) GS:ffff8880b9400000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f0d8f907a6c CR3: 000000000e134000 CR4: 00000000003506f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
 Call Trace:
  <TASK>
- __dump_stack lib/dump_stack.c:88 [inline]
- dump_stack_lvl+0x116/0x1f0 lib/dump_stack.c:114
- kasan_report+0xd9/0x110 mm/kasan/report.c:601
- check_region_inline mm/kasan/generic.c:183 [inline]
- kasan_check_range+0xef/0x1a0 mm/kasan/generic.c:189
- instrument_atomic_write include/linux/instrumented.h:82 [inline]
- clear_bit include/asm-generic/bitops/instrumented-atomic.h:41 [inline]
- l2cap_sock_resume_cb+0xd0/0x130 net/bluetooth/l2cap_sock.c:1697
- l2cap_security_cfm+0x78d/0x11d0 net/bluetooth/l2cap_core.c:7354
- hci_encrypt_cfm+0x194/0x720 include/net/bluetooth/hci_core.h:2041
- hci_encrypt_change_evt+0x554/0x10f0 net/bluetooth/hci_event.c:3649
- hci_event_func net/bluetooth/hci_event.c:7445 [inline]
- hci_event_packet+0x9eb/0x1180 net/bluetooth/hci_event.c:7497
- hci_rx_work+0x2c6/0x1610 net/bluetooth/hci_core.c:4029
- process_one_work+0x9c5/0x1b40 kernel/workqueue.c:3231
- process_scheduled_works kernel/workqueue.c:3312 [inline]
- worker_thread+0x6c8/0xf20 kernel/workqueue.c:3390
- kthread+0x2c1/0x3a0 kernel/kthread.c:389
- ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
+ __debug_check_no_obj_freed lib/debugobjects.c:990 [inline]
+ debug_check_no_obj_freed+0x45b/0x580 lib/debugobjects.c:1020
+ slab_free_hook mm/slub.c:2202 [inline]
+ slab_free mm/slub.c:4464 [inline]
+ kfree+0x10f/0x360 mm/slub.c:4585
+ hci_release_dev+0x1525/0x16b0 net/bluetooth/hci_core.c:2760
+ bt_host_release+0x83/0x90 net/bluetooth/hci_sysfs.c:94
+ device_release+0x99/0x1c0
+ kobject_cleanup lib/kobject.c:689 [inline]
+ kobject_release lib/kobject.c:720 [inline]
+ kref_put include/linux/kref.h:65 [inline]
+ kobject_put+0x22f/0x480 lib/kobject.c:737
+ vhci_release+0x8b/0xd0 drivers/bluetooth/hci_vhci.c:667
+ __fput+0x24a/0x8a0 fs/file_table.c:422
+ task_work_run+0x24f/0x310 kernel/task_work.c:222
+ exit_task_work include/linux/task_work.h:40 [inline]
+ do_exit+0xa2f/0x27f0 kernel/exit.c:877
+ do_group_exit+0x207/0x2c0 kernel/exit.c:1026
+ __do_sys_exit_group kernel/exit.c:1037 [inline]
+ __se_sys_exit_group kernel/exit.c:1035 [inline]
+ __x64_sys_exit_group+0x3f/0x40 kernel/exit.c:1035
+ x64_sys_call+0x26c3/0x26d0 arch/x86/include/generated/asm/syscalls_64.h:232
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7fbfd8775b59
+Code: Unable to access opcode bytes at 0x7fbfd8775b2f.
+RSP: 002b:00007ffda750f638 EFLAGS: 00000246 ORIG_RAX: 00000000000000e7
+RAX: ffffffffffffffda RBX: 00007fbfd87e4a82 RCX: 00007fbfd8775b59
+RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000043
+RBP: 00007fbfd87e4a94 R08: 00007ffda750d3d7 R09: 0000000000000bb8
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000006
+R13: 0000000000000bb8 R14: 000000000003e8dd R15: 000000000003e8ae
  </TASK>
-==================================================================
 
 
 ---
