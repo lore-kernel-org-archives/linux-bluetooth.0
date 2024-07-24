@@ -1,136 +1,110 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f171.google.com (mail-lj1-f171.google.com [209.85.208.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6925B15ECEC;
-	Wed, 24 Jul 2024 17:13:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E57D15FA6B
+	for <linux-bluetooth@vger.kernel.org>; Wed, 24 Jul 2024 18:27:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721841237; cv=none; b=r2bumrolDuz75BoVQMvvsHSbLNtklwNG6ZBlgVuU4kA81DZwNQTQ5b2u28RYtEmmFYb87Pw8UMp5prhyzUS00z4gjr/+4ioZtpHp1WLvJNwvMRTk2P/I7NVpntignoYXZhDyxQEjbn6MwmUXaoqy3pUb0fVvW9UVxb/G0ACEE0g=
+	t=1721845627; cv=none; b=bzmpc89M11vuBawnfguJ14i/vyubxpOnLSrtiv1zIKf0ihCm8nfqkEiK4I9GLhE4Qm1ujoN4eNuQIGwNVdZ0kUCos/d8xSgUvdLRXIC+uA6hMWvAjAQrFcZNbzIULvsDaFLHQS6NUjgoLGzsBoKRYlQHXwcFo0Yb6OSofM2trN4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721841237; c=relaxed/simple;
-	bh=oa4BYzZy3kq1pbLBpJsb1owa8AeGXnIShl4WHE1XK7I=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IpaVBYxD6V0uwANP/8vAnzteNAcFIcJImAhFhnqIBGjmDfKB9dSWbtAS1zR/20UyWE8rnQ674ztjQOowB7YzOQUYaOV5GoKEEvZXDc0vSarFsygLhgvKtSceQI/BDZaBO7PjgWnCNM3Bqr6Zt5faubuKE3BZw57k2/Dg7AkQEKg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Gu0vtcwl; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1721845627; c=relaxed/simple;
+	bh=uWbsoaA7o2jn18ph2xE+KTe62+SX/OKHY4QjDgkQysk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=CCwTg3VboXefp1SmhHQOeZHnoFOJ0BfU+Ds48QDV9ZSsXTt/NG96xZ4kgbR4IMlJnp97llnAR+dvZ4xcOv0xnDZfE9v0ZaCMJR6dmqnDp8hbekdmQ3+J7qQTiUULzQ/lSYWk02A4wI8Aj72vNcuhv/Ds9wnw9zTVh5W8gAtW25I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=F8poaa/o; arc=none smtp.client-ip=209.85.208.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Gu0vtcwl"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 36E45C32781;
-	Wed, 24 Jul 2024 17:13:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1721841237;
-	bh=oa4BYzZy3kq1pbLBpJsb1owa8AeGXnIShl4WHE1XK7I=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Gu0vtcwliOaEFO9TQNOi8tIiHqSeJjdQ6j2SxxiNpd5k44RXf7PIXWgRMud8uXVw9
-	 nkmdIt8VFqFuUcYc2446tfUM3jl/6V6w6kMI4JgB6f918SmVTxKrUQe1NieMoZa04D
-	 fXCcajwz8+0QlyxOGe0fsiFw+yVpl4haL+cw+LzbDYOJunwe/q4MsFrEwsEtTm+yuh
-	 TbDgzqEP8i45IpTgkvq9SeRDFwGB5EfjJbLNIi9XZzO9QyGTVYZ6BvEk19IBT75kBp
-	 UtGA5LOnyo3xpZXwQBOqHAUl5MYsYpVt18lnkisTgsQG9DM7OoFtm0QpYl9PotjNzg
-	 uIpqjEbU81oNA==
-Date: Wed, 24 Jul 2024 18:13:51 +0100
-From: Simon Horman <horms@kernel.org>
-To: Yunseong Kim <yskelg@gmail.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-	stable@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Yeoreum Yun <yeoreum.yun@arm.com>,
-	Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
-Subject: Re: [PATCH] Bluetooth: hci_core: fix suspicious RCU usage in
- hci_conn_drop()
-Message-ID: <20240724171351.GD97837@kernel.org>
-References: <20240723171756.13755-2-yskelg@gmail.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="F8poaa/o"
+Received: by mail-lj1-f171.google.com with SMTP id 38308e7fff4ca-2f01e9f53e3so1787591fa.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 24 Jul 2024 11:27:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1721845623; x=1722450423; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=d1PRZpgyZdEPZHXkHQ6E0B5+Y7PHBW1XY9H32/k5xeQ=;
+        b=F8poaa/ofPx08pE5R5O7mkbhgBHKQcMSyM1eArC2hsvKZiXu3x02z01X55kLA+wsrO
+         OG2sJi9bt2hgdtiuHfSuczYnO0vBENxsXiDps/6lByfBpqJLKMAqgkGxtsLD/B/DhFsS
+         BfbBWXXQLXqGBWwqgV64gPmmQZbTMUq/UDmQueCdi94mD570FxKufSoOLK3tag5omhTp
+         845XjiGI6d5Vgu2IkBUGqPhsh46SEDaTXv2n4EDT2Nh/JHzmSHuzkedXKgLEc6gsvQbQ
+         1EsYcXE7ecKug7z6Kgaa/FUbydLpYNMmpGu/5vEDtrcBlp+5yDdrwNoVRDj3le8yP+pF
+         9fqQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1721845623; x=1722450423;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=d1PRZpgyZdEPZHXkHQ6E0B5+Y7PHBW1XY9H32/k5xeQ=;
+        b=tBV/YfY/LWrLB8G80IgWOqNrVY5W+FISbjP9vyN0kGDLoqgziSqFOCL7QmGN1fw9Cq
+         GN2Zi4tEVoZHsYI6lzheYrlv+yTaGDLqwZeq3zc3cYRFOlObVxH7VW74YgE1GYxtVHRj
+         QFapIuWnjbq1H8dFEfgLq5UIKuMfts47uT1Sh7Nyjy8xl0mXzMj/FCmPBZv/AEj08brn
+         rVu782ipJrbB5cc+M3oJXvaP4xmNycG/9wsb2XU+1z+GviFxEbnkPKqioPIjYJPtPALp
+         rOXPYkS4Tbx8JNY32ZqKt+GnwZypfFmPPPlvnorcAjwfiM/R6IGv0iaLqC9aFLrAu9mB
+         wwaQ==
+X-Gm-Message-State: AOJu0Yw3RYZCmumavbqiaVk0q4S+F9My0/sEV+gAo/NehzuSX67dV/cF
+	Oe/3Kx2HFbb60vSliOVOwKpJaNXxtkJgqMbCNuZRqyCufvufDOx/pV5YZlXM2nX/K/o0N1hkVQi
+	Q2gWYXUzieWMIPddNP16i0LGfmqTRRQ==
+X-Google-Smtp-Source: AGHT+IHMS+Vc7xmyWAqA5W4AYdaWgYLXx5vDOzMJRUmnvnUQ1RlZCgxeFW+YhUOWQ8vek++e/Iuypu+7MezTUecgWt0=
+X-Received: by 2002:a2e:2a85:0:b0:2ef:18ae:5cbd with SMTP id
+ 38308e7fff4ca-2f039ccb250mr5688701fa.27.1721845623207; Wed, 24 Jul 2024
+ 11:27:03 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240723171756.13755-2-yskelg@gmail.com>
+References: <20240724143425.165959-1-vlad.pruteanu@nxp.com>
+In-Reply-To: <20240724143425.165959-1-vlad.pruteanu@nxp.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Wed, 24 Jul 2024 14:26:50 -0400
+Message-ID: <CABBYNZJXg1pGQK08cCCcuuibS81jKT_fdOwCF5tMhE4OZ6-sFQ@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 0/4] Add 'broadcasting' state
+To: Vlad Pruteanu <vlad.pruteanu@nxp.com>
+Cc: linux-bluetooth@vger.kernel.org, mihai-octavian.urzica@nxp.com, 
+	iulia.tanasescu@nxp.com, andrei.istodorescu@nxp.com, pav@iki.fi
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-+ Handa-san
+Hi Vlad,
 
-On Wed, Jul 24, 2024 at 02:17:57AM +0900, Yunseong Kim wrote:
-> Protection from the queuing operation is achieved with an RCU read lock
-> to avoid calling 'queue_delayed_work()' after 'cancel_delayed_work()',
-> but this does not apply to 'hci_conn_drop()'.
-> 
-> commit deee93d13d38 ("Bluetooth: use hdev->workqueue when queuing
->  hdev->{cmd,ncmd}_timer works")
-> 
-> The situation described raises concerns about suspicious RCU usage in a
-> corrupted context.
-> 
-> CPU 1                   CPU 2
->  hci_dev_do_reset()
->   synchronize_rcu()      hci_conn_drop()
->   drain_workqueue()       <-- no RCU read protection during queuing. -->
->                            queue_delayed_work()
-> 
-> It displays a warning message like the following
-> 
-> Bluetooth: hci0: unexpected cc 0x0c38 length: 249 > 2
-> =============================
-> WARNING: suspicious RCU usage
-> 6.10.0-rc6-01340-gf14c0bb78769 #5 Not tainted
-> -----------------------------
-> net/mac80211/util.c:4000 RCU-list traversed in non-reader section!!
-> 
-> other info that might help us debug this:
-> 
-> rcu_scheduler_active = 2, debug_locks = 1
-> 2 locks held by syz-executor/798:
->  #0: ffff800089a3de50 (rtnl_mutex){+.+.}-{4:4},
->     at: rtnl_lock+0x28/0x40 net/core/rtnetlink.c:79
-> 
-> stack backtrace:
-> CPU: 0 PID: 798 Comm: syz-executor Not tainted
->   6.10.0-rc6-01340-gf14c0bb78769 #5
-> Hardware name: linux,dummy-virt (DT)
-> Call trace:
->  dump_backtrace.part.0+0x1b8/0x1d0 arch/arm64/kernel/stacktrace.c:317
->  dump_backtrace arch/arm64/kernel/stacktrace.c:323 [inline]
->  show_stack+0x34/0x50 arch/arm64/kernel/stacktrace.c:324
->  __dump_stack lib/dump_stack.c:88 [inline]
->  dump_stack_lvl+0xf0/0x170 lib/dump_stack.c:114
->  dump_stack+0x20/0x30 lib/dump_stack.c:123
->  lockdep_rcu_suspicious+0x204/0x2f8 kernel/locking/lockdep.c:6712
->  ieee80211_check_combinations+0x71c/0x828 [mac80211]
->  ieee80211_check_concurrent_iface+0x494/0x700 [mac80211]
->  ieee80211_open+0x140/0x238 [mac80211]
->  __dev_open+0x270/0x498 net/core/dev.c:1474
->  __dev_change_flags+0x47c/0x610 net/core/dev.c:8837
->  dev_change_flags+0x98/0x170 net/core/dev.c:8909
->  devinet_ioctl+0xdf0/0x18d0 net/ipv4/devinet.c:1177
->  inet_ioctl+0x34c/0x388 net/ipv4/af_inet.c:1003
->  sock_do_ioctl+0xe4/0x240 net/socket.c:1222
->  sock_ioctl+0x4cc/0x740 net/socket.c:1341
->  vfs_ioctl fs/ioctl.c:51 [inline]
->  __do_sys_ioctl fs/ioctl.c:907 [inline]
->  __se_sys_ioctl fs/ioctl.c:893 [inline]
->  __arm64_sys_ioctl+0x184/0x218 fs/ioctl.c:893
->  __invoke_syscall arch/arm64/kernel/syscall.c:34 [inline]
->  invoke_syscall+0x90/0x2e8 arch/arm64/kernel/syscall.c:48
->  el0_svc_common.constprop.0+0x200/0x2a8 arch/arm64/kernel/syscall.c:131
->  el0_svc+0x48/0xc0 arch/arm64/kernel/entry-common.c:712
->  el0t_64_sync_handler+0x120/0x130 arch/arm64/kernel/entry-common.c:730
->  el0t_64_sync+0x190/0x198 arch/arm64/kernel/entry.S:598
-> 
-> This patch attempts to fix that issue with the same convention.
-> 
-> Cc: stable@vger.kernel.org # v6.1+
-> Fixes: deee93d13d38 ("Bluetooth: use hdev->workqueue when queuing hdev->
-> {cmd,ncmd}_timer works")
+On Wed, Jul 24, 2024 at 10:35=E2=80=AFAM Vlad Pruteanu <vlad.pruteanu@nxp.c=
+om> wrote:
+>
+> This series adds a new 'broadcasting' state for transports created by
+> the Broadcast Sink device as a result of scanning a Broadcast Source.
+> Such transports will remain  in the 'idle' state until the user
+> selects them, at which point they will be moved to 'broadcasting'.
+> PipeWire detects these transports and automatically acquires them.
+>
+> The transport selection is done using the 'transport.select' method,
+> that this series implements. The user can thus select the BIS that
+> he wishes to sync to.
+>
+> A PR has also been opened for PipeWire, I added Pauli to CC so that
+> he is also aware of this change.
+>
+>
+> Vlad Pruteanu (4):
+>   transport: Add 'broadcasting' state
+>   transport: Add "select" method
+>   client/player: Expose transport "select" method to the user
+>   transport: Broadcast sink: wait for user to select transport
 
-nit: Fixes tags should not be line-wrapped.
+Where are the changes to org.bluez.MediaTransport.rst? That is the
+sort of first thing you need to do to explain how it works, also it
+shall probably be broadcast only I guess?
 
-> Signed-off-by: Yeoreum Yun <yeoreum.yun@arm.com>
-> Tested-by: Yunseong Kim <yskelg@gmail.com>
-> Signed-off-by: Yunseong Kim <yskelg@gmail.com>
+>  client/player.c            | 52 ++++++++++++++++++++++++++++++++++++++
+>  profiles/audio/transport.c | 50 ++++++++++++++++++++++++++++++------
+>  2 files changed, 94 insertions(+), 8 deletions(-)
+>
+> --
+> 2.40.1
+>
+>
 
-...
+
+--=20
+Luiz Augusto von Dentz
