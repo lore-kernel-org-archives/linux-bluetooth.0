@@ -1,244 +1,158 @@
-Received: from mail-io1-f72.google.com (mail-io1-f72.google.com [209.85.166.72])
+Received: from mail-oo1-f52.google.com (mail-oo1-f52.google.com [209.85.161.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F009A14F133
-	for <linux-bluetooth@vger.kernel.org>; Wed, 24 Jul 2024 08:59:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1BCE17E9
+	for <linux-bluetooth@vger.kernel.org>; Wed, 24 Jul 2024 09:42:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721811562; cv=none; b=I2FYog7rQBY9e+XLKdWluNAOTMo4ll+CcpR2EH2LMrpT1GOheRNbxj7FlAg5oVauzNw33oZU0KruzYdceR+rU338GC2tQTHZiqNfIGgYS7Ux6N+OhoRfeClugjfMOYwGtovc2ylVojiH1RUtewBz1siBBpDjn8/B3vVFONPEu1w=
+	t=1721814153; cv=none; b=O4JXtDcA8L9m5bZHrSYWHl1AK/YTMk6TaloprbmElah8mGe3XPxtjMpUP/xl4Yl30UV2FXeF1r3ayFeED8WwhOUrf1Xg6EMDDN9U5fVlf7WTAfrFZBFQJc8/832O0gTFR5LzvDtipqcXS9QKPqK1wgSVVor65NWRMDqkj/QIkH0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721811562; c=relaxed/simple;
-	bh=GLVAF4ULstnW84fgSz/a5YmLZn8B2hFhVEbftkKjmLY=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=CYyLxkaDytqfKra/+GfxK0Hy4LHiWQJ0sbl3+tJHj7DQIn9TSBIu2h+OZqy20eswJxxLVcjBdS9UkSgjmPpMLGnV6bsif4s6JCfpaFccVUkD37Ty+vTD4pE7sIbK2DP/pbap4G5fFHRQ7MWlMj51el98+uWLrVmP4/XlkvsYv+w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f72.google.com with SMTP id ca18e2360f4ac-8041a66f2ebso1016820339f.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 24 Jul 2024 01:59:20 -0700 (PDT)
+	s=arc-20240116; t=1721814153; c=relaxed/simple;
+	bh=8QzJTNKcdUycyOP+3ejDLo+WoZV9pbp4lVWDPfDB3V0=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=WKuylR2XlM8XV8gkM0irVBCxtSIulgL57/i0wEZmXBJlLYFQdNqCdoBodp0gbCVdDlulbes0TIehRvsicEaD3+DFHCRoJ14uWebVxO4j506DyJ552CWeB55plnO+7ETtkehdH1zUQh/PUD4zf6fcryzuhg+nhvUf6jOOo0iKuwY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=I9MkTtcm; arc=none smtp.client-ip=209.85.161.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="I9MkTtcm"
+Received: by mail-oo1-f52.google.com with SMTP id 006d021491bc7-5cbc5b63939so3461918eaf.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 24 Jul 2024 02:42:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1721814150; x=1722418950; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=Qg2CS/5HYqF97Wvis6NTrGlBmCqcx9wOTPmg3k+W8gU=;
+        b=I9MkTtcmd0KIwGLRXoG7vqF9gIQXklN9iw3L7mrdppge9v5okQjEc7m9XtoLLN56Qq
+         hcwtEvKNIBHyPCSSjWqtURju1XbgLUlJAEmh0bbnr+Z9Kfw949m+z9sIeMqsVclipCgo
+         kIacGT7GGhIBIEOfJ7VLCq5wik3u+SbgAJzKsmdgDCFSWRDqCE9ta9WNlfn1vs0fqZxH
+         6D8BbWDM+IULNK2FYHn8/A2WFi1C3/dzaXrAW03y6Cu/pZ113+tpt1HNrkAKUCjNcHBO
+         DXdARWtWiO/zDpwkYinY77zJ25qmLswWaNBOOF1ayMJWricGfQ4jGWR/GdQ0gVBDt7Yo
+         3PmQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721811560; x=1722416360;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=t1Fhw1S5C/O8PQznzsd5xFoGs3e7zPVK3lIN9xy59Gg=;
-        b=EQtsNSdbkCAE92S16ZjXqDgsHyt+YHDVyGR9v0f1hWFCHYuLtb0Sj+thOJhubYi1yi
-         pMryNM+NRvOkMH+4CC2wOaGPXJGc1Fz63jkPK0rQtebTFeaZ6N6a5uJORXwA9raVYele
-         kYhWta08d2T5QSepipLFNtl1r5g2Xd/6ZMWcBAdBmAx4XQT87cpOZdIc7iv8BpYsKKoh
-         ygrz4drvoP+r5sozjzLUBz399D5xLwSTcKiYTfZRfPDQA5D0lfhuCVh23feZaZstG0q/
-         rQmx2n5Muya5L4B+h6/Ou+owCF6OP2rGp9iLihqgdBlDj8DQkYWb3gY9HgOTwmbf3RNh
-         FxUg==
-X-Forwarded-Encrypted: i=1; AJvYcCXj4PizmmaKzXRCOamfzJtxfhhZ9kGgKEvFOjLXsBavI5NUJLAepYR1IP1Wtxh094CfA88vybjm1hcPMUMdODCDSREC41KiB+v2qVNyAuAl
-X-Gm-Message-State: AOJu0YwArpunCfSxe4WTAx4e1ipDHgCrC2jLH3F1jz4JORxyItIFx214
-	ll/uQmIp9zDrV8drqnhxYiw4+XaBhAELwXEHoYq1w75NGmNI6hZ9L845SVwxA4hHMLEsmr5F1bp
-	i7mgrYdGVIfQUzVsT0d7w82hD6E249DPQa6qex4nbnaEoAIvLAf7CuCQ=
-X-Google-Smtp-Source: AGHT+IGS95Of6P/5SNVM7r/fixVYTKcZ0WZU0y3HY5v/j+f/3C8HApgdJ72qGOjIYs4vAegOfPuSfiOXh+BSgKA6ekJ7DFVu2Isk
+        d=1e100.net; s=20230601; t=1721814150; x=1722418950;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Qg2CS/5HYqF97Wvis6NTrGlBmCqcx9wOTPmg3k+W8gU=;
+        b=DNvdgwb0V5HODAF+UM92kXYF/erBZE1WhPmvjegWolATugoWkztqb4MnNOAKyyL85Z
+         dwtYZDlaH5QF0RmdEdjU8pNCC/ih6T/apaWk1K/YoY41oOc+ELP44kGKmr0FIRu7xZSn
+         2yh07wiUlGbLxis9PXOR3P1+zr0BMoaaV9oOzvu6uqOy2w2pJWK7fItBb2PAk585agHf
+         l/QlV3CUThC7iWoo236cewZK+XvqzVvP/w9thZycHSQtHO1M5parz7D3OxkasdCtd3Y0
+         V768UUyH/4adaDbxxBjQIJm3++n1pizPZaqSlMP48CJMjxWGOO+Hrm7wCU1qYfsdTzWm
+         z93g==
+X-Gm-Message-State: AOJu0YyXkQgL8m/wte425iHdKnr3ldVvPho97Ho9V1BlsoI961eB9zGO
+	IDmr4wzBmaGdW0M7L2bakDwR+IHuvaePWl2HOWWjhJy7yk1iiJavZKxRcg==
+X-Google-Smtp-Source: AGHT+IEeR6VvFGJwwEZDv1O0AWVeWTq924nnk5S+aQZvFPnn3RG8FmXC07G+kCEeaBjQDI2KzjmFxw==
+X-Received: by 2002:a05:6358:6223:b0:1aa:d6fe:f424 with SMTP id e5c5f4694b2df-1acc5b0cb92mr1436138755d.13.1721814149428;
+        Wed, 24 Jul 2024 02:42:29 -0700 (PDT)
+Received: from [172.17.0.2] ([20.161.78.5])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7a1990792a0sm562268985a.109.2024.07.24.02.42.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 24 Jul 2024 02:42:29 -0700 (PDT)
+Message-ID: <66a0cc85.050a0220.d03af.12db@mx.google.com>
+Date: Wed, 24 Jul 2024 02:42:29 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============5137355272875575307=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6638:8412:b0:4c1:4388:46bb with SMTP id
- 8926c6da1cb9f-4c289e08bd8mr160215173.0.1721811560133; Wed, 24 Jul 2024
- 01:59:20 -0700 (PDT)
-Date: Wed, 24 Jul 2024 01:59:20 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <00000000000069859c061dfa7e91@google.com>
-Subject: [syzbot] [bluetooth?] KASAN: slab-use-after-free Read in mgmt_remove_adv_monitor_sync
-From: syzbot <syzbot+479aff51bb361ef5aa18@syzkaller.appspotmail.com>
-To: johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, luiz.dentz@gmail.com, marcel@holtmann.org, 
-	netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, quic_nakella@quicinc.com
+Subject: RE: [BlueZ,v1] hcitool - Added option for Peripheral Initiated Connection Parameter Update Request.
+In-Reply-To: <20240724074415.17590-1-quic_nakella@quicinc.com>
+References: <20240724074415.17590-1-quic_nakella@quicinc.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Hello,
+--===============5137355272875575307==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-syzbot found the following issue on:
+This is automated email and please do not reply to this email!
 
-HEAD commit:    d7e78951a8b8 Merge tag 'net-6.11-rc0' of git://git.kernel...
-git tree:       net-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=126a9fc3980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=8d1cf7c29e32ce12
-dashboard link: https://syzkaller.appspot.com/bug?extid=479aff51bb361ef5aa18
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+Dear submitter,
 
-Unfortunately, I don't have any reproducer for this issue yet.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=873454
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/3c208b51873e/disk-d7e78951.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/adec146cf41c/vmlinux-d7e78951.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/52f09b8f7356/bzImage-d7e78951.xz
+---Test result---
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+479aff51bb361ef5aa18@syzkaller.appspotmail.com
+Test Summary:
+CheckPatch                    FAIL      0.77 seconds
+GitLint                       FAIL      0.51 seconds
+BuildEll                      PASS      24.73 seconds
+BluezMake                     PASS      1652.07 seconds
+MakeCheck                     PASS      13.37 seconds
+MakeDistcheck                 PASS      177.75 seconds
+CheckValgrind                 PASS      252.63 seconds
+CheckSmatch                   PASS      353.87 seconds
+bluezmakeextell               PASS      119.76 seconds
+IncrementalBuild              PASS      1401.88 seconds
+ScanBuild                     WARNING   1020.86 seconds
 
-==================================================================
-BUG: KASAN: slab-use-after-free in mgmt_remove_adv_monitor_sync+0x3a/0xd0 net/bluetooth/mgmt.c:5444
-Read of size 8 at addr ffff88802aac0f18 by task kworker/u9:0/54
+Details
+##############################
+Test: CheckPatch - FAIL
+Desc: Run checkpatch.pl script
+Output:
+[BlueZ,v1] hcitool - Added option for Peripheral Initiated Connection Parameter Update Request.
+WARNING:COMMIT_LOG_LONG_LINE: Possible unwrapped commit description (prefer a maximum 75 chars per line)
+#105: 
+https://lore.kernel.org/linux-bluetooth/CAPm3yA0m0AUyQd04J4H+mQ3NL7XjvkLX3M8R7cKhc8QGGG25hA@mail.gmail.com/
 
-CPU: 0 PID: 54 Comm: kworker/u9:0 Not tainted 6.10.0-syzkaller-09703-gd7e78951a8b8 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 06/27/2024
-Workqueue: hci0 hci_cmd_sync_work
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:88 [inline]
- dump_stack_lvl+0x241/0x360 lib/dump_stack.c:114
- print_address_description mm/kasan/report.c:377 [inline]
- print_report+0x169/0x550 mm/kasan/report.c:488
- kasan_report+0x143/0x180 mm/kasan/report.c:601
- mgmt_remove_adv_monitor_sync+0x3a/0xd0 net/bluetooth/mgmt.c:5444
- hci_cmd_sync_work+0x22b/0x400 net/bluetooth/hci_sync.c:328
- process_one_work kernel/workqueue.c:3231 [inline]
- process_scheduled_works+0xa2c/0x1830 kernel/workqueue.c:3312
- worker_thread+0x86d/0xd40 kernel/workqueue.c:3390
- kthread+0x2f0/0x390 kernel/kthread.c:389
- ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
- </TASK>
+/github/workspace/src/src/13740640.patch total: 0 errors, 1 warnings, 238 lines checked
 
-Allocated by task 7112:
- kasan_save_stack mm/kasan/common.c:47 [inline]
- kasan_save_track+0x3f/0x80 mm/kasan/common.c:68
- poison_kmalloc_redzone mm/kasan/common.c:370 [inline]
- __kasan_kmalloc+0x98/0xb0 mm/kasan/common.c:387
- kasan_kmalloc include/linux/kasan.h:211 [inline]
- __kmalloc_cache_noprof+0x19c/0x2c0 mm/slub.c:4180
- kmalloc_noprof include/linux/slab.h:681 [inline]
- kzalloc_noprof include/linux/slab.h:807 [inline]
- mgmt_pending_new+0x65/0x250 net/bluetooth/mgmt_util.c:269
- mgmt_pending_add+0x36/0x120 net/bluetooth/mgmt_util.c:296
- remove_adv_monitor+0x102/0x1b0 net/bluetooth/mgmt.c:5469
- hci_mgmt_cmd+0xc47/0x11d0 net/bluetooth/hci_sock.c:1712
- hci_sock_sendmsg+0x7b8/0x11c0 net/bluetooth/hci_sock.c:1832
- sock_sendmsg_nosec net/socket.c:730 [inline]
- __sock_sendmsg+0x221/0x270 net/socket.c:745
- sock_write_iter+0x2dd/0x400 net/socket.c:1160
- new_sync_write fs/read_write.c:497 [inline]
- vfs_write+0xa72/0xc90 fs/read_write.c:590
- ksys_write+0x1a0/0x2c0 fs/read_write.c:643
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
 
-Freed by task 7179:
- kasan_save_stack mm/kasan/common.c:47 [inline]
- kasan_save_track+0x3f/0x80 mm/kasan/common.c:68
- kasan_save_free_info+0x40/0x50 mm/kasan/generic.c:579
- poison_slab_object+0xe0/0x150 mm/kasan/common.c:240
- __kasan_slab_free+0x37/0x60 mm/kasan/common.c:256
- kasan_slab_free include/linux/kasan.h:184 [inline]
- slab_free_hook mm/slub.c:2235 [inline]
- slab_free mm/slub.c:4464 [inline]
- kfree+0x149/0x360 mm/slub.c:4585
- mgmt_pending_foreach+0xd1/0x130 net/bluetooth/mgmt_util.c:259
- __mgmt_power_off+0x187/0x420 net/bluetooth/mgmt.c:9458
- hci_dev_close_sync+0x665/0x11a0 net/bluetooth/hci_sync.c:5118
- hci_dev_do_close net/bluetooth/hci_core.c:490 [inline]
- hci_dev_close+0x112/0x210 net/bluetooth/hci_core.c:515
- sock_do_ioctl+0x158/0x460 net/socket.c:1222
- sock_ioctl+0x629/0x8e0 net/socket.c:1341
- vfs_ioctl fs/ioctl.c:51 [inline]
- __do_sys_ioctl fs/ioctl.c:907 [inline]
- __se_sys_ioctl+0xfc/0x170 fs/ioctl.c:893
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
+/github/workspace/src/src/13740640.patch has style problems, please review.
 
-The buggy address belongs to the object at ffff88802aac0f00
- which belongs to the cache kmalloc-96 of size 96
-The buggy address is located 24 bytes inside of
- freed 96-byte region [ffff88802aac0f00, ffff88802aac0f60)
+NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
 
-The buggy address belongs to the physical page:
-page: refcount:1 mapcount:0 mapping:0000000000000000 index:0xffff88802aac0b80 pfn:0x2aac0
-flags: 0xfff00000000200(workingset|node=0|zone=1|lastcpupid=0x7ff)
-page_type: 0xffffefff(slab)
-raw: 00fff00000000200 ffff888015041280 ffffea00007c85d0 ffffea0001a17590
-raw: ffff88802aac0b80 000000000020000a 00000001ffffefff 0000000000000000
-page dumped because: kasan: bad access detected
-page_owner tracks the page as allocated
-page last allocated via order 0, migratetype Unmovable, gfp_mask 0x352800(GFP_NOWAIT|__GFP_NORETRY|__GFP_COMP|__GFP_HARDWALL|__GFP_THISNODE), pid 5330, tgid 5329 (syz.3.37), ts 87033405855, free_ts 86894920419
- set_page_owner include/linux/page_owner.h:32 [inline]
- post_alloc_hook+0x1f3/0x230 mm/page_alloc.c:1473
- prep_new_page mm/page_alloc.c:1481 [inline]
- get_page_from_freelist+0x2e4c/0x2f10 mm/page_alloc.c:3425
- __alloc_pages_noprof+0x256/0x6c0 mm/page_alloc.c:4683
- __alloc_pages_node_noprof include/linux/gfp.h:269 [inline]
- alloc_pages_node_noprof include/linux/gfp.h:296 [inline]
- alloc_slab_page+0x5f/0x120 mm/slub.c:2304
- allocate_slab+0x5a/0x2f0 mm/slub.c:2467
- new_slab mm/slub.c:2520 [inline]
- ___slab_alloc+0xcd1/0x14b0 mm/slub.c:3706
- __slab_alloc+0x58/0xa0 mm/slub.c:3796
- __slab_alloc_node mm/slub.c:3849 [inline]
- slab_alloc_node mm/slub.c:4016 [inline]
- __do_kmalloc_node mm/slub.c:4148 [inline]
- __kmalloc_node_noprof+0x286/0x440 mm/slub.c:4155
- kmalloc_array_node_noprof include/linux/slab.h:788 [inline]
- alloc_slab_obj_exts mm/slub.c:1959 [inline]
- account_slab mm/slub.c:2430 [inline]
- allocate_slab+0xb6/0x2f0 mm/slub.c:2485
- new_slab mm/slub.c:2520 [inline]
- ___slab_alloc+0xcd1/0x14b0 mm/slub.c:3706
- __slab_alloc+0x58/0xa0 mm/slub.c:3796
- __slab_alloc_node mm/slub.c:3849 [inline]
- slab_alloc_node mm/slub.c:4016 [inline]
- kmem_cache_alloc_noprof+0x1c1/0x2a0 mm/slub.c:4035
- sk_prot_alloc+0x58/0x210 net/core/sock.c:2090
- sk_alloc+0x38/0x370 net/core/sock.c:2149
- inet_create+0x652/0xe70 net/ipv4/af_inet.c:326
- __sock_create+0x490/0x920 net/socket.c:1571
-page last free pid 5318 tgid 5318 stack trace:
- reset_page_owner include/linux/page_owner.h:25 [inline]
- free_pages_prepare mm/page_alloc.c:1093 [inline]
- free_unref_folios+0xf23/0x19e0 mm/page_alloc.c:2637
- folios_put_refs+0x93a/0xa60 mm/swap.c:1024
- free_pages_and_swap_cache+0x5c8/0x690 mm/swap_state.c:332
- __tlb_batch_free_encoded_pages mm/mmu_gather.c:136 [inline]
- tlb_batch_pages_flush mm/mmu_gather.c:149 [inline]
- tlb_flush_mmu_free mm/mmu_gather.c:366 [inline]
- tlb_flush_mmu+0x3a3/0x680 mm/mmu_gather.c:373
- tlb_finish_mmu+0xd4/0x200 mm/mmu_gather.c:465
- exit_mmap+0x44f/0xc80 mm/mmap.c:3354
- __mmput+0x115/0x390 kernel/fork.c:1343
- exit_mm+0x220/0x310 kernel/exit.c:566
- do_exit+0x9b2/0x27f0 kernel/exit.c:864
- do_group_exit+0x207/0x2c0 kernel/exit.c:1026
- __do_sys_exit_group kernel/exit.c:1037 [inline]
- __se_sys_exit_group kernel/exit.c:1035 [inline]
- __x64_sys_exit_group+0x3f/0x40 kernel/exit.c:1035
- x64_sys_call+0x26c3/0x26d0 arch/x86/include/generated/asm/syscalls_64.h:232
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
 
-Memory state around the buggy address:
- ffff88802aac0e00: fa fb fb fb fb fb fb fb fb fb fb fb fc fc fc fc
- ffff88802aac0e80: 00 00 00 00 00 00 00 00 00 00 00 00 fc fc fc fc
->ffff88802aac0f00: fa fb fb fb fb fb fb fb fb fb fb fb fc fc fc fc
-                            ^
- ffff88802aac0f80: fa fb fb fb fb fb fb fb fb fb fb fb fc fc fc fc
- ffff88802aac1000: 04 fc fc fc 04 fc fc fc 04 fc fc fc 04 fc fc fc
-==================================================================
+
+##############################
+Test: GitLint - FAIL
+Desc: Run gitlint
+Output:
+[BlueZ,v1] hcitool - Added option for Peripheral Initiated Connection Parameter Update Request.
+
+WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
+1: T1 Title exceeds max length (95>80): "[BlueZ,v1] hcitool - Added option for Peripheral Initiated Connection Parameter Update Request."
+1: T3 Title has trailing punctuation (.): "[BlueZ,v1] hcitool - Added option for Peripheral Initiated Connection Parameter Update Request."
+11: B1 Line exceeds max length (107>80): "https://lore.kernel.org/linux-bluetooth/CAPm3yA0m0AUyQd04J4H+mQ3NL7XjvkLX3M8R7cKhc8QGGG25hA@mail.gmail.com/"
+##############################
+Test: ScanBuild - WARNING
+Desc: Run Scan Build
+Output:
+tools/hcitool.c:3404:13: warning: Null pointer passed to 1st parameter expecting 'nonnull'
+                        handle = strtoul(optarg, NULL, base);
+                                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+tools/hcitool.c:3407:10: warning: Null pointer passed to 1st parameter expecting 'nonnull'
+                        min = strtoul(optarg, NULL, base);
+                              ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+tools/hcitool.c:3410:10: warning: Null pointer passed to 1st parameter expecting 'nonnull'
+                        max = strtoul(optarg, NULL, base);
+                              ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+tools/hcitool.c:3413:14: warning: Null pointer passed to 1st parameter expecting 'nonnull'
+                        latency = strtoul(optarg, NULL, base);
+                                  ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+tools/hcitool.c:3416:14: warning: Null pointer passed to 1st parameter expecting 'nonnull'
+                        timeout = strtoul(optarg, NULL, base);
+                                  ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+5 warnings generated.
+
 
 
 ---
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+Regards,
+Linux Bluetooth
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+--===============5137355272875575307==--
