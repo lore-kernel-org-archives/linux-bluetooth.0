@@ -1,114 +1,244 @@
-Received: from mail-oi1-f170.google.com (mail-oi1-f170.google.com [209.85.167.170])
+Received: from mail-io1-f72.google.com (mail-io1-f72.google.com [209.85.166.72])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A0631CAA1
-	for <linux-bluetooth@vger.kernel.org>; Wed, 24 Jul 2024 08:55:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F009A14F133
+	for <linux-bluetooth@vger.kernel.org>; Wed, 24 Jul 2024 08:59:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721811316; cv=none; b=c+zDrwI6O6dZQRj1ldB2Mu6diVU2hJzGFfmBsfxRWfUrZ1+ke3dOQvdUC232QdSalJERSXr40UaNkPDMuoNA3HiF2PAYOG9ss9Z6j98wNDx/4pWmDVYBdM84+3H+q3n3tOce/gsACkXFjloStra6S/THfVRxeBFXyFhlRKeu7Fs=
+	t=1721811562; cv=none; b=I2FYog7rQBY9e+XLKdWluNAOTMo4ll+CcpR2EH2LMrpT1GOheRNbxj7FlAg5oVauzNw33oZU0KruzYdceR+rU338GC2tQTHZiqNfIGgYS7Ux6N+OhoRfeClugjfMOYwGtovc2ylVojiH1RUtewBz1siBBpDjn8/B3vVFONPEu1w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721811316; c=relaxed/simple;
-	bh=534dvhcOHXCR+5M63oAsEp3FJR+gQdmZPviq/d8fOv0=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=mEnkko9wfI79zhaF13QX8kmnuQty5J+TLjXFSZBBLEF1OVMhKfMI3oW4lHL8cMGedphtV4Kj+jhK6NmzZAX0S9w80L25URno/bDfnqMyknEoVyelpwKy+hcxHPwn1YphsQRKf1NfVzxvrM6Hs+0YN+gfhrY1WFRJRwj9kRn06+A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=F1CnneX+; arc=none smtp.client-ip=209.85.167.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="F1CnneX+"
-Received: by mail-oi1-f170.google.com with SMTP id 5614622812f47-3d9e13ef9aaso3968303b6e.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 24 Jul 2024 01:55:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1721811313; x=1722416113; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=RO33nwV55QSuPUfS4D9FAtjGr2L0hqBVbmQFawCAo1s=;
-        b=F1CnneX+JR7t9b74ceNtA3b1NCG8DYBE5PTlxtmAdRGIOQZ8huxs864voSNguDg7NP
-         UEnkFc7YJrhlCMdyEawqlMbKMMjjdB/xiznU1mBUG0YTUcYVyRjAICz+I5SQjgnvdnl5
-         xb7Udl11odwAtSqp6o3C+7rS85ttQVm/N7XudafdarDD3MQ72KV5SykAwRUnxqykw8y7
-         ijbGZ+zCJgOugCGqEhSzu6uFpSL8AQKquBpTKldY2/v/gtSO8pfsKl8C4a1xf9iN8oJa
-         WSWvtHs8CUfXIlun1gMIgSEH5UwvO/k+hWyDvHyzr1L67Eot0jtGynoXN+3VIlC8N3Sa
-         gcUw==
+	s=arc-20240116; t=1721811562; c=relaxed/simple;
+	bh=GLVAF4ULstnW84fgSz/a5YmLZn8B2hFhVEbftkKjmLY=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=CYyLxkaDytqfKra/+GfxK0Hy4LHiWQJ0sbl3+tJHj7DQIn9TSBIu2h+OZqy20eswJxxLVcjBdS9UkSgjmPpMLGnV6bsif4s6JCfpaFccVUkD37Ty+vTD4pE7sIbK2DP/pbap4G5fFHRQ7MWlMj51el98+uWLrVmP4/XlkvsYv+w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f72.google.com with SMTP id ca18e2360f4ac-8041a66f2ebso1016820339f.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 24 Jul 2024 01:59:20 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721811313; x=1722416113;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=RO33nwV55QSuPUfS4D9FAtjGr2L0hqBVbmQFawCAo1s=;
-        b=SYvlIWW8bRoilQru3XPI5+RyTwIMDQWS0IJ1KJWhGFuzrDb82mDUM06dHm8BGDn90b
-         KcgQHwb1CwSHQoJBiFyBa8po7gLyM94r/12TCOFD4lEmY3R/JQ/YbFlsKx38yogKmCer
-         7PDckfDOdd4yCKT6NrLd3rC+vpjxrqXKDZYs0xJDSj5HE60lJkcYZ8bEzwuH+kYOOuc+
-         7tpp2Q5ygdtDJGiCoBZbG+BB3CRdC9NgUagxOZ4b5ER8jOkiFpzZUBLuZQAj4XkhY02d
-         bT2hs7zujBJWtEIptvv8P4Fnrv06h8Q1tOdg0clrpFXdKQ+BcvIVxPBYlOWaWkBX03mw
-         fCeQ==
-X-Gm-Message-State: AOJu0YwFjbMdEoHXF36eiMj9v2hfSaO0ynvAClTkwXJuAqOP9jUGKocC
-	7UtzNxShFnGmwQb27H0XYJoGGdAMn8xQuu8//vRfp4ztHL07eSNdk9TFNZlX
-X-Google-Smtp-Source: AGHT+IH8q661pRNKfk3U7IoPU9pN4K+NHrv0xky87Y3mwixKqciB7etQW+WvlxeErhuw2dysvoXsDA==
-X-Received: by 2002:a05:6808:f90:b0:3d9:2e7e:53c4 with SMTP id 5614622812f47-3dae984410cmr15347581b6e.34.1721811313473;
-        Wed, 24 Jul 2024 01:55:13 -0700 (PDT)
-Received: from localhost.localdomain ([192.227.249.122])
-        by smtp.gmail.com with ESMTPSA id 5614622812f47-3daf59bdb7dsm1248914b6e.50.2024.07.24.01.55.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 24 Jul 2024 01:55:13 -0700 (PDT)
-From: Yancey Chiew <yanceychiew@gmail.com>
-X-Google-Original-From: Yancey Chiew <YanceyChiew@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Yancey Chiew <YanceyChiew@gmail.com>
-Subject: [PATCH BlueZ 1/1] profiles/battery: Fix batt random lose percentage
-Date: Wed, 24 Jul 2024 16:53:18 +0800
-Message-ID: <20240724085318.209318-2-YanceyChiew@gmail.com>
-X-Mailer: git-send-email 2.45.2
-In-Reply-To: <20240724085318.209318-1-YanceyChiew@gmail.com>
-References: <20240724085318.209318-1-YanceyChiew@gmail.com>
+        d=1e100.net; s=20230601; t=1721811560; x=1722416360;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=t1Fhw1S5C/O8PQznzsd5xFoGs3e7zPVK3lIN9xy59Gg=;
+        b=EQtsNSdbkCAE92S16ZjXqDgsHyt+YHDVyGR9v0f1hWFCHYuLtb0Sj+thOJhubYi1yi
+         pMryNM+NRvOkMH+4CC2wOaGPXJGc1Fz63jkPK0rQtebTFeaZ6N6a5uJORXwA9raVYele
+         kYhWta08d2T5QSepipLFNtl1r5g2Xd/6ZMWcBAdBmAx4XQT87cpOZdIc7iv8BpYsKKoh
+         ygrz4drvoP+r5sozjzLUBz399D5xLwSTcKiYTfZRfPDQA5D0lfhuCVh23feZaZstG0q/
+         rQmx2n5Muya5L4B+h6/Ou+owCF6OP2rGp9iLihqgdBlDj8DQkYWb3gY9HgOTwmbf3RNh
+         FxUg==
+X-Forwarded-Encrypted: i=1; AJvYcCXj4PizmmaKzXRCOamfzJtxfhhZ9kGgKEvFOjLXsBavI5NUJLAepYR1IP1Wtxh094CfA88vybjm1hcPMUMdODCDSREC41KiB+v2qVNyAuAl
+X-Gm-Message-State: AOJu0YwArpunCfSxe4WTAx4e1ipDHgCrC2jLH3F1jz4JORxyItIFx214
+	ll/uQmIp9zDrV8drqnhxYiw4+XaBhAELwXEHoYq1w75NGmNI6hZ9L845SVwxA4hHMLEsmr5F1bp
+	i7mgrYdGVIfQUzVsT0d7w82hD6E249DPQa6qex4nbnaEoAIvLAf7CuCQ=
+X-Google-Smtp-Source: AGHT+IGS95Of6P/5SNVM7r/fixVYTKcZ0WZU0y3HY5v/j+f/3C8HApgdJ72qGOjIYs4vAegOfPuSfiOXh+BSgKA6ekJ7DFVu2Isk
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-Received: by 2002:a05:6638:8412:b0:4c1:4388:46bb with SMTP id
+ 8926c6da1cb9f-4c289e08bd8mr160215173.0.1721811560133; Wed, 24 Jul 2024
+ 01:59:20 -0700 (PDT)
+Date: Wed, 24 Jul 2024 01:59:20 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <00000000000069859c061dfa7e91@google.com>
+Subject: [syzbot] [bluetooth?] KASAN: slab-use-after-free Read in mgmt_remove_adv_monitor_sync
+From: syzbot <syzbot+479aff51bb361ef5aa18@syzkaller.appspotmail.com>
+To: johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, luiz.dentz@gmail.com, marcel@holtmann.org, 
+	netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-Fix an error related to "Trying to update an unregistered battery",
-which causes the battery1 dbus service to fail to provide the
-initial value until the battery level changes.
+Hello,
 
-battery.c:batt_io_value_cb() maybe run earlier than
-battery.c:batt_io_ccc_written_cb(), which causes the percentage
-to be updated in the batt structure when the dbus interface
-has not been registered.
+syzbot found the following issue on:
 
-After the dbus interface is registered, the function to update
-the battery percentage is skipped again because the battery level
-has not changed yet.
+HEAD commit:    d7e78951a8b8 Merge tag 'net-6.11-rc0' of git://git.kernel...
+git tree:       net-next
+console output: https://syzkaller.appspot.com/x/log.txt?x=126a9fc3980000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=8d1cf7c29e32ce12
+dashboard link: https://syzkaller.appspot.com/bug?extid=479aff51bb361ef5aa18
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+
+Unfortunately, I don't have any reproducer for this issue yet.
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/3c208b51873e/disk-d7e78951.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/adec146cf41c/vmlinux-d7e78951.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/52f09b8f7356/bzImage-d7e78951.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+479aff51bb361ef5aa18@syzkaller.appspotmail.com
+
+==================================================================
+BUG: KASAN: slab-use-after-free in mgmt_remove_adv_monitor_sync+0x3a/0xd0 net/bluetooth/mgmt.c:5444
+Read of size 8 at addr ffff88802aac0f18 by task kworker/u9:0/54
+
+CPU: 0 PID: 54 Comm: kworker/u9:0 Not tainted 6.10.0-syzkaller-09703-gd7e78951a8b8 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 06/27/2024
+Workqueue: hci0 hci_cmd_sync_work
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:88 [inline]
+ dump_stack_lvl+0x241/0x360 lib/dump_stack.c:114
+ print_address_description mm/kasan/report.c:377 [inline]
+ print_report+0x169/0x550 mm/kasan/report.c:488
+ kasan_report+0x143/0x180 mm/kasan/report.c:601
+ mgmt_remove_adv_monitor_sync+0x3a/0xd0 net/bluetooth/mgmt.c:5444
+ hci_cmd_sync_work+0x22b/0x400 net/bluetooth/hci_sync.c:328
+ process_one_work kernel/workqueue.c:3231 [inline]
+ process_scheduled_works+0xa2c/0x1830 kernel/workqueue.c:3312
+ worker_thread+0x86d/0xd40 kernel/workqueue.c:3390
+ kthread+0x2f0/0x390 kernel/kthread.c:389
+ ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
+ </TASK>
+
+Allocated by task 7112:
+ kasan_save_stack mm/kasan/common.c:47 [inline]
+ kasan_save_track+0x3f/0x80 mm/kasan/common.c:68
+ poison_kmalloc_redzone mm/kasan/common.c:370 [inline]
+ __kasan_kmalloc+0x98/0xb0 mm/kasan/common.c:387
+ kasan_kmalloc include/linux/kasan.h:211 [inline]
+ __kmalloc_cache_noprof+0x19c/0x2c0 mm/slub.c:4180
+ kmalloc_noprof include/linux/slab.h:681 [inline]
+ kzalloc_noprof include/linux/slab.h:807 [inline]
+ mgmt_pending_new+0x65/0x250 net/bluetooth/mgmt_util.c:269
+ mgmt_pending_add+0x36/0x120 net/bluetooth/mgmt_util.c:296
+ remove_adv_monitor+0x102/0x1b0 net/bluetooth/mgmt.c:5469
+ hci_mgmt_cmd+0xc47/0x11d0 net/bluetooth/hci_sock.c:1712
+ hci_sock_sendmsg+0x7b8/0x11c0 net/bluetooth/hci_sock.c:1832
+ sock_sendmsg_nosec net/socket.c:730 [inline]
+ __sock_sendmsg+0x221/0x270 net/socket.c:745
+ sock_write_iter+0x2dd/0x400 net/socket.c:1160
+ new_sync_write fs/read_write.c:497 [inline]
+ vfs_write+0xa72/0xc90 fs/read_write.c:590
+ ksys_write+0x1a0/0x2c0 fs/read_write.c:643
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+Freed by task 7179:
+ kasan_save_stack mm/kasan/common.c:47 [inline]
+ kasan_save_track+0x3f/0x80 mm/kasan/common.c:68
+ kasan_save_free_info+0x40/0x50 mm/kasan/generic.c:579
+ poison_slab_object+0xe0/0x150 mm/kasan/common.c:240
+ __kasan_slab_free+0x37/0x60 mm/kasan/common.c:256
+ kasan_slab_free include/linux/kasan.h:184 [inline]
+ slab_free_hook mm/slub.c:2235 [inline]
+ slab_free mm/slub.c:4464 [inline]
+ kfree+0x149/0x360 mm/slub.c:4585
+ mgmt_pending_foreach+0xd1/0x130 net/bluetooth/mgmt_util.c:259
+ __mgmt_power_off+0x187/0x420 net/bluetooth/mgmt.c:9458
+ hci_dev_close_sync+0x665/0x11a0 net/bluetooth/hci_sync.c:5118
+ hci_dev_do_close net/bluetooth/hci_core.c:490 [inline]
+ hci_dev_close+0x112/0x210 net/bluetooth/hci_core.c:515
+ sock_do_ioctl+0x158/0x460 net/socket.c:1222
+ sock_ioctl+0x629/0x8e0 net/socket.c:1341
+ vfs_ioctl fs/ioctl.c:51 [inline]
+ __do_sys_ioctl fs/ioctl.c:907 [inline]
+ __se_sys_ioctl+0xfc/0x170 fs/ioctl.c:893
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+The buggy address belongs to the object at ffff88802aac0f00
+ which belongs to the cache kmalloc-96 of size 96
+The buggy address is located 24 bytes inside of
+ freed 96-byte region [ffff88802aac0f00, ffff88802aac0f60)
+
+The buggy address belongs to the physical page:
+page: refcount:1 mapcount:0 mapping:0000000000000000 index:0xffff88802aac0b80 pfn:0x2aac0
+flags: 0xfff00000000200(workingset|node=0|zone=1|lastcpupid=0x7ff)
+page_type: 0xffffefff(slab)
+raw: 00fff00000000200 ffff888015041280 ffffea00007c85d0 ffffea0001a17590
+raw: ffff88802aac0b80 000000000020000a 00000001ffffefff 0000000000000000
+page dumped because: kasan: bad access detected
+page_owner tracks the page as allocated
+page last allocated via order 0, migratetype Unmovable, gfp_mask 0x352800(GFP_NOWAIT|__GFP_NORETRY|__GFP_COMP|__GFP_HARDWALL|__GFP_THISNODE), pid 5330, tgid 5329 (syz.3.37), ts 87033405855, free_ts 86894920419
+ set_page_owner include/linux/page_owner.h:32 [inline]
+ post_alloc_hook+0x1f3/0x230 mm/page_alloc.c:1473
+ prep_new_page mm/page_alloc.c:1481 [inline]
+ get_page_from_freelist+0x2e4c/0x2f10 mm/page_alloc.c:3425
+ __alloc_pages_noprof+0x256/0x6c0 mm/page_alloc.c:4683
+ __alloc_pages_node_noprof include/linux/gfp.h:269 [inline]
+ alloc_pages_node_noprof include/linux/gfp.h:296 [inline]
+ alloc_slab_page+0x5f/0x120 mm/slub.c:2304
+ allocate_slab+0x5a/0x2f0 mm/slub.c:2467
+ new_slab mm/slub.c:2520 [inline]
+ ___slab_alloc+0xcd1/0x14b0 mm/slub.c:3706
+ __slab_alloc+0x58/0xa0 mm/slub.c:3796
+ __slab_alloc_node mm/slub.c:3849 [inline]
+ slab_alloc_node mm/slub.c:4016 [inline]
+ __do_kmalloc_node mm/slub.c:4148 [inline]
+ __kmalloc_node_noprof+0x286/0x440 mm/slub.c:4155
+ kmalloc_array_node_noprof include/linux/slab.h:788 [inline]
+ alloc_slab_obj_exts mm/slub.c:1959 [inline]
+ account_slab mm/slub.c:2430 [inline]
+ allocate_slab+0xb6/0x2f0 mm/slub.c:2485
+ new_slab mm/slub.c:2520 [inline]
+ ___slab_alloc+0xcd1/0x14b0 mm/slub.c:3706
+ __slab_alloc+0x58/0xa0 mm/slub.c:3796
+ __slab_alloc_node mm/slub.c:3849 [inline]
+ slab_alloc_node mm/slub.c:4016 [inline]
+ kmem_cache_alloc_noprof+0x1c1/0x2a0 mm/slub.c:4035
+ sk_prot_alloc+0x58/0x210 net/core/sock.c:2090
+ sk_alloc+0x38/0x370 net/core/sock.c:2149
+ inet_create+0x652/0xe70 net/ipv4/af_inet.c:326
+ __sock_create+0x490/0x920 net/socket.c:1571
+page last free pid 5318 tgid 5318 stack trace:
+ reset_page_owner include/linux/page_owner.h:25 [inline]
+ free_pages_prepare mm/page_alloc.c:1093 [inline]
+ free_unref_folios+0xf23/0x19e0 mm/page_alloc.c:2637
+ folios_put_refs+0x93a/0xa60 mm/swap.c:1024
+ free_pages_and_swap_cache+0x5c8/0x690 mm/swap_state.c:332
+ __tlb_batch_free_encoded_pages mm/mmu_gather.c:136 [inline]
+ tlb_batch_pages_flush mm/mmu_gather.c:149 [inline]
+ tlb_flush_mmu_free mm/mmu_gather.c:366 [inline]
+ tlb_flush_mmu+0x3a3/0x680 mm/mmu_gather.c:373
+ tlb_finish_mmu+0xd4/0x200 mm/mmu_gather.c:465
+ exit_mmap+0x44f/0xc80 mm/mmap.c:3354
+ __mmput+0x115/0x390 kernel/fork.c:1343
+ exit_mm+0x220/0x310 kernel/exit.c:566
+ do_exit+0x9b2/0x27f0 kernel/exit.c:864
+ do_group_exit+0x207/0x2c0 kernel/exit.c:1026
+ __do_sys_exit_group kernel/exit.c:1037 [inline]
+ __se_sys_exit_group kernel/exit.c:1035 [inline]
+ __x64_sys_exit_group+0x3f/0x40 kernel/exit.c:1035
+ x64_sys_call+0x26c3/0x26d0 arch/x86/include/generated/asm/syscalls_64.h:232
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+Memory state around the buggy address:
+ ffff88802aac0e00: fa fb fb fb fb fb fb fb fb fb fb fb fc fc fc fc
+ ffff88802aac0e80: 00 00 00 00 00 00 00 00 00 00 00 00 fc fc fc fc
+>ffff88802aac0f00: fa fb fb fb fb fb fb fb fb fb fb fb fc fc fc fc
+                            ^
+ ffff88802aac0f80: fa fb fb fb fb fb fb fb fb fb fb fb fc fc fc fc
+ ffff88802aac1000: 04 fc fc fc 04 fc fc fc 04 fc fc fc 04 fc fc fc
+==================================================================
+
+
 ---
- profiles/battery/battery.c | 10 ++++++----
- 1 file changed, 6 insertions(+), 4 deletions(-)
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-diff --git a/profiles/battery/battery.c b/profiles/battery/battery.c
-index 02d024d92..b2699c0d7 100644
---- a/profiles/battery/battery.c
-+++ b/profiles/battery/battery.c
-@@ -94,13 +94,15 @@ static void parse_battery_level(struct batt *batt,
- 	uint8_t percentage;
- 
- 	percentage = value[0];
-+
-+	if (!batt->battery) {
-+		warn("Trying to update an unregistered battery");
-+		return;
-+	}
-+
- 	if (batt->percentage != percentage) {
- 		batt->percentage = percentage;
- 		DBG("Battery Level updated: %d%%", percentage);
--		if (!batt->battery) {
--			warn("Trying to update an unregistered battery");
--			return;
--		}
- 		btd_battery_update(batt->battery, batt->percentage);
- 	}
- }
--- 
-2.45.2
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
