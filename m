@@ -1,77 +1,77 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f72.google.com (mail-io1-f72.google.com [209.85.166.72])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49EDD13CFBB
-	for <linux-bluetooth@vger.kernel.org>; Thu, 25 Jul 2024 23:39:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 289B7149002
+	for <linux-bluetooth@vger.kernel.org>; Thu, 25 Jul 2024 23:45:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721950759; cv=none; b=ZGsunkRXOmUUoGGXF6UirY1v3GdUmSZxl82YM14fbZLl5wLArl0YinOtD6UNSXYCacsjTC0A04y/yio4qarbwWFZPA9safCCJv9HTPQq+PzOB7uhXGTchcvabbAjbqgvHPROJlb+d5MOFBFuUGH/dC1c32BZZc6lMue9U3qmSrg=
+	t=1721951105; cv=none; b=qvwyzxHTS+7A65e1LwCqTOtkNFD6jhI5jcwDKZtxGvJHho4LBwkbyroYnEncT3NqeYAEKDGBVwRcVOLLn2ESXD/b+sPVawC+d06OyVSYLscPmfa3w091nOGDAvNATJfg7b7VE/6qFdc0npMN6S4TXejaCrpTmP4kjm+vJ/3dAY8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721950759; c=relaxed/simple;
-	bh=HRZP8iSfi2/dGyTmM/zH6Yu94uFipvMrorZ2E4Yshc4=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=Wi/de0WMbKoups3zDQfmoTnfuTNGYYLBtKY5vfQVweJ6xigwqTwgUb7zQVeqjerU34In4NDTgpirsJvvdwSriE8pFnZfBTaXzNB67ZbfgCcKFB2lLZ18PHG8yms6wRK0gSjAdWxYf/37D5VzwYdWXU6EGgncCjorXgmsjtLs4uA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=f2+GWo/P; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="f2+GWo/P"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id D2BA6C116B1
-	for <linux-bluetooth@vger.kernel.org>; Thu, 25 Jul 2024 23:39:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1721950758;
-	bh=HRZP8iSfi2/dGyTmM/zH6Yu94uFipvMrorZ2E4Yshc4=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=f2+GWo/Pv86nyv+L2W1tgsZ/JO7Qw7y5O1xJA3i/VOYWRjjKUbkibu0QyZBTZXtx9
-	 9HJF38fRop15iU7alW30J6S3QTN8HVwRSWopoBKbO13x7T/c7zpRa+Fqsc/8y4IXcO
-	 7qNVBx8lmzLhVjx9kYJX2Uf+W49Xfx+Ct0e0oV2Kn+Leb1dPg5zaGFppV+OKV+Kj22
-	 VNZXePIVw9WPxgFkFVUjEK/1MjH2BjfoCys6Zpcnfyes6esc/WvadnbHiTOgviP98Y
-	 VqpvYUasDvdEdsoU6+y54Yd3p6D5w7TbSOjlPOoRKp6lkEtsSvg/BmR+qYV7Q4Fb1f
-	 oHDNMgg5YcqDg==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id C3DC0C53B7F; Thu, 25 Jul 2024 23:39:18 +0000 (UTC)
-From: bugzilla-daemon@kernel.org
-To: linux-bluetooth@vger.kernel.org
-Subject: [Bug 219088] bluetooth scanning doesn't work in 6.10.0
-Date: Thu, 25 Jul 2024 23:39:18 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: eugene.shalygin@gmail.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P3
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-219088-62941-i9I4d3x7Xe@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-219088-62941@https.bugzilla.kernel.org/>
-References: <bug-219088-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+	s=arc-20240116; t=1721951105; c=relaxed/simple;
+	bh=wwX9ogO+l7SoYYXmYsTfnxkf2Tf/OV6Krfu4CDL3YrE=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=bmJ62Pvu9Krs0JO5rtXoDz4s0BMOim36qMGNxVO+VHKXU6CF9hGIOYycrm+PesZLf7AEjSR48yQ+YB/EwNj1Q/lzRT+va7fkYboZBudjmQkfM+kyaN53oh6tRQLbLuZmdIXkHyQx/uMtoWHI7bKjLLqlL+wDbC0J33/75iCeuN0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f72.google.com with SMTP id ca18e2360f4ac-7fdfb3333e5so101324639f.1
+        for <linux-bluetooth@vger.kernel.org>; Thu, 25 Jul 2024 16:45:03 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1721951103; x=1722555903;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=kD7O2lXC3zqdl4EtbgcEWNtaDBfdLurNknRdZY7aUgs=;
+        b=IPH84n5bEkReqmlXMcCzvgukaDHH00hubcRjAofVhbyZKK7FsB4ArMfbUn/q4H3xla
+         wasiS2R/94mXdKxxhDoQpKwKhjOImadVNhO9bG/Wc6GYsxHyk/rQGbvyTkTiK6oeRZoZ
+         dNGj3G/T57NFynleQqNenCzEp1Vw1285Mm26W64NbHR14XHI18VMQIY3dLHdERKfaxTZ
+         78sDFEy/nf06AdI67XdHVW8nPhkeJ+QL968XabC6wayQPYjBusYh6aILm2WzBeXKN/Jb
+         nPIHs7pTnx1NxSYkiuo6bXboEhpskbWs1mELwJQQhlA4B0QGUJbEGhjRS70FE/Gl0HYI
+         MygA==
+X-Forwarded-Encrypted: i=1; AJvYcCXkIYfGnwIUrH7YrUDYXreLCZTxHzgg9m/IV02xNU7A8rIGXGPOt91Lq1xwuEHumMmCPqfLmjaedzNd60lVU529pNO/yPw9inuHr7z+Xwth
+X-Gm-Message-State: AOJu0YzUjgsEHfMZEPusl5jX7ZVQzMkcsS8cMUglJsdrEoBploYppxx9
+	Nhvw44GqTKIrf92HI0cwKw+vFcuf+qQBaRUYestfDAX5Z053BumKxmtKg3/ulr7vLEW3NgyrSiq
+	GWYMoD2lB9AobCUiwgHW6T7Ozka/24r6ozIuDCtovpRqqU5Cp8YdkdD8=
+X-Google-Smtp-Source: AGHT+IH9qgQqpxH+zD3KrXMCHbTJdndRs8/9ObQNoj+OGubcWHXMkjSrsrRetYcTWr2Wd6IW3Zl3Hupd4ryprl5+ta3iYXXm2MtY
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+X-Received: by 2002:a05:6638:3015:b0:4c0:9a3e:c259 with SMTP id
+ 8926c6da1cb9f-4c29c211258mr149009173.5.1721951103186; Thu, 25 Jul 2024
+ 16:45:03 -0700 (PDT)
+Date: Thu, 25 Jul 2024 16:45:03 -0700
+In-Reply-To: <000000000000ec64cd0616084ae9@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000d390be061e1afb9c@google.com>
+Subject: Re: [syzbot] [bluetooth?] WARNING in hci_conn_set_handle
+From: syzbot <syzbot+d6282a21a27259b5f7e7@syzkaller.appspotmail.com>
+To: eadavis@qq.com, hdanton@sina.com, johan.hedberg@gmail.com, 
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	luiz.dentz@gmail.com, luiz.von.dentz@intel.com, marcel@holtmann.org, 
+	mukattreyee@gmail.com, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D219088
+syzbot suspects this issue was fixed by commit:
 
---- Comment #19 from Eugene Shalygin (eugene.shalygin@gmail.com) ---
-(In reply to Luiz Von Dentz from comment #18)
-> Created attachment 306621 [details]
-> Bluetooth: hci_event: Fix setting DISCOVERY_FINDING for passive scanning
+commit 015d79c96d62cd8a4a359fcf5be40d58088c936b
+Author: Edward Adam Davis <eadavis@qq.com>
+Date:   Mon Jun 17 11:09:37 2024 +0000
 
-Applied that to 6.10.0 and it helped. Thank you!
+    Bluetooth: Ignore too large handle values in BIG
 
---=20
-You may reply to this email to add a comment.
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=13110dad980000
+start commit:   480e035fc4c7 Merge tag 'drm-next-2024-03-13' of https://gi..
+git tree:       upstream
+kernel config:  https://syzkaller.appspot.com/x/.config?x=1e5b814e91787669
+dashboard link: https://syzkaller.appspot.com/bug?extid=d6282a21a27259b5f7e7
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=10f3e213180000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=162d4723180000
 
-You are receiving this mail because:
-You are the assignee for the bug.=
+If the result looks correct, please mark the issue as fixed by replying with:
+
+#syz fix: Bluetooth: Ignore too large handle values in BIG
+
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
