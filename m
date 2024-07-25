@@ -1,91 +1,105 @@
-Received: from mail-lj1-f175.google.com (mail-lj1-f175.google.com [209.85.208.175])
+Received: from mail-pg1-f181.google.com (mail-pg1-f181.google.com [209.85.215.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19FA84D8A3
-	for <linux-bluetooth@vger.kernel.org>; Thu, 25 Jul 2024 20:35:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8A03249ED
+	for <linux-bluetooth@vger.kernel.org>; Thu, 25 Jul 2024 20:48:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721939742; cv=none; b=RTVxoD45X4J17J4PHh+PKWZRz2iAFth6rb16Cw5OOvWmUmHFMWIOkgc4jtxvak9jgqICyDi8QyuCK7HxI7NW5Mus8HiuoahMevwwHF9c9eWDEPUBB6+f/w19g9JjQlIbHvLv27XTRqLfNEy+Hm1yO20lP6hB/WxhvoZrGt+CY5s=
+	t=1721940483; cv=none; b=oZxCMuZ1DvKUrvvXsEMnqke24JWLS9znSNgqloxC5DuP0zb0tPNQ0f4WA/yNiEDFHvws6gQe0fbjIBUg4MeCRARiN6uvhPdx0YngYQ1XatuMHiChokq2nCKemVoouga1Lm72rTfh2nqsj6O/P9/ahi8H3rPYI0JMkD+0YOOvcOY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721939742; c=relaxed/simple;
-	bh=YtMySxkyLmF4BEpR7uyWE/39aC2i8iMpKpQV7jBsECU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=oRjVH8aLRGU535kulYqtRp8s28+kPa1aiNNyidJUb2oGf2DMdJWg0SGjGgN42R/qIdeBbDNQMMiol7yVbDdvGp57ep7jD4AL/e3btWZZAq9AVYVFu/FsVFBlU/LqVRZCcPrJeCwdjk097tEP64od3mH4wbkekOOpEIFuCmqT3+I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gL+pDYtZ; arc=none smtp.client-ip=209.85.208.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1721940483; c=relaxed/simple;
+	bh=rhXoNqDfqqggPPDeX8KuavAyrGa9lS4NvvS718U3qqY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=WwHRJ1rYWEYuzcPhm2ZxRSc4c+FPZRhUM+BcVLQx/uFFy0H6nQWlLEIq7QsJvJR1WizrQ5H7Z6I3CUXXBroXctpf0AfXi9yYjO13P4TOCIe6wrckeNL1uhd482uI0YMdkXXEvcveyPzn3QG/nIozU/wBOffhYFDQ5XI4uvSsPfI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=penguintechs.org; spf=pass smtp.mailfrom=penguintechs.org; dkim=pass (1024-bit key) header.d=penguintechs.org header.i=@penguintechs.org header.b=dihqZx2D; arc=none smtp.client-ip=209.85.215.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=penguintechs.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=penguintechs.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gL+pDYtZ"
-Received: by mail-lj1-f175.google.com with SMTP id 38308e7fff4ca-2f035ae0ff1so5150421fa.0
-        for <linux-bluetooth@vger.kernel.org>; Thu, 25 Jul 2024 13:35:40 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=penguintechs.org header.i=@penguintechs.org header.b="dihqZx2D"
+Received: by mail-pg1-f181.google.com with SMTP id 41be03b00d2f7-7a115c427f1so215138a12.0
+        for <linux-bluetooth@vger.kernel.org>; Thu, 25 Jul 2024 13:48:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1721939739; x=1722544539; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=YtMySxkyLmF4BEpR7uyWE/39aC2i8iMpKpQV7jBsECU=;
-        b=gL+pDYtZUXY9r4OQN0iBVcgEhDSXZ3+iRJR9W+ySKd/pmdT41Fc+MkQ7Lnx7kwB3xn
-         w71zCkIRAnR9GDa7UEs2GbdR8WJlrM6NGzEUTTtbGaIC0wtCLY+3ogz7NPO/1si+PNWE
-         pq6uzLO3EbYaIFBSiRkzjBSXZKjYNO2n+HTFKBz5yeGUBhVtkPz89JOWF/Du1wYZohzJ
-         q33TVtybccekvhmJ11jABglXQV7M5VQCGZmWxh8fbK1WGP+y1M8Rr882JdiWvN4VJYjN
-         cPW88LwNSSY6gVCxfcPLvvDpDfLfRZ6G0pT0c5mxcyUZbFrIL6bUSX9/C0MLR6sdsICq
-         LV9A==
+        d=penguintechs.org; s=google; t=1721940480; x=1722545280; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=SGas4NAIZlgp1NOKOLjoYlKyc4maTrUF5UV+zPz4UcU=;
+        b=dihqZx2DVg+lYhP4foEiaoJohRP8xkbug82sS+pyvnBzKgW7TYJFtozU3MNntq8j+p
+         GNGthkGT0uLWnotHG8uyRMgqGp4JT6F/B5XTPZqW5WIwNnMhIz9+O79TEcC0YDQGCYfI
+         YFmCPZYfYplRqP7cKUeidSCviYRmpHo21fENo=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721939739; x=1722544539;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=YtMySxkyLmF4BEpR7uyWE/39aC2i8iMpKpQV7jBsECU=;
-        b=HWIa3g8LeC9YZ3J5VI+I+x1r6T+gbV/G+xr/gVkMKy7+4yzr84ZKUvUo1l+QlFcpE2
-         RTzUBL/TBSElqPgEDsM2PvYlQqnSOqMzDzU9jOXebyXBTh14SNMmqPCu3hIocdFuAU95
-         Ej/eQWVH3LSizCGQl9ZWE6eFgx4/dWLcbrBwsf0IQPiwrYEv7abc2NdWEVgLzVsOQ/3O
-         ZKqU5V2ItLL6y9ZCV5F17de9KKo569WIhz05NAGUSpylCB4vDBhFiB1nv7DMpMJXMgGt
-         Na9v7m9AxibQe+J/demmUkkTr8cczAY/lcZMmI6eJokD9uLem+QAgHhgxyLQvbVFRhaT
-         u/YA==
-X-Gm-Message-State: AOJu0YxULQa1ld/FaH5cj7amZkZAfPJqyeIj79p4pGrHjj5CtG2G9eBX
-	kQG8D1RCMjGej7bhr6aUkvCTB/yllCSp/89Rq7DmRmewBpcBoK2J4VCEvpYSgTxbQi3bUyCwfOW
-	SSCdXlm2Ksh9BmW0ROZTHLs9sC5QHgf7L
-X-Google-Smtp-Source: AGHT+IG8JtXgHgktqZBtjeqC/c1eHDVr+xUqd7DDDGVLKEFzTl/8LsV59gsbwjwC9bNokIBbNGP/DEljSesCcPq8b48=
-X-Received: by 2002:a2e:8612:0:b0:2ee:7c35:d892 with SMTP id
- 38308e7fff4ca-2f03ac4076emr11760281fa.17.1721939738941; Thu, 25 Jul 2024
- 13:35:38 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1721940480; x=1722545280;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=SGas4NAIZlgp1NOKOLjoYlKyc4maTrUF5UV+zPz4UcU=;
+        b=nOx3WQRddtDUJIa4m1KbQ45bAIp8rpoFMpzy3ddszX21LlZ6ai5VUAnSqrpChdqmWZ
+         V32Br1uYeO84J4UmGxYFgSpm52fj6o7OkYrbMqQEZp4ygTmfOh2UcQ0cpqggfHL48qmT
+         6t7bgD/VWf2c+dp+muz7GibEI/3MPrXJ8EKBESeZepuY72r2M0BvFErPBLk5gNxn8v0t
+         O9P0PgPnGYPXDeJ7TzGQSeeb0o9xtuWnUrKFpGo2u7eMZGFBz1hoVtJV/+owffQcVtd5
+         RrLUCVWycJMkL9SwV7o5zSbTwoR3M9I9F5P0nFP5iAgkxfQZq1Vs86xUOZI6oTwwud5d
+         6zLQ==
+X-Gm-Message-State: AOJu0YyRheUOM3GnEgb8MKmJYxPGXzAgbVUVsKpanEGJvdcrEWVS711f
+	1DKFrpLpwgudbj1Rn//Gmq8zCEigp+8dYnEdn3FctjF835FDu1Mpxr2jYm5tU4lGHKHKmcO1FYd
+	wvA==
+X-Google-Smtp-Source: AGHT+IFVKupZQZl9SVw6WfvRtUtjWeLYhis6k0gFAnjdUNF/b/i3KaSxCxBP/k2KJtmYBQCVLDZXdQ==
+X-Received: by 2002:a05:6a20:cf8d:b0:1bd:28b9:6f88 with SMTP id adf61e73a8af0-1c47b1a1fbemr3794379637.24.1721940479709;
+        Thu, 25 Jul 2024 13:47:59 -0700 (PDT)
+Received: from ?IPV6:2601:646:8700:dd30:5f3e:5ba7:e0ea:9a08? ([2601:646:8700:dd30:5f3e:5ba7:e0ea:9a08])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7a9f8655dffsm1361446a12.39.2024.07.25.13.47.58
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 25 Jul 2024 13:47:59 -0700 (PDT)
+Message-ID: <30319168-9456-49dd-be27-480b2a068fe3@penguintechs.org>
+Date: Thu, 25 Jul 2024 13:47:57 -0700
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <27e6a6c5-fb63-4219-be0b-eefa2c116e06@penguintechs.org>
-In-Reply-To: <27e6a6c5-fb63-4219-be0b-eefa2c116e06@penguintechs.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Thu, 25 Jul 2024 16:35:26 -0400
-Message-ID: <CABBYNZ+vVFUm1Tb+BvViYMJd6XQczTYPgyO++GGbCcWrkaC4Kg@mail.gmail.com>
+User-Agent: Mozilla Thunderbird
 Subject: Re: QCA6390 broken in current kernel
-To: Wren Turkal <wt@penguintechs.org>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+References: <27e6a6c5-fb63-4219-be0b-eefa2c116e06@penguintechs.org>
+ <CABBYNZ+vVFUm1Tb+BvViYMJd6XQczTYPgyO++GGbCcWrkaC4Kg@mail.gmail.com>
+Content-Language: en-US
+From: Wren Turkal <wt@penguintechs.org>
+In-Reply-To: <CABBYNZ+vVFUm1Tb+BvViYMJd6XQczTYPgyO++GGbCcWrkaC4Kg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-Hi Wren,
+On 7/25/24 1:35 PM, Luiz Augusto von Dentz wrote:
+> Hi Wren,
+> 
+> On Thu, Jul 25, 2024 at 2:35 PM Wren Turkal <wt@penguintechs.org> wrote:
+>>
+>> Hello BT folks,
+>>
+>> Just so y'all know, the QCA6390 bluetooth hardware appears to be broken
+>> at least since commit 720261cfc732.
+>>
+>> The KDE and Gnome bluetooth control panels appear to think there is no
+>> bluetooth hardware. Rolling back to 6.10 appear to function.
+>>
+>> I have a Dell XPS13 9310.
+>>
+>> I will attempt to capture some kernel logs in a bit.
+> 
+> git show 720261cfc732
+> fatal: ambiguous argument '720261cfc732': unknown revision or path not
+> in the working tree.
 
-On Thu, Jul 25, 2024 at 2:35=E2=80=AFPM Wren Turkal <wt@penguintechs.org> w=
-rote:
->
-> Hello BT folks,
->
-> Just so y'all know, the QCA6390 bluetooth hardware appears to be broken
-> at least since commit 720261cfc732.
->
-> The KDE and Gnome bluetooth control panels appear to think there is no
-> bluetooth hardware. Rolling back to 6.10 appear to function.
->
-> I have a Dell XPS13 9310.
->
-> I will attempt to capture some kernel logs in a bit.
+I gave you the sha for the built fedora rawhide kernel package, not a 
+mainline sha. Sorry about that. I thought it was a mainline sha. I am 
+trying to bisect the problem. Hopefully, I can get a mainline git sha 
+for you soon.
 
-git show 720261cfc732
-fatal: ambiguous argument '720261cfc732': unknown revision or path not
-in the working tree.
+If it helps, the build date of the kernel is 2024-07-19.
 
---=20
-Luiz Augusto von Dentz
+Sorry about the confusion. Hope this helps track down the problem.
+
+wt
+-- 
+You're more amazing than you think!
+
