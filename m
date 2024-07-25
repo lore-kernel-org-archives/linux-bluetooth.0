@@ -1,133 +1,87 @@
-Received: from mail-qk1-f170.google.com (mail-qk1-f170.google.com [209.85.222.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF04326281
-	for <linux-bluetooth@vger.kernel.org>; Thu, 25 Jul 2024 12:41:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBE24199386
+	for <linux-bluetooth@vger.kernel.org>; Thu, 25 Jul 2024 13:44:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721911317; cv=none; b=KOe4Ys2KnFROykF3is6HjKxywPCTwC4JutHV1jDCv97Je6PQ8x7P1/xdYWfzu0WCzhOW322lPxquee4j+ZCuIlFLkpU2vxYwR50k2yiO9Bgij5K5ZPd/Utt0IjSWJ4xrWM2POry9Sfc7iNlufobQDjZmjr0Zs1qarGYneZlIApU=
+	t=1721915051; cv=none; b=P3SbIYFTFs9pYvobSUu6M78ziKHXL58vRm6pr1BGxIc4J3RwHEOCjIVief+rWjU09EiI11te86VPyX+7E9ej7hl5gQs7fP/zDcpixc8DMrgzSgRhfWWpUMUKy5QBE8kz9KbMasUSl/Ex2PJ2oqoAeO6oxjAV5+btSG3AWo5s7gg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721911317; c=relaxed/simple;
-	bh=62/dZ057ty04qVXk/+wqqJe5kwjK+3gPCDFAA+grAbk=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=BP4ghAlaNuQFsa3N9DKv3rQxNKqAkMmIXFW06KajA81IYxVmEMN6q2ltqTUnBsuYfEwL24nXSwUouIbRmm5RE41I+S78DI+PDawnGmUXC6uLtHROKlus9ZIJvXxAQwG55f0WSd9D4NhscomOXftfI+MwxDkHorAVe3XFvwMjf6U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QMquUgts; arc=none smtp.client-ip=209.85.222.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1721915051; c=relaxed/simple;
+	bh=69SIKbiOekgShx1kHFtL9KxKQ078kgEGm5ZPO0oJg/4=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=D9owqGQrjCr/CoT/VuSyyEUE5rmpkW+n5Ux97kcTaPuy2BZehuqhM5XgS0rIkJcmd3EaZc8J3Q2lFtzfMl984TqKPvuz9IufiRrcrXpcOk/eqA31uS2Bw56xGDXillzXYCw4181OjfUm3FZDUuQKAvFG0L1AdbSIEekcSPEyl30=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UZFL8OVQ; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QMquUgts"
-Received: by mail-qk1-f170.google.com with SMTP id af79cd13be357-7a1d984ed52so28310385a.0
-        for <linux-bluetooth@vger.kernel.org>; Thu, 25 Jul 2024 05:41:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1721911315; x=1722516115; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=f9hI1oqTJv5ZHwP/wo2FTifjoX1Xz5kaGDi8eBZDbkQ=;
-        b=QMquUgts72Rz4FgQJjzzmYc+O7db1PV2kKbpSF8qzYJ3JYzJUWxUKkbLEp2Af6K7jX
-         JzgLgfc3W/FrxcsgtI+vHS/OIjQVsHi79iiDrD/e2+IQa61cIXM/NHV16l697EKAc60R
-         XF7uJIxcw9B6HR+sL1qjQvJvViYZo934hXd/MdhNy25ZCImRey5XCxks1nFU0BUpryQt
-         ahYD0VmA3j79opHWXsrqlMp3D3jWNta63mJOIhOp1bfRubttGQvbKf12iJc2A8mYf4Bl
-         45zGIlLcCaSHpjt/P+9cVWIbzRLh7h1M9154P9mGmT55mKQjAznBhfudtMkmx6gRhbW9
-         ChwA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721911315; x=1722516115;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=f9hI1oqTJv5ZHwP/wo2FTifjoX1Xz5kaGDi8eBZDbkQ=;
-        b=FYmPoSZK9019WLFz8vnje4HskQjMGkphjV5zwHFr9lMmySKnZOpANj2xqZ8kLhFESy
-         OsgJGH09/Swk62LkahV9hJcxlnWZmYooqTgGLQ8XLHHoL/iedja6PzJ2CPTgQMDY7i1X
-         OGb0qm/NmidPJIRzlixNELCFhYH8zWIe09EBjZp6RBhbmjlQSjCOiD7LQcLshsD39I4y
-         1kRzhH1t1IMZm7R9qRL6xi5HyM9LA4Q2wgmkF5g4mnG9CWQ7FAeax2f++H1ya5tJvYp2
-         G+tNx4C4X/5CUnv7fZKYRNPJ/xXXP2eZ3Q8eEyLtxc8XkqeFNpzvLBJkVLdWqZ/osq+9
-         5R/A==
-X-Gm-Message-State: AOJu0YxpwDbTnkWn+B/C/H3BtKNjJaeNlkXTDyYB24H0RaO/HjQbwSpo
-	gq5Fzkve/ijAOBpdihirsgkdQF3LiGgVKEF7vRDDTJiWGxJGaFRS3HUakQ==
-X-Google-Smtp-Source: AGHT+IGOeTg1YA4jXIjkCMdqSodNUnUWlJdv8NJfqVUwOG0vz6ekjAtE8lSgI48JhXxu3OsdzQEIeg==
-X-Received: by 2002:a05:620a:404b:b0:79d:5399:baf5 with SMTP id af79cd13be357-7a1d7e49247mr216937085a.15.1721911314550;
-        Thu, 25 Jul 2024 05:41:54 -0700 (PDT)
-Received: from [172.17.0.2] ([40.76.119.98])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7a1d7398229sm78993385a.4.2024.07.25.05.41.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 25 Jul 2024 05:41:54 -0700 (PDT)
-Message-ID: <66a24812.050a0220.5cb2.1e27@mx.google.com>
-Date: Thu, 25 Jul 2024 05:41:54 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============1892902862100222659=="
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UZFL8OVQ"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 4CF1FC32782
+	for <linux-bluetooth@vger.kernel.org>; Thu, 25 Jul 2024 13:44:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1721915051;
+	bh=69SIKbiOekgShx1kHFtL9KxKQ078kgEGm5ZPO0oJg/4=;
+	h=From:To:Subject:Date:In-Reply-To:References:From;
+	b=UZFL8OVQmdcxVK71gBV0pOUHMRQQ/nLtUlFGsficL+OosT13vhjHXZ/C/ds4wOwb2
+	 Gq6VS7C8kP6cjQxiJ/YpCBdO39S23gzIdQC4Pu+gs03N7coHvludjkNLB69z6hQ/5W
+	 L0BHHNpzCJY/b2i7zSZybevEj9s2QYnb7qJSpAWBbQ5IMaVvR7DN1PxuvqrK8DKYPk
+	 rMa3eV4cp4XtLperxBy2jZ2hYAULR/68cSvOrluhFW3tIdc5dZM7yCV8DTPx3hh3HN
+	 CxlGdoEzy8GSO91ab9PKYL2BD2/L3hyysqTagZciUXqhr7DUWE0aywI3qqdLDt+u4F
+	 midqNhgTlFHdw==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+	id 3F269C53B7F; Thu, 25 Jul 2024 13:44:11 +0000 (UTC)
+From: bugzilla-daemon@kernel.org
+To: linux-bluetooth@vger.kernel.org
+Subject: [Bug 219088] bluetooth scanning doesn't work in 6.10.0
+Date: Thu, 25 Jul 2024 13:44:11 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: luiz.dentz@gmail.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P3
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: cc
+Message-ID: <bug-219088-62941-pnYk3C4RhO@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-219088-62941@https.bugzilla.kernel.org/>
+References: <bug-219088-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, quic_amisjain@quicinc.com
-Subject: RE: [v6] obex: Move size emit signal to plugins instead of obex.c
-In-Reply-To: <20240725105226.3121-1-quic_amisjain@quicinc.com>
-References: <20240725105226.3121-1-quic_amisjain@quicinc.com>
-Reply-To: linux-bluetooth@vger.kernel.org
 
---===============1892902862100222659==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+https://bugzilla.kernel.org/show_bug.cgi?id=3D219088
 
-This is automated email and please do not reply to this email!
+Luiz Von Dentz (luiz.dentz@gmail.com) changed:
 
-Dear submitter,
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+                 CC|                            |luiz.dentz@gmail.com
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=873803
+--- Comment #6 from Luiz Von Dentz (luiz.dentz@gmail.com) ---
+I wasn't able to reproduce with current bluetooth-next:
 
----Test result---
+https://gist.github.com/Vudentz/da22fb40ad55091b4a1e67f14a8ad033
 
-Test Summary:
-CheckPatch                    FAIL      0.67 seconds
-GitLint                       PASS      0.33 seconds
-BuildEll                      PASS      24.97 seconds
-BluezMake                     PASS      1767.28 seconds
-MakeCheck                     PASS      13.40 seconds
-MakeDistcheck                 PASS      180.62 seconds
-CheckValgrind                 PASS      254.28 seconds
-CheckSmatch                   PASS      358.12 seconds
-bluezmakeextell               PASS      120.75 seconds
-IncrementalBuild              PASS      1532.05 seconds
-ScanBuild                     PASS      1058.75 seconds
+@Eugene please collect the btmon traces.
 
-Details
-##############################
-Test: CheckPatch - FAIL
-Desc: Run checkpatch.pl script
-Output:
-[v6] obex: Move size emit signal to plugins instead of obex.c
-ERROR:SPACING: spaces required around that '==' (ctx:VxV)
-#120: FILE: obexd/plugins/ftp.c:178:
-+	if (ret==0 && obex_get_size(os) != OBJECT_SIZE_DELETE &&
- 	       ^
+That change should actually help to detect scanning had started so it would=
+ be
+quite surprising if it caused events to not be submitted to userspace.
 
-ERROR:SPACING: spaces required around that '==' (ctx:VxV)
-#136: FILE: obexd/plugins/opp.c:90:
-+	if (err==0 && obex_get_size(os) != OBJECT_SIZE_DELETE &&
- 	       ^
+--=20
+You may reply to this email to add a comment.
 
-/github/workspace/src/src/13741794.patch total: 2 errors, 0 warnings, 31 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/src/13741794.patch has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============1892902862100222659==--
+You are receiving this mail because:
+You are the assignee for the bug.=
