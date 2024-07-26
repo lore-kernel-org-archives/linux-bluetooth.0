@@ -1,113 +1,112 @@
-Received: from mail-ua1-f42.google.com (mail-ua1-f42.google.com [209.85.222.42])
+Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D93CBA53;
-	Fri, 26 Jul 2024 15:05:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C82AB155386
+	for <linux-bluetooth@vger.kernel.org>; Fri, 26 Jul 2024 18:52:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722006307; cv=none; b=U5pSLkRvRZ6RyIQOCgZ/acx26OKgb0CMRzgueh5yCNWx+CUX1m0BBUy/AM25LXjBI/jJ0F5SDKFckAFi/uXxRKUH7XM1ZQMhIx8R0bTj8CDAXz2OQyReqROW4PxSFPm5aheVn8pFVql3Q4dsesPKyRxSW9kBovCoh7nd8oCdyco=
+	t=1722019939; cv=none; b=GAFAiLY4sNRu33/hZ9PUO/Q6S7ftzg+MJEmV6s2CbYGbgeKtUN2MXOHfBVWEi9nMEsn7x3+JMsYWqS9egqAXCgKj1XO512lKBoteuvcpqMwp9VmFO4YhRlzyrlQPgMHGBLE3gU12x8RGgK7c+OQk4jBxUM3Itij/PR9wSQKCcp4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722006307; c=relaxed/simple;
-	bh=KQ+QVKQ67JPyWmdy372+U0rPCho3OrSUr0D1G+qLUHc=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=sdtotAka1GBrImuO22LZxcsjglRAZyxME5rkhzE8jCEXKI8vf2xY9bEyDL2nhi8wdmJWvRX9hBxr/3xlvu6m0hPqDLjtdJfVKkTINpf6S4KeuuIIkWSDm7NXhNs8+RlVlFHm6e5DaM+16A+I2I1qclameRQQfsiQiXtvnZlFm+4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hcaZyWa+; arc=none smtp.client-ip=209.85.222.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1722019939; c=relaxed/simple;
+	bh=lDCYy0iwb8e146vK4FXtOlCuC26DpAKb7NVmVzdjl0w=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=KZ7FgIvZlwzokCpdqThmvIN9Jeq3hULJHmufg98r5YOqjUzop6eF6tHMVXYKzxzXjuccZ88/5ANrvGQfketG6JBoCzgmSaUOpAT9OrQ5HU/FPJJe2givX+ATHVNum/D74MqVG6ku/FVQv84jbXyFejecgJtZ/xfuU6S3V4HTonA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=penguintechs.org; spf=pass smtp.mailfrom=penguintechs.org; dkim=pass (1024-bit key) header.d=penguintechs.org header.i=@penguintechs.org header.b=ZYmcozgL; arc=none smtp.client-ip=209.85.214.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=penguintechs.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=penguintechs.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hcaZyWa+"
-Received: by mail-ua1-f42.google.com with SMTP id a1e0cc1a2514c-82c30468266so217705241.0;
-        Fri, 26 Jul 2024 08:05:05 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=penguintechs.org header.i=@penguintechs.org header.b="ZYmcozgL"
+Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-1fd640a6454so10023215ad.3
+        for <linux-bluetooth@vger.kernel.org>; Fri, 26 Jul 2024 11:52:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1722006305; x=1722611105; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=wvj1Ca5nVOPovMpEJijtfF3dALD2KklkmvzpDeQp7y8=;
-        b=hcaZyWa+73OKbULUZAG/HP34SqIOTfadMITneBU/lBPDGyhuBp6ialzxhA4STymT8s
-         Bx4k//BjfDj2EKiKWbGyvDQeqQt0buhp+QSiOz8xzL94fd3uUvriQhF3YYYCq52aXgNv
-         MO6OwooIfntLoR5FmvrQntk4fxbxL31UXw+jbO7eJqxGY+XHlp9BUPJLHWYtASk7c/aF
-         ScflG/Mu+dN076USAUZq0DNT2WVpA3hHsM9jt56ztP3FHSdosEik2eo+pQmiMaigJaQB
-         piqsnHiGxJDhUy3iNtvdEvxxuBoILnbaLbw98NkaRyul3WmT7hslvs+bJF+Ze6hq+b2I
-         h7Vw==
+        d=penguintechs.org; s=google; t=1722019936; x=1722624736; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:from:subject:user-agent:mime-version:date:message-id:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=JFzDfizDvhfPemSFveDwT5/JRbF8KXcgsh052FyrAMQ=;
+        b=ZYmcozgLeQcC+ljgQPb9M1w6nwv/1ZHk8m5mpwYrI1XOch1647w+IRhsb42tQxULUU
+         +svh9IWeNS+AW9B5Sq42RoNyCgyCiH13AkdC6/LKncktehevcMgQBcE72mqpRLDm7iiD
+         t8paqrW6TSZlJAi60ShEOJuDNNWODbDPW+6E0=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722006305; x=1722611105;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=wvj1Ca5nVOPovMpEJijtfF3dALD2KklkmvzpDeQp7y8=;
-        b=pkMGWaZr9M2Q6nnM7SOOAbiht4is+3pdW/Iu9bVjUs1MqsnMAJ9zkE2tAKgZC6kx9F
-         OrT5kroZprpEnvcgSQRETHvIgYM2NfxuKD3A5Evj0UEDfh95iMEyV+SFDNn2M2+HQKds
-         6QibVtAVUp+oyEh1cS+EzNJb/AIgUJhEJMNoei1LenH/t18Iewf1SGswqBkpZozTEYTH
-         xh+jcKgJe7+tnjaBHkiB1WqJRDgWpI8pmOAHdzENR5BMwTpBo5VhVVwAExotOE2OiiZT
-         IxT6i2+uaTNro5m8WdMGoTLtReFJI+HjL4bTrJmskfqrkYohcTslxBijvxDu4u6RqxLH
-         8u+Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUxlCihz/fD70gzY8Nc71l5eCEJ8c6zySCVaSiZbIczREiCMQtLGiLzg9z8V1L3nrrxoU3oUeK6U6IEMRwC0r+AoWUexY83
-X-Gm-Message-State: AOJu0YzZA4PhhEvJCPzpEaEQbj88/7h/oZRlQ2MC2pm9nQ1x3C7zgl8o
-	r2FmJSN4xYBipV0NCLCCSJuQTzZQIh8Ha8XLzRV609Yh7oX1ctY1R4SA5A==
-X-Google-Smtp-Source: AGHT+IHPQZnid0m5X/U++vBLKieyuPShqbtLPr27CoSqUc8XaT1syY/6aI4EJGPZPdU4RqUrSynLyg==
-X-Received: by 2002:a05:6102:3b16:b0:492:99d6:e71a with SMTP id ada2fe7eead31-493d9ae0f89mr5367863137.18.1722006304881;
-        Fri, 26 Jul 2024 08:05:04 -0700 (PDT)
-Received: from lvondent-mobl4.. (syn-107-146-107-067.res.spectrum.com. [107.146.107.67])
-        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-493d98afb56sm661051137.25.2024.07.26.08.05.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 26 Jul 2024 08:05:04 -0700 (PDT)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: davem@davemloft.net,
-	kuba@kernel.org
-Cc: linux-bluetooth@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: pull request: bluetooth 2024-07-26
-Date: Fri, 26 Jul 2024 11:05:02 -0400
-Message-ID: <20240726150502.3300832-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.45.2
+        d=1e100.net; s=20230601; t=1722019936; x=1722624736;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:from:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=JFzDfizDvhfPemSFveDwT5/JRbF8KXcgsh052FyrAMQ=;
+        b=qWm0YL7xVqNt3enCice0c3MVx5qo1xjOqUNkUpUKTe6CZ3pMHwAkoVUwkVVjNMqM10
+         v89EfhiF0Zj2lFaJg+v0bIO8KZr/YaFkrF5X7Cm4oGaH1t0SIF536R7ARl38v5wUwOcX
+         CmmMwGo23clWe53aA3DSV8R7trgrs7Wr03O+ppxE2yNQdQaKTF1BDRo7ndnIo4DVEpuT
+         Oko3fQdSGF1D6h/s5OeR+9oRjiqk2ktVmOiVjsP/Fw5krPWrwRXbGa7MLqUhwMM6Ksxs
+         ZdDJOSUJRibtgCIWLZaQhOH5lX0pCX5G1/rRC/PAhliOovWOzz9legqOpvQSt9oh7L5V
+         PxTA==
+X-Gm-Message-State: AOJu0YziAzGeV27vo77vJauEEA3GbBLe99p9VdJejBMfw3aZ8LwnEYtH
+	DA//N3Ae7GYK1PMYZGmWt/pFgVh/SkLzWEZ5HriHIWk9OPe2AqWHPHg0IgnO2YOPy+O3qp0ASiJ
+	Drw==
+X-Google-Smtp-Source: AGHT+IFWqnLMmkdcEeyDdioQ9syvu9qycACd3pdjErs/oKNgWT3KigoXNVBpIT2Lei6/dp+SxTIAMw==
+X-Received: by 2002:a17:903:41ca:b0:1fd:9c2d:2f1b with SMTP id d9443c01a7336-1ff04910c43mr7767065ad.52.1722019935811;
+        Fri, 26 Jul 2024 11:52:15 -0700 (PDT)
+Received: from ?IPV6:2601:646:8700:dd30:5f3e:5ba7:e0ea:9a08? ([2601:646:8700:dd30:5f3e:5ba7:e0ea:9a08])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1fed7c8d201sm36292975ad.30.2024.07.26.11.52.14
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 26 Jul 2024 11:52:15 -0700 (PDT)
+Message-ID: <1a519b2f-f5cf-40b3-8223-162dc04f8ca8@penguintechs.org>
+Date: Fri, 26 Jul 2024 11:52:13 -0700
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: QCA6390 broken in current kernel
+From: Wren Turkal <wt@penguintechs.org>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+References: <27e6a6c5-fb63-4219-be0b-eefa2c116e06@penguintechs.org>
+ <CABBYNZ+vVFUm1Tb+BvViYMJd6XQczTYPgyO++GGbCcWrkaC4Kg@mail.gmail.com>
+ <30319168-9456-49dd-be27-480b2a068fe3@penguintechs.org>
+Content-Language: en-US
+In-Reply-To: <30319168-9456-49dd-be27-480b2a068fe3@penguintechs.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-The following changes since commit 225990c487c1023e7b3aa89beb6a68011fbc0461:
+On 7/25/24 1:47 PM, Wren Turkal wrote:
+> On 7/25/24 1:35 PM, Luiz Augusto von Dentz wrote:
+>> Hi Wren,
+>>
+>> On Thu, Jul 25, 2024 at 2:35 PM Wren Turkal <wt@penguintechs.org> wrote:
+>>>
+>>> Hello BT folks,
+>>>
+>>> Just so y'all know, the QCA6390 bluetooth hardware appears to be broken
+>>> at least since commit 720261cfc732.
+>>>
+>>> The KDE and Gnome bluetooth control panels appear to think there is no
+>>> bluetooth hardware. Rolling back to 6.10 appear to function.
+>>>
+>>> I have a Dell XPS13 9310.
+>>>
+>>> I will attempt to capture some kernel logs in a bit.
+>>
+>> git show 720261cfc732
+>> fatal: ambiguous argument '720261cfc732': unknown revision or path not
+>> in the working tree.
+> 
+> I gave you the sha for the built fedora rawhide kernel package, not a 
+> mainline sha. Sorry about that. I thought it was a mainline sha. I am 
+> trying to bisect the problem. Hopefully, I can get a mainline git sha 
+> for you soon.
+> 
+> If it helps, the build date of the kernel is 2024-07-19.
+> 
+> Sorry about the confusion. Hope this helps track down the problem.
 
-  net: phy: realtek: add support for RTL8366S Gigabit PHY (2024-07-26 14:29:06 +0100)
+I have managed to get the following commit id range for the issue:
+80ab5445da6235..e2f710f97f35
 
-are available in the Git repository at:
+I am still working on the bisect to further narrow.
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2024-07-26
+wt
+-- 
+You're more amazing than you think!
 
-for you to fetch changes up to df3d6a3e01fd82cb74b6bb309f7be71e728a3448:
-
-  Bluetooth: hci_event: Fix setting DISCOVERY_FINDING for passive scanning (2024-07-26 10:57:09 -0400)
-
-----------------------------------------------------------------
-bluetooth pull request for net:
-
- - btmtk: Fix kernel crash when entering btmtk_usb_suspend
- - btmtk: Fix btmtk.c undefined reference build error
- - btintel: Fail setup on error
- - hci_sync: Fix suspending with wrong filter policy
- - hci_event: Fix setting DISCOVERY_FINDING for passive scanning
-
-----------------------------------------------------------------
-Arnd Bergmann (2):
-      Bluetooth: btmtk: Fix btmtk.c undefined reference build error harder
-      Bluetooth: btmtk: remove #ifdef around declarations
-
-Chris Lu (2):
-      Bluetooth: btmtk: Fix kernel crash when entering btmtk_usb_suspend
-      Bluetooth: btmtk: Fix btmtk.c undefined reference build error
-
-Kiran K (1):
-      Bluetooth: btintel: Fail setup on error
-
-Luiz Augusto von Dentz (2):
-      Bluetooth: hci_sync: Fix suspending with wrong filter policy
-      Bluetooth: hci_event: Fix setting DISCOVERY_FINDING for passive scanning
-
- drivers/bluetooth/Kconfig   |  2 ++
- drivers/bluetooth/btintel.c |  3 +++
- drivers/bluetooth/btmtk.c   |  5 ++++-
- net/bluetooth/hci_core.c    |  7 -------
- net/bluetooth/hci_event.c   |  5 +++--
- net/bluetooth/hci_sync.c    | 21 +++++++++++++++++++++
- 6 files changed, 33 insertions(+), 10 deletions(-)
