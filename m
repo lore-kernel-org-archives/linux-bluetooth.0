@@ -1,104 +1,223 @@
-Received: from mail-qv1-f51.google.com (mail-qv1-f51.google.com [209.85.219.51])
+Received: from mail-il1-f200.google.com (mail-il1-f200.google.com [209.85.166.200])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E239413C661
-	for <linux-bluetooth@vger.kernel.org>; Fri, 26 Jul 2024 11:41:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0E73140E34
+	for <linux-bluetooth@vger.kernel.org>; Fri, 26 Jul 2024 12:17:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.200
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721994083; cv=none; b=ldk4RbO6CVj0pFUDztSF2UVgNpL4Z30h18UzbpHXgkrabRwrViW2mPiA4tzOXCGeBX6Aun5dJF6L0+RGMwpNp3mzn5SH0HzWRkzA7geud2Rhtf4mxlK1IMgiEI7RuVhrEGTmP/y4wU4qj+isuRQ3lraIghYNAmWBIq49GQmU/fU=
+	t=1721996244; cv=none; b=aci19EdUK7Kfmr2IRjW9BoSORO0bzw757jrkeU+yxmu8qfyny8Y+q4sfE6meqb9M/zD3iwklzWMdqglLVAGUugsLqFVwTEDI/Wr5hUQpD26D72UCD1GA/DYjZ+i5BdtFh66xuCHQHFrP5vGD6TKwcY1e+aeloBDaQkRJ1WbLL7I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721994083; c=relaxed/simple;
-	bh=luVXb4lSpHlFFlUv3tKpdIz47wLTq8yx49IaYvT9E7E=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=C1en0JzkE7JH0wshIZ+68DT7xi69W9MhYQRlPFPOtwcE1Z1fL8Nho1w+89y3aMVqKayBf0wOauKM924qyhZluAXIiZMtwkuNQ5WYXAMt7sVPt6PTvxbP9+0G4IuAml1sy5LLb97fWEQd9bm8lBGssQ1I2cNFJiI5JlNKHzHAays=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UdBOOJGx; arc=none smtp.client-ip=209.85.219.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UdBOOJGx"
-Received: by mail-qv1-f51.google.com with SMTP id 6a1803df08f44-6b798e07246so3997986d6.2
-        for <linux-bluetooth@vger.kernel.org>; Fri, 26 Jul 2024 04:41:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1721994081; x=1722598881; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=Mi6RZZV5HLNfQOP6sphtqsZ9YpZIWdmT+a/pe58JBMo=;
-        b=UdBOOJGxYMUzhoN4gw4nAjF7lzlIP/UTdAAMYPbkLXtb3rqr+UFmF+u7HxA7840S4F
-         nak8jtGEWWulLhYWtOr/Zhw7cZzrp2rPiwuK9s+Vy7ouWM3LgCQG/hGQg85Z3T9O7WY9
-         sTk2cVBSQQV5N58hrHXjkNlvbYusL554CTIjke8CKW9M5WT68mv5tIkFI091DbJraFrN
-         DyUEVaSjiwupLnrE8lVMUL7MDqnoELuFc4RhrDs1rJRIXm4pV2/vba3OMalbjKxiifnK
-         BkNVhzvaEB9WaixmLE000esQdxEVd7p3y3JEtAfE/wDkS887SUljYabwSYpveB/DtZFY
-         C70Q==
+	s=arc-20240116; t=1721996244; c=relaxed/simple;
+	bh=q7Cf+E6fWBqXAXV+Ggn2QdmzstTOmtSckAQ5Q07SNFA=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=l9mpQ2xX2QyTFuhsm1BgTXRli6kfoyES/MOYe/5Fduf1OBmjxkM4AwIy7UTg/iiAzbJ07ahm3MJ91PNVVT4+ORR1pkvKokatmVZvCJwxH+qs1VTc40fDDEE878lTJFQZKQZllPhZZXtxxqBxNKAQULsUo74T+dZstzm/VzZ9oXI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.200
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f200.google.com with SMTP id e9e14a558f8ab-39827d07ca7so25001475ab.3
+        for <linux-bluetooth@vger.kernel.org>; Fri, 26 Jul 2024 05:17:22 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721994081; x=1722598881;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Mi6RZZV5HLNfQOP6sphtqsZ9YpZIWdmT+a/pe58JBMo=;
-        b=eOSAghOJlr5CYCYwUjxFiWWC2ej/yvaAnCAz6X2sir00blEyHsKoOUS6LWDvtRaEPN
-         eMoi08Tz8qJn4j9wZeiplKGar0jNrO/BGdCzIEUSvdyVj8r4V4BoYN5gbbXJsTP4U1r/
-         KxDtyZCODSqSenvkp45OtqjVx48A7gwCU5OCxIp9uBaPG7/ZMqVNbZJJcVi9I2/RTxVz
-         EazGshbt5kHgAPGeR9BcMFHBN2bNPni0lG0Mz7fFXkAn+T0yUwM8NxLbSGXSmgytxt+K
-         9i+xxL26PO/K1Td5SIwfj2uWjQNSogRgTiTDp1vDwdb5jRiS5nBFJyn5QnJBxUXLRtB8
-         I7fA==
-X-Gm-Message-State: AOJu0YzA1V+0UWvtorkgJz3XUm0l50WKc7UTJw0YeFK7SETgc/7mex3p
-	kg+xIyhzvwBGhc3RnSR3DcdW41bJ7BRJdFkr8tkVUSNCrFrAJHh475Vp7A==
-X-Google-Smtp-Source: AGHT+IHIJHkXvK+7L8JnAv+clev6pqG5+XA1GiFSqSa3PKBXf6iWOYC3bYkETV8WqQVTDRYWCkjPdQ==
-X-Received: by 2002:a05:6214:2584:b0:6b5:4e07:2a55 with SMTP id 6a1803df08f44-6bb407147admr56777686d6.29.1721994080592;
-        Fri, 26 Jul 2024 04:41:20 -0700 (PDT)
-Received: from [172.17.0.2] ([172.183.52.206])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6bb3fb0bf4asm15796506d6.139.2024.07.26.04.41.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 26 Jul 2024 04:41:20 -0700 (PDT)
-Message-ID: <66a38b60.050a0220.df98f.5e7b@mx.google.com>
-Date: Fri, 26 Jul 2024 04:41:20 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============4646317042316306268=="
+        d=1e100.net; s=20230601; t=1721996242; x=1722601042;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=sjkIkzOxJQyrhrSOzBpoWQ1g/lM5/MDIADDwMMu5VfM=;
+        b=nMFpvmxtX/vS5Kkdj4B4IGHFAPc2Req6fssaTDsiMuxXKMvGLlBBVOD/OeoyNVHtqF
+         Ae71+NIkfk84e8SDsBj3koxoBW33bHebVP/xqYk9fz5UcJ6/Befs0C4Bv9RZ0SYn2sq3
+         TjbaOLCMUHhVeANM7aYch7YZCbSPG5ikr5oaVcivAPnPiXt3Ej+OfaB6XaLST+o09CXk
+         YOSR+pP66RsdUHxACr5b18nmVTMSQuaPXtqTUeHh9sE4ypFheeaVmeo0Fr21NCafUv4M
+         hPfn2zh3oXK0YgblmynJ5GkQzv2sWYlI2zETH7/AIrP/GNvEzHgV7pfpMOoovXIbt3FV
+         UECg==
+X-Forwarded-Encrypted: i=1; AJvYcCX8Vdqz4CgvSm9j29HYjYN3NQxXezM+a1n5wnRSM/qr7eqoeXohCn3H5ADQ7Zyy1alZTwKdNImQ2bc7JK8/T+8SnpvqLV66FiOHv9fZ5Bfd
+X-Gm-Message-State: AOJu0YxhHOhe+IFuf2lGW5WdGUntXeys7r5XheXGmqXFZ7VXsN8BfS3h
+	ZGboNyKSvHSAgCjAcFek1vzWGb5N3Uc3IEOpFGnTFuafBCEGIpWsxWV0/iBSgEwZ+SY/wj6aC4U
+	e77fAkr5zWUOAdwqDpmeroxtCMXyWxFkeBRwmflr6paPG5f2Jumb4Xco=
+X-Google-Smtp-Source: AGHT+IGecfzpqb1585FbTHFhLLkbgqqNkvivNB5/eaexz8ca9jvAn+m2j/gxdh0pAkfEvql/M0u8QpKkB/azwgrtRABrp+Pvp3Zp
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, vlad.pruteanu@nxp.com
-Subject: RE: bap: Update default sync_factor
-In-Reply-To: <20240726101015.263668-2-vlad.pruteanu@nxp.com>
-References: <20240726101015.263668-2-vlad.pruteanu@nxp.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+X-Received: by 2002:a05:6e02:1908:b0:39a:e900:7e3e with SMTP id
+ e9e14a558f8ab-39ae9008001mr1337775ab.3.1721996241981; Fri, 26 Jul 2024
+ 05:17:21 -0700 (PDT)
+Date: Fri, 26 Jul 2024 05:17:21 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000004ee343061e257ed5@google.com>
+Subject: [syzbot] [bluetooth?] BUG: workqueue leaked atomic, lock or RCU: kworker/u33:NUM[NUM]
+From: syzbot <syzbot+45ac74737e866894acb0@syzkaller.appspotmail.com>
+To: johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, luiz.dentz@gmail.com, marcel@holtmann.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
---===============4646317042316306268==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hello,
 
-This is automated email and please do not reply to this email!
+syzbot found the following issue on:
 
-Dear submitter,
+HEAD commit:    22f902dfc51e Merge tag 'i2c-for-6.10-rc7' of git://git.ker..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=156bc135980000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=de2d4dc103148cd6
+dashboard link: https://syzkaller.appspot.com/bug?extid=45ac74737e866894acb0
+compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=17243d76980000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=15832bc1980000
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=874045
+Downloadable assets:
+disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/7bc7510fe41f/non_bootable_disk-22f902df.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/52eba6820000/vmlinux-22f902df.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/b9c5671dd5ff/bzImage-22f902df.xz
 
----Test result---
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+45ac74737e866894acb0@syzkaller.appspotmail.com
 
-Test Summary:
-CheckPatch                    PASS      0.37 seconds
-GitLint                       PASS      0.45 seconds
-BuildEll                      PASS      24.64 seconds
-BluezMake                     PASS      1684.44 seconds
-MakeCheck                     PASS      13.09 seconds
-MakeDistcheck                 PASS      179.75 seconds
-CheckValgrind                 PASS      253.39 seconds
-CheckSmatch                   PASS      356.90 seconds
-bluezmakeextell               PASS      120.30 seconds
-IncrementalBuild              PASS      1451.44 seconds
-ScanBuild                     PASS      1014.48 seconds
+BUG: workqueue leaked atomic, lock or RCU: kworker/u33:2[5195]
+     preempt=0x00000000 lock=0->1 RCU=0->0 workfn=hci_rx_work
+1 lock held by kworker/u33:2/5195:
+ #0: ffff88801ac26518 (&chan->lock/1){+.+.}-{3:3}, at: l2cap_chan_lock include/net/bluetooth/l2cap.h:827 [inline]
+ #0: ffff88801ac26518 (&chan->lock/1){+.+.}-{3:3}, at: l2cap_conless_channel net/bluetooth/l2cap_core.c:6764 [inline]
+ #0: ffff88801ac26518 (&chan->lock/1){+.+.}-{3:3}, at: l2cap_recv_frame+0x14f2/0x8ea0 net/bluetooth/l2cap_core.c:6830
+CPU: 3 PID: 5195 Comm: kworker/u33:2 Not tainted 6.10.0-rc6-syzkaller-00215-g22f902dfc51e #0
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
+Workqueue: hci0 hci_rx_work
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:88 [inline]
+ dump_stack_lvl+0x16c/0x1f0 lib/dump_stack.c:114
+ process_one_work+0x11ea/0x1b40 kernel/workqueue.c:3269
+ process_scheduled_works kernel/workqueue.c:3329 [inline]
+ worker_thread+0x6c8/0xf30 kernel/workqueue.c:3409
+ kthread+0x2c1/0x3a0 kernel/kthread.c:389
+ ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
+ </TASK>
 
+======================================================
+WARNING: possible circular locking dependency detected
+6.10.0-rc6-syzkaller-00215-g22f902dfc51e #0 Not tainted
+------------------------------------------------------
+kworker/u33:2/5195 is trying to acquire lock:
+ffff88801ef0a948 ((wq_completion)hci0#2){+.+.}-{0:0}, at: process_one_work+0x1277/0x1b40 kernel/workqueue.c:3223
+
+but task is already holding lock:
+ffff88801ac26518 (&chan->lock/1){+.+.}-{3:3}, at: l2cap_chan_lock include/net/bluetooth/l2cap.h:827 [inline]
+ffff88801ac26518 (&chan->lock/1){+.+.}-{3:3}, at: l2cap_conless_channel net/bluetooth/l2cap_core.c:6764 [inline]
+ffff88801ac26518 (&chan->lock/1){+.+.}-{3:3}, at: l2cap_recv_frame+0x14f2/0x8ea0 net/bluetooth/l2cap_core.c:6830
+
+which lock already depends on the new lock.
+
+
+the existing dependency chain (in reverse order) is:
+
+-> #1 (&chan->lock/1){+.+.}-{3:3}:
+       __lock_release kernel/locking/lockdep.c:5468 [inline]
+       lock_release+0x33e/0x6c0 kernel/locking/lockdep.c:5774
+       process_one_work+0xa96/0x1b40 kernel/workqueue.c:3255
+       process_scheduled_works kernel/workqueue.c:3329 [inline]
+       worker_thread+0x6c8/0xf30 kernel/workqueue.c:3409
+       kthread+0x2c1/0x3a0 kernel/kthread.c:389
+       ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
+       ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
+
+-> #0 ((wq_completion)hci0#2){+.+.}-{0:0}:
+       check_prev_add kernel/locking/lockdep.c:3134 [inline]
+       check_prevs_add kernel/locking/lockdep.c:3253 [inline]
+       validate_chain kernel/locking/lockdep.c:3869 [inline]
+       __lock_acquire+0x2478/0x3b30 kernel/locking/lockdep.c:5137
+       lock_acquire kernel/locking/lockdep.c:5754 [inline]
+       lock_acquire+0x1b1/0x560 kernel/locking/lockdep.c:5719
+       process_one_work+0x12a6/0x1b40 kernel/workqueue.c:3223
+       process_scheduled_works kernel/workqueue.c:3329 [inline]
+       worker_thread+0x6c8/0xf30 kernel/workqueue.c:3409
+       kthread+0x2c1/0x3a0 kernel/kthread.c:389
+       ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
+       ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
+
+other info that might help us debug this:
+
+ Possible unsafe locking scenario:
+
+       CPU0                    CPU1
+       ----                    ----
+  lock(&chan->lock/1);
+                               lock((wq_completion)hci0#2);
+                               lock(&chan->lock/1);
+  lock((wq_completion)hci0#2);
+
+ *** DEADLOCK ***
+
+1 lock held by kworker/u33:2/5195:
+ #0: ffff88801ac26518 (&chan->lock/1){+.+.}-{3:3}, at: l2cap_chan_lock include/net/bluetooth/l2cap.h:827 [inline]
+ #0: ffff88801ac26518 (&chan->lock/1){+.+.}-{3:3}, at: l2cap_conless_channel net/bluetooth/l2cap_core.c:6764 [inline]
+ #0: ffff88801ac26518 (&chan->lock/1){+.+.}-{3:3}, at: l2cap_recv_frame+0x14f2/0x8ea0 net/bluetooth/l2cap_core.c:6830
+
+stack backtrace:
+CPU: 2 PID: 5195 Comm: kworker/u33:2 Not tainted 6.10.0-rc6-syzkaller-00215-g22f902dfc51e #0
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
+Workqueue: hci0 hci_cmd_timeout
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:88 [inline]
+ dump_stack_lvl+0x116/0x1f0 lib/dump_stack.c:114
+ check_noncircular+0x31a/0x400 kernel/locking/lockdep.c:2187
+ check_prev_add kernel/locking/lockdep.c:3134 [inline]
+ check_prevs_add kernel/locking/lockdep.c:3253 [inline]
+ validate_chain kernel/locking/lockdep.c:3869 [inline]
+ __lock_acquire+0x2478/0x3b30 kernel/locking/lockdep.c:5137
+ lock_acquire kernel/locking/lockdep.c:5754 [inline]
+ lock_acquire+0x1b1/0x560 kernel/locking/lockdep.c:5719
+ process_one_work+0x12a6/0x1b40 kernel/workqueue.c:3223
+ process_scheduled_works kernel/workqueue.c:3329 [inline]
+ worker_thread+0x6c8/0xf30 kernel/workqueue.c:3409
+ kthread+0x2c1/0x3a0 kernel/kthread.c:389
+ ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
+ </TASK>
+Bluetooth: hci0: command tx timeout
+BUG: workqueue leaked atomic, lock or RCU: kworker/u33:2[5195]
+     preempt=0x00000000 lock=1->0 RCU=0->0 workfn=hci_cmd_timeout
+INFO: lockdep is turned off.
+CPU: 2 PID: 5195 Comm: kworker/u33:2 Not tainted 6.10.0-rc6-syzkaller-00215-g22f902dfc51e #0
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
+Workqueue: hci0 hci_cmd_timeout
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:88 [inline]
+ dump_stack_lvl+0x16c/0x1f0 lib/dump_stack.c:114
+ process_one_work+0x11ea/0x1b40 kernel/workqueue.c:3269
+ process_scheduled_works kernel/workqueue.c:3329 [inline]
+ worker_thread+0x6c8/0xf30 kernel/workqueue.c:3409
+ kthread+0x2c1/0x3a0 kernel/kthread.c:389
+ ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
+ </TASK>
+Bluetooth: hci0: command tx timeout
+Bluetooth: hci0: command tx timeout
+Bluetooth: hci0: command tx timeout
 
 
 ---
-Regards,
-Linux Bluetooth
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
---===============4646317042316306268==--
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
