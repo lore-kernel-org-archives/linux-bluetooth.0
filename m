@@ -1,35 +1,64 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ua1-f42.google.com (mail-ua1-f42.google.com [209.85.222.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E7941EA6F
-	for <linux-bluetooth@vger.kernel.org>; Fri, 26 Jul 2024 14:50:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D93CBA53;
+	Fri, 26 Jul 2024 15:05:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722005432; cv=none; b=dR1IXaEKIJ7zBBqpGoL4sJJWXPRj51OrsE7BfilUdmxm3lUCPe7n5pz95X63JywSWdj3U9pZZ2tyykGROesycPeP0lyuj7z3hiitvFqsUEqBYJ+/9xA5SJV//qy9TR9UiGtnvgec4J5Aa4EiHCTAeI8A2G0vF6okMEOcNI+P5uc=
+	t=1722006307; cv=none; b=U5pSLkRvRZ6RyIQOCgZ/acx26OKgb0CMRzgueh5yCNWx+CUX1m0BBUy/AM25LXjBI/jJ0F5SDKFckAFi/uXxRKUH7XM1ZQMhIx8R0bTj8CDAXz2OQyReqROW4PxSFPm5aheVn8pFVql3Q4dsesPKyRxSW9kBovCoh7nd8oCdyco=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722005432; c=relaxed/simple;
-	bh=92PycdZTaVBZsC+DSOJs3bDHS2GhKPbpescfWABsOb4=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=pfpe/vL9kFHvu8A+x3sp6V6dCMkMNWguJeor2TX8d7Khs4OOz1xG4P4fsV6eojjPPioMI7B7lKxuW47tUavZFyL9a87QIXbPRxNkX0ULm10vvO/cY+zQ/II7BXMW1F3WaG36aIdT2ih/fAH5RduC5qokkqZKA6P1soYWzdCeoOs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gOEuL4TP; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1722006307; c=relaxed/simple;
+	bh=KQ+QVKQ67JPyWmdy372+U0rPCho3OrSUr0D1G+qLUHc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=sdtotAka1GBrImuO22LZxcsjglRAZyxME5rkhzE8jCEXKI8vf2xY9bEyDL2nhi8wdmJWvRX9hBxr/3xlvu6m0hPqDLjtdJfVKkTINpf6S4KeuuIIkWSDm7NXhNs8+RlVlFHm6e5DaM+16A+I2I1qclameRQQfsiQiXtvnZlFm+4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hcaZyWa+; arc=none smtp.client-ip=209.85.222.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gOEuL4TP"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id D9C79C32786;
-	Fri, 26 Jul 2024 14:50:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1722005431;
-	bh=92PycdZTaVBZsC+DSOJs3bDHS2GhKPbpescfWABsOb4=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=gOEuL4TPeSbPXC+QK2Yi6Q4yclMA7QJgm8jf40ty+lLQGjF4VqNrtI90b+RmDJcQu
-	 qy0mtOMdMMVtAaxg19iE+v8A39ZgCmiiToHUltiZve2Rz1UoAxJXhmNACjnTFmeTAz
-	 UNpMbdaVekK0vXKo5zYZ4XU860NhhkwZkNF4J8uyzDz3g+wfGFXCKziO5o276aKODl
-	 /IsriV+UVuEwL0ogGxGn2GrdFiv1bSqgL1ED+GPNPsPYUr4sH6LoLpg9IrgvRSXdbe
-	 fcqB++IJQ7iBvf+dsgfzLl4MYxGjwC0w9ryllNFdiek1Aqaqy57EmkgYKK7FFja1H+
-	 0wikXFYXzN55w==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id C91F5C4333B;
-	Fri, 26 Jul 2024 14:50:31 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hcaZyWa+"
+Received: by mail-ua1-f42.google.com with SMTP id a1e0cc1a2514c-82c30468266so217705241.0;
+        Fri, 26 Jul 2024 08:05:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1722006305; x=1722611105; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=wvj1Ca5nVOPovMpEJijtfF3dALD2KklkmvzpDeQp7y8=;
+        b=hcaZyWa+73OKbULUZAG/HP34SqIOTfadMITneBU/lBPDGyhuBp6ialzxhA4STymT8s
+         Bx4k//BjfDj2EKiKWbGyvDQeqQt0buhp+QSiOz8xzL94fd3uUvriQhF3YYYCq52aXgNv
+         MO6OwooIfntLoR5FmvrQntk4fxbxL31UXw+jbO7eJqxGY+XHlp9BUPJLHWYtASk7c/aF
+         ScflG/Mu+dN076USAUZq0DNT2WVpA3hHsM9jt56ztP3FHSdosEik2eo+pQmiMaigJaQB
+         piqsnHiGxJDhUy3iNtvdEvxxuBoILnbaLbw98NkaRyul3WmT7hslvs+bJF+Ze6hq+b2I
+         h7Vw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1722006305; x=1722611105;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=wvj1Ca5nVOPovMpEJijtfF3dALD2KklkmvzpDeQp7y8=;
+        b=pkMGWaZr9M2Q6nnM7SOOAbiht4is+3pdW/Iu9bVjUs1MqsnMAJ9zkE2tAKgZC6kx9F
+         OrT5kroZprpEnvcgSQRETHvIgYM2NfxuKD3A5Evj0UEDfh95iMEyV+SFDNn2M2+HQKds
+         6QibVtAVUp+oyEh1cS+EzNJb/AIgUJhEJMNoei1LenH/t18Iewf1SGswqBkpZozTEYTH
+         xh+jcKgJe7+tnjaBHkiB1WqJRDgWpI8pmOAHdzENR5BMwTpBo5VhVVwAExotOE2OiiZT
+         IxT6i2+uaTNro5m8WdMGoTLtReFJI+HjL4bTrJmskfqrkYohcTslxBijvxDu4u6RqxLH
+         8u+Q==
+X-Forwarded-Encrypted: i=1; AJvYcCUxlCihz/fD70gzY8Nc71l5eCEJ8c6zySCVaSiZbIczREiCMQtLGiLzg9z8V1L3nrrxoU3oUeK6U6IEMRwC0r+AoWUexY83
+X-Gm-Message-State: AOJu0YzZA4PhhEvJCPzpEaEQbj88/7h/oZRlQ2MC2pm9nQ1x3C7zgl8o
+	r2FmJSN4xYBipV0NCLCCSJuQTzZQIh8Ha8XLzRV609Yh7oX1ctY1R4SA5A==
+X-Google-Smtp-Source: AGHT+IHPQZnid0m5X/U++vBLKieyuPShqbtLPr27CoSqUc8XaT1syY/6aI4EJGPZPdU4RqUrSynLyg==
+X-Received: by 2002:a05:6102:3b16:b0:492:99d6:e71a with SMTP id ada2fe7eead31-493d9ae0f89mr5367863137.18.1722006304881;
+        Fri, 26 Jul 2024 08:05:04 -0700 (PDT)
+Received: from lvondent-mobl4.. (syn-107-146-107-067.res.spectrum.com. [107.146.107.67])
+        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-493d98afb56sm661051137.25.2024.07.26.08.05.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 26 Jul 2024 08:05:04 -0700 (PDT)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: davem@davemloft.net,
+	kuba@kernel.org
+Cc: linux-bluetooth@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: pull request: bluetooth 2024-07-26
+Date: Fri, 26 Jul 2024 11:05:02 -0400
+Message-ID: <20240726150502.3300832-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -37,39 +66,48 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v1] Bluetooth: hci_event: Fix setting DISCOVERY_FINDING for
- passive scanning
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <172200543181.11662.17120885746605495280.git-patchwork-notify@kernel.org>
-Date: Fri, 26 Jul 2024 14:50:31 +0000
-References: <20240725223451.3208825-1-luiz.dentz@gmail.com>
-In-Reply-To: <20240725223451.3208825-1-luiz.dentz@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
 
-Hello:
+The following changes since commit 225990c487c1023e7b3aa89beb6a68011fbc0461:
 
-This patch was applied to bluetooth/bluetooth-next.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+  net: phy: realtek: add support for RTL8366S Gigabit PHY (2024-07-26 14:29:06 +0100)
 
-On Thu, 25 Jul 2024 18:34:51 -0400 you wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> 
-> DISCOVERY_FINDING shall only be set for active scanning as passive
-> scanning is not meant to generate MGMT Device Found events causing
-> discovering state to go out of sync since userspace would believe it
-> is discovering when in fact it is just passive scanning.
-> 
-> [...]
+are available in the Git repository at:
 
-Here is the summary with links:
-  - [v1] Bluetooth: hci_event: Fix setting DISCOVERY_FINDING for passive scanning
-    https://git.kernel.org/bluetooth/bluetooth-next/c/7a27b0ac58ab
+  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2024-07-26
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+for you to fetch changes up to df3d6a3e01fd82cb74b6bb309f7be71e728a3448:
 
+  Bluetooth: hci_event: Fix setting DISCOVERY_FINDING for passive scanning (2024-07-26 10:57:09 -0400)
 
+----------------------------------------------------------------
+bluetooth pull request for net:
+
+ - btmtk: Fix kernel crash when entering btmtk_usb_suspend
+ - btmtk: Fix btmtk.c undefined reference build error
+ - btintel: Fail setup on error
+ - hci_sync: Fix suspending with wrong filter policy
+ - hci_event: Fix setting DISCOVERY_FINDING for passive scanning
+
+----------------------------------------------------------------
+Arnd Bergmann (2):
+      Bluetooth: btmtk: Fix btmtk.c undefined reference build error harder
+      Bluetooth: btmtk: remove #ifdef around declarations
+
+Chris Lu (2):
+      Bluetooth: btmtk: Fix kernel crash when entering btmtk_usb_suspend
+      Bluetooth: btmtk: Fix btmtk.c undefined reference build error
+
+Kiran K (1):
+      Bluetooth: btintel: Fail setup on error
+
+Luiz Augusto von Dentz (2):
+      Bluetooth: hci_sync: Fix suspending with wrong filter policy
+      Bluetooth: hci_event: Fix setting DISCOVERY_FINDING for passive scanning
+
+ drivers/bluetooth/Kconfig   |  2 ++
+ drivers/bluetooth/btintel.c |  3 +++
+ drivers/bluetooth/btmtk.c   |  5 ++++-
+ net/bluetooth/hci_core.c    |  7 -------
+ net/bluetooth/hci_event.c   |  5 +++--
+ net/bluetooth/hci_sync.c    | 21 +++++++++++++++++++++
+ 6 files changed, 33 insertions(+), 10 deletions(-)
