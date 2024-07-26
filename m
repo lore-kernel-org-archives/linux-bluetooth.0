@@ -1,57 +1,60 @@
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1A8A17920C
-	for <linux-bluetooth@vger.kernel.org>; Fri, 26 Jul 2024 10:28:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1C7C17920C
+	for <linux-bluetooth@vger.kernel.org>; Fri, 26 Jul 2024 10:29:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721989741; cv=none; b=iQ/HCw4LUwTOuU1C+NWjUEm+Qvbo0XyGIlSBdKc1iDQfFUJrUxoaqLyUjGr2CPAUEc39tv5HUfs2cdM/xxzuscSwuW+p/fGvCqMRjW27o/U2YSxwh08lIgOZHm9uCezbGbR9/2zJiqC6866/J57WXQFzOTS8QVlQaAhj6bk41bM=
+	t=1721989745; cv=none; b=HP2mmYEUY8bwAo+LNDVHYif4utL7OwMhgE5tHt1LRIk+x9t7d/uGqvQ9SNesvwyy/lG6cfq1SIlagNP/Jl0TSArFXc5aj2AUQbzrvhjOg6ebz0Uua4boxHQRQ4cIsnNRY6YE8LxbxMHJAcCA1/WMCf1lrdmkAyuBDYcrgqCfAs0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721989741; c=relaxed/simple;
-	bh=aRd3sBsAWCMSsciIU23Y1I4LkWdDP/r3dXjmiFW7xh4=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=WrTq+AAYAPW0csiks/R4sR0rDHpkll/6wDZ17HuAT9m8VxgbXGlSTI9EnqF8umw337+ZChR++k5EzW/urqVx8Jwu1ulWQ7sFqxs+XAoEkeTpm+iWuvf+PaFG8wcQq/FUTmHsjTUgCmy7amPFOg42Incc95jobEHNKtRKofjAVIc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=RWvJzSBa; arc=none smtp.client-ip=198.175.65.20
+	s=arc-20240116; t=1721989745; c=relaxed/simple;
+	bh=j1qwJSx6p/LG5LI0UGfU+grmrYpHECObcu3Y9ArejE4=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=RG8MFli0XFLfDpW9pANAcy7Qhc9fUEjV3ci2UtTHE8Fgc17yJlXE8qUupD/OTj4GvNTyTenlsGzQskmWZ0CWrA5FKGMmWKDQPzPA2y+BxvJpb26472tJ+s7za9zLBDNlbWekLFh2ZPkRDPc48vFZyYBMAxXO1jNoR9FhiIIII80=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=e3G5cNh+; arc=none smtp.client-ip=198.175.65.20
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="RWvJzSBa"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="e3G5cNh+"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1721989739; x=1753525739;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=aRd3sBsAWCMSsciIU23Y1I4LkWdDP/r3dXjmiFW7xh4=;
-  b=RWvJzSBavrUpEMtpjchUG6csEM1kwbDQByKKbOe1Yv0UCXVKFE+WkSWs
-   HJTp7Myeir+C98bwE8maSzUJeSApAZwlPdDzZgTWL3X2bS6TcSgFR4z3w
-   lrBtHMg+axHsXmzfpQUz6OR/biiWl6Qzd1A6jgTZVz7mnh/xlCg6SilGZ
-   M8yqJHg5OeGLwAK4uP776WC96zWxyAjUItIvajP8hDnjrTKJWaBT5jL+3
-   rE7wPy9DdvpuVXKQp7xQXxQAmrAqIxH4kNUXU86rNrAYZVFIo2+4eBCBa
-   8exD9qZ5QOs9lklXffjSTJJJZhu/XkDESVp3M723hN+d5c5Viv9zPxGcE
-   w==;
-X-CSE-ConnectionGUID: X8NmGpa8RaSODmgDKbb8qw==
-X-CSE-MsgGUID: jGjSrb5sSz6gaAEGygVR1w==
-X-IronPort-AV: E=McAfee;i="6700,10204,11144"; a="19575412"
+  t=1721989743; x=1753525743;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=j1qwJSx6p/LG5LI0UGfU+grmrYpHECObcu3Y9ArejE4=;
+  b=e3G5cNh+wPuhwhJfxDj4CsV9vJorLcsYQzRkxrqloWoLyFrkwsdqi/G8
+   qU4Cj7Y6izw4SEWAkxH9ZVfAmOKNwEzZkym7SN/C7ZaC+3eJA6RMvYWO5
+   ahpR+sVTBwFXKfimve2XbjGtOuR7Aj6e7ocWm/O1/ro//zAmyEOYKkjqj
+   yaald0riYwDiuzTMMSahZiLH3vinNgv/QGrQzGinvsgruWmIZoGusRf4w
+   MYwqXRlZofeJ5z6RXKtMQnVjlM3JUxA76g/K6eJFghbNCpCRWKZCimzGE
+   V8Y9eKXNIngO8VzXQVI02bwxZNmGDIF3v+C71JOPTefVHu+hH3fFiT17r
+   g==;
+X-CSE-ConnectionGUID: kxwvK9gCSXSPz4TaDB3TCg==
+X-CSE-MsgGUID: BwzvSv+xQLibKln701Yvvg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11144"; a="19575417"
 X-IronPort-AV: E=Sophos;i="6.09,238,1716274800"; 
-   d="scan'208";a="19575412"
+   d="scan'208";a="19575417"
 Received: from orviesa010.jf.intel.com ([10.64.159.150])
-  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jul 2024 03:28:59 -0700
-X-CSE-ConnectionGUID: R7iKY0OcRJ6h3ae1SK6ohw==
-X-CSE-MsgGUID: OX1xZQ/qRtOgLIGVvJE8vw==
+  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jul 2024 03:29:01 -0700
+X-CSE-ConnectionGUID: TQF7D35vTKqTINO80TY1bg==
+X-CSE-MsgGUID: dhwXXznUTYmwaKYgwfIhyQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.09,238,1716274800"; 
-   d="scan'208";a="53146335"
+   d="scan'208";a="53146352"
 Received: from intel-lenovo-legion-y540-15irh-pg0.iind.intel.com ([10.224.186.95])
-  by orviesa010.jf.intel.com with ESMTP; 26 Jul 2024 03:28:57 -0700
+  by orviesa010.jf.intel.com with ESMTP; 26 Jul 2024 03:28:59 -0700
 From: Kiran K <kiran.k@intel.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: ravishankar.srivatsa@intel.com,
 	chethan.tumkur.narayan@intel.com,
 	chandrashekar.devegowda@intel.com,
 	Kiran K <kiran.k@intel.com>
-Subject: [PATCH v1 1/3] Bluetooth: Add a helper function to extract iso header
-Date: Fri, 26 Jul 2024 16:13:24 +0530
-Message-Id: <20240726104326.459668-1-kiran.k@intel.com>
+Subject: [PATCH v1 2/3] Bluetooth: Add tx/rx counters to track iso packets
+Date: Fri, 26 Jul 2024 16:13:25 +0530
+Message-Id: <20240726104326.459668-2-kiran.k@intel.com>
 X-Mailer: git-send-email 2.40.1
+In-Reply-To: <20240726104326.459668-1-kiran.k@intel.com>
+References: <20240726104326.459668-1-kiran.k@intel.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -60,29 +63,40 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add a helper function hci_iso_hdr() to extract iso header from skb.
+Add counters in hci_dev_stats to track iso tx and rx packets.
 
 Signed-off-by: Kiran K <kiran.k@intel.com>
 ---
- include/net/bluetooth/hci.h | 5 +++++
- 1 file changed, 5 insertions(+)
+ include/net/bluetooth/hci_sock.h | 2 ++
+ net/bluetooth/hci_core.c         | 2 ++
+ 2 files changed, 4 insertions(+)
 
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index e372a88e8c3f..ace5d210af38 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -2898,6 +2898,11 @@ static inline struct hci_sco_hdr *hci_sco_hdr(const struct sk_buff *skb)
- 	return (struct hci_sco_hdr *) skb->data;
- }
+diff --git a/include/net/bluetooth/hci_sock.h b/include/net/bluetooth/hci_sock.h
+index 13e8cd4414a1..98991a11844a 100644
+--- a/include/net/bluetooth/hci_sock.h
++++ b/include/net/bluetooth/hci_sock.h
+@@ -101,6 +101,8 @@ struct hci_dev_stats {
+ 	__u32 acl_rx;
+ 	__u32 sco_tx;
+ 	__u32 sco_rx;
++	__u32 iso_tx;
++	__u32 iso_rx;
+ 	__u32 byte_rx;
+ 	__u32 byte_tx;
+ };
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 8a4ebd93adfc..b0d40b62238b 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -3858,6 +3858,8 @@ static void hci_isodata_packet(struct hci_dev *hdev, struct sk_buff *skb)
+ 	bt_dev_dbg(hdev, "len %d handle 0x%4.4x flags 0x%4.4x", skb->len,
+ 		   handle, flags);
  
-+static inline struct hci_iso_hdr *hci_iso_hdr(const struct sk_buff *skb)
-+{
-+	return (struct hci_iso_hdr *)skb->data;
-+}
++	hdev->stat.iso_rx++;
 +
- /* Command opcode pack/unpack */
- #define hci_opcode_pack(ogf, ocf)	((__u16) ((ocf & 0x03ff)|(ogf << 10)))
- #define hci_opcode_ogf(op)		(op >> 10)
+ 	hci_dev_lock(hdev);
+ 	conn = hci_conn_hash_lookup_handle(hdev, handle);
+ 	hci_dev_unlock(hdev);
 -- 
 2.40.1
 
