@@ -1,132 +1,120 @@
-Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60C30288BD;
-	Sat, 27 Jul 2024 18:39:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA2D31946B9;
+	Sun, 28 Jul 2024 00:54:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722105566; cv=none; b=pPuMcnOM7dn1t3084EIZYsUE5On3vB7x9TFo2HAOOFzt6RWEUjf4wnTRlBvGlk45MQqZYQRgSJaJ4MLlScXdae7AMsvYqROjYe9M9B+mZv/1SeqvelufLNnmWq4pwUYJRG0p000DP6h10Yr1IwE0wu3Br6fWi7boZQ4J7MdVO6U=
+	t=1722128073; cv=none; b=Mll6DWYlPASpOtFVGUpFBMgvVGjLw+5zfLVhZm8WCpzEdQ6wSVOd2HXORuQBA7/aVegRxXbTIsTHW+TYSgXCC/TwsFLRMbbNtRhkJcuA3smvTVGxpcTAnWIh0x17z0DzX12ZJJlXDv4p4KPw0uck6zYE1zyUudQN1UOEU1LvJA0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722105566; c=relaxed/simple;
-	bh=mqqTbeT3cQxsVumINcr8inDBGKCLmYlO+jG2QvMYj74=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=H7sy07HB4NM/x9nQ7ZdbG5ICFG31BlLGzd22jlUaoFB/6f7g6Aj0SxpZ211LB/96nYc0e2I31Zos1bqCaWINpxJG84WB4iWHXK0mAEw8DBrQGcVKnXCuENyvl4oZ3pnbh9QtbLrEya08GDvaSvatRU7Mib/P+VU5o6PG0k6/moM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=in74GW17; arc=none smtp.client-ip=209.85.214.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1722128073; c=relaxed/simple;
+	bh=+rw9sX6ExhPILG9uMeRQy2EZCfxLpN3fJJJqTjNxXls=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=YlNU7PfQscekUFwB2Fyy92nnyG+6aGpzxegtYxtrNic9Q82aK/+NZa7vxAahjGexnrICgaBX1vRV8xT9bDdfzjuwzBeXWMy1VWMBvCdrW0Jx90g1/+e1a/pIYtg0GC3o4alzBEcYWPpAHTVG5v49SP8JNhAjXdmrtuHMBXOkQSg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CIOl2RGD; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="in74GW17"
-Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-1fd69e44596so11907685ad.1;
-        Sat, 27 Jul 2024 11:39:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1722105563; x=1722710363; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Tb01SeeGpCzCq1LvvFZXXuhnamF3QgcshPskKwvVvF4=;
-        b=in74GW17K6oUtIdSAl87weIrbC8qEsPdm7QY8xi/ftacyT1yTYgpt8A5oZA14FbvS6
-         Uxsb/1cZTkZF/QJELQvinire/qgTfKX7sU8PHGO9+VZurLhFBsc8tN2ZfsJBelcZVfPe
-         IbAFgE6bg+3i4fsGdWtHFC/MaqCMxb65noUwsAZXp9YjoADjP25Q1nxOI1VOkiEnupWG
-         7qKGd5B110UWvF5/QOoL/RXgTtNcXUnXwsa2Zuj6xBQdP0JVzguUNYtn2vauvmpyRat9
-         RmsBxgMZ+je6qkDx9bZix0uMJn52TKpUZ50fLeiBus9Sp1T+Xi4IjgKVMaE36VB72BhV
-         fCQQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722105563; x=1722710363;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Tb01SeeGpCzCq1LvvFZXXuhnamF3QgcshPskKwvVvF4=;
-        b=P9jHodRQa4nqd3cOi40MSBs8HHNOTxGOw2mFRKg7+4/XPfRm/NSXsjKbHnCR9PnLy8
-         oaShIu/nK1TD4tlmWXmUhe2+QxpueaX5aq/S9ZgtF8GGnnAsQJCLSBWozLGYozGAH3Ee
-         CwlRy8iJj8sfqSEIgW9S+Z/9X8QR38BeqRDblA8kAcArZCOndnUkdFSBMGMmbGtYyD3J
-         LyQORsMDEdR2kSImBG2Hfmgx2AJwOuGOlTc1Xxnp9L+WVzGvrOfIP+diw0JJ0779pzNL
-         ijxjYKyfnjgYFczeir0JDMOTpDFE+WwttB+rcTAhPFbymPJ82lzoyn387Q7Xq5tL6kvX
-         N7vg==
-X-Forwarded-Encrypted: i=1; AJvYcCXyA1PCDGJviTjkUa3GxXD70LKYWfWLjRYfHFZMLmUD1H4eKYyG8CJWCtmzpWQsVTnp+tVRCXoe0z8rdNBNyuWXDuTsyLahwtA7BRfPr/AkG+rz/Fy+BFgA22JtIXPwIqC4WP6nxkB4HqMheUZrkx03pcnRM4qex+diBP7l
-X-Gm-Message-State: AOJu0YwXk5+AzyiIOj2BKTUpM40G/PjFc0ikinAjPIdxQCr6yziaynK8
-	mFjGUH+2cely0ZSxYzGZiziN5M3Y9SV7icixErVxDoAF0KuCrTZJ
-X-Google-Smtp-Source: AGHT+IEJ4IRHhYPrzjr/OjD23R9bp2YPKOjIQBf1Lw3E5OFbAgholhIYZ4qqgS0clYvxTh+5y6ZLkQ==
-X-Received: by 2002:a17:902:d48a:b0:1fd:65ad:d8a1 with SMTP id d9443c01a7336-1ff04b01785mr52332705ad.21.1722105563425;
-        Sat, 27 Jul 2024 11:39:23 -0700 (PDT)
-Received: from [192.168.50.95] ([118.32.98.101])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1fed7c7fbe1sm53831005ad.45.2024.07.27.11.39.19
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 27 Jul 2024 11:39:22 -0700 (PDT)
-Message-ID: <b2232e8d-275b-4e98-84fe-bbb33e3c6b7e@gmail.com>
-Date: Sun, 28 Jul 2024 03:39:18 +0900
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CIOl2RGD"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6FEF9C32781;
+	Sun, 28 Jul 2024 00:54:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1722128073;
+	bh=+rw9sX6ExhPILG9uMeRQy2EZCfxLpN3fJJJqTjNxXls=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=CIOl2RGDSrRaIL5BdWUw3EIkmEE2jaqF41zU9C6nO8Czj4zNUmTehP2PKsYzoYFr2
+	 1Q478B0h6GrTDQubI6/Odnyz45WV9vku4ZboDHPM6vg49Num3cBGszdCzaNC2k4v8G
+	 zfDOOFrjKNsvVsc6MvFqW+yF76OJJ+2OEF9GdqljZ8avh2mbIMYYhBEqPScjc5CUn9
+	 kgSMDavavbCo9+uVzDrkHEIxi0TupbYMyCP26Ts1TCQOylueQUOXuuiVHuhhaUfUih
+	 jsb08IEy7tYQ2+1j92Aa7n9jsqBJzmcAhtKMQZ8YNqQYubhcSPrixpYctD9eABk5rR
+	 02T2f+2Wzzx0w==
+From: Sasha Levin <sashal@kernel.org>
+To: linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Cc: Luke Wang <ziniu.wang_1@nxp.com>,
+	Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
+	Sasha Levin <sashal@kernel.org>,
+	amitkumar.karwar@nxp.com,
+	neeraj.sanjaykale@nxp.com,
+	marcel@holtmann.org,
+	luiz.dentz@gmail.com,
+	linux-bluetooth@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.10 26/27] Bluetooth: btnxpuart: Shutdown timer and prevent rearming when driver unloading
+Date: Sat, 27 Jul 2024 20:53:09 -0400
+Message-ID: <20240728005329.1723272-26-sashal@kernel.org>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20240728005329.1723272-1-sashal@kernel.org>
+References: <20240728005329.1723272-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2] Bluetooth: hci_core: fix suspicious RCU usage in
- hci_conn_drop()
-To: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>,
- Marcel Holtmann <marcel@holtmann.org>,
- Johan Hedberg <johan.hedberg@gmail.com>,
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
- stable@vger.kernel.org, linux-kernel@vger.kernel.org,
- Yeoreum Yun <yeoreum.yun@arm.com>
-References: <20240725134741.27281-2-yskelg@gmail.com>
- <9dc0399a-573a-40c1-b342-a81410864cd9@I-love.SAKURA.ne.jp>
-Content-Language: en-US
-From: Yunseong Kim <yskelg@gmail.com>
-In-Reply-To: <9dc0399a-573a-40c1-b342-a81410864cd9@I-love.SAKURA.ne.jp>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+X-stable: review
+X-Patchwork-Hint: Ignore
+X-stable-base: Linux 6.10.2
+Content-Transfer-Encoding: 8bit
 
-Hi Tetsuo,
+From: Luke Wang <ziniu.wang_1@nxp.com>
 
-> Excuse me, but I can't interpret why this patch solves the warning.
-> 
-> The warning says that list_for_each_entry_rcu() { } in
-> ieee80211_check_combinations() is called outside of rcu_read_lock() and
-> rcu_read_unlock() pair, doesn't it? How does that connected to
-> guarding hci_dev_test_flag() and queue_delayed_work() with rcu_read_lock()
-> and rcu_read_unlock() pair? Unless you guard list_for_each_entry_rcu() { }
-> in ieee80211_check_combinations() with rcu_read_lock() and rcu_read_unlock()
-> pair (or annotate that appropriate locks are already held), I can't expect
-> that the warning will be solved...
+[ Upstream commit 0d0df1e750bac0fdaa77940e711c1625cff08d33 ]
 
-Thank you for the code review.
+When unload the btnxpuart driver, its associated timer will be deleted.
+If the timer happens to be modified at this moment, it leads to the
+kernel call this timer even after the driver unloaded, resulting in
+kernel panic.
+Use timer_shutdown_sync() instead of del_timer_sync() to prevent rearming.
 
-Sorry, I apologize for attaching the wrong kernel dump.
+panic log:
+  Internal error: Oops: 0000000086000007 [#1] PREEMPT SMP
+  Modules linked in: algif_hash algif_skcipher af_alg moal(O) mlan(O) crct10dif_ce polyval_ce polyval_generic   snd_soc_imx_card snd_soc_fsl_asoc_card snd_soc_imx_audmux mxc_jpeg_encdec v4l2_jpeg snd_soc_wm8962 snd_soc_fsl_micfil   snd_soc_fsl_sai flexcan snd_soc_fsl_utils ap130x rpmsg_ctrl imx_pcm_dma can_dev rpmsg_char pwm_fan fuse [last unloaded:   btnxpuart]
+  CPU: 5 PID: 723 Comm: memtester Tainted: G           O       6.6.23-lts-next-06207-g4aef2658ac28 #1
+  Hardware name: NXP i.MX95 19X19 board (DT)
+  pstate: 20400009 (nzCv daif +PAN -UAO -TCO -DIT -SSBS BTYPE=--)
+  pc : 0xffff80007a2cf464
+  lr : call_timer_fn.isra.0+0x24/0x80
+...
+  Call trace:
+   0xffff80007a2cf464
+   __run_timers+0x234/0x280
+   run_timer_softirq+0x20/0x40
+   __do_softirq+0x100/0x26c
+   ____do_softirq+0x10/0x1c
+   call_on_irq_stack+0x24/0x4c
+   do_softirq_own_stack+0x1c/0x2c
+   irq_exit_rcu+0xc0/0xdc
+   el0_interrupt+0x54/0xd8
+   __el0_irq_handler_common+0x18/0x24
+   el0t_64_irq_handler+0x10/0x1c
+   el0t_64_irq+0x190/0x194
+  Code: ???????? ???????? ???????? ???????? (????????)
+  ---[ end trace 0000000000000000 ]---
+  Kernel panic - not syncing: Oops: Fatal exception in interrupt
+  SMP: stopping secondary CPUs
+  Kernel Offset: disabled
+  CPU features: 0x0,c0000000,40028143,1000721b
+  Memory Limit: none
+  ---[ end Kernel panic - not syncing: Oops: Fatal exception in interrupt ]---
 
-> Also, what guarantees that drain_workqueue() won't be disturbed by
-> queue_work(disc_work) which will be called after "timeo" delay, for you are
-> not explicitly cancelling scheduled "disc_work" (unlike "cmd_timer" work
-> and "ncmd_timer" work shown below) before calling drain_workqueue() ?
-> 
-> 	/* Cancel these to avoid queueing non-chained pending work */
-> 	hci_dev_set_flag(hdev, HCI_CMD_DRAIN_WORKQUEUE);
-> 	/* Wait for
-> 	 *
-> 	 *    if (!hci_dev_test_flag(hdev, HCI_CMD_DRAIN_WORKQUEUE))
-> 	 *        queue_delayed_work(&hdev->{cmd,ncmd}_timer)
-> 	 *
-> 	 * inside RCU section to see the flag or complete scheduling.
-> 	 */
-> 	synchronize_rcu();
-> 	/* Explicitly cancel works in case scheduled after setting the flag. */
-> 	cancel_delayed_work(&hdev->cmd_timer);
-> 	cancel_delayed_work(&hdev->ncmd_timer);
-> 
-> 	/* Avoid potential lockdep warnings from the *_flush() calls by
-> 	 * ensuring the workqueue is empty up front.
-> 	 */
-> 	drain_workqueue(hdev->workqueue);
+Signed-off-by: Luke Wang <ziniu.wang_1@nxp.com>
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ drivers/bluetooth/btnxpuart.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
+diff --git a/drivers/bluetooth/btnxpuart.c b/drivers/bluetooth/btnxpuart.c
+index 9bfa9a6ad56c8..8fa06eb051d1e 100644
+--- a/drivers/bluetooth/btnxpuart.c
++++ b/drivers/bluetooth/btnxpuart.c
+@@ -328,7 +328,7 @@ static void ps_cancel_timer(struct btnxpuart_dev *nxpdev)
+ 	struct ps_data *psdata = &nxpdev->psdata;
+ 
+ 	flush_work(&psdata->work);
+-	del_timer_sync(&psdata->ps_timer);
++	timer_shutdown_sync(&psdata->ps_timer);
+ }
+ 
+ static void ps_control(struct hci_dev *hdev, u8 ps_state)
+-- 
+2.43.0
 
-Please bear with me for a moment.
-
-I'll attach the correct kernel dump and resend the patch email.
-
-
-Warm regards,
-
-Yunseong Kim
