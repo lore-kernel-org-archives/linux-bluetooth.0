@@ -1,120 +1,141 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62C4F19DFA4;
-	Sun, 28 Jul 2024 00:55:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A418D8F6C
+	for <linux-bluetooth@vger.kernel.org>; Sun, 28 Jul 2024 07:56:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722128115; cv=none; b=ah9XHlVlhGjTcMOvJpYZBJ5zqSFmuiDAYaaON3qe/lWBCTlTZghCT1eKTwuF62ZqtZvDAgVASZHw8vor6w6rt5tEuHjg7mnwj8txjfBV1VOIWIRM5ghiqdVs/G0qAfGXdNoSI9A3VmRi0JguGogLLV1vBCNZTQc6k8mrDZNDGWA=
+	t=1722153398; cv=none; b=nnPv5ioX0Po+9YLjwjI19c5QeU77rydKfkmsW2wif4A9xvprPtgzT5m5u5RVdkBgcM39o24sqPSRFGUPQt34QO6XaKCnfnBg1HH643WgeR1hW5SGRlBxF4YfVBdmRF/yXBLegTUfsVb4/TqbCArog9XNzzA6FjJl0iEXudt7vY8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722128115; c=relaxed/simple;
-	bh=F9bd3n+CVGUqmtHiWncOEfIoNG+/RsW9OoAZJVIZ5KE=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=kHctd27ewqYI/o/MbcVaivCB+wlsWNRT5EN1YSnBKd7LG7816fJ6XWiUKSzEyr7zb9iK5YFS5GfKNXf1pUk1uBjbD4/aPxVhuvVvY8yN/rlbZD3ZRRuPrtzbTFAqEz6sLWIjOWI3yR+9noPIhMLjyRP2wCNOiIrlCbm9+/bDQfQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AevYz4gX; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1722153398; c=relaxed/simple;
+	bh=YfzWHva2Xx3MBCi7A4RmryMUvL+7fsm9EWGB5Tb4vBE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Srguh+iXlosN8R+1s4iJ1kDamYf6KpFBy14HYKiucFAJ4ugDi2sdpf6IOnlDLO3BQZVZ+C5+dj6tJbBgsNhQTGcXjxrSeJ2uwxx+ZX75Gx+s416hz2eGOl8HPIYVWNDgUr/2e8wqh9NVdc8/ZOQxXRe9PIpJQrtQECmCcD2/RZA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VrdkHpGe; arc=none smtp.client-ip=209.85.218.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AevYz4gX"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0C985C32781;
-	Sun, 28 Jul 2024 00:55:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1722128115;
-	bh=F9bd3n+CVGUqmtHiWncOEfIoNG+/RsW9OoAZJVIZ5KE=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=AevYz4gXoLNYga9EXWJO2MH2JrN7M6cGKO+8QLagVC3hOkNQdWT+uy1M/qOsXMrUX
-	 G9Xjp+qy4dEtu/Wok2C1WAUA2Yv9Ihz05GjzFoLg3ilXgxqSLgZ4nv/P7xTIa0CFi8
-	 x4pyHKvEHb0uzsg2vgwKhrXLUCLuDSXSSn6PCUPdDIbcR59Qkk3pX5KVTRYODBaxXU
-	 TqZxAkxzx2jZQSDEThCiSaPD61aERKdX4bVwcT4+P6Mgad+XTF1Qm4O7yHa5yy3jvy
-	 +S/dVE2qYgHDaPt+f9k2VDMLCtYqZc/37Zy8Tp+98Vl8PKaeT++R1vfdzociZUGL8H
-	 NQ0xDkYYTc1Mw==
-From: Sasha Levin <sashal@kernel.org>
-To: linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Cc: Luke Wang <ziniu.wang_1@nxp.com>,
-	Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
-	Sasha Levin <sashal@kernel.org>,
-	amitkumar.karwar@nxp.com,
-	neeraj.sanjaykale@nxp.com,
-	marcel@holtmann.org,
-	luiz.dentz@gmail.com,
-	linux-bluetooth@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.6 15/15] Bluetooth: btnxpuart: Shutdown timer and prevent rearming when driver unloading
-Date: Sat, 27 Jul 2024 20:54:36 -0400
-Message-ID: <20240728005442.1729384-15-sashal@kernel.org>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240728005442.1729384-1-sashal@kernel.org>
-References: <20240728005442.1729384-1-sashal@kernel.org>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VrdkHpGe"
+Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-a7a81bd549eso245963266b.3
+        for <linux-bluetooth@vger.kernel.org>; Sun, 28 Jul 2024 00:56:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1722153395; x=1722758195; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Oa0JC3Mroc/GuvIjMJOeY/179SghKFKTygFRtE6Fw/E=;
+        b=VrdkHpGeTMkVSVDIQ2q52ebRoHz1ojtkSZPInuhwJuwrpbdpCv9Y/v2Y8nejqHWVrv
+         EAmAbLXvHBDU1SY06836PI/loOS0jFbysQKxY/HuEOhcvo8+NUrGp6l/f7mrtYgp9Pcf
+         96YgRKzZVAve8ALz91XlmBWRo+s+rmfryTs46AKbdPh5OLaV4AIC50mgkqLifx+hPBZN
+         Bc7SwMLy0TXIWFfQFlxSy7chzsp6ZaG9no9N6IFkjZaXBT0cv3BgXPpUG2ZJvlV3Uxzy
+         5+CidSdCZnXb6nnxDCBRXdgyLIG1ja8dLHyKZDEfVVOYKddDDbNmFxnpKJaACp9ZBVEo
+         zxIw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1722153395; x=1722758195;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Oa0JC3Mroc/GuvIjMJOeY/179SghKFKTygFRtE6Fw/E=;
+        b=EEw8poy0cV6S9kSgc3RRI+QhRCGpLiVqaXdExT+ArjNpoPcMDBSskBl2DFnSFrc8vB
+         0VTGwzdJEUQtplPsMs8BRK4HzY+hZHSQe0SEYwWXvlmtyDoymtNNpDtjs29WyawRqkvG
+         aIUxahwCKu/eTFPty8TyMjkytO419MZw3MkPjpKGnc7ejr5THQt2G8FBX84sTY3ihra3
+         nXuAvdF2gRPBKCaDYtByN1SDC9GSrZEuZHX9zFbPDkutohasOa/z+Fal4tRd3f5TPjdl
+         S5VKQkqln4Z7Mcot5VO4aVgudcTK4cazB8txOdHHxtuheIGS8xuOZrrJcESKDqSwiZ87
+         AVhA==
+X-Gm-Message-State: AOJu0YySCPNazS9DenKv87etvsQvkCA8lQiKnr6TDDgWveyGZWUc4KiR
+	vrDR+5vYOOp2AJB6CxUWiA2NHyKscP3KkLeDWWUpF24vpFJXyT12qt70CA==
+X-Google-Smtp-Source: AGHT+IFxsDwk3S/EOOw1KM5GBowr4HXeH0pjswg4LPnDrVL0Mm8VgOe6EAq5ouAG3NGpuqhTUjVmWQ==
+X-Received: by 2002:a17:906:d263:b0:a79:7f94:8a73 with SMTP id a640c23a62f3a-a7d40003423mr258334566b.20.1722153394420;
+        Sun, 28 Jul 2024 00:56:34 -0700 (PDT)
+Received: from x1cx.uhrm.ch ([2a02:168:4f3f:7:4b00:1bb0:11f:418d])
+        by smtp.googlemail.com with ESMTPSA id a640c23a62f3a-a7acadb9dd3sm361795666b.220.2024.07.28.00.56.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 28 Jul 2024 00:56:34 -0700 (PDT)
+From: Markus Uhr <uhrmar@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Markus Uhr <uhrmar@gmail.com>
+Subject: [PATCH] Add pattern matching for service UUIDs
+Date: Sun, 28 Jul 2024 09:56:22 +0200
+Message-ID: <20240728075622.333056-1-uhrmar@gmail.com>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.6.43
 Content-Transfer-Encoding: 8bit
 
-From: Luke Wang <ziniu.wang_1@nxp.com>
-
-[ Upstream commit 0d0df1e750bac0fdaa77940e711c1625cff08d33 ]
-
-When unload the btnxpuart driver, its associated timer will be deleted.
-If the timer happens to be modified at this moment, it leads to the
-kernel call this timer even after the driver unloaded, resulting in
-kernel panic.
-Use timer_shutdown_sync() instead of del_timer_sync() to prevent rearming.
-
-panic log:
-  Internal error: Oops: 0000000086000007 [#1] PREEMPT SMP
-  Modules linked in: algif_hash algif_skcipher af_alg moal(O) mlan(O) crct10dif_ce polyval_ce polyval_generic   snd_soc_imx_card snd_soc_fsl_asoc_card snd_soc_imx_audmux mxc_jpeg_encdec v4l2_jpeg snd_soc_wm8962 snd_soc_fsl_micfil   snd_soc_fsl_sai flexcan snd_soc_fsl_utils ap130x rpmsg_ctrl imx_pcm_dma can_dev rpmsg_char pwm_fan fuse [last unloaded:   btnxpuart]
-  CPU: 5 PID: 723 Comm: memtester Tainted: G           O       6.6.23-lts-next-06207-g4aef2658ac28 #1
-  Hardware name: NXP i.MX95 19X19 board (DT)
-  pstate: 20400009 (nzCv daif +PAN -UAO -TCO -DIT -SSBS BTYPE=--)
-  pc : 0xffff80007a2cf464
-  lr : call_timer_fn.isra.0+0x24/0x80
-...
-  Call trace:
-   0xffff80007a2cf464
-   __run_timers+0x234/0x280
-   run_timer_softirq+0x20/0x40
-   __do_softirq+0x100/0x26c
-   ____do_softirq+0x10/0x1c
-   call_on_irq_stack+0x24/0x4c
-   do_softirq_own_stack+0x1c/0x2c
-   irq_exit_rcu+0xc0/0xdc
-   el0_interrupt+0x54/0xd8
-   __el0_irq_handler_common+0x18/0x24
-   el0t_64_irq_handler+0x10/0x1c
-   el0t_64_irq+0x190/0x194
-  Code: ???????? ???????? ???????? ???????? (????????)
-  ---[ end trace 0000000000000000 ]---
-  Kernel panic - not syncing: Oops: Fatal exception in interrupt
-  SMP: stopping secondary CPUs
-  Kernel Offset: disabled
-  CPU features: 0x0,c0000000,40028143,1000721b
-  Memory Limit: none
-  ---[ end Kernel panic - not syncing: Oops: Fatal exception in interrupt ]---
-
-Signed-off-by: Luke Wang <ziniu.wang_1@nxp.com>
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
+This commit extends the pattern matching capabilities of advertisement monitors
+with matching for service UUIDs. This functionality was lost with bc2ab4b
+(see #652) and not added with b0656c2.
 ---
- drivers/bluetooth/btnxpuart.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ src/shared/ad.c | 47 +++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 47 insertions(+)
 
-diff --git a/drivers/bluetooth/btnxpuart.c b/drivers/bluetooth/btnxpuart.c
-index abccd571cf3ee..45a06c94a8606 100644
---- a/drivers/bluetooth/btnxpuart.c
-+++ b/drivers/bluetooth/btnxpuart.c
-@@ -324,7 +324,7 @@ static void ps_cancel_timer(struct btnxpuart_dev *nxpdev)
- 	struct ps_data *psdata = &nxpdev->psdata;
- 
- 	flush_work(&psdata->work);
--	del_timer_sync(&psdata->ps_timer);
-+	timer_shutdown_sync(&psdata->ps_timer);
+diff --git a/src/shared/ad.c b/src/shared/ad.c
+index d08ce7af9..4a76d42ac 100644
+--- a/src/shared/ad.c
++++ b/src/shared/ad.c
+@@ -1362,6 +1362,45 @@ static bool match_manufacturer(const void *data, const void *user_data)
+ 	return false;
  }
  
- static void ps_control(struct hci_dev *hdev, u8 ps_state)
++static bool match_uuid(const void *data, const void *user_data)
++{
++	const bt_uuid_t *uuid = data;
++	const struct pattern_match_info *info = user_data;
++	const struct bt_ad_pattern *pattern;
++	if (!uuid || !info)
++		return false;
++
++	if (info->matched_pattern)
++		return false;
++
++	pattern = info->current_pattern;
++
++	if (!pattern)
++		return false;
++
++	switch (pattern->type) {
++	case BT_AD_UUID16_ALL:
++	case BT_AD_UUID16_SOME:
++		if (pattern->offset != 0 || pattern->len != sizeof(uint16_t))
++			return false;
++		break;
++	case BT_AD_UUID32_ALL:
++	case BT_AD_UUID32_SOME:
++		if (pattern->offset != 0 || pattern->len != sizeof(uint32_t))
++			return false;
++		break;
++	case BT_AD_UUID128_ALL:
++	case BT_AD_UUID128_SOME:
++		if (pattern->offset != 0 || pattern->len != sizeof(uint128_t))
++			return false;
++		break;
++	default:
++		return false;
++	}
++
++	return !memcmp(&uuid->value, pattern->data, pattern->len);
++}
++
+ static bool match_service(const void *data, const void *user_data)
+ {
+ 	const struct bt_ad_service_data *service_data = data;
+@@ -1451,6 +1490,14 @@ static void pattern_match(void *data, void *user_data)
+ 		matched = queue_find(ad->manufacturer_data, match_manufacturer,
+ 				user_data);
+ 		break;
++	case BT_AD_UUID16_ALL:
++	case BT_AD_UUID16_SOME:
++	case BT_AD_UUID32_ALL:
++	case BT_AD_UUID32_SOME:
++	case BT_AD_UUID128_ALL:
++	case BT_AD_UUID128_SOME:
++		matched = queue_find(ad->service_uuids, match_uuid, user_data);
++		break;
+ 	case BT_AD_SERVICE_DATA16:
+ 	case BT_AD_SERVICE_DATA32:
+ 	case BT_AD_SERVICE_DATA128:
 -- 
-2.43.0
+2.45.2
 
