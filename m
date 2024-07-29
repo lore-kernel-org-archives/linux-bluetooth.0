@@ -1,27 +1,26 @@
-Received: from smtpbg151.qq.com (smtpbg151.qq.com [18.169.211.239])
+Received: from smtpbgeu2.qq.com (smtpbgeu2.qq.com [18.194.254.142])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA650770F6
-	for <linux-bluetooth@vger.kernel.org>; Mon, 29 Jul 2024 01:44:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.169.211.239
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75C6178C90
+	for <linux-bluetooth@vger.kernel.org>; Mon, 29 Jul 2024 01:44:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.194.254.142
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722217471; cv=none; b=MrBSqbWvYRlBp9JRgRASw97BzJ4VUPz//hjL1nJ/BYpuOeA6fQxsGkvk6EG2b2WIDbvSZw8pMFodbuiPAq+qOv87rBoGQg0u6JLnJ+A+sfunZyNekvvSyOOcXxPiDXpauTF/WZRzm8own9EfF9B+Zz38X2sfI8l/JvUTN6jJMyo=
+	t=1722217480; cv=none; b=d6+GGISFEEXlqojmMpY11Jl8y42A71vcpe6Qk1LlfvriZQul9Nde/33iD89QFouMiw4BfKqOoSGur98CBBdiyM4QseD2tIO0/kBnKYWOtGz4iuYrzS7by8GwJM2w7DU/zCxmnspugQo5Z7uT6vGLOTxle72Gjb7fkwz8+w2KzXs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722217471; c=relaxed/simple;
-	bh=Oh39XAQDg5R86RZQSeaQMLqrjTFfCloBimtzrU5mKHI=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=BFYMIT2m+hz1sk9dkGhYR2didNsarl1HOozS0wdf4qeu396Ce2aU0941w601JL5Ld+7xAOwACueMVXtKdNGaAgaGn7S0VUjGbgbt0Gvtd1w+gSQarcOdbjlHWEnVWQxvOOeaASft0VLdKS2X0xlqp/6kelY7FYBc6MxC8Y7AriE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=uniontech.com; spf=pass smtp.mailfrom=uniontech.com; arc=none smtp.client-ip=18.169.211.239
+	s=arc-20240116; t=1722217480; c=relaxed/simple;
+	bh=6v33Qy88eR7kYjxr9TwQXM+CT2Z+vGrGXZO88GY2vvE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=RTGHKtK+vmHisSQVJ0rGhW9WWkRbok75Tp5ocBnVDbJLvkMgl1/Z/HHZIDcF03lZkvAyprBKK7qagD/KoJuPhBB4dTAqjBYOsrbAtn/TOBVRDeg8FvW5Hcy4kzpLgv5pjMOjDvJVowR34vfmOAhp6PGBLhU1/U/Lin3EqrLW1Ds=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=uniontech.com; spf=pass smtp.mailfrom=uniontech.com; arc=none smtp.client-ip=18.194.254.142
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=uniontech.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniontech.com
-X-QQ-mid: bizesmtpsz7t1722217410t0n6dnj
-X-QQ-Originating-IP: Q0VegAvULdBG8j4khezVTp4/Mx+d7xGGpWepEWso0yM=
+X-QQ-mid: bizesmtpsz7t1722217400tj1cp6g
+X-QQ-Originating-IP: R0HGwCld4PqqFA+z2Z2ygOp7Nm3vNtcHlrfBu3WmytE=
 Received: from uniontech.localdomain ( [113.57.152.160])
 	by bizesmtp.qq.com (ESMTP) with 
-	id ; Mon, 29 Jul 2024 09:43:23 +0800 (CST)
+	id ; Mon, 29 Jul 2024 09:43:17 +0800 (CST)
 X-QQ-SSF: 0000000000000000000000000000000
 X-QQ-GoodBg: 1
-X-BIZMAIL-ID: 359325207963766891
+X-BIZMAIL-ID: 9795413247571200008
 From: Erpeng Xu <xuerpeng@uniontech.com>
 To: stable@vger.kernel.org,
 	gregkh@linuxfoundation.org,
@@ -35,12 +34,10 @@ Cc: marcel@holtmann.org,
 	guanwentao@uniontech.com,
 	luiz.von.dentz@intel.com,
 	Erpeng Xu <xuerpeng@uniontech.com>
-Subject: [PATCH 6.10 2/2] Bluetooth: btusb: Add Realtek RTL8852BE support ID 0x13d3:0x3591
-Date: Mon, 29 Jul 2024 09:42:53 +0800
-Message-ID: <AA0BD42C5ED9EF10+20240729014309.5699-2-xuerpeng@uniontech.com>
+Subject: [PATCH 6.10 1/2] Bluetooth: btusb: Add RTL8852BE device 0489:e125 to device tables
+Date: Mon, 29 Jul 2024 09:42:52 +0800
+Message-ID: <8AB7BB893B74C562+20240729014309.5699-1-xuerpeng@uniontech.com>
 X-Mailer: git-send-email 2.45.2
-In-Reply-To: <20240729014309.5699-1-xuerpeng@uniontech.com>
-References: <20240729014309.5699-1-xuerpeng@uniontech.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -51,18 +48,18 @@ Content-Transfer-Encoding: 8bit
 X-QQ-SENDSIZE: 520
 Feedback-ID: bizesmtpsz:uniontech.com:qybglogicsvrgz:qybglogicsvrgz5a-1
 
-From: WangYuli <wangyuli@uniontech.com>
+From: Hilda Wu <hildawu@realtek.com>
 
-commit 473a89b4ed7fd52a419340f7c540d5c8fc96fc75 upstream
+commit 295ef07a9dae6182ad4b689aa8c6a7dbba21474c upstream
 
-Add the support ID(0x13d3, 0x3591) to usb_device_id table for
-Realtek RTL8852BE.
+Add the support ID 0489:e125 to usb_device_id table for
+Realtek RTL8852B chip.
 
-The device table is as follows:
+The device info from /sys/kernel/debug/usb/devices as below.
 
-T:  Bus=01 Lev=02 Prnt=03 Port=00 Cnt=01 Dev#=  5 Spd=12   MxCh= 0
+T:  Bus=01 Lev=01 Prnt=01 Port=07 Cnt=03 Dev#=  5 Spd=12   MxCh= 0
 D:  Ver= 1.00 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-P:  Vendor=13d3 ProdID=3591 Rev= 0.00
+P:  Vendor=0489 ProdID=e125 Rev= 0.00
 S:  Manufacturer=Realtek
 S:  Product=Bluetooth Radio
 S:  SerialNumber=00e04c000001
@@ -90,9 +87,7 @@ I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
 E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
 E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
 
-Cc: stable@vger.kernel.org
-Signed-off-by: Wentao Guan <guanwentao@uniontech.com>
-Signed-off-by: WangYuli <wangyuli@uniontech.com>
+Signed-off-by: Hilda Wu <hildawu@realtek.com>
 Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 Signed-off-by: Erpeng Xu <xuerpeng@uniontech.com>
 ---
@@ -100,18 +95,18 @@ Signed-off-by: Erpeng Xu <xuerpeng@uniontech.com>
  1 file changed, 2 insertions(+)
 
 diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index aec6da3e37ef..789c492df6fa 100644
+index e384ef6ff050..aec6da3e37ef 100644
 --- a/drivers/bluetooth/btusb.c
 +++ b/drivers/bluetooth/btusb.c
 @@ -555,6 +555,8 @@ static const struct usb_device_id quirks_table[] = {
  						     BTUSB_WIDEBAND_SPEECH },
  	{ USB_DEVICE(0x13d3, 0x3572), .driver_info = BTUSB_REALTEK |
  						     BTUSB_WIDEBAND_SPEECH },
-+	{ USB_DEVICE(0x13d3, 0x3591), .driver_info = BTUSB_REALTEK |
++	{ USB_DEVICE(0x0489, 0xe125), .driver_info = BTUSB_REALTEK |
 +						     BTUSB_WIDEBAND_SPEECH },
- 	{ USB_DEVICE(0x0489, 0xe125), .driver_info = BTUSB_REALTEK |
- 						     BTUSB_WIDEBAND_SPEECH },
  
+ 	/* Realtek 8852BT/8852BE-VT Bluetooth devices */
+ 	{ USB_DEVICE(0x0bda, 0x8520), .driver_info = BTUSB_REALTEK |
 -- 
 2.45.2
 
