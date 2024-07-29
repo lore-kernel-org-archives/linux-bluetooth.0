@@ -1,113 +1,99 @@
-Received: from mail-yb1-f177.google.com (mail-yb1-f177.google.com [209.85.219.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail1.khirnov.net (quelana.khirnov.net [94.230.150.81])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 525EC155CB0
-	for <linux-bluetooth@vger.kernel.org>; Mon, 29 Jul 2024 15:49:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 130278004E
+	for <linux-bluetooth@vger.kernel.org>; Mon, 29 Jul 2024 16:05:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=94.230.150.81
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722268188; cv=none; b=RvYZ4ULKvYUs/TmaYky93OYAJcenUTww3gyAjnifpWhN8j4mlu2hvFyO5GunApPLa17iqGWv0GlcK7mPhTtOeDko8ARhFo2rAIv4jczXmprsNrxSKnDcWJGhuj8Of1t8i9z12bUfaj6mFQmowc5/Rm4PRkwMDTO1WAfxzIK5ZbI=
+	t=1722269148; cv=none; b=S41dRn9jB3gi9AyobsBmklbtPxWN43rQ7d/J5qyUaJbCukbyzUGSnTHEcxFggkTZzqbIt5fv34kqCNsu101mZIguUG69mFYrysSdgAuuAXOFUwaSXOP8ISMK0qQoTRPHkeNpDAUCOhUW+rSG/0AFTcMBjQH6DIhCaDpRlN/oW+Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722268188; c=relaxed/simple;
-	bh=/MxvJRIOTpaisqQ5VS8y812OOricyEl4+mPRJINBr/w=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=DyBfqltgQV/UpwJJhR6/L8YW4rRXsoPpSDEq+0qRAMiQIVU85k37uAIjfajpKhpczfcsheob7G/mRuztm0Qfd8v9rbPFnzTMPEnGhS66wMoCq5rDuX0yb054HPjeO4HzOScM7TY3UI8PJeWqNXGpAudj+5BASVKnnd+nwZxPj+0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QC13Pu16; arc=none smtp.client-ip=209.85.219.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1722269148; c=relaxed/simple;
+	bh=hoQRoSYKXrXcT0dwcI9MQbSsaXRRq0I4nioosoRjaxA=;
+	h=From:To:Subject:Date:Message-Id:MIME-Version; b=IkTDj2SkYVMORUlDarhceTa2jzRkodJ6+9X8ULsiBwSyIAuVHO07GglNxAKvlSF69VUYjQVYk/q6gnSlQj23doL918l4X/P3Z2+5VuDrD6K8EehAUEbVoqA4hxTI5i5rpuRkIAYD949jpTx9WOzhZeAdagCqR7EOZh6wwwfTyek=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=khirnov.net; spf=pass smtp.mailfrom=khirnov.net; dkim=pass (2048-bit key) header.d=khirnov.net header.i=@khirnov.net header.b=FvuPCyJZ; arc=none smtp.client-ip=94.230.150.81
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=khirnov.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=khirnov.net
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QC13Pu16"
-Received: by mail-yb1-f177.google.com with SMTP id 3f1490d57ef6-e026a2238d8so2100262276.0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 29 Jul 2024 08:49:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1722268186; x=1722872986; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=j+vh/dL45prkfTXERsvtl6OfPXG5uLbs8o0SZu1Z3Ks=;
-        b=QC13Pu16QJ0+HqMpA/a5SuOcPz5mJ6d7U6/eu/tr9jcM+HH7gE+cON/1UYy+FvPfjb
-         4wpFji9M6JurtFcSRMYIy1qwU0eGT4met0ZxcW8LRfYJi0jAIS6hXlzXRjjZbZeS0NLq
-         evbTjs3hOg6CzrmLMGJeu5kLNZoRo8A9ySnVl5eIpzViHq7PwKK7wwJ6SQdpNrSHrAvt
-         qvTBSfOHkDJfe69DJyyy0zK7i1R8R43IDJv63yJg+ru7hCJFYYp+OzBueZgAcDDcG99u
-         dSxUgPWQgZUx0NZAgZkaLQgLvqX/EI2MAH9wKTSEOzN5bs+uLkfjo86ApB1ZDxkoH91I
-         II6w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722268186; x=1722872986;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=j+vh/dL45prkfTXERsvtl6OfPXG5uLbs8o0SZu1Z3Ks=;
-        b=LcG84wrGUlvCkzbNB3PufyZ9hXi+4RGW+t2cKZgx0JUvDWbf2x/GyApDkkO/iSMYnK
-         L83SuCIft0HA9TU2HwT9NdCGB/t1Cm3L2tiTS+penWUqN2rkz/xtgWk+zRwsobMdKWcM
-         9fweL7yoaf7mx4FvbvSxDS0FlfzhfVyXkabOpaLDDoIEN20dmpp9m1u/NDzsdo9p7nhC
-         R7XsE5qT85vvGdlJ+5LDx8I1v+zQGMXSRYTybe2Z+Xfi6Syp0ybPLOVFU4SYiDsw2XYd
-         SCBsbdsiA/Pdn6o97zt9mIAjgOgmufL69plq5fYRzy+eWLCkfd/+nE7mF6ayR8zheun1
-         +kXA==
-X-Gm-Message-State: AOJu0YybWMvS0m0DkckJdLSbVD+zGA4ncQH9SfpPiBI69SH4Ux3fPXZD
-	C5SSBsJLwYV76NrkO2Zp9J1Sx/dtHQZ7bA0Llx9VGhkWaXUiZxEt22UwnA==
-X-Google-Smtp-Source: AGHT+IFp1tXDwV6p50GdVds9gsDkokwfWAWsFTsmd/uea5Xn5PLCuwPqr4S6ZPD3BOE2d2taLFmgwg==
-X-Received: by 2002:a05:6902:1b01:b0:e08:62e5:8d6a with SMTP id 3f1490d57ef6-e0b546349f8mr7214881276.52.1722268186199;
-        Mon, 29 Jul 2024 08:49:46 -0700 (PDT)
-Received: from [172.17.0.2] ([20.51.206.4])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6bb3fa94e63sm53522486d6.76.2024.07.29.08.49.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 29 Jul 2024 08:49:45 -0700 (PDT)
-Message-ID: <66a7ba19.050a0220.3b7982.f482@mx.google.com>
-Date: Mon, 29 Jul 2024 08:49:45 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============1624479231672856467=="
+	dkim=pass (2048-bit key) header.d=khirnov.net header.i=@khirnov.net header.b="FvuPCyJZ"
+Authentication-Results: mail1.khirnov.net;
+	dkim=pass (2048-bit key; unprotected) header.d=khirnov.net header.i=@khirnov.net header.a=rsa-sha256 header.s=mail header.b=FvuPCyJZ;
+	dkim-atps=neutral
+Received: from localhost (mail1.khirnov.net [IPv6:::1])
+	by mail1.khirnov.net (Postfix) with ESMTP id 052124DE1
+	for <linux-bluetooth@vger.kernel.org>; Mon, 29 Jul 2024 17:59:22 +0200 (CEST)
+Received: from mail1.khirnov.net ([IPv6:::1])
+ by localhost (mail1.khirnov.net [IPv6:::1]) (amavis, port 10024) with ESMTP
+ id YKt60V4eQT8Q for <linux-bluetooth@vger.kernel.org>;
+ Mon, 29 Jul 2024 17:59:21 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=khirnov.net; s=mail;
+	t=1722268761; bh=hoQRoSYKXrXcT0dwcI9MQbSsaXRRq0I4nioosoRjaxA=;
+	h=From:To:Subject:Date:From;
+	b=FvuPCyJZ/2272wYipHPP6+P88KJt18NN3VfQOA9euPBbi+9mOz4m1qQa8N/r0CLLF
+	 vfCMQlWscsOVTgQbXqoYUW3ecNo4vgzChvyA7Q+iT2vwVFs9Z7EZ9DumpPtwmf5CKO
+	 tr39WzAvgrFcut8hBuF+blQHU3LpT8GmgxQzPn3csFLaxwT9m2HLUc59krRlfbOoOA
+	 KBKv/L3eSLPKcxytunQY7/cs4egsh+X+K2inpszmWopZfodzdj+S9Rg6ElnWNLpeij
+	 +BJq26YTzGJAsWgab+D+A4CRKYEAW60Iwqr2hAUV6bBoiR2i6XcfNWbqNCYlJiI7yr
+	 g7BMeXVgy5QDg==
+Received: from dev0.khirnov.net (dev0.khirnov.net [IPv6:2a00:c500:561:201::6])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256
+	 client-signature RSA-PSS (2048 bits) client-digest SHA256)
+	(Client CN "dev0.khirnov.net", Issuer "smtp.khirnov.net SMTP CA" (verified OK))
+	by mail1.khirnov.net (Postfix) with ESMTPS id E7082EFE
+	for <linux-bluetooth@vger.kernel.org>; Mon, 29 Jul 2024 17:59:20 +0200 (CEST)
+Received: by dev0.khirnov.net (Postfix, from userid 1000)
+	id BD8FC40341E; Mon, 29 Jul 2024 17:59:14 +0200 (CEST)
+From: Anton Khirnov <anton@khirnov.net>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: hci_sync: avoid dup filtering when passive scanning with adv monitor
+Date: Mon, 29 Jul 2024 17:55:46 +0200
+Message-Id: <20240729155546.20932-1-anton@khirnov.net>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [BlueZ,v1] client/player: Fix not setting config target_latency with edpoint.config
-In-Reply-To: <20240729135705.172810-1-luiz.dentz@gmail.com>
-References: <20240729135705.172810-1-luiz.dentz@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 
---===============1624479231672856467==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+This restores behaviour (including the comment) from now-removed
+hci_request.c, and also matches existing code for active scanning.
 
-This is automated email and please do not reply to this email!
+Without this, the duplicates filter is always active when passive
+scanning, which makes it impossible to work with devices that send
+nontrivial dynamic data in their advertisement reports.
 
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=874593
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      0.48 seconds
-GitLint                       FAIL      0.57 seconds
-BuildEll                      PASS      26.23 seconds
-BluezMake                     PASS      2017.64 seconds
-MakeCheck                     PASS      12.88 seconds
-MakeDistcheck                 PASS      181.94 seconds
-CheckValgrind                 PASS      257.16 seconds
-CheckSmatch                   PASS      386.98 seconds
-bluezmakeextell               PASS      125.74 seconds
-IncrementalBuild              PASS      1613.76 seconds
-ScanBuild                     PASS      1045.75 seconds
-
-Details
-##############################
-Test: GitLint - FAIL
-Desc: Run gitlint
-Output:
-[BlueZ,v1] client/player: Fix not setting config target_latency with edpoint.config
-
-WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
-1: T1 Title exceeds max length (83>80): "[BlueZ,v1] client/player: Fix not setting config target_latency with edpoint.config"
-
-
+Signed-off-by: Anton Khirnov <anton@khirnov.net>
 ---
-Regards,
-Linux Bluetooth
+ net/bluetooth/hci_sync.c | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
 
+diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+index a31d39a821f4..e79cd40bd079 100644
+--- a/net/bluetooth/hci_sync.c
++++ b/net/bluetooth/hci_sync.c
+@@ -3019,6 +3019,20 @@ static int hci_passive_scan_sync(struct hci_dev *hdev)
+ 	} else if (hci_is_adv_monitoring(hdev)) {
+ 		window = hdev->le_scan_window_adv_monitor;
+ 		interval = hdev->le_scan_int_adv_monitor;
++
++		/* Disable duplicates filter when scanning for advertisement
++		 * monitor for the following reasons.
++		 *
++		 * For HW pattern filtering (ex. MSFT), Realtek and Qualcomm
++		 * controllers ignore RSSI_Sampling_Period when the duplicates
++		 * filter is enabled.
++		 *
++		 * For SW pattern filtering, when we're not doing interleaved
++		 * scanning, it is necessary to disable duplicates filter,
++		 * otherwise hosts can only receive one advertisement and it's
++		 * impossible to know if a peer is still in range.
++		 */
++		filter_dups = LE_SCAN_FILTER_DUP_DISABLE;
+ 	} else {
+ 		window = hdev->le_scan_window;
+ 		interval = hdev->le_scan_interval;
+-- 
+2.39.2
 
---===============1624479231672856467==--
