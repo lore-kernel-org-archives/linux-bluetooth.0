@@ -1,129 +1,121 @@
-Received: from mail-lj1-f179.google.com (mail-lj1-f179.google.com [209.85.208.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mr85p00im-zteg06021901.me.com (mr85p00im-zteg06021901.me.com [17.58.23.194])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E07FE8002E
-	for <linux-bluetooth@vger.kernel.org>; Mon, 29 Jul 2024 16:18:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A91A18FC8A
+	for <linux-bluetooth@vger.kernel.org>; Mon, 29 Jul 2024 16:22:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=17.58.23.194
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722269928; cv=none; b=D6yO5cFxRbTkyy2+vnscG6UbW68BvDOW3d4xUvLywBRcQQQKJf/CcAVNWBccsv8VMvnzEk1H5mZIDFk+JNoCoOhqPuCto8xSm3tA+aP6f5uZtJSU1v6PrDPbkW8dW7lCk+wF4KG4O5sLi86y3Q0IIRRW14DVqhTiMEMXBIIJd4c=
+	t=1722270140; cv=none; b=g/o8VvSvBk8WLMq8WuU3QfjYFo8yWWpqqK+0LXKZfrLzEpq7PFO4rj5+mysqfm2wqnmJEsy6M2w6cAq5bnaQrHdVbJxG6Hbr9KNRfjg/l+BDkcIIG2lBW1kWYuMIreQQj8qRCk3TfV3FbE3srwffWbZXhLpfFoGSjvW3V8NLxCQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722269928; c=relaxed/simple;
-	bh=s8bEcS0ozK+7klzbUuiYWOTqErQZ1i19o8BpQT1ekdg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=RBG/qqNUXloz6P1GdAslU0z3JfyIKhOCG6j0mb7nLOACLTnXA8ZGE8nrGiATLoDXzuE6zu+ioYIkKQuJwJT98A1L1G0I3D7W+QALinivoelPXlrtDAzFmRyPkE3cF1z8ErJx8YKR+nwC5rBQLhkWS9h6CgWajV3Ltc8kQny0y3Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OOHGC7il; arc=none smtp.client-ip=209.85.208.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1722270140; c=relaxed/simple;
+	bh=GXSyX5h32pZlR3NWWUJpZoFglo7EuA94+siR4uBo28o=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=QKDMLLsl86uK7XklT4m+CIBaCEfXz6/uPsUpqt1hsAimdYf0sMgsF6t+hgjRl/43qaiukJElODOb4uhuheES2xYZ4yOQX5EjvpVK7ZbXILm2+3HEuoJJ/2UWppkvxVqrUetG1B53PF/SvAzPYy3fmT9+sb1m3GDwzXmUJnqj8zQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com; spf=pass smtp.mailfrom=icloud.com; dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b=iEcr13/B; arc=none smtp.client-ip=17.58.23.194
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=icloud.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OOHGC7il"
-Received: by mail-lj1-f179.google.com with SMTP id 38308e7fff4ca-2f029e9c9cfso57915941fa.2
-        for <linux-bluetooth@vger.kernel.org>; Mon, 29 Jul 2024 09:18:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1722269925; x=1722874725; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=4AEXYmhh3nJshaznrQebnHPUzmXMqoED3ycKo+WCzdQ=;
-        b=OOHGC7ilEjyYNgvwSTi12kMGCPBHEGAfTkGEacur06KEiJOuQEwKMLQBkJ2UzxdUFY
-         2IXKm/MRhILDjkRqwv2fzi1MwKh1R0hmOpcCU4TspgqFUOdKHjV1hGLYoQnRbPR1fqst
-         e5rZF2d9aAp2CB3dtXOQyK46CMQea1HeX+iltzEF5kQVgFyLSI1J01qlOdW74IfNxpSL
-         tJE0SqgYODpaAXQaL4qeYQdM9R5xGFWI1+EMTwScfJtJSk9du9v4roEmPFgGsmYFv1NE
-         Yy3q4bMDPWUxcWtQvc0PFmYFRnJxvSIjNXSphBlFhpYsWDv4jES9hnPFKsxSFyh98aVr
-         fy9w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722269925; x=1722874725;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=4AEXYmhh3nJshaznrQebnHPUzmXMqoED3ycKo+WCzdQ=;
-        b=ohHuPUZg9My8RkOHkyXEXLx4Azff3+I7+ermsuwiTL6MHJry3kbnvKtSzdZ0CBtnb+
-         4SZHsnqWoXmFJsyseCYDgycKT2Ltw2UQMU7aBwTPRgXDaieoDrd1zfU/UU1ZpQx1BqYE
-         nAgMCCOC/jV+RCF9JIsOLmwntoHQuaeaq7+eYFrn5NU4vTFiRqsnNsY3WFEPe036cA+/
-         7AyC8PU+k05VlUjYEX5z384V1o32sklKCAGGM89OolwC8bnGcx64G2TnfUL3iT89YXaH
-         H2fBxCRseixuqqzS1oVS/pAvyDxYGeAUbv8fMZ79yeK9mjLgIaeMWdKRp2DVw5ht5Edm
-         nzkw==
-X-Gm-Message-State: AOJu0Yzzn2jX4Gy5Sw7s2vFOFWDTX5eD365iVVTYSslj1C4HMfBrC6Kz
-	+kV1IPhDYNl5N6r7nF5OUxWH1ry/GEE5P+t+8qc/3orMMqmxdO90kBgrlJCqaF/ssjcvUwa6pBb
-	c3LNFG4+hqNAEAjkLQ0769cEDM0N+gzG77+8=
-X-Google-Smtp-Source: AGHT+IFN5LFmudFmnYRRs1iGhE5J7AyoCATQ81lxCWWa3vp9bA0cLiOi9Zc3pUFodV+mlMPZU25WSFSNfr19FQzfLq4=
-X-Received: by 2002:a2e:3311:0:b0:2ef:2677:7b74 with SMTP id
- 38308e7fff4ca-2f12ee62638mr69580231fa.41.1722269924539; Mon, 29 Jul 2024
- 09:18:44 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b="iEcr13/B"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=icloud.com;
+	s=1a1hai; t=1722270138;
+	bh=KOrRGY8mn8r2Bejzz65Ymd7dY4GRF4aIcYISeRSMx4Y=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To;
+	b=iEcr13/BeUVz8XKb3bSPrCekzh+UC4+4Zi8qB+yUXhsXrDe+uli72cwMcndPwKPjd
+	 pgMIQG9TueCiUxzlGMUJsGUyV2EIOtqXiMXyf7dHA5JwpLxeSX4GB4V4Obapt86IL9
+	 4AbbmTuy+2S6nA63PuVaF/V21cQPrew4U+XuOjbFifMUgDXybxSSOzgnp9XRK9dy/i
+	 bJd28cccdTA/u7H+u22edj/Luv6oQu+N1RiqCNDfFs1tKrLN7yDWmD/l9RJBm0116t
+	 dtvWmCHl7eBjOXwjiKumwbZl/vsiouG2oLr50j0JesAHbah90iO39DQ/WkaXMb/5kX
+	 3cwF2tfCJj2rQ==
+Received: from [192.168.1.26] (mr38p00im-dlb-asmtp-mailmevip.me.com [17.57.152.18])
+	by mr85p00im-zteg06021901.me.com (Postfix) with ESMTPSA id 4CC657402EF;
+	Mon, 29 Jul 2024 16:22:17 +0000 (UTC)
+From: Zijun Hu <zijun_hu@icloud.com>
+Date: Tue, 30 Jul 2024 00:22:02 +0800
+Subject: [PATCH] Bluetooth: hci_qca: [Don't Merge] For QCA6390 regression
+ debugging.
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240729155546.20932-1-anton@khirnov.net>
-In-Reply-To: <20240729155546.20932-1-anton@khirnov.net>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 29 Jul 2024 17:18:31 +0100
-Message-ID: <CABBYNZJvn73dWHqYCbWy614vCeUer7TQ6WD6koJFMMeWtpeWBQ@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: hci_sync: avoid dup filtering when passive
- scanning with adv monitor
-To: Anton Khirnov <anton@khirnov.net>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20240730-qca6390_fix-v1-1-e0340a511756@icloud.com>
+X-B4-Tracking: v=1; b=H4sIAKnBp2YC/6tWKk4tykwtVrJSqFYqSi3LLM7MzwNyDHUUlJIzE
+ vPSU3UzU4B8JSMDIxMDcyNL3cLkRDNjS4P4tMwK3ZQ0izSzNINEUwNzAyWgjoKiVKAw2LTo2Np
+ aAB57uKpdAAAA
+To: Marcel Holtmann <marcel@holtmann.org>, 
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ Zijun Hu <zijun_hu@icloud.com>
+X-Mailer: b4 0.14.1
+X-Proofpoint-ORIG-GUID: g0MgE40dmEhtsC5Y8eiwxiJILOY6KgUU
+X-Proofpoint-GUID: g0MgE40dmEhtsC5Y8eiwxiJILOY6KgUU
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-07-29_14,2024-07-26_01,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 malwarescore=0 mlxscore=0
+ mlxlogscore=999 clxscore=1011 spamscore=0 suspectscore=0 bulkscore=0
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2308100000 definitions=main-2407290110
+X-Apple-Remote-Links: v=1;h=KCk=;charset=UTF-8
 
-Hi Anton,
+For QCA6390 regression debugging.
 
-On Mon, Jul 29, 2024 at 5:06=E2=80=AFPM Anton Khirnov <anton@khirnov.net> w=
-rote:
->
-> This restores behaviour (including the comment) from now-removed
-> hci_request.c, and also matches existing code for active scanning.
+Signed-off-by: Zijun Hu <zijun_hu@icloud.com>
+---
+ drivers/bluetooth/hci_qca.c | 17 +++++++++++++++++
+ 1 file changed, 17 insertions(+)
 
-Make sure you add the Fixes tag with the commit hash that introduced
-the problem, since we might want to backport this.
+diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+index ca6466676902..3ae014af7f1f 100644
+--- a/drivers/bluetooth/hci_qca.c
++++ b/drivers/bluetooth/hci_qca.c
+@@ -2187,9 +2187,12 @@ static void qca_power_shutdown(struct hci_uart *hu)
+ 		}
+ 		break;
+ 
++		/* what to do ? */
++#if 0
+ 	case QCA_QCA6390:
+ 		pwrseq_power_off(qcadev->bt_power->pwrseq);
+ 		break;
++#endif
+ 
+ 	default:
+ 		gpiod_set_value_cansleep(qcadev->bt_en, 0);
+@@ -2418,11 +2421,25 @@ static int qca_serdev_probe(struct serdev_device *serdev)
+ 	case QCA_QCA6390:
+ 		qcadev->bt_power->pwrseq = devm_pwrseq_get(&serdev->dev,
+ 							   "bluetooth");
++
++		{
++			long x_err = 0;
++			if (IS_ERR(qcadev->bt_power->pwrseq))
++				x_err = PTR_ERR(qcadev->bt_power->pwrseq);
++			dev_info(&serdev->dev, "x_err(%lu)\n", x_err);
++			if (x_err == -ENOSYS ||
++			    (x_err == -ENODEV || x_err == -ENOENT)) {
++				qcadev->bt_power->pwrseq = NULL;
++				goto do_default;
++			}
++		}
++
+ 		if (IS_ERR(qcadev->bt_power->pwrseq))
+ 			return PTR_ERR(qcadev->bt_power->pwrseq);
+ 		break;
+ 
+ 	default:
++do_default:
+ 		qcadev->bt_en = devm_gpiod_get_optional(&serdev->dev, "enable",
+ 					       GPIOD_OUT_LOW);
+ 		if (IS_ERR(qcadev->bt_en)) {
 
-> Without this, the duplicates filter is always active when passive
-> scanning, which makes it impossible to work with devices that send
-> nontrivial dynamic data in their advertisement reports.
->
-> Signed-off-by: Anton Khirnov <anton@khirnov.net>
-> ---
->  net/bluetooth/hci_sync.c | 14 ++++++++++++++
->  1 file changed, 14 insertions(+)
->
-> diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-> index a31d39a821f4..e79cd40bd079 100644
-> --- a/net/bluetooth/hci_sync.c
-> +++ b/net/bluetooth/hci_sync.c
-> @@ -3019,6 +3019,20 @@ static int hci_passive_scan_sync(struct hci_dev *h=
-dev)
->         } else if (hci_is_adv_monitoring(hdev)) {
->                 window =3D hdev->le_scan_window_adv_monitor;
->                 interval =3D hdev->le_scan_int_adv_monitor;
-> +
-> +               /* Disable duplicates filter when scanning for advertisem=
-ent
-> +                * monitor for the following reasons.
-> +                *
-> +                * For HW pattern filtering (ex. MSFT), Realtek and Qualc=
-omm
-> +                * controllers ignore RSSI_Sampling_Period when the dupli=
-cates
-> +                * filter is enabled.
-> +                *
-> +                * For SW pattern filtering, when we're not doing interle=
-aved
-> +                * scanning, it is necessary to disable duplicates filter=
-,
-> +                * otherwise hosts can only receive one advertisement and=
- it's
-> +                * impossible to know if a peer is still in range.
-> +                */
-> +               filter_dups =3D LE_SCAN_FILTER_DUP_DISABLE;
->         } else {
->                 window =3D hdev->le_scan_window;
->                 interval =3D hdev->le_scan_interval;
-> --
-> 2.39.2
->
->
+---
+base-commit: 7a27b0ac58abccdf46e89bea9ed9f81a496132ab
+change-id: 20240729-qca6390_fix-df8f6f0a5070
 
+Best regards,
+-- 
+Zijun Hu <zijun_hu@icloud.com>
 
---=20
-Luiz Augusto von Dentz
