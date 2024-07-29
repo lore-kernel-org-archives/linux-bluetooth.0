@@ -1,147 +1,108 @@
-Received: from mail-lj1-f174.google.com (mail-lj1-f174.google.com [209.85.208.174])
+Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3216145B27;
-	Mon, 29 Jul 2024 13:31:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA07D14A0B7
+	for <linux-bluetooth@vger.kernel.org>; Mon, 29 Jul 2024 13:57:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722259875; cv=none; b=mYBiOjV3Z/rx0qTUVh7HiIUbpLw7K6hRurbITa04Ux35BKl/eziBV2bi94BvaML57HR1/wuXf7oKSRBq8iBWPm1yolQhZDLEZF9sAAquJneUG3UXb1jCY5+vgrjtjxayEaJQGs+laM2r/Vx7yhwreDCHYMqbNSFXRX+CT+DYMhY=
+	t=1722261430; cv=none; b=pTY+5N77IVv3C72Nbqxos8hfrZMm5C5vp5D1n5J1PKBMaXOknyAKDPDl0NIz2IFam/g10oRRNq7VDoR9ugx/Cl/kRwKnBL6ZxEZXRcTRfdT76Cwsp3DPZzDgYBvV/ETPc4ddlxKUlHzpZdhRP6lYTHeZnFgaTO9fmyu+pPeEPsw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722259875; c=relaxed/simple;
-	bh=dC4StydkvhN4D2FnulCowDb8t4nCXLe2HWtCaL9svbs=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=dxgDw684swh9a7zMdB3LmX3bAzUEvwegyQgLEGAqCXlCQmPsYedKQOu05JGb1cCWFclRqO1pkzBq67aGXKHupJVOnwJW/pxZEp+vdntzpwk8H4VaKMmDVu+GRjJxIczgAzyMkkCKw+m+tOLadt+IkP4g4JjaJqxh6ACV+cfoLaM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eIsfwdWt; arc=none smtp.client-ip=209.85.208.174
+	s=arc-20240116; t=1722261430; c=relaxed/simple;
+	bh=DMB8MlNqBbccl0wiHPYaV3P9ig6cJAqgBB7BdhWwnOI=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=E4t3cg+cek4p98uo9Oz9tePlzClu632DrHdpYO/PnLYfvaT39HRQJvnq0QiGPrXaSMXcz07t3Hje62DLmcsKhkzsRs74M8kQVFvJbFI8cQgoZGcAz0z+NaSKFI4TnRIDiYw6KSJeg+EnOsPNFxDe+jzdrrLCCwAL7EO8RClfsC8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nocJ/VDE; arc=none smtp.client-ip=209.85.218.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eIsfwdWt"
-Received: by mail-lj1-f174.google.com with SMTP id 38308e7fff4ca-2f0271b0ae9so44472441fa.1;
-        Mon, 29 Jul 2024 06:31:13 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nocJ/VDE"
+Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-a7aa4bf4d1eso473711966b.0
+        for <linux-bluetooth@vger.kernel.org>; Mon, 29 Jul 2024 06:57:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1722259872; x=1722864672; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=oOY+AlMeRwJs0YCYC6hzJCvRhv1dC+GmSx9gBu2yiuA=;
-        b=eIsfwdWtksxaDwol+JBUEY3S1XHvPGcSGVyUMgOsgZJFrl3rN15ZC45ghAujJha5KB
-         1iabPY7jskcKdleR4DdUaEOxy+pdybhQMqjA87Cxmeci07YlyPK+0nhmlI7xwWy+zOF0
-         GWtsNpBTY6Ulb+Sq+UOh0PyazL8VkzIB1opFoxenvzzum9dN09xvFNEOPX3HdC709gL0
-         hLXP7LK5y5+JjuMWRpWKr9ERc2nTk1Z/I5/akZJNFHSHMirjiXH2j420QhjsaFc9lfaq
-         EHEoBgUR9myBjvM+X60PXYPWqKMtFdFqoPj7rSeU0IA2lw7esCNSbwk0/6liK7jwooHa
-         Qh9Q==
+        d=gmail.com; s=20230601; t=1722261426; x=1722866226; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=eKPhT4vuLRiWEgUh5srrWxG2+l39dvR0wo2/JJ1Fk4E=;
+        b=nocJ/VDE+zXL0Ktt3jNhyXz8ttYzqtxZss1M7s6c//JlavGZKckCarReCmFiRmWNDl
+         9bxA0Qr/krhc3aqvkxtPo6LzYg+BvwEV58At/V0usQu4tcXc3Ha1p2+r1gmCharxUunp
+         +UvEJaNUT8E/s3AHHxL07+0DusPirx82b79lFlAIinw9KAZ5RK9St/+ceOs0OyzbIMRu
+         o7jJtszUNU7Y0xcRLwOoFZ2Kg+HLUhTSzSo7qJXT5AMl0D+m5V5WZ+2VPbf5JKqqUaWK
+         nYzCvT+MUlAX8ePrXm/YawsCJ3w7BvvzwBN67ZpFQgSQ7TkoGYq2J9RG1jR+XT5972EY
+         5Pqg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722259872; x=1722864672;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=oOY+AlMeRwJs0YCYC6hzJCvRhv1dC+GmSx9gBu2yiuA=;
-        b=RcOA5tiT4RQt3oZ1WsZZ/WDFoN1Jc5o3BQEaf4TIbZ96fWgeRH5YBNijqF3excTcZt
-         /JOQH6TWZCRXG5Gf1Ur6zn0syPO615rhSgljeYqe+1Ik4XzBOVtPcVUR5jSugvGK5mQW
-         RaIW6/0MbnGo+DpcwjfiGhcXSfPMbDtgJUGby2sEIMoU/jUxnD/TH6m51RXtflzN3K3f
-         5T1v/tlzqn+XPDOPKeg8VlbcV5g546DWOXq5PyzOMJtt+R//sc59HiAn9QWGx9dxxrcx
-         Q02ZMSw/vCqfGCih4Dtw2Oy678hBr/RNrI3KYDXPyMVRZ9jhxj65tKwK1whiYfCpn9gj
-         i9dg==
-X-Forwarded-Encrypted: i=1; AJvYcCWTn7UysmnOl14qiMu5eow3ItLw4M4zs19aci6C4/b/g4S3fU2dF/qmejXpdcdxeGyOVj5TMSisWy+DBPzTZIts7QR1edOT2AlZFGcMKhAh/whotGhCFLs/iBkjhrnsgHBBy+2HqaVZ5RzC7D/IFq+QhGYPttaWse5IbSoXpi6UsGl7D2KXmAaT
-X-Gm-Message-State: AOJu0YzvP++cpCg708x1gcCFlcKCpUZ2YsOATE86Aeb9seNmTc57Gc8J
-	XnuSn7j39EVJP0qgwQafOqjl4WAHXOEb8mWaivUdlVLE7CNYmz52lbv03yvdQNcHtYXTJaKpIKH
-	YZap/1AUUEYCx2hvd4VaLoam8WwM=
-X-Google-Smtp-Source: AGHT+IEkj8gJtt7Xa/PRg0sMhXYsUI0z5cB0Kqpuw44BH7fbPSlxtdi/VtkbDXSJ+OEuJ4+ru7ds3EoONnjafiZrjfk=
-X-Received: by 2002:a2e:8710:0:b0:2ef:2f60:1950 with SMTP id
- 38308e7fff4ca-2f12ee1bdf2mr47796711fa.30.1722259871270; Mon, 29 Jul 2024
- 06:31:11 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1722261426; x=1722866226;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=eKPhT4vuLRiWEgUh5srrWxG2+l39dvR0wo2/JJ1Fk4E=;
+        b=HsFDDhL/UtqESA7hv2qE8X/BJkYd80C9uWbD/W/tyMnRDhedlRrA9d6pOaPPQtZVjy
+         iJWn0PWYojh4sjXTU4W4CKA3IGzTZAXz9PDH1OS8l7TPWu1SxBvJNwSybTxj4k0Ch+fo
+         dkrLtVcvN+dKiVP1jHQfQKUwyV5dhhJXcFdclTDUEL29AJMTb66hJOEabUkxfGcVYJhM
+         XcVvEvkFStEonN/6Cwa4T0A8KH6gYWgHRvx/UuyD3hQSSQ3Rojj6lyo8bS7tTo2Y9RO4
+         2zGCe+O8eFKGLhrR3R2XuwXREHI53xkOrf8VCURwZ9BOexQP0ONqsYLUophSPIzgubqu
+         nK4g==
+X-Gm-Message-State: AOJu0YxsInu3CFQckvuzLkfyASkEmthn1Ns684vFr/srkpGu9Azu9iVd
+	BzTHjszxSs7s/6jUnSLTLWle8zNf/Mx1oFuEg1IUzW5pzDjR/C8At5FcA3ycnco=
+X-Google-Smtp-Source: AGHT+IFrRAFWhiLA/6XorJt4BKMJ2cAKM5KrW25MLTrx+EaNAH1wBdOLsoXxhodCtIOV4OpwKGvgzw==
+X-Received: by 2002:a17:907:d8e:b0:a70:c02f:8a7e with SMTP id a640c23a62f3a-a7d400dbfe2mr700200766b.54.1722261426352;
+        Mon, 29 Jul 2024 06:57:06 -0700 (PDT)
+Received: from lvondent-mobl3.wlan.qualcomm.com ([212.136.9.4])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a7acad4119bsm505519666b.115.2024.07.29.06.57.05
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 29 Jul 2024 06:57:05 -0700 (PDT)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ v1] client/player: Fix not setting config target_latency with edpoint.config
+Date: Mon, 29 Jul 2024 14:57:05 +0100
+Message-ID: <20240729135705.172810-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.45.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <su3wp6s44hrxf4ijvsdfzbvv4unu4ycb7kkvwbx6ltdafkldir@4g7ydqm2ap5j>
- <aa9d6aec-ef94-4137-b2ff-0c86d9a92d42@molgen.mpg.de> <CAA8EJpqGXe0A0yDpEP==60k-bPEbDORpLUtsiPvGSi+b_XphAg@mail.gmail.com>
- <CABBYNZJP2c4L-nFHtug0isqnKPR+Q0CE09o_ACsPLobjLpHtcg@mail.gmail.com> <CAMRc=McB1hY+Lad-gBj9-_Ve2OeW+rXaRqHL2xO4zDPMRD41jw@mail.gmail.com>
-In-Reply-To: <CAMRc=McB1hY+Lad-gBj9-_Ve2OeW+rXaRqHL2xO4zDPMRD41jw@mail.gmail.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 29 Jul 2024 14:30:57 +0100
-Message-ID: <CABBYNZJXgJmfe=o2bgj_Gs1wsD=OQRokEkzVRc_OhBs5-_+Dww@mail.gmail.com>
-Subject: Re: btqca: crash with linux-next on bt power down
-To: Bartosz Golaszewski <brgl@bgdev.pl>
-Cc: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>, Paul Menzel <pmenzel@molgen.mpg.de>, 
-	Marcel Holtmann <marcel@holtmann.org>, Bartosz Golaszewski <bartosz.golaszewski@linaro.org>, 
-	linux-bluetooth@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
-	linux-pm@vger.kernel.org, regressions@lists.linux.dev, 
-	Zijun Hu <quic_zijuhu@quicinc.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-Hi Bartosz,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Mon, Jul 29, 2024 at 12:58=E2=80=AFPM Bartosz Golaszewski <brgl@bgdev.pl=
-> wrote:
->
-> On Mon, Jul 29, 2024 at 1:56=E2=80=AFPM Luiz Augusto von Dentz
-> <luiz.dentz@gmail.com> wrote:
-> >
-> > Hi Dmitry,
-> >
-> > On Mon, Jul 29, 2024 at 12:01=E2=80=AFPM Dmitry Baryshkov
-> > <dmitry.baryshkov@linaro.org> wrote:
-> > >
-> > > #regzbot: introduced:
-> > > 973dd9c4db4746200f88fe46e30eada7054fdbea..84f9288208dfcd955446060a53a=
-dd15b9e01af4e
-> > >
-> > > On Mon, 29 Jul 2024 at 13:21, Paul Menzel <pmenzel@molgen.mpg.de> wro=
-te:
-> > > > Am 29.07.24 um 04:11 schrieb Dmitry Baryshkov:
-> > > >
-> > > > > On Qualcomm Dragonboard 820c (APQ8096, QCA6174) soon after the bo=
-ot I
-> > > > > observe the following crash:
-> > > > >
-> > > > > Unable to handle kernel NULL pointer dereference at virtual addre=
-ss 0000000000000018
-> > > > > Mem abort info:
-> > > > >    ESR =3D 0x0000000096000006
-> > > > >    EC =3D 0x25: DABT (current EL), IL =3D 32 bits
-> > > > >    SET =3D 0, FnV =3D 0
-> > > > >    EA =3D 0, S1PTW =3D 0
-> > > > >    FSC =3D 0x06: level 2 translation fault
-> > > > > Data abort info:
-> > > > >    ISV =3D 0, ISS =3D 0x00000006, ISS2 =3D 0x00000000
-> > > > >    CM =3D 0, WnR =3D 0, TnD =3D 0, TagAccess =3D 0
-> > > > >    GCS =3D 0, Overlay =3D 0, DirtyBit =3D 0, Xs =3D 0
-> > > > > user pgtable: 4k pages, 48-bit VAs, pgdp=3D000000010da63000
-> > > > > [0000000000000018] pgd=3D080000010da62003, p4d=3D080000010da62003=
-, pud=3D080000010da61003, pmd=3D0000000000000000
-> > > > > Internal error: Oops: 0000000096000006 [#1] PREEMPT SMP
-> > > > > Modules linked in: hci_uart btqca
-> > > > > CPU: 2 UID: 0 PID: 66 Comm: kworker/u19:0 Not tainted 6.10.0-next=
--20240726-13923-gd3ce7ebd61f9-dirty #2722
-> > > >
-> > > > I am unable to find the commit. Your tree also seems dirty. What is=
- the
-> > > > last working commit?
-> > >
-> > > Checked the commit range on the linux-bluetooth branch, hope this hel=
-ps.
-> >
-> > Im currently traveling so it would take some time for me to
-> > investigate this but I suspect it could be some of the changes
-> > introduced by Bartosz with power sequence, @Bartosz Golaszewski
-> > perhaps you can help?
-> >
->
-> Hi!
->
-> I just came back from last week's vacation to a bunch of different
-> regressions. I will get to it but it may be later this week.
+This fixes not setting target_latency with endpoint.config command.
+---
+ client/player.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
-Thanks, looks like there were other reports saying QCA driver is not
-working which perhaps is related.
+diff --git a/client/player.c b/client/player.c
+index ac595f434..1280f9a03 100644
+--- a/client/player.c
++++ b/client/player.c
+@@ -1958,9 +1958,9 @@ static void append_ucast_qos(DBusMessageIter *iter, struct endpoint_config *cfg)
+ 					DBUS_TYPE_UINT32, &qos->delay);
+ 
+ 	if (cfg->target_latency) {
+-		bt_shell_printf("TargetLatency 0x%02x\n", qos->target_latency);
++		bt_shell_printf("TargetLatency 0x%02x\n", cfg->target_latency);
+ 		g_dbus_dict_append_entry(iter, "TargetLatency", DBUS_TYPE_BYTE,
+-					&qos->target_latency);
++					&cfg->target_latency);
+ 	}
+ 
+ 	append_io_qos(iter, &qos->io_qos);
+@@ -4008,6 +4008,7 @@ static void cmd_config_endpoint(int argc, char *argv[])
+ 		/* Copy capabilities */
+ 		util_iov_append(cfg->caps, preset->data.iov_base,
+ 				preset->data.iov_len);
++		cfg->target_latency = preset->target_latency;
+ 
+ 		/* Set QoS parameters */
+ 		cfg->qos = preset->qos;
+@@ -4203,7 +4204,7 @@ static void custom_target_latency(const char *input, void *user_data)
+ 	else if (!strcasecmp(input, "Balance"))
+ 		p->target_latency = 0x02;
+ 	else if (!strcasecmp(input, "High"))
+-		p->target_latency = 0x02;
++		p->target_latency = 0x03;
+ 	else {
+ 		char *endptr = NULL;
+ 
+-- 
+2.45.0
 
-> Bart
-
-
-
---=20
-Luiz Augusto von Dentz
