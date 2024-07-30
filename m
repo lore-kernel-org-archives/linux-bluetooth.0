@@ -1,161 +1,149 @@
-Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
+Received: from mail-oi1-f182.google.com (mail-oi1-f182.google.com [209.85.167.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C98081BA880;
-	Tue, 30 Jul 2024 15:49:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BFBB757FC
+	for <linux-bluetooth@vger.kernel.org>; Tue, 30 Jul 2024 16:38:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722354575; cv=none; b=Eh/Bf2OcfyYdYGqLk+hVCppo34jp02S8sy6xsPuXEAFbfo3gXSIBQ1HuH/OxezZyigVBe+eH5ZvpW7SQ9FeG/VqIql+zwS89XiBf7FB4vVlAdAeRxttIrDiLGHBO98MFR1MsV1URn/f7PBspyg49m7cvFH8ZITHwaSjgtYPRs5c=
+	t=1722357524; cv=none; b=oFZj/0R9y2YnUuqQEqLBgca8+Gu1jUsANWOdJmJI7mm9A6/e+MDUa4yhuGnAZscsbT+bYHFJAMY9FqEng0TgxObElnVmyZZQQ45+CR4cBCpXRAIQ0QZUwXboY+dUZWuza+gmQOWyaD28DwZljXPIeSt5qqVJP2JekSxkeLP/x1Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722354575; c=relaxed/simple;
-	bh=BM/Opj+kL4c7QeFGjSbLAKBiUolZPcSnxAdCnQtb8U8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=tphTSSnQtCbMxVznXykasUDkT94u2L8jiVPN/huDwdqEmq/mVnBWQrCl3ZEbjwM+77RggLuMB5m9wYsVaSl429MkljdRychvI+yhOXi6LDE4rZfyYBg9NVZc9J5cHd3Spl+3tIeYXQZqDBJJLuJA0KcPqL6mf6GE8JuazngDGgU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nRGC+FYx; arc=none smtp.client-ip=209.85.210.178
+	s=arc-20240116; t=1722357524; c=relaxed/simple;
+	bh=OfE/JyvaxHoxsw2nO8bxT2mM0dZFZ9lHTAU1xF+0OKQ=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=SgbXpGwQb5hkJizuUpnLz5gw5ElGewG2Zitv9988sExmG7dyp0922Q5w/nf2NR6bN9CGOKB5amMC4xZBQxFl754H8bY6gqMkOy2oE/zn1cpE7UvO/demccZU2bL1gQ2MyGeBQhUFgI5+hgqMnh8ULuNf//5F6fveRfBtN2TE1Fo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bZ4VpXar; arc=none smtp.client-ip=209.85.167.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nRGC+FYx"
-Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-70ef732ff95so1353135b3a.0;
-        Tue, 30 Jul 2024 08:49:33 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bZ4VpXar"
+Received: by mail-oi1-f182.google.com with SMTP id 5614622812f47-3db35ec5688so1498627b6e.3
+        for <linux-bluetooth@vger.kernel.org>; Tue, 30 Jul 2024 09:38:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1722354573; x=1722959373; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=+fzlR0gUQTK+JspvCAP1K6WdAPDoHJFZmXy8zZHI6HU=;
-        b=nRGC+FYxyUy9fQ/KTwzfNO5Ak5bsAYuHmIGGkgCKzmQ5hwxAkz4BdSDNG2cvJP9Drg
-         uIAu/wBALn5iOh3ULjFn0CyvBUuK0f4SSFMcPCdGMs1MtZCa/TQP+tlAoC8JzIQ0K+U4
-         LGYRw2LHWBU2RZpbx/kMgyorkFSagx3xZGx9UyISFz+K5C0l99L7cygRr2l0cu45izLf
-         GshxA4ARhvwU2AVyMkZl7Iko/7LodhUoGFDfGhAC0jsggeE2r0yIB9mEFswaQnaJ0kGB
-         xr64Bcz1Go9MarS6S8HQrikgqWaxMj6cW5dyxKhaAxhrJVdfDh4gmmC6t5JKTKH2CCAT
-         a/aA==
+        d=gmail.com; s=20230601; t=1722357522; x=1722962322; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=4NxY5fFlfhG+NO64yvh0KZqg61tSuRQDbpdPkOV8wz0=;
+        b=bZ4VpXar0G1JvWdmgYt0+6i8n7G8roUWZibyzbYEQDo0xohBwDfzwOjuMWkPudOFGE
+         yGpSnllyqIkku0n9F1Y4RFzJIbDCXagWO3xUx+rO2QAcKXsw26i3/9p0miClmSGB1i2M
+         X6LI3Y/FML+QTzRUTV0xeNAiWf1F3L9ssI0rSw6zRugssmyPj28Axt7yLnTdIsmY/hSE
+         RJAvFxIDg+L6/Bafji4pBYuQmxd48J1LM7CV6ajaKNF6RY0XCMgM/bHhDnudEgHDY/MC
+         FFmt7ZigGF+CQm3ueoDEh9+h+aIKwmOpoEZnJTOGztgPiV7JUflYlhf14KZn4XdjqMoR
+         4Z9w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722354573; x=1722959373;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20230601; t=1722357522; x=1722962322;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=+fzlR0gUQTK+JspvCAP1K6WdAPDoHJFZmXy8zZHI6HU=;
-        b=ad78PUFWMicJ2O3DuBlFMxwvaPINsT7aCaBOUNDT2NgCEAlOoZpxpw0G2P3pjEI//i
-         c+yqSGLrfGW4Kb30dOYUcl4KShthnYs/Ca5cDFqjn10FABa4Zo8T1yzPRySZflu0WFOA
-         ON3FXAOyIuqy2nrokZ3fPSry5XdPAEL1lJaag8JlVQOlUhe5ZBatLBRBQvqSOoI9eAJl
-         FY7Sc0DG2/UGUHPTD5vfZ854r/N8Ra1JzTG8OIR39Pvrg3Unqtwc3fN0gfdmu6QsQp1F
-         j6jMh5C/1sq6PuLyqkwh0egtekTgbnIVi/Q2/k1be7kfhKT4IhM4VB9SWMoJfVnghB78
-         zLKA==
-X-Forwarded-Encrypted: i=1; AJvYcCWXDDYLSqj2E7zwaaTrqrwfEZJQXWnSUqcmkwfi7tYDgSe/zSEH5PhjGdZ8WkfvhzTkaZQSxhk9gxiUHbhAobrAkaelsQWm1Ff2v5/loLKz63vbKQJ7ORhVxACAf7ZBD2O/dkBeKHYsYH6CISnB
-X-Gm-Message-State: AOJu0Yw94GUDkiYlpsea8JEYxQakj3KNE40fE3UX8UVSxIn2JZZ2iysc
-	4JlikRzGrhHYVOQbaklFh83IXqa4BjYvyhhqjAqNydmLo3rIimPZXRxV4jZek3s=
-X-Google-Smtp-Source: AGHT+IFK3xcCzpXpB/s4nEqDyqFp8KQ6QA1toDF6ndOG/GhzzLYvkAh8ZzKRgN/1pZ0P42+CDl8gIQ==
-X-Received: by 2002:a05:6a20:3d91:b0:1c4:81ab:1f5e with SMTP id adf61e73a8af0-1c4a13afd47mr11291549637.38.1722354573004;
-        Tue, 30 Jul 2024 08:49:33 -0700 (PDT)
-Received: from OPEN-HORIZONS.attlocal.net ([2600:1700:65a0:8110::c])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-70ead816722sm8600644b3a.106.2024.07.30.08.49.31
+        bh=4NxY5fFlfhG+NO64yvh0KZqg61tSuRQDbpdPkOV8wz0=;
+        b=bXkpLfbVMZW6FS5noLDlQ4iK49oisiDrnZnNlN/v+NfouXdOywgEkHD649dgzEOPn0
+         20sP9NUEW2B326eVm3qFR3SRAZWfIKGwloE1+WZmi0NwB4IAqDpq5+kVcxXZUbxKPUtn
+         oWSU51PtsgcJ5J53Mpxh+iUFxMlOZtZ6OfHwLp/W9o4yd449a6u8LvXzSp+0n+yAvzH/
+         VoTl1KRuX5gCeo+PsSv2Y2Rb/0morJZjZAz8VkNhEGemh409Zzgv6zSVpCtPWwU/7myV
+         FDWntzNIsSNx8O2rLH50UOA3dgs28Pg7CH6Sks/wFrDd1DqrwTigOpb0bVZyileja6TJ
+         3yLQ==
+X-Gm-Message-State: AOJu0YyjLbnKDOlziSTGE8+zlbm22Eg735kCrdvfBValNcfrJ9jYnIGZ
+	oJWLJIsnoHQc7/SavW0H3Ktm21ay1/cFjfzGLTOe8R2WDLswfshVQaMocg==
+X-Google-Smtp-Source: AGHT+IFWYIKPT0OYx/TFMNYZPlhIOBFwfqIt1+bGJgKXLqRspYNOEObfP8Zsc7k6t703MVP/3Hszow==
+X-Received: by 2002:a05:6808:1692:b0:3d9:324a:3c9 with SMTP id 5614622812f47-3db23a862ccmr12670442b6e.11.1722357521988;
+        Tue, 30 Jul 2024 09:38:41 -0700 (PDT)
+Received: from [172.17.0.2] ([20.161.76.234])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-44fe8126979sm51155211cf.7.2024.07.30.09.38.41
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 30 Jul 2024 08:49:32 -0700 (PDT)
-From: ultrabear <bearodark@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: ultrabear <bearodark@gmail.com>,
-	linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v3] Bluetooth: btusb: Add MediaTek MT7925-B22M support ID 0x13d3:0x3604
-Date: Tue, 30 Jul 2024 08:41:18 -0700
-Message-ID: <20240730154116.25336-4-bearodark@gmail.com>
-X-Mailer: git-send-email 2.45.2
+        Tue, 30 Jul 2024 09:38:41 -0700 (PDT)
+Message-ID: <66a91711.050a0220.8474d.fbb5@mx.google.com>
+Date: Tue, 30 Jul 2024 09:38:41 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============5008782058040737423=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, bearodark@gmail.com
+Subject: RE: [v3] Bluetooth: btusb: Add MediaTek MT7925-B22M support ID 0x13d3:0x3604
+In-Reply-To: <20240730154116.25336-4-bearodark@gmail.com>
+References: <20240730154116.25336-4-bearodark@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-This patch fixes bluetooth support on the MediaTek MT7925 WiFi 7 +
-BT 5.3 M.2 chipset that I purchased from aliexpress (and which 
-arrived today). The PCB states that it is an MT7925B22M.
+--===============5008782058040737423==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Device from /sys/kernel/debug/usb/devices:
+This is automated email and please do not reply to this email!
 
-T:  Bus=03 Lev=02 Prnt=03 Port=02 Cnt=01 Dev#=  4 Spd=480  MxCh= 0
-D:  Ver= 2.10 Cls=ef(misc ) Sub=02 Prot=01 MxPS=64 #Cfgs=  1
-P:  Vendor=13d3 ProdID=3604 Rev= 1.00
-S:  Manufacturer=MediaTek Inc.
-S:  Product=Wireless_Device
-S:  SerialNumber=000000000
-C:* #Ifs= 3 Cfg#= 1 Atr=e0 MxPwr=100mA
-A:  FirstIf#= 0 IfCount= 3 Cls=e0(wlcon) Sub=01 Prot=01
-I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=125us
-E:  Ad=82(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-E:  Ad=02(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-I:  If#= 1 Alt= 6 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  63 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  63 Ivl=1ms
-I:* If#= 2 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
-E:  Ad=8a(I) Atr=03(Int.) MxPS=  64 Ivl=125us
-E:  Ad=0a(O) Atr=03(Int.) MxPS=  64 Ivl=125us
-I:  If#= 2 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
-E:  Ad=8a(I) Atr=03(Int.) MxPS= 512 Ivl=125us
-E:  Ad=0a(O) Atr=03(Int.) MxPS= 512 Ivl=125us
+Dear submitter,
 
-High fidelity images I took of the chip itself for future reference:
-https://archive.org/details/MediaTek-MT7925B22M/
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=875134
 
-Webpage the chip was purchased from, note it is different from the
-images taken:
-https://web.archive.org/web/20240620021119/https://www.aliexpress.
-us/item/3256806821207897.html
+---Test result---
 
-Signed-off-by: Alexander Hall <bearodark@gmail.com>
+Test Summary:
+CheckPatch                    FAIL      0.89 seconds
+GitLint                       FAIL      0.53 seconds
+SubjectPrefix                 PASS      0.12 seconds
+BuildKernel                   PASS      29.96 seconds
+CheckAllWarning               PASS      32.32 seconds
+CheckSparse                   PASS      37.78 seconds
+CheckSmatch                   PASS      102.37 seconds
+BuildKernel32                 PASS      31.77 seconds
+TestRunnerSetup               PASS      531.76 seconds
+TestRunner_l2cap-tester       PASS      24.14 seconds
+TestRunner_iso-tester         PASS      37.51 seconds
+TestRunner_bnep-tester        PASS      5.01 seconds
+TestRunner_mgmt-tester        PASS      111.28 seconds
+TestRunner_rfcomm-tester      PASS      7.68 seconds
+TestRunner_sco-tester         PASS      15.23 seconds
+TestRunner_ioctl-tester       PASS      8.05 seconds
+TestRunner_mesh-tester        PASS      6.13 seconds
+TestRunner_smp-tester         PASS      7.13 seconds
+TestRunner_userchan-tester    PASS      5.30 seconds
+IncrementalBuild              PASS      28.21 seconds
+
+Details
+##############################
+Test: CheckPatch - FAIL
+Desc: Run checkpatch.pl script
+Output:
+[v3] Bluetooth: btusb: Add MediaTek MT7925-B22M support ID 0x13d3:0x3604
+WARNING: From:/Signed-off-by: email name mismatch: 'From: ultrabear <bearodark@gmail.com>' != 'Signed-off-by: Alexander Hall <bearodark@gmail.com>'
+
+total: 0 errors, 1 warnings, 9 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/src/13747554.patch has style problems, please review.
+
+NOTE: Ignored message types: UNKNOWN_COMMIT_ID
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+##############################
+Test: GitLint - FAIL
+Desc: Run gitlint
+Output:
+[v3] Bluetooth: btusb: Add MediaTek MT7925-B22M support ID 0x13d3:0x3604
+
+WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
+4: B2 Line has trailing whitespace: "BT 5.3 M.2 chipset that I purchased from aliexpress (and which "
+61: B3 Line contains hard tab characters (\t): "	 archive.org, however aliexpress is incompatible with waybacks"
+62: B3 Line contains hard tab characters (\t): "	 scraping tool, and as an alternative I have taken high resolution"
+63: B3 Line contains hard tab characters (\t): "	 images of the actual chip I received and put them on archive.org."
+66: B3 Line contains hard tab characters (\t): "	 get_maintainers.pl"
+69: B3 Line contains hard tab characters (\t): "	clearer"
+70: B3 Line contains hard tab characters (\t): "	web archive eventually came through so I have readded the link to that"
+71: B3 Line contains hard tab characters (\t): "	aswell"
+
+
 ---
-Changes from v1:
-It was suggested that the (now removed) aliexpress link be run through
-	 archive.org, however aliexpress is incompatible with waybacks
-	 scraping tool, and as an alternative I have taken high resolution
-	 images of the actual chip I received and put them on archive.org.
-The prefix of this patch was changed to `Bluetooth:` as suggested
-Maintainers and open lists have been auto CC'd as suggested, via
-	 get_maintainers.pl
-Changes from v2:
-  the commit name has been updated to include the device:vendor id to be
-	clearer
-	web archive eventually came through so I have readded the link to that
-	aswell
+Regards,
+Linux Bluetooth
 
 
- drivers/bluetooth/btusb.c | 3 +++
- 1 file changed, 3 insertions(+)
-
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index e384ef6ff..2ea46a0e6 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -691,6 +691,9 @@ static const struct usb_device_id quirks_table[] = {
- 	{ USB_DEVICE(0x13d3, 0x3603), .driver_info = BTUSB_MEDIATEK |
- 						     BTUSB_WIDEBAND_SPEECH |
- 						     BTUSB_VALID_LE_STATES },
-+	{ USB_DEVICE(0x13d3, 0x3604), .driver_info = BTUSB_MEDIATEK |
-+						     BTUSB_WIDEBAND_SPEECH |
-+						     BTUSB_VALID_LE_STATES },
- 
- 	/* Additional Realtek 8723AE Bluetooth devices */
- 	{ USB_DEVICE(0x0930, 0x021d), .driver_info = BTUSB_REALTEK },
--- 
-2.45.1
-
+--===============5008782058040737423==--
