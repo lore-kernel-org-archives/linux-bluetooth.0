@@ -1,64 +1,79 @@
-Received: from out-26.smtp.github.com (out-26.smtp.github.com [192.30.252.209])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AA4E1B1421
-	for <linux-bluetooth@vger.kernel.org>; Wed, 31 Jul 2024 17:07:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.209
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6249E1A76A1
+	for <linux-bluetooth@vger.kernel.org>; Wed, 31 Jul 2024 17:10:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722445673; cv=none; b=gyqTDgvBclItzEfHKSHPLNhVq+7xLVwuJMtHSC/srNS+Ma2xZSanzdQaTh4IDkBmiGIwvjIJXamQ98bUgjG3jZWzQoQfwZOV26gGbniH0WZyPtcdSgByokFKPJX6PSeLvlS3o3nVEY7v06ZQ7laaC8wIh53aseIAIqxz1cHzIoM=
+	t=1722445832; cv=none; b=PPA0FpxqyruTts73Zry5E59Gzy+X+1lSzgcgnoxhJspkPbx7NCMIhZYVgi2gXJebD4Jjfh8U+WqvGj7blrfKxKch/fVSaJzGSIr3w+q9NTiEF3xAHP/RCcddj/scEnR/yuzcp5d3BUtc2seqDte2BaxK0yqRH21ICW2fa9ZKW6A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722445673; c=relaxed/simple;
-	bh=CreNGhCwzMRt0ou+nW++w3N0OMnKkudWeY6MVf2bvXk=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=nPP7UPsMfNh6jAiAN9+n8IDY8pnMp6yutz3RGOhvVbczYnbvB0QvO+PxBSOQgRQPwjITspfzpqqnR3zfc2p2e4NiUFxiI5Ty1aBIhJBMSOKCfcesJzzN4l8Gg19TuIjBeC9SZgz8DlulQBwed2jM+HITVBzll4X8EBy0Cxax4rY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=aEhNHHCb; arc=none smtp.client-ip=192.30.252.209
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1722445832; c=relaxed/simple;
+	bh=Rq0nDCPisD1hbnQOJQgp2jXZJJLCcCzf0R0KlfSOnBk=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=t24WAJBoREwt8VEpR9Kt0jFPpK31/hZ+u/lKWC8Or/8UQFMhpbKjmrbp4FzW4zu2ACFoeoqEgE5hhxvQn3+Cxw0pCHv7moDHjlaNMFnPKfZ/cqYWj59jo6D569RE1JL9Jl2l0KUvOZtSPf3pXblNKxVIu8iEc7epLDZW9+Tux+Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=I2XoHh7Z; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="aEhNHHCb"
-Received: from github.com (hubbernetes-node-0ac6ab5.ash1-iad.github.net [10.56.146.23])
-	by smtp.github.com (Postfix) with ESMTPA id 6ABB46003BC
-	for <linux-bluetooth@vger.kernel.org>; Wed, 31 Jul 2024 10:07:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1722445671;
-	bh=WkSqIsTxjWICJhZnHHYPCR5LJVf4giiqbOO+jOcjv6A=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=aEhNHHCbUJGLiIBpc+1sIztcvNw4vV+HKVVk77mK3rvlVW3U6IG6h2/+ZcrZtb6mD
-	 pDQI37djqsK4HAmfRbbmiDZBKKUd8vTNbUb7nA2Ki5ipCydfetue1WgLOn4EJ7Lz7W
-	 oYb2SxgVrj4cLhCowqA39ZnAv/tGJVm4cSJY8kyA=
-Date: Wed, 31 Jul 2024 10:07:51 -0700
-From: Luiz Augusto von Dentz <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/master/fcf391-549d38@github.com>
-Subject: [bluez/bluez] 549d38: client/player: Fix not setting config
- target_laten...
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="I2XoHh7Z"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 05319C4AF0C;
+	Wed, 31 Jul 2024 17:10:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1722445832;
+	bh=Rq0nDCPisD1hbnQOJQgp2jXZJJLCcCzf0R0KlfSOnBk=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=I2XoHh7ZTJKBUHd8gv2Q5NRkiJjB704rHAcid7e5a30HZWRSSmF9i1OY+Y1Xlm3MM
+	 8wp/OyvSr6gBjM+maGKG0/+OG0dp6ZZwCI38eWkABsJf6u5vZMKjdW6rvg74mcwFrV
+	 P1y3CcmupBdznG5Zmt4/520uQZ8VIfIBLJKKs+dbMtT4nC2xZca85+1YaCRY+WkfJz
+	 1X+BZ2f5lidUrjZZHK5YM8A3X7LzQol3kebf0mHsypmDAPVO3BUP3cWCGfwL5Q7kYp
+	 92RNO8t/D4k821ERzc7B+AoYEvkoPh6pRbJY/nkl2Wme+8LixJeNgz3QRM3fZ1EIgt
+	 OxMq2JVgYuxtQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id E3005C6E396;
+	Wed, 31 Jul 2024 17:10:31 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH BlueZ v1 1/4] client/player: Fix not setting config
+ target_latency with edpoint.config
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <172244583192.3222.10554985461302298758.git-patchwork-notify@kernel.org>
+Date: Wed, 31 Jul 2024 17:10:31 +0000
+References: <20240731135718.429604-1-luiz.dentz@gmail.com>
+In-Reply-To: <20240731135718.429604-1-luiz.dentz@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
 
-  Branch: refs/heads/master
-  Home:   https://github.com/bluez/bluez
-  Commit: 549d38852f665d8251b2c0c0e8c9f3d5574ac99b
-      https://github.com/bluez/bluez/commit/549d38852f665d8251b2c0c0e8c9f3d5574ac99b
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2024-07-29 (Mon, 29 Jul 2024)
+Hello:
 
-  Changed paths:
-    M client/player.c
+This series was applied to bluetooth/bluez.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-  Log Message:
-  -----------
-  client/player: Fix not setting config target_latency with edpoint.config
+On Wed, 31 Jul 2024 14:57:15 +0100 you wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> 
+> This fixes not setting target_latency with endpoint.config command.
+> ---
+>  client/player.c | 7 ++++---
+>  1 file changed, 4 insertions(+), 3 deletions(-)
 
-This fixes not setting target_latency with endpoint.config command.
+Here is the summary with links:
+  - [BlueZ,v1,1/4] client/player: Fix not setting config target_latency with edpoint.config
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=549d38852f66
+  - [BlueZ,v1,2/4] monitor: Fix crash parsing notification
+    (no matching commit)
+  - [BlueZ,v1,3/4] shared/bap: Fix not setting metadata
+    (no matching commit)
+  - [BlueZ,v1,4/4] bap: Fix not setting metatada
+    (no matching commit)
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
-
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
