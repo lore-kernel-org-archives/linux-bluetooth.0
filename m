@@ -1,147 +1,131 @@
-Received: from mail-oi1-f181.google.com (mail-oi1-f181.google.com [209.85.167.181])
+Received: from mail-qk1-f173.google.com (mail-qk1-f173.google.com [209.85.222.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E363274413
-	for <linux-bluetooth@vger.kernel.org>; Wed, 31 Jul 2024 19:33:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C87B14AD3F
+	for <linux-bluetooth@vger.kernel.org>; Wed, 31 Jul 2024 20:29:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722454419; cv=none; b=i9BkTLIjyVOn1FWRxr8a7KVh8lH3AYHebBBTgKiCRQCJb/QWrtDQGLtvaA/Zui7SZM+EBO6pp83buKQuLhDyxdfHMpW/mxn/w54oJRHHP+WCI4rLAmJcNyLGPDacXq0GUiXeJkLXnmtElTNExQHkPicPaSfxWP8nXQGm8YAeEco=
+	t=1722457786; cv=none; b=pqQPZYTzC8J9FeTS+OzRoH4yY+Co0IUKHwofps0/MzsdRIow/ZtTWTpM4bVH6hquKvg+PI/ICgWhe/pOIrgel5/T/0bBJ9zADb+WddCGDwPj9uUpzeCOts0Pv28ETjjZi2kGKQREk+22kBGPgrI5hNv9jpBTy3dN3xpdSCrZEKc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722454419; c=relaxed/simple;
-	bh=MKzKxBdiK8CV1g79MaTkH39XftNOhPUICgBvyNflXXk=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=LCuzGuGFumVwcdpkjgHjshQDY6IWBHcciMNAhYzDGwgPokxvkxj5Up7qWrVA1C3wBNjhc/zHCgbFzsd0nkg2jzla3J5L1PRL9vnAJn5fjI7CGrTzPytgpxA+b6Am1J1E1a4/V3bqsw8vlZdRpqB0SX4okvWXxzSSMiTfqppiR+Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=E7o0gjaE; arc=none smtp.client-ip=209.85.167.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1722457786; c=relaxed/simple;
+	bh=FqYVA6k1iLJ0poKNCNzTySZxGfnEvNDdUMDGkm/7lBo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=GHe9q3CsXyzkK5CQ3FwVnufc+GU77vEN3NyZRaebGaniPH93nFEZ2jzUkkYtTXFkAfihRLbH16G2PyhfKcEzH5bbIVlP1a3MV4HTeWqnjgF6Mvt7EDfXApQ+YcGcp+OdaDST4wncmrNPCTDS7nZtydS4irbS/yJUlbz1n6O6E9w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=H7HsdI36; arc=none smtp.client-ip=209.85.222.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="E7o0gjaE"
-Received: by mail-oi1-f181.google.com with SMTP id 5614622812f47-3db18c4927bso3279645b6e.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 31 Jul 2024 12:33:37 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="H7HsdI36"
+Received: by mail-qk1-f173.google.com with SMTP id af79cd13be357-79f19f19059so380629385a.0
+        for <linux-bluetooth@vger.kernel.org>; Wed, 31 Jul 2024 13:29:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1722454417; x=1723059217; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=IGrdH5WWLL4HB1BWbcxs6hPQMIa/mynPC1NqLMNKqVM=;
-        b=E7o0gjaE3IX1dYg3+T0hQl2lIZqdZ2i97c5+gb9zhGylCoIHkav9wycfbnZMDyoyVw
-         7vhks8UXKEt3grn+dY/Cb6IOCCbwOwfeh2sVk42Yn+90FLfCRjGtLwEzhYGbBsNQ+463
-         tbEq2ThI22BuNcyrUV4tnJgWYxS+gaIkP8dPCa9VgZv0FiN7JNUD6mGrCLCkdFEX0dQz
-         LWGPkbBiVE4JA+95QbybjwyrlINSjmragX1y7jyRI5/dcy9f8e6CEk8M55t64MHaa5MG
-         8nZ2+D9Vqb/iKQ9KNpbRt+lBNi50Xt/Izx8aOGQpJLyfP9vB9FJrT3UOb5KftLJuWrz9
-         cpBg==
+        d=chromium.org; s=google; t=1722457782; x=1723062582; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=6SZR84pufxEJHH9akehyEVjbbV4hh1UfXsmtqulpwvc=;
+        b=H7HsdI3655HKZWKn26fhQ2CLdgGdE05XP2gb5MdKoDKXlZjvcfxDk0OoI+RbxhkLRB
+         8msU5x/5c0vnJJjl5YY9L29ih7GQHQi3jko7uvlGrmrKghCMBbON+7BJPJ61P1xme1Rh
+         JWQ7auhFVEKCJqSxzS2/gUz3riu/TZHQ/7YJo=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722454417; x=1723059217;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=IGrdH5WWLL4HB1BWbcxs6hPQMIa/mynPC1NqLMNKqVM=;
-        b=IZbO86CBaY6n4APr8BDdJhSXdaNMBGt+6v2ajeX9XOb7uNHXgYDL2zI8Rvs6Tnh6oW
-         2/LT6zkgtw2LMY438E0vuorrzrpR8jxV4/o5fjVNj7lqWq4XZqE7p317PUGHDOxZEw2n
-         BCzIjN8PGOU9vWQ/HRs59Yf5Fe8A9Jq4MDJKTEopxoxgQ18Hii5Oybu+CX9dwX9lPSiI
-         MKPtiR8DZ4m9igsROzNhpLKzWyICq+EfyUeuPSgPmtYxQOBKB4NiiQHTJ06TPSSUKe/G
-         y/vh/2x2dEyyctheWzmfrDlQPB9LKk1OBflZCALu0go4qcrT5uSDmlgKAAiw3/vatAHm
-         1TPw==
-X-Gm-Message-State: AOJu0YwBZQBt0xm/A4rv2nscmgaSNLqBkAKwZ+ar+/V8ett6dq3LZfCa
-	LRpQH3wvDV3+DsI5p3ZL8S/owaHcumtbQZVGylSgh5oDbEVpWV2GPdNHSw==
-X-Google-Smtp-Source: AGHT+IE+hTNOj7VPmNsRsrlsZCYxHOX//S4tXYMAEs/uacn/YLUWd7B1vTFLQ+wqhXLJy5QcQFMV0g==
-X-Received: by 2002:a05:6808:188f:b0:3d9:34c4:1c07 with SMTP id 5614622812f47-3db511c860dmr141390b6e.9.1722454416812;
-        Wed, 31 Jul 2024 12:33:36 -0700 (PDT)
-Received: from [172.17.0.2] ([20.55.223.39])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-44fe840f8afsm63059991cf.87.2024.07.31.12.33.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 31 Jul 2024 12:33:36 -0700 (PDT)
-Message-ID: <66aa9190.c80a0220.ffa5e.5a57@mx.google.com>
-Date: Wed, 31 Jul 2024 12:33:36 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============6382411107317635176=="
+        d=1e100.net; s=20230601; t=1722457782; x=1723062582;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=6SZR84pufxEJHH9akehyEVjbbV4hh1UfXsmtqulpwvc=;
+        b=asWjiDwVU6QIYf5YWp5RzVtRTm0CicHepOho98e3wr0i52R3xOu/XvFxoKHF6yLQt1
+         jpiplbRYLKI5qJRg43EhSsUDzAserKEEQAfgrn5tqoQxxZG/0ZDZot6nfTRsesqJFJLD
+         dnyQxkyTri4yQ78H4iGbTmTJuk1yVKPF3zEjQBjxyK++EC87VXBH9dOafwXw62GwEeNP
+         qQq5yipX2MJQVQyZ+qCJawemruQONj5IEU07THZW1nBbC7Vip3TYDydBEtVzKNn7JDki
+         H3YPEVw8YfIPM8BmjXtXi4jPb9M8nUwY7G8N01fs9xQ3EoJ1ZREuTFEWOpB2IXRl2nA2
+         s7TQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXN3dtVudFPvK4yhRzqDB7lzfqrSmp0Il5ARpmxBYjeOiwm2NOGV35OW0+PSHLtAnVjRW1A80ODG0qgBiNIC3AYTFsvIDrs9zVY8mVMRo5E
+X-Gm-Message-State: AOJu0YwMBtbUrGOsK+ZU+sDM6onqDmx98VELqmxZZ8+F/2/dyE/KUzSK
+	strss9Q69zIwY4yDMUeXpj9CziFRsJxH9sPGstrvQZ1gfOqLHdUQ4/CyArCQOca0h7ePl//CfHk
+	=
+X-Google-Smtp-Source: AGHT+IEuz8VtGJQu4QdXfuO8RvdjI6/UITUbY0IjlJPJWQOzX+ia3Y60+00F5xH3gcXk4/LGwkyUHQ==
+X-Received: by 2002:a05:620a:24c9:b0:79f:1869:11fe with SMTP id af79cd13be357-7a30c6e26d7mr40346885a.52.1722457782147;
+        Wed, 31 Jul 2024 13:29:42 -0700 (PDT)
+Received: from mail-qt1-f180.google.com (mail-qt1-f180.google.com. [209.85.160.180])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7a1d7435509sm783979385a.84.2024.07.31.13.29.40
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 31 Jul 2024 13:29:40 -0700 (PDT)
+Received: by mail-qt1-f180.google.com with SMTP id d75a77b69052e-44fee2bfd28so484431cf.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 31 Jul 2024 13:29:40 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCVBgvywRkah/cA7ntvdub/kI03Ve4Lvndd6qxPrVnx8sQcKRg3QqNie5prlQeIqj0FZSlhT4BgNgUv3NJPfzd+sZSNCgoHGOZq83EJ73EcV
+X-Received: by 2002:a05:622a:13c7:b0:447:f914:8719 with SMTP id
+ d75a77b69052e-4504199ef23mr5362921cf.2.1722457779975; Wed, 31 Jul 2024
+ 13:29:39 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, cascardo@igalia.com
-Subject: RE: Bluetooth: btmtk: avoid UAF in btmtk_process_coredump
-In-Reply-To: <20240731190330.1619718-1-cascardo@igalia.com>
-References: <20240731190330.1619718-1-cascardo@igalia.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+References: <20240517170246.1.Ia769fe5fbeaa6aca2edfb01b82eb7df0c6955459@changeid>
+ <CAD=FV=Wd4UdjGdFODGCa4acviQG2V_YuM9J8oxi8A--ZmseNUA@mail.gmail.com>
+In-Reply-To: <CAD=FV=Wd4UdjGdFODGCa4acviQG2V_YuM9J8oxi8A--ZmseNUA@mail.gmail.com>
+From: Doug Anderson <dianders@chromium.org>
+Date: Wed, 31 Jul 2024 13:29:23 -0700
+X-Gmail-Original-Message-ID: <CAD=FV=WqyEo9mWgYyRQjLmhh1pNTNTFM1zwbi2g0n9FMseUtHg@mail.gmail.com>
+Message-ID: <CAD=FV=WqyEo9mWgYyRQjLmhh1pNTNTFM1zwbi2g0n9FMseUtHg@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: qca: If memdump doesn't work, re-enable IBS
+To: Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Stephen Boyd <swboyd@chromium.org>, Guenter Roeck <groeck@chromium.org>, 
+	Johan Hovold <johan+linaro@kernel.org>, 
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>, 
+	Sai Teja Aluvala <quic_saluvala@quicinc.com>, linux-bluetooth@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
---===============6382411107317635176==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi,
 
-This is automated email and please do not reply to this email!
+On Mon, Jun 10, 2024 at 4:52=E2=80=AFPM Doug Anderson <dianders@chromium.or=
+g> wrote:
+>
+> Hi,
+>
+> On Fri, May 17, 2024 at 5:03=E2=80=AFPM Douglas Anderson <dianders@chromi=
+um.org> wrote:
+> >
+> > On systems in the field, we are seeing this sometimes in the kernel log=
+s:
+> >   Bluetooth: qca_controller_memdump() hci0: hci_devcd_init Return:-95
+> >
+> > This means that _something_ decided that it wanted to get a memdump
+> > but then hci_devcd_init() returned -EOPNOTSUPP (AKA -95).
+> >
+> > The cleanup code in qca_controller_memdump() when we get back an error
+> > from hci_devcd_init() undoes most things but forgets to clear
+> > QCA_IBS_DISABLED. One side effect of this is that, during the next
+> > suspend, qca_suspend() will always get a timeout.
+> >
+> > Let's fix it so that we clear the bit.
+> >
+> > Fixes: 06d3fdfcdf5c ("Bluetooth: hci_qca: Add qcom devcoredump support"=
+)
+> > Signed-off-by: Douglas Anderson <dianders@chromium.org>
+> > ---
+> > I'm nowhere near an expert on this code so please give extra eyes on
+> > this patch. I also have no idea how to reproduce the problem nor even
+> > how to trigger a memdump to test it. I'd love any advice that folks
+> > could give. ;-)
+> >
+> >  drivers/bluetooth/hci_qca.c | 1 +
+> >  1 file changed, 1 insertion(+)
+>
+> Totally fine if you just need more time, but I wanted to follow up and
+> check to see if there is anything you need me to do to help move this
+> patch forward. If not, I'll snooze this patch and check up on it again
+> sometime around the end of July.
 
-Dear submitter,
+It being the end of July, I'm back to check up on this patch. I
+checked mainline and bluetooth-next and I don't see any sign of this
+patch. Is there anything blocking it? Do you need me to repost it or
+take any other actions?
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=875598
+Thanks!
 
----Test result---
-
-Test Summary:
-CheckPatch                    FAIL      0.94 seconds
-GitLint                       FAIL      0.50 seconds
-SubjectPrefix                 PASS      0.83 seconds
-BuildKernel                   PASS      30.40 seconds
-CheckAllWarning               PASS      45.30 seconds
-CheckSparse                   PASS      38.73 seconds
-CheckSmatch                   PASS      104.59 seconds
-BuildKernel32                 PASS      29.56 seconds
-TestRunnerSetup               PASS      539.78 seconds
-TestRunner_l2cap-tester       PASS      20.46 seconds
-TestRunner_iso-tester         PASS      41.69 seconds
-TestRunner_bnep-tester        PASS      5.08 seconds
-TestRunner_mgmt-tester        PASS      119.77 seconds
-TestRunner_rfcomm-tester      PASS      7.79 seconds
-TestRunner_sco-tester         PASS      15.28 seconds
-TestRunner_ioctl-tester       PASS      8.33 seconds
-TestRunner_mesh-tester        PASS      6.25 seconds
-TestRunner_smp-tester         PASS      7.19 seconds
-TestRunner_userchan-tester    PASS      5.36 seconds
-IncrementalBuild              PASS      28.58 seconds
-
-Details
-##############################
-Test: CheckPatch - FAIL
-Desc: Run checkpatch.pl script
-Output:
-Bluetooth: btmtk: avoid UAF in btmtk_process_coredump
-WARNING: Prefer a maximum 75 chars per line (possible unwrapped commit description?)
-#81: 
-CPU: 0 PID: 82 Comm: kworker/0:3 Tainted: G     U             6.6.40-lockdep-03464-g1d8b4eb3060e #1 b0b3c1cc0c842735643fb411799d97921d1f688c
-
-total: 0 errors, 1 warnings, 37 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/src/13749065.patch has style problems, please review.
-
-NOTE: Ignored message types: UNKNOWN_COMMIT_ID
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-##############################
-Test: GitLint - FAIL
-Desc: Run gitlint
-Output:
-Bluetooth: btmtk: avoid UAF in btmtk_process_coredump
-
-WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
-10: B1 Line exceeds max length (140>80): "CPU: 0 PID: 82 Comm: kworker/0:3 Tainted: G     U             6.6.40-lockdep-03464-g1d8b4eb3060e #1 b0b3c1cc0c842735643fb411799d97921d1f688c"
-11: B1 Line exceeds max length (90>80): "Hardware name: Google Yaviks_Ufs/Yaviks_Ufs, BIOS Google_Yaviks_Ufs.15217.552.0 05/07/2024"
-18: B1 Line exceeds max length (84>80): " btmtk_process_coredump+0x2a7/0x2d0 [btmtk 03edd567dd71a65958807c95a65db31d433e1d01]"
-58: B1 Line exceeds max length (90>80): "page:00000000a174ba93 refcount:1 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x33cfa"
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============6382411107317635176==--
+-Doug
