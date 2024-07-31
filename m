@@ -1,62 +1,62 @@
-Received: from mail-ej1-f44.google.com (mail-ej1-f44.google.com [209.85.218.44])
+Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B17F01AED53
-	for <linux-bluetooth@vger.kernel.org>; Wed, 31 Jul 2024 13:57:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 594C11B29D7
+	for <linux-bluetooth@vger.kernel.org>; Wed, 31 Jul 2024 13:57:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722434247; cv=none; b=O1W4F+ZwqG39/rXKZGuWmFj52+ZJl477tab73JuyNxLC7h//whU4avBq7ozQVShrc1sys0fz6BvC1c4ZPihEg1DnPW3mNt7Nd+rw2JH0ydj0sqZA6AYGxsZaOHtDxjkDTixGUhDFP7+ss43TQ4hDa4HelIm9Lrt2tTeui2uP3qw=
+	t=1722434247; cv=none; b=ep2F+GzVCS5nSyTOIV84qWlMbnwfWLex68HFiL7h5EplVm1ASCY/plTRtSQvacty9BSFv9MSKZjS+3RT5ZF8lBS1MebWoLwRW/aNvSr8jfXDPn1MKAppqdL1IBNJ1MLI8hzAuhIYmfhIezgqizwjAm4zZmvt81dojhQs7PWlGN0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1722434247; c=relaxed/simple;
-	bh=o9h6rsB6ftlMwOh3AU0PLDUXJw3KUnf8i+QIUM3JGPk=;
+	bh=NhSwMsjZg89Aw5OlQmXm7xwkq9viY2RnmqKDqkAKR9c=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=d3NeHLDF8ReMoPh/FU9hzn3u/IRwPu+Ex0EbvFqtu0yCqELFtwUMcEyJNYMUNW5Ti5J+j9m4Oq06sm02EAzOSCATHKTV/07fgERY1eZRFkQurF7dGvYD0VQGN2LvpYfxmNYfhS3+YqKL9OguF0jLuVzRuGeHN1v4J2c4zhaeS+8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EL6c/7WF; arc=none smtp.client-ip=209.85.218.44
+	 MIME-Version; b=Oeq5Vp1/Wp9zNE3AAVl8Tg9jlIApcvru/Id/MhDqiK8a6f+yNn6OiQkZkUWgIZ1LJ4JP5pS2NqZx8w6xGDYlX/HIWyQB0lh5L8YHl96z7ecyOZxS2BDLn1uYr3JtFyQ7s8X5EdXpVkZ97xfS0dvD7eUXN/Rd7vZRgL3Fui/9+Q0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IcDXLvfk; arc=none smtp.client-ip=209.85.218.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EL6c/7WF"
-Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-a7ac449a0e6so468459066b.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 31 Jul 2024 06:57:25 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IcDXLvfk"
+Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-a6265d3ba8fso541001666b.0
+        for <linux-bluetooth@vger.kernel.org>; Wed, 31 Jul 2024 06:57:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1722434243; x=1723039043; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1722434244; x=1723039044; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=f0ifOWpXPDm976yezlya2rMJUdCbb/i5qM7P0W7RaAQ=;
-        b=EL6c/7WFYORXTParNVRAhyWmaSoWPUQidB39+KpFPq8mjQ++cV5pQS6S2vCcdbexsV
-         As7/FHYkOlnlSdlAfEnxedPuX7GrfcHbCG/Bbd2rO5Srm1ccyNcm6d4qWTtUj2/fSOO7
-         1Vgh/8kLVeNCN+BfXW37vVX0JZG79B4/1Z0A2E3eN8OSa/sLBwFJo+lAl/E9qh12w+Wj
-         bVFo4grkfh7EuPkTkcP+6UC2C7l05aDEsyRHEEOhSnKggGj/4L7Dow1ucCaVu3dmaDyT
-         QkhoVnot+bAfqWy1A8k3yeDIEk3P2sgxXu7pqbDb2VZzBLe3uahuA1SQGCgQx/k6XAlu
-         9A9Q==
+        bh=/0o7wK6f7my5NzT3+kEHNbYAQwaybfRVmaM0eb2Q2Zo=;
+        b=IcDXLvfkGsakiCnmKuRZo4JL0MiDYzuXhoF1xmGpARvNWTmaemGQuBkh7GsKAY4xHT
+         sKRR2aLSjZSHP1h8hX9XtvC2tpliXiROZp9CDPq7V0Wxp4EH+c2QtQZLywVcO0nHt7ZJ
+         sq2w/lqWYMlCFF6Duh5eWoPr9ee/Zaf8QMbkVAtr3LPWqpefJ/z7CJ5UvlhCB8YO6b1g
+         3pAyXWCyhGJdLMsPNFwZPK483emxikeAZA+DxUciPJ5qEvmGxChWpGRxTEkod9QiR6sT
+         C6a78Z/B7BKvpPtk1o75Mb6TVDHpnqO0fMV3fyiYgz6D8mTz0A3NwJPIhlW5zJRjrgM2
+         6AWA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722434243; x=1723039043;
+        d=1e100.net; s=20230601; t=1722434244; x=1723039044;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=f0ifOWpXPDm976yezlya2rMJUdCbb/i5qM7P0W7RaAQ=;
-        b=PcinfnyI4HxXlN5r610crko3hDG0Kqi+upWeroA6u5k65pJRJzSduwAekiHGZ4tBdV
-         j1bmLSKXoAHd580NO2N2GpS6ZybkM+xAs5I5g5WyqgGO8RljLhWuWO1zrZH/LRlIieaD
-         qMrRl7OqiPNF/JTS/UpRKOHUTiI3QIA/793++FkmPV6VEL036xWtigySsbJsx8abQGgr
-         ql3j78LHJl9nw5+owNBkgDwBkskSTivAh9ghFva0L8oBKDYsTLRfe5418cvGLTfu9WfC
-         ftjTcNojCw+jYmzThAnvKcn8UOWr9MlsZgHF7+YL6xX/VZHhSxzEmTpe/wMGh38lfoQh
-         YomA==
-X-Gm-Message-State: AOJu0YxP2CbXkkjyzkirimCqLhJh9jvBeCgfwRYBR0H9/0evuFSimmsv
-	GZVXKeZbRgOx1vSjV+GsOCb12r90ZSda3aXhNjk2WMR6bs4P7ak4ckODeFaa
-X-Google-Smtp-Source: AGHT+IHvL+tr30XPCHAjidjtWbrNnOuOMAKVkdYukfXGbQaCPSyariodtx/U8WYdDU2gY8gbvhxFIg==
-X-Received: by 2002:a17:907:2cc6:b0:a7d:4dc4:3d8 with SMTP id a640c23a62f3a-a7d4dc40564mr914847966b.54.1722434242842;
-        Wed, 31 Jul 2024 06:57:22 -0700 (PDT)
+        bh=/0o7wK6f7my5NzT3+kEHNbYAQwaybfRVmaM0eb2Q2Zo=;
+        b=bk1i+cT9l0zgTi+un2SrZsGrTZLpqZQXq+niEheQDllCkkR4ciW3Eyp+DH8F+KMp6+
+         OQt/F5zjwrQiyoYTgwd4lEenBXzP8MI7ZnU7WqMnjg8nUWU2rntEK0VIQzX68c0vusG1
+         +9HMDZGeHsEVORZeye1Cist9JCwNFwyw98h7ObDQIHEcT0jMPoSWlfJfqXY4uMrGDa1J
+         RspnMg15QJe4hJzWhI79iu5g4i4C/9w2AjS6CoEW4rNewQuW4b/zdoYxGWTvlVXYRpUr
+         eKq5ISt+JfTtIOgKeFbQ+IRQyK6iv8PyY2DXgm4TCgiNQPIQ+jl/Xx9DlyKqntb4cylh
+         xXQA==
+X-Gm-Message-State: AOJu0YzvgXWJI6RWBmpHU9EX+Rk3lUTslPJvMMewUr79DFMLU3vqeG+B
+	PaFQtDvZ4EZRBJ7KUhckzKYPEshX9692tsrDrvZSkhHWn+oqLHX3BHjmXQ6r
+X-Google-Smtp-Source: AGHT+IEqrNwTSvBP2CCQhzcAkAiHCvuxddiKWxDitxxj4ibl/SkMo1VMblBBmpHdAXJxOg34swrrmw==
+X-Received: by 2002:a17:907:96a0:b0:a72:7da4:267c with SMTP id a640c23a62f3a-a7d3ffa612bmr1165489966b.12.1722434243900;
+        Wed, 31 Jul 2024 06:57:23 -0700 (PDT)
 Received: from lvondent-mobl3.wlan.qualcomm.com ([212.136.9.4])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a7acad91041sm779143666b.174.2024.07.31.06.57.20
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a7acad91041sm779143666b.174.2024.07.31.06.57.22
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 31 Jul 2024 06:57:20 -0700 (PDT)
+        Wed, 31 Jul 2024 06:57:23 -0700 (PDT)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v1 2/4] monitor: Fix crash parsing notification
-Date: Wed, 31 Jul 2024 14:57:16 +0100
-Message-ID: <20240731135718.429604-2-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v1 3/4] shared/bap: Fix not setting metadata
+Date: Wed, 31 Jul 2024 14:57:17 +0100
+Message-ID: <20240731135718.429604-3-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.45.0
 In-Reply-To: <20240731135718.429604-1-luiz.dentz@gmail.com>
 References: <20240731135718.429604-1-luiz.dentz@gmail.com>
@@ -70,40 +70,37 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This fixes the following crash caused by notify callback being NULL:
-
-Jump to the invalid address stated on the next line
-   at 0x0: ???
-   by 0x1E8375: print_notify (att.c:5420)
-   by 0x1E9464: att_multiple_vl_rsp (att.c:5463)
-   by 0x20D39E: att_packet (att.c:5637)
-   by 0x1B2054: l2cap_frame (l2cap.c:2567)
-   by 0x1B4A4D: l2cap_packet (l2cap.c:2708)
-   by 0x19AD43: packet_hci_acldata (packet.c:12522)
-   by 0x19CF07: packet_monitor (packet.c:4249)
-   by 0x152405: data_callback (control.c:973)
-   by 0x2204F6: mainloop_run (mainloop.c:106)
-   by 0x221017: mainloop_run_with_signal (mainloop-notify.c:189)
-   by 0x14F387: main (main.c:298)
- Address 0x0 is not stack'd, malloc'd or (recently) free'd
+bt_bap_stream_metatada shall not send Update Metadata if the states
+don't allow it, instead it shall store it so it can be send later when
+enabling the stream.
 ---
- monitor/att.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ src/shared/bap.c | 13 +++++++++++--
+ 1 file changed, 11 insertions(+), 2 deletions(-)
 
-diff --git a/monitor/att.c b/monitor/att.c
-index a23347ef7..73a616584 100644
---- a/monitor/att.c
-+++ b/monitor/att.c
-@@ -4646,7 +4646,8 @@ static void print_notify(const struct l2cap_frame *frame, uint16_t handle,
- 		frame = &clone;
+diff --git a/src/shared/bap.c b/src/shared/bap.c
+index 499e740c9..a7217b417 100644
+--- a/src/shared/bap.c
++++ b/src/shared/bap.c
+@@ -1971,8 +1971,17 @@ static unsigned int bap_ucast_metadata(struct bt_bap_stream *stream,
+ 		return 0;
  	}
  
--	handler->notify(frame);
-+	if (handler->notify)
-+		handler->notify(frame);
+-	return bap_stream_metadata(stream, BT_ASCS_METADATA, data, func,
+-					user_data);
++	switch (bt_bap_stream_get_state(stream)) {
++	/* Valid only if ASE_State field = 0x03 (Enabling) */
++	case BT_BAP_STREAM_STATE_ENABLING:
++	 /* or 0x04 (Streaming) */
++	case BT_BAP_STREAM_STATE_STREAMING:
++		return bap_stream_metadata(stream, BT_ASCS_METADATA, data, func,
++						user_data);
++	}
++
++	stream_metadata(stream, data, NULL);
++	return 0;
  }
  
- static void att_handle_value_notify(const struct l2cap_frame *frame)
+ static uint8_t stream_release(struct bt_bap_stream *stream, struct iovec *rsp)
 -- 
 2.45.0
 
