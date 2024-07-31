@@ -1,105 +1,118 @@
-Received: from mail-lj1-f181.google.com (mail-lj1-f181.google.com [209.85.208.181])
+Received: from mail-ot1-f44.google.com (mail-ot1-f44.google.com [209.85.210.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6099B15E96;
-	Wed, 31 Jul 2024 16:32:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7483612B93
+	for <linux-bluetooth@vger.kernel.org>; Wed, 31 Jul 2024 16:58:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722443567; cv=none; b=nVMh41aYC/Ec6ybD6LIQ/5Pi8LwhfGuG5Pv6kh0Rz3ybHKYqv6a0Sn7pa7CWPjkJSBz6Bhu48LoYMbf/+v8fHk6eTYUuKiLUEzap2CHv5ThrLoIqg8Ur7tqbfJmjLA6jyQIG+kPnQbgv4PtPlvI/XMfiJ4nnjzD5icc1NsNTc0U=
+	t=1722445122; cv=none; b=CFcwbhN3BgJfVdAjZTGDV4bZzjdENkKGo4qPPcfl/qfe6OwGbZ6an0TW/eZ02WxgGJmkMgGsOq8G2NxxqQ/Zuzv1K26Du20pA7hFAkBExi5LPZWWBPOkmqEdQ77mKtwNkZQ2DhGiCcnyKDPxS1f+tRpabKpLmFwSp5kVEhSrjUk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722443567; c=relaxed/simple;
-	bh=aFIDWBq4Nmy0FWXw+JYhaJRwtgoDGGvlMCLfC7m1N+M=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=oim7+89YHWzPFucsG97aSuP83AJgq3WFNJyKqIA2flnekcafB1Dc6M8XnK1V953DigdQFsybKtxkneOob6rMcMonbqGL5dgHgknhFTU/dNQok6x4Txouj4JAbv7dxX50ChmOuUZ2GQcS+fuF/+1ZdKFncepCQz5BClE90CuOyT0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=g+j02xlg; arc=none smtp.client-ip=209.85.208.181
+	s=arc-20240116; t=1722445122; c=relaxed/simple;
+	bh=Ijiv9Nngakia70F5ZsKKVTsnGpw3cCcAOwewb1Favfo=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=ew0pIlD9Y7Q0Lc4a4aLoScRHOC/T6bL74xvvGegB1RgROrolX85gC6VVVlF8wIzbjXE/GgxqLOPdXTqS7jujSYml6zcgRwi9XQzs4ZIAHA2gQlFHdE5Q4HktGH2hJtoab9fzaJ7wMCk1/4Hy18FKDmQaG/hrHrB2xCIH6wt57bY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=m/8VmJjS; arc=none smtp.client-ip=209.85.210.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="g+j02xlg"
-Received: by mail-lj1-f181.google.com with SMTP id 38308e7fff4ca-2ef7fef3ccfso71150561fa.3;
-        Wed, 31 Jul 2024 09:32:45 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="m/8VmJjS"
+Received: by mail-ot1-f44.google.com with SMTP id 46e09a7af769-7093997dffdso1982519a34.2
+        for <linux-bluetooth@vger.kernel.org>; Wed, 31 Jul 2024 09:58:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1722443563; x=1723048363; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=bIefGprQjQzzRl+XymqNxAaIt5Yc30PGPqqfK1kTf5o=;
-        b=g+j02xlgMjojwGlz9vDhFa2rf/qLOpvmXHkIwS1mUB6hBAQRcJrARYSiirvXkNLOKU
-         +Ma0u1Fx/RTgIY0XCTXESWzeRbkNvZoxoeqP+Nvm/ZA7eP1cVPLuBSiXOzK4M9dNXRjc
-         ewkTY5X3qM1RaS+w8HGk9SRnJEJ6YAkgikRLmZsVZYSc9hP2RijeEAJGOAAiMGd17Blq
-         0u4ha0bKjWTJsmuQm6vG6iEbiVP6xfVMMe44FjBJyq7d2ciaVjmMyLNdpA7Si+beTe0s
-         HGX5hcEBIOiq+Qh5Voy03yZbGv+Okq0qsPd868Wgui2GPWfkdHl6EZeyz2Zihnzk7UEz
-         pYLA==
+        d=gmail.com; s=20230601; t=1722445120; x=1723049920; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=STQfvKFGUoutjeyktjTlDxJQxH17E69JShWvluOtnKc=;
+        b=m/8VmJjSzFoo9pFkR55ow1imM32j6mGgPBedsrRGOltxSEUdzwRmsG7KOLFw4y/4KU
+         I+Hp9Oa94Yqxj2etQXpcMGi0exbycCeVFvxHPGRaGXCI1P7jQR+gW8YmWmXLxCqda4r3
+         1CZMiRrJ1Bp3Xulpk+PR2PRs1DF2oCbIwke+Lat/c5be7d1lgNC2OzR891gdQ/RZZH8g
+         DkZ2HG5Tyxed/O5/Sn6XvHPxQcRCkTcZbhcFTpk7QymwsmM1XPvOkFMBDDotv0GQhp51
+         rFzn3sfcI+REUNCAgwGQH2k1DZo3s9qy/vR/vZDLPh+uLmZAc3ppPz7Pu71jHvkk9xsl
+         WpRA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722443563; x=1723048363;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=bIefGprQjQzzRl+XymqNxAaIt5Yc30PGPqqfK1kTf5o=;
-        b=Q2SdP8rNymOcUXXfxzbj6JnYbiQK8jkS4drVr31r4bQwuudlBxipxeYb7fnbGCJDAH
-         3Cto+c7wCXUwby2UkeGJIIA6hqtbpN0cKaOVcGw8TwtlQae4yoICMMJ2m5mVttLPvw3Y
-         lahiv+67jaqGfudqfu5nt57Zm4Fb8u5JYpCqfXl74bnvEQS4nOTa+r4VzU2xVFdmSOWR
-         uuobtLsB33yuO1+BMCg/OpHQBJaAdMCu59OjAwtQc/mzqutnGp386uh/Eyp9Kc1M8jDz
-         VDUTCddt6HMqpcVVVYsMo4L8aFJYmRpBurTFxFTdtKvnyv9p7cntXEoHDVttJZmPzuqk
-         ICaQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWBW2608Wsz5G64j1Hw1uXjq1XAIJkGJKuT/kVk28yg/9ZVZ7FDuZKX2J8Zj7iPABf2y7dwTYESLxaxEpcZKtWHoFACQvVBcqKNcHg7PcDRQGWn8b+n3lcT9oTRASVuKSL6UhR4P8s4SAmXRntV
-X-Gm-Message-State: AOJu0YybcYhfCNo4997mXI3ApLLQy7D7858cNDcRshzgnIwqzISRY0cY
-	Ya5pDKGGwsDB92hLsIviirRhtW0/uy61YmhXJevk56c+OXmqzflhpjDCRthLmYPVjETAaKoyRJN
-	JzhJTBWHeglawG/7uqkaNL/tCKz4=
-X-Google-Smtp-Source: AGHT+IFc9t3k6Dm47Ha58j7yx2K2/CRo4wNoeikNws55HD+Vm14k5JDII7jSv6PofGp4s0NZed1po0DtWbnoaMvuxjo=
-X-Received: by 2002:a2e:740d:0:b0:2ef:2203:5dbf with SMTP id
- 38308e7fff4ca-2f12ee1992amr91540701fa.27.1722443563178; Wed, 31 Jul 2024
- 09:32:43 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1722445120; x=1723049920;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=STQfvKFGUoutjeyktjTlDxJQxH17E69JShWvluOtnKc=;
+        b=Uduyck054NnRLw1iAcvy0aDj/Ka49bEZxKALJnVVkRP4HULKCaRz4zuZ16layNvtIl
+         fRctvZH1xYSSoksZTuPa1I/xola8zpIylg0UtZpBXwMoOcjxeGJtI9EIq4uaWazqEqBc
+         9SnOWxjQVi8qNJ1yxiayXHAnR3eKeCHwrTXvJHM43BrGFfUVXdPNVYE0A4TIkbrsZqRK
+         lwUr2apGwpcb4MfYhIn17y4iXCkzyrmbFHXwDp+tNQsmzQyLhgXTJreUUZVtPCdqvBPo
+         0wLXymgCNNd8C9l/bw3Q8weJ8FToEA78nBVuk3HXIhY1guukFNdhWCNeDVaDhxaQTRxF
+         JotQ==
+X-Gm-Message-State: AOJu0YwoixttVda5RvVnLiSI9uRO+okK8fMxs7TY8/MXYOPVILWikSX+
+	VfkkERyL7ZAqOgpY4GzjG4AP22Cn5pKxdjm4CpNmMkruWGeSukWvbDikmw==
+X-Google-Smtp-Source: AGHT+IFeE00HUnAv/UU6iAevPSOcVD0X/rrmPjPr2adHLYRFE9Mg3jlsKpmWvumouUsHvlBEo8qP5Q==
+X-Received: by 2002:a05:6830:6315:b0:709:5fef:c9a6 with SMTP id 46e09a7af769-7095fefce5emr5730110a34.20.1722445120434;
+        Wed, 31 Jul 2024 09:58:40 -0700 (PDT)
+Received: from [172.17.0.2] ([74.249.14.162])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-44fe8187c0fsm60869981cf.55.2024.07.31.09.58.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 31 Jul 2024 09:58:40 -0700 (PDT)
+Message-ID: <66aa6d40.050a0220.f5562.457f@mx.google.com>
+Date: Wed, 31 Jul 2024 09:58:40 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============8894817956645275620=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240731-hci_qca_fixes-v1-0-59dad830b243@linaro.org>
-In-Reply-To: <20240731-hci_qca_fixes-v1-0-59dad830b243@linaro.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Wed, 31 Jul 2024 12:32:31 -0400
-Message-ID: <CABBYNZ+dvLGos9oLi6euFkmiU9OReJ5F3qsA6WrhW29yeZ-jWQ@mail.gmail.com>
-Subject: Re: [PATCH 0/3] Bluetooth: hci_qca: fix post merge window regressions
-To: Bartosz Golaszewski <brgl@bgdev.pl>
-Cc: Marcel Holtmann <marcel@holtmann.org>, Wren Turkal <wt@penguintechs.org>, 
-	Dmitry Baryshkov <dmitry.baryshkov@linaro.org>, 
-	Luiz Augusto von Dentz <luiz.von.dentz@intel.com>, linux-bluetooth@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, 
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [BlueZ,v1,1/4] client/player: Fix not setting config target_latency with edpoint.config
+In-Reply-To: <20240731135718.429604-1-luiz.dentz@gmail.com>
+References: <20240731135718.429604-1-luiz.dentz@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Hi Wren,
+--===============8894817956645275620==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-On Wed, Jul 31, 2024 at 11:21=E2=80=AFAM Bartosz Golaszewski <brgl@bgdev.pl=
-> wrote:
->
-> Here are the fixes for regressions reported by Wren and Dmitry. I could
-> reproduce the crash on db820c and so I was able to test it but patch 2/3
-> could use a Tested-by from Wren on QCA6390.
+This is automated email and please do not reply to this email!
 
-Can you give this set a try and report back?
+Dear submitter,
 
-> Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-> ---
-> Bartosz Golaszewski (3):
->       Bluetooth: hci_qca: don't call pwrseq_power_off() twice for QCA6390
->       Bluetooth: hci_qca: fix QCA6390 support on non-DT platforms
->       Bluetooth: hci_qca: fix a NULL-pointer derefence at shutdown
->
->  drivers/bluetooth/hci_qca.c | 19 +++++++++----------
->  1 file changed, 9 insertions(+), 10 deletions(-)
-> ---
-> base-commit: cd19ac2f903276b820f5d0d89de0c896c27036ed
-> change-id: 20240731-hci_qca_fixes-8e7a8ed3ad83
->
-> Best regards,
-> --
-> Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
->
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=875511
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      1.87 seconds
+GitLint                       FAIL      4.72 seconds
+BuildEll                      PASS      25.15 seconds
+BluezMake                     PASS      1690.11 seconds
+MakeCheck                     PASS      13.56 seconds
+MakeDistcheck                 PASS      177.39 seconds
+CheckValgrind                 PASS      251.75 seconds
+CheckSmatch                   WARNING   352.40 seconds
+bluezmakeextell               PASS      119.37 seconds
+IncrementalBuild              PASS      6230.29 seconds
+ScanBuild                     PASS      981.65 seconds
+
+Details
+##############################
+Test: GitLint - FAIL
+Desc: Run gitlint
+Output:
+[BlueZ,v1,1/4] client/player: Fix not setting config target_latency with edpoint.config
+
+WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
+1: T1 Title exceeds max length (87>80): "[BlueZ,v1,1/4] client/player: Fix not setting config target_latency with edpoint.config"
+##############################
+Test: CheckSmatch - WARNING
+Desc: Run smatch tool with source
+Output:
+monitor/att.c: note: in included file:monitor/display.h:82:26: warning: Variable length array is used.src/shared/bap.c:288:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structuressrc/shared/bap.c:288:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structuressrc/shared/bap.c:288:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structures
 
 
---=20
-Luiz Augusto von Dentz
+---
+Regards,
+Linux Bluetooth
+
+
+--===============8894817956645275620==--
