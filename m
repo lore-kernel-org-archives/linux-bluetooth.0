@@ -1,114 +1,104 @@
-Received: from mail-lj1-f182.google.com (mail-lj1-f182.google.com [209.85.208.182])
+Received: from mail-lj1-f181.google.com (mail-lj1-f181.google.com [209.85.208.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B59781CAA9
-	for <linux-bluetooth@vger.kernel.org>; Wed, 31 Jul 2024 16:23:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6099B15E96;
+	Wed, 31 Jul 2024 16:32:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722442991; cv=none; b=HdU0404GbxxjE0VDpCVqR2YbL0sZoNIjNn6Sk3W1bXnlxRTV806KIL5PjIy7sVy/ERxz771ihWKUDka7aXwbDwYwTsSOMQVcSbWkLhOMLFUhMoSNHgsWP0mFwXOP0GG24pXRsxk/Okdhk6+UNWyElRirsZxKCAgaSqgt3v+1Q94=
+	t=1722443567; cv=none; b=nVMh41aYC/Ec6ybD6LIQ/5Pi8LwhfGuG5Pv6kh0Rz3ybHKYqv6a0Sn7pa7CWPjkJSBz6Bhu48LoYMbf/+v8fHk6eTYUuKiLUEzap2CHv5ThrLoIqg8Ur7tqbfJmjLA6jyQIG+kPnQbgv4PtPlvI/XMfiJ4nnjzD5icc1NsNTc0U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722442991; c=relaxed/simple;
-	bh=tmxKZOqQCijCft0eHCD2+++pyfc+gXQ1biWz+a4Ds/8=;
+	s=arc-20240116; t=1722443567; c=relaxed/simple;
+	bh=aFIDWBq4Nmy0FWXw+JYhaJRwtgoDGGvlMCLfC7m1N+M=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=JCMCxrlZr4fMTsVtjChBGP9X88gHIOFQF8Fp5cBgqXxOY1ac5ZjL8RdIXi5ZMKEwCdQtIeieuB4VYXRrA3M4eWUl7k31TMhVEEGMMZoa/UAIbZ7SR+4XNXCuCRpxU9EbyzvmdaeBqyKtJe3X1AVoSD8mte8tpDUTTOpv/mgqWQQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=grkKlLVB; arc=none smtp.client-ip=209.85.208.182
+	 To:Cc:Content-Type; b=oim7+89YHWzPFucsG97aSuP83AJgq3WFNJyKqIA2flnekcafB1Dc6M8XnK1V953DigdQFsybKtxkneOob6rMcMonbqGL5dgHgknhFTU/dNQok6x4Txouj4JAbv7dxX50ChmOuUZ2GQcS+fuF/+1ZdKFncepCQz5BClE90CuOyT0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=g+j02xlg; arc=none smtp.client-ip=209.85.208.181
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="grkKlLVB"
-Received: by mail-lj1-f182.google.com with SMTP id 38308e7fff4ca-2f01e9f53e3so87954451fa.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 31 Jul 2024 09:23:09 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="g+j02xlg"
+Received: by mail-lj1-f181.google.com with SMTP id 38308e7fff4ca-2ef7fef3ccfso71150561fa.3;
+        Wed, 31 Jul 2024 09:32:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1722442988; x=1723047788; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1722443563; x=1723048363; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Ysi/4722CXklzqeIG7G3oFD2bHIHajIT+woaSQIF5cA=;
-        b=grkKlLVBTuC+Cv5vQLQ3JykQqgy+38gfiIdDaTzTO8KqoisbXYeJ7V5RmqnH4IY2EZ
-         HCSSk70NqdhlpXi/xhSXgGFFP9fDuKUAiPNII5MJVOaH6j6L+L9MjmCzyeo8eOd2DtmX
-         m2CXh/H+GG0Zmhx29gL+RnXMj2wFOdlmsr5YIR8dkuOg34usaIawYhOPAl4X14AJhoV0
-         1GdzWNS+i6zW0XalBXTwYmb2URnp8I6FsRqyHYJGYgl0zao6H3bteXhDQQKpGkiFseUA
-         6le5ZvzRj9cTwSKhVlYwQ5eWGw6WQWSgiU9gqWMHEdlrDDPLg/ih3ii9HMmJNsTV/ziW
-         vHFw==
+        bh=bIefGprQjQzzRl+XymqNxAaIt5Yc30PGPqqfK1kTf5o=;
+        b=g+j02xlgMjojwGlz9vDhFa2rf/qLOpvmXHkIwS1mUB6hBAQRcJrARYSiirvXkNLOKU
+         +Ma0u1Fx/RTgIY0XCTXESWzeRbkNvZoxoeqP+Nvm/ZA7eP1cVPLuBSiXOzK4M9dNXRjc
+         ewkTY5X3qM1RaS+w8HGk9SRnJEJ6YAkgikRLmZsVZYSc9hP2RijeEAJGOAAiMGd17Blq
+         0u4ha0bKjWTJsmuQm6vG6iEbiVP6xfVMMe44FjBJyq7d2ciaVjmMyLNdpA7Si+beTe0s
+         HGX5hcEBIOiq+Qh5Voy03yZbGv+Okq0qsPd868Wgui2GPWfkdHl6EZeyz2Zihnzk7UEz
+         pYLA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722442988; x=1723047788;
+        d=1e100.net; s=20230601; t=1722443563; x=1723048363;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=Ysi/4722CXklzqeIG7G3oFD2bHIHajIT+woaSQIF5cA=;
-        b=SoAL7PX1b3UzTVK2pQmGa/hd4jMcnuFDRkX/FuHr1HOVoeCWn3YsiyLlcn8jmim+jW
-         LMDh9z2RTcW0I9kE3E0VwT1LxOIiKW1d7wv2z4qYeCdsHBaGHApuTs2lPKdXOZNdGWnv
-         /+aIWtzA+LqBj6L6JFI/FnYygs2K5uVuF67iagdFaogaf/tfNWelVCbbChGs0B8weMzw
-         SWJTiem0qwCmNgS+Wf1PIBAoDU9q5kU9FtxMqVUmC2y5y6JlbY2tXI8WvF2c7lwTNV1E
-         IvQwTGlKFNqfXYHtK7zcHjDc/nAUdc1icbOi51CoYTn0jLdGIHa/iayY/lfGyZoc541M
-         ihDg==
-X-Gm-Message-State: AOJu0YzJfTbepzXHy0K0+HgEvhPo0lEYz59j2fPX0Ifqk8dl7cdIbjze
-	xk9NiV4S0MDMUO344SXPRYdltHbxDRn6Htu5NcdqcTbcJvd3oAEw0NTr1zXJqBaxoISwMjsEvE1
-	ybubExL1NEZulTwTTa/8t+TbH70E=
-X-Google-Smtp-Source: AGHT+IEhJW3WURqW3rbfl8bmNFunJOZHSanwJ0pw9894CptSbuKxqSld+KcpgbWCPcEJ8bH19Xexd70MVOkfWdy3L3s=
-X-Received: by 2002:a2e:b714:0:b0:2ef:17ee:62a2 with SMTP id
- 38308e7fff4ca-2f12ee1185bmr119648961fa.14.1722442987508; Wed, 31 Jul 2024
- 09:23:07 -0700 (PDT)
+        bh=bIefGprQjQzzRl+XymqNxAaIt5Yc30PGPqqfK1kTf5o=;
+        b=Q2SdP8rNymOcUXXfxzbj6JnYbiQK8jkS4drVr31r4bQwuudlBxipxeYb7fnbGCJDAH
+         3Cto+c7wCXUwby2UkeGJIIA6hqtbpN0cKaOVcGw8TwtlQae4yoICMMJ2m5mVttLPvw3Y
+         lahiv+67jaqGfudqfu5nt57Zm4Fb8u5JYpCqfXl74bnvEQS4nOTa+r4VzU2xVFdmSOWR
+         uuobtLsB33yuO1+BMCg/OpHQBJaAdMCu59OjAwtQc/mzqutnGp386uh/Eyp9Kc1M8jDz
+         VDUTCddt6HMqpcVVVYsMo4L8aFJYmRpBurTFxFTdtKvnyv9p7cntXEoHDVttJZmPzuqk
+         ICaQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWBW2608Wsz5G64j1Hw1uXjq1XAIJkGJKuT/kVk28yg/9ZVZ7FDuZKX2J8Zj7iPABf2y7dwTYESLxaxEpcZKtWHoFACQvVBcqKNcHg7PcDRQGWn8b+n3lcT9oTRASVuKSL6UhR4P8s4SAmXRntV
+X-Gm-Message-State: AOJu0YybcYhfCNo4997mXI3ApLLQy7D7858cNDcRshzgnIwqzISRY0cY
+	Ya5pDKGGwsDB92hLsIviirRhtW0/uy61YmhXJevk56c+OXmqzflhpjDCRthLmYPVjETAaKoyRJN
+	JzhJTBWHeglawG/7uqkaNL/tCKz4=
+X-Google-Smtp-Source: AGHT+IFc9t3k6Dm47Ha58j7yx2K2/CRo4wNoeikNws55HD+Vm14k5JDII7jSv6PofGp4s0NZed1po0DtWbnoaMvuxjo=
+X-Received: by 2002:a2e:740d:0:b0:2ef:2203:5dbf with SMTP id
+ 38308e7fff4ca-2f12ee1992amr91540701fa.27.1722443563178; Wed, 31 Jul 2024
+ 09:32:43 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240731061713.435586-1-vlad.pruteanu@nxp.com>
-In-Reply-To: <20240731061713.435586-1-vlad.pruteanu@nxp.com>
+References: <20240731-hci_qca_fixes-v1-0-59dad830b243@linaro.org>
+In-Reply-To: <20240731-hci_qca_fixes-v1-0-59dad830b243@linaro.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Wed, 31 Jul 2024 12:22:54 -0400
-Message-ID: <CABBYNZ+R9rqX66fXXfLLnfMDwEHgpx9p3S2Ds7b8LB_V9CCEag@mail.gmail.com>
-Subject: Re: [PATCH BlueZ v5 0/8] Add 'broadcasting' state
-To: Vlad Pruteanu <vlad.pruteanu@nxp.com>
-Cc: linux-bluetooth@vger.kernel.org, mihai-octavian.urzica@nxp.com, 
-	iulia.tanasescu@nxp.com, andrei.istodorescu@nxp.com, pav@iki.fi
+Date: Wed, 31 Jul 2024 12:32:31 -0400
+Message-ID: <CABBYNZ+dvLGos9oLi6euFkmiU9OReJ5F3qsA6WrhW29yeZ-jWQ@mail.gmail.com>
+Subject: Re: [PATCH 0/3] Bluetooth: hci_qca: fix post merge window regressions
+To: Bartosz Golaszewski <brgl@bgdev.pl>
+Cc: Marcel Holtmann <marcel@holtmann.org>, Wren Turkal <wt@penguintechs.org>, 
+	Dmitry Baryshkov <dmitry.baryshkov@linaro.org>, 
+	Luiz Augusto von Dentz <luiz.von.dentz@intel.com>, linux-bluetooth@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, 
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi Pauli,
+Hi Wren,
 
-On Wed, Jul 31, 2024 at 2:17=E2=80=AFAM Vlad Pruteanu <vlad.pruteanu@nxp.co=
-m> wrote:
+On Wed, Jul 31, 2024 at 11:21=E2=80=AFAM Bartosz Golaszewski <brgl@bgdev.pl=
+> wrote:
 >
-> This series adds a new 'broadcasting' state for transports created by
-> the Broadcast Sink device as a result of scanning a Broadcast Source.
-> Such transports will remain  in the 'idle' state until the user
-> selects them, at which point they will be moved to 'broadcasting'.
-> PipeWire detects these transports and automatically acquires them.
+> Here are the fixes for regressions reported by Wren and Dmitry. I could
+> reproduce the crash on db820c and so I was able to test it but patch 2/3
+> could use a Tested-by from Wren on QCA6390.
+
+Can you give this set a try and report back?
+
+> Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+> ---
+> Bartosz Golaszewski (3):
+>       Bluetooth: hci_qca: don't call pwrseq_power_off() twice for QCA6390
+>       Bluetooth: hci_qca: fix QCA6390 support on non-DT platforms
+>       Bluetooth: hci_qca: fix a NULL-pointer derefence at shutdown
 >
-> The transport selection is done using the 'transport.select' method,
-> that this series implements. This allows the user to select the desired
-> stream when running the setup with PipeWire since it acquires any
-> transport that is broadcasting.
+>  drivers/bluetooth/hci_qca.c | 19 +++++++++----------
+>  1 file changed, 9 insertions(+), 10 deletions(-)
+> ---
+> base-commit: cd19ac2f903276b820f5d0d89de0c896c27036ed
+> change-id: 20240731-hci_qca_fixes-8e7a8ed3ad83
 >
-> Termination of the sync to a BIS is done using the 'transport.unselect'
-> method, that also involves a 2 step process. The first step is the call
-> to this method, which changes the transport's state to idle, with the
-> second step being done by the audio server which detects this change
-> and releases the transport.
->
-> Vlad Pruteanu (8):
->   doc/media: Add 'broadcasting' state and 'Select' method
->   transport: Add 'broadcasting' state
->   transport: Add 'Select' method
->   client/player: Expose transport 'Select' method to the user
->   transport: Broadcast sink: wait for user to select transport
->   doc/media: Add 'Unselect' method
->   transport: Add 'Unselect' method
->   client/player: Expose transport 'Unselect' method to the user
->
->  client/player.c                  | 100 +++++++++++++++++++++++++++++++
->  doc/org.bluez.MediaTransport.rst |  31 +++++++++-
->  profiles/audio/transport.c       |  90 ++++++++++++++++++++++++----
->  3 files changed, 207 insertions(+), 14 deletions(-)
->
+> Best regards,
 > --
-> 2.40.1
-
-I'm planning to apply this set later today, let me know if you have
-any objections.
+> Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+>
 
 
 --=20
