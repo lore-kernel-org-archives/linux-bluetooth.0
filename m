@@ -1,114 +1,126 @@
-Received: from mail-lj1-f178.google.com (mail-lj1-f178.google.com [209.85.208.178])
+Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A9D9168B8
-	for <linux-bluetooth@vger.kernel.org>; Wed, 31 Jul 2024 15:21:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72ADF168B8
+	for <linux-bluetooth@vger.kernel.org>; Wed, 31 Jul 2024 15:58:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722439267; cv=none; b=LIKlfvanayvkn+BUXMhsX+dZllNXgRkMGhZSrkxOECIz/89qD7LWPQkvVdVz5ZJTJ+0axAV67OBnYNrnVgkx3RNn4d0NzT8ZnyoSvsuEpK+7QUAVys/5gU2IpZKu9x7qnK+5g0owOsTF1JTfXPk2P9CqA8q2hv1JSHUf4gMGvHA=
+	t=1722441517; cv=none; b=baQsEdXXEV07CavU6hmdjGnbYgdPXuNy60PR2U3AzZlv+QWFg7DzRhVEkBAs9ly22BbI0zdf+bRcWS8ZqJOEiZLBYTSPCiY/x+rJ6OIt1oTWUtmMViqwg/1lPtUH5qJ/16qhDaXXdYDUYnLPxfgAmWeNVX0MKlO4D1U3oSTBR/c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722439267; c=relaxed/simple;
-	bh=+SbEPfgpH/hFpT3PraiDHygVL8HF/LfftQ6Q2/alDBI=;
-	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=txh10MaTzYzJjM0ZSwZ05+JhiNiFtuoXE6RzM5q9WVLDedqZIA1L5xjfxPmX0gPeFnTnYpVcC6AbAWevG7/ZfAqoMZJPVH+9lXhxZN/goKoSVCQfdi/DlvLaXNOxW2CLFkekFHUzCZ1H7gNAML+NkQcHLvJDLwKkgp4EZGI6nbs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=pjHYquub; arc=none smtp.client-ip=209.85.208.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
+	s=arc-20240116; t=1722441517; c=relaxed/simple;
+	bh=X6YiIXwe6MQBBoOLr7xM2Us3VDnLATtwS2wiIiYMfnQ=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=VfREEIflKaCK70VLrhY8ur9NF3GXjVwBd2xVQJT/xadWWlHhvvgLGI/v6tLJjxVvzpJ/AOT+AAyMpVsdAJT12qz7icOjAqXL3JR/0qDIO4jsdnbs1TwkcU6A8Q2l8za7Lnov7kXnV44NrVVuPSeuLSLAJZqDbGUcMhTOtzgEvzw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Q4ae59QS; arc=none smtp.client-ip=209.85.214.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="pjHYquub"
-Received: by mail-lj1-f178.google.com with SMTP id 38308e7fff4ca-2ef2c109eabso75517181fa.0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 31 Jul 2024 08:21:03 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Q4ae59QS"
+Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-1fd9e70b592so40663355ad.3
+        for <linux-bluetooth@vger.kernel.org>; Wed, 31 Jul 2024 08:58:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1722439261; x=1723044061; darn=vger.kernel.org;
-        h=cc:to:content-transfer-encoding:mime-version:message-id:date
-         :subject:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=cCiWYkROgI93lDUlu4n/pJ2oJ0YJVxVSXcd616C/MpE=;
-        b=pjHYquubKRl3L86ysoDJEzOsGOVdRJT8ADRT2JrB23OvcOJ/jlHVW40mAm1rsUtnam
-         CoyS5i6/q5APK+nbB4B1nrW7QxD/h3fGcug5EGDeZ5QwRyW7st4YP7x6bkcc18VJHq2P
-         tOVf3cUtbbCIVqNehCZZsjjgyq8MzYOJ7v6N1E6N5r0gnSAv0cacskg65t2TaRu67mzt
-         0nAB0e96HVOqeghifkgPfpHmdO+vL6b7v/sNmZI9yCMF1p/l6eaERK+0x6dlKO8TrDBk
-         o7tWScWHDdsEjV4WhI/iBvQr1rO1AeEIKp4K/qEL+CnE+HTfIygYN59bqwGHxjnpdmKC
-         7JmQ==
+        d=gmail.com; s=20230601; t=1722441515; x=1723046315; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=OtY+x5vQfBzz4286XJrUZufUt1VANHOslEQ7SKHr6W4=;
+        b=Q4ae59QSLTsfhD7r4dpp/9sNmlKsKyYFwwFgo00p9nrO9ro4s9LveHsMCpqk8ZszS8
+         J9WFIDSvbW6FymJPOPhNjBcayNPx9T1XCT0mZobOKmsRG/EIJCAgU8CLhKbEv5P7Xrtc
+         wBl4vVba9iHFu55Nok+jKULC+xBRBPqRP+5zWluTeFe6oPvZy2sNlLLEnsmDf0yqOtiE
+         3aPQrarHCBMaXxhealcJCzE5JXN+8CCeZp4ktsxZV1ADPxYgol/z69afSOPujcJ1Q9ZY
+         9BoKJRwVrrH3mBIv1SXig6xrsGd2ANsR8UDFV1qXdKxadi5Uu6UJ5kD713G2rr+LzvWE
+         b6aw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722439261; x=1723044061;
-        h=cc:to:content-transfer-encoding:mime-version:message-id:date
-         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20230601; t=1722441515; x=1723046315;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=cCiWYkROgI93lDUlu4n/pJ2oJ0YJVxVSXcd616C/MpE=;
-        b=gqBAb2V4TKYuS7Iy5JAIh5wYYC3QQxpbIlBcTYjnlpXZ22SKHew68QiSIO34uc/9ij
-         JBmpnNHa1Mrfg7iYAbtPe0oYllieGV+g6Fi8Rse0BN4l2sQmNweW9xkloKdJzqHVtWiv
-         1A5+d07/Xi7MKBqoRFh2sJzAfRByHDBZ9Ai7derCWtJN+bsguURroNcvVWW2aUmosT7L
-         QMCmnx9VtTpO1ofSe45TpDZcHsHrS87C1Gk+RcuMopF9wZo0Qnmhv72WGCScCtI1oWcW
-         djxSbe+CaMVWyUOIFZgI4C5vbMPgNKcdJWPoFJB5szwmExJnbFOQoUnQfLCSznzVCcnz
-         HXCg==
-X-Forwarded-Encrypted: i=1; AJvYcCWsQsxPJhdBKYUIsqOz9xH41uXTNydW25Z+JXs9ACjjhfJyhnd+A9Lv7cAZQXwpAuMVIuS5oauoV3CxtthFHuybqGZdbAFlKY7puAwoCr35
-X-Gm-Message-State: AOJu0YzEdzX5l0iH6So7jeD0MhzTK8NrxHBffCg2i5sdpeNztunw9Cql
-	RgVGIQz7vDCZ5cV8aAPoHWBje5k342gUk8yjd74mJWUx/S3nf8K+xoY7ZPe5OGI=
-X-Google-Smtp-Source: AGHT+IG7CJt6t5qJCHyGKp/mo0NxzGfDkWvMcEe7uZh6E+y4pDooAoq7eQ5eZ+XU3qjbqC+bGpxAvg==
-X-Received: by 2002:a2e:b059:0:b0:2ef:2685:177d with SMTP id 38308e7fff4ca-2f12ecd5249mr94676691fa.20.1722439261120;
-        Wed, 31 Jul 2024 08:21:01 -0700 (PDT)
-Received: from [127.0.1.1] ([2a01:cb1d:dc:7e00:9c3f:3dd8:b524:cb31])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4282b8addd6sm24752925e9.20.2024.07.31.08.21.00
+        bh=OtY+x5vQfBzz4286XJrUZufUt1VANHOslEQ7SKHr6W4=;
+        b=FWY/gLsrpGxsF4IEQnsyFo0XseKmFysr6qNnUQoGE6lgLx/ZN8efNAph9K0MH/Zfe2
+         82wwPTlSRqOqzb2PGHs4YT0N6VwjJ8/y0c7tvDEEtVi5AeWtA82n15axoX6eP+VxCE4O
+         2qHTW6fxnAw2+JNLAKwxS6GK9jz39T7OWyue6mFYgXwWkT7PPXR6CBULwPsNdHV42nTL
+         w5Y+/TDHlrF4W+mrO5uYeJxiIYPgSa2l0MG/frXqMAgu157CoVW4V9rWV8lkYfHtKEU2
+         tbhTwMh/XQMdiN4vMlTK5XtcFdISdM0Lp2WyWN/YKCkHSTLHqepsYMvPjkPEmFzIfSjL
+         YWDw==
+X-Gm-Message-State: AOJu0YyEvrglNTdiEwws/jjsb1XJF6LcSG+gh0N3bb9HD7NBMYf8FfKh
+	VtzGAUiKeFmNYeaAQZEXGIWYlv4BW7W2TGAteRzjasUWRo4IqYrMER5mCQ==
+X-Google-Smtp-Source: AGHT+IFD9wT30OsnfvzThUdPALh0Sr4lra6X+P2kKSshlzvdonVv7YVzMhl1lFk8CVoTSYDDDp4gag==
+X-Received: by 2002:a17:90a:1786:b0:2ca:f33b:9f26 with SMTP id 98e67ed59e1d1-2cf7e606caemr12766562a91.28.1722441515479;
+        Wed, 31 Jul 2024 08:58:35 -0700 (PDT)
+Received: from [172.17.0.2] ([52.238.29.132])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2cfdc42595dsm1525808a91.4.2024.07.31.08.58.35
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 31 Jul 2024 08:21:00 -0700 (PDT)
-From: Bartosz Golaszewski <brgl@bgdev.pl>
-Subject: [PATCH 0/3] Bluetooth: hci_qca: fix post merge window regressions
-Date: Wed, 31 Jul 2024 17:20:47 +0200
-Message-Id: <20240731-hci_qca_fixes-v1-0-59dad830b243@linaro.org>
+        Wed, 31 Jul 2024 08:58:35 -0700 (PDT)
+Message-ID: <66aa5f2b.170a0220.15cb2e.3d91@mx.google.com>
+Date: Wed, 31 Jul 2024 08:58:35 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============7859804283173045658=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, brgl@bgdev.pl
+Subject: RE: Bluetooth: hci_qca: fix post merge window regressions
+In-Reply-To: <20240731-hci_qca_fixes-v1-1-59dad830b243@linaro.org>
+References: <20240731-hci_qca_fixes-v1-1-59dad830b243@linaro.org>
+Reply-To: linux-bluetooth@vger.kernel.org
+
+--===============7859804283173045658==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIAE9WqmYC/x3LTQqAIBBA4avIrBP8CZSuEiGiU87GSiEC8e5Jy
- 4/Ha1CxEFZYWIOCD1U684CcGITk84Gc4jAooWZhtOQpkLuDdzu9WLlF4y1G7aPVMJ6r4B/Gsm6
- 9f49zeyVfAAAA
-To: Marcel Holtmann <marcel@holtmann.org>, 
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
- Wren Turkal <wt@penguintechs.org>, 
- Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
-Cc: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>, 
- linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
- Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-X-Mailer: b4 0.13.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=796;
- i=bartosz.golaszewski@linaro.org; h=from:subject:message-id;
- bh=+SbEPfgpH/hFpT3PraiDHygVL8HF/LfftQ6Q2/alDBI=;
- b=owEBbQKS/ZANAwAKARGnLqAUcddyAcsmYgBmqlZXE4Md+7XSIQbpcxIMM18fw5OanFFl7W4Tu
- 1Ja4wiNyteJAjMEAAEKAB0WIQQWnetsC8PEYBPSx58Rpy6gFHHXcgUCZqpWVwAKCRARpy6gFHHX
- csM3EAC7cQyjytCwjdWldEJKGVoDSHCh78bW0xAi4x69G03mNNhTXSljpnkfoCK5KUIuGEc4WKM
- ZJm5OaAssDLTyT7HhoEll/HqTLFbNk+Hkhrx5iTfVMIuOQAQqxNYbbtZE2JcASImLgvuoOXkzA2
- FwPJsDUBlw0ekxOgjiTlk7j2ZVI2fOdxHgBt5IfuphGOiPJoVHSraxwBs0j2cjqOL6A9sk6navq
- uN4++kvBJ0+1DwQvovnfI3YykF3tGGp9hl1OAY4En2RZxfXUxUlLfgzyBSjEYHnlUbxLTlBzztq
- NkuQ8BIA4m9udC0IHADa1meXRQN1OWFVEjV4cxGAEMGQiDo78m4K1svlSz0CD42POLon43SEUql
- E/54JvHDpCQHQOMxg0O5XZ7KJAK5MtfmrEQmXOk95JLabA0bKd7W0Ns6OcNY/Bkr/kvuuKNC7Ks
- hDqSEd2VMevjHDb55ZtvfZeOniMczJGQR5wrprYi7jmfwVhsWIrKB5HDOvW62MDLT8eTNNxfcUT
- 4I3Vj31Yd9lItxLAnn3aiStZZqlE+rR/q3rHp0A4XKZMveAKEXpX2kEPJDfQ+NsNqeJuOaV3T2y
- 9qc9+pmdMfHxzR81tXhE6lXli6fkUKP+MAoVOjnIQbXgVEWvgg3t5o4cP193K45ev/sBXAmhdkx
- /BSCgVyhvXdJtYQ==
-X-Developer-Key: i=bartosz.golaszewski@linaro.org; a=openpgp;
- fpr=169DEB6C0BC3C46013D2C79F11A72EA01471D772
 
-Here are the fixes for regressions reported by Wren and Dmitry. I could
-reproduce the crash on db820c and so I was able to test it but patch 2/3
-could use a Tested-by from Wren on QCA6390.
+This is automated email and please do not reply to this email!
 
-Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=875539
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      1.37 seconds
+GitLint                       FAIL      0.96 seconds
+SubjectPrefix                 PASS      0.17 seconds
+BuildKernel                   PASS      29.58 seconds
+CheckAllWarning               PASS      31.85 seconds
+CheckSparse                   PASS      37.57 seconds
+CheckSmatch                   PASS      101.64 seconds
+BuildKernel32                 PASS      28.46 seconds
+TestRunnerSetup               PASS      522.64 seconds
+TestRunner_l2cap-tester       PASS      20.28 seconds
+TestRunner_iso-tester         PASS      31.33 seconds
+TestRunner_bnep-tester        PASS      4.95 seconds
+TestRunner_mgmt-tester        PASS      118.54 seconds
+TestRunner_rfcomm-tester      PASS      7.55 seconds
+TestRunner_sco-tester         PASS      15.12 seconds
+TestRunner_ioctl-tester       PASS      8.12 seconds
+TestRunner_mesh-tester        PASS      6.09 seconds
+TestRunner_smp-tester         PASS      7.09 seconds
+TestRunner_userchan-tester    PASS      5.13 seconds
+IncrementalBuild              PASS      37.81 seconds
+
+Details
+##############################
+Test: GitLint - FAIL
+Desc: Run gitlint
+Output:
+[2/3] Bluetooth: hci_qca: fix QCA6390 support on non-DT platforms
+
+WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
+12: B1 Line exceeds max length (102>80): "Closes: https://lore.kernel.org/linux-bluetooth/27e6a6c5-fb63-4219-be0b-eefa2c116e06@penguintechs.org/"
+[3/3] Bluetooth: hci_qca: fix a NULL-pointer derefence at shutdown
+
+WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
+10: B1 Line exceeds max length (112>80): "Closes: https://lore.kernel.org/linux-bluetooth/su3wp6s44hrxf4ijvsdfzbvv4unu4ycb7kkvwbx6ltdafkldir@4g7ydqm2ap5j/"
+
+
 ---
-Bartosz Golaszewski (3):
-      Bluetooth: hci_qca: don't call pwrseq_power_off() twice for QCA6390
-      Bluetooth: hci_qca: fix QCA6390 support on non-DT platforms
-      Bluetooth: hci_qca: fix a NULL-pointer derefence at shutdown
+Regards,
+Linux Bluetooth
 
- drivers/bluetooth/hci_qca.c | 19 +++++++++----------
- 1 file changed, 9 insertions(+), 10 deletions(-)
----
-base-commit: cd19ac2f903276b820f5d0d89de0c896c27036ed
-change-id: 20240731-hci_qca_fixes-8e7a8ed3ad83
 
-Best regards,
--- 
-Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-
+--===============7859804283173045658==--
