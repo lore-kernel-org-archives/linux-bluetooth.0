@@ -1,139 +1,284 @@
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+Received: from out-24.smtp.github.com (out-24.smtp.github.com [192.30.252.207])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3A8B28F3
-	for <linux-bluetooth@vger.kernel.org>; Thu,  1 Aug 2024 09:31:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68794170A29
+	for <linux-bluetooth@vger.kernel.org>; Thu,  1 Aug 2024 09:32:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.207
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722504710; cv=none; b=FMIQrCxHmD8uycCyVa1yb+Z77sBRlkcD+bzY95+yfayXSCtbK0a8SOS5LDeR4+VesOs0hYHpOuMdjUoUy5difmX9/8C3QTotVAykUipd8AH52E85lZDfKv5gEeoHZQyPUvEF9BGhrVccSCNet6cs/vNRF6j+Gk2V934sFfjUuKc=
+	t=1722504725; cv=none; b=JYvFsGqea4uFW0MRobXwv6H9CTU0D7H4yEWFM0j08OE9uL0CEsqKG5fdLfO+4Uy69bYe79nbbSV11g7dMWPDUfXqzRDnkJ2V0Qae8Hb+9/RtpGYjiWHlSlLm3707b7AVwFFIu3b60tsZAn85r/gDYNfhgq1Cb6inTQv9R0pm7+g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722504710; c=relaxed/simple;
-	bh=kjrFp4tfVaPwEla1S3FT/++0eAIdUlLj8I4cqiOKyDc=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Aww0GkPv5Fbnf+YRwExqwrBSPlmJHcUF1whcYuvr4kXBpGLe7Ti8cBJqBVjz8VZc2B7UFyC7EDX7w4o54UOf/uAqhBuUZhRF9EIbM6lLUST49tgfFZ2114LUcuphD8jA0pLMDlv0l8Eyp1aeUJOB0UtwNFIx/UEA9XMKwomtthk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=oLSmEaxr; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+	s=arc-20240116; t=1722504725; c=relaxed/simple;
+	bh=I4YZiAvV95bfui+Tf3fzlfwWc9yAipwR9TiziRupok8=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=MjKUHeR0/+U1CFECPmn93MkVMW/VtEyL4/CFuyEZXI7MDjEqwj0xuLy3YrAoPhDEHwR2c2JlLosxpl4BwrwSVP/zy02BX8F4agxv1X/rcNy0JUNhEUk0Lh29TknWF6+5c6FwWe8dv+9PzSlsd93M0TciAoIXez9alr9N0K4fOt4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=amwzNHGh; arc=none smtp.client-ip=192.30.252.207
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="oLSmEaxr"
-Received: from pps.filterd (m0279864.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4712t3K6029975;
-	Thu, 1 Aug 2024 09:31:37 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-type:date:from:message-id:mime-version:subject:to; s=
-	qcppdkim1; bh=CyFJrwhUL0tFNvg8PQyTWA/CZweN8iRVLnrNb2rvkXw=; b=oL
-	SmEaxrVQy1qD5cQDy+G0P5k91aUBCcGH74n05/lnKXrkmRk3m3b67Or2DpJurn43
-	oyInIkXMhHAqhddK7zUlNCae2McAGdbygtaSnAwYY0koh1WWB7GEUmwZ7foUoR0d
-	4npti9nkkcFN4XDH7cB90OEu2yDhnt+/wREIvclzOeN/sT+FordgE3dxdgOXdpc4
-	4xEKhxoUnR4q9SaxqiJ1CzI8xRw3+QACgp7CROGLotOFJ7r42jCsvmw2jWWR0Nu0
-	Hir8vMTftkMZU3YycFP1qNBqJ1gnFQ1Ap6xo4o+JPRvSpb+qqj86MTtd8OYjHXyh
-	giiqPmzh449YNX4HvqIA==
-Received: from nasanppmta01.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 40pq528m6f-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 01 Aug 2024 09:31:36 +0000 (GMT)
-Received: from nasanex01c.na.qualcomm.com (nasanex01c.na.qualcomm.com [10.45.79.139])
-	by NASANPPMTA01.qualcomm.com (8.17.1.19/8.17.1.19) with ESMTPS id 4719VaYR023119
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 1 Aug 2024 09:31:36 GMT
-Received: from hu-amisjain-hyd.qualcomm.com (10.80.80.8) by
- nasanex01c.na.qualcomm.com (10.45.79.139) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.9; Thu, 1 Aug 2024 02:31:33 -0700
-From: Amisha Jain <quic_amisjain@quicinc.com>
-To: <linux-bluetooth@vger.kernel.org>, <pmenzel@molgen.mpg.de>,
-        <luiz.dentz@gmail.com>
-CC: <quic_mohamull@quicinc.com>, <quic_hbandi@quicinc.com>,
-        <quic_anubhavg@quicinc.com>
-Subject: [PATCH v7] obex: Move size emit signal to plugins instead of obex.c
-Date: Thu, 1 Aug 2024 15:01:19 +0530
-Message-ID: <20240801093119.25832-1-quic_amisjain@quicinc.com>
-X-Mailer: git-send-email 2.17.1
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="amwzNHGh"
+Received: from github.com (hubbernetes-node-1b3c1fc.ac4-iad.github.net [10.52.153.31])
+	by smtp.github.com (Postfix) with ESMTPA id 82936641165
+	for <linux-bluetooth@vger.kernel.org>; Thu,  1 Aug 2024 02:32:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1722504722;
+	bh=Sy5JTc4XiQLOnRjgIIn13ndu+hIDKzrk/Ok2vyHvvJM=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=amwzNHGhJgPgDZQmoku0p3p3G+cQiTtu/pfkXcWcL3BVMBACrb7pYyGryNSKroCsU
+	 FmufDSBnxjAl2YQ80frrjZL7Vp3CY4CNQGTkItCJjFYeGj+iD4hdFhhM7CQ+XmLgQ6
+	 Qs+OV/ViDjKgHsBsHe+jnyHShCHErVSl9yi8ZcNE=
+Date: Thu, 01 Aug 2024 02:32:02 -0700
+From: Luiz Augusto von Dentz <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/master/549d38-998104@github.com>
+Subject: [bluez/bluez] d7b7f3: doc/media: Add 'broadcasting' state and
+ 'Select' m...
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nasanex01c.na.qualcomm.com (10.45.79.139)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: VBJPyRZ0Z75Gh6cQGaJLmwZQ1EFY6uxA
-X-Proofpoint-ORIG-GUID: VBJPyRZ0Z75Gh6cQGaJLmwZQ1EFY6uxA
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-08-01_06,2024-07-31_01,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 mlxlogscore=999
- adultscore=0 priorityscore=1501 spamscore=0 bulkscore=0 mlxscore=0
- lowpriorityscore=0 clxscore=1011 malwarescore=0 suspectscore=0
- impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2407110000 definitions=main-2408010058
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-Instead of emitting the property "Size" from obex_put_stream_start(),
-Call the function manager_emit_transfer_property() from plugins/*.c
-wherever plugin has transfer object present.
-Remove the code from obex.c which is generic for all profiles.
+  Branch: refs/heads/master
+  Home:   https://github.com/bluez/bluez
+  Commit: d7b7f3a39562ca6341254a711ce079b6b8185cd1
+      https://github.com/bluez/bluez/commit/d7b7f3a39562ca6341254a711ce079b6b8185cd1
+  Author: Vlad Pruteanu <vlad.pruteanu@nxp.com>
+  Date:   2024-08-01 (Thu, 01 Aug 2024)
 
-This change resolves the type mismatch issue when calling the
-manager_emit_transfer_property from obex.c. We are passing
-'os->service_data' of plugin session type but the
-manager_emit_transfer_property() expects the 'obex_transfer'
-type, therefore size is not set properly and might cause
-crash/disconnection.
+  Changed paths:
+    M doc/org.bluez.MediaTransport.rst
 
----
- obexd/plugins/ftp.c | 5 +++++
- obexd/plugins/opp.c | 5 +++++
- obexd/src/obex.c    | 3 ---
- 3 files changed, 10 insertions(+), 3 deletions(-)
+  Log Message:
+  -----------
+  doc/media: Add 'broadcasting' state and 'Select' method
 
-diff --git a/obexd/plugins/ftp.c b/obexd/plugins/ftp.c
-index 874fe2b8b..6c841d207 100644
---- a/obexd/plugins/ftp.c
-+++ b/obexd/plugins/ftp.c
-@@ -175,6 +175,11 @@ int ftp_chkput(struct obex_session *os, void *user_data)
- 
- 	ret = obex_put_stream_start(os, path);
- 
-+	if (ret == 0 && obex_get_size(os) != OBJECT_SIZE_DELETE &&
-+				obex_get_size(os) != OBJECT_SIZE_UNKNOWN) {
-+		manager_emit_transfer_property(ftp->transfer, "Size");
-+	}
-+
- 	if (ret == 0)
- 		manager_emit_transfer_started(ftp->transfer);
- 
-diff --git a/obexd/plugins/opp.c b/obexd/plugins/opp.c
-index 777f5f8ed..2220efd49 100644
---- a/obexd/plugins/opp.c
-+++ b/obexd/plugins/opp.c
-@@ -87,6 +87,11 @@ skip_auth:
- 
- 	err = obex_put_stream_start(os, path);
- 
-+	if (err == 0 && obex_get_size(os) != OBJECT_SIZE_DELETE &&
-+				obex_get_size(os) != OBJECT_SIZE_UNKNOWN) {
-+		manager_emit_transfer_property(user_data, "Size");
-+	}
-+
- 	g_free(path);
- 
- 	if (err < 0)
-diff --git a/obexd/src/obex.c b/obexd/src/obex.c
-index 98d6245a4..370bfac9e 100644
---- a/obexd/src/obex.c
-+++ b/obexd/src/obex.c
-@@ -716,9 +716,6 @@ int obex_put_stream_start(struct obex_session *os, const char *filename)
- 		return err;
- 	}
- 
--	if (os->size != OBJECT_SIZE_DELETE && os->size != OBJECT_SIZE_UNKNOWN)
--		manager_emit_transfer_property(os->service_data, "Size");
--
- 	os->path = g_strdup(filename);
- 
- 	return 0;
--- 
-2.17.1
+This adds a new state for transports created by the Broadcast
+Sink. Such transports will remain  in the 'idle' state until the
+user calls 'Select' on them, at which point they will be moved to
+'broadcasting'. This allows the user to select the desired BIS as
+the audio server automatically acquires transports that are in this
+state.
 
+
+  Commit: 9357edb87bb98c74677f4c5548a4fe2d589230f8
+      https://github.com/bluez/bluez/commit/9357edb87bb98c74677f4c5548a4fe2d589230f8
+  Author: Vlad Pruteanu <vlad.pruteanu@nxp.com>
+  Date:   2024-08-01 (Thu, 01 Aug 2024)
+
+  Changed paths:
+    M profiles/audio/transport.c
+
+  Log Message:
+  -----------
+  transport: Add 'broadcasting' state
+
+This adds a new state for transports created by the Broadcast
+Sink device as a result of scanning a Broadcast Source. Such
+transports will remain  in the 'idle' state until the user
+selects them using 'transport.select', at which point they will
+be moved to 'broadcasting'.
+
+
+  Commit: 083d1a7b66b5c495d2545670d5d255aef340dbf9
+      https://github.com/bluez/bluez/commit/083d1a7b66b5c495d2545670d5d255aef340dbf9
+  Author: Vlad Pruteanu <vlad.pruteanu@nxp.com>
+  Date:   2024-08-01 (Thu, 01 Aug 2024)
+
+  Changed paths:
+    M profiles/audio/transport.c
+
+  Log Message:
+  -----------
+  transport: Add 'Select' method
+
+This adds the 'Select' method for Broadcast transports. It's role
+is to change the transport's state from idle to broadcasting. This
+allows the user to select the desired stream when running the setup
+with PipeWire since it acquires any transport that is broadcasting.
+
+
+  Commit: 61e16e3b831754368599fc619ddac31f0db48571
+      https://github.com/bluez/bluez/commit/61e16e3b831754368599fc619ddac31f0db48571
+  Author: Vlad Pruteanu <vlad.pruteanu@nxp.com>
+  Date:   2024-08-01 (Thu, 01 Aug 2024)
+
+  Changed paths:
+    M client/player.c
+
+  Log Message:
+  -----------
+  client/player: Expose transport 'Select' method to the user
+
+This exposes the 'Select' method for Broadcast transports. This
+allows the user to select the desired stream when running the setup
+with PipeWire since it acquires any transport that is broadcasting.
+
+
+  Commit: 53a4078cb350f630b19f7fe6ea32dd4e1c01b7bb
+      https://github.com/bluez/bluez/commit/53a4078cb350f630b19f7fe6ea32dd4e1c01b7bb
+  Author: Vlad Pruteanu <vlad.pruteanu@nxp.com>
+  Date:   2024-08-01 (Thu, 01 Aug 2024)
+
+  Changed paths:
+    M profiles/audio/transport.c
+
+  Log Message:
+  -----------
+  transport: Broadcast sink: wait for user to select transport
+
+This changes the flow for transports created on broadcast sink side.
+Transports are not automatically changed to pending anymore, instead
+the user must first run transport.select on them which updates the
+state to 'broadcasting'. This allows for the selection of the desired
+stream when running the setup with PipeWire, which acquires any transport
+that is broadcasting.
+
+
+  Commit: c7e79fa8bfffff1c7b76cd32ff925ab4613ceb45
+      https://github.com/bluez/bluez/commit/c7e79fa8bfffff1c7b76cd32ff925ab4613ceb45
+  Author: Vlad Pruteanu <vlad.pruteanu@nxp.com>
+  Date:   2024-08-01 (Thu, 01 Aug 2024)
+
+  Changed paths:
+    M doc/org.bluez.MediaTransport.rst
+
+  Log Message:
+  -----------
+  doc/media: Add 'Unselect' method
+
+This adds the documentation for a new method, exclusive to transports
+created by the Broadcast Sink. It would allow the user to terminate the
+sync to a BIS, via a 2 step process. The first step is the call to this
+method, which changes the transport's state to idle, with the second step
+being done by the audio server which detects this change and releases
+the transport.
+
+
+  Commit: 6ee75c3ec383c664cd7e7be02e951999758a6c4f
+      https://github.com/bluez/bluez/commit/6ee75c3ec383c664cd7e7be02e951999758a6c4f
+  Author: Vlad Pruteanu <vlad.pruteanu@nxp.com>
+  Date:   2024-08-01 (Thu, 01 Aug 2024)
+
+  Changed paths:
+    M profiles/audio/transport.c
+
+  Log Message:
+  -----------
+  transport: Add 'Unselect' method
+
+This adds a new method, exclusive to transports created by the Broadcast
+Sink. It allows the user to terminate the sync to a BIS, via a 2 step
+process. The first step is the call to this method, which changes the
+transport's state to idle, with the second step being done by the audio
+server which detects this change and releases the transport.
+
+
+  Commit: 827416638289d901fe5b2bc747fc33cff8b7db99
+      https://github.com/bluez/bluez/commit/827416638289d901fe5b2bc747fc33cff8b7db99
+  Author: Vlad Pruteanu <vlad.pruteanu@nxp.com>
+  Date:   2024-08-01 (Thu, 01 Aug 2024)
+
+  Changed paths:
+    M client/player.c
+
+  Log Message:
+  -----------
+  client/player: Expose transport 'Unselect' method to the user
+
+This exposes the 'Unselect' method for Broadcast transports. This
+allows the user to terminate the sync to a specific BIS, via a 2
+step process. The first step is the call to this method, which
+changes the transport's state to idle, with the second step being
+done by the audio server which detects this change and releases
+the transport.
+
+
+  Commit: 720e8ec9760b8d8bfb565e535bd311bbc8273a76
+      https://github.com/bluez/bluez/commit/720e8ec9760b8d8bfb565e535bd311bbc8273a76
+  Author: Alexander Ganslandt <alexander.ganslandt@axis.com>
+  Date:   2024-08-01 (Thu, 01 Aug 2024)
+
+  Changed paths:
+    M client/gatt.c
+
+  Log Message:
+  -----------
+  client/gatt: Set handle before calling print functions
+
+The print functions (print_service, print_chrc and print_desc) all print
+the handle, but the handle is never set in the struct object. This
+results in the handle always printing as 0x0000. Set the handle before
+calling the print function.
+
+
+  Commit: 8a708aa5f04613768e903d243a7261efd202ea88
+      https://github.com/bluez/bluez/commit/8a708aa5f04613768e903d243a7261efd202ea88
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2024-08-01 (Thu, 01 Aug 2024)
+
+  Changed paths:
+    M monitor/att.c
+
+  Log Message:
+  -----------
+  monitor: Fix crash parsing notification
+
+This fixes the following crash caused by notify callback being NULL:
+
+Jump to the invalid address stated on the next line
+   at 0x0: ???
+   by 0x1E8375: print_notify (att.c:5420)
+   by 0x1E9464: att_multiple_vl_rsp (att.c:5463)
+   by 0x20D39E: att_packet (att.c:5637)
+   by 0x1B2054: l2cap_frame (l2cap.c:2567)
+   by 0x1B4A4D: l2cap_packet (l2cap.c:2708)
+   by 0x19AD43: packet_hci_acldata (packet.c:12522)
+   by 0x19CF07: packet_monitor (packet.c:4249)
+   by 0x152405: data_callback (control.c:973)
+   by 0x2204F6: mainloop_run (mainloop.c:106)
+   by 0x221017: mainloop_run_with_signal (mainloop-notify.c:189)
+   by 0x14F387: main (main.c:298)
+ Address 0x0 is not stack'd, malloc'd or (recently) free'd
+
+
+  Commit: fe703a0058d8271a259885d3da4e886400cf4245
+      https://github.com/bluez/bluez/commit/fe703a0058d8271a259885d3da4e886400cf4245
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2024-08-01 (Thu, 01 Aug 2024)
+
+  Changed paths:
+    M src/shared/bap.c
+
+  Log Message:
+  -----------
+  shared/bap: Fix not setting metadata
+
+bt_bap_stream_metatada shall not send Update Metadata if the states
+don't allow it, instead it shall store it so it can be send later when
+enabling the stream.
+
+
+  Commit: 998104507ba103ae0c83641d381794bf11dd46e0
+      https://github.com/bluez/bluez/commit/998104507ba103ae0c83641d381794bf11dd46e0
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2024-08-01 (Thu, 01 Aug 2024)
+
+  Changed paths:
+    M profiles/audio/bap.c
+
+  Log Message:
+  -----------
+  bap: Fix not setting metatada
+
+Fix not using bt_bap_stream_metadata when configuring a new stream as
+the endpoint/client may have set it.
+
+
+Compare: https://github.com/bluez/bluez/compare/549d38852f66...998104507ba1
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
