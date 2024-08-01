@@ -1,73 +1,64 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-17.smtp.github.com (out-17.smtp.github.com [192.30.252.200])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6726D1B9B37
-	for <linux-bluetooth@vger.kernel.org>; Thu,  1 Aug 2024 13:00:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 840351A0B0C
+	for <linux-bluetooth@vger.kernel.org>; Thu,  1 Aug 2024 13:12:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.200
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722517232; cv=none; b=YZUV7lWiLmhoNeN9abQTUmED7Nt/c7w001jgjMEbMn6CGhsz0bpWtEyqQSEN3ZvIwFVFhLTGCxYNkqN/HFmZYhpnmDdLUgG9QOG9Z5+Ij1Gz+uoupdZcFcr/VXyQJkWeQjJEqWTPuP4ioMzLS3LAyC9qhAWqLq5txiBku0h8u38=
+	t=1722517958; cv=none; b=HEqRNyCjdRpf4wzW8Sp+7f/oSi5kXx6GLGNDA3kBrFTqxeBLAqoFb5MC5khoOugicFN9lBQDdLQGHw23A2tgP1LAd6t9CfBDNys30GThZ5qIz5KlqFc8h3MtkcOL+b5MALmfmwsfJ//XDXuagtbk6MCMXVW2WtrvhM7/C+5UmUU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722517232; c=relaxed/simple;
-	bh=aCYy+sHOT7vYsUTQsRUamawgAV7fDdJiuhEn5elrqws=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=q5vrLM3qZDhcX6xh3EOFJ/No1sxA0ZmIIlhLCt0SlSTXc2NpJHjv+BIrrgstVcDvs9/DSOOcq/ZPE0RrpyfEqNQQQ0WpDUthgVPHt9Uu6YhF33czUehRg7WBD3hSozvzQ03yDHsf1OOEMkD0cyRlCjT1KzFtV00KYEimtDaTS9g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RBYzfjd0; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1722517958; c=relaxed/simple;
+	bh=eCP7QpTaLNJo0bDsB4+HA6lgQNr04uy1wsOIANCz8Dc=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=ueKA3kn92gKIeAykqVkjGvN50hFBUh+uJKjo50KkGZ6luHIICfqvVwhVA8GqbgVtPmNc7LzRdJALQiqva0/QbxXacEVCczS9Mb+woC804RQqTxVs55aUMeirZmMsFc7k0PfKqeGRzxHELGL59KejhD4Y+LQX8HaYVeIJNJSoWPU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=JpCvlfJ+; arc=none smtp.client-ip=192.30.252.200
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RBYzfjd0"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 4B31FC4AF0E;
-	Thu,  1 Aug 2024 13:00:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1722517232;
-	bh=aCYy+sHOT7vYsUTQsRUamawgAV7fDdJiuhEn5elrqws=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=RBYzfjd0619sFyjkwbpNd1E0z8MKxlRC9jASqTMjUmXQXxk0QtALVSPD7jVwb6HUr
-	 Lzi6gYLZ3jW9K3rBN9JachAAjuKWAUvI0PMNQMXH5NzgBJ+ZjteU4O37zDvcnqUBYx
-	 vX1aXUDRzkyyPhtr25C2hwwlChPsLjhSN7RmP7+hoIxjeFMSTtDExO1wUQ+xfQA2t2
-	 4OMrNUrWVgQ1JfOC/O6/LvTWzSXDGgkWtN082T3w7hHmRlYBqDctheHDYwr0ow2DBF
-	 e3+NfY7Dd9Ajq1BASV1QZUGOLPDv6rV7xQrQaC4iR1M4FBuU5By3u/OU8CLLYvD/Kk
-	 O8Mj/jFHNpd9A==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 3A50DC43443;
-	Thu,  1 Aug 2024 13:00:32 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="JpCvlfJ+"
+Received: from github.com (hubbernetes-node-006e911.va3-iad.github.net [10.48.133.43])
+	by smtp.github.com (Postfix) with ESMTPA id 8DA194E0D63
+	for <linux-bluetooth@vger.kernel.org>; Thu,  1 Aug 2024 06:12:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1722517956;
+	bh=QtTBWBhHYKNAUSysdIHUI7m4QA0ZJYz/+3DZUuwa2HA=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=JpCvlfJ+tHDUN+QWncJnzzJhPh45J700XrVwkjs4Q2q+KMb2EgOCgDil+/DeO4NuX
+	 7TtV1sKo2VPQ3JEBzYxigniXllcRIpmvkY+zpDD++nSKjj9uCrCXzkSEtgn6VlhSOb
+	 247+hxZm5bXLlv2x3YnmnYYYPOiZKNd9aHA67V4U=
+Date: Thu, 01 Aug 2024 06:12:36 -0700
+From: Luiz Augusto von Dentz <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/master/998104-100c84@github.com>
+Subject: [bluez/bluez] 100c84: shared/bap: Fix overwriting sink attribute
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH BlueZ v1] shared/bap: Fix overwriting sink attribute
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <172251723223.10617.6361943923347897080.git-patchwork-notify@kernel.org>
-Date: Thu, 01 Aug 2024 13:00:32 +0000
-References: <20240801093010.144495-1-luiz.dentz@gmail.com>
-In-Reply-To: <20240801093010.144495-1-luiz.dentz@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-Hello:
+  Branch: refs/heads/master
+  Home:   https://github.com/bluez/bluez
+  Commit: 100c845b2d20e7f4f96b371e044b8b59944230ab
+      https://github.com/bluez/bluez/commit/100c845b2d20e7f4f96b371e044b8b59944230ab
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2024-08-01 (Thu, 01 Aug 2024)
 
-This patch was applied to bluetooth/bluez.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+  Changed paths:
+    M src/shared/bap.c
 
-On Thu,  1 Aug 2024 05:30:10 -0400 you wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> 
-> When allocating the sink and sink_ccc attribute they were being
-> overwriten by source and source_ccc attributes.
-> ---
->  src/shared/bap.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+  Log Message:
+  -----------
+  shared/bap: Fix overwriting sink attribute
 
-Here is the summary with links:
-  - [BlueZ,v1] shared/bap: Fix overwriting sink attribute
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=100c845b2d20
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+When allocating the sink and sink_ccc attribute they were being
+overwriten by source and source_ccc attributes.
 
 
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
