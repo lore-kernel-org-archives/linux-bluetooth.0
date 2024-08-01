@@ -1,55 +1,56 @@
-Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
+Received: from mail-pg1-f176.google.com (mail-pg1-f176.google.com [209.85.215.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5F611581FC
-	for <linux-bluetooth@vger.kernel.org>; Thu,  1 Aug 2024 07:53:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A2411EB4A6
+	for <linux-bluetooth@vger.kernel.org>; Thu,  1 Aug 2024 07:59:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722498804; cv=none; b=qz9XHh8b8kYzQWIuD7oVjDG4YUPQZoVHARRS3b4sXRFXWpXbhWvmVgEWTRmAgXjwHPwR2u+hSyWNO+nZPQZPGTuUfYDhv0ambsDwywLry4qwvgkXC8z6ODCXa0xpYdTTfQRMALc5ZlNC2l9mOEWA2SUP3UdPU2U9lYKCXp59914=
+	t=1722499163; cv=none; b=gJf/uaG092hn+YACMTri00/IsQV+D6l23asIz49Ai51RvbBOhTxZi499vA3rCP+T63lByMiSaFPhIMtJ2ryHdV4KD/tdyPCugqbWdcYvWOR36IYJedKjYw7kDpOlZiq/+oCZpcrXWgMgROiXlVUp+kcdH+7nRf7Rxho2OgP+huo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722498804; c=relaxed/simple;
-	bh=1vMAoAs0mZsaXqJKrSidydDhDckA/Xhiuk4iUkA+y3U=;
+	s=arc-20240116; t=1722499163; c=relaxed/simple;
+	bh=TdGc8HYman/AsKmvU2SzEFOJP3JzH2NV9z5CHhgu7fU=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=VATFjq+5cXGTTtdrXCu4Be7v2h49Z+VaFDVNSo+X2UWpTeRcQk/jl4hrPpG3QaVlCKdMAOgToQaQT6Rbp3vUaynV4tKir3XPUWTJF8t1nc8M55bzQ6FT/2p2juFHU69ufxsR5Go8pp3TG1HfoYl1Egk6k4yRZxxxbxr76jyK69U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=penguintechs.org; spf=pass smtp.mailfrom=penguintechs.org; dkim=pass (1024-bit key) header.d=penguintechs.org header.i=@penguintechs.org header.b=evGYxoMu; arc=none smtp.client-ip=209.85.210.176
+	 In-Reply-To:Content-Type; b=DF5zHY7aNoISw+vD/5ZBVJImKHS6yi6EvGbAYgP5TG5it0BjhgDGbb/Oj5DDulX/JvwOKlVzbbn+Hi3j1AuLHtIuGYzP2ztBr3jSGtTgzttIBRlfwix5O4KPuA50auUi6n5m3+ZqfaxKhKiyN6C/SlUZMyRutbsQjeG0YAUdvXw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=penguintechs.org; spf=pass smtp.mailfrom=penguintechs.org; dkim=pass (1024-bit key) header.d=penguintechs.org header.i=@penguintechs.org header.b=FWqAz+/e; arc=none smtp.client-ip=209.85.215.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=penguintechs.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=penguintechs.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=penguintechs.org header.i=@penguintechs.org header.b="evGYxoMu"
-Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-70d150e8153so1263330b3a.0
-        for <linux-bluetooth@vger.kernel.org>; Thu, 01 Aug 2024 00:53:22 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=penguintechs.org header.i=@penguintechs.org header.b="FWqAz+/e"
+Received: by mail-pg1-f176.google.com with SMTP id 41be03b00d2f7-7a92098ec97so4522896a12.2
+        for <linux-bluetooth@vger.kernel.org>; Thu, 01 Aug 2024 00:59:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=penguintechs.org; s=google; t=1722498802; x=1723103602; darn=vger.kernel.org;
+        d=penguintechs.org; s=google; t=1722499161; x=1723103961; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=xGB/2XQq/7ZCXGPIPBVqSmNziWCjEOy2DmhtcCr21Vk=;
-        b=evGYxoMu3OMIr+StLNJhHwMgjmq2bago84sI9urZp7BBHvRvEyZluULCuDOFKfH241
-         w6GTtx6FBH57I8cfY/Q08g13SXV/t3iDkrWpH5nWViGZ7gYln17vydHyAv9LKKZADiSQ
-         OD+ugJv52iM5ow/5qLJ1X7HF8UVGJ/CbNnDEg=
+        bh=jxEMkiW5AF7hanjXSFu4zgg/RDegXqyfXH+v23bN8d8=;
+        b=FWqAz+/er0Hzf0viBuyPCAG8HYiVNhUAH+SAULIIPJS8g+jo6tat1w8unuH2TMsCB1
+         1wz4wnkyrfxW38HdU0IrYTb6o9ZTZNmrcLkoiJ8Ta2g8FFxJJilt6YgjwmlpOSjEwebe
+         OPkGedLkjGf9JBrU0le0bPXFUTUdseMDKyZa4=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722498802; x=1723103602;
+        d=1e100.net; s=20230601; t=1722499161; x=1723103961;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=xGB/2XQq/7ZCXGPIPBVqSmNziWCjEOy2DmhtcCr21Vk=;
-        b=C0go+OjtNqqSbPMr8dU8/6y71lQ/uwj5jH6adWAmOAHUdqqh2hu+/bCGIw599nQODB
-         X62Y22CL/GZ+kzLnX2ymB/kPP4mw9y3TSFUllRhRW4soqwLA3r7OOoN48HgxGnVlB2A5
-         /Cgx2S4X2bgs2/gvQY7iglS6YenSH2juJ+TiaPCE52T8T+LASYV6h9ZDepJfCd6gxz9v
-         xRD1YN+ulYaRbQxpY7S31XKvohEOKrHZDNpj+dbRWtSkP27dpQ+rlwGUwLRdXFNhzn12
-         JIiHx8CHu9p7gQs0Avu4ymymn4PNtZ+pF75SNbjwSc7vzQhlMZXMSTlDaR0NN0MR5l+Y
-         bPQA==
-X-Gm-Message-State: AOJu0YzTjAqCrK2aTcbd54yavKXf9tfvxuKUSMsYV9jFE+voI8X3iXY9
-	tsgQVonegTnMvc6cFkf7Sr9Nx0q9XdMz75kmboYGtFGGSW1nbT3hfa7p0OGkow==
-X-Google-Smtp-Source: AGHT+IFmZgorEuoJtBDUjF73dk7CdEGsO2rlcI03MN5SDR9x3EtpO2YEO0tLSB0swdVkb18+aia+GQ==
-X-Received: by 2002:a05:6a00:1302:b0:70d:26cd:9741 with SMTP id d2e1a72fcca58-71065ec3947mr891818b3a.12.1722498801831;
-        Thu, 01 Aug 2024 00:53:21 -0700 (PDT)
+        bh=jxEMkiW5AF7hanjXSFu4zgg/RDegXqyfXH+v23bN8d8=;
+        b=MX0CRvRD7T+FzCDlPz0TMMMpojUJIxRVfXk8mPpkcZ0j0/F3EIyp++YxwYHqAps+cI
+         Sf+ufpVlyKn5DnsS12e0o6rABOvKMgdj3HE/Lsh7InqVsgViE6hmOG5DlIbbwaBpj8O/
+         TBpZqm2XKfyxc5HDdQ8D7KScQnoRZnLbaKqUgjuXvA2G/n0K8991gyICYY+7Dqk9YpLu
+         WELvYWQWICHAntAxBTHf+vg//R0reZ0hdBUMKLklVzpHv8IzbXimIKdR272usAMZbAeq
+         xuUsHKW/8agFo6gyvvqvhg+DkdCEWbBrRQL98QYIytBdwP7mRTS7ziBqG3EYzIvy3DpY
+         MOWg==
+X-Forwarded-Encrypted: i=1; AJvYcCU1VrGvmjREDGhL3VVA7tM7ODYcXG4sJKnu3KrpGe8q4SNpdH+kDuCDg2RxN35fmslqt62CbedFRD3r+rGgRD4y+kYfPaE/IM0KX9RjrEEn
+X-Gm-Message-State: AOJu0Yy+zK3NXFnPRfUVvJ4Xkzs3PPUmEJkAxyG7paDfcnBvpg/aRwm1
+	5FtsByuk28v9u5vRHHs1WwESrphb0sitFKN8O7mTuaSWul9Pglo+vkT/6WZEiA==
+X-Google-Smtp-Source: AGHT+IEOCORlO9v8f2Cef2WdUTK+a0Et3fsMg1FKbsHm226CDreMtIirqXY/8gQD3JPdzykqndfjew==
+X-Received: by 2002:a05:6a21:9990:b0:1c0:f0c1:5d45 with SMTP id adf61e73a8af0-1c68d125490mr2297955637.44.1722499160638;
+        Thu, 01 Aug 2024 00:59:20 -0700 (PDT)
 Received: from ?IPV6:2601:646:8700:dd30:5f3e:5ba7:e0ea:9a08? ([2601:646:8700:dd30:5f3e:5ba7:e0ea:9a08])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-70ead715733sm10977195b3a.84.2024.08.01.00.53.20
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2cfdc405f4asm2623873a91.11.2024.08.01.00.59.19
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 01 Aug 2024 00:53:21 -0700 (PDT)
-Message-ID: <9fd98bc2-d19a-4ad2-9f0a-02baae89ac08@penguintechs.org>
-Date: Thu, 1 Aug 2024 00:53:19 -0700
+        Thu, 01 Aug 2024 00:59:20 -0700 (PDT)
+Message-ID: <3dc56ebc-d378-4ba0-aed8-03c93e0aea20@penguintechs.org>
+Date: Thu, 1 Aug 2024 00:59:18 -0700
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -58,150 +59,93 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Subject: Re: QCA6390 broken in current kernel
-To: Zijun Hu <zijun_hu@icloud.com>,
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
- Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-Cc: linux-bluetooth@vger.kernel.org, regressions@lists.linux.dev,
- Paul Menzel <pmenzel@molgen.mpg.de>
+To: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
+ Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
+Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+ Zijun Hu <quic_zijuhu@quicinc.com>, linux-bluetooth@vger.kernel.org
 References: <27e6a6c5-fb63-4219-be0b-eefa2c116e06@penguintechs.org>
  <CABBYNZ+vVFUm1Tb+BvViYMJd6XQczTYPgyO++GGbCcWrkaC4Kg@mail.gmail.com>
  <30319168-9456-49dd-be27-480b2a068fe3@penguintechs.org>
  <1a519b2f-f5cf-40b3-8223-162dc04f8ca8@penguintechs.org>
  <21645f07-da90-4441-8dbb-d999298165e9@penguintechs.org>
- <09962266-9b55-408b-8b5d-d2387c871eef@icloud.com>
- <0940abda-fe74-4009-9a83-7384bb8cf103@penguintechs.org>
- <1ff58133-7322-47fc-b3db-6fe4a697aefe@penguintechs.org>
- <7e447839-4976-4d3b-aee5-c0961637deb5@penguintechs.org>
- <3996ac6a-4b9b-4049-83e7-530eb49616de@icloud.com>
+ <b1061ec0-5f8f-44af-8955-2d6fa11f94b3@penguintechs.org>
+ <CACMJSet3H3B1rz2eZyxUr_ySUOdhTkAognfKpFZ=Kzto8UsxMQ@mail.gmail.com>
+ <534cff38-7bbf-4e9d-90c5-c4a4ba331a8e@penguintechs.org>
+ <CACMJSett7WOHWnfNGwtWL0sQQ3K9rqr08W9KDF5U=rJbpBZfzA@mail.gmail.com>
+ <CAA8EJprdmXfJYx2xk5fcV4UgWqeBPekrgv1iv7F7FugaBH6=KA@mail.gmail.com>
+ <CACMJSesML_Q-Z79XyAZd0sJuE=AbGQ-TWozPWTRmdF3sMh7VHg@mail.gmail.com>
 Content-Language: en-US
 From: Wren Turkal <wt@penguintechs.org>
-In-Reply-To: <3996ac6a-4b9b-4049-83e7-530eb49616de@icloud.com>
+In-Reply-To: <CACMJSesML_Q-Z79XyAZd0sJuE=AbGQ-TWozPWTRmdF3sMh7VHg@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 
-Zijun,
+Bart,
 
-On 7/30/24 6:28 PM, Zijun Hu wrote:
-> On 2024/7/31 04:12, Wren Turkal wrote:
->> Zijun,
+On 7/31/24 2:05 AM, Bartosz Golaszewski wrote:
+> On Wed, 31 Jul 2024 at 10:55, Dmitry Baryshkov
+> <dmitry.baryshkov@linaro.org> wrote:
 >>
->> On 7/30/24 12:48 PM, Wren Turkal wrote:
->>> Zijun,
+>> On Wed, 31 Jul 2024 at 11:51, Bartosz Golaszewski
+>> <bartosz.golaszewski@linaro.org> wrote:
 >>>
->>> On 7/30/24 12:26 PM, Wren Turkal wrote:
->>>> On 7/29/24 9:25 AM, Zijun Hu wrote:
->>>>> On 2024/7/27 03:25, Wren Turkal wrote:
->>>>>> On 7/26/24 11:52 AM, Wren Turkal wrote:
->>>>>>> On 7/25/24 1:47 PM, Wren Turkal wrote:
->>>>>>>> On 7/25/24 1:35 PM, Luiz Augusto von Dentz wrote:
->>>>>>>>> Hi Wren,
->>>>>>>>>
->>>>>>>>> On Thu, Jul 25, 2024 at 2:35 PM Wren Turkal <wt@penguintechs.org>
->>>>>>>>> wrote:
->>>>>>>>>>
->>>>>>>>>> Hello BT folks,
->>>>>>>>>>
->>>>>>>>>> Just so y'all know, the QCA6390 bluetooth hardware appears to be
->>>>>>>>>> broken
->>>>>>>>>> at least since commit 720261cfc732.
->>>>>>>>>>
->>>>>>>>>> The KDE and Gnome bluetooth control panels appear to think
->>>>>>>>>> there is no
->>>>>>>>>> bluetooth hardware. Rolling back to 6.10 appear to function.
->>>>>>>>>>
->>>>>>>>>> I have a Dell XPS13 9310.
->>>>>>>>>>
->>>>>>>>>> I will attempt to capture some kernel logs in a bit.
->>>>>>>>>
->>>>>>>>> git show 720261cfc732
->>>>>>>>> fatal: ambiguous argument '720261cfc732': unknown revision or
->>>>>>>>> path not
->>>>>>>>> in the working tree.
->>>>>>>>
->>>>>>>> I gave you the sha for the built fedora rawhide kernel package,
->>>>>>>> not a
->>>>>>>> mainline sha. Sorry about that. I thought it was a mainline sha.
->>>>>>>> I am
->>>>>>>> trying to bisect the problem. Hopefully, I can get a mainline git
->>>>>>>> sha
->>>>>>>> for you soon.
->>>>>>>>
->>>>>>>> If it helps, the build date of the kernel is 2024-07-19.
->>>>>>>>
->>>>>>>> Sorry about the confusion. Hope this helps track down the problem.
->>>>>>>
->>>>>>> I have managed to get the following commit id range for the issue:
->>>>>>> 80ab5445da6235..e2f710f97f35
+>>> On Tue, 30 Jul 2024 at 22:05, Wren Turkal <wt@penguintechs.org> wrote:
+>>>>>
+>>>>> Hi Wren,
+>>>>>
+>>>>> Thanks for the report. I was made aware of this yesterday. I had some
+>>>>> more regressions on my plate but with those now fixed, I will take
+>>>>> care of the Bluetooth breakage tomorrow morning.
+>>>>>
+>>>>> Bartosz
+>>>>>
+>>>>>> I will next try Zijun's suggested patch.
 >>>>>>
->>>>>> Narrowed to 80ab5445da6235..586f14a6a182
+>>>>>> wt
+>>>>>> --
+>>>>>> You're more amazing than you think!
 >>>>>>
->>>>> i feel a little sad that QCA6390 of your machine are broken again.
->>>>> i find out a doubtful point by checking recent changes.
->>>>>
->>>>> you maybe have a attempt for below change if you would like to do that.
->>>>> https://patchwork.kernel.org/project/bluetooth/patch/20240730-
->>>>> qca6390_fix-v1-1-e0340a511756@icloud.com/
->>>>>
->>>>> thanks
->>>>>
->>>>>
 >>>>
->>>> Yeah, I am sad that my bluetooth is broken again as well. I am trying
->>>> your patch now to see if it gets my hardware working. Will reply back
->>>> soon.
+>>>> Thanks! If there is anything I can do to help, like test a patch, please
+>>>> feel free to include me. I'd really like to help you, if I can.
 >>>>
 >>>> wt
+>>>> --
+>>>> You're more amazing than you think!
+>>>>
 >>>
->>> This patch does not fix the problem. The first broken commit is
->>> 9a15ce685706e73154. This patch effectively reverts only one part of
->>> that patch.
+>>> The issue Dmitry reported to me happens with qca6174 not qca6390 which
+>>> makes me think it's a different issue after all.
 >>>
->>> FTR, I applied this patch on top of the parent commit of the first
->>> broken commit. I will try it on the tip of mainline as well.
+>>> The laptop you're using is not supported by upstream device-tree, is it?
+>>>
+>>> Is the device tree publicly available?
+>>>
+>>> I'm thinking that - since we switched qca6390 to using the power
+>>> sequencer exclusively in the driver (we could do it as there were no
+>>> DT bindings in place that would say otherwise so no ABI contract) -
+>>> out-of-tree DT sources could potentially stop working. You may need to
+>>> update it to reflect the true internal architecture of the qca6390.
 >>
->> This patch doesn't appear to apply cleanly to the current tip of
->> bluetooth-next/master, so I can't really go further in testing it right
->> now.
+>> Please allow me to point out that QCA6390 supports binding via ACPI
+>> tables? And it might be used on x86 laptops with no device tree.
 >>
-> 
-> my aim is to known which commit cause this issue ASAP since i very care
-> about QCA6390, now i got it, so don't need any further actions any more.
-> 
->> Also, so you know, Bartosz has said that he is aware of the regression
->> and is working on it.
+>> Dell XPS13 9310 is an Intel-based laptop.
 >>
+>> --
+>> With best wishes
+>> Dmitry
 > 
-> i did not notice above info before my last reply, i did not see such
-> info in this discussion thread until your reply as well.
-> 
-> BTW, you maybe add relevant link if you are referring something from
-> another discussion thread.
+> Indeed. I don't know why I assumed it must be an ARM laptop. I will
+> come up with a fix shortly.
 
-The discussion was in a another branch on this thread. I think I added 
-you to the discussion there.
+I have a question, does this fact have anything to do with the problem 
+with failing to intialize the QCA6390 BT hardware on my laptop after a 
+warm reboot? As I didn't understand the connection to DT in that other 
+issue, does this fact change anything about how to approach that issue? 
+I only ask because that issue still very much exists.
 
->> Zijun, you should talk the folks at qualcomm and see if there is any
->> appetite for getting closer to the Linaro folks with regard to this
->> stuff. You have been very eager to jump in, and I see that Bartosz and
->> Luis also seem interested in fixing this. I do wonder if there a way to
->> take advantage of that to build a better working relationship in this
->> bluetooth space with qualcomm and the linux kernel devs.
->>
-> 
-> you maybe ignore that all my reply come from icloud.com, so you maybe
-> not associate it with qualcomm, it is the first time for icloud.com to
-> join BT relevant discussion. (^^)
-
-I'm sorry. I didn't realize you weren't associated with Qualcomm here. 
-Apologies.
-
->> If qualcomm would be interested in hiring a tech person to help with
->> this stuff. I am definitely interested in helping in this area.
->>
->> Thanks,
->> wt
-> 
-
+wt
 -- 
 You're more amazing than you think!
 
