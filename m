@@ -1,151 +1,91 @@
-Received: from mail-pg1-f176.google.com (mail-pg1-f176.google.com [209.85.215.176])
+Received: from mail-yw1-f176.google.com (mail-yw1-f176.google.com [209.85.128.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A2411EB4A6
-	for <linux-bluetooth@vger.kernel.org>; Thu,  1 Aug 2024 07:59:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 571221EB490
+	for <linux-bluetooth@vger.kernel.org>; Thu,  1 Aug 2024 08:09:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722499163; cv=none; b=gJf/uaG092hn+YACMTri00/IsQV+D6l23asIz49Ai51RvbBOhTxZi499vA3rCP+T63lByMiSaFPhIMtJ2ryHdV4KD/tdyPCugqbWdcYvWOR36IYJedKjYw7kDpOlZiq/+oCZpcrXWgMgROiXlVUp+kcdH+7nRf7Rxho2OgP+huo=
+	t=1722499757; cv=none; b=r69e0XHF5tarxO8A1/DLfUHLH604n9ehLCH+V4G9WPy4z8valQbJ74S2uvKSx8Nlv3Vk8WjBl7jkZCqY4Io23GEHWzEupTyW26I/4dBnQ5WshJgAO6Ad1+eCwYN/X0/LBUugmN3Q/54e0FzfCOOrJ3Gvb0LKEz/zlfiWiDZmuZ4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722499163; c=relaxed/simple;
-	bh=TdGc8HYman/AsKmvU2SzEFOJP3JzH2NV9z5CHhgu7fU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=DF5zHY7aNoISw+vD/5ZBVJImKHS6yi6EvGbAYgP5TG5it0BjhgDGbb/Oj5DDulX/JvwOKlVzbbn+Hi3j1AuLHtIuGYzP2ztBr3jSGtTgzttIBRlfwix5O4KPuA50auUi6n5m3+ZqfaxKhKiyN6C/SlUZMyRutbsQjeG0YAUdvXw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=penguintechs.org; spf=pass smtp.mailfrom=penguintechs.org; dkim=pass (1024-bit key) header.d=penguintechs.org header.i=@penguintechs.org header.b=FWqAz+/e; arc=none smtp.client-ip=209.85.215.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=penguintechs.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=penguintechs.org
+	s=arc-20240116; t=1722499757; c=relaxed/simple;
+	bh=IvkcJPRsLJL/kSY9pOtqT+Uo6JQwIJNeaSIruS8V99A=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=hZW+9xg8QrOqLsPiFgq2pMU6K5GY+0lucpelAaQU2wYK3p5ZXfA9nnQ+KCr7bg7i4A+2h7sZlGkOZyDMu+bEylQok1b/+tnddhG+5y+6WVVztCIks2XZoTD4/7wtJBPSHTPO0wzpX/r5TZEL9LOWhvZbNBNiCimSZ6uZVaAinYc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=VVZwjp2a; arc=none smtp.client-ip=209.85.128.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=penguintechs.org header.i=@penguintechs.org header.b="FWqAz+/e"
-Received: by mail-pg1-f176.google.com with SMTP id 41be03b00d2f7-7a92098ec97so4522896a12.2
-        for <linux-bluetooth@vger.kernel.org>; Thu, 01 Aug 2024 00:59:21 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="VVZwjp2a"
+Received: by mail-yw1-f176.google.com with SMTP id 00721157ae682-661d7e68e89so15404267b3.0
+        for <linux-bluetooth@vger.kernel.org>; Thu, 01 Aug 2024 01:09:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=penguintechs.org; s=google; t=1722499161; x=1723103961; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=jxEMkiW5AF7hanjXSFu4zgg/RDegXqyfXH+v23bN8d8=;
-        b=FWqAz+/er0Hzf0viBuyPCAG8HYiVNhUAH+SAULIIPJS8g+jo6tat1w8unuH2TMsCB1
-         1wz4wnkyrfxW38HdU0IrYTb6o9ZTZNmrcLkoiJ8Ta2g8FFxJJilt6YgjwmlpOSjEwebe
-         OPkGedLkjGf9JBrU0le0bPXFUTUdseMDKyZa4=
+        d=linaro.org; s=google; t=1722499754; x=1723104554; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=IvkcJPRsLJL/kSY9pOtqT+Uo6JQwIJNeaSIruS8V99A=;
+        b=VVZwjp2aQ/HCmTcHD7mxkPBzmQTjRUVU1j5v7AZt1Kr8kN+el6NWZ+9NzqPeIeV26I
+         qbUQDyISa0cdKTA2qdVv5gc79f7EW3pGC9FnqvIzKkWvx2rA9cA96FmRup0H30mNvfQl
+         MOOyp5+FqsPiyVRm1nwUf5fkh/Z0wQbxo4Lzqj0NYdPUJwc0MUR9J1cDFovcIAZtjCZ4
+         YQVgWHlyNMJnMVV5ODJxviOJGZzHgQhrKro8b20T39RQ1Liea8C3fAb5r4jEoxD0Jk2f
+         jAMtT5w2qHeV4cb6p0AS6qp/3Kn1w4NuJwOKTaNNdS9tWPGGziPyBpJbfFth45CidJdG
+         3E/A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722499161; x=1723103961;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=jxEMkiW5AF7hanjXSFu4zgg/RDegXqyfXH+v23bN8d8=;
-        b=MX0CRvRD7T+FzCDlPz0TMMMpojUJIxRVfXk8mPpkcZ0j0/F3EIyp++YxwYHqAps+cI
-         Sf+ufpVlyKn5DnsS12e0o6rABOvKMgdj3HE/Lsh7InqVsgViE6hmOG5DlIbbwaBpj8O/
-         TBpZqm2XKfyxc5HDdQ8D7KScQnoRZnLbaKqUgjuXvA2G/n0K8991gyICYY+7Dqk9YpLu
-         WELvYWQWICHAntAxBTHf+vg//R0reZ0hdBUMKLklVzpHv8IzbXimIKdR272usAMZbAeq
-         xuUsHKW/8agFo6gyvvqvhg+DkdCEWbBrRQL98QYIytBdwP7mRTS7ziBqG3EYzIvy3DpY
-         MOWg==
-X-Forwarded-Encrypted: i=1; AJvYcCU1VrGvmjREDGhL3VVA7tM7ODYcXG4sJKnu3KrpGe8q4SNpdH+kDuCDg2RxN35fmslqt62CbedFRD3r+rGgRD4y+kYfPaE/IM0KX9RjrEEn
-X-Gm-Message-State: AOJu0Yy+zK3NXFnPRfUVvJ4Xkzs3PPUmEJkAxyG7paDfcnBvpg/aRwm1
-	5FtsByuk28v9u5vRHHs1WwESrphb0sitFKN8O7mTuaSWul9Pglo+vkT/6WZEiA==
-X-Google-Smtp-Source: AGHT+IEOCORlO9v8f2Cef2WdUTK+a0Et3fsMg1FKbsHm226CDreMtIirqXY/8gQD3JPdzykqndfjew==
-X-Received: by 2002:a05:6a21:9990:b0:1c0:f0c1:5d45 with SMTP id adf61e73a8af0-1c68d125490mr2297955637.44.1722499160638;
-        Thu, 01 Aug 2024 00:59:20 -0700 (PDT)
-Received: from ?IPV6:2601:646:8700:dd30:5f3e:5ba7:e0ea:9a08? ([2601:646:8700:dd30:5f3e:5ba7:e0ea:9a08])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2cfdc405f4asm2623873a91.11.2024.08.01.00.59.19
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 01 Aug 2024 00:59:20 -0700 (PDT)
-Message-ID: <3dc56ebc-d378-4ba0-aed8-03c93e0aea20@penguintechs.org>
-Date: Thu, 1 Aug 2024 00:59:18 -0700
+        d=1e100.net; s=20230601; t=1722499754; x=1723104554;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=IvkcJPRsLJL/kSY9pOtqT+Uo6JQwIJNeaSIruS8V99A=;
+        b=VxuGymidVoACtspvkXm0Zw1DOKIxJATABlV3h97fpXy74sbmj9Bzus85duPn/j0ljs
+         HEn0IMz1xJEYgK9Rlczi7fU2s0rnlwVKlle40KIdmRHf+nC0XaOyo20//SV02LIaQYXh
+         6MEkmmWci8XaPm2L2y7IeeyFPZrkq/fyLxLnddAtABM0lDA2gU7cPqi1X8zvffHvVImh
+         cs+MYB2XMHUZngYy8fH1KHZHr1rHMrqY+l1m408oHCqXaAvHFenR/AqVmoxlu+uPuve0
+         MLh+XPdPnRmmKluW+jnQv14fOC1w8q1nUQJWUQEdAyqsk6JH60fcyooMdfbCzuzmWyh9
+         47Ug==
+X-Forwarded-Encrypted: i=1; AJvYcCUD+iAQUtalQGCsa4JQdJ1OCb99mXWR+0CRYa5GmL4yrjdBxNJ6MWMjZpg453q3eb1YAmeX3GXcl8QE+Jeuxv+wob/9v+CS9yBJvaUUSMp5
+X-Gm-Message-State: AOJu0Yy452ENELFexILPLGLh/6gMfFzSglts8OEMUmokNU8otcWnKdkx
+	YhhG6pMvXlPQGuq0kKd6S9kG7Eavv41s5L+tYjiWxZ3rj4qqReUTvqMUMldYnrdkro4tCZb9XSA
+	zRfyV161hnPYVFj3BK6knXadGTYprPZhCApqsPQ==
+X-Google-Smtp-Source: AGHT+IGz0UyhAohu1QAtEh045Ksj+CKA+FhvPQd6DNHDRe8vkEM2HwS0qZ/5aGELfcDkyVK9kf/1Bo1bIn/SIhPuYV0=
+X-Received: by 2002:a81:b40a:0:b0:644:4a1c:1868 with SMTP id
+ 00721157ae682-688556cfd66mr3426677b3.24.1722499754277; Thu, 01 Aug 2024
+ 01:09:14 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: QCA6390 broken in current kernel
-To: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
- Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
-Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
- Zijun Hu <quic_zijuhu@quicinc.com>, linux-bluetooth@vger.kernel.org
 References: <27e6a6c5-fb63-4219-be0b-eefa2c116e06@penguintechs.org>
  <CABBYNZ+vVFUm1Tb+BvViYMJd6XQczTYPgyO++GGbCcWrkaC4Kg@mail.gmail.com>
- <30319168-9456-49dd-be27-480b2a068fe3@penguintechs.org>
- <1a519b2f-f5cf-40b3-8223-162dc04f8ca8@penguintechs.org>
- <21645f07-da90-4441-8dbb-d999298165e9@penguintechs.org>
- <b1061ec0-5f8f-44af-8955-2d6fa11f94b3@penguintechs.org>
+ <30319168-9456-49dd-be27-480b2a068fe3@penguintechs.org> <1a519b2f-f5cf-40b3-8223-162dc04f8ca8@penguintechs.org>
+ <21645f07-da90-4441-8dbb-d999298165e9@penguintechs.org> <b1061ec0-5f8f-44af-8955-2d6fa11f94b3@penguintechs.org>
  <CACMJSet3H3B1rz2eZyxUr_ySUOdhTkAognfKpFZ=Kzto8UsxMQ@mail.gmail.com>
- <534cff38-7bbf-4e9d-90c5-c4a4ba331a8e@penguintechs.org>
- <CACMJSett7WOHWnfNGwtWL0sQQ3K9rqr08W9KDF5U=rJbpBZfzA@mail.gmail.com>
+ <534cff38-7bbf-4e9d-90c5-c4a4ba331a8e@penguintechs.org> <CACMJSett7WOHWnfNGwtWL0sQQ3K9rqr08W9KDF5U=rJbpBZfzA@mail.gmail.com>
  <CAA8EJprdmXfJYx2xk5fcV4UgWqeBPekrgv1iv7F7FugaBH6=KA@mail.gmail.com>
- <CACMJSesML_Q-Z79XyAZd0sJuE=AbGQ-TWozPWTRmdF3sMh7VHg@mail.gmail.com>
-Content-Language: en-US
-From: Wren Turkal <wt@penguintechs.org>
-In-Reply-To: <CACMJSesML_Q-Z79XyAZd0sJuE=AbGQ-TWozPWTRmdF3sMh7VHg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+ <CACMJSesML_Q-Z79XyAZd0sJuE=AbGQ-TWozPWTRmdF3sMh7VHg@mail.gmail.com> <3dc56ebc-d378-4ba0-aed8-03c93e0aea20@penguintechs.org>
+In-Reply-To: <3dc56ebc-d378-4ba0-aed8-03c93e0aea20@penguintechs.org>
+From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+Date: Thu, 1 Aug 2024 10:09:03 +0200
+Message-ID: <CACMJSetaLXr8a9ffpSN3GpH6YOcHn-o2seL4fj9q6iFbfEUxDg@mail.gmail.com>
+Subject: Re: QCA6390 broken in current kernel
+To: Wren Turkal <wt@penguintechs.org>
+Cc: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>, 
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Zijun Hu <quic_zijuhu@quicinc.com>, 
+	linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-Bart,
+On Thu, 1 Aug 2024 at 09:59, Wren Turkal <wt@penguintechs.org> wrote:
+> >
+> > Indeed. I don't know why I assumed it must be an ARM laptop. I will
+> > come up with a fix shortly.
+>
+> I have a question, does this fact have anything to do with the problem
+> with failing to intialize the QCA6390 BT hardware on my laptop after a
+> warm reboot? As I didn't understand the connection to DT in that other
+> issue, does this fact change anything about how to approach that issue?
+> I only ask because that issue still very much exists.
+>
 
-On 7/31/24 2:05 AM, Bartosz Golaszewski wrote:
-> On Wed, 31 Jul 2024 at 10:55, Dmitry Baryshkov
-> <dmitry.baryshkov@linaro.org> wrote:
->>
->> On Wed, 31 Jul 2024 at 11:51, Bartosz Golaszewski
->> <bartosz.golaszewski@linaro.org> wrote:
->>>
->>> On Tue, 30 Jul 2024 at 22:05, Wren Turkal <wt@penguintechs.org> wrote:
->>>>>
->>>>> Hi Wren,
->>>>>
->>>>> Thanks for the report. I was made aware of this yesterday. I had some
->>>>> more regressions on my plate but with those now fixed, I will take
->>>>> care of the Bluetooth breakage tomorrow morning.
->>>>>
->>>>> Bartosz
->>>>>
->>>>>> I will next try Zijun's suggested patch.
->>>>>>
->>>>>> wt
->>>>>> --
->>>>>> You're more amazing than you think!
->>>>>>
->>>>
->>>> Thanks! If there is anything I can do to help, like test a patch, please
->>>> feel free to include me. I'd really like to help you, if I can.
->>>>
->>>> wt
->>>> --
->>>> You're more amazing than you think!
->>>>
->>>
->>> The issue Dmitry reported to me happens with qca6174 not qca6390 which
->>> makes me think it's a different issue after all.
->>>
->>> The laptop you're using is not supported by upstream device-tree, is it?
->>>
->>> Is the device tree publicly available?
->>>
->>> I'm thinking that - since we switched qca6390 to using the power
->>> sequencer exclusively in the driver (we could do it as there were no
->>> DT bindings in place that would say otherwise so no ABI contract) -
->>> out-of-tree DT sources could potentially stop working. You may need to
->>> update it to reflect the true internal architecture of the qca6390.
->>
->> Please allow me to point out that QCA6390 supports binding via ACPI
->> tables? And it might be used on x86 laptops with no device tree.
->>
->> Dell XPS13 9310 is an Intel-based laptop.
->>
->> --
->> With best wishes
->> Dmitry
-> 
-> Indeed. I don't know why I assumed it must be an ARM laptop. I will
-> come up with a fix shortly.
+Can you remind me if you had bisected it to a specific offending commit?
 
-I have a question, does this fact have anything to do with the problem 
-with failing to intialize the QCA6390 BT hardware on my laptop after a 
-warm reboot? As I didn't understand the connection to DT in that other 
-issue, does this fact change anything about how to approach that issue? 
-I only ask because that issue still very much exists.
-
-wt
--- 
-You're more amazing than you think!
-
+Bart
