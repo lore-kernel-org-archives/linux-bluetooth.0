@@ -1,85 +1,59 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from nuclearsunshine.com (nuclearsunshine.com [81.187.79.3])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 378B6380;
-	Sat,  3 Aug 2024 01:04:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CAC1101EC
+	for <linux-bluetooth@vger.kernel.org>; Sat,  3 Aug 2024 21:50:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=81.187.79.3
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722647065; cv=none; b=URekHMl0hvJ2ovkSlGpSOz3tz0hg2WNy/Y7hy9YJzg39pRLAkP6gFv16ODBm1lEcjZsVec3JRS/vhBm2Ea/dkBqX3QrHiQagdBqPAxfZouSwp4oMMMUtppAOTn0qgm8+LnrISrNVgvrBCGOQS2J0ZsBSYzBPfUpjRKL6rV/YOjQ=
+	t=1722721814; cv=none; b=NQeqsAQkzWy3hoJQ7uXZc0AX79aLuyJ9paSG9ZCB6+WuXui6LYZaMAJpKQcqLpWh0MurIXlPnmwMGvehOnY7sJfmX7Yi72Q8TxJfz4K33m7zdj1Fq6FjsORPsVhYkxuLRJmfbDFPonPw5ICyKVB8Fe/qipIzzujwHcDWm2DNhuM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722647065; c=relaxed/simple;
-	bh=o4qoXIl8hP6PXLbezXZCU7oESBWmoZAHNWU1VqWVoPI=;
-	h=Message-ID:Content-Type:MIME-Version:In-Reply-To:References:
-	 Subject:From:Cc:To:Date; b=s3kSzJBvBh6vfOcNF6LATdHkkmVOvOQ60xvlZ8JzO1qU65bEIVKkv0xRU4x0E9/rKPHsdlqa7p8JfGfnaRCJy3CljmgQOuF1M9CmfERwoOT0MD6jx+23Eua6DFsqc2miaFYzXlXoREViXnsRnbH0AOwPPFev+uZeyTDpwJVwJmE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gAofaV60; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gAofaV60"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 914ACC32782;
-	Sat,  3 Aug 2024 01:04:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1722647064;
-	bh=o4qoXIl8hP6PXLbezXZCU7oESBWmoZAHNWU1VqWVoPI=;
-	h=In-Reply-To:References:Subject:From:Cc:To:Date:From;
-	b=gAofaV60abe4akulSSdrBLcUmRozKJ7S522cOTHAEWUziciGY7WZx18NbNEtM5XA+
-	 LMBr+QOmRxm26zoaLqlPrE6y++1yyO85bxTcMVpesWtKnVUOa2YfzLVu9middUyOM3
-	 k+mJPwDX8qCJBXLvhqeMXLJvYK+e22fbR+3ldpguMtK2gwDQ3AltcX6cq9HpsXT3jM
-	 KtBMXdyUUMUh7o9bAJOR7tLPOomOtkT59YYvHTzEBjFZt19eDY1tP3ITFXm6Qu888g
-	 pxO2sGHVfZ42qBHtXIR4RG5mWgzZ9UxKLeqsTd1EdXvaI7NTi5XEPchfEzVuUxTWTz
-	 KH/Ijv6a3bGqw==
-Message-ID: <4b41be0c9874c5873c0cf4b6e210812d.sboyd@kernel.org>
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1722721814; c=relaxed/simple;
+	bh=YsMxTve02Pdsve2FO+JNP7kgVwVrQvXBg4hfrCHG/8w=;
+	h=Message-ID:Subject:From:To:Date:Content-Type:MIME-Version; b=gBlBtvvcthJ5dPA7HcayhWhVRI/6hg6bvo7kVnuI2d0ebTaUiMUBM14w5LRD9bzIERevPRQf1mleBCbBQpmiWvljXemTdw9j1fca47F6DUaVcS1h4uZ4aM5gb47YLcnTjKFe54ndK3Vw+05cWC7OVl7uS8k6UVtchAZ8e/k9ROY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nuclearsunshine.com; spf=pass smtp.mailfrom=nuclearsunshine.com; arc=none smtp.client-ip=81.187.79.3
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nuclearsunshine.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nuclearsunshine.com
+Received: from desktop.internal.chaoschild.com (desktop.internal.chaoschild.com [192.168.1.2])
+	by chaoschild.com (Postfix) with ESMTPSA id BC0A817631DC
+	for <linux-bluetooth@vger.kernel.org>; Sat,  3 Aug 2024 22:44:50 +0100 (BST)
+Message-ID: <a2cd95d91354168876eab963bb7e1cfa1b31e985.camel@nuclearsunshine.com>
+Subject: [PATCH 1/1] Bluetooth: btusb: add 13d3/3608 VID/PID for MT7925
+From: Nuclear Sunshine <kernel-2024-q3@nuclearsunshine.com>
+To: linux-bluetooth@vger.kernel.org
+Date: Sat, 03 Aug 2024 22:44:50 +0100
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.52.3 (3.52.3-1.fc40) 
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <20240801-clk-new-helper-v1-1-81e9338b7b17@linaro.org>
-References: <20240801-clk-new-helper-v1-0-81e9338b7b17@linaro.org> <20240801-clk-new-helper-v1-1-81e9338b7b17@linaro.org>
-Subject: Re: [PATCH RFC 1/2] clk: provide devm_clk_get_optional_enabled_with_rate()
-From: Stephen Boyd <sboyd@kernel.org>
-Cc: linux-clk@vger.kernel.org, linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org, Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-To: Bartosz Golaszewski <brgl@bgdev.pl>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Marcel Holtmann <marcel@holtmann.org>, Michael Turquette <mturquette@baylibre.com>, Russell King <linux@armlinux.org.uk>
-Date: Fri, 02 Aug 2024 18:04:22 -0700
-User-Agent: alot/0.10
 
-Quoting Bartosz Golaszewski (2024-08-01 08:58:49)
-> diff --git a/drivers/clk/clk-devres.c b/drivers/clk/clk-devres.c
-> index 90e6078fb6e1..34e800525e21 100644
-> --- a/drivers/clk/clk-devres.c
-> +++ b/drivers/clk/clk-devres.c
-> @@ -99,6 +99,34 @@ struct clk *devm_clk_get_optional_enabled(struct devic=
-e *dev, const char *id)
->  }
->  EXPORT_SYMBOL_GPL(devm_clk_get_optional_enabled);
-> =20
-> +struct clk *devm_clk_get_optional_enabled_with_rate(struct device *dev,
-> +                                                   const char *id,
-> +                                                   unsigned long rate)
-> +{
-> +       struct clk *clk;
-> +       int ret;
-> +
-> +       clk =3D __devm_clk_get(dev, id, clk_get_optional, NULL,
-> +                            clk_disable_unprepare);
-> +       if (IS_ERR(clk))
-> +               return ERR_CAST(clk);
-> +
-> +       ret =3D clk_set_rate(clk, rate);
-> +       if (ret)
-> +               goto out_put_clk;
-> +
-> +       ret =3D clk_prepare_enable(clk);
-> +       if (ret)
-> +               goto out_put_clk;
-> +
-> +       return clk;
-> +
-> +out_put_clk:
-> +       devm_clk_put(dev, clk);
-> +       return ERR_PTR(ret);
-> +}
-> +EXPORT_SYMBOL(devm_clk_get_optional_enabled_with_rate);
+The VID/PID are as seen for this chipset in the Asus Zenbook S 16
+(UM5606), and have been successfully tested with the mt7925e driver.
 
-GPL
+Signed-off-by: Nuclear Sunshine <kernel-2024-q3@nuclearsunshine.com>
+---
+ drivers/bluetooth/btusb.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index acdba5d77694..fccefa57506a 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -696,6 +696,9 @@ static const struct usb_device_id quirks_table[] =3D {
+ 	{ USB_DEVICE(0x13d3, 0x3603), .driver_info =3D BTUSB_MEDIATEK |
+ 						     BTUSB_WIDEBAND_SPEECH |
+ 						     BTUSB_VALID_LE_STATES },
++	{ USB_DEVICE(0x13d3, 0x3608), .driver_info =3D BTUSB_MEDIATEK |
++						     BTUSB_WIDEBAND_SPEECH |
++						     BTUSB_VALID_LE_STATES },
+=20
+ 	/* Additional Realtek 8723AE Bluetooth devices */
+ 	{ USB_DEVICE(0x0930, 0x021d), .driver_info =3D BTUSB_REALTEK },
+--=20
+2.45.2
+
+
