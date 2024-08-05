@@ -1,33 +1,28 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06BCFA934;
-	Mon,  5 Aug 2024 05:31:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EBB11109
+	for <linux-bluetooth@vger.kernel.org>; Mon,  5 Aug 2024 05:57:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722835908; cv=none; b=XOA5nUAurUnxWiWHN4PO98YdTbCIvanMlIXmkOnhP/9zYmbFG5PNHvi0ypJ5EIA5iptssCqg14rtKeQYiA6PId7Q8rg/wF4Pd3Z4XvQDVLrHsP0UxZMeruZLoklh/7vwkHHPM+e8ETufL+4F5/HSNKSuNvraN1g7jnwDHxbkOd0=
+	t=1722837467; cv=none; b=rcLhs8XZfnEsd4J8xS4hOTWqz3bg+CnHem1i3A9YbQcD8mnTavOhSzu9yla7G9Qow6ChX3sEX38eekyG4PlHajOSnCx94Z38se7QUWlBlmypyiP0Jc/cIaGWQeYTRQTQQwrox4PX1E2bANiOfS26hTlJYqAJpROLjU/8mesqkek=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722835908; c=relaxed/simple;
-	bh=n3NtmQvJlQ5vB+svvAz6BIt3hbOaafeeRuHejPZS0Lk=;
+	s=arc-20240116; t=1722837467; c=relaxed/simple;
+	bh=V32I50FtNfnjVyOG36bvNCQzTNYVY5m4YoZWhmaDb5I=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Uba7KRwonkbiUZSlJv1Pv7S61nCXLxJWjfdgwXJRQdOpPBi6R4bORPTlJTAsaroBFuHp634uPudv/QlzWuqaRhpKORDb7DIW24oy76dvr2AffFQzzTHlMv5+bCMClD464qDC4+gnSPvtU6axQ4NbcYxE9RqHOoQFec8Tpo54Ldk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uUoVgU1I; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uUoVgU1I"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CCD75C32782;
-	Mon,  5 Aug 2024 05:31:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1722835907;
-	bh=n3NtmQvJlQ5vB+svvAz6BIt3hbOaafeeRuHejPZS0Lk=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=uUoVgU1IA43v6CTc3Sy3VJAcq7OAXmSbZxQl1jcwo+1kNYbj5Mya6jEZZw72NiZ0e
-	 YVCHVxC3fwt7lh+J+pSTSS7cY2aNUWsasYJPTtOPJF+ybpq35YdhSWKQP1r3XfQJU0
-	 hi9q4r1T++C0Wet4ltHiYFP/zTXAHgTslwn9zHWz8S4fqoCvlr2ls6s9uaePc21yGz
-	 pDCk7LLt9owU8QPwR0f8KZt/RBNuHh5g9kimepEH4QtXNgkCw1TOP89huRqi65Qhtr
-	 gexEP7pGbP0KladU1LHjNIZBE17SV2vooAcC6QcIGURFudiIlZhzUEnJctuS9ZQpXw
-	 7/E72kEnaUo8Q==
-Message-ID: <88d08de1-ce0f-4fe2-975b-29e451f5659e@kernel.org>
-Date: Mon, 5 Aug 2024 07:31:39 +0200
+	 In-Reply-To:Content-Type; b=WhEZm3gbqpCa0mPWTXBqUQO2MPxHibjeU8Acvqj/TGXhwHHUFIvqFoZ41hw0pWaoJXXbfNeG8s8ZLEF7rjF3dbH5AFpYzXF/qmWEKCkJqfywmlmAjrBd7nrXsNufs/V3deNdLa9WZHDw4rwMOIhj6HbrgAzUuYwrWRHDhFDht2w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
+Received: from [192.168.0.224] (ip5f5aeb91.dynamic.kabel-deutschland.de [95.90.235.145])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 3D89161E646D5;
+	Mon,  5 Aug 2024 07:57:30 +0200 (CEST)
+Message-ID: <b6dde53d-d897-4175-ac25-40398a6e721a@molgen.mpg.de>
+Date: Mon, 5 Aug 2024 07:57:23 +0200
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -35,95 +30,64 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 4/4] Bluetooth: hci_qca: add compatible for QCA9379
-To: Felix Kaechele <felix@kaechele.ca>, Marcel Holtmann
- <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Conor Dooley <conor+dt@kernel.org>, Kalle Valo <kvalo@kernel.org>,
- Jeff Johnson <jjohnson@kernel.org>, Ulf Hansson <ulf.hansson@linaro.org>,
- Balakrishna Godavarthi <quic_bgodavar@quicinc.com>,
- Rocky Liao <quic_rjliao@quicinc.com>
-Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-wireless@vger.kernel.org, ath10k@lists.infradead.org,
- linux-mmc@vger.kernel.org
-References: <20240805040131.450412-1-felix@kaechele.ca>
- <20240805040131.450412-5-felix@kaechele.ca>
-From: Krzysztof Kozlowski <krzk@kernel.org>
+Subject: Re: [PATCH] Bluetooth: btusb: Add USB HW ID for ASUS Zenbook S 16.
+To: Bas Nieuwenhuizen <bas@basnieuwenhuizen.nl>
+Cc: luiz.dentz@gmail.com, marcel@holtmann.org,
+ linux-bluetooth@vger.kernel.org,
+ Nuclear Sunshine <kernel-2024-q3@nuclearsunshine.com>
+References: <20240804195319.3499920-1-bas@basnieuwenhuizen.nl>
 Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 fv0=
-In-Reply-To: <20240805040131.450412-5-felix@kaechele.ca>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <20240804195319.3499920-1-bas@basnieuwenhuizen.nl>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On 05/08/2024 06:01, Felix Kaechele wrote:
-> The QCA9379 (Naples) is a WiFi and Bluetooth SoC in the QCA6174 (Rome)
-> family. As such it is supported by this driver.
-> 
-> According to the naming format defined in the code, the driver will
-> request the following firmware files for a QCA9379-3:
-> - nvm_00150100.bin
-> - rampatch_00150100.bin
-> 
-> Signed-off-by: Felix Kaechele <felix@kaechele.ca>
+Dear Bas,
+
+
+Thank you for your patch. I’d mention Mediatek and remove the dot at the 
+end in the commit message summary/title.
+
+
+Am 04.08.24 um 21:53 schrieb Bas Nieuwenhuizen:
+> Variant UM5605WA,  which uses MT7925 with this device. With
+
+Just use one space after the comma?
+
+> this patch I was able to pair my earbuds. I don't know what
+> other testing is needed here.
+
+I think it’s common to include the output of 
+`/sys/kernel/debug/usb/devices`.
+
+> Signed-off-by: Bas Nieuwenhuizen <bas@basnieuwenhuizen.nl>
 > ---
->  drivers/bluetooth/hci_qca.c | 1 +
->  1 file changed, 1 insertion(+)
+>   drivers/bluetooth/btusb.c | 4 ++++
+>   1 file changed, 4 insertions(+)
 > 
-> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-> index ca6466676902..06895bafd3b6 100644
-> --- a/drivers/bluetooth/hci_qca.c
-> +++ b/drivers/bluetooth/hci_qca.c
-> @@ -2690,6 +2690,7 @@ static const struct of_device_id qca_bluetooth_of_match[] = {
->  	{ .compatible = "qcom,qca6174-bt" },
->  	{ .compatible = "qcom,qca6390-bt", .data = &qca_soc_data_qca6390},
->  	{ .compatible = "qcom,qca9377-bt" },
-> +	{ .compatible = "qcom,qca9379-bt" },
+> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+> index 789c492df6fa..b5fdc0f3c341 100644
+> --- a/drivers/bluetooth/btusb.c
+> +++ b/drivers/bluetooth/btusb.c
+> @@ -695,6 +695,10 @@ static const struct usb_device_id quirks_table[] = {
+>   	{ USB_DEVICE(0x13d3, 0x3603), .driver_info = BTUSB_MEDIATEK |
+>   						     BTUSB_WIDEBAND_SPEECH |
+>   						     BTUSB_VALID_LE_STATES },
+> +	{ USB_DEVICE(0x13d3, 0x3608), .driver_info = BTUSB_MEDIATEK |
+> +						     BTUSB_WIDEBAND_SPEECH |
+> +						     BTUSB_VALID_LE_STATES },
+> +
+>   
+>   	/* Additional Realtek 8723AE Bluetooth devices */
+>   	{ USB_DEVICE(0x0930, 0x021d), .driver_info = BTUSB_REALTEK },
 
-Let's don't grow this that way. Use existing fallback.
+I just noticed that Nuclear Sunshine sent the same diff [1].
 
-Best regards,
-Krzysztof
 
+Kind regards,
+
+Paul
+
+
+[1]: 
+https://lore.kernel.org/all/53ccc7377341b64ff3fbdde3df28cbd14f245340.camel@nuclearsunshine.com/
