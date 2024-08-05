@@ -1,169 +1,104 @@
-Received: from mail-lj1-f178.google.com (mail-lj1-f178.google.com [209.85.208.178])
+Received: from mail-oo1-f53.google.com (mail-oo1-f53.google.com [209.85.161.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA4E7155743
-	for <linux-bluetooth@vger.kernel.org>; Mon,  5 Aug 2024 15:37:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C346017C64
+	for <linux-bluetooth@vger.kernel.org>; Mon,  5 Aug 2024 16:39:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722872264; cv=none; b=oqMtljvfzkU14/TgH2whYJzgopJ8G1H7IbXKqFHVS1PfUxw+UkaZ/K1jS/pfF7r19UoezKN5TId5rv6oeNnfoUCbG8bLrnA9EdKMcHX3YwZEYuocMz5dbBRKMQ+wzuE6V3fi0rkctGZnjWWw2yNpevqCBcfBVx2QOIx4S4u3gBE=
+	t=1722875959; cv=none; b=XV4SOOfO2GLkmYWk/pDtGn6BviDmvGqgDN66qcc1Bafab6c4tZVXcng73ArkERpsQ9i+/8lMsot/aEfgsZlrUMmxVGLlv5H828isRrgAQ8UIgMaSvMEtdfOcOrsF3KH7WYviicnR7ZmzI5kPJgZ9ArD/G9/Q9SjG9HHJH5qlFVo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722872264; c=relaxed/simple;
-	bh=vPqT1LsRUhzdz5tX8Igt01zDoqgjDD7BT4lQOT5a82M=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=F0R7riPyOY03zxHZJ/A6UTGmAXNRMzjO0lASUvy+JoJzfGVSffw5zzlR96HfNelVz08/jEe2iXSdH4qgLRqNr861CJlyeBVXuVpLNca7IwyLeMb0qPx9H8kZpNRx83lbozF3mNgVhoROGipVprrTBkVUOTemjjb6XAC/5gPBv+M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ja0RR2HY; arc=none smtp.client-ip=209.85.208.178
+	s=arc-20240116; t=1722875959; c=relaxed/simple;
+	bh=pqHRwMRiG7AbbZx0Ikavn4KVrmthECJYHySxh1UJgwA=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=EKZguQUDySwYMMxkzQ+eeHK0SdQCzlaKrVShgytMMw76Z44TWqt4LyKVb34OeYYw7id8mh2v9DQ/LMHh/NvPn/jOc1gLL5LMlKRLT8GuPUpm27Dy3ETdN0waLhlx5RUEPMyVFqLDNIbtfoz6EnuSypna3CzPz/BMz71dcd+W0Z8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=a/8ngYHe; arc=none smtp.client-ip=209.85.161.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ja0RR2HY"
-Received: by mail-lj1-f178.google.com with SMTP id 38308e7fff4ca-2f029e9c9cfso158449531fa.2
-        for <linux-bluetooth@vger.kernel.org>; Mon, 05 Aug 2024 08:37:42 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="a/8ngYHe"
+Received: by mail-oo1-f53.google.com with SMTP id 006d021491bc7-5d5c324267aso5722926eaf.0
+        for <linux-bluetooth@vger.kernel.org>; Mon, 05 Aug 2024 09:39:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1722872261; x=1723477061; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=vPqT1LsRUhzdz5tX8Igt01zDoqgjDD7BT4lQOT5a82M=;
-        b=ja0RR2HYlGLQRVJobY4FQzMCiaAA/f4rR35yi+dIQWtDoYGElLe9p63b/FpJmL8I+t
-         W0kgqc6sJ776BN17bYVAYIRkm+CrJ6YnauIka5cLjYyLj2lPU3VnoKUnhW5B1zEpckgv
-         imHirghZiciMO1xkL/Lejp9kdctrkmi5PTU4NfPCN7aqH+eBgx6Bq0VS748p1spTvUAE
-         fkJf7n2hUbPongdq+7TYKo5v0MvDM20rB8aerrUFIXNXGRdX8S1WQjxJmoVlRZ891vSN
-         Q7a8lplTSiNTFNgLuuIMSy+rwl8pLfpxlJFNuNZdf+qtarQrar/AbRnK7WcBAA/xxTCC
-         27/Q==
+        d=gmail.com; s=20230601; t=1722875957; x=1723480757; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=HBt9R6eO/u+7hu9ZeiPa7c7vbF0b7EWO2ZRjNYd+CiY=;
+        b=a/8ngYHettTBbDl1ASSxhYB4LX2Q8t+zyvsCFX01Vwrfv+wT02pmtX8PtHUk37WAoc
+         IFyAiTlFCMWTLH9XM8jdzoiNRXCJ5Bf0GmXTfrq+H+2AgLCEPOgNrD8xXeQLuuqS++Of
+         9T+yS6YIgdSZPqTGqqdwnY2OYaKdXIsbODY7HPxg124AxT0R46Z8qI0AMjEuHqbb+DiX
+         BAVVebLnbwyjiXwHxgezfPvdPmpHCfUDfIys2OSf4QqtU3CztgL/DlLN7FCXVaBegnie
+         LgEy3cjwxPjisPLs2fa7uFaQJMUIvp5oGQzOxLdiqnCbuxpacatpFVizh4W8weO7FRqS
+         UPTg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722872261; x=1723477061;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=vPqT1LsRUhzdz5tX8Igt01zDoqgjDD7BT4lQOT5a82M=;
-        b=utWYdQutkimBmHdBpYnFHkIF1x6bzQ8Z0fm2TQhOAsqC9PFBa4VTWwkNSmOh7JqURq
-         HAUhXzjS8ObXzowwB69DtO2UnDNUEfJ93KatP7n2x+qLlg/nX92tZR8xFOXeuDdzObf6
-         Wm9MkpegqkOqfsHpZsHaO3vAJH+wbbVp6fHP/4/5nTRHmvXmrxMsKxCtS5Wn+LbGkIhT
-         HKnJ4rfhQAShcGfXkz16OeKmV1vLBoXMbhh9FGFj5N3sU2YY84CZETA8lTKZnz1dz2HH
-         otBsDlRnN+bYlehIOrHDP6IES713MrnQvl9u4LfyfWZeIr2Ijmvmim/2dbx5uajqm2cv
-         FnNQ==
-X-Gm-Message-State: AOJu0Yz/DrlId3a4Wp/RlKNeVLL5+HTVeYRP8FodABZT8z99HtLe1JyL
-	Z59cEZ9WFxc+mSWduCKJGlLA/39ST5D0udN2agu0n3UUUc557MjRc+UYzcks6nvxYhLKdlgNYbL
-	l4CpQN6fERTUVINsxLrjUpsChvG21oGvt
-X-Google-Smtp-Source: AGHT+IH7Tv7powp4HokKk1mED76g8qQY4px9oLJUIkFVDmrfWgVv0lODup2hdLBBkgK6XEqTgalgAmgZ3XqylKJOrrA=
-X-Received: by 2002:a2e:9b03:0:b0:2ef:2422:dc21 with SMTP id
- 38308e7fff4ca-2f15ab5cd3amr94552901fa.43.1722872260613; Mon, 05 Aug 2024
- 08:37:40 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1722875957; x=1723480757;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=HBt9R6eO/u+7hu9ZeiPa7c7vbF0b7EWO2ZRjNYd+CiY=;
+        b=q0Mgd97GUHMd38dxFTCbtlG2gzsySF637A4YQPE9m9vncvzk4uJECiRofk7CvE2LAs
+         YxUpcGWzpyap9gnFV1JGw80Ted6W1rqV63f66BvcC3ZCZplpNv8P0QqKk1ekZgzZUSon
+         U2+WmV2r2yS3e+Z2nmzNV8FZvn4NNqOhqONj4PtmcZUAZTGjWrMf0svxSTWLZNgJIj76
+         JSwHyeUbpmh/ezlWQiHKVO7/qfzNoMqvMMVBuQzpquqQcEtv3J+U5Dv/CGKFn0hY8HeO
+         Ml9dGFlAcpNGPLN1GQX9SQYLn7rSnBY3JDZmjpY0FAvp8OYA6o7JaTELVC8gQbiO+2L7
+         j0rQ==
+X-Gm-Message-State: AOJu0YyWlP0H/5lfiz95lyPd1ab0+0V2vz6DhZ9k0VUl8ty8eRGqzeb8
+	ba8w5Jc0fKAU+DbsyXfqcqhaiVSZp8cvK4Op8CsxFZiGa2ZNKWXqYKsfww==
+X-Google-Smtp-Source: AGHT+IH3qzFUCEkwm1XPVanWyzVqOlAjroJyK4cB6cJCeWbpcf1qjZf4nZVYR3oXWgK2XS6eDISDMw==
+X-Received: by 2002:a05:6358:3419:b0:1ac:fed2:c3eb with SMTP id e5c5f4694b2df-1af3ba3b1femr1396864055d.2.1722875956568;
+        Mon, 05 Aug 2024 09:39:16 -0700 (PDT)
+Received: from [172.17.0.2] ([20.81.159.71])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6bb9c83c6eesm36837586d6.94.2024.08.05.09.39.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 05 Aug 2024 09:39:16 -0700 (PDT)
+Message-ID: <66b10034.050a0220.c122a.adce@mx.google.com>
+Date: Mon, 05 Aug 2024 09:39:16 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============1361737942374917558=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <GVXPR02MB8256E67B738C97EC57D1FA0F9CBE2@GVXPR02MB8256.eurprd02.prod.outlook.com>
- <CABBYNZ+HwmhFhUZsSnhW1KU-cXQhHKGt3xJeCX1sxt6xyBBnHw@mail.gmail.com>
- <CABBYNZLCDU+vQFzdYKoUCKvuWMGUPbjxoHJYCVsE3J1=1i3iww@mail.gmail.com> <GVXPR02MB8256A0C28CB1DECA4A299D679CBE2@GVXPR02MB8256.eurprd02.prod.outlook.com>
-In-Reply-To: <GVXPR02MB8256A0C28CB1DECA4A299D679CBE2@GVXPR02MB8256.eurprd02.prod.outlook.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 5 Aug 2024 11:37:27 -0400
-Message-ID: <CABBYNZJo1mgSF6dyq8XdjK9dtQCRTj7xcgH6ED7m6TrPBtX=vQ@mail.gmail.com>
-Subject: Re: GATT characteristic for only LE or BR/EDR
-To: Alexander Ganslandt <Alexander.Ganslandt@axis.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, iulia.tanasescu@nxp.com
+Subject: RE: Implement the MediaAssistant "Push" command
+In-Reply-To: <20240805120429.67606-2-iulia.tanasescu@nxp.com>
+References: <20240805120429.67606-2-iulia.tanasescu@nxp.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Hi Alexander,
+--===============1361737942374917558==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-On Mon, Aug 5, 2024 at 11:21=E2=80=AFAM Alexander Ganslandt
-<Alexander.Ganslandt@axis.com> wrote:
->
-> Hi Luiz,
->
-> On Mon, Aug 5, 2024 at 15:12 Luiz Augusto von Dentz
-> <luiz.dentz@gmail.com> wrote:
-> > Hi Alexander,
-> >
-> > On Mon, Aug 5, 2024 at 9:04=E2=80=AFAM Luiz Augusto von Dentz
-> > <luiz.dentz@gmail.com> wrote:
-> > >
-> > > Hi Alexander,
-> > >
-> > > On Mon, Aug 5, 2024 at 8:31=E2=80=AFAM Alexander Ganslandt
-> > > <Alexander.Ganslandt@axis.com> wrote:
-> > > >
-> > > > Hello!
-> > > >
-> > > > I found a previous discussion about this here: https://lore.kernel.=
-org/all/59CDEBDF.3090200@digi.com/t/, but there was no conclusion. Now I'm =
-having the same issue 7 years later :)
-> > > >
-> > > > I'm trying to pass BT SIG tests but fail on two test cases: GATT/SR=
-/GAR/BI-34-C and GATT/SR/GAR/BI-35-C. To my understanding, in order to pass=
- these tests, you need to register a GATT characteristic that is readable o=
-nly through LE or BR/EDR, but not both at the same time. However, when I re=
-gister a service+characteristic through bluetoothctl, it is automatically r=
-egistered for both LE and BR/EDR. To verify this, I use gatttool with and w=
-ithout "-p 31" to connect over BR/EDR and LE respectively, and the characte=
-ristic shows up in both. Based on the previous discussion, and based on rea=
-ding the BlueZ API, there doesn't seem to be a way to only support ONE tran=
-sport for a characteristic? Is this conclusion correct?
-> > >
-> > > You can detect what bearer it is connected via:
-> > >
-> > > bluez/doc/org.bluez.GattCharacteristic.rst at master =C2=B7 bluez/blu=
-ez =C2=B7 GitHub
-> > >
-> > > Looks like we are missing one of the options is link which can be
-> > > either LE or BR/EDR:
-> > >
-> > > bluez/src/gatt-database.c at master =C2=B7 bluez/bluez =C2=B7 GitHub
-> >
-> > Here is the commit that added support for it which specifically targets=
- BI-34-C:
-> >
-> > gatt: Add implementation of link option =C2=B7 bluez/bluez@e577e47 =C2=
-=B7 GitHub
-> >
->
-> Many thanks for the info! If I understand this correctly, is the idea to =
-implement a custom GATT server with two characteristics, where you check li=
-nk_type in ReadValue to only allow BR/EDR for one of the characteristics, a=
-nd LE for the other? And if the wrong transport is used you respond with th=
-e error the test expects?
+This is automated email and please do not reply to this email!
 
-Yeah, we could perhaps add support for something like that into
-bluetoothctl directly so we could have a script registering the
-attributes and then responding based on the link type.
+Dear submitter,
 
-> If so, I will try doing this and report back the result if it passes the =
-tests, just for future reference to other poor people that run into this is=
-sue :)
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=876697
 
-Yeah, btw you might be interested in the following discussion as well
-if you are actually planning on qualifying BlueZ:
+---Test result---
 
-https://github.com/orgs/bluez/discussions/817
-
-> > > > If so, how can one pass these BT SIG tests? In the previous thread =
-I linked, the "solution" seemed to be to write an application that simply r=
-ejects the read request for a certain transport, but this seems like more o=
-f a hack than a solution to me. Is there any other solution?
-> > > >
-> > > > Very thankful for any thoughts!
-> > > >
-> > > > Best regards,
-> > > > Alexander
-> > >
-> > >
-> > >
-> > > --
-> > > Luiz Augusto von Dentz
-> >
-> >
-> >
-> > --
-> > Luiz Augusto von Dentz
->
-> BR,
-> Alexander
+Test Summary:
+CheckPatch                    PASS      4.44 seconds
+GitLint                       PASS      3.63 seconds
+BuildEll                      PASS      24.73 seconds
+BluezMake                     PASS      1713.09 seconds
+MakeCheck                     PASS      13.55 seconds
+MakeDistcheck                 PASS      181.30 seconds
+CheckValgrind                 PASS      253.21 seconds
+CheckSmatch                   PASS      357.08 seconds
+bluezmakeextell               PASS      120.23 seconds
+IncrementalBuild              PASS      11308.49 seconds
+ScanBuild                     PASS      1006.70 seconds
 
 
 
---=20
-Luiz Augusto von Dentz
+---
+Regards,
+Linux Bluetooth
+
+
+--===============1361737942374917558==--
