@@ -1,33 +1,56 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9C0515EFAA;
-	Mon,  5 Aug 2024 17:29:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD6FF1D540
+	for <linux-bluetooth@vger.kernel.org>; Mon,  5 Aug 2024 18:48:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722878962; cv=none; b=kdY4qVyIa20ZlV9LrXSgrkO7urxPVU7AdeK35PGwYpMDaUXENeXWydThOUF53i43lBHVU55GKMaei8emvPFItBQPJUUJcnZejYgRROt8IVB0RuhimWh5/QsVcSj4gdpX9Rv2Q++wpXQjQ74HY9EZdOpCK6VSv8fehQYPv+QDSlM=
+	t=1722883684; cv=none; b=Cb+G0AjBm34OlRIfn39fcxXxKHJN6aPi+YRILDSNJ0o2U5BRU18zYklaOlqW7HF3wvcCFyaSASvowAOUeIIBlIzW3RSkTJT4mm3wRBZ7vicAehmpaV1yd8uH+QVRMSfdMHP3Q7IUxdcczr+e7Ir+bUeRc5y/r9YEb9UToOOo6w0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722878962; c=relaxed/simple;
-	bh=6F/aB6kF73WOwcPDI1RWMRuhjTLBsn+Aln5CPPXhX40=;
+	s=arc-20240116; t=1722883684; c=relaxed/simple;
+	bh=2FQvdAEz9c7t59DnbbJlR0dBMhbPZ3sABY47I8zXsxQ=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Se1j/vc64PjzKum4wMkFLD2NaEDGMsH7beCr8v9nkPNmMpHeaXBeVGfxmafkReWhSpp2YlcjlU1iatJRO60rse8UC13XRqo7M+p0FHVHeYh7EADFjkS3MRyAKw84DLNlPUrdzaWnBFPXBUWYK3dJ6jL2Yl1r//K6Ln9F6/+SUyQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YMfvf/ZT; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:Content-Type; b=OhUkfAoYFn9OfOFFpPnHfyLl/t4hSyXMUT+WAM7G7ZpCCjvW4f8GYW5d4SrSEfAxNEGFhLu8YhIhoTgkq15KdS+6fGrw2nJ+le8cCL4HVImNKLlOWvFnUJIhIRaUy6eqDgr7gxNu02cN7ufKNIEIGR/jJ8jP0Vi6dIN7SAoWO7w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=penguintechs.org; spf=pass smtp.mailfrom=penguintechs.org; dkim=pass (1024-bit key) header.d=penguintechs.org header.i=@penguintechs.org header.b=VBzF2hzh; arc=none smtp.client-ip=209.85.214.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=penguintechs.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=penguintechs.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YMfvf/ZT"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C0639C32782;
-	Mon,  5 Aug 2024 17:29:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1722878962;
-	bh=6F/aB6kF73WOwcPDI1RWMRuhjTLBsn+Aln5CPPXhX40=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=YMfvf/ZThBO2tnly4KEbbmCpo80YRUOojmgBJzSyrAqhNSoNsup1mqwPrSPTYc75B
-	 4RMopSTHWJSSsHffIk/R5od6iBalKpHCKTPWeAMnC7A9zz2lX+g3Z11ijCb5cMkF0J
-	 3avjm9BLgIQYX2yvr2M1tRcDFqli47L/6a4JvPI96DozqS/wgoO/yEIwTHA4tmi3fe
-	 XEv9pSV5mdhoe+/OS6LTfAwcjbmr2JcdGEwHLQRjiOzw0GwX2MXZpxpLJS0cxSSf19
-	 byCIoqy8/mUh4yh6COqlnqgZrZ1Bx1fFD6OIumN/ymBh5nxOEJVIwOIKMDxLK0CA76
-	 WbjFDrbeUTkOw==
-Message-ID: <2dee0055-49fe-4920-93d7-5462e88b8096@kernel.org>
-Date: Mon, 5 Aug 2024 19:29:14 +0200
+	dkim=pass (1024-bit key) header.d=penguintechs.org header.i=@penguintechs.org header.b="VBzF2hzh"
+Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-1fd9e6189d5so86303295ad.3
+        for <linux-bluetooth@vger.kernel.org>; Mon, 05 Aug 2024 11:48:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=penguintechs.org; s=google; t=1722883682; x=1723488482; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=HMNhcFmSQ5UcD0HqrK9ywZFFx1lvm5X7nz0EGtEQvgE=;
+        b=VBzF2hzh5hU/UiSpdjKhsfTVWQhSRu8OjFcBULZ8Ze+JKlbEQl8y5E4843XOrhSmEI
+         llzRO4bIc1K8WWCFQMzqvtqNJlkAg7myOpkfdESCAOs31N/UKnVt2UcM0WD6AD0jikMh
+         BAc94Iu9WVBtAd8DFuZMI3j04NUFKpO6lbrqU=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1722883682; x=1723488482;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=HMNhcFmSQ5UcD0HqrK9ywZFFx1lvm5X7nz0EGtEQvgE=;
+        b=KfL9yEDfrT29oe+ee9qB26b9PiiDCrpupdQUJOJNFPBnnpcZ595ufbZeNauG4+U48U
+         RxDehFj66KkURhCd7YX2iB4GqUIgYmVlPi5JnVUll/DvwFbtU4vE+2QmneBtDyd2Vj6i
+         96GLC3mbjED7P1vFQQo8dULkoR6/RZJOceAQIc0wC0kLlscGLogllr0Hb8RIolmEHvpu
+         DlBeLs8WUApTowivTS1301pj/QmH0AZF/gyrHJM8IHDK1nrAXlhMJxY8CMxHaKxqZn69
+         GoWlfzxFbSJT4yVdT43svltsDy19Qk7v247JwN/zlpnn9I/yonHLv/24Li1ceBYZT5ce
+         9dxA==
+X-Gm-Message-State: AOJu0Yzh8IRJPeW05rnKT76OUZtV5z0wZ9jABxTF1ModmCEkFYj+AtNz
+	fs/N75hv6+0XyJZGqYwUC72uzRA1lOSK5sXf+DvX0g5r4y6jjyo/slFyMfADfr+eV4sSTOxljHM
+	e4Q==
+X-Google-Smtp-Source: AGHT+IG6eJZSfymiHUYaiCyEcgd4DWhLixPN0Fdi6UuKMBSdGRmp8Iyxg1Awy5Vo4qrVRA8fUmwptQ==
+X-Received: by 2002:a17:902:d503:b0:1fb:6616:9cd4 with SMTP id d9443c01a7336-1ff5735b795mr130933825ad.38.1722883681662;
+        Mon, 05 Aug 2024 11:48:01 -0700 (PDT)
+Received: from ?IPV6:2601:646:8700:dd30:5f3e:5ba7:e0ea:9a08? ([2601:646:8700:dd30:5f3e:5ba7:e0ea:9a08])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1ff592978f2sm71938845ad.255.2024.08.05.11.47.57
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 05 Aug 2024 11:48:00 -0700 (PDT)
+Message-ID: <98e263a2-ecb9-4228-82d3-8bd35636359f@penguintechs.org>
+Date: Mon, 5 Aug 2024 11:47:55 -0700
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -35,91 +58,41 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 2/3] Bluetooth: hci_uart: Add support for Amlogic HCI
- UART
-To: yang.li@amlogic.com, Marcel Holtmann <marcel@holtmann.org>,
+Subject: Re: QCA6390 broken in current kernel
+To: Zijun Hu <zijun_hu@icloud.com>,
  Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Conor Dooley <conor+dt@kernel.org>, Catalin Marinas
- <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>
-Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, Ye He <ye.he@amlogic.com>
-References: <20240802-btaml-v3-0-d8110bf9963f@amlogic.com>
- <20240802-btaml-v3-2-d8110bf9963f@amlogic.com>
-From: Krzysztof Kozlowski <krzk@kernel.org>
+ Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+Cc: linux-bluetooth@vger.kernel.org, regressions@lists.linux.dev,
+ Paul Menzel <pmenzel@molgen.mpg.de>
+References: <27e6a6c5-fb63-4219-be0b-eefa2c116e06@penguintechs.org>
+ <CABBYNZ+vVFUm1Tb+BvViYMJd6XQczTYPgyO++GGbCcWrkaC4Kg@mail.gmail.com>
+ <30319168-9456-49dd-be27-480b2a068fe3@penguintechs.org>
+ <1a519b2f-f5cf-40b3-8223-162dc04f8ca8@penguintechs.org>
+ <21645f07-da90-4441-8dbb-d999298165e9@penguintechs.org>
+ <09962266-9b55-408b-8b5d-d2387c871eef@icloud.com>
+ <0940abda-fe74-4009-9a83-7384bb8cf103@penguintechs.org>
+ <1ff58133-7322-47fc-b3db-6fe4a697aefe@penguintechs.org>
+ <7e447839-4976-4d3b-aee5-c0961637deb5@penguintechs.org>
+ <3996ac6a-4b9b-4049-83e7-530eb49616de@icloud.com>
+ <9fd98bc2-d19a-4ad2-9f0a-02baae89ac08@penguintechs.org>
+ <34b74dbf-d57d-473a-93aa-ba970f4e4b7b@icloud.com>
 Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 fv0=
-In-Reply-To: <20240802-btaml-v3-2-d8110bf9963f@amlogic.com>
-Content-Type: text/plain; charset=UTF-8
+From: Wren Turkal <wt@penguintechs.org>
+In-Reply-To: <34b74dbf-d57d-473a-93aa-ba970f4e4b7b@icloud.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 02/08/2024 11:39, Yang Li via B4 Relay wrote:
-> From: Yang Li <yang.li@amlogic.com>
-> 
+Zijun,
 
-...
+On 8/2/24 5:08 AM, Zijun Hu wrote:
+> actually, my first reply is earlier than the other branch of this thread
+> as shown by below link (^^).
 
-> +
-> +static const struct aml_device_data data_w155s2 = {
-> +	.iccm_offset = 256 * 1024,
-> +};
-> +
-> +static const struct aml_device_data data_w265s2 = {
-> +	.iccm_offset = 384 * 1024,
-> +};
-> +
-> +static const struct of_device_id aml_bluetooth_of_match[] = {
-> +	{ .compatible = "amlogic,w155s2-bt", .data = &data_w155s2 },
-> +	{ .compatible = "amlogic,w265s2-bt", .data = &data_w265s2 },
+That is true. However, the source of the regression in this case was 
+Bart's change. I was also trying to make sure that the discussion didn't 
+diverge. I meant no disrespect to you or anyone else.
 
-Your binding says these devices are compatible, but above suggests it is
-not. Confusing.
-
-Best regards,
-Krzysztof
+wt
+-- 
+You're more amazing than you think!
 
