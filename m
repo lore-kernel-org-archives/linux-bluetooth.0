@@ -1,88 +1,129 @@
-Received: from mail.kaechele.ca (mail.kaechele.ca [54.39.219.105])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oi1-f180.google.com (mail-oi1-f180.google.com [209.85.167.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C581140397;
-	Mon,  5 Aug 2024 04:01:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.39.219.105
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABCD8A3B
+	for <linux-bluetooth@vger.kernel.org>; Mon,  5 Aug 2024 04:37:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722830509; cv=none; b=njyBWBGvLho9yjkriipjtCUDEY3Gnasp9BD6MC1uqUXsjfeyzZpV5T/bmTxOeSXJeMh44WRJln3NuhAVhBZTfdWPDRuNwKtHsUQX/fUODTRQjWIyqj1G1mLRghXvcrTBAJWc5W5+fnCT7y0cTiHD8Dljj63IxGBX8ga43vSaR2g=
+	t=1722832659; cv=none; b=P1UaM5/sxqGurXtWQYQ7ftelctwFcimz024TaB3JGBx6jGVrcsqgBU9Ht4zWCb3RyhpKV85k9MaNpIORgzBgdFAiYwXMC7XXfKPq4VhFC/HgyGsY7Qcm88VQ29UZ1z1UChKwjzFQcQVyiDwpDdYjUd0StM6J5N/I9WRee/gZXIg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722830509; c=relaxed/simple;
-	bh=18HtVMEp/nF3kNlJjM+WZDtQoUGZb+1VQXJHdkEbHWU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=DKb9QjdxFkFLrPdFtAVkYxBoJ74Hm79763oKjJSChBceRKuSy4cCl0k40IOwCyEUPC8FzeZpV7ZcEDXLFiezlEAtJFgLYNtlaKNogscWO49bJs8m2PJ2IkDMxVaiVCbwFY2uKpUKhtnUgulsWJ4wIqYsDszw6gF4Xc7YQuNv5eY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=kaechele.ca; spf=pass smtp.mailfrom=kaechele.ca; dkim=pass (1024-bit key) header.d=kaechele.ca header.i=@kaechele.ca header.b=H44bPviR; arc=none smtp.client-ip=54.39.219.105
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=kaechele.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kaechele.ca
+	s=arc-20240116; t=1722832659; c=relaxed/simple;
+	bh=DsXb9L1SkEStB/5K342/IrAxQ5nb/D3XhOsRZnMZqfM=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=hh2ZyGut5KgM69H7at1+wou9Ul51SGNX7QsHcgkVPT1TU0DLmSKFgEUrEg3OpiavYlxvYuGHslE5nwZ3HPy7Kblv5oKDZSepekydqpoDwCnSlKn1gkisoFDl837d04W9WXzA/4OvAWjG4NN0EYtcCcTQP9qTnMyFKnXgKdOkT3w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=loOqE4cd; arc=none smtp.client-ip=209.85.167.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=kaechele.ca header.i=@kaechele.ca header.b="H44bPviR"
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 14BABC0070;
-	Mon,  5 Aug 2024 00:02:07 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kaechele.ca; s=201907;
-	t=1722830527; h=from:subject:date:message-id:to:cc:mime-version:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=dVzuzpmdVrqMI5w9EIT5MwcsYd0C1S7U4DW6/blDxME=;
-	b=H44bPviR4QaV9HO5Fx49j54ui8s5ZJTEPgjklEJq6QlSBpYbbJN3YPEKCMEG4XkKp24z+n
-	aBAg68yuZsTpYugqOyTa+8cxyHpGpqCqENkgbwBhL9md7t4kqLx/R7GO2VufY+19nN5Bjj
-	3dWx9SXBdmWUBYFs2NtpXpixzF1m7vs=
-From: Felix Kaechele <felix@kaechele.ca>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Kalle Valo <kvalo@kernel.org>,
-	Jeff Johnson <jjohnson@kernel.org>,
-	Ulf Hansson <ulf.hansson@linaro.org>,
-	Balakrishna Godavarthi <quic_bgodavar@quicinc.com>,
-	Rocky Liao <quic_rjliao@quicinc.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	netdev@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-wireless@vger.kernel.org,
-	ath10k@lists.infradead.org,
-	linux-mmc@vger.kernel.org
-Subject: [PATCH 4/4] Bluetooth: hci_qca: add compatible for QCA9379
-Date: Mon,  5 Aug 2024 00:01:31 -0400
-Message-ID: <20240805040131.450412-5-felix@kaechele.ca>
-X-Mailer: git-send-email 2.45.2
-In-Reply-To: <20240805040131.450412-1-felix@kaechele.ca>
-References: <20240805040131.450412-1-felix@kaechele.ca>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="loOqE4cd"
+Received: by mail-oi1-f180.google.com with SMTP id 5614622812f47-3db18c4927bso5606964b6e.1
+        for <linux-bluetooth@vger.kernel.org>; Sun, 04 Aug 2024 21:37:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1722832656; x=1723437456; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=EPViYOml23LC8hwP1Cp7Thwnu5UAQvxIRVeEC2IR7sM=;
+        b=loOqE4cddMZBZSyzfQ4PfPxIGpoRSWvrUyYA2YdLr7vafDRXx4LT4utC+6aFaNzhkq
+         ekZNEOlnUQSz1MeyMfKoW1Lv5rzliB2XvB+ZvZlOAPSmmT6+x8ptc5ecu5y4rFxWLlbT
+         TPfEo5PThPwkZK+NCBCmT4z89MY+Xshq4JdQEsIbBxG098V5hhi0k3zGOpC0ipn81kok
+         2idAekseA1safQaXxjAIEjBdCiOF8ACXfYSv0q6YYP3llkeZ6qpTHw+nqhL6+TT3Ah4i
+         fggc2YqQExc0ozE3B7teedlWtu1rufNvyxOYw4dUWJQ5hKSRK5lxLA+7JfqhPgbUViy3
+         9fWw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1722832656; x=1723437456;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=EPViYOml23LC8hwP1Cp7Thwnu5UAQvxIRVeEC2IR7sM=;
+        b=cH90E3paW+84/ov2NAFHGowPqNx1x+lB7pttTpInKAYBngGhjAGdfAR3ZSHKGSkK8s
+         hyyQOWrXA8uwveNwpFKROWic6AG66DX6Q7OiRJe9pyJRiRqKespTZQYuQE4OL7jxjrSI
+         dSQv+IpbnTeUbdaALnHVFSmuLcnNZFYbQDkBy0pKfXpTwkxRYYiplw+GpmMUbrIEjpX4
+         wn/MrUsjmXiB5pdvulCgLnWDxoHH0kobTKUA7rq43HgONmCl5sRfW1mEUYtwRGhn9bvI
+         afxDzPRN2VHIj8sCTJtq5J6caRy+jqU6NwSaVhYilWoQJ+yDcxLxK6np5iDEMuPklqmh
+         stPA==
+X-Gm-Message-State: AOJu0Yw2bojIKd5Jz5QrlBylduyuYPYfteGuaaMcTSYZBRagqVKT++mS
+	bh/bQ27Scb7MoKjtSaz7DYeU7l4uv73xNlgbwExk5czkoYrQ3/J6kt94GQ==
+X-Google-Smtp-Source: AGHT+IHseOl+/Czo4YY8O/QqoYfbyyl8vUMt5DQGLN3vX1xj2q9HT0GrNEtUh3uiESTFsXDQHzV49Q==
+X-Received: by 2002:a05:6808:16ac:b0:3d9:3463:4444 with SMTP id 5614622812f47-3db557fb795mr12294389b6e.5.1722832656518;
+        Sun, 04 Aug 2024 21:37:36 -0700 (PDT)
+Received: from [172.17.0.2] ([52.225.77.111])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7b763944181sm4721083a12.44.2024.08.04.21.37.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 04 Aug 2024 21:37:36 -0700 (PDT)
+Message-ID: <66b05710.630a0220.5d4e0.cfd5@mx.google.com>
+Date: Sun, 04 Aug 2024 21:37:36 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============3707927121668757127=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Last-TLS-Session-Version: TLSv1.3
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, felix@kaechele.ca
+Subject: RE: Add support for QCA9379 hw1.0 SDIO WiFi/BT
+In-Reply-To: <20240805040131.450412-2-felix@kaechele.ca>
+References: <20240805040131.450412-2-felix@kaechele.ca>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-The QCA9379 (Naples) is a WiFi and Bluetooth SoC in the QCA6174 (Rome)
-family. As such it is supported by this driver.
+--===============3707927121668757127==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-According to the naming format defined in the code, the driver will
-request the following firmware files for a QCA9379-3:
-- nvm_00150100.bin
-- rampatch_00150100.bin
+This is automated email and please do not reply to this email!
 
-Signed-off-by: Felix Kaechele <felix@kaechele.ca>
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=876576
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      2.65 seconds
+GitLint                       PASS      0.80 seconds
+SubjectPrefix                 FAIL      0.55 seconds
+BuildKernel                   PASS      31.01 seconds
+CheckAllWarning               PASS      33.17 seconds
+CheckSparse                   PASS      39.59 seconds
+CheckSmatch                   PASS      105.68 seconds
+BuildKernel32                 PASS      29.97 seconds
+TestRunnerSetup               PASS      540.58 seconds
+TestRunner_l2cap-tester       PASS      20.32 seconds
+TestRunner_iso-tester         FAIL      35.90 seconds
+TestRunner_bnep-tester        PASS      5.01 seconds
+TestRunner_mgmt-tester        PASS      111.73 seconds
+TestRunner_rfcomm-tester      PASS      7.54 seconds
+TestRunner_sco-tester         PASS      15.04 seconds
+TestRunner_ioctl-tester       PASS      8.02 seconds
+TestRunner_mesh-tester        PASS      6.03 seconds
+TestRunner_smp-tester         PASS      6.98 seconds
+TestRunner_userchan-tester    PASS      5.20 seconds
+IncrementalBuild              PASS      44.82 seconds
+
+Details
+##############################
+Test: SubjectPrefix - FAIL
+Desc: Check subject contains "Bluetooth" prefix
+Output:
+"Bluetooth: " prefix is not specified in the subject
+"Bluetooth: " prefix is not specified in the subject
+"Bluetooth: " prefix is not specified in the subject
+##############################
+Test: TestRunner_iso-tester - FAIL
+Desc: Run iso-tester with test-runner
+Output:
+Total: 122, Passed: 117 (95.9%), Failed: 1, Not Run: 4
+
+Failed Test Cases
+ISO Connect2 Suspend - Success                       Failed       4.246 seconds
+
+
 ---
- drivers/bluetooth/hci_qca.c | 1 +
- 1 file changed, 1 insertion(+)
+Regards,
+Linux Bluetooth
 
-diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-index ca6466676902..06895bafd3b6 100644
---- a/drivers/bluetooth/hci_qca.c
-+++ b/drivers/bluetooth/hci_qca.c
-@@ -2690,6 +2690,7 @@ static const struct of_device_id qca_bluetooth_of_match[] = {
- 	{ .compatible = "qcom,qca6174-bt" },
- 	{ .compatible = "qcom,qca6390-bt", .data = &qca_soc_data_qca6390},
- 	{ .compatible = "qcom,qca9377-bt" },
-+	{ .compatible = "qcom,qca9379-bt" },
- 	{ .compatible = "qcom,wcn3988-bt", .data = &qca_soc_data_wcn3988},
- 	{ .compatible = "qcom,wcn3990-bt", .data = &qca_soc_data_wcn3990},
- 	{ .compatible = "qcom,wcn3991-bt", .data = &qca_soc_data_wcn3991},
--- 
-2.45.2
 
+--===============3707927121668757127==--
