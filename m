@@ -1,33 +1,33 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5890B2C684;
-	Mon,  5 Aug 2024 17:27:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9C0515EFAA;
+	Mon,  5 Aug 2024 17:29:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722878877; cv=none; b=a8gekEyFBdkepChgKPbnoruZ41LL/7LGGJx8j352oiBbSQZu81yJz2jib64gC99+7Dz+m/QlrPG1Ap8v9e2/+62Emgyea8p/urclP8dVCFB4Zb/S+i75gzcG54H+ESi7R5PLb/jQ9EYP6gUUjXCZFGKErSnWewp/LdCQU7KEgUA=
+	t=1722878962; cv=none; b=kdY4qVyIa20ZlV9LrXSgrkO7urxPVU7AdeK35PGwYpMDaUXENeXWydThOUF53i43lBHVU55GKMaei8emvPFItBQPJUUJcnZejYgRROt8IVB0RuhimWh5/QsVcSj4gdpX9Rv2Q++wpXQjQ74HY9EZdOpCK6VSv8fehQYPv+QDSlM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722878877; c=relaxed/simple;
-	bh=WCgP8hlNk0QcSt9lOyTkLO14E5HFaN8bJI79ZrmftSY=;
+	s=arc-20240116; t=1722878962; c=relaxed/simple;
+	bh=6F/aB6kF73WOwcPDI1RWMRuhjTLBsn+Aln5CPPXhX40=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ow597s9PtslsHeHCJeEraGT/8y6Td3GwB+vUKg5ugAW2+BruomeCodF0F3ud1udg0yXasila6HEsGkXyedsvCWXtadeO2a7X3okGElI14oQb1hrqlBbXBvzTMyEZcUchlW4fsukb1EvzBIdzgQzpU+hsf0/ZstgwKz7Xj8eyNfM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Jn9riv34; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:Content-Type; b=Se1j/vc64PjzKum4wMkFLD2NaEDGMsH7beCr8v9nkPNmMpHeaXBeVGfxmafkReWhSpp2YlcjlU1iatJRO60rse8UC13XRqo7M+p0FHVHeYh7EADFjkS3MRyAKw84DLNlPUrdzaWnBFPXBUWYK3dJ6jL2Yl1r//K6Ln9F6/+SUyQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YMfvf/ZT; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Jn9riv34"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A82FBC32782;
-	Mon,  5 Aug 2024 17:27:51 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YMfvf/ZT"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C0639C32782;
+	Mon,  5 Aug 2024 17:29:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1722878877;
-	bh=WCgP8hlNk0QcSt9lOyTkLO14E5HFaN8bJI79ZrmftSY=;
+	s=k20201202; t=1722878962;
+	bh=6F/aB6kF73WOwcPDI1RWMRuhjTLBsn+Aln5CPPXhX40=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=Jn9riv34WwWOFnIkvGeqfwUWe1Xr1imBQur8ZnUleqY3Bci7QFUOVMqTMDCQ5OAJD
-	 V/EcFZSFtO19rIsSkiRTYn++r+Y0cmiRxb3e987QbY4VGFA5qnz7qfI2D3zBDzYArw
-	 TwdB8+ORF5P+Y5hNSGUd4jcuz+Nsl8Qp7rLeBVeSVoWbPHEFPt8T6uqqf5759Aau7O
-	 Zjai3AeSRLXG0eJS6zCgi0D8XpCuiPPQKB6dTe4Y8bVRhPgcTFxt1KDkVgDXjvVz0y
-	 kpa0ZSLwemAZjeOAKc+k83lM+Lo+2bEiZr8sPr1eDSC6ceBLXeiE9xJ5M81Ny+NNHQ
-	 bkzfO6Xo3Sz7A==
-Message-ID: <cf67c1b3-82cf-408a-a51d-9a09d057dc70@kernel.org>
-Date: Mon, 5 Aug 2024 19:27:48 +0200
+	b=YMfvf/ZThBO2tnly4KEbbmCpo80YRUOojmgBJzSyrAqhNSoNsup1mqwPrSPTYc75B
+	 4RMopSTHWJSSsHffIk/R5od6iBalKpHCKTPWeAMnC7A9zz2lX+g3Z11ijCb5cMkF0J
+	 3avjm9BLgIQYX2yvr2M1tRcDFqli47L/6a4JvPI96DozqS/wgoO/yEIwTHA4tmi3fe
+	 XEv9pSV5mdhoe+/OS6LTfAwcjbmr2JcdGEwHLQRjiOzw0GwX2MXZpxpLJS0cxSSf19
+	 byCIoqy8/mUh4yh6COqlnqgZrZ1Bx1fFD6OIumN/ymBh5nxOEJVIwOIKMDxLK0CA76
+	 WbjFDrbeUTkOw==
+Message-ID: <2dee0055-49fe-4920-93d7-5462e88b8096@kernel.org>
+Date: Mon, 5 Aug 2024 19:29:14 +0200
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -35,8 +35,8 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 1/3] dt-bindings: net: bluetooth: Add support for
- Amlogic Bluetooth
+Subject: Re: [PATCH v3 2/3] Bluetooth: hci_uart: Add support for Amlogic HCI
+ UART
 To: yang.li@amlogic.com, Marcel Holtmann <marcel@holtmann.org>,
  Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
  "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
@@ -46,9 +46,9 @@ To: yang.li@amlogic.com, Marcel Holtmann <marcel@holtmann.org>,
  <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>
 Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
  devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org
+ linux-arm-kernel@lists.infradead.org, Ye He <ye.he@amlogic.com>
 References: <20240802-btaml-v3-0-d8110bf9963f@amlogic.com>
- <20240802-btaml-v3-1-d8110bf9963f@amlogic.com>
+ <20240802-btaml-v3-2-d8110bf9963f@amlogic.com>
 From: Krzysztof Kozlowski <krzk@kernel.org>
 Content-Language: en-US
 Autocrypt: addr=krzk@kernel.org; keydata=
@@ -94,32 +94,31 @@ Autocrypt: addr=krzk@kernel.org; keydata=
  uZwJCLykjad45hsWcOGk3OcaAGQS6NDlfhM6O9aYNwGL6tGt/6BkRikNOs7VDEa4/HlbaSJo
  7FgndGw1kWmkeL6oQh7wBvYll2buKod4qYntmNKEicoHGU+x91Gcan8mCoqhJkbqrL7+nXG2
  5Q/GS5M9RFWS+nYyJh+c3OcfKqVcZQNANItt7+ULzdNJuhvTRRdC3g9hmCEuNSr+CLMdnRBY fv0=
-In-Reply-To: <20240802-btaml-v3-1-d8110bf9963f@amlogic.com>
+In-Reply-To: <20240802-btaml-v3-2-d8110bf9963f@amlogic.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 On 02/08/2024 11:39, Yang Li via B4 Relay wrote:
 > From: Yang Li <yang.li@amlogic.com>
 > 
-> Add binding document for Amlogic Bluetooth chipsets attached over UART.
-> 
-> Signed-off-by: Yang Li <yang.li@amlogic.com>
 
+...
 
-> +  firmware-name:
-> +    maxItems: 1
-> +    description: specify the path of firmware bin to load
 > +
-> +required:
-> +  - compatible
-> +  - enable-gpios
-> +  - vddio-supply
-> +  - clocks
-> +  - firmware-name
+> +static const struct aml_device_data data_w155s2 = {
+> +	.iccm_offset = 256 * 1024,
+> +};
+> +
+> +static const struct aml_device_data data_w265s2 = {
+> +	.iccm_offset = 384 * 1024,
+> +};
+> +
+> +static const struct of_device_id aml_bluetooth_of_match[] = {
+> +	{ .compatible = "amlogic,w155s2-bt", .data = &data_w155s2 },
+> +	{ .compatible = "amlogic,w265s2-bt", .data = &data_w265s2 },
 
-Keep the same order as listed in properties section. With this fixed:
-
-Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Your binding says these devices are compatible, but above suggests it is
+not. Confusing.
 
 Best regards,
 Krzysztof
