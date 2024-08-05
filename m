@@ -1,46 +1,46 @@
-Received: from DB3PR0202CU003.outbound.protection.outlook.com (mail-northeuropeazon11011011.outbound.protection.outlook.com [52.101.65.11])
+Received: from DUZPR83CU001.outbound.protection.outlook.com (mail-northeuropeazon11013031.outbound.protection.outlook.com [52.101.67.31])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31DA1156F48
-	for <linux-bluetooth@vger.kernel.org>; Mon,  5 Aug 2024 12:04:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.65.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F7D3156980
+	for <linux-bluetooth@vger.kernel.org>; Mon,  5 Aug 2024 12:04:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.67.31
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722859495; cv=fail; b=FP8LnfVHw8IiQOpt8h/3Goax3h5JTXEZH8t5nQOc1/Y2irQJTVDkujIV1cayYiiBBODkH6abnTds4nad4bsASAQ5sgWZOIWaBkM8r1hn8q6YqSO/JmEe0p/wl6TjCWpcHP5QdjL2f3nLYh4f9Zud6/fqiinQ02sVOcpCTUW3+bY=
+	t=1722859501; cv=fail; b=Qm3+mIrsVB9mQYq5kz6YEzMmPt7S0LOtLJIRHyIMhFSw1G3sxWcazgeMcbwZIjxohyTl9v3RJjfCZIKQG6huzd+uLuFCtPsWrb5FN65kLlnmfqt1MplQcF6IlBYrKtWYMTTtYtHtb6JyFnbFahHR/pJnZfpltbQYRRiaSjEYmPg=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722859495; c=relaxed/simple;
-	bh=j6gvTI+bJ7k28rh2d+w6H3NeCpw1RdhIy3vtUIiMYgk=;
+	s=arc-20240116; t=1722859501; c=relaxed/simple;
+	bh=ZebobFKVVlRQoBo1057thmYwxiIJws7CsPO1R4jUQ2E=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=XZMdrN7FfS2jR+D5JWUSwbdsQlFhZY/Zf90G0eng4PdEZLNjLziOrIpVr4Wwo11HsYk2PIgQS+MG8rFTgRL1xVlVqAwgWNoAJwuG5hEl5fMVLDNSlo6oTZl59T9U8424eXlZ3aGk5XBE3SNI+ssvJ7fY+r4H9L3Acez1IGdwgYM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=TdyHKZfs; arc=fail smtp.client-ip=52.101.65.11
+	 Content-Type:MIME-Version; b=V/D9je9zC9L50s34Cdk/S4xeq8rZTHC5Qfk6TOccg+zlu7BhCWmQFz8VVhuF6cGmycMWnEWtK2pO09DH95YtQZg2IrMTD89ozs+rhkOrubif8mFZPcMorZCE9hBGbsMbOy6nenV8axLMXxBKZ4NEtM236R9zI38Do3s8OT5a5uw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=PEO3gyBR; arc=fail smtp.client-ip=52.101.67.31
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="TdyHKZfs"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="PEO3gyBR"
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=hVDrLpRKZhWyPOCt/6+vv4E/MOI86WCl9iQZkF1RY49tyQPPY8byzF9q0HhnRpIE7xMvNhYQuBb8UbIl5BZPptOSOAFqGiQOeQoDsmxFXMWcMXCCtL/t4PtUbKoNIs/TCm3/lg9uSK+h40opLcmfBcW59wAyAxwBWRzgp44T7L3K2nMZ8S2Z3li5RtzGTDPTL+QUuVzeWgcylG9o61+St2jks1GNAVN0lD+T2Qmjh/u0jlQzZMFlz4EWjlK0eXb8fbpFV8PLnBEzmeCbfWbo9BRJqOyE2B1xt3zJ1wIHaTnHTpzbpjXmBrLDrF9jF2volJhJBGaFqwQJwOUkpOQqXA==
+ b=tPoS5DXeQrVD2q1EZyeIDHnjEGqKbE22oP54v4aB22hrTYZT4znwRJPLCUNoRY39HDiaok1xSaSp4aQNtb8fCWua6QCjMl8sxv+BJikVx4MU8tBY3kwL2cJNGSkkiJJUSaW6+KE/4aEpkVTNHmeTYJPsSOL/NbibDGBHiJzeqEnYr1LvBa+7aruNrP1LSzIlQsCcze2YPQYee+HBZf1EchGXuEpy/j0ufBwv1ZHjA6HMjCsvT8fGAXBcBhYYuFxQYaS99c89g59BL18jr/BRC0LqN9e8rHl6jG8zrhCxsV5Q9oYX0ddpGVJ1VXSrIiYlD3q4dEXNwG0T3ci7B+P+Cw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Zrpot0YDEBBZnfYFkguLklbCwu1oOwLX8hRdLNVMRKk=;
- b=MYEztRpdyR+KRMcZUWKLa2/rax+mBlCWmZhn93DDW6/Ql9tz1eh2Xa6H+AiX+irLwv36xKidGaSUR5LDh9jDXMEPyHwqsvkGWtc3OvzHmtO5uLIpPUuXOYGSwVPGtuoZcXw10H9V6WIV0ijV/yeNAjh7gJ1D3vXI21egdNVPADjNPLxyiDkcbJe5+LXY2IfJFPw5FC3E+6flno8iUGinc/sderIh0JFs8xZGNAYvz6qBwN62h+kB3PalIVhLCMfjtRUu+/1T98sx91nlsG65hXATt+a7OMBp+aef9+0VI+EABm/fFXUF3SxPguSjbIbcsEmcSw3kxlM1rrdLdIDFvw==
+ bh=VlQveIIE7GNZf1JFQ04sEvTtPHBYjPtyvRlb8ikQL3Q=;
+ b=o+EdPWC6GDR0MK0tzW/p3a06Gpyw6BQ4Sp3oX1ZI6OGRSHrN4j65QLBOKa+Kb56613LcVazIBTy0Mm7UJemOiXU7dz6SjPJuC6JyB6YMfzX5OH6JBYwbuTtIikysxWqwJRwFpMvigQnrAEOFq1N3+YbIX7G8hEdSNCt3TennngzBPHOkmCidGg7cwMQPV9oLPq1JmzYkR9CvJ9HtqBjfNOwD5Wt/iQ6XvIFLMoSGyV23OGpreulRlZlm3mZUjaZVy7WuOfUIgD/SZHDl7gNQXTPmYTMdPTLMj6unAMBPa1PH8mE/66cihWsHBp8eklKHXs9j1AzQGB1q0pvNjR9PWg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
  header.d=nxp.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Zrpot0YDEBBZnfYFkguLklbCwu1oOwLX8hRdLNVMRKk=;
- b=TdyHKZfsltFWNh5nbl+6ZtxUlhYqRCZ71a5fq2cR2aQWovbNfAcWMEqHFa3nkijPZwNgtEHkxX+EIrHF9qSogLu07dTrjtqbQGlpD7UCHpanBRdUIKOqxhBVuPbnlEBiqnsYaQzxwOBBQw0OrJJEhikb2u7IVdzaXVkC8Q9TPlX5mn0NZBNRxghT70d97myaqwHCloYfeYnuic/PDokyBoAGOe2mGn6/y9llHFORcyOVvLKZLlW7DRP5VtABLEcdjq/As55CRcq7jbNpigeth9f4L1iRQxgMWlp0PKgk0SyCFtldBfaKQRmQY6wAHav4ECJkasGWkb9Xjdd3QWDb5w==
+ bh=VlQveIIE7GNZf1JFQ04sEvTtPHBYjPtyvRlb8ikQL3Q=;
+ b=PEO3gyBRk45Vl7NtwJpm1tqLXM/bwGxz3w0cn0KrxFrTDGpX1Zrf1Es54TGF75+H+7TqovfmF2o0qLTP1OeoMUc5Uy7qKwCC1Iu8yDC1GFciZ1ueZZcBVgVWKoFmIgFa0fEroVw8ewav5p1rQRwXNuTXjCF0uNDFglIo0Bx6NRdX+qUZZ4jy0KxhXfJLHI+YBNFI49G6j1YB5HciiWDflpiWY/MNPyMwYeXqbb0io12jOeT2qVtBA0xWhKHQ4HTS7VisCVmepx3D60CiO+a3qVAZdLYh6taPkndaXCtSKYJfqd20U9ACxdqsuJripKyTuxwSupo9JF5/JOLqWwuwBw==
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=nxp.com;
 Received: from AS8PR04MB8898.eurprd04.prod.outlook.com (2603:10a6:20b:42d::15)
  by DU4PR04MB10499.eurprd04.prod.outlook.com (2603:10a6:10:568::14) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7828.26; Mon, 5 Aug
- 2024 12:04:51 +0000
+ 2024 12:04:54 +0000
 Received: from AS8PR04MB8898.eurprd04.prod.outlook.com
  ([fe80::5e22:869c:33c:9654]) by AS8PR04MB8898.eurprd04.prod.outlook.com
  ([fe80::5e22:869c:33c:9654%5]) with mapi id 15.20.7828.023; Mon, 5 Aug 2024
- 12:04:51 +0000
+ 12:04:54 +0000
 From: Iulia Tanasescu <iulia.tanasescu@nxp.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: claudia.rosu@nxp.com,
@@ -49,16 +49,16 @@ Cc: claudia.rosu@nxp.com,
 	andrei.istodorescu@nxp.com,
 	luiz.dentz@gmail.com,
 	Iulia Tanasescu <iulia.tanasescu@nxp.com>
-Subject: [PATCH BlueZ 6/7] bass: Implement MediaAssistant Push method
-Date: Mon,  5 Aug 2024 15:04:28 +0300
-Message-Id: <20240805120429.67606-7-iulia.tanasescu@nxp.com>
+Subject: [PATCH BlueZ 7/7] assistant: Implement MediaAssistant Push command
+Date: Mon,  5 Aug 2024 15:04:29 +0300
+Message-Id: <20240805120429.67606-8-iulia.tanasescu@nxp.com>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20240805120429.67606-1-iulia.tanasescu@nxp.com>
 References: <20240805120429.67606-1-iulia.tanasescu@nxp.com>
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: AS4P250CA0006.EURP250.PROD.OUTLOOK.COM
- (2603:10a6:20b:5df::8) To AS8PR04MB8898.eurprd04.prod.outlook.com
+X-ClientProxiedBy: AM4PR07CA0031.eurprd07.prod.outlook.com
+ (2603:10a6:205:1::44) To AS8PR04MB8898.eurprd04.prod.outlook.com
  (2603:10a6:20b:42d::15)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -68,438 +68,526 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: AS8PR04MB8898:EE_|DU4PR04MB10499:EE_
-X-MS-Office365-Filtering-Correlation-Id: ff44e418-7bdc-48e6-29dc-08dcb546cfa1
+X-MS-Office365-Filtering-Correlation-Id: 7409ee90-7036-47ef-9b34-08dcb546d15a
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?RmaCiGLDhvFzZ4YzBpSa/+jFHNF1JmnJszYlxK+KfVUlKxheMhEXYNVs+Qkp?=
- =?us-ascii?Q?CoNalOohvg60v9c8LPaFnaKupdZUYtyOVGWeGVzkeEHxs+Vq5TskjE6ddyOQ?=
- =?us-ascii?Q?dbXKmhLnKhUFSKwCGotRVVoEUAxTIBk8EuRqzggkJtVPGRhCUe2CYnmUEHTC?=
- =?us-ascii?Q?o2IniSVhHn3oVACrRnBzZS8VG3mEcze4AVenHTSiyS53KpRvH16bRiL1ytM6?=
- =?us-ascii?Q?/+UdbGfDMk2Fm0+BL0rBOSfjFBYYCrlmZPPrux4namlQ/O8FcWTXT04VJ3ZO?=
- =?us-ascii?Q?uD2Z/taLqmzwivKkIRL54L2s0iGCme+TXJCl0S+zMwoPq5OP5JqKN+p7ncz3?=
- =?us-ascii?Q?l1MDV9ANrUu1yg6I8620MBmVRBPjfeicaHhLNCUXAfV8pz6S7W5B3yb4unFp?=
- =?us-ascii?Q?eYWxVdTbmqRZ8Ur2unmi2SvWAUK3vJnUI0FVCsMm4Vabsx0eUWTQi8pqDyFf?=
- =?us-ascii?Q?NS1ScXxICwErohY81Lz2FnLisIaYKhHNIqr2n45jcBsZ1gduqzs3WyBytvTt?=
- =?us-ascii?Q?jKOtdfmARbOJ33pULPSnPV34ReEl3IqbS5HifWYGIRgk+Al/O9aj1b2b9sID?=
- =?us-ascii?Q?pP7p3dSnQRmVBtpXSCX6eN4MdUXsgl6dAUc6QayiTZLq2b7vUdT4HNp7zUoZ?=
- =?us-ascii?Q?8N25yaIDBJ8NQYatlnvB0sgErViSR/DYO2txy3nNslssj1No6wAXhBwBU4eM?=
- =?us-ascii?Q?njMdC+OyY2D3xtOTSM/FMcm2sRqMNoGmQBuOxjjE0MEVuQQwsPhYPsaWqMXP?=
- =?us-ascii?Q?5TQmIQ+VJFbk3/qlY4yP7yMm6OQFpN3rL8l4McDPnzUfH/AuZSff1v/s4rof?=
- =?us-ascii?Q?2UTRmvbzY4o9ZFjZJypsBbfc6tLOXI8tqATFih7yaSkb5tGX6FwAOilMVAK9?=
- =?us-ascii?Q?TMVpTjbdyA4o3y62maRzhFVoQiGA/rBG60UxQxwPdVHGcblKJV0/Hs7uFdGa?=
- =?us-ascii?Q?z3p9B+ZkmsntpfY85kaBZWx/1ZjRxDEiPQ5IaCOHglwDwMXF9swFij7hcKmT?=
- =?us-ascii?Q?ej1gnXHxvcwagg8KfI8RnvylZPOVvgX5CU3ajtCDBZyP9dmaupEJx9Wan2Tt?=
- =?us-ascii?Q?52hxMidrHnS4SgzqMeMWgswVIWF4F9YqnCl6A0nDbYrZRv/c8vqCQTyPz49N?=
- =?us-ascii?Q?XEm8E96FvZnHqSk1LG78JrAFcy/w4DL50EDTXtVZMBoKB/RUH1y+vVxTFwFH?=
- =?us-ascii?Q?sOsfLj+2bfC0bZink+yT1cWXN0Tvg7aZPxx5mv+ILO1RbCf0eEKCXuD/CXqb?=
- =?us-ascii?Q?78PHsQBcebwppce3oF1hdXS66AIFFb/s68KOQi3nPr0GU9qB1XwveKA7ayah?=
- =?us-ascii?Q?WK5oC1Cfv0Gx7oqvpfgWP6TQD3nW4N8D2B0EolJUDfRlsg=3D=3D?=
+	=?us-ascii?Q?nkQdnLJ9lBgQTPr3qkntVp5aiC91rJvldIJjGZ+Zq7fDCvBvmg0w/NB2aFZ2?=
+ =?us-ascii?Q?ccJdkF0GM5599GI1yv57uRad8dbHf4phazKuJ6pC0sxcFJSJvAw0fh2O1xbl?=
+ =?us-ascii?Q?z/Q/GjXfLS5+Umht1bengt62zeZilyKKBcb4rybSeZz6fNWQfFoLnA35puPO?=
+ =?us-ascii?Q?Z2fX5O1HGPD/pR0StdXvB5Gv5KmB/9kBIEKaj+a516Mt7jj6SOadfImCuyWJ?=
+ =?us-ascii?Q?oQrsomd1OYjiheNkhJ3Z0YrTEWqwyYJ4EnuSUNfrL8u/zesMarHYGASI/P/f?=
+ =?us-ascii?Q?644T2CVuNqJcd9xS1fgCs2Niy0T3R0fd4AOXQGLo1XHI5WWyUYXPTkjsDwrK?=
+ =?us-ascii?Q?cVw8KLn12hiErdyi+c4JzcKJNEt+GgcxH6GmOC1uddPKozjGiBPFO1KAc9Ku?=
+ =?us-ascii?Q?vjlgSGuV0gdFeK+mrn/O/r8gGGuWgE1cc53Us3w66qvTnz20i0KlvK3JFckv?=
+ =?us-ascii?Q?cFhwuO19YnsiGvozoIlmrEgEqxV8vWfCrrTEsnRIFXiKmrSSHlY7mzU568iW?=
+ =?us-ascii?Q?3t9Pjx18k6JD/eEl0ty5T5chNe3ZLBQYsfCw+Q1A29jYJ5NFIzpp+t9lBbI+?=
+ =?us-ascii?Q?w0rxmJo0BMTTd+7l7Oa86F3hQsQu9zRObGw8gt1MOaBdSz+5tcreaZ1y5ixr?=
+ =?us-ascii?Q?7fuhw4Ex+aLtEfnnQWJBj8dPuaVGYqz1IUhT3/oIH5jzAWHYh12P7FV/9up3?=
+ =?us-ascii?Q?uw7Y6oI0frHi/39s5rNLHXB3ivKXyQw1hUaUiXQ8Wvh1wKApT1GDp22u3bh0?=
+ =?us-ascii?Q?164jeTBLnzec94dosY/pIhv1DAzRiPl0SPOhTTmxNx9jF7Qf0/SsW2ce3P4d?=
+ =?us-ascii?Q?EbspqVB8Hfj6acWXloXkmStGEktRJkbP1pyenge7RM4m8D5jYiLraluCxxDJ?=
+ =?us-ascii?Q?eyCdJhASzLiOgXhieYzakZ+ptBTRwgJM/T7CoHQU8AieHxFUlmeqoh0FQdgX?=
+ =?us-ascii?Q?ZwSOGrp4LlH5WWmQvPp2dc5JBTU6Cmk6aBR5FHeAaB6M4DJowKpNVM/AMT0r?=
+ =?us-ascii?Q?CSSjhcTldYyN4gSYVoCEb0iqdbfziykemNBEUtM5kiJwpvxWkuv0KPIUfLDB?=
+ =?us-ascii?Q?3SC7ioVK0SmMiV/kllzGrNgURwksHMZPQzNbqlS277PTfGwQa821LrQCHI+5?=
+ =?us-ascii?Q?wW08D7dvobBDpYTiZQs8TAigMRaRN6fRPKfIcU3aeNNsZJ2El08HcglToshN?=
+ =?us-ascii?Q?ep6KypaT1ltymq+LHcbSXemOp4xkQdVcrbe9YybL1QdJPtnrSGIy95ms6xrV?=
+ =?us-ascii?Q?C42mQ+BDLa3f0cDwP2Eeb9THhxc75BKITKjawDfYNE8Avnx9nNUcCiHxVHrV?=
+ =?us-ascii?Q?SB4m7yYTknZxM36vK/E02KivQyj148rjlnVDAL7TMMoAUg=3D=3D?=
 X-Forefront-Antispam-Report:
 	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AS8PR04MB8898.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?2eAINssomf6409Wpc9cufOVdGe+XgoO2DeH4ODAS6UPRTygKmg0hdoKbcWej?=
- =?us-ascii?Q?qQtiEt7ZVRbmKvX6lFrNnb1KSCHrddbbv6T3cziNstbTMT3FuejvZj1hdTfe?=
- =?us-ascii?Q?JgqV84Y1iNsQ8SLCOWzt0fMTAKad0fAPTdWxK5iJ+8S4tAg0mvAp+h8kS1Dq?=
- =?us-ascii?Q?iiKrnDKYeth0fJw1t/0eVL9ur03Nje/mrey+YhSXU83pqxmZAJ/AC09p1PlQ?=
- =?us-ascii?Q?7dhXIACO/RyAK8TyTdvHp2mniK7Y3hqcilC9lAf5hz24sv8Hqi0n2WpWONiK?=
- =?us-ascii?Q?4jT4kpTJL2G8J8YGCdHCY32h29xtUKV9TVs1sABep0asOWsK/mpGyw9guJMj?=
- =?us-ascii?Q?nMgYgaZw6Ee+9fW+bOtUuxifs/94EQAxH+LBfe6/afXTX/6sNIp6KunfPBgP?=
- =?us-ascii?Q?7SW6Y+uUFrFk++NxVxNKT7zc1ABiThgiCeK0hBYyUCFOIsbZdTcjGV378xFQ?=
- =?us-ascii?Q?k9DQmVzzhOiJdx+/wOpxPL+HDSyDkF41ADJUnIXkF7vPiAQUY1iXlXLAKzhj?=
- =?us-ascii?Q?KHu7VP8c2acL5ZwyvoL86PQInALG1YnK4HWRfEX/EUuZilMYHSN0vvBu2PqW?=
- =?us-ascii?Q?h8XJ+0ft3FkGesCfrMahKWiGHT04uXYji5tN42++FDVgXhjZHW7GHUCVsU+U?=
- =?us-ascii?Q?9Npvrx+FdX1G2gtn32PWPD5wPwONWRIm5gB22Akt7wuRsMcFUMC+EdSxFunL?=
- =?us-ascii?Q?/6baPNRJMVH3Cs30OPprxzimL9F2l/lH6sI5XnWpdLd9b68yb1l5cKgW4euc?=
- =?us-ascii?Q?RR4vlPEjCFmRlCSDhDtXU6FjVrSed8KQ5t+lOpaq4yXbohkmYNe5SrmnuICr?=
- =?us-ascii?Q?spqEmrhq+0m4Yz9kXZlZaSQTQuu9SXlJmC5srV2e2uX4PFL0z8FbqZwH+gQR?=
- =?us-ascii?Q?hFM409F5b7goQ8Ch/csnb9YL5+c2DHswUuPEagGEgj+PlkNrL5uDMmgoIpqX?=
- =?us-ascii?Q?Z3IYP62Ssnfc9UYzFWplpy01NRroDLiMdCQdjds8CLFtWxhcc0i1cam/UOXp?=
- =?us-ascii?Q?S/G9RXNkEHLOUUNG1rwyhC4ZfxGT+MlWtKWcPwMuKK2e1exPmCeMq61eLoj2?=
- =?us-ascii?Q?DMLloS/M21lTTiMhVXyNzd3jQy2IbrIAuN0RnHVd6PQGt93s/dFYbebLsCfb?=
- =?us-ascii?Q?9BB4hxpdmYSZFuwgOIaItYLtiPZpN0LL/OPPYXtr2jtCdi/GoOfIUZa6KVVf?=
- =?us-ascii?Q?tKGKqjtU5zYLgu4CD8OhGvIU50F1wMYKs+FJIx94TY/ikNGrpMnRkroWLujx?=
- =?us-ascii?Q?YE6ZFb0xxpex9rCI/XeORTHzta+VjAFzNuczcpf73S9RdVffdRI5z6OE/lsZ?=
- =?us-ascii?Q?4TDa/pBAj06B0YdBtEUME+SE6jXWzaPlNuLYnXXVcB6IAAl93e7tnY4ZRJh1?=
- =?us-ascii?Q?yr76TmRopiOaABwaK1VNQ8cEtgRIgHzOKae6bJxx96r385zkjvq6eyV7qY7P?=
- =?us-ascii?Q?XQG8VUhWZOa6EGSxjRaQ4xbM7tm9UFira/nSPGD//KU9yfOpW/ws7mylcHLG?=
- =?us-ascii?Q?sM3R0qDB81GGhakBcLHfABH3ZZICZaAXVrnmV5tryr449UcSjmSukpBMDnnQ?=
- =?us-ascii?Q?8R7TkhfkfhbQV4MsUrDPFK0KTTTNV0iO7di94uvSuLOdXPsbb8iyKigpCghN?=
- =?us-ascii?Q?PA=3D=3D?=
+	=?us-ascii?Q?mk9Oq6LjvzN/FO+9p3AXzY0if/jPn7GPguJLc7ozapmqTEdUE44es11bW3Ja?=
+ =?us-ascii?Q?XyiRMBV1T6oVMCC6fUJDdopLMc+pihyuP6dInXTA+1SUXUtIBFfWMLAE0jG2?=
+ =?us-ascii?Q?yudbduFAfqB6C2rhN2bU0lQO1InWCNtw6cR2QrpzL9Nf0cZA+A6DFPyvrNpx?=
+ =?us-ascii?Q?+w/lDDc0fLXI3+8jQoPnKQBFU03pPymz9XM600LZZmZ0zJT0OuACdiPLhSEB?=
+ =?us-ascii?Q?LFB3afwvpjbfb5KYmqfjjt7HsX5AJa7sDSYoBQclNBbMvt6R9QR1X9xF1tY0?=
+ =?us-ascii?Q?DdJzvFZbf9oWqfcTtmEi6qc7kdiNjPIXTe/VvUJzkRwH3VzPjzQL8ERCdMlo?=
+ =?us-ascii?Q?qM+ttes8Rf8+VkbeWIQUUYK80yODaVHeZMBDREmoXJ8GDbhfk8r02fLuN67H?=
+ =?us-ascii?Q?ge3mrrMmOZjiZoytLO8UnV9i8SFQSAYIgE4Kdqc7dTmdjKtPo/BvuzJovA0X?=
+ =?us-ascii?Q?4jiLGpwXFsn4C1mYCASURvKYJUTfafHJxdG5UIISjqREUTwqgpX84B7O9buO?=
+ =?us-ascii?Q?sYjRRjfHpQOFR0jZhAX6Md0oaB+Hb4PqgYdDFvE6o+qDWzK2CYl3fDNFdWoy?=
+ =?us-ascii?Q?DxksIGFgSg9LRyqI3+D6+a+LGnZ1GukhUaRCKMBYlLuVmnmoLnP2gXicHWQ9?=
+ =?us-ascii?Q?F+Gu9JXbCs3dRBf3WfFajYx7HRsIZlXTSnLvtMvZhDHBJGBIzatk34F8jQdk?=
+ =?us-ascii?Q?APVlecsAA2JSSwOmaJ10lPyRqGoDyVAS4v1PrtkUTH2w3prMwlmKhn2r+2sA?=
+ =?us-ascii?Q?x+juY8nc0bzPHk/BTWYNjRhjl46r7uITVP2T/uxa+bXIR/UvbM5AyF8c26+H?=
+ =?us-ascii?Q?UrA/bKaX+MLlMcPn5LRjiNQsYIIne7ekVe243iFbMcDci51snctx9MyHDIdB?=
+ =?us-ascii?Q?nDQosRlGbBv5F48I1vam1jx5VYzZtTjdgHDy5VGvDoXRGTLz/cKWMfbAZ3TV?=
+ =?us-ascii?Q?EeivpmeC0ApwKrPn6XmOq6nlRbxfyl0lEtMAG9va4CxWuIkHdb03xDStTPlH?=
+ =?us-ascii?Q?et5mC8Igt6yCd+MqlPhunB1PVAedXhbrUW3XfjoCsve2yP5tkrgu70foL3+v?=
+ =?us-ascii?Q?zVKE0hqSqDDy9ToyA+81iB60eS0z1QrCgKOcG85ycUS0fOSPSaXlt7bVjJuQ?=
+ =?us-ascii?Q?KPbnfDo1KzrvQNUgGQ4GoFF/M27mQHK/4WP7WzyQr9wxgOlSKELDI4O8rLpN?=
+ =?us-ascii?Q?RoC+ZWtGRf3wJsd6WMuyRQQIMV4LiuvOstJ2x5IKsV6AF+U97yuMULcIKVV/?=
+ =?us-ascii?Q?6C9G6eYoY2jIJHFGTiFnhPNmLFq5MmiPREHqOHnDnOkqVDAePwkryZCUDd6h?=
+ =?us-ascii?Q?N4cdo7cvNMpmMFDlknE3UEE09Ns6hK6lsr0ErMWD7Uf19VDbueZHLNrLaJam?=
+ =?us-ascii?Q?P32DeziJ2Wee3K1r8Vd5ZKDqmX/27f6mCVrU93bSot7Oeafn4S+SdO0nUfKe?=
+ =?us-ascii?Q?OTE+girqDKPpTzRwVCYgUFfu5blX3dTlo0tOjXwD/euXplLA9T6Znj235vcW?=
+ =?us-ascii?Q?+lcQyIERanaifpJjwGtPIy00UBRvYiIzP0gE0AziEZVcsd3F50tCcXP4Xrps?=
+ =?us-ascii?Q?d8vPEPBJMn7XofZrE/sccdkk5f4xqpWQdO7RgJiPnv4DzdmRWOUvg7uabslA?=
+ =?us-ascii?Q?Nw=3D=3D?=
 X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: ff44e418-7bdc-48e6-29dc-08dcb546cfa1
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7409ee90-7036-47ef-9b34-08dcb546d15a
 X-MS-Exchange-CrossTenant-AuthSource: AS8PR04MB8898.eurprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Aug 2024 12:04:51.7022
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Aug 2024 12:04:54.6492
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 8gJ9qN6/V5iqsHkMk2MKBJzsvYRyZyhRLS+EbY0QPamBenIn2R9DDOVejbI73mMXuZx488g9WeqxDwsSYJtb0A==
+X-MS-Exchange-CrossTenant-UserPrincipalName: UPWCwtTB+Ni5PCYosPUr7JhYE156+WwXYTjAEeEidEmPpc4xSO3OYqWqdjPZZZ6gXxR6qMLdUOUIWoLM8j8FNQ==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: DU4PR04MB10499
 
-This implements the MediaAssistant "Push" method, which sends a GATT
-write command for the Broadcast Audio Scan Control Point characteristic
-with the "Add Source" opcode.
+This implements the MediaAssistant "Push" command, to trigger the
+BlueZ Broadcast Assistant to send stream information to the peer.
 
-This also registers a callback with shared/bass, to handle GATT
-notifications from the peer. A MediaAssistant object transitions
-to different states, depending on information received in the
-callback. The callback is also useful to check if the peer requires
-a Broadcast Code to decrypt the stream - in this case, the Assistant
-uses the "Set Broadcast_Code" operation to provide the code.
+After issuing the "Push" command, the user is prompted to enter
+any stream metadata to be sent to the peer. If the "auto" value
+is chosen, the default metadata found in the BASE will be sent.
+Otherwise, the LTVs found in the BASE will be overwritten by the
+user input.
+
+If the stream is encrypted, the user is also prompted to enter the
+Broadcast Code for decrypting. If the "auto" value is chosen, a zero
+filled array will be provided over DBus.
+
+Below is a bluetoothctl log to exercise the "Push" command for an
+unencrypted stream:
+
+client/bluetoothctl
+[bluetooth]# [CHG] Controller 00:60:37:31:7E:3F Pairable: yes
+[bluetooth]# AdvertisementMonitor path registered
+[bluetooth]# scan on
+[bluetooth]# [NEW] Device 00:60:37:31:7E:3F 00-60-37-31-7E-3F
+[bluetooth]# connect 00:60:37:31:7E:3F
+Attempting to connect to 00:60:37:31:7E:3F
+[CHG] Device 00:60:37:31:7E:3F Connected: yes
+[00-60-37-31-7E-3F]# Connection successful
+[00-60-37-31-7E-3F]# [NEW] Device 15:19:44:63:76:7A 15-19-44-63-76-7A
+[00-60-37-31-7E-3F]# [NEW] Assistant
+      /org/bluez/hci0/src_15_19_44_63_76_7A/dev_00_60_37_31_7E_3F/bis1
+[00-60-37-31-7E-3F]# assistant.push
+      /org/bluez/hci0/src_15_19_44_63_76_7A/dev_00_60_37_31_7E_3F/bis1
+[Assistant] Enter Metadata (auto/value): 0x03 0x02 0x04 0x00
+[00-60-37-31-7E-3F]# [CHG] Assistant
+      /org/bluez/hci0/src_15_19_44_63_76_7A/dev_00_60_37_31_7E_3F/bis1
+      State: pending
+[00-60-37-31-7E-3F]# Assistant
+      /org/bluez/hci0/src_15_19_44_63_76_7A/dev_00_60_37_31_7E_3F/bis1
+      pushed
+[00-60-37-31-7E-3F]# [CHG] Assistant
+      /org/bluez/hci0/src_15_19_44_63_76_7A/dev_00_60_37_31_7E_3F/bis1
+      State: active
+
+The btmon log below shows the GATT write command sent by the Assistant
+and the GATT notification received from the peer:
+
+< ACL Data TX: Handle 0 flags 0x00 dlen 32
+      ATT: Write Command (0x52) len 27
+        Handle: 0x0040 Type: Broadcast Audio Scan Control Point (0x2bc7)
+          Data[25]: 02017a766344191500c21a3702ffff01010000000403020400
+            Opcode: Add Source (0x02)
+            Source_Address_Type: 1
+            Source_Address: 15:19:44:63:76:7A
+            Source_Adv_SID: 0
+            Broadcast_ID: 0x371ac2
+            PA_Sync_State: Synchronize to PA - PAST not available
+            PA_Interval: 0xffff
+            Num_Subgroups: 1
+            Subgroup #0:
+              BIS_Sync State: 0x00000001
+              Metadata: #0: len 0x03 type 0x02
+              Metadata:   04 00
+
+> ACL Data RX: Handle 0 flags 0x01 dlen 6
+      ATT: Handle Multiple Value Notification (0x23) len 28
+        Length: 0x0018
+        Handle: 0x003a Type: Broadcast Receive State (0x2bc8)
+          Data[24]: 01017a766344191500c21a37020001010000000403020400
+          Source_ID: 1
+          Source_Address_Type: 1
+          Source_Address: 15:19:44:63:76:7A
+          Source_Adv_SID: 0
+          Broadcast_ID: 0x371ac2
+          PA_Sync_State: Synchronized to PA
+          BIG_Encryption: Not encrypted
+          Num_Subgroups: 1
+          Subgroup #0:
+            BIS_Sync State: 0x00000001
+            Metadata: #0: len 0x03 type 0x02
+            Metadata:   04 00
+
+The bluetoothctl log below shows the "Push" command flow for an
+encrypted stream:
+
+client/bluetoothctl
+[bluetooth]# [CHG] Controller 00:60:37:31:7E:3F Pairable: yes
+[bluetooth]# AdvertisementMonitor path registered
+[bluetooth]# scan on
+[bluetooth]# [NEW] Device 00:60:37:31:7E:3F 00-60-37-31-7E-3F
+[bluetooth]# connect 00:60:37:31:7E:3F
+Attempting to connect to 00:60:37:31:7E:3F
+[CHG] Device 00:60:37:31:7E:3F Connected: yes
+[00-60-37-31-7E-3F]# Connection successful
+[00-60-37-31-7E-3F]# [NEW] Device 05:1F:EE:F3:F8:7D 05-1F-EE-F3-F8-7D
+[00-60-37-31-7E-3F]# [NEW] Assistant
+      /org/bluez/hci0/src_05_1F_EE_F3_F8_7D/dev_00_60_37_31_7E_3F/bis1
+[00-60-37-31-7E-3F]# assistant.push
+      /org/bluez/hci0/src_05_1F_EE_F3_F8_7D/dev_00_60_37_31_7E_3F/bis1
+[Assistant] Enter Metadata (auto/value): 0x03 0x02 0x04 0x00
+[Assistant] Enter Broadcast Code (auto/value): 0x01 0x02 0x68 0x05 0x53
+      0xf1 0x41 0x5a 0xa2 0x65 0xbb 0xaf 0xc6 0xea 0x03 0xb8
+[00-60-37-31-7E-3F]# [CHG] Assistant
+      /org/bluez/hci0/src_05_1F_EE_F3_F8_7D/dev_00_60_37_31_7E_3F/bis1
+      State: pending
+[00-60-37-31-7E-3F]# Assistant
+      /org/bluez/hci0/src_05_1F_EE_F3_F8_7D/dev_00_60_37_31_7E_3F/bis1
+      pushed
+[00-60-37-31-7E-3F]# [CHG] Assistant
+      /org/bluez/hci0/src_05_1F_EE_F3_F8_7D/dev_00_60_37_31_7E_3F/bis1
+      State: requesting
+[00-60-37-31-7E-3F]# [CHG] Assistant
+      /org/bluez/hci0/src_05_1F_EE_F3_F8_7D/dev_00_60_37_31_7E_3F/bis1
+      State: active
+
+The GATT write commands and notifications for this scenario are shown
+in the btmon log below:
+
+< ACL Data TX: Handle 0 flags 0x00 dlen 32
+      ATT: Write Command (0x52) len 27
+        Handle: 0x0040 Type: Broadcast Audio Scan Control Point (0x2bc7)
+          Data[25]: 02017df8f3ee1f0500f4015d02ffff01010000000403020400
+            Opcode: Add Source (0x02)
+            Source_Address_Type: 1
+            Source_Address: 05:1F:EE:F3:F8:7D
+            Source_Adv_SID: 0
+            Broadcast_ID: 0x5d01f4
+            PA_Sync_State: Synchronize to PA - PAST not available
+            PA_Interval: 0xffff
+            Num_Subgroups: 1
+            Subgroup #0:
+              BIS_Sync State: 0x00000001
+              Metadata: #0: len 0x03 type 0x02
+              Metadata:   04 00
+
+> ACL Data RX: Handle 0 flags 0x01 dlen 6
+      ATT: Handle Multiple Value Notification (0x23) len 28
+        Length: 0x0018
+        Handle: 0x003a Type: Broadcast Receive State (0x2bc8)
+          Data[24]: 01017df8f3ee1f0500f4015d020101000000000403020400
+          Source_ID: 1
+          Source_Address_Type: 1
+          Source_Address: 05:1F:EE:F3:F8:7D
+          Source_Adv_SID: 0
+          Broadcast_ID: 0x5d01f4
+          PA_Sync_State: Synchronized to PA
+          BIG_Encryption: Broadcast_Code required
+          Num_Subgroups: 1
+          Subgroup #0:
+            BIS_Sync State: 0x00000000
+            Metadata: #0: len 0x03 type 0x02
+            Metadata:   04 00
+
+< ACL Data TX: Handle 0 flags 0x00 dlen 25
+      ATT: Write Command (0x52) len 20
+        Handle: 0x0040 Type: Broadcast Audio Scan Control Point (0x2bc7)
+          Data[18]: 04010102680553f1415aa265bbafc6ea03b8
+            Opcode: Set Broadcast_Code (0x04)
+            Source_ID: 1
+            Broadcast_Code[16]: 0102680553f1415aa265bbafc6ea03b8
+
+> ACL Data RX: Handle 0 flags 0x01 dlen 6
+      ATT: Handle Multiple Value Notification (0x23) len 28
+        Length: 0x0018
+        Handle: 0x003a Type: Broadcast Receive State (0x2bc8)
+          Data[24]: 01017df8f3ee1f0500f4015d020201010000000403020400
+          Source_ID: 1
+          Source_Address_Type: 1
+          Source_Address: 05:1F:EE:F3:F8:7D
+          Source_Adv_SID: 0
+          Broadcast_ID: 0x5d01f4
+          PA_Sync_State: Synchronized to PA
+          BIG_Encryption: Decrypting
+          Num_Subgroups: 1
+          Subgroup #0:
+            BIS_Sync State: 0x00000001
+            Metadata: #0: len 0x03 type 0x02
+            Metadata:   04 00
 ---
- profiles/audio/bass.c | 295 ++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 295 insertions(+)
+ client/assistant.c | 247 +++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 247 insertions(+)
 
-diff --git a/profiles/audio/bass.c b/profiles/audio/bass.c
-index 795b4b80a..b3740f64e 100644
---- a/profiles/audio/bass.c
-+++ b/profiles/audio/bass.c
-@@ -70,10 +70,18 @@ enum assistant_state {
- 					 */
- };
+diff --git a/client/assistant.c b/client/assistant.c
+index 69a955c18..77fb78329 100644
+--- a/client/assistant.c
++++ b/client/assistant.c
+@@ -43,6 +43,14 @@
  
-+static const char *const str_state[] = {
-+	"ASSISTANT_STATE_IDLE",
-+	"ASSISTANT_STATE_PENDING",
-+	"ASSISTANT_STATE_REQUESTING",
-+	"ASSISTANT_STATE_ACTIVE",
+ #define MEDIA_ASSISTANT_INTERFACE "org.bluez.MediaAssistant1"
+ 
++#define BCODE_LEN		16
++
++struct assistant_config {
++	GDBusProxy *proxy;	/* DBus object reference */
++	struct iovec *meta;	/* Stream metadata LTVs */
++	struct bt_iso_qos qos;	/* Stream QoS parameters */
 +};
 +
- struct bass_data {
- 	struct btd_device *device;
- 	struct btd_service *service;
- 	struct bt_bass *bass;
-+	unsigned int src_id;
- };
+ static DBusConnection *dbus_conn;
  
- struct bass_assistant {
-@@ -92,14 +100,206 @@ struct bass_assistant {
- static struct queue *sessions;
- static struct queue *assistants;
- 
-+static const char *state2str(enum assistant_state state);
-+
- static void bass_debug(const char *str, void *user_data)
- {
- 	DBG_IDX(0xffff, "%s", str);
+ static GList *assistants;
+@@ -141,10 +149,249 @@ static void disconnect_handler(DBusConnection *connection, void *user_data)
+ 	assistants = NULL;
  }
  
-+static void assistant_set_state(struct bass_assistant *assistant,
-+					enum assistant_state state)
++static uint8_t *str2bytearray(char *arg, size_t *val_len)
 +{
-+	enum assistant_state old_state = assistant->state;
-+	const char *str;
++	uint8_t value[UINT8_MAX];
++	char *entry;
++	unsigned int i;
 +
-+	if (old_state == state)
-+		return;
++	for (i = 0; (entry = strsep(&arg, " \t")) != NULL; i++) {
++		long val;
++		char *endptr = NULL;
 +
-+	assistant->state = state;
++		if (*entry == '\0')
++			continue;
 +
-+	DBG("State changed %s: %s -> %s", assistant->path, str_state[old_state],
-+							str_state[state]);
++		if (i >= G_N_ELEMENTS(value)) {
++			bt_shell_printf("Too much data\n");
++			return NULL;
++		}
 +
-+	str = state2str(state);
++		val = strtol(entry, &endptr, 0);
++		if (!endptr || *endptr != '\0' || val > UINT8_MAX) {
++			bt_shell_printf("Invalid value at index %d\n", i);
++			return NULL;
++		}
 +
-+	if (g_strcmp0(str, state2str(old_state)) != 0)
-+		g_dbus_emit_property_changed(btd_get_dbus_connection(),
-+						assistant->path,
-+						MEDIA_ASSISTANT_INTERFACE,
-+						"State");
++		value[i] = val;
++	}
++
++	*val_len = i;
++
++	return util_memdup(value, i);
 +}
 +
-+static int assistant_parse_qos(struct bass_assistant *assistant,
-+						DBusMessageIter *iter)
++static void append_qos(DBusMessageIter *iter, struct assistant_config *cfg)
 +{
++	DBusMessageIter entry, var, dict;
++	const char *key = "QoS";
++	const char *bcode_key = "BCode";
++	uint8_t *bcode = cfg->qos.bcast.bcode;
++
++	dbus_message_iter_open_container(iter, DBUS_TYPE_DICT_ENTRY,
++						NULL, &entry);
++
++	dbus_message_iter_append_basic(&entry, DBUS_TYPE_STRING, &key);
++
++	dbus_message_iter_open_container(&entry, DBUS_TYPE_VARIANT,
++						"a{sv}", &var);
++
++	dbus_message_iter_open_container(&var, DBUS_TYPE_ARRAY, "{sv}",
++					&dict);
++
++	g_dbus_dict_append_basic_array(&dict, DBUS_TYPE_STRING,
++					&bcode_key, DBUS_TYPE_BYTE,
++					&bcode, BCODE_LEN);
++
++	dbus_message_iter_close_container(&var, &dict);
++	dbus_message_iter_close_container(&entry, &var);
++	dbus_message_iter_close_container(iter, &entry);
++}
++
++static void push_setup(DBusMessageIter *iter, void *user_data)
++{
++	struct assistant_config *cfg = user_data;
 +	DBusMessageIter dict;
-+	const char *key;
++	const char *meta = "Metadata";
 +
-+	dbus_message_iter_recurse(iter, &dict);
++	dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY, "{sv}", &dict);
 +
-+	while (dbus_message_iter_get_arg_type(&dict) == DBUS_TYPE_DICT_ENTRY) {
-+		DBusMessageIter value, entry;
-+		int var;
++	if (cfg->meta)
++		g_dbus_dict_append_basic_array(&dict, DBUS_TYPE_STRING, &meta,
++				DBUS_TYPE_BYTE, &cfg->meta->iov_base,
++				cfg->meta->iov_len);
 +
-+		dbus_message_iter_recurse(&dict, &entry);
-+		dbus_message_iter_get_basic(&entry, &key);
++	if (cfg->qos.bcast.encryption)
++		append_qos(&dict, cfg);
 +
-+		dbus_message_iter_next(&entry);
-+		dbus_message_iter_recurse(&entry, &value);
-+
-+		var = dbus_message_iter_get_arg_type(&value);
-+
-+		if (!strcasecmp(key, "BCode")) {
-+			DBusMessageIter array;
-+			struct iovec iov = {0};
-+
-+			if (var != DBUS_TYPE_ARRAY)
-+				return -EINVAL;
-+
-+			dbus_message_iter_recurse(&value, &array);
-+			dbus_message_iter_get_fixed_array(&array,
-+							&iov.iov_base,
-+							(int *)&iov.iov_len);
-+
-+			if (iov.iov_len != BT_BASS_BCAST_CODE_SIZE) {
-+				error("Invalid size for BCode: %zu != 16",
-+								iov.iov_len);
-+				return -EINVAL;
-+			}
-+
-+			memcpy(assistant->qos.bcast.bcode, iov.iov_base,
-+								iov.iov_len);
-+
-+			return 0;
-+		}
-+
-+		dbus_message_iter_next(&dict);
-+	}
-+
-+	return 0;
++	dbus_message_iter_close_container(iter, &dict);
 +}
 +
-+static int assistant_parse_props(struct bass_assistant *assistant,
-+					DBusMessageIter *props)
++static void push_reply(DBusMessage *message, void *user_data)
 +{
-+	DBusMessageIter value, entry, array;
-+	const char *key;
++	struct assistant_config *cfg = user_data;
++	DBusError error;
 +
-+	while (dbus_message_iter_get_arg_type(props) == DBUS_TYPE_DICT_ENTRY) {
-+		dbus_message_iter_recurse(props, &entry);
-+		dbus_message_iter_get_basic(&entry, &key);
++	dbus_error_init(&error);
 +
-+		dbus_message_iter_next(&entry);
-+		dbus_message_iter_recurse(&entry, &value);
++	if (dbus_set_error_from_message(&error, message)) {
++		bt_shell_printf("Failed to push assistant: %s\n",
++				error.name);
 +
-+		if (!strcasecmp(key, "Metadata")) {
-+			struct iovec iov;
++		dbus_error_free(&error);
 +
-+			if (dbus_message_iter_get_arg_type(&value) !=
-+							DBUS_TYPE_ARRAY)
-+				goto fail;
-+
-+			dbus_message_iter_recurse(&value, &array);
-+			dbus_message_iter_get_fixed_array(&array,
-+							&iov.iov_base,
-+							(int *)&iov.iov_len);
-+
-+			util_iov_free(assistant->meta, 1);
-+			assistant->meta = util_iov_dup(&iov, 1);
-+			DBG("Parsed Metadata");
-+		} else if (!strcasecmp(key, "QoS")) {
-+			if (dbus_message_iter_get_arg_type(&value) !=
-+							DBUS_TYPE_ARRAY)
-+				goto fail;
-+
-+			if (assistant_parse_qos(assistant, &value))
-+				goto fail;
-+
-+			DBG("Parsed QoS");
-+		}
-+
-+		dbus_message_iter_next(props);
++		return bt_shell_noninteractive_quit(EXIT_FAILURE);
 +	}
 +
-+	return 0;
++	bt_shell_printf("Assistant %s pushed\n",
++				g_dbus_proxy_get_path(cfg->proxy));
++
++	free(cfg->meta);
++	g_free(cfg);
++
++	return bt_shell_noninteractive_quit(EXIT_SUCCESS);
++}
++
++static void assistant_set_bcode_cfg(const char *input, void *user_data)
++{
++	struct assistant_config *cfg = user_data;
++	char *endptr;
++	uint8_t *bcode = cfg->qos.bcast.bcode;
++
++	if (!strcasecmp(input, "a") || !strcasecmp(input, "auto")) {
++		memset(bcode, 0, BCODE_LEN);
++	} else {
++		bcode[0] = strtol(input, &endptr, 16);
++
++		for (uint8_t i = 1; i < BCODE_LEN; i++)
++			bcode[i] = strtol(endptr, &endptr, 16);
++	}
++
++	if (!g_dbus_proxy_method_call(cfg->proxy, "Push",
++					push_setup, push_reply,
++					cfg, NULL)) {
++		bt_shell_printf("Failed to push assistant\n");
++
++		free(cfg->meta);
++		g_free(cfg);
++
++		return bt_shell_noninteractive_quit(EXIT_FAILURE);
++	}
++}
++
++static void assistant_set_metadata_cfg(const char *input, void *user_data)
++{
++	struct assistant_config *cfg = user_data;
++	DBusMessageIter iter, dict, entry, value;
++	const char *key;
++
++	if (!strcasecmp(input, "a") || !strcasecmp(input, "auto"))
++		goto done;
++
++	if (!cfg->meta)
++		cfg->meta = g_new0(struct iovec, 1);
++
++	cfg->meta->iov_base = str2bytearray((char *) input,
++				&cfg->meta->iov_len);
++	if (!cfg->meta->iov_base) {
++		free(cfg->meta);
++		cfg->meta = NULL;
++	}
++
++done:
++	/* Get QoS property to check if the stream is encrypted */
++	if (!g_dbus_proxy_get_property(cfg->proxy, "QoS", &iter))
++		goto fail;
++
++	if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_ARRAY)
++		goto fail;
++
++	dbus_message_iter_recurse(&iter, &dict);
++
++	if (dbus_message_iter_get_arg_type(&dict) != DBUS_TYPE_DICT_ENTRY)
++		goto fail;
++
++	dbus_message_iter_recurse(&dict, &entry);
++	dbus_message_iter_get_basic(&entry, &key);
++
++	if (strcasecmp(key, "Encryption") != 0)
++		goto fail;
++
++	dbus_message_iter_next(&entry);
++	dbus_message_iter_recurse(&entry, &value);
++
++	if (dbus_message_iter_get_arg_type(&value) != DBUS_TYPE_BYTE)
++		goto fail;
++
++	dbus_message_iter_get_basic(&value, &cfg->qos.bcast.encryption);
++
++	if (cfg->qos.bcast.encryption)
++		/* Prompt user to enter the Broadcast Code to decrypt
++		 * the stream
++		 */
++		bt_shell_prompt_input("Assistant",
++				"Enter Broadcast Code (auto/value):",
++				assistant_set_bcode_cfg, cfg);
++	else
++		if (!g_dbus_proxy_method_call(cfg->proxy, "Push",
++						push_setup, push_reply,
++						cfg, NULL)) {
++			bt_shell_printf("Failed to push assistant\n");
++			goto fail;
++		}
++
++	return;
 +
 +fail:
-+	DBG("Failed parsing %s", key);
++	free(cfg->meta);
++	g_free(cfg);
 +
-+	return -EINVAL;
++	return bt_shell_noninteractive_quit(EXIT_FAILURE);
 +}
 +
- static DBusMessage *push(DBusConnection *conn, DBusMessage *msg,
- 							  void *user_data)
- {
-+	struct bass_assistant *assistant = user_data;
-+	struct bt_bass_bcast_audio_scan_cp_hdr hdr;
-+	struct bt_bass_add_src_params params;
-+	struct iovec iov = {0};
-+	uint32_t bis_sync = 0;
-+	uint8_t meta_len = 0;
-+	int err;
-+	DBusMessageIter props, dict;
-+
-+	DBG("");
-+
-+	dbus_message_iter_init(msg, &props);
-+
-+	if (dbus_message_iter_get_arg_type(&props) != DBUS_TYPE_ARRAY) {
-+		DBG("Unable to parse properties");
-+		return btd_error_invalid_args(msg);
-+	}
-+
-+	dbus_message_iter_recurse(&props, &dict);
-+
-+	if (assistant_parse_props(assistant, &dict)) {
-+		DBG("Unable to parse properties");
-+		return btd_error_invalid_args(msg);
-+	}
-+
-+	hdr.op = BT_BASS_ADD_SRC;
-+
-+	if (device_get_le_address_type(assistant->device) == BDADDR_LE_PUBLIC)
-+		params.addr_type = BT_BASS_ADDR_PUBLIC;
-+	else
-+		params.addr_type = BT_BASS_ADDR_RANDOM;
-+
-+	bacpy(&params.addr, device_get_address(assistant->device));
-+	put_le24(assistant->bid, params.bid);
-+	params.pa_sync = PA_SYNC_NO_PAST;
-+	params.pa_interval = PA_INTERVAL_UNKNOWN;
-+	params.num_subgroups = assistant->sgrp + 1;
-+
-+	util_iov_append(&iov, &params, sizeof(params));
-+
-+	/* Metadata and the BIS index associated with the MediaAssistant
-+	 * object will be set in the subgroup they belong to. For the other
-+	 * subgroups, no metadata and no BIS index will be provided.
-+	 */
-+	for (uint8_t sgrp = 0; sgrp < assistant->sgrp; sgrp++) {
-+		util_iov_append(&iov, &bis_sync, sizeof(bis_sync));
-+		util_iov_append(&iov, &meta_len, sizeof(meta_len));
-+	}
-+
-+	bis_sync = (1 << (assistant->bis - 1));
-+	meta_len = assistant->meta->iov_len;
-+
-+	util_iov_append(&iov, &bis_sync, sizeof(bis_sync));
-+	util_iov_append(&iov, &meta_len, sizeof(meta_len));
-+	util_iov_append(&iov, assistant->meta->iov_base,
-+				assistant->meta->iov_len);
-+
-+	err = bt_bass_send(assistant->data->bass, &hdr, &iov);
-+	if (err) {
-+		DBG("Unable to send BASS Write Command");
-+		return btd_error_failed(msg, strerror(-err));
-+	}
-+
-+	free(iov.iov_base);
-+
-+	assistant_set_state(assistant, ASSISTANT_STATE_PENDING);
-+
- 	return g_dbus_create_reply(msg, DBUS_TYPE_INVALID);
- }
- 
-@@ -381,6 +581,8 @@ static void bass_data_free(struct bass_data *data)
- 		bt_bass_set_user_data(data->bass, NULL);
- 	}
- 
-+	bt_bass_src_unregister(data->bass, data->src_id);
-+
- 	bt_bass_unref(data->bass);
- 
- 	queue_remove_all(assistants, assistant_match_data,
-@@ -453,6 +655,93 @@ static void bass_attached(struct bt_bass *bass, void *user_data)
- 	bass_data_add(data);
- }
- 
-+static void bass_handle_bcode_req(struct bass_assistant *assistant, int id)
++static void cmd_push_assistant(int argc, char *argv[])
 +{
-+	struct bt_bass_bcast_audio_scan_cp_hdr hdr;
-+	struct bt_bass_set_bcast_code_params params;
-+	struct iovec iov = {0};
-+	int err;
++	struct assistant_config *cfg;
 +
-+	assistant_set_state(assistant, ASSISTANT_STATE_REQUESTING);
++	cfg = new0(struct assistant_config, 1);
++	if (!cfg)
++		goto fail;
 +
-+	hdr.op = BT_BASS_SET_BCAST_CODE;
-+
-+	params.id = id;
-+	memcpy(params.bcast_code, assistant->qos.bcast.bcode,
-+					BT_BASS_BCAST_CODE_SIZE);
-+
-+	iov.iov_base = malloc0(sizeof(params));
-+	if (!iov.iov_base)
-+		return;
-+
-+	util_iov_push_mem(&iov, sizeof(params), &params);
-+
-+	err = bt_bass_send(assistant->data->bass, &hdr, &iov);
-+	if (err) {
-+		DBG("Unable to send BASS Write Command");
-+		return;
++	/* Search for DBus object */
++	cfg->proxy = g_dbus_proxy_lookup(assistants, NULL, argv[1],
++						MEDIA_ASSISTANT_INTERFACE);
++	if (!cfg->proxy) {
++		bt_shell_printf("Assistant %s not found\n", argv[1]);
++		goto fail;
 +	}
 +
-+	free(iov.iov_base);
++	/* Prompt user to enter metadata */
++	bt_shell_prompt_input("Assistant",
++			"Enter Metadata (auto/value):",
++			assistant_set_metadata_cfg, cfg);
++
++	return;
++
++fail:
++	g_free(cfg);
++	return bt_shell_noninteractive_quit(EXIT_FAILURE);
 +}
 +
-+static void bass_src_changed(uint8_t id, uint32_t bid, uint8_t enc,
-+					uint32_t bis_sync, void *user_data)
-+{
-+	const struct queue_entry *entry;
++static const struct bt_shell_menu assistant_menu = {
++	.name = "assistant",
++	.desc = "Media Assistant Submenu",
++	.entries = {
++	{ "push", "<assistant>", cmd_push_assistant,
++					"Send stream information to peer" },
++	{} },
++};
 +
-+	for (entry = queue_get_entries(assistants); entry;
-+						entry = entry->next) {
-+		struct bass_assistant *assistant = entry->data;
-+		uint32_t bis = 1 << (assistant->bis - 1);
-+
-+		if (assistant->bid != bid)
-+			/* Only handle assistant objects
-+			 * that match the source
-+			 */
-+			continue;
-+
-+		switch (enc) {
-+		case BT_BASS_BIG_ENC_STATE_BCODE_REQ:
-+			if (assistant->state != ASSISTANT_STATE_PENDING)
-+				/* Only handle assistant objects that
-+				 * have been pushed by the user
-+				 */
-+				break;
-+
-+			/* Provide Broadcast Code to peer */
-+			bass_handle_bcode_req(assistant, id);
-+			break;
-+		case BT_BASS_BIG_ENC_STATE_NO_ENC:
-+			if (assistant->state != ASSISTANT_STATE_PENDING)
-+				/* Only handle assistant objects that
-+				 * have been pushed by the user
-+				 */
-+				break;
-+
-+			/* Match BIS index */
-+			if (bis & bis_sync)
-+				assistant_set_state(assistant,
-+						ASSISTANT_STATE_ACTIVE);
-+			break;
-+		case BT_BASS_BIG_ENC_STATE_DEC:
-+			/* Only handle assistant objects that
-+			 * have requested a Broadcast Code
-+			 */
-+			if (assistant->state != ASSISTANT_STATE_REQUESTING)
-+				break;
-+
-+			/* Match BIS index */
-+			if (bis & bis_sync)
-+				assistant_set_state(assistant,
-+						ASSISTANT_STATE_ACTIVE);
-+			break;
-+		default:
-+			continue;
-+		}
-+	}
-+}
-+
- static int bass_probe(struct btd_service *service)
+ static GDBusClient * client;
+ 
+ void assistant_add_submenu(void)
  {
- 	struct btd_device *device = btd_service_get_device(service);
-@@ -485,6 +774,12 @@ static int bass_probe(struct btd_service *service)
- 	bass_data_add(data);
- 	bt_bass_set_user_data(data->bass, service);
- 
-+	/* Register callback to be called when notifications for
-+	 * Broadcast Receive State characteristics are received.
-+	 */
-+	data->src_id = bt_bass_src_register(data->bass, bass_src_changed,
-+						data, NULL);
++	bt_shell_add_submenu(&assistant_menu);
 +
- 	return 0;
- }
- 
+ 	dbus_conn = bt_shell_get_env("DBUS_CONNECTION");
+ 	if (!dbus_conn || client)
+ 		return;
 -- 
 2.39.2
 
