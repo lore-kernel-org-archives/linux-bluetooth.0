@@ -1,130 +1,164 @@
-Received: from mail-qk1-f180.google.com (mail-qk1-f180.google.com [209.85.222.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F8A36FB9
-	for <linux-bluetooth@vger.kernel.org>; Sun,  4 Aug 2024 20:36:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.180
+Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.4])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1184EDC
+	for <linux-bluetooth@vger.kernel.org>; Mon,  5 Aug 2024 02:01:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722803771; cv=none; b=HRfKnB4yOwGoznXkBV9Zvq5QyMCeFjKhBC6nZqkmOrB400Tfvj5CrILt0LIi+fob9IPOjHvmFNJPqHP5XyoRoBV2sACx8SgJ0c2H8Eq4pe5/G83mslGzcIbTYb1SmMQ7Sf6ghEjFY/BK4PQ0FaS/I2EGcTQ5f1oIbpu5gzmgjgE=
+	t=1722823306; cv=none; b=JEz09zMaXoe1r+byYHEjffBcjF1cTbbTbBSiaD2mMpyIro4MS7Ef5OotRMxKEUQnAbjIog4vJSoRMjSY8lS6qRxASqAbIZ36IRUFoWbYUXV8Hgn7av4iatFccWBthK98rnKfbUgcJW+/1+Zmo9oZmpLmcijnwDw/B7VLoKrvuEU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722803771; c=relaxed/simple;
-	bh=Cggi1eNHliiz5MyR8NlN3ZDs3/x2waIFrGVGvARGveg=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=Textm6+vMTu4gNWccIXi63CkMP8JUUtPMvPoDDWutlHdK/pKrg7IHm8GBiejWMYguRqXdXpIsKjJk8hSZyB0VX7DXoeOF3KbTP7sNEMy5TDzWZ5CP7FyIuc6+T9hAr1Ew9dxmVZGp+KoNklW5DM5R6+HMR4EU9icoxkmFTTcUOA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Mv8nZs52; arc=none smtp.client-ip=209.85.222.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1722823306; c=relaxed/simple;
+	bh=d+kavo78siIMbP12vIvXEJr2o35clAf0q9h9eJ6eAJc=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=AR4kqVwPPJwLfhJ+NPq1U6clJ2Pc3QddfSsulTfobyD/wOJTyShBZDqaOedv1sbFcaTeY4BZV/mzFgPj7pfQACdDNqaR0G7wTA3wejidKZxi0ctiqK9RcShlD5ah983hR6uQZV6bI4Et1piGVEWvOS9lKCn24w2GWIJx0jPTCUQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=W6vmzM0t; arc=none smtp.client-ip=220.197.31.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Mv8nZs52"
-Received: by mail-qk1-f180.google.com with SMTP id af79cd13be357-7a1d7bc07b7so580556885a.0
-        for <linux-bluetooth@vger.kernel.org>; Sun, 04 Aug 2024 13:36:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1722803768; x=1723408568; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=aZ2Hbg/Ed1fDsRNDhQW45EdSZ/LkMQFLKCeQRf3u+Xw=;
-        b=Mv8nZs52cRHi7gG/d1Du0F5xrBdVDMfVuzKbBQOTQtrYPAzyZJS+OZYkowEOJS0fXw
-         0RjNfG+HSu3ZeqcjLKFYhgZUuLZN2tiQzXSsb3vPhkhHCLtbzGQ8Z+wKSqjB3Ga2MN8m
-         YKU9jSVTufkIm8mdxG+QeI+oO6iPdYfmdlcI0pBBWvcMyeH3Kh8TZ5VuqFqtF8wdUxzC
-         S1qxohoQ6b0pOOhLZOG8vh/MdXZXoH7qr49kgte7gHTRJfJahQ4Qpo9AZ+xO24aWebZz
-         S8uW4T3Me2yUNwHqqPbMjKVujA+BSQkyA3cDNdJER7r+GZ2mzcCzv8aY7eikoWdEv1F0
-         Ilgg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722803768; x=1723408568;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=aZ2Hbg/Ed1fDsRNDhQW45EdSZ/LkMQFLKCeQRf3u+Xw=;
-        b=kNSJt9k8F1shpd6hGl0zhMT8CCnn2DsYu1qXFgAOZUlR+lWCUbc2iIndeTdq9y1jG5
-         /NIpWL4TaN3dk1VVWY56sKYsOyB2nkwfZQIbbSQsJ5B+T6zDsvSwqi+OKOphGt2ST0kr
-         IcLVAYPupoPiBuq7jmZ3515+DsX4vSgemtVWEhPUebHlAwVVRdO/+2wnCbZBKBAtFAoZ
-         jouFuUQG2LOsg2ZeM8G5EufxNYH+3qo0eSaf/diw9/xXiP2IZQbSS72Rc4X1NDhy5Hk8
-         8tl65/8q0f+urXgg9TvfiyYjmIOlzItO3cln95pOBPq096FXwHhUXR9zhysImY9L8Oad
-         +vmw==
-X-Gm-Message-State: AOJu0YxpsipAl4ZQjXDdpCJ5JdYMQpQdzbQEnoIoi7D9FSm4C/1smHiZ
-	IrJDEHjFidtS2E0NWif7ALplgGm8PPns26TmYM//hPmmoLsLvubyisDbBg==
-X-Google-Smtp-Source: AGHT+IGj4e4jry1TmBOffti2Vi4cGwyK4dq8yBVCh4uCl+G5AaFp7kqL9404gltzGiYD9BDrU9bkFQ==
-X-Received: by 2002:a05:620a:3956:b0:79f:8f3:6ad4 with SMTP id af79cd13be357-7a34eed1880mr1356862385a.1.1722803768164;
-        Sun, 04 Aug 2024 13:36:08 -0700 (PDT)
-Received: from [172.17.0.2] ([172.183.36.16])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7a34f6e714fsm287258685a.33.2024.08.04.13.36.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 04 Aug 2024 13:36:08 -0700 (PDT)
-Message-ID: <66afe638.050a0220.1fc171.8fec@mx.google.com>
-Date: Sun, 04 Aug 2024 13:36:08 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============5049340421401441314=="
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="W6vmzM0t"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=From:Subject:Date:Message-Id:MIME-Version; bh=iuYfQ
+	DQidliFTg8Yx/y0H/5iECtXEzZaNmvD8MSEKPM=; b=W6vmzM0t55b610BCq1fZo
+	NjlcA38Ji+PBWH3146+PO7MOQwkoKy0nzqdp4Dgwissao2eC0SDZ++LFmboQOewy
+	eJVj8L4NI1J1FzKPhs0GpHcuhYNYyoUQzcJ6Ku1BEAHZEttEQml1ilZqR/oZKWys
+	AUUiJOkByelEisSg1pc8mQ=
+Received: from WH-D-007635B.QUECTEL.COM (unknown [223.76.229.213])
+	by gzga-smtp-mta-g2-0 (Coremail) with SMTP id _____wAXm893MrBmc8ftCw--.51888S2;
+	Mon, 05 Aug 2024 10:01:28 +0800 (CST)
+From: clancy_shang@163.com
+To: linux-bluetooth@vger.kernel.org
+Cc: zhongjun.yu@quectel.com,
+	Clancy Shang <clancy.shang@quectel.com>
+Subject: [PATCH] [BlueZ] adapter: Fix execute "LE Add Device To Resolving List" command fail
+Date: Mon,  5 Aug 2024 10:01:26 +0800
+Message-Id: <20240805020126.903959-1-clancy_shang@163.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, bas@basnieuwenhuizen.nl
-Subject: RE: Bluetooth: btusb: Add USB HW ID for ASUS Zenbook S 16.
-In-Reply-To: <20240804195319.3499920-1-bas@basnieuwenhuizen.nl>
-References: <20240804195319.3499920-1-bas@basnieuwenhuizen.nl>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:_____wAXm893MrBmc8ftCw--.51888S2
+X-Coremail-Antispam: 1Uf129KBjvJXoWxCF48tF4DWF45tF47uF4Uurg_yoW5try8pr
+	Z8JF9Yqws5tr17Kr4fuF4xWry5ur4kJ345KFZ3W3srKF17WFyUZFWSkryfta4xGwn5W3ZI
+	van0qa4DGa1UGF7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07U00PDUUUUU=
+X-CM-SenderInfo: xfod0ux1bvxtlqj6il2tof0z/1tbiLBwyuGXAnfXDXQAAsp
 
---===============5049340421401441314==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+From: Clancy Shang <clancy.shang@quectel.com>
 
-This is automated email and please do not reply to this email!
+According to Bluetooth Core Specification Version 5.4 | Vol 4, Part E,
+7.8.38, if there is an existing entry in the resolving list with the same
+non-zero Peer_IRK, the Controller should return the error code Invalid
+HCI Command Parameters (0x12), so fix it.
 
-Dear submitter,
+Test environment:
+I tested with the game controller device, and the steps are as follows:
+1. The game controller device enters advertising pairing mode and then
+   connects.
+2. Disconnect.
+3. Make the hand shank enter advertising pairing mode again and then
+   reconnect.
+4. Reproduce.
+The step one and step four, the game controller device is the same device
+but with a different privacy static address, causing the same IRK.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=876531
+There could be some trouble if it is fixed in the kernel.
+Firstly, there would be two devices in the paired list, but only the latest
+device can be conneted. Actually they are the same device.
+Secondly, the display will show two devices too.
 
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      10.04 seconds
-GitLint                       FAIL      0.46 seconds
-SubjectPrefix                 PASS      0.09 seconds
-BuildKernel                   PASS      29.88 seconds
-CheckAllWarning               PASS      32.21 seconds
-CheckSparse                   PASS      50.88 seconds
-CheckSmatch                   PASS      102.27 seconds
-BuildKernel32                 PASS      29.31 seconds
-TestRunnerSetup               PASS      531.84 seconds
-TestRunner_l2cap-tester       PASS      19.96 seconds
-TestRunner_iso-tester         PASS      31.67 seconds
-TestRunner_bnep-tester        PASS      5.11 seconds
-TestRunner_mgmt-tester        FAIL      121.30 seconds
-TestRunner_rfcomm-tester      PASS      7.36 seconds
-TestRunner_sco-tester         PASS      15.01 seconds
-TestRunner_ioctl-tester       PASS      7.86 seconds
-TestRunner_mesh-tester        PASS      5.97 seconds
-TestRunner_smp-tester         PASS      6.88 seconds
-TestRunner_userchan-tester    PASS      5.01 seconds
-IncrementalBuild              PASS      27.72 seconds
-
-Details
-##############################
-Test: GitLint - FAIL
-Desc: Run gitlint
-Output:
-Bluetooth: btusb: Add USB HW ID for ASUS Zenbook S 16.
-
-WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
-1: T3 Title has trailing punctuation (.): "Bluetooth: btusb: Add USB HW ID for ASUS Zenbook S 16."
-##############################
-Test: TestRunner_mgmt-tester - FAIL
-Desc: Run mgmt-tester with test-runner
-Output:
-Total: 492, Passed: 489 (99.4%), Failed: 1, Not Run: 2
-
-Failed Test Cases
-LL Privacy - Remove Device 4 (Disable Adv)           Timed out    2.717 seconds
-
-
+Signed-off-by: Clancy Shang <clancy.shang@quectel.com>
 ---
-Regards,
-Linux Bluetooth
+ src/adapter.c | 69 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 69 insertions(+)
 
+diff --git a/src/adapter.c b/src/adapter.c
+index 85ddfc165..c6021f173 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -8901,6 +8901,73 @@ static void store_irk(struct btd_adapter *adapter, const bdaddr_t *peer,
+ 	g_key_file_free(key_file);
+ }
+ 
++static void delete_existing_irk_from_directory(
++						struct btd_adapter *adapter,
++						const unsigned char *key)
++{
++	char dirname[PATH_MAX];
++	GError *gerr = NULL;
++	DIR *dir;
++	struct dirent *entry;
++
++	create_filename(dirname, PATH_MAX, "/%s",
++				btd_adapter_get_storage_dir(adapter));
++
++	dir = opendir(dirname);
++	if (!dir) {
++		btd_error(adapter->dev_id,
++				"Unable to open adapter storage directory: %s",
++								dirname);
++		return;
++	}
++
++	while ((entry = readdir(dir)) != NULL) {
++		struct btd_device *device;
++		char filename[PATH_MAX];
++		GKeyFile *key_file;
++		struct irk_info *irk_info;
++		uint8_t bdaddr_type;
++
++		if (entry->d_type == DT_UNKNOWN)
++			entry->d_type = util_get_dt(dirname, entry->d_name);
++
++		if (entry->d_type != DT_DIR || bachk(entry->d_name) < 0)
++			continue;
++
++		create_filename(filename, PATH_MAX, "/%s/%s/info",
++					btd_adapter_get_storage_dir(adapter),
++					entry->d_name);
++
++		key_file = g_key_file_new();
++		if (!g_key_file_load_from_file(key_file, filename,
++								0, &gerr)) {
++			error("Unable to load key file from %s: (%s)",
++					filename, gerr->message);
++			g_clear_error(&gerr);
++		}
++
++		bdaddr_type = get_addr_type(key_file);
++
++		irk_info = get_irk_info(key_file, entry->d_name, bdaddr_type);
++
++		if (irk_info) {
++			if (!memcmp(irk_info->val, key, 16)) {
++				DBG("Has same irk, delete it");
++				device = btd_adapter_find_device(adapter,
++							&irk_info->bdaddr,
++							irk_info->bdaddr_type);
++				if (device)
++					btd_adapter_remove_device(adapter,
++									device);
++			}
++		}
++		g_key_file_free(key_file);
++	}
++
++	closedir(dir);
++
++}
++
+ static void new_irk_callback(uint16_t index, uint16_t length,
+ 					const void *param, void *user_data)
+ {
+@@ -8950,6 +9017,8 @@ static void new_irk_callback(uint16_t index, uint16_t length,
+ 	if (!persistent)
+ 		return;
+ 
++	delete_existing_irk_from_directory(adapter, irk->val);
++
+ 	store_irk(adapter, &addr->bdaddr, addr->type, irk->val);
+ 
+ 	btd_device_set_temporary(device, false);
+-- 
+2.25.1
 
---===============5049340421401441314==--
