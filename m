@@ -1,173 +1,117 @@
-Received: from mail-lj1-f182.google.com (mail-lj1-f182.google.com [209.85.208.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A13A22A1CA
-	for <linux-bluetooth@vger.kernel.org>; Tue,  6 Aug 2024 19:08:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18CC716EB53;
+	Tue,  6 Aug 2024 20:28:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722971339; cv=none; b=AmXjgP91q8SbQA4UwHgzxnqP8nVMUPfGyyAVVEnnVkCRhPnmBb7sNZ+GufJYBHt7eHK9wcXzd4ta5qq5RGtxZwYDLl8GuO+FbT6RXiwFZ+NUd9fLPc31ezvc1dNi+uVqXBsdQpdqXc3Uvg//zWq4hNHOxtFRTyzVgg04+He+JIw=
+	t=1722976139; cv=none; b=scToRGERGnQwWXhJIZ2YBTIkOKZwlXTvz0q5n/Rc8uboP6TgOICtRYpGRuGm2mv1vGRQ46624wy5+FTiTa7pXPAHzcHjm4/vixSPxb6/pvJuZSxBJ6WE60W92QaTAceP6mT/PQdwnwimyz0hTTuy8yNgiRH51SPcjcUPEv4L7F0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722971339; c=relaxed/simple;
-	bh=NizTV+fjibItL3luEMQDu9+ctgrr2JN1sriwpAsCZgw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=sOwzhuYxXE18JLR/stn4dN4B0PxvL5ssc2hViLxF9YClxWO3F37DqVcj73DQPnWwXBfwAyuzVZ3lj9dyQRwgtaAAkjAsIHBEL3w2mjs3CwkS37SLQ2BNUgC66Nfk7hH9MPLhRjQAGK7y7KuxvJlSsZmRfDUVYmHDl/FIKPuOhVQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lB8E4YtW; arc=none smtp.client-ip=209.85.208.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1722976139; c=relaxed/simple;
+	bh=+L1mds7XdZNr2tLDXx7FUINDaM3YND1xEBDwsLW6GKA=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=p+7TVYJKnUlv/VHbNMPYPRFvogYhLmQjVtNT4OTiQ75jUTRKiUDjIApD4/WopU9ktqaH89Tc0FrjWdwsxIe4chL9JjKx0AhYi70yiSp9TiXe9+939otL7FsX2JRPiSuNdSg6LXXbzLroa4cvbu8ylb1e6eIOYAyy+hwQMymHlx0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eJ3Gu0zp; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lB8E4YtW"
-Received: by mail-lj1-f182.google.com with SMTP id 38308e7fff4ca-2f0dfdc9e16so12246741fa.2
-        for <linux-bluetooth@vger.kernel.org>; Tue, 06 Aug 2024 12:08:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1722971336; x=1723576136; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=KbcYhzXkCHlZr63fVmgUULTDN8ddERbPpRTqoQqHuNc=;
-        b=lB8E4YtWoCd4V7W3F4KDDPr9n2B68AlYAt4Cp39DbIYaeBBOfuxTTd8ybY+NNgjk6K
-         /7Xj41UMT6EFxWjAT01KjeOYqBupfZYOnaGLu17rxsmMvw4sa5+zkl3jG7uYXqp2JUDg
-         FUrrGJI+GG0KOxjCkUFD1Gox1n5Y9S93OgCGTKpvjk9nfZucvA+7AdisX5vdLO59sepF
-         6hqGLvXvtO64btPMuCwbh1y73K2Svl5+NHcXyyfIdGZLmwCE09RyxkoxNNbnuvMGS5RY
-         Os7NIPBjA0IXQDYH9AGV6Kyb4YB9hxT5/uaJlacS6TUA7n9VgqZ7TRh3/m7sSlN4P5US
-         BpZg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722971336; x=1723576136;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=KbcYhzXkCHlZr63fVmgUULTDN8ddERbPpRTqoQqHuNc=;
-        b=BxdlcOZb0aY27+w8hSQ5mHmx1BMvMUsRiNceTqML8NrEXuQ1gMPCfhXQQGR/S9qE1u
-         +xGWk8TKK5oaZnWTcME+A3BYkbxCm/NCg5b1/TTW1wzivezbcWA3htmh0ci+e5KYhZG+
-         2yo6XilT0WS7zkeRJe/2wsUSWSHHHZFz/VGW98pibGtCNXo1KWQi5dDQ+fN8p5fpjvlY
-         2pLEpwGhVLFCRtddltj/vB7WYddLyAfMDujI7Qq/F4odWo0js1x7fxD/FcqrrDNJBzhf
-         IEbyHbJuOFUCmJ3f9xuZTM/fsNFJIj/7cM+vvM99aVkgDfuurk8NMKfRxOE4ChyfCuLy
-         HvNw==
-X-Gm-Message-State: AOJu0YxlLYeN2qs69w9vxHWBHXvwT1OmX84fKaQTwjsIgeSaPFcbVlk3
-	OJM/NqhvpOW4rDl0HD1KSpp90/WkaarUw0+2HScI05SpncWOJd8PLctVQRhlIWSQfpG0nuMWRiq
-	Dm9zU+aCAfi6ovWWIE275RkB56AHdoonJ
-X-Google-Smtp-Source: AGHT+IF3ZL8W1pdEiwOaLZECW0QcfJzpsxQ9kahLIoMALUyzTHq377HktdB+rhD0/prl46HdrSOJ/F5QtdmLKieVsoA=
-X-Received: by 2002:a2e:81c1:0:b0:2ef:2638:48cd with SMTP id
- 38308e7fff4ca-2f15aafdbfcmr93926681fa.30.1722971335453; Tue, 06 Aug 2024
- 12:08:55 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eJ3Gu0zp"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ECA41C32786;
+	Tue,  6 Aug 2024 20:28:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1722976139;
+	bh=+L1mds7XdZNr2tLDXx7FUINDaM3YND1xEBDwsLW6GKA=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=eJ3Gu0zpS8fS/uM5YLvs+JxVtosZFExcaB9DjfT/JAiZk3HVAtXYV03oWCpIrbVWt
+	 Du3fTltzirTeiPRYZSG6X5ZSrtUB4D0p7Mh/6UoJHLM0UdG9WV89BzmmNocL8f/dbd
+	 2x+BguWfDXKrSxlZJoaL2QSYThIt43WHHqdaiwsafvvCaXGbG03B+q6B0gwbyC+PuE
+	 jmfHMhoJEu9/r7HopPf2zHKQnO0ACeobrhK41ZJvboVthM1zDiIzJeDjgWjIJ9jVO7
+	 NHhZxpIW3E67a5/N2GX7+N2YuASj2RNCATBLwsijz/2ykNBMgk92s4PA5QP3bkkROF
+	 IyeD9nX24Bw8A==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB60239EF94A;
+	Tue,  6 Aug 2024 20:28:58 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240805140840.1606239-1-hadess@hadess.net> <20240805140840.1606239-7-hadess@hadess.net>
-In-Reply-To: <20240805140840.1606239-7-hadess@hadess.net>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Tue, 6 Aug 2024 15:08:43 -0400
-Message-ID: <CABBYNZLeuUw5nO-nw65nccSCKXcf-KLMxqDfPTObk-S3NP+tTQ@mail.gmail.com>
-Subject: Re: [BlueZ 6/8] shared/gatt-db: Fix possible buffer overrun
-To: Bastien Nocera <hadess@hadess.net>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH 1/2] Bluetooth: btusb: Add new VID/PID 0489/e139 for MT7925
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <172297613766.1692635.8217339619604849343.git-patchwork-notify@kernel.org>
+Date: Tue, 06 Aug 2024 20:28:57 +0000
+References: <20240715061508.14077-1-jiande.lu@mediatek.com>
+In-Reply-To: <20240715061508.14077-1-jiande.lu@mediatek.com>
+To: Jiande Lu <jiande.lu@mediatek.com>
+Cc: marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
+ sean.wang@mediatek.com, chris.lu@mediatek.com, deren.Wu@mediatek.com,
+ aaron.hou@mediatek.com, steve.lee@mediatek.com,
+ linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-mediatek@lists.infradead.org
 
-Hi Bastien,
+Hello:
 
-On Mon, Aug 5, 2024 at 10:09=E2=80=AFAM Bastien Nocera <hadess@hadess.net> =
-wrote:
->
-> uuid_to_le() returns one of the possible values from bt_uuid_len().
-> bt_uuid_len() returns "type / 8".
-> type is a value between 0 and 128, but could be something else
-> depending on the validity of the UUID that's parsed. So an invalid
-> value of type between 128 and 256 would trigger an overrun.
->
-> Add a check to make sure that an invalid type isn't used to calculate
-> the length.
->
-> Error: OVERRUN (CWE-119): [#def6] [important]
-> bluez-5.77/src/shared/gatt-db.c:612:2: assignment: Assigning: "len" =3D "=
-uuid_to_le(uuid, value)". The value of "len" is now between 0 and 31 (inclu=
-sive).
-> bluez-5.77/src/shared/gatt-db.c:614:2: overrun-buffer-arg: Overrunning ar=
-ray "value" of 16 bytes by passing it to a function which accesses it at by=
-te offset 30 using argument "len" (which evaluates to 31).
-> 612|    len =3D uuid_to_le(uuid, value);
-> 613|
-> 614|->  service->attributes[0] =3D new_attribute(service, handle, type, v=
-alue,
-> 615|                                                                    l=
-en);
-> 616|    if (!service->attributes[0]) {
-> ---
->  src/shared/gatt-db.c | 11 ++++++++---
->  1 file changed, 8 insertions(+), 3 deletions(-)
->
-> diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
-> index b35763410d17..cd0eba6bf1d0 100644
-> --- a/src/shared/gatt-db.c
-> +++ b/src/shared/gatt-db.c
-> @@ -560,9 +560,14 @@ static int uuid_to_le(const bt_uuid_t *uuid, uint8_t=
- *dst)
->                 return bt_uuid_len(uuid);
->         }
->
-> -       bt_uuid_to_uuid128(uuid, &uuid128);
-> -       bswap_128(&uuid128.value.u128, dst);
-> -       return bt_uuid_len(&uuid128);
-> +       if (uuid->type =3D=3D BT_UUID32 ||
+This series was applied to bluetooth/bluetooth-next.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-BT_UUID32 is not really valid in LE, so Id leave this check to be:
+On Mon, 15 Jul 2024 14:15:07 +0800 you wrote:
+> Add VID 0489 & PID e139 for Mediatek MT7925 USB Bluetooth chip.
+> The information in /sys/kernel/debug/usb/devices about the Bluetooth
+> device is listed as the below
+> 
+> T:  Bus=07 Lev=01 Prnt=01 Port=10 Cnt=02 Dev#=  2 Spd=480  MxCh= 0
+> D:  Ver= 2.10 Cls=ef(misc ) Sub=02 Prot=01 MxPS=64 #Cfgs=  1
+> P:  Vendor=0489 ProdID=e139 Rev= 1.00
+> S:  Manufacturer=MediaTek Inc.
+> S:  Product=Wireless_Device
+> S:  SerialNumber=000000000
+> C:* #Ifs= 3 Cfg#= 1 Atr=e0 MxPwr=100mA
+> A:  FirstIf#= 0 IfCount= 3 Cls=e0(wlcon) Sub=01 Prot=01
+> I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=125us
+> E:  Ad=82(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+> E:  Ad=02(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+> I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+> I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+> I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+> I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+> I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+> I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+> I:  If#= 1 Alt= 6 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  63 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  63 Ivl=1ms
+> I:* If#= 2 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
+> E:  Ad=8a(I) Atr=03(Int.) MxPS=  64 Ivl=125us
+> E:  Ad=0a(O) Atr=03(Int.) MxPS=  64 Ivl=125us
+> I:  If#= 2 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
+> E:  Ad=8a(I) Atr=03(Int.) MxPS= 512 Ivl=125us
+> E:  Ad=0a(O) Atr=03(Int.) MxPS= 512 Ivl=125us
+> 
+> [...]
 
-switch (uuid->type) {
-case BT_UUID16:
-        put_le16(uuid->value.u16, dst);
-        return bt_uuid_len(uuid);
-case BT_UUID128:
-         bt_uuid_to_uuid128(uuid, &uuid128);
-         bswap_128(&uuid128.value.u128, dst);
-         return bt_uuid_len(&uuid128);
-}
+Here is the summary with links:
+  - [1/2] Bluetooth: btusb: Add new VID/PID 0489/e139 for MT7925
+    (no matching commit)
+  - [2/2] Bluetooth: btusb: Add new VID/PID 13d3/3604 for MT7925
+    https://git.kernel.org/bluetooth/bluetooth-next/c/bd0b4dae74b0
 
-return 0;
-
-We do however have bt_uuid_to_le with the only difference being that
-it is more generic and it doesn't return the actual bytes written to
-the dst, anyway we could replace the code above with:
-
-diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
-index b35763410d17..71976de48569 100644
---- a/src/shared/gatt-db.c
-+++ b/src/shared/gatt-db.c
-@@ -553,16 +553,9 @@ bool gatt_db_isempty(struct gatt_db *db)
-
- static int uuid_to_le(const bt_uuid_t *uuid, uint8_t *dst)
- {
--       bt_uuid_t uuid128;
-+       bt_uuid_to_le(uuid, dst);
-
--       if (uuid->type =3D=3D BT_UUID16) {
--               put_le16(uuid->value.u16, dst);
--               return bt_uuid_len(uuid);
--       }
--
--       bt_uuid_to_uuid128(uuid, &uuid128);
--       bswap_128(&uuid128.value.u128, dst);
--       return bt_uuid_len(&uuid128);
-+       return bt_uuid_len(uuid) =3D=3D 4 ? 16 : bt_uuid_len(uuid);
- }
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
-> +           uuid->type =3D=3D BT_UUID128) {
-> +               bt_uuid_to_uuid128(uuid, &uuid128);
-> +               bswap_128(&uuid128.value.u128, dst);
-> +               return bt_uuid_len(&uuid128);
-> +       }
-> +
-> +       return 0;
->  }
->
->  static bool le_to_uuid(const uint8_t *src, size_t len, bt_uuid_t *uuid)
-> --
-> 2.45.2
->
->
-
-
---=20
-Luiz Augusto von Dentz
