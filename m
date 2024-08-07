@@ -1,235 +1,108 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f45.google.com (mail-lf1-f45.google.com [209.85.167.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53E721C7B8F
-	for <linux-bluetooth@vger.kernel.org>; Wed,  7 Aug 2024 07:31:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68F223EA64
+	for <linux-bluetooth@vger.kernel.org>; Wed,  7 Aug 2024 07:53:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723015918; cv=none; b=tiOEkl7lZ8g44LkaWb1BX3HmbabtXS4VnTaqWR8b+1n8e2yfs5kvdKEcsE1KRIxo4lJJtbvUorA614F4N7ik6Uf6ig+NdU2uWlx2BM9PS33Qk8Pwp4cl26sUn95jV1iWZr4j2OFBuIQom1VSAKFAOpzIoG89A5H0J13CH8BKa2o=
+	t=1723017228; cv=none; b=kUEO1dJNB7O6516byVi6aRaTuOJRQaEVYHYYOJy1uYtN54BHMACcO7gU/qq0dJ/c9xiP8hCya1ZeNs7jVlcFwX9ymJ3FzMla6V483nmKKLSv8bq6cz1nesErEbjMLQiPuI4pWFvAAsH638aEx4Ng9bK1B0Vt7KZSTAX6gGLRHEw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723015918; c=relaxed/simple;
-	bh=7CKxee13IE83t0qX0HBtQWheSZ6VVw3VNEIUK0SbjGQ=;
-	h=Date:From:To:Cc:Subject:Message-ID; b=CCllLG6amysnBhGjN4Dny4f/dJYOA8CYVWP+M15epAb6tkCD/P/pXLHJgkapHboy1Tf65NJiiH9XC/a5Sz7xuyHTcnWY993YMkkSF5QdCyBl7CbHMp3/+/QBFpY3QZE5HsXwx5u9Fljh23iHrrkmcYt1Uq+FXQaVPDnw2VGo5Gk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=fT3exgGo; arc=none smtp.client-ip=192.198.163.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1723017228; c=relaxed/simple;
+	bh=KqnPxyjijqgj7Dabl0pL8UK9VNQba/K8dgna1uY/+o8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=IQ26Berwy9iwV2sIHtdvWgg7gJakv3iUcFbqI1IdqSeZnlTXGlL9DH/GZQaMt+Mb3ppTfxqA4nL0JbystkxfvIIpnTwAz6PrcGHRPq9UYr8J1/AvzewNajif3OcShjhYee8vEjYJ5XMndDjHWxKcIXIMudkrejscsxBn2IcQJ9I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=h9uWMD6g; arc=none smtp.client-ip=209.85.167.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fT3exgGo"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1723015916; x=1754551916;
-  h=date:from:to:cc:subject:message-id;
-  bh=7CKxee13IE83t0qX0HBtQWheSZ6VVw3VNEIUK0SbjGQ=;
-  b=fT3exgGomchWgCVYu0IED9ip3ZfbmAL7crN5FSmvh2LradAEMvrE+D89
-   qg2CafgCHOmmnsReRLyTllpfK+PkR32VHglmBEGD9GPj1G0+NIDCZP1S3
-   +BDFCjWHfJ3ki1O7v5gkt5HwjqLLtTiYuMpXGy1Vy7bmuCtQQrM60DTTP
-   DapAMMUxAYnOmHD43ljDvsE1PBVDvQbnco4hO9kN4pEq4cQRlQ+Rj18Ly
-   PDQJcfsG7Few+YjJW2A0kFOTEweMrOYkjfSewLFlcTVuKMtaaE+uXk4nY
-   PHAbnoykubfCWNREb8/9l4nVmyj6+9vvC9ijW5IaaZ1NQ4vNOXbXoHDbp
-   g==;
-X-CSE-ConnectionGUID: hnXvtu32RcetoYjsq1CTPg==
-X-CSE-MsgGUID: 2OlwzjMLSdOqmsCu7+h8mQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11156"; a="21244470"
-X-IronPort-AV: E=Sophos;i="6.09,269,1716274800"; 
-   d="scan'208";a="21244470"
-Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Aug 2024 00:31:56 -0700
-X-CSE-ConnectionGUID: l3GV0TJkSMyj567wuYuwAQ==
-X-CSE-MsgGUID: FQ9xakA0RY2QgtUsOpKpkA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.09,269,1716274800"; 
-   d="scan'208";a="56992248"
-Received: from unknown (HELO b6bf6c95bbab) ([10.239.97.151])
-  by orviesa006.jf.intel.com with ESMTP; 07 Aug 2024 00:31:55 -0700
-Received: from kbuild by b6bf6c95bbab with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1sbb97-0005Cq-1l;
-	Wed, 07 Aug 2024 07:31:48 +0000
-Date: Wed, 07 Aug 2024 15:31:26 +0800
-From: kernel test robot <lkp@intel.com>
-To: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: [bluetooth-next:master] BUILD SUCCESS
- bd0b4dae74b0f0ee9ea37818e1c132b56a26d6dd
-Message-ID: <202408071524.JwCwxCxc-lkp@intel.com>
-User-Agent: s-nail v14.9.24
+	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="h9uWMD6g"
+Received: by mail-lf1-f45.google.com with SMTP id 2adb3069b0e04-52fc4388a64so1926554e87.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 07 Aug 2024 00:53:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1723017223; x=1723622023; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=KqnPxyjijqgj7Dabl0pL8UK9VNQba/K8dgna1uY/+o8=;
+        b=h9uWMD6gEvL9VFBHXMTgT30wHAi724kV+7WcdiKDv0XwwtFMT/srTumwwpg9JufOfF
+         neRV7C1NqFQU6B08MLOmZjpdeHBq9fP6jAQSlyt2pX2h8lfp+81wGw3svjiNNrTUfrW3
+         8BtX8RXM5EHiGT0JyCsYK5Ms5JYRo3d0VKvBsDBlCXY6dedtj6AM4QttVlqF+gj7AVVa
+         ZR1bPuhvPOPPe+7isMbTYuEZlv8EZjUlGvLfS1qDQlRzs/XiUq/pY53lpRw5ZW3K0+bn
+         ed51U4ualsuW1NVLBVaMlvIJtnrjsITMCi8+PvdlAOZFxBy0Nkd+H/KNsfClt84gkkR1
+         +K3A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723017223; x=1723622023;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=KqnPxyjijqgj7Dabl0pL8UK9VNQba/K8dgna1uY/+o8=;
+        b=d6U8QjuEXqINd1Q8X+egl0uAqltzKw7VKdpZkrjXDz2kf+vehsXOb+OsePDbsSkyqc
+         goIurtvx1Lk/8XJwX8s+2ctbxBbGLDXJjtVow6FpYECrH0+1mUT8eRQuvBOFBDtXpdpm
+         VxhsgPDjo8oJq4HosswJgqFgCcNatuJYjBZW8ruAfkb1wuxjX5eOoR9r5iKwC6ZRE6j1
+         2X7BMSjdZKcJpdMbbqIuALeKmYfgqjQS71h7/cB9yTNyBXprIvs5PNebsAFL+cY6Ebbl
+         TWkDlbowTKogY5jfHP5PndEIqR3F6y238f+gPUTIKLRgFir+lyl3oMECQiyV9ym4jP/c
+         CurQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWpPkZLFszyGmAHLDhas25+DKu4s/bK8vCJLyHetz1llK7lwD+NSGrRW8XmNbQlBVZsNIY6St8bkuSYL62bzJ+U+nZRNxdMTa97dL+tPwsO
+X-Gm-Message-State: AOJu0YxRAoGQoiRPeFSNzYOqGyhlQaFFCxwOM2/WB/byK3EboIYaksu4
+	3HHQ4TtZBu+p0lDp6tkOlKwXfPcn72yNIN2n3jaogpZW5j2xcHWQegQIJTsYiSisc/oVStuGMLY
+	9s3PXhivwg/3/OtuqgfTqftzcnG1agJw64f7R8Q==
+X-Google-Smtp-Source: AGHT+IEMHPUoCGAziZXFqLRYhcE89Hu0RXOGMn5qoswWzoIi01nwD/49Dvb2oq880JBBAmn6aIs0b95/3o35im4sNu4=
+X-Received: by 2002:a05:6512:2302:b0:52f:d69e:bb58 with SMTP id
+ 2adb3069b0e04-530bb39b7d5mr13670284e87.44.1723017223061; Wed, 07 Aug 2024
+ 00:53:43 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+References: <20240731-hci_qca_fixes-v1-0-59dad830b243@linaro.org>
+ <20240731-hci_qca_fixes-v1-3-59dad830b243@linaro.org> <1723fdc3-33b9-4518-8f25-161ab59ecf21@notapiano>
+In-Reply-To: <1723fdc3-33b9-4518-8f25-161ab59ecf21@notapiano>
+From: Bartosz Golaszewski <brgl@bgdev.pl>
+Date: Wed, 7 Aug 2024 09:53:31 +0200
+Message-ID: <CAMRc=MdSH6n=QKwWnT9zNaBito34t+BpCufQDjnAOaeC5iuD+Q@mail.gmail.com>
+Subject: Re: [PATCH 3/3] Bluetooth: hci_qca: fix a NULL-pointer derefence at shutdown
+To: =?UTF-8?B?TsOtY29sYXMgRi4gUi4gQS4gUHJhZG8=?= <nfraprado@collabora.com>, 
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Luiz Augusto von Dentz <luiz.von.dentz@intel.com>, 
+	Marcel Holtmann <marcel@holtmann.org>
+Cc: Wren Turkal <wt@penguintechs.org>, Dmitry Baryshkov <dmitry.baryshkov@linaro.org>, 
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
-branch HEAD: bd0b4dae74b0f0ee9ea37818e1c132b56a26d6dd  Bluetooth: btusb: Add MediaTek MT7925-B22M support ID 0x13d3:0x3604
+On Wed, Aug 7, 2024 at 12:44=E2=80=AFAM N=C3=ADcolas F. R. A. Prado
+<nfraprado@collabora.com> wrote:
+>
+> On Wed, Jul 31, 2024 at 05:20:50PM +0200, Bartosz Golaszewski wrote:
+> > From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+> >
+> > Unlike qca_regulator_init(), qca_power_shutdown() may be called for
+> > QCA_ROME which does not have qcadev->bt_power assigned. Add a
+> > NULL-pointer check before dereferencing the struct qca_power pointer.
+> >
+> > Fixes: eba1718717b0 ("Bluetooth: hci_qca: make pwrseq calls the default=
+ if available")
+> > Reported-by: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
+> > Closes: https://lore.kernel.org/linux-bluetooth/su3wp6s44hrxf4ijvsdfzbv=
+v4unu4ycb7kkvwbx6ltdafkldir@4g7ydqm2ap5j/
+> > Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+>
+> Hi,
+>
+> I just noticed we're still hitting this issue in mainline (saw it on the
+> mt8183-juniper platform in KernelCI). I see this commit was merged 6 days=
+ ago to
+> bluetooth-next, but it seems there wasn't a pull request with this fix ye=
+t to
+> include it in 6.11. I'm wondering if it's still going to be sent.
+>
+> Thanks,
+> N=C3=ADcolas
 
-Warning ids grouped by kconfigs:
+The patches are in next so I don't see why they wouldn't be sent upstream.
 
-recent_errors
-`-- arm64-randconfig-051-20240807
-    |-- arch-arm64-boot-dts-qcom-sm8650-qrd.dtb:bluetooth:vddrfa1p8-supply-is-a-required-property
-    |-- arch-arm64-boot-dts-qcom-sm8650-qrd.dtb:bluetooth:vddrfacmn-supply-is-a-required-property
-    |-- arch-arm64-boot-dts-qcom-sm8650-qrd.dtb:bluetooth:vddwlcx-supply-is-a-required-property
-    `-- arch-arm64-boot-dts-qcom-sm8650-qrd.dtb:bluetooth:vddwlmx-supply-is-a-required-property
+Moving Luiz and Marcel to To: to make sure they see this message.
 
-elapsed time: 729m
-
-configs tested: 149
-configs skipped: 3
-
-The following configs have been built successfully.
-More configs may be tested in the coming days.
-
-tested configs:
-alpha                             allnoconfig   gcc-13.3.0
-alpha                            allyesconfig   gcc-13.3.0
-alpha                               defconfig   gcc-13.2.0
-arc                              allmodconfig   gcc-13.2.0
-arc                               allnoconfig   gcc-13.2.0
-arc                              allyesconfig   gcc-13.2.0
-arc                                 defconfig   gcc-13.2.0
-arc                   randconfig-001-20240807   gcc-13.2.0
-arc                   randconfig-002-20240807   gcc-13.2.0
-arm                              allmodconfig   gcc-14.1.0
-arm                               allnoconfig   clang-20
-arm                              allyesconfig   gcc-14.1.0
-arm                                 defconfig   gcc-13.2.0
-arm                   randconfig-001-20240807   clang-20
-arm                   randconfig-002-20240807   gcc-14.1.0
-arm                   randconfig-003-20240807   gcc-14.1.0
-arm                   randconfig-004-20240807   gcc-14.1.0
-arm64                            allmodconfig   clang-20
-arm64                             allnoconfig   gcc-14.1.0
-arm64                               defconfig   gcc-13.2.0
-arm64                 randconfig-001-20240807   gcc-14.1.0
-arm64                 randconfig-002-20240807   clang-17
-arm64                 randconfig-003-20240807   clang-15
-arm64                 randconfig-004-20240807   clang-20
-csky                              allnoconfig   gcc-14.1.0
-csky                                defconfig   gcc-13.2.0
-csky                  randconfig-001-20240807   gcc-14.1.0
-csky                  randconfig-002-20240807   gcc-14.1.0
-hexagon                          allmodconfig   clang-20
-hexagon                           allnoconfig   clang-20
-hexagon                          allyesconfig   clang-20
-hexagon               randconfig-001-20240807   clang-14
-hexagon               randconfig-002-20240807   clang-20
-i386                             allmodconfig   gcc-12
-i386                              allnoconfig   gcc-12
-i386                             allyesconfig   gcc-12
-i386         buildonly-randconfig-001-20240807   clang-18
-i386         buildonly-randconfig-002-20240807   clang-18
-i386         buildonly-randconfig-003-20240807   clang-18
-i386         buildonly-randconfig-003-20240807   gcc-12
-i386         buildonly-randconfig-004-20240807   clang-18
-i386         buildonly-randconfig-005-20240807   clang-18
-i386         buildonly-randconfig-006-20240807   clang-18
-i386         buildonly-randconfig-006-20240807   gcc-12
-i386                                defconfig   clang-18
-i386                  randconfig-001-20240807   clang-18
-i386                  randconfig-001-20240807   gcc-12
-i386                  randconfig-002-20240807   clang-18
-i386                  randconfig-003-20240807   clang-18
-i386                  randconfig-004-20240807   clang-18
-i386                  randconfig-004-20240807   gcc-12
-i386                  randconfig-005-20240807   clang-18
-i386                  randconfig-005-20240807   gcc-12
-i386                  randconfig-006-20240807   clang-18
-i386                  randconfig-011-20240807   clang-18
-i386                  randconfig-012-20240807   clang-18
-i386                  randconfig-012-20240807   gcc-11
-i386                  randconfig-013-20240807   clang-18
-i386                  randconfig-014-20240807   clang-18
-i386                  randconfig-015-20240807   clang-18
-i386                  randconfig-016-20240807   clang-18
-i386                  randconfig-016-20240807   gcc-12
-loongarch                        allmodconfig   gcc-14.1.0
-loongarch                         allnoconfig   gcc-14.1.0
-loongarch                           defconfig   gcc-13.2.0
-loongarch             randconfig-001-20240807   gcc-14.1.0
-loongarch             randconfig-002-20240807   gcc-14.1.0
-m68k                             allmodconfig   gcc-14.1.0
-m68k                              allnoconfig   gcc-14.1.0
-m68k                             allyesconfig   gcc-14.1.0
-m68k                                defconfig   gcc-13.2.0
-microblaze                       allmodconfig   gcc-14.1.0
-microblaze                        allnoconfig   gcc-14.1.0
-microblaze                       allyesconfig   gcc-14.1.0
-microblaze                          defconfig   gcc-13.2.0
-mips                              allnoconfig   gcc-14.1.0
-nios2                             allnoconfig   gcc-14.1.0
-nios2                               defconfig   gcc-13.2.0
-nios2                 randconfig-001-20240807   gcc-14.1.0
-nios2                 randconfig-002-20240807   gcc-14.1.0
-openrisc                          allnoconfig   gcc-14.1.0
-openrisc                         allyesconfig   gcc-14.1.0
-openrisc                            defconfig   gcc-14.1.0
-parisc                           allmodconfig   gcc-14.1.0
-parisc                            allnoconfig   gcc-14.1.0
-parisc                           allyesconfig   gcc-14.1.0
-parisc                              defconfig   gcc-14.1.0
-parisc                randconfig-001-20240807   gcc-14.1.0
-parisc                randconfig-002-20240807   gcc-14.1.0
-parisc64                            defconfig   gcc-13.2.0
-powerpc                          allmodconfig   gcc-14.1.0
-powerpc                           allnoconfig   gcc-14.1.0
-powerpc                          allyesconfig   clang-20
-powerpc               randconfig-001-20240807   clang-20
-powerpc               randconfig-002-20240807   clang-20
-powerpc               randconfig-003-20240807   gcc-14.1.0
-powerpc64             randconfig-001-20240807   clang-15
-powerpc64             randconfig-002-20240807   gcc-14.1.0
-powerpc64             randconfig-003-20240807   gcc-14.1.0
-riscv                            allmodconfig   clang-20
-riscv                             allnoconfig   gcc-14.1.0
-riscv                            allyesconfig   clang-20
-riscv                               defconfig   clang-20
-riscv                 randconfig-001-20240807   clang-20
-riscv                 randconfig-002-20240807   clang-20
-s390                             allmodconfig   clang-20
-s390                              allnoconfig   clang-20
-s390                              allnoconfig   gcc-14.1.0
-s390                             allyesconfig   gcc-14.1.0
-s390                                defconfig   clang-20
-s390                  randconfig-001-20240807   gcc-14.1.0
-s390                  randconfig-002-20240807   gcc-14.1.0
-sh                               allmodconfig   gcc-14.1.0
-sh                                allnoconfig   gcc-14.1.0
-sh                               allyesconfig   gcc-14.1.0
-sh                                  defconfig   gcc-14.1.0
-sh                    randconfig-001-20240807   gcc-14.1.0
-sh                    randconfig-002-20240807   gcc-14.1.0
-sparc                            allmodconfig   gcc-14.1.0
-sparc64                             defconfig   gcc-14.1.0
-sparc64               randconfig-001-20240807   gcc-14.1.0
-sparc64               randconfig-002-20240807   gcc-14.1.0
-um                               allmodconfig   clang-20
-um                                allnoconfig   clang-17
-um                                allnoconfig   gcc-14.1.0
-um                               allyesconfig   gcc-12
-um                                  defconfig   clang-20
-um                             i386_defconfig   gcc-12
-um                    randconfig-001-20240807   gcc-12
-um                    randconfig-002-20240807   clang-20
-um                           x86_64_defconfig   clang-15
-x86_64                            allnoconfig   clang-18
-x86_64                           allyesconfig   clang-18
-x86_64       buildonly-randconfig-001-20240807   clang-18
-x86_64       buildonly-randconfig-002-20240807   clang-18
-x86_64       buildonly-randconfig-003-20240807   clang-18
-x86_64       buildonly-randconfig-004-20240807   clang-18
-x86_64       buildonly-randconfig-005-20240807   clang-18
-x86_64       buildonly-randconfig-006-20240807   clang-18
-x86_64                              defconfig   gcc-11
-x86_64                randconfig-001-20240807   clang-18
-x86_64                randconfig-002-20240807   gcc-12
-x86_64                randconfig-003-20240807   clang-18
-x86_64                randconfig-004-20240807   gcc-12
-x86_64                randconfig-006-20240807   gcc-12
-x86_64                          rhel-8.3-rust   clang-18
-xtensa                            allnoconfig   gcc-14.1.0
-xtensa                randconfig-001-20240807   gcc-14.1.0
-xtensa                randconfig-002-20240807   gcc-14.1.0
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Bart
