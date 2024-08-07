@@ -1,63 +1,59 @@
-Received: from mail-vk1-f173.google.com (mail-vk1-f173.google.com [209.85.221.173])
+Received: from mail-vs1-f47.google.com (mail-vs1-f47.google.com [209.85.217.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86C821422D5;
-	Wed,  7 Aug 2024 21:01:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96F9812A14C
+	for <linux-bluetooth@vger.kernel.org>; Wed,  7 Aug 2024 21:28:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723064472; cv=none; b=PcmJJ6XhpZtJjZDXDFjJW9ZI099OfJiiUzuBHCMyxCkZIBT9rmQzI9o8xgV++WBFsdeFKm9kd4tRz9dS5E9tB5SGSW5x5IJkkec1hHrSWoqImsB3xzEKB44Nsv9L1AUeZvGs+rwNLg0oG9ldGLeDu0wSYE1z//icy2XSqkqXBKk=
+	t=1723066103; cv=none; b=cQIGl4zxmQVtnj09l3tJ1VuHbEktPK0Q/wbEw1FG7bO7R3ZGqjb1tiBXRi+P9V0Cq2Ics9racY80PVkbBaWz88Raza6DCqI6E2QyxLpfOU76kHS55vchAlUEpQ94/olm98QgZP/RNOmjls4l1Fz0K5vbn5DOZaoKtkmk+NV+AO8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723064472; c=relaxed/simple;
-	bh=fzJi4vne43VEz1FdDXI81C6wJWDcd4tnB3M183hqPn4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=eZIUnrBzw3PZtheURttaVrjcKACyyY2YUfDqRWOGYNMgGP4bcHtWkQnmhY2lbirNG/u1NW82DRCZBlZKYIR9DHDwOjK+IKg5CTRCDQseO5XbUhdjHpaeAzwz+23kFDPx9dsEyHNLYg1B78rqMpc4S9stHLLMRHR6BOgfEu2/PQ4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kqNU4+96; arc=none smtp.client-ip=209.85.221.173
+	s=arc-20240116; t=1723066103; c=relaxed/simple;
+	bh=oAN7EliLUrnDsEzRm1rnTQCI3EDsGWO/Q9QC3PUG0lw=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=adglrrpHtGHkItby8eD9hZ7S6/6YY1zYY5rY/n+o3J+EY2hG3c0Kb6MIiVLwfsMlxZpHMjtV1Bn4jqtUf8adDMyGMYUW/pGRUw1QlFeyoQO7tauby77kb1928fP2GpfjA86cbQa5CKlpoDlbZw7N/ErKh4ycwHxKzRUWJaycg0k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UdnFvqi6; arc=none smtp.client-ip=209.85.217.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kqNU4+96"
-Received: by mail-vk1-f173.google.com with SMTP id 71dfb90a1353d-4f6be9d13cdso97674e0c.3;
-        Wed, 07 Aug 2024 14:01:10 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UdnFvqi6"
+Received: by mail-vs1-f47.google.com with SMTP id ada2fe7eead31-494556dfa3aso101504137.0
+        for <linux-bluetooth@vger.kernel.org>; Wed, 07 Aug 2024 14:28:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1723064469; x=1723669269; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=5REQGrZj3ljHT9VgSTZ7Q1MOiyGSO0dvGiTO97nTy7k=;
-        b=kqNU4+96yFIRlatA3Yqz71DoUubwKT+Roga5MouImrtUY5o7hGjCJuhDwm3pFKy655
-         BhxnnMI1IhqkxbgT5F0aE81fDxFqXX1hLVGRxtHdlRrMHGwKyraBFPZuMAuD0LBi68c9
-         PZ5FBx8p+5XmcTqq3IiyL5Qcnh08ZOtRJbEqijuOcREL/NxqM5TonpUnO4M7UgkA1YGt
-         Wg5vwsn5Lbz7DGLvyjiejcZKtTdfM/HemIerNCQRkq6twKplkJDc4sJj0ZL+S1cnoI9y
-         /hoexfGIvRAx3AzIOX6l2Mw8ZbmW6stPfqr/qBqYjMMNBsH6MbBYnAkLRK8WaZDY40TW
-         hO0A==
+        d=gmail.com; s=20230601; t=1723066100; x=1723670900; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=qclHKzexKMuNxGUFLGx+XZQmpxGczDy46V4MJ3PWfrY=;
+        b=UdnFvqi6xG4tgKBfUYNsxZV85hZxfcWbAZeTBbpTZPOdRKwARgM2MP8y1Y5B+hlgRY
+         C+6us+NgUWmKX/wU/Hb3z+twBQQLKKKVEQuGZjO44Xp5NBFQot2p4pu+pXkeLeFzRskY
+         /C7JBNL1k0/g1SSGC1ivxMkYhTyeUK9leJBbI6BgoHtZN0Z03imjIHkbXBAmoo272X07
+         /mvUy+9Gp7cVtVdfsKtpFfAEHkIylsSmzWQDGc0A2dxDO49iUD2NkzAlG6U3ak5wzoQT
+         ER/AtjIpHEQpSgsal/coEKIvWLl0tlmqVbx0xsxgfXGPrLMUzTv+UKO7OzSrMLF+7ahA
+         Lumw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723064469; x=1723669269;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=5REQGrZj3ljHT9VgSTZ7Q1MOiyGSO0dvGiTO97nTy7k=;
-        b=SsqGrJsEupdj+zoebqu3MVDDjfh3zYUthsK4bpdSbi/MFbZggqba0dsjFYegN9R8YO
-         e4OVOmBqX1K+dus/kNPeqBOOl1fvAUVqNwFvnq8INcnBF7wyKVEgQmZvo9gV9GLzawMU
-         tY78zkaykAf1og7V0+aU8eb3/4lzCh12e87011Qfq/OY3jNT63ajj8tpdcgBJWMrmAFI
-         qCQj7L/tYDGnIlYk9E8HTo9kGOW9vHAXOS5w93STWeQiNp6N3BPshMjccCkKW9vEKbZc
-         v6meRkZPrb3auaLeU1ahENrX8k2TZuXsV/ysb06mT0OEhURXmnDwEkdXm1n9JdkAw6wJ
-         Clcg==
-X-Forwarded-Encrypted: i=1; AJvYcCUQTpAke3i9O71nZ/FBW4P902FoXS6G1Js9Qs7dU2JujQ3FCFRpqOTOCVs2tL8eu5d4mIdVq/IyQtz7xgup/EfUpaTshAGa
-X-Gm-Message-State: AOJu0YzINReZ6Fw9/gBTlLqt8dlgKBTbeRPdG0JSl2geaU86HQr1tBET
-	gchPE/LLBEzLTRXTF7ZrY5ZfreeV3t/xp0eZ8m56NAwXAothR+NQ
-X-Google-Smtp-Source: AGHT+IGtFUNqoVpQ3WTYE9dBxGNBrCVMyYyt5mh2kcWnjW8Fjxb8+/c7KoPShnEREXkI0zpS/3U/LA==
-X-Received: by 2002:a05:6122:1ac6:b0:4f2:ec14:3b6 with SMTP id 71dfb90a1353d-4f89ff8fa32mr18321710e0c.6.1723064469105;
-        Wed, 07 Aug 2024 14:01:09 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1723066100; x=1723670900;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=qclHKzexKMuNxGUFLGx+XZQmpxGczDy46V4MJ3PWfrY=;
+        b=BIBD2F24OLYyw1f8R5t2mTQZlU/hwgWSlOfQDJiEHRlViDSi1PAFrhJOaE3jWfnJd0
+         lI6gNW0sqijJhlnswKPNk7QiDbhLQBO1oT4vhJRyMDnXum//3waPFlWUw3h4bzFZraZF
+         cnHQfnc5ZbWqNMhTLdD1z6FJV/HeV0X/C5ZeYv3Iuh+9vJzZ7Rcpkcwy1vfm6kvYleB6
+         ewB2vGMA+rlorV7p/EwzMi6E1JX8rJboHefrjdhqpKTPht1XoJQNDePXXZYLr9kJ0CAQ
+         R0CcCawGWQUJv86hiu2ZVmc8g7fZA1u4H3qfc+TwC4I4jSkUYtz4AsgKHv0RGYwrr+Pe
+         h3wA==
+X-Gm-Message-State: AOJu0YxiVxOJW0h9j4m998/U5wS5yKyZaRdeBZvTXd+L7f/ZkcjGoPgZ
+	34tmi7yTtxO9RbL17rAdQA1KkDxymGIy5crLHSsCN9nyq11Kwhf812ugj3GM
+X-Google-Smtp-Source: AGHT+IEOif1D8popzTZiP/MsAAyIuGW+AH5qp7Rxp9TcT1PLKNzIqKsiPzQ5TtvusPFIOu8iqWmu+w==
+X-Received: by 2002:a05:6102:942:b0:48f:96a8:fa33 with SMTP id ada2fe7eead31-495c5b1f1c3mr54549137.11.1723066100355;
+        Wed, 07 Aug 2024 14:28:20 -0700 (PDT)
 Received: from lvondent-mobl5.. (syn-107-146-107-067.res.spectrum.com. [107.146.107.67])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-4f8a1a35bddsm1600471e0c.1.2024.08.07.14.01.07
+        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-83c09450925sm1701772241.32.2024.08.07.14.28.19
+        for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 07 Aug 2024 14:01:08 -0700 (PDT)
+        Wed, 07 Aug 2024 14:28:19 -0700 (PDT)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: davem@davemloft.net,
-	kuba@kernel.org
-Cc: linux-bluetooth@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: pull request: bluetooth 2024-07-26
-Date: Wed,  7 Aug 2024 17:01:03 -0400
-Message-ID: <20240807210103.142483-1-luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ v1 1/2] shared/shell: Add support for comments on scripts
+Date: Wed,  7 Aug 2024 17:28:17 -0400
+Message-ID: <20240807212818.193908-1-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -67,40 +63,39 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The following changes since commit 1ca645a2f74a4290527ae27130c8611391b07dbf:
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-  net: usb: qmi_wwan: add MeiG Smart SRM825L (2024-08-06 19:35:08 -0700)
+This adds support for entering comments onscripts by starting the line
+'#'.
+---
+ src/shared/shell.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
-are available in the Git repository at:
+diff --git a/src/shared/shell.c b/src/shared/shell.c
+index 88ecaa076adc..932dd7dd4a52 100644
+--- a/src/shared/shell.c
++++ b/src/shared/shell.c
+@@ -262,6 +262,10 @@ static int bt_shell_queue_exec(char *line)
+ {
+ 	int err;
+ 
++	/* Ignore comments */
++	if (line[0] == '#')
++		return 0;
++
+ 	/* Queue if already executing */
+ 	if (data.line) {
+ 		/* Check if prompt is being held then release using the line */
+@@ -876,7 +880,8 @@ static void rl_handler(char *input)
+ 		return;
+ 	}
+ 
+-	if (!strlen(input))
++	/* Ignore empty/comment lines */
++	if (!strlen(input) || input[0] == '#')
+ 		goto done;
+ 
+ 	if (!bt_shell_release_prompt(input))
+-- 
+2.45.2
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2024-08-07
-
-for you to fetch changes up to b5431dc2803ac159d6d4645ae237d15c3cb252db:
-
-  Bluetooth: hci_sync: avoid dup filtering when passive scanning with adv monitor (2024-08-07 16:36:01 -0400)
-
-----------------------------------------------------------------
-bluetooth pull request for net:
-
- - hci_sync: avoid dup filtering when passive scanning with adv monitor
- - hci_qca: don't call pwrseq_power_off() twice for QCA6390
- - hci_qca: fix QCA6390 support on non-DT platforms
- - hci_qca: fix a NULL-pointer derefence at shutdown
- - l2cap: always unlock channel in l2cap_conless_channel()
-
-----------------------------------------------------------------
-Anton Khirnov (1):
-      Bluetooth: hci_sync: avoid dup filtering when passive scanning with adv monitor
-
-Bartosz Golaszewski (3):
-      Bluetooth: hci_qca: don't call pwrseq_power_off() twice for QCA6390
-      Bluetooth: hci_qca: fix QCA6390 support on non-DT platforms
-      Bluetooth: hci_qca: fix a NULL-pointer derefence at shutdown
-
-Dmitry Antipov (1):
-      Bluetooth: l2cap: always unlock channel in l2cap_conless_channel()
-
- drivers/bluetooth/hci_qca.c | 19 +++++++++----------
- net/bluetooth/hci_sync.c    | 14 ++++++++++++++
- net/bluetooth/l2cap_core.c  |  1 +
- 3 files changed, 24 insertions(+), 10 deletions(-)
