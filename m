@@ -1,72 +1,93 @@
-Received: from mail-il1-f199.google.com (mail-il1-f199.google.com [209.85.166.199])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7979715444E
-	for <linux-bluetooth@vger.kernel.org>; Thu,  8 Aug 2024 11:03:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 304C918D651
+	for <linux-bluetooth@vger.kernel.org>; Thu,  8 Aug 2024 11:36:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723114984; cv=none; b=JGIsGAoRRioPJRlX5NxBvy1oEpqYhWvLhPxI3YvJPS8i+naRLrZ+Fn8rPpP1lw25vSz4hX7tQFa4jwATFWUhKXEV522JDKThkRQhOQdl81zMOOL/Oa3YrV2nZjnIgep+0TGkKymMVxbzAYIdB4FAPVj3CIPK5vu8Xz3nwRQf/98=
+	t=1723116975; cv=none; b=VCxmGQ+idMn2/YPsJDzn7bNfqzY+D3xz8oeRdNyeMOTejrDzl7RluWgb80HWxHwsKJ4Z8fQlzhbhBJeK0Qq3yo4DEEzS7hkSiCVNqv1hH5A7ueVSdtXTf/mrQAGz54leaNPoaYQmmJq8VQHVhxsJW1Ecu0skIUub2pY3U98KipY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723114984; c=relaxed/simple;
-	bh=Ok+dZk9SstegenVqbnAQRN6NWf1Fam24wrC95Gyx7z8=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=b8E06wU81yc3INilF5RlEAk2tQJZExYQGSHzF1XsarfJhY6h3ht7V7BEKb3EpFn8svCwHeoUyJIJPx204zmRkqM633652tWPqwrR3TEJUiahNWOHiyq9N9Y1fyLfxFJnbZrifVIHIUqfnWiyqx6Gs6o/dh/317mCxbI8nyG9A8w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f199.google.com with SMTP id e9e14a558f8ab-39a1f627b3dso10618155ab.1
-        for <linux-bluetooth@vger.kernel.org>; Thu, 08 Aug 2024 04:03:03 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723114982; x=1723719782;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=njYrZI2KAenj1tRYEV1B/WyO4YVNlDOY48s1Oi9rOOw=;
-        b=U29lQLhZsBPjWrlnFKsAECkVxEFdzSe2MjOHqLWO2kT5t9oU5l53GZ+rxtuv5gzwgE
-         RHFDvLZ+rCLZ1FAq+3imXJfrWdIKqYZzjPlVPKB6SkKHbztIPEQ+IKQKz/XjzDpJjShi
-         hODWqawpLR01/1e5UndoA5Gt7W0vqkLHG5cTUQVnXdAGm6t2tnQ1GIJ0c5MUwbQNL7n6
-         l02LmJycqnWHC08hRbg7oO9/VBVhEBi41SsLEbW6GmdkR7tbvwHr4PuyMJEWngmydK1A
-         heJNvFZuJipCFoxUDC5VWxMjZohVJpJlo2Qt7E97pdSEgIKgnDAGXx/earvj/HpzF1Rx
-         JUgQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXEaKKI/gVP6IHIm0902ovJxTa+hUc3YOhaNk1rw8k1cdgQ8hI5dY8ktbpzqJN1OyYHJ9fhey7RrVya3DfA0RxdQd0dFpibJtZvjJlwUjJM
-X-Gm-Message-State: AOJu0YwbqMaUXuoftrzEQVjU1edpKXqAx++Ee0dEvZMf8qOGL9soTvuT
-	8LDk7X9fHA5VUP9fxIshdCNTBvEf3WVdXE7e3jP+GEEJzJvc1vrqB59O9rlVrUfWDDm81l4XBar
-	RQpRfpklJl+Vki0IvjnUixRQZwGxkBRcH6FF5nYv4K8g3/NicnAkcCZo=
-X-Google-Smtp-Source: AGHT+IE563ij+gekVscxGZzfs6EJqcj+1X3TmLCDhC/vmiiDnRfFQpLPrgC04GgGJsEn4UeHI4k+7X5clLTXlOlpcUEhyZXG8ftJ
+	s=arc-20240116; t=1723116975; c=relaxed/simple;
+	bh=jcozdenczioISaE6aA+5MTCExjJBJn/ozdvQ3ZDvy0s=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=OdnrI+hTnPa3Rg9o6ixSmqFCKFx83bZJSb2yenM2LDhMLgvfEIVQjHl7MeZNeZsxbVeXCDWdU49GYVOysRTNyGLCJFzsNRRXJLEcQOdeEpdGdt4qF1OARlZ96ePIPBp5z0wwai+6nQErOFTZENovghJx6UAnJm/DI/6hcg6CFgg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=f/E2QjFC; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="f/E2QjFC"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id A6B51C32782
+	for <linux-bluetooth@vger.kernel.org>; Thu,  8 Aug 2024 11:36:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1723116974;
+	bh=jcozdenczioISaE6aA+5MTCExjJBJn/ozdvQ3ZDvy0s=;
+	h=From:To:Subject:Date:In-Reply-To:References:From;
+	b=f/E2QjFCRHLAwSTRe1zgYlqiTKguKYWeZfgrUeGFOIkUifaQZjEQvJYTMaltitznz
+	 d8r7Qvh55vBJyyJ+G0yMx8+NizCzFhLx6qGxBW+6yr3pwS9QfWqfD8srPz3mTAfLCO
+	 qTFMThQIqgO6BAVepx5ILhYysZHeRXFi7fI/2Y5kAKkzu6DkLO8OWu23dJqurgaQRW
+	 as5WwsTlV6a/k6yNghwqiXxdi1qYV/vZS3+iI5p4dJxqo5jVmQ4MSjyg8cHZaz0Dvp
+	 JfrBNZVIl/btosuziEhZ9Vi9mGgY+z+3o3nXQFOF7kzscQGPKPpBvomibsSdEhqLhj
+	 KGJ2UWft5xlYQ==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+	id 96F32C53B73; Thu,  8 Aug 2024 11:36:14 +0000 (UTC)
+From: bugzilla-daemon@kernel.org
+To: linux-bluetooth@vger.kernel.org
+Subject: [Bug 218952] bluetooth and wireplumber stop working after some time
+ - dmesg report BUG
+Date: Thu, 08 Aug 2024 11:36:14 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: blocking
+X-Bugzilla-Who: nicolas.baranger@3xo.fr
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P3
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-218952-62941-W5YFCVph7e@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-218952-62941@https.bugzilla.kernel.org/>
+References: <bug-218952-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1c2b:b0:39a:e800:eec9 with SMTP id
- e9e14a558f8ab-39b5ed6c734mr1119185ab.4.1723114982649; Thu, 08 Aug 2024
- 04:03:02 -0700 (PDT)
-Date: Thu, 08 Aug 2024 04:03:02 -0700
-In-Reply-To: <20240808103754.2783-1-hdanton@sina.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <00000000000072c34e061f29f8c9@google.com>
-Subject: Re: [syzbot] [pm?] INFO: trying to register non-static key in netdev_unregister_kobject
-From: syzbot <syzbot+27c3c57b78da2a0995d8@syzkaller.appspotmail.com>
-To: hdanton@sina.com, linux-bluetooth@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
 
-Hello,
+https://bugzilla.kernel.org/show_bug.cgi?id=3D218952
 
-syzbot has tested the proposed patch and the reproducer did not trigger any issue:
+--- Comment #3 from Nicolas BARANGER (nicolas.baranger@3xo.fr) ---
+Dear maintener
 
-Reported-by: syzbot+27c3c57b78da2a0995d8@syzkaller.appspotmail.com
-Tested-by: syzbot+27c3c57b78da2a0995d8@syzkaller.appspotmail.com
+Hope you're doing well...
+For the moment, (good news?) I did not succeeded in reproducing the issue on
+mainline kernel.=20
 
-Tested on:
+I'll keept a particuliar attention on this issue and will update this case =
+if
+the issue appears again with newer kernel.=20
 
-commit:         6a0e3826 Merge tag 'for-6.11-rc2-tag' of git://git.ker..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=11eff061980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=73b1a61cb77f73e5
-dashboard link: https://syzkaller.appspot.com/bug?extid=27c3c57b78da2a0995d8
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-patch:          https://syzkaller.appspot.com/x/patch.diff?x=14872e5d980000
+Also, as I did not succeeded in reproducing the issue on mainline since now=
+ ~2
+months, I did not get any new logs/status which could help to find the Root
+Cause, sorry !
 
-Note: testing is done by a robot and is best-effort only.
+I remain available if you need help to make a deeper investigatation on this
+issue.
+
+Kind regards=20
+Nicolas Baranger
+
+--=20
+You may reply to this email to add a comment.
+
+You are receiving this mail because:
+You are the assignee for the bug.=
