@@ -1,67 +1,72 @@
-Received: from smtp134-25.sina.com.cn (smtp134-25.sina.com.cn [180.149.134.25])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f199.google.com (mail-il1-f199.google.com [209.85.166.199])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0AB218A922
-	for <linux-bluetooth@vger.kernel.org>; Thu,  8 Aug 2024 10:40:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.149.134.25
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7979715444E
+	for <linux-bluetooth@vger.kernel.org>; Thu,  8 Aug 2024 11:03:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723113641; cv=none; b=OH9xc4f2O2TJf5JTcqDM7rxyxRVwiE4Ii3CLonimHcGY79yx19zuJOMCaJOLpf1C8b9z0O0LKRIyronsjzNbGGWaWo4HJ3f7YcnhxBMf55i1+A9YoJ++3q7xByRoxBtyYyugSoyurTzfhQ7uEfXIYYus7LWIdtcQmK7K61bJtfc=
+	t=1723114984; cv=none; b=JGIsGAoRRioPJRlX5NxBvy1oEpqYhWvLhPxI3YvJPS8i+naRLrZ+Fn8rPpP1lw25vSz4hX7tQFa4jwATFWUhKXEV522JDKThkRQhOQdl81zMOOL/Oa3YrV2nZjnIgep+0TGkKymMVxbzAYIdB4FAPVj3CIPK5vu8Xz3nwRQf/98=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723113641; c=relaxed/simple;
-	bh=kODzgVI1TluZZIddHpBvW0ElTZwEdXb/qgX3yNC7Awk=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=GGJopeHXM4nIA46poqLs+od8UOFMRcTVe/JdjBLUUEE/Nh2re/kzUsaGoVAGM566XW2En5qCUEdiitYuWvlQvcIATqv5FjWTAIqmiDY0VL+HeHe0jkeLmam6jJFCJlFz7tWqfFCVQSEEXhJL+ATd3ZpLmC0onq6kpeHrdR62Bmg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sina.com; spf=pass smtp.mailfrom=sina.com; arc=none smtp.client-ip=180.149.134.25
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sina.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sina.com
-X-SMAIL-HELO: localhost.localdomain
-Received: from unknown (HELO localhost.localdomain)([113.118.66.75])
-	by sina.com (10.185.250.21) with ESMTP
-	id 66B4A00A000050AB; Thu, 8 Aug 2024 18:38:05 +0800 (CST)
-X-Sender: hdanton@sina.com
-X-Auth-ID: hdanton@sina.com
-Authentication-Results: sina.com;
-	 spf=none smtp.mailfrom=hdanton@sina.com;
-	 dkim=none header.i=none;
-	 dmarc=none action=none header.from=hdanton@sina.com
-X-SMAIL-MID: 8245633408333
-X-SMAIL-UIID: D51D29BBBD6740BABCD5E7D8CCCA9FD9-20240808-183805-1
-From: Hillf Danton <hdanton@sina.com>
-To: syzbot <syzbot+27c3c57b78da2a0995d8@syzkaller.appspotmail.com>
-Cc: linux-kernel@vger.kernel.org,
-	linux-bluetooth@vger.kernel.org,
-	syzkaller-bugs@googlegroups.com
-Subject: Re: [syzbot] [pm?] INFO: trying to register non-static key in netdev_unregister_kobject
-Date: Thu,  8 Aug 2024 18:37:54 +0800
-Message-Id: <20240808103754.2783-1-hdanton@sina.com>
-In-Reply-To: <000000000000795a2506196e7cd5@google.com>
-References: 
+	s=arc-20240116; t=1723114984; c=relaxed/simple;
+	bh=Ok+dZk9SstegenVqbnAQRN6NWf1Fam24wrC95Gyx7z8=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=b8E06wU81yc3INilF5RlEAk2tQJZExYQGSHzF1XsarfJhY6h3ht7V7BEKb3EpFn8svCwHeoUyJIJPx204zmRkqM633652tWPqwrR3TEJUiahNWOHiyq9N9Y1fyLfxFJnbZrifVIHIUqfnWiyqx6Gs6o/dh/317mCxbI8nyG9A8w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.199
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f199.google.com with SMTP id e9e14a558f8ab-39a1f627b3dso10618155ab.1
+        for <linux-bluetooth@vger.kernel.org>; Thu, 08 Aug 2024 04:03:03 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723114982; x=1723719782;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=njYrZI2KAenj1tRYEV1B/WyO4YVNlDOY48s1Oi9rOOw=;
+        b=U29lQLhZsBPjWrlnFKsAECkVxEFdzSe2MjOHqLWO2kT5t9oU5l53GZ+rxtuv5gzwgE
+         RHFDvLZ+rCLZ1FAq+3imXJfrWdIKqYZzjPlVPKB6SkKHbztIPEQ+IKQKz/XjzDpJjShi
+         hODWqawpLR01/1e5UndoA5Gt7W0vqkLHG5cTUQVnXdAGm6t2tnQ1GIJ0c5MUwbQNL7n6
+         l02LmJycqnWHC08hRbg7oO9/VBVhEBi41SsLEbW6GmdkR7tbvwHr4PuyMJEWngmydK1A
+         heJNvFZuJipCFoxUDC5VWxMjZohVJpJlo2Qt7E97pdSEgIKgnDAGXx/earvj/HpzF1Rx
+         JUgQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXEaKKI/gVP6IHIm0902ovJxTa+hUc3YOhaNk1rw8k1cdgQ8hI5dY8ktbpzqJN1OyYHJ9fhey7RrVya3DfA0RxdQd0dFpibJtZvjJlwUjJM
+X-Gm-Message-State: AOJu0YwbqMaUXuoftrzEQVjU1edpKXqAx++Ee0dEvZMf8qOGL9soTvuT
+	8LDk7X9fHA5VUP9fxIshdCNTBvEf3WVdXE7e3jP+GEEJzJvc1vrqB59O9rlVrUfWDDm81l4XBar
+	RQpRfpklJl+Vki0IvjnUixRQZwGxkBRcH6FF5nYv4K8g3/NicnAkcCZo=
+X-Google-Smtp-Source: AGHT+IE563ij+gekVscxGZzfs6EJqcj+1X3TmLCDhC/vmiiDnRfFQpLPrgC04GgGJsEn4UeHI4k+7X5clLTXlOlpcUEhyZXG8ftJ
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-Received: by 2002:a05:6e02:1c2b:b0:39a:e800:eec9 with SMTP id
+ e9e14a558f8ab-39b5ed6c734mr1119185ab.4.1723114982649; Thu, 08 Aug 2024
+ 04:03:02 -0700 (PDT)
+Date: Thu, 08 Aug 2024 04:03:02 -0700
+In-Reply-To: <20240808103754.2783-1-hdanton@sina.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <00000000000072c34e061f29f8c9@google.com>
+Subject: Re: [syzbot] [pm?] INFO: trying to register non-static key in netdev_unregister_kobject
+From: syzbot <syzbot+27c3c57b78da2a0995d8@syzkaller.appspotmail.com>
+To: hdanton@sina.com, linux-bluetooth@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Mon, 27 May 2024 05:16:25 -0700
-> syzbot found the following issue on:
-> 
-> HEAD commit:    e67572cd2204 Linux 6.9-rc6
-> git tree:       upstream
-> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=13274a87180000
+Hello,
 
-#syz test upstream  master
+syzbot has tested the proposed patch and the reproducer did not trigger any issue:
 
---- x/net/bluetooth/hci_core.c
-+++ y/net/bluetooth/hci_core.c
-@@ -2598,7 +2598,7 @@ int hci_register_dev(struct hci_dev *hde
- 	if (!IS_ERR_OR_NULL(bt_debugfs))
- 		hdev->debugfs = debugfs_create_dir(hdev->name, bt_debugfs);
- 
--	error = device_add(&hdev->dev);
-+	error = device_register(&hdev->dev);
- 	if (error < 0)
- 		goto err_wqueue;
- 
---
+Reported-by: syzbot+27c3c57b78da2a0995d8@syzkaller.appspotmail.com
+Tested-by: syzbot+27c3c57b78da2a0995d8@syzkaller.appspotmail.com
+
+Tested on:
+
+commit:         6a0e3826 Merge tag 'for-6.11-rc2-tag' of git://git.ker..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=11eff061980000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=73b1a61cb77f73e5
+dashboard link: https://syzkaller.appspot.com/bug?extid=27c3c57b78da2a0995d8
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+patch:          https://syzkaller.appspot.com/x/patch.diff?x=14872e5d980000
+
+Note: testing is done by a robot and is best-effort only.
