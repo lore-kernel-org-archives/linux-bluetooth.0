@@ -1,29 +1,32 @@
 Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 185DE197A68
-	for <linux-bluetooth@vger.kernel.org>; Fri,  9 Aug 2024 16:23:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB5891990C3
+	for <linux-bluetooth@vger.kernel.org>; Fri,  9 Aug 2024 16:23:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723220600; cv=none; b=c9WlYvwtKv4W5WToZ2qgiYL4zWX7C3gBo3pbBhEyfIqyCYXdRxUXnN6RfFGavMqeo0ZaWRfV+FWkKpcVZ2Dke8shJmaXc1VNxscik+jqM454/CHOv0B+aH3TtVglbwhYWC2fPP9o3YV+iCOuj+KRb4tfJXltD2BKschOTTQIAXY=
+	t=1723220605; cv=none; b=tpnhIFXG8+LHG/01ZU3baTfiFzIcHJENstHBwvaIdqIu07QI/RCOx9uH6oBLytyBtguXFlYPRrBQMnDxp4KjCS9R+lp+fvAw8aI4ZOJfRotDMa4T8SfJ4F2pEz3u3JNeJkeCfQEPt+hvcaD/BY8RHz62oEDpp/sQdORrOmmFvX8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723220600; c=relaxed/simple;
-	bh=eeo9rWPh1B1JgbhLChe12IlOgwXRninNCC6Ag3uBhL4=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Px1AlnhZvCuA6MPQOtiEFqqubwK45i1nmuBLI+2mtkSOvTWxdIxqlP55qlnL6lQSg9xOGWaNOBse0FXGkbuBZBFAHwd86LPnYzPfqDbinYYTueszEkioWtUG6urD0re96dl8TXfQjXAwJPjkI2AUw6V92xg9/xktyHgaZtF7A9k=
+	s=arc-20240116; t=1723220605; c=relaxed/simple;
+	bh=uBoElLSDsBpFKL/DwbkxqKmVQnZsutjxXJuJliB+P/Q=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=HHToi1Y/9FKanJAFqEuV3G8AaTSR1RB6mLP18ErbT9nITYQhHyxxAbiwWlIwA61vsegee89BDsdvE2oIsNr7C+3Qtex476bJ3NtfrpZCkMZ5GEhDA+iOsPevIj1GUN88cmugg3KASYd5WNkmTRdynXpofyQ6X+IbpVfBndYeajs=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
 Received: from localhost.localdomain (217.23.186.16) by msexch01.omp.ru
  (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Fri, 9 Aug
- 2024 19:23:06 +0300
+ 2024 19:23:11 +0300
 From: Roman Smirnov <r.smirnov@omp.ru>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Roman Smirnov <r.smirnov@omp.ru>
-Subject: [PATCH BlueZ v1 0/3] fix errors found by SVACE static analyzer #4
-Date: Fri, 9 Aug 2024 19:22:26 +0300
-Message-ID: <20240809162252.50098-1-r.smirnov@omp.ru>
+Subject: [PATCH BlueZ v1 resend 1/3] tools/rctest: add NULL checks to main()
+Date: Fri, 9 Aug 2024 19:22:27 +0300
+Message-ID: <20240809162252.50098-2-r.smirnov@omp.ru>
 X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20240809162252.50098-1-r.smirnov@omp.ru>
+References: <20240809162252.50098-1-r.smirnov@omp.ru>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -65,18 +68,97 @@ X-KSE-Attachment-Filter-Triggered-Rules: Clean
 X-KSE-Attachment-Filter-Triggered-Filters: Clean
 X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
-Several bug fixes.
+It is necessary to prevent dereferencing of a NULL pointer.
 
-Roman Smirnov (3):
-  tools/rctest: add NULL checks to main()
-  android/avctp: remove check in session_browsing_cb()
-  android/avdtp: fix leak in avdtp_new()
+Found with the SVACE static analysis tool.
+---
+ tools/rctest.c | 30 +++++++++++++++++++++++-------
+ 1 file changed, 23 insertions(+), 7 deletions(-)
 
- android/avctp.c |  6 ++----
- android/avdtp.c |  4 +++-
- tools/rctest.c  | 30 +++++++++++++++++++++++-------
- 3 files changed, 28 insertions(+), 12 deletions(-)
-
+diff --git a/tools/rctest.c b/tools/rctest.c
+index b72be917c..367e41e3c 100644
+--- a/tools/rctest.c
++++ b/tools/rctest.c
+@@ -742,6 +742,9 @@ int main(int argc, char *argv[])
+ 			break;
+ 
+ 		case 'a':
++			if (!optarg)
++				break;
++
+ 			mode = AUTO;
+ 
+ 			if (!strncasecmp(optarg, "hci", 3))
+@@ -756,6 +759,9 @@ int main(int argc, char *argv[])
+ 			break;
+ 
+ 		case 'i':
++			if (!optarg)
++				break;
++
+ 			if (!strncasecmp(optarg, "hci", 3))
+ 				hci_devba(atoi(optarg + 3), &bdaddr);
+ 			else
+@@ -763,10 +769,14 @@ int main(int argc, char *argv[])
+ 			break;
+ 
+ 		case 'P':
+-			channel = atoi(optarg);
++			if (optarg)
++				channel = atoi(optarg);
+ 			break;
+ 
+ 		case 'U':
++			if (!optarg)
++				break;
++
+ 			if (!strcasecmp(optarg, "spp"))
+ 				uuid = SERIAL_PORT_SVCLASS_ID;
+ 			else if (!strncasecmp(optarg, "0x", 2))
+@@ -792,11 +802,13 @@ int main(int argc, char *argv[])
+ 			break;
+ 
+ 		case 'L':
+-			linger = atoi(optarg);
++			if (optarg)
++				linger = atoi(optarg);
+ 			break;
+ 
+ 		case 'W':
+-			defer_setup = atoi(optarg);
++			if (optarg)
++				defer_setup = atoi(optarg);
+ 			break;
+ 
+ 		case 'B':
+@@ -808,19 +820,23 @@ int main(int argc, char *argv[])
+ 			break;
+ 
+ 		case 'N':
+-			num_frames = atoi(optarg);
++			if (optarg)
++				num_frames = atoi(optarg);
+ 			break;
+ 
+ 		case 'C':
+-			count = atoi(optarg);
++			if (optarg)
++				count = atoi(optarg);
+ 			break;
+ 
+ 		case 'D':
+-			delay = atoi(optarg) * 1000;
++			if (optarg)
++				delay = atoi(optarg) * 1000;
+ 			break;
+ 
+ 		case 'Y':
+-			priority = atoi(optarg);
++			if (optarg)
++				priority = atoi(optarg);
+ 			break;
+ 
+ 		case 'T':
 -- 
 2.43.0
 
