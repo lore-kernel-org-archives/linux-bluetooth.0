@@ -1,123 +1,88 @@
-Received: from mail-lj1-f179.google.com (mail-lj1-f179.google.com [209.85.208.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28193195980;
-	Fri,  9 Aug 2024 14:49:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A12F13FFC;
+	Fri,  9 Aug 2024 14:50:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723214953; cv=none; b=saEiiYC8I3GAmcy9YcoRH2L1hpwwp07X/cooRZu4janHyzvpcDc43AAeJi+a7iO/MeN0J1h0USbq0/99liFLX1gTi5XTu8LINbWUiUYtyysk/NJ/J4HOvSjzp1npqpAYr+7rb18Zbwkr9d/+aqipu/q2mTeiB9PFQ0ZVm0nBfCk=
+	t=1723215032; cv=none; b=uMSkCfSiBhVM+CG2vVO+X3IGR2THl4E7JzB3lzNMI8Xk00QG+qzQjRKSlYDZovRZuAuI9/39zcglkrlZqR2AX/xoVvEfRQWnVGJbNq8YACpPxF0aNclOXy5JbxtBBTtAGwgKJ793h4I7fWynX15JVElXJ6ObeSXSZ8FapMf61R4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723214953; c=relaxed/simple;
-	bh=vn7LfbjPhATnOujxqUmZwluZtBU3qLpvzFawLfUqrU8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=gbYCrUd1vm1D3vmCx5FAw701yFoKjpRM7DDbRl2Wm4dwl0JhKD9uCYJeZWiDVqpy4DLE26LGq0O3tWdybMSXSu6xqSecbADqnhcFddwlAwn3zq0GVNos2Rz44otQtPtxWLiOA6E3esbfswkeMOBwHfimcaiAeynIzdDMQvTOjP0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PnzKiw/O; arc=none smtp.client-ip=209.85.208.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1723215032; c=relaxed/simple;
+	bh=o2boHsvugOoSfnRryclCz3yN8ZygMbaTL2M4TClf0ho=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=fkwC0RXEdqwLgnsVk07uL+/xJ2BqcuMI2iIOxPL2MsJmC8s+EPvgTTCKZDTn9AeJcCqyt3XnRM8vpZs9V6DPsBUXmSXQxPOQ39xF1+1/5GMtIYYenPg3saS81L0XBJt2mdffA5ICo3ah3ZfBqiw6RIjamTKpMGTGJLQU8h5doDs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=u9PjMn7r; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PnzKiw/O"
-Received: by mail-lj1-f179.google.com with SMTP id 38308e7fff4ca-2f0271b0ae9so21790151fa.1;
-        Fri, 09 Aug 2024 07:49:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1723214950; x=1723819750; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=CE9WjafHbNcAarbfWw+lBM4t01a9uasEkOO/YQedVzY=;
-        b=PnzKiw/OmjXq0pmmGKSfnsmAyhbtppB6mE/dYO0QJt0LMfI6Wf9xZBKSweoQvp8wJU
-         u8WSaYiYdHFQWFyoWWdv6RMXME9ugyLM9p4w83rjvnA86fCFo074IEPrRl9ZQTUwKGO8
-         piSKp/UikOwM9lbagexOWOqP8GPojamTF9eFZwaDZ/4i4wLfn4Y6fPdn2FooZYmRkFNI
-         vIOXuovUaCKrJCXaQz4x20ohLo7kM1VvwkMaqvLyWtsWc2onzBETXj2QKs+ecRU8cINS
-         ghfzzCowFExbxCI7LKFysIWaxSZ5rcJZFFnHX/r5YKwkfAOOiL2c0i4BTb62rfJFhvor
-         BDBw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723214950; x=1723819750;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=CE9WjafHbNcAarbfWw+lBM4t01a9uasEkOO/YQedVzY=;
-        b=jNFfZSUpsIH7y6SVAavX4iTTjqzSeWcfaP6TcemWfTAGXI8PyB9Hpl8ophXKZPPSN7
-         ZqTDhHGjcjXKsNhhsCXx45iq0ynpJdueomEAYHLSqWF7xlAa4sOrfubHZWagABUwbzX+
-         kFvJTJmNrzdV7WaXRM5s/P2743WIHtYynMkCig2H1mITZoJ/UbAwTirRRj3B/GZqEstn
-         wzm/tgiE1kGU3lHbO8f2c3Ya9fBxveuNIj9WbVS33/hE/f8mm73OEZnxAfYc1sALBd7h
-         d5WvBmA0+hfaYGpD1IMh2WbNvp7qD0aojmyV+vVi02vN9BMUihHs/Jdd/QP4XjyKfbyM
-         4pVw==
-X-Forwarded-Encrypted: i=1; AJvYcCUCA3IcJgzOKwxrsb3fLOwJcgdBgTpKBTOWxZoY+yGNhDGAOVJfCc35HzedwPxSSk3ssM8DltOs7/6HnYS8K3nJ7oGHrsXY3rUCJrSqK2TPfkdoblpQDPzcF0CVrnDrZLgJvN2fgGlu
-X-Gm-Message-State: AOJu0YyeE9tj2KepMEa5FdNDTJv867TJzBIGvAPWfcj18AjlHC5h8p35
-	RFRxJ8sACIuI9MhkNJshJaLre1jjMy3r+aencLsWjMch8fp372koikl8hMYa7eDKcVPc3yedp8N
-	OzN0Jkz/lqIu22KJEjq+aGqOqAADxIimu
-X-Google-Smtp-Source: AGHT+IFZqhLtje5XgnpiqTXNnHVHcvu6hqbGLwt4IP16T8g3vt4Ks5rc+0NKr3pTRE679D+NKxLwoSyJ1e+mflcZxpI=
-X-Received: by 2002:a05:651c:551:b0:2ef:2c86:4d45 with SMTP id
- 38308e7fff4ca-2f1a6d1d224mr14931431fa.27.1723214949602; Fri, 09 Aug 2024
- 07:49:09 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="u9PjMn7r"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CB2CAC32782;
+	Fri,  9 Aug 2024 14:50:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1723215030;
+	bh=o2boHsvugOoSfnRryclCz3yN8ZygMbaTL2M4TClf0ho=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=u9PjMn7rRm/BVqGZVoTXCghvzLq1t+ClKm564TRMywPtaeTIB6+74i5T8cQiss5XS
+	 fcu7Z9W3kAcLFcfwX9i2MxCkoprfn6C5uBw7LWJGYEtAcZ66cguckB08J08aQRwWoq
+	 5Ry3C0RnhI2H7Pyo3sAR9dJym4ulLDbFDNHMf44WhIyTqieERQqDLnW+jOIbXQDpy2
+	 id+mCpL6CQEiToKcY9aIFV7ViJrE+uV6NjbfXiFpOzdroMTZtbngf8R+TExCBtK+si
+	 59hctD/uUghz/QCVO3dDg6+0WQQuXn2dIlREFsiQ8mMfQ8nw9b2Y20Y2/KadEi/eCp
+	 /j8j7b+CaaSxw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAEB6382333D;
+	Fri,  9 Aug 2024 14:50:30 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240807210103.142483-1-luiz.dentz@gmail.com> <172308842863.2761812.8638817331652488290.git-patchwork-notify@kernel.org>
-In-Reply-To: <172308842863.2761812.8638817331652488290.git-patchwork-notify@kernel.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Fri, 9 Aug 2024 10:48:56 -0400
-Message-ID: <CABBYNZ+ERf+EzzbWSz3nt2Qo2yudktM_wiV5n3PRajaOnEmU=A@mail.gmail.com>
-Subject: Re: pull request: bluetooth 2024-07-26
-To: patchwork-bot+netdevbpf@kernel.org
-Cc: davem@davemloft.net, kuba@kernel.org, linux-bluetooth@vger.kernel.org, 
-	netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v4 0/3] Add support for Amlogic HCI UART
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <172321502977.3810378.15779692366071680309.git-patchwork-notify@kernel.org>
+Date: Fri, 09 Aug 2024 14:50:29 +0000
+References: <20240809-btaml-v4-0-376b284405a7@amlogic.com>
+In-Reply-To: <20240809-btaml-v4-0-376b284405a7@amlogic.com>
+To: Yang Li via B4 Relay <devnull+yang.li.amlogic.com@kernel.org>
+Cc: marcel@holtmann.org, luiz.dentz@gmail.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, robh@kernel.org,
+ krzk+dt@kernel.org, conor+dt@kernel.org, catalin.marinas@arm.com,
+ will@kernel.org, linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, yang.li@amlogic.com,
+ krzysztof.kozlowski@linaro.org, ye.he@amlogic.com
 
-Hi Jakub,
+Hello:
 
-On Wed, Aug 7, 2024 at 11:40=E2=80=AFPM <patchwork-bot+netdevbpf@kernel.org=
-> wrote:
->
-> Hello:
->
-> This pull request was applied to netdev/net.git (main)
-> by Jakub Kicinski <kuba@kernel.org>:
->
-> On Wed,  7 Aug 2024 17:01:03 -0400 you wrote:
-> > The following changes since commit 1ca645a2f74a4290527ae27130c8611391b0=
-7dbf:
-> >
-> >   net: usb: qmi_wwan: add MeiG Smart SRM825L (2024-08-06 19:35:08 -0700=
-)
-> >
-> > are available in the Git repository at:
-> >
-> >   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git=
- tags/for-net-2024-08-07
-> >
-> > [...]
->
-> Here is the summary with links:
->   - pull request: bluetooth 2024-07-26
->     https://git.kernel.org/netdev/net/c/b928e7d19dfd
->
-> You are awesome, thank you!
+This series was applied to bluetooth/bluetooth-next.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-Im trying to rebase on top of net-next but Im getting the following error:
+On Fri, 09 Aug 2024 13:42:23 +0800 you wrote:
+> Add support for Amlogic HCI UART, including dt-binding,
+> and Amlogic Bluetooth driver.
+> 
+> Signed-off-by: Yang Li <yang.li@amlogic.com>
+> ---
+> Changes in v4:
+> - Modified the compatible list in the DT binding.
+> - Reduced the boot delay from 350ms to 60ms.
+> - Minor fixes.
+> - Link to v3: https://lore.kernel.org/r/20240802-btaml-v3-0-d8110bf9963f@amlogic.com
+> 
+> [...]
 
-In file included from arch/x86/entry/vdso/vgetrandom.c:7:
-arch/x86/entry/vdso/../../../../lib/vdso/getrandom.c: In function
-=E2=80=98memcpy_and_zero_src=E2=80=99:
-arch/x86/entry/vdso/../../../../lib/vdso/getrandom.c:18:17: error:
-implicit declaration of function =E2=80=98__put_unaligned_t=E2=80=99; did y=
-ou mean
-=E2=80=98__put_unaligned_le24=E2=80=99? [-Wimplicit-function-declaration]
+Here is the summary with links:
+  - [v4,1/3] dt-bindings: net: bluetooth: Add support for Amlogic Bluetooth
+    https://git.kernel.org/bluetooth/bluetooth-next/c/8802f81065c3
+  - [v4,2/3] Bluetooth: hci_uart: Add support for Amlogic HCI UART
+    https://git.kernel.org/bluetooth/bluetooth-next/c/58803465ec1a
+  - [v4,3/3] MAINTAINERS: Add an entry for Amlogic HCI UART (M: Yang Li)
+    https://git.kernel.org/bluetooth/bluetooth-next/c/f173b220f9dc
 
-I tried to google it but got no results, perhaps there is something
-wrong with my .config, it used to work just fine but it seems
-something had changed.
-
-> --
-> Deet-doot-dot, I am a bot.
-> https://korg.docs.kernel.org/patchwork/pwbot.html
->
->
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
---=20
-Luiz Augusto von Dentz
