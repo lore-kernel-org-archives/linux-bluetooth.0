@@ -1,29 +1,29 @@
 Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C1B8198E7A
-	for <linux-bluetooth@vger.kernel.org>; Fri,  9 Aug 2024 16:23:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08E201991B9
+	for <linux-bluetooth@vger.kernel.org>; Fri,  9 Aug 2024 16:23:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723220609; cv=none; b=Lk4YgeBZ8vpQ9JbE6RyU2xTrm4JCFB2iLAdPMy4eGxa4vrOMuhYgVA2thMW/T4reouSveNu6ifjyxurgYbxQU++DLz24R5g3PLqYeXxq75ivPVUg51u+gNPSbLjY3ngI43202WKM6Gxlr/mofW0PSpmy0JJE6GHqfdwORtUhKzc=
+	t=1723220615; cv=none; b=uDYIzbIC4dHhCyv0j7RBYeYilKF/ItiUBwxoOf0PiXASx8RIfV5/NE4BbsnTSpm7WoB8AFt5wh9N6KCgnHGIRFlhU35ROYQtFB/F9qkHJHtLiHgapoUMleigtCpuPHmz1cXgRl/O7qtDr2FODLGieoGhU0LQDgTyw9BkZqrylm0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723220609; c=relaxed/simple;
-	bh=unmtuWTjHyPR3KhVftLMF8SQYxmm2OQiL8d5NZmh410=;
+	s=arc-20240116; t=1723220615; c=relaxed/simple;
+	bh=tAn8KcDWKi/HaXKYargqnpBpgd+bpu/ghQBoF6wcm+4=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=TPRL1g+uilvRB1WpWnJ95yHqcctNK10a3L94aUoBGT4q9/7cZKip2aguf9hl6RGpq4/0znk2soA/dLZHFNTlwd4LxoIo+zVvdp4XoC9ytntrNtIHZZ7AVoOuyHvATSvFu2ktFS2Ivt8Y1qnMVyM2XlqYKv1DRDwdxWlV+S1uuxQ=
+	 MIME-Version:Content-Type; b=nGrWEM9lWgsmVJf3MeS/7spkBnawgg8Uew4uP27LUcFzx7M/5xJM5tbL9mqcd8hBX7006A39iI0MvbkjKLQFliFo+O0h1yEUwwRHMg/cYB3By4EGz+nP9EZ5dOpCS03RrsRy9DLUKR7AfRITWtAavKcqG4AP9V0hj+wwKD0kmqE=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
 Received: from localhost.localdomain (217.23.186.16) by msexch01.omp.ru
  (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Fri, 9 Aug
- 2024 19:23:12 +0300
+ 2024 19:23:13 +0300
 From: Roman Smirnov <r.smirnov@omp.ru>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Roman Smirnov <r.smirnov@omp.ru>
-Subject: [PATCH BlueZ v1 2/3] android/avctp: remove check in session_browsing_cb()
-Date: Fri, 9 Aug 2024 19:22:28 +0300
-Message-ID: <20240809162252.50098-3-r.smirnov@omp.ru>
+Subject: [PATCH BlueZ v1 3/3] android/avdtp: fix leak in avdtp_new()
+Date: Fri, 9 Aug 2024 19:22:29 +0300
+Message-ID: <20240809162252.50098-4-r.smirnov@omp.ru>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240809162252.50098-1-r.smirnov@omp.ru>
 References: <20240809162252.50098-1-r.smirnov@omp.ru>
@@ -68,31 +68,29 @@ X-KSE-Attachment-Filter-Triggered-Rules: Clean
 X-KSE-Attachment-Filter-Triggered-Filters: Clean
 X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
-session->browsing is dereferenced at the beginning of the function, so
-the check can be removed.
+It is necessary to close the file descriptor in case of an error.
 
 Found with the SVACE static analysis tool.
 ---
- android/avctp.c | 6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
+ android/avdtp.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/android/avctp.c b/android/avctp.c
-index 37b4cec4f..d8104a7c2 100644
---- a/android/avctp.c
-+++ b/android/avctp.c
-@@ -905,10 +905,8 @@ send:
- failed:
- 	DBG("AVCTP Browsing: disconnected");
+diff --git a/android/avdtp.c b/android/avdtp.c
+index a261a8e5f..e0466853b 100644
+--- a/android/avdtp.c
++++ b/android/avdtp.c
+@@ -2130,8 +2130,10 @@ struct avdtp *avdtp_new(int fd, size_t imtu, size_t omtu, uint16_t version,
+ 		return NULL;
+ 	}
  
--	if (session->browsing) {
--		avctp_channel_destroy(session->browsing);
--		session->browsing = NULL;
--	}
-+	avctp_channel_destroy(session->browsing);
-+	session->browsing = NULL;
+-	if (set_priority(new_fd, 6) < 0)
++	if (set_priority(new_fd, 6) < 0) {
++		close(new_fd);
+ 		return NULL;
++	}
  
- 	return FALSE;
- }
+ 	session = g_new0(struct avdtp, 1);
+ 	session->io = g_io_channel_unix_new(new_fd);
 -- 
 2.43.0
 
