@@ -1,137 +1,91 @@
-Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
+Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7188416B750
-	for <linux-bluetooth@vger.kernel.org>; Sun, 11 Aug 2024 18:17:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C26DB1E890
+	for <linux-bluetooth@vger.kernel.org>; Sun, 11 Aug 2024 21:05:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723400254; cv=none; b=Q+FSxc3qt1pVMP1OXHmGN77Z2gHfEpbokE0SC6x7zYP9BxpmZRT6jHB1pR+2t+bexMssUHqGNs3OTLZD9JQ5CHb+vRszl3YBKUIyQDSzKTiEvSBLY+tNu78CsT8TlhuqV0A+eddhU/NGs9CZyS0gNFHq/1lkynqcCOW2CNyEtsw=
+	t=1723410310; cv=none; b=PQkXAQDjz0Ls7ZEIK03+ITyBex4P0VZsQAZTRDS73M7GMCwwf4TWwgXWJa272a/KAlkD+ormU1v2z4ie1TjolxnYUMknnIuuF4kZdE1sd9tUwC745lnu+dIKibKYr0Wlj9++jmMFoFCou7uBN0P8pdPnZ5RZ+neQrn6hrfAGK8c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723400254; c=relaxed/simple;
-	bh=i+lTvqxiMRXFw4pW4fXIUgAA4bXjhigtS13EAIn2h9I=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=edQvYrH1s+czxvaVO7oSs0a1UiGozBCfqaqmo9jDbMSRVq524AAiDK+XWipR4BEm5ZVIFhNtDNM4nBiGZelc12iHDDUWqmnsmJQ6jfjMVbMr+nHXSDiGrZ6JtOiGNHrVqg2BGGjSYTJCxXTa9Ju0IUxL4DiivHqla6yyKHpBpeg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=CdEnF589; arc=none smtp.client-ip=209.85.208.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	s=arc-20240116; t=1723410310; c=relaxed/simple;
+	bh=x4zqCiFjd8JEpMTAj50pU8Fbdw+7zStSFThvmIlpBA8=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=kXlp4Gft1r6cl2Or2++oY/7/wluoYXx9OIwqPyITAVSB9+1gvpcltaUR08b0yRbr8IanNsfaVG050EPIb2tAdQjPZGAc7yneyESzll82fv/31lpCeOmA/x3S30L2Ubsy8IgKmapajbPsWZje3Q7YelQC+GFkk3PFRbk0+ZvT6Hs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kjoGIt/4; arc=none smtp.client-ip=209.85.218.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="CdEnF589"
-Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-5b391c8abd7so4229074a12.2
-        for <linux-bluetooth@vger.kernel.org>; Sun, 11 Aug 2024 11:17:31 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kjoGIt/4"
+Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-a7ac469e4c4so597870766b.0
+        for <linux-bluetooth@vger.kernel.org>; Sun, 11 Aug 2024 14:05:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1723400250; x=1724005050; darn=vger.kernel.org;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=JvbZ+8SyXPbkfWIxq8fFFxIwmoC4vttG1Fog7o3RX+I=;
-        b=CdEnF589n0JAAIAH4FERLOqOO51a1AKViW45tAa+pSmCCxJCxAkiT0tjGHDSKw//LC
-         9wdaCf9pKzlR+nvEyggzqxq4wt0KbEZfvxqC9ogCaAVaj/SRrTjvFhbRnlX9u02avHAw
-         1on6ndsMpiCADolJ9sgSq9CI5UXB0M5CQN/FNmHHofNCGTk5Ar9nb/2WWeTxmR1lHmgT
-         dw4AZ777rvsJ2ALtjNdMMCMHZbbkVxt0CipQeYSSyJ2hKLVddQEaTcXv08CNC+HHhpts
-         EMYKQUimIy36ASi9FFMpYgKgi99whST1BGvyssVc6G/KBddRZWvUWYwOglqd72viNbmn
-         cwxA==
+        d=gmail.com; s=20230601; t=1723410307; x=1724015107; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=UL5D99O0OLyrDJ7cZQ2e87U1TZUu8UC6T/hwhu71104=;
+        b=kjoGIt/4jzkcLN6jpgYRc6bZG5QPmWBIL+3cshjZZxEPwF6bRW+DUBVCFQjBzYQLY1
+         OFebNVtkXD1yyDFwIP7kzDx2vO3y95UHzA+NeZ34oanGhjctXtUqwjvFShMNq3dTpJk3
+         0TcUxaQR21T03hOVwmyuERbq2cnR8Nu+aNGZL3qzkyXeDH7DXYVA5ah5ZFhh2xfjyM4R
+         ZnSAVzJUIzIWW8nZTfGot9rkPmdfk+mie2w3b3LHYqHdew6QRrg9jGPZKqkvLYO+/a4V
+         rfqh0WT5fNCF989cCVLPAHfEJOlpBQoCX6MsgHJjzpDyWJCDEO2H4+1zTgnfiIg2zGVN
+         I6Sg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723400250; x=1724005050;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1723410307; x=1724015107;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=JvbZ+8SyXPbkfWIxq8fFFxIwmoC4vttG1Fog7o3RX+I=;
-        b=mt8gvPIo0vBNDRDaZBiI+PakDFq91D8fLKXI3VGtvjelEDYzyg+In1iMfvkluBklYs
-         wX7GshGTesMX2cZqoO40JDGr5w8lP0w2ZbUSKuMJ+NO8bcwVuAQ7c9P5ds3qNNEiqLB3
-         APQHNzzuSDKdJ/ldHfgPUFz+Ilf4jo6KeoFS0tHZWiuf67sF41l587NxnOOMrTswf5d1
-         v6YlS+iqbtw4CHlvLNv6TCbcOqHYEk/Y1Dqj3c1YhU04gvPliNb4KhVGY5n4dhorwUbd
-         c9caQ+BemO/P/q8AXYpj0RrDNjQAUto0ym7m2gP1zLje77cv4wsJGLcutFv7R5doU3+F
-         epSQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWJqdpDylizwoo2DoBAbRcdvifkQDdvrxCuX9uqrwP7KrAfI3UxJ+5LvxFxbFqzvD0ulmgLu2evPRJPhX1N/ECtA16qBsWRIF2wpqsBweqy
-X-Gm-Message-State: AOJu0YxNf+J+ew228JuB8oprXxDYXJbGvdlCJMG866nszlpnvQZHTh64
-	yWiYawOzenNVuKun93uY+6UL+ceu6Wo5cn0fSTmMulcERWTZntuC9PnezXuYJBs=
-X-Google-Smtp-Source: AGHT+IF845o0XSP5n/BwrlmriZw7Zb6P6jQ3BpfatLkLOENLMyaMOLi7UlDJBP7b5+N/eNUzZ5p81w==
-X-Received: by 2002:a05:6402:458f:b0:5a1:c40a:3a81 with SMTP id 4fb4d7f45d1cf-5bd0a6603a2mr3481173a12.35.1723400249713;
-        Sun, 11 Aug 2024 11:17:29 -0700 (PDT)
-Received: from [127.0.1.1] ([178.197.219.137])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5bd1a6032c1sm1610593a12.92.2024.08.11.11.17.27
+        bh=UL5D99O0OLyrDJ7cZQ2e87U1TZUu8UC6T/hwhu71104=;
+        b=vIOvVmgZVaosMSJ5Y5VaZOaCBJBZr2T76z75lBGKnq+26YZNC3NYVlxLN9aAghDIBK
+         155uaXVrxcQDHPYvcQBk/JogOz2eEEYajGhbKkuLn969T7EY6/IZOztVG+FwYY0el3Nt
+         QoyEAfFh8hAo+Vh/o36h3i8Bi5ibWBHS5t6jsMmKX9JZyR5k0zUX06dBvrcc7HcI/hu4
+         UkbaODyGJj+vlDZkDF0P0GJa45eVJJiDIErVVNveKl+WRKaBDZYTrQhcZZvnwKYa2USp
+         NJJz2x/Z2Gk7GltyeowU1mQxm1wMUdt0AaBGb9Dqcws0Ek6FQ5XNAXrM7emtOots2Ec2
+         pVQw==
+X-Forwarded-Encrypted: i=1; AJvYcCVR+IR3VQViWJTRPJLxCBzA9mteErtWOKDKMdqH15tAyipjSZhT7bGHu9ifiv/31+yIqkJ4y9N299d/IG7S6T17QD5QkfsTLGj1Fp1Mwrv0
+X-Gm-Message-State: AOJu0YxH86wIvECHjJfTntmN0608o/NdU8IVoXMJleQJN5WIO34qOju9
+	eny9OKHIRZ4wzJv/DECSAuqTvS5b3CiEauq1k+54gU6a/W8wgobr
+X-Google-Smtp-Source: AGHT+IHN5HHu8h6w/Ia0Ve2BPF+zaCDU/w+cy7O7mxVoVgr/izxWKMHozXPv4HsG9MGNZDH189yeVQ==
+X-Received: by 2002:a17:906:ee8d:b0:a7d:ab62:c317 with SMTP id a640c23a62f3a-a809207e2fcmr1021072066b.30.1723410306753;
+        Sun, 11 Aug 2024 14:05:06 -0700 (PDT)
+Received: from x1cx.uhrm.ch ([2a02:168:4f3f:7:4b00:1bb0:11f:418d])
+        by smtp.googlemail.com with ESMTPSA id a640c23a62f3a-a80bb08fe90sm173095266b.27.2024.08.11.14.05.05
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 11 Aug 2024 11:17:29 -0700 (PDT)
-From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Date: Sun, 11 Aug 2024 20:17:09 +0200
-Subject: [PATCH 6/6] ASoC: dt-bindings: serial-midi: reference
- serial-peripheral-props.yaml
+        Sun, 11 Aug 2024 14:05:06 -0700 (PDT)
+From: Markus Uhr <uhrmar@gmail.com>
+To: raul.cheleguini@gmail.com
+Cc: johan.hedberg@gmail.com,
+	linux-bluetooth@vger.kernel.org,
+	luiz.dentz@gmail.com,
+	marcel@holtmann.org
+Subject: Re: [PATCH v2] Bluetooth: Add new quirk for broken extended create connection for ATS2851
+Date: Sun, 11 Aug 2024 23:05:05 +0200
+Message-ID: <20240811210505.3089013-1-uhrmar@gmail.com>
+X-Mailer: git-send-email 2.46.0
+In-Reply-To: <20230425163120.1059724-1-raul.cheleguini@gmail.com>
+References: <20230425163120.1059724-1-raul.cheleguini@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20240811-dt-bindings-serial-peripheral-props-v1-6-1dba258b7492@linaro.org>
-References: <20240811-dt-bindings-serial-peripheral-props-v1-0-1dba258b7492@linaro.org>
-In-Reply-To: <20240811-dt-bindings-serial-peripheral-props-v1-0-1dba258b7492@linaro.org>
-To: Rob Herring <robh@kernel.org>, 
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
- Jiri Slaby <jirislaby@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
- Conor Dooley <conor+dt@kernel.org>, Marcel Holtmann <marcel@holtmann.org>, 
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Matthias Brugger <matthias.bgg@gmail.com>, 
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, 
- Linus Walleij <linus.walleij@linaro.org>, Johan Hovold <johan@kernel.org>, 
- Liam Girdwood <lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>, 
- Daniel Kaehn <kaehndan@gmail.com>
-Cc: linux-serial@vger.kernel.org, linux-kernel@vger.kernel.org, 
- devicetree@vger.kernel.org, linux-bluetooth@vger.kernel.org, 
- netdev@vger.kernel.org, linux-mediatek@lists.infradead.org, 
- linux-arm-kernel@lists.infradead.org, linux-sound@vger.kernel.org, 
- Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-X-Mailer: b4 0.14.1
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1136;
- i=krzysztof.kozlowski@linaro.org; h=from:subject:message-id;
- bh=i+lTvqxiMRXFw4pW4fXIUgAA4bXjhigtS13EAIn2h9I=;
- b=owEBbQKS/ZANAwAKAcE3ZuaGi4PXAcsmYgBmuQArOhpNatW52wzJpXmws0fDjOokzOoUe8LaC
- lsqDe/iqmyJAjMEAAEKAB0WIQTd0mIoPREbIztuuKjBN2bmhouD1wUCZrkAKwAKCRDBN2bmhouD
- 10kpD/9SOhRnOR0/feUFtJ3/1bim82Fw4+7IumOZPA7eiWKJANvWp2lMdImnWInzmSwBhyQreJX
- CcZOcbd29+X1YgRQFNNxf6PkQ444aPBNpCmUggJxXS1hYJZF6HWHMIQtlr3FelO4SHIF4QJdMEh
- exRB43qX03biWL0S+zQcNW9/WOmyfmOqJkzjrW3yohC2VGvgqpMw98+8+wpX4EIE34vvu3Hk9ta
- Dgh9Ho9WU79eqWzdn7C8aawEviq3Hbn7o7SRJX43kVaAy0KHVYOLTrWQQrVd22AVwBxm2JFtEB0
- 752kvhWQRzIlOL5PEvcbg0sxnIMtixrhBPw/JZfOrnzdSJ3R5BCn1D5p1GCTPzCjBY+xJBFUDjQ
- SaTdfn+xLdc6HYz1XPQgRyypy5RTUxaqAYe9Nd5dGGgKmm1ihWw5W4W8o/C7Ko3cTAR/GJsBxOI
- PDixnjajQVDH9z6sgoDoifPyYwrLxfvWMhzWjZATVFw7x3f03Z6SIjKq/+6ScEuYaVp6qfMbKpb
- Rgo0ayBhAXShHODYAWm3U8uXrSTWMY+b1EaCNxbxB/ZSk1pmOkbcxl50h7/CfqDMq8Mrv4xMobm
- t3YbsVbWF6YCTxKpBDShzvOXWpp5ULhSQ/Y2dLnrqsQStlcfK/ZVJaPQyinHcyCcJG0LUhlfuxN
- b7/go1JyGYOp9xA==
-X-Developer-Key: i=krzysztof.kozlowski@linaro.org; a=openpgp;
- fpr=9BD07E0E0C51F8D59677B7541B93437D3B41629B
+Content-Transfer-Encoding: 8bit
 
-Reference common serial properties schema (for children of UART
-controllers) to bring common definition of "current-speed" and
-"max-speed" properties.
+On Tue, 25 Apr 2023 13:31:20 -0300
+Raul Cheleguini <raul.cheleguini@gmail.com> wrote:
 
-Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+> The controller based on ATS2851 advertises support for the "LE
+> Extended Create Connection" command, but it does not actually
+> implement it. This issue is blocking the pairing process from
+> beginning.
+> 
+> To resolve this, add the quirk HCI_QUIRK_BROKEN_EXT_CREATE_CONN.
+> This will avoid the unsupported command and instead send a regular "LE
+> Create Connection" command.
 
----
+I'm interested in getting this patch merged. Was this just forgotten, or
+is there still work to be done before it can be merged?
 
-This patch should probably go via Rob's Devicetree tree.  It depends on
-the serial patch adding serial-peripheral-props.yaml.
----
- Documentation/devicetree/bindings/sound/serial-midi.yaml | 3 +++
- 1 file changed, 3 insertions(+)
-
-diff --git a/Documentation/devicetree/bindings/sound/serial-midi.yaml b/Documentation/devicetree/bindings/sound/serial-midi.yaml
-index f6a807329a5a..3b2f6dd5bffa 100644
---- a/Documentation/devicetree/bindings/sound/serial-midi.yaml
-+++ b/Documentation/devicetree/bindings/sound/serial-midi.yaml
-@@ -22,6 +22,9 @@ description:
-   configure the clocks of the parent serial device so that a requested baud of 38.4 kBaud
-   results in the standard MIDI baud rate, and set the 'current-speed' property to 38400 (default)
- 
-+allOf:
-+  - $ref: /schemas/serial/serial-peripheral-props.yaml#
-+
- properties:
-   compatible:
-     const: serial-midi
-
--- 
-2.43.0
-
+Best regards,
+Markus Uhr
