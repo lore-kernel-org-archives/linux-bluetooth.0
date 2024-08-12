@@ -1,132 +1,112 @@
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
+Received: from mail-vk1-f175.google.com (mail-vk1-f175.google.com [209.85.221.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DC7118733D
-	for <linux-bluetooth@vger.kernel.org>; Mon, 12 Aug 2024 16:37:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1F53192B86
+	for <linux-bluetooth@vger.kernel.org>; Mon, 12 Aug 2024 20:06:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723480644; cv=none; b=T3S1iGseqYnYfB/oAKyT4mAdYMJl+ORFK7mnozRukfw5PvWt3q4gfh4zcbJk9dCx82/e9rkuTWE5DaLg1VWV6Cox1A4bGtv8APKpClk0gh12tLE8plWlFfqJENUG0gU9fO17C/gneMh9KP+UzLnRIeGbYpW9WfZ+P5MsUXPU3co=
+	t=1723493189; cv=none; b=T4r2d3vY+M4+tcbuHtJCy4i/g6ZS2fjzd4fFradg5utpcy1vQGno00lnb4QYDihkHrxcxi3AUvf0uTV4W9p8tAhcugaS1TJihzEmzgPLyshV/Yvoi43xh+yn5LvyB7hiWZa+USwbwq25wf4mqB363f12N640JxPuZBRpnvn8aNA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723480644; c=relaxed/simple;
-	bh=LsqYatbRv1R8r1Rv2N59WgctizpIoa9XfMohagZZE9Y=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=U58p8W1BsVVjgzxeQK7I/mOC6zS2u3DFLQ7+CnBP/DUn/rWlvOg67OYVBAAF14n45bBKdqjNn6xMQVnUkuHYib9BzH1brD2A1ybuz0Zx9gIxXcP4R1sAVsRSZchHjIYnhMTkhL4zChdUBGOmZaaX4hEhP1f2fomJ2JnqLGwYgtY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GrYCRUP5; arc=none smtp.client-ip=209.85.214.173
+	s=arc-20240116; t=1723493189; c=relaxed/simple;
+	bh=6E3vmpTZRf5BEdWfqgA6TXGLu+jjt7noG/bcZI0NvYQ=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=VBV24qPHj7Fl71bWQO38Ze7JGnO2M1gWmaVY2+4eRn5xH8C3bgg/EqA+c/6FqVdNSZGtCfKOtxRw+wbYwzeoEY5kWfCZE9Xtb2mCpjUNDF6NcFicnYV/Hx6DWdcMto54Dq1yS1f8kMKpyi7dwWAxGLxgNmDQ56iZdFsJKVQm+AQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OL6coQBe; arc=none smtp.client-ip=209.85.221.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GrYCRUP5"
-Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-1ff4568676eso43553885ad.0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 12 Aug 2024 09:37:22 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OL6coQBe"
+Received: by mail-vk1-f175.google.com with SMTP id 71dfb90a1353d-4f6b8b7d85bso1611249e0c.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 12 Aug 2024 13:06:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1723480642; x=1724085442; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=f14NAlVU3ImOebsP/km9u1ZckfdCoyU3l7EB4/mhS7U=;
-        b=GrYCRUP5tr4cOpjwO0ZsxiwN4ZabcBZFGU1yXQQHo5mzcVFkqIBIB128ff3XJDiwjW
-         cQtPaLi7z7X1JFzbvzET2HWfN/kxkJ9lPTbmiOS5tdUFMrYhqKkszpF9wbcd7cJJ3IBt
-         puzpdMK8ATXi5gjOqxHtHeX+mo5o8kBPp6oXuMyX9xDxYFIeH1Y9fx5GT0hi3sgige6F
-         KeUb5X590UotOgmRWAPT6LsQPZrjxdjYvI1d3mN6S+0qgL+VILhp4sokEEFhtry0aKZk
-         ZcbUhbebyR6v3xA3uCR99JpEUD1hVgUd7nbxC44ln+RMbQBnVhQfgiTrnYhZ7U4I1rlT
-         y5Hg==
+        d=gmail.com; s=20230601; t=1723493185; x=1724097985; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=8WZh5rHB7Rh/cjAtYoP5i/aNUfogSzPHqAz4xv4Vgw4=;
+        b=OL6coQBe5jT5jmZkNDYBQZNuFL/FTVyFCQcvmYiz8KpUhavnJBYT67+JSQCwAyRY9K
+         Dx3Tv6Vqm5wnvOIlbkVTcB2sgYiAlCWz+tIs7DnANTA+NFx3DVIAi/KF83zP/uXcjOwx
+         8/lYa6bw5c35dY9a5fOZDZBqCjeAHMgb7/DLVeJoOuD6WbBosVC9gOUjkPLfqeovzOsn
+         LP1xfLMQ79Hlq7nve8lplxVaUBCUtolqcXhey3nYBwJlP51oEcZx8gMpD+ailXHp4QOm
+         A3tuTG1/xP1ehvcG3MIP88hugl0SXBcSPPrH3US9e43WM9gD5CJ1grZF3avnb2JnxApY
+         5w3A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723480642; x=1724085442;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=f14NAlVU3ImOebsP/km9u1ZckfdCoyU3l7EB4/mhS7U=;
-        b=i5clOjinwD6eUFv/0MklWBAuDNEq+m1A1bspQUjG6APL0HynqGXPzTLck6uaAy7L+g
-         OKNVctB0GWXK1JHFVg6nh2hVbTFZOGCfAMDQqGX3J9LRuOT+w7U0AYlfhvWNGHh8mJzA
-         WH3kDY9pn1PPvF7jH8SoFu6C7j67gojp8C2+/UITutC+guAW///W8DYTIP7nS3UR/0zT
-         HykK9r7bUymbw4EKAmCohSubdeclQLm021CAwlw0UXXQIYdDyOgvTOmvHCkvGMQGxLz/
-         jN5AYyXWIqC12RRovs88XyKUMUZLfPOAgAhqNvh1BPFKvBgrmrYwdmhbm2tgNVE1nSoG
-         Ds/g==
-X-Gm-Message-State: AOJu0YxyDf15uVWBVW3AQEBoJePxP7dQNN9dkukTK2644redAs0oREQo
-	mmK0SJUAcbavFkCyush4EKHGh78b3iTT84QX3rpUoRKwWXIyrn7Nyn8q0w==
-X-Google-Smtp-Source: AGHT+IEIfREygXrTMssaH7gojBqJJWm+CBrk68AdQf4lw3ppKXetroSRBmLyX/Uh1ZaefWb1TYx1bQ==
-X-Received: by 2002:a17:902:cf03:b0:1fd:acd1:b642 with SMTP id d9443c01a7336-201ca1e9f13mr10624965ad.64.1723480642130;
-        Mon, 12 Aug 2024 09:37:22 -0700 (PDT)
-Received: from [172.17.0.2] ([4.227.115.128])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-200bbb3fc1bsm40036485ad.264.2024.08.12.09.37.21
+        d=1e100.net; s=20230601; t=1723493185; x=1724097985;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=8WZh5rHB7Rh/cjAtYoP5i/aNUfogSzPHqAz4xv4Vgw4=;
+        b=rFSS6z007J5ANM8s/uOUa6gwCJQK6xdOv+t2HaSWHNKa73vxyMYc+bUGmAzx2AymPh
+         FBGO4elKUWUyjXUc/CnB1taxvETjCEnnqFw3HXVBgZUxcvOQrkH/spQ0YTn2eh8uxGTM
+         fLrDZor7adfrjjs1Lak/m6kcitLW2SGyAa/saaxjElVLCZnO1NZGsozVnNDV3HjF9qnu
+         Nh1tYAc/Q3NmG6muPfV0MMCaZPSX2qJR1y2iVcO1VjD5OvmQAuCgsZXM3QY+CFLDViCI
+         SoHMGuZkxXNPZmokQ4jt4HLzKTLWUlzsdrMEn4czvlh6Jm5FBifWVoHDYYhgi6qVVnfD
+         Zm6w==
+X-Gm-Message-State: AOJu0YyVLckakfI01iqx+TTLUkDy8If00FQK8i83Xq+YRdVClBFnT/Oz
+	G0XF2odfeLcQ5wzz/b5cCZInhI5301kXpAPAhFUG+W/1179GPuSHSs4Fig==
+X-Google-Smtp-Source: AGHT+IHvbcUDiVM+jO9xMQMcd3YrCUVxrqzNNIzPn8rsx4r/qZyjktjCuEeBTRE/fgLg0Q10S7SUGg==
+X-Received: by 2002:a05:6122:a22:b0:4f5:446c:f749 with SMTP id 71dfb90a1353d-4fabeef1110mr1785178e0c.6.1723493184794;
+        Mon, 12 Aug 2024 13:06:24 -0700 (PDT)
+Received: from lvondent-mobl5.. (syn-107-146-107-067.res.spectrum.com. [107.146.107.67])
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-4f91f2b948csm736133e0c.8.2024.08.12.13.06.23
+        for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 12 Aug 2024 09:37:21 -0700 (PDT)
-Message-ID: <66ba3a41.170a0220.188600.b5b1@mx.google.com>
-Date: Mon, 12 Aug 2024 09:37:21 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============9027294666952006242=="
+        Mon, 12 Aug 2024 13:06:23 -0700 (PDT)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ v1 1/2] shared/uhid: Fix registering UHID_START multiple times
+Date: Mon, 12 Aug 2024 16:06:21 -0400
+Message-ID: <20240812200622.351942-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.46.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [v2,1/2] Bluetooth: HCI: Invert LE State quirk to be opt-out rather then opt-in
-In-Reply-To: <20240812150439.283920-1-luiz.dentz@gmail.com>
-References: <20240812150439.283920-1-luiz.dentz@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 
---===============9027294666952006242==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=878844
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      2.89 seconds
-GitLint                       PASS      0.50 seconds
-SubjectPrefix                 PASS      0.17 seconds
-BuildKernel                   PASS      30.72 seconds
-CheckAllWarning               PASS      32.73 seconds
-CheckSparse                   WARNING   38.21 seconds
-CheckSmatch                   WARNING   103.02 seconds
-BuildKernel32                 PASS      29.98 seconds
-TestRunnerSetup               PASS      531.60 seconds
-TestRunner_l2cap-tester       PASS      22.03 seconds
-TestRunner_iso-tester         PASS      40.25 seconds
-TestRunner_bnep-tester        PASS      4.79 seconds
-TestRunner_mgmt-tester        FAIL      117.59 seconds
-TestRunner_rfcomm-tester      PASS      7.47 seconds
-TestRunner_sco-tester         PASS      15.03 seconds
-TestRunner_ioctl-tester       PASS      7.97 seconds
-TestRunner_mesh-tester        PASS      6.04 seconds
-TestRunner_smp-tester         PASS      6.97 seconds
-TestRunner_userchan-tester    PASS      4.99 seconds
-IncrementalBuild              PASS      33.05 seconds
-
-Details
-##############################
-Test: CheckSparse - WARNING
-Desc: Run sparse tool with linux kernel
-Output:
-net/bluetooth/hci_event.c: note: in included file (through include/net/bluetooth/hci_core.h):
-##############################
-Test: CheckSmatch - WARNING
-Desc: Run smatch tool with source
-Output:
-net/bluetooth/hci_event.c: note: in included file (through include/net/bluetooth/hci_core.h):
-##############################
-Test: TestRunner_mgmt-tester - FAIL
-Desc: Run mgmt-tester with test-runner
-Output:
-Total: 492, Passed: 489 (99.4%), Failed: 1, Not Run: 2
-
-Failed Test Cases
-LL Privacy - Remove Device 4 (Disable Adv)           Timed out    2.470 seconds
-
-
+UHID_START callback shall only be registered once otherwise there is a
+risk of processing input queue multiple times.
 ---
-Regards,
-Linux Bluetooth
+ src/shared/uhid.c | 11 +++++++++--
+ 1 file changed, 9 insertions(+), 2 deletions(-)
 
+diff --git a/src/shared/uhid.c b/src/shared/uhid.c
+index 1eddc6122990..b0a436d7862b 100644
+--- a/src/shared/uhid.c
++++ b/src/shared/uhid.c
+@@ -46,6 +46,7 @@ struct bt_uhid {
+ 	struct queue *input;
+ 	uint8_t type;
+ 	bool created;
++	unsigned int start_id;
+ 	bool started;
+ 	struct uhid_replay *replay;
+ };
+@@ -351,6 +352,14 @@ int bt_uhid_create(struct bt_uhid *uhid, const char *name, bdaddr_t *src,
+ 	if (uhid->created)
+ 		return 0;
+ 
++	/* Register callback for UHID_START if not registered yet */
++	if (!uhid->start_id) {
++		uhid->start_id = bt_uhid_register(uhid, UHID_START, uhid_start,
++									uhid);
++		if (!uhid->start_id)
++			return -ENOMEM;
++	}
++
+ 	memset(&ev, 0, sizeof(ev));
+ 	ev.type = UHID_CREATE2;
+ 	strncpy((char *) ev.u.create2.name, name,
+@@ -378,8 +387,6 @@ int bt_uhid_create(struct bt_uhid *uhid, const char *name, bdaddr_t *src,
+ 	if (err)
+ 		return err;
+ 
+-	bt_uhid_register(uhid, UHID_START, uhid_start, uhid);
+-
+ 	uhid->created = true;
+ 	uhid->started = false;
+ 	uhid->type = type;
+-- 
+2.46.0
 
---===============9027294666952006242==--
