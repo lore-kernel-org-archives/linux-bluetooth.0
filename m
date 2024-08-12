@@ -1,60 +1,65 @@
-Received: from mail-oo1-f45.google.com (mail-oo1-f45.google.com [209.85.161.45])
+Received: from mail-qt1-f171.google.com (mail-qt1-f171.google.com [209.85.160.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C2B44D112
-	for <linux-bluetooth@vger.kernel.org>; Mon, 12 Aug 2024 15:04:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3DCC17D368
+	for <linux-bluetooth@vger.kernel.org>; Mon, 12 Aug 2024 15:04:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723475085; cv=none; b=AyPG27drTSiK+EtpcZ7tK48wuOCKugxN/gwbbTIrff5GxMa0cZhuZ8Q2E0TJkhYvqDgBGkhHCiBMAZ0E4rdLA/VEHGhtYgiQOqgjHwhR85UUZUUAoFIFSdpFlVZ5ccWep0l+wR81/KsTVDiP/VVk2mYY6+pulCTmBFT7JXaeHnc=
+	t=1723475087; cv=none; b=MNliVNfShFA9XygVdfIFzqtslac4JIsSjbfWxZ2umZa2wg658P+e6/LYUh5P+06phpIscMsMQ97gTIMZJAGa4DiN+nkjxBTn6A/1FQ5H68ZOGfKErAiVvbDSomlzpNJkj8egd7zIx6M6LUHJpogu5ou/6w4bRdD+Mxp5H4X6Wsk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723475085; c=relaxed/simple;
-	bh=HhwhME3yWKSZ3K1FZ5aIvwXw8AOeSe23qTRpkiag6Fw=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=b9/P1g3rfjkmmPJRdEkc2nEHXhQyQ6GtjwrL/KgkN77iWYrlCjOcjqq/hS8RuowafCVBN5oqZZyAkguARLcar+ni8EhrngZt4Mt+c1wFZ43X5B2lSjQTDWqJpakG7Wd5zBgMo+LL4RMR4Dd0wTjVK7QaGzLeyYtWOF+Qq57Fgmw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=l19BIGD3; arc=none smtp.client-ip=209.85.161.45
+	s=arc-20240116; t=1723475087; c=relaxed/simple;
+	bh=8nWoK2jDNtY1NPoYkGe3Ozx0Nm3IahkFgHyRn7OhWmc=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=tfVeg0mxFKoxtVDfHeEKhrUiaXMfhXZUYIPcfSJSvFPTq6uJovr0yFmcExqcye+hqzhpDO8l0WzNWeVtYLjfhf+5CSdbG/FY6y8AVm18lNc550hpNyomVau5abR/xQltEuGnIZJYzxz5n4jC58obj+5SYfm6lvqDSvC9v3c3kE0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZtZNS3d8; arc=none smtp.client-ip=209.85.160.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="l19BIGD3"
-Received: by mail-oo1-f45.google.com with SMTP id 006d021491bc7-5d5aecbe0a9so2818610eaf.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 12 Aug 2024 08:04:43 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZtZNS3d8"
+Received: by mail-qt1-f171.google.com with SMTP id d75a77b69052e-44fea44f725so2054301cf.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 12 Aug 2024 08:04:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1723475082; x=1724079882; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=KPTHGxzjMyEA6HyUd4RPblLCJnq+LlaQRRcaTlB3AOA=;
-        b=l19BIGD37VumcBWab+IQ1EDrzbtpIwy8mBFZkFnLo5Sqf6PladEHMO9UCJjXLHINk7
-         lxgOnBw/8ooRb6T2ZZS/zu1TiFHfc9w5GElfRFtjLa33G5H/GShPp5vtPF4f3EDbzx/X
-         +KDq5p41eNaYQAHbZ8htAnV8lYbAA6ZqrJw6iMoj4dgj+HFdDFt0yKl7Zxbp/2pp6zg4
-         3A/62iArssMtPApSY0zWuRmf4mF6ZPN0Etfx9Iu4fWLdQKs7dtfo8CRqidtG9WfnpS+x
-         s4q3b88Vy3vvjfGFRNyR8shHn16iN7ze/TsBncE5viCJDcax6XTUWjqCS1j7hsBSbj8Q
-         iWJQ==
+        d=gmail.com; s=20230601; t=1723475084; x=1724079884; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Gyk2LOnQrwP+MZem9tnjjfrWgEXxZwcCVbiI2B2MGHI=;
+        b=ZtZNS3d8k6XhR1vi413yqXP6Je2f8l/jEC1SjTFdSS6DNbAoip6TtgpCXX599UhCO3
+         qpsBWxecN87rCuR+vvvKSYdu8QhI9LhqhEAbHMoP06aMybUFj90hw86NSMJ/Ybyr4xgr
+         WCi5B2eE7rJ0EMKg8TcetwI0J5lFuPe13uvzJq4kQh4P/N5/cV1qlCxalvMIIdIEVF3P
+         0DTRc/Yr/U6cOFcPygTnXBAWMGyETpFpBCGDi0TQ9X/JtDcoXvXvH5IaGH9de9dOA1DL
+         pbXp7RX14gUV+LIDHlkhzraJ3nSSEGzlkJjYIQ8WPeSbr0thHR6YfhnJyGssmqT4IM26
+         JbMA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723475082; x=1724079882;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=KPTHGxzjMyEA6HyUd4RPblLCJnq+LlaQRRcaTlB3AOA=;
-        b=qt5hx7lKjGYkvMQKJgRv7q36pQfDi6cHC0pJON5B6I4+XWVyNrhRtd+euUmTpi1zkG
-         FDSYPnQg7Q8/gGRuSTMGtHz1+y3AR265MjdfJucqHFlRNu7mDS9qGm4NWJaFKK8hxMNR
-         ZYpVdGnCBxr3lctr+5/I2VBjlEbh5OIAyfWQysoV75jJ4RDc47+DsM6AxgVzfQOHwi6B
-         rS4f9F53DNroNUB31tHhVdTCP+TaKdA0YbXVDma0J3dgbUTFUwRdV++Tc/DDbOY12u+g
-         r6O4eYpdo1JcADgJ+8ilFGWn+YvXLD4NlzVXWQNhajZLWx2/oEkRJap0NNI6JfhebbQS
-         +SGw==
-X-Gm-Message-State: AOJu0YyhBvQ547qOU5HryRdKngMaGvSSG90rFHscvAkeK0ZKwd5+wBQw
-	HUoQJJlzEF0UqZFLDJyxqCmFkvAVGZxy9WNv6PcdIbfXkD94KDBMcM2qYg==
-X-Google-Smtp-Source: AGHT+IHy2Zqsj0+QcUHJxdjkweub1tY8JlCoxw5yoIVk+7doEWQemc7depQo9P7b8n3foQQ6pfXxhw==
-X-Received: by 2002:a05:6359:4c90:b0:1aa:c4b4:b26f with SMTP id e5c5f4694b2df-1b19d2f3daamr86498855d.26.1723475081545;
-        Mon, 12 Aug 2024 08:04:41 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1723475084; x=1724079884;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Gyk2LOnQrwP+MZem9tnjjfrWgEXxZwcCVbiI2B2MGHI=;
+        b=BJnP+hlu74YEhqAFzeOMxTb21DT500ge5hl85c7P7C3jIrg8TdvThVjcCnNwQ9RKuB
+         3X6L+sGmetw8Ru582gdFd1RPriB4Wi3gOnvOV9+hJMYAPniceZHzQFFfs0dIV6h0q3Vb
+         1zHtLTRvC5HzzaXIesGRjz6UDK6ch0HR9s/ATinQJMhL03gK16fCBWdyWgPmbLLwXlxl
+         SeBCJ7XX5XXDB12bfdexh0IRxL/YixZQMQZ+8FEp939SmX+6fuKffRst0Oycm6lwAkvz
+         yV8JrXxbXcNIBuFNl3mgNiK6p2Xyrp63TAA4Xk+tm4R1HQJ/g6C1CJl8IJDztFqfzq85
+         Ea6w==
+X-Gm-Message-State: AOJu0YxTwHXVnQt/HEsZNdx4vAOrBHsvAmcHK3xO7I5yqFD3SqZw+yiq
+	y29TEjqBgrF/UeGF7R85bjBQkoRJ4v/gdQKl0D4mRSJwCnhgmilgJ6Ks8A==
+X-Google-Smtp-Source: AGHT+IHN0a2+Edr5iCn878tOlGuyj/rlp6KckdEV4nkSUd+jeIOgWYt01tqoY75tFHE8kf/OZ8vxVw==
+X-Received: by 2002:a05:622a:13c8:b0:447:f8b1:aeb9 with SMTP id d75a77b69052e-4534a34d9admr7130851cf.16.1723475083564;
+        Mon, 12 Aug 2024 08:04:43 -0700 (PDT)
 Received: from lvondent-mobl5.. (syn-107-146-107-067.res.spectrum.com. [107.146.107.67])
-        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-841367e2ef6sm694970241.38.2024.08.12.08.04.40
+        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-841367e2ef6sm694970241.38.2024.08.12.08.04.41
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 12 Aug 2024 08:04:40 -0700 (PDT)
+        Mon, 12 Aug 2024 08:04:42 -0700 (PDT)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 1/2] Bluetooth: HCI: Invert LE State quirk to be opt-out rather then opt-in
-Date: Mon, 12 Aug 2024 11:04:38 -0400
-Message-ID: <20240812150439.283920-1-luiz.dentz@gmail.com>
+Subject: [PATCH v2 2/2] Bluetooth: btusb: Invert LE State flag to set invalid rather then valid
+Date: Mon, 12 Aug 2024 11:04:39 -0400
+Message-ID: <20240812150439.283920-2-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.46.0
+In-Reply-To: <20240812150439.283920-1-luiz.dentz@gmail.com>
+References: <20240812150439.283920-1-luiz.dentz@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -65,208 +70,362 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This inverts the LE State quirk so by default we assume the controllers
-would report valid states rather than invalid which is how quirks
-normally behave, also this would result in HCI command failing it the LE
-States are really broken thus exposing the controllers that are really
-broken in this respect.
+This inverts the LE State flag so by default we assume the controllers
+would report valid states rather than invalid so it is inline with the
+respective quirk (HCI_QUIRK_BROKEN_LE_STATES).
 
-Link: https://github.com/bluez/bluez/issues/584
-Fixes: 220915857e29 ("Bluetooth: Adding driver and quirk defs for multi-role LE")
 Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 ---
- drivers/bluetooth/btintel.c      | 10 ----------
- drivers/bluetooth/btintel_pcie.c |  3 ---
- drivers/bluetooth/btmtksdio.c    |  3 ---
- drivers/bluetooth/btrtl.c        |  1 -
- drivers/bluetooth/btusb.c        |  4 ++--
- drivers/bluetooth/hci_qca.c      |  4 ++--
- drivers/bluetooth/hci_vhci.c     |  2 --
- include/net/bluetooth/hci.h      | 17 ++++++++++-------
- include/net/bluetooth/hci_core.h |  2 +-
- net/bluetooth/hci_event.c        |  2 +-
- 10 files changed, 16 insertions(+), 32 deletions(-)
+ drivers/bluetooth/btusb.c | 226 +++++++++++++-------------------------
+ 1 file changed, 76 insertions(+), 150 deletions(-)
 
-diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
-index cef74fd1271d..1ccbb5157515 100644
---- a/drivers/bluetooth/btintel.c
-+++ b/drivers/bluetooth/btintel.c
-@@ -3069,9 +3069,6 @@ static int btintel_setup_combined(struct hci_dev *hdev)
- 					       INTEL_ROM_LEGACY_NO_WBS_SUPPORT))
- 				set_bit(HCI_QUIRK_WIDEBAND_SPEECH_SUPPORTED,
- 					&hdev->quirks);
--			if (ver.hw_variant == 0x08 && ver.fw_variant == 0x22)
--				set_bit(HCI_QUIRK_VALID_LE_STATES,
--					&hdev->quirks);
- 
- 			err = btintel_legacy_rom_setup(hdev, &ver);
- 			break;
-@@ -3080,7 +3077,6 @@ static int btintel_setup_combined(struct hci_dev *hdev)
- 		case 0x12:      /* ThP */
- 		case 0x13:      /* HrP */
- 		case 0x14:      /* CcP */
--			set_bit(HCI_QUIRK_VALID_LE_STATES, &hdev->quirks);
- 			fallthrough;
- 		case 0x0c:	/* WsP */
- 			/* Apply the device specific HCI quirks
-@@ -3172,9 +3168,6 @@ static int btintel_setup_combined(struct hci_dev *hdev)
- 		/* These variants don't seem to support LE Coded PHY */
- 		set_bit(HCI_QUIRK_BROKEN_LE_CODED, &hdev->quirks);
- 
--		/* Set Valid LE States quirk */
--		set_bit(HCI_QUIRK_VALID_LE_STATES, &hdev->quirks);
--
- 		/* Setup MSFT Extension support */
- 		btintel_set_msft_opcode(hdev, ver.hw_variant);
- 
-@@ -3200,9 +3193,6 @@ static int btintel_setup_combined(struct hci_dev *hdev)
- 		 */
- 		set_bit(HCI_QUIRK_WIDEBAND_SPEECH_SUPPORTED, &hdev->quirks);
- 
--		/* Apply LE States quirk from solar onwards */
--		set_bit(HCI_QUIRK_VALID_LE_STATES, &hdev->quirks);
--
- 		/* Setup MSFT Extension support */
- 		btintel_set_msft_opcode(hdev,
- 					INTEL_HW_VARIANT(ver_tlv.cnvi_bt));
-diff --git a/drivers/bluetooth/btintel_pcie.c b/drivers/bluetooth/btintel_pcie.c
-index 8f855410c2c5..d255bdf777b4 100644
---- a/drivers/bluetooth/btintel_pcie.c
-+++ b/drivers/bluetooth/btintel_pcie.c
-@@ -1196,9 +1196,6 @@ static int btintel_pcie_setup(struct hci_dev *hdev)
- 		 */
- 		set_bit(HCI_QUIRK_WIDEBAND_SPEECH_SUPPORTED, &hdev->quirks);
- 
--		/* Apply LE States quirk from solar onwards */
--		set_bit(HCI_QUIRK_VALID_LE_STATES, &hdev->quirks);
--
- 		/* Setup MSFT Extension support */
- 		btintel_set_msft_opcode(hdev,
- 					INTEL_HW_VARIANT(ver_tlv.cnvi_bt));
-diff --git a/drivers/bluetooth/btmtksdio.c b/drivers/bluetooth/btmtksdio.c
-index 39d6898497a4..497e4c87f5be 100644
---- a/drivers/bluetooth/btmtksdio.c
-+++ b/drivers/bluetooth/btmtksdio.c
-@@ -1148,9 +1148,6 @@ static int btmtksdio_setup(struct hci_dev *hdev)
- 			}
- 		}
- 
--		/* Valid LE States quirk for MediaTek 7921 */
--		set_bit(HCI_QUIRK_VALID_LE_STATES, &hdev->quirks);
--
- 		break;
- 	case 0x7663:
- 	case 0x7668:
-diff --git a/drivers/bluetooth/btrtl.c b/drivers/bluetooth/btrtl.c
-index f2f37143c454..fd7991ea7672 100644
---- a/drivers/bluetooth/btrtl.c
-+++ b/drivers/bluetooth/btrtl.c
-@@ -1287,7 +1287,6 @@ void btrtl_set_quirks(struct hci_dev *hdev, struct btrtl_device_info *btrtl_dev)
- 	case CHIP_ID_8852C:
- 	case CHIP_ID_8851B:
- 	case CHIP_ID_8852BT:
--		set_bit(HCI_QUIRK_VALID_LE_STATES, &hdev->quirks);
- 		set_bit(HCI_QUIRK_WIDEBAND_SPEECH_SUPPORTED, &hdev->quirks);
- 
- 		/* RTL8852C needs to transmit mSBC data continuously without
 diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 47ae6f4eab0b..d3514def9828 100644
+index d3514def9828..42c867b2e42c 100644
 --- a/drivers/bluetooth/btusb.c
 +++ b/drivers/bluetooth/btusb.c
-@@ -3959,8 +3959,8 @@ static int btusb_probe(struct usb_interface *intf,
+@@ -59,7 +59,7 @@ static struct usb_driver btusb_driver;
+ #define BTUSB_CW6622			BIT(19)
+ #define BTUSB_MEDIATEK			BIT(20)
+ #define BTUSB_WIDEBAND_SPEECH		BIT(21)
+-#define BTUSB_VALID_LE_STATES		BIT(22)
++#define BTUSB_INVALID_LE_STATES		BIT(22)
+ #define BTUSB_QCA_WCN6855		BIT(23)
+ #define BTUSB_INTEL_BROKEN_SHUTDOWN_LED	BIT(24)
+ #define BTUSB_INTEL_BROKEN_INITIAL_NCMD BIT(25)
+@@ -298,115 +298,79 @@ static const struct usb_device_id quirks_table[] = {
+ 
+ 	/* QCA WCN6855 chipset */
+ 	{ USB_DEVICE(0x0cf3, 0xe600), .driver_info = BTUSB_QCA_WCN6855 |
+-						     BTUSB_WIDEBAND_SPEECH |
+-						     BTUSB_VALID_LE_STATES },
++						     BTUSB_WIDEBAND_SPEECH },
+ 	{ USB_DEVICE(0x0489, 0xe0cc), .driver_info = BTUSB_QCA_WCN6855 |
+-						     BTUSB_WIDEBAND_SPEECH |
+-						     BTUSB_VALID_LE_STATES },
++						     BTUSB_WIDEBAND_SPEECH },
+ 	{ USB_DEVICE(0x0489, 0xe0d6), .driver_info = BTUSB_QCA_WCN6855 |
+-						     BTUSB_WIDEBAND_SPEECH |
+-						     BTUSB_VALID_LE_STATES },
++						     BTUSB_WIDEBAND_SPEECH },
+ 	{ USB_DEVICE(0x0489, 0xe0e3), .driver_info = BTUSB_QCA_WCN6855 |
+-						     BTUSB_WIDEBAND_SPEECH |
+-						     BTUSB_VALID_LE_STATES },
++						     BTUSB_WIDEBAND_SPEECH },
+ 	{ USB_DEVICE(0x10ab, 0x9309), .driver_info = BTUSB_QCA_WCN6855 |
+-						     BTUSB_WIDEBAND_SPEECH |
+-						     BTUSB_VALID_LE_STATES },
++						     BTUSB_WIDEBAND_SPEECH },
+ 	{ USB_DEVICE(0x10ab, 0x9409), .driver_info = BTUSB_QCA_WCN6855 |
+-						     BTUSB_WIDEBAND_SPEECH |
+-						     BTUSB_VALID_LE_STATES },
++						     BTUSB_WIDEBAND_SPEECH },
+ 	{ USB_DEVICE(0x0489, 0xe0d0), .driver_info = BTUSB_QCA_WCN6855 |
+-						     BTUSB_WIDEBAND_SPEECH |
+-						     BTUSB_VALID_LE_STATES },
++						     BTUSB_WIDEBAND_SPEECH },
+ 	{ USB_DEVICE(0x10ab, 0x9108), .driver_info = BTUSB_QCA_WCN6855 |
+-						     BTUSB_WIDEBAND_SPEECH |
+-						     BTUSB_VALID_LE_STATES },
++						     BTUSB_WIDEBAND_SPEECH },
+ 	{ USB_DEVICE(0x10ab, 0x9109), .driver_info = BTUSB_QCA_WCN6855 |
+-						     BTUSB_WIDEBAND_SPEECH |
+-						     BTUSB_VALID_LE_STATES },
++						     BTUSB_WIDEBAND_SPEECH },
+ 	{ USB_DEVICE(0x10ab, 0x9208), .driver_info = BTUSB_QCA_WCN6855 |
+-						     BTUSB_WIDEBAND_SPEECH |
+-						     BTUSB_VALID_LE_STATES },
++						     BTUSB_WIDEBAND_SPEECH },
+ 	{ USB_DEVICE(0x10ab, 0x9209), .driver_info = BTUSB_QCA_WCN6855 |
+-						     BTUSB_WIDEBAND_SPEECH |
+-						     BTUSB_VALID_LE_STATES },
++						     BTUSB_WIDEBAND_SPEECH },
+ 	{ USB_DEVICE(0x10ab, 0x9308), .driver_info = BTUSB_QCA_WCN6855 |
+-						     BTUSB_WIDEBAND_SPEECH |
+-						     BTUSB_VALID_LE_STATES },
++						     BTUSB_WIDEBAND_SPEECH },
+ 	{ USB_DEVICE(0x10ab, 0x9408), .driver_info = BTUSB_QCA_WCN6855 |
+-						     BTUSB_WIDEBAND_SPEECH |
+-						     BTUSB_VALID_LE_STATES },
++						     BTUSB_WIDEBAND_SPEECH },
+ 	{ USB_DEVICE(0x10ab, 0x9508), .driver_info = BTUSB_QCA_WCN6855 |
+-						     BTUSB_WIDEBAND_SPEECH |
+-						     BTUSB_VALID_LE_STATES },
++						     BTUSB_WIDEBAND_SPEECH },
+ 	{ USB_DEVICE(0x10ab, 0x9509), .driver_info = BTUSB_QCA_WCN6855 |
+-						     BTUSB_WIDEBAND_SPEECH |
+-						     BTUSB_VALID_LE_STATES },
++						     BTUSB_WIDEBAND_SPEECH },
+ 	{ USB_DEVICE(0x10ab, 0x9608), .driver_info = BTUSB_QCA_WCN6855 |
+-						     BTUSB_WIDEBAND_SPEECH |
+-						     BTUSB_VALID_LE_STATES },
++						     BTUSB_WIDEBAND_SPEECH },
+ 	{ USB_DEVICE(0x10ab, 0x9609), .driver_info = BTUSB_QCA_WCN6855 |
+-						     BTUSB_WIDEBAND_SPEECH |
+-						     BTUSB_VALID_LE_STATES },
++						     BTUSB_WIDEBAND_SPEECH },
+ 	{ USB_DEVICE(0x10ab, 0x9f09), .driver_info = BTUSB_QCA_WCN6855 |
+-						     BTUSB_WIDEBAND_SPEECH |
+-						     BTUSB_VALID_LE_STATES },
++						     BTUSB_WIDEBAND_SPEECH },
+ 	{ USB_DEVICE(0x04ca, 0x3022), .driver_info = BTUSB_QCA_WCN6855 |
+-						     BTUSB_WIDEBAND_SPEECH |
+-						     BTUSB_VALID_LE_STATES },
++						     BTUSB_WIDEBAND_SPEECH },
+ 	{ USB_DEVICE(0x0489, 0xe0c7), .driver_info = BTUSB_QCA_WCN6855 |
+-						     BTUSB_WIDEBAND_SPEECH |
+-						     BTUSB_VALID_LE_STATES },
++						     BTUSB_WIDEBAND_SPEECH },
+ 	{ USB_DEVICE(0x0489, 0xe0c9), .driver_info = BTUSB_QCA_WCN6855 |
+-						     BTUSB_WIDEBAND_SPEECH |
+-						     BTUSB_VALID_LE_STATES },
++						     BTUSB_WIDEBAND_SPEECH },
+ 	{ USB_DEVICE(0x0489, 0xe0ca), .driver_info = BTUSB_QCA_WCN6855 |
+-						     BTUSB_WIDEBAND_SPEECH |
+-						     BTUSB_VALID_LE_STATES },
++						     BTUSB_WIDEBAND_SPEECH },
+ 	{ USB_DEVICE(0x0489, 0xe0cb), .driver_info = BTUSB_QCA_WCN6855 |
+-						     BTUSB_WIDEBAND_SPEECH |
+-						     BTUSB_VALID_LE_STATES },
++						     BTUSB_WIDEBAND_SPEECH },
+ 	{ USB_DEVICE(0x0489, 0xe0ce), .driver_info = BTUSB_QCA_WCN6855 |
+-						     BTUSB_WIDEBAND_SPEECH |
+-						     BTUSB_VALID_LE_STATES },
++						     BTUSB_WIDEBAND_SPEECH },
+ 	{ USB_DEVICE(0x0489, 0xe0de), .driver_info = BTUSB_QCA_WCN6855 |
+-						     BTUSB_WIDEBAND_SPEECH |
+-						     BTUSB_VALID_LE_STATES },
++						     BTUSB_WIDEBAND_SPEECH },
+ 	{ USB_DEVICE(0x0489, 0xe0df), .driver_info = BTUSB_QCA_WCN6855 |
+-						     BTUSB_WIDEBAND_SPEECH |
+-						     BTUSB_VALID_LE_STATES },
++						     BTUSB_WIDEBAND_SPEECH },
+ 	{ USB_DEVICE(0x0489, 0xe0e1), .driver_info = BTUSB_QCA_WCN6855 |
+-						     BTUSB_WIDEBAND_SPEECH |
+-						     BTUSB_VALID_LE_STATES },
++						     BTUSB_WIDEBAND_SPEECH },
+ 	{ USB_DEVICE(0x0489, 0xe0ea), .driver_info = BTUSB_QCA_WCN6855 |
+-						     BTUSB_WIDEBAND_SPEECH |
+-						     BTUSB_VALID_LE_STATES },
++						     BTUSB_WIDEBAND_SPEECH },
+ 	{ USB_DEVICE(0x0489, 0xe0ec), .driver_info = BTUSB_QCA_WCN6855 |
+-						     BTUSB_WIDEBAND_SPEECH |
+-						     BTUSB_VALID_LE_STATES },
++						     BTUSB_WIDEBAND_SPEECH },
+ 	{ USB_DEVICE(0x04ca, 0x3023), .driver_info = BTUSB_QCA_WCN6855 |
+-						     BTUSB_WIDEBAND_SPEECH |
+-						     BTUSB_VALID_LE_STATES },
++						     BTUSB_WIDEBAND_SPEECH },
+ 	{ USB_DEVICE(0x04ca, 0x3024), .driver_info = BTUSB_QCA_WCN6855 |
+-						     BTUSB_WIDEBAND_SPEECH |
+-						     BTUSB_VALID_LE_STATES },
++						     BTUSB_WIDEBAND_SPEECH },
+ 	{ USB_DEVICE(0x04ca, 0x3a22), .driver_info = BTUSB_QCA_WCN6855 |
+-						     BTUSB_WIDEBAND_SPEECH |
+-						     BTUSB_VALID_LE_STATES },
++						     BTUSB_WIDEBAND_SPEECH },
+ 	{ USB_DEVICE(0x04ca, 0x3a24), .driver_info = BTUSB_QCA_WCN6855 |
+-						     BTUSB_WIDEBAND_SPEECH |
+-						     BTUSB_VALID_LE_STATES },
++						     BTUSB_WIDEBAND_SPEECH },
+ 	{ USB_DEVICE(0x04ca, 0x3a26), .driver_info = BTUSB_QCA_WCN6855 |
+-						     BTUSB_WIDEBAND_SPEECH |
+-						     BTUSB_VALID_LE_STATES },
++						     BTUSB_WIDEBAND_SPEECH },
+ 	{ USB_DEVICE(0x04ca, 0x3a27), .driver_info = BTUSB_QCA_WCN6855 |
+-						     BTUSB_WIDEBAND_SPEECH |
+-						     BTUSB_VALID_LE_STATES },
++						     BTUSB_WIDEBAND_SPEECH },
+ 
+ 	/* QCA WCN785x chipset */
+ 	{ USB_DEVICE(0x0cf3, 0xe700), .driver_info = BTUSB_QCA_WCN6855 |
+-						     BTUSB_WIDEBAND_SPEECH |
+-						     BTUSB_VALID_LE_STATES },
++						     BTUSB_WIDEBAND_SPEECH },
+ 
+ 	/* Broadcom BCM2035 */
+ 	{ USB_DEVICE(0x0a5c, 0x2009), .driver_info = BTUSB_BCM92035 },
+@@ -571,134 +535,96 @@ static const struct usb_device_id quirks_table[] = {
+ 	/* MediaTek Bluetooth devices */
+ 	{ USB_VENDOR_AND_INTERFACE_INFO(0x0e8d, 0xe0, 0x01, 0x01),
+ 	  .driver_info = BTUSB_MEDIATEK |
+-			 BTUSB_WIDEBAND_SPEECH |
+-			 BTUSB_VALID_LE_STATES },
++			 BTUSB_WIDEBAND_SPEECH },
+ 
+ 	/* Additional MediaTek MT7615E Bluetooth devices */
+ 	{ USB_DEVICE(0x13d3, 0x3560), .driver_info = BTUSB_MEDIATEK},
+ 
+ 	/* Additional MediaTek MT7663 Bluetooth devices */
+ 	{ USB_DEVICE(0x043e, 0x310c), .driver_info = BTUSB_MEDIATEK |
+-						     BTUSB_WIDEBAND_SPEECH |
+-						     BTUSB_VALID_LE_STATES },
++						     BTUSB_WIDEBAND_SPEECH },
+ 	{ USB_DEVICE(0x04ca, 0x3801), .driver_info = BTUSB_MEDIATEK |
+-						     BTUSB_WIDEBAND_SPEECH |
+-						     BTUSB_VALID_LE_STATES },
++						     BTUSB_WIDEBAND_SPEECH },
+ 
+ 	/* Additional MediaTek MT7668 Bluetooth devices */
+ 	{ USB_DEVICE(0x043e, 0x3109), .driver_info = BTUSB_MEDIATEK |
+-						     BTUSB_WIDEBAND_SPEECH |
+-						     BTUSB_VALID_LE_STATES },
++						     BTUSB_WIDEBAND_SPEECH },
+ 
+ 	/* Additional MediaTek MT7921 Bluetooth devices */
+ 	{ USB_DEVICE(0x0489, 0xe0c8), .driver_info = BTUSB_MEDIATEK |
+-						     BTUSB_WIDEBAND_SPEECH |
+-						     BTUSB_VALID_LE_STATES },
++						     BTUSB_WIDEBAND_SPEECH },
+ 	{ USB_DEVICE(0x0489, 0xe0cd), .driver_info = BTUSB_MEDIATEK |
+-						     BTUSB_WIDEBAND_SPEECH |
+-						     BTUSB_VALID_LE_STATES },
++						     BTUSB_WIDEBAND_SPEECH },
+ 	{ USB_DEVICE(0x0489, 0xe0e0), .driver_info = BTUSB_MEDIATEK |
+-						     BTUSB_WIDEBAND_SPEECH |
+-						     BTUSB_VALID_LE_STATES },
++						     BTUSB_WIDEBAND_SPEECH },
+ 	{ USB_DEVICE(0x0489, 0xe0f2), .driver_info = BTUSB_MEDIATEK |
+-						     BTUSB_WIDEBAND_SPEECH |
+-						     BTUSB_VALID_LE_STATES },
++						     BTUSB_WIDEBAND_SPEECH },
+ 	{ USB_DEVICE(0x04ca, 0x3802), .driver_info = BTUSB_MEDIATEK |
+-						     BTUSB_WIDEBAND_SPEECH |
+-						     BTUSB_VALID_LE_STATES },
++						     BTUSB_WIDEBAND_SPEECH },
+ 	{ USB_DEVICE(0x0e8d, 0x0608), .driver_info = BTUSB_MEDIATEK |
+-						     BTUSB_WIDEBAND_SPEECH |
+-						     BTUSB_VALID_LE_STATES },
++						     BTUSB_WIDEBAND_SPEECH },
+ 	{ USB_DEVICE(0x13d3, 0x3563), .driver_info = BTUSB_MEDIATEK |
+-						     BTUSB_WIDEBAND_SPEECH |
+-						     BTUSB_VALID_LE_STATES },
++						     BTUSB_WIDEBAND_SPEECH },
+ 	{ USB_DEVICE(0x13d3, 0x3564), .driver_info = BTUSB_MEDIATEK |
+-						     BTUSB_WIDEBAND_SPEECH |
+-						     BTUSB_VALID_LE_STATES },
++						     BTUSB_WIDEBAND_SPEECH },
+ 	{ USB_DEVICE(0x13d3, 0x3567), .driver_info = BTUSB_MEDIATEK |
+-						     BTUSB_WIDEBAND_SPEECH |
+-						     BTUSB_VALID_LE_STATES },
++						     BTUSB_WIDEBAND_SPEECH },
+ 	{ USB_DEVICE(0x13d3, 0x3578), .driver_info = BTUSB_MEDIATEK |
+-						     BTUSB_WIDEBAND_SPEECH |
+-						     BTUSB_VALID_LE_STATES },
++						     BTUSB_WIDEBAND_SPEECH },
+ 	{ USB_DEVICE(0x13d3, 0x3583), .driver_info = BTUSB_MEDIATEK |
+-						     BTUSB_WIDEBAND_SPEECH |
+-						     BTUSB_VALID_LE_STATES },
++						     BTUSB_WIDEBAND_SPEECH },
+ 	{ USB_DEVICE(0x13d3, 0x3606), .driver_info = BTUSB_MEDIATEK |
+-						     BTUSB_WIDEBAND_SPEECH |
+-						     BTUSB_VALID_LE_STATES },
++						     BTUSB_WIDEBAND_SPEECH },
+ 
+ 	/* MediaTek MT7922 Bluetooth devices */
+ 	{ USB_DEVICE(0x13d3, 0x3585), .driver_info = BTUSB_MEDIATEK |
+-						     BTUSB_WIDEBAND_SPEECH |
+-						     BTUSB_VALID_LE_STATES },
++						     BTUSB_WIDEBAND_SPEECH },
+ 
+ 	/* MediaTek MT7922A Bluetooth devices */
+ 	{ USB_DEVICE(0x0489, 0xe0d8), .driver_info = BTUSB_MEDIATEK |
+-						     BTUSB_WIDEBAND_SPEECH |
+-						     BTUSB_VALID_LE_STATES },
++						     BTUSB_WIDEBAND_SPEECH },
+ 	{ USB_DEVICE(0x0489, 0xe0d9), .driver_info = BTUSB_MEDIATEK |
+-						     BTUSB_WIDEBAND_SPEECH |
+-						     BTUSB_VALID_LE_STATES },
++						     BTUSB_WIDEBAND_SPEECH },
+ 	{ USB_DEVICE(0x0489, 0xe0e2), .driver_info = BTUSB_MEDIATEK |
+-						     BTUSB_WIDEBAND_SPEECH |
+-						     BTUSB_VALID_LE_STATES },
++						     BTUSB_WIDEBAND_SPEECH },
+ 	{ USB_DEVICE(0x0489, 0xe0e4), .driver_info = BTUSB_MEDIATEK |
+-						     BTUSB_WIDEBAND_SPEECH |
+-						     BTUSB_VALID_LE_STATES },
++						     BTUSB_WIDEBAND_SPEECH },
+ 	{ USB_DEVICE(0x0489, 0xe0f1), .driver_info = BTUSB_MEDIATEK |
+-						     BTUSB_WIDEBAND_SPEECH |
+-						     BTUSB_VALID_LE_STATES },
++						     BTUSB_WIDEBAND_SPEECH },
+ 	{ USB_DEVICE(0x0489, 0xe0f2), .driver_info = BTUSB_MEDIATEK |
+-						     BTUSB_WIDEBAND_SPEECH |
+-						     BTUSB_VALID_LE_STATES },
++						     BTUSB_WIDEBAND_SPEECH },
+ 	{ USB_DEVICE(0x0489, 0xe0f5), .driver_info = BTUSB_MEDIATEK |
+-						     BTUSB_WIDEBAND_SPEECH |
+-						     BTUSB_VALID_LE_STATES },
++						     BTUSB_WIDEBAND_SPEECH },
+ 	{ USB_DEVICE(0x0489, 0xe0f6), .driver_info = BTUSB_MEDIATEK |
+-						     BTUSB_WIDEBAND_SPEECH |
+-						     BTUSB_VALID_LE_STATES },
++						     BTUSB_WIDEBAND_SPEECH },
+ 	{ USB_DEVICE(0x0489, 0xe102), .driver_info = BTUSB_MEDIATEK |
+-						     BTUSB_WIDEBAND_SPEECH |
+-						     BTUSB_VALID_LE_STATES },
++						     BTUSB_WIDEBAND_SPEECH },
+ 	{ USB_DEVICE(0x04ca, 0x3804), .driver_info = BTUSB_MEDIATEK |
+-						     BTUSB_WIDEBAND_SPEECH |
+-						     BTUSB_VALID_LE_STATES },
++						     BTUSB_WIDEBAND_SPEECH },
+ 	{ USB_DEVICE(0x04ca, 0x38e4), .driver_info = BTUSB_MEDIATEK |
+-						     BTUSB_WIDEBAND_SPEECH |
+-						     BTUSB_VALID_LE_STATES },
++						     BTUSB_WIDEBAND_SPEECH },
+ 	{ USB_DEVICE(0x13d3, 0x3568), .driver_info = BTUSB_MEDIATEK |
+-						     BTUSB_WIDEBAND_SPEECH |
+-						     BTUSB_VALID_LE_STATES },
++						     BTUSB_WIDEBAND_SPEECH },
+ 	{ USB_DEVICE(0x13d3, 0x3605), .driver_info = BTUSB_MEDIATEK |
+-						     BTUSB_WIDEBAND_SPEECH |
+-						     BTUSB_VALID_LE_STATES },
++						     BTUSB_WIDEBAND_SPEECH },
+ 	{ USB_DEVICE(0x13d3, 0x3607), .driver_info = BTUSB_MEDIATEK |
+-						     BTUSB_WIDEBAND_SPEECH |
+-						     BTUSB_VALID_LE_STATES },
++						     BTUSB_WIDEBAND_SPEECH },
+ 	{ USB_DEVICE(0x13d3, 0x3614), .driver_info = BTUSB_MEDIATEK |
+-						     BTUSB_WIDEBAND_SPEECH |
+-						     BTUSB_VALID_LE_STATES },
++						     BTUSB_WIDEBAND_SPEECH },
+ 	{ USB_DEVICE(0x13d3, 0x3615), .driver_info = BTUSB_MEDIATEK |
+-						     BTUSB_WIDEBAND_SPEECH |
+-						     BTUSB_VALID_LE_STATES },
++						     BTUSB_WIDEBAND_SPEECH },
+ 	{ USB_DEVICE(0x35f5, 0x7922), .driver_info = BTUSB_MEDIATEK |
+-						     BTUSB_WIDEBAND_SPEECH |
+-						     BTUSB_VALID_LE_STATES },
++						     BTUSB_WIDEBAND_SPEECH },
+ 
+ 	/* Additional MediaTek MT7925 Bluetooth devices */
+ 	{ USB_DEVICE(0x0489, 0xe113), .driver_info = BTUSB_MEDIATEK |
+-						     BTUSB_WIDEBAND_SPEECH |
+-						     BTUSB_VALID_LE_STATES },
++						     BTUSB_WIDEBAND_SPEECH },
+ 	{ USB_DEVICE(0x13d3, 0x3602), .driver_info = BTUSB_MEDIATEK |
+-						     BTUSB_WIDEBAND_SPEECH |
+-						     BTUSB_VALID_LE_STATES },
++						     BTUSB_WIDEBAND_SPEECH },
+ 	{ USB_DEVICE(0x13d3, 0x3603), .driver_info = BTUSB_MEDIATEK |
+-						     BTUSB_WIDEBAND_SPEECH |
+-						     BTUSB_VALID_LE_STATES },
++						     BTUSB_WIDEBAND_SPEECH },
+ 	{ USB_DEVICE(0x13d3, 0x3604), .driver_info = BTUSB_MEDIATEK |
+-						     BTUSB_WIDEBAND_SPEECH |
+-						     BTUSB_VALID_LE_STATES },
++						     BTUSB_WIDEBAND_SPEECH },
+ 
+ 	/* Additional Realtek 8723AE Bluetooth devices */
+ 	{ USB_DEVICE(0x0930, 0x021d), .driver_info = BTUSB_REALTEK },
+@@ -3959,7 +3885,7 @@ static int btusb_probe(struct usb_interface *intf,
  	if (id->driver_info & BTUSB_WIDEBAND_SPEECH)
  		set_bit(HCI_QUIRK_WIDEBAND_SPEECH_SUPPORTED, &hdev->quirks);
  
--	if (id->driver_info & BTUSB_VALID_LE_STATES)
--		set_bit(HCI_QUIRK_VALID_LE_STATES, &hdev->quirks);
-+	if (!(id->driver_info & BTUSB_VALID_LE_STATES))
-+		set_bit(HCI_QUIRK_BROKEN_LE_STATES, &hdev->quirks);
+-	if (!(id->driver_info & BTUSB_VALID_LE_STATES))
++	if (id->driver_info & BTUSB_INVALID_LE_STATES)
+ 		set_bit(HCI_QUIRK_BROKEN_LE_STATES, &hdev->quirks);
  
  	if (id->driver_info & BTUSB_DIGIANSWER) {
- 		data->cmdreq_type = USB_TYPE_VENDOR;
-diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-index 45adc1560d94..4b1ad7ea5b95 100644
---- a/drivers/bluetooth/hci_qca.c
-+++ b/drivers/bluetooth/hci_qca.c
-@@ -2474,8 +2474,8 @@ static int qca_serdev_probe(struct serdev_device *serdev)
- 			set_bit(HCI_QUIRK_WIDEBAND_SPEECH_SUPPORTED,
- 				&hdev->quirks);
- 
--		if (data->capabilities & QCA_CAP_VALID_LE_STATES)
--			set_bit(HCI_QUIRK_VALID_LE_STATES, &hdev->quirks);
-+		if (!(data->capabilities & QCA_CAP_VALID_LE_STATES))
-+			set_bit(HCI_QUIRK_BROKEN_LE_STATES, &hdev->quirks);
- 	}
- 
- 	return 0;
-diff --git a/drivers/bluetooth/hci_vhci.c b/drivers/bluetooth/hci_vhci.c
-index c4046f8f1985..43e9ac5a3324 100644
---- a/drivers/bluetooth/hci_vhci.c
-+++ b/drivers/bluetooth/hci_vhci.c
-@@ -425,8 +425,6 @@ static int __vhci_create_device(struct vhci_data *data, __u8 opcode)
- 	if (opcode & 0x80)
- 		set_bit(HCI_QUIRK_RAW_DEVICE, &hdev->quirks);
- 
--	set_bit(HCI_QUIRK_VALID_LE_STATES, &hdev->quirks);
--
- 	if (hci_register_dev(hdev) < 0) {
- 		BT_ERR("Can't register HCI device");
- 		hci_free_dev(hdev);
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index ace5d210af38..bab1e3d7452a 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -206,14 +206,17 @@ enum {
- 	 */
- 	HCI_QUIRK_WIDEBAND_SPEECH_SUPPORTED,
- 
--	/* When this quirk is set, the controller has validated that
--	 * LE states reported through the HCI_LE_READ_SUPPORTED_STATES are
--	 * valid.  This mechanism is necessary as many controllers have
--	 * been seen has having trouble initiating a connectable
--	 * advertisement despite the state combination being reported as
--	 * supported.
-+	/* When this quirk is set, the LE states reported through the
-+	 * HCI_LE_READ_SUPPORTED_STATES are invalid/broken.
-+	 *
-+	 * This mechanism is necessary as many controllers have been seen has
-+	 * having trouble initiating a connectable advertisement despite the
-+	 * state combination being reported as supported.
-+	 *
-+	 * This quirk can be set before hci_register_dev is called or
-+	 * during the hdev->setup vendor callback.
- 	 */
--	HCI_QUIRK_VALID_LE_STATES,
-+	HCI_QUIRK_BROKEN_LE_STATES,
- 
- 	/* When this quirk is set, then erroneous data reporting
- 	 * is ignored. This is mainly due to the fact that the HCI
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 31020891fc68..e449dba698f3 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -825,7 +825,7 @@ extern struct mutex hci_cb_list_lock;
- 	} while (0)
- 
- #define hci_dev_le_state_simultaneous(hdev) \
--	(test_bit(HCI_QUIRK_VALID_LE_STATES, &hdev->quirks) && \
-+	(!test_bit(HCI_QUIRK_BROKEN_LE_STATES, &hdev->quirks) && \
- 	 (hdev->le_states[4] & 0x08) &&	/* Central */ \
- 	 (hdev->le_states[4] & 0x40) &&	/* Peripheral */ \
- 	 (hdev->le_states[3] & 0x10))	/* Simultaneous */
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index d0c118c47f6c..1c82dcdf6e8f 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -5920,7 +5920,7 @@ static struct hci_conn *check_pending_le_conn(struct hci_dev *hdev,
- 	 * while we have an existing one in peripheral role.
- 	 */
- 	if (hdev->conn_hash.le_num_peripheral > 0 &&
--	    (!test_bit(HCI_QUIRK_VALID_LE_STATES, &hdev->quirks) ||
-+	    (test_bit(HCI_QUIRK_BROKEN_LE_STATES, &hdev->quirks) ||
- 	     !(hdev->le_states[3] & 0x10)))
- 		return NULL;
- 
 -- 
 2.46.0
 
