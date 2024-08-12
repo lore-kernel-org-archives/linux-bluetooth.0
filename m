@@ -1,100 +1,133 @@
-Received: from mail-lj1-f178.google.com (mail-lj1-f178.google.com [209.85.208.178])
+Received: from mail-vs1-f41.google.com (mail-vs1-f41.google.com [209.85.217.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2032A16D332
-	for <linux-bluetooth@vger.kernel.org>; Mon, 12 Aug 2024 15:17:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67120F9E8
+	for <linux-bluetooth@vger.kernel.org>; Mon, 12 Aug 2024 15:32:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723475857; cv=none; b=aC1OAv5cRRHHeldBy+foRgF5j16v/jmF3r4JRNm4sWBwtuvUHx+FKYczrQWJPA4SxS6xI+bNZky6W5lWZnfz+U+UohFezjje+a12YmxpP2vcL+4jrN02lPWD3y7YsN69WdJexf0PbRqpAq3/rVKZxDN2l8JIiXMf1+KHHpXfUbM=
+	t=1723476744; cv=none; b=AW3SLlaZPaJjJQ3CWXOepH8wOiHOl7DyFZkmiSS/9BaE4kbuYIWgTxXoM68C+V6sLxho7YV8wC5ptsDNjK+Ed72sgBzvSAmC/yYEsrCABuwlyDGBM+WlwiRBCGy4k3Us2co2XKlm+ogQoJDrzvJULd/iEysAo5kMftuwie5Kk28=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723475857; c=relaxed/simple;
-	bh=lGbUKA451O4fA8Tr7piXdJvOheNb+7vmJJ/lU50sTmU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=S5XuH01+AFP4GER1TxSrfl1kDmRFbFebJixmKN9ICZlUWt9Dsyt+Es9o/NwbhPc0YIrhM4hPHhqMjEw7zbeVDQlmjUm1ByisLcg7BeU8dMA80HsdyL62Blh8fR0Zdomxx/A2OvX8D9DJwSIwf6kwKV75x70DM64pecoVABSu/Pw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XFt2jXRG; arc=none smtp.client-ip=209.85.208.178
+	s=arc-20240116; t=1723476744; c=relaxed/simple;
+	bh=nyGS+8CdRT8plw0NP0Z0523hGngAcdySnS8t1JQEnic=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=Za6CJ6L+/pdg/k9rNTMVPm6lqm4eZhA2B/yLEq3j7Pdw1yQy28moGkDgvfPSvPgF8vHKV8A9YZN6cTu4DPPExf4UFXPuhw1DXgp5QZVc+7VxiFPjtFIeDVz4/lyrYj1Gc1qx+VCPuJdh5qoe06aYQlBEcCXRFYb5LJ+SPe4q/T4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VTlDPIGV; arc=none smtp.client-ip=209.85.217.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XFt2jXRG"
-Received: by mail-lj1-f178.google.com with SMTP id 38308e7fff4ca-2f16767830dso44787181fa.0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 12 Aug 2024 08:17:35 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VTlDPIGV"
+Received: by mail-vs1-f41.google.com with SMTP id ada2fe7eead31-492aae5fd78so1611701137.2
+        for <linux-bluetooth@vger.kernel.org>; Mon, 12 Aug 2024 08:32:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1723475854; x=1724080654; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=lGbUKA451O4fA8Tr7piXdJvOheNb+7vmJJ/lU50sTmU=;
-        b=XFt2jXRGksobvV9JsT+vj7LYfsQrljiG9i+RX0oAMfs77XXfMb5LvVNKudCc16RxDe
-         v+GxP2kerm7Cm4D6nGkQ9hVXzIDMI8TfSmmioR0zsMFeSKLpYoA6Wxkk8CfbS3gVzlFN
-         IEPRNdIt2Xo7/N2tM77EsgBqG5Vog/tcUbn27rUbrMQjMNkgQmsb64s5Ch1vpgtZXXC3
-         9O0dkThJnMbD+/v6QXtHtN027ZJF9Ez4Ow1QglZMguWD1VrRjuq+UttxacSzzCUxnaXT
-         jiHB3wDEZX6JMVM3rLSTcyBNj4E4j8xPQ+MVkv+90BRz4th5a4TMF4DaPayXqKTL7+U0
-         cLRw==
+        d=gmail.com; s=20230601; t=1723476741; x=1724081541; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=XnTlJTIn3gGbaam3/l4MmjD64A2xbXGNtEPBdy4Ltqc=;
+        b=VTlDPIGVDLueaP0LEtL6TuEWBA92SfnD66t0Ut94ckUQ+ZG5wcVS3fDF+YCfSvV8G9
+         3z2PI41XFdll+cxUK8/NWyTJQ4PJ6Y8P5SjJM9af7qQQYhkPmIOZFkUW/3hlnz+hHROG
+         pc8zGfTvLPymWmgnvkqN9jpzEGZxR4+C7SNVSOvSCuqb6TjODHDtOdhfS3d80w+kMyIe
+         8MfjIx9N5NhcSKvn7x6CSMNIg+UVyC9KeYGJ0YvF0KAVNiyP1SvAL/RMmeQPu4kMFJpB
+         jGSiknohVfB6vTA9AIjtt9AmcUmexoJpGi0Zq0c6fEF8XN3ItM0BN+0LAqZqwt2t4Tv3
+         fR6A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723475854; x=1724080654;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=lGbUKA451O4fA8Tr7piXdJvOheNb+7vmJJ/lU50sTmU=;
-        b=n3aKsPwRvJWpbBbrmV35Bo8NcvIzW5efRwkHz5dxFAOS3YeBoUi4klf0bnDxNAzto8
-         nEbyCGKyupSGi3kNWuauoAZkiXvx3M1MUy4XkblNZDIGp2GYTBO7dzizmuOmqW8gm12i
-         la2vH753AvT/OYpxbdUOhTwtxSvcLCyGCDR++dVSc2AQP6lUnOUPGJ75i2oP7IMj1dfd
-         LwLqQeeP6EGbCFeKRMcHIym4FgBEWnneDP9MoT+D9I48aGbUwFQxs5+btwl0H+BxBrfU
-         NicFggKPj288lu/sXk0/ZBQwYLrwALt0yKOCMSVAQmcajzEf4/8NiCBRZg2o/EIttRUt
-         /IxA==
-X-Forwarded-Encrypted: i=1; AJvYcCWsKKKndW/zHrvNsUqMhkBtYvklROI/WXIsi3OhAt1a1I1LXk9arTPxaaPTtJkttDvbzJESsN0zyZdHgguYlKUhOZJaWQCDJzF0Z4mtb0lJ
-X-Gm-Message-State: AOJu0YzbD6HOEJn+W4xk2wfePpI8WpXrWGNTqtQu7t6oPIJSdN+pJY8S
-	Wt0Gf1BObrMxkDQnmFyQY2F0Yacs9jYHbFRYJYxLHMXZh0ovPgW4PHTTFKIIZHpRF/Fm+6uBjlY
-	8OZB+n2R08Hd6NFl4wzCy+nGvxpE=
-X-Google-Smtp-Source: AGHT+IFhtanjPRuKvqXr8ekRv6FwL2VGZAhKKojqmRRdnEy4wcYWgHGCoBhVcHGgh8BFD7Hx0CPlA3EOE5fRaVABpJ0=
-X-Received: by 2002:a2e:b8ca:0:b0:2f0:3cff:30ce with SMTP id
- 38308e7fff4ca-2f2b70d4ba6mr5258331fa.0.1723475853845; Mon, 12 Aug 2024
- 08:17:33 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1723476741; x=1724081541;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=XnTlJTIn3gGbaam3/l4MmjD64A2xbXGNtEPBdy4Ltqc=;
+        b=sUYBzghdxQrEKT53BZBT1R6UIBRAWqGY07vGMtiEpn3Ga1dOW68xAWtRc/kX2hFrfP
+         Qu3uFIFkzlwMjIx30enW0nP7pQSk5jeqg4LpTTvrPLFgo5knspOYFCNzUpZ8IrKOhzu8
+         IwrdzrWIi4x2Kg/K+UwQSLfU1XlCBxXDW8jEJ3aIlAZ5QsYmvo8NTJyZsLUrGDfovSiv
+         N4iVDnkw/PXgqN4y+eSzCx5ch3wN+23bn2CAHUNyiExMJ2VW3al9AsYZmIhoz5uZDM4z
+         1OpoQfNMBGzjDVDZ/pnsBoCrNcnSpQ1saeVzEpIQ2hIMSe9Gu25e2DiByjtWcV/6bYQa
+         HvEw==
+X-Gm-Message-State: AOJu0YwXbK9/X1El6WZHMiHTGWrZQue77QiCMi/TwkRELD1PJHXZCz9K
+	lGi/8ojmDm3l09DcN28JFLbAiVNOK7ChGShd8eHPQd9BrF9OtI6885gqYw==
+X-Google-Smtp-Source: AGHT+IF7HX9T3AfVuhjueWG7ywQZCPHBdffRcsAZXQfNV+QnqxxqisVYIOZRVKcOfWINpw8CmhqaCw==
+X-Received: by 2002:a05:6102:2aca:b0:492:a11f:a878 with SMTP id ada2fe7eead31-49743b2da4cmr907951137.23.1723476741538;
+        Mon, 12 Aug 2024 08:32:21 -0700 (PDT)
+Received: from lvondent-mobl5.. (syn-107-146-107-067.res.spectrum.com. [107.146.107.67])
+        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-49709fa317fsm838647137.23.2024.08.12.08.32.20
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 12 Aug 2024 08:32:20 -0700 (PDT)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH v1] Bluetooth: hci_core: Fix LE quote calculation
+Date: Mon, 12 Aug 2024 11:32:19 -0400
+Message-ID: <20240812153219.290388-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.46.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230425163120.1059724-1-raul.cheleguini@gmail.com> <20240811210505.3089013-1-uhrmar@gmail.com>
-In-Reply-To: <20240811210505.3089013-1-uhrmar@gmail.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 12 Aug 2024 11:17:20 -0400
-Message-ID: <CABBYNZJgf0HobQqRR8orizGM-adToJaU20_NXfC-+jrc1efyxA@mail.gmail.com>
-Subject: Re: [PATCH v2] Bluetooth: Add new quirk for broken extended create
- connection for ATS2851
-To: Markus Uhr <uhrmar@gmail.com>
-Cc: raul.cheleguini@gmail.com, johan.hedberg@gmail.com, 
-	linux-bluetooth@vger.kernel.org, marcel@holtmann.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-Hi Markus,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Sun, Aug 11, 2024 at 5:05=E2=80=AFPM Markus Uhr <uhrmar@gmail.com> wrote=
-:
->
-> On Tue, 25 Apr 2023 13:31:20 -0300
-> Raul Cheleguini <raul.cheleguini@gmail.com> wrote:
->
-> > The controller based on ATS2851 advertises support for the "LE
-> > Extended Create Connection" command, but it does not actually
-> > implement it. This issue is blocking the pairing process from
-> > beginning.
-> >
-> > To resolve this, add the quirk HCI_QUIRK_BROKEN_EXT_CREATE_CONN.
-> > This will avoid the unsupported command and instead send a regular "LE
-> > Create Connection" command.
->
-> I'm interested in getting this patch merged. Was this just forgotten, or
-> is there still work to be done before it can be merged?
+Function hci_sched_le needs to update the respective counter variable
+inplace other the likes of hci_quote_sent would attempt to use the
+possible outdated value of conn->{le_cnt,acl_cnt}.
 
-It might need to be resend since it is no longer listed in patchwork.
+Link: https://github.com/bluez/bluez/issues/915
+Fixes: 73d80deb7bdf ("Bluetooth: prioritizing data over HCI")
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+---
+ net/bluetooth/hci_core.c | 19 +++++++------------
+ 1 file changed, 7 insertions(+), 12 deletions(-)
 
-> Best regards,
-> Markus Uhr
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 06da8ac13dca..f25a21f532aa 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -3664,19 +3664,19 @@ static void hci_sched_le(struct hci_dev *hdev)
+ {
+ 	struct hci_chan *chan;
+ 	struct sk_buff *skb;
+-	int quote, cnt, tmp;
++	int quote, *cnt, tmp;
+ 
+ 	BT_DBG("%s", hdev->name);
+ 
+ 	if (!hci_conn_num(hdev, LE_LINK))
+ 		return;
+ 
+-	cnt = hdev->le_pkts ? hdev->le_cnt : hdev->acl_cnt;
++	cnt = hdev->le_pkts ? &hdev->le_cnt : &hdev->acl_cnt;
+ 
+-	__check_timeout(hdev, cnt, LE_LINK);
++	__check_timeout(hdev, *cnt, LE_LINK);
+ 
+-	tmp = cnt;
+-	while (cnt && (chan = hci_chan_sent(hdev, LE_LINK, &quote))) {
++	tmp = *cnt;
++	while (*cnt && (chan = hci_chan_sent(hdev, LE_LINK, &quote))) {
+ 		u32 priority = (skb_peek(&chan->data_q))->priority;
+ 		while (quote-- && (skb = skb_peek(&chan->data_q))) {
+ 			BT_DBG("chan %p skb %p len %d priority %u", chan, skb,
+@@ -3691,7 +3691,7 @@ static void hci_sched_le(struct hci_dev *hdev)
+ 			hci_send_frame(hdev, skb);
+ 			hdev->le_last_tx = jiffies;
+ 
+-			cnt--;
++			(*cnt)--;
+ 			chan->sent++;
+ 			chan->conn->sent++;
+ 
+@@ -3701,12 +3701,7 @@ static void hci_sched_le(struct hci_dev *hdev)
+ 		}
+ 	}
+ 
+-	if (hdev->le_pkts)
+-		hdev->le_cnt = cnt;
+-	else
+-		hdev->acl_cnt = cnt;
+-
+-	if (cnt != tmp)
++	if (*cnt != tmp)
+ 		hci_prio_recalculate(hdev, LE_LINK);
+ }
+ 
+-- 
+2.46.0
 
-
-
---=20
-Luiz Augusto von Dentz
