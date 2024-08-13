@@ -1,116 +1,109 @@
-Received: from mail-qk1-f176.google.com (mail-qk1-f176.google.com [209.85.222.176])
+Received: from mail-pj1-f48.google.com (mail-pj1-f48.google.com [209.85.216.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FE2D16DEAB
-	for <linux-bluetooth@vger.kernel.org>; Mon, 12 Aug 2024 22:07:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 538D51CF9A;
+	Tue, 13 Aug 2024 12:20:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723500438; cv=none; b=um399e5p8aFTQOlF24BGGYMYI+V4Bq9acdJT7F1G4yiCW1LrjzHUpW7nQ2VVVH+pKvouhBFyASVgewpKl8dAVqvz5oAdk6UvWhcXTHnbuCJcH822Av0udJ9Abi0ZvsXA0KSuo0GmUxwqAm/FALD/p5mtu3wih71kKXkbRRW3UoQ=
+	t=1723551637; cv=none; b=prXJRRodnRDnVydT5v8xTrwqFtabL+/Y7Ys4cZrpLDAUQte/Fr78zcafa8zlJmaYO/hM4GDXC/XEesxYHqlCquz4z1BJ9tRopJNTEZLJexp4uEas/8+Psgb9nK9qYg1uKrNv+3JJqDZHBno8iaN4mHVy8PJ47+Ah6T3vzViMgvI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723500438; c=relaxed/simple;
-	bh=0QLiPY9pS+wb3raHufGnnlgmksVYaYMO2yIEa9frdn8=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=lqXkdlcFpEdgHFQkF9sklQEVzu9xTdO0YshqFd+yFAql1HMNgd5XB8b6yxtMUJoouAwVEiMsUCGQegF5xc/zOuntwNb11aNskQPNWTCnfLFXw99dU224fEQK+P7I4PzHK2u5bLQsfOi6gBpjoCnm0vPL8YMP1hyn9VMrLj3YEns=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=khcoN024; arc=none smtp.client-ip=209.85.222.176
+	s=arc-20240116; t=1723551637; c=relaxed/simple;
+	bh=chAb2GOyV/hBwqq1AGYRaBy1jbqHrZJBU7pvL4YwHDc=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Y+jqoFcr1K7+fD96DYl+WzPIvUiRujtJjwZ3mDgHP6Ral8/2XDC9b3emC4dWEgaZMkuBMyjsy2qajk5MO4VA8vZt3jTGn1L3LvJerUj+Id7g4Jdp98ZQC+DOQqv++v7r82n65PbXXRnm2IaJm4PzUMGpW67yM3EoX8YDzagYmDI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KuXS0sHj; arc=none smtp.client-ip=209.85.216.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="khcoN024"
-Received: by mail-qk1-f176.google.com with SMTP id af79cd13be357-7a1e2ac1ee5so321634085a.2
-        for <linux-bluetooth@vger.kernel.org>; Mon, 12 Aug 2024 15:07:16 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KuXS0sHj"
+Received: by mail-pj1-f48.google.com with SMTP id 98e67ed59e1d1-2cb5789297eso3588521a91.3;
+        Tue, 13 Aug 2024 05:20:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1723500435; x=1724105235; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=0QLiPY9pS+wb3raHufGnnlgmksVYaYMO2yIEa9frdn8=;
-        b=khcoN0245NkC0ljN+U5wY9MkQEc4FuFD1I6kKYQcYkD1IhepvP+Be9W9VmpHQfqkzu
-         fuf8rkB1HVqtLlPS5sZD9JCaQ/Fc/A/wXfTTIty6DeNPDqwWXIZ7Z6jEpzYuEz4TU8Mq
-         2W70t216ZOISIlmf8dFvJuvcvZpMlZ5AqBAXKHX+0/8a93tshxwn3O/Im+QijS9tKP1B
-         hG+jo7HzF6JQ3Ht99gsTqH2E/Bcur0YxnRR/IYoWryE1hAQ6AgmrCzubttg842QJn37Q
-         mGVQxnuAKrk2hw4yGGigVMYUzJ2qVI0oqZkCiHHK8y/DZuxUyxx02Yoz+sCXU1wavit3
-         Ar4g==
+        d=gmail.com; s=20230601; t=1723551635; x=1724156435; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Z3mWR2mtNanCFR3pbd+apr4voFLl2lzERm6XILSMuMA=;
+        b=KuXS0sHjU7E/ZYLCTH7sGFln4r6nUxZ8v9ep164DRaatKQIFC2Zt4v6uHMdQXxlV4b
+         g86LYb563BSDYAr43eogjSLjGwpZIKKRgzldblTVtjZXxEXtoCxTeTPCvL+33S/piLRh
+         rwIhZa+JjuTDIqTItnwGM+1h+JZZOSAqE/ogiIA+g2x9eVqkz335RTsgDl90x5CMa1Bb
+         MuWqMRLiwJo6xustLuteYVP7XrhX+fy4zuU7adZx1sOJmyxmUf2495WHRVqwQplJUt2q
+         kGd7HMlID+pie5wM9uGypMZOqs4sMHIZTKixekPa5jvCbRPovFjTx6vHbY9DVyJ52+WG
+         VYXw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723500435; x=1724105235;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20230601; t=1723551635; x=1724156435;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=0QLiPY9pS+wb3raHufGnnlgmksVYaYMO2yIEa9frdn8=;
-        b=ludLEwsit9UEu3ZTlx0nLyu98w4dIUcblT7OvBD8DWY2AIYwEzYaXF0QedPzr88jhX
-         Jk602cE6ffm/bZS7eIfsGzpNwkKyHQ/euLJjXrUzP4OenLqmbANGMk4HeveYXgAGf8TV
-         jrFepeKapa+xxK4tQT+zLm2igDcxsPvdy6R1w5tI4oTjQ8WTJYY0fmT7+L9ZkGmNHSP0
-         giOUuPLPWlw6yioHPAkizzlIgHOPwc9KSkrLR0g+qNxzcwZcJkb/eSFyW8bsGjI0XPTF
-         KALmAdRexQJrkfPy6SFQ2GMXHXLqWVoxO3mOCMDctBseVAAGK4yjoMBautPE47WFLbU1
-         TJXg==
-X-Gm-Message-State: AOJu0YyuuRVazN17rC6YTOnNmIi9jSPIvCvNTFpgA9U/CLUwp5yisbNs
-	8LnekUhqrQ1uUFOD9PE7L6A4/cLBVYJcSHqf9rJKw4adJSXo55BS/A8BLw==
-X-Google-Smtp-Source: AGHT+IGCaDtZk7ZpS3k+TQntU2feUulFpN4lA9CpGnuA3lpiNj+7xnNAjbQ9CNW73sAoEyDF+5LLZQ==
-X-Received: by 2002:a05:620a:3712:b0:79f:947:8915 with SMTP id af79cd13be357-7a4e15361c6mr195676785a.29.1723500435445;
-        Mon, 12 Aug 2024 15:07:15 -0700 (PDT)
-Received: from [172.17.0.2] ([40.71.163.67])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7a4c7d64284sm281986885a.4.2024.08.12.15.07.14
+        bh=Z3mWR2mtNanCFR3pbd+apr4voFLl2lzERm6XILSMuMA=;
+        b=GI/pC0UFDvByTnUO7VC5LMU66wuVcl5Qv3bcC61EuRann0FMmm1Fiq3vv5boI102hG
+         RJEaygzsD472DvmZ2vCaEyMPZ4mDbU+K69hvf/9ZKjAtluthStI9VualDKXfcLSdgIDd
+         PSlBF8sVY8v3BJG2zI3Wf7lIJY8w4+Oi9qQGNOIwdtaV9t3JwiY6kvvxJosw6cL0g6y5
+         U8e5Lrlcm0hT2GT+f5odaHFXzmF2IhD36fz56LuSeWuivXGYj0YXMLUdbxiLfefu9VT/
+         iAoYRlSuY0oXlljmBuw/GYDceVHKNPGhfjuiF/+33XUPgPkyu2aHcV2XAl8aDr5BS2fv
+         4oEg==
+X-Forwarded-Encrypted: i=1; AJvYcCXwXfxoetyCvK137GHpYsuWq5AXfTgIQEPdk20WdRvLZs/Ha3IPxrs45zLWcabQgvx+SbNqvjxyu5FF3UgNuIJZB06Lo1unUkXmovCmlk3zL7aNe+Sx0aFtFXlQ6ddkRGwIsAJV1/jeGjKRVEhc
+X-Gm-Message-State: AOJu0Yw1EymyKQzG5iZPcLfqPPrxXbbW2KCeMuRg0WlfmH715UvObUJM
+	HMV65mc12KRNX8t3WJQCksInhmoQKEqp9WoVDB8QDrCcNhwJj/t0
+X-Google-Smtp-Source: AGHT+IE1wpvYvO+X8aOgD1ucXI5Hpo8sCpkifzovrkkhUkzJyZM0MyY3uf4Jalzh0qzJR2XxEwT8ww==
+X-Received: by 2002:a17:90a:7448:b0:2d1:b49d:7f2 with SMTP id 98e67ed59e1d1-2d392548219mr3858002a91.22.1723551635481;
+        Tue, 13 Aug 2024 05:20:35 -0700 (PDT)
+Received: from 0x7f800001.hitronhub.home ([2407:4d00:3c04:81a0:c062:fc81:d816:8b73])
+        by smtp.googlemail.com with ESMTPSA id 98e67ed59e1d1-2d1fcf06589sm7092679a91.25.2024.08.13.05.20.32
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 12 Aug 2024 15:07:15 -0700 (PDT)
-Message-ID: <66ba8793.050a0220.3b8558.8cbf@mx.google.com>
-Date: Mon, 12 Aug 2024 15:07:15 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============6652571041883510396=="
+        Tue, 13 Aug 2024 05:20:34 -0700 (PDT)
+From: "Yo-Jung (Leo) Lin" <0xff07@gmail.com>
+To: 
+Cc: linux-kernel-mentees@lists.linuxfoundation.org,
+	ricardo@marliere.net,
+	skhan@linuxfoundation.org,
+	0xff07@gmail.com,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] Bluetooth: vhci: manage mutex with cleanup helpers
+Date: Tue, 13 Aug 2024 20:18:28 +0800
+Message-Id: <20240813121829.6693-1-0xff07@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [BlueZ,v1,1/2] shared/uhid: Fix registering UHID_START multiple times
-In-Reply-To: <20240812200622.351942-1-luiz.dentz@gmail.com>
-References: <20240812200622.351942-1-luiz.dentz@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 
---===============6652571041883510396==
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
+Use macros in liunx/cleanup.h for automatic resource cleanup.
 
-VGhpcyBpcyBhdXRvbWF0ZWQgZW1haWwgYW5kIHBsZWFzZSBkbyBub3QgcmVwbHkgdG8gdGhpcyBl
-bWFpbCEKCkRlYXIgc3VibWl0dGVyLAoKVGhhbmsgeW91IGZvciBzdWJtaXR0aW5nIHRoZSBwYXRj
-aGVzIHRvIHRoZSBsaW51eCBibHVldG9vdGggbWFpbGluZyBsaXN0LgpUaGlzIGlzIGEgQ0kgdGVz
-dCByZXN1bHRzIHdpdGggeW91ciBwYXRjaCBzZXJpZXM6ClBXIExpbms6aHR0cHM6Ly9wYXRjaHdv
-cmsua2VybmVsLm9yZy9wcm9qZWN0L2JsdWV0b290aC9saXN0Lz9zZXJpZXM9ODc4OTQ2CgotLS1U
-ZXN0IHJlc3VsdC0tLQoKVGVzdCBTdW1tYXJ5OgpDaGVja1BhdGNoICAgICAgICAgICAgICAgICAg
-ICBQQVNTICAgICAgMi42NSBzZWNvbmRzCkdpdExpbnQgICAgICAgICAgICAgICAgICAgICAgIFBB
-U1MgICAgICAxLjEzIHNlY29uZHMKQnVpbGRFbGwgICAgICAgICAgICAgICAgICAgICAgUEFTUyAg
-ICAgIDI0LjU1IHNlY29uZHMKQmx1ZXpNYWtlICAgICAgICAgICAgICAgICAgICAgUEFTUyAgICAg
-IDE2OTQuNTkgc2Vjb25kcwpNYWtlQ2hlY2sgICAgICAgICAgICAgICAgICAgICBGQUlMICAgICAg
-MTMuNjYgc2Vjb25kcwpNYWtlRGlzdGNoZWNrICAgICAgICAgICAgICAgICBGQUlMICAgICAgMTU5
-LjIwIHNlY29uZHMKQ2hlY2tWYWxncmluZCAgICAgICAgICAgICAgICAgRkFJTCAgICAgIDI1MS4w
-NiBzZWNvbmRzCkNoZWNrU21hdGNoICAgICAgICAgICAgICAgICAgIFBBU1MgICAgICAzNTMuMjkg
-c2Vjb25kcwpibHVlem1ha2VleHRlbGwgICAgICAgICAgICAgICBQQVNTICAgICAgMTE5LjU0IHNl
-Y29uZHMKSW5jcmVtZW50YWxCdWlsZCAgICAgICAgICAgICAgUEFTUyAgICAgIDMwMjQuMDcgc2Vj
-b25kcwpTY2FuQnVpbGQgICAgICAgICAgICAgICAgICAgICBQQVNTICAgICAgOTk4LjUyIHNlY29u
-ZHMKCkRldGFpbHMKIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjClRlc3Q6IE1ha2VDaGVj
-ayAtIEZBSUwKRGVzYzogUnVuIEJsdWV6IE1ha2UgQ2hlY2sKT3V0cHV0OgoKbWFrZVszXTogKioq
-IFtNYWtlZmlsZToxMTc2NDogdGVzdC1zdWl0ZS5sb2ddIEVycm9yIDEKbWFrZVsyXTogKioqIFtN
-YWtlZmlsZToxMTg3MjogY2hlY2stVEVTVFNdIEVycm9yIDIKbWFrZVsxXTogKioqIFtNYWtlZmls
-ZToxMjMwMTogY2hlY2stYW1dIEVycm9yIDIKbWFrZTogKioqIFtNYWtlZmlsZToxMjMwMzogY2hl
-Y2tdIEVycm9yIDIKIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjClRlc3Q6IE1ha2VEaXN0
-Y2hlY2sgLSBGQUlMCkRlc2M6IFJ1biBCbHVleiBNYWtlIERpc3RjaGVjawpPdXRwdXQ6CgpQYWNr
-YWdlIGN1cHMgd2FzIG5vdCBmb3VuZCBpbiB0aGUgcGtnLWNvbmZpZyBzZWFyY2ggcGF0aC4KUGVy
-aGFwcyB5b3Ugc2hvdWxkIGFkZCB0aGUgZGlyZWN0b3J5IGNvbnRhaW5pbmcgYGN1cHMucGMnCnRv
-IHRoZSBQS0dfQ09ORklHX1BBVEggZW52aXJvbm1lbnQgdmFyaWFibGUKTm8gcGFja2FnZSAnY3Vw
-cycgZm91bmQKbWFrZVs0XTogKioqIFtNYWtlZmlsZToxMTc2NDogdGVzdC1zdWl0ZS5sb2ddIEVy
-cm9yIDEKbWFrZVszXTogKioqIFtNYWtlZmlsZToxMTg3MjogY2hlY2stVEVTVFNdIEVycm9yIDIK
-bWFrZVsyXTogKioqIFtNYWtlZmlsZToxMjMwMTogY2hlY2stYW1dIEVycm9yIDIKbWFrZVsxXTog
-KioqIFtNYWtlZmlsZToxMjMwMzogY2hlY2tdIEVycm9yIDIKbWFrZTogKioqIFtNYWtlZmlsZTox
-MjIyNDogZGlzdGNoZWNrXSBFcnJvciAxCiMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIwpU
-ZXN0OiBDaGVja1ZhbGdyaW5kIC0gRkFJTApEZXNjOiBSdW4gQmx1ZXogTWFrZSBDaGVjayB3aXRo
-IFZhbGdyaW5kCk91dHB1dDoKCnRvb2xzL21nbXQtdGVzdGVyLmM6IEluIGZ1bmN0aW9uIOKAmG1h
-aW7igJk6CnRvb2xzL21nbXQtdGVzdGVyLmM6MTI3MjU6NTogbm90ZTogdmFyaWFibGUgdHJhY2tp
-bmcgc2l6ZSBsaW1pdCBleGNlZWRlZCB3aXRoIOKAmC1mdmFyLXRyYWNraW5nLWFzc2lnbm1lbnRz
-4oCZLCByZXRyeWluZyB3aXRob3V0CjEyNzI1IHwgaW50IG1haW4oaW50IGFyZ2MsIGNoYXIgKmFy
-Z3ZbXSkKICAgICAgfCAgICAgXn5+fgptYWtlWzNdOiAqKiogW01ha2VmaWxlOjExNzY0OiB0ZXN0
-LXN1aXRlLmxvZ10gRXJyb3IgMQptYWtlWzJdOiAqKiogW01ha2VmaWxlOjExODcyOiBjaGVjay1U
-RVNUU10gRXJyb3IgMgptYWtlWzFdOiAqKiogW01ha2VmaWxlOjEyMzAxOiBjaGVjay1hbV0gRXJy
-b3IgMgptYWtlOiAqKiogW01ha2VmaWxlOjEyMzAzOiBjaGVja10gRXJyb3IgMgoKCi0tLQpSZWdh
-cmRzLApMaW51eCBCbHVldG9vdGgKCg==
+Signed-off-by: Yo-Jung (Leo) Lin <0xff07@gmail.com>
+---
+ drivers/bluetooth/hci_vhci.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
---===============6652571041883510396==--
+diff --git a/drivers/bluetooth/hci_vhci.c b/drivers/bluetooth/hci_vhci.c
+index c4046f8f1985..70f0c28372ec 100644
+--- a/drivers/bluetooth/hci_vhci.c
++++ b/drivers/bluetooth/hci_vhci.c
+@@ -19,6 +19,7 @@
+ #include <linux/errno.h>
+ #include <linux/sched.h>
+ #include <linux/poll.h>
++#include <linux/cleanup.h>
+ 
+ #include <linux/skbuff.h>
+ #include <linux/miscdevice.h>
+@@ -468,9 +469,9 @@ static int vhci_create_device(struct vhci_data *data, __u8 opcode)
+ {
+ 	int err;
+ 
+-	mutex_lock(&data->open_mutex);
+-	err = __vhci_create_device(data, opcode);
+-	mutex_unlock(&data->open_mutex);
++	scoped_guard(mutex, &data->open_mutex) {
++		err = __vhci_create_device(data, opcode);
++	}
+ 
+ 	return err;
+ }
+-- 
+2.34.1
+
