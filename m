@@ -1,151 +1,104 @@
-Received: from out-28.smtp.github.com (out-28.smtp.github.com [192.30.252.211])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f177.google.com (mail-qk1-f177.google.com [209.85.222.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D78691A0715
-	for <linux-bluetooth@vger.kernel.org>; Tue, 13 Aug 2024 16:09:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2D76370
+	for <linux-bluetooth@vger.kernel.org>; Tue, 13 Aug 2024 16:31:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723565359; cv=none; b=myhwYAYG0k/gdBX2S8LT9Umm1FV+w8O/mFi8L04Xq1Dv68LU6BnPVEzT8AsF2hAznCvDrDrYqPDo7UvgfwsBUVMWG5reJhc1vQtXAHWZDL9Ztn936KskCXoOU+VUwdg8uNghj6XHu3Sgyho+6RESxuTL0dwGN7NhjWxRPWYN368=
+	t=1723566697; cv=none; b=sxIaybeJVUPGPBm+Gri6Wdryyvnyj+c3j+oFe3INtx0OxvyZxrbTG6kxHsJs8AGHFGbm2J32tun9BR6cwauWifZrqG+DeHWQiYAEUgsdB4Zjt4kPNRMuwa2wuYi2y6zGrQZKaxH+W7+lUX2rOb5gtAlw/vPhreg8rvTlrMGiUMQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723565359; c=relaxed/simple;
-	bh=cwFxsAHe9jlDsQoejiIpjnz6mgrsNcCTSC6OZghLNKM=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=hpceKKvpPHNhhlIJfvWlfUvpjo+GZt9JNWNMcn4n6i0t2HpS9HsZH2A2zdGrkvb/S7gEL0zy2KRWs66pjqcf8mEuhO0G0uBRFhWR2Yn+RFmyI/83RQ5D1xRt05E8TUzlkQY+ib9Q0BuNuos/W8K99InmWeT/BW2wdX1y3tITgnQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=c3+kzQMS; arc=none smtp.client-ip=192.30.252.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1723566697; c=relaxed/simple;
+	bh=nD8QgBYWXs4iQEX8/+QjUSU0Ua6jEk3oLTyNhaw89uc=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=lJvIMBpdoULRUXTOatNbZ9NEtgPdOp1b+QnKwcQZVRZv+RqVFxmASE0x7LO2lMM8HBxyWQBgSta5VhSwL156oj+0bLyWbuehZAfqbeANYst3lx9TcYNveulrr6ZztdGeA1tuNIsJe7fZZwHUShyowUu57SH/wyT7A1jXDRH8L6U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=P1sWpCOQ; arc=none smtp.client-ip=209.85.222.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="c3+kzQMS"
-Received: from github.com (hubbernetes-node-0531bd6.ash1-iad.github.net [10.56.147.29])
-	by smtp.github.com (Postfix) with ESMTPA id CCBA36C0545
-	for <linux-bluetooth@vger.kernel.org>; Tue, 13 Aug 2024 09:09:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1723565356;
-	bh=n/07vxWcsICRzW9N10qOzGbumf+PUeS8K4SyeDto4Q8=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=c3+kzQMSr1l1daXtNy/FLiPdQ5WwlMS0huJKQvwW/XHZvmTNVDSR7EsaVF0gXHeWA
-	 WRQhZlqkAf+9DvtwjtI7AIPRF73KW5ILHfrKpwlnZMKBIq4vPy/0F+hp7Dqe4uItx2
-	 xE5uoo5kDKJ6Jf4M6huOFCLhhBwndeiyJGbUnXaQ=
-Date: Tue, 13 Aug 2024 09:09:16 -0700
-From: BluezTestBot <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/master/40621e-537e39@github.com>
-Subject: [bluez/bluez] 523680: org.bluez.GattCharacteristic: Add missing link
- opt...
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="P1sWpCOQ"
+Received: by mail-qk1-f177.google.com with SMTP id af79cd13be357-7a1da036d35so358604785a.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 13 Aug 2024 09:31:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1723566694; x=1724171494; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=WoT1J9iRcf1Du7M28PwCdIRqJX9H8esgV851FIZDGIg=;
+        b=P1sWpCOQFoZst4ds5iYkuYqO6LglLbE/bZsOK5jU6IDzbYINuUkW8S7KmwHulAd4hy
+         1EMyQDO01CNvutoYf/kzefpEhhf+9gMLX7MJoVRRO4qv9UnyAEOfJ48GHFPPMxpFOGQC
+         Q36GWOZZKSBnRNc9C9rSuv0b6JFtusx1MeK7CC0G/TW5DDrUaE5vNYniAy3YpqV1pfkG
+         6bO1W65CJ/mllKhFxdo5wCC0IG6WCjz3C610CZr5o1svveimAvkieeGRcgMw2nvPIgd6
+         YVg9FUVQQ1fA42/P9KA8Ev5mbGYNANY/7+mavgQQPhNhwIKtuL64u9ljx8SI8kl1in4p
+         qMOQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723566694; x=1724171494;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=WoT1J9iRcf1Du7M28PwCdIRqJX9H8esgV851FIZDGIg=;
+        b=L2Z6cyuBNRpXlpI2h5ln0EcShEnDH9VXx9wPx0dbzgMlGm1N0ZutiH98ZocmOhtKIh
+         SlE6KvGxjPsHcjLcrpuSqWueUAoQl/E09hWEf+3Uj1m1DaZxKSaXUvLhDQeSAOCdFfF2
+         08nxEUfiq5rn+AxqItFhptCagTojFt7dyi33vpTZjNe47smzI93G0lgAghR4yN+gkZgX
+         H8DtmMMQm/9n1RAzsZnqbojq4/o9/NzHaz7TS7OHyOqGD9gjfde5dFCNXMAWKiQo8j/+
+         BOJEtS4G9AIbH/pe/7M6nXxtgn1gJ8FFcjk4BlYZAOaY5kwtcglRd2wCMFBECVkt94qJ
+         6W+w==
+X-Gm-Message-State: AOJu0YwjF7P2HwjF4Ehj54Sj3OGXMN4b44mtzOpZ8zyHDfvY1Qcdhhxj
+	vIjw+YtxO1CE/suyvXWZUkcXSmN3AnG2Mtn7uGh+nyqBZrc8POaJH3PG0Q==
+X-Google-Smtp-Source: AGHT+IGj0hDQId3Ijwp2JlLWp3dAyTy7LGDulmC8R2gUAGVX3dYBjermY/AJly/7THHjys8N7Jm/jg==
+X-Received: by 2002:a05:622a:4a19:b0:453:14c2:d503 with SMTP id d75a77b69052e-4534992a136mr61400711cf.24.1723566694399;
+        Tue, 13 Aug 2024 09:31:34 -0700 (PDT)
+Received: from [172.17.0.2] ([172.183.107.253])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4531c1a7f28sm33614371cf.10.2024.08.13.09.31.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 13 Aug 2024 09:31:34 -0700 (PDT)
+Message-ID: <66bb8a66.050a0220.8497a.b70c@mx.google.com>
+Date: Tue, 13 Aug 2024 09:31:34 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============3721786191462680717=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
+MIME-Version: 1.0
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [BlueZ,v3,1/2] shared/uhid: Fix registering UHID_START multiple times
+In-Reply-To: <20240813142935.504400-1-luiz.dentz@gmail.com>
+References: <20240813142935.504400-1-luiz.dentz@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
+
+--===============3721786191462680717==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
 
-  Branch: refs/heads/master
-  Home:   https://github.com/bluez/bluez
-  Commit: 5236809407c9f041e102de6fba7a40b8b2c318e5
-      https://github.com/bluez/bluez/commit/5236809407c9f041e102de6fba7a40b8b2c318e5
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2024-08-13 (Tue, 13 Aug 2024)
+This is automated email and please do not reply to this email!
 
-  Changed paths:
-    M doc/org.bluez.GattCharacteristic.rst
+Dear submitter,
 
-  Log Message:
-  -----------
-  org.bluez.GattCharacteristic: Add missing link option to ReadValue
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=879259
 
-Just like GattDescriptor.ReadValue characteristics also support link
-option which indicates in what bearer the operation is taken place.
+---Test result---
 
-
-  Commit: ee39d01fb9ee3d0953641a6681fed212ddb8fb0a
-      https://github.com/bluez/bluez/commit/ee39d01fb9ee3d0953641a6681fed212ddb8fb0a
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2024-08-13 (Tue, 13 Aug 2024)
-
-  Changed paths:
-    M src/shared/uhid.c
-    M unit/test-uhid.c
-
-  Log Message:
-  -----------
-  shared/uhid: Fix registering UHID_START multiple times
-
-UHID_START callback shall only be registered once otherwise there is a
-risk of processing input queue multiple times.
+Test Summary:
+CheckPatch                    PASS      0.76 seconds
+GitLint                       PASS      0.53 seconds
+BuildEll                      PASS      25.31 seconds
+BluezMake                     PASS      1715.75 seconds
+MakeCheck                     PASS      13.54 seconds
+MakeDistcheck                 PASS      183.50 seconds
+CheckValgrind                 PASS      258.93 seconds
+CheckSmatch                   PASS      361.11 seconds
+bluezmakeextell               PASS      122.10 seconds
+IncrementalBuild              PASS      3027.76 seconds
+ScanBuild                     PASS      1047.24 seconds
 
 
-  Commit: a13638e6ae38f4f5c035bc5fd2532f73f10888b6
-      https://github.com/bluez/bluez/commit/a13638e6ae38f4f5c035bc5fd2532f73f10888b6
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2024-08-13 (Tue, 13 Aug 2024)
 
-  Changed paths:
-    M src/shared/uhid.c
-
-  Log Message:
-  -----------
-  shared/uhid: Fix not cleanup input queue on destroy
-
-The input queue shall be cleanup on bt_uhid_destroy since that shall not
-be carried to the next session even if the input node is not destroyed.
+---
+Regards,
+Linux Bluetooth
 
 
-  Commit: b752f760da474c53d66cc4b137db0838aee3c953
-      https://github.com/bluez/bluez/commit/b752f760da474c53d66cc4b137db0838aee3c953
-  Author: Roman Smirnov <r.smirnov@omp.ru>
-  Date:   2024-08-13 (Tue, 13 Aug 2024)
-
-  Changed paths:
-    M tools/rctest.c
-
-  Log Message:
-  -----------
-  tools/rctest: add NULL checks to main()
-
-It is necessary to prevent dereferencing of a NULL pointer.
-
-Found with the SVACE static analysis tool.
-
-
-  Commit: 19ff9ab9151205501025a8bd061da022bb44bd58
-      https://github.com/bluez/bluez/commit/19ff9ab9151205501025a8bd061da022bb44bd58
-  Author: Roman Smirnov <r.smirnov@omp.ru>
-  Date:   2024-08-13 (Tue, 13 Aug 2024)
-
-  Changed paths:
-    M android/avctp.c
-
-  Log Message:
-  -----------
-  android/avctp: remove check in session_browsing_cb()
-
-session->browsing is dereferenced at the beginning of the function, so
-the check can be removed.
-
-Found with the SVACE static analysis tool.
-
-
-  Commit: 537e399aa0960d57de5ba958ed4ddde713cd7ae2
-      https://github.com/bluez/bluez/commit/537e399aa0960d57de5ba958ed4ddde713cd7ae2
-  Author: Roman Smirnov <r.smirnov@omp.ru>
-  Date:   2024-08-13 (Tue, 13 Aug 2024)
-
-  Changed paths:
-    M android/avdtp.c
-
-  Log Message:
-  -----------
-  android/avdtp: fix leak in avdtp_new()
-
-It is necessary to close the file descriptor in case of an error.
-
-Found with the SVACE static analysis tool.
-
-
-Compare: https://github.com/bluez/bluez/compare/40621e269287...537e399aa096
-
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
+--===============3721786191462680717==--
