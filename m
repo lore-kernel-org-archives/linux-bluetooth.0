@@ -1,55 +1,55 @@
 Received: from mail-lj1-f176.google.com (mail-lj1-f176.google.com [209.85.208.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 452991B1429;
-	Thu, 15 Aug 2024 16:32:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD8AE1B9B59;
+	Thu, 15 Aug 2024 16:38:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723739578; cv=none; b=uiB8sZwSaHRxq88l3l5xEPiP9b+jZlh5syTvaAdZBckfZlyUttxGqOoSczr73U+BW7p0xy0tfZ1AGPngvyL5xZ9oOODkRzvssMSBE+AAbzxz+nc4aPkPe2gjaiYqcfrfwPCk60PP0Kqol8dsli0PkSCJGDwqmYcgFFpCaHr3HPA=
+	t=1723739940; cv=none; b=AS3p12FHd3l60FDLK1VKasI0Sy1izf/xcFkFNNxQu+XuDlMoUVP+HlgOXnyfqSLSNLCg9TXeQJWLbgEAjuWvepM8lc2hvxcNOzFyruJLkgDG6VNzYS96vZIm1+0R1zvGuOa+L35Edd4bWfVgQ1JCOSTDh+YEOsLrTayyxyEsKAM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723739578; c=relaxed/simple;
-	bh=oex+NN6RpNLLdno9D4x6XuydzPruIYMG1hE1IXuZRM8=;
+	s=arc-20240116; t=1723739940; c=relaxed/simple;
+	bh=c4TQb/OkEEVaG8Pi6rTPvz/w2ofTmhjlSrJsCtnO1No=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=m7xniKssbeVNDWk+xGiJQKLrG+qdLZd6NRZLbkIbHvSiG0QqjBHWssXEsyatLUJovajLYMAJF7B0LEYPjL6MtvtRd6TtO6pzbL0PQUDXUv8EP08KXN5PFXe4m5YNVtaNc+mQK6dz54pBSfJHbN8oCH2lYQxKhKIKLsr112/pGDs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RbsVmKtp; arc=none smtp.client-ip=209.85.208.176
+	 To:Cc:Content-Type; b=TXzExi3QYBtOgqytuCLlrKpkE2msq5tq/SImhMICMsJMQe4ARHZ3a/bcDVch5h4xN6LmsxuKXfHf4fnm2PziKYecjo8ksy//8w5AKWnoBMSWNkc+QZvmYd+bqO8jRmTf47uDuqIHUQRjVB+w3YRyhf54MWbn0XQsJO5UaLUtNe8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bS+9wkdO; arc=none smtp.client-ip=209.85.208.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RbsVmKtp"
-Received: by mail-lj1-f176.google.com with SMTP id 38308e7fff4ca-2f025b94e07so13148151fa.0;
-        Thu, 15 Aug 2024 09:32:55 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bS+9wkdO"
+Received: by mail-lj1-f176.google.com with SMTP id 38308e7fff4ca-2eeb1ba040aso15814831fa.1;
+        Thu, 15 Aug 2024 09:38:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1723739574; x=1724344374; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1723739937; x=1724344737; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=7YPHhglnz9AoIQWEr0RxYjspKNhJlZykA7F7KTO9WhY=;
-        b=RbsVmKtpqzfEAdSFoODLS/ZKbp/rkxD33hL7tXBd2bky16RREth4B2RUgtoLDjS0kO
-         6WMCnhSLLu0SixZCdKcfB5N5+G07EBDGJtLd2XZOjb1/En5SM/+xixYvh/ZphovwYrLx
-         syWUdcIYC0AQozqIoowwyF/5d/FsKrnmQX9v1LvngfTEcTnWkBE3DgbtNtcDwinAcYe6
-         nl+aPdFIHSWjiDANX1iiwc6vn0f4eFLf2OPkzOIqjyVHH+cZx9vrHsl5LhlegOChjn7J
-         EedGpTqo9I2s6QgmW54Y4dYGilyqSk5UYROVbwkikeOFk3idsYPEvqL4724yww+qs9c9
-         vkdw==
+        bh=9Ltd3dFU6KqzAIVKoCFdt6BnHRMNHVSodtgtZQ7hBEU=;
+        b=bS+9wkdOUEMCHYmDQH9702ZISnuRcZQD9aXfRQbrIR+tUtKMoazO3bZB8U3/uM8EfG
+         hZcxtFEbzlI5QvCwTOkiKNLMzC57n6nW4Z4jHhrq0zOTyQU94FHwgS8+tvYZKzVHzsTB
+         kdaApq24e63w/OtVdMWlYDhpYJkEMWOBMs0D7XjrOTMUsqCFFFZhUTE/VYtBD+wceeBN
+         dq5m4gN3TZ7w3yXx7UmUTSPFLb3hNfNSEEabT1K1wPO+Ov0RzPbCZHnDTZIiCM6QttX3
+         YVEL/RpkM6ag+9rAut20TNlNg4NXC25uDIoa+YOFBpUKQoGeZofBJ3bbE6J174wie3R2
+         p7kg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723739574; x=1724344374;
+        d=1e100.net; s=20230601; t=1723739937; x=1724344737;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=7YPHhglnz9AoIQWEr0RxYjspKNhJlZykA7F7KTO9WhY=;
-        b=G4LfaYeQ8W1NB0ytCBjecMN+iwPV0tvFMIWcXggngbM7dWd0cJ9AMjwVpSNj1CineS
-         pLJUj1WF5D6ZMQorlpM6WaLmecgCx+72aOul4/Y1Wbo9AlOwsuLDVezVth7sJqoC0udm
-         ZWwZFVw+jMKjaatLPsPMFOgppFe/QqtmzhFz5sLSOQ0o7ScTBRbQqBY7IF3SOPWGGWuz
-         tSExYm3mfA/cmSD/eVATiY5GLlYpwCCwlMZX33QW1aiX7SbCol9nLwCRUtZyi5QZWA5U
-         d4GZMGDLQlENqJlkmmgKwB3BgI2ouPM9Ifmfmbv+TGuGiuTlFhEkeNTt6aGWRAEbEH/w
-         0NGg==
-X-Forwarded-Encrypted: i=1; AJvYcCU0Zd5YmHWv1Ylj7nHAB7AUr+XQHaAzX1+hfkvijHPbLEG4sNsxfT9QNiMoGSJPqOAzwJGUFdqS0oHnY6c9c59dFyO7s1fKy8gtf9j0Curfp0ArIYeUOWauk0tyDEPPeXA25qx1bbt8
-X-Gm-Message-State: AOJu0Yyk7L3yb2k8xaG4Sf5wKVcA71HoTljpOEq44LAZ7DCoud/MSG8v
-	5ulTrCdQu8qdaDq8ELcGwmDg075GNQxxaHpKOvdhBVFf/Juap2bR6zDtaNYVGRwMyy3J1ZGt/sI
-	o05+vteXQbG8hmeY32JvwkKGm99OYRT6p
-X-Google-Smtp-Source: AGHT+IHtUB/ZB9bSRJKkA5F6lU6s40qmXBUALwJKt7aJT1CtiPF7hLpDBlgVAesiIXOcCXARUeuEXrtDoHJH8LYKJlA=
-X-Received: by 2002:a2e:6111:0:b0:2ef:18ae:5cc2 with SMTP id
- 38308e7fff4ca-2f3be5a1facmr1512131fa.21.1723739573816; Thu, 15 Aug 2024
- 09:32:53 -0700 (PDT)
+        bh=9Ltd3dFU6KqzAIVKoCFdt6BnHRMNHVSodtgtZQ7hBEU=;
+        b=jXOLYc53X26b/jC8Mna2UGOOp9f7AU7lTeOmKnra3Teh52nrNjqX8gj7ktayZGiviN
+         nPWFJyInBS+2s20Fh+hDlW0bfbQhI4skFL9Wu52n2fBk7KljdzD7LLZi8f6bPZa9c9hL
+         CVBz9j+AGBG4LzswtuVr/vsvzMcrMPzFxro/UOJtD0GL9y1xgVgppAL3ych8cGC1JTDC
+         6t94BZI5pW6wYJIZNJ6dyr6/kVA7L5auv48Mp9k7thlJJ5W0Y/LYCt10xYT5TWpkRLqj
+         tJoHM56dXF42gHf6Awrb/DnPXcDFV2GuLnoY8Xq9qLgMqh5E/0Un7asEus7FaptyY/Yj
+         zvtA==
+X-Forwarded-Encrypted: i=1; AJvYcCWnYHJ32yI1iD6FvStuYSS88GeNVBml9yXGzUZJAIR4isPAhO/r4h6PCWh8IShdUBjayXtSum0BZeXNz0A4ADsrMme4VkYo4AV2KdWzhIlUzqf+sE+bQux6aq8uyLldHk0bnZsIzDyF
+X-Gm-Message-State: AOJu0Yx/FQxw/EmlgOYbtcZHOIzb3b7IecgP3tn5m33TuN6N8jbbic25
+	X2IevQDqHa4rWJCynTRV8XX9Cxfkww2wXOoZM96Q4qqcx1OnKQeE0bW65uj0Tu3qBqiRCPjbp6Y
+	95NvizR/DAuwTxh68OaHI+UGTuLU=
+X-Google-Smtp-Source: AGHT+IEPAiMG52d+sNXUkj37HOpXZNaWzXULpUX+4pMpK4o+YycvgJ7DOpBMrO/IEc/lS8CKyKbZLiITro2+S9KN8fE=
+X-Received: by 2002:a2e:f01:0:b0:2ef:2b1f:6c4a with SMTP id
+ 38308e7fff4ca-2f3be5f7d90mr1499291fa.30.1723739936106; Thu, 15 Aug 2024
+ 09:38:56 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -60,11 +60,11 @@ References: <20240807210103.142483-1-luiz.dentz@gmail.com> <172308842863.2761812
  <CABBYNZ+ERf+EzzbWSz3nt2Qo2yudktM_wiV5n3PRajaOnEmU=A@mail.gmail.com>
  <CABBYNZJW7t=yDbZi68L_g3iwTWatGDk=WAfv1acQWY_oG-_QPA@mail.gmail.com>
  <ZrZ0BHp5-eHGcaV-@zx2c4.com> <CABBYNZ+3yMdHu77Mz-8jmEgJ-j3WPHD8r_Mhz8Qu-bTJbdspUQ@mail.gmail.com>
- <ZrZ6MUj2egxakWUT@zx2c4.com>
-In-Reply-To: <ZrZ6MUj2egxakWUT@zx2c4.com>
+ <ZrZ6MUj2egxakWUT@zx2c4.com> <CABBYNZ+usGWfFjHeO0n=ndyb4+xLZTQasAPeQM37y=2AUektYQ@mail.gmail.com>
+In-Reply-To: <CABBYNZ+usGWfFjHeO0n=ndyb4+xLZTQasAPeQM37y=2AUektYQ@mail.gmail.com>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Thu, 15 Aug 2024 12:32:40 -0400
-Message-ID: <CABBYNZ+usGWfFjHeO0n=ndyb4+xLZTQasAPeQM37y=2AUektYQ@mail.gmail.com>
+Date: Thu, 15 Aug 2024 12:38:44 -0400
+Message-ID: <CABBYNZ+1QzsPA8KzXBHoRFQdOuE5WGdJ28QYfWOOY1-HE-_a3A@mail.gmail.com>
 Subject: Re: pull request: bluetooth 2024-07-26
 To: "Jason A. Donenfeld" <Jason@zx2c4.com>
 Cc: patchwork-bot+netdevbpf@kernel.org, davem@davemloft.net, kuba@kernel.org, 
@@ -74,109 +74,127 @@ Content-Transfer-Encoding: quoted-printable
 
 Hi Jason,
 
-On Fri, Aug 9, 2024 at 4:21=E2=80=AFPM Jason A. Donenfeld <Jason@zx2c4.com>=
- wrote:
+On Thu, Aug 15, 2024 at 12:32=E2=80=AFPM Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
 >
-> On Fri, Aug 09, 2024 at 04:02:36PM -0400, Luiz Augusto von Dentz wrote:
-> > Hi Jason,
+> Hi Jason,
+>
+> On Fri, Aug 9, 2024 at 4:21=E2=80=AFPM Jason A. Donenfeld <Jason@zx2c4.co=
+m> wrote:
 > >
-> > On Fri, Aug 9, 2024 at 3:54=E2=80=AFPM Jason A. Donenfeld <Jason@zx2c4.=
-com> wrote:
+> > On Fri, Aug 09, 2024 at 04:02:36PM -0400, Luiz Augusto von Dentz wrote:
+> > > Hi Jason,
 > > >
-> > > Hi,
-> > >
-> > > On Fri, Aug 09, 2024 at 11:12:32AM -0400, Luiz Augusto von Dentz wrot=
-e:
+> > > On Fri, Aug 9, 2024 at 3:54=E2=80=AFPM Jason A. Donenfeld <Jason@zx2c=
+4.com> wrote:
+> > > >
 > > > > Hi,
 > > > >
-> > > > On Fri, Aug 9, 2024 at 10:48=E2=80=AFAM Luiz Augusto von Dentz
-> > > > <luiz.dentz@gmail.com> wrote:
+> > > > On Fri, Aug 09, 2024 at 11:12:32AM -0400, Luiz Augusto von Dentz wr=
+ote:
+> > > > > Hi,
 > > > > >
-> > > > > Hi Jakub,
-> > > > >
-> > > > > On Wed, Aug 7, 2024 at 11:40=E2=80=AFPM <patchwork-bot+netdevbpf@=
-kernel.org> wrote:
+> > > > > On Fri, Aug 9, 2024 at 10:48=E2=80=AFAM Luiz Augusto von Dentz
+> > > > > <luiz.dentz@gmail.com> wrote:
 > > > > > >
-> > > > > > Hello:
+> > > > > > Hi Jakub,
 > > > > > >
-> > > > > > This pull request was applied to netdev/net.git (main)
-> > > > > > by Jakub Kicinski <kuba@kernel.org>:
-> > > > > >
-> > > > > > On Wed,  7 Aug 2024 17:01:03 -0400 you wrote:
-> > > > > > > The following changes since commit 1ca645a2f74a4290527ae27130=
-c8611391b07dbf:
+> > > > > > On Wed, Aug 7, 2024 at 11:40=E2=80=AFPM <patchwork-bot+netdevbp=
+f@kernel.org> wrote:
 > > > > > > >
-> > > > > > >   net: usb: qmi_wwan: add MeiG Smart SRM825L (2024-08-06 19:3=
-5:08 -0700)
+> > > > > > > Hello:
 > > > > > > >
-> > > > > > > are available in the Git repository at:
+> > > > > > > This pull request was applied to netdev/net.git (main)
+> > > > > > > by Jakub Kicinski <kuba@kernel.org>:
 > > > > > > >
-> > > > > > >   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/blu=
-etooth.git tags/for-net-2024-08-07
+> > > > > > > On Wed,  7 Aug 2024 17:01:03 -0400 you wrote:
+> > > > > > > > The following changes since commit 1ca645a2f74a4290527ae271=
+30c8611391b07dbf:
+> > > > > > > >
+> > > > > > > >   net: usb: qmi_wwan: add MeiG Smart SRM825L (2024-08-06 19=
+:35:08 -0700)
+> > > > > > > >
+> > > > > > > > are available in the Git repository at:
+> > > > > > > >
+> > > > > > > >   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/b=
+luetooth.git tags/for-net-2024-08-07
+> > > > > > > >
+> > > > > > > > [...]
 > > > > > > >
-> > > > > > > [...]
+> > > > > > > Here is the summary with links:
+> > > > > > >   - pull request: bluetooth 2024-07-26
+> > > > > > >     https://git.kernel.org/netdev/net/c/b928e7d19dfd
+> > > > > > >
+> > > > > > > You are awesome, thank you!
 > > > > > >
-> > > > > > Here is the summary with links:
-> > > > > >   - pull request: bluetooth 2024-07-26
-> > > > > >     https://git.kernel.org/netdev/net/c/b928e7d19dfd
+> > > > > > Im trying to rebase on top of net-next but Im getting the follo=
+wing error:
 > > > > > >
-> > > > > > You are awesome, thank you!
+> > > > > > In file included from arch/x86/entry/vdso/vgetrandom.c:7:
+> > > > > > arch/x86/entry/vdso/../../../../lib/vdso/getrandom.c: In functi=
+on
+> > > > > > =E2=80=98memcpy_and_zero_src=E2=80=99:
+> > > > > > arch/x86/entry/vdso/../../../../lib/vdso/getrandom.c:18:17: err=
+or:
+> > > > > > implicit declaration of function =E2=80=98__put_unaligned_t=E2=
+=80=99; did you mean
+> > > > > > =E2=80=98__put_unaligned_le24=E2=80=99? [-Wimplicit-function-de=
+claration]
+> > > > > >
+> > > > > > I tried to google it but got no results, perhaps there is somet=
+hing
+> > > > > > wrong with my .config, it used to work just fine but it seems
+> > > > > > something had changed.
 > > > > >
-> > > > > Im trying to rebase on top of net-next but Im getting the followi=
-ng error:
+> > > > > Looks like the culprit is "x86: vdso: Wire up getrandom() vDSO
+> > > > > implementation", if I revert that I got it to build properly.
 > > > > >
-> > > > > In file included from arch/x86/entry/vdso/vgetrandom.c:7:
-> > > > > arch/x86/entry/vdso/../../../../lib/vdso/getrandom.c: In function
-> > > > > =E2=80=98memcpy_and_zero_src=E2=80=99:
-> > > > > arch/x86/entry/vdso/../../../../lib/vdso/getrandom.c:18:17: error=
-:
-> > > > > implicit declaration of function =E2=80=98__put_unaligned_t=E2=80=
-=99; did you mean
-> > > > > =E2=80=98__put_unaligned_le24=E2=80=99? [-Wimplicit-function-decl=
-aration]
+> > > > > @Jason A. Donenfeld since you are the author of the specific chan=
+ge
+> > > > > perhaps you can tell me what is going on, my .config is based on:
 > > > > >
-> > > > > I tried to google it but got no results, perhaps there is somethi=
-ng
-> > > > > wrong with my .config, it used to work just fine but it seems
-> > > > > something had changed.
+> > > > > https://github.com/Vudentz/BlueZ/blob/master/doc/test-runner.txt
 > > > >
-> > > > Looks like the culprit is "x86: vdso: Wire up getrandom() vDSO
-> > > > implementation", if I revert that I got it to build properly.
-> > > >
-> > > > @Jason A. Donenfeld since you are the author of the specific change
-> > > > perhaps you can tell me what is going on, my .config is based on:
-> > > >
-> > > > https://github.com/Vudentz/BlueZ/blob/master/doc/test-runner.txt
+> > > > Could you send your actual .config so I can repro?
 > > >
-> > > Could you send your actual .config so I can repro?
+> > > Here it is.
 > >
-> > Here it is.
+> > Hmm, I did a clean checkout of net-next, used this .config, and it buil=
+t
+> > just fine. Any oddities I should look into?
 >
-> Hmm, I did a clean checkout of net-next, used this .config, and it built
-> just fine. Any oddities I should look into?
+> Something is wrong with asm/unaligned.h on my system, if I do the
+> following change it builds properly:
+>
+> diff --git a/lib/vdso/getrandom.c b/lib/vdso/getrandom.c
+> index b230f0b10832..c1a18f5c6fe3 100644
+> --- a/lib/vdso/getrandom.c
+> +++ b/lib/vdso/getrandom.c
+> @@ -10,7 +10,7 @@
+>  #include <vdso/getrandom.h>
+>  #include <asm/vdso/getrandom.h>
+>  #include <asm/vdso/vsyscall.h>
+> -#include <asm/unaligned.h>
+> +#include <asm-generic/unaligned.h>
+>  #include <uapi/linux/mman.h>
+>
+>  #define MEMCPY_AND_ZERO_SRC(type, dst, src, len) do {
+>          \
+>
+> My system is based on meteor lake, not sure if that is affecting the
+> build with a mix of LP+E+P cores?
 
-Something is wrong with asm/unaligned.h on my system, if I do the
-following change it builds properly:
+Sorry for the noise, it seems that there is some leftover when I
+switch branches since on bluetooth-next I do have
+./arch/x86/include/asm/unaligned.h but on net-next that was removed
+but it was still left on the tree for some reason.
 
-diff --git a/lib/vdso/getrandom.c b/lib/vdso/getrandom.c
-index b230f0b10832..c1a18f5c6fe3 100644
---- a/lib/vdso/getrandom.c
-+++ b/lib/vdso/getrandom.c
-@@ -10,7 +10,7 @@
- #include <vdso/getrandom.h>
- #include <asm/vdso/getrandom.h>
- #include <asm/vdso/vsyscall.h>
--#include <asm/unaligned.h>
-+#include <asm-generic/unaligned.h>
- #include <uapi/linux/mman.h>
-
- #define MEMCPY_AND_ZERO_SRC(type, dst, src, len) do {
-         \
-
-My system is based on meteor lake, not sure if that is affecting the
-build with a mix of LP+E+P cores?
-
-> Jason
+> > Jason
+>
+>
+>
+> --
+> Luiz Augusto von Dentz
 
 
 
