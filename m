@@ -1,76 +1,106 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-20.smtp.github.com (out-20.smtp.github.com [192.30.252.203])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9733B1DDF5
-	for <linux-bluetooth@vger.kernel.org>; Thu, 15 Aug 2024 19:40:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDD4914386C
+	for <linux-bluetooth@vger.kernel.org>; Thu, 15 Aug 2024 20:08:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.203
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723750831; cv=none; b=WJAVV7uHHU1JksbU7ka/09U6t/NdU3E9ibyCbCRYE9M6TMP8RXG/as1FlCrzVYrOFyF/II8W+dVsS7HMn//oRv+RA63HdlWsAxWeP0ekAocDw/2gZdIwjMQ+pvinYVcQgWUIgcxSk/zKieNwGwkhu1h3Qyn8hc+vtqxMY8X3/qg=
+	t=1723752528; cv=none; b=iyGY0SQIIcua4YEIp3Wp+ZB5TKrhKd3NmoNZlPdlYi2+kDvDNy13qLLLOU5lILpUeZ9fXD/x1XPw2uITDSa6A+wTO4w7piqk7V279NBtZYeVe2Ljqt1ajlf0F2+ptEagapMW5B89eiVGNXrLPF1XXmocSpH+y73o9YJKCT9I7Wo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723750831; c=relaxed/simple;
-	bh=Z2R3PVs2T5R8SIO/9btlI/z+bNOvuvBwhQnbxjFMjRQ=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=hRX2X3uFn/ThsRC0qelul6o3CrJmj1LpnbgfI14pVD3kEA/hkCggJuxyXKtM/pwMTmdgLQUJjyU0WbeBx7T78h4tdoJ7dTHeL0v+U0Dbc3xZlEmrUPLENIFhWMeD3yjoBRU8zRKVzubdyCvUmXiN8J2xkbFBsTTRy2zcdEwDnWY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZzfCGcCI; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1723752528; c=relaxed/simple;
+	bh=LESBeNJERwcziPANP+JxgtOTk8++pX6tLVbolxnd+jg=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=OX6KE5iDKCEgSG+Qevw1F0TjvCaGkmqKJwiVJ91oip1FLNNO3zuG8yzEQn3+yPHv+GZtwtMjoQwq8j24FI+jNrJV44V460PaZa4pPkOZyRPdxMpRzqOrI35k+U7om0UIl5daz8qfLae1k3nFzlbNkcZy7z4JeijuMvpHL2Jz6GU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=XL2jORtb; arc=none smtp.client-ip=192.30.252.203
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZzfCGcCI"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 74F92C4AF0D;
-	Thu, 15 Aug 2024 19:40:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1723750831;
-	bh=Z2R3PVs2T5R8SIO/9btlI/z+bNOvuvBwhQnbxjFMjRQ=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=ZzfCGcCIEUZ841apqBvRwZj3du3B3QzSo/n4jFL8G6vM9ODAEdAmxVB7rqLzct0Hs
-	 o+P+1Nu7RfrxsMc2Lz1+TGTQwin8YFTLiojYUjbSyszxjqqDl+z+8/5lcZSlFLC9YJ
-	 mSZLYEWYTAErVgwE+hFR2knwAWzKigZMidvW7wRwU/29KlXb/cY768F4+VJUf/MqWQ
-	 QyjcaSP3mv8ABZbzkhkNrxD91fl/9dBdgQt1VDtytHWVFR3N3z9ZkwbeKfxNb6/d7J
-	 sOHoKFoWXlwp/n4hpYt332oujlTVd1vs93AoqsvWYRsUM5b9mFwN/9LFVb7JqT8g4o
-	 hLnuR+62wBphw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAC7D382327A;
-	Thu, 15 Aug 2024 19:40:31 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="XL2jORtb"
+Received: from github.com (hubbernetes-node-6350b8c.va3-iad.github.net [10.48.153.33])
+	by smtp.github.com (Postfix) with ESMTPA id A7D148C05AF
+	for <linux-bluetooth@vger.kernel.org>; Thu, 15 Aug 2024 13:08:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1723752525;
+	bh=MbXFQnl7lncNUIod0Tz6xKoXVGiOOHLVrlZLSerWCF0=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=XL2jORtbim/Lra8dJCV8BvpgMD819bn5YfmcFWbKAQwZBFIw+D1yjKitX53kQNPYo
+	 fHK4Xy2dPDH5BCLUaYeOxftPjWK0UxceRNfvFIP1Pi69yzclQbKbNjLA7d9Mtmtkmg
+	 MhVgcc5rbuX6D7qbT+MLDIvz44ZTc/pqAXGB2YJM=
+Date: Thu, 15 Aug 2024 13:08:45 -0700
+From: Luiz Augusto von Dentz <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/master/537e39-939133@github.com>
+Subject: [bluez/bluez] 3b7f4b: test-uhid: Add support for device specific
+ testing
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH BlueZ v1] test-uhid: Add support for device specific testing
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <172375083048.2993361.11521678841465830178.git-patchwork-notify@kernel.org>
-Date: Thu, 15 Aug 2024 19:40:30 +0000
-References: <20240814151135.725001-1-luiz.dentz@gmail.com>
-In-Reply-To: <20240814151135.725001-1-luiz.dentz@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-Hello:
+  Branch: refs/heads/master
+  Home:   https://github.com/bluez/bluez
+  Commit: 3b7f4b4d3c83bc1c302a56f0eaa7c2b842e014d7
+      https://github.com/bluez/bluez/commit/3b7f4b4d3c83bc1c302a56f0eaa7c2b842e014d7
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2024-08-14 (Wed, 14 Aug 2024)
 
-This patch was applied to bluetooth/bluez.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+  Changed paths:
+    M unit/test-uhid.c
 
-On Wed, 14 Aug 2024 11:11:35 -0400 you wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> 
-> This enables device specific testing and switch to run
-> bt_uhid_new_default when running as root so the actual kernel driver is
-> used:
-> 
-> input: MX Anywhere 3 as /devices/virtual/misc/uhid/0005:046D:B025.0031/input/input86
-> logitech-hidpp-device 0005:046D:B025.0031: input,hidraw10: BLUETOOTH HID v0.14 Mouse [MX Anywhere 3] on 00:00:00:00:00:00
-> 
-> [...]
+  Log Message:
+  -----------
+  test-uhid: Add support for device specific testing
 
-Here is the summary with links:
-  - [BlueZ,v1] test-uhid: Add support for device specific testing
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=3b7f4b4d3c83
+This enables device specific testing and switch to run
+bt_uhid_new_default when running as root so the actual kernel driver is
+used:
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+input: MX Anywhere 3 as /devices/virtual/misc/uhid/0005:046D:B025.0031/input/input86
+logitech-hidpp-device 0005:046D:B025.0031: input,hidraw10: BLUETOOTH HID v0.14 Mouse [MX Anywhere 3] on 00:00:00:00:00:00
 
 
+  Commit: c315b42e053892e623dc8a755a278d369d910291
+      https://github.com/bluez/bluez/commit/c315b42e053892e623dc8a755a278d369d910291
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2024-08-14 (Wed, 14 Aug 2024)
+
+  Changed paths:
+    M doc/org.bluez.Device.rst
+    M src/device.c
+
+  Log Message:
+  -----------
+  device: Promote Device.{AdvertisingData, AdvertisingFlags} to stable
+
+This promotes AdvertisingData and AdvertisingFlags to stable so they can
+be used by upper layers without having to enable experimental.
+
+
+  Commit: 9391332938293b37cd29013dde65fdeeec614b5d
+      https://github.com/bluez/bluez/commit/9391332938293b37cd29013dde65fdeeec614b5d
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2024-08-14 (Wed, 14 Aug 2024)
+
+  Changed paths:
+    M src/adapter.c
+
+  Log Message:
+  -----------
+  adapter: Create devices if they are connectable
+
+Rather than just depend on discoverable also check if the device is
+considered connectable since upper layers shall now be able to use
+AdvertisingFlags to detect when a device shall be considered visible
+or not and bluetoothctl has been using it since commit 815f779aa8e4
+("client: Use AdvertisingFlags when available").
+
+
+Compare: https://github.com/bluez/bluez/compare/537e399aa096...939133293829
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
