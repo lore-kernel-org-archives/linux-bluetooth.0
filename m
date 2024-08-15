@@ -1,125 +1,153 @@
-Received: from fout2-smtp.messagingengine.com (fout2-smtp.messagingengine.com [103.168.172.145])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo1-f46.google.com (mail-oo1-f46.google.com [209.85.161.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 047097DA9B;
-	Thu, 15 Aug 2024 11:51:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.145
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34F621714CC
+	for <linux-bluetooth@vger.kernel.org>; Thu, 15 Aug 2024 12:44:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723722689; cv=none; b=RBLQiLiFYrGY9cKx9R89BSRRHXV5PTWn+SYPHhfMKo2qw7ItREGGHvQNg4ujTuf6cbNz+QOKXarncMcrIYv2+eVJuXW5Ay1M8B2ROaKLlsXiRF6/EmAP6Km3oTaHnOg9Pj1m8gCRs1ymB8AroUS3RRArlSLfI4C68WeRVs353c4=
+	t=1723725868; cv=none; b=ETtHRDQ5IGx3ZdgV6ykbRrV/va5nX5HcBQ2+Fm55bESQyoHVb7tFJtEhnP4pyvHaN2YMoLZlrTaRpCgz0f2Mb19vLfYYyjp9Ma1g5cLdKvH3rF2e48qaNnuxntQpS2JYxt6WV2fbhNGqK3BwoHvXabheZYrqbLYCteTB3s67Scg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723722689; c=relaxed/simple;
-	bh=kGuVMJqQ7fJH5gwvQiMwjdCOEknsUjuW3RN+kRtocuY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=kuxrZUC0nTBFL00Zu/iNFn3A0Ypv7j+WUq0xGTCwbqNmvFzxW5+gNBoIUh0phL5U4LuEjj5JYB3ELNgmNwRlGE6E6foCfoLUJD/WUYSDeznY60u4stL0bHdm4XYfRbFi4VIQPCQ0wB8SkHPVAlKUctepFEah1kFCaNcrCofkTJE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=kroah.com; spf=pass smtp.mailfrom=kroah.com; dkim=pass (2048-bit key) header.d=kroah.com header.i=@kroah.com header.b=RjpgfACH; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=XUQLCVsw; arc=none smtp.client-ip=103.168.172.145
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=kroah.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kroah.com
+	s=arc-20240116; t=1723725868; c=relaxed/simple;
+	bh=GT8PGOSe7AUf5wUUxMJDpN0F01cuiFwxg0EVhP82AtQ=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=pR39Xo/pBPg4uw7CIM/BZxIN93WbU9cNM0OPsxBCc6qose8EmZTbbGyBz1aWTM12ZAeiHZyBK7JYmrxnoPWEyf/ZyOFaiVs7lyqz3eRP+tW6UTsGFeWD0ohXvLlhCrjP237RuClrXp/Cc/lQGgGMd9H4TGZM7temCnk78MxCZ0c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jm9B5uTD; arc=none smtp.client-ip=209.85.161.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kroah.com header.i=@kroah.com header.b="RjpgfACH";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="XUQLCVsw"
-Received: from phl-compute-06.internal (phl-compute-06.nyi.internal [10.202.2.46])
-	by mailfout.nyi.internal (Postfix) with ESMTP id F0654138FFCF;
-	Thu, 15 Aug 2024 07:51:26 -0400 (EDT)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-06.internal (MEProxy); Thu, 15 Aug 2024 07:51:26 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kroah.com; h=cc
-	:cc:content-transfer-encoding:content-type:date:date:from:from
-	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
-	:to; s=fm3; t=1723722686; x=1723809086; bh=PqqsNeWnq9+9Q5vizD6sw
-	F9qbRHy40p4oTWpwRdJXlw=; b=RjpgfACHakte+aKMFcWvMs77pzX/HR16ynvY4
-	kPVYOWyYSGw5cNKT+AjMEXnCufVqQ95Dz7Lzr/dfa5v9cROY0B4C4aqtXbattAZH
-	SaNrV+OkVFE213EoZNi7GnXy1XY1hwdgRiAzEjklI88udercsfNZc5y6nHaenHD5
-	CxqRMzKPKRzKqZH7kIqQRzS55idPpCWtQboCNwTwQzNla8AWJXu1pV8Y70dOHsBa
-	rvRKzlZfeqdLuY/bpKZRBat2k99uDR5fcoDvwNPZDtx2d8cDweuZbA71Jr/HrN4E
-	PBZdcZ9VURYLZ/RVRjL3MR9x++PJXsAe6tpk6maB0B5/pQsNA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:date:date:feedback-id:feedback-id:from:from
-	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
-	fm3; t=1723722686; x=1723809086; bh=PqqsNeWnq9+9Q5vizD6swF9qbRHy
-	40p4oTWpwRdJXlw=; b=XUQLCVsw8/1fxDAfGvYU4rdbLgGGJS/eW+1cwnnH90yA
-	jHAeOLwE/69TPW1dspRxaNOq9CBzYtjR/a7Ud8LXV5/DPbhqBQSM5kvqs0fUjdUg
-	vf/y9H/WpCKUgg/xVGefIbBMIEfWcherxdeyKGBgsPwRBoe7iQCFJD2tFNW3A7th
-	dawp0WWq+4lDKIp32ajs56kLL5oQcIQKYh4K6GaiCujjvUThBIl5fYvScZxBcs5+
-	RG4APU6AD0bEquMtOfgqoLLUEn8/lduTgD1WDITlZLKoXIDv3jgi2f9r8l/HaIm5
-	TpvtYTjIAM+3v7sn759Y+yQ9fTp9HKXV+APMnhnzAw==
-X-ME-Sender: <xms:vuu9ZtTTdYKidud_h-I3eflimt-ElnCZAr8AMezQuCerjnzsiR5kBw>
-    <xme:vuu9ZmzF4c_ZNCZGcnYsBvG0CRYJcdySGaUGcNHT4fR8Xs6KTslwGv-EGRvEj-3uy
-    VvfN8JfBmB2-ak>
-X-ME-Received: <xmr:vuu9Zi1vcPmzM0AAe7QvuiAPmlFLPjdJ6K0WfTKQw_M_rJWZmFDo31ZbOI_X2LhWF5LHdbHgY8-AughU386zd0-My_KDgo1MoXLkE4E-82sKZKOT>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeftddruddtiedggeefucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggvpdfu
-    rfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnh
-    htshculddquddttddmnecujfgurhephffvvefufffkofgggfestdekredtredttdenucfh
-    rhhomhepifhrihhffhhinhcumfhrohgrhhdqjfgrrhhtmhgrnhcuoehgrhhifhhfihhnse
-    hkrhhorghhrdgtohhmqeenucggtffrrghtthgvrhhnpeekvdfhkefgtdeugfelueejffel
-    ueeludegieejtedtveekteetieehkedvkeevleenucevlhhushhtvghrufhiiigvpedtne
-    curfgrrhgrmhepmhgrihhlfhhrohhmpehgrhhifhhfihhnsehkrhhorghhrdgtohhmpdhn
-    sggprhgtphhtthhopeekpdhmohguvgepshhmthhpohhuthdprhgtphhtthhopehmrghrtg
-    gvlheshhholhhtmhgrnhhnrdhorhhgpdhrtghpthhtohepjhhohhgrnhdrhhgvuggsvghr
-    ghesghhmrghilhdrtghomhdprhgtphhtthhopehluhhiiidruggvnhhtiiesghhmrghilh
-    drtghomhdprhgtphhtthhopehlihhnuhigqdgslhhuvghtohhothhhsehvghgvrhdrkhgv
-    rhhnvghlrdhorhhgpdhrtghpthhtoheplhhinhhugidqkhgvrhhnvghlsehvghgvrhdrkh
-    gvrhhnvghlrdhorhhgpdhrtghpthhtohepghhrihhffhhinheskhhrohgrhhdrtghomhdp
-    rhgtphhtthhopeiihhgrnhegieeftdesphhurhguuhgvrdgvughupdhrtghpthhtohepsh
-    htrggslhgvsehkvghrnhgvlhdrohhrgh
-X-ME-Proxy: <xmx:vuu9ZlAwIQHQ6M6ROilKnHNgSxjatC0vDIkzzBD0sAMf3D_zoDQa7g>
-    <xmx:vuu9Zmg2jXKlQx9UbRgG0sOwPhjxkCS-aWcsdC9tYtNeXykNKPtz1g>
-    <xmx:vuu9Zpo2yH38Lj1vrMjRpYYyc01SZb9-MaHpgLp-S0-OrWyb-e_Yiw>
-    <xmx:vuu9Zhgt48OOf-zFlKV3D7hlNrgrySTaBrk1Y2V62xhWWkS8jniJFw>
-    <xmx:vuu9ZvV8fa7cOl7sEDGjktgX_p_K__cT1T1Ahq3E1ubS6Cofk7JFslMZ>
-Feedback-ID: i1d2843be:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
- 15 Aug 2024 07:51:25 -0400 (EDT)
-From: Griffin Kroah-Hartman <griffin@kroah.com>
-To: marcel@holtmann.org,
-	johan.hedberg@gmail.com,
-	luiz.dentz@gmail.com
-Cc: linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Griffin Kroah-Hartman <griffin@kroah.com>,
-	Yiwei Zhang <zhan4630@purdue.edu>,
-	Stable <stable@kernel.org>
-Subject: [PATCH] Bluetooth: MGMT: Add error handling to pair_device()
-Date: Thu, 15 Aug 2024 13:51:00 +0200
-Message-ID: <20240815115100.13100-1-griffin@kroah.com>
-X-Mailer: git-send-email 2.46.0
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jm9B5uTD"
+Received: by mail-oo1-f46.google.com with SMTP id 006d021491bc7-5d5e1c86b83so532718eaf.3
+        for <linux-bluetooth@vger.kernel.org>; Thu, 15 Aug 2024 05:44:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1723725865; x=1724330665; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=nXgRiFDM4//7RmW1xvDIk4YDY+fqAfCZ6vd7pMEfDxs=;
+        b=jm9B5uTDp4Y+4G0L7k+ODp+NSE8Fs1dBltqbUUz7WsYEvO75q5gLBEva4bhj/Fb/qv
+         FEgHQDCOmeZt73cjCr41tqFrQ/Au6Pd+M6pzd0slU+wG95aaL4H7sgfiEgLraJ9LZSjA
+         R/ThfokEncS9iqfQJdnxu752J71koPancUAj7rcbAq2N9wLGOhJ5w7WecvWxv18u/RmJ
+         LJmIRBd70vtcf7HKRQF+k11ChBkB53SGb/deTUO00NJ7hD4yqd9tjZWM1ry3lQ0SRZIQ
+         EwijXmlvo/7RmrzeweP1zAG2VDRf8Mt8R6vQQEFgKTcc2Rj1JpjFNL14VlwSKFNgrfYO
+         uBtA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723725865; x=1724330665;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=nXgRiFDM4//7RmW1xvDIk4YDY+fqAfCZ6vd7pMEfDxs=;
+        b=wVkjQRY5yys1C0GlMf4klh077WNFDvYESuBYopGWcqv0iUMne0GLBCK94dHL5xQVmK
+         DDA0hKXI5MDshMs+Nux0PL0HZf8v37YWwmxrIN8wh6An+08so29b9F50NMFnhKCPr+A1
+         3Ix7F0SUUPXtH1WflUZ7pxvQIHttdWcW5SRNzO9TAytHO7eV9rKm/rGZGT5qSWSYeBK0
+         7QCZGOfO1YXQFRb6wt0DH9r4Xg4X8xGp8uxtCem26+Dg2WPjQ0hp7FeyDS6GBG0aZJFe
+         WEGxi7WwsIyxxVpbAhzKMsoJfZcbDRwa98XxzBWSto6+6DQTJn2d0boqMvoS0WU2+MX2
+         MhGQ==
+X-Gm-Message-State: AOJu0YxJ2EMjJH1gDzlobPfZZTyRM0g+Ji/85HNAbVkN5iw89O/p+oFR
+	hQlz2Y/pAwa30IbPOpI6iTm7J0VPz/HUrlclTXuiZKnI8bXbl5IihrOsVQ==
+X-Google-Smtp-Source: AGHT+IEtpnS7x869Q7lp41SsNlpnf1Mljj9rh40qmTkNPFqHNi04kRbwm4PMRbJAPC+nSbBoPl0fjw==
+X-Received: by 2002:a05:6359:410d:b0:1ac:ed54:224d with SMTP id e5c5f4694b2df-1b1aab56a74mr721901555d.11.1723725864887;
+        Thu, 15 Aug 2024 05:44:24 -0700 (PDT)
+Received: from [172.17.0.2] ([20.51.198.170])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7a4ff06a25bsm60171985a.54.2024.08.15.05.44.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 15 Aug 2024 05:44:24 -0700 (PDT)
+Message-ID: <66bdf828.050a0220.33278.1bbd@mx.google.com>
+Date: Thu, 15 Aug 2024 05:44:24 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============4194014235563274294=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, griffin@kroah.com
+Subject: RE: Bluetooth: MGMT: Add error handling to pair_device()
+In-Reply-To: <20240815115100.13100-1-griffin@kroah.com>
+References: <20240815115100.13100-1-griffin@kroah.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
+--===============4194014235563274294==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=879977
+
+---Test result---
+
+Test Summary:
+CheckPatch                    FAIL      0.86 seconds
+GitLint                       PASS      0.31 seconds
+SubjectPrefix                 PASS      0.12 seconds
+BuildKernel                   PASS      29.83 seconds
+CheckAllWarning               PASS      32.48 seconds
+CheckSparse                   PASS      38.47 seconds
+CheckSmatch                   PASS      103.32 seconds
+BuildKernel32                 PASS      29.29 seconds
+TestRunnerSetup               PASS      531.73 seconds
+TestRunner_l2cap-tester       PASS      20.33 seconds
+TestRunner_iso-tester         PASS      35.43 seconds
+TestRunner_bnep-tester        PASS      4.95 seconds
+TestRunner_mgmt-tester        FAIL      114.42 seconds
+TestRunner_rfcomm-tester      PASS      7.54 seconds
+TestRunner_sco-tester         PASS      15.23 seconds
+TestRunner_ioctl-tester       PASS      8.10 seconds
+TestRunner_mesh-tester        PASS      5.98 seconds
+TestRunner_smp-tester         PASS      7.01 seconds
+TestRunner_userchan-tester    PASS      5.14 seconds
+IncrementalBuild              PASS      28.70 seconds
+
+Details
+##############################
+Test: CheckPatch - FAIL
+Desc: Run checkpatch.pl script
+Output:
+Bluetooth: MGMT: Add error handling to pair_device()
+WARNING: Prefer a maximum 75 chars per line (possible unwrapped commit description?)
+#118: 
 hci_conn_params_add() never checks for a NULL value and could lead to a NULL
-pointer dereference causing a crash.
 
-Fixed by adding error handling in the function.
-
+WARNING: Reported-by: should be immediately followed by Closes: with a URL to the report
+#123: 
 Reported-by: Yiwei Zhang <zhan4630@purdue.edu>
 Cc: Stable <stable@kernel.org>
-Fixes: 5157b8a503fa ("Bluetooth: Fix initializing conn_params in scan phase")
-Signed-off-by: Griffin Kroah-Hartman <griffin@kroah.com>
+
+WARNING: Invalid email format for stable: 'Stable <stable@kernel.org>', prefer 'stable@kernel.org'
+#124: 
+Cc: Stable <stable@kernel.org>
+
+total: 0 errors, 3 warnings, 0 checks, 10 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/src/13764703.patch has style problems, please review.
+
+NOTE: Ignored message types: UNKNOWN_COMMIT_ID
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+##############################
+Test: TestRunner_mgmt-tester - FAIL
+Desc: Run mgmt-tester with test-runner
+Output:
+Total: 492, Passed: 489 (99.4%), Failed: 1, Not Run: 2
+
+Failed Test Cases
+LL Privacy - Remove Device 4 (Disable Adv)           Timed out    2.573 seconds
+
+
 ---
- net/bluetooth/mgmt.c | 4 ++++
- 1 file changed, 4 insertions(+)
+Regards,
+Linux Bluetooth
 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 40d4887c7f79..25979f4283a6 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -3456,6 +3456,10 @@ static int pair_device(struct sock *sk, struct hci_dev *hdev, void *data,
- 		 * will be kept and this function does nothing.
- 		 */
- 		p = hci_conn_params_add(hdev, &cp->addr.bdaddr, addr_type);
-+		if (!p) {
-+			err = -EIO;
-+			goto unlock;
-+		}
- 
- 		if (p->auto_connect == HCI_AUTO_CONN_EXPLICIT)
- 			p->auto_connect = HCI_AUTO_CONN_DISABLED;
--- 
-2.46.0
 
+--===============4194014235563274294==--
