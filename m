@@ -1,157 +1,181 @@
-Received: from inva021.nxp.com (inva021.nxp.com [92.121.34.21])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31AF3A957;
-	Fri, 16 Aug 2024 06:50:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=92.121.34.21
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44A6313DBBC
+	for <linux-bluetooth@vger.kernel.org>; Fri, 16 Aug 2024 07:47:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723791032; cv=none; b=FIPNZbYUUYxj5tC8ackMNQxjedd7KTRqp272g0Vzt2dS8YZ+QiKw+sxT3JNHVX1hpQ7OY9lDvTXmkR43/3R8fH8G3KOwM9D02M62oGdMAJHVomXqtmm/663F4lOuTVij250fq+oj5RkKdOENar4Be10+6VP884UiU3oQi3fgj00=
+	t=1723794429; cv=none; b=rQsAf2OPxNcPYzRRuGO1AADtjCivznQR6nfuZStzeW1XGI+xyzkaVW7m+Je5d84HmqiBbhWBY2Ds3quC43QNpRQ9LqkhqOH55p9b3pYJ+LKISHM+60K0+son/QX9r668lVaoXOGQmy+Z1v7TUm+pT9VhNAreJQ0AMOXxDrqrCUA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723791032; c=relaxed/simple;
-	bh=IaCxeUGRxOzR+2EH9a4OSRud8kn6GhunpGvBvmz1HG0=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=TCqlTKhuRlkOEEfeD3/wy+4n+4uiAk1PyeM64q5iA967Z92aMFqStjDghVzd6JONIWV9EPWAjv7rUZoQGGXvMQO3UMkrEbRGpWkAtRWRw0Q6musvHJQmgv5Ll3kGbI8lvkEBMRS+zYdaMcORPQJC1IdZ7rQSWwIasNSbKTsnEOo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; arc=none smtp.client-ip=92.121.34.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
-Received: from inva021.nxp.com (localhost [127.0.0.1])
-	by inva021.eu-rdc02.nxp.com (Postfix) with ESMTP id 45337200D6B;
-	Fri, 16 Aug 2024 08:50:12 +0200 (CEST)
-Received: from aprdc01srsp001v.ap-rdc01.nxp.com (aprdc01srsp001v.ap-rdc01.nxp.com [165.114.16.16])
-	by inva021.eu-rdc02.nxp.com (Postfix) with ESMTP id D78A5202C97;
-	Fri, 16 Aug 2024 08:50:11 +0200 (CEST)
-Received: from pe-lt8779.in-pnq01.nxp.com (pe-lt8779.in-pnq01.nxp.com [10.17.104.141])
-	by aprdc01srsp001v.ap-rdc01.nxp.com (Postfix) with ESMTP id 7AA16181D0FD;
-	Fri, 16 Aug 2024 14:50:10 +0800 (+08)
-From: Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>
-To: marcel@holtmann.org,
-	luiz.dentz@gmail.com
-Cc: linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	amitkumar.karwar@nxp.com,
-	rohit.fule@nxp.com,
-	neeraj.sanjaykale@nxp.com,
-	sherry.sun@nxp.com,
-	ziniu.wang_1@nxp.com,
-	haibo.chen@nxp.com,
-	LnxRevLi@nxp.com
-Subject: [PATCH v1] Bluetooth: btnxpuart: Fix random crash seen while removing driver
-Date: Fri, 16 Aug 2024 12:17:51 +0530
-Message-Id: <20240816064751.284786-1-neeraj.sanjaykale@nxp.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1723794429; c=relaxed/simple;
+	bh=BMi6EXAjyH7mAjAAXcgWfMaTrqeIQj1w3EGqmiC0nQI=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:CC:References:
+	 In-Reply-To:Content-Type; b=EdFE8wL8eyBze73OtJlM2FvRcFrAIXsF/nNw13EUbpn8kaD1PW6mSSF3d3cfA6yG13CNq8RVFxuNi7JIOlaEBiLbyuVqJn6o2KS6LS098yhkZA6J4nsUvGCyvWS3c1b4PDWxtHw48MbzH8fSiA82tIEbbV1P0F4LXPURA8NTf3g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=o9wEYulV; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="o9wEYulV"
+Received: from pps.filterd (m0279871.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 47G5r1Vx001511;
+	Fri, 16 Aug 2024 07:46:56 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	WR3DluiHSXeAEeVlyI0ZkP1HOTjz1zm4W6//FturMD4=; b=o9wEYulVVrOJXdC2
+	1wHk+nYzLjk4PWp2H9uyHNGPEIlrgNRIDWLEyCIAGMdMmPupRrx17i4EZ246BYT5
+	mR1tdGjljsRUBIM2hUjzi6JGz8khGEpYNWZG7Ix59MIid7pbZ2qkCQuT3HdVDY7d
+	k9XVdnxoEoJZ0YP9HvKiyXD4JCFN3xwkW+DpDl1Q2wBJi7kAwyqtqMm4Uim+zXyq
+	f9KasMOL7t9HlfmpIBzu62VPEMxlg0XnBn0cAawV/w97hIF1Y4uC/tVsWVhc6rvy
+	AbGcgU2Uop3gxC/GrMHJurY0SfW6WtQp8NP+lBrQ/rcUqrAWEhTK6PTs5L6SzgXd
+	jV28Pg==
+Received: from nalasppmta02.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4104381k09-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 16 Aug 2024 07:46:56 +0000 (GMT)
+Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
+	by NALASPPMTA02.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 47G7ks30024834
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 16 Aug 2024 07:46:54 GMT
+Received: from [10.219.0.111] (10.80.80.8) by nalasex01c.na.qualcomm.com
+ (10.47.97.35) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Fri, 16 Aug
+ 2024 00:46:52 -0700
+Message-ID: <70f65184-e263-465d-a627-d9a1bf3b03d4@quicinc.com>
+Date: Fri, 16 Aug 2024 13:16:49 +0530
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] build: obexd: Add system bus support for obexd
+From: Damodar Reddy GangiReddy <quic_dgangire@quicinc.com>
+To: Paul Menzel <pmenzel@molgen.mpg.de>
+CC: <quic_mohamull@quicinc.com>, <quic_hbandi@quicinc.com>,
+        <quic_anubhavg@quicinc.com>, <linux-bluetooth@vger.kernel.org>
+References: <20240723075455.2934376-1-quic_dgangire@quicinc.com>
+ <7c427210-24ad-4769-9c11-aaebe9656cec@molgen.mpg.de>
+ <89308a3b-c4b2-4dad-89df-aef86c53a5e8@quicinc.com>
+Content-Language: en-US
+In-Reply-To: <89308a3b-c4b2-4dad-89df-aef86c53a5e8@quicinc.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
-X-Virus-Scanned: ClamAV using ClamSMTP
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nalasex01c.na.qualcomm.com (10.47.97.35)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: kARhwhiKhP_19DkpCvvTPX2DW-6g6E4h
+X-Proofpoint-GUID: kARhwhiKhP_19DkpCvvTPX2DW-6g6E4h
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-08-15_18,2024-08-15_01,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 clxscore=1011
+ mlxlogscore=999 malwarescore=0 lowpriorityscore=0 phishscore=0 spamscore=0
+ bulkscore=0 suspectscore=0 adultscore=0 mlxscore=0 priorityscore=1501
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2407110000
+ definitions=main-2408160055
 
-This fixes the random kernel crash seen while removing the driver, when
-running the load/unload test over multiple iterations.
-The ps_wakeup() call in btnxpuart_close() schedules the psdata->work(),
-which gets scheduled after module is removed, causing a kernel crash.
+Hi Paul,
 
-The new ps_cleanup() deasserts UART break immediately while closing
-serdev device, cancels any scheduled ps_work and destroys the ps_lock
-mutex.
+Can you please provide your inputs/comments on the whole patch.
+https://patchwork.kernel.org/project/bluetooth/list/?series=873224
 
-[   85.884604] Unable to handle kernel paging request at virtual address ffffd4a61638f258
-[   85.884624] Mem abort info:
-[   85.884625]   ESR = 0x0000000086000007
-[   85.884628]   EC = 0x21: IABT (current EL), IL = 32 bits
-[   85.884633]   SET = 0, FnV = 0
-[   85.884636]   EA = 0, S1PTW = 0
-[   85.884638]   FSC = 0x07: level 3 translation fault
-[   85.884642] swapper pgtable: 4k pages, 48-bit VAs, pgdp=0000000041dd0000
-[   85.884646] [ffffd4a61638f258] pgd=1000000095fff003, p4d=1000000095fff003, pud=100000004823d003, pmd=100000004823e003, pte=0000000000000000
-[   85.884662] Internal error: Oops: 0000000086000007 [#1] PREEMPT SMP
-[   85.890932] Modules linked in: algif_hash algif_skcipher af_alg overlay fsl_jr_uio caam_jr caamkeyblob_desc caamhash_desc caamalg_desc crypto_engine authenc libdes crct10dif_ce polyval_ce polyval_generic snd_soc_imx_spdif snd_soc_imx_card snd_soc_ak5558 snd_soc_ak4458 caam secvio error snd_soc_fsl_spdif snd_soc_fsl_micfil snd_soc_fsl_sai snd_soc_fsl_utils gpio_ir_recv rc_core fuse [last unloaded: btnxpuart(O)]
-[   85.927297] CPU: 1 PID: 67 Comm: kworker/1:3 Tainted: G           O       6.1.36+g937b1be4345a #1
-[   85.936176] Hardware name: FSL i.MX8MM EVK board (DT)
-[   85.936182] Workqueue: events 0xffffd4a61638f380
-[   85.936198] pstate: 60000005 (nZCv daif -PAN -UAO -TCO -DIT -SSBS BTYPE=--)
-[   85.952817] pc : 0xffffd4a61638f258
-[   85.952823] lr : 0xffffd4a61638f258
-[   85.952827] sp : ffff8000084fbd70
-[   85.952829] x29: ffff8000084fbd70 x28: 0000000000000000 x27: 0000000000000000
-[   85.963112] x26: ffffd4a69133f000 x25: ffff4bf1c8540990 x24: ffff4bf215b87305
-[   85.963119] x23: ffff4bf215b87300 x22: ffff4bf1c85409d0 x21: ffff4bf1c8540970
-[   85.977382] x20: 0000000000000000 x19: ffff4bf1c8540880 x18: 0000000000000000
-[   85.977391] x17: 0000000000000000 x16: 0000000000000133 x15: 0000ffffe2217090
-[   85.977399] x14: 0000000000000001 x13: 0000000000000133 x12: 0000000000000139
-[   85.977407] x11: 0000000000000001 x10: 0000000000000a60 x9 : ffff8000084fbc50
-[   85.977417] x8 : ffff4bf215b7d000 x7 : ffff4bf215b83b40 x6 : 00000000000003e8
-[   85.977424] x5 : 00000000410fd030 x4 : 0000000000000000 x3 : 0000000000000000
-[   85.977432] x2 : 0000000000000000 x1 : ffff4bf1c4265880 x0 : 0000000000000000
-[   85.977443] Call trace:
-[   85.977446]  0xffffd4a61638f258
-[   85.977451]  0xffffd4a61638f3e8
-[   85.977455]  process_one_work+0x1d4/0x330
-[   85.977464]  worker_thread+0x6c/0x430
-[   85.977471]  kthread+0x108/0x10c
-[   85.977476]  ret_from_fork+0x10/0x20
-[   85.977488] Code: bad PC value
-[   85.977491] ---[ end trace 0000000000000000 ]---
-
-Message from syslogd@imx8mmevk-NH-DUT at Fri Jul 26 05:57:37 2024 ...
-kernel: Code: bad PC value
-
-Message from syslogd@imx8mmevk-NH-DUT at Fri Jul 26 05:57:37 2024 ...
-kernel: Internal error: Oops: 0000000086000007 [#1] PREEMPT SMP
-
-Fixes: 86d55f124b52 ("Bluetooth: btnxpuart: Deasset UART break before closing serdev device")
-Signed-off-by: Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>
----
- drivers/bluetooth/btnxpuart.c | 20 ++++++++++++++++++--
- 1 file changed, 18 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/bluetooth/btnxpuart.c b/drivers/bluetooth/btnxpuart.c
-index f75b24bd3045..4bac4a81249c 100644
---- a/drivers/bluetooth/btnxpuart.c
-+++ b/drivers/bluetooth/btnxpuart.c
-@@ -449,6 +449,23 @@ static bool ps_wakeup(struct btnxpuart_dev *nxpdev)
- 	return false;
- }
- 
-+static void ps_cleanup(struct btnxpuart_dev *nxpdev)
-+{
-+	struct ps_data *psdata = &nxpdev->psdata;
-+	u8 ps_state;
-+
-+	mutex_lock(&psdata->ps_lock);
-+	ps_state = psdata->ps_state;
-+	mutex_unlock(&psdata->ps_lock);
-+
-+	if (ps_state != PS_STATE_AWAKE)
-+		ps_control(psdata->hdev, PS_STATE_AWAKE);
-+
-+	ps_cancel_timer(nxpdev);
-+	cancel_work_sync(&psdata->work);
-+	mutex_destroy(&psdata->ps_lock);
-+}
-+
- static int send_ps_cmd(struct hci_dev *hdev, void *data)
- {
- 	struct btnxpuart_dev *nxpdev = hci_get_drvdata(hdev);
-@@ -1363,7 +1380,6 @@ static int btnxpuart_close(struct hci_dev *hdev)
- {
- 	struct btnxpuart_dev *nxpdev = hci_get_drvdata(hdev);
- 
--	ps_wakeup(nxpdev);
- 	serdev_device_close(nxpdev->serdev);
- 	skb_queue_purge(&nxpdev->txq);
- 	if (!IS_ERR_OR_NULL(nxpdev->rx_skb)) {
-@@ -1516,8 +1532,8 @@ static void nxp_serdev_remove(struct serdev_device *serdev)
- 			nxpdev->new_baudrate = nxpdev->fw_init_baudrate;
- 			nxp_set_baudrate_cmd(hdev, NULL);
- 		}
--		ps_cancel_timer(nxpdev);
- 	}
-+	ps_cleanup(nxpdev);
- 	hci_unregister_dev(hdev);
- 	hci_free_dev(hdev);
- }
--- 
-2.34.1
+On 7/23/2024 5:19 PM, Damodar Reddy GangiReddy wrote:
+> 
+> 
+> On 7/23/2024 4:10 PM, Paul Menzel wrote:
+>> Dear Damodar,
+>>
+>>
+>> Thank you for your patch.
+>>
+>> Am 23.07.24 um 09:54 schrieb quic_dgangire@quicinc.com:
+>>> From: Damodar Reddy GangiReddy <quic_dgangire@quicinc.com>
+>>
+>> Is your last named spelled in camel case?
+>>
+> yes
+>>> Currently obexd uses session bus.
+>>> Distros  where session bus is not supported and still obex profiles
+>>> are required in that case use system bus instead of session bus
+>>> which can be configured with new optional feature
+>>>
+>>> Additional optional feature has been added to achieve this
+>>> with name --enable-use-systembus-for-obexd
+>>>
+>>> steps to configure system bus
+>>> ./configure --enable-use-systembus-for-obexd
+>>>
+>>> If this optional option is approved  will add other patches
+>>> on how to use system bus based on this option
+>>
+>> This paragraph does not belong into the commit message.
+>>
+> yes, so removing it and will share the whole patch
+>>> ---
+>>>   Makefile.obexd | 14 ++++++++++++++
+>>>   configure.ac   |  9 +++++++++
+>>>   2 files changed, 23 insertions(+)
+>>>
+>>> diff --git a/Makefile.obexd b/Makefile.obexd
+>>> index b7e9f2d33..87432cc37 100644
+>>> --- a/Makefile.obexd
+>>> +++ b/Makefile.obexd
+>>> @@ -2,6 +2,19 @@
+>>>   if OBEX
+>>>     if SYSTEMD
+>>> +
+>>> +if USE_SYSTEMBUS_FOR_OBEXD
+>>> +
+>>> +systemdsystemunit_DATA += obexd/src/obex.service
+>>> +dbussystembus_DATA += obexd/src/org.bluez.obex.service
+>>> +
+>>> +obexd-add-service-symlink:
+>>> +    $(LN_S) -f obex.service $(DESTDIR)$(SYSTEMD_SYSTEMUNITDIR)/dbus-org.bluez.obex.service
+>>> +
+>>> +obexd-remove-service-symlink:
+>>> +    rm -f $(DESTDIR)$(SYSTEMD_SYSTEMUNITDIR)/dbus-org.bluez.obex.service
+>>> +else
+>>> +
+>>>   systemduserunitdir = $(SYSTEMD_USERUNITDIR)
+>>>   systemduserunit_DATA = obexd/src/obex.service
+>>>   @@ -13,6 +26,7 @@ obexd-add-service-symlink:
+>>>     obexd-remove-service-symlink:
+>>>       rm -f $(DESTDIR)$(SYSTEMD_USERUNITDIR)/dbus-org.bluez.obex.service
+>>> +endif
+>>>   else
+>>>   obexd-add-service-symlink:
+>>>   obexd-remove-service-symlink:
+>>> diff --git a/configure.ac b/configure.ac
+>>> index d31eb1656..cc9a55f4c 100644
+>>> --- a/configure.ac
+>>> +++ b/configure.ac
+>>> @@ -283,6 +283,15 @@ if (test "${enable_obex}" != "no"); then
+>>>   fi
+>>>   AM_CONDITIONAL(OBEX, test "${enable_obex}" != "no")
+>>>   +AC_ARG_ENABLE(use-systembus-for-obexd, AS_HELP_STRING([--enable-use-systembus-for-obexd],
+>>> +        [enable systembus for obexd]), [enable_use_systembus_for_obexd=${enableval}])
+>>> +AM_CONDITIONAL(USE_SYSTEMBUS_FOR_OBEXD, test "${enable_use_systembus_for_obexd}" = "yes")
+>>> +if (test "${enable_use_systembus_for_obexd}" = "yes"); then
+>>> +    AC_DEFINE(USE_SYSTEMBUS_FOR_OBEXD, 1, [Define to 1 if you want to use system bus for obexd.])
+>>> +else
+>>> +    AC_DEFINE(USE_SYSTEMBUS_FOR_OBEXD, 0, [Define to 0 if you want to use session bus for obexd.])
+>>> +fi
+>>> +
+>>>   AC_ARG_ENABLE(btpclient, AS_HELP_STRING([--enable-btpclient],
+>>>           [enable BTP client]), [enable_btpclient=${enableval}])
+>>>   AM_CONDITIONAL(BTPCLIENT, test "${enable_btpclient}" = "yes")
+>>
+>> It would be nice to see the whole picture. Is it just for creating and placing the systemd units in the right place?
+>>
+>>
+> yes, it is used to place the systemd units in the right place.
+> Will share the whole patch.
+>> Kind regards,
+>>
+>> Paul
+Kind Regards,
+Damodar.
 
