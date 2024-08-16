@@ -1,114 +1,157 @@
-Received: from mail-qk1-f175.google.com (mail-qk1-f175.google.com [209.85.222.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from inva021.nxp.com (inva021.nxp.com [92.121.34.21])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3233212BEBB
-	for <linux-bluetooth@vger.kernel.org>; Fri, 16 Aug 2024 06:46:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31AF3A957;
+	Fri, 16 Aug 2024 06:50:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=92.121.34.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723790797; cv=none; b=r1x/xj261y/DPKL+sAW6I+PWqqk1nkChCMkebAQ8Il5JzFuUS64kEDUii2Xgz5CoV/G9AhJXR7FHkrOLLytIPI6UXlG5GwuJQnp6vC0jsJOB2rRWfnyqkdDgzVxn5yiQgCMGGnELu2lbtq+0Bc3WTmR4dRNMuxonYCN/kh0ozgE=
+	t=1723791032; cv=none; b=FIPNZbYUUYxj5tC8ackMNQxjedd7KTRqp272g0Vzt2dS8YZ+QiKw+sxT3JNHVX1hpQ7OY9lDvTXmkR43/3R8fH8G3KOwM9D02M62oGdMAJHVomXqtmm/663F4lOuTVij250fq+oj5RkKdOENar4Be10+6VP884UiU3oQi3fgj00=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723790797; c=relaxed/simple;
-	bh=21RboMPrkpVCsQgZEkEI1Tul3kkgDoqBOxqTWzdArDw=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=U3pKbJWAjKWesP9CQs9PvOqNwCiDNfxPREG7oXOUJ9ab1toxQz1r1mbSVJ9nQfrKOKFnQHiAGyFOoV0MMA/qQwAz/+hkswubb5qKSxL6UTm1VNYrkMjn+0ScI2c+5iCoEhvAGvvaxjeKh2cKnmHq2VVLFUyZ0Pi/RFO7CDlEcPY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SJRQaJQH; arc=none smtp.client-ip=209.85.222.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SJRQaJQH"
-Received: by mail-qk1-f175.google.com with SMTP id af79cd13be357-7a5074ebb9aso31248385a.1
-        for <linux-bluetooth@vger.kernel.org>; Thu, 15 Aug 2024 23:46:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1723790795; x=1724395595; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=21RboMPrkpVCsQgZEkEI1Tul3kkgDoqBOxqTWzdArDw=;
-        b=SJRQaJQHjgSqA1C4ER5rQ/YlZVt47+FwygGDW1RqNIaOcYhtrIlu2n1WQETYYQ5yaW
-         FAcZJWEvm4hPgBXT6K/sTN884P8AvfkxfXwrb28rqnWM1jREf2yw3sBtboLFQQI82e39
-         gAxLFmdU/RmKlBs1HT70wbmb7/DbNvzdoOEChiqy7mwsXG1t5sbF8bPzsb8f1bhv2J1d
-         iTUuFcKAbdTbH8pAYM3A9HvY/2t/qn2FX2OMWbq5bTLmHQPIPsi9nM5a7OoeoGh4OE8x
-         JZQIYRd9grSsJXcV4F8gbLsWtHZhltA9i2IpwqkPiUK3IyjFYxKTV/Z3ktRbmwB6/5hC
-         Gp7g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723790795; x=1724395595;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=21RboMPrkpVCsQgZEkEI1Tul3kkgDoqBOxqTWzdArDw=;
-        b=wkkRFiNdVgM6HWvFhf3MnXqRRSZcGBTfYeWyBufTZE6Y1uw4aPX4hp9SUXVeYUt78i
-         CCRVITd0fDVuj7KuvwLLKZ4VbYGhMMsCNO0XC2h/V0bi5rJRYJRsamO+FGxW7mg3z5yF
-         gdyCbCvtatwLKXvknfSwGcSA3CzZniuhWvoA9AJ+/uwVaB/H7vRwLKSuOcPmEh8Db6JC
-         /aj/oWvfjABTopHfVwlU3rBaAtsaGlTzYpTfw+brfvqgb0R58TYu7ekiRiIxzmKCQ58p
-         abFmMQOMcEJiuJb7044qqucAI0bhCTGMC2dtK7mKxn7ta9a/HvpjYGwsgsF6aT/ZzPaY
-         zrqQ==
-X-Gm-Message-State: AOJu0YxMHhsFcOmGIEHvaWzUzVxlztSou+wMtdis/274jpVwDkKIhvL8
-	gNoyTG6xp02wYi9U9ooLAmUI2kRGSrk7VrPjcX5TqSk6waAp2SrsU5v/qQ==
-X-Google-Smtp-Source: AGHT+IF8jAKQ/VDn/z56TgA6GVJ9jCX5D/tbx6VbdWKJgIC8ZECEys0gh68eStV7rPwvLFB06lhpoQ==
-X-Received: by 2002:a05:620a:2a10:b0:7a2:d64:1cbc with SMTP id af79cd13be357-7a50693d5efmr244847285a.26.1723790794631;
-        Thu, 15 Aug 2024 23:46:34 -0700 (PDT)
-Received: from [172.17.0.2] ([20.81.159.51])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7a4ff01de0csm139407285a.1.2024.08.15.23.46.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 15 Aug 2024 23:46:34 -0700 (PDT)
-Message-ID: <66bef5ca.e90a0220.3822a8.6f9f@mx.google.com>
-Date: Thu, 15 Aug 2024 23:46:34 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============4818911030774837082=="
+	s=arc-20240116; t=1723791032; c=relaxed/simple;
+	bh=IaCxeUGRxOzR+2EH9a4OSRud8kn6GhunpGvBvmz1HG0=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=TCqlTKhuRlkOEEfeD3/wy+4n+4uiAk1PyeM64q5iA967Z92aMFqStjDghVzd6JONIWV9EPWAjv7rUZoQGGXvMQO3UMkrEbRGpWkAtRWRw0Q6musvHJQmgv5Ll3kGbI8lvkEBMRS+zYdaMcORPQJC1IdZ7rQSWwIasNSbKTsnEOo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; arc=none smtp.client-ip=92.121.34.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+Received: from inva021.nxp.com (localhost [127.0.0.1])
+	by inva021.eu-rdc02.nxp.com (Postfix) with ESMTP id 45337200D6B;
+	Fri, 16 Aug 2024 08:50:12 +0200 (CEST)
+Received: from aprdc01srsp001v.ap-rdc01.nxp.com (aprdc01srsp001v.ap-rdc01.nxp.com [165.114.16.16])
+	by inva021.eu-rdc02.nxp.com (Postfix) with ESMTP id D78A5202C97;
+	Fri, 16 Aug 2024 08:50:11 +0200 (CEST)
+Received: from pe-lt8779.in-pnq01.nxp.com (pe-lt8779.in-pnq01.nxp.com [10.17.104.141])
+	by aprdc01srsp001v.ap-rdc01.nxp.com (Postfix) with ESMTP id 7AA16181D0FD;
+	Fri, 16 Aug 2024 14:50:10 +0800 (+08)
+From: Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>
+To: marcel@holtmann.org,
+	luiz.dentz@gmail.com
+Cc: linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	amitkumar.karwar@nxp.com,
+	rohit.fule@nxp.com,
+	neeraj.sanjaykale@nxp.com,
+	sherry.sun@nxp.com,
+	ziniu.wang_1@nxp.com,
+	haibo.chen@nxp.com,
+	LnxRevLi@nxp.com
+Subject: [PATCH v1] Bluetooth: btnxpuart: Fix random crash seen while removing driver
+Date: Fri, 16 Aug 2024 12:17:51 +0530
+Message-Id: <20240816064751.284786-1-neeraj.sanjaykale@nxp.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, howardchung@google.com
-Subject: RE: [Bluez,v1] Monitor: Complete missing fields in ESco Connection
-In-Reply-To: <20240816131145.Bluez.v1.1.I6eb6574a1f0abd21e735618d5e8936fd230a4fa3@changeid>
-References: <20240816131145.Bluez.v1.1.I6eb6574a1f0abd21e735618d5e8936fd230a4fa3@changeid>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
+X-Virus-Scanned: ClamAV using ClamSMTP
 
---===============4818911030774837082==
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
+This fixes the random kernel crash seen while removing the driver, when
+running the load/unload test over multiple iterations.
+The ps_wakeup() call in btnxpuart_close() schedules the psdata->work(),
+which gets scheduled after module is removed, causing a kernel crash.
 
-VGhpcyBpcyBhdXRvbWF0ZWQgZW1haWwgYW5kIHBsZWFzZSBkbyBub3QgcmVwbHkgdG8gdGhpcyBl
-bWFpbCEKCkRlYXIgc3VibWl0dGVyLAoKVGhhbmsgeW91IGZvciBzdWJtaXR0aW5nIHRoZSBwYXRj
-aGVzIHRvIHRoZSBsaW51eCBibHVldG9vdGggbWFpbGluZyBsaXN0LgpUaGlzIGlzIGEgQ0kgdGVz
-dCByZXN1bHRzIHdpdGggeW91ciBwYXRjaCBzZXJpZXM6ClBXIExpbms6aHR0cHM6Ly9wYXRjaHdv
-cmsua2VybmVsLm9yZy9wcm9qZWN0L2JsdWV0b290aC9saXN0Lz9zZXJpZXM9ODgwMTg1CgotLS1U
-ZXN0IHJlc3VsdC0tLQoKVGVzdCBTdW1tYXJ5OgpDaGVja1BhdGNoICAgICAgICAgICAgICAgICAg
-ICBQQVNTICAgICAgMC41NiBzZWNvbmRzCkdpdExpbnQgICAgICAgICAgICAgICAgICAgICAgIFBB
-U1MgICAgICAwLjM2IHNlY29uZHMKQnVpbGRFbGwgICAgICAgICAgICAgICAgICAgICAgUEFTUyAg
-ICAgIDI1LjAwIHNlY29uZHMKQmx1ZXpNYWtlICAgICAgICAgICAgICAgICAgICAgUEFTUyAgICAg
-IDE2MjAuODAgc2Vjb25kcwpNYWtlQ2hlY2sgICAgICAgICAgICAgICAgICAgICBQRU5ESU5HICAg
-NzQuMDMgc2Vjb25kcwpNYWtlRGlzdGNoZWNrICAgICAgICAgICAgICAgICBGQUlMICAgICAgMTYz
-LjU2IHNlY29uZHMKQ2hlY2tWYWxncmluZCAgICAgICAgICAgICAgICAgRkFJTCAgICAgIDI1Ni43
-MiBzZWNvbmRzCkNoZWNrU21hdGNoICAgICAgICAgICAgICAgICAgIFBFTkRJTkcgICA0MDUuMzAg
-c2Vjb25kcwpibHVlem1ha2VleHRlbGwgICAgICAgICAgICAgICBQQVNTICAgICAgMTIxLjQ5IHNl
-Y29uZHMKSW5jcmVtZW50YWxCdWlsZCAgICAgICAgICAgICAgUEFTUyAgICAgIDE2MDQuNzQgc2Vj
-b25kcwpTY2FuQnVpbGQgICAgICAgICAgICAgICAgICAgICBQQVNTICAgICAgMTAwNy43MSBzZWNv
-bmRzCgpEZXRhaWxzCiMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIwpUZXN0OiBNYWtlQ2hl
-Y2sgLSBQRU5ESU5HCkRlc2M6IFJ1biBCbHVleiBNYWtlIENoZWNrCk91dHB1dDoKCiMjIyMjIyMj
-IyMjIyMjIyMjIyMjIyMjIyMjIyMjIwpUZXN0OiBNYWtlRGlzdGNoZWNrIC0gRkFJTApEZXNjOiBS
-dW4gQmx1ZXogTWFrZSBEaXN0Y2hlY2sKT3V0cHV0OgoKUGFja2FnZSBjdXBzIHdhcyBub3QgZm91
-bmQgaW4gdGhlIHBrZy1jb25maWcgc2VhcmNoIHBhdGguClBlcmhhcHMgeW91IHNob3VsZCBhZGQg
-dGhlIGRpcmVjdG9yeSBjb250YWluaW5nIGBjdXBzLnBjJwp0byB0aGUgUEtHX0NPTkZJR19QQVRI
-IGVudmlyb25tZW50IHZhcmlhYmxlCk5vIHBhY2thZ2UgJ2N1cHMnIGZvdW5kCm1ha2VbNF06ICoq
-KiBbTWFrZWZpbGU6MTE3NjQ6IHRlc3Qtc3VpdGUubG9nXSBFcnJvciAxCm1ha2VbM106ICoqKiBb
-TWFrZWZpbGU6MTE4NzI6IGNoZWNrLVRFU1RTXSBFcnJvciAyCm1ha2VbMl06ICoqKiBbTWFrZWZp
-bGU6MTIzMDE6IGNoZWNrLWFtXSBFcnJvciAyCm1ha2VbMV06ICoqKiBbTWFrZWZpbGU6MTIzMDM6
-IGNoZWNrXSBFcnJvciAyCm1ha2U6ICoqKiBbTWFrZWZpbGU6MTIyMjQ6IGRpc3RjaGVja10gRXJy
-b3IgMQojIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMKVGVzdDogQ2hlY2tWYWxncmluZCAt
-IEZBSUwKRGVzYzogUnVuIEJsdWV6IE1ha2UgQ2hlY2sgd2l0aCBWYWxncmluZApPdXRwdXQ6Cgp0
-b29scy9tZ210LXRlc3Rlci5jOiBJbiBmdW5jdGlvbiDigJhtYWlu4oCZOgp0b29scy9tZ210LXRl
-c3Rlci5jOjEyNzI1OjU6IG5vdGU6IHZhcmlhYmxlIHRyYWNraW5nIHNpemUgbGltaXQgZXhjZWVk
-ZWQgd2l0aCDigJgtZnZhci10cmFja2luZy1hc3NpZ25tZW50c+KAmSwgcmV0cnlpbmcgd2l0aG91
-dAoxMjcyNSB8IGludCBtYWluKGludCBhcmdjLCBjaGFyICphcmd2W10pCiAgICAgIHwgICAgIF5+
-fn4KbWFrZVszXTogKioqIFtNYWtlZmlsZToxMTc2NDogdGVzdC1zdWl0ZS5sb2ddIEVycm9yIDEK
-bWFrZVsyXTogKioqIFtNYWtlZmlsZToxMTg3MjogY2hlY2stVEVTVFNdIEVycm9yIDIKbWFrZVsx
-XTogKioqIFtNYWtlZmlsZToxMjMwMTogY2hlY2stYW1dIEVycm9yIDIKbWFrZTogKioqIFtNYWtl
-ZmlsZToxMjMwMzogY2hlY2tdIEVycm9yIDIKIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMj
-ClRlc3Q6IENoZWNrU21hdGNoIC0gUEVORElORwpEZXNjOiBSdW4gc21hdGNoIHRvb2wgd2l0aCBz
-b3VyY2UKT3V0cHV0OgoKCgotLS0KUmVnYXJkcywKTGludXggQmx1ZXRvb3RoCgo=
+The new ps_cleanup() deasserts UART break immediately while closing
+serdev device, cancels any scheduled ps_work and destroys the ps_lock
+mutex.
 
---===============4818911030774837082==--
+[   85.884604] Unable to handle kernel paging request at virtual address ffffd4a61638f258
+[   85.884624] Mem abort info:
+[   85.884625]   ESR = 0x0000000086000007
+[   85.884628]   EC = 0x21: IABT (current EL), IL = 32 bits
+[   85.884633]   SET = 0, FnV = 0
+[   85.884636]   EA = 0, S1PTW = 0
+[   85.884638]   FSC = 0x07: level 3 translation fault
+[   85.884642] swapper pgtable: 4k pages, 48-bit VAs, pgdp=0000000041dd0000
+[   85.884646] [ffffd4a61638f258] pgd=1000000095fff003, p4d=1000000095fff003, pud=100000004823d003, pmd=100000004823e003, pte=0000000000000000
+[   85.884662] Internal error: Oops: 0000000086000007 [#1] PREEMPT SMP
+[   85.890932] Modules linked in: algif_hash algif_skcipher af_alg overlay fsl_jr_uio caam_jr caamkeyblob_desc caamhash_desc caamalg_desc crypto_engine authenc libdes crct10dif_ce polyval_ce polyval_generic snd_soc_imx_spdif snd_soc_imx_card snd_soc_ak5558 snd_soc_ak4458 caam secvio error snd_soc_fsl_spdif snd_soc_fsl_micfil snd_soc_fsl_sai snd_soc_fsl_utils gpio_ir_recv rc_core fuse [last unloaded: btnxpuart(O)]
+[   85.927297] CPU: 1 PID: 67 Comm: kworker/1:3 Tainted: G           O       6.1.36+g937b1be4345a #1
+[   85.936176] Hardware name: FSL i.MX8MM EVK board (DT)
+[   85.936182] Workqueue: events 0xffffd4a61638f380
+[   85.936198] pstate: 60000005 (nZCv daif -PAN -UAO -TCO -DIT -SSBS BTYPE=--)
+[   85.952817] pc : 0xffffd4a61638f258
+[   85.952823] lr : 0xffffd4a61638f258
+[   85.952827] sp : ffff8000084fbd70
+[   85.952829] x29: ffff8000084fbd70 x28: 0000000000000000 x27: 0000000000000000
+[   85.963112] x26: ffffd4a69133f000 x25: ffff4bf1c8540990 x24: ffff4bf215b87305
+[   85.963119] x23: ffff4bf215b87300 x22: ffff4bf1c85409d0 x21: ffff4bf1c8540970
+[   85.977382] x20: 0000000000000000 x19: ffff4bf1c8540880 x18: 0000000000000000
+[   85.977391] x17: 0000000000000000 x16: 0000000000000133 x15: 0000ffffe2217090
+[   85.977399] x14: 0000000000000001 x13: 0000000000000133 x12: 0000000000000139
+[   85.977407] x11: 0000000000000001 x10: 0000000000000a60 x9 : ffff8000084fbc50
+[   85.977417] x8 : ffff4bf215b7d000 x7 : ffff4bf215b83b40 x6 : 00000000000003e8
+[   85.977424] x5 : 00000000410fd030 x4 : 0000000000000000 x3 : 0000000000000000
+[   85.977432] x2 : 0000000000000000 x1 : ffff4bf1c4265880 x0 : 0000000000000000
+[   85.977443] Call trace:
+[   85.977446]  0xffffd4a61638f258
+[   85.977451]  0xffffd4a61638f3e8
+[   85.977455]  process_one_work+0x1d4/0x330
+[   85.977464]  worker_thread+0x6c/0x430
+[   85.977471]  kthread+0x108/0x10c
+[   85.977476]  ret_from_fork+0x10/0x20
+[   85.977488] Code: bad PC value
+[   85.977491] ---[ end trace 0000000000000000 ]---
+
+Message from syslogd@imx8mmevk-NH-DUT at Fri Jul 26 05:57:37 2024 ...
+kernel: Code: bad PC value
+
+Message from syslogd@imx8mmevk-NH-DUT at Fri Jul 26 05:57:37 2024 ...
+kernel: Internal error: Oops: 0000000086000007 [#1] PREEMPT SMP
+
+Fixes: 86d55f124b52 ("Bluetooth: btnxpuart: Deasset UART break before closing serdev device")
+Signed-off-by: Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>
+---
+ drivers/bluetooth/btnxpuart.c | 20 ++++++++++++++++++--
+ 1 file changed, 18 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/bluetooth/btnxpuart.c b/drivers/bluetooth/btnxpuart.c
+index f75b24bd3045..4bac4a81249c 100644
+--- a/drivers/bluetooth/btnxpuart.c
++++ b/drivers/bluetooth/btnxpuart.c
+@@ -449,6 +449,23 @@ static bool ps_wakeup(struct btnxpuart_dev *nxpdev)
+ 	return false;
+ }
+ 
++static void ps_cleanup(struct btnxpuart_dev *nxpdev)
++{
++	struct ps_data *psdata = &nxpdev->psdata;
++	u8 ps_state;
++
++	mutex_lock(&psdata->ps_lock);
++	ps_state = psdata->ps_state;
++	mutex_unlock(&psdata->ps_lock);
++
++	if (ps_state != PS_STATE_AWAKE)
++		ps_control(psdata->hdev, PS_STATE_AWAKE);
++
++	ps_cancel_timer(nxpdev);
++	cancel_work_sync(&psdata->work);
++	mutex_destroy(&psdata->ps_lock);
++}
++
+ static int send_ps_cmd(struct hci_dev *hdev, void *data)
+ {
+ 	struct btnxpuart_dev *nxpdev = hci_get_drvdata(hdev);
+@@ -1363,7 +1380,6 @@ static int btnxpuart_close(struct hci_dev *hdev)
+ {
+ 	struct btnxpuart_dev *nxpdev = hci_get_drvdata(hdev);
+ 
+-	ps_wakeup(nxpdev);
+ 	serdev_device_close(nxpdev->serdev);
+ 	skb_queue_purge(&nxpdev->txq);
+ 	if (!IS_ERR_OR_NULL(nxpdev->rx_skb)) {
+@@ -1516,8 +1532,8 @@ static void nxp_serdev_remove(struct serdev_device *serdev)
+ 			nxpdev->new_baudrate = nxpdev->fw_init_baudrate;
+ 			nxp_set_baudrate_cmd(hdev, NULL);
+ 		}
+-		ps_cancel_timer(nxpdev);
+ 	}
++	ps_cleanup(nxpdev);
+ 	hci_unregister_dev(hdev);
+ 	hci_free_dev(hdev);
+ }
+-- 
+2.34.1
+
