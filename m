@@ -1,166 +1,174 @@
-Received: from inva021.nxp.com (inva021.nxp.com [92.121.34.21])
+Received: from AS8PR04CU009.outbound.protection.outlook.com (mail-westeuropeazon11011016.outbound.protection.outlook.com [52.101.70.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44584170A1F;
-	Fri, 16 Aug 2024 10:23:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=92.121.34.21
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723803817; cv=none; b=bq+BT3gxT5cuSu8tQDSQQDwYcXyC8hsw+4b07U2oELqzTVCytk63wGfSI4D2KBkCNRA8OZZKG77xrosFFUyBQsLXFhiNx1sTWp9RFxQxpH1WwciSg6dau6nSNfGZ4jGW49OY1R+nnDsyg5nUq933m7Xf+YfhVX2ogp6vMAuwOTs=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723803817; c=relaxed/simple;
-	bh=Y4ndJSjO4/q+jn8rndjn4vogLDaqvgYuUybvHzudgTA=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=HOdYRiHMNx8365wAfGWdF1pqvWK7Bkepk4HRtwHSKeKoIi4Jv4mzfrkO9ZMd62XkZqIIxKWZ0ax1KliW+5YxykwmdOja26ytk2BKxuYkRQY9Pqt+FQ94joHsGJeLI0KCyyAw4oHssLWtr+DcrICpbMH5aJybvgaAuIOixvYtQgc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; arc=none smtp.client-ip=92.121.34.21
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C00316F0D2;
+	Fri, 16 Aug 2024 10:27:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.70.16
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1723804042; cv=fail; b=ugO8vw76rNaTAaGtKBbSw65xmWXRyktE8BnuO77NpLVjusqEieIYECBqZZaBPriLboS/Li94K2wk682tsWX9SpESYpAj604TZBPQhsjUeezzFuXidVl46fgNYScP4pKBwX2Ly+qy6uBWyI7kUL+AZyajN3pV69BWwPDVBrdUJ6w=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1723804042; c=relaxed/simple;
+	bh=1BDpmu1BBufXSfsiMD62zPgRFODR3l51a8J14Y9f0dI=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=HocRvhrppM1GUNOKh3Bq9PnJTHYN//wVtbh1n34gdZ6zG8zn6ZUsKjcwJavl2hDAQ17tC+cMQdxtcmRzL5jAKMuEB8AMsNb2aupnJIktoHHVAccPP8i3c1+HncLHTvO4X/SDBD3qN68G5Zl60YOLoJP7z10LtLCK2vObtFqGTJs=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=UtadUHMd; arc=fail smtp.client-ip=52.101.70.16
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
-Received: from inva021.nxp.com (localhost [127.0.0.1])
-	by inva021.eu-rdc02.nxp.com (Postfix) with ESMTP id 969482008FB;
-	Fri, 16 Aug 2024 12:23:33 +0200 (CEST)
-Received: from aprdc01srsp001v.ap-rdc01.nxp.com (aprdc01srsp001v.ap-rdc01.nxp.com [165.114.16.16])
-	by inva021.eu-rdc02.nxp.com (Postfix) with ESMTP id 0BF9420069C;
-	Fri, 16 Aug 2024 12:23:33 +0200 (CEST)
-Received: from pe-lt8779.in-pnq01.nxp.com (pe-lt8779.in-pnq01.nxp.com [10.17.104.141])
-	by aprdc01srsp001v.ap-rdc01.nxp.com (Postfix) with ESMTP id 5F4771800318;
-	Fri, 16 Aug 2024 18:23:31 +0800 (+08)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="UtadUHMd"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=jZnUHdjkepgUPH0bZ4HpzxOMkCAoQoXeT//iUyETWO3wugw/hg4fLOojb3+wSpPpDaCG34nHRxlXVzZkYZ2y/LTxG10Xld1PGXivrMwwGKAlKUkP/wItDxeIcsK1rDqBD/RGe2v7AQrcvCPOResO482bFV6b0FzMmdov+5VViKaUR47T/m3P6CHLJTAb5Ht7nE3BvF1bzxDCfvXidu+3Di7IVThFQnlA8UsmLBMgTAQcZ4VRv4MNsLluJgys4cjCDcQsT+DB/Xs9pkq+fbgPp/OnNUNYTxsohCFeq3NqlnUXNefXZfPJBQHGrrEuhxYPUQ0IAo5femHvUIOr6S3+sQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=1BDpmu1BBufXSfsiMD62zPgRFODR3l51a8J14Y9f0dI=;
+ b=knWOZS4CcvNdKLsIofqM0BLsMbg52S7cYAcYpzMjJFiiwjSIOi/UQXIMHIbu7gJHW09nLeAdwL2ET/k1Y6l5+IGOU0WSf0/6hvwSgT+Paj1HfK4yizrtjiAjZSRenLHevPQvPAbQnHtW/wSTEg5oGAce3p/tF+6I5q8cLzc8IUdh3z7kpJfT+dkJTHPuJL96WEnVlsQK4aSvODUV0jXhwweAvR9IIJ9czHUFSxWY0Gw4lCfKIrwTsOBqhDG63Y9pwC8w8HpH3u8jZ6dkj2e5FBXzT92/4nqDPNynBGpe33IANVUIZPRKUnsBcs8CDcg7Fhw5YaF3IBUMEgdo8RFgsQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=1BDpmu1BBufXSfsiMD62zPgRFODR3l51a8J14Y9f0dI=;
+ b=UtadUHMdmjvybJXE/lLNeAN5zvlcSN5b5vZvLhOUtxRBuAmC6Aix8oHs4G2NU+Og/dCRQNzemyCoVfh2z3cB7S8oKKoSe0AkcSlUSfMVOrOOpGPn2mLMX/iq/gA4zInDoZH8kFQoCjJqrjAdk6D2AJrzmzKQgeFPEBUzELRbDuCN6CKBkctxmSyyC3K3qd9WIAzr7X2W72Tq3XvyKwUIlwmhtHTQiCK7nr37f72RC8lRsRLJheDvAhfOV2A70MoSyUtO4eSuDmdROu3BTN0uhphQ+fZ1MONKj/inrlLLc6mvKhoZiquFCC56KNBPDIICoCaenp7a3DoNMQ0/s2cHnw==
+Received: from AS4PR04MB9692.eurprd04.prod.outlook.com (2603:10a6:20b:4fe::20)
+ by PAXPR04MB8688.eurprd04.prod.outlook.com (2603:10a6:102:21f::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7875.18; Fri, 16 Aug
+ 2024 10:27:17 +0000
+Received: from AS4PR04MB9692.eurprd04.prod.outlook.com
+ ([fe80::a2bf:4199:6415:f299]) by AS4PR04MB9692.eurprd04.prod.outlook.com
+ ([fe80::a2bf:4199:6415:f299%6]) with mapi id 15.20.7875.018; Fri, 16 Aug 2024
+ 10:27:17 +0000
 From: Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>
-To: marcel@holtmann.org,
-	luiz.dentz@gmail.com
-Cc: linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	amitkumar.karwar@nxp.com,
-	rohit.fule@nxp.com,
-	neeraj.sanjaykale@nxp.com,
-	sherry.sun@nxp.com,
-	ziniu.wang_1@nxp.com,
-	haibo.chen@nxp.com,
-	LnxRevLi@nxp.com
-Subject: [PATCH v2] Bluetooth: btnxpuart: Fix random crash seen while removing driver
-Date: Fri, 16 Aug 2024 15:51:13 +0530
-Message-Id: <20240816102113.286531-1-neeraj.sanjaykale@nxp.com>
-X-Mailer: git-send-email 2.34.1
+To: Paul Menzel <pmenzel@molgen.mpg.de>
+CC: "marcel@holtmann.org" <marcel@holtmann.org>, "luiz.dentz@gmail.com"
+	<luiz.dentz@gmail.com>, "linux-bluetooth@vger.kernel.org"
+	<linux-bluetooth@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, Amitkumar Karwar <amitkumar.karwar@nxp.com>,
+	Rohit Fule <rohit.fule@nxp.com>, Sherry Sun <sherry.sun@nxp.com>, Luke Wang
+	<ziniu.wang_1@nxp.com>, Bough Chen <haibo.chen@nxp.com>, LnxRevLi
+	<LnxRevLi@nxp.com>
+Subject: Re: [PATCH v1] Bluetooth: btnxpuart: Fix random crash seen while
+ removing driver
+Thread-Topic: [PATCH v1] Bluetooth: btnxpuart: Fix random crash seen while
+ removing driver
+Thread-Index: AQHa78beE2C5tcC5fEyrBp4Ub07g9g==
+Date: Fri, 16 Aug 2024 10:27:17 +0000
+Message-ID:
+ <AS4PR04MB9692DDCF49E162650102A87DE7812@AS4PR04MB9692.eurprd04.prod.outlook.com>
+References: <20240816064751.284786-1-neeraj.sanjaykale@nxp.com>
+ <da777827-cefe-4d95-b072-1579f0c662d9@molgen.mpg.de>
+In-Reply-To: <da777827-cefe-4d95-b072-1579f0c662d9@molgen.mpg.de>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: AS4PR04MB9692:EE_|PAXPR04MB8688:EE_
+x-ms-office365-filtering-correlation-id: 51acb173-a7bf-41c0-22c5-08dcbdde00d6
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|366016|376014|1800799024|38070700018;
+x-microsoft-antispam-message-info:
+ =?utf-8?B?N0dyalZJS1lSZDJ5RUQ0aUJBcnJVOEMzNXUyM2V4Q1hZbWN1ODh0cGhEUnV3?=
+ =?utf-8?B?SDF2bWdDNW1ST0pWUWM3cVhWUGR0NTZTc1MzaXlwRWZiRFk1YVdwV3lOZXFX?=
+ =?utf-8?B?VjR4WVdLL1liTGVoSGJINnlmdnpBakdGQVhzZkY5cXRQZ2lEZldKTGlzMkkx?=
+ =?utf-8?B?dEJ4NmRYbVRvb09WV0JzRG1QVk5hc3R0VC82ZndBS0Q2MStTaGt3Y2kzbTJ1?=
+ =?utf-8?B?bGliM3JFcWdzZUNGSW9HV05KYXlQYVVZNUQ5bVBoU3MwdktMYlpkSkYrMlNB?=
+ =?utf-8?B?QmMwNVhRZ3N5R0dxa1J2MEtZVlBwUlpiTEM4ci9kWWUzM2FPRGg4NUFGRks4?=
+ =?utf-8?B?em9KdDk5TE43eTluMFk0L3VIMW5KQVFnU3VtL3dCcDN3R1dxQzhkMW45c01T?=
+ =?utf-8?B?N2pKOW95S0s5MldXS0kxQlFiWVlMM3BlNGV5NlpXVzVPUk1HOU93RFA3Vlc2?=
+ =?utf-8?B?Y0lRTWx3b0FJdFB6OUs0bGc4V2FhUDY3RXZvYnVFVU9XdlNtUFZ4VkZxbDlq?=
+ =?utf-8?B?WnN0YkczMWxxL1FQSmZmak84RW16cmI0VzNFd3pSWmFsNWJsRXJPcGowWEdB?=
+ =?utf-8?B?Y1l1SnVPUFpkUm81QXpnQUpJZkZBTk9tVTN2S2x3aFdVMHI1RjNEM20yaCts?=
+ =?utf-8?B?VU1OUWhHRDNSTzRzY1g4L3JBNytuSkFxSFJNUDhoNnNodHdiZHkzOXFyZWJP?=
+ =?utf-8?B?dXVtejBHbFRuS0N0NXFGQ2dMdC9Pamt2UXU3RVp6dDhyZklGUTQ2ZWZSM1I5?=
+ =?utf-8?B?aWVOZTRxVUtQeHRxcUUxSTV1cDNDY00rTDIycmkzNEdUZHVPMVZUSkx5a3RF?=
+ =?utf-8?B?NE8zd3RYNEJBM0NSeUZwNktrb3prUEk0UmprS0tRVWVNSmVZcDMrbVlJajBa?=
+ =?utf-8?B?SjBOT24wQW1FUWNqTHYxaFlDVWt3LzNiYkNMbkkrZ0RNUDhzMC9EdXozRUsy?=
+ =?utf-8?B?YTBpNFROZ1Z0ZGw5VU5ySExSTGNUZUFnc1M5bnF6U0xSQ1kyZTlVcnFXYkRE?=
+ =?utf-8?B?KzJERGYyOXFtQ0E4QlowR29jOEI1NmNVUG5CeTJlMnFyRThKaStZZ0w2clhP?=
+ =?utf-8?B?ZHF5alR3OENub1I5L0QydjRzK1JnRXNBRnNwcEJSZ1EzMWF2VDZTVUk1dEUv?=
+ =?utf-8?B?cTFxRHFmb1FsbnhqWUtzYy8vcStjQlBURW1WSzZZZ3J4QTVyOFdhbS9WWU40?=
+ =?utf-8?B?dDZ5Sk82ZmJEMFI5a0RMTzBIejJ2VmgxbFozdm5xdnpOR0JSSEJWMUhNcFpV?=
+ =?utf-8?B?OFJCajZ4MXFGOUM5VUdON25HckMyUExhb1h0S0dNdldmekxJVC8zdGd0REZZ?=
+ =?utf-8?B?ZUNkdGV0LzNyeHRWdUtLMy9ZTnNsRUhVM0ZtZ1l0KzV4dGdlbHF6VHVEL25o?=
+ =?utf-8?B?MUUzS2ZEcUp0NUVONGpjblpwZmsxekY3S3dpMk1KVkxOZ1AvRXFHTHp2aFRR?=
+ =?utf-8?B?S0cxd0M3eTFOOGFEeFRUTnJINlpuNTc2L1d6MWJ2QU81dmhoQk9Zb0V4Rm1K?=
+ =?utf-8?B?NSs0bjEwNW1JeDloQXEvMm1BRWR0cUc0eEFyQXJsRFV5WStpdWRhbkFSVTBY?=
+ =?utf-8?B?RVpnVjFyakRFelI3aUhSN0lpdlVCS3JlK3NYaWRSUEhyV1JURzQrMW1pUmoz?=
+ =?utf-8?B?QklTT0ZQeDF3djBBd3oydkRQOFJyZk9Jejc0QnZQLy9WMUZuYXU0eGpQZitp?=
+ =?utf-8?B?ZjBiK1diUHNpaXZqclFmMjZnT1V6U0dyM0pabWxtazFUQW9JcE56VnVxZXNP?=
+ =?utf-8?B?WU9XOHM4Ukd2Z3FBeFNBU3gzYVRxZHZKVWE5YXpISmxwVWtrdkpRekJ2bjhR?=
+ =?utf-8?B?RWlhZlpoOVRJV1Y2a2lhd0E3SmJXNlNvdVN0OE1vVDVaclVKVFNHQm9QV0U3?=
+ =?utf-8?B?VzVYZmlZZ0RGeXlDckNaQmh4MG1jMzlMZ1BXaVhwTStwN2c9PQ==?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AS4PR04MB9692.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?utf-8?B?VG5oekRSL0lzckUxSnp4S2x2UzJ6dzZIUHNUMHdndEFFeHJqS2Yra1RqdkZh?=
+ =?utf-8?B?Q0I3K0ZiSjBUZnJjREVjbmRiSlJndFA2cHF1MHZYaUpZeHlqUmhCQUVrbnVV?=
+ =?utf-8?B?cFRINWlVbEdIVFIyNlk2akxheVdoZ2o3NlJSaTlZU3hJT3dpQjlqREUxUzAv?=
+ =?utf-8?B?d00zMEhaaGkwZzhKSE5IdjhsYStJb01KN2NuajRkMmN0RUN1WTVRM0htUHhj?=
+ =?utf-8?B?WDJKYkFvWE5sTDdMM2ZISHIxb2p6Y1FQcm1NV3hLV2NRbktxODB2UkUzMVpN?=
+ =?utf-8?B?S1hJNUZPWURNdDRCcXVKS05VbFJuVzMyT3hyajBab0tYRmo1RmcxY3JPVysz?=
+ =?utf-8?B?UnhObFVtci9yeEgxZDVCWldNWkp3bk9oNVpzVnIycUFtSzZyN01BMzJqelRh?=
+ =?utf-8?B?VU04c2QwalRhaUtYVi9UNlhPZXhiWDR6RUlidDV2MFFlL3hoWVBaWDUxUWJ5?=
+ =?utf-8?B?ZG1MdHU0V0lHTWtxT0x0R2tkT0dkV3VrS1BONEtvdis4Yk1QbHBaeGptUnJK?=
+ =?utf-8?B?T1Exdktua2RGdXhKQWg0SFJveG1HaG1JVGFObVVzaTF6ZE9rRmRobldpbGhS?=
+ =?utf-8?B?SWNTcTJKbFF3bS93UU53N3k5bDBnZDZQZk1PQ3ZxZUR4S0d3VE83aGhZRll0?=
+ =?utf-8?B?bmc5Mzc1YW5uS3lVd0txUE93VXZ3aXNYV0R6eGdvZzFmSUJpVGxOY0p1ankv?=
+ =?utf-8?B?RWFjLzlJYWJ6aEdZYXhnekNhRVR1SVFEdWRZMVhxTHJPUkRqOW8yak1KTnpE?=
+ =?utf-8?B?aWdyZlFmckx3NFpkNm5OeHhQS2o3NmNLK1hyelE1UWMrL3d3NlY0SXFUdGtQ?=
+ =?utf-8?B?N0VJY1RhRHVkWXI1ZjV4dnVnNVJhbHBCUnJxVjlhZTkveXpJb0RXWDlieG1R?=
+ =?utf-8?B?QnVXS2kyUU1GWGZZdmo3d245SURzTEljbm5JdWowTjNXeWVxTDdxU0NsdXRD?=
+ =?utf-8?B?bEppM3hkSkY3SEVGS1pWd2JVbjEraEJuZEZzWExMUmpUWTJRZE11blYzWEd1?=
+ =?utf-8?B?dC9qTEhBemgrc0RUZlJ0cnhWTTVZTVUzcWwreExWUElpbGtJL0VFSittNWJB?=
+ =?utf-8?B?LzJOdklQRFJKVVJ6NU5yVWxjV0UwYkxrc2FXcGgrSGxOdlZFZVBCWjg2a2dh?=
+ =?utf-8?B?TzJUYmtZMUVwMFRWZ3hCMXpCMFdJKzkyd3B2NndtS1dnQmcxNkZxVkVydDAr?=
+ =?utf-8?B?bkhrTWloVlR5ejNKV29TRkZHVHZLR05UUUUweTRrYjF1QiszRjNBcC96RWZT?=
+ =?utf-8?B?Nnh4SlVOUXdUTWZ4eGFKem5IcW9INExwaXl2UXRleHRSR0lHcjIvMk5XOFl2?=
+ =?utf-8?B?SjRKckJJRmpjVEFOQ3lGRHZWdVlxWWVQcWhUSXI1aFRoVS9UNDdsbDBMYUVD?=
+ =?utf-8?B?bUlMVFY1THpKMllqdUpGblgyZDdZdnFSUm84S3VZcm42Nm82bXZnL01YSER0?=
+ =?utf-8?B?OVNaTmxZRTdPQzJyL0lFemx0aU05Yk9mZlA0WkxuWUx4U21UM3kwUlUzNzZE?=
+ =?utf-8?B?N1lhb3ZHVEoxZkRJeHVFcUIvd3kvTlg1MXhHUE1rRlJxQTZ1TnBJRXRzTitK?=
+ =?utf-8?B?bkRsb01FMzJGNlVnMkxVVERBdDhESlNTRm1jMjdxTTR4dU44NHJrV0JGQ2lR?=
+ =?utf-8?B?UUNIalNFWmpFQnRhU1RNRUhjVTAvbTFDVFlLWW9JMlU0cm9PNVFLSG1tMzdk?=
+ =?utf-8?B?VVNDM0JqVk14L2IxOWxHdllXajVPV3lQYUxKRjA1NmpIb3BZMHNZUDQ3RXpY?=
+ =?utf-8?B?ZkZjendnK3p0ODJPQ2l2bGxHSW1MS25vZHN2N2hVblNYaGJaenFyRXhYZDNO?=
+ =?utf-8?B?VTcwTU9hdnRwZnpndnlvV2UwS01vQ0tJeGJvODVVOHAwSksxVTE5VkFtNVox?=
+ =?utf-8?B?eFJNUW9NdEFpREh0L21zdngxaHZnNWdiV01WTC9GV2c1WXhrUkZKVXVmc1V2?=
+ =?utf-8?B?U3JSUFRTRnhCOHY1VE5sYlNjdGlNTDFzRUxUU0dZbElwSS9uODFjcGFpeGhN?=
+ =?utf-8?B?empZRHViMEtDaWZWT095VzJVQmxlVG1YVDV1T0hPcHhWSXJHQU9BTHpJdmV5?=
+ =?utf-8?B?YjBvVEU5Zm9sVXN3aWJVNGRuY3A1bS9RZHpHTFZGREdhRG5vYUh4aTVsQ0wv?=
+ =?utf-8?B?Yi9PbkdDTXFrWk5EZHBRb3dSSktHSk14Q0Y3TG05OVA1RS8rZWduVTcyTisw?=
+ =?utf-8?B?blE9PQ==?=
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Virus-Scanned: ClamAV using ClamSMTP
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: AS4PR04MB9692.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 51acb173-a7bf-41c0-22c5-08dcbdde00d6
+X-MS-Exchange-CrossTenant-originalarrivaltime: 16 Aug 2024 10:27:17.4123
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 0tz1yfT7qkhVTUttGvHxJMGa4gg2KqgKXjSJjRLl89NzGqKoBIhHB4xosQ1yeDU6/awjlFsrB1dQP0v7ASjh2eIn+jp5mb9IL7R+y0tQaTg=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PAXPR04MB8688
 
-This fixes the random kernel crash seen while removing the driver, when
-running the load/unload test over multiple iterations.
-
-1) modprobe btnxpuart
-2) hciconfig hci0 reset
-3) hciconfig (check hci0 interface up with valid BD address)
-4) modprobe -r btnxpuart
-Repeat steps 1 to 4
-
-The ps_wakeup() call in btnxpuart_close() schedules the psdata->work(),
-which gets scheduled after module is removed, causing a kernel crash.
-
-This hidden issue got highlighted after enabling Power Save by default
-in 4183a7be7700 (Bluetooth: btnxpuart: Enable Power Save feature on
-startup)
-
-The new ps_cleanup() deasserts UART break immediately while closing
-serdev device, cancels any scheduled ps_work and destroys the ps_lock
-mutex.
-
-[   85.884604] Unable to handle kernel paging request at virtual address ffffd4a61638f258
-[   85.884624] Mem abort info:
-[   85.884625]   ESR = 0x0000000086000007
-[   85.884628]   EC = 0x21: IABT (current EL), IL = 32 bits
-[   85.884633]   SET = 0, FnV = 0
-[   85.884636]   EA = 0, S1PTW = 0
-[   85.884638]   FSC = 0x07: level 3 translation fault
-[   85.884642] swapper pgtable: 4k pages, 48-bit VAs, pgdp=0000000041dd0000
-[   85.884646] [ffffd4a61638f258] pgd=1000000095fff003, p4d=1000000095fff003, pud=100000004823d003, pmd=100000004823e003, pte=0000000000000000
-[   85.884662] Internal error: Oops: 0000000086000007 [#1] PREEMPT SMP
-[   85.890932] Modules linked in: algif_hash algif_skcipher af_alg overlay fsl_jr_uio caam_jr caamkeyblob_desc caamhash_desc caamalg_desc crypto_engine authenc libdes crct10dif_ce polyval_ce polyval_generic snd_soc_imx_spdif snd_soc_imx_card snd_soc_ak5558 snd_soc_ak4458 caam secvio error snd_soc_fsl_spdif snd_soc_fsl_micfil snd_soc_fsl_sai snd_soc_fsl_utils gpio_ir_recv rc_core fuse [last unloaded: btnxpuart(O)]
-[   85.927297] CPU: 1 PID: 67 Comm: kworker/1:3 Tainted: G           O       6.1.36+g937b1be4345a #1
-[   85.936176] Hardware name: FSL i.MX8MM EVK board (DT)
-[   85.936182] Workqueue: events 0xffffd4a61638f380
-[   85.936198] pstate: 60000005 (nZCv daif -PAN -UAO -TCO -DIT -SSBS BTYPE=--)
-[   85.952817] pc : 0xffffd4a61638f258
-[   85.952823] lr : 0xffffd4a61638f258
-[   85.952827] sp : ffff8000084fbd70
-[   85.952829] x29: ffff8000084fbd70 x28: 0000000000000000 x27: 0000000000000000
-[   85.963112] x26: ffffd4a69133f000 x25: ffff4bf1c8540990 x24: ffff4bf215b87305
-[   85.963119] x23: ffff4bf215b87300 x22: ffff4bf1c85409d0 x21: ffff4bf1c8540970
-[   85.977382] x20: 0000000000000000 x19: ffff4bf1c8540880 x18: 0000000000000000
-[   85.977391] x17: 0000000000000000 x16: 0000000000000133 x15: 0000ffffe2217090
-[   85.977399] x14: 0000000000000001 x13: 0000000000000133 x12: 0000000000000139
-[   85.977407] x11: 0000000000000001 x10: 0000000000000a60 x9 : ffff8000084fbc50
-[   85.977417] x8 : ffff4bf215b7d000 x7 : ffff4bf215b83b40 x6 : 00000000000003e8
-[   85.977424] x5 : 00000000410fd030 x4 : 0000000000000000 x3 : 0000000000000000
-[   85.977432] x2 : 0000000000000000 x1 : ffff4bf1c4265880 x0 : 0000000000000000
-[   85.977443] Call trace:
-[   85.977446]  0xffffd4a61638f258
-[   85.977451]  0xffffd4a61638f3e8
-[   85.977455]  process_one_work+0x1d4/0x330
-[   85.977464]  worker_thread+0x6c/0x430
-[   85.977471]  kthread+0x108/0x10c
-[   85.977476]  ret_from_fork+0x10/0x20
-[   85.977488] Code: bad PC value
-[   85.977491] ---[ end trace 0000000000000000 ]---
-
-Preset since v6.9.11
-Fixes: 86d55f124b52 ("Bluetooth: btnxpuart: Deasset UART break before closing serdev device")
-Signed-off-by: Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>
-Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
----
-v2: Add details to commit message (Paul Menzel)
----
- drivers/bluetooth/btnxpuart.c | 20 ++++++++++++++++++--
- 1 file changed, 18 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/bluetooth/btnxpuart.c b/drivers/bluetooth/btnxpuart.c
-index f75b24bd3045..4bac4a81249c 100644
---- a/drivers/bluetooth/btnxpuart.c
-+++ b/drivers/bluetooth/btnxpuart.c
-@@ -449,6 +449,23 @@ static bool ps_wakeup(struct btnxpuart_dev *nxpdev)
- 	return false;
- }
- 
-+static void ps_cleanup(struct btnxpuart_dev *nxpdev)
-+{
-+	struct ps_data *psdata = &nxpdev->psdata;
-+	u8 ps_state;
-+
-+	mutex_lock(&psdata->ps_lock);
-+	ps_state = psdata->ps_state;
-+	mutex_unlock(&psdata->ps_lock);
-+
-+	if (ps_state != PS_STATE_AWAKE)
-+		ps_control(psdata->hdev, PS_STATE_AWAKE);
-+
-+	ps_cancel_timer(nxpdev);
-+	cancel_work_sync(&psdata->work);
-+	mutex_destroy(&psdata->ps_lock);
-+}
-+
- static int send_ps_cmd(struct hci_dev *hdev, void *data)
- {
- 	struct btnxpuart_dev *nxpdev = hci_get_drvdata(hdev);
-@@ -1363,7 +1380,6 @@ static int btnxpuart_close(struct hci_dev *hdev)
- {
- 	struct btnxpuart_dev *nxpdev = hci_get_drvdata(hdev);
- 
--	ps_wakeup(nxpdev);
- 	serdev_device_close(nxpdev->serdev);
- 	skb_queue_purge(&nxpdev->txq);
- 	if (!IS_ERR_OR_NULL(nxpdev->rx_skb)) {
-@@ -1516,8 +1532,8 @@ static void nxp_serdev_remove(struct serdev_device *serdev)
- 			nxpdev->new_baudrate = nxpdev->fw_init_baudrate;
- 			nxp_set_baudrate_cmd(hdev, NULL);
- 		}
--		ps_cancel_timer(nxpdev);
- 	}
-+	ps_cleanup(nxpdev);
- 	hci_unregister_dev(hdev);
- 	hci_free_dev(hdev);
- }
--- 
-2.34.1
-
+SGkgUGF1bA0KDQpUaGFuayB5b3UgZm9yIHJldmlld2luZyB0aGUgcGF0Y2guDQoNCg0KPiA+IEZp
+eGVzOiA4NmQ1NWYxMjRiNTIgKCJCbHVldG9vdGg6IGJ0bnhwdWFydDogRGVhc3NldCBVQVJUIGJy
+ZWFrIGJlZm9yZQ0KPiA+IGNsb3Npbmcgc2VyZGV2IGRldmljZSIpDQo+IA0KPiAoSnVzdCBmb3Ig
+bWUsIHByZXNlbnQgc2luY2UgNi40LXJjMS4pDQo+IA0KVGhpcyBpc3N1ZSBpcyBzZWVuIGZyb20g
+djYuOS4xMS4gSXQgd2FzIGhpZ2hsaWdodGVkIGFmdGVyIGRlZmF1bHQgcG93ZXIgc2F2ZSBtZWNo
+YW5pc20gd2FzIHNldCB0byBlbmFibGUuDQpJIGhhdmUgYWRkZWQgdGhlIGRldGFpbHMgdG8gdGhl
+IGNvbW1pdCBtZXNzYWdlLg0KDQpUaGFua3MsDQpOZWVyYWoNCg==
