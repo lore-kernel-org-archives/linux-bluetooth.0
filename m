@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3329101C4;
-	Tue, 20 Aug 2024 17:00:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 957461BDA9A;
+	Tue, 20 Aug 2024 17:00:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724173238; cv=none; b=IA/wGUEsBgT7kVDSTh05h2x024gclFDY2VOTG6yD7goj3ZVroImT/pBcDayNE7RlfqnmMkcNU7CvC+RFPnj9QtI/qpggKb80S9RAusfb5rRtBSIEhow5Eu4Fscv7pXDXu/e5saBhHWwMphYKRwpxLlTOkPDAjbJexEu0bseSrj0=
+	t=1724173239; cv=none; b=VCvw4IWqpbcPlvJJVkHmiGzSucoe+8WzexlUXDCEqx65HS8uqm/U5mn61a6jh0na7Ag3haWVAqKPPZbmCLxeLtRjvs7a2MP3ght//YWUYnuO7c/+1iIQRdTn5W8dkxwscrD2wnbdjq01nH4ikEN3JlVhA2XyPgk44G/HhQOPF1I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724173238; c=relaxed/simple;
-	bh=/2unedT4cvDoi1CZ7XzX+1ac69dYNxdKOs3uyeY0MCE=;
+	s=arc-20240116; t=1724173239; c=relaxed/simple;
+	bh=tF2uGBBzpjRbGxoxEl+9DcbALfLb/EhuBuzFJa4AGvk=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=tfWhWu5E5KbGxJiigpj6cNg33haCZY/AeG+Ot7HbFRcSeKQnlzqZLSr0XZiFIkD7MxBXkngwc7ItwZSogMYXxkOfKS8Ferakf+Yumkq+hhU3KSydFjv9Y7j52WkQoi8k+BqZCjY+V767EkG2+KvYqqzR3J6Z3CMCTkM/aaeArio=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=X4oQU/iu; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=BBLbB4ow/5Sr3Uh51qjDsQQQyTx/+TubeiFnFWEMiQKirO1I8O9nWk1+A4qnHT09IAad5Y4/v9iR4NbhrIKZ9UgWHEU4N4p/aFuLzyfOT+89/ZSrDdkSM0HIz/PmZ4TxukWymu2ubqsPyy2q+ogy+jeyoSt2AuBY0NqgsE6V7R0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UEpcVZ8p; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="X4oQU/iu"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 75EE8C4AF0E;
-	Tue, 20 Aug 2024 17:00:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724173237;
-	bh=/2unedT4cvDoi1CZ7XzX+1ac69dYNxdKOs3uyeY0MCE=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=X4oQU/iuBJpDwHkFDRX2DM3tC3w+64SuLnumNf823d+eYctJ4X5+0zdS9lHknbEaT
-	 j9uG71GhzLgeIttnN07A3lKDwC36D6WQ7A84N0Uk4DA+48H1aZU6/5zQm+W311DIPA
-	 HTZsb5/Y91oEJhf395pMaYLlAZn9b3MxN1xLvdhoYQGfUOcghbEG1kl9FszQvp2qNy
-	 HfJIRwpBbeVOGLvE6M+GkjTzYGK/6u3CjNZcUA7tSOxMOT+4IqDW/MWpZ8WLk0NgR9
-	 I+PAeUXh4hUQ4dU2ycuafpXc5vpYHeIrqqRxwymX4oMQt99IUiPSxSnMr1p6yczE9W
-	 dOXm7iHqSA95A==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 343033804CA6;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UEpcVZ8p"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EDF66C4AF14;
 	Tue, 20 Aug 2024 17:00:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1724173239;
+	bh=tF2uGBBzpjRbGxoxEl+9DcbALfLb/EhuBuzFJa4AGvk=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=UEpcVZ8ptV3pM8HFc70vXNzlC6UJu/L1BnFmyQNqebTr2C7qG1fQSJnyDW4VKmico
+	 3Z1tVE3Gk5U6ruilBIo93f4+RMVcdRvBHxgTYdyQhlzBcRPbODQucjuC5Dg5t6hWPO
+	 vHy/SZapoYgTw6ZztO1ZH/zkOTdxdBr/xttJQY/voRw7ZtXj/LUnPL7RTIfAXe+34J
+	 ex60+zGJCWuhh/8Y3Oh4U+6RJrusBiQ4hG1fQOU8k/q3dDlwLAA4W/UjU9aR2IsPS6
+	 XY2kVmcSKe7vqK7vEtujfDashM8MM6RZ/Jh4EP1kDNotnRDhRtXURoZI/Ai5foOgC+
+	 DHCxvVied8v5g==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADD143804CA6;
+	Tue, 20 Aug 2024 17:00:39 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -37,17 +37,16 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] Bluetooth: L2CAP: Remove unused declarations
+Subject: Re: [PATCH] Bluetooth: hci_conn: Remove redundant memset after kzalloc
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <172417323701.1194903.10776389655528832403.git-patchwork-notify@kernel.org>
-Date: Tue, 20 Aug 2024 17:00:37 +0000
-References: <20240819135211.119827-1-yuehaibing@huawei.com>
-In-Reply-To: <20240819135211.119827-1-yuehaibing@huawei.com>
-To: Yue Haibing <yuehaibing@huawei.com>
+ <172417323825.1194903.2068866577999998083.git-patchwork-notify@kernel.org>
+Date: Tue, 20 Aug 2024 17:00:38 +0000
+References: <20240810141415.124113-1-visitorckw@gmail.com>
+In-Reply-To: <20240810141415.124113-1-visitorckw@gmail.com>
+To: Kuan-Wei Chiu <visitorckw@gmail.com>
 Cc: marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+ jserv@ccns.ncku.edu.tw, linux-bluetooth@vger.kernel.org,
  linux-kernel@vger.kernel.org
 
 Hello:
@@ -55,18 +54,20 @@ Hello:
 This patch was applied to bluetooth/bluetooth-next.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Mon, 19 Aug 2024 21:52:11 +0800 you wrote:
-> Commit e7b02296fb40 ("Bluetooth: Remove BT_HS") removed the implementations
-> but leave declarations.
+On Sat, 10 Aug 2024 22:14:15 +0800 you wrote:
+> Since kzalloc already zeroes the allocated memory, the subsequent
+> memset call is unnecessary. This patch removes the redundant memset to
+> clean up the code and enhance efficiency.
 > 
-> Signed-off-by: Yue Haibing <yuehaibing@huawei.com>
+> Signed-off-by: Kuan-Wei Chiu <visitorckw@gmail.com>
 > ---
->  include/net/bluetooth/l2cap.h | 4 ----
->  1 file changed, 4 deletions(-)
+> Note: Build test only.
+> 
+> [...]
 
 Here is the summary with links:
-  - [net-next] Bluetooth: L2CAP: Remove unused declarations
-    https://git.kernel.org/bluetooth/bluetooth-next/c/215220f8c90f
+  - Bluetooth: hci_conn: Remove redundant memset after kzalloc
+    https://git.kernel.org/bluetooth/bluetooth-next/c/7a6abe8d0fdb
 
 You are awesome, thank you!
 -- 
