@@ -1,126 +1,167 @@
-Received: from mail-qk1-f177.google.com (mail-qk1-f177.google.com [209.85.222.177])
+Received: from mail-ua1-f53.google.com (mail-ua1-f53.google.com [209.85.222.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 536BD194129
-	for <linux-bluetooth@vger.kernel.org>; Tue, 20 Aug 2024 15:54:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F0B4190671
+	for <linux-bluetooth@vger.kernel.org>; Tue, 20 Aug 2024 16:28:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724169286; cv=none; b=GvGd7bgecJffoo/xJmjUgnhdirD5TeY91eAfmcnATjFp2WOeDof78Gxlf7Oj7ORO+lpvTh8DvjxkyfgPqD8FU0glsjfFu+cjCCX9sJialco/XabNa1zOnnf8vT0HEU9GMboethL/6WX9zIpvfsnIyQ+WfidnWGaPJtXNeGl1AOA=
+	t=1724171302; cv=none; b=cLvkP+6CB17FORxGwY7kICRM57uYzLG+G+i54xUe4Z9xiYd66Xw/WRmpt/dB2b0cTnRGZC7LhOR46wbvT9qNo7X9PX4XNC4ZYeP4UxAKdhosQ4v/egzXXqb3lNTRYW02FAAbzckBeYTR7M+H0PS/hdW1m8hxEgI22oQrdcT8jpY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724169286; c=relaxed/simple;
-	bh=opQI35izZ6WQtBEicSMe5AQ7UT/vnA8rTEHw3gUCOjY=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=mYrRV3W8Mg6v8MnyjoHCbB3maKYjRiUxwN09BNYwylV+uqHFTnBLqdfQPKa5HBbPlO+PSdVPT0mWpejbHmUkatYxib74gERyQPppcZjxlJCmiOcCQ2YESDOaH/6sDmsdNFSqAZT77eC8+FoyHKDlPaeiHAl4uiUPB2VsENUoOJw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=clvoS3Q0; arc=none smtp.client-ip=209.85.222.177
+	s=arc-20240116; t=1724171302; c=relaxed/simple;
+	bh=zucuwRzPwnbALFb0QQqY6Y4SrezZ4e2Uc5ZDpNFMpy4=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=GkQU1yC/e6rzQYA/g1O2B7fTRlNeSa3/wZJs3xQ4Y7iRpi8uvZddg+7UYR13E68hpfB/UPYftS1LxmHc7agXcuovrObLXpFCVK7ootwOHeqjJurBiXZyDYp/L9XpNs0AURvaYZAPry0A0L3uqj2RZUDou5naSdplA7bgey1K7jQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=c2IYhQjl; arc=none smtp.client-ip=209.85.222.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="clvoS3Q0"
-Received: by mail-qk1-f177.google.com with SMTP id af79cd13be357-7a3574acafeso356410485a.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 20 Aug 2024 08:54:45 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="c2IYhQjl"
+Received: by mail-ua1-f53.google.com with SMTP id a1e0cc1a2514c-8430557e436so1647412241.2
+        for <linux-bluetooth@vger.kernel.org>; Tue, 20 Aug 2024 09:28:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1724169284; x=1724774084; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=opQI35izZ6WQtBEicSMe5AQ7UT/vnA8rTEHw3gUCOjY=;
-        b=clvoS3Q0hb2NYzGUE0Mv/llHaf67GxByAhYsYXNP+h16vGB9qmfBm2Q+IOmV/j2IcS
-         TqSG5X7+Pe26AO+om3IVot47bo1irmu9AsodhqBf+EUDucYz54h4FqnWvHNz+pSkvSeE
-         V06UN9muzjRjwwjiqaKMsK7OS6mZg7T0MebhujzT2MVa9LyPvoU7EWiPVykAXsjBUbav
-         KdiJE2dti0GcL+nMYVOmto7+OYDZDORd3o0YVp+Ysz5haNdi8bf3otU2nwUai64OV4fT
-         YqHoLem3aQvWQmkilbpojBINNz8lSS6CdK3uPZYYMlA571llPZ8GmsBlKKO+DFapueQb
-         C+LQ==
+        d=gmail.com; s=20230601; t=1724171299; x=1724776099; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=4k0oyaArmrTRChexp3A7axxXJn5CFtt9suCpVQLvw0k=;
+        b=c2IYhQjlpzds0pH/Qiwa0rIR5ArvelFFKTRCyFwdxPKQ5V8diWOrc33ZFKoqKEXjKT
+         P2AJl2iCTK6KKJdeb6Za7c51Ylo0WMkmlzWpsfxdw6txrIcGRap2oP00ezv4pNJnnb9v
+         J3gJcbOQ6oAD1Wx03dG9XG/f8swkaHnT1pMqLxY+yO8z7bkUX89/be20uBsxNeTSbluE
+         r3wrBKw/VmT1Qh3S2BYtg1zh9O0t5wJ/jhIvnrQCDTWQzYxAh6wHMPYOW7TaGyPTw8Cn
+         IGJ+mUm2U/YrpfQ9m2CCbcgmcx5tNBbH+TNsub8V8eqaOBMRLv7y7gqjDhGj+aGtvaJx
+         K6YA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724169284; x=1724774084;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=opQI35izZ6WQtBEicSMe5AQ7UT/vnA8rTEHw3gUCOjY=;
-        b=KaLWMq1DdN6K7IW6tl2UyiwhBzPyHAT4SWT9X/XLSxP1kkxXnDvfP4ByUpQsicf3OE
-         TiZO/LOKATPpd/+Plvn12x7LrxtICI1BvO39+rdELlNOZ0SAwF0pCevzokG5wZxY2kNM
-         JWP8fGjfGl2Z/5H9YLTlpzq/lFxUCL4873cTHKiNHk8QrNAttL6UHoSWqbBPkBgy32yt
-         Rm7XN3G6TfVjA4YQ25JFKlReRE3CDpRMQKOUbA1Q/vt0JfjB7gwKoe4Er+C9u8c3uCqb
-         8Ebg2OBPFevALMeiGJxsBBiAdIdkcyZbHjivR38bwhj0wgCS0FBBP/ulYRzcYT1RrA5/
-         qmJw==
-X-Gm-Message-State: AOJu0YxXwBjLVBA8G6wbKRVcgEkLPUHfalFwNh++nTkd0U+dqJpKndqa
-	IsGuNdhbVWXKcMLWPIK9y0Z16tqiycN8N5zho+bhV/giIOg2BXDYEuVzwg==
-X-Google-Smtp-Source: AGHT+IHbsbbdQtNgGyaLztAOTTQu65IW0OEP9vUDU9VPZLwA1/e/cJOqCEVRbwuHF40rQ+ICOhtQZQ==
-X-Received: by 2002:a05:620a:17a7:b0:79f:37f:9c40 with SMTP id af79cd13be357-7a5068e98a6mr1626640985a.12.1724169283870;
-        Tue, 20 Aug 2024 08:54:43 -0700 (PDT)
-Received: from [172.17.0.2] ([20.161.78.52])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7a4ff0e3592sm540973985a.92.2024.08.20.08.54.43
+        d=1e100.net; s=20230601; t=1724171299; x=1724776099;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=4k0oyaArmrTRChexp3A7axxXJn5CFtt9suCpVQLvw0k=;
+        b=EdHQTSxatN/eMLV+HJu2kMLcVVTq8FlHzrhipkd0JWxycNCnCAtP4K/pgsHyKQQd3n
+         HdfKuCqZLsW7UFVJOaJfmG6UyrzgpZaZh5GdA3g5YxI0Ltzdhis+78Vkc9AHTQh0kg3/
+         LNtpMXCg3DrlIFSPZEzfDBu6bIMKA/iN+8ovRa/we0EOkKuAQx5zObzu0PnxffmTQ5gs
+         RrhxYn5magO5BawXM7pctWKgLAZ6aPmRSP+E+52bxJ7YmIsGTKJHdoqHngKL9YavgCFQ
+         DTvsQc9kCd58S9RZrqPuGabKkPK3m9TMSfHee7A1KJasWVbN04q/IrTXz14ZOUSPBVKZ
+         kraQ==
+X-Gm-Message-State: AOJu0YxqoBXc26OM7UtopiIENb5mGowoWrx585ACb+DhM5vHU0hUbcru
+	jXhK/FF2+o+iwof97NV4We0IHYCmrfNgSR45JbpsQXgs98zetc7OgFBdXQ==
+X-Google-Smtp-Source: AGHT+IH5baHFQd9hHD+GSXYrhrq82n/xJkWVO4n1F5isnzuoePcdUPR7Dfn/iHjJnWpYoP0P4MJrZw==
+X-Received: by 2002:a05:6122:553:b0:4f6:a5ed:eb11 with SMTP id 71dfb90a1353d-4fc6c713793mr18023392e0c.8.1724171299272;
+        Tue, 20 Aug 2024 09:28:19 -0700 (PDT)
+Received: from lvondent-mobl5.. (syn-107-146-107-067.res.spectrum.com. [107.146.107.67])
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-4fc5b901a3fsm1394845e0c.26.2024.08.20.09.28.17
+        for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 20 Aug 2024 08:54:43 -0700 (PDT)
-Message-ID: <66c4bc43.050a0220.c15f3.62c6@mx.google.com>
-Date: Tue, 20 Aug 2024 08:54:43 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============3466313948557150407=="
+        Tue, 20 Aug 2024 09:28:18 -0700 (PDT)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ v1] bluetoothctl-endpoint.1: Update documentation
+Date: Tue, 20 Aug 2024 12:28:17 -0400
+Message-ID: <20240820162817.179210-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.46.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, vlad.pruteanu@nxp.com
-Subject: RE: Add support for setting bcode on bcast sink
-In-Reply-To: <20240820103918.24246-2-vlad.pruteanu@nxp.com>
-References: <20240820103918.24246-2-vlad.pruteanu@nxp.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 
---===============3466313948557150407==
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-VGhpcyBpcyBhdXRvbWF0ZWQgZW1haWwgYW5kIHBsZWFzZSBkbyBub3QgcmVwbHkgdG8gdGhpcyBl
-bWFpbCEKCkRlYXIgc3VibWl0dGVyLAoKVGhhbmsgeW91IGZvciBzdWJtaXR0aW5nIHRoZSBwYXRj
-aGVzIHRvIHRoZSBsaW51eCBibHVldG9vdGggbWFpbGluZyBsaXN0LgpUaGlzIGlzIGEgQ0kgdGVz
-dCByZXN1bHRzIHdpdGggeW91ciBwYXRjaCBzZXJpZXM6ClBXIExpbms6aHR0cHM6Ly9wYXRjaHdv
-cmsua2VybmVsLm9yZy9wcm9qZWN0L2JsdWV0b290aC9saXN0Lz9zZXJpZXM9ODgxMzAwCgotLS1U
-ZXN0IHJlc3VsdC0tLQoKVGVzdCBTdW1tYXJ5OgpDaGVja1BhdGNoICAgICAgICAgICAgICAgICAg
-ICBQQVNTICAgICAgMy43OSBzZWNvbmRzCkdpdExpbnQgICAgICAgICAgICAgICAgICAgICAgIFBB
-U1MgICAgICAyLjYwIHNlY29uZHMKQnVpbGRFbGwgICAgICAgICAgICAgICAgICAgICAgUEFTUyAg
-ICAgIDI0Ljc3IHNlY29uZHMKQmx1ZXpNYWtlICAgICAgICAgICAgICAgICAgICAgUEFTUyAgICAg
-IDE3NTUuNDMgc2Vjb25kcwpNYWtlQ2hlY2sgICAgICAgICAgICAgICAgICAgICBGQUlMICAgICAg
-MTMuMTggc2Vjb25kcwpNYWtlRGlzdGNoZWNrICAgICAgICAgICAgICAgICBGQUlMICAgICAgMTYx
-LjIyIHNlY29uZHMKQ2hlY2tWYWxncmluZCAgICAgICAgICAgICAgICAgRkFJTCAgICAgIDI1My43
-MSBzZWNvbmRzCkNoZWNrU21hdGNoICAgICAgICAgICAgICAgICAgIFdBUk5JTkcgICAzNTguODYg
-c2Vjb25kcwpibHVlem1ha2VleHRlbGwgICAgICAgICAgICAgICBQQVNTICAgICAgMTIwLjYyIHNl
-Y29uZHMKSW5jcmVtZW50YWxCdWlsZCAgICAgICAgICAgICAgUEFTUyAgICAgIDEzMDYwLjQwIHNl
-Y29uZHMKU2NhbkJ1aWxkICAgICAgICAgICAgICAgICAgICAgUEFTUyAgICAgIDEwMTYuOTUgc2Vj
-b25kcwoKRGV0YWlscwojIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMKVGVzdDogTWFrZUNo
-ZWNrIC0gRkFJTApEZXNjOiBSdW4gQmx1ZXogTWFrZSBDaGVjawpPdXRwdXQ6CgptYWtlWzNdOiAq
-KiogW01ha2VmaWxlOjExNzY0OiB0ZXN0LXN1aXRlLmxvZ10gRXJyb3IgMQptYWtlWzJdOiAqKiog
-W01ha2VmaWxlOjExODcyOiBjaGVjay1URVNUU10gRXJyb3IgMgptYWtlWzFdOiAqKiogW01ha2Vm
-aWxlOjEyMzAxOiBjaGVjay1hbV0gRXJyb3IgMgptYWtlOiAqKiogW01ha2VmaWxlOjEyMzAzOiBj
-aGVja10gRXJyb3IgMgojIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMKVGVzdDogTWFrZURp
-c3RjaGVjayAtIEZBSUwKRGVzYzogUnVuIEJsdWV6IE1ha2UgRGlzdGNoZWNrCk91dHB1dDoKClBh
-Y2thZ2UgY3VwcyB3YXMgbm90IGZvdW5kIGluIHRoZSBwa2ctY29uZmlnIHNlYXJjaCBwYXRoLgpQ
-ZXJoYXBzIHlvdSBzaG91bGQgYWRkIHRoZSBkaXJlY3RvcnkgY29udGFpbmluZyBgY3Vwcy5wYycK
-dG8gdGhlIFBLR19DT05GSUdfUEFUSCBlbnZpcm9ubWVudCB2YXJpYWJsZQpObyBwYWNrYWdlICdj
-dXBzJyBmb3VuZAptYWtlWzRdOiAqKiogW01ha2VmaWxlOjExNzY0OiB0ZXN0LXN1aXRlLmxvZ10g
-RXJyb3IgMQptYWtlWzNdOiAqKiogW01ha2VmaWxlOjExODcyOiBjaGVjay1URVNUU10gRXJyb3Ig
-MgptYWtlWzJdOiAqKiogW01ha2VmaWxlOjEyMzAxOiBjaGVjay1hbV0gRXJyb3IgMgptYWtlWzFd
-OiAqKiogW01ha2VmaWxlOjEyMzAzOiBjaGVja10gRXJyb3IgMgptYWtlOiAqKiogW01ha2VmaWxl
-OjEyMjI0OiBkaXN0Y2hlY2tdIEVycm9yIDEKIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMj
-ClRlc3Q6IENoZWNrVmFsZ3JpbmQgLSBGQUlMCkRlc2M6IFJ1biBCbHVleiBNYWtlIENoZWNrIHdp
-dGggVmFsZ3JpbmQKT3V0cHV0OgoKdG9vbHMvbWdtdC10ZXN0ZXIuYzogSW4gZnVuY3Rpb24g4oCY
-bWFpbuKAmToKdG9vbHMvbWdtdC10ZXN0ZXIuYzoxMjcyNTo1OiBub3RlOiB2YXJpYWJsZSB0cmFj
-a2luZyBzaXplIGxpbWl0IGV4Y2VlZGVkIHdpdGgg4oCYLWZ2YXItdHJhY2tpbmctYXNzaWdubWVu
-dHPigJksIHJldHJ5aW5nIHdpdGhvdXQKMTI3MjUgfCBpbnQgbWFpbihpbnQgYXJnYywgY2hhciAq
-YXJndltdKQogICAgICB8ICAgICBefn5+Cm1ha2VbM106ICoqKiBbTWFrZWZpbGU6MTE3NjQ6IHRl
-c3Qtc3VpdGUubG9nXSBFcnJvciAxCm1ha2VbMl06ICoqKiBbTWFrZWZpbGU6MTE4NzI6IGNoZWNr
-LVRFU1RTXSBFcnJvciAyCm1ha2VbMV06ICoqKiBbTWFrZWZpbGU6MTIzMDE6IGNoZWNrLWFtXSBF
-cnJvciAyCm1ha2U6ICoqKiBbTWFrZWZpbGU6MTIzMDM6IGNoZWNrXSBFcnJvciAyCiMjIyMjIyMj
-IyMjIyMjIyMjIyMjIyMjIyMjIyMjIwpUZXN0OiBDaGVja1NtYXRjaCAtIFdBUk5JTkcKRGVzYzog
-UnVuIHNtYXRjaCB0b29sIHdpdGggc291cmNlCk91dHB1dDoKc3JjL3NoYXJlZC9iYXAuYzoyODg6
-MjU6IHdhcm5pbmc6IGFycmF5IG9mIGZsZXhpYmxlIHN0cnVjdHVyZXNzcmMvc2hhcmVkL2JhcC5j
-OiBub3RlOiBpbiBpbmNsdWRlZCBmaWxlOi4vc3JjL3NoYXJlZC9hc2NzLmg6ODg6MjU6IHdhcm5p
-bmc6IGFycmF5IG9mIGZsZXhpYmxlIHN0cnVjdHVyZXNzcmMvc2hhcmVkL2JhcC5jOjI4ODoyNTog
-d2FybmluZzogYXJyYXkgb2YgZmxleGlibGUgc3RydWN0dXJlc3NyYy9zaGFyZWQvYmFwLmM6IG5v
-dGU6IGluIGluY2x1ZGVkIGZpbGU6Li9zcmMvc2hhcmVkL2FzY3MuaDo4ODoyNTogd2FybmluZzog
-YXJyYXkgb2YgZmxleGlibGUgc3RydWN0dXJlc3NyYy9zaGFyZWQvYmFwLmM6Mjg4OjI1OiB3YXJu
-aW5nOiBhcnJheSBvZiBmbGV4aWJsZSBzdHJ1Y3R1cmVzc3JjL3NoYXJlZC9iYXAuYzogbm90ZTog
-aW4gaW5jbHVkZWQgZmlsZTouL3NyYy9zaGFyZWQvYXNjcy5oOjg4OjI1OiB3YXJuaW5nOiBhcnJh
-eSBvZiBmbGV4aWJsZSBzdHJ1Y3R1cmVzCgoKLS0tClJlZ2FyZHMsCkxpbnV4IEJsdWV0b290aAoK
+This updates the documentation for endpoint.presets command and also add
+some examples of how to enter extra capabilities/configuration and
+how to setup custom presets.
+---
+ client/bluetoothctl-endpoint.rst | 72 +++++++++++++++++++++++++++++++-
+ 1 file changed, 70 insertions(+), 2 deletions(-)
 
---===============3466313948557150407==--
+diff --git a/client/bluetoothctl-endpoint.rst b/client/bluetoothctl-endpoint.rst
+index 91409943a32d..d7865486e2a2 100644
+--- a/client/bluetoothctl-endpoint.rst
++++ b/client/bluetoothctl-endpoint.rst
+@@ -40,7 +40,26 @@ register
+ 
+ Register Endpoint.
+ 
+-:Usage: **# register <UUID> <codec> [capabilities...]**
++:Usage: **# register <UUID> <codec[:company]> [capabilities...]**
++:Example LC3 source:
++	 | **#endpoint.register 00002bcb-0000-1000-8000-00805f9b34fb 0x06**
++	 | **#Auto Accept (yes/no):** y
++	 | **#Max Transports (auto/value):** a
++	 | **#Locations:** a
++	 | **#Supported Context (value):** 3
++	 | **#Context (value):** 3
++	 | **#CIG (auto/value):** a
++	 | **#CIS (auto/value):** a
++:Example LC3 since with extra capabilities:
++	 | **#endpoint.register 00002bc9-0000-1000-8000-00805f9b34fb 0x06 "0x03 0xe5 0x03 0x00 0x02 0xe6 0x07"**
++	 | **#Enter Metadata (value/no):** n
++	 | **#Auto Accept (yes/no):** y
++	 | **#Max Transports (auto/value):** a
++	 | **#Locations:** a
++	 | **#Supported Context (value):** 3
++	 | **#Context (value):** 3
++	 | **#CIG (auto/value):** a
++	 | **#CIS (auto/value):** a
+ 
+ unregister
+ ----------
+@@ -61,7 +80,56 @@ presets
+ 
+ List available presets.
+ 
+-:Usage: **# presets <UUID> [default]**
++:Usage: **# presets <endpoint>/<UUID> [codec[:company]] [preset] [codec config] [metadata]**
++:Example using endpoint:
++	  | **#presets /local/endpoint/ep0 32_1_1**
++	  | **#presets /local/endpoint/ep0**
++	  | Preset 32_1_1
++	  | Configuration.#0: len 0x02 type 0x01
++          | Configuration.Sampling Frequency: 32 Khz (0x06)
++          | Configuration.#1: len 0x02 type 0x02
++          | Configuration.Frame Duration: 7.5 ms (0x00)
++          | Configuration.#2: len 0x03 type 0x04
++          | Configuration.Frame Length: 60 (0x003c)
++:Example using UUID:
++	  | **#presets 00002bc9-0000-1000-8000-00805f9b34fb 0x06 32_1_1**
++	  | **#presets 00002bc9-0000-1000-8000-00805f9b34fb 0x06**
++	  | ...
++	  | ***32_1_1**
++:Example setting up LC3 custom preset:
++	  | **#presets 00002bc9-0000-1000-8000-00805f9b34fb 0x06 custom**
++	  | **#[Codec] Enter frequency (Khz):** 48
++	  | **#[Codec] Enter frame duration (ms):** 10
++	  | **#[Codec] Enter channel allocation:** 3
++	  | **#[Codec] Enter frame length:** 100
++	  | **#[QoS] Enter Target Latency (Low, Balance, High):** Low
++	  | **#[QoS] Enter SDU Interval (us):** 1000
++	  | **#[QoS] Enter Framing (Unframed, Framed):** Unframed
++	  | **#[QoS] Enter PHY (1M, 2M):** 2M
++	  | **#[QoS] Enter Max SDU:** 200
++	  | **#[QoS] Enter RTN:** 3
++	  | **#[QoS] Enter Max Transport Latency (ms):** 10
++	  | **#[QoS] Enter Presentation Delay (us):** 20000
++	  | **#presets 00002bc9-0000-1000-8000-00805f9b34fb 0x06**
++	  | ...
++	  | ***custom**
++:Example setting up LC3 custom preset with extra configuration:
++	  | **#presets 00002bc9-0000-1000-8000-00805f9b34fb 0x06 custom "0x03 0xe8 0x00 0x00 0x02 0xe9 0x00"**
++	  | **#[Codec] Enter frequency (Khz):** 48
++	  | **#[Codec] Enter frame duration (ms):** 10
++	  | **#[Codec] Enter channel allocation:** 3
++	  | **#[Codec] Enter frame length:** 100
++	  | **#[QoS] Enter Target Latency (Low, Balance, High):** Low
++	  | **#[QoS] Enter SDU Interval (us):** 1000
++	  | **#[QoS] Enter Framing (Unframed, Framed):** Unframed
++	  | **#[QoS] Enter PHY (1M, 2M):** 2M
++	  | **#[QoS] Enter Max SDU:** 200
++	  | **#[QoS] Enter RTN:** 3
++	  | **#[QoS] Enter Max Transport Latency (ms):** 10
++	  | **#[QoS] Enter Presentation Delay (us):** 20000
++	  | **#presets 00002bc9-0000-1000-8000-00805f9b34fb 0x06**
++	  | ...
++	  | ***custom**
+ 
+ RESOURCES
+ =========
+-- 
+2.46.0
+
