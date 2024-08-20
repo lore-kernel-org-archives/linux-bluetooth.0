@@ -1,117 +1,141 @@
-Received: from mail-qk1-f181.google.com (mail-qk1-f181.google.com [209.85.222.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from sender4-op-o12.zoho.com (sender4-op-o12.zoho.com [136.143.188.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CF5518E023
-	for <linux-bluetooth@vger.kernel.org>; Tue, 20 Aug 2024 13:08:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.181
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724159282; cv=none; b=LGmUq8hD0iivsn+mFFgiCzla5iDx+d64nhR+JcFzZ/YohVIVaA32bPu8cEbdr/0epBApylq8brN96YJph3SGvo5LN0S2SMtGK7D0x+buIzbczlbW/fQgnoj3/Np+g7rlJP5CfRTxiMS5CUfRUqXqkTKnQwzHPyHuFqHIR+T8GkM=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724159282; c=relaxed/simple;
-	bh=plJ6Jyc6U0JgtXw3iPSNFcY9K/PBv1CUUdalr4hw0+g=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=Yh49hkpg/RwUty8KSNTdnmY4x3WGTRbjs4z6au5JV/4yb8vIm9WHL8VZc8XHgMDrCtWHzkGPLkeD/GRv10XRVHAsCtv2AWKiSqNrumvaoyKtVkitcFJ/pAAdSZ/qiMGr2CtPQXs7sjwgUlkYJSKiqZabkJXdYilPNTrrOkYP7vk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hohnNEJ9; arc=none smtp.client-ip=209.85.222.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4B22191476
+	for <linux-bluetooth@vger.kernel.org>; Tue, 20 Aug 2024 14:04:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.12
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1724162667; cv=pass; b=poDW9dmb9DnTr7kbmjRtwWcj0ekGH39pR0TYSepvbEkscuJGBNbpqYzXuYAzzK8xymxFllvgPAphp32A+o1/1JF94YyB2o4+sVqsOMmhY/iVAnt8ynfLgBgRjncFHReikmBhQtOzsmOCnDsUd6q2DT1ka8YsGbTv4xbe00LXfxE=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1724162667; c=relaxed/simple;
+	bh=A4NW1yg+fl/nHZrZLJikCceHKNv1o7J4XmcLlw4jRd8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=nlRcdzqJMKpo8BZeRo8SL4Kq0GdbncXU7OmbSg2d/WE4wY6sFue+CutmmC5bHVWRKT0qrNnOVbUlP9vcABxnbytf4COM4zZQQUammgwBK0DPKCc10zV5z3F9uY3I/6l8dj9RUUFXz3m32L/njcbReNnWnZ7nzSZ7dTx4zPMincQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (1024-bit key) header.d=collabora.com header.i=frederic.danis@collabora.com header.b=BxXaZ5iu; arc=pass smtp.client-ip=136.143.188.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hohnNEJ9"
-Received: by mail-qk1-f181.google.com with SMTP id af79cd13be357-7a1d436c95fso336979485a.3
-        for <linux-bluetooth@vger.kernel.org>; Tue, 20 Aug 2024 06:08:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1724159280; x=1724764080; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=plJ6Jyc6U0JgtXw3iPSNFcY9K/PBv1CUUdalr4hw0+g=;
-        b=hohnNEJ9D8+RJKoJ7vmyQHJdvSoTk7Ci9ebaL+wOic+C26DumBDmV9WQZiEJ56GVfB
-         tG+o62pfgsfTD4fmJpEw1oJogB/BRdKkBcjCumDafspqMFTASGu6oGbf1oohyCH2XCt4
-         jkPC+FJpANyNKtAh9oLZPGlvSAX8lK0rjY9Ir6uNxFiAiDY/KRiwzCxKtI4D3fSC9HSh
-         GgjMItmNSUKfSPnqfm0fr1ScQCMKT9NhE/2tnD2Qvr0/p7VHdBxsUnGnhMQBkGCUq9we
-         Vh9UFxIC/cSOuTcX4wtQRomP9yIFLbYFIXW02ZnADaY1Al5GBQysiL8xuz1rnzkvVcbb
-         IxqA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724159280; x=1724764080;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=plJ6Jyc6U0JgtXw3iPSNFcY9K/PBv1CUUdalr4hw0+g=;
-        b=UC8WF8ZW7/6AyIVK3trDdsbzxE3O95wj5oF3ChP3Yl1yEop1oD9DWhDL3/XNUf8M4V
-         VvqnxZtxHQdObCXJrlP5ysGMfxrKAWkoi0RPYzHzqNdlhI/sJzQG/3p5zlw3ApNjBYb5
-         U7RqEZdAeS8SaHMvC5LG+gLcbWPqM4OOLB7Vzpj6KicHGg6wp7OARIX9mxCiiNuJ1+Oo
-         /8cVOy1QP4H/dVhpHASKxWZ1zwu3HaCNOehRIbReNXb2v75w7deXYxTGc1tyHpTrHd49
-         K8Tl5kQX4MwTp4ILr4RaYogh4VnGR5Am4Q6w6EzD+iYlUtoJNscG8qH8GNgRIWAHaXBH
-         5nsQ==
-X-Gm-Message-State: AOJu0YwjV4AGO+qGstzJQmcWk8aDp5fOZ2+rlrOdL8V6Q8LIA+DZSYuY
-	w7YEBDytTHJWV/NhGrGJj4UFDea6Z4igg4BC3Iplbn5xfai4BU3l9/lL1A==
-X-Google-Smtp-Source: AGHT+IEhwbzuBtvIPNnkL+GyPk7X6XcC/5tj+vmzY9/NYiXgp6b9TFJ17USY1sba43isPMSV0hu31Q==
-X-Received: by 2002:a05:6214:4906:b0:6b5:e3ee:f7f6 with SMTP id 6a1803df08f44-6bf7cdd895cmr214276976d6.23.1724159279445;
-        Tue, 20 Aug 2024 06:07:59 -0700 (PDT)
-Received: from [172.17.0.2] ([172.183.131.137])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6bf6fdd886asm51532096d6.24.2024.08.20.06.07.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 20 Aug 2024 06:07:59 -0700 (PDT)
-Message-ID: <66c4952f.050a0220.cdf27.49ac@mx.google.com>
-Date: Tue, 20 Aug 2024 06:07:59 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============3409623707274417495=="
+	dkim=pass (1024-bit key) header.d=collabora.com header.i=frederic.danis@collabora.com header.b="BxXaZ5iu"
+ARC-Seal: i=1; a=rsa-sha256; t=1724162661; cv=none; 
+	d=zohomail.com; s=zohoarc; 
+	b=Mz7tsNghXcPvBNvVBdsuenezjvcI0RV6Q6a4NCfebL8kK5wNOLs6EMkFjpjxg/L+jSoZVmlBeTS5WoWaLG1yCEScFhgqyeA5kZ7sJGg1pfxZwq7zjkoyuQjP995mO2gL8vUQCV9QzFczX6HYkwhVuTUWchHwpTJU0MymJirxBNc=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
+	t=1724162661; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
+	bh=0Ud9NghJIIlZGeIo/8KuLkX2pdvHz+Va3xHSC9BZRCs=; 
+	b=LgbSI00KqggIhhKzvFC9tq3MRUnS9BLdxCXOmPy2Fm6blcosfKbdVd9fONOfkMD+Kyisz/CNVE21izDLbbk4430J4s7LhTbDJVqLr+a0sA2aVmEEQfHq47L+SPCz7KzM+XX9BpqB2J4oGKv+DQKjCYdg+D6IfyzHnK1g1SW3am4=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+	dkim=pass  header.i=collabora.com;
+	spf=pass  smtp.mailfrom=frederic.danis@collabora.com;
+	dmarc=pass header.from=<frederic.danis@collabora.com>
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1724162661;
+	s=zohomail; d=collabora.com; i=frederic.danis@collabora.com;
+	h=Message-ID:Date:Date:MIME-Version:Subject:Subject:To:To:Cc:Cc:References:From:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:Message-Id:Reply-To;
+	bh=0Ud9NghJIIlZGeIo/8KuLkX2pdvHz+Va3xHSC9BZRCs=;
+	b=BxXaZ5iufcdEbkZ+51nloSCBa80+mMIYzPAj/DmBXRlc5NNrhAO3xO1Oun20ClRl
+	eYpARMD1vhwDYkQN1Y4B7T3js9dtMez1yuxKw9HQzde3qSch8yj1AmZO/JGeB4OnCbI
+	Fuq0I3BCO3HVDHGX6GEHmjEmImhv+E4O9ZM11W9s=
+Received: by mx.zohomail.com with SMTPS id 172416266005230.829279300486974;
+	Tue, 20 Aug 2024 07:04:20 -0700 (PDT)
+Message-ID: <7ddf521f-4c43-4217-859a-aa59468b8e3a@collabora.com>
+Date: Tue, 20 Aug 2024 16:04:17 +0200
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, iulia.tanasescu@nxp.com
-Subject: RE: client: Add bluetoothctl-assistant.1 man page
-In-Reply-To: <20240820113153.25708-2-iulia.tanasescu@nxp.com>
-References: <20240820113153.25708-2-iulia.tanasescu@nxp.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] Bluetooth: hci_bcm: Use speed set by btattach as
+ oper_speed
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+References: <20240814130018.263129-1-frederic.danis@collabora.com>
+ <CABBYNZJsmq6KYEZi9+KbdtN40uoi+6M6j+D5-a732X_34H1-fA@mail.gmail.com>
+Content-Language: en-US
+From: =?UTF-8?Q?Fr=C3=A9d=C3=A9ric_Danis?= <frederic.danis@collabora.com>
+In-Reply-To: <CABBYNZJsmq6KYEZi9+KbdtN40uoi+6M6j+D5-a732X_34H1-fA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ZohoMailClient: External
 
---===============3409623707274417495==
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
+Hi Luiz,
 
-VGhpcyBpcyBhdXRvbWF0ZWQgZW1haWwgYW5kIHBsZWFzZSBkbyBub3QgcmVwbHkgdG8gdGhpcyBl
-bWFpbCEKCkRlYXIgc3VibWl0dGVyLAoKVGhhbmsgeW91IGZvciBzdWJtaXR0aW5nIHRoZSBwYXRj
-aGVzIHRvIHRoZSBsaW51eCBibHVldG9vdGggbWFpbGluZyBsaXN0LgpUaGlzIGlzIGEgQ0kgdGVz
-dCByZXN1bHRzIHdpdGggeW91ciBwYXRjaCBzZXJpZXM6ClBXIExpbms6aHR0cHM6Ly9wYXRjaHdv
-cmsua2VybmVsLm9yZy9wcm9qZWN0L2JsdWV0b290aC9saXN0Lz9zZXJpZXM9ODgxMzE0CgotLS1U
-ZXN0IHJlc3VsdC0tLQoKVGVzdCBTdW1tYXJ5OgpDaGVja1BhdGNoICAgICAgICAgICAgICAgICAg
-ICBQQVNTICAgICAgMC4zOCBzZWNvbmRzCkdpdExpbnQgICAgICAgICAgICAgICAgICAgICAgIFBB
-U1MgICAgICAwLjMwIHNlY29uZHMKQnVpbGRFbGwgICAgICAgICAgICAgICAgICAgICAgUEFTUyAg
-ICAgIDI1LjExIHNlY29uZHMKQmx1ZXpNYWtlICAgICAgICAgICAgICAgICAgICAgUEFTUyAgICAg
-IDE3NzcuMzAgc2Vjb25kcwpNYWtlQ2hlY2sgICAgICAgICAgICAgICAgICAgICBGQUlMICAgICAg
-MTMuNjUgc2Vjb25kcwpNYWtlRGlzdGNoZWNrICAgICAgICAgICAgICAgICBGQUlMICAgICAgMTYy
-LjI5IHNlY29uZHMKQ2hlY2tWYWxncmluZCAgICAgICAgICAgICAgICAgRkFJTCAgICAgIDI1NS43
-MSBzZWNvbmRzCkNoZWNrU21hdGNoICAgICAgICAgICAgICAgICAgIFBBU1MgICAgICAzNjIuMjgg
-c2Vjb25kcwpibHVlem1ha2VleHRlbGwgICAgICAgICAgICAgICBQQVNTICAgICAgMTIzLjk1IHNl
-Y29uZHMKSW5jcmVtZW50YWxCdWlsZCAgICAgICAgICAgICAgUEFTUyAgICAgIDE1NDUuNzUgc2Vj
-b25kcwpTY2FuQnVpbGQgICAgICAgICAgICAgICAgICAgICBQRU5ESU5HICAgMTA5OS45NyBzZWNv
-bmRzCgpEZXRhaWxzCiMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIwpUZXN0OiBNYWtlQ2hl
-Y2sgLSBGQUlMCkRlc2M6IFJ1biBCbHVleiBNYWtlIENoZWNrCk91dHB1dDoKCm1ha2VbM106ICoq
-KiBbTWFrZWZpbGU6MTE3NjY6IHRlc3Qtc3VpdGUubG9nXSBFcnJvciAxCm1ha2VbMl06ICoqKiBb
-TWFrZWZpbGU6MTE4NzQ6IGNoZWNrLVRFU1RTXSBFcnJvciAyCm1ha2VbMV06ICoqKiBbTWFrZWZp
-bGU6MTIzMDM6IGNoZWNrLWFtXSBFcnJvciAyCm1ha2U6ICoqKiBbTWFrZWZpbGU6MTIzMDU6IGNo
-ZWNrXSBFcnJvciAyCiMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIwpUZXN0OiBNYWtlRGlz
-dGNoZWNrIC0gRkFJTApEZXNjOiBSdW4gQmx1ZXogTWFrZSBEaXN0Y2hlY2sKT3V0cHV0OgoKUGFj
-a2FnZSBjdXBzIHdhcyBub3QgZm91bmQgaW4gdGhlIHBrZy1jb25maWcgc2VhcmNoIHBhdGguClBl
-cmhhcHMgeW91IHNob3VsZCBhZGQgdGhlIGRpcmVjdG9yeSBjb250YWluaW5nIGBjdXBzLnBjJwp0
-byB0aGUgUEtHX0NPTkZJR19QQVRIIGVudmlyb25tZW50IHZhcmlhYmxlCk5vIHBhY2thZ2UgJ2N1
-cHMnIGZvdW5kCm1ha2VbNF06ICoqKiBbTWFrZWZpbGU6MTE3NjY6IHRlc3Qtc3VpdGUubG9nXSBF
-cnJvciAxCm1ha2VbM106ICoqKiBbTWFrZWZpbGU6MTE4NzQ6IGNoZWNrLVRFU1RTXSBFcnJvciAy
-Cm1ha2VbMl06ICoqKiBbTWFrZWZpbGU6MTIzMDM6IGNoZWNrLWFtXSBFcnJvciAyCm1ha2VbMV06
-ICoqKiBbTWFrZWZpbGU6MTIzMDU6IGNoZWNrXSBFcnJvciAyCm1ha2U6ICoqKiBbTWFrZWZpbGU6
-MTIyMjY6IGRpc3RjaGVja10gRXJyb3IgMQojIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMK
-VGVzdDogQ2hlY2tWYWxncmluZCAtIEZBSUwKRGVzYzogUnVuIEJsdWV6IE1ha2UgQ2hlY2sgd2l0
-aCBWYWxncmluZApPdXRwdXQ6Cgp0b29scy9tZ210LXRlc3Rlci5jOiBJbiBmdW5jdGlvbiDigJht
-YWlu4oCZOgp0b29scy9tZ210LXRlc3Rlci5jOjEyNzI1OjU6IG5vdGU6IHZhcmlhYmxlIHRyYWNr
-aW5nIHNpemUgbGltaXQgZXhjZWVkZWQgd2l0aCDigJgtZnZhci10cmFja2luZy1hc3NpZ25tZW50
-c+KAmSwgcmV0cnlpbmcgd2l0aG91dAoxMjcyNSB8IGludCBtYWluKGludCBhcmdjLCBjaGFyICph
-cmd2W10pCiAgICAgIHwgICAgIF5+fn4KbWFrZVszXTogKioqIFtNYWtlZmlsZToxMTc2NjogdGVz
-dC1zdWl0ZS5sb2ddIEVycm9yIDEKbWFrZVsyXTogKioqIFtNYWtlZmlsZToxMTg3NDogY2hlY2st
-VEVTVFNdIEVycm9yIDIKbWFrZVsxXTogKioqIFtNYWtlZmlsZToxMjMwMzogY2hlY2stYW1dIEVy
-cm9yIDIKbWFrZTogKioqIFtNYWtlZmlsZToxMjMwNTogY2hlY2tdIEVycm9yIDIKIyMjIyMjIyMj
-IyMjIyMjIyMjIyMjIyMjIyMjIyMjClRlc3Q6IFNjYW5CdWlsZCAtIFBFTkRJTkcKRGVzYzogUnVu
-IFNjYW4gQnVpbGQKT3V0cHV0OgoKCgotLS0KUmVnYXJkcywKTGludXggQmx1ZXRvb3RoCgo=
+On 19/08/2024 16:49, Luiz Augusto von Dentz wrote:
+> Hi Frédéric,
+>
+> On Wed, Aug 14, 2024 at 9:07 AM Frédéric Danis
+> <frederic.danis@collabora.com> wrote:
+>> Starting a BCM UART controller not defined as a platform device or
+>> a serdev with "btattach -B /dev/ttyS1 -P bcm -S 3000000" works fine
+>> but the serial port remains at the init_speed, i.e. 115200.
+>>
+>> The oper_speed is only set if a device is declared in ACPI, device
+>> tree or as a platform device.
+>>
+>> When no registered device has been found this commit will use the
+>> current tty speed set by btattach as the oper_speed.
+>>
+>> Signed-off-by: Frédéric Danis <frederic.danis@collabora.com>
+>> ---
+>>
+>> This has been tested with 5.4 kernel only.
+>> Afaict there's no change in this driver which should be impacted by
+>> this commit in latest kernel.
+>>
+>>   drivers/bluetooth/hci_bcm.c | 5 +++++
+>>   1 file changed, 5 insertions(+)
+>>
+>> diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
+>> index 89d4c2224546..57cacf63ae12 100644
+>> --- a/drivers/bluetooth/hci_bcm.c
+>> +++ b/drivers/bluetooth/hci_bcm.c
+>> @@ -508,6 +508,11 @@ static int bcm_open(struct hci_uart *hu)
+>>
+>>                  if (err)
+>>                          goto err_unset_hu;
+>> +       } else {
+>> +               /* This is not a serdev or platform device, it should have been started by
+>> +                * btattach, in this case use the tty speed set by btattach as oper_speed
+>> +                */
+>> +               hu->oper_speed = hu->tty->termios.c_ospeed;
+>>          }
+> While Im fine with the general idea of derive the speed from the tty
+> what Im not sure where it should be done since doing this on the
+> driver may duplicate the logic if we later found there is a better
+> place to do it.
+>
+> Looks at hci_uart.c it seems like we could actually register a set_termios:
+>
+>   * @set_termios: [TTY] ``void ()(struct tty_struct *tty, const struct
+> ktermios *old)``
+>   *
+>   *    This function notifies the line discpline that a change has been made
+>   *    to the termios structure.
+>   *
+>   *    Optional.
+>
+> So I assume when the user changes the speed the above callback gets
+> called and we could then reflect the changes to the oper_speed, or
+> perhaps the real problem was that hci_uart_set_baudrate was not
+> called?
 
---===============3409623707274417495==--
+The hci_uart_set_baudrate is called correctly as when I forced the 
+oper_speed the serial port speed changes accordingly and I saw the 
+hci_uart_set_baudrate debug trace.
+
+Unfortunately, the serial port speed is fixed by btattach before setting 
+the line discipline, so that the set_termios is not called in this case.
+But above all, set_termios is called each time the driver change the 
+speed, i.e. when it sets the initial speed.
+
+I will send a new patch to copy the serial port speed to the oper_speed 
+in hci_uart_tty_open() of drivers/bluetooth/hci_ldisc.c.
+
+-- 
+Frédéric Danis
+Senior Software Engineer
+
+Collabora Ltd.
+Platinum Building, St John's Innovation Park, Cambridge CB4 0DS, United Kingdom
+Registered in England & Wales, no. 5513718
+
