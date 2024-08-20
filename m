@@ -1,54 +1,55 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F06D018E352
-	for <linux-bluetooth@vger.kernel.org>; Tue, 20 Aug 2024 08:51:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 312501171C
+	for <linux-bluetooth@vger.kernel.org>; Tue, 20 Aug 2024 08:53:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724143865; cv=none; b=l5VJUuv36YMSuaH6+C0DzwLuTujiZjwvn1NcTFAkgvbRd2jDoRExiugtXUPA+DnwpTAJIlPEYU9rO8OXg1d8Gz272dkmndf8xaQdbm7jyVpiEBavVEcbXjQnJAzokpaX9UGJveKSsPXhcS5uT/FsWyXnbwJ4Qd9SThxBNURYdp4=
+	t=1724143982; cv=none; b=TDshT0MO1RwPwQFAfrrm67u2sP/EUUp0h9Q8wkvl8hOC2k4XJROsV8MhOChrJfNIuiZXGRKb2NfZuNejbh/kGlbS9rpJzbL0/bqf6GTuukI/7te2oF+80sPAc9AZb3elqQJ1K2O1s4MhjJgZ2uzUa2ymicGqJK73d5NJDl4Kbco=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724143865; c=relaxed/simple;
-	bh=UWtwbihwD4czI6riwgMVd6PD40sDZd9jcapgcrwy0X8=;
-	h=From:To:Subject:Date:Message-ID:Content-Type:MIME-Version; b=tmk9u3f3D9UouXKsP+j9gQfqFMPMXltDsojlOPxqQa88n8jsMmdqHbNaOljlT7qkOJvHnHzAErGJyiy9ufmiLZErqGpXQr10paN6mFh9vQyOYKzqZMiC76SPNcPxw+CESwIrEyojxWMI44nYi8IjnO8aEGHC6BZ4ZBojD2i7oBk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LdqJod6m; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1724143982; c=relaxed/simple;
+	bh=L7uJ65DnqM4pqlwyew9cAxkM13ZMHgmSfBf+NHss1w4=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=ByLpFQy+UQP0mF64lvSOdJ9yDIZ5KQe6fbTMuWvYlDiVACooPL1UhEXJchxMamdLHVodF4PyBQs6jjBkzp2awXfL2+iMB2n3qs0vd4MHXe2fVmX7j8t4SqdP9bnAAL5hQUaH4nKqEsfTeluKqQ0EQ9kfrJSveakAuwf82dU/OJ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NjtWC1kg; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LdqJod6m"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 792C0C4AF0B
-	for <linux-bluetooth@vger.kernel.org>; Tue, 20 Aug 2024 08:51:04 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NjtWC1kg"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id A522DC4AF0F
+	for <linux-bluetooth@vger.kernel.org>; Tue, 20 Aug 2024 08:53:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724143864;
-	bh=UWtwbihwD4czI6riwgMVd6PD40sDZd9jcapgcrwy0X8=;
-	h=From:To:Subject:Date:From;
-	b=LdqJod6m5UvFK3zbTyRMJeG6w5bY2XFFlOeRFmrU0lv46vo2CNVuWH/luj2bE+nJv
-	 iirupdGDYhWxEgYWPrV2VLXCCBxbPF0XX9syKPOGZGP0rY79pWH/Ttpn2qgUPFCGsH
-	 BonSkpIcZIyHmIJwu5WM46Av7YVybDlcoCi0rsFklfLafPrfpusyxmNRFTJqSwnUKM
-	 e+B+LYiv1rI7cIe9mfgmRLktwYPolbzAul8JjEsSGTg5Q83iB00m66np23s20YKQfI
-	 0yes8woKODxECjpHl7YqF353O6hySUy6HffCtzga29Xs6KoNllaNnyc/JnYQ5OvDJK
-	 rXwMdhGA/on0Q==
+	s=k20201202; t=1724143981;
+	bh=L7uJ65DnqM4pqlwyew9cAxkM13ZMHgmSfBf+NHss1w4=;
+	h=From:To:Subject:Date:In-Reply-To:References:From;
+	b=NjtWC1kgF3UXWdKUO9HqvSBY9CpUcCtiJXXGM/T4AyZaeBt6e99AuFX+Mz3vMiHvD
+	 LmW3ZYmO6DoBxDFTb6LVTB/9Ug30f3Jti5QFP3J8ow3JsYXy97tQdgX/NIUgBnF4T3
+	 0c9wxZ+1ZN0vkR45TWzTkpVzxWL7hrJk7lBrmJ3dVDwRNwvTWjNm4zt46qrkVi6P+t
+	 azqU3Nxb+u740nDRXNWpny2UL+r9xYdRMMO2IVPMuBZ8S5JzPFzUb7ry8S77cTqRs5
+	 AJ2II5Rph1dStSTJXsahNZAEHMuT65CzyLSiFfJP2K6Tfy13Y9JztUt8DxRoNDlIoD
+	 ZIuJE5r4cuVDA==
 Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id 67F93C53B7F; Tue, 20 Aug 2024 08:51:04 +0000 (UTC)
+	id 9E407C53BA7; Tue, 20 Aug 2024 08:53:01 +0000 (UTC)
 From: bugzilla-daemon@kernel.org
 To: linux-bluetooth@vger.kernel.org
-Subject: [Bug 219182] New: MT7925 new USBID 13d3:3608
-Date: Tue, 20 Aug 2024 08:51:04 +0000
+Subject: [Bug 219182] MT7925 new USBID 13d3:3608
+Date: Tue, 20 Aug 2024 08:53:01 +0000
 X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: new
+X-Bugzilla-Type: changed
 X-Bugzilla-Watch-Reason: None
 X-Bugzilla-Product: Drivers
 X-Bugzilla-Component: Bluetooth
 X-Bugzilla-Version: 2.5
 X-Bugzilla-Keywords: 
 X-Bugzilla-Severity: normal
-X-Bugzilla-Who: pavel@noa-labs.com
+X-Bugzilla-Who: pmenzel+bugzilla.kernel.org@molgen.mpg.de
 X-Bugzilla-Status: NEW
 X-Bugzilla-Resolution: 
 X-Bugzilla-Priority: P3
 X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
 X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: bug_id short_desc product version rep_platform
- op_sys bug_status bug_severity priority component assigned_to reporter
- cf_regression attachments.created
-Message-ID: <bug-219182-62941@https.bugzilla.kernel.org/>
+X-Bugzilla-Changed-Fields: cc
+Message-ID: <bug-219182-62941-FIbdgEDfPV@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-219182-62941@https.bugzilla.kernel.org/>
+References: <bug-219182-62941@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-Bugzilla-URL: https://bugzilla.kernel.org/
@@ -62,27 +63,18 @@ MIME-Version: 1.0
 
 https://bugzilla.kernel.org/show_bug.cgi?id=3D219182
 
-            Bug ID: 219182
-           Summary: MT7925 new USBID 13d3:3608
-           Product: Drivers
-           Version: 2.5
-          Hardware: All
-                OS: Linux
-            Status: NEW
-          Severity: normal
-          Priority: P3
-         Component: Bluetooth
-          Assignee: linux-bluetooth@vger.kernel.org
-          Reporter: pavel@noa-labs.com
-        Regression: No
+Paul Menzel (pmenzel+bugzilla.kernel.org@molgen.mpg.de) changed:
 
-Created attachment 306759
-  --> https://bugzilla.kernel.org/attachment.cgi?id=3D306759&action=3Dedit
-Patch to add new USBID
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+                 CC|                            |pmenzel+bugzilla.kernel.org
+                   |                            |@molgen.mpg.de
 
-Bus 003 Device 002: ID 13d3:3608 IMC Networks Wireless_Device
-
-Please add the new USBID for MT7925 stick shipped in 2024 Asus laptops
+--- Comment #1 from Paul Menzel (pmenzel+bugzilla.kernel.org@molgen.mpg.de)=
+ ---
+Dear Pavel, thank you for the diff. It=E2=80=99d be great if you sent a pro=
+perly
+git-formatted patch to the mailing list.
 
 --=20
 You may reply to this email to add a comment.
