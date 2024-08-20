@@ -1,117 +1,217 @@
-Received: from mail-yb1-f177.google.com (mail-yb1-f177.google.com [209.85.219.177])
+Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A55F33C6BA
-	for <linux-bluetooth@vger.kernel.org>; Mon, 19 Aug 2024 23:16:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1784117C8D;
+	Tue, 20 Aug 2024 05:16:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724109377; cv=none; b=uNnbSWSX+P0XKoSPMxcH7gpTGfL8UaZxSAIyfjXL7pxiOQJ18nQBfrmXzPZo8/O5bjd0FglvRzCslfniZlE9WQJJ6jTtk0uVZDl0Gv3VblujGpHXJlei7rdNuLb+zhlUJEhzaeLsI4HbTjn6F3wQGmNaLF/YMJguMKeP+LnOmZs=
+	t=1724131011; cv=none; b=DOd/Pp5aS+u8fvU+8SGUgttdUCqhhc2JCUruE6cchGM4icXWEDe2ImeL4HX2Y5Wp3N3TZZdIIWxEjbJr+/oX+jlZdewVvFTg8qcNUy1qwCRb0x+TpI3v2Gg+zIAkiZ04CuUVCq8KZ6pzsiT1BPbqnmdUJwkmO1JILekZONmVAYA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724109377; c=relaxed/simple;
-	bh=xU9krIdBZoNidBPazH5es1A0nV6TBF6sIW/oxYD2aJ8=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=tr4FyMFiNCxd++d9LTxMualMxL87+0QcYO90kvvNhSsAUQ0r5PaVLhjGMHyjIoTfn+Dg+I9SaOb/VkuyGNbzxXc6XSUccMlFSKMr/OFn1uG9AyhyPQyAaZC7PVClGwkCavTZTP7OcrjA/EjZTr9lCKpbqRtRcSJNtHW4HO1lI64=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OjRtD+kD; arc=none smtp.client-ip=209.85.219.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1724131011; c=relaxed/simple;
+	bh=7HCJNj1GcoBnd6+tf7NQ9IOVhyPv2+Th8/UrgnjlNJU=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=VWDI39OkceJmWFSsfm5jsV9rdzTUdgxK7S/sBmpeSxn6KHiTFI5JhKOQn3+sm/edJ4Pq5/gqeZ+e2Ib71QHYBrng1huyVSEuwxZ3wZD4cvI8sq/3kbS8N3OdVu3LIdAWLEWOF0LC2z+e8yIuAXY3q3cqAJvHhwoXIZ02IF8vXAs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com; spf=pass smtp.mailfrom=realtek.com; dkim=temperror (0-bit key) header.d=realtek.com header.i=@realtek.com header.b=tdqKL/ZS; arc=none smtp.client-ip=211.75.126.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realtek.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OjRtD+kD"
-Received: by mail-yb1-f177.google.com with SMTP id 3f1490d57ef6-e0875f1e9edso4786741276.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 19 Aug 2024 16:16:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1724109374; x=1724714174; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=xU9krIdBZoNidBPazH5es1A0nV6TBF6sIW/oxYD2aJ8=;
-        b=OjRtD+kDaQ+e+EqpLKgaM7y8gNppvMoQYwwBAls1MlQHACAaJ7gKNt26YT94M3iQiA
-         e5qsTgTS8eeYgMg91g7Eqnruqnh+Q1a3WU/Ifw3wa83v2hWANHIrJAL4rPFBeLfgeY4n
-         qsnbG4poNlOksF92/rIwqFyiVP6AQImg9W2FCP87ixE86murZFyWQ4PECbLcE9WpXwu/
-         lb1VdD33O0eQBNBjtfjWi1teJwIZcs34gcRVpISFf9tzvt88hvMvawxetqUKyMFicJ5z
-         9uzDQh/OUQpJDFIYnfjwGQUhaOOepJhjnIBWwmi6pkb2yXFVFX+XzuvXvfG2s1C+8OiK
-         l4Qw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724109374; x=1724714174;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=xU9krIdBZoNidBPazH5es1A0nV6TBF6sIW/oxYD2aJ8=;
-        b=CIkg5b4BqGX7bjtzHf88hq3H+mS9fUPYXc4cJoZVyqBklUhqAJX41tiYfQINvHkhet
-         fmPxgBSrzQgd0Pl0mqTqN+4mlqAu1aJsSFGp9zLhNvyXKQAaSAvhILF014KIoKDWYkbl
-         BvWeXCc7u+eXMTjksgW0mbKEgMj+CWn0n291/6QNSFYiw2Lw1BEhBT2qo2viMI5kwRKg
-         var3gjPx2kq7nh8ffwJTIoJhOj5mKYmMJSrCcuNybq3WWr7IP8tU5TFeW/4/liyqYcUN
-         OKpFJfYAgdZDxVe/2tCb1SmuhLMgwF845c0svWwRCaHcznmiaMI9MWBvyfMThy7A2YnS
-         o+5g==
-X-Gm-Message-State: AOJu0Yw9fD8+9yCG0+MxiyWM0+jaxWwo95rdgGYq5nneA/PInivm7g9Q
-	bTNJtpMotJqG8ebZHO6GQHKqw483TtzeVXotqAE8w2XjkUW7fLMrhbz0Sw==
-X-Google-Smtp-Source: AGHT+IHuJrZJ7B8bBtz6xxaTuhIckuD2zrq14iHgb9U/H3Dugnpjk//f2nGeRzZxa9ITaN+yBfhn+Q==
-X-Received: by 2002:a05:6902:2209:b0:e13:e58b:1a32 with SMTP id 3f1490d57ef6-e13e58b1beemr7063847276.2.1724109374184;
-        Mon, 19 Aug 2024 16:16:14 -0700 (PDT)
-Received: from [172.17.0.2] ([20.185.156.200])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6bf6ff140f5sm46353276d6.146.2024.08.19.16.16.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 19 Aug 2024 16:16:13 -0700 (PDT)
-Message-ID: <66c3d23d.d40a0220.1eef8c.2e4d@mx.google.com>
-Date: Mon, 19 Aug 2024 16:16:13 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============2998885963468695753=="
+	dkim=temperror (0-bit key) header.d=realtek.com header.i=@realtek.com header.b="tdqKL/ZS"
+X-SpamFilter-By: ArmorX SpamTrap 5.78 with qID 47K5GeVsA1051109, This message is accepted by code: ctloc85258
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=realtek.com; s=dkim;
+	t=1724131000; bh=7HCJNj1GcoBnd6+tf7NQ9IOVhyPv2+Th8/UrgnjlNJU=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:
+	 Content-Transfer-Encoding:Content-Type;
+	b=tdqKL/ZSbfBweKEfslJG9Zr6wyw5jNV1kHeXcEsUI2kCbeWJ0yVkHuP7pzX+6Ax1F
+	 EAXbDr0c9PyM6CbThdHvmCiiknCNtHtBxmRNTq6jnhOgbZZC3k6ez3RD8wFA9QBw/B
+	 cj3e6ZRKNBaL7fLdW+N2xOMKFhFA2HuEiPORVON4IwbNIHyDikg3jEfsykMvGmMMYa
+	 OAWGTue/Bcw8g+bFw4PqZqdjMVqVI46SVwiEOVy0IZ9E0ZzO/5NIQdjfcTWMpRG3Yj
+	 2JX8EIgKs1bpJ14u+fdPE+jzn3iP7XOamLz/3yFoy5Q/odGK6JfwYXTm0nJwGy1W1r
+	 YXr2GnkW5HqUg==
+Received: from mail.realtek.com (rtexh36505.realtek.com.tw[172.21.6.25])
+	by rtits2.realtek.com.tw (8.15.2/3.02/5.92) with ESMTPS id 47K5GeVsA1051109
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 20 Aug 2024 13:16:40 +0800
+Received: from RTEXMBS03.realtek.com.tw (172.21.6.96) by
+ RTEXH36505.realtek.com.tw (172.21.6.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Tue, 20 Aug 2024 13:16:40 +0800
+Received: from localhost.localhost (172.21.132.123) by
+ RTEXMBS03.realtek.com.tw (172.21.6.96) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Tue, 20 Aug 2024 13:16:39 +0800
+From: <max.chou@realtek.com>
+To: Marcel Holtmann <marcel@holtmann.org>,
+        Luiz Augusto von Dentz
+	<luiz.dentz@gmail.com>,
+        <linux-bluetooth@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: Hilda Wu <hildawu@realtek.com>, alex_lu <alex_lu@realsil.com.cn>,
+        KidmanLee <kidman@realtek.com>, Karen Hsu <karenhsu@realtek.com>,
+        Max Chou
+	<max.chou@realtek.com>
+Subject: [PATCH V2 RESEND] Bluetooth: btrtl: Add the support for RTL8922A
+Date: Tue, 20 Aug 2024 13:16:35 +0800
+Message-ID: <20240820051635.25049-1-max.chou@realtek.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [BlueZ,v1,1/2] hog-lib: Fix calling bt_uhid_destroy with invalid instance
-In-Reply-To: <20240819205304.60594-1-luiz.dentz@gmail.com>
-References: <20240819205304.60594-1-luiz.dentz@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: RTEXH36505.realtek.com.tw (172.21.6.25) To
+ RTEXMBS03.realtek.com.tw (172.21.6.96)
+X-KSE-ServerInfo: RTEXMBS03.realtek.com.tw, 9
+X-KSE-AntiSpam-Interceptor-Info: fallback
+X-KSE-Antivirus-Interceptor-Info: fallback
+X-KSE-AntiSpam-Interceptor-Info: fallback
 
---===============2998885963468695753==
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
+From: Max Chou <max.chou@realtek.com>
 
-VGhpcyBpcyBhdXRvbWF0ZWQgZW1haWwgYW5kIHBsZWFzZSBkbyBub3QgcmVwbHkgdG8gdGhpcyBl
-bWFpbCEKCkRlYXIgc3VibWl0dGVyLAoKVGhhbmsgeW91IGZvciBzdWJtaXR0aW5nIHRoZSBwYXRj
-aGVzIHRvIHRoZSBsaW51eCBibHVldG9vdGggbWFpbGluZyBsaXN0LgpUaGlzIGlzIGEgQ0kgdGVz
-dCByZXN1bHRzIHdpdGggeW91ciBwYXRjaCBzZXJpZXM6ClBXIExpbms6aHR0cHM6Ly9wYXRjaHdv
-cmsua2VybmVsLm9yZy9wcm9qZWN0L2JsdWV0b290aC9saXN0Lz9zZXJpZXM9ODgxMDQ1CgotLS1U
-ZXN0IHJlc3VsdC0tLQoKVGVzdCBTdW1tYXJ5OgpDaGVja1BhdGNoICAgICAgICAgICAgICAgICAg
-ICBQQVNTICAgICAgMC45MiBzZWNvbmRzCkdpdExpbnQgICAgICAgICAgICAgICAgICAgICAgIFBB
-U1MgICAgICAwLjY2IHNlY29uZHMKQnVpbGRFbGwgICAgICAgICAgICAgICAgICAgICAgUEFTUyAg
-ICAgIDI1LjI4IHNlY29uZHMKQmx1ZXpNYWtlICAgICAgICAgICAgICAgICAgICAgUEFTUyAgICAg
-IDE4MjguMDUgc2Vjb25kcwpNYWtlQ2hlY2sgICAgICAgICAgICAgICAgICAgICBGQUlMICAgICAg
-MTQuMDAgc2Vjb25kcwpNYWtlRGlzdGNoZWNrICAgICAgICAgICAgICAgICBGQUlMICAgICAgMTY4
-Ljg1IHNlY29uZHMKQ2hlY2tWYWxncmluZCAgICAgICAgICAgICAgICAgRkFJTCAgICAgIDI2NS4y
-NyBzZWNvbmRzCkNoZWNrU21hdGNoICAgICAgICAgICAgICAgICAgIFBBU1MgICAgICAzNzUuNDAg
-c2Vjb25kcwpibHVlem1ha2VleHRlbGwgICAgICAgICAgICAgICBQQVNTICAgICAgMTI3LjY3IHNl
-Y29uZHMKSW5jcmVtZW50YWxCdWlsZCAgICAgICAgICAgICAgUEFTUyAgICAgIDMxOTkuMzAgc2Vj
-b25kcwpTY2FuQnVpbGQgICAgICAgICAgICAgICAgICAgICBQRU5ESU5HICAgMTEyNy4xOCBzZWNv
-bmRzCgpEZXRhaWxzCiMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIwpUZXN0OiBNYWtlQ2hl
-Y2sgLSBGQUlMCkRlc2M6IFJ1biBCbHVleiBNYWtlIENoZWNrCk91dHB1dDoKCm1ha2VbM106ICoq
-KiBbTWFrZWZpbGU6MTE3NjQ6IHRlc3Qtc3VpdGUubG9nXSBFcnJvciAxCm1ha2VbMl06ICoqKiBb
-TWFrZWZpbGU6MTE4NzI6IGNoZWNrLVRFU1RTXSBFcnJvciAyCm1ha2VbMV06ICoqKiBbTWFrZWZp
-bGU6MTIzMDE6IGNoZWNrLWFtXSBFcnJvciAyCm1ha2U6ICoqKiBbTWFrZWZpbGU6MTIzMDM6IGNo
-ZWNrXSBFcnJvciAyCiMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIwpUZXN0OiBNYWtlRGlz
-dGNoZWNrIC0gRkFJTApEZXNjOiBSdW4gQmx1ZXogTWFrZSBEaXN0Y2hlY2sKT3V0cHV0OgoKUGFj
-a2FnZSBjdXBzIHdhcyBub3QgZm91bmQgaW4gdGhlIHBrZy1jb25maWcgc2VhcmNoIHBhdGguClBl
-cmhhcHMgeW91IHNob3VsZCBhZGQgdGhlIGRpcmVjdG9yeSBjb250YWluaW5nIGBjdXBzLnBjJwp0
-byB0aGUgUEtHX0NPTkZJR19QQVRIIGVudmlyb25tZW50IHZhcmlhYmxlCk5vIHBhY2thZ2UgJ2N1
-cHMnIGZvdW5kCm1ha2VbNF06ICoqKiBbTWFrZWZpbGU6MTE3NjQ6IHRlc3Qtc3VpdGUubG9nXSBF
-cnJvciAxCm1ha2VbM106ICoqKiBbTWFrZWZpbGU6MTE4NzI6IGNoZWNrLVRFU1RTXSBFcnJvciAy
-Cm1ha2VbMl06ICoqKiBbTWFrZWZpbGU6MTIzMDE6IGNoZWNrLWFtXSBFcnJvciAyCm1ha2VbMV06
-ICoqKiBbTWFrZWZpbGU6MTIzMDM6IGNoZWNrXSBFcnJvciAyCm1ha2U6ICoqKiBbTWFrZWZpbGU6
-MTIyMjQ6IGRpc3RjaGVja10gRXJyb3IgMQojIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMK
-VGVzdDogQ2hlY2tWYWxncmluZCAtIEZBSUwKRGVzYzogUnVuIEJsdWV6IE1ha2UgQ2hlY2sgd2l0
-aCBWYWxncmluZApPdXRwdXQ6Cgp0b29scy9tZ210LXRlc3Rlci5jOiBJbiBmdW5jdGlvbiDigJht
-YWlu4oCZOgp0b29scy9tZ210LXRlc3Rlci5jOjEyNzI1OjU6IG5vdGU6IHZhcmlhYmxlIHRyYWNr
-aW5nIHNpemUgbGltaXQgZXhjZWVkZWQgd2l0aCDigJgtZnZhci10cmFja2luZy1hc3NpZ25tZW50
-c+KAmSwgcmV0cnlpbmcgd2l0aG91dAoxMjcyNSB8IGludCBtYWluKGludCBhcmdjLCBjaGFyICph
-cmd2W10pCiAgICAgIHwgICAgIF5+fn4KbWFrZVszXTogKioqIFtNYWtlZmlsZToxMTc2NDogdGVz
-dC1zdWl0ZS5sb2ddIEVycm9yIDEKbWFrZVsyXTogKioqIFtNYWtlZmlsZToxMTg3MjogY2hlY2st
-VEVTVFNdIEVycm9yIDIKbWFrZVsxXTogKioqIFtNYWtlZmlsZToxMjMwMTogY2hlY2stYW1dIEVy
-cm9yIDIKbWFrZTogKioqIFtNYWtlZmlsZToxMjMwMzogY2hlY2tdIEVycm9yIDIKIyMjIyMjIyMj
-IyMjIyMjIyMjIyMjIyMjIyMjIyMjClRlc3Q6IFNjYW5CdWlsZCAtIFBFTkRJTkcKRGVzYzogUnVu
-IFNjYW4gQnVpbGQKT3V0cHV0OgoKCgotLS0KUmVnYXJkcywKTGludXggQmx1ZXRvb3RoCgo=
+Add the support for RTL8922A BT controller on USB interface.
+The necessary firmware will be submitted to linux-firmware project.
 
---===============2998885963468695753==--
+The device info from /sys/kernel/debug/usb/devices as below.
+
+T:  Bus=01 Lev=02 Prnt=02 Port=02 Cnt=01 Dev#=  3 Spd=12   MxCh= 0
+D:  Ver= 1.00 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+P:  Vendor=0bda ProdID=8922 Rev= 0.00
+S:  Manufacturer=Realtek
+S:  Product=Bluetooth Radio
+S:  SerialNumber=00E04C885A01
+C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=500mA
+I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
+E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+I:  If#= 1 Alt= 6 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  63 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  63 Ivl=1ms
+
+Signed-off-by: Max Chou <max.chou@realtek.com>
+---
+change:
+v2: edit commit log
+---
+ drivers/bluetooth/btrtl.c | 16 ++++++++++++++++
+ drivers/bluetooth/btusb.c | 13 +++++++++++++
+ 2 files changed, 29 insertions(+)
+
+diff --git a/drivers/bluetooth/btrtl.c b/drivers/bluetooth/btrtl.c
+index f2f37143c454..555c2964ec1b 100644
+--- a/drivers/bluetooth/btrtl.c
++++ b/drivers/bluetooth/btrtl.c
+@@ -30,6 +30,7 @@
+ #define RTL_ROM_LMP_8822B	0x8822
+ #define RTL_ROM_LMP_8852A	0x8852
+ #define RTL_ROM_LMP_8851B	0x8851
++#define RTL_ROM_LMP_8922A	0x8922
+ #define RTL_CONFIG_MAGIC	0x8723ab55
+ 
+ #define RTL_VSC_OP_COREDUMP	0xfcff
+@@ -69,6 +70,7 @@ enum btrtl_chip_id {
+ 	CHIP_ID_8852B = 20,
+ 	CHIP_ID_8852C = 25,
+ 	CHIP_ID_8851B = 36,
++	CHIP_ID_8922A = 44,
+ 	CHIP_ID_8852BT = 47,
+ };
+ 
+@@ -309,6 +311,15 @@ static const struct id_table ic_id_table[] = {
+ 	  .cfg_name = "rtl_bt/rtl8851bu_config",
+ 	  .hw_info  = "rtl8851bu" },
+ 
++	/* 8922A */
++	{ IC_INFO(RTL_ROM_LMP_8922A, 0xa, 0xc, HCI_USB),
++	  .config_needed = false,
++	  .has_rom_version = true,
++	  .has_msft_ext = true,
++	  .fw_name  = "rtl_bt/rtl8922au_fw",
++	  .cfg_name = "rtl_bt/rtl8922au_config",
++	  .hw_info  = "rtl8922au" },
++
+ 	/* 8852BT/8852BE-VT */
+ 	{ IC_INFO(RTL_ROM_LMP_8852A, 0x87, 0xc, HCI_USB),
+ 	  .config_needed = false,
+@@ -655,6 +666,7 @@ static int rtlbt_parse_firmware(struct hci_dev *hdev,
+ 		{ RTL_ROM_LMP_8852A, 20 },	/* 8852B */
+ 		{ RTL_ROM_LMP_8852A, 25 },	/* 8852C */
+ 		{ RTL_ROM_LMP_8851B, 36 },	/* 8851B */
++		{ RTL_ROM_LMP_8922A, 44 },	/* 8922A */
+ 		{ RTL_ROM_LMP_8852A, 47 },	/* 8852BT */
+ 	};
+ 
+@@ -1255,6 +1267,7 @@ int btrtl_download_firmware(struct hci_dev *hdev,
+ 	case RTL_ROM_LMP_8852A:
+ 	case RTL_ROM_LMP_8703B:
+ 	case RTL_ROM_LMP_8851B:
++	case RTL_ROM_LMP_8922A:
+ 		err = btrtl_setup_rtl8723b(hdev, btrtl_dev);
+ 		break;
+ 	default:
+@@ -1286,6 +1299,7 @@ void btrtl_set_quirks(struct hci_dev *hdev, struct btrtl_device_info *btrtl_dev)
+ 	case CHIP_ID_8852B:
+ 	case CHIP_ID_8852C:
+ 	case CHIP_ID_8851B:
++	case CHIP_ID_8922A:
+ 	case CHIP_ID_8852BT:
+ 		set_bit(HCI_QUIRK_VALID_LE_STATES, &hdev->quirks);
+ 		set_bit(HCI_QUIRK_WIDEBAND_SPEECH_SUPPORTED, &hdev->quirks);
+@@ -1529,3 +1543,5 @@ MODULE_FIRMWARE("rtl_bt/rtl8852btu_config.bin");
+ MODULE_FIRMWARE("rtl_bt/rtl8852cu_fw.bin");
+ MODULE_FIRMWARE("rtl_bt/rtl8852cu_fw_v2.bin");
+ MODULE_FIRMWARE("rtl_bt/rtl8852cu_config.bin");
++MODULE_FIRMWARE("rtl_bt/rtl8922au_fw.bin");
++MODULE_FIRMWARE("rtl_bt/rtl8922au_config.bin");
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index acdba5d77694..8f931cfbac11 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -540,6 +540,8 @@ static const struct usb_device_id quirks_table[] = {
+ 						     BTUSB_WIDEBAND_SPEECH },
+ 	{ USB_DEVICE(0x13d3, 0x3592), .driver_info = BTUSB_REALTEK |
+ 						     BTUSB_WIDEBAND_SPEECH },
++	{ USB_DEVICE(0x0489, 0xe122), .driver_info = BTUSB_REALTEK |
++						     BTUSB_WIDEBAND_SPEECH },
+ 
+ 	/* Realtek 8852BE Bluetooth devices */
+ 	{ USB_DEVICE(0x0cb8, 0xc559), .driver_info = BTUSB_REALTEK |
+@@ -564,6 +566,17 @@ static const struct usb_device_id quirks_table[] = {
+ 	/* Realtek 8852BT/8852BE-VT Bluetooth devices */
+ 	{ USB_DEVICE(0x0bda, 0x8520), .driver_info = BTUSB_REALTEK |
+ 						     BTUSB_WIDEBAND_SPEECH },
++
++	/* Realtek 8922AE Bluetooth devices */
++	{ USB_DEVICE(0x0bda, 0x8922), .driver_info = BTUSB_REALTEK |
++						     BTUSB_WIDEBAND_SPEECH },
++	{ USB_DEVICE(0x13d3, 0x3617), .driver_info = BTUSB_REALTEK |
++						     BTUSB_WIDEBAND_SPEECH },
++	{ USB_DEVICE(0x13d3, 0x3616), .driver_info = BTUSB_REALTEK |
++						     BTUSB_WIDEBAND_SPEECH },
++	{ USB_DEVICE(0x0489, 0xe130), .driver_info = BTUSB_REALTEK |
++						     BTUSB_WIDEBAND_SPEECH },
++
+ 	/* Realtek Bluetooth devices */
+ 	{ USB_VENDOR_AND_INTERFACE_INFO(0x0bda, 0xe0, 0x01, 0x01),
+ 	  .driver_info = BTUSB_REALTEK },
+-- 
+2.25.1
+
