@@ -1,116 +1,136 @@
-Received: from mail-qt1-f171.google.com (mail-qt1-f171.google.com [209.85.160.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D030C18E34F
-	for <linux-bluetooth@vger.kernel.org>; Wed, 21 Aug 2024 03:51:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 594782599;
+	Wed, 21 Aug 2024 04:16:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724212317; cv=none; b=ZZaCJt6HYdKrw7aAYR3MawcxAUzjl+Q/agbI45gvb5i6Y0oF8nuBEiQvWMjbzo/SKguws6A5lRpPHGw6npNrAUrFG21oM4zx/vVDtWqgg8oqVceoGd5TTRlYaNaLzryPdkb+bdPD5ZCd0pg7637ZWsKz4ONCn3wiC6DRHtoDow8=
+	t=1724213777; cv=none; b=bS33WzBVpBgI63YtGJfg0RRIn135C2cJhp2cPnVMqLgUmDhX9RWwlrebo1ifaOuzrwMxPyyQud8uygdqL4+hfG/G9vLvtfwbXpCIP2iWjS+BsIym+0WUYNUBIJFrjk4A7pdsC3Bi63INT4J4DRLY+Uqthrnqq7wVn0SkVOQ/En4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724212317; c=relaxed/simple;
-	bh=pjUDQ/5g4GPx1GqsGJPX+cFBZ9vMRHO4l4r+ZVpshPs=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=U6drOU2qXjf9mD6XzXLno+pSppp/Yzothp/a2GAJDEbBZkzfs1COhTIjNKMpENyx8qkwsoY5TlSEfp9GE+9ai6bKw1SCV6V4Yd9oJ1R8fQ6puub+0kvnE+gLRJ2nNXN3gxXmB2p3CxB/+iiO81BaOui5XX+Sk17glstaZ+5BGkk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fS7dfo8p; arc=none smtp.client-ip=209.85.160.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1724213777; c=relaxed/simple;
+	bh=fcb8W/36ubfc+gGKRsB7vY+KskPeQNEaLuIcW7TjOE8=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:CC:References:
+	 In-Reply-To:Content-Type; b=Wy2Wp6ZmBqjgyv8hIVMUFlt5u93eLJgpzmrgZYm4yQpyLe94XfROzu0a7HJjBIwZ8O0jLsemb5bmgnjGOe3BulTUlD5zrYMCZc60VBBIkIXpTdRR4qs+Yy+MskJh64pIGFKZMo6t+IDuD70s5V++UsTW6ygmy2zNfIh5IJBxSe0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=YVoNi6ur; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fS7dfo8p"
-Received: by mail-qt1-f171.google.com with SMTP id d75a77b69052e-4503ccbc218so2714391cf.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 20 Aug 2024 20:51:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1724212314; x=1724817114; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=pjUDQ/5g4GPx1GqsGJPX+cFBZ9vMRHO4l4r+ZVpshPs=;
-        b=fS7dfo8pejc4uYu8okItNn42fOEB6d08b4F429D77/r5JZVaZMpJgkEmzAT0fsoxNB
-         u94FP06JWpFMTLMaQ9eeSy6mA4bpj6s9ft1KsSNYJWTV99c1MGe4oB5Uvzv6Rp5RslfL
-         CzR+2G/5qv3vCQ8gjGBXtg6umemP67a3sNUyxOuEmurxlhV1cAg6t0913uN0oS1AhNj2
-         qkM/k+PJSwoyFk6uzvhCs6RekfEEaBCaol8zG3GaxsyrWZbjTiGR0c+rDmsrkc9Ga0Dl
-         GpjTqR6x7CESKt7+7jfh+e0zisrKMlwrYlVdwBRwIvtQLe41jkZVC/qx1UXex9WNL+fm
-         jEYg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724212314; x=1724817114;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=pjUDQ/5g4GPx1GqsGJPX+cFBZ9vMRHO4l4r+ZVpshPs=;
-        b=PAtDiX62yJxLAtoN0CPb12Qp/pIGJmA5jr+wgN7SBHJ19VnuUzG7mqAgsx6Pxl9e0k
-         X5jqMYAt8F7XROp8cTAVlgPcETeQl1dfkS8xGnaY/Nqa/Oho9iOh63LhtOw40Qf1RJCj
-         Ps2GDmIAtD9299tKU+91BdsZ3iRJq4bMGp50lOlkLEbfLdOkqnFbeyC8pGW10//NO9E+
-         2Rts7HXjswBiABVpXThJldXO9QEMzLuMMlmxkWWuzwT7cZ9WTp7W3lMLe8NKhmzXtaZp
-         gCa+dZYoE0XSQ8kvBJqLSY+twvijl5PSh7FDfVfcCsE25UGnmdKplaax6riuoSFw76jL
-         MEvQ==
-X-Gm-Message-State: AOJu0Yy3TEQ5ld09YAuAazFwfwBycZDTVnvhbGJx0hEff7vo63QWtsei
-	s5VZGTTmvPaZkubI5FgpqPOvoFWxcRvGoxqninxN/xsBIi6ZlfNHr5HghA==
-X-Google-Smtp-Source: AGHT+IGK2g6G/9K8uA+tk7aYcLWHII3P+SR5O4YFV9JJH6oPdojyIN5qqiAok0jBqDwJawaim5V0Yg==
-X-Received: by 2002:ac8:6f1a:0:b0:453:57b0:8814 with SMTP id d75a77b69052e-454f1fd2e66mr21342121cf.6.1724212314415;
-        Tue, 20 Aug 2024 20:51:54 -0700 (PDT)
-Received: from [172.17.0.2] ([172.183.58.163])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-45369fd729fsm55877921cf.17.2024.08.20.20.51.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 20 Aug 2024 20:51:53 -0700 (PDT)
-Message-ID: <66c56459.050a0220.2cc798.781d@mx.google.com>
-Date: Tue, 20 Aug 2024 20:51:53 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============2190299310962995451=="
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="YVoNi6ur"
+Received: from pps.filterd (m0279866.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 47KEqX9Y019502;
+	Wed, 21 Aug 2024 04:16:10 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	S5PGvNFc85jqmrGlrsScyVAG4hF8skxfLF6Oja0FmRw=; b=YVoNi6ur+bgkbDM0
+	UZy+R2WssJtEitWBlju6pDWk0N7zkjr5LFK6MzyCzmjzTV7E5G9pgI2mH7idPna6
+	U8H/J57/RB0bH8dXTxF1udljiOzY5NnwNufdhC9NHwcAlqYbNspxR7nsy/5NhLiB
+	aeps4w/h8g35dqB/wRHwdYmlGjkaSX4Rx1KEaHTDFx+WjJaMZzq75xJU5guXnPIu
+	IRNIG7fzlEg2+v/nBm3VHxQ+cO/PLNO9q7UGn3Y5LK9TPyekhbJ/P2wwk2OkB8PZ
+	Z+UiLSM3gWQGEI++JDB2VJOOjX/IKx5EjyLTwk8L3xrm1h8/6EqZE3s0O8CVdNgl
+	oHl2Vg==
+Received: from nalasppmta05.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 414phvax1m-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 21 Aug 2024 04:16:09 +0000 (GMT)
+Received: from nalasex01b.na.qualcomm.com (nalasex01b.na.qualcomm.com [10.47.209.197])
+	by NALASPPMTA05.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 47L4G8kG017154
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 21 Aug 2024 04:16:08 GMT
+Received: from [10.231.216.175] (10.80.80.8) by nalasex01b.na.qualcomm.com
+ (10.47.209.197) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Tue, 20 Aug
+ 2024 21:16:07 -0700
+Message-ID: <15472cea-904c-4d79-9195-3063ce7f1e2e@quicinc.com>
+Date: Wed, 21 Aug 2024 12:16:04 +0800
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, clancy_shang@163.com
-Subject: RE: [BlueZ] adapter: Fix execute "LE Add Device To Resolving List" command fail
-In-Reply-To: <20240821013505.1344247-1-clancy_shang@163.com>
-References: <20240821013505.1344247-1-clancy_shang@163.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v1] Bluetooth: hci_qca: Drop unused event during BT on
+From: Cheng Jiang <quic_chejiang@quicinc.com>
+To: Marcel Holtmann <marcel@holtmann.org>,
+        Luiz Augusto von Dentz
+	<luiz.dentz@gmail.com>
+CC: <linux-bluetooth@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+References: <20240726095828.2707111-1-quic_chejiang@quicinc.com>
+Content-Language: en-US
+In-Reply-To: <20240726095828.2707111-1-quic_chejiang@quicinc.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nalasex01b.na.qualcomm.com (10.47.209.197)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: 8NZs7Fgp_wy1GYWQyzpqlBQj4wWIPwYA
+X-Proofpoint-GUID: 8NZs7Fgp_wy1GYWQyzpqlBQj4wWIPwYA
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-08-21_04,2024-08-19_03,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
+ malwarescore=0 bulkscore=0 suspectscore=0 phishscore=0 lowpriorityscore=0
+ clxscore=1011 adultscore=0 mlxlogscore=999 spamscore=0 mlxscore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2407110000 definitions=main-2408210028
 
---===============2190299310962995451==
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
+Dear receivers,
 
-VGhpcyBpcyBhdXRvbWF0ZWQgZW1haWwgYW5kIHBsZWFzZSBkbyBub3QgcmVwbHkgdG8gdGhpcyBl
-bWFpbCEKCkRlYXIgc3VibWl0dGVyLAoKVGhhbmsgeW91IGZvciBzdWJtaXR0aW5nIHRoZSBwYXRj
-aGVzIHRvIHRoZSBsaW51eCBibHVldG9vdGggbWFpbGluZyBsaXN0LgpUaGlzIGlzIGEgQ0kgdGVz
-dCByZXN1bHRzIHdpdGggeW91ciBwYXRjaCBzZXJpZXM6ClBXIExpbms6aHR0cHM6Ly9wYXRjaHdv
-cmsua2VybmVsLm9yZy9wcm9qZWN0L2JsdWV0b290aC9saXN0Lz9zZXJpZXM9ODgxNTI5CgotLS1U
-ZXN0IHJlc3VsdC0tLQoKVGVzdCBTdW1tYXJ5OgpDaGVja1BhdGNoICAgICAgICAgICAgICAgICAg
-ICBQQVNTICAgICAgMC40NyBzZWNvbmRzCkdpdExpbnQgICAgICAgICAgICAgICAgICAgICAgIFBB
-U1MgICAgICAwLjI4IHNlY29uZHMKQnVpbGRFbGwgICAgICAgICAgICAgICAgICAgICAgUEFTUyAg
-ICAgIDI0LjY4IHNlY29uZHMKQmx1ZXpNYWtlICAgICAgICAgICAgICAgICAgICAgUEFTUyAgICAg
-IDE3MzQuNjYgc2Vjb25kcwpNYWtlQ2hlY2sgICAgICAgICAgICAgICAgICAgICBGQUlMICAgICAg
-MTMuNTQgc2Vjb25kcwpNYWtlRGlzdGNoZWNrICAgICAgICAgICAgICAgICBGQUlMICAgICAgMTU5
-LjEwIHNlY29uZHMKQ2hlY2tWYWxncmluZCAgICAgICAgICAgICAgICAgRkFJTCAgICAgIDI1MC4z
-MiBzZWNvbmRzCkNoZWNrU21hdGNoICAgICAgICAgICAgICAgICAgIFBBU1MgICAgICAzNTIuNTMg
-c2Vjb25kcwpibHVlem1ha2VleHRlbGwgICAgICAgICAgICAgICBQQVNTICAgICAgMTIwLjkwIHNl
-Y29uZHMKSW5jcmVtZW50YWxCdWlsZCAgICAgICAgICAgICAgUEFTUyAgICAgIDE1NjguNzUgc2Vj
-b25kcwpTY2FuQnVpbGQgICAgICAgICAgICAgICAgICAgICBQQVNTICAgICAgOTk2Ljk1IHNlY29u
-ZHMKCkRldGFpbHMKIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjClRlc3Q6IE1ha2VDaGVj
-ayAtIEZBSUwKRGVzYzogUnVuIEJsdWV6IE1ha2UgQ2hlY2sKT3V0cHV0OgoKbWFrZVszXTogKioq
-IFtNYWtlZmlsZToxMTc2NjogdGVzdC1zdWl0ZS5sb2ddIEVycm9yIDEKbWFrZVsyXTogKioqIFtN
-YWtlZmlsZToxMTg3NDogY2hlY2stVEVTVFNdIEVycm9yIDIKbWFrZVsxXTogKioqIFtNYWtlZmls
-ZToxMjMwMzogY2hlY2stYW1dIEVycm9yIDIKbWFrZTogKioqIFtNYWtlZmlsZToxMjMwNTogY2hl
-Y2tdIEVycm9yIDIKIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjClRlc3Q6IE1ha2VEaXN0
-Y2hlY2sgLSBGQUlMCkRlc2M6IFJ1biBCbHVleiBNYWtlIERpc3RjaGVjawpPdXRwdXQ6CgpQYWNr
-YWdlIGN1cHMgd2FzIG5vdCBmb3VuZCBpbiB0aGUgcGtnLWNvbmZpZyBzZWFyY2ggcGF0aC4KUGVy
-aGFwcyB5b3Ugc2hvdWxkIGFkZCB0aGUgZGlyZWN0b3J5IGNvbnRhaW5pbmcgYGN1cHMucGMnCnRv
-IHRoZSBQS0dfQ09ORklHX1BBVEggZW52aXJvbm1lbnQgdmFyaWFibGUKTm8gcGFja2FnZSAnY3Vw
-cycgZm91bmQKbWFrZVs0XTogKioqIFtNYWtlZmlsZToxMTc2NjogdGVzdC1zdWl0ZS5sb2ddIEVy
-cm9yIDEKbWFrZVszXTogKioqIFtNYWtlZmlsZToxMTg3NDogY2hlY2stVEVTVFNdIEVycm9yIDIK
-bWFrZVsyXTogKioqIFtNYWtlZmlsZToxMjMwMzogY2hlY2stYW1dIEVycm9yIDIKbWFrZVsxXTog
-KioqIFtNYWtlZmlsZToxMjMwNTogY2hlY2tdIEVycm9yIDIKbWFrZTogKioqIFtNYWtlZmlsZTox
-MjIyNjogZGlzdGNoZWNrXSBFcnJvciAxCiMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIwpU
-ZXN0OiBDaGVja1ZhbGdyaW5kIC0gRkFJTApEZXNjOiBSdW4gQmx1ZXogTWFrZSBDaGVjayB3aXRo
-IFZhbGdyaW5kCk91dHB1dDoKCnRvb2xzL21nbXQtdGVzdGVyLmM6IEluIGZ1bmN0aW9uIOKAmG1h
-aW7igJk6CnRvb2xzL21nbXQtdGVzdGVyLmM6MTI3MjU6NTogbm90ZTogdmFyaWFibGUgdHJhY2tp
-bmcgc2l6ZSBsaW1pdCBleGNlZWRlZCB3aXRoIOKAmC1mdmFyLXRyYWNraW5nLWFzc2lnbm1lbnRz
-4oCZLCByZXRyeWluZyB3aXRob3V0CjEyNzI1IHwgaW50IG1haW4oaW50IGFyZ2MsIGNoYXIgKmFy
-Z3ZbXSkKICAgICAgfCAgICAgXn5+fgptYWtlWzNdOiAqKiogW01ha2VmaWxlOjExNzY2OiB0ZXN0
-LXN1aXRlLmxvZ10gRXJyb3IgMQptYWtlWzJdOiAqKiogW01ha2VmaWxlOjExODc0OiBjaGVjay1U
-RVNUU10gRXJyb3IgMgptYWtlWzFdOiAqKiogW01ha2VmaWxlOjEyMzAzOiBjaGVjay1hbV0gRXJy
-b3IgMgptYWtlOiAqKiogW01ha2VmaWxlOjEyMzA1OiBjaGVja10gRXJyb3IgMgoKCi0tLQpSZWdh
-cmRzLApMaW51eCBCbHVldG9vdGgKCg==
+Is there any comment for the changes? Thanks! 
 
---===============2190299310962995451==--
+On 7/26/2024 5:58 PM, Cheng Jiang wrote:
+> For the WCN6750/WCN6855/WCN7850, the vendor command for a baudrate
+> change is not sent as synchronous HCI command, controller sends the
+> corresponding vendor event with the new baudrate. It needs to be
+> dropped, otherwise it may be misinterpreted as response to a later
+> command.
+> 
+> Signed-off-by: Cheng Jiang <quic_chejiang@quicinc.com>
+> ---
+>  drivers/bluetooth/hci_qca.c | 16 +++++++++++++++-
+>  1 file changed, 15 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+> index ca6466676902..f497d601e035 100644
+> --- a/drivers/bluetooth/hci_qca.c
+> +++ b/drivers/bluetooth/hci_qca.c
+> @@ -1206,7 +1206,15 @@ static int qca_recv_event(struct hci_dev *hdev, struct sk_buff *skb)
+>  		 * vendor command).
+>  		 */
+>  
+> -		if (hdr->evt == HCI_EV_VENDOR)
+> +		/* For the WCN6750/WCN6855/WCN7850, like the WCN3990, the
+> +		 * vendor command for a baudrate change command isn't sent as
+> +		 * synchronous HCI command, the controller sends the corresponding
+> +		 * command complete event with the new baudrate. The event is
+> +		 * received and properly decoded after changing the baudrate of
+> +		 * the host port. It needs to be dropped.
+> +		 */
+> +
+> +		if (hdr->evt == HCI_EV_VENDOR || hdr->evt == HCI_EV_CMD_COMPLETE)
+>  			complete(&qca->drop_ev_comp);
+>  
+>  		kfree_skb(skb);
+> @@ -1497,6 +1505,9 @@ static int qca_set_speed(struct hci_uart *hu, enum qca_speed_type speed_type)
+>  
+>  		switch (soc_type) {
+>  		case QCA_WCN3990:
+> +		case QCA_WCN6750:
+> +		case QCA_WCN6855:
+> +		case QCA_WCN7850:
+>  			reinit_completion(&qca->drop_ev_comp);
+>  			set_bit(QCA_DROP_VENDOR_EVENT, &qca->flags);
+>  			break;
+> @@ -1531,6 +1542,9 @@ static int qca_set_speed(struct hci_uart *hu, enum qca_speed_type speed_type)
+>  
+>  		switch (soc_type) {
+>  		case QCA_WCN3990:
+> +		case QCA_WCN6750:
+> +		case QCA_WCN6855:
+> +		case QCA_WCN7850:
+>  			/* Wait for the controller to send the vendor event
+>  			 * for the baudrate change command.
+>  			 */
+
