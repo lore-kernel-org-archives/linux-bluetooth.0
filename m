@@ -1,46 +1,46 @@
-Received: from EUR02-DB5-obe.outbound.protection.outlook.com (mail-db5eur02on2043.outbound.protection.outlook.com [40.107.249.43])
+Received: from DUZPR83CU001.outbound.protection.outlook.com (mail-northeuropeazon11013045.outbound.protection.outlook.com [52.101.67.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02B521B2ED6
-	for <linux-bluetooth@vger.kernel.org>; Wed, 21 Aug 2024 14:56:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.249.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAF3C1B1D4E
+	for <linux-bluetooth@vger.kernel.org>; Wed, 21 Aug 2024 14:56:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.67.45
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724252196; cv=fail; b=B2P2o/MFm1tCCKP0EE01UpvHhc+QXw07VSGZ6yioPdm6SPJkTSrN5DZXa6u2yp1mE8rawAoEnQyKBdfzJURR2jljHR3D3CZmRVk4wQSv0ibw/U7KFJ09WMO3diYaABiXuG3xwakQx4iJM5qUm2aER35XnoUD74jaD6kw2Hr4dE8=
+	t=1724252203; cv=fail; b=o8mDgUwYiRnRmBY9m4FIj99kE7XXaVwJ3dZevMurlwng+ritpBtCTeQ2rk3HCmSiEJa6Vg2tVYTQ1vVEkH0kUT6mbwHLmSvX+YVyjm2/wb8/EQWnm7jzM3fxo5EE/FN6kqNUJSrnleICn0tNSWtpWL4KZRABifoFe5tG9ChzE4Y=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724252196; c=relaxed/simple;
-	bh=byegnlnYu/gcSMgtojUeTNxvU5oKZO+2XC2mnLl9i5I=;
+	s=arc-20240116; t=1724252203; c=relaxed/simple;
+	bh=Xj0iuXMp4wmKPn2xSlhixHToEFcoUPboiEoVbnGWTnk=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=dx319MViHFZ65pPCRV7euKFP4MZPbq5PmY239YZjvR+Eal5xbL7NTsUC820o65OYLpr2/Qb7JyVBCYXHR5PrIssI2rcUA6zM7HefEUlohNmIsvasdYaeNimtSCa76e7O8aIxFD3klIzuJY+FE3iSaMx92p5pz8K4Zcixd775qtI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=adx1vlP9; arc=fail smtp.client-ip=40.107.249.43
+	 Content-Type:MIME-Version; b=ZPY1AN13uvR89/Emmb6wbTVKWY3t7v/WM3pP46be3PV9xSQrDHkJLaOLiR15HFmGL+HaZxpOOm41PighLSKYHGYsY58JERJ+ZKG35eb1bjdKayaJOTAv3910Izw8Y3YAZHu0piJSQmjxbtJi1EdNyFtNndeLQuY64iFZxw27zbE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=PplJo1o3; arc=fail smtp.client-ip=52.101.67.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="adx1vlP9"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="PplJo1o3"
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=V7KgTTkCFYIGHcc2PhSF/VmE78o52XI32ZkzT304WjJvAsm4aYdwLRenflVCM+mMtuOz2JT2I67FWhHUbMaZTZjOW9Th2cfJOtcwzf5km6svBVEaeEiSr4PGUuIl38W/5/FBESiQecHzREOnpTp/H7Wcv5UZE5a7rcC3H9Nc5F87YjVxCSOMN481WJcyX9El2j5BAe89dW2bdbUav/O77EWkPh+90WbPH8tiIgfjGrgSgpsSN18vRzLIql0gZHrniquFSVOMEMPlIdJSTd7LJIM0WnJeRMdNI8YqI7+qM5sRGNn0rLD8XAdYvtT9EDM//PjqA91N5zpt7JA8LAfLHw==
+ b=wJMF1rhf7ejAEm3gNNGH31DesdmSZPG2eGzCW/y0q0B1HToopDZ8KB/OXpJ/nDsgR8a0OmdYTGdPE9nNjaJrK73sETlbqp0Nusb9uQdfkIvRzdExxLu+0lg9dGm6mGqClpTpVpDrAb8KgiAvWQcJFUppT7tQTYn65G8Xh4yZiVuIb+uV1eq76Ulz9dCUeOIc2GTIs3Usl53F19oU0TNjQqlLyoWeb0JJYcUbEOOA8k5NB+VTGvJVZ6vUUM2pyuk7wNtdkk7slSxjqBncTEnWHDC5EP/mOzmW8P4NVa+ReaLRsdIbWDgv4i8NVeTSS1kU2RcHXjCr81fEG1Kr2GZKmg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=fFjbGv1gVK4zKseDku8+u/eMqcE953O6sweqZZBPOQk=;
- b=Ilp1pJXBNci7W/FEgbMlk9jbW40nBezAdpvVOG7rfwZEGU/ZkwUnJkiReo/esQIhgyQn6giQl07IC5T3d5q2oXdSAq2SDMBGCu+Ss6XSSZmEW5tJ6qj5i8jlTI7hy4RRVPE5+0ePtx9znz1cw37WUe6wYfj3HEv9f+HNeoSDtKCvoGicxDSX3xdYPtsVzLW8nX0Ys6/eUHxmYfZPxbPkHvnZCAio1aIlS/sTzEIORGlgmcfJlbWwfjlitiqT01OsHVP/56xUSF88wxfGjhUGn0DwfDdOMkuYHNN3N3XeY3x3258ghGaQTxUJ20fIUxudH6jEEEsJgcNFNqZwibn6rw==
+ bh=oTUifbOiXRLSvfccmIcxkAcS1tj32YAhduDe53d0QDA=;
+ b=W5crR2O9iDw3gltDTlCm16x9Uo+DyovLl/uEnDiQjl7oGjZ5keKjTywqK/iZeLHETM0xxvezmg2ktnES7QsKRTcWWbMeLLOFyGMzWJh/QTZK/2vn7WSoHJxd/ZOm8Xs1ZM05EwWCzXYSi6aO34MOAJL2aZcKyFM+KMufTeVoWSc4l2QgKgI8jGGUCAA4gwKDcnLK6Q3YRkjww9zlrxgTYiuN6DoILXc27B6hNkEXI+DEqtZ7SdtTx8K/oKWXxlWSmqKElbABcSOwQPsgY1FFiLNJvmOdlRuGA8EwE5MKkQinMsqJH6O0m/vCbTGJii5db/pFKso5BvySexYbxRAR5w==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
  header.d=nxp.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=fFjbGv1gVK4zKseDku8+u/eMqcE953O6sweqZZBPOQk=;
- b=adx1vlP9srQ5+ATG5+h/n0WpSZ3zi1yGEcegqyjRa0pq/ajDCDm10hSiu9AtyZJH2zCOxWHraCZWRYO/KHlcMX8PfTjm0Aam5PXa2iDNFhxDiwckKF5OkvwnMlyGj3xZ3Fx7wVbnR55iM5y208sDPCPfMfmPfll9XVREBFbzaAfGUGNrM2lNz2LH2XphA86jzjfHfAXQu+eR3nDGNiZFHOWSjUAGCTYsCe2b/lY4XXF+IN5QbWAPb7H+KApYbwERyvNkpUgRpk/becLeipZyJS5P5YV5zxWbtsEyMkuuSdMXtCQeGdod5El+WEGWEl25hEyZdsa+SCJa8qx2V0wQBg==
+ bh=oTUifbOiXRLSvfccmIcxkAcS1tj32YAhduDe53d0QDA=;
+ b=PplJo1o3w7EFu6/YA+sTEIm6FGlQnjOKzrC05qBlny4cXGBbE1nBiRG5pAd5hTpk4fsPrLxIuvrXzKH7EQ9ua02K4UEQOF2Rtok+4ED/n3YzGWNwJC1ub3cKjEulen9MsN1cUZec4ABaEHgOtxqqiPd4DK/Z+w8i2EP2pOxELAQo0b5sjOnDt7mKMAk9apLQNrRu1icn7Bz+CK4vyZlJnxYPXB49Byb87RYjdmwNVXhx2UKLunG4nC9QbD2jrg8YowRAJwz+dO2Dmg0kNjGmq8mf48RXRpogf75BEA27fTkeNZMYsj0g/i/mj/e83iGaSW5CIcMxYE7G3T6ZoKX/FA==
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=nxp.com;
 Received: from AS8PR04MB8898.eurprd04.prod.outlook.com (2603:10a6:20b:42d::15)
- by AM9PR04MB7618.eurprd04.prod.outlook.com (2603:10a6:20b:2dc::13) with
+ by AS8PR04MB8753.eurprd04.prod.outlook.com (2603:10a6:20b:42c::18) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7875.21; Wed, 21 Aug
- 2024 14:56:33 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7897.18; Wed, 21 Aug
+ 2024 14:56:39 +0000
 Received: from AS8PR04MB8898.eurprd04.prod.outlook.com
  ([fe80::5e22:869c:33c:9654]) by AS8PR04MB8898.eurprd04.prod.outlook.com
  ([fe80::5e22:869c:33c:9654%5]) with mapi id 15.20.7875.019; Wed, 21 Aug 2024
- 14:56:33 +0000
+ 14:56:39 +0000
 From: Iulia Tanasescu <iulia.tanasescu@nxp.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: claudia.rosu@nxp.com,
@@ -49,16 +49,16 @@ Cc: claudia.rosu@nxp.com,
 	andrei.istodorescu@nxp.com,
 	luiz.dentz@gmail.com,
 	Iulia Tanasescu <iulia.tanasescu@nxp.com>
-Subject: [PATCH BlueZ 08/14] bass: Add APIs to probe/remove Broadcasters
-Date: Wed, 21 Aug 2024 17:55:56 +0300
-Message-Id: <20240821145602.92083-9-iulia.tanasescu@nxp.com>
+Subject: [PATCH BlueZ 10/14] shared/bass: Add APIs to set/clear BIS sync bits
+Date: Wed, 21 Aug 2024 17:55:58 +0300
+Message-Id: <20240821145602.92083-11-iulia.tanasescu@nxp.com>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20240821145602.92083-1-iulia.tanasescu@nxp.com>
 References: <20240821145602.92083-1-iulia.tanasescu@nxp.com>
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: AM0PR10CA0010.EURPRD10.PROD.OUTLOOK.COM
- (2603:10a6:208:17c::20) To AS8PR04MB8898.eurprd04.prod.outlook.com
+X-ClientProxiedBy: AM9P250CA0006.EURP250.PROD.OUTLOOK.COM
+ (2603:10a6:20b:21c::11) To AS8PR04MB8898.eurprd04.prod.outlook.com
  (2603:10a6:20b:42d::15)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -67,184 +67,157 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AS8PR04MB8898:EE_|AM9PR04MB7618:EE_
-X-MS-Office365-Filtering-Correlation-Id: f9e56ef6-9972-40ee-eaab-08dcc1f172bf
+X-MS-TrafficTypeDiagnostic: AS8PR04MB8898:EE_|AS8PR04MB8753:EE_
+X-MS-Office365-Filtering-Correlation-Id: 8a1b1cf3-9aa9-4e9c-f9f8-08dcc1f17624
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|366016;
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|366016|1800799024;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?wFwd5du8fwECXAP/M5xPFX+cRtc8C2aEQjrkpM04SGnh2woLjAeQzMLLU00z?=
- =?us-ascii?Q?WKKfDM3brjR29muTkMkdQfj/Rark/wnpcGxfmltzNZwBAI+FjMOUWqI7sshG?=
- =?us-ascii?Q?TY7dRBdcUy/ZlqxIwzESrDjYDJZM1aUaEKg1tw7uAcT6RNQWPsHsf7rh5uuw?=
- =?us-ascii?Q?gseIO30KX7j983AzEbYBJfRHUbXKXyQ1MEnL7DzmEzsndu6Lo6B8385HUTLR?=
- =?us-ascii?Q?Ot9V5yVpmKVP2O4EYT8X23+hfhyde53ubd35DnNBuVX+IMzUB/6ckCOCv0wh?=
- =?us-ascii?Q?ml5vWgWhiutV1TkX8t8lwVWgnXj4J76VKDNid11LUdUyO89R3aUiVsMs5uvg?=
- =?us-ascii?Q?Bzwfger7ZuX57TCM8/RW9/+HebLb80cymuZBBO7/1rf+KSIGiVeWXnT2yckH?=
- =?us-ascii?Q?fAzt8IknyPcdZRw1hzutIRMtcyPhWK2j8I8oXIJ+yLFVrtPw4XYoNyTgkyzy?=
- =?us-ascii?Q?z5ELJPSzwShvJn6CEE5hVUuCUbQLDYcA1+v5sauMUs2tkpvKCVeFCQYxf3df?=
- =?us-ascii?Q?JFC01lADB7H17y16Z0oSFPHs3Vy1UU9BoA0G6ca+E1tv16bMrqCeZOD9xtg3?=
- =?us-ascii?Q?1Ymj6I2PBCCLA/oaMSZVACUZMDNzMgOpZEcZwZuK9KLGQuAcM2lLhvXMwP1L?=
- =?us-ascii?Q?kw8J8glMIVm3ZQjk9jxMhzrENdOI+sSz2pr0ra25sqNhNIRUbVhvpunAp8/p?=
- =?us-ascii?Q?yCib8AVjyU5yTf1M3GOTVQzgg7yc5YQCz+Z8vLwLT8u8lbgy4CFHR6slhgNl?=
- =?us-ascii?Q?zQ/hajLTRffoqP7LZ4abhCVnx9BNrC8dEGiFf47p/1YeA2HVr0BCGnWPvSl2?=
- =?us-ascii?Q?+aYIY8cDBWzsMG8MigJ83NwQVKWDTB4HOCmWAxHO1MAjMUDVyIC/rtvICQlP?=
- =?us-ascii?Q?mkiWOqOOqBZuI3Rq5c3yPazUT+quHI4svuxhM83oEF4/afSwb5OTA80EXtT+?=
- =?us-ascii?Q?NbJb+39wDGDCcNFcJSePx02BEupvHlpY85A4+MbylotutPE5Ug6JwrQugFgq?=
- =?us-ascii?Q?umCkK7cf2KVHMTCDje8OvshBsQH9Mq6X3LWQzXSnBw1g/l+dEiRUzf7OrYyx?=
- =?us-ascii?Q?CWO3L1eP3vL9gBGgxsytZ6+AKxLNVscDXgFZk8ZH270ur5SzXrBbZeKgNnhC?=
- =?us-ascii?Q?+r1pl3qPVWkDoVPRGN1LRIZOYE6Xe+EC5c/myqB316J5eDcR8wCFuWhPH2FS?=
- =?us-ascii?Q?83C27vOsejG+XvFVN1U8W4R+CqZEjBXHkrEufsmhcf2Qw3fPxnDrQr9FJQOr?=
- =?us-ascii?Q?9VXs3mBL4mUO35NaWB1hn6tdsOQmOBppJZ0D6r/5pZlt36n2X/qb5ijxyyvP?=
- =?us-ascii?Q?2EF64AJi2WJUZoPmFDiRbI4cQ1kazUeQ9CXVar8U2izotg=3D=3D?=
+	=?us-ascii?Q?pI+qsal6ifBfaWlV+9jxQaG/zgpONePGlFNjpqMGDGR2vq62llKTYq38P8g6?=
+ =?us-ascii?Q?CyT7Cm18ST1+kxSpztOkB3282nOIhyMTFQniCcmfYu0WLsQ6LZPp+vJQJiI0?=
+ =?us-ascii?Q?F4bBCTMngoApxEp59fGjrANO1stst9GR8/RE/iFAoXud/TybnFsC54gSSxHZ?=
+ =?us-ascii?Q?hv27BaoiAMZC8zwhcpPcr2+mXLzL1AOSzKrH9gRwlTNmbVa/74hnIhjAN948?=
+ =?us-ascii?Q?is3MtIaqCLdVyyYMA/Zw3pjS3nC8lSGivqbdSfH6nPACyJVtS4lATXvbXLPe?=
+ =?us-ascii?Q?HqOWiLhXfKAwi07C2pBVUhqG/G+9HlvtSGx+dTih2Ax4paJ4jsEqSCGULZFp?=
+ =?us-ascii?Q?tE5rR9v7wcA11CE52DHilpon7QvKgWvyQFVtjFd0V71krtHAXiVXWjit/N4N?=
+ =?us-ascii?Q?mdry9sspaxt/M3XPZbFvwUZvOdzZp3YGZq91RLYewNfQdOvEAPmmk70syLjP?=
+ =?us-ascii?Q?UIsNWHIMgZjIyafZliDt3m7U5oQ2zirN0BO0nAxy6mexfZFqzTcusF7/oxEl?=
+ =?us-ascii?Q?5lWi8tNZLpyPBnEtz+BXaeFZsE6X7uci/fG72AGnKms4so2iS/5aRmZuBymA?=
+ =?us-ascii?Q?7NVSHcTZUqZubBr66D6QRIw5T2Nuyz56Zjfy+EwpvRA4ES/NBbCww0TRm2u8?=
+ =?us-ascii?Q?83I75UfFRIZGw796uqtuXz+4KPnMkkAMMuJ5aRq6dt3NusLL6xsx19DkOlll?=
+ =?us-ascii?Q?O76MpKXGG6xaXqBY+MnB0mhxSP4YnU5+gzpQBs67bzDEc5xra1Do9st3UcKV?=
+ =?us-ascii?Q?SS36kB6qzj1LlLGn8bAf0Q7CVGDCA/xH78WFx3JNjijLoPd7k6vXQdwUxfq3?=
+ =?us-ascii?Q?zQkaTZSo2D8LvECmk7o0Jp8qUPm+idPmzi3Z9MLkhbnEKAEDNCmQ5rmYn8wb?=
+ =?us-ascii?Q?beMuyUQetw/nwunuju7JqqmV4xiwwAwVJNAiCMvrBpQnh+NlR3qb9gsB5xtY?=
+ =?us-ascii?Q?+Lxfcuoyuv9lAZPfFfMTn+kz1ESDthhrGRzR4Y2HtX5MMXKLZoNzO5/zbbua?=
+ =?us-ascii?Q?GbL8HSq3h0GlxRpXOoDl+dIuYx8X5e8gqHFYTSMDPkxRu1+2HhOuAFvStXys?=
+ =?us-ascii?Q?Rt33PSFOK2n4+5oa7kbpjgI/W2hBVfNnuNV4IzdWT/K9v0xk6Thmoi0qyY6O?=
+ =?us-ascii?Q?z1jJD1W7iaho5JhhMSrpcvTQp8iuAU3YCTdNac7xHWBhZssvUqFqBfnh7uEk?=
+ =?us-ascii?Q?+9UcrpqnQ9GrtOWip1mpkW3jchGpyz7kPJJ4Lo7UB1i2D+sLk8bIQhjf8/tj?=
+ =?us-ascii?Q?PZ43fzSjo7576rpkeErbMCPppFxqg/SDzFVv1sQjrul8+sVVGn7uv8qoYvDk?=
+ =?us-ascii?Q?ymKiIH+vTaP/+P1wPZEbSenXDV5b8SI9IDKVsxiJrYOFdQ=3D=3D?=
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AS8PR04MB8898.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016);DIR:OUT;SFP:1101;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AS8PR04MB8898.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?akxfhqBPc99r5mmpWrwrWFoQIWXudnHbumfIRNVvYVeQHMbrxNt0TOOgFF5K?=
- =?us-ascii?Q?+4QRUSfaV/lK2cYScyPft5vGTNtfkiOEGqvv9LiigPx2wKVp6yVJeVsjnZTo?=
- =?us-ascii?Q?ZMeKfqxj+HYWSqmLSRkTc4IMZi8nbcvYq9MEfnQLn3nivarS1XzsdxeIZgVX?=
- =?us-ascii?Q?2/ZWxy7xLbPuezggxYSVYT+AWYctJLIdBIJEFs6MxopejNzjX0mT/F3/wr5V?=
- =?us-ascii?Q?OgNSslXgfgH1J4ZUcmvWaQgc3xqdcsLQ7enCAn5QWfFvbqmE/X3UVGMNYwgp?=
- =?us-ascii?Q?n91tvDg2zbahK98IdfmKrUnxoAArqPseCVY1ZEVSIayT1BOMWSqdygL2WY4R?=
- =?us-ascii?Q?+38V/CthO7LSh1lcN2cEQ933dYfe/KUOSOPBt/91lnOWyjejbQNZvThLquVp?=
- =?us-ascii?Q?nNzxPKPSM3YiIOjFOMgz58622wmwRNLqFuFm+Yg+Z4RDkwYhmPmiZX3VqGQy?=
- =?us-ascii?Q?fpW/ivhOxz1kzHBvyJPS+LPubowlGllonu1b+em6Dzby1/O9EpdpppsMBe1r?=
- =?us-ascii?Q?HmsjazgpI1XIcaZz/aK84oVH5Igcxb0Eik/2fQiTvpadHY6u3hRP6MW4dOBv?=
- =?us-ascii?Q?57HZoZkCmOZPh4Z3v0ThwfKKHMMYzByGSnjolkSog7MK6N1ZqtqU/lnMWFR9?=
- =?us-ascii?Q?dmcGXgcypJy/FZNT2b/oTClY9QcfJ5XFGyn9WR8K/mqpGcSyVXM4AuJdLpl2?=
- =?us-ascii?Q?XTrbEIsUk4xSxVTf/qIKvAgjZTTXt45wpD799UexvTtgVfjvGzpT1tkRClGO?=
- =?us-ascii?Q?kN292of4dy+7sP4BNwQJLGYeznVJXfIUAWx9XM9G6lZBhFrvVxCm4DfNfL9h?=
- =?us-ascii?Q?ijIgVwan8EV5NL7pz1schd6F8BghPIA+I27Sq0k8+w34jRMcWzsyRoPQwNq3?=
- =?us-ascii?Q?/Z96VDzJHjzS91r42URmV3WR6n/XjNsLIKcdn1gk4d0pRGg6TcEhETZqrB6W?=
- =?us-ascii?Q?NRoKwBl8vsTePdzea8MHQZHCNUwqZ0zF0+xhGyP6h0rpUlMqXCFXwdjI5w6f?=
- =?us-ascii?Q?XBkNxiE8Su4a2EPLPHEBNo0Ey6C4K/vfjXQNFPiVyyJpwWh4TvEglLBYK/ND?=
- =?us-ascii?Q?ePW7y6QnX8GIBDJMTZxSFZD5VXD/Qfm8CvLi4QqAfJ3B/d53+C/n3amVENjo?=
- =?us-ascii?Q?P8g6cLs2FOgsbUJeUeJ6Qgc3BmTbSxhl/8SHuAWfOLDNbAndmK+tfESWjvyr?=
- =?us-ascii?Q?z9AjjtVbw1MvW+uizm/mLhZifat3rk3NmviVSxMXOmhfcyfrQs6xNcfSY1Pt?=
- =?us-ascii?Q?v0iEfIe6whyIRxOtuEcEQpECC4w6PEQteCjaWsSNUQlWGXW3A4EmZiLiM0Ru?=
- =?us-ascii?Q?z9YOjcB/FqEaWC1H1z5VkRLeDy0wOd0V+/6641TR6TWbHgyS+XhgZWfPP+9m?=
- =?us-ascii?Q?HDJrTahdKatfMdLWODEslOr6hy9NlXF2HuVvLQJq5pvYlw43xev3B8uBJjwk?=
- =?us-ascii?Q?QHqXC9O9RzsSEEs94bzzTMrmNKY2jylgxdOAC8ZbfFcE/jMbr95sMb9ZBTHL?=
- =?us-ascii?Q?8KOPJUFtjUEU9WUckJ6pghNWBduQE4PY8wef++Du0pqIyx90UVUFkuVBNm54?=
- =?us-ascii?Q?q3YbwZ1pYFlob+8OuOk/4jGH6H2f3lPdmK86R/A7Kq5NzeKAZtejj92JYTsG?=
- =?us-ascii?Q?tg=3D=3D?=
+	=?us-ascii?Q?c7U/TpCsOsQ2sLgJQfn+BuMCGXRGXf5N2pheiuiXcjj3JQkoUtb3AGwrubHD?=
+ =?us-ascii?Q?iRZ9ukNyoM76fF06WEkf7uJGxiNGQxlB9a/KzGoQk+zHwrh+cx97XaV/Cajc?=
+ =?us-ascii?Q?mdTJjnpb3zm9ZJ7tp9fWtcy12ZY/9gvvkTyMKEL4mAAx8+shd2/LuEOLx0NJ?=
+ =?us-ascii?Q?nNp9iaNbUwv1wHIEBwKgTFog7mwQW35bmY0o3nRUz9MWoDRVjGriBzkatnrh?=
+ =?us-ascii?Q?4OYFgy4xyvpDbVNZxAGtFgC7zvP848LWZoQioF+AqK7/LtI/lkn41te0hcOc?=
+ =?us-ascii?Q?Ujq33l3yf7a4z50pr4cPWhjDhZwhEwKvp6VGKCbLOqVKm8W/YODsUp+JLX62?=
+ =?us-ascii?Q?yVzRQG8EOrfdk0/hrOByavS+EAGXul3wQI/n93u9BOLlSx7G9qNBIeW8bMpZ?=
+ =?us-ascii?Q?vrusinV2A+fFzNqIHlcKKBraR0H4B3nkoS9y6oC52mAFlmWknRePCphbWW81?=
+ =?us-ascii?Q?SBmaTf/G+TlqBKEGAIEpfdmWbZF9RVum+TjYDNVkSh5EQjPu58PTUD8giw9j?=
+ =?us-ascii?Q?0W2AFJGPOahMd0x30+GsG8LujYeavpvJIikP3aw3fpXar/7cAl6hPSL/MQFq?=
+ =?us-ascii?Q?HGVVaaUq79p1EvVh2z9hd16eKLafftkyunTahjZ3qY/0bGcqHeocPaV5gvXS?=
+ =?us-ascii?Q?G/oXLm7TNufkh7jBnuCW4gqErOIz40b2GZTW8HICBsmLyi4OparWLls4ywgx?=
+ =?us-ascii?Q?X1AiCxnQTjFOagUxmnKHgpyqJhVlTxfk8sMYRZZ9A+iTbb/y0Es9Y8dTeeoQ?=
+ =?us-ascii?Q?V95RnaAAeeeEVHoc8hIdxapyX3O9cqCUzJOnIGTmii71WeejWkjuwA6ZyFRx?=
+ =?us-ascii?Q?itRuCBhfXq+f5Az7VZJKjvQYvVVXoBdeJaN+mx/RI6vNKSylRAEjcVrak54F?=
+ =?us-ascii?Q?NH7v+GBnMBLNUK8RA9L6iAR8orTxw4Ru2/kgGIktyZGkXZvqWo/ZBXAzh+8O?=
+ =?us-ascii?Q?1T4CR2uhq84BsCWu19NXaa9yRqBJ5bD8GYJQcckU2IV0ZPfeva1oJ6Rkj0Gg?=
+ =?us-ascii?Q?oERgk+BITTduRColksVC4wcSJS+fSeibbft2I82ZOq1PYWFa3t3TNw5SUFdq?=
+ =?us-ascii?Q?obssCZ5gVJO7mc7iL2dhjZfHckE4MMU8pKp2OxJMM4fmx6169t4MCreuLfUL?=
+ =?us-ascii?Q?K32CDCrcgl9ZZi3tCwQ7SsvKMb98GXFDKXsyGf8woVFEAkXocb9kpjnA0sl0?=
+ =?us-ascii?Q?FNDMQ0Q9ujg/3uhVKle8snivmpuy3hUsictz/BXnMkCXlQTHuspG8iurpfXB?=
+ =?us-ascii?Q?RSgspdV5I9hZSdqO7gCnVZq2ozhV2AVeRvkvSsleeHbzajjbnfuFQ2aE2yXL?=
+ =?us-ascii?Q?EwXYJuMr3GlIgmm9A+PC0Y/RORaYbO+0afyeSYCwvHYvNWFxUigfw4+KRYPj?=
+ =?us-ascii?Q?dze/700QTO3wNWlPxMTdU39PLB5FIg5gc4AqVzQ1Lv2RqmS0OHCAkQ4Oia/6?=
+ =?us-ascii?Q?GERYGuV/Ww4xVhUVtLZFrPzAClgtnQeguWvra3++nWJiM+5qqrDVKnbk8vfK?=
+ =?us-ascii?Q?6zk4y9MR4oKBrWPQBK9XBS3xIP4MbQwZuMSGs8z/v3AjGag1Cxgi8CpSQi/a?=
+ =?us-ascii?Q?UO95GI3UbtQDtvaWAnImasAfoHDVsXEY9m6p7qSymFxLeM6h3SXavXdsjyDj?=
+ =?us-ascii?Q?MA=3D=3D?=
 X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: f9e56ef6-9972-40ee-eaab-08dcc1f172bf
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8a1b1cf3-9aa9-4e9c-f9f8-08dcc1f17624
 X-MS-Exchange-CrossTenant-AuthSource: AS8PR04MB8898.eurprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Aug 2024 14:56:33.7392
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Aug 2024 14:56:39.4064
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: t17FpEtmJfgbvLZZztBF+3aq6iT54y1EIeMHhYc/30NXusGf8Gzqyvrp8xXJJWueNt451O9i/V16t0ahi+pdjw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM9PR04MB7618
+X-MS-Exchange-CrossTenant-UserPrincipalName: aM6DbV3hZUD6CGAYJ8t1Ur1fzXW4xszDlQbo/WEaYgRW5Snjhixx1D9MVSWdUUpklSlubUXtUaBv5R91n/kBfQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR04MB8753
 
-This adds BASS APIs to probe/remove Broadcasters probed by BAP.
-
-The BAP plugin might probe Broadcasters that were either scanned
-autonomously, or that were added by a Broadcast Assistant through
-BASS.
-
-After performing short-lived PA sync with a Broadcaster added by a
-Broadcast Assistant, the BAP plugin will call the BASS probe API,
-to inform BASS that PA has been established with the Broadcast Source
-and to provide a reference to the created bt_bap session. Once a
-Broadcaster has been probed, BASS will update the PA sync state inside
-the corresponding Broadcast Receive State characteristic and
-the peer Broadcast Assistant will be notified about the update.
-
-Once the BAP session with a Broadcaster is deleted, the BASS remove
-API will be called, to inform BASS that the Source is no longer active.
-The BASS plugin will update the PA sync field of the corresponding
-Broadcast Receive State characteristic and it will notify the peer
-Broadcast Assistant that PA sync is no longer established with the
-Source.
+This adds shared/bass APIs to set/clear bits inside the BIS sync bitmask
+of Broadcast Receive State characteristics. Notifications are sent to the
+peers each time the characteristic is updated.
 ---
- profiles/audio/bass.c | 51 +++++++++++++++++++++++++++++++++++++++++++
- profiles/audio/bass.h |  3 +++
+ src/shared/bass.c | 52 +++++++++++++++++++++++++++++++++++++++++++++++
+ src/shared/bass.h |  2 ++
  2 files changed, 54 insertions(+)
 
-diff --git a/profiles/audio/bass.c b/profiles/audio/bass.c
-index 5aadb0dc8..22e8d1c9b 100644
---- a/profiles/audio/bass.c
-+++ b/profiles/audio/bass.c
-@@ -102,6 +102,7 @@ struct bass_assistant {
- struct bass_delegator {
- 	struct btd_device *device;	/* Broadcast source device */
- 	struct bt_bcast_src *src;
-+	struct bt_bap *bap;
- };
+diff --git a/src/shared/bass.c b/src/shared/bass.c
+index 958b6f788..8f02086a1 100644
+--- a/src/shared/bass.c
++++ b/src/shared/bass.c
+@@ -1766,3 +1766,55 @@ int bt_bass_set_pa_sync(struct bt_bcast_src *bcast_src, uint8_t sync_state)
  
- static struct queue *sessions;
-@@ -115,6 +116,56 @@ static void bass_debug(const char *str, void *user_data)
- 	DBG_IDX(0xffff, "%s", str);
+ 	return 0;
  }
- 
-+static bool delegator_match_device(const void *data, const void *match_data)
-+{
-+	const struct bass_delegator *dg = data;
-+	const struct btd_device *device = match_data;
 +
-+	return dg->device == device;
++int bt_bass_set_bis_sync(struct bt_bcast_src *bcast_src, uint8_t bis)
++{
++	struct iovec *iov;
++
++	for (uint8_t i = 0; i < bcast_src->num_subgroups; i++) {
++		struct bt_bass_subgroup_data *sgrp =
++				&bcast_src->subgroup_data[i];
++		uint32_t bitmask = 1 << (bis - 1);
++
++		if (sgrp->pending_bis_sync & bitmask) {
++			sgrp->bis_sync |= bitmask;
++
++			iov = bass_parse_bcast_src(bcast_src);
++			if (!iov)
++				return -ENOMEM;
++
++			bt_bass_notify_all(bcast_src->attr, iov);
++
++			free(iov->iov_base);
++			free(iov);
++		}
++	}
++
++	return 0;
 +}
 +
-+bool bass_bcast_probe(struct btd_device *device, struct bt_bap *bap)
++int bt_bass_clear_bis_sync(struct bt_bcast_src *bcast_src, uint8_t bis)
 +{
-+	struct bass_delegator *dg;
++	struct iovec *iov;
 +
-+	dg = queue_find(delegators, delegator_match_device, device);
-+	if (!dg)
-+		return false;
++	for (uint8_t i = 0; i < bcast_src->num_subgroups; i++) {
++		struct bt_bass_subgroup_data *sgrp =
++				&bcast_src->subgroup_data[i];
++		uint32_t bitmask = 1 << (bis - 1);
 +
-+	DBG("%p", dg);
++		if (sgrp->pending_bis_sync & bitmask) {
++			sgrp->bis_sync &= ~bitmask;
 +
-+	dg->bap = bap;
++			iov = bass_parse_bcast_src(bcast_src);
++			if (!iov)
++				return -ENOMEM;
 +
-+	/* Update Broadcast Receive State characteristic value and notify
-+	 * peers.
-+	 */
-+	if (bt_bass_set_pa_sync(dg->src, BT_BASS_SYNCHRONIZED_TO_PA))
-+		DBG("Failed to update Broadcast Receive State characteristic");
++			bt_bass_notify_all(bcast_src->attr, iov);
 +
-+	return true;
++			free(iov->iov_base);
++			free(iov);
++		}
++	}
++
++	return 0;
 +}
-+
-+bool bass_bcast_remove(struct btd_device *device)
-+{
-+	struct bass_delegator *dg;
-+
-+	dg = queue_remove_if(delegators, delegator_match_device, device);
-+	if (!dg)
-+		return false;
-+
-+	DBG("%p", dg);
-+
-+	/* Update Broadcast Receive State characteristic value and notify
-+	 * peers.
-+	 */
-+	if (bt_bass_set_pa_sync(dg->src, BT_BASS_NOT_SYNCHRONIZED_TO_PA))
-+		DBG("Failed to update Broadcast Receive State characteristic");
-+
-+	free(dg);
-+
-+	return true;
-+}
-+
- static void assistant_set_state(struct bass_assistant *assistant,
- 					enum assistant_state state)
- {
-diff --git a/profiles/audio/bass.h b/profiles/audio/bass.h
-index 5bef92946..7e20385e5 100644
---- a/profiles/audio/bass.h
-+++ b/profiles/audio/bass.h
-@@ -11,3 +11,6 @@ void bass_add_stream(struct btd_device *device, struct iovec *meta,
- 			struct iovec *caps, struct bt_iso_qos *qos,
- 			uint8_t sgrp, uint8_t bis);
- void bass_remove_stream(struct btd_device *device);
-+
-+bool bass_bcast_probe(struct btd_device *device, struct bt_bap *bap);
-+bool bass_bcast_remove(struct btd_device *device);
+diff --git a/src/shared/bass.h b/src/shared/bass.h
+index a82d8f573..f3f708246 100644
+--- a/src/shared/bass.h
++++ b/src/shared/bass.h
+@@ -130,3 +130,5 @@ unsigned int bt_bass_cp_handler_register(struct bt_bass *bass,
+ bool bt_bass_cp_handler_unregister(struct bt_bass *bass,
+ 				unsigned int id);
+ int bt_bass_set_pa_sync(struct bt_bcast_src *bcast_src, uint8_t sync_state);
++int bt_bass_set_bis_sync(struct bt_bcast_src *bcast_src, uint8_t bis);
++int bt_bass_clear_bis_sync(struct bt_bcast_src *bcast_src, uint8_t bis);
 -- 
 2.39.2
 
