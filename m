@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DC431B2EC2
-	for <linux-bluetooth@vger.kernel.org>; Wed, 21 Aug 2024 14:50:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 946CF1B2ED4
+	for <linux-bluetooth@vger.kernel.org>; Wed, 21 Aug 2024 14:50:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724251837; cv=none; b=qg1lCzcY5gVjWmnwXPIRxNEXTUwQEMefPrm1dbCGDyODkac+kg4/Js3JR1LKryfumvHpu1oFvCOzNPQQQfGiIGq7FkAEHodnx3UDYkiQSSkhiD2iFLSl6v6fZGDRAwYdksQLiRIHg3Ytf/z8EXYHC4dx+cKJiLrDqE/yuZGFXdA=
+	t=1724251838; cv=none; b=hpGK/0GeC/cTCdAWfgBPxnY7X4+eJgVBDakdOfhYumAk9Z9jo0/n+eHyvmtO7ftPLXELfABF+l8bvdCeNiMsaZKGoxdwiaQ9M52JSwjMrUA0go82YxZgREuoKev0kOJjZt75tpQ6LPWh9uOmROi92BoFAX4UACTPVig6X8DREcI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724251837; c=relaxed/simple;
-	bh=yMBBjVg3zeOksdwtOscZ7x7nLm7ZdXFaWcqSgXHrIL4=;
+	s=arc-20240116; t=1724251838; c=relaxed/simple;
+	bh=Xf9tZl1dNJ1dG1YNa2jNfdATweOoRLA4Or0+W1s+H78=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=JmBbSD1yl1uLLrt5sU3WYt9ti2E8y/IUhxlbDqyRcqmLEYoJG/XcSGyJfacq8216BWfgfQa3FQPsZshxGvjtZbC2C245QSptgNtdj1d8p4B6N6uWGl0mG27hrnTkb7Vx/84PhD0jfjgiSN9wQMpQXxXgPvF5YAs0PsjefCCUJCU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GoCrhNWV; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=N7EWtpScd2cwkdvI2O6bkqwIs5RLLr372L82TAi0zHldPwNOli9MxTTZuVyqU7L5R3sLV3BWjpdja0JZOuQFcMbShxq4rNwUmNf3/AlvCDkvgjEs8TU5STW88juboCO4z5mY97mfRSL+2Ls1lhZazu0u+FQRzUcz51pOY05NC58=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JFbPlIpF; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GoCrhNWV"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E00AFC4AF0E;
-	Wed, 21 Aug 2024 14:50:36 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JFbPlIpF"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 21945C32786;
+	Wed, 21 Aug 2024 14:50:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724251836;
-	bh=yMBBjVg3zeOksdwtOscZ7x7nLm7ZdXFaWcqSgXHrIL4=;
+	s=k20201202; t=1724251838;
+	bh=Xf9tZl1dNJ1dG1YNa2jNfdATweOoRLA4Or0+W1s+H78=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=GoCrhNWVqIT63xITwHMo5Vd/C8QCNnG5gwhca+DHLcudZHYe7KkeiPiKrXE+kYgu5
-	 HJy4VnuqDMyfYMWoXn+NtzT/D6KAZNmxCiKp7uifstZ3e3/tfjoXoPi9b/UhfqZAqH
-	 LP2U1uOPJC3DJQaGfzkbQ7LhqBecIIIvso+PFPwrivmHIJMrZGb7OLWYmi+7i7aNNX
-	 lgsleVwtj/17l7RdgILgje44QUYRWg2JlQK1ceFiNZVIt/NYCKimwjE9B0jnQVlIo3
-	 4UvRiT6BbZYKPmi5apNs4JlqaXQVeNv2IAclnDMiu8qxJtSZE3Sa+/Gp2TkyVB75eW
-	 Li86Q2S5a9RYA==
+	b=JFbPlIpFMT12mrxRjRtI7z6VUNVSrSAEtWLAVKOpidkXBQlaIUrLvpA1eL3+ReV8j
+	 MKOEPLxztFLcPRJnzkQQOPJfHPkKX4ImJXcuMRzUjxPd98/dOHzRcdnxapoT6XAG8R
+	 8xroKLQGNVJ4QiLSokb7cP3ZE0K0bKc+sROLTYLPXbnkIrScgnX0vYcg8s85Au9PbM
+	 4ORLINCfbw5miO1aaGkqNHsEGdYdN0KitSDDhDzMJg21ScqxQDbezG+pJPC2+uZsGO
+	 vANKnVRH/giZEWSUTjVcHEJjoEsN7fexgIXeGr74j9QMP5RG4yziLZFIFGU0HCxHgc
+	 5DlwagCDBP6Ng==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AE5073809ABF;
-	Wed, 21 Aug 2024 14:50:37 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB1863809ABF;
+	Wed, 21 Aug 2024 14:50:38 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -37,34 +37,35 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH -next] Bluetooth: btrtl: Use kvmemdup to simplify the code
+Subject: Re: [PATCH v2] Bluetooth: hci_ldisc: Use speed set by btattach as
+ oper_speed
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <172425183649.1745569.14976866974609827181.git-patchwork-notify@kernel.org>
-Date: Wed, 21 Aug 2024 14:50:36 +0000
-References: <20240821012403.1947764-1-lizetao1@huawei.com>
-In-Reply-To: <20240821012403.1947764-1-lizetao1@huawei.com>
-To: Li Zetao <lizetao1@huawei.com>
-Cc: marcel@holtmann.org, luiz.dentz@gmail.com, linux-bluetooth@vger.kernel.org
+ <172425183774.1745569.7849751646109918046.git-patchwork-notify@kernel.org>
+Date: Wed, 21 Aug 2024 14:50:37 +0000
+References: <20240820141716.288862-1-frederic.danis@collabora.com>
+In-Reply-To: <20240820141716.288862-1-frederic.danis@collabora.com>
+To: =?utf-8?b?RnLDqWTDqXJpYyBEYW5pcyA8ZnJlZGVyaWMuZGFuaXNAY29sbGFib3JhLmNvbT4=?=@aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org
+Cc: linux-bluetooth@vger.kernel.org
 
 Hello:
 
 This patch was applied to bluetooth/bluetooth-next.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Wed, 21 Aug 2024 09:24:03 +0800 you wrote:
-> Use kvmemdup instead of kvmalloc() + memcpy() to simplify the code.
+On Tue, 20 Aug 2024 16:17:16 +0200 you wrote:
+> Starting a BCM UART controller not defined as a platform device or
+> a serdev with "btattach -B /dev/ttyS1 -P bcm -S 3000000" works fine
+> but the serial port remains at the init_speed, i.e. 115200.
 > 
-> No functional change intended.
+> The oper_speed is only set if a device is declared in ACPI, device
+> tree or as a platform device.
 > 
-> Signed-off-by: Li Zetao <lizetao1@huawei.com>
-> ---
->  drivers/bluetooth/btrtl.c | 6 ++----
->  1 file changed, 2 insertions(+), 4 deletions(-)
+> [...]
 
 Here is the summary with links:
-  - [-next] Bluetooth: btrtl: Use kvmemdup to simplify the code
-    https://git.kernel.org/bluetooth/bluetooth-next/c/a15c5bad1770
+  - [v2] Bluetooth: hci_ldisc: Use speed set by btattach as oper_speed
+    https://git.kernel.org/bluetooth/bluetooth-next/c/96f44a40e702
 
 You are awesome, thank you!
 -- 
