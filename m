@@ -1,120 +1,133 @@
-Received: from mail-qv1-f41.google.com (mail-qv1-f41.google.com [209.85.219.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94D1B205A79
-	for <linux-bluetooth@vger.kernel.org>; Wed, 21 Aug 2024 09:47:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12A9B16631C;
+	Wed, 21 Aug 2024 10:50:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724233668; cv=none; b=IjHsO17vxpIPlJYV3erqvQGsZXNlena9WOOFe3TVWeK3l5szgDP1d80t7cpBI7cdYt1jOd91S3kO5kNv0OEDqARjMVrJTmAb2dFEI1ItJE/MAr+z7yP/qBQvehIHNFVBtJ8Y2vrr78OLT+DdKWNnnEweriKoHTVt3OlEMjme8wY=
+	t=1724237459; cv=none; b=aVESe5WfDtMXR61okayXskcSrMhxPYhWO5Mg9Tw5Hbit+rR+rvqYw60HnWfQ3WiBFugg48aKH6V7+/ISOPLhA9mJiqmWmKXWH56k5k8GW2HAVqU0qhHAHBcnrWr4Yhl7mVDyZpW0s1cx/xCGqPWTcm0sCNgdFP8cvt43zIZmPQA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724233668; c=relaxed/simple;
-	bh=Np4JXK5sIZ0fDWgLysIjTU/X54PprhKiKocoD9oVHsY=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=VMomqlLRrp91z5yzPT1lRS4Yhm0ImQjaCJ5YZ/rOhrLTnEb+miWWCaBvNwny7k+7l2pVamREy/WT576qv4Pt2HWdtfNixkmwgWGjqzXMBb/NGaE0NVGaRnleaLQPlmu+owWRKpkkLDEmScOnqDAKZPqFZUDEl3gjY2WfJYrd8d0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EQV28WNX; arc=none smtp.client-ip=209.85.219.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1724237459; c=relaxed/simple;
+	bh=STTb97XVBz3WjzVy6MSRqy7ftFl5sqfmRKl6jqsdREA=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=rWcp+Bl/XSWa2XNncedPQAE3ieW+UBkcxZihi1d0kCe5k16OtsQWJZFhZFXaruibWab3k0bEIsQXGcM83w0ywERh6vddTPwnAz72GoBGDE8FecKVUO7KK+R7lUn3DN26K4kUTPDHw9QhydZjzR+k3XuwmWOuRVt8aF3AXJ5gxRQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=psmkusK1; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EQV28WNX"
-Received: by mail-qv1-f41.google.com with SMTP id 6a1803df08f44-6bf775d1bdfso33250896d6.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 21 Aug 2024 02:47:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1724233665; x=1724838465; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=Np4JXK5sIZ0fDWgLysIjTU/X54PprhKiKocoD9oVHsY=;
-        b=EQV28WNX8XpRb94wU0gbqsdo7BErw6qYtcEK5pg9JVopYHsQ2Df7zOC+Dl6yA9hfom
-         1tT2VH8+lYE8OR39zp5yuOcXlyYmjI21p33GQarhQQRu/a7ztVWKm9sdISvHlXo6RbN/
-         ePWpP47Kv/sHubdCRpR2AeyQC//5qjrM01IQDV2biJmKps9QbyTJgJ+zhEmZd05KW/3F
-         7Gjxwbz71W4kJc3ZJoR+RWhHKvzGSRF1NBGrSILJRtwctqi563BSMBZMCZpB9H+J9M2L
-         2NV4obrdNh941tVOCvk4raNUy6AONoqh2RnKG6EEecgksFfy0aKZkLG1jFrAAe4SpDTY
-         brkg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724233665; x=1724838465;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Np4JXK5sIZ0fDWgLysIjTU/X54PprhKiKocoD9oVHsY=;
-        b=UMat+ciohxJFWz0IpyhSQ4AqtzB8WGox+NZCws813RaQIA/SR8zl84S4W53UA+SrSh
-         Mr+iVB0j/MGctAhUjBgXOWlgItJy52X0dUS5w55ZNgo86zHLZE7UGwsBYsjNLEHZhmDu
-         BIV/h3NtGbhYbmPwnkzj779/nFvEayp0poSh3/oWZy1Y96CO2MBmvCjQM2VEX62F33kD
-         IdsXkHvgbbgkBcRU+6/7zT1OnUXVuOhvGGtHAdFiXeQdPPHN5pGbqYR7ELDVZazt0nJX
-         xv+Ws7PUPHceZp4ZsKjconiBAA4ntx/qnV1uvY+vKeBtw2HIx6cskxQkZA0uRJNxrEMe
-         Q7NQ==
-X-Gm-Message-State: AOJu0YxVSi2ZNroiUFXBfz3HBqtVWHzShJ70JIdJ3Y07aN94xnFWu9Re
-	SJvh1GizPKzokDx2DUC5eHgx4rPKaTeuN6AHmzf+8+sH3osjgtwCDeYX/Q==
-X-Google-Smtp-Source: AGHT+IEj9nKiw+g6OW3Ni64callfOxHWrcGtKx2v16imZ3iKBnN/Llta8Ua8HdCuKNKXXt2lJM/RxQ==
-X-Received: by 2002:a05:6214:578a:b0:6bb:bc83:660b with SMTP id 6a1803df08f44-6c155d889f0mr21424236d6.20.1724233665163;
-        Wed, 21 Aug 2024 02:47:45 -0700 (PDT)
-Received: from [172.17.0.2] ([20.55.14.174])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6bf6fe26c71sm59162126d6.61.2024.08.21.02.47.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 21 Aug 2024 02:47:44 -0700 (PDT)
-Message-ID: <66c5b7c0.050a0220.c109d.8821@mx.google.com>
-Date: Wed, 21 Aug 2024 02:47:44 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============0982158715395868526=="
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="psmkusK1"
+Received: from pps.filterd (m0279872.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 47L60wWw022325;
+	Wed, 21 Aug 2024 10:50:53 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=qcppdkim1; bh=v3C0hKwf6U5koWi3YHL8Ch
+	lv9pfgBpLCqynad2rPYq0=; b=psmkusK1B1kO8NfJUVxis7m+rkCjdjq5P1UzdA
+	dLSyv0OGG4XIPYAkK6TKQfctDI7nKCoPLibr1Lj3uIhGCPG8tccSK1jqOY7ag7Fp
+	sxYn0wFLoxR1GJIETjBZ83n5Ddl0ENImdBdq374htx7lT6lxx/dL2UctNSUzde/q
+	Y6A8gKqLxj1L4joZG6La/zkwJvHn7YcbJdicaR9RPBQKcMmdOYgG6UXpnihRa8Ba
+	pWhOeCvNp/xKUo8JV43IGowmjd/L2i79JFKUpco6ReLC/NwHx+IQ94hheSvvRM49
+	O/ccu+vrwXwn4naljE1twhhyLs0MnkRcn1i35lRGCxkO/NRQ==
+Received: from nalasppmta02.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 414pdmcb1j-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 21 Aug 2024 10:50:53 +0000 (GMT)
+Received: from nalasex01b.na.qualcomm.com (nalasex01b.na.qualcomm.com [10.47.209.197])
+	by NALASPPMTA02.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 47LAoqXI008407
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 21 Aug 2024 10:50:52 GMT
+Received: from chejiang-gv.qualcomm.com (10.80.80.8) by
+ nalasex01b.na.qualcomm.com (10.47.209.197) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.9; Wed, 21 Aug 2024 03:50:50 -0700
+From: Cheng Jiang <quic_chejiang@quicinc.com>
+To: Marcel Holtmann <marcel@holtmann.org>,
+        Luiz Augusto von Dentz
+	<luiz.dentz@gmail.com>
+CC: <linux-bluetooth@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+Subject: [PATCH v2] Bluetooth: hci_qca: Drop unused event during BT on
+Date: Wed, 21 Aug 2024 18:50:27 +0800
+Message-ID: <20240821105027.425783-1-quic_chejiang@quicinc.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, frederic.danis@collabora.com
-Subject: RE: [BlueZ] a2dp: Fix connection error message
-In-Reply-To: <20240821075714.357691-1-frederic.danis@collabora.com>
-References: <20240821075714.357691-1-frederic.danis@collabora.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nalasex01b.na.qualcomm.com (10.47.209.197)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: eniah-unZFNH2GNxhEreTlWpHJJrai8l
+X-Proofpoint-ORIG-GUID: eniah-unZFNH2GNxhEreTlWpHJJrai8l
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-08-21_08,2024-08-19_03,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999 spamscore=0
+ suspectscore=0 malwarescore=0 phishscore=0 priorityscore=1501 mlxscore=0
+ impostorscore=0 bulkscore=0 lowpriorityscore=0 adultscore=0 clxscore=1015
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2407110000
+ definitions=main-2408210079
 
---===============0982158715395868526==
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
+For the WCN6750/WCN6855/WCN7850, the vendor command for a baudrate
+change is not sent as synchronous HCI command, controller sends the
+corresponding vendor event with the new baudrate. It needs to be
+dropped, otherwise it may be misinterpreted as response to a later
+command.
 
-VGhpcyBpcyBhdXRvbWF0ZWQgZW1haWwgYW5kIHBsZWFzZSBkbyBub3QgcmVwbHkgdG8gdGhpcyBl
-bWFpbCEKCkRlYXIgc3VibWl0dGVyLAoKVGhhbmsgeW91IGZvciBzdWJtaXR0aW5nIHRoZSBwYXRj
-aGVzIHRvIHRoZSBsaW51eCBibHVldG9vdGggbWFpbGluZyBsaXN0LgpUaGlzIGlzIGEgQ0kgdGVz
-dCByZXN1bHRzIHdpdGggeW91ciBwYXRjaCBzZXJpZXM6ClBXIExpbms6aHR0cHM6Ly9wYXRjaHdv
-cmsua2VybmVsLm9yZy9wcm9qZWN0L2JsdWV0b290aC9saXN0Lz9zZXJpZXM9ODgxNjQ3CgotLS1U
-ZXN0IHJlc3VsdC0tLQoKVGVzdCBTdW1tYXJ5OgpDaGVja1BhdGNoICAgICAgICAgICAgICAgICAg
-ICBQQVNTICAgICAgMC40NiBzZWNvbmRzCkdpdExpbnQgICAgICAgICAgICAgICAgICAgICAgIFBB
-U1MgICAgICAwLjMzIHNlY29uZHMKQnVpbGRFbGwgICAgICAgICAgICAgICAgICAgICAgUEFTUyAg
-ICAgIDI1Ljk2IHNlY29uZHMKQmx1ZXpNYWtlICAgICAgICAgICAgICAgICAgICAgUEFTUyAgICAg
-IDE3MDcuMzQgc2Vjb25kcwpNYWtlQ2hlY2sgICAgICAgICAgICAgICAgICAgICBGQUlMICAgICAg
-MTIuODkgc2Vjb25kcwpNYWtlRGlzdGNoZWNrICAgICAgICAgICAgICAgICBGQUlMICAgICAgMTYy
-LjIwIHNlY29uZHMKQ2hlY2tWYWxncmluZCAgICAgICAgICAgICAgICAgRkFJTCAgICAgIDI1NS43
-MCBzZWNvbmRzCkNoZWNrU21hdGNoICAgICAgICAgICAgICAgICAgIFBBU1MgICAgICAzNjAuNTMg
-c2Vjb25kcwpibHVlem1ha2VleHRlbGwgICAgICAgICAgICAgICBQQVNTICAgICAgMTIyLjk0IHNl
-Y29uZHMKSW5jcmVtZW50YWxCdWlsZCAgICAgICAgICAgICAgUEFTUyAgICAgIDE0NjkuMTcgc2Vj
-b25kcwpTY2FuQnVpbGQgICAgICAgICAgICAgICAgICAgICBXQVJOSU5HICAgMTA2MC43MiBzZWNv
-bmRzCgpEZXRhaWxzCiMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIwpUZXN0OiBNYWtlQ2hl
-Y2sgLSBGQUlMCkRlc2M6IFJ1biBCbHVleiBNYWtlIENoZWNrCk91dHB1dDoKCm1ha2VbM106ICoq
-KiBbTWFrZWZpbGU6MTE3NjY6IHRlc3Qtc3VpdGUubG9nXSBFcnJvciAxCm1ha2VbMl06ICoqKiBb
-TWFrZWZpbGU6MTE4NzQ6IGNoZWNrLVRFU1RTXSBFcnJvciAyCm1ha2VbMV06ICoqKiBbTWFrZWZp
-bGU6MTIzMDM6IGNoZWNrLWFtXSBFcnJvciAyCm1ha2U6ICoqKiBbTWFrZWZpbGU6MTIzMDU6IGNo
-ZWNrXSBFcnJvciAyCiMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIwpUZXN0OiBNYWtlRGlz
-dGNoZWNrIC0gRkFJTApEZXNjOiBSdW4gQmx1ZXogTWFrZSBEaXN0Y2hlY2sKT3V0cHV0OgoKUGFj
-a2FnZSBjdXBzIHdhcyBub3QgZm91bmQgaW4gdGhlIHBrZy1jb25maWcgc2VhcmNoIHBhdGguClBl
-cmhhcHMgeW91IHNob3VsZCBhZGQgdGhlIGRpcmVjdG9yeSBjb250YWluaW5nIGBjdXBzLnBjJwp0
-byB0aGUgUEtHX0NPTkZJR19QQVRIIGVudmlyb25tZW50IHZhcmlhYmxlCk5vIHBhY2thZ2UgJ2N1
-cHMnIGZvdW5kCm1ha2VbNF06ICoqKiBbTWFrZWZpbGU6MTE3NjY6IHRlc3Qtc3VpdGUubG9nXSBF
-cnJvciAxCm1ha2VbM106ICoqKiBbTWFrZWZpbGU6MTE4NzQ6IGNoZWNrLVRFU1RTXSBFcnJvciAy
-Cm1ha2VbMl06ICoqKiBbTWFrZWZpbGU6MTIzMDM6IGNoZWNrLWFtXSBFcnJvciAyCm1ha2VbMV06
-ICoqKiBbTWFrZWZpbGU6MTIzMDU6IGNoZWNrXSBFcnJvciAyCm1ha2U6ICoqKiBbTWFrZWZpbGU6
-MTIyMjY6IGRpc3RjaGVja10gRXJyb3IgMQojIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMK
-VGVzdDogQ2hlY2tWYWxncmluZCAtIEZBSUwKRGVzYzogUnVuIEJsdWV6IE1ha2UgQ2hlY2sgd2l0
-aCBWYWxncmluZApPdXRwdXQ6Cgp0b29scy9tZ210LXRlc3Rlci5jOiBJbiBmdW5jdGlvbiDigJht
-YWlu4oCZOgp0b29scy9tZ210LXRlc3Rlci5jOjEyNzI1OjU6IG5vdGU6IHZhcmlhYmxlIHRyYWNr
-aW5nIHNpemUgbGltaXQgZXhjZWVkZWQgd2l0aCDigJgtZnZhci10cmFja2luZy1hc3NpZ25tZW50
-c+KAmSwgcmV0cnlpbmcgd2l0aG91dAoxMjcyNSB8IGludCBtYWluKGludCBhcmdjLCBjaGFyICph
-cmd2W10pCiAgICAgIHwgICAgIF5+fn4KbWFrZVszXTogKioqIFtNYWtlZmlsZToxMTc2NjogdGVz
-dC1zdWl0ZS5sb2ddIEVycm9yIDEKbWFrZVsyXTogKioqIFtNYWtlZmlsZToxMTg3NDogY2hlY2st
-VEVTVFNdIEVycm9yIDIKbWFrZVsxXTogKioqIFtNYWtlZmlsZToxMjMwMzogY2hlY2stYW1dIEVy
-cm9yIDIKbWFrZTogKioqIFtNYWtlZmlsZToxMjMwNTogY2hlY2tdIEVycm9yIDIKIyMjIyMjIyMj
-IyMjIyMjIyMjIyMjIyMjIyMjIyMjClRlc3Q6IFNjYW5CdWlsZCAtIFdBUk5JTkcKRGVzYzogUnVu
-IFNjYW4gQnVpbGQKT3V0cHV0Ogpwcm9maWxlcy9hdWRpby9hMmRwLmM6MzcxOjg6IHdhcm5pbmc6
-IFVzZSBvZiBtZW1vcnkgYWZ0ZXIgaXQgaXMgZnJlZWQKICAgICAgICAgICAgICAgIGlmICghY2It
-PnJlc3VtZV9jYikKICAgICAgICAgICAgICAgICAgICAgXn5+fn5+fn5+fn5+fgoxIHdhcm5pbmcg
-Z2VuZXJhdGVkLgoKCgotLS0KUmVnYXJkcywKTGludXggQmx1ZXRvb3RoCgo=
+According to
+80-WL520-14_REV_F_Bluetooth_HCI_Vendor_Specific_Commands_Application_Note.pdf
+event for set baudrate HCI command is sent with event code
+HCI_EV_CMD_COMPLETE(0x0e), add related handle in qca_recv_event when
+sending set baudrate HCI command.
 
---===============0982158715395868526==--
+Signed-off-by: Cheng Jiang <quic_chejiang@quicinc.com>
+---
+ drivers/bluetooth/hci_qca.c | 15 ++++++++++++++-
+ 1 file changed, 14 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+index ca6466676902..8dacf6dcf248 100644
+--- a/drivers/bluetooth/hci_qca.c
++++ b/drivers/bluetooth/hci_qca.c
+@@ -1206,7 +1206,14 @@ static int qca_recv_event(struct hci_dev *hdev, struct sk_buff *skb)
+ 		 * vendor command).
+ 		 */
+ 
+-		if (hdr->evt == HCI_EV_VENDOR)
++		/* For the WCN6750/WCN6855/WCN7850, like the WCN3990, the
++		 * vendor command for a baudrate change command isn't sent as
++		 * synchronous HCI command, the controller sends the corresponding
++		 * command complete event with the new baudrate. The event is
++		 * received and properly decoded after changing the baudrate of
++		 * the host port. It needs to be dropped.
++		 */
++		if (hdr->evt == HCI_EV_VENDOR || hdr->evt == HCI_EV_CMD_COMPLETE)
+ 			complete(&qca->drop_ev_comp);
+ 
+ 		kfree_skb(skb);
+@@ -1497,6 +1504,9 @@ static int qca_set_speed(struct hci_uart *hu, enum qca_speed_type speed_type)
+ 
+ 		switch (soc_type) {
+ 		case QCA_WCN3990:
++		case QCA_WCN6750:
++		case QCA_WCN6855:
++		case QCA_WCN7850:
+ 			reinit_completion(&qca->drop_ev_comp);
+ 			set_bit(QCA_DROP_VENDOR_EVENT, &qca->flags);
+ 			break;
+@@ -1531,6 +1541,9 @@ static int qca_set_speed(struct hci_uart *hu, enum qca_speed_type speed_type)
+ 
+ 		switch (soc_type) {
+ 		case QCA_WCN3990:
++		case QCA_WCN6750:
++		case QCA_WCN6855:
++		case QCA_WCN7850:
+ 			/* Wait for the controller to send the vendor event
+ 			 * for the baudrate change command.
+ 			 */
+-- 
+2.25.1
+
