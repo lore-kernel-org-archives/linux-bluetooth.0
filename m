@@ -1,529 +1,343 @@
-Received: from mail-lj1-f175.google.com (mail-lj1-f175.google.com [209.85.208.175])
+Received: from mail-qt1-f177.google.com (mail-qt1-f177.google.com [209.85.160.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA08E14C5AA
-	for <linux-bluetooth@vger.kernel.org>; Wed, 21 Aug 2024 15:36:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9B2614E2D4
+	for <linux-bluetooth@vger.kernel.org>; Wed, 21 Aug 2024 16:34:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724254616; cv=none; b=XlwfGbzaz+OyQliHxXwa6cg4Xl6r/zNu3xSOiswMOdvj4AcEAnAfOR76Vc+LbzWg1EKKlW3G7V0Rq9ZmpNB4ow2tS+PYzY8Nwn5rq6bjC42kYFliA8WGv3ZPbPkguu6qmzxsPltgmGbZk8q9jFAy9BWCwN3oduwTGJ6HocHn1V8=
+	t=1724258060; cv=none; b=NItyk31DEwAngjRTUaVw6/cYxwxSEIplQeu28Wz7aR4xdgb+dxfxd5Eg0md57+2UyV6mHS6Uyl6734RhuxnVKFDXtBjDCIICg3Pm5BwBeYWRLpjgaXldgd2Esq8SDmVPWOAYnkwDSMGVbbLuI7lakDBnjdL/PitDXynzEXp4BTM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724254616; c=relaxed/simple;
-	bh=bCjfh+vacrRFpjM4/wxEyX5tSWuZxsA2G3cDfExijDU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=EPRXPp3kYKi/IIcHh4z5JCduWjsZ5XlOBd3zcH+GgEUYqKqq1tqnTEa3mYj3OiG9M6oGZ3ROcTxWE+3Qd6Xu7zKcQ1rMdQRw0ok43nM11IL/G6eIx3Q1ujeVOtYrJFBOv/wE8Usg95uO9I9MG/oUf2RNzr4EuiCGRGr7AMhLV7g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Xv1GikPP; arc=none smtp.client-ip=209.85.208.175
+	s=arc-20240116; t=1724258060; c=relaxed/simple;
+	bh=Cf5Ee/hqgaMRjBEJ3bet3VrKm7BLjYqGXFUx1iAoe9A=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=pkJM7MZO6NaRaSb5SONcSmwynRnKvlj09wXRCQDuD/d5gq5CvDkSR9aCKY/7fTm1MRYRwADOwEukiI8PAZBWNLzVjrMiaqzehL2gEA/WI5InbId1ED3JP9LZYnoTvOw+13E3OgNbIETgWjBGFp2IBloA9n97ZFg1eHmT2Mu/95Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AMEg3we4; arc=none smtp.client-ip=209.85.160.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Xv1GikPP"
-Received: by mail-lj1-f175.google.com with SMTP id 38308e7fff4ca-2f029e9c9cfso43496411fa.2
-        for <linux-bluetooth@vger.kernel.org>; Wed, 21 Aug 2024 08:36:53 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AMEg3we4"
+Received: by mail-qt1-f177.google.com with SMTP id d75a77b69052e-451b7e1d157so43342201cf.3
+        for <linux-bluetooth@vger.kernel.org>; Wed, 21 Aug 2024 09:34:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1724254612; x=1724859412; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=vsTQa8LdBUOUG2emiz6/EjkFgm8Zt7X6nlrTpqx6ZmI=;
-        b=Xv1GikPPvGVudQBFq+oYgJWHh7HvZX/wvvOtQgLfn34vFP0AAdNoVCgJQQwpHpSmXa
-         bPXMCnLqTc+QL4UULSc6AmxcWKFKUN7QoYt0d1+fsZ1+V0HDr3dHZqxXCiJ8V61+fKd/
-         JqKiYVLyMfWZaaA3JhIQcj8UwY9R7tHgs+I1ymXKFMa5Ze3YGMIa74pN7A2U58QGbpbj
-         luvpfNuIKJu5ne+QqwEc+AEKS58flAXrBVAX35j6BfRGKnBJJ9NkLbICchwlxUqX4K8B
-         dKEVG/1oEb2AGEV0nTZPDZeo53OXdito93E47DisnyxpXgrvPx0ooWQCJVgNY/zGer1H
-         z7WA==
+        d=gmail.com; s=20230601; t=1724258057; x=1724862857; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=Cf5Ee/hqgaMRjBEJ3bet3VrKm7BLjYqGXFUx1iAoe9A=;
+        b=AMEg3we4JY4GTdd36sOrTdkXWLG8FMwdIf5niGb7iy28IlNf6CHeaDiQUULLjgcqy/
+         pVHOseIC04f/RBJ7JfEIhoMHiaTmtJisGhHhh/QFBMPvuLAnQXWKBrkRZSbQiMBbqvq3
+         89kKP8yxPIDhXdA29uV9zxMiBiQLQkMrN5GJn6sBzL16SGiFmxqqeRQxVa9WldAlKoJr
+         1Gw1FV0nCiqiXjCcx3pGn+vBA+P0CgKiRrzosjhTogeRp9iyBL3HeDRY5adLDEY0l4ZW
+         8hGHwTpnEWcirshmQWr8mT48A7D/dLsjcTciTNEtvsPT46PL9Y4feD1y1NowjwnBJXD2
+         vqeA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724254612; x=1724859412;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=vsTQa8LdBUOUG2emiz6/EjkFgm8Zt7X6nlrTpqx6ZmI=;
-        b=W3m4QdPUkShSw2PxVJkhvKbXMXI7c9/b9U85MZZzMLNZWIishTmIFBOOVkh1EefD9f
-         +LfTb0u24l9WOICXC3bbUV2XgIF44daNcwVo+A7o+sk2dOSB2KVpEibR376Q8TdR6kOJ
-         RaNHhyKLGO4+dMweovRos+rtimpwqEQLOtlCeFFlBNdj91bLk+6VkpVfz0Uz06tLymIr
-         wzmahqj4MxYJX5XZGrykHKmuOTmYAeTOqq4nHUGHoM1gdefcnGGBcXSdh6bmPl+52Wel
-         CVyJZ1p0FbrJdUiRG1LMKbQtxeCj0Vlst+OlW9Q/fiSeb4parNc+lspYLJF+iwuGYtgi
-         vySA==
-X-Gm-Message-State: AOJu0YyJXPvjwZAEOPGxGdmmM/zE2oPsRa3yMfgmA4fL8Yz0vnfhiJgd
-	QsjiKcsszi3RPuQB1/M8VcqgVNOQxWhy36b3mmob1pOZ/FdWU7rszNwb9JIFlrp8Fk6XeyHkGM4
-	xjMDQnmGKGLWqHoSA4BfpIq/rBZz+pg==
-X-Google-Smtp-Source: AGHT+IEsnKpwDt7adnY0E3rQ7n9taYc7Lozo0vJOjVLgiZ/6vzgMVw4fNMjD9kDdieRSes1SlqxZ3DUAsmqcrgJ+f28=
-X-Received: by 2002:a2e:be0e:0:b0:2f3:e5de:7fc1 with SMTP id
- 38308e7fff4ca-2f3f8948bbdmr24889341fa.34.1724254610767; Wed, 21 Aug 2024
- 08:36:50 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1724258057; x=1724862857;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Cf5Ee/hqgaMRjBEJ3bet3VrKm7BLjYqGXFUx1iAoe9A=;
+        b=ooTkVbooiP8Gkv83er5lykErYWw8sTXGCLkK9NAsHgIcWNsxt7DcmQlCJeEJPL9s+u
+         Zq/aFJUPuKjbiruzu1wO3oWNXkIG/yU3NyhDGXGfKqLVZpy7N98n8n9HO1HpTg3a8nbW
+         oCY4M0GmDihh/QbAh1oFMDvUm+RmyjrQxlJHszasYA9A/tuaAMx3bQSycMBgsV7HCion
+         7BiQUX50imHZRTY9X62d8zJIzz2yz8UicR26cEzHQSi7U1J0yXSoZPWlzem6+Z1qFm7s
+         TluttJya6vrkuwj3ZvwD8FMpGE3HeK0uWBxsjPcG5mYRtZfQCLxYLSbmEG3Jtf9oew6R
+         PA8w==
+X-Gm-Message-State: AOJu0Yw2s18+zS3IZLlWmrpLv9uz12kcvgrGPM5ow938srDnFM3Abtq5
+	TWqAYG/Yp52eIevbpnFyTu9QAONKVkJ5DGGcsoYOb84+iPMSEmmuFGIYRA==
+X-Google-Smtp-Source: AGHT+IEWvMba58TR3K7GGYGBzDeV2IgnnDbvJtE9YWqOFlsoi45Pouh1rFLL1CeoOWT9RuqHyj0KYw==
+X-Received: by 2002:a05:622a:1b06:b0:451:d821:2eb8 with SMTP id d75a77b69052e-454f256cad3mr34003681cf.51.1724258057307;
+        Wed, 21 Aug 2024 09:34:17 -0700 (PDT)
+Received: from [172.17.0.2] ([20.55.46.199])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4536a0035c6sm60919271cf.42.2024.08.21.09.34.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 21 Aug 2024 09:34:16 -0700 (PDT)
+Message-ID: <66c61708.c80a0220.323cc9.9b16@mx.google.com>
+Date: Wed, 21 Aug 2024 09:34:16 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============9060838048642394226=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240821145602.92083-1-iulia.tanasescu@nxp.com> <20240821145602.92083-10-iulia.tanasescu@nxp.com>
-In-Reply-To: <20240821145602.92083-10-iulia.tanasescu@nxp.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Wed, 21 Aug 2024 11:36:37 -0400
-Message-ID: <CABBYNZL8wKFRm06-Yzsvqahp4=M_nKCfEAfFTd=HL-ODYGkGJQ@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 09/14] bap: Probe Broadcasters with BASS
-To: Iulia Tanasescu <iulia.tanasescu@nxp.com>
-Cc: linux-bluetooth@vger.kernel.org, claudia.rosu@nxp.com, 
-	mihai-octavian.urzica@nxp.com, vlad.pruteanu@nxp.com, 
-	andrei.istodorescu@nxp.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, iulia.tanasescu@nxp.com
+Subject: RE: Add Scan Delegator support for Add Source op
+In-Reply-To: <20240821145602.92083-2-iulia.tanasescu@nxp.com>
+References: <20240821145602.92083-2-iulia.tanasescu@nxp.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Hi Iulia,
+--===============9060838048642394226==
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
 
-On Wed, Aug 21, 2024 at 10:56=E2=80=AFAM Iulia Tanasescu
-<iulia.tanasescu@nxp.com> wrote:
->
-> After short-lived PA sync, this adds a call to probe the bap session
-> with the Broadcaster with BASS.
->
-> If the BAP Broadcast Sink has probed the Broadcaster autonomously,
-> the short lived PA sync io is closed immediately, since PA sync needs
-> to be terminated so other Broadcasters can be probed next. If the BAP
-> Broadcast Sink is acting as a Scan Delegator and the probed Broadcaster
-> was added by a Broadcast Assistant, PA sync needs to remain active (it
-> should be terminated only on Broadcast Assistant command).
->
-> This commit updates the way short-lived PA sync is handled in case of
-> a Scan Delegator use case: A reference to PA sync io is kept inside
-> data->listen_io, to keep the sync active. The PA sync request is also
-> kept in progress in the adapter queue, so that no other short-lived PA
-> syncs will be attempted. Once the BAP data is freed, the listen_io will
-> be closed and the PA sync request will be dequeued and freed as well.
-> Then, other Broadcasters will continue to be probed.
+VGhpcyBpcyBhdXRvbWF0ZWQgZW1haWwgYW5kIHBsZWFzZSBkbyBub3QgcmVwbHkgdG8gdGhpcyBl
+bWFpbCEKCkRlYXIgc3VibWl0dGVyLAoKVGhhbmsgeW91IGZvciBzdWJtaXR0aW5nIHRoZSBwYXRj
+aGVzIHRvIHRoZSBsaW51eCBibHVldG9vdGggbWFpbGluZyBsaXN0LgpUaGlzIGlzIGEgQ0kgdGVz
+dCByZXN1bHRzIHdpdGggeW91ciBwYXRjaCBzZXJpZXM6ClBXIExpbms6aHR0cHM6Ly9wYXRjaHdv
+cmsua2VybmVsLm9yZy9wcm9qZWN0L2JsdWV0b290aC9saXN0Lz9zZXJpZXM9ODgxODA0CgotLS1U
+ZXN0IHJlc3VsdC0tLQoKVGVzdCBTdW1tYXJ5OgpDaGVja1BhdGNoICAgICAgICAgICAgICAgICAg
+ICBQQVNTICAgICAgNi40OCBzZWNvbmRzCkdpdExpbnQgICAgICAgICAgICAgICAgICAgICAgIFBB
+U1MgICAgICA0LjI0IHNlY29uZHMKQnVpbGRFbGwgICAgICAgICAgICAgICAgICAgICAgUEFTUyAg
+ICAgIDI1LjQzIHNlY29uZHMKQmx1ZXpNYWtlICAgICAgICAgICAgICAgICAgICAgUEFTUyAgICAg
+IDE3MTYuNTAgc2Vjb25kcwpNYWtlQ2hlY2sgICAgICAgICAgICAgICAgICAgICBGQUlMICAgICAg
+MTIuOTYgc2Vjb25kcwpNYWtlRGlzdGNoZWNrICAgICAgICAgICAgICAgICBGQUlMICAgICAgMTU5
+LjI3IHNlY29uZHMKQ2hlY2tWYWxncmluZCAgICAgICAgICAgICAgICAgRkFJTCAgICAgIDI1MC4x
+OCBzZWNvbmRzCkNoZWNrU21hdGNoICAgICAgICAgICAgICAgICAgIFBBU1MgICAgICAzNTYuMjEg
+c2Vjb25kcwpibHVlem1ha2VleHRlbGwgICAgICAgICAgICAgICBQQVNTICAgICAgMTE5Ljg4IHNl
+Y29uZHMKSW5jcmVtZW50YWxCdWlsZCAgICAgICAgICAgICAgRkFJTCAgICAgIDE0NzguMDcgc2Vj
+b25kcwpTY2FuQnVpbGQgICAgICAgICAgICAgICAgICAgICBGQUlMICAgICAgNTM3LjUxIHNlY29u
+ZHMKCkRldGFpbHMKIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjClRlc3Q6IE1ha2VDaGVj
+ayAtIEZBSUwKRGVzYzogUnVuIEJsdWV6IE1ha2UgQ2hlY2sKT3V0cHV0OgoKbWFrZVszXTogKioq
+IFtNYWtlZmlsZToxMTc2NjogdGVzdC1zdWl0ZS5sb2ddIEVycm9yIDEKbWFrZVsyXTogKioqIFtN
+YWtlZmlsZToxMTg3NDogY2hlY2stVEVTVFNdIEVycm9yIDIKbWFrZVsxXTogKioqIFtNYWtlZmls
+ZToxMjMwMzogY2hlY2stYW1dIEVycm9yIDIKbWFrZTogKioqIFtNYWtlZmlsZToxMjMwNTogY2hl
+Y2tdIEVycm9yIDIKIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjClRlc3Q6IE1ha2VEaXN0
+Y2hlY2sgLSBGQUlMCkRlc2M6IFJ1biBCbHVleiBNYWtlIERpc3RjaGVjawpPdXRwdXQ6CgpQYWNr
+YWdlIGN1cHMgd2FzIG5vdCBmb3VuZCBpbiB0aGUgcGtnLWNvbmZpZyBzZWFyY2ggcGF0aC4KUGVy
+aGFwcyB5b3Ugc2hvdWxkIGFkZCB0aGUgZGlyZWN0b3J5IGNvbnRhaW5pbmcgYGN1cHMucGMnCnRv
+IHRoZSBQS0dfQ09ORklHX1BBVEggZW52aXJvbm1lbnQgdmFyaWFibGUKTm8gcGFja2FnZSAnY3Vw
+cycgZm91bmQKbWFrZVs0XTogKioqIFtNYWtlZmlsZToxMTc2NjogdGVzdC1zdWl0ZS5sb2ddIEVy
+cm9yIDEKbWFrZVszXTogKioqIFtNYWtlZmlsZToxMTg3NDogY2hlY2stVEVTVFNdIEVycm9yIDIK
+bWFrZVsyXTogKioqIFtNYWtlZmlsZToxMjMwMzogY2hlY2stYW1dIEVycm9yIDIKbWFrZVsxXTog
+KioqIFtNYWtlZmlsZToxMjMwNTogY2hlY2tdIEVycm9yIDIKbWFrZTogKioqIFtNYWtlZmlsZTox
+MjIyNjogZGlzdGNoZWNrXSBFcnJvciAxCiMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIwpU
+ZXN0OiBDaGVja1ZhbGdyaW5kIC0gRkFJTApEZXNjOiBSdW4gQmx1ZXogTWFrZSBDaGVjayB3aXRo
+IFZhbGdyaW5kCk91dHB1dDoKCnRvb2xzL21nbXQtdGVzdGVyLmM6IEluIGZ1bmN0aW9uIOKAmG1h
+aW7igJk6CnRvb2xzL21nbXQtdGVzdGVyLmM6MTI3MjU6NTogbm90ZTogdmFyaWFibGUgdHJhY2tp
+bmcgc2l6ZSBsaW1pdCBleGNlZWRlZCB3aXRoIOKAmC1mdmFyLXRyYWNraW5nLWFzc2lnbm1lbnRz
+4oCZLCByZXRyeWluZyB3aXRob3V0CjEyNzI1IHwgaW50IG1haW4oaW50IGFyZ2MsIGNoYXIgKmFy
+Z3ZbXSkKICAgICAgfCAgICAgXn5+fgptYWtlWzNdOiAqKiogW01ha2VmaWxlOjExNzY2OiB0ZXN0
+LXN1aXRlLmxvZ10gRXJyb3IgMQptYWtlWzJdOiAqKiogW01ha2VmaWxlOjExODc0OiBjaGVjay1U
+RVNUU10gRXJyb3IgMgptYWtlWzFdOiAqKiogW01ha2VmaWxlOjEyMzAzOiBjaGVjay1hbV0gRXJy
+b3IgMgptYWtlOiAqKiogW01ha2VmaWxlOjEyMzA1OiBjaGVja10gRXJyb3IgMgojIyMjIyMjIyMj
+IyMjIyMjIyMjIyMjIyMjIyMjIyMKVGVzdDogSW5jcmVtZW50YWxCdWlsZCAtIEZBSUwKRGVzYzog
+SW5jcmVtZW50YWwgYnVpbGQgd2l0aCB0aGUgcGF0Y2hlcyBpbiB0aGUgc2VyaWVzCk91dHB1dDoK
+W0JsdWVaLDAyLzE0XSBzaGFyZWQvYmFzczogTWFrZSBidF9iY2FzdF9zcmMgcHJpdmF0ZQoKc3Jj
+L3NoYXJlZC9iYXNzLmM6IEluIGZ1bmN0aW9uIOKAmGNvbm5lY3RfY2LigJk6CnNyYy9zaGFyZWQv
+YmFzcy5jOjY3NzoyNzogZXJyb3I6IOKAmHN0cnVjdCBidF9iY2FzdF9zcmPigJkgaGFzIG5vIG1l
+bWJlciBuYW1lZCDigJhiaXNlc+KAmQogIDY3NyB8ICBxdWV1ZV9wdXNoX3RhaWwoYmNhc3Rfc3Jj
+LT5iaXNlcywgaW8pOwogICAgICB8ICAgICAgICAgICAgICAgICAgICAgICAgICAgXn4Kc3JjL3No
+YXJlZC9iYXNzLmM6NzEyOjI2OiBlcnJvcjog4oCYc3RydWN0IGJ0X2JjYXN0X3NyY+KAmSBoYXMg
+bm8gbWVtYmVyIG5hbWVkIOKAmGJpc2Vz4oCZCiAgNzEyIHwgICBxdWV1ZV9kZXN0cm95KGJjYXN0
+X3NyYy0+YmlzZXMsIGJhc3NfYmlzX3VucmVmKTsKICAgICAgfCAgICAgICAgICAgICAgICAgICAg
+ICAgICAgXn4Kc3JjL3NoYXJlZC9iYXNzLmM6NzEzOjEyOiBlcnJvcjog4oCYc3RydWN0IGJ0X2Jj
+YXN0X3NyY+KAmSBoYXMgbm8gbWVtYmVyIG5hbWVkIOKAmGJpc2Vz4oCZCiAgNzEzIHwgICBiY2Fz
+dF9zcmMtPmJpc2VzID0gTlVMTDsKICAgICAgfCAgICAgICAgICAgIF5+CnNyYy9zaGFyZWQvYmFz
+cy5jOjcxNjozNDogZXJyb3I6IOKAmHN0cnVjdCBidF9iY2FzdF9zcmPigJkgaGFzIG5vIG1lbWJl
+ciBuYW1lZCDigJhsaXN0ZW5faW/igJkKICA3MTYgfCAgIGdfaW9fY2hhbm5lbF9zaHV0ZG93bihi
+Y2FzdF9zcmMtPmxpc3Rlbl9pbywgVFJVRSwgTlVMTCk7CiAgICAgIHwgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgXn4Kc3JjL3NoYXJlZC9iYXNzLmM6NzE3OjMxOiBlcnJvcjog4oCY
+c3RydWN0IGJ0X2JjYXN0X3NyY+KAmSBoYXMgbm8gbWVtYmVyIG5hbWVkIOKAmGxpc3Rlbl9pb+KA
+mQogIDcxNyB8ICAgZ19pb19jaGFubmVsX3VucmVmKGJjYXN0X3NyYy0+bGlzdGVuX2lvKTsKICAg
+ICAgfCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBefgpzcmMvc2hhcmVkL2Jhc3MuYzo3
+MTg6MTI6IGVycm9yOiDigJhzdHJ1Y3QgYnRfYmNhc3Rfc3Jj4oCZIGhhcyBubyBtZW1iZXIgbmFt
+ZWQg4oCYbGlzdGVuX2lv4oCZCiAgNzE4IHwgICBiY2FzdF9zcmMtPmxpc3Rlbl9pbyA9IE5VTEw7
+CiAgICAgIHwgICAgICAgICAgICBefgpzcmMvc2hhcmVkL2Jhc3MuYzo3MjE6MTY6IGVycm9yOiDi
+gJhzdHJ1Y3QgYnRfYmNhc3Rfc3Jj4oCZIGhhcyBubyBtZW1iZXIgbmFtZWQg4oCYcGFfc3luY19p
+b+KAmQogIDcyMSB8ICAgaWYgKGJjYXN0X3NyYy0+cGFfc3luY19pbykgewogICAgICB8ICAgICAg
+ICAgICAgICAgIF5+CnNyYy9zaGFyZWQvYmFzcy5jOjcyMjozNTogZXJyb3I6IOKAmHN0cnVjdCBi
+dF9iY2FzdF9zcmPigJkgaGFzIG5vIG1lbWJlciBuYW1lZCDigJhwYV9zeW5jX2lv4oCZCiAgNzIy
+IHwgICAgZ19pb19jaGFubmVsX3NodXRkb3duKGJjYXN0X3NyYy0+cGFfc3luY19pbywKICAgICAg
+fCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXn4Kc3JjL3NoYXJlZC9iYXNzLmM6
+NzI0OjMyOiBlcnJvcjog4oCYc3RydWN0IGJ0X2JjYXN0X3NyY+KAmSBoYXMgbm8gbWVtYmVyIG5h
+bWVkIOKAmHBhX3N5bmNfaW/igJkKICA3MjQgfCAgICBnX2lvX2NoYW5uZWxfdW5yZWYoYmNhc3Rf
+c3JjLT5wYV9zeW5jX2lvKTsKICAgICAgfCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+Xn4Kc3JjL3NoYXJlZC9iYXNzLmM6NzI1OjEzOiBlcnJvcjog4oCYc3RydWN0IGJ0X2JjYXN0X3Ny
+Y+KAmSBoYXMgbm8gbWVtYmVyIG5hbWVkIOKAmHBhX3N5bmNfaW/igJkKICA3MjUgfCAgICBiY2Fz
+dF9zcmMtPnBhX3N5bmNfaW8gPSBOVUxMOwogICAgICB8ICAgICAgICAgICAgIF5+CnNyYy9zaGFy
+ZWQvYmFzcy5jOiBJbiBmdW5jdGlvbiDigJhjb25maXJtX2Ni4oCZOgpzcmMvc2hhcmVkL2Jhc3Mu
+Yzo3ODg6MTE6IGVycm9yOiDigJhzdHJ1Y3QgYnRfYmNhc3Rfc3Jj4oCZIGhhcyBubyBtZW1iZXIg
+bmFtZWQg4oCYcGFfc3luY19pb+KAmQogIDc4OCB8ICBiY2FzdF9zcmMtPnBhX3N5bmNfaW8gPSBp
+bzsKICAgICAgfCAgICAgICAgICAgXn4Kc3JjL3NoYXJlZC9iYXNzLmM6Nzg5OjI4OiBlcnJvcjog
+4oCYc3RydWN0IGJ0X2JjYXN0X3NyY+KAmSBoYXMgbm8gbWVtYmVyIG5hbWVkIOKAmHBhX3N5bmNf
+aW/igJkKICA3ODkgfCAgZ19pb19jaGFubmVsX3JlZihiY2FzdF9zcmMtPnBhX3N5bmNfaW8pOwog
+ICAgICB8ICAgICAgICAgICAgICAgICAgICAgICAgICAgIF5+CnNyYy9zaGFyZWQvYmFzcy5jOjgw
+NzozNzogZXJyb3I6IOKAmHN0cnVjdCBidF9iY2FzdF9zcmPigJkgaGFzIG5vIG1lbWJlciBuYW1l
+ZCDigJhwYV9zeW5jX2lv4oCZCiAgODA3IHwgICAgaWYgKCFidF9pb19iY2FzdF9hY2NlcHQoYmNh
+c3Rfc3JjLT5wYV9zeW5jX2lvLAogICAgICB8ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgIF5+CnNyYy9zaGFyZWQvYmFzcy5jOiBJbiBmdW5jdGlvbiDigJhiYXNzX2hhbmRsZV9h
+ZGRfc3JjX29w4oCZOgpzcmMvc2hhcmVkL2Jhc3MuYzoxMDgxOjEyOiBlcnJvcjog4oCYc3RydWN0
+IGJ0X2JjYXN0X3NyY+KAmSBoYXMgbm8gbWVtYmVyIG5hbWVkIOKAmGxpc3Rlbl9pb+KAmQogMTA4
+MSB8ICAgYmNhc3Rfc3JjLT5saXN0ZW5faW8gPSBpbzsKICAgICAgfCAgICAgICAgICAgIF5+CnNy
+Yy9zaGFyZWQvYmFzcy5jOjEwODI6Mjk6IGVycm9yOiDigJhzdHJ1Y3QgYnRfYmNhc3Rfc3Jj4oCZ
+IGhhcyBubyBtZW1iZXIgbmFtZWQg4oCYbGlzdGVuX2lv4oCZCiAxMDgyIHwgICBnX2lvX2NoYW5u
+ZWxfcmVmKGJjYXN0X3NyYy0+bGlzdGVuX2lvKTsKICAgICAgfCAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgXn4Kc3JjL3NoYXJlZC9iYXNzLmM6MTA4NDozMjogZXJyb3I6IOKAmHN0cnVjdCBi
+dF9iY2FzdF9zcmPigJkgaGFzIG5vIG1lbWJlciBuYW1lZCDigJhiaXNlc+KAmQogMTA4NCB8ICAg
+aWYgKG51bV9iaXMgPiAwICYmICFiY2FzdF9zcmMtPmJpc2VzKQogICAgICB8ICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICBefgpzcmMvc2hhcmVkL2Jhc3MuYzoxMDg1OjEzOiBlcnJvcjog
+4oCYc3RydWN0IGJ0X2JjYXN0X3NyY+KAmSBoYXMgbm8gbWVtYmVyIG5hbWVkIOKAmGJpc2Vz4oCZ
+CiAxMDg1IHwgICAgYmNhc3Rfc3JjLT5iaXNlcyA9IHF1ZXVlX25ldygpOwogICAgICB8ICAgICAg
+ICAgICAgIF5+CnNyYy9zaGFyZWQvYmFzcy5jOiBJbiBmdW5jdGlvbiDigJhiYXNzX2hhbmRsZV9z
+ZXRfYmNhc3RfY29kZV9vcOKAmToKc3JjL3NoYXJlZC9iYXNzLmM6MTE3MDoxNjogZXJyb3I6IOKA
+mHN0cnVjdCBidF9iY2FzdF9zcmPigJkgaGFzIG5vIG1lbWJlciBuYW1lZCDigJhwYV9zeW5jX2lv
+4oCZCiAxMTcwIHwgIGlmICghYmNhc3Rfc3JjLT5wYV9zeW5jX2lvKQogICAgICB8ICAgICAgICAg
+ICAgICAgIF5+CnNyYy9zaGFyZWQvYmFzcy5jOjExNzM6NDE6IGVycm9yOiDigJhzdHJ1Y3QgYnRf
+YmNhc3Rfc3Jj4oCZIGhhcyBubyBtZW1iZXIgbmFtZWQg4oCYcGFfc3luY19pb+KAmQogMTE3MyB8
+ICBzayA9IGdfaW9fY2hhbm5lbF91bml4X2dldF9mZChiY2FzdF9zcmMtPnBhX3N5bmNfaW8pOwog
+ICAgICB8ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBefgpzcmMvc2hh
+cmVkL2Jhc3MuYzoxMTkwOjM1OiBlcnJvcjog4oCYc3RydWN0IGJ0X2JjYXN0X3NyY+KAmSBoYXMg
+bm8gbWVtYmVyIG5hbWVkIOKAmHBhX3N5bmNfaW/igJkKIDExOTAgfCAgaWYgKCFidF9pb19iY2Fz
+dF9hY2NlcHQoYmNhc3Rfc3JjLT5wYV9zeW5jX2lvLCBjb25uZWN0X2NiLAogICAgICB8ICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICBefgpzcmMvc2hhcmVkL2Jhc3MuYzogSW4gZnVu
+Y3Rpb24g4oCYYmFzc19iY2FzdF9zcmNfZnJlZeKAmToKc3JjL3NoYXJlZC9iYXNzLmM6MTM3ODox
+NTogZXJyb3I6IOKAmHN0cnVjdCBidF9iY2FzdF9zcmPigJkgaGFzIG5vIG1lbWJlciBuYW1lZCDi
+gJhsaXN0ZW5faW/igJkKIDEzNzggfCAgaWYgKGJjYXN0X3NyYy0+bGlzdGVuX2lvKSB7CiAgICAg
+IHwgICAgICAgICAgICAgICBefgpzcmMvc2hhcmVkL2Jhc3MuYzoxMzc5OjM0OiBlcnJvcjog4oCY
+c3RydWN0IGJ0X2JjYXN0X3NyY+KAmSBoYXMgbm8gbWVtYmVyIG5hbWVkIOKAmGxpc3Rlbl9pb+KA
+mQogMTM3OSB8ICAgZ19pb19jaGFubmVsX3NodXRkb3duKGJjYXN0X3NyYy0+bGlzdGVuX2lvLCBU
+UlVFLCBOVUxMKTsKICAgICAgfCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBefgpz
+cmMvc2hhcmVkL2Jhc3MuYzoxMzgwOjMxOiBlcnJvcjog4oCYc3RydWN0IGJ0X2JjYXN0X3NyY+KA
+mSBoYXMgbm8gbWVtYmVyIG5hbWVkIOKAmGxpc3Rlbl9pb+KAmQogMTM4MCB8ICAgZ19pb19jaGFu
+bmVsX3VucmVmKGJjYXN0X3NyYy0+bGlzdGVuX2lvKTsKICAgICAgfCAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICBefgpzcmMvc2hhcmVkL2Jhc3MuYzoxMzgzOjE1OiBlcnJvcjog4oCYc3Ry
+dWN0IGJ0X2JjYXN0X3NyY+KAmSBoYXMgbm8gbWVtYmVyIG5hbWVkIOKAmHBhX3N5bmNfaW/igJkK
+IDEzODMgfCAgaWYgKGJjYXN0X3NyYy0+cGFfc3luY19pbykgewogICAgICB8ICAgICAgICAgICAg
+ICAgXn4Kc3JjL3NoYXJlZC9iYXNzLmM6MTM4NDozNDogZXJyb3I6IOKAmHN0cnVjdCBidF9iY2Fz
+dF9zcmPigJkgaGFzIG5vIG1lbWJlciBuYW1lZCDigJhwYV9zeW5jX2lv4oCZCiAxMzg0IHwgICBn
+X2lvX2NoYW5uZWxfc2h1dGRvd24oYmNhc3Rfc3JjLT5wYV9zeW5jX2lvLCBUUlVFLCBOVUxMKTsK
+ICAgICAgfCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBefgpzcmMvc2hhcmVkL2Jh
+c3MuYzoxMzg1OjMxOiBlcnJvcjog4oCYc3RydWN0IGJ0X2JjYXN0X3NyY+KAmSBoYXMgbm8gbWVt
+YmVyIG5hbWVkIOKAmHBhX3N5bmNfaW/igJkKIDEzODUgfCAgIGdfaW9fY2hhbm5lbF91bnJlZihi
+Y2FzdF9zcmMtPnBhX3N5bmNfaW8pOwogICAgICB8ICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgIF5+CnNyYy9zaGFyZWQvYmFzcy5jOjEzODg6MjU6IGVycm9yOiDigJhzdHJ1Y3QgYnRfYmNh
+c3Rfc3Jj4oCZIGhhcyBubyBtZW1iZXIgbmFtZWQg4oCYYmlzZXPigJkKIDEzODggfCAgcXVldWVf
+ZGVzdHJveShiY2FzdF9zcmMtPmJpc2VzLCBiYXNzX2Jpc191bnJlZik7CiAgICAgIHwgICAgICAg
+ICAgICAgICAgICAgICAgICAgXn4KbWFrZVsxXTogKioqIFtNYWtlZmlsZTo4NjcyOiBzcmMvc2hh
+cmVkL2xpYnNoYXJlZF9tYWlubG9vcF9sYS1iYXNzLmxvXSBFcnJvciAxCm1ha2VbMV06ICoqKiBX
+YWl0aW5nIGZvciB1bmZpbmlzaGVkIGpvYnMuLi4uCm1ha2U6ICoqKiBbTWFrZWZpbGU6NDY3Njog
+YWxsXSBFcnJvciAyCiMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIwpUZXN0OiBTY2FuQnVp
+bGQgLSBGQUlMCkRlc2M6IFJ1biBTY2FuIEJ1aWxkCk91dHB1dDoKCnNyYy9zaGFyZWQvZ2F0dC1j
+bGllbnQuYzo0NTE6MjE6IHdhcm5pbmc6IFVzZSBvZiBtZW1vcnkgYWZ0ZXIgaXQgaXMgZnJlZWQK
+ICAgICAgICBnYXR0X2RiX3VucmVnaXN0ZXIob3AtPmNsaWVudC0+ZGIsIG9wLT5kYl9pZCk7CiAg
+ICAgICAgICAgICAgICAgICAgICAgICAgIF5+fn5+fn5+fn4Kc3JjL3NoYXJlZC9nYXR0LWNsaWVu
+dC5jOjY5NjoyOiB3YXJuaW5nOiBVc2Ugb2YgbWVtb3J5IGFmdGVyIGl0IGlzIGZyZWVkCiAgICAg
+ICAgZGlzY292ZXJ5X29wX2NvbXBsZXRlKG9wLCBmYWxzZSwgYXR0X2Vjb2RlKTsKICAgICAgICBe
+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+CnNyYy9zaGFyZWQvZ2F0
+dC1jbGllbnQuYzo5OTY6Mjogd2FybmluZzogVXNlIG9mIG1lbW9yeSBhZnRlciBpdCBpcyBmcmVl
+ZAogICAgICAgIGRpc2NvdmVyeV9vcF9jb21wbGV0ZShvcCwgc3VjY2VzcywgYXR0X2Vjb2RlKTsK
+ICAgICAgICBefn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn4Kc3Jj
+L3NoYXJlZC9nYXR0LWNsaWVudC5jOjExMDI6Mjogd2FybmluZzogVXNlIG9mIG1lbW9yeSBhZnRl
+ciBpdCBpcyBmcmVlZAogICAgICAgIGRpc2NvdmVyeV9vcF9jb21wbGV0ZShvcCwgc3VjY2Vzcywg
+YXR0X2Vjb2RlKTsKICAgICAgICBefn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+
+fn5+fn5+fn4Kc3JjL3NoYXJlZC9nYXR0LWNsaWVudC5jOjEyOTY6Mjogd2FybmluZzogVXNlIG9m
+IG1lbW9yeSBhZnRlciBpdCBpcyBmcmVlZAogICAgICAgIGRpc2NvdmVyeV9vcF9jb21wbGV0ZShv
+cCwgc3VjY2VzcywgYXR0X2Vjb2RlKTsKICAgICAgICBefn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+
+fn5+fn5+fn5+fn5+fn5+fn5+fn4Kc3JjL3NoYXJlZC9nYXR0LWNsaWVudC5jOjEzNjE6Mjogd2Fy
+bmluZzogVXNlIG9mIG1lbW9yeSBhZnRlciBpdCBpcyBmcmVlZAogICAgICAgIGRpc2NvdmVyeV9v
+cF9jb21wbGV0ZShvcCwgc3VjY2VzcywgYXR0X2Vjb2RlKTsKICAgICAgICBefn5+fn5+fn5+fn5+
+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn4Kc3JjL3NoYXJlZC9nYXR0LWNsaWVudC5j
+OjE2MzY6Njogd2FybmluZzogVXNlIG9mIG1lbW9yeSBhZnRlciBpdCBpcyBmcmVlZAogICAgICAg
+IGlmIChyZWFkX2RiX2hhc2gob3ApKSB7CiAgICAgICAgICAgIF5+fn5+fn5+fn5+fn5+fn4Kc3Jj
+L3NoYXJlZC9nYXR0LWNsaWVudC5jOjE2NDE6Mjogd2FybmluZzogVXNlIG9mIG1lbW9yeSBhZnRl
+ciBpdCBpcyBmcmVlZAogICAgICAgIGRpc2NvdmVyX2FsbChvcCk7CiAgICAgICAgXn5+fn5+fn5+
+fn5+fn5+fgpzcmMvc2hhcmVkL2dhdHQtY2xpZW50LmM6MjE0NTo2OiB3YXJuaW5nOiBVc2Ugb2Yg
+bWVtb3J5IGFmdGVyIGl0IGlzIGZyZWVkCiAgICAgICAgaWYgKHJlYWRfZGJfaGFzaChvcCkpIHsK
+ICAgICAgICAgICAgXn5+fn5+fn5+fn5+fn5+fgpzcmMvc2hhcmVkL2dhdHQtY2xpZW50LmM6MjE1
+Mzo4OiB3YXJuaW5nOiBVc2Ugb2YgbWVtb3J5IGFmdGVyIGl0IGlzIGZyZWVkCiAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgZGlzY292ZXJ5X29w
+X3JlZihvcCksCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgXn5+fn5+fn5+fn5+fn5+fn5+fn4Kc3JjL3NoYXJlZC9nYXR0LWNsaWVudC5jOjMy
+NDI6Mjogd2FybmluZzogVXNlIG9mIG1lbW9yeSBhZnRlciBpdCBpcyBmcmVlZAogICAgICAgIGNv
+bXBsZXRlX3dyaXRlX2xvbmdfb3AocmVxLCBzdWNjZXNzLCAwLCBmYWxzZSk7CiAgICAgICAgXn5+
+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fgpzcmMvc2hhcmVkL2dh
+dHQtY2xpZW50LmM6MzI2NDoyOiB3YXJuaW5nOiBVc2Ugb2YgbWVtb3J5IGFmdGVyIGl0IGlzIGZy
+ZWVkCiAgICAgICAgcmVxdWVzdF91bnJlZihyZXEpOwogICAgICAgIF5+fn5+fn5+fn5+fn5+fn5+
+fgoxMiB3YXJuaW5ncyBnZW5lcmF0ZWQuCnNyYy9zaGFyZWQvYmFzcy5jOiBJbiBmdW5jdGlvbiDi
+gJhjb25uZWN0X2Ni4oCZOgpzcmMvc2hhcmVkL2Jhc3MuYzo2Nzc6Mjc6IGVycm9yOiDigJhzdHJ1
+Y3QgYnRfYmNhc3Rfc3Jj4oCZIGhhcyBubyBtZW1iZXIgbmFtZWQg4oCYYmlzZXPigJkKICA2Nzcg
+fCAgcXVldWVfcHVzaF90YWlsKGJjYXN0X3NyYy0+YmlzZXMsIGlvKTsKICAgICAgfCAgICAgICAg
+ICAgICAgICAgICAgICAgICAgIF5+CnNyYy9zaGFyZWQvYmFzcy5jOjcxMjoyNjogZXJyb3I6IOKA
+mHN0cnVjdCBidF9iY2FzdF9zcmPigJkgaGFzIG5vIG1lbWJlciBuYW1lZCDigJhiaXNlc+KAmQog
+IDcxMiB8ICAgcXVldWVfZGVzdHJveShiY2FzdF9zcmMtPmJpc2VzLCBiYXNzX2Jpc191bnJlZik7
+CiAgICAgIHwgICAgICAgICAgICAgICAgICAgICAgICAgIF5+CnNyYy9zaGFyZWQvYmFzcy5jOjcx
+MzoxMjogZXJyb3I6IOKAmHN0cnVjdCBidF9iY2FzdF9zcmPigJkgaGFzIG5vIG1lbWJlciBuYW1l
+ZCDigJhiaXNlc+KAmQogIDcxMyB8ICAgYmNhc3Rfc3JjLT5iaXNlcyA9IE5VTEw7CiAgICAgIHwg
+ICAgICAgICAgICBefgpzcmMvc2hhcmVkL2Jhc3MuYzo3MTY6MzQ6IGVycm9yOiDigJhzdHJ1Y3Qg
+YnRfYmNhc3Rfc3Jj4oCZIGhhcyBubyBtZW1iZXIgbmFtZWQg4oCYbGlzdGVuX2lv4oCZCiAgNzE2
+IHwgICBnX2lvX2NoYW5uZWxfc2h1dGRvd24oYmNhc3Rfc3JjLT5saXN0ZW5faW8sIFRSVUUsIE5V
+TEwpOwogICAgICB8ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIF5+CnNyYy9zaGFy
+ZWQvYmFzcy5jOjcxNzozMTogZXJyb3I6IOKAmHN0cnVjdCBidF9iY2FzdF9zcmPigJkgaGFzIG5v
+IG1lbWJlciBuYW1lZCDigJhsaXN0ZW5faW/igJkKICA3MTcgfCAgIGdfaW9fY2hhbm5lbF91bnJl
+ZihiY2FzdF9zcmMtPmxpc3Rlbl9pbyk7CiAgICAgIHwgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgXn4Kc3JjL3NoYXJlZC9iYXNzLmM6NzE4OjEyOiBlcnJvcjog4oCYc3RydWN0IGJ0X2Jj
+YXN0X3NyY+KAmSBoYXMgbm8gbWVtYmVyIG5hbWVkIOKAmGxpc3Rlbl9pb+KAmQogIDcxOCB8ICAg
+YmNhc3Rfc3JjLT5saXN0ZW5faW8gPSBOVUxMOwogICAgICB8ICAgICAgICAgICAgXn4Kc3JjL3No
+YXJlZC9iYXNzLmM6NzIxOjE2OiBlcnJvcjog4oCYc3RydWN0IGJ0X2JjYXN0X3NyY+KAmSBoYXMg
+bm8gbWVtYmVyIG5hbWVkIOKAmHBhX3N5bmNfaW/igJkKICA3MjEgfCAgIGlmIChiY2FzdF9zcmMt
+PnBhX3N5bmNfaW8pIHsKICAgICAgfCAgICAgICAgICAgICAgICBefgpzcmMvc2hhcmVkL2Jhc3Mu
+Yzo3MjI6MzU6IGVycm9yOiDigJhzdHJ1Y3QgYnRfYmNhc3Rfc3Jj4oCZIGhhcyBubyBtZW1iZXIg
+bmFtZWQg4oCYcGFfc3luY19pb+KAmQogIDcyMiB8ICAgIGdfaW9fY2hhbm5lbF9zaHV0ZG93bihi
+Y2FzdF9zcmMtPnBhX3N5bmNfaW8sCiAgICAgIHwgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgIF5+CnNyYy9zaGFyZWQvYmFzcy5jOjcyNDozMjogZXJyb3I6IOKAmHN0cnVjdCBidF9i
+Y2FzdF9zcmPigJkgaGFzIG5vIG1lbWJlciBuYW1lZCDigJhwYV9zeW5jX2lv4oCZCiAgNzI0IHwg
+ICAgZ19pb19jaGFubmVsX3VucmVmKGJjYXN0X3NyYy0+cGFfc3luY19pbyk7CiAgICAgIHwgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgIF5+CnNyYy9zaGFyZWQvYmFzcy5jOjcyNToxMzog
+ZXJyb3I6IOKAmHN0cnVjdCBidF9iY2FzdF9zcmPigJkgaGFzIG5vIG1lbWJlciBuYW1lZCDigJhw
+YV9zeW5jX2lv4oCZCiAgNzI1IHwgICAgYmNhc3Rfc3JjLT5wYV9zeW5jX2lvID0gTlVMTDsKICAg
+ICAgfCAgICAgICAgICAgICBefgpzcmMvc2hhcmVkL2Jhc3MuYzogSW4gZnVuY3Rpb24g4oCYY29u
+ZmlybV9jYuKAmToKc3JjL3NoYXJlZC9iYXNzLmM6Nzg4OjExOiBlcnJvcjog4oCYc3RydWN0IGJ0
+X2JjYXN0X3NyY+KAmSBoYXMgbm8gbWVtYmVyIG5hbWVkIOKAmHBhX3N5bmNfaW/igJkKICA3ODgg
+fCAgYmNhc3Rfc3JjLT5wYV9zeW5jX2lvID0gaW87CiAgICAgIHwgICAgICAgICAgIF5+CnNyYy9z
+aGFyZWQvYmFzcy5jOjc4OToyODogZXJyb3I6IOKAmHN0cnVjdCBidF9iY2FzdF9zcmPigJkgaGFz
+IG5vIG1lbWJlciBuYW1lZCDigJhwYV9zeW5jX2lv4oCZCiAgNzg5IHwgIGdfaW9fY2hhbm5lbF9y
+ZWYoYmNhc3Rfc3JjLT5wYV9zeW5jX2lvKTsKICAgICAgfCAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICBefgpzcmMvc2hhcmVkL2Jhc3MuYzo4MDc6Mzc6IGVycm9yOiDigJhzdHJ1Y3QgYnRfYmNh
+c3Rfc3Jj4oCZIGhhcyBubyBtZW1iZXIgbmFtZWQg4oCYcGFfc3luY19pb+KAmQogIDgwNyB8ICAg
+IGlmICghYnRfaW9fYmNhc3RfYWNjZXB0KGJjYXN0X3NyYy0+cGFfc3luY19pbywKICAgICAgfCAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBefgpzcmMvc2hhcmVkL2Jhc3MuYzog
+SW4gZnVuY3Rpb24g4oCYYmFzc19oYW5kbGVfYWRkX3NyY19vcOKAmToKc3JjL3NoYXJlZC9iYXNz
+LmM6MTA4MToxMjogZXJyb3I6IOKAmHN0cnVjdCBidF9iY2FzdF9zcmPigJkgaGFzIG5vIG1lbWJl
+ciBuYW1lZCDigJhsaXN0ZW5faW/igJkKIDEwODEgfCAgIGJjYXN0X3NyYy0+bGlzdGVuX2lvID0g
+aW87CiAgICAgIHwgICAgICAgICAgICBefgpzcmMvc2hhcmVkL2Jhc3MuYzoxMDgyOjI5OiBlcnJv
+cjog4oCYc3RydWN0IGJ0X2JjYXN0X3NyY+KAmSBoYXMgbm8gbWVtYmVyIG5hbWVkIOKAmGxpc3Rl
+bl9pb+KAmQogMTA4MiB8ICAgZ19pb19jaGFubmVsX3JlZihiY2FzdF9zcmMtPmxpc3Rlbl9pbyk7
+CiAgICAgIHwgICAgICAgICAgICAgICAgICAgICAgICAgICAgIF5+CnNyYy9zaGFyZWQvYmFzcy5j
+OjEwODQ6MzI6IGVycm9yOiDigJhzdHJ1Y3QgYnRfYmNhc3Rfc3Jj4oCZIGhhcyBubyBtZW1iZXIg
+bmFtZWQg4oCYYmlzZXPigJkKIDEwODQgfCAgIGlmIChudW1fYmlzID4gMCAmJiAhYmNhc3Rfc3Jj
+LT5iaXNlcykKICAgICAgfCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXn4Kc3JjL3No
+YXJlZC9iYXNzLmM6MTA4NToxMzogZXJyb3I6IOKAmHN0cnVjdCBidF9iY2FzdF9zcmPigJkgaGFz
+IG5vIG1lbWJlciBuYW1lZCDigJhiaXNlc+KAmQogMTA4NSB8ICAgIGJjYXN0X3NyYy0+YmlzZXMg
+PSBxdWV1ZV9uZXcoKTsKICAgICAgfCAgICAgICAgICAgICBefgpzcmMvc2hhcmVkL2Jhc3MuYzog
+SW4gZnVuY3Rpb24g4oCYYmFzc19oYW5kbGVfc2V0X2JjYXN0X2NvZGVfb3DigJk6CnNyYy9zaGFy
+ZWQvYmFzcy5jOjExNzA6MTY6IGVycm9yOiDigJhzdHJ1Y3QgYnRfYmNhc3Rfc3Jj4oCZIGhhcyBu
+byBtZW1iZXIgbmFtZWQg4oCYcGFfc3luY19pb+KAmQogMTE3MCB8ICBpZiAoIWJjYXN0X3NyYy0+
+cGFfc3luY19pbykKICAgICAgfCAgICAgICAgICAgICAgICBefgpzcmMvc2hhcmVkL2Jhc3MuYzox
+MTczOjQxOiBlcnJvcjog4oCYc3RydWN0IGJ0X2JjYXN0X3NyY+KAmSBoYXMgbm8gbWVtYmVyIG5h
+bWVkIOKAmHBhX3N5bmNfaW/igJkKIDExNzMgfCAgc2sgPSBnX2lvX2NoYW5uZWxfdW5peF9nZXRf
+ZmQoYmNhc3Rfc3JjLT5wYV9zeW5jX2lvKTsKICAgICAgfCAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgXn4Kc3JjL3NoYXJlZC9iYXNzLmM6MTE5MDozNTogZXJyb3I6IOKA
+mHN0cnVjdCBidF9iY2FzdF9zcmPigJkgaGFzIG5vIG1lbWJlciBuYW1lZCDigJhwYV9zeW5jX2lv
+4oCZCiAxMTkwIHwgIGlmICghYnRfaW9fYmNhc3RfYWNjZXB0KGJjYXN0X3NyYy0+cGFfc3luY19p
+bywgY29ubmVjdF9jYiwKICAgICAgfCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+Xn4Kc3JjL3NoYXJlZC9iYXNzLmM6IEluIGZ1bmN0aW9uIOKAmGJhc3NfYmNhc3Rfc3JjX2ZyZWXi
+gJk6CnNyYy9zaGFyZWQvYmFzcy5jOjEzNzg6MTU6IGVycm9yOiDigJhzdHJ1Y3QgYnRfYmNhc3Rf
+c3Jj4oCZIGhhcyBubyBtZW1iZXIgbmFtZWQg4oCYbGlzdGVuX2lv4oCZCiAxMzc4IHwgIGlmIChi
+Y2FzdF9zcmMtPmxpc3Rlbl9pbykgewogICAgICB8ICAgICAgICAgICAgICAgXn4Kc3JjL3NoYXJl
+ZC9iYXNzLmM6MTM3OTozNDogZXJyb3I6IOKAmHN0cnVjdCBidF9iY2FzdF9zcmPigJkgaGFzIG5v
+IG1lbWJlciBuYW1lZCDigJhsaXN0ZW5faW/igJkKIDEzNzkgfCAgIGdfaW9fY2hhbm5lbF9zaHV0
+ZG93bihiY2FzdF9zcmMtPmxpc3Rlbl9pbywgVFJVRSwgTlVMTCk7CiAgICAgIHwgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgXn4Kc3JjL3NoYXJlZC9iYXNzLmM6MTM4MDozMTogZXJy
+b3I6IOKAmHN0cnVjdCBidF9iY2FzdF9zcmPigJkgaGFzIG5vIG1lbWJlciBuYW1lZCDigJhsaXN0
+ZW5faW/igJkKIDEzODAgfCAgIGdfaW9fY2hhbm5lbF91bnJlZihiY2FzdF9zcmMtPmxpc3Rlbl9p
+byk7CiAgICAgIHwgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXn4Kc3JjL3NoYXJlZC9i
+YXNzLmM6MTM4MzoxNTogZXJyb3I6IOKAmHN0cnVjdCBidF9iY2FzdF9zcmPigJkgaGFzIG5vIG1l
+bWJlciBuYW1lZCDigJhwYV9zeW5jX2lv4oCZCiAxMzgzIHwgIGlmIChiY2FzdF9zcmMtPnBhX3N5
+bmNfaW8pIHsKICAgICAgfCAgICAgICAgICAgICAgIF5+CnNyYy9zaGFyZWQvYmFzcy5jOjEzODQ6
+MzQ6IGVycm9yOiDigJhzdHJ1Y3QgYnRfYmNhc3Rfc3Jj4oCZIGhhcyBubyBtZW1iZXIgbmFtZWQg
+4oCYcGFfc3luY19pb+KAmQogMTM4NCB8ICAgZ19pb19jaGFubmVsX3NodXRkb3duKGJjYXN0X3Ny
+Yy0+cGFfc3luY19pbywgVFJVRSwgTlVMTCk7CiAgICAgIHwgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgXn4Kc3JjL3NoYXJlZC9iYXNzLmM6MTM4NTozMTogZXJyb3I6IOKAmHN0cnVj
+dCBidF9iY2FzdF9zcmPigJkgaGFzIG5vIG1lbWJlciBuYW1lZCDigJhwYV9zeW5jX2lv4oCZCiAx
+Mzg1IHwgICBnX2lvX2NoYW5uZWxfdW5yZWYoYmNhc3Rfc3JjLT5wYV9zeW5jX2lvKTsKICAgICAg
+fCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBefgpzcmMvc2hhcmVkL2Jhc3MuYzoxMzg4
+OjI1OiBlcnJvcjog4oCYc3RydWN0IGJ0X2JjYXN0X3NyY+KAmSBoYXMgbm8gbWVtYmVyIG5hbWVk
+IOKAmGJpc2Vz4oCZCiAxMzg4IHwgIHF1ZXVlX2Rlc3Ryb3koYmNhc3Rfc3JjLT5iaXNlcywgYmFz
+c19iaXNfdW5yZWYpOwogICAgICB8ICAgICAgICAgICAgICAgICAgICAgICAgIF5+Cm1ha2VbMV06
+ICoqKiBbTWFrZWZpbGU6ODY3Mjogc3JjL3NoYXJlZC9saWJzaGFyZWRfbWFpbmxvb3BfbGEtYmFz
+cy5sb10gRXJyb3IgMQptYWtlWzFdOiAqKiogV2FpdGluZyBmb3IgdW5maW5pc2hlZCBqb2JzLi4u
+LgptYWtlOiAqKiogW01ha2VmaWxlOjQ2NzY6IGFsbF0gRXJyb3IgMgoKCi0tLQpSZWdhcmRzLApM
+aW51eCBCbHVldG9vdGgKCg==
 
-This sounds like a bad idea to share the IO handling between different
-plugins, either we shall move the PA Sync handling to core or create
-its own IO handling in BASS rather than reuse BAP IO handling. Also it
-shall be possible to have both a local user and a BASS server attempt
-to sync to broadcasters, for the above paragraph it seems to me that
-wouldn't be possible? I guess part of the problem is that controller
-normally wouldn't support multiple PA Sync thus we have the
-short-lived PA syncs to enumerate broadcasters but if BASS want a
-long-lived PA sync then it would interfere with BAP, in that case I
-rather have the operation going in parallel (short-lived vs long
-lived) so it is up to the controller to allow that or not so we can do
-the IO handling independently in each plugin.
-
-> This also adds a call to notify BASS about a session with a Broadcaster
-> being removed, in bap_bcast_remove.
->
-> The bluetoothctl log below shows a Scan Delegator creating a media
-> transport for a BIS added by a Broadcast Assistant through the
-> Add Source command, and then disconnecting from the Broadcaster:
->
-> client/bluetoothctl
-> [bluetooth]# endpoint.register 00001851-0000-1000-8000-00805f9b34fb 0x06
-> [/local/endpoint/ep0] Auto Accept (yes/no): y
-> [/local/endpoint/ep0] Max Transports (auto/value): a
-> [/local/endpoint/ep0] Locations: 1
-> [/local/endpoint/ep0] Supported Context (value): 1
-> [bluetooth]# Endpoint /local/endpoint/ep0 registered
-> [bluetooth]# advertise on
-> [bluetooth]# [NEW] Device 00:60:37:31:7E:3F 00-60-37-31-7E-3F
-> [00-60-37-31-7E-3F]# [NEW] Device 03:E2:C0:11:57:DA 03-E2-C0-11-57-DA
-> [00-60-37-31-7E-3F]# [NEW] Transport
->     /org/bluez/hci1/dev_03_E2_C0_11_57_DA/bis1/fd0
-> [00-60-37-31-7E-3F]# disconnect 03:E2:C0:11:57:DA
-> Attempting to disconnect from 03:E2:C0:11:57:DA
-> [00-60-37-31-7E-3F]# [DEL] Transport
->     /org/bluez/hci1/dev_03_E2_C0_11_57_DA/bis1/fd0
-> [00-60-37-31-7E-3F]# [DEL] Device 03:E2:C0:11:57:DA 03-E2-C0-11-57-DA
->
-> The btmon log below shows that after PA sync is established inside
-> the BAP plugin, the Scan Delegator sends a GATT notification to
-> inform the Broadcast Assistant that PA sync has been established.
-> Once the Broadcaster device is deleted, PA sync is terminated and
-> the Scan Delegator once again notifies the peer about the update:
->
-> > ACL Data RX: Handle 0 flags 0x01 dlen 1
->       ATT: Write Command (0x52) len 23
->         Handle: 0x0040 Type: Broadcast Audio Scan Control Point (0x2bc7)
->           Data[21]: 0201da5711c0e203001a2d5602ffff010100000000
->             Opcode: Add Source (0x02)
->             Source_Address_Type: 1
->             Source_Address: 03:E2:C0:11:57:DA
->             Source_Adv_SID: 0
->             Broadcast_ID: 0x562d1a
->             PA_Sync_State: Synchronize to PA - PAST not available
->             PA_Interval: 0xffff
->             Num_Subgroups: 1
->             Subgroup #0:
->               BIS_Sync State: 0x00000001
-> < HCI Command: LE Periodic Advertising Create Sync (0x08|0x0044)
->         Options: 0x0000
->         Use advertising SID, Advertiser Address Type and address
->         Reporting initially enabled
->         SID: 0x00
->         Adv address type: Random (0x01)
->         Adv address: 03:E2:C0:11:57:DA (Non-Resolvable)
->         Skip: 0x0000
->         Sync timeout: 20000 msec (0x07d0)
->         Sync CTE type: 0x0000
-> > HCI Event: Command Status (0x0f) plen 4
->       LE Periodic Advertising Create Sync (0x08|0x0044) ncmd 1
->         Status: Success (0x00)
-> > HCI Event: LE Meta Event (0x3e) plen 16
->       LE Periodic Advertising Sync Established (0x0e)
->         Status: Success (0x00)
->         Sync handle: 0
->         Advertising SID: 0x00
->         Advertiser address type: Random (0x01)
->         Advertiser address: 03:E2:C0:11:57:DA (Non-Resolvable)
->         Advertiser PHY: LE 2M (0x02)
->         Periodic advertising interval: 10.00 msec (0x0008)
->         Advertiser clock accuracy: 0x07
-> > HCI Event: LE Meta Event (0x3e) plen 42
->       LE Periodic Advertising Report (0x0f)
->         Sync handle: 0
->         TX power: 127 dbm (0x7f)
->         RSSI: -64 dBm (0xc0)
->         CTE Type: No Constant Tone Extension (0xff)
->         Data status: Complete
->         Data length: 0x22
->         Service Data: Basic Audio Announcement (0x1851)
->           Presetation Delay: 40000
->           Number of Subgroups: 1
->             Subgroup #0:
->             Number of BIS(s): 1
->             Codec: LC3 (0x06)
->             Codec Specific Configuration: #0: len 0x02 type 0x01
->             Codec Specific Configuration: Sampling Frequency: 16 Khz
->             Codec Specific Configuration: #1: len 0x02 type 0x02
->             Codec Specific Configuration: Frame Duration: 10 ms (0x01)
->             Codec Specific Configuration: #2: len 0x03 type 0x04
->             Codec Specific Configuration: Frame Length: 40 (0x0028)
->             Codec Specific Configuration: #3: len 0x05 type 0x03
->             Codec Specific Configuration: Location: 0x00000001
->             Codec Specific Configuration: Location: Front Left
->               BIS #0:
->               Index: 1
-> > HCI Event: LE Meta Event (0x3e) plen 20
->       LE Broadcast Isochronous Group Info Advertising Report (0x22)
->         Sync Handle: 0x0000
->         Number BIS: 1
->         NSE: 3
->         ISO Interval: 10.00 msec (0x0008)
->         BN: 1
->         PTO: 1
->         IRC: 3
->         Maximum PDU: 40
->         SDU Interval: 10000 us (0x002710)
->         Maximum SDU: 40
->         PHY: LE 2M (0x02)
->         Framing: Unframed (0x00)
->         Encryption: 0x00
-> bluetoothd[4636]: < ACL Data TX: Handle 0 flags 0x00 dlen 29
->       ATT: Handle Multiple Value Notification (0x23) len 24
->         Length: 0x0014
->         Handle: 0x003a Type: Broadcast Receive State (0x2bc8)
->           Data[20]: 0101da5711c0e203001a2d560200010000000000
->           Source_ID: 1
->           Source_Address_Type: 1
->           Source_Address: 03:E2:C0:11:57:DA
->           Source_Adv_SID: 0
->           Broadcast_ID: 0x562d1a
->           PA_Sync_State: Synchronized to PA
->           BIG_Encryption: Not encrypted
->           Num_Subgroups: 1
->           Subgroup #0:
->             BIS_Sync State: 0x00000000
-> bluetoothd[70621]: < ACL Data TX: Handle 0 flags 0x00 dlen 29
->       ATT: Handle Multiple Value Notification (0x23) len 24
->         Length: 0x0014
->         Handle: 0x003a Type: Broadcast Receive State (0x2bc8)
->           Data[20]: 0101dd7c8046f72a00f863f00000010000000000
->           Source_ID: 1
->           Source_Address_Type: 1
->           Source_Address: 2A:F7:46:80:7C:DD
->           Source_Adv_SID: 0
->           Broadcast_ID: 0xf063f8
->           PA_Sync_State: Not synchronized to PA
->           BIG_Encryption: Not encrypted
->           Num_Subgroups: 1
->           Subgroup #0:
->             BIS_Sync State: 0x00000000
-> < HCI Command: LE Periodic Advertising Terminate Sync (0x08|0x0046) plen =
-2
->         Sync handle: 0x0000
-> > HCI Event: Command Complete (0x0e) plen 4
->       LE Periodic Advertising Terminate Sync (0x08|0x0046) ncmd 1
->         Status: Success (0x00
-> ---
->  profiles/audio/bap.c | 128 ++++++++++++++++++++++++++++++++-----------
->  1 file changed, 95 insertions(+), 33 deletions(-)
->
-> diff --git a/profiles/audio/bap.c b/profiles/audio/bap.c
-> index a2c5a546d..bf924932a 100644
-> --- a/profiles/audio/bap.c
-> +++ b/profiles/audio/bap.c
-> @@ -182,6 +182,9 @@ static struct bt_iso_qos bap_sink_pa_qos =3D {
->         }
->  };
->
-> +static bool match_service(const void *data, const void *match_data);
-> +static void iso_do_big_sync(GIOChannel *io, void *user_data);
-> +
->  static bool bap_data_set_user_data(struct bap_data *data, void *user_dat=
-a)
->  {
->         if (!data)
-> @@ -211,6 +214,8 @@ static void setup_free(void *data);
->
->  static void bap_data_free(struct bap_data *data)
->  {
-> +       struct bap_bcast_pa_req *req;
-> +
->         if (data->listen_io) {
->                 g_io_channel_shutdown(data->listen_io, TRUE, NULL);
->                 g_io_channel_unref(data->listen_io);
-> @@ -230,6 +235,22 @@ static void bap_data_free(struct bap_data *data)
->         bt_bap_state_unregister(data->bap, data->state_id);
->         bt_bap_pac_unregister(data->bap, data->pac_id);
->         bt_bap_unref(data->bap);
-> +
-> +       if (data->adapter) {
-> +               /* If this is a Broadcast Sink session with a Broadcast S=
-ource,
-> +                * remove any pending PA sync requests from the adapter q=
-ueue,
-> +                * since the session is about to be deleted.
-> +                */
-> +               req =3D queue_remove_if(data->adapter->bcast_pa_requests,
-> +                                               match_service, data->serv=
-ice);
-> +               if (req && req->io_id) {
-> +                       g_source_remove(req->io_id);
-> +                       req->io_id =3D 0;
-> +               }
-> +
-> +               free(req);
-> +       }
-> +
->         free(data);
->  }
->
-> @@ -1004,9 +1025,11 @@ static void iso_bcast_confirm_cb(GIOChannel *io, G=
-Error *err, void *user_data)
->
->         DBG("BIG Sync completed");
->
-> -       g_io_channel_unref(setup->io);
-> -       g_io_channel_shutdown(setup->io, TRUE, NULL);
-> -       setup->io =3D NULL;
-> +       if (setup->io) {
-> +               g_io_channel_unref(setup->io);
-> +               g_io_channel_shutdown(setup->io, TRUE, NULL);
-> +               setup->io =3D NULL;
-> +       }
->
->         /* This device is no longer needed */
->         btd_service_connecting_complete(bap_data->service, 0);
-> @@ -1258,9 +1281,25 @@ static gboolean big_info_report_cb(GIOChannel *io,=
- GIOCondition cond,
->         /* Close the io and remove the queue request for another PA Sync =
-*/
->         g_io_channel_shutdown(data->listen_io, TRUE, NULL);
->         g_io_channel_unref(data->listen_io);
-> -       g_io_channel_shutdown(io, TRUE, NULL);
->         data->listen_io =3D NULL;
->
-> +       if (bass_bcast_probe(data->device, data->bap)) {
-> +               /* If this Broadcast Source was successfully probed insid=
-e
-> +                * BASS, it means that the Broadcast Sink acting as a Sca=
-n
-> +                * Delegator performed short-lived PA sync as a request f=
-rom
-> +                * a Broadcast Assistant. The Scan Delegator should keep =
-PA
-> +                * sync active until instructed otherwise by the Assistan=
-t.
-> +                * Keep a reference to the PA sync io to keep the fd open=
-.
-> +                */
-> +               data->listen_io =3D io;
-> +               g_io_channel_ref(io);
-> +       } else {
-> +               /* Unless it is required by a Broadcast Assistant, PA syn=
-c is
-> +                * no longer needed at this point, so the io can be close=
-d.
-> +                */
-> +               g_io_channel_shutdown(io, TRUE, NULL);
-> +       }
-> +
->         /* Analyze received BASE data and create remote media endpoints f=
-or each
->          * BIS matching our capabilities
->          */
-> @@ -1268,9 +1307,18 @@ static gboolean big_info_report_cb(GIOChannel *io,=
- GIOCondition cond,
->
->         service_set_connecting(req->data.service);
->
-> -       queue_remove(data->adapter->bcast_pa_requests, req);
->         req->io_id =3D 0;
-> -       free(req);
-> +
-> +       if (!data->listen_io) {
-> +               /* If PA sync has been terminated, dequeue request to be =
-able
-> +                * to probe other Broadcasters. Otherwise, keep this requ=
-est
-> +                * in progress to avoid probing other Broadcasters as lon=
-g as
-> +                * PA is active with the current one. The request will be
-> +                * dequeued and freed when the PA sync io will be shutdow=
-n.
-> +                */
-> +               queue_remove(data->adapter->bcast_pa_requests, req);
-> +               free(req);
-> +       }
->
->         return FALSE;
->  }
-> @@ -2236,6 +2284,26 @@ static void setup_accept_io_broadcast(struct bap_d=
-ata *data,
->         struct bap_bcast_pa_req *req =3D new0(struct bap_bcast_pa_req, 1)=
-;
->         struct bap_adapter *adapter =3D data->adapter;
->
-> +       req->type =3D BAP_PA_BIG_SYNC_REQ;
-> +       req->in_progress =3D FALSE;
-> +       req->data.setup =3D setup;
-> +
-> +       if (data->listen_io) {
-> +               /* If there is an active listen io for the BAP session
-> +                * with the Broadcast Source, it means that PA sync is
-> +                * already established. Go straight to establishing BIG
-> +                * sync.
-> +                */
-> +               iso_do_big_sync(data->listen_io, req);
-> +               return;
-> +       }
-> +
-> +       /* Add this request to the PA queue.
-> +        * We don't need to check the queue here, as we cannot have
-> +        * BAP_PA_BIG_SYNC_REQ before a short PA (BAP_PA_SHORT_REQ)
-> +        */
-> +       queue_push_tail(adapter->bcast_pa_requests, req);
-> +
->         /* Timer could be stopped if all the short lived requests were tr=
-eated.
->          * Check the state of the timer and turn it on so that this reque=
-sts
->          * can also be treated.
-> @@ -2244,15 +2312,6 @@ static void setup_accept_io_broadcast(struct bap_d=
-ata *data,
->                 adapter->pa_timer_id =3D g_timeout_add_seconds(PA_IDLE_TI=
-MEOUT,
->                                                                 pa_idle_t=
-imer,
->                                                                 adapter);
-> -
-> -       /* Add this request to the PA queue.
-> -        * We don't need to check the queue here, as we cannot have
-> -        * BAP_PA_BIG_SYNC_REQ before a short PA (BAP_PA_SHORT_REQ)
-> -        */
-> -       req->type =3D BAP_PA_BIG_SYNC_REQ;
-> -       req->in_progress =3D FALSE;
-> -       req->data.setup =3D setup;
-> -       queue_push_tail(adapter->bcast_pa_requests, req);
->  }
->
->  static void setup_create_ucast_io(struct bap_data *data,
-> @@ -3030,10 +3089,17 @@ static void iso_do_big_sync(GIOChannel *io, void =
-*user_data)
->         const char *strbis =3D NULL;
->
->         DBG("PA Sync done");
-> -       g_io_channel_unref(setup->io);
-> -       g_io_channel_shutdown(setup->io, TRUE, NULL);
-> -       setup->io =3D io;
-> -       g_io_channel_ref(setup->io);
-> +
-> +       if (setup->io) {
-> +               g_io_channel_unref(setup->io);
-> +               g_io_channel_shutdown(setup->io, TRUE, NULL);
-> +
-> +               /* Keep a reference to the PA sync io until
-> +                * BIG sync is established.
-> +                */
-> +               setup->io =3D io;
-> +               g_io_channel_ref(setup->io);
-> +       }
->
->         /* TODO
->          * We can only synchronize with a single BIS to a BIG.
-> @@ -3086,14 +3152,14 @@ static void iso_do_big_sync(GIOChannel *io, void =
-*user_data)
->         memcpy(&qos.bcast.out, &setup->qos.bcast.io_qos,
->                         sizeof(struct bt_iso_io_qos));
->
-> -       if (!bt_io_set(setup->io, &err,
-> +       if (!bt_io_set(io, &err,
->                         BT_IO_OPT_QOS, &qos,
->                         BT_IO_OPT_INVALID)) {
->                 error("bt_io_set: %s", err->message);
->                 g_error_free(err);
->         }
->
-> -       if (!bt_io_bcast_accept(setup->io,
-> +       if (!bt_io_bcast_accept(io,
->                         iso_bcast_confirm_cb,
->                         req, NULL, &err,
->                         BT_IO_OPT_ISO_BC_NUM_BIS,
-> @@ -3211,7 +3277,6 @@ static void bap_bcast_remove(struct btd_service *se=
-rvice)
->  {
->         struct btd_device *device =3D btd_service_get_device(service);
->         struct bap_data *data;
-> -       struct bap_bcast_pa_req *req;
->         char addr[18];
->
->         ba2str(device_get_address(device), addr);
-> @@ -3222,17 +3287,9 @@ static void bap_bcast_remove(struct btd_service *s=
-ervice)
->                 error("BAP service not handled by profile");
->                 return;
->         }
-> -       /* Remove the corresponding entry from the pa_req queue. Any pa_r=
-eq that
-> -        * are in progress will be stopped by bap_data_remove which calls
-> -        * bap_data_free.
-> -        */
-> -       req =3D queue_remove_if(data->adapter->bcast_pa_requests,
-> -                                               match_service, service);
-> -       if (req && req->io_id) {
-> -               g_source_remove(req->io_id);
-> -               req->io_id =3D 0;
-> -       }
-> -       free(req);
-> +
-> +       /* Notify the BASS plugin about the removed session. */
-> +       bass_bcast_remove(device);
->
->         bap_data_remove(data);
->
-> @@ -3393,8 +3450,13 @@ static void bap_adapter_remove(struct btd_profile =
-*p,
->         DBG("%s", addr);
->
->         queue_destroy(data->adapter->bcast_pa_requests, free);
-> +
-> +       if (data->adapter->pa_timer_id)
-> +               g_source_remove(data->adapter->pa_timer_id);
-> +
->         queue_remove(adapters, data->adapter);
->         free(data->adapter);
-> +       data->adapter =3D NULL;
->
->         if (queue_isempty(adapters)) {
->                 queue_destroy(adapters, NULL);
-> --
-> 2.39.2
->
-
-
---=20
-Luiz Augusto von Dentz
+--===============9060838048642394226==--
