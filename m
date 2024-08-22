@@ -1,109 +1,111 @@
-Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mailgw01.mediatek.com (unknown [60.244.123.138])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B052017C7BE
-	for <linux-bluetooth@vger.kernel.org>; Wed, 21 Aug 2024 22:44:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C57D364DC;
+	Thu, 22 Aug 2024 05:23:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=60.244.123.138
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724280250; cv=none; b=MsymFJdIW3fHyPyRkSN7K0A3uOE1iN7EOP0mWbjAdqyiuQOXHeqZgHdzOlBDms90NNFR7NlRBeZbtRmlxC/ZutiNQ7/M5s3M6/cUzCqH4nnw8VEcdcDrx8j6HkFF+eRb3nCvmyrQ2sW77myrGG1e+vCnu03ajXsG1HDqi+vgSpA=
+	t=1724304206; cv=none; b=s8hrICTOU/GY3iKMaIPdVciutt85a49Nhg3lVH+hRXcNmAW2QFTqSAJ3Tehm37QKH9CJirngFcqJkNKsN+4CV1I+ET+aUJIZ2HaUKZ5l1ZHPABJw3sY72VhTEtLzTLYPkK0DmL3mbgzG6iXMiOqflvGltoi5+klfVVHZs1Rav/8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724280250; c=relaxed/simple;
-	bh=5cLHH69JJDhOiZb/fBtbVOyASTGvXu6KKQLE3TDOJWU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=n0PsAMzSgwUq/Gsu5mbbHuXU6uWdeqLRU9VAZuEMew/UikVdhnLItk6bj6ROqMbBUGzLXkCM188NuBfY1oOj0MlDnUMcC6PemO28T9Mgzq7rbKNO0LnWHFsqinfVbFKJxgNBCro+qzG2Nq8EucYQ8xUR+Udyjp3xTD67JWd2rLo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=JmlFguGD; arc=none smtp.client-ip=209.85.210.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+	s=arc-20240116; t=1724304206; c=relaxed/simple;
+	bh=JvviZ/TvdZzyy0lB23E39wSs1MZdbpxISdkQn13dXe0=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=WyIFsBHqUbbtUUmrktlcy4eIZLsu4IhOm63vSp1bzPvSnyleTBpL4qiyvvvbHLfT2yWEDVF254KTvXGyMX6mNt5MUKusbCsZSR/EX1HzHRXvCtCA1scfXgYOtZ1Sds6hC3p10CHGKUeCWSj2YPnBQdZ6wDT5ljKiTOqMZZvoYn8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com; spf=pass smtp.mailfrom=mediatek.com; dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b=EJr90hX4; arc=none smtp.client-ip=60.244.123.138
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mediatek.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="JmlFguGD"
-Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-713edc53429so151296b3a.2
-        for <linux-bluetooth@vger.kernel.org>; Wed, 21 Aug 2024 15:44:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1724280248; x=1724885048; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=WqryzH7j3wvqpBXhrLGUt8KpB52GpjP5213AXHE2etM=;
-        b=JmlFguGDuqKT3oWwE7Su3z1wZ273p+Q1qZXq7u6aXIAu1XsOYnIbS9pY+erp0Eb2Ex
-         t+iem3nv6i1h2YD+8P0H3SKPnq6hhBvb3xUm+74jaFIrPzx67Qh5tZc8Zwsn7bgoOOhs
-         q0jB+DEmVvxNINQvFp6dylrAiR/lgK93ojB5g=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724280248; x=1724885048;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=WqryzH7j3wvqpBXhrLGUt8KpB52GpjP5213AXHE2etM=;
-        b=f8We2DsrXsH05UZyRg3ZEw/j9rvmr0d6872C9TKjmqY3hHBKvWUgN2CR029ph0dZ4i
-         /QXy26a979Xd/G2d2HVox4eah2ajJQnGw+QA10C9EZfveElRfnA0g3C9OfBwBY57hfvA
-         c0GMa03g6rh2HtULYV65DbHVCbUGZE2tjLN88TGDm4U9yZd+RelG696tG2ZWqsOqmM8e
-         wsxKiFOstWsYTmbE6s40XSAmlaLHSJrlZTwbDadrKFncAdRh4oSaEqkIXMHWEywkRW4D
-         R43svNtNGr594z563WVO3Dj9plMpYC3XrBj8l2YqSgtA2hyfxKu3rZFkGHv3NKC06jjK
-         9usg==
-X-Forwarded-Encrypted: i=1; AJvYcCVNq7887BnaXEP2W+rmgyFtJDstDYrqy4poYX5gHt7+YWDdVnyLRuF1dvXs3jMKRZA3EjkBMDzZnS1AjR6Q2gw=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy7fEk7RoILvqOchscl+X9gmM5amH3otJRigC5eWSEWmQ4XabNb
-	3JyPx8Zz6dXiBMky8ZFomRoLPwgvC368otIAz3KcK7E5hNtcRiXidZKFLMpyZg==
-X-Google-Smtp-Source: AGHT+IFwM9rn2lURI25CT0hrSuglfVOUBVyVM6H/oqBUlv0bJmvcoH/Gcz2c+LGeDKE/N6Yy88qgHg==
-X-Received: by 2002:a05:6300:41:b0:1c4:8da5:21a4 with SMTP id adf61e73a8af0-1cad81a7279mr5139868637.41.1724280247846;
-        Wed, 21 Aug 2024 15:44:07 -0700 (PDT)
-Received: from dianders.sjc.corp.google.com ([2620:15c:9d:2:8b27:65e9:2bb6:ed40])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-714342e0a10sm157368b3a.108.2024.08.21.15.44.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 21 Aug 2024 15:44:07 -0700 (PDT)
-From: Douglas Anderson <dianders@chromium.org>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Guenter Roeck <groeck@chromium.org>,
-	Stephen Boyd <swboyd@chromium.org>,
-	Johan Hovold <johan+linaro@kernel.org>,
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
-	Douglas Anderson <dianders@chromium.org>,
-	Sai Teja Aluvala <quic_saluvala@quicinc.com>,
-	linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [REPOST PATCH] Bluetooth: qca: If memdump doesn't work, re-enable IBS
-Date: Wed, 21 Aug 2024 15:43:40 -0700
-Message-ID: <20240821154339.REPOST.1.Ia769fe5fbeaa6aca2edfb01b82eb7df0c6955459@changeid>
-X-Mailer: git-send-email 2.46.0.184.g6999bdac58-goog
+	dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b="EJr90hX4"
+X-UUID: a1d68574604611ef8593d301e5c8a9c0-20240822
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
+	h=Content-Type:MIME-Version:Message-ID:Date:Subject:CC:To:From; bh=Zi1oFdwslpFsySYhI5Npfy3fFU8blZB+R3aDcpwYrDk=;
+	b=EJr90hX42QkxH5dLceei7o5zekXmK+Pwhs2mRyBjUfQcBcwmw+KL9cbzmRLLGJ4O36eiUkKLgrejl+OfoRCKiURwE7/J+zc/N/nUEO51kpaLfk73jzFlOkhW+lZBOilPRGLXw/s5vP/eTkVKxP+c9NHAJ6JsvgYqpakZAA8sSKg=;
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.1.41,REQID:4e655bc7-c2a6-4667-8ea7-e762cb4a6147,IP:0,U
+	RL:0,TC:0,Content:-5,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION
+	:release,TS:-5
+X-CID-META: VersionHash:6dc6a47,CLOUDID:48e7fdce-7921-4900-88a1-3aef019a55ce,B
+	ulkID:nil,BulkQuantity:0,Recheck:0,SF:102,TC:nil,Content:0,EDM:-3,IP:nil,U
+	RL:0,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES:1,
+	SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
+X-CID-BVR: 0,NGT
+X-CID-BAS: 0,NGT,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR
+X-UUID: a1d68574604611ef8593d301e5c8a9c0-20240822
+Received: from mtkmbs10n1.mediatek.inc [(172.21.101.34)] by mailgw01.mediatek.com
+	(envelope-from <hao.qin@mediatek.com>)
+	(Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
+	with ESMTP id 1287319304; Thu, 22 Aug 2024 13:23:15 +0800
+Received: from mtkmbs13n1.mediatek.inc (172.21.101.193) by
+ MTKMBS14N1.mediatek.inc (172.21.101.75) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.26; Thu, 22 Aug 2024 13:23:14 +0800
+Received: from mhfsdcap04.gcn.mediatek.inc (10.17.3.154) by
+ mtkmbs13n1.mediatek.inc (172.21.101.73) with Microsoft SMTP Server id
+ 15.2.1118.26 via Frontend Transport; Thu, 22 Aug 2024 13:23:13 +0800
+From: Hao Qin <hao.qin@mediatek.com>
+To: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg
+	<johan.hedberg@gmail.com>, Luiz Von Dentz <luiz.dentz@gmail.com>
+CC: Chris Lu <chris.lu@mediatek.com>, Sean Wang <sean.wang@mediatek.com>,
+	Deren Wu <deren.Wu@mediatek.com>, Aaron Hou <aaron.hou@mediatek.com>, "Steve
+ Lee" <steve.lee@mediatek.com>, linux-bluetooth
+	<linux-bluetooth@vger.kernel.org>, linux-kernel
+	<linux-kernel@vger.kernel.org>, linux-mediatek
+	<linux-mediatek@lists.infradead.org>, Hao Qin <hao.qin@mediatek.com>
+Subject: [PATCH] Bluetooth: btmtk: Remove resetting mt7921 before downloading the fw
+Date: Thu, 22 Aug 2024 13:23:10 +0800
+Message-ID: <20240822052310.25220-1-hao.qin@mediatek.com>
+X-Mailer: git-send-email 2.18.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-TM-AS-Product-Ver: SMEX-14.0.0.3152-9.1.1006-23728.005
+X-TM-AS-Result: No-10--4.498600-8.000000
+X-TMASE-MatchedRID: hQ3LGvLpFaKGsPek1xLHVhuZoNKc6pl+Kx5ICGp/WtGIoW+1yT7Gw43q
+	EYKsEnZO8DRYXhYkzdkwc9Bdak/KgMcUiDRLzlgWRlqShqb35p59LQinZ4QefPcjNeVeWlqY+gt
+	Hj7OwNO34ZhR52Rc1ar8VznWR013yuuTZ49+OrM4KkaNHlVdn53Hot+sf2xIPIBp7MM+pUoZl7Z
+	Lan9xbOfC4Kd09x+FJ9Wlxn6Xuslj+Nzym4pugNUma3zYT97IFAYfQIAUhBayZvmCbKVb49sZL6
+	x5U/HridGByp+zdaDg=
+X-TM-AS-User-Approved-Sender: No
+X-TM-AS-User-Blocked-Sender: No
+X-TMASE-Result: 10--4.498600-8.000000
+X-TMASE-Version: SMEX-14.0.0.3152-9.1.1006-23728.005
+X-TM-SNTS-SMTP:
+	CC8BD9FB5F7243A38A9609A53706687D8166E6C3555EE50B17BC3AC959645F4E2000:8
 
-On systems in the field, we are seeing this sometimes in the kernel logs:
-  Bluetooth: qca_controller_memdump() hci0: hci_devcd_init Return:-95
+Remove resetting mt7921 before downloading the fw, as it may cause
+command timeout when performing the reset.
 
-This means that _something_ decided that it wanted to get a memdump
-but then hci_devcd_init() returned -EOPNOTSUPP (AKA -95).
-
-The cleanup code in qca_controller_memdump() when we get back an error
-from hci_devcd_init() undoes most things but forgets to clear
-QCA_IBS_DISABLED. One side effect of this is that, during the next
-suspend, qca_suspend() will always get a timeout.
-
-Let's fix it so that we clear the bit.
-
-Fixes: 06d3fdfcdf5c ("Bluetooth: hci_qca: Add qcom devcoredump support")
-Reviewed-by: Guenter Roeck <groeck@chromium.org>
-Reviewed-by: Stephen Boyd <swboyd@chromium.org>
-Signed-off-by: Douglas Anderson <dianders@chromium.org>
+Signed-off-by: Hao Qin <hao.qin@mediatek.com>
 ---
+ drivers/bluetooth/btmtk.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
- drivers/bluetooth/hci_qca.c | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-index 45adc1560d94..efce3846d5fc 100644
---- a/drivers/bluetooth/hci_qca.c
-+++ b/drivers/bluetooth/hci_qca.c
-@@ -1091,6 +1091,7 @@ static void qca_controller_memdump(struct work_struct *work)
- 				qca->memdump_state = QCA_MEMDUMP_COLLECTED;
- 				cancel_delayed_work(&qca->ctrl_memdump_timeout);
- 				clear_bit(QCA_MEMDUMP_COLLECTION, &qca->flags);
-+				clear_bit(QCA_IBS_DISABLED, &qca->flags);
- 				mutex_unlock(&qca->hci_memdump_lock);
- 				return;
- 			}
+diff --git a/drivers/bluetooth/btmtk.c b/drivers/bluetooth/btmtk.c
+index 2b7c80043aa2..a46f70135cbd 100644
+--- a/drivers/bluetooth/btmtk.c
++++ b/drivers/bluetooth/btmtk.c
+@@ -1326,7 +1326,6 @@ int btmtk_usb_setup(struct hci_dev *hdev)
+ 		fwname = FIRMWARE_MT7668;
+ 		break;
+ 	case 0x7922:
+-	case 0x7961:
+ 	case 0x7925:
+ 		/* Reset the device to ensure it's in the initial state before
+ 		 * downloading the firmware to ensure.
+@@ -1334,7 +1333,8 @@ int btmtk_usb_setup(struct hci_dev *hdev)
+ 
+ 		if (!test_bit(BTMTK_FIRMWARE_LOADED, &btmtk_data->flags))
+ 			btmtk_usb_subsys_reset(hdev, dev_id);
+-
++		fallthrough;
++	case 0x7961:
+ 		btmtk_fw_get_filename(fw_bin_name, sizeof(fw_bin_name), dev_id,
+ 				      fw_version, fw_flavor);
+ 
 -- 
-2.46.0.184.g6999bdac58-goog
+2.18.0
 
