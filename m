@@ -1,272 +1,136 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f181.google.com (mail-lj1-f181.google.com [209.85.208.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A34613C9CB
-	for <linux-bluetooth@vger.kernel.org>; Thu, 22 Aug 2024 16:16:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39B831CCB42
+	for <linux-bluetooth@vger.kernel.org>; Thu, 22 Aug 2024 16:17:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724343387; cv=none; b=sm/KhgDQAMEtUwVPeGp02sxeAxbRoZYPFF6+VdbxgxPSwKLSClLFY76dZ57aRPHzVSimdgQpgBudr38YL2qp9Z/TWy9iI6AHLFEuFzz6O3fsy8bnp2lWe2O9YOzE74TI25GOFCc9vyQAUvKwmjg6IG2J9b/bz2yPP8Y++reSf5c=
+	t=1724343478; cv=none; b=QPxWY4aWFOBPZGQPcxZexu26jRC4I5A6+tyrUkyoY85cICALc9GKJuGcyhTg/LdbaewlZu+K5GDFDH58ippTYixW94V8GfA4pZpZquME+XcgJrbgIIq8SEvo+Vfhlvp497To49iJkjgbsIBDEI+L+hADaAxQ5fyhXS3f85aYjGs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724343387; c=relaxed/simple;
-	bh=1mJqwM31urFbryjqXOPnwIrHWrrskwz7oXqYF9Wu6XI=;
-	h=Date:From:To:Cc:Subject:Message-ID; b=eoeEpQd1k9PokRCY4qFdwNnEidzz0blVV60drxTDv8JeOiRSxUIdC3ujI8WrEe3cvnW0oOpPjpKRBfpr7dZNgSMiUTMDeoXhhgX/UMsdQND3RH356LVz9sjmkcSmNcvvC5A4YKjKfRdmpSKKPuDHl6LAvpD2ZjBfNOKpmQfaLaQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=a1HpEO/c; arc=none smtp.client-ip=192.198.163.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1724343478; c=relaxed/simple;
+	bh=UdS69SHHtL/Z2PrFGHX8onafPC6E1ZVxNrlhG+o9Vd0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Dq5ksLNd4Rjap16whcMGPPXR0Jv+GZ1FgB5serVyssNcsWMf8TRPwi/nolAhGi+Ap0MqvF/uMtnZU6triatj/78WB0x/r/rs0EEKGN9LtnRlAqn/LoGeKRsHXVNp7+wZQDEOHl6QRDrfGq3xe2U11Vpo42Aga8srbOUBV91GMDs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JyY8EUrD; arc=none smtp.client-ip=209.85.208.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="a1HpEO/c"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1724343384; x=1755879384;
-  h=date:from:to:cc:subject:message-id;
-  bh=1mJqwM31urFbryjqXOPnwIrHWrrskwz7oXqYF9Wu6XI=;
-  b=a1HpEO/cKT8I5ppte5Q/ga7b0jjx3tgAd2GBD1AL13bZCclo8BRTWhGG
-   7CUxZbgjKByUuMm4Ckg8daCrDKSt5TMMuTHNMjn0M/YVvmH+6++B/GiPV
-   4k0q5kGNq6SbhEWADyjteDJVvvhnPHq9VINCRCeCxrKYyH8ruEIH3cEvH
-   dbgxWmjd79MUL7NiGOt4WOplC1KdOrNDVNyMKRoZz1afqShTzkOLyPI+H
-   JuKICZdJX4rstHwVVMhCdTxtB8GNi7BOU6zb3QzDIIQYzUo5VP03DJAoi
-   CFeGbfizP7W4jn33KeaoxmXtU9BeAt9Tu0LbV7t8mzrG3yrYXLp1banrH
-   w==;
-X-CSE-ConnectionGUID: RxgQRf3gTxOYYqnAo9geFQ==
-X-CSE-MsgGUID: Qr4pGuBrTpiuemLIWZE1Rw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11172"; a="33438474"
-X-IronPort-AV: E=Sophos;i="6.10,167,1719903600"; 
-   d="scan'208";a="33438474"
-Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Aug 2024 09:16:20 -0700
-X-CSE-ConnectionGUID: TLf1A4uBQmeijZjsRpDFNQ==
-X-CSE-MsgGUID: lS/Bm7KTRBiEZOlLeWgssw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.10,167,1719903600"; 
-   d="scan'208";a="92242226"
-Received: from lkp-server01.sh.intel.com (HELO 9a732dc145d3) ([10.239.97.150])
-  by orviesa002.jf.intel.com with ESMTP; 22 Aug 2024 09:16:18 -0700
-Received: from kbuild by 9a732dc145d3 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1shATw-000CyD-0x;
-	Thu, 22 Aug 2024 16:16:16 +0000
-Date: Fri, 23 Aug 2024 00:15:25 +0800
-From: kernel test robot <lkp@intel.com>
-To: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: [bluetooth-next:master] BUILD SUCCESS
- a15c5bad17706e132334514a7502d6c0d67cd5d4
-Message-ID: <202408230022.zfI7HCaq-lkp@intel.com>
-User-Agent: s-nail v14.9.24
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JyY8EUrD"
+Received: by mail-lj1-f181.google.com with SMTP id 38308e7fff4ca-2f15790b472so10170351fa.0
+        for <linux-bluetooth@vger.kernel.org>; Thu, 22 Aug 2024 09:17:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1724343475; x=1724948275; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Lp4mOaMW/pf29YROwITKqZLopEXQJwUOPOrliRSH2ZY=;
+        b=JyY8EUrDqKmOoLMCLlterA/tgY4KbDGZViiFNP/WeAGI8MS5WoXwn75BTuWeW8xFLz
+         uA79jYLLuki8nHSR7A6miNc2Sau1w7joYRDm1MrHExQ2xDXQArH73W5vJFI9vbqf33jn
+         Mv0koNcVuv21bvdaR0plKKjy0BW3jqhHmKxTeWpa4Q9LgWtSLn3K8V/nQwhY6OaplSFw
+         wz7SNsKv+9KkBQtvMZE3VyMX+dmgKORragZxPOpta7YHFewJK5XfxjvuMB+Oc7jFSh8i
+         ErKlfEZJ9bo3LGpcvxUifgUFM/FGjP34gPUd8nD+sSRJyK4NsDs6jo0eGFDIr4rlynHi
+         Ro5Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724343475; x=1724948275;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Lp4mOaMW/pf29YROwITKqZLopEXQJwUOPOrliRSH2ZY=;
+        b=B7BIaUwHKaz2TvEnRQj/+9fb6DdI5zZ62mQxx2rJ+fVkdmgV1JqMavcK8rqVP7WCwK
+         qELB7Xi3/FiT2G+N1CiTS/xPHsv6I2EDww08cYZgDjGLtU2Z3agFRx3nbURlCKhyeyKi
+         9dW30b4Delj1Wo8XoDjAWNI+uIERtwkAvZDu+0UbKnjpjdqwNjbsQYP9E7i6lHNBJMcI
+         wCIXAV5HdUWZbOIT+f0dXQOazmk+jIQ0lIrCe/zzpDJ3hdzVZaTaAgwPY2Hz93M3ulSy
+         1NLdgbFFsUcwtkD0IlbfKNrcNWDBuIpPtRK35T+SKd/gT9EHVuwfK3zNmhuEYAOUJ8xq
+         3PRg==
+X-Gm-Message-State: AOJu0YxW48hnRrEuDu/ze2pAZPUzPRRXtvYn9yawJf9gUR/85MXplvEI
+	qtNRsRcE1al1mxCeFtJZFPqK4mIfvDMnMuSDpoKAAYRBU+g1UKwJdm5or/JEDwXjwIeVLoHDPxO
+	zw9FIz9I4xQE+rbdD633FYeFQOPI=
+X-Google-Smtp-Source: AGHT+IEz0Q9poSlhWSXyRuTPbSOq1IMuejDmxkLRqtduae/kvC3vZnFHWJOGJAVr5BTqGZkhEyyt97bgSSDf5qVfLB4=
+X-Received: by 2002:a2e:be9e:0:b0:2ef:c281:54f7 with SMTP id
+ 38308e7fff4ca-2f3f893f342mr50536901fa.37.1724343474427; Thu, 22 Aug 2024
+ 09:17:54 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+References: <20240822113226.223790-1-kupper.benedek@gmail.com>
+In-Reply-To: <20240822113226.223790-1-kupper.benedek@gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Thu, 22 Aug 2024 12:17:42 -0400
+Message-ID: <CABBYNZJQvtOHiApjO-APPr4T459iu-1nxtvRnBkVAD0_iOEkCg@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] gatt-client: allow AcquireNotify when
+ characteristic has indicate flag
+To: Benedek Kupper <kupper.benedek@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org, 
+	Benedek Kupper <benedek.kupper@epitome.inc>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
-branch HEAD: a15c5bad17706e132334514a7502d6c0d67cd5d4  Bluetooth: btrtl: Use kvmemdup to simplify the code
+Hi Benedek,
 
-elapsed time: 1457m
+On Thu, Aug 22, 2024 at 7:32=E2=80=AFAM Benedek Kupper <kupper.benedek@gmai=
+l.com> wrote:
+>
+> From: Benedek Kupper <benedek.kupper@epitome.inc>
+>
+> StartNotify / StopNotify already correctly allows usage when the
+> characteristic indicate is present (simplify this check though),
+> apply the same to AcquireNotify.
+> ---
+>  src/gatt-client.c | 7 ++++---
+>  1 file changed, 4 insertions(+), 3 deletions(-)
+>
+> diff --git a/src/gatt-client.c b/src/gatt-client.c
+> index 8d83a9577..a67e04eee 100644
+> --- a/src/gatt-client.c
+> +++ b/src/gatt-client.c
+> @@ -1556,7 +1556,8 @@ static DBusMessage *characteristic_acquire_notify(D=
+BusConnection *conn,
+>         if (!queue_isempty(chrc->notify_clients))
+>                 return btd_error_in_progress(msg);
+>
+> -       if (!(chrc->props & BT_GATT_CHRC_PROP_NOTIFY))
+> +       if (!(chrc->props & (BT_GATT_CHRC_PROP_NOTIFY |
+> +                       BT_GATT_CHRC_PROP_INDICATE)))
+>                 return btd_error_not_supported(msg);
+>
+>         client =3D notify_client_create(chrc, sender);
+> @@ -1601,8 +1602,8 @@ static DBusMessage *characteristic_start_notify(DBu=
+sConnection *conn,
+>         if (chrc->notify_io)
+>                 return btd_error_not_permitted(msg, "Notify acquired");
+>
+> -       if (!(chrc->props & BT_GATT_CHRC_PROP_NOTIFY ||
+> -                               chrc->props & BT_GATT_CHRC_PROP_INDICATE)=
+)
+> +       if (!(chrc->props & (BT_GATT_CHRC_PROP_NOTIFY |
+> +                               BT_GATT_CHRC_PROP_INDICATE)))
+>                 return btd_error_not_supported(msg);
 
-configs tested: 195
-configs skipped: 7
+Afaik this is working according to the documentation:
 
-The following configs have been built successfully.
-More configs may be tested in the coming days.
+'Only works with characteristic that has NotifyAcquired property which
+relies on "notify" Flag and no other client have called
+StartNotify().'
 
-tested configs:
-alpha                             allnoconfig   gcc-13.2.0
-alpha                             allnoconfig   gcc-13.3.0
-alpha                            allyesconfig   gcc-13.3.0
-alpha                               defconfig   gcc-13.2.0
-arc                              allmodconfig   gcc-13.2.0
-arc                               allnoconfig   gcc-13.2.0
-arc                              allyesconfig   gcc-13.2.0
-arc                          axs103_defconfig   gcc-13.2.0
-arc                                 defconfig   gcc-13.2.0
-arc                     nsimosci_hs_defconfig   gcc-13.2.0
-arc                   randconfig-001-20240822   gcc-13.2.0
-arc                   randconfig-002-20240822   gcc-13.2.0
-arm                              allmodconfig   gcc-13.2.0
-arm                              allmodconfig   gcc-14.1.0
-arm                               allnoconfig   clang-20
-arm                               allnoconfig   gcc-13.2.0
-arm                              allyesconfig   gcc-13.2.0
-arm                              allyesconfig   gcc-14.1.0
-arm                                 defconfig   gcc-13.2.0
-arm                      footbridge_defconfig   gcc-13.2.0
-arm                          ixp4xx_defconfig   gcc-13.2.0
-arm                            mmp2_defconfig   gcc-13.2.0
-arm                   randconfig-001-20240822   gcc-13.2.0
-arm                   randconfig-002-20240822   gcc-13.2.0
-arm                   randconfig-003-20240822   gcc-13.2.0
-arm                   randconfig-004-20240822   gcc-13.2.0
-arm                        shmobile_defconfig   gcc-13.2.0
-arm64                            allmodconfig   clang-20
-arm64                            allmodconfig   gcc-13.2.0
-arm64                             allnoconfig   gcc-13.2.0
-arm64                             allnoconfig   gcc-14.1.0
-arm64                               defconfig   gcc-13.2.0
-arm64                 randconfig-001-20240822   gcc-13.2.0
-arm64                 randconfig-002-20240822   gcc-13.2.0
-arm64                 randconfig-003-20240822   gcc-13.2.0
-arm64                 randconfig-004-20240822   gcc-13.2.0
-csky                              allnoconfig   gcc-13.2.0
-csky                              allnoconfig   gcc-14.1.0
-csky                                defconfig   gcc-13.2.0
-csky                  randconfig-001-20240822   gcc-13.2.0
-csky                  randconfig-002-20240822   gcc-13.2.0
-hexagon                          allmodconfig   clang-20
-hexagon                           allnoconfig   clang-20
-hexagon                          allyesconfig   clang-20
-i386                             allmodconfig   clang-18
-i386                             allmodconfig   gcc-12
-i386                              allnoconfig   clang-18
-i386                              allnoconfig   gcc-12
-i386                             allyesconfig   clang-18
-i386                             allyesconfig   gcc-12
-i386         buildonly-randconfig-001-20240822   gcc-12
-i386         buildonly-randconfig-002-20240822   gcc-12
-i386         buildonly-randconfig-003-20240822   clang-18
-i386         buildonly-randconfig-003-20240822   gcc-12
-i386         buildonly-randconfig-004-20240822   clang-18
-i386         buildonly-randconfig-004-20240822   gcc-12
-i386         buildonly-randconfig-005-20240822   gcc-12
-i386         buildonly-randconfig-006-20240822   gcc-12
-i386                                defconfig   clang-18
-i386                  randconfig-001-20240822   gcc-12
-i386                  randconfig-002-20240822   gcc-12
-i386                  randconfig-003-20240822   clang-18
-i386                  randconfig-003-20240822   gcc-12
-i386                  randconfig-004-20240822   clang-18
-i386                  randconfig-004-20240822   gcc-12
-i386                  randconfig-005-20240822   gcc-12
-i386                  randconfig-006-20240822   clang-18
-i386                  randconfig-006-20240822   gcc-12
-i386                  randconfig-011-20240822   clang-18
-i386                  randconfig-011-20240822   gcc-12
-i386                  randconfig-012-20240822   clang-18
-i386                  randconfig-012-20240822   gcc-12
-i386                  randconfig-013-20240822   clang-18
-i386                  randconfig-013-20240822   gcc-12
-i386                  randconfig-014-20240822   gcc-12
-i386                  randconfig-015-20240822   gcc-12
-i386                  randconfig-016-20240822   clang-18
-i386                  randconfig-016-20240822   gcc-12
-loongarch                        allmodconfig   gcc-14.1.0
-loongarch                         allnoconfig   gcc-13.2.0
-loongarch                         allnoconfig   gcc-14.1.0
-loongarch                           defconfig   gcc-13.2.0
-loongarch                 loongson3_defconfig   gcc-13.2.0
-loongarch             randconfig-001-20240822   gcc-13.2.0
-loongarch             randconfig-002-20240822   gcc-13.2.0
-m68k                             allmodconfig   gcc-14.1.0
-m68k                              allnoconfig   gcc-13.2.0
-m68k                              allnoconfig   gcc-14.1.0
-m68k                             allyesconfig   gcc-14.1.0
-m68k                                defconfig   gcc-13.2.0
-m68k                            q40_defconfig   gcc-13.2.0
-m68k                           virt_defconfig   gcc-13.2.0
-microblaze                       allmodconfig   gcc-14.1.0
-microblaze                        allnoconfig   gcc-13.2.0
-microblaze                        allnoconfig   gcc-14.1.0
-microblaze                       allyesconfig   gcc-14.1.0
-microblaze                          defconfig   gcc-13.2.0
-mips                              allnoconfig   gcc-13.2.0
-mips                              allnoconfig   gcc-14.1.0
-mips                    maltaup_xpa_defconfig   gcc-13.2.0
-nios2                             allnoconfig   gcc-13.2.0
-nios2                             allnoconfig   gcc-14.1.0
-nios2                               defconfig   gcc-13.2.0
-nios2                 randconfig-001-20240822   gcc-13.2.0
-nios2                 randconfig-002-20240822   gcc-13.2.0
-openrisc                          allnoconfig   gcc-14.1.0
-openrisc                         allyesconfig   gcc-14.1.0
-openrisc                            defconfig   gcc-14.1.0
-parisc                           allmodconfig   gcc-14.1.0
-parisc                            allnoconfig   gcc-14.1.0
-parisc                           allyesconfig   gcc-14.1.0
-parisc                              defconfig   gcc-14.1.0
-parisc                randconfig-001-20240822   gcc-13.2.0
-parisc                randconfig-002-20240822   gcc-13.2.0
-parisc64                            defconfig   gcc-13.2.0
-powerpc                          allmodconfig   gcc-14.1.0
-powerpc                           allnoconfig   gcc-14.1.0
-powerpc                          allyesconfig   gcc-14.1.0
-powerpc                      bamboo_defconfig   gcc-13.2.0
-powerpc                     kmeter1_defconfig   gcc-13.2.0
-powerpc                 linkstation_defconfig   gcc-13.2.0
-powerpc64             randconfig-001-20240822   gcc-13.2.0
-powerpc64             randconfig-002-20240822   gcc-13.2.0
-powerpc64             randconfig-003-20240822   gcc-13.2.0
-riscv                            allmodconfig   gcc-14.1.0
-riscv                             allnoconfig   gcc-14.1.0
-riscv                            allyesconfig   gcc-14.1.0
-riscv                               defconfig   gcc-14.1.0
-riscv                 randconfig-001-20240822   gcc-13.2.0
-riscv                 randconfig-002-20240822   gcc-13.2.0
-s390                             allmodconfig   clang-20
-s390                              allnoconfig   clang-20
-s390                             allyesconfig   clang-20
-s390                             allyesconfig   gcc-14.1.0
-s390                                defconfig   gcc-14.1.0
-s390                  randconfig-001-20240822   gcc-13.2.0
-s390                  randconfig-002-20240822   gcc-13.2.0
-sh                               allmodconfig   gcc-14.1.0
-sh                                allnoconfig   gcc-13.2.0
-sh                                allnoconfig   gcc-14.1.0
-sh                               allyesconfig   gcc-14.1.0
-sh                                  defconfig   gcc-14.1.0
-sh                          landisk_defconfig   gcc-13.2.0
-sh                    randconfig-001-20240822   gcc-13.2.0
-sh                    randconfig-002-20240822   gcc-13.2.0
-sh                           se7724_defconfig   gcc-13.2.0
-sh                             sh03_defconfig   gcc-13.2.0
-sh                   sh7770_generic_defconfig   gcc-13.2.0
-sparc                            allmodconfig   gcc-14.1.0
-sparc64                             defconfig   gcc-14.1.0
-sparc64               randconfig-001-20240822   gcc-13.2.0
-sparc64               randconfig-002-20240822   gcc-13.2.0
-um                               allmodconfig   clang-20
-um                               allmodconfig   gcc-13.3.0
-um                                allnoconfig   clang-17
-um                               allyesconfig   gcc-12
-um                               allyesconfig   gcc-13.3.0
-um                                  defconfig   gcc-14.1.0
-um                             i386_defconfig   gcc-14.1.0
-um                    randconfig-001-20240822   gcc-13.2.0
-um                    randconfig-002-20240822   gcc-13.2.0
-um                           x86_64_defconfig   gcc-14.1.0
-x86_64                            allnoconfig   clang-18
-x86_64                           allyesconfig   clang-18
-x86_64       buildonly-randconfig-001-20240822   gcc-12
-x86_64       buildonly-randconfig-002-20240822   gcc-12
-x86_64       buildonly-randconfig-003-20240822   gcc-12
-x86_64       buildonly-randconfig-004-20240822   gcc-12
-x86_64       buildonly-randconfig-005-20240822   gcc-12
-x86_64       buildonly-randconfig-006-20240822   gcc-12
-x86_64                              defconfig   clang-18
-x86_64                              defconfig   gcc-11
-x86_64                randconfig-001-20240822   gcc-12
-x86_64                randconfig-002-20240822   gcc-12
-x86_64                randconfig-003-20240822   gcc-12
-x86_64                randconfig-004-20240822   gcc-12
-x86_64                randconfig-005-20240822   gcc-12
-x86_64                randconfig-006-20240822   gcc-12
-x86_64                randconfig-011-20240822   gcc-12
-x86_64                randconfig-012-20240822   gcc-12
-x86_64                randconfig-013-20240822   gcc-12
-x86_64                randconfig-014-20240822   gcc-12
-x86_64                randconfig-015-20240822   gcc-12
-x86_64                randconfig-016-20240822   gcc-12
-x86_64                randconfig-071-20240822   gcc-12
-x86_64                randconfig-072-20240822   gcc-12
-x86_64                randconfig-073-20240822   gcc-12
-x86_64                randconfig-074-20240822   gcc-12
-x86_64                randconfig-075-20240822   gcc-12
-x86_64                randconfig-076-20240822   gcc-12
-x86_64                          rhel-8.3-rust   clang-18
-xtensa                            allnoconfig   gcc-13.2.0
-xtensa                            allnoconfig   gcc-14.1.0
-xtensa                randconfig-001-20240822   gcc-13.2.0
-xtensa                randconfig-002-20240822   gcc-13.2.0
+https://github.com/bluez/bluez/blob/master/doc/org.bluez.GattCharacteristic=
+.rst#fd-uint16-acquirenotifydict-options-optional[1]
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+So if we want it to work with Indication as well then we need to
+change the documentation to reflect these changes, indication does
+mean one need to confirm the reception which is something that would
+require some work if done via fd, but in the other hand I think we are
+auto confirming in case of D-Bus since that is using a D-Bus signals
+so perhaps it would be fine to do the same with fd as well.
+
+>         /* Each client can only have one active notify session. */
+> --
+> 2.34.1
+>
+>
+
+
+--=20
+Luiz Augusto von Dentz
