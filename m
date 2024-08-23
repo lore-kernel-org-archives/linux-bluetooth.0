@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 351321A01A6;
-	Fri, 23 Aug 2024 20:01:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFDBF19B3C3;
+	Fri, 23 Aug 2024 20:10:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724443320; cv=none; b=T+8AwhsprP/HeanNFY1xGzVag9iW7QOgY8G5PiX0eVrB5Oas5i+RG3FkRN3dA9MwJ4dkFNmRJDuwuYQr6GmYeImoji4v1ZmeK7JFYyVrpHutzG+7tUnRa3E8ghDs/C8fR+/30ASb5/iYeVhTZthcmhwxXz142eGIk88sV/doB+A=
+	t=1724443831; cv=none; b=DesK0N5Vgrn1nZABMepbhcA5q2J1g3tnZmvlTEemsIwduSErV4/uo0gBYQWSI/Bv0iEQWhtJTHAOv206ybtM8q6Z99myXlJ3y5LvAHhd22TrHnKqmr010lhfiKfJFbJ5b4snivod7e9Niff0xBxe3MqLIbYUTFL3q8XVJMaLsbM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724443320; c=relaxed/simple;
-	bh=aSWACHlXzLHKkcmfzNOd5WUEhgM4CMKEnL54qohj+2g=;
+	s=arc-20240116; t=1724443831; c=relaxed/simple;
+	bh=lcz14trCuLOJaC4+18sMdfiYHLkThfIvWwpfCzhfeDU=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=fhpxgB6NTWWhsVFt/alYe56s9ghE7OIXofjxwP2XAumR4+CKPcN7s1V0OOkpAJa3CH7yVgXejedf2LgoTwV0HGFxF/ietiEr83BbpvmXpIwSx4U0x1qaqYocmXn78dGqBJxuUegFuZbAp7Xf28cYqxxfgJBb00BY+YPzhp8rVb4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hXQDqrSy; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=uifsbNalWYWi8f6gFIgEBBBUXGbo4fssZHiuy5+eFMadCoRZl8upsjmK/Dyjm6JjVL14h0bDTtPDtXg3JZzYEL5DVDSneKDqQgxHxUDc5WXzrnOFZHhV2sv9u6UYHBa/I7i9GwtBkmxe/3dNvO2cwLu7gruX7qIL/UorTLixTJw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OcDwINt9; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hXQDqrSy"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B6137C32786;
-	Fri, 23 Aug 2024 20:01:59 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OcDwINt9"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 44289C32786;
+	Fri, 23 Aug 2024 20:10:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724443319;
-	bh=aSWACHlXzLHKkcmfzNOd5WUEhgM4CMKEnL54qohj+2g=;
+	s=k20201202; t=1724443831;
+	bh=lcz14trCuLOJaC4+18sMdfiYHLkThfIvWwpfCzhfeDU=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=hXQDqrSy1doTWV+Bih5K+RuoLl0W3CknnsF3LzwQeggo7ZwCGOnVsA+nAGVAWpJMJ
-	 D1TTilf5XyC4U1Um0c8CCtcwbbh0rb068yDPlFVSEmx9TVWiJvOYMMgkby4fJKmN/U
-	 21aS8Nm/qL7xBnL0eCxv6aLmMw7U2SJ34gr3mwp21yLiD9/Vwmmwdx3B0NECTKbRsV
-	 WKdz9kiXg1/mXt4YkUv/rJo3pnpOK/SfLAiVL5qjCRCRNST8MNNrKARB+w354RZHbM
-	 Z9XihpXqF0OY8QgQBkDDNClosaKMKhiXQUS4Ai79AjgIUW6fGrrZqUDBGnJ4JHy3dp
-	 p5SJitm2tnuMg==
+	b=OcDwINt9Hhmt/hRhRBn3JOh3+JCMDnB2Ypb/dsWj+PWv66ZNZefvndQkAm4kAeCFL
+	 4M3WegNmAEe1FuXFy1IV2/VZu87ihy1ZbdKEy2poRTkOk/zpJAGXZc1JbB7V3wadsq
+	 T1BUc9TB4XymjPkpi8axtlcKHLxNEYt5KIgtE806YHj2M3bqZZBMctiZYMZ7tZnqKJ
+	 6ykgvlztzB1pcVvUE0GtFp3F+jBLjQATbH6RcgXzIuItPTOFJKGwcx05Km3CySvgqG
+	 V1tKDvRrOu7qWtjPeco7NENpjghWRXNzSjM0DfkQORM2SYf/sQ35AkTD82e7cyCT+w
+	 4Do361H61NaMw==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AE17C3804C86;
-	Fri, 23 Aug 2024 20:02:00 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 349283804C86;
+	Fri, 23 Aug 2024 20:10:32 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -37,36 +37,41 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: pull request: bluetooth 2024-09-15
+Subject: Re: [REPOST PATCH] Bluetooth: qca: If memdump doesn't work, re-enable IBS
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <172444331929.3068205.4809543576405834132.git-patchwork-notify@kernel.org>
-Date: Fri, 23 Aug 2024 20:01:59 +0000
-References: <20240815171950.1082068-1-luiz.dentz@gmail.com>
-In-Reply-To: <20240815171950.1082068-1-luiz.dentz@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: davem@davemloft.net, kuba@kernel.org, linux-bluetooth@vger.kernel.org,
- netdev@vger.kernel.org
+ <172444383104.3074025.5017578776237520440.git-patchwork-notify@kernel.org>
+Date: Fri, 23 Aug 2024 20:10:31 +0000
+References: <20240821154339.REPOST.1.Ia769fe5fbeaa6aca2edfb01b82eb7df0c6955459@changeid>
+In-Reply-To: <20240821154339.REPOST.1.Ia769fe5fbeaa6aca2edfb01b82eb7df0c6955459@changeid>
+To: Doug Anderson <dianders@chromium.org>
+Cc: marcel@holtmann.org, luiz.dentz@gmail.com, groeck@chromium.org,
+ swboyd@chromium.org, johan+linaro@kernel.org, bartosz.golaszewski@linaro.org,
+ quic_saluvala@quicinc.com, linux-bluetooth@vger.kernel.org,
+ linux-kernel@vger.kernel.org
 
 Hello:
 
-This pull request was applied to bluetooth/bluetooth-next.git (master)
-by Jakub Kicinski <kuba@kernel.org>:
+This patch was applied to bluetooth/bluetooth-next.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Thu, 15 Aug 2024 13:19:50 -0400 you wrote:
-> The following changes since commit 9c5af2d7dfe18e3a36f85fad8204cd2442ecd82b:
+On Wed, 21 Aug 2024 15:43:40 -0700 you wrote:
+> On systems in the field, we are seeing this sometimes in the kernel logs:
+>   Bluetooth: qca_controller_memdump() hci0: hci_devcd_init Return:-95
 > 
->   Merge tag 'nf-24-08-15' of git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf (2024-08-15 13:25:06 +0200)
+> This means that _something_ decided that it wanted to get a memdump
+> but then hci_devcd_init() returned -EOPNOTSUPP (AKA -95).
 > 
-> are available in the Git repository at:
-> 
->   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2024-08-15
+> The cleanup code in qca_controller_memdump() when we get back an error
+> from hci_devcd_init() undoes most things but forgets to clear
+> QCA_IBS_DISABLED. One side effect of this is that, during the next
+> suspend, qca_suspend() will always get a timeout.
 > 
 > [...]
 
 Here is the summary with links:
-  - pull request: bluetooth 2024-09-15
-    https://git.kernel.org/bluetooth/bluetooth-next/c/2d7423040b7c
+  - [REPOST] Bluetooth: qca: If memdump doesn't work, re-enable IBS
+    https://git.kernel.org/bluetooth/bluetooth-next/c/61bea6923172
 
 You are awesome, thank you!
 -- 
