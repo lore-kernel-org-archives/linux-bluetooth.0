@@ -1,67 +1,89 @@
-Received: from out-17.smtp.github.com (out-17.smtp.github.com [192.30.252.200])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E2E81C174B
-	for <linux-bluetooth@vger.kernel.org>; Fri, 23 Aug 2024 20:32:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1125F3A8E4;
+	Sat, 24 Aug 2024 06:30:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724445143; cv=none; b=Ol9ZF6OMbqWy3Rb1be7DbygryuhycVeXDlozRNCo0rNZ5jAZSUSwcP3HiwRACrAULYWNjjyAg3rs/KG1U7E9u/1JhAkFCZWP7Y+6PCC5/YcESHKaY2Isf5/lNNUzAESPB4xaSEimJsY7HK6F0YiYBrhmCErK4DBhy47XK+ALYN0=
+	t=1724481033; cv=none; b=maYNKXaPyPSoC+plChn/lsUBQy+jtaZRuO4o0E+vzCU4y6i4ne6Tc5NYM6pyocVMeFun3Bvml41Htlj3Ml6YIrROp/AUj2DnwWkPE7fUIJjQ3ATANmxoZK6DQxC7TSAq/EeXUaTqEYQHRIRKjV6Dw04fzq2zZx04cZRE8t+P2ms=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724445143; c=relaxed/simple;
-	bh=QiP+WYNn2fB8a8vB7rT0ndUWxVOuszsp2XAcYOHaksA=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=fBYuBOCcBrL9mb0eFriuzHOKYr3bKusRkRK1s/Ut/pPZnriEBDdm7Mxp0PuJecCXFwQS+PZR/3poCZV55aCCJIBXRMRNLusOHzaRA3IkWGoIShRVh/fn8aN/y4DxjhLvDI1rISIDfEDyRUs9VEmebb0ZpBjnjXIkS1QE/1RHpk8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=DhXvn1x1; arc=none smtp.client-ip=192.30.252.200
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1724481033; c=relaxed/simple;
+	bh=8ZW0C1G6c5DfMKglNLllIKATSj5OZh1hs2/PFlDai9w=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=M7n1Vl+519W8matnbQxNrXecN5odiXvK7WL6OrJyuDKhRIK+8hIiDkyeqVlJnbUx8kS8PuDS3VsG1XHsQQYX656bY08A76T1FxG4Q47vH1y0GUbOVobPt6vqfqJP+8TZAc+Ms81iRFC9ECFX9vTNgOeFK1nGv/OX1JN/wDbIro4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cr64kY9q; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="DhXvn1x1"
-Received: from github.com (hubbernetes-node-ee2c532.va3-iad.github.net [10.48.206.59])
-	by smtp.github.com (Postfix) with ESMTPA id 325094E0B41
-	for <linux-bluetooth@vger.kernel.org>; Fri, 23 Aug 2024 13:32:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1724445141;
-	bh=MrvDMP+iM68+2qKa5gVHeqHB2qaWP6Nsi5uO2ycfIrQ=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=DhXvn1x1Aq/y+1rzZu0GvgQ9XoVnpBZEN5osRbODAUjOV/O2Yg9lHm4Jf1hjS4uDw
-	 yrHhLbl5Oij8Etww4Mt1ak3gTYlOzaKYlHUcWqmXcqpEJVyJt0rzCY7syM+EpMCNVl
-	 jWMsIq89JUi3Mq4du/POWJvlOMdTjEsBVXq0wEqs=
-Date: Fri, 23 Aug 2024 13:32:21 -0700
-From: Luiz Augusto von Dentz <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/master/a6ac17-4ed706@github.com>
-Subject: [bluez/bluez] 4ed706: test-uhid: Fix attempting to run when bt_uhid
- is NULL
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cr64kY9q"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A7037C32781;
+	Sat, 24 Aug 2024 06:30:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1724481032;
+	bh=8ZW0C1G6c5DfMKglNLllIKATSj5OZh1hs2/PFlDai9w=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=cr64kY9qomjZQwnaUs3S9tL8cnadlk4bWZdZ3p4xzqRTfzr1gWkH9F2gBgd4bchUk
+	 N0KiCn15ghXPcTQIdFJcgcFVv0vELid6xHMoUNuopdiNbUSCGCzGAbqUkCXf/sjBDJ
+	 y3VCNa8SaYLmx68RIw7SknV603mFxFdG9FeiuViLvja/1XKnMkti/C+mqaMX05l5fK
+	 TOc79q9MfQ41qbfzMDOmD5KarV2lyqC/wLhwxjzdkB8XptCW9g/x1QyM+leg+ghsU9
+	 RgzAbPWgmmrpZOUrI0MrlIkpEQvGgChK33NG56O8+CVcJ4SaYzEuWr2+AQ9ajwvllD
+	 Ej2rUnU0N4DeA==
+Date: Sat, 24 Aug 2024 08:30:23 +0200
+From: Krzysztof Kozlowski <krzk@kernel.org>
+To: Catalin Popescu <catalin.popescu@leica-geosystems.com>
+Cc: amitkumar.karwar@nxp.com, neeraj.sanjaykale@nxp.com, 
+	marcel@holtmann.org, luiz.dentz@gmail.com, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com, robh@kernel.org, krzk+dt@kernel.org, 
+	conor+dt@kernel.org, linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org, 
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	bsp-development.geo@leica-geosystems.com, customers.leicageo@pengutronix.de
+Subject: Re: [PATCH next 1/2] dt-bindings: net: bluetooth: nxp: support
+ multiple init baudrates
+Message-ID: <6he2msn6oj74isl4l3b2ivegfh6sf5rvqo6cqpcmoqrnvonka4@kesvvmd45l7i>
+References: <20240823124239.2263107-1-catalin.popescu@leica-geosystems.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20240823124239.2263107-1-catalin.popescu@leica-geosystems.com>
 
-  Branch: refs/heads/master
-  Home:   https://github.com/bluez/bluez
-  Commit: 4ed7060ca9dfcc89c55801f818b0b43db6f5acdd
-      https://github.com/bluez/bluez/commit/4ed7060ca9dfcc89c55801f818b0b43db6f5acdd
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2024-08-23 (Fri, 23 Aug 2024)
+On Fri, Aug 23, 2024 at 02:42:38PM +0200, Catalin Popescu wrote:
+> Make "fw-init-baudrate" a list of baudrates in order to support chips
+> using different baudrates assuming that we could not detect the
+> supported baudrate otherwise.
+> 
+> Signed-off-by: Catalin Popescu <catalin.popescu@leica-geosystems.com>
+> ---
+>  .../devicetree/bindings/net/bluetooth/nxp,88w8987-bt.yaml  | 7 ++++---
+>  1 file changed, 4 insertions(+), 3 deletions(-)
+> 
+> diff --git a/Documentation/devicetree/bindings/net/bluetooth/nxp,88w8987-bt.yaml b/Documentation/devicetree/bindings/net/bluetooth/nxp,88w8987-bt.yaml
+> index 37a65badb448..42e3713927de 100644
+> --- a/Documentation/devicetree/bindings/net/bluetooth/nxp,88w8987-bt.yaml
+> +++ b/Documentation/devicetree/bindings/net/bluetooth/nxp,88w8987-bt.yaml
+> @@ -25,11 +25,12 @@ properties:
+>  
+>    fw-init-baudrate:
+>      $ref: /schemas/types.yaml#/definitions/uint32
+> +    maxItems: 8
+>      default: 115200
+>      description:
+> -      Chip baudrate after FW is downloaded and initialized.
+> -      This property depends on the module vendor's
+> -      configuration.
+> +      List of chip baudrates after FW is downloaded and initialized.
+> +      The driver goes through the list until it founds a working baudrate.
+> +      This property depends on the module vendor's configuration.
+>  
 
-  Changed paths:
-    M unit/test-uhid.c
+You need to test your patch... and update the example and explain why
+changing from 1 to 8 items (so ABI break) is okay or needed.
 
-  Log Message:
-  -----------
-  test-uhid: Fix attempting to run when bt_uhid is NULL
+But even without updating the example, you would see errors when testing
+DTS, so this was never tested. :/
 
-When running under root there is a possibility the bt_uhid_new_default
-doesn't work (e.g. fakeroot) in which case the test shall be aborted
-since it is likely a device specific test case which would require
-proper permissions to run.
+Best regards,
+Krzysztof
 
-
-
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
