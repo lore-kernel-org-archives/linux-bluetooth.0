@@ -1,89 +1,91 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1125F3A8E4;
-	Sat, 24 Aug 2024 06:30:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5554539AEB;
+	Sat, 24 Aug 2024 17:37:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724481033; cv=none; b=maYNKXaPyPSoC+plChn/lsUBQy+jtaZRuO4o0E+vzCU4y6i4ne6Tc5NYM6pyocVMeFun3Bvml41Htlj3Ml6YIrROp/AUj2DnwWkPE7fUIJjQ3ATANmxoZK6DQxC7TSAq/EeXUaTqEYQHRIRKjV6Dw04fzq2zZx04cZRE8t+P2ms=
+	t=1724521076; cv=none; b=d1G0aBX366BTW9lfrZU9kdTftEME1Wkw8kpUiDTn4oJaNewyepQ13sUSOzUMKe2ibGqt5dHCp/X1ZewcQn37iENTDPnSB15pSUdR93BYjeeZIWWabBfXzfIyu6NwHhzmqcllU/kKyvJxkzXYOgQopsB7AqGGcUKRcCl1deE3yQk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724481033; c=relaxed/simple;
-	bh=8ZW0C1G6c5DfMKglNLllIKATSj5OZh1hs2/PFlDai9w=;
+	s=arc-20240116; t=1724521076; c=relaxed/simple;
+	bh=kvFHrsJZkycSTtQ8Bk9AGl8Z5ArrHeL5DmVbuvmclFs=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=M7n1Vl+519W8matnbQxNrXecN5odiXvK7WL6OrJyuDKhRIK+8hIiDkyeqVlJnbUx8kS8PuDS3VsG1XHsQQYX656bY08A76T1FxG4Q47vH1y0GUbOVobPt6vqfqJP+8TZAc+Ms81iRFC9ECFX9vTNgOeFK1nGv/OX1JN/wDbIro4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cr64kY9q; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=JI8SqpNgFRFsuZ7qLyqtHDlGCml+ZP0Ig4XDfAILHaXdDhzBnLAMxYV1Yedh3+deAXjSESPoR3ZMaEqxJWDL60MJVUW3O1WKqyCtIM0klD82+8LOivlXYUOQmSL5VbmpZZGX4vbUHQCHBEdLyuu6grENJjzTywyg/Uz/7/Yj/xM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UcQOtRSS; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cr64kY9q"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A7037C32781;
-	Sat, 24 Aug 2024 06:30:26 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UcQOtRSS"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C20A0C32781;
+	Sat, 24 Aug 2024 17:37:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724481032;
-	bh=8ZW0C1G6c5DfMKglNLllIKATSj5OZh1hs2/PFlDai9w=;
+	s=k20201202; t=1724521075;
+	bh=kvFHrsJZkycSTtQ8Bk9AGl8Z5ArrHeL5DmVbuvmclFs=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=cr64kY9qomjZQwnaUs3S9tL8cnadlk4bWZdZ3p4xzqRTfzr1gWkH9F2gBgd4bchUk
-	 N0KiCn15ghXPcTQIdFJcgcFVv0vELid6xHMoUNuopdiNbUSCGCzGAbqUkCXf/sjBDJ
-	 y3VCNa8SaYLmx68RIw7SknV603mFxFdG9FeiuViLvja/1XKnMkti/C+mqaMX05l5fK
-	 TOc79q9MfQ41qbfzMDOmD5KarV2lyqC/wLhwxjzdkB8XptCW9g/x1QyM+leg+ghsU9
-	 RgzAbPWgmmrpZOUrI0MrlIkpEQvGgChK33NG56O8+CVcJ4SaYzEuWr2+AQ9ajwvllD
-	 Ej2rUnU0N4DeA==
-Date: Sat, 24 Aug 2024 08:30:23 +0200
-From: Krzysztof Kozlowski <krzk@kernel.org>
-To: Catalin Popescu <catalin.popescu@leica-geosystems.com>
-Cc: amitkumar.karwar@nxp.com, neeraj.sanjaykale@nxp.com, 
-	marcel@holtmann.org, luiz.dentz@gmail.com, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, robh@kernel.org, krzk+dt@kernel.org, 
-	conor+dt@kernel.org, linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org, 
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	bsp-development.geo@leica-geosystems.com, customers.leicageo@pengutronix.de
-Subject: Re: [PATCH next 1/2] dt-bindings: net: bluetooth: nxp: support
- multiple init baudrates
-Message-ID: <6he2msn6oj74isl4l3b2ivegfh6sf5rvqo6cqpcmoqrnvonka4@kesvvmd45l7i>
-References: <20240823124239.2263107-1-catalin.popescu@leica-geosystems.com>
+	b=UcQOtRSSjWW7zN/YQVx94pfQM7OEZjl8Ds54OGdQiAOAW5oL3HOyRJ0Kq3JHAZCWE
+	 fGDWlGWjIFWupfgOc9PMidFqC/cycQ7l7bZo0RsmMSuQzJIZqCRdwX/vDbaBJu3NAI
+	 QV9DapgZmd2U330XSXZ7Hir30DvBzRjwaRpwxUCmv3jfmAWmLgK4cHYY2kEJ6//5ik
+	 +OHW8ifYBJ2TORxAAL2N7qMOe+8o7GTHA0dksMuO8GeLXr/7WmoIjKcHTWY/Qsyr8k
+	 O97PydhxV4jUDBBDQab1BfawVDXKPE6bZ+OCNa+H6tshQwV+0w/A/sKTGM6Ar9yp8o
+	 t7xBgjeHkolDg==
+Date: Sat, 24 Aug 2024 18:37:47 +0100
+From: Simon Horman <horms@kernel.org>
+To: Li Zetao <lizetao1@huawei.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, marcel@holtmann.org, johan.hedberg@gmail.com,
+	luiz.dentz@gmail.com, idryomov@gmail.com, xiubli@redhat.com,
+	dsahern@kernel.org, trondmy@kernel.org, anna@kernel.org,
+	chuck.lever@oracle.com, jlayton@kernel.org, neilb@suse.de,
+	okorniev@redhat.com, Dai.Ngo@oracle.com, tom@talpey.com,
+	jmaloy@redhat.com, ying.xue@windriver.com, linux@treblig.org,
+	jacob.e.keller@intel.com, willemb@google.com, kuniyu@amazon.com,
+	wuyun.abel@bytedance.com, quic_abchauha@quicinc.com,
+	gouhao@uniontech.com, netdev@vger.kernel.org,
+	linux-bluetooth@vger.kernel.org, ceph-devel@vger.kernel.org,
+	linux-nfs@vger.kernel.org, tipc-discussion@lists.sourceforge.net
+Subject: Re: [PATCH net-next 3/8] net: caif: use max() to simplify the code
+Message-ID: <20240824173747.GN2164@kernel.org>
+References: <20240822133908.1042240-1-lizetao1@huawei.com>
+ <20240822133908.1042240-4-lizetao1@huawei.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240823124239.2263107-1-catalin.popescu@leica-geosystems.com>
+In-Reply-To: <20240822133908.1042240-4-lizetao1@huawei.com>
 
-On Fri, Aug 23, 2024 at 02:42:38PM +0200, Catalin Popescu wrote:
-> Make "fw-init-baudrate" a list of baudrates in order to support chips
-> using different baudrates assuming that we could not detect the
-> supported baudrate otherwise.
+On Thu, Aug 22, 2024 at 09:39:03PM +0800, Li Zetao wrote:
+> When processing the tail append of sk buffer, the final length needs
+> to be determined based on expectlen and addlen. Using max() here can
+> increase the readability of the code.
 > 
-> Signed-off-by: Catalin Popescu <catalin.popescu@leica-geosystems.com>
+> Signed-off-by: Li Zetao <lizetao1@huawei.com>
 > ---
->  .../devicetree/bindings/net/bluetooth/nxp,88w8987-bt.yaml  | 7 ++++---
->  1 file changed, 4 insertions(+), 3 deletions(-)
+>  net/caif/cfpkt_skbuff.c | 6 ++----
+>  1 file changed, 2 insertions(+), 4 deletions(-)
 > 
-> diff --git a/Documentation/devicetree/bindings/net/bluetooth/nxp,88w8987-bt.yaml b/Documentation/devicetree/bindings/net/bluetooth/nxp,88w8987-bt.yaml
-> index 37a65badb448..42e3713927de 100644
-> --- a/Documentation/devicetree/bindings/net/bluetooth/nxp,88w8987-bt.yaml
-> +++ b/Documentation/devicetree/bindings/net/bluetooth/nxp,88w8987-bt.yaml
-> @@ -25,11 +25,12 @@ properties:
+> diff --git a/net/caif/cfpkt_skbuff.c b/net/caif/cfpkt_skbuff.c
+> index 2ae8cfa3df88..96236d21b18e 100644
+> --- a/net/caif/cfpkt_skbuff.c
+> +++ b/net/caif/cfpkt_skbuff.c
+> @@ -298,10 +298,8 @@ struct cfpkt *cfpkt_append(struct cfpkt *dstpkt,
+>  	if (unlikely(is_erronous(dstpkt) || is_erronous(addpkt))) {
+>  		return dstpkt;
+>  	}
+> -	if (expectlen > addlen)
+> -		neededtailspace = expectlen;
+> -	else
+> -		neededtailspace = addlen;
+> +
+> +	neededtailspace = max(expectlen, addlen);
+
+The types of all three variables involved here are u16,
+so this looks correct to me. And the code replaced
+seems to be an open coding of max() both in intent and function.
+
+Reviewed-by: Simon Horman <horms@kernel.org>
+
 >  
->    fw-init-baudrate:
->      $ref: /schemas/types.yaml#/definitions/uint32
-> +    maxItems: 8
->      default: 115200
->      description:
-> -      Chip baudrate after FW is downloaded and initialized.
-> -      This property depends on the module vendor's
-> -      configuration.
-> +      List of chip baudrates after FW is downloaded and initialized.
-> +      The driver goes through the list until it founds a working baudrate.
-> +      This property depends on the module vendor's configuration.
->  
-
-You need to test your patch... and update the example and explain why
-changing from 1 to 8 items (so ABI break) is okay or needed.
-
-But even without updating the example, you would see errors when testing
-DTS, so this was never tested. :/
-
-Best regards,
-Krzysztof
-
+>  	if (dst->tail + neededtailspace > dst->end) {
+>  		/* Create a dumplicate of 'dst' with more tail space */
