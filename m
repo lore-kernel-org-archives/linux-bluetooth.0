@@ -1,142 +1,104 @@
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
+Received: from mail-qt1-f170.google.com (mail-qt1-f170.google.com [209.85.160.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 928E0321D
-	for <linux-bluetooth@vger.kernel.org>; Sun, 25 Aug 2024 20:59:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6462D47A6A
+	for <linux-bluetooth@vger.kernel.org>; Sun, 25 Aug 2024 22:42:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724619589; cv=none; b=P1R7bZd8fLP6dyb52+SSxBzSqbpMPplrGWe8ziBHIBu6zU2nVsq9bemNZj8ro6m0U4fj5lqhyTAXgVwMtCf4XwCr+sy5R2l2Kt7QqVyYN8xXmHJUvlIeaenDury9dFgbdETulN6oy7x6+RZiAuDxbbkB9OBGu5iASQ7Q8A4nHO0=
+	t=1724625747; cv=none; b=AsOa6ZnY5n6KuPUShagwia5f6yasmjnHAVGqIL/xyAm6PvFEXOlRh93lFu4BIEmeM0MJmnzyZJwJMjyoeJhzRHuz/YAujq9I4XdPl7i7FkHO4gb2Zy7wktUriZlCqeL7hldUXATSLwfNc6cxNlgXvUQxRMM4nbGPutRqpLBehb4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724619589; c=relaxed/simple;
-	bh=yzRM8ubRIcfHEW/ijBjMyxMJQL0lF78Sxw4lfUrKPjk=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=jU+XuWqD+exIhcpKuC0R0hZ4GlNX9rseAfbzoadHBvj/l9UIahaUhJUBgH5w1kHvui7wn5JL2EUn5Jkvi+490EgHvRTfSCy6np8seZkvTmGvspqV85XCTSltYMxlJp2aBMhAC1vxoUJkQiXiM8OCcIgSa+tTBZmhP3934TJxRXc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ento0ZPW; arc=none smtp.client-ip=209.85.128.53
+	s=arc-20240116; t=1724625747; c=relaxed/simple;
+	bh=4JxIXRJI/6n5sfS32/TW31dyRg+Bna2I1ABdAtp2vXI=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=mQb66UN7BqomfG2ZmA23VDntrZhKJ+7vRCT6guV693j6nNUwdK0xbi55tC3AHveZ2bopNtIW/fMCo8Z6qWN9IGjny7GSOgsS6Qy5LPp+tLGuLvf1Kw787d733VVrVFCeu3WsO9YAhmQdLBAEB1O3rl7aNEUpLAFx2lKyd2hLC90=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ce21Uapb; arc=none smtp.client-ip=209.85.160.170
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ento0ZPW"
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-4281ca54fd3so32171465e9.2
-        for <linux-bluetooth@vger.kernel.org>; Sun, 25 Aug 2024 13:59:47 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ce21Uapb"
+Received: by mail-qt1-f170.google.com with SMTP id d75a77b69052e-454b3d89a18so20870101cf.2
+        for <linux-bluetooth@vger.kernel.org>; Sun, 25 Aug 2024 15:42:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1724619586; x=1725224386; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=8LAm/gcFco20+OvhIAZ3H5uHjdGcjGlEUIongsqcqi0=;
-        b=ento0ZPWK0QfREfIaObbxxusTqirTA/19iWIqPPfS0Rvj0nbC7rOi7ILsthe8F706K
-         JDBuTUJsGezQCmPScdo5W71HqxgxUNi9JGJF7WATqrwNpTdh0aWJgrPHZ8p7bVyWbhST
-         GjRWeY8irb+4C0OKlZazzrhgEA2HCTw4InWBwQhOEbaJhFT3QJXUAl66QYGBMcITVybG
-         fIIb1UUz2HKQKnvrRaXHzNOU6EgAehR6pkroUelCYE/3ousRYofFE5it4DzxL0a/I8bQ
-         iUatq06dWSQXQXjz0/2gga6+X5BIju4r9VG5nhcnFrE46lbamlhgv0Z2eMkTbEaUWr88
-         8VPA==
+        d=gmail.com; s=20230601; t=1724625745; x=1725230545; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=52OK6vPU5eJM7yNzj0UMQXLYl62Mxmz86+sm4ovwpcU=;
+        b=Ce21Uapbmn7+RoOiBShIWn7LjgCWq44hLOhn7HgRJUw+Bkxjc/l85s/7SpCMQinmrk
+         BXjNQRrIAFlz5aZS9sPqNBXLPwJ+z2dka8eayRkqOEaRRBhZgV5Eu/TOJrIxld1EiXAw
+         zyKUJaVZ28x8fhAVfgq2SnMJOHeW+P/3vRKoZlyYNq0cRojKShtH9PO7fWpfCCOsH6GW
+         9MLZlxpeuQUBRk3lvEWIixFriHpo4452iZpCWi5C4Uh+ihcG+ayPthcfU8RvwcXJmvAt
+         n0EsbMlME87QJlo0dTP4ILm8Qq8LEG3RIJqNdko6fdbfGSbSCIYOANItOPTlleYKrfbd
+         mXzw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724619586; x=1725224386;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20230601; t=1724625745; x=1725230545;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=8LAm/gcFco20+OvhIAZ3H5uHjdGcjGlEUIongsqcqi0=;
-        b=uTff7zXFZAo39c+vDp3DUCBvcdaSEQYmlaBHb5W3meXp3g4jhiRjemU11dwLNVO8jb
-         1TGMET80apIUPDoOKKpV7x2hQ/QDqaAkooxU7oyJoBQSVdFU+GpWUHqrUdSh1d/M64KW
-         vCSa0RvE/3hzoZDWB3ltHKDekFgBdbd3T8EpOkBY/sm+lj5xb3RvamrgUyajEzEvPkKl
-         voRb4I2HFidKS5lKGT0g6MSpJsh3vMPljYmiTvDiIiqHNeEMFU48HDfPr33GWQ68q8Tg
-         lk9DOksj/kXI2MLUb+gDt3qH28f1uSmrgIUs7/jPUrF3NJQhkeZ7knUz4gzzzH1UjgoT
-         3P5Q==
-X-Gm-Message-State: AOJu0YzP2bPqHsQkrQeEZ6VhLj1mZlTAyJvxFBL3L797HVGiFsVPXevq
-	Ob5bmXpLoZFEPAQ+Ezi69G54jDRda8qlwjUiy2J4Ij6FEOyo9VlKOr/hGQ==
-X-Google-Smtp-Source: AGHT+IEpLe9ibfBFGo+4SRpxAYWw8wDQvHt9xhxqvt/eQqrn4prdl1Edi/waXQp5j+js9Dbrs9aEMg==
-X-Received: by 2002:adf:f00a:0:b0:366:eeda:c32d with SMTP id ffacd0b85a97d-373118683fcmr4957351f8f.31.1724619585355;
-        Sun, 25 Aug 2024 13:59:45 -0700 (PDT)
-Received: from x1cx.uhrm.ch ([2a02:168:4f3f:7:4b00:1bb0:11f:418d])
-        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-42abed922b4sm169263975e9.11.2024.08.25.13.59.44
+        bh=52OK6vPU5eJM7yNzj0UMQXLYl62Mxmz86+sm4ovwpcU=;
+        b=FFe/fCWL4EvfZfjsXjKIu2zHoE5FX+HK3pCzj4ePqX0B56s5uQKdjfwwDxEOt5PgDS
+         OgxUFqx96FNQTPtx1um/leVdzirBM2XNQ4ZAV07EWfieltJiTbBYk8Fj2bdZKi6++3hG
+         Ue6ue+WlHMjaienKIwnLPyt1tXapGE/KZuTj9AS+pNH42VtkJpusaTQCA7EgouUIHKjY
+         BYI1f3Vyie+n867Syp8NmT/5nTraTVP/X6EXg0MefzMnjS3M4z/qkNSwmfawiGBhAAEt
+         zRmkyR7ADV7HyXvQ20eOdkQDWOYv9NVJkF/VmVVYpfa+edOmZi5suwnCrDa83MtiL5Lr
+         quqQ==
+X-Gm-Message-State: AOJu0Yw7LXOFYRAPqVPnMDT7WQMohBUJUJFr+oKfScZN9seFSlXM+kgo
+	OlZjQhotMRwZEm3oydB/PCE916/hZjLv4lRaC04tpOXeQEpph8hU9PLQVQ==
+X-Google-Smtp-Source: AGHT+IFXzALio1b6VueT8vO809FkhENgWEC86Izxn2Zu+GPpzIE+5BI760FZATsthU8yqYlhFuFFAg==
+X-Received: by 2002:a05:622a:5c97:b0:450:4536:16ad with SMTP id d75a77b69052e-455096fb5f8mr106156031cf.35.1724625744925;
+        Sun, 25 Aug 2024 15:42:24 -0700 (PDT)
+Received: from [172.17.0.2] ([20.55.118.246])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-454fdfc9cbesm38123471cf.14.2024.08.25.15.42.23
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 25 Aug 2024 13:59:44 -0700 (PDT)
-From: Markus Uhr <uhrmar@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Markus Uhr <uhrmar@gmail.com>
-Subject: [PATCH v2] Add pattern matching for service UUIDs
-Date: Sun, 25 Aug 2024 22:58:17 +0200
-Message-ID: <20240825205817.70066-1-uhrmar@gmail.com>
-X-Mailer: git-send-email 2.46.0
+        Sun, 25 Aug 2024 15:42:24 -0700 (PDT)
+Message-ID: <66cbb350.c80a0220.257424.c150@mx.google.com>
+Date: Sun, 25 Aug 2024 15:42:24 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============4083201615969333300=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, uhrmar@gmail.com
+Subject: RE: [v2] Add pattern matching for service UUIDs
+In-Reply-To: <20240825205817.70066-1-uhrmar@gmail.com>
+References: <20240825205817.70066-1-uhrmar@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-This commit extends the pattern matching capabilities of advertisement
-monitors with matching for service UUIDs. This functionality was lost
-with bc2ab4b (see #652) and not added with b0656c2.
+--===============4083201615969333300==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=883075
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.49 seconds
+GitLint                       PASS      0.33 seconds
+BuildEll                      PASS      24.72 seconds
+BluezMake                     PASS      1703.42 seconds
+MakeCheck                     PASS      12.88 seconds
+MakeDistcheck                 PASS      181.22 seconds
+CheckValgrind                 PASS      254.17 seconds
+CheckSmatch                   PASS      358.38 seconds
+bluezmakeextell               PASS      121.75 seconds
+IncrementalBuild              PASS      1588.75 seconds
+ScanBuild                     PASS      1048.78 seconds
+
+
+
 ---
- src/shared/ad.c | 48 ++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 48 insertions(+)
+Regards,
+Linux Bluetooth
 
-diff --git a/src/shared/ad.c b/src/shared/ad.c
-index d08ce7af9..53c4628b6 100644
---- a/src/shared/ad.c
-+++ b/src/shared/ad.c
-@@ -1362,6 +1362,46 @@ static bool match_manufacturer(const void *data, const void *user_data)
- 	return false;
- }
- 
-+static bool match_uuid(const void *data, const void *user_data)
-+{
-+	const bt_uuid_t *uuid = data;
-+	const struct pattern_match_info *info = user_data;
-+	const struct bt_ad_pattern *pattern;
-+
-+	if (!uuid || !info)
-+		return false;
-+
-+	if (info->matched_pattern)
-+		return false;
-+
-+	pattern = info->current_pattern;
-+
-+	if (!pattern)
-+		return false;
-+
-+	switch (pattern->type) {
-+	case BT_AD_UUID16_ALL:
-+	case BT_AD_UUID16_SOME:
-+		if (pattern->offset != 0 || pattern->len != sizeof(uint16_t))
-+			return false;
-+		break;
-+	case BT_AD_UUID32_ALL:
-+	case BT_AD_UUID32_SOME:
-+		if (pattern->offset != 0 || pattern->len != sizeof(uint32_t))
-+			return false;
-+		break;
-+	case BT_AD_UUID128_ALL:
-+	case BT_AD_UUID128_SOME:
-+		if (pattern->offset != 0 || pattern->len != sizeof(uint128_t))
-+			return false;
-+		break;
-+	default:
-+		return false;
-+	}
-+
-+	return !memcmp(&uuid->value, pattern->data, pattern->len);
-+}
-+
- static bool match_service(const void *data, const void *user_data)
- {
- 	const struct bt_ad_service_data *service_data = data;
-@@ -1451,6 +1491,14 @@ static void pattern_match(void *data, void *user_data)
- 		matched = queue_find(ad->manufacturer_data, match_manufacturer,
- 				user_data);
- 		break;
-+	case BT_AD_UUID16_ALL:
-+	case BT_AD_UUID16_SOME:
-+	case BT_AD_UUID32_ALL:
-+	case BT_AD_UUID32_SOME:
-+	case BT_AD_UUID128_ALL:
-+	case BT_AD_UUID128_SOME:
-+		matched = queue_find(ad->service_uuids, match_uuid, user_data);
-+		break;
- 	case BT_AD_SERVICE_DATA16:
- 	case BT_AD_SERVICE_DATA32:
- 	case BT_AD_SERVICE_DATA128:
--- 
-2.46.0
 
+--===============4083201615969333300==--
