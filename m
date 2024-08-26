@@ -1,208 +1,117 @@
-Received: from mail-lj1-f170.google.com (mail-lj1-f170.google.com [209.85.208.170])
+Received: from mail-lj1-f178.google.com (mail-lj1-f178.google.com [209.85.208.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C08EB28DC1
-	for <linux-bluetooth@vger.kernel.org>; Mon, 26 Aug 2024 21:13:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32B3313D53F
+	for <linux-bluetooth@vger.kernel.org>; Mon, 26 Aug 2024 21:17:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724706785; cv=none; b=YltG1hkW3bvd+lizhP1uUm1x5+nZusUEyqvnlcT+Bfv/GH14H8FpkJ0T2caHCbAPH76KqE+gXIgxEeRxqwOcR2HEoAyLQzHOJrq0b1ZqU71sS81YsOLpbfapioHChUaWVlUOphgiF2bsxoV6CUQYySlkP5GrGNmq3bK6S2DfN74=
+	t=1724707072; cv=none; b=NjmcuvzdhILc1x7wRsfkRc5WIHo9BKffQoHqgTRfEshJj4lgF8pG17Ue+zgBjYqmq/uEZhEh1XmwEzGHnJYXJFtnsMX6FzLOISwkwOOyQH7nT2stR9YZR/W0nwZGQ+qG7FBmtqeoxFDMkZuNEOOF34UJcFD/07ONPa3FwujJS1E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724706785; c=relaxed/simple;
-	bh=PxLsSiTXsPyDGXmiWDjv2zpzNcKFI4/SFUFhPSK+1EA=;
+	s=arc-20240116; t=1724707072; c=relaxed/simple;
+	bh=7ijOdi8bOwSWvOkRElKH74u2Ju/z++6QT43+lP3S1Go=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=nbNIkxkxRIt7aWKi71pBbtHD6J7D+8JgNzZ/JWHdTVVw3CezB5dxb4uRkDVXVFe3WUSt3tZlmQ8MAkDXCuZngjXXUusFhhxFUX7xHFvjVC/9hngQz7sLzTrtmBBAKGkjJmk4Y6ZZU8Txv5emaXyIpW/oL6whFXWL8hNOzMwAafQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mXqgR0+A; arc=none smtp.client-ip=209.85.208.170
+	 To:Cc:Content-Type; b=o4diJ4+p84Ro6nD9wJ7PO0x6ceSwVVSL6RxLtEhKxFNso3sfqoFPpS8ij2WtxLEOfATsjZC0D+0026NSiyvw8mejjy4QelPmme0Ri6gv0K+RpnM0883T+wj5OjdR9adCiQE7deMN6k/JYpNbNMh21mQDHtb+ZDUHNaTqF3KfSIU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BM/JCGRO; arc=none smtp.client-ip=209.85.208.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mXqgR0+A"
-Received: by mail-lj1-f170.google.com with SMTP id 38308e7fff4ca-2f3f07ac2dcso53166911fa.2
-        for <linux-bluetooth@vger.kernel.org>; Mon, 26 Aug 2024 14:13:03 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BM/JCGRO"
+Received: by mail-lj1-f178.google.com with SMTP id 38308e7fff4ca-2f409c87b07so55904011fa.0
+        for <linux-bluetooth@vger.kernel.org>; Mon, 26 Aug 2024 14:17:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1724706782; x=1725311582; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1724707068; x=1725311868; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=+EbJ/cULufonvqvLkFJ1WIOLVmKRz6tp0l9WMUOXDJY=;
-        b=mXqgR0+A7xXnT81zsykCrnM+G98PSJ9uOtKtLzAPHFQWf+tDW8Ll/jK3Eq1YSjz+75
-         yudFEAQy1mhTlfuxIZCtdgwE3P73Fjmj2NSyD6pVgDKO4tXs5G5Csi0Sx0XSB/q+ki5s
-         P3v5hdHrplJBhU1rq3JI4dnOUtYLiQIeDDsDN29epSoqXIi9B2Y4mDeMdl297taGNQgU
-         eTJ2svxHv65oXzicy553p9IPhIRuBeEyfaLMNtQfy9YkW8MlzrF9Kfvsn8n8rDm/fxC0
-         EsqBPJsfDkdPwlaLfi+QI7Fah0cFRiqi44Tv3mPwkaBQLu6OQdA9zLeOqxPsakl9RwGA
-         p9Zw==
+        bh=IuYaPXotbGFHhLBr0my5gI2UlBYNR105IVpHjw8DEK0=;
+        b=BM/JCGROF0js1ZrEWPi+6KiCoVV7WustjOc45jIvvoxW1sCMT7gUqjMcTeeSxNMx7h
+         3PHee+cBH35MLKRoTcye+5oerTScUVnsHpA62Ngkplc/TCQfAyPqokbh+w8EFEaDgvwb
+         SUPLte3SACfbvCuMmSU8I5C7r+0/9U4fqyVGNMpYBv3GyVDaY8v+UJFZVzV3xTBCHipb
+         UxIy6pUS2dB4l9GicJ1ryOmLQXhtQr7yUy5nChudnjRyHCag92avXUS1DjAxjPFNm3RN
+         N9gIjXfrtrZidEdLalv+BE276GKfLZhaJvln+31ukSy7iy7Y3xrj3O0vQAVuUzIGUXJ6
+         FNWQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724706782; x=1725311582;
+        d=1e100.net; s=20230601; t=1724707068; x=1725311868;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=+EbJ/cULufonvqvLkFJ1WIOLVmKRz6tp0l9WMUOXDJY=;
-        b=OAGe/veMoS2q8W3JM/udGdFja/dC2EyaFAcqs+ftP1YS+znUojf7OcRG7yfYPUcXmO
-         AUuo2lty5HH+mvkFmmeMzzPjKZwKdOz7lO2xo2PFZpLCTP0fIX5bY4c5QzJZx1Lo3uB1
-         zEZ4Xpm27yWh5SCOnLrzfcQzz8g/nZcl8BqSEUveqyzR/UKIhasOmpsgkGDHZIiuDgD1
-         CtVuBDft5is2lxZVJnY1rkRWV0u5K0a06zYFpJB42q+UJAIIMIXO88PBNV2TLYK2i/rn
-         GqVephY5Zf5jEcS5cuFITAvuCuazI+1+evvQohfQ8EfzxoP8RC0VFb6qLTzb1JCC/IGR
-         9OoA==
-X-Forwarded-Encrypted: i=1; AJvYcCWr5CGmGsQ4QWP00H+bO+PFGRfpPK4lv8Di/kK/tLBaNnh3PWJ0DGXcbAoYvoH4Ou0ZJ2ZhPJBw7S+pp+CHW2E=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzTnGiaGtThRY04OlqO0+hyrdGg5dsapoAF3pF/FTdG0xUK8m57
-	8BpeXs/HWrFjZEmOf3pcJ3HZg9D1BXGauMO2JQ6bcVuPhAN1Io1WAnhRyrljWyYff5xPHK+dhux
-	GTEyRTSAsOf2y91AvluKAkehRbmo=
-X-Google-Smtp-Source: AGHT+IEdrFm009HrbPBUQdMOZ/9CWzSgv7DhkOAAnH3ta6hF/BrHBLOQZkargUFRnFx48Ni2HuF95zxLuKkqMnurE3Y=
-X-Received: by 2002:a2e:bc25:0:b0:2ef:243b:6dce with SMTP id
- 38308e7fff4ca-2f4f5728c0bmr84683291fa.10.1724706780906; Mon, 26 Aug 2024
- 14:13:00 -0700 (PDT)
+        bh=IuYaPXotbGFHhLBr0my5gI2UlBYNR105IVpHjw8DEK0=;
+        b=kiPbMzB7LrDmpGP59iCr/99u1qSumvnZR3gcFVnHlqMYLauTVe3CniLPRA5RCr2kVk
+         hd2T/ATmYayk5i4odP7CQJmDD8CcTlpB7oXjmicBObZdRFoR8U/PhA+enZPMlV7uUogp
+         lllnNmC6CrDHCBr5i4pAyEBUeXQk1ZXR/cp69U8WtB/tHgasUjp9FBLx2DMBJdunjEdR
+         sKIgq0pUfEjXkiedDe06PZmXoCtKipsBLgDhKnzbOCrVfsBHmCmDuOH7Woja3n6Al8Tp
+         VTB6qKFA/u4vE8drGiGh4WtEiMGiwDRHWPKrkcxs4J6rEMzG4boYjnTTKaZSAUK/pvS5
+         D4+w==
+X-Forwarded-Encrypted: i=1; AJvYcCXrhd1qhr3qtF02BR2jOVQskJT9Ck0P4r78cxJPCPVCbpQaKo8axmvn6ayhNdYOLiaYiYCELPxIEnMZZGmrVsE=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyv6VB9AyfsLThOYvTnfrZeIajsCGmkEWQ5n42HCwehzmZcROnP
+	Fy3rx5EGi+z4FE6w5+zR5ulVD3Hffxkzf8bQGN4v+WSrE1nkwLvVMwIJ/nwPvMMmG46O9ghfihj
+	m+bs+tUTWJRqZwvmCTkQ4d0t78Qg=
+X-Google-Smtp-Source: AGHT+IG/Dtsj9Xj3CzNtxbjWM0ACisQ+54avm0LBZZjsDKPDb9itBRy/GI4mu63jlN8ACKLzGaTFSllKl6ThnHiBv9U=
+X-Received: by 2002:a2e:b8c2:0:b0:2f3:e5de:7ff1 with SMTP id
+ 38308e7fff4ca-2f4f4733210mr73362831fa.0.1724707067289; Mon, 26 Aug 2024
+ 14:17:47 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231211162729.1183207-1-xiaokeqinhealth@126.com> <55903fdb-e970-4b89-b620-daa93bad7811@archlinux.org>
-In-Reply-To: <55903fdb-e970-4b89-b620-daa93bad7811@archlinux.org>
+References: <20231211162718.1183182-1-xiaokeqinhealth@126.com> <170239802565.22444.13565680839471776744.git-patchwork-notify@kernel.org>
+In-Reply-To: <170239802565.22444.13565680839471776744.git-patchwork-notify@kernel.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 26 Aug 2024 17:12:47 -0400
-Message-ID: <CABBYNZ+X1gWovfui7Vyaag80PFz_1q4A_F7r=wpgF_gm9f9orA@mail.gmail.com>
-Subject: Re: [PATCH 1/2] adapter: Fix addr_type for smp_irk/ltk_info/link_key
-To: Robin Candau <antiz@archlinux.org>
+Date: Mon, 26 Aug 2024 17:17:35 -0400
+Message-ID: <CABBYNZJ8+t+ooibh1WRpM6YPiFwbbO82WHfv7nFmR1tYnaHv=g@mail.gmail.com>
+Subject: Re: [PATCH v2] Bluetooth: MGMT/SMP: Fix address type when using SMP
+ over BREDR/LE
+To: patchwork-bot+bluetooth@kernel.org
 Cc: Xiao Yao <xiaokeqinhealth@126.com>, linux-bluetooth@vger.kernel.org, 
-	Xiao Yao <xiaoyao@rock-chips.com>
+	xiaoyao@rock-chips.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
 Hi Xiao,
 
-On Fri, Dec 15, 2023 at 8:06=E2=80=AFPM Robin Candau <antiz@archlinux.org> =
-wrote:
+On Tue, Dec 12, 2023 at 11:20=E2=80=AFAM <patchwork-bot+bluetooth@kernel.or=
+g> wrote:
 >
-> On 12/11/23 17:27, Xiao Yao wrote:
+> Hello:
 >
-> From: Xiao Yao <xiaoyao@rock-chips.com>
+> This patch was applied to bluetooth/bluetooth-next.git (master)
+> by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 >
-> According to BLUETOOTH CORE SPECIFICATION Version 5.4 | Vol 3,
-> Part H, 2.4.24/2.4.25, The LE LTK and BR/EDR link keys can be
-> converted between each other, so the addr type can be either
-> BREDR or LE, so fix it.
+> On Tue, 12 Dec 2023 00:27:18 +0800 you wrote:
+> > From: Xiao Yao <xiaoyao@rock-chips.com>
+> >
+> > If two Bluetooth devices both support BR/EDR and BLE, and also
+> > support Secure Connections, then they only need to pair once.
+> > The LTK generated during the LE pairing process may be converted
+> > into a BR/EDR link key for BR/EDR transport, and conversely, a
+> > link key generated during the BR/EDR SSP pairing process can be
+> > converted into an LTK for LE transport. Hence, the link type of
+> > the link key and LTK is not fixed, they can be either an LE LINK
+> > or an ACL LINK.
+> >
+> > [...]
 >
-> Signed-off-by: Xiao Yao <xiaoyao@rock-chips.com>
-> ---
->  src/adapter.c | 20 ++++++++++++++------
->  1 file changed, 14 insertions(+), 6 deletions(-)
+> Here is the summary with links:
+>   - [v2] Bluetooth: MGMT/SMP: Fix address type when using SMP over BREDR/=
+LE
+>     https://git.kernel.org/bluetooth/bluetooth-next/c/d66abc0fbb27
 >
-> diff --git a/src/adapter.c b/src/adapter.c
-> index 86fff72bc..ee70b00d2 100644
-> --- a/src/adapter.c
-> +++ b/src/adapter.c
-> @@ -170,6 +170,7 @@ static GSList *conn_fail_list =3D NULL;
->
->  struct link_key_info {
->   bdaddr_t bdaddr;
-> + uint8_t bdaddr_type;
->   unsigned char key[16];
->   uint8_t type;
->   uint8_t pin_len;
-> @@ -3964,7 +3965,9 @@ static bool is_blocked_key(uint8_t key_type, uint8_=
-t *key_value)
->   return false;
->  }
->
-> -static struct link_key_info *get_key_info(GKeyFile *key_file, const char=
- *peer)
-> +static struct link_key_info *get_key_info(GKeyFile *key_file, const char=
- *peer,
-> + uint8_t bdaddr_type)
-> +
->  {
->   struct link_key_info *info =3D NULL;
->   char *str;
-> @@ -3976,6 +3979,7 @@ static struct link_key_info *get_key_info(GKeyFile =
-*key_file, const char *peer)
->   info =3D g_new0(struct link_key_info, 1);
->
->   str2ba(peer, &info->bdaddr);
-> + info->bdaddr_type =3D bdaddr_type;
->
->   if (!strncmp(str, "0x", 2))
->   str2buf(&str[2], info->key, sizeof(info->key));
-> @@ -4343,7 +4347,7 @@ static void load_link_keys(struct btd_adapter *adap=
-ter, GSList *keys,
->   struct link_key_info *info =3D l->data;
->
->   bacpy(&key->addr.bdaddr, &info->bdaddr);
-> - key->addr.type =3D BDADDR_BREDR;
-> + key->addr.type =3D info->bdaddr_type;
->   key->type =3D info->type;
->   memcpy(key->val, info->key, 16);
->   key->pin_len =3D info->pin_len;
-> @@ -4598,14 +4602,18 @@ static void load_conn_params(struct btd_adapter *=
-adapter, GSList *params)
->   btd_error(adapter->dev_id, "Load connection parameters failed");
->  }
->
-> -static uint8_t get_le_addr_type(GKeyFile *keyfile)
-> +static uint8_t get_addr_type(GKeyFile *keyfile)
->  {
->   uint8_t addr_type;
->   char *type;
->
-> + /* The AddressType is written to file only When dev->le is
-> + * set to true, as referenced in the update_technologies().
-> + * Therefore, When type is NULL, it default to BDADDR_BREDR.
-> + */
->   type =3D g_key_file_get_string(keyfile, "General", "AddressType", NULL)=
-;
->   if (!type)
-> - return BDADDR_LE_PUBLIC;
-> + return BDADDR_BREDR;
->
->   if (g_str_equal(type, "public"))
->   addr_type =3D BDADDR_LE_PUBLIC;
-> @@ -4914,9 +4922,9 @@ static void load_devices(struct btd_adapter *adapte=
-r)
->   g_clear_error(&gerr);
->   }
->
-> - key_info =3D get_key_info(key_file, entry->d_name);
-> + bdaddr_type =3D get_addr_type(key_file);
->
-> - bdaddr_type =3D get_le_addr_type(key_file);
-> + key_info =3D get_key_info(key_file, entry->d_name, bdaddr_type);
->
->   ltk_info =3D get_ltk_info(key_file, entry->d_name, bdaddr_type);
->
->
-> Hello,
->
-> It seems like the above commit introduced a regression where the initial =
-auto-connect for Bluetooth devices doesn't work anymore.
->
-> Indeed, at system startup, starting a Bluetooth device will cause it to g=
-o in a "connected/disconnected" state loop, requiring to initialize a manua=
-l connection first (with sometimes multiple attempts needed) before getting=
- it connected correctly and working as intended.
->
-> `systemctl status bluetooth` reports the following error:
->
-> [...]
-> d=C3=A9c. 15 11:03:18 Arch-Desktop bluetoothd[592]: Failed to load link k=
-eys for hci0: Invalid Parameters (0x0d)
-> [...]
->
-> I bisected the bug with `git bisect` and it pointed out this commit [1] a=
-s the "faulty" one.
-> I can confirm that reverting it solves the issue.
->
-> I reported this bug including details in the GitHub repo [2].
->
-> I remain available if any additional information are needed.
->
-> [1] https://github.com/bluez/bluez/commit/d5536e0cd431e22be9a1132be6d4af2=
-445590633
-> [2] https://github.com/bluez/bluez/issues/686
->
+> You are awesome, thank you!
 > --
-> Regards,
-> Robin Candau / Antiz
+> Deet-doot-dot, I am a bot.
+> https://korg.docs.kernel.org/patchwork/pwbot.html
 
-Perhaps related to:
-https://github.com/bluez/bluez/issues/875#issuecomment-2311100872?
+So this changes introduced a regression, the
+MGMT_OP_LOAD_LONG_TERM_KEYS doesn't accept BR/EDR keys of LTK, besides
+I think some combination old_kernel+new_userspace and
+new_kerne+old_userspace where also broken in the process.
+
+>
+>
+>
+
+
 --=20
 Luiz Augusto von Dentz
