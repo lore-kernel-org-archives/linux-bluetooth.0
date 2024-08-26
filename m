@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E89FF1946B8;
-	Mon, 26 Aug 2024 16:00:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F068E10A0D;
+	Mon, 26 Aug 2024 17:00:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724688028; cv=none; b=N8+c0as2jPdQ72UxYVFK8Nu2aFg0lRdtbWoRlbDkFbo6SuhEJl4RSp3JraOWuZdBNc3N2oRV2TmO3jVLB90oHj14ytUkcdtPfhFVzk7wtap5dCupIxIeTUGpx/LJwXlcN/X1HpXmk18qXbg9xa7WUpxtv+RtMIH8wVUOBHVCdeo=
+	t=1724691629; cv=none; b=TIchx5atzOEZgCAxayyGkJei1JKD6RjX/LIUlf9dE9c2xOmj706griKEtWYq/Kz8wcsaXwXw9wRsq+/mBJgz1FeplMyk555RYoO+FHHonSdx2lePyEnKICYCfpzJpCml5GdxxyUYGSaCSP3NFpbhLk5veB0HRJK184MC7VY5E2s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724688028; c=relaxed/simple;
-	bh=i4VPrvL8MtEb6RByDzrZ9U7Fn5YAOXXC3WE7cvKBYRU=;
+	s=arc-20240116; t=1724691629; c=relaxed/simple;
+	bh=doOdWMqY3vxQVLC7/mSNh1GfH3I58afGjOrUy2ZiPgQ=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=YXKX9CcrQ/+1G7/pfO6BLRQVuFn+GCsH673C250phOaApJpjur+qKqKwxY3vfvf2dhTrssTUKddHyNFzUJfL3IBP1h2KAgZ82QZeZ803EVg/Q2RiO5lhSQeyWV3NlwHn7Qq2MywpQKvv0M5LwhQxPrHZOfZYrU9btNnEMA476kw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lBdfOApq; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=pPzoeg2A9ivVpkQ9ccDlfN+rP/KUe360qQ5piEQbD6oVYLgCNqhtBMh6bOU5JB4Qqa1O6icEadAqZo3kEo2uYyoQK89P9685PjaHyIiM6NRcFLjyJ7wsl7s3nJH7aI0VoPX/U3ykN4wDNZit699FdFUTW2W4FhdsKGvwl/vNoA8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=a2by0JeI; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lBdfOApq"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 78D63C4E671;
-	Mon, 26 Aug 2024 16:00:27 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="a2by0JeI"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 77687C4FF67;
+	Mon, 26 Aug 2024 17:00:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724688027;
-	bh=i4VPrvL8MtEb6RByDzrZ9U7Fn5YAOXXC3WE7cvKBYRU=;
+	s=k20201202; t=1724691628;
+	bh=doOdWMqY3vxQVLC7/mSNh1GfH3I58afGjOrUy2ZiPgQ=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=lBdfOApq8+yOutmFKxnHneFFIZHGMaAaY941hs4Wwk9k+UF+fBUcdsIVoPLaiR2Bg
-	 Xaq/iPlO1yckhrU+Ci0L/wPvoCtUa8WCNtjK4ZkowQ2VXNjkPVn6Ye0QWV2pfdzh/4
-	 xFTklPTexPPnTlVp0zixIeMCQORSkJPngNa5eM0bgudg53RhIT0W9v9O8z6qWSXbDR
-	 Mp8ED9nR5JZsC1n1rThPq171FNmNGg9uLD54uqQyTy7y0DivCpw47oYvsxOz9EI3LN
-	 l3grC4+rupoRgpHLcbgCYGutVpchK5Bw6DWgbuRuQAI5AY9M6EBJ79V+ei7odXCzPF
-	 E1TiHmcDtAxCg==
+	b=a2by0JeIDJ6W8C4t3xO65+9lLCYq4kKhcVyr4oGl+oWFKZ461G9FttZHaP5Xm9Nst
+	 +cukq2A8+WuWA2+jNnt4++zeBYU3r7r0pb0OUtSFakBksDi4vidJTSQESL1AzYwAvs
+	 RIrYW8zKiPuhUN8N6e7uvvtHsVz6F2JxWANtTxgOumpzYtZyLVrYehp30Wng1pfFV8
+	 JjhefHCT2M2i/jr1sa3ppsACgT43Jjl+5cSeOcUPLqp3s0Shl/FRuqaae5LjNV+MaP
+	 fAnZ+edWM6LAW5CbhVxbfeZOs1Jstcnd5wOGvJOHkihnFjPSLx8DMQH6w44WYhVzzo
+	 FYF6b9Y1FJcTQ==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADE8F3822D6D;
-	Mon, 26 Aug 2024 16:00:28 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AE38B3822D6D;
+	Mon, 26 Aug 2024 17:00:29 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -37,36 +37,66 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: pull request: bluetooth 2024-08-23
+Subject: Re: [PATCH net-next 0/8] Some modifications to optimize code readability
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <172468802751.52913.2477836895316729072.git-patchwork-notify@kernel.org>
-Date: Mon, 26 Aug 2024 16:00:27 +0000
-References: <20240823200008.65241-1-luiz.dentz@gmail.com>
-In-Reply-To: <20240823200008.65241-1-luiz.dentz@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: davem@davemloft.net, kuba@kernel.org, linux-bluetooth@vger.kernel.org,
- netdev@vger.kernel.org
+ <172469162851.70473.1457098908791177308.git-patchwork-notify@kernel.org>
+Date: Mon, 26 Aug 2024 17:00:28 +0000
+References: <20240822133908.1042240-1-lizetao1@huawei.com>
+In-Reply-To: <20240822133908.1042240-1-lizetao1@huawei.com>
+To: Li Zetao <lizetao1@huawei.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, marcel@holtmann.org, johan.hedberg@gmail.com,
+ luiz.dentz@gmail.com, idryomov@gmail.com, xiubli@redhat.com,
+ dsahern@kernel.org, trondmy@kernel.org, anna@kernel.org,
+ chuck.lever@oracle.com, jlayton@kernel.org, neilb@suse.de,
+ okorniev@redhat.com, Dai.Ngo@oracle.com, tom@talpey.com, jmaloy@redhat.com,
+ ying.xue@windriver.com, linux@treblig.org, jacob.e.keller@intel.com,
+ willemb@google.com, kuniyu@amazon.com, wuyun.abel@bytedance.com,
+ quic_abchauha@quicinc.com, gouhao@uniontech.com, netdev@vger.kernel.org,
+ linux-bluetooth@vger.kernel.org, ceph-devel@vger.kernel.org,
+ linux-nfs@vger.kernel.org, tipc-discussion@lists.sourceforge.net
 
 Hello:
 
-This pull request was applied to netdev/net.git (main)
+This series was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Fri, 23 Aug 2024 16:00:08 -0400 you wrote:
-> The following changes since commit 8af174ea863c72f25ce31cee3baad8a301c0cf0f:
+On Thu, 22 Aug 2024 21:39:00 +0800 you wrote:
+> This patchset is mainly optimized for readability in contexts where size
+> needs to be determined. By using min() or max(), or even directly
+> removing redundant judgments (such as the 5th patch), the code is more
+> consistent with the context.
 > 
->   net: mana: Fix race of mana_hwc_post_rx_wqe and new hwc response (2024-08-23 14:24:24 +0100)
-> 
-> are available in the Git repository at:
-> 
->   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2024-08-23
+> Li Zetao (8):
+>   atm: use min() to simplify the code
+>   Bluetooth: use min() to simplify the code
+>   net: caif: use max() to simplify the code
+>   libceph: use min() to simplify the code
+>   net: remove redundant judgments to simplify the code
+>   ipv6: mcast: use min() to simplify the code
+>   tipc: use min() to simplify the code
+>   SUNRPC: use min() to simplify the code
 > 
 > [...]
 
 Here is the summary with links:
-  - pull request: bluetooth 2024-08-23
-    https://git.kernel.org/netdev/net/c/31a972959ae5
+  - [net-next,1/8] atm: use min() to simplify the code
+    (no matching commit)
+  - [net-next,2/8] Bluetooth: use min() to simplify the code
+    (no matching commit)
+  - [net-next,3/8] net: caif: use max() to simplify the code
+    https://git.kernel.org/netdev/net-next/c/b4985aa8e312
+  - [net-next,4/8] libceph: use min() to simplify the code
+    (no matching commit)
+  - [net-next,5/8] net: remove redundant judgments to simplify the code
+    (no matching commit)
+  - [net-next,6/8] ipv6: mcast: use min() to simplify the code
+    https://git.kernel.org/netdev/net-next/c/26549dab8a46
+  - [net-next,7/8] tipc: use min() to simplify the code
+    https://git.kernel.org/netdev/net-next/c/a18308623ce3
+  - [net-next,8/8] SUNRPC: use min() to simplify the code
+    (no matching commit)
 
 You are awesome, thank you!
 -- 
