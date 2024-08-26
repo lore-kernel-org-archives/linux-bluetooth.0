@@ -1,194 +1,172 @@
-Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from CH1PR05CU001.outbound.protection.outlook.com (mail-northcentralusazon11020110.outbound.protection.outlook.com [52.101.193.110])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C1B919412F
-	for <linux-bluetooth@vger.kernel.org>; Mon, 26 Aug 2024 17:38:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.172
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724693929; cv=none; b=HhXqc/su+k0nPOcP0kjzLQj7AUUdq/qn6SaHwrQu2Pcp17iNwq2mJnmb/N9jXFOsTXmXfta6XiwURGth3ljn8xPXPwQh+pkmT3D8y4GZrmN8cxpYR4jubvE+QsgSGZQgVR5bOzbXFVtjyGo7eWFLOykN12vGNg+X2xDRaMQgdgk=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724693929; c=relaxed/simple;
-	bh=IEL9mcKuoi6p93sB9gx45tD7+aLeEpBPem+FwW3oFV4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=V+U703uFdl3VbzgbY9xBEQtRjUh7bPlKTUGP+dPxTL1WavDXpywFgqebyjDBUzbGDFGxv9U2/vnf8CRS38eQjlLVkLeB96FtMib/Kbgj48/snWwh4R4HgaFN+a6ziK7KQq2CyXLLS2F2VFU8KUbqYhOsoQPBsUA/+oUGJee5Mcc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cACk45HS; arc=none smtp.client-ip=209.85.210.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E15E18E057
+	for <linux-bluetooth@vger.kernel.org>; Mon, 26 Aug 2024 18:06:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.193.110
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1724695570; cv=fail; b=mcktTXPjgGUGD82DCcnXW39PAznecJs5v604L/qKy6lR9dzLp6x3yN9zcKkG7I06wgAzFB/bmu/vvEstY9kmdmCh0SR20a4ze/jxLzg0Jx4a+TOakXXI6HbbsuWVOobkHypzPiKzMS100pSm+UMrpf94zJN3qlHyy8cb/lqW690=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1724695570; c=relaxed/simple;
+	bh=zMnBUDysvhh67BMdE9TmB7ngYr3HpnrFrK6WWtVjIWg=;
+	h=From:To:Subject:Date:Message-ID:Content-Type:MIME-Version; b=QgNjyz/VJWdD27n0nOdjvnaxTugle84+h8qL8Ioe9ndYqbBkDeJ4cdoAV8X+YVo+874LdSKj3oHFcQ0sdVLHRufr8m7hIih5OmIO1gap1Kr0YgtA6esAa3DQG5ph2nxj/tB8RKLuxUuvHfnXjVDD7Unp3Mr2gULgWw30jBNhzpQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=michaelburch.net; spf=pass smtp.mailfrom=michaelburch.net; dkim=pass (2048-bit key) header.d=michaelburch.net header.i=@michaelburch.net header.b=J9CLxWj5; arc=fail smtp.client-ip=52.101.193.110
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=michaelburch.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=michaelburch.net
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cACk45HS"
-Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-7140ff4b1e9so3622467b3a.3
-        for <linux-bluetooth@vger.kernel.org>; Mon, 26 Aug 2024 10:38:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1724693927; x=1725298727; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZtI5VlJZLIEFTTgL2T+lpjJvYe+gCRXPjG5WcgeEucM=;
-        b=cACk45HSvR95z1rRgK4l1XxWQh/rom+d7VjHnTw+LN7cKd5x9QmNvLBYMwxz3DWnEe
-         PnYBCOo+b5ZuqwOvMtJKwAzjbLr4PQSZMmBS3jjUfP4RNOmqv/sUKgvYwCpEvQI+X21g
-         aVVEqGIRC+nkZ58EeFl+/DD/qZ16UOHDsMbq8el9Zu0vs7Ia2f3/1THE/Oj08r27u+D2
-         +JD2AsErv03pai54BVXrSCY+DqWK4yzBerKEKb/G4SEB5o9e8k5iFsD9AXu4Tcnf32rS
-         nkWy1cE4sZ4yCFxMA0pKpQx0cWq8zTK9Hrn3BQXJ/6mCDAZY42KBspJFH2IpzTbvKeOb
-         7isA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724693927; x=1725298727;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ZtI5VlJZLIEFTTgL2T+lpjJvYe+gCRXPjG5WcgeEucM=;
-        b=Vri2vXZyJqCtNRjGty/IjIHz8UaJtffWIMH0LFu2Hm/feBCC3v24AMQC7nfY8TKLOX
-         nWXkIt6Focj1WrR658FP9P1fXu1585m8SrIuaRr2fevPqVLFZnk8o5Eget9iJytBRBkO
-         26ufNjtBjKz7C9KcJtnUnLcFKuOJZIdrABeeCar1Hjm/W1eSwMufkiKKEcFk5phHZPgV
-         bU/2QpIchLMlPJLP+T9ZnZf9zKmyj16b8kq+fBOh/VVFHTe9Uo8qzoBgeIOTjgvU4g0v
-         s2YQnmmhs/22y053Jak78rMV9inrRUxIq5KUNqEX9qfHM4Ka5AArhktMvOB6jSegXQn+
-         LnKQ==
-X-Gm-Message-State: AOJu0YysJOZJcA0upy3iSERTMPcnK2SXGYGCe3Sy3/vf8qmnEyMRM0bJ
-	EglstpoUPRBrNcwMCaPo+yuNUZGVr9+gKuViYKal+aW6b6NLqF+A/j2cMQ==
-X-Google-Smtp-Source: AGHT+IHLfRXeZEqDerqL4sIoALzhFUFa17T5bBjGqPAyI9fIlT2Z6UHCyu5O7oUBOr4v+afJRLQfeA==
-X-Received: by 2002:a05:6a20:9d91:b0:1c6:b0cc:c448 with SMTP id adf61e73a8af0-1ccc097b720mr308269637.43.1724693927240;
-        Mon, 26 Aug 2024 10:38:47 -0700 (PDT)
-Received: from apollo.localdomain ([2601:646:9d80:4380::2696])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71434309676sm7509299b3a.174.2024.08.26.10.38.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 26 Aug 2024 10:38:46 -0700 (PDT)
-From: Khem Raj <raj.khem@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Khem Raj <raj.khem@gmail.com>
-Subject: [PATCH BlueZ] Provide GNU basename compatible implementation
-Date: Mon, 26 Aug 2024 10:38:44 -0700
-Message-ID: <20240826173844.2918630-1-raj.khem@gmail.com>
-X-Mailer: git-send-email 2.46.0
+	dkim=pass (2048-bit key) header.d=michaelburch.net header.i=@michaelburch.net header.b="J9CLxWj5"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=wQgriWpdZviSG8P6l77eblKeNI9oQbFpo8JSXu5BajC2kmVKowqV2nyffYsjpTuq+T8VHe8xqfC8w7l6iwoNRi7/Nsmr/P4UqYgxRV9fE1b0I7qVw6Acsxc4xFnHUZY9aQ/BQUR35HZYQjHUNQVYd0wks/Q4nm+mBq2t8EwI97qf4LyoB+GFf+1pvy0OFerlPPk/CvKbbJgoyue0qXORtnr7kNb6l8Awf+Bv8QnIFtwbEY/tnEcZxtm/uhyk/MNdLd3CWXPFSM9FQC2qFymar/VOvutRKdXjrc8rizRhCgGR/729LUFcV51CL473QBoXn69iR03c4v43hK0lXeG1+Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=zMnBUDysvhh67BMdE9TmB7ngYr3HpnrFrK6WWtVjIWg=;
+ b=M9NwRkg1fqlrG1iO15mDMCCWjVRqXWEMK7J1pHuRCKS1kTc6rklf4A8cSQz+/N6ZM5KYoCM74hxjEVFXh5KCH+yEK9CMT3T1WOXyrN/F4rDAdUbkKyM+Xf+G58+EPGQ10PHmGm07sI3PF5go8pVMRLdshsb+yNSpHjDNWFI+9uj4FpljlCsNzokqz3nhIsvIlkFG/JY5XOkQ5GMpJPhU6EhV9Zisu230TtgRwkev8uJQBeFiCy23EP6pjAQjP4lruM4U9d3nDdN+1YoPsuR7FTlFIpzGVRWZkm6Zdeyld9X13y7l2OLNNWTyQRgwe2cXPPZcFbGkHBsY8IvDkv9ZzQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=michaelburch.net; dmarc=pass action=none
+ header.from=michaelburch.net; dkim=pass header.d=michaelburch.net; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=michaelburch.net;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=zMnBUDysvhh67BMdE9TmB7ngYr3HpnrFrK6WWtVjIWg=;
+ b=J9CLxWj5SmJcG3aTjlKukjRrGpLE4+NOE4tJs3TeMg5FD9kvXSAWXvC5eAb07KfQ8X+OcTCUcOae3HbtXa6HLJiSHHZndpMPIkmXaSXdjkXFSOxBsWLV/sHlMcqIzO3snBP3Fy9yJdNpPb+ihVlpFqDXOf39+BRB8sF7W8yMLRaGj6++SDVWWB88TjQ6epJfxv4Df6P1Yb7vwvYNWEyKEwAmN8aTZ4kMSI0jD7S0mxPW4K6E8YsWfXtLGgXg+xhpAQtOoSo3RhsUgzIiNCATQt2Gq0qQCteiIpu6ePNlcTVVorI1aTBF+KOSmlSsQgHag+9RbdUSnqsnSH4mPlFIsA==
+Received: from SN6PR01MB5070.prod.exchangelabs.com (2603:10b6:805:b7::28) by
+ BN0PR01MB7072.prod.exchangelabs.com (2603:10b6:408:16a::5) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7897.25; Mon, 26 Aug 2024 18:06:06 +0000
+Received: from SN6PR01MB5070.prod.exchangelabs.com
+ ([fe80::8e42:e034:6306:aaf9]) by SN6PR01MB5070.prod.exchangelabs.com
+ ([fe80::8e42:e034:6306:aaf9%5]) with mapi id 15.20.7875.019; Mon, 26 Aug 2024
+ 18:06:06 +0000
+From: Michael Burch <me@michaelburch.net>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Bluetooth: btusb: Add USB HW IDs for MT7925
+Thread-Topic: Bluetooth: btusb: Add USB HW IDs for MT7925
+Thread-Index: AQHa994+RkzJ3XaFJkOJ7P2U+fb5DA==
+Date: Mon, 26 Aug 2024 18:06:06 +0000
+Message-ID:
+ <SN6PR01MB50705B846790BE05B92FDE7CA58B2@SN6PR01MB5070.prod.exchangelabs.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+msip_labels:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=michaelburch.net;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: SN6PR01MB5070:EE_|BN0PR01MB7072:EE_
+x-ms-office365-filtering-correlation-id: 01dab296-b5eb-4f03-a25b-08dcc5f9c165
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|366016|1800799024|376014|38070700018;
+x-microsoft-antispam-message-info:
+ =?iso-8859-1?Q?oMoOIQxi++W7caT+zpOftEeXshxeImcZnUm1UZRU09yioX1twlPe/ba6y3?=
+ =?iso-8859-1?Q?96rEUlV3PzNuOaQ/TAeTOmgqgp7JOzPlIAN2s+hdJw2AbS//V4otJXlHgu?=
+ =?iso-8859-1?Q?ijBsswTJupS8ISZB/ogN+Ky7+K79MVYFpIvx0LUCP7Rttm/R9utXwFVGBQ?=
+ =?iso-8859-1?Q?7rNrjQVSMN8RBqYAUbw/gyGICGCgRVBuRIkNwzRV3ka/JQ6DflszxgaJD/?=
+ =?iso-8859-1?Q?6ovqSgMuphdVuU5li3AGQBUvPjYOIwniObl3MjjRQ+jipFVM9YcopIrbM/?=
+ =?iso-8859-1?Q?Fvb5eHWGdcA0YXzU9Rb+WpPd5oYY6bjBJlAiA+ekeJIWJUOj6t+eV0Ebo0?=
+ =?iso-8859-1?Q?aKykZPIWTpebazLMGVaO28reQvJMp4A3AamVSID7a+1ZPs8YzeO9//SPMe?=
+ =?iso-8859-1?Q?ou0HNKqa9k0CcTt/l07GqrtLrpYbt7KCSWmTgeMWk40dvPEgcH3fIWL43U?=
+ =?iso-8859-1?Q?So2qfIz2ci0W7jwN22FFD2RPVwmdW/yzi1lzjBWsW4kGFlgj2d4uOPkP5H?=
+ =?iso-8859-1?Q?kmbIkV9hEV8+e3Oe4hNXvv0QEhMX1pCxaer5DFJGqgSWHayRcPeubcOy9z?=
+ =?iso-8859-1?Q?2PJvd4XGLibeDhpzGniHwQjUxOVNzZfPyg3K0CvlX9AXU8bG/0lzQMUbq7?=
+ =?iso-8859-1?Q?DNfb4X2VtOKjwIyAtEFms0QoHrUtitB2/iKElyeZD+6wFDXSksF+YyOQot?=
+ =?iso-8859-1?Q?wIwrFgtQmooNspnqKSlvnJcf8toh91l1Mhbbc8+d1hTEGCLPE75j65enHj?=
+ =?iso-8859-1?Q?xED0zdqwIxmrSoPPSWqcIQ+InjIej8LCHji5b0ieNIJ6gkLM2YDpgh+s5M?=
+ =?iso-8859-1?Q?mUpACSuB9LN7Ig0RC00oI4dm5MbIIXZ9PABCuavp5AkQSBfE882OmFYGKI?=
+ =?iso-8859-1?Q?YXUNszMfelhVljTK84eIxX4Hkod94LZ1Am2JCTHgB3woxBm9nens+HmUHf?=
+ =?iso-8859-1?Q?m758jn2imlMzlqLWzRd2nb6YWwmo4fbMaOl5zhXkX42SipJrQ0/BiY1lAP?=
+ =?iso-8859-1?Q?yeVAyBtM/G067tT/rrPTI/IofViU0vwkXNycZD8vh9+U4cbeg36svXgiuV?=
+ =?iso-8859-1?Q?IGJZNA8ro2AJhjVJWIiltDs3Z2iHtMjgeDyFL4EyuY0XVKDGwTwKgiepH7?=
+ =?iso-8859-1?Q?LJY2I7QtmzAZRw7C0Lbpy7+nqJnt62Mtlfyt6md9oHp/Lj/BQJ7c0OD/IF?=
+ =?iso-8859-1?Q?/ZKxWhncUDebDRVKfkhXqLzXNplZfnH4YTgHg2+NFCuI/gv9edMQZUPTej?=
+ =?iso-8859-1?Q?f33BpTSYOJ87wpINHBGuTwctmzZzBWHlXNEYALV2C07ggAFoMJT4BKFmVy?=
+ =?iso-8859-1?Q?PpRJYo3vvB1eI6DWXe495xfnlSDXqRoHaXJ9HNhD899KHepiG47Qyi0ixy?=
+ =?iso-8859-1?Q?BP39bv/jgXrRgIrCqkqXpn0z6IlAJyzPNsnclF2pSPr1+YOzCIA4mxD1bg?=
+ =?iso-8859-1?Q?DJAXgEaip3RIWpytfVhZaVmShcuTNqO1r0Iafg=3D=3D?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR01MB5070.prod.exchangelabs.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(38070700018);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?iso-8859-1?Q?QjmTDvj8s60SlxtuKAZmtWWo7nqhCtImG5ZBtURpGYaoxF6sPFaQpWVXYL?=
+ =?iso-8859-1?Q?G5b3+7/NutPP9pB82Fui9xmj/CPKgzLULaKbOnVlo+hblFCNCJI8F6dYXV?=
+ =?iso-8859-1?Q?xtmJnETOgi01904DTH3ElFQuVwtGen+FFdVlo8HuZ54J/GhWRmNKRmg2cE?=
+ =?iso-8859-1?Q?rK0T40ZDtgQbSHMMsUxBVOYAnPAZIVp4wfJi5jIX3dp0POXxLZp21LV8E/?=
+ =?iso-8859-1?Q?NR/mYzXmIIWVpazI5uxkvzGV7a2Abo5fpemGnkS6PEMpUN0T9SQGbA025x?=
+ =?iso-8859-1?Q?AErRskWHxXIOgiR59J+osGknNaV3bugHoknSh29mypj5Q6hHjG8qjZMsAe?=
+ =?iso-8859-1?Q?FXLviKH8XlEA9oFezWH9wBDtRa9omL6T4vnpHffXN2laDmS1EP4cn9CwzX?=
+ =?iso-8859-1?Q?PIMyEuhYOWSnp9U1h25ThUNLbh3vFos47R6ZK0d2AN6lIv8fP0IQtENV60?=
+ =?iso-8859-1?Q?eG40RjShSdelV27X8YjOWqQQys9UUB4NWuM36D1xTRlF/Av11lFA7DxwZr?=
+ =?iso-8859-1?Q?jR7zY+m5rjduEQtnhtWvOPEMIBYNymqt38hvKjkTivmH2UbQwqWu2svSaT?=
+ =?iso-8859-1?Q?VvbLNRSiAx7sGaMXCudTniRDCc/G+DrpHe+RKDuTRHWqbMCLaOBrdDq43s?=
+ =?iso-8859-1?Q?mCxQsSDo81F8GE4s8/3oGW2hcDHPRgWeAh7s87PdeEbmhHWctxOORpNRNJ?=
+ =?iso-8859-1?Q?M3PDT28Kciooz8aPqNQ/k5mBgc78dhjEYHPES92Uywsh6tJFwpR/X3qQGF?=
+ =?iso-8859-1?Q?y+y+DGQmilz51ztaKSciE9TKXsltLmxB4KEOJ9x+niMPdNIK3op6D1NxNz?=
+ =?iso-8859-1?Q?olwkYjVfTCo6KU6EpKMcDQfk+7/uZ7rTZgdAIi4EtX2K1Zy/O4iMuV1R3Q?=
+ =?iso-8859-1?Q?c1ho68UjSokRBDiasd0p8y9gMWpf6F3jH9M+IzZw/DifDUDGQJRlY8aWaR?=
+ =?iso-8859-1?Q?aii5uqyeXj/PYz6rijFz0F6/Ut80XSSXkjbrBQp3AhQtcx+w7s1OJkzqqw?=
+ =?iso-8859-1?Q?Mb49YPC2XTMEdnjx2JcbpJEv3ux3wMTkPwC84wEie15tsmFJKwmzrZ1b03?=
+ =?iso-8859-1?Q?85pi90TA/Hz1F7KltrEpsU0QUhV/ktcU+04zK6z7TACh4EUj9eLWiWdhrW?=
+ =?iso-8859-1?Q?D5RsT9T1dv/wmlKXQnaU2NASqytkeyEPd6X0eT3qq74I7OhJnba0Yuwnoh?=
+ =?iso-8859-1?Q?b/IGcyuLo/JA2I6GibJ9BuMw258iGOMfN6jltCNZVAQaPa8D/+jrhk/Nzw?=
+ =?iso-8859-1?Q?b+tPSCT4u7CNzRTPu8m9+DnUTjHog7/8qF+rgbim12B/BexFqrAJYfISsE?=
+ =?iso-8859-1?Q?sHnbFOCrSYUr/D6YEwyanG3unyBlEXxxzhlCIrDTt0Xx0Yj1YTloBA86P0?=
+ =?iso-8859-1?Q?mup8/UL+eWqeryUNigX5QKM6zak/ax8HBD1JRkGu3i4+/c7/GwI+H40cY+?=
+ =?iso-8859-1?Q?yCCsZqhPERfoQd4LfqNprLgy/4W6RTgIXyjW3hruX7pynK4FSlq/Wp/Cu0?=
+ =?iso-8859-1?Q?PTSqeWVJJs2AMeCCSGgAG0iFA40t7NQk4s63+G27uDImahLa/T1zSXN7gZ?=
+ =?iso-8859-1?Q?we53U8Pubxfds32OuKYl4WXx8XGUb66f3W/CQo8dhmrOgMxpByvA3/sl4C?=
+ =?iso-8859-1?Q?hI6w7mE/kpDeA=3D?=
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-OriginatorOrg: michaelburch.net
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SN6PR01MB5070.prod.exchangelabs.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 01dab296-b5eb-4f03-a25b-08dcc5f9c165
+X-MS-Exchange-CrossTenant-originalarrivaltime: 26 Aug 2024 18:06:06.1875
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 8256b244-08e6-4df2-b146-877069d9ce10
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 52UA1liDOkopsh/BylzqUCFS3VjRaG1tN9lin5LxtkB5MJlZRxelbj0qY771kC3GwT+A7oyvlT3w1jHg0w24VA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN0PR01MB7072
 
-Call to basename() relies on a GNU extension
-to take a const char * vs a char *. Let's define
-a trivial helper function to ensure compatibility
-with musl.
-
-Fixes Issue: https://github.com/bluez/bluez/issues/843
----
- Makefile.mesh           | 2 ++
- Makefile.tools          | 3 ++-
- mesh/mesh-config-json.c | 5 +++--
- mesh/rpl.c              | 3 ++-
- src/shared/util.h       | 6 ++++++
- tools/hex2hcd.c         | 3 ++-
- 6 files changed, 17 insertions(+), 5 deletions(-)
-
-diff --git a/Makefile.mesh b/Makefile.mesh
-index e4c9fa6a3..bebedaf05 100644
---- a/Makefile.mesh
-+++ b/Makefile.mesh
-@@ -47,6 +47,8 @@ mesh/main.$(OBJEXT): src/builtin.h lib/bluetooth/bluetooth.h
- mesh_bluetooth_meshd_SOURCES = $(mesh_sources) mesh/main.c
- mesh_bluetooth_meshd_LDADD = src/libshared-ell.la $(ell_ldadd) -ljson-c
- 
-+mesh_bluetooth_meshd_CFLAGS = -I${top_srcdir}/src
-+
- if MANPAGES
- man_MANS += mesh/bluetooth-meshd.8
- endif
-diff --git a/Makefile.tools b/Makefile.tools
-index 5b9034078..6fc73b8a2 100644
---- a/Makefile.tools
-+++ b/Makefile.tools
-@@ -328,7 +328,8 @@ tools_l2ping_LDADD = lib/libbluetooth-internal.la
- tools_bluemoon_SOURCES = tools/bluemoon.c monitor/bt.h
- tools_bluemoon_LDADD = src/libshared-mainloop.la
- 
--tools_hex2hcd_SOURCES = tools/hex2hcd.c
-+tools_hex2hcd_SOURCES = tools/hex2hcd.c src/shared/util.h
-+tools_hex2hcd_CFLAGS = -I${top_srcdir}/src
- 
- tools_mpris_proxy_SOURCES = tools/mpris-proxy.c
- tools_mpris_proxy_LDADD = gdbus/libgdbus-internal.la $(GLIB_LIBS) $(DBUS_LIBS)
-diff --git a/mesh/mesh-config-json.c b/mesh/mesh-config-json.c
-index c198627c6..8f89a1498 100644
---- a/mesh/mesh-config-json.c
-+++ b/mesh/mesh-config-json.c
-@@ -28,6 +28,7 @@
- #include <ell/ell.h>
- #include <json-c/json.h>
- 
-+#include "shared/util.h"
- #include "mesh/mesh-defs.h"
- #include "mesh/util.h"
- #include "mesh/mesh-config.h"
-@@ -2694,7 +2695,7 @@ bool mesh_config_load_nodes(const char *cfgdir_name, mesh_config_node_func_t cb,
- 
- void mesh_config_destroy_nvm(struct mesh_config *cfg)
- {
--	char *node_dir, *node_name;
-+	const char *node_dir, *node_name;
- 	char uuid[33];
- 
- 	if (!cfg)
-@@ -2706,7 +2707,7 @@ void mesh_config_destroy_nvm(struct mesh_config *cfg)
- 	if (!hex2str(cfg->uuid, 16, uuid, sizeof(uuid)))
- 		return;
- 
--	node_name = basename(node_dir);
-+	node_name = bluez_basename(node_dir);
- 
- 	/* Make sure path name of node follows expected guidelines */
- 	if (strcmp(node_name, uuid))
-diff --git a/mesh/rpl.c b/mesh/rpl.c
-index fb225dddd..fb89f0afd 100644
---- a/mesh/rpl.c
-+++ b/mesh/rpl.c
-@@ -24,6 +24,7 @@
- 
- #include <ell/ell.h>
- 
-+#include "shared/util.h"
- #include "mesh/mesh-defs.h"
- 
- #include "mesh/node.h"
-@@ -146,7 +147,7 @@ static void get_entries(const char *iv_path, struct l_queue *rpl_list)
- 	if (!dir)
- 		return;
- 
--	iv_txt = basename(iv_path);
-+	iv_txt = bluez_basename(iv_path);
- 	if (sscanf(iv_txt, "%08x", &iv_index) != 1) {
- 		closedir(dir);
- 		return;
-diff --git a/src/shared/util.h b/src/shared/util.h
-index f2ca4f29f..0f0f67718 100644
---- a/src/shared/util.h
-+++ b/src/shared/util.h
-@@ -296,3 +296,9 @@ static inline void put_be64(uint64_t val, void *dst)
- {
- 	put_unaligned(cpu_to_be64(val), (uint64_t *) dst);
- }
-+
-+static inline const char *bluez_basename(const char *path)
-+{
-+	const char *base = strrchr(path, '/');
-+	return base ? base + 1 : path;
-+}
-diff --git a/tools/hex2hcd.c b/tools/hex2hcd.c
-index e6dca5a81..05fa69470 100644
---- a/tools/hex2hcd.c
-+++ b/tools/hex2hcd.c
-@@ -24,6 +24,7 @@
- #include <stdlib.h>
- #include <stdbool.h>
- #include <sys/stat.h>
-+#include "shared/util.h"
- 
- static ssize_t process_record(int fd, const char *line, uint16_t *upper_addr)
- {
-@@ -302,7 +303,7 @@ static void ver_parse_entry(const char *pathname)
- 	}
- 
- 	if (S_ISREG(st.st_mode)) {
--		ver_parse_file(basename(pathname));
-+		ver_parse_file(bluez_basename(pathname));
- 		goto done;
- 	}
- 
+Add HW IDs for wireless module specific to ASUS=0A=
+notebook model to ensure proper recognition and functionality.=0A=
+These HW IDs are extracted from Windows driver inf file.=0A=
+=0A=
+Signed-off-by: Michael Burch <me@michaelburch.net>=0A=
+---=0A=
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c=0A=
+index 51d9d4532dda..d712f5acc338 100644=0A=
+--- a/drivers/bluetooth/btusb.c=0A=
++++ b/drivers/bluetooth/btusb.c=0A=
+@@ -690,6 +690,12 @@ static const struct usb_device_id quirks_table[] =3D {=
+=0A=
+ =A0 =A0{ USB_DEVICE(0x0489, 0xe113), .driver_info =3D BTUSB_MEDIATEK |=0A=
+ =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 BTUSB_WIDEBAND_SPE=
+ECH |=0A=
+ =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 BTUSB_VALID_LE_STA=
+TES },=0A=
++ =A0 { USB_DEVICE(0x0489, 0xe118), .driver_info =3D BTUSB_MEDIATEK |=0A=
++ =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0BTUSB_WIDEBAND_SPE=
+ECH |=0A=
++ =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0BTUSB_VALID_LE_STA=
+TES },=0A=
++ =A0 { USB_DEVICE(0x0489, 0xe11e), .driver_info =3D BTUSB_MEDIATEK |=0A=
++ =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0BTUSB_WIDEBAND_SPE=
+ECH |=0A=
++ =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0BTUSB_VALID_LE_STA=
+TES },=0A=
+ =A0 =A0{ USB_DEVICE(0x13d3, 0x3602), .driver_info =3D BTUSB_MEDIATEK |=0A=
+ =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 BTUSB_WIDEBAND_SPE=
+ECH |=0A=
+ =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 BTUSB_VALID_LE_STA=
+TES },=0A=
+=0A=
