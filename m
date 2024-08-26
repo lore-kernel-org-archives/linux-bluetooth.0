@@ -1,67 +1,66 @@
-Received: from mail-lj1-f169.google.com (mail-lj1-f169.google.com [209.85.208.169])
+Received: from mail-lj1-f180.google.com (mail-lj1-f180.google.com [209.85.208.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CD6B40855
-	for <linux-bluetooth@vger.kernel.org>; Mon, 26 Aug 2024 13:43:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AA01FC08
+	for <linux-bluetooth@vger.kernel.org>; Mon, 26 Aug 2024 13:57:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724679838; cv=none; b=uzaW+NlXNrPNR4THwDNEjQi28YTwe3Xz3KLhOrEw0k63+TrGbVLlAc5saOdZ+KJ8UjcvjoA8E82qHcCnA0UT/KIr0qp1vaKnldvSf1jg/GksDTbaFuHtcxKr2Gkq+EEs79AwugOkAJcR44yP4r8FFtKl6WnpVq/5ol7tOTEPNjY=
+	t=1724680634; cv=none; b=t3SQhGeA7VL+KbqvvlTpkzMe+tC2fxmlH9kKOUciJy23BIpZTrCVQ8f8vm0Y3isgJWrGlZYmZyQQj5C9z+dHj85ABWk0+dv7+GZT3dtkNZFBKRlr+1SUomrwuyKeSowMosgfL58ai6iPzxuzrj6uDDdP6Fx+ZEay32MlyXZYjOM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724679838; c=relaxed/simple;
-	bh=HBywNm/HSGYYBRZQNMO808fqDYbuwhGAVtI93G6RzNU=;
+	s=arc-20240116; t=1724680634; c=relaxed/simple;
+	bh=dyx5ge/O8wuEWdgr6fAgf4XZBlyAXn6JNB0paW5mBhM=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=e0MJIijg3A11JrBdCfQBdVnnUGBbfd0vj6O2BqttR6PuNr4rSmzKyz1m5eyOwRzuFyciUx38MGwAZWbT+gs/bSlX1AREdQUDu5ayeKvw3ouMqn8SZS3UCGH4pt9jD2Qq0FJPRlePeY0PT1YZOme8nFJf/UTWX6KYOK4rnY6jdWM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=h9Lggd+K; arc=none smtp.client-ip=209.85.208.169
+	 To:Cc:Content-Type; b=gao2RA/amIrgYPEd5jAPvzTnXqoSrs2Cek4qs7eXwLqeVj2af6h2uAMoiJe9IQI1ml8n38hj9/Fmc8v1RuwsUIweak0ZvoOwOABSAVHqHewTGkiyI2T++7U/kkopHClqxJRd8T7Q/mNm8tFd22VyxJKxZCenRt/qb/rC3REwV/E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KTVy9F2p; arc=none smtp.client-ip=209.85.208.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="h9Lggd+K"
-Received: by mail-lj1-f169.google.com with SMTP id 38308e7fff4ca-2f4f8742138so33268691fa.0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 26 Aug 2024 06:43:56 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KTVy9F2p"
+Received: by mail-lj1-f180.google.com with SMTP id 38308e7fff4ca-2f3cb747fafso45216561fa.3
+        for <linux-bluetooth@vger.kernel.org>; Mon, 26 Aug 2024 06:57:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1724679835; x=1725284635; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1724680630; x=1725285430; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=DQ2JrwrskauDm68y7rjkwhT0z4WWBEirZUiQKuAy2oY=;
-        b=h9Lggd+Kv4/fUEUdEKQG2pDY7blbs6SyL+Ea29pwx4fgqL2+aLzpuoAlbc3zRiBLmO
-         B335WAHIsdqaupYXbmbRWskvwMPo4qKYMBerTg6VRR0FDWHLaU7MtpY4q82YYcKzjWMH
-         HYwtwCRICKmBJ445chfUANaMt4J0+B8N+yMBUFA5fzazar9QQ1sLusaKLCBR9HxsgH1q
-         V0nVizE45RTFq9VLmVgzaloSwQXsfnBIu770oflQ6lPNqwK1DwJWaNGPmjVwVxja/23V
-         7cCK4v4wLKfKaD0rqQQU6emc9d4tvC5YZVH7/YJnKMBOEZdjHS6BdvE8b/glxe6f5qYm
-         /qDg==
+        bh=n/k03tGNaYfk6Re/GvIHKEFJUgoMBYxCmQyq7/yoqts=;
+        b=KTVy9F2pBBFJRqPbygdeWN9y9Nty0dBMlAQSQCOWVzoiME32IFwhQGWw1SoxZuSI5F
+         io2X48osBft7eLzrwECwVMItCbX5JtoixsOohym14Exoq7FZHqevsynBdaIKLH5sjejd
+         GW6sM5eb/bXg4E5oQKWzbKhSdddTqiNnhNVYiwPCeKz7yxZXVkDEvY3xMOG0PUHFxsPv
+         eNNxGQ+2pBfs/dDQPm1VwKb1LF3TS6xQkllXW5uSwUWh/NA04j78naOaEm3cuwAaMNBV
+         Mdw0hY2qbbFjQG9kA+uMQ+MnKdVqx/8Qp9vQuZdjrCyfINRpr5uaNDY7z0EBc9iXp2tP
+         G5pQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724679835; x=1725284635;
+        d=1e100.net; s=20230601; t=1724680630; x=1725285430;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=DQ2JrwrskauDm68y7rjkwhT0z4WWBEirZUiQKuAy2oY=;
-        b=ZM7/b3EOqrlXD6i6yn0d3owwD0zYmcITWMGtC9HBDy8NK7+9zYdWirhxaY/gH1CgI3
-         eHgGhCxslBqTFZxsWyGf3q971VGYgaA2AMVt0p3j03rSZ3mGNpg5iP4OCJnWsj/erzqZ
-         3eS95ckCiN10pEzTDzbZLChL1Qn6m5j+LUnPA4RsT1sweblYIhTHIYEjGKuIExxZwzkt
-         empiaOJWfIZ99r61rf/GSh3E9YWMazNtB2R78AdurOCD4pmHSlSF65tsirisjcaZJAom
-         kmRisKXYwDH9rAb+Cckw/TRssxjzAMOoiTu+zIg4kt3oG6iCv3WLYTDK7J4/FhlHhcEu
-         hppw==
-X-Gm-Message-State: AOJu0YyjJdy7fwKLSrT7i4+XSLZktPZXkY/XJ17CskcsxZFiVK90Z9W9
-	FkscONL4aHed9XjUQEGhM6WZnOE+7k5JPfH5jIl8WWK0l0+0BV2I0+A+0hYCVoOhJNljGH3Y6tp
-	mkTIkkVQ6xHf4mDKSAQZGUk2/XmASknRQ
-X-Google-Smtp-Source: AGHT+IE8OQfFqNNd/NVm5/FVGFUEKaQtCFcONUF9qDqX5OHn1N3AN7V/U5T8Ltjcv/g9ZazZS3ID1RpBDPE14TVjjWU=
-X-Received: by 2002:a2e:a99d:0:b0:2ef:2bb4:45d with SMTP id
- 38308e7fff4ca-2f4f48edae5mr77903211fa.9.1724679833920; Mon, 26 Aug 2024
- 06:43:53 -0700 (PDT)
+        bh=n/k03tGNaYfk6Re/GvIHKEFJUgoMBYxCmQyq7/yoqts=;
+        b=F4c3pSyrk9TtsVZPJPORllAitEHcY3bTy7ZlZ6ZW/Qctc9FctW1NcvyMVh4Pn5+MZg
+         5LgdSWZ4fixgI60g6MQWsdlxrTCq9+A9jcddbP+Us/KtHs0RWJVzyvoz+xJAQlk/vrwH
+         OdSy2qOsBfSRnK7L9+1ww3XFfNQa1Fo7Ba7bTJyot8BEss8EKh8UZ+oeGP8sH0rh/Jzf
+         s6TWp3/jkH8wkPf02I/ube2URf/8fhct6ShmuRi1asJq0Uz3/04JCZVohNY+3u4uHriB
+         Dj/uN9n1/K5F6Qx+Qw88h1eRaxbclcuHVMQzSU0abuN/cOyFjAAes1lxdKHF85+3mvRQ
+         p7fw==
+X-Gm-Message-State: AOJu0YwWDCQlSrEiCd0c2qcM2atcqco2iVVK4PqLEtgvHTbHhK3W4F0a
+	SgS8OeJHmQ1mYsrqP3cm2CXa0OKOgjOXgLgeNrwxavxzmqsZf87qw6epKcpIwGdsGv3ljgVgOlV
+	vgrvmSy/wa1K8x405t5oKtZwwgHDkSw==
+X-Google-Smtp-Source: AGHT+IFLw7JKEcrNPaOc/1a0m7RCaRWzbO6rwR+zAOK1+2rhnw6SqjjUtfvJPTfnh6GQ98SEjxQwP9vpMyBEB3DK6Y0=
+X-Received: by 2002:a2e:be03:0:b0:2f0:1d51:a8fa with SMTP id
+ 38308e7fff4ca-2f4f4938743mr66222611fa.30.1724680629644; Mon, 26 Aug 2024
+ 06:57:09 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240826090044.560142-1-quic_chejiang@quicinc.com>
-In-Reply-To: <20240826090044.560142-1-quic_chejiang@quicinc.com>
+References: <20240826070438.557107-1-quic_chejiang@quicinc.com>
+In-Reply-To: <20240826070438.557107-1-quic_chejiang@quicinc.com>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 26 Aug 2024 09:43:41 -0400
-Message-ID: <CABBYNZLOawJZgtm89QKBpbMdS1_NgXOzHgh2ftBzPyNRKfx+Sw@mail.gmail.com>
-Subject: Re: [PATCH v2] adapter: Cancel the service authorization when remote
- is disconnected
+Date: Mon, 26 Aug 2024 09:56:56 -0400
+Message-ID: <CABBYNZL5A5SoDrthoyvwuauEnnyOzebHgtkqwptcHZ1em=dAjg@mail.gmail.com>
+Subject: Re: [PATCH v1] adapter: Manage device state of cross-transport SMP keys
 To: Cheng Jiang <quic_chejiang@quicinc.com>
 Cc: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
@@ -69,88 +68,245 @@ Content-Transfer-Encoding: quoted-printable
 
 Hi Cheng,
 
-On Mon, Aug 26, 2024 at 5:01=E2=80=AFAM Cheng Jiang <quic_chejiang@quicinc.=
+On Mon, Aug 26, 2024 at 3:05=E2=80=AFAM Cheng Jiang <quic_chejiang@quicinc.=
 com> wrote:
 >
-> If the remote device drops the connection before DUT confirm the
-> service authorization, the DUT still must wait for service
-> authorization timeout before processing future request.
+> Cross-transport derived ltk/csrk/irk are reported to bluetoothd from
+> kernel with BR/EDR address type, and bluetoothd doesn't treat it as LE
+> paired/bonded. In this case, bluetoothd won't send remove bond operation
+> with LE address type to kernel when executing unpair, so SMP keys are
+> retained in kernel list. Then RPA is getting resolved since we still
+> have irk which was not deleted when unpair device is done because only
+> link key is deleted since addr type is bredr.
 >
-> Cancel the service authorization request when connection is dropped.
+> What=E2=80=99s more, pair LE of the same address will always fail in kern=
+el
+> for ltk existence, and send back AlreadyExists error, but device state
+> is still unpaired/unbonded in bluetoothd.
+>
+> So bluetoothd needs to consider LE paired/bonded when receiving SMP keys
+> even if they are cross-transport derived.
 > ---
->  src/adapter.c | 20 ++++++++++++++++++++
->  1 file changed, 20 insertions(+)
+>  src/adapter.c | 53 ++++++++++++++++++++++++++++++++++++++-------------
+>  1 file changed, 40 insertions(+), 13 deletions(-)
 >
 > diff --git a/src/adapter.c b/src/adapter.c
-> index 245de4456..3ad000425 100644
+> index 245de4456..4e5af9579 100644
 > --- a/src/adapter.c
 > +++ b/src/adapter.c
-> @@ -8502,6 +8502,25 @@ static void disconnect_notify(struct btd_device *d=
-ev, uint8_t reason)
+> @@ -8647,6 +8647,7 @@ static void new_link_key_callback(uint16_t index, u=
+int16_t length,
+>         struct btd_adapter *adapter =3D user_data;
+>         struct btd_device *device;
+>         char dst[18];
+> +       uint8_t addr_type;
+>
+>         if (length < sizeof(*ev)) {
+>                 btd_error(adapter->dev_id, "Too small new link key event"=
+);
+> @@ -8666,7 +8667,13 @@ static void new_link_key_callback(uint16_t index, =
+uint16_t length,
+>                 return;
 >         }
+>
+> -       device =3D btd_adapter_get_device(adapter, &addr->bdaddr, addr->t=
+ype);
+> +       /*
+> +        * For LE public address, key here is cross-transport derived,
+> +        * so consider it as BR/EDR public address.
+> +        *
+> +        */
+> +       addr_type =3D addr->type =3D=3D BDADDR_LE_PUBLIC ? BDADDR_BREDR :=
+ addr->type;
+> +       device =3D btd_adapter_get_device(adapter, &addr->bdaddr, addr_ty=
+pe);
+>         if (!device) {
+>                 btd_error(adapter->dev_id,
+>                                 "Unable to get device object for %s", dst=
+);
+> @@ -8682,7 +8689,7 @@ static void new_link_key_callback(uint16_t index, u=
+int16_t length,
+>                 device_set_bonded(device, BDADDR_BREDR);
+>         }
+>
+> -       bonding_complete(adapter, &addr->bdaddr, addr->type, 0);
+> +       bonding_complete(adapter, &addr->bdaddr, addr_type, 0);
 >  }
 >
-> +static void adapter_cancel_service_auth(struct btd_adapter *adapter,
-> +                                       struct btd_device *device)
-> +{
-> +       struct service_auth *auth;
-> +       GList *l;
-> +
-> +       auth =3D NULL;
-> +       for (l =3D adapter->auths->head; l !=3D NULL; l =3D l->next) {
-> +               auth =3D l->data;
-> +               if (auth->device =3D=3D device)
-> +                       break;
-> +       }
-> +       if (auth !=3D NULL) {
-> +               DBG("Cancel pending auth: %s", auth->uuid);
-> +               g_queue_remove(auth->adapter->auths, auth);
-> +               service_auth_cancel(auth);
-> +       }
-> +}
-> +
->  static void dev_disconnected(struct btd_adapter *adapter,
->                                         const struct mgmt_addr_info *addr=
+>  static void store_ltk_group(struct btd_adapter *adapter, const bdaddr_t =
+*peer,
+> @@ -8773,6 +8780,7 @@ static void new_long_term_key_callback(uint16_t ind=
+ex, uint16_t length,
+>         struct btd_device *device;
+>         bool persistent;
+>         char dst[18];
+> +       uint8_t addr_type;
+>
+>         if (length < sizeof(*ev)) {
+>                 btd_error(adapter->dev_id, "Too small long term key event=
+");
+> @@ -8784,7 +8792,13 @@ static void new_long_term_key_callback(uint16_t in=
+dex, uint16_t length,
+>         DBG("hci%u new LTK for %s type %u enc_size %u",
+>                 adapter->dev_id, dst, ev->key.type, ev->key.enc_size);
+>
+> -       device =3D btd_adapter_get_device(adapter, &addr->bdaddr, addr->t=
+ype);
+> +       /*
+> +        * For BR/EDR public address, key here is cross-transport derived=
 ,
->                                         uint8_t reason)
-> @@ -8516,6 +8535,7 @@ static void dev_disconnected(struct btd_adapter *ad=
-apter,
->         device =3D btd_adapter_find_device(adapter, &addr->bdaddr, addr->=
-type);
->         if (device) {
->                 adapter_remove_connection(adapter, device, addr->type);
-> +               adapter_cancel_service_auth(adapter, device);
+> +        * so consider it as LE public address for SMP.
+> +        *
+> +        */
 
-This shall probably be placed together with
-device_cancel_authentication in adapter_remove_connection but we need
-to track in what bearer the authorization is for and remove all
-authorization requests like in btd_adapter_remove_device:
+This is only the case if, an only if, the device is a dual-mode
+device, so this probably need to be checked that we don't attempt to
+do this regardless.
 
-    l =3D adapter->auths->head;
-    while (l !=3D NULL) {
-        struct service_auth *auth =3D l->data;
-        GList *next =3D g_list_next(l);
-
-        if (auth->device !=3D dev) {
-            l =3D next;
-            continue;
-        }
-
-        g_queue_delete_link(adapter->auths, l);
-        l =3D next;
-
-        service_auth_cancel(auth);
-   }
-
-I'd probably move the above code to a helper function so it can be
-called from different places, as for doing this on a per bearer basis
-would probably need to add bearer information to btd_service but I
-guess that can be treated separately.
-
-
->                 disconnect_notify(device, reason);
+> +       addr_type =3D addr->type =3D=3D BDADDR_BREDR ? BDADDR_LE_PUBLIC :=
+ addr->type;
+> +       device =3D btd_adapter_get_device(adapter, &addr->bdaddr, addr_ty=
+pe);
+>         if (!device) {
+>                 btd_error(adapter->dev_id,
+>                                 "Unable to get device object for %s", dst=
+);
+> @@ -8802,8 +8816,7 @@ static void new_long_term_key_callback(uint16_t ind=
+ex, uint16_t length,
+>          * be persistently stored.
+>          *
+>          */
+> -       if (addr->type =3D=3D BDADDR_LE_RANDOM &&
+> -                               (addr->bdaddr.b[5] & 0xc0) !=3D 0xc0)
+> +       if (addr_type =3D=3D BDADDR_LE_RANDOM && (addr->bdaddr.b[5] & 0xc=
+0) !=3D 0xc0)
+>                 persistent =3D false;
+>         else
+>                 persistent =3D !!ev->store_hint;
+> @@ -8817,15 +8830,15 @@ static void new_long_term_key_callback(uint16_t i=
+ndex, uint16_t length,
+>                 rand =3D le64_to_cpu(key->rand);
+>
+>                 store_longtermkey(adapter, &key->addr.bdaddr,
+> -                                       key->addr.type, key->val, key->ce=
+ntral,
+> +                                       addr_type, key->val, key->central=
+,
+>                                         key->type, key->enc_size, ediv, r=
+and);
+>
+> -               device_set_bonded(device, addr->type);
+> +               device_set_bonded(device, addr_type);
 >         }
 >
+>         device_set_ltk(device, ev->key.val, ev->key.central, ev->key.enc_=
+size);
+>
+> -       bonding_complete(adapter, &addr->bdaddr, addr->type, 0);
+> +       bonding_complete(adapter, &addr->bdaddr, addr_type, 0);
+>  }
+>
+>  static void new_csrk_callback(uint16_t index, uint16_t length,
+> @@ -8837,6 +8850,7 @@ static void new_csrk_callback(uint16_t index, uint1=
+6_t length,
+>         struct btd_adapter *adapter =3D user_data;
+>         struct btd_device *device;
+>         char dst[18];
+> +       uint8_t addr_type;
+>
+>         if (length < sizeof(*ev)) {
+>                 btd_error(adapter->dev_id, "Too small CSRK event");
+> @@ -8848,7 +8862,13 @@ static void new_csrk_callback(uint16_t index, uint=
+16_t length,
+>         DBG("hci%u new CSRK for %s type %u", adapter->dev_id, dst,
+>                                                                 ev->key.t=
+ype);
+>
+> -       device =3D btd_adapter_get_device(adapter, &addr->bdaddr, addr->t=
+ype);
+> +       /*
+> +        * For BR/EDR public address, key here is cross-transport derived=
+,
+> +        * so consider it as LE public address for SMP.
+> +        *
+> +        */
+> +       addr_type =3D addr->type =3D=3D BDADDR_BREDR ? BDADDR_LE_PUBLIC :=
+ addr->type;
+
+Ditto.
+
+> +       device =3D btd_adapter_get_device(adapter, &addr->bdaddr, addr_ty=
+pe);
+>         if (!device) {
+>                 btd_error(adapter->dev_id,
+>                                 "Unable to get device object for %s", dst=
+);
+> @@ -8911,6 +8931,7 @@ static void new_irk_callback(uint16_t index, uint16=
+_t length,
+>         struct btd_device *device, *duplicate;
+>         bool persistent;
+>         char dst[18], rpa[18];
+> +       uint8_t addr_type;
+>
+>         if (length < sizeof(*ev)) {
+>                 btd_error(adapter->dev_id, "Too small New IRK event");
+> @@ -8922,16 +8943,22 @@ static void new_irk_callback(uint16_t index, uint=
+16_t length,
+>
+>         DBG("hci%u new IRK for %s RPA %s", adapter->dev_id, dst, rpa);
+>
+> +       /*
+> +        * For BR/EDR public address, key here is cross-transport derived=
+,
+> +        * so consider it as LE public address for SMP.
+> +        *
+> +        */
+> +       addr_type =3D addr->type =3D=3D BDADDR_BREDR ? BDADDR_LE_PUBLIC :=
+ addr->type;
+
+Ditto.
+
+>         if (bacmp(&ev->rpa, BDADDR_ANY)) {
+>                 device =3D btd_adapter_get_device(adapter, &ev->rpa,
+>                                                         BDADDR_LE_RANDOM)=
+;
+>                 duplicate =3D btd_adapter_find_device(adapter, &addr->bda=
+ddr,
+> -                                                               addr->typ=
+e);
+> +                                                               addr_type=
+);
+>                 if (duplicate =3D=3D device)
+>                         duplicate =3D NULL;
+>         } else {
+>                 device =3D btd_adapter_get_device(adapter, &addr->bdaddr,
+> -                                                               addr->typ=
+e);
+> +                                                               addr_type=
+);
+>                 duplicate =3D NULL;
+>         }
+>
+> @@ -8941,7 +8968,7 @@ static void new_irk_callback(uint16_t index, uint16=
+_t length,
+>                 return;
+>         }
+>
+> -       device_update_addr(device, &addr->bdaddr, addr->type);
+> +       device_update_addr(device, &addr->bdaddr, addr_type);
+>
+>         if (duplicate)
+>                 device_merge_duplicate(device, duplicate);
+> @@ -8950,7 +8977,7 @@ static void new_irk_callback(uint16_t index, uint16=
+_t length,
+>         if (!persistent)
+>                 return;
+>
+> -       store_irk(adapter, &addr->bdaddr, addr->type, irk->val);
+> +       store_irk(adapter, &addr->bdaddr, addr_type, irk->val);
+>
+>         btd_device_set_temporary(device, false);
+>  }
 > --
 > 2.25.1
 >
