@@ -1,242 +1,199 @@
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C79CF1CDA1D
-	for <linux-bluetooth@vger.kernel.org>; Tue, 27 Aug 2024 16:40:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7ABD13E49E
+	for <linux-bluetooth@vger.kernel.org>; Tue, 27 Aug 2024 16:49:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724776843; cv=none; b=FX2x3NlBjyaUu4QoYXNM02htqQrjXpu02gf7O62TjsmrZTZMwrguSMAkM0h9XC96wCRmzc6pnZFK8Z5a5rk9vw0Gjj3jS6Wp/H3x9SHWFQL16aG81KDs70rg1kJ2VvjiFmE8a85RieHr7qivcSc4tivyfzbGnCTvys91utPtEzI=
+	t=1724777394; cv=none; b=dSu5fPnjL183aK2YtVpKmYy1V6cKghv5Ub5Q1sJhMEZcDvwDRHgJ50h9FC15mb1MBkDalJjuXGGGSA6Wswo1awKyMbujRsvKyTugjoab7O2TDF6n9lzFBhPfE8d+TZwl7EDHddlEvtEXWCorKdWCdXiSXUtJJI7Fxa7mN1UOqvY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724776843; c=relaxed/simple;
-	bh=QWKegxBTcwv53Xz1SMWHSQ2mW8gaMNECq7tIHvYcjg4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:Cc:From:
-	 In-Reply-To:Content-Type; b=lvvxpSRBn2aUJcmaby9HdhzukXiuGhCqlpWDLpQd+NPpWP8MWLXI1kTTVAQojp3W4F77u8BT1b1xTWeNDlL3ZRbn0MclxIgj8EZ+nbrCWIyn6wDF+zURBSaXAoP+pJMaJyuHcLcQenWHIdOOIZjhB5GzqbaVG3ClHvDYEJe6xB0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from [192.168.0.2] (ip5f5af7d7.dynamic.kabel-deutschland.de [95.90.247.215])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 7A47861E5FE05;
-	Tue, 27 Aug 2024 18:40:33 +0200 (CEST)
-Message-ID: <a4847d7a-d635-49c2-8fb9-24a2222785d7@molgen.mpg.de>
-Date: Tue, 27 Aug 2024 18:40:32 +0200
+	s=arc-20240116; t=1724777394; c=relaxed/simple;
+	bh=Ix3HTDZI997fA7IDNDUs4KxG5QUMirXNgwhy6QSg0yI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=kXx781QwfmZahtfaZ2Xu4DgKCD9NYnZS1/hTm+Xn9AQ2hBfcoUj5QWcu0EFXj0YEwXO/yG0/7iF3HEuPum0gsiIFkcxfzw/x283sXtFQ0HqqMI7rdoMt2zysiS/JXXE0VM1wKGXUiBRa/dl/SWzu4Hv98PWBB0eqJQfYTDGu99o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cZJ1YAI8; arc=none smtp.client-ip=209.85.214.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cZJ1YAI8"
+Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-202146e93f6so58549975ad.3
+        for <linux-bluetooth@vger.kernel.org>; Tue, 27 Aug 2024 09:49:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1724777392; x=1725382192; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=J6aoBHoM11eMgdvSTx0czC/JL55UqPDuDBjAOfV03kE=;
+        b=cZJ1YAI8aGyHc/qglahVS9D1X9T4qkK4nCQViS3xf9zxIdU4YbklF/bsYOB12mfZY5
+         9cKG2BlLWoqLWmr5RT1ylvioXWs5/gJ13RwzpqGt/PrmnbYFmbhUt+EkbOt+4PoxzVkq
+         ndzGL+b8Q2+L02NaUu4ijIpuVJnMc+25v8+U4onIsSJcy//A5j7pGvqIBLgtMG3QOPUp
+         4r5/QJ5UNug5W0XVfmXZ/ajk1ltSDd5zYMNkaPiIdhDpLTYdzaCfEKvt6GtTGKlcwteA
+         UF3yJDWQsUz3Gk5npLQJqBV1GSZ0sSK/vgwbdAV2kZ+TGQG/B09D1f7YjTLEGfK1LB/c
+         CSUQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724777392; x=1725382192;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=J6aoBHoM11eMgdvSTx0czC/JL55UqPDuDBjAOfV03kE=;
+        b=ByxAeT7vsjvBZIonrU2F+TXWK4bqvCKraD3oLw01lBCfJ59QQq69ECeP3zZuSPQzhL
+         ryVs7CFXEPCuyulaegcN4idPdLE/ifoEugl6nkKFgQPOd586tb21PAGw9y1aPL3poSjm
+         FfD7b6VmcakRA4Ugvc9XjXhzZrrnXRSy/miMqlsbNVZQJMUcHn+Zh/FcPlrB3ycRhxWM
+         kbnF34miS2NC0BDP7XVM+DqTXhRWs9nbwR3kIN4BvPXDlpqTwYDm6kfhlPiUvWfIpuCr
+         ih9S3U/SaLhNlq2xV3wLeNLnybnl6RaedilmntyU7iU5S/tXuA8vgA5mRMwk36aMmo/F
+         W3bw==
+X-Gm-Message-State: AOJu0YzIFL02Z4y2/JmrDmPmdemlsUibDFle7Yg/opj5+nlBbsOXYs/r
+	G70+JyCu0zllq/Kgyb6zShEMrroGBM6QU4U3rlclTY+ztwEBeLnk7H0oBw==
+X-Google-Smtp-Source: AGHT+IHieHQrIRGSeDA3ZxGkVurzP8YSbUeJHnm6VLJhPLGOuQGFM+jmMnT7IHd4VqGXAorREXzSLQ==
+X-Received: by 2002:a17:903:1d2:b0:200:aa78:cfc7 with SMTP id d9443c01a7336-2039e44f09dmr200001415ad.2.1724777391938;
+        Tue, 27 Aug 2024 09:49:51 -0700 (PDT)
+Received: from apollo.localdomain ([2601:646:9d80:4380::2696])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20385be047fsm85319965ad.282.2024.08.27.09.49.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 27 Aug 2024 09:49:51 -0700 (PDT)
+From: Khem Raj <raj.khem@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Khem Raj <raj.khem@gmail.com>
+Subject: [PATCH v3 BlueZ] Provide GNU basename compatible implementation
+Date: Tue, 27 Aug 2024 09:49:48 -0700
+Message-ID: <20240827164948.3030478-1-raj.khem@gmail.com>
+X-Mailer: git-send-email 2.46.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 2/2] Bluetooth: MGMT: Fix not generating command
- complete for MGMT_OP_DISCONNECT
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-References: <20240827140529.635522-1-luiz.dentz@gmail.com>
- <20240827140529.635522-2-luiz.dentz@gmail.com>
-Content-Language: en-US
-Cc: linux-bluetooth@vger.kernel.org
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <20240827140529.635522-2-luiz.dentz@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-Dear Luiz,
+Call to basename() relies on a GNU extension
+to take a const char * vs a char *. Let's define
+a trivial helper function to ensure compatibility
+with musl.
 
+Fixes Issue: https://github.com/bluez/bluez/issues/843
+---
+v2: Fix code formatter reported errors
+v3: Make just node_name as const and keep node_dir as such
 
-Thank you for posting version 3. I found one more nit.
+ Makefile.mesh           | 2 ++
+ Makefile.tools          | 3 ++-
+ mesh/mesh-config-json.c | 6 ++++--
+ mesh/rpl.c              | 3 ++-
+ src/shared/util.h       | 7 +++++++
+ tools/hex2hcd.c         | 3 ++-
+ 6 files changed, 19 insertions(+), 5 deletions(-)
 
-
-Am 27.08.24 um 16:05 schrieb Luiz Augusto von Dentz:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> 
-> MGMT_OP_DISCONNECT can be called while mgmt_device_connected has not
-> been called yet, which will cause the connection procedure to be
-> aborted, so mgmt_device_disconnected shall still respond with command
-> complete to MGMT_OP_DISCONNECT and just not emit
-> MGMT_EV_DEVICE_DISCONNECTED since MGMT_EV_DEVICE_CONNECTED was never
-> sent.
-> 
-> To fix this MGMT_OP_DISCONNECT is changed to work similarly to other
-> command which do use hci_cmd_sync_queue and then use hci_conn_abort to
-> disconnect and returns the result, in order for hci_conn_abort to be
-> used from hci_cmd_sync context it now uses hci_cmd_sync_run_once.
-> 
-> Link: https://github.com/bluez/bluez/issues/932
-> Fixes: 12d4a3b ("Bluetooth: Move check for MGMT_CONNECTED flag into mgmt.c")
-> Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> ---
->   net/bluetooth/hci_conn.c |  6 ++-
->   net/bluetooth/mgmt.c     | 84 ++++++++++++++++++++--------------------
->   2 files changed, 47 insertions(+), 43 deletions(-)
-> 
-> diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-> index 8f0c9322eadb..d51d8dbea631 100644
-> --- a/net/bluetooth/hci_conn.c
-> +++ b/net/bluetooth/hci_conn.c
-> @@ -2951,5 +2951,9 @@ int hci_abort_conn(struct hci_conn *conn, u8 reason)
->   		return 0;
->   	}
->   
-> -	return hci_cmd_sync_queue_once(hdev, abort_conn_sync, conn, NULL);
-> +	/* Run immediately if on cmd_sync_work since this maybe called
-
-s/maybe/may be/
-
-
-Kind regards,
-
-Paul
-
-
-> +	 * as a result to MGMT_OP_DISCONNECT and MGMT_OP_UNPAIR which does
-> +	 * already queue its callback on cmd_sync_work.
-> +	 */
-> +	return hci_cmd_sync_run_once(hdev, abort_conn_sync, conn, NULL);
->   }
-> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-> index 25979f4283a6..59f9d457ca31 100644
-> --- a/net/bluetooth/mgmt.c
-> +++ b/net/bluetooth/mgmt.c
-> @@ -2921,7 +2921,12 @@ static int unpair_device_sync(struct hci_dev *hdev, void *data)
->   	if (!conn)
->   		return 0;
->   
-> -	return hci_abort_conn_sync(hdev, conn, HCI_ERROR_REMOTE_USER_TERM);
-> +	/* Disregard any possible error since the likes of hci_abort_conn_sync
-> +	 * will cleanup the connection no matter the error.
-> +	 */
-> +	hci_abort_conn(conn, HCI_ERROR_REMOTE_USER_TERM);
-> +
-> +	return 0;
->   }
->   
->   static int unpair_device(struct sock *sk, struct hci_dev *hdev, void *data,
-> @@ -3053,13 +3058,44 @@ static int unpair_device(struct sock *sk, struct hci_dev *hdev, void *data,
->   	return err;
->   }
->   
-> +static void disconnect_complete(struct hci_dev *hdev, void *data, int err)
-> +{
-> +	struct mgmt_pending_cmd *cmd = data;
-> +
-> +	cmd->cmd_complete(cmd, mgmt_status(err));
-> +	mgmt_pending_free(cmd);
-> +}
-> +
-> +static int disconnect_sync(struct hci_dev *hdev, void *data)
-> +{
-> +	struct mgmt_pending_cmd *cmd = data;
-> +	struct mgmt_cp_disconnect *cp = cmd->param;
-> +	struct hci_conn *conn;
-> +
-> +	if (cp->addr.type == BDADDR_BREDR)
-> +		conn = hci_conn_hash_lookup_ba(hdev, ACL_LINK,
-> +					       &cp->addr.bdaddr);
-> +	else
-> +		conn = hci_conn_hash_lookup_le(hdev, &cp->addr.bdaddr,
-> +					       le_addr_type(cp->addr.type));
-> +
-> +	if (!conn)
-> +		return -ENOTCONN;
-> +
-> +	/* Disregard any possible error since the likes of hci_abort_conn_sync
-> +	 * will cleanup the connection no matter the error.
-> +	 */
-> +	hci_abort_conn(conn, HCI_ERROR_REMOTE_USER_TERM);
-> +
-> +	return 0;
-> +}
-> +
->   static int disconnect(struct sock *sk, struct hci_dev *hdev, void *data,
->   		      u16 len)
->   {
->   	struct mgmt_cp_disconnect *cp = data;
->   	struct mgmt_rp_disconnect rp;
->   	struct mgmt_pending_cmd *cmd;
-> -	struct hci_conn *conn;
->   	int err;
->   
->   	bt_dev_dbg(hdev, "sock %p", sk);
-> @@ -3082,27 +3118,7 @@ static int disconnect(struct sock *sk, struct hci_dev *hdev, void *data,
->   		goto failed;
->   	}
->   
-> -	if (pending_find(MGMT_OP_DISCONNECT, hdev)) {
-> -		err = mgmt_cmd_complete(sk, hdev->id, MGMT_OP_DISCONNECT,
-> -					MGMT_STATUS_BUSY, &rp, sizeof(rp));
-> -		goto failed;
-> -	}
-> -
-> -	if (cp->addr.type == BDADDR_BREDR)
-> -		conn = hci_conn_hash_lookup_ba(hdev, ACL_LINK,
-> -					       &cp->addr.bdaddr);
-> -	else
-> -		conn = hci_conn_hash_lookup_le(hdev, &cp->addr.bdaddr,
-> -					       le_addr_type(cp->addr.type));
-> -
-> -	if (!conn || conn->state == BT_OPEN || conn->state == BT_CLOSED) {
-> -		err = mgmt_cmd_complete(sk, hdev->id, MGMT_OP_DISCONNECT,
-> -					MGMT_STATUS_NOT_CONNECTED, &rp,
-> -					sizeof(rp));
-> -		goto failed;
-> -	}
-> -
-> -	cmd = mgmt_pending_add(sk, MGMT_OP_DISCONNECT, hdev, data, len);
-> +	cmd = mgmt_pending_new(sk, MGMT_OP_DISCONNECT, hdev, data, len);
->   	if (!cmd) {
->   		err = -ENOMEM;
->   		goto failed;
-> @@ -3110,9 +3126,10 @@ static int disconnect(struct sock *sk, struct hci_dev *hdev, void *data,
->   
->   	cmd->cmd_complete = generic_cmd_complete;
->   
-> -	err = hci_disconnect(conn, HCI_ERROR_REMOTE_USER_TERM);
-> +	err = hci_cmd_sync_queue(hdev, disconnect_sync, cmd,
-> +				 disconnect_complete);
->   	if (err < 0)
-> -		mgmt_pending_remove(cmd);
-> +		mgmt_pending_free(cmd);
->   
->   failed:
->   	hci_dev_unlock(hdev);
-> @@ -9689,18 +9706,6 @@ void mgmt_device_connected(struct hci_dev *hdev, struct hci_conn *conn,
->   	mgmt_event_skb(skb, NULL);
->   }
->   
-> -static void disconnect_rsp(struct mgmt_pending_cmd *cmd, void *data)
-> -{
-> -	struct sock **sk = data;
-> -
-> -	cmd->cmd_complete(cmd, 0);
-> -
-> -	*sk = cmd->sk;
-> -	sock_hold(*sk);
-> -
-> -	mgmt_pending_remove(cmd);
-> -}
-> -
->   static void unpair_device_rsp(struct mgmt_pending_cmd *cmd, void *data)
->   {
->   	struct hci_dev *hdev = data;
-> @@ -9744,8 +9749,6 @@ void mgmt_device_disconnected(struct hci_dev *hdev, bdaddr_t *bdaddr,
->   	if (link_type != ACL_LINK && link_type != LE_LINK)
->   		return;
->   
-> -	mgmt_pending_foreach(MGMT_OP_DISCONNECT, hdev, disconnect_rsp, &sk);
-> -
->   	bacpy(&ev.addr.bdaddr, bdaddr);
->   	ev.addr.type = link_to_bdaddr(link_type, addr_type);
->   	ev.reason = reason;
-> @@ -9758,9 +9761,6 @@ void mgmt_device_disconnected(struct hci_dev *hdev, bdaddr_t *bdaddr,
->   
->   	if (sk)
->   		sock_put(sk);
-> -
-> -	mgmt_pending_foreach(MGMT_OP_UNPAIR_DEVICE, hdev, unpair_device_rsp,
-> -			     hdev);
->   }
->   
->   void mgmt_disconnect_failed(struct hci_dev *hdev, bdaddr_t *bdaddr,
-
+diff --git a/Makefile.mesh b/Makefile.mesh
+index e4c9fa6a3..bebedaf05 100644
+--- a/Makefile.mesh
++++ b/Makefile.mesh
+@@ -47,6 +47,8 @@ mesh/main.$(OBJEXT): src/builtin.h lib/bluetooth/bluetooth.h
+ mesh_bluetooth_meshd_SOURCES = $(mesh_sources) mesh/main.c
+ mesh_bluetooth_meshd_LDADD = src/libshared-ell.la $(ell_ldadd) -ljson-c
+ 
++mesh_bluetooth_meshd_CFLAGS = -I${top_srcdir}/src
++
+ if MANPAGES
+ man_MANS += mesh/bluetooth-meshd.8
+ endif
+diff --git a/Makefile.tools b/Makefile.tools
+index 5b9034078..6fc73b8a2 100644
+--- a/Makefile.tools
++++ b/Makefile.tools
+@@ -328,7 +328,8 @@ tools_l2ping_LDADD = lib/libbluetooth-internal.la
+ tools_bluemoon_SOURCES = tools/bluemoon.c monitor/bt.h
+ tools_bluemoon_LDADD = src/libshared-mainloop.la
+ 
+-tools_hex2hcd_SOURCES = tools/hex2hcd.c
++tools_hex2hcd_SOURCES = tools/hex2hcd.c src/shared/util.h
++tools_hex2hcd_CFLAGS = -I${top_srcdir}/src
+ 
+ tools_mpris_proxy_SOURCES = tools/mpris-proxy.c
+ tools_mpris_proxy_LDADD = gdbus/libgdbus-internal.la $(GLIB_LIBS) $(DBUS_LIBS)
+diff --git a/mesh/mesh-config-json.c b/mesh/mesh-config-json.c
+index c198627c6..608384cb6 100644
+--- a/mesh/mesh-config-json.c
++++ b/mesh/mesh-config-json.c
+@@ -28,6 +28,7 @@
+ #include <ell/ell.h>
+ #include <json-c/json.h>
+ 
++#include "shared/util.h"
+ #include "mesh/mesh-defs.h"
+ #include "mesh/util.h"
+ #include "mesh/mesh-config.h"
+@@ -2694,7 +2695,8 @@ bool mesh_config_load_nodes(const char *cfgdir_name, mesh_config_node_func_t cb,
+ 
+ void mesh_config_destroy_nvm(struct mesh_config *cfg)
+ {
+-	char *node_dir, *node_name;
++	char *node_dir;
++	const char* node_name;
+ 	char uuid[33];
+ 
+ 	if (!cfg)
+@@ -2706,7 +2708,7 @@ void mesh_config_destroy_nvm(struct mesh_config *cfg)
+ 	if (!hex2str(cfg->uuid, 16, uuid, sizeof(uuid)))
+ 		return;
+ 
+-	node_name = basename(node_dir);
++	node_name = bluez_basename(node_dir);
+ 
+ 	/* Make sure path name of node follows expected guidelines */
+ 	if (strcmp(node_name, uuid))
+diff --git a/mesh/rpl.c b/mesh/rpl.c
+index fb225dddd..fb89f0afd 100644
+--- a/mesh/rpl.c
++++ b/mesh/rpl.c
+@@ -24,6 +24,7 @@
+ 
+ #include <ell/ell.h>
+ 
++#include "shared/util.h"
+ #include "mesh/mesh-defs.h"
+ 
+ #include "mesh/node.h"
+@@ -146,7 +147,7 @@ static void get_entries(const char *iv_path, struct l_queue *rpl_list)
+ 	if (!dir)
+ 		return;
+ 
+-	iv_txt = basename(iv_path);
++	iv_txt = bluez_basename(iv_path);
+ 	if (sscanf(iv_txt, "%08x", &iv_index) != 1) {
+ 		closedir(dir);
+ 		return;
+diff --git a/src/shared/util.h b/src/shared/util.h
+index f2ca4f29f..f55b3a4c3 100644
+--- a/src/shared/util.h
++++ b/src/shared/util.h
+@@ -296,3 +296,10 @@ static inline void put_be64(uint64_t val, void *dst)
+ {
+ 	put_unaligned(cpu_to_be64(val), (uint64_t *) dst);
+ }
++
++static inline const char *bluez_basename(const char *path)
++{
++	const char *base = strrchr(path, '/');
++
++	return base ? base + 1 : path;
++}
+diff --git a/tools/hex2hcd.c b/tools/hex2hcd.c
+index e6dca5a81..05fa69470 100644
+--- a/tools/hex2hcd.c
++++ b/tools/hex2hcd.c
+@@ -24,6 +24,7 @@
+ #include <stdlib.h>
+ #include <stdbool.h>
+ #include <sys/stat.h>
++#include "shared/util.h"
+ 
+ static ssize_t process_record(int fd, const char *line, uint16_t *upper_addr)
+ {
+@@ -302,7 +303,7 @@ static void ver_parse_entry(const char *pathname)
+ 	}
+ 
+ 	if (S_ISREG(st.st_mode)) {
+-		ver_parse_file(basename(pathname));
++		ver_parse_file(bluez_basename(pathname));
+ 		goto done;
+ 	}
+ 
