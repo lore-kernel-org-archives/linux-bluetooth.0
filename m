@@ -1,104 +1,97 @@
-Received: from mail-qv1-f48.google.com (mail-qv1-f48.google.com [209.85.219.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4EBA19D8BF
-	for <linux-bluetooth@vger.kernel.org>; Tue, 27 Aug 2024 09:55:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C260197A83
+	for <linux-bluetooth@vger.kernel.org>; Tue, 27 Aug 2024 10:53:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724752502; cv=none; b=dYOd27+ibXefA1OIxCCmgYpYli2eXRMLMGrCH3DqY5qbVMzWpCgNBuUYZJkUq1bwwQzg3+g5nGhs8f3to3f4UK4Qvl+gMwDE4D82D7UA7q8FCzhqfq11BK9Kmgod8mjOHDwEz4ig+CyFLX0xhkLisCn+qU9tXTacfCU/FgaIm7I=
+	t=1724755990; cv=none; b=Q9MsUIi77axUbXRxn1AsUh0GgDCpSD5OJg3JNypililJlWPCUeKjI+Ppi5BzFYoVjEqjcSOsNSeBXyIpM17wRsEGECo8BTBOvv7JfmQmKmG+okDPBd1HhC4dpEMD8HeZR9pXm/ksIY6tKPcYMMYfkWeRtgqKneYcmASVQwVPw8U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724752502; c=relaxed/simple;
-	bh=MBElzrpto+DCEoNsVpAQ7tWj2UzOEhwKi7A9LJa7kyM=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=s+t4A/ELb+TDcZ4YfMMVs6yQkWVZRoCsKDPpMd3g3Vpuewp6NvRrmvCxZuaD2weirSMWsxYeyvvJLpBa9qdlE4OjW6c/Vpex8YeehiQwtNMyLUEh6gWaqLafvZtn06w/eMYQ4NX/Qe/s7I4r4+L6m1J3h56VGF/y7V2OSOgiZuw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AjL/09Kr; arc=none smtp.client-ip=209.85.219.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1724755990; c=relaxed/simple;
+	bh=vhGFAKURRpGiLzdI/3d0EafP4TO+MvKjm+sOuc/Hq10=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=OZo5EujYdlY2w6IlCkMXw9zSMj4QfhYvu5regG9bASNu2frzaznOscgTjd986vsZ1dXFcFPxUcLtuPiT2kJI8Udi01ggAdlGzYa2rnjfIDV9FBKivVdX/XoZUMIN1VRPWps+D4wjmrjdF7LqQKf0pgtLg0AIlLXTUSMXXdvXdCg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VTqjvijg; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AjL/09Kr"
-Received: by mail-qv1-f48.google.com with SMTP id 6a1803df08f44-6bf8b41b34dso26592556d6.0
-        for <linux-bluetooth@vger.kernel.org>; Tue, 27 Aug 2024 02:55:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1724752500; x=1725357300; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=0yi5ys6PJC7b4gPZbA8T6NmjN1rUoUM6tMo+/IHt92k=;
-        b=AjL/09KryFRAM9vb1nBgxx2MSguFzUhz3hReRa/lo64gdlhyGdo1zADEtirPIcA+Jv
-         J0OhvWR07jy4ojgIlRu74eLIEcNtcwC1ofAhGzyY5dxvL7732s97g74VXBi5pgO3O6yi
-         oXNKxxmgSHJO3y6mUBDiZemWsHKWkeBTWOPu6Mpd7DDYASyr8+tPH9UMpvh3xlhkNEwH
-         yABuhbIPM7h9FxymcFlSg95GHTevTjG5aX89dPpm4P3wxkYCDjtUzwYOhaawNJYJlPZ/
-         AXx6DpeqsqmVgqzERBSeng7cYVNKxVtVbjI5ax3sSYF5ElynMPvbKoj6v372jsDl1WT2
-         vDww==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724752500; x=1725357300;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=0yi5ys6PJC7b4gPZbA8T6NmjN1rUoUM6tMo+/IHt92k=;
-        b=j2wviZJrfHISrA8sxIuCBfXhlz/5fn5apLOLBY3fTw4af9E2vH2U/zmthC8bKaUd44
-         IuZmptsPtRWK06Lf6gKXZXAYc7bH0RC/NKH7yGvT/Gdz+I4AkWGdnO00gi669pvRoQQ6
-         3IA6royO4RRirR4QAJWHlWF9JrrW3jhAwyknF5Wbnn2y/ZHIYVmnJXey/9NDEpXKYQ8l
-         JFnbW5TZXl1iD7rjQeKZV9gIR6RpDCmnHsgPlM8mSo8Sbls9fXN49HZOkFUJTYYuIiKy
-         2ku9XyuHd7efwaRktZ2VlvtYvr9NsNGmQ18Ycp7J7wn9H0AX5tZbrZELMljLdnq16K1Z
-         vvfA==
-X-Gm-Message-State: AOJu0YzM9zdXkfcNFtxgET6w0TO7iNNiBzsiblEmfGX8MHJnqoxwJsjP
-	YIfeWWXYObSRWrebu/lL246RIA3fvrb5XIvY2+eN61S6bv7RBUHxrcbt4g==
-X-Google-Smtp-Source: AGHT+IE+B3cDoyGvGQOQ0AC2tk2dYqoliHjzo3ugpn/dvL0+9pGhZmvZuvTPAoCZ14+MycZ8R1Gybg==
-X-Received: by 2002:a05:6214:5691:b0:6bf:9a8b:74e2 with SMTP id 6a1803df08f44-6c16deb456emr132791346d6.53.1724752499541;
-        Tue, 27 Aug 2024 02:54:59 -0700 (PDT)
-Received: from [172.17.0.2] ([172.190.111.168])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6c162de80e8sm54365366d6.142.2024.08.27.02.54.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 27 Aug 2024 02:54:59 -0700 (PDT)
-Message-ID: <66cda273.050a0220.2af004.2e44@mx.google.com>
-Date: Tue, 27 Aug 2024 02:54:59 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============7952802935142985004=="
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VTqjvijg"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1724755987;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=ZgYvxJxYadRu72QVbqiiBTAQxcLnOjms0OIyTFIa+gI=;
+	b=VTqjvijgVU17FEqNcN+VobdPYKbnVfRYO2qpCRhrqMwHLNYRvf1AUWydEQiB4k5AdKa13q
+	3HBq/aM0CfWOp7m46fVgjnJIobln+OxqYLMtYTrRrfAsQWR2ym4ELvDUSVuPdx8k9vVOBT
+	I4DqWixaXftkYrPm5IoPBCkIQOMPp6g=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-377-wQvwAnrlMsCTy8IQiO2-SA-1; Tue,
+ 27 Aug 2024 06:53:03 -0400
+X-MC-Unique: wQvwAnrlMsCTy8IQiO2-SA-1
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 6BD4E1954B32;
+	Tue, 27 Aug 2024 10:53:00 +0000 (UTC)
+Received: from localhost.localdomain (unknown [10.39.193.3])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id F0A4A1955DE4;
+	Tue, 27 Aug 2024 10:52:57 +0000 (UTC)
+From: Hans de Goede <hdegoede@redhat.com>
+To: Marcel Holtmann <marcel@holtmann.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Hans de Goede <hdegoede@redhat.com>,
+	Pavel Machek <pavel@ucw.cz>,
+	Lee Jones <lee@kernel.org>,
+	linux-leds@vger.kernel.org,
+	linux-bluetooth@vger.kernel.org
+Subject: [PATCH resend] Bluetooth: Use led_set_brightness() in LED trigger activate() callback
+Date: Tue, 27 Aug 2024 12:52:48 +0200
+Message-ID: <20240827105248.18177-1-hdegoede@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, xiaokeqinhealth@126.com
-Subject: RE: [BlueZ,1/1] att: Correctly handle negative return values in can_write_data
-In-Reply-To: <20240827080925.55684-1-xiaokeqinhealth@126.com>
-References: <20240827080925.55684-1-xiaokeqinhealth@126.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
---===============7952802935142985004==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+A LED trigger's activate() callback gets called when the LED trigger
+gets activated for a specific LED, so that the trigger code can ensure
+the LED state matches the current state of the trigger condition
+(LED_FULL when HCI_UP is set in this case).
 
-This is automated email and please do not reply to this email!
+led_trigger_event() is intended for trigger condition state changes and
+iterates over _all_ LEDs which are controlled by this trigger changing
+the brightness of each of them.
 
-Dear submitter,
+In the activate() case only the brightness of the LED which is being
+activated needs to change and that LED is passed as an argument to
+activate(), switch to led_set_brightness() to only change the brightness
+of the LED being activated.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=883691
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      0.45 seconds
-GitLint                       PASS      0.32 seconds
-BuildEll                      PASS      25.24 seconds
-BluezMake                     PASS      1776.12 seconds
-MakeCheck                     PASS      13.66 seconds
-MakeDistcheck                 PASS      197.53 seconds
-CheckValgrind                 PASS      271.73 seconds
-CheckSmatch                   PASS      359.10 seconds
-bluezmakeextell               PASS      121.55 seconds
-IncrementalBuild              PASS      1697.00 seconds
-ScanBuild                     PASS      1172.61 seconds
-
-
-
+Signed-off-by: Hans de Goede <hdegoede@redhat.com>
 ---
-Regards,
-Linux Bluetooth
+ net/bluetooth/leds.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
+diff --git a/net/bluetooth/leds.c b/net/bluetooth/leds.c
+index f46847632ffa..6e349704efe4 100644
+--- a/net/bluetooth/leds.c
++++ b/net/bluetooth/leds.c
+@@ -48,7 +48,7 @@ static int power_activate(struct led_classdev *led_cdev)
+ 	htrig = to_hci_basic_led_trigger(led_cdev->trigger);
+ 	powered = test_bit(HCI_UP, &htrig->hdev->flags);
+ 
+-	led_trigger_event(led_cdev->trigger, powered ? LED_FULL : LED_OFF);
++	led_set_brightness(led_cdev, powered ? LED_FULL : LED_OFF);
+ 
+ 	return 0;
+ }
+-- 
+2.46.0
 
---===============7952802935142985004==--
