@@ -1,134 +1,65 @@
-Received: from mail-oa1-f46.google.com (mail-oa1-f46.google.com [209.85.160.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE1D7747F;
-	Tue, 27 Aug 2024 07:31:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.46
+Received: from m16.mail.126.com (m16.mail.126.com [220.197.31.8])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69B3F1428F1
+	for <linux-bluetooth@vger.kernel.org>; Tue, 27 Aug 2024 08:09:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.8
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724743908; cv=none; b=tK6XwNr5kl1l6YMa0FU4B2iLnERLUEGuEbSeFBYE/8cKHv5UBxgFfV5pRmEHKmu/kNJT7t59dK86jOVwKamu6sxhrWPx/blmFPd9Wj87QcfpGQ/Gv5tdTqGfChgQgnnlZVez5OdbMCs7DmPW1PftdUUDaLP/taHnkXjVClsbvzA=
+	t=1724746185; cv=none; b=IcyUolPdUFx/PyHuh+y2i6iYuBYX+w8DnT3riXmsEAGQQaioF6q7Rh5aINoVM+PqN+H63biia7kFI/FsgpIoXOweuO8OnNbjEys9g4KsFiIO7sNFDOKUycbMstE2nBNGoJU94jOo+tIs70c9bqCUK4DC21gkd9zZMTcnTQWSPUQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724743908; c=relaxed/simple;
-	bh=mDJuyJqY7HxSUpYyQsIPkYxF6N1t9wLoCXzdOlBN48A=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=VF4nOyMo48LHq7AVnFBR4oL0Uh7zjKE8zARVy+ZqrEIfRyXJEa0GBpo9VP3+3yoMbiqpmM5CZYe4UAx5ZqC7JdljnJIA3a1Ch+2QzPkuaH4ubzu4f5blmQVTQfNd2U9oJlRYcuI10HTEo4FNXlq69hIP192P7BaGTavocqQruLY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kGTeefnm; arc=none smtp.client-ip=209.85.160.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1724746185; c=relaxed/simple;
+	bh=R2f+ZWFeGkE7OCVq5vgG+66cveITxAf5+IIsW0L7OPE=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=steWuOadOwoMIkDn25dgejASMyPH/YYcwFZQNFJgoO1MwrzW8npuafmUXDpQ2d3P+dggHrTfqLiIACYFEFg85mqgg2xs3tnsM1TLtWhQeNatgOzIfqo2lt4tlP4X3GxUMp9SzgsA4+59YCLQF9wu3qvFdbCi9Bo1qQV/w7wL+G0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=126.com; spf=pass smtp.mailfrom=126.com; dkim=pass (1024-bit key) header.d=126.com header.i=@126.com header.b=WwyxbdlK; arc=none smtp.client-ip=220.197.31.8
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=126.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=126.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kGTeefnm"
-Received: by mail-oa1-f46.google.com with SMTP id 586e51a60fabf-270420e231aso3474662fac.2;
-        Tue, 27 Aug 2024 00:31:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1724743905; x=1725348705; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=A1lD5NsHrENDzakDwTmISjEXVDogNpfvH/RKxNRH+uM=;
-        b=kGTeefnmo40otANZZA1wQC/jCOKifpdKFozNXJeiD0GkPQ8nGbZkyxT6HuegAebdvY
-         OnfUDhO9QDqVP8KY5c4nOkccMmddn4gatLEhtV0H3sunCl2/IbUnOKKDDttIz7C6gYoc
-         lCjPRuPhuhXfHvywPKVeZTrkU8ZlmhzvVm2PKbXnGicfqAZScdWnJdktuoHRQdlOyjWn
-         PG1/cxUuaF8qOsTrH6+YsDBVu4JfHicb0vlaz9e+nFVXSv0OLzDZrzKeFOgrCW/M7MFo
-         7zuibkFq3x00F0MHwBLforQ9QyLNN7Gpjgg7Jsp/9GWv4IH502UJ3fxeV1jDNV0jEFpX
-         3m8Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724743905; x=1725348705;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=A1lD5NsHrENDzakDwTmISjEXVDogNpfvH/RKxNRH+uM=;
-        b=R15zw/kcDnDV+P4xBAK48gos24np/M7LM5r0vbDMosxmHsxOvxVfV+v88zAkxoey4m
-         uKh1jvi7pfOQ9CdBBzf6+OvDRoDC6HUDpfUILZuB4BCIn6Tl2QhhkaXnCt+WH9+VTZow
-         smWxrkHYXmHseO94iaGEuM0GteCb8jW5EBwnrORw0N/T+o4YG/NikwW6tx9K17S7wuYR
-         2p3aevj/b0oUj2csoNbRMAjf7g+yDkEY+WH6yfkVe1EY40Vb7PoXoL1A/mBpiBpv/Yuh
-         xwjJWL51+nE+WxtjyGmOy7kJdVhSUkQ1kSM1KbTuR7zNCgPfOgWp9aVCIV7tUCC5ZdVl
-         F+sQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUMQQmB3u8Y1wTMr5VbU34SQDgORXfseeR+OspaZ3vPA+usGXMLSdE57hIi63VK73/rJuOU40zCK7YnkHuVBQDP@vger.kernel.org, AJvYcCVUUICxnwao70NPBw7tH+v2gcqeKAVkgJZjFGHYeVA0FdUXFl+xoxZd1FQZIAO9a+gNt0Xjb9t3m/IM@vger.kernel.org, AJvYcCVq32NyPCgawS8C7uk8uBDgUzm1ARB0kOsz16qNRGzfolqZ3UDG6YrdMEOVl/Lkcvzg7aey20Vw@vger.kernel.org, AJvYcCWeeCRviZU5LhqwbNyZi2H35jSPd4Zvyefxs26qZ2XWCPdU5r2+DhETHd1jDjRIlfxb5gyzOrn3RpR0@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx3JUa5DH/UXektWt5h39mWxLlBnnkj0YevPNvS2zwEcQJRBE7g
-	CakENjOzPsHleQ0n8OhJlAXRYWyFxOfqg9KfMYTo9up80VGCMiRTlq3WMDWP09J2P7Mch3asmRA
-	aKwoDgLGLaqaTatVFA0R9+9jRsPw=
-X-Google-Smtp-Source: AGHT+IGmpmLBeTAPXPIRwiUfzbOE2eGaYU4f2bM4AiH6RqrYHO9Xxr86yvTVC9mVJ9J5ccdXs8Q9/sfsLUHxQxRc7WI=
-X-Received: by 2002:a05:6871:299:b0:25e:c013:a7fb with SMTP id
- 586e51a60fabf-2775a0ad385mr2070533fac.43.1724743905038; Tue, 27 Aug 2024
- 00:31:45 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=126.com header.i=@126.com header.b="WwyxbdlK"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=126.com;
+	s=s110527; h=From:Subject:Date:Message-Id:MIME-Version; bh=PSd0U
+	iTa8GxL439RyFT55es/lYaTAdadZ/QwVOOkSbw=; b=WwyxbdlKhRzHUHgHt5+Ez
+	yQon9wV0x4agUC+JXQ/to7dpSPpOhTrhiMsG4Kd4VfRyQkFIyxR9Ad/Pb0qJoVCD
+	CLclUjOaPCSkznpnDHmjJ96axWpDREZgy/K5qG6HxRYnljbUlWF5GWc+B1eFXa7q
+	5Bivz1v1QDoPgi4U/S5LKQ=
+Received: from localhost.localdomain (unknown [58.22.7.114])
+	by gzga-smtp-mta-g2-0 (Coremail) with SMTP id _____wD3n2W5ic1msxN4BQ--.16578S2;
+	Tue, 27 Aug 2024 16:09:30 +0800 (CST)
+From: Felix Qin <xiaokeqinhealth@126.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Felix Qin <xiaoyao@rock-chips.com>
+Subject: [PATCH BlueZ 1/1] att: Correctly handle negative return values in can_write_data
+Date: Tue, 27 Aug 2024 16:09:25 +0800
+Message-Id: <20240827080925.55684-1-xiaokeqinhealth@126.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240822133908.1042240-1-lizetao1@huawei.com> <20240822133908.1042240-5-lizetao1@huawei.com>
- <20240824181209.GR2164@kernel.org> <CAOi1vP98rmMKKH-ik4dshO1A9chrfsPqiWDY6Wk4EfQNTeNe8Q@mail.gmail.com>
-In-Reply-To: <CAOi1vP98rmMKKH-ik4dshO1A9chrfsPqiWDY6Wk4EfQNTeNe8Q@mail.gmail.com>
-From: Ilya Dryomov <idryomov@gmail.com>
-Date: Tue, 27 Aug 2024 09:31:33 +0200
-Message-ID: <CAOi1vP8TaPmxj7Bx4jRubS7rr0+BOmFdJyZx-X6nwivei=sACw@mail.gmail.com>
-Subject: Re: [PATCH net-next 4/8] libceph: use min() to simplify the code
-To: Simon Horman <horms@kernel.org>
-Cc: Li Zetao <lizetao1@huawei.com>, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, marcel@holtmann.org, 
-	johan.hedberg@gmail.com, luiz.dentz@gmail.com, xiubli@redhat.com, 
-	dsahern@kernel.org, trondmy@kernel.org, anna@kernel.org, 
-	chuck.lever@oracle.com, jlayton@kernel.org, neilb@suse.de, 
-	okorniev@redhat.com, Dai.Ngo@oracle.com, tom@talpey.com, jmaloy@redhat.com, 
-	ying.xue@windriver.com, linux@treblig.org, jacob.e.keller@intel.com, 
-	willemb@google.com, kuniyu@amazon.com, wuyun.abel@bytedance.com, 
-	quic_abchauha@quicinc.com, gouhao@uniontech.com, netdev@vger.kernel.org, 
-	linux-bluetooth@vger.kernel.org, ceph-devel@vger.kernel.org, 
-	linux-nfs@vger.kernel.org, tipc-discussion@lists.sourceforge.net
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:_____wD3n2W5ic1msxN4BQ--.16578S2
+X-Coremail-Antispam: 1Uf129KBjDUn29KB7ZKAUJUUUU8529EdanIXcx71UUUUU7v73
+	VFW2AGmfu7bjvjm3AaLaJ3UbIYCTnIWIevJa73UjIFyTuYvjxUrnYwUUUUU
+X-CM-SenderInfo: 50ld0yhhtl0xhhdo3xa6rslhhfrp/1tbimgpI1WbNhjxGdQAAsv
 
-On Sun, Aug 25, 2024 at 6:21=E2=80=AFPM Ilya Dryomov <idryomov@gmail.com> w=
-rote:
->
-> On Sat, Aug 24, 2024 at 8:12=E2=80=AFPM Simon Horman <horms@kernel.org> w=
-rote:
-> >
-> > On Thu, Aug 22, 2024 at 09:39:04PM +0800, Li Zetao wrote:
-> > > When resolving name in ceph_dns_resolve_name(), the end address of na=
-me
-> > > is determined by the minimum value of delim_p and colon_p. So using m=
-in()
-> > > here is more in line with the context.
-> > >
-> > > Signed-off-by: Li Zetao <lizetao1@huawei.com>
-> > > ---
-> > >  net/ceph/messenger.c | 2 +-
-> > >  1 file changed, 1 insertion(+), 1 deletion(-)
-> > >
-> > > diff --git a/net/ceph/messenger.c b/net/ceph/messenger.c
-> > > index 3c8b78d9c4d1..d1b5705dc0c6 100644
-> > > --- a/net/ceph/messenger.c
-> > > +++ b/net/ceph/messenger.c
-> > > @@ -1254,7 +1254,7 @@ static int ceph_dns_resolve_name(const char *na=
-me, size_t namelen,
-> > >       colon_p =3D memchr(name, ':', namelen);
-> > >
-> > >       if (delim_p && colon_p)
-> > > -             end =3D delim_p < colon_p ? delim_p : colon_p;
-> > > +             end =3D min(delim_p, colon_p);
-> >
-> > Both delim_p, and colon_p are char *, so this seems correct to me.
-> >
-> > And the code being replaced does appear to be a min() operation in
-> > both form and function.
-> >
-> > Reviewed-by: Simon Horman <horms@kernel.org>
-> >
-> > However, I don't believe libceph changes usually don't go through next-=
-next.
-> > So I think this either needs to be reposted or get some acks from
-> > one of the maintainers.
-> >
-> > Ilya, Xiubo, perhaps you can offer some guidance here?
->
-> Hi Simon,
->
-> I'm OK with this being taken through net-next.
+From: Felix Qin <xiaoyao@rock-chips.com>
 
-I see that Jakub picked up some patches from this series, but not this
-one.  I'll go ahead and apply to the Ceph tree.
+---
+ src/shared/att.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Thanks,
+diff --git a/src/shared/att.c b/src/shared/att.c
+index a45e9c268..4a406f4b9 100644
+--- a/src/shared/att.c
++++ b/src/shared/att.c
+@@ -551,7 +551,7 @@ static bool can_write_data(struct io *io, void *user_data)
+ 	if (!op)
+ 		return false;
+ 
+-	if (!bt_att_chan_write(chan, op->opcode, op->pdu, op->len)) {
++	if (bt_att_chan_write(chan, op->opcode, op->pdu, op->len) < 0) {
+ 		if (op->callback)
+ 			op->callback(BT_ATT_OP_ERROR_RSP, NULL, 0,
+ 							op->user_data);
+-- 
+2.34.1
 
-                Ilya
