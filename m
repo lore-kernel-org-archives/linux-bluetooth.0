@@ -1,28 +1,30 @@
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69C141946B5
-	for <linux-bluetooth@vger.kernel.org>; Tue, 27 Aug 2024 08:19:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
+Received: from m16.mail.126.com (m16.mail.126.com [220.197.31.9])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B566654656
+	for <linux-bluetooth@vger.kernel.org>; Tue, 27 Aug 2024 08:26:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724746802; cv=none; b=lFRVhqvrKNFPWFHmTUKhtDZrHd3Dh/PCj+B4YDEcpY7e1k6a3xH60YN8/cksgi+5Nnsh1hbW87ysCAF5SACaHcIIQvv9lDMqOUr3q9Ock4thcN9sTCe9FzR0pSpZdTll7FjJOOLFVIWeEz8PiS2apURe2RMmisxeHbron+M1jGc=
+	t=1724747192; cv=none; b=MbeNRF9DPIwKTGTm1y3AEiFyZN+ni8Qarc+0O7BZNfk8mjbXV6maBlbzO8bcFn8bCaGnWGRCGeAJqVOm0R0413R2AXbq+YYTDtbbMCrkeljsn4c9tvNFke9W3dj7AGlXuismmHJvts2W98hbTMB8iteRjHMSEv0STfLk5JXbqJs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724746802; c=relaxed/simple;
-	bh=Q1MnWK+q2Ki8FDU55KqjuAzBVyrb6/UX+23k89pyXMg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:Cc:From:
-	 In-Reply-To:Content-Type; b=r96lM6PP1FM7UzTejVTgY/ElSLExZEoSUmJbWOmeNJnX2rtjGMwE6aZiS8d4BOVNQj9kUE0Uml5/uX0ggHZI3dZmCOvZ4XVqxk1SQcrSGgyATy+rB5LXfuGLDFCw7wKL2pLxbK24DMCIyO7nWA27/oMzqXIjnb3cSwdzr5bd578=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from [141.14.14.122] (v122.vpnx.molgen.mpg.de [141.14.14.122])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id AA41561E5FE05;
-	Tue, 27 Aug 2024 10:19:46 +0200 (CEST)
-Message-ID: <cf6d8d94-2bdf-4b60-95cd-18d67e8d4b96@molgen.mpg.de>
-Date: Tue, 27 Aug 2024 10:19:41 +0200
+	s=arc-20240116; t=1724747192; c=relaxed/simple;
+	bh=Z1mB0bgSP+eXQ4rwYwgordNux1ihRglKER+ENBsA+F4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Gc7ipN7sYgSKyhlnJXrURq41V7thZQ8lDDfbgoHrmf7sItC2Mql/DTyn0mgwrPFwbbtcLCbJ5U3DmMvqOeUYWXRDDboYf2Zf2Gwg7OUen0ydKiOgTG4x6nERFuRaM0BFGH4hKzyfywPbZH22xP34GLCb+WK8dvamb2F7OgybIbk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=126.com; spf=pass smtp.mailfrom=126.com; dkim=pass (1024-bit key) header.d=126.com header.i=@126.com header.b=bIz3v4Jj; arc=none smtp.client-ip=220.197.31.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=126.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=126.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=126.com header.i=@126.com header.b="bIz3v4Jj"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=126.com;
+	s=s110527; h=Message-ID:Date:MIME-Version:Subject:From:
+	Content-Type; bh=4xZckVI8nc5xeTCjHGjXCFY0AG1zFCNawoZWDqKy5js=;
+	b=bIz3v4JjrEgF+Xp9FuhTEzUbZxw/3kP5xeRtp5Svwb4D9QkaRT2ab7MKsuojlS
+	kz7KbC0sJ3JR4GoiZwxh5/mtyMRME8W+SYseFWTtTCL9iXAMCCKczVvrpxeM5bhm
+	xWmt2pfmjmO3uBem6KBNs27hD48DV4drpV3J+n2Ck3LOc=
+Received: from [192.168.50.76] (unknown [58.22.7.114])
+	by gzsmtp1 (Coremail) with SMTP id pSkvCgDnr8qigs1mJXkLAA--.20723S2;
+	Tue, 27 Aug 2024 15:39:14 +0800 (CST)
+Message-ID: <e4be48f5-1139-4871-a229-8dae7a7d745f@126.com>
+Date: Tue, 27 Aug 2024 15:39:13 +0800
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -30,196 +32,320 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 2/2] Bluetooth: MGMT: Fix not generating command
- complete for MGMT_OP_DISCONNECT
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-References: <20240826202518.524007-1-luiz.dentz@gmail.com>
- <20240826202518.524007-2-luiz.dentz@gmail.com>
-Content-Language: en-US
-Cc: linux-bluetooth@vger.kernel.org
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <20240826202518.524007-2-luiz.dentz@gmail.com>
+Subject: Re: [PATCH 1/2] adapter: Fix addr_type for smp_irk/ltk_info/link_key
+Content-Language: en-GB
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+ Robin Candau <antiz@archlinux.org>, quic_chejiang@quicinc.com
+Cc: linux-bluetooth@vger.kernel.org, Xiao Yao <xiaoyao@rock-chips.com>
+References: <20231211162729.1183207-1-xiaokeqinhealth@126.com>
+ <55903fdb-e970-4b89-b620-daa93bad7811@archlinux.org>
+ <CABBYNZ+X1gWovfui7Vyaag80PFz_1q4A_F7r=wpgF_gm9f9orA@mail.gmail.com>
+From: Yao Xiao <xiaokeqinhealth@126.com>
+In-Reply-To: <CABBYNZ+X1gWovfui7Vyaag80PFz_1q4A_F7r=wpgF_gm9f9orA@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:pSkvCgDnr8qigs1mJXkLAA--.20723S2
+X-Coremail-Antispam: 1Uf129KBjvJXoW3KryUtF1rJr13Cry8Zw1fJFb_yoWDWF13pF
+	ZxJFy2kFWUWr12gr47Wr43uFyY9wsY9ryFgry2g3WS9Fs8ZrWvvrW5KrWY9ay8Arykta9I
+	qF4qvFyYg3WUCFJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07j1VbgUUUUU=
+X-CM-SenderInfo: 50ld0yhhtl0xhhdo3xa6rslhhfrp/1tbi6AJI1WVLdQL7SQAAsc
 
-Dear Luiz,
+Hi luiz,
+The kernel should always report the correct address type for all kinds 
+of keys. Older kernels ignore the derivation of keys, which prevents the 
+user layer from knowing the correct address type. This can cause a lot 
+of confusion for users. For example, when a user connects to a 
+traditional Bluetooth audio device, due to the default activation of key 
+derivation, bluetoothd reports both BREDR and BLE pairing and binding, 
+and the address is updated to LE public. When the user actively calls 
+the Connect method of org.bluez.Device1 to reconnect, sometimes the 
+address type is set to LE public, leading to a failed connection, and 
+vice versa.
 
+We should enable bluetoothd to know the reason for the generation of 
+keys as much as possible. Older kernels always assume the address type 
+of linkey is BREDR, and ltk/irk/csrk are LE public. Therefore, we can 
+use this as a basis for judgment, allowing bluetoothd to handle various 
+issues, such as reloading keys and handling unpaired devices. Below is a 
+pseudo-code that is not running in practice but just a thought. Please 
+help review it.
+-------------------------------------------
+diff --git a/src/adapter.c b/src/adapter.c
+index 85ddfc165..babe7c9b2 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -4958,6 +4958,7 @@ static void load_devices(struct btd_adapter *adapter)
+          struct irk_info *irk_info;
+          struct conn_param *param;
+          uint8_t bdaddr_type;
++        bool derived_key;
 
-Thank you for the patch. Two minor comments.
+          if (entry->d_type == DT_UNKNOWN)
+              entry->d_type = util_get_dt(dirname, entry->d_name);
+@@ -4976,10 +4977,21 @@ static void load_devices(struct btd_adapter 
+*adapter)
+              g_clear_error(&gerr);
+          }
 
-Am 26.08.24 um 22:25 schrieb Luiz Augusto von Dentz:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
++        derived_key = g_key_file_get_boolean(key_file, "General",
++                                "DerivedKey", NULL);
++
++        /* For link key */
+          bdaddr_type = get_addr_type(key_file);
++        if (!derived_key)
++            bdaddr_type = BDADDR_BREDR;
+
+          key_info = get_key_info(key_file, entry->d_name, bdaddr_type);
+
++        /* For ltk/irk/csrk */
++        bdaddr_type = get_addr_type(key_file);
++        if (!derived_key)
++            bdaddr_type = BDADDR_LE_PUBLIC;
++
+          ltk_info = get_ltk_info(key_file, entry->d_name, bdaddr_type);
+
+          peripheral_ltk_info = get_peripheral_ltk_info(key_file,
+@@ -8673,6 +8685,12 @@ static void new_link_key_callback(uint16_t index, 
+uint16_t length,
+          return;
+      }
+
++    /*
++     * For older kernels, the address type is always BREDR.
++     */
++    if (addr->type == BDADDR_LE_PUBLIC)
++        device->derived_key = true;
++
+      if (ev->store_hint) {
+          const struct mgmt_link_key_info *key = &ev->key;
+
+@@ -8791,6 +8809,12 @@ static void new_long_term_key_callback(uint16_t 
+index, uint16_t length,
+          return;
+      }
+
++    /*
++     * For older kernels, the address type is always BDADDR_LE_PUBLIC.
++     */
++    if (addr->type == BDADDR_BREDR)
++        device->derived_key = true;
++
+      /*
+       * Some older kernel versions set store_hint for long term keys
+       * from resolvable and unresolvable random addresses, but there
+@@ -8855,6 +8879,9 @@ static void new_csrk_callback(uint16_t index, 
+uint16_t length,
+          return;
+      }
+
++    if (addr->type == BDADDR_BREDR)
++        device->derived_key = true;
++
+      device_set_csrk(device, key->val, 0, key->type, ev->store_hint);
+  }
+
+@@ -8941,6 +8968,9 @@ static void new_irk_callback(uint16_t index, 
+uint16_t length,
+          return;
+      }
+
++    if (addr->type == BDADDR_BREDR)
++        device->derived_key = true;
++
+      device_update_addr(device, &addr->bdaddr, addr->type);
+
+      if (duplicate)
+diff --git a/src/device.c b/src/device.c
+index a1dc0750c..062b9c49d 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -272,6 +272,7 @@ struct btd_device {
+      struct csrk_info *remote_csrk;
+      struct ltk_info *ltk;
+      struct queue    *sirks;
++    bool        derived_key;            /* key is derived. */
+
+      sdp_list_t    *tmp_records;
+
+@@ -482,6 +483,9 @@ static gboolean store_device_info_cb(gpointer user_data)
+      g_key_file_set_boolean(key_file, "General", "Blocked",
+                              device->blocked);
+
++    g_key_file_set_boolean(key_file, "General", "DerivedKey",
++                            device->derived_key);
++
+      if (device->wake_override != WAKE_FLAG_DEFAULT) {
+          g_key_file_set_boolean(key_file, "General", "WakeAllowed",
+                         device->wake_override ==
+@@ -1829,7 +1833,11 @@ static void bonding_request_cancel(struct 
+bonding_req *bonding)
+      struct btd_device *device = bonding->device;
+      struct btd_adapter *adapter = device->adapter;
+
+-    adapter_cancel_bonding(adapter, &device->bdaddr, device->bdaddr_type);
++    if (device->derived_key) {
++        adapter_cancel_bonding(adapter, &device->bdaddr, BDADDR_BREDR);
++        adapter_cancel_bonding(adapter, &device->bdaddr, BDADDR_LE_PUBLIC);
++    } else
++        adapter_cancel_bonding(adapter, &device->bdaddr, 
+device->bdaddr_type);
+  }
+
+  static void dev_disconn_service(gpointer a, gpointer b)
+@@ -3196,12 +3204,19 @@ static DBusMessage 
+*cancel_pairing(DBusConnection *conn, DBusMessage *msg,
+  {
+      struct btd_device *device = data;
+      struct bonding_req *req = device->bonding;
++    uint8_t bdaddr_type;
+
+      DBG("");
+
+      if (!req) {
+-        btd_adapter_remove_bonding(device->adapter, &device->bdaddr,
+-                        device->bdaddr_type);
++        if (device->derived_key) {
++            btd_adapter_remove_bonding(device->adapter, &device->bdaddr,
++                            BDADDR_BREDR);
++            btd_adapter_remove_bonding(device->adapter, &device->bdaddr,
++                            BDADDR_LE_PUBLIC);
++        } else
++            btd_adapter_remove_bonding(device->adapter, &device->bdaddr,
++                            device->bdaddr_type);
+          return btd_error_does_not_exist(msg);
+      }
+
+@@ -3833,6 +3848,9 @@ next:
+          gerr = NULL;
+      }
+
++    device->derived_key = g_key_file_get_boolean(key_file, "General",
++                            "DerivedKey", NULL);
++
+      if (store_needed)
+          store_device_info(device);
+  }
+
+On 2024/8/27 5:12, Luiz Augusto von Dentz wrote:
+> Hi Xiao,
 > 
-> MGMT_OP_DISCONNECT can be called while mgmt_device_connected has not
-> been called yet, which will cause the connection procedure to be
-> aborted, so mgmt_device_disconnected shall still respond with command
-> complete to MGMT_OP_DISCONNECT and just not emit
-> MGMT_EV_DEVICE_DISCONNECTED since MGMT_EV_DEVICE_CONNECTED was never
-> sent.
+> On Fri, Dec 15, 2023 at 8:06 PM Robin Candau <antiz@archlinux.org> wrote:
+>>
+>> On 12/11/23 17:27, Xiao Yao wrote:
+>>
+>> From: Xiao Yao <xiaoyao@rock-chips.com>
+>>
+>> According to BLUETOOTH CORE SPECIFICATION Version 5.4 | Vol 3,
+>> Part H, 2.4.24/2.4.25, The LE LTK and BR/EDR link keys can be
+>> converted between each other, so the addr type can be either
+>> BREDR or LE, so fix it.
+>>
+>> Signed-off-by: Xiao Yao <xiaoyao@rock-chips.com>
+>> ---
+>>   src/adapter.c | 20 ++++++++++++++------
+>>   1 file changed, 14 insertions(+), 6 deletions(-)
+>>
+>> diff --git a/src/adapter.c b/src/adapter.c
+>> index 86fff72bc..ee70b00d2 100644
+>> --- a/src/adapter.c
+>> +++ b/src/adapter.c
+>> @@ -170,6 +170,7 @@ static GSList *conn_fail_list = NULL;
+>>
+>>   struct link_key_info {
+>>    bdaddr_t bdaddr;
+>> + uint8_t bdaddr_type;
+>>    unsigned char key[16];
+>>    uint8_t type;
+>>    uint8_t pin_len;
+>> @@ -3964,7 +3965,9 @@ static bool is_blocked_key(uint8_t key_type, uint8_t *key_value)
+>>    return false;
+>>   }
+>>
+>> -static struct link_key_info *get_key_info(GKeyFile *key_file, const char *peer)
+>> +static struct link_key_info *get_key_info(GKeyFile *key_file, const char *peer,
+>> + uint8_t bdaddr_type)
+>> +
+>>   {
+>>    struct link_key_info *info = NULL;
+>>    char *str;
+>> @@ -3976,6 +3979,7 @@ static struct link_key_info *get_key_info(GKeyFile *key_file, const char *peer)
+>>    info = g_new0(struct link_key_info, 1);
+>>
+>>    str2ba(peer, &info->bdaddr);
+>> + info->bdaddr_type = bdaddr_type;
+>>
+>>    if (!strncmp(str, "0x", 2))
+>>    str2buf(&str[2], info->key, sizeof(info->key));
+>> @@ -4343,7 +4347,7 @@ static void load_link_keys(struct btd_adapter *adapter, GSList *keys,
+>>    struct link_key_info *info = l->data;
+>>
+>>    bacpy(&key->addr.bdaddr, &info->bdaddr);
+>> - key->addr.type = BDADDR_BREDR;
+>> + key->addr.type = info->bdaddr_type;
+>>    key->type = info->type;
+>>    memcpy(key->val, info->key, 16);
+>>    key->pin_len = info->pin_len;
+>> @@ -4598,14 +4602,18 @@ static void load_conn_params(struct btd_adapter *adapter, GSList *params)
+>>    btd_error(adapter->dev_id, "Load connection parameters failed");
+>>   }
+>>
+>> -static uint8_t get_le_addr_type(GKeyFile *keyfile)
+>> +static uint8_t get_addr_type(GKeyFile *keyfile)
+>>   {
+>>    uint8_t addr_type;
+>>    char *type;
+>>
+>> + /* The AddressType is written to file only When dev->le is
+>> + * set to true, as referenced in the update_technologies().
+>> + * Therefore, When type is NULL, it default to BDADDR_BREDR.
+>> + */
+>>    type = g_key_file_get_string(keyfile, "General", "AddressType", NULL);
+>>    if (!type)
+>> - return BDADDR_LE_PUBLIC;
+>> + return BDADDR_BREDR;
+>>
+>>    if (g_str_equal(type, "public"))
+>>    addr_type = BDADDR_LE_PUBLIC;
+>> @@ -4914,9 +4922,9 @@ static void load_devices(struct btd_adapter *adapter)
+>>    g_clear_error(&gerr);
+>>    }
+>>
+>> - key_info = get_key_info(key_file, entry->d_name);
+>> + bdaddr_type = get_addr_type(key_file);
+>>
+>> - bdaddr_type = get_le_addr_type(key_file);
+>> + key_info = get_key_info(key_file, entry->d_name, bdaddr_type);
+>>
+>>    ltk_info = get_ltk_info(key_file, entry->d_name, bdaddr_type);
+>>
+>>
+>> Hello,
+>>
+>> It seems like the above commit introduced a regression where the initial auto-connect for Bluetooth devices doesn't work anymore.
+>>
+>> Indeed, at system startup, starting a Bluetooth device will cause it to go in a "connected/disconnected" state loop, requiring to initialize a manual connection first (with sometimes multiple attempts needed) before getting it connected correctly and working as intended.
+>>
+>> `systemctl status bluetooth` reports the following error:
+>>
+>> [...]
+>> déc. 15 11:03:18 Arch-Desktop bluetoothd[592]: Failed to load link keys for hci0: Invalid Parameters (0x0d)
+>> [...]
+>>
+>> I bisected the bug with `git bisect` and it pointed out this commit [1] as the "faulty" one.
+>> I can confirm that reverting it solves the issue.
+>>
+>> I reported this bug including details in the GitHub repo [2].
+>>
+>> I remain available if any additional information are needed.
+>>
+>> [1] https://github.com/bluez/bluez/commit/d5536e0cd431e22be9a1132be6d4af2445590633
+>> [2] https://github.com/bluez/bluez/issues/686
+>>
+>> --
+>> Regards,
+>> Robin Candau / Antiz
 > 
-> To fix this MGMT_OP_DISCONNECT is changed to work similarly to other
-> command which do use hci_cmd_sync_queue and then use hci_conn_abort to
-> disconnect and returns the result, in order for hci_conn_abort to be
-> used from hci_cmd_sync context it now uses hci_cmd_sync_run_once.
-> 
-> Link: https://github.com/bluez/bluez/issues/932
-> Fixes: 12d4a3b ("Bluetooth: Move check for MGMT_CONNECTED flag into mgmt.c")
-> Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> ---
->   net/bluetooth/hci_conn.c |  6 +++-
->   net/bluetooth/mgmt.c     | 72 +++++++++++++++++++++++-----------------
->   2 files changed, 47 insertions(+), 31 deletions(-)
-> 
-> diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-> index 8f0c9322eadb..6225f13177c3 100644
-> --- a/net/bluetooth/hci_conn.c
-> +++ b/net/bluetooth/hci_conn.c
-> @@ -2951,5 +2951,9 @@ int hci_abort_conn(struct hci_conn *conn, u8 reason)
->   		return 0;
->   	}
->   
-> -	return hci_cmd_sync_queue_once(hdev, abort_conn_sync, conn, NULL);
-> +	/* Run immediately if on cmd_sync_work since it maybe called from
-> +	 * as a result to MGMT_OP_DISCONNECT and MGMT_OP_UNPAIR which does
-
-I am unable to parse it from “since …”.
-
-> +	 * already queue its callback on cmd_sync_work.
-> +	 */
-> +	return hci_cmd_sync_run_once(hdev, abort_conn_sync, conn, NULL);
->   }
-> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-> index 25979f4283a6..54dc9976abcf 100644
-> --- a/net/bluetooth/mgmt.c
-> +++ b/net/bluetooth/mgmt.c
-> @@ -2921,7 +2921,12 @@ static int unpair_device_sync(struct hci_dev *hdev, void *data)
->   	if (!conn)
->   		return 0;
->   
-> -	return hci_abort_conn_sync(hdev, conn, HCI_ERROR_REMOTE_USER_TERM);
-> +	/* Disregard any possible error since the likes of hci_abort_conn_sync
-> +	 * will cleanup the connection no matter the error.
-
-The verb *clean up* is spelled with a space.
-
-
-Kind regards,
-
-Paul
-
-
-> +	 */
-> +	hci_abort_conn(conn, HCI_ERROR_REMOTE_USER_TERM);
-> +
-> +	return 0;
->   }
->   
->   static int unpair_device(struct sock *sk, struct hci_dev *hdev, void *data,
-> @@ -3053,13 +3058,44 @@ static int unpair_device(struct sock *sk, struct hci_dev *hdev, void *data,
->   	return err;
->   }
->   
-> +static void disconnect_complete(struct hci_dev *hdev, void *data, int err)
-> +{
-> +	struct mgmt_pending_cmd *cmd = data;
-> +
-> +	cmd->cmd_complete(cmd, mgmt_status(err));
-> +	mgmt_pending_free(cmd);
-> +}
-> +
-> +static int disconnect_sync(struct hci_dev *hdev, void *data)
-> +{
-> +	struct mgmt_pending_cmd *cmd = data;
-> +	struct mgmt_cp_disconnect *cp = cmd->param;
-> +	struct hci_conn *conn;
-> +
-> +	if (cp->addr.type == BDADDR_BREDR)
-> +		conn = hci_conn_hash_lookup_ba(hdev, ACL_LINK,
-> +					       &cp->addr.bdaddr);
-> +	else
-> +		conn = hci_conn_hash_lookup_le(hdev, &cp->addr.bdaddr,
-> +					       le_addr_type(cp->addr.type));
-> +
-> +	if (!conn)
-> +		return -ENOTCONN;
-> +
-> +	/* Disregard any possible error since the likes of hci_abort_conn_sync
-> +	 * will cleanup the connection no matter the error.
-> +	 */
-> +	hci_abort_conn(conn, HCI_ERROR_REMOTE_USER_TERM);
-> +
-> +	return 0;
-> +}
-> +
->   static int disconnect(struct sock *sk, struct hci_dev *hdev, void *data,
->   		      u16 len)
->   {
->   	struct mgmt_cp_disconnect *cp = data;
->   	struct mgmt_rp_disconnect rp;
->   	struct mgmt_pending_cmd *cmd;
-> -	struct hci_conn *conn;
->   	int err;
->   
->   	bt_dev_dbg(hdev, "sock %p", sk);
-> @@ -3082,27 +3118,7 @@ static int disconnect(struct sock *sk, struct hci_dev *hdev, void *data,
->   		goto failed;
->   	}
->   
-> -	if (pending_find(MGMT_OP_DISCONNECT, hdev)) {
-> -		err = mgmt_cmd_complete(sk, hdev->id, MGMT_OP_DISCONNECT,
-> -					MGMT_STATUS_BUSY, &rp, sizeof(rp));
-> -		goto failed;
-> -	}
-> -
-> -	if (cp->addr.type == BDADDR_BREDR)
-> -		conn = hci_conn_hash_lookup_ba(hdev, ACL_LINK,
-> -					       &cp->addr.bdaddr);
-> -	else
-> -		conn = hci_conn_hash_lookup_le(hdev, &cp->addr.bdaddr,
-> -					       le_addr_type(cp->addr.type));
-> -
-> -	if (!conn || conn->state == BT_OPEN || conn->state == BT_CLOSED) {
-> -		err = mgmt_cmd_complete(sk, hdev->id, MGMT_OP_DISCONNECT,
-> -					MGMT_STATUS_NOT_CONNECTED, &rp,
-> -					sizeof(rp));
-> -		goto failed;
-> -	}
-> -
-> -	cmd = mgmt_pending_add(sk, MGMT_OP_DISCONNECT, hdev, data, len);
-> +	cmd = mgmt_pending_new(sk, MGMT_OP_DISCONNECT, hdev, data, len);
->   	if (!cmd) {
->   		err = -ENOMEM;
->   		goto failed;
-> @@ -3110,9 +3126,10 @@ static int disconnect(struct sock *sk, struct hci_dev *hdev, void *data,
->   
->   	cmd->cmd_complete = generic_cmd_complete;
->   
-> -	err = hci_disconnect(conn, HCI_ERROR_REMOTE_USER_TERM);
-> +	err = hci_cmd_sync_queue(hdev, disconnect_sync, cmd,
-> +				 disconnect_complete);
->   	if (err < 0)
-> -		mgmt_pending_remove(cmd);
-> +		mgmt_pending_free(cmd);
->   
->   failed:
->   	hci_dev_unlock(hdev);
-> @@ -9744,8 +9761,6 @@ void mgmt_device_disconnected(struct hci_dev *hdev, bdaddr_t *bdaddr,
->   	if (link_type != ACL_LINK && link_type != LE_LINK)
->   		return;
->   
-> -	mgmt_pending_foreach(MGMT_OP_DISCONNECT, hdev, disconnect_rsp, &sk);
-> -
->   	bacpy(&ev.addr.bdaddr, bdaddr);
->   	ev.addr.type = link_to_bdaddr(link_type, addr_type);
->   	ev.reason = reason;
-> @@ -9758,9 +9773,6 @@ void mgmt_device_disconnected(struct hci_dev *hdev, bdaddr_t *bdaddr,
->   
->   	if (sk)
->   		sock_put(sk);
-> -
-> -	mgmt_pending_foreach(MGMT_OP_UNPAIR_DEVICE, hdev, unpair_device_rsp,
-> -			     hdev);
->   }
->   
->   void mgmt_disconnect_failed(struct hci_dev *hdev, bdaddr_t *bdaddr,
+> Perhaps related to:
+> https://github.com/bluez/bluez/issues/875#issuecomment-2311100872?
 
