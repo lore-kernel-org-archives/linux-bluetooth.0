@@ -1,86 +1,134 @@
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+Received: from mail-oa1-f46.google.com (mail-oa1-f46.google.com [209.85.160.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2F7FC133
-	for <linux-bluetooth@vger.kernel.org>; Tue, 27 Aug 2024 07:19:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE1D7747F;
+	Tue, 27 Aug 2024 07:31:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724743188; cv=none; b=msYdiSjfvgdzV84bqUraKdry/TUjBB8zOhAB2vrBeFxcVxzv6vKL9vwQHOr6SCurea6UuA+VdibUXsmuSpwBaEBMi/4dxll0JTwksW8g1ApTDZIDqEiJLgn/mDlRHwRO3n/Pt5cS1y57INZ2TtgCihOy2BDgHIzXlFM7JBuEq1Q=
+	t=1724743908; cv=none; b=tK6XwNr5kl1l6YMa0FU4B2iLnERLUEGuEbSeFBYE/8cKHv5UBxgFfV5pRmEHKmu/kNJT7t59dK86jOVwKamu6sxhrWPx/blmFPd9Wj87QcfpGQ/Gv5tdTqGfChgQgnnlZVez5OdbMCs7DmPW1PftdUUDaLP/taHnkXjVClsbvzA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724743188; c=relaxed/simple;
-	bh=HRMBdVRIv7uebRCwMPC8GZglmXaEVEHyK9weJKDSmRQ=;
-	h=Message-ID:Date:From:To:Subject:MIME-Version:Content-Type:
-	 Content-Disposition; b=if3Dz/sH/FuF0ri4LbsMIU3M5T0TSwGbyMDgIOxtaq8+hcLwSFmAiacv6TW6oHnjCDNbY0SZE89Nx+UD+33rQrDbTjOrCGhDOdlgP5cTUfkeI92T9F7pFSHdxlq/B5LF7phiyAHRiqQgteMUsfSty8Ku3bIssVFIiEh5kreWKR4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nFPlNNy5; arc=none smtp.client-ip=209.85.214.180
+	s=arc-20240116; t=1724743908; c=relaxed/simple;
+	bh=mDJuyJqY7HxSUpYyQsIPkYxF6N1t9wLoCXzdOlBN48A=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=VF4nOyMo48LHq7AVnFBR4oL0Uh7zjKE8zARVy+ZqrEIfRyXJEa0GBpo9VP3+3yoMbiqpmM5CZYe4UAx5ZqC7JdljnJIA3a1Ch+2QzPkuaH4ubzu4f5blmQVTQfNd2U9oJlRYcuI10HTEo4FNXlq69hIP192P7BaGTavocqQruLY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kGTeefnm; arc=none smtp.client-ip=209.85.160.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nFPlNNy5"
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-1fec34f94abso51419435ad.2
-        for <linux-bluetooth@vger.kernel.org>; Tue, 27 Aug 2024 00:19:46 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kGTeefnm"
+Received: by mail-oa1-f46.google.com with SMTP id 586e51a60fabf-270420e231aso3474662fac.2;
+        Tue, 27 Aug 2024 00:31:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1724743185; x=1725347985; darn=vger.kernel.org;
-        h=content-disposition:mime-version:subject:to:from:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=HRMBdVRIv7uebRCwMPC8GZglmXaEVEHyK9weJKDSmRQ=;
-        b=nFPlNNy5D5JZN7a29FugaC8vy7DbVVlddWR8bXZSVBK0qXR7827wXeCN5sW6dX8NPM
-         PZcUk8Br+geZ31kMcw0OprBbu1UYpCOMItTT+P/0OVIVEFDc72obH+a/6nZgtoWaoHLQ
-         IlQfbFGSC+Rv6XHDlwmkmEM8H28ymIS9uT4klVrDlaWaYlURadctUyJKplvpii/xehLQ
-         nZKSejhpbgSzIbkMUGzt6AQLPvpivYF/dvoeHBMnQVa4u+Rj2QpmCXerG/Yb2vKCZuc+
-         EQr0UvbUz/xpW/28S6uKuLmRtho4m/hT39G8rmto0rtuMruPGgtzI0Hf+M7ZrMs6gkDB
-         i/tg==
+        d=gmail.com; s=20230601; t=1724743905; x=1725348705; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=A1lD5NsHrENDzakDwTmISjEXVDogNpfvH/RKxNRH+uM=;
+        b=kGTeefnmo40otANZZA1wQC/jCOKifpdKFozNXJeiD0GkPQ8nGbZkyxT6HuegAebdvY
+         OnfUDhO9QDqVP8KY5c4nOkccMmddn4gatLEhtV0H3sunCl2/IbUnOKKDDttIz7C6gYoc
+         lCjPRuPhuhXfHvywPKVeZTrkU8ZlmhzvVm2PKbXnGicfqAZScdWnJdktuoHRQdlOyjWn
+         PG1/cxUuaF8qOsTrH6+YsDBVu4JfHicb0vlaz9e+nFVXSv0OLzDZrzKeFOgrCW/M7MFo
+         7zuibkFq3x00F0MHwBLforQ9QyLNN7Gpjgg7Jsp/9GWv4IH502UJ3fxeV1jDNV0jEFpX
+         3m8Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724743185; x=1725347985;
-        h=content-disposition:mime-version:subject:to:from:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=HRMBdVRIv7uebRCwMPC8GZglmXaEVEHyK9weJKDSmRQ=;
-        b=IbuKznMD94tmyea10xGhXJtZVwr/7mM7K8fiHjC40XlOXTHV+LAlxEb8srCbtuhUKe
-         4v2hwCCYLJZwf78LZGLGd3VOvYPtqGLjT2hNolEGabR/R7BVfziFnBZqSHAjgc6WxGCN
-         tnjON+kZ2MGiXLZ7jsOMd/uRycN86MNFZdjQBJ3ic1g8WP5Kf296cdW1pmnxwgLEc5pY
-         QTKPGQwo/PJxawVes5pa7dgASD9R4rlJQlnQhrMFTRPTYHnKKqQ8D8Rnr2lzjC3aYLde
-         MhB7yDKih7c6NKB1EY0djeGUrgQuTMr1644z+lysZRj3IYXvcUK2Ua2L143ebKEYJ70c
-         YEaQ==
-X-Gm-Message-State: AOJu0Yx1Q1cEL/bY66gmw/R78SLK+4U3qIFpXKNdhpnEYS2qcwue9tlj
-	gKVIEcECpD5mGQL2HhwA7tUXJ4LHXRL88Za9wqdYsPSDX340pkcKgngPOw==
-X-Google-Smtp-Source: AGHT+IEv3f23b1DN1KsbN72xIBgt6B7b3WJNwWzdEnFVI7nS5388/FF27Sy2J037oB7Lo7kzQ3itLA==
-X-Received: by 2002:a17:903:2301:b0:1fb:2bed:6418 with SMTP id d9443c01a7336-2039e515956mr152921655ad.57.1724743185174;
-        Tue, 27 Aug 2024 00:19:45 -0700 (PDT)
-Received: from JUNHO-NEOSTACK. ([221.154.134.3])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2038560fad1sm77597365ad.209.2024.08.27.00.19.44
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 27 Aug 2024 00:19:44 -0700 (PDT)
-Message-ID: <66cd7e10.170a0220.c4108.dd07@mx.google.com>
-X-Google-Original-Message-ID: <Zs1+D3tTL9fv8D7w@JUNHO-NEOSTACK.>
-Date: Tue, 27 Aug 2024 16:19:43 +0900
-From: Junho Lee <tot0roprog@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: Sharing functions that parse configs in src/main.c to the mesh module
+        d=1e100.net; s=20230601; t=1724743905; x=1725348705;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=A1lD5NsHrENDzakDwTmISjEXVDogNpfvH/RKxNRH+uM=;
+        b=R15zw/kcDnDV+P4xBAK48gos24np/M7LM5r0vbDMosxmHsxOvxVfV+v88zAkxoey4m
+         uKh1jvi7pfOQ9CdBBzf6+OvDRoDC6HUDpfUILZuB4BCIn6Tl2QhhkaXnCt+WH9+VTZow
+         smWxrkHYXmHseO94iaGEuM0GteCb8jW5EBwnrORw0N/T+o4YG/NikwW6tx9K17S7wuYR
+         2p3aevj/b0oUj2csoNbRMAjf7g+yDkEY+WH6yfkVe1EY40Vb7PoXoL1A/mBpiBpv/Yuh
+         xwjJWL51+nE+WxtjyGmOy7kJdVhSUkQ1kSM1KbTuR7zNCgPfOgWp9aVCIV7tUCC5ZdVl
+         F+sQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUMQQmB3u8Y1wTMr5VbU34SQDgORXfseeR+OspaZ3vPA+usGXMLSdE57hIi63VK73/rJuOU40zCK7YnkHuVBQDP@vger.kernel.org, AJvYcCVUUICxnwao70NPBw7tH+v2gcqeKAVkgJZjFGHYeVA0FdUXFl+xoxZd1FQZIAO9a+gNt0Xjb9t3m/IM@vger.kernel.org, AJvYcCVq32NyPCgawS8C7uk8uBDgUzm1ARB0kOsz16qNRGzfolqZ3UDG6YrdMEOVl/Lkcvzg7aey20Vw@vger.kernel.org, AJvYcCWeeCRviZU5LhqwbNyZi2H35jSPd4Zvyefxs26qZ2XWCPdU5r2+DhETHd1jDjRIlfxb5gyzOrn3RpR0@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx3JUa5DH/UXektWt5h39mWxLlBnnkj0YevPNvS2zwEcQJRBE7g
+	CakENjOzPsHleQ0n8OhJlAXRYWyFxOfqg9KfMYTo9up80VGCMiRTlq3WMDWP09J2P7Mch3asmRA
+	aKwoDgLGLaqaTatVFA0R9+9jRsPw=
+X-Google-Smtp-Source: AGHT+IGmpmLBeTAPXPIRwiUfzbOE2eGaYU4f2bM4AiH6RqrYHO9Xxr86yvTVC9mVJ9J5ccdXs8Q9/sfsLUHxQxRc7WI=
+X-Received: by 2002:a05:6871:299:b0:25e:c013:a7fb with SMTP id
+ 586e51a60fabf-2775a0ad385mr2070533fac.43.1724743905038; Tue, 27 Aug 2024
+ 00:31:45 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+References: <20240822133908.1042240-1-lizetao1@huawei.com> <20240822133908.1042240-5-lizetao1@huawei.com>
+ <20240824181209.GR2164@kernel.org> <CAOi1vP98rmMKKH-ik4dshO1A9chrfsPqiWDY6Wk4EfQNTeNe8Q@mail.gmail.com>
+In-Reply-To: <CAOi1vP98rmMKKH-ik4dshO1A9chrfsPqiWDY6Wk4EfQNTeNe8Q@mail.gmail.com>
+From: Ilya Dryomov <idryomov@gmail.com>
+Date: Tue, 27 Aug 2024 09:31:33 +0200
+Message-ID: <CAOi1vP8TaPmxj7Bx4jRubS7rr0+BOmFdJyZx-X6nwivei=sACw@mail.gmail.com>
+Subject: Re: [PATCH net-next 4/8] libceph: use min() to simplify the code
+To: Simon Horman <horms@kernel.org>
+Cc: Li Zetao <lizetao1@huawei.com>, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com, marcel@holtmann.org, 
+	johan.hedberg@gmail.com, luiz.dentz@gmail.com, xiubli@redhat.com, 
+	dsahern@kernel.org, trondmy@kernel.org, anna@kernel.org, 
+	chuck.lever@oracle.com, jlayton@kernel.org, neilb@suse.de, 
+	okorniev@redhat.com, Dai.Ngo@oracle.com, tom@talpey.com, jmaloy@redhat.com, 
+	ying.xue@windriver.com, linux@treblig.org, jacob.e.keller@intel.com, 
+	willemb@google.com, kuniyu@amazon.com, wuyun.abel@bytedance.com, 
+	quic_abchauha@quicinc.com, gouhao@uniontech.com, netdev@vger.kernel.org, 
+	linux-bluetooth@vger.kernel.org, ceph-devel@vger.kernel.org, 
+	linux-nfs@vger.kernel.org, tipc-discussion@lists.sourceforge.net
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi,
-While reviewing the code to add new Mesh States to mesh/mesh-main.conf,
-I noticed the following issues:
+On Sun, Aug 25, 2024 at 6:21=E2=80=AFPM Ilya Dryomov <idryomov@gmail.com> w=
+rote:
+>
+> On Sat, Aug 24, 2024 at 8:12=E2=80=AFPM Simon Horman <horms@kernel.org> w=
+rote:
+> >
+> > On Thu, Aug 22, 2024 at 09:39:04PM +0800, Li Zetao wrote:
+> > > When resolving name in ceph_dns_resolve_name(), the end address of na=
+me
+> > > is determined by the minimum value of delim_p and colon_p. So using m=
+in()
+> > > here is more in line with the context.
+> > >
+> > > Signed-off-by: Li Zetao <lizetao1@huawei.com>
+> > > ---
+> > >  net/ceph/messenger.c | 2 +-
+> > >  1 file changed, 1 insertion(+), 1 deletion(-)
+> > >
+> > > diff --git a/net/ceph/messenger.c b/net/ceph/messenger.c
+> > > index 3c8b78d9c4d1..d1b5705dc0c6 100644
+> > > --- a/net/ceph/messenger.c
+> > > +++ b/net/ceph/messenger.c
+> > > @@ -1254,7 +1254,7 @@ static int ceph_dns_resolve_name(const char *na=
+me, size_t namelen,
+> > >       colon_p =3D memchr(name, ':', namelen);
+> > >
+> > >       if (delim_p && colon_p)
+> > > -             end =3D delim_p < colon_p ? delim_p : colon_p;
+> > > +             end =3D min(delim_p, colon_p);
+> >
+> > Both delim_p, and colon_p are char *, so this seems correct to me.
+> >
+> > And the code being replaced does appear to be a min() operation in
+> > both form and function.
+> >
+> > Reviewed-by: Simon Horman <horms@kernel.org>
+> >
+> > However, I don't believe libceph changes usually don't go through next-=
+next.
+> > So I think this either needs to be reposted or get some acks from
+> > one of the maintainers.
+> >
+> > Ilya, Xiubo, perhaps you can offer some guidance here?
+>
+> Hi Simon,
+>
+> I'm OK with this being taken through net-next.
 
-The parse_settings() function in mesh/mesh.c, the existing configs
-parsing function, has many duplicate lines and is not well separated.
-On the other hand, the parse-related functions in src/main.c are well
-separated in the same structure. I think this code could be reused to
-improve the mesh conf parsing function.
-Rather than duplicate implementations of similar code, I would like to
-ask for feedback on whether it would be better to isolate the reusable
-lines in the src/shared/ directory and make them available in
-mesh/mesh.c as well. It would not be necessary to move all the prefix
-parse_ functions in src/main.c, just the prefix prase_config_ that
-parses the data type. I would like to ask if this would break the bluez
-semantics.
+I see that Jakub picked up some patches from this series, but not this
+one.  I'll go ahead and apply to the Ceph tree.
 
-Regards,
-Junho Lee
+Thanks,
+
+                Ilya
