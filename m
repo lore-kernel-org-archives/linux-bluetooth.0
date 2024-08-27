@@ -1,60 +1,59 @@
-Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
+Received: from mail-oo1-f43.google.com (mail-oo1-f43.google.com [209.85.161.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C8DB1C4623
-	for <linux-bluetooth@vger.kernel.org>; Tue, 27 Aug 2024 18:52:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83A021D278D
+	for <linux-bluetooth@vger.kernel.org>; Tue, 27 Aug 2024 19:06:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724784753; cv=none; b=d7wHSUny+aGBmLUhvFkcqZP0S63ER37ugRpRYKoKM5IhV+DBsvf3PtX74OKBR03gk/pKKcoSufm+z6mkZ8R7aJ3ghM1gYgaUCWspNfrKTNC0MQ3ctSPSwJOCBRKRgMvt4dUL9tO68fy6xex/kBEJqVy2B+HOOcxyUAYeWQ3R7uE=
+	t=1724785621; cv=none; b=NFJD7wFdDEvhCQq0ejpY8sJK16nNDyxreV1XjcE0PnHQ5i/thEiqjEtR1QgZoiPL5YUkW/B5qPplcdhSWpLblgywyKiKvAXwy7pDvZMLyBSvAwYESRBDj/sguC/ofHfe4XB/afNIktdqsHVfDm3zclTEplBldlau5mww+Z4B170=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724784753; c=relaxed/simple;
-	bh=2UJBCjjKZPnrpQ+/a9n9uNexJBrORM1Y2azUFeB+fCM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=gHG74/35uwLCuAzTmcytGdlIt12OHEtWez9hZsojx1lx7e3YoCIFTolMlxJ+ljRumI8ZRMYMFo4jwhOMa46DvSkJMOSKE+obuS4+f5E/fVg4kcwg7XLAqiPtguKuIR02SBD9N3egn2JgGqP4Y3kLtO5bydx7tuxUiJKz0IzGRB0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PNXXad4f; arc=none smtp.client-ip=209.85.214.175
+	s=arc-20240116; t=1724785621; c=relaxed/simple;
+	bh=P9UYFIm0r4hMTwWWB9cWRZjjSgXz2ITdgIOgMooOwvw=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=T7zX7zjLSShH/B7TQw1wqruf7QJSihxQDdtSbUZ6I+8ZrhZEjH/tZOychV3A/eIjr7G0G2uXXKJlVWJ09Vhexvw/DG923MgSTHI84g9uDuIaHXeGpAm7ILghaVz9BK4e5irdLOiE+qHqKWWPPNkzf/+0mw2Ce1wI9WUnHwOlphE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KZNJafxp; arc=none smtp.client-ip=209.85.161.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PNXXad4f"
-Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-2020b730049so45865145ad.3
-        for <linux-bluetooth@vger.kernel.org>; Tue, 27 Aug 2024 11:52:32 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KZNJafxp"
+Received: by mail-oo1-f43.google.com with SMTP id 006d021491bc7-5d5b22f97b7so6211143eaf.2
+        for <linux-bluetooth@vger.kernel.org>; Tue, 27 Aug 2024 12:06:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1724784751; x=1725389551; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=IJFP5B2pIGfuZyPIPwpbdrESn84N7z11eaQC27/xb9o=;
-        b=PNXXad4fmF3hKL6o37s43z2LQtl8UyUems0XsHztZgXr5LTTt923jEVGLDtvJgypFX
-         cIkq+gBGwIuzvQ6W1nwk9hb4syEFFH8QFevciDpDbF/2REqZOgwC8QqswvvF+avHEeC0
-         5qCDzFXeLETusnWHkMCSVm7C3Z6TumFJHWGSnjgIM0K+wYnc4ka3ib866DVniqB2ruE2
-         cbz4DAy5pHIlWT5IQazI87dAEKLFgPbb+NpIb4uPddziqMqFOcKg4m808wXO+HlikyZQ
-         EOgfjploq9cxMhIZwOnZuwvhapTTk72lH4FsfiGs7YlImcSOI/uik7+pJoNvXbL5AY3r
-         Rq9g==
+        d=gmail.com; s=20230601; t=1724785618; x=1725390418; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=ei8wPc+vZHo1/MEG4WE7GCMxNufKRbLT+Ky/Z6kQ/ao=;
+        b=KZNJafxp2t/1EXluy62En4R/MvoUhmxMPdOT9n3SosdDLVSWJwCYdzQ6py4AyKFH0C
+         ItxlZq7WFNzcnld3Q8i+/JllVf4Ep6KNvcTo4ikvO/9Xm9q3xFuXvNDuaV2bnm7wWn58
+         WHyIE5hqrYjEla4hmuR7IQH6yllUgzG5i1/SEA84hRHVNXYRspTwC+dz1QPzcOIZNUDD
+         uLUj3VKbz/MVFZ9I8UWGBVVOyYwUGUirv33azN+TEWChpNcaYWJtjdR8gBHNNzekprZv
+         JQWly6xII7TF/LGTBQgqCR7fnMSuSDdd4PH561seO7Yx5yNRT2h6qzuvpaAJ8V1tW3oo
+         9HRw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724784751; x=1725389551;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=IJFP5B2pIGfuZyPIPwpbdrESn84N7z11eaQC27/xb9o=;
-        b=tbwNDd23zYb1CPNtUAFPa82rWljgoMCEn/Vu4xI4ztKKqwrVOaBXxi4DXmwt4Tv/QY
-         T8pq136jDmiA7IkzeyBP/9mo83QXbtTZ2LscctnWliSAkxaOAlTdPAiM0jzc5Y54sPaZ
-         MLqPhFS33ZiLqM/UXmRWMw4JXavJ1V2IY+QsQunjAFFgxvHex72gDyzdyfBdzsZyoAtH
-         tbPcObAgHahuj7atRJrIxTL3XlZHUf5E3ptm2sKnWgMQ2J4lj5ILpvQ7/00Irsx89ugu
-         tOO7u8OrshczT1Ozg+njLtjx/rjwQN3kdotcObziBDtESQP/2+WNFNaOJ8/hPvv3WH1i
-         eCxg==
-X-Gm-Message-State: AOJu0Ywcxh/b3My4b1cetmMNFiqyINIxpN/rd1YGfih9fSisvPtc2tc8
-	bhaWCvKXMA+DSn8d3ef/Co1TKZxbz7zkbyBEmqA5ANz2owKKa2piZmPyiw==
-X-Google-Smtp-Source: AGHT+IFDA4D38MRoWbeFzsW7rZvxa+1bqu2QFz340XkRPyrZbbi6QOn4dn9FP+K0dTxxJca62iqbAw==
-X-Received: by 2002:a17:902:a508:b0:202:5e7:115 with SMTP id d9443c01a7336-2039e538fd3mr106725645ad.56.1724784751186;
-        Tue, 27 Aug 2024 11:52:31 -0700 (PDT)
-Received: from apollo.localdomain ([2601:646:9d80:4380::2696])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2038557eec1sm86542055ad.91.2024.08.27.11.52.30
+        d=1e100.net; s=20230601; t=1724785618; x=1725390418;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ei8wPc+vZHo1/MEG4WE7GCMxNufKRbLT+Ky/Z6kQ/ao=;
+        b=B+DLG3tIHjxLqkvkEFzs1gAz7ElMcIXG7OUsflDB/1g/8xcUYQ79mz02AYW4hkKRMR
+         Gcyyf6uIFtcMJGdWsWuVuHvyWXnLMI3Ste3IeDfZu6Rrkg2iOgetzs+JaE+tQjZ1QKaO
+         u5hvLtBHc96Qhz+piuee/WBWlViu30VCa39R39Wslu9QIb0KfhwuD6vQntWRxR1VWQHx
+         75sjq5VknBpIjyb3zxIxEEzNDz9+e1cX7ADOKWBQ55O1XvIXtA0MXgCzN9eTsFFe9vau
+         3JrsXSpvbW+ByyGcqmVjnWDYPwKZeJ5IrN3v60PuHFR/jguaZaXSSYdN0mM80VW+fzIH
+         HM9Q==
+X-Gm-Message-State: AOJu0YyzJGljHN8YJNrvP8QaWXdX75dWDogo0w1DFpuJE3LJgs6Bbr89
+	9hyZU3Vrlj4g48obXac/BlrJpoJIJNGWzKkEeVWHZL3AQ3fKyycOS4032A==
+X-Google-Smtp-Source: AGHT+IGDLFF5taNWWWihlESpAh/wyyomQv1TbUefo0NwhVLwlsoxyZ1LofxEb9OQHJxIELpcQ3OSDA==
+X-Received: by 2002:a05:6358:2486:b0:1b5:968f:e221 with SMTP id e5c5f4694b2df-1b5c3a3b6a8mr1683961755d.2.1724785617526;
+        Tue, 27 Aug 2024 12:06:57 -0700 (PDT)
+Received: from lvondent-mobl5.. (syn-107-146-107-067.res.spectrum.com. [107.146.107.67])
+        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-844ce4da5d6sm1395092241.4.2024.08.27.12.06.56
+        for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 27 Aug 2024 11:52:30 -0700 (PDT)
-From: Khem Raj <raj.khem@gmail.com>
+        Tue, 27 Aug 2024 12:06:56 -0700 (PDT)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Khem Raj <raj.khem@gmail.com>
-Subject: [PATCH v4 BlueZ] Provide GNU basename compatible implementation
-Date: Tue, 27 Aug 2024 11:52:28 -0700
-Message-ID: <20240827185228.3515299-1-raj.khem@gmail.com>
+Subject: [PATCH v1 1/2] Revert "Bluetooth: MGMT/SMP: Fix address type when using SMP over BREDR/LE"
+Date: Tue, 27 Aug 2024 15:06:54 -0400
+Message-ID: <20240827190655.675179-1-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.46.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -64,137 +63,222 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Call to basename() relies on a GNU extension
-to take a const char * vs a char *. Let's define
-a trivial helper function to ensure compatibility
-with musl.
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Fixes Issue: https://github.com/bluez/bluez/issues/843
+This reverts commit 59b047bc98084f8af2c41483e4d68a5adf2fa7f7 which
+breaks compatibility with commands like:
+
+bluetoothd[46328]: @ MGMT Command: Load.. (0x0013) plen 74  {0x0001} [hci0]
+        Keys: 2
+        BR/EDR Address: C0:DC:DA:A5:E5:47 (Samsung Electronics Co.,Ltd)
+        Key type: Authenticated key from P-256 (0x03)
+        Central: 0x00
+        Encryption size: 16
+        Diversifier[2]: 0000
+        Randomizer[8]: 0000000000000000
+        Key[16]: 6ed96089bd9765be2f2c971b0b95f624
+        LE Address: D7:2A:DE:1E:73:A2 (Static)
+        Key type: Unauthenticated key from P-256 (0x02)
+        Central: 0x00
+        Encryption size: 16
+        Diversifier[2]: 0000
+        Randomizer[8]: 0000000000000000
+        Key[16]: 87dd2546ededda380ffcdc0a8faa4597
+@ MGMT Event: Command Status (0x0002) plen 3                {0x0001} [hci0]
+      Load Long Term Keys (0x0013)
+        Status: Invalid Parameters (0x0d)
+
+Cc: stable@vger.kernel.org
+Link: https://github.com/bluez/bluez/issues/875
+Fixes: 59b047bc9808 ("Bluetooth: MGMT/SMP: Fix address type when using SMP over BREDR/LE")
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 ---
-v2: Fix code formatter reported errors
-v3: Make just node_name as const and keep node_dir as such
-v4: Fix code formatting errors
+ include/net/bluetooth/hci_core.h |  5 -----
+ net/bluetooth/mgmt.c             | 25 +++++++------------------
+ net/bluetooth/smp.c              |  7 -------
+ 3 files changed, 7 insertions(+), 30 deletions(-)
 
- Makefile.mesh           | 2 ++
- Makefile.tools          | 3 ++-
- mesh/mesh-config-json.c | 6 ++++--
- mesh/rpl.c              | 3 ++-
- src/shared/util.h       | 7 +++++++
- tools/hex2hcd.c         | 3 ++-
- 6 files changed, 19 insertions(+), 5 deletions(-)
-
-diff --git a/Makefile.mesh b/Makefile.mesh
-index e4c9fa6a3..bebedaf05 100644
---- a/Makefile.mesh
-+++ b/Makefile.mesh
-@@ -47,6 +47,8 @@ mesh/main.$(OBJEXT): src/builtin.h lib/bluetooth/bluetooth.h
- mesh_bluetooth_meshd_SOURCES = $(mesh_sources) mesh/main.c
- mesh_bluetooth_meshd_LDADD = src/libshared-ell.la $(ell_ldadd) -ljson-c
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index e449dba698f3..1a32e602630e 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -186,7 +186,6 @@ struct blocked_key {
+ struct smp_csrk {
+ 	bdaddr_t bdaddr;
+ 	u8 bdaddr_type;
+-	u8 link_type;
+ 	u8 type;
+ 	u8 val[16];
+ };
+@@ -196,7 +195,6 @@ struct smp_ltk {
+ 	struct rcu_head rcu;
+ 	bdaddr_t bdaddr;
+ 	u8 bdaddr_type;
+-	u8 link_type;
+ 	u8 authenticated;
+ 	u8 type;
+ 	u8 enc_size;
+@@ -211,7 +209,6 @@ struct smp_irk {
+ 	bdaddr_t rpa;
+ 	bdaddr_t bdaddr;
+ 	u8 addr_type;
+-	u8 link_type;
+ 	u8 val[16];
+ };
  
-+mesh_bluetooth_meshd_CFLAGS = -I${top_srcdir}/src
-+
- if MANPAGES
- man_MANS += mesh/bluetooth-meshd.8
- endif
-diff --git a/Makefile.tools b/Makefile.tools
-index 5b9034078..6fc73b8a2 100644
---- a/Makefile.tools
-+++ b/Makefile.tools
-@@ -328,7 +328,8 @@ tools_l2ping_LDADD = lib/libbluetooth-internal.la
- tools_bluemoon_SOURCES = tools/bluemoon.c monitor/bt.h
- tools_bluemoon_LDADD = src/libshared-mainloop.la
+@@ -219,8 +216,6 @@ struct link_key {
+ 	struct list_head list;
+ 	struct rcu_head rcu;
+ 	bdaddr_t bdaddr;
+-	u8 bdaddr_type;
+-	u8 link_type;
+ 	u8 type;
+ 	u8 val[HCI_LINK_KEY_SIZE];
+ 	u8 pin_len;
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 4c20dbf92c71..240dd8cf7c7d 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -2833,8 +2833,7 @@ static int load_link_keys(struct sock *sk, struct hci_dev *hdev, void *data,
+ 	for (i = 0; i < key_count; i++) {
+ 		struct mgmt_link_key_info *key = &cp->keys[i];
  
--tools_hex2hcd_SOURCES = tools/hex2hcd.c
-+tools_hex2hcd_SOURCES = tools/hex2hcd.c src/shared/util.h
-+tools_hex2hcd_CFLAGS = -I${top_srcdir}/src
+-		/* Considering SMP over BREDR/LE, there is no need to check addr_type */
+-		if (key->type > 0x08)
++		if (key->addr.type != BDADDR_BREDR || key->type > 0x08)
+ 			return mgmt_cmd_status(sk, hdev->id,
+ 					       MGMT_OP_LOAD_LINK_KEYS,
+ 					       MGMT_STATUS_INVALID_PARAMS);
+@@ -7089,7 +7088,6 @@ static int load_irks(struct sock *sk, struct hci_dev *hdev, void *cp_data,
  
- tools_mpris_proxy_SOURCES = tools/mpris-proxy.c
- tools_mpris_proxy_LDADD = gdbus/libgdbus-internal.la $(GLIB_LIBS) $(DBUS_LIBS)
-diff --git a/mesh/mesh-config-json.c b/mesh/mesh-config-json.c
-index c198627c6..85e2adb0e 100644
---- a/mesh/mesh-config-json.c
-+++ b/mesh/mesh-config-json.c
-@@ -28,6 +28,7 @@
- #include <ell/ell.h>
- #include <json-c/json.h>
+ 	for (i = 0; i < irk_count; i++) {
+ 		struct mgmt_irk_info *irk = &cp->irks[i];
+-		u8 addr_type = le_addr_type(irk->addr.type);
  
-+#include "shared/util.h"
- #include "mesh/mesh-defs.h"
- #include "mesh/util.h"
- #include "mesh/mesh-config.h"
-@@ -2694,7 +2695,8 @@ bool mesh_config_load_nodes(const char *cfgdir_name, mesh_config_node_func_t cb,
+ 		if (hci_is_blocked_key(hdev,
+ 				       HCI_BLOCKED_KEY_TYPE_IRK,
+@@ -7099,12 +7097,8 @@ static int load_irks(struct sock *sk, struct hci_dev *hdev, void *cp_data,
+ 			continue;
+ 		}
  
- void mesh_config_destroy_nvm(struct mesh_config *cfg)
- {
--	char *node_dir, *node_name;
-+	char *node_dir;
-+	const char *node_name;
- 	char uuid[33];
- 
- 	if (!cfg)
-@@ -2706,7 +2708,7 @@ void mesh_config_destroy_nvm(struct mesh_config *cfg)
- 	if (!hex2str(cfg->uuid, 16, uuid, sizeof(uuid)))
- 		return;
- 
--	node_name = basename(node_dir);
-+	node_name = bluez_basename(node_dir);
- 
- 	/* Make sure path name of node follows expected guidelines */
- 	if (strcmp(node_name, uuid))
-diff --git a/mesh/rpl.c b/mesh/rpl.c
-index fb225dddd..fb89f0afd 100644
---- a/mesh/rpl.c
-+++ b/mesh/rpl.c
-@@ -24,6 +24,7 @@
- 
- #include <ell/ell.h>
- 
-+#include "shared/util.h"
- #include "mesh/mesh-defs.h"
- 
- #include "mesh/node.h"
-@@ -146,7 +147,7 @@ static void get_entries(const char *iv_path, struct l_queue *rpl_list)
- 	if (!dir)
- 		return;
- 
--	iv_txt = basename(iv_path);
-+	iv_txt = bluez_basename(iv_path);
- 	if (sscanf(iv_txt, "%08x", &iv_index) != 1) {
- 		closedir(dir);
- 		return;
-diff --git a/src/shared/util.h b/src/shared/util.h
-index f2ca4f29f..f55b3a4c3 100644
---- a/src/shared/util.h
-+++ b/src/shared/util.h
-@@ -296,3 +296,10 @@ static inline void put_be64(uint64_t val, void *dst)
- {
- 	put_unaligned(cpu_to_be64(val), (uint64_t *) dst);
- }
-+
-+static inline const char *bluez_basename(const char *path)
-+{
-+	const char *base = strrchr(path, '/');
-+
-+	return base ? base + 1 : path;
-+}
-diff --git a/tools/hex2hcd.c b/tools/hex2hcd.c
-index e6dca5a81..05fa69470 100644
---- a/tools/hex2hcd.c
-+++ b/tools/hex2hcd.c
-@@ -24,6 +24,7 @@
- #include <stdlib.h>
- #include <stdbool.h>
- #include <sys/stat.h>
-+#include "shared/util.h"
- 
- static ssize_t process_record(int fd, const char *line, uint16_t *upper_addr)
- {
-@@ -302,7 +303,7 @@ static void ver_parse_entry(const char *pathname)
+-		/* When using SMP over BR/EDR, the addr type should be set to BREDR */
+-		if (irk->addr.type == BDADDR_BREDR)
+-			addr_type = BDADDR_BREDR;
+-
+ 		hci_add_irk(hdev, &irk->addr.bdaddr,
+-			    addr_type, irk->val,
++			    le_addr_type(irk->addr.type), irk->val,
+ 			    BDADDR_ANY);
  	}
  
- 	if (S_ISREG(st.st_mode)) {
--		ver_parse_file(basename(pathname));
-+		ver_parse_file(bluez_basename(pathname));
- 		goto done;
+@@ -7185,7 +7179,6 @@ static int load_long_term_keys(struct sock *sk, struct hci_dev *hdev,
+ 	for (i = 0; i < key_count; i++) {
+ 		struct mgmt_ltk_info *key = &cp->keys[i];
+ 		u8 type, authenticated;
+-		u8 addr_type = le_addr_type(key->addr.type);
+ 
+ 		if (hci_is_blocked_key(hdev,
+ 				       HCI_BLOCKED_KEY_TYPE_LTK,
+@@ -7220,12 +7213,8 @@ static int load_long_term_keys(struct sock *sk, struct hci_dev *hdev,
+ 			continue;
+ 		}
+ 
+-		/* When using SMP over BR/EDR, the addr type should be set to BREDR */
+-		if (key->addr.type == BDADDR_BREDR)
+-			addr_type = BDADDR_BREDR;
+-
+ 		hci_add_ltk(hdev, &key->addr.bdaddr,
+-			    addr_type, type, authenticated,
++			    le_addr_type(key->addr.type), type, authenticated,
+ 			    key->val, key->enc_size, key->ediv, key->rand);
  	}
  
+@@ -9519,7 +9508,7 @@ void mgmt_new_link_key(struct hci_dev *hdev, struct link_key *key,
+ 
+ 	ev.store_hint = persistent;
+ 	bacpy(&ev.key.addr.bdaddr, &key->bdaddr);
+-	ev.key.addr.type = link_to_bdaddr(key->link_type, key->bdaddr_type);
++	ev.key.addr.type = BDADDR_BREDR;
+ 	ev.key.type = key->type;
+ 	memcpy(ev.key.val, key->val, HCI_LINK_KEY_SIZE);
+ 	ev.key.pin_len = key->pin_len;
+@@ -9570,7 +9559,7 @@ void mgmt_new_ltk(struct hci_dev *hdev, struct smp_ltk *key, bool persistent)
+ 		ev.store_hint = persistent;
+ 
+ 	bacpy(&ev.key.addr.bdaddr, &key->bdaddr);
+-	ev.key.addr.type = link_to_bdaddr(key->link_type, key->bdaddr_type);
++	ev.key.addr.type = link_to_bdaddr(LE_LINK, key->bdaddr_type);
+ 	ev.key.type = mgmt_ltk_type(key);
+ 	ev.key.enc_size = key->enc_size;
+ 	ev.key.ediv = key->ediv;
+@@ -9599,7 +9588,7 @@ void mgmt_new_irk(struct hci_dev *hdev, struct smp_irk *irk, bool persistent)
+ 
+ 	bacpy(&ev.rpa, &irk->rpa);
+ 	bacpy(&ev.irk.addr.bdaddr, &irk->bdaddr);
+-	ev.irk.addr.type = link_to_bdaddr(irk->link_type, irk->addr_type);
++	ev.irk.addr.type = link_to_bdaddr(LE_LINK, irk->addr_type);
+ 	memcpy(ev.irk.val, irk->val, sizeof(irk->val));
+ 
+ 	mgmt_event(MGMT_EV_NEW_IRK, hdev, &ev, sizeof(ev), NULL);
+@@ -9628,7 +9617,7 @@ void mgmt_new_csrk(struct hci_dev *hdev, struct smp_csrk *csrk,
+ 		ev.store_hint = persistent;
+ 
+ 	bacpy(&ev.key.addr.bdaddr, &csrk->bdaddr);
+-	ev.key.addr.type = link_to_bdaddr(csrk->link_type, csrk->bdaddr_type);
++	ev.key.addr.type = link_to_bdaddr(LE_LINK, csrk->bdaddr_type);
+ 	ev.key.type = csrk->type;
+ 	memcpy(ev.key.val, csrk->val, sizeof(csrk->val));
+ 
+diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
+index 4f9fdf400584..8b9724fd752a 100644
+--- a/net/bluetooth/smp.c
++++ b/net/bluetooth/smp.c
+@@ -1060,7 +1060,6 @@ static void smp_notify_keys(struct l2cap_conn *conn)
+ 	}
+ 
+ 	if (smp->remote_irk) {
+-		smp->remote_irk->link_type = hcon->type;
+ 		mgmt_new_irk(hdev, smp->remote_irk, persistent);
+ 
+ 		/* Now that user space can be considered to know the
+@@ -1080,28 +1079,24 @@ static void smp_notify_keys(struct l2cap_conn *conn)
+ 	}
+ 
+ 	if (smp->csrk) {
+-		smp->csrk->link_type = hcon->type;
+ 		smp->csrk->bdaddr_type = hcon->dst_type;
+ 		bacpy(&smp->csrk->bdaddr, &hcon->dst);
+ 		mgmt_new_csrk(hdev, smp->csrk, persistent);
+ 	}
+ 
+ 	if (smp->responder_csrk) {
+-		smp->responder_csrk->link_type = hcon->type;
+ 		smp->responder_csrk->bdaddr_type = hcon->dst_type;
+ 		bacpy(&smp->responder_csrk->bdaddr, &hcon->dst);
+ 		mgmt_new_csrk(hdev, smp->responder_csrk, persistent);
+ 	}
+ 
+ 	if (smp->ltk) {
+-		smp->ltk->link_type = hcon->type;
+ 		smp->ltk->bdaddr_type = hcon->dst_type;
+ 		bacpy(&smp->ltk->bdaddr, &hcon->dst);
+ 		mgmt_new_ltk(hdev, smp->ltk, persistent);
+ 	}
+ 
+ 	if (smp->responder_ltk) {
+-		smp->responder_ltk->link_type = hcon->type;
+ 		smp->responder_ltk->bdaddr_type = hcon->dst_type;
+ 		bacpy(&smp->responder_ltk->bdaddr, &hcon->dst);
+ 		mgmt_new_ltk(hdev, smp->responder_ltk, persistent);
+@@ -1121,8 +1116,6 @@ static void smp_notify_keys(struct l2cap_conn *conn)
+ 		key = hci_add_link_key(hdev, smp->conn->hcon, &hcon->dst,
+ 				       smp->link_key, type, 0, &persistent);
+ 		if (key) {
+-			key->link_type = hcon->type;
+-			key->bdaddr_type = hcon->dst_type;
+ 			mgmt_new_link_key(hdev, key, persistent);
+ 
+ 			/* Don't keep debug keys around if the relevant
+-- 
+2.46.0
+
