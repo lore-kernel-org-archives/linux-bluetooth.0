@@ -1,361 +1,162 @@
-Received: from mail-lj1-f178.google.com (mail-lj1-f178.google.com [209.85.208.178])
+Received: from mail-oo1-f51.google.com (mail-oo1-f51.google.com [209.85.161.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 260AC19A29A
-	for <linux-bluetooth@vger.kernel.org>; Tue, 27 Aug 2024 12:59:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F7091E487
+	for <linux-bluetooth@vger.kernel.org>; Tue, 27 Aug 2024 14:05:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724763583; cv=none; b=LSEEs6yv07jn+hNRG+yyFrFYh3XFA10elIYS98ymj8EK5szLmPxCdoO42iVYpii4/wkizeHrA4BvdFjr977KcbvosTqDM4D78AJbl4hJZ4WIJ/LSq8lqLNcCiijkh7OLNt7wYaP3djk04XTceKvHxMbwiwnxD2RLOAPLm6K7OeY=
+	t=1724767535; cv=none; b=Kbdxz32I+wY9nk0ggOGqcNLDJa2J+0yY5j+HQaVTJ9pTaRx8SR365u09OGTcvrAARo0lmpf+TxG03UMiX4oTRwU5ysyJWxxxgZcnxaXR3QqbblODlQur5E8ohR3RmSrQsJuGRC/OWw0bMt874w0XL839VM6HbO/65rogTlOnpD4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724763583; c=relaxed/simple;
-	bh=z54daB+7MBQy/aGyCho8PJjGRi13O5CydAmsEU0/e+8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=CdABQM2gjcy5tWswMys6bPXNpuhAMqoV5Ku3fEd2FbFHIlH0+GB06Dw8CigxOs2Cfk4VvEE3qUCYf8yTg7/ttPHJS2eDn+yDolEv0pNprPe/niaNJPOgs4daZ1RJxyPxp5NI/O/W4M2x81R4FXvg7XpM+lBRBx2nre760Wc8F0U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Gr/ggne8; arc=none smtp.client-ip=209.85.208.178
+	s=arc-20240116; t=1724767535; c=relaxed/simple;
+	bh=i3bc9JwCIAY/CzUsnC+hGW60iuX8efZwwzQrv5oLSOE=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=s1cSzauspND3bsI5nVmx/2s3+v/2az5AXC1sTEwpYyc5OB7rT7iDIjFivH+PAIWB7TjAsNxQIJN3SSvvWB848jw5jai00y6ZTnz3d+UV7oMgtiBThv6e65VO9wm7+MMfYBJ7FK6Z7VkEI0VAT2aGqXmPr8HVocGyk3fJjA1yAp0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JmbgWrFN; arc=none smtp.client-ip=209.85.161.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Gr/ggne8"
-Received: by mail-lj1-f178.google.com with SMTP id 38308e7fff4ca-2f3e9fb6ee9so63918151fa.3
-        for <linux-bluetooth@vger.kernel.org>; Tue, 27 Aug 2024 05:59:40 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JmbgWrFN"
+Received: by mail-oo1-f51.google.com with SMTP id 006d021491bc7-5da6865312eso4550875eaf.3
+        for <linux-bluetooth@vger.kernel.org>; Tue, 27 Aug 2024 07:05:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1724763579; x=1725368379; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=BNvoZR4VZ4eUiGhxxKfASqmsbEaygbZFje5MLEqILMQ=;
-        b=Gr/ggne8zWmvS+kv+CHDUgnvNVQTGIwKNdM/ngkMq7PXQwyvpyDRMNvyNznNZae1ZO
-         O9leVwT+N44xqOPwZcfV/uCEt04DMuuXO6ovg6QpWujaCplqRNSqI1ziNF6gUZe+F2jK
-         TzqPqHeVoJWSqIX1MWxUMy+elOQdPMFcLWlWEfYArX0i5l2XGChj1Y9zd08sFh076ni1
-         2d/7NTGIYXd704r49gjKKht18yITulzhX+GfegzQu9p0I52ttm6H6xfoV0Dhzh8iJ6/E
-         qyUpxyebHUONIeL9P5EayfJQyLrGBZQK4ejsFFt+w4nQRqi0MqpuxqNqgUoE7tR/aFPa
-         O8sg==
+        d=gmail.com; s=20230601; t=1724767532; x=1725372332; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=MIBJlvoJyQt5yhkogIg2C4Mf00EV4uxKnogdf+CUEbo=;
+        b=JmbgWrFNAIw7uToX26hMqzhHmn0fZg2eQtcAjz3b0PyQIBXgz+Wm4ZqlQX8aSnP8Ff
+         +f+vqM0ovxMj/zk78uZNMLAwXe7t+JGopJcH3QbnlvaGuyiID1FGawb4acB1eEjUX4gl
+         Gcwi08FI5h8SyFlQvKN61UANDzHfGc2gMzdBol/1WzouE7WeIouqYkezflkrL0sU+MMY
+         G818qKJEL9WumKViP+F89RivW4z1mzNG6r6jebyDLBD38VbuO5DjicTaY4eHPnmO8HdM
+         IVZ5zdkYl3FM4FTcZ7MlIs85n0WmEkIv8K8rdlCbsnFQj+Gq+qIEufDISWCYknh3YNZJ
+         OKaw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724763579; x=1725368379;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=BNvoZR4VZ4eUiGhxxKfASqmsbEaygbZFje5MLEqILMQ=;
-        b=XSyxNEzgaBVN9wORtbujdgJo+IaVCMK+n//LJLtZHjYF3UXsDoh/A2g1RhFvmTz8U7
-         yjdtBPPjin1Vm+Gyxlcwdnd1e0eeeo0BxBk/wlZVhccAk9/+4Fj+mF2l9HY8LjI93zcr
-         Tg1CcRkOMUgqHZ0bSF5779qb+VfVBp7JjakC8BbsedxtFCZfWpo+SJvXNrqNiYI1YZiG
-         lo54QFNZsz2YspWfL91FAs2+Cob7XRjCt27ljKwZdy/s07cmad08yGIFqhwcWESKlZ2+
-         eGyc86hqG5yH8TDNi6pNVhtHQM2oaq7H+dA66/1uBb4PwG4MJl4kkx+1atPUaDmsHXvQ
-         mooA==
-X-Gm-Message-State: AOJu0Yze5PKgxephDFeEmzrINkjEeQhRUVT1haoA/1nuA3F8JAqXGAN7
-	79xvd8TKCcrGfJhqnrpbTZUJ7fPeRitKawA6aELhJgt3mW+u3v5ORwOUegaiO2CUEIKIvErxnth
-	s0Uy0nVHRKFy+RX3+8Xt79n7ItjM=
-X-Google-Smtp-Source: AGHT+IHgfLU5qgAAYBKXOz4TsMgjmHcMKytTPO4TOgKI87Xr+/g1m2gGlblz2QpbaShu6ZHynpzoDXpkxDfBs9DXdps=
-X-Received: by 2002:a2e:5109:0:b0:2ef:2c27:6680 with SMTP id
- 38308e7fff4ca-2f4f48f8efamr76522081fa.12.1724763578249; Tue, 27 Aug 2024
- 05:59:38 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1724767532; x=1725372332;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=MIBJlvoJyQt5yhkogIg2C4Mf00EV4uxKnogdf+CUEbo=;
+        b=VwBq6VORu3bon5x5L8fRgIAjhx6SzDXnd32vA3AhW+INLfB1eTmtf1cFHF/LKQ/UEo
+         W80QnlArrFCp9p6yGNlLEjrxT29pU9zcmMx5E6DshzBbpsMEhLuYSr9MlnpwY/dL538F
+         X6lvUO4wIq0fgyFL7GRpUrYojatfV1Xo2oYyvL/1DSeSX0tYg3EkgJPyDUFhmDi+LaEt
+         UiBcZpV5bNGy07IsWKWI1vItYScp93Lu6ZAmqjrTwe3alRv4T77xKh9i0a/UM5ziGjiy
+         UB8Adt9I+t9WkzQTD38na8m+t0CRsea8qtBmaq5c1mHceYs0hp1Ce4KKnglro4fxXkUu
+         CksA==
+X-Gm-Message-State: AOJu0Yzb77tC/BvD4oifi38mI+9ohBIpY1nGI9XQnNkIS9AvEMQ++hf4
+	s12SpdV5JZjHdNr/IrP7DcYcSkgGrwlzpzr3f+nTDM8sTs7CuFAcJ4oTgg==
+X-Google-Smtp-Source: AGHT+IHavg8rbb0iXp5zES6Dr4L980A6jcKqekp47csax8jZOvNJ7yI8I4pH8Npin+uu30xpRo83DQ==
+X-Received: by 2002:a05:6358:60c4:b0:1b5:a139:4d92 with SMTP id e5c5f4694b2df-1b5ebefa5b3mr401417455d.3.1724767531668;
+        Tue, 27 Aug 2024 07:05:31 -0700 (PDT)
+Received: from lvondent-mobl5.. (syn-107-146-107-067.res.spectrum.com. [107.146.107.67])
+        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-498e48f8c7esm1539433137.28.2024.08.27.07.05.29
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 27 Aug 2024 07:05:30 -0700 (PDT)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH v3 1/2] Bluetooth: hci_sync: Introduce hci_cmd_sync_run/hci_cmd_sync_run_once
+Date: Tue, 27 Aug 2024 10:05:28 -0400
+Message-ID: <20240827140529.635522-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.46.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240826070438.557107-1-quic_chejiang@quicinc.com>
- <CABBYNZL5A5SoDrthoyvwuauEnnyOzebHgtkqwptcHZ1em=dAjg@mail.gmail.com> <770d58c7-753b-435b-a98c-ed36ef23d275@quicinc.com>
-In-Reply-To: <770d58c7-753b-435b-a98c-ed36ef23d275@quicinc.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Tue, 27 Aug 2024 08:59:25 -0400
-Message-ID: <CABBYNZL9u++gGSbGLHCR_4nX-1h4aAaLs6VrnNV=6UVmRitECA@mail.gmail.com>
-Subject: Re: [PATCH v1] adapter: Manage device state of cross-transport SMP keys
-To: Cheng Jiang <quic_chejiang@quicinc.com>, Xiao Yao <xiaoyao@rock-chips.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-Hi Cheng,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Mon, Aug 26, 2024 at 10:20=E2=80=AFPM Cheng Jiang <quic_chejiang@quicinc=
-.com> wrote:
->
-> Hi Luiz, Please check the comment inline, Please correct me if I'm wrong.
->
-> On 8/26/2024 9:56 PM, Luiz Augusto von Dentz wrote:
-> > Hi Cheng,
-> >
-> > On Mon, Aug 26, 2024 at 3:05=E2=80=AFAM Cheng Jiang <quic_chejiang@quic=
-inc.com> wrote:
-> >>
-> >> Cross-transport derived ltk/csrk/irk are reported to bluetoothd from
-> >> kernel with BR/EDR address type, and bluetoothd doesn't treat it as LE
-> >> paired/bonded. In this case, bluetoothd won't send remove bond operati=
-on
-> >> with LE address type to kernel when executing unpair, so SMP keys are
-> >> retained in kernel list. Then RPA is getting resolved since we still
-> >> have irk which was not deleted when unpair device is done because only
-> >> link key is deleted since addr type is bredr.
-> >>
-> >> What=E2=80=99s more, pair LE of the same address will always fail in k=
-ernel
-> >> for ltk existence, and send back AlreadyExists error, but device state
-> >> is still unpaired/unbonded in bluetoothd.
-> >>
-> >> So bluetoothd needs to consider LE paired/bonded when receiving SMP ke=
-ys
-> >> even if they are cross-transport derived.
+This introduces hci_cmd_sync_run/hci_cmd_sync_run_once which acts like
+hci_cmd_sync_queue/hci_cmd_sync_queue_once but runs immediately when
+already on hdev->cmd_sync_work context.
 
-Yeah, and we are chasing our own tail here:
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+---
+ include/net/bluetooth/hci_sync.h |  4 +++
+ net/bluetooth/hci_sync.c         | 42 ++++++++++++++++++++++++++++++--
+ 2 files changed, 44 insertions(+), 2 deletions(-)
 
-https://github.com/bluez/bluetooth-next/commit/59b047bc98084f8af2c41483e4d6=
-8a5adf2fa7f7
+diff --git a/include/net/bluetooth/hci_sync.h b/include/net/bluetooth/hci_sync.h
+index 75e052909b5f..f3052cb252ef 100644
+--- a/include/net/bluetooth/hci_sync.h
++++ b/include/net/bluetooth/hci_sync.h
+@@ -73,6 +73,10 @@ int hci_cmd_sync_queue(struct hci_dev *hdev, hci_cmd_sync_work_func_t func,
+ 		       void *data, hci_cmd_sync_work_destroy_t destroy);
+ int hci_cmd_sync_queue_once(struct hci_dev *hdev, hci_cmd_sync_work_func_t func,
+ 			    void *data, hci_cmd_sync_work_destroy_t destroy);
++int hci_cmd_sync_run(struct hci_dev *hdev, hci_cmd_sync_work_func_t func,
++		     void *data, hci_cmd_sync_work_destroy_t destroy);
++int hci_cmd_sync_run_once(struct hci_dev *hdev, hci_cmd_sync_work_func_t func,
++			  void *data, hci_cmd_sync_work_destroy_t destroy);
+ struct hci_cmd_sync_work_entry *
+ hci_cmd_sync_lookup_entry(struct hci_dev *hdev, hci_cmd_sync_work_func_t func,
+ 			  void *data, hci_cmd_sync_work_destroy_t destroy);
+diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+index e79cd40bd079..5533e6f561b3 100644
+--- a/net/bluetooth/hci_sync.c
++++ b/net/bluetooth/hci_sync.c
+@@ -112,7 +112,7 @@ static void hci_cmd_sync_add(struct hci_request *req, u16 opcode, u32 plen,
+ 	skb_queue_tail(&req->cmd_q, skb);
+ }
+ 
+-static int hci_cmd_sync_run(struct hci_request *req)
++static int hci_req_sync_run(struct hci_request *req)
+ {
+ 	struct hci_dev *hdev = req->hdev;
+ 	struct sk_buff *skb;
+@@ -169,7 +169,7 @@ struct sk_buff *__hci_cmd_sync_sk(struct hci_dev *hdev, u16 opcode, u32 plen,
+ 
+ 	hdev->req_status = HCI_REQ_PEND;
+ 
+-	err = hci_cmd_sync_run(&req);
++	err = hci_req_sync_run(&req);
+ 	if (err < 0)
+ 		return ERR_PTR(err);
+ 
+@@ -782,6 +782,44 @@ int hci_cmd_sync_queue_once(struct hci_dev *hdev, hci_cmd_sync_work_func_t func,
+ }
+ EXPORT_SYMBOL(hci_cmd_sync_queue_once);
+ 
++/* Run HCI command:
++ *
++ * - hdev must be running
++ * - if on cmd_sync_work then run immediately otherwise queue
++ */
++int hci_cmd_sync_run(struct hci_dev *hdev, hci_cmd_sync_work_func_t func,
++		     void *data, hci_cmd_sync_work_destroy_t destroy)
++{
++	/* Only queue command if hdev is running which means it had been opened
++	 * and is either on init phase or is already up.
++	 */
++	if (!test_bit(HCI_RUNNING, &hdev->flags))
++		return -ENETDOWN;
++
++	/* If on cmd_sync_work then run immediately otherwise queue */
++	if (current_work() == &hdev->cmd_sync_work)
++		return func(hdev, data);
++
++	return hci_cmd_sync_submit(hdev, func, data, destroy);
++}
++EXPORT_SYMBOL(hci_cmd_sync_run);
++
++/* Run HCI command entry once:
++ *
++ * - Lookup if an entry already exist and only if it doesn't creates a new entry
++ *   and run it.
++ * - if on cmd_sync_work then run immediately otherwise queue
++ */
++int hci_cmd_sync_run_once(struct hci_dev *hdev, hci_cmd_sync_work_func_t func,
++			  void *data, hci_cmd_sync_work_destroy_t destroy)
++{
++	if (hci_cmd_sync_lookup_entry(hdev, func, data, destroy))
++		return 0;
++
++	return hci_cmd_sync_run(hdev, func, data, destroy);
++}
++EXPORT_SYMBOL(hci_cmd_sync_run_once);
++
+ /* Lookup HCI command entry:
+  *
+  * - Return first entry that matches by function callback or data or
+-- 
+2.46.0
 
-So I think we better revert that since that is the culprit of the
-problem and doesn't follow our very own documentation, too bad we
-didn't realize it sooner because it is causing a lot of problems such:
-
-https://github.com/bluez/bluez/issues/875
-
-> >> ---
-> >>  src/adapter.c | 53 ++++++++++++++++++++++++++++++++++++++------------=
--
-> >>  1 file changed, 40 insertions(+), 13 deletions(-)
-> >>
-> >> diff --git a/src/adapter.c b/src/adapter.c
-> >> index 245de4456..4e5af9579 100644
-> >> --- a/src/adapter.c
-> >> +++ b/src/adapter.c
-> >> @@ -8647,6 +8647,7 @@ static void new_link_key_callback(uint16_t index=
-, uint16_t length,
-> >>         struct btd_adapter *adapter =3D user_data;
-> >>         struct btd_device *device;
-> >>         char dst[18];
-> >> +       uint8_t addr_type;
-> >>
-> >>         if (length < sizeof(*ev)) {
-> >>                 btd_error(adapter->dev_id, "Too small new link key eve=
-nt");
-> >> @@ -8666,7 +8667,13 @@ static void new_link_key_callback(uint16_t inde=
-x, uint16_t length,
-> >>                 return;
-> >>         }
-> >>
-> >> -       device =3D btd_adapter_get_device(adapter, &addr->bdaddr, addr=
-->type);
-> >> +       /*
-> >> +        * For LE public address, key here is cross-transport derived,
-> >> +        * so consider it as BR/EDR public address.
-> >> +        *
-> >> +        */
-> >> +       addr_type =3D addr->type =3D=3D BDADDR_LE_PUBLIC ? BDADDR_BRED=
-R : addr->type;
-> >> +       device =3D btd_adapter_get_device(adapter, &addr->bdaddr, addr=
-_type);
-> >>         if (!device) {
-> >>                 btd_error(adapter->dev_id,
-> >>                                 "Unable to get device object for %s", =
-dst);
-> >> @@ -8682,7 +8689,7 @@ static void new_link_key_callback(uint16_t index=
-, uint16_t length,
-> >>                 device_set_bonded(device, BDADDR_BREDR);
-> >>         }
-> >>
-> >> -       bonding_complete(adapter, &addr->bdaddr, addr->type, 0);
-> >> +       bonding_complete(adapter, &addr->bdaddr, addr_type, 0);
-> >>  }
-> >>
-> >>  static void store_ltk_group(struct btd_adapter *adapter, const bdaddr=
-_t *peer,
-> >> @@ -8773,6 +8780,7 @@ static void new_long_term_key_callback(uint16_t =
-index, uint16_t length,
-> >>         struct btd_device *device;
-> >>         bool persistent;
-> >>         char dst[18];
-> >> +       uint8_t addr_type;
-> >>
-> >>         if (length < sizeof(*ev)) {
-> >>                 btd_error(adapter->dev_id, "Too small long term key ev=
-ent");
-> >> @@ -8784,7 +8792,13 @@ static void new_long_term_key_callback(uint16_t=
- index, uint16_t length,
-> >>         DBG("hci%u new LTK for %s type %u enc_size %u",
-> >>                 adapter->dev_id, dst, ev->key.type, ev->key.enc_size);
-> >>
-> >> -       device =3D btd_adapter_get_device(adapter, &addr->bdaddr, addr=
-->type);
-> >> +       /*
-> >> +        * For BR/EDR public address, key here is cross-transport deri=
-ved,
-> >> +        * so consider it as LE public address for SMP.
-> >> +        *
-> >> +        */
-> >
-> > This is only the case if, an only if, the device is a dual-mode
-> > device, so this probably need to be checked that we don't attempt to
-> > do this regardless.
-> Only the dual-mode device supports Cross-transport derived Keys. From BLE=
- keys to BR/EDR keys, vice versa. If
-> single mode device, the addr->type always is BDADDR_BREDR in link key cal=
-lback. and BDADDR_LE_PUBLIC or
-> BDADDR_LE_RANDOM for LTK/CSRK/IRK callback.
->
-> Link Key is for BR/EDR, so we check the address type is BDADDR_LE_PUBLIC =
-or not, if yes, treated as BR/EDR,
-> it means the link key is derived from BLE bearer. Otherwise, use the orig=
-inal addr type. LTK, CSRK, IRK are
-> related to BLE, so checked the address type is BDADDR_BREDR or not, if ye=
-s, treated as BLE address, it means
-> the BLE related key are derived from BR/EDR bearer.
->
-> The change seems not affect the current logic, could you please help to e=
-xplain more what need to check? Thanks!
-> >
-> >> +       addr_type =3D addr->type =3D=3D BDADDR_BREDR ? BDADDR_LE_PUBLI=
-C : addr->type;
-> >> +       device =3D btd_adapter_get_device(adapter, &addr->bdaddr, addr=
-_type);
-> >>         if (!device) {
-> >>                 btd_error(adapter->dev_id,
-> >>                                 "Unable to get device object for %s", =
-dst);
-> >> @@ -8802,8 +8816,7 @@ static void new_long_term_key_callback(uint16_t =
-index, uint16_t length,
-> >>          * be persistently stored.
-> >>          *
-> >>          */
-> >> -       if (addr->type =3D=3D BDADDR_LE_RANDOM &&
-> >> -                               (addr->bdaddr.b[5] & 0xc0) !=3D 0xc0)
-> >> +       if (addr_type =3D=3D BDADDR_LE_RANDOM && (addr->bdaddr.b[5] & =
-0xc0) !=3D 0xc0)
-> >>                 persistent =3D false;
-> >>         else
-> >>                 persistent =3D !!ev->store_hint;
-> >> @@ -8817,15 +8830,15 @@ static void new_long_term_key_callback(uint16_=
-t index, uint16_t length,
-> >>                 rand =3D le64_to_cpu(key->rand);
-> >>
-> >>                 store_longtermkey(adapter, &key->addr.bdaddr,
-> >> -                                       key->addr.type, key->val, key-=
->central,
-> >> +                                       addr_type, key->val, key->cent=
-ral,
-> >>                                         key->type, key->enc_size, ediv=
-, rand);
-> >>
-> >> -               device_set_bonded(device, addr->type);
-> >> +               device_set_bonded(device, addr_type);
-> >>         }
-> >>
-> >>         device_set_ltk(device, ev->key.val, ev->key.central, ev->key.e=
-nc_size);
-> >>
-> >> -       bonding_complete(adapter, &addr->bdaddr, addr->type, 0);
-> >> +       bonding_complete(adapter, &addr->bdaddr, addr_type, 0);
-> >>  }
-> >>
-> >>  static void new_csrk_callback(uint16_t index, uint16_t length,
-> >> @@ -8837,6 +8850,7 @@ static void new_csrk_callback(uint16_t index, ui=
-nt16_t length,
-> >>         struct btd_adapter *adapter =3D user_data;
-> >>         struct btd_device *device;
-> >>         char dst[18];
-> >> +       uint8_t addr_type;
-> >>
-> >>         if (length < sizeof(*ev)) {
-> >>                 btd_error(adapter->dev_id, "Too small CSRK event");
-> >> @@ -8848,7 +8862,13 @@ static void new_csrk_callback(uint16_t index, u=
-int16_t length,
-> >>         DBG("hci%u new CSRK for %s type %u", adapter->dev_id, dst,
-> >>                                                                 ev->ke=
-y.type);
-> >>
-> >> -       device =3D btd_adapter_get_device(adapter, &addr->bdaddr, addr=
-->type);
-> >> +       /*
-> >> +        * For BR/EDR public address, key here is cross-transport deri=
-ved,
-> >> +        * so consider it as LE public address for SMP.
-> >> +        *
-> >> +        */
-> >> +       addr_type =3D addr->type =3D=3D BDADDR_BREDR ? BDADDR_LE_PUBLI=
-C : addr->type;
-> >
-> > Ditto.
-> >
-> >> +       device =3D btd_adapter_get_device(adapter, &addr->bdaddr, addr=
-_type);
-> >>         if (!device) {
-> >>                 btd_error(adapter->dev_id,
-> >>                                 "Unable to get device object for %s", =
-dst);
-> >> @@ -8911,6 +8931,7 @@ static void new_irk_callback(uint16_t index, uin=
-t16_t length,
-> >>         struct btd_device *device, *duplicate;
-> >>         bool persistent;
-> >>         char dst[18], rpa[18];
-> >> +       uint8_t addr_type;
-> >>
-> >>         if (length < sizeof(*ev)) {
-> >>                 btd_error(adapter->dev_id, "Too small New IRK event");
-> >> @@ -8922,16 +8943,22 @@ static void new_irk_callback(uint16_t index, u=
-int16_t length,
-> >>
-> >>         DBG("hci%u new IRK for %s RPA %s", adapter->dev_id, dst, rpa);
-> >>
-> >> +       /*
-> >> +        * For BR/EDR public address, key here is cross-transport deri=
-ved,
-> >> +        * so consider it as LE public address for SMP.
-> >> +        *
-> >> +        */
-> >> +       addr_type =3D addr->type =3D=3D BDADDR_BREDR ? BDADDR_LE_PUBLI=
-C : addr->type;
-> >
-> > Ditto.
-> >
-> >>         if (bacmp(&ev->rpa, BDADDR_ANY)) {
-> >>                 device =3D btd_adapter_get_device(adapter, &ev->rpa,
-> >>                                                         BDADDR_LE_RAND=
-OM);
-> >>                 duplicate =3D btd_adapter_find_device(adapter, &addr->=
-bdaddr,
-> >> -                                                               addr->=
-type);
-> >> +                                                               addr_t=
-ype);
-> >>                 if (duplicate =3D=3D device)
-> >>                         duplicate =3D NULL;
-> >>         } else {
-> >>                 device =3D btd_adapter_get_device(adapter, &addr->bdad=
-dr,
-> >> -                                                               addr->=
-type);
-> >> +                                                               addr_t=
-ype);
-> >>                 duplicate =3D NULL;
-> >>         }
-> >>
-> >> @@ -8941,7 +8968,7 @@ static void new_irk_callback(uint16_t index, uin=
-t16_t length,
-> >>                 return;
-> >>         }
-> >>
-> >> -       device_update_addr(device, &addr->bdaddr, addr->type);
-> >> +       device_update_addr(device, &addr->bdaddr, addr_type);
-> >>
-> >>         if (duplicate)
-> >>                 device_merge_duplicate(device, duplicate);
-> >> @@ -8950,7 +8977,7 @@ static void new_irk_callback(uint16_t index, uin=
-t16_t length,
-> >>         if (!persistent)
-> >>                 return;
-> >>
-> >> -       store_irk(adapter, &addr->bdaddr, addr->type, irk->val);
-> >> +       store_irk(adapter, &addr->bdaddr, addr_type, irk->val);
-> >>
-> >>         btd_device_set_temporary(device, false);
-> >>  }
-> >> --
-> >> 2.25.1
-> >>
-> >>
-> >
-> >
->
-
-
---=20
-Luiz Augusto von Dentz
