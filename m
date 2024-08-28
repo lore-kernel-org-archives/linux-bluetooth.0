@@ -1,72 +1,99 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-24.smtp.github.com (out-24.smtp.github.com [192.30.252.207])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B38B14F115
-	for <linux-bluetooth@vger.kernel.org>; Wed, 28 Aug 2024 18:20:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C5A71AAE29
+	for <linux-bluetooth@vger.kernel.org>; Wed, 28 Aug 2024 18:38:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.207
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724869242; cv=none; b=ArQsOgqkkVHuE3ji5p2BGe8CtXFQDHTLiqxDX+g7AFR8R+TXdxfxWxc775YehMEoclNRofaqLrEs7M7nioWJ5+h5JS+MTgsxuIj0+hhIzU2tD6QWijr6uDdrgUs6m1DTco9SCEjFbiq9GRaU/tmgLpa2cY2F4MGF5gwH+MFl894=
+	t=1724870332; cv=none; b=JcdqKIh5YsvoHC9F5TM2AGzbyR+93gAE/0ZgC7TXLgVpvnFn43T5vh549+PNORWu4hM0I5O6029B/oNGk8kM4jL0MH1FCT5QQUC+fY4Abotr1/7RNCYZzzk78hwURUzYEcgjNGMEpARCgTosS/hXueJzjzNDwhZtKro+AjWfUyM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724869242; c=relaxed/simple;
-	bh=qgb3deHhafRD1jNEALyp0/xrFAfULmRTayTHKUOwVks=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=DE+Bd7xm5aKgblvRVDbl6Wiij1VzZLc157QKnTUWjatH34l7yLr4iI5SAu9oCC4WwKmOne23UnUa7m62WdumxkAGtjlvsRFHTnohl04ZW11V80f6dwelzG6/EL2ynOueYQvP7KWngWwZtzfaZvLWxS6lqbD0cIkRUBD7AGvXUcA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ffVSKkbi; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1724870332; c=relaxed/simple;
+	bh=geDBCrJA1G5D2slGfQoKZ+kul2QB1YYIvYRQPCIXLSM=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=AfW2seSnC80Ulg/I7lZ+lH/O7soJ5oMApx29jOzJWnhp35WBv7NYiPEsmfAKdcL7IfMEY5PkF6Zf5O9cy1P4X24R+teO8RP2bA9rKsgOh8JELgivVcD/gfUVTgcmDN/ejr8mYbhFjCZWzx2Q1pRCkLmFvRedP0j3Enka6fXI3Ig=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=ZdWWIC1W; arc=none smtp.client-ip=192.30.252.207
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ffVSKkbi"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D129AC4CEC1;
-	Wed, 28 Aug 2024 18:20:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724869241;
-	bh=qgb3deHhafRD1jNEALyp0/xrFAfULmRTayTHKUOwVks=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=ffVSKkbie0esRdhOZiysKZeuT5NxoCTvWq/2keXfxLPpIXSbSUg3HW7a+b1v1IsaH
-	 ak6r8jXl7WTgqUq88LFY+PIVQk2cjNAmPbe+E14ibkm3c9I1czSqnatYIyGP/P+LZ4
-	 EgkHsS1VzYkg4ZJCtdqBEvosByRHyNl9ZfVCWW8tomFB9pyZmmkNViCZSNwDd0cw7X
-	 rflRZ63TGNC8sV8kHQR1+60MMqmXXxvhYCAOID6c4OxCOYn5W1lwPQwU+W6hq1tSzj
-	 ltvdmHLPNutdWigcQGg5C/qKo6HMtJG4lr9Jd6K4aOKIWNbIQReorGllLgEsi5ESkG
-	 xAEr66qBFiLiA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 3533D3809A80;
-	Wed, 28 Aug 2024 18:20:43 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="ZdWWIC1W"
+Received: from github.com (hubbernetes-node-91932c9.ac4-iad.github.net [10.52.134.20])
+	by smtp.github.com (Postfix) with ESMTPA id 3595C6412A1
+	for <linux-bluetooth@vger.kernel.org>; Wed, 28 Aug 2024 11:38:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1724870330;
+	bh=4EPtiiim4JBzeEKh3Oue7GLLb+6L8R6BUwvX+mAZQCU=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=ZdWWIC1W+KatxbV8YHit7t24J3A8x0X+irI6CXr4zaweBWHk9qwm0F/8s2Z+11XhG
+	 KMBnUlTtx2kOgMb92bfcz1ByXonuhCSCBWxTUdCtf3J6hsFQfT3ftOE4nteELeg++W
+	 s3omWOk5HnbYbPjZ5F8vRNgaHNBE1lz/uvfRnUuU=
+Date: Wed, 28 Aug 2024 11:38:50 -0700
+From: xiaoyao <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/master/4ed706-32a081@github.com>
+Subject: [bluez/bluez] 366a8c: adapter: Fix up address type when loading keys
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH BlueZ 1/1] att: Correctly handle negative return values in
- can_write_data
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <172486924174.1386371.10574486854610218141.git-patchwork-notify@kernel.org>
-Date: Wed, 28 Aug 2024 18:20:41 +0000
-References: <20240827080925.55684-1-xiaokeqinhealth@126.com>
-In-Reply-To: <20240827080925.55684-1-xiaokeqinhealth@126.com>
-To: Yao Xiao <xiaokeqinhealth@126.com>
-Cc: linux-bluetooth@vger.kernel.org, xiaoyao@rock-chips.com
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-Hello:
+  Branch: refs/heads/master
+  Home:   https://github.com/bluez/bluez
+  Commit: 366a8c522b648f47147de4852c5c030d69b916b3
+      https://github.com/bluez/bluez/commit/366a8c522b648f47147de4852c5c030d69b916b3
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2024-08-28 (Wed, 28 Aug 2024)
 
-This patch was applied to bluetooth/bluez.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+  Changed paths:
+    M src/adapter.c
 
-On Tue, 27 Aug 2024 16:09:25 +0800 you wrote:
-> From: Felix Qin <xiaoyao@rock-chips.com>
-> 
-> ---
->  src/shared/att.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+  Log Message:
+  -----------
+  adapter: Fix up address type when loading keys
 
-Here is the summary with links:
-  - [BlueZ,1/1] att: Correctly handle negative return values in can_write_data
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=32a0811685c5
+Due to kernel change 59b047bc9808
+("Bluetooth: MGMT/SMP: Fix address type when using SMP over BREDR/LE")
+some keys maybe store using the wrong/invalid address type as per MGMT
+API, so this attempts to fix them up.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+Fixes: https://github.com/bluez/bluez/issues/875
 
 
+  Commit: d6515f4ca7d4134af5c277945d140742deda498b
+      https://github.com/bluez/bluez/commit/d6515f4ca7d4134af5c277945d140742deda498b
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2024-08-28 (Wed, 28 Aug 2024)
+
+  Changed paths:
+    M src/adapter.c
+
+  Log Message:
+  -----------
+  Revert "adapter: Fix link key address type for old kernels"
+
+This reverts commit 7ad5669402c9acff8e4cc808edc12a41df36654e since it no
+longer possible to have the wrong address type being loaded as they fix
+up in place when that happens.
+
+
+  Commit: 32a0811685c5dd290f1152bef2dfbde3b2848446
+      https://github.com/bluez/bluez/commit/32a0811685c5dd290f1152bef2dfbde3b2848446
+  Author: Felix Qin <xiaoyao@rock-chips.com>
+  Date:   2024-08-28 (Wed, 28 Aug 2024)
+
+  Changed paths:
+    M src/shared/att.c
+
+  Log Message:
+  -----------
+  att: Correctly handle negative return values in can_write_data
+
+
+Compare: https://github.com/bluez/bluez/compare/4ed7060ca9df...32a0811685c5
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
