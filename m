@@ -1,165 +1,211 @@
-Received: from mail-qt1-f180.google.com (mail-qt1-f180.google.com [209.85.160.180])
+Received: from mail-pg1-f179.google.com (mail-pg1-f179.google.com [209.85.215.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E5F21799F
-	for <linux-bluetooth@vger.kernel.org>; Wed, 28 Aug 2024 05:43:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 959C81799F
+	for <linux-bluetooth@vger.kernel.org>; Wed, 28 Aug 2024 06:09:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724823814; cv=none; b=t0D/8XRgQrrovrPfXpeKxt/Rb4Dg6pJwDltjG1CbIMPAfvpWd0W2hh3H818fDm/t86huZwYAHLmcaHTKoVmaNJmeNJIuzwXHyHIfGIv/peG9AA43BSE4c/37wXZg1+42e8An0jMCuB3DvwBb9X7UlDi10XHiXNW5defDKgsIcLs=
+	t=1724825372; cv=none; b=lA0exf1CGW6MhPSNF9E75+lzmfyrFTO5vFfHODpy1DMOVoQGeQ3TuylmYbkoOM6zNRXzS5d2GZs/sEddb6JeGEE+t3jM6wSewO0Lk0EWMW3DQEho6wMugQAA/6sjAlCtPcItRrXjYli4vCI7DZf3cceYnAheD48XBdbQV07tsKA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724823814; c=relaxed/simple;
-	bh=orQ3/R7nzggV2wUCF1v/JuQ6TJe8ELzjEJjRY0Mm3/k=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=DyQ54l8MAuDH/iiGZprAGIlVVBHU/svkA/SBstW0Of630cQ5vCQiWCvy41kmQ5QekZWtzVjoBHDnUrt1Y4llp8qTiABsZcP5lfz3NGMf1HGa8qpdPK95GvEOD6bOX7akV4doFbWRuuPwLQfJHwB4Jf50+lJTB+FZPALsJMGSMr8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cRPpp6kP; arc=none smtp.client-ip=209.85.160.180
+	s=arc-20240116; t=1724825372; c=relaxed/simple;
+	bh=vSgrLZdB5jFFnPniMfdH5yALfJNcKQ9uR8PuiswWfPM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=kg46Tm9n21XwhYtohgGz+UtPPOZiSgVb2SRvDuZaEFvw9iuLvskRqhpTUcB5BgTDJ4cYynPWEOXAnyade/qr041W7l0OxnJuPQY0jsSzWlgvmOORjnDdsyS3YWNQkAbSkBiXpWtGDTSp5FCXpSJdh4ikDDrY0o0k75DJ/jK+jIU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=F8q38ngK; arc=none smtp.client-ip=209.85.215.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cRPpp6kP"
-Received: by mail-qt1-f180.google.com with SMTP id d75a77b69052e-44ff6dd158cso35184571cf.3
-        for <linux-bluetooth@vger.kernel.org>; Tue, 27 Aug 2024 22:43:32 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="F8q38ngK"
+Received: by mail-pg1-f179.google.com with SMTP id 41be03b00d2f7-6bce380eb96so3501896a12.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 27 Aug 2024 23:09:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1724823811; x=1725428611; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=EJF3MBsKWdv3uwiwzhCH8dRYHNUze2Wn9EQlV+vzu6s=;
-        b=cRPpp6kP+9vp+2kC9GnxFkYOjEet8OjsOnkh2QjHdh5E/rP6CS081C5Qr8qCuc0GR9
-         NvFbOxrNOYyujVXKl18imQqiqWkn0YAQbMwMwY05pgC9aeHcD5zgI2SEeyOAFOLMpLoX
-         hTXVin0WOqontCw3BsLqf1z9/QKugMJPQqa2Np4aizxDNeM+BSR6DHTSDUgexA/a+lBd
-         uVqAbZXUVIvjcW2Z8HZvzLEdopTyMS0avPUxMJw2yg3+P2Kyipi1oAmj4/W4M8HvNfMJ
-         bzAeoypczg9rrcwPsJvPaOKLBGW3MY55MWeewYmitExaabIRSyoS6rIebzr01/UlqSx3
-         NJnw==
+        d=gmail.com; s=20230601; t=1724825370; x=1725430170; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=+q6S0XKqpcPPscvDqEl6W7sRJoVGKE4nojGmodtgk38=;
+        b=F8q38ngKDtgYUKlUHWA2tLivG7fvrfuay2HLFonXsZjoVe2PZrxjRdQhAZad85ajJ9
+         MHWcm5AJkh+qmf3LuE3d0yFUzMrO5aFFpAI7+YBRyhpYFk6nNZMWjzff14GOravBUkaO
+         rsiaqAyrZJQIdW1n/bCDkAumieHJVnXnk/lI4gwqMBlCxlWH5wLmOScAd8+ijnkZ8mfx
+         XMvHBjru81KGK44cZ6rPSQQGJFQQ3wWyBCgu/FBWte0h52y5XluT7mRtxvdGWzoaxBEa
+         mDte71uJ7iaLV6mjXHJ2AzikUkKob3xocSoT9GogE//yygpv00aLOX+NwSU7jkOojNVS
+         GY1g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724823811; x=1725428611;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20230601; t=1724825370; x=1725430170;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=EJF3MBsKWdv3uwiwzhCH8dRYHNUze2Wn9EQlV+vzu6s=;
-        b=ioKs/TYfR5jZWkIqCDbO/qILRzZG1nSG30y8hFiPU6Q952Lfuwi8XvVFwGT/yv5pZy
-         JZnx79QsjiJ3pA46Es59Jak1kMWVGfAZW3C/nMzYA4yqS14KR8Sy8Ml8i+xQA5KZo0tq
-         kyS0W6ZwbEYxIYGtKmo7XW2p5xzr1WNGpefaMWMx5irrocQRdHYrPpmTiYGdW9Hsw96Z
-         SpwjIgUpIk8L4vW9R25rngt2gsrRrWHvsaw9P4VkghxyldWXC1W4PkKKx6sS1eyszyNh
-         uNACgj+zn2orfb5vY0ugQMkz3+mJSRYroOHpGnTTH8Usz8s3/cAV+5MBaVw0t+jp9XPg
-         K9Dg==
-X-Gm-Message-State: AOJu0YzFdMSqB2cXZSon6mZNcYDJej5wCb1wGVVnCaKG1bNLYslYZmkU
-	V3UPLGKXsPuTpaVjSqDdmtDhSjiIRhZHSciw9z/5hXwRN2YkkNHSpU18Fg==
-X-Google-Smtp-Source: AGHT+IHAvL10zQ0XB/ljLoJu/bGvL+v8oVTNp//X1oPQEiDNiOx/9xGTsvRMo5VyHMNiCp88NqNLRQ==
-X-Received: by 2002:a05:622a:488f:b0:44f:a251:2c05 with SMTP id d75a77b69052e-45509d59828mr210041831cf.59.1724823810925;
-        Tue, 27 Aug 2024 22:43:30 -0700 (PDT)
-Received: from [172.17.0.2] ([172.183.132.30])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-454fdfbfa29sm58893481cf.17.2024.08.27.22.43.30
+        bh=+q6S0XKqpcPPscvDqEl6W7sRJoVGKE4nojGmodtgk38=;
+        b=LyXiEWrmPead2MHDYlLVYVHF4+yMwYVAsaRKJ5SXGXNDiyuvJkRhC2hp6rG8t+h+Eu
+         5jpB4kxXJqZrPum7ohxTNcLn5QVe+C9sU4WB/ZNkF6RC0Vmt7JscjM3pVewCCDv6QG7R
+         1OjH+SjQTfkwtiUurJorMse+zxpPSnT/Ves07rLomX9y65vGhUl9Tu44w6r945E2GU3M
+         DJp/rhAeWHFr3VsZXcg0onkeWPPg5Wzu4xsB4dz+ffh18uyEUv5y1G5RSm3tXXRsaHMN
+         8+SaNk74X6++L21veCQOv2jxGcqDQOusoJZ5VzJBuDC3rrn3h4AcrBD2WJUStcbVQJxt
+         88Xg==
+X-Gm-Message-State: AOJu0YzCGCg2FOiiRvR3dvCcrZYT0dAvG3BDr3MO24G/Vv48fWwz+fw3
+	yEfXjNlMHaOOyFy9Hp/AZ1ezJjpIoduHAuw1r/4OK2pA6jUBFdqf7BK2Sw==
+X-Google-Smtp-Source: AGHT+IGPCnD9llfl2MxZClvpxlDQmTqPBvIUd70YQWZCzIrxCCd7nM9eBze8IWYhstXcM1aD5Ky8aQ==
+X-Received: by 2002:a05:6a20:6f01:b0:1c2:9070:90ce with SMTP id adf61e73a8af0-1ccd28dd44amr866177637.43.1724825369464;
+        Tue, 27 Aug 2024 23:09:29 -0700 (PDT)
+Received: from apollo.localdomain ([2601:646:9d80:4380::2696])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-203855664b3sm92144605ad.21.2024.08.27.23.09.28
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 27 Aug 2024 22:43:30 -0700 (PDT)
-Message-ID: <66ceb902.c80a0220.23dfb0.68b6@mx.google.com>
-Date: Tue, 27 Aug 2024 22:43:30 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============4379404739759053893=="
+        Tue, 27 Aug 2024 23:09:29 -0700 (PDT)
+From: Khem Raj <raj.khem@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Khem Raj <raj.khem@gmail.com>
+Subject: [PATCH v6 BlueZ] Provide GNU basename compatible implementation
+Date: Tue, 27 Aug 2024 23:09:26 -0700
+Message-ID: <20240828060926.3710535-1-raj.khem@gmail.com>
+X-Mailer: git-send-email 2.46.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, raj.khem@gmail.com
-Subject: RE: [v5,BlueZ] Provide GNU basename compatible implementation
-In-Reply-To: <20240828041644.3331363-1-raj.khem@gmail.com>
-References: <20240828041644.3331363-1-raj.khem@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 
---===============4379404739759053893==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Call to basename() relies on a GNU extension
+to take a const char * vs a char *. Let's define
+a trivial helper function to ensure compatibility
+with musl.
 
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=884060
-
----Test result---
-
-Test Summary:
-CheckPatch                    FAIL      0.63 seconds
-GitLint                       PASS      0.27 seconds
-BuildEll                      PASS      24.68 seconds
-BluezMake                     PASS      1683.62 seconds
-MakeCheck                     PASS      13.42 seconds
-MakeDistcheck                 FAIL      68.17 seconds
-CheckValgrind                 PASS      253.06 seconds
-CheckSmatch                   WARNING   357.07 seconds
-bluezmakeextell               PASS      122.25 seconds
-IncrementalBuild              PASS      1465.75 seconds
-ScanBuild                     PASS      1043.98 seconds
-
-Details
-##############################
-Test: CheckPatch - FAIL
-Desc: Run checkpatch.pl script
-Output:
-[v5,BlueZ] Provide GNU basename compatible implementation
-ERROR:POINTER_LOCATION: "foo* bar" should be "foo *bar"
-#151: FILE: mesh/mesh-config-json.c:2699:
-+	const char* node_name;
-
-WARNING:LEADING_SPACE: please, no spaces at the start of a line
-#177: FILE: mesh/missing.h:17:
-+  const char *base = strrchr(path, '/');$
-
-WARNING:LEADING_SPACE: please, no spaces at the start of a line
-#179: FILE: mesh/missing.h:19:
-+  return base ? base + 1 : path;$
-
-WARNING:LEADING_SPACE: please, no spaces at the start of a line
-#228: FILE: tools/missing.h:17:
-+  const char *base = strrchr(path, '/');$
-
-WARNING:LEADING_SPACE: please, no spaces at the start of a line
-#230: FILE: tools/missing.h:19:
-+  return base ? base + 1 : path;$
-
-/github/workspace/src/src/13780500.patch total: 1 errors, 4 warnings, 89 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/src/13780500.patch has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-##############################
-Test: MakeDistcheck - FAIL
-Desc: Run Bluez Make Distcheck
-Output:
-
-Package cups was not found in the pkg-config search path.
-Perhaps you should add the directory containing `cups.pc'
-to the PKG_CONFIG_PATH environment variable
-No package 'cups' found
-../../mesh/mesh-config-json.c:31:10: fatal error: mesh/missing.h: No such file or directory
-   31 | #include "mesh/missing.h"
-      |          ^~~~~~~~~~~~~~~~
-compilation terminated.
-make[2]: *** [Makefile:7850: mesh/mesh-config-json.o] Error 1
-make[2]: *** Waiting for unfinished jobs....
-make[1]: *** [Makefile:4676: all] Error 2
-make: *** [Makefile:12226: distcheck] Error 1
-##############################
-Test: CheckSmatch - WARNING
-Desc: Run smatch tool with source
-Output:
-tools/hex2hcd.c:136:26: warning: Variable length array is used.
-
-
+Fixes Issue: https://github.com/bluez/bluez/issues/843
 ---
-Regards,
-Linux Bluetooth
+v2: Fix code formatter reported errors
+v3: Make just node_name as const and keep node_dir as such
+v4: Fix code formatting errors
+v5: Redo the patch to address textrels seen on ppc32/arm
+v6: Fix checkpatch.pl errors/warnings
 
+ configure.ac            | 11 ++++++++++-
+ mesh/mesh-config-json.c |  4 +++-
+ mesh/missing.h          | 21 +++++++++++++++++++++
+ mesh/rpl.c              |  1 +
+ tools/hex2hcd.c         |  1 +
+ tools/missing.h         | 21 +++++++++++++++++++++
+ 6 files changed, 57 insertions(+), 2 deletions(-)
+ create mode 100644 mesh/missing.h
+ create mode 100644 tools/missing.h
 
---===============4379404739759053893==--
+diff --git a/configure.ac b/configure.ac
+index d31eb1656..f0f1ec100 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -70,7 +70,16 @@ AC_CHECK_LIB(pthread, pthread_create, dummy=yes,
+ AC_CHECK_LIB(dl, dlopen, dummy=yes,
+ 			AC_MSG_ERROR(dynamic linking loader is required))
+ 
+-AC_CHECK_HEADERS(linux/types.h linux/if_alg.h linux/uinput.h linux/uhid.h sys/random.h)
++AC_CHECK_HEADERS(string.h linux/types.h linux/if_alg.h linux/uinput.h linux/uhid.h sys/random.h)
++
++# basename may be only available in libgen.h with the POSIX behavior,
++# not desired here
++AC_CHECK_DECLS([basename], [],
++				AC_MSG_WARN([GNU basename extension not found]),
++				[#define _GNU_SOURCE 1
++				 #include <string.h>
++				 ])
++
+ 
+ PKG_CHECK_MODULES(GLIB, glib-2.0 >= 2.28)
+ 
+diff --git a/mesh/mesh-config-json.c b/mesh/mesh-config-json.c
+index c198627c6..a17a48b6d 100644
+--- a/mesh/mesh-config-json.c
++++ b/mesh/mesh-config-json.c
+@@ -28,6 +28,7 @@
+ #include <ell/ell.h>
+ #include <json-c/json.h>
+ 
++#include "mesh/missing.h"
+ #include "mesh/mesh-defs.h"
+ #include "mesh/util.h"
+ #include "mesh/mesh-config.h"
+@@ -2694,7 +2695,8 @@ bool mesh_config_load_nodes(const char *cfgdir_name, mesh_config_node_func_t cb,
+ 
+ void mesh_config_destroy_nvm(struct mesh_config *cfg)
+ {
+-	char *node_dir, *node_name;
++	char *node_dir;
++	const char *node_name;
+ 	char uuid[33];
+ 
+ 	if (!cfg)
+diff --git a/mesh/missing.h b/mesh/missing.h
+new file mode 100644
+index 000000000..464df9b1c
+--- /dev/null
++++ b/mesh/missing.h
+@@ -0,0 +1,21 @@
++// SPDX-License-Identifier: LGPL-2.1-or-later
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2024  Khem Raj <raj.khem@gmail.com>
++ *
++ */
++
++#ifdef HAVE_CONFIG_H
++#include <config.h>
++#endif
++#if !HAVE_DECL_BASENAME
++#include <string.h>
++static inline const char *basename(const char *path)
++{
++	const char *base = strrchr(path, '/');
++
++	return base ? base + 1 : path;
++}
++#endif
+diff --git a/mesh/rpl.c b/mesh/rpl.c
+index fb225dddd..2fa17d72f 100644
+--- a/mesh/rpl.c
++++ b/mesh/rpl.c
+@@ -24,6 +24,7 @@
+ 
+ #include <ell/ell.h>
+ 
++#include "mesh/missing.h"
+ #include "mesh/mesh-defs.h"
+ 
+ #include "mesh/node.h"
+diff --git a/tools/hex2hcd.c b/tools/hex2hcd.c
+index e6dca5a81..452ab2beb 100644
+--- a/tools/hex2hcd.c
++++ b/tools/hex2hcd.c
+@@ -24,6 +24,7 @@
+ #include <stdlib.h>
+ #include <stdbool.h>
+ #include <sys/stat.h>
++#include "tools/missing.h"
+ 
+ static ssize_t process_record(int fd, const char *line, uint16_t *upper_addr)
+ {
+diff --git a/tools/missing.h b/tools/missing.h
+new file mode 100644
+index 000000000..464df9b1c
+--- /dev/null
++++ b/tools/missing.h
+@@ -0,0 +1,21 @@
++// SPDX-License-Identifier: LGPL-2.1-or-later
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2024  Khem Raj <raj.khem@gmail.com>
++ *
++ */
++
++#ifdef HAVE_CONFIG_H
++#include <config.h>
++#endif
++#if !HAVE_DECL_BASENAME
++#include <string.h>
++static inline const char *basename(const char *path)
++{
++	const char *base = strrchr(path, '/');
++
++	return base ? base + 1 : path;
++}
++#endif
