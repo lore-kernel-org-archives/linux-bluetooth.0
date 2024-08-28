@@ -1,92 +1,94 @@
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81D818288F
-	for <linux-bluetooth@vger.kernel.org>; Wed, 28 Aug 2024 08:33:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6872415B57A;
+	Wed, 28 Aug 2024 09:56:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724833990; cv=none; b=QtM0mXjra1cHylZ7wFSCtuBXsrPlX0ePy4RNav2LK9fM8pTAhzo+kQhBF6LBECnBhYFQSfy6t8sGL/LMr6P64kbYCFeN5mBvq3mNO+lcJo9JRRc5qUmdteYUOIjPY/OurYn9rOoa7hQ+ErpxDJ57LP1ZUsFqMYW+EwcP46Vmtt8=
+	t=1724838997; cv=none; b=RT/As+AHpSDpbHni+ATSnwvmMbhhAAXdzkvv3NqurxyprECUHFo2U8tL1b7a74VKtbVQwOXElsw1DPS7dLraC3COQaojOoWBfu6UBhgPNH7MYRAwiMsrJGSAusxmmYfaEa/KiF+pVKG+WRB0hgfUlWWQEDyEufJ5wIShBStNR2A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724833990; c=relaxed/simple;
-	bh=i+SfHuxrQCw8A/k+QyiOgepiYEFB+8Z7hYB6Pjdvx8I=;
-	h=Message-ID:Date:From:To:Subject:MIME-Version:Content-Type:
-	 Content-Disposition; b=dRyPH0KMZS5QCBzeUUW12zL/gmPHJLAbXG/UyjzlWrkxSCvRAZQxPEpHtyU58hHKeNvEYMRNoG+AxBxJIeeId8puQDaP+0r6HPkYneDxnMPbkorsGhTtyR7Wwj8ANwGio/CDhvv34Ooa/9YCbqv8jaaSABF7cmF+6Bt6M88NdMY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Xb9wskW8; arc=none smtp.client-ip=209.85.214.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1724838997; c=relaxed/simple;
+	bh=f7KMAHk1SB6+PtXqQ/OFDoN8SVHtWKuIrn/8JhJY3Vc=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=me6QZu2XyPT7+SnOOm9ze5oKdiSJu9U7j6I0dlbmMk4pap2LDiHPf/WYvedbyIYNMNM2S1biz1n1qHR+z7QZ/5W6ZMsdwgCoIrpO1at6xKAZQyGdYT7cLHncVMCLTCyuPFpdd7qVoAioP6mZsL6XT7kZ5rVUlhsXJ8wXMhyz19k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com; spf=pass smtp.mailfrom=realtek.com; dkim=temperror (0-bit key) header.d=realtek.com header.i=@realtek.com header.b=trPBvWmi; arc=none smtp.client-ip=211.75.126.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realtek.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Xb9wskW8"
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-2020ac89cabso59717455ad.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 28 Aug 2024 01:33:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1724833988; x=1725438788; darn=vger.kernel.org;
-        h=content-disposition:mime-version:subject:to:from:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=EtfI9OdHmnQga/rERzT9p/UDuuyUObUsTKB20E2RlAU=;
-        b=Xb9wskW8X0E5DYDbOAmtIwh4YIhL0mnyC73x3eUv0h6AYF+I3B9no7v9r1PWDY/gly
-         nRTAbs+YonnCLvvbslyIc40KBwKvAQ6XlLSkk4rgTLW/b7TI2ZgcbLaGqRNCtltJX6i3
-         ymPugXSK74wRxXYQFKvC/ATb8cp5mKExftayujdfAt9yyZfL65X8ii18TYKoSK1t3u1R
-         p6rQWvWAvWfeDdc49wyj2BmJCl37P84b5hdLocHeKppq/+BGJ+qvEWSarHSIDgr/m4kO
-         WxmqbPKtWj47eFBiD92BOvv//Xz2SBBN82C7gOcInsXlE0dXlLm10SxeWZB+UmoPaues
-         ZV4A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724833988; x=1725438788;
-        h=content-disposition:mime-version:subject:to:from:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=EtfI9OdHmnQga/rERzT9p/UDuuyUObUsTKB20E2RlAU=;
-        b=osBluhqKVJbuG7I/t7L5UMw9TgS5SLDu48AOuTopwvt95Nc9vkSkUa5f7FLOD0xdj4
-         Qo5ucBLDj1p8sWRY0Ul+E4ZguXAvt/VQyWaXL8q7ouZX0pgiMF7u2P4JrtA7H0PvB82H
-         7fdMy4goZdFr82BEsqmGY9dn1Vu2cizLodWzhUevR3YzIo7TjFnUUBpjSOMTlvgJweKM
-         SCbX3Q9R9dJHoe5aduaLMltUFAO3ReWOxIkqbPcWbQBOT8D/xJfhcH3NSdMcbbXBmw5W
-         TcCnVfjyCkfxw5qTTtKJVQh3WKxIAqaFElTCIdWRwe+vEoNz3S8QDYFiVGPPDEaEa/3U
-         p+Sg==
-X-Gm-Message-State: AOJu0YwRS7y5A3bayTorLIJ9pjeq+hGJg2CdP2I7Czz/0TZACn7/Kxky
-	y0AJICaZT6xrAM0+mXwM+I5GZetHIg0iwCi5RpoC6TjusDnXGkoat5S4yw==
-X-Google-Smtp-Source: AGHT+IG+Mwa4VwnmSfzPZ6PJJFJw2/Pc0xHaw3jaSW4AFwEXgd5txMrRNvfo+JwxEuMI3gSTbloHzg==
-X-Received: by 2002:a17:902:e80d:b0:202:4666:f031 with SMTP id d9443c01a7336-2039e4ab21dmr151118765ad.29.1724833988158;
-        Wed, 28 Aug 2024 01:33:08 -0700 (PDT)
-Received: from JUNHO-NEOSTACK. ([221.154.134.3])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-203855e1826sm94309785ad.122.2024.08.28.01.33.06
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 28 Aug 2024 01:33:07 -0700 (PDT)
-Message-ID: <66cee0c3.170a0220.a7c52.44a7@mx.google.com>
-X-Google-Original-Message-ID: <Zs7gwUMkDX9a29IT@JUNHO-NEOSTACK.>
-Date: Wed, 28 Aug 2024 17:33:05 +0900
-From: Junho Lee <tot0roprog@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/2 v2 BlueZ] mesh: Remove duplicated initialization
+	dkim=temperror (0-bit key) header.d=realtek.com header.i=@realtek.com header.b="trPBvWmi"
+X-SpamFilter-By: ArmorX SpamTrap 5.78 with qID 47S9uOA912130977, This message is accepted by code: ctloc85258
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=realtek.com; s=dkim;
+	t=1724838984; bh=f7KMAHk1SB6+PtXqQ/OFDoN8SVHtWKuIrn/8JhJY3Vc=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:
+	 Content-Transfer-Encoding:Content-Type;
+	b=trPBvWmiO2XzHItPy2gRXTzXPWi0bEBkKI7SKvW3CwyyZX8rTOOnzTTKaAhdMj0tZ
+	 wDQKJXqsMkQC5Cbpqe/LudZ9XGg2+E297cXMnPKDR/PlTTnYJKH7QQjWVmR2ry01mg
+	 pjPUJB6VTtx7oey8gicCvkarB/MGVO3iGX0OKqvC3DvsUYY0E2UsK4gpUOw/z5YRn7
+	 xZQHBN4tiJN4+j0IWLmjqoUY85qYR6/ryxWsXMwvnEEAvZkfdSqSdp/o9LbG6gCKbU
+	 CFTjW2ldHWRkbAzjquiY2aBna4e340oO51425xmEtd4fCZ8LicyC3fqli5MiBBl/nS
+	 Ou6F9n8XwFoZA==
+Received: from mail.realtek.com (rtexh36505.realtek.com.tw[172.21.6.25])
+	by rtits2.realtek.com.tw (8.15.2/3.02/5.92) with ESMTPS id 47S9uOA912130977
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 28 Aug 2024 17:56:24 +0800
+Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
+ RTEXH36505.realtek.com.tw (172.21.6.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Wed, 28 Aug 2024 17:56:25 +0800
+Received: from localhost.localhost (172.21.132.53) by RTEXMBS04.realtek.com.tw
+ (172.21.6.97) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.35; Wed, 28 Aug
+ 2024 17:56:24 +0800
+From: Hilda Wu <hildawu@realtek.com>
+To: <marcel@holtmann.org>
+CC: <luiz.dentz@gmail.com>, <linux-bluetooth@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <alex_lu@realsil.com.cn>,
+        <max.chou@realtek.com>, <kidman@realtek.com>
+Subject: [PATCH V2 RESEND] Bluetooth: btrtl: Set MSFT_EXT_ADDRESS_FILTER quirk for RTL8852B
+Date: Wed, 28 Aug 2024 17:56:20 +0800
+Message-ID: <20240828095620.663466-1-hildawu@realtek.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: RTEXH36506.realtek.com.tw (172.21.6.27) To
+ RTEXMBS04.realtek.com.tw (172.21.6.97)
 
-This removes duplicate initialization code, as ProvTimeout and
-Algorithms are already initialized when the data structure is created.
+Set HCI_QUIRK_USE_MSFT_EXT_ADDRESS_FILTER quirk for RTL8852B.
 
-Signed-off-by: Junho Lee <tot0roprog@gmail.com>
+The quirk to support tracking multiple devices concurrently.
+Commit 9e14606d8f38 ("Bluetooth: msft: Extended monitor tracking by
+address filter")
+
+With this setting, when a pattern monitor detects the device, this
+feature issues an address monitor for tracking that device. Let
+pattern monitor can keep monitor new devices.
+
+Signed-off-by: Hilda Wu <hildawu@realtek.com>
 ---
- mesh/mesh.c | 3 ---
- 1 file changed, 3 deletions(-)
+Change in v2:
+ - Add reference commit, update commit description
+---
+---
+ drivers/bluetooth/btrtl.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/mesh/mesh.c b/mesh/mesh.c
-index 7b670e40a..49d252e5e 100644
---- a/mesh/mesh.c
-+++ b/mesh/mesh.c
-@@ -266,9 +266,6 @@ bool mesh_init(const char *config_dir, const char *mesh_conf_fname,
- 	mesh_model_init();
- 	mesh_agent_init();
+diff --git a/drivers/bluetooth/btrtl.c b/drivers/bluetooth/btrtl.c
+index 4c0f551a9975..2d95b3ea046d 100644
+--- a/drivers/bluetooth/btrtl.c
++++ b/drivers/bluetooth/btrtl.c
+@@ -1308,6 +1308,7 @@ void btrtl_set_quirks(struct hci_dev *hdev, struct btrtl_device_info *btrtl_dev)
+ 			btrealtek_set_flag(hdev, REALTEK_ALT6_CONTINUOUS_TX_CHIP);
  
--	mesh.prov_timeout = DEFAULT_PROV_TIMEOUT;
--	mesh.algorithms = DEFAULT_ALGORITHMS;
--
- 	storage_dir = config_dir ? config_dir : MESH_STORAGEDIR;
+ 		if (btrtl_dev->project_id == CHIP_ID_8852A ||
++		    btrtl_dev->project_id == CHIP_ID_8852B ||
+ 		    btrtl_dev->project_id == CHIP_ID_8852C)
+ 			set_bit(HCI_QUIRK_USE_MSFT_EXT_ADDRESS_FILTER, &hdev->quirks);
  
- 	l_info("Loading node configuration from %s", storage_dir);
 -- 
 2.34.1
 
