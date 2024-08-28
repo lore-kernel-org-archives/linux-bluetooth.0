@@ -1,127 +1,120 @@
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
+Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82FE515A851
-	for <linux-bluetooth@vger.kernel.org>; Wed, 28 Aug 2024 07:45:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A89984D0D
+	for <linux-bluetooth@vger.kernel.org>; Wed, 28 Aug 2024 08:32:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724831107; cv=none; b=GajYkObAaPfEiDaaI3zZOZAEZ2snoiX8Y+/EIeQX1BTq9iesWAh/aR0sZE6Ks0qsQYu4ETc3CNso/SCSyPfbtghYAwTa6gUyWFhSs6chSbnsBFq3kXUoBMLl6w47KSPw8ihKwNMIcl3fgIw3xuUOxFoWYSw383TbxWSPfjfRGSg=
+	t=1724833953; cv=none; b=Dz1+QsvDDe4xlAGVpgMwKK4BZwPETyd/fe2df9qwgCu9hBTkfNFMDZNzKRHRPLncBMUFjGdUZpulVsZGpTZ8MaCTU1RqoTnJQjS27a9/YzBgYywYzLhX89OluIGj4TC/l+b+ySQB++SyBjVMHgtTllCkXamgvibOf0FWsXbZWQI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724831107; c=relaxed/simple;
-	bh=IAJrz9zw0e7vZa845yOO2+tV4ZYYvHMSWGib7eaN9fA=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=s1Sm+6aFXoPqIdkUxGdA7kwe6BERDwYFjihHRlLRwPVJLY9O/g5/xmRbiq1XMNUCkuJFt+lCmv98dFZCZxXnyN2rcTa1Uydj0ZTGonmGYAImN7IbiA9NtWufbTZVyaLvMScCLPvCOHR+dVgi5M7/AP3JpdR0OSkUuY0zJ3RhG+A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LCQgzZpB; arc=none smtp.client-ip=209.85.214.173
+	s=arc-20240116; t=1724833953; c=relaxed/simple;
+	bh=4HfIXDtgYdE3nVjCWi3qzvOxU6WSL6YJw1rBDBUhy6o=;
+	h=Message-ID:Date:From:To:Subject:MIME-Version:Content-Type:
+	 Content-Disposition; b=B2NmRFkDU+nONjbOFQbX5D3dUbqa6DRV935lP7cyOh59m3caX3WzvmVXXx/jLJLDkdYlcrYHdfxzEHyw6q4Lt4stptZwNWxOntsOFgq7LPUhLirFMZXKbmNDs3KG3mzNF7Dc9A3v9oN2q6t8YpOJjhTFFlqJoqIkCoBNV3V8wh0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YMjF6pzz; arc=none smtp.client-ip=209.85.214.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LCQgzZpB"
-Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-201fbd0d7c2so53145605ad.0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 28 Aug 2024 00:45:06 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YMjF6pzz"
+Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-202146e9538so58054465ad.3
+        for <linux-bluetooth@vger.kernel.org>; Wed, 28 Aug 2024 01:32:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1724831105; x=1725435905; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=hQdAc2NqvKJYINkVnBlAh8d18FKejKHjhpu362+l9UQ=;
-        b=LCQgzZpBihUblwizWY6xIM2DHk3vmU9trFGtM9NpJuK1WmC8HZIrzlNLDw4irtkRQa
-         /kxUbFLeZeM0T17Q1/M3pP6RM6uh3jpHbiN+DFGEvnzm3NWXKjZLJiwU+8ibbvxdaiNo
-         +NAz0ZbNEOLiqislLPLrjRile53+ko1Q3md94XShggPU/EBtvI2VlE1jQZQBKty5XKSR
-         bN/SmxH7xt1qwjEiP4X/DqgLlugZc69z8Iqi3NJYxutOqH+Jj6RHxPSU4keUQ0yQYg+L
-         lnCUQ+Z9zsviGcdBenTyHLzxc3wkHbBWovW/16ukPeK5GJL9AufChYoqPImUJVuu/Jgq
-         ycag==
+        d=gmail.com; s=20230601; t=1724833950; x=1725438750; darn=vger.kernel.org;
+        h=content-disposition:mime-version:subject:to:from:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=jpx1bqf0YFMxrS1p3MCTySkTsKSVu+uzLSCUKZT0QE4=;
+        b=YMjF6pzz+wzRgF/t6EGFtHWOtVjGX5pkGONWWIFfog3mHkzCMqRjfCZZUO3M213pBp
+         Fn8SeGpeZhgKUZmsliSef+caJ33Jq0dAFQsTKNhuZTYlhx6I3d3Utgob6l6eBNQIkhtN
+         91dcTZo4ZfHCwn1WYUKROwlN7XEEEMvLJaOdpych5AqhL8WGLmPgr+27zGpbbAlfk7Yl
+         GH//KHh9oxFoZwLHssV0O3yFxrNHEaGxFLrXVNbOFpD7pKlysXeuD4f/0XSnmQhIZRfr
+         8o21uTOuPJk6PH/LZcwMo31JKxlB5JQp0P7DK1OTjVY6Hrf85MW+H8p/mu+2yh05BO8l
+         xB9Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724831105; x=1725435905;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=hQdAc2NqvKJYINkVnBlAh8d18FKejKHjhpu362+l9UQ=;
-        b=S1oVSe95omY2ONKZQK3giqicpfw7ZcNlUKOUSzPQUkNVgUgiOp6J8BMrj303pE8P84
-         4T1bbpbA3w0bsWbg0WGWccigGr5ilnZpQHdpSUt31/KbTpm+7oFON7Tpl149edbm6msX
-         3ZUcHjXZwqYgpeIqmwgxkgrs9l7DCRSbM9MxcKH3dkImc/DXT4b8JugGacsYEZ/omMe0
-         3QKQRIcKeY5BgLhI4GbpW3euhHW1wXPrHYy1sDn1ZkmzCL4V/25E7InLAL2s54veZsx9
-         /uNgGRPWS4gXhbA+JcnkPxqhF5FHYZXzu/hpynEcd4Nc+X/AOxRYQa5T5w7pkuGGIXT2
-         CJvw==
-X-Gm-Message-State: AOJu0YzV/0BAFMfI6RAW09ap3bsT66/U2CQnKBjgfU361lGObN/9Rs2K
-	9YqmKHLFhDPl1Wd0i91jFQCc33pY61A4falQiKNS8WvvdDHiHoYA6jLLmA==
-X-Google-Smtp-Source: AGHT+IHwtclhzhgV/8tyYwUPVy1W3sTF94bBXCW0OmyN1FryKZnAB5wD/8qGVHZXDsgqcSQnyNBI7g==
-X-Received: by 2002:a17:90a:df0c:b0:2d3:c6a7:5c83 with SMTP id 98e67ed59e1d1-2d8441b1f5emr1298441a91.35.1724831105415;
-        Wed, 28 Aug 2024 00:45:05 -0700 (PDT)
-Received: from [172.17.0.2] ([13.86.227.248])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2d8445dfa64sm963374a91.6.2024.08.28.00.45.04
+        d=1e100.net; s=20230601; t=1724833950; x=1725438750;
+        h=content-disposition:mime-version:subject:to:from:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=jpx1bqf0YFMxrS1p3MCTySkTsKSVu+uzLSCUKZT0QE4=;
+        b=SB3JjnWBl+VviEAuKWlpo5hMHnskHSMYL5TK3R6vGoya7kRqsuKzFCp/QP2cPnLrsL
+         pCamfZz7XSszS808zQ7El77ZXkhqyIjmKONNJTn4fJb+NPUZZDHvjnsfMWixi0Z9nTQr
+         x6BCiaa7ovEpo9/lf66URu6GDNZJuIPStmiE4o7ghFLRLvlSeR4hbQUCAOLRubjM/S0v
+         WNKv6YJi9fmesSewQnZ5WB/cvERr18XA7BeloQoacfTmJTXO7KEEwYOXWSTZBK0Q0D9n
+         32672Ulx1Chq74uk03LxHT+1IONECBydDX6lFf8qSRaVFN5Vgd3BLr0kFc7FIkbWeVOu
+         5Tmg==
+X-Gm-Message-State: AOJu0YyqAQolDjNAYV4V/biOKKgmco5eehMSPQ9FtSYS/j6808czXgb2
+	A6267wQdlhv24qNzxi2UN8JWYIp7NM89xbzG6sckXtYQmOnTyyGfHF2B+g==
+X-Google-Smtp-Source: AGHT+IEwgIwXq/PenQAPzt8uJCjlMYcKOXGoCVdRTEwT7EaeIF3Xyq3CfDPM3nk7stlNF+RHuMaGoQ==
+X-Received: by 2002:a17:90a:de8e:b0:2d3:da82:2728 with SMTP id 98e67ed59e1d1-2d646d5eba9mr15806275a91.41.1724833950008;
+        Wed, 28 Aug 2024 01:32:30 -0700 (PDT)
+Received: from JUNHO-NEOSTACK. ([221.154.134.3])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2d844640ab6sm1080356a91.42.2024.08.28.01.32.28
+        for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 28 Aug 2024 00:45:04 -0700 (PDT)
-Message-ID: <66ced580.170a0220.1fd9a3.2824@mx.google.com>
-Date: Wed, 28 Aug 2024 00:45:04 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============1324967068314587638=="
+        Wed, 28 Aug 2024 01:32:29 -0700 (PDT)
+Message-ID: <66cee09d.170a0220.239498.270e@mx.google.com>
+X-Google-Original-Message-ID: <Zs7gmv0Yllh40Rvu@JUNHO-NEOSTACK.>
+Date: Wed, 28 Aug 2024 17:32:26 +0900
+From: Junho Lee <tot0roprog@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 1/2 v2 BlueZ] mesh: Add provisioning algorithms config
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, raj.khem@gmail.com
-Subject: RE: [v6,BlueZ] Provide GNU basename compatible implementation
-In-Reply-To: <20240828060926.3710535-1-raj.khem@gmail.com>
-References: <20240828060926.3710535-1-raj.khem@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
---===============1324967068314587638==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+This added the Algorithms config to the conf file because there was a
+`TODO` comment waiting to be added to the config file, and it was a
+mutable config.
 
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=884094
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      0.27 seconds
-GitLint                       PASS      0.18 seconds
-BuildEll                      PASS      24.43 seconds
-BluezMake                     PASS      1670.47 seconds
-MakeCheck                     PASS      13.81 seconds
-MakeDistcheck                 FAIL      68.03 seconds
-CheckValgrind                 PASS      252.55 seconds
-CheckSmatch                   WARNING   356.66 seconds
-bluezmakeextell               PASS      119.91 seconds
-IncrementalBuild              PASS      1469.35 seconds
-ScanBuild                     PASS      1011.25 seconds
-
-Details
-##############################
-Test: MakeDistcheck - FAIL
-Desc: Run Bluez Make Distcheck
-Output:
-
-Package cups was not found in the pkg-config search path.
-Perhaps you should add the directory containing `cups.pc'
-to the PKG_CONFIG_PATH environment variable
-No package 'cups' found
-../../mesh/mesh-config-json.c:31:10: fatal error: mesh/missing.h: No such file or directory
-   31 | #include "mesh/missing.h"
-      |          ^~~~~~~~~~~~~~~~
-compilation terminated.
-make[2]: *** [Makefile:7850: mesh/mesh-config-json.o] Error 1
-make[2]: *** Waiting for unfinished jobs....
-make[1]: *** [Makefile:4676: all] Error 2
-make: *** [Makefile:12226: distcheck] Error 1
-##############################
-Test: CheckSmatch - WARNING
-Desc: Run smatch tool with source
-Output:
-tools/hex2hcd.c:136:26: warning: Variable length array is used.
-
-
+Signed-off-by: Junho Lee <tot0roprog@gmail.com>
 ---
-Regards,
-Linux Bluetooth
 
+v2: Split commits because the previous commit appears to have changed two issues
+at once
 
---===============1324967068314587638==--
+ mesh/mesh-main.conf | 5 +++++
+ mesh/mesh.c         | 5 ++++-
+ 2 files changed, 9 insertions(+), 1 deletion(-)
+
+diff --git a/mesh/mesh-main.conf b/mesh/mesh-main.conf
+index aca9e6fa5..72154493e 100644
+--- a/mesh/mesh-main.conf
++++ b/mesh/mesh-main.conf
+@@ -41,3 +41,8 @@
+ # Setting this value to zero means there's no timeout.
+ # Defaults to 60.
+ #ProvTimeout = 60
++
++# Bitmask of supported provisioning security algorithms.
++# Valid range: 0-65535
++# Defaults to 1.
++#Algorithms = 1
+diff --git a/mesh/mesh.c b/mesh/mesh.c
+index 91cf25175..7b670e40a 100644
+--- a/mesh/mesh.c
++++ b/mesh/mesh.c
+@@ -245,6 +245,10 @@ static void parse_settings(const char *mesh_conf_fname)
+ 	if (l_settings_get_uint(settings, "General", "ProvTimeout", &value))
+ 		mesh.prov_timeout = value;
+ 
++	if (l_settings_get_uint(settings, "General", "Algorithms", &value) &&
++								value <= 65535)
++		mesh.algorithms = value;
++
+ done:
+ 	l_settings_free(settings);
+ }
+@@ -262,7 +266,6 @@ bool mesh_init(const char *config_dir, const char *mesh_conf_fname,
+ 	mesh_model_init();
+ 	mesh_agent_init();
+ 
+-	/* TODO: read mesh.conf */
+ 	mesh.prov_timeout = DEFAULT_PROV_TIMEOUT;
+ 	mesh.algorithms = DEFAULT_ALGORITHMS;
+ 
+-- 
+2.34.1
+
