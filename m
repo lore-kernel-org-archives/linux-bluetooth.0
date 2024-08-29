@@ -1,107 +1,98 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vs1-f52.google.com (mail-vs1-f52.google.com [209.85.217.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF72E1AC8A9
-	for <linux-bluetooth@vger.kernel.org>; Thu, 29 Aug 2024 16:56:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AF6728685
+	for <linux-bluetooth@vger.kernel.org>; Thu, 29 Aug 2024 20:18:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724950604; cv=none; b=gwcK6HLIiVBiU9YgUyQNE3uBhLbfZe7ZWR2YZrLHFKdFiPmGYlJMvatjznWo+rOiQw9EYYWyfdI0mS0midHwvmJuotGqeFs/T9EkippScKLEm/WklrpEdK92Ae6xl39FTzrq5FS5Zh136IY90JTvk1YOyqvfrSOS+5HxIXg2eGY=
+	t=1724962689; cv=none; b=jrFNGN38mdOI+oL4R7uXmw/FktLrHIy4ZJkEYbtytWfKi9hNH+dD9mb9ZeCliMONQyd3Zj2fBMgrFEP63c5o+9UYHH1j8YaR1hNwKDHluyaSM3/uTOgSnkwau5y3kw2NjV5Yc3jdiWL+RKNbqQgWEaGVPSeiY+RU5I1IGtVvwfk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724950604; c=relaxed/simple;
-	bh=+r1nXpu3BPQkrbGv1ozsrrv3XUNS2q4fMZrkhfExxSY=;
-	h=From:To:Subject:Date:Message-ID:Content-Type:MIME-Version; b=qUUE4ZMo019tEBTHN66zlh8QMCc14nWlJjfxx+b93ntCQii+74X9TszHQyBomAurXfdlGaFKCACDY+DVSP29Ig+J8BrQmnpRN+mX5//13L8ldGQDETAC+fzOOcwHXYdTd7RvqKUEXdz0M5VnW5S572vdvbJ0UcBmj04za22GG9w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=erDEB1j8; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1724962689; c=relaxed/simple;
+	bh=ZjlsCN79x406alqrhys11WXnG5KtXZ9f17j3EBCzXs0=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=e+l7lENpOwXoVbMgVRh9jxqCwDJVIAyLFITJs9zkDMW0Ze8BUAWDcVkKLjbjgF6u9kesKO36D9jzPY+YDnZ5wsiSbKryS0sMsfey8oLBgClPrFqDYAMtjBApRgk+ySo8NbUB0+M4kxXmzKgze+9++QWXo8vDYeyjMA2dlziRCTk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HX+OdwAN; arc=none smtp.client-ip=209.85.217.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="erDEB1j8"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 2DD42C4CEC1
-	for <linux-bluetooth@vger.kernel.org>; Thu, 29 Aug 2024 16:56:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724950604;
-	bh=+r1nXpu3BPQkrbGv1ozsrrv3XUNS2q4fMZrkhfExxSY=;
-	h=From:To:Subject:Date:From;
-	b=erDEB1j8JRFXuMI79YNECRGnSo7MJdfA1Jydbk9TyVfvMLWTai6x+POOOxu2ZPl8s
-	 mTpHm/+3gOfnQGSqWOd/qE4NeRQMXl2AVVAXAMmnfMoUR70qAMEMkBpjxsnLWip5O5
-	 Ue2CcPEu0v2PNtz2OZyy/3ZeRbnnv1MQoZDIrf5Cn35uQBhhwkIBvjnkNIJ+hOorOV
-	 a9kvGFKssJ0pLi9OV5JBinUNZUluAQYbtHBD7dcmlUnI5mK57ZPdq3+2ha5t69EeW3
-	 AIIRmeAmhx5F+6vOeysgc82RFEfZd2rkTg2Vg5GYT3jJmqtbuv8HrxDosjoIxNJcKB
-	 KavcPI5iNOZHg==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id 1B0D6C53B73; Thu, 29 Aug 2024 16:56:44 +0000 (UTC)
-From: bugzilla-daemon@kernel.org
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HX+OdwAN"
+Received: by mail-vs1-f52.google.com with SMTP id ada2fe7eead31-498cca5d48aso356261137.3
+        for <linux-bluetooth@vger.kernel.org>; Thu, 29 Aug 2024 13:18:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1724962686; x=1725567486; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=p5WfVQ5E3p9UvMDX3ygOcbyHH8QBhSj5xgqOgxC4dFQ=;
+        b=HX+OdwANIvRWrZJ5D46coO9/ocQHfAIx85XWP5n71xrthIXBYa/DhLQ9HO6MyaaUkk
+         SkAOMYSKaMCIkBaAC60tVYVIGYYB2nu5+t1ZKM/PowItt2B1Gr/t8HZxemE1BJFXqF8X
+         0WJJKDvUGY93BNYdT22FR158HrWuav+amptJaGvD1HNjdGJm6ZV7CigjzLSCJUPCBDAl
+         gU+eJ+AgMgTXPGlKTf/jAhy+Di0r+2HTJzofkmtUem9njdZQkNP2CLrVskF0o4rtulDv
+         6yNurnt2py2g8DOacyscCDD3oeAtsJB8tHk+kFnjQ+7I4t2qJVwtySelWbORE63FHvpG
+         PUHg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724962686; x=1725567486;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=p5WfVQ5E3p9UvMDX3ygOcbyHH8QBhSj5xgqOgxC4dFQ=;
+        b=XiSkhqIiI/N68TPsCXGTpmIB2ad49Cex5cocTRgUlT6h8QlCDeJuOUmIjIOpA1q2xx
+         gWUTH41G/Ax/2pFpszhsUNeqyaOg4xxj2/tDm9hY/OPJs6U93LAaFpLycFoHcH4vym5X
+         QOgldi12W5Ztwf4v9wScR3ThmMEWkWWCDQU7xnOLKo7yw86Wx+EsA2Ljkztv+SmN/mak
+         GiE2T4QifVjBC20j31ysdb77fzn45aBRP9TqPn9wkuwwkfl2DuuFLP/WN7RYa4lN/4XO
+         kAyZRZVoAWaUGodr1m5E09pLQX1R/aRYtyGCJxb5jjiU+P0ptrlt2uYEhiFY8qFVxE38
+         wYgg==
+X-Gm-Message-State: AOJu0YxnWZP2aEhaWuBTjWMinOgdNAk1JUqFNuJTEGA8GAYmirjGHQJt
+	GAgEfTZxlFb5KZZGtLHSZ+w7M3t47KCfvQmo+F3kNN033OQAAJ5+pA150A==
+X-Google-Smtp-Source: AGHT+IEplHD6Hqr4jMZ+1jsvQp996Jls9vu4XvbWgef1K4oYT6LngbqBOM/xxEBDjnEW7Y6U/s/iDw==
+X-Received: by 2002:a05:6102:c0b:b0:495:c4e8:fc3f with SMTP id ada2fe7eead31-49a5af48a80mr4871957137.23.1724962686299;
+        Thu, 29 Aug 2024 13:18:06 -0700 (PDT)
+Received: from lvondent-mobl5.. (syn-107-146-107-067.res.spectrum.com. [107.146.107.67])
+        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-846a9d127besm231386241.6.2024.08.29.13.18.05
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 29 Aug 2024 13:18:05 -0700 (PDT)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [Bug 219211] New: Bluetooth not working. Bluetooth: hci0: Opcode
- 0x0c03 failed: -110
-Date: Thu, 29 Aug 2024 16:56:43 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: new
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: aprilgrimoire@gmail.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P3
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: bug_id short_desc product version rep_platform
- op_sys bug_status bug_severity priority component assigned_to reporter
- cf_regression attachments.created
-Message-ID: <bug-219211-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+Subject: [PATCH BlueZ v1] device: Fix Pair method not setting auto_connect
+Date: Thu, 29 Aug 2024 16:18:03 -0400
+Message-ID: <20240829201803.1103129-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.46.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D219211
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-            Bug ID: 219211
-           Summary: Bluetooth not working. Bluetooth: hci0: Opcode 0x0c03
-                    failed: -110
-           Product: Drivers
-           Version: 2.5
-          Hardware: AMD
-                OS: Linux
-            Status: NEW
-          Severity: normal
-          Priority: P3
-         Component: Bluetooth
-          Assignee: linux-bluetooth@vger.kernel.org
-          Reporter: aprilgrimoire@gmail.com
-        Regression: No
+Due to commit 507ba12483c3 ("profile: Remove probe_on_discover")
+disable_auto_connect may be set when a service is probed but the device
+is still temporary which is normally the result of service being
+discovered over advertisement rather than connection.
 
-Created attachment 306791
-  --> https://bugzilla.kernel.org/attachment.cgi?id=3D306791&action=3Dedit
-output of journalctl -b 0
+To fix this the Device.Pair method needs to check if the
+disable_auto_connect flag has been set and then reset it set auto_connect
+which is similar to how Device.Connect works.
+---
+ src/device.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-Bluetooth adapter not working:
+diff --git a/src/device.c b/src/device.c
+index 1a5e8a7caa27..0f18c8c7f54e 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -3114,6 +3114,11 @@ static DBusMessage *pair_device(DBusConnection *conn, DBusMessage *msg,
+ 	 * this in the ATT connect callback)
+ 	 */
+ 	if (bdaddr_type != BDADDR_BREDR) {
++		if (device->disable_auto_connect) {
++			device->disable_auto_connect = FALSE;
++			device_set_auto_connect(device, TRUE);
++		}
++
+ 		if (!state->connected && btd_le_connect_before_pairing())
+ 			err = device_connect_le(device);
+ 		else
+-- 
+2.46.0
 
-(base) april@AprilGrimoire-Mechrevo ~ $ rfkill list
-0: hci0: Bluetooth
-        Soft blocked: no
-        Hard blocked: no
-1: phy0: Wireless LAN
-        Soft blocked: no
-        Hard blocked: no
-(base) april@AprilGrimoire-Mechrevo ~ $ bluetoothctl=20
-Waiting to connect to bluetoothd...[bluetooth]# Agent registered
-[bluetooth]# list
-[bluetooth]#=20
-
-I see the following error message from kernel:
-
-[    3.545797] Bluetooth: hci0: Opcode 0x0c03 failed: -110
-
---=20
-You may reply to this email to add a comment.
-
-You are receiving this mail because:
-You are the assignee for the bug.=
