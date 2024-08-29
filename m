@@ -1,182 +1,528 @@
-Received: from EUR03-DBA-obe.outbound.protection.outlook.com (mail-dbaeur03on2044.outbound.protection.outlook.com [40.107.104.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BEDC1ABEAD
-	for <linux-bluetooth@vger.kernel.org>; Thu, 29 Aug 2024 13:25:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.104.44
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724937928; cv=fail; b=hc20YGAFYVDM+F+8PURBuOLMPu2dnz4AUidY1Nkb1T4QzWdPBs4Y6214x2arVjgTx6bO5iK6pYGd6DqYQgJxv90Dia3xuumkJr4OyOmD+RAd7caS6Af1+QNL66UgKEF6nshYfq/v+FoI6wxzZ/jv8GVPEfoEyJIKb22hdCUgzv4=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724937928; c=relaxed/simple;
-	bh=JDi0E2AoY6qOabO4Kf694/K3CkpWi4m2c3WOG1emJOA=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=QFJjS5JDDzUfD64cec+FWJC9m5o70wj2oJ+siFn8Zr3iSkg3NH3Rq9QRhua03ShhqqVhrEERgd/ApcBDuk8ufEu8ZPgiuKF9b/d0GvW0tqThiCE1y+LUjX5HLqzr1rRArFoRhxbOwPMg200BAndW0b94OWA1M3q7ynLAwDYSRbA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=ALX9136Q; arc=fail smtp.client-ip=40.107.104.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+Received: from m16.mail.126.com (m16.mail.126.com [220.197.31.9])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A76901AE866
+	for <linux-bluetooth@vger.kernel.org>; Thu, 29 Aug 2024 13:28:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.9
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1724938103; cv=none; b=Bz4GWty2AzIqlgWUfSF+L9hdepUrsyueh360gg1LcXrcpfqSrjf9K4Zt3Z9lYYIv5Kfs/OQm5klPmVD0NMFa4JCjCc0uItRwUxh75fLNJMTIKBkmzvdejFko0KB16JTkNviV+4y88rWjHGRZ70+X7W6askJsyTsIbfq/7ZhR9dM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1724938103; c=relaxed/simple;
+	bh=6joUppzDxKS/pOKUSpOYyK3+gVRLbwWO9PPGcGBb/Iw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=lUhM6gCt3NH/UA8bLpibhazHz7Fun0a9DPhiwNRNA0KuImsOuh0gcV98VaS/m9X0qCfi2OFQlgr9/6Uuu88jIQkgiFDc3INVEgz7V2lWcb6VdtExv+58kC4GhCPRZK1Wib4RqVxPTLJa05IdjbkY75y9QMHUqF5liISh29bHWjA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=126.com; spf=pass smtp.mailfrom=126.com; dkim=pass (1024-bit key) header.d=126.com header.i=@126.com header.b=d378T4Lr; arc=none smtp.client-ip=220.197.31.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=126.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=126.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="ALX9136Q"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=JrzePfFE/URChSZCBRP4o3xIPgTnlQI+YYAGFky7aUsC+WOI/E0dF1GE1jzI3GJmcp4EGuWAHbp0T2W4dBJghj8VvlaSNiE8buBvEXcej5EFfxZnHudFVGid+ZdepZniskwUopO3MDbEbHM5Vb2fDXYGhVQsQjTPjklhNcaWplO8LOYkmNcsyLTOWmiwyrmmgrp4ALI1lkWbkScc+ykfoLtQ8s3/mQJVoKpjAZQ+DRsz86Tbof0lk59pnBQ2osCT639/uyBdm8KFunfL9IAmUPibc2VzxV68B11GdMKvoqH+t1QmLwNr5sXUS5LJq8LLgi6gGhEGMyGs46QLzw5+zQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=D2uMz9ubI4zLD2/THMWsuoEGoJNSSH4xaMBwXPVUaVg=;
- b=XDaJriUiNmUJL5I9Ko/Ee04YXyq+ybVzTA3o9YCmRLwtwox9IHHEQDH9xsE2VhEDI42HDcIRE5vMUFdxGiyrOdyPDiYxcX1loeNKntGZl7YXZ15cUzHzbTPRh3d4Sa989c5GdYXJScseWJRdqegqpCTHlkE+aPhX2o+eSV0F9MN/t/H0B39dgwrXqR3M5LsIP5fvaZGw9azvw5cBYmfNYZxsG1qY/9M3zQQV/+e85AV1Qn1i/xt66v0u/82ELiVt2072ruQMALdTNkI82vpEA6qP8hv4py+RN23RWicqEBJFQ5ZuV9J/0WX1hMWnL8VSbcIg1eLvHZkQvtmZLcYAVg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=D2uMz9ubI4zLD2/THMWsuoEGoJNSSH4xaMBwXPVUaVg=;
- b=ALX9136Q963e2VQwieAjg8m08LDqOjb6IqVYD2G1PgrD9KCjfkwDbAijBj19kZ5zdKsblbSOttjX6paepBIoq1igiTvgXOFkeL+v7ouV63mFr24iYJaabEPOPjJTcYoFSlP5qDRjkLQG0s2WBIKRj+fu34RROBpjYn3imQurwxdbQ8fQ3OzGgYR4hPjLRLhSyTZ6wUm+bG9nI6hMNCIDjP1OhiTkq8xRSy8+OmGQ2rWv4wkNZVJByYtWSoE6+jEXQO1K4TVhKUqTzQL7CsY7aif7dgArYEJvhwr5vcAwcL1Ngbf2r+a5qLOozWwvdud3Mujjf4Q/Tz8XQ2ArM2/0Vg==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from AS8PR04MB8898.eurprd04.prod.outlook.com (2603:10a6:20b:42d::15)
- by AS4PR04MB9385.eurprd04.prod.outlook.com (2603:10a6:20b:4e8::6) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7897.28; Thu, 29 Aug
- 2024 13:25:21 +0000
-Received: from AS8PR04MB8898.eurprd04.prod.outlook.com
- ([fe80::5e22:869c:33c:9654]) by AS8PR04MB8898.eurprd04.prod.outlook.com
- ([fe80::5e22:869c:33c:9654%5]) with mapi id 15.20.7897.027; Thu, 29 Aug 2024
- 13:25:21 +0000
-From: Iulia Tanasescu <iulia.tanasescu@nxp.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: claudia.rosu@nxp.com,
-	mihai-octavian.urzica@nxp.com,
-	vlad.pruteanu@nxp.com,
-	andrei.istodorescu@nxp.com,
-	luiz.dentz@gmail.com,
-	Iulia Tanasescu <iulia.tanasescu@nxp.com>
-Subject: [PATCH BlueZ 2/2] bluetoothctl-assistant.1: Update push command example
-Date: Thu, 29 Aug 2024 16:25:07 +0300
-Message-Id: <20240829132507.4545-3-iulia.tanasescu@nxp.com>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20240829132507.4545-1-iulia.tanasescu@nxp.com>
-References: <20240829132507.4545-1-iulia.tanasescu@nxp.com>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: AM0P190CA0013.EURP190.PROD.OUTLOOK.COM
- (2603:10a6:208:190::23) To AS8PR04MB8898.eurprd04.prod.outlook.com
- (2603:10a6:20b:42d::15)
+	dkim=pass (1024-bit key) header.d=126.com header.i=@126.com header.b="d378T4Lr"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=126.com;
+	s=s110527; h=Message-ID:Date:MIME-Version:Subject:From:
+	Content-Type; bh=AA/jMYpmSuLBitDb95naTjJ6g2wbikWqEgnH5iItjP8=;
+	b=d378T4Lr8df/qpB+4eNqga0aQb3FOE1Ob/0U3eq+SF8lYtpIOxcAWYqMVo+DI2
+	Is5QUizadxVbtH7ZOAKDQjdIhurZMKXBQNRv618xDXQ7FYJiT/XbXNCqmjFlnGyc
+	AUV3D4tJu6oSJEWSD/sm8CMQtMBFxHrrFgqIOMh1/sOlc=
+Received: from [192.168.50.76] (unknown [58.22.7.114])
+	by gzsmtp5 (Coremail) with SMTP id qSkvCgD3n1Fdd9BmsoiMAA--.49045S2;
+	Thu, 29 Aug 2024 21:27:58 +0800 (CST)
+Message-ID: <4a5a6af5-9eaa-4663-bf11-73cdd95a5ad3@126.com>
+Date: Thu, 29 Aug 2024 21:27:58 +0800
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AS8PR04MB8898:EE_|AS4PR04MB9385:EE_
-X-MS-Office365-Filtering-Correlation-Id: 6fa69e6f-483b-44da-d987-08dcc82e085f
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?XQeyOBft/+ob10QpQSuwOlX7eXtPWBqGDGOonyE1pcECotvBP3Z/XDbgh08r?=
- =?us-ascii?Q?CQnFNLNIfI5YxqJRxzKL2vc9rPmQYniNxi6wzi7YXh69q+MFScOwHFVHpj/S?=
- =?us-ascii?Q?lB8XV/ZvAX8MxkxNOP4OzFqz2ekO/F0NWgm408xGM4UHMk5OYSajazNv/sQB?=
- =?us-ascii?Q?hpCu7WwI+E6J/Uczuefq0qNQHKGNJ9olBk55T43jcOCxcJGvgl1BcR+spnaR?=
- =?us-ascii?Q?dh8043zQphXHz++QnLvDpCpCTYFUNmTxu8cmiejBBNjIz4PEVUISSLJ4a5U5?=
- =?us-ascii?Q?+XWlKiyF+gIIlxBaLuvzF4/MZRQXdXQxdb/RnxJDws4zF+blUY+9Pywuhtbo?=
- =?us-ascii?Q?NmVp9NPL1w5pVRAbZhQioWvU8twSedEQacHTV5ERt98NWtO0CG/aLY5Bbj7U?=
- =?us-ascii?Q?fOaCMb/QvpkPDj09MCD0JxweGBNvGtALwZ2kENOTpTtojWOkokOjPUT2HnDV?=
- =?us-ascii?Q?90xFssXjyuQpta8AxqbBhWHANWtanuBzXfoGVRyVBY3ABv2cc34frgdZ1mrh?=
- =?us-ascii?Q?h5izzFL4ad2wNTGGodgIj/XekRsTqPLj2xeY1obo5T4DQMuJzq9thLXV2D0o?=
- =?us-ascii?Q?3PA+TEyfyI2wzreTqaM+VrhNC5IkLjHF7oQNt0LrPvVgN9jxtJXxPBQPj0Zy?=
- =?us-ascii?Q?ZW80FRaIeWSTcP3KCkB0ntgtnZnlCogVtm3KkZFjzZxASlXy93jqxIFCtNC/?=
- =?us-ascii?Q?JISixhG80JA/Wr1ArSPdu1LgXPhvb/dZAupO6Yi7JaFF7gfaGpnm2eJz5Pvy?=
- =?us-ascii?Q?XXfu+CPsT+q93EbjvwG67/avuu96cN3Wsz3VxreiheRaEZZVkJbYi5nK334m?=
- =?us-ascii?Q?+mdd4vCxhkpvKE4s8sZJBLbGp7bj6rw9ITgIZdLyPSpnuSMmsj/9XawNKKq3?=
- =?us-ascii?Q?71PRbBf81db+eBzF9tW6jzxtNTe5Gt8jWPbClNxpkR9HWWUY+93E5JJPcJJV?=
- =?us-ascii?Q?OCx0SGlVI1U4rah+5lYAU3kcFJIVyWRVYVq3lk+47dwbB0JrGz/j+Bg/3HDq?=
- =?us-ascii?Q?kDUTh1/Dn/MGZ48mMeNh1Hzhdwkkz+vdpyFRIO301r4qYt6vtgdUA9Zyl4Ad?=
- =?us-ascii?Q?oEmbxTjTtv75zuoJ5qtiVKOdSjmMiozSgazbEYxJbczT7SfK2EcpjEoHH/1Z?=
- =?us-ascii?Q?uU1hTsS5R+sbiRGjQTP5hrB3x/Qm6SlIPuISpupnWJh2w4uI5VjQHSf8vL/i?=
- =?us-ascii?Q?UAR3+mrC56ws2w5YqQc4sGRGy+2pyj2TLakT4OLLfP6zdJtylYqCeSZTJZXr?=
- =?us-ascii?Q?NTKj0fn0Sqj8iptLgG5FacjNfgUzapk6LM/jnNecKaB0Q26mEXC8RdntgGzV?=
- =?us-ascii?Q?vZ0Zi33iFVU42JbAA0TATWaqnCAbl2h/pSjIzep+adJMcw=3D=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AS8PR04MB8898.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?ropHdg/fyVBt6KW9mjJ/bQE2Ub8GFJakdCqn/fIGLSG6EeJiOLT1kNLYRGDG?=
- =?us-ascii?Q?vVSDl0Ejtp2FDo5yN1CaU2G/dqgr7/LpsT3wOfgYAfYvFN6xzuqUPLoUe+xK?=
- =?us-ascii?Q?B3NcgNK7+IKGV9wikwCVESvCx7eWK0jESuo0QVzyW+To2/lcJzp0uDo2QOmQ?=
- =?us-ascii?Q?jf0I/BNgcqAfa6cQZzUyaI1NEtUdzP0pIjmaj1dj8pKaPB8AvXR3v8QGuHS/?=
- =?us-ascii?Q?GP2cnyh1wmL8kSrjg8ApDYkFBZiTRqVF5ocG7UjkAtvm0Ji6gK37gNTEXo5C?=
- =?us-ascii?Q?37DHMpotxqaggu7CctPaWBssiMB7EBOmUrqqreZaQn31rmfSOgzeqoImK6zO?=
- =?us-ascii?Q?8pjS2qQDoAjC+w4nmJsZwQRzxM7bLo5aP9uDxL9a+Cjr61NRHHHZIHBt2XQd?=
- =?us-ascii?Q?ZDTZ88VEZhD6jC4XwaPYXVu8KWUETbgRwZRbVBzXxlyg7IljdD9GjSRXR7us?=
- =?us-ascii?Q?OsHdN6Ostwr8qhKu0lp6j9/M6GkAbbJAlOyJR2tSfMilhfoBFvZs3ETSyKBq?=
- =?us-ascii?Q?tR9jPxUOOUc9cReWZCb0OYw9CdoxD/4hzwQ/oPoCQPQNrhHfGKvpso4XdoB+?=
- =?us-ascii?Q?c9pobHKMyPtlmy+yXwqNuLsqe05kwaYCI8T2DFvq2wMQ8SZkoGoiBv+nQJ6u?=
- =?us-ascii?Q?tU6P2QQRf9y4b8/RSY3YOTO7Q7hFEHwEJxZ1jfo4oGLaKrXhdIfwgkzFerEa?=
- =?us-ascii?Q?4I6tdF3OnuZ/z5Bv6N326fWDqxqeujV8Ah7a958VbP8AWMD63/elhmvEAjY6?=
- =?us-ascii?Q?WB8qg6nY7SMjSDSj1i4pIh6KskKJOJeYazqukerg3Vf8PS5C2yKzO/FdU2kF?=
- =?us-ascii?Q?DBY6sdxMk+Zx+7N5r2wTvVJHIxTEjI/5fIPwzoIQcgFlKmcXbZcPcmTqzQc1?=
- =?us-ascii?Q?lVAya70CYHSGKpu9UMq48xnO4Rar9kpwDjjn601W5IfrMJ8DObtimUKzXLZ3?=
- =?us-ascii?Q?hzIrBX4dO6ozrshUaXSnxQ3K+FYCf7hGMylNNig04ihLh9OkPi9WWcqXXbg9?=
- =?us-ascii?Q?t1Zi74vHcfvTtvRQFgTbSgVw+hbF5+ZW2jS8qYtT04htrQwAiWEnx7xJaZ8a?=
- =?us-ascii?Q?yhwxII2QMvg1gGixwZqQycAc/d0JMyC8LaKAGlVb+5SsB76CQigHwAHCMhZs?=
- =?us-ascii?Q?JKVO/PZtb8kv+yEf/PAkgd6PLP5SmJz9/E0cAoNrFxUty6a4Z4UCa80sBWF+?=
- =?us-ascii?Q?vhnQWzARsa71WYP84U+lN0EKtTQUC1o3LSaEXX0/9ZpVLnPfNr6aj0FVMYhf?=
- =?us-ascii?Q?jB/TDA9Q4kWLtfdKYdCB7pMnjQavOlAS2boW1gmvEPQDt3qSpTxkEkBXY6TP?=
- =?us-ascii?Q?6UIygbtUTab2wTpPPGLml3FH9cSHv0ARylKEU9n/aHP3LmAyvlsNVXpuFgCz?=
- =?us-ascii?Q?Jr67kCFTmpZxHQ4ipjGMivwCvAsbTzST+jYwcrpfcF4h/zoP9RWaXI9LjqL9?=
- =?us-ascii?Q?w/k0Agu1HvB1+TY+cxHEFJLhOQvSBr2CtRwUF1wSHR4OXwx9oLuIM0eYnQye?=
- =?us-ascii?Q?izG0maKitthH9EkgF5Xb2ZhAvO5Rivs+CMs6GvFDp+0K7LuE6Aj9b0wVPOrj?=
- =?us-ascii?Q?SoVKzBP+LZM+bFrybXjrCpLsr7odyVVwBWy9914vwDkSqQ2BGwN6pWkn6RVw?=
- =?us-ascii?Q?eQ=3D=3D?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6fa69e6f-483b-44da-d987-08dcc82e085f
-X-MS-Exchange-CrossTenant-AuthSource: AS8PR04MB8898.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Aug 2024 13:25:21.5385
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 1DBV4alNamwwcVZ1jjwwB/qOelr4C6VgVDqHwmeFe6/esxzYSEYyMQ4umI8rZjIM7G00a7hL+cxJ3LMoSBpUvg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS4PR04MB9385
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/2] adapter: Fix addr_type for smp_irk/ltk_info/link_key
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Robin Candau <antiz@archlinux.org>, quic_chejiang@quicinc.com,
+ linux-bluetooth@vger.kernel.org, Xiao Yao <xiaoyao@rock-chips.com>
+References: <20231211162729.1183207-1-xiaokeqinhealth@126.com>
+ <55903fdb-e970-4b89-b620-daa93bad7811@archlinux.org>
+ <CABBYNZ+X1gWovfui7Vyaag80PFz_1q4A_F7r=wpgF_gm9f9orA@mail.gmail.com>
+ <e4be48f5-1139-4871-a229-8dae7a7d745f@126.com>
+ <CABBYNZK6qYdvAkKJDTfgxOxC2+qBxRriaprH3ooxV0jRMsf8fQ@mail.gmail.com>
+ <4b897b9f-8ea5-45ad-9a41-faae01d2ed18@126.com>
+ <CABBYNZLvA+ParxAny3KGiTEN1AXi64pG1ZtOz7aMvXDFubDp9Q@mail.gmail.com>
+ <588714fa-ffa0-4e5a-9d06-00c198e0700b@126.com>
+ <CABBYNZ+G3xpV+C5JPeXGu=rxjwexEV+0mTr9OMw_UxEV9K5CPA@mail.gmail.com>
+ <0b172ceb-6f8b-44f8-a861-a8480b62f6ca@126.com>
+ <CABBYNZK9O7udF=xMj5O+LHZDspgjp-PXwTt1epb73uKB7R-RJQ@mail.gmail.com>
+Content-Language: en-GB
+From: Yao Xiao <xiaokeqinhealth@126.com>
+In-Reply-To: <CABBYNZK9O7udF=xMj5O+LHZDspgjp-PXwTt1epb73uKB7R-RJQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:qSkvCgD3n1Fdd9BmsoiMAA--.49045S2
+X-Coremail-Antispam: 1Uf129KBjvAXoWfZrW7Gr48AFy8Ar18tr4fZrb_yoW8ur1kJo
+	WrJr13Jr4xJr1UJr4UJ34UXr4Ut3W8Kr1UJryUJr1DXa12qa43AF18Jr1UJan8Gr1UGr1U
+	Jry8JryrAry7JF1rn29KB7ZKAUJUUUU8529EdanIXcx71UUUUU7v73VFW2AGmfu7bjvjm3
+	AaLaJ3UbIYCTnIWIevJa73UjIFyTuYvjxUc5ETDUUUU
+X-CM-SenderInfo: 50ld0yhhtl0xhhdo3xa6rslhhfrp/1tbimglK1WbQcRRahAAAsB
 
-This updates the push command example to enter the Broadcast Code,
-since it should be entered as a string instead of a byte array.
----
- client/bluetoothctl-assistant.rst | 16 ++++++++++------
- 1 file changed, 10 insertions(+), 6 deletions(-)
+Hi,
 
-diff --git a/client/bluetoothctl-assistant.rst b/client/bluetoothctl-assistant.rst
-index b4f7d039b..fb8c3a0d8 100644
---- a/client/bluetoothctl-assistant.rst
-+++ b/client/bluetoothctl-assistant.rst
-@@ -41,16 +41,20 @@ the default metadata will be overwritten by the LTVs
- entered by the user.
- 
- If the stream is encrypted, the user will also be prompted
--to enter the Broadcast Code. This is a 16 bytes array which
--will be used by the peer to decrypt the stream. If the auto
--value is chosen, a zero filled array will be sent to the peer.
--Otherwise, the bytes entered by the user will be sent.
-+to enter the Broadcast Code. This is the key to decrypt the
-+stream. On the UI level, the Broadcast Code shall be represented
-+as a string of at least 4 octets, and no more than 16 octets
-+when represented in UTF-8. The string will be sent to the peer
-+via GATT as an array of 16 octets.
-+
-+If the auto value is chosen when prompted for the Broadcast
-+Code, a zero filled array will be sent to the peer. Otherwise,
-+the string entered by the user will be sent as an array of bytes.
- 
- :Usage: **# push <assistant>**
- :Example: | **# push /org/bluez/hci0/src_05_1F_EE_F3_F8_7D/dev_00_60_37_31_7E_3F/bis1**
-           | **[Assistant] Enter Metadata (auto/value): 0x03 0x02 0x04 0x00**
--          | **[Assistant] Enter Broadcast Code (auto/value): 0x01 0x02 0x68 0x05 0x53
--                          0xf1 0x41 0x5a 0xa2 0x65 0xbb 0xaf 0xc6 0xea 0x03 0xb8**
-+          | **[Assistant] Enter Broadcast Code (auto/value): Borne House**
- 
- RESOURCES
- =========
--- 
-2.39.2
+On 2024/8/28 22:37, Luiz Augusto von Dentz wrote:
+> Hi,
+> 
+> On Wed, Aug 28, 2024 at 6:03 AM Yao Xiao <xiaokeqinhealth@126.com> wrote:
+>>
+>> Hi Luiz,
+>>
+>> On 2024/8/28 2:30, Luiz Augusto von Dentz wrote:
+>>> Hi Yao,
+>>>
+>>> On Tue, Aug 27, 2024 at 2:03 PM Yao Xiao <xiaokeqinhealth@126.com> wrote:
+>>>>
+>>>> Hi,
+>>>>
+>>>> On 2024/8/27 23:47, Luiz Augusto von Dentz wrote:
+>>>>> Hi,
+>>>>>
+>>>>> On Tue, Aug 27, 2024 at 10:33 AM Yao Xiao <xiaokeqinhealth@126.com> wrote:
+>>>>>>
+>>>>>> Hi Luiz,
+>>>>>>
+>>>>>> On 2024/8/27 20:52, Luiz Augusto von Dentz wrote:
+>>>>>>> Hi,
+>>>>>>>
+>>>>>>> On Tue, Aug 27, 2024 at 3:41 AM Yao Xiao <xiaokeqinhealth@126.com> wrote:
+>>>>>>>>
+>>>>>>>> Hi luiz,
+>>>>>>>> The kernel should always report the correct address type for all kinds
+>>>>>>>> of keys. Older kernels ignore the derivation of keys, which prevents the
+>>>>>>>> user layer from knowing the correct address type. This can cause a lot
+>>>>>>>> of confusion for users. For example, when a user connects to a
+>>>>>>>> traditional Bluetooth audio device, due to the default activation of key
+>>>>>>>> derivation, bluetoothd reports both BREDR and BLE pairing and binding,
+>>>>>>>> and the address is updated to LE public. When the user actively calls
+>>>>>>>> the Connect method of org.bluez.Device1 to reconnect, sometimes the
+>>>>>>>> address type is set to LE public, leading to a failed connection, and
+>>>>>>>> vice versa.
+>>>>>>>
+>>>>>>> The correct address type can only be the ones listed on mgmt-api
+>>>>>>> otherwise we are breaking APIs, also except if there are some new case
+>>>>>>> I don't know and Load Keys and Load LTK are bearer specific.
+>>>>>>>
+>>>>>>>> We should enable bluetoothd to know the reason for the generation of
+>>>>>>>> keys as much as possible. Older kernels always assume the address type
+>>>>>>>> of linkey is BREDR, and ltk/irk/csrk are LE public. Therefore, we can
+>>>>>>>> use this as a basis for judgment, allowing bluetoothd to handle various
+>>>>>>>> issues, such as reloading keys and handling unpaired devices. Below is a
+>>>>>>>> pseudo-code that is not running in practice but just a thought. Please
+>>>>>>>> help review it.
+>>>>>>>
+>>>>>>> Yeah, and what exactly was wrong with that? What you mention about
+>>>>>>> having keys for both BR/EDR and LE public is not an issue, that
+>>>>>>> basically the very definition of a dual-mode device and bluetoothd
+>>>>>>> shall be able to tell when to connect to BR/EDR and LE public, if it
+>>>>>>> doesn't we shall fix that and not start breaking APIs.
+>>>>>> Returning to my original issue: When BlueZ acts as a sink device and a
+>>>>>> phone connects to it, pairs successfully, and derives related keys,
+>>>>>> BlueZ reports to the user layer that bonded (both bredr_state.bonded and
+>>>>>> dev->le_state.bonded) are true, and addr_type is LE_PUBLIC. If the
+>>>>>> device restarts and the org.bluez.Device1:Connect method is called to
+>>>>>> reconnect to the phone, according to the rules in select_conn_bearer,
+>>>>>> addr_type will be set to LE_PUBLIC, leading to a failed reconnection
+>>>>>> when device_connect_le is called.
+>>>>>
+>>>>> If I recall this correctly we do reconnect based on the last seen
+>>>>> bearer, also the addr_type is only really relevant for LE bearer,
+>>>>> BR/EDR shall be detected via bearer state alone. Anyway there was a
+>>>>> discussion regarding having bearer specific API's as alternative to
+>>>>> org.bluez.Device1.Connect to pickup a bearer, but in some cases, like
+>>>>> when acting as a peripheral, perhaps we need a different policy, in
+>>>>> the specific case of being a A2DP sink though, we could detect that LE
+>>>>> keys are for a peripheral and in that case advertisement shall be used
+>>>>> for connecting the LE bearer thus the BR/EDR shall be chosen which
+>>>>> shall fix this behavior.
+>>>>>
+>>>>>> In this situation, how should bluetoothd choose the correct address type
+>>>>>> when it doesn't know the physical bearer layer? Should there be a
+>>>>>> configuration option to turn key derivation on or off? Additionally,
+>>>>>> there's another use case: When a phone connects to a BlueZ device, it
+>>>>>> continuously transmits custom data via BLE and music via traditional
+>>>>>> Bluetooth (BREDR). If the user only wants to unpair the BREDR, it may
+>>>>>> cause the BLE connection to be disconnected as well, leading to data
+>>>>>> transmission interruption. Should we also consider turning off key
+>>>>>> derivation in this scenario?
+>>>>>
+>>>>> Device API is not bearer specific though, so one cannot really unpair
+>>>>> BR/EDR alone, in fact I would be surprised if any stack implements
+>>>>> this that way because depending on what bearer is connected it may
+>>>>> trigger a missing link key which could possibly lead to repairing
+>>>>> procedure which will most likely having to replace the other bearer
+>>>>> keys as well, if the idea is you only really need BR/EDR then you
+>>>>> might as well disable LE completely.
+>>>>
+>>>> Could we possibly implement a configuration that allows for the enabling
+>>>> or disabling of key derivation? Currently, a significant portion of
+>>>> devices only require either BR/EDR or BLE functionality independently
+>>>> and do not need key derivation, which can cause some confusion and
+>>>> issues for users. Additionally, as I understand, there are some
+>>>> proprietary RTOS Bluetooth protocol stacks that have disabled key
+>>>> derivation and support separate management of pairing keys for BR/EDR
+>>>> and BLE devices. For example, an IoT device that supports both BR/EDR
+>>>> and BLE could be detected as two separate devices by an iPhone, sharing
+>>>> the same address—one for BLE used for ANCS notifications (Apple
+>>>> Notification Center Service (ANCS) Specification) and the other for
+>>>> A2DP. The phone could connect to or remove either device without
+>>>> interference between the two.
+>>>
+>>> That will likely require a lot of work to get working since we would
+>>> endup with the same device object, if this really exists in real life
+>>> Im afraid it breaks a lot of things in the process and it will never
+>>> be backwards compatible, so I'm really not convinced this is the right
+>>> thing to do, in fact Id claim that if a device wants to have separate
+>>> pairing/bonding procedures then it must use different addresses which
+>>> means the LE bearer shall probably use a random static address rather
+>>> than attempt to reuse the same identity address of BR/EDR, afterall it
+>>> want to have distinct devices so it really makes no sense to keep
+>>> using the same address.
+>>
+>> BLUETOOTH CORE SPECIFICATION Version 5.2 | Vol 6, Part B
+>> 1.3 DEVICE ADDRESS
+>> Devices are identified using a device address and an address type;
+>> Whenever two device addresses are compared, the comparison shall include
+>> the device address type (i.e. if the two addresses have different types,
+>> they are different even if the two 48-bit addresses are the same).
+> 
+> Yeah, but it doesn't make any difference if both BREDR and LE address
+> type is a public identity address, which must be the case since BREDR
+> can only be a public address, or are you talking about giving a random
+> static the same address to a public? While possible I would argue that
+> is a self inflicted pain because the device should attempt to generate
+> a unique address exactly for the purpose of not allocating addresses
+> which may belong to another company (OUI):
+> 
+> https://www.wireshark.org/tools/oui-lookup.html
+> 
+> And no, as far as MAC address is concerned there is no address type,
+> this is something that Bluetooth invented and that I very much dislike
+> since it completely disregards things like OUI exists.
+
+I fully agree.
+
+> 
+>> According to the specification, even if the addresses are the same, as
+>> long as the address types are different, they are considered two
+>> different devices; the iPhone(iOS) can scan for two devices: they have
+>> the same address but different address types, and can be paired and
+>> unpaired independently.
+> 
+> That is fair enough when the devices are from different manufacturers,
+> what I'm questioning is why someone would deliberately have the same
+> address with different address types? Btw, are these devices on the
+> market already?
+
+This type of product has indeed been launched on the market. Based on my 
+tests, the own addr type bit in the broadcast of the peripheral device 
+is set to 0x01, which corresponds to a Random Device address, and the 
+address remains consistent with the BREDR address.
+When I modify the own addr type in the broadcast of the peripheral 
+device to 0, the iPhone (iOS) will then treat them as one device.
+
+Own_Address_Type
+Value Parameter Description
+0x00 Public Device Address (default)
+0x01 Random Device Address
+0x02 Controller generates Resolvable ...
+0x03 Controller generates Resolvable ...
+
+> 
+>>
+>>>
+>>>>
+>>>>>
+>>>>>>
+>>>>>>>
+>>>>>>>> -------------------------------------------
+>>>>>>>> diff --git a/src/adapter.c b/src/adapter.c
+>>>>>>>> index 85ddfc165..babe7c9b2 100644
+>>>>>>>> --- a/src/adapter.c
+>>>>>>>> +++ b/src/adapter.c
+>>>>>>>> @@ -4958,6 +4958,7 @@ static void load_devices(struct btd_adapter *adapter)
+>>>>>>>>               struct irk_info *irk_info;
+>>>>>>>>               struct conn_param *param;
+>>>>>>>>               uint8_t bdaddr_type;
+>>>>>>>> +        bool derived_key;
+>>>>>>>>
+>>>>>>>>               if (entry->d_type == DT_UNKNOWN)
+>>>>>>>>                   entry->d_type = util_get_dt(dirname, entry->d_name);
+>>>>>>>> @@ -4976,10 +4977,21 @@ static void load_devices(struct btd_adapter
+>>>>>>>> *adapter)
+>>>>>>>>                   g_clear_error(&gerr);
+>>>>>>>>               }
+>>>>>>>>
+>>>>>>>> +        derived_key = g_key_file_get_boolean(key_file, "General",
+>>>>>>>> +                                "DerivedKey", NULL);
+>>>>>>>> +
+>>>>>>>> +        /* For link key */
+>>>>>>>>               bdaddr_type = get_addr_type(key_file);
+>>>>>>>> +        if (!derived_key)
+>>>>>>>> +            bdaddr_type = BDADDR_BREDR;
+>>>>>>>>
+>>>>>>>>               key_info = get_key_info(key_file, entry->d_name, bdaddr_type);
+>>>>>>>>
+>>>>>>>> +        /* For ltk/irk/csrk */
+>>>>>>>> +        bdaddr_type = get_addr_type(key_file);
+>>>>>>>> +        if (!derived_key)
+>>>>>>>> +            bdaddr_type = BDADDR_LE_PUBLIC;
+>>>>>>>> +
+>>>>>>>>               ltk_info = get_ltk_info(key_file, entry->d_name, bdaddr_type);
+>>>>>>>>
+>>>>>>>>               peripheral_ltk_info = get_peripheral_ltk_info(key_file,
+>>>>>>>> @@ -8673,6 +8685,12 @@ static void new_link_key_callback(uint16_t index,
+>>>>>>>> uint16_t length,
+>>>>>>>>               return;
+>>>>>>>>           }
+>>>>>>>>
+>>>>>>>> +    /*
+>>>>>>>> +     * For older kernels, the address type is always BREDR.
+>>>>>>>> +     */
+>>>>>>>> +    if (addr->type == BDADDR_LE_PUBLIC)
+>>>>>>>> +        device->derived_key = true;
+>>>>>>>> +
+>>>>>>>>           if (ev->store_hint) {
+>>>>>>>>               const struct mgmt_link_key_info *key = &ev->key;
+>>>>>>>>
+>>>>>>>> @@ -8791,6 +8809,12 @@ static void new_long_term_key_callback(uint16_t
+>>>>>>>> index, uint16_t length,
+>>>>>>>>               return;
+>>>>>>>>           }
+>>>>>>>>
+>>>>>>>> +    /*
+>>>>>>>> +     * For older kernels, the address type is always BDADDR_LE_PUBLIC.
+>>>>>>>> +     */
+>>>>>>>> +    if (addr->type == BDADDR_BREDR)
+>>>>>>>> +        device->derived_key = true;
+>>>>>>>> +
+>>>>>>>>           /*
+>>>>>>>>            * Some older kernel versions set store_hint for long term keys
+>>>>>>>>            * from resolvable and unresolvable random addresses, but there
+>>>>>>>> @@ -8855,6 +8879,9 @@ static void new_csrk_callback(uint16_t index,
+>>>>>>>> uint16_t length,
+>>>>>>>>               return;
+>>>>>>>>           }
+>>>>>>>>
+>>>>>>>> +    if (addr->type == BDADDR_BREDR)
+>>>>>>>> +        device->derived_key = true;
+>>>>>>>> +
+>>>>>>>>           device_set_csrk(device, key->val, 0, key->type, ev->store_hint);
+>>>>>>>>       }
+>>>>>>>>
+>>>>>>>> @@ -8941,6 +8968,9 @@ static void new_irk_callback(uint16_t index,
+>>>>>>>> uint16_t length,
+>>>>>>>>               return;
+>>>>>>>>           }
+>>>>>>>>
+>>>>>>>> +    if (addr->type == BDADDR_BREDR)
+>>>>>>>> +        device->derived_key = true;
+>>>>>>>> +
+>>>>>>>>           device_update_addr(device, &addr->bdaddr, addr->type);
+>>>>>>>>
+>>>>>>>>           if (duplicate)
+>>>>>>>> diff --git a/src/device.c b/src/device.c
+>>>>>>>> index a1dc0750c..062b9c49d 100644
+>>>>>>>> --- a/src/device.c
+>>>>>>>> +++ b/src/device.c
+>>>>>>>> @@ -272,6 +272,7 @@ struct btd_device {
+>>>>>>>>           struct csrk_info *remote_csrk;
+>>>>>>>>           struct ltk_info *ltk;
+>>>>>>>>           struct queue    *sirks;
+>>>>>>>> +    bool        derived_key;            /* key is derived. */
+>>>>>>>>
+>>>>>>>>           sdp_list_t    *tmp_records;
+>>>>>>>>
+>>>>>>>> @@ -482,6 +483,9 @@ static gboolean store_device_info_cb(gpointer user_data)
+>>>>>>>>           g_key_file_set_boolean(key_file, "General", "Blocked",
+>>>>>>>>                                   device->blocked);
+>>>>>>>>
+>>>>>>>> +    g_key_file_set_boolean(key_file, "General", "DerivedKey",
+>>>>>>>> +                            device->derived_key);
+>>>>>>>> +
+>>>>>>>>           if (device->wake_override != WAKE_FLAG_DEFAULT) {
+>>>>>>>>               g_key_file_set_boolean(key_file, "General", "WakeAllowed",
+>>>>>>>>                              device->wake_override ==
+>>>>>>>> @@ -1829,7 +1833,11 @@ static void bonding_request_cancel(struct
+>>>>>>>> bonding_req *bonding)
+>>>>>>>>           struct btd_device *device = bonding->device;
+>>>>>>>>           struct btd_adapter *adapter = device->adapter;
+>>>>>>>>
+>>>>>>>> -    adapter_cancel_bonding(adapter, &device->bdaddr, device->bdaddr_type);
+>>>>>>>> +    if (device->derived_key) {
+>>>>>>>> +        adapter_cancel_bonding(adapter, &device->bdaddr, BDADDR_BREDR);
+>>>>>>>> +        adapter_cancel_bonding(adapter, &device->bdaddr, BDADDR_LE_PUBLIC);
+>>>>>>>> +    } else
+>>>>>>>> +        adapter_cancel_bonding(adapter, &device->bdaddr,
+>>>>>>>> device->bdaddr_type);
+>>>>>>>>       }
+>>>>>>>>
+>>>>>>>>       static void dev_disconn_service(gpointer a, gpointer b)
+>>>>>>>> @@ -3196,12 +3204,19 @@ static DBusMessage
+>>>>>>>> *cancel_pairing(DBusConnection *conn, DBusMessage *msg,
+>>>>>>>>       {
+>>>>>>>>           struct btd_device *device = data;
+>>>>>>>>           struct bonding_req *req = device->bonding;
+>>>>>>>> +    uint8_t bdaddr_type;
+>>>>>>>>
+>>>>>>>>           DBG("");
+>>>>>>>>
+>>>>>>>>           if (!req) {
+>>>>>>>> -        btd_adapter_remove_bonding(device->adapter, &device->bdaddr,
+>>>>>>>> -                        device->bdaddr_type);
+>>>>>>>> +        if (device->derived_key) {
+>>>>>>>> +            btd_adapter_remove_bonding(device->adapter, &device->bdaddr,
+>>>>>>>> +                            BDADDR_BREDR);
+>>>>>>>> +            btd_adapter_remove_bonding(device->adapter, &device->bdaddr,
+>>>>>>>> +                            BDADDR_LE_PUBLIC);
+>>>>>>>> +        } else
+>>>>>>>> +            btd_adapter_remove_bonding(device->adapter, &device->bdaddr,
+>>>>>>>> +                            device->bdaddr_type);
+>>>>>>>>               return btd_error_does_not_exist(msg);
+>>>>>>>>           }
+>>>>>>>>
+>>>>>>>> @@ -3833,6 +3848,9 @@ next:
+>>>>>>>>               gerr = NULL;
+>>>>>>>>           }
+>>>>>>>>
+>>>>>>>> +    device->derived_key = g_key_file_get_boolean(key_file, "General",
+>>>>>>>> +                            "DerivedKey", NULL);
+>>>>>>>> +
+>>>>>>>>           if (store_needed)
+>>>>>>>>               store_device_info(device);
+>>>>>>>>       }
+>>>>>>>>
+>>>>>>>> On 2024/8/27 5:12, Luiz Augusto von Dentz wrote:
+>>>>>>>>> Hi Xiao,
+>>>>>>>>>
+>>>>>>>>> On Fri, Dec 15, 2023 at 8:06 PM Robin Candau <antiz@archlinux.org> wrote:
+>>>>>>>>>>
+>>>>>>>>>> On 12/11/23 17:27, Xiao Yao wrote:
+>>>>>>>>>>
+>>>>>>>>>> From: Xiao Yao <xiaoyao@rock-chips.com>
+>>>>>>>>>>
+>>>>>>>>>> According to BLUETOOTH CORE SPECIFICATION Version 5.4 | Vol 3,
+>>>>>>>>>> Part H, 2.4.24/2.4.25, The LE LTK and BR/EDR link keys can be
+>>>>>>>>>> converted between each other, so the addr type can be either
+>>>>>>>>>> BREDR or LE, so fix it.
+>>>>>>>>>>
+>>>>>>>>>> Signed-off-by: Xiao Yao <xiaoyao@rock-chips.com>
+>>>>>>>>>> ---
+>>>>>>>>>>       src/adapter.c | 20 ++++++++++++++------
+>>>>>>>>>>       1 file changed, 14 insertions(+), 6 deletions(-)
+>>>>>>>>>>
+>>>>>>>>>> diff --git a/src/adapter.c b/src/adapter.c
+>>>>>>>>>> index 86fff72bc..ee70b00d2 100644
+>>>>>>>>>> --- a/src/adapter.c
+>>>>>>>>>> +++ b/src/adapter.c
+>>>>>>>>>> @@ -170,6 +170,7 @@ static GSList *conn_fail_list = NULL;
+>>>>>>>>>>
+>>>>>>>>>>       struct link_key_info {
+>>>>>>>>>>        bdaddr_t bdaddr;
+>>>>>>>>>> + uint8_t bdaddr_type;
+>>>>>>>>>>        unsigned char key[16];
+>>>>>>>>>>        uint8_t type;
+>>>>>>>>>>        uint8_t pin_len;
+>>>>>>>>>> @@ -3964,7 +3965,9 @@ static bool is_blocked_key(uint8_t key_type, uint8_t *key_value)
+>>>>>>>>>>        return false;
+>>>>>>>>>>       }
+>>>>>>>>>>
+>>>>>>>>>> -static struct link_key_info *get_key_info(GKeyFile *key_file, const char *peer)
+>>>>>>>>>> +static struct link_key_info *get_key_info(GKeyFile *key_file, const char *peer,
+>>>>>>>>>> + uint8_t bdaddr_type)
+>>>>>>>>>> +
+>>>>>>>>>>       {
+>>>>>>>>>>        struct link_key_info *info = NULL;
+>>>>>>>>>>        char *str;
+>>>>>>>>>> @@ -3976,6 +3979,7 @@ static struct link_key_info *get_key_info(GKeyFile *key_file, const char *peer)
+>>>>>>>>>>        info = g_new0(struct link_key_info, 1);
+>>>>>>>>>>
+>>>>>>>>>>        str2ba(peer, &info->bdaddr);
+>>>>>>>>>> + info->bdaddr_type = bdaddr_type;
+>>>>>>>>>>
+>>>>>>>>>>        if (!strncmp(str, "0x", 2))
+>>>>>>>>>>        str2buf(&str[2], info->key, sizeof(info->key));
+>>>>>>>>>> @@ -4343,7 +4347,7 @@ static void load_link_keys(struct btd_adapter *adapter, GSList *keys,
+>>>>>>>>>>        struct link_key_info *info = l->data;
+>>>>>>>>>>
+>>>>>>>>>>        bacpy(&key->addr.bdaddr, &info->bdaddr);
+>>>>>>>>>> - key->addr.type = BDADDR_BREDR;
+>>>>>>>>>> + key->addr.type = info->bdaddr_type;
+>>>>>>>>>>        key->type = info->type;
+>>>>>>>>>>        memcpy(key->val, info->key, 16);
+>>>>>>>>>>        key->pin_len = info->pin_len;
+>>>>>>>>>> @@ -4598,14 +4602,18 @@ static void load_conn_params(struct btd_adapter *adapter, GSList *params)
+>>>>>>>>>>        btd_error(adapter->dev_id, "Load connection parameters failed");
+>>>>>>>>>>       }
+>>>>>>>>>>
+>>>>>>>>>> -static uint8_t get_le_addr_type(GKeyFile *keyfile)
+>>>>>>>>>> +static uint8_t get_addr_type(GKeyFile *keyfile)
+>>>>>>>>>>       {
+>>>>>>>>>>        uint8_t addr_type;
+>>>>>>>>>>        char *type;
+>>>>>>>>>>
+>>>>>>>>>> + /* The AddressType is written to file only When dev->le is
+>>>>>>>>>> + * set to true, as referenced in the update_technologies().
+>>>>>>>>>> + * Therefore, When type is NULL, it default to BDADDR_BREDR.
+>>>>>>>>>> + */
+>>>>>>>>>>        type = g_key_file_get_string(keyfile, "General", "AddressType", NULL);
+>>>>>>>>>>        if (!type)
+>>>>>>>>>> - return BDADDR_LE_PUBLIC;
+>>>>>>>>>> + return BDADDR_BREDR;
+>>>>>>>>>>
+>>>>>>>>>>        if (g_str_equal(type, "public"))
+>>>>>>>>>>        addr_type = BDADDR_LE_PUBLIC;
+>>>>>>>>>> @@ -4914,9 +4922,9 @@ static void load_devices(struct btd_adapter *adapter)
+>>>>>>>>>>        g_clear_error(&gerr);
+>>>>>>>>>>        }
+>>>>>>>>>>
+>>>>>>>>>> - key_info = get_key_info(key_file, entry->d_name);
+>>>>>>>>>> + bdaddr_type = get_addr_type(key_file);
+>>>>>>>>>>
+>>>>>>>>>> - bdaddr_type = get_le_addr_type(key_file);
+>>>>>>>>>> + key_info = get_key_info(key_file, entry->d_name, bdaddr_type);
+>>>>>>>>>>
+>>>>>>>>>>        ltk_info = get_ltk_info(key_file, entry->d_name, bdaddr_type);
+>>>>>>>>>>
+>>>>>>>>>>
+>>>>>>>>>> Hello,
+>>>>>>>>>>
+>>>>>>>>>> It seems like the above commit introduced a regression where the initial auto-connect for Bluetooth devices doesn't work anymore.
+>>>>>>>>>>
+>>>>>>>>>> Indeed, at system startup, starting a Bluetooth device will cause it to go in a "connected/disconnected" state loop, requiring to initialize a manual connection first (with sometimes multiple attempts needed) before getting it connected correctly and working as intended.
+>>>>>>>>>>
+>>>>>>>>>> `systemctl status bluetooth` reports the following error:
+>>>>>>>>>>
+>>>>>>>>>> [...]
+>>>>>>>>>> déc. 15 11:03:18 Arch-Desktop bluetoothd[592]: Failed to load link keys for hci0: Invalid Parameters (0x0d)
+>>>>>>>>>> [...]
+>>>>>>>>>>
+>>>>>>>>>> I bisected the bug with `git bisect` and it pointed out this commit [1] as the "faulty" one.
+>>>>>>>>>> I can confirm that reverting it solves the issue.
+>>>>>>>>>>
+>>>>>>>>>> I reported this bug including details in the GitHub repo [2].
+>>>>>>>>>>
+>>>>>>>>>> I remain available if any additional information are needed.
+>>>>>>>>>>
+>>>>>>>>>> [1] https://github.com/bluez/bluez/commit/d5536e0cd431e22be9a1132be6d4af2445590633
+>>>>>>>>>> [2] https://github.com/bluez/bluez/issues/686
+>>>>>>>>>>
+>>>>>>>>>> --
+>>>>>>>>>> Regards,
+>>>>>>>>>> Robin Candau / Antiz
+>>>>>>>>>
+>>>>>>>>> Perhaps related to:
+>>>>>>>>> https://github.com/bluez/bluez/issues/875#issuecomment-2311100872?
+>>>>>>>>
+>>>>>>>
+>>>>>>>
+>>>>>>
+>>>>>
+>>>>>
+>>>>
+>>>
+>>>
+>>
+> 
+> 
 
