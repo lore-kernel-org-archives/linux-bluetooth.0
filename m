@@ -1,95 +1,66 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-18.smtp.github.com (out-18.smtp.github.com [192.30.252.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89C971B1512
-	for <linux-bluetooth@vger.kernel.org>; Thu, 29 Aug 2024 16:00:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14D971B373C
+	for <linux-bluetooth@vger.kernel.org>; Thu, 29 Aug 2024 16:09:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724947229; cv=none; b=HrpZtdLePESuLVsO08O2CofZQXp8aSpiEadhk8VsATAQgbse3DLd8ui2hZSZO0+6+StP4KEfh1w9DAoXY9xYacpjrZQ5s1hYqn/RJaYGA82aeYs7sjk5hlM64ERn/zOLwoJhAVLCsBywOFAbiBrWaYkfeSf8OUkDHCOBknqo9S8=
+	t=1724947800; cv=none; b=sW8z7Lk1KeYV1fX/HaG0IUlwW7syTd+aqrSfh8rNypCFgPuV4mT5w+SoIScyhyvuIyo0oDrtio1tB2VbbVp0gQ7pHveK6HG8IndZ6wo843OgUXJzcUlmWAfVzkPN+qdjRuzhdjbrnEfwq6keVZbgTSaiuTMCwHfqO5bbVeEbcNg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724947229; c=relaxed/simple;
-	bh=o4oYoW0nQoK0CdDgKJX9zO9evUQsVEAbTkTV/u9+nSk=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=s5XRBNFVEjp4gk38UDIZemV38LZgVDoCpfk6fM0rTJg3Fc2I6pDXua031yjfGTnLyWDMNIE+0CQc3HkQIEryVMS0fKgMnbFE6sWheR+MfbOkiATr/BdtH3NyFwBvayA5xWs1N2QuaBgiylg3ureXXRUc3N5i+ZRmXcHW3fjWCr0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KqfNSy7s; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1724947800; c=relaxed/simple;
+	bh=d+rrm5Y1bQQmuSEhP7B9IO5oC3qlL9f7S899iofuwvU=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=lY2XOMWx15hzY8pO9mRlhzWEH7wSnNl6kMARaW1KnVAuP53bH6WmFzaeFHAQz1ZISPIb1HMwdzpl2hva+jqJVAZudHQRNqS66tr9FFMG4ie2XfctTUR2KxgzO2MUwxwmFUEECztUDm/wFXK3M+RQpShtvBHBSbB7ZoosMcuMch0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=bbt3eoV3; arc=none smtp.client-ip=192.30.252.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KqfNSy7s"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1A618C4CEC2;
-	Thu, 29 Aug 2024 16:00:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724947229;
-	bh=o4oYoW0nQoK0CdDgKJX9zO9evUQsVEAbTkTV/u9+nSk=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=KqfNSy7sZkB3kgxdvKHjvfimNdbektJLU2ESzNEUUsalE7w1xiJhYEYJIrhf8tJUM
-	 WUvFb2CihvkVF6qCfkUAv2O3m0twWVAkO+PDNMpx+IYHuRsuMMbEhbKO+HOX/nP03v
-	 3xR8Dgc4u8rzYL9b8MKPC0U3/it/Gfe6YcXbXAPuiWPMtJbk1aH7ko+bnqEfGluvUc
-	 ctu6Ukfb5ZrMY9JWDIfpB6RXGn99bCZIF4VhPc0UyTUWm+mcDBwAkB//PPPXA9V/dj
-	 CICYOBsSMz6PmDWoNs+6MVcx/3UAu70Xn7Jo79sgAYsAbmPUVg4qaMOd+/O2BBPZMC
-	 qgZZtHKxgdgLg==
-Received: from ip-10-30-226-235.us-west-2.compute.internal (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 6EDCD3822D6B;
-	Thu, 29 Aug 2024 16:00:30 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="bbt3eoV3"
+Received: from github.com (hubbernetes-node-58bed60.va3-iad.github.net [10.48.145.31])
+	by smtp.github.com (Postfix) with ESMTPA id 04F9BE0A72
+	for <linux-bluetooth@vger.kernel.org>; Thu, 29 Aug 2024 09:09:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1724947798;
+	bh=yLNEWrDo9OEDtamcXdwXgmF1r4B9rWcWGpXKrASGCT8=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=bbt3eoV3ltlMwQd9c4qSKjsBhwPoyTumt5oFxx9dsCUpged8h/tbRsVPEv65VCJwt
+	 sZBUikicdvJfbcF/S/R2ucPeth/wFmfvcel1fTPakfRs0HxyGAbmIO+tWAgUZGLXe7
+	 DW7VfV0cbi+8jGUZUKvvrzlnJzodv7BZyyHDNdI8=
+Date: Thu, 29 Aug 2024 09:09:58 -0700
+From: Luiz Augusto von Dentz <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/master/32a081-2dadde@github.com>
+Subject: [bluez/bluez] 2dadde: shared/uhid: Fix unregistering UHID_START on
+ bt_uh...
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2 1/2] Revert "Bluetooth: MGMT/SMP: Fix address type when
- using SMP over BREDR/LE"
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <172494723043.2004244.8894234300227929231.git-patchwork-notify@kernel.org>
-Date: Thu, 29 Aug 2024 16:00:30 +0000
-References: <20240828181051.876598-1-luiz.dentz@gmail.com>
-In-Reply-To: <20240828181051.876598-1-luiz.dentz@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-Hello:
+  Branch: refs/heads/master
+  Home:   https://github.com/bluez/bluez
+  Commit: 2daddeada069d38c6e98e4d28a7ecd6709909c21
+      https://github.com/bluez/bluez/commit/2daddeada069d38c6e98e4d28a7ecd6709909c21
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2024-08-28 (Wed, 28 Aug 2024)
 
-This series was applied to bluetooth/bluetooth-next.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+  Changed paths:
+    M src/shared/uhid.c
 
-On Wed, 28 Aug 2024 14:10:50 -0400 you wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> 
-> This reverts commit 59b047bc98084f8af2c41483e4d68a5adf2fa7f7 which
-> breaks compatibility with commands like:
-> 
-> bluetoothd[46328]: @ MGMT Command: Load.. (0x0013) plen 74  {0x0001} [hci0]
->         Keys: 2
->         BR/EDR Address: C0:DC:DA:A5:E5:47 (Samsung Electronics Co.,Ltd)
->         Key type: Authenticated key from P-256 (0x03)
->         Central: 0x00
->         Encryption size: 16
->         Diversifier[2]: 0000
->         Randomizer[8]: 0000000000000000
->         Key[16]: 6ed96089bd9765be2f2c971b0b95f624
->         LE Address: D7:2A:DE:1E:73:A2 (Static)
->         Key type: Unauthenticated key from P-256 (0x02)
->         Central: 0x00
->         Encryption size: 16
->         Diversifier[2]: 0000
->         Randomizer[8]: 0000000000000000
->         Key[16]: 87dd2546ededda380ffcdc0a8faa4597
-> @ MGMT Event: Command Status (0x0002) plen 3                {0x0001} [hci0]
->       Load Long Term Keys (0x0013)
->         Status: Invalid Parameters (0x0d)
-> 
-> [...]
+  Log Message:
+  -----------
+  shared/uhid: Fix unregistering UHID_START on bt_uhid_unregister_all
 
-Here is the summary with links:
-  - [v2,1/2] Revert "Bluetooth: MGMT/SMP: Fix address type when using SMP over BREDR/LE"
-    https://git.kernel.org/bluetooth/bluetooth-next/c/4e76e85acacd
-  - [v2,2/2] Bluetooth: MGMT: Ignore keys being loaded with invalid type
-    https://git.kernel.org/bluetooth/bluetooth-next/c/c858dc985d70
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+uhid->start_id shall not be unregistered in case of
+bt_uhid_unregister_all as that is considerer a internal notification
+not under controller of the users.
 
 
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
