@@ -1,98 +1,127 @@
-Received: from mail-vs1-f52.google.com (mail-vs1-f52.google.com [209.85.217.52])
+Received: from mail-qk1-f174.google.com (mail-qk1-f174.google.com [209.85.222.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AF6728685
-	for <linux-bluetooth@vger.kernel.org>; Thu, 29 Aug 2024 20:18:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EA70189F5A
+	for <linux-bluetooth@vger.kernel.org>; Thu, 29 Aug 2024 22:01:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724962689; cv=none; b=jrFNGN38mdOI+oL4R7uXmw/FktLrHIy4ZJkEYbtytWfKi9hNH+dD9mb9ZeCliMONQyd3Zj2fBMgrFEP63c5o+9UYHH1j8YaR1hNwKDHluyaSM3/uTOgSnkwau5y3kw2NjV5Yc3jdiWL+RKNbqQgWEaGVPSeiY+RU5I1IGtVvwfk=
+	t=1724968917; cv=none; b=Pon2MtjpkNJmqAfQoo1e2/ro6f6cQpYuJnALHfW97OfmjkIy4bQx049Rknwcjd4vcrDJB5GI22RNx3a95d73H1X0vFFMEmrj9+oY3TW5LSwayfsHvJOQAj6e1GIV0SuLEXg6HEaIG71pSCya71b23kZeGtT/rkmTJRnmel2dX50=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724962689; c=relaxed/simple;
-	bh=ZjlsCN79x406alqrhys11WXnG5KtXZ9f17j3EBCzXs0=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=e+l7lENpOwXoVbMgVRh9jxqCwDJVIAyLFITJs9zkDMW0Ze8BUAWDcVkKLjbjgF6u9kesKO36D9jzPY+YDnZ5wsiSbKryS0sMsfey8oLBgClPrFqDYAMtjBApRgk+ySo8NbUB0+M4kxXmzKgze+9++QWXo8vDYeyjMA2dlziRCTk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HX+OdwAN; arc=none smtp.client-ip=209.85.217.52
+	s=arc-20240116; t=1724968917; c=relaxed/simple;
+	bh=XTqS0AGaUIZZ7OABh5XjmoJJ4KT+DoKVW8pvGIObXVE=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=aDgIHF5bd4kvAlEzO9LDL0YDdkXT0rD2jNewmtmaPYj+7z0+TSnNFE08pY3FK9wsWs1umQRH4+A8kUG8EERvNr0E2vepS9bstB36oYai2cjGxzCQEPBRcw9q1CIL1DNH5feKDIcpgP2PAvUseFWTMVMisqM5oxDY+ZRTQLHS8LI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bFihBUdB; arc=none smtp.client-ip=209.85.222.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HX+OdwAN"
-Received: by mail-vs1-f52.google.com with SMTP id ada2fe7eead31-498cca5d48aso356261137.3
-        for <linux-bluetooth@vger.kernel.org>; Thu, 29 Aug 2024 13:18:08 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bFihBUdB"
+Received: by mail-qk1-f174.google.com with SMTP id af79cd13be357-7a7fef9a5fdso117359185a.1
+        for <linux-bluetooth@vger.kernel.org>; Thu, 29 Aug 2024 15:01:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1724962686; x=1725567486; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=p5WfVQ5E3p9UvMDX3ygOcbyHH8QBhSj5xgqOgxC4dFQ=;
-        b=HX+OdwANIvRWrZJ5D46coO9/ocQHfAIx85XWP5n71xrthIXBYa/DhLQ9HO6MyaaUkk
-         SkAOMYSKaMCIkBaAC60tVYVIGYYB2nu5+t1ZKM/PowItt2B1Gr/t8HZxemE1BJFXqF8X
-         0WJJKDvUGY93BNYdT22FR158HrWuav+amptJaGvD1HNjdGJm6ZV7CigjzLSCJUPCBDAl
-         gU+eJ+AgMgTXPGlKTf/jAhy+Di0r+2HTJzofkmtUem9njdZQkNP2CLrVskF0o4rtulDv
-         6yNurnt2py2g8DOacyscCDD3oeAtsJB8tHk+kFnjQ+7I4t2qJVwtySelWbORE63FHvpG
-         PUHg==
+        d=gmail.com; s=20230601; t=1724968915; x=1725573715; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=O77ZDQrrEf4SMnAz0+FAUV51QYmB8bnPyvcW9PCbEIQ=;
+        b=bFihBUdBd24IKMhtVluyk+jjOMdw0Rnmu01zu8SWVCXC7pVyU5En8N9K+/NyEfOj0C
+         7DQ1+11H3ZtZo7CqnXveVBPCd8Isgw7b4U745eoxP1KZtumZrwyKBs3XP138Z0Qo7m4u
+         wucOEF5BpUBKiUP/Xeb7J8jPL8+Dohyrqf8m1G1PUfQ8DMt6nWF0QuKbxHg9wS0YduIm
+         Rn/I6lSsrCuzitEytQCOt4F90JrPbnOZL1DjKhNQQVAnr368fwWQ00f6wtSI67MMwoB7
+         DfikggMvuLrglYXX9rTH9n//aakl3vlUumk1ZQYUqXUjwpcY7lRJvfSLLoGwuJ15PZ6P
+         vCnw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724962686; x=1725567486;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=p5WfVQ5E3p9UvMDX3ygOcbyHH8QBhSj5xgqOgxC4dFQ=;
-        b=XiSkhqIiI/N68TPsCXGTpmIB2ad49Cex5cocTRgUlT6h8QlCDeJuOUmIjIOpA1q2xx
-         gWUTH41G/Ax/2pFpszhsUNeqyaOg4xxj2/tDm9hY/OPJs6U93LAaFpLycFoHcH4vym5X
-         QOgldi12W5Ztwf4v9wScR3ThmMEWkWWCDQU7xnOLKo7yw86Wx+EsA2Ljkztv+SmN/mak
-         GiE2T4QifVjBC20j31ysdb77fzn45aBRP9TqPn9wkuwwkfl2DuuFLP/WN7RYa4lN/4XO
-         kAyZRZVoAWaUGodr1m5E09pLQX1R/aRYtyGCJxb5jjiU+P0ptrlt2uYEhiFY8qFVxE38
-         wYgg==
-X-Gm-Message-State: AOJu0YxnWZP2aEhaWuBTjWMinOgdNAk1JUqFNuJTEGA8GAYmirjGHQJt
-	GAgEfTZxlFb5KZZGtLHSZ+w7M3t47KCfvQmo+F3kNN033OQAAJ5+pA150A==
-X-Google-Smtp-Source: AGHT+IEplHD6Hqr4jMZ+1jsvQp996Jls9vu4XvbWgef1K4oYT6LngbqBOM/xxEBDjnEW7Y6U/s/iDw==
-X-Received: by 2002:a05:6102:c0b:b0:495:c4e8:fc3f with SMTP id ada2fe7eead31-49a5af48a80mr4871957137.23.1724962686299;
-        Thu, 29 Aug 2024 13:18:06 -0700 (PDT)
-Received: from lvondent-mobl5.. (syn-107-146-107-067.res.spectrum.com. [107.146.107.67])
-        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-846a9d127besm231386241.6.2024.08.29.13.18.05
-        for <linux-bluetooth@vger.kernel.org>
+        d=1e100.net; s=20230601; t=1724968915; x=1725573715;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=O77ZDQrrEf4SMnAz0+FAUV51QYmB8bnPyvcW9PCbEIQ=;
+        b=az1qQeqjch8DCKZVKruWlsdAqpnu4Tnwcra4fA1CyCjcgt205QTiHM5e7N1XQp88pQ
+         /LRkdCheXLfeTE42/A3XYYo4lIg5kQozMwlbSrwBdinWwiTBI25fJk5uDPiSliprr/b0
+         qD1zadCOwdG4OkZWvzpgRKubsMmgPIgLtE4RhqDCnlECu4dIYSZfxE9KtgM1nupIxhx9
+         4GFNnNAmgppQPkG/hLyWS29UXoCNiGnuAqRIJxEYqYLk6ldJyLzN5wa4vfXfq1I8urI0
+         HbSSXq7Lx5XfYyLSCHAE+uBHV/UtpqASoSjofoOj/fypYeJqiT/4FQXhQ5RM8GZKhISi
+         dRhQ==
+X-Gm-Message-State: AOJu0YwxAnsZZsXF6Nru5Ik/tjjFqIDUC8uYDwPzIOOMg63rc3II+Jm2
+	3d0CCQ3o+/2xN32mQUN81rg2l1hjnsTLH4Ot2xIHuUQA/T79ABQ3KDfFAg==
+X-Google-Smtp-Source: AGHT+IFMVuBm7sxBxj0upvwfejf80U+K2bQres7yxs6eo+k29dz8FQFm0hF8kMH5+lwO8+zwhqNhRA==
+X-Received: by 2002:a05:620a:2993:b0:79f:1352:8318 with SMTP id af79cd13be357-7a811ed13e3mr57271885a.4.1724968914504;
+        Thu, 29 Aug 2024 15:01:54 -0700 (PDT)
+Received: from [172.17.0.2] ([172.183.98.202])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7a806d881ecsm87716185a.132.2024.08.29.15.01.53
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 29 Aug 2024 13:18:05 -0700 (PDT)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v1] device: Fix Pair method not setting auto_connect
-Date: Thu, 29 Aug 2024 16:18:03 -0400
-Message-ID: <20240829201803.1103129-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.46.0
+        Thu, 29 Aug 2024 15:01:54 -0700 (PDT)
+Message-ID: <66d0efd2.050a0220.90407.38c8@mx.google.com>
+Date: Thu, 29 Aug 2024 15:01:54 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============0423103465029481208=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [BlueZ,v1] device: Fix Pair method not setting auto_connect
+In-Reply-To: <20240829201803.1103129-1-luiz.dentz@gmail.com>
+References: <20240829201803.1103129-1-luiz.dentz@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+--===============0423103465029481208==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=884907
+
+---Test result---
+
+Test Summary:
+CheckPatch                    FAIL      0.63 seconds
+GitLint                       PASS      0.28 seconds
+BuildEll                      PASS      24.67 seconds
+BluezMake                     PASS      1648.16 seconds
+MakeCheck                     PASS      13.38 seconds
+MakeDistcheck                 PASS      178.87 seconds
+CheckValgrind                 PASS      276.23 seconds
+CheckSmatch                   PASS      357.27 seconds
+bluezmakeextell               PASS      119.89 seconds
+IncrementalBuild              PASS      1419.79 seconds
+ScanBuild                     PASS      1009.37 seconds
+
+Details
+##############################
+Test: CheckPatch - FAIL
+Desc: Run checkpatch.pl script
+Output:
+[BlueZ,v1] device: Fix Pair method not setting auto_connect
+WARNING:UNKNOWN_COMMIT_ID: Unknown commit id '507ba12483c3', maybe rebased or not pulled?
+#91: 
 Due to commit 507ba12483c3 ("profile: Remove probe_on_discover")
-disable_auto_connect may be set when a service is probed but the device
-is still temporary which is normally the result of service being
-discovered over advertisement rather than connection.
 
-To fix this the Device.Pair method needs to check if the
-disable_auto_connect flag has been set and then reset it set auto_connect
-which is similar to how Device.Connect works.
+/github/workspace/src/src/13783802.patch total: 0 errors, 1 warnings, 11 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/src/13783802.patch has style problems, please review.
+
+NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+
+
 ---
- src/device.c | 5 +++++
- 1 file changed, 5 insertions(+)
+Regards,
+Linux Bluetooth
 
-diff --git a/src/device.c b/src/device.c
-index 1a5e8a7caa27..0f18c8c7f54e 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -3114,6 +3114,11 @@ static DBusMessage *pair_device(DBusConnection *conn, DBusMessage *msg,
- 	 * this in the ATT connect callback)
- 	 */
- 	if (bdaddr_type != BDADDR_BREDR) {
-+		if (device->disable_auto_connect) {
-+			device->disable_auto_connect = FALSE;
-+			device_set_auto_connect(device, TRUE);
-+		}
-+
- 		if (!state->connected && btd_le_connect_before_pairing())
- 			err = device_connect_le(device);
- 		else
--- 
-2.46.0
 
+--===============0423103465029481208==--
