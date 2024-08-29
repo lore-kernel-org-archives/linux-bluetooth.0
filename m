@@ -1,206 +1,107 @@
-Received: from mail-il1-f180.google.com (mail-il1-f180.google.com [209.85.166.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E77C38F9C
-	for <linux-bluetooth@vger.kernel.org>; Thu, 29 Aug 2024 16:24:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF72E1AC8A9
+	for <linux-bluetooth@vger.kernel.org>; Thu, 29 Aug 2024 16:56:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724948675; cv=none; b=liU/Y1mkb12P9J5yMaZBAWIb3squTuliUUKOkfMvwyUbCcUzUZpGiVGzamJueuV83GAeXWlCTQwHWOGSdRNwQqYVw32R7u47jmwIK5nPkWsLFhw4YoK7jbNUmBGYxT41eI7iRrfWgvmR9eLjFQ4luakdD6h0DKfzDTD0sSXAHQE=
+	t=1724950604; cv=none; b=gwcK6HLIiVBiU9YgUyQNE3uBhLbfZe7ZWR2YZrLHFKdFiPmGYlJMvatjznWo+rOiQw9EYYWyfdI0mS0midHwvmJuotGqeFs/T9EkippScKLEm/WklrpEdK92Ae6xl39FTzrq5FS5Zh136IY90JTvk1YOyqvfrSOS+5HxIXg2eGY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724948675; c=relaxed/simple;
-	bh=KCAgsh0vQHQF+Ra2PV7Da9M6orza3dE//YU23zUGTVQ=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=ZNilz8aRCWJ2YGI78ykSzCH8vfuFT2pWn0p3ylcsRBwSZa6LPacTSfxwXuozajxJKW6UbQeeuUV2J4Ky1rRfOjtuVknrpSJfIKko1mT3ysdvRHbJ1HpR9d9D+hqb5tmMngdDr6ig5M/wTTMTfsJEPdPdt8wUBqhFoU7YzLuh8VA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OBEhgwhq; arc=none smtp.client-ip=209.85.166.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1724950604; c=relaxed/simple;
+	bh=+r1nXpu3BPQkrbGv1ozsrrv3XUNS2q4fMZrkhfExxSY=;
+	h=From:To:Subject:Date:Message-ID:Content-Type:MIME-Version; b=qUUE4ZMo019tEBTHN66zlh8QMCc14nWlJjfxx+b93ntCQii+74X9TszHQyBomAurXfdlGaFKCACDY+DVSP29Ig+J8BrQmnpRN+mX5//13L8ldGQDETAC+fzOOcwHXYdTd7RvqKUEXdz0M5VnW5S572vdvbJ0UcBmj04za22GG9w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=erDEB1j8; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OBEhgwhq"
-Received: by mail-il1-f180.google.com with SMTP id e9e14a558f8ab-39d29ba04f2so3428535ab.2
-        for <linux-bluetooth@vger.kernel.org>; Thu, 29 Aug 2024 09:24:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1724948673; x=1725553473; darn=vger.kernel.org;
-        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=KCAgsh0vQHQF+Ra2PV7Da9M6orza3dE//YU23zUGTVQ=;
-        b=OBEhgwhqWOwBWsHQiiNFqXS9aDvoA6ZYGHE2vzAKqDWyJ2K1nHe04oSJS12TK9CRGx
-         jGbULHzV0Tk2iQVhw6Dr5JM0DY7mfdKdJj6dVry/MJ2pX0r3LjlHAlirb+ak5yKhl/Xd
-         fwYt9nuCtJyx+nZx2x+CLXJGhE0gBEZI2DPRWdUV6q4sljbXJEW2JbM98PDU3yYnUZ7m
-         jnvJgizdEm7bRxN+APp+4OWNO5erBJC+FvVrZqwrTcQa1oNxM+y4xeypMtsYkgE1wdfq
-         5XlcwyfVhNs3u/tcIK6394MeQ9czsdsPy0PTiDt69mWTVaU3lVkDgVonFb2jvjn2l2HG
-         l9nA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724948673; x=1725553473;
-        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=KCAgsh0vQHQF+Ra2PV7Da9M6orza3dE//YU23zUGTVQ=;
-        b=HslK4TV38kgKJoMcUMrcdWHbV+zbQno/6/njYhBAOmz2Ldo0zG46jA03sQE8Ns9I97
-         V1hJ3cN3uqb1kfcGL8BQk4mFm1ew3iBx+s6hVmr+mN7KQSumqnhV7vhrppZmSP+ZlTZf
-         q9wWt7a7U+DfVM5Wd3OujD7vaYKJKk8/BofjKjmwrO1F8zA0GxHNW8KkVC3chV6PsrCA
-         Rdt3QFwpOTvKWhCbrjsygr3qNTcYkDej6vZBbRg1n9Y+1No4ADZzbWg2S+SgwIIzQsNu
-         gPEOFdZjf5HWU7XTReQ5P8ujCRK3jn5/VRhHDgwnCftnx6MizQ8GQwKYpl5CR5MSXDVO
-         6rNg==
-X-Gm-Message-State: AOJu0YwLQNCnHHNvJI25HwKWMjRVWqzKgFXrBsvMYeehZCDOT8H764bZ
-	mOKS/uIAdPoS8VDhSdfiQlY0sO1AONupYW6h/jZi6Rjl5nHxQrEc4i8sU/BMMzt/HefapAPehh3
-	xi7tWMpfCKDq6XLizoL5oCnXqB0Jqe/uI
-X-Google-Smtp-Source: AGHT+IFihhkc8AHN+IMOEAPm6qwL+upWZM0y/kKBeNDt3ZMpznyM0sEFsJzExrmUIjlhRSE3aeY4xua3OJeHxlMwERE=
-X-Received: by 2002:a05:6e02:1a6a:b0:39d:5203:1636 with SMTP id
- e9e14a558f8ab-39f3788c774mr37410535ab.24.1724948673316; Thu, 29 Aug 2024
- 09:24:33 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="erDEB1j8"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 2DD42C4CEC1
+	for <linux-bluetooth@vger.kernel.org>; Thu, 29 Aug 2024 16:56:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1724950604;
+	bh=+r1nXpu3BPQkrbGv1ozsrrv3XUNS2q4fMZrkhfExxSY=;
+	h=From:To:Subject:Date:From;
+	b=erDEB1j8JRFXuMI79YNECRGnSo7MJdfA1Jydbk9TyVfvMLWTai6x+POOOxu2ZPl8s
+	 mTpHm/+3gOfnQGSqWOd/qE4NeRQMXl2AVVAXAMmnfMoUR70qAMEMkBpjxsnLWip5O5
+	 Ue2CcPEu0v2PNtz2OZyy/3ZeRbnnv1MQoZDIrf5Cn35uQBhhwkIBvjnkNIJ+hOorOV
+	 a9kvGFKssJ0pLi9OV5JBinUNZUluAQYbtHBD7dcmlUnI5mK57ZPdq3+2ha5t69EeW3
+	 AIIRmeAmhx5F+6vOeysgc82RFEfZd2rkTg2Vg5GYT3jJmqtbuv8HrxDosjoIxNJcKB
+	 KavcPI5iNOZHg==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+	id 1B0D6C53B73; Thu, 29 Aug 2024 16:56:44 +0000 (UTC)
+From: bugzilla-daemon@kernel.org
+To: linux-bluetooth@vger.kernel.org
+Subject: [Bug 219211] New: Bluetooth not working. Bluetooth: hci0: Opcode
+ 0x0c03 failed: -110
+Date: Thu, 29 Aug 2024 16:56:43 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: new
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: aprilgrimoire@gmail.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P3
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: bug_id short_desc product version rep_platform
+ op_sys bug_status bug_severity priority component assigned_to reporter
+ cf_regression attachments.created
+Message-ID: <bug-219211-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: vincent planat <vincent.planat@gmail.com>
-Date: Thu, 29 Aug 2024 18:24:20 +0200
-Message-ID: <CAChiOE3+fSM2Lms=f3h9CW=sAQSNK5yAjKv7B1Qo7+8k5K-Y6w@mail.gmail.com>
-Subject: 'discover-unprovisioned on' does not detect nodes available on other system
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
 
-I'm testing mesh using 2 raspberry PI 5 on which I've recompile &
-install the latest 5.77 version
-I try a basic test where on
-PI-1 I join (mesh-cfgclient) a node
-PI-2 I try to discover it
+https://bugzilla.kernel.org/show_bug.cgi?id=3D219211
 
-I can discover the node on PI-1 but not on PI-2 .... ?
-Same system on both side, same stack, same version
+            Bug ID: 219211
+           Summary: Bluetooth not working. Bluetooth: hci0: Opcode 0x0c03
+                    failed: -110
+           Product: Drivers
+           Version: 2.5
+          Hardware: AMD
+                OS: Linux
+            Status: NEW
+          Severity: normal
+          Priority: P3
+         Component: Bluetooth
+          Assignee: linux-bluetooth@vger.kernel.org
+          Reporter: aprilgrimoire@gmail.com
+        Regression: No
 
-Find below my test case.
-If an expert in the community could help me that would be great !!!
+Created attachment 306791
+  --> https://bugzilla.kernel.org/attachment.cgi?id=3D306791&action=3Dedit
+output of journalctl -b 0
 
-Regards
+Bluetooth adapter not working:
 
-On both PI
-sudo systemctl disable bluetooth
-sudo systemctl stop bluetooth
-in /etc/bluetooth/main.conf, AutoEnable=false then reboot
+(base) april@AprilGrimoire-Mechrevo ~ $ rfkill list
+0: hci0: Bluetooth
+        Soft blocked: no
+        Hard blocked: no
+1: phy0: Wireless LAN
+        Soft blocked: no
+        Hard blocked: no
+(base) april@AprilGrimoire-Mechrevo ~ $ bluetoothctl=20
+Waiting to connect to bluetoothd...[bluetooth]# Agent registered
+[bluetooth]# list
+[bluetooth]#=20
 
-On PI-1
-Terminal-1
-sudo rm -rf ~/.config/meshcfg/config_db.json
-sudo rm -fr /root/.config/meshcfg/config_db.json
-sudo rm -rf /var/lib/bluetooth/mesh
-sudo mkdir /var/lib/bluetooth/mesh
-sudo /usr/libexec/bluetooth/bluetooth-meshd -nd --debug
+I see the following error message from kernel:
 
-Terminal-2
-sudo mesh-cfgclient
-create
+[    3.545797] Bluetooth: hci0: Opcode 0x0c03 failed: -110
 
-Terminal-3
-pyhton3 test-mesh
-join
-==> here I get: Joining with UUID 346d6b0cf5b8446d9beff2078ec9bfdf
+--=20
+You may reply to this email to add a comment.
 
-Terminal-2
-discover-unprovisioned on
-list-unprovisioned
-==> Here I get:
-Unprovisioned devices:
-#1 UUID: 346D6B0CF5B8446D9BEFF2078EC9BFDF, RSSI 0, Server: 0001
-
-Up to here all looks fine
-
-On the PI-2, I try to discover the the un provisioned node active on the PI-1
-PI-2 & PI-1 have the same 5.77 bluez stack recompile
-
-On PI-2
-Terminal-1
-sudo rm -rf ~/.config/meshcfg/config_db.json
-sudo rm -fr /root/.config/meshcfg/config_db.json
-sudo rm -rf /var/lib/bluetooth/mesh
-sudo mkdir /var/lib/bluetooth/mesh
-sudo /usr/libexec/bluetooth/bluetooth-meshd -nd --debug
-
-Terminal-2
-sudo mesh-cfgclient
-create
-discover-unprovisioned on
-list-unprovisioned
-Unprovisioned devices:
-
-====>>>
-The problem is that my list-unprovisioned on PI-2 / Terminal-2 does
-not retrieve anything
-
-I see nevertheless, on PI-2 (see meshd logs below) some beacon
-activity, but I don't understand why I can get them on the
-list-unprovisioned
-
-Thanks very much for your support
-Regards
-user@localhost:~ $ sudo /usr/libexec/bluetooth/bluetooth-meshd -nd --debug
-D-Bus ready
-Loading node configuration from /var/lib/bluetooth/mesh
-mesh/mesh-mgmt.c:mesh_mgmt_list() send read index_list
-mesh/mesh.c:mesh_init() io 0x55567219e080
-mesh/mesh-mgmt.c:read_index_list_cb() Number of controllers: 1
-mesh/mesh-mgmt.c:read_info_cb() hci 0 status 0x00
-mesh/mesh-mgmt.c:read_info_cb() settings: supp 0001feff curr 00000080
-mesh/mesh-mgmt.c:features_cb() Status: 0, Length: 4
-index 0 up:1 pwr: 0 mesh: 1
-mesh/mesh-io-mgmt.c:read_info_cb() hci 0 status 0x00
-Controller hci 0 not in use
-mesh/mesh-io-mgmt.c:le_up() HCI0 LE up status: 0
-mesh/mesh-io-mgmt.c:ctl_up() HCI0 is up status: 0
-mesh/mesh-io-mgmt.c:ctl_up() done 0 mesh startup
-mesh_ready_callback
-Added Network Interface on /org/bluez/mesh
-mesh/mesh-io-mgmt.c:mesh_up() HCI0 Mesh up status: 0
-mesh/mesh.c:create_network_call() Create network request
-mesh/node.c:node_create()
-mesh/node.c:get_app_properties() path /mesh/cfgclient
-mesh/node.c:get_element_properties() path /mesh/cfgclient/ele0
-mesh/mesh-config-json.c:mesh_config_create() New node config
-/var/lib/bluetooth/mesh/f449ed321026445a888075a0f85f18f6/node.json
-mesh/mesh-config-json.c:mesh_config_net_key_add() netKey 0000
-mesh/net.c:trigger_heartbeat() HB: 0002 --> 0
-mesh/net.c:mesh_net_set_friend_mode() mesh_net_set_friend_mode - 0
-mesh/net.c:trigger_heartbeat() HB: 0001 --> 0
-mesh/cfgmod-server.c:cfgmod_server_init() 00
-mesh/prvbeac-server.c:prv_beacon_server_init() 00
-mesh/keyring.c:keyring_put_remote_dev_key() Put Dev Key
-/var/lib/bluetooth/mesh/f449ed321026445a888075a0f85f18f6/dev_keys/0001
-mesh/mesh.c:create_node_ready_cb() Calling JoinComplete (create)
-mesh/mesh.c:attach_call() Attach
-mesh/node.c:get_app_properties() path /mesh/cfgclient
-mesh/node.c:get_element_properties() path /mesh/cfgclient/ele0
-mesh/node.c:build_element_config() Element 0
-mesh/node.c:dev_key_send_call() DevKeySend
-mesh/mesh-config-json.c:mesh_config_write_seq_number() Seq Cache: 1 -> 30001
-mesh/model.c:mesh_model_rx() iv_index 00000000 key_aid = 00
-mesh/util.c:print_packet() 43751.675 Clr Rx: 800880
-mesh/cfgmod-server.c:cfg_srv_pkt() CONFIG-SRV-opcode 0x8008 size 1 idx 000
-mesh/model.c:mesh_model_rx() iv_index 00000000 key_aid = 00
-mesh/util.c:print_packet() 43751.675 Clr Rx:
-0200f10502000100ff7f050000000600000001000400050008000900
-mesh/cfgmod-server.c:cfg_srv_pkt() CONFIG-SRV-opcode 0x2 size 27 idx 000
-mesh/prvbeac-server.c:prvbec_srv_pkt() PRV-BEAC-SRV-opcode 0x2 size 27 idx 000
-mesh/model.c:send_dev_key_msg_rcvd() Send "DevKeyMessageReceived"
-mesh/prvbeac-server.c:prvbec_srv_pkt() PRV-BEAC-SRV-opcode 0x8008 size 1 idx 000
-mesh/model.c:mesh_model_rx() iv_index 00000000 key_aid = 00
-mesh/util.c:print_packet() 43754.793 Clr Rx: 8052053c
-mesh/cfgmod-server.c:cfg_srv_pkt() CONFIG-SRV-opcode 0x8052 size 2 idx 000
-PB-SVR: src 0001 dst 0001
-mesh/util.c:print_packet() 43754.794 App Tx: 80540001053c
-mesh/model.c:mesh_model_rx() iv_index 00000000 key_aid = 00
-mesh/util.c:print_packet() 43754.794 Clr Rx: 80540001053c
-mesh/cfgmod-server.c:cfg_srv_pkt() CONFIG-SRV-opcode 0x8054 size 4 idx 000
-mesh/prvbeac-server.c:prvbec_srv_pkt() PRV-BEAC-SRV-opcode 0x8054 size 4 idx 000
-mesh/prvbeac-server.c:prvbec_srv_pkt() PRV-BEAC-SRV-opcode 0x8052 size 2 idx 000
-mesh/util.c:print_packet() 43757.940 Set SNB to:
-2b01002a9d9d56281cefca0000000005e47ebf08b81ef0
-mesh/net-keys.c:net_key_beacon_refresh() Set Beacon: IVI: 00000000,
-IVU: 0, KR: 0
-mesh/net-keys.c:beacon_timeout() beacon 1 for 1 nodes, period 20, obs 2, exp 3
-mesh/net-keys.c:beacon_timeout() beacon 1 for 1 nodes, period 20, obs 2, exp 2
-mesh/net-keys.c:beacon_timeout() beacon 1 for 1 nodes, period 20, obs 2, exp 2
-mesh/manager.c:scan_cancel()
-mesh/model.c:mesh_model_rx() iv_index 00000000 key_aid = 00
-mesh/util.c:print_packet() 43814.794 Clr Rx: 8053
-mesh/cfgmod-server.c:cfg_srv_pkt() CONFIG-SRV-opcode 0x8053 size 0 idx 000
-mesh/prvbeac-server.c:prvbec_srv_pkt() PRV-BEAC-SRV-opcode 0x8053 size 0 idx 000
-mesh/net-keys.c:beacon_timeout() beacon 1 for 1 nodes, period 20, obs 2, exp 2
+You are receiving this mail because:
+You are the assignee for the bug.=
