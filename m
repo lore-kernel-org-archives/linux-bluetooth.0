@@ -1,45 +1,46 @@
 Received: from AM0PR83CU005.outbound.protection.outlook.com (mail-westeuropeazon11010048.outbound.protection.outlook.com [52.101.69.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D72A1AE856
-	for <linux-bluetooth@vger.kernel.org>; Thu, 29 Aug 2024 12:49:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BD5B1AE860
+	for <linux-bluetooth@vger.kernel.org>; Thu, 29 Aug 2024 12:49:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.69.48
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724935770; cv=fail; b=EOX3sZrNiqt9+smIM9BS0sKjNNQHYPSoaAfo29MdMCNbj1kbVwK+IbBAjONqlOANfj6/OdQQFof038bsoLt7+HMC1Oqn5cCVR7gTAuOTycUw7CGqVQQtXSrV0qfdAgi+vYKP+UE8ocmCH+4kifO4iKGgPe3ngPdJqJGs2iQUHx4=
+	t=1724935773; cv=fail; b=uMKaWajNvFMJMMhL2i/kur7cD2Vt3D0aKb8oQh8xgJ1SqvQK/rwU9wE4iauboy60taQ0TSheCFnPXwFcK0TDg2BbJJpiCiENs4biva5o+sZquqQt+PcpTbXRo4ADEcsdaluboS9Xkgp88DPdXbGYDHPiQFzZtZmd0HvlgrN0mnQ=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724935770; c=relaxed/simple;
-	bh=E+uGf87c++i09TqSizLli+m+bAXZ6kqrA1tKbi6f0Qw=;
-	h=From:To:Cc:Subject:Date:Message-Id:Content-Type:MIME-Version; b=Wwc0CWpqW8TJHPCpV+J4oX4PIrgS1JUoFo65rbZnpFapSawRvqIhEuA7yhf/wdyxGA9DgNNlvG+deWlxhEYAbSqtA4l2LZfIeULNMXiihE14IHcCIy/4x2pY+y+0lBjk32klbEAQN1o7URY6SaXxmbNOo617fyWtVVL+oUJfSaA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=LAw0OXrj; arc=fail smtp.client-ip=52.101.69.48
+	s=arc-20240116; t=1724935773; c=relaxed/simple;
+	bh=gKDyHTNpHEQoXhGeR0poSKbW+fu9XI6e02W16qKV1uo=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=o5wIT6soZlCA73sgVj5ZK7+nuMWFnA5vtNcb6FiJLY8phnVb0eCPkkYkFBqhdTuZ/OUr+wLxGQpjHlt2GLgPBePe+1/X1+AOigvQv23+gfwC2TJCuO43dvEJUpAbu6gSNQ9INFxgJITpBL/dmE2Yigdw+v2luSgNr7At92uMxu8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=m+y417Yt; arc=fail smtp.client-ip=52.101.69.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="LAw0OXrj"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="m+y417Yt"
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=JBfUg3INY7rGNUIPO1i18Apil1hZiYx415r8mepe3UWIjzbR0yoxtHkUF7yEcq490n9qE6HjAMcRSy9KK02n/D77x4p5uDSHOUk1ljkaz4yl37VKCnAeF0qXkD/2hrfHGqcZXGDkVKxriTnkw5sUc76+FZPc5wYgEZLB/40G8S+jUx0pwzYJHGjYvsEO/Z3oIa78IuBNqlzlRXmzx6q0Ymsulk0eUhABo0soqsza+gY8nK853keopKv2SUKv/3V4d14Azpoeqyb/C0YZG6tWoJAjw8K2gjVqKjCJkmAWmt1GK4L4g/LDmnpcfDuLFzxC2MYTq0REly1cd0vy6EndGA==
+ b=oBW/Z+h+GKnQHSFRyGz9OzYr+4LrrVAzsNymvD7O0Uhgnic99oVXm+7m3UHarFuiJfV0h0BG0h9E7C5PGjRyT+jN8rvkipjAKy1lzXY8isfaWRETxWrX+TK3lYH0T499nBTV6vNI0D3XWU/ErOUmgoL32nlN2/10jPAuQg7bMLB6+gFg55NeV7sEQop3yNW9zMsF5vv4dB2wh8b9GVYUeJs8k2Ohjcqv1JjCEpxnHWPS7G571eYy7Bmulcu8zcWgtGfYL/l9kC/UWmih2SAUBMxtqjxImV/icydhsdZpRQBKJNAFt+vPaKZ0IqG3ACDPe+/oQupsNkeysGYFpqIu7g==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ZA7igX96HvCQAe5FzFgPqTZ0e/8xJN1PrMWW4RiIYzo=;
- b=imW7kP+XfiDZg6iYbXvx4VGiZLYYI+pD0Qm2MWCSV82H3Pwnj9agtuj6O43hIpdP05vmEEHoW9jgpOOH85fTbMVlCNr8cIHldHcwjOisUGOfShsd3KnpvVTG1UATSIjn+kPITVu3U4D3O/Tt5HTB1YsUvuOachQWWXtj/ld1nFrAnlFUAk9iYQ7HKRBdptI3XLl6EvSj9nb5D/Mtx/x81FLCzeQMjuFBTmJGOklFu0nu8KwormuB+rSRbIre1Ke0fLdv2PpDsHV+wm4aeiDUvmK9dyuZzmq86FeDvH/U8xROA9IJTR/T1I6LZxk1JMzkdfY+vkO8zT50yOTmlfL5KA==
+ bh=P78dLhEckEI7M9s756uuWK5zuiswAEtJxHVmG5ivHdI=;
+ b=d8w5fwoKWsAwg7NDiFnL0HQ5lRH+lXg85usmTTwsmWOY36q3EI1Nst6eryiswAEq1+YGz1lpa1shkgafs6ESQWVI7c3C17a2XDWnDBbOPbkB+vIpndUDlNd63odL/ZKMR+1OATfywiUbQGLsuEGp4ZvL0IF3EckeVEhtJib+8UDheQM27HgpOF1GMjVQlJp/I1NYJyCussy+JkUr7fgybz5brhRGLW5SLp/NvdGOLfy2JXSUP404Bt8A1Y2jBI6N47lZ1KHC9GaPYC/W6i/a8zuVOy55x+3+4XhlTt8fKg7DcnnHzHfqyh6jTDS8FB6ygybt+1VDw/PfNPx7nGfrNQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
  header.d=nxp.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ZA7igX96HvCQAe5FzFgPqTZ0e/8xJN1PrMWW4RiIYzo=;
- b=LAw0OXrjiWP64oUDFY15eed1u+920eoy4y6YEkPcpi5mXK5WA08NLyaTvR0cjOxKnD9WGUqPuoFE6SCxO8a0O2n+OXzqMVOrfK3vl8DzMS8w561WqAp6vGtj9lsrsycOd9U2zp9rzZ75R6IidyAqgLupqxFnJChbsQa+axf5P3MkEMjHMSKmLePuc4AOSeVIEc+yMFSjFhU1XybIFfqUjrATC1ue5fulCPSVBbbDcSpDqMBJfzCTW2olknTlVQLyHEWbsv3dEiB1H/joDw209ScAI9PBd0qNck+99ifXqWP44WVqDjfouIoNXeHoXUnhFMyNhf8j6ZwvQ9d6H082Yw==
+ bh=P78dLhEckEI7M9s756uuWK5zuiswAEtJxHVmG5ivHdI=;
+ b=m+y417YtMVeI4hBu1wy2eFn2y2sKF2DYGGAvqU1Zw1SMCMSpVSr5Oqx65uTk8CiFyxkCGqiuFvdmNCMbd11Gw6QCkYJZCpJ9uGMqEBPMly/QjIp01xWBSKA44euXC8PbiC2QZYtfYpYy7UCu/K315aYtqByafDfVnup7oEp1ZO7n9olLWFyMQtSRMUZmhdgUpF6ery/TSUTqUWKE3PvjUm/P5zH4lGBxjGwvpejOMt+GiBJN+YMNWw5ERcAGz0B5mGRN4dnS3+liGmVus1ZvGprKaDEwgX3wFLA6Sp3tn2sa1KbUzyvzlgAJNzdntRy6xdilx39m0f5tDk9h4e1fzQ==
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=nxp.com;
 Received: from AS8PR04MB8898.eurprd04.prod.outlook.com (2603:10a6:20b:42d::15)
  by AM8PR04MB7425.eurprd04.prod.outlook.com (2603:10a6:20b:1d6::5) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7897.27; Thu, 29 Aug
- 2024 12:49:25 +0000
+ 2024 12:49:28 +0000
 Received: from AS8PR04MB8898.eurprd04.prod.outlook.com
  ([fe80::5e22:869c:33c:9654]) by AS8PR04MB8898.eurprd04.prod.outlook.com
  ([fe80::5e22:869c:33c:9654%5]) with mapi id 15.20.7897.027; Thu, 29 Aug 2024
- 12:49:25 +0000
+ 12:49:28 +0000
 From: Iulia Tanasescu <iulia.tanasescu@nxp.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: claudia.rosu@nxp.com,
@@ -48,14 +49,16 @@ Cc: claudia.rosu@nxp.com,
 	andrei.istodorescu@nxp.com,
 	luiz.dentz@gmail.com,
 	Iulia Tanasescu <iulia.tanasescu@nxp.com>
-Subject: [PATCH BlueZ v2 00/16] Add Scan Delegator support for Add Source op
-Date: Thu, 29 Aug 2024 15:49:02 +0300
-Message-Id: <20240829124918.84809-1-iulia.tanasescu@nxp.com>
+Subject: [PATCH BlueZ v2 01/16] shared/bass: Register ATT disconnect cb
+Date: Thu, 29 Aug 2024 15:49:03 +0300
+Message-Id: <20240829124918.84809-2-iulia.tanasescu@nxp.com>
 X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20240829124918.84809-1-iulia.tanasescu@nxp.com>
+References: <20240829124918.84809-1-iulia.tanasescu@nxp.com>
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: AM0P190CA0013.EURP190.PROD.OUTLOOK.COM
- (2603:10a6:208:190::23) To AS8PR04MB8898.eurprd04.prod.outlook.com
+X-ClientProxiedBy: AS4P250CA0027.EURP250.PROD.OUTLOOK.COM
+ (2603:10a6:20b:5e3::18) To AS8PR04MB8898.eurprd04.prod.outlook.com
  (2603:10a6:20b:42d::15)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -65,325 +68,176 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: AS8PR04MB8898:EE_|AM8PR04MB7425:EE_
-X-MS-Office365-Filtering-Correlation-Id: 514d5cef-b174-49ce-9027-08dcc8290304
+X-MS-Office365-Filtering-Correlation-Id: 512c59e7-ba59-4287-497c-08dcc8290507
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|376014;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?vy96HWrX6aeqnOx8VdObZozkcwcBfUflWYv/2KvRP36Fknfcdjg1nz9xTAp+?=
- =?us-ascii?Q?leuTjoy0dBcm29dgXmMtph3m9EkJvwWXoPEzE/Q1LvIGEezv/vJ7QckiYt+3?=
- =?us-ascii?Q?G83O7P2i2aoEAXv4hl6WuZWF3v8Bgfmbsw3fN0BHYfPFZlD7eBkg2SIQjAT5?=
- =?us-ascii?Q?iZmF7h2RfskQ8sAd63pQC1fliQA6+UjU8vC2pARLY62DDme4WJW8Uu9oCxBf?=
- =?us-ascii?Q?MvFJqoIlqkWNgynGBfyzjirVZUU1TvqPi8J/4imkAnL8Dd/hpjO+kzS8y2tZ?=
- =?us-ascii?Q?kIbg+let2rS8vpndEhzry4g97s4L0icIGy0MPuDgEy5lwXnt0IB/sSmasCVW?=
- =?us-ascii?Q?C9289o95fEzLV3QXpuXkIbdDrlB2CKTzAahj+9q3R/+x/IcF0RhDzw8X9EBb?=
- =?us-ascii?Q?rCAogHlDbO6TZoL4ZOQBSGDJEWUVSGMm4TZQLTXX/m6QimYLt9SXRk6nm2OS?=
- =?us-ascii?Q?BD2o73zbx7iSbuST9kgSwWMTYEQzxsH75OR29hcZRqxqpINmcbCpYI9Sw5RQ?=
- =?us-ascii?Q?Y0vrLK4t2dpxoHaklF4tkx7NyYFupZzBpJ4Yv8/Ih52HbUATTTLRa8TLc8xH?=
- =?us-ascii?Q?YfMNP/BMtjTKWzwt5x9kdltW0ApaegzJcDaY9Pk1ZGGhjHW4ta6krSvsdMfI?=
- =?us-ascii?Q?T5PxiLd5KrUqI1edG7YR8EdCI/R4aJLaxvn9tnQgoosP4bd4lc42OXkKSGu7?=
- =?us-ascii?Q?32vd55BMIBdtGZwDibUbi3McNLTHvCfPs9oK/750USxiK0GiqlwRMZDiH1YW?=
- =?us-ascii?Q?4DcCSSvaCJVHlpfU7Byx+YB4QAzLTvsFjvZeNQcv8vCsFgEeTBP2iwSEXFxP?=
- =?us-ascii?Q?XOPvRJAwLIeRfYArl45dVtkliyvGrROouHgh5bjd78Fh4B0bxPtn72D9191g?=
- =?us-ascii?Q?u5wOaozom101DsXfRqim+WsRHh6IvMqhCoPJi+f+0CshaMkuH6cTrDP/P1KM?=
- =?us-ascii?Q?5+OHD3xNEmFgMdsr9GnobxTpnxK/owd1a/4akFCpvT1Lll0gOr8qljT8iePU?=
- =?us-ascii?Q?qqN24WH8FBFtC/zuNLx8UYKWzY6cLssu7uEaAcDDH5SGPrtaX96yNHQlhfT2?=
- =?us-ascii?Q?68hnc3gSkw+5EojaYzUdkdz19wx5fIYGPj4sAIiXv3Rq7DIeWnasyT+ybeTE?=
- =?us-ascii?Q?j3gMIgyjq7cgF6Zywe0gnEHlW4GvB/Pte556onngEHcQGt4xFNBYiZ8gMuuV?=
- =?us-ascii?Q?IakGDmhtIYuS16IePxAD1E5iwZzvzXRxDkNMPzPVmg0ZlRI3iOmsjYM1nx6d?=
- =?us-ascii?Q?zkgY+6dXYjuFNgdZmypovvKJNkBzeZADWTNgCVP/NfpE3t2m6WmOT/zaEpUl?=
- =?us-ascii?Q?7smZpor6dK0QAWW9eOqoP1ASwBuUaKJjuH9bxW3MmQgmng=3D=3D?=
+	=?us-ascii?Q?boDyMaiR9VQag/PJTm15BFfrhOK+MAZ+k1FpGENdN4KJ8EErLNRODcWZ2Fkr?=
+ =?us-ascii?Q?zj+3UUKdxbos7OErKsD29qo4rJo+y7B5tubrvgEzasmyJqTQoeEU4EEqvsFX?=
+ =?us-ascii?Q?jFfsBVzbZ1uevK0xkZm5j/azJNaJAo+6jn3zURncEn2V4RrMsRfiZSNR6FfF?=
+ =?us-ascii?Q?7RJbmA88wR63P6iPRktS5C6sSW4EPiIRBRz8m1FA4DQEpWiY1kFq98rHjYYR?=
+ =?us-ascii?Q?DklW9FQN4Pm1HPLPfQS4m4WN5g6Fv8SFaVTk/RF5igw9XmAYu5uVBAJplJ9W?=
+ =?us-ascii?Q?Lp4tMgpfvQZZqSPGEkcsb0OB3JCSFT/Q5coFdADYQDhoM5C/TaqQj0Clyp6Y?=
+ =?us-ascii?Q?YUI7LJR1dr0o/L85o7llUcj35FZzKjxW2EuYN1DwNMo9UlOwkw0ZOl2KVT80?=
+ =?us-ascii?Q?AlI9N2pGUkOivTiKPiH1x4gNFXNi1cu0XX48p9epA7umKlFHwbRqMO8ICFtb?=
+ =?us-ascii?Q?wPIbcGJ5/AKq+ba+VQH0eUAxRkGDZIqyUiFV2GBh9ZkpGhu6WhYtAmbAb/ef?=
+ =?us-ascii?Q?N3yFjQ3o2dirwrcuFW5GSzNjg0ZEWxlx+UjbXGp+1BuzoZCJ2dMuWUNtcAsM?=
+ =?us-ascii?Q?/FoAFlxWa5m8oQNkR1X543rDShqS3KtBtA20HUf8cxJEPgtXmzWUo6ace21E?=
+ =?us-ascii?Q?3ySQRCxoKygstp53SkgW5ZOXCi70MkX2mIMTn2akHTHz9jpHi5V8fvWmAVF7?=
+ =?us-ascii?Q?KAMaqdFRfWcHEpCNyc31qLmyJv6T3ZvPaAlD9W/a6c5ZQ49Svyj16RwDY8BG?=
+ =?us-ascii?Q?tmfUofit/onfdghdFEzusx/47QrqAnodk+qVlPnUD3qMkFnQP9KIW4QHnxtT?=
+ =?us-ascii?Q?+JiT/5/dRzJ3MjhFAreLGHrbsF40RupryymsEqTD8gXIbnkXpvUWFCb/b9Jl?=
+ =?us-ascii?Q?46xm4Y7u+G2Hp2GvNZUf5hJmElhDQ1GxMRP5G7go22MByVpzsCzmRu6bFtKH?=
+ =?us-ascii?Q?I4q8sipRZ8Gj8/ulBs4lZxAGNDI8/2wNIjnsybmbi7ApJXqx5t6k44R7nw7i?=
+ =?us-ascii?Q?cK56EIiHziVc3Q0fOBr4C/nPsdvrz1bvaExnDS2LyVBRQpXTNDovcFlvZgTv?=
+ =?us-ascii?Q?+WaNyCGiypl4dD4W1fNrT/hW143qGEvVJpUYpBUEHFoyQwkGcljItePRQjBb?=
+ =?us-ascii?Q?AjFgkCrcA9SO3hjBnrgg43mda1/Dh35SH7QwyInahOX6BTqjZ6+aRsmO5rSV?=
+ =?us-ascii?Q?3ba40NiFR3+unfhf7exkghL2tt2Us7p3QgSooX28USelWq0izcBfqEg9ZewZ?=
+ =?us-ascii?Q?rDN6LyE7lTz1KQY/wjjazpN/MCLL7feril9HYxxUgPn20yjO2s96MnhvL1Io?=
+ =?us-ascii?Q?kiM1Cg2pv4C/U22Fxtek4kjS8bEymNnYwJuOYiKWtzrxTQ=3D=3D?=
 X-Forefront-Antispam-Report:
 	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AS8PR04MB8898.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?eVKMGHwEyZcHRI3ZMkzG7QipnuFf5/Y8Ww7xivXO/+JjksTtbQCnnqHc40BC?=
- =?us-ascii?Q?xJYgcl6cJ12rdT330E57Lkw07NU63raPtH2ShLkM3RWB1Ah1W+xViZB7bTHh?=
- =?us-ascii?Q?SM5mtw/26Jrn8zcxcR9Sf58P6c5pfBwVDyr2VlJTcx1Ot58rdZVWasRmeZAO?=
- =?us-ascii?Q?N+e7G3gcWeC3W5YQaCQF5TKBNNJdJ4jq8/aQT3xHzZKoRCq2bpJDOmHL3mW3?=
- =?us-ascii?Q?u89XXkq9qrX+oZUOjTEBRz47VWSsNzdBaBCzpa5BKRSaQmlgWHrqADrb3ZTu?=
- =?us-ascii?Q?+IElD3kN/oT4iMxbFQxsVJN7uZa1dQH7HVG8CfX8Qx1MdCItELICUPw1DT6O?=
- =?us-ascii?Q?UfhJ/CVwcOyq3AbMRY8cWu2l5dSBtUy6DGlWlNiCScJuMyZDdBD1qtuzvEvJ?=
- =?us-ascii?Q?w/N+YK/LHuCwRtnIX7cIgCFyJM5QO7U7HGcfjA94rOHKsdkjCQofQGXR101J?=
- =?us-ascii?Q?3XFWW2jEHY6VCJImkthM1tuHeJbBqDnbV15+gkEaC8OqSLd4tUVccto8j9M7?=
- =?us-ascii?Q?Vhf6Gro2IxiFKnHrJ6LGvcjxMKFpb9RF3fvjJbf5k64dG18aeXEWGNZbv/Sh?=
- =?us-ascii?Q?haV9PnDGKzeNTvbxtpWme8C1uSBTiDK1j7opn5d9mWGSgHIy38XPHOVHeZF2?=
- =?us-ascii?Q?3s+Ig7P0ArLUo2JNwbAfa2nfjXvmogpw/iJsYRv/E5B4UbDzoGyPt9NdQfjx?=
- =?us-ascii?Q?IWHIbpXifqa0igNeE7PVtzy12tOMwr//d0M3Wvuz2Kt2eR97z+ww54bGbAJ8?=
- =?us-ascii?Q?MzdNCS9f+djpoufZYqmFwk4JlmTLgKQbXjy87YxL8AnCkL8lGWYkYY7LN0Fk?=
- =?us-ascii?Q?vSsOVbdXmpSEhwRm4Uac95YeYptFAgbMvyi4aMi52qmIUqGW8e0vazmj+BMt?=
- =?us-ascii?Q?wEuAo6M0XtPdb2rJkyZMZyvno9KjFlsTMIqZoyjVvVxY8PRWvphbdqA9/Y5d?=
- =?us-ascii?Q?84I6PIDXkmE3pUJwdSBf19zv9PPHWsVyyUHxTeJsb0INWQlmmSVkvfTdDsws?=
- =?us-ascii?Q?o6cxPyoOhaoQH8NJFEiHfl7dtcFlPfBP9aEpvPjIPWZDd3ShnaVFWhWefrF+?=
- =?us-ascii?Q?zkJJ4sSWP7Y0xkCGxD+dUScRb6cOpfK2rP8f9eapncrlsIzpTUaC/kHDXB/o?=
- =?us-ascii?Q?iSDUQJQuQGutD3VZ4V7u9urWZpp4pFXHK5eaI/Oin19WJY+fnY9Nicee8ksd?=
- =?us-ascii?Q?kGrCFqgd+X5WKUnsX+jxfjAmTbX/EgbuVTkHfba3g3hfAhcRctKMQkpWuxM0?=
- =?us-ascii?Q?YKGmHxgnBYUDH0VkzX7izqiL6Xl15ciBMFXLExncCO1OKRmIicWundtGzp+C?=
- =?us-ascii?Q?aKQ4VstkC2+X4wCKEiPi9YvJZP0M+S1ogg4hWl2itJmOpb1HaQcOcRlOqcZ3?=
- =?us-ascii?Q?WF6HD/CbBWCRXSB6bA9wTKwcvp5vwzBwaoC17bKJXeAyfyqhMX0IXzAovyaF?=
- =?us-ascii?Q?fWUmoRvs7xNpH2VDZ0ba1Tl/DbBgVXj01J/cQZ6qhEL1ctf6JHn37JYVRFCz?=
- =?us-ascii?Q?opIoIv5Mpq7SFEDK5j2+pvrUrP6HHoFQXNApg71g/t4R/9f2tR0WwXucddAc?=
- =?us-ascii?Q?pYxk9esDqiaQaXNnE7+xo7/JcuQ4s/hy6yBMKcUwaWLlWgfRTJwVpm7B6xvy?=
- =?us-ascii?Q?9g=3D=3D?=
+	=?us-ascii?Q?lDAH67JvXVzIz5KN8aEz8f9UyPfUO1DxAVx9udBXk9j3zo1rdt3LWW8w7GQc?=
+ =?us-ascii?Q?Z09habktWqjEkGxN5g2WjHaWxlK4c80N7i2YmybrmVIF7RW451oKvAU/zfpv?=
+ =?us-ascii?Q?pJJiOUPjTcJwtZz/AjV8PXVDsNEpGU2Rxv7SkAEBGUUWyS/JEFFm8zfFsneF?=
+ =?us-ascii?Q?jDAsggyKAhEUYeSlwCJpP0B1wR6XSsNTBWSPavsSuIP/vCnznD9A4lB3Ii2f?=
+ =?us-ascii?Q?TmsnMpvjxrPpYsEEJE3PvQiR4DEo12DfX2sCvSwFHl6qQe+phBE084eG8J8H?=
+ =?us-ascii?Q?nWwXpr6A/9uci2ACJxJoQG0Rtn7FqfXpJIRaZm1OMK/4hlNm0c3AS3qZ3SsV?=
+ =?us-ascii?Q?p6mMRpdJjaKiKJ6k0sexP6kVA2jwYGECbmPdz2qBQ2VmEIoiQx/w4cM4rfbk?=
+ =?us-ascii?Q?RUgQODfmqhdgixoubKOEW+FrD7KqkDGQbFYLewLJVcBc6dbk2X3agcNUMHvT?=
+ =?us-ascii?Q?rsTY6bcObVr8nIPLKmCrhm7i4D7Er9WXCAKnKvSxejNwjPrERmeCRW36GI1V?=
+ =?us-ascii?Q?x1dyLdl59J9CawpDkWqtKtZAu1geBf8FhBNUlCO/cSJqkLiobL1xRmhpzSc4?=
+ =?us-ascii?Q?jQVx8FTirIRNRqnfB315im6Qj0F0S5KdxR6upW9CLYmgfWcxXGX6DqSDsnjm?=
+ =?us-ascii?Q?8zjKySls/Cgkr12TvRkuO2xnrXlZEtQWJhO8xdJtS5co09j/uldqdf/LcYtL?=
+ =?us-ascii?Q?k4qJlqql8X+53k5LZf5xdDJ91aP15On5YsTIwGsvFT7guA1GYBDCRdAoQNUA?=
+ =?us-ascii?Q?M8AnhWvzOs9EkDoMehNTay5v1ZuKP0lCtWeM5f3LjGCRSPu3cbQ3dIAN7kLt?=
+ =?us-ascii?Q?Mv8V7yiYFzLQyS9M9CFATa6JDST/YkeNKm6+0bmw9Vb2BNDD+pYCMDyrwQEw?=
+ =?us-ascii?Q?Tx6wV3Eb3Ib1famY47BKUnfC1mJb2cQ34Hv+KGnlYlrbjas5lusf4PrYsi6S?=
+ =?us-ascii?Q?2ocZShxqKwm32rXjYGs8kS5RfplZyAezFrUklZa27L3pcRhCbKpQRs6Qy7OY?=
+ =?us-ascii?Q?VX0tTKPcG4nJsH/eEg46r1ICkJUXxes5kTo4NLTuJ5DCxvFOYTkxwRWtMzK/?=
+ =?us-ascii?Q?88bkGJ2sfLkAv198jChqwyuHRKB7XxveUWoX7n7CEigFTD7KJlm/Suwf/v7v?=
+ =?us-ascii?Q?Ozcn5LK+PlsV+GYo3aemohoBpn/HWbToyQAKttlh+cChYuN6Sp81C9oFnkCX?=
+ =?us-ascii?Q?DWX7IG1i/ddut4u5z4Wqx2v7hqfhjeHdcTkCorFsLTZm3+zgFN8wKB002dMQ?=
+ =?us-ascii?Q?C4i4tAxPj9F6cryIha0LrOpePIRg+tDuOZqOdfcTq6xE6SOyIDOh5eUwHaO2?=
+ =?us-ascii?Q?4t3OXuQdTBolMtR/2y+/w/xpwpOvZ0kUldi+hjUhTTgnIVbsfkYluC5OTSXe?=
+ =?us-ascii?Q?AEG14FKdBYWHpatzAQh7Rl3hyT+wKnsYMTUpZ6nLUsyTlOGwdVoFU0lP1Vlk?=
+ =?us-ascii?Q?Qn5xyISa3ifkBeT9jOTPuheZHmtzCf+MXNanzhRHIZXoTCnPnvv/HqHPD1DU?=
+ =?us-ascii?Q?SyHzRbMuLGsc/cCejkpba3Vdh7EH+d0pvCVROrGupeCEt63TOTwqZTbTOOTr?=
+ =?us-ascii?Q?XYKwxzyVYPjwOW3c1yckrJBzlCGDmOkotwvRG+rPRBLXij3V8Qy26l2QfpmG?=
+ =?us-ascii?Q?mw=3D=3D?=
 X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 514d5cef-b174-49ce-9027-08dcc8290304
+X-MS-Exchange-CrossTenant-Network-Message-Id: 512c59e7-ba59-4287-497c-08dcc8290507
 X-MS-Exchange-CrossTenant-AuthSource: AS8PR04MB8898.eurprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Aug 2024 12:49:25.0384
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Aug 2024 12:49:28.4466
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: YdfFGsaY25LdFwEUzo4zAPcSpApx1cBiDFHko1dxWgKzOh8VnkWY1//JU1eKdw60yGYrd5a8fmP+uMzBd9Mf7A==
+X-MS-Exchange-CrossTenant-UserPrincipalName: T7npcYYrSQfyl0T6QZTy7mLCM/AoY/drv6krQxRr8K3cB/D8NwXK68+z9KEz9m2Lkrne2v64kfsljNbjPKwmQQ==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM8PR04MB7425
 
-This adds support for the BAP Scan Delegator role to handle the
-Add Source command received from a Broadcast Assistant.
+This registers an ATT disconnect callback with bass, to properly
+clean uo the session if the ATT connection is removed.
+---
+ src/shared/bass.c | 46 +++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 45 insertions(+), 1 deletion(-)
 
-The Broadcast Assistant informs a Scan Delegator about a Broadcaster
-by sending a GATT write command for the BASS Broadcast Audio Scan
-Control Point characteristic with the "Add Source" opcode. Using
-the parameters received through GATT, the Scan Delegator creates
-a device for the Broadcaster and probes it with BAP. The BAP plugin
-will then perform long-lived PA sync and it will create streams
-for each BIS required by the Assistant. The transports can then be
-acquired/released, and the Assistant will be notified about each
-change in the state of the streams.
-
-The bluetoothctl and btmon logs below show an example of this scenario:
-
-client/bluetoothctl
-[bluetooth]# endpoint.register 00001851-0000-1000-8000-00805f9b34fb 0x06
-[/local/endpoint/ep0] Auto Accept (yes/no): y
-[/local/endpoint/ep0] Max Transports (auto/value): a
-[/local/endpoint/ep0] Locations: 1
-[/local/endpoint/ep0] Supported Context (value): 1
-[bluetooth]# Endpoint /local/endpoint/ep0 registered
-[bluetooth]# advertise on
-[bluetooth]# [NEW] Device 00:60:37:31:7E:3F 00-60-37-31-7E-3F
-[00-60-37-31-7E-3F]# [NEW] Device 03:E2:C0:11:57:DA 03-E2-C0-11-57-DA
-[00-60-37-31-7E-3F]# [NEW] Transport
-    /org/bluez/hci1/dev_03_E2_C0_11_57_DA/bis1/fd0
-[00-60-37-31-7E-3F]# Endpoint: SetConfiguration
-[00-60-37-31-7E-3F]# Transport
-    /org/bluez/hci1/dev_03_E2_C0_11_57_DA/bis1/fd0
-[00-60-37-31-7E-3F]# Properties.Device:
-    /org/bluez/hci1/dev_03_E2_C0_11_57_DA
-[00-60-37-31-7E-3F]# Auto Accepting...
-[00-60-37-31-7E-3F]# transport.select
-    /org/bluez/hci1/dev_03_E2_C0_11_57_DA/bis1/fd0
-[00-60-37-31-7E-3F]# [CHG] Transport
-    /org/bluez/hci1/dev_03_E2_C0_11_57_DA/bis1/fd0 State: broadcasting
-[00-60-37-31-7E-3F]# transport.acquire
-    /org/bluez/hci1/dev_03_E2_C0_11_57_DA/bis1/fd0
-auto acquiring...
-Transport /org/bluez/hci1/dev_03_E2_C0_11_57_DA/bis1/fd0 acquiring
-[00-60-37-31-7E-3F]# Transport
-    /org/bluez/hci1/dev_03_E2_C0_11_57_DA/bis1/fd0 acquiring complete
-[00-60-37-31-7E-3F]# Acquire successful: fd 8 MTU 40:0
-[00-60-37-31-7E-3F]# [CHG] Transport
-    /org/bluez/hci1/dev_03_E2_C0_11_57_DA/bis1/fd0 State: active
-[00-60-37-31-7E-3F]# transport.release
-    /org/bluez/hci1/dev_03_E2_C0_11_57_DA/bis1/fd0
-[00-60-37-31-7E-3F]# Transport fd disconnected
-[00-60-37-31-7E-3F]# [CHG] Transport
-    /org/bluez/hci1/dev_03_E2_C0_11_57_DA/bis1/fd0 State: idle
-[00-60-37-31-7E-3F]# Release successful
-
-> ACL Data RX: Handle 0 flags 0x01 dlen 1
-      ATT: Write Command (0x52) len 23
-        Handle: 0x0040 Type: Broadcast Audio Scan Control Point (0x2bc7)
-          Data[21]: 0201da5711c0e203001a2d5602ffff010100000000
-            Opcode: Add Source (0x02)
-            Source_Address_Type: 1
-            Source_Address: 03:E2:C0:11:57:DA
-            Source_Adv_SID: 0
-            Broadcast_ID: 0x562d1a
-            PA_Sync_State: Synchronize to PA - PAST not available
-            PA_Interval: 0xffff
-            Num_Subgroups: 1
-            Subgroup #0:
-              BIS_Sync State: 0x00000001
-< HCI Command: LE Periodic Advertising Create Sync (0x08|0x0044)
-        Options: 0x0000
-        Use advertising SID, Advertiser Address Type and address
-        Reporting initially enabled
-        SID: 0x00
-        Adv address type: Random (0x01)
-        Adv address: 03:E2:C0:11:57:DA (Non-Resolvable)
-        Skip: 0x0000
-        Sync timeout: 20000 msec (0x07d0)
-        Sync CTE type: 0x0000
-> HCI Event: Command Status (0x0f) plen 4
-      LE Periodic Advertising Create Sync (0x08|0x0044) ncmd 1
-        Status: Success (0x00)
-> HCI Event: LE Meta Event (0x3e) plen 16
-      LE Periodic Advertising Sync Established (0x0e)
-        Status: Success (0x00)
-        Sync handle: 0
-        Advertising SID: 0x00
-        Advertiser address type: Random (0x01)
-        Advertiser address: 03:E2:C0:11:57:DA (Non-Resolvable)
-        Advertiser PHY: LE 2M (0x02)
-        Periodic advertising interval: 10.00 msec (0x0008)
-        Advertiser clock accuracy: 0x07
-> HCI Event: LE Meta Event (0x3e) plen 42
-      LE Periodic Advertising Report (0x0f)
-        Sync handle: 0
-        TX power: 127 dbm (0x7f)
-        RSSI: -64 dBm (0xc0)
-        CTE Type: No Constant Tone Extension (0xff)
-        Data status: Complete
-        Data length: 0x22
-        Service Data: Basic Audio Announcement (0x1851)
-          Presetation Delay: 40000
-          Number of Subgroups: 1
-            Subgroup #0:
-            Number of BIS(s): 1
-            Codec: LC3 (0x06)
-            Codec Specific Configuration: #0: len 0x02 type 0x01
-            Codec Specific Configuration: Sampling Frequency: 16 Khz
-            Codec Specific Configuration: #1: len 0x02 type 0x02
-            Codec Specific Configuration: Frame Duration: 10 ms (0x01)
-            Codec Specific Configuration: #2: len 0x03 type 0x04
-            Codec Specific Configuration: Frame Length: 40 (0x0028)
-            Codec Specific Configuration: #3: len 0x05 type 0x03
-            Codec Specific Configuration: Location: 0x00000001
-            Codec Specific Configuration: Location: Front Left
-              BIS #0:
-              Index: 1
-> HCI Event: LE Meta Event (0x3e) plen 20
-      LE Broadcast Isochronous Group Info Advertising Report (0x22)
-        Sync Handle: 0x0000
-        Number BIS: 1
-        NSE: 3
-        ISO Interval: 10.00 msec (0x0008)
-        BN: 1
-        PTO: 1
-        IRC: 3
-        Maximum PDU: 40
-        SDU Interval: 10000 us (0x002710)
-        Maximum SDU: 40
-        PHY: LE 2M (0x02)
-        Framing: Unframed (0x00)
-        Encryption: 0x00
-bluetoothd[4636]: < ACL Data TX: Handle 0 flags 0x00 dlen 29
-      ATT: Handle Multiple Value Notification (0x23) len 24
-        Length: 0x0014
-        Handle: 0x003a Type: Broadcast Receive State (0x2bc8)
-          Data[20]: 0101da5711c0e203001a2d560200010000000000
-          Source_ID: 1
-          Source_Address_Type: 1
-          Source_Address: 03:E2:C0:11:57:DA
-          Source_Adv_SID: 0
-          Broadcast_ID: 0x562d1a
-          PA_Sync_State: Synchronized to PA
-          BIG_Encryption: Not encrypted
-          Num_Subgroups: 1
-          Subgroup #0:
-            BIS_Sync State: 0x00000000
-< HCI Command: LE Broadcast Isochronous Group Create Sync (0x08|0x006b)
-        BIG Handle: 0x00
-        BIG Sync Handle: 0x0000
-        Encryption: Unencrypted (0x00)
-        Broadcast Code[16]: 00000000000000000000000000000000
-        Maximum Number Subevents: 0x00
-        Timeout: 20000 ms (0x07d0)
-        Number of BIS: 1
-        BIS ID: 0x01
-> HCI Event: Command Status (0x0f) plen 4
-      LE Broadcast Isochronous Group Create Sync (0x08|0x006b) ncmd 1
-        Status: Success (0x00
-> HCI Event: LE Meta Event (0x3e) plen 17
-      LE Broadcast Isochronous Group Sync Estabilished (0x1d)
-        Status: Success (0x00)
-        BIG Handle: 0x00
-        Transport Latency: 912 us (0x000390)
-        NSE: 3
-        BN: 1
-        PTO: 1
-        IRC: 3
-        Maximum PDU: 40
-        ISO Interval: 10.00 msec (0x0008)
-        Connection Handle #0: 10
-< HCI Command: LE Setup Isochronous Data Path (0x08|0x006e) plen 13
-        Handle: 10
-        Data Path Direction: Output (Controller to Host) (0x01)
-        Data Path: HCI (0x00)
-        Coding Format: Transparent (0x03)
-        Company Codec ID: Ericsson Technology Licensing (0)
-        Vendor Codec ID: 0
-        Controller Delay: 0 us (0x000000)
-        Codec Configuration Length: 0
-        Codec Configuration[0]:
-> HCI Event: Command Complete (0x0e) plen 6
-      LE Setup Isochronous Data Path (0x08|0x006e) ncmd 1
-        Status: Success (0x00)
-        Handle: 10
-bluetoothd[4636]: < ACL Data TX: Handle 0 flags 0x00 dlen 29
-      ATT: Handle Multiple Value Notification (0x23) len 24
-        Length: 0x0014
-        Handle: 0x003a Type: Broadcast Receive State (0x2bc8)
-          Data[20]: 0101da5711c0e203001a2d560200010100000000
-          Source_ID: 1
-          Source_Address_Type: 1
-          Source_Address: 03:E2:C0:11:57:DA
-          Source_Adv_SID: 0
-          Broadcast_ID: 0x562d1a
-          PA_Sync_State: Synchronized to PA
-          BIG_Encryption: Not encrypted
-          Num_Subgroups: 1
-          Subgroup #0:
-            BIS_Sync State: 0x00000001
-bluetoothd[4636]: < ACL Data TX: Handle 0 flags 0x00 dlen 29
-      ATT: Handle Multiple Value Notification (0x23) len 24
-        Length: 0x0014
-        Handle: 0x003a Type: Broadcast Receive State (0x2bc8)
-          Data[20]: 0101da5711c0e203001a2d560200010000000000
-          Source_ID: 1
-          Source_Address_Type: 1
-          Source_Address: 03:E2:C0:11:57:DA
-          Source_Adv_SID: 0
-          Broadcast_ID: 0x562d1a
-          PA_Sync_State: Synchronized to PA
-          BIG_Encryption: Not encrypted
-          Num_Subgroups: 1
-          Subgroup #0:
-            BIS_Sync State: 0x00000000
-< HCI Command: LE Broadcast Isochronous Group Terminate Sync (0x08|0x006c)
-        BIG Handle: 0x00
-> HCI Event: Command Complete (0x0e) plen 5
-      LE Broadcast Isochronous Group Terminate Sync (0x08|0x006c) ncmd 1
-        Status: Success (0x00)
-
-Iulia Tanasescu (16):
-  shared/bass: Register ATT disconnect cb
-  shared/bass: Make bt_bcast_src private
-  shared/bass: Remove io handling
-  shared/bass: Add support to register cp handlers
-  shared/bass: Call cp handler for the Add Source cmd
-  bap: Add support for long-lived PA sync
-  bap: Add API for Scan Delegator probe
-  bass: Register cp handler for Add Source cmd
-  shared/bass: Add API to set PA sync state
-  bass: Add APIs to probe/remove Broadcasters
-  bap: Probe Broadcasters with BASS
-  shared/bass: Add APIs to set/clear BIS sync bits
-  bass: Register BAP state changed cb
-  shared/bass: Add API to check BIS required for sync
-  bass: Add API to check BIS required for sync
-  bap: Create streams for required BISes
-
- profiles/audio/bap.c  | 124 +++++++--
- profiles/audio/bap.h  |   1 +
- profiles/audio/bass.c | 202 +++++++++++++++
- profiles/audio/bass.h |   5 +
- src/shared/bass.c     | 587 +++++++++++++++++++-----------------------
- src/shared/bass.h     |  43 +---
- 6 files changed, 590 insertions(+), 372 deletions(-)
-
-
-base-commit: 32a0811685c5dd290f1152bef2dfbde3b2848446
+diff --git a/src/shared/bass.c b/src/shared/bass.c
+index b54bf3094..bf739526c 100644
+--- a/src/shared/bass.c
++++ b/src/shared/bass.c
+@@ -73,6 +73,8 @@ struct bt_bass {
+ 
+ 	struct queue *src_cbs;
+ 
++	unsigned int disconn_id;
++
+ 	void *user_data;
+ };
+ 
+@@ -1579,6 +1581,32 @@ static void bass_attached(void *data, void *user_data)
+ 	cb->attached(bass, cb->user_data);
+ }
+ 
++static void bass_disconnected(int err, void *user_data)
++{
++	struct bt_bass *bass = user_data;
++
++	bass->disconn_id = 0;
++
++	DBG(bass, "bass %p disconnected err %d", bass, err);
++
++	bt_bass_detach(bass);
++}
++
++static void bass_attach_att(struct bt_bass *bass, struct bt_att *att)
++{
++	if (bass->disconn_id) {
++		if (att == bt_bass_get_att(bass))
++			return;
++
++		bt_att_unregister_disconnect(bt_bass_get_att(bass),
++							bass->disconn_id);
++	}
++
++	bass->disconn_id = bt_att_register_disconnect(att,
++							bass_disconnected,
++							bass, NULL);
++}
++
+ bool bt_bass_attach(struct bt_bass *bass, struct bt_gatt_client *client)
+ {
+ 	bt_uuid_t uuid;
+@@ -1590,8 +1618,11 @@ bool bt_bass_attach(struct bt_bass *bass, struct bt_gatt_client *client)
+ 
+ 	queue_foreach(bass_cbs, bass_attached, bass);
+ 
+-	if (!client)
++	if (!client) {
++		if (bass->att)
++			bass_attach_att(bass, bass->att);
+ 		return true;
++	}
+ 
+ 	if (bass->client)
+ 		return false;
+@@ -1600,6 +1631,8 @@ bool bt_bass_attach(struct bt_bass *bass, struct bt_gatt_client *client)
+ 	if (!bass->client)
+ 		return false;
+ 
++	bass_attach_att(bass, bt_gatt_client_get_att(client));
++
+ 	bt_uuid16_create(&uuid, BASS_UUID);
+ 	gatt_db_foreach_service(bass->rdb->db, &uuid, foreach_bass_service,
+ 				bass);
+@@ -1626,12 +1659,23 @@ static void bass_detached(void *data, void *user_data)
+ 
+ void bt_bass_detach(struct bt_bass *bass)
+ {
++	struct  bt_att *att;
++
+ 	if (!queue_remove(sessions, bass))
+ 		return;
+ 
++	if (bass->client)
++		att = bt_gatt_client_get_att(bass->client);
++	else
++		att = bass->att;
++
++	bt_att_unregister_disconnect(att, bass->disconn_id);
++
+ 	bt_gatt_client_unref(bass->client);
+ 	bass->client = NULL;
+ 
++	bass->att = NULL;
++
+ 	queue_foreach(bass_cbs, bass_detached, bass);
+ }
+ 
 -- 
 2.39.2
 
