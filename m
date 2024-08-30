@@ -1,33 +1,33 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82D6D1B2EC5;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82D2114B949;
 	Fri, 30 Aug 2024 16:30:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725035429; cv=none; b=dcG8NymQFE/kqKmS8ujD/ss0OUab5vREqFNzxf2XhYNgpnFy/p5/XkQ2J0pYxZexeXYwBiNp3/XRw4mKNIf1slr9l7H9DIlYoR3kNyj1s95FYP8lI0eBUuc8jJ1AlbVLGazfoOahm1eV6iOFQOPTikdzfqlUtCk/bSgGw1h5XCg=
+	t=1725035429; cv=none; b=FjHcUhtvoDzpO2HveEPMNA69pNbNkBqu34CPgENA42jerlNAnmmrbPsyiAXAEoyRbBpwz46HNoYKD30KiKD648sARwigAVtSp3nbeoxAu1/seJ917h37N5EAZdJ4BfiQSri8ZtSm/0JWx+XDcZnmo4a+gfb5qPSCH+CmDokh1FU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1725035429; c=relaxed/simple;
-	bh=kLwFn1Uc2Gr4pxTN+hSImb9jArLkR+hKmintZzt+71I=;
+	bh=+XleoGvMIu7vWzlolqcvi3QD4HwPGFeNdxNXbuUZYgI=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=DDAC55kpF0MzYSqPeEA+cl6fs06kmvjiIJqAzqySZfUt6ZACfrKSnmfW8rO0A71n/qyz5wZCk4aq0LpJeNB5k/+o1riHx17jqRrjpd/iGkqEs0JGfX6EEEIyS0nhfrJT9rQblAsBOmCITYk13xf6du7M8caFWWhD+oSjulLZblU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=vP6eIvKm; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=oOq4K7DxraqqfRptOtzm9Q+pznTnM1IvCSfAyvd3uvQ3gqHO27mT/oefqsXwrc2flmqtri5PegaySxiicJR4YlHDZyK9pKdpjXr2BXSAQN9bOtJvK7DwRPXrYB16pbSQGmsvB3YSIYwOn1dGPkwH/TxE3KbCfSI4QEitXahNSCk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ehLFRetI; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="vP6eIvKm"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2EF9CC4CEC5;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ehLFRetI"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 22330C4CEC7;
 	Fri, 30 Aug 2024 16:30:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1725035429;
-	bh=kLwFn1Uc2Gr4pxTN+hSImb9jArLkR+hKmintZzt+71I=;
+	bh=+XleoGvMIu7vWzlolqcvi3QD4HwPGFeNdxNXbuUZYgI=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=vP6eIvKmeYoOIZw5Qsnd2+ILYw2CBUu+RTtIg9jDh0QOc0tmxVwglFW1bl8/xp49p
-	 5G8i6s6Qt9mUxDFgZN1B8gwTlzyflDAwbRGiK1pJMOz4zQsLJEnJv6g0TOaPao5DW7
-	 5w4+90Np/oKZB0nVKYS+afmTdf0weF9TK+LPnRbz/gOK+XAh7G0dXhw73lW0vtIfgA
-	 d4WGZavP641TQM4zISOWTcxizTZTPpUFhESKwRlaunR4+sDVgAPMA9gGd4gTVX+akQ
-	 WPwAoJzuGcgN+bfh7iFLHD3X5ejA1ZFnAOIph3X78GpB7QXSq0mhqYfW2QAsgeyKc0
-	 Pn7Y7gP0vFl6A==
+	b=ehLFRetIbC0L7Td4IaFMtIB9+i/zmd0zoT9NOwEu8JeKELSMZez4hYSkv3rPzlG1V
+	 OYd7bDaIhelZWGdzzSXpTaUGVlNkfLZ93zcLfiGmV3b+NsUFklTc7WNx//GICgh1Lp
+	 p0oUbMTPLvynt6v/QvSB6kGIhT0Qnyp9LfS+dVpbM10VtWL3m2Un0sOqdDQJ11A3o8
+	 t3NUQPdjsCMxVpUHyZW0DbrQUIR+eoO2B6zMJ6dJyBfeyj5BxNXm2kkQVqQSjWhM2Y
+	 AoM/eTlhlMWjBKmtCcRJmw1nWKNTtJ5fVsrYpJI5GwOBLEK+5WCG8mlkwQOc5PxYZV
+	 lq/YLimUqP84w==
 Received: from ip-10-30-226-235.us-west-2.compute.internal (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id C25F93809A82;
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id B72883809A81;
 	Fri, 30 Aug 2024 16:30:30 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -37,40 +37,39 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH V2 RESEND] Bluetooth: btrtl: Set MSFT_EXT_ADDRESS_FILTER quirk
- for RTL8852B
+Subject: Re: [PATCH resend] Bluetooth: Use led_set_brightness() in LED trigger
+ activate() callback
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <172503543079.2648350.6843292974799885307.git-patchwork-notify@kernel.org>
+ <172503543072.2648350.9880242652165643665.git-patchwork-notify@kernel.org>
 Date: Fri, 30 Aug 2024 16:30:30 +0000
-References: <20240828095620.663466-1-hildawu@realtek.com>
-In-Reply-To: <20240828095620.663466-1-hildawu@realtek.com>
-To: Hilda Wu <hildawu@realtek.com>
-Cc: marcel@holtmann.org, luiz.dentz@gmail.com,
- linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
- alex_lu@realsil.com.cn, max.chou@realtek.com, kidman@realtek.com
+References: <20240827105248.18177-1-hdegoede@redhat.com>
+In-Reply-To: <20240827105248.18177-1-hdegoede@redhat.com>
+To: Hans de Goede <hdegoede@redhat.com>
+Cc: marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
+ pavel@ucw.cz, lee@kernel.org, linux-leds@vger.kernel.org,
+ linux-bluetooth@vger.kernel.org
 
 Hello:
 
 This patch was applied to bluetooth/bluetooth-next.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Wed, 28 Aug 2024 17:56:20 +0800 you wrote:
-> Set HCI_QUIRK_USE_MSFT_EXT_ADDRESS_FILTER quirk for RTL8852B.
+On Tue, 27 Aug 2024 12:52:48 +0200 you wrote:
+> A LED trigger's activate() callback gets called when the LED trigger
+> gets activated for a specific LED, so that the trigger code can ensure
+> the LED state matches the current state of the trigger condition
+> (LED_FULL when HCI_UP is set in this case).
 > 
-> The quirk to support tracking multiple devices concurrently.
-> Commit 9e14606d8f38 ("Bluetooth: msft: Extended monitor tracking by
-> address filter")
-> 
-> With this setting, when a pattern monitor detects the device, this
-> feature issues an address monitor for tracking that device. Let
-> pattern monitor can keep monitor new devices.
+> led_trigger_event() is intended for trigger condition state changes and
+> iterates over _all_ LEDs which are controlled by this trigger changing
+> the brightness of each of them.
 > 
 > [...]
 
 Here is the summary with links:
-  - [V2,RESEND] Bluetooth: btrtl: Set MSFT_EXT_ADDRESS_FILTER quirk for RTL8852B
-    https://git.kernel.org/bluetooth/bluetooth-next/c/e278dcc0a237
+  - [resend] Bluetooth: Use led_set_brightness() in LED trigger activate() callback
+    https://git.kernel.org/bluetooth/bluetooth-next/c/669e8c8b5663
 
 You are awesome, thank you!
 -- 
