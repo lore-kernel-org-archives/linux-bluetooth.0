@@ -1,86 +1,80 @@
-Received: from o7.sgmail.github.com (o7.sgmail.github.com [167.89.101.198])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFD02199FB7
-	for <linux-bluetooth@vger.kernel.org>; Fri, 30 Aug 2024 16:09:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=167.89.101.198
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82D6D1B2EC5;
+	Fri, 30 Aug 2024 16:30:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725034194; cv=none; b=rXEHYOUrN3x1CHofErwaF6fKp5ZFT+4Gfy+zsNYcXksfZPpHWBBK8Qs+Q5MflcsOpJ7S72sMX3Lp5zMvqmBu7SyuUc+m7JCL4I0UaWRZpRvRBEQY80IPus6C2Ae4RY4oqe5Tjz//LcmlJJ21Ci+ub9M4VhiXNNjzsQ5Qf/0cDss=
+	t=1725035429; cv=none; b=dcG8NymQFE/kqKmS8ujD/ss0OUab5vREqFNzxf2XhYNgpnFy/p5/XkQ2J0pYxZexeXYwBiNp3/XRw4mKNIf1slr9l7H9DIlYoR3kNyj1s95FYP8lI0eBUuc8jJ1AlbVLGazfoOahm1eV6iOFQOPTikdzfqlUtCk/bSgGw1h5XCg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725034194; c=relaxed/simple;
-	bh=xrGlaQavIT8RtGSfrXITq95H1RKyUmuocQ75Pzw6VCA=;
-	h=Date:From:Message-ID:Subject:Mime-Version:Content-Type:To; b=AvS97R4sMV1VENYIKr3qsXpEcIcsVAYW2whDDmu8+6UZat2Jt3ZTB9xciggZsyrEXfvP87171dCY5t1HzixENBMjrZ/fqcPDoiWdp1jY7V+HkPt5zhEWkZtRsYd3MS+OI+87MuNInS0+9PNuz5rkP/ogtfOkTdx3/qQmwr9+BYI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=sgmail.github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=qmIswlJ7; arc=none smtp.client-ip=167.89.101.198
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sgmail.github.com
+	s=arc-20240116; t=1725035429; c=relaxed/simple;
+	bh=kLwFn1Uc2Gr4pxTN+hSImb9jArLkR+hKmintZzt+71I=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=DDAC55kpF0MzYSqPeEA+cl6fs06kmvjiIJqAzqySZfUt6ZACfrKSnmfW8rO0A71n/qyz5wZCk4aq0LpJeNB5k/+o1riHx17jqRrjpd/iGkqEs0JGfX6EEEIyS0nhfrJT9rQblAsBOmCITYk13xf6du7M8caFWWhD+oSjulLZblU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=vP6eIvKm; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="qmIswlJ7"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	h=from:subject:mime-version:content-type:content-transfer-encoding:
-	list-unsubscribe:to:cc:content-type:from:subject:to;
-	s=smtpapi; bh=CVYLeA3B2aZ0qw784rft4HzIuzIRbN5obiuZZ+iJvAQ=;
-	b=qmIswlJ7/pGQj3JlInFE6n4BK+XO3WRLaYkKwUcq6hUyk/g7es/WzzV8YqmNJPySTPBV
-	ubKTDzHXamM8hyZVX09SG2mbQQDIoObZ0y7CKSWn63giY4UiB6V8/jZlr09H5+SlLEcWmK
-	gg1NEAAbL2kyHCt71jd+oIxM8oqdU1z3E=
-Received: by recvd-canary-5b6884b69d-vpgnq with SMTP id recvd-canary-5b6884b69d-vpgnq-1-66D1EECE-A4
-	2024-08-30 16:09:50.998670527 +0000 UTC m=+755061.284401400
-Received: from out-25.smtp.github.com (unknown)
-	by geopod-ismtpd-28 (SG)
-	with ESMTP id Rg7X273sTq2NOWaOHPoDag
-	for <linux-bluetooth@vger.kernel.org>;
-	Fri, 30 Aug 2024 16:09:50.954 +0000 (UTC)
-Received: from github.com (hubbernetes-node-1227519.ash1-iad.github.net [10.56.212.78])
-	by smtp.github.com (Postfix) with ESMTPA id 47B851411A6
-	for <linux-bluetooth@vger.kernel.org>; Fri, 30 Aug 2024 09:09:44 -0700 (PDT)
-Date: Fri, 30 Aug 2024 16:09:51 +0000 (UTC)
-From: Luiz Augusto von Dentz <noreply@github.com>
-Message-ID: <bluez/bluez/push/refs/heads/master/2dadde-394675@github.com>
-Subject: [bluez/bluez] 394675: device: Fix Pair method not setting
- auto_connect
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="vP6eIvKm"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2EF9CC4CEC5;
+	Fri, 30 Aug 2024 16:30:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1725035429;
+	bh=kLwFn1Uc2Gr4pxTN+hSImb9jArLkR+hKmintZzt+71I=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=vP6eIvKmeYoOIZw5Qsnd2+ILYw2CBUu+RTtIg9jDh0QOc0tmxVwglFW1bl8/xp49p
+	 5G8i6s6Qt9mUxDFgZN1B8gwTlzyflDAwbRGiK1pJMOz4zQsLJEnJv6g0TOaPao5DW7
+	 5w4+90Np/oKZB0nVKYS+afmTdf0weF9TK+LPnRbz/gOK+XAh7G0dXhw73lW0vtIfgA
+	 d4WGZavP641TQM4zISOWTcxizTZTPpUFhESKwRlaunR4+sDVgAPMA9gGd4gTVX+akQ
+	 WPwAoJzuGcgN+bfh7iFLHD3X5ejA1ZFnAOIph3X78GpB7QXSq0mhqYfW2QAsgeyKc0
+	 Pn7Y7gP0vFl6A==
+Received: from ip-10-30-226-235.us-west-2.compute.internal (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id C25F93809A82;
+	Fri, 30 Aug 2024 16:30:30 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
-X-SG-EID: 
- =?us-ascii?Q?u001=2E8ki=2FFbqwlQO04QBiriT34f6qhM6wd38+BQvADylPPTIQmeZqt0Mdj+E9P?=
- =?us-ascii?Q?ngWQlMPxccS8u9EBUyRL9UmZaAIArP3mazTo04A?=
- =?us-ascii?Q?6lKN0d6dizJr2=2FHOOzeTV8njri4L7Rxczmyc3N+?=
- =?us-ascii?Q?uKzhd6Ujd12gyE24WK=2FEvqKPedeCKa2HyfKlW5c?=
- =?us-ascii?Q?QDh5JrxypzP9T6e=2FkYLKid4PROzaq3jqyDnbNjB?=
- =?us-ascii?Q?Qnw16OhZ2QePqN4O+yKapJHcdcOqMUHV=2Fl1FnNT?=
- =?us-ascii?Q?CoKwmcIJ+jBnRWlRJC8I=2F2Ne=2FQ=3D=3D?=
-To: linux-bluetooth@vger.kernel.org
-X-Entity-ID: u001.h3RSp2myFsXwI84tgZKC3Q==
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH V2 RESEND] Bluetooth: btrtl: Set MSFT_EXT_ADDRESS_FILTER quirk
+ for RTL8852B
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <172503543079.2648350.6843292974799885307.git-patchwork-notify@kernel.org>
+Date: Fri, 30 Aug 2024 16:30:30 +0000
+References: <20240828095620.663466-1-hildawu@realtek.com>
+In-Reply-To: <20240828095620.663466-1-hildawu@realtek.com>
+To: Hilda Wu <hildawu@realtek.com>
+Cc: marcel@holtmann.org, luiz.dentz@gmail.com,
+ linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+ alex_lu@realsil.com.cn, max.chou@realtek.com, kidman@realtek.com
 
-  Branch: refs/heads/master
-  Home:   https://github.com/bluez/bluez
-  Commit: 39467578207889fd015775cbe81a3db9dd26abea
-      https://github.com/bluez/bluez/commit/39467578207889fd015775cbe81a3db9dd26abea
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2024-08-29 (Thu, 29 Aug 2024)
+Hello:
 
-  Changed paths:
-    M src/device.c
+This patch was applied to bluetooth/bluetooth-next.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-  Log Message:
-  -----------
-  device: Fix Pair method not setting auto_connect
+On Wed, 28 Aug 2024 17:56:20 +0800 you wrote:
+> Set HCI_QUIRK_USE_MSFT_EXT_ADDRESS_FILTER quirk for RTL8852B.
+> 
+> The quirk to support tracking multiple devices concurrently.
+> Commit 9e14606d8f38 ("Bluetooth: msft: Extended monitor tracking by
+> address filter")
+> 
+> With this setting, when a pattern monitor detects the device, this
+> feature issues an address monitor for tracking that device. Let
+> pattern monitor can keep monitor new devices.
+> 
+> [...]
 
-Due to commit 507ba12483c3 ("profile: Remove probe_on_discover")
-disable_auto_connect may be set when a service is probed but the device
-is still temporary which is normally the result of service being
-discovered over advertisement rather than connection.
+Here is the summary with links:
+  - [V2,RESEND] Bluetooth: btrtl: Set MSFT_EXT_ADDRESS_FILTER quirk for RTL8852B
+    https://git.kernel.org/bluetooth/bluetooth-next/c/e278dcc0a237
 
-To fix this the Device.Pair method needs to check if the
-disable_auto_connect flag has been set and then reset it set auto_connect
-which is similar to how Device.Connect works.
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
-
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
