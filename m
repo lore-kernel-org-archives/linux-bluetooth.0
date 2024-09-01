@@ -1,173 +1,127 @@
-Received: from CH1PR05CU001.outbound.protection.outlook.com (mail-northcentralusazon11020087.outbound.protection.outlook.com [52.101.193.87])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f200.google.com (mail-il1-f200.google.com [209.85.166.200])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 236251C36
-	for <linux-bluetooth@vger.kernel.org>; Sun,  1 Sep 2024 04:28:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.193.87
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725164933; cv=fail; b=newtMG+ILopQ/h9ngtXP9pxSiO2IksS2P61+ilbrN7zeClAmv2wOwCu6gj2zQl1FJu614Cbya1IbUJDu2VeTpbQ+yVDIXPtMQrjCtf0eQgfUjmQLuN4/4ui+l8RL5Q7/y1HXvH0BSV8JhPujnoZqMwnzLBzATQvWbR0HcYvKNhE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725164933; c=relaxed/simple;
-	bh=oLKVF3ljgb7b4j9ins6SZt+yJh7cXN7ZmJQV4htF6ss=;
-	h=From:To:CC:Subject:Date:Message-ID:Content-Type:MIME-Version; b=V20gWYlC60DldFX+5urHgERbun/R7bGEo0CI5bVUySCsuRNclZEzQML+G1PhErMQQtFriWngK45aDM9rDpaIItSaKvQLcfYQFA8H+eT6lHPYcQvvgoDkVA8EWzI16Y1nInN9nnxn0I2VCs0f+blsNaGyjTue/361GVKJd9Jkskg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=michaelburch.net; spf=pass smtp.mailfrom=michaelburch.net; dkim=pass (2048-bit key) header.d=michaelburch.net header.i=@michaelburch.net header.b=VzsCWK96; arc=fail smtp.client-ip=52.101.193.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=michaelburch.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=michaelburch.net
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=michaelburch.net header.i=@michaelburch.net header.b="VzsCWK96"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=wpokR0hMrYu4DmChcWhmkCuNzx/vWqe7NSAbksNGWxKzBSNW2+ZdI50Mp/F21SdhEUij3nTardEDW6aHXTxg9qWS8tvebGIutJid1EcSbaD59kUi9YGDeZlUrvtZUw/JoSO2FJAa75pivQniXM5AulS/zpeLquzWVZdnRfCOXoiYPIMuklNtGEx5X3KsBbCdXNya8wRSe8wv3w79MpVCrg07B12/SySI5iCx6QcHozGdEd8ZPH1B9SqQXCqDaq8CgNS0RXhdvthybPIgcTZl/aL5cnMCU9SPPlwGXyXjQ7G4dD48KFfguLwaeKeP4j8wOJMxxYpACmf+P+HXXwUxBw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=L+9MQlOiyKfFbyVrar8RFbmx3tnn6ME613W/zyOWvNA=;
- b=L3QwytJGjj94J+zfz9kG8u1kKLi/0rJpSjJos+AnOiyUvidQcUhzzJu3cbbjVFYCt6UepeqtS5cfey4iKlLnWX9nZ2B4t/w9rBm6kCywr+P5zoq63k2vEHE5jwh5aVrlWsvF6bNK84YXA9kkFQyeKuF7lg3GMOMXN9keUUsDHNrHxUsQjNI6L1scZ93yq5PgqtKhFG24V2FYXV7yWgmJjtoopmSytUAu/XRRD71CgeGX8IAl9VyWxBVghLB83My/VfLc6dRsj3Usvwx8KkzoAvYyI17nb44xWeN5CMdhBwR1bN5kwNwGEwl8pukFgJR58jwUrQ0nfAs9sV7cob4cjw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=michaelburch.net; dmarc=pass action=none
- header.from=michaelburch.net; dkim=pass header.d=michaelburch.net; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=michaelburch.net;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=L+9MQlOiyKfFbyVrar8RFbmx3tnn6ME613W/zyOWvNA=;
- b=VzsCWK96lc+psv2IK4EuqoeFIjlOszDlnNgdwqOBkUfoKemP6IHmMCwoge2DZeLA81Gd01Wu2iJWcTU4uyZn0wcqnG2NSEV6xGEy1v4ZTVJhIIX+oEiAIe9wKiGlR25Gy0WQUqDNvDdbI50d5nmp+VDzpdR5tffiqkAi1evvjDfMSfZl/fA8gUkbGOlcMXDxrbqK3vbiM5COjLul2QnGaNAixoSKAQHZl6UqWjm0Kd2SeFOGp/ZyZ7JxF1I8HoyTAUTeLBh97hSQdSpfRSNi62/UMMoxI0mr89zXbh3awTbZUZHHe18N23iYA87E/z00vEdNFuietUtFhsBjFGmEuQ==
-Received: from SN6PR01MB5070.prod.exchangelabs.com (2603:10b6:805:b7::28) by
- CO1PR01MB6614.prod.exchangelabs.com (2603:10b6:303:d9::6) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7918.23; Sun, 1 Sep 2024 04:28:48 +0000
-Received: from SN6PR01MB5070.prod.exchangelabs.com
- ([fe80::8e42:e034:6306:aaf9]) by SN6PR01MB5070.prod.exchangelabs.com
- ([fe80::8e42:e034:6306:aaf9%5]) with mapi id 15.20.7875.019; Sun, 1 Sep 2024
- 04:28:47 +0000
-From: Michael Burch <me@michaelburch.net>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-CC: Jiande Lu <jiande.lu@mediatek.com>, Paul Menzel <pmenzel@molgen.mpg.de>
-Subject: [PATCH v3] Bluetooth: btusb: Add 2 USB HW IDs for MT7925 (0xe118/e)
-Thread-Topic: [PATCH v3] Bluetooth: btusb: Add 2 USB HW IDs for MT7925
- (0xe118/e)
-Thread-Index: AQHa/CbXUN5I62JsEUuBvnSxc7bgbQ==
-Date: Sun, 1 Sep 2024 04:28:47 +0000
-Message-ID:
- <SN6PR01MB5070DA7BB9E7C6FA574D1E4CA5912@SN6PR01MB5070.prod.exchangelabs.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-msip_labels:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=michaelburch.net;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: SN6PR01MB5070:EE_|CO1PR01MB6614:EE_
-x-ms-office365-filtering-correlation-id: 5d758518-224e-469d-5905-08dcca3e927f
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|366016|1800799024|376014|38070700018;
-x-microsoft-antispam-message-info:
- =?iso-8859-1?Q?Ffumd8OiECrcJ7RiibXK/8VLRzBhlVwOHcF3Bg1fQuSla+HX50Mk7LHjli?=
- =?iso-8859-1?Q?fczCWFUby/gPuQPy/WbrJZOxF3GIn20Xv6af8ssjzZSR/0SDGdrIjA3Y14?=
- =?iso-8859-1?Q?NssEDWOMUWn9WJ/CajNgxFWFwLRAPmta2FfvZC8eJbyJZEjr5zsIsZXGul?=
- =?iso-8859-1?Q?S0Ws5IyOGE4pGwzaXXZNpqzCCcWncyRcjxxS7QvMU2r2Gu4KiOVZqfkS6y?=
- =?iso-8859-1?Q?14hSdv6f5p4ByAWc5v356mh2uQ2dmycSZXEcSwRslMiAg3mkrX1F9Lm/o1?=
- =?iso-8859-1?Q?w8YX80Cmo4TlhW9/llC5Hbs1L2DFY2C/fMLAwF+I1hYd4PwnZyx5pIfHJi?=
- =?iso-8859-1?Q?dte8puQhf4htmyszoe2BGgQGL0EcPGK1ZE4WY6ZPqARE07DhWB6/xwvjeo?=
- =?iso-8859-1?Q?/OXJPgpfyLKDDlTgOEIaWP63TYfuVS+nkxxmCJ0ZcQZ8rQyKO8REazYa98?=
- =?iso-8859-1?Q?s9kw2ICz1L6Nfs6zJiUYao6KzaUt4gdech2eJLEKYF9XxuRdLzu4BUrZKN?=
- =?iso-8859-1?Q?RY9jraklpJ8py+3HvGgjzLNehB9WLsVWyoZ1cFEK6/dsHKO6SK4qnjLFzR?=
- =?iso-8859-1?Q?5JACfZhJrVSnw9enfVK1fHjwsUqFn7TPIVnZ21u5k13kr+jP9tFYnqn/hV?=
- =?iso-8859-1?Q?nIn21zQdzGniLtemsegRAjKz/Q5kPxeUsDSxxTqeF2TyGRgL6hhs5jPgvF?=
- =?iso-8859-1?Q?geTiM7woDueatRWpPbbAN84rkGLD3gamRYXgGDK6DeDtbT5TDapgDHVqSd?=
- =?iso-8859-1?Q?uv1+fVpSxqa9GFRXJ7ScqlIDHx4dkFHSQeobR9RjT0R8ohCkPCleJ3Vm2D?=
- =?iso-8859-1?Q?A2+4puW1sNlShg/fbgt56exVmH2e+UlJV59nRCj+Xlv/WbbaXCXAOWUfwj?=
- =?iso-8859-1?Q?OFhmldxmc/HoUDXjktaQRWyHL0dFBH0HeHPKTf5baU24nxO0l0nJmOVQCu?=
- =?iso-8859-1?Q?0TOt1HCpgGSLcbWZ5HqILR73kCZhy8t9WTU3e6JfGY9a/TaMDdVsvGbG1m?=
- =?iso-8859-1?Q?EXZzXC5ydqfHochgsppx0OyBr1CrnCU2q8ylgvwzjLetfTVxhYqk20g95P?=
- =?iso-8859-1?Q?UT9cTmNTvfc2pccq10A6jl3Gel5C1nPCuLC3GyyoIBKmcuUausErARJsSf?=
- =?iso-8859-1?Q?T+ARCvRJGMNsn6/iJmGKA3hpmnhrTxzB+YAGccYdisv7mDa2FfHejtx2Aa?=
- =?iso-8859-1?Q?EAzamZ2xcwTJZma4kTkApKGUaV8XDHq/sGSPdpJaJxakmFBhwDIr/GS9QG?=
- =?iso-8859-1?Q?mA4be7iu3Ft2RFGeZAgBGejARcLg5FcIN8dXU0bFRxh8vjSMlwOp0YgeNP?=
- =?iso-8859-1?Q?Q/XMg0h6xnmKwzgBwewV0LAxHetZz1a0AqoHmXPowmLbHOQineqtI1Cdb9?=
- =?iso-8859-1?Q?6+39TIeIVfpMlx20ks8aZ0YRemK4wqQCwVbXycOZ94Hb7ybe0bDgK1bBWw?=
- =?iso-8859-1?Q?NtqMX9OfuMK2JPQHniRXBPYVb/Lv8N/exFnEAA=3D=3D?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR01MB5070.prod.exchangelabs.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(38070700018);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?iso-8859-1?Q?Dm365xwJ1Wj3KtFa80SSvt2i2KGgU14CTO3FYP4tTns/0uy/cRXlRDIWdX?=
- =?iso-8859-1?Q?Kuapbc8UmwUdZbtCFzyKUWB317IkZTYSnT8PU+4WDHLnK5bel7Bqsq0z1D?=
- =?iso-8859-1?Q?GxcIeOLVk+Aj+DR/CGG7NUaJ2v7t23rkWbwWGnAfJl2TrvuE5OX7Iosgre?=
- =?iso-8859-1?Q?XRisOGoEVxXq1FHtLIv3GSF9DIHzFf73lFEWkqDVVg5mDiod2nFDOeWZEx?=
- =?iso-8859-1?Q?qkxwFp5Ki5+CE2jJRYVlMHO2k/HrGueGmc/ABhn4L8xF3oQi1GvOVuIcC7?=
- =?iso-8859-1?Q?GBNeNfghmu6Cyam+378ROByhAcT9XvRgpgTh/2m83CiQQl6CPBEERyJ3E/?=
- =?iso-8859-1?Q?Er+zYqv/7LzP2ncYEHGSsnvoqfk6fDG4C5HdZ3XP2rE6G1Mq40nAF9/EgC?=
- =?iso-8859-1?Q?tD/ELQKOfFoySyBLsYIeU3CgPtcLNgZUHJWQxPjrnnkrtkGHhdjDkQ7uaO?=
- =?iso-8859-1?Q?qNhrN4jTugCAcqikKDEGf2cz42+YsAZ1KHKcqFE+Zt9VQ2ZsM21z9+Wt+4?=
- =?iso-8859-1?Q?mjpFI2Y6S7e2pCi4MrW0+wmKK8kLAqX/r8aPXIdzLigOBScAVOYthkBYLQ?=
- =?iso-8859-1?Q?q4q8X9geuK6VjkedcShV+FZT6y0Btok4/9Ztr4f24HIuC2q/u0c31QX2q6?=
- =?iso-8859-1?Q?MRvdVCTZne4GDUUOWsQA4CVleE4v7MsK6WaIyns5Z9864Wxg4AywSd8hNU?=
- =?iso-8859-1?Q?036/moL7Qv0vpf9EWC3snB27ch31clmyr3uyUykWagObLAMT4OBgMj881z?=
- =?iso-8859-1?Q?CWUR5G8rZearw6uX9E80AeL9GJFh7E6zRYyy83fL8X+Cn3qGPt6A38PBWO?=
- =?iso-8859-1?Q?+FZMxp1K4BcbVDjgDhoKoSt/yGJN++JBEZWiMYEP+QQ4d0oKXtxfqDcmjj?=
- =?iso-8859-1?Q?kLhlYH0hUh3d2qfjYdiYggT1EPfHr0hGEeZCqxeaS3cExQXwFB0ZRe5Whg?=
- =?iso-8859-1?Q?2C/71UOtlUN2c4ndsYsaVFdsd8OEMg0WlJoStBHSSW72gr+1eU0iaC1dCO?=
- =?iso-8859-1?Q?jn82DsSR75WPQfj6bOgdjCXYISJkQdsc4WADx0D+AR75hTM+Oe33Qfa4xa?=
- =?iso-8859-1?Q?92n+PcGtnqWwfirESOWmZGxMizFW5AEitbUpBSw2tXOKMirkAzueynmrxD?=
- =?iso-8859-1?Q?/T7Z3R+fqnGvR6mDqGojjywdyWddG4L2KUlqZq4FMz4O08LVsCtqVV2hg1?=
- =?iso-8859-1?Q?6kVAjTqfK057uIaO4fyWXKwBbXIslD0t8XraeMuUdH705IznJ2/6S8f8Hr?=
- =?iso-8859-1?Q?ycrozDQTXJThEoHyuacL8a7ziQfqAKM6JbmBXIDZe3PHINqhN7Zd2vqmu0?=
- =?iso-8859-1?Q?QQ8p8ZiqMO9WiPp6dYNSaoq7Sg6oW1RzFaPEAAL9P4Vq+Gxe7zMyctgo5O?=
- =?iso-8859-1?Q?E0QKVJP4NdiVLhfBhn5HC0FEpcMBcLxW3PE0UNPLII3D88X49mTGxfrB3k?=
- =?iso-8859-1?Q?oJl4cYiVc4WGgbxf03+EV4wmvI440Z0JtnXOf7gojQGsrgW4lPRMdc1WX9?=
- =?iso-8859-1?Q?SBXfFrlixuOWG1oLU1MUZIUpIdF0NzS8uhKw+nt/k4Out6X3/DVjT4Nwng?=
- =?iso-8859-1?Q?e2ZDeLabJuVbxqjoo1oIMepCHUbu1FuIFJHjxKi52w+ayqzV574Zy3kAjJ?=
- =?iso-8859-1?Q?JPjEcS8MImAQc=3D?=
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E44AC7E101
+	for <linux-bluetooth@vger.kernel.org>; Sun,  1 Sep 2024 07:39:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.200
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1725176370; cv=none; b=qbRvADGtnyZyi+fXIsfSNrUs+Iswh6oABPsSsM07ZF8WUkmsjf6wUdvpPY9PquSKJp+ISHwQuabjxKbn2WmiU6b2LNJtzqT8onGMZN55EauVTQZI46HX98UTtKwtEN2n5OfXFov6WaGdta8lwS7ECKgtcYiWlA4mbUcePClJeNk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1725176370; c=relaxed/simple;
+	bh=aA7PRBVXeURc0y4haGj3b8s3j8jYM8sH8nwHmA2n6zA=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=OdowVkVQ29gKdGF7SW+Blv+0yQnf9K5ZhDUZzPHJVmzQfmKs9Qemk/ZGMLCOkbhocmrxnDb/rT4sxfiZBfTznMSSnFlSb4qzQgyIrfUDFV5XUHiJ+IksjQNQRqdmddJEydHGDRv8yKbwb7GcumpiMQjtfqpeR+cfzI8PIFVC9WY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.200
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f200.google.com with SMTP id e9e14a558f8ab-39d4b5b9fa0so40230825ab.1
+        for <linux-bluetooth@vger.kernel.org>; Sun, 01 Sep 2024 00:39:28 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1725176368; x=1725781168;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=xUfKU43Y0F3kPZOkwB+JSr6rYJBGPcvBjhYK8OyoDvM=;
+        b=bOeuZCGZjwtehygRBIA9iAtLGm0mMzBUbdS55VfpiFZo9xdo+NquSe2rbDTqAzE+JJ
+         ud6CBS2d8yJSNdQJh0nCbsMAc0RFtRFPQiJr9Q0ALsj74JU4PvmuboNDsyK5wJIGJJIo
+         PMsF5kwh3/diuCXiZSDqy5pvx2i9dsV78E7ndCyU9agvcUICcYMkB6C4NVlmAGRpcAHx
+         zeokUrcZeevhdviRIOQ+f0SuAUoR5VqsajlZoRawJEvHlEm+IA4bXLMqoFXu1QpQ08+R
+         fLlR57QjzDBFV9bPCJpOSKji00X28y3kmQpoKAKn5ciIwYFBL+LcQVEAf1lwNYx8ygJf
+         aAyg==
+X-Forwarded-Encrypted: i=1; AJvYcCV2JjcMUWXTv6mkagSrmn1WoX+Mv0wYB20IcCNLB0q6K4SVmTmD6dTC63G+7VCnuTHbf73KZd/OkBlj+qHOlXI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YygONZsmjq1CRDuLieC8Fbz8ZraYxsH3gVSAevKuTS0pLUYfsX2
+	bBO6LaDrnzBEbgNN8+Y9q/tN31mh7Ce1kU6hWqd+1Tlzk0qA8+SCNn0c0CL6L9ahDWhW4drden8
+	cDCgg50zJrw62yZw/bZfN40ftzbDD0z2xOcTHrnDUCiOxq7Etq9CRrZw=
+X-Google-Smtp-Source: AGHT+IFJmiPebFmp8ZPNjSW7Ap7vhs7XgThHVj2oE0FS1Okr7LH+V8qyPxGD3dp6mkKRZAreo1BmAxxKnczd+OsCPJBAsE5xJVy+
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: michaelburch.net
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SN6PR01MB5070.prod.exchangelabs.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5d758518-224e-469d-5905-08dcca3e927f
-X-MS-Exchange-CrossTenant-originalarrivaltime: 01 Sep 2024 04:28:47.3807
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 8256b244-08e6-4df2-b146-877069d9ce10
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 0v0LjaO/7rYdu69aqMUqsyJU9EKEMOSkiv/18I2Oim9tSRpsPc3nhhjKbc5BrTlkfQphoW9bv6JKCAHTw1JOww==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO1PR01MB6614
+X-Received: by 2002:a05:6e02:1d83:b0:39d:3043:1f20 with SMTP id
+ e9e14a558f8ab-39f410838a3mr5885555ab.5.1725176367961; Sun, 01 Sep 2024
+ 00:39:27 -0700 (PDT)
+Date: Sun, 01 Sep 2024 00:39:27 -0700
+In-Reply-To: <000000000000e43c5106170f2fb4@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <00000000000096680f062109ec63@google.com>
+Subject: Re: [syzbot] [bluetooth?] KASAN: slab-use-after-free Read in l2cap_recv_frame
+From: syzbot <syzbot+5c915dc5dd417b83b348@syzkaller.appspotmail.com>
+To: johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, luiz.dentz@gmail.com, marcel@holtmann.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-Add 2 USB HW IDs for MT7925 (0xe118/e) to ensure proper recognition.=0A=
-These HW IDs are extracted from Windows driver inf file https://dlcdnets.as=
-us.com/pub/ASUS/nb/Image/Driver/Bluetooth/39389/Bluetooth_DCH_MediaTek_B_V1=
-.1037.0.433Sub2_39389.exe?model=3DH7606WV=0A=
-=0A=
-Patch has been tested successfully on an Asus ProArt P16 model H7606WV. Con=
-troller is recognized devices pair successfully.=0A=
-=0A=
-Signed-off-by: Michael Burch <me@michaelburch.net>=0A=
----=0A=
- drivers/bluetooth/btusb.c | 4 ++++=0A=
- 1 file changed, 4 insertions(+)=0A=
-=0A=
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c=0A=
-index 36a869a57910..d9286feacef8 100644=0A=
---- a/drivers/bluetooth/btusb.c=0A=
-+++ b/drivers/bluetooth/btusb.c=0A=
-@@ -632,6 +632,10 @@ static const struct usb_device_id quirks_table[] =3D {=
-=0A=
- 	/* Additional MediaTek MT7925 Bluetooth devices */=0A=
- 	{ USB_DEVICE(0x0489, 0xe113), .driver_info =3D BTUSB_MEDIATEK |=0A=
- 						     BTUSB_WIDEBAND_SPEECH },=0A=
-+	{ USB_DEVICE(0x0489, 0xe118), .driver_info =3D BTUSB_MEDIATEK |=0A=
-+						     BTUSB_WIDEBAND_SPEECH },=0A=
-+	{ USB_DEVICE(0x0489, 0xe11e), .driver_info =3D BTUSB_MEDIATEK |=0A=
-+						     BTUSB_WIDEBAND_SPEECH },=0A=
- 	{ USB_DEVICE(0x13d3, 0x3602), .driver_info =3D BTUSB_MEDIATEK |=0A=
- 						     BTUSB_WIDEBAND_SPEECH },=0A=
- 	{ USB_DEVICE(0x13d3, 0x3603), .driver_info =3D BTUSB_MEDIATEK |=0A=
--- =0A=
-2.46.0=0A=
-=0A=
+syzbot has found a reproducer for the following issue on:
+
+HEAD commit:    e8784b0aef62 Merge tag 'usb-6.11-rc6' of git://git.kernel...
+git tree:       upstream
+console+strace: https://syzkaller.appspot.com/x/log.txt?x=1600ea63980000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=b3e19fd08b312452
+dashboard link: https://syzkaller.appspot.com/bug?extid=5c915dc5dd417b83b348
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=13ba6d1f980000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=10dfdadb980000
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/e1d3f7f323a8/disk-e8784b0a.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/01c01dcebf01/vmlinux-e8784b0a.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/53cc8ab0ce4d/bzImage-e8784b0a.xz
+
+Bisection is inconclusive: the first bad commit could be any of:
+
+b79e04091010 Bluetooth: btintel: Fix null ptr deref in btintel_read_version
+e7b02296fb40 Bluetooth: Remove BT_HS
+
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=17d8bd73980000
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+5c915dc5dd417b83b348@syzkaller.appspotmail.com
+
+=====================================================
+BUG: KMSAN: uninit-value in l2cap_conless_channel net/bluetooth/l2cap_core.c:6757 [inline]
+BUG: KMSAN: uninit-value in l2cap_recv_frame+0xc9c5/0x18b10 net/bluetooth/l2cap_core.c:6831
+ l2cap_conless_channel net/bluetooth/l2cap_core.c:6757 [inline]
+ l2cap_recv_frame+0xc9c5/0x18b10 net/bluetooth/l2cap_core.c:6831
+ l2cap_recv_acldata+0xdd9/0x2ac0 net/bluetooth/l2cap_core.c:7514
+ hci_acldata_packet net/bluetooth/hci_core.c:3791 [inline]
+ hci_rx_work+0xb38/0x1130 net/bluetooth/hci_core.c:4028
+ process_one_work kernel/workqueue.c:3231 [inline]
+ process_scheduled_works+0xae0/0x1c40 kernel/workqueue.c:3312
+ worker_thread+0xea7/0x14d0 kernel/workqueue.c:3389
+ kthread+0x3e2/0x540 kernel/kthread.c:389
+ ret_from_fork+0x6d/0x90 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
+
+Uninit was created at:
+ slab_post_alloc_hook mm/slub.c:3994 [inline]
+ slab_alloc_node mm/slub.c:4037 [inline]
+ kmem_cache_alloc_node_noprof+0x6bf/0xb80 mm/slub.c:4080
+ kmalloc_reserve+0x13d/0x4a0 net/core/skbuff.c:583
+ __alloc_skb+0x363/0x7b0 net/core/skbuff.c:674
+ alloc_skb include/linux/skbuff.h:1320 [inline]
+ bt_skb_alloc include/net/bluetooth/bluetooth.h:493 [inline]
+ vhci_get_user drivers/bluetooth/hci_vhci.c:487 [inline]
+ vhci_write+0x128/0x910 drivers/bluetooth/hci_vhci.c:607
+ new_sync_write fs/read_write.c:497 [inline]
+ vfs_write+0xb2f/0x1550 fs/read_write.c:590
+ ksys_write+0x20f/0x4c0 fs/read_write.c:643
+ __do_sys_write fs/read_write.c:655 [inline]
+ __se_sys_write fs/read_write.c:652 [inline]
+ __x64_sys_write+0x93/0xe0 fs/read_write.c:652
+ x64_sys_call+0x306a/0x3ba0 arch/x86/include/generated/asm/syscalls_64.h:2
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xcd/0x1e0 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+CPU: 0 UID: 0 PID: 5180 Comm: kworker/u9:2 Not tainted 6.11.0-rc5-syzkaller-00310-ge8784b0aef62 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 08/06/2024
+Workqueue: hci0 hci_rx_work
+=====================================================
+
+
+---
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
