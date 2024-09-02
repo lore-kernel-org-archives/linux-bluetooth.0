@@ -1,79 +1,78 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f70.google.com (mail-io1-f70.google.com [209.85.166.70])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D29DE186287;
-	Mon,  2 Sep 2024 09:25:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B241E1AB6D4
+	for <linux-bluetooth@vger.kernel.org>; Mon,  2 Sep 2024 15:28:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.70
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725269154; cv=none; b=ZJIXsP0BRBY/Zb9ktSNxMNK31MqTIhIrU5Mf13FZ/ba97o1cpTpqGeYaCo0ZnGB7CvqGVA9wIOQbqzw0WLnMBb+bb4YR/xGXaIHKFQZUFRtvRx8IvBNYCdbS42GU5QPIu0wpgrW7HHdcaCgZbgRxlzrSf0CRSyTq4PMsAZAb07I=
+	t=1725290884; cv=none; b=s421io3rGQvAsU54GyMSk5mzE01J9JLrNw9jIkcVp4BB760sfKdbuTvHqLoVJhVwkJLD3zTAhwN5dUPEivHtSEJ6kaApg1DJQhOWqDKoUGpceILVbYjf+UyNFoXVs6n9i/mIcsP/BJUI9zmvMd/MSnB1ALNDyifzpXKaYUOUH0g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725269154; c=relaxed/simple;
-	bh=y2hA+BM6Wh4Gb/HYnUiwib15uBEwPAS/N4viBKH8hNM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=iySOvralyTf4ZEP0lgNSYqxSqi2bAUbskobTTKQA2nwOcOPLr0BixVE1NM52eGRy3uyKI38ARphV7BTRh+YH7TLCKZ0bBrAinKWCr7CLDKxKQuH5oZjMJqA6yPYj1yOeXlXWQUIQXOSkmWQy9Ir9nt+wch3xILWTSvxpuwsnEZo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BUiqE2Z6; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BUiqE2Z6"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 536A0C4CEC2;
-	Mon,  2 Sep 2024 09:25:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725269154;
-	bh=y2hA+BM6Wh4Gb/HYnUiwib15uBEwPAS/N4viBKH8hNM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=BUiqE2Z6SWe7wUi/B2Ju2JT/k3KCXpk+JIGcjkSRpX7fgURtevEka9vtefHW5mFX6
-	 jx06+/QruKGv/vXhhXn7AkEs7Bz5JaYeBfCmm/QrmPeuMXyOiyWcl3/gaAU+5+HGIS
-	 8ZpMEDRWZMRG2UWgoSm+j/guZf1Avwjbz2IC/vF/yROvZEtsFCn+MPWmGfHCrVh0Zw
-	 kEzu/9J0ekfVdfqqA0tbVZ5a2AsOjpEZOrnp1nEr9/9r3lQ3+vkN/maEZ3kfFQsE2+
-	 A6BOM8DZbrK4xnWvDEPiXTRbdOpattt9viJgbI0mRzPCzDAWWQCrG1QwmmRJRF7xq7
-	 hisGLBapCO4FA==
-Received: from johan by xi.lan with local (Exim 4.97.1)
-	(envelope-from <johan@kernel.org>)
-	id 1sl3K3-0000000077m-2Ifc;
-	Mon, 02 Sep 2024 11:26:07 +0200
-Date: Mon, 2 Sep 2024 11:26:07 +0200
-From: Johan Hovold <johan@kernel.org>
-To: Andreas Kemnade <andreas@kemnade.info>
-Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>, marcel@holtmann.org,
-	pmenzel@molgen.mpg.de, jirislaby@kernel.org,
-	gregkh@linuxfoundation.org, linux-kernel@vger.kernel.org,
-	linux-bluetooth@vger.kernel.org, Adam Ford <aford173@gmail.com>,
-	Tony Lindgren <tony@atomide.com>, tomi.valkeinen@ideasonboard.com,
-	=?utf-8?B?UMOpdGVy?= Ujfalusi <peter.ujfalusi@gmail.com>,
-	robh@kernel.org, hns@goldelico.com
-Subject: Re: [PATCH v4 0/4] Bluetooth/gnss: GNSS support for TiWi chips
-Message-ID: <ZtWEr8ESJGLa-lUm@hovoldconsulting.com>
-References: <20240606183032.684481-1-andreas@kemnade.info>
- <CABBYNZ+Fz2TLSNa28H3kjVKOSA7C-XOzdQJiHdJs3FKxnq01DA@mail.gmail.com>
- <20240902112221.1a6ac6f5@akair>
+	s=arc-20240116; t=1725290884; c=relaxed/simple;
+	bh=fcsvwgJHszrqFYBuVGMJyWBjEoNkn9u8s/Qvo7dREkE=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=OOQxW2JB1WuGe6yJw+rYIKmGN2x2mpkaFiiY77bqSaOfKw3F+JiMv1eYTnCYMKkwDnleFwNCOmcaG2z1PizuciHtecdPy3t5MkHfEH/AscBQZF1J6Q6UvxpA/2X3myn4s2W3JlukyodQmV4/AfcLfxB8aFDF+wOiabZJphdbbaI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.70
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-82a124bc41aso538494239f.2
+        for <linux-bluetooth@vger.kernel.org>; Mon, 02 Sep 2024 08:28:02 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1725290882; x=1725895682;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=DPWC6U8f2qBdEbiB/1tHLk14BDYkG8mFDHPKIKYsGpk=;
+        b=myRFzbXdVRzCStcZ/qrNsJehBZzUkI7wHUEq4xbJ/eST/CrAsKSPX4NgOrqOB78NeJ
+         J4XSIfy/WfmT4AVQub1dFUxbVcLCYNI9cJaUrKdgfDVX+hPh9CCD1qv2PJwo3WO3BusM
+         x7HMVOpT1sBfupktogGY72HNlfrArcSyetttzGQ74RVvh1OakC0mjzwMimoL5l8bCwpB
+         DGgEfKkqwnGbcOrL6/gRlyi/vZEJzvNlW8NjBgUEkfCy2E8VjXrteH53kJchWlXOtnUX
+         3WjzYL72hzwFfm6Di4po2wZgascrHBw1ID3a+/+5Ouf1sq0ZOvGNcyaXV6muRpYyKzXs
+         X6IA==
+X-Forwarded-Encrypted: i=1; AJvYcCXniaFRU5Q6RPbQibhnHgmQSNhdYJa163NQzT1uulO2NtRi9dmyJ0nutiGlGBA9FbTkt6q9oA7UYq6wTLdx5dA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywohpq5hmxGhYk4ckt/zfoJM7WKIvZDZeErjZlDL7+ewktUrWbN
+	w4hVqy4lrr9N40O1bWvCdQy5Nmo9VYt0mIqThPt79+eNuYTusoep+MvgSJXpdRoMr9VThOwrKh2
+	cPKTWHyYMH664gx7q4/Z7lEfUXslrBlQlew3e0xl1cjFSmxMNNS0jI2Q=
+X-Google-Smtp-Source: AGHT+IGYE7aRkq1QdG5CqeZumrhss9UwB66VHx1USISJdAEcgiBS8pGvcFiBithIiWwzkPxwiT2pBaJMBi9K1YaRPMlswNp5FSto
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240902112221.1a6ac6f5@akair>
+X-Received: by 2002:a05:6638:8704:b0:4b9:e5b4:67fd with SMTP id
+ 8926c6da1cb9f-4d017d77c32mr899228173.1.1725290881918; Mon, 02 Sep 2024
+ 08:28:01 -0700 (PDT)
+Date: Mon, 02 Sep 2024 08:28:01 -0700
+In-Reply-To: <00000000000087bd88062117d676@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <00000000000026b5250621249667@google.com>
+Subject: Re: [syzbot] [fs?] [mm?] INFO: task hung in page_cache_ra_unbounded (2)
+From: syzbot <syzbot+265e1cae90f8fa08f14d@syzkaller.appspotmail.com>
+To: akpm@linux-foundation.org, davem@davemloft.net, johan.hedberg@gmail.com, 
+	kuba@kernel.org, linma@zju.edu.cn, linux-bluetooth@vger.kernel.org, 
+	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-mm@kvack.org, luiz.dentz@gmail.com, marcel@holtmann.org, 
+	netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com, willy@infradead.org
+Content-Type: text/plain; charset="UTF-8"
 
-On Mon, Sep 02, 2024 at 11:22:21AM +0200, Andreas Kemnade wrote:
-> Am Thu, 6 Jun 2024 16:04:10 -0400
-> schrieb Luiz Augusto von Dentz <luiz.dentz@gmail.com>:
+syzbot has bisected this issue to:
 
-> > > Andreas Kemnade (4):
-> > >   gnss: Add AI2 protocol used by some TI combo chips
-> > >   Bluetooth: ti-st: Add GNSS subdevice for TI Wilink chips  
-> > 
-> > The bluetooth one looks relatively simple so I could take that one and
-> > push to bluetooth-next if there are no dependencies on the other
-> > changes.
-> > 
-> hmm, nothing happens here. You did not ack it so Johan could not take
-> it. So what about taking the bluetooth patch now and the other ones can
-> go in for maybe 6.13? At least that would reduce spam and the poor
-> bluetooth ci bot will not spam complaints because it sees non-bluetotoh
-> patches.
+commit e305509e678b3a4af2b3cfd410f409f7cdaabb52
+Author: Lin Ma <linma@zju.edu.cn>
+Date:   Sun May 30 13:37:43 2021 +0000
 
-No, please don't merge anything before I've looked at this. It's on my
-list, I'll try to get to this soon.
+    Bluetooth: use correct lock to prevent UAF of hdev object
 
-Johan
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=16a579eb980000
+start commit:   431c1646e1f8 Linux 6.11-rc6
+git tree:       upstream
+final oops:     https://syzkaller.appspot.com/x/report.txt?x=15a579eb980000
+console output: https://syzkaller.appspot.com/x/log.txt?x=11a579eb980000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=660f6eb11f9c7dc5
+dashboard link: https://syzkaller.appspot.com/bug?extid=265e1cae90f8fa08f14d
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=16f8f0fb980000
+
+Reported-by: syzbot+265e1cae90f8fa08f14d@syzkaller.appspotmail.com
+Fixes: e305509e678b ("Bluetooth: use correct lock to prevent UAF of hdev object")
+
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
