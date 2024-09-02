@@ -1,112 +1,112 @@
-Received: from mail-lf1-f45.google.com (mail-lf1-f45.google.com [209.85.167.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.andi.de1.cc (mail.andi.de1.cc [178.238.236.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A90EB155C8D
-	for <linux-bluetooth@vger.kernel.org>; Mon,  2 Sep 2024 08:33:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DB95187355;
+	Mon,  2 Sep 2024 09:22:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.238.236.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725266034; cv=none; b=LFiX51vksar7WEzX9yk8rQtcfIInLMqPrz7iNiFHdsuDdVetEuvhUEyeuRR43gGbT/NlXfw67FfPUqteCAUpe2x30GIk0lhPqa3AC7R/FUiNaRZNojnwByPtFS8Yb+3nfbqcPLWSmyyk25/jCVJ/Bjh31qVaFM6+/tLTMq4oLlo=
+	t=1725268947; cv=none; b=NiKfdppAZXRXz0dFFQQQdPIUDrYoxyMjOkQPEee+rdkWc8UxVTADknlvJ4xbGattkbu3rd8l8ImdEZbqO1DepbR3PSyFiRuGXUXeDArYk2Kvf98u+JRx0R+ZYqEP5eHnjRcK3oCz/Z70OcrbozMS0JPczqrZNco06PKQh4crJFc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725266034; c=relaxed/simple;
-	bh=zrv086Fdv9w35daxdi6hHW2giaN+qyNFa21Z0q4DoZ8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=F41tdjB8zoxB0Dy9mk2hCZ9SoftW43VZWmaIj3pWK6MjNmak32OWy63yCboFhXkAImBe8Ho+kOI/n+ksoc78tgaJmaRCxGcNIf2gwLm9hE6UTT8QJKNYsthX25mvi17jVYp5mIyL4ubhU4MN0wrTu9HlB/0hufdmKOFkydVX7Ic=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=jYOjl+0A; arc=none smtp.client-ip=209.85.167.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
+	s=arc-20240116; t=1725268947; c=relaxed/simple;
+	bh=xXSRxoBLqMmn53NEyGThH49aDQBEWaB97Ehs5ZCQHbI=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=sR1Y9WnVEA/tn15QuHyJiaB8yXMuxkHCamAUaOXI3I9TfB8Wuc792l6mASQYo9PnTYUOs/akfFxqfBDqJni6yKfFDzUHPtyYMlWvpEeEQw4SJ1k/SKtfCmxSMS50w6MfaaH9RVANrUnVTWW4rjAjJ1e899UY2KBWPobbdRydZoI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=kemnade.info; spf=pass smtp.mailfrom=kemnade.info; dkim=pass (2048-bit key) header.d=kemnade.info header.i=@kemnade.info header.b=05Ja1ol6; arc=none smtp.client-ip=178.238.236.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=kemnade.info
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kemnade.info
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="jYOjl+0A"
-Received: by mail-lf1-f45.google.com with SMTP id 2adb3069b0e04-5334879ba28so5525722e87.3
-        for <linux-bluetooth@vger.kernel.org>; Mon, 02 Sep 2024 01:33:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1725266031; x=1725870831; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=goZxaS9ZQb5+JNlLUTZNbTEFCx+Y5sRzY+bt3xQbfq8=;
-        b=jYOjl+0AcPqri4YkwLEYNf6WxPMylAw/SUhWSkk6jJEiaXeBGDzs8bT3wtRAjLsGaZ
-         2DksmifeiG9dfc/fRRuMMgZ1D6u/Qsc6En2AtUw+onzkMdNGJ4I2sDNfRS5wF2xqFHW2
-         A+/84UdxjHj3DtNEcBHM84l+rp+5ZlNGt9OItWsMtzV2PtS96VRjjeOgLJVrflccPXdf
-         JbsieIwJHbZ7Oyihgk/TGrvwfgJG2DyVniqomFXrtGrk12kHtXaPG46xee9OIxCJqWe7
-         8iFv2crS5cN4P22OCftYdiTxqwKl0Df3RSJYhFj513qvQdWsNjI5Gn95JSk1NuRcgxiF
-         It8Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725266031; x=1725870831;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=goZxaS9ZQb5+JNlLUTZNbTEFCx+Y5sRzY+bt3xQbfq8=;
-        b=dxNeMg9ZBA9Jgdb0N2zx7E/EQAbs9ehd++2F/9l0Fl+CIZKJ9wkoT1zdbUwZDlB4yw
-         dHtnrEkViTZ69mgIbljBlzGmJkTOYSPnQvtD/PzdirTgvanKW+oBMFAeG4Pk0L9D9lRn
-         UdCtGCcGfLBYKvhw68xL9MqlFE4NPuRGTEf+rf47PvsG2rWJZqFHwJ1058Vm0YfgsC6f
-         sOwDoHFm7gvCTq1aWQzOH4R/yQwgbQCZ2bioCCMlqrlTpkvxE2TO5ljeM/6ML8aBYuZ5
-         9b8wJD5COl2uxazHFFfGlWD7ZwtkGs1kl5xHxV0NxFnjll2lVgR1fJAfg3WG9xVlv6IQ
-         yMOw==
-X-Forwarded-Encrypted: i=1; AJvYcCXHFi3PDIG0eBu8T9LFBF0g/VCCnUsCXw4V65kBfiIsOoXufJ9UOPfE9eMmsWPFdP1pAFl5iTgqnAyfay4+sg8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzh8SzLTyYZr3SmmGbAyloX4/hZo75a988LsAE2+P+lZqnktkKK
-	ru6ZesPm9//D56/sd+QN9Br5AW+GY7LSXFTQOlgduX7UIQIoK1+FVecCuRnzATtt6iOMxI34hje
-	4CYtCpNxbhrdI3pLYUMMUqxdeHDVRYcfuvKVo8Q==
-X-Google-Smtp-Source: AGHT+IFKRDHwzB9Quu4PF58ILc2a/dguARhk2kJwxG3I8e6vD/m0GzTIkGdk+QIAGoeC6Hg1Qc9gjF6NjrTW5KKvYuM=
-X-Received: by 2002:a05:6512:3f26:b0:52c:df3d:4e9d with SMTP id
- 2adb3069b0e04-53546b8d6bfmr6080640e87.37.1725266030043; Mon, 02 Sep 2024
- 01:33:50 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kemnade.info header.i=@kemnade.info header.b="05Ja1ol6"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=kemnade.info; s=20220719; h=References:In-Reply-To:Cc:From:Sender:Reply-To:
+	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
+	Resent-To:Resent-Cc:Resent-Message-ID;
+	bh=JJRNQx3uCtDtruHeYL7QK+pnZYNa7ZPC2N20RQFGTVc=; b=05Ja1ol6KWfmVDSSME+pjVSDfE
+	BMbUFpk6bDs1uyFtE3OAVp8zqvtXJZs3MoJjaKcaAzPFYHhK/2vQksbhV31rwneRk+aSkepOdxeuN
+	oqIUIS+z/BUyRusWCC3Scv3VjurfFx1SMaZUFcLZAgpiYOorb2aGtv95p2tFc4RXNv/uiW6echBhD
+	3blNhG+L3GIZmcQdLX9s9Ty+5So9ZmbDafVzuU/iyB8QbxATnSKXY9RPVXtShsYmG/2zD2eXe6GUG
+	QkPdwoyNYktd2lDtcFVaeqiPn2tUtErbSXeHxx1oJLdSVNqBa86tXu7ytQR5zfZrktWnz7eidtLAM
+	0MsCKmiA==;
+Date: Mon, 2 Sep 2024 11:22:21 +0200
+From: Andreas Kemnade <andreas@kemnade.info>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: marcel@holtmann.org, johan@kernel.org, pmenzel@molgen.mpg.de,
+ jirislaby@kernel.org, gregkh@linuxfoundation.org,
+ linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org, Adam Ford
+ <aford173@gmail.com>, Tony Lindgren <tony@atomide.com>,
+ tomi.valkeinen@ideasonboard.com, =?UTF-8?B?UMOpdGVy?= Ujfalusi
+ <peter.ujfalusi@gmail.com>, robh@kernel.org, hns@goldelico.com
+Subject: Re: [PATCH v4 0/4] Bluetooth/gnss: GNSS support for TiWi chips
+Message-ID: <20240902112221.1a6ac6f5@akair>
+In-Reply-To: <CABBYNZ+Fz2TLSNa28H3kjVKOSA7C-XOzdQJiHdJs3FKxnq01DA@mail.gmail.com>
+References: <20240606183032.684481-1-andreas@kemnade.info>
+	<CABBYNZ+Fz2TLSNa28H3kjVKOSA7C-XOzdQJiHdJs3FKxnq01DA@mail.gmail.com>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240805-clk-new-helper-v2-0-e5fdd1e1d729@linaro.org>
-In-Reply-To: <20240805-clk-new-helper-v2-0-e5fdd1e1d729@linaro.org>
-From: Bartosz Golaszewski <brgl@bgdev.pl>
-Date: Mon, 2 Sep 2024 10:33:38 +0200
-Message-ID: <CAMRc=MdVRdy7tBcx0RiQG8uGf9gDzGTRL7XrXDtOkDxss4et4A@mail.gmail.com>
-Subject: Re: [PATCH v2 0/2] clk: implement a new managed helper and add first user
-To: Michael Turquette <mturquette@baylibre.com>, Stephen Boyd <sboyd@kernel.org>, 
-	Russell King <linux@armlinux.org.uk>, Marcel Holtmann <marcel@holtmann.org>, 
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-clk@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-bluetooth@vger.kernel.org, 
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Aug 5, 2024 at 10:57=E2=80=AFAM Bartosz Golaszewski <brgl@bgdev.pl>=
- wrote:
->
-> I'm posting this as RFC to see if there's any interest. I noticed that
-> some drivers do: clk_get() -> clk_set_rate() -> clk_prepare_enable(). I
-> was wondering if it's worth factoring this out into dedicated helpers.
->
-> This series adds a new such helper for the "optional-enabled" use-case
-> and the first user. Let me know if this makes sense.
->
-> Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-> ---
-> Changes in v2:
-> - s/EXPORT_SYMBOL/EXPORT_SYMBOL_GPL/
-> - add a stub for !COMMON_CLK
-> - Link to v1: https://lore.kernel.org/r/20240801-clk-new-helper-v1-0-81e9=
-338b7b17@linaro.org
->
-> ---
-> Bartosz Golaszewski (2):
->       clk: provide devm_clk_get_optional_enabled_with_rate()
->       Bluetooth: hci_qca: use devm_clk_get_optional_enabled_with_rate()
->
->  drivers/bluetooth/hci_qca.c | 24 ++----------------------
->  drivers/clk/clk-devres.c    | 28 ++++++++++++++++++++++++++++
->  include/linux/clk.h         | 33 +++++++++++++++++++++++++++++++++
->  3 files changed, 63 insertions(+), 22 deletions(-)
-> ---
-> base-commit: d6dbc9f56c3a70e915625b6f1887882c23dc5c91
-> change-id: 20240801-clk-new-helper-7853f662cda1
->
-> Best regards,
-> --
-> Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
->
+Hi,
 
-It's been a month. Any comments on this?
+Am Thu, 6 Jun 2024 16:04:10 -0400
+schrieb Luiz Augusto von Dentz <luiz.dentz@gmail.com>:
 
-Bart
+> Hi Andreas,
+>=20
+> On Thu, Jun 6, 2024 at 2:30=E2=80=AFPM Andreas Kemnade <andreas@kemnade.i=
+nfo>
+> wrote:
+> >
+> > Some of these chips have GNSS support. In some vendor kernels
+> > a driver on top of misc/ti-st can be found providing a /dev/tigps
+> > device which speaks the secretive Air Independent Interface (AI2)
+> > protocol.
+> >
+> > To be more compatible with userspace send out NMEA by default but
+> > allow a more raw mode by using a module parameter.
+> >
+> > This was tested on the Epson Moverio BT-200.
+> >
+> > Who will take this series (1-3)? GNSS with ack from Bluetooth?
+> >
+> > Changes since V3:
+> > - Finally remove the period from 1/4 subject
+> > - include things directly for get_unaligned_le16() to fix 0-day
+> > issues
+> >
+> > Changes since V2:
+> > - Optimize waits
+> > - Fix some packet analysis / checksum computation issue
+> > - Adding a proposal for removing those waits as RFC
+> > - Minor spell corrections and improved descriptions
+> >
+> > Changes since V1:
+> > - Set up things for NMEA output
+> > - Powerup/down at open()/close()
+> > - split out logic between drivers/bluetooth and drivers/gnss
+> > - leave out drivers/misc/ti-st driver removal to avoid
+> >   filling up mailboxes during the iterations, this series is
+> >   still a proof that it is not needed, will take the brush after
+> >   this series is accepted.
+> >
+> >
+> > Andreas Kemnade (4):
+> >   gnss: Add AI2 protocol used by some TI combo chips
+> >   Bluetooth: ti-st: Add GNSS subdevice for TI Wilink chips =20
+>=20
+> The bluetooth one looks relatively simple so I could take that one and
+> push to bluetooth-next if there are no dependencies on the other
+> changes.
+>=20
+hmm, nothing happens here. You did not ack it so Johan could not take
+it. So what about taking the bluetooth patch now and the other ones can
+go in for maybe 6.13? At least that would reduce spam and the poor
+bluetooth ci bot will not spam complaints because it sees non-bluetotoh
+patches.
+
+Regards,
+Andreas
