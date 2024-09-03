@@ -1,130 +1,123 @@
-Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f51.google.com (mail-ot1-f51.google.com [209.85.210.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 710E815574F
-	for <linux-bluetooth@vger.kernel.org>; Tue,  3 Sep 2024 18:38:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AA5826ACC
+	for <linux-bluetooth@vger.kernel.org>; Tue,  3 Sep 2024 20:11:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725388707; cv=none; b=aq1ph1jCn3t0D7w1FeQt5moeba9yW76wZySz19XOiesDg//H2mt487pQn8YpNT9zhpW4vrtzXav0bRFeKiBnJsx4psG1mesxIarzsywg5f0KhudYqK2y/vWDJWkkDTFFn+rtNZhXWZhWafcTyvh6iPq5PVBOMkeaTtAV8vzGUHs=
+	t=1725394282; cv=none; b=Yl0K8/tv9ZAw94ZOdTyz30fsuQwaz/WcuebAS6xWhMgz4pZN8O7XLZ3AuJQk2f/6ERhruRcVsVNEX53J6anDJStJ2eb1/zrv/IL0rPLLyISLiyjkDBxbBwcQO4golit+kvnnthQH6qA3a5eW2fleNbT84c4YPCmjCirdfYVfdUo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725388707; c=relaxed/simple;
-	bh=j5C5Alu4DSE+v664/7R5D9NGIIqfVVuW4VHnqZihLes=;
-	h=From:To:Subject:Date:Message-Id:MIME-Version:Content-Type; b=d2UuM/CloUk9uOF5629oMsbQX3dPwJOWpPSr4BhZOlSl37EFVkgFIgu+phBLC/55mZMJmZ7n8A1rrxl4QDbgmKpJ5+aF3KyQuFHmQ9tpuQylH2Pb9/P+TxZ9Q6F1dhGT+GTddQ0GRNBwR1DsO9gDakE15fFQAszYVQUfBqi8e2E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=HxBE+cUJ; arc=none smtp.client-ip=148.251.105.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+	s=arc-20240116; t=1725394282; c=relaxed/simple;
+	bh=+5m7UgSzqu/4NKjuAaUmztjc+HJECkmaw/PAw+4/0Tc=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=hXNuAFZP99UARYzBz+hsTOx4DpxrcwN285i9/qZT7tUGwNPEvGQutzZ79Ac7eEyKYb1kqjok81gD1mMRlnxsyIxfZGzWxFcvJjPfH+/SE/C5/Ug8YbZqlTN7XpeoQV6qoR2hMVuX4lQrOneDuVnZ83bpuiPBX0tTmF5NdcGKvbQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RZAHWBua; arc=none smtp.client-ip=209.85.210.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="HxBE+cUJ"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1725388703;
-	bh=j5C5Alu4DSE+v664/7R5D9NGIIqfVVuW4VHnqZihLes=;
-	h=From:To:Subject:Date:From;
-	b=HxBE+cUJAlYd1OAwtrS6d+woUPKYzJuUslnF8WGsyn4QYMrQf+QWKUyKs+hOWMlwm
-	 zMdrHM9aX+65QQGQaRqz4/BtENaePSfbaImToNxShkNrYiUs9em8D30RJj3YclEiJv
-	 TowREzgwqpvE1jugoErbP7QNgvJw85cJDHCJCkSZf643ErpsqgE6hue5oB1osSqPLx
-	 z4z1Mct2EOtr/rPd8zYSIEYl+XDDHaI2mWipBhSpUEcBJEQX4S7qxTADqa8zKmlJ5B
-	 I/gLAixUPpOA9ureKFHZKbSpRCktfLuPyjm/Uyps5s+pT/QJm/E+MUmlRy9fazlvfd
-	 qvqlS6CJ2O0Cw==
-Received: from fdanis-XPS-13-9370.. (67.227.121.78.rev.sfr.net [78.121.227.67])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: fdanis)
-	by bali.collaboradmins.com (Postfix) with ESMTPSA id 5594317E121A
-	for <linux-bluetooth@vger.kernel.org>; Tue,  3 Sep 2024 20:38:23 +0200 (CEST)
-From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?= <frederic.danis@collabora.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v2] gobex: Replace g_convert by utf16_to_utf8
-Date: Tue,  3 Sep 2024 20:38:17 +0200
-Message-Id: <20240903183817.155842-1-frederic.danis@collabora.com>
-X-Mailer: git-send-email 2.34.1
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RZAHWBua"
+Received: by mail-ot1-f51.google.com with SMTP id 46e09a7af769-70f73ca989aso2169476a34.2
+        for <linux-bluetooth@vger.kernel.org>; Tue, 03 Sep 2024 13:11:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1725394280; x=1725999080; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=1ePWQqjUQ47q4aBd8q213gyVk0FoOCL2kLAzSWk72II=;
+        b=RZAHWBuabLr8ccy2f0HzSXzo3PQPXWSoY9so0XA9cyxuZ3PogaLpGOlCnDqV6PGLqz
+         ZV6Tj5zDypqankCr9MJLT7Jwd3iQuyycRu9ogSeQt5diR+fzEv5PZPApR/7xahiHeAQl
+         h3oRmnIk8exP83OUffTcxmHRrGtCd3McZUFHv8NDCeyuOS+TGbvQDOipNUlCkCYCfef8
+         Pv+B7VYTjeC3F3MUjjOJ0IncQnkMBCxZYKZ8YFeYwTJ94z0VYo/x2gQ7ruPxg2sRFQvY
+         OtDrLhWHcETN9U66Qi51erohal6bDmRee6W2jaZdfCHjqCPSvvi2xQb5HiDhxNRVoQgM
+         5zEg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1725394280; x=1725999080;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=1ePWQqjUQ47q4aBd8q213gyVk0FoOCL2kLAzSWk72II=;
+        b=R/GFX21FhAlK48Tr9WiMcyhokpMt9ffrsNDeCc0Tq80w26Na3qbYG0QlB6a7J+wi6G
+         ew9GmuBqZ/Xczo2bdQcvAjikHJZaFFZQ4rAqjfFNVlC8ZjrnA6FL6Nyb1RUyQ02bCEMj
+         +DrJtHzlgRNNtq1gclUvgPfoYcqJirwkAvAOxhCpTDI0L8y84TY70W5ylqk4BkYEoKct
+         6Pk6+E1xCYuHGNPy+799fhb7QNnpQxj9gdNU4jhOCFs411/O4Jd+yQ+wqrcZ60YNaYT3
+         05Sq0fAdWBCTLRi0F9QephiUsSu0haPkzsuoc58/Uh+HMUtWYLQk74Hr7/MzMcVZo9FE
+         pYQg==
+X-Gm-Message-State: AOJu0Yy+V6vElN8CIehpi8m53A1ivH9bq8IIiADdm7SOQbcFaG1/WNv7
+	BdTNg2u/k1d1gQly0BK4wNlPUnjx4TqsEgfhCai2bu2oeDSS5HBOgPxPEg==
+X-Google-Smtp-Source: AGHT+IEvty60exvQDIBxDaW2jj599YdEY191ZvhNJOI87m11flgv38JlQvpGUxrd06/j/VidaSiAig==
+X-Received: by 2002:a05:6830:618b:b0:704:482e:216a with SMTP id 46e09a7af769-70f5c39235amr24076870a34.14.1725394279453;
+        Tue, 03 Sep 2024 13:11:19 -0700 (PDT)
+Received: from [172.17.0.2] ([40.79.247.234])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6c340c435dbsm56741266d6.71.2024.09.03.13.11.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 03 Sep 2024 13:11:19 -0700 (PDT)
+Message-ID: <66d76d67.0c0a0220.c11e6.56ab@mx.google.com>
+Date: Tue, 03 Sep 2024 13:11:19 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============4447301288362762988=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, frederic.danis@collabora.com
+Subject: RE: [BlueZ,v2] gobex: Replace g_convert by utf16_to_utf8
+In-Reply-To: <20240903183817.155842-1-frederic.danis@collabora.com>
+References: <20240903183817.155842-1-frederic.danis@collabora.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-g_lib may be built without the gconv modules for UTF-16, which
-prevent to use g_convert().
-This commit replaces it by a function similar to the existing
-utf8_to_utf16() function.
+--===============4447301288362762988==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=886437
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.50 seconds
+GitLint                       PASS      0.31 seconds
+BuildEll                      PASS      24.99 seconds
+BluezMake                     PASS      1764.69 seconds
+MakeCheck                     FAIL      12.86 seconds
+MakeDistcheck                 PASS      182.50 seconds
+CheckValgrind                 PASS      257.54 seconds
+CheckSmatch                   PASS      363.81 seconds
+bluezmakeextell               PASS      122.14 seconds
+IncrementalBuild              PASS      1524.38 seconds
+ScanBuild                     WARNING   1031.59 seconds
+
+Details
+##############################
+Test: MakeCheck - FAIL
+Desc: Run Bluez Make Check
+Output:
+
+make[3]: *** [Makefile:11766: test-suite.log] Error 1
+make[2]: *** [Makefile:11874: check-TESTS] Error 2
+make[1]: *** [Makefile:12303: check-am] Error 2
+make: *** [Makefile:12305: check] Error 2
+##############################
+Test: ScanBuild - WARNING
+Desc: Run Scan Build
+Output:
+gobex/gobex-header.c:95:2: warning: Null pointer passed to 2nd parameter expecting 'nonnull'
+        memcpy(to, from, count);
+        ^~~~~~~~~~~~~~~~~~~~~~~
+1 warning generated.
+
+
+
 ---
-v1 -> v2: Fix missing g_free
+Regards,
+Linux Bluetooth
 
- gobex/gobex-header.c | 41 +++++++++++++++++++++++++++++++++++------
- 1 file changed, 35 insertions(+), 6 deletions(-)
 
-diff --git a/gobex/gobex-header.c b/gobex/gobex-header.c
-index 002ba8861..a6cabdf41 100644
---- a/gobex/gobex-header.c
-+++ b/gobex/gobex-header.c
-@@ -62,6 +62,34 @@ static glong utf8_to_utf16(gunichar2 **utf16, const char *utf8) {
- 	return utf16_len;
- }
- 
-+static glong utf16_to_utf8(char **utf8, const gunichar2 *utf16, glong len,
-+				GError **err)
-+{
-+	glong utf8_len;
-+	int i;
-+	gunichar2 *buf;
-+
-+	if (*utf16 == '\0') {
-+		*utf8 = NULL;
-+		return 0;
-+	}
-+
-+	/* OBEX requires network byteorder (big endian) UTF-16
-+	 * but g_utf16_to_utf8 expects host-byteorder UTF-8
-+	 */
-+	buf = g_malloc0(sizeof(gunichar2) * len);
-+	for (i = 0; i < len; i++)
-+		(buf)[i] = g_ntohs(utf16[i]);
-+
-+	*utf8 = g_utf16_to_utf8(buf, -1, NULL, &utf8_len, err);
-+	if (*utf8 == NULL)
-+		utf8_len = -1;
-+
-+	g_free(buf);
-+
-+	return utf8_len;
-+}
-+
- static guint8 *put_bytes(guint8 *to, const void *from, gsize count)
- {
- 	memcpy(to, from, count);
-@@ -130,7 +158,7 @@ GObexHeader *g_obex_header_decode(const void *data, gsize len,
- 	GObexHeader *header;
- 	const guint8 *ptr = data;
- 	guint16 hdr_len;
--	gsize str_len;
-+	glong str_len;
- 	GError *conv_err = NULL;
- 
- 	if (len < 2) {
-@@ -177,13 +205,14 @@ GObexHeader *g_obex_header_decode(const void *data, gsize len,
- 			goto failed;
- 		}
- 
--		header->v.string = g_convert((const char *) ptr, hdr_len - 5,
--						"UTF-8", "UTF-16BE",
--						NULL, &str_len, &conv_err);
--		if (header->v.string == NULL) {
-+		str_len = utf16_to_utf8(&header->v.string,
-+					(const gunichar2 *) ptr,
-+					hdr_len - 5,
-+					&conv_err);
-+		if (str_len < 0) {
- 			g_set_error(err, G_OBEX_ERROR,
- 					G_OBEX_ERROR_PARSE_ERROR,
--					"Unicode conversion failed: %s",
-+					"UTF16 to UTF8 conversion failed: %s",
- 					conv_err->message);
- 			g_error_free(conv_err);
- 			goto failed;
--- 
-2.34.1
-
+--===============4447301288362762988==--
