@@ -1,37 +1,37 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D2A81CE6E1
-	for <linux-bluetooth@vger.kernel.org>; Wed,  4 Sep 2024 10:52:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 077661DA2F7
+	for <linux-bluetooth@vger.kernel.org>; Wed,  4 Sep 2024 13:26:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725447173; cv=none; b=mJnuhNoK51XDEPQSNl+7LjCXkieVnP9Y5helZXOMYlo2apLdxTQDyeCPFHU2mswrainjwKkRvYpYqqh+jiO9ewNa4d9unCvkU7AY63HxPa0wOfZH6MMSzeNq5kZo6/4aJY3JexyBVdd5Hb6NL5HXCom8AxwVElNL7P0RgviGfYs=
+	t=1725456386; cv=none; b=meRWr9VsNSXoRCpcyqPsLkmREwMAsUVv/d4NEGtYa5HreRlcj0vHp5RzzpQfWVl+6ugeqBJaRPBMdaaUFd0SMd74EpPLmsImeYC5AZbEy2kZ/nqSL7BOwmemid8CN19K7NixYLFd5UuML6qRNEBndfg7mgKjwi9WUaVZTFzWEfk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725447173; c=relaxed/simple;
-	bh=PRobZXQA8iJO43Vz/XDWhm8dtTWuC0AhqJWSSg8MuPI=;
+	s=arc-20240116; t=1725456386; c=relaxed/simple;
+	bh=aLAaR4znabY7rOHqMAqot775DxezYoxbc+8CDERzYeY=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=J6SecPq37cRFrT2FoAMjE4PQoPwLLX5wnE2vArmidLpVWQU/GYyXrVlq4D1WzlxaBU7J1Dejo3zikFANnsFHTyyhiDbdOFM+KFnrVy9Uv1wZphZf9dFJjNa+Ny67YdLWzqSe1flpd4bnG+0gjj2LWsHT06sMJXaDd/dof3DzGns=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ci2XiSjG; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:MIME-Version; b=szKY754zwhbAyhKhS7NWhbvPj8xM9GVFifP/xrMgE5tx9rMThhxX8AToBMsv07/YBWWJIiSQyk9zxJ3CPZBnXjMledz82mH4XlK18RgChAFjGNNvJesIXkOc093sIO7V1pAmKIAXcUIy9yMlNAxobuyu4CLRb+IBn6CWZNyHDBw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GFOJtuvn; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ci2XiSjG"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id F2F34C4CEC2
-	for <linux-bluetooth@vger.kernel.org>; Wed,  4 Sep 2024 10:52:52 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GFOJtuvn"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 8F808C4CEC3
+	for <linux-bluetooth@vger.kernel.org>; Wed,  4 Sep 2024 13:26:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725447173;
-	bh=PRobZXQA8iJO43Vz/XDWhm8dtTWuC0AhqJWSSg8MuPI=;
+	s=k20201202; t=1725456385;
+	bh=aLAaR4znabY7rOHqMAqot775DxezYoxbc+8CDERzYeY=;
 	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=Ci2XiSjGqw/ufsvoASLQltEChiFiYTM56Sbx3vFeghIiv+pBqwcT+u87QSi7EpK+Z
-	 ZiKwBi1n19gBPz/pjI4r9lQmBdrgMEcUOf/l+y09F3KmPQeU5jGEQJz4Ed9ZrKFtM9
-	 E5neKqeFt+vuwEyLWD2l+4zlSJRDb3jab+aOg1Kc5y6nacKHGCwMYMayrkHradj+iS
-	 Sf+K2wK90lC9g9hbQ3/m45nrOubNQ8yqIZ5FKeFPSrCLbD8NVO4Cf9D+ReofKJu7os
-	 2OLxu30xIPjc2YelHDuDGagHYa5Y+jtWpOVwOtbg0p8juUkAm3PqLULNbqBDQMi9jw
-	 9EqYiULIthxPg==
+	b=GFOJtuvnS/UY+8+poO/qS2YfX3kBUrEBTVG+L9YiKWb8GNTvn/Islf7lOW/LmUzrR
+	 Sg74v/i90JlISQ73VZy//ZVG5ouGiqbIlWT05PrX1gi0OdbNl3WWDtdZuuoer0mP2C
+	 YDMzyNh/+UKJk0GCOKA3O8scLbGB5KHr87CJdTBtgegIOWHwheX5YQKjTCg4rvVMVi
+	 /jvAw/Ji0CKL11kojn2I97m4m+rfKy7tdgi6OWcBdCP51f2cDeix/Cu+l5qGOUiOIt
+	 V/MvTpIIr25nVxwzZhfy3pMHddrWKHc9DIj0XgF71TwzIqhax4O82wPdZhiMV0iez6
+	 1UQ18vCzW+ZuQ==
 Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id EA7BBC53B73; Wed,  4 Sep 2024 10:52:52 +0000 (UTC)
+	id 7F0DEC53B73; Wed,  4 Sep 2024 13:26:25 +0000 (UTC)
 From: bugzilla-daemon@kernel.org
 To: linux-bluetooth@vger.kernel.org
 Subject: [Bug 219234] btusb: regression in rtl8761bu firmware
-Date: Wed, 04 Sep 2024 10:52:52 +0000
+Date: Wed, 04 Sep 2024 13:26:25 +0000
 X-Bugzilla-Reason: AssignedTo
 X-Bugzilla-Type: changed
 X-Bugzilla-Watch-Reason: None
@@ -41,13 +41,13 @@ X-Bugzilla-Version: 2.5
 X-Bugzilla-Keywords: 
 X-Bugzilla-Severity: normal
 X-Bugzilla-Who: alexander@tsoy.me
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
+X-Bugzilla-Status: RESOLVED
+X-Bugzilla-Resolution: INVALID
 X-Bugzilla-Priority: P3
 X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
 X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-219234-62941-M6bDx4S7H7@https.bugzilla.kernel.org/>
+X-Bugzilla-Changed-Fields: bug_status resolution
+Message-ID: <bug-219234-62941-AQQCWzi00T@https.bugzilla.kernel.org/>
 In-Reply-To: <bug-219234-62941@https.bugzilla.kernel.org/>
 References: <bug-219234-62941@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
@@ -63,9 +63,15 @@ MIME-Version: 1.0
 
 https://bugzilla.kernel.org/show_bug.cgi?id=3D219234
 
---- Comment #1 from Alexander Tsoy (alexander@tsoy.me) ---
-The device in question:
-Bus 005 Device 089: ID 0bda:8771 Realtek Semiconductor Corp. Bluetooth Radio
+Alexander Tsoy (alexander@tsoy.me) changed:
+
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+             Status|NEW                         |RESOLVED
+         Resolution|---                         |INVALID
+
+--- Comment #2 from Alexander Tsoy (alexander@tsoy.me) ---
+I'll try to submit updated firmware to linux-firmware
 
 --=20
 You may reply to this email to add a comment.
