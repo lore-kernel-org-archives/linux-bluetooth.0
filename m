@@ -1,81 +1,206 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FAAC1DCB10
-	for <linux-bluetooth@vger.kernel.org>; Wed,  4 Sep 2024 14:58:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BD63DDCD
+	for <linux-bluetooth@vger.kernel.org>; Wed,  4 Sep 2024 15:07:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725461894; cv=none; b=rMpe5JkLyk/r97J/HxfJKQAOHKd+t/zkyAye0VbDFhumJG2aAx+DNC5E6tfV7G6RdVsHgkLnB/c2zrkSeeWRzTNPh/EXw0OeImcN/X7zPkK0X7LkEFrK30C4ruvV41BhYj0SWLAzFqobm6orbMVQNoD6vkr9YUdW+pHGsUDigjk=
+	t=1725462456; cv=none; b=cYAzIkE3dvOakSn3aQ7dQhpsqW0nqa7xAYs4AdnbOwrpJarQGNQ4oTFejyK7NyA5lH/wc80iMfLtPvUYR9BUlG8tZffBkyZLW+DC3U8qmrBe/dzQSblSN/M/H10cuhtdcLDkK83jzwhwX/dgqre2B7cB4hWGtXHtnEllziLELwk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725461894; c=relaxed/simple;
-	bh=LWFIjPg/7q9Gw3vnHQf1VV0gvn+cH4y9lKja7jhMaJI=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=gb+untnJNtsLN1hxcYoJRZev3yMAGxdaGDbazZ/tkM8kNlv5HnOQEljioyu3K6JXyMs0jJjSAbf28iud5MynwTFE6K5ekNj2mPeArOzwdcDnW+n1hP9DIGrRnPKA02hJgodz0LLWffxZoh3RRgWXg9JQq+BUFWxzU1bCRg5JKpg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eUb6HpNa; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1725462456; c=relaxed/simple;
+	bh=btPHVcon9YDMqNYfKwngWcxA0cQhn3eBU0q38HMpFXU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=YZ4a/oHBNVlF3o76s8Km3mKBKvq6g07L1XIOvFEIh5AEFul8v5dZSaOngSxYWzueSY5bjAC10gOil5f/SFcPz1Jf39SDBjf1KoohB9Agj3g+I8vSEEyVuL4xCADScRUtz58T/DXbawtXB9nauBlXK5XzL4djGeZitmjLS6YGloU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=X0ag7gRt; arc=none smtp.client-ip=209.85.214.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eUb6HpNa"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 3C099C4CECA
-	for <linux-bluetooth@vger.kernel.org>; Wed,  4 Sep 2024 14:58:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725461894;
-	bh=LWFIjPg/7q9Gw3vnHQf1VV0gvn+cH4y9lKja7jhMaJI=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=eUb6HpNazBp+xoZW6AFdTyUZ0AqanRLkb7+ZHipE31WGpkPz6cEPzLiQR5L+y8qvs
-	 YJzN5NWjE4QOOo7WHzTrU3zyoGi9+v4+MKOZGPwNExjJJ1qRS5Ukd1RgPP3nA6Tvj9
-	 uvGShCYjUJviAvCo5WRIR0Rdb9cwdsXCsD9te2gz6T6n8Mirig/JpAGKSwg+INJUdW
-	 thl931MKE/z+6kJk0ldI09SF1OLbp+xffbbAp4nva0vOJ++39R/FU6P+yAwkpooUgy
-	 8BhW6rMklb0btAg5BNoGWU6jdmCctf6KXzEIZLvde+JJ1iJq3p2AEJ63sGbOcqUIzx
-	 jEVeUlQ/m72aQ==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id 2DD0BC53BC3; Wed,  4 Sep 2024 14:58:14 +0000 (UTC)
-From: bugzilla-daemon@kernel.org
-To: linux-bluetooth@vger.kernel.org
-Subject: [Bug 219233] Bluetooth: hci0: Failed to load Intel firmware file
- intel/ibt-18-16-0.sfi (-2)
-Date: Wed, 04 Sep 2024 14:58:13 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: luiz.dentz@gmail.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P3
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: cc
-Message-ID: <bug-219233-62941-kXuff7vHpX@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-219233-62941@https.bugzilla.kernel.org/>
-References: <bug-219233-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="X0ag7gRt"
+Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-20536dcc6e9so33023315ad.2
+        for <linux-bluetooth@vger.kernel.org>; Wed, 04 Sep 2024 08:07:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1725462454; x=1726067254; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=8zruJ6SZ514YkU4YtSRS/cKRhklgyaoz5jEj/cbFjhE=;
+        b=X0ag7gRtHIWTF2N1EbDYQ/rEh4nB3Dlnzchg9NYXORt3HRDrYFHIgftrTvIBF43oZU
+         EaYXSpO5JrkW4VUVFrTFpAqG3WBAcVrzMkrQreesHNZx3z8e1JwD5Y9HoJ9XZxFVcDgw
+         pJGvSlJRBW3jFp9LoKWXaKpmaN8BRsDfTLa+OUFPQqqRC4Xh57HJG+e9bfLFo0fjWOTf
+         3TkR+ybP1bsvvvqknndPOAmQRgXFMJoyJprSEhQzASM8AUR/pRfmtP1+KNrNUZTvC2MK
+         yI0K2vO/zAl+pOM+VxR/KoxJCjp6LL+I+RGMx7FDkPv3FjXJXoTisMbnGVONTR5MZwPX
+         1DkA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1725462454; x=1726067254;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=8zruJ6SZ514YkU4YtSRS/cKRhklgyaoz5jEj/cbFjhE=;
+        b=JNio9ccEsAJse80Y68Cc7R5CkPYmNknBAEowUydB8ttlJRrqhZeeu2cKbEtaDGWNIV
+         e5+SDBVWvSGb5eDdZv0o7VgaHfXT7w8B3rI39h89UHzp+5LTh5N+HcQwIlCz7QLKU+s5
+         PWsHlX0zE3/il3Q2XjniEP7wFAIFF9FoIgCxAnLiQXRtBdGb7mzgW1Gd+9rwRHeBqsOi
+         Bx7NXfyqKsDumIICEvbK2LrP0FkdAOOhqlU/emr5yvXxICjOryG9cXdLE3dpN1Io4dXe
+         kX19nf9+VjQBeTk0d8WMO6GtHI/z8NIHgNwtocz/XCWQnA+43EWKQzrZqq23MCfpx5A9
+         NKUg==
+X-Gm-Message-State: AOJu0Yw+O2yUhuStBn5g0NO/UT+Mm8KRpDsOZEByhW0I57YBnGk1OMJZ
+	9GzEK/2ReBdbHsTAfC5R8gyZ+n+ghUScohIgwA232S30YA1IrBWal5rmQOu5+D3f9KiZ/Yhkvhb
+	Biut7p+NQUStWJH8NjBtsva6Wj6AxhA==
+X-Google-Smtp-Source: AGHT+IHFN6kilRyILjXabU0KDmhYmaMC9tNazEwG57fVM3jumakgrbHs1NA8FdY0wfZHNvH6kCBO3RhBFPnc7CflUdg=
+X-Received: by 2002:a17:902:ef0f:b0:1f7:1655:825c with SMTP id
+ d9443c01a7336-2050c37b310mr176553745ad.36.1725462454155; Wed, 04 Sep 2024
+ 08:07:34 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+References: <20240904140421.283166-1-frederic.danis@collabora.com> <20240904140421.283166-4-frederic.danis@collabora.com>
+In-Reply-To: <20240904140421.283166-4-frederic.danis@collabora.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Wed, 4 Sep 2024 11:07:05 -0400
+Message-ID: <CABBYNZKS501DW21KcjKVEhKV5CkvFdpb256=DQ=y6Xb87km=XA@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 3/7] player: Add image handle support property
+To: =?UTF-8?B?RnLDqWTDqXJpYyBEYW5pcw==?= <frederic.danis@collabora.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D219233
+Hi Fr=C3=A9d=C3=A9ric,
 
-Luiz Von Dentz (luiz.dentz@gmail.com) changed:
+On Wed, Sep 4, 2024 at 10:04=E2=80=AFAM Fr=C3=A9d=C3=A9ric Danis
+<frederic.danis@collabora.com> wrote:
+>
+> This is part of the metadata when the AVRCP target supports covert
+> art download and a OBEX BIP session is connected.
+> The image handle references the cover art associated to the track,
+> and is valid only during OBEX BIP session.
+> ---
+>  doc/org.bluez.MediaPlayer.rst | 4 ++++
+>  monitor/avctp.c               | 3 +++
+>  profiles/audio/avrcp.c        | 7 ++++++-
+>  profiles/audio/avrcp.h        | 3 ++-
+>  tools/parser/avrcp.c          | 3 +++
+>  5 files changed, 18 insertions(+), 2 deletions(-)
+>
+> diff --git a/doc/org.bluez.MediaPlayer.rst b/doc/org.bluez.MediaPlayer.rs=
+t
+> index f1e999bdf..5bb38e7c2 100644
+> --- a/doc/org.bluez.MediaPlayer.rst
+> +++ b/doc/org.bluez.MediaPlayer.rst
+> @@ -237,6 +237,10 @@ dict Track [readonly]
+>
+>                 Track duration in milliseconds
+>
+> +       :string ImgHandle:
+> +
+> +               Track image handle
 
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-                 CC|                            |luiz.dentz@gmail.com
+I guess we want something more descriptive here, as ThumbnailURL or
+something .e.g obex://<handle>, that said I don't know if perhaps we
+could load it automatically via plugin.
 
---- Comment #1 from Luiz Von Dentz (luiz.dentz@gmail.com) ---
--2 is ENOENT so the firmware file is missing, perhaps you haven't installed
-linux-firmware package?
+>  object Device [readonly]
+>  ````````````````````````
+>
+> diff --git a/monitor/avctp.c b/monitor/avctp.c
+> index c59e93b20..4da448750 100644
+> --- a/monitor/avctp.c
+> +++ b/monitor/avctp.c
+> @@ -156,6 +156,7 @@
+>  #define AVRCP_MEDIA_ATTRIBUTE_TOTAL    0x05
+>  #define AVRCP_MEDIA_ATTRIBUTE_GENRE    0x06
+>  #define AVRCP_MEDIA_ATTRIBUTE_DURATION 0x07
+> +#define AVRCP_MEDIA_ATTRIBUTE_IMG_HANDLE       0x08
+>
+>  /* play status */
+>  #define AVRCP_PLAY_STATUS_STOPPED      0x00
+> @@ -582,6 +583,8 @@ static const char *mediattr2str(uint32_t attr)
+>                 return "Genre";
+>         case AVRCP_MEDIA_ATTRIBUTE_DURATION:
+>                 return "Track duration";
+> +       case AVRCP_MEDIA_ATTRIBUTE_IMG_HANDLE:
+> +               return "Imaging handle";
+>         default:
+>                 return "Reserved";
+>         }
+> diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
+> index 61558e492..fe24b5a92 100644
+> --- a/profiles/audio/avrcp.c
+> +++ b/profiles/audio/avrcp.c
+> @@ -417,7 +417,8 @@ static sdp_record_t *avrcp_ct_record(bool browsing)
+>         uint16_t feat =3D ( AVRCP_FEATURE_CATEGORY_1 |
+>                                                 AVRCP_FEATURE_CATEGORY_2 =
+|
+>                                                 AVRCP_FEATURE_CATEGORY_3 =
+|
+> -                                               AVRCP_FEATURE_CATEGORY_4)=
+;
+> +                                               AVRCP_FEATURE_CATEGORY_4 =
+|
+> +                                               AVRCP_FEATURE_CT_GET_THUM=
+BNAIL);
+>
+>         record =3D sdp_record_alloc();
+>         if (!record)
+> @@ -883,6 +884,8 @@ static const char *metadata_to_str(uint32_t id)
+>                 return "NumberOfTracks";
+>         case AVRCP_MEDIA_ATTRIBUTE_DURATION:
+>                 return "Duration";
+> +       case AVRCP_MEDIA_ATTRIBUTE_IMG_HANDLE:
+> +               return "ImgHandle";
+>         }
+>
+>         return NULL;
+> @@ -1197,6 +1200,8 @@ static uint32_t str_to_metadata(const char *str)
+>                 return AVRCP_MEDIA_ATTRIBUTE_N_TRACKS;
+>         else if (strcasecmp(str, "Duration") =3D=3D 0)
+>                 return AVRCP_MEDIA_ATTRIBUTE_DURATION;
+> +       else if (strcasecmp(str, "ImgHandle") =3D=3D 0)
+> +               return AVRCP_MEDIA_ATTRIBUTE_IMG_HANDLE;
+>
+>         return 0;
+>  }
+> diff --git a/profiles/audio/avrcp.h b/profiles/audio/avrcp.h
+> index dcc580e37..59117e946 100644
+> --- a/profiles/audio/avrcp.h
+> +++ b/profiles/audio/avrcp.h
+> @@ -46,7 +46,8 @@
+>  #define AVRCP_MEDIA_ATTRIBUTE_N_TRACKS 0x05
+>  #define AVRCP_MEDIA_ATTRIBUTE_GENRE    0x06
+>  #define AVRCP_MEDIA_ATTRIBUTE_DURATION 0x07
+> -#define AVRCP_MEDIA_ATTRIBUTE_LAST     AVRCP_MEDIA_ATTRIBUTE_DURATION
+> +#define AVRCP_MEDIA_ATTRIBUTE_IMG_HANDLE       0x08
+> +#define AVRCP_MEDIA_ATTRIBUTE_LAST     AVRCP_MEDIA_ATTRIBUTE_IMG_HANDLE
+>
+>  /* play status */
+>  #define AVRCP_PLAY_STATUS_STOPPED      0x00
+> diff --git a/tools/parser/avrcp.c b/tools/parser/avrcp.c
+> index e73a6317e..d574c7ee3 100644
+> --- a/tools/parser/avrcp.c
+> +++ b/tools/parser/avrcp.c
+> @@ -160,6 +160,7 @@
+>  #define AVRCP_MEDIA_ATTRIBUTE_TOTAL    0x5
+>  #define AVRCP_MEDIA_ATTRIBUTE_GENRE    0x6
+>  #define AVRCP_MEDIA_ATTRIBUTE_DURATION 0x7
+> +#define AVRCP_MEDIA_ATTRIBUTE_IMG_HANDLE       0x08
+>
+>  /* play status */
+>  #define AVRCP_PLAY_STATUS_STOPPED      0x00
+> @@ -933,6 +934,8 @@ static const char *mediattr2str(uint32_t attr)
+>                 return "Genre";
+>         case AVRCP_MEDIA_ATTRIBUTE_DURATION:
+>                 return "Track duration";
+> +       case AVRCP_MEDIA_ATTRIBUTE_IMG_HANDLE:
+> +               return "Imaging handle";
+>         default:
+>                 return "Reserved";
+>         }
+> --
+> 2.34.1
+>
+>
+
 
 --=20
-You may reply to this email to add a comment.
-
-You are receiving this mail because:
-You are the assignee for the bug.=
+Luiz Augusto von Dentz
