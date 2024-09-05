@@ -1,68 +1,58 @@
-Received: from finn.localdomain (finn.gateworks.com [108.161.129.64])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 676E116F831;
-	Thu,  5 Sep 2024 18:32:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=108.161.129.64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6FCC823DE;
+	Thu,  5 Sep 2024 21:42:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725561169; cv=none; b=KxeO79xpArwNtGJaNOK8tzD9gJbcIp48QSQbqZJzIdx/P2gUcg/PN1HU7n+tjLkX8yivf+OpnYvc+8KAnIDzzHW8qXfR6e1fIm491TzRVL2CvwcDxe1BwSSSXakXztX19rip4tKSGCT3zuvFRz7k+GfnNCpoFxwczZElrNgdqys=
+	t=1725572567; cv=none; b=PEbJVZGxfQ2z8TyTRu1Jyzzz3AMGs3cU9+J2sxYeXXVe2XkuGCakuiEoT1V8/a6rL3Hi25n2/I+tNuP9zlGJ8c1n340LPu7VWVxMe+ojUFiCXcHEsODpKMWcTbjrw6hvSOISNCavyrU7PuYTnuqQf0d6Y2EGoPW1qFiz3i+b/B4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725561169; c=relaxed/simple;
-	bh=xQA4CPG7n7H6uJZUderckdAz0EXW5IkWeUjkPgckOdY=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=cmPKyn5T0LsGuvMvURVTdDds27/53+kJOQQ+L8O5UPQV4U0/GCoK4of1kmIJxC/v1YORbR/w3bFQDo89szaxOwokXQqL2i6FOnF/xh1SAyQw8Vzdf68uGwLY5DGNfRJx60Bm9BQ4uv+zzIxVHbQOlBMTbTXE9XTK+rhxl1YweUo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gateworks.com; spf=pass smtp.mailfrom=gateworks.com; arc=none smtp.client-ip=108.161.129.64
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gateworks.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gateworks.com
-Received: from syn-068-189-091-139.biz.spectrum.com ([68.189.91.139] helo=tharvey.pdc.gateworks.com)
-	by finn.localdomain with esmtp (Exim 4.95)
-	(envelope-from <tharvey@gateworks.com>)
-	id 1smGn0-00C9I5-4Z;
-	Thu, 05 Sep 2024 18:01:02 +0000
-From: Tim Harvey <tharvey@gateworks.com>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Scott Ehlert <ehlert@battelle.org>,
-	Tim Harvey <tharvey@gateworks.com>
-Subject: [PATCH v2] Bluetooth: btsdio: Do not bind to non-removable CYW4373
-Date: Thu,  5 Sep 2024 11:01:00 -0700
-Message-Id: <20240905180100.507975-1-tharvey@gateworks.com>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1725572567; c=relaxed/simple;
+	bh=0X9ovGL1bPiVMErLIUVjlhSlP6NAWKa6SGZnK6fQyxA=;
+	h=Message-ID:Content-Type:MIME-Version:In-Reply-To:References:
+	 Subject:From:Cc:To:Date; b=FdErMHNkYsBofkaBkTzT3gWws+ofr8hCUfW6DqFQMlx1DW6PR6jOOc9u+8hyOddmQywmLn/LDtutB+CztsttKeo8csRYHBo0BnsIoVJ5nbeHzl4W9xYkUSRP82IaYNx9AGi94Af6ABaH89HrVj/eH2Yq8aIdXSB++7uKT7RkDVM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=E2ootA+r; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="E2ootA+r"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 50B91C4CEC3;
+	Thu,  5 Sep 2024 21:42:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1725572566;
+	bh=0X9ovGL1bPiVMErLIUVjlhSlP6NAWKa6SGZnK6fQyxA=;
+	h=In-Reply-To:References:Subject:From:Cc:To:Date:From;
+	b=E2ootA+r2Jzcgf/NmNy+AJzniX/8/qwwz88HEwzDL5SE/yZfLg7IciHSckm2v/uUH
+	 XVODWkzdY3MYX/Lgl+ehEJAW29AzuALvCb322qUElHRCaCvp6X4oP17R9YdXXTKkz3
+	 W9TMmE7jKLSrq1jQKSkF1AsxPfw9TZByIdV5KED9ETytIzKoibrkImI7icxg85tKjf
+	 oT0wtqU7gpMbFxneaLxxD66Vy4FuXVSw3011NWTs3w0m0xe8swVxK5P/L3SPrzK53G
+	 rX/y97OBU+0pzPY6c59Y9paGXnkat2aXaF+2NA3h1CB+Jjwq45FtsB9wZXWaDePJNd
+	 cWlgANhUFUnRQ==
+Message-ID: <220024b46504658718c21c5f0c221007.sboyd@kernel.org>
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20240805-clk-new-helper-v2-1-e5fdd1e1d729@linaro.org>
+References: <20240805-clk-new-helper-v2-0-e5fdd1e1d729@linaro.org> <20240805-clk-new-helper-v2-1-e5fdd1e1d729@linaro.org>
+Subject: Re: [PATCH v2 1/2] clk: provide devm_clk_get_optional_enabled_with_rate()
+From: Stephen Boyd <sboyd@kernel.org>
+Cc: linux-clk@vger.kernel.org, linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org, Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+To: Bartosz Golaszewski <brgl@bgdev.pl>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Marcel Holtmann <marcel@holtmann.org>, Michael Turquette <mturquette@baylibre.com>, Russell King <linux@armlinux.org.uk>
+Date: Thu, 05 Sep 2024 14:42:44 -0700
+User-Agent: alot/0.10
 
-From: Scott Ehlert <ehlert@battelle.org>
+Quoting Bartosz Golaszewski (2024-08-05 01:57:31)
+> From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+>=20
+> There are clock users in the kernel that can't use
+> devm_clk_get_optional_enabled() as they need to set rate after getting
+> the clock and before enabling it. Provide a managed helper that wraps
+> these operations in the correct order.
+>=20
+> Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+> ---
 
-CYW4373 devices soldered onto the PCB (non-removable),
-use a UART connection for Bluetooth and the advertised btsdio
-support as an SDIO function should be ignored.
-
-Signed-off-by: Scott Ehlert <ehlert@battelle.org>
-Signed-off-by: Tim Harvey <tharvey@gateworks.com>
----
-v2: no changes; resending due to being dropped for unrelated CI failure
----
- drivers/bluetooth/btsdio.c | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/drivers/bluetooth/btsdio.c b/drivers/bluetooth/btsdio.c
-index fdcfe9c50313..a69feb08486a 100644
---- a/drivers/bluetooth/btsdio.c
-+++ b/drivers/bluetooth/btsdio.c
-@@ -295,6 +295,7 @@ static int btsdio_probe(struct sdio_func *func,
- 		case SDIO_DEVICE_ID_BROADCOM_4345:
- 		case SDIO_DEVICE_ID_BROADCOM_43455:
- 		case SDIO_DEVICE_ID_BROADCOM_4356:
-+		case SDIO_DEVICE_ID_BROADCOM_CYPRESS_4373:
- 			return -ENODEV;
- 		}
- 	}
--- 
-2.25.1
-
+Applied to clk-next
