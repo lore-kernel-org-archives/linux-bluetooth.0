@@ -1,58 +1,58 @@
-Received: from mail-qv1-f54.google.com (mail-qv1-f54.google.com [209.85.219.54])
+Received: from mail-ot1-f51.google.com (mail-ot1-f51.google.com [209.85.210.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEA3B15E5D2
-	for <linux-bluetooth@vger.kernel.org>; Sat,  7 Sep 2024 23:05:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F599181
+	for <linux-bluetooth@vger.kernel.org>; Sun,  8 Sep 2024 00:04:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725750305; cv=none; b=PKzjJBacsM4HvONJrwhmypE2V5Pz7MoyoqTcpuqe8cLCgJMrIei8p1amnq7/hOS81MqGGyisx0cWIy+0fhTY+qkHO0hJIfOuM4Dv4nuSGK801k8iudXvmluSjuRPdi+dYMJ2yjhm38j1SCZgoUu9qEIS5jMNViVERX+btSrTQKY=
+	t=1725753885; cv=none; b=HMLYh3p7ZPe9eRiEp+ioeZer2frmzL/IVwcWrsVu9UvHElGZrww8Jaovxb0DKmDPRL/4YaZphd2pmWK5k/i0uMKgXHjXFLKfob9eHqs7V05sk9wIHt3vh+LngekjlFvXK5KsYbesSv/d/GVl9w9oHfr/6QLMppmz7Gs23CXMbHo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725750305; c=relaxed/simple;
-	bh=5T+I56KZAMz97k4OmsAKGPbd4ssNFpxO1xLZfJLxI7k=;
+	s=arc-20240116; t=1725753885; c=relaxed/simple;
+	bh=cl/3O4fEEGeot/e+PENThgKNggGjMoiNujeS1UHSRXY=;
 	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=VZ/tcTxwF5iQZ2dpoNDWzGh4ts1cFStEELbGwK1v/FY29HcyfSKAQ+9nyoQgI1fKT9nJw8tz1cVIZ3JdIxQS38upV043brUoNKBxPXbawJnHQwcKnBndJfqUUfLfapA1YtPPxOfSF8GTkd8lJ6eMZfDZCrgYhvouklqCnZadfmQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=F9b91B/B; arc=none smtp.client-ip=209.85.219.54
+	 In-Reply-To:References; b=HvvJ+5/GN40zlbWZgbnH3/S+ETP3apb9Yp8H+IyN9mevDx7qKg6rh3ZA7iLmkuCFqceC/N3CFxkOUKwiBdo85Rh0lTG6MsBN41NZwthxcPeZkxcCy7tHx/bTkUCTWa0KmzYrl3felhqf9FTxjCIT/nbNY24jfLrXKcmaV+VHZwk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RsT2CP8s; arc=none smtp.client-ip=209.85.210.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="F9b91B/B"
-Received: by mail-qv1-f54.google.com with SMTP id 6a1803df08f44-6c3567a143eso18413376d6.2
-        for <linux-bluetooth@vger.kernel.org>; Sat, 07 Sep 2024 16:05:03 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RsT2CP8s"
+Received: by mail-ot1-f51.google.com with SMTP id 46e09a7af769-710dead5d2aso317782a34.0
+        for <linux-bluetooth@vger.kernel.org>; Sat, 07 Sep 2024 17:04:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1725750302; x=1726355102; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1725753883; x=1726358683; darn=vger.kernel.org;
         h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
          :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=Tx4bPuTTq9ro8q8OYTA+0l12xXEKgJtcmOJ+89v/KVI=;
-        b=F9b91B/BcjC5UAvUqm8DzMxGWXtvHbYMIU71slMbBKBmDfrSf9YIcgdtE2AHoIS40y
-         19+T/EI7rj/i/IjzshIDxgJOJRuBJnwyfQ5qek675YLIn75/lK/G/4A4kqWjqVTvAomQ
-         T/EamjkupD2MpRjsFnu02Q2geYlPn2UfnrmAhyqhb1gq6F0MNMw8gQkOXG1Z4xH575Tk
-         Yoj0bFuw2tOmXG4W670m7ZCFXHs8n4MFDvXkhCdSOBu6Fli0F8FEJnLh9HZRp1dTdlNL
-         k2eXdcTPpz/uI5EqKuXJ7aSIwNE9GYsFEMmTl1TPHzM8kthKcsH6OU+50Un7NEPVAKfX
-         dUxQ==
+        bh=uDSGEoBPNYOCtF++Pw56LyFPqZTEhwdoXYLML/cI3hQ=;
+        b=RsT2CP8sK3D+omNUlSCIWozGEFwsFUClr6E05+0g68voGma/ZY5f9xoKYGVbV8OjFG
+         jXyJjmb28wY5TxGPQvM3re5eerwfg9GtiIc1RopbHgo+2KtQAdR+NPG5WIDmk0Vfn4Ie
+         qKBu0D5xsSS3NQqcEECLjqAz4G6W0rQg6HtY8BJMdcCQPLhZ2wVyvSbXo9dcKn61FsCa
+         Ywp8ldIpmdpqwR4tqsXzIvWg7OwWPMk5HGi7pTRFeFxyLsmiawV64uDoVRlIR5NmLJEO
+         7FjN7k29GBverXNRcRLVOJfS7nueDxFtIHISwdXYHhSn/nlvl8y+zmn6Vp+lEhqjpj75
+         45Pg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725750302; x=1726355102;
+        d=1e100.net; s=20230601; t=1725753883; x=1726358683;
         h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
          :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=Tx4bPuTTq9ro8q8OYTA+0l12xXEKgJtcmOJ+89v/KVI=;
-        b=o24IC9FS94+Bs/8htLdYOmuZJ40UuK1kgFhaiCDVwfS9gb7lOat3zvGbY+xhPxi48P
-         jYL8Zh1n/x+QyMe8bZ8JWVUkBYS6uB1GUJJaRgocxybkpvzQGlCX6S0N3+ugc70+vSos
-         Cv/CFk2Tj9Vwi2ItD8aptuOnauWp0ZEdGyF1UOaOG137FNu5DGd3KsSBrj1aa26KbbCk
-         L5OLotDatwvHh1/sbTx15upwSRXkWUCKVANjY1WVrkYsRkeJ5tFq0wuSEnwQLAHPtklR
-         fDjQXUGOo3TUvoeHKYPmXJs7HfN1H3JnsJoctzM/0meD9miLr5YMtEBuj6nzS0dLb8B0
-         15vQ==
-X-Gm-Message-State: AOJu0YyT7txxSsDEIalu5plrIgia30dKxP8YEWIvmxA3ogzYl89JCknK
-	RuSojVzzYc6pl/KpnIeDVQFq6kj/VsCweu4GbmQumv5hfZcGobs5RswWXg==
-X-Google-Smtp-Source: AGHT+IGCmRRDcVTQEZuM2yt0rrl8QdczFvo8Jzf3URxwHGm4TqDJI9IBYPTrV4w3Rtq7QGpRI8tlkA==
-X-Received: by 2002:a05:6214:418b:b0:6c1:6bf9:8fea with SMTP id 6a1803df08f44-6c52851d078mr71700456d6.50.1725750302337;
-        Sat, 07 Sep 2024 16:05:02 -0700 (PDT)
-Received: from [172.17.0.2] ([172.183.132.93])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6c534786b52sm8171226d6.142.2024.09.07.16.05.01
+        bh=uDSGEoBPNYOCtF++Pw56LyFPqZTEhwdoXYLML/cI3hQ=;
+        b=Tu0ZJgv5/ykXOKqiy+xtzII1WrjIZrB2zdgs9HGZhoe/A8AeSeYOn5QiaHFXdCbyQG
+         +ctyG0Qv7zYpNwqEsQrAOfkI8A3W5d5UCldGABTCYXB9DOFVqe8ZnV9PrsX/xYN0Q+Mk
+         gnKIC5nhqI0BU41w9/ICkuB4K2hdVv9ZN3AOK2epqUnKIBr1nLXTjTOVW7GqwUGqo7XK
+         hfPcn0AV4G94wSiZg1/QNMel1nz2Cyld1kINKAfq9FWpAu7dqpexen2EzNYDuVebaxb5
+         nrr9BrzqgI1sCXfZG40ryxpUkdzvVp6+mujYAsMEVDJJUQ8rQLo07H3OUxWMLRMXdsmh
+         /88w==
+X-Gm-Message-State: AOJu0Yy4hINMwLF6XebQnQ/nGEL4Esql93WXhg5+XiRZ055qmsnsoT6m
+	CwLtK17+TDO5kEW8071whlVubPVWmwnTtCw3yh26TH535Y9pMAa7WmYDCg==
+X-Google-Smtp-Source: AGHT+IHRM8qbhxPCeXcewA8Z2f1dsi98CNwF2Exx+M3veHxbZCbaahUQFgmV2qoItwYNbs7qXFNb7A==
+X-Received: by 2002:a05:6830:2b0a:b0:70c:a521:7e5c with SMTP id 46e09a7af769-710d6dede46mr3916176a34.5.1725753882784;
+        Sat, 07 Sep 2024 17:04:42 -0700 (PDT)
+Received: from [172.17.0.2] ([20.49.55.108])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6c534774752sm8573526d6.117.2024.09.07.17.04.42
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 07 Sep 2024 16:05:01 -0700 (PDT)
-Message-ID: <66dcdc1d.d40a0220.393e5e.2990@mx.google.com>
-Date: Sat, 07 Sep 2024 16:05:01 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============6233905939941956695=="
+        Sat, 07 Sep 2024 17:04:42 -0700 (PDT)
+Message-ID: <66dcea1a.050a0220.3797d6.29ca@mx.google.com>
+Date: Sat, 07 Sep 2024 17:04:42 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============1320477737077082335=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -61,12 +61,12 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 From: bluez.test.bot@gmail.com
 To: linux-bluetooth@vger.kernel.org, vibhavp@gmail.com
-Subject: RE: [BlueZ,1/2] device: Add ConnectionType property.
-In-Reply-To: <20240907204941.8006-1-vibhavp@gmail.com>
-References: <20240907204941.8006-1-vibhavp@gmail.com>
+Subject: RE: org.bluez.Device1: Add GetServiceRecords method to get a device's SDP records.
+In-Reply-To: <20240907213301.14000-2-vibhavp@gmail.com>
+References: <20240907213301.14000-2-vibhavp@gmail.com>
 Reply-To: linux-bluetooth@vger.kernel.org
 
---===============6233905939941956695==
+--===============1320477737077082335==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -77,36 +77,23 @@ Dear submitter,
 
 Thank you for submitting the patches to the linux bluetooth mailing list.
 This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=888046
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=888047
 
 ---Test result---
 
 Test Summary:
-CheckPatch                    PASS      0.79 seconds
-GitLint                       FAIL      0.75 seconds
-BuildEll                      PASS      24.49 seconds
-BluezMake                     PASS      1648.94 seconds
-MakeCheck                     PASS      13.72 seconds
-MakeDistcheck                 PASS      176.37 seconds
-CheckValgrind                 PASS      250.72 seconds
-CheckSmatch                   PASS      353.18 seconds
-bluezmakeextell               PASS      119.16 seconds
-IncrementalBuild              PASS      2921.19 seconds
-ScanBuild                     PASS      982.22 seconds
+CheckPatch                    PASS      1.05 seconds
+GitLint                       PASS      0.66 seconds
+BuildEll                      PASS      24.72 seconds
+BluezMake                     PASS      1682.04 seconds
+MakeCheck                     PASS      13.55 seconds
+MakeDistcheck                 PASS      178.67 seconds
+CheckValgrind                 PASS      252.77 seconds
+CheckSmatch                   PASS      356.35 seconds
+bluezmakeextell               PASS      119.86 seconds
+IncrementalBuild              PASS      2978.48 seconds
+ScanBuild                     PASS      1001.94 seconds
 
-Details
-##############################
-Test: GitLint - FAIL
-Desc: Run gitlint
-Output:
-[BlueZ,1/2] device: Add ConnectionType property.
-
-WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
-1: T3 Title has trailing punctuation (.): "[BlueZ,1/2] device: Add ConnectionType property."
-[BlueZ,2/2] org.bluez.Device: Add documentation for ConnectionType.
-
-WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
-1: T3 Title has trailing punctuation (.): "[BlueZ,2/2] org.bluez.Device: Add documentation for ConnectionType."
 
 
 ---
@@ -114,4 +101,4 @@ Regards,
 Linux Bluetooth
 
 
---===============6233905939941956695==--
+--===============1320477737077082335==--
