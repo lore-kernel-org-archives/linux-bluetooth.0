@@ -1,79 +1,119 @@
-Received: from mail-io1-f72.google.com (mail-io1-f72.google.com [209.85.166.72])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C99E1173347
-	for <linux-bluetooth@vger.kernel.org>; Sun,  8 Sep 2024 16:43:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91F4B4C81;
+	Mon,  9 Sep 2024 03:09:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725813785; cv=none; b=Ipvf9inMjphhoTh6+xhiKfUtVYdJe/qTH3DlqVmg8BXEYXGn9argndMCgSilRfUDThEjP0CbJHPbk14PY91waIItYvgjHrVepvWOPw4Nc6i+syNBirP6TLHVHn1H5/xSG5ynlS50cgCa2xO9xsOsCF/WXeGFb9yRnzTTYLf/0Fw=
+	t=1725851379; cv=none; b=E2ONXfOHRFl5hF+xoG3Wdd5+WaMbatmv/cTOvUKN5oakjt5rwNsKD6uS5syPBl48ME0Fobwvm/eaqKec8cbH2bOnoMQYTsx63I3FHlnjA3xZ0wh8dEh3S3kNoSie3royG+byA7ZB4K/lQFqnROJWxXyIlM1vjVHoHbmYGGecBMA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725813785; c=relaxed/simple;
-	bh=+hpRt2dV5nPaL/nXyAs/uGkUnfPrWQbCVMJPn5e929Q=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=JZWinUL58moMUXZNdHjf/etpH0JBX+iJmN5EGPNBuLhR8LwhvpO+MpEMwjeXvHmclY1yHkmnvldOPyNFk6tl50BL254hOmsK/cCZuCUBD1rGpjnKVMIT5wtrQBHYBW5YI3YNW6fAMSX3LsmWqzbsEk/AJOjdcYKlCGmPDo1Qjaw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f72.google.com with SMTP id ca18e2360f4ac-82aad3fa5edso148241039f.2
-        for <linux-bluetooth@vger.kernel.org>; Sun, 08 Sep 2024 09:43:03 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725813783; x=1726418583;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=l+wp0usBhcD98D12aDAt+WbEjn/+6VIsoMm0S/3mqMI=;
-        b=iiWoOihb94Rf2FD1Hz6tG45d+ShnZ9jR+erBF0bslxBzoWn4cIJBfnI93pzNo9V1Lr
-         9RXXl9UHMsQ4byoAR3TMTmsPW3RwmSnza8sQtD1s5C2nrqfauZdciAyamQO7sUh76Olx
-         s/vbpAPvbKxZFPJUw/ZxWEgsrhhrJJusKzY3vSXJbbo4j1jN8dCyVYf7TvpZKtOTMteb
-         LiB5Z0OfSRDe/MlD66AU90lSPANQhW61uETtzKHVQ840dSajqEkSleonRuIj21XphyVG
-         vRUGFY9tdXd6N21fX8WI/J4p5G5M6OSliIx4v3lF5gjoHxSocjk5RzCh2JHc0POpJRIl
-         aFJg==
-X-Forwarded-Encrypted: i=1; AJvYcCXrB7z8AOr7QK8mODLKeYPKHQ4NyydPPWbIMyWh/pdTPK+tJ9kQqsnGU2aoE4KUwwdHTKBl1ZX/zdrXe4rWQhg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyYT2gdNE+W/YUW94O7TUJzwTONDH9lyuxgAfx2PsKM9n0+VEeC
-	06PsTphQvv7C1HZ9k3W/hvgWoyjVJdfqyo04J1v25aUeqLniQl3MrDdWFw2LAVhlRNP2/scj4i9
-	wHf2F/1+6jNG+I+YFvJaJeHXwtTu2jB5n36JO3NzRjV+Kh9xiJS0rG6A=
-X-Google-Smtp-Source: AGHT+IErW406J68fk8lzI9LE+Br5vIRWQbo3xGD7mtxZhp3G/swle8CJ+fMHpBuJiwZP8Jv49IExS2en+n4PALMBN85sEoQb4UpM
+	s=arc-20240116; t=1725851379; c=relaxed/simple;
+	bh=Qn1xwmbieFJo2P3HZjsMlyrGYEfUrw7eYRCJ9Cvtkgc=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=U0yXc/F9fMc3FCo1tJzI7Xg0RStShrj2Fsw6dGWC9dNDAL0fyBph/cFrwui09eRXebDQpIsBGjkY6eSqcWUmkbYSNJY/qGFRpAL70GmSMCgyBVK60bhpwGSsWQppNw4incKavAsUxwCUEytcvtEpIBr22uUvk9tINX4yYVpB1Ls=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=a2j8b43m; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="a2j8b43m"
+Received: from pps.filterd (m0279866.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 488NWEhJ018316;
+	Mon, 9 Sep 2024 03:09:28 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=qcppdkim1; bh=A0mZDBa1peMp6ysKu0Owbb
+	dmW7yzG9XZzXBo4iYrJXI=; b=a2j8b43mc2aEYxNGPOWnqdxLKgZo9V8f1Q7Stx
+	30vrQ7aGe+osbKbHcRSdcgDHurIxSvKBwSa8PQLTW0GPDWXych+RP0SuWVa931cs
+	l9pNcUs5CfRTo/rYsSLmi/1JnGEQoGkrJVg6JZN6wTvyQhwVaiWwiBcUg6xOhHN9
+	134C7UcpQEG/kKa7uchPybPV2cCpYvrnYsj6E/Rygwrg7h9LPWcXn1xAMaG2Eqvd
+	lCsPBXOd0Cqo626Ie5txmRbJnXnIWRAlKr1gU62n3DyqPaO6Wy7wrXR0VyOThZaz
+	ZyAqsKERkEqzagVWxWHgFVcur/TfVZvjdcmfG8oKldQ1Z0Aw==
+Received: from nalasppmta02.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 41gy6shhcs-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 09 Sep 2024 03:09:28 +0000 (GMT)
+Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
+	by NALASPPMTA02.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 48939S6e009707
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 9 Sep 2024 03:09:28 GMT
+Received: from jiaymao-gv.qualcomm.com (10.80.80.8) by
+ nalasex01c.na.qualcomm.com (10.47.97.35) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.9; Sun, 8 Sep 2024 20:09:26 -0700
+From: Jiayang Mao <quic_jiaymao@quicinc.com>
+To: Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg
+	<johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+CC: <linux-bluetooth@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+Subject: [PATCH v1] Bluetooth: mgmt: Verify cmd pending status before removing it
+Date: Mon, 9 Sep 2024 11:09:06 +0800
+Message-ID: <20240909030906.26375-1-quic_jiaymao@quicinc.com>
+X-Mailer: git-send-email 2.46.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1c27:b0:3a0:4dcb:de0b with SMTP id
- e9e14a558f8ab-3a057461e7dmr42929675ab.10.1725813782959; Sun, 08 Sep 2024
- 09:43:02 -0700 (PDT)
-Date: Sun, 08 Sep 2024 09:43:02 -0700
-In-Reply-To: <000000000000932e45061d45f6e8@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000007b685f06219e55c5@google.com>
-Subject: Re: [syzbot] [bluetooth?] KASAN: slab-use-after-free Read in set_powered_sync
-From: syzbot <syzbot+03d6270b6425df1605bf@syzkaller.appspotmail.com>
-To: brian.gix@intel.com, davem@davemloft.net, johan.hedberg@gmail.com, 
-	kuba@kernel.org, linux-bluetooth@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, luiz.dentz@gmail.com, luiz.von.dentz@intel.com, 
-	marcel@holtmann.org, mlevitsk@redhat.com, netdev@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nalasex01c.na.qualcomm.com (10.47.97.35)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: 9nkBzS1_BC_8i9d2NyzykCA4_i2Il0zA
+X-Proofpoint-ORIG-GUID: 9nkBzS1_BC_8i9d2NyzykCA4_i2Il0zA
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
+ definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 spamscore=0
+ suspectscore=0 mlxlogscore=999 malwarescore=0 mlxscore=0 bulkscore=0
+ adultscore=0 clxscore=1011 priorityscore=1501 lowpriorityscore=0
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2408220000 definitions=main-2409090025
 
-syzbot has bisected this issue to:
+From: jiaymao <quic_jiaymao@quicinc.com>
 
-commit 275f3f64870245b06188f24bdf917e55a813d294
-Author: Brian Gix <brian.gix@intel.com>
-Date:   Tue Mar 1 22:34:57 2022 +0000
+Add a verification step to ensure that a command is still in the pending
+list before attempting to remove it. A crash may occur during the boot
+process when Bluetooth is enabled and then immediately disabled. In a
+race condition, mgmt_index_removed() might free the pending command
+before mgmt_add_adv_patterns_monitor_complete() is called, leading to a
+double free scenario.
 
-    Bluetooth: Fix not checking MGMT cmd pending queue
+Part of the crash call trace:
+0x0000053D: __list_del_entry_valid_or_report+0x98/0xdc
+0x0000053D: mgmt_pending_remove+0x18/0x58 [bluetooth]
+0x0000053E: mgmt_remove_adv_monitor_complete+0x80/0x108 [bluetooth]
+0x0000053E: hci_cmd_sync_work+0xbc/0x164 [bluetooth]
 
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=138c743b980000
-start commit:   f723224742fc Merge tag 'nf-next-24-09-06' of git://git.ker..
-git tree:       net-next
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=104c743b980000
-console output: https://syzkaller.appspot.com/x/log.txt?x=178c743b980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=37742f4fda0d1b09
-dashboard link: https://syzkaller.appspot.com/bug?extid=03d6270b6425df1605bf
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=110c589f980000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=139b0e00580000
+Signed-off-by: jiaymao <quic_jiaymao@quicinc.com>
+---
+ net/bluetooth/mgmt.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-Reported-by: syzbot+03d6270b6425df1605bf@syzkaller.appspotmail.com
-Fixes: 275f3f648702 ("Bluetooth: Fix not checking MGMT cmd pending queue")
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 25979f4283a6..9d019db92043 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -5428,6 +5428,9 @@ static void mgmt_remove_adv_monitor_complete(struct hci_dev *hdev,
+ 
+ 	hci_dev_lock(hdev);
+ 
++	if (cmd != pending_find(MGMT_OP_REMOVE_ADV_MONITOR, hdev))
++		goto done;
++
+ 	rp.monitor_handle = cp->monitor_handle;
+ 
+ 	if (!status)
+@@ -5437,6 +5440,7 @@ static void mgmt_remove_adv_monitor_complete(struct hci_dev *hdev,
+ 			  mgmt_status(status), &rp, sizeof(rp));
+ 	mgmt_pending_remove(cmd);
+ 
++done:
+ 	hci_dev_unlock(hdev);
+ 	bt_dev_dbg(hdev, "remove monitor %d complete, status %d",
+ 		   rp.monitor_handle, status);
+-- 
+2.46.0
 
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
