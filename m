@@ -1,196 +1,112 @@
-Received: from out-17.smtp.github.com (out-17.smtp.github.com [192.30.252.200])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EBA41758F
-	for <linux-bluetooth@vger.kernel.org>; Mon,  9 Sep 2024 16:40:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C02B71758F
+	for <linux-bluetooth@vger.kernel.org>; Mon,  9 Sep 2024 16:50:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725900042; cv=none; b=NxpAWHjWGQEjnNW5BgU+Jfan0MXpDmjfoE58uC1P83Xj9KI8+uekkIXkMYr2YserIGUdkJs1luUB45wknJWViNDeHLOSG44DAZslRr2OPUazOZOvVG8+DjHhMXe+emCrI+vbYmP1EzJsH/fVctsxRCy3/QpYuW79n5gZFqw7s1c=
+	t=1725900632; cv=none; b=cy+cPqutAV9nVGQC6EWDEBCncTjX6kbuuDXGyw79ptY0zqxzrvI/HzcN7cvu3zBbautX9FAUbMJoqoBxkJJk1/CyxRziCAzWRsZ8Loiu0S/uLtfDFUArePnhKaI7q2x4+p7Ak2tXegjIepOBsfvMq9HNCRUCH7fvbPxVdMXXvb4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725900042; c=relaxed/simple;
-	bh=Vr0wE8DxC9XuHl31ERbYkXQ9j3wJ3r0x+iY3PE84nrA=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=OoSKfK6cXh3qR9BEsgy4tS62Ree2EovYPZc4kwuARHEukCkJjYrgy9RJmiH4lFoxZUpLWf4tMO4voxuv0hOzWaSE7G1TTj8SWClpj5X42Mx5i1sFbMddjBZB+5yMY5E3cIagmXbWPnd1hTEZBYykAlHKDQxft5L6NWhsmGJxq3M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=RQtUx/AQ; arc=none smtp.client-ip=192.30.252.200
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1725900632; c=relaxed/simple;
+	bh=yQX8r91dv5ffJWnl9XeMmTmlIEv9CajHP4C3lEPzgUM=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=UsarWZ57bosaAy00eEgb+AAyEjBR6WeZOMHI5VrL5kKxAyw4d1qnEvfVlnK9MKWre+Ugpeyi0+q10OVHDERHNhhJtyn46ilONjSkd1Uvd6g6YoeQaNnGVnjwHsGVIdG2JCeQUel03DDY3dKJKiBezXw52EZCQzbMzlCz7voFmNw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=owEuQjGL; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="RQtUx/AQ"
-Received: from github.com (hubbernetes-node-7cb6da4.va3-iad.github.net [10.48.14.65])
-	by smtp.github.com (Postfix) with ESMTPA id 766604E08DA
-	for <linux-bluetooth@vger.kernel.org>; Mon,  9 Sep 2024 09:40:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1725900039;
-	bh=Xn1SNaUya9LRHp5FnGJeWkltK5nkcfmJOIt3BV/10H4=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=RQtUx/AQBGob76AH2fbmemQdIla43I2PtFkBd7sUqS7GlNo1oy2Xr02cW4IgKNSKZ
-	 UneBkGocaGp+IIkmJJc4/oSfcjnWQnqNxO96lNk81t+PY+SXW9wmosoAMTe9TKFXmI
-	 fWyF6Vbeu91svcZMZQcYaxOW+UlUjNT3j3vqlqwc=
-Date: Mon, 09 Sep 2024 09:40:39 -0700
-From: vlad-pruteanu <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/master/e8575b-4ecfde@github.com>
-Subject: [bluez/bluez] 5c9431: doc/media: Add Encryption and BCode fields to
- QoS ...
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="owEuQjGL"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 801A2C4CEC5;
+	Mon,  9 Sep 2024 16:50:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1725900631;
+	bh=yQX8r91dv5ffJWnl9XeMmTmlIEv9CajHP4C3lEPzgUM=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=owEuQjGL9y72GKrR8WEzQ0WVduGwPPblCEjILqHS4un+u0HQWKdh1j3dZT4lIGute
+	 oEQ7B3hli0o65Jda+fLCltSNzWnjGwkYA+5xWgy+A3cB3/m00eisDQHWb/SDj/deSw
+	 jjO/nYNXup/H6Hk72VTwLFtY/1F6SAYfn/g7TWHzkrdxc1NZ4YyMkyL8X34IM3uiQV
+	 3faotpYfepm1owjoofAYsaJrdBVrSRfy7mcJeAxm4lBqPXBUUTM4cP6Ulgg3/2Sdy2
+	 LJbcHONfLopjpUxLZ6l3/YoaTRWVw+oHc0DL73hrEkK7DBqEeNIz45MZFd61hvLe+l
+	 XINOTqfRBN0UA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AE0663806654;
+	Mon,  9 Sep 2024 16:50:33 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH BlueZ v2 00/16] Add Scan Delegator support for Add Source op
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <172590063252.3857512.9575691357117732856.git-patchwork-notify@kernel.org>
+Date: Mon, 09 Sep 2024 16:50:32 +0000
+References: <20240829124918.84809-1-iulia.tanasescu@nxp.com>
+In-Reply-To: <20240829124918.84809-1-iulia.tanasescu@nxp.com>
+To: Iulia Tanasescu <iulia.tanasescu@nxp.com>
+Cc: linux-bluetooth@vger.kernel.org, claudia.rosu@nxp.com,
+ mihai-octavian.urzica@nxp.com, vlad.pruteanu@nxp.com,
+ andrei.istodorescu@nxp.com, luiz.dentz@gmail.com
 
-  Branch: refs/heads/master
-  Home:   https://github.com/bluez/bluez
-  Commit: 5c9431fc2b97b24f8523b3cb9a3df2fedec3000e
-      https://github.com/bluez/bluez/commit/5c9431fc2b97b24f8523b3cb9a3df2fedec3000e
-  Author: Vlad Pruteanu <vlad.pruteanu@nxp.com>
-  Date:   2024-09-09 (Mon, 09 Sep 2024)
+Hello:
 
-  Changed paths:
-    M doc/org.bluez.MediaTransport.rst
+This series was applied to bluetooth/bluez.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-  Log Message:
-  -----------
-  doc/media: Add Encryption and BCode fields to QoS property
+On Thu, 29 Aug 2024 15:49:02 +0300 you wrote:
+> This adds support for the BAP Scan Delegator role to handle the
+> Add Source command received from a Broadcast Assistant.
+> 
+> The Broadcast Assistant informs a Scan Delegator about a Broadcaster
+> by sending a GATT write command for the BASS Broadcast Audio Scan
+> Control Point characteristic with the "Add Source" opcode. Using
+> the parameters received through GATT, the Scan Delegator creates
+> a device for the Broadcaster and probes it with BAP. The BAP plugin
+> will then perform long-lived PA sync and it will create streams
+> for each BIS required by the Assistant. The transports can then be
+> acquired/released, and the Assistant will be notified about each
+> change in the state of the streams.
+> 
+> [...]
 
-This adds the missing QoS fields, Encryption and BCode.
+Here is the summary with links:
+  - [BlueZ,v2,01/16] shared/bass: Register ATT disconnect cb
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=38b7dc7d17b4
+  - [BlueZ,v2,02/16] shared/bass: Make bt_bcast_src private
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=25119b6a72aa
+  - [BlueZ,v2,03/16] shared/bass: Remove io handling
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=8abcfd7028e8
+  - [BlueZ,v2,04/16] shared/bass: Add support to register cp handlers
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=30c190089ffe
+  - [BlueZ,v2,05/16] shared/bass: Call cp handler for the Add Source cmd
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=0446d1eef9ef
+  - [BlueZ,v2,06/16] bap: Add support for long-lived PA sync
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=b65767c5dab5
+  - [BlueZ,v2,07/16] bap: Add API for Scan Delegator probe
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=b8530f0d2672
+  - [BlueZ,v2,08/16] bass: Register cp handler for Add Source cmd
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=4191ff1c4045
+  - [BlueZ,v2,09/16] shared/bass: Add API to set PA sync state
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=06d20a80249b
+  - [BlueZ,v2,10/16] bass: Add APIs to probe/remove Broadcasters
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=f3a43bd0e4af
+  - [BlueZ,v2,11/16] bap: Probe Broadcasters with BASS
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=ea7b69102434
+  - [BlueZ,v2,12/16] shared/bass: Add APIs to set/clear BIS sync bits
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=c6278d24d9d2
+  - [BlueZ,v2,13/16] bass: Register BAP state changed cb
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=a032a570489b
+  - [BlueZ,v2,14/16] shared/bass: Add API to check BIS required for sync
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=7c3821f822f8
+  - [BlueZ,v2,15/16] bass: Add API to check BIS required for sync
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=df4e11fab68b
+  - [BlueZ,v2,16/16] bap: Create streams for required BISes
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=dfcbc2d3c011
 
-
-  Commit: f72fd8265000bbd5e3bf4b705576cf046ca2c8a5
-      https://github.com/bluez/bluez/commit/f72fd8265000bbd5e3bf4b705576cf046ca2c8a5
-  Author: Vlad Pruteanu <vlad.pruteanu@nxp.com>
-  Date:   2024-09-09 (Mon, 09 Sep 2024)
-
-  Changed paths:
-    M profiles/audio/transport.c
-
-  Log Message:
-  -----------
-  transport: Make get_bcast_qos return the encryption flag
-
-This adds the encryption flag to the response returned by the
-get_bcast_qos method.
-
-
-  Commit: a1bde349db6bdb483f0396d1ba79f9078a3df431
-      https://github.com/bluez/bluez/commit/a1bde349db6bdb483f0396d1ba79f9078a3df431
-  Author: Vlad Pruteanu <vlad.pruteanu@nxp.com>
-  Date:   2024-09-09 (Mon, 09 Sep 2024)
-
-  Changed paths:
-    M gdbus/client.c
-    M gdbus/gdbus.h
-
-  Log Message:
-  -----------
-  gdbus: Add g_dbus_proxy_set_property_dict
-
-This adds a new gdbus function to allow for the setting of a
-dictionary-type property (a{sv}). It receives the name of the
-property, the name of the first entry to be set from the
-dictionary, it's type and value, followed by the second pair of
-entry_name, type, value, and so on, marking the end of the
-entries with NULL. Additionally, if the type is an array, the
-type of the array and it's length must also be proviedd. These
-values are passed as a dict entry, to the set method associated
-with the property. There, it must be parsed and the appropriate
-entry updated.
-
-Example of usage:
-
-g_dbus_proxy_set_property_dict(proxy, "dict_property_name", cb,
-user_data, NULL, "entry_1", DBUS_TYPE_ARRAY, DBUS_TYPE_BYTE,
-value_1_len, value_1, "entry_2", DBUS_TYPE_BYTE, value_2, NULL)
-
-
-  Commit: b48d366458edd180679de6c7b21a49feb4a86b1f
-      https://github.com/bluez/bluez/commit/b48d366458edd180679de6c7b21a49feb4a86b1f
-  Author: Vlad Pruteanu <vlad.pruteanu@nxp.com>
-  Date:   2024-09-09 (Mon, 09 Sep 2024)
-
-  Changed paths:
-    M doc/org.bluez.MediaTransport.rst
-
-  Log Message:
-  -----------
-  doc/media: Make QoS property readwrite
-
-Update the QoS property to allow for write, so that fields such as
-BCode can be updated.
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
-  Commit: c922cc4a74e25b672b3e8a055f63e5048e8824b6
-      https://github.com/bluez/bluez/commit/c922cc4a74e25b672b3e8a055f63e5048e8824b6
-  Author: Vlad Pruteanu <vlad.pruteanu@nxp.com>
-  Date:   2024-09-09 (Mon, 09 Sep 2024)
-
-  Changed paths:
-    M profiles/audio/transport.c
-
-  Log Message:
-  -----------
-  transport: Add set_bcast_qos method
-
-This adds a set method for the QoS property of bcast transports.
-This is needed so that applications like bluetoothctl are able to
-modify the QoS (for example, for setting the broadcast code).
-
-
-  Commit: 8d43c209f084628c0896526174b3061171c9a64b
-      https://github.com/bluez/bluez/commit/8d43c209f084628c0896526174b3061171c9a64b
-  Author: Vlad Pruteanu <vlad.pruteanu@nxp.com>
-  Date:   2024-09-09 (Mon, 09 Sep 2024)
-
-  Changed paths:
-    M src/shared/bap.c
-
-  Log Message:
-  -----------
-  shared/bap: Enable set qos method for BT_BAP_BCAST_SINK stream
-
-This enables the set qos method, bap_bcast_qos, for the bcast sink
-streams as well.
-
-
-  Commit: 35f2bb95171e595df6ed7495afcf125bc0fee274
-      https://github.com/bluez/bluez/commit/35f2bb95171e595df6ed7495afcf125bc0fee274
-  Author: Vlad Pruteanu <vlad.pruteanu@nxp.com>
-  Date:   2024-09-09 (Mon, 09 Sep 2024)
-
-  Changed paths:
-    M client/player.c
-
-  Log Message:
-  -----------
-  client/player: Prompt the user to enter the bcode
-
-This adds support for entering the broadcast code on sink side. When
-the user selects a transport, if the transport is encrypted, the user
-will be prompted to enter the broadcast code before the process of
-transport selection can continue.
-
-
-  Commit: 4ecfdef3b52fbd39a5049baa2321942637c2bc0e
-      https://github.com/bluez/bluez/commit/4ecfdef3b52fbd39a5049baa2321942637c2bc0e
-  Author: Vlad Pruteanu <vlad.pruteanu@nxp.com>
-  Date:   2024-09-09 (Mon, 09 Sep 2024)
-
-  Changed paths:
-    M profiles/audio/bap.c
-
-  Log Message:
-  -----------
-  bap: Refresh qos stored in setup before doing BIG sync
-
-When syncing to an encrypted stream, after setting the broadcast
-code, the qos values stored in the setup must be refreshed so that
-they reflect this change.
-
-
-Compare: https://github.com/bluez/bluez/compare/e8575b6196ab...4ecfdef3b52f
-
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
