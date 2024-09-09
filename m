@@ -1,101 +1,196 @@
-Received: from mail-qv1-f53.google.com (mail-qv1-f53.google.com [209.85.219.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-17.smtp.github.com (out-17.smtp.github.com [192.30.252.200])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 346441758F
-	for <linux-bluetooth@vger.kernel.org>; Mon,  9 Sep 2024 16:36:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EBA41758F
+	for <linux-bluetooth@vger.kernel.org>; Mon,  9 Sep 2024 16:40:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.200
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725899820; cv=none; b=N5Hss+j782LxLKbkLJAo1qhHBKe9zYHHvu2jdP3KQFASdIvd7w+EJ4eLLujrZJzDi52McpDFUTXfp6Y/vlFu0dc/OhONevDt1HLF6Q7lYDAhUmMiRszxAi79j6VNYc20YhDwsygASG26Fdg3M1rYPzjxcz8zZd0w/n0/X4HLQDc=
+	t=1725900042; cv=none; b=NxpAWHjWGQEjnNW5BgU+Jfan0MXpDmjfoE58uC1P83Xj9KI8+uekkIXkMYr2YserIGUdkJs1luUB45wknJWViNDeHLOSG44DAZslRr2OPUazOZOvVG8+DjHhMXe+emCrI+vbYmP1EzJsH/fVctsxRCy3/QpYuW79n5gZFqw7s1c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725899820; c=relaxed/simple;
-	bh=AGS8+8zP9Z+g9AhLV7i9KyBHYjuUvkaoU7uy+LPiBH4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=uxFEyOaFfwhJ4PS1H27EgCApUF+//hYDEF54QqrQ4YFEv+xLPv90xPXtiOFXZhExhg81zrO91AYvmhsHYgfG8xRZc1ILqejSQ1yOXHnlJq3+JjJXv69sGqVuPEPEmT+nbNzihYFryifnAS/RO4cq15emED6wvK+Lkqgu7YPhVAc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fsCAUuFs; arc=none smtp.client-ip=209.85.219.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1725900042; c=relaxed/simple;
+	bh=Vr0wE8DxC9XuHl31ERbYkXQ9j3wJ3r0x+iY3PE84nrA=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=OoSKfK6cXh3qR9BEsgy4tS62Ree2EovYPZc4kwuARHEukCkJjYrgy9RJmiH4lFoxZUpLWf4tMO4voxuv0hOzWaSE7G1TTj8SWClpj5X42Mx5i1sFbMddjBZB+5yMY5E3cIagmXbWPnd1hTEZBYykAlHKDQxft5L6NWhsmGJxq3M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=RQtUx/AQ; arc=none smtp.client-ip=192.30.252.200
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fsCAUuFs"
-Received: by mail-qv1-f53.google.com with SMTP id 6a1803df08f44-6c35b72f943so38885006d6.0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 09 Sep 2024 09:36:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1725899818; x=1726504618; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=nAbOBcE73gbZ/dq/POFpa2HDrqM0cRL3Kjj6Ygo6spU=;
-        b=fsCAUuFsEyXMk0bGIQHaaDWh1eBb1IfxAMYtrhJQIS1J3AIPhPS5j+9vESFHPWaI0l
-         Qk/9zN6dNnuln1M6H1PTUgL0ewuOyrEWpgezSjlqXTE5SZHyLL4ePP2CN/SfzDa/aafw
-         UEbyZubtoPfD9Mf5vcxm/po0sSBcT5VHyokzx7OCtg33UGkVJUgtF5VdqVz9veMNdhJR
-         MmsGK83JEDA2fIxVBsos0ybbGkSR6jcM/IiqKZT70KK4tmmDb8mfAnaIJbsp3J5BaDi+
-         SL+obfup8ywqmiJG6JYdUGNLqVrjmE2SynzIB5UC3OMmzWauvoPICicDYSJ5MA+bCkao
-         RElQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725899818; x=1726504618;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=nAbOBcE73gbZ/dq/POFpa2HDrqM0cRL3Kjj6Ygo6spU=;
-        b=czLZVVijtqJ7m0XhPEIZ19bOF2Jmni3EB+rMUWsmCM3bc3A12XlKK2MEVIUc+dwqJD
-         ly+7K2spkNZnlE8Q8z7rnBLWrnTIXmiQuCmlIcBVJaL9vqGsqAlkVkkYOFOibW1TBtGk
-         qBaH6vhbZbfo9JOj+8Ykas1OzrpSZ7O6RALoXZfV7icgjytJhKdXdwiWUY7bPVGdgwwo
-         TmlE9kXWWgEhdfxM6rAKjsy2czjQskpCy0R9A36PvhnS/TVOdUl5JyOUW+rxqsJBF3y3
-         SH2NvcJ3NuwD5navZP499Lte0aXuhPPYt5OccSUHcTT/1uRMinWb9oFIVsV0iG3FFGp5
-         tlQQ==
-X-Gm-Message-State: AOJu0YzEkMMNu7y0BchI2WfM0ArtmE6iwwu7LTzlrv42ElIPxq4NFF49
-	82yXIH06yKN5juEPsS/Cf++n4MrVM1oZuJTpyKlYIrOCgnVPveZy7oFazFX9kUL48lAYFmRH9Ad
-	23fo4zCe6+QI/Hg9c9H2KKDSmHwccuSDS
-X-Google-Smtp-Source: AGHT+IGG38sjPHAGjltSQqdfRy12MFasloJXOWrP/nKNUncseeeohAcEWYXBbG6Ve6N0qn1poSHPrpTSgAviVYcZv4Y=
-X-Received: by 2002:a05:6214:3b86:b0:6c3:5454:6e1e with SMTP id
- 6a1803df08f44-6c554d6ffe3mr3131256d6.24.1725899818014; Mon, 09 Sep 2024
- 09:36:58 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="RQtUx/AQ"
+Received: from github.com (hubbernetes-node-7cb6da4.va3-iad.github.net [10.48.14.65])
+	by smtp.github.com (Postfix) with ESMTPA id 766604E08DA
+	for <linux-bluetooth@vger.kernel.org>; Mon,  9 Sep 2024 09:40:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1725900039;
+	bh=Xn1SNaUya9LRHp5FnGJeWkltK5nkcfmJOIt3BV/10H4=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=RQtUx/AQBGob76AH2fbmemQdIla43I2PtFkBd7sUqS7GlNo1oy2Xr02cW4IgKNSKZ
+	 UneBkGocaGp+IIkmJJc4/oSfcjnWQnqNxO96lNk81t+PY+SXW9wmosoAMTe9TKFXmI
+	 fWyF6Vbeu91svcZMZQcYaxOW+UlUjNT3j3vqlqwc=
+Date: Mon, 09 Sep 2024 09:40:39 -0700
+From: vlad-pruteanu <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/master/e8575b-4ecfde@github.com>
+Subject: [bluez/bluez] 5c9431: doc/media: Add Encryption and BCode fields to
+ QoS ...
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20240907204941.8006-1-vibhavp@gmail.com> <CABBYNZLVcMqXVXeWf7pSX50yRQNP-NMTUP-u91huuO-kpjU7ZA@mail.gmail.com>
-In-Reply-To: <CABBYNZLVcMqXVXeWf7pSX50yRQNP-NMTUP-u91huuO-kpjU7ZA@mail.gmail.com>
-From: Vibhav Pant <vibhavp@gmail.com>
-Date: Mon, 9 Sep 2024 22:06:46 +0530
-Message-ID: <CA+T2Sh07fL3jq5CnCK9ZxjUtK8pNkm73ft+VYn3T-z_BZZF+bw@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 1/2] device: Add ConnectionType property.
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-On Mon, Sep 9, 2024 at 9:00=E2=80=AFPM Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
->
-> Hi Vibhav,
->
-> Don't really like where this is going, if we need bearer specific API
-> like this then we need a whole new interface, besides you didn't
-> really explain the reason why you needed this, is that to determine if
-> there are SDP records to be fetched?
+  Branch: refs/heads/master
+  Home:   https://github.com/bluez/bluez
+  Commit: 5c9431fc2b97b24f8523b3cb9a3df2fedec3000e
+      https://github.com/bluez/bluez/commit/5c9431fc2b97b24f8523b3cb9a3df2fedec3000e
+  Author: Vlad Pruteanu <vlad.pruteanu@nxp.com>
+  Date:   2024-09-09 (Mon, 09 Sep 2024)
 
-ConnectionType is needed only to differentiate between LE and BR/EDR
-devices. This is because the NT kernel creates device objects for
-every discovered Bluetooth device, and BR/EDR and LE devices exist
-under different paths/hierarchies (I suppose the equivalent would be
-BR/EDR devices existing under /dev/bluetooth/devices/bredr, and LE
-devices under /dev/bluetooth/devices/le). Essentially, BR/EDR and LE
-devices can be differentiated in several significant ways, and I could
-not find a way to reliably do that. The current code checks if
-AddressType is random, otherwise tries to see if the device object has
-org.bluez.Gatt* interfaces to determine if the connection bearer is
-LE. However, I understand that's not reliable, and doesn't determine
-if the device is connected using dual-mode.
+  Changed paths:
+    M doc/org.bluez.MediaTransport.rst
 
-That being said, Bearer does sound like a better name for the
-property, and I can modify the patch to that effect. However, I don't
-foresee the need for a ConnectBearer property for Wine. Ultimately, my
-goal is to implement Bluetooth functionality with the minimum possible
-API surface added to BlueZ, hence the small (ish) patches.
+  Log Message:
+  -----------
+  doc/media: Add Encryption and BCode fields to QoS property
 
---=20
-Vibhav Pant
-vibhavp@gmail.com
-GPG: 7ED1 D48C 513C A024 BE3A  785F E3FB 28CB 6AB5 9598
+This adds the missing QoS fields, Encryption and BCode.
+
+
+  Commit: f72fd8265000bbd5e3bf4b705576cf046ca2c8a5
+      https://github.com/bluez/bluez/commit/f72fd8265000bbd5e3bf4b705576cf046ca2c8a5
+  Author: Vlad Pruteanu <vlad.pruteanu@nxp.com>
+  Date:   2024-09-09 (Mon, 09 Sep 2024)
+
+  Changed paths:
+    M profiles/audio/transport.c
+
+  Log Message:
+  -----------
+  transport: Make get_bcast_qos return the encryption flag
+
+This adds the encryption flag to the response returned by the
+get_bcast_qos method.
+
+
+  Commit: a1bde349db6bdb483f0396d1ba79f9078a3df431
+      https://github.com/bluez/bluez/commit/a1bde349db6bdb483f0396d1ba79f9078a3df431
+  Author: Vlad Pruteanu <vlad.pruteanu@nxp.com>
+  Date:   2024-09-09 (Mon, 09 Sep 2024)
+
+  Changed paths:
+    M gdbus/client.c
+    M gdbus/gdbus.h
+
+  Log Message:
+  -----------
+  gdbus: Add g_dbus_proxy_set_property_dict
+
+This adds a new gdbus function to allow for the setting of a
+dictionary-type property (a{sv}). It receives the name of the
+property, the name of the first entry to be set from the
+dictionary, it's type and value, followed by the second pair of
+entry_name, type, value, and so on, marking the end of the
+entries with NULL. Additionally, if the type is an array, the
+type of the array and it's length must also be proviedd. These
+values are passed as a dict entry, to the set method associated
+with the property. There, it must be parsed and the appropriate
+entry updated.
+
+Example of usage:
+
+g_dbus_proxy_set_property_dict(proxy, "dict_property_name", cb,
+user_data, NULL, "entry_1", DBUS_TYPE_ARRAY, DBUS_TYPE_BYTE,
+value_1_len, value_1, "entry_2", DBUS_TYPE_BYTE, value_2, NULL)
+
+
+  Commit: b48d366458edd180679de6c7b21a49feb4a86b1f
+      https://github.com/bluez/bluez/commit/b48d366458edd180679de6c7b21a49feb4a86b1f
+  Author: Vlad Pruteanu <vlad.pruteanu@nxp.com>
+  Date:   2024-09-09 (Mon, 09 Sep 2024)
+
+  Changed paths:
+    M doc/org.bluez.MediaTransport.rst
+
+  Log Message:
+  -----------
+  doc/media: Make QoS property readwrite
+
+Update the QoS property to allow for write, so that fields such as
+BCode can be updated.
+
+
+  Commit: c922cc4a74e25b672b3e8a055f63e5048e8824b6
+      https://github.com/bluez/bluez/commit/c922cc4a74e25b672b3e8a055f63e5048e8824b6
+  Author: Vlad Pruteanu <vlad.pruteanu@nxp.com>
+  Date:   2024-09-09 (Mon, 09 Sep 2024)
+
+  Changed paths:
+    M profiles/audio/transport.c
+
+  Log Message:
+  -----------
+  transport: Add set_bcast_qos method
+
+This adds a set method for the QoS property of bcast transports.
+This is needed so that applications like bluetoothctl are able to
+modify the QoS (for example, for setting the broadcast code).
+
+
+  Commit: 8d43c209f084628c0896526174b3061171c9a64b
+      https://github.com/bluez/bluez/commit/8d43c209f084628c0896526174b3061171c9a64b
+  Author: Vlad Pruteanu <vlad.pruteanu@nxp.com>
+  Date:   2024-09-09 (Mon, 09 Sep 2024)
+
+  Changed paths:
+    M src/shared/bap.c
+
+  Log Message:
+  -----------
+  shared/bap: Enable set qos method for BT_BAP_BCAST_SINK stream
+
+This enables the set qos method, bap_bcast_qos, for the bcast sink
+streams as well.
+
+
+  Commit: 35f2bb95171e595df6ed7495afcf125bc0fee274
+      https://github.com/bluez/bluez/commit/35f2bb95171e595df6ed7495afcf125bc0fee274
+  Author: Vlad Pruteanu <vlad.pruteanu@nxp.com>
+  Date:   2024-09-09 (Mon, 09 Sep 2024)
+
+  Changed paths:
+    M client/player.c
+
+  Log Message:
+  -----------
+  client/player: Prompt the user to enter the bcode
+
+This adds support for entering the broadcast code on sink side. When
+the user selects a transport, if the transport is encrypted, the user
+will be prompted to enter the broadcast code before the process of
+transport selection can continue.
+
+
+  Commit: 4ecfdef3b52fbd39a5049baa2321942637c2bc0e
+      https://github.com/bluez/bluez/commit/4ecfdef3b52fbd39a5049baa2321942637c2bc0e
+  Author: Vlad Pruteanu <vlad.pruteanu@nxp.com>
+  Date:   2024-09-09 (Mon, 09 Sep 2024)
+
+  Changed paths:
+    M profiles/audio/bap.c
+
+  Log Message:
+  -----------
+  bap: Refresh qos stored in setup before doing BIG sync
+
+When syncing to an encrypted stream, after setting the broadcast
+code, the qos values stored in the setup must be refreshed so that
+they reflect this change.
+
+
+Compare: https://github.com/bluez/bluez/compare/e8575b6196ab...4ecfdef3b52f
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
