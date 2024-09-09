@@ -1,219 +1,96 @@
-Received: from out-21.smtp.github.com (out-21.smtp.github.com [192.30.252.204])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ua1-f47.google.com (mail-ua1-f47.google.com [209.85.222.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CDEA18801E
-	for <linux-bluetooth@vger.kernel.org>; Mon,  9 Sep 2024 17:35:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.204
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 925623CF51
+	for <linux-bluetooth@vger.kernel.org>; Mon,  9 Sep 2024 19:44:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725903356; cv=none; b=aij0QaWSac9Ldtg49ml7OMGmSAVmjUBMB8Zo6qFZ/TeqgxwGqoaYJ1scXsnbDXa2lRK59ZJPkJYL1FxMqpsodnf9XKRXJKZPOFqK+/R6akH1S7NIc3d88i0fkarDEl8dWfwdo0XT3iY2xojKkkk+lZgtAHZ6+Ft0HiBtYHFewuA=
+	t=1725911089; cv=none; b=Rccum6753fqfr8+AT3W7YrIbmTlLMviB9xtrM9QHNh5ePrdwPFwMBQhk0lo4Y0cKrjkvMFBbYFeoTbPhQMwX6Bhi+y0COzCzVxAoiJA0b1PBR6I5ayZ3PvoJNYiNh9SIEKzdXwzJfB8jaXJmzxztF/6jUGspmxatU0KTk889KW4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725903356; c=relaxed/simple;
-	bh=B03lsdJhaTNZTY6NeOhaIDXriAfJP8Mx544C19+M4+8=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=N2s63ubYU0U04EdUG3WInszjA/1Z5sfHICnAbxtXY+q6ZkesFGMkw6cv7Nt18bXqPWTnX5c5lYrKVIF9kidncCc8W83Gn81E+cTuajIs6v4EUXLnt0Q25nNbnNNg646KR4MbFRCV5t2wZMWOSAADto+iiOrWDc/1pdmDzIUpz3U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=R4vwhbcR; arc=none smtp.client-ip=192.30.252.204
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1725911089; c=relaxed/simple;
+	bh=Pmf5qRBAY1GX0Iz3zETdKHJA7ADI2jumk7QcEy7eZ6U=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=KqItxMDzT4ULbhHDwAGc+rMEt8kUYqfX9IfGIq0VdurYBBkbXMim/74R+4vCbLxcrans0siWf3rduJfqERj1j3i/WPjVYB+DQtmjRZf3WOxfTy+f6p2YHwzrzslnVh8UaLrmobpZOH7LC6MkwyxeHpvQZRP/NUajJQ7uHvVZ7Zg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BXnz/8Qi; arc=none smtp.client-ip=209.85.222.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="R4vwhbcR"
-Received: from github.com (hubbernetes-node-25778e7.ac4-iad.github.net [10.52.131.39])
-	by smtp.github.com (Postfix) with ESMTPA id 405B1700A91
-	for <linux-bluetooth@vger.kernel.org>; Mon,  9 Sep 2024 10:35:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1725903353;
-	bh=WhCjnhPb6WjuBM3MtldP/WmQ+fHzCD59qJuWW1ZlFQM=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=R4vwhbcRh1tyP+S6v5pEfrhON/Kc1jGDHHuFkX2NU1f5zL7lggHM7fVrLiP+YZlCV
-	 Wkrz9iJ+JqR3iqkwdUzcGPNrKUgjIt6NBiyUxFEqYKRME4MZk89j6L7DoOzGhn/N9A
-	 XB576CdPiuaQWVVed8LBD+Fk8tzxyrDytlywwNK4=
-Date: Mon, 09 Sep 2024 10:35:53 -0700
-From: vlad-pruteanu <noreply@github.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BXnz/8Qi"
+Received: by mail-ua1-f47.google.com with SMTP id a1e0cc1a2514c-846ca104682so808241.2
+        for <linux-bluetooth@vger.kernel.org>; Mon, 09 Sep 2024 12:44:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1725911086; x=1726515886; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=BWR25QdGDmkOHfEyQz727qFXs/Fk4VaD8IwJ/1Zo19w=;
+        b=BXnz/8QiqaCdxa9poW1Aozn9OmZV7thgtBEUx3/GIdqT96N2exnCye5mMsb/G7sS13
+         uACHdpGtA/4mJQKN8IppQ8EZj5anYckw1Hl6Ahg+uV10dD8aL6CU7QUS0+AL6zuMb4T3
+         DVpFaAGioztFmOr/PxGOKZ3JIGFUy9pIfhK7rBextRTIj5wdExGaUn4PAAWIeTRuhyc7
+         LYatWyuUpeOo35i6bZGAxKFDo6e/2bcAZTN2AssWBOvDkk800K0Qm1C68vE0S3mBRU3O
+         XLYt3r8fco0NRv+duysetT3Nkhs6DwBzv+03s/alBs27dLk/OK5xfLyu/1YmDqtHJQle
+         z19w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1725911086; x=1726515886;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=BWR25QdGDmkOHfEyQz727qFXs/Fk4VaD8IwJ/1Zo19w=;
+        b=gXTNNU59awhee7Dn0LnGOwj26jVU8bPcMt2LNbv5d/hd5a8eiwnxwTW0YJaFCURrl7
+         RTY67DREs2JEho6tWKDFOPM7tKaNBAvMJfrcoM/uQLtZ4MXksf+J4lD6bt56pNCmENqa
+         SOCcJWDI29jlqomS1OeLgxiqUFcvRsVIaXwqc5qek5/61f9a7fbmlu8vkUkaKQFT+Y5A
+         /B6SeuhbE7+o30L4N1D0fRkWoFjkggPrkKoVvMpFDoAdl+50X6TOEuUiqPBK9O8zxK8u
+         3NX29MV55IsFDQzlIyhF3J/zdyoMdIXR64ZKJ+z5t7Pc2UGn1gmI3nWCbJMNhlxAkXUZ
+         Xl2A==
+X-Gm-Message-State: AOJu0YzlK31WBeUMjXJN0iSfwqNm0ea3huWTXRLtXwZzGf85VRbnRzlC
+	wYV/TVpRbB6eH3owJADlJVODq4gpjnMrXNzXKIVeQ8RNMHWQLxg1VNy+4w==
+X-Google-Smtp-Source: AGHT+IGLBfJrDCL9e0J2g0wB4ASt779UruPZzzJ2EBEHrrPN8T5GUZK02YLXezlfDU/7fJw2zP7SUw==
+X-Received: by 2002:a05:6102:26d4:b0:493:e582:70ce with SMTP id ada2fe7eead31-49beccf9791mr6950731137.10.1725911085640;
+        Mon, 09 Sep 2024 12:44:45 -0700 (PDT)
+Received: from lvondent-mobl5.. (syn-107-146-107-067.res.spectrum.com. [107.146.107.67])
+        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-49c16ce78aasm27243137.18.2024.09.09.12.44.44
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 09 Sep 2024 12:44:45 -0700 (PDT)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/master/dfcbc2-54866c@github.com>
-Subject: [bluez/bluez] 2ec779: client/assistant: Enter Broadcast Code as
- string
+Subject: [RESEND v1] Bluetooth: hci_sync: Ignore errors from HCI_OP_REMOTE_NAME_REQ_CANCEL
+Date: Mon,  9 Sep 2024 15:44:43 -0400
+Message-ID: <20240909194443.2387703-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.46.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-  Branch: refs/heads/master
-  Home:   https://github.com/bluez/bluez
-  Commit: 2ec7799354968f66dd00832bb33895134029c3bb
-      https://github.com/bluez/bluez/commit/2ec7799354968f66dd00832bb3389=
-5134029c3bb
-  Author: Iulia Tanasescu <iulia.tanasescu@nxp.com>
-  Date:   2024-09-09 (Mon, 09 Sep 2024)
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-  Changed paths:
-    M client/assistant.c
+This ignores errors from HCI_OP_REMOTE_NAME_REQ_CANCEL since it
+shouldn't interfere with the stopping of discovery and in certain
+conditions it seems to be failing.
 
-  Log Message:
-  -----------
-  client/assistant: Enter Broadcast Code as string
+Link: https://github.com/bluez/bluez/issues/575
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+---
+ net/bluetooth/hci_sync.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-Currently, the user sets the Broadcast Code as an array of bytes
-when prompted from the assistant submenu. However, the Bluetooth
-Core Specification requires that, on the UI level, the Broadcast
-Code shall be represented as a string (Vol 3, Part C, 3.2.6).
+diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+index 5533e6f561b3..40ccdef168d7 100644
+--- a/net/bluetooth/hci_sync.c
++++ b/net/bluetooth/hci_sync.c
+@@ -5380,7 +5380,10 @@ int hci_stop_discovery_sync(struct hci_dev *hdev)
+ 		if (!e)
+ 			return 0;
+ 
+-		return hci_remote_name_cancel_sync(hdev, &e->data.bdaddr);
++		/* Ignore cancel errors since it should interfere with stopping
++		 * of the discovery.
++		 */
++		hci_remote_name_cancel_sync(hdev, &e->data.bdaddr);
+ 	}
+ 
+ 	return 0;
+-- 
+2.46.0
 
-This commit makes the Broadcast Code be parsed as a string from
-the assistant prompt. The bluetoothctl log below shows a Broadcast
-Assistant pushing an encrypted stream to a peer:
-
-client/bluetoothctl
-[bluetooth]# [CHG] Controller 00:60:37:31:7E:3F Pairable: yes
-[bluetooth]# AdvertisementMonitor path registered
-[bluetooth]# scan on
-[bluetooth]# [NEW] Device 00:60:37:31:7E:3F 00-60-37-31-7E-3F
-[bluetooth]# connect 00:60:37:31:7E:3F
-Attempting to connect to 00:60:37:31:7E:3F
-[CHG] Device 00:60:37:31:7E:3F Connected: yes
-[00-60-37-31-7E-3F]# Connection successful
-[00-60-37-31-7E-3F]# [NEW] Device 19:9A:7A:71:E5:8B 19-9A-7A-71-E5-8B
-[00-60-37-31-7E-3F]# [NEW] Assistant
-    /org/bluez/hci0/src_19_9A_7A_71_E5_8B/dev_00_60_37_31_7E_3F/bis1
-[00-60-37-31-7E-3F]# assistant.push
-    /org/bluez/hci0/src_19_9A_7A_71_E5_8B/dev_00_60_37_31_7E_3F/bis1
-[Assistant] Enter Metadata (auto/value): a
-[Assistant] Enter Broadcast Code (auto/value): Borne House
-[00-60-37-31-7E-3F]# [CHG] Assistant
-    /org/bluez/hci0/src_19_9A_7A_71_E5_8B/dev_00_60_37_31_7E_3F/bis1
-    State: pending
-[00-60-37-31-7E-3F]# Assistant
-    /org/bluez/hci0/src_19_9A_7A_71_E5_8B/dev_00_60_37_31_7E_3F/bis1
-    pushed
-[00-60-37-31-7E-3F]# [CHG] Assistant
-    /org/bluez/hci0/src_19_9A_7A_71_E5_8B/dev_00_60_37_31_7E_3F/bis1
-    State: requesting
-[00-60-37-31-7E-3F]# [CHG] Assistant
-    /org/bluez/hci0/src_19_9A_7A_71_E5_8B/dev_00_60_37_31_7E_3F/bis1
-    State: active
-
-The btmon log below shows the way the Broadcast Code string is converted
-into a byte array and sent to the peer via GATT:
-
-bluetoothd[6013]: < ACL Data TX: Handle 0 flags 0x00 dlen 28
-      ATT: Write Command (0x52) len 23
-        Handle: 0x0040 Type: Broadcast Audio Scan Control Point (0x2bc7)
-          Data[21]: 02018be5717a9a1900db5e3a02ffff010100000000
-            Opcode: Add Source (0x02)
-            Source_Address_Type: 1
-            Source_Address: 19:9A:7A:71:E5:8B
-            Source_Adv_SID: 0
-            Broadcast_ID: 0x3a5edb
-            PA_Sync_State: Synchronize to PA - PAST not available
-            PA_Interval: 0xffff
-            Num_Subgroups: 1
-            Subgroup #0:
-              BIS_Sync State: 0x00000001
-> ACL Data RX: Handle 0 flags 0x01 dlen 2
-      ATT: Handle Multiple Value Notification (0x23) len 24
-        Length: 0x0014
-        Handle: 0x003a Type: Broadcast Receive State (0x2bc8)
-          Data[20]: 01018be5717a9a1900db5e3a0201010000000000
-          Source_ID: 1
-          Source_Address_Type: 1
-          Source_Address: 19:9A:7A:71:E5:8B
-          Source_Adv_SID: 0
-          Broadcast_ID: 0x3a5edb
-          PA_Sync_State: Synchronized to PA
-          BIG_Encryption: Broadcast_Code required
-          Num_Subgroups: 1
-          Subgroup #0:
-            BIS_Sync State: 0x00000000
-bluetoothd[6013]: < ACL Data TX: Handle 0 flags 0x00 dlen 25
-      ATT: Write Command (0x52) len 20
-        Handle: 0x0040 Type: Broadcast Audio Scan Control Point (0x2bc7)
-          Data[18]: 040142c3b8726e6520486f75736500000000
-            Opcode: Set Broadcast_Code (0x04)
-            Source_ID: 1
-            Broadcast_Code[16]: 426f726e6520486f7573650000000000
-> ACL Data RX: Handle 0 flags 0x01 dlen 2
-      ATT: Handle Multiple Value Notification (0x23) len 24
-        Length: 0x0014
-        Handle: 0x003a Type: Broadcast Receive State (0x2bc8)
-          Data[20]: 01018be5717a9a1900db5e3a0202010100000000
-          Source_ID: 1
-          Source_Address_Type: 1
-          Source_Address: 19:9A:7A:71:E5:8B
-          Source_Adv_SID: 0
-          Broadcast_ID: 0x3a5edb
-          PA_Sync_State: Synchronized to PA
-          BIG_Encryption: Decrypting
-          Num_Subgroups: 1
-          Subgroup #0:
-            BIS_Sync State: 0x00000001
-
-
-  Commit: f30cbaa43d28b430104393b76c648323d8100b33
-      https://github.com/bluez/bluez/commit/f30cbaa43d28b430104393b76c648=
-323d8100b33
-  Author: Iulia Tanasescu <iulia.tanasescu@nxp.com>
-  Date:   2024-09-09 (Mon, 09 Sep 2024)
-
-  Changed paths:
-    M client/bluetoothctl-assistant.rst
-
-  Log Message:
-  -----------
-  bluetoothctl-assistant.1: Update push command example
-
-This updates the push command example to enter the Broadcast Code,
-since it should be entered as a string instead of a byte array.
-
-
-  Commit: daa86e06c376d6e92bb0d1e2f1edb649974bfcbd
-      https://github.com/bluez/bluez/commit/daa86e06c376d6e92bb0d1e2f1edb=
-649974bfcbd
-  Author: Guido G=C3=BCnther <agx@sigxcpu.org>
-  Date:   2024-09-09 (Mon, 09 Sep 2024)
-
-  Changed paths:
-    M Makefile.am
-    M Makefile.obexd
-    M Makefile.tools
-    M configure.ac
-    A tools/mpris-proxy.service.in
-
-  Log Message:
-  -----------
-  tools/mpris-proxy: Add systemd user unit
-
-That way it will be started automatically which is convenient on phones.
-Distributions can then decide part of which install the unit should be.
-
-Signed-off-by: Guido G=C3=BCnther <agx@sigxcpu.org>
-
-
-  Commit: 54866cee3fad31880047ba81dbb12746186522cb
-      https://github.com/bluez/bluez/commit/54866cee3fad31880047ba81dbb12=
-746186522cb
-  Author: Vlad Pruteanu <vlad.pruteanu@nxp.com>
-  Date:   2024-09-09 (Mon, 09 Sep 2024)
-
-  Changed paths:
-    M profiles/audio/transport.c
-
-  Log Message:
-  -----------
-  transport: Fix broadcast sink check
-
-In transport_update_playing a check is performed to guard the path
-which contains the TRANSPORT_STATE_BROADCASTING state. This branch
-should be taken only when the device on which the code runs is a
-broadcast sink. Thus, the UUID check is wrong, and this patch
-updates it appropriately.
-
-
-Compare: https://github.com/bluez/bluez/compare/dfcbc2d3c011...54866cee3f=
-ad
-
-To unsubscribe from these emails, change your notification settings at ht=
-tps://github.com/bluez/bluez/settings/notifications
