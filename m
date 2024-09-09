@@ -1,88 +1,128 @@
-Received: from mail-yw1-f175.google.com (mail-yw1-f175.google.com [209.85.128.175])
+Received: from mail-lj1-f170.google.com (mail-lj1-f170.google.com [209.85.208.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 404F718A959
-	for <linux-bluetooth@vger.kernel.org>; Mon,  9 Sep 2024 20:58:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D672A18C33A;
+	Mon,  9 Sep 2024 21:23:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725915482; cv=none; b=KPwhTMouRSzFcj8MKKbn0UXya5PjRmvm4xoTezTzcTxHNMvG7YrEOA37HAGLcdDvXTWhcamIXJhU95IcXkoGZKsZLKT1lBssybOl6KYKDmuCtBwhqn+HyzCRCP7SxRTBxOjKHq69GKyK0xWpodVecPuOa2WcLTajC7RV9cVZdCA=
+	t=1725917030; cv=none; b=s5bQbteNa9Lq2FNoH5et2ARMECqKo0itCWsWbdnGqdVmrKuemjPygPFfUtKZXDpvvmKK+QKtaAm6nL00W6+dE8plIERiONmmjcH8aWDK+GD1CMCAepxYGsrdyhwHuIAV0KdsfKWB/81fmEKfrykasBUV5LocB6V8C8X1bTjEEU4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725915482; c=relaxed/simple;
-	bh=lGLdY1ylT3wRFiKmV/y6n60Cr/2cy7pdFUH8q8cqxfA=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=JlY8KsxMwFNUE5ZK6gofvmHlmjL7fMAuzFRv3SjtE3EBxzunRO2A2YUtFi98+kRTzJs/+FZtc0MqzalCFjNBhyKrrIQjCE/pEakWqrgjkJUV4BprnOF+LkqgIqXkVsWBBaszZjtLiXwAW0P6g4X+bAuxlWwZaBqiyGhBusHYysc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=tvisioninsights.com; spf=pass smtp.mailfrom=tvisioninsights.com; dkim=pass (2048-bit key) header.d=tvisioninsights.com header.i=@tvisioninsights.com header.b=UGl0DmRF; arc=none smtp.client-ip=209.85.128.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=tvisioninsights.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tvisioninsights.com
+	s=arc-20240116; t=1725917030; c=relaxed/simple;
+	bh=LJycY7wUCB2mnqi/4rp/m+7fAW+Ob1l/t407YniIBd4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=WY0UnSqCuqBwllpbeXvWLfgC2Y04UX1wfPZhOrf6pY1oMheiTBcAzfdzz6kYPIMS32HVSWVqiqYdg5l7qetoVRvIrjoYQ7Qe1I6rC2uaUY8pXdDocWuqlRPiQT0+TirY+SG8WNnN5+TU75sokciHX5eT7ZmbCxWsJcPtvB1GCa4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OCjVTiJg; arc=none smtp.client-ip=209.85.208.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tvisioninsights.com header.i=@tvisioninsights.com header.b="UGl0DmRF"
-Received: by mail-yw1-f175.google.com with SMTP id 00721157ae682-6d6a3ab427aso36864457b3.2
-        for <linux-bluetooth@vger.kernel.org>; Mon, 09 Sep 2024 13:57:59 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OCjVTiJg"
+Received: by mail-lj1-f170.google.com with SMTP id 38308e7fff4ca-2f6580c2bbfso49429451fa.1;
+        Mon, 09 Sep 2024 14:23:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=tvisioninsights.com; s=google; t=1725915479; x=1726520279; darn=vger.kernel.org;
-        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=lGLdY1ylT3wRFiKmV/y6n60Cr/2cy7pdFUH8q8cqxfA=;
-        b=UGl0DmRFxCNwB1JVwsFN/vmEU6zhBo/D4G/0+E4ZGl1IIHUpWT7w7+rVm42q1VUqm2
-         DJUL36J7VYF/ee2DmrU8dm3ResKUo3NqsXifEONj7P8v+Lpn2UAnndT+PYRLyfBM/xAV
-         xJUaC4+4ISMnDjVS5e+i1XbpuXO897jyChLC/pHZ8BUc76qdr+R/Ij719AqNSDRzIBlu
-         VBOmZIzIyrN0C6E4vwEYupTJ7cRl7OOMNO5jB06/QrQMCClFf6fnTfkcoISudfMyq8hk
-         ZfkU1ibZubboxkHaBoZYs0ImJ31it5wzYG14P2yp4qJJKEcjHuoixWJcp8v/3IOtCCMD
-         bQzQ==
+        d=gmail.com; s=20230601; t=1725917027; x=1726521827; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=VF/r4+qQtlkpT6+w0E5eY/DCQQmMuW8PUgpZZm72sBk=;
+        b=OCjVTiJgf6+XbqqxmveWOHKy/ZxoEdsvHGsOP40d4/hH2LG4eKbo1YrYzE/B1LuKkJ
+         5skb7P+L3QY1+323ILoowcuNIHG7HuoiOGrAPUyknrey9TTCUlLnxDRuwE2BlBhITTdt
+         0hTHHt96y/VZFL5tacoT8AIB96pn+ohMSL15h3MTWEH2ZZP+db1X8qGAIj4hIFs3Q0Pi
+         e6IJ6XLVG35HBPnCjB6r+kk+dapqR5Z/4IKKLCF7IVDhknlEe+h/25+7mh2Vl2VzxKSr
+         zfK5mvTDFcqhs8W4F4Fs3juRTgcGIvU1PbRqfun5NySi6PBaybOuOrkE2KMsJwbNE/ua
+         8GUg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725915479; x=1726520279;
-        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=lGLdY1ylT3wRFiKmV/y6n60Cr/2cy7pdFUH8q8cqxfA=;
-        b=gn3YZkvxkXYM+48Jr5atZznXDNk6nWPOhLe35aWXCL0Vt2sp4vj69FmdNkhfpSGH31
-         /JoEatSI8Ca6B8G9SGmj9ipT5+/s5HPuJ9JY0wdW8k4CGqs3AMS2+QU/GTLRewziAQID
-         M32MrQP+4urd4pHWH4IrdhsxFK18a0Kpdqt2cwcR/xWEsLrr8iMN9eq2ejpGxLmwkIkV
-         KRqAz/YY3EOBoL3s+eq/PAEiotoDpiOuJpyDhLpqflf73tDX2Op/2o1Wk9tTAavaOoPx
-         gfGatNPcHia3tbQZ7jnwP4IdI6fMmm8QtknRtq+smsps4EDG7R8nWTyu/rryb2VMtw6j
-         PNew==
-X-Forwarded-Encrypted: i=1; AJvYcCUKYOOeQMdr/G5ZZqGPagqXlX4Y7en3H5jsd+DLMh47u0YPu/FquegEXbNvkpnh4PX9BWdyh/PwR9tnC5/FNiA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyAL1OtezKKoQ0Se77ro7Ps+P+kt4DOnT2vzlECLh9Mumxk5SUF
-	ulkQPUxV6j5cz1R5S4aaVQj8T5dJ+0H7iw/7FnD+a77lOXt4EMLNLdzXJZswWcD17rzP2mmRfoq
-	VPE9H9Nv2RVH7AXEOhp9HWEecEhqPEYyR6eqkbc+kLXf4ak2tiZo=
-X-Google-Smtp-Source: AGHT+IF1orA8emKndjOJ/2i/tad6xxCgsRxmQyBlQGvdH9F9sv7UvwrvEA/tsy5zVBWAnjAOG13yOWajqFxSY0gauFU=
-X-Received: by 2002:a05:690c:6a88:b0:64a:4161:4f94 with SMTP id
- 00721157ae682-6db44dfe5damr115813387b3.20.1725915479053; Mon, 09 Sep 2024
- 13:57:59 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1725917027; x=1726521827;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=VF/r4+qQtlkpT6+w0E5eY/DCQQmMuW8PUgpZZm72sBk=;
+        b=Tvvn4WngLQ2Vk+nysU1yoKTj0qH5Z9ylA1DoQl0sDZywuqnAKFzCwfaQXUv2M74SzB
+         qlAg3bfXSXtFmsNAgONoANkbSLAUpNg1hieB7WN6tMSMAvWsLEBF0oQKmiGvP2zrBlcw
+         rVSPkU24qetDfzjp/43sgTDchZyQAM5SL4sKc+XQm4ab38W/OafdfEiUEf4AfppWpmgH
+         FXYXxwu+qSDvgkYMbi/m2Ojmn1FfEPcGsRzEQBaBug9r+kPtp5Ar/yckDr0BGHicc4pb
+         lr3biudH9UROvkp4DnRaSyjWe2hmOce/pZvp5GHDM3yoRj5U3PzNkJJXZV9AHAV6hXsC
+         HZ4A==
+X-Forwarded-Encrypted: i=1; AJvYcCU/3NIUwT+y9jME1E/wyQyMev7vOtYLr5tfvYouzt/OEPxc8wElPR2CxURK4PuoTb8fo25IOr7NN2qvK7qRfp8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzStJgU7TazSvSVscGh1nAlhsVKJSAdR4mVWpY2N+TQ/xbIPA5w
+	zyeNviycmBxiZ9sMJ26YsAZU9C4Hy94Zw2DTlT/8RW4EiJLrW8L9fw+5fCb+acZGf6Oo+v7KRHU
+	OKb3hO0EPiNNdvOQvL4Cl9OF4xyRq9RfX
+X-Google-Smtp-Source: AGHT+IE8r828tWLfEiuUn0wZC/opaltdjLbmW1H2wPR/VUjtzdDywTX/IUL4Valhglw38IMiyFscn8vClMnapQFWT1Q=
+X-Received: by 2002:a05:651c:1a0a:b0:2ef:21a6:7c82 with SMTP id
+ 38308e7fff4ca-2f7726fb55dmr2144811fa.20.1725917025989; Mon, 09 Sep 2024
+ 14:23:45 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Julio Lajara <julio@tvisioninsights.com>
-Date: Mon, 9 Sep 2024 16:57:23 -0400
-Message-ID: <CAOrC7GfMagHXiZ3GzxmPMRgguWi0g1rUgcpgQFYHstfkaSstBw@mail.gmail.com>
-Subject: Initializing bluetooth using socket.c userland functions broken after
- upgrade from 6.5 to 6.8 (and mainline 6.9, 6.10)
-To: linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org
+References: <CAOrC7GfMagHXiZ3GzxmPMRgguWi0g1rUgcpgQFYHstfkaSstBw@mail.gmail.com>
+In-Reply-To: <CAOrC7GfMagHXiZ3GzxmPMRgguWi0g1rUgcpgQFYHstfkaSstBw@mail.gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Mon, 9 Sep 2024 17:23:33 -0400
+Message-ID: <CABBYNZKJH3916j3V17Jc51Rr7xs22aFq7zA3FVvBo50hguXJoA@mail.gmail.com>
+Subject: Re: Initializing bluetooth using socket.c userland functions broken
+ after upgrade from 6.5 to 6.8 (and mainline 6.9, 6.10)
+To: Julio Lajara <julio@tvisioninsights.com>
+Cc: linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-My company uses pybleno to initialize bluetooth LE devices on our IOT
-devices as GATT servers.
-This has worked fine from 4.x kernels on Ubuntu 18.04 up to 6.5.0 on
-Ubuntu 22.04 for us. The Python code interfaces
-with the socket.c userland functions AFAICT.
+Hi Julio,
 
-After upgrading from 6.5 to 6.8 kernel on Ubuntu 22.04, the kernel is
-now returning
+On Mon, Sep 9, 2024 at 4:58=E2=80=AFPM Julio Lajara <julio@tvisioninsights.=
+com> wrote:
+>
+> My company uses pybleno to initialize bluetooth LE devices on our IOT
+> devices as GATT servers.
+> This has worked fine from 4.x kernels on Ubuntu 18.04 up to 6.5.0 on
+> Ubuntu 22.04 for us. The Python code interfaces
+> with the socket.c userland functions AFAICT.
+>
+> After upgrading from 6.5 to 6.8 kernel on Ubuntu 22.04, the kernel is
+> now returning
+>
+> "[Errno 22] Invalid Argument" from the socket.c setsockopt function.
+>
+> I have outline as best I can what I checked in the downstream pybleno
+> ticket here: https://github.com/Adam-Langley/pybleno/issues/63
+>
+> I could use some input on whether on not any of the recent socket.c
+> changes between 6.5 to 6.8 changes could have caused this and if
+> this is a regression or whether not the Python calls to these socket.c
+> functions which have worked since 4.x need to be rewritten as a result
+> of an expected interface change on the kernel side.
+>
+> This problem exists for us as well when we tested with mainline 6.9
+> and 6.10 kernels last week and our only current solution is
+> downgrading to 6.5 .
+>
+> Thank you,
 
-"[Errno 22] Invalid Argument" from the socket.c setsockopt function.
+Most likely:
 
-I have outline as best I can what I checked in the downstream pybleno
-ticket here: https://github.com/Adam-Langley/pybleno/issues/63
+Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Date:   Fri Apr 5 16:46:50 2024 -0400
 
-I could use some input on whether on not any of the recent socket.c
-changes between 6.5 to 6.8 changes could have caused this and if
-this is a regression or whether not the Python calls to these socket.c
-functions which have worked since 4.x need to be rewritten as a result
-of an expected interface change on the kernel side.
+    Bluetooth: hci_sock: Fix not validating setsockopt user input
 
-This problem exists for us as well when we tested with mainline 6.9
-and 6.10 kernels last week and our only current solution is
-downgrading to 6.5 .
+    Check user input length before copying data.
 
-Thank you,
+    Fixes: 09572fca7223 ("Bluetooth: hci_sock: Add support for BT_{SND,RCV}=
+BUF")
+    Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+
+I wouldn't be surprised that people are actually not using hci_ufilter
+struct when setting HCI_FILTER and the it fails at:
+
+static inline int bt_copy_from_sockptr(void *dst, size_t dst_size,
+                       sockptr_t src, size_t src_size)
+{
+    if (dst_size > src_size)
+        return -EINVAL;
+
+    return copy_from_sockptr(dst, src, dst_size);
+}
+
+--=20
+Luiz Augusto von Dentz
