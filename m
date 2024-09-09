@@ -1,110 +1,211 @@
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f178.google.com (mail-lj1-f178.google.com [209.85.208.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0158A1B375C;
-	Mon,  9 Sep 2024 12:40:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEDB8139CF6
+	for <linux-bluetooth@vger.kernel.org>; Mon,  9 Sep 2024 15:17:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725885630; cv=none; b=UBoTkCiTY0uCxfPhYWQA/5C/qdiLvFB2Aq4GmbFDAp8QH5QzI2z4L9VRgXgNzN7fhnvrQS1gyI63/4ncPM7pBEZTZBIbsMKxFkHhY4lOscoFZzEkDC6Rzgtw65xvpYcxSie7LZo3by0L7aIHd7Rr89l8CrIt6LfYq0QCU3r55H8=
+	t=1725895033; cv=none; b=ia80+C8f9sSIYSNLuSCmuTXNL4eQYjKxcNFUwd860fR26DibmJI2CdoeEfmslwGOoQwavKqoHYCFdL+owTqCqD8/iDUIj5xi0BJ2HT8+rJR+fQRATk6QvveN18Z6HCM0gW3wNo+4/uChz0ZWfjBZPLgKLaJ9w9e2r05pbYi9lzw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725885630; c=relaxed/simple;
-	bh=avLcO7PKE2LaQ9TnVodcfdEGPe+Kj9ffz1kmZQ3Rn6I=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=qp5Qn6Sv2Bp4EQ1SbdgiWJP0RApBxiiyv9sSXvkxLLSDy6Wsf/kVbh32WfJuj1y8m6SbUqAAUsc9FgN4G+9zWl5iPiKVGEpQ6mlnoZtVAXt0ms7FzOz6dzsGavtwHspC04iR2MHwEiDV/MALKXAkhDggC0UAKVr3qp5+n/ioIjE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from [10.16.9.194] (hh-wlan-01.rz-berlin.mpg.de [141.14.51.17])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 8492661E64862;
-	Mon,  9 Sep 2024 14:40:10 +0200 (CEST)
-Message-ID: <6a993f00-ee3a-41fe-89f4-eeb604c3c880@molgen.mpg.de>
-Date: Mon, 9 Sep 2024 14:40:09 +0200
+	s=arc-20240116; t=1725895033; c=relaxed/simple;
+	bh=PfUbmvl8pnC38nNG+85kwfU7OQq+MlTh3LFpyXNxJqQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=fplQM4b4hhLfReTNM4gVXt3lf+bm6aBlLKzchSNfGxGLp9xEN4Y6vbtrNcN0GOwcM06l1AG2wwtb333qcRDYcUAlegYxHKVEE9wVuSK3l5fxa0Ow6T9JisBqyYz8VfRo/YCJXK8X/+XmXcBo5AE6qOJepYkzJhVVfk2gsXemTaM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fhdBRvb8; arc=none smtp.client-ip=209.85.208.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fhdBRvb8"
+Received: by mail-lj1-f178.google.com with SMTP id 38308e7fff4ca-2f75c6ed397so22528801fa.2
+        for <linux-bluetooth@vger.kernel.org>; Mon, 09 Sep 2024 08:17:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1725895030; x=1726499830; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=CLA0mDVxoimThfZPYgeYBnLDpXJg/tS2MYQqK1x7b1Y=;
+        b=fhdBRvb8y5ojuRPLVAtVBisVGoVGq0utkMP6m/CR2tEkNRL+EulFe+zcDdRCyqKCke
+         4TZL+vsG/yaof6Qr6c+74d0R4C61bMUDsKmPi8sLRg6gtOQ5ySiAV7/vMgqNZEn3Zi7T
+         hXnX1f2lSFbIIDL365MSLzyevbWKErTcxisgGkL0JNoIXlZLJIsyO1bSLtecWDyz6hOW
+         c5ao9yRybS0r+HzJkZbxq6k6cYk+E+dPDzJxO2syL+qw++cgakezS13RyXqKAb/7KkLW
+         hnbtDa6fIS5LXOyv6egyXdfPKwZL7fR6fgA4ZXVZl0rt9uolD681iKxvedceTudcfaOd
+         i0ew==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1725895030; x=1726499830;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=CLA0mDVxoimThfZPYgeYBnLDpXJg/tS2MYQqK1x7b1Y=;
+        b=cq8X1qj+xYBulJpHeVZUS035i2EAhQY/5d9hpigUGnJ+bkjbUPqPegLNODNUXg5RaQ
+         FohkcXyqUpwvj0F7mJSwtX7mH9cjaMgbU+0CiUPfz1OhbgO4ejt7RsC37ZkQKo+D2uoD
+         kpgjrFltgAiSoralSecwkuwqJ4Xhq3ZrOoMdIjSdqBupaIkvhIMRpK0Z4yTELDqritLf
+         WEofmiMYw31c+7bUrse1KSWd3pwPA+vjAMdEeB7W1fuHAMoEO+8sm/f5Fs6oovEU0Deq
+         +f4mLXwiIzirLSK8ielMuB20sFFCdRPUDNLLUDSfM8ouRmGlg5x0rUnlkIol7PPOdRSv
+         lEoA==
+X-Gm-Message-State: AOJu0YyM6xsh6yfwGlQsoJ5aKH85SCjX/asQxp5G3EiEPhJ62N/oi8HT
+	4UJLiDAbAbqdx52gBqKiIUhkyp4k2XmgRFkd6QOMTNM41aZsOUUt0XmT9vClqtZY0ywavFLWjtz
+	5mU8b27jCcMpY3vWj5wW6D3d/yPc=
+X-Google-Smtp-Source: AGHT+IE/NqnmUcc4p3cn7ocnRNXA9Syjd595VawgRybk7HfwQd0mwAXmjspGAB/QB7Vd/n8iVTU2GXuYD27OLP4i9O4=
+X-Received: by 2002:a05:651c:502:b0:2f6:5f7b:e5e0 with SMTP id
+ 38308e7fff4ca-2f751efa3bcmr61745961fa.21.1725895029122; Mon, 09 Sep 2024
+ 08:17:09 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1] Bluetooth: mgmt: Verify cmd pending status before
- removing it
-To: Jiayang Mao <quic_jiaymao@quicinc.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
- Johan Hedberg <johan.hedberg@gmail.com>,
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
- linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20240909030906.26375-1-quic_jiaymao@quicinc.com>
-Content-Language: en-US
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <20240909030906.26375-1-quic_jiaymao@quicinc.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20240907213301.14000-1-vibhavp@gmail.com> <20240907213301.14000-2-vibhavp@gmail.com>
+In-Reply-To: <20240907213301.14000-2-vibhavp@gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Mon, 9 Sep 2024 11:16:56 -0400
+Message-ID: <CABBYNZ+sskbvtEb2CMyGU3_yYJAe4e4Cmh+vrvKj4U9+7872mA@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 1/2] device: Add method GetServiceRecords
+To: Vibhav Pant <vibhavp@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Dear Jiayang,
+Hi Vibhav,
 
+On Sat, Sep 7, 2024 at 5:33=E2=80=AFPM Vibhav Pant <vibhavp@gmail.com> wrot=
+e:
+>
+> GetServiceRecords returns all currently known BR/EDR service records
+> for the device, as an array of array of bytes. Each individual byte
+> array represents a raw SDP record, as defined by the Bluetooth Service
+> Discovery Protocol spec.
+> This method is intended to be only used by compatibility layers like
+> Wine, that need to provide access to raw SDP records to implement the
+> Win32 Bluetooth API. Applications should instead use the Profile API
+> for services-related functionality.
 
-Thank you for your patch.
-
-Am 09.09.24 um 05:09 schrieb Jiayang Mao:
-> From: jiaymao <quic_jiaymao@quicinc.com>
-
-Please use your full name:
-
-     $ git config --global user.name "Jiayang Mao"
-     $ git commit -s --amend --author="Jiayang Mao 
-<quic_jiaymao@quicinc.com>"
-
-> Add a verification step to ensure that a command is still in the pending
-> list before attempting to remove it. A crash may occur during the boot
-> process when Bluetooth is enabled and then immediately disabled. In a
-> race condition, mgmt_index_removed() might free the pending command
-> before mgmt_add_adv_patterns_monitor_complete() is called, leading to a
-> double free scenario.
-> 
-> Part of the crash call trace:
-> 0x0000053D: __list_del_entry_valid_or_report+0x98/0xdc
-> 0x0000053D: mgmt_pending_remove+0x18/0x58 [bluetooth]
-> 0x0000053E: mgmt_remove_adv_monitor_complete+0x80/0x108 [bluetooth]
-> 0x0000053E: hci_cmd_sync_work+0xbc/0x164 [bluetooth]
-
-What is your test environment? Please document it.
-
-> Signed-off-by: jiaymao <quic_jiaymao@quicinc.com>
-
-Ditto.
+Is this the best format though? I'm afraid this would require an upper
+level to implement SDP record parsing as well or is that what Windows
+exposes as well?
 
 > ---
->   net/bluetooth/mgmt.c | 4 ++++
->   1 file changed, 4 insertions(+)
-> 
-> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-> index 25979f4283a6..9d019db92043 100644
-> --- a/net/bluetooth/mgmt.c
-> +++ b/net/bluetooth/mgmt.c
-> @@ -5428,6 +5428,9 @@ static void mgmt_remove_adv_monitor_complete(struct hci_dev *hdev,
->   
->   	hci_dev_lock(hdev);
->   
-> +	if (cmd != pending_find(MGMT_OP_REMOVE_ADV_MONITOR, hdev))
-> +		goto done;
+>  src/device.c | 83 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 83 insertions(+)
+>
+> diff --git a/src/device.c b/src/device.c
+> index 0f18c8c7f..6aa809c80 100644
+> --- a/src/device.c
+> +++ b/src/device.c
+> @@ -3215,6 +3215,86 @@ static DBusMessage *cancel_pairing(DBusConnection =
+*conn, DBusMessage *msg,
+>         return dbus_message_new_method_return(msg);
+>  }
+>
+> +static sdp_list_t *read_device_records(struct btd_device *device);
 > +
->   	rp.monitor_handle = cp->monitor_handle;
->   
->   	if (!status)
-> @@ -5437,6 +5440,7 @@ static void mgmt_remove_adv_monitor_complete(struct hci_dev *hdev,
->   			  mgmt_status(status), &rp, sizeof(rp));
->   	mgmt_pending_remove(cmd);
->   
-> +done:
->   	hci_dev_unlock(hdev);
->   	bt_dev_dbg(hdev, "remove monitor %d complete, status %d",
->   		   rp.monitor_handle, status);
+> +static DBusMessage *get_service_records(DBusConnection *conn, DBusMessag=
+e *msg,
+> +                                       void *data)
+> +{
+> +       DBusMessage *reply;
+> +       DBusMessageIter records_arr, record;
+> +       struct btd_device *device =3D data;
+> +       sdp_list_t *cur;
+> +
+> +       if (!btd_adapter_get_powered(device->adapter))
+> +               return btd_error_not_ready(msg);
+> +
+> +       if (!btd_device_is_connected(device))
+> +               return btd_error_not_connected(msg);
+> +
+> +       if (!device->bredr_state.svc_resolved)
+> +               return btd_error_not_ready(msg);
+> +
+> +       if (!device->tmp_records) {
+> +               device->tmp_records =3D read_device_records(device);
+> +               if (!device->tmp_records)
+> +                       return btd_error_does_not_exist(msg);
+> +       }
+> +
+> +       reply =3D dbus_message_new_method_return(msg);
+> +       if (!reply)
+> +               return btd_error_failed(msg, "Could not create method rep=
+ly");
+> +
+> +       dbus_message_iter_init_append(reply, &records_arr);
+> +       if (!dbus_message_iter_open_container(&records_arr, DBUS_TYPE_ARR=
+AY,
+> +                                             "ay", &record)) {
+> +               dbus_message_unref(reply);
+> +               return btd_error_failed(msg, "Could not initialize iterat=
+or");
+> +       }
+> +
+> +       for (cur =3D device->tmp_records; cur; cur =3D cur->next) {
+> +               DBusMessageIter record_bytes;
+> +               sdp_record_t *rec =3D cur->data;
+> +               sdp_buf_t buf;
+> +               int result;
+> +
+> +               result =3D sdp_gen_record_pdu(rec, &buf);
+> +               if (result) {
+> +                       dbus_message_iter_abandon_container(&records_arr,
+> +                                                           &record);
+> +                       dbus_message_unref(reply);
+> +                       return btd_error_failed(
+> +                               msg, "Could not marshal service record");
+> +               }
+> +               if (!dbus_message_iter_open_container(&record, DBUS_TYPE_=
+ARRAY,
+> +                                                     "y", &record_bytes)=
+) {
+> +                       bt_free(buf.data);
+> +                       dbus_message_iter_abandon_container(&records_arr,
+> +                                                           &record);
+> +                       dbus_message_unref(reply);
+> +                       return btd_error_failed(
+> +                               msg, "Could not initialize iterator");
+> +               }
+> +               if (!dbus_message_iter_append_fixed_array(
+> +                           &record_bytes, DBUS_TYPE_BYTE, &buf.data,
+> +                           buf.data_size)) {
+> +                       bt_free(buf.data);
+> +                       dbus_message_iter_abandon_container(&record,
+> +                                                           &record_bytes=
+);
+> +                       dbus_message_iter_abandon_container(&records_arr,
+> +                                                           &record);
+> +                       dbus_message_unref(reply);
+> +                       return btd_error_failed(
+> +                               msg, "Could not append record data to rep=
+ly");
+> +               }
+> +               dbus_message_iter_close_container(&record, &record_bytes)=
+;
+> +               bt_free(buf.data);
+> +       }
+> +
+> +       dbus_message_iter_close_container(&records_arr, &record);
+> +
+> +       return reply;
+> +}
+> +
+>  static const GDBusMethodTable device_methods[] =3D {
+>         { GDBUS_ASYNC_METHOD("Disconnect", NULL, NULL, dev_disconnect) },
+>         { GDBUS_ASYNC_METHOD("Connect", NULL, NULL, dev_connect) },
+> @@ -3224,6 +3304,9 @@ static const GDBusMethodTable device_methods[] =3D =
+{
+>                                                 NULL, disconnect_profile)=
+ },
+>         { GDBUS_ASYNC_METHOD("Pair", NULL, NULL, pair_device) },
+>         { GDBUS_METHOD("CancelPairing", NULL, NULL, cancel_pairing) },
+> +       { GDBUS_EXPERIMENTAL_METHOD("GetServiceRecords", NULL,
+> +                                   GDBUS_ARGS({ "Records", "aay" }),
+> +                                   get_service_records) },
+>         { }
+>  };
+>
+> --
+> 2.46.0
+>
+>
 
 
-Kind regards,
-
-Paul
+--=20
+Luiz Augusto von Dentz
