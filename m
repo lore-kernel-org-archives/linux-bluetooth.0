@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60D7517C205
-	for <linux-bluetooth@vger.kernel.org>; Mon,  9 Sep 2024 17:30:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D84A217C205
+	for <linux-bluetooth@vger.kernel.org>; Mon,  9 Sep 2024 17:30:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725903036; cv=none; b=eXdEXYDRGzjF0cVG5Og0cgYvWhjDGdHDLpwZqJ0qeD7360bY0Wqlg1M2JsVOyqBqDQtZLPy5uKaD72YFiFSaq/sZ/p4tXcvT65zseeTk4fxN7gQ5yS0Tp1pwXrb7G23NQKHX1SNIu7XmEHOaPLHx8ZnCJPBhSdOD/YPdR6BkTQg=
+	t=1725903037; cv=none; b=N8BhXWqKgdb4IXZotfSvjo40NFxARLAlb8cI/ZPmPKLya6eyMiJzdoU+e2Ns8R3lC2ugFifWCO8RQVOGGzorT7aMuXlUu6nWNOHPlx6hU7dxhIwBlyxxl8ZozoUsn55LZTxfiQB6EavHYTuBOV7pyQCSTw3VKu83vW+JxPs0VK8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725903036; c=relaxed/simple;
-	bh=RZ+ai00cDvAl3o4zxwAeE97jOxhIvb7/0bcsRHEdLnM=;
+	s=arc-20240116; t=1725903037; c=relaxed/simple;
+	bh=S5+EjS18f+DJOczQgrFIkjcM0WxfUrY9Pp4V9gmeWtI=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=cpauyexckvnXXftq0RaB34G6J7Eqv/cSS/FJpzX7VgLHI/3uQe5LtR4HzI+6mAGM56daLUx5+ZtK1j1tAx/uxthLc0wK7v0tOLH5CCSIrcfs8n7JbfhY5ntdk+/JcMfVFV2GQWOPxa6aIH6ZMhl+7y/RU++kF/DLeVdVZKZisIM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=J/wVq9iK; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=QhnwHbg176VohxKuTyIGoDsW97TpU7Bpy3okBDLj3eA5xOhUZZ8VxeK92H43Rwns3p5cDkUTfVdleqdJ0cnkaE0P9pkA0IGZjKqenxE1hykaJ4iL8fg0uMEz3kZfPA2KwU0JrMFA5Z7Xw1Jq56qf67wy4U7aW3SWCMpH5tGde9Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZnC/elGP; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="J/wVq9iK"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 34CADC4CEE2;
-	Mon,  9 Sep 2024 17:30:36 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZnC/elGP"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 74553C4CEE1;
+	Mon,  9 Sep 2024 17:30:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725903036;
-	bh=RZ+ai00cDvAl3o4zxwAeE97jOxhIvb7/0bcsRHEdLnM=;
+	s=k20201202; t=1725903037;
+	bh=S5+EjS18f+DJOczQgrFIkjcM0WxfUrY9Pp4V9gmeWtI=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=J/wVq9iKOOLKilMrDaD/NN4HN1PLKxnEQFtvnpDiSHiPk4wpap0dabKLqcWl709SW
-	 syG5b7E4UdVoeyYYLWf0Ok4UoT0hQ+RWu+IUFQ7tNc0Yv2FvQ3UjZfoaGbrCPInxX9
-	 /sCmCZYexFbNtz5wyXyQc9Ga34doDO9c1quh+CHm6G4pKBi5Drhi1VC5ZjBBqYuzPQ
-	 6IDdGo804IMoaeEalAXIzND/pOrX+uuxawSz910dy+dVTtCs92NSRNL8HWfaaAi4T1
-	 JzrQ8E/zFcnu4v5PdsSqhl6gi+WEhn6uRfeQJv0B95LgBX775IyE5OefXxQnQw61i1
-	 OZpP1nuWKaWgA==
+	b=ZnC/elGPLfWGBJnQHNzkq+6QgZVKvFeHAWw/0Q8AO7NzIbz7XZYsxeMRluUcd5y1D
+	 FzqGRZAe9oDfpuGDGcP2d78mH0Zkdvec1tdW4wFuscoWkxmE/Y8Zyd4wqYDaqrEKBf
+	 TfKzsBGDc0C5bsrKXsYNJYYG+OqF6ppdhtGYRFmRTIf2/G2v8dwKDfLi7YRkc6tUBO
+	 IWvHyDLotkJFJXpFXZ29yIp/uoObA/MeokJbbSGvOSWN0Av0738OBzvks6aNxblxJP
+	 h77J0BBOdBhagUDlV114h22PM/vPbOXCvGdqZQkwL0WzwQTR38jIqgleLJfPHIBlqm
+	 /rdx2sL3/qycg==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70FF03806654;
-	Mon,  9 Sep 2024 17:30:38 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AE02F3806654;
+	Mon,  9 Sep 2024 17:30:39 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -37,38 +37,37 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] tools/mpris-proxy: Add systemd user unit
+Subject: Re: [PATCH BlueZ 0/1] transport: Fix broadcast sink check
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <172590303717.3870513.10000246983993833488.git-patchwork-notify@kernel.org>
-Date: Mon, 09 Sep 2024 17:30:37 +0000
-References: <3548acb9bee2d1d8e0bd8e650a8557241e9e76ca.1725373981.git.agx@sigxcpu.org>
-In-Reply-To: <3548acb9bee2d1d8e0bd8e650a8557241e9e76ca.1725373981.git.agx@sigxcpu.org>
-To: =?utf-8?q?Guido_G=C3=BCnther_=3Cagx=40sigxcpu=2Eorg=3E?=@aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org
-Cc: linux-bluetooth@vger.kernel.org
+ <172590303849.3870513.11045093016032310184.git-patchwork-notify@kernel.org>
+Date: Mon, 09 Sep 2024 17:30:38 +0000
+References: <20240905141340.65495-1-vlad.pruteanu@nxp.com>
+In-Reply-To: <20240905141340.65495-1-vlad.pruteanu@nxp.com>
+To: Vlad Pruteanu <vlad.pruteanu@nxp.com>
+Cc: linux-bluetooth@vger.kernel.org, mihai-octavian.urzica@nxp.com,
+ iulia.tanasescu@nxp.com, andrei.istodorescu@nxp.com, luiz.dentz@gmail.com
 
 Hello:
 
 This patch was applied to bluetooth/bluez.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Tue,  3 Sep 2024 16:33:15 +0200 you wrote:
-> That way it will be started automatically which is convenient on phones.
-> Distributions can then decide part of which install the unit should be.
+On Thu,  5 Sep 2024 17:13:39 +0300 you wrote:
+> In transport_update_playing a check is performed to guard the path
+> which contains the TRANSPORT_STATE_BROADCASTING state. This branch
+> should be taken only when the device on which the code runs is a
+> broadcast sink. Thus, the UUID check is wrong, and this patch
+> updates it appropriately.
 > 
-> Signed-off-by: Guido Günther <agx@sigxcpu.org>
-> ---
->  Makefile.am                  |  3 +++
->  Makefile.obexd               |  3 +--
->  Makefile.tools               |  3 +++
->  configure.ac                 |  9 +++++++++
->  tools/mpris-proxy.service.in | 13 +++++++++++++
->  5 files changed, 29 insertions(+), 2 deletions(-)
->  create mode 100644 tools/mpris-proxy.service.in
+> Vlad Pruteanu (1):
+>   transport: Fix broadcast sink check
+> 
+> [...]
 
 Here is the summary with links:
-  - tools/mpris-proxy: Add systemd user unit
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=daa86e06c376
+  - [BlueZ,1/1] transport: Fix broadcast sink check
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=54866cee3fad
 
 You are awesome, thank you!
 -- 
