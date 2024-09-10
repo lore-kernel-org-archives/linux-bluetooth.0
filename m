@@ -1,74 +1,98 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-28.smtp.github.com (out-28.smtp.github.com [192.30.252.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B5CE192D6C
-	for <linux-bluetooth@vger.kernel.org>; Tue, 10 Sep 2024 19:30:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CACE11A76D2
+	for <linux-bluetooth@vger.kernel.org>; Tue, 10 Sep 2024 19:32:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725996639; cv=none; b=OJd7Jd4+02pipB+VRhp8a1cxJll+2PPA4IVOy0e6PJc8RSyLCFYpbwWgz+YIP6a9q15aHtXOr2Kb0lsI3rMYK5n/f7FuKR+Ggd+qfKikD76lvmNK0RqxySZHsBHMlBaMIavplSeBn9OMfZ+sr2rqsAroeRn9NgKV4AMy3he8CCE=
+	t=1725996757; cv=none; b=Zk2EzJiJA0uGve8HgcOj9Jf1wghLY1gdYfreaQy6eXvM+7aHN2PgTIMDitXt3FaWvtci4BrffaGdWshkOi7Sf/5Gd1QakoQUwZLFszE1CFm/I8GilS1TRZrm1+1EwJ/F424skFSfOImaF581uybA/1GoNJNxIHXZ7fXLffdIdqQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725996639; c=relaxed/simple;
-	bh=ozB1SVeX0x4csfCLs7lzS5/v5GTfilmlUl3i9ieA7Gc=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=eN8ztSTgJVIZAdt/wkZkZclZS6aOkJzYft687ck01phn3bKY47G6fXcFzNc9B6euWAUQYg4KaAw28x4TN6Zv9jrGk1EHsKDB4yJ+mj7Wele6OIblhnuZQZEtalOCQqASrSVA3c0I9ma0LjXU0wxwXetdgElKMJccik8EY4QsJl0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kAl5sz2+; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1725996757; c=relaxed/simple;
+	bh=qYRK3eSe1mGHgC3NBKzylLzwRu8lejKkGWsvoL9eLI8=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=OoNp+ia0kPTDERcCM01a32C80ldRQ5Fbzt31++TknwSeFKYcyP5tzfAZhRGr3AipbxrLOa+fnmwxN4PbKwrplWJN+sgvnLgWAMIMPXpOtvHJ0y5ZFOlmAXOBRXfvfnFxfCCLZKVTAVLD9nzr2yR70LthJvIZ/kE4iHcvsuGdXNg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=kqZ2Mf++; arc=none smtp.client-ip=192.30.252.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kAl5sz2+"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2BC02C4CEC3;
-	Tue, 10 Sep 2024 19:30:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725996638;
-	bh=ozB1SVeX0x4csfCLs7lzS5/v5GTfilmlUl3i9ieA7Gc=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=kAl5sz2+0m35v1ecgq6MbAGPD2Y4sZ6+w9vIBhFAC/VNeTkvo1ywJ6Rv7ZA5cWY1v
-	 bK0STqcFUPkhKF+sPx+o/N3JTGsVHBu8SiSNoe/YkFD2ftVfnELamGU9s4V/nTNGJo
-	 tKkx8n3H6OCiLbM/M27QtnMcHF0Hmhcek+A97X/SufDajvD8CY94a+awkQJoxKNdBe
-	 YGzxcCJ3IxrSVS9EF4IeIijNBIJqfMXd02SNAPH+KVlOOr7kruh+VO8qk/yLrRv+Lr
-	 7glwQIqAiwaWs7gWmNVWEoePRKS29ZHaECZPcdSWTBthWsnU/aSqZXe+c1TbFzxOdr
-	 YpXMeNXQCFS4g==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 713543804CAB;
-	Tue, 10 Sep 2024 19:30:40 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="kqZ2Mf++"
+Received: from github.com (hubbernetes-node-bf34b8e.ash1-iad.github.net [10.56.171.16])
+	by smtp.github.com (Postfix) with ESMTPA id C43B66C11B1
+	for <linux-bluetooth@vger.kernel.org>; Tue, 10 Sep 2024 12:32:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1725996754;
+	bh=vuksIxZiy3IHvAWsrOiCWb9C+Zch6Y6uk3hex0P19cI=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=kqZ2Mf++k6zFXMwKRkrFEq4E1eEsyno6J1tJHgJQ6lTok/DTSM+bwv0gWZm/N1vcn
+	 BndM1M8S1Wjvswqp96wThZC4AV7uruXZQ2hvDgl2YaVKUmItIchACJ77Z1d2gm/5gL
+	 PLP9M4GrbfurRHc80DVDO5vKwxymolQf5jeRdeoc=
+Date: Tue, 10 Sep 2024 12:32:34 -0700
+From: fdanis-oss <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/master/54866c-615fc3@github.com>
+Subject: [bluez/bluez] 690ecc: mesh: Provide GNU basename compatible
+ implementation
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v6 BlueZ] Provide GNU basename compatible implementation
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <172599663901.370850.15452739101514293274.git-patchwork-notify@kernel.org>
-Date: Tue, 10 Sep 2024 19:30:39 +0000
-References: <20240828060926.3710535-1-raj.khem@gmail.com>
-In-Reply-To: <20240828060926.3710535-1-raj.khem@gmail.com>
-To: Khem Raj <raj.khem@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-Hello:
+  Branch: refs/heads/master
+  Home:   https://github.com/bluez/bluez
+  Commit: 690eccbe8562cc33f33503af67beb313ca737817
+      https://github.com/bluez/bluez/commit/690eccbe8562cc33f33503af67beb=
+313ca737817
+  Author: Khem Raj <raj.khem@gmail.com>
+  Date:   2024-09-10 (Tue, 10 Sep 2024)
 
-This patch was applied to bluetooth/bluez.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+  Changed paths:
+    M configure.ac
+    M mesh/mesh-config-json.c
+    A mesh/missing.h
+    M mesh/rpl.c
+    M tools/hex2hcd.c
+    A tools/missing.h
 
-On Tue, 27 Aug 2024 23:09:26 -0700 you wrote:
-> Call to basename() relies on a GNU extension
-> to take a const char * vs a char *. Let's define
-> a trivial helper function to ensure compatibility
-> with musl.
-> 
-> Fixes Issue: https://github.com/bluez/bluez/issues/843
-> 
-> [...]
+  Log Message:
+  -----------
+  mesh: Provide GNU basename compatible implementation
 
-Here is the summary with links:
-  - [v6,BlueZ] Provide GNU basename compatible implementation
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=690eccbe8562
+Call to basename() relies on a GNU extension
+to take a const char * vs a char *. Let's define
+a trivial helper function to ensure compatibility
+with musl.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+Fixes: https://github.com/bluez/bluez/issues/843
 
 
+  Commit: 615fc3592a57e32b42691a16b5d5cc88e378cbc1
+      https://github.com/bluez/bluez/commit/615fc3592a57e32b42691a16b5d5c=
+c88e378cbc1
+  Author: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
+  Date:   2024-09-10 (Tue, 10 Sep 2024)
+
+  Changed paths:
+    M gobex/gobex-header.c
+
+  Log Message:
+  -----------
+  gobex: Replace g_convert by utf16_to_utf8
+
+The glibc's iconv implementation is based around plug in modules
+for specific translations which may not been built on the platform
+and prevent to use g_convert().
+This commit replaces it by a function similar to the existing
+utf8_to_utf16() function.
+
+
+Compare: https://github.com/bluez/bluez/compare/54866cee3fad...615fc3592a=
+57
+
+To unsubscribe from these emails, change your notification settings at ht=
+tps://github.com/bluez/bluez/settings/notifications
