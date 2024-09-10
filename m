@@ -1,139 +1,95 @@
-Received: from mail-lj1-f173.google.com (mail-lj1-f173.google.com [209.85.208.173])
+Received: from mail-yw1-f171.google.com (mail-yw1-f171.google.com [209.85.128.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B2ED1E493;
-	Tue, 10 Sep 2024 13:34:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 686CC14F12C
+	for <linux-bluetooth@vger.kernel.org>; Tue, 10 Sep 2024 13:40:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725975292; cv=none; b=jC74adZw2ML1CuOaNDXDo/qBbQwH4tuPnEAzln/wt9X5UpWbkPVPqN3AWG4gcMpe+PHFTkyfAayAO2GWhAnpBEpAlZq4Bh6qFvYJxUs+5ugJaKjXOajWRSpt1+bhSd926a4C7lldh1Uq9KnXKQL2npalfiIgEzAjtnI+AZx4xZk=
+	t=1725975651; cv=none; b=d/lyjRWBx/Kjk6uAxxoYq+Q44uDKfelvAy2X753P25O1TdvW6c1k3Tvt72099sP8t5Qaiq0wh1tW2mkPypZaU3Fs03a1EFoAfyqLLO8zHnuZGIF34MtVoWEmlgFr5hzOu/yjnF9SThxUgXfI6Wn4lZrLzHMmYS9A7zXEEWxF5Cg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725975292; c=relaxed/simple;
-	bh=O53f7rbnvqpVCD1pt+wiSLnCd5tW/FK4LsdM+LJyIDE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=AAMaJAYcaGHGiCQn/N6Bb2YzfEr4xgDHR/sOR0mlhhKfpoAOmwQ9AR1WlEoQfJBe6RFRHgo4g2UKPPa3h8/JOlfiCrAAivgPtNjrg+QQfSAjYdQ2JhyCxKCrBExad6hgt89W13qACe/g1YfoTbrKvWGH3ebYF/Qbp8tXbDFaRYY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=O0rro3GB; arc=none smtp.client-ip=209.85.208.173
+	s=arc-20240116; t=1725975651; c=relaxed/simple;
+	bh=ua3CNj7QXZmWPjFqqHq73Jkfl7HTZy6CpyvJQrXC6u8=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=Dp50z3vyIae8Ji9natZaDKInsPLYusVi6GKZkO8PakirVlKfv7kzC5UT7zZBsEtfXfXty94PoP4IMPEZIX1Qzmy3xPvMlPxj+lqegCVE8XFIynncNUNJF4jzAh2FQGN/v52qzKE01ZwbPi3NU/Lw6a/Q3DzzbR9TgvE7uYonurA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KiMtOYRi; arc=none smtp.client-ip=209.85.128.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="O0rro3GB"
-Received: by mail-lj1-f173.google.com with SMTP id 38308e7fff4ca-2f758f84dfbso6166991fa.0;
-        Tue, 10 Sep 2024 06:34:49 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KiMtOYRi"
+Received: by mail-yw1-f171.google.com with SMTP id 00721157ae682-6db9f7969fdso3994117b3.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 10 Sep 2024 06:40:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1725975288; x=1726580088; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=H/2dhYmqzVQj21Zis9HyVEbCA0RMNcxW7L5Y1sXl9II=;
-        b=O0rro3GBM/uy6xmIPNeKwNTzC9ghKU1A1EMCaNVUPw2KLg/POMFkuJiY6XtOBqoDb2
-         aUs2FtKsZoOQVqLatG2p6JlO5w02X0dgPrs/ZLkHlV120XyfM89BMP18KrHQmu78HiPp
-         zMJdO1nFSVJJxwMLC8qBkriKvWNFFuimuGwXDvJU/wy1+0j5FJprxEbpUnbGVCWb0S5T
-         aMeH2K/EweBdIPxpeme5Pe2weWmt6ZuQkIlVjK496qBpCAGR6H/smwft0JWhjYvsCrZh
-         rE84lEnwBCZ91F7uhQFdKFOgtmIWwmzVRtnPgXxUaCpBwIkC3xXImIvlNyC+6VUSKAMN
-         RT4A==
+        d=gmail.com; s=20230601; t=1725975649; x=1726580449; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=ua3CNj7QXZmWPjFqqHq73Jkfl7HTZy6CpyvJQrXC6u8=;
+        b=KiMtOYRiuh0nk0Zm0y6qbZfTKTb+Glxa+ZMo6NQI/Rn5zlVZPNu4dh0Bhvk3Jm1Ggt
+         bJ6l9qQ5GZvq2YFuiZ3z2gh6WjOQ+2VMItYT5DAlIB9HJRWWo6A9cwBOE6zOlzrK6ucx
+         bVrV7T7k0JhN3I2zMZjVhBtQjef3CLYaahHhF/mwsRzi19LAzVNqY/lsBTATIUJci7ZZ
+         5A7zsqzjpzQIuJ8ncj8PX5V9BBmqAPy/XefmDwTfQfINbBsi0qem2dMcXyGQTPn1vcJW
+         cpmswksILX34wDGEANHC8M3lM1k10CU0RoMiq2xOAi16Kn3GWtk4BjmtyC2styNfSoGP
+         Kv3A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725975288; x=1726580088;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=H/2dhYmqzVQj21Zis9HyVEbCA0RMNcxW7L5Y1sXl9II=;
-        b=Ao+IO/oeGz1ThlmSZ0cz5/EV19gnn7V6HFXY/V+xqueIxzXmdHTlfFjQX1P6mGAiwy
-         qltGDhZHvzT0NThdropC0pxlgJR/A+9BAjcFu3Vr6/Iu1lq5apKh9X3cwuaKIl33Gqzt
-         N+I73JbESqBVuAC6tUIr/pHj2S9tWj9kMJ8sL9k1rBnkOnfFbyH8t7d7cXWjoTD1H6z1
-         xwEGoaLfu5OZ1e28mM6xDUJ2iPbuQrSxg/NTm5OCOAM3h86MpgCeb7qU+hyJXPULC9gu
-         4e+upHE01abzKBUWmiQiKnz6WUXBOO6+CBNRoCXB01zzW9+MJtmSBM3YDo7WdhzvwdJR
-         VkMg==
-X-Forwarded-Encrypted: i=1; AJvYcCXgp0BrNgxd/ZI4mmAM2v+x8bJUR8aPt07psXY0GeZc/mdPW3+0V9fTKzFI3PgWJdolWRebtzC9Dgo=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzd0nKuBxK/qNEm++CV+1enGz5BfeIsempHqlhF88T1MszUw9rY
-	rXnWkK6mXgqLJYVfEQcA2crRYaIsZU/UARr5N23pOKnob7W5nxwJS3Y6hTAw1lpral0sP/c56us
-	x/rJ684UmJcfyTDqpV2x4HAfjlE6EEg==
-X-Google-Smtp-Source: AGHT+IEAA2I6AIO3F4pKXQ9YFbUFUEDGbSv3reF1Gzkzsbwu0pq0bHJPgw4SJT3VSh77/gY60DFCYKxaXQADs3ETy04=
-X-Received: by 2002:a05:651c:b0c:b0:2f7:4b90:204b with SMTP id
- 38308e7fff4ca-2f751eb876dmr105662631fa.12.1725975287392; Tue, 10 Sep 2024
- 06:34:47 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1725975649; x=1726580449;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ua3CNj7QXZmWPjFqqHq73Jkfl7HTZy6CpyvJQrXC6u8=;
+        b=lJSA0dX+Zi8Cceh+Y8eqJukPkQVf3EutScgP1g9S1JION2TC9IrtKzarNUl6bWAHEW
+         FjfOT3xoFAvS1NJacy+aNc1xf4c9tcPQZUHC1tZQOxr9/5FWcL8uSzEYP8fsJHmYhNEV
+         CoF6bujJtJYubzhhOTwjw3OR1ab20zue3ISfeXGbRietqouF6O+bjydEBpmi1GrArvPu
+         JESDx90jVTsDmgxv+xHSo7ou1hcUvdGKseLBCYAy38aEg1VDZmd2ORQI0wZHlqhRwTUq
+         eHx9ltxtCd0BNm4bCTePkVxwvYo0n5ptyC5jNJDAeru/xj5YD0BulzRgKRrXYptLg4I6
+         ejug==
+X-Gm-Message-State: AOJu0Yzw3I4NEK0omrLyIS7ohaF0EGfzH4Qv+nqjbCA7MTR7/MBPBVzV
+	wzLr3ivsmAXoZCOQ+GFkvJA33TXSvnSWCbSSj9VUsaNokJp4tStW8S3aag==
+X-Google-Smtp-Source: AGHT+IHz9nR1uVfEvhdL8jqD9SuI8xpyj9oxlPiSurj78caV7B2C5KtFRk0Oph/pDvK444Qj9mNHCg==
+X-Received: by 2002:a05:690c:6d84:b0:6d5:ccc5:e2f4 with SMTP id 00721157ae682-6db9531acedmr26754927b3.2.1725975649023;
+        Tue, 10 Sep 2024 06:40:49 -0700 (PDT)
+Received: from [172.17.0.2] ([172.183.107.249])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-6db964281bbsm2955317b3.26.2024.09.10.06.40.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 10 Sep 2024 06:40:48 -0700 (PDT)
+Message-ID: <66e04c60.050a0220.cb158.19b1@mx.google.com>
+Date: Tue, 10 Sep 2024 06:40:48 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============3984606948732716607=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240909205152.2397337-1-luiz.dentz@gmail.com> <1a2b267a-8d9f-44e6-880d-2383f8b5369b@molgen.mpg.de>
-In-Reply-To: <1a2b267a-8d9f-44e6-880d-2383f8b5369b@molgen.mpg.de>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Tue, 10 Sep 2024 09:34:35 -0400
-Message-ID: <CABBYNZKJNT3kY7Ug+S3=v0p2x1S1adR+wmb7RNfy0_DJBqJg1w@mail.gmail.com>
-Subject: Re: [PATCH v1] Bluetooth: btusb: Fix not handling ZPL/short-transfer
-To: Paul Menzel <pmenzel@molgen.mpg.de>
-Cc: linux-bluetooth@vger.kernel.org, linux-usb@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, pchelkin@ispras.ru
+Subject: RE: [5.10/5.15] Bluetooth: hci_core: Fix unbalanced unlock in set_device_flags()
+In-Reply-To: <20240910131503.146688-1-pchelkin@ispras.ru>
+References: <20240910131503.146688-1-pchelkin@ispras.ru>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Hi Paul,
+--===============3984606948732716607==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-On Tue, Sep 10, 2024 at 3:31=E2=80=AFAM Paul Menzel <pmenzel@molgen.mpg.de>=
- wrote:
->
-> Dear Luiz,
->
->
-> Thank you for your patch.
->
-> Am 09.09.24 um 22:51 schrieb Luiz Augusto von Dentz:
-> > From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> >
-> > Requesting transfers of the exact same size of wMaxPacketSize may resul=
-t
-> > in ZPL/short-transfer since the USB stack cannot handle it as we are
-> > limiting the buffer size to be the same as wMaxPacketSize.
-> >
-> > Also, in terms of throughput this change has the same effect to
-> > interrupt endpoint as 290ba200815f "Bluetooth: Improve USB driver throu=
-ghput
->
-> (*interrupt* would fit on the line above.)
->
-> > by increasing the frame size" had for the bulk endpoint, so users of th=
-e
-> > advertisement bearer (e.g. BT Mesh) may benefit from this change.
->
-> Do you have a benchmark script, that can be run?
+This is an automated email and please do not reply to this email.
 
-It is a **may** not a might and not the main objective of the change.
+Dear Submitter,
 
-> > Fixes: 5e23b923da03 ("[Bluetooth] Add generic driver for Bluetooth USB =
-devices")
-> > Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> > ---
-> >   drivers/bluetooth/btusb.c | 5 ++++-
-> >   1 file changed, 4 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> > index 36a869a57910..83df387aea92 100644
-> > --- a/drivers/bluetooth/btusb.c
-> > +++ b/drivers/bluetooth/btusb.c
-> > @@ -1341,7 +1341,10 @@ static int btusb_submit_intr_urb(struct hci_dev =
-*hdev, gfp_t mem_flags)
-> >       if (!urb)
-> >               return -ENOMEM;
-> >
-> > -     size =3D le16_to_cpu(data->intr_ep->wMaxPacketSize);
-> > +     /* Use maximum HCI Event size so the USB stack handles
-> > +      * ZPL/short-transfer automatically.
-> > +      */
-> > +     size =3D HCI_MAX_EVENT_SIZE;
-> >
-> >       buf =3D kmalloc(size, mem_flags);
-> >       if (!buf) {
->
->
-> Kind regards,
->
-> Paul
->
-> Kind regards,
->
-> Paul
+Thank you for submitting the patches to the linux bluetooth mailing list.
+While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
+
+----- Output -----
+
+error: patch failed: net/bluetooth/mgmt.c:4138
+error: net/bluetooth/mgmt.c: patch does not apply
+hint: Use 'git am --show-current-patch' to see the failed patch
+
+Please resolve the issue and submit the patches again.
 
 
+---
+Regards,
+Linux Bluetooth
 
---=20
-Luiz Augusto von Dentz
+
+--===============3984606948732716607==--
