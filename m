@@ -1,95 +1,100 @@
-Received: from mail-qv1-f51.google.com (mail-qv1-f51.google.com [209.85.219.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F22B41863E
-	for <linux-bluetooth@vger.kernel.org>; Wed, 11 Sep 2024 01:08:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF43624B26
+	for <linux-bluetooth@vger.kernel.org>; Wed, 11 Sep 2024 02:37:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726016921; cv=none; b=e3JnmkkrEMmvUJ93fPlm1tVEzCxU/6mOdQJ3RqS60wPoW3iy/Y0Y4DlSvm+BBttPiZZpIscWt1GbEJcMbJat2znnLzERJSVZ7xSw4ZcTb7Ag85q6SOFjgE4SYiRU5se4Ao50DCvM6XK4r42lyqs0/ZqHzUpGoC/nJQtT6lpHcqQ=
+	t=1726022251; cv=none; b=r9qiLyCLFBBgCg74wGuDxm/gJ6zjJgXteOHApkq/8WTTEAaySDR2SxZJOSUlCZeMFMRmr9k4z/u896EzIJGNID6qKjV7HXUxaQovrlizYEpyBp6+Ky7+FLXgGaWho8kwkeFf3xbrGMljOXr0/xA0rpFmiERL3Z+mZjY2WOxW56Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726016921; c=relaxed/simple;
-	bh=g+ghn/rVKrpoCpUCze1652+Jz7Cqh4h9BCBFiCn8M/w=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=QX9E2iu3lOccRROtwEx5UWoCZJhkPGDu6jgUTaDo324/6mZpdY7GsLgTRvEpeyCZCdt3QCrDGN4uxSWCncmIyabhIijLVEbkCu6a8gEd6qFloQF9OAwhHqxOdvYNDe0LIF++W4tCOa18o7/e+2oC728FIhtQhHkIVCR2vv0qc+4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hPl7weLO; arc=none smtp.client-ip=209.85.219.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1726022251; c=relaxed/simple;
+	bh=rke1Pey4GAmHXbUH9kYCvnd/hVXAyGYhM3+5juHSaZU=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=e3xWedAst7b+BWXGG/fXZRddA882rS7y2ZFOmYbK4TvW5UjzrYk6oHNvoljmjOkYyIH9foN5ZQGqwdytP6s6flHyhyPT/O4IITNqepUKCu7HCU6l7ynOT4T9yq8izDVJ4dArwiZQs8X8GR8hXorPR+g7CErYOhpj+dFT8sbVEsA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YY7chD+o; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hPl7weLO"
-Received: by mail-qv1-f51.google.com with SMTP id 6a1803df08f44-6c34c02ff1cso35636186d6.2
-        for <linux-bluetooth@vger.kernel.org>; Tue, 10 Sep 2024 18:08:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1726016919; x=1726621719; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=g+ghn/rVKrpoCpUCze1652+Jz7Cqh4h9BCBFiCn8M/w=;
-        b=hPl7weLOqQA3DRWs8x4EGSIZEhxmd580ZDTnqZxjhvu/lQOXZekV7LL0ZQTRwmDIvS
-         qFtoAQ7mI7bF8rYhzN4GyBBG/gbIVXALDHUNemHl2E3VcxT93reNJJvERU7h902GEfsq
-         lumiX6srne4GbkTAFhReqmuyFadYNJMoI8XIPsGH55W4ph7lgLrLgHEB+z0pQtye9wTy
-         SJ5996+Vpi/jXVQW2sNUxXo/W/gYwbJ4ZsWRIHvMm2Nz0peYv7EOTl2P3hgtT/PCnJuo
-         aCiHB675sDjtgH8u7zT9waueJV6HcpWY/Y8vI8yWFEBI4tfdRxED2HYqe2qbPrI0fQow
-         zBwg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726016919; x=1726621719;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=g+ghn/rVKrpoCpUCze1652+Jz7Cqh4h9BCBFiCn8M/w=;
-        b=GQ0LNNJk3NtQiQuCvtIb6tEP/mSGAh8rujIu44Q8+sQ5qJ1DRIR52HklXSIgeM3LmF
-         2DQo7Bzqyn5pm4/ujmcsN4lDi/ZMi3SwcvWHvVygV62zkPXNINBur1bsWvhjgJY1Kj/+
-         0omBf4Jmlxkv8XtZPBAIil4JKTkYVjciKoBTOjg7ICis1+DwePSDQcrYAdw2SklR1L+D
-         DuTJGlpByjz+7tSZOSvOeNenV1coKRC1oxOabDL5BtP3s5mq/N8yfewSWLoCtQ39uzek
-         vQzNPoCY0GiOwh0wGwtvrRmx9kipvLaw6nQ5v5ob933QT9Ie+YcVJQdht+mnDWd4OqLC
-         g31A==
-X-Gm-Message-State: AOJu0Yz7ecVNrWYQPsUUIKNJ3Cr00mqTkXwZ6vjRRXP8xAjCN7YAF6P/
-	vkKSITAGkbLkUHNrq83Xi+45Up1+HsEIsfmZL41J47eYL2F16fvBFI+3lQ==
-X-Google-Smtp-Source: AGHT+IHeNAtlqnmez3yWUV9CBeNdlOXqnaUzc8zjbzvDLK73A/V5fH/3mEk+lx7HNY52hipu01bQvg==
-X-Received: by 2002:ad4:498d:0:b0:6c5:30c9:c055 with SMTP id 6a1803df08f44-6c530c9c2c9mr184508896d6.14.1726016918614;
-        Tue, 10 Sep 2024 18:08:38 -0700 (PDT)
-Received: from [172.17.0.2] ([172.183.37.95])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6c5343296afsm35508226d6.2.2024.09.10.18.08.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 10 Sep 2024 18:08:38 -0700 (PDT)
-Message-ID: <66e0ed96.050a0220.3552d4.da4b@mx.google.com>
-Date: Tue, 10 Sep 2024 18:08:38 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============1142825054874421240=="
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YY7chD+o"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 4E3B5C4CED0
+	for <linux-bluetooth@vger.kernel.org>; Wed, 11 Sep 2024 02:37:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1726022248;
+	bh=rke1Pey4GAmHXbUH9kYCvnd/hVXAyGYhM3+5juHSaZU=;
+	h=From:To:Subject:Date:In-Reply-To:References:From;
+	b=YY7chD+oeYZ1AZT8kRDbZRkIDjxErnM3l09estCwLebBgwpZuCsFgrI90OvB58FRd
+	 3wKbtxEGuRvnh5gCQmPEJssuCsmR/VyvhX4sx4ILAGUY+KIghjV7KvrLKJt1UX2tl/
+	 0lIsFKDfWFEU6UakI3B3f/fQsD/+6IGX85XrCcsVT7m7cN7+o97Mt/Fr87r6Qi9ptg
+	 SF0jR6g1D2yJE82RB4mmPcG5Z/77IpjjR8k9hVkhItVW9tAI7mKnM65dpYN8CsAy39
+	 EEIm+X1jDoKjjpjCs7i/XpvowN+gDVMAhv8MctNjsADchCBoCNNe0/zVwk9VfVrhcO
+	 nuNfd/suhzLIg==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+	id 46882C53BBF; Wed, 11 Sep 2024 02:37:28 +0000 (UTC)
+From: bugzilla-daemon@kernel.org
+To: linux-bluetooth@vger.kernel.org
+Subject: [Bug 217023] [Intel AX200] hci0: Malformed MSFT vendor event: 0x02
+Date: Wed, 11 Sep 2024 02:37:27 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: alexknoptech@protonmail.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: cc
+Message-ID: <bug-217023-62941-RxGWmayH3P@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-217023-62941@https.bugzilla.kernel.org/>
+References: <bug-217023-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, tot0roprog@gmail.com
-Subject: RE: [BlueZ] mesh: Remove duplicated init for mesh config
-In-Reply-To: <66e0e4f9.050a0220.385dec.8d26@mx.google.com>
-References: <66e0e4f9.050a0220.385dec.8d26@mx.google.com>
-Reply-To: linux-bluetooth@vger.kernel.org
 
---===============1142825054874421240==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+https://bugzilla.kernel.org/show_bug.cgi?id=3D217023
 
-This is an automated email and please do not reply to this email.
+alexknoptech@protonmail.com changed:
 
-Dear Submitter,
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+                 CC|                            |alexknoptech@protonmail.com
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
+--- Comment #11 from alexknoptech@protonmail.com ---
+Seeing the same error with Intel AX211 on kernel 6.10.8:
 
------ Output -----
-
-error: patch failed: mesh/mesh.c:266
-error: mesh/mesh.c: patch does not apply
-hint: Use 'git am --show-current-patch' to see the failed patch
-
-Please resolve the issue and submit the patches again.
+[   15.392496] Bluetooth: hci0: Malformed MSFT vendor event: 0x02
 
 
----
-Regards,
-Linux Bluetooth
 
+System:
+  Host: fedora Kernel: 6.10.8-200.fc40.x86_64 arch: x86_64 bits: 64
+    compiler: gcc v: 2.41-37.fc40 clocksource: tsc
+  Console: pty pts/1 wm: gnome-shell DM: GDM v: 46.2 Distro: Fedora Linux
+    40 (Workstation Edition)
+Machine:
+  Type: Laptop System: Razer product: Blade 15 (2022) - RZ09-0421 v: 8.04
+    serial: BY2222M73501760 Chassis: type: 10 serial: N/A
+  Mobo: Razer model: CH580 v: 4 serial: N/A part-nu: RZ09-0421EED3
+    uuid: 66376534-3534-6236-3161-656334366230 UEFI: Razer v: 2.06
+    date: 11/01/2023
+Bluetooth:
+  Device-1: Intel AX211 Bluetooth driver: btusb v: 0.8 type: USB rev: 2.0
+    speed: 12 Mb/s lanes: 1 bus-ID: 1-10:4 chip-ID: 8087:0033 class-ID: e001
+  Report: btmgmt ID: hci0 rfk-id: 0 state: up address: 4C:44:5B:81:97:E0
+    bt-v: 5.3 lmp-v: 12 class-ID: 6c010c
 
---===============1142825054874421240==--
+--=20
+You may reply to this email to add a comment.
+
+You are receiving this mail because:
+You are the assignee for the bug.=
