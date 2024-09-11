@@ -1,62 +1,62 @@
-Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
+Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FC9B15C13F
-	for <linux-bluetooth@vger.kernel.org>; Wed, 11 Sep 2024 14:51:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71CC21AAE23
+	for <linux-bluetooth@vger.kernel.org>; Wed, 11 Sep 2024 14:51:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726066288; cv=none; b=MsakyDwYlbC3KUlS9MmrER8G2LXO18o1vCN2rOGxq0RmKMCBgNLPAOxjNoqXRJho5CIUEWmDeewuVbwwoO7RRnQzjTdfHb9vhlSGHSP1O78bDFgG3uYpYL0xBXD9ST7IzNuhpDrFaEkdn1QRPOPyDjLX7XUX/SQvZS09x/NEqFg=
+	t=1726066290; cv=none; b=GFJQ8V1PX0uCWOgLyRsckeKPDZxuL5u7GjdGnFYjYPoX1zHrVh4cdflLtCX7GHhlo2DGyFFg5suuuvvZWGzEfVDDB7c1gq/fc7kPTBDas5BKuz6fiX5jWyTurfTDyIeVJiKegYILev5H24sjwZa86GVoT4vgsjZx9LLQQJSOHvo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726066288; c=relaxed/simple;
-	bh=2tp5hsJygUIqTiw+g1uyzx4IVqCdmVgfMHKU5D1QNqA=;
+	s=arc-20240116; t=1726066290; c=relaxed/simple;
+	bh=6acP4DT0RWXg1w8zoMI84YVCKF3hfcZFyavi1onXYwA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=OpAhIboR2Pga2GqhRiqGgo6FyNy4Vu5OamLwvDgigivDM7mayCba1qlW7k00WLpJ5cOdBn4uZjZI0vg+dGLxxnB5Yj6MW3IyyFZm/9h7ppHC9UTwa1XPSt/PQKIM6DMnxYR0TbK5GLeSAwWDCCALX/LDUhTed2NmEZr1t+84170=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NPF5G8YO; arc=none smtp.client-ip=209.85.221.53
+	 MIME-Version; b=aPpTqx/7Bw6JbA2ywwWtRFVJbaWciRMnvyjPXljTHxh1XF93tXcv4IjP8S3aowz1eY3izniix8qj4yJU+A03/gJ2cS6tdMts0oN+WnmY1HnFzwh6yDnq4xom2uvubmV56pSG5bgBr4HH4nTlCDIfVdtyLouVMdASeaP+mcy1PwE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=C302cKNf; arc=none smtp.client-ip=209.85.221.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NPF5G8YO"
-Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-374d29ad8a7so4443090f8f.2
-        for <linux-bluetooth@vger.kernel.org>; Wed, 11 Sep 2024 07:51:26 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="C302cKNf"
+Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-374b9761eecso1644560f8f.2
+        for <linux-bluetooth@vger.kernel.org>; Wed, 11 Sep 2024 07:51:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1726066285; x=1726671085; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1726066287; x=1726671087; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=VpzyWQnslR584DCuyfWDdVfKtdiscMYgLxyWHUHTklI=;
-        b=NPF5G8YOXcV/WQxiPwBovbmulRGM1jNwC2l5dpOr8eiq6s9mCkJQtZ3Cf3Aq+xCNEZ
-         GMmmw6wXlCwvSYT+XPj1h4PXjCOXj6EIgyv9uNDYVMzS8VmrlQIbQXwNC1f0PTEwD90W
-         BBioHXqBR9a8ibpitE2zb8OP56C3+zCiRV+/WC9vEX9Das5+KxiRGz4hNGv8P73jW86x
-         FRXkUcnBSF0KoxZUhU+D4PnJFwqM5HY/3Dg2bjuBcn2KJ7BNDKx6FwwPKT0nsheYKim/
-         1+VOVtiE4DZ+SVM6U2FjFNkypGSMoQt3OVCEoRkI7zpxy2LBGMcL1PngJ+EAHoyVD97v
-         yx4Q==
+        bh=8dO8mvOVta2kBXYCz2E0HVGW4ezYp/G6MUNiDNivvII=;
+        b=C302cKNfBDb9839Vvo4SZA/HhfejXqtVgsuXjWESSN0n6vpKfTkUUZAHVq2Eapsj7C
+         tzqUzwiWRdMHFIqLZrhgILtA3wa8Pv9bbzdEvVeYJ1lTcNKLVkuRBOcZbw7QfYp65U9b
+         8OaVIBplH+wESD/RXZh+NX6RqCI+jDkqUvxB8M2RlkyFaLe36Kw3p6BmbSQaOiWqTwy7
+         SWOaRU1UwJ9/wt/3xaqlmQ7i75D9wGQYjFqEqVmP8Uqe7M21+uZEKkyrPCC4vvKhO6fm
+         o4UW/mdoPz1a+5BLIYtrXXrgHAQhYFWARUXwtw7Cf4n74E8CNdqKeuGn51TY30qTvYkS
+         ay+A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726066285; x=1726671085;
+        d=1e100.net; s=20230601; t=1726066287; x=1726671087;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=VpzyWQnslR584DCuyfWDdVfKtdiscMYgLxyWHUHTklI=;
-        b=LQCF6QJbpI5w0vxabBni2WlH7FfS4pvOSzpTVa7XyPZuO41ILVAtpPOzjp4Z0giOrl
-         BIec2o+vBmRkaFIaa9JxPWH2ZTl0LTjQ9w0hbVAEQx6ZW0nhIbXPVb5fd7Yo3e7z9jBD
-         iUZit7apCN+qvaYiyAvYPw9vDGGET540l3Sgnb94UctKpTesuvEYXZclLE4NgxIbIkEn
-         ONQ7f5wiYihHx0zDGovNp6x69YjAiadaIL2BSIwL79V9KdgyKeMIYUsNtjmbWraS5C0M
-         JNFT8pCtDKBDW07SByC1oozGqxNBKHSdjyYitMmO8G/jK8Z3oSSOShzg2qKAFzoaPEnk
-         vNpw==
-X-Gm-Message-State: AOJu0Yzl/p8ccIz5tLmHbCSxNL1i/iz23Frvwlq1J+jdq3+YgRW0sEX4
-	HsDehx6Xba7TC/nnpRLv/pNq59Z9ar7laJye5ACR/wgqVgf/kuC7q4suHQ==
-X-Google-Smtp-Source: AGHT+IFG2IAd2fJoKOkADFxyfbhZXYSx/JHBSueW6xQ1E4vX+Tx/88Fm0J6aX0i2I1gb9FEqfoxtMA==
-X-Received: by 2002:a5d:424f:0:b0:377:6073:48df with SMTP id ffacd0b85a97d-3788969b01amr10231543f8f.58.1726066284907;
-        Wed, 11 Sep 2024 07:51:24 -0700 (PDT)
+        bh=8dO8mvOVta2kBXYCz2E0HVGW4ezYp/G6MUNiDNivvII=;
+        b=KYsabem8nYrDcM/ZnRwEYHt7iLdn9v/v9F8G5LQRYUh6Vab7HMJaZYNQ4+7kKSmnWM
+         QaC0iNbMUBNSDGgoq7/1I4JdPbmhKdTp74lHeqTKmMrC+m4VeL4vjkQRbWOlSE3p34AL
+         s25rHnj+9WNmeUR+vg96cRvnWlYk31sc7Sd7FtzAYeyNypWNHr0GHAbtMtQLA4fzCzYu
+         HOnPdeJ/J42v9B4J8jb3sbFdi2rYwYFVQjQl9pW+on05jdwrXgfg6nuoaet3V/kpnyLj
+         ULL3FnIdXRgd/g7BWFghCWTMz4g1nFJv2D2EwLwBNAxN1vYaKev23OaCSyXMd17kbXUu
+         PJQA==
+X-Gm-Message-State: AOJu0Yz5X+Ih8hsiXadVlsNxVYtK5zhLWHdOdLpnOWprpOCVQF48M0Ig
+	Cxr4ceEMfCPnG4iriaW8eAFONMayVM5b7y2TA+6yKyoCqDj6ZQzkosHZyg==
+X-Google-Smtp-Source: AGHT+IFoDUP/DOlcGMvsWFHzq7xpoTquxN0+FYRId9gLnRB4hKOzwB2ITSVirDkrKLQ9/NT7tLk9tQ==
+X-Received: by 2002:a5d:624d:0:b0:371:8ec6:f2f0 with SMTP id ffacd0b85a97d-378b07a57d3mr2192097f8f.16.1726066287431;
+        Wed, 11 Sep 2024 07:51:27 -0700 (PDT)
 Received: from vibhavp-an515-58.lan ([2401:4900:1c63:4161:2261:f710:6aeb:b934])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-37895665517sm12081277f8f.36.2024.09.11.07.51.22
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-37895665517sm12081277f8f.36.2024.09.11.07.51.25
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 11 Sep 2024 07:51:24 -0700 (PDT)
+        Wed, 11 Sep 2024 07:51:26 -0700 (PDT)
 From: Vibhav Pant <vibhavp@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Vibhav Pant <vibhavp@gmail.com>
-Subject: [PATCH BlueZ 1/2] adapter: Add support for the Connectable property.
-Date: Wed, 11 Sep 2024 20:21:13 +0530
-Message-ID: <20240911145114.103340-2-vibhavp@gmail.com>
+Subject: [PATCH BlueZ 2/2] org.bluez.Adapter: Add documentation for the Connectable property.
+Date: Wed, 11 Sep 2024 20:21:14 +0530
+Message-ID: <20240911145114.103340-3-vibhavp@gmail.com>
 X-Mailer: git-send-email 2.46.0
 In-Reply-To: <20240911145114.103340-1-vibhavp@gmail.com>
 References: <20240911145114.103340-1-vibhavp@gmail.com>
@@ -68,62 +68,34 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-To not break previous behavior, allow enabling the Discoverable
-property even if Connectable is currently false.
 ---
- src/adapter.c | 25 +++++++++++++++++++++++++
- 1 file changed, 25 insertions(+)
+ doc/org.bluez.Adapter.rst | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
 
-diff --git a/src/adapter.c b/src/adapter.c
-index d6c058196..f5a876382 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -3180,6 +3180,11 @@ static void property_set_mode(struct btd_adapter *adapter, uint32_t setting,
- 		param = &mode;
- 		len = sizeof(mode);
- 		break;
-+	case MGMT_SETTING_CONNECTABLE:
-+		opcode = MGMT_OP_SET_CONNECTABLE;
-+		param = &mode;
-+		len = sizeof(mode);
-+		break;
- 	default:
- 		goto failed;
- 	}
-@@ -3576,6 +3581,24 @@ static gboolean property_get_version(const GDBusPropertyTable *property,
- 	return TRUE;
- }
+diff --git a/doc/org.bluez.Adapter.rst b/doc/org.bluez.Adapter.rst
+index f53728123..3f5fdc8fe 100644
+--- a/doc/org.bluez.Adapter.rst
++++ b/doc/org.bluez.Adapter.rst
+@@ -283,6 +283,19 @@ uint32 Class [readonly]
+ 	This property represents the value that is either automatically
+ 	configured by DMI/ACPI information or provided as static configuration.
  
-+static gboolean property_get_connectable(const GDBusPropertyTable *property,
-+					 DBusMessageIter *iter, void *user_data)
-+{
-+	struct btd_adapter *adapter = user_data;
++boolean Connectable [readwrite]
++```````````````````````````````
 +
-+	return property_get_mode(adapter, MGMT_SETTING_CONNECTABLE, iter);
-+}
++	Set an adapter to connectable or non-connectable. This is a global
++	setting and should only be used by the settings application.
 +
-+static void property_set_connectable(const GDBusPropertyTable *property,
-+				     DBusMessageIter *iter,
-+				     GDBusPendingPropertySet id,
-+				     void *user_data)
-+{
-+	struct btd_adapter *adapter = user_data;
++	Setting this property to false will set the Discoverable property
++	of the adapter to false as well, which will not be reverted if
++	if Connectable is set back to true. If required, the application
++	will need to manually set Discoverable to true.
 +
-+	property_set_mode(adapter, MGMT_SETTING_CONNECTABLE, iter, id);
-+}
++	Note that this property only affects incoming connections.
 +
- static DBusMessage *remove_device(DBusConnection *conn,
- 					DBusMessage *msg, void *user_data)
- {
-@@ -3917,6 +3940,8 @@ static const GDBusPropertyTable adapter_properties[] = {
- 	{ "Name", "s", property_get_name },
- 	{ "Alias", "s", property_get_alias, property_set_alias },
- 	{ "Class", "u", property_get_class },
-+	{ "Connectable", "b", property_get_connectable,
-+					property_set_connectable },
- 	{ "Powered", "b", property_get_powered, property_set_powered },
- 	{ "PowerState", "s", property_get_power_state },
- 	{ "Discoverable", "b", property_get_discoverable,
+ boolean Powered [readwrite]
+ ```````````````````````````
+ 
 -- 
 2.46.0
 
