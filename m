@@ -1,30 +1,57 @@
-Received: from relay7-d.mail.gandi.net (relay7-d.mail.gandi.net [217.70.183.200])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D19E91922F7
-	for <linux-bluetooth@vger.kernel.org>; Thu, 12 Sep 2024 09:22:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 973CB187552
+	for <linux-bluetooth@vger.kernel.org>; Thu, 12 Sep 2024 10:36:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726132978; cv=none; b=OMF5aoyoK+oeNjhKahzk9RU7l+OOjag43f7GPNx0nQ71CYqDFMG/3wrYAiQyWFg2vCwVOd31eaCEvDMb1INAwQUuOF+eVVYuYdGHoWzXxmODIVV28tFqhUBlC+JAhr6J84FIlbcyC6I5Q/NozBOtAKa1lO7fG2O3A14wuhP6p08=
+	t=1726137363; cv=none; b=YKAIFM0VKt7KEuX2ILctslZGDeuSZ0OkYDFRe1vQtYuIyko0n4HRfuBtV9y8jQQgdCSsXXjkTe+o9sv2vkQjxJW/iVpW/c1wt3NSel1xsXBBoEAomlLXc198bmLdYICz2Xw5aJBMMP/C/S8KI3gDBBSnYmtBybpTAMe3Ws7UXxk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726132978; c=relaxed/simple;
-	bh=YJWKGGl4tfwsKhgXgm2ipnc6kCTPQeU5yUKinybK5+Y=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=tPUxx9olgpEyonGKRKkOHSqZNuHzBBSwD2GwxaBxRtkfe7w8sNPW2ZW6MvxHZypDiDtJ9yO4YfU5XL4jEIgukKM6YIJm1CEvtbG4/WASzOpWNbLwOoe3BZdVqb9IXSbfxQzagMTaKByQ4vb4OuHipb221+DI+EoTtO2Blz64JzY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.183.200
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hadess.net
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 2A7A420008;
-	Thu, 12 Sep 2024 09:22:55 +0000 (UTC)
-From: Bastien Nocera <hadess@hadess.net>
+	s=arc-20240116; t=1726137363; c=relaxed/simple;
+	bh=ujn2FRvhWf3TDMx/LQRDUKK8fFVgbSQI00OCD2psH+E=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=VfVriHiRjEQjZMXSVJxPEq73MliUsFOoFPgFppxlnJTXnauaiVwLyhGlBTQyTMDJHFScK5jyK6Rn9gS6ubJHis/shAwPS+078E5JTN4fZU4a7LiherQlv0HALCnIpPCaNLc1/22R/ftLp+IjxDTBW4Y2JeZvRlOZhgrZy2i0Jv4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=KFw656+U; arc=none smtp.client-ip=192.198.163.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="KFw656+U"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1726137362; x=1757673362;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=ujn2FRvhWf3TDMx/LQRDUKK8fFVgbSQI00OCD2psH+E=;
+  b=KFw656+UVjJBz/rN6xq9Ej5yuYVDX1HVAjLgN+YotecHDh3AyfdyWyi1
+   fCLMOjQ+70l5ZGtwXVaAxPY3YMqg7aNdnLc3oJO3g6VH8hOUZ5s1kfkzs
+   NqMA2ubUbL7KnnRDVIfqp4VWS1XDwMAN/gQ3rq7gHEZxPhWa0CyM3qyEn
+   FMl9FtA0kgQNi1JWIh7C3QyfiIAhpnvzsy5EIJGGC4ULdYuz1JTnAgkGh
+   gf7EbXA1SKXFJbf2iYFui/TdOL7CBIyfv2s50KoSF2Wp4OxDAjwU/rwAg
+   TeIw1oVc4/+sFYFf00UvyA+BZQYiaDEGJhWfdKx+ansNpF7xQxjak1NXF
+   w==;
+X-CSE-ConnectionGUID: gAv0rM2PSoyLWINhwO6M5w==
+X-CSE-MsgGUID: RaY96FLdR+GhrZYN9RX2LA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11192"; a="35569311"
+X-IronPort-AV: E=Sophos;i="6.10,222,1719903600"; 
+   d="scan'208";a="35569311"
+Received: from fmviesa009.fm.intel.com ([10.60.135.149])
+  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Sep 2024 03:35:59 -0700
+X-CSE-ConnectionGUID: YaPk9aobRq+A/Re0mdxW6A==
+X-CSE-MsgGUID: fLBsOrcCS4eVeiTKhkU6/g==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.10,222,1719903600"; 
+   d="scan'208";a="67656446"
+Received: from intel-lenovo-legion-y540-15irh-pg0.iind.intel.com ([10.224.186.95])
+  by fmviesa009.fm.intel.com with ESMTP; 12 Sep 2024 03:35:57 -0700
+From: Kiran K <kiran.k@intel.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Bastien Nocera <hadess@hadess.net>
-Subject: [BlueZ 3/3] shared/shell: Exit after printing the help
-Date: Thu, 12 Sep 2024 11:20:12 +0200
-Message-ID: <20240912092253.119754-4-hadess@hadess.net>
-X-Mailer: git-send-email 2.46.0
-In-Reply-To: <20240912092253.119754-1-hadess@hadess.net>
-References: <20240912092253.119754-1-hadess@hadess.net>
+Cc: ravishankar.srivatsa@intel.com,
+	chethan.tumkur.narayan@intel.com,
+	chandrashekar.devegowda@intel.com,
+	Kiran K <kiran.k@intel.com>
+Subject: [PATCH v1] Bluetooth: btintel_pcie: Allocate memory for driver private data
+Date: Thu, 12 Sep 2024 16:21:00 +0530
+Message-Id: <20240912105100.46534-1-kiran.k@intel.com>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -32,29 +59,29 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-GND-Sasl: hadess@hadess.net
 
-Exit after handling --help, so as to avoid the daemon waiting to
-communicate with a D-Bus service that might not be running.
+Fix driver not allocating memory for struct btintel_data which is used
+to store internal data.
+
+Fixes: 6e65a09f9275 ("Bluetooth: btintel_pcie: Add *setup* function to download firmware")
+Signed-off-by: Kiran K <kiran.k@intel.com>
 ---
- src/shared/shell.c | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
+ drivers/bluetooth/btintel_pcie.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/src/shared/shell.c b/src/shared/shell.c
-index c31487190d0f..f7e8b3300373 100644
---- a/src/shared/shell.c
-+++ b/src/shared/shell.c
-@@ -1324,9 +1324,7 @@ void bt_shell_init(int argc, char **argv, const struct bt_shell_opt *opt)
- 			return;
- 		case 'h':
- 			usage(argc, argv, opt);
--			data.argc = 1;
--			data.argv = &cmplt;
--			data.mode = 1;
-+			exit(EXIT_SUCCESS);
- 			goto done;
- 		case 's':
- 			if (optarg && data.init_fd < 0) {
+diff --git a/drivers/bluetooth/btintel_pcie.c b/drivers/bluetooth/btintel_pcie.c
+index d255bdf777b4..fda47948c35d 100644
+--- a/drivers/bluetooth/btintel_pcie.c
++++ b/drivers/bluetooth/btintel_pcie.c
+@@ -1224,7 +1224,7 @@ static int btintel_pcie_setup_hdev(struct btintel_pcie_data *data)
+ 	int err;
+ 	struct hci_dev *hdev;
+ 
+-	hdev = hci_alloc_dev();
++	hdev = hci_alloc_dev_priv(sizeof(struct btintel_data));
+ 	if (!hdev)
+ 		return -ENOMEM;
+ 
 -- 
-2.46.0
+2.40.1
 
