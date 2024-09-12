@@ -1,43 +1,43 @@
 Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E23D1BB69E
-	for <linux-bluetooth@vger.kernel.org>; Thu, 12 Sep 2024 17:49:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C676188592
+	for <linux-bluetooth@vger.kernel.org>; Thu, 12 Sep 2024 17:49:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726163372; cv=none; b=XfKae8KRsfHGJvmLsUxUG3iT2Xr13aZ6B1cg03Gwdcft+tVYg68AwTG1lK9em3Q5LexnGg33r2zmCnjFqIRzzabw+/9AblarTo5ISBImOEjcVE3syR04kcmVQxhKhb01Y4jf40cjG6qNabtZ1PVrrBCa4qKDYBRZXL4ZfwGnulI=
+	t=1726163372; cv=none; b=RdWkQpYwASBGTB/LbfauimTU2O5tAbV/qFnaiAebzt+Fe5qb3KgYjqikrofiA9Unb+RmqvV2kAc4b7Nn0CQGrw1PwgQzcfsDHph8EuQvHyJYTREvS/MHG2gssvdODFD//w7uS6rTxG2wc8LwX12VSId6UpiG7/zqE/IFvQ6YekI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1726163372; c=relaxed/simple;
-	bh=EtdCOzGnbzlPFulYQy3i/17FuGbLkuw+UEVT+ofyroI=;
+	bh=uCmcIu0gyA2WYaokt64j4mglaqF6ujTo3V6h+5K5IhQ=;
 	h=From:To:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ikhF6ydaMz4e7rYZWak9Ja01eTxdLTzq9iz6vF+8ZRbFkRCXhRsvYOti5QeUmcZk6djlctFqqIf4MOncEq2rAaLnmxLiPKP0Hp/j7T9NQoqF3aWHfOJsVDVHwPwFiB+s9sNIz/WDUpDUt4bmCFlaBqsEGDFVLwnKeHNnurlqhgk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=kmZhjzeG; arc=none smtp.client-ip=148.251.105.195
+	 MIME-Version:Content-Type; b=sEjbiBXQo0Hv32yidd2P4m64JWYMXXG49ge9Iq+xr5QJX70i+x1Zfjlq3Hi9Sc+xNhiD84naJyLQbrIgX3UUgZFyjJZXa++oGUGmpNX8iLAlNzbK+S9sUWKw2D73bWaTmuaHzJ67G/5hZQ6McmKPyqn5UeLOj2A4MYGB2OK38ZE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=L0IfB7MT; arc=none smtp.client-ip=148.251.105.195
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="kmZhjzeG"
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="L0IfB7MT"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
 	s=mail; t=1726163368;
-	bh=EtdCOzGnbzlPFulYQy3i/17FuGbLkuw+UEVT+ofyroI=;
+	bh=uCmcIu0gyA2WYaokt64j4mglaqF6ujTo3V6h+5K5IhQ=;
 	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=kmZhjzeGt26Dq2BiH/GCINHIQ38Aorcdl48w8q/vxGAy7/VaYbqPU8R94ZDnkdf6c
-	 Yurq0ZodcafquEslfixXzXTTL+2h9hHqoAtd1VTB0mkj8Jab+OdB6qEM7aM3vUQhJt
-	 Z6jdSQVt/aISB3RyACXWGXR3oRyVeidHcelXECKrFQgkiZCH6j2MyYORQm/4BDhguA
-	 sFu/Eedde+lWHunka5ccHE8YyvWxeZ3uFWWxOafP2VNs7FnZxDSxdBfCOpoxtSEMup
-	 xkOzWQ18e6P5yVRGaAFlhB+pVG1dZXfBct1iCZtVtxbzuXf4Uu4jik0MuzwhXCAfzL
-	 sI+DFB+Lbf/Mw==
+	b=L0IfB7MT/5y7YpWDz0/s2DjkmEQ7IkETbGj++29Ro6RacFdD14TJEyvr5F2KIxU9k
+	 lWJIQEVPkq65TLtF4W0LqbfZcRkToRv2p0B/9BsiWdRm/JLqcyKEkLSIWBZxF5lXBl
+	 p03TMK2Dn/KMwLGBXbMyOpMHAobooqxpd3tP5ty/CEUoWOQj1rmC9i16fiEBEIVBOv
+	 sHfSifG9x2U1/cYf9rRVH2drwI7whZ2UPS8DKfuZMDBbSyXmnLSU/W/8Wy3bh1iPt8
+	 D61pMCFYnpunYbx/Mk5VisyFIv58ksl0ZqQOI2SFY9J8hWCsVuixoJp6tQkujmuj39
+	 koE/hjEQG0ycw==
 Received: from fdanis-XPS-13-9370.. (67.227.121.78.rev.sfr.net [78.121.227.67])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: fdanis)
-	by bali.collaboradmins.com (Postfix) with ESMTPSA id 08A1317E3601
+	by bali.collaboradmins.com (Postfix) with ESMTPSA id 873A417E3604
 	for <linux-bluetooth@vger.kernel.org>; Thu, 12 Sep 2024 19:49:28 +0200 (CEST)
 From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?= <frederic.danis@collabora.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v2 2/7] player: Add OBEX PSM port for cover art support
-Date: Thu, 12 Sep 2024 19:49:16 +0200
-Message-Id: <20240912174921.386856-3-frederic.danis@collabora.com>
+Subject: [PATCH BlueZ v2 4/7] obexd: Add BIP client for AVRCP cover art download.
+Date: Thu, 12 Sep 2024 19:49:18 +0200
+Message-Id: <20240912174921.386856-5-frederic.danis@collabora.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240912174921.386856-1-frederic.danis@collabora.com>
 References: <20240912174921.386856-1-frederic.danis@collabora.com>
@@ -50,214 +50,297 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 
-This parse the AVRCP Target SDP record for the L2CAP PSM to use with
-the OBEX session to get the cover art.
+The cover art image handle is available in the metadata of the track
+when the OBEX BIP session is connected to the PSM port provided
+in AVRCP SDP record and available as org.bluez.MediaPlayer property.
+
+This service allows to get the thumbnail.
 ---
-v1 -> v2: Set new propert as experimental
+ Makefile.obexd           |   1 +
+ obexd/client/bip-avrcp.c | 171 +++++++++++++++++++++++++++++++++++++++
+ obexd/client/bip-avrcp.h |  12 +++
+ obexd/client/manager.c   |   2 +
+ obexd/client/transfer.c  |  16 ++++
+ obexd/client/transfer.h  |   2 +
+ 6 files changed, 204 insertions(+)
+ create mode 100644 obexd/client/bip-avrcp.c
+ create mode 100644 obexd/client/bip-avrcp.h
 
- doc/org.bluez.MediaPlayer.rst |  6 +++++
- profiles/audio/avrcp.c        | 51 +++++++++++++++++++++++++++++++----
- profiles/audio/player.c       | 30 +++++++++++++++++++++
- profiles/audio/player.h       |  1 +
- 4 files changed, 83 insertions(+), 5 deletions(-)
-
-diff --git a/doc/org.bluez.MediaPlayer.rst b/doc/org.bluez.MediaPlayer.rst
-index 60bd679bb..858344b30 100644
---- a/doc/org.bluez.MediaPlayer.rst
-+++ b/doc/org.bluez.MediaPlayer.rst
-@@ -313,3 +313,9 @@ object Playlist
- ```````````````
- 
- 	Playlist object path.
+diff --git a/Makefile.obexd b/Makefile.obexd
+index 4cdce73af..8038d2327 100644
+--- a/Makefile.obexd
++++ b/Makefile.obexd
+@@ -81,6 +81,7 @@ obexd_src_obexd_SOURCES = $(btio_sources) $(gobex_sources) \
+ 			obexd/client/ftp.h obexd/client/ftp.c \
+ 			obexd/client/opp.h obexd/client/opp.c \
+ 			obexd/client/map.h obexd/client/map.c \
++			obexd/client/bip-avrcp.h obexd/client/bip-avrcp.c \
+ 			obexd/client/map-event.h obexd/client/map-event.c \
+ 			obexd/client/transfer.h obexd/client/transfer.c \
+ 			obexd/client/transport.h obexd/client/transport.c \
+diff --git a/obexd/client/bip-avrcp.c b/obexd/client/bip-avrcp.c
+new file mode 100644
+index 000000000..ca702be5a
+--- /dev/null
++++ b/obexd/client/bip-avrcp.c
+@@ -0,0 +1,171 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
++/*
++ *
++ *  OBEX Client
++ *
++ *  Copyright (C) 2024  Collabora Ltd.
++ *
++ *
++ */
 +
-+uint16 ObexPort [readonly, experimental]
-+````````````````````````````````````````
++#define _GNU_SOURCE
++#include <errno.h>
++#include <stdlib.h>
++#include <string.h>
 +
-+	If present indicates the player can get cover art using BIP over OBEX
-+	on this PSM port.
-diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
-index 752e55be3..61558e492 100644
---- a/profiles/audio/avrcp.c
-+++ b/profiles/audio/avrcp.c
-@@ -118,8 +118,14 @@
- #define AVRCP_FEATURE_CATEGORY_2	0x0002
- #define AVRCP_FEATURE_CATEGORY_3	0x0004
- #define AVRCP_FEATURE_CATEGORY_4	0x0008
--#define AVRCP_FEATURE_PLAYER_SETTINGS	0x0010
--#define AVRCP_FEATURE_BROWSING			0x0040
-+#define AVRCP_FEATURE_TG_PLAYER_SETTINGS	0x0010
-+#define AVRCP_FEATURE_TG_GROUP_NAVIGATION	0x0020
-+#define AVRCP_FEATURE_BROWSING				0x0040
-+#define AVRCP_FEATURE_TG_MULTIPLE_PLAYER	0x0080
-+#define AVRCP_FEATURE_TG_COVERT_ART			0x0100
-+#define AVRCP_FEATURE_CT_GET_IMAGE_PROP		0x0080
-+#define AVRCP_FEATURE_CT_GET_IMAGE			0x0100
-+#define AVRCP_FEATURE_CT_GET_THUMBNAIL		0x0200
- 
- #define AVRCP_BATTERY_STATUS_NORMAL		0
- #define AVRCP_BATTERY_STATUS_WARNING		1
-@@ -254,6 +260,7 @@ struct avrcp_data {
- 	struct avrcp_player *player;
- 	uint16_t version;
- 	int features;
-+	uint16_t obex_port;
- 	GSList *players;
- };
- 
-@@ -487,7 +494,7 @@ static sdp_record_t *avrcp_tg_record(bool browsing)
- 					AVRCP_FEATURE_CATEGORY_2 |
- 					AVRCP_FEATURE_CATEGORY_3 |
- 					AVRCP_FEATURE_CATEGORY_4 |
--					AVRCP_FEATURE_PLAYER_SETTINGS );
-+					AVRCP_FEATURE_TG_PLAYER_SETTINGS);
- 
- 	record = sdp_record_alloc();
- 	if (!record)
-@@ -3522,6 +3529,7 @@ static struct avrcp_player *create_ct_player(struct avrcp *session,
- 		return NULL;
- 	}
- 
-+	media_player_set_obex_port(mp, session->controller->obex_port);
- 	media_player_set_callbacks(mp, &ct_cbs, player);
- 	player->user_data = mp;
- 	player->destroy = (GDestroyNotify) media_player_destroy;
-@@ -4006,7 +4014,8 @@ static gboolean avrcp_get_capabilities_resp(struct avctp *conn, uint8_t code,
- 	if (events == (1 << AVRCP_EVENT_VOLUME_CHANGED))
- 		return FALSE;
- 
--	if ((session->controller->features & AVRCP_FEATURE_PLAYER_SETTINGS) &&
-+	if ((session->controller->features &
-+			AVRCP_FEATURE_TG_PLAYER_SETTINGS) &&
- 			!(events & (1 << AVRCP_EVENT_SETTINGS_CHANGED)))
- 		avrcp_list_player_attributes(session);
- 
-@@ -4075,8 +4084,9 @@ static struct avrcp_data *data_init(struct avrcp *session, const char *uuid)
- {
- 	struct avrcp_data *data;
- 	const sdp_record_t *rec;
--	sdp_list_t *list;
-+	sdp_list_t *list, *protos;
- 	sdp_profile_desc_t *desc;
-+	int port = 0;
- 
- 	data = g_new0(struct avrcp_data, 1);
- 
-@@ -4092,6 +4102,35 @@ static struct avrcp_data *data_init(struct avrcp *session, const char *uuid)
- 	sdp_get_int_attr(rec, SDP_ATTR_SUPPORTED_FEATURES, &data->features);
- 	sdp_list_free(list, free);
- 
-+	if ((g_strcmp0(uuid, AVRCP_TARGET_UUID) != 0) ||
-+			!(data->features & AVRCP_FEATURE_TG_COVERT_ART) ||
-+			(sdp_get_add_access_protos(rec, &protos) != 0))
-+		return data;
++#include "gdbus/gdbus.h"
++#include "gobex/gobex.h"
 +
-+	/* Get the PSM port from the Additional Protocol Descriptor list
-+	 * entry containing OBEX UUID
-+	 */
-+	for (list = protos; list; list = list->next) {
-+		sdp_list_t *p;
++#include "obexd/src/log.h"
++#include "transfer.h"
++#include "session.h"
++#include "driver.h"
++#include "bip-avrcp.h"
 +
-+		for (p = list->data; p; p = p->next) {
-+			sdp_data_t *seq = p->data;
++#define OBEX_BIP_AVRCP_UUID \
++	"\x71\x63\xDD\x54\x4A\x7E\x11\xE2\xB4\x7C\x00\x50\xC2\x49\x00\x48"
++#define OBEX_BIP_AVRCP_UUID_LEN 16
 +
-+			if ((sdp_uuid_to_proto(&seq->val.uuid) == OBEX_UUID) &&
-+					SDP_IS_UUID(seq->dtd)) {
-+				port = sdp_get_proto_port(list, L2CAP_UUID);
-+				goto done;
-+			}
-+		}
++#define BIP_AVRCP_INTERFACE "org.bluez.obex.BipAvrcp1"
++#define ERROR_INTERFACE "org.bluez.obex.Error"
++#define BIP_AVRCP_UUID "0000111A-0000-1000-8000-00805f9b34fb"
++
++#define IMG_HANDLE_TAG  0x30
++
++static DBusConnection *conn;
++
++struct bip_avrcp_data {
++	struct obc_session *session;
++};
++
++static DBusMessage *get_image_thumbnail(DBusConnection *connection,
++					DBusMessage *message, void *user_data)
++{
++	struct bip_avrcp_data *bip_avrcp = user_data;
++	const char *handle = NULL, *image_path = NULL;
++	struct obc_transfer *transfer;
++	GObexHeader *header;
++	DBusMessage *reply = NULL;
++	GError *err = NULL;
++
++	DBG("");
++
++	if (dbus_message_get_args(message, NULL,
++				DBUS_TYPE_STRING, &image_path,
++				DBUS_TYPE_STRING, &handle,
++				DBUS_TYPE_INVALID) == FALSE) {
++		reply = g_dbus_create_error(message,
++				ERROR_INTERFACE ".InvalidArguments", NULL);
++		goto fail;
 +	}
 +
-+done:
-+	if (port > 0)
-+		data->obex_port = port;
++	transfer = obc_transfer_get("x-bt/img-thm", NULL, image_path, &err);
++	if (transfer == NULL)
++		goto fail;
 +
-+	sdp_list_foreach(protos, (sdp_list_func_t) sdp_list_free, NULL);
-+	sdp_list_free(protos, NULL);
++	header = g_obex_header_new_unicode(IMG_HANDLE_TAG, handle);
++	obc_transfer_add_header(transfer, header);
 +
- 	return data;
- }
- 
-@@ -4189,6 +4228,8 @@ static void controller_init(struct avrcp *session)
- 	session->controller = controller;
- 
- 	DBG("%p version 0x%04x", controller, controller->version);
-+	if (controller->obex_port)
-+		DBG("%p OBEX PSM 0x%04x", controller, controller->obex_port);
- 
- 	service = btd_device_get_service(session->dev, AVRCP_TARGET_UUID);
- 	btd_service_connecting_complete(service, 0);
-diff --git a/profiles/audio/player.c b/profiles/audio/player.c
-index c995697fe..b3a6920fc 100644
---- a/profiles/audio/player.c
-+++ b/profiles/audio/player.c
-@@ -88,6 +88,7 @@ struct media_player {
- 	struct player_callback	*cb;
- 	GSList			*pending;
- 	GSList			*folders;
-+	uint16_t		obex_port;
- };
- 
- static void append_track(void *key, void *value, void *user_data)
-@@ -437,6 +438,28 @@ static gboolean get_playlist(const GDBusPropertyTable *property,
- 	return TRUE;
- }
- 
-+static gboolean obexport_exists(const GDBusPropertyTable *property,
-+								void *data)
-+{
-+	struct media_player *mp = data;
++	if (!obc_session_queue(bip_avrcp->session, transfer, NULL, NULL, &err))
++		goto fail;
 +
-+	return mp->obex_port != 0;
++	return obc_transfer_create_dbus_reply(transfer, message);
++
++fail:
++	reply = g_dbus_create_error(message, ERROR_INTERFACE ".Failed", "%s",
++								err->message);
++	g_error_free(err);
++	return reply;
 +}
 +
-+static gboolean get_obexport(const GDBusPropertyTable *property,
-+					DBusMessageIter *iter, void *data)
++static const GDBusMethodTable bip_avrcp_methods[] = {
++	{ GDBUS_ASYNC_METHOD("GetImageThumbnail",
++		GDBUS_ARGS({ "file", "s" }, { "handle", "s"}),
++		GDBUS_ARGS({ "transfer", "o" }, { "properties", "a{sv}" }),
++		get_image_thumbnail) },
++	{ }
++};
++
++static void bip_avrcp_free(void *data)
 +{
-+	struct media_player *mp = data;
++	struct bip_avrcp_data *bip_avrcp = data;
 +
-+	if (mp->obex_port == 0)
-+		return FALSE;
-+
-+	dbus_message_iter_append_basic(iter, DBUS_TYPE_UINT16,
-+							&mp->obex_port);
-+
-+	return TRUE;
++	obc_session_unref(bip_avrcp->session);
++	g_free(bip_avrcp);
 +}
 +
- static DBusMessage *media_player_play(DBusConnection *conn, DBusMessage *msg,
- 								void *data)
- {
-@@ -778,6 +801,8 @@ static const GDBusPropertyTable media_player_properties[] = {
- 	{ "Browsable", "b", get_browsable, NULL, browsable_exists },
- 	{ "Searchable", "b", get_searchable, NULL, searchable_exists },
- 	{ "Playlist", "o", get_playlist, NULL, playlist_exists },
-+	{ "ObexPort", "q", get_obexport, NULL, obexport_exists,
-+			G_DBUS_PROPERTY_FLAG_EXPERIMENTAL },
++static int bip_avrcp_probe(struct obc_session *session)
++{
++	struct bip_avrcp_data *bip_avrcp;
++	const char *path;
++
++	path = obc_session_get_path(session);
++
++	DBG("%s", path);
++
++	bip_avrcp = g_try_new0(struct bip_avrcp_data, 1);
++	if (!bip_avrcp)
++		return -ENOMEM;
++
++	bip_avrcp->session = obc_session_ref(session);
++
++	if (!g_dbus_register_interface(conn, path, BIP_AVRCP_INTERFACE,
++					bip_avrcp_methods,
++					NULL, NULL,
++					bip_avrcp, bip_avrcp_free)) {
++		bip_avrcp_free(bip_avrcp);
++		return -ENOMEM;
++	}
++
++	return 0;
++}
++
++static void bip_avrcp_remove(struct obc_session *session)
++{
++	const char *path = obc_session_get_path(session);
++
++	DBG("%s", path);
++
++	g_dbus_unregister_interface(conn, path, BIP_AVRCP_INTERFACE);
++}
++
++static struct obc_driver bip_avrcp = {
++	.service = "BIP-AVRCP",
++	.uuid = BIP_AVRCP_UUID,
++	.target = OBEX_BIP_AVRCP_UUID,
++	.target_len = OBEX_BIP_AVRCP_UUID_LEN,
++	.probe = bip_avrcp_probe,
++	.remove = bip_avrcp_remove
++};
++
++int bip_avrcp_init(void)
++{
++	int err;
++
++	DBG("");
++
++	conn = dbus_bus_get(DBUS_BUS_SESSION, NULL);
++	if (!conn)
++		return -EIO;
++
++	err = obc_driver_register(&bip_avrcp);
++	if (err < 0)
++		goto failed;
++
++	return 0;
++
++failed:
++	dbus_connection_unref(conn);
++	conn = NULL;
++	return err;
++}
++
++void bip_avrcp_exit(void)
++{
++	DBG("");
++
++	dbus_connection_unref(conn);
++	conn = NULL;
++
++	obc_driver_unregister(&bip_avrcp);
++}
+diff --git a/obexd/client/bip-avrcp.h b/obexd/client/bip-avrcp.h
+new file mode 100644
+index 000000000..acd8068f2
+--- /dev/null
++++ b/obexd/client/bip-avrcp.h
+@@ -0,0 +1,12 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
++/*
++ *
++ *  OBEX Client
++ *
++ *  Copyright (C) 2024  Collabora Ltd.
++ *
++ *
++ */
++
++int bip_avrcp_init(void);
++void bip_avrcp_exit(void);
+diff --git a/obexd/client/manager.c b/obexd/client/manager.c
+index 52c00fb0c..5078f56da 100644
+--- a/obexd/client/manager.c
++++ b/obexd/client/manager.c
+@@ -32,6 +32,7 @@
+ #include "pbap.h"
+ #include "sync.h"
+ #include "map.h"
++#include "bip-avrcp.h"
+ #include "manager.h"
+ 
+ #define CLIENT_INTERFACE	"org.bluez.obex.Client1"
+@@ -258,6 +259,7 @@ static const struct obc_module {
+ 	{ "pbap", pbap_init, pbap_exit },
+ 	{ "sync", sync_init, sync_exit },
+ 	{ "map", map_init, map_exit },
++	{ "bip-avrcp", bip_avrcp_init, bip_avrcp_exit },
  	{ }
  };
  
-@@ -1997,3 +2022,8 @@ struct media_item *media_player_set_playlist_item(struct media_player *mp,
+diff --git a/obexd/client/transfer.c b/obexd/client/transfer.c
+index a7a85a0c0..fdf32a985 100644
+--- a/obexd/client/transfer.c
++++ b/obexd/client/transfer.c
+@@ -57,6 +57,7 @@ struct obc_transfer {
+ 	GObex *obex;
+ 	uint8_t status;
+ 	GObexApparam *apparam;
++	GSList *headers;
+ 	guint8 op;
+ 	struct transfer_callback *callback;
+ 	DBusConnection *conn;
+@@ -820,6 +821,16 @@ static gboolean transfer_start_get(struct obc_transfer *transfer, GError **err)
+ 		g_obex_packet_add_bytes(req, G_OBEX_HDR_TYPE, transfer->type,
+ 						strlen(transfer->type) + 1);
  
- 	return item;
++	if (transfer->headers != NULL) {
++		GSList *l;
++
++		for (l = transfer->headers; l != NULL; l = g_slist_next(l)) {
++			GObexHeader *hdr = l->data;
++
++			g_obex_packet_add_header(req, hdr);
++		}
++	}
++
+ 	if (transfer->apparam != NULL) {
+ 		hdr = g_obex_header_new_apparam(transfer->apparam);
+ 		g_obex_packet_add_header(req, hdr);
+@@ -974,3 +985,8 @@ gint64 obc_transfer_get_size(struct obc_transfer *transfer)
+ {
+ 	return transfer->size;
  }
 +
-+void media_player_set_obex_port(struct media_player *mp, uint16_t port)
++void obc_transfer_add_header(struct obc_transfer *transfer, void *data)
 +{
-+	mp->obex_port = port;
++	transfer->headers = g_slist_append(transfer->headers, data);
 +}
-diff --git a/profiles/audio/player.h b/profiles/audio/player.h
-index 74fb7d771..0076c4641 100644
---- a/profiles/audio/player.h
-+++ b/profiles/audio/player.h
-@@ -86,6 +86,7 @@ void media_player_set_folder(struct media_player *mp, const char *path,
- void media_player_set_playlist(struct media_player *mp, const char *name);
- struct media_item *media_player_set_playlist_item(struct media_player *mp,
- 								uint64_t uid);
-+void media_player_set_obex_port(struct media_player *mp, uint16_t port);
+diff --git a/obexd/client/transfer.h b/obexd/client/transfer.h
+index 323332a62..1ed195984 100644
+--- a/obexd/client/transfer.h
++++ b/obexd/client/transfer.h
+@@ -47,3 +47,5 @@ gint64 obc_transfer_get_size(struct obc_transfer *transfer);
  
- struct media_item *media_player_create_folder(struct media_player *mp,
- 						const char *name,
+ DBusMessage *obc_transfer_create_dbus_reply(struct obc_transfer *transfer,
+ 							DBusMessage *message);
++
++void obc_transfer_add_header(struct obc_transfer *transfer, void *data);
 -- 
 2.34.1
 
