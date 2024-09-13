@@ -1,60 +1,60 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A4CE78B4E
-	for <linux-bluetooth@vger.kernel.org>; Fri, 13 Sep 2024 04:17:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 700C417B400
+	for <linux-bluetooth@vger.kernel.org>; Fri, 13 Sep 2024 05:29:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726201057; cv=none; b=bj8JjFGD8A5bnWQfV9rCTQfODejccUGS8iooRJQ0CzxvReF/mJvh2t7yJonrLExzJqvqf+hsQLV3nHnqWEYqAn97TjFSpMH9rZ7cPW+bf+8bcfFmR79t+4AOg3L3rt78l51LwjVTwjqG2TC3ndFyTYhEpiFcvwpuHwY/lMMkZ6o=
+	t=1726205379; cv=none; b=ubFv5FXWAUI9ePWnZwKHNp4ITFJP+wMGPBgpKRpICqBncknlC2ANAkTXU6Qfbb5/+bj2068kpTwAaRJgBsJv4K4BQN1rAowkbcrZggIJaRqmlRXjmEpvJs7PcFwvb4n33xs7bGIMYSV0w3iJFdTT/QpY4HIA1ABKpSFwKDOVK24=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726201057; c=relaxed/simple;
-	bh=EpdHpZFDKM10d3kQHw+GuaxEYxE5eEki6OWFTfxcAeM=;
+	s=arc-20240116; t=1726205379; c=relaxed/simple;
+	bh=oZ6M4pTD4oSlItcuflxFMv3uiQ9/2J3rMvHi70Xj3LA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hu9MDlrZnIH3QMvLYWtZQGksozsDk4xYzr3Ek2ZLf38DE8P5nH+HPWyOpJJS3kUtWjc2mimXL/Nlqq2ono7mk8LInBJa2BnT+pA9nbkfz5tTRhF72f4w5vcExLy6p2PK/pbF025HNFR1YkiEo/2oUlMYJAT73/GNN31K48VTp18=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Sb/IvM7F; arc=none smtp.client-ip=198.175.65.10
+	 Content-Type:Content-Disposition:In-Reply-To; b=P2bRjMVukVBizSOSWwhCGlnlFmIcn8vUmwkbEm1SXgpPb3uq8h8B4T97cjPBRdUCH9W9ixPatOmvcjOOPN8ijyfY44cB18oAhKi2K9zCjNKhdQal6ikBGejV5aso7lZiIydAuHRwbssqFhmPNYhgpOg49LWQXegWyG5VCPv9i1Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=BiLCKbih; arc=none smtp.client-ip=198.175.65.16
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Sb/IvM7F"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="BiLCKbih"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1726201055; x=1757737055;
+  t=1726205376; x=1757741376;
   h=date:from:to:cc:subject:message-id:references:
    mime-version:in-reply-to;
-  bh=EpdHpZFDKM10d3kQHw+GuaxEYxE5eEki6OWFTfxcAeM=;
-  b=Sb/IvM7F6iSIMWUMd2VuvFRlvX5vTHTU0M4ZSfjueQaSdif1WkrUC/5g
-   rZQrPshq52nwfHmPPzOVFlpQqcj/fvjGudXDe4aP3KvH8NJQZpESV1kb0
-   SxC7gimGMEZCUdowIg6tvuTWA3Wv2nnXO1qaIT8dvocYLJOGEVz0deERg
-   1djhZpJl5GCm+LVcH6+/W+ELrZGwk6HJTuCF+A5z0G1DF4o+Enb+PnPEl
-   CORynqRPVC2LHDH4fsbG10nRsS0I7QHR7lN+h7bP4sqDyQD4jW6z4R+PG
-   6nN87OM7L78m6F6+dHhQtvnU/+JTNRFEOJQYLSTtPsvEeUHw+fbub5dOR
-   A==;
-X-CSE-ConnectionGUID: bX3DkHOQT1yTB44LXPsQFA==
-X-CSE-MsgGUID: TgpPJ+vhT7atLHYwNTeUIQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11193"; a="42564406"
-X-IronPort-AV: E=Sophos;i="6.10,224,1719903600"; 
-   d="scan'208";a="42564406"
-Received: from orviesa010.jf.intel.com ([10.64.159.150])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Sep 2024 21:17:35 -0700
-X-CSE-ConnectionGUID: 7ZlYBhWgQS6LBQSOPcOHNg==
-X-CSE-MsgGUID: 7rErM16vTPCmMkPHJwZm3g==
+  bh=oZ6M4pTD4oSlItcuflxFMv3uiQ9/2J3rMvHi70Xj3LA=;
+  b=BiLCKbih+5j+gMswsF5eoY+sMfnCdc0PrVLXH9wkC32uEhBS2iuBatvT
+   s04YDAMX/mMVzhSJ4ewZ0nfbWl5o9sTcXmK9POx1IOY4DRxsNaBeXuuUp
+   jCZJ4iY2qGq80qas2K1djyJren5NOqV59Q91/QPgi3WMEMi7F62ZUNTiY
+   Hy6XX+hsIihhQgC0KkLLI8tdhiIqmyWCC89N+hl8Ko9yAd63GbTLKUKq8
+   hUsgGk870+5rG33522cq6J48W+gabg9Wm0yhyE2aexgOco0cIInfsraxl
+   Hq6cLzrbNoZxf0aKk0U+MmCWlNF/ggT/HRkdJ+NNQFKL3NzKRl1UfED+E
+   Q==;
+X-CSE-ConnectionGUID: fkOGjhqkRkyccRbshHhe8Q==
+X-CSE-MsgGUID: 4b6vjP8kQnmL+a9ZR3aW4A==
+X-IronPort-AV: E=McAfee;i="6700,10204,11193"; a="25190250"
+X-IronPort-AV: E=Sophos;i="6.10,225,1719903600"; 
+   d="scan'208";a="25190250"
+Received: from fmviesa003.fm.intel.com ([10.60.135.143])
+  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Sep 2024 22:29:36 -0700
+X-CSE-ConnectionGUID: Y0e2ByUoTRSF6u2ryCuEww==
+X-CSE-MsgGUID: y/3z5rAkQP+mR0DBby+Waw==
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.10,224,1719903600"; 
-   d="scan'208";a="67766195"
+X-IronPort-AV: E=Sophos;i="6.10,225,1719903600"; 
+   d="scan'208";a="72047679"
 Received: from lkp-server01.sh.intel.com (HELO 53e96f405c61) ([10.239.97.150])
-  by orviesa010.jf.intel.com with ESMTP; 12 Sep 2024 21:17:33 -0700
+  by fmviesa003.fm.intel.com with ESMTP; 12 Sep 2024 22:29:35 -0700
 Received: from kbuild by 53e96f405c61 with local (Exim 4.96)
 	(envelope-from <lkp@intel.com>)
-	id 1soxkR-0005zq-0N;
-	Fri, 13 Sep 2024 04:17:31 +0000
-Date: Fri, 13 Sep 2024 12:16:33 +0800
+	id 1soys8-00062o-2j;
+	Fri, 13 Sep 2024 05:29:32 +0000
+Date: Fri, 13 Sep 2024 13:29:13 +0800
 From: kernel test robot <lkp@intel.com>
 To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
 	linux-bluetooth@vger.kernel.org
-Cc: oe-kbuild-all@lists.linux.dev
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev
 Subject: Re: [PATCH v1] Bluetooth: MGMT: Fix possible crash on
  mgmt_index_removed
-Message-ID: <202409131212.VOjz2kzX-lkp@intel.com>
+Message-ID: <202409131332.j8QQVdrT-lkp@intel.com>
 References: <20240912164454.2996352-1-luiz.dentz@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -71,7 +71,7 @@ Hi Luiz,
 kernel test robot noticed the following build errors:
 
 [auto build test ERROR on bluetooth-next/master]
-[also build test ERROR on bluetooth/master linus/master v6.11-rc7 next-20240912]
+[also build test ERROR on bluetooth/master linus/master v6.11-rc7]
 [If your patch is applied to the wrong git tree, kindly drop us a note.
 And when submitting patch, we suggest to use '--base' as documented in
 https://git-scm.com/docs/git-format-patch#_base_tree_information]
@@ -80,21 +80,21 @@ url:    https://github.com/intel-lab-lkp/linux/commits/Luiz-Augusto-von-Dentz/Bl
 base:   https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
 patch link:    https://lore.kernel.org/r/20240912164454.2996352-1-luiz.dentz%40gmail.com
 patch subject: [PATCH v1] Bluetooth: MGMT: Fix possible crash on mgmt_index_removed
-config: openrisc-randconfig-r071-20240913 (https://download.01.org/0day-ci/archive/20240913/202409131212.VOjz2kzX-lkp@intel.com/config)
-compiler: or1k-linux-gcc (GCC) 14.1.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240913/202409131212.VOjz2kzX-lkp@intel.com/reproduce)
+config: i386-buildonly-randconfig-001-20240913 (https://download.01.org/0day-ci/archive/20240913/202409131332.j8QQVdrT-lkp@intel.com/config)
+compiler: clang version 18.1.8 (https://github.com/llvm/llvm-project 3b5b5c1ec4a3095ab096dd780e84d7ab81f3d7ff)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240913/202409131332.j8QQVdrT-lkp@intel.com/reproduce)
 
 If you fix the issue in a separate patch/commit (i.e. not just a new version of
 the same patch/commit), kindly add following tags
 | Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202409131212.VOjz2kzX-lkp@intel.com/
+| Closes: https://lore.kernel.org/oe-kbuild-all/202409131332.j8QQVdrT-lkp@intel.com/
 
 All errors (new ones prefixed by >>):
 
-   net/bluetooth/mgmt.c: In function 'cmd_complete_rsp':
->> net/bluetooth/mgmt.c:1459:33: error: 'struct mgmt_pending_cmd' has no member named 'hdev'
+>> net/bluetooth/mgmt.c:1459:28: error: no member named 'hdev' in 'struct mgmt_pending_cmd'
     1459 |         hci_cmd_sync_dequeue(cmd->hdev, NULL, cmd, NULL);
-         |                                 ^~
+         |                              ~~~  ^
+   1 error generated.
 
 
 vim +1459 net/bluetooth/mgmt.c
