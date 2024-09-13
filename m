@@ -1,136 +1,125 @@
-Received: from mail-qv1-f43.google.com (mail-qv1-f43.google.com [209.85.219.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D667B6FBF
-	for <linux-bluetooth@vger.kernel.org>; Thu, 12 Sep 2024 22:45:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A4CE78B4E
+	for <linux-bluetooth@vger.kernel.org>; Fri, 13 Sep 2024 04:17:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726181136; cv=none; b=UpFQ6BFIpbdgu1X/AzkNV5Qw0OYRwwAUA4hZUCMHxB/2cnTS5A4t0U3QYwzu1U/zYZMnc+cDDdZsPD7ROJfykX/+N2EWGbhlkuccaScDylBu0v5Z6cui5oWF+zVMQPsoedJA5jZGRADrVT0Kxq/h5Wyv67qx5BZOQNiyIQnUoIw=
+	t=1726201057; cv=none; b=bj8JjFGD8A5bnWQfV9rCTQfODejccUGS8iooRJQ0CzxvReF/mJvh2t7yJonrLExzJqvqf+hsQLV3nHnqWEYqAn97TjFSpMH9rZ7cPW+bf+8bcfFmR79t+4AOg3L3rt78l51LwjVTwjqG2TC3ndFyTYhEpiFcvwpuHwY/lMMkZ6o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726181136; c=relaxed/simple;
-	bh=+d68i/m43E9fv7nLh7WYrSMjVFcaut7V+s9F+otqsWU=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=TzCp+ZeTqXkFQdBbePxIRJDMuK6dnlzkDNw9aqRnC637y6AY8by4uvEACO1dncFIvsA2IXd6i+kDWgV4wSQobmOQHYmg/uWsipQx7iOwmgFDbbUCwcHvTuKhPFuxkVe9ojI9r96GOX8/aVXqqqzm5uL0KdO+/IAJMIfD8wT6Ot4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JSma7cpw; arc=none smtp.client-ip=209.85.219.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1726201057; c=relaxed/simple;
+	bh=EpdHpZFDKM10d3kQHw+GuaxEYxE5eEki6OWFTfxcAeM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=hu9MDlrZnIH3QMvLYWtZQGksozsDk4xYzr3Ek2ZLf38DE8P5nH+HPWyOpJJS3kUtWjc2mimXL/Nlqq2ono7mk8LInBJa2BnT+pA9nbkfz5tTRhF72f4w5vcExLy6p2PK/pbF025HNFR1YkiEo/2oUlMYJAT73/GNN31K48VTp18=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Sb/IvM7F; arc=none smtp.client-ip=198.175.65.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JSma7cpw"
-Received: by mail-qv1-f43.google.com with SMTP id 6a1803df08f44-6c35a23b378so9360976d6.2
-        for <linux-bluetooth@vger.kernel.org>; Thu, 12 Sep 2024 15:45:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1726181133; x=1726785933; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=kVtut/aL/Izv8m2mLmKs9tgwenTlfuCzqPDlqHjgrCo=;
-        b=JSma7cpw7BnJaRkf32p4BPtj6YYg8+wch6OfqvUnInfZAp+1Pg+38sQowvDelax6Kn
-         QmQdkbeCFrVyoooTDPju46HjfLCqcfIrPM4XvNbmhkVVOeRfRj36EEZmhA1Fu6HGItJb
-         OW02LKPjJs9O8y/1jWOxRIfw+vZjJQ7C28lNBxUg8POO5lwgdQF9mje5kRTsD+RK5Mxd
-         /L8vHfbQPVsJnnKU3959r1mbRyK3jtXreiPsqTLZgXZQ2AemobaV+TkPrrIVfQn/r3Qm
-         78ZJyZMWEHe4KQquLG+TS410/inqvg0v9Nbgjyubbj8viRrPnxix+FhnUMLd5j9yY61u
-         cV4g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726181133; x=1726785933;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=kVtut/aL/Izv8m2mLmKs9tgwenTlfuCzqPDlqHjgrCo=;
-        b=nGf2wajfUJuqbF/kDujdBGreMxmttEe7GJsqJRfPZ0MTzbTaH+irupQA/EPU+6OgUm
-         UdIQeAZVbiOgVWLkVdq6xfaRgiWGObzrsUf0uzJgMKFqLQVv9gjSS49HdFsOVyCfyDmJ
-         4GkxXk3E14dK8pZZmOQW2neXYXil9tLDyYvj42hqm2joaUnlSB3w8vVbikaGjS3RaYiY
-         VgO9g5FLFjqsLDCSdmiCMLrE1X443U1x0rUvuwA4Jq4/Q9sIWU3VQgKcK6eW6sLl7jnR
-         gRtcNih1afhYvdSoy716vgGMIBW9awoU/owgVvGVqVhrJodbb82m7NF3F2YoCJPBOjwh
-         OZhw==
-X-Gm-Message-State: AOJu0Ywsoeg8lfxIE4jl3Q3mnjL3ZSStr0QQEiYqTKhZAfTvkBQtJxzx
-	vLkJXI4e9kYrthDmyWfiQ3ypupVXvyG1E8A6v+/wLXUZYf+YvuqefNfUfA==
-X-Google-Smtp-Source: AGHT+IGDnI6O+Pi1u29eNdTixSGQTduz5zmWDMURLqC3WwMwGyU6cSfAQFOCsTQ3HUXz8eHEE0+aMg==
-X-Received: by 2002:a05:6214:451c:b0:6c5:5114:96e8 with SMTP id 6a1803df08f44-6c57353515fmr64282266d6.21.1726181133408;
-        Thu, 12 Sep 2024 15:45:33 -0700 (PDT)
-Received: from [172.17.0.2] ([74.249.14.161])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6c53432dfadsm59448826d6.15.2024.09.12.15.45.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 12 Sep 2024 15:45:33 -0700 (PDT)
-Message-ID: <66e36f0d.0c0a0220.31e0af.69b3@mx.google.com>
-Date: Thu, 12 Sep 2024 15:45:33 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============7177864037746081394=="
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Sb/IvM7F"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1726201055; x=1757737055;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=EpdHpZFDKM10d3kQHw+GuaxEYxE5eEki6OWFTfxcAeM=;
+  b=Sb/IvM7F6iSIMWUMd2VuvFRlvX5vTHTU0M4ZSfjueQaSdif1WkrUC/5g
+   rZQrPshq52nwfHmPPzOVFlpQqcj/fvjGudXDe4aP3KvH8NJQZpESV1kb0
+   SxC7gimGMEZCUdowIg6tvuTWA3Wv2nnXO1qaIT8dvocYLJOGEVz0deERg
+   1djhZpJl5GCm+LVcH6+/W+ELrZGwk6HJTuCF+A5z0G1DF4o+Enb+PnPEl
+   CORynqRPVC2LHDH4fsbG10nRsS0I7QHR7lN+h7bP4sqDyQD4jW6z4R+PG
+   6nN87OM7L78m6F6+dHhQtvnU/+JTNRFEOJQYLSTtPsvEeUHw+fbub5dOR
+   A==;
+X-CSE-ConnectionGUID: bX3DkHOQT1yTB44LXPsQFA==
+X-CSE-MsgGUID: TgpPJ+vhT7atLHYwNTeUIQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11193"; a="42564406"
+X-IronPort-AV: E=Sophos;i="6.10,224,1719903600"; 
+   d="scan'208";a="42564406"
+Received: from orviesa010.jf.intel.com ([10.64.159.150])
+  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Sep 2024 21:17:35 -0700
+X-CSE-ConnectionGUID: 7ZlYBhWgQS6LBQSOPcOHNg==
+X-CSE-MsgGUID: 7rErM16vTPCmMkPHJwZm3g==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.10,224,1719903600"; 
+   d="scan'208";a="67766195"
+Received: from lkp-server01.sh.intel.com (HELO 53e96f405c61) ([10.239.97.150])
+  by orviesa010.jf.intel.com with ESMTP; 12 Sep 2024 21:17:33 -0700
+Received: from kbuild by 53e96f405c61 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1soxkR-0005zq-0N;
+	Fri, 13 Sep 2024 04:17:31 +0000
+Date: Fri, 13 Sep 2024 12:16:33 +0800
+From: kernel test robot <lkp@intel.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+Cc: oe-kbuild-all@lists.linux.dev
+Subject: Re: [PATCH v1] Bluetooth: MGMT: Fix possible crash on
+ mgmt_index_removed
+Message-ID: <202409131212.VOjz2kzX-lkp@intel.com>
+References: <20240912164454.2996352-1-luiz.dentz@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [BlueZ,v1] client: Print a warning when setting discoverable without a timeout
-In-Reply-To: <20240912204458.3037144-1-luiz.dentz@gmail.com>
-References: <20240912204458.3037144-1-luiz.dentz@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240912164454.2996352-1-luiz.dentz@gmail.com>
 
---===============7177864037746081394==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi Luiz,
 
-This is automated email and please do not reply to this email!
+kernel test robot noticed the following build errors:
 
-Dear submitter,
+[auto build test ERROR on bluetooth-next/master]
+[also build test ERROR on bluetooth/master linus/master v6.11-rc7 next-20240912]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=889892
+url:    https://github.com/intel-lab-lkp/linux/commits/Luiz-Augusto-von-Dentz/Bluetooth-MGMT-Fix-possible-crash-on-mgmt_index_removed/20240913-004604
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
+patch link:    https://lore.kernel.org/r/20240912164454.2996352-1-luiz.dentz%40gmail.com
+patch subject: [PATCH v1] Bluetooth: MGMT: Fix possible crash on mgmt_index_removed
+config: openrisc-randconfig-r071-20240913 (https://download.01.org/0day-ci/archive/20240913/202409131212.VOjz2kzX-lkp@intel.com/config)
+compiler: or1k-linux-gcc (GCC) 14.1.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240913/202409131212.VOjz2kzX-lkp@intel.com/reproduce)
 
----Test result---
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202409131212.VOjz2kzX-lkp@intel.com/
 
-Test Summary:
-CheckPatch                    FAIL      26.93 seconds
-GitLint                       FAIL      36.52 seconds
-BuildEll                      PASS      45.36 seconds
-BluezMake                     PASS      1678.48 seconds
-MakeCheck                     PASS      13.53 seconds
-MakeDistcheck                 PASS      201.91 seconds
-CheckValgrind                 PASS      254.43 seconds
-CheckSmatch                   PASS      358.21 seconds
-bluezmakeextell               PASS      120.68 seconds
-IncrementalBuild              PASS      1514.42 seconds
-ScanBuild                     PASS      1027.79 seconds
+All errors (new ones prefixed by >>):
 
-Details
-##############################
-Test: CheckPatch - FAIL
-Desc: Run checkpatch.pl script
-Output:
-[BlueZ,v1] client: Print a warning when setting discoverable without a timeout
-WARNING:COMMIT_LOG_LONG_LINE: Possible unwrapped commit description (prefer a maximum 75 chars per line)
-#97: 
-[bluetooth]# [CHG] Controller 4C:49:6C:44:F5:E7 DiscoverableTimeout: 0x00000000 (0)
-
-/github/workspace/src/src/13802641.patch total: 0 errors, 1 warnings, 25 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/src/13802641.patch has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+   net/bluetooth/mgmt.c: In function 'cmd_complete_rsp':
+>> net/bluetooth/mgmt.c:1459:33: error: 'struct mgmt_pending_cmd' has no member named 'hdev'
+    1459 |         hci_cmd_sync_dequeue(cmd->hdev, NULL, cmd, NULL);
+         |                                 ^~
 
 
-##############################
-Test: GitLint - FAIL
-Desc: Run gitlint
-Output:
-[BlueZ,v1] client: Print a warning when setting discoverable without a timeout
+vim +1459 net/bluetooth/mgmt.c
 
-WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
-10: B1 Line exceeds max length (83>80): "[bluetooth]# [CHG] Controller 4C:49:6C:44:F5:E7 DiscoverableTimeout: 0x00000000 (0)"
-12: B1 Line exceeds max length (86>80): "Warning: setting discoverable while discoverable-timeout not set(0) is not recommended"
+  1453	
+  1454	static void cmd_complete_rsp(struct mgmt_pending_cmd *cmd, void *data)
+  1455	{
+  1456		/* dequeue cmd_sync entries using cmd as data as that is about to be
+  1457		 * removed/freed.
+  1458		 */
+> 1459		hci_cmd_sync_dequeue(cmd->hdev, NULL, cmd, NULL);
+  1460	
+  1461		if (cmd->cmd_complete) {
+  1462			u8 *status = data;
+  1463	
+  1464			cmd->cmd_complete(cmd, *status);
+  1465			mgmt_pending_remove(cmd);
+  1466	
+  1467			return;
+  1468		}
+  1469	
+  1470		cmd_status_rsp(cmd, data);
+  1471	}
+  1472	
 
-
----
-Regards,
-Linux Bluetooth
-
-
---===============7177864037746081394==--
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
