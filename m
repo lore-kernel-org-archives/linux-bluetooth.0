@@ -1,96 +1,119 @@
-Received: from mail-il1-f199.google.com (mail-il1-f199.google.com [209.85.166.199])
+Received: from mail-pg1-f196.google.com (mail-pg1-f196.google.com [209.85.215.196])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E31277115
-	for <linux-bluetooth@vger.kernel.org>; Sat, 14 Sep 2024 10:58:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF643210E9
+	for <linux-bluetooth@vger.kernel.org>; Sat, 14 Sep 2024 14:09:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.196
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726311507; cv=none; b=Vb1a7et2TjRT4XE57iHm3RYfZdXkVG2W80ADJ67XmWDt/zdoglrtCH3Odl7Zdf4IQ7izXNzDeFckuNoEQu0lR98srQg4jdxvDax3rmnz3MdYhOr6dPB+8qhG407zDRpfkOzLzKasr28ZSgl4T4C0B6vUyTKaqmW2UVFnk3m1wM8=
+	t=1726322995; cv=none; b=ITr6VQhr/YSD1jYVZmXayXyd39dJZR1FF/PtOhnCDjbLf6+8JvkVKkVk/fSucECC/MQ5qf4gSqbTxe7umnijnvo+PhuHBJ88o3Am5XsnqD1kBEFh7rX0JSKuY704dlHMTbNbVRTy2N3tOSqrKlnUKmlAqPyjWYxIYiQ6hN4dNSM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726311507; c=relaxed/simple;
-	bh=DTkYzvnHqco9rQOUXz2XRQZxajWtuXqCK8oXSvONs04=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=u2nde7QYUjA/A5G+lNtaxQwRY0WcbwT8dduGb+T5c9GvWhrHn5sV1RhLUaVJoOqRqPwKtMDQvuQYI3AZDzmZVfn/5dTPPWw7PpVgUWlOG8TnsUYn2w8n/bNCvQ8uPF6guAwNw2S8gnXHpyD3PiBiONvl0ynifiVea7LvctjS8sI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f199.google.com with SMTP id e9e14a558f8ab-3a087f805c1so58856585ab.3
-        for <linux-bluetooth@vger.kernel.org>; Sat, 14 Sep 2024 03:58:26 -0700 (PDT)
+	s=arc-20240116; t=1726322995; c=relaxed/simple;
+	bh=OYNMkWyAo+IkmyUssxMl5AbUm7P2zhSB91b2b0PQIQk=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=sLaJRX1Uh4zpFcAAPGqpnJV/5GPBNLMZTtmnwHHZw1hY9erNn22uY0DxXi2dO1lmttirtTqsCwR0r/9HC9Meu75jFXHd4IymICITaM+ToxQpTAKteUajXRg9FD2psW79IElS/M0bZlOVh6Lt0JPj3sgK7PKMsrlvOAROJpfAr+8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=I3VV/4FD; arc=none smtp.client-ip=209.85.215.196
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="I3VV/4FD"
+Received: by mail-pg1-f196.google.com with SMTP id 41be03b00d2f7-7d4f9e39c55so2203098a12.2
+        for <linux-bluetooth@vger.kernel.org>; Sat, 14 Sep 2024 07:09:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1726322992; x=1726927792; darn=vger.kernel.org;
+        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
+         :date:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=M23J2aqvTtvSN7S2IZIER8Y39GvULB4jVm/UXtIx/c0=;
+        b=I3VV/4FDFLz6u2/uTtwd30n9+1U9mgOp01iWuk9I3/4wpb2zyCqLmCpaht+ROf+cg8
+         6AM3loG0vTzZ/cfKvO2qPtftwMBNv5aJG7bBdNsXGzcgCxUyIur6JewKSlHG2vh2ZzFO
+         mjiIq8oGYzps2hxkvMarn9Hqb0nCeASsKMlb96O/xjeGAA2qSHseXI9KPc5585I1TukF
+         2hBWWSOjdLrHJ+AgHeSqTmopD5cRJaCCnlZlHbcjHazm5mVNyH/fPoJa8ayqMR0/5mAO
+         jDo6/SKD67JFjq8AFmeS2T2lBMoDq/OYaLL9Iw+4avL/HRzFLvbBUsyrO59bzRsixiCg
+         mKxg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726311505; x=1726916305;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=2C5K8uZnWh3ulLYjAusOjWaZCIxeifUvq8qtQntTFUc=;
-        b=kWWXnUUeJob1wXo1SB20sg7D1vBpc0ctQePlQkiBmu3ApljtrwjLzoA7pLLExLUS5f
-         862CWCGFMfjnwmoxQpSM2H7t2fZ93rEhxeGyVpUBz4TXlZCRe01JwR5BeS+2W973Ku/3
-         M7h5WoN3Z8gPYPQveKZLqZpfcnxT6qvmncj3mB1VRHvfht/8ojz3r6PekvjXHLPg27zd
-         0vrkXk3eg4PA6cnyx0cxj9BMoxH19EWFv0wgcSBdsHX7nYX826b8UwZeb2hDMClE1fdD
-         gQyN67npAKYVpUp+XQ+48NCmZV2ODrNbxyoW0u8uy+WWmM59aIIaGkw7IihuUykUMV/0
-         mCqw==
-X-Gm-Message-State: AOJu0Yw7H3E78a84lzLsYOTfhFe+8FlBds1tv6vfBHe4ndGbWlb5meMO
-	MwGpPlSyAFB2/zn911qiBcxvx7BlymerUeATW30/GcGCyVDvuET8yuekNt+O2gxIHPsh1OZzwSB
-	3H09GS6XGagYJEa5WsEb4BV9/YSEyhdLL7OlGkOwDSq3M+vUIiU3qQTQ=
-X-Google-Smtp-Source: AGHT+IEAoNsD7xvfNYkaJsheQNi8xbPTqVG/fWGMbXTWNHBLQFfoUb1IyPFWBeXqy831rozWSVd3KLyeDuj56yOniPfNygW/Px+e
+        d=1e100.net; s=20230601; t=1726322992; x=1726927792;
+        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
+         :date:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=M23J2aqvTtvSN7S2IZIER8Y39GvULB4jVm/UXtIx/c0=;
+        b=bC4gxBA2+yBboJJxJHowPReiy+JzNQe/TBnt/PKWuX16ysB14HPK6poIWmWLfZ2KOy
+         qpjT8V/UCrCXFLcMry6Lok1nx/SgzQwe1MbV0smHyR161YHF8Qbc9ZbSLPu9BO9xG8LF
+         GqQHGnYzMNABI58E9zRazRaI0gRAFxD2KGD/8HN/8qK8q3oOPFPPw5MHtz6NgBiUdQYt
+         rzeWn822/7tDUwV9od/8XU8fbx9DyK2+q8pVnj4syaP2TKYk2EmEUw0fW2uYJSlWl+Om
+         OPmJ8sEs2/X8988oY1U9mURr+H9fWwUzHqNI0OabGxWOQggFP+GIyGIdwIhD055bf1G6
+         dOFw==
+X-Gm-Message-State: AOJu0YzSiSV+Anvu+KRuX2y/7YFtBSgSfGUzjyO2K9BZxoP0kZ1BhuYG
+	pHcDme1WEjCmGKZfm2Bn7ZN+n7ye+Oa+qZeNONvcJFY/+WrFzzQ5yAwfTWv2wuw=
+X-Google-Smtp-Source: AGHT+IEMyaW6fhPL4P9Ga9iSAZ4nZ+y4VtZwTiH1IBArlkh4usy6mMOLMrzeQOJu1U+gt4XtDDgBgA==
+X-Received: by 2002:a17:90a:644d:b0:2da:89ac:75b9 with SMTP id 98e67ed59e1d1-2db9ff9237emr10428928a91.11.1726322991940;
+        Sat, 14 Sep 2024 07:09:51 -0700 (PDT)
+Received: from localhost ([103.156.242.194])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2dbb9d953a6sm3690771a91.56.2024.09.14.07.09.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 14 Sep 2024 07:09:51 -0700 (PDT)
+From: Celeste Liu <coelacanthushex@gmail.com>
+X-Google-Original-From: Celeste Liu <CoelacanthusHex@gmail.com>
+Date: Sat, 14 Sep 2024 22:09:43 +0800
+Subject: [PATCH] monitor: fix buffer overflow when terminal width > 255
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1aae:b0:3a0:455a:3884 with SMTP id
- e9e14a558f8ab-3a08494a886mr101566885ab.22.1726311505547; Sat, 14 Sep 2024
- 03:58:25 -0700 (PDT)
-Date: Sat, 14 Sep 2024 03:58:25 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <66e56c51.050a0220.3a9b1.002e.GAE@google.com>
-Subject: [syzbot] Monthly bluetooth report (Sep 2024)
-From: syzbot <syzbot+list5fb7cac78e857facc2f9@syzkaller.appspotmail.com>
-To: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	luiz.dentz@gmail.com, marcel@holtmann.org, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20240914-fix-log-buffer-overflow-v1-1-733cb4fff673@gmail.com>
+X-B4-Tracking: v=1; b=H4sIACaZ5WYC/x2M3QpAQBQGX0Xn2ikrhFeRi8W3nJLV2fyUvLvN5
+ dTMPBSggkBt8pDilCB+i2DShMbFbjNYpsiUZ3mRNaZgJzevfubhcA7K/oS61V/cWFuiMkA51BT
+ rXRHV/9z17/sBbOcMJmkAAAA=
+To: Bluez <linux-bluetooth@vger.kernel.org>
+Cc: Celeste Liu <CoelacanthusHex@gmail.com>
+X-Mailer: b4 0.15-dev
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1498;
+ i=CoelacanthusHex@gmail.com; h=from:subject:message-id;
+ bh=OYNMkWyAo+IkmyUssxMl5AbUm7P2zhSB91b2b0PQIQk=;
+ b=owJ4nJvAy8zAJfY4pvNJRPo6U8bTakkMaU9napv9816voGB+cP/qiD9mTLKvG6d3efK4aazgV
+ Fa/d0GTdWlHKQuDGBeDrJgii9jOp6+XlT76sIzXZAbMHFYmkCEMXJwCMJETiQz/LOusp4TymrlP
+ vqg9afXhs/Mz/jmvXnwuf/qJhRtkc+Y/0mf4H9FttTVzOquD5eerCnozH/7brsN7bzfb9KyCEM5
+ NWdbveQFMr0tB
+X-Developer-Key: i=CoelacanthusHex@gmail.com; a=openpgp;
+ fpr=892EBC7DC392DFF9C9C03F1D15F4180E73787863
 
-Hello bluetooth maintainers/developers,
+In current code, we create line buffer with size 256, which can contains
+255 ASCII characters. But in modern system, terminal can have larger
+width. It may cause buffer overflow in snprintf() text.
 
-This is a 31-day syzbot report for the bluetooth subsystem.
-All related reports/information can be found at:
-https://syzkaller.appspot.com/upstream/s/bluetooth
+We need allocate line buffer with size which can contains one line in
+terminal. The size should be difficult to calculate because of multibyte
+characters, but our code using line buffer assumed all characters has
+1 byte size (e.g. when we put packet text into line buffer via
+snprintf(), we calculate max size by 1B * col.), so it's safe to
+allocate line buffer with col + 1.
 
-During the period, 0 new issues were detected and 0 were fixed.
-In total, 51 issues are still open and 70 have been fixed so far.
+Signed-off-by: Celeste Liu <CoelacanthusHex@gmail.com>
+---
+ monitor/packet.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-Some of the still happening issues:
-
-Ref  Crashes Repro Title
-<1>  22304   Yes   possible deadlock in rfcomm_sk_state_change
-                   https://syzkaller.appspot.com/bug?extid=d7ce59b06b3eb14fd218
-<2>  13307   Yes   possible deadlock in rfcomm_dlc_exists
-                   https://syzkaller.appspot.com/bug?extid=b69a625d06e8ece26415
-<3>  5704    Yes   WARNING in hci_conn_timeout
-                   https://syzkaller.appspot.com/bug?extid=2446dd3cb07277388db6
-<4>  3906    Yes   WARNING in call_timer_fn
-                   https://syzkaller.appspot.com/bug?extid=6fb78d577e89e69602f9
-<5>  291     Yes   general protection fault in lock_sock_nested
-                   https://syzkaller.appspot.com/bug?extid=d3ccfb78a0dc16ffebe3
-<6>  268     Yes   KASAN: slab-use-after-free Write in sco_sock_timeout
-                   https://syzkaller.appspot.com/bug?extid=4c0d0c4cde787116d465
-<7>  135     Yes   KASAN: slab-use-after-free Read in skb_release_head_state
-                   https://syzkaller.appspot.com/bug?extid=d863bc2d28ef7ff42984
-<8>  134     Yes   BUG: sleeping function called from invalid context in hci_le_create_big_complete_evt
-                   https://syzkaller.appspot.com/bug?extid=2fb0835e0c9cefc34614
-<9>  50      Yes   BUG: sleeping function called from invalid context in lock_sock_nested (3)
-                   https://syzkaller.appspot.com/bug?extid=55cd5225f71c5cff7f6f
-<10> 45      Yes   KASAN: slab-use-after-free Read in set_powered_sync
-                   https://syzkaller.appspot.com/bug?extid=03d6270b6425df1605bf
+diff --git a/monitor/packet.c b/monitor/packet.c
+index c2599fe6864ab44d657c121fcc3ceecc1ebc52a6..3a21909116b341f782bcaf47c0cb3b880cb3a288 100644
+--- a/monitor/packet.c
++++ b/monitor/packet.c
+@@ -376,7 +376,8 @@ static void print_packet(struct timeval *tv, struct ucred *cred, char ident,
+ 					const char *text, const char *extra)
+ {
+ 	int col = num_columns();
+-	char line[256], ts_str[96], pid_str[140];
++	char ts_str[96], pid_str[140];
++	char *line = (char *) malloc(sizeof(char) * col + 1);
+ 	int n, ts_len = 0, ts_pos = 0, len = 0, pos = 0;
+ 	static size_t last_frame;
+ 
 
 ---
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+base-commit: 41f943630d9a03c40e95057b2ac3d96470b9c71e
+change-id: 20240914-fix-log-buffer-overflow-9aa5e61ee5b8
 
-To disable reminders for individual bugs, reply with the following command:
-#syz set <Ref> no-reminders
+Best regards,
+-- 
+Celeste Liu <CoelacanthusHex@gmail.com>
 
-To change bug's subsystems, reply with:
-#syz set <Ref> subsystems: new-subsystem
-
-You may send multiple commands in a single email message.
