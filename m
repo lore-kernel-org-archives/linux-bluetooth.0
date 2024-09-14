@@ -1,76 +1,96 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f199.google.com (mail-il1-f199.google.com [209.85.166.199])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F284318EA2;
-	Sat, 14 Sep 2024 03:00:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E31277115
+	for <linux-bluetooth@vger.kernel.org>; Sat, 14 Sep 2024 10:58:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726282835; cv=none; b=EMF0VjCPv9C7A2ysVXeomVoM27ehRYGDBRDJqr6uBMG90zCN+Xl4eT9sOgfbhgADmHeyTs3f5jgbpOTUqCZ9SVWA88WW+ttts67JuVtJ7uHMA+DU8PZeKtSRZ88syOR5yKlGQo+kq4NyN+Dqk0MlvGLvr9RVf65pw1Ln8cQ4eVs=
+	t=1726311507; cv=none; b=Vb1a7et2TjRT4XE57iHm3RYfZdXkVG2W80ADJ67XmWDt/zdoglrtCH3Odl7Zdf4IQ7izXNzDeFckuNoEQu0lR98srQg4jdxvDax3rmnz3MdYhOr6dPB+8qhG407zDRpfkOzLzKasr28ZSgl4T4C0B6vUyTKaqmW2UVFnk3m1wM8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726282835; c=relaxed/simple;
-	bh=vdjolh7I7BGGXQqO/aOAeiLLTNhqGa31sBVBIzGf9vQ=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=iGqR5HaPkGtthYCYRR+LVTIE5U06PCaC+5SNSDPks5iegVgnV6DJTdtivArnUmSRBjGW1aXJqzqMjKiXznsrnHUuH2Sw9xxP0p+HxWlrUVNIWUPNyTAmOJQEMkznmwtvcOtplKIw/LMsL1tH2yxOlNJEB9jkh6Dlo1A/nUYE+lc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RaojS8nG; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RaojS8nG"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A0ACDC4CEC0;
-	Sat, 14 Sep 2024 03:00:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1726282834;
-	bh=vdjolh7I7BGGXQqO/aOAeiLLTNhqGa31sBVBIzGf9vQ=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=RaojS8nGh8g6x7ounBShSkZAYPj8h0JutSvZxWxGp1B6R43OfhLzJuu72RoiUN7gH
-	 7QGzOG22LR26ryXGQGDUse0uOd3tutFio1M7lIwjVm4DA3ogHO4zfmO0kbSI9feIF8
-	 gfxhujXaxbixBQW0qN7oV0IoO8/3jVKpbGJt59Mrp/csqlfVWTNyKakZQpQ38+EUHd
-	 q7MEO459d4DkPkwi6CO9dLliGHRdAAuwUIXzg+yji1KfNiv8sPo2YPBUfOhIkrVkQD
-	 fhHDhNWJXXM1vc/msnPZzsvPGUCg5agibV6RoMbukXpOKDZBQm08isHtPhD7t1u8sp
-	 tEOlHcFk1OO9g==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33C333806655;
-	Sat, 14 Sep 2024 03:00:37 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1726311507; c=relaxed/simple;
+	bh=DTkYzvnHqco9rQOUXz2XRQZxajWtuXqCK8oXSvONs04=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=u2nde7QYUjA/A5G+lNtaxQwRY0WcbwT8dduGb+T5c9GvWhrHn5sV1RhLUaVJoOqRqPwKtMDQvuQYI3AZDzmZVfn/5dTPPWw7PpVgUWlOG8TnsUYn2w8n/bNCvQ8uPF6guAwNw2S8gnXHpyD3PiBiONvl0ynifiVea7LvctjS8sI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.199
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f199.google.com with SMTP id e9e14a558f8ab-3a087f805c1so58856585ab.3
+        for <linux-bluetooth@vger.kernel.org>; Sat, 14 Sep 2024 03:58:26 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1726311505; x=1726916305;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=2C5K8uZnWh3ulLYjAusOjWaZCIxeifUvq8qtQntTFUc=;
+        b=kWWXnUUeJob1wXo1SB20sg7D1vBpc0ctQePlQkiBmu3ApljtrwjLzoA7pLLExLUS5f
+         862CWCGFMfjnwmoxQpSM2H7t2fZ93rEhxeGyVpUBz4TXlZCRe01JwR5BeS+2W973Ku/3
+         M7h5WoN3Z8gPYPQveKZLqZpfcnxT6qvmncj3mB1VRHvfht/8ojz3r6PekvjXHLPg27zd
+         0vrkXk3eg4PA6cnyx0cxj9BMoxH19EWFv0wgcSBdsHX7nYX826b8UwZeb2hDMClE1fdD
+         gQyN67npAKYVpUp+XQ+48NCmZV2ODrNbxyoW0u8uy+WWmM59aIIaGkw7IihuUykUMV/0
+         mCqw==
+X-Gm-Message-State: AOJu0Yw7H3E78a84lzLsYOTfhFe+8FlBds1tv6vfBHe4ndGbWlb5meMO
+	MwGpPlSyAFB2/zn911qiBcxvx7BlymerUeATW30/GcGCyVDvuET8yuekNt+O2gxIHPsh1OZzwSB
+	3H09GS6XGagYJEa5WsEb4BV9/YSEyhdLL7OlGkOwDSq3M+vUIiU3qQTQ=
+X-Google-Smtp-Source: AGHT+IEAoNsD7xvfNYkaJsheQNi8xbPTqVG/fWGMbXTWNHBLQFfoUb1IyPFWBeXqy831rozWSVd3KLyeDuj56yOniPfNygW/Px+e
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: pull request: bluetooth-next 2024-09-12
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <172628283574.2435669.13261947732320394840.git-patchwork-notify@kernel.org>
-Date: Sat, 14 Sep 2024 03:00:35 +0000
-References: <20240912214317.3054060-1-luiz.dentz@gmail.com>
-In-Reply-To: <20240912214317.3054060-1-luiz.dentz@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: davem@davemloft.net, kuba@kernel.org, linux-bluetooth@vger.kernel.org,
- netdev@vger.kernel.org
+X-Received: by 2002:a05:6e02:1aae:b0:3a0:455a:3884 with SMTP id
+ e9e14a558f8ab-3a08494a886mr101566885ab.22.1726311505547; Sat, 14 Sep 2024
+ 03:58:25 -0700 (PDT)
+Date: Sat, 14 Sep 2024 03:58:25 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <66e56c51.050a0220.3a9b1.002e.GAE@google.com>
+Subject: [syzbot] Monthly bluetooth report (Sep 2024)
+From: syzbot <syzbot+list5fb7cac78e857facc2f9@syzkaller.appspotmail.com>
+To: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	luiz.dentz@gmail.com, marcel@holtmann.org, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-Hello:
+Hello bluetooth maintainers/developers,
 
-This pull request was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+This is a 31-day syzbot report for the bluetooth subsystem.
+All related reports/information can be found at:
+https://syzkaller.appspot.com/upstream/s/bluetooth
 
-On Thu, 12 Sep 2024 17:43:15 -0400 you wrote:
-> The following changes since commit 525034e2e2ee60d31519af0919e374b0032a70de:
-> 
->   net: mdiobus: Debug print fwnode handle instead of raw pointer (2024-09-10 12:24:17 +0200)
-> 
-> are available in the Git repository at:
-> 
->   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git tags/for-net-next-2024-09-12
-> 
-> [...]
+During the period, 0 new issues were detected and 0 were fixed.
+In total, 51 issues are still open and 70 have been fixed so far.
 
-Here is the summary with links:
-  - pull request: bluetooth-next 2024-09-12
-    https://git.kernel.org/netdev/net-next/c/ef17c3d22cee
+Some of the still happening issues:
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+Ref  Crashes Repro Title
+<1>  22304   Yes   possible deadlock in rfcomm_sk_state_change
+                   https://syzkaller.appspot.com/bug?extid=d7ce59b06b3eb14fd218
+<2>  13307   Yes   possible deadlock in rfcomm_dlc_exists
+                   https://syzkaller.appspot.com/bug?extid=b69a625d06e8ece26415
+<3>  5704    Yes   WARNING in hci_conn_timeout
+                   https://syzkaller.appspot.com/bug?extid=2446dd3cb07277388db6
+<4>  3906    Yes   WARNING in call_timer_fn
+                   https://syzkaller.appspot.com/bug?extid=6fb78d577e89e69602f9
+<5>  291     Yes   general protection fault in lock_sock_nested
+                   https://syzkaller.appspot.com/bug?extid=d3ccfb78a0dc16ffebe3
+<6>  268     Yes   KASAN: slab-use-after-free Write in sco_sock_timeout
+                   https://syzkaller.appspot.com/bug?extid=4c0d0c4cde787116d465
+<7>  135     Yes   KASAN: slab-use-after-free Read in skb_release_head_state
+                   https://syzkaller.appspot.com/bug?extid=d863bc2d28ef7ff42984
+<8>  134     Yes   BUG: sleeping function called from invalid context in hci_le_create_big_complete_evt
+                   https://syzkaller.appspot.com/bug?extid=2fb0835e0c9cefc34614
+<9>  50      Yes   BUG: sleeping function called from invalid context in lock_sock_nested (3)
+                   https://syzkaller.appspot.com/bug?extid=55cd5225f71c5cff7f6f
+<10> 45      Yes   KASAN: slab-use-after-free Read in set_powered_sync
+                   https://syzkaller.appspot.com/bug?extid=03d6270b6425df1605bf
 
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
+To disable reminders for individual bugs, reply with the following command:
+#syz set <Ref> no-reminders
+
+To change bug's subsystems, reply with:
+#syz set <Ref> subsystems: new-subsystem
+
+You may send multiple commands in a single email message.
