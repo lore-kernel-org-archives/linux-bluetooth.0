@@ -1,133 +1,127 @@
-Received: from mail-pl1-f196.google.com (mail-pl1-f196.google.com [209.85.214.196])
+Received: from mail-pf1-f195.google.com (mail-pf1-f195.google.com [209.85.210.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57B291E4AD
-	for <linux-bluetooth@vger.kernel.org>; Sat, 14 Sep 2024 16:09:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.196
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F18C1CEEBC
+	for <linux-bluetooth@vger.kernel.org>; Sat, 14 Sep 2024 16:12:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726330173; cv=none; b=b7+Iin3uABpB15kBhYkx+loSxolDC43hQmVOGsgsMwNX3natUhoDCR9jH5wry0EpKmWxxZ1+NPdbhXKq68eEyxEkBs3/RL3eYdUrfyK4XEDt2eJfSJX9qdRtKl3HL9KQJtgZT1csY26RfunvmQzJ5Mt+n5zaxlZm8S6zwTqhyZw=
+	t=1726330334; cv=none; b=iyrx73qEMV/Q2dYfZxa+kuN7J6QuFJdsc1aL+nmOkxDmxXJmtvx5g2Td6An+oS51853eCsdKh4qTOeXw45YGcW7uf09PvSaqFKrthLkvmlMXOjV2THS39Z9Wwelowi+x5DhgupGyMWj7VtbgzuKrJZxTKjxwAlLy7rorUyyq1y8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726330173; c=relaxed/simple;
-	bh=jjOlCE967+CV/mcToD3IrLkrfYTekeDJdAvXkaJF3Xs=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=BEKAFiMY6apFlXrIh7kFLZfA7+ajDVlgoLxNKKhZu2HdLphX8L0rZtFBxdd4ld1ILdmt0nQ7pS59pomhCSomkI/MEIUStVh6000cjtB5odFJJj4zAK9l4/5I/V46paONFbLHHJD9gLI6KqOCx+VpgMCOvu38aLjsAa80HN0rV/A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eKHoALIc; arc=none smtp.client-ip=209.85.214.196
+	s=arc-20240116; t=1726330334; c=relaxed/simple;
+	bh=V89o1QCGoPIrn4pkqWOVZOb6Y+U526MmIvoypHCf/7M=;
+	h=From:Message-ID:Date:MIME-Version:Subject:To:References:
+	 In-Reply-To:Content-Type; b=exo/IEzgsW/C86aPH4mehK8nCi3RmIlsbnqwtijotGVhiEqDu/fLQJUY60toLeXNlKNUlvnabG1TDV2Ds3SeLyt6tDAOK1fajHLsYtEWIqJgciQ/KlnJURXOjAcMBOg4jGVvg3ctq/ZSrt65aGyg99E4adTv61awwioCCjaFE3c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ejr2bOe/; arc=none smtp.client-ip=209.85.210.195
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eKHoALIc"
-Received: by mail-pl1-f196.google.com with SMTP id d9443c01a7336-20696938f86so26549845ad.3
-        for <linux-bluetooth@vger.kernel.org>; Sat, 14 Sep 2024 09:09:32 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ejr2bOe/"
+Received: by mail-pf1-f195.google.com with SMTP id d2e1a72fcca58-718816be6cbso2419277b3a.1
+        for <linux-bluetooth@vger.kernel.org>; Sat, 14 Sep 2024 09:12:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1726330171; x=1726934971; darn=vger.kernel.org;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=iApZeigucloW/bJEb7THQPRwNtKHBp/lao+DOhYZHes=;
-        b=eKHoALIcyD/cwBYjo+8CyW5l8tgR34Owb/YhpW6gfPWEkp+sCJYbUIPWk4f21FZIaL
-         DXzRETWIDm9E/BUOPf1Waawt3CuF8w0UvjM9CNpksiTzSunuM2zfiHrEqm27yuPYAzTU
-         k/G2DcFB80Tl1f0D99wgOJ2CBLwEgQd5Dnbppd0We6d8Xfu2NNQv8M7m3F6ZyF47DtA0
-         4fKFcEQGnAlyCqd2icZIhSVRXX8KLYqDO9TMq5VHnjGs4BZFLrUjfo8lSW5uqKb/Ja2o
-         hy847i1km7PKfY2cbET8ALtBojLZ0PEYz4FbtYSheIL+3J1rdsHrkmSBKPnK4LOiETZm
-         QpIw==
+        d=gmail.com; s=20230601; t=1726330331; x=1726935131; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=pAYd54xwbeB4ivrhcCIdqlVDBdFRwk6DGssNxk0lvmM=;
+        b=Ejr2bOe/tazVLz80pAkuhT/UuuoGE8pwxrVBmAks8FNBFqNG37+EWd51MZnSpiZqbs
+         5GO08lyvcKNdwoGfpJe/g3LxTKcKgF7xExo9oTARVUJsm2er4Zwj5tLrV+m8ReaE/48d
+         a+AoPBnDrwCw+tV0PYhjls4NhHCn/pQDkeie4ZRif3UHsds/YpYlZ5u7yULencCFqOrF
+         C41LnQBAij73CetyCEtxcWpGMfnJxkOGMrde2vyUN0IhiP8wJ1etQLKRfRUzEcHOptD/
+         0zOSkWDR663/ILvuXyOWGDMa911boVIoDpZM5Cs2Q40CcpRrhPZ0jN3o5Qj7cbyJ5g9X
+         iATg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726330171; x=1726934971;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=iApZeigucloW/bJEb7THQPRwNtKHBp/lao+DOhYZHes=;
-        b=oa0TyzIE0ux1MBrLQlnt659xuJOS6vLw06Ul9OCQmyjC3ZnHftJdm2lJEpiy0XRi0p
-         sNt9lPi4m30cfhO3FdSA00UA/jMeTc87pD0PQgyaOkqnaDvuFXznj+iVdvCVEU5rEZN1
-         hFud4qsC1oi05vCSFBJnOiJOucSDdaUryOq5QVb0UgbbuOl1XIOIqmipYAR4XF8+l25G
-         mBCpZsueJHRug699VDcDOTym9iyOS0Myqh6TC7JyiSWFpDjEhw+KAnLFIMEodHqy0juf
-         ETDAsg8fJ2dahb0B1o2fqs2BPEOQG/7r0DSakCCxTI1oKkIFlGUBz9cFNrzsLOQVJ4Pk
-         /gyg==
-X-Gm-Message-State: AOJu0Yw/RNF3D7aM58odCBYiCNyQq6OFG4ms5KxwqIL8ywwzhxU9EdhV
-	JKhxuFyjgLN4znR2fVGmDfOyXlFFnWIOJpFm9EjRj67fM3HTz6kJ
-X-Google-Smtp-Source: AGHT+IFHGwQBP1792Ea1zr9z14C3J2Ysjd2mavEo4xUwQsbLq2EkSf5zOYhA9c/Qrh4h1XBJJY4lsA==
-X-Received: by 2002:a17:903:1245:b0:1fd:9c2d:2f27 with SMTP id d9443c01a7336-2076e36d91bmr140957385ad.24.1726330171139;
-        Sat, 14 Sep 2024 09:09:31 -0700 (PDT)
-Received: from localhost ([103.156.242.194])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-207946d1691sm11033505ad.151.2024.09.14.09.09.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 14 Sep 2024 09:09:30 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1726330331; x=1726935131;
+        h=content-transfer-encoding:in-reply-to:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=pAYd54xwbeB4ivrhcCIdqlVDBdFRwk6DGssNxk0lvmM=;
+        b=uFGHr1dAs07Z+rG3khdFidwKx5Gx7X0ADxnAL9Lg4+cKqPXBrqJ3CtWtNpKTuAlXvY
+         H9TPd//0ZftKHwNDmWqcRxlwTxq3EKA3+l4riQCYF8386BT+C7b5TMbD0N/RGTMEJvz8
+         tVGTHtEITo7vRUXCDo29K9V1lPwJ2jnfmN4/YafWHiSe3tVnM6oysrJ9fNPg0pPeMMtv
+         9dohOxC8aAKc2tPpql1figS9f6ACvLXjd1+elMLmEBu1Nz/4Bo3ymY3UVF0996ieiqh+
+         n4Uv2To7OTOJ9E/imAdN4/EGriSQh6iC8sG+SSqErD/btmMWnneGKppI6ikbneVcio4N
+         fHlQ==
+X-Gm-Message-State: AOJu0YwYdoiiecAwLZpMxsMPpy+b645xe9B8zzAUL8MeQyVmH/aA6R2c
+	t9+P4Mm6novWY7sCYaOXUscMFWMXJSEQnrISTXnk+GMPUXddRlmTXWdfcR9SPFs=
+X-Google-Smtp-Source: AGHT+IGRMdt2G/OgZ4ue5DFz5rzboRLxyKHM77SI3Jk1cVPf7xnW1C+oeyYriOtNWeJy6AATbba2ww==
+X-Received: by 2002:a05:6a00:1783:b0:718:a3c1:60f6 with SMTP id d2e1a72fcca58-719261ecd95mr14126818b3a.18.1726330331370;
+        Sat, 14 Sep 2024 09:12:11 -0700 (PDT)
+Received: from [127.0.0.1] ([103.156.242.194])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-719449b370fsm1150474b3a.0.2024.09.14.09.12.10
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 14 Sep 2024 09:12:10 -0700 (PDT)
 From: Celeste Liu <coelacanthushex@gmail.com>
 X-Google-Original-From: Celeste Liu <CoelacanthusHex@gmail.com>
-Date: Sun, 15 Sep 2024 00:09:24 +0800
-Subject: [PATCH bluez v2] monitor: fix buffer overflow when terminal width
- > 255
+Message-ID: <ec0ee6ff-f70c-43df-a4ac-a21b1f109b8f@gmail.com>
+Date: Sun, 15 Sep 2024 00:12:08 +0800
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: monitor: fix buffer overflow when terminal width > 255
+Content-Language: en-GB-large
+To: linux-bluetooth@vger.kernel.org
+References: <20240914-fix-log-buffer-overflow-v1-1-733cb4fff673@gmail.com>
+ <66e5b39d.050a0220.34073d.206c@mx.google.com>
+In-Reply-To: <66e5b39d.050a0220.34073d.206c@mx.google.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-Message-Id: <20240915-fix-log-buffer-overflow-v2-1-fb6b52a7d4b2@gmail.com>
-X-B4-Tracking: v=1; b=H4sIADS15WYC/4WNSw6CMBCGr2Jm7RjKU1x5D8OixRmYpFDTSn0Q7
- m7DBVz+r+9fIZAXCnA5rOApShA3J5EfD9CPeh4I5Z405FleZq0qkeWN1g1oFmby6CJ5tu6FrdY
- V1YqoMmdI64enVN3JNzB2oS90yR4lPJ3/7H9R7eFfdFSosCmK3pTMXDfFdZi02FPvJui2bfsBj
- RGkj8UAAAA=
-To: Bluez <linux-bluetooth@vger.kernel.org>
-Cc: Celeste Liu <CoelacanthusHex@gmail.com>
-X-Mailer: b4 0.15-dev
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1895;
- i=CoelacanthusHex@gmail.com; h=from:subject:message-id;
- bh=jjOlCE967+CV/mcToD3IrLkrfYTekeDJdAvXkaJF3Xs=;
- b=owJ4nJvAy8zAJfY4pvNJRPo6U8bTakkMaU+3mt/L7bnuV7O5MG/pY3EZKxkJ+5UF4qzr+9dfX
- vD54WL/D/wdpSwMYlwMsmKKLGI7n75eVvrowzJekxkwc1iZQIYwcHEKwESkXjMybNbe6+Mwuy2g
- dBaThIDDgZg//11fvZQTiep0nzxxbrhsNyPDsj0znkUvuVbCeH9le1cTe8S0Z8atiip87gY/rvU
- uOfGdCwAYGUu0
-X-Developer-Key: i=CoelacanthusHex@gmail.com; a=openpgp;
- fpr=892EBC7DC392DFF9C9C03F1D15F4180E73787863
 
-In current code, we create line buffer with size 256, which can contains
-255 ASCII characters. But in modern system, terminal can have larger
-width. It may cause buffer overflow in snprintf() text.
 
-We need allocate line buffer with size which can contains one line in
-terminal. The size should be difficult to calculate because of multibyte
-characters, but our code using line buffer assumed all characters has
-1 byte size (e.g. when we put packet text into line buffer via
-snprintf(), we calculate max size by 1B * col.), so it's safe to
-allocate line buffer with col + 1.
+On 2024-09-15 00:02, bluez.test.bot@gmail.com wrote:
+> This is automated email and please do not reply to this email!
+> 
+> Dear submitter,
+> 
+> Thank you for submitting the patches to the linux bluetooth mailing list.
+> This is a CI test results with your patch series:
+> PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=890395
+> 
+> ---Test result---
+> 
+> Test Summary:
+> CheckPatch                    PASS      0.49 seconds
+> GitLint                       PASS      0.35 seconds
+> BuildEll                      PASS      24.73 seconds
+> BluezMake                     PASS      1696.44 seconds
+> MakeCheck                     PASS      13.31 seconds
+> MakeDistcheck                 PASS      179.41 seconds
+> CheckValgrind                 PASS      256.32 seconds
+> CheckSmatch                   WARNING   358.63 seconds
+> bluezmakeextell               PASS      120.73 seconds
+> IncrementalBuild              PASS      1407.21 seconds
+> ScanBuild                     WARNING   1016.29 seconds
+> 
+> Details
+> ##############################
+> Test: CheckSmatch - WARNING
+> Desc: Run smatch tool with source
+> Output:
+> monitor/packet.c: note: in included file:monitor/display.h:82:26: warning: Variable length array is used.monitor/packet.c:1868:26: warning: Variable length array is used.monitor/packet.c: note: in included file:monitor/bt.h:3606:52: warning: array of flexible structuresmonitor/bt.h:3594:40: warning: array of flexible structures
 
-Signed-off-by: Celeste Liu <CoelacanthusHex@gmail.com>
----
-Changes in v2:
-- Add free() forgot in v1.
-- Link to v1: https://patch.msgid.link/20240914-fix-log-buffer-overflow-v1-1-733cb4fff673@gmail.com
----
- monitor/packet.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+It's the code already there before I touch.
 
-diff --git a/monitor/packet.c b/monitor/packet.c
-index c2599fe6864ab44d657c121fcc3ceecc1ebc52a6..bef55477a221b6cb43ff224454ac3fa593cd8221 100644
---- a/monitor/packet.c
-+++ b/monitor/packet.c
-@@ -376,7 +376,8 @@ static void print_packet(struct timeval *tv, struct ucred *cred, char ident,
- 					const char *text, const char *extra)
- {
- 	int col = num_columns();
--	char line[256], ts_str[96], pid_str[140];
-+	char ts_str[96], pid_str[140];
-+	char *line = (char *) malloc(sizeof(char) * col + 1);
- 	int n, ts_len = 0, ts_pos = 0, len = 0, pos = 0;
- 	static size_t last_frame;
- 
-@@ -525,6 +526,7 @@ static void print_packet(struct timeval *tv, struct ucred *cred, char ident,
- 		printf("%s%s\n", use_color() ? COLOR_TIMESTAMP : "", ts_str);
- 	} else
- 		printf("%s\n", line);
-+	free(line);
- }
- 
- static const struct {
+> ##############################
+> Test: ScanBuild - WARNING
+> Desc: Run Scan Build
+> Output:
+> monitor/packet.c:529:1: warning: Potential leak of memory pointed to by 'line'
 
----
-base-commit: 41f943630d9a03c40e95057b2ac3d96470b9c71e
-change-id: 20240914-fix-log-buffer-overflow-9aa5e61ee5b8
+v2 has been sent. Add forgot free() and send prefix "bluez".
 
-Best regards,
--- 
-Celeste Liu <CoelacanthusHex@gmail.com>
+> }
+> ^
+> 1 warning generated.
+> 
+> 
+> 
+> ---
+> Regards,
+> Linux Bluetooth
+> 
 
