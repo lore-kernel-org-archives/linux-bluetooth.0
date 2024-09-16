@@ -1,321 +1,133 @@
-Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f178.google.com (mail-qk1-f178.google.com [209.85.222.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 626F6157E6B
-	for <linux-bluetooth@vger.kernel.org>; Mon, 16 Sep 2024 13:28:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27DB8156880
+	for <linux-bluetooth@vger.kernel.org>; Mon, 16 Sep 2024 14:53:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726493314; cv=none; b=rBQcP5ZmMnPrUAe6u2JaMdB53jqK5J/DPT9HRIMQ5s9wTi08mQikXaVr4V+GhZw1mcINr55tiobm5pFawfUWtRff0nkamzx/ycL+Ve1AH7Xowm39p0mqh8HYMBe4t4CzeEEKQjVxTi6jRPthzXpjRNjwOL7DXci1hQtcksC+s4w=
+	t=1726498383; cv=none; b=RlBiUKdGHKqu+VWmKhDevwe1Tu7MATfa+YQsF03rmgljnAcVFXGBA01y6jXPlgJf95goA3ww5JA8eJ9BoEtE6HeF6jQWzTWvMvc9x+GBby5FHaMreINsgslQNkuppfu7iLXo3E/sDSLWoOjBOto5JefQR8TXSfJE8BO28p4maGg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726493314; c=relaxed/simple;
-	bh=+Of5tE2yu6nSxIrKUrCHTxJXNCCBaJhc/Haj3FftXuc=;
-	h=From:To:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=TuRmpAqKyc8xM1v+m0vKNMrlYVuApWH82dkPkA32eXWBdeC5QRMFsqEu1PDVr3Q4XFnvuheXqjPik4n0mI4kUghX2wk9HHjDrp3SE/PcL6qRC4aXtOvsoLb96jNUFVpsAk8CRdW8c8IDcQUK/yws/T2yTgHDhs5lwIquIS/QZVM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=k45/a0Yg; arc=none smtp.client-ip=148.251.105.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+	s=arc-20240116; t=1726498383; c=relaxed/simple;
+	bh=/hAMlWEyNFbtvb8r7KHWT3f67ST0Uv8vss+t79LGAbE=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=Lonqi3jao2vXfhQgjHsWnxsWW0YYYSbVjZQM6LG48WgO0s59nbBumweowD3t/HVWOla3MIaO4ICsW9zdCcH9IIefLH+vzUp2cXb8BHBLclhKTeEb8fuEZYplTf0gqFM1XHbgYq3cfwD6MrPi3jeVPNyVYp8VekRv5uL+HbFvxVc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GVPXJP7q; arc=none smtp.client-ip=209.85.222.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="k45/a0Yg"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1726493299;
-	bh=+Of5tE2yu6nSxIrKUrCHTxJXNCCBaJhc/Haj3FftXuc=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=k45/a0YgMp1Y5IOBM1X/eOPzxD/gvhK5maYrYajm8iqffOHPOFkRrNBJXqLfJrPA7
-	 w3WM+3N6282tuypPxC0WoGtCzN3+skle+IplEbglS2X0EcWPOhaqssIOBSwksPIGAf
-	 wxBAnHQQj8avO9bC4a3smK4biPvVUv6cyi5yZrNIVgl3Atl0ERdCTXqngX9FaOrrUY
-	 GS+/bce8dIshQaRTeFEptHCHyBSy2dPy08Q1vpZKaGXtOsHBJmjR8TxOg5sq3CyzOg
-	 IXb05dQPctqdlDD99+3tGR1qEwQtFfF+gOeoqpJNwrUgHlv5Kz+aeCRxNJdak7LPUj
-	 JSdJd8QX13mHg==
-Received: from fdanis-XPS-13-9370.. (67.227.121.78.rev.sfr.net [78.121.227.67])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: fdanis)
-	by bali.collaboradmins.com (Postfix) with ESMTPSA id CAFE017E35CC
-	for <linux-bluetooth@vger.kernel.org>; Mon, 16 Sep 2024 15:28:19 +0200 (CEST)
-From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?= <frederic.danis@collabora.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v3 7/9] obexd: Add GetImage to bip-avrcp
-Date: Mon, 16 Sep 2024 15:28:11 +0200
-Message-Id: <20240916132813.165731-8-frederic.danis@collabora.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240916132813.165731-1-frederic.danis@collabora.com>
-References: <20240916132813.165731-1-frederic.danis@collabora.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GVPXJP7q"
+Received: by mail-qk1-f178.google.com with SMTP id af79cd13be357-7a9b3cd75e5so476386085a.0
+        for <linux-bluetooth@vger.kernel.org>; Mon, 16 Sep 2024 07:53:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1726498381; x=1727103181; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=C4x0ogAV7sg2GQzOTntaEk24bTCVjuT0uOH9rjwbZHM=;
+        b=GVPXJP7q/tIyl7eko7d2+N5+BeDqueKjMkvhDZQvcEgpf3eqdOvyjtA9DxQ4vguhC0
+         YGz0b2bTckVgWGIWAAObdtysUKcSzMujg/HVpeT4LKAh8oqyDBFWU0g5va89KolFpn4+
+         4sBOHtkR2GP1p+V3xsMjFvJT8gy0vMSAWShJeiV79zVPjdBQLKyY5RC/kSQE+GRr4S6b
+         mPHANQpNHXmg4XKbyRa34hAIo9ZBPlkXaG+our6HI7m126MqC0JaC4nXs62lRpC2tNSd
+         2Q+j1b8N9w7govqkVV3A2MgOT0IH7Ob1DXJ6TBZmAXz13TVafBD7Pg4lyU2/2tXHbkfV
+         Ml2g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1726498381; x=1727103181;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=C4x0ogAV7sg2GQzOTntaEk24bTCVjuT0uOH9rjwbZHM=;
+        b=eDxhxNMpsjntz4DWKi+dqIsNlWMsAGHvssavgdN/tn0VyZa67NygjlrzoRULWBTpDz
+         nSFeGLa4NNmleJmlgKRf1nHq9UC6hCNFOobWhhCXDsox3bT2u2p637Difo5MBO9nS+Ml
+         LN2/vi2YPO21Epc1lvLcn1EmNy8RUKUHPMoEoadFLkM72W7v4LulaZvAzkmNDKtr6XQ2
+         Au4nX23fbAOwNcSi9t8EFcaVWZRVX1InS+OYNblDimAnVDLlPSqcysAvxUuj8lGR+41u
+         gpv9ky51r4nv6+0j3kK/dft3SEzfz2eZFjqdT4kmeClehd9tr2VHNnunLxrinZfrVhi/
+         ylVA==
+X-Gm-Message-State: AOJu0YyzEN5bMLeqZ0LgOJ5XwbzyMd80ZyoWGZQwLPaSj8HJ51Dy7KH3
+	3Gh3uaEIZYK2algReHqEzkyUypavZ/A0qqLYMoqi2up0z5NIxhAsaePnUg==
+X-Google-Smtp-Source: AGHT+IF8E87bZzywssphBQwSjLmnzrbwOO9eNyj2OngnCfVHj2RfuW3Nozo1FDmsl75y/9Ek+ZvKFQ==
+X-Received: by 2002:a05:6214:449a:b0:6c3:5ae8:9e71 with SMTP id 6a1803df08f44-6c5735725bbmr230428796d6.41.1726498380613;
+        Mon, 16 Sep 2024 07:53:00 -0700 (PDT)
+Received: from [172.17.0.2] ([20.55.223.44])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6c58c7d9f0esm24908566d6.143.2024.09.16.07.52.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 16 Sep 2024 07:53:00 -0700 (PDT)
+Message-ID: <66e8464c.d40a0220.1a1404.8022@mx.google.com>
+Date: Mon, 16 Sep 2024 07:53:00 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============1656702221373099636=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, ismael@iodev.co.uk
+Subject: RE: [v2] Replace the usage of non-standard GNU-basename with strrchr
+In-Reply-To: <20240916130824.11246-2-ismael@iodev.co.uk>
+References: <20240916130824.11246-2-ismael@iodev.co.uk>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Retrieves the image corresponding to the handle and the description,
-as one of the descriptions retrieved by GetImageProperties, and store
-it in a local file.
+--===============1656702221373099636==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-If the "transform" property description exists it should be set
-to one of the value listed by GetImageProperties for this
-description.
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=890677
+
+---Test result---
+
+Test Summary:
+CheckPatch                    FAIL      0.68 seconds
+GitLint                       PASS      0.33 seconds
+BuildEll                      PASS      24.71 seconds
+BluezMake                     PASS      1744.38 seconds
+MakeCheck                     PASS      13.29 seconds
+MakeDistcheck                 PASS      179.14 seconds
+CheckValgrind                 PASS      254.61 seconds
+CheckSmatch                   WARNING   362.17 seconds
+bluezmakeextell               PASS      123.51 seconds
+IncrementalBuild              PASS      1574.25 seconds
+ScanBuild                     PASS      1021.39 seconds
+
+Details
+##############################
+Test: CheckPatch - FAIL
+Desc: Run checkpatch.pl script
+Output:
+[v2] Replace the usage of non-standard GNU-basename with strrchr
+WARNING:LINE_SPACING: Missing a blank line after declarations
+#100: FILE: tools/hex2hcd.c:307:
++		const char *bname = strrchr(pathname, '/');
++		if (!bname++)
+
+/github/workspace/src/src/13805416.patch total: 0 errors, 1 warnings, 31 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/src/13805416.patch has style problems, please review.
+
+NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+##############################
+Test: CheckSmatch - WARNING
+Desc: Run smatch tool with source
+Output:
+tools/hex2hcd.c:136:26: warning: Variable length array is used.
+
+
 ---
- obexd/client/bip-common.c |  21 ++++-
- obexd/client/bip-common.h |   5 ++
- obexd/client/bip.c        | 168 ++++++++++++++++++++++++++++++++++++++
- 3 files changed, 193 insertions(+), 1 deletion(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/obexd/client/bip-common.c b/obexd/client/bip-common.c
-index 9e96c81d8..613b52ceb 100644
---- a/obexd/client/bip-common.c
-+++ b/obexd/client/bip-common.c
-@@ -49,7 +49,7 @@ static const gchar *convBIP2IM(const gchar *encoding)
- 	return NULL;
- }
- 
--static gboolean parse_pixel_range(const gchar *dim, unsigned int *lower_ret,
-+gboolean parse_pixel_range(const gchar *dim, unsigned int *lower_ret,
- 						unsigned int *upper_ret,
- 						gboolean *fixed_ratio_ret)
- {
-@@ -139,6 +139,18 @@ char *transforms[] = {
- 	NULL
- };
- 
-+gboolean verify_encoding(const char *encoding)
-+{
-+	struct encconv_pair *et = encconv_table;
-+
-+	while (et->bip) {
-+		if (g_strcmp0(encoding, et->bip) == 0)
-+			return TRUE;
-+		et++;
-+	}
-+	return FALSE;
-+}
-+
- static gboolean verify_transform(const char *transform)
- {
- 	char **str = transforms;
-@@ -151,6 +163,13 @@ static gboolean verify_transform(const char *transform)
- 	return FALSE;
- }
- 
-+char *parse_transform(const char *transform)
-+{
-+	if (!verify_transform(transform))
-+		return NULL;
-+	return g_strdup(transform);
-+}
-+
- static char *parse_transform_list(const char *transform)
- {
- 	char **args = NULL, **arg = NULL;
-diff --git a/obexd/client/bip-common.h b/obexd/client/bip-common.h
-index 0fee54636..6e7aac375 100644
---- a/obexd/client/bip-common.h
-+++ b/obexd/client/bip-common.h
-@@ -13,6 +13,11 @@
- 
- struct prop_object;
- 
-+gboolean parse_pixel_range(const gchar *dim, unsigned int *lower_ret,
-+						unsigned int *upper_ret,
-+						gboolean *fixed_ratio_ret);
-+gboolean verify_encoding(const char *encoding);
-+char *parse_transform(const char *transform);
- struct prop_object *parse_properties(char *data, unsigned int length,
- 							int *err);
- gboolean verify_properties(struct prop_object *obj);
-diff --git a/obexd/client/bip.c b/obexd/client/bip.c
-index 6e1fa642a..86df3f407 100644
---- a/obexd/client/bip.c
-+++ b/obexd/client/bip.c
-@@ -32,6 +32,14 @@
- #define BIP_AVRCP_UUID "0000111A-0000-1000-8000-00805f9b34fb"
- 
- #define IMG_HANDLE_TAG  0x30
-+#define IMG_DESC_TAG    0x71
-+
-+#define EOL_CHARS "\n"
-+#define IMG_DESC_BEGIN "<image-descriptor version=\"1.0\">" EOL_CHARS
-+#define IMG_BEGIN "<image encoding=\"%s\" pixel=\"%s\""
-+#define IMG_TRANSFORM " transformation=\"%s\""
-+#define IMG_END "/>" EOL_CHARS
-+#define IMG_DESC_END "</image-descriptor>" EOL_CHARS
- 
- static DBusConnection *conn;
- 
-@@ -175,11 +183,171 @@ fail:
- 	return reply;
- }
- 
-+static gboolean parse_get_image_dict(DBusMessage *msg, char **path,
-+					char **handle, char **pixel,
-+					char **encoding, uint64_t *maxsize,
-+							char **transform)
-+{
-+	DBusMessageIter iter, array;
-+
-+	DBG("");
-+
-+	*path = NULL;
-+	*handle = NULL;
-+	*pixel = NULL;
-+	*encoding = NULL;
-+	*transform = NULL;
-+
-+	dbus_message_iter_init(msg, &iter);
-+
-+	if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_STRING)
-+		goto failed;
-+	dbus_message_iter_get_basic(&iter, path);
-+	*path = g_strdup(*path);
-+	if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_STRING)
-+		goto failed;
-+	dbus_message_iter_next(&iter);
-+	dbus_message_iter_get_basic(&iter, handle);
-+	*handle = g_strdup(*handle);
-+	dbus_message_iter_next(&iter);
-+	if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_ARRAY)
-+		goto failed;
-+
-+	dbus_message_iter_recurse(&iter, &array);
-+
-+	while (dbus_message_iter_get_arg_type(&array) == DBUS_TYPE_DICT_ENTRY) {
-+		DBusMessageIter entry, value;
-+		const char *key, *val;
-+
-+		dbus_message_iter_recurse(&array, &entry);
-+
-+		if (dbus_message_iter_get_arg_type(&entry) != DBUS_TYPE_STRING)
-+			return FALSE;
-+		dbus_message_iter_get_basic(&entry, &key);
-+		dbus_message_iter_next(&entry);
-+		dbus_message_iter_recurse(&entry, &value);
-+		switch (dbus_message_iter_get_arg_type(&value)) {
-+		case DBUS_TYPE_STRING:
-+			dbus_message_iter_get_basic(&value, &val);
-+			if (g_str_equal(key, "pixel")) {
-+				if (!parse_pixel_range(val, NULL, NULL, NULL))
-+					goto failed;
-+				*pixel = g_strdup(val);
-+			} else if (g_str_equal(key, "encoding")) {
-+				if (!verify_encoding(val))
-+					goto failed;
-+				*encoding = g_strdup(val);
-+				if (*encoding == NULL)
-+					goto failed;
-+			} else if (g_str_equal(key, "transformation")) {
-+				*transform = parse_transform(val);
-+				if (*transform == NULL)
-+					goto failed;
-+			}
-+			break;
-+		case DBUS_TYPE_UINT64:
-+			if (g_str_equal(key, "maxsize") == TRUE) {
-+				dbus_message_iter_get_basic(&value, maxsize);
-+				if (*maxsize == 0)
-+					goto failed;
-+			}
-+			break;
-+		}
-+		dbus_message_iter_next(&array);
-+	}
-+
-+	if (*pixel == NULL)
-+		*pixel = strdup("");
-+	if (*encoding == NULL)
-+		*encoding = strdup("");
-+
-+	DBG("pixel: '%s' encoding: '%s' maxsize: '%lu' transform: '%s'",
-+			*pixel, *encoding, *maxsize, *transform
-+	);
-+
-+	return TRUE;
-+failed:
-+	g_free(*path);
-+	g_free(*handle);
-+	g_free(*pixel);
-+	g_free(*encoding);
-+	g_free(*transform);
-+	return FALSE;
-+}
-+
-+static DBusMessage *get_image(DBusConnection *connection,
-+					DBusMessage *message, void *user_data)
-+{
-+	struct bip_avrcp_data *bip_avrcp = user_data;
-+	char *handle = NULL, *image_path = NULL, *transform = NULL,
-+		*encoding = NULL, *pixel = NULL;
-+	uint64_t maxsize;
-+	struct obc_transfer *transfer;
-+	GObexHeader *header;
-+	DBusMessage *reply = NULL;
-+	GString *descriptor = NULL;
-+	GError *err = NULL;
-+
-+	DBG("");
-+
-+	if (!parse_get_image_dict(message, &image_path, &handle, &pixel,
-+					&encoding, &maxsize, &transform))
-+		return g_dbus_create_error(message,
-+				ERROR_INTERFACE ".InvalidArguments", NULL);
-+
-+	transfer = obc_transfer_get("x-bt/img-img", NULL, image_path, &err);
-+	if (transfer == NULL) {
-+		reply = g_dbus_create_error(message, ERROR_INTERFACE ".Failed",
-+						"%s",
-+						err->message);
-+		g_error_free(err);
-+		goto fail;
-+	}
-+
-+	header = g_obex_header_new_unicode(IMG_HANDLE_TAG, handle);
-+	obc_transfer_add_header(transfer, header);
-+
-+	descriptor = g_string_new(IMG_DESC_BEGIN);
-+	g_string_append_printf(descriptor, IMG_BEGIN, encoding, pixel);
-+	if (transform != NULL)
-+		g_string_append_printf(descriptor, IMG_TRANSFORM, transform);
-+	g_string_append(descriptor, IMG_END);
-+	descriptor = g_string_append(descriptor, IMG_DESC_END);
-+	header = g_obex_header_new_bytes(IMG_DESC_TAG, descriptor->str,
-+						descriptor->len);
-+	obc_transfer_add_header(transfer, header);
-+	g_string_free(descriptor, TRUE);
-+
-+	if (!obc_session_queue(bip_avrcp->session, transfer, NULL, NULL,
-+								&err)) {
-+		reply = g_dbus_create_error(message, ERROR_INTERFACE ".Failed",
-+						"%s",
-+						err->message);
-+		g_error_free(err);
-+		goto fail;
-+	}
-+
-+	reply = obc_transfer_create_dbus_reply(transfer, message);
-+
-+fail:
-+	g_free(handle);
-+	g_free(image_path);
-+	g_free(transform);
-+	g_free(encoding);
-+	g_free(pixel);
-+	return reply;
-+}
-+
- static const GDBusMethodTable bip_avrcp_methods[] = {
- 	{ GDBUS_ASYNC_METHOD("GetImageProperties",
- 		GDBUS_ARGS({ "handle", "s"}),
- 		GDBUS_ARGS({ "properties", "aa{sv}" }),
- 		get_image_properties) },
-+	{ GDBUS_ASYNC_METHOD("GetImage",
-+		GDBUS_ARGS({ "file", "s" }, { "handle", "s"},
-+				{"properties", "a{sv}"}),
-+		GDBUS_ARGS({ "transfer", "o" }, { "properties", "a{sv}" }),
-+		get_image) },
- 	{ GDBUS_ASYNC_METHOD("GetImageThumbnail",
- 		GDBUS_ARGS({ "file", "s" }, { "handle", "s"}),
- 		GDBUS_ARGS({ "transfer", "o" }, { "properties", "a{sv}" }),
--- 
-2.34.1
 
+--===============1656702221373099636==--
