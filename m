@@ -1,93 +1,104 @@
-Received: from mail-vk1-f176.google.com (mail-vk1-f176.google.com [209.85.221.176])
+Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B10664174A
-	for <linux-bluetooth@vger.kernel.org>; Mon, 16 Sep 2024 20:23:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDB325258
+	for <linux-bluetooth@vger.kernel.org>; Mon, 16 Sep 2024 22:27:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726518231; cv=none; b=ixWqSEr/dMoXVme/Z40kqlZSp0t3dnqrcXrvsjX18UhrOxBlZrYbgb6ptpzLLuZTxpgfO5fSHlKGOZBbz7hpOAs9V/rcbcgR1uXKV7OsO8PBSgAPJIuEtGsXfarB7RntIehSVPV+d4YmgoNLVGp5R00UX0c2biJP7b5zL0KqMmM=
+	t=1726525655; cv=none; b=rBwdVH9Ed6zPfOml5exNCNnQ3eDmgbfMeNr5eiPJ8Tqu94RVXjR8iE4oYfaU7lSfR2fsLJUe54FiWriwfD5uiq4DK+svQQBNYNburHJMjkZyug877Y4f4RRPv25LS/WVA7+JAyzhpwXme4bdZF/Ze6CsOpawewIclrEkqt1ZRFA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726518231; c=relaxed/simple;
-	bh=dE9ncddaBxqIHr6u+VYR2VArdd/tXGYl02HqWQcgn+4=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ihzo0Gu6ynoE3mubK1sCcvhzi8i0vbBMdgb4l3Ts4olpKD5aGmKxFUWcXUC1TxcCpf+HQpDJphjyuNPS+6hOvGsv1X1Vk1quUSUVeJKbTccXjjiX3OPrjAEh8zpjr4xfEydH3DDhPzM1axRNbMMnwg0c4P/jJPH33Umx4HbkLaI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DWZ7u5Di; arc=none smtp.client-ip=209.85.221.176
+	s=arc-20240116; t=1726525655; c=relaxed/simple;
+	bh=+qQTbU0nBlkL7w0ySgdUSfa7qvwcu6vMSlG+uqoea10=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=eLwYiQFCg3sMqqAI7YtjHDx19n193aFVN3ZzO0AM5zBosEz6hR/UhM/WQdSr9olNkhkecEimzNfnQZm1n4UM6MoQ0eanp+vE/2LGoVyhgp3K5QOePeGKSlmH8Kpnt4kr/ECbFi8AR/ixslqsilK4h4WYD+daDbGjdpLFw1ynkWM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XQyOPEhW; arc=none smtp.client-ip=209.85.214.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DWZ7u5Di"
-Received: by mail-vk1-f176.google.com with SMTP id 71dfb90a1353d-501204753c4so2468198e0c.0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 16 Sep 2024 13:23:49 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XQyOPEhW"
+Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-2055f630934so42763195ad.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 16 Sep 2024 15:27:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1726518228; x=1727123028; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=WfuY4LDsqVgg3sv4m3MLMlnvHz6GWqxzPzNtKt8TZ0A=;
-        b=DWZ7u5DiGkcxEmLzBaGbfZFIc4A/5McieylqYF4LX8qTdNaJBuDgi2WzxFpWEix5Z/
-         q3ogT+vqobGynn/IIxBT9mJqgJH1YCr8fBs4X8KPQ8mh/G2dOy1i0OzbBMwRwlRaL3HR
-         b+ZnyW06GVNrLDQe/elPoa48vEQBnw/FP3CV/b4GFFGzLq1d3C37oIJFxwdUHcqceNz6
-         uPrPV0t4jUTryXdiWA8UxUnAzgiBH9JL8eBlbqYOYu7SFyjqrSy6WPU0dHurTIPIgiGr
-         aN16bMQBIt27DFwbaICawqWcGWgLTNKTZNRKW5MX671zt1qbFrMAFQ0XxT9bgwP/3pMv
-         rSWw==
+        d=gmail.com; s=20230601; t=1726525653; x=1727130453; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=eIxGEkjV0cncgSwZXbnJ8RfmVlwQlu+GgaEm2DqmG7I=;
+        b=XQyOPEhWNy0wUe4odq583NaJCSAvWGjvsu3f9LJG72/CUZJFbLtVX5FA5hkqWFVghY
+         mlM56nnFqkEYSdvtpH1NzalmX+D0gW6AVcWK3o8WGY1PlDqH3hqP7HEZA4i/V2iFB6KY
+         0BxheLBWp5RXdyPcuQZM31gFHbK8P8B9o2iZplXnuA/vJHgqIV5EjfxCcYx+UzqH1waw
+         TLvv489kYgV0Ie3tuJmjNgiDg3CmEldJz7EohPOhF+TzafEAzftTzuoDNkix89jMK3lO
+         AY9BPIOXo8gQ9Zzm6gB49gPukOh0KrPPQ5gDovvIlb0Ko/LVwH+o/ZdF3lsGmKBFIF+r
+         0f8A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726518228; x=1727123028;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=WfuY4LDsqVgg3sv4m3MLMlnvHz6GWqxzPzNtKt8TZ0A=;
-        b=pYil2wt9vkZnvRCJ5d8Q8iP7E9ubCv+Mj3X8bxGSyjMIKXwRlELXAh6CFwHGCqJnGG
-         0HVDh1FxT29AHvsejm2a7ACCF/vjsH6i6J68oksjGHhgZN4pNTgqJYmX0SR08btOmLVk
-         +37FoTrgAwmP64aLNHRFQMzuvCh6PRf+wfq1XPzfz6gDAxnabQWCEkzWQCco5vpnyoG+
-         Z0s1OhhDuzZiq9Ii02i6IJ/mVBUcAG09EESehEXv7xWmA/oahN1bZUah55zNfgaai+ns
-         POVqah+TeBKF0nYSF3foPL1HBnE3IbqLFKMedrOaTVU78NqyS0KzapRpayrlphXTJ2P6
-         +aWQ==
-X-Gm-Message-State: AOJu0YxkdVaL7e/gmFmRNmVWz6aQklqHOlCH5+R1tDu+DuqTMKsq2EE4
-	3iGJeHwn2Mrk38VBiD4Y8NryvuZA/niZjZOY5tR3+9bpSNHQLfFinizevQ==
-X-Google-Smtp-Source: AGHT+IH+hIznlwmvWNlkWb9PQHHLF23shNrXtdh53e3Cvda/q1Z/ZxEa2/jSSfcJ8fF+1VxG1pekKQ==
-X-Received: by 2002:a05:6122:3111:b0:501:2221:a3c9 with SMTP id 71dfb90a1353d-502f70e13ecmr21283697e0c.0.1726518227881;
-        Mon, 16 Sep 2024 13:23:47 -0700 (PDT)
-Received: from lvondent-mobl5.. (syn-107-146-107-067.res.spectrum.com. [107.146.107.67])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5035b929ec9sm622787e0c.9.2024.09.16.13.23.45
-        for <linux-bluetooth@vger.kernel.org>
+        d=1e100.net; s=20230601; t=1726525653; x=1727130453;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=eIxGEkjV0cncgSwZXbnJ8RfmVlwQlu+GgaEm2DqmG7I=;
+        b=c55FvXhKNRFxxJAy1mwFvlMbsRRpXYlLX8MLD/TyMhrcWVMQn/m2ww6RA1835kK/vy
+         V+ix8FJMfaOaQ4o2YtGc1fiHPCXM18AbTGHV8ydZC0i2Uq6RstZstCZ2TUIbBuAgPxHo
+         s+Ydbx6/4iZtAhrKGzVJSsDr22+hOXnUULwd/sMS7CNwJhOUqgPfjiHKmBHA2uEZWp9s
+         nfbBhxRn2cMPlGnj92/YizkhWuWwzchkKVfOjUk5x1ehExL/5Efw3RWsSUpD+GTbNVQX
+         MLPmxH4u2a5ov10G+0WI1qqEEjbA4YGVFaocrc9jhXyPAua7KO0rWDyY94bzjMvSR0Ev
+         V+Bw==
+X-Gm-Message-State: AOJu0Yx16FNpJQLvkqlEfIs7VgcPk/yCc2l4zwzmNzg4KcpmIZdAllf9
+	cH4Xaipawd8TxVvZhUJyyQkZZJ9f6LsDM5wLmxw03GU4T3k8Tn6EPLkbog==
+X-Google-Smtp-Source: AGHT+IF5M8y08EVkI2wVkX6Bp93fBRhTaX6zhpEi4YUKqU9e0IJefwgZyTMG6/tPgh/FN6P+lX9AyQ==
+X-Received: by 2002:a17:902:e842:b0:207:173d:d400 with SMTP id d9443c01a7336-2076e444173mr240370465ad.61.1726525652624;
+        Mon, 16 Sep 2024 15:27:32 -0700 (PDT)
+Received: from [172.17.0.2] ([52.238.29.198])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20794605721sm40869015ad.111.2024.09.16.15.27.31
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 16 Sep 2024 13:23:46 -0700 (PDT)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v2 2/2] test-uhid: Add call to bt_uhid_unregister_all
-Date: Mon, 16 Sep 2024 16:23:41 -0400
-Message-ID: <20240916202341.238735-2-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.46.0
-In-Reply-To: <20240916202341.238735-1-luiz.dentz@gmail.com>
-References: <20240916202341.238735-1-luiz.dentz@gmail.com>
+        Mon, 16 Sep 2024 15:27:32 -0700 (PDT)
+Message-ID: <66e8b0d4.170a0220.94c9f.d381@mx.google.com>
+Date: Mon, 16 Sep 2024 15:27:32 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============8636172040509777263=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [BlueZ,v2,1/2] shared/uhid: Fix crash after bt_uhid_unregister_all
+In-Reply-To: <20240916202341.238735-1-luiz.dentz@gmail.com>
+References: <20240916202341.238735-1-luiz.dentz@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+--===============8636172040509777263==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-This adds a call to bt_uhid_unregister_all so it tests if notification
-callback end up calling that.
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=890773
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.59 seconds
+GitLint                       PASS      0.42 seconds
+BuildEll                      PASS      24.58 seconds
+BluezMake                     PASS      1637.31 seconds
+MakeCheck                     PASS      13.11 seconds
+MakeDistcheck                 PASS      178.59 seconds
+CheckValgrind                 PASS      252.10 seconds
+CheckSmatch                   PASS      353.91 seconds
+bluezmakeextell               PASS      119.54 seconds
+IncrementalBuild              PASS      2900.41 seconds
+ScanBuild                     PASS      1010.87 seconds
+
+
+
 ---
- unit/test-uhid.c | 1 +
- 1 file changed, 1 insertion(+)
+Regards,
+Linux Bluetooth
 
-diff --git a/unit/test-uhid.c b/unit/test-uhid.c
-index 6871c22eeaa1..c5848bef97f9 100644
---- a/unit/test-uhid.c
-+++ b/unit/test-uhid.c
-@@ -100,6 +100,7 @@ static void destroy_context(struct context *context)
- 	if (context->source > 0)
- 		g_source_remove(context->source);
- 
-+	bt_uhid_unregister_all(context->uhid);
- 	bt_uhid_unref(context->uhid);
- 
- 	test_free(context->data);
--- 
-2.46.0
 
+--===============8636172040509777263==--
