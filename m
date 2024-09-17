@@ -1,110 +1,144 @@
-Received: from mx1.t-argos.ru (mx1.t-argos.ru [109.73.34.58])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f181.google.com (mail-yb1-f181.google.com [209.85.219.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 792A0160783;
-	Tue, 17 Sep 2024 11:16:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=109.73.34.58
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BFE1200A3
+	for <linux-bluetooth@vger.kernel.org>; Tue, 17 Sep 2024 11:31:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726571772; cv=none; b=OJHz7EJiB4TFsBHNdvB1ksbNT8AaiH74lF8QfgOYRaiw+rISNPQZutsCdzBF/WiaQ44iDOxsRdGpqsVm4jvP53qeqFjv1TtdH+UCyrE699j+k8EVJyugikEc7kw+1zE8TAZmXCBfHxEWBcJ3M4XGAWu8S1XtRLTzEAZvWble+1M=
+	t=1726572684; cv=none; b=Oq+tmaATP1H4dkif02uREstX7ppxV+5bD7DYWCOlddbUTuHBsp326qfdSpWlIB85wud/12wlJqkMHab2MYUmrkYnteKYR4xlh/HK5i7aYlkLmyzM1e9Zvzftt57gQUyB3eypE0KnjR25wHnbmoM9VFQ7G2p84deldwPtP/3eqUE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726571772; c=relaxed/simple;
-	bh=XaUYLXIqWZXFi1ya7GVV7DGLhcm+rPQJisRqHcBfWtM=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=JM1nYAcB7GN5M87LtrxZO3/1WvABLxDXpRWsijj7NgEY6OmQhh4zEBRO1VC1ZZl5HUZHpooe8yhzZzunwlGJ8oLT2WDGPu5gdneKJhkP+KN9E1zuhyVCRTrSS/YygaJrgS+izHNE/wRtH8zfVy2Ml6MLE5tmVvxJ2igS6iQCv44=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=t-argos.ru; spf=pass smtp.mailfrom=t-argos.ru; dkim=pass (2048-bit key) header.d=t-argos.ru header.i=@t-argos.ru header.b=qHvMjHtq; arc=none smtp.client-ip=109.73.34.58
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=t-argos.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=t-argos.ru
+	s=arc-20240116; t=1726572684; c=relaxed/simple;
+	bh=66QgM/EACc6syaw9J6TlvF88SBLVQln80C+8D0CStfE=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=tz38gPYOq3XUxiA5YDPrwJKX86tuz0TOGlKC9kLCNvKOq9D497R473R5cEvS09IJQXzZrwEc2umvo6RCqUPSlCBaQ+puOlQKjHunOTF9XHDZdcWJO5EkcyBss+UhnSmV1uVy3QHSFAtgFyb8H1biIkvqV+xN/0toQC66oU6eSjQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XlH4RNM2; arc=none smtp.client-ip=209.85.219.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=t-argos.ru header.i=@t-argos.ru header.b="qHvMjHtq"
-Received: from mx1.t-argos.ru (localhost [127.0.0.1])
-	by mx1.t-argos.ru (Postfix) with ESMTP id 3A343100002;
-	Tue, 17 Sep 2024 14:15:50 +0300 (MSK)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=t-argos.ru; s=mail;
-	t=1726571750; bh=6sgalFP85udVYT0SyDvdVc1QnWQOlj49H27drdPYLA8=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type;
-	b=qHvMjHtq/7liKhnsXqGVGhZ93imTRzQS7cX0Lo1fd1TB7tDNsOPBxKIeezeXF4+UL
-	 ZEY0OKsEeF30wG/wDEwRVwtAATEI8xl4dftwdJgLbnt7Ddm7cUl/ZmnMsqIGwETLSb
-	 GmEfPEu9WROrRjsTbawENtJ/fSeu5fe19iINiaIhkYm1r+UIb8dD2K96Q6O5eotSoe
-	 fMwJVjOIkKWOB1QVVf+u4RMBWW7Rc7J3g8eipt7Bwmu4+K1NV1vR8zoM71MC23gYmz
-	 a3A6wInoFOijMPZO0iZkXUNODtMPx+pMTZ/7e7oPN5gKS4Wsy+c4B1dWjGRiMXXQiM
-	 +gHhp419cC0uA==
-Received: from mx1.t-argos.ru.ru (mail.t-argos.ru [172.17.13.212])
-	by mx1.t-argos.ru (Postfix) with ESMTP;
-	Tue, 17 Sep 2024 14:15:04 +0300 (MSK)
-Received: from Comp.ta.t-argos.ru (172.17.44.124) by ta-mail-02
- (172.17.13.212) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Tue, 17 Sep
- 2024 14:14:43 +0300
-From: Aleksandr Mishin <amishin@t-argos.ru>
-To: Linus Walleij <linus.walleij@linaro.org>, <stable@vger.kernel.org>, Greg
- Kroah-Hartman <gregkh@linuxfoundation.org>
-CC: Aleksandr Mishin <amishin@t-argos.ru>, Marcel Holtmann
-	<marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	<linux-bluetooth@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<lvc-project@linuxtesting.org>
-Subject: [PATCH 5.10/5.15/6.1] Bluetooth: btbcm: Handle memory allocation failure in btbcm_get_board_name()
-Date: Tue, 17 Sep 2024 14:14:22 +0300
-Message-ID: <20240917111422.33375-1-amishin@t-argos.ru>
-X-Mailer: git-send-email 2.30.2
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XlH4RNM2"
+Received: by mail-yb1-f181.google.com with SMTP id 3f1490d57ef6-e1da3677ca7so4476798276.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 17 Sep 2024 04:31:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1726572681; x=1727177481; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=RpIg75GQT4pqfjczKDCdBD0wfBIRXnFW5K/e8zellcM=;
+        b=XlH4RNM2/h6cOJn6GpC8R0mUuUquJ/S2kzlM/Xdgf96hkL+N0wM8Rw56JCmJpqYSrd
+         0J89JKu0y1uL2ya1o9qW2HTRKY+OZRx9vK+Zo0J3xEv4f+6IQNLXfbeo5WPOaLz4a/mv
+         FhyjI8IbWrOm6XbWisZx+1NfL7qgV9/qPcrCyVJUHVXuhL4osIgk4tuQIKBXUwSECMj9
+         vG8BVa8fh31WGFNUVlLovAzf5+aotfLq6LhwgzRJjqe8BwvHgz/pHoTXpoyItWX1HRlx
+         sSjO7s7iL7XPRxGKRafq1tQt1xIAvtiGVseSeX/cAWZT94dInQh+ub/q1lkgmiABSD5R
+         LiMQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1726572681; x=1727177481;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=RpIg75GQT4pqfjczKDCdBD0wfBIRXnFW5K/e8zellcM=;
+        b=bCe7BqrL7kCG1uvncP7zTUNhiI/8rf8C3gSpEcsLK7OXVulrO7sF6wdSzwdYmA885P
+         sBCG06upoK4TiwU8X6NcbmZtKKwPHGyVVcGJRb5KhLq189KMtDkGs//IzyLtrBmATSJq
+         skxd45/QFpygfpUAsjLm7PktvHMBfKqG7yhfyb6S5dLSAyJHSBncNHszPikc77XFiI4W
+         cAKfE5LeCHKGHJcGcAtoB9wI+k8EUmdf3jS7NrYMWrBpegFl7Y8P7PZYPcD6od6d7Q4l
+         qDLqwBaWcSivXAVTgP1gYfkwpqnkoSJzuHL4+oU6vLO3UaxssvrJsSuCExmLGvh6iBTT
+         qU2Q==
+X-Gm-Message-State: AOJu0YxDH0Mz6+U/SY0sflkPh3LIwlv4ZYBHnCCSnogwpzvLQ8Pr5/SV
+	1ZPpj1DjMv2Ek43zXdUmPEYXQXbT7Zus48yCQYRSxEEdmljGCsHKQnEcbg==
+X-Google-Smtp-Source: AGHT+IFRnCPEiuSualKorbNzJpwpmYP3prKIhPheSCHqbWmQAyDO2pfmQjVHXOTL3Od0sAnhdlTBSg==
+X-Received: by 2002:a05:6902:727:b0:e20:19b7:3bc1 with SMTP id 3f1490d57ef6-e2019b73dc1mr793420276.37.1726572681102;
+        Tue, 17 Sep 2024 04:31:21 -0700 (PDT)
+Received: from [172.17.0.2] ([20.55.214.161])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6c58c691ad9sm33121336d6.77.2024.09.17.04.31.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 17 Sep 2024 04:31:20 -0700 (PDT)
+Message-ID: <66e96888.0c0a0220.1cc49d.ba24@mx.google.com>
+Date: Tue, 17 Sep 2024 04:31:20 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============2749686421873092619=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: ta-mail-02.ta.t-argos.ru (172.17.13.212) To ta-mail-02
- (172.17.13.212)
-X-KSMG-Rule-ID: 1
-X-KSMG-Message-Action: clean
-X-KSMG-AntiSpam-Lua-Profiles: 187797 [Sep 17 2024]
-X-KSMG-AntiSpam-Version: 6.1.1.5
-X-KSMG-AntiSpam-Envelope-From: amishin@t-argos.ru
-X-KSMG-AntiSpam-Rate: 0
-X-KSMG-AntiSpam-Status: not_detected
-X-KSMG-AntiSpam-Method: none
-X-KSMG-AntiSpam-Auth: dkim=none
-X-KSMG-AntiSpam-Info: LuaCore: 34 0.3.34 8a1fac695d5606478feba790382a59668a4f0039, {Tracking_from_domain_doesnt_match_to}, t-argos.ru:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;mx1.t-argos.ru.ru:7.1.1;127.0.0.199:7.1.2, FromAlignment: s
-X-MS-Exchange-Organization-SCL: -1
-X-KSMG-AntiSpam-Interceptor-Info: scan successful
-X-KSMG-AntiPhishing: Clean, bases: 2024/09/17 10:04:00
-X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 1.1.2.30, bases: 2024/09/17 09:54:00 #26602246
-X-KSMG-AntiVirus-Status: Clean, skipped
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, frederic.danis@collabora.com
+Subject: RE: Add BIP for AVRCP covert art OBEX client
+In-Reply-To: <20240917074217.231677-2-frederic.danis@collabora.com>
+References: <20240917074217.231677-2-frederic.danis@collabora.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-No upstream commit exists for this commit.
+--===============2749686421873092619==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-The issue was introduced with commit 63fac3343b99 ("Bluetooth: btbcm:
-Support per-board firmware variants").
+This is automated email and please do not reply to this email!
 
-In btbcm_get_board_name() devm_kstrdup() can return NULL due to memory
-allocation failure.
+Dear submitter,
 
-Add NULL return check to prevent NULL dereference.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=890843
 
-Upstream branch code has been significantly refactored and can't be
-backported directly.
+---Test result---
 
-Found by Linux Verification Center (linuxtesting.org) with SVACE.
+Test Summary:
+CheckPatch                    FAIL      3.73 seconds
+GitLint                       FAIL      1.90 seconds
+BuildEll                      PASS      25.04 seconds
+BluezMake                     PASS      1673.62 seconds
+MakeCheck                     PASS      13.15 seconds
+MakeDistcheck                 PASS      191.11 seconds
+CheckValgrind                 PASS      266.53 seconds
+CheckSmatch                   PASS      360.24 seconds
+bluezmakeextell               PASS      121.89 seconds
+IncrementalBuild              PASS      7709.01 seconds
+ScanBuild                     WARNING   1033.83 seconds
 
-Fixes: 63fac3343b99 ("Bluetooth: btbcm: Support per-board firmware variants")
-Signed-off-by: Aleksandr Mishin <amishin@t-argos.ru>
+Details
+##############################
+Test: CheckPatch - FAIL
+Desc: Run checkpatch.pl script
+Output:
+[BlueZ,v4,2/5] obexd: Add Properties to org.bluez.obex.Image
+WARNING:COMMIT_LOG_LONG_LINE: Possible unwrapped commit description (prefer a maximum 75 chars per line)
+#78: 
+[2] https://github.com/enkait/Basic-Imaging-Profile-in-obexd/blob/gsoc_final/plugins/bip_util.c
+
+/github/workspace/src/src/13805953.patch total: 0 errors, 1 warnings, 926 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/src/13805953.patch has style problems, please review.
+
+NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+##############################
+Test: GitLint - FAIL
+Desc: Run gitlint
+Output:
+[BlueZ,v4,2/5] obexd: Add Properties to org.bluez.obex.Image
+
+WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
+10: B1 Line exceeds max length (95>80): "[2] https://github.com/enkait/Basic-Imaging-Profile-in-obexd/blob/gsoc_final/plugins/bip_util.c"
+##############################
+Test: ScanBuild - WARNING
+Desc: Run Scan Build
+Output:
+profiles/audio/avrcp.c:1942:2: warning: Value stored to 'operands' is never read
+        operands += sizeof(*pdu);
+        ^           ~~~~~~~~~~~~
+1 warning generated.
+
+
+
 ---
- drivers/bluetooth/btbcm.c | 2 ++
- 1 file changed, 2 insertions(+)
+Regards,
+Linux Bluetooth
 
-diff --git a/drivers/bluetooth/btbcm.c b/drivers/bluetooth/btbcm.c
-index de2ea589aa49..6191fd74ab3d 100644
---- a/drivers/bluetooth/btbcm.c
-+++ b/drivers/bluetooth/btbcm.c
-@@ -551,6 +551,8 @@ static const char *btbcm_get_board_name(struct device *dev)
- 	/* get rid of any '/' in the compatible string */
- 	len = strlen(tmp) + 1;
- 	board_type = devm_kzalloc(dev, len, GFP_KERNEL);
-+	if (!board_type)
-+		return NULL;
- 	strscpy(board_type, tmp, len);
- 	for (i = 0; i < len; i++) {
- 		if (board_type[i] == '/')
--- 
-2.30.2
 
+--===============2749686421873092619==--
