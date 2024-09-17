@@ -1,224 +1,119 @@
-Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF41C1531CB
-	for <linux-bluetooth@vger.kernel.org>; Tue, 17 Sep 2024 07:42:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2D6A1531C2
+	for <linux-bluetooth@vger.kernel.org>; Tue, 17 Sep 2024 08:09:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726558952; cv=none; b=TgFanOemqwcj1O9P/A5jF5CyBHm0pUOXtcVUKFbdlCdDWI58ejQfxUEcH3U+gtj3hgtkR6nCbTQdr5e6kWyrvUVwbzL8G0fseS/wH3CuVyH+9VAjkEleyoHBvt4TozjDIq70cCN6xw2FXoveNi4HEW0MiU8q2EwsqfNmcYL8h/8=
+	t=1726560546; cv=none; b=q2KvbxU7uJvgCHQeyhjmbg53/Ads271ZI7WUureiRbWBgKG6h77ljej/oVcQsahYJ033SdYhG7qWwV6gaWSoEJPr432JthqNN4L7Kv6XdUALspRLZYgMwoCJc/VkxI0JERUgUkeUreQpaUIwLTSSwICf9IkFhU2c+xMCjr4dsy0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726558952; c=relaxed/simple;
-	bh=gEWuxhGv6DQWM/f5KSXhlN++SrGJaN6FwEHyxQ1KIdA=;
-	h=From:To:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Sk4afWU7lXh3Fk49zO24QGjL3x7iU9bNEsOATUpxFfI0rPfcyH16mDk+hNtBf5tOzwxzqbSTbSYHxSIa7PAr+OYd/M3ERGYc3kH5OVVOCrFUiZ+8WHgLWKU3BVsqS0cjGZxGCht+4tT6ZNCHjB8tTw/RGo7DlmZt5Lr/iK15FVU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=NP6k5Rb2; arc=none smtp.client-ip=148.251.105.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+	s=arc-20240116; t=1726560546; c=relaxed/simple;
+	bh=6nCF3kDwxVjDycX1WjeBaFsGR4vf7p0PaSGrHU+pSPI=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=eyzKaYQkQFPQfqZOj/AwCuYUoSMRgGYo8Qmxm06wIpkJZ3L+8YWoVF+OrhezAXwZ7o+4/bjMb3MPdHWryQc73K6EnFq4qEOe35m+GmFVDoFZZyYlWDkIjlbHAovM11/wbw/HbRQ0xHZiUwpfrFJHWlW/4mh3LmUmeQeO/XircBw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EL4ae+LJ; arc=none smtp.client-ip=209.85.214.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="NP6k5Rb2"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1726558946;
-	bh=gEWuxhGv6DQWM/f5KSXhlN++SrGJaN6FwEHyxQ1KIdA=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=NP6k5Rb2vLcCXfTgjx5q0kWYdUAJfeLJfAMbjmxqPm3XX90GF3cL9fu2CVpuVixom
-	 H3K3NU8gZTvklAUWcCAk7inwRxIz2TQhZlZnOJ8lzJcA1yQXKmhhFn791PZIx9vZkT
-	 Ld3yLNPADMtHrgToyJBuuzCVBgo88nlPjsA8hy/35CdXnJ8WAd2SONjAIp9JdqxMVB
-	 3B4NYPS6fexVAGY4KK3KTn4SRUWQda8P+a11ROWpCnTHNzbvFXYfeLwc05F7DjUwva
-	 TxoVfCvdKwhKMqHjzIscjFyVTmme3pPbkasOaMt9B9aGqWLKD06O7moAQuUXUqzCSk
-	 e6C0YdMge/8YQ==
-Received: from fdanis-XPS-13-9370.. (67.227.121.78.rev.sfr.net [78.121.227.67])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: fdanis)
-	by bali.collaboradmins.com (Postfix) with ESMTPSA id E142717E1034
-	for <linux-bluetooth@vger.kernel.org>; Tue, 17 Sep 2024 09:42:25 +0200 (CEST)
-From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?= <frederic.danis@collabora.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v4 5/5] doc: Add description of org.bluez.obex.Image
-Date: Tue, 17 Sep 2024 09:42:17 +0200
-Message-Id: <20240917074217.231677-6-frederic.danis@collabora.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240917074217.231677-1-frederic.danis@collabora.com>
-References: <20240917074217.231677-1-frederic.danis@collabora.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EL4ae+LJ"
+Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-20551eeba95so36661285ad.2
+        for <linux-bluetooth@vger.kernel.org>; Tue, 17 Sep 2024 01:09:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1726560543; x=1727165343; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=VwxTWh/dwDOTanVKObye7b4utDnLoHHd49QCyd1oRUo=;
+        b=EL4ae+LJjgLXyvTSmS221fjD1VXIxfiDguV7j24+dQrwh7WQJ1TCE5POGBJli/HARl
+         7FOpYxMurwS8sKINDIsTBYhBqa4DkA1WmWRLnE6Ml4KaWVIIk8nr6MLPaFjWpCDRZL8T
+         +dkH41Tke+rdjKsK4g+J1bTOKtlceMlOvF8qs68Pa2q+hBGOY5yXK9NFEgLKgFtkZpuS
+         vBQwayR3DiQ28IhIzvTW3vpItyC1XYGtkLwksQHUbxge80pXLRBLrgrrcdqdI4weSD9b
+         umbo9RtTVBFpBIrxrI9xhEC7VjIJBBILipQtylNL7lDxxz0V/b/gEkRzr8re8N4fTfgc
+         P3Ig==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1726560543; x=1727165343;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=VwxTWh/dwDOTanVKObye7b4utDnLoHHd49QCyd1oRUo=;
+        b=mBORiY7M9GwfrHL/J9QwsLgfI2N8e/V3jbWbcbOdyOyeVPUBiMMkKwlwbK+zPm+BCt
+         nwdRcusfZvDjjiKzJUSlmETk4LZPnErZFhxcLmtI0MVZcFeOYtlcvoCK8QO2nS1EyAE1
+         jXE4UvhCFQ59tBU2Q74HTS2uvGFMd/44Mg8PQ+ZyE30zVehCIPuOKAjTnDCB0bEDQ3Cy
+         VkO5uKuXWAwe0gTlJ48pRu1mdtIFL6lon0NwOMWh+qYsxFW5fvhu25GTOyoZG0J1koIQ
+         Zh7xFgLg7RLABm+LOSBKNoXtsMZYGQda2p1I9xLhCAXgWRVMgjWjL7l3ueImQqUV+j56
+         OpDQ==
+X-Gm-Message-State: AOJu0YwxIrTpHT4JO8TCVlXZc93+zd5/384oG+hNWFf15WlidxfskBZU
+	6IWxSMIzzhd8Y9iNNoCSlyRIp0fLhLY9AERo0kIKMMPJ9JEBWllwc+GkOg==
+X-Google-Smtp-Source: AGHT+IGauiBXOCZQEibf1L710GYYavpBJyuVTofy9qdiA8c40cElO75vwSOm7AuSoeAArIyr+skSSQ==
+X-Received: by 2002:a17:902:f541:b0:202:348d:4e85 with SMTP id d9443c01a7336-2078296a9a8mr197553225ad.39.1726560543383;
+        Tue, 17 Sep 2024 01:09:03 -0700 (PDT)
+Received: from [172.17.0.2] ([52.190.141.49])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-207947356e2sm46242565ad.250.2024.09.17.01.09.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 17 Sep 2024 01:09:02 -0700 (PDT)
+Message-ID: <66e9391e.170a0220.355c7e.eb61@mx.google.com>
+Date: Tue, 17 Sep 2024 01:09:02 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============7402111237841986210=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, coelacanthushex@gmail.com
+Subject: RE: [bluez,v3] monitor: fix buffer overflow when terminal width > 255
+In-Reply-To: <20240917-fix-log-buffer-overflow-v3-1-26fd441bb7df@gmail.com>
+References: <20240917-fix-log-buffer-overflow-v3-1-26fd441bb7df@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-This new interface allows to get the image referenced in the audio
-metadata ImgHandle available in org.bluez.MediaPlayer track properties.
-The image handle is only available in track info if an OBEX session is
-connected to the ObexPort port provided in  org.bluez.MediaPlayer
-properties.
+--===============7402111237841986210==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=890823
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.28 seconds
+GitLint                       FAIL      0.45 seconds
+BuildEll                      PASS      24.54 seconds
+BluezMake                     PASS      1727.17 seconds
+MakeCheck                     PASS      13.74 seconds
+MakeDistcheck                 PASS      181.34 seconds
+CheckValgrind                 PASS      259.09 seconds
+CheckSmatch                   WARNING   363.88 seconds
+bluezmakeextell               PASS      120.05 seconds
+IncrementalBuild              PASS      1423.05 seconds
+ScanBuild                     PASS      992.04 seconds
+
+Details
+##############################
+Test: GitLint - FAIL
+Desc: Run gitlint
+Output:
+[bluez,v3] monitor: fix buffer overflow when terminal width > 255
+
+WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
+20: B1 Line exceeds max length (100>80): "- Link to v2: https://lore.kernel.org/r/20240915-fix-log-buffer-overflow-v2-1-fb6b52a7d4b2@gmail.com"
+24: B1 Line exceeds max length (99>80): "- Link to v1: https://patch.msgid.link/20240914-fix-log-buffer-overflow-v1-1-733cb4fff673@gmail.com"
+##############################
+Test: CheckSmatch - WARNING
+Desc: Run smatch tool with source
+Output:
+monitor/packet.c: note: in included file:monitor/display.h:82:26: warning: Variable length array is used.monitor/packet.c:1868:26: warning: Variable length array is used.monitor/packet.c: note: in included file:monitor/bt.h:3606:52: warning: array of flexible structuresmonitor/bt.h:3594:40: warning: array of flexible structures
+
+
 ---
- Makefile.am                  |   9 ++-
- doc/org.bluez.obex.Image.rst | 118 +++++++++++++++++++++++++++++++++++
- 2 files changed, 124 insertions(+), 3 deletions(-)
- create mode 100644 doc/org.bluez.obex.Image.rst
+Regards,
+Linux Bluetooth
 
-diff --git a/Makefile.am b/Makefile.am
-index 88044aa05..3eb0a5302 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -382,7 +382,8 @@ man_MANS += doc/org.bluez.obex.Client.5 doc/org.bluez.obex.Session.5 \
- 		doc/org.bluez.obex.PhonebookAccess.5 \
- 		doc/org.bluez.obex.MessageAccess.5 \
- 		doc/org.bluez.obex.Message.5 \
--		doc/org.bluez.obex.AgentManager.5 doc/org.bluez.obex.Agent.5
-+		doc/org.bluez.obex.AgentManager.5 doc/org.bluez.obex.Agent.5 \
-+		doc/org.bluez.obex.Image.5
- endif
- manual_pages += src/bluetoothd.8
- manual_pages += doc/l2cap.7 doc/rfcomm.7
-@@ -415,7 +416,8 @@ manual_pages += doc/org.bluez.obex.Client.5 doc/org.bluez.obex.Session.5 \
- 		doc/org.bluez.obex.PhonebookAccess.5 \
- 		doc/org.bluez.obex.MessageAccess.5 \
- 		doc/org.bluez.obex.Message.5 \
--		doc/org.bluez.obex.AgentManager.5 doc/org.bluez.obex.Agent.5
-+		doc/org.bluez.obex.AgentManager.5 doc/org.bluez.obex.Agent.5 \
-+		doc/org.bluez.obex.Image.5
- 
- EXTRA_DIST += src/genbuiltin src/bluetooth.conf \
- 			src/main.conf profiles/network/network.conf \
-@@ -497,7 +499,8 @@ EXTRA_DIST += doc/org.bluez.obex.Client.rst doc/org.bluez.obex.Session.rst \
- 		doc/org.bluez.obex.PhonebookAccess.rst \
- 		doc/org.bluez.obex.MessageAccess.rst \
- 		doc/org.bluez.obex.Message.rst \
--		doc/org.bluez.obex.AgentManager.rst doc/org.bluez.obex.Agent.rst
-+		doc/org.bluez.obex.AgentManager.rst doc/org.bluez.obex.Agent.rst \
-+		doc/org.bluez.obex.Image.rst
- 
- EXTRA_DIST += doc/pics-opp.txt doc/pixit-opp.txt \
- 		doc/pts-opp.txt
-diff --git a/doc/org.bluez.obex.Image.rst b/doc/org.bluez.obex.Image.rst
-new file mode 100644
-index 000000000..386805203
---- /dev/null
-+++ b/doc/org.bluez.obex.Image.rst
-@@ -0,0 +1,118 @@
-+====================
-+org.bluez.obex.Image
-+====================
-+
-+--------------------------------------------------
-+BlueZ D-Bus OBEX Image API documentation
-+--------------------------------------------------
-+
-+:Version: BlueZ
-+:Date: August 2024
-+:Manual section: 5
-+:Manual group: Linux System Administration
-+
-+Interface
-+=========
-+
-+:Service:	org.bluez.obex
-+:Interface:	org.bluez.obex.Image1 [experimental]
-+:Object path:	[Session object path]
-+
-+Methods
-+-------
-+
-+object, dict Get(string targetfile, string handle, dict description)
-+````````````````````````````````````````````````````````````````````
-+
-+    Retrieves the image corresponding to the handle and the description, as
-+    one of the descriptions retrieved by GetImageProperties, and store it in
-+    a local file.
-+
-+    If the "transform" property description exists it should be set to one
-+    of the value listed by GetImageProperties for this description.
-+
-+    If description is an empty dict, the native image will be retrieved.
-+
-+	Possible errors:
-+
-+	:org.bluez.obex.Error.InvalidArguments:
-+	:org.bluez.obex.Error.Failed:
-+
-+array{dict} Properties(string handle)
-+`````````````````````````````````````
-+
-+    Retrieves the image properties corresponding to the handle.
-+
-+    The first dict entry is mandatory and correspond to 'handle' and 'name'
-+    of the image.
-+
-+    The second dict entry is mandatory and correspond to the native description
-+    ('type':'native') of the image.
-+
-+    The following dict entries are optional and correspond to variant
-+    descriptions of the image. If the 'transform' entry exists in the
-+    description, it lists the available possible image transformations and
-+    should be set to one of them before using the description as parameter
-+    to GetImage.
-+
-+	Possible property values:
-+
-+	:string type:
-+
-+		Type of dict properties. Mandatory for each dict.
-+
-+		Possible values:
-+
-+		:"native":
-+		:"variant":
-+
-+	:string encoding:
-+
-+		File encoding format.
-+
-+		Possible values:
-+
-+        :"BMP":
-+        :"GIF":
-+		:"JPEG":
-+        :"JPEG2000":
-+		:"PNG":
-+        :"WBMP":
-+
-+	:string pixel:
-+
-+		File encoding format size of form "<width>*<height>".
-+
-+	:uint64 size:
-+
-+		File size.
-+
-+	:uint64 maxsize:
-+
-+		File maximum size.
-+
-+	:string transformation:
-+
-+		List of available transformations separated by space.
-+
-+		Possible values:
-+
-+		:"crop":
-+		:"fill":
-+		:"stretch":
-+
-+	Possible errors:
-+
-+	:org.bluez.obex.Error.InvalidArguments:
-+	:org.bluez.obex.Error.Failed:
-+
-+object, dict GetThumbnail(string targetfile, string handle)
-+```````````````````````````````````````````````````````````
-+
-+    Retrieves the image thumbnail corresponding to the handle and store it in
-+    a local file.
-+
-+	Possible errors:
-+
-+	:org.bluez.obex.Error.InvalidArguments:
-+	:org.bluez.obex.Error.Failed:
--- 
-2.34.1
 
+--===============7402111237841986210==--
