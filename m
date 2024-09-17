@@ -1,195 +1,135 @@
-Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtpbgsg1.qq.com (smtpbgsg1.qq.com [54.254.200.92])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6752E15AF6
-	for <linux-bluetooth@vger.kernel.org>; Tue, 17 Sep 2024 03:17:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADFA02746D;
+	Tue, 17 Sep 2024 03:56:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.254.200.92
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726543072; cv=none; b=Rk8Nz94zFsJUj/ez4s30r97uPdUxblg7VtwNbMKdddDpKDn53MSSeUf5AdtyCobfwyGXKHI0DZRaSCgjNR8cqrAYZUkDdf6OCr3prtC+aS31cO1YS0B0HY5p3TnAbcPg83sb3MPlSjJoyRJX4xUXVNHoWj9vfnNFVT+lTMiAtuM=
+	t=1726545378; cv=none; b=Lj33abx2jh3ldGZv/FSgi5BS4ZLAOJZezNJvyBuWmUAox/mZ1j2MqZSIriF4LS2VJcz4isA03vhy5WaN26phK84zZtyXM0NpVp/XH1+GUNGBRmbfuX3y/31dq0ZRNE/KGJ6OQGBZ06bfK4GojOPd3MAv/L2l4SW/3r5eYAkz8A4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726543072; c=relaxed/simple;
-	bh=FuoT01rxjzBs/XBs85vukP42I1pNjJYtvyAkFq9WlAc=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=pwvTMah/0a78c2PXDj7KHdJ73C/UGlm5NXGQcVfClCdvRkcbl8yWlN4nZ8SkxeOJQXwjszyxwgB6ifgZfGzkrHH3NVbf5zPK4jRyEN5ZJpJLB1PcasGOKAL4WlFLheMoRTDSvIvh7IVFHknWSSjsWvS//ZnfnAvPX6bFj/Vlak4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gzAGtMdz; arc=none smtp.client-ip=209.85.214.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1726545378; c=relaxed/simple;
+	bh=RxDqC2ozWh7Na6ekNLJXlIzMu5kIVsVugWTFCC2B6O8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=riHMIG2lMJj58HkJfQCwtZ7e3rSa1Qn+U5/kn7LceY5tPjpboHzoqNluO/KRI1UKVKQ4vED09YdlXCwJNuw5KHt8NMWlUzLQJh+7nBdm+CsGhMb1Wk2u5zuKT4EXohVI64KK44MY5Zusvvk+1Hxs7/zrXTP4tMql7MkebsmC50I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com; spf=pass smtp.mailfrom=uniontech.com; dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b=XhS1Rtha; arc=none smtp.client-ip=54.254.200.92
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniontech.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gzAGtMdz"
-Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-205909afad3so52593055ad.2
-        for <linux-bluetooth@vger.kernel.org>; Mon, 16 Sep 2024 20:17:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1726543070; x=1727147870; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=wpdDR1bCoKjeNN0ZN/hE6LicrubjLRM7s17ic7nByJ8=;
-        b=gzAGtMdzJ+TUZz9wQMljTEetNSwEcOpjoiuA2vFJYUtwomP2zzBKeDg8MonVlCtv36
-         Ekz6kturpqNKgwgh3NYr6FxYnph13sz/B8C5L5uBGj0TimFTDkp/KakHGpH44N0M9bCb
-         wJWgct0zkxTpCm6ZHsq887H7fJDkUp6w2QUvxV046D1BKSJ5pj36PIPI4tObp++UI1s7
-         SVoQG5+5LcI2GL+b4A3AJuNGYXysm3Qv6k7EZQPUi8GOjW2mc8KCM1SNyULq7P8ciQ13
-         HOOwPpolBR2RjMUoxFKDMe0bDFZW4ZC/LPRtfc5+LTQNXBKc+huZNOdOw3aZwa49/ESs
-         gUcw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726543070; x=1727147870;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=wpdDR1bCoKjeNN0ZN/hE6LicrubjLRM7s17ic7nByJ8=;
-        b=XA+b4gghtNACkbeB57l1ZVmhXoa9x4lMY/783BKJzHva4i0yuOkQF1YlVOkUkHKRv+
-         tx05lRFt2muaFfksBldGucBuHmMwFhsKWQXjW7jC5vmIPAx+0nNKxJrnsGn2CK96I+v7
-         tiqWDa8MiAJK5fjqti/YxBl2+ePfFNOvOMHMW/mZ8YaoU9vgcmDBe/J/Qb2FR+wgkVor
-         OHAISQ17CC0g3I3HXUlooD74DAFfzp86e4j4X+RJdRiPXW4zqYX9NkORF7n/lEw0lmM+
-         ij2JBPyr3RcjtVneBJpwjKLYUMbh8GV/1tKt2SU3yiniBwtfnG0dCZ+nOZVLB9tb5ibs
-         QwBw==
-X-Gm-Message-State: AOJu0YwBYXa9AtxtSuNGriSzzfWBp+fNnyInaWUjaSKEIRX/4xwE5ECd
-	tt8pYCzp3ShXu35YAn53++8Ac+dN5BvotdLpwc0yZHtuShThZk2bjMGTcHDz
-X-Google-Smtp-Source: AGHT+IGajKoSBONeKyzIZX4A9wiWwgfuRhTd7OWDpRV3szWeyrvvwjCFltq6OpecYt6Ip14CAks2pw==
-X-Received: by 2002:a17:902:e88a:b0:206:b7b8:1efd with SMTP id d9443c01a7336-2076e417cc1mr207420885ad.53.1726543070175;
-        Mon, 16 Sep 2024 20:17:50 -0700 (PDT)
-Received: from apollo.hsd1.ca.comcast.net ([2601:646:9d80:4380::de58])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7db49924669sm5009527a12.49.2024.09.16.20.17.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 16 Sep 2024 20:17:49 -0700 (PDT)
-From: Khem Raj <raj.khem@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Khem Raj <raj.khem@gmail.com>
-Subject: [PATCH v2] mesh: Move local basename into utility file
-Date: Mon, 16 Sep 2024 20:17:45 -0700
-Message-ID: <20240917031745.1641153-1-raj.khem@gmail.com>
-X-Mailer: git-send-email 2.46.1
+	dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b="XhS1Rtha"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uniontech.com;
+	s=onoh2408; t=1726545370;
+	bh=rdaKv2SCKQiEUBlkoIWcwFivUueaYkkndS0l9oHCs3g=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version;
+	b=XhS1RthaZ7kvnnXheodzMpPhIp86mlGCd1Wy7g6j3KF6XyjSK0Asomsc+fsWUiiXw
+	 Ve8jGHpRnH06F91HdpmJXA1vp42StFjU/gV33nAFT/Fjo7xsbODDwzTdI/A72xzEfK
+	 u16WAFnIjNmRWDH7KPC7JBeHGbFxDw4DuaoYEroM=
+X-QQ-mid: bizesmtpip4t1726545357t2v78q9
+X-QQ-Originating-IP: JkZWiTTTCundvO0LijIHjMBooeCg5sOePB39obv1NMI=
+Received: from avenger-OMEN-by-HP-Gaming-Lapto ( [localhost])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Tue, 17 Sep 2024 11:55:54 +0800 (CST)
+X-QQ-SSF: 0000000000000000000000000000000
+X-QQ-GoodBg: 1
+X-BIZMAIL-ID: 3136961633973931208
+From: WangYuli <wangyuli@uniontech.com>
+To: marcel@holtmann.org,
+	johan.hedberg@gmail.com,
+	luiz.dentz@gmail.com,
+	matthias.bgg@gmail.com,
+	hello@felixjara.me,
+	wangyuli@uniontech.com
+Cc: linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org,
+	aaron.ma@canonical.com,
+	guanwentao@uniontech.com,
+	zhanjun@uniontech.com
+Subject: [PATCH] Bluetooth: btusb: Add MT7925 support for ID 0x13d3:0x3608
+Date: Tue, 17 Sep 2024 11:55:45 +0800
+Message-ID: <C2837417C967D014+20240917035545.21209-1-wangyuli@uniontech.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+X-QQ-SENDSIZE: 520
+Feedback-ID: bizesmtpip:uniontech.com:qybglogicsvrgz:qybglogicsvrgz8a-1
 
-Defining an override via a missing.h can prove difficult when a file
-needs to use basename and dirname both the APIs and needs to include
-libgen.h for them, in such situations there will be signature clash
-for basename function.
+From: Félix Jara <hello@felixjara.me>
+
+Add compatibility Bluetooth device MT7925 for Asus UM5606 with
+ID 13d3:3608.
+
+The device info from /sys/kernel/debug/usb/devices as below.
+
+T:  Bus=03 Lev=01 Prnt=01 Port=00 Cnt=01 Dev#=  2 Spd=480  MxCh= 0
+D:  Ver= 2.10 Cls=ef(misc ) Sub=02 Prot=01 MxPS=64 #Cfgs=  1
+P:  Vendor=13d3 ProdID=3608 Rev= 1.00
+S:  Manufacturer=MediaTek Inc.
+S:  Product=Wireless_Device
+S:  SerialNumber=000000000
+C:* #Ifs= 3 Cfg#= 1 Atr=e0 MxPwr=100mA
+A:  FirstIf#= 0 IfCount= 3 Cls=e0(wlcon) Sub=01 Prot=01
+I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=125us
+E:  Ad=82(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+E:  Ad=02(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+I:  If#= 1 Alt= 6 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  63 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  63 Ivl=1ms
+I:* If#= 2 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
+E:  Ad=8a(I) Atr=03(Int.) MxPS=  64 Ivl=125us
+E:  Ad=0a(O) Atr=03(Int.) MxPS=  64 Ivl=125us
+I:  If#= 2 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
+E:  Ad=8a(I) Atr=03(Int.) MxPS= 512 Ivl=125us
+E:  Ad=0a(O) Atr=03(Int.) MxPS= 512 Ivl=125us
+
+Tested in Asus Zenbook S 16 UM5606XA
+
+Signed-off-by: Félix Jara <hello@felixjara.me>
+Tested-by: Félix Jara <hello@felixjara.me>
+Link: https://github.com/openSUSE/kernel/pull/10
+Signed-off-by: WangYuli <wangyuli@uniontech.com>
 ---
-v2: Remove reference to missing.h in Makefile.mesh
+ drivers/bluetooth/btusb.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
- Makefile.mesh           |  2 +-
- mesh/mesh-config-json.c |  3 +--
- mesh/missing.h          | 21 ---------------------
- mesh/rpl.c              |  3 +--
- mesh/util.c             | 10 ++++++++++
- mesh/util.h             |  5 +++++
- 6 files changed, 18 insertions(+), 26 deletions(-)
- delete mode 100644 mesh/missing.h
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index cd22b34542d5..ff804a2b6c94 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -508,6 +508,9 @@ static const struct usb_device_id blacklist_table[] = {
+ 	{ USB_DEVICE(0x13d3, 0x3568), .driver_info = BTUSB_MEDIATEK |
+ 						     BTUSB_WIDEBAND_SPEECH |
+ 						     BTUSB_VALID_LE_STATES },
++	{ USB_DEVICE(0x13d3, 0x3608), .driver_info = BTUSB_MEDIATEK |
++						     BTUSB_WIDEBAND_SPEECH |
++						     BTUSB_VALID_LE_STATES },
+ 	{ USB_DEVICE(0x0489, 0xe0e2), .driver_info = BTUSB_MEDIATEK |
+ 						     BTUSB_WIDEBAND_SPEECH |
+ 						     BTUSB_VALID_LE_STATES },
+-- 
+2.43.0
 
-diff --git a/Makefile.mesh b/Makefile.mesh
-index f5e99a955..e4c9fa6a3 100644
---- a/Makefile.mesh
-+++ b/Makefile.mesh
-@@ -38,7 +38,7 @@ mesh_sources = mesh/mesh.h mesh/mesh.c \
- 				mesh/keyring.h mesh/keyring.c \
- 				mesh/rpl.h mesh/rpl.c \
- 				mesh/prv-beacon.h mesh/prvbeac-server.c \
--				mesh/mesh-defs.h mesh/missing.h
-+				mesh/mesh-defs.h
- pkglibexec_PROGRAMS += mesh/bluetooth-meshd
- 
- mesh/mesh.$(OBJEXT): ell/internal
-diff --git a/mesh/mesh-config-json.c b/mesh/mesh-config-json.c
-index a17a48b6d..5372130d7 100644
---- a/mesh/mesh-config-json.c
-+++ b/mesh/mesh-config-json.c
-@@ -28,7 +28,6 @@
- #include <ell/ell.h>
- #include <json-c/json.h>
- 
--#include "mesh/missing.h"
- #include "mesh/mesh-defs.h"
- #include "mesh/util.h"
- #include "mesh/mesh-config.h"
-@@ -2708,7 +2707,7 @@ void mesh_config_destroy_nvm(struct mesh_config *cfg)
- 	if (!hex2str(cfg->uuid, 16, uuid, sizeof(uuid)))
- 		return;
- 
--	node_name = basename(node_dir);
-+	node_name = mesh_basename(node_dir);
- 
- 	/* Make sure path name of node follows expected guidelines */
- 	if (strcmp(node_name, uuid))
-diff --git a/mesh/missing.h b/mesh/missing.h
-deleted file mode 100644
-index 464df9b1c..000000000
---- a/mesh/missing.h
-+++ /dev/null
-@@ -1,21 +0,0 @@
--// SPDX-License-Identifier: LGPL-2.1-or-later
--/*
-- *
-- *  BlueZ - Bluetooth protocol stack for Linux
-- *
-- *  Copyright (C) 2024  Khem Raj <raj.khem@gmail.com>
-- *
-- */
--
--#ifdef HAVE_CONFIG_H
--#include <config.h>
--#endif
--#if !HAVE_DECL_BASENAME
--#include <string.h>
--static inline const char *basename(const char *path)
--{
--	const char *base = strrchr(path, '/');
--
--	return base ? base + 1 : path;
--}
--#endif
-diff --git a/mesh/rpl.c b/mesh/rpl.c
-index 2fa17d72f..69533bf43 100644
---- a/mesh/rpl.c
-+++ b/mesh/rpl.c
-@@ -24,7 +24,6 @@
- 
- #include <ell/ell.h>
- 
--#include "mesh/missing.h"
- #include "mesh/mesh-defs.h"
- 
- #include "mesh/node.h"
-@@ -147,7 +146,7 @@ static void get_entries(const char *iv_path, struct l_queue *rpl_list)
- 	if (!dir)
- 		return;
- 
--	iv_txt = basename(iv_path);
-+	iv_txt = mesh_basename(iv_path);
- 	if (sscanf(iv_txt, "%08x", &iv_index) != 1) {
- 		closedir(dir);
- 		return;
-diff --git a/mesh/util.c b/mesh/util.c
-index 82b57f642..73f13aab7 100644
---- a/mesh/util.c
-+++ b/mesh/util.c
-@@ -161,3 +161,13 @@ void enable_debug(void)
- 	debug_enabled = true;
- 	l_debug_enable("*");
- }
-+
-+#if !HAVE_DECL_BASENAME
-+#include <string.h>
-+const char *mesh_basename(const char *path)
-+{
-+	const char *base = strrchr(path, '/');
-+
-+	return base ? base + 1 : path;
-+}
-+#endif
-diff --git a/mesh/util.h b/mesh/util.h
-index 085ec3330..bb417dc40 100644
---- a/mesh/util.h
-+++ b/mesh/util.h
-@@ -16,3 +16,8 @@ void print_packet(const char *label, const void *data, uint16_t size);
- int create_dir(const char *dir_name);
- void del_path(const char *path);
- void enable_debug(void);
-+#if !HAVE_DECL_BASENAME
-+const char *mesh_basename(const char *path);
-+#else
-+#define mesh_basename basename
-+#endif
