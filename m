@@ -1,207 +1,309 @@
-Received: from mail-pl1-f196.google.com (mail-pl1-f196.google.com [209.85.214.196])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D9D236B17
-	for <linux-bluetooth@vger.kernel.org>; Tue, 17 Sep 2024 06:31:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.196
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D73D97BB15
+	for <linux-bluetooth@vger.kernel.org>; Tue, 17 Sep 2024 07:42:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726554703; cv=none; b=c7eispliW4Nsr9flfQirfBN3+6ndXl1f+hTV9WgVynqmwBbiTXEWFGLtm4dwAGv35tGlvxElzXeRCEF993Fy87beSN5gjvj755JNp9K8k4fVU6w2YgrZIFnGYGZcJoFPeSOfML3KktJHHxE+YFWjsykwRIIfSCgUN+zZFuS0j8o=
+	t=1726558949; cv=none; b=lKagBb4mYfQDRv3f6yUCEls5aR8+VnjOPVox335ZegXQ+iiTjoliMJqtflTUC3W71YRRkCNa6ZTF2BhGDU8LFwKG+TIMVHo8/mesy7Jnq4Z1dYJ7npqUBvyZoujzZAE7YdX3BblthFBRiV3sHjrcHXVUxn80Cg4ic4P5Rguwtxc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726554703; c=relaxed/simple;
-	bh=ncAKfF30gTHEG/N3Thej96v0DQx4j7j/VwtIgJxBYkc=;
-	h=From:Message-ID:Date:MIME-Version:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=cZy5zZ/oMOgyzxkbnLB7njBoRjtRP1HFMvvqo7IqKql0jJ5K+Y7JPnnMBvQJin3Tva9thwcZM2R+ixmQDBqlxTNb57fxsb6Xdgs96RqtmAMCoVz8v2SX81ALfT4a5liijhFrOHe3jFG3mpRs6aJUqm7K6cXumCBNDszUlpHW4qQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fmij2MZt; arc=none smtp.client-ip=209.85.214.196
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1726558949; c=relaxed/simple;
+	bh=p7qzDefy4KmvnMHlngGPsS8f648+E4Q2NNUAQa67wWo=;
+	h=From:To:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=EkqyN8E4S1J6zGg2eQ666YYJiAFP/Vf+DpBnUxRcqa0h6QF2VnwYc37doWY8YBbCiYJcPej9luDqVBdXjR+Oc0Md8bALe8fq3tiheyKDj/Lsdl9qLfjYczWjywpBsbNHEpDeBT4ca2ksS++hlhvbfj410pB0QOAJGQ7FieLBGIc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=PAIKT9At; arc=none smtp.client-ip=148.251.105.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fmij2MZt"
-Received: by mail-pl1-f196.google.com with SMTP id d9443c01a7336-205659dc63aso50947145ad.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 16 Sep 2024 23:31:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1726554701; x=1727159501; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=bTDefMiCw8xZeCPY6RuY1XQKwTYf9rKwztHbr8Q5dyE=;
-        b=fmij2MZtfOOTNcuJhq0tG5zDwsevA4giK2Z20qMPwkSzHHlzyoal3jwWH6OCQF+aRe
-         x6C4CpqXLC0kHwhrXOGCoUx46Jsq2AcbOfDSk7x4qqWH3+f6JIpaf1pme6b409khXNAr
-         bE8HSVB0P9UOdVkZijYwLGkvMKUiO8kfKeJnhgEZB7dSqmYEWdjH0FWBvWicRojIZExL
-         kwqgABUfgj8U4SCbOZFvVzKT6gQcoiQ7j2x9zrN3dncibwe+XBN5dTXkORNe6g9E3OMu
-         6c/976PkLwpu8JIB2jlzttM0+54160Z9jWF1ZKAQJzh2K3Ke5vTsROyOqkeODOM5cWbc
-         qI+A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726554701; x=1727159501;
-        h=content-transfer-encoding:in-reply-to:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=bTDefMiCw8xZeCPY6RuY1XQKwTYf9rKwztHbr8Q5dyE=;
-        b=l2dCc/RpSUQ8fJAh1btdC53Ev5W/EzO5SaRQBByXVCeBnu3+oOjYSMsGqL58hmka2t
-         5Ind93RwWYSh4klpvXU+Bw4Kkn9zF2rXBCEioGx4XRBQ72q7K5ra1NNRJB+4mfZSeg/8
-         fzOJjCkjuzJctiQhpMYWmq+xpLhzFVTTnbrIh1Xx1xpqidBnR7id0QFFL6uoRB9M3R5Z
-         hUzBzk6MqCpYMtXQS8OEGzv01dTpO+WxPJXiJlsfL/zImGBBWrME1PCRWQh/yvaL1wry
-         8VwY17x9VjVAYKuPgc9C4X/Y7ED917gIe2/nblUilfGJ+9fch9lguHBAQuJgfNJSS/PL
-         +oOw==
-X-Gm-Message-State: AOJu0YxKBcQhN2rf5bu25AI/pqHcGBx5cjC/4zKkjIz+6nxy8R1frwQm
-	0AKavI+0XmP6UmO18SNEEU8ArAYI53cyiDnoB0TJtKQh9a0IBnHTLS+lnsiMMEs=
-X-Google-Smtp-Source: AGHT+IFZfC9cXiPhhSkFxclGkR+0mNUZwTVcaZUhWUNB2/XiU/KXLE1ZCsDmo88vXTWIOfICyLMroA==
-X-Received: by 2002:a17:902:f543:b0:207:6ef:d8ab with SMTP id d9443c01a7336-2076e48346emr303649135ad.49.1726554701319;
-        Mon, 16 Sep 2024 23:31:41 -0700 (PDT)
-Received: from [127.0.0.1] ([103.156.242.194])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20794706f41sm44865495ad.215.2024.09.16.23.31.39
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 16 Sep 2024 23:31:40 -0700 (PDT)
-From: Celeste Liu <coelacanthushex@gmail.com>
-X-Google-Original-From: Celeste Liu <CoelacanthusHex@gmail.com>
-Message-ID: <3384f1fa-eba3-4426-9935-124872d80ef0@gmail.com>
-Date: Tue, 17 Sep 2024 14:31:38 +0800
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="PAIKT9At"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+	s=mail; t=1726558944;
+	bh=p7qzDefy4KmvnMHlngGPsS8f648+E4Q2NNUAQa67wWo=;
+	h=From:To:Subject:Date:In-Reply-To:References:From;
+	b=PAIKT9At7183ZvbmnuK1xFEb0Pr6neATEVJGjbQt0D7EvhAErcdAOHuM2hkrpWtso
+	 6hwV+r03uSspT2lcDjlGR0EbcQB9lG8euHefdKcLh0s+lh4aUoKkCEkwLoSnbTpe9m
+	 Uq7fAoL4dVIw3gUgksRc+HuWnqr8rghjxZA7WKLj/tC3pCD7Rfhb3rBUovgYmG8CHj
+	 ovuLq7qCdCz/ohrXgFq3A6QgSegwi61eD0TLUhq0BnZMthkuhBo6ZKwb703/lU50se
+	 S91K+VjA+gUm6EKsvMziMSvb9xVc+ShHzhVkMVBIvCsGhv0qCD4mKRcJeGoXsJx9b5
+	 oqK2t83H1bz0w==
+Received: from fdanis-XPS-13-9370.. (67.227.121.78.rev.sfr.net [78.121.227.67])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: fdanis)
+	by bali.collaboradmins.com (Postfix) with ESMTPSA id CEA6D17E0FD6
+	for <linux-bluetooth@vger.kernel.org>; Tue, 17 Sep 2024 09:42:24 +0200 (CEST)
+From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?= <frederic.danis@collabora.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ v4 1/5] obexd: Add BIP client for AVRCP cover art download
+Date: Tue, 17 Sep 2024 09:42:13 +0200
+Message-Id: <20240917074217.231677-2-frederic.danis@collabora.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20240917074217.231677-1-frederic.danis@collabora.com>
+References: <20240917074217.231677-1-frederic.danis@collabora.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH bluez v2] monitor: fix buffer overflow when terminal width
- > 255
-Content-Language: en-GB-large
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Bluez <linux-bluetooth@vger.kernel.org>,
- Marcel Holtmann <marcel@holtmann.org>
-References: <20240915-fix-log-buffer-overflow-v2-1-fb6b52a7d4b2@gmail.com>
- <CABBYNZ+YMC856CdhETpCM9u4OYeO5+R+3hSbgigLszVaa+UPQQ@mail.gmail.com>
- <098e9614-7a88-405c-8fb4-e13bc4f40efc@gmail.com>
- <5f11a98c-9f41-44a4-9e30-df33b8a0560e@gmail.com>
- <CABBYNZ+fm3y4NXc1WTjoc6E-ZiSeVeADgGsmRjuOEU7FjdL4pA@mail.gmail.com>
-In-Reply-To: <CABBYNZ+fm3y4NXc1WTjoc6E-ZiSeVeADgGsmRjuOEU7FjdL4pA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 
+The cover art image handle is available in the metadata of the track
+when the OBEX BIP session is connected to the PSM port provided
+in AVRCP SDP record and available as org.bluez.MediaPlayer property.
 
-On 2024-09-17 00:22, Luiz Augusto von Dentz wrote:
-> Hi,
-> 
-> On Mon, Sep 16, 2024 at 11:57 AM Celeste Liu <coelacanthushex@gmail.com> wrote:
->>
->>
->> On 2024-09-16 23:39, Celeste Liu wrote:
->>>
->>> On 2024-09-16 23:10, Luiz Augusto von Dentz wrote:
->>>> Hi Celeste,
->>>>
->>>> On Sat, Sep 14, 2024 at 12:10 PM Celeste Liu <coelacanthushex@gmail.com> wrote:
->>>>>
->>>>> In current code, we create line buffer with size 256, which can contains
->>>>> 255 ASCII characters. But in modern system, terminal can have larger
->>>>> width. It may cause buffer overflow in snprintf() text.
->>>>>
->>>>> We need allocate line buffer with size which can contains one line in
->>>>> terminal. The size should be difficult to calculate because of multibyte
->>>>> characters, but our code using line buffer assumed all characters has
->>>>> 1 byte size (e.g. when we put packet text into line buffer via
->>>>> snprintf(), we calculate max size by 1B * col.), so it's safe to
->>>>> allocate line buffer with col + 1.
->>>>>
->>>>> Signed-off-by: Celeste Liu <CoelacanthusHex@gmail.com>
->>>>> ---
->>>>> Changes in v2:
->>>>> - Add free() forgot in v1.
->>>>> - Link to v1: https://patch.msgid.link/20240914-fix-log-buffer-overflow-v1-1-733cb4fff673@gmail.com
->>>>> ---
->>>>>  monitor/packet.c | 4 +++-
->>>>>  1 file changed, 3 insertions(+), 1 deletion(-)
->>>>>
->>>>> diff --git a/monitor/packet.c b/monitor/packet.c
->>>>> index c2599fe6864ab44d657c121fcc3ceecc1ebc52a6..bef55477a221b6cb43ff224454ac3fa593cd8221 100644
->>>>> --- a/monitor/packet.c
->>>>> +++ b/monitor/packet.c
->>>>> @@ -376,7 +376,8 @@ static void print_packet(struct timeval *tv, struct ucred *cred, char ident,
->>>>>                                         const char *text, const char *extra)
->>>>>  {
->>>>>         int col = num_columns();
->>>>> -       char line[256], ts_str[96], pid_str[140];
->>>>> +       char ts_str[96], pid_str[140];
->>>>> +       char *line = (char *) malloc(sizeof(char) * col + 1);
->>>>
->>>> Perhaps we could replace malloc with alloca here so we allocate the
->>>> line on the heap rather than stack.
->>>
->>> I will replace it with alloca() in the next version.
->>> But to be honest, I think alloca() is not a good choice. The compiler will
->>> prevent the functions that call alloca() be inline, otherwise it may trigger
->>> unexpected stack overflow because it's not a scope-based lifetime. It may be
->>> better to replace it with VLA once we bump the standard requirement to C99 or
->>> above.
->>
->> But I found a VLA usage in monitor/display.h:82, which was introduced by Marcel Holtmann
->> in d9e3aab39d2af7d7a822993ededaa41cd0311c53 in 2012. Could we use VLA directly? Or we
->> need to treat that usage as a bug and fix it?
-> 
-> Afaik VLA has more problems than using alloca, because depending on
-> the C (11-23) version VLA is optional, so afaik alloca is a safer
-> option provided the length is not considered too big, anyway perhaps
-> we should use some define like LINE_MAX instead:
-> 
->        {LINE_MAX}
->              Unless otherwise noted, the maximum length, in bytes, of a
->              utility's input line (either standard input or another
->              file), when the utility is described as processing text
->              files. The length includes room for the trailing <newline>.
->              Minimum Acceptable Value: {_POSIX2_LINE_MAX}
-> https://www.man7.org/linux/man-pages/man0/limits.h.0p.html
+This service allows to get the thumbnail.
+---
+ Makefile.obexd                |   1 +
+ doc/org.bluez.obex.Client.rst |   1 +
+ obexd/client/bip.c            | 171 ++++++++++++++++++++++++++++++++++
+ obexd/client/bip.h            |  12 +++
+ obexd/client/manager.c        |   2 +
+ 5 files changed, 187 insertions(+)
+ create mode 100644 obexd/client/bip.c
+ create mode 100644 obexd/client/bip.h
 
-v3 has been sent.
-
-> So something like the following:
-> 
-> diff --git a/monitor/packet.c b/monitor/packet.c
-> index c2599fe6864a..32a440bbea68 100644
-> --- a/monitor/packet.c
-> +++ b/monitor/packet.c
-> @@ -26,6 +26,7 @@
->  #include <time.h>
->  #include <sys/time.h>
->  #include <sys/socket.h>
-> +#include <limits.h>
-> 
->  #include "lib/bluetooth.h"
->  #include "lib/uuid.h"
-> @@ -376,7 +377,7 @@ static void print_packet(struct timeval *tv,
-> struct ucred *cred, char ident,
->                                         const char *text, const char *extra)
->  {
->         int col = num_columns();
-> -       char line[256], ts_str[96], pid_str[140];
-> +       char line[LINE_MAX], ts_str[96], pid_str[140];
->         int n, ts_len = 0, ts_pos = 0, len = 0, pos = 0;
->         static size_t last_frame;
-> 
->>>
->>>>
->>>>>         int n, ts_len = 0, ts_pos = 0, len = 0, pos = 0;
->>>>>         static size_t last_frame;
->>>>>
->>>>> @@ -525,6 +526,7 @@ static void print_packet(struct timeval *tv, struct ucred *cred, char ident,
->>>>>                 printf("%s%s\n", use_color() ? COLOR_TIMESTAMP : "", ts_str);
->>>>>         } else
->>>>>                 printf("%s\n", line);
->>>>> +       free(line);
->>>>>  }
->>>>>
->>>>>  static const struct {
->>>>>
->>>>> ---
->>>>> base-commit: 41f943630d9a03c40e95057b2ac3d96470b9c71e
->>>>> change-id: 20240914-fix-log-buffer-overflow-9aa5e61ee5b8
->>>>>
->>>>> Best regards,
->>>>> --
->>>>> Celeste Liu <CoelacanthusHex@gmail.com>
->>>>>
->>>>>
->>>>
->>>>
->>
-> 
-> 
+diff --git a/Makefile.obexd b/Makefile.obexd
+index 4cdce73af..866147dd1 100644
+--- a/Makefile.obexd
++++ b/Makefile.obexd
+@@ -81,6 +81,7 @@ obexd_src_obexd_SOURCES = $(btio_sources) $(gobex_sources) \
+ 			obexd/client/ftp.h obexd/client/ftp.c \
+ 			obexd/client/opp.h obexd/client/opp.c \
+ 			obexd/client/map.h obexd/client/map.c \
++			obexd/client/bip.h obexd/client/bip.c \
+ 			obexd/client/map-event.h obexd/client/map-event.c \
+ 			obexd/client/transfer.h obexd/client/transfer.c \
+ 			obexd/client/transport.h obexd/client/transport.c \
+diff --git a/doc/org.bluez.obex.Client.rst b/doc/org.bluez.obex.Client.rst
+index 5ae7cc5e8..f20dd5baa 100644
+--- a/doc/org.bluez.obex.Client.rst
++++ b/doc/org.bluez.obex.Client.rst
+@@ -43,6 +43,7 @@ object CreateSession(string destination, dict args)
+ 		:"opp":
+ 		:"pbap":
+ 		:"sync":
++		:"bip-avrcp":
+ 
+ 	:string Source:
+ 
+diff --git a/obexd/client/bip.c b/obexd/client/bip.c
+new file mode 100644
+index 000000000..252bc4cec
+--- /dev/null
++++ b/obexd/client/bip.c
+@@ -0,0 +1,171 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
++/*
++ *
++ *  OBEX Client
++ *
++ *  Copyright (C) 2024  Collabora Ltd.
++ *
++ *
++ */
++
++#define _GNU_SOURCE
++#include <errno.h>
++#include <stdlib.h>
++#include <string.h>
++
++#include "gdbus/gdbus.h"
++#include "gobex/gobex.h"
++
++#include "obexd/src/log.h"
++#include "transfer.h"
++#include "session.h"
++#include "driver.h"
++#include "bip.h"
++
++#define OBEX_BIP_AVRCP_UUID \
++	"\x71\x63\xDD\x54\x4A\x7E\x11\xE2\xB4\x7C\x00\x50\xC2\x49\x00\x48"
++#define OBEX_BIP_AVRCP_UUID_LEN 16
++
++#define IMAGE_INTERFACE "org.bluez.obex.Image1"
++#define ERROR_INTERFACE "org.bluez.obex.Error"
++#define IMAGE_UUID "0000111A-0000-1000-8000-00805f9b34fb"
++
++#define IMG_HANDLE_TAG  0x30
++
++static DBusConnection *conn;
++
++struct bip_avrcp_data {
++	struct obc_session *session;
++};
++
++static DBusMessage *get_thumbnail(DBusConnection *connection,
++					DBusMessage *message, void *user_data)
++{
++	struct bip_avrcp_data *bip_avrcp = user_data;
++	const char *handle = NULL, *image_path = NULL;
++	struct obc_transfer *transfer;
++	GObexHeader *header;
++	DBusMessage *reply = NULL;
++	GError *err = NULL;
++
++	DBG("");
++
++	if (dbus_message_get_args(message, NULL,
++				DBUS_TYPE_STRING, &image_path,
++				DBUS_TYPE_STRING, &handle,
++				DBUS_TYPE_INVALID) == FALSE) {
++		reply = g_dbus_create_error(message,
++				ERROR_INTERFACE ".InvalidArguments", NULL);
++		return reply;
++	}
++
++	transfer = obc_transfer_get("x-bt/img-thm", NULL, image_path, &err);
++	if (transfer == NULL)
++		goto fail;
++
++	header = g_obex_header_new_unicode(IMG_HANDLE_TAG, handle);
++	obc_transfer_add_header(transfer, header);
++
++	if (!obc_session_queue(bip_avrcp->session, transfer, NULL, NULL, &err))
++		goto fail;
++
++	return obc_transfer_create_dbus_reply(transfer, message);
++
++fail:
++	reply = g_dbus_create_error(message, ERROR_INTERFACE ".Failed", "%s",
++								err->message);
++	g_error_free(err);
++	return reply;
++}
++
++static const GDBusMethodTable bip_avrcp_methods[] = {
++	{ GDBUS_ASYNC_METHOD("GetThumbnail",
++		GDBUS_ARGS({ "file", "s" }, { "handle", "s"}),
++		GDBUS_ARGS({ "transfer", "o" }, { "properties", "a{sv}" }),
++		get_thumbnail) },
++	{ }
++};
++
++static void bip_avrcp_free(void *data)
++{
++	struct bip_avrcp_data *bip_avrcp = data;
++
++	obc_session_unref(bip_avrcp->session);
++	g_free(bip_avrcp);
++}
++
++static int bip_avrcp_probe(struct obc_session *session)
++{
++	struct bip_avrcp_data *bip_avrcp;
++	const char *path;
++
++	path = obc_session_get_path(session);
++
++	DBG("%s", path);
++
++	bip_avrcp = g_try_new0(struct bip_avrcp_data, 1);
++	if (!bip_avrcp)
++		return -ENOMEM;
++
++	bip_avrcp->session = obc_session_ref(session);
++
++	if (!g_dbus_register_interface(conn, path, IMAGE_INTERFACE,
++					bip_avrcp_methods,
++					NULL, NULL,
++					bip_avrcp, bip_avrcp_free)) {
++		bip_avrcp_free(bip_avrcp);
++		return -ENOMEM;
++	}
++
++	return 0;
++}
++
++static void bip_avrcp_remove(struct obc_session *session)
++{
++	const char *path = obc_session_get_path(session);
++
++	DBG("%s", path);
++
++	g_dbus_unregister_interface(conn, path, IMAGE_INTERFACE);
++}
++
++static struct obc_driver bip_avrcp = {
++	.service = "BIP-AVRCP",
++	.uuid = IMAGE_UUID,
++	.target = OBEX_BIP_AVRCP_UUID,
++	.target_len = OBEX_BIP_AVRCP_UUID_LEN,
++	.probe = bip_avrcp_probe,
++	.remove = bip_avrcp_remove
++};
++
++int bip_init(void)
++{
++	int err;
++
++	DBG("");
++
++	conn = dbus_bus_get(DBUS_BUS_SESSION, NULL);
++	if (!conn)
++		return -EIO;
++
++	err = obc_driver_register(&bip_avrcp);
++	if (err < 0)
++		goto failed;
++
++	return 0;
++
++failed:
++	dbus_connection_unref(conn);
++	conn = NULL;
++	return err;
++}
++
++void bip_exit(void)
++{
++	DBG("");
++
++	dbus_connection_unref(conn);
++	conn = NULL;
++
++	obc_driver_unregister(&bip_avrcp);
++}
+diff --git a/obexd/client/bip.h b/obexd/client/bip.h
+new file mode 100644
+index 000000000..18e3360f3
+--- /dev/null
++++ b/obexd/client/bip.h
+@@ -0,0 +1,12 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
++/*
++ *
++ *  OBEX Client
++ *
++ *  Copyright (C) 2024  Collabora Ltd.
++ *
++ *
++ */
++
++int bip_init(void);
++void bip_exit(void);
+diff --git a/obexd/client/manager.c b/obexd/client/manager.c
+index 52c00fb0c..52f4d0179 100644
+--- a/obexd/client/manager.c
++++ b/obexd/client/manager.c
+@@ -32,6 +32,7 @@
+ #include "pbap.h"
+ #include "sync.h"
+ #include "map.h"
++#include "bip.h"
+ #include "manager.h"
+ 
+ #define CLIENT_INTERFACE	"org.bluez.obex.Client1"
+@@ -258,6 +259,7 @@ static const struct obc_module {
+ 	{ "pbap", pbap_init, pbap_exit },
+ 	{ "sync", sync_init, sync_exit },
+ 	{ "map", map_init, map_exit },
++	{ "bip", bip_init, bip_exit },
+ 	{ }
+ };
+ 
+-- 
+2.34.1
 
