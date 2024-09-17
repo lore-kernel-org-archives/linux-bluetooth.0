@@ -1,43 +1,43 @@
 Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D73D97BB15
-	for <linux-bluetooth@vger.kernel.org>; Tue, 17 Sep 2024 07:42:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CE72136337
+	for <linux-bluetooth@vger.kernel.org>; Tue, 17 Sep 2024 07:42:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726558949; cv=none; b=lKagBb4mYfQDRv3f6yUCEls5aR8+VnjOPVox335ZegXQ+iiTjoliMJqtflTUC3W71YRRkCNa6ZTF2BhGDU8LFwKG+TIMVHo8/mesy7Jnq4Z1dYJ7npqUBvyZoujzZAE7YdX3BblthFBRiV3sHjrcHXVUxn80Cg4ic4P5Rguwtxc=
+	t=1726558949; cv=none; b=EYbeOH+ShXwfNFKG9D3LFyMUIONO5atUmSJAq8VkKU6ZijK/gS8e1O9vDgGmth/1Kwq+Ezn19BunFAbjFLc9KV4570CryZvq4rKTLNhEk0U6lvZIaWpZN46RTybhf8yQdUxZGFgpJhjtNCYVzGWIPoa/FVzQHAQ7NLiKC5D+HaE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1726558949; c=relaxed/simple;
-	bh=p7qzDefy4KmvnMHlngGPsS8f648+E4Q2NNUAQa67wWo=;
+	bh=smFRCYsWNavwVvSktnaHmaigHf+1dqSKNebGultjZW8=;
 	h=From:To:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=EkqyN8E4S1J6zGg2eQ666YYJiAFP/Vf+DpBnUxRcqa0h6QF2VnwYc37doWY8YBbCiYJcPej9luDqVBdXjR+Oc0Md8bALe8fq3tiheyKDj/Lsdl9qLfjYczWjywpBsbNHEpDeBT4ca2ksS++hlhvbfj410pB0QOAJGQ7FieLBGIc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=PAIKT9At; arc=none smtp.client-ip=148.251.105.195
+	 MIME-Version:Content-Type; b=KdnesKbx00ZSIrJiqKYWkNwpIrdEebjt4nPLwzoGQI6X3nS7hCsAbO05VXLYdarDYhw9WKoWDBo7p91zXjqGrucz/fTazI13EXlS3U45cnyOO2Oo7pzasodHV4Rl+0dPi4KVnsHocakpkbs+iwgD+nsuuv4yVW/GK8WnDxwdCOY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=l5nmGY0L; arc=none smtp.client-ip=148.251.105.195
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="PAIKT9At"
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="l5nmGY0L"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1726558944;
-	bh=p7qzDefy4KmvnMHlngGPsS8f648+E4Q2NNUAQa67wWo=;
+	s=mail; t=1726558945;
+	bh=smFRCYsWNavwVvSktnaHmaigHf+1dqSKNebGultjZW8=;
 	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=PAIKT9At7183ZvbmnuK1xFEb0Pr6neATEVJGjbQt0D7EvhAErcdAOHuM2hkrpWtso
-	 6hwV+r03uSspT2lcDjlGR0EbcQB9lG8euHefdKcLh0s+lh4aUoKkCEkwLoSnbTpe9m
-	 Uq7fAoL4dVIw3gUgksRc+HuWnqr8rghjxZA7WKLj/tC3pCD7Rfhb3rBUovgYmG8CHj
-	 ovuLq7qCdCz/ohrXgFq3A6QgSegwi61eD0TLUhq0BnZMthkuhBo6ZKwb703/lU50se
-	 S91K+VjA+gUm6EKsvMziMSvb9xVc+ShHzhVkMVBIvCsGhv0qCD4mKRcJeGoXsJx9b5
-	 oqK2t83H1bz0w==
+	b=l5nmGY0LJ07kq7kgXnaa0qEetlSq3VSQj/DQ51FZ0QbEDgYKmbmOc+m1OGF/dReaR
+	 pf5hm6ZiQUGGvAGGkl3EQ6V13+cJgVacTQzvlomIVyPWDhebknM/FW0Ec8pW362fRY
+	 2WuAiWGlTgsz8dK2C7/KVn9PjcY39Exmn58BzUl7kfgOKT20EJdZl5tLdgxjtmzD6z
+	 VeNfOGiZGrCceE1mHkitM/O/N7t0NbAmyZcu55NiJnHAY3ZtmmcQ54Mr8KK2RwEtcD
+	 B/VQc7KlHu75hwW/W5okUAQVlLgdPqXsA67JdFg4IQmBqnTT+amxE28ut/IzcMhmY9
+	 bs7+Mv8V20Hgw==
 Received: from fdanis-XPS-13-9370.. (67.227.121.78.rev.sfr.net [78.121.227.67])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: fdanis)
-	by bali.collaboradmins.com (Postfix) with ESMTPSA id CEA6D17E0FD6
-	for <linux-bluetooth@vger.kernel.org>; Tue, 17 Sep 2024 09:42:24 +0200 (CEST)
+	by bali.collaboradmins.com (Postfix) with ESMTPSA id 62BA917E100A
+	for <linux-bluetooth@vger.kernel.org>; Tue, 17 Sep 2024 09:42:25 +0200 (CEST)
 From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?= <frederic.danis@collabora.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v4 1/5] obexd: Add BIP client for AVRCP cover art download
-Date: Tue, 17 Sep 2024 09:42:13 +0200
-Message-Id: <20240917074217.231677-2-frederic.danis@collabora.com>
+Subject: [PATCH BlueZ v4 3/5] obexd: Add Get to org.bluez.obex.Image
+Date: Tue, 17 Sep 2024 09:42:15 +0200
+Message-Id: <20240917074217.231677-4-frederic.danis@collabora.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240917074217.231677-1-frederic.danis@collabora.com>
 References: <20240917074217.231677-1-frederic.danis@collabora.com>
@@ -50,260 +50,271 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 
-The cover art image handle is available in the metadata of the track
-when the OBEX BIP session is connected to the PSM port provided
-in AVRCP SDP record and available as org.bluez.MediaPlayer property.
+Retrieves the image corresponding to the handle and the description,
+as one of the descriptions retrieved by Properties, and store it in
+a local file.
 
-This service allows to get the thumbnail.
+If the "transform" property description exists it should be set
+to one of the value listed by Properties for this description.
 ---
- Makefile.obexd                |   1 +
- doc/org.bluez.obex.Client.rst |   1 +
- obexd/client/bip.c            | 171 ++++++++++++++++++++++++++++++++++
- obexd/client/bip.h            |  12 +++
- obexd/client/manager.c        |   2 +
- 5 files changed, 187 insertions(+)
- create mode 100644 obexd/client/bip.c
- create mode 100644 obexd/client/bip.h
+ obexd/client/bip-common.c |  21 ++++-
+ obexd/client/bip-common.h |   5 ++
+ obexd/client/bip.c        | 168 ++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 193 insertions(+), 1 deletion(-)
 
-diff --git a/Makefile.obexd b/Makefile.obexd
-index 4cdce73af..866147dd1 100644
---- a/Makefile.obexd
-+++ b/Makefile.obexd
-@@ -81,6 +81,7 @@ obexd_src_obexd_SOURCES = $(btio_sources) $(gobex_sources) \
- 			obexd/client/ftp.h obexd/client/ftp.c \
- 			obexd/client/opp.h obexd/client/opp.c \
- 			obexd/client/map.h obexd/client/map.c \
-+			obexd/client/bip.h obexd/client/bip.c \
- 			obexd/client/map-event.h obexd/client/map-event.c \
- 			obexd/client/transfer.h obexd/client/transfer.c \
- 			obexd/client/transport.h obexd/client/transport.c \
-diff --git a/doc/org.bluez.obex.Client.rst b/doc/org.bluez.obex.Client.rst
-index 5ae7cc5e8..f20dd5baa 100644
---- a/doc/org.bluez.obex.Client.rst
-+++ b/doc/org.bluez.obex.Client.rst
-@@ -43,6 +43,7 @@ object CreateSession(string destination, dict args)
- 		:"opp":
- 		:"pbap":
- 		:"sync":
-+		:"bip-avrcp":
+diff --git a/obexd/client/bip-common.c b/obexd/client/bip-common.c
+index 9e96c81d8..613b52ceb 100644
+--- a/obexd/client/bip-common.c
++++ b/obexd/client/bip-common.c
+@@ -49,7 +49,7 @@ static const gchar *convBIP2IM(const gchar *encoding)
+ 	return NULL;
+ }
  
- 	:string Source:
+-static gboolean parse_pixel_range(const gchar *dim, unsigned int *lower_ret,
++gboolean parse_pixel_range(const gchar *dim, unsigned int *lower_ret,
+ 						unsigned int *upper_ret,
+ 						gboolean *fixed_ratio_ret)
+ {
+@@ -139,6 +139,18 @@ char *transforms[] = {
+ 	NULL
+ };
  
++gboolean verify_encoding(const char *encoding)
++{
++	struct encconv_pair *et = encconv_table;
++
++	while (et->bip) {
++		if (g_strcmp0(encoding, et->bip) == 0)
++			return TRUE;
++		et++;
++	}
++	return FALSE;
++}
++
+ static gboolean verify_transform(const char *transform)
+ {
+ 	char **str = transforms;
+@@ -151,6 +163,13 @@ static gboolean verify_transform(const char *transform)
+ 	return FALSE;
+ }
+ 
++char *parse_transform(const char *transform)
++{
++	if (!verify_transform(transform))
++		return NULL;
++	return g_strdup(transform);
++}
++
+ static char *parse_transform_list(const char *transform)
+ {
+ 	char **args = NULL, **arg = NULL;
+diff --git a/obexd/client/bip-common.h b/obexd/client/bip-common.h
+index 0fee54636..6e7aac375 100644
+--- a/obexd/client/bip-common.h
++++ b/obexd/client/bip-common.h
+@@ -13,6 +13,11 @@
+ 
+ struct prop_object;
+ 
++gboolean parse_pixel_range(const gchar *dim, unsigned int *lower_ret,
++						unsigned int *upper_ret,
++						gboolean *fixed_ratio_ret);
++gboolean verify_encoding(const char *encoding);
++char *parse_transform(const char *transform);
+ struct prop_object *parse_properties(char *data, unsigned int length,
+ 							int *err);
+ gboolean verify_properties(struct prop_object *obj);
 diff --git a/obexd/client/bip.c b/obexd/client/bip.c
-new file mode 100644
-index 000000000..252bc4cec
---- /dev/null
+index e5ea5468c..9d9ecec81 100644
+--- a/obexd/client/bip.c
 +++ b/obexd/client/bip.c
-@@ -0,0 +1,171 @@
-+/* SPDX-License-Identifier: GPL-2.0-or-later */
-+/*
-+ *
-+ *  OBEX Client
-+ *
-+ *  Copyright (C) 2024  Collabora Ltd.
-+ *
-+ *
-+ */
+@@ -32,6 +32,14 @@
+ #define IMAGE_UUID "0000111A-0000-1000-8000-00805f9b34fb"
+ 
+ #define IMG_HANDLE_TAG  0x30
++#define IMG_DESC_TAG    0x71
 +
-+#define _GNU_SOURCE
-+#include <errno.h>
-+#include <stdlib.h>
-+#include <string.h>
++#define EOL_CHARS "\n"
++#define IMG_DESC_BEGIN "<image-descriptor version=\"1.0\">" EOL_CHARS
++#define IMG_BEGIN "<image encoding=\"%s\" pixel=\"%s\""
++#define IMG_TRANSFORM " transformation=\"%s\""
++#define IMG_END "/>" EOL_CHARS
++#define IMG_DESC_END "</image-descriptor>" EOL_CHARS
+ 
+ static DBusConnection *conn;
+ 
+@@ -175,11 +183,171 @@ fail:
+ 	return reply;
+ }
+ 
++static gboolean parse_get_image_dict(DBusMessage *msg, char **path,
++					char **handle, char **pixel,
++					char **encoding, uint64_t *maxsize,
++							char **transform)
++{
++	DBusMessageIter iter, array;
 +
-+#include "gdbus/gdbus.h"
-+#include "gobex/gobex.h"
++	DBG("");
 +
-+#include "obexd/src/log.h"
-+#include "transfer.h"
-+#include "session.h"
-+#include "driver.h"
-+#include "bip.h"
++	*path = NULL;
++	*handle = NULL;
++	*pixel = NULL;
++	*encoding = NULL;
++	*transform = NULL;
 +
-+#define OBEX_BIP_AVRCP_UUID \
-+	"\x71\x63\xDD\x54\x4A\x7E\x11\xE2\xB4\x7C\x00\x50\xC2\x49\x00\x48"
-+#define OBEX_BIP_AVRCP_UUID_LEN 16
++	dbus_message_iter_init(msg, &iter);
 +
-+#define IMAGE_INTERFACE "org.bluez.obex.Image1"
-+#define ERROR_INTERFACE "org.bluez.obex.Error"
-+#define IMAGE_UUID "0000111A-0000-1000-8000-00805f9b34fb"
++	if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_STRING)
++		goto failed;
++	dbus_message_iter_get_basic(&iter, path);
++	*path = g_strdup(*path);
++	if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_STRING)
++		goto failed;
++	dbus_message_iter_next(&iter);
++	dbus_message_iter_get_basic(&iter, handle);
++	*handle = g_strdup(*handle);
++	dbus_message_iter_next(&iter);
++	if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_ARRAY)
++		goto failed;
 +
-+#define IMG_HANDLE_TAG  0x30
++	dbus_message_iter_recurse(&iter, &array);
 +
-+static DBusConnection *conn;
++	while (dbus_message_iter_get_arg_type(&array) == DBUS_TYPE_DICT_ENTRY) {
++		DBusMessageIter entry, value;
++		const char *key, *val;
 +
-+struct bip_avrcp_data {
-+	struct obc_session *session;
-+};
++		dbus_message_iter_recurse(&array, &entry);
 +
-+static DBusMessage *get_thumbnail(DBusConnection *connection,
++		if (dbus_message_iter_get_arg_type(&entry) != DBUS_TYPE_STRING)
++			return FALSE;
++		dbus_message_iter_get_basic(&entry, &key);
++		dbus_message_iter_next(&entry);
++		dbus_message_iter_recurse(&entry, &value);
++		switch (dbus_message_iter_get_arg_type(&value)) {
++		case DBUS_TYPE_STRING:
++			dbus_message_iter_get_basic(&value, &val);
++			if (g_str_equal(key, "pixel")) {
++				if (!parse_pixel_range(val, NULL, NULL, NULL))
++					goto failed;
++				*pixel = g_strdup(val);
++			} else if (g_str_equal(key, "encoding")) {
++				if (!verify_encoding(val))
++					goto failed;
++				*encoding = g_strdup(val);
++				if (*encoding == NULL)
++					goto failed;
++			} else if (g_str_equal(key, "transformation")) {
++				*transform = parse_transform(val);
++				if (*transform == NULL)
++					goto failed;
++			}
++			break;
++		case DBUS_TYPE_UINT64:
++			if (g_str_equal(key, "maxsize") == TRUE) {
++				dbus_message_iter_get_basic(&value, maxsize);
++				if (*maxsize == 0)
++					goto failed;
++			}
++			break;
++		}
++		dbus_message_iter_next(&array);
++	}
++
++	if (*pixel == NULL)
++		*pixel = strdup("");
++	if (*encoding == NULL)
++		*encoding = strdup("");
++
++	DBG("pixel: '%s' encoding: '%s' maxsize: '%lu' transform: '%s'",
++			*pixel, *encoding, *maxsize, *transform
++	);
++
++	return TRUE;
++failed:
++	g_free(*path);
++	g_free(*handle);
++	g_free(*pixel);
++	g_free(*encoding);
++	g_free(*transform);
++	return FALSE;
++}
++
++static DBusMessage *get_image(DBusConnection *connection,
 +					DBusMessage *message, void *user_data)
 +{
 +	struct bip_avrcp_data *bip_avrcp = user_data;
-+	const char *handle = NULL, *image_path = NULL;
++	char *handle = NULL, *image_path = NULL, *transform = NULL,
++		*encoding = NULL, *pixel = NULL;
++	uint64_t maxsize;
 +	struct obc_transfer *transfer;
 +	GObexHeader *header;
 +	DBusMessage *reply = NULL;
++	GString *descriptor = NULL;
 +	GError *err = NULL;
 +
 +	DBG("");
 +
-+	if (dbus_message_get_args(message, NULL,
-+				DBUS_TYPE_STRING, &image_path,
-+				DBUS_TYPE_STRING, &handle,
-+				DBUS_TYPE_INVALID) == FALSE) {
-+		reply = g_dbus_create_error(message,
++	if (!parse_get_image_dict(message, &image_path, &handle, &pixel,
++					&encoding, &maxsize, &transform))
++		return g_dbus_create_error(message,
 +				ERROR_INTERFACE ".InvalidArguments", NULL);
-+		return reply;
-+	}
 +
-+	transfer = obc_transfer_get("x-bt/img-thm", NULL, image_path, &err);
-+	if (transfer == NULL)
++	transfer = obc_transfer_get("x-bt/img-img", NULL, image_path, &err);
++	if (transfer == NULL) {
++		reply = g_dbus_create_error(message, ERROR_INTERFACE ".Failed",
++						"%s",
++						err->message);
++		g_error_free(err);
 +		goto fail;
++	}
 +
 +	header = g_obex_header_new_unicode(IMG_HANDLE_TAG, handle);
 +	obc_transfer_add_header(transfer, header);
 +
-+	if (!obc_session_queue(bip_avrcp->session, transfer, NULL, NULL, &err))
-+		goto fail;
++	descriptor = g_string_new(IMG_DESC_BEGIN);
++	g_string_append_printf(descriptor, IMG_BEGIN, encoding, pixel);
++	if (transform != NULL)
++		g_string_append_printf(descriptor, IMG_TRANSFORM, transform);
++	g_string_append(descriptor, IMG_END);
++	descriptor = g_string_append(descriptor, IMG_DESC_END);
++	header = g_obex_header_new_bytes(IMG_DESC_TAG, descriptor->str,
++						descriptor->len);
++	obc_transfer_add_header(transfer, header);
++	g_string_free(descriptor, TRUE);
 +
-+	return obc_transfer_create_dbus_reply(transfer, message);
++	if (!obc_session_queue(bip_avrcp->session, transfer, NULL, NULL,
++								&err)) {
++		reply = g_dbus_create_error(message, ERROR_INTERFACE ".Failed",
++						"%s",
++						err->message);
++		g_error_free(err);
++		goto fail;
++	}
++
++	reply = obc_transfer_create_dbus_reply(transfer, message);
 +
 +fail:
-+	reply = g_dbus_create_error(message, ERROR_INTERFACE ".Failed", "%s",
-+								err->message);
-+	g_error_free(err);
++	g_free(handle);
++	g_free(image_path);
++	g_free(transform);
++	g_free(encoding);
++	g_free(pixel);
 +	return reply;
 +}
 +
-+static const GDBusMethodTable bip_avrcp_methods[] = {
-+	{ GDBUS_ASYNC_METHOD("GetThumbnail",
-+		GDBUS_ARGS({ "file", "s" }, { "handle", "s"}),
+ static const GDBusMethodTable bip_avrcp_methods[] = {
+ 	{ GDBUS_ASYNC_METHOD("Properties",
+ 		GDBUS_ARGS({ "handle", "s"}),
+ 		GDBUS_ARGS({ "properties", "aa{sv}" }),
+ 		get_image_properties) },
++	{ GDBUS_ASYNC_METHOD("Get",
++		GDBUS_ARGS({ "file", "s" }, { "handle", "s"},
++				{"properties", "a{sv}"}),
 +		GDBUS_ARGS({ "transfer", "o" }, { "properties", "a{sv}" }),
-+		get_thumbnail) },
-+	{ }
-+};
-+
-+static void bip_avrcp_free(void *data)
-+{
-+	struct bip_avrcp_data *bip_avrcp = data;
-+
-+	obc_session_unref(bip_avrcp->session);
-+	g_free(bip_avrcp);
-+}
-+
-+static int bip_avrcp_probe(struct obc_session *session)
-+{
-+	struct bip_avrcp_data *bip_avrcp;
-+	const char *path;
-+
-+	path = obc_session_get_path(session);
-+
-+	DBG("%s", path);
-+
-+	bip_avrcp = g_try_new0(struct bip_avrcp_data, 1);
-+	if (!bip_avrcp)
-+		return -ENOMEM;
-+
-+	bip_avrcp->session = obc_session_ref(session);
-+
-+	if (!g_dbus_register_interface(conn, path, IMAGE_INTERFACE,
-+					bip_avrcp_methods,
-+					NULL, NULL,
-+					bip_avrcp, bip_avrcp_free)) {
-+		bip_avrcp_free(bip_avrcp);
-+		return -ENOMEM;
-+	}
-+
-+	return 0;
-+}
-+
-+static void bip_avrcp_remove(struct obc_session *session)
-+{
-+	const char *path = obc_session_get_path(session);
-+
-+	DBG("%s", path);
-+
-+	g_dbus_unregister_interface(conn, path, IMAGE_INTERFACE);
-+}
-+
-+static struct obc_driver bip_avrcp = {
-+	.service = "BIP-AVRCP",
-+	.uuid = IMAGE_UUID,
-+	.target = OBEX_BIP_AVRCP_UUID,
-+	.target_len = OBEX_BIP_AVRCP_UUID_LEN,
-+	.probe = bip_avrcp_probe,
-+	.remove = bip_avrcp_remove
-+};
-+
-+int bip_init(void)
-+{
-+	int err;
-+
-+	DBG("");
-+
-+	conn = dbus_bus_get(DBUS_BUS_SESSION, NULL);
-+	if (!conn)
-+		return -EIO;
-+
-+	err = obc_driver_register(&bip_avrcp);
-+	if (err < 0)
-+		goto failed;
-+
-+	return 0;
-+
-+failed:
-+	dbus_connection_unref(conn);
-+	conn = NULL;
-+	return err;
-+}
-+
-+void bip_exit(void)
-+{
-+	DBG("");
-+
-+	dbus_connection_unref(conn);
-+	conn = NULL;
-+
-+	obc_driver_unregister(&bip_avrcp);
-+}
-diff --git a/obexd/client/bip.h b/obexd/client/bip.h
-new file mode 100644
-index 000000000..18e3360f3
---- /dev/null
-+++ b/obexd/client/bip.h
-@@ -0,0 +1,12 @@
-+/* SPDX-License-Identifier: GPL-2.0-or-later */
-+/*
-+ *
-+ *  OBEX Client
-+ *
-+ *  Copyright (C) 2024  Collabora Ltd.
-+ *
-+ *
-+ */
-+
-+int bip_init(void);
-+void bip_exit(void);
-diff --git a/obexd/client/manager.c b/obexd/client/manager.c
-index 52c00fb0c..52f4d0179 100644
---- a/obexd/client/manager.c
-+++ b/obexd/client/manager.c
-@@ -32,6 +32,7 @@
- #include "pbap.h"
- #include "sync.h"
- #include "map.h"
-+#include "bip.h"
- #include "manager.h"
- 
- #define CLIENT_INTERFACE	"org.bluez.obex.Client1"
-@@ -258,6 +259,7 @@ static const struct obc_module {
- 	{ "pbap", pbap_init, pbap_exit },
- 	{ "sync", sync_init, sync_exit },
- 	{ "map", map_init, map_exit },
-+	{ "bip", bip_init, bip_exit },
- 	{ }
- };
- 
++		get_image) },
+ 	{ GDBUS_ASYNC_METHOD("GetThumbnail",
+ 		GDBUS_ARGS({ "file", "s" }, { "handle", "s"}),
+ 		GDBUS_ARGS({ "transfer", "o" }, { "properties", "a{sv}" }),
 -- 
 2.34.1
 
