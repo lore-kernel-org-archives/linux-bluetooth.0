@@ -1,104 +1,100 @@
-Received: from mail-qv1-f53.google.com (mail-qv1-f53.google.com [209.85.219.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 922BF17D344
-	for <linux-bluetooth@vger.kernel.org>; Thu, 19 Sep 2024 10:09:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.53
+Received: from iodev.co.uk (iodev.co.uk [46.30.189.100])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7FBC81DA23
+	for <linux-bluetooth@vger.kernel.org>; Thu, 19 Sep 2024 12:03:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.30.189.100
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726740578; cv=none; b=l4tb+Do11DkpGu1PxQrq7t3UQfKlHhPRPc4ppIobgZ0oJQ6o2Ok8GwFzLJyT1f3OJ6pX/aYpFct5uA6zStthR+rtPacuR1CngxHLPN3rmoJ1kpBHhOMp/r4fGacizm2OKxupRjmL8HGdrfYRJtiu3tDEXg3Ym87t95Wrfntv5YQ=
+	t=1726747394; cv=none; b=t0x9IyYf2GuXJRjay1W8Uqb9DIc2A0z1B170oP3BT0ju7Al2SuIt63rJi/+Nu0zDs+c4Q2PDbFx85qNyO0V6WrnRZrKDLE2oVB6FanxsdEGZtjgHqVbwxK1/MYMm9RT5iaao7qAhio1Z418adTzndmRaY26WsgO++0laF7ICjxM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726740578; c=relaxed/simple;
-	bh=ZecpU0MZOyATwt/gYfD2gPkQHzibrfmomTjdlmoytdc=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=NEGpPYDDDoWggYBaVO+7MwPNWdKaOwdU4DUmHjqETXwSag4o5otAr8Y02iiaCbs70xI5JvWv608ZTc3KrglgzsmroZoR6a5atRTWFpqpATGRswEM9OGBvvcA7M7vGf+KbHDyzOH2MsvWjK+H1wkLwTR8qrB/znt4b6W1uNWKdUw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KIbC4Wgw; arc=none smtp.client-ip=209.85.219.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KIbC4Wgw"
-Received: by mail-qv1-f53.google.com with SMTP id 6a1803df08f44-6c354415c19so4842906d6.2
-        for <linux-bluetooth@vger.kernel.org>; Thu, 19 Sep 2024 03:09:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1726740575; x=1727345375; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=zt11ijXFn8hqS3ijeX4ooynARjNX2HD6WAKEJSEBhfw=;
-        b=KIbC4Wgw+S62HHmVko29FtLIS55DKrC0GHi3fs+aMmmteEDLiXtyEqzaogFC5XXQMM
-         WryqZzKW+hpgbbWqs1Ht4NpxPaT+M2+t91ABYgiEEml1aDsKviMnPuPemyVm1i1KFXeq
-         YP2bY8sLSmbv7fK/dImgVeAJNb15cakS03/ZI9jywkn7w0x1LsxIberAdB9J3u01um1h
-         ImNAXOwJEVSRhujtmLmV8Njy9jZUX0Wj7uiRSziQP7JEupMXaup/vfThHR+B0KuEH57c
-         hychziJxf9bC1StYWGCm9xy5BtAd2+dqnyaBBkYRgrHDVbY6P2rSCra+mtBvmZqBpriP
-         D9iQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726740575; x=1727345375;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=zt11ijXFn8hqS3ijeX4ooynARjNX2HD6WAKEJSEBhfw=;
-        b=H5f740vBCZYWm4FZsP/2t8ihmmHbfsPZFlRNJ5SMCvhd4G7Mx6Ia1tBUixGUI9/twn
-         A/FjfrwkDmaqvahAlOvgGMMwplXmFp9sQBF4BSvIu89By3j7Izr4ELhXCml/UBKt4IcB
-         5uTshVF+V29Sm1RxXV7ekNzCj0O4DVQG8kfkqozagJbm7ogqoSL3fUs8jeY0tDC0hsCr
-         pabmjPGm+RYLyMzWeK42ZIevjG4LRpgu7Demfp2MARJMbHUWExr1QI1I0/NMn2Cs96L+
-         fil18gxQnjy6n23kqswsKx5VIkmpr/9Q+UITjJ/ha6/7LBak7s3IY67H2dh48DVlyexf
-         dnTg==
-X-Gm-Message-State: AOJu0YymWOXvtTZjtUUjSNhCglRWpBg79Qlad6MTOQEFLq4dnmbsRhL+
-	veWc/+qfTAuXc4Hs4V0BkG48L7885S0Dqrhyq210ssb9q5GoAwXmkq/ytVPg
-X-Google-Smtp-Source: AGHT+IGTLDR0a4592cp1yonPx8VysYYYS6UXNXnbvT/QV1jBnaBsoBuq7Pi4uWeg9GtrXfWIAybxrw==
-X-Received: by 2002:a05:6214:3907:b0:6c5:2fce:4904 with SMTP id 6a1803df08f44-6c57355e7bamr387260126d6.12.1726740575128;
-        Thu, 19 Sep 2024 03:09:35 -0700 (PDT)
-Received: from [172.17.0.2] ([172.171.255.192])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6c75e586b42sm5785486d6.138.2024.09.19.03.09.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 19 Sep 2024 03:09:34 -0700 (PDT)
-Message-ID: <66ebf85e.050a0220.249880.1c99@mx.google.com>
-Date: Thu, 19 Sep 2024 03:09:34 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============2177975399061401861=="
+	s=arc-20240116; t=1726747394; c=relaxed/simple;
+	bh=BQ0bUWsu/xxRoIoqKiDPxpd/7W4IPho+xkq3LOVY+2g=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=RZwO8fdhT6t1QejPWiD5j+tYkJ4VG6vfrgs0vFiB2SX5lTLSr28g6OdYQ909iJrAxXWmFdeyyXU3iM70kEvbSyyHqvbRhqXQuH2poq1IUvpBEWpDa3iYegbwR3BF0ADZ3fMXtz61j5jDv6YeqcOOaGseEMnQ9UElEZ9segYwky0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=iodev.co.uk; spf=pass smtp.mailfrom=iodev.co.uk; arc=none smtp.client-ip=46.30.189.100
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=iodev.co.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iodev.co.uk
+Received: from localhost (unknown [83.68.141.146])
+	by iodev.co.uk (Postfix) with ESMTPSA id 24DCD3497E8;
+	Thu, 19 Sep 2024 14:03:04 +0200 (CEST)
+From: Ismael Luceno <ismael@iodev.co.uk>
+To: linux-bluetooth@vger.kernel.org
+Cc: Ismael Luceno <ismael@iodev.co.uk>
+Subject: [PATCH v3] Replace the usage of non-standard GNU-basename with strrchr
+Date: Thu, 19 Sep 2024 14:02:46 +0200
+Message-ID: <20240919120252.25086-2-ismael@iodev.co.uk>
+X-Mailer: git-send-email 2.46.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, iulia.tanasescu@nxp.com
-Subject: RE: bap: Set bap debug func at broadcast probe
-In-Reply-To: <20240919082046.7208-2-iulia.tanasescu@nxp.com>
-References: <20240919082046.7208-2-iulia.tanasescu@nxp.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 
---===============2177975399061401861==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Fixes build against musl libc, since it doesn't provide a GNU-compatible
+implementation of basename.
 
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=891354
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      0.48 seconds
-GitLint                       PASS      0.34 seconds
-BuildEll                      PASS      24.11 seconds
-BluezMake                     PASS      1659.41 seconds
-MakeCheck                     PASS      13.50 seconds
-MakeDistcheck                 PASS      181.74 seconds
-CheckValgrind                 PASS      255.39 seconds
-CheckSmatch                   PASS      358.33 seconds
-bluezmakeextell               PASS      119.25 seconds
-IncrementalBuild              PASS      1478.98 seconds
-ScanBuild                     PASS      1078.56 seconds
-
-
-
+Signed-off-by: Ismael Luceno <ismael@iodev.co.uk>
 ---
-Regards,
-Linux Bluetooth
 
+Notes:
+    Changes since v2:
+    - Fixed style complaint from checkpatch.pl
+    
+    Changes since v1:
+    - Fixed missing parameter at mesh/rpl.c:150
 
---===============2177975399061401861==--
+ mesh/mesh-config-json.c | 4 +++-
+ mesh/rpl.c              | 4 +++-
+ tools/hex2hcd.c         | 7 ++++++-
+ 3 files changed, 12 insertions(+), 3 deletions(-)
+
+diff --git a/mesh/mesh-config-json.c b/mesh/mesh-config-json.c
+index a17a48b6d11f..49b9d01a7ef4 100644
+--- a/mesh/mesh-config-json.c
++++ b/mesh/mesh-config-json.c
+@@ -2708,7 +2708,9 @@ void mesh_config_destroy_nvm(struct mesh_config *cfg)
+ 	if (!hex2str(cfg->uuid, 16, uuid, sizeof(uuid)))
+ 		return;
+ 
+-	node_name = basename(node_dir);
++	node_name = strrchr(node_dir, '/');
++	if (!node_name++)
++		node_name = node_dir;
+ 
+ 	/* Make sure path name of node follows expected guidelines */
+ 	if (strcmp(node_name, uuid))
+diff --git a/mesh/rpl.c b/mesh/rpl.c
+index 2fa17d72f6cb..1c58703eae4e 100644
+--- a/mesh/rpl.c
++++ b/mesh/rpl.c
+@@ -147,7 +147,9 @@ static void get_entries(const char *iv_path, struct l_queue *rpl_list)
+ 	if (!dir)
+ 		return;
+ 
+-	iv_txt = basename(iv_path);
++	iv_txt = strrchr(iv_path, '/');
++	if (!iv_txt++)
++		iv_txt = iv_path;
+ 	if (sscanf(iv_txt, "%08x", &iv_index) != 1) {
+ 		closedir(dir);
+ 		return;
+diff --git a/tools/hex2hcd.c b/tools/hex2hcd.c
+index 452ab2beb572..6f7c826b683d 100644
+--- a/tools/hex2hcd.c
++++ b/tools/hex2hcd.c
+@@ -303,7 +303,12 @@ static void ver_parse_entry(const char *pathname)
+ 	}
+ 
+ 	if (S_ISREG(st.st_mode)) {
+-		ver_parse_file(basename(pathname));
++		const char *bname;
++		
++		bname = strrchr(pathname, '/');
++		if (!bname++)
++			bname = pathname;
++		ver_parse_file(bname);
+ 		goto done;
+ 	}
+ 
+-- 
+2.46.0
+
