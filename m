@@ -1,141 +1,169 @@
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f175.google.com (mail-lj1-f175.google.com [209.85.208.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D82A13C918
-	for <linux-bluetooth@vger.kernel.org>; Fri, 20 Sep 2024 09:58:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE4BA17B427;
+	Fri, 20 Sep 2024 14:55:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726826321; cv=none; b=PRMc7isD46MPjFGV/dnhkzyBbIYBW+uovF7BOkiUZxxKWgGkkdABGCn7U+owk3eFUMRJTpksUpiEIfuJB0V2eUD2lSobDg6DacKINIOvigaMTN3xcH/lQlrceY+hV8yFwJAtHhQO+bksoTgVNcJEGYDLOd/zwmiuEjdRjn9eP8g=
+	t=1726844108; cv=none; b=WqAEv0AvQ6YnA7HhFyPL4yh/O/XLMRZYEWZdzuZoqH8u33W+jF5+0bhMnbi2fPU5Wk36gol60XrtM4iz2EIm/rBBqHV+Xlm08+P1Df3Ph8l054vHGBbaehxEr84vLWiatlyQwe0BGc90HYI6clef1QDfkexmUmi4+ZDdbaCNSgI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726826321; c=relaxed/simple;
-	bh=JPPkNBIlG1sDjkv72Zjh1frfPSvkMTWjqSkfkd46nVQ=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-ID:To:CC; b=tk8s7gc+1i+G2eG4oaR5s0xaCs1UOz/RQEjWjwXYaXCaFOeXNLGqGrVShPBH4+UwFbZSqJolLZv2wv0DOlAuClh3WE937N4uMcnMJ41aF0QCFB0jtoipI6m5Tca1rPeSe380UfABQ1uzQh/uRVd1wBZWrveuaZWCb+J4/QPI99g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=oHmRDIF3; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+	s=arc-20240116; t=1726844108; c=relaxed/simple;
+	bh=RoJg69/sSksKDasmFyN/iEDFBNBh8oRsNnabyTCKEAg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=CpKbYNwAF8Dz7BH4uAT7wSx9MA0WB08AcoxLHjz7eJwua+tUQiP29b9tUEKfH23TTCRM0tbPnDbr7S6nivk5++NTQ954gmO+Fsp1VdOmfHsBVClPXmJLPNyCidzjaSkEdWTQKfVuliuYRY0EnfBZmDFc+xRCgHPZCpAO2Ho3A4s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=c8ozusu7; arc=none smtp.client-ip=209.85.208.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="oHmRDIF3"
-Received: from pps.filterd (m0279871.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 48K83A7Q018307;
-	Fri, 20 Sep 2024 09:58:35 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:message-id
-	:mime-version:subject:to; s=qcppdkim1; bh=KAnPjz1UBgyZhw/WC143h1
-	+HZQA+H14hpnp++CmKGco=; b=oHmRDIF3D/NwCnTFx74aIth8pNA5KAzo1eJcrq
-	tFFlpaUmyJCzBYuQKASWAVnt+OaDbe4BT3cCb3KuNhp9fkzCdjVNli2zr2HOS65e
-	/QlU8O4ESHf+9o3ZywlzYDPOWGLVkH4hubkihoaCvgeMyENmhGTKbHTttNTUFzU8
-	IkbWinT5qP7Vw9pMBITiKiRS4EzZ4G5x949X/Qzmlw18LPHN2OUulILLqF4Hi71B
-	H9gM/QU8Jj84h6fZPxlp1Vlge6NwwwW38s4LAIjg+uMNXgHSVSYanVH6E39t/9GA
-	5mCrhISYN3RGFgsZQWqnQl12wSj3bMjA4FzUDSHGr5W1Kj/g==
-Received: from nasanppmta01.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 41n4hhgk89-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 20 Sep 2024 09:58:35 +0000 (GMT)
-Received: from nasanex01a.na.qualcomm.com (nasanex01a.na.qualcomm.com [10.52.223.231])
-	by NASANPPMTA01.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 48K9wXoY009607
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 20 Sep 2024 09:58:33 GMT
-Received: from hu-zijuhu-lv.qualcomm.com (10.49.16.6) by
- nasanex01a.na.qualcomm.com (10.52.223.231) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.9; Fri, 20 Sep 2024 02:58:33 -0700
-From: Zijun Hu <quic_zijuhu@quicinc.com>
-Date: Fri, 20 Sep 2024 02:58:14 -0700
-Subject: [PATCH] Bluetooth: btusb: Add one more ID 0x0489:0xe0f3 for
- Qualcomm WCN785x
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="c8ozusu7"
+Received: by mail-lj1-f175.google.com with SMTP id 38308e7fff4ca-2f74e613a10so33832301fa.1;
+        Fri, 20 Sep 2024 07:55:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1726844105; x=1727448905; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Urf9epkit9Wnq7mh+mMh5qFW8LtYH5Rj1D3J2QjXNes=;
+        b=c8ozusu7AUZjY+phJYkaEg9cBuwDEWPwhdNqJVPyjX1BwStdpMa7j/tMmxU3xNR8IO
+         W/DxGABXUHaIeeMTiXt3tYFCXWDbDePK3oIEyiOx3nUvLAjk2NgPwoWZz8EOkfDg+Lf7
+         Ajg4rMH2Ya8J0ty2n0eLcnboz/KuvPn1wSuDBRmPUhAvpAU0XFA7K5HrhCVgFh7AM7E6
+         bT8fL4SSLoVXuw3GeHqqbqnEA6PS/VQmvfh0zmORlcGlocMIfrtQGSvvQEtdRohmQrzf
+         HR4LCSAQRvQSpwHXj1bAhi53bsUlA8oERTcYGCJnTJtFaDdzTy7HvslpWnBxj/YvLhG2
+         rVyw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1726844105; x=1727448905;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Urf9epkit9Wnq7mh+mMh5qFW8LtYH5Rj1D3J2QjXNes=;
+        b=gOc9/F4+5ppdPzaj20OCEFLta0DdCsstUucjIZCyu41LFax7lNBZiJj2wpB2+8l+Xb
+         QldQxHLJztHwPtZ/8EqZq9YoRPjSJSaYLuU9Isi7itnGkeWGJwRDger950SCFJM3MOCJ
+         uZACzu7/N6uAZSDyTA+4nyU95orACLHLRnVWHAIPWI7N6nE/sRe0qJrwDP+pk7wltb1D
+         LEHOLFIqGFwBzZNJV/9J6vwbcDoLISWGTZKKb9fhgneBPl+KXHZRUvmDKFfUhAed5o1M
+         VTkxSTh33mO7hmd7vpveRrzSdqLVtrTipBCOAAV1Hfr9FWQPUewj9dXh3/uu05otE9Td
+         T4pA==
+X-Forwarded-Encrypted: i=1; AJvYcCVGvwxfvvKFTvGYlBV6byJONEKtWuVIlE2/VHDrrXHyQAMQp+Iuw6yhHaS6DsmXES4McSlYUj1mYA1JKmh0Kx4=@vger.kernel.org, AJvYcCXS4qcKSgH5T6jM3YXXy/4tvrIbAZSJ7cpDq/Y6DxBR9zJfsqEzxgerYslAGTAyXqoFMoORQclsCHbi/B9z@vger.kernel.org
+X-Gm-Message-State: AOJu0YzjCAyb1hXkTE1mfoLbSRNIIJg1IOKQRVvmfz99eBMcNrOwzT1t
+	sDEYDhb29dozuao6y/SEyL9QVhLr9SWnXQZk55BbpQQa/wjue5uldq6j9zdJsiuq5utle2WgaSq
+	dTm/WPwQ2enHNrNFAVSWyHyhQlRg=
+X-Google-Smtp-Source: AGHT+IGRMbJOtLIe11lU8+yttfrugpnh34xPWQlgkz2BjnvZmPECE9B5LY05OCCCUvgqw8AZro92Tf2rVv9ya4d944k=
+X-Received: by 2002:a2e:a9a2:0:b0:2ef:1b1b:7f42 with SMTP id
+ 38308e7fff4ca-2f7cb367bf3mr29478471fa.36.1726844104528; Fri, 20 Sep 2024
+ 07:55:04 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-ID: <20240920-btusb_add_id-v1-1-8c488ccf83ae@quicinc.com>
-X-B4-Tracking: v=1; b=H4sIADVH7WYC/6tWKk4tykwtVrJSqFYqSi3LLM7MzwNyDHUUlJIzE
- vPSU3UzU4B8JSMDIxMDS0NL3aSS0uKk+MSUlPjMFF2z5KQ0UwMTM9OUxEQloJaCotS0zAqwcdG
- xtbUAl7EEA14AAAA=
-To: Marcel Holtmann <marcel@holtmann.org>,
-        Luiz Augusto von Dentz
-	<luiz.dentz@gmail.com>
-CC: <linux-bluetooth@vger.kernel.org>, Zijun Hu <quic_zijuhu@quicinc.com>
-X-Mailer: b4 0.14.1
-X-ClientProxiedBy: nalasex01c.na.qualcomm.com (10.47.97.35) To
- nasanex01a.na.qualcomm.com (10.52.223.231)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: pWt8kZ-uasRlfk-sX4wwMdLhS3HH72eR
-X-Proofpoint-ORIG-GUID: pWt8kZ-uasRlfk-sX4wwMdLhS3HH72eR
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
- definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 suspectscore=0
- adultscore=0 impostorscore=0 phishscore=0 priorityscore=1501 clxscore=1011
- mlxlogscore=895 mlxscore=0 spamscore=0 lowpriorityscore=0 malwarescore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2408220000
- definitions=main-2409200071
+References: <20240919074925.22860-1-chris.lu@mediatek.com> <20240919074925.22860-4-chris.lu@mediatek.com>
+In-Reply-To: <20240919074925.22860-4-chris.lu@mediatek.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Fri, 20 Sep 2024 10:54:52 -0400
+Message-ID: <CABBYNZJ62dw0JHTrNK7xe9_kO61_gH9+XGPm+UEWw4CGRVCnnQ@mail.gmail.com>
+Subject: Re: [PATCH v2 3/4] Bluetooth: btusb: mediatek: add intf release flow
+ when usb disconnect
+To: Chris Lu <chris.lu@mediatek.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg <johan.hedberg@gmail.com>, 
+	Sean Wang <sean.wang@mediatek.com>, Aaron Hou <aaron.hou@mediatek.com>, 
+	Steve Lee <steve.lee@mediatek.com>, linux-bluetooth <linux-bluetooth@vger.kernel.org>, 
+	linux-kernel <linux-kernel@vger.kernel.org>, 
+	linux-mediatek <linux-mediatek@lists.infradead.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Add one more part with ID (0x0489, 0xe0f3) to usb_device_id table for
-Qualcomm WCN785x, and its device info from /sys/kernel/debug/usb/devices
-is shown below:
+Hi Chris,
 
-T:  Bus=01 Lev=01 Prnt=01 Port=13 Cnt=03 Dev#=  4 Spd=12   MxCh= 0
-D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-P:  Vendor=0489 ProdID=e0f3 Rev= 0.01
-C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
-I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
-E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-I:  If#= 1 Alt= 6 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  63 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  63 Ivl=1ms
-I:  If#= 1 Alt= 7 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  65 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  65 Ivl=1ms
+On Thu, Sep 19, 2024 at 3:49=E2=80=AFAM Chris Lu <chris.lu@mediatek.com> wr=
+ote:
+>
+> MediaTek claim an special usb intr interface for ISO data transmission.
+> The interface need to be released before unregistering hci device when
+> usb disconnect. Removing BT usb dongle without properly releasing the
+> interface may cause Kernel panic while unregister hci device.
+>
+> Signed-off-by: Chris Lu <chris.lu@mediatek.com>
+> ---
+>  drivers/bluetooth/btusb.c | 12 +++++++-----
+>  1 file changed, 7 insertions(+), 5 deletions(-)
+>
+> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+> index dfc42bdc8aaf..37e67b451b34 100644
+> --- a/drivers/bluetooth/btusb.c
+> +++ b/drivers/bluetooth/btusb.c
+> @@ -2614,9 +2614,9 @@ static void btusb_mtk_claim_iso_intf(struct btusb_d=
+ata *data)
+>         set_bit(BTMTK_ISOPKT_OVER_INTR, &btmtk_data->flags);
+>  }
+>
+> -static void btusb_mtk_release_iso_intf(struct btusb_data *data)
+> +static int btusb_mtk_release_iso_intf(struct hci_dev *hdev)
+>  {
+> -       struct btmtk_data *btmtk_data =3D hci_get_priv(data->hdev);
+> +       struct btmtk_data *btmtk_data =3D hci_get_priv(hdev);
+>
+>         if (btmtk_data->isopkt_intf) {
+>                 usb_kill_anchored_urbs(&btmtk_data->isopkt_anchor);
+> @@ -2630,6 +2630,8 @@ static void btusb_mtk_release_iso_intf(struct btusb=
+_data *data)
+>         }
+>
+>         clear_bit(BTMTK_ISOPKT_OVER_INTR, &btmtk_data->flags);
+> +
+> +       return 0;
+>  }
+>
+>  static int btusb_mtk_reset(struct hci_dev *hdev, void *rst_data)
+> @@ -2649,7 +2651,7 @@ static int btusb_mtk_reset(struct hci_dev *hdev, vo=
+id *rst_data)
+>                 return err;
+>
+>         if (test_bit(BTMTK_ISOPKT_RUNNING, &btmtk_data->flags))
+> -               btusb_mtk_release_iso_intf(data);
+> +               btusb_mtk_release_iso_intf(hdev);
 
-Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
----
- drivers/bluetooth/btusb.c | 2 ++
- 1 file changed, 2 insertions(+)
+We can probably move the check for BTMTK_ISOPKT_RUNNING into
+btusb_mtk_release_iso_intf to avoid having to duplicate it whenever
+calling btusb_mtk_release_iso_intf.
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 6c9c761d5b93..91b96fad2310 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -371,6 +371,8 @@ static const struct usb_device_id quirks_table[] = {
- 	/* QCA WCN785x chipset */
- 	{ USB_DEVICE(0x0cf3, 0xe700), .driver_info = BTUSB_QCA_WCN6855 |
- 						     BTUSB_WIDEBAND_SPEECH },
-+	{ USB_DEVICE(0x0489, 0xe0f3), .driver_info = BTUSB_QCA_WCN6855 |
-+						     BTUSB_WIDEBAND_SPEECH },
- 
- 	/* Broadcom BCM2035 */
- 	{ USB_DEVICE(0x0a5c, 0x2009), .driver_info = BTUSB_BCM92035 },
+>
+>         btusb_stop_traffic(data);
+>         usb_kill_anchored_urbs(&data->tx_anchor);
+> @@ -2703,14 +2705,13 @@ static int btusb_mtk_setup(struct hci_dev *hdev)
+>
+>  static int btusb_mtk_shutdown(struct hci_dev *hdev)
+>  {
+> -       struct btusb_data *data =3D hci_get_drvdata(hdev);
+>         struct btmtk_data *btmtk_data =3D hci_get_priv(hdev);
+>         int ret;
+>
+>         ret =3D btmtk_usb_shutdown(hdev);
+>
+>         if (test_bit(BTMTK_ISOPKT_RUNNING, &btmtk_data->flags))
+> -               btusb_mtk_release_iso_intf(data);
+> +               btusb_mtk_release_iso_intf(hdev);
 
----
-base-commit: eb3ad76a07b6cdaaa156766da5fe6c384a12930b
-change-id: 20240919-btusb_add_id-6cbf50465daa
+Ditto.
 
-Best regards,
--- 
-Zijun Hu <quic_zijuhu@quicinc.com>
+>         return ret;
+>  }
+> @@ -3824,6 +3825,7 @@ static int btusb_probe(struct usb_interface *intf,
+>                 data->recv_acl =3D btmtk_usb_recv_acl;
+>                 data->suspend =3D btmtk_usb_suspend;
+>                 data->resume =3D btmtk_usb_resume;
+> +               data->disconnect =3D btusb_mtk_release_iso_intf;
 
+I'd wrap (e.g. btmtk_usb_disconnect) the call to
+btusb_mtk_release_iso_intf since that is only meant to release the ISO
+endpoint.
+
+>         }
+>
+>         if (id->driver_info & BTUSB_SWAVE) {
+> --
+> 2.18.0
+>
+
+
+--=20
+Luiz Augusto von Dentz
