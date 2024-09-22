@@ -1,182 +1,104 @@
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CED51E529
-	for <linux-bluetooth@vger.kernel.org>; Sun, 22 Sep 2024 03:05:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0F6A1EB46
+	for <linux-bluetooth@vger.kernel.org>; Sun, 22 Sep 2024 04:43:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726974303; cv=none; b=o44O+ore9mR4nSfTQnsrmKA9wOZCR+CgszkqBCV5gbr/8cJZ5K16gUcYlFGcXfRNZcfaizySyeo5ROr8X+TGCEZgAvxqpQkrtGjokuzuDbwehz/DwZgZ1Lq8HPC+01C0aC6p2s4PiqMMNh78EEjfNwDAiQTUjs9ZZ0DpaUn4V7o=
+	t=1726980221; cv=none; b=KemNm3braMSlJKD28Buk9E7Ko8mbLDjAmKiU6vDGgbhFoR8L5Auzsij76YCsRHJmPt4sZC5EW1G503yAeyENgTSDlaeHlLc0m0ClMaZ9XH85dvxSPEA2Q1zRig5bb0ETMibC0+3dJpr/vhmjViVgmY98PHJKtH6wA36Cejr3rzc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726974303; c=relaxed/simple;
-	bh=cYQ2LHypgp9y1z21bOEDAHSsa3m68sIB/yChEfOITiA=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=ijbphFOgQxiknyHuOvYB4KubfG93Turgwray1ADa8OHOxWmt1UEqhySvs43xfxAdadbSeI63mg9irux2ScFmPegPEP7dToAe7bm+RJ/qgbGY2eYrjyMF2O1oOW10tE6hwta2IIIUtNGPn5iu0LKk9tHAQehMpGPkK9X1Z7CXf+k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=dGLQzbVQ; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+	s=arc-20240116; t=1726980221; c=relaxed/simple;
+	bh=4jUv2KA/gfiAuzN7sdUoHueMtRLPrcbAp1VWv9PZy6c=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=OTV+cqKCuXv/y0unukumyf2MafPWdO/v3e4XkWscySLKd5WsBQtKXm2eLfDr7r9kAqKk+TzAjZePyuLbn7rT8SIcZpA+rr8Bz5Y5WOZl34ZUib0sSjW9noYx1X50/WGMu5sXoZ5H5UAb5bcinIY2IgemWBHf00WHE7iu582udjc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SkeyHajp; arc=none smtp.client-ip=209.85.214.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="dGLQzbVQ"
-Received: from pps.filterd (m0279873.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 48M2AVQG003569
-	for <linux-bluetooth@vger.kernel.org>; Sun, 22 Sep 2024 03:04:53 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:message-id
-	:mime-version:subject:to; s=qcppdkim1; bh=7Wg3EFntnKuYzJiaBunUdw
-	wICcpmiNlEDkBAztH7W84=; b=dGLQzbVQ41y+EABuci0HmG7gHS0jRsaR9r2Kq1
-	Z9B+ht4pn+HNsftzhTr41s2fEU64Dg09MmYHWnqs7ZHtkGydYCqP7bNSPP3O7IhR
-	shWl+J1W6NAXld4xmGcH+6ZQRW7zNSyeZ3jaIA4tKTKjLVDtbmG+VzzkfI4jogdh
-	Q+kTPaCk737kITG6nZWg6kgHRGVcMsnAkAl9V28o/JDTfCmbufyOOBKUkUfGyjkW
-	10pE/0yrKk1Nzpi90pOApritmd8eZIAPoJJm3DPCd3cCh1R8NYkczwwVRIF3BV0y
-	Ld4ZaClPHmszDe4zWffmZhGZJvAtEIpUX36E6GxjdLbpV9BQ==
-Received: from nalasppmta03.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 41skgn21ju-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <linux-bluetooth@vger.kernel.org>; Sun, 22 Sep 2024 03:04:53 +0000 (GMT)
-Received: from nalasex01b.na.qualcomm.com (nalasex01b.na.qualcomm.com [10.47.209.197])
-	by NALASPPMTA03.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 48M34qaW026874
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <linux-bluetooth@vger.kernel.org>; Sun, 22 Sep 2024 03:04:52 GMT
-Received: from chejiang-gv.qualcomm.com (10.80.80.8) by
- nalasex01b.na.qualcomm.com (10.47.209.197) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.9; Sat, 21 Sep 2024 20:04:51 -0700
-From: Cheng Jiang <quic_chejiang@quicinc.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: <quic_jiaymao@quicinc.com>
-Subject: [PATCH v3] adapter: Cancel the service authorization when remote is disconnected
-Date: Sun, 22 Sep 2024 11:04:17 +0800
-Message-ID: <20240922030417.140005-1-quic_chejiang@quicinc.com>
-X-Mailer: git-send-email 2.25.1
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SkeyHajp"
+Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-208cf673b8dso33256875ad.3
+        for <linux-bluetooth@vger.kernel.org>; Sat, 21 Sep 2024 21:43:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1726980219; x=1727585019; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=wMaNSYR7nIkqlm9WU8RmjrlU97uJsbXRAUEOSbnTP2U=;
+        b=SkeyHajpBL0705XTHTNt6ETvWWx1P7C9WSeB5/5tdxCrNUn0uRJVYzn2wR4XB6aoVy
+         CW0+wLx1ZJjfRsuevID7ZYF1d23OUZT/Xm1att5maMmCJn6vzneLf4Z7XMD0mNjrH4M3
+         FCq+R4fnXwElAFlP7GxkgT3rQbm6bFNvF4Rr+rKj6zOndcW6A2aiCB/HpqBDWMkmKRX3
+         9aVX1h9hfyDlPmsQ4BCVVsn0L926950Qxhquam+bKqw38PX4ztSF5QwUrcExnc0I29m4
+         8plRcqOjnyKIRYsmU0sV4Y3WFV5nF1ynwefml6h0vempVnRjRKQR/3nvnFxo7Z0QOZcY
+         L9Pw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1726980219; x=1727585019;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=wMaNSYR7nIkqlm9WU8RmjrlU97uJsbXRAUEOSbnTP2U=;
+        b=JT2SRX2Zf5ccgxzrm2mly8Olo5MbIK5AXkkcS7X7lZ3MxCUYz9t6UWWYXfRhljH02S
+         E7XSpLXKlS8Ehj656x+zoRraKtGwAXryt2XA189WOR9RwtYONxmuyJG5FkbJhSyTkijO
+         7f/xr7AV9d37D75aeFiIGOiUsJAP5hYHnQYbVrPahBLnJQ49c76KA/pvtkGhC/1A8cqz
+         FDaxKSErg/Sc/WyalEpd0Q6+bC4bbsath24B4dLJZxxqBEV2oyQwOucwkCL0iEo06jvg
+         acXPcGIlfaKsssooQZEnlPkRi/lyNKndXcVnhs+pKVHu7V1iguD/3GFYgYYtoR/Oryt7
+         vrqQ==
+X-Gm-Message-State: AOJu0YygYV9IKQ4Q5L3bbJ8Bu9ZGolcfJAcgGdXNZxxl9Rc1qJYZ6efh
+	OHphTBpJqGiM9DT9+VSe17LnX2sPukLs9xyMj57czEa591Mb6S7z7ICVcg==
+X-Google-Smtp-Source: AGHT+IGRj5zts5Q7Ul35nKa1CCm6z4dSL55XVss4TxOl7IryGf2eo6JVRzMd225nOMsfwC0U/BjHNg==
+X-Received: by 2002:a17:902:fc85:b0:207:4c7f:37fd with SMTP id d9443c01a7336-208d981d025mr96915225ad.31.1726980218792;
+        Sat, 21 Sep 2024 21:43:38 -0700 (PDT)
+Received: from [172.17.0.2] ([13.87.243.40])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20794731afasm115164335ad.272.2024.09.21.21.43.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 21 Sep 2024 21:43:38 -0700 (PDT)
+Message-ID: <66efa07a.170a0220.38600b.e8c4@mx.google.com>
+Date: Sat, 21 Sep 2024 21:43:38 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============1228629796016835242=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nalasex01b.na.qualcomm.com (10.47.209.197)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: roFncojxlSmQpkb1KKCCx08hzeQq-kG4
-X-Proofpoint-GUID: roFncojxlSmQpkb1KKCCx08hzeQq-kG4
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
- definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 bulkscore=0
- mlxlogscore=999 adultscore=0 suspectscore=0 phishscore=0 impostorscore=0
- spamscore=0 mlxscore=0 priorityscore=1501 lowpriorityscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2408220000 definitions=main-2409220022
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, quic_chejiang@quicinc.com
+Subject: RE: [v3] adapter: Cancel the service authorization when remote is disconnected
+In-Reply-To: <20240922030417.140005-1-quic_chejiang@quicinc.com>
+References: <20240922030417.140005-1-quic_chejiang@quicinc.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-If the remote device drops the connection before DUT confirm the
-service authorization, the DUT still must wait for service
-authorization timeout before processing future request.
+--===============1228629796016835242==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Cancel the service authorization request when connection is dropped.
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=891875
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.33 seconds
+GitLint                       PASS      0.21 seconds
+BuildEll                      PASS      24.17 seconds
+BluezMake                     PASS      1509.41 seconds
+MakeCheck                     PASS      13.26 seconds
+MakeDistcheck                 PASS      176.21 seconds
+CheckValgrind                 PASS      248.79 seconds
+CheckSmatch                   PASS      349.19 seconds
+bluezmakeextell               PASS      117.72 seconds
+IncrementalBuild              PASS      1390.41 seconds
+ScanBuild                     PASS      1014.84 seconds
+
+
+
 ---
- src/adapter.c | 44 ++++++++++++++++++++++++--------------------
- src/adapter.h |  2 ++
- src/device.c  |  3 +++
- 3 files changed, 29 insertions(+), 20 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/src/adapter.c b/src/adapter.c
-index 6fbfcdf2e..2bb94cf16 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -1420,8 +1420,6 @@ static void adapter_remove_device(struct btd_adapter *adapter,
- void btd_adapter_remove_device(struct btd_adapter *adapter,
- 				struct btd_device *dev)
- {
--	GList *l;
--
- 	adapter->connect_list = g_slist_remove(adapter->connect_list, dev);
- 
- 	adapter_remove_device(adapter, dev);
-@@ -1435,22 +1433,7 @@ void btd_adapter_remove_device(struct btd_adapter *adapter,
- 	if (adapter->connect_le == dev)
- 		adapter->connect_le = NULL;
- 
--	l = adapter->auths->head;
--	while (l != NULL) {
--		struct service_auth *auth = l->data;
--		GList *next = g_list_next(l);
--
--		if (auth->device != dev) {
--			l = next;
--			continue;
--		}
--
--		g_queue_delete_link(adapter->auths, l);
--		l = next;
--
--		service_auth_cancel(auth);
--	}
--
-+	btd_adapter_cancel_service_auth(adapter, dev);
- 	device_remove(dev, TRUE);
- }
- 
-@@ -7538,8 +7521,7 @@ static void adapter_remove_connection(struct btd_adapter *adapter,
- 
- 	device_remove_connection(device, bdaddr_type, &remove_device);
- 
--	if (device_is_authenticating(device))
--		device_cancel_authentication(device, TRUE);
-+	device_cancel_authentication(device, TRUE);
- 
- 	/* If another bearer is still connected */
- 	if (btd_device_bearer_is_connected(device))
-@@ -10905,3 +10887,25 @@ bool btd_adapter_has_exp_feature(struct btd_adapter *adapter, uint32_t feature)
- 
- 	return false;
- }
-+
-+void btd_adapter_cancel_service_auth(struct btd_adapter *adapter,
-+			struct btd_device *device)
-+{
-+	GList *l;
-+
-+	l = adapter->auths->head;
-+	while (l != NULL) {
-+		struct service_auth *auth = l->data;
-+		GList *next = g_list_next(l);
-+
-+		if (auth->device != device) {
-+			l = next;
-+			continue;
-+		}
-+
-+		g_queue_delete_link(adapter->auths, l);
-+		l = next;
-+
-+		service_auth_cancel(auth);
-+	}
-+}
-diff --git a/src/adapter.h b/src/adapter.h
-index e3695b21b..8dfbe762e 100644
---- a/src/adapter.h
-+++ b/src/adapter.h
-@@ -298,3 +298,5 @@ void btd_adapter_store_conn_param(struct btd_adapter *adapter,
- 				const bdaddr_t *peer, uint8_t bdaddr_type,
- 				uint16_t min_interval, uint16_t max_interval,
- 				uint16_t latency, uint16_t timeout);
-+void btd_adapter_cancel_service_auth(struct btd_adapter *adapter,
-+				struct btd_device *device);
-diff --git a/src/device.c b/src/device.c
-index 8cba804ce..f8f61e643 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -7038,6 +7038,9 @@ void device_cancel_authentication(struct btd_device *device, gboolean aborted)
- 	struct authentication_req *auth = device->authr;
- 	char addr[18];
- 
-+	if (device->adapter)
-+		btd_adapter_cancel_service_auth(device->adapter, device);
-+
- 	if (!auth)
- 		return;
- 
--- 
-2.25.1
 
+--===============1228629796016835242==--
