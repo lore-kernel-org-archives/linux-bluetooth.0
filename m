@@ -1,70 +1,162 @@
-Received: from out-17.smtp.github.com (out-17.smtp.github.com [192.30.252.200])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f180.google.com (mail-lj1-f180.google.com [209.85.208.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C583C199FC6
-	for <linux-bluetooth@vger.kernel.org>; Mon, 23 Sep 2024 15:18:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BAB1126C01;
+	Mon, 23 Sep 2024 15:20:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727104703; cv=none; b=cQSFhRYvUFmAVy9Sa7jCUgwweWtWXGH/VAG6+3rlf+Pib18J2+wkRrPgIRNPOhAAtOIf2CX1RskDihysmzhkGzKB7rCQnO13LTdCMpfHb5G9/E8xYsrurxanc/TYLAhcYbV1vlSFUjCdKvvy/YrCV36Tjmqm8W+Yybn962ln9wc=
+	t=1727104859; cv=none; b=pfMVIUtyMxaXkAfi9Au/cznB6IgSkBLD9anxVlEk75l/JL3WM6TDhYla6KTvvcOeBNJG1LqpIGSPaOdoMjHqbY9VpWZii5eWXixhFuwLz96jj+8iUhV8XA93iZpg9tZOwVSWL3Z7pHeAJ/xtUVjjfyPlpLExpHZwI//Ou5ERs6w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727104703; c=relaxed/simple;
-	bh=pb1VPsA/Xxn8Q8/JZPW/AvdQuRjP27tazijeyjZRqvY=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=iJQLuh0BcoSqJXk4k31RmdlsMjD8TgjPNjgHlZa477oQPVomWuSOO+rIZB+u+ED9KKF7W48TC/LWQ/dw0dPAQpRMIQgbXNFPWb+gTCm3JaFhjjkBM1CPuU6lzjcbywxhpgBTfouI8CS1G0LOocp4nkpPcH7XGU2FDr9gq4icR4o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=TQz4SmGn; arc=none smtp.client-ip=192.30.252.200
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1727104859; c=relaxed/simple;
+	bh=YSWCktVxHghjtszXZwcauDiq7p2MJW8gBplodPVyGFo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=d0mjAP0hEBDVOSQ47jEweZ6zHZYX8zdAHEpQvIukISQEaFyzUonF3ReK1aew9J35fH/+aoMgVTUcLQRPNPd4hw1B5OYawpUnnEbF54NVNRT+Nji0C8yzq06fVX9qo/G2vyv3/i6VIHHwCZo08ckn/RzIeOceAb3cB0cOqihm1Dg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PH89QFpX; arc=none smtp.client-ip=209.85.208.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="TQz4SmGn"
-Received: from github.com (hubbernetes-node-e98d5fd.va3-iad.github.net [10.48.138.20])
-	by smtp.github.com (Postfix) with ESMTPA id D3DED4E0CCD
-	for <linux-bluetooth@vger.kernel.org>; Mon, 23 Sep 2024 08:18:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1727104700;
-	bh=l/vCiidwiVZE4bcsQW0qsJeqyI5lFG9aIT4nJwC45CE=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=TQz4SmGn4V9CPTxdZSW/wJMruZOEa9mdTxQveYWCINS1e12iw6k+gSFKbA6HZnhu7
-	 aX/7t+DgD8QAKPfsAl5wVSY9IEJnBlPrQmlKhb2VGCfq+P3LLwNQTufBA3t5etUrjN
-	 lJ/kcvYD2foXdsxKLnD80zNS0HWXG1TYfp93APmQ=
-Date: Mon, 23 Sep 2024 08:18:20 -0700
-From: BluezTestBot <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/master/ce6462-5b6ffe@github.com>
-Subject: [bluez/bluez] 5b6ffe: adapter: Cancel the service authorization when
- rem...
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PH89QFpX"
+Received: by mail-lj1-f180.google.com with SMTP id 38308e7fff4ca-2f754d4a6e4so43155061fa.3;
+        Mon, 23 Sep 2024 08:20:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1727104855; x=1727709655; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=4YKpJjkT/dP6ztSbjaCFugg3gOx+PZd6e/Lb/+M/JDA=;
+        b=PH89QFpXpQfcktpdv+wE3gOyylDxe6B9KawlvzIvIZLek8B13q34K6P99RofEyh2x9
+         rwJSEizVuQf1fm9y7iiFQvzCqa0m0Sd9q6k4HDKPRrhzQUEsfTLjFiJnSj0N01CMn7nL
+         4n7mi0FrSzvMFgu1rnKHdsxWESbXaOtzSpR8AemLrE8R5hOnWl88FEkr2S9QcC1hdfR1
+         qNZf4jwEcinoOWiQT4V6kJccyu1tjD16CaefXlvDR4TdDgDjHGiJ0AYWe2RQVUGDsCwA
+         Y1fWl2R3AEKdODVbUDaLMRx6rle6FwA12rXcVDjd6snTYQnRi7MybGXOtrbWUkhhHGhc
+         sBUQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1727104855; x=1727709655;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=4YKpJjkT/dP6ztSbjaCFugg3gOx+PZd6e/Lb/+M/JDA=;
+        b=WRShlQYZh6H7bce6CDWen+KuRrRes6mj9JyPKjOhnBWM5dagpgVt774akl1sZIBggP
+         hNK9AIledz1ih/pEIn0YOzTuhRyha3o8U52WB1Da1kCqgdTmYQR3OQ5xah4ClqXLmT5S
+         vfavwH24md3CNfPpwVKdZGrfNiST2wG+YvVOF9lyhhTsIlew52kAdJCjMID8N4iN7199
+         DC5wFBJK+eMtQ+So+DoQ9KqbF8QRGLFx+FybVr9ixGwzJYz6hbC57jqJpV6CV1FUVtWG
+         lP2kGmZR528KRf4mHAFZpTKC/I5AXdHrV57ib3sFbzZhrGfd617Vdb00a9KKaCjvsnZ6
+         Wv9A==
+X-Forwarded-Encrypted: i=1; AJvYcCU4OMmKQR9DVyrbMrC4Fi2XxYkIBYsfZ0HugZdHFYKCKdLHJlWrv7NTiJowmzI+o+P9D95kQrVgNDYCFJNe@vger.kernel.org, AJvYcCVVQ2zqZZPVDjmeG92+6E5BUZSDR/TYtX0xT/HdqhKQVH36cORIMWH+fuWAdSg2qTbDa5/YbDrwPv+EFK5XNQM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwLVkbVYICi2MdovvMY0gqBwL4xmHXsl51unM9zKn2FdcZtQ8eO
+	GOuVakrUYKE82lEBKP4Qnn7GQx9bdrZpOcVsm9Tt/AGQtuw8vSu13yY5nDOGGKV5ZPjNZc+u9z9
+	xfSkaLPFLCzcWgKQmGspTGfGGyzk=
+X-Google-Smtp-Source: AGHT+IEL2czF2KjlS+h6a4/EK6zHMexJS+PrFlJf2J3D4oheXFf9W5E4gcN9lgiTM0lnOJgvx6EsHQbhXGdz9TrRP2A=
+X-Received: by 2002:a2e:a98a:0:b0:2f7:5a95:3a11 with SMTP id
+ 38308e7fff4ca-2f7cc3576c4mr52982621fa.6.1727104855203; Mon, 23 Sep 2024
+ 08:20:55 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+References: <CABBYNZLnohZofm4Tchk7p36XS=HwYmN94DB0FGyiPFJno+evSw@mail.gmail.com>
+ <20240921105609.1025-1-hdanton@sina.com> <CABBYNZLqXfAc7_YO+goAf7fnAsmJ+j9V0cjmPMX4+MhoDhzOCA@mail.gmail.com>
+ <CANp29Y7bbvUckx7c+Bke28p5AzNCw7kYfXr87DsAD2DtUm99Xw@mail.gmail.com>
+In-Reply-To: <CANp29Y7bbvUckx7c+Bke28p5AzNCw7kYfXr87DsAD2DtUm99Xw@mail.gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Mon, 23 Sep 2024 11:20:41 -0400
+Message-ID: <CABBYNZLKMu296VLeEcyMZBw1HFivMA=L6xOZRHHcKwWZb7PQ4g@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth/l2cap: Fix uaf in l2cap_connect
+To: Aleksandr Nogikh <nogikh@google.com>
+Cc: Hillf Danton <hdanton@sina.com>, Edward Adam Davis <eadavis@qq.com>, 
+	syzbot+c12e2f941af1feb5632c@syzkaller.appspotmail.com, 
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-  Branch: refs/heads/master
-  Home:   https://github.com/bluez/bluez
-  Commit: 5b6ffe0381e80dcc980f0e73ff0621c2a6033be3
-      https://github.com/bluez/bluez/commit/5b6ffe0381e80dcc980f0e73ff0621c2a6033be3
-  Author: Cheng Jiang <quic_chejiang@quicinc.com>
-  Date:   2024-09-23 (Mon, 23 Sep 2024)
+Hi Aleksandr,
 
-  Changed paths:
-    M src/adapter.c
-    M src/adapter.h
-    M src/device.c
+On Mon, Sep 23, 2024 at 10:37=E2=80=AFAM Aleksandr Nogikh <nogikh@google.co=
+m> wrote:
+>
+> On Mon, Sep 23, 2024 at 4:33=E2=80=AFPM Luiz Augusto von Dentz
+> <luiz.dentz@gmail.com> wrote:
+> >
+> > Hi Hillf,
+> >
+> > On Sat, Sep 21, 2024 at 6:56=E2=80=AFAM Hillf Danton <hdanton@sina.com>=
+ wrote:
+> > >
+> > > On Tue, Sep 10, 2024 at 4:56=E2=80=AFPM Luiz Augusto von Dentz <luiz.=
+dentz@gmail.com> wrote:
+> > > >
+> > > > Maybe something like the following would be a better approach:
+> > > >
+> > > > https://gist.github.com/Vudentz/121a15fa4391b2b1f6c7e8d420a6846e
+> > >
+> > > If your idea is not bad, boy, feel free to win Tested-by from syzbot =
+with it.
+> >
+> > Is there a way to quickly check a patch with syzbot?
+>
+> You can send a `#syz test` command in a reply to syzbot and attach the
+> patch-to-test to the email message.
+>
+> See https://github.com/google/syzkaller/blob/master/docs/syzbot.md#testin=
+g-patches
 
-  Log Message:
-  -----------
-  adapter: Cancel the service authorization when remote is disconnected
+Thanks, lets see if this works:
 
-If the remote device drops the connection before DUT confirm the
-service authorization, the DUT still must wait for service
-authorization timeout before processing future request.
+#syz test
 
-Cancel the service authorization request when connection is dropped.
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index d6976db02c06..b2f8f9c5b610 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -3782,6 +3782,8 @@ static void hci_acldata_packet(struct hci_dev
+*hdev, struct sk_buff *skb)
 
+        hci_dev_lock(hdev);
+        conn =3D hci_conn_hash_lookup_handle(hdev, handle);
++       if (conn && hci_dev_test_flag(hdev, HCI_MGMT))
++               mgmt_device_connected(hdev, conn, NULL, 0);
+        hci_dev_unlock(hdev);
 
+        if (conn) {
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 1c82dcdf6e8f..b87c0f1dab9e 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -3706,7 +3706,7 @@ static void hci_remote_features_evt(struct
+hci_dev *hdev, void *data,
+                goto unlock;
+        }
 
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
+-       if (!ev->status && !test_bit(HCI_CONN_MGMT_CONNECTED, &conn->flags)=
+) {
++       if (!ev->status) {
+                struct hci_cp_remote_name_req cp;
+                memset(&cp, 0, sizeof(cp));
+                bacpy(&cp.bdaddr, &conn->dst);
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 9988ba382b68..6544c1ed7143 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -4066,17 +4066,9 @@ static void l2cap_connect(struct l2cap_conn
+*conn, struct l2cap_cmd_hdr *cmd,
+ static int l2cap_connect_req(struct l2cap_conn *conn,
+                             struct l2cap_cmd_hdr *cmd, u16 cmd_len, u8 *da=
+ta)
+ {
+-       struct hci_dev *hdev =3D conn->hcon->hdev;
+-       struct hci_conn *hcon =3D conn->hcon;
+-
+        if (cmd_len < sizeof(struct l2cap_conn_req))
+                return -EPROTO;
+
+-       hci_dev_lock(hdev);
+-       if (hci_dev_test_flag(hdev, HCI_MGMT))
+-               mgmt_device_connected(hdev, hcon, NULL, 0);
+-       hci_dev_unlock(hdev);
+-
+        l2cap_connect(conn, cmd, data, L2CAP_CONN_RSP);
+        return 0;
+ }
