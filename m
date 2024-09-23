@@ -1,133 +1,95 @@
-Received: from smtpbguseast1.qq.com (smtpbguseast1.qq.com [54.204.34.129])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88E324C7D;
-	Mon, 23 Sep 2024 02:52:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.204.34.129
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F4F62114
+	for <linux-bluetooth@vger.kernel.org>; Mon, 23 Sep 2024 03:04:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727059965; cv=none; b=uwtzoQf46NZEpFi9hZ4iqJkCVAtI/u/Zp4dp049P2fjYOU2bHKmzb1alN/6V9vFrIqs4QrYS/Igm5c03q/5JAfeOcXxgKOEDeHQfol68OD3qwOU6rV9jraM0qWBug/BGsQX1v5qU837CjHicGfKY657oSOrQ5g1oqr3AKTMF5TE=
+	t=1727060678; cv=none; b=A0CEEAtVgIEKCMR8mtYIeTv8MT6yDvVdjYF9vdZEPOsq0p8y8mqz2pmG/yh0x4hwhfXIHugojYixS9l8/dJtQ60xqx41Dt+Bwb7agZURkggMy0Kw5Fhiyz1ajSV5IgFkvbXx+IWvmgFIR/fCaZUxOREywt8yA/xXXYQkaBU6rMA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727059965; c=relaxed/simple;
-	bh=JFaT0LYZbAmveZeB0SFySL/06wDYX5gBwrzQ14Dn2kU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=n6Iz0G4QnTROyVqE4FsA4vpkUsfbTuX9qKG7opWCqEt6AO/1Hc94rULnC0mNVdSBH/w1AFAZWoQdAN1mzK6dK40F+tYtK4bJyu/bDAr63sJyGK+QDoMkajPGFby0u4p+rEpXkVWAwc8PQY/VM73GeWGtWoFOa0kK1PS2B4uhHuE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com; spf=pass smtp.mailfrom=uniontech.com; dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b=f53XrlFe; arc=none smtp.client-ip=54.204.34.129
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniontech.com
+	s=arc-20240116; t=1727060678; c=relaxed/simple;
+	bh=WZ/1VwI7w609GquzsBVlRVr7qMP0HRNRY1TOpntprjc=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=aipI3DTkGAwY/FV6WBjulfLsPc6bSb5Vux4pK7hauXmYe3ynpAmuAXv4D5xYq4bCZYX4NdED4m9Dk6+n1dUledgkiHrkiwf6Asb7OfBHYR118MNy7v7JCg/o2uil/N6qFohhSOavo399sHfg3J5J8ALA9nsSbzXV4zdyjNYZXB0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=h0mx4PV8; arc=none smtp.client-ip=209.85.210.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b="f53XrlFe"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uniontech.com;
-	s=onoh2408; t=1727059919;
-	bh=rZHvVfowzI3daZqCxdNalDtcmaBy5OTc9UKJrJPe1mo=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version;
-	b=f53XrlFeEtrqr5cPv+pWYgX2YjjKCKkuIQ3ANJdprcsk6/pKt16SrCUadWxh2JnAU
-	 ZAyacolnx/7IHnf1UjPCu/qp07FKvXHI4d6/LQe8dHM1zguowfbvx7qUY4me58dFy1
-	 wFuAvGkfdWoFZB7WHprDc7Ad/eipm2p+LheU84ag=
-X-QQ-mid: bizesmtpsz3t1727059912tzvaznk
-X-QQ-Originating-IP: 8rFUNVYVcjqggWqMvlS/s0Rj40wgSb1NTrKgqlyk7DQ=
-Received: from localhost.localdomain ( [113.57.152.160])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Mon, 23 Sep 2024 10:51:50 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 1
-X-BIZMAIL-ID: 12430750089845987053
-From: WangYuli <wangyuli@uniontech.com>
-To: marcel@holtmann.org,
-	luiz.dentz@gmail.com,
-	hello@felixjara.me,
-	wangyuli@uniontech.com
-Cc: linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	guanwentao@uniontech.com,
-	zhanjun@uniontech.com
-Subject: [PATCH v2] Bluetooth: btusb: Add MT7925 support for ID 0x13d3:0x3608
-Date: Mon, 23 Sep 2024 10:51:47 +0800
-Message-ID: <423A85B62ADD708B+20240923025147.693748-1-wangyuli@uniontech.com>
-X-Mailer: git-send-email 2.45.2
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="h0mx4PV8"
+Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-71957eb256bso3389408b3a.3
+        for <linux-bluetooth@vger.kernel.org>; Sun, 22 Sep 2024 20:04:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1727060676; x=1727665476; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=WZ/1VwI7w609GquzsBVlRVr7qMP0HRNRY1TOpntprjc=;
+        b=h0mx4PV87U2lY5W9IA3bbOgEvcV9xBIdDHGGkIYo/DFqe9CIcSoJqLDToFQt4HzenY
+         ccwAP3EUvH4jdsqF+QTe5ObS64dbQ9DZugHBEQ0Ux0UuHE4yBqz/q/Ats5B+GbCn7/kF
+         YvvibYIDTP727NKGZT/aRKH06tjydPYk2EeC6JaYvRALGUaD6l4+HTWSVj03yFaaPmv9
+         LR0dVrocRZusplEYt7ePKajultZ/Fbv+zPsOjykGuhJxlIPldIA0oMlzUhHWBDystCsw
+         NJ2m3Cp9EnnQxIIQL+mvcakpjxOqKRR6UeUOYpczYTpvYMDrxeQx2ZVRLvxveZBDkYw2
+         TDgw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1727060676; x=1727665476;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=WZ/1VwI7w609GquzsBVlRVr7qMP0HRNRY1TOpntprjc=;
+        b=f2nc6JlbTUjms19QphuXDolDPwekk0K21pNstBGiUl79HHwrc8YSF/edN2AdXfpCmY
+         JcBnMB4NzBp9IILHS2QDmi4dFmSIYJARW7rYzqgm6zgGZ2vSJDy6wvPfD+QXM463oktg
+         UkvznQvss2fKGlp5pPRjkJb2ssAerkQP2C8U5oVuLSZE9qc2YVPTpAL0BwD4ppmNqv2g
+         2uEWPw9hyKCbeQ8VO1oRzaqHzTIhA8GzgVHTiFK7aHjcN1qChTfIjiHt79M5HSN6zYhb
+         Wi1UZRKt2i3WmVE7B5SnYM58Sw3dZE8S5UJXycC6DUBUHSaFRrnvKlmSBKwzl4CyGOz8
+         pT4A==
+X-Gm-Message-State: AOJu0YwMWtBis+sayjp/kfhNjZy6ae/xUC8+i/vaVse7lsIj9OuMHjft
+	AeNZfaxhhJ/aQmkQLfvc66lnIi+XCbMVZkOg1IEGvxvvGR51MZgb3TWEUw==
+X-Google-Smtp-Source: AGHT+IGjNVolbBBe4/e3BGUWeSH9Ps5/OPiOebVI7A8iNft3HjF0uxGgqZrYfNC9+ATBoEMXp7cblg==
+X-Received: by 2002:a05:6a00:39aa:b0:718:d519:20de with SMTP id d2e1a72fcca58-7199c96be5dmr14632020b3a.13.1727060676017;
+        Sun, 22 Sep 2024 20:04:36 -0700 (PDT)
+Received: from [172.17.0.2] ([52.159.136.241])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71944b97560sm13434217b3a.148.2024.09.22.20.04.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 22 Sep 2024 20:04:35 -0700 (PDT)
+Message-ID: <66f0dac3.a70a0220.115b39.4666@mx.google.com>
+Date: Sun, 22 Sep 2024 20:04:35 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============3104846412453756605=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: bizesmtpsz:uniontech.com:qybglogicsvrgz:qybglogicsvrgz8a-1
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, wangyuli@uniontech.com
+Subject: RE: [v2] Bluetooth: btusb: Add MT7925 support for ID 0x13d3:0x3608
+In-Reply-To: <423A85B62ADD708B+20240923025147.693748-1-wangyuli@uniontech.com>
+References: <423A85B62ADD708B+20240923025147.693748-1-wangyuli@uniontech.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-From: Félix Jara <hello@felixjara.me>
+--===============3104846412453756605==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Add compatibility Bluetooth device MT7925 for Asus UM5606 with
-ID 13d3:3608.
+This is an automated email and please do not reply to this email.
 
-The device info from /sys/kernel/debug/usb/devices as below.
+Dear Submitter,
 
-T:  Bus=03 Lev=01 Prnt=01 Port=00 Cnt=01 Dev#=  2 Spd=480  MxCh= 0
-D:  Ver= 2.10 Cls=ef(misc ) Sub=02 Prot=01 MxPS=64 #Cfgs=  1
-P:  Vendor=13d3 ProdID=3608 Rev= 1.00
-S:  Manufacturer=MediaTek Inc.
-S:  Product=Wireless_Device
-S:  SerialNumber=000000000
-C:* #Ifs= 3 Cfg#= 1 Atr=e0 MxPwr=100mA
-A:  FirstIf#= 0 IfCount= 3 Cls=e0(wlcon) Sub=01 Prot=01
-I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=125us
-E:  Ad=82(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-E:  Ad=02(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-I:  If#= 1 Alt= 6 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  63 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  63 Ivl=1ms
-I:* If#= 2 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
-E:  Ad=8a(I) Atr=03(Int.) MxPS=  64 Ivl=125us
-E:  Ad=0a(O) Atr=03(Int.) MxPS=  64 Ivl=125us
-I:  If#= 2 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
-E:  Ad=8a(I) Atr=03(Int.) MxPS= 512 Ivl=125us
-E:  Ad=0a(O) Atr=03(Int.) MxPS= 512 Ivl=125us
+Thank you for submitting the patches to the linux bluetooth mailing list.
+While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
 
-Tested in Asus Zenbook S 16 UM5606XA
+----- Output -----
 
-Co-developed-by: Félix Jara <hello@felixjara.me>
-Signed-off-by: Félix Jara <hello@felixjara.me>
-Tested-by: Félix Jara <hello@felixjara.me>
-Link: https://github.com/openSUSE/kernel/pull/10
-Signed-off-by: WangYuli <wangyuli@uniontech.com>
+error: patch failed: drivers/bluetooth/btusb.c:512
+error: drivers/bluetooth/btusb.c: patch does not apply
+hint: Use 'git am --show-current-patch' to see the failed patch
+
+Please resolve the issue and submit the patches again.
+
+
 ---
- drivers/bluetooth/btusb.c | 5 +++++
- 1 file changed, 5 insertions(+)
+Regards,
+Linux Bluetooth
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index cd22b34542d5..4adae0be8222 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -512,6 +512,11 @@ static const struct usb_device_id blacklist_table[] = {
- 						     BTUSB_WIDEBAND_SPEECH |
- 						     BTUSB_VALID_LE_STATES },
- 
-+	/* MediaTek MT7925 Bluetooth devices */
-+	{ USB_DEVICE(0x13d3, 0x3608), .driver_info = BTUSB_MEDIATEK |
-+						     BTUSB_WIDEBAND_SPEECH |
-+						     BTUSB_VALID_LE_STATES },
-+
- 	/* Additional Realtek 8723AE Bluetooth devices */
- 	{ USB_DEVICE(0x0930, 0x021d), .driver_info = BTUSB_REALTEK },
- 	{ USB_DEVICE(0x13d3, 0x3394), .driver_info = BTUSB_REALTEK },
--- 
-2.45.2
 
+--===============3104846412453756605==--
