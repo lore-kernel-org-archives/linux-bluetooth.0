@@ -1,105 +1,128 @@
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f173.google.com (mail-yb1-f173.google.com [209.85.219.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7117F156222
-	for <linux-bluetooth@vger.kernel.org>; Wed, 25 Sep 2024 09:10:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8C8414B07E
+	for <linux-bluetooth@vger.kernel.org>; Wed, 25 Sep 2024 10:11:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727255401; cv=none; b=FkRPy0Bb8eFp7TwTFyDcvQuE7wYbUhK3dxLqWgikpWWoZe5ykQhisRJGBg0L626w+haIQejTT5c27XCIGPghASh2av8T4LkUmJQ5D3UWgFQLr3cwpWyIoF2jQg4pIF4jUKVTe03XpaZktl0s19TIhC6GRBfKn2HgiYt4diNZn/c=
+	t=1727259106; cv=none; b=UHDGnt3VG7ek9YS22XApURWGpKkSpLEaGm7hp+HMAEuNKKhxzZuO/+m4SLbIK44gEFMzPp0N5F7oetTc2X+2oIZSu8vwr5FkpAvPMze1tbWJyI8f0tZmKDVXIxPHnPCKoa+DWDdTRT0AlwcRr479h33E/hxoVagArHOvLFnhGt4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727255401; c=relaxed/simple;
-	bh=iOM9g7XxrwHfICmY3EC2MZaDUgYgvAmBOdtwR+vEY8c=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=T2l+5ZZVwZp3hOiDkKnbBDSOhQxNehkCjdrTgeznfbhzrS9nHhOr3eOEu0O7bpleA7a9LPzWehd89sW5ufN7GTbRsIYAv2DbJF06j7kjw2hyKhQ9kptml919tTRA3Sr962iw9TFBK+ShHUiyycJN4jT9TSU4hBTAw8dBAJYu7oo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=YoWXNYaM; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+	s=arc-20240116; t=1727259106; c=relaxed/simple;
+	bh=77R0QdkP3JlcxS/K/vc8eV3t9fPMWRlVj7zrs7ijmnQ=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=k1qsDk0GvqefyaZ8LxJkC0YK+zBhz2aYi/dGYbNlyWlEj20MgcSUobDj1KuKmYSem0zel3tF5Q+gPZavr8UWH2xPWav2yvL72tFPNfGI5cFoxu6DAp4zTBrHdBjUc3lI0dSv8DMPEW2bLvLJUPcgQqhjFoZsesGzYbyC0Bfc/Do=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=km8hX0mi; arc=none smtp.client-ip=209.85.219.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="YoWXNYaM"
-Received: from pps.filterd (m0279862.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 48P6xrvk032191
-	for <linux-bluetooth@vger.kernel.org>; Wed, 25 Sep 2024 09:09:59 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:message-id
-	:mime-version:subject:to; s=qcppdkim1; bh=zf6k4+xOqTYAnhlxa2/GYF
-	Ab/784V3YAqkhWYNL5kBs=; b=YoWXNYaMQL17XNbOaW6Wpoh28Mysc29SrcD7cW
-	ppUz3mK/tl4iqCOHd6klDKNizv0f7WgFccjrUTMtDIDRknlMZO6jOs3b8JzGpzmn
-	ULnw/KRRuouNXco3TbGJL+63r9Zk/g99c8hJEWnTgvik+mis8HNODZbnTaBl1nCs
-	YqqCCqcw38LNLFKBgiQyO03dAN2vVY47JcbPgK9DaFQJ9xGg14lfCRLnhP8YQJdc
-	lbgC29rbzI8hG3LwCzjGLMmeb35ELpGyg8RK61UaQi1+OfPVvbYmSBJ6JVG/5xLm
-	3gC0Fl23+ecxCBVRCZSXv0L8QsysuG7grnBCEO9xcpEhrrjg==
-Received: from nalasppmta05.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 41spweu8ky-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <linux-bluetooth@vger.kernel.org>; Wed, 25 Sep 2024 09:09:59 +0000 (GMT)
-Received: from nalasex01b.na.qualcomm.com (nalasex01b.na.qualcomm.com [10.47.209.197])
-	by NALASPPMTA05.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 48P99wwX017924
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <linux-bluetooth@vger.kernel.org>; Wed, 25 Sep 2024 09:09:58 GMT
-Received: from chejiang-gv.qualcomm.com (10.80.80.8) by
- nalasex01b.na.qualcomm.com (10.47.209.197) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.9; Wed, 25 Sep 2024 02:09:57 -0700
-From: Cheng Jiang <quic_chejiang@quicinc.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: <quic_jiaymao@quicinc.com>
-Subject: [PATCH v3] device: Remove device after all bearers are disconnected
-Date: Wed, 25 Sep 2024 17:09:48 +0800
-Message-ID: <20240925090948.1540589-1-quic_chejiang@quicinc.com>
-X-Mailer: git-send-email 2.25.1
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="km8hX0mi"
+Received: by mail-yb1-f173.google.com with SMTP id 3f1490d57ef6-e1d2cf4cbf1so5919534276.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 25 Sep 2024 03:11:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1727259103; x=1727863903; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=sNsneTvTMamXybV8EXl6ZUn9Z7beMPsweAJmMvCqW0Q=;
+        b=km8hX0miPHbUruwK64lS8A8fabqx4uBBwoTvPpM7+dcc1P2SnwJS+QM0HOeg5L4Lbg
+         /KQH8I6B+zwyVxehIz6QD0XtHYv4j1IO+RNrCGC22uQBcjJmCgXVFnilJ8kVcCtf3XU8
+         bD/ELa6YkAjHQnjInfLnejTxUN00anpKHz4Sb7YfWBeyopz1haqwlSNd7sSlv1CTtGoY
+         PooclKq19XGGGO0X3xZzOi1gqwuRKi8LFu25f4NQt2VekiRlVzWRJPbFcLSZ/pRVx9dS
+         eL1N1Lzoun4uxWUMfKWmzL9tT12ygctNXMjR58fY0UFPD9QCGOxdzwF1NGCYAax/E4KR
+         6Ttg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1727259103; x=1727863903;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=sNsneTvTMamXybV8EXl6ZUn9Z7beMPsweAJmMvCqW0Q=;
+        b=fOMiyrVDbIh4SuN7PjUZ5BWmmjK8CIjscQE5Qw+kplAIDRL094SLcIUGdHOniCwCEo
+         E/6P8zDKvOVpm/Q/1K7RbVLO20GpnxTIbZLxJ6Q6bssHdcmumTd0ChF3WopfOWGTAe2P
+         Nxr6NWpobkp4IlVDu6UrxI8sliEnMMfnBFwT3p90D0PbfZGNwtdeEsbDOgujS5lcSnf2
+         zkLgV11EZDCLF8gm5gZ5D9UUyHfpDZSDghON18UGuNKJb+t7hIXCSHuGrH6R2zOzNfot
+         NKraTm6Ly2wz5tEEWAabz9OikIRRswLNQ6Q3/EzTox2z6JP1m2w6NOoM7xN1iXUcR9kV
+         Illg==
+X-Gm-Message-State: AOJu0YzVkDaNdsP7/IWjOD1SM0fIBQ1v/2s1H6PRlPYWnjup8N8IEv/V
+	QejthzV1fcgrQ73GK31KSWGD3yJ/1wiKOPgHXt9ncfm64BYhGFyqfsuilA==
+X-Google-Smtp-Source: AGHT+IHDcboMf3o62kGEUtXVY71xLeu3vEEQTk0/Z7Mp9/5ryVjSqRmI58Z2QrqOg+S6yXq3o8k7aA==
+X-Received: by 2002:a05:6902:2684:b0:e20:2b46:7682 with SMTP id 3f1490d57ef6-e24d7824507mr1236455276.1.1727259103264;
+        Wed, 25 Sep 2024 03:11:43 -0700 (PDT)
+Received: from [172.17.0.2] ([20.97.191.49])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-45b52572710sm14743831cf.22.2024.09.25.03.11.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 25 Sep 2024 03:11:42 -0700 (PDT)
+Message-ID: <66f3e1de.c80a0220.da2b4.687c@mx.google.com>
+Date: Wed, 25 Sep 2024 03:11:42 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============1412340711006623206=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nalasex01b.na.qualcomm.com (10.47.209.197)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: QQBUs0-O9yYRhmbQbMvxNb2Vr1igKJnn
-X-Proofpoint-ORIG-GUID: QQBUs0-O9yYRhmbQbMvxNb2Vr1igKJnn
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
- definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- suspectscore=0 adultscore=0 priorityscore=1501 clxscore=1015
- malwarescore=0 mlxscore=0 mlxlogscore=661 impostorscore=0 phishscore=0
- spamscore=0 bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2408220000 definitions=main-2409250065
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, quic_chejiang@quicinc.com
+Subject: RE: [v2] device: Remove device after all bearers are disconnected
+In-Reply-To: <20240925082750.1516282-1-quic_chejiang@quicinc.com>
+References: <20240925082750.1516282-1-quic_chejiang@quicinc.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-For a combo mode remote, both BR/EDR and BLE may be connected.
-RemoveDevice should be handled after all bearers are dropped,
-otherwise, remove device is not performed in adapter_remove_connection.
----
- src/device.c | 12 +++++++++++-
- 1 file changed, 11 insertions(+), 1 deletion(-)
+--===============1412340711006623206==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-diff --git a/src/device.c b/src/device.c
-index f8f61e643..c25bf6b60 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -3492,8 +3492,18 @@ void device_remove_connection(struct btd_device *device, uint8_t bdaddr_type,
- 		DBusMessage *msg = device->disconnects->data;
- 
- 		if (dbus_message_is_method_call(msg, ADAPTER_INTERFACE,
--								"RemoveDevice"))
-+							"RemoveDevice")) {
-+
-+			/* Don't handle the RemoveDevice msg if device is
-+			 * connected. For a dual mode remote, both BR/EDR
-+			 * and BLE may be connected, RemoveDevice should
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=892705
+
+---Test result---
+
+Test Summary:
+CheckPatch                    FAIL      0.66 seconds
+GitLint                       PASS      0.33 seconds
+BuildEll                      PASS      24.80 seconds
+BluezMake                     PASS      1673.81 seconds
+MakeCheck                     PASS      13.45 seconds
+MakeDistcheck                 PASS      178.92 seconds
+CheckValgrind                 PASS      249.18 seconds
+CheckSmatch                   PASS      350.04 seconds
+bluezmakeextell               PASS      118.20 seconds
+IncrementalBuild              PASS      1504.34 seconds
+ScanBuild                     PASS      1044.85 seconds
+
+Details
+##############################
+Test: CheckPatch - FAIL
+Desc: Run checkpatch.pl script
+Output:
+[v2] device: Remove device after all bearers are disconnected
+WARNING:BLOCK_COMMENT_STYLE: Block comments should align the * on each line
+#115: FILE: src/device.c:3501:
 +			 * be handled after all bearers are disconnects.
-+			 */
-+			if (device->bredr_state.connected ||
-+					device->le_state.connected)
-+				break;
- 			remove_device = true;
-+		}
- 
- 		g_dbus_send_reply(dbus_conn, msg, DBUS_TYPE_INVALID);
- 		device->disconnects = g_slist_remove(device->disconnects, msg);
--- 
-2.25.1
++			*/
 
+/github/workspace/src/src/13811785.patch total: 0 errors, 1 warnings, 19 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/src/13811785.patch has style problems, please review.
+
+NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============1412340711006623206==--
