@@ -1,210 +1,149 @@
-Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
+Received: from mail-il1-f198.google.com (mail-il1-f198.google.com [209.85.166.198])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACE42101F2
-	for <linux-bluetooth@vger.kernel.org>; Fri, 27 Sep 2024 14:32:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BD2C1C0DD7
+	for <linux-bluetooth@vger.kernel.org>; Fri, 27 Sep 2024 14:53:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.198
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727447540; cv=none; b=C6mH9sjru9tyKuB26VVvGNamaYVVeCIFgrAiDSp+Q8sZC1Y4Rhes2IEeUbHjVbszyHsL+Q2Q5dEHtaG3Yh+WfTZTCAaUvA5xE+jz/2V0SVUNbj6fJvWpQsMX5qGmTapK/bjiHcPgaUuQHGEaV9N5N9ahPGl6hfLW7rWaCf6JOFE=
+	t=1727448809; cv=none; b=I7H0esffU7K6eqHCjumdmZWa8HcQyQPo7ZxSg1lRV/VbOtDz1qHi3EWmNa5KtyucGuwEeOYpbGpJGdlWjuJU6jcDL40hf1SUFIKxi67Hs3GEqIisx7n3cRk7iN4g/UKrPB/55HmFj7oPtUhYs1MEZgHnsyYwv75EqXU9J6eh84E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727447540; c=relaxed/simple;
-	bh=UeP5wWeY/PHDdEMJ7xb10F6uNp+1NcHjzBLUz+QEBoE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=VkqqwGF9aVBXb320j09LukH6qqpYpiBso30ZfoQM1Pev70aAanXVAwmUtI7zeEtwTumYmIQ2oESgLaSg9kmLSK60iwJx7xXYw2gWLjdtDJY90G7ucWAyM7yYZerr1DiEmv6wX9cM/i4xKslzKPwpcZJCSjRT5NYhwE6QYQDW81E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=d5nk5WCe; arc=none smtp.client-ip=209.85.214.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="d5nk5WCe"
-Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-208ccde82e6so18426915ad.0
-        for <linux-bluetooth@vger.kernel.org>; Fri, 27 Sep 2024 07:32:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1727447538; x=1728052338; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=yGshuMhUi31rLD3vo8imJhAfUbp4AQprUmb56tDp1wI=;
-        b=d5nk5WCemtIg03JJlyaDZTfyxPd7ckrSba1b3Y+piFxStQvhgVX00CGPVpmQEvuR8U
-         jvetbuj4eVvml7gZvYGr1dI3sh0Gjv5rqH+Hr7721Zu62xk4U+SCAJ8tYDE6caqTeMFr
-         pv54m9grN04Gy1ixCTpTyLh/sp8vm/5fl54rB4fEaS+r9zpFVviy7blSvUNaZFYomRBg
-         nEhGs/j5ydCv5gYmyRrNvSpEc6jLqKDeqXVojVsdl25FAXkj9tHYccUCg+gNfjF7Ngln
-         wQnLi0szN5Un19H8libzdVVUV7fCOE3399WFY6E8jG+hXnEh3whdMrBDM+0h79Gq5uqs
-         WFLA==
+	s=arc-20240116; t=1727448809; c=relaxed/simple;
+	bh=HaX/MQx1zNcIHLfx6OG1HhNLa8dC2O4MTlK7wLnEgJw=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=er/LDa76DOEn/59yEZN//UOYzWhROc49hq0CmwpBtum1RUC+KUEXnXs42yEtKZWyoF5cLagEnGcAupXeDB/vk77GR10mQKhiBmNWKBUbHs+Z/KwsN9vhjqJKNPqC7OPhklsX8J84Zk3DIMmRdu7uDibf3BROkG0T+o/uj66m7hs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.198
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-3a342e872a7so18043325ab.3
+        for <linux-bluetooth@vger.kernel.org>; Fri, 27 Sep 2024 07:53:27 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727447538; x=1728052338;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=yGshuMhUi31rLD3vo8imJhAfUbp4AQprUmb56tDp1wI=;
-        b=flCgYsiOdr9SPY7Q/tt1zOQyRf+ATWYz9SKvOp9YoBdtSdc180hgUvtQGFctlKIewN
-         k6OwqkQReP81SgZLhNpXTkHGbPVRuUuJRj5lWUHTeA04GO1KWXaR0KJm8uNwamHmwdHw
-         hrmhDYhD9SILnVbgP1SSjXrtCjPtARKteClEaQc6Hio3V4V/MvPZylv3FBGtLT2qfxkg
-         2J0tNTuhfdy4K67G9UUY8NychWPUAWVCmQdggsqnT1078F4SlCnPSA4ie7A0FHCHK1rx
-         T69cml3f4xPzmG3/tVxGkZCROB1JpFpkCWS+SbrCpWsTpJmWhviZD52JAlG6IwEOeSW2
-         POmg==
-X-Gm-Message-State: AOJu0YxTPkMBuSGZQLAQk9Nofq5+XBXOaBt1x2nssal9F64XO/y7/DXM
-	yHd9c8nR2cATB5+MY//eQiW+p71NYz6jsnNZfw1QZTRSxYheY+6E5GMwdor8pcOClUGzaPgEk06
-	2CptjpF8q36uGYUsjFgmAbv23kdFVyoin
-X-Google-Smtp-Source: AGHT+IHdcl7ver1hyUqDfTUqlpU1y3z70kUZkNmQiiD45Tc0K4Iypj5sSfzt7Eo1TgHOjPkXznehIfF9mmMzNPv9qT0=
-X-Received: by 2002:a17:90a:f404:b0:2d8:dd14:79ed with SMTP id
- 98e67ed59e1d1-2e0b8ea5e93mr3798993a91.31.1727447537913; Fri, 27 Sep 2024
- 07:32:17 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1727448807; x=1728053607;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=INg9NDGbJndgApL4ta3KYfHMik711xYxdB14onZZNkM=;
+        b=dvw5cWRlsVFdWmT0DwWgZEn+CpUW8gLOBJDU6SvbR1/GD+QUGiO9Mn1uhPMiWdIX8T
+         8yLH49ik3gXC5i8a3Br+/DPtk52BXXKy0leS99m4XLCGE0RHI5u4t8IySHvNjiCNcE/L
+         1R0xarFH6fa9uilWOYjq+2D9MLjtbamIl9cR0G1scCx0QHrqz0XzE4szfxdR7QK9Xp04
+         IufYAZhVwges1pOA3hKvX9hF9Vm+/dYt6+QrQP+5q34BQVFBo89StsaYVsLMCTs1IXRM
+         YwJbiF7xCNgGLYcqs2SY62mTts3JxmA9KNwuAdkDDE0IJwOGcF/FRJdriR3eWr9PkwdQ
+         vgSg==
+X-Forwarded-Encrypted: i=1; AJvYcCVTebjnQKuCFVsdMV5sePE1MNkrXiT7EUGbQzd4KT8ERXjWqo5H0g/6fymt+pSLeC34DbxBQxKd8U0nHHiWGYA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwyL0YkAvFqoZ2UU3CJrXGkDaqoP+7h94oq5Xykea8TbeyI78vD
+	RR7rtdQ+49RknTRJGl8DSuzLnynz3crb7vTchkXM6Y/XsPpQX2phCc+sC8RVgZ2pbGs/UiaUqaO
+	OiPxSAz+8JBhuWEjcjtNn96saIwim7EyZD9ngSIop/3UbkcvxOWml8Vs=
+X-Google-Smtp-Source: AGHT+IHIUcpYtJFgSP7pDy5XgukcodOG+wBBK/L59AFlPJQxsc2QKzR35Blq4RzUjYQRWd3myrD5J0AkyOk9IN0/XkOe0NkeMsiK
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240927131441.2617450-1-quic_chejiang@quicinc.com>
-In-Reply-To: <20240927131441.2617450-1-quic_chejiang@quicinc.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Fri, 27 Sep 2024 10:31:51 -0400
-Message-ID: <CABBYNZJVVTqw=rz3ndWvak6=9PaQe0H1uwzT5qT+BK5D0R+_yg@mail.gmail.com>
-Subject: Re: [PATCH v1] Client: Fix the list_attributes command returning
- nothing for a dual-mode remote
-To: Cheng Jiang <quic_chejiang@quicinc.com>
-Cc: linux-bluetooth@vger.kernel.org, quic_jiaymao@quicinc.com
+X-Received: by 2002:a05:6e02:1d84:b0:3a2:74eb:91fa with SMTP id
+ e9e14a558f8ab-3a3451c1b12mr31149485ab.25.1727448807297; Fri, 27 Sep 2024
+ 07:53:27 -0700 (PDT)
+Date: Fri, 27 Sep 2024 07:53:27 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <66f6c6e7.050a0220.38ace9.0024.GAE@google.com>
+Subject: [syzbot] [bluetooth?] BUG: corrupted list in _hci_cmd_sync_cancel_entry
+From: syzbot <syzbot+01fdb2cc3f0b4ddcfcf1@syzkaller.appspotmail.com>
+To: johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, luiz.dentz@gmail.com, marcel@holtmann.org, 
+	syzkaller-bugs@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-Hi Cheng,
+Hello,
 
-On Fri, Sep 27, 2024 at 9:16=E2=80=AFAM Cheng Jiang <quic_chejiang@quicinc.=
-com> wrote:
->
-> When a dual-mode device is paired first on BR/EDR and
-> then on BLE through RPA, the RPA changes to a public
-> address after receiving the IRK. This results in two proxies
-> in default_ctrl->devices with the same public address.
-> In cmd_list_attributes, if the BR/EDR proxy is found first,
-> it prints no attributes.
+syzbot found the following issue on:
 
-This seems to be a bug then, if we resolve the address and there is
-already a device object for it then that shall be used instead of
-keeping 2 different objects paths, fixing bluetoothctl to allow
-multiple proxies with the same device won't do anything for other
-clients so this is just a workaround.
+HEAD commit:    a430d95c5efa Merge tag 'lsm-pr-20240911' of git://git.kern..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=136ba607980000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=44d46e514184cd24
+dashboard link: https://syzkaller.appspot.com/bug?extid=01fdb2cc3f0b4ddcfcf1
+compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
 
-There seems to be some code for detecting and merging the objects:
+Unfortunately, I don't have any reproducer for this issue yet.
 
-/* It is possible that we have two device objects for the same device in
- * case it has first been discovered over BR/EDR and has a private
- * address when discovered over LE for the first time. In such a case we
- * need to inherit critical values from the duplicate so that we don't
- * ovewrite them when writing to storage. The next time bluetoothd
- * starts the device will show up as a single instance.
- */
-void device_merge_duplicate(struct btd_device *dev, struct btd_device *dup)
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/bdf130384fad/disk-a430d95c.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/c62ff195641a/vmlinux-a430d95c.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/4069702199e2/bzImage-a430d95c.xz
 
-But it doesn't seem to carry over the services, etc, as it seems we
-can't really just use one object at this point then both need to
-interact with each other, perhaps by storing the duplicate into
-btd_device so the right object can be used depending on the bearer,
-etc.
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+01fdb2cc3f0b4ddcfcf1@syzkaller.appspotmail.com
 
-> Modify cmd_list_attributes to search all proxies in
-> default_ctrl->devices and display the related attributes.
-> ---
->  client/main.c | 55 +++++++++++++++++++++++++++++++++++++++++++++++----
->  1 file changed, 51 insertions(+), 4 deletions(-)
->
-> diff --git a/client/main.c b/client/main.c
-> index 50aa3e7a6..17c1fb278 100644
-> --- a/client/main.c
-> +++ b/client/main.c
-> @@ -768,6 +768,29 @@ static GDBusProxy *find_proxy_by_address(GList *sour=
-ce, const char *address)
->         return NULL;
->  }
->
-> +static GList *find_all_proxy_by_address(GList *source, const char *addre=
-ss)
-> +{
-> +       GList *list;
-> +       GList *all_proxy =3D NULL;
-> +
-> +       for (list =3D g_list_first(source); list; list =3D g_list_next(li=
-st)) {
-> +               GDBusProxy *proxy =3D list->data;
-> +               DBusMessageIter iter;
-> +               const char *str;
-> +
-> +               if (g_dbus_proxy_get_property(proxy, "Address", &iter) =
-=3D=3D FALSE)
-> +                       continue;
-> +
-> +               dbus_message_iter_get_basic(&iter, &str);
-> +
-> +               if (!strcasecmp(str, address))
-> +                       all_proxy =3D g_list_append(all_proxy, proxy);
-> +       }
-> +
-> +       return all_proxy;
-> +}
-> +
-> +
->  static gboolean check_default_ctrl(void)
->  {
->         if (!default_ctrl) {
-> @@ -2051,7 +2074,9 @@ static void cmd_disconn(int argc, char *argv[])
->
->  static void cmd_list_attributes(int argc, char *argv[])
->  {
-> -       GDBusProxy *proxy;
-> +       GList *all_proxy =3D NULL;
-> +       GList *list;
-> +       GDBusProxy *proxy =3D NULL;
->         const char *path;
->
->         if (argc > 1 && !strcmp(argv[1], "local")) {
-> @@ -2059,11 +2084,33 @@ static void cmd_list_attributes(int argc, char *a=
-rgv[])
->                 goto done;
->         }
->
-> -       proxy =3D find_device(argc, argv);
-> -       if (!proxy)
-> +       if (argc < 2 || !strlen(argv[1])) {
-> +               if (default_dev) {
-> +                       proxy =3D default_dev;
-> +                       path =3D g_dbus_proxy_get_path(proxy);
-> +                       goto done;
-> +               }
-> +               bt_shell_printf("Missing device address argument\n");
->                 return bt_shell_noninteractive_quit(EXIT_FAILURE);
-> +       } else {
-> +               if (check_default_ctrl() =3D=3D FALSE)
-> +                       return bt_shell_noninteractive_quit(EXIT_FAILURE)=
-;
->
-> -       path =3D g_dbus_proxy_get_path(proxy);
-> +               all_proxy =3D find_all_proxy_by_address(default_ctrl->dev=
-ices,
-> +                                                               argv[1]);
-> +               if (!all_proxy) {
-> +                       bt_shell_printf("Device %s not available\n", argv=
-[1]);
-> +                       return bt_shell_noninteractive_quit(EXIT_FAILURE)=
-;
-> +               }
-> +               for (list =3D g_list_first(all_proxy); list;
-> +                                               list =3D g_list_next(list=
-)) {
-> +                       proxy =3D list->data;
-> +                       path =3D g_dbus_proxy_get_path(proxy);
-> +                       gatt_list_attributes(path);
-> +               }
-> +               g_list_free(all_proxy);
-> +               return bt_shell_noninteractive_quit(EXIT_SUCCESS);
-> +       }
->
->  done:
->         gatt_list_attributes(path);
-> --
-> 2.25.1
->
->
+list_del corruption, ffff88801febb580->next is LIST_POISON1 (dead000000000100)
+------------[ cut here ]------------
+kernel BUG at lib/list_debug.c:56!
+Oops: invalid opcode: 0000 [#1] PREEMPT SMP KASAN PTI
+CPU: 1 UID: 0 PID: 8278 Comm: kworker/u9:2 Not tainted 6.11.0-syzkaller-02574-ga430d95c5efa #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 08/06/2024
+Workqueue: hci2 hci_conn_timeout
+RIP: 0010:__list_del_entry_valid_or_report+0x108/0x1c0 lib/list_debug.c:56
+Code: c7 c7 80 1b b1 8b e8 c7 c6 dd fc 90 0f 0b 48 c7 c7 e0 1b b1 8b e8 b8 c6 dd fc 90 0f 0b 48 c7 c7 40 1c b1 8b e8 a9 c6 dd fc 90 <0f> 0b 48 89 ca 48 c7 c7 a0 1c b1 8b e8 97 c6 dd fc 90 0f 0b 48 89
+RSP: 0018:ffffc90003a1fbe0 EFLAGS: 00010286
+RAX: 000000000000004e RBX: ffff88801febb580 RCX: ffffffff816c6699
+RDX: 0000000000000000 RSI: ffffffff816cf7b6 RDI: 0000000000000005
+RBP: ffff88805f5a8000 R08: 0000000000000005 R09: 0000000000000000
+R10: 0000000080000000 R11: 0000000000000001 R12: ffff88801febb588
+R13: dffffc0000000000 R14: ffff88805f5a8618 R15: ffff88801febb580
+FS:  0000000000000000(0000) GS:ffff8880b8900000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00000000202f5000 CR3: 0000000060a82000 CR4: 00000000003506f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ __list_del_entry_valid include/linux/list.h:124 [inline]
+ __list_del_entry include/linux/list.h:215 [inline]
+ list_del include/linux/list.h:229 [inline]
+ _hci_cmd_sync_cancel_entry.constprop.0+0x80/0x1d0 net/bluetooth/hci_sync.c:643
+ hci_cmd_sync_cancel_entry net/bluetooth/hci_sync.c:847 [inline]
+ hci_cmd_sync_dequeue_once net/bluetooth/hci_sync.c:866 [inline]
+ hci_cancel_connect_sync+0x103/0x2c0 net/bluetooth/hci_sync.c:6844
+ hci_abort_conn+0x163/0x340 net/bluetooth/hci_conn.c:2948
+ hci_conn_timeout+0x1ab/0x220 net/bluetooth/hci_conn.c:576
+ process_one_work+0x9c5/0x1b40 kernel/workqueue.c:3231
+ process_scheduled_works kernel/workqueue.c:3312 [inline]
+ worker_thread+0x6c8/0xf00 kernel/workqueue.c:3393
+ kthread+0x2c1/0x3a0 kernel/kthread.c:389
+ ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
+ </TASK>
+Modules linked in:
+---[ end trace 0000000000000000 ]---
+RIP: 0010:__list_del_entry_valid_or_report+0x108/0x1c0 lib/list_debug.c:56
+Code: c7 c7 80 1b b1 8b e8 c7 c6 dd fc 90 0f 0b 48 c7 c7 e0 1b b1 8b e8 b8 c6 dd fc 90 0f 0b 48 c7 c7 40 1c b1 8b e8 a9 c6 dd fc 90 <0f> 0b 48 89 ca 48 c7 c7 a0 1c b1 8b e8 97 c6 dd fc 90 0f 0b 48 89
+RSP: 0018:ffffc90003a1fbe0 EFLAGS: 00010286
+RAX: 000000000000004e RBX: ffff88801febb580 RCX: ffffffff816c6699
+RDX: 0000000000000000 RSI: ffffffff816cf7b6 RDI: 0000000000000005
+RBP: ffff88805f5a8000 R08: 0000000000000005 R09: 0000000000000000
+R10: 0000000080000000 R11: 0000000000000001 R12: ffff88801febb588
+R13: dffffc0000000000 R14: ffff88805f5a8618 R15: ffff88801febb580
+FS:  0000000000000000(0000) GS:ffff8880b8900000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00000000202f5000 CR3: 0000000060a82000 CR4: 00000000003506f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
 
 
---=20
-Luiz Augusto von Dentz
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
