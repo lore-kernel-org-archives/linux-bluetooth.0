@@ -1,66 +1,67 @@
-Received: from mail-pj1-f49.google.com (mail-pj1-f49.google.com [209.85.216.49])
+Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE0274D8AE
-	for <linux-bluetooth@vger.kernel.org>; Fri, 27 Sep 2024 14:04:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACE42101F2
+	for <linux-bluetooth@vger.kernel.org>; Fri, 27 Sep 2024 14:32:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727445846; cv=none; b=NOUl15dRBGDbAceGLiHoVObbrrqC7MUOrZl+L/kW4Gy8k+jhaSy6DEiHT7QRmtyzaMkfJQe8Rdo0SnOVOIEJMw9/wB3+M3qsquUR8SPuCAFuX+csEvcJjcaN0WTqFRfyezl0DaF2uI8O4HVYs9Y1wz5oPzP5DSQqGJqxtMXK0bg=
+	t=1727447540; cv=none; b=C6mH9sjru9tyKuB26VVvGNamaYVVeCIFgrAiDSp+Q8sZC1Y4Rhes2IEeUbHjVbszyHsL+Q2Q5dEHtaG3Yh+WfTZTCAaUvA5xE+jz/2V0SVUNbj6fJvWpQsMX5qGmTapK/bjiHcPgaUuQHGEaV9N5N9ahPGl6hfLW7rWaCf6JOFE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727445846; c=relaxed/simple;
-	bh=xi771b3alc1fONBXY5mndzop2Ch4Alrv71ofNyh6lV0=;
+	s=arc-20240116; t=1727447540; c=relaxed/simple;
+	bh=UeP5wWeY/PHDdEMJ7xb10F6uNp+1NcHjzBLUz+QEBoE=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Feu2C2KeoR9RmOFpC//FNcZO23DcJAYCO2GLCAIur9kFGooTrWQt2GFtrXozjibW1Yg12wR34e9ho6lOPzHIVM0YCfMOz+d1LaBwW9sCkxan3qM+cIetNSZjDoJxtxEAJ7exNO1tl0RsYmVIIQwaZlV9KHB6NEZOBgPSsOx5Qko=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LPQ928xn; arc=none smtp.client-ip=209.85.216.49
+	 To:Cc:Content-Type; b=VkqqwGF9aVBXb320j09LukH6qqpYpiBso30ZfoQM1Pev70aAanXVAwmUtI7zeEtwTumYmIQ2oESgLaSg9kmLSK60iwJx7xXYw2gWLjdtDJY90G7ucWAyM7yYZerr1DiEmv6wX9cM/i4xKslzKPwpcZJCSjRT5NYhwE6QYQDW81E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=d5nk5WCe; arc=none smtp.client-ip=209.85.214.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LPQ928xn"
-Received: by mail-pj1-f49.google.com with SMTP id 98e67ed59e1d1-2e078d28fe9so1672725a91.2
-        for <linux-bluetooth@vger.kernel.org>; Fri, 27 Sep 2024 07:04:04 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="d5nk5WCe"
+Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-208ccde82e6so18426915ad.0
+        for <linux-bluetooth@vger.kernel.org>; Fri, 27 Sep 2024 07:32:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1727445844; x=1728050644; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1727447538; x=1728052338; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=XmOY+Gm8ZjonH2bBJkgcnepbJdHLQAXV0V/l6wZ3V/g=;
-        b=LPQ928xnv6vndw4uYWzRp4bz9LBvoHipHsoucxOp34yUS1aG1R6FUQdUobvvHQUpOS
-         8UazUDEeNHQ+E0kTSmoXcg9uzrxKROL5tiP8dI0qNvLhbGusV2FSAI+gwEhM3XqCZkr+
-         RXunbYFC18Drv71R8IP3oGjydwF1Ya1n48CVPvThqeTk1mP2Cx1de6BNNIWN9TIwe5EQ
-         Be3vaw+WvdFWZm8ctIA+FLoaiarmWbfykPPLa+wKSQ0ggIt76FTLlS/zGizLM2a46C4c
-         mdfiEl4lb83lZkbRGAIRMphL0NzsVJjH/0M/t7mUMmcBKUaSuS2W/v+5aNtA33kZYO3G
-         P56w==
+        bh=yGshuMhUi31rLD3vo8imJhAfUbp4AQprUmb56tDp1wI=;
+        b=d5nk5WCemtIg03JJlyaDZTfyxPd7ckrSba1b3Y+piFxStQvhgVX00CGPVpmQEvuR8U
+         jvetbuj4eVvml7gZvYGr1dI3sh0Gjv5rqH+Hr7721Zu62xk4U+SCAJ8tYDE6caqTeMFr
+         pv54m9grN04Gy1ixCTpTyLh/sp8vm/5fl54rB4fEaS+r9zpFVviy7blSvUNaZFYomRBg
+         nEhGs/j5ydCv5gYmyRrNvSpEc6jLqKDeqXVojVsdl25FAXkj9tHYccUCg+gNfjF7Ngln
+         wQnLi0szN5Un19H8libzdVVUV7fCOE3399WFY6E8jG+hXnEh3whdMrBDM+0h79Gq5uqs
+         WFLA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727445844; x=1728050644;
+        d=1e100.net; s=20230601; t=1727447538; x=1728052338;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=XmOY+Gm8ZjonH2bBJkgcnepbJdHLQAXV0V/l6wZ3V/g=;
-        b=HhCwe0Th28SbgJmTt3hq16mzYfBdVDd8c9+KEWoXNGMk/Le1BXHJlArpSdS4DK9ukU
-         LJxa57A+uf0mudBpz46B67OTbfDG3OIzw1OvoMSHoPwgWFTeq9kbhnsV5I+In4bJTk3G
-         ikYcWIL+5K4y9H77YbtGO82vNJEUvgM9C7KpwfgD8+7t7ilnt13LBkA6LDc3JRr+/w3o
-         AnQHVtzL8cQtLFG9RAVPWhTElnqfBNrCP04OGrufexWM5DOnnsANWmX+dbByLQevnSYc
-         OPHfdbpUcaTKBdqQHPuQgQzkwy0jre602yBogfgXIfou8cMiMobTgGQM05bTeFBv9DRL
-         kt5A==
-X-Gm-Message-State: AOJu0YyJGtI8+QIj3z73GYuWd3l76skqa5C/tJjpbcfmZ5iovTxsT7pM
-	0lWHdswKMdNYTT/wex3yRJa+s5KaR5gfPBLPiP16LpsWHvkkOUM9j7dlv0nA1+79fVZsRJRw29/
-	6wTsuxJNLQeF7xsA6RPtqSoqxITs=
-X-Google-Smtp-Source: AGHT+IGpMTUgVTUMt2RyFebTEYKoZvP399JiXhRSh6/QWCKxCAT29dS51dTCE5d2CwCJaNUDblKWhcUYjcAoW680Hio=
-X-Received: by 2002:a17:90a:cb96:b0:2c8:f3b4:421 with SMTP id
- 98e67ed59e1d1-2e0b89a68d7mr4126522a91.4.1727445844023; Fri, 27 Sep 2024
- 07:04:04 -0700 (PDT)
+        bh=yGshuMhUi31rLD3vo8imJhAfUbp4AQprUmb56tDp1wI=;
+        b=flCgYsiOdr9SPY7Q/tt1zOQyRf+ATWYz9SKvOp9YoBdtSdc180hgUvtQGFctlKIewN
+         k6OwqkQReP81SgZLhNpXTkHGbPVRuUuJRj5lWUHTeA04GO1KWXaR0KJm8uNwamHmwdHw
+         hrmhDYhD9SILnVbgP1SSjXrtCjPtARKteClEaQc6Hio3V4V/MvPZylv3FBGtLT2qfxkg
+         2J0tNTuhfdy4K67G9UUY8NychWPUAWVCmQdggsqnT1078F4SlCnPSA4ie7A0FHCHK1rx
+         T69cml3f4xPzmG3/tVxGkZCROB1JpFpkCWS+SbrCpWsTpJmWhviZD52JAlG6IwEOeSW2
+         POmg==
+X-Gm-Message-State: AOJu0YxTPkMBuSGZQLAQk9Nofq5+XBXOaBt1x2nssal9F64XO/y7/DXM
+	yHd9c8nR2cATB5+MY//eQiW+p71NYz6jsnNZfw1QZTRSxYheY+6E5GMwdor8pcOClUGzaPgEk06
+	2CptjpF8q36uGYUsjFgmAbv23kdFVyoin
+X-Google-Smtp-Source: AGHT+IHdcl7ver1hyUqDfTUqlpU1y3z70kUZkNmQiiD45Tc0K4Iypj5sSfzt7Eo1TgHOjPkXznehIfF9mmMzNPv9qT0=
+X-Received: by 2002:a17:90a:f404:b0:2d8:dd14:79ed with SMTP id
+ 98e67ed59e1d1-2e0b8ea5e93mr3798993a91.31.1727447537913; Fri, 27 Sep 2024
+ 07:32:17 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240927023854.2447283-1-quic_chejiang@quicinc.com>
-In-Reply-To: <20240927023854.2447283-1-quic_chejiang@quicinc.com>
+References: <20240927131441.2617450-1-quic_chejiang@quicinc.com>
+In-Reply-To: <20240927131441.2617450-1-quic_chejiang@quicinc.com>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Fri, 27 Sep 2024 10:03:27 -0400
-Message-ID: <CABBYNZKy191ztOWergLbA1B5O0f-E-e59XT4eQoEFebzxPW-iQ@mail.gmail.com>
-Subject: Re: [PATCH v4] device: Remove device after all bearers are disconnected
+Date: Fri, 27 Sep 2024 10:31:51 -0400
+Message-ID: <CABBYNZJVVTqw=rz3ndWvak6=9PaQe0H1uwzT5qT+BK5D0R+_yg@mail.gmail.com>
+Subject: Re: [PATCH v1] Client: Fix the list_attributes command returning
+ nothing for a dual-mode remote
 To: Cheng Jiang <quic_chejiang@quicinc.com>
 Cc: linux-bluetooth@vger.kernel.org, quic_jiaymao@quicinc.com
 Content-Type: text/plain; charset="UTF-8"
@@ -68,116 +69,137 @@ Content-Transfer-Encoding: quoted-printable
 
 Hi Cheng,
 
-On Thu, Sep 26, 2024 at 10:39=E2=80=AFPM Cheng Jiang <quic_chejiang@quicinc=
-.com> wrote:
+On Fri, Sep 27, 2024 at 9:16=E2=80=AFAM Cheng Jiang <quic_chejiang@quicinc.=
+com> wrote:
 >
-> For a combo mode remote, both BR/EDR and BLE may be connected.
-> RemoveDevice should be handled after all bearers are dropped,
-> otherwise, remove device is not performed in adapter_remove_connection.
+> When a dual-mode device is paired first on BR/EDR and
+> then on BLE through RPA, the RPA changes to a public
+> address after receiving the IRK. This results in two proxies
+> in default_ctrl->devices with the same public address.
+> In cmd_list_attributes, if the BR/EDR proxy is found first,
+> it prints no attributes.
+
+This seems to be a bug then, if we resolve the address and there is
+already a device object for it then that shall be used instead of
+keeping 2 different objects paths, fixing bluetoothctl to allow
+multiple proxies with the same device won't do anything for other
+clients so this is just a workaround.
+
+There seems to be some code for detecting and merging the objects:
+
+/* It is possible that we have two device objects for the same device in
+ * case it has first been discovered over BR/EDR and has a private
+ * address when discovered over LE for the first time. In such a case we
+ * need to inherit critical values from the duplicate so that we don't
+ * ovewrite them when writing to storage. The next time bluetoothd
+ * starts the device will show up as a single instance.
+ */
+void device_merge_duplicate(struct btd_device *dev, struct btd_device *dup)
+
+But it doesn't seem to carry over the services, etc, as it seems we
+can't really just use one object at this point then both need to
+interact with each other, perhaps by storing the duplicate into
+btd_device so the right object can be used depending on the bearer,
+etc.
+
+> Modify cmd_list_attributes to search all proxies in
+> default_ctrl->devices and display the related attributes.
 > ---
->  src/device.c | 21 ++++++++++++++++++++-
->  1 file changed, 20 insertions(+), 1 deletion(-)
+>  client/main.c | 55 +++++++++++++++++++++++++++++++++++++++++++++++----
+>  1 file changed, 51 insertions(+), 4 deletions(-)
 >
-> diff --git a/src/device.c b/src/device.c
-> index f8f61e643..4efd755a0 100644
-> --- a/src/device.c
-> +++ b/src/device.c
-> @@ -3492,8 +3492,27 @@ void device_remove_connection(struct btd_device *d=
-evice, uint8_t bdaddr_type,
->                 DBusMessage *msg =3D device->disconnects->data;
+> diff --git a/client/main.c b/client/main.c
+> index 50aa3e7a6..17c1fb278 100644
+> --- a/client/main.c
+> +++ b/client/main.c
+> @@ -768,6 +768,29 @@ static GDBusProxy *find_proxy_by_address(GList *sour=
+ce, const char *address)
+>         return NULL;
+>  }
 >
->                 if (dbus_message_is_method_call(msg, ADAPTER_INTERFACE,
-> -                                                               "RemoveDe=
-vice"))
-> +                                                       "RemoveDevice")) =
-{
+> +static GList *find_all_proxy_by_address(GList *source, const char *addre=
+ss)
+> +{
+> +       GList *list;
+> +       GList *all_proxy =3D NULL;
 > +
-> +                       /* Don't handle the RemoveDevice msg if device is
-> +                        * connected. For a dual-mode remote, both BR/EDR
-> +                        * and BLE may be connected, RemoveDevice should
-> +                        * be handled after all bearers are disconnects.
-> +                        * Otherwise, if msg is removed, but not all
-> +                        * connection are dropped, this function returns
-> +                        * before *remove is updated, then after all
-> +                        * connections are dropped, but device->disconnec=
-ts
-> +                        * is NULL, remove_device is not updated. Consequ=
-ently
-> +                        * *remove is not set to true. The device is not =
-removed
-> +                        * for adapter in adapter_remove_connection. Need
-> +                        * to wait for temporary device timeout to remove
-> +                        * the device.
-> +                        */
-
-I mean as git description, anyway Im having second thoughts about this
-change, see below.
-
-> +                       if (device->bredr_state.connected ||
-> +                                       device->le_state.connected)
-> +                               break;
->                         remove_device =3D true;
-> +               }
+> +       for (list =3D g_list_first(source); list; list =3D g_list_next(li=
+st)) {
+> +               GDBusProxy *proxy =3D list->data;
+> +               DBusMessageIter iter;
+> +               const char *str;
+> +
+> +               if (g_dbus_proxy_get_property(proxy, "Address", &iter) =
+=3D=3D FALSE)
+> +                       continue;
+> +
+> +               dbus_message_iter_get_basic(&iter, &str);
+> +
+> +               if (!strcasecmp(str, address))
+> +                       all_proxy =3D g_list_append(all_proxy, proxy);
+> +       }
+> +
+> +       return all_proxy;
+> +}
+> +
+> +
+>  static gboolean check_default_ctrl(void)
+>  {
+>         if (!default_ctrl) {
+> @@ -2051,7 +2074,9 @@ static void cmd_disconn(int argc, char *argv[])
 >
->                 g_dbus_send_reply(dbus_conn, msg, DBUS_TYPE_INVALID);
->                 device->disconnects =3D g_slist_remove(device->disconnect=
-s, msg);
-
-How we move the block checking for disconnect message after check all
-bearers have been disconnected:
-
-diff --git a/src/device.c b/src/device.c
-index f8f61e64376c..76d2c859c747 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -3488,18 +3488,6 @@ void device_remove_connection(struct btd_device
-*device, uint8_t bdaddr_type,
-                device->connect =3D NULL;
-        }
-
--       while (device->disconnects) {
--               DBusMessage *msg =3D device->disconnects->data;
--
--               if (dbus_message_is_method_call(msg, ADAPTER_INTERFACE,
--                                                               "RemoveDevi=
-ce"))
--                       remove_device =3D true;
--
--               g_dbus_send_reply(dbus_conn, msg, DBUS_TYPE_INVALID);
--               device->disconnects =3D g_slist_remove(device->disconnects,=
- msg);
--               dbus_message_unref(msg);
--       }
--
-        /* Check paired status of both bearers since it's possible to be
-        /* Check paired status of both bearers since it's possible to be
-        /* Check paired status of both bearers since it's possible to be
-         * paired but not connected via link key to LTK conversion.
-         */
-@@ -3539,6 +3527,18 @@ void device_remove_connection(struct btd_device
-*device, uint8_t bdaddr_type,
-        g_dbus_emit_property_changed(dbus_conn, device->path,
-                                                DEVICE_INTERFACE, "Connecte=
-d");
-
-+       while (device->disconnects) {
-+               DBusMessage *msg =3D device->disconnects->data;
-+
-+               if (dbus_message_is_method_call(msg, ADAPTER_INTERFACE,
-+                                                               "RemoveDevi=
-ce"))
-+                       remove_device =3D true;
-+
-+               g_dbus_send_reply(dbus_conn, msg, DBUS_TYPE_INVALID);
-+               device->disconnects =3D g_slist_remove(device->disconnects,=
- msg);
-+               dbus_message_unref(msg);
-+       }
-+
-        if (remove_device)
-                *remove =3D remove_device;
-
-
+>  static void cmd_list_attributes(int argc, char *argv[])
+>  {
+> -       GDBusProxy *proxy;
+> +       GList *all_proxy =3D NULL;
+> +       GList *list;
+> +       GDBusProxy *proxy =3D NULL;
+>         const char *path;
+>
+>         if (argc > 1 && !strcmp(argv[1], "local")) {
+> @@ -2059,11 +2084,33 @@ static void cmd_list_attributes(int argc, char *a=
+rgv[])
+>                 goto done;
+>         }
+>
+> -       proxy =3D find_device(argc, argv);
+> -       if (!proxy)
+> +       if (argc < 2 || !strlen(argv[1])) {
+> +               if (default_dev) {
+> +                       proxy =3D default_dev;
+> +                       path =3D g_dbus_proxy_get_path(proxy);
+> +                       goto done;
+> +               }
+> +               bt_shell_printf("Missing device address argument\n");
+>                 return bt_shell_noninteractive_quit(EXIT_FAILURE);
+> +       } else {
+> +               if (check_default_ctrl() =3D=3D FALSE)
+> +                       return bt_shell_noninteractive_quit(EXIT_FAILURE)=
+;
+>
+> -       path =3D g_dbus_proxy_get_path(proxy);
+> +               all_proxy =3D find_all_proxy_by_address(default_ctrl->dev=
+ices,
+> +                                                               argv[1]);
+> +               if (!all_proxy) {
+> +                       bt_shell_printf("Device %s not available\n", argv=
+[1]);
+> +                       return bt_shell_noninteractive_quit(EXIT_FAILURE)=
+;
+> +               }
+> +               for (list =3D g_list_first(all_proxy); list;
+> +                                               list =3D g_list_next(list=
+)) {
+> +                       proxy =3D list->data;
+> +                       path =3D g_dbus_proxy_get_path(proxy);
+> +                       gatt_list_attributes(path);
+> +               }
+> +               g_list_free(all_proxy);
+> +               return bt_shell_noninteractive_quit(EXIT_SUCCESS);
+> +       }
+>
+>  done:
+>         gatt_list_attributes(path);
 > --
 > 2.25.1
 >
