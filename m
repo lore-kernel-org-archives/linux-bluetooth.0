@@ -1,104 +1,107 @@
-Received: from mail-qv1-f51.google.com (mail-qv1-f51.google.com [209.85.219.51])
+Received: from mail-yb1-f176.google.com (mail-yb1-f176.google.com [209.85.219.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF89E198A01
-	for <linux-bluetooth@vger.kernel.org>; Mon, 30 Sep 2024 16:41:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F24811514C9
+	for <linux-bluetooth@vger.kernel.org>; Mon, 30 Sep 2024 19:30:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727714504; cv=none; b=SAf13jKOmPQKhYvSc8Od1BCYILgAcC6vyt3KLe5dk+udBiN/2zQ51V5FY4PL2IxAUFI4LIHeBdhZxjCMZu62yfcI42SzZBNEyrHfbignw1Zf1/uJPICTNH3r72ZRK7x4l5iF14CQ/CGEZtpRfZFDb2+VWnXzgOreSjmaLH1mSHo=
+	t=1727724650; cv=none; b=Waswfp+e8wiK8GrDodb2KPrPR3XfQdGpGXMRjec2JWlOHGpjItB1G9LegvigcW5a1HM6YNPwqCBEvQ70ib0Pc52Djz89Xsf1CgfDN8iSEWlpLSeTgtmplGQ+r5hgrZ8ZvkXRhkJXmiVMJ2HocZfiNp+K7PmZsOKMzXXBbwnoTfY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727714504; c=relaxed/simple;
-	bh=wQ0KKfj/Vpv/65TDDPTr8BARQFooBK5/PMuqd5VXZSI=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=LD0UN4msewCGqK2gxhR+teb/uPkiTetlNEJ2vUNp2tPLPStwY2rW1+4Att0qgXw8/2KB1l8adXzGvkQROEyV1G7uDmugutXwxCF8wrEn1xLzg6Ax8rQPbRZ+o+QYy0H9PMeZjSDIu/VsXBeIx/8su4SD9hUjFrze75Q8ICrOV6g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TdIGtENb; arc=none smtp.client-ip=209.85.219.51
+	s=arc-20240116; t=1727724650; c=relaxed/simple;
+	bh=/b+gsPVuyPaVSP71MAlIW80vA5n0QNd1zI8QCC9Ynt8=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=L5mApZcVzbsD/gqQpTczJktH2VVHW2l1KY8Q+TrO6Rs2wObUoABSiQ6tNWOrmOSCG9zMtCQpI8ilIEolflskvTM4Lsqmjn4LTCHjJy9+FILKEYfkw6jL4EyPTz6dwiSfYBXGthDlYftgGtaEUe/nCG/TAlf53WsruaXBYRNeupc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bR7c8JI3; arc=none smtp.client-ip=209.85.219.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TdIGtENb"
-Received: by mail-qv1-f51.google.com with SMTP id 6a1803df08f44-6cb54eef205so16853726d6.2
-        for <linux-bluetooth@vger.kernel.org>; Mon, 30 Sep 2024 09:41:41 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bR7c8JI3"
+Received: by mail-yb1-f176.google.com with SMTP id 3f1490d57ef6-e262c652f99so167242276.0
+        for <linux-bluetooth@vger.kernel.org>; Mon, 30 Sep 2024 12:30:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1727714500; x=1728319300; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=GfVsdlQU6OR8HO9AyeMdIPhQ0jooGkqRv20mo037jyg=;
-        b=TdIGtENbm1JbTMjJFi91sIb6NFVJ81nbPR6sTH0VAFhM6RSKlR+dGzZRkTft8XukYd
-         +LD9OCkVoKoe6DiEBsJsaUgUuxTZpApPYCaYogjAYkeBqfS/qbijSPU+WK9sB3b3nxLc
-         kCyjyIkVFkB6hgQpwW1iFVhgpQPafT4tzkaNe1I/tkaJDM2EvmsiHEhZtYTNULhfNgXX
-         KMk1nsHIp37B9Y4u6YZOXsM5Y7K0oz4kStBrP/fQrX7Ao7nqVa2uzQp0FjoZn/8KNmsQ
-         F1q9jmrK9hH20NFqe9RkJ76KHuVuYKR/PiIg+wuFbMQH/kQ2g62yDiAsfjWX+rch9xGA
-         xISQ==
+        d=gmail.com; s=20230601; t=1727724647; x=1728329447; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=OkDsgt1f4U8H7Pj7Y2ppusMAZHpfUVV2u+6EYx34DBc=;
+        b=bR7c8JI3LxLxaBDgNSgrtR0vpmSGhtDnoaDyjofH2H7UCjTCceAf/Iq7YMzVCgASpw
+         1BVFeKbYvUMT6TKbi38AlgQYPltxJSXBvzOi8z6n8KSTgfY09O/cwwNW7C5dAuMLVLqH
+         59Ol+wzDcUx+B2DZU4osl0WWxPR2nQIhRZJZixqZYiYtfH6lh2eiuetKjGRoDtsae7n1
+         CLiOirYwluFAV3ASgYM6hpDh+txi8jM1dDDjHv00HngcFmLkXRLUXEh5QlT1Rzol2Wd1
+         zP6JNwqL727XOEyeqikNqs5u00e6xWDNuxlhOz2qYyZFBgN2s2RZ3HGuevzlztaRJc2m
+         gb+Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727714500; x=1728319300;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=GfVsdlQU6OR8HO9AyeMdIPhQ0jooGkqRv20mo037jyg=;
-        b=DLcMy4hJ/RK6d81CD54KRUVY98lFQQSVsWJ0UhQTRpkAbiHJyc7pDq49AyRRU9kWgp
-         vR084DPv+7N16VOSE/kx/iS8dHkScolh+eEDHYBEg2+woect9zU/cRQ/FxP837BjXALM
-         TacIYZyB+EwFKjwPBTFT9EnYZg/CPC/7gX52X6iVAiYUz2x5BRqDgxFzsOD2mk3zQrhf
-         4uq4wwFfF2CtAhPKygcEiKn7P8qfYO2vYsfKBe+Rwxemq2xpIN/GYNRVz/nF13xNuEuR
-         3FTWatW+1XxFW+NsJlQVcXNcTD5B918P9AOosUCydADnfA3RToD1AwCKsJv4GDzbiexz
-         lF0A==
-X-Gm-Message-State: AOJu0Yzd1LWpdu7SwYOKFK6GHlSnfi33+l30PhxtumO6sY/GNJi6sih5
-	Cx2iRWzdryvS7Jm6eZzeCvLtiAUfKwCEalrzT0KfDde7t865hM+A2+FVXQ==
-X-Google-Smtp-Source: AGHT+IH6bLaIedyWHw7cvfXCPEK0YxmxIs3It/glOIRfzFLA6CMkE1RMxLPzUDdZ9q/u2/PQdGWwZw==
-X-Received: by 2002:a05:6214:4a8a:b0:6cb:1b95:1436 with SMTP id 6a1803df08f44-6cb3b5ee149mr238588926d6.19.1727714500472;
-        Mon, 30 Sep 2024 09:41:40 -0700 (PDT)
-Received: from [172.17.0.2] ([20.161.77.195])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6cb3b5ff1basm41501066d6.12.2024.09.30.09.41.39
+        d=1e100.net; s=20230601; t=1727724647; x=1728329447;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=OkDsgt1f4U8H7Pj7Y2ppusMAZHpfUVV2u+6EYx34DBc=;
+        b=azu7ofLykLXc/Se/8AXoA0MkOgK726Ep9b/D8hvrulpa4qVNUUcPA6ZXOa4JHBWiHf
+         hqpvSd0MV3RYrUyA497HrVdKS0J72Fc/hnumfFKlZn5xms4nA5yFFIkONCLI2yNKhgFv
+         lCu3NTObb0MidI2k5tqxJNqSGXZi9tLmIfwKEL27AxcBGgPtoUy5gLNsR4AMXRwU7hH2
+         pLOwlEhGAvyADINzDrK6LZD1jO67yYVDUDhUuoIztARJ0uZa4aOFWH+GXWMnBOn7ahnc
+         e1B9KbnTjYhsEXxvnVxCkTnC8GM7SEm0rUpHBd6P/+wFw4eg0U8Fawg75OrEjR8840kb
+         iJmw==
+X-Gm-Message-State: AOJu0YzH7yDlJAK6ngIpNOadCW4Q1GNlUKkLs0Km6EloLLiTxY5Gn4/v
+	UwqrRkZndh+lWE5eyW3i0GHltGxj1ZfEG3DdQbS8tKEpU7wlsRMfyUkfRg==
+X-Google-Smtp-Source: AGHT+IFHqkXzFmRzbL6CiWbqnmfUgpKY+7JfZbe9qEn8Fc7b3Bj4XYYuRquEIHHm0g0Sd+1/9IKU9A==
+X-Received: by 2002:a05:6902:c11:b0:e22:59c6:5d2f with SMTP id 3f1490d57ef6-e2604caa689mr11181057276.51.1727724647024;
+        Mon, 30 Sep 2024 12:30:47 -0700 (PDT)
+Received: from lvondent-mobl5.. (syn-107-146-107-067.res.spectrum.com. [107.146.107.67])
+        by smtp.gmail.com with ESMTPSA id 3f1490d57ef6-e25e400f721sm2465810276.14.2024.09.30.12.30.45
+        for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 30 Sep 2024 09:41:39 -0700 (PDT)
-Message-ID: <66fad4c3.050a0220.2375f7.de99@mx.google.com>
-Date: Mon, 30 Sep 2024 09:41:39 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============2691215067875162719=="
+        Mon, 30 Sep 2024 12:30:45 -0700 (PDT)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH v1] Bluetooth: RFCOMM: FIX possible deadlock in rfcomm_sk_state_change
+Date: Mon, 30 Sep 2024 15:30:44 -0400
+Message-ID: <20240930193044.2907716-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.46.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, vlad.pruteanu@nxp.com
-Subject: RE: [1/1] client: Update endpoint and trasport doc
-In-Reply-To: <20240930145830.864663-1-vlad.pruteanu@nxp.com>
-References: <20240930145830.864663-1-vlad.pruteanu@nxp.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 
---===============2691215067875162719==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This is automated email and please do not reply to this email!
+rfcomm_sk_state_change attempts to use sock_lock so it must never be
+called with it locked but rfcomm_sock_ioctl always attempt to lock it
+causing the following trace:
 
-Dear submitter,
+======================================================
+WARNING: possible circular locking dependency detected
+6.8.0-syzkaller-08951-gfe46a7dd189e #0 Not tainted
+------------------------------------------------------
+syz-executor386/5093 is trying to acquire lock:
+ffff88807c396258 (sk_lock-AF_BLUETOOTH-BTPROTO_RFCOMM){+.+.}-{0:0}, at: lock_sock include/net/sock.h:1671 [inline]
+ffff88807c396258 (sk_lock-AF_BLUETOOTH-BTPROTO_RFCOMM){+.+.}-{0:0}, at: rfcomm_sk_state_change+0x5b/0x310 net/bluetooth/rfcomm/sock.c:73
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=894120
+but task is already holding lock:
+ffff88807badfd28 (&d->lock){+.+.}-{3:3}, at: __rfcomm_dlc_close+0x226/0x6a0 net/bluetooth/rfcomm/core.c:491
 
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      0.44 seconds
-GitLint                       PASS      0.32 seconds
-BuildEll                      PASS      24.61 seconds
-BluezMake                     PASS      1601.56 seconds
-MakeCheck                     PASS      15.11 seconds
-MakeDistcheck                 PASS      176.29 seconds
-CheckValgrind                 PASS      249.67 seconds
-CheckSmatch                   PASS      349.75 seconds
-bluezmakeextell               PASS      119.79 seconds
-IncrementalBuild              PASS      1414.52 seconds
-ScanBuild                     PASS      1013.68 seconds
-
-
-
+Reported-by: syzbot+d7ce59b06b3eb14fd218@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=d7ce59b06b3eb14fd218
+Fixes: 3241ad820dbb ("[Bluetooth] Add timestamp support to L2CAP, RFCOMM and SCO")
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 ---
-Regards,
-Linux Bluetooth
+ net/bluetooth/rfcomm/sock.c | 2 --
+ 1 file changed, 2 deletions(-)
 
+diff --git a/net/bluetooth/rfcomm/sock.c b/net/bluetooth/rfcomm/sock.c
+index 37d63d768afb..f48250e3f2e1 100644
+--- a/net/bluetooth/rfcomm/sock.c
++++ b/net/bluetooth/rfcomm/sock.c
+@@ -865,9 +865,7 @@ static int rfcomm_sock_ioctl(struct socket *sock, unsigned int cmd, unsigned lon
+ 
+ 	if (err == -ENOIOCTLCMD) {
+ #ifdef CONFIG_BT_RFCOMM_TTY
+-		lock_sock(sk);
+ 		err = rfcomm_dev_ioctl(sk, cmd, (void __user *) arg);
+-		release_sock(sk);
+ #else
+ 		err = -EOPNOTSUPP;
+ #endif
+-- 
+2.46.1
 
---===============2691215067875162719==--
