@@ -1,173 +1,124 @@
-Received: from out-24.smtp.github.com (out-24.smtp.github.com [192.30.252.207])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f182.google.com (mail-lj1-f182.google.com [209.85.208.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BFA41A0B0C
-	for <linux-bluetooth@vger.kernel.org>; Mon, 30 Sep 2024 20:18:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.207
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5544C1A0AFA
+	for <linux-bluetooth@vger.kernel.org>; Mon, 30 Sep 2024 20:36:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727727525; cv=none; b=ul1szvNH6mK9zYK6/5BuHXj9xAf0g5koPFWqCanUm/uNSdf85mYRS+zkvhFpi1jd+aVl3gMYofMaKUWy3uZ2cl2nR1mG1e1eVTC2l6lik8fnBCn8ENURq82FzvgLly6FNTbAaDz3171pBogczBGyx3wrfN3oHveuaw4vpBlb26A=
+	t=1727728582; cv=none; b=iWozletiJElPCjhiS0DQHcFh15twDyrzKu79o8NhBGeyFYGrj6JUa2SXotg5QQexzLIpfcGlnED9VZv+z8psTGkH/aKGEyiz+5wKPxOytQgXXFfPy5PyU8x1A6INOlKD1hkVEUV4yMf+owPRcYL3DZGyVl7KLg11jpIWZs+lfCs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727727525; c=relaxed/simple;
-	bh=SSVpH3kNDxN9/iad7HWzk38u1hUJqcIi0/8tyiWhhJM=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=VYDiF9w06/EnJKy0g3eCBVRdh3MUslrOUFAFPYcOrUO0Y4urqKEIvVArEymTV5MvQU4UlP3MuB+kwB3Yi071ptBF685+4yVwAIhyjHku3l7mnwGoBc5Fh7+ppJRu53bVYemfAOM0OPmqQ2RRpcnxBX9QBbN/74wvnaYAL6AVMeU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=fFlQ9kKj; arc=none smtp.client-ip=192.30.252.207
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1727728582; c=relaxed/simple;
+	bh=JI5NfGq0gMASplyD5moBErjerGTvBDt0poQONGmeICo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=P+faN62Ny9RzcOmklqlC+FpQvXMa1fOAy2as3B4UQDQXEvISIvwMJ3DCw0EvOvD9jxKZ1Z9NPmqx7Yd5P4Jg3XueOO5OHXN3cfuhfw2XARlqyOU+MSMbWqfYRvdp0I1UloXhLZUipjDO8zWv4uU+zhSLKoknk3KTAnNF/FhLzZ4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=B5j90IpQ; arc=none smtp.client-ip=209.85.208.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="fFlQ9kKj"
-Received: from github.com (hubbernetes-node-297a7a9.ac4-iad.github.net [10.52.135.19])
-	by smtp.github.com (Postfix) with ESMTPA id 3055F640D10
-	for <linux-bluetooth@vger.kernel.org>; Mon, 30 Sep 2024 13:18:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1727727523;
-	bh=gX9rteX4+oZte3aGhiS/5mPEcPjurtXw1pn/xlSt4XE=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=fFlQ9kKjZBGQT1j5f58YWhBSykEHzoZ1oqliKTZC78nOC6+tgviKNGr5ud0Ofu7VW
-	 yxjYg+6Io/dj4gZAqhxahE3nSi5wBoBOZCkeSPJNuZhSdvSl/L/QRkOmS9mHlU46M7
-	 F8XstbbOy24FZwn3ichFldFaCvsdUBJ5qtTrg5fg=
-Date: Mon, 30 Sep 2024 13:18:43 -0700
-From: BluezTestBot <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/master/9a9dc3-38734e@github.com>
-Subject: [bluez/bluez] 95c15d: client/player: Make endpoint.show print all
- endpoi...
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="B5j90IpQ"
+Received: by mail-lj1-f182.google.com with SMTP id 38308e7fff4ca-2f7657f9f62so55766811fa.3
+        for <linux-bluetooth@vger.kernel.org>; Mon, 30 Sep 2024 13:36:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1727728577; x=1728333377; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=nZC6XyIOiJHJwZocn3wl48AQYobh5kChYXVoUiIHlcI=;
+        b=B5j90IpQ+RRtbhJIg2ZX9DUlzru3wuyG65N7a52mUmpGLgygJIxcMxgylv2+JzLmJf
+         oXy2N9/Nz3SOJqChWcDWtsn8wtPF9+ONIi2SgGhwznfQvNqjezcV6xxngAEAcNVd+2jD
+         zvYDetGWft0oirLanfXz8j5VVzGa340Hx9/kkSrt27E9nj1KW16qWHxFFP3YBaa/MNZh
+         8oXmqnePJ5TGsaAfdOrY7Rl0v1WU/+LebJ4CBnhiqtxqY4TQidMQA0u6k6KhTquHtRoC
+         zP1mIHJWf2Fv5ZDvr/iai+JCEqBOOtqMZzilVV8uL72Hzc9nDWVG0ZV3uboF7koM0ZxS
+         gSgA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1727728577; x=1728333377;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=nZC6XyIOiJHJwZocn3wl48AQYobh5kChYXVoUiIHlcI=;
+        b=XdXG1zeKBzK5uCzv/IfsMwl1rD2nKsoXkETFgsTKpDuapAuwtJk26NbaJSwkPvxKdS
+         z3a4JFK0ICvpS5mbVbIYrzEy8+7MmrS8gxWxOJIO+CQAQHYfL+mdSKtrJsMuBViA2LZU
+         ofKNi+Gg/hdtoojZKwTopOqX9Ru5ZRP/heXdZK0dujumdFTkNIgmfyZCY+tga20w/ecW
+         2+id3Jc8/5lXUblsbp8o1UVQyXfwv3NS77oUOqxgi3aVGYZsIlEH6rPJYu528Zuag28m
+         mGoTvz2DEnmrmj87xnMxK82Y/b7B6H2x36xumxqPgCT6i1/V4PW2Jz91dFMveJOCjerH
+         g6hQ==
+X-Gm-Message-State: AOJu0YxrVFxA/D4w2Y9m/CRPDJkArT8/yXYQnK9jgQAeQX7GuGDcYNfk
+	0XVepQ7youbeDJu3HRJviBJRCnEmfRpEcA77xK5qRseDPQzLtyliY9tEO5SGempzsJdG65QeKLq
+	bm6qP4Eo1ypqtFkj8fsB74EYfJU5gNg==
+X-Google-Smtp-Source: AGHT+IET5WwhrUr38ieQIhr/88au9MytXt8vqmOtbYp1MzZtjLNCgTGCuOaqMlWoilITEwPR7gPaEanR7wkrrJrQO+M=
+X-Received: by 2002:a2e:a99c:0:b0:2fa:d978:a6cf with SMTP id
+ 38308e7fff4ca-2fad978a992mr3364571fa.6.1727728576269; Mon, 30 Sep 2024
+ 13:36:16 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+References: <20240930193044.2907716-1-luiz.dentz@gmail.com>
+In-Reply-To: <20240930193044.2907716-1-luiz.dentz@gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Mon, 30 Sep 2024 16:36:03 -0400
+Message-ID: <CABBYNZJmvW8B65OR3M19pWnKCipDzoHbxKVtGvoQZCBi5feK+g@mail.gmail.com>
+Subject: Re: [PATCH v1] Bluetooth: RFCOMM: FIX possible deadlock in rfcomm_sk_state_change
+To: linux-bluetooth@vger.kernel.org
+Cc: syzbot+d7ce59b06b3eb14fd218@syzkaller.appspotmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-  Branch: refs/heads/master
-  Home:   https://github.com/bluez/bluez
-  Commit: 95c15d2ca02a1056947884a0f5cd8a8360862815
-      https://github.com/bluez/bluez/commit/95c15d2ca02a1056947884a0f5cd8a8360862815
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2024-09-27 (Fri, 27 Sep 2024)
-
-  Changed paths:
-    M client/player.c
-
-  Log Message:
-  -----------
-  client/player: Make endpoint.show print all endpoint with no argument
-
-This makes endpoint.show arguments optional and in case none is given
-print all (local and remote) endpoints:
-
-[bluetooth]# endpoint.show
-Endpoint /local/endpoint/a2dp_src/sbc
-	UUID 0000110a-0000-1000-8000-00805f9b34fb
-	Codec 0x00 (0)
-	Media Codec: SBC
-	Channel Modes: Mono DualChannel Stereo JointStereo
-	Frequencies: 16Khz 32Khz 44.1Khz 48Khz
-	Subbands: 4 8
-	Blocks: 4 8 12 16
-	Bitpool Range: 2-64
-Endpoint /local/endpoint/a2dp_snk/sbc
-	UUID 0000110b-0000-1000-8000-00805f9b34fb
-	Codec 0x00 (0)
-	Media Codec: SBC
-	Channel Modes: Mono DualChannel Stereo JointStereo
-	Frequencies: 16Khz 32Khz 44.1Khz 48Khz
-	Subbands: 4 8
-	Blocks: 4 8 12 16
-	Bitpool Range: 2-64
-
-
-  Commit: eda123dc6d8e04ba7fadfd95d36b9f3ff0b1e1ff
-      https://github.com/bluez/bluez/commit/eda123dc6d8e04ba7fadfd95d36b9f3ff0b1e1ff
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2024-09-27 (Fri, 27 Sep 2024)
-
-  Changed paths:
-    M client/player.c
-
-  Log Message:
-  -----------
-  client/player: Make transport.show print all transports with no argument
-
-This makes transport.show arguments optional and in case none is given
-print all configured transports:
-
-[bluetooth]# transport.show
-Transport /org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX/sep4/fd0
-	UUID: Audio Source              (0000110a-0000-1000-8000-00805f9b34fb)
-	Codec: 0x02 (2)
-	Media Codec: MPEG24
-	Object Types: MPEG-2 AAC LC
-	Frequencies: 48kHz
-	Channels: 2
-	Bitrate: 320000
-	VBR: Yes
-	Device: /org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX
-	State: active
-	Delay: 0x06a4 (1700)
-	Volume: 0x0059 (89)
-	Endpoint: /org/bluez/hci0/dev_94_XX_XX_XX_XX_XX/sep4
+On Mon, Sep 30, 2024 at 3:30=E2=80=AFPM Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+>
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>
+> rfcomm_sk_state_change attempts to use sock_lock so it must never be
+> called with it locked but rfcomm_sock_ioctl always attempt to lock it
+> causing the following trace:
+>
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D
+> WARNING: possible circular locking dependency detected
+> 6.8.0-syzkaller-08951-gfe46a7dd189e #0 Not tainted
+> ------------------------------------------------------
+> syz-executor386/5093 is trying to acquire lock:
+> ffff88807c396258 (sk_lock-AF_BLUETOOTH-BTPROTO_RFCOMM){+.+.}-{0:0}, at: l=
+ock_sock include/net/sock.h:1671 [inline]
+> ffff88807c396258 (sk_lock-AF_BLUETOOTH-BTPROTO_RFCOMM){+.+.}-{0:0}, at: r=
+fcomm_sk_state_change+0x5b/0x310 net/bluetooth/rfcomm/sock.c:73
+>
+> but task is already holding lock:
+> ffff88807badfd28 (&d->lock){+.+.}-{3:3}, at: __rfcomm_dlc_close+0x226/0x6=
+a0 net/bluetooth/rfcomm/core.c:491
+>
+> Reported-by: syzbot+d7ce59b06b3eb14fd218@syzkaller.appspotmail.com
+> Closes: https://syzkaller.appspot.com/bug?extid=3Dd7ce59b06b3eb14fd218
+> Fixes: 3241ad820dbb ("[Bluetooth] Add timestamp support to L2CAP, RFCOMM =
+and SCO")
+> Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> ---
+>  net/bluetooth/rfcomm/sock.c | 2 --
+>  1 file changed, 2 deletions(-)
+>
+> diff --git a/net/bluetooth/rfcomm/sock.c b/net/bluetooth/rfcomm/sock.c
+> index 37d63d768afb..f48250e3f2e1 100644
+> --- a/net/bluetooth/rfcomm/sock.c
+> +++ b/net/bluetooth/rfcomm/sock.c
+> @@ -865,9 +865,7 @@ static int rfcomm_sock_ioctl(struct socket *sock, uns=
+igned int cmd, unsigned lon
+>
+>         if (err =3D=3D -ENOIOCTLCMD) {
+>  #ifdef CONFIG_BT_RFCOMM_TTY
+> -               lock_sock(sk);
+>                 err =3D rfcomm_dev_ioctl(sk, cmd, (void __user *) arg);
+> -               release_sock(sk);
+>  #else
+>                 err =3D -EOPNOTSUPP;
+>  #endif
+> --
+> 2.46.1
+>
 
 
-  Commit: f7028d6a0569d295ba1fd0386c72b734da9dc8db
-      https://github.com/bluez/bluez/commit/f7028d6a0569d295ba1fd0386c72b734da9dc8db
-  Author: nxf92481 <vlad.pruteanu@nxp.com>
-  Date:   2024-09-30 (Mon, 30 Sep 2024)
-
-  Changed paths:
-    M client/bluetoothctl-endpoint.rst
-    M client/bluetoothctl-transport.rst
-
-  Log Message:
-  -----------
-  client: Update endpoint and trasport doc
-
-This updates the documentation for the use of endpoints and
-transports according to the latest changes in their design.
-
-
-  Commit: 20a38abb36618b14f4cf7593de3dba9634970cc7
-      https://github.com/bluez/bluez/commit/20a38abb36618b14f4cf7593de3dba9634970cc7
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2024-09-30 (Mon, 30 Sep 2024)
-
-  Changed paths:
-    M client/bluetoothctl-endpoint.rst
-    M client/bluetoothctl-transport.rst
-
-  Log Message:
-  -----------
-  client: Update endpoint.show and transport.show documentation
-
-endpoint.show and transport.show argument is optional with latest
-changes.
-
-
-  Commit: 38734e02051364b4b6db6e684beda8c47a1ba452
-      https://github.com/bluez/bluez/commit/38734e02051364b4b6db6e684beda8c47a1ba452
-  Author: Cheng Jiang <quic_chejiang@quicinc.com>
-  Date:   2024-09-30 (Mon, 30 Sep 2024)
-
-  Changed paths:
-    M src/device.c
-
-  Log Message:
-  -----------
-  device: Remove device after all bearers are disconnected
-
-For a dual-mode remote, both BR/EDR and BLE may be connected,
-RemoveDevice should be handled after all bearers are disconnects.
-Otherwise, if msg is removed, but not all connection are dropped,
-this function returns before *remove is updated, then after all
-connections are dropped, but device->disconnects is NULL,
-remove_device is not updated. Consequently *remove is not set to
-true. Remove device is not performed in adapter_remove_connection.
-
-
-Compare: https://github.com/bluez/bluez/compare/9a9dc3d456c0...38734e020513
-
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
+--=20
+Luiz Augusto von Dentz
