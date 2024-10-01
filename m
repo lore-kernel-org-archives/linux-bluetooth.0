@@ -1,147 +1,117 @@
-Received: from mail-yw1-f179.google.com (mail-yw1-f179.google.com [209.85.128.179])
+Received: from mail-lj1-f180.google.com (mail-lj1-f180.google.com [209.85.208.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 865011C68AE
-	for <linux-bluetooth@vger.kernel.org>; Tue,  1 Oct 2024 15:21:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D15251C9EA3;
+	Tue,  1 Oct 2024 15:29:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727796103; cv=none; b=MF4AbXLE7HSjlOSP31ERANsec8IV6oVMB9fl6qrN7arhQtBxKR8rmh20abX+EnHIyB76gMQs74g006f+pnvxU1w/x9knHzrIvC5FGwo/wxOxKg3xovx3SOjHgT0BKvco9vuWngsjGKRO8BbkPCp/CWcrmL4l9rUid78xXqTCoPQ=
+	t=1727796574; cv=none; b=sUmt3YxsV1/0m87wFw6iGMlxdmpq8goXZW9MgCUeukrnSQuJT3jKuOuaqaRbN8iabY7yG/tSk+dx/vfk2r5BqqVD3ZkjpXDq12J4n1549kymx7n8kqU7W0WWASlEGdHNCo0FA/35VH0ddVYmh2ahcPjJB4ieZkii1O5tfxxYpfc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727796103; c=relaxed/simple;
-	bh=w7zneVYmJ1MSbusVQdVJgCrVRyPEuy+tYpmGlvWaT+c=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=O8etFdnXfgx6Pd/BiqilXi5y7Rkh7IGiRcZY3WRBKoqOUnMRqXoyF3VRdtXkXda0GlEQ49+lvaWzstQjxWvaifZxNpY3xTSsAO+37JOZ2Ydq4kQGpJpAsWRPJP+Dzu9453Mv0l0aAcE3G8w6qPbjD9whcwmOYikO/8kP2Pzh5y0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eHPbN9bS; arc=none smtp.client-ip=209.85.128.179
+	s=arc-20240116; t=1727796574; c=relaxed/simple;
+	bh=ExSg9jxWWOXUZIYAenu/yAYPq0EsIP31UsbMrncQcVo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=bu8IiZNogKScFPyQ2v8pg/1T7c0SDdt6vJctq/sVQLJSVPUnlrvSTf7uNqYbYvjKZ1PlEOjZNLYr46JjpBXv/wV48vQ0PiKp/5cOD4IReQVl6ngynjNEiBUu8wNQoyQNwgHw2fDbqDMhcZy0iDm3ZfNnfOGvWzXRwviNJrqRmKs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bFgWid9N; arc=none smtp.client-ip=209.85.208.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eHPbN9bS"
-Received: by mail-yw1-f179.google.com with SMTP id 00721157ae682-6c3f1939d12so46498507b3.2
-        for <linux-bluetooth@vger.kernel.org>; Tue, 01 Oct 2024 08:21:41 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bFgWid9N"
+Received: by mail-lj1-f180.google.com with SMTP id 38308e7fff4ca-2fac275471dso29385461fa.0;
+        Tue, 01 Oct 2024 08:29:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1727796099; x=1728400899; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Jpz1nY5Sq4QxLHDCVs04EHH6bNTs7unfS+PrflkV8BE=;
-        b=eHPbN9bSmhL8e7P6M5oHD1E66ir+qfRPMY3igmaabURv8quGUsQUNGcKjmxwSZGdCN
-         P7Mxs0JqmzttQ+NSQBZkGjSaA82sCbNcuExshtU2iUVeBUU/ubdzGS2eSyDCRJ9aqn0M
-         ntZtYxeJA95FDkP8KNqXcs9k57EqHw3iQUZchpm36FzZObL+jWaVC49IxBz4eRkhdFvV
-         M+ckdRnC76wr0muxDdmW2vNfDZGghu0nsIeRqFJo7EO8TeXTncYifAkoa/UCtQJXDvtz
-         SgnzV8PXHHKWF6TfL4Jsyp6crjpt/oYKPpjSX+pdK4RY9xJtK71E2wQr818wrIkfqpx0
-         KiUw==
+        d=gmail.com; s=20230601; t=1727796571; x=1728401371; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=JKiujOg6CYINrgCG2TnZdYyyvY37bP0hD4EoAW2yqHU=;
+        b=bFgWid9NwEbkQ7M1EAD+urGmuAq7ppj+/OrKCi3mnEpvqjfgjlvKdb3HGlZYlcPjjW
+         PhpUq8SZVxoJiPK1ZV0hQYZ/9glnaZJj4Llu13dzZfSPk7bg4V6BQ+uS9HJ3CjR08Jzz
+         c915d8SKLuirOwxYiNPpAIPu8g9stMwKcc5GsSdKGXH9YZnsHifdej4SSbxLn1jlKlwl
+         VtLGRHCqXQTj3TIdrmQkUpUEVh6BLRXpxYz5fGsURifSlXe5+SMEUAwQg675faZukRHB
+         8MN0/7PEh1qPcWWQqWuhVcTfAc/gBvN7HCM/f4wgIP6wZvx3VlcyDAkRzibyHdzK4dxo
+         hpsA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727796099; x=1728400899;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Jpz1nY5Sq4QxLHDCVs04EHH6bNTs7unfS+PrflkV8BE=;
-        b=ZO1Q7OpBnXYwBf+Ogz8q2k2PPi4Inyyj/kbHX6xKltbQaeIMjb17mXoGkRZDPELmNe
-         oeDtH9gG+ReoyN0DstaAIOTQdLwQyQmMdtmsrLbETwb8cmVOvjAJQrYvHItI4xYbq34g
-         wu/aVmuCrcXM1NYQIwHPdJ9JhXWtRH/uSWdHuHXDFyHYvqAiNh7gsoIpfeq7xuQWXczd
-         mhfXprpG/zvrsIuxaMHCPAk1EJ7WRjH/t5aHiHGsE28AVFGeI3aaJhoDt7Kp1gj4Ciju
-         Q123HZCKBVeIe5jDIg6k91cKK82J7M6cJ2PJ3VyeE0PPhdfcGu/IpVajOZb4hD46Wfet
-         4QrQ==
-X-Gm-Message-State: AOJu0YyHoSPcGZ/YTHDlvLWVtu7Xz96mjptS482TiVdD1NY7z7s9Ey6g
-	b4Xv4uLuIt82NtVPwitHcruX2Xyhh5Tm2N+XaUHQfjsgDsck1eyYCgmC0A==
-X-Google-Smtp-Source: AGHT+IHjrYhNug9B1ODG+Zc0OgPqYNxYYFw844WWmfq/A+rvrV4CwxHfzrCMLwSwiwHByKBU/GoClA==
-X-Received: by 2002:a05:690c:6ac8:b0:6e2:1334:a944 with SMTP id 00721157ae682-6e2a2ada28bmr1051197b3.9.1727796099400;
-        Tue, 01 Oct 2024 08:21:39 -0700 (PDT)
-Received: from lvondent-mobl5.. (syn-107-146-107-067.res.spectrum.com. [107.146.107.67])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-6e2454a1dbasm20342417b3.137.2024.10.01.08.21.38
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 01 Oct 2024 08:21:38 -0700 (PDT)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [RESEND v3] Bluetooth: btusb: Don't fail external suspend requests
-Date: Tue,  1 Oct 2024 11:21:37 -0400
-Message-ID: <20241001152137.3071690-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.46.1
+        d=1e100.net; s=20230601; t=1727796571; x=1728401371;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=JKiujOg6CYINrgCG2TnZdYyyvY37bP0hD4EoAW2yqHU=;
+        b=FEVFddsUwsM3zqBx6G6CtsAYwrtrNKsCXKzABJDdEFfVS7GPsnSilghjynu5KBSp+b
+         RcNKaVIyYKwYg+J/xTHDUSXuA61jXinpY6U3Im62SMw+lCr0s7B1HFLN+xfisbcEiqjl
+         R8qPj/hwMK0Ohv/blROpJ1Vn59SIPT4TeK8KWRvpZVNPtFYxJN3zcGITezrllqwJQ/u4
+         DgszZt2HAM0XeCzxAOgQ/MSJyUr4PJ/zy9QEW3r4nE65wcIE//ewta+VC6nIV/nvWyLX
+         n+5QdTlnTc26IVWhadkfBDYQQYOk4ewdPiO+p3EXiwpFeaOTfhuubC7y+9/QcDWgOZU2
+         vp3A==
+X-Forwarded-Encrypted: i=1; AJvYcCX1DW3rubLrnni0e42Jgz4wcMYi/neq4oxltZaG6fsMWtgb+ritCf0M9WQC6WJ5c59O6XDCASli4Qgb/bvQ1yc=@vger.kernel.org, AJvYcCXiPqNCSCN+4JrqDT7vAQxGJYIy7AIN/qUo6+U5h6ZjLlBSFym9hiVvyHRjTLhfRbVuzhkA32q4fBduc7ER@vger.kernel.org
+X-Gm-Message-State: AOJu0YyGebafo60zxeroCwLbKPY7n4140sEX4SBnktgUA3ZwFwPAc9Ae
+	tjt9M0YhMzXcK59IKuXrlrvjo69wpiLeOn33pQFX2LFZifxSInC5kPhxG/8IVQ7Rb9lFp6PP4uV
+	goykQ5kuz9Ers7m0x9k6TQ0iZc3g=
+X-Google-Smtp-Source: AGHT+IGWY4UN/+6v16SuDRnsJsC9wBlxJW95T/Ea6m+RdbOLxmzcd6XTbioSzCVIjgQoRhDE3YcGu6heBwkap1rVVfU=
+X-Received: by 2002:a2e:be27:0:b0:2f5:2ba:2c89 with SMTP id
+ 38308e7fff4ca-2fad86962c9mr15446781fa.11.1727796570754; Tue, 01 Oct 2024
+ 08:29:30 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20241001074339.1160157-1-hildawu@realtek.com>
+In-Reply-To: <20241001074339.1160157-1-hildawu@realtek.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Tue, 1 Oct 2024 11:29:17 -0400
+Message-ID: <CABBYNZJj+gtmSUUz4gUigkg3GUaBuR29jEU=ZxKjxu7cPSv1Yw@mail.gmail.com>
+Subject: Re: [PATCH v2] Bluetooth: btrtl: Decrease HCI_OP_RESET timeout from
+ 10 s to 2 s
+To: Hilda Wu <hildawu@realtek.com>
+Cc: marcel@holtmann.org, linux-bluetooth@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, alex_lu@realsil.com.cn, max.chou@realtek.com, 
+	kidman@realtek.com, howardchung@google.com, apusaka@chromium.org, 
+	yinghsu@chromium.org, johnlai@google.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Hilda,
 
-Commit 4e0a1d8b0675
-("Bluetooth: btusb: Don't suspend when there are connections")
-introduces a check for connections to prevent auto-suspend but that
-actually ignored the fact the .suspend callback can be called for
-external suspend requests which
-Documentation/driver-api/usb/power-management.rst states the following:
+On Tue, Oct 1, 2024 at 3:43=E2=80=AFAM Hilda Wu <hildawu@realtek.com> wrote=
+:
+>
+> The original timeout setting for HCI Reset on shutdown is 10 seconds.
+> Since the HCI Reset processing time is soon, so decrease the timeout
+> to 2 seconds for HCI Reset on shutdown.
 
- 'External suspend calls should never be allowed to fail in this way,
- only autosuspend calls.  The driver can tell them apart by applying
- the :c:func:`PMSG_IS_AUTO` macro to the message argument to the
- ``suspend`` method; it will return True for internal PM events
- (autosuspend) and False for external PM events.'
+I guess you are saying that HCI Reset shouldn't take 10 seconds to
+complete so instead use the default timeout for commands. I can update
+the description myself if you agree to use the above sentence.
 
-In addition to that align system suspend with USB suspend by using
-hci_suspend_dev since otherwise the stack would be expecting events
-such as advertising reports which may not be delivered while the
-transport is suspended.
+> Signed-off-by: Hilda Wu <hildawu@realtek.com>
+> ---
+> V1 -> V2: Modify commit message and summary
+> ---
+> ---
+>  drivers/bluetooth/btrtl.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/drivers/bluetooth/btrtl.c b/drivers/bluetooth/btrtl.c
+> index 2d95b3ea046d..7128a8a0ba25 100644
+> --- a/drivers/bluetooth/btrtl.c
+> +++ b/drivers/bluetooth/btrtl.c
+> @@ -1371,7 +1371,7 @@ int btrtl_shutdown_realtek(struct hci_dev *hdev)
+>         /* According to the vendor driver, BT must be reset on close to a=
+void
+>          * firmware crash.
+>          */
+> -       skb =3D __hci_cmd_sync(hdev, HCI_OP_RESET, 0, NULL, HCI_INIT_TIME=
+OUT);
+> +       skb =3D __hci_cmd_sync(hdev, HCI_OP_RESET, 0, NULL, HCI_CMD_TIMEO=
+UT);
+>         if (IS_ERR(skb)) {
+>                 ret =3D PTR_ERR(skb);
+>                 bt_dev_err(hdev, "HCI reset during shutdown failed");
+> --
+> 2.34.1
+>
 
-Fixes: 4e0a1d8b0675 ("Bluetooth: btusb: Don't suspend when there are connections")
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
----
- drivers/bluetooth/btusb.c | 20 ++++++++++++++++++--
- 1 file changed, 18 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 4d3eea414c2a..d14b941bfde8 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -4075,16 +4075,29 @@ static void btusb_disconnect(struct usb_interface *intf)
- static int btusb_suspend(struct usb_interface *intf, pm_message_t message)
- {
- 	struct btusb_data *data = usb_get_intfdata(intf);
-+	int err;
- 
- 	BT_DBG("intf %p", intf);
- 
--	/* Don't suspend if there are connections */
--	if (hci_conn_count(data->hdev))
-+	/* Don't auto-suspend if there are connections; external suspend calls
-+	 * shall never fail.
-+	 */
-+	if (PMSG_IS_AUTO(message) && hci_conn_count(data->hdev))
- 		return -EBUSY;
- 
- 	if (data->suspend_count++)
- 		return 0;
- 
-+	/* Notify Host stack to suspend; this has to be done before stopping
-+	 * the traffic since the hci_suspend_dev itself may generate some
-+	 * traffic.
-+	 */
-+	err = hci_suspend_dev(data->hdev);
-+	if (err) {
-+		data->suspend_count--;
-+		return err;
-+	}
-+
- 	spin_lock_irq(&data->txlock);
- 	if (!(PMSG_IS_AUTO(message) && data->tx_in_flight)) {
- 		set_bit(BTUSB_SUSPENDING, &data->flags);
-@@ -4092,6 +4105,7 @@ static int btusb_suspend(struct usb_interface *intf, pm_message_t message)
- 	} else {
- 		spin_unlock_irq(&data->txlock);
- 		data->suspend_count--;
-+		hci_resume_dev(data->hdev);
- 		return -EBUSY;
- 	}
- 
-@@ -4212,6 +4226,8 @@ static int btusb_resume(struct usb_interface *intf)
- 	spin_unlock_irq(&data->txlock);
- 	schedule_work(&data->work);
- 
-+	hci_resume_dev(data->hdev);
-+
- 	return 0;
- 
- failed:
--- 
-2.46.1
-
+--=20
+Luiz Augusto von Dentz
