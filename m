@@ -1,71 +1,78 @@
-Received: from mail-il1-f199.google.com (mail-il1-f199.google.com [209.85.166.199])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03E8D1C9DDB
-	for <linux-bluetooth@vger.kernel.org>; Tue,  1 Oct 2024 15:52:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00F4F1CB30A
+	for <linux-bluetooth@vger.kernel.org>; Tue,  1 Oct 2024 16:10:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727797925; cv=none; b=AJloFTtYqHoYilVheJ6FWSQuNaNO4O2oA+jJ9j45Sbt+2Ib5v+Ngd+zOnma42h9NX3tZvjPxHd7JoPYUjbjO67ng4wpNuRUkwdhDpD8bSIB851OebZhPmNUKDWJh8Eh5PK76n5uw6/P6ejON8I0jZN0BPYpV9yEpQ+M2Bhi9fSY=
+	t=1727799030; cv=none; b=RbqPPt7wZuEfsuPNR6x//IBbG8tkEhLV+COXUv2gpupXNOsaKKAwGYveHurZZzxnw2NIiytFnWIN4Nc2r9M1ouAPZ9qbvicPmbAIGeH/Ip4iFKGUMNSnAF6wq4rE4mMF1z7IuAJOLpGNMVsvc7ocGVDhBNbXwATmo7U/RHO8uDE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727797925; c=relaxed/simple;
-	bh=hLaGC1unzGRXv60Ntnixr0kWcN7sp3RmvbIHbphIIHs=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=RjkuYLKO0j31SZlPpzTOrpLtwEYaG3WyLVT8dqIOp5acw/s6/of5fiuZyIM+3huKjfh2l0QBjyCWvuehlBT41aZqIOTHDb5t0mcI/0DvyVGWW3Tba1PXKkN+eGxdXr1HbzdY74S+Ho2vSJ0a/JTXJsOeL5ldPs9cA1PTTOIb2gs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f199.google.com with SMTP id e9e14a558f8ab-3a3496b480dso44511515ab.2
-        for <linux-bluetooth@vger.kernel.org>; Tue, 01 Oct 2024 08:52:03 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727797923; x=1728402723;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=59SB+V8kGrCj4j9f0TQBf0du/i+6iY0rJlO9QAMoS3E=;
-        b=GaJ5FBIAM0u7cUibAeuhy1hkZi6pDGh5lUFOhoOyGyHyBr2BZYg3/FU2pNdjglxcJi
-         B0Vxzi5uoUDChxd3sV1YafJOFBqKtCrvt5WBcTAGCv2wQZ5Lf5ql+aiUBSaPV9KGNCls
-         mUOhypQv2o3CChzLAqLDZ+d6htmV+J+meh30o1BsiX2PjeXCubZORlYh+spIB9WC5S00
-         UYHIwjYsyzTtULoS4dxProRNuxhcLz3EZ2+NrU6NU4KRX16jLWUHDt9uUwGFrAgBqey7
-         cy4gLq+lwX8e9Sj9VtKW7deeZohzJIX952agsqXyTRldVCj/oMacXF5SEQOTrP1drULP
-         PXrA==
-X-Gm-Message-State: AOJu0Ywkj0fcN8e27bwiHKnMv/FRa35QjWJs6OJE4+8Un40wtoKrEBpK
-	YCmUgCYHciSdgyx1IKsXei0w0iE/3aaGBGP2Nli1gHwtBMeFGLt1/haoRzQ4VR9aA5XIstMwu+r
-	59HoFyNoF4V6ryg2Gw5HUxil7BRMIhLb3hZgqMY6Yi06MlaaQk+pdrWo=
-X-Google-Smtp-Source: AGHT+IFdWoiNWcHPm7jFLXmcVI/1in0+qYG6NCF5Na0y45if1mwde/nXQrJqUMPRxxVtuBaXQSHmr3Z4XNxlNmZwjRmdIZxyiaEG
+	s=arc-20240116; t=1727799030; c=relaxed/simple;
+	bh=yQYpmxxo0MmetTwpCeFGutn+/YumZkTQpBwOTD6DdFM=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=T0GJliqeppi9Fq9wQEZ7hzHFd/L/30tQdxcqnw+TS+cslQXFPsIM5Zjr6x4AVN0cVXAJDeUhkeyrx9MKy660BBdwP9xZqKogRG8tjBZKlbZiIOkXkKg+c80ZjcNM/X4yoXYXBpXcptit1QEGWoPFdUU0tRgwFYJdYHTyL3Mrt08=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XSnUtzoV; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XSnUtzoV"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 906E7C4CEC6;
+	Tue,  1 Oct 2024 16:10:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1727799029;
+	bh=yQYpmxxo0MmetTwpCeFGutn+/YumZkTQpBwOTD6DdFM=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=XSnUtzoVi0Ayd9f7huJoI9p4/airRkmVWkIJ9ItJ9TadQIe3B1VFUhUV7ccL030mS
+	 Uh1KCl/qUE9rW9hNhS9I6bRzu0uh9TcJXxtrGEHodF5aKyIxZYM4f98DjUtmReSDqm
+	 s6WJSOdXh3e5El4+xcbI7OjWeIf8ElgBC6f6BZZgfcs58l/NkJRyJA1wWRhqzyS2xD
+	 0ouvvHsmpm3FCPY+nREMSrAybPOluv3j5VbvrXGP/Bj5RsgsGFewo/SU9W1+kK3q+V
+	 1TgTak1WKRKzSan9lF6nfWEC1LYs0Lm9/BclvCq+h6B6SwNGQ6dscO9InpdK4Vr0l7
+	 VgvfdI21v792Q==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB316380DBF7;
+	Tue,  1 Oct 2024 16:10:33 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a92:c26e:0:b0:3a0:c820:c5f0 with SMTP id
- e9e14a558f8ab-3a3452bb9a8mr143447325ab.24.1727797923000; Tue, 01 Oct 2024
- 08:52:03 -0700 (PDT)
-Date: Tue, 01 Oct 2024 08:52:02 -0700
-In-Reply-To: <CABBYNZJvjcnQm33Qn_ZbdPcrd2ZTF9jOQGJJcva35YigkfchAQ@mail.gmail.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <66fc1aa2.050a0220.f28ec.04b2.GAE@google.com>
-Subject: Re: [syzbot] [bluetooth?] possible deadlock in rfcomm_sk_state_change
-From: syzbot <syzbot+d7ce59b06b3eb14fd218@syzkaller.appspotmail.com>
-To: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	luiz.dentz@gmail.com, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v1] Bluetooth: RFCOMM: FIX possible deadlock in
+ rfcomm_sk_state_change
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <172779903266.441512.13566037177072323367.git-patchwork-notify@kernel.org>
+Date: Tue, 01 Oct 2024 16:10:32 +0000
+References: <20240930193044.2907716-1-luiz.dentz@gmail.com>
+In-Reply-To: <20240930193044.2907716-1-luiz.dentz@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
 
-Hello,
+Hello:
 
-syzbot has tested the proposed patch and the reproducer did not trigger any issue:
+This patch was applied to bluetooth/bluetooth-next.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-Reported-by: syzbot+d7ce59b06b3eb14fd218@syzkaller.appspotmail.com
-Tested-by: syzbot+d7ce59b06b3eb14fd218@syzkaller.appspotmail.com
+On Mon, 30 Sep 2024 15:30:44 -0400 you wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> 
+> rfcomm_sk_state_change attempts to use sock_lock so it must never be
+> called with it locked but rfcomm_sock_ioctl always attempt to lock it
+> causing the following trace:
+> 
+> ======================================================
+> WARNING: possible circular locking dependency detected
+> 6.8.0-syzkaller-08951-gfe46a7dd189e #0 Not tainted
+> 
+> [...]
 
-Tested on:
+Here is the summary with links:
+  - [v1] Bluetooth: RFCOMM: FIX possible deadlock in rfcomm_sk_state_change
+    https://git.kernel.org/bluetooth/bluetooth-next/c/ffb3f98d4dae
 
-commit:         e32cde8d Merge tag 'sched_ext-for-6.12-rc1-fixes-1' of..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=12a33dd0580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=c9c87051d13eb9da
-dashboard link: https://syzkaller.appspot.com/bug?extid=d7ce59b06b3eb14fd218
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-patch:          https://syzkaller.appspot.com/x/patch.diff?x=139c139f980000
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-Note: testing is done by a robot and is best-effort only.
+
