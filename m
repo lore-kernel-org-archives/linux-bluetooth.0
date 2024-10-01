@@ -1,222 +1,634 @@
-Received: from mail-il1-f198.google.com (mail-il1-f198.google.com [209.85.166.198])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E5E91A08A8
-	for <linux-bluetooth@vger.kernel.org>; Tue,  1 Oct 2024 10:15:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.198
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 112CC1A01CD
+	for <linux-bluetooth@vger.kernel.org>; Tue,  1 Oct 2024 10:29:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727777733; cv=none; b=fYq8uE2P2yPXoE7Vug0gZA4AaXFYhiX8dD13cq/a7ep6kMXVP3CB5Bc40e4JY6736WFBXENyTKyK9UH7WSeGGg0zweSfercMmLWHMgDOa7KYeVzuvVNEh/fTILi/0+fNMy+MyT43pA7x3nM/amZ+8IYfXLC4fyAabJY+PhTYmDs=
+	t=1727778586; cv=none; b=Ta6DJpRx+39VhtZ/B+fzZCYxnJa3MzL6qfL14fEqhK3nYquHRZ/9iOivd6UL2HYTc+3EL8kkjoPC71rp1Zi+ri+J+W9ML4Ww//wTVcNz4o3CCvziJHpz0mgEMu5XJxEUuH4aNvFFB09b5dzqbkrEJIt23qeNO3+ukbvAPBNKuPU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727777733; c=relaxed/simple;
-	bh=lc/E+luZd1F0MNzXV7BZPZja1beqMPB1l595a90Ds9c=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=q/VBA+TPxQLXvXnThOf4EnoBb0OReSStP7Gh/1Gg7d/tN1H8ANgtoOBT2+P03JbP4THiMNhi8yJ8IJbGvd5Jg9S4iHPQj+FUilqJ20/CCDyLi7U6pzilVqPzl2dOSX3ZRfp27oQReH8iytWzccL0PAW0elYRk15j6gC2LISXUnk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.198
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-3a0ce4692a4so50003585ab.0
-        for <linux-bluetooth@vger.kernel.org>; Tue, 01 Oct 2024 03:15:29 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727777728; x=1728382528;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=ptr5r2SpkMbHm5MxrAOzGN6piib9APQNVGMdCf7EpM8=;
-        b=OVKUmRE8Hgd8kvxTp2TQOqiYvYBUCokScDpc/b7ARsiOwd03gbmQI/lXJtMZFJDY7w
-         e4j70kz49v95YXHI/SIxSzWvDd9H5D3o1z6U1Hq/OXSKfhPiy4Tdvqb16vUidwLHDFqA
-         pSK2Bi/9y3nOcDqeW//InFxC8Vhp9Nlnfquh7Qb56RIKaQkwIRdfMNqzpJoL+lYULtJ7
-         ipEtzxC6ySXUJPsHBOuyN5dD8q0EBlugRLaQ0MubjeCrsDW8lzLHVlaJ4SwyxXKNPysb
-         Ghdk4htpk6kDfsBM0se9OtxbDVNdmNhB1ZuexGNRqV95osvC034eryhfOZsAVsmvlDKy
-         1viA==
-X-Forwarded-Encrypted: i=1; AJvYcCXIrEKJzJcE20HSo093s2TcF5CufCtq8soSWzSaGYT77H4CHJxJPLkRM1RBcdepdcWOBbRELTzxLQuewN6rdrY=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzmgzy8oMaKttSDCmmNiGRBxUbJnDJYUPUl3fywbd3QcF1whasD
-	egpLT4Ut59o6t4ypnnS+nAlVal4E62p652FVqy+qtJNkiqfuGqES/PynuoS77zikV5PzScXl0kQ
-	kRwXVsAp/H9JXIUI8nZozAyDcjgJ2Pl5RrHOiog/DSJgIsZQ6FrfCLzU=
-X-Google-Smtp-Source: AGHT+IEfma8UNMcsxL0kSSN3RDomzWpJaEIsamZceUEnGiKsmdDamfYeVA7XXNhO1RkEkP4wr2wIS59EDAAMAWCrMLpxFgl7M/2N
+	s=arc-20240116; t=1727778586; c=relaxed/simple;
+	bh=BzxwMM7EUOfoqgBYGd402S4wwWlTCy4YKer4wEkmnbY=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=KCdfahsyFPSx3NcNx3vZcnF9/2OYXQnYp4Cw+spGqMbLK4SAGwzKFkWeOlc1pA9+XzNpnxncOy5/cIjGwljGZGq8bFzQKvkNuMsozP5xRXS3NmkBEvN/kGExr0gdyCZS8WtUk7WZs+vvzSet8CvJf2P1cTgxPvAp+jd0xRtNTZY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ECFPfv9V; arc=none smtp.client-ip=198.175.65.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ECFPfv9V"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1727778584; x=1759314584;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=BzxwMM7EUOfoqgBYGd402S4wwWlTCy4YKer4wEkmnbY=;
+  b=ECFPfv9V7kXdKJ0LvUgA9QZv2vhz8PpLwbQpsg6tpYRNFHTWCoaYtLHl
+   +xe8tFz+BmUgW66KwoKjHk34xiPm/KFiMcVjaQKpSyIqEqJAzEE3l/HT8
+   7bZ3kP2OiR9N9P+gEkOUtzzcC39HUNpHtV03pZ/TkjPH0QvvhXwV8hM+c
+   vaComNjF0Xr9A4bSrp13Pa3mi3uxy4udCwAeBOBt/zBZqelvesJgvUL6z
+   Xx+RXMZL1eo3xM76jFkRoCrPQyi7PQPnDHKPsNSQfv2aCGbWoi13CAxqf
+   nsOV8plX0Xz7T4FE6kT4Ic+ZTni5qKaLy1tSVdFKVlbaax+/LT7dM04qY
+   Q==;
+X-CSE-ConnectionGUID: FkhFhSFKQk62JxgvpDpM4Q==
+X-CSE-MsgGUID: t0sLjahlSgC9SiuCcSkugA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11211"; a="26780140"
+X-IronPort-AV: E=Sophos;i="6.11,167,1725346800"; 
+   d="scan'208";a="26780140"
+Received: from fmviesa007.fm.intel.com ([10.60.135.147])
+  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Oct 2024 03:29:43 -0700
+X-CSE-ConnectionGUID: ICkQacQXRzaBFr9lUL73MQ==
+X-CSE-MsgGUID: VldHhhxcSECDRZKGoU6Ebw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,167,1725346800"; 
+   d="scan'208";a="73274505"
+Received: from intel-lenovo-legion-y540-15irh-pg0.iind.intel.com ([10.224.186.95])
+  by fmviesa007.fm.intel.com with ESMTP; 01 Oct 2024 03:29:41 -0700
+From: Kiran K <kiran.k@intel.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: ravishankar.srivatsa@intel.com,
+	chethan.tumkur.narayan@intel.com,
+	chandrashekar.devegowda@intel.com,
+	Kiran K <kiran.k@intel.com>
+Subject: [PATCH v1 1/2] Bluetooth: btintel_pcie: Add handshake between driver and firmware
+Date: Tue,  1 Oct 2024 16:14:50 +0530
+Message-Id: <20241001104451.626964-1-kiran.k@intel.com>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:148a:b0:3a0:cc84:9859 with SMTP id
- e9e14a558f8ab-3a35eb6177fmr18980275ab.10.1727777728417; Tue, 01 Oct 2024
- 03:15:28 -0700 (PDT)
-Date: Tue, 01 Oct 2024 03:15:28 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <66fbcbc0.050a0220.6bad9.0058.GAE@google.com>
-Subject: [syzbot] [bluetooth?] KASAN: slab-use-after-free Read in
- l2cap_sock_ready_cb (2)
-From: syzbot <syzbot+9265e754091c2d27ea29@syzkaller.appspotmail.com>
-To: johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, luiz.dentz@gmail.com, marcel@holtmann.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-Hello,
+The following handshake mechanism needs be followed after firmware
+download is completed to bring the firmware to running state.
 
-syzbot found the following issue on:
+After firmware fragments of Operational image are downloaded and
+secure sends result of the image succeeds,
 
-HEAD commit:    5f5673607153 Merge branch 'for-next/core' into for-kernelci
-git tree:       git://git.kernel.org/pub/scm/linux/kernel/git/arm64/linux.git for-kernelci
-console output: https://syzkaller.appspot.com/x/log.txt?x=12881980580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=dedbcb1ff4387972
-dashboard link: https://syzkaller.appspot.com/bug?extid=9265e754091c2d27ea29
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-userspace arch: arm64
+1. Driver sends HCI Intel reset with boot option #1 to switch FW image.
+2. FW sends Alive GP[0] MSIx
+3. Driver enables data path (doorbell 0x460 for RBDs, etc...)
+4. Driver gets Bootup event from firmware
+5. Driver performs D0 entry to device (WRITE to IPC_Sleep_Control =0x0)
+6. FW sends Alive GP[0] MSIx
+7. Device host interface is fully set for BT protocol stack operation.
+8. Driver may optionally get debug event with ID 0x97 which can be dropped
 
-Unfortunately, I don't have any reproducer for this issue yet.
+For Intermediate loadger image, all the above steps are applicable
+expcept #5 and #6.
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/40172aed5414/disk-5f567360.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/58372f305e9d/vmlinux-5f567360.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/d2aae6fa798f/Image-5f567360.gz.xz
+On HCI_OP_RESET, firmware raises alive interrupt. Driver needs to wait
+for it before passing control over to bluetooth stack.
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+9265e754091c2d27ea29@syzkaller.appspotmail.com
-
-kobject: kobject_add_internal failed for hci0:201 with -EEXIST, don't try to register things with the same name in the same directory.
-Bluetooth: hci0: failed to register connection device
-==================================================================
-BUG: KASAN: slab-use-after-free in l2cap_sock_ready_cb+0xc4/0x130 net/bluetooth/l2cap_sock.c:1670
-Read of size 8 at addr ffff0000da74b188 by task kworker/u9:6/6425
-
-CPU: 0 UID: 0 PID: 6425 Comm: kworker/u9:6 Not tainted 6.11.0-rc7-syzkaller-g5f5673607153 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 08/06/2024
-Workqueue: hci0 hci_rx_work
-Call trace:
- dump_backtrace+0x1b8/0x1e4 arch/arm64/kernel/stacktrace.c:319
- show_stack+0x2c/0x3c arch/arm64/kernel/stacktrace.c:326
- __dump_stack lib/dump_stack.c:93 [inline]
- dump_stack_lvl+0xe4/0x150 lib/dump_stack.c:119
- print_address_description mm/kasan/report.c:377 [inline]
- print_report+0x198/0x538 mm/kasan/report.c:488
- kasan_report+0xd8/0x138 mm/kasan/report.c:601
- __asan_report_load8_noabort+0x20/0x2c mm/kasan/report_generic.c:381
- l2cap_sock_ready_cb+0xc4/0x130 net/bluetooth/l2cap_sock.c:1670
- l2cap_chan_ready net/bluetooth/l2cap_core.c:1256 [inline]
- l2cap_le_start+0xa6c/0x1384 net/bluetooth/l2cap_core.c:1368
- l2cap_conn_ready net/bluetooth/l2cap_core.c:1624 [inline]
- l2cap_connect_cfm+0x57c/0xe24 net/bluetooth/l2cap_core.c:7286
- hci_connect_cfm+0xa0/0x13c include/net/bluetooth/hci_core.h:1960
- le_conn_complete_evt+0xa1c/0xf0c net/bluetooth/hci_event.c:5761
- hci_le_conn_complete_evt+0x114/0x404 net/bluetooth/hci_event.c:5787
- hci_le_meta_evt+0x2a4/0x478 net/bluetooth/hci_event.c:7135
- hci_event_func net/bluetooth/hci_event.c:7443 [inline]
- hci_event_packet+0x890/0x106c net/bluetooth/hci_event.c:7498
- hci_rx_work+0x318/0xa80 net/bluetooth/hci_core.c:4023
- process_one_work+0x79c/0x15b8 kernel/workqueue.c:3231
- process_scheduled_works kernel/workqueue.c:3312 [inline]
- worker_thread+0x978/0xec4 kernel/workqueue.c:3389
- kthread+0x288/0x310 kernel/kthread.c:389
- ret_from_fork+0x10/0x20 arch/arm64/kernel/entry.S:860
-
-Allocated by task 6795:
- kasan_save_stack mm/kasan/common.c:47 [inline]
- kasan_save_track+0x40/0x78 mm/kasan/common.c:68
- kasan_save_alloc_info+0x40/0x50 mm/kasan/generic.c:565
- poison_kmalloc_redzone mm/kasan/common.c:370 [inline]
- __kasan_kmalloc+0xac/0xc4 mm/kasan/common.c:387
- kasan_kmalloc include/linux/kasan.h:211 [inline]
- __do_kmalloc_node mm/slub.c:4162 [inline]
- __kmalloc_noprof+0x2a4/0x498 mm/slub.c:4174
- kmalloc_noprof include/linux/slab.h:685 [inline]
- sk_prot_alloc+0xc4/0x1f0 net/core/sock.c:2096
- sk_alloc+0x44/0x3f0 net/core/sock.c:2149
- bt_sock_alloc+0x4c/0x304 net/bluetooth/af_bluetooth.c:148
- l2cap_sock_alloc net/bluetooth/l2cap_sock.c:1877 [inline]
- l2cap_sock_create+0x140/0x2b8 net/bluetooth/l2cap_sock.c:1917
- bt_sock_create+0x14c/0x248 net/bluetooth/af_bluetooth.c:132
- __sock_create+0x43c/0x884 net/socket.c:1571
- sock_create net/socket.c:1622 [inline]
- __sys_socket_create net/socket.c:1659 [inline]
- __sys_socket+0x134/0x340 net/socket.c:1706
- __do_sys_socket net/socket.c:1720 [inline]
- __se_sys_socket net/socket.c:1718 [inline]
- __arm64_sys_socket+0x7c/0x94 net/socket.c:1718
- __invoke_syscall arch/arm64/kernel/syscall.c:35 [inline]
- invoke_syscall+0x98/0x2b8 arch/arm64/kernel/syscall.c:49
- el0_svc_common+0x130/0x23c arch/arm64/kernel/syscall.c:132
- do_el0_svc+0x48/0x58 arch/arm64/kernel/syscall.c:151
- el0_svc+0x54/0x168 arch/arm64/kernel/entry-common.c:712
- el0t_64_sync_handler+0x84/0xfc arch/arm64/kernel/entry-common.c:730
- el0t_64_sync+0x190/0x194 arch/arm64/kernel/entry.S:598
-
-Freed by task 6794:
- kasan_save_stack mm/kasan/common.c:47 [inline]
- kasan_save_track+0x40/0x78 mm/kasan/common.c:68
- kasan_save_free_info+0x54/0x6c mm/kasan/generic.c:579
- poison_slab_object+0x128/0x180 mm/kasan/common.c:240
- __kasan_slab_free+0x3c/0x70 mm/kasan/common.c:256
- kasan_slab_free include/linux/kasan.h:184 [inline]
- slab_free_hook mm/slub.c:2256 [inline]
- slab_free mm/slub.c:4477 [inline]
- kfree+0x154/0x3e0 mm/slub.c:4598
- sk_prot_free net/core/sock.c:2132 [inline]
- __sk_destruct+0x4b8/0x74c net/core/sock.c:2224
- sk_destruct net/core/sock.c:2239 [inline]
- __sk_free+0x388/0x4f4 net/core/sock.c:2250
- sk_free+0x60/0xc8 net/core/sock.c:2261
- sock_put include/net/sock.h:1884 [inline]
- l2cap_sock_kill+0x12c/0x234 net/bluetooth/l2cap_sock.c:1250
- l2cap_sock_release+0x138/0x1b4 net/bluetooth/l2cap_sock.c:1421
- __sock_release net/socket.c:659 [inline]
- sock_close+0xa4/0x1e8 net/socket.c:1421
- __fput+0x1bc/0x774 fs/file_table.c:422
- ____fput+0x20/0x30 fs/file_table.c:450
- task_work_run+0x230/0x2e0 kernel/task_work.c:228
- resume_user_mode_work include/linux/resume_user_mode.h:50 [inline]
- do_notify_resume+0x178/0x1f4 arch/arm64/kernel/entry-common.c:151
- exit_to_user_mode_prepare arch/arm64/kernel/entry-common.c:169 [inline]
- exit_to_user_mode arch/arm64/kernel/entry-common.c:178 [inline]
- el0_svc+0xac/0x168 arch/arm64/kernel/entry-common.c:713
- el0t_64_sync_handler+0x84/0xfc arch/arm64/kernel/entry-common.c:730
- el0t_64_sync+0x190/0x194 arch/arm64/kernel/entry.S:598
-
-The buggy address belongs to the object at ffff0000da74b000
- which belongs to the cache kmalloc-2k of size 2048
-The buggy address is located 392 bytes inside of
- freed 2048-byte region [ffff0000da74b000, ffff0000da74b800)
-
-The buggy address belongs to the physical page:
-page: refcount:1 mapcount:0 mapping:0000000000000000 index:0xffff0000da74e000 pfn:0x11a748
-head: order:3 mapcount:0 entire_mapcount:0 nr_pages_mapped:0 pincount:0
-flags: 0x5ffc00000000240(workingset|head|node=0|zone=2|lastcpupid=0x7ff)
-page_type: 0xfdffffff(slab)
-raw: 05ffc00000000240 ffff0000c0002000 fffffdffc369c610 fffffdffc3093810
-raw: ffff0000da74e000 0000000000080006 00000001fdffffff 0000000000000000
-head: 05ffc00000000240 ffff0000c0002000 fffffdffc369c610 fffffdffc3093810
-head: ffff0000da74e000 0000000000080006 00000001fdffffff 0000000000000000
-head: 05ffc00000000003 fffffdffc369d201 ffffffffffffffff 0000000000000000
-head: 0000000000000008 0000000000000000 00000000ffffffff 0000000000000000
-page dumped because: kasan: bad access detected
-
-Memory state around the buggy address:
- ffff0000da74b080: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
- ffff0000da74b100: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
->ffff0000da74b180: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-                      ^
- ffff0000da74b200: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
- ffff0000da74b280: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-==================================================================
-
-
+Co-developed-by: Devegowda Chandrashekar <chandrashekar.devegowda@intel.com>
+Signed-off-by: Devegowda Chandrashekar <chandrashekar.devegowda@intel.com>
+Signed-off-by: Kiran K <kiran.k@intel.com>
 ---
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+ drivers/bluetooth/btintel.c      |  56 ++++++-
+ drivers/bluetooth/btintel.h      |   7 +
+ drivers/bluetooth/btintel_pcie.c | 262 ++++++++++++++++++++++++++++++-
+ drivers/bluetooth/btintel_pcie.h |  16 +-
+ 4 files changed, 329 insertions(+), 12 deletions(-)
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
+index 1ccbb5157515..fed1a939aad6 100644
+--- a/drivers/bluetooth/btintel.c
++++ b/drivers/bluetooth/btintel.c
+@@ -1841,6 +1841,37 @@ static int btintel_boot_wait(struct hci_dev *hdev, ktime_t calltime, int msec)
+ 	return 0;
+ }
+ 
++static int btintel_boot_wait_d0(struct hci_dev *hdev, ktime_t calltime,
++				int msec)
++{
++	ktime_t delta, rettime;
++	unsigned long long duration;
++	int err;
++
++	bt_dev_info(hdev, "Waiting for device transition to d0");
++
++	err = btintel_wait_on_flag_timeout(hdev, INTEL_WAIT_FOR_D0,
++					   TASK_INTERRUPTIBLE,
++					   msecs_to_jiffies(msec));
++	if (err == -EINTR) {
++		bt_dev_err(hdev, "Device d0 move interrupted");
++		return -EINTR;
++	}
++
++	if (err) {
++		bt_dev_err(hdev, "Device d0 move timeout");
++		return -ETIMEDOUT;
++	}
++
++	rettime = ktime_get();
++	delta = ktime_sub(rettime, calltime);
++	duration = (unsigned long long)ktime_to_ns(delta) >> 10;
++
++	bt_dev_info(hdev, "Device moved to D0 in %llu usecs", duration);
++
++	return 0;
++}
++
+ static int btintel_boot(struct hci_dev *hdev, u32 boot_addr)
+ {
+ 	ktime_t calltime;
+@@ -1849,6 +1880,7 @@ static int btintel_boot(struct hci_dev *hdev, u32 boot_addr)
+ 	calltime = ktime_get();
+ 
+ 	btintel_set_flag(hdev, INTEL_BOOTING);
++	btintel_set_flag(hdev, INTEL_WAIT_FOR_D0);
+ 
+ 	err = btintel_send_intel_reset(hdev, boot_addr);
+ 	if (err) {
+@@ -1861,13 +1893,28 @@ static int btintel_boot(struct hci_dev *hdev, u32 boot_addr)
+ 	 * is done by the operational firmware sending bootup notification.
+ 	 *
+ 	 * Booting into operational firmware should not take longer than
+-	 * 1 second. However if that happens, then just fail the setup
++	 * 5 second. However if that happens, then just fail the setup
+ 	 * since something went wrong.
+ 	 */
+-	err = btintel_boot_wait(hdev, calltime, 1000);
+-	if (err == -ETIMEDOUT)
++	err = btintel_boot_wait(hdev, calltime, 5000);
++	if (err == -ETIMEDOUT) {
+ 		btintel_reset_to_bootloader(hdev);
++		goto exit_error;
++	}
+ 
++	if (hdev->bus == HCI_PCI) {
++		/* In case of PCIe, after receiving bootup event, driver performs
++		 * D0 entry by writing 0 to sleep control register (check
++		 * btintel_pcie_recv_event())
++		 * Firmware acks with alive interrupt indicating host is full ready to
++		 * perform BT operation. Lets wait here till INTEL_WAIT_FOR_D0
++		 * bit is cleared.
++		 */
++		calltime = ktime_get();
++		err = btintel_boot_wait_d0(hdev, calltime, 2000);
++	}
++
++exit_error:
+ 	return err;
+ }
+ 
+@@ -3273,7 +3320,7 @@ int btintel_configure_setup(struct hci_dev *hdev, const char *driver_name)
+ }
+ EXPORT_SYMBOL_GPL(btintel_configure_setup);
+ 
+-static int btintel_diagnostics(struct hci_dev *hdev, struct sk_buff *skb)
++int btintel_diagnostics(struct hci_dev *hdev, struct sk_buff *skb)
+ {
+ 	struct intel_tlv *tlv = (void *)&skb->data[5];
+ 
+@@ -3302,6 +3349,7 @@ static int btintel_diagnostics(struct hci_dev *hdev, struct sk_buff *skb)
+ recv_frame:
+ 	return hci_recv_frame(hdev, skb);
+ }
++EXPORT_SYMBOL_GPL(btintel_diagnostics);
+ 
+ int btintel_recv_event(struct hci_dev *hdev, struct sk_buff *skb)
+ {
+diff --git a/drivers/bluetooth/btintel.h b/drivers/bluetooth/btintel.h
+index aa70e4c27416..b448c67e8ed9 100644
+--- a/drivers/bluetooth/btintel.h
++++ b/drivers/bluetooth/btintel.h
+@@ -178,6 +178,7 @@ enum {
+ 	INTEL_ROM_LEGACY,
+ 	INTEL_ROM_LEGACY_NO_WBS_SUPPORT,
+ 	INTEL_ACPI_RESET_ACTIVE,
++	INTEL_WAIT_FOR_D0,
+ 
+ 	__INTEL_NUM_FLAGS,
+ };
+@@ -249,6 +250,7 @@ int btintel_bootloader_setup_tlv(struct hci_dev *hdev,
+ int btintel_shutdown_combined(struct hci_dev *hdev);
+ void btintel_hw_error(struct hci_dev *hdev, u8 code);
+ void btintel_print_fseq_info(struct hci_dev *hdev);
++int btintel_diagnostics(struct hci_dev *hdev, struct sk_buff *skb);
+ #else
+ 
+ static inline int btintel_check_bdaddr(struct hci_dev *hdev)
+@@ -382,4 +384,9 @@ static inline void btintel_hw_error(struct hci_dev *hdev, u8 code)
+ static inline void btintel_print_fseq_info(struct hci_dev *hdev)
+ {
+ }
++
++static inline int btintel_diagnostics(struct hci_dev *hdev, struct sk_buff *skb)
++{
++	return -EOPNOTSUPP;
++}
+ #endif
+diff --git a/drivers/bluetooth/btintel_pcie.c b/drivers/bluetooth/btintel_pcie.c
+index fda47948c35d..cff3e7afdff9 100644
+--- a/drivers/bluetooth/btintel_pcie.c
++++ b/drivers/bluetooth/btintel_pcie.c
+@@ -48,6 +48,17 @@ MODULE_DEVICE_TABLE(pci, btintel_pcie_table);
+ #define BTINTEL_PCIE_HCI_EVT_PKT	0x00000004
+ #define BTINTEL_PCIE_HCI_ISO_PKT	0x00000005
+ 
++/* Alive interrupt context */
++enum {
++	BTINTEL_PCIE_ROM,
++	BTINTEL_PCIE_FW_DL,
++	BTINTEL_PCIE_HCI_RESET,
++	BTINTEL_PCIE_INTEL_HCI_RESET1,
++	BTINTEL_PCIE_INTEL_HCI_RESET2,
++	BTINTEL_PCIE_D0,
++	BTINTEL_PCIE_D3
++};
++
+ static inline void ipc_print_ia_ring(struct hci_dev *hdev, struct ia *ia,
+ 				     u16 queue_num)
+ {
+@@ -290,8 +301,9 @@ static int btintel_pcie_enable_bt(struct btintel_pcie_data *data)
+ 	/* wait for interrupt from the device after booting up to primary
+ 	 * bootloader.
+ 	 */
++	data->alive_intr_ctxt = BTINTEL_PCIE_ROM;
+ 	err = wait_event_timeout(data->gp0_wait_q, data->gp0_received,
+-				 msecs_to_jiffies(BTINTEL_DEFAULT_INTR_TIMEOUT));
++				 msecs_to_jiffies(BTINTEL_DEFAULT_INTR_TIMEOUT_MS));
+ 	if (!err)
+ 		return -ETIME;
+ 
+@@ -302,12 +314,78 @@ static int btintel_pcie_enable_bt(struct btintel_pcie_data *data)
+ 	return 0;
+ }
+ 
++/* BIT(0) - ROM, BIT(1) - IML and BIT(3) - OP
++ * Sometimes during firmware image switching from ROM to IML or IML to OP image,
++ * the previous image bit is not cleared by firmware when alive interrupt is
++ * received. Driver needs to take care of these sticky bits when deciding the
++ * current image running on controller.
++ * Ex: 0x10 and 0x11 - both represents that controller is running IML
++ */
++static inline bool btintel_pcie_in_rom(struct btintel_pcie_data *data)
++{
++	return data->boot_stage_cache & BTINTEL_PCIE_CSR_BOOT_STAGE_ROM &&
++		!(data->boot_stage_cache & BTINTEL_PCIE_CSR_BOOT_STAGE_IML) &&
++		!(data->boot_stage_cache & BTINTEL_PCIE_CSR_BOOT_STAGE_OPFW);
++}
++
++static inline bool btintel_pcie_in_op(struct btintel_pcie_data *data)
++{
++	return data->boot_stage_cache & BTINTEL_PCIE_CSR_BOOT_STAGE_OPFW;
++}
++
++static inline bool btintel_pcie_in_iml(struct btintel_pcie_data *data)
++{
++	return data->boot_stage_cache & BTINTEL_PCIE_CSR_BOOT_STAGE_IML &&
++		!(data->boot_stage_cache & BTINTEL_PCIE_CSR_BOOT_STAGE_OPFW);
++}
++
++static inline bool btintel_pcie_in_d3(struct btintel_pcie_data *data)
++{
++	return data->boot_stage_cache & BTINTEL_PCIE_CSR_BOOT_STAGE_D3_STATE_READY;
++}
++
++static inline bool btintel_pcie_in_d0(struct btintel_pcie_data *data)
++{
++	return !(data->boot_stage_cache & BTINTEL_PCIE_CSR_BOOT_STAGE_D3_STATE_READY);
++}
++
++static void btintel_pcie_wr_sleep_cntrl(struct btintel_pcie_data *data,
++					u32 dxstate)
++{
++	bt_dev_dbg(data->hdev, "writing sleep_ctl_reg: 0x%8.8x", dxstate);
++	btintel_pcie_wr_reg32(data, BTINTEL_PCIE_CSR_IPC_SLEEP_CTL_REG, dxstate);
++}
++
++static inline char *btintel_pcie_alivectxt_state2str(u32 alive_intr_ctxt)
++{
++	switch (alive_intr_ctxt) {
++	case BTINTEL_PCIE_ROM:
++		return "rom";
++	case BTINTEL_PCIE_FW_DL:
++		return "fw_dl";
++	case BTINTEL_PCIE_D0:
++		return "d0";
++	case BTINTEL_PCIE_D3:
++		return "d3";
++	case BTINTEL_PCIE_HCI_RESET:
++		return "hci_reset";
++	case BTINTEL_PCIE_INTEL_HCI_RESET1:
++		return "intel_reset1";
++	case BTINTEL_PCIE_INTEL_HCI_RESET2:
++		return "intel_reset2";
++	default:
++		return "unknown";
++	}
++	return "null";
++}
++
+ /* This function handles the MSI-X interrupt for gp0 cause (bit 0 in
+  * BTINTEL_PCIE_CSR_MSIX_HW_INT_CAUSES) which is sent for boot stage and image response.
+  */
+ static void btintel_pcie_msix_gp0_handler(struct btintel_pcie_data *data)
+ {
+-	u32 reg;
++	bool submit_rx, signal_waitq;
++	u32 reg, old_ctxt;
+ 
+ 	/* This interrupt is for three different causes and it is not easy to
+ 	 * know what causes the interrupt. So, it compares each register value
+@@ -317,20 +395,87 @@ static void btintel_pcie_msix_gp0_handler(struct btintel_pcie_data *data)
+ 	if (reg != data->boot_stage_cache)
+ 		data->boot_stage_cache = reg;
+ 
++	bt_dev_dbg(data->hdev, "Alive context: %s old_boot_stage: 0x%8.8x new_boot_stage: 0x%8.8x",
++		   btintel_pcie_alivectxt_state2str(data->alive_intr_ctxt),
++		   data->boot_stage_cache, reg);
+ 	reg = btintel_pcie_rd_reg32(data, BTINTEL_PCIE_CSR_IMG_RESPONSE_REG);
+ 	if (reg != data->img_resp_cache)
+ 		data->img_resp_cache = reg;
+ 
+ 	data->gp0_received = true;
+ 
+-	/* If the boot stage is OP or IML, reset IA and start RX again */
+-	if (data->boot_stage_cache & BTINTEL_PCIE_CSR_BOOT_STAGE_OPFW ||
+-	    data->boot_stage_cache & BTINTEL_PCIE_CSR_BOOT_STAGE_IML) {
++	old_ctxt = data->alive_intr_ctxt;
++	submit_rx = false;
++	signal_waitq = false;
++
++	switch (data->alive_intr_ctxt) {
++	case BTINTEL_PCIE_ROM:
++		data->alive_intr_ctxt = BTINTEL_PCIE_FW_DL;
++		signal_waitq = true;
++		break;
++	case BTINTEL_PCIE_FW_DL:
++		/* Error case is already handled. Ideally control shall not
++		 * reach here
++		 */
++		break;
++	case BTINTEL_PCIE_INTEL_HCI_RESET1:
++		if (btintel_pcie_in_op(data)) {
++			submit_rx = true;
++			break;
++		}
++
++		if (btintel_pcie_in_iml(data)) {
++			submit_rx = true;
++			data->alive_intr_ctxt = BTINTEL_PCIE_FW_DL;
++			break;
++		}
++		break;
++	case BTINTEL_PCIE_INTEL_HCI_RESET2:
++		if (btintel_test_and_clear_flag(data->hdev, INTEL_WAIT_FOR_D0)) {
++			btintel_wake_up_flag(data->hdev, INTEL_WAIT_FOR_D0);
++			data->alive_intr_ctxt = BTINTEL_PCIE_D0;
++		}
++		break;
++	case BTINTEL_PCIE_D0:
++		if (btintel_pcie_in_d3(data)) {
++			data->alive_intr_ctxt = BTINTEL_PCIE_D3;
++			signal_waitq = true;
++			break;
++		}
++		break;
++	case BTINTEL_PCIE_D3:
++		if (btintel_pcie_in_d0(data)) {
++			data->alive_intr_ctxt = BTINTEL_PCIE_D0;
++			submit_rx = true;
++			signal_waitq = true;
++			break;
++		}
++		break;
++	case BTINTEL_PCIE_HCI_RESET:
++		data->alive_intr_ctxt = BTINTEL_PCIE_D0;
++		submit_rx = true;
++		signal_waitq = true;
++		break;
++	default:
++		bt_dev_err(data->hdev, "Unknown state: 0x%2.2x",
++			   data->alive_intr_ctxt);
++		break;
++	}
++
++	if (submit_rx) {
+ 		btintel_pcie_reset_ia(data);
+ 		btintel_pcie_start_rx(data);
+ 	}
+ 
+-	wake_up(&data->gp0_wait_q);
++	if (signal_waitq) {
++		bt_dev_dbg(data->hdev, "wake up gp0 wait_q");
++		wake_up(&data->gp0_wait_q);
++	}
++
++	if (old_ctxt != data->alive_intr_ctxt)
++		bt_dev_dbg(data->hdev, "alive context changed: %s  ->  %s",
++			   btintel_pcie_alivectxt_state2str(old_ctxt),
++			   btintel_pcie_alivectxt_state2str(data->alive_intr_ctxt));
+ }
+ 
+ /* This function handles the MSX-X interrupt for rx queue 0 which is for TX
+@@ -364,6 +509,80 @@ static void btintel_pcie_msix_tx_handle(struct btintel_pcie_data *data)
+ 	}
+ }
+ 
++static int btintel_pcie_recv_event(struct hci_dev *hdev, struct sk_buff *skb)
++{
++	struct hci_event_hdr *hdr = (void *)skb->data;
++	const char diagnostics_hdr[] = { 0x87, 0x80, 0x03 };
++	struct btintel_pcie_data *data = hci_get_drvdata(hdev);
++
++	if (skb->len > HCI_EVENT_HDR_SIZE && hdr->evt == 0xff &&
++	    hdr->plen > 0) {
++		const void *ptr = skb->data + HCI_EVENT_HDR_SIZE + 1;
++		unsigned int len = skb->len - HCI_EVENT_HDR_SIZE - 1;
++
++		if (btintel_test_flag(hdev, INTEL_BOOTLOADER)) {
++			switch (skb->data[2]) {
++			case 0x02:
++				/* When switching to the operational firmware
++				 * the device sends a vendor specific event
++				 * indicating that the bootup completed.
++				 */
++				btintel_bootup(hdev, ptr, len);
++
++				/* If bootup event is from operational image,
++				 * driver needs to write sleep control register to
++				 * move into D0 state
++				 */
++				if (btintel_pcie_in_op(data)) {
++					btintel_pcie_wr_sleep_cntrl(data, BTINTEL_PCIE_STATE_D0);
++					data->alive_intr_ctxt = BTINTEL_PCIE_INTEL_HCI_RESET2;
++					break;
++				}
++
++				if (btintel_pcie_in_iml(data)) {
++					/* In case of IML, there is no concept
++					 * of D0 transition. Just mimic as if
++					 * IML moved to D0 by clearing INTEL_WAIT_FOR_D0
++					 * bit and waking up the task waiting on
++					 * INTEL_WAIT_FOR_D0. This is required
++					 * as intel_boot() is common function for
++					 * both IML and OP image loading.
++					 */
++					if (btintel_test_and_clear_flag(data->hdev,
++									INTEL_WAIT_FOR_D0))
++						btintel_wake_up_flag(data->hdev,
++								     INTEL_WAIT_FOR_D0);
++				}
++				break;
++			case 0x06:
++				/* When the firmware loading completes the
++				 * device sends out a vendor specific event
++				 * indicating the result of the firmware
++				 * loading.
++				 */
++				btintel_secure_send_result(hdev, ptr, len);
++				break;
++			}
++		}
++
++		/* Handle all diagnostics events separately. May still call
++		 * hci_recv_frame.
++		 */
++		if (len >= sizeof(diagnostics_hdr) &&
++		    memcmp(&skb->data[2], diagnostics_hdr,
++			   sizeof(diagnostics_hdr)) == 0) {
++			return btintel_diagnostics(hdev, skb);
++		}
++
++		/* This is a debug event that comes from IML and OP image when it
++		 * starts execution. There is no need pass this event to stack.
++		 */
++		if (skb->data[2] == 0x97)
++			return 0;
++	}
++
++	return hci_recv_frame(hdev, skb);
++}
+ /* Process the received rx data
+  * It check the frame header to identify the data type and create skb
+  * and calling HCI API
+@@ -465,7 +684,7 @@ static int btintel_pcie_recv_frame(struct btintel_pcie_data *data,
+ 	hdev->stat.byte_rx += plen;
+ 
+ 	if (pcie_pkt_type == BTINTEL_PCIE_HCI_EVT_PKT)
+-		ret = btintel_recv_event(hdev, new_skb);
++		ret = btintel_pcie_recv_event(hdev, new_skb);
+ 	else
+ 		ret = hci_recv_frame(hdev, new_skb);
+ 
+@@ -1053,8 +1272,11 @@ static int btintel_pcie_send_frame(struct hci_dev *hdev,
+ 				       struct sk_buff *skb)
+ {
+ 	struct btintel_pcie_data *data = hci_get_drvdata(hdev);
++	struct hci_command_hdr *cmd;
++	__u16 opcode = ~0;
+ 	int ret;
+ 	u32 type;
++	u32 old_ctxt;
+ 
+ 	/* Due to the fw limitation, the type header of the packet should be
+ 	 * 4 bytes unlike 1 byte for UART. In UART, the firmware can read
+@@ -1073,6 +1295,8 @@ static int btintel_pcie_send_frame(struct hci_dev *hdev,
+ 	switch (hci_skb_pkt_type(skb)) {
+ 	case HCI_COMMAND_PKT:
+ 		type = BTINTEL_PCIE_HCI_CMD_PKT;
++		cmd = (void *)skb->data;
++		opcode = le16_to_cpu(cmd->opcode);
+ 		if (btintel_test_flag(hdev, INTEL_BOOTLOADER)) {
+ 			struct hci_command_hdr *cmd = (void *)skb->data;
+ 			__u16 opcode = le16_to_cpu(cmd->opcode);
+@@ -1111,6 +1335,30 @@ static int btintel_pcie_send_frame(struct hci_dev *hdev,
+ 		bt_dev_err(hdev, "Failed to send frame (%d)", ret);
+ 		goto exit_error;
+ 	}
++
++	if (type == BTINTEL_PCIE_HCI_CMD_PKT &&
++	    (opcode == HCI_OP_RESET || opcode == 0xfc01)) {
++		old_ctxt = data->alive_intr_ctxt;
++		data->alive_intr_ctxt =
++			(opcode == 0xfc01 ? BTINTEL_PCIE_INTEL_HCI_RESET1 :
++				BTINTEL_PCIE_HCI_RESET);
++		bt_dev_dbg(data->hdev, "sent cmd: 0x%4.4x alive context changed: %s  ->  %s",
++			   opcode, btintel_pcie_alivectxt_state2str(old_ctxt),
++			   btintel_pcie_alivectxt_state2str(data->alive_intr_ctxt));
++		if (opcode == HCI_OP_RESET) {
++			data->gp0_received = false;
++			ret = wait_event_timeout(data->gp0_wait_q,
++						 data->gp0_received,
++						 msecs_to_jiffies(BTINTEL_DEFAULT_INTR_TIMEOUT_MS));
++			if (!ret) {
++				hdev->stat.err_tx++;
++				bt_dev_err(hdev, "No alive interrupt received for %s",
++					   btintel_pcie_alivectxt_state2str(data->alive_intr_ctxt));
++				ret = -ETIME;
++				goto exit_error;
++			}
++		}
++	}
+ 	hdev->stat.byte_tx += skb->len;
+ 	kfree_skb(skb);
+ 
+diff --git a/drivers/bluetooth/btintel_pcie.h b/drivers/bluetooth/btintel_pcie.h
+index baaff70420f5..8b7824ad005a 100644
+--- a/drivers/bluetooth/btintel_pcie.h
++++ b/drivers/bluetooth/btintel_pcie.h
+@@ -12,6 +12,7 @@
+ #define BTINTEL_PCIE_CSR_HW_REV_REG		(BTINTEL_PCIE_CSR_BASE + 0x028)
+ #define BTINTEL_PCIE_CSR_RF_ID_REG		(BTINTEL_PCIE_CSR_BASE + 0x09C)
+ #define BTINTEL_PCIE_CSR_BOOT_STAGE_REG		(BTINTEL_PCIE_CSR_BASE + 0x108)
++#define BTINTEL_PCIE_CSR_IPC_SLEEP_CTL_REG	(BTINTEL_PCIE_CSR_BASE + 0x114)
+ #define BTINTEL_PCIE_CSR_CI_ADDR_LSB_REG	(BTINTEL_PCIE_CSR_BASE + 0x118)
+ #define BTINTEL_PCIE_CSR_CI_ADDR_MSB_REG	(BTINTEL_PCIE_CSR_BASE + 0x11C)
+ #define BTINTEL_PCIE_CSR_IMG_RESPONSE_REG	(BTINTEL_PCIE_CSR_BASE + 0x12C)
+@@ -32,6 +33,7 @@
+ #define BTINTEL_PCIE_CSR_BOOT_STAGE_IML_LOCKDOWN	(BIT(11))
+ #define BTINTEL_PCIE_CSR_BOOT_STAGE_MAC_ACCESS_ON	(BIT(16))
+ #define BTINTEL_PCIE_CSR_BOOT_STAGE_ALIVE		(BIT(23))
++#define BTINTEL_PCIE_CSR_BOOT_STAGE_D3_STATE_READY	(BIT(24))
+ 
+ /* Registers for MSI-X */
+ #define BTINTEL_PCIE_CSR_MSIX_BASE		(0x2000)
+@@ -55,6 +57,16 @@ enum msix_hw_int_causes {
+ 	BTINTEL_PCIE_MSIX_HW_INT_CAUSES_GP0	= BIT(0),	/* cause 32 */
+ };
+ 
++/* PCIe device states
++ * Host-Device interface is active
++ * Host-Device interface is inactive(as reflected by IPC_SLEEP_CONTROL_CSR_AD)
++ * Host-Device interface is inactive(as reflected by IPC_SLEEP_CONTROL_CSR_AD)
++ */
++enum {
++	BTINTEL_PCIE_STATE_D0 = 0,
++	BTINTEL_PCIE_STATE_D3_HOT = 2,
++	BTINTEL_PCIE_STATE_D3_COLD = 3,
++};
+ #define BTINTEL_PCIE_MSIX_NON_AUTO_CLEAR_CAUSE	BIT(7)
+ 
+ /* Minimum and Maximum number of MSI-X Vector
+@@ -67,7 +79,7 @@ enum msix_hw_int_causes {
+ #define BTINTEL_DEFAULT_MAC_ACCESS_TIMEOUT_US	200000
+ 
+ /* Default interrupt timeout in msec */
+-#define BTINTEL_DEFAULT_INTR_TIMEOUT	3000
++#define BTINTEL_DEFAULT_INTR_TIMEOUT_MS	3000
+ 
+ /* The number of descriptors in TX/RX queues */
+ #define BTINTEL_DESCS_COUNT	16
+@@ -343,6 +355,7 @@ struct rxq {
+  * @ia: Index Array struct
+  * @txq: TX Queue struct
+  * @rxq: RX Queue struct
++ * @alive_intr_ctxt: Alive interrupt context
+  */
+ struct btintel_pcie_data {
+ 	struct pci_dev	*pdev;
+@@ -389,6 +402,7 @@ struct btintel_pcie_data {
+ 	struct ia	ia;
+ 	struct txq	txq;
+ 	struct rxq	rxq;
++	u32	alive_intr_ctxt;
+ };
+ 
+ static inline u32 btintel_pcie_rd_reg32(struct btintel_pcie_data *data,
+-- 
+2.40.1
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
