@@ -1,215 +1,212 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f182.google.com (mail-lj1-f182.google.com [209.85.208.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C40F8286A
-	for <linux-bluetooth@vger.kernel.org>; Wed,  2 Oct 2024 20:17:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C667B21730E
+	for <linux-bluetooth@vger.kernel.org>; Wed,  2 Oct 2024 20:46:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727900259; cv=none; b=M6aKw0xnctTJliJsK0+r5sZewaukYCqesduuntcAg/GTCBdI5IeXWftQCbKO5qtbQhbE7L0friXxHstJQbDB1hi1TqIIXUOvMUjE2x6ckJn8N4FauCdF6c+ALBtu7sddzLF2T8AIGIQQR/VuIaXjXRBYyHJ3tTPg+ZpIYS/XYy0=
+	t=1727902017; cv=none; b=Tnq4mHLUY0fMqjnZ3zDFKCkERZY0SCM2gew4BjkqD2gOLZwML4g8JwBgrcOmH1l2iDe1L+d6QJug8XRY3V34dkTHBdhgOf/hJW1LYIgR7+7FRJSo1BZzrwmhPUnz6TtctxHft0FEIn02LxXtsI4K0abN6krkZeW21XIAxT+RnyU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727900259; c=relaxed/simple;
-	bh=BUCKyaPvG1GuHevpI0QMVXuQnAAHllL5Rny0K3GFfoc=;
-	h=Date:From:To:Cc:Subject:Message-ID; b=KuM+ZUYI44g5HzBt7hneFmoxXpP6bCJNHoWsCSZrcwydMx7KV2czW8zkxIVkPYQSyprHUCh0mYioiesVhpCkwbn4ghRnkOtaf4ESqJN7GTNq7hOLpvDTfaOXnPQxiyYC9Dx7Q8kxMDo+oXJ39GDJBZ+mM3fiFTDfL7ZsVILI2xc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=A6caLTyk; arc=none smtp.client-ip=192.198.163.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1727902017; c=relaxed/simple;
+	bh=sXkopTABTgrmZNJK5MvngEooy6oh/WwM5ad46iKyxWw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=DV+9YpCJG2PdqMoD1RvI9b3Ui3zEcbJ9FwcUSsZtp/QlRxTNhQtazbHOZ+N6uS6TfkYwUw5JFhXqFByu2HEr4Q5iQqg638ESk2n7L5YSBgixRypGqOKx6ZSIk2zPuNrO+JoZbWGtFE+4BItJtI8so3g94UJtb47PhH6we/ax3Sg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hw50t97Y; arc=none smtp.client-ip=209.85.208.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="A6caLTyk"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1727900258; x=1759436258;
-  h=date:from:to:cc:subject:message-id;
-  bh=BUCKyaPvG1GuHevpI0QMVXuQnAAHllL5Rny0K3GFfoc=;
-  b=A6caLTykIXJAYeRCxz7I0ObHHGG8zCc3oNcCOSdE6TSXL6PUZlVyGhkU
-   MDh4GNK5hHzOhHr9c7sL9EvDbbU9Sm+DO2TpgQzXAbKptg/ybNyvZXR0u
-   u5ca2c4JLsNScxNmyTEj6uJUoG0pkrQ0KPNZRtP2LcPbstTMYIfKN81m1
-   ZpFalsgZ6r8YwRZ4yf2wpsl4FBVCzp62uWH5VFmX0HGE4uhlaOgXZmGfC
-   JEahP+Y4mKUesCXUQd6ENbMswkLQ1hgUotZgvZkUKOKD7xQkzVQNzArbB
-   lCvcxfVHMoaVOeNp85C+UWLK3mvFaH3qIItCtrd3zWEsJ+IE5pGr10SPX
-   g==;
-X-CSE-ConnectionGUID: IgO0GJRNRQKRU4gfpSA0BA==
-X-CSE-MsgGUID: uxiBlNI+SPe/T1xsP38XJQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11213"; a="27254527"
-X-IronPort-AV: E=Sophos;i="6.11,172,1725346800"; 
-   d="scan'208";a="27254527"
-Received: from orviesa008.jf.intel.com ([10.64.159.148])
-  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Oct 2024 13:17:37 -0700
-X-CSE-ConnectionGUID: yOA7dMiNTUiRYNWl0M0f7Q==
-X-CSE-MsgGUID: T+4Z/7y5Q7C9AfzsfmRwfA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,172,1725346800"; 
-   d="scan'208";a="74919250"
-Received: from lkp-server01.sh.intel.com (HELO 53e96f405c61) ([10.239.97.150])
-  by orviesa008.jf.intel.com with ESMTP; 02 Oct 2024 13:17:36 -0700
-Received: from kbuild by 53e96f405c61 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1sw5mv-000UWn-0s;
-	Wed, 02 Oct 2024 20:17:33 +0000
-Date: Thu, 03 Oct 2024 04:16:42 +0800
-From: kernel test robot <lkp@intel.com>
-To: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: [bluetooth-next:master] BUILD SUCCESS
- 6774cca543da1248a24bf8ae6b8c5a424e6293ec
-Message-ID: <202410030430.CxXyzRq6-lkp@intel.com>
-User-Agent: s-nail v14.9.24
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hw50t97Y"
+Received: by mail-lj1-f182.google.com with SMTP id 38308e7fff4ca-2f75c56f16aso2475751fa.0
+        for <linux-bluetooth@vger.kernel.org>; Wed, 02 Oct 2024 13:46:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1727902013; x=1728506813; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=HLU5piaOwj/zQoerTkWI+1qEpTJD0hz3gFbERQmNUyY=;
+        b=hw50t97Y++sk5DD0gI3o+R60k5aIly1956qYTu2BiwYt4MUJk2FRimXrNBTDff54pR
+         7Vz8q4fLayNxWklvP5nWulT8aVU1fDd2Kn7UVAf8beRGSftgJLC8iw9nbUNpSY9Gwl88
+         p//UyJWsfkbhuGLBhme+q1We5zdXZ37MVEhfAA7sAppRBg5H34qA8HNAoxlZ68Qww+Ld
+         z5218pCU4vcCxnjOKUZo+BJRyudBKN+ANiFofDBYmheMy9Q8wpZNH46phZnm8OhZL/hw
+         jXNf5xvUG0CHPrcwYFd8SGoNMN+YvxXfXWhwvcUGPnZD4Wwozr798iSf+J8E3oa/vmd2
+         Brzg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1727902013; x=1728506813;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=HLU5piaOwj/zQoerTkWI+1qEpTJD0hz3gFbERQmNUyY=;
+        b=j2U0h1nF2rKQA7xpwa5ApXiGgJJVrvCZp3m4kKmuVS2ZGVIp7AGmYCFhzu+ox5xYDM
+         UmJLtaDu9NHLDOs/sXiZyTXixNyaUlUEpqQgTg3YW6iqlBlsWAUKAwi6KuLXHErVXG/o
+         yaFqtmwdrXRV5yphThDiH/nHl7xzDuzO5AnN/rKLwyMKOSJUfYAnof3+ureXYCcj2fP7
+         2YfH0mlJSKGaODqjE3IwD3p3f4eqeDlSDdoL83I1+AE94WBRCTdxtp4/bcLk6aIIybkG
+         l3xgjSBLJw6YrPagnN1J7c5T1TDBpc/uMrPt3k8O0r/UK2H+TQTiB/zhwJFiDME4gv+v
+         MwaA==
+X-Gm-Message-State: AOJu0Yx4CS44sX4k4PHKoABLGArWPzvIA8mxrqfZaT9cPkt4SX9CY038
+	UJrzM4pIw2NMsAS472uwFiaHR0pPfdg2+f3sJ+YGuYGqlnkk8e4Zy543ckR4V1NkKI+RZYyGfL9
+	qu0+cayUqSfBBUDOgDZ8ft7nU5CuRAA==
+X-Google-Smtp-Source: AGHT+IFwUF0pvc6zTXvS0VpjjQnYxaRXp/ZxeKnKd4Ohm0U7XMzQbR8d/g6FNXghoPIapMHAxo79xwCqUVShPgMBfZc=
+X-Received: by 2002:a05:651c:2206:b0:2fa:e4d0:eb4f with SMTP id
+ 38308e7fff4ca-2fae4d0eca3mr19544541fa.4.1727902012870; Wed, 02 Oct 2024
+ 13:46:52 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+References: <20241002190452.3405592-1-luiz.dentz@gmail.com>
+ <CABBYNZKqrja__qdidRwqXh9wcJJ6YdGqdh4bejU5HsL02qcFpw@mail.gmail.com> <CABBYNZLoh-K2QLinNwJrbQgSccTKW37C2wt5+AmM272Du3p81A@mail.gmail.com>
+In-Reply-To: <CABBYNZLoh-K2QLinNwJrbQgSccTKW37C2wt5+AmM272Du3p81A@mail.gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Wed, 2 Oct 2024 16:46:40 -0400
+Message-ID: <CABBYNZLeWWtX9PdNarFajZynUSsyrd4mavExPXzY2GUf_ZzECw@mail.gmail.com>
+Subject: Re: [PATCH v3] Bluetooth: SCO: Use disable_delayed_work_sync
+To: linux-bluetooth@vger.kernel.org
+Cc: syzbot+4c0d0c4cde787116d465@syzkaller.appspotmail.com
+Content-Type: multipart/mixed; boundary="000000000000af3d2c06238489f3"
 
-tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
-branch HEAD: 6774cca543da1248a24bf8ae6b8c5a424e6293ec  Bluetooth: hci_conn: Use disable_delayed_work_sync
+--000000000000af3d2c06238489f3
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-elapsed time: 1448m
+#syz test
 
-configs tested: 138
-configs skipped: 5
+On Wed, Oct 2, 2024 at 3:46=E2=80=AFPM Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+>
+> #syz test
+>
+> On Wed, Oct 2, 2024 at 3:19=E2=80=AFPM Luiz Augusto von Dentz
+> <luiz.dentz@gmail.com> wrote:
+> >
+> > #syz test
+> >
+> > On Wed, Oct 2, 2024 at 3:04=E2=80=AFPM Luiz Augusto von Dentz
+> > <luiz.dentz@gmail.com> wrote:
+> > >
+> > > From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> > >
+> > > This makes use of disable_delayed_work_sync instead
+> > > cancel_delayed_work_sync as it not only cancel the ongoing work but a=
+lso
+> > > disables new submit which is disarable since the object holding the w=
+ork
+> > > is about to be freed.
+> > >
+> > > In addition to it remove call to sco_sock_set_timer on __sco_sock_clo=
+se
+> > > since at that point it is useless to set a timer as the sk will be fr=
+eed
+> > > there is nothing to be done in sco_sock_timeout.
+> > >
+> > > Reported-by: syzbot+4c0d0c4cde787116d465@syzkaller.appspotmail.com
+> > > Closes: https://syzkaller.appspot.com/bug?extid=3D4c0d0c4cde787116d46=
+5
+> > > Fixes: ba316be1b6a0 ("Bluetooth: schedule SCO timeouts with delayed_w=
+ork")
+> > > Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> > > ---
+> > >  net/bluetooth/sco.c | 13 +------------
+> > >  1 file changed, 1 insertion(+), 12 deletions(-)
+> > >
+> > > diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
+> > > index a5ac160c592e..2b1e66976068 100644
+> > > --- a/net/bluetooth/sco.c
+> > > +++ b/net/bluetooth/sco.c
+> > > @@ -208,7 +208,7 @@ static void sco_conn_del(struct hci_conn *hcon, i=
+nt err)
+> > >         }
+> > >
+> > >         /* Ensure no more work items will run before freeing conn. */
+> > > -       cancel_delayed_work_sync(&conn->timeout_work);
+> > > +       disable_delayed_work_sync(&conn->timeout_work);
+> > >
+> > >         hcon->sco_data =3D NULL;
+> > >         kfree(conn);
+> > > @@ -442,17 +442,6 @@ static void __sco_sock_close(struct sock *sk)
+> > >
+> > >         case BT_CONNECTED:
+> > >         case BT_CONFIG:
+> > > -               if (sco_pi(sk)->conn->hcon) {
+> > > -                       sk->sk_state =3D BT_DISCONN;
+> > > -                       sco_sock_set_timer(sk, SCO_DISCONN_TIMEOUT);
+> > > -                       sco_conn_lock(sco_pi(sk)->conn);
+> > > -                       hci_conn_drop(sco_pi(sk)->conn->hcon);
+> > > -                       sco_pi(sk)->conn->hcon =3D NULL;
+> > > -                       sco_conn_unlock(sco_pi(sk)->conn);
+> > > -               } else
+> > > -                       sco_chan_del(sk, ECONNRESET);
+> > > -               break;
+> > > -
+> > >         case BT_CONNECT2:
+> > >         case BT_CONNECT:
+> > >         case BT_DISCONN:
+> > > --
+> > > 2.46.1
+> > >
+> >
+> >
+> > --
+> > Luiz Augusto von Dentz
+>
+>
+>
+> --
+> Luiz Augusto von Dentz
 
-The following configs have been built successfully.
-More configs may be tested in the coming days.
 
-tested configs:
-alpha                             allnoconfig    gcc-14.1.0
-alpha                            allyesconfig    clang-20
-alpha                            allyesconfig    gcc-13.3.0
-alpha                               defconfig    gcc-14.1.0
-arc                              allmodconfig    clang-20
-arc                              allmodconfig    gcc-13.2.0
-arc                               allnoconfig    gcc-14.1.0
-arc                              allyesconfig    clang-20
-arc                              allyesconfig    gcc-13.2.0
-arc                                 defconfig    gcc-14.1.0
-arm                              allmodconfig    clang-20
-arm                              allmodconfig    gcc-14.1.0
-arm                               allnoconfig    gcc-14.1.0
-arm                              allyesconfig    clang-20
-arm                                 defconfig    gcc-14.1.0
-arm                            dove_defconfig    gcc-14.1.0
-arm                             pxa_defconfig    gcc-14.1.0
-arm64                            allmodconfig    clang-20
-arm64                             allnoconfig    gcc-14.1.0
-arm64                               defconfig    gcc-14.1.0
-csky                              allnoconfig    gcc-14.1.0
-csky                                defconfig    gcc-14.1.0
-hexagon                          allmodconfig    clang-20
-hexagon                           allnoconfig    gcc-14.1.0
-hexagon                          allyesconfig    clang-20
-hexagon                             defconfig    gcc-14.1.0
-i386                             allmodconfig    clang-18
-i386                             allmodconfig    gcc-12
-i386                              allnoconfig    clang-18
-i386                              allnoconfig    gcc-12
-i386                             allyesconfig    clang-18
-i386                             allyesconfig    gcc-12
-i386        buildonly-randconfig-001-20241002    clang-18
-i386        buildonly-randconfig-002-20241002    clang-18
-i386        buildonly-randconfig-003-20241002    gcc-12
-i386        buildonly-randconfig-004-20241002    gcc-12
-i386        buildonly-randconfig-005-20241002    gcc-12
-i386        buildonly-randconfig-006-20241002    gcc-12
-i386                                defconfig    clang-18
-i386                  randconfig-001-20241002    gcc-12
-i386                  randconfig-002-20241002    gcc-12
-i386                  randconfig-003-20241002    clang-18
-i386                  randconfig-004-20241002    clang-18
-i386                  randconfig-005-20241002    clang-18
-i386                  randconfig-006-20241002    gcc-12
-i386                  randconfig-011-20241002    clang-18
-i386                  randconfig-012-20241002    clang-18
-i386                  randconfig-013-20241002    gcc-12
-i386                  randconfig-014-20241002    clang-18
-i386                  randconfig-015-20241002    clang-18
-i386                  randconfig-016-20241002    clang-18
-loongarch                        allmodconfig    gcc-14.1.0
-loongarch                         allnoconfig    gcc-14.1.0
-loongarch                           defconfig    gcc-14.1.0
-m68k                             allmodconfig    gcc-14.1.0
-m68k                              allnoconfig    gcc-14.1.0
-m68k                             allyesconfig    gcc-14.1.0
-m68k                         apollo_defconfig    gcc-14.1.0
-m68k                                defconfig    gcc-14.1.0
-m68k                       m5475evb_defconfig    gcc-14.1.0
-m68k                            q40_defconfig    gcc-14.1.0
-microblaze                       allmodconfig    gcc-14.1.0
-microblaze                        allnoconfig    gcc-14.1.0
-microblaze                       allyesconfig    gcc-14.1.0
-microblaze                          defconfig    gcc-14.1.0
-mips                              allnoconfig    gcc-14.1.0
-mips                          malta_defconfig    gcc-14.1.0
-mips                        qi_lb60_defconfig    gcc-14.1.0
-nios2                             allnoconfig    gcc-14.1.0
-nios2                               defconfig    gcc-14.1.0
-openrisc                         allyesconfig    gcc-14.1.0
-openrisc                            defconfig    gcc-12
-parisc                           allmodconfig    gcc-14.1.0
-parisc                           allyesconfig    gcc-14.1.0
-parisc                              defconfig    gcc-12
-parisc64                            defconfig    gcc-14.1.0
-powerpc                          allmodconfig    gcc-14.1.0
-powerpc                          allyesconfig    gcc-14.1.0
-powerpc                     asp8347_defconfig    gcc-14.1.0
-powerpc                 mpc834x_itx_defconfig    gcc-14.1.0
-powerpc                     tqm5200_defconfig    gcc-14.1.0
-riscv                            allmodconfig    clang-20
-riscv                            allmodconfig    gcc-14.1.0
-riscv                            allyesconfig    clang-20
-riscv                            allyesconfig    gcc-14.1.0
-riscv                               defconfig    gcc-12
-s390                             allmodconfig    clang-20
-s390                             allyesconfig    gcc-14.1.0
-s390                                defconfig    gcc-12
-s390                                defconfig    gcc-14.1.0
-sh                               allmodconfig    gcc-14.1.0
-sh                                allnoconfig    gcc-14.1.0
-sh                               allyesconfig    gcc-14.1.0
-sh                                  defconfig    gcc-12
-sh                           se7712_defconfig    gcc-14.1.0
-sh                        sh7763rdp_defconfig    gcc-14.1.0
-sparc                            allmodconfig    gcc-14.1.0
-sparc                       sparc64_defconfig    gcc-14.1.0
-sparc64                             defconfig    gcc-12
-um                               allmodconfig    clang-20
-um                               allyesconfig    clang-20
-um                               allyesconfig    gcc-12
-um                                  defconfig    gcc-12
-um                             i386_defconfig    gcc-12
-um                           x86_64_defconfig    gcc-12
-x86_64                            allnoconfig    clang-18
-x86_64                           allyesconfig    clang-18
-x86_64      buildonly-randconfig-001-20241002    gcc-12
-x86_64      buildonly-randconfig-002-20241002    gcc-12
-x86_64      buildonly-randconfig-003-20241002    gcc-12
-x86_64      buildonly-randconfig-004-20241002    gcc-12
-x86_64      buildonly-randconfig-005-20241002    gcc-12
-x86_64      buildonly-randconfig-006-20241002    gcc-12
-x86_64                              defconfig    clang-18
-x86_64                              defconfig    gcc-11
-x86_64                                  kexec    clang-18
-x86_64                randconfig-001-20241002    gcc-12
-x86_64                randconfig-002-20241002    gcc-12
-x86_64                randconfig-003-20241002    gcc-12
-x86_64                randconfig-004-20241002    gcc-12
-x86_64                randconfig-005-20241002    gcc-12
-x86_64                randconfig-006-20241002    gcc-12
-x86_64                randconfig-011-20241002    gcc-12
-x86_64                randconfig-012-20241002    gcc-12
-x86_64                randconfig-013-20241002    gcc-12
-x86_64                randconfig-014-20241002    gcc-12
-x86_64                randconfig-015-20241002    gcc-12
-x86_64                randconfig-016-20241002    gcc-12
-x86_64                randconfig-071-20241002    gcc-12
-x86_64                randconfig-072-20241002    gcc-12
-x86_64                randconfig-073-20241002    gcc-12
-x86_64                randconfig-074-20241002    gcc-12
-x86_64                randconfig-075-20241002    gcc-12
-x86_64                randconfig-076-20241002    gcc-12
-x86_64                               rhel-8.3    gcc-12
-x86_64                          rhel-8.3-rust    clang-18
-xtensa                            allnoconfig    gcc-14.1.0
-xtensa                         virt_defconfig    gcc-14.1.0
 
---
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+--=20
+Luiz Augusto von Dentz
+
+--000000000000af3d2c06238489f3
+Content-Type: text/x-patch; charset="US-ASCII"; 
+	name="v4-0001-Bluetooth-SCO-Use-disable_delayed_work_sync.patch"
+Content-Disposition: attachment; 
+	filename="v4-0001-Bluetooth-SCO-Use-disable_delayed_work_sync.patch"
+Content-Transfer-Encoding: base64
+Content-ID: <f_m1sc8fnx0>
+X-Attachment-Id: f_m1sc8fnx0
+
+RnJvbSA4NWI0Mzg2NzNkZDRmMWJiNjg2NzYyOTRkNTY3NGQyMGEwZDQ3YzA5IE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBMdWl6IEF1Z3VzdG8gdm9uIERlbnR6IDxsdWl6LnZvbi5kZW50
+ekBpbnRlbC5jb20+CkRhdGU6IFR1ZSwgMSBPY3QgMjAyNCAxNTo0NjoxMCAtMDQwMApTdWJqZWN0
+OiBbUEFUQ0ggdjRdIEJsdWV0b290aDogU0NPOiBVc2UgZGlzYWJsZV9kZWxheWVkX3dvcmtfc3lu
+YwoKVGhpcyBtYWtlcyB1c2Ugb2YgZGlzYWJsZV9kZWxheWVkX3dvcmtfc3luYyBpbnN0ZWFkCmNh
+bmNlbF9kZWxheWVkX3dvcmtfc3luYyBhcyBpdCBub3Qgb25seSBjYW5jZWwgdGhlIG9uZ29pbmcg
+d29yayBidXQgYWxzbwpkaXNhYmxlcyBuZXcgc3VibWl0IHdoaWNoIGlzIGRpc2FyYWJsZSBzaW5j
+ZSB0aGUgb2JqZWN0IGhvbGRpbmcgdGhlIHdvcmsKaXMgYWJvdXQgdG8gYmUgZnJlZWQuCgpJbiBh
+ZGRpdGlvbiB0byBpdCByZW1vdmUgY2FsbCB0byBzY29fc29ja19zZXRfdGltZXIgb24gX19zY29f
+c29ja19jbG9zZQpzaW5jZSBhdCB0aGF0IHBvaW50IGl0IGlzIHVzZWxlc3MgdG8gc2V0IGEgdGlt
+ZXIgYXMgdGhlIHNrIHdpbGwgYmUgZnJlZWQKdGhlcmUgaXMgbm90aGluZyB0byBiZSBkb25lIGlu
+IHNjb19zb2NrX3RpbWVvdXQuCgpSZXBvcnRlZC1ieTogc3l6Ym90KzRjMGQwYzRjZGU3ODcxMTZk
+NDY1QHN5emthbGxlci5hcHBzcG90bWFpbC5jb20KQ2xvc2VzOiBodHRwczovL3N5emthbGxlci5h
+cHBzcG90LmNvbS9idWc/ZXh0aWQ9NGMwZDBjNGNkZTc4NzExNmQ0NjUKRml4ZXM6IGJhMzE2YmUx
+YjZhMCAoIkJsdWV0b290aDogc2NoZWR1bGUgU0NPIHRpbWVvdXRzIHdpdGggZGVsYXllZF93b3Jr
+IikKU2lnbmVkLW9mZi1ieTogTHVpeiBBdWd1c3RvIHZvbiBEZW50eiA8bHVpei52b24uZGVudHpA
+aW50ZWwuY29tPgotLS0KIG5ldC9ibHVldG9vdGgvc2NvLmMgfCAyMCArKysrKy0tLS0tLS0tLS0t
+LS0tLQogMSBmaWxlIGNoYW5nZWQsIDUgaW5zZXJ0aW9ucygrKSwgMTUgZGVsZXRpb25zKC0pCgpk
+aWZmIC0tZ2l0IGEvbmV0L2JsdWV0b290aC9zY28uYyBiL25ldC9ibHVldG9vdGgvc2NvLmMKaW5k
+ZXggYTVhYzE2MGM1OTJlLi5jZWU4N2M2YzkxOTQgMTAwNjQ0Ci0tLSBhL25ldC9ibHVldG9vdGgv
+c2NvLmMKKysrIGIvbmV0L2JsdWV0b290aC9zY28uYwpAQCAtMTY5LDEwICsxNjksMTEgQEAgc3Rh
+dGljIHZvaWQgc2NvX2NoYW5fZGVsKHN0cnVjdCBzb2NrICpzaywgaW50IGVycikKIAkJc2NvX2Nv
+bm5fbG9jayhjb25uKTsKIAkJY29ubi0+c2sgPSBOVUxMOwogCQlzY29fcGkoc2spLT5jb25uID0g
+TlVMTDsKLQkJc2NvX2Nvbm5fdW5sb2NrKGNvbm4pOwotCi0JCWlmIChjb25uLT5oY29uKQorCQlp
+ZiAoY29ubi0+aGNvbikgewogCQkJaGNpX2Nvbm5fZHJvcChjb25uLT5oY29uKTsKKwkJCWNvbm4t
+Pmhjb24gPSBOVUxMOworCQl9CisJCXNjb19jb25uX3VubG9jayhjb25uKTsKIAl9CiAKIAlzay0+
+c2tfc3RhdGUgPSBCVF9DTE9TRUQ7CkBAIC0yMDgsNyArMjA5LDcgQEAgc3RhdGljIHZvaWQgc2Nv
+X2Nvbm5fZGVsKHN0cnVjdCBoY2lfY29ubiAqaGNvbiwgaW50IGVycikKIAl9CiAKIAkvKiBFbnN1
+cmUgbm8gbW9yZSB3b3JrIGl0ZW1zIHdpbGwgcnVuIGJlZm9yZSBmcmVlaW5nIGNvbm4uICovCi0J
+Y2FuY2VsX2RlbGF5ZWRfd29ya19zeW5jKCZjb25uLT50aW1lb3V0X3dvcmspOworCWRpc2FibGVf
+ZGVsYXllZF93b3JrX3N5bmMoJmNvbm4tPnRpbWVvdXRfd29yayk7CiAKIAloY29uLT5zY29fZGF0
+YSA9IE5VTEw7CiAJa2ZyZWUoY29ubik7CkBAIC00NDIsMTcgKzQ0Myw2IEBAIHN0YXRpYyB2b2lk
+IF9fc2NvX3NvY2tfY2xvc2Uoc3RydWN0IHNvY2sgKnNrKQogCiAJY2FzZSBCVF9DT05ORUNURUQ6
+CiAJY2FzZSBCVF9DT05GSUc6Ci0JCWlmIChzY29fcGkoc2spLT5jb25uLT5oY29uKSB7Ci0JCQlz
+ay0+c2tfc3RhdGUgPSBCVF9ESVNDT05OOwotCQkJc2NvX3NvY2tfc2V0X3RpbWVyKHNrLCBTQ09f
+RElTQ09OTl9USU1FT1VUKTsKLQkJCXNjb19jb25uX2xvY2soc2NvX3BpKHNrKS0+Y29ubik7Ci0J
+CQloY2lfY29ubl9kcm9wKHNjb19waShzayktPmNvbm4tPmhjb24pOwotCQkJc2NvX3BpKHNrKS0+
+Y29ubi0+aGNvbiA9IE5VTEw7Ci0JCQlzY29fY29ubl91bmxvY2soc2NvX3BpKHNrKS0+Y29ubik7
+Ci0JCX0gZWxzZQotCQkJc2NvX2NoYW5fZGVsKHNrLCBFQ09OTlJFU0VUKTsKLQkJYnJlYWs7Ci0K
+IAljYXNlIEJUX0NPTk5FQ1QyOgogCWNhc2UgQlRfQ09OTkVDVDoKIAljYXNlIEJUX0RJU0NPTk46
+Ci0tIAoyLjQ2LjEKCg==
+--000000000000af3d2c06238489f3--
