@@ -1,90 +1,78 @@
-Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.4])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4BAA1527B4;
-	Thu,  3 Oct 2024 16:45:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.4
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 627F91A76D2
+	for <linux-bluetooth@vger.kernel.org>; Thu,  3 Oct 2024 16:50:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727973964; cv=none; b=mrEDAYiS6/gv+J8/mX4+9/WiQnj/u0RSFsbG2s3f9HPrT2q2FdRk2v3B96k+gr4kq9ZBdQOsCCIv8UJdqX4iLshUoafrxMLj2E4qeIRC8f4SZk6+gsPO2uhc2/+eHsGhjhKhKJNLMyPpgodTj+4ls9QxXl/ccNbwDm9LjIt9AIw=
+	t=1727974229; cv=none; b=RPY9iwTb6bd2Y0R6N5v+4eYW0V+r/KoIgxDlIUCu8XUUbt8McytlWJezx4iZu7DCCuOuPWypDsx/ue+55nQ2iqysXgg5T4LYgpnX8rfDuWi3Zd73jKLgyRAwHSe45kJdiaRF0OOmrNoPMfyBKK6AU409xSA2p0prh8ZYqqnkk7I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727973964; c=relaxed/simple;
-	bh=TT5hyo8P9xB4I74Z99Xi7KjdTLVHYZ/Ow0Q856OZbOE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XL020/NLDIGO1kXTjKxvBOZSnYxLcpqZRypSpgSHdqJduXZkEM7v3D19ysxYOeWx40x7ikTlHxUe3+oO/PLP/Is77EpvwSbjUiMwy8f7GfM9DVV0Cqu6SbbVQriUHQ0JFm7TRuptQQaOhERmM9ImJZLp308esQ4Uu0vlPGcKF90=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=RyoQ5qxw; arc=none smtp.client-ip=220.197.31.4
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+	s=arc-20240116; t=1727974229; c=relaxed/simple;
+	bh=ceXqN5VtXf7cIozpAR04jwbVCWXmXtAzouhs444mCcY=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=QAfmhJd2i+8QNvW1w9MG6HFDrsqwuoXApUzgU4KTDUiDQN+YH9tHzL5pvdQU9l0jM44wDx8zatJsNQwAP5JScnG6BJd0MSMIuBSapDS9exPL5iYLTc6J0nx1Rbgs7q4bLigvIbzXE3JRo1kFUY09flpLvJq5gpGzf6smGsig9M0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RXtKzsfy; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="RyoQ5qxw"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=Date:From:Subject:Message-ID:MIME-Version:
-	Content-Type; bh=y7bZ/ZoDlTNd7MJdssOu3Ri2ZdMJ22HYsJD2RsYxNo0=;
-	b=RyoQ5qxwZcmPO1TgqMaxhR/ks+gTW0X5y3dqN5dhTPtB7JHUdrmAdpkoislc6d
-	kziQ5Rc+dne4jw7pY77BncyriQFeNwFi0IHtX4boiseanqPnk9ElsZePRzsw6qKq
-	RDOSGxIJHeX+QeFnOWnj3D2n/8+KS/m43Rygbutda6OVw=
-Received: from localhost (unknown [36.5.132.7])
-	by gzga-smtp-mtada-g1-3 (Coremail) with SMTP id _____wD33wQ6yv5mJOQ9Aw--.10151S2;
-	Fri, 04 Oct 2024 00:45:46 +0800 (CST)
-Date: Fri, 4 Oct 2024 00:45:46 +0800
-From: Qianqiang Liu <qianqiang.liu@163.com>
-To: syzbot <syzbot+03d6270b6425df1605bf@syzkaller.appspotmail.com>
-Cc: johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org, luiz.dentz@gmail.com,
-	marcel@holtmann.org, syzkaller-bugs@googlegroups.com
-Subject: Re: [syzbot] [bluetooth?] KASAN: slab-use-after-free Read in
- set_powered_sync
-Message-ID: <Zv7KOuMKKHrLTvfw@fedora>
-References: <Zv67JUPfzgQp7Kgf@fedora>
- <66fec4aa.050a0220.9ec68.004b.GAE@google.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RXtKzsfy"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CD7B8C4CEC5;
+	Thu,  3 Oct 2024 16:50:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1727974228;
+	bh=ceXqN5VtXf7cIozpAR04jwbVCWXmXtAzouhs444mCcY=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=RXtKzsfy01VoEfNaDbftOjIGq2IQGGKbU1+8RY50o5IY9kxAyDcyo5aGyQQNW0GAx
+	 iuSvaF6rS9JXKZih0SfedrKlFcs1GKETt96p4vWjHWrhCclWZDeYu+vqdiFVbeM8vd
+	 /B9CF6wPYyuGIGIaDvxmX9142USYSLXCMgkdRsHrRDo0nCPZtIK1oovr4cQus82Q5J
+	 TrqXowj/44VVOZ0RKICsIW3RTaqSCRuwMyZoTCachoQwkwVg9d2vwrHVpDnKEObE4G
+	 EBMys2wHFItyVjdWMoyjlPTD6q9oFG+xllpHZdZcq+SrnX+rj5yTl+YCZp8w3vbFjY
+	 qGH2Yz6hSrBpA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 715CB3803263;
+	Thu,  3 Oct 2024 16:50:33 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <66fec4aa.050a0220.9ec68.004b.GAE@google.com>
-X-CM-TRANSID:_____wD33wQ6yv5mJOQ9Aw--.10151S2
-X-Coremail-Antispam: 1Uf129KBjvdXoW7GrW5uF1UKF43Kw47Cr18Grg_yoWDAFg_uw
-	1Yva4fGrWUXFy5JF42grZrur4fAFnxKr1xWw1SqFWUWas8Ga1UJr4UXFn3Zr13uas7AF17
-	CrsxCFyfXw48KjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-	9fnUUvcSsGvfC2KfnxnUUI43ZEXa7xRRknY3UUUUU==
-X-CM-SenderInfo: xtld01pldqwhxolxqiywtou0bp/1tbiRRBtamb+xz0hDwAAse
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH BlueZ 0/1] client: Add Broadcast Assistant/Scan Delegator
+ scripts
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <172797423228.1920089.11952184176890128376.git-patchwork-notify@kernel.org>
+Date: Thu, 03 Oct 2024 16:50:32 +0000
+References: <20241002141345.27931-1-iulia.tanasescu@nxp.com>
+In-Reply-To: <20241002141345.27931-1-iulia.tanasescu@nxp.com>
+To: Iulia Tanasescu <iulia.tanasescu@nxp.com>
+Cc: linux-bluetooth@vger.kernel.org, claudia.rosu@nxp.com,
+ mihai-octavian.urzica@nxp.com, vlad.pruteanu@nxp.com,
+ andrei.istodorescu@nxp.com, luiz.dentz@gmail.com
 
-#syz test
+Hello:
 
-diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-index 5533e6f561b3..20d0793d3832 100644
---- a/net/bluetooth/hci_sync.c
-+++ b/net/bluetooth/hci_sync.c
-@@ -325,9 +325,11 @@ static void hci_cmd_sync_work(struct work_struct *work)
- 			int err;
- 
- 			hci_req_sync_lock(hdev);
--			err = entry->func(hdev, entry->data);
--			if (entry->destroy)
--				entry->destroy(hdev, entry->data, err);
-+			if (entry->data) {
-+				err = entry->func(hdev, entry->data);
-+				if (entry->destroy)
-+					entry->destroy(hdev, entry->data, err);
-+			}
- 			hci_req_sync_unlock(hdev);
- 		}
- 
-diff --git a/net/bluetooth/mgmt_util.c b/net/bluetooth/mgmt_util.c
-index 0115f783bde8..eccc51bfaf2e 100644
---- a/net/bluetooth/mgmt_util.c
-+++ b/net/bluetooth/mgmt_util.c
-@@ -307,6 +307,7 @@ void mgmt_pending_free(struct mgmt_pending_cmd *cmd)
- 	sock_put(cmd->sk);
- 	kfree(cmd->param);
- 	kfree(cmd);
-+	cmd = NULL;
- }
- 
- void mgmt_pending_remove(struct mgmt_pending_cmd *cmd)
+This patch was applied to bluetooth/bluez.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
+On Wed,  2 Oct 2024 17:13:44 +0300 you wrote:
+> This adds sample bluetoothctl scripts for the Broadcast
+> Assistant/Scan Delegator scenarios.
+> 
+> A test setup can be created using these 2 scripts and the
+> broadcast-source.bt script: The Broadcast Assistant connects
+> to the Scan Delegator and sends information about a broadcast
+> stream.
+> 
+> [...]
+
+Here is the summary with links:
+  - [BlueZ,1/1] client: Add Broadcast Assistant/Scan Delegator scripts
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=43bd13f7c700
+
+You are awesome, thank you!
 -- 
-Best,
-Qianqiang Liu
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
