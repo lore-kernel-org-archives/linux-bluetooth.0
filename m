@@ -1,64 +1,73 @@
-Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.2])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43E521A706F;
-	Thu,  3 Oct 2024 17:16:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.2
+Received: from mx.treblig.org (mx.treblig.org [46.235.229.95])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09D0F1AAE0D
+	for <linux-bluetooth@vger.kernel.org>; Thu,  3 Oct 2024 17:51:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.229.95
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727975772; cv=none; b=WQBfguLMofq0Ho3d3+4atZ9Egp6QZOgz1DtQinpZ4x2WpnOxZDsuBnkjb9fMs42u93zx7BMV6wUJTtDrMzPRo8Kj4gRSeQPE8PN3+AjZbQUwG4Hv287b1jDpbUqYr72M7zzjqeJvzzVkcsWVKH/IVv3sa6O6Zu/vs8v3vEgNu+k=
+	t=1727977894; cv=none; b=OeDvHzjTJkOxNkgw3eov1Jdr0AyAQvwS776PHTu8cnWJWVGMHaN9OoT3q5fUqV8yA/HgYR8uWOjuPxkOSav491ogpy1W1PFhdZlUtZvQob/QS3OJf5ir+jSlpr3tE/TNZG66b9dh1s75wLyX5j2l34MmQYfLxu4A/Cw2AcgsV/0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727975772; c=relaxed/simple;
-	bh=e7D4hobOqd225DG+zQcY8sCES/eQeMsusT1t+CamYzs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KyXYXXIjHbvxYeNHiv4hgWO8btyrcARcjOd3gPaNVjmpwoiTYUAa9zCIS0nHG2sAMa4BVwJS8YCfALJGc74Sh/7dMVSh1a5QHF6wGstXe6+gXtPthYHIECwLKasLMUo4bI6lUlZ/Jvho7z+toeKHCEIW4/VmX3KrQB0ZipacLOw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=pg9kMZgn; arc=none smtp.client-ip=117.135.210.2
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+	s=arc-20240116; t=1727977894; c=relaxed/simple;
+	bh=UHzkMw++es1QxCZMuuw8zPYXNCq0nqCjj4ZS1Y6p4M0=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=JMhu7YbBvuQkCCrTvZtAK10rMutxj5gPjPLY8HMO0KPRXGHBDMsPMqBEEQP9rN/D9VtNajHtHfo1b6QsBMa6GiMtmuZ5zG6FYKEvtaKoFKfROsX1acIinVBdfNoS1HWXYwOKErE1+mZCEswIG2EKKUdz7uye3XO+fjDghDtcTH4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org; spf=pass smtp.mailfrom=treblig.org; dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b=DM82MLkx; arc=none smtp.client-ip=46.235.229.95
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=treblig.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="pg9kMZgn"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=Date:From:Subject:Message-ID:MIME-Version:
-	Content-Type; bh=6dMXLEP6AG16UTPfZKDGlkx3svSo6DpKyVS2oKZNG8c=;
-	b=pg9kMZgncrQSoce+LHBQaBq5FL1IqhAJeu9HCyS5eRkTWsk4CHkvOtjPVnOamj
-	hiCwxy1QAN6frM+JAcfF7U7KPxF7iJqDvpmOJU5yF0LBXjimFxmLyzcCtPGgajPf
-	HTTz61ebLTfidvhVvLa7DD3OOKPFUEoFsrsaFzIEccRTI=
-Received: from localhost (unknown [36.5.132.7])
-	by gzga-smtp-mtada-g1-2 (Coremail) with SMTP id _____wC3fwVH0f5mIiIxAw--.45120S2;
-	Fri, 04 Oct 2024 01:15:51 +0800 (CST)
-Date: Fri, 4 Oct 2024 01:15:51 +0800
-From: Qianqiang Liu <qianqiang.liu@163.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: syzbot <syzbot+03d6270b6425df1605bf@syzkaller.appspotmail.com>,
-	johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org, marcel@holtmann.org,
-	syzkaller-bugs@googlegroups.com
-Subject: Re: [syzbot] [bluetooth?] KASAN: slab-use-after-free Read in
- set_powered_sync
-Message-ID: <Zv7RRwVy7fcDLPHJ@fedora>
-References: <Zv67JUPfzgQp7Kgf@fedora>
- <66fec4aa.050a0220.9ec68.004b.GAE@google.com>
- <Zv7KOuMKKHrLTvfw@fedora>
- <CABBYNZ+BwrGdL0HYh3cmQ39RFwEqjzreJSyYhFkkhSWxeoorNg@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b="DM82MLkx"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=treblig.org
+	; s=bytemarkmx; h=Content-Type:MIME-Version:Message-ID:Subject:From:Date:From
+	:Subject; bh=Ul6j9mwcGcmNiWWQEg6Xzwswk/dC/2XvRqxnfzRIk5E=; b=DM82MLkxQwfZOMJM
+	Hoib8rwk0cUURL66wO08A1BAJFNAV9faYQcgdO5hvp3h7pb+SpPlfSaYMxgbgkFl8fes9uKhnZSha
+	c0Kj+9WZ7pVMtu34GSeTSmPiZD4ETfk7yT38mNpDgVQ19nx7340zQjOUURbFlxC+AmkH4scyrSpKf
+	Ph6LTzJuHDk+EraBxZqt+DIDHFitxR7E3u5JiRaP/iCRQ0XsjeX8REFgaU6/vmuvPm0eaCt/R3Az/
+	VdqN4hQTLOR++1K1pGVtoAWFTbI2Cq0tjrMLb+pI56j8Fjl0lZ/r7Tq78Y8ZAdJOQno/oSF9Bo90n
+	O+EDCFGXvNkInFq0XQ==;
+Received: from dg by mx.treblig.org with local (Exim 4.96)
+	(envelope-from <dg@treblig.org>)
+	id 1swPz1-008iEk-0a;
+	Thu, 03 Oct 2024 17:51:23 +0000
+Date: Thu, 3 Oct 2024 17:51:23 +0000
+From: "Dr. David Alan Gilbert" <dave@treblig.org>
+To: linux-bluetooth@vger.kernel.org, kiran.k@intel.com,
+	luiz.von.dentz@intel.com
+Cc: marcel@holtmann.org, luiz.dentz@gmail.com
+Subject: of btintel_regmap_init
+Message-ID: <Zv7Zm2sq3Jr7yzW0@gallifrey>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <CABBYNZ+BwrGdL0HYh3cmQ39RFwEqjzreJSyYhFkkhSWxeoorNg@mail.gmail.com>
-X-CM-TRANSID:_____wC3fwVH0f5mIiIxAw--.45120S2
-X-Coremail-Antispam: 1Uf129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7v73
-	VFW2AGmfu7bjvjm3AaLaJ3UbIYCTnIWIevJa73UjIFyTuYvjxUjzuAUUUUU
-X-CM-SenderInfo: xtld01pldqwhxolxqiywtou0bp/1tbiRRBtamb+zaItHAAAsU
+X-Chocolate: 70 percent or better cocoa solids preferably
+X-Operating-System: Linux/6.1.0-21-amd64 (x86_64)
+X-Uptime: 17:48:59 up 148 days,  5:03,  1 user,  load average: 0.00, 0.00,
+ 0.00
+User-Agent: Mutt/2.2.12 (2023-09-09)
 
-Hi Luiz,
+Hi,
+  A script of mine noticed that btintel_regmap_init doesn't appear
+to be called anywhere; it was added way back by:
 
-> Are you sure this hasn't been already fixed by Bluetooth: MGMT: Fix
-> possible crash on mgmt_index_removed?
+commit d06f107bcd828a6c3ecd4a7d449d5d0c0dba0326
+Author: Loic Poulain <loic.poulain@intel.com>
+Date:   Thu Oct 1 18:16:21 2015 +0200
 
-Oh, it looks like it's already fixed by your patch, thanks!
+Bluetooth: btintel: Add iBT register access over HCI support
 
+and I don't think it's ever been called since.
+
+Is this just dead code (which I'd be happy to prepare a patch to remove)
+or should this be called from somewhere?
+
+Dave
+P.S. I'm doing general deadcoding here, and don't know much about BT
 -- 
-Best,
-Qianqiang Liu
-
+ -----Open up your eyes, open up your mind, open up your code -------   
+/ Dr. David Alan Gilbert    |       Running GNU/Linux       | Happy  \ 
+\        dave @ treblig.org |                               | In Hex /
+ \ _________________________|_____ http://www.treblig.org   |_______/
