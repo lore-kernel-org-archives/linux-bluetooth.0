@@ -1,87 +1,196 @@
-Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f172.google.com (mail-lj1-f172.google.com [209.85.208.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3292B212EFD
-	for <linux-bluetooth@vger.kernel.org>; Fri,  4 Oct 2024 14:40:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA2781AA790
+	for <linux-bluetooth@vger.kernel.org>; Fri,  4 Oct 2024 15:01:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728052855; cv=none; b=ALc04/uv6rJpF4H1CB/vR4CmOzo2ijgHwIJvslWSFCHCapIYzIRMuTwdb3yNehErAxGrHekxmD58x1B18ohpNuwunXW/MfT1CuBKVRHrsloMKY4im1S/lwIqvITkeO0PxebjVSklRdKAiuhLYtZMDHeso3zR+JnBFt83fHyo2k8=
+	t=1728054090; cv=none; b=cR69x2lR4j0pkEKElNYEcH0GNTULzBNqYU6k2GG1GJDT+Z5AaFbwEPVxJ8g9maGt5YAsfBNrJQZ5CHKRUDibWNqgmMwnpdQo0trWcuejMKe8Lh0Dg5CbOKXwe8eZADEPBHf41nbl3M80gJoiNM8cmisMyCrYhWTbOPACw3rkGXw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728052855; c=relaxed/simple;
-	bh=GZGYIac7uutGvNXI79cYaUYhXRq6HIhwcjCz/K7iogQ=;
-	h=From:To:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=fqdafPZrUUKVsO1nG6I8diMkoGtCuNOb2+h8O/G4d2RsrR/rwQxOmb7As5I9G88RSKISudkE9iKEWvsVNaPbLBq+r5kVmAtiB2Ed8biC4eczsP3TRa2oUaefDNIJLKOYl8UdUMHwvhcLdor4OQbqWTRNXumwMgGZO6C/bogy/Fw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=YA1A0jMh; arc=none smtp.client-ip=148.251.105.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+	s=arc-20240116; t=1728054090; c=relaxed/simple;
+	bh=pXr4Bk0E9uUMVzQFDfGWAmLohzfMwp0OlPtapvYwOLI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=YgSVdqMExD7jxw62PkVvk2/Aeu9RPFayx8QKK15auYwr+kYSBV7sVbbwyfsKSF+crFSxEOOnw8e4Dn2kCnwhiFFrdxGdfLne78/wYYs2MjgEpDjIKinv856WSeul/K5SfmkC2tS0C5uOslcmceAYgn4fpR4UwqdsiA2nYEj86dY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JuOZ+T2O; arc=none smtp.client-ip=209.85.208.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="YA1A0jMh"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1728052850;
-	bh=GZGYIac7uutGvNXI79cYaUYhXRq6HIhwcjCz/K7iogQ=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=YA1A0jMhZKWA9gVhOjur6DaGkkAKPVL9aRSsttkjaZuaeM4ET/K2cjAkl+Ga4grCl
-	 gvT6fIL/BDdJAJPp9HZPqgop42wNe8ANj9UOEs5WFBh9/Ju0ndV6/GeidWLD0H0Qv4
-	 MoIQa3ZIqDkIKbGv1ZXefRrWwL70iutYpzPTr9UesDo86dprw2yLfQB4pE8PTpQOq8
-	 auweQKQgnYhSFlSTRD1QYLnM4nYU4YoBRvwmNGDcxoVnZczW6OEPgilTtfzZWQzOlP
-	 W9XlHarggbZJpFPRo73cMQtmx4S7fkNpum73lAJEVJUyX8DJtQ0xgvLrMbin7VeiZh
-	 1ASdfdrPVmItA==
-Received: from fdanis-XPS-13-9370.. (67.227.121.78.rev.sfr.net [78.121.227.67])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: fdanis)
-	by bali.collaboradmins.com (Postfix) with ESMTPSA id 74AD517E35FB
-	for <linux-bluetooth@vger.kernel.org>; Fri,  4 Oct 2024 16:40:50 +0200 (CEST)
-From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?= <frederic.danis@collabora.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 1/3] audio/player: Fix media_player_set_metadata item destination
-Date: Fri,  4 Oct 2024 16:40:41 +0200
-Message-Id: <20241004144043.419832-2-frederic.danis@collabora.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20241004144043.419832-1-frederic.danis@collabora.com>
-References: <20241004144043.419832-1-frederic.danis@collabora.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JuOZ+T2O"
+Received: by mail-lj1-f172.google.com with SMTP id 38308e7fff4ca-2facf48157dso24759401fa.2
+        for <linux-bluetooth@vger.kernel.org>; Fri, 04 Oct 2024 08:01:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1728054087; x=1728658887; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=VA0ws/R71gvfZgwOmjNya3wmNYxMJ7cwDmDcuDOGk0o=;
+        b=JuOZ+T2OyaaxBGRBzdRxwfRN+BbbIdcG+xLRP78V+/PVEq1KlGQhXNRaxIqqjOMnxf
+         NOdLtaA15fjAbU1mpwsvvcectfNIfCmcAjRc4TQzeOL7ZwACEiklelQRYMSZhFX1OvkA
+         hrlq3LdUgpJtG4ZWGgbFdHPx4Op7n3t09kQbA28cRcNOBwOG99UIugjXA04epCQz+Ls5
+         cWFBr9HD2AlpqN/eWgwcBzvmdi7zlQQg3lyb/SABNgNYmPPtFmWcIftPdq8a4K9eTEIi
+         f08CHVzteR2Dy+Rxy1yffsvWlkiKWNxGs5H99ZXpPXTpnzyY14iOHslSCxlJGqr0kuMy
+         obIg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728054087; x=1728658887;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=VA0ws/R71gvfZgwOmjNya3wmNYxMJ7cwDmDcuDOGk0o=;
+        b=fHd83srmdYsfqsI71RThYWgAW85zFwy7YUuOE8bcUy2pJnE+V4sfRZl1phZ7zGRVUt
+         47H4+0nBIDEzKY1ZLx/++3ZRUAfcLZk1qtWgN0vKSSHm/oolqT8nmdMjATBcA8yzzkpg
+         eSXc9LM9hKPbRaB4MvzBmGKpP68y9/ssI7DfipoYdAZJVAzmcStzvoQyuwV7HiavS2iY
+         mC+AqFtNAMx8CaUdKKvOYx0UwG3YYkaCJWClvzGY3wc/wKzrJQRdi9qOMwFJUkJf8SrN
+         ZE8Q7+aFlBvl3Ka61kchzLyJco3HlaHqOuO+RyVoAMeu7ni1gkepScKQrQKZWxv+kVig
+         J4Sg==
+X-Gm-Message-State: AOJu0Yy+H7Lh9fz3wGJCLREFsbd8IURVkUK5FgJ0v2jkUIIxxHz8E/BQ
+	jHw/7jzERQzV+u5nmiTD+VA/SNbThruO998LnUAsjYMetJqVgiDqLCzyNXu5zCDAXDOZXNQtb5o
+	1CJuc7i0J+sGsviFp/MkP2nBs0p8=
+X-Google-Smtp-Source: AGHT+IEvciuTAz7cP1AZii3VI6QX41SzZSonkpFgyaVYcTd40uFwJp9AsXjMXswIZ4uXba1c7cffYZRy0BjqyghQM54=
+X-Received: by 2002:a2e:be9b:0:b0:2f6:62c3:4e0e with SMTP id
+ 38308e7fff4ca-2faf3bfee3bmr17259301fa.6.1728054086340; Fri, 04 Oct 2024
+ 08:01:26 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+References: <20241004123523.1012743-1-vlad.pruteanu@nxp.com> <20241004123523.1012743-5-vlad.pruteanu@nxp.com>
+In-Reply-To: <20241004123523.1012743-5-vlad.pruteanu@nxp.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Fri, 4 Oct 2024 11:01:13 -0400
+Message-ID: <CABBYNZLpYe40jcS5a-wAR+JNy4cp0rCZHsHyiUVoBvEvacUP2A@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 4/9] transport: Trigger transport release when
+ syncing to multiple BISes
+To: Vlad Pruteanu <vlad.pruteanu@nxp.com>
+Cc: linux-bluetooth@vger.kernel.org, mihai-octavian.urzica@nxp.com, 
+	iulia.tanasescu@nxp.com, andrei.istodorescu@nxp.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Use item provided as parameter, or mp->track if NULL which is used
-by MCP.
----
- profiles/audio/player.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+Hi Vlad,
 
-diff --git a/profiles/audio/player.c b/profiles/audio/player.c
-index b3a6920fc..5bb3bc1a9 100644
---- a/profiles/audio/player.c
-+++ b/profiles/audio/player.c
-@@ -1438,18 +1438,19 @@ void media_player_set_metadata(struct media_player *mp,
- 				void *data, size_t len)
- {
- 	char *value, *curval;
-+	GHashTable *metadata = item ? item->metadata : mp->track;
- 
- 	value = g_strndup(data, len);
- 
- 	DBG("%s: %s", key, value);
- 
--	curval = g_hash_table_lookup(mp->track, key);
-+	curval = g_hash_table_lookup(metadata, key);
- 	if (g_strcmp0(curval, value) == 0) {
- 		g_free(value);
- 		return;
- 	}
- 
--	g_hash_table_replace(mp->track, g_strdup(key), value);
-+	g_hash_table_replace(metadata, g_strdup(key), value);
- }
- 
- void media_player_metadata_changed(struct media_player *mp)
--- 
-2.34.1
+On Fri, Oct 4, 2024 at 8:35=E2=80=AFAM Vlad Pruteanu <vlad.pruteanu@nxp.com=
+> wrote:
+>
+> In order to sync to multiple BISes from the same BIG, the existing
+> sync must be destroyed and a new one created. This is accomplished
+> by prompting the audio server to release the existing, active,
+> transports (by moving them to the IDLE state). They will later be
+> identified by the RELEASING state of their streams and the process
+> for reacquirement (along with the new transport) will begin.
+> ---
+>  profiles/audio/transport.c | 41 ++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 41 insertions(+)
+>
+> diff --git a/profiles/audio/transport.c b/profiles/audio/transport.c
+> index caa7287db..e68695c39 100644
+> --- a/profiles/audio/transport.c
+> +++ b/profiles/audio/transport.c
+> @@ -1366,6 +1366,7 @@ static DBusMessage *select_transport(DBusConnection=
+ *conn, DBusMessage *msg,
+>                                         void *data)
+>  {
+>         struct media_transport *transport =3D data;
+> +       GSList *l;
+>
+>         if (transport->owner !=3D NULL)
+>                 return btd_error_not_authorized(msg);
+> @@ -1375,6 +1376,29 @@ static DBusMessage *select_transport(DBusConnectio=
+n *conn, DBusMessage *msg,
+>
+>         if (!strcmp(media_endpoint_get_uuid(transport->endpoint),
+>                                                 BAA_SERVICE_UUID)) {
+> +               /* Check if there are any ACTIVE transports, from the sam=
+e
+> +                * device. If there are, it means that this is a request =
+to add
+> +                * a new BIS to the active BIG sync. This is done by rele=
+asing
+> +                * the ACTIVE transports, and then reaquiring them along =
+with
+> +                * the new transport that needs to be added to the sync. =
+To
+> +                * release the transports, bt_bap_stream_release is calle=
+d,
+> +                * which will set the stream's state to
+> +                * BT_BAP_STREAM_STATE_RELEASING. On bap_state_changed, t=
+his
+> +                * will be detected and transport_update_playing will be =
+called,
+> +                * with playing set to FALSE. This will move the transpor=
+t to
+> +                * IDLE, prompting the audio server to release it.
+> +                */
+> +               for (l =3D transports; l; l =3D g_slist_next(l)) {
+> +                       struct media_transport *tr =3D l->data;
+> +                       struct bap_transport *bap_temp =3D tr->data;
+> +
+> +                       if (tr->device =3D=3D transport->device &&
+> +                                       tr->state =3D=3D TRANSPORT_STATE_=
+ACTIVE) {
+> +                               bt_bap_stream_release(bap_temp->stream,
+> +                                                               NULL, NUL=
+L);
+> +                       }
+> +               }
 
+This seems a little counter intuitive, I don't think we should allow,
+at least not by default, to sync BIS(s) one by one otherwise on every
+select we would then need to do the release/reacquire logic that you
+are proposing, instead what we should probably be doing is to list the
+BIS(s) of the same BIG as Links:
+
+https://github.com/bluez/bluez/blob/master/doc/org.bluez.MediaTransport.rst=
+#arrayobject-links-readonly-optional-iso-only-experimental
+
+>                 transport_update_playing(transport, TRUE);
+>         }
+>
+> @@ -1385,9 +1409,22 @@ static DBusMessage *unselect_transport(DBusConnect=
+ion *conn, DBusMessage *msg,
+>                                         void *data)
+>  {
+>         struct media_transport *transport =3D data;
+> +       GSList *l;
+>
+>         if (!strcmp(media_endpoint_get_uuid(transport->endpoint),
+>                                                 BAA_SERVICE_UUID)) {
+> +               for (l =3D transports; l; l =3D g_slist_next(l)) {
+> +                       struct media_transport *tr =3D l->data;
+> +                       struct bap_transport *bap_temp =3D tr->data;
+> +
+> +                       if (tr->device =3D=3D transport->device &&
+> +                                       tr->state =3D=3D TRANSPORT_STATE_=
+ACTIVE  &&
+> +                               tr !=3D transport) {
+> +                               bt_bap_stream_release(bap_temp->stream,
+> +                                                               NULL, NUL=
+L);
+> +                       }
+> +               }
+> +
+>                 transport_update_playing(transport, FALSE);
+>         }
+>
+> @@ -1768,6 +1805,10 @@ static void bap_state_changed(struct bt_bap_stream=
+ *stream, uint8_t old_state,
+>                         bap_update_bcast_qos(transport);
+>                 break;
+>         case BT_BAP_STREAM_STATE_RELEASING:
+> +               if (bt_bap_stream_io_dir(stream) =3D=3D BT_BAP_BCAST_SOUR=
+CE) {
+> +                       transport_update_playing(transport, FALSE);
+> +                       return;
+> +               }
+>                 if (bt_bap_stream_io_dir(stream) =3D=3D BT_BAP_BCAST_SINK=
+)
+>                         return;
+>                 break;
+> --
+> 2.40.1
+>
+
+
+--=20
+Luiz Augusto von Dentz
