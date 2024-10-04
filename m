@@ -1,71 +1,98 @@
-Received: from mail-il1-f197.google.com (mail-il1-f197.google.com [209.85.166.197])
+Received: from mail-vs1-f48.google.com (mail-vs1-f48.google.com [209.85.217.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AF0D1ADFF0
-	for <linux-bluetooth@vger.kernel.org>; Fri,  4 Oct 2024 20:54:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.197
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DAD0231C87;
+	Fri,  4 Oct 2024 21:01:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728075244; cv=none; b=YyCLofY+r5/X2B7nCWIQCg/4G0VkX1+Iz32SFr+ghu0QKLnsJifUcwQHFVjGd4Fkzx0FDpbrccR+0A7dL+z4EY0i5zT2F8Url1bR4QAylCGogd8h/qXMkryqQvb0u1F/XNDcDQ/+QsrpzPN1GYSC1iYP5rLdaOJ1bwrtWyOQMpM=
+	t=1728075691; cv=none; b=athSAm0fIZr1UmvMX4QwvKnzrZRXCHyZ+jhvGNVEmYIov4PmepDv0lVXJoCoFQTtRlbdsfP3OR9odplAFMAf7Flt1QKnSFcRxIQW0KYRWSOAEPn1iKHjjRLx+8yTF6N3s9ieeXxgmd7+wbzyCva3Ws6AyeOYiUyPfW21nlfFfQY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728075244; c=relaxed/simple;
-	bh=sHrNFovkx7cIfUOdmMEBpo+snV8G9B0mz8ruz/fphSs=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=ah9ns4LMpSLI1jFUsWDc4Y8XUPOcwZpEoW4H4fuWyD06wmQUODY7Ml94Q1uJhgJuIRGf61cqnYU7cP+oONxTjpKjjmpr3+/Y61gqVaA0WKmrIewoPYFLkOQFtAS93azBv0ecBfvO7jLJgpYxOOOEHT5G/Tp/SqeRe07WlK2C2Ic=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.197
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-3a348ebb940so27621435ab.2
-        for <linux-bluetooth@vger.kernel.org>; Fri, 04 Oct 2024 13:54:02 -0700 (PDT)
+	s=arc-20240116; t=1728075691; c=relaxed/simple;
+	bh=IiXT8R+PZu6D57wZCq1PVL4exdlKrRgjlOaFLW93W4c=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=D6oaOE+E8xttyPfP/iP/u/38QF8wdKjXnN1I75zqjqoaWXZOUsBi5yloUx4k7jyyCCRlTzogISTSxAcfMVKdX/pbMVyLbRBC5/IO/1m9DPRgX7ZlcoN+npwAUQEBxAw/y4eh+DA5VraZ0Z+PNLMSLJRlrymXBbZvFPsQ9wrMtk0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PaB+0pOK; arc=none smtp.client-ip=209.85.217.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PaB+0pOK"
+Received: by mail-vs1-f48.google.com with SMTP id ada2fe7eead31-4a3c6bc4cecso710511137.0;
+        Fri, 04 Oct 2024 14:01:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1728075688; x=1728680488; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=eCAwr3wWq1gW9iEkujpHE5/UksXg5caVVj+cmaQRza8=;
+        b=PaB+0pOKJbjwhFwrEnp8lfE8/rrWxoJSwfvN33G5d/1kxVNd/hAFekZdjcLVqheX1k
+         ayZGyJRBNX12PgJtbSOmeXr/+kTQejlZOpme8NMEBqo4Cp+52rFYXGr2rGy8zauM0Md7
+         az2iCM/rc8KRQL4urmZoOssauIYceIJixpHfrKO+NloOOBxPAKF1xqaMlGDIGOEypeRf
+         /v+3h0eZnh7sf2NBbsDVr0oVIH6RSV2cQ9JUYSF2CAASw3U/2Epso/tNe0P3cLXwfpKY
+         HCJBLcKLAjWmimeJ5p7wPNVUZSrC2TPiNyupm16HGeHYe9/orRhGtGCvUsxX2NHYplFM
+         ZSPA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728075242; x=1728680042;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=le2JLJB1ZWwLNcK4vQGN5IO/HRsEugT8/CIAYs9lFSM=;
-        b=D4gD+chtu/eCLLaB9j/cAkkrDNh3u6fWGJRFaIilD1/Bsb/cFL1GbOlicCWH/uQhJf
-         VRL7WJs96IwmfcJGDcCk9RWefTexY3MG0nwuT1bVG/sFKZBeQ6BIg/BSl+UOmUUue0MN
-         zVqv62tB1TPezWdqMC7qv7hbHVa9qzs0RI/2jdhOR5FDx8Xn+Ylz0mYKrpQv24l+4owM
-         DDvr2TdJCWbQRZpShq5QObwK6I5QzunyLqOt0u4T+FG8QFZ++Z1BCm+x31AlUdlaPi9G
-         U5QJDhBMSb8OnzrPmHhOnvKbh/zE+3uHuI7vh1UqN16VpziDkgycw66K0+6m38V8TfsF
-         zPcA==
-X-Forwarded-Encrypted: i=1; AJvYcCVtk0mv6FiNM4gWdNvTgCLZCdO2xfCk3TOmdXjU80yP3bMEQ9XAkCiVP5CZkzp3crrWNXX3BeDB7bNZWBbKITA=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy2FTLlqgut52ftJ9f8CtvRYenJH9H14skA3b7V6MXlN+GD+k6l
-	IwpkhCMoBETLo35RqGXeDK+aXt3ITnCC9m87tztc8nOPccpdrn/DVEuNtN3mO4JFpTzjr7gzEW7
-	er6LQ/7WPldtvXfTPaXVmppQiLPaQwo5xgaVgpJUgWG4xmgl8nFMm5GY=
-X-Google-Smtp-Source: AGHT+IHgv5TMs/7T7aq6PVZ8bJabIyYEU37Oudywg8Kmi+ABr5pCKc0/mWyTJLeSCIbUDmzgSMeSQPcoul6ZVlBdS1iliKDhzoev
+        d=1e100.net; s=20230601; t=1728075688; x=1728680488;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=eCAwr3wWq1gW9iEkujpHE5/UksXg5caVVj+cmaQRza8=;
+        b=b3wHpnHTHs/Om3jGwgN6rd9gnthtYo6tV6h4YhatGfyvV2et6yXGEVMtEUtsl4yhO0
+         ROFOhWcoiRIhHcVfUDC515wT/EIGm5E5xhZLfm5l01fjtkJ7YhpJuvq5u3YeQKgdJyNc
+         gqIsBYfjzKW5DNibE+uQtHH4WPaD4tkQu1hu3DL629VYmb6nDXU9y8Hxw+viNp/oKhJu
+         KKsNySTB5kHb5dtV8GMCb8zBVdjV2CtewMVnmHWBlbqKK/vUzLJA2T91g0n9Z/vuSGLv
+         bhTmAdUjbjcffSXJdXjxMcySsGB2yJiqJKY9WqyP7jxL6IPS1JMXBmy8YgpIgpw4QfAP
+         bmUA==
+X-Forwarded-Encrypted: i=1; AJvYcCXR8Yc1R/af0Jql9Ze3DqzjjDZEgkd0AQ+kLni8+Qj98HObDaTZk8yteLirisPd+4AN1u27l5w=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwzvPVsKeh8vXwlD72z1WTJt+RCX2Ldb/KlLs965LsSf9cgl/MV
+	9PUOZ0Zcs6//GK801KFuSswd2UsKU68VSEodwz04v37H33gP9l0qwNE7Dg==
+X-Google-Smtp-Source: AGHT+IFDgQXt6BE0vslO+PL31Pp1JZlQ3KT8WG2EfLa77Km88t5+msWn4a4Tfn5M1LU67rcOYuWgVw==
+X-Received: by 2002:a05:6102:290e:b0:4a3:cb2b:9748 with SMTP id ada2fe7eead31-4a4058ee453mr3181653137.24.1728075688450;
+        Fri, 04 Oct 2024 14:01:28 -0700 (PDT)
+Received: from lvondent-mobl5.. (syn-107-146-107-067.res.spectrum.com. [107.146.107.67])
+        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-84f5c78c78csm103860241.13.2024.10.04.14.01.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 04 Oct 2024 14:01:26 -0700 (PDT)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: davem@davemloft.net,
+	kuba@kernel.org
+Cc: linux-bluetooth@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: pull request: bluetooth 2024-10-04
+Date: Fri,  4 Oct 2024 17:01:24 -0400
+Message-ID: <20241004210124.4010321-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.46.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1a65:b0:3a0:9d2b:2420 with SMTP id
- e9e14a558f8ab-3a375be1cedmr41886895ab.25.1728075242253; Fri, 04 Oct 2024
- 13:54:02 -0700 (PDT)
-Date: Fri, 04 Oct 2024 13:54:02 -0700
-In-Reply-To: <CABBYNZKxOsgd6FpfdOKGUD9tbSadCnBzzsnf1K8sVZQ5Tn0cQQ@mail.gmail.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <670055ea.050a0220.49194.04a0.GAE@google.com>
-Subject: Re: [syzbot] [bluetooth?] KASAN: slab-use-after-free Read in set_powered_sync
-From: syzbot <syzbot+03d6270b6425df1605bf@syzkaller.appspotmail.com>
-To: johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, luiz.dentz@gmail.com, marcel@holtmann.org, 
-	qianqiang.liu@163.com, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-Hello,
+The following changes since commit 500257db81d067c1ad5a202501a085a8ffea10f1:
 
-syzbot tried to test the proposed patch but the build/boot failed:
+  Merge branch 'ibmvnic-fix-for-send-scrq-direct' (2024-10-04 12:04:12 -0700)
 
-patch is already applied
+are available in the Git repository at:
 
+  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2024-10-04
 
-Tested on:
+for you to fetch changes up to 610712298b11b2914be00b35abe9326b5dbb62c8:
 
-commit:         5c2ab978 ethtool: rss: fix rss key initialization warn..
-git tree:       net-next
-kernel config:  https://syzkaller.appspot.com/x/.config?x=37742f4fda0d1b09
-dashboard link: https://syzkaller.appspot.com/bug?extid=03d6270b6425df1605bf
-compiler:       
-patch:          https://syzkaller.appspot.com/x/patch.diff?x=11cb079f980000
+  Bluetooth: btusb: Don't fail external suspend requests (2024-10-04 16:54:25 -0400)
 
+----------------------------------------------------------------
+bluetooth pull request for net:
+
+ - RFCOMM: FIX possible deadlock in rfcomm_sk_state_change
+ - hci_conn: Fix UAF in hci_enhanced_setup_sync
+ - btusb: Don't fail external suspend requests
+
+----------------------------------------------------------------
+Luiz Augusto von Dentz (3):
+      Bluetooth: RFCOMM: FIX possible deadlock in rfcomm_sk_state_change
+      Bluetooth: hci_conn: Fix UAF in hci_enhanced_setup_sync
+      Bluetooth: btusb: Don't fail external suspend requests
+
+ drivers/bluetooth/btusb.c   | 20 ++++++++++++++++++--
+ net/bluetooth/hci_conn.c    |  3 +++
+ net/bluetooth/rfcomm/sock.c |  2 --
+ 3 files changed, 21 insertions(+), 4 deletions(-)
