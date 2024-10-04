@@ -1,54 +1,48 @@
 Received: from smtp-out0.aaront.org (smtp-out0.aaront.org [52.10.12.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DB02A955;
-	Fri,  4 Oct 2024 00:31:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80BF217C9;
+	Fri,  4 Oct 2024 00:38:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.10.12.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728001899; cv=none; b=LXCPLqIpxvZZH/s28BY7pkvemPVA9Qt6by+DWlOyJ/KNUpITsPZhn/MO/R3yxfFOKy0g0V9R0MPPqgx9sgkaqpdmF9rv/RogyIZuLav4EupVZaSRwKYALadRSQu4TA+nLOnuHsU8Tvtd5qQWwHQZRJXuJVCzr+rL4gBfq0AnPlE=
+	t=1728002305; cv=none; b=ohqAE3iCwsfGSCjzIvsdT1Cz9hxQheoBtCDMh5rtnIN/SiX4VUgDRVBVuQS3hTqeZvhrgf8Pwyiy7EJIrD+rA8jQPZ1nsvj5c00RxZpPS8pLepjjaDP9uxF8w+sJby5fh/8Yqm5cXb+9Ds+Vm/U423M0s1Hasj90DTSVOygIB/M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728001899; c=relaxed/simple;
-	bh=f0FQOyiYq7FpaBC/Z+gvQXYwpERUJNHDeFsnskdp8kg=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=cIlx4MYu1Sj/6SzQKiJOqMb0F387i3Jc5bBUHcpfzCyOQbawOx2o2c/tlyt18FMWWy7plGpEmeC6NjHdJsBbCrIjySC8cZe8XavxB1scDZgLN7m4lt4A+YlxQou80JzCFmbGYoIuEJ8OZKQ9ZPe4jGq7YNJKicFJl+g2GodOlaM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=aaront.org; spf=pass smtp.mailfrom=aaront.org; dkim=permerror (0-bit key) header.d=aaront.org header.i=@aaront.org header.b=BaUcvNxo; dkim=pass (2048-bit key) header.d=aaront.org header.i=@aaront.org header.b=RYzUmZTC; arc=none smtp.client-ip=52.10.12.108
+	s=arc-20240116; t=1728002305; c=relaxed/simple;
+	bh=fy5ywXs76Pb+xeflNQJh6/EAulNeH2bY3Xst/VNsM8g=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=h9F0p/wNpnXOyM29nYR5YxilUuFukrOPqia/Fo4exXZispYsEOdI+Iyu731yV9307XaSVDkkh9Tsz0dMqxfnmA3fogMTmn2DASdzAUdn0wtkMJ9qoyakAfqfCdL/6vYz1CnHcbc42Fyiit1DG55Bmt54L1Yf6RQbaZ7l7T+uYAQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=aaront.org; spf=pass smtp.mailfrom=aaront.org; dkim=permerror (0-bit key) header.d=aaront.org header.i=@aaront.org header.b=t/xQ3V7/; dkim=pass (2048-bit key) header.d=aaront.org header.i=@aaront.org header.b=HZhDi49H; arc=none smtp.client-ip=52.10.12.108
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=aaront.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=aaront.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=permerror (0-bit key) header.d=aaront.org header.i=@aaront.org header.b="BaUcvNxo";
-	dkim=pass (2048-bit key) header.d=aaront.org header.i=@aaront.org header.b="RYzUmZTC"
-Received: by smtp-out0.aaront.org (Postfix) with ESMTP id 4XKTxj0NhpzRj;
-	Fri,  4 Oct 2024 00:31:37 +0000 (UTC)
+	dkim=permerror (0-bit key) header.d=aaront.org header.i=@aaront.org header.b="t/xQ3V7/";
+	dkim=pass (2048-bit key) header.d=aaront.org header.i=@aaront.org header.b="HZhDi49H"
+Received: by smtp-out0.aaront.org (Postfix) with ESMTP id 4XKTxS6YtzzPT;
+	Fri,  4 Oct 2024 00:31:24 +0000 (UTC)
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/simple; d=aaront.org;
-    h=from:to:cc:subject:date:message-id:in-reply-to:references
-    :mime-version:content-transfer-encoding; s=bgzxjfijqntwovyv; bh=
-    f0FQOyiYq7FpaBC/Z+gvQXYwpERUJNHDeFsnskdp8kg=; b=BaUcvNxo9vK/8Y9J
-    +SKv7rgse3m3vjeAeGt0M451L15SmSrzYNnmkHl9RIZykMapV2JCcxUbDJpverVh
-    HBEwAA==
+    h=from:to:cc:subject:date:message-id:mime-version
+    :content-transfer-encoding; s=bgzxjfijqntwovyv; bh=fy5ywXs76Pb+x
+    eflNQJh6/EAulNeH2bY3Xst/VNsM8g=; b=t/xQ3V7/JUNuSxnfugRg9NFFiJ05F
+    XRrxrE3GN+m49eqaqCbdgbYxVJvOzqBbN6ppl7dckFHbfiO9Ew3ZkrjBA==
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=aaront.org; h=
-    from:to:cc:subject:date:message-id:in-reply-to:references
-    :mime-version:content-transfer-encoding; s=elwxqanhxhag6erl; bh=
-    f0FQOyiYq7FpaBC/Z+gvQXYwpERUJNHDeFsnskdp8kg=; b=RYzUmZTCxYVdJUAq
-    FDkVjIAy2EyvrYyJgzVF3xozkaeMgRKz6Ht4J/hHAqQ3l4dRPKKZQM0phu011sU8
-    YZuYBNCSahCg9yR6l1zQNTfbW/ojBR2IrATVS6b9dqR4bNRb7RIw5SJREASVWcFo
-    ho1Lc3dP0kELPM04St0kpAZuwuQwM8P/wvas85DFp+VNEEPY2Z1GZKwlxKXo+ytr
-    0FACIeLA2VL+gU+oZr1sHQdwC3puUGDQ3G2Nyvp1CmoBgRQh4wG/0+IG4whKNte6
-    FC77CRtDVyfvKmWJKMn9KBxtLlhKpHfsY0MbbuFfh8L+HN7XDKnl+z2PrJSx6SlQ
-    mQryWA==
+    from:to:cc:subject:date:message-id:mime-version
+    :content-transfer-encoding; s=elwxqanhxhag6erl; bh=fy5ywXs76Pb+x
+    eflNQJh6/EAulNeH2bY3Xst/VNsM8g=; b=HZhDi49HiYGl+8br4vw/s3jqYQ+RW
+    ZOKyybN/HC8Ju7qVJPl1IqoV6uIsiMABR4509oslgC+GrZQenCRO4CUKeVTs0DYQ
+    WIzRN63c1W+AhpFG1VKy1YjwFF9SbUjQtQFsBiCkDhGO8+eFKUAa8SaR3N+3D37W
+    s2ZYZ+TRMoiB3Zqmjof5UN2sJU9cjafcKlAZ0dba5vGj4EyQPlNXGmDDm07qGS9m
+    uFepazL6HDZLjfpQzetjxPjEYw589TKXwuw2t88rT/rScybeXkewgh8Blg7bDrvN
+    yxnC0hrRpny6RGaLgepjXi4mvjQ1Buv/ZBc1PbTYC/1dDTBZe4d1+KlVA==
 From: Aaron Thompson <dev@aaront.org>
 To: Johan Hedberg <johan.hedberg@gmail.com>,
 	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
 	Marcel Holtmann <marcel@holtmann.org>,
 	linux-bluetooth@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Cc: Aaron Thompson <dev@aaront.org>,
-	stable@vger.kernel.org
-Subject: [PATCH 3/3] Bluetooth: Remove debugfs directory on module init failure
-Date: Fri,  4 Oct 2024 00:30:30 +0000
-Message-Id: <20241004003030.160721-4-dev@aaront.org>
+Cc: Aaron Thompson <dev@aaront.org>
+Subject: [PATCH 0/3] Bluetooth: Fix a few module init/deinit bugs
+Date: Fri,  4 Oct 2024 00:30:27 +0000
+Message-Id: <20241004003030.160721-1-dev@aaront.org>
 X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20241004003030.160721-1-dev@aaront.org>
-References: <20241004003030.160721-1-dev@aaront.org>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -57,73 +51,25 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Aaron Thompson <dev@aaront.org>
+Hi all,
 
-If bt_init() fails, the debugfs directory currently is not removed. If
-the module is loaded again after that, the debugfs directory is not set
-up properly due to the existing directory.
+These patches fix a few bugs in init and deinit for the bluetooth
+module. I ran into the first one when I started running a kernel with
+debugfs disabled on my laptop, and I ran into the next two when I was
+working on the fix for the first one.
 
-  # modprobe bluetooth
-  # ls -laF /sys/kernel/debug/bluetooth
-  total 0
-  drwxr-xr-x  2 root root 0 Sep 27 14:26 ./
-  drwx------ 31 root root 0 Sep 27 14:25 ../
-  -r--r--r--  1 root root 0 Sep 27 14:26 l2cap
-  -r--r--r--  1 root root 0 Sep 27 14:26 sco
-  # modprobe -r bluetooth
-  # ls -laF /sys/kernel/debug/bluetooth
-  ls: cannot access '/sys/kernel/debug/bluetooth': No such file or directory
-  #
+Aaron Thompson (3):
+  Bluetooth: ISO: Fix multiple init when debugfs is disabled
+  Bluetooth: Call iso_exit() on module unload
+  Bluetooth: Remove debugfs directory on module init failure
 
-  # modprobe bluetooth
-  modprobe: ERROR: could not insert 'bluetooth': Invalid argument
-  # dmesg | tail -n 6
-  Bluetooth: Core ver 2.22
-  NET: Registered PF_BLUETOOTH protocol family
-  Bluetooth: HCI device and connection manager initialized
-  Bluetooth: HCI socket layer initialized
-  Bluetooth: Faking l2cap_init() failure for testing
-  NET: Unregistered PF_BLUETOOTH protocol family
-  # ls -laF /sys/kernel/debug/bluetooth
-  total 0
-  drwxr-xr-x  2 root root 0 Sep 27 14:31 ./
-  drwx------ 31 root root 0 Sep 27 14:26 ../
-  #
-
-  # modprobe bluetooth
-  # dmesg | tail -n 7
-  Bluetooth: Core ver 2.22
-  debugfs: Directory 'bluetooth' with parent '/' already present!
-  NET: Registered PF_BLUETOOTH protocol family
-  Bluetooth: HCI device and connection manager initialized
-  Bluetooth: HCI socket layer initialized
-  Bluetooth: L2CAP socket layer initialized
-  Bluetooth: SCO socket layer initialized
-  # ls -laF /sys/kernel/debug/bluetooth
-  total 0
-  drwxr-xr-x  2 root root 0 Sep 27 14:31 ./
-  drwx------ 31 root root 0 Sep 27 14:26 ../
-  #
-
-Cc: stable@vger.kernel.org
-Fixes: ffcecac6a738 ("Bluetooth: Create root debugfs directory during module init")
-Signed-off-by: Aaron Thompson <dev@aaront.org>
----
  net/bluetooth/af_bluetooth.c | 1 +
- 1 file changed, 1 insertion(+)
+ net/bluetooth/iso.c          | 6 +-----
+ net/bluetooth/mgmt.c         | 1 +
+ 3 files changed, 3 insertions(+), 5 deletions(-)
 
-diff --git a/net/bluetooth/af_bluetooth.c b/net/bluetooth/af_bluetooth.c
-index 67604ccec2f4..0d4b171b939a 100644
---- a/net/bluetooth/af_bluetooth.c
-+++ b/net/bluetooth/af_bluetooth.c
-@@ -825,6 +825,7 @@ static int __init bt_init(void)
- 	bt_sysfs_cleanup();
- cleanup_led:
- 	bt_leds_cleanup();
-+	debugfs_remove_recursive(bt_debugfs);
- 	return err;
- }
- 
+
+base-commit: 9852d85ec9d492ebef56dc5f229416c925758edc
 -- 
 2.39.5
 
