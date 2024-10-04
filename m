@@ -1,84 +1,89 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f179.google.com (mail-pg1-f179.google.com [209.85.215.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9759612BF02;
-	Fri,  4 Oct 2024 06:37:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E0631862
+	for <linux-bluetooth@vger.kernel.org>; Fri,  4 Oct 2024 07:30:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728023864; cv=none; b=ajYByd//yLwnnhHgIR6SW5d/V46ozDYk3VNlVvPg70vWBt9U0PGLVbRk7hpEEVi+dRrGvW+fUGlTEsQmaqmUet35NCTHkjuNLETcz44RSlLMZ2RdFjqcyH+ydsFE3Kt/AJA4XuUpPs8fSH6n8upl4gdozMsMOruZX2Kd3+cA0IQ=
+	t=1728027044; cv=none; b=jTWYeO/PxNBtWGQCw9wnmJxBuQzpZRPKRDcp3gVqWAmyNtS1mVvAlsGP30maw2esO1XUTp1G82s3eyAwyoP0gBSQyYtIgmnE1kcbn51GTE++Q7yXU5S7u9uLKgY4rfJCI19NojoGYI+L3vflkThHoZFvKi9R8eXJ2ko+bAmmGbQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728023864; c=relaxed/simple;
-	bh=fmiIz7ZGhk56W9CE6q0sAiRv9tksjwu8iHjEIe44L5o=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=f2lJhOc/NRnGiJKXWPLmusQU3C9vdfC0Fu2zzBNw5NueCMJ+SEnUdLHS+SxpnSCk2ee/WQYSDKoTeq6xJzn05r/5gnF6mlXNeiMW3vCjXytu7PrhU2WYupnxl0JCLNhKBjTsySyck/o4eccwbgOaJoX4veCq4ySVZX4dExm2Kl4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Uw2vpVhS; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1728027044; c=relaxed/simple;
+	bh=93GR+LhSnWzWHwwq0a2v2o62knpcSroivfa3z8RhYTo=;
+	h=Message-ID:Date:From:To:Cc:Subject:MIME-Version:Content-Type:
+	 Content-Disposition; b=jSbUqAL9a1PA19v5G/zIbi9YC/8rG6cXdeW2pc5Saqd8DZAffWy/841c6Illk8B8dwoXucP//fEJHTi3c8wsvtyh3IQYDQANEShym8Wgm22rG87Mwpq3NXcYGrBc1HNwXbd6fVGZw+A/RJX6tBqVQ1YcGFKIAYm1eItT3rRBixY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=d9suAaBe; arc=none smtp.client-ip=209.85.215.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Uw2vpVhS"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 27A37C4CEC6;
-	Fri,  4 Oct 2024 06:37:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728023864;
-	bh=fmiIz7ZGhk56W9CE6q0sAiRv9tksjwu8iHjEIe44L5o=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Uw2vpVhS+pyYwdKUhy2TNXi3zrnmY49Sk4EK16SlFWHZ0z4+GYPER1vEoGv8uT2Lk
-	 tJdx1rbpzb4vdEDt4U4qMnJ1/O1B/9XQPhN1hQEflrPLsRwKlyOAPjkiqQXGihn/qi
-	 6sWgURMIsCMTCTPUbbxZY6Ofh35pG2jAka6eRGzlYcPT+usq2DyrT9eKYBI/rSY4R9
-	 uqLZOE8VKOTTPJOZvEeAAn/a3EYhVoFKOmtePiVL7KBWu+0SmhcN0+Sg4mO8nCoywR
-	 8yggJG6qjJCRdOx2SbdC5VeeH3Z5iFPaIQ7QYvKGrL0hOe5IQEVmzT1O1P0bcV/kpY
-	 15XE0hH9U1o+Q==
-Date: Fri, 4 Oct 2024 08:37:40 +0200
-From: Krzysztof Kozlowski <krzk@kernel.org>
-To: Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>
-Cc: marcel@holtmann.org, luiz.dentz@gmail.com, robh@kernel.org, 
-	krzk+dt@kernel.org, conor+dt@kernel.org, linux-bluetooth@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, devicetree@vger.kernel.org, amitkumar.karwar@nxp.com, 
-	rohit.fule@nxp.com, sherry.sun@nxp.com, ziniu.wang_1@nxp.com, haibo.chen@nxp.com, 
-	LnxRevLi@nxp.com
-Subject: Re: [PATCH v2 1/2] dt-bindings: net: bluetooth: nxp: Add support for
- power save feature using GPIO
-Message-ID: <sllfy6srzwlwemkesnrgbdegywy6llysrylq45xf7no7ox7uwt@4u25dxff2fyr>
-References: <20241003154507.537363-1-neeraj.sanjaykale@nxp.com>
- <20241003154507.537363-2-neeraj.sanjaykale@nxp.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="d9suAaBe"
+Received: by mail-pg1-f179.google.com with SMTP id 41be03b00d2f7-7e6bb2aa758so782400a12.2
+        for <linux-bluetooth@vger.kernel.org>; Fri, 04 Oct 2024 00:30:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1728027042; x=1728631842; darn=vger.kernel.org;
+        h=content-disposition:mime-version:subject:cc:to:from:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=oRkFzW8T8w8ym6koJpww/06LEcgdMAntqrbK5PntlIo=;
+        b=d9suAaBeazkBum82+qYOmKgtrSTabpsL2aJPKYlA/8JoXPtHG2OPZeypKm2Hm6QvLk
+         UBaBPPh3ScN4JsyMzFx6iIHkaxQjTnHDXpLpmYP6onmyoV3JCmvG0vY3F8skrq5T41ew
+         ZagbwFwRf9EpoCwHKHZhTX0ZL1sV3itkY6FLMxXE9pRnHyDGQ2KKmE8e3S8JDKFX2aoB
+         a1OKreGIFLOBYieDcX+9KhN+a1pjnQhhw4S6Oni29GUIqwmUb7lTddg4efjTVk6iKdAn
+         Dr2kceZTZQO/8G3prGHsvYfHisi7BXS1+mpIXytQel9RJE0JWJy1kpOjdA+FDOPk3cGq
+         Am6Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728027042; x=1728631842;
+        h=content-disposition:mime-version:subject:cc:to:from:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=oRkFzW8T8w8ym6koJpww/06LEcgdMAntqrbK5PntlIo=;
+        b=qu8HEtinrugFWo06TvwBPXi12NgLH1x3TAs2tGHMxZp653itEoKBJNrIKxmTg15yXa
+         cq98LNpdJsTz+CSQf00u0uPvvRUyBqDl6ufgShPvSrYo79zX/25GQi5t+AAr8R9XHBlc
+         CySsTwGqVmf4vHLkeKGWMf4GvIZpfIWONCswTZcZbu24E1WFAlNXR8bAOnR0W3xc+dUA
+         3RoesLKp/WFufgwWFuneNwcOQ+yJ7livcjR/NV7YPPPiMr2xFnpDoEQ/3W8wcTcibJyX
+         ExC7AYSCS8xBIiLJmHF/0FwJnTxTo+mu+JHsEV6M8PZ2jkGcLtJkB09USpJo7hEgH6bU
+         qfOw==
+X-Gm-Message-State: AOJu0Yz4PQ8W9oSHlm+bqja4+RUR8jqKPQf5wz9Ts/wXcSpK/fBG4PDv
+	joMYu8fnRTYlDZdiwr7raycELiT1PDLAPUJi3NlajzOydwkmbPT/aeroAg==
+X-Google-Smtp-Source: AGHT+IE0SzjOZUxwFb7QzRIHXikH65Qje70/RSJ+KGSRR3DQeFrclWKCktza+tHk5UAFrXyf03aBTQ==
+X-Received: by 2002:a05:6a21:9204:b0:1cc:b22d:979f with SMTP id adf61e73a8af0-1d6dfa23d10mr2993584637.4.1728027042315;
+        Fri, 04 Oct 2024 00:30:42 -0700 (PDT)
+Received: from JUNHO-NEOSTACK. ([221.154.134.3])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71dd9d83fa2sm2566149b3a.47.2024.10.04.00.30.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 04 Oct 2024 00:30:41 -0700 (PDT)
+Message-ID: <66ff99a1.a70a0220.1fac1d.b37c@mx.google.com>
+X-Google-Original-Message-ID: <Zv+Zn1cDkCQoOmbv@JUNHO-NEOSTACK.>
+Date: Fri, 4 Oct 2024 16:30:39 +0900
+From: Junho Lee <tot0roprog@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: bggixx@gmail.com
+Subject: [PATCH BlueZ 0/4] mesh: Fix segmentation behavior of Lower transport
+ layer
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241003154507.537363-2-neeraj.sanjaykale@nxp.com>
 
-On Thu, Oct 03, 2024 at 09:15:06PM +0530, Neeraj Sanjay Kale wrote:
-> This adds a new optional device tree property h2c-ps-gpios, which specifies
-> the GPIO connected to BT_WAKE_IN pin of the NXP chipset.
-> 
-> If this property is defined, the driver will use this GPIO for driving chip
-> into sleep/wakeup state, else use the UART break signal by default.
-> 
-> Signed-off-by: Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>
-> ---
-> v2: Rephrase description and use "-gpios". (Krzysztof, Rob)
-> ---
->  .../devicetree/bindings/net/bluetooth/nxp,88w8987-bt.yaml | 8 ++++++++
->  1 file changed, 8 insertions(+)
-> 
-> diff --git a/Documentation/devicetree/bindings/net/bluetooth/nxp,88w8987-bt.yaml b/Documentation/devicetree/bindings/net/bluetooth/nxp,88w8987-bt.yaml
-> index 37a65badb448..cd8236eb31de 100644
-> --- a/Documentation/devicetree/bindings/net/bluetooth/nxp,88w8987-bt.yaml
-> +++ b/Documentation/devicetree/bindings/net/bluetooth/nxp,88w8987-bt.yaml
-> @@ -34,6 +34,12 @@ properties:
->    firmware-name:
->      maxItems: 1
->  
-> +  h2c-ps-gpios:
-> +    maxItems: 1
-> +    description:
-> +      Host-To-Chip power save mechanism is driven by this GPIO
-> +      connected to BT_WAKE_IN pin of the NXP chipset.
+These is implementations of segmentation and reassembly, except for the
+friend feature for LPN nodes, implemented according to Mesh Protocol 1.1
+section 3.5.
 
-So this should be wakeup-gpios or device-wakeup-gpios?
+Junho Lee (4):
+  mesh: Implement lower transport layer for segmentation and reassembly
+  mesh: Add mesh conf for SAR Transmitter and Receiver
+  mesh: Fix inserting NULL into bool type arguments to false
+  mesh: Add features of Segmented Control message
 
-Best regards,
-Krzysztof
+ mesh/crypto.c       |  69 ++--
+ mesh/mesh-main.conf | 107 ++++++
+ mesh/mesh.c         | 125 ++++++-
+ mesh/mesh.h         |   2 +
+ mesh/net.c          | 868 ++++++++++++++++++++++++++++++--------------
+ mesh/net.h          |  33 +-
+ 6 files changed, 881 insertions(+), 323 deletions(-)
+
+-- 
+2.34.1
 
