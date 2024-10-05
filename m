@@ -1,199 +1,104 @@
-Received: from relay02.th.seeweb.it (relay02.th.seeweb.it [5.144.164.163])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f174.google.com (mail-qk1-f174.google.com [209.85.222.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20114171088
-	for <linux-bluetooth@vger.kernel.org>; Sat,  5 Oct 2024 21:50:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=5.144.164.163
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8FF716F908
+	for <linux-bluetooth@vger.kernel.org>; Sat,  5 Oct 2024 23:00:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728165010; cv=none; b=IIA42YAGgt7UIhJxjOJTnw6JZ5wb38XY8Z9subR+bev87t17179eRTIzoIOIhtkJ+bG1j9VZNCY5slrMj7B9w/GZiRDPI+uNuztXBGBCiyRNppvkmAA8N2IPpgaWrsIY0jAAhCTDYeHV85u5Sjt6ptwxiAm5MFkPuSK0vFRHsB0=
+	t=1728169211; cv=none; b=ci1+/KbKTTAQZ5PELjyUU7pIxi+m/dk8NivR/X5xv13DjPAJbu9RL5rI6Cy3bBMP2DeWdcZbkFWrOzjt9D92ulYZYpze/QCVyIdTK20nDVLgo8Cv9MnzmAfqtH6SuMcXIaTZ3+qbYu+aCZpIiHB9tl+THttuoQVUnhkB9dsyKfs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728165010; c=relaxed/simple;
-	bh=NQ8oHyAK5DK5N2JIoQO0q21RhpsMba9BN8GC+sW2UIg=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=bR4fgfF4kfjzphnB+ZhUrymSHQKE6/L/DhU50v4breh5+F8w1095/FHncBkPqtkYnvBgU1P2PeYdSo27esA+qbAvcIhQh1cNMJJGDHot84NuR7f3y3gUB8lpIir5xOhDYDEIblpZ/IiSRXBCM0uhOlCaX2yo5tGQqh4yJRNS65w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=somainline.org; spf=pass smtp.mailfrom=somainline.org; arc=none smtp.client-ip=5.144.164.163
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=somainline.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=somainline.org
-Received: from Marijn-Arch-PC.localdomain (94-211-6-86.cable.dynamic.v4.ziggo.nl [94.211.6.86])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by m-r1.th.seeweb.it (Postfix) with ESMTPSA id DBCC11F925;
-	Sat,  5 Oct 2024 23:43:22 +0200 (CEST)
-From: Marijn Suijten <marijn.suijten@somainline.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Marijn Suijten <marijn.suijten@somainline.org>,
-	Yu Liu <yudiliu@google.com>,
-	Bartosz Fabianowski <bartosz@fabianowski.eu>,
-	Pauli Virtanen <pav@iki.fi>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Marek Czerski <ma.czerski@gmail.com>
-Subject: [PATCH BlueZ v4 1/3] audio/avrcp: Guard SetAbsoluteVolume without target behind config value
-Date: Sat,  5 Oct 2024 23:43:06 +0200
-Message-ID: <20241005214321.84250-2-marijn.suijten@somainline.org>
-X-Mailer: git-send-email 2.46.2
-In-Reply-To: <20241005214321.84250-1-marijn.suijten@somainline.org>
-References: <20241005214321.84250-1-marijn.suijten@somainline.org>
+	s=arc-20240116; t=1728169211; c=relaxed/simple;
+	bh=TbIynJxZv10BqVhkMKP4hx6JDf4bNlq+xeyqG4DwjiE=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=o6oa37ywPzfIh4N3iu3DJh/boOcoWlRQZXnNuNTlUtVZ4MoEph9OQ2iVKSQ+HtrZHeh5tYQRCBoYpJFTyjKMbiPdNGqqnSsKi+39SVpJH9ZOCFLOU/Yxle7TbbdrcPm2nfGAFPUQ13/0io5yWZW90FMpWzaKRL/P/qQJZAjw2aM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZETcMf/v; arc=none smtp.client-ip=209.85.222.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZETcMf/v"
+Received: by mail-qk1-f174.google.com with SMTP id af79cd13be357-7a9a7bea3cfso196147585a.1
+        for <linux-bluetooth@vger.kernel.org>; Sat, 05 Oct 2024 16:00:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1728169205; x=1728774005; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=BJaEPEOyuyxL6SOADp37+RIBFORQNZvx11isJJMqmRA=;
+        b=ZETcMf/v0EJ9/mdDNTHZ1+UTkqLvqdv4mGuBBnd3/aNtHiViR1T7Rs6mwLMjXEE5aE
+         oZHRsmVWD5ecH7HN9fp0nHwJuV5xkHNPpj0nng9ZJjXoCWXSvdVXsGmQpZYw34KBlSUQ
+         vAwLkG1tMU32LOgC2QmMBJvvZrxWX1F0MJCzJgfF3T3QJzSLvTjiGuAnpIM9vK/CTp9U
+         A5eFACQQAsuoiyQirzU+nKnfEvj5dOVvR1SmThboag/WiB8MdI/QnLc2zhhy04x/eJBl
+         ygOTuV/kRQCQl+zD7fr/wvb5/dudOZaJf4RQ8yebIl+vNWGDL1Dj4iiAsuTfmxWzJMqB
+         y7ww==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728169205; x=1728774005;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=BJaEPEOyuyxL6SOADp37+RIBFORQNZvx11isJJMqmRA=;
+        b=HwA/FvlPJHMvQa4sz5+sfCuvJWssdgYmzyt8HlHxipxvjFgZZAKl65jdhCCuceCcMr
+         mSnGJOFwW4vfxCCLiOyJdGLHbkogeHC9zfCs+VVIPQzNykUijsSdFWtPOW5m7adMsJqG
+         paZ+Jd8ZY+bQPriD6kCotKG1HM8bQwY8F8w+j8P6yXjUNI50MjU20HpGMCv7bwwoogO+
+         me6TNifofzK2Ry/B94YS+Emnr9UXdnwam/02odtXkxVfNyiJvqAJSqQnuoI1SGQo3fVN
+         9J6jpmKZQFxlNgEknDuZW9NTfb7I+bWAs8rlOMovWkfyTVN+H46XECfuDa4PriOlN/Z6
+         xUBQ==
+X-Gm-Message-State: AOJu0YzZoG2tTcNoAX/ABuFz8XGg9z3Gu17TjZcgCEfb3dTahblyz+sH
+	zgTz9dqZvOTkcimpfv9Wg2bf53LmHuCK+sBbETwy/+5WuLytLY9aVsbmcQ==
+X-Google-Smtp-Source: AGHT+IFZE3EsYfqT7VeehPrXafvPrDjRgTW4tz5PJI4Zxg0EjeixBItps98Yme/ePw7ILB7Y0j4mwQ==
+X-Received: by 2002:a05:620a:1911:b0:7a9:b021:ee6 with SMTP id af79cd13be357-7ae6f421a8dmr1075768385a.11.1728169205322;
+        Sat, 05 Oct 2024 16:00:05 -0700 (PDT)
+Received: from [172.17.0.2] ([20.51.206.231])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-45dae2be1d6sm6120331cf.56.2024.10.05.16.00.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 05 Oct 2024 16:00:04 -0700 (PDT)
+Message-ID: <6701c4f4.c80a0220.27527f.1652@mx.google.com>
+Date: Sat, 05 Oct 2024 16:00:04 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============6444383404581711996=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, arkadiusz.bokowy@gmail.com
+Subject: RE: [BlueZ] avdtp: Fix state check before sending delay report
+In-Reply-To: <20241005211510.409471-1-arkadiusz.bokowy@gmail.com>
+References: <20241005211510.409471-1-arkadiusz.bokowy@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Commit 179ccb936 ("avrcp: Set volume if volume changed event is
-registered") invented a workaround that allows SetAbsoluteVolume to be
-sent to a remote device that does _not_ implement the AVRCP TG profile,
-as long as it previously registered for the EVENT_VOLUME_CHANGED
-notification.  This is strange as the TG role is required to be able to
-send commands to the peer, but the commit must have been applied to the
-tree for a reason.
+--===============6444383404581711996==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-We discussed in [1] that workarounds for dubious peers and software
-stacks should be guarded behind a config entry in main.conf, so this
-starts out by introducing a new [AVRCP] category that will later be
-extended with other workarounds.  It guards the changed functionality
-behind a `VolumeWithoutTarget = false` boolean to disallow this obscure
-check.
+This is automated email and please do not reply to this email!
 
-[1]: https://lore.kernel.org/linux-bluetooth/20211025210206.bkt5wovzmkmt6teg@SoMainline.org/
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=895894
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.45 seconds
+GitLint                       PASS      0.32 seconds
+BuildEll                      PASS      23.99 seconds
+BluezMake                     PASS      1517.49 seconds
+MakeCheck                     PASS      13.42 seconds
+MakeDistcheck                 PASS      175.51 seconds
+CheckValgrind                 PASS      247.86 seconds
+CheckSmatch                   PASS      349.28 seconds
+bluezmakeextell               PASS      117.39 seconds
+IncrementalBuild              PASS      1389.91 seconds
+ScanBuild                     PASS      1007.73 seconds
+
+
+
 ---
- profiles/audio/avrcp.c | 16 +++++++++++++---
- src/btd.h              |  5 +++++
- src/main.c             | 16 ++++++++++++++++
- src/main.conf          |  6 ++++++
- 4 files changed, 40 insertions(+), 3 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
-index 1622734b3..553673b19 100644
---- a/profiles/audio/avrcp.c
-+++ b/profiles/audio/avrcp.c
-@@ -48,6 +48,7 @@
- #include "src/dbus-common.h"
- #include "src/shared/timeout.h"
- #include "src/shared/util.h"
-+#include "src/btd.h"
- 
- #include "avctp.h"
- #include "avrcp.h"
-@@ -4670,9 +4671,18 @@ int avrcp_set_volume(struct btd_device *dev, int8_t volume, bool notify)
- 								&volume);
- 	}
- 
--	if (!session->controller && !avrcp_event_registered(session,
--					AVRCP_EVENT_VOLUME_CHANGED))
--		return -ENOTSUP;
-+	if (btd_opts.avrcp.volume_without_target) {
-+		/* If there is no target profile (we didn't create a controller for it),
-+		 * allow the call to pass through if the remote controller registered
-+		 * for a volume changed event.
-+		 */
-+		if (!session->controller && !avrcp_event_registered(session,
-+						AVRCP_EVENT_VOLUME_CHANGED))
-+			return -ENOTSUP;
-+	} else {
-+		if (!session->controller || session->controller->version < 0x0104)
-+			return -ENOTSUP;
-+	}
- 
- 	memset(buf, 0, sizeof(buf));
- 
-diff --git a/src/btd.h b/src/btd.h
-index 383bd7c19..147b61f12 100644
---- a/src/btd.h
-+++ b/src/btd.h
-@@ -104,6 +104,10 @@ struct btd_avdtp_opts {
- 	uint8_t  stream_mode;
- };
- 
-+struct btd_avrcp_opts {
-+	bool		volume_without_target;
-+};
-+
- struct btd_advmon_opts {
- 	uint8_t		rssi_sampling_period;
- };
-@@ -145,6 +149,7 @@ struct btd_opts {
- 	enum mps_mode_t	mps;
- 
- 	struct btd_avdtp_opts avdtp;
-+	struct btd_avrcp_opts avrcp;
- 
- 	uint8_t		key_size;
- 
-diff --git a/src/main.c b/src/main.c
-index 69ae1b1e3..5bd3a035d 100644
---- a/src/main.c
-+++ b/src/main.c
-@@ -165,6 +165,11 @@ static const char *avdtp_options[] = {
- 	NULL
- };
- 
-+static const char *avrcp_options[] = {
-+	"VolumeWithoutTarget",
-+	NULL
-+};
-+
- static const char *advmon_options[] = {
- 	"RSSISamplingPeriod",
- 	NULL
-@@ -181,6 +186,7 @@ static const struct group_table {
- 	{ "GATT",	gatt_options },
- 	{ "CSIS",	csip_options },
- 	{ "AVDTP",	avdtp_options },
-+	{ "AVRCP",	avrcp_options },
- 	{ "AdvMon",	advmon_options },
- 	{ }
- };
-@@ -1140,6 +1146,13 @@ static void parse_avdtp(GKeyFile *config)
- 	parse_avdtp_stream_mode(config);
- }
- 
-+static void parse_avrcp(GKeyFile *config)
-+{
-+	parse_config_bool(config, "AVRCP",
-+		"VolumeWithoutTarget",
-+		&btd_opts.avrcp.volume_without_target);
-+}
-+
- static void parse_advmon(GKeyFile *config)
- {
- 	parse_config_u8(config, "AdvMon", "RSSISamplingPeriod",
-@@ -1163,6 +1176,7 @@ static void parse_config(GKeyFile *config)
- 	parse_gatt(config);
- 	parse_csis(config);
- 	parse_avdtp(config);
-+	parse_avrcp(config);
- 	parse_advmon(config);
- }
- 
-@@ -1205,6 +1219,8 @@ static void init_defaults(void)
- 	btd_opts.avdtp.session_mode = BT_IO_MODE_BASIC;
- 	btd_opts.avdtp.stream_mode = BT_IO_MODE_BASIC;
- 
-+	btd_opts.avrcp.volume_without_target = false;
-+
- 	btd_opts.advmon.rssi_sampling_period = 0xFF;
- 	btd_opts.csis.encrypt = true;
- }
-diff --git a/src/main.conf b/src/main.conf
-index 82040b3fa..5d206b9ec 100644
---- a/src/main.conf
-+++ b/src/main.conf
-@@ -305,6 +305,12 @@
- # streaming: Use L2CAP Streaming Mode
- #StreamMode = basic
- 
-+[AVRCP]
-+# Allow SetAbsoluteVolume calls to a peer device that does not advertise the
-+# AVRCP remote control target profile.  If it does advertise this profile, the
-+# version is ignored.
-+#VolumeWithoutTarget = false
-+
- [Policy]
- #
- # The ReconnectUUIDs defines the set of remote services that should try
--- 
-2.46.2
 
+--===============6444383404581711996==--
