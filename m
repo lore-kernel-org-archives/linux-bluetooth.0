@@ -1,33 +1,27 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps-ovh.mhejs.net (vps-ovh.mhejs.net [145.239.82.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CFD1749A;
-	Sun,  6 Oct 2024 11:33:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65B1C19A;
+	Sun,  6 Oct 2024 14:03:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=145.239.82.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728214389; cv=none; b=BpU4BLjYFesQZb39agYM6TBxwpR4PIUXTtsvAe4QAu4EXiCS6OGm6SXwVDyVntjR2igbLBvRgfiyilg2jMzbYNxANSh5CzxL7ta7H8sasuqnfVE1rgNqqV07M6eGsiyqh9Jm5iEurB0qGpA4DsFKnrFlNuU55qjc+qyDnzu8HlQ=
+	t=1728223387; cv=none; b=QFRB4Ukh4YCEboifTUIK9GNr2IvW5sH/cACrsgpkeEumQ9Tjs0xE8xb1666fB2leNDhWa50FDMNmrfeDgRMzVC0rbwsbvesqzO1PXKFk8yPtFpDFeXIWkedfgCdgM5J11KmukmQbzWEuX0SP998yClFVnmkI6UBFg5zYE2bLTDg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728214389; c=relaxed/simple;
-	bh=ZICSkUBYeMZu29N/modjDAZ4GFu4V0bbMg9/g8AetzM=;
+	s=arc-20240116; t=1728223387; c=relaxed/simple;
+	bh=cg01ApAm6HeYDHmPuYyBqTkaWNBkTkRXVLXFFpAWDr8=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Lk8ZrXHT25wGKC0em66RoIJXe+Q0tHuy1u9uR2Av6cC6j6hbkQe/fntgJQKATGuP/9ndzfoUN3DrBLyYBQJfOnHeVJdCB26IXkWlPa7id70rV42/+nrOPHv8kjxPU0tunrD9B9qAkPWALawA/yTSoyY5DTWeE3vqf/CzlBeWHgw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=B1HDQKCE; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="B1HDQKCE"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 61DFDC4CEC5;
-	Sun,  6 Oct 2024 11:33:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728214389;
-	bh=ZICSkUBYeMZu29N/modjDAZ4GFu4V0bbMg9/g8AetzM=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=B1HDQKCEYBdm1jb77/l6hRmJwxRrVwpL0njdi9h07MiW02Utrlqf0lwtBM4iEZ8cA
-	 tikEeoE03+PUxo6l/QqNxLqhrvQelaPo9G2YqQSqwJCFjAQNDLus6RiGHdFUB3dByL
-	 F+LOwKyidNxzAZjo8v3gmGRekYp9FSat7gK5zb0uLXgiEpwLYhvV+ozHg7CM6MoJOw
-	 DL0Ib4GCSX1x+3mKHp/3pjra3s1zUdB0ziLUDSUu/UkTIbMPuZTE2LGGCwtHD5ELMW
-	 3QLRvyVr9q5aoYLvG3HB+b8SAeeYYqYf/WLzy9hdA1eGiMnefeLWxHde//Ik81hWvo
-	 IEZyNxYeNq9DA==
-Message-ID: <3fa35cd2-e52c-4873-8a7f-db459b016a97@kernel.org>
-Date: Sun, 6 Oct 2024 13:33:00 +0200
+	 In-Reply-To:Content-Type; b=eZZ9T92nnCwSY8i2WEOFwy+o3JpMmlvKpN9hzgq4DSfinQhz9R1R9FYkvQns9YuZqpV+DtlxAH7SdG+UAvJDBNJi1/LSw6M5uMvjqF2EfWt6UOr+W00RlqLZ/LvLp6yLpVy/iu8PVgAYP0yCasuIJ6KB8t3U89FRaoC0+TX4sM8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=maciej.szmigiero.name; spf=none smtp.mailfrom=vps-ovh.mhejs.net; arc=none smtp.client-ip=145.239.82.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=maciej.szmigiero.name
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=vps-ovh.mhejs.net
+Received: from MUA
+	by vps-ovh.mhejs.net with esmtpsa  (TLS1.3) tls TLS_AES_128_GCM_SHA256
+	(Exim 4.98)
+	(envelope-from <mhej@vps-ovh.mhejs.net>)
+	id 1sxRqU-00000000KMu-40zv;
+	Sun, 06 Oct 2024 16:02:50 +0200
+Message-ID: <fac3f1f0-f76e-45bd-902c-60c395afcc16@maciej.szmigiero.name>
+Date: Sun, 6 Oct 2024 16:02:45 +0200
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -35,130 +29,132 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/2] dt-bindings: net: bluetooth: nxp: add support for
- supply and reset
-To: Sherry Sun <sherry.sun@nxp.com>,
- Catalin Popescu <catalin.popescu@leica-geosystems.com>,
- Amitkumar Karwar <amitkumar.karwar@nxp.com>,
- Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>,
- "marcel@holtmann.org" <marcel@holtmann.org>,
- "luiz.dentz@gmail.com" <luiz.dentz@gmail.com>,
- "robh@kernel.org" <robh@kernel.org>, "krzk+dt@kernel.org"
- <krzk+dt@kernel.org>, "conor+dt@kernel.org" <conor+dt@kernel.org>,
- "p.zabel@pengutronix.de" <p.zabel@pengutronix.de>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
- "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "m.felsch@pengutronix.de" <m.felsch@pengutronix.de>,
- "bsp-development.geo@leica-geosystems.com"
- <bsp-development.geo@leica-geosystems.com>
-References: <20241004113557.2851060-1-catalin.popescu@leica-geosystems.com>
- <DB9PR04MB8429B4535422D3AE07D8EE79927C2@DB9PR04MB8429.eurprd04.prod.outlook.com>
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 fv0=
-In-Reply-To: <DB9PR04MB8429B4535422D3AE07D8EE79927C2@DB9PR04MB8429.eurprd04.prod.outlook.com>
-Content-Type: text/plain; charset=UTF-8
+Subject: Re: Root filesystem read access for firmware load during hibernation
+ image writing
+To: Pavel Machek <pavel@ucw.cz>
+Cc: "Rafael J. Wysocki" <rafael@kernel.org>, Len Brown <len.brown@intel.com>,
+ linux-pm <linux-pm@vger.kernel.org>, linux-kernel@vger.kernel.org,
+ Ping-Ke Shih <pkshih@realtek.com>,
+ linux-wireless <linux-wireless@vger.kernel.org>,
+ Marcel Holtmann <marcel@holtmann.org>,
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+ linux-bluetooth@vger.kernel.org
+References: <3c95fb54-9cac-4b4f-8e1b-84ca041b57cb@maciej.szmigiero.name>
+ <ZwF6JEHIQda92sIL@duo.ucw.cz>
+Content-Language: en-US, pl-PL
+From: "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
+Autocrypt: addr=mail@maciej.szmigiero.name; keydata=
+ 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
+In-Reply-To: <ZwF6JEHIQda92sIL@duo.ucw.cz>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
+Sender: mhej@vps-ovh.mhejs.net
 
-On 06/10/2024 10:49, Sherry Sun wrote:
+On 5.10.2024 19:40, Pavel Machek wrote:
+> Hi!
 > 
+>> In my case, a USB device (RTL8821CU) gets reset at that stage due to
+>> commit 04b8c8143d46 ("btusb: fix Realtek suspend/resume") and so it tries
+>> to request_firmware() from the root filesystem after that thaw/reset,
+>> when the hibernation image is being written.
+>>
+>> It usually succeeds, however often it deadlocks somewhere in Btrfs code
+>> resulting in the system failing to power off after writing the hibernate
+>> image:
+>> power_off() calls dpm_suspend_start(), which calls dpm_prepare(), which
+>> waits for device probe to finish.
+>>
+>> And device probe is stuck forever trying to load that USB stick firmware
+>> from the filesystem - so in the end the system never powers off during
+>> (after) hibernation.
+>>
+>> That's why I wonder whether this firmware load is supposed to work correctly
+>> during that hibernation state and so the system may be hitting some kind of
+>> a swsusp/btrfs/block layer race condition.
+>>
+>> Or, alternatively, maybe  reading files is not supported at this point and
+>> so this is really a btrtl/rtw88 bug?
 > 
->> -----Original Message-----
->> From: Catalin Popescu <catalin.popescu@leica-geosystems.com>
->> Sent: Friday, October 4, 2024 7:36 PM
->> To: Amitkumar Karwar <amitkumar.karwar@nxp.com>; Neeraj Sanjay Kale
->> <neeraj.sanjaykale@nxp.com>; marcel@holtmann.org;
->> luiz.dentz@gmail.com; robh@kernel.org; krzk+dt@kernel.org;
->> conor+dt@kernel.org; p.zabel@pengutronix.de
->> Cc: linux-bluetooth@vger.kernel.org; devicetree@vger.kernel.org; linux-
->> kernel@vger.kernel.org; m.felsch@pengutronix.de; bsp-
->> development.geo@leica-geosystems.com; Catalin Popescu
->> <catalin.popescu@leica-geosystems.com>
->> Subject: [PATCH 1/2] dt-bindings: net: bluetooth: nxp: add support for supply
->> and reset
->>
->> Add support for chip power supply and chip reset/powerdown.
->>
->> Signed-off-by: Catalin Popescu <catalin.popescu@leica-geosystems.com>
->> ---
->>  .../bindings/net/bluetooth/nxp,88w8987-bt.yaml        | 11 +++++++++++
->>  1 file changed, 11 insertions(+)
->>
->> diff --git a/Documentation/devicetree/bindings/net/bluetooth/nxp,88w8987-
->> bt.yaml b/Documentation/devicetree/bindings/net/bluetooth/nxp,88w8987-
->> bt.yaml
->> index 37a65badb448..8520b3812bd2 100644
->> --- a/Documentation/devicetree/bindings/net/bluetooth/nxp,88w8987-
->> bt.yaml
->> +++ b/Documentation/devicetree/bindings/net/bluetooth/nxp,88w8987-
->> bt.yaml
->> @@ -34,6 +34,14 @@ properties:
->>    firmware-name:
->>      maxItems: 1
->>
->> +  vcc-supply:
->> +    description:
->> +      phandle of the regulator that provides the supply voltage.
->> +
->> +  reset-gpios:
->> +    description:
->> +      Chip powerdown/reset signal (PDn).
->> +
-> 
-> Hi Catalin,
-> 
-> For NXP WIFI/BT chip, WIFI and BT share the one PDn pin, which means that both wifi and BT controller will be powered on and off at the same time.
-> Taking the M.2 NXP WIFI/BT module as an example, pin56(W_DISABLE1) is connected to the WIFI/BT chip PDn pin, we has already controlled this pin in the corresponding PCIe/SDIO controller dts nodes.
-> It is not clear to me what exactly pins for vcc-supply and reset-gpios you describing here. Can you help understand the corresponding pins on M.2 interface as an example? Thanks.
+> I'd say not supported at this point. Reading file may still read to
+> atime update, etc, and we can't really can't support that easily.
 
-Please wrap your replies.
+Thanks for this clarification.
 
-It seems you need power sequencing just like Bartosz did for Qualcomm WCN.
+I've dropped btrfs folks from the CC list since this isn't a btrfs issue
+after all and added rtw88/btrtl maintainers instead.
+  
+> Suggestion is to keep firmware cached in memory, or at least cache it
+> in memory when hibernation begins.
+
+Since a WiFi/BT NIC is hardly useful for hibernation snapshot writing
+operation it seems that an easier option would be to simply return
+something like -EPROBE_DEFER from both rtw88 and btrtl probe callbacks
+during PMSG_THAW hibernation stage.
+That -EPROBE_DEFER will hopefully handle the unlikely case that the
+hibernation snapshot writing fails or someone is running a
+HIBERNATION_TEST_RESUME.
+
+In turn, the easiest trigger for this would be the "in_suspend"
+variable being set, however this would require EXPORTing it - it looks
+like system_entering_hibernation() only covers the case when the
+system is hibernating using platform hibernation support.
+
+I will see whether this workaround works for me, if someone wants
+to implement the "firmware caching" approach instead then feel
+free to do so.
 
 
-Best regards,
-Krzysztof
+By the way, I don't see any reason why other USB devices that load
+firmware at their probe time can't be affected too since that
+lock_device_hotplug() call in hibernate() seems to only prevent
+CPU/RAM/ACPI hotplug, not USB hotplug.
+
+So if such USB device happens to get reset during hibernation time
+(for example from hub EMI) it would suffer the same issue.
+
+> BR,
+> 										Pavel
+> 										
+
+Thanks,
+Maciej
 
