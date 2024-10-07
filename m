@@ -1,121 +1,132 @@
-Received: from mail-pg1-f180.google.com (mail-pg1-f180.google.com [209.85.215.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from forward100b.mail.yandex.net (forward100b.mail.yandex.net [178.154.239.147])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1092015A8
-	for <linux-bluetooth@vger.kernel.org>; Mon,  7 Oct 2024 00:18:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD8F11BC5C
+	for <linux-bluetooth@vger.kernel.org>; Mon,  7 Oct 2024 07:45:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.154.239.147
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728260284; cv=none; b=YWJPoAgV7Zi3kECmmf5hawQnGdAT2izNLBjSHnCA5ts0HjDRScEFFH0LRJVSQJZvfbGZfZ1+4vw4u5vK5O1LTd2G7WYeV8b1YILu9//quZuZ8NhYlXEGRu3SsxqRjElWYrS4LRDnxOfrX7p+eqt5P7dce5C0tri82iNMOygEwIA=
+	t=1728287154; cv=none; b=IJmB0yqEPlP7TrDvjrW+9jQVZXqTlvYp7XdH94JIeoOmfDfFLQBonqZx0n72tgIA2tqHDg1lzZwi2aenk/thS8w4i/sZ+d9/LJ4dwyBezJYVLTx2uLX4hLMfEgjhIkeIFvAUA1d06ZNBSPyPZXNNPEHGX+e3bDnh6P4HPKjmnLI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728260284; c=relaxed/simple;
-	bh=wCSlnJLeG8nmJKOOT4ChdTKwdM1VlargIBSKWlgVLn4=;
-	h=Message-ID:Date:From:To:Cc:Subject:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DyfyteZbxsERWqcrs4ZOw/9nlCntuxKqk2vLIGDg2B1VA0izKt6XFvb0I2y8xiM1/I0va2MxgsbsNKfOJpP+FWyVnnjHI2S/S4/MV7pQSDGFZ3Tq3Rkd139oZNzcyx0pn2gvYzClef9ATLgagpnkeH76sK3IVdA9gF0z0KXCbc8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RM8HTo0m; arc=none smtp.client-ip=209.85.215.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1728287154; c=relaxed/simple;
+	bh=x2zbooBF33TYaBLRUcwYwyzT5+3QU3mG04Ez/Vc29Fw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=mLPDnuXUkQ+jI2Aou9TGxKk+lLKjR1YDmdovuQsv4q1d9awcydOpaA8PGus1ddlTZzOyDQ+7p1IcMW9uuIqxak4/VOD8sfhf023VxDb9NR2KU7L0sN92FncLpHnea9HNmTNSSno6MoyOGc3hpwzGoYeyGo9d++/l5MRKyO3qpqE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru; spf=pass smtp.mailfrom=yandex.ru; dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b=vioV+SzY; arc=none smtp.client-ip=178.154.239.147
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yandex.ru
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RM8HTo0m"
-Received: by mail-pg1-f180.google.com with SMTP id 41be03b00d2f7-7ea03ecf191so727907a12.0
-        for <linux-bluetooth@vger.kernel.org>; Sun, 06 Oct 2024 17:18:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1728260282; x=1728865082; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:subject:cc:to:from:date:message-id:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=mKU61D2ctOhGCvqkG2pDCamTS6SVWO/Y/lsygjmkc2s=;
-        b=RM8HTo0mqA2+u1lxgRXGTUcG78fx/gDqfmGJ6B2roKrfJ/H3k1IwvFccn7EPKpmwP0
-         xN0FcAGglq0MOu9jIMO40ek1/uIbySgt6gRcHaVspBPdlJ3KpcZUtX5uVmf47a2mMjus
-         VXw38JjIQXeZCVlpKRXbow+6/vfb9qnebZHa40jOHoYbgSR0n2u+m1hqFDtWxuJPMQnU
-         qjeERBlgwjGEQb4Yn/r3BryimbOO/VZp4l/Kr1L0wKWxzrnwX3Ftk0LbHvrhDU0xYmIP
-         vOFm6qgssvRx3ZgyZd6POFxThtSYno76JokAxjdEocOBaSO0gng/oNJzA5dFnfJKDjZP
-         KJGA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728260282; x=1728865082;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:subject:cc:to:from:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=mKU61D2ctOhGCvqkG2pDCamTS6SVWO/Y/lsygjmkc2s=;
-        b=uGGsg7uqI2yTPZ/bTImyGqoT9NVTg+SvB5S8wCQlOnzeZYjRUNrsXC+7o3hoqSgDYM
-         Ybpfi+XqivwVSzUMerCQc2MTh6iVWhMNwcuPTUkngswHT4k7RBceSOiMG5fs9Gf27x2L
-         FXec7/ocn2YsskfXhQsnQgvzAt4aNGW5jiL0FjWUMtnAylS8dpuZquq4wHbpGe3JMjF/
-         yf9KNNejV3hoF6s7VvkIVhOv/o15relXPEJNTHQszfQVORW0WNNk+DHBq5b6BZPr+58t
-         XsAhZzGdgZ0HVaDou9wRzTcqJ6iQjOYFxulfWS3NETPBg2JYdVfvnU4gGJv2oLX3rn4g
-         p4nA==
-X-Gm-Message-State: AOJu0Yy1kQQGd+JIoMg3sdJ08PUTXYWMRMB3IPrD5qmrP4vqcINoUf9t
-	MceXBr9GqN+9HFJEY4SPOFqAG+7pFOv3sAlFKVI5TP5Xs6eoZ7t3lOmqEg==
-X-Google-Smtp-Source: AGHT+IFGM7xIi20bo9jRqs8EjYZEKYvM4+t4v8bcSQRi3C08NE25Qb/q/r8BjGjPI8gUU5RLdUrbyw==
-X-Received: by 2002:a05:6a20:c781:b0:1ce:e080:185c with SMTP id adf61e73a8af0-1d6dfafbe29mr13506265637.41.1728260282146;
-        Sun, 06 Oct 2024 17:18:02 -0700 (PDT)
-Received: from JUNHO-NEOSTACK. ([221.154.134.3])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71df0d7d2f3sm3254716b3a.201.2024.10.06.17.18.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 06 Oct 2024 17:18:01 -0700 (PDT)
-Message-ID: <670328b9.050a0220.66bba.9cd8@mx.google.com>
-X-Google-Original-Message-ID: <ZwMotqWoskduBelo@JUNHO-NEOSTACK.>
-Date: Mon, 7 Oct 2024 09:17:58 +0900
-From: Junho Lee <tot0roprog@gmail.com>
+	dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b="vioV+SzY"
+Received: from mail-nwsmtp-smtp-production-main-17.iva.yp-c.yandex.net (mail-nwsmtp-smtp-production-main-17.iva.yp-c.yandex.net [IPv6:2a02:6b8:c0c:aba6:0:640:703c:0])
+	by forward100b.mail.yandex.net (Yandex) with ESMTPS id 0786F60AB3;
+	Mon,  7 Oct 2024 10:45:42 +0300 (MSK)
+Received: by mail-nwsmtp-smtp-production-main-17.iva.yp-c.yandex.net (smtp/Yandex) with ESMTPSA id eja7oaf7WqM0-5vxSF4re;
+	Mon, 07 Oct 2024 10:45:41 +0300
+X-Yandex-Fwd: 1
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex.ru; s=mail;
+	t=1728287141; bh=fGDwIrAyo1ywJtzlqnxwdOIxL8rYhs73gLcpDxH2zSo=;
+	h=Message-ID:Date:Cc:Subject:To:From;
+	b=vioV+SzYvXrS7zzgZ/EEt+iWApwweApwdAOc/aFbnabjaiu3Se/URPniZAc3OO0Jj
+	 eGqnRO4wPah5AC6a42C1p82wZNgePOQWmFMIZlyEPhZ5lpKT6yI/GFieT4fhcK6AKz
+	 9WGOcjVHAT42PQIIQYHVswrpJxqI7VWtsbPFj+y4=
+Authentication-Results: mail-nwsmtp-smtp-production-main-17.iva.yp-c.yandex.net; dkim=pass header.i=@yandex.ru
+From: Dmitry Antipov <dmantipov@yandex.ru>
 To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org, bggixx@gmail.com
-Subject: Re: [PATCH BlueZ 0/4] mesh: Fix segmentation behavior of Lower
- transport layer
-References: <66ff99a1.a70a0220.1fac1d.b37c@mx.google.com>
- <CABBYNZ+waey5srQd23fnUGT_65T2TdF7npmXRo8P+rW+m-B7UQ@mail.gmail.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	linux-bluetooth@vger.kernel.org,
+	lvc-project@linuxtesting.org,
+	Dmitry Antipov <dmantipov@yandex.ru>,
+	syzbot+03d6270b6425df1605bf@syzkaller.appspotmail.com
+Subject: [PATCH] Bluetooth: do not send mgmt commands to device which is going to close
+Date: Mon,  7 Oct 2024 10:45:38 +0300
+Message-ID: <20241007074538.109613-1-dmantipov@yandex.ru>
+X-Mailer: git-send-email 2.46.2
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CABBYNZ+waey5srQd23fnUGT_65T2TdF7npmXRo8P+rW+m-B7UQ@mail.gmail.com>
+X-Yandex-Filter: 1
 
-Hi,
+Syzbot has observed the following race between 'hci_dev_close()' and
+'hci_cmd_sync_work()':
 
-Sorry, resending with a bad cc.
+T0:                             T1:
 
-On Fri, Oct 04, 2024 at 11:16:16AM -0400, Luiz Augusto von Dentz wrote:
-> Hi,
-> 
-> On Fri, Oct 4, 2024 at 3:30 AM Junho Lee <tot0roprog@gmail.com> wrote:
-> >
-> > These is implementations of segmentation and reassembly, except for the
-> > friend feature for LPN nodes, implemented according to Mesh Protocol 1.1
-> > section 3.5.
-> >
-> > Junho Lee (4):
-> >   mesh: Implement lower transport layer for segmentation and reassembly
-> >   mesh: Add mesh conf for SAR Transmitter and Receiver
-> >   mesh: Fix inserting NULL into bool type arguments to false
-> >   mesh: Add features of Segmented Control message
-> >
-> >  mesh/crypto.c       |  69 ++--
-> >  mesh/mesh-main.conf | 107 ++++++
-> >  mesh/mesh.c         | 125 ++++++-
-> >  mesh/mesh.h         |   2 +
-> >  mesh/net.c          | 868 ++++++++++++++++++++++++++++++--------------
-> >  mesh/net.h          |  33 +-
-> >  6 files changed, 881 insertions(+), 323 deletions(-)
-> >
-> > --
-> > 2.34.1
-> >
-> >
-> 
-> Lets see if Brian has some free time to review this set, one thing
-> that might help in the future is if we do some unit testing to cover
-> the testing spec, it is probably a lot of work but I think we add them
-> over time, with that it would be a lot easier to check if something
-> breaks.
-> 
-> -- 
-> Luiz Augusto von Dentz
+...
+-> sock_ioctl()
+ -> sock_do_ioctl()
+  -> hci_dev_close()
+   -> hci_dev_close_sync()
+    -> __mgmt_power_off()        ...
+     -> mgmt_pending_foreach()   -> process_scheduled_works()
+      -> settings_rsp()           -> hci_cmd_sync_work()
+       -> kfree()                  -> set_powered_sync()
 
-Thanks for your reply. I agree with what you said. If so, what is
-something I should or can do? I hope this commit can be approved,
-as the existing code is actually causing performance issues.
+That is, 'hci_cmd_sync_work()' makes an attempt to process a command
+from (partially) freed 'cmd_sync_work_list', which causes UAF detected
+by KASAN. Fix this by marking the closing device with HCI_CLOSING bit
+very early and rejecting new mgmt commands for such a device.
 
-Regards,
-Junho Lee
+Reported-by: syzbot+03d6270b6425df1605bf@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=03d6270b6425df1605bf
+Signed-off-by: Dmitry Antipov <dmantipov@yandex.ru>
+---
+ include/net/bluetooth/hci.h | 1 +
+ net/bluetooth/hci_core.c    | 4 ++++
+ net/bluetooth/hci_sock.c    | 5 +++++
+ 3 files changed, 10 insertions(+)
+
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index bab1e3d7452a..492723a22e68 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -345,6 +345,7 @@ enum {
+ 	HCI_UP,
+ 	HCI_INIT,
+ 	HCI_RUNNING,
++	HCI_CLOSING,
+ 
+ 	HCI_PSCAN,
+ 	HCI_ISCAN,
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 629c302f7407..95f55cfb6da6 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -501,12 +501,16 @@ int hci_dev_close(__u16 dev)
+ 		goto done;
+ 	}
+ 
++	set_bit(HCI_CLOSING, &hdev->flags);
++
+ 	cancel_work_sync(&hdev->power_on);
+ 	if (hci_dev_test_and_clear_flag(hdev, HCI_AUTO_OFF))
+ 		cancel_delayed_work(&hdev->power_off);
+ 
+ 	err = hci_dev_do_close(hdev);
+ 
++	if (unlikely(err))
++		clear_bit(HCI_CLOSING, &hdev->flags);
+ done:
+ 	hci_dev_put(hdev);
+ 	return err;
+diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
+index 2272e1849ebd..ff43718822d4 100644
+--- a/net/bluetooth/hci_sock.c
++++ b/net/bluetooth/hci_sock.c
+@@ -1671,6 +1671,11 @@ static int hci_mgmt_cmd(struct hci_mgmt_chan *chan, struct sock *sk,
+ 			goto done;
+ 		}
+ 
++		if (unlikely(test_bit(HCI_CLOSING, &hdev->flags))) {
++			err = -ENODEV;
++			goto done;
++		}
++
+ 		if (hci_dev_test_flag(hdev, HCI_SETUP) ||
+ 		    hci_dev_test_flag(hdev, HCI_CONFIG) ||
+ 		    hci_dev_test_flag(hdev, HCI_USER_CHANNEL)) {
+-- 
+2.46.2
+
