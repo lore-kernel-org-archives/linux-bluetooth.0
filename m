@@ -1,55 +1,57 @@
-Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
+Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2141A18BC16
-	for <linux-bluetooth@vger.kernel.org>; Mon,  7 Oct 2024 21:35:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0BB918C352
+	for <linux-bluetooth@vger.kernel.org>; Mon,  7 Oct 2024 21:35:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728336937; cv=none; b=krZwpmk6SSLBdR0awes9tIcCWCmAQIu3VZlqUynL3uLLckibkl4buKDZ5wfTYcCkHdgFamTHBO5PbINldj59OxnnGJO09cBYXg3oQGP7jV2z4m0bJyqKpYCsSbttdUiDRk5dyqw3u0WxtwwpUsBt788MqyVIyMPHpPBrePMH+80=
+	t=1728336938; cv=none; b=HF/QXVO4tlCJtceZ0Uv1Oec6eZKeDYlj/qUWDscT68WfgZ4zgGYnv4H2p2KImwEijyqcL3nJgdBvximbKOhHM1VA2f1PxQFig2mrNDQ3C6Izhl4rz+AKhG2ZA0KwpiItIN7fW2RPAf9aVpOi/qKr67dF4jnOuFn02ZvWbwYNCE8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728336937; c=relaxed/simple;
-	bh=Cj/g2VTG0C81FjDq7sBsvd4h8InwdCQJmL5VU9F0Z9Y=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=qZrdHYDAJLXS96REnn5yBqgiRWWV7Qgyo0FREOIk/ansp/qMAozNVpe5Tv7PyfjFh6jIUSjaBcELXsUj0QW4hm/vnL5gN1UjseONM68E8RuiX/jbfvw2aUox5k01jLuIuNf65OBBM4w61ncAJ/SkgVb0TYH+7hfYAYDBToCv8HM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=YsrItt43; arc=none smtp.client-ip=209.85.128.47
+	s=arc-20240116; t=1728336938; c=relaxed/simple;
+	bh=tF3+7/64K2pNMC2yMmqB0bNnDpkF/qc4QvYqWOU0LHs=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=PtoX51Og6tWWCqtwBFMuLL9y1vST/TPHBOFr92QZarhRFXb5T1f3RovlSdpoa/zcGPhotFy8SP5KECFrAT2Xj6CUMcaWGC+LoV9KpJf7JurO8AkDi9Zk1BrsQbMTp5NmodWel2u4aaZdAe6QCJk1x4COYb9PkC+MgsCKQspkoWQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=gBg2Fv9f; arc=none smtp.client-ip=209.85.128.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="YsrItt43"
-Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-42cb60aff1eso50782215e9.0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 07 Oct 2024 14:35:33 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="gBg2Fv9f"
+Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-42cb60aff1eso50782445e9.0
+        for <linux-bluetooth@vger.kernel.org>; Mon, 07 Oct 2024 14:35:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1728336932; x=1728941732; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=jrqMOPb+Ys+vm2FHKNfe83E/YEHFtEwX37/HgcffrLo=;
-        b=YsrItt43njWe4aw+ykZd/UEPseVGMOZjD0t3/bWccbWX/hc4Qb1wzL3A2/9nSjtQFu
-         90S7U5/c/lYwBLL/6koIGOTJynxk1S3kCOCM2vtPPsx3vzUCjU7AQBH/DfkFP5hoqHOA
-         vfB+/nBhtSB2AvFgE+R7rq6stUTeqVmW8lUDexWnnOnlv5RXwL1Ruox4UhQ5BBcAoqYw
-         bIQbNgqU5FLGJIAJYkABvf1R52isIKe0kT/Dqy0WHCW1EMDZoctcy1MlTApLozI8vUmU
-         CWXV/TtaKYugUxkU2Q3m68XgF+j1b+ZaDwLaxSH4lPrjRH5Z3epL28z8oBQyu/S4j742
-         wLCg==
+        d=cloudflare.com; s=google09082023; t=1728336935; x=1728941735; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=OvyWYlYW9NKrX6tjwjorxSh4AbupOomnLhmwVzPjUzY=;
+        b=gBg2Fv9fYDeUYC50Ah1y/IuP8inxo5A5v/KcTviaSFNvLolTTCWlM5HJB68gye0c1x
+         4jOFPRQZt8d2nO62/XgR9SnncQZlI0BeB3i21p956gRiGjtH1WqzdQAUxQbELVB4hEFe
+         R2DLs5mTUzHu5AqurfR9YPBACBECX8QQxLijrB01TMDPfd+NTqAarSO2HgvZKYuhXad8
+         9ynkNC6RyuAfZ/f6kwdqo6Nt3356JDixtuCwoDEbhGVBFygrSqjwwF0mWBT/5GeTf+yj
+         gm7CNQi7glWXVXe/xyJxp7luIyE4c796sbgJbL66eqqeYdfp2/aKFKucbbBPb8r/rE8S
+         686w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728336932; x=1728941732;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=jrqMOPb+Ys+vm2FHKNfe83E/YEHFtEwX37/HgcffrLo=;
-        b=HstK9xMGKKhRT+np9lxLIbKlWLFhf4L0K1jhrIbrJHN2SkW2hxpzEG0TAm+Boj3I/o
-         CJ8tvEi++64Rf78MPAjFAoJhLAfr0EB6f/EgPo/2yFJ9bRG3NHG0iQxiSkdDtZYlHORd
-         8JbqgPQX6wTy+XtcXRwTdoylnv7+51/A0DKOsFeaY+R3LSK83KdR/LAR/xJ0POcxJJd4
-         3TtmzypoHe6fNepfemitZ5TtpXBBufHO2uWlEEInTPh801Itim3mOy7Tak//1O8BjQ9Z
-         UeWx0EjQCWdGBO4fJH+BvdEYkpiW+cUNAhS+o0HdmTO1qCtnAm+4FPNKahZ/QGVDUHke
-         xBcQ==
-X-Forwarded-Encrypted: i=1; AJvYcCV4sz8fn0+3lywWcAaxQjeAVjeTrXFJpDGK1hdQmuSA1JMcnhJ4u+LYTqyDC1kC6c6C0lhimDkzK76ynGQSPAo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyEFnGUKhqrMWl1COs99t3NSlwCMzrLUHfQfDiuaZHuoLfhcceQ
-	rXsKu6oXnpxFCklL6WJ//pniBo2CHFTYErsBpERJCOUdvJhMOJOOZVjRvWSdU2g=
-X-Google-Smtp-Source: AGHT+IHlG2I62I2zeXAxqMGyHeNmGHzkATxTykamA43gyhtpvqM0nGUZ+C0M68aJb9FCrknBGd5udA==
-X-Received: by 2002:a05:600c:5804:b0:42c:b1ee:4b04 with SMTP id 5b1f17b1804b1-42f85ae918amr92954035e9.28.1728336932471;
-        Mon, 07 Oct 2024 14:35:32 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1728336935; x=1728941735;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=OvyWYlYW9NKrX6tjwjorxSh4AbupOomnLhmwVzPjUzY=;
+        b=WWIZVsch4drQAvHeoZjXd0SJMEZGcKXN/rpnIaNe7YVKWMy7KcafcuikuZ2tmiW3oh
+         cPe41UnKiXB323/AUPWxA+/6wAjEiRXMvygKtOVGjD0HRL/s4vcKqINXcOzy2IEJxE7S
+         pzj1oLhjh9tWIT0Zed5RgI8rDoC5rxpy1GVnrCaTUC/MgeG4UlL1PC49hFilRRwupKFN
+         ZEBk3ZWBCac3hagDQ9oU05f/917jjli2s1FS3KGshkVtLogMdnZ0/zWwEIrl9qEAMe1+
+         r1bV9EsZLBQFhcnAuQdNhao+8t0fOLOoroHW452giinUbNcoxodLH0jfPcNJVRx0hiO9
+         Nohw==
+X-Forwarded-Encrypted: i=1; AJvYcCVaokd30u5hhP9wOA4eu2lIe76ErKQ6+EHYxtUU3vTqFj96g8Ax+bIbjig+rNv980x+RMLJ0yH/PByjN5zm/+U=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw1IbCWfCnn1NcM+5AaMtwyljwWmawQBo/Sn3R1Tm6LWWkkEr0q
+	zCs53DJXjZpdzqHOb/gc5pSgZCvAVvyvq9oGy78bDmJVROFtGV5kfTYhK51JPks=
+X-Google-Smtp-Source: AGHT+IHLqNN1LAQf8g76woikHrigZw9N4TvlV2Fn4+zidESGtMa7IAByD8UA/IadWMwT9LMt7nSTnA==
+X-Received: by 2002:adf:f8d0:0:b0:374:c454:dbb3 with SMTP id ffacd0b85a97d-37d0eae49f1mr6186667f8f.55.1728336934922;
+        Mon, 07 Oct 2024 14:35:34 -0700 (PDT)
 Received: from localhost.localdomain ([104.28.192.66])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-37d1691a4absm6535887f8f.29.2024.10.07.14.35.30
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-37d1691a4absm6535887f8f.29.2024.10.07.14.35.32
         (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Mon, 07 Oct 2024 14:35:31 -0700 (PDT)
+        Mon, 07 Oct 2024 14:35:34 -0700 (PDT)
 From: Ignat Korchagin <ignat@cloudflare.com>
 To: "David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
@@ -73,11 +75,14 @@ To: "David S. Miller" <davem@davemloft.net>,
 Cc: kernel-team@cloudflare.com,
 	kuniyu@amazon.com,
 	alibuda@linux.alibaba.com,
-	Ignat Korchagin <ignat@cloudflare.com>
-Subject: [PATCH v2 0/8] do not leave dangling sk pointers in pf->create functions
-Date: Mon,  7 Oct 2024 22:34:54 +0100
-Message-Id: <20241007213502.28183-1-ignat@cloudflare.com>
+	Ignat Korchagin <ignat@cloudflare.com>,
+	stable@vger.kernel.org
+Subject: [PATCH v2 1/8] net: explicitly clear the sk pointer, when pf->create fails
+Date: Mon,  7 Oct 2024 22:34:55 +0100
+Message-Id: <20241007213502.28183-2-ignat@cloudflare.com>
 X-Mailer: git-send-email 2.39.5 (Apple Git-154)
+In-Reply-To: <20241007213502.28183-1-ignat@cloudflare.com>
+References: <20241007213502.28183-1-ignat@cloudflare.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -86,55 +91,66 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Some protocol family create() implementations have an error path after
-allocating the sk object and calling sock_init_data(). sock_init_data()
-attaches the allocated sk object to the sock object, provided by the
-caller.
+We have recently noticed the exact same KASAN splat as in commit
+6cd4a78d962b ("net: do not leave a dangling sk pointer, when socket
+creation fails"). The problem is that commit did not fully address the
+problem, as some pf->create implementations do not use sk_common_release
+in their error paths.
 
-If the create() implementation errors out after calling sock_init_data(),
-it releases the allocated sk object, but the caller ends up having a
-dangling sk pointer in its sock object on return. Subsequent manipulations
-on this sock object may try to access the sk pointer, because it is not
-NULL thus creating a use-after-free scenario.
+For example, we can use the same reproducer as in the above commit, but
+changing ping to arping. arping uses AF_PACKET socket and if packet_create
+fails, it will just sk_free the allocated sk object.
 
-While the first patch in the series should be enough to handle this
-scenario Eric Dumazet suggested that it would be a good idea to refactor
-the code for the af_packet implementation to avoid the error path, which
-leaves a dangling pointer, because it may be better for some tools like
-kmemleak. I went a bit further and tried to actually fix all the
-implementations, which could potentially leave a dangling sk pointer.
+While we could chase all the pf->create implementations and make sure they
+NULL the freed sk object on error from the socket, we can't guarantee
+future protocols will not make the same mistake.
 
-Changes in V2:
-  * reverted the change introduced in 6cd4a78d962b ("net: do not leave a
-    dangling sk pointer, when socket creation fails")
-  * added optional commits to all pf->create implementaions to clear the
-    sk pointer on error after sock_init_data()
+So it is easier to just explicitly NULL the sk pointer upon return from
+pf->create in __sock_create. We do know that pf->create always releases the
+allocated sk object on error, so if the pointer is not NULL, it is
+definitely dangling.
 
-Ignat Korchagin (8):
-  net: explicitly clear the sk pointer, when pf->create fails
-  af_packet: avoid erroring out after sock_init_data() in
-    packet_create()
-  Bluetooth: L2CAP: do not leave dangling sk pointer on error in
-    l2cap_sock_create()
-  Bluetooth: RFCOMM: avoid leaving dangling sk pointer in
-    rfcomm_sock_alloc()
-  net: af_can: do not leave a dangling sk pointer in can_create()
-  net: ieee802154: do not leave a dangling sk pointer in
-    ieee802154_create()
-  net: inet: do not leave a dangling sk pointer in inet_create()
-  inet6: do not leave a dangling sk pointer in inet6_create()
+Fixes: 6cd4a78d962b ("net: do not leave a dangling sk pointer, when socket creation fails")
+Signed-off-by: Ignat Korchagin <ignat@cloudflare.com>
+Cc: stable@vger.kernel.org
+---
+ net/core/sock.c | 3 ---
+ net/socket.c    | 7 ++++++-
+ 2 files changed, 6 insertions(+), 4 deletions(-)
 
- net/bluetooth/l2cap_sock.c  |  1 +
- net/bluetooth/rfcomm/sock.c | 10 +++++-----
- net/can/af_can.c            |  1 +
- net/core/sock.c             |  3 ---
- net/ieee802154/socket.c     | 12 +++++++-----
- net/ipv4/af_inet.c          | 22 ++++++++++------------
- net/ipv6/af_inet6.c         | 22 ++++++++++------------
- net/packet/af_packet.c      | 12 ++++++------
- net/socket.c                |  7 ++++++-
- 9 files changed, 46 insertions(+), 44 deletions(-)
-
+diff --git a/net/core/sock.c b/net/core/sock.c
+index 039be95c40cf..e6e04081949c 100644
+--- a/net/core/sock.c
++++ b/net/core/sock.c
+@@ -3819,9 +3819,6 @@ void sk_common_release(struct sock *sk)
+ 
+ 	sk->sk_prot->unhash(sk);
+ 
+-	if (sk->sk_socket)
+-		sk->sk_socket->sk = NULL;
+-
+ 	/*
+ 	 * In this point socket cannot receive new packets, but it is possible
+ 	 * that some packets are in flight because some CPU runs receiver and
+diff --git a/net/socket.c b/net/socket.c
+index 601ad74930ef..042451f01c65 100644
+--- a/net/socket.c
++++ b/net/socket.c
+@@ -1574,8 +1574,13 @@ int __sock_create(struct net *net, int family, int type, int protocol,
+ 	rcu_read_unlock();
+ 
+ 	err = pf->create(net, sock, protocol, kern);
+-	if (err < 0)
++	if (err < 0) {
++		/* ->create should release the allocated sock->sk object on error
++		 * but it may leave the dangling pointer
++		 */
++		sock->sk = NULL;
+ 		goto out_module_put;
++	}
+ 
+ 	/*
+ 	 * Now to bump the refcnt of the [loadable] module that owns this
 -- 
 2.39.5
 
