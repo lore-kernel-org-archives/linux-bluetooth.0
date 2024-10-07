@@ -1,110 +1,146 @@
-Received: from smtp-fw-52003.amazon.com (smtp-fw-52003.amazon.com [52.119.213.152])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f182.google.com (mail-yb1-f182.google.com [209.85.219.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E33A74C08;
-	Mon,  7 Oct 2024 21:57:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.152
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF4F774C08
+	for <linux-bluetooth@vger.kernel.org>; Mon,  7 Oct 2024 22:09:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728338274; cv=none; b=MdJm1acYzyHVjUGJylc0rMHMVBM7pk2KiwViFG3GHJdX3SbM9aMN7o6TbhtdWV++cUtGkPp4ekFyC353q/i30Gb6ek/3nxnZoSDWZHvF703xKd+kfGPBWbFOcFAwYfcuKw69L6UOvHFmO7jgWPlf3RWC0mYLNoRRBvEJVLCNP0E=
+	t=1728338943; cv=none; b=VtpLQECqFP4ct2ym7Q2TuadzgsJ99D7jk2bAnLaVZRlBkASKzTXp0YCw1D0yuJtRg7rYMviPWhEswyr8mgG3qQnSbkjGCoz/MLytdWWUb/eJotNAEe9pU2WtMkkubbWwgkUI/MDikmjcUrUpO2zIWmOl0T6w/GDGwqPIc2lPzis=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728338274; c=relaxed/simple;
-	bh=yO83BjF/EhIdb6aTjF7BPHgAouFqqASxCf24Qe5GbGU=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=KmecxqxFW5emA63r9YBBqFwBIhzKQsKdRqv1CI2Py8IigVjhiznPoHRNI9MNSEuxarClyod2IZKmdkKQ1SIyvDhDeYfNRmbWIza9lyTKKLscBNDdoYHV5rU8ugD00hNX2dvf9ipbMlr/GfTwnnmLht0b5N/hMRlnUjg5jPS0HTE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=kYPRDpNf; arc=none smtp.client-ip=52.119.213.152
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+	s=arc-20240116; t=1728338943; c=relaxed/simple;
+	bh=CqX9Y0dEmHgiIN61I3/zW08Bfod5n7pFQiGUVIMbBVk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=OhUYZStspElbdk+F+BjJmLgzvaHgqylskEWiDAc8uBinDQkaJKi+QEDjkLW3Co9X4+JDHC2XQwPV1TFdy43oh73SMaPY24BZZGJAbSaIRB1sbBRdI1zIMlESLb+8Bx9LLPcpn6tYTo6NLQ5Oof5Ecu9YoT3HMxPyfn/CFDPdRYU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=f42ekjaj; arc=none smtp.client-ip=209.85.219.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="kYPRDpNf"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="f42ekjaj"
+Received: by mail-yb1-f182.google.com with SMTP id 3f1490d57ef6-e28e6a1b11eso706180276.0
+        for <linux-bluetooth@vger.kernel.org>; Mon, 07 Oct 2024 15:09:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1728338273; x=1759874273;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=k/7b6auwZDyRxDUdfhnW2bApj7G/ZohOfXk40geD9XI=;
-  b=kYPRDpNf2rPaqk6p6xKvRnkw7juaodWEMO94V8lxy9Wy+US0uHFDbmww
-   dHRRO38siQyA1mwSOJcRroMwyCge3VFd5d/BJMnVffTtiypVyOxD3lWwO
-   22gNQqnMHmDwhRVmrwqqt7a+t2U+zrRLC/PMnogWoBw4a19Xva0CzsfwO
-   o=;
-X-IronPort-AV: E=Sophos;i="6.11,185,1725321600"; 
-   d="scan'208";a="31343091"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-52003.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Oct 2024 21:57:48 +0000
-Received: from EX19MTAUWA001.ant.amazon.com [10.0.38.20:62342]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.41.198:2525] with esmtp (Farcaster)
- id d363b916-a870-437d-8fb0-40975da680ee; Mon, 7 Oct 2024 21:57:47 +0000 (UTC)
-X-Farcaster-Flow-ID: d363b916-a870-437d-8fb0-40975da680ee
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWA001.ant.amazon.com (10.250.64.218) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Mon, 7 Oct 2024 21:57:46 +0000
-Received: from 88665a182662.ant.amazon.com (10.119.221.239) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
- Mon, 7 Oct 2024 21:57:42 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <ignat@cloudflare.com>
-CC: <alex.aring@gmail.com>, <alibuda@linux.alibaba.com>,
-	<davem@davemloft.net>, <dsahern@kernel.org>, <edumazet@google.com>,
-	<johan.hedberg@gmail.com>, <kernel-team@cloudflare.com>, <kuba@kernel.org>,
-	<kuniyu@amazon.com>, <linux-bluetooth@vger.kernel.org>,
-	<linux-can@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<linux-wpan@vger.kernel.org>, <luiz.dentz@gmail.com>, <marcel@holtmann.org>,
-	<miquel.raynal@bootlin.com>, <mkl@pengutronix.de>, <netdev@vger.kernel.org>,
-	<pabeni@redhat.com>, <socketcan@hartkopp.net>, <stefan@datenfreihafen.org>,
-	<willemdebruijn.kernel@gmail.com>
-Subject: Re: [PATCH v2 0/8] do not leave dangling sk pointers in pf->create functions
-Date: Mon, 7 Oct 2024 14:57:34 -0700
-Message-ID: <20241007215734.72373-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20241007213502.28183-1-ignat@cloudflare.com>
-References: <20241007213502.28183-1-ignat@cloudflare.com>
+        d=linaro.org; s=google; t=1728338941; x=1728943741; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=CqX9Y0dEmHgiIN61I3/zW08Bfod5n7pFQiGUVIMbBVk=;
+        b=f42ekjajbfDK67ZKARCmr941NjbWO+zYjmvxMyp4Fy4kuKtSrf2iKVgUnqsi4Pq/C8
+         ipLnwDdGgIhMpbV6MbaWihNRjelX2+woJYoIbLTf7wbD0Bhx61DhylVJNKfm5EKD+bxx
+         t76f21S9sdP2+Srx/IKijDY7UfyJgxLwnqWIBzkYi0Sb+DT3hOoxoIAQVRQPbOB/qV3q
+         Adu2DK2XKllz6BnqNBICrcVCCtOrLKrRgH/K3/H9o6de1RgHgyfio5vJeL9oVtyZ5KBH
+         JuVFWDW0N8Y7ot5/Mgf88aiwlINp0hKoeKv2zWBPzzQeNqT2AoyY/oKF9WuxmYryhJzP
+         QjeQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728338941; x=1728943741;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=CqX9Y0dEmHgiIN61I3/zW08Bfod5n7pFQiGUVIMbBVk=;
+        b=UfOM212qbik8O+CcM+Ggwab21F4J9+2xzVD0XCVDoC1wuAb/YTKhtmOpFsfkWi9aDQ
+         ZlkcvzYJGPS/xsvxsDVKrDjQYDgCrojTyo7+ORwEtI5ac9Qm/jEf8vjmB6rknvclPUfD
+         CnAgbxd+QSpQ5VirLbLOe5tMV2xtEe/XeWUUAWtxQvr7lBZzV+FJ3+sFGfvWZ0N8YifU
+         h7x0HsISg+Yv3ff1Ns+DXC0cbnauy/3EtEw65YKy/FIdNmIDrn608gzZ0QZ42ZjIEw08
+         vYchxV/IGxCnw5gWaTybZgYGkvtcpti+3iGy3jAE0PG4s0c96GvHdosvQss5OHjVFhi5
+         Zxxg==
+X-Forwarded-Encrypted: i=1; AJvYcCUgUk1CMF2XuGWnEFc7Z69PkRdjfD1qFANq7LRURS2ddBwdpcmeLEx9A89x5KPvORTa8f/GlzSFfW7nzlgRasQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxSkDtz49meKSPNEhiwGAb6CZBIjc8OUCFiFLjqq/OXeY0xZalv
+	VJbmCsTBPW2JbDQKrTqYKDI/+Kq8Y2mQH2PQGXTjhtCM6l9pZloni64JccgOfdK5NCXkozRbt6B
+	MF0Pz6lqa+H75dej+Em9doZkWC4DZFxLrTAxKkA==
+X-Google-Smtp-Source: AGHT+IE2nJVabbXdwibt1H0pVBms5dYTsG8RkBKKAzfdsgMhYsZ8VyWIk7HanuWHiQPQxXFBk2ezA08qlljJFN0QQR4=
+X-Received: by 2002:a05:6902:848:b0:e28:edbd:765f with SMTP id
+ 3f1490d57ef6-e28edbd7f75mr206026276.2.1728338940867; Mon, 07 Oct 2024
+ 15:09:00 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D036UWB002.ant.amazon.com (10.13.139.139) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+References: <20241004094101.113349-1-sakari.ailus@linux.intel.com>
+ <CAPDyKFp0N6UJhnHS164Tdf=xkWB0jzq65L9TdvYazeBQ-6WjeQ@mail.gmail.com> <20241007184924.GH14766@pendragon.ideasonboard.com>
+In-Reply-To: <20241007184924.GH14766@pendragon.ideasonboard.com>
+From: Ulf Hansson <ulf.hansson@linaro.org>
+Date: Tue, 8 Oct 2024 00:08:24 +0200
+Message-ID: <CAPDyKFpQVnF7eQv3dup8k-3EijnMjuveCG9sZ=Rpey1Y6MBJEg@mail.gmail.com>
+Subject: Re: [PATCH 00/51] treewide: Switch to __pm_runtime_put_autosuspend()
+To: Laurent Pinchart <laurent.pinchart@ideasonboard.com>
+Cc: Sakari Ailus <sakari.ailus@linux.intel.com>, dri-devel@lists.freedesktop.org, 
+	linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org, 
+	linux-clk@vger.kernel.org, linux-crypto@vger.kernel.org, 
+	dmaengine@vger.kernel.org, linux-gpio@vger.kernel.org, 
+	amd-gfx@lists.freedesktop.org, nouveau@lists.freedesktop.org, 
+	linux-stm32@st-md-mailman.stormreply.com, 
+	linux-arm-kernel@lists.infradead.org, linux-i2c@vger.kernel.org, 
+	linux-i3c@lists.infradead.org, linux-iio@vger.kernel.org, 
+	linux-input@vger.kernel.org, patches@opensource.cirrus.com, 
+	iommu@lists.linux.dev, imx@lists.linux.dev, 
+	linux-mediatek@lists.infradead.org, linux-media@vger.kernel.org, 
+	linux-mmc@vger.kernel.org, linux-mtd@lists.infradead.org, 
+	netdev@vger.kernel.org, linux-wireless@vger.kernel.org, 
+	linux-pci@vger.kernel.org, linux-phy@lists.infradead.org, 
+	linux-pwm@vger.kernel.org, linux-remoteproc@vger.kernel.org, 
+	linux-sound@vger.kernel.org, linux-spi@vger.kernel.org, 
+	linux-staging@lists.linux.dev, linux-usb@vger.kernel.org, 
+	linux-serial@vger.kernel.org, greybus-dev@lists.linaro.org, 
+	asahi@lists.linux.dev, rafael@kernel.org, 
+	Andy Shevchenko <andy.shevchenko@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 
-> [PATCH v2 0/8] do not leave dangling sk pointers in pf->create functions
+On Mon, 7 Oct 2024 at 20:49, Laurent Pinchart
+<laurent.pinchart@ideasonboard.com> wrote:
+>
+> Hi Ulf,
+>
+> On Fri, Oct 04, 2024 at 04:38:36PM +0200, Ulf Hansson wrote:
+> > On Fri, 4 Oct 2024 at 11:41, Sakari Ailus <sakari.ailus@linux.intel.com> wrote:
+> > >
+> > > Hello everyone,
+> > >
+> > > This set will switch the users of pm_runtime_put_autosuspend() to
+> > > __pm_runtime_put_autosuspend() while the former will soon be re-purposed
+> > > to include a call to pm_runtime_mark_last_busy(). The two are almost
+> > > always used together, apart from bugs which are likely common. Going
+> > > forward, most new users should be using pm_runtime_put_autosuspend().
+> > >
+> > > Once this conversion is done and pm_runtime_put_autosuspend() re-purposed,
+> > > I'll post another set to merge the calls to __pm_runtime_put_autosuspend()
+> > > and pm_runtime_mark_last_busy().
+> >
+> > That sounds like it could cause a lot of churns.
+> >
+> > Why not add a new helper function that does the
+> > pm_runtime_put_autosuspend() and the pm_runtime_mark_last_busy()
+> > things? Then we can start moving users over to this new interface,
+> > rather than having this intermediate step?
+>
+> I think the API would be nicer if we used the shortest and simplest
+> function names for the most common use cases. Following
+> pm_runtime_put_autosuspend() with pm_runtime_mark_last_busy() is that
+> most common use case. That's why I like Sakari's approach of repurposing
+> pm_runtime_put_autosuspend(), and introducing
+> __pm_runtime_put_autosuspend() for the odd cases where
+> pm_runtime_mark_last_busy() shouldn't be called.
 
-For the future patches, please specify the target tree, net or net-next.
+Okay, so the reason for this approach is because we couldn't find a
+short and descriptive name that could be used in favor of
+pm_runtime_put_autosuspend(). Let me throw some ideas at it and maybe
+you like it - or not. :-)
 
+I don't know what options you guys discussed, but to me the entire
+"autosuspend"-suffix isn't really that necessary in my opinion. There
+are more ways than calling pm_runtime_put_autosuspend() that triggers
+us to use the RPM_AUTO flag for rpm_suspend(). For example, just
+calling pm_runtime_put() has the similar effect.
 
-From: Ignat Korchagin <ignat@cloudflare.com>
-Date: Mon,  7 Oct 2024 22:34:54 +0100
-> Some protocol family create() implementations have an error path after
-> allocating the sk object and calling sock_init_data(). sock_init_data()
-> attaches the allocated sk object to the sock object, provided by the
-> caller.
-> 
-> If the create() implementation errors out after calling sock_init_data(),
-> it releases the allocated sk object, but the caller ends up having a
-> dangling sk pointer in its sock object on return. Subsequent manipulations
-> on this sock object may try to access the sk pointer, because it is not
-> NULL thus creating a use-after-free scenario.
-> 
-> While the first patch in the series should be enough to handle this
-> scenario Eric Dumazet suggested that it would be a good idea to refactor
-> the code for the af_packet implementation to avoid the error path, which
-> leaves a dangling pointer, because it may be better for some tools like
-> kmemleak. I went a bit further and tried to actually fix all the
-> implementations, which could potentially leave a dangling sk pointer.
+Moreover, it's similar for pm_runtime_mark_last_busy(), it's called
+during rpm_resume() too, for example. So why bother about having
+"mark_last_busy" in the new name too.
 
-I feel patch 2-8 are net-next materials as the first patch is enough
-to fix the issue.
+That said, my suggestion is simply "pm_runtime_put_suspend".
 
-Also, once all protocols have moved sock_init_data() after the last
-failure point, we can change the patch 1's part to
+If you don't like it, I will certainly not object to your current
+approach, even if I think it leads to unnecessary churns.
 
-	err = pf->create(net, sock, protocol, kern);
-	if (err) {
-		DEBUG_NET_WARN_ON_ONCE(sock->sk);
-		goto out_module_put;
-	}
+[...]
 
-for the future protocols.
+Kind regards
+Uffe
