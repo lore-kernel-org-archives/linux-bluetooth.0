@@ -1,45 +1,46 @@
 Received: from AS8PR04CU009.outbound.protection.outlook.com (mail-westeuropeazon11011009.outbound.protection.outlook.com [52.101.70.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 929FB1D3586;
-	Mon,  7 Oct 2024 13:12:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B072F1D3621;
+	Mon,  7 Oct 2024 13:12:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.70.9
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728306741; cv=fail; b=U3lhzN8olTfubDOUif4W+0FOLJJDblu2urTa299r7XhrcdtHnVGXvOkjzuoSpAx4tAcaLxtQQaMvmnI1LKCNVrATWWSlhqoxgyhGf2Gbm0d1h0R0+GWdIJeNGCr8s29L80qFQd48qoshF8NKsWliKrMebbLpefcWhIHAbIme+Bw=
+	t=1728306743; cv=fail; b=IOX6qA3xJs/hyO3uWMJhhX73ng3380otPPxyH4fhJ71bPvXOs0UF5Ah05FKWtZrC3BrPh6Lu+X9NBRaWG6rOVCL6sc7zjcWGFU3dmgZN8qQiJA8BMFrFpDEyksPPT2CRQJUYvTcAJ56QWTiX6u2lEmfUwgW/2xgjKrAzTgZy4Cs=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728306741; c=relaxed/simple;
-	bh=AbADff0WuzI8qiEOAjSlKjIgfjoBiz8i5whiFpKxFCQ=;
-	h=From:To:Cc:Subject:Date:Message-Id:Content-Type:MIME-Version; b=k9gb3gak0sCnpAr2zPfh3aPB/me/i6xVLk/nXDpub9c06yxWzOWgC8y/KtkM3yJxHsD16UeneZq4GPPaws7e0APZuidw8ZF6J5ww6QyKL3R2lEYe8MZmEAJWgaekXC4VW3ZqwkOO9oaaUSaA1T11+MYFNiePU0696g/Y3u8n6+g=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=M6irg5EJ; arc=fail smtp.client-ip=52.101.70.9
+	s=arc-20240116; t=1728306743; c=relaxed/simple;
+	bh=R6sNBlJudpvV20qC6/tPL/SM9V/5GIi/PFwJWCWcSjQ=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=SKrWEoSd6ZAcB2WsQ0/Z/8iS+R/zKuxyX8Le/A0ahKcAqgzIk7//Yq0AVcdVzPMA2UPN5FphQCSDSpSAOC4hfQ+OtbBRwaYxmy8vOfNmBKtKKjWisOSXWdGFHfw5LieMPmwNlYzaD2sAXoPeeraKUUo4RUkojM5pdzxO5oR3m3M=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=A2Kcdqjn; arc=fail smtp.client-ip=52.101.70.9
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="M6irg5EJ"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="A2Kcdqjn"
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=N6G1W0phOi8AkBqipXXUYJPSYFrxfNDmf+qpImXIcHoiV8t5WfpDNJjXtrUJU3+rgrblNlbqlJDTOqtOdCo8yUqgy3Brx/yIQcaRn9xT2lBSwJ74eWaZo5Q9vZ+lqHezvfzde+loI6V4q/Bjdat5IDARmiJKHE16ndS1MGIMxkvJQXCTZMhH29jrjCJkdZqdrVpUTt+7+GZHJbaIBdvIJ/E+Qwg/ajvTfG27dOZisEYPrLDXpQFZhXT4gxJ7P+1vvccI/8PzmwMsitZgfC4ypejr0NYTQ5Wv3SpmymVvql52IMJ6iN767lR5JMFNvEHItaKN2rb1a8VLi6nS9qiruA==
+ b=KLfjRGpiQ1z/1VcuxErEBt9wGm/KEZOYQePO94M6uOrFEEPH/4GgeP24O7O1j0WOjqcfVI9CSEaCkur0MkvMZDkE+ZVfH7wWwNpdRkovvI0UxWn+aCFd1otv9BqwPzTFjEO83+t8dWONz+/UQmadezz/HXf+Lt50rZrKdDGwVn1mHgLAYCcJ/f8wd53YsxDMxqbvwQUhRTxjLhis3EhLj8coFC72u5d+Wq0OzNEDiYPEihF8nqEZMYM1g/szctuASCwXxyG5ZqenPFuZ5bFjA8dwPLca3IgN8lPHx6wbwcoSgLmCtULmFZwaTbppgywDB8pGex8OQGHW55Nu+/nV7A==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=fscn+LlJB3G9Ni/ragW15/byPX5JPkpf8d/ugCTFEUI=;
- b=q6WsBU0LOMh60KIlTtP4V+CM/pqR9JiXxMpEEPoJygr2vTAY01VlNDT94epbal+gKn4B6NdYaUomjEDjXeL/APOMYmBiP2nlPZgttdUb9fDT/SLXvjAwyU346dBaphQQtbwp7LBIc2iA5MYQIX9NNpe98oqir6ZLAlzLi2DDyqBqiU04D4NpIvL3aGtCtRrm6HRQysUZMJWJeU7gTbuG6IJkIhpqEUSOPEcQCrQf+F2XrcUxOXl0X+Z8VF5KFGpkz+CKmf2BBbCgcE8VwJ9LjbItcERiDZYOynp+9vC2T5+H0peOrs60wGmCFCrms7vtXgstxpXItKDD+qeWKzI9Ig==
+ bh=L6ohec0CYSFqkDPt1MNpQwKYdTxT10eBLWFOYN1ARcc=;
+ b=qKA+x2NZ2HQ13r/kowmmN3Wev35f/vN12pY27fAPpeIYIY/xaPt+QYSyf7JQhvl5dOrlJPzuwjxZ7Gv1DnT/SLMZcNriRB64uWv1nZ4GBtmmgG2wqLFI4QJA0spqpTyD3P9TKnbL3LdVlmU6V9HwejHfJUfhrJfhf9D6Yuj5nyWlOtsBWiS5QZPwzBTJb1uyUvKLLh0wYAu6/5Le6usGaiLtXfcMfc/s8ulMRlkxs/Ywbzxd7umg/ro2OLSXODqAC6+Oa8Hw20XQ2b3bM/2OX7laC9NIUuxMjFhS63399yn7A41Uu7RT5TfZqNQyvoE3X7gOv/M8UgLLNojIAHn9rA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
  header.d=nxp.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=fscn+LlJB3G9Ni/ragW15/byPX5JPkpf8d/ugCTFEUI=;
- b=M6irg5EJStQVJrC6jy0VZf/YBZoTf2j8QONFj1C51XKbYkgVTTw9tb4fUPjDlX6kP6MvB0xbKzupZB+aEvWinMZT0KHdZJ3+yvpMo4Y2HAqRnXxqOlKJWPZnSElyqwOftWAKaHbsnxuG3xDY2J/K+hC2bWIxceKc2kda9Cy15xlpZNctUf/YZcg+7XG4ja7puTwqvNX/hPjzp0JTIO4b5VhJH96pOCyb096toVgjPvIGe630tRN5FkWDuE1j6StFGzXJ5+H3d6YqJ+ST/+GaY/Uv2tWosOx4O7noz8RYQ2lu0K/BszHrf7PMCLIwYN72GeMxzy7o+6/99Fxicd+E2A==
+ bh=L6ohec0CYSFqkDPt1MNpQwKYdTxT10eBLWFOYN1ARcc=;
+ b=A2KcdqjnCMUlCtYhSYna5ludvMx4WVJRE7vCk1E9d7rQ37E0V8G6LGjBs3Tg/HikDm9Sxa9PhLni6Xh7nUXywUykwY2+SMWWRmxeU9lV3vgYr4s9iUAuW15Lmf3EIW1l+6V3zojKvXS1U1zuLxWcQWR7+AoFG4vfZSXDXwJHHarpFYyx7xdv0xi3nf2BOAkakWUcT6sdCwbX/Y+xBBNH8vr4/+k8Ixrnl41FX7qpnpX5+3iatNOPPfVUlA5yWGcwU5fZ2aHRAHDAt9LshWaBdFUIxnTfefYl9XYBK2jlQN2DnpvcQ+9dsGTihgU3z8PognY5VxD4CuNAkpy3W1KDNw==
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=nxp.com;
 Received: from AS4PR04MB9692.eurprd04.prod.outlook.com (2603:10a6:20b:4fe::20)
  by PA1PR04MB11036.eurprd04.prod.outlook.com (2603:10a6:102:48b::8) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8026.22; Mon, 7 Oct
- 2024 13:12:13 +0000
+ 2024 13:12:17 +0000
 Received: from AS4PR04MB9692.eurprd04.prod.outlook.com
  ([fe80::a2bf:4199:6415:f299]) by AS4PR04MB9692.eurprd04.prod.outlook.com
  ([fe80::a2bf:4199:6415:f299%5]) with mapi id 15.20.8026.020; Mon, 7 Oct 2024
- 13:12:13 +0000
+ 13:12:17 +0000
 From: Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>
 To: marcel@holtmann.org,
 	luiz.dentz@gmail.com,
@@ -56,10 +57,12 @@ Cc: linux-bluetooth@vger.kernel.org,
 	ziniu.wang_1@nxp.com,
 	haibo.chen@nxp.com,
 	LnxRevLi@nxp.com
-Subject: [PATCH v4 0/2] Bluetooth: btnxpuart: Add GPIO mechanism to
-Date: Mon,  7 Oct 2024 18:43:14 +0530
-Message-Id: <20241007131316.626690-1-neeraj.sanjaykale@nxp.com>
+Subject: [PATCH v4 1/2] dt-bindings: net: bluetooth: nxp: Add support for power save feature using GPIO
+Date: Mon,  7 Oct 2024 18:43:15 +0530
+Message-Id: <20241007131316.626690-2-neeraj.sanjaykale@nxp.com>
 X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20241007131316.626690-1-neeraj.sanjaykale@nxp.com>
+References: <20241007131316.626690-1-neeraj.sanjaykale@nxp.com>
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
 X-ClientProxiedBy: SI1PR02CA0017.apcprd02.prod.outlook.com
@@ -73,106 +76,125 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: AS4PR04MB9692:EE_|PA1PR04MB11036:EE_
-X-MS-Office365-Filtering-Correlation-Id: 9eb78560-3798-4382-4a93-08dce6d1a8ac
+X-MS-Office365-Filtering-Correlation-Id: 88696622-3aef-4542-2668-08dce6d1ab50
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
 	BCL:0;ARA:13230040|366016|376014|52116014|1800799024|38350700014;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?OSV+ylgdiWK6HBeNA1jMjg7GLMIt9Po5md2SpoF4Nh7096WcpLx7w8b5yM7g?=
- =?us-ascii?Q?RMnZq5Pz6lqpCJ1aM5uwCL08dGtq/FhTznYebgbXJGuLTx2tQ/tmx7iju74K?=
- =?us-ascii?Q?jfptTnExq27LBRtTjscwgxIz4Xq8aV0YTKhQIDg0lloyftj5k7tOFP1OzyrZ?=
- =?us-ascii?Q?jZ+4tPO7oP7OoOqXIwbtAAaqSZurpXqZYOTZpAv2Y12vWlSNklnKPZmHSrg7?=
- =?us-ascii?Q?DxCPKZU9TVugkvLOkq03mgV9BcktjUAyQVvr8lE9ca5fY7go8khJyZFVFYV0?=
- =?us-ascii?Q?HkNu11tpuFu399ECAgZE+ra5tXTGQ89uRs1kRHgiMJUztecGTsYmfZ93vjCk?=
- =?us-ascii?Q?8MVl4ad4TWXJqNd86Dppi0qE4c1SsW5YVYGY6XLs4vFW5eQocHQ7Z2Y+yjgS?=
- =?us-ascii?Q?9XQH1VHlHJmvMvCa/Pa1906cDN12kdQplHF8yJKvrwGhA73iljbMopiE7kO7?=
- =?us-ascii?Q?TipKy2v89CCmtCsulwZhylavIsQCodp16D+DtdrTvbJ6kDhxedUpb7nbUwuj?=
- =?us-ascii?Q?DpCnRb18I52WrlJGKIfWF8WjrGXXiHqH89G56Sf8ChkClRInkOlfJVpO7nnw?=
- =?us-ascii?Q?E0Ih7YwK1GngP/qssGJINXi9yS1B1a8WPktPk0+0VMb0cpWNOz62RUceh7Qb?=
- =?us-ascii?Q?NO1ppLAU++2YQBuwY/hX1Nv+SdBzhJXJ34r2Gmdol9DxWyVlj6ipvxTtVVOK?=
- =?us-ascii?Q?pKz3Kp5nFH/5Yzx8ck7tlxQqY6GHMofHRqdHA74kgD3tdqlYM3m+ID0tM5/f?=
- =?us-ascii?Q?iqvpWwyr9XyuroguwpoK7UmBq1pQFsbuJDPPuIFjH28i8FmKeg5L4WTw7tLB?=
- =?us-ascii?Q?v4PSc0VrtOaQUFZi+GR5ZQCma1LSwJ9SHmPNkVn7zEpEu2ddsKdNtqjydKSR?=
- =?us-ascii?Q?CJw3S9XUcGBiCCIlDMhqPoZJGuzV7LzNPLEYQmiWaGOp9hB+ToHkS06M34Xw?=
- =?us-ascii?Q?QxdnHP/ZPdYSdP95d4QdhV83EjhrLHebPJq67UajJoYzvqLvcWXTTMXwgI6f?=
- =?us-ascii?Q?BuFPY+pVKXQS7x8jwvIjjr17VnwecKQUG22wwWZNAYhVIjYybnvAWa3CfPAl?=
- =?us-ascii?Q?aPmYYY9+JEMkPh1mT3sS5AhtbtV+x4l8UBjMj8ivo1PiyRcBJ/+bDeggADst?=
- =?us-ascii?Q?Xgn4f6sJ71x5mHwgWXVO/cSWPPb6VZl13FOaN/g+6EHAg/26CkSs8exmnwmH?=
- =?us-ascii?Q?kPh9zHt/aCcDWzyZBQt8iuWo8MnQ4B5ROcNl/pxaVPeJ52LKujVJyp2vvrUW?=
- =?us-ascii?Q?CNNq/gZCkhcgxMqvHg/0we7EP5SwbOH5ScZN/rZjVIUUrihxABUv1oCuDJiX?=
- =?us-ascii?Q?Z+Wi2zKmHaVKAEVIB/SD9deBedbl5eos+FhELahVJ3SnAw=3D=3D?=
+	=?us-ascii?Q?ZX/Ju3EtFggQzei3cIp8bdW/EE6bLnl0I9sF6lHIvN94J6p/ToiBurxjbndM?=
+ =?us-ascii?Q?yUHChBg6erHq1p/RGjkvEyH46QSvlR+j31+qqLI6EPdheQR0DOaPjtXZ91Sl?=
+ =?us-ascii?Q?xSHB2M7JgGt05RFkTwqpW+EITs8eg1frwuqqvN2jWidhXLvohwQnxRKXktuH?=
+ =?us-ascii?Q?Kf2RQwEFE2W3782vCKTNSwAgXZYsMgl24jYMk3xIX6cUa/qSoHOtzCAbsMgR?=
+ =?us-ascii?Q?4qe1ONpS7GxS5Mx/4yNx+B5gCyySSuRrXRZSAJoCLOFfPoERNAHdeuflUi4l?=
+ =?us-ascii?Q?i/QT3y7vzdcuwngt6no6dNocAZxTxF59VhVN90ZGtxOUJzt6LR66avUDZ0El?=
+ =?us-ascii?Q?ZpwyuJrgU1/qZKNmaOyr9EZp8R9Ad6whOftSOGRBuhBYRdPkC4/UbJ3y3xFq?=
+ =?us-ascii?Q?uC/lvE/oJJslzIc1hPKmEK/mp2NuA5txyvMDCI0Lbr7lL1uTqQhu5cEFMarM?=
+ =?us-ascii?Q?nTy6Sq1foyNjmPkA5soDX5PRIEZfmyRF2CaNoQyaXmfJXH9nQCW+jiw5R6PY?=
+ =?us-ascii?Q?dxSMdLOxej7qfowbkFEc4bSjUOfltgs3sWwSsvvRSS7jZL2bUeSYal09Bay/?=
+ =?us-ascii?Q?klkDeTUkp4bb3vxQTseyLUePpSTHd0StqJS7c/EpkpC63ncf2geARAT6UZFZ?=
+ =?us-ascii?Q?1cvUm/Jw3LeEthg0itQKK/W+YViLXq7wsZrWsfpzlAJYhmq1yXRIsbvZz/nT?=
+ =?us-ascii?Q?86yFIJGl2lBSX9e5t687RJERqNvwtCtYPzR4bKbqZjVVOH4AM/VxxHccu77v?=
+ =?us-ascii?Q?R5AVx0VO8XI32k4riMH/kak9sQdesklW6SqDt5zGZBvYzq9JU9Db7+QoVYNR?=
+ =?us-ascii?Q?JOTAeBQpl4YINekQUREuqHquKknfSXWSIztwjIwCgRfSJSvvx/U35aVI8Svq?=
+ =?us-ascii?Q?eK7SkmsTX5rOLAfg2v9h7gVM2t0OV7TgDmTYGN88janEP21pw9u8yYf/wVln?=
+ =?us-ascii?Q?Iy37935bo3cCYrkpr1CgsokbcC5COrxAjI1Sr53bjVZGpY/ISXUXtlvXqeef?=
+ =?us-ascii?Q?xBpnUkQp5te6LjNuLMzQedg632Ti+rGVhzRiH4HN8ombDbGOAJEhL95IU8fC?=
+ =?us-ascii?Q?uEANrYu6h+z58v/4WMTa+R8fD4YK0kEj58blhHZaXjgRh5hZWK1J2Z7+GArr?=
+ =?us-ascii?Q?9SNVBohpXrtIAZinl7ah1xyeKoJbwyNejBjoLlO/RQcz3YTqjdQBGOq1tztS?=
+ =?us-ascii?Q?Mgf+1hOzxpFLYXkddqypzMzZjj6Hz1A9MdaueQP6Zcwvy11qmUxUdcSPWIX9?=
+ =?us-ascii?Q?hk+YnFkAybKv39Arbp089Phc+2HR06EQvzBrPCcYSWd8+4R5DuT/A9txHwPi?=
+ =?us-ascii?Q?xRUorRI0ng+2V71c3NP5P1nEFoRtivPVqnl45wk6itsiWw=3D=3D?=
 X-Forefront-Antispam-Report:
 	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AS4PR04MB9692.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(52116014)(1800799024)(38350700014);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?z1wrkPAka6ItamIFo2D94YBYecY0Eyslo9sfQ2UPV9iTAweNHzuvph5RhT7g?=
- =?us-ascii?Q?7OX0afoepJo4buBgBew55/ybg4OCTZ4lgE0gJfrUzpXD+CnyknlARZBy1sdX?=
- =?us-ascii?Q?tJtNRytShZNkWXNFudbaztPPCfZyEr8XzaWcszGSCQIaoqxgF72EikWP1TBV?=
- =?us-ascii?Q?DZ5bsf4OROKpyqiqxjIpyeu9igUKXyQpOzp0Ings4Dx6SjKwizHdFFP6myuy?=
- =?us-ascii?Q?Pi9bO6Oob1hZ6PgHzQYbUi/OU8881aQWtEuymZtC5uN9jRxZYA0ElXAf/eWK?=
- =?us-ascii?Q?GpbOkCrZcxbvO+aMEHpxQho7aG+idN+x4cxl2TgdhdeMYz4CPn2u6lISYotH?=
- =?us-ascii?Q?JM7arbmrM3vPKKJzRzJb+wPt3wDEk0pR06JuhKoee0YUaiPGJaPnuXKlfp1u?=
- =?us-ascii?Q?jwOXkq7/PTcphzSsex7f2DiIudACrcPOJPldXNERO0isBHt/nZAclMuEab3j?=
- =?us-ascii?Q?ZtWEV+iDI3nBFJuyz3Sf0tzyU7RLWcLg+ZfdcIyn1JHOlL++IW72p0lU7ETw?=
- =?us-ascii?Q?ZmRsiOsalOHnjotz2K3k0xnnQDjT4oQr0j4fanUwDEl/op7wfAAwisXHyawF?=
- =?us-ascii?Q?7mkUxqXyG1aq9nUOJF4FHeE/37aQtSKVx1/etuqltjafj6IYlZrVw8h54eeR?=
- =?us-ascii?Q?ExW+V2thbsejC8K+vXHCOsdZRwKsSpFrh5K4PlzNqOrT0YmBHFiMDamspWDN?=
- =?us-ascii?Q?+dmbTH4HHaHzs5N1Tc4RrqjElyoyAxCSso7HlVBJ7/F6GN7WbgDSy53vrreu?=
- =?us-ascii?Q?UXR/rsCnRmp2h9sqEF+JTbBhlGB/gnw1I36GeOmdxOh+pHtj1YQdkTOiwEe8?=
- =?us-ascii?Q?L0piXfFvUhJDDrUy+0Ttq7NcjgSxMxTpk7n0w3MNxZrc86sd7HvzoN52ARYK?=
- =?us-ascii?Q?swyTn1R9gjAG1viyR63prMVO17GVxSvSYIcGH1KtygrXacbITMKjC9SgHOEY?=
- =?us-ascii?Q?BOmlMjUXQPilNeIDwLBQGOpKgCuMwgXd3zGM9lQyr7doB2WAr6NT7SvsmW0c?=
- =?us-ascii?Q?JiVq4f5LQq3a+jGQm0kK908xk8CuvpWXUXodxvRCv8Il/HApPOksThz/HzC+?=
- =?us-ascii?Q?0hSvi9l3zbxpTpHshKopT3KDBD+iBYvwFGole8spTsf/IxMGfFlwhi3ltVzw?=
- =?us-ascii?Q?UTWEvb6h7pvV1x8K5KImSrzc5u6Y7Y6SxmISZBrHbmKf36N3p3WMTrFaLXQ1?=
- =?us-ascii?Q?2t7DaPmlHBXKJ713JRHsyV9NRUEWX9uVC1D+WZhNXBqTqrAx6lTCeDQ0XTjg?=
- =?us-ascii?Q?a+dtOy7QJDqRBconvHQQXKQ7ARlj3jyG4d2vee3LxSJG8obVzg7jFIz+/uBE?=
- =?us-ascii?Q?vyI3GPsvpDErFX9sOCOLFyQnoBacxA7yQVGoOYZwxL4Y3j7n4McEFI30YU0T?=
- =?us-ascii?Q?fhCBQkwl8GYxmcgYtC6oJUx41Efh82aJPpFsKhT8DCLL9dXrP+XsY9RyA36I?=
- =?us-ascii?Q?tYh+dCKAwY9fA8E9bXE1AFw430fY1vgmBBmPJufqje7rb8FrD/NJRF9y/Yy9?=
- =?us-ascii?Q?1QBoEXteCimegWIaImR/434HVwHbLwcgBmppxItSW66Q7MknTewccpJFrXWR?=
- =?us-ascii?Q?izj8guRNv9aZ+cJEiYg0iBgLhuPUYlmORoIFFwkFV5hc34NnLnxlJg5bm/JF?=
- =?us-ascii?Q?8g=3D=3D?=
+	=?us-ascii?Q?1jdBrhyZN3OGE2Fk2HDN7rXdbFvwH3/YxG5juGFtXPA7KRPP+EWAgt2D39lY?=
+ =?us-ascii?Q?8CKJqsk5wglanSDD73bkeb4JxAbPpP30IsHAxeSqqwTgVynYpxsvrK/Ii4RO?=
+ =?us-ascii?Q?1m1FFtHyGHHXajtRwPPBEvyflVM4iavQfhEYxMgQLu76jtAjtj1osCDHN6S7?=
+ =?us-ascii?Q?NPwq/Wojnt4u+Em7YMgx/9KfwsuSa2hGSVIKY3DEl7S/e8G1nEiegsADmreD?=
+ =?us-ascii?Q?ObpUenKi9sNjt39NqSzDkzcZ9A8YVqpLCKqoDM7SY/e085YRw+2v0OQ4/+Pb?=
+ =?us-ascii?Q?UMkIt2JcuGDjuztddcXwBeJC+2kzRhoUdr6JEdbAXimuGWMEv7TggAmjux1T?=
+ =?us-ascii?Q?3YEjnfxWT1uNUHP1oGXe7yFX4ApDf7FjplNECm2Hd5fLhUlPn9b0P25ijFID?=
+ =?us-ascii?Q?s2NbOl/qfo5AuDK3ZPGZwZBu1rXWd6mrnIxYSrFXqS6xCyeCfYvRDboKfheZ?=
+ =?us-ascii?Q?tSTqNGxdLJvhBQxKQ8TjbdVaQIgkXSw1uHf5KKPHhlJ5O2/rlZNIw0St0vfo?=
+ =?us-ascii?Q?tv1floBLO1ftv43fXM4cB4c1IJTHDwMMO6AfY05JNaNpo7WwK0K+DiNxL0Bb?=
+ =?us-ascii?Q?JMMZKKgN8tNStzbla8mqIwuhVOzWajufAaHRBiVcYeqobjuA1vxy21OgeRiI?=
+ =?us-ascii?Q?j/re33/WsMRuEwvQA3DvbIaY5tpb6qguB5sQfOTfHmGylS3mFWWeJEtQtyrK?=
+ =?us-ascii?Q?sgfwf0gNXV9D4BXC7WboIOVhQpVhrR3jqwPY7+fUmGTNe45KmfChsobCKEnG?=
+ =?us-ascii?Q?g9W5cN3BWNOWmma9Vy9CAv7KfsZJFAkHY3f/JNryzXkIgxXNGpuJD8qtiUJD?=
+ =?us-ascii?Q?DGHMI2aJCCADSlLn7TZo2i5r2MFYeJCJNLRh2QuTAWlqOJIcifFlbpQkbk/E?=
+ =?us-ascii?Q?yBGKTWhJpLjHQeQbQfbGqjxRTN5DmCpg8oicaIsUPpd53gL688llHDLC7wwL?=
+ =?us-ascii?Q?maUX3srRYl8rPoZ6K9bdWAil892sv06NVz8U+1xBOuDGg1DJTjVqO31ESXev?=
+ =?us-ascii?Q?JrLLkxJcnlXnNdxqLz3bAGp7qQbgRYdfF69/RW5kMiwqVWWi0bfvmXT55AkA?=
+ =?us-ascii?Q?I3y3wuuBblwBas5XbzV/kY0mBzsYh4YLrFA7C0WFIahpDz71Jk3ENwyputFL?=
+ =?us-ascii?Q?CgWPRfXI3TuN0l0aV7q9R3bs+tduRwp2mnrcx6DZiYWpZZ1hg+fati1noaYe?=
+ =?us-ascii?Q?f5sQaVxI6MTkV/NhIzQ/A+GTkL6cw5SMh/RXS+D+yAe8OJH8QoTosuqKCDB7?=
+ =?us-ascii?Q?HJC1jYVT1zvC7PmlSdmwyHJ9pZyUJoCEaEp7k/GUCzml5oLuOyF5queHqUPA?=
+ =?us-ascii?Q?vYxtUiYqdtnoCr1IG2gu4lOjBqPPQryHky4E3Onod0ycUDsyHWkMAQg3BulT?=
+ =?us-ascii?Q?hmy6N0IetKRYI2aYP5FlCYuOcao4SUAVLWfcSDi4txuxROI2FcxA34sjzRnv?=
+ =?us-ascii?Q?tNMlsKPqHqNEIb1+QsikvnUABsIaw7xLcFsD45ry5BTBLtJAXkNr+lfh7geh?=
+ =?us-ascii?Q?uwFWD89/xfLWyel22x4kPBWDsKG+YLOCJ3mrnKMpf9c0NEFOXhZD2T/dmgdB?=
+ =?us-ascii?Q?xl38aPmz0IkQ2V3cKm2yZU2Am48lQm5Or6uCWEEKTfb/Xc/yPMWtVIblB2ZT?=
+ =?us-ascii?Q?Ig=3D=3D?=
 X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9eb78560-3798-4382-4a93-08dce6d1a8ac
+X-MS-Exchange-CrossTenant-Network-Message-Id: 88696622-3aef-4542-2668-08dce6d1ab50
 X-MS-Exchange-CrossTenant-AuthSource: AS4PR04MB9692.eurprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Oct 2024 13:12:13.5613
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Oct 2024 13:12:17.8138
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: I2IU2l7Rcdodunl9xB/CJDZtdY5UmoxM9UtTiDMpusLdXmSEROsw9UvyTQehjRsbrYgS9pZtWl0HvCdKYymzhrwSsm+07xhQMz5yM/U7Bls=
+X-MS-Exchange-CrossTenant-UserPrincipalName: KwjZw1AdM4DOCDSAhHkkNVPOkxO6B1GSGRNeVsZ6B0nUFeBwHsLQ0ywIvYsCFuug8kmdSr1JnAbGoITGBz3aA/pLlb/+jQ3LYXYX/upCCZ4=
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: PA1PR04MB11036
 
-This patch series introduces a new optional device tree property
-device-wakeup-gpios, which specifies the GPIO connected to BT_WAKE_IN pin of
-the NXP chipset.
+This adds a new optional device tree property device-wakeup-gpios, which specifies
+the GPIO connected to BT_WAKE_IN pin of the NXP chipset.
 
-If this property is defined, the BTNXPUART driver uses this GPIO to put
-the BT controller into sleep or wake it up, instead of the default UART
-break mechanism.
-
-The vendor command parameters HCI_NXP_WAKEUP_METHOD are configured to
-use GPIO method instead of UART-break signal, to inform the chip about
-this new mechanism.
-
-Once power save feature is enabled, the driver puts the chip into power
-save state by driving the GPIO high, and wakes it up by driving the GPIO
-low.
+If this property is defined, the driver will use this GPIO for driving chip
+into sleep/wakeup state, else use the UART break signal by default.
 
 Signed-off-by: Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>
+Reviewed-by: Rob Herring (Arm) <robh@kernel.org>
+---
+v2: Rephrase description and use "-gpios". (Krzysztof, Rob)
+v3: Use device-wakeup-gpios instead of h2c-ps-gpios. (Krzysztof)
+v4: Add Reviewed-by (Rob)
+---
+ .../devicetree/bindings/net/bluetooth/nxp,88w8987-bt.yaml | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-Neeraj Sanjay Kale (2):
-  dt-bindings: net: bluetooth: nxp: Add support for power save feature
-    using GPIO
-  Bluetooth: btnxpuart: Add GPIO support to power save feature
-
- .../net/bluetooth/nxp,88w8987-bt.yaml         |  8 +++
- drivers/bluetooth/btnxpuart.c                 | 57 +++++++++++++++++--
- 2 files changed, 59 insertions(+), 6 deletions(-)
-
+diff --git a/Documentation/devicetree/bindings/net/bluetooth/nxp,88w8987-bt.yaml b/Documentation/devicetree/bindings/net/bluetooth/nxp,88w8987-bt.yaml
+index 37a65badb448..0a2d7baf5db3 100644
+--- a/Documentation/devicetree/bindings/net/bluetooth/nxp,88w8987-bt.yaml
++++ b/Documentation/devicetree/bindings/net/bluetooth/nxp,88w8987-bt.yaml
+@@ -34,6 +34,12 @@ properties:
+   firmware-name:
+     maxItems: 1
+ 
++  device-wakeup-gpios:
++    maxItems: 1
++    description:
++      Host-To-Chip power save mechanism is driven by this GPIO
++      connected to BT_WAKE_IN pin of the NXP chipset.
++
+ required:
+   - compatible
+ 
+@@ -41,10 +47,12 @@ additionalProperties: false
+ 
+ examples:
+   - |
++    #include <dt-bindings/gpio/gpio.h>
+     serial {
+         bluetooth {
+             compatible = "nxp,88w8987-bt";
+             fw-init-baudrate = <3000000>;
+             firmware-name = "uartuart8987_bt_v0.bin";
++            device-wakeup-gpios = <&gpio 11 GPIO_ACTIVE_HIGH>;
+         };
+     };
 -- 
 2.25.1
 
