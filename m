@@ -1,325 +1,154 @@
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f175.google.com (mail-lj1-f175.google.com [209.85.208.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E5191DE4CB;
-	Tue,  8 Oct 2024 12:41:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C8741DF966
+	for <linux-bluetooth@vger.kernel.org>; Tue,  8 Oct 2024 13:39:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728391293; cv=none; b=t/DqEu1hQbS6KzRYwQMDNOMm1x2aa2FZwSUw+dhLaA7XHfcUA+8bAPZ+YaN9KEmPNASB4lSKll0PbbtU3s7giRC/rJqO4N0SHOn8Cmz4tMLV0Wdz0JcWA1yLV/BBD+pH5IqHOdTpxKVrbz/9sNRSUj0etcBGESYSAob1jxErshY=
+	t=1728394765; cv=none; b=eAolhcSSl6ufK5vu+Emou5BESzyDYni2U+2Kgd7pWoCieZtsC+fOCtCbnjcGxDWu//ZlXPR3at2xTlPmjadi65EsOsfm9SeYpyzHzmCgIhQfty5a7tLyS58dnVTB46ydnFmkUeLjg+TQnl+5VL6oDfqb9BKscp/6pm336RJZzUo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728391293; c=relaxed/simple;
-	bh=j7KaGUsyaLEUfGtXkukiFzIvWKJHDMnnZRqJknyuK2M=;
-	h=From:Date:Subject:Content-Type:Message-Id:References:In-Reply-To:
-	 To:Cc:MIME-Version; b=nesT8sn1N/Qg8t+Em/FpGz2xbulHBymfRRAqmcD/+ZkRMBTglOkKBE09EcrkbVa0giQXGHanKK8r2AswDOaZlGnyhFjcQfBYdnD+6oarhFOSsLD4q45ItB3NpVCOLD2hAHEmI3uzf4w8oCgDYaRpxGCCZ2Xg5rthjJOSZ8dpeOk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=WiIVuAXi; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1728394765; c=relaxed/simple;
+	bh=J7cUaiYgFzkw/eeV9y0YYoAQfyozATulIOzucz2bj40=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=UsMJTFFUrATklIYXqlPZMz9iDfajobx528u6OQImHz52VjrEXgIJ4tkWWn46sFm0bx/kaTKxLo1uxbVDX1ilwHzl4bcohBEbgeNMlRSyWiYZxuwdAESNdptknSSUKsg6n40YfwnVUGos0CFXHxO1YBHw2pEr0UNEl/uWrfX5ES4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QMzobFN3; arc=none smtp.client-ip=209.85.208.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="WiIVuAXi"
-Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 498BsMpS006194;
-	Tue, 8 Oct 2024 12:40:59 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from
-	:date:subject:content-type:message-id:references:in-reply-to:to
-	:cc:content-transfer-encoding:mime-version; s=pp1; bh=gJGd5/wr8D
-	cxtqBm0AFwiAsWUR/rh1W6zfn73uIs31M=; b=WiIVuAXi//XTK+GAvS53FesISF
-	AEcXXbY57tr/ItEJeGg2zH0XgEu8CDF8jbUsxvbCgl1R8rG5uTyl5008CqprqWb/
-	7DH1KymenTA8aQITz/kojV7/oWg9Pmq8hOZD/DrCkMtQRYr+/Hx1Xc7VKvPaCqg4
-	2jGBDpD3R6p9ZHjCMxl17A5FRWy5oDZy3EHEHRNRrcvkrpozqs3coDOOo+EcOOW8
-	1JNs7sP7RaLe8I2s7/eAbvsatYXmqXx80ZgyLLEQ09626fGhO/1bZKVn7MMiLJiV
-	SRqw9hS6BIWYjoTn38AUyMRYndeBdmr8WocshnCYr6ZnuKXi87jfrvgsrx2A==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 42549908pf-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 08 Oct 2024 12:40:58 +0000 (GMT)
-Received: from m0356516.ppops.net (m0356516.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 498Ca5Ne023011;
-	Tue, 8 Oct 2024 12:40:58 GMT
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 42549908p5-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 08 Oct 2024 12:40:58 +0000 (GMT)
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 498APkGC010715;
-	Tue, 8 Oct 2024 12:40:57 GMT
-Received: from smtprelay03.wdc07v.mail.ibm.com ([172.16.1.70])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 423j0jc124-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 08 Oct 2024 12:40:57 +0000
-Received: from smtpav03.wdc07v.mail.ibm.com (smtpav03.wdc07v.mail.ibm.com [10.39.53.230])
-	by smtprelay03.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 498CetU627001508
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 8 Oct 2024 12:40:55 GMT
-Received: from smtpav03.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 7BD8058054;
-	Tue,  8 Oct 2024 12:40:55 +0000 (GMT)
-Received: from smtpav03.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 8AC4F58066;
-	Tue,  8 Oct 2024 12:40:50 +0000 (GMT)
-Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
-	by smtpav03.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Tue,  8 Oct 2024 12:40:50 +0000 (GMT)
-From: Niklas Schnelle <schnelle@linux.ibm.com>
-Date: Tue, 08 Oct 2024 14:39:46 +0200
-Subject: [PATCH v8 5/5] asm-generic/io.h: Remove I/O port accessors for
- HAS_IOPORT=n
-Content-Type: text/plain; charset="utf-8"
-Message-Id: <20241008-b4-has_ioport-v8-5-793e68aeadda@linux.ibm.com>
-References: <20241008-b4-has_ioport-v8-0-793e68aeadda@linux.ibm.com>
-In-Reply-To: <20241008-b4-has_ioport-v8-0-793e68aeadda@linux.ibm.com>
-To: Brian Cain <bcain@quicinc.com>, Marcel Holtmann <marcel@holtmann.org>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Patrik Jakobsson <patrik.r.jakobsson@gmail.com>,
-        Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
-        Maxime Ripard <mripard@kernel.org>,
-        Thomas Zimmermann <tzimmermann@suse.de>,
-        David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
-        Dave Airlie <airlied@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
-        Lucas De Marchi <lucas.demarchi@intel.com>,
-        =?utf-8?q?Thomas_Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>,
-        Rodrigo Vivi <rodrigo.vivi@intel.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Jiri Slaby <jirislaby@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
-        "Maciej W. Rozycki" <macro@orcam.me.uk>,
-        Heiko Carstens <hca@linux.ibm.com>
-Cc: linux-kernel@vger.kernel.org, linux-hexagon@vger.kernel.org,
-        linux-bluetooth@vger.kernel.org, dri-devel@lists.freedesktop.org,
-        virtualization@lists.linux.dev, spice-devel@lists.freedesktop.org,
-        intel-xe@lists.freedesktop.org, linux-serial@vger.kernel.org,
-        linux-arch@vger.kernel.org, Niklas Schnelle <schnelle@linux.ibm.com>,
-        Arnd Bergmann <arnd@kernel.org>
-X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=openpgp-sha256; l=5763;
- i=schnelle@linux.ibm.com; h=from:subject:message-id;
- bh=j7KaGUsyaLEUfGtXkukiFzIvWKJHDMnnZRqJknyuK2M=;
- b=owGbwMvMwCX2Wz534YHOJ2GMp9WSGNJZNQzXGM6a7CKhPjMv48StB+W1vKk2+zfa73tq8F3Ch
- Zlh+/t1HaUsDGJcDLJiiiyLupz91hVMMd0T1N8BM4eVCWQIAxenAEzkYj3DP/VVKno+F2SXiM5L
- /LnePUmH+2RMuGLmLp17u3OFnDrV1jEyzHW/f+uGsRTDg67md8Vn9boW+/jNmC26ysZjy47kVS8
- cWAE=
-X-Developer-Key: i=schnelle@linux.ibm.com; a=openpgp;
- fpr=9DB000B2D2752030A5F72DDCAFE43F15E8C26090
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 5qJmzXVUXu_PPGWzienVGSvZhaeyctpR
-X-Proofpoint-ORIG-GUID: RHnEoljeT0f3lG_stDyffoOEyw6MUwE3
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QMzobFN3"
+Received: by mail-lj1-f175.google.com with SMTP id 38308e7fff4ca-2fad5024b8dso64031221fa.1
+        for <linux-bluetooth@vger.kernel.org>; Tue, 08 Oct 2024 06:39:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1728394761; x=1728999561; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=6aGEcuVZw3m3YXpk5HhLAFOUMtHT0mCLFSBTmYzosXQ=;
+        b=QMzobFN3aoilSJg3krYs6o73fIn3PqpEHxB4dsnMIRmCngsypcY7vaz790OpDjRUf8
+         8ErO84TDCHx1o4XDBB8508i8U9uZMmvqP+QzPeOQnWVcVmNZBwUkJYGaZ1pq2nJT5Thu
+         bvtRliiUcA+V/YcEgQvHwp9RtEdCtKNkItjX/yxN8k5HvIVRewUxnuzNCl40UPcVmgoF
+         5MEZOXx/6yrSeDryXbBHySnuH/eBRS0S9sxJCxZlB6F7SRcUOC/Ss0SeHBURQr999/w+
+         ux0/exAj8BSB4OoACJVMcU6Zgn78KtkSF81mqw4Ci+WUmfrNXSK6cFYATYcL7hi//UyN
+         h1Zw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728394761; x=1728999561;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=6aGEcuVZw3m3YXpk5HhLAFOUMtHT0mCLFSBTmYzosXQ=;
+        b=econexeax8FeI6IK0vQ/vkyJTgrntKuppbybm+vUJ6ORdluwPNildqw75pQr5l3r8f
+         sDjumlkftn/U+FT3OvBic3n/yRI1niTgcJyINz6ZzEKywqDfy+maNdxCS21mpgY85+oz
+         PIsI13ws4YbSJvVjU1FlkQO+NBBMcBhefG27QKMcsdetNoY0c6//UHWCJjR7Yz3JXOPl
+         Z8hHZw4J/iFFCydZZKU4n3U7RdnMU1DJA3ACfd+FF3g23BZOQKQIGRia/DTwy3mHH00u
+         T5uAlALHVkKmiexAZMBc0E3yB4+Fh/00DDlsmN4e1t2zJKrdQEM/u6qNeP15TqLruItB
+         Kb+Q==
+X-Forwarded-Encrypted: i=1; AJvYcCUhIV6NR5c/tsPfO5GlogBAfG9BQ1jGRJhe6FHlUzrWw7j4jKNrQ38jqRtF5MgDqKJ/OOcS5aZ0kzdAQ4huxKg=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzn4fFfqbxxRx4I/md8hhXAnnwaZ9x7msndU+TlK0R77z5uv6Y7
+	18+xSO/CcnOsHlxJlYiOnRWcAh/b/pNXIidYnT/nQs9y3xx3fTghpkp97pywvO/HBq3vA0EMqdG
+	fW9gqhJwowXB4zrAR9tIsGTHnTejHMw==
+X-Google-Smtp-Source: AGHT+IFRuFdiSaQmQPTm/iVOtBf4fHkAXNvgRlJA+uLxnNsq4xXy9ylkWdSDqJ6NdnkIL3gVC/tdOMK8VDVsrWaHGDA=
+X-Received: by 2002:a05:651c:1502:b0:2fa:e03a:bee7 with SMTP id
+ 38308e7fff4ca-2faf3c64dffmr83701601fa.28.1728394761050; Tue, 08 Oct 2024
+ 06:39:21 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
- definitions=2024-10-08_10,2024-10-08_01,2024-09-30_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 mlxlogscore=999
- priorityscore=1501 impostorscore=0 spamscore=0 malwarescore=0
- lowpriorityscore=0 suspectscore=0 phishscore=0 adultscore=0 clxscore=1015
- mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2409260000 definitions=main-2410080078
+References: <20241008082721.4004100-1-wenst@chromium.org>
+In-Reply-To: <20241008082721.4004100-1-wenst@chromium.org>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Tue, 8 Oct 2024 09:39:05 -0400
+Message-ID: <CABBYNZ+UGx8TtW+aXZer_j=L79NYEP28+FcSeRqT3BKN7L+CGw@mail.gmail.com>
+Subject: Re: [PATCH RESEND] Bluetooth: btmtksdio: Lookup device node only as fallback
+To: Chen-Yu Tsai <wenst@chromium.org>
+Cc: Marcel Holtmann <marcel@holtmann.org>, Sean Wang <sean.wang@kernel.org>, 
+	linux-bluetooth@vger.kernel.org, linux-mediatek@lists.infradead.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-With all subsystems and drivers either declaring their dependence on
-HAS_IOPORT or fencing I/O port specific code sections we can finally
-make inb()/outb() and friends compile-time dependent on HAS_IOPORT as
-suggested by Linus in the linked mail. The main benefit of this is that
-on platforms such as s390 which have no meaningful way of implementing
-inb()/outb() their use without the proper HAS_IOPORT dependency will
-result in easy to catch and fix compile-time errors instead of compiling
-code that can never work.
+Hi,
 
-Link: https://lore.kernel.org/lkml/CAHk-=wg80je=K7madF4e7WrRNp37e3qh6y10Svhdc7O8SZ_-8g@mail.gmail.com/
-Co-developed-by: Arnd Bergmann <arnd@kernel.org>
-Signed-off-by: Arnd Bergmann <arnd@kernel.org>
-Signed-off-by: Niklas Schnelle <schnelle@linux.ibm.com>
----
- include/asm-generic/io.h | 60 ++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 60 insertions(+)
+On Tue, Oct 8, 2024 at 4:27=E2=80=AFAM Chen-Yu Tsai <wenst@chromium.org> wr=
+ote:
+>
+> If the device tree is properly written, the SDIO function device node
+> should be correctly defined, and the mmc core in Linux should correctly
+> tie it to the device being probed.
+>
+> Only fall back to searching for the device node by compatible if the
+> original device node tied to the device is incorrect, as seen in older
+> device trees.
+>
+> Signed-off-by: Chen-Yu Tsai <wenst@chromium.org>
 
-diff --git a/include/asm-generic/io.h b/include/asm-generic/io.h
-index 80de699bf6af4b7b77f582c0469c43e978f67a43..1027be6a62bcbcd5f6797e0fa42035208d0ca79f 100644
---- a/include/asm-generic/io.h
-+++ b/include/asm-generic/io.h
-@@ -540,6 +540,7 @@ static inline void writesq(volatile void __iomem *addr, const void *buffer,
- 
- #if !defined(inb) && !defined(_inb)
- #define _inb _inb
-+#ifdef CONFIG_HAS_IOPORT
- static inline u8 _inb(unsigned long addr)
- {
- 	u8 val;
-@@ -549,10 +550,15 @@ static inline u8 _inb(unsigned long addr)
- 	__io_par(val);
- 	return val;
- }
-+#else
-+u8 _inb(unsigned long addr)
-+	__compiletime_error("inb()) requires CONFIG_HAS_IOPORT");
-+#endif
- #endif
- 
- #if !defined(inw) && !defined(_inw)
- #define _inw _inw
-+#ifdef CONFIG_HAS_IOPORT
- static inline u16 _inw(unsigned long addr)
- {
- 	u16 val;
-@@ -562,10 +568,15 @@ static inline u16 _inw(unsigned long addr)
- 	__io_par(val);
- 	return val;
- }
-+#else
-+u16 _inw(unsigned long addr)
-+	__compiletime_error("inw() requires CONFIG_HAS_IOPORT");
-+#endif
- #endif
- 
- #if !defined(inl) && !defined(_inl)
- #define _inl _inl
-+#ifdef CONFIG_HAS_IOPORT
- static inline u32 _inl(unsigned long addr)
- {
- 	u32 val;
-@@ -575,36 +586,55 @@ static inline u32 _inl(unsigned long addr)
- 	__io_par(val);
- 	return val;
- }
-+#else
-+u32 _inl(unsigned long addr)
-+	__compiletime_error("inl() requires CONFIG_HAS_IOPORT");
-+#endif
- #endif
- 
- #if !defined(outb) && !defined(_outb)
- #define _outb _outb
-+#ifdef CONFIG_HAS_IOPORT
- static inline void _outb(u8 value, unsigned long addr)
- {
- 	__io_pbw();
- 	__raw_writeb(value, PCI_IOBASE + addr);
- 	__io_paw();
- }
-+#else
-+void _outb(u8 value, unsigned long addr)
-+	__compiletime_error("outb() requires CONFIG_HAS_IOPORT");
-+#endif
- #endif
- 
- #if !defined(outw) && !defined(_outw)
- #define _outw _outw
-+#ifdef CONFIG_HAS_IOPORT
- static inline void _outw(u16 value, unsigned long addr)
- {
- 	__io_pbw();
- 	__raw_writew((u16 __force)cpu_to_le16(value), PCI_IOBASE + addr);
- 	__io_paw();
- }
-+#else
-+void _outw(u16 value, unsigned long addr)
-+	__compiletime_error("outw() requires CONFIG_HAS_IOPORT");
-+#endif
- #endif
- 
- #if !defined(outl) && !defined(_outl)
- #define _outl _outl
-+#ifdef CONFIG_HAS_IOPORT
- static inline void _outl(u32 value, unsigned long addr)
- {
- 	__io_pbw();
- 	__raw_writel((u32 __force)cpu_to_le32(value), PCI_IOBASE + addr);
- 	__io_paw();
- }
-+#else
-+void _outl(u32 value, unsigned long addr)
-+	__compiletime_error("outl() requires CONFIG_HAS_IOPORT");
-+#endif
- #endif
- 
- #include <linux/logic_pio.h>
-@@ -688,53 +718,83 @@ static inline void outl_p(u32 value, unsigned long addr)
- 
- #ifndef insb
- #define insb insb
-+#ifdef CONFIG_HAS_IOPORT
- static inline void insb(unsigned long addr, void *buffer, unsigned int count)
- {
- 	readsb(PCI_IOBASE + addr, buffer, count);
- }
-+#else
-+void insb(unsigned long addr, void *buffer, unsigned int count)
-+	__compiletime_error("insb() requires HAS_IOPORT");
-+#endif
- #endif
- 
- #ifndef insw
- #define insw insw
-+#ifdef CONFIG_HAS_IOPORT
- static inline void insw(unsigned long addr, void *buffer, unsigned int count)
- {
- 	readsw(PCI_IOBASE + addr, buffer, count);
- }
-+#else
-+void insw(unsigned long addr, void *buffer, unsigned int count)
-+	__compiletime_error("insw() requires HAS_IOPORT");
-+#endif
- #endif
- 
- #ifndef insl
- #define insl insl
-+#ifdef CONFIG_HAS_IOPORT
- static inline void insl(unsigned long addr, void *buffer, unsigned int count)
- {
- 	readsl(PCI_IOBASE + addr, buffer, count);
- }
-+#else
-+void insl(unsigned long addr, void *buffer, unsigned int count)
-+	__compiletime_error("insl() requires HAS_IOPORT");
-+#endif
- #endif
- 
- #ifndef outsb
- #define outsb outsb
-+#ifdef CONFIG_HAS_IOPORT
- static inline void outsb(unsigned long addr, const void *buffer,
- 			 unsigned int count)
- {
- 	writesb(PCI_IOBASE + addr, buffer, count);
- }
-+#else
-+void outsb(unsigned long addr, const void *buffer, unsigned int count)
-+	__compiletime_error("outsb() requires HAS_IOPORT");
-+#endif
- #endif
- 
- #ifndef outsw
- #define outsw outsw
-+#ifdef CONFIG_HAS_IOPORT
- static inline void outsw(unsigned long addr, const void *buffer,
- 			 unsigned int count)
- {
- 	writesw(PCI_IOBASE + addr, buffer, count);
- }
-+#else
-+void outsw(unsigned long addr, const void *buffer, unsigned int count)
-+	__compiletime_error("outsw() requires HAS_IOPORT");
-+#endif
- #endif
- 
- #ifndef outsl
- #define outsl outsl
-+#ifdef CONFIG_HAS_IOPORT
- static inline void outsl(unsigned long addr, const void *buffer,
- 			 unsigned int count)
- {
- 	writesl(PCI_IOBASE + addr, buffer, count);
- }
-+#else
-+void outsl(unsigned long addr, const void *buffer, unsigned int count)
-+	__compiletime_error("outsl() requires HAS_IOPORT");
-+#endif
- #endif
- 
- #ifndef insb_p
+I was hoping to see some Reviewed-by/Tested-by here, were the mediatek
+made aware of these changes?
 
--- 
-2.43.0
+> ---
+> Resending after three and a half months.
+>
+> This follows up on the MT7921S bluetooth binding and DT fixup patches [1]=
+.
+> This should not be backported.
+>
+> [1] https://lore.kernel.org/linux-bluetooth/20240412073046.1192744-1-wens=
+t@chromium.org/
+>
+>  drivers/bluetooth/btmtksdio.c | 17 +++++++++++++++--
+>  1 file changed, 15 insertions(+), 2 deletions(-)
+>
+> diff --git a/drivers/bluetooth/btmtksdio.c b/drivers/bluetooth/btmtksdio.=
+c
+> index cc097aedc1e1..a1dfcfe43d3a 100644
+> --- a/drivers/bluetooth/btmtksdio.c
+> +++ b/drivers/bluetooth/btmtksdio.c
+> @@ -1328,6 +1328,8 @@ static int btmtksdio_probe(struct sdio_func *func,
+>  {
+>         struct btmtksdio_dev *bdev;
+>         struct hci_dev *hdev;
+> +       struct device_node *old_node;
+> +       bool restore_node;
+>         int err;
+>
+>         bdev =3D devm_kzalloc(&func->dev, sizeof(*bdev), GFP_KERNEL);
+> @@ -1411,13 +1413,24 @@ static int btmtksdio_probe(struct sdio_func *func=
+,
+>         if (err)
+>                 bt_dev_err(hdev, "failed to initialize device wakeup");
+>
+> -       bdev->dev->of_node =3D of_find_compatible_node(NULL, NULL,
+> -                                                    "mediatek,mt7921s-bl=
+uetooth");
+> +       restore_node =3D false;
+> +       if (!of_device_is_compatible(bdev->dev->of_node, "mediatek,mt7921=
+s-bluetooth")) {
+> +               restore_node =3D true;
+> +               old_node =3D bdev->dev->of_node;
+> +               bdev->dev->of_node =3D of_find_compatible_node(NULL, NULL=
+,
+> +                                                            "mediatek,mt=
+7921s-bluetooth");
+> +       }
+> +
+>         bdev->reset =3D devm_gpiod_get_optional(bdev->dev, "reset",
+>                                               GPIOD_OUT_LOW);
+>         if (IS_ERR(bdev->reset))
+>                 err =3D PTR_ERR(bdev->reset);
+>
+> +       if (restore_node) {
+> +               of_node_put(bdev->dev->of_node);
+> +               bdev->dev->of_node =3D old_node;
+> +       }
+> +
+>         return err;
+>  }
+>
+> --
+> 2.47.0.rc0.187.ge670bccf7e-goog
+>
 
+
+--=20
+Luiz Augusto von Dentz
