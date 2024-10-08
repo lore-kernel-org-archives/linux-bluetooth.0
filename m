@@ -1,181 +1,82 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
+Received: from relay2-d.mail.gandi.net (relay2-d.mail.gandi.net [217.70.183.194])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A93A218FDB7;
-	Tue,  8 Oct 2024 08:11:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BBC71DACBE;
+	Tue,  8 Oct 2024 08:12:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.194
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728375108; cv=none; b=FuMFmR+dpfEiegvQWeKRdmJBxlFjDUUbwMfhZFH80MoU1uDDxcd/2tlH9dzWeMPiTgfQJIjTRIli2WgDvNYmbbomJKl8taKmvdzEkYIFrMvdlfPaZzAqAbdCfgt4wPZZwRnw/f+5xUJAgV5yourfV3B6tV6PWgUPK1MVmBHLuQw=
+	t=1728375160; cv=none; b=lIDGfUEP7nwwDMuzdLL4dyX4uNq7Osp+MmHvsp/77bYcoLMHHsOzHrr6H2ZUUzoiWHq/81PtRJcAI8KkqtKSmhYwmSsZbPZbPhs8fthPIkG1Y6WAKqzgOl5JaucG0F3mc2t/zHrdGEzIriW4MHXa1Va9EQpIwqkNNR531m6TP08=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728375108; c=relaxed/simple;
-	bh=F2qXz/WIke5JYnywjFUODNGIhgeCaMbp2Q2K3tt5jV4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Oc33lXzUdtJIPfgTo2KPCsv5zfVeRB5z2pYAaq8oXVl8VC8WRPUvF0vm7N411Vm3hwVFPFcKJS75ZXJqc4mOnfQKmyYudrzIL3Zg6eLExZPFLoZfWzyWtouQ1gh1mLaLTp54xGIm2YvfhVQPQNqdp5ZyG4gLeH3LQzEyx8hwXjQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=gSNNk7u8; arc=none smtp.client-ip=198.175.65.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1728375160; c=relaxed/simple;
+	bh=B3ysfxiqFRhVVNCstervNndWXGwXlQgXohHe/DyQ+g8=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=titD5ljhx8i8PVLRQCjg/YUVG+IYadTXPd4RYgQpLMrtCoYg/0CgdIFcPC3B0ct4S+2PCG0nOT33gydu1YZgxe4EWw4bPpJm1DlM2n3elgHdegmz8LniextXNY9fQlyGmTe/Im3jZEIw3zF5uccG07nEO3ajl88pAuGR90CZy5I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=oARTCco1; arc=none smtp.client-ip=217.70.183.194
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="gSNNk7u8"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1728375107; x=1759911107;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=F2qXz/WIke5JYnywjFUODNGIhgeCaMbp2Q2K3tt5jV4=;
-  b=gSNNk7u8Dvg2Jiu1Ofkh5rIjKoeIZbGanM5p4VeqqpdGc14aQvUSzAba
-   mOpssGMJBFkwy4DvXDvs7yQcixaQneYvSjeBNaUIlqiSWO/CWXCwKFwzI
-   uGefd35nImdOVq9kS4dMuF6JsOeHIZPDsBmqHqOuCXJQUl4Wzi93aQfd2
-   7yusAaaBKRR6xcvgYZNx7LqNqAkyGzCxTYW83NrJU1Wjb0MfUjSAef3fZ
-   eLZKVr0VK8H3QK/kKyfm1GGaUmyulXXEbzDEJsz59MnRNAid6dqxM355R
-   6AF0nvbM8IPpTIB8sNqi16Go986VQLZN4eRnqG0nr6heQBSDwvqXtcCsU
-   w==;
-X-CSE-ConnectionGUID: Utiik9s6Te+wDIkgwVPRdQ==
-X-CSE-MsgGUID: eE0QZbvrS2u5eU9cOzCClA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11218"; a="27498958"
-X-IronPort-AV: E=Sophos;i="6.11,186,1725346800"; 
-   d="scan'208";a="27498958"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Oct 2024 01:11:47 -0700
-X-CSE-ConnectionGUID: OrSDAzvoT/i4qIU6uBYKaw==
-X-CSE-MsgGUID: NEZ6dFjtRTCip3sFf84OVQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,186,1725346800"; 
-   d="scan'208";a="75729498"
-Received: from lkp-server01.sh.intel.com (HELO a48cf1aa22e8) ([10.239.97.150])
-  by orviesa009.jf.intel.com with ESMTP; 08 Oct 2024 01:11:43 -0700
-Received: from kbuild by a48cf1aa22e8 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1sy5Jk-00064q-0Z;
-	Tue, 08 Oct 2024 08:11:40 +0000
-Date: Tue, 8 Oct 2024 16:11:12 +0800
-From: kernel test robot <lkp@intel.com>
-To: Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>, marcel@holtmann.org,
-	luiz.dentz@gmail.com, robh@kernel.org, krzk+dt@kernel.org,
-	conor+dt@kernel.org
-Cc: oe-kbuild-all@lists.linux.dev, linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
-	amitkumar.karwar@nxp.com, rohit.fule@nxp.com,
-	neeraj.sanjaykale@nxp.com, sherry.sun@nxp.com, ziniu.wang_1@nxp.com,
-	haibo.chen@nxp.com, LnxRevLi@nxp.com
-Subject: Re: [PATCH v4 2/2] Bluetooth: btnxpuart: Add GPIO support to power
- save feature
-Message-ID: <202410081516.Mt35mvJk-lkp@intel.com>
-References: <20241007131316.626690-3-neeraj.sanjaykale@nxp.com>
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="oARTCco1"
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 56F2F40005;
+	Tue,  8 Oct 2024 08:12:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1728375155;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=WxOr0+Orzjei2/3t3Lr8z6xjWY7VkO+u4ngNgmdCxmk=;
+	b=oARTCco1tu8VcZP2stCjjo6TSwMv7A8HWGKO2gATZmkeIp75C/KpMPHPZuFEIlq9DB7Cj1
+	9uDVKYJD2XG3ktFd7MsS0R2dbXBBxbf6TJT8mRWgw0zZyE433PQ7CDYTYu7kplprzkYbdZ
+	69ifxQMzF/M4jj6qbxv0Ta4vJkn2Jp3eYwWhjbKtroaob067OblmAa86jwxZ9JqgaKi0Xn
+	0bXqR4Tz2REqsdWUP7VfsSD6aQGAMC9bz2qjMRs6KYN92luQEu64YE/UWjQ7nyaag/38Ct
+	AkKFICym00WreIWFMgqqtSEfi42XGF/VCdxYh+ooK58fW5LNvERbf1ctEmstQQ==
+Date: Tue, 8 Oct 2024 10:12:32 +0200
+From: Miquel Raynal <miquel.raynal@bootlin.com>
+To: Ignat Korchagin <ignat@cloudflare.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg
+ <johan.hedberg@gmail.com>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+ Oliver Hartkopp <socketcan@hartkopp.net>, Marc Kleine-Budde
+ <mkl@pengutronix.de>, Alexander Aring <alex.aring@gmail.com>, Stefan
+ Schmidt <stefan@datenfreihafen.org>, David Ahern <dsahern@kernel.org>,
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+ linux-bluetooth@vger.kernel.org, linux-can@vger.kernel.org,
+ linux-wpan@vger.kernel.org, kernel-team@cloudflare.com, kuniyu@amazon.com,
+ alibuda@linux.alibaba.com
+Subject: Re: [PATCH v2 6/8] net: ieee802154: do not leave a dangling sk
+ pointer in ieee802154_create()
+Message-ID: <20241008101232.123389e1@xps-13>
+In-Reply-To: <20241007213502.28183-7-ignat@cloudflare.com>
+References: <20241007213502.28183-1-ignat@cloudflare.com>
+	<20241007213502.28183-7-ignat@cloudflare.com>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241007131316.626690-3-neeraj.sanjaykale@nxp.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-GND-Sasl: miquel.raynal@bootlin.com
 
-Hi Neeraj,
+Hi Ignat,
 
-kernel test robot noticed the following build errors:
+ignat@cloudflare.com wrote on Mon,  7 Oct 2024 22:35:00 +0100:
 
-[auto build test ERROR on bluetooth/master]
-[also build test ERROR on bluetooth-next/master robh/for-next linus/master v6.12-rc2 next-20241004]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+> sock_init_data() attaches the allocated sk object to the provided sock
+> object. If ieee802154_create() fails later, the allocated sk object is
+> freed, but the dangling pointer remains in the provided sock object, which
+> may allow use-after-free.
+>=20
+> Clear the sk pointer in the sock object on error.
+>=20
+> Signed-off-by: Ignat Korchagin <ignat@cloudflare.com>
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Neeraj-Sanjay-Kale/dt-bindings-net-bluetooth-nxp-Add-support-for-power-save-feature-using-GPIO/20241007-211315
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git master
-patch link:    https://lore.kernel.org/r/20241007131316.626690-3-neeraj.sanjaykale%40nxp.com
-patch subject: [PATCH v4 2/2] Bluetooth: btnxpuart: Add GPIO support to power save feature
-config: m68k-allmodconfig (https://download.01.org/0day-ci/archive/20241008/202410081516.Mt35mvJk-lkp@intel.com/config)
-compiler: m68k-linux-gcc (GCC) 14.1.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20241008/202410081516.Mt35mvJk-lkp@intel.com/reproduce)
+Reviewed-by: Miquel Raynal <miquel.raynal@bootlin.com>
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202410081516.Mt35mvJk-lkp@intel.com/
-
-All error/warnings (new ones prefixed by >>):
-
-   In file included from drivers/bluetooth/btnxpuart.c:21:
-   drivers/bluetooth/btnxpuart.c: In function 'ps_setup':
->> drivers/bluetooth/btnxpuart.c:445:28: error: expected ')' before 'PTR_ERR'
-     445 |                            PTR_ERR(psdata->h2c_ps_gpio));
-         |                            ^~~~~~~
-   include/net/bluetooth/bluetooth.h:263:40: note: in definition of macro 'BT_ERR'
-     263 | #define BT_ERR(fmt, ...)        bt_err(fmt "\n", ##__VA_ARGS__)
-         |                                        ^~~
-   drivers/bluetooth/btnxpuart.c:444:17: note: in expansion of macro 'bt_dev_err'
-     444 |                 bt_dev_err(hdev, "Error fetching device-wakeup-gpios: %ld"
-         |                 ^~~~~~~~~~
-   include/net/bluetooth/bluetooth.h:263:39: note: to match this '('
-     263 | #define BT_ERR(fmt, ...)        bt_err(fmt "\n", ##__VA_ARGS__)
-         |                                       ^
-   include/net/bluetooth/bluetooth.h:278:9: note: in expansion of macro 'BT_ERR'
-     278 |         BT_ERR("%s: " fmt, bt_dev_name(hdev), ##__VA_ARGS__)
-         |         ^~~~~~
-   drivers/bluetooth/btnxpuart.c:444:17: note: in expansion of macro 'bt_dev_err'
-     444 |                 bt_dev_err(hdev, "Error fetching device-wakeup-gpios: %ld"
-         |                 ^~~~~~~~~~
->> include/net/bluetooth/bluetooth.h:278:16: warning: format '%s' expects a matching 'char *' argument [-Wformat=]
-     278 |         BT_ERR("%s: " fmt, bt_dev_name(hdev), ##__VA_ARGS__)
-         |                ^~~~~~
-   include/net/bluetooth/bluetooth.h:263:40: note: in definition of macro 'BT_ERR'
-     263 | #define BT_ERR(fmt, ...)        bt_err(fmt "\n", ##__VA_ARGS__)
-         |                                        ^~~
-   drivers/bluetooth/btnxpuart.c:444:17: note: in expansion of macro 'bt_dev_err'
-     444 |                 bt_dev_err(hdev, "Error fetching device-wakeup-gpios: %ld"
-         |                 ^~~~~~~~~~
-   include/net/bluetooth/bluetooth.h:278:18: note: format string is defined here
-     278 |         BT_ERR("%s: " fmt, bt_dev_name(hdev), ##__VA_ARGS__)
-         |                 ~^
-         |                  |
-         |                  char *
->> include/net/bluetooth/bluetooth.h:278:16: warning: format '%ld' expects a matching 'long int' argument [-Wformat=]
-     278 |         BT_ERR("%s: " fmt, bt_dev_name(hdev), ##__VA_ARGS__)
-         |                ^~~~~~
-   include/net/bluetooth/bluetooth.h:263:40: note: in definition of macro 'BT_ERR'
-     263 | #define BT_ERR(fmt, ...)        bt_err(fmt "\n", ##__VA_ARGS__)
-         |                                        ^~~
-   drivers/bluetooth/btnxpuart.c:444:17: note: in expansion of macro 'bt_dev_err'
-     444 |                 bt_dev_err(hdev, "Error fetching device-wakeup-gpios: %ld"
-         |                 ^~~~~~~~~~
-
-Kconfig warnings: (for reference only)
-   WARNING: unmet direct dependencies detected for GET_FREE_REGION
-   Depends on [n]: SPARSEMEM [=n]
-   Selected by [m]:
-   - RESOURCE_KUNIT_TEST [=m] && RUNTIME_TESTING_MENU [=y] && KUNIT [=m]
-
-
-vim +445 drivers/bluetooth/btnxpuart.c
-
-   434	
-   435	static int ps_setup(struct hci_dev *hdev)
-   436	{
-   437		struct btnxpuart_dev *nxpdev = hci_get_drvdata(hdev);
-   438		struct serdev_device *serdev = nxpdev->serdev;
-   439		struct ps_data *psdata = &nxpdev->psdata;
-   440	
-   441		psdata->h2c_ps_gpio = devm_gpiod_get_optional(&serdev->dev, "device-wakeup",
-   442							      GPIOD_OUT_LOW);
-   443		if (IS_ERR(psdata->h2c_ps_gpio)) {
-   444			bt_dev_err(hdev, "Error fetching device-wakeup-gpios: %ld"
- > 445				   PTR_ERR(psdata->h2c_ps_gpio));
-   446			return PTR_ERR(psdata->h2c_ps_gpio);
-   447		}
-   448	
-   449		if (!psdata->h2c_ps_gpio)
-   450			psdata->h2c_wakeup_gpio = 0xff;
-   451	
-   452		psdata->hdev = hdev;
-   453		INIT_WORK(&psdata->work, ps_work_func);
-   454		mutex_init(&psdata->ps_lock);
-   455		timer_setup(&psdata->ps_timer, ps_timeout_func, 0);
-   456	
-   457		return 0;
-   458	}
-   459	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Thanks,
+Miqu=C3=A8l
