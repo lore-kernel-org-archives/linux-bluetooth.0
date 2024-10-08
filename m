@@ -1,154 +1,81 @@
-Received: from mail-lj1-f175.google.com (mail-lj1-f175.google.com [209.85.208.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C8741DF966
-	for <linux-bluetooth@vger.kernel.org>; Tue,  8 Oct 2024 13:39:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83A2F1DF733;
+	Tue,  8 Oct 2024 14:00:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728394765; cv=none; b=eAolhcSSl6ufK5vu+Emou5BESzyDYni2U+2Kgd7pWoCieZtsC+fOCtCbnjcGxDWu//ZlXPR3at2xTlPmjadi65EsOsfm9SeYpyzHzmCgIhQfty5a7tLyS58dnVTB46ydnFmkUeLjg+TQnl+5VL6oDfqb9BKscp/6pm336RJZzUo=
+	t=1728396027; cv=none; b=LRYbZulw/uTtmUwwCznPC34jRQJN7ABu7wKYaCScnXsgv5LCyMn/FkyKcaGuxXRAd8lAOx6lv5LOnF0uxSCT3PCN8gTUeHXcKZ2VTRDvibjDQbUFjMAyoNCLAU6eUM0ngmQLvLhfM3BzOvgSvVbLLw+Dv94Q4EJHG+nvIzW0iLs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728394765; c=relaxed/simple;
-	bh=J7cUaiYgFzkw/eeV9y0YYoAQfyozATulIOzucz2bj40=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=UsMJTFFUrATklIYXqlPZMz9iDfajobx528u6OQImHz52VjrEXgIJ4tkWWn46sFm0bx/kaTKxLo1uxbVDX1ilwHzl4bcohBEbgeNMlRSyWiYZxuwdAESNdptknSSUKsg6n40YfwnVUGos0CFXHxO1YBHw2pEr0UNEl/uWrfX5ES4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QMzobFN3; arc=none smtp.client-ip=209.85.208.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1728396027; c=relaxed/simple;
+	bh=r4wujnASR6D/hXBsKF9WAbc//3dXDucJJY8k4Z3RIVo=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=PrfgexZGFpynZy5F8UXj5CSXr2XVyFv497uaFVuw2tL7ff0lhWo2UReEPo88X8xOQjcjyo5FgswosYy+ifXnWTmw8zRWKsTBvBjoLvkKuqPWJakPdmQldntwcrsjJfirvKXLYta1XAqaAw66R8zmubTO5W0625hCSWLkEl1vfX4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XbILffz7; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QMzobFN3"
-Received: by mail-lj1-f175.google.com with SMTP id 38308e7fff4ca-2fad5024b8dso64031221fa.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 08 Oct 2024 06:39:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1728394761; x=1728999561; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=6aGEcuVZw3m3YXpk5HhLAFOUMtHT0mCLFSBTmYzosXQ=;
-        b=QMzobFN3aoilSJg3krYs6o73fIn3PqpEHxB4dsnMIRmCngsypcY7vaz790OpDjRUf8
-         8ErO84TDCHx1o4XDBB8508i8U9uZMmvqP+QzPeOQnWVcVmNZBwUkJYGaZ1pq2nJT5Thu
-         bvtRliiUcA+V/YcEgQvHwp9RtEdCtKNkItjX/yxN8k5HvIVRewUxnuzNCl40UPcVmgoF
-         5MEZOXx/6yrSeDryXbBHySnuH/eBRS0S9sxJCxZlB6F7SRcUOC/Ss0SeHBURQr999/w+
-         ux0/exAj8BSB4OoACJVMcU6Zgn78KtkSF81mqw4Ci+WUmfrNXSK6cFYATYcL7hi//UyN
-         h1Zw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728394761; x=1728999561;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=6aGEcuVZw3m3YXpk5HhLAFOUMtHT0mCLFSBTmYzosXQ=;
-        b=econexeax8FeI6IK0vQ/vkyJTgrntKuppbybm+vUJ6ORdluwPNildqw75pQr5l3r8f
-         sDjumlkftn/U+FT3OvBic3n/yRI1niTgcJyINz6ZzEKywqDfy+maNdxCS21mpgY85+oz
-         PIsI13ws4YbSJvVjU1FlkQO+NBBMcBhefG27QKMcsdetNoY0c6//UHWCJjR7Yz3JXOPl
-         Z8hHZw4J/iFFCydZZKU4n3U7RdnMU1DJA3ACfd+FF3g23BZOQKQIGRia/DTwy3mHH00u
-         T5uAlALHVkKmiexAZMBc0E3yB4+Fh/00DDlsmN4e1t2zJKrdQEM/u6qNeP15TqLruItB
-         Kb+Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUhIV6NR5c/tsPfO5GlogBAfG9BQ1jGRJhe6FHlUzrWw7j4jKNrQ38jqRtF5MgDqKJ/OOcS5aZ0kzdAQ4huxKg=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzn4fFfqbxxRx4I/md8hhXAnnwaZ9x7msndU+TlK0R77z5uv6Y7
-	18+xSO/CcnOsHlxJlYiOnRWcAh/b/pNXIidYnT/nQs9y3xx3fTghpkp97pywvO/HBq3vA0EMqdG
-	fW9gqhJwowXB4zrAR9tIsGTHnTejHMw==
-X-Google-Smtp-Source: AGHT+IFRuFdiSaQmQPTm/iVOtBf4fHkAXNvgRlJA+uLxnNsq4xXy9ylkWdSDqJ6NdnkIL3gVC/tdOMK8VDVsrWaHGDA=
-X-Received: by 2002:a05:651c:1502:b0:2fa:e03a:bee7 with SMTP id
- 38308e7fff4ca-2faf3c64dffmr83701601fa.28.1728394761050; Tue, 08 Oct 2024
- 06:39:21 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XbILffz7"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 128A0C4CEC7;
+	Tue,  8 Oct 2024 14:00:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1728396027;
+	bh=r4wujnASR6D/hXBsKF9WAbc//3dXDucJJY8k4Z3RIVo=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=XbILffz7WaM0MxCKaDb7TlAHpU6uTw9X17dwwjZjLCdKeFRuruNnQ+LtfuXWmpadr
+	 hRgl0ZSOURmGUyQhxa7UgAYLnKAuH7RHWh42RZv6MTUlNAmnCVfK6XNO/rXaFWHx1r
+	 6QwyjVRcAQtxgD3lhoGK4PWqsIKhXS/Lk8bQ+9PdSFeYhdw1paxNbAcO/TG7UPiMu4
+	 +joLEnWrqg9X9+/hjjasSMJnl3+OOEeqSd066p/I5gBem0YnO1+7XzlODTpaqAgusa
+	 6cfQLF3N/NFSquvgYopIo1R4k4F+09hAN3W/kqFUzwi8BxkIPFhNpFbm1mHQ/Q6qyf
+	 bo+Q7nIf/XcSA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 715503810938;
+	Tue,  8 Oct 2024 14:00:32 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241008082721.4004100-1-wenst@chromium.org>
-In-Reply-To: <20241008082721.4004100-1-wenst@chromium.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Tue, 8 Oct 2024 09:39:05 -0400
-Message-ID: <CABBYNZ+UGx8TtW+aXZer_j=L79NYEP28+FcSeRqT3BKN7L+CGw@mail.gmail.com>
-Subject: Re: [PATCH RESEND] Bluetooth: btmtksdio: Lookup device node only as fallback
-To: Chen-Yu Tsai <wenst@chromium.org>
-Cc: Marcel Holtmann <marcel@holtmann.org>, Sean Wang <sean.wang@kernel.org>, 
-	linux-bluetooth@vger.kernel.org, linux-mediatek@lists.infradead.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v5 0/2] Bluetooth: btnxpuart: Add GPIO mechanism to
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <172839603126.554899.7517324308392311956.git-patchwork-notify@kernel.org>
+Date: Tue, 08 Oct 2024 14:00:31 +0000
+References: <20241008091159.650531-1-neeraj.sanjaykale@nxp.com>
+In-Reply-To: <20241008091159.650531-1-neeraj.sanjaykale@nxp.com>
+To: Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>
+Cc: marcel@holtmann.org, luiz.dentz@gmail.com, robh@kernel.org,
+ krzk+dt@kernel.org, conor+dt@kernel.org, linux-bluetooth@vger.kernel.org,
+ linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
+ amitkumar.karwar@nxp.com, rohit.fule@nxp.com, sherry.sun@nxp.com,
+ ziniu.wang_1@nxp.com, haibo.chen@nxp.com, LnxRevLi@nxp.com
 
-Hi,
+Hello:
 
-On Tue, Oct 8, 2024 at 4:27=E2=80=AFAM Chen-Yu Tsai <wenst@chromium.org> wr=
-ote:
->
-> If the device tree is properly written, the SDIO function device node
-> should be correctly defined, and the mmc core in Linux should correctly
-> tie it to the device being probed.
->
-> Only fall back to searching for the device node by compatible if the
-> original device node tied to the device is incorrect, as seen in older
-> device trees.
->
-> Signed-off-by: Chen-Yu Tsai <wenst@chromium.org>
+This series was applied to bluetooth/bluetooth-next.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-I was hoping to see some Reviewed-by/Tested-by here, were the mediatek
-made aware of these changes?
+On Tue,  8 Oct 2024 14:41:57 +0530 you wrote:
+> This patch series introduces a new optional device tree property
+> device-wakeup-gpios, which specifies the GPIO connected to BT_WAKE_IN pin of
+> the NXP chipset.
+> 
+> If this property is defined, the BTNXPUART driver uses this GPIO to put
+> the BT controller into sleep or wake it up, instead of the default UART
+> break mechanism.
+> 
+> [...]
 
-> ---
-> Resending after three and a half months.
->
-> This follows up on the MT7921S bluetooth binding and DT fixup patches [1]=
-.
-> This should not be backported.
->
-> [1] https://lore.kernel.org/linux-bluetooth/20240412073046.1192744-1-wens=
-t@chromium.org/
->
->  drivers/bluetooth/btmtksdio.c | 17 +++++++++++++++--
->  1 file changed, 15 insertions(+), 2 deletions(-)
->
-> diff --git a/drivers/bluetooth/btmtksdio.c b/drivers/bluetooth/btmtksdio.=
-c
-> index cc097aedc1e1..a1dfcfe43d3a 100644
-> --- a/drivers/bluetooth/btmtksdio.c
-> +++ b/drivers/bluetooth/btmtksdio.c
-> @@ -1328,6 +1328,8 @@ static int btmtksdio_probe(struct sdio_func *func,
->  {
->         struct btmtksdio_dev *bdev;
->         struct hci_dev *hdev;
-> +       struct device_node *old_node;
-> +       bool restore_node;
->         int err;
->
->         bdev =3D devm_kzalloc(&func->dev, sizeof(*bdev), GFP_KERNEL);
-> @@ -1411,13 +1413,24 @@ static int btmtksdio_probe(struct sdio_func *func=
-,
->         if (err)
->                 bt_dev_err(hdev, "failed to initialize device wakeup");
->
-> -       bdev->dev->of_node =3D of_find_compatible_node(NULL, NULL,
-> -                                                    "mediatek,mt7921s-bl=
-uetooth");
-> +       restore_node =3D false;
-> +       if (!of_device_is_compatible(bdev->dev->of_node, "mediatek,mt7921=
-s-bluetooth")) {
-> +               restore_node =3D true;
-> +               old_node =3D bdev->dev->of_node;
-> +               bdev->dev->of_node =3D of_find_compatible_node(NULL, NULL=
-,
-> +                                                            "mediatek,mt=
-7921s-bluetooth");
-> +       }
-> +
->         bdev->reset =3D devm_gpiod_get_optional(bdev->dev, "reset",
->                                               GPIOD_OUT_LOW);
->         if (IS_ERR(bdev->reset))
->                 err =3D PTR_ERR(bdev->reset);
->
-> +       if (restore_node) {
-> +               of_node_put(bdev->dev->of_node);
-> +               bdev->dev->of_node =3D old_node;
-> +       }
-> +
->         return err;
->  }
->
-> --
-> 2.47.0.rc0.187.ge670bccf7e-goog
->
+Here is the summary with links:
+  - [v5,1/2] dt-bindings: net: bluetooth: nxp: Add support for power save feature using GPIO
+    https://git.kernel.org/bluetooth/bluetooth-next/c/99ba211a9b71
+  - [v5,2/2] Bluetooth: btnxpuart: Add GPIO support to power save feature
+    https://git.kernel.org/bluetooth/bluetooth-next/c/039468a21912
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
---=20
-Luiz Augusto von Dentz
