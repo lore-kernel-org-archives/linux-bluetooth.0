@@ -1,174 +1,163 @@
-Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
+Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 939D220CCF7
-	for <linux-bluetooth@vger.kernel.org>; Tue,  8 Oct 2024 20:09:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D6AC212D23
+	for <linux-bluetooth@vger.kernel.org>; Tue,  8 Oct 2024 20:38:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728418177; cv=none; b=Z9Lia176+cqq1iEjZagx50QWUA0tNrMwDb9rHxnRY6GZEb9D+nmxru34gTqIopG2/omZ0WWgw0LOl2AiRyXwU8JdfVtvkB2tYbVFLrR/jyxCRwOsaC8mHKeo9GacAw93o0j0jJqHdp5OjbavmP9XLODDsuV2k8KJOMmIe33id90=
+	t=1728419888; cv=none; b=g38moa0yxGPdtpRIaAcEZQo6b29QO58snnp1zZvJ241SOwoBNdTvdZ//V9GtTUCPvkCfxq+CRZlr3C844sbImCScd8Rd0mvTikcytsafqv7d+civehr7M9z7CllQ4++71qlI5msOBsvdBedRyTH68izBZnSWPAZhbQLyV6pMg1Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728418177; c=relaxed/simple;
-	bh=PeAzhENfQfee5EWxQIt8YDPfsBI+Z/9byNwjmqDBHBI=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=lrQQCHfSDQ3syxQ3PnxLYCp8Jtt0tQkWg7L67nd+7CTSWgFhGI6iWbXQOig/XO35PLHnEMISaFFoqRJ9JceFhHK684aMAt6tKydLE6OaVxXWrAhS5CquBQNnJ9RpvfrFhYe5alGPl2FPz4uEyRNpRSTQ8hnPRU9i6XjDNYJ3vjQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lwvCbQtB; arc=none smtp.client-ip=209.85.208.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1728419888; c=relaxed/simple;
+	bh=jBKc56vBxPYaOUWcC+VFZKlnp8sdizUoPysD1KL2n2Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=mfU0mYIn+4an77G7l6/kk6cyZvLDEL2mfOgXwby2aZW32i34Qa+o64iPPK6KXQrWkyYwUMyyH6ELjTj5AptlVx4/H/5ZM0ZQJePBtC+c7idVetMWVhbXQxn7V5crN7f9prlFH2D04l1f6xDpRsoMCfZXFHKKtqOKzJ+16bPm4Cc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com; spf=pass smtp.mailfrom=baylibre.com; dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b=18fWZBkO; arc=none smtp.client-ip=209.85.218.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baylibre.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lwvCbQtB"
-Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-5c88c9e45c2so342167a12.0
-        for <linux-bluetooth@vger.kernel.org>; Tue, 08 Oct 2024 13:09:35 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b="18fWZBkO"
+Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-a9951fba3b4so404169466b.1
+        for <linux-bluetooth@vger.kernel.org>; Tue, 08 Oct 2024 13:38:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1728418174; x=1729022974; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=4LqLabfwfdChDNDindRIOvcr+6Tak8IIeu+4JDFbXq4=;
-        b=lwvCbQtB7uY+VgdeE/D0MQbBTiWot0H+9QPQPtlqy9PoLAMxEUqyu6cnCoSbyPgBXr
-         6qSRDzZjYSKGr+/E8TQhCEVXWzRHc/JILb9zQBhYTpK49sulrUwGIimgswAfHfysy7Oa
-         XyjjhK35tF1/+csrEiVOuYxtI3/lcCQOc+Q46WMdA5jPVmljdCS0DCbAx9zPnWCkNwBC
-         /mwIcM3dtI9a0VRkNohl8MD4zUV15chXhQUV4ATuLbwnjVIcvNf9b24BEKw6W7s/8vMq
-         dzi61rKTbUzIw0z4eqDGvnjlLvw6w83euGX9WfTQfhriqCJprP7UJQqvMa2dPM55g+Zb
-         YwUw==
+        d=baylibre-com.20230601.gappssmtp.com; s=20230601; t=1728419885; x=1729024685; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=jBKc56vBxPYaOUWcC+VFZKlnp8sdizUoPysD1KL2n2Y=;
+        b=18fWZBkO9cDHNP5XkQ39MRLClR2iDC1zySqkncD3SsZKu5Rgs7Dl8pH8lKJp2p962M
+         ZQCXVVOIGzjU5UY81OJcQw0kiLkVxi82epBgL4dI4RqabJSCfzsJV/w4rEU39jnWCoY7
+         yG6e+6Huic3MWrYC1oSE1/3jjgRJEPNAKN3ZTXu7yDRI5rDcTHA6JVJ03K88LUsNIndN
+         hxu1wyd0FmRvkB0XvGhYzl60f9BZXhmzkblJFg6rToFyXPRB5BLZ/aQ9AquxPwlKwAUC
+         26vZdSJyysWVJfHabIaR2zJD8Gkd7meZi0reyXepjlExZa64VCzKDkCcaGkjDZZZyvzq
+         ni5A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728418174; x=1729022974;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=4LqLabfwfdChDNDindRIOvcr+6Tak8IIeu+4JDFbXq4=;
-        b=PqT0q76mVHwAzQFfg4/B4rxVE/te+4uU8CSLCIQPDHxTlhuAQ+xQ1ypL/I13WiWqGe
-         ullOEHNEkeWvEyQUVnMObyd+GQVsFME9q3qTYGZtXJzctA1ar5tAD75g1BCF2y61MGAv
-         EPmolbPJPFcSJnNx2lwPsx6J1MSzzvGlngjih3iRWbObk0wArFJu0DE5u9t5wNhHS4CY
-         gnFZdjF9k9RUBSM8bKC2l5unJ3GRk3NwkXOU4Ur6hvqebwoF++68ZHHVg2Rnocx7YTFe
-         H0PUdVdvGDY4pzxbCV4ClfeRNgsZnxQ9l51nWr2DBIpkwwdP3R39Stclg4aZqrkRKjqx
-         mt3g==
-X-Gm-Message-State: AOJu0YxR6S+FZuGmVmyP0lIApkWzwysPsPaW1Rg7UXQJyM+uFsV6GDYB
-	NoYq6nkkkerjb84VYrnd2JWZtzVG4hpxA7XdKIGgBkyGGlFAhly3aoiaEg==
-X-Google-Smtp-Source: AGHT+IGXpdYOMRG7uYjfPMZjozA4RA0+c+yOLOYn7abXw+dEtoOWM/Qm3eSgRlVe6y67+FZ7Qsfu8g==
-X-Received: by 2002:a05:6402:3582:b0:5c8:a257:a33b with SMTP id 4fb4d7f45d1cf-5c91cf7f9ffmr348786a12.3.1728418173431;
-        Tue, 08 Oct 2024 13:09:33 -0700 (PDT)
-Received: from raspberrypi.home (46.205.194.156.nat.ftth.dynamic.t-mobile.pl. [46.205.194.156])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5c8e05acccbsm4608472a12.32.2024.10.08.13.09.31
+        d=1e100.net; s=20230601; t=1728419885; x=1729024685;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=jBKc56vBxPYaOUWcC+VFZKlnp8sdizUoPysD1KL2n2Y=;
+        b=nrK95roK+6LN7HG/MHeomaADtXnjRjpJYv9Dph9qt7Eve8f8gBNIqrTpG81p6smjwF
+         cXTD0Ei/bfmznu3rAGmGmWq/ysEEjmSYw7mLqBbWVR8CuIHIdii/w2F82ycPoeCswMNa
+         DiVYyLFC2sZn3xRG020XrxicsueNJcpozUrLkeR862t09lkuBU0vvxeTcnsnZIhv38vQ
+         fOiadqlk6lSlOFqUlJJV+2sOeWhvPMcbTuIYOuVuD8g2zFq5PpCyR7mUXcrvOyWtJ+As
+         hWvKuHRuoROjf/JwPq8LbEk70j/0w002FVxwPOlMWjwhbpnf4szBvb84+Adwot+P6UaZ
+         OmMQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU1xoTSg+MJTSysfdwHBL2fztbEfpkaXxU2c/M9WzU2GQF05Wlc19WMQlA5UXVXeGDDIAr7UF79GkBZOXSrOBU=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx1yGYdeqC4rTNIKVoruJNMaUYLAhrByx27O1X9KXxnvc4HBZ5l
+	Ng7oV+Be8KONMl31bAk6np56e7ZixEaABp2adCiH7rOfnkSTQOaTfuxqp6Gg5UM=
+X-Google-Smtp-Source: AGHT+IFQsuFQDnMORn6KRqls83kXMRALTmz1xji/Zv3nzyXsaV17OwyYMIY5gtZ7u9n9SjQRNHRlFg==
+X-Received: by 2002:a17:907:94d4:b0:a8d:250a:52b2 with SMTP id a640c23a62f3a-a998d114bbemr3268366b.6.1728419884897;
+        Tue, 08 Oct 2024 13:38:04 -0700 (PDT)
+Received: from localhost ([2a02:8071:b783:6940:c420:a9b6:c5e1:5b65])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a996274deeesm196971266b.103.2024.10.08.13.38.04
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 08 Oct 2024 13:09:32 -0700 (PDT)
-From: Arkadiusz Bokowy <arkadiusz.bokowy@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Arkadiusz Bokowy <arkadiusz.bokowy@gmail.com>
-Subject: [PATCH BlueZ] transport: Delay existence based on delay reporting capability
-Date: Tue,  8 Oct 2024 22:09:26 +0200
-Message-Id: <20241008200926.428679-1-arkadiusz.bokowy@gmail.com>
-X-Mailer: git-send-email 2.39.5
+        Tue, 08 Oct 2024 13:38:04 -0700 (PDT)
+Date: Tue, 8 Oct 2024 22:38:02 +0200
+From: Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@baylibre.com>
+To: Laurent Pinchart <laurent.pinchart@ideasonboard.com>
+Cc: Ulf Hansson <ulf.hansson@linaro.org>, 
+	Sakari Ailus <sakari.ailus@linux.intel.com>, dri-devel@lists.freedesktop.org, linux-kernel@vger.kernel.org, 
+	linux-bluetooth@vger.kernel.org, linux-clk@vger.kernel.org, linux-crypto@vger.kernel.org, 
+	dmaengine@vger.kernel.org, linux-gpio@vger.kernel.org, amd-gfx@lists.freedesktop.org, 
+	nouveau@lists.freedesktop.org, linux-stm32@st-md-mailman.stormreply.com, 
+	linux-arm-kernel@lists.infradead.org, linux-i2c@vger.kernel.org, linux-i3c@lists.infradead.org, 
+	linux-iio@vger.kernel.org, linux-input@vger.kernel.org, patches@opensource.cirrus.com, 
+	iommu@lists.linux.dev, imx@lists.linux.dev, linux-mediatek@lists.infradead.org, 
+	linux-media@vger.kernel.org, linux-mmc@vger.kernel.org, linux-mtd@lists.infradead.org, 
+	netdev@vger.kernel.org, linux-wireless@vger.kernel.org, linux-pci@vger.kernel.org, 
+	linux-phy@lists.infradead.org, linux-pwm@vger.kernel.org, linux-remoteproc@vger.kernel.org, 
+	linux-sound@vger.kernel.org, linux-spi@vger.kernel.org, linux-staging@lists.linux.dev, 
+	linux-usb@vger.kernel.org, linux-serial@vger.kernel.org, greybus-dev@lists.linaro.org, 
+	asahi@lists.linux.dev, rafael@kernel.org, Andy Shevchenko <andy.shevchenko@gmail.com>
+Subject: Re: [PATCH 00/51] treewide: Switch to __pm_runtime_put_autosuspend()
+Message-ID: <ttmnzgsdyng5vab63pvj7csrotbsmwnultjelvdotrvyg2snac@iv7afgect5f3>
+References: <20241004094101.113349-1-sakari.ailus@linux.intel.com>
+ <CAPDyKFp0N6UJhnHS164Tdf=xkWB0jzq65L9TdvYazeBQ-6WjeQ@mail.gmail.com>
+ <20241007184924.GH14766@pendragon.ideasonboard.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="2ocqjla6tcmukjn3"
+Content-Disposition: inline
+In-Reply-To: <20241007184924.GH14766@pendragon.ideasonboard.com>
 
-In case when the existence of the delay property is based on its value
-not being zero it is not possible to read the delay if sink sets it to
-zero on purpose (or it was not updated by the sink at all). However,
-client might expect it to be readable, if SEP reports delay reporting
-as available.
 
-Instead of checking the value, we should check the capabilities of
-the AVDTP stream. Also, by doing that we can allow this property to
-be writable in the future - the exists() callback is used in the
-properties_set() function as well.
----
- profiles/audio/avdtp.c     |  4 ++++
- profiles/audio/avdtp.h     |  1 +
- profiles/audio/transport.c | 23 ++++++++++++++++++-----
- 3 files changed, 23 insertions(+), 5 deletions(-)
+--2ocqjla6tcmukjn3
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/profiles/audio/avdtp.c b/profiles/audio/avdtp.c
-index 448ee2730..289b40827 100644
---- a/profiles/audio/avdtp.c
-+++ b/profiles/audio/avdtp.c
-@@ -3203,6 +3203,10 @@ gboolean avdtp_stream_has_capabilities(struct avdtp_stream *stream,
- 	return TRUE;
- }
- 
-+gboolean avdtp_stream_has_delay_reporting(struct avdtp_stream *stream) {
-+	return stream->delay_reporting;
-+}
-+
- struct avdtp_remote_sep *avdtp_stream_get_remote_sep(
- 						struct avdtp_stream *stream)
- {
-diff --git a/profiles/audio/avdtp.h b/profiles/audio/avdtp.h
-index 102a2603e..500b814ac 100644
---- a/profiles/audio/avdtp.h
-+++ b/profiles/audio/avdtp.h
-@@ -252,6 +252,7 @@ struct avdtp_service_capability *avdtp_stream_get_codec(
- 						struct avdtp_stream *stream);
- gboolean avdtp_stream_has_capabilities(struct avdtp_stream *stream,
- 					GSList *caps);
-+gboolean avdtp_stream_has_delay_reporting(struct avdtp_stream *stream);
- struct avdtp_remote_sep *avdtp_stream_get_remote_sep(
- 						struct avdtp_stream *stream);
- 
-diff --git a/profiles/audio/transport.c b/profiles/audio/transport.c
-index caa7287db..1a65ec6f9 100644
---- a/profiles/audio/transport.c
-+++ b/profiles/audio/transport.c
-@@ -377,13 +377,22 @@ static gboolean media_transport_set_fd(struct media_transport *transport,
- 	return TRUE;
- }
- 
-+static struct avdtp_stream *
-+transport_a2dp_get_stream(struct media_transport *transport)
-+{
-+	struct media_endpoint *endpoint = transport->endpoint;
-+	struct a2dp_sep *sep = media_endpoint_get_sep(endpoint);
-+	struct avdtp_stream *stream = a2dp_sep_get_stream(sep);
-+
-+	return stream;
-+}
-+
- static void a2dp_resume_complete(struct avdtp *session, int err,
- 							void *user_data)
- {
- 	struct media_owner *owner = user_data;
- 	struct media_request *req = owner->pending;
- 	struct media_transport *transport = owner->transport;
--	struct a2dp_sep *sep = media_endpoint_get_sep(transport->endpoint);
- 	struct avdtp_stream *stream;
- 	int fd;
- 	uint16_t imtu, omtu;
-@@ -394,7 +403,7 @@ static void a2dp_resume_complete(struct avdtp *session, int err,
- 	if (err)
- 		goto fail;
- 
--	stream = a2dp_sep_get_stream(sep);
-+	stream = transport_a2dp_get_stream(transport);
- 	if (stream == NULL)
- 		goto fail;
- 
-@@ -852,9 +861,13 @@ static gboolean delay_reporting_exists(const GDBusPropertyTable *property,
- 							void *data)
- {
- 	struct media_transport *transport = data;
--	struct a2dp_transport *a2dp = transport->data;
-+	struct avdtp_stream *stream;
-+
-+	stream = media_transport_get_stream(transport);
-+	if (stream == NULL)
-+		return FALSE;
- 
--	return a2dp->delay != 0;
-+	return avdtp_stream_has_delay_reporting(stream);
- }
- 
- static gboolean get_delay_reporting(const GDBusPropertyTable *property,
-@@ -2023,7 +2036,7 @@ static void *transport_asha_init(struct media_transport *transport, void *data)
- #define A2DP_OPS(_uuid, _init, _set_volume, _destroy) \
- 	TRANSPORT_OPS(_uuid, transport_a2dp_properties, NULL, NULL, _init, \
- 			transport_a2dp_resume, transport_a2dp_suspend, \
--			transport_a2dp_cancel, NULL, NULL, \
-+			transport_a2dp_cancel, NULL, transport_a2dp_get_stream, \
- 			transport_a2dp_get_volume, _set_volume, \
- 			_destroy)
- 
--- 
-2.39.5
+Hello,
 
+On Mon, Oct 07, 2024 at 09:49:24PM +0300, Laurent Pinchart wrote:
+> On Fri, Oct 04, 2024 at 04:38:36PM +0200, Ulf Hansson wrote:
+> > On Fri, 4 Oct 2024 at 11:41, Sakari Ailus <sakari.ailus@linux.intel.com=
+> wrote:
+> > >
+> > > Hello everyone,
+> > >
+> > > This set will switch the users of pm_runtime_put_autosuspend() to
+> > > __pm_runtime_put_autosuspend() while the former will soon be re-purpo=
+sed
+> > > to include a call to pm_runtime_mark_last_busy(). The two are almost
+> > > always used together, apart from bugs which are likely common. Going
+> > > forward, most new users should be using pm_runtime_put_autosuspend().
+> > >
+> > > Once this conversion is done and pm_runtime_put_autosuspend() re-purp=
+osed,
+> > > I'll post another set to merge the calls to __pm_runtime_put_autosusp=
+end()
+> > > and pm_runtime_mark_last_busy().
+> >=20
+> > That sounds like it could cause a lot of churns.
+> >=20
+> > Why not add a new helper function that does the
+> > pm_runtime_put_autosuspend() and the pm_runtime_mark_last_busy()
+> > things? Then we can start moving users over to this new interface,
+> > rather than having this intermediate step?
+>=20
+> I think the API would be nicer if we used the shortest and simplest
+> function names for the most common use cases. Following
+> pm_runtime_put_autosuspend() with pm_runtime_mark_last_busy() is that
+> most common use case. That's why I like Sakari's approach of repurposing
+> pm_runtime_put_autosuspend(), and introducing
+> __pm_runtime_put_autosuspend() for the odd cases where
+> pm_runtime_mark_last_busy() shouldn't be called.
+
+That's ok for me. However this patch series isn't the optimal path to
+there because most drivers (i.e. those that already today do
+pm_runtime_mark_last_busy() in combination with
+pm_runtime_put_autosuspend()) have to be patched twice.
+
+The saner route is: Only convert the drivers with a sole
+pm_runtime_put_autosuspend() (i.e. without pm_runtime_mark_last_busy())
+to __pm_runtime_put_autosuspend(). Then add the mark_last_busy() bits to
+pm_runtime_put_autosuspend() and then drop the explicit calls to
+pm_runtime_mark_last_busy() before pm_runtime_put_autosuspend().
+
+(Note this doesn't take into account Rafael's position that
+pm_runtime_put() might be the saner option. My argument applies for that
+conversion analogously.)
+
+Best regards
+Uwe
+
+--2ocqjla6tcmukjn3
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEP4GsaTp6HlmJrf7Tj4D7WH0S/k4FAmcFmCEACgkQj4D7WH0S
+/k6xnwf/QOZhbtT562rFFa3JIiBatDxTcqyEXoXClrP7jSyQFY/VFzq2S2jRHOFt
+wM6zQUX1bTUqDtC4HozJIbQDjLxd3qFgc5RoTRLV8VhRJbcq9cOo5Nf1h4KJ5Ip9
+nhpzoHwUHoEjEHj1f9UvEWfnFAVCSLFxgb14ZDHZyb2pQue3G5OYI2f2cJYT8YVB
+xQktDFp7rUu4xWDTzoIxNKvR1Ipy5fGxdf9R2/+IQhW64sWuDG2ZH6tAmfn6mEb8
+ecspbesJx+NMbZ06Zl7wqBvyj/DpQGgPaCnWUQ5cI0Of/kOzqxh4+65JK68CLLs0
+/Goin2zz55IZITGC5zHuAA07bW/c7Q==
+=7Wup
+-----END PGP SIGNATURE-----
+
+--2ocqjla6tcmukjn3--
