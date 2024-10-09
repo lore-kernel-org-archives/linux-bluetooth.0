@@ -1,123 +1,128 @@
-Received: from mail-yb1-f178.google.com (mail-yb1-f178.google.com [209.85.219.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 652941E0E16
-	for <linux-bluetooth@vger.kernel.org>; Wed,  9 Oct 2024 17:42:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65068152E1C
+	for <linux-bluetooth@vger.kernel.org>; Wed,  9 Oct 2024 17:53:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728495727; cv=none; b=mX7ciQx3kQ3iH0jvwRxfv9QaO6k0an01MxD1U9e/SD822f7cZ/NuW9QQaVv/SdnKgXfhgvUy47HcfF3c+qG57JqOHF4OY8LPT5DiZ1ELJa/YDf6e07fHbRQX6YCspE4dsPok1WSEtjOXxGGEhICpsaL1xbBGENB3KKxrccE69XQ=
+	t=1728496409; cv=none; b=IeEuVbXLucNv07zcVNyUvx0Id/BKt9sAG7Q1DmSIMk5M9GOhxJsoBMWXFSRugaPTCQk/ZaK6nGVsihUzt6H3gkxAq/VRiqJWlSPyihx7zf5QbdMdoHKgZnWgnK7TyVjjCgcy83kxjuHNoUFn66Y4kNybOcZbtozV3frB19JIOUo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728495727; c=relaxed/simple;
-	bh=mKRaqqrTDqsjJiGT5HqYOVAvwqO16cHV5uyotgYW5ww=;
+	s=arc-20240116; t=1728496409; c=relaxed/simple;
+	bh=g4yq2IQZCDeawzaR+ZnWEmNfNCKeyCM9oGnrwXbLB+I=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=pZrjPkfm2Iv8KW9lQvHSNd8UdEkBUk8jjMIo5jQAZW7ADzRCX5WCpkLYDDR4ooxYl/tloGt6XnxkW35nrOraa05hbvZJTv650nqG3ftD8Lu9QhGKlkbY/c3ZSFHdmZHpZ+BymadDAHdALRr+dvA+bT9cjBzL+1T8tC4RqEOVdV4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lwm03hC0; arc=none smtp.client-ip=209.85.219.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	 Content-Type:MIME-Version; b=b51Q7yfMa8eU+VfBYfVwQAbbSZWwVQ1ZeZmU4Pu6z1XJzNIsvaL3tujtLun7+uwB6rV7FsZjmhp4oJy3+B1IkU9Eljt6/VbW5Y6oY4QcZWQAZAQsRKmw++kfC4N9QX2WGmge4boF+AiJzuVzWfMrt3edxGNHtL8b8B/isbP9IMc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=juG90MSz; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lwm03hC0"
-Received: by mail-yb1-f178.google.com with SMTP id 3f1490d57ef6-e2908e8d45eso451648276.2
-        for <linux-bluetooth@vger.kernel.org>; Wed, 09 Oct 2024 10:42:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1728495725; x=1729100525; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=SYNUEVyY6t3O86bI0XZXWo8P5jtZ/LYl1bjt0nJaaBQ=;
-        b=lwm03hC0Z7KtKH7tlR6262SSkuZCgrA30gUh+SvYtV34C9oo7tXgL+GjCcZ1c+TrbQ
-         AQtKOaUVThso+VC7uteSQXzhFLkMMVr/UUpAxBDkvot+g9Ew2MOvUVG2rRZuzcmjtivF
-         uwWoEZMGBTmHdSCj5ulVkQgXGqlkQOumIP+ArzTKdyZxsbVW76WDVJzoe4z2qbMTMMqf
-         nV9geZgdtS7XzHY07fcLxWCKFZ+XGzEblql8hISAmff5yCYpBUcMQmBdl2L5H0W1zB95
-         J2vBtb4ApkgzSVIzaoaYFifTRzXYPrl2EHjj6HRTdHk+CZwUGjM+a+TD6rVa5S4cSDqx
-         9S2Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728495725; x=1729100525;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=SYNUEVyY6t3O86bI0XZXWo8P5jtZ/LYl1bjt0nJaaBQ=;
-        b=AC/+P7bhK3PenyOvZzTqBggS0qM6I8JmjU10y3qVJpVb+mPDUCtDffr+DED3pmn2YF
-         dSRuuMOZEITI82tr9pyQN0p3GgCcwQNZG3c7OnXP/C5GD2K+vNj78MokRlNZQJy9kkRl
-         98fXSMNtO62XbssNwzzwcuPdj40EmULeo2CheBKaBVIJkh3RfvNBiVOLjON95GRc2BOL
-         ZfKKaLqI3AIReHA28wH8ad0zQ1JipjSbK0Wy7EO9mMblh213if98VkJ9m6kJ38sxsMeQ
-         kwXZ9NbWakEeS7a/jEoKPilfMOBttucwpfc0P5LbH6l7Q+sYs/N3so7RVduETnRFXxi2
-         Mbcw==
-X-Gm-Message-State: AOJu0YwH3jn35bo0dJyyB1OoagC42nr7ZlX4rmulNQau+mUidd0+t2gL
-	bjtOpr8SRPU/HvOJx+KxfaylBZKO9us7qP2OOrVTVW0dgZ64pzK86cOoWWDs
-X-Google-Smtp-Source: AGHT+IGo3kECjQ6tEDcHTOMp+fHt9kwSsyPd8ZyHIQyJywQhQ5wMPo6jRgcTHlVYgSelE3oF01cnGg==
-X-Received: by 2002:a05:6902:c03:b0:e28:eaed:3244 with SMTP id 3f1490d57ef6-e28fe420229mr2090403276.55.1728495724593;
-        Wed, 09 Oct 2024 10:42:04 -0700 (PDT)
-Received: from lvondent-mobl5.safetynetaccess.com ([50.204.57.18])
-        by smtp.gmail.com with ESMTPSA id 3f1490d57ef6-e28a5c3755fsm1850405276.17.2024.10.09.10.42.02
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 09 Oct 2024 10:42:03 -0700 (PDT)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="juG90MSz"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id E1347C4CECC
+	for <linux-bluetooth@vger.kernel.org>; Wed,  9 Oct 2024 17:53:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1728496405;
+	bh=g4yq2IQZCDeawzaR+ZnWEmNfNCKeyCM9oGnrwXbLB+I=;
+	h=From:To:Subject:Date:In-Reply-To:References:From;
+	b=juG90MSzTDWUIvC51VqVklnjgJtECQK0LKVk/4DLh6Mlh9j2J/C23m0+nKUMSPLiG
+	 ejveALQyegcM4SvXsoCP+wkUKUV30ksQvj/D6DoFYivOcSCzv7NI99Gsnqq09gg1fV
+	 lCSt97Ch3A+Rx/aXhO6A6FVB5o2d8QAKrGd+5qkyTFqTaHvIxhSAwl0AQ6jFpC09fn
+	 ShE9O6qQpChpG+DeDm7/ym256mj5NVFbXnez6VHRT2k0XzTvafZ4RETTPoqMXq3RsV
+	 c9a4isiXzmYdsctjH01hPCbQiH6jB7tVS8g5LADcyxXw1xu2IWqC7c6/vo+Ps9KiS6
+	 pVzJ7kekMbHcw==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+	id D511BC53BC7; Wed,  9 Oct 2024 17:53:25 +0000 (UTC)
+From: bugzilla-daemon@kernel.org
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 2/2] Bluetooth: hci_core: Fix not checking skb length on hci_scodata_packet
-Date: Wed,  9 Oct 2024 13:41:59 -0400
-Message-ID: <20241009174159.15658-2-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.46.2
-In-Reply-To: <20241009174159.15658-1-luiz.dentz@gmail.com>
-References: <20241009174159.15658-1-luiz.dentz@gmail.com>
+Subject: [Bug 219365] USB bluetooth dongle stop working after upgrade from
+ 6.11.1 to 6.11.2
+Date: Wed, 09 Oct 2024 17:53:25 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: adilson@adilson.net.br
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P3
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-219365-62941-jYIq6avIdi@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-219365-62941@https.bugzilla.kernel.org/>
+References: <bug-219365-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+https://bugzilla.kernel.org/show_bug.cgi?id=3D219365
 
-This fixes not checking if skb really contains an SCO header otherwise
-the code may attempt to access some uninitilized/invalid memory past the
-valid skb->data.
+--- Comment #2 from Adilson Dantas (adilson@adilson.net.br) ---
+I tested each commit with 6.11.2 and 6.12-rc2 and I have isolated the
+regression at commit 8603daa4300b84abb3c68e48f3b607d7d5a2a207=20
 
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
----
- net/bluetooth/hci_core.c | 13 +++++++++----
- 1 file changed, 9 insertions(+), 4 deletions(-)
 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index d5f917076e0e..779c4aeaef22 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -3808,18 +3808,22 @@ static void hci_acldata_packet(struct hci_dev *hdev, struct sk_buff *skb)
- /* SCO data packet */
- static void hci_scodata_packet(struct hci_dev *hdev, struct sk_buff *skb)
- {
--	struct hci_sco_hdr *hdr = (void *) skb->data;
-+	struct hci_sco_hdr *hdr;
- 	struct hci_conn *conn;
- 	__u16 handle, flags;
- 
--	skb_pull(skb, HCI_SCO_HDR_SIZE);
-+	hdr = skb_pull_data(skb, sizeof(*hdr));
-+	if (!hdr) {
-+		bt_dev_err(hdev, "SCO packet too small");
-+		goto drop;
-+	}
- 
- 	handle = __le16_to_cpu(hdr->handle);
- 	flags  = hci_flags(handle);
- 	handle = hci_handle(handle);
- 
--	BT_DBG("%s len %d handle 0x%4.4x flags 0x%4.4x", hdev->name, skb->len,
--	       handle, flags);
-+	bt_dev_dbg(hdev, "len %d handle 0x%4.4x flags 0x%4.4x", skb->len,
-+		   handle, flags);
- 
- 	hdev->stat.sco_rx++;
- 
-@@ -3837,6 +3841,7 @@ static void hci_scodata_packet(struct hci_dev *hdev, struct sk_buff *skb)
- 				       handle);
- 	}
- 
-+drop:
- 	kfree_skb(skb);
- }
- 
--- 
-2.46.2
+    Bluetooth: btusb: Fix not handling ZPL/short-transfer
 
+    [ Upstream commit 7b05933340f4490ef5b09e84d644d12484b05fdf ]
+
+Reverting this commit fix the regression on my BT dongle.
+
+
+(In reply to Paul Menzel from comment #1)
+> Thank you for your report, and great that you can build the Linux kernel
+> yourself.
+>=20
+> > Maybe is one or all commits has caused the regression on my BT dongle
+>=20
+> It=E2=80=99d be great if you tested each of the three commits. (Normally,=
+ `git
+> bisect start -- drivers/bluetooth/btusb.c net/bluetooth/`, and then `git
+> bisect good v6.11.1` and `git bisect bad v6.11.2`, would do that
+> automatically.)
+>=20
+> If you already have git clone, then:
+>=20
+>     git remote add stable
+> git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux-stable.git
+>     git fetch stable
+>=20
+> or, if you do not,
+>=20
+>     git clone
+> git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux-stable.git
+>=20
+> Then
+>=20
+>     git reset --hard f68f72d04b60d3af36b63b888fe084966bca07b9
+>=20
+> build and test. If it does *not* work, it=E2=80=99s the fault commit.
+>=20
+> Then
+>=20
+>     git reset --hard 846a6fc7860119ee72737391856497b3fcf7c2b5
+>=20
+> If it does *not* work, it=E2=80=99s the fault commit.
+>=20
+> Then
+>=20
+>     git reset --hard 8603daa4300b84abb3c68e48f3b607d7d5a2a207
+>=20
+> If it does *not* work, it=E2=80=99s the fault commit.
+>=20
+> It=E2=80=99d be also good to know, if it works with current Linux master =
+branch, or
+> 6.12-rc2.
+
+--=20
+You may reply to this email to add a comment.
+
+You are receiving this mail because:
+You are the assignee for the bug.=
