@@ -1,173 +1,121 @@
-Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.86.151])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f173.google.com (mail-yb1-f173.google.com [209.85.219.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DEA41DF97F
-	for <linux-bluetooth@vger.kernel.org>; Wed,  9 Oct 2024 16:37:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.58.86.151
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 774441E1A1C
+	for <linux-bluetooth@vger.kernel.org>; Wed,  9 Oct 2024 17:42:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728491864; cv=none; b=HjhdoaQFZRyyzHTKcKM3ptj41fnJt8xH2f7IhNIhTpFzFXEUSDaKj6R7q4e2OlZHZIhISoll/u0/n+yGQWf/hdXW9rVplMx8+/x1MbZWvJbKsCHgsEiX4YtHarferzjgI4g5sFWjirpx0P+gvFHtKVd85nCSzVzEM/yzFErmMkY=
+	t=1728495726; cv=none; b=DGw/5Glu3K0SLqIEnnL4TocWfIepksfxvB5pA442bQODvL/1XdyTOcHU/PaKzcrkt7ZG3CCTkQsxCZFse6YLRSx2wJSVxla//nweUH2UobXcQCqusZskfEyQeE9fu/UsB7cGL74zd+gtgktQZWOmo+hXTep+efkDtUPzZlYYiSk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728491864; c=relaxed/simple;
-	bh=28jugDOhquh+90spPGv5MKQk4Y8RSQb7T1bWx5XH7I4=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 MIME-Version:Content-Type; b=qOGy477paoxdgKnmzLV0XdKLb8piWPsLrLoQP5OlM9JRClifkH9fCFessWe1dkp1oLNgQq1cEj2NeAxc2tZjSx4dVw+yhU4SeL87QdnmOigdWZtrh1XlsSDOhFbIpwoTxuLz7njailAgV+W1og5q046oz2Gfg3nBFR0KXkT4DL8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ACULAB.COM; spf=pass smtp.mailfrom=aculab.com; arc=none smtp.client-ip=185.58.86.151
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ACULAB.COM
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=aculab.com
-Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
- relay.mimecast.com with ESMTP with both STARTTLS and AUTH (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- uk-mta-133-m9nfg3y3MLyW_hUkH7wLog-1; Wed, 09 Oct 2024 17:37:33 +0100
-X-MC-Unique: m9nfg3y3MLyW_hUkH7wLog-1
-Received: from AcuMS.Aculab.com (10.202.163.4) by AcuMS.aculab.com
- (10.202.163.4) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Wed, 9 Oct
- 2024 17:37:32 +0100
-Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
- id 15.00.1497.048; Wed, 9 Oct 2024 17:37:32 +0100
-From: David Laight <David.Laight@ACULAB.COM>
-To: 'Andrej Shadura' <andrew.shadura@collabora.co.uk>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-CC: Nathan Chancellor <nathan@kernel.org>, Justin Stitt
-	<justinstitt@google.com>, Aleksei Vetrov <vvvvvv@google.com>,
-	"llvm@lists.linux.dev" <llvm@lists.linux.dev>, "kernel@collabora.com"
-	<kernel@collabora.com>, George Burgess <gbiv@chromium.org>,
-	"stable@vger.kernel.org" <stable@vger.kernel.org>
-Subject: RE: [PATCH v2] Bluetooth: Fix type of len in
- rfcomm_sock_getsockopt{,_old}()
-Thread-Topic: [PATCH v2] Bluetooth: Fix type of len in
- rfcomm_sock_getsockopt{,_old}()
-Thread-Index: AQHbGllm5JoAzzHp/kq/PUrt6KxIY7J+nDog
-Date: Wed, 9 Oct 2024 16:37:32 +0000
-Message-ID: <49c81d21778b4ef5a7ab458b359a9993@AcuMS.aculab.com>
-References: <20241009121424.1472485-1-andrew.shadura@collabora.co.uk>
-In-Reply-To: <20241009121424.1472485-1-andrew.shadura@collabora.co.uk>
-Accept-Language: en-GB, en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
+	s=arc-20240116; t=1728495726; c=relaxed/simple;
+	bh=EKKtXBmbTsgg5aJfG+bqnKrO3lF5cL6lJybtQvaFXls=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=ajL0xlxvc5sSmGJ3p35rL4Q/J6Mjz+iGATQjQd1UUQ92AfzWdgYUt2OIxXqSXJYZ2uZahZy4EfSr5Nfh1FVpZiY/PNH4UKVC4c0/Xl/ptHvFaVyEaWHJyr8+Z4v6GDi5e88cLPguvmq4ut0IZUeRkh2pqYbd4D42RVkW9amwi/M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=J9o7avNo; arc=none smtp.client-ip=209.85.219.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="J9o7avNo"
+Received: by mail-yb1-f173.google.com with SMTP id 3f1490d57ef6-e28ea358f65so93934276.0
+        for <linux-bluetooth@vger.kernel.org>; Wed, 09 Oct 2024 10:42:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1728495723; x=1729100523; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=KK9o9FLLSOpGDDJwgR8CE1uDvUbDAUP113jniXxEl8w=;
+        b=J9o7avNopQv4zc4jWk7qwBPXw4Y/il0AKc94lJVAJtGY6M/RxP8SXY6KSeAS4/kK55
+         VEHzYIgP1wqC2mtabD7GQNsFrl47KJFQdyxsnQ6wFDkOttULaziievGADZTxT4tgjSz7
+         rpZl9EvofInrLZXwIIL2mcaG+f5IasJkQikFs0Fsj89p9/ShQhSl4OQGXzM77k+0KXby
+         ax/PzUfYVgJpL26fzI1Agy3QIApba/65HElEH/S2l4LQFXahEuhHVy34ZlUJ6M9wY3lm
+         FeKytFV2QZI5KAss+HjZMelvAuUTs260qvreLd3OPW5y5zoJxz+F6FW8SchAh+xHhfb+
+         LaEw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728495723; x=1729100523;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=KK9o9FLLSOpGDDJwgR8CE1uDvUbDAUP113jniXxEl8w=;
+        b=mlz8C0cnrhBBYJ1uIKhildmajaDkvw8IDoGdqsopt5kEMomKMfDkkQ3Q8c4xXKCZWJ
+         b93hiV3XIms74gL1mVG+u9F208GqaP2PjMLAyoIyXIUEeq+SUlqBKpW0sw3847yUoB8H
+         W3ysfsGknbX9KJqJLGP4geuanHi6ia/97QZnYQGz5BEwBJMpXqG7hTfaudvdlhQnuRLz
+         mC1NuuxIzo8l4/D8JaBsIHl2V6yk8TwSWDbzYQLgbuPH6qAfmqIHN4sDrY0XzQBYPTZ7
+         Dtr0QByjnJ4kXsXcMeAQaSPtaPLKLGxqgLTWxHQ+ZIZcl1VDASsYHY8wf4JLF49Skmxe
+         dLZA==
+X-Gm-Message-State: AOJu0YyL5EsNPUzgO3W+mRmsejPr334v20R9B/GyVqrfBW2kKJhUN9dE
+	+8o05Cp3BShs+O7eOOa9kzNqF2Q5PMCGSmaG1y57mSw4Zr+AzPHXTDQbcgcY
+X-Google-Smtp-Source: AGHT+IFVNxhjo+4+n9Di826hZUZHxmgmh5g9ZfELlKI72Fy/9IYUWmk/UKkSYp8YFNFWU02dhtCm2g==
+X-Received: by 2002:a05:6902:114c:b0:e28:e4d8:f6ac with SMTP id 3f1490d57ef6-e290b7eb2b0mr516539276.17.1728495722707;
+        Wed, 09 Oct 2024 10:42:02 -0700 (PDT)
+Received: from lvondent-mobl5.safetynetaccess.com ([50.204.57.18])
+        by smtp.gmail.com with ESMTPSA id 3f1490d57ef6-e28a5c3755fsm1850405276.17.2024.10.09.10.42.00
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 09 Oct 2024 10:42:00 -0700 (PDT)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH v2 1/2] Bluetooth: hci_core: Fix not checking skb length on hci_acldata_packet
+Date: Wed,  9 Oct 2024 13:41:58 -0400
+Message-ID: <20241009174159.15658-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.46.2
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: aculab.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-From: Andrej Shadura
-> Sent: 09 October 2024 13:14
->=20
-> Commit 9bf4e919ccad worked around an issue introduced after an innocuous
-> optimisation change in LLVM main:
->=20
-> > len is defined as an 'int' because it is assigned from
-> > '__user int *optlen'. However, it is clamped against the result of
-> > sizeof(), which has a type of 'size_t' ('unsigned long' for 64-bit
-> > platforms). This is done with min_t() because min() requires compatible
-> > types, which results in both len and the result of sizeof() being caste=
-d
-> > to 'unsigned int', meaning len changes signs and the result of sizeof()
-> > is truncated. From there, len is passed to copy_to_user(), which has a
-> > third parameter type of 'unsigned long', so it is widened and changes
-> > signs again.
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-That can't matter because the value is a small positive integer.
+This fixes not checking if skb really contains an ACL header otherwise
+the code may attempt to access some uninitilized/invalid memory past the
+valid skb->data.
 
-> This excessive casting in combination with the KCSAN
-> > instrumentation causes LLVM to fail to eliminate the __bad_copy_from()
-> > call, failing the build.
->=20
-> The same issue occurs in rfcomm in functions rfcomm_sock_getsockopt and
-> rfcomm_sock_getsockopt_old.
->=20
-> Change the type of len to size_t in both rfcomm_sock_getsockopt and
-> rfcomm_sock_getsockopt_old and replace min_t() with min().
+Reported-by: syzbot+6ea290ba76d8c1eb1ac2@syzkaller.appspotmail.com
+Tested-by: syzbot+6ea290ba76d8c1eb1ac2@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=6ea290ba76d8c1eb1ac2
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+---
+ net/bluetooth/hci_core.c | 13 +++++++++----
+ 1 file changed, 9 insertions(+), 4 deletions(-)
 
-Isn't there still a problem if the application passed a negative length.
-You are converting it to a very large unsigned value and then reducing
-it to the structure size.
-Since the structure size will be less than 2GB it makes no difference
-whether the '__user int optlen' is ever converted to 64bits.
-I think you are just hiding a bug in a different way.
-
-Note that pretty much all the checks for 'optlen' have treated
-negative values as 4 since well before the min() and min_t()
-#defines were added.
-Look at the tcp code!
-
-I bet that globally fixing the test will cause some important
-application that is passing 'on stack garbage' to fail.
-
-=09David
-
->=20
-> Cc: stable@vger.kernel.org
-> Co-authored-by: Aleksei Vetrov <vvvvvv@google.com>
-> Improves: 9bf4e919ccad ("Bluetooth: Fix type of len in {l2cap,sco}_sock_g=
-etsockopt_old()")
-> Link: https://github.com/ClangBuiltLinux/linux/issues/2007
-> Link: https://github.com/llvm/llvm-project/issues/85647
-> Signed-off-by: Andrej Shadura <andrew.shadura@collabora.co.uk>
-> Reviewed-by: Nathan Chancellor <nathan@kernel.org>
-> ---
->  net/bluetooth/rfcomm/sock.c | 10 ++++++----
->  1 file changed, 6 insertions(+), 4 deletions(-)
->=20
-> diff --git a/net/bluetooth/rfcomm/sock.c b/net/bluetooth/rfcomm/sock.c
-> index 37d63d768afb..5f9d370e09b1 100644
-> --- a/net/bluetooth/rfcomm/sock.c
-> +++ b/net/bluetooth/rfcomm/sock.c
-> @@ -729,7 +729,8 @@ static int rfcomm_sock_getsockopt_old(struct socket *=
-sock, int optname, char __u
->  =09struct sock *l2cap_sk;
->  =09struct l2cap_conn *conn;
->  =09struct rfcomm_conninfo cinfo;
-> -=09int len, err =3D 0;
-> +=09int err =3D 0;
-> +=09size_t len;
->  =09u32 opt;
->=20
->  =09BT_DBG("sk %p", sk);
-> @@ -783,7 +784,7 @@ static int rfcomm_sock_getsockopt_old(struct socket *=
-sock, int optname, char __u
->  =09=09cinfo.hci_handle =3D conn->hcon->handle;
->  =09=09memcpy(cinfo.dev_class, conn->hcon->dev_class, 3);
->=20
-> -=09=09len =3D min_t(unsigned int, len, sizeof(cinfo));
-> +=09=09len =3D min(len, sizeof(cinfo));
->  =09=09if (copy_to_user(optval, (char *) &cinfo, len))
->  =09=09=09err =3D -EFAULT;
->=20
-> @@ -802,7 +803,8 @@ static int rfcomm_sock_getsockopt(struct socket *sock=
-, int level, int optname, c
->  {
->  =09struct sock *sk =3D sock->sk;
->  =09struct bt_security sec;
-> -=09int len, err =3D 0;
-> +=09int err =3D 0;
-> +=09size_t len;
->=20
->  =09BT_DBG("sk %p", sk);
->=20
-> @@ -827,7 +829,7 @@ static int rfcomm_sock_getsockopt(struct socket *sock=
-, int level, int optname, c
->  =09=09sec.level =3D rfcomm_pi(sk)->sec_level;
->  =09=09sec.key_size =3D 0;
->=20
-> -=09=09len =3D min_t(unsigned int, len, sizeof(sec));
-> +=09=09len =3D min(len, sizeof(sec));
->  =09=09if (copy_to_user(optval, (char *) &sec, len))
->  =09=09=09err =3D -EFAULT;
->=20
-> --
-> 2.43.0
->=20
-
--
-Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1=
-PT, UK
-Registration No: 1397386 (Wales)
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index b2f8f9c5b610..d5f917076e0e 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -3765,18 +3765,22 @@ static void hci_tx_work(struct work_struct *work)
+ /* ACL data packet */
+ static void hci_acldata_packet(struct hci_dev *hdev, struct sk_buff *skb)
+ {
+-	struct hci_acl_hdr *hdr = (void *) skb->data;
++	struct hci_acl_hdr *hdr;
+ 	struct hci_conn *conn;
+ 	__u16 handle, flags;
+ 
+-	skb_pull(skb, HCI_ACL_HDR_SIZE);
++	hdr = skb_pull_data(skb, sizeof(*hdr));
++	if (!hdr) {
++		bt_dev_err(hdev, "ACL packet too small");
++		goto drop;
++	}
+ 
+ 	handle = __le16_to_cpu(hdr->handle);
+ 	flags  = hci_flags(handle);
+ 	handle = hci_handle(handle);
+ 
+-	BT_DBG("%s len %d handle 0x%4.4x flags 0x%4.4x", hdev->name, skb->len,
+-	       handle, flags);
++	bt_dev_dbg(hdev, "len %d handle 0x%4.4x flags 0x%4.4x", skb->len,
++		   handle, flags);
+ 
+ 	hdev->stat.acl_rx++;
+ 
+@@ -3797,6 +3801,7 @@ static void hci_acldata_packet(struct hci_dev *hdev, struct sk_buff *skb)
+ 			   handle);
+ 	}
+ 
++drop:
+ 	kfree_skb(skb);
+ }
+ 
+-- 
+2.46.2
 
