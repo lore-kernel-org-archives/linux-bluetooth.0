@@ -1,206 +1,169 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E68DE38DD3
-	for <linux-bluetooth@vger.kernel.org>; Wed,  9 Oct 2024 04:50:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3793238DD3
+	for <linux-bluetooth@vger.kernel.org>; Wed,  9 Oct 2024 04:59:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728449455; cv=none; b=bdcareXITDRiFYrpKt/TkE278aQ+hxuffvLsGKubx2aDRdi05AobJHkCzT4Fz0Bcudf9MytiiJio0w05sm0i0Atde8XO2Vyo2owKHWj58wfB+q+AA7NXqD82XmU5Dg7Pc9HgrGhyemet87sL0RofaQhqgA0Sf1oGSlEoPquMWzg=
+	t=1728449972; cv=none; b=Otap8M6tCr1kx8WPBLaisuxmYYdF6Rjb6+Tisftclhp+VgqFIdW7s6rA7RfxPpayTyLS6YjR7l26jMDDArdgKwWYBm6BNmiTUlv9E5+hbbfjQdjRwWh185uqcS8EDTAYSm32ysw8bovPpffXTunwPZRwSQQW82kH+MsdFUM34Fc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728449455; c=relaxed/simple;
-	bh=dbNfqyCnb6tyMcUk8RFGr4oNVmPaqT6/sRxSiNTbfoM=;
-	h=From:To:Subject:Date:Message-ID:Content-Type:MIME-Version; b=HDFlMOctxDobRUtiwL1xZ0oJ+iqKzEtN8hDwttqS7ChUPPCOFemp9iRVZPnA4IfYQeihMpoxqvPliJAqjtprARJFMTjLx3T3EJ2MhTGR70GTLScTEKdKiHFTMVYW1Cu9IIG6eGF8GPNURY5L/O3znyzK1mFXd/iDXw76HGxF7iI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aDHHLP0c; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1728449972; c=relaxed/simple;
+	bh=D1K0zNs2VLrfrw8EZiBoNOnliTn0ioPcv0weP2ltOTg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=L1aYaKpa2r2IvjHtlZSZoE1E3X2Swix1DWghbcya7oNMv9aqlPfdBDsV8JtF1TiCflp+pxrN/g1aFUgpJriQpayjrc+BlBYqJ4bzDLefHF9PCQ/KTVLgIXzjCsFiBrY+JPiuqwVEwU5QCEUO0rbcsvvkoOQFwnpcqFVRB8fkr4s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=dZQd1xzf; arc=none smtp.client-ip=192.198.163.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aDHHLP0c"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 7A307C4CEC5
-	for <linux-bluetooth@vger.kernel.org>; Wed,  9 Oct 2024 04:50:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728449454;
-	bh=dbNfqyCnb6tyMcUk8RFGr4oNVmPaqT6/sRxSiNTbfoM=;
-	h=From:To:Subject:Date:From;
-	b=aDHHLP0cSYW0dlm67f2tMjHc2jBpgOIsHAEgRh5/QhnihIAxtY1r+TpOvoHBJe1ib
-	 K2jtni+DyEgQ1pBrLMEfdsQWCb9PH6yiaVvzuAuaf8rk1clfuYnqIpWzgCWmYMw4J7
-	 Zt8FWvmYJuqYc5BU9DCSeD2d8XC0VaE4WKAP9Jj4CLjs6FND8zdfx5ac1FS0G1QDdi
-	 8evglRiQjVRfRFsO5RnHDwgKB7xqwm5S7JJ3Q+KP6cSU+JQAmS1OQi6/9HNcWe44oB
-	 H2ScPiOFRyVTFvdQsVRAiPMYb9v7Ax5cQYk/BGEpmQq+3VjlYtituW0JBi5M2O/AbN
-	 s1OuCvCyYhoJQ==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id 65127C53BBF; Wed,  9 Oct 2024 04:50:54 +0000 (UTC)
-From: bugzilla-daemon@kernel.org
-To: linux-bluetooth@vger.kernel.org
-Subject: [Bug 219365] New: USB bluetooth dongle stop working after upgrade
- from 6.11.1 to 6.11.2
-Date: Wed, 09 Oct 2024 04:50:54 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: new
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: adilson@adilson.net.br
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P3
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: bug_id short_desc product version
- cf_kernel_version rep_platform op_sys bug_status bug_severity priority
- component assigned_to reporter cf_regression
-Message-ID: <bug-219365-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="dZQd1xzf"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1728449970; x=1759985970;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=D1K0zNs2VLrfrw8EZiBoNOnliTn0ioPcv0weP2ltOTg=;
+  b=dZQd1xzfKexM/M1cpOLTOnzJ94DQ0ZEw3u3ZQP+rlrEfPRlQ0wS8KrgH
+   cWkrApgcNnNHPEszKZSwAbxyQ1IFOmdmHI1mQK9H180oY3teZHMBnwA1j
+   gBft98DWRQbxQ0dbPa9115eWLkLZe3id61HAzM0SEy3AFncaNjXuTKqXn
+   LTiA9b5AsDCrP8x2YnyM2CMCKDvirMp3Ryl9vPNv9ltKrc6z2fMWBJTgJ
+   CxnGu2HmHnBDKAVmMnPfBUCWJBugJgM7mJdawn3UGI19G/urtHg4YcTGK
+   eC4EBht7bUk5GERExNC3uMTfXXGP++nXy0iiyOL7S5qrV7V37JRs/y3L/
+   A==;
+X-CSE-ConnectionGUID: Sn/BsrgvShOWOKBSF5T/1g==
+X-CSE-MsgGUID: L0cIIVMTROSsvF3bdtBTyA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11219"; a="15348136"
+X-IronPort-AV: E=Sophos;i="6.11,189,1725346800"; 
+   d="scan'208";a="15348136"
+Received: from fmviesa008.fm.intel.com ([10.60.135.148])
+  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Oct 2024 21:59:29 -0700
+X-CSE-ConnectionGUID: +KSim3ZxQE+rp+jWPzO2pg==
+X-CSE-MsgGUID: 35afDs9JR7yOWruXhROr4w==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,189,1725346800"; 
+   d="scan'208";a="76232807"
+Received: from lkp-server01.sh.intel.com (HELO a48cf1aa22e8) ([10.239.97.150])
+  by fmviesa008.fm.intel.com with ESMTP; 08 Oct 2024 21:59:29 -0700
+Received: from kbuild by a48cf1aa22e8 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1syOnF-0008ka-2Z;
+	Wed, 09 Oct 2024 04:59:25 +0000
+Date: Wed, 9 Oct 2024 12:58:49 +0800
+From: kernel test robot <lkp@intel.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+Cc: oe-kbuild-all@lists.linux.dev
+Subject: Re: [PATCH v1 2/2] Bluetooth: hci_core: Fix not checking skb length
+ on hci_scodata_packet
+Message-ID: <202410091240.Pm3POYhz-lkp@intel.com>
+References: <20241008154005.595169-2-luiz.dentz@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241008154005.595169-2-luiz.dentz@gmail.com>
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D219365
+Hi Luiz,
 
-            Bug ID: 219365
-           Summary: USB bluetooth dongle stop working after upgrade from
-                    6.11.1 to 6.11.2
-           Product: Drivers
-           Version: 2.5
-    Kernel Version: 6.11.2
-          Hardware: All
-                OS: Linux
-            Status: NEW
-          Severity: normal
-          Priority: P3
-         Component: Bluetooth
-          Assignee: linux-bluetooth@vger.kernel.org
-          Reporter: adilson@adilson.net.br
-        Regression: Yes
+kernel test robot noticed the following build warnings:
 
-After upgrading from 6.11.1 to 6.11.2, my bluetooth dongle stop working with
-the following errors below:
+[auto build test WARNING on bluetooth-next/master]
+[also build test WARNING on bluetooth/master linus/master v6.12-rc2 next-20241008]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
+url:    https://github.com/intel-lab-lkp/linux/commits/Luiz-Augusto-von-Dentz/Bluetooth-hci_core-Fix-not-checking-skb-length-on-hci_scodata_packet/20241008-234120
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
+patch link:    https://lore.kernel.org/r/20241008154005.595169-2-luiz.dentz%40gmail.com
+patch subject: [PATCH v1 2/2] Bluetooth: hci_core: Fix not checking skb length on hci_scodata_packet
+config: x86_64-rhel-8.3 (https://download.01.org/0day-ci/archive/20241009/202410091240.Pm3POYhz-lkp@intel.com/config)
+compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20241009/202410091240.Pm3POYhz-lkp@intel.com/reproduce)
 
-2024-10-09T01:29:45.564367-03:00 r2d2 kernel: usb 1-1: new full-speed USB
-device number 19 using xhci_hcd
-2024-10-09T01:29:45.695468-03:00 r2d2 kernel: usb 1-1: New USB device found,
-idVendor=3D0a12, idProduct=3D0001, bcdDevice=3D88.91
-2024-10-09T01:29:45.695539-03:00 r2d2 kernel: usb 1-1: New USB device strin=
-gs:
-Mfr=3D0, Product=3D2, SerialNumber=3D0
-2024-10-09T01:29:45.695557-03:00 r2d2 kernel: usb 1-1: Product: BT DONGLE10
-2024-10-09T01:29:45.705487-03:00 r2d2 kernel: Bluetooth: hci1: CSR: Setting=
- up
-dongle with HCI ver=3D6 rev=3D3120
-2024-10-09T01:29:45.705563-03:00 r2d2 kernel: Bluetooth: hci1: LMP ver=3D6
-subver=3D22bb; manufacturer=3D10
-2024-10-09T01:29:45.705573-03:00 r2d2 kernel: Bluetooth: hci1: CSR: Unbrand=
-ed
-CSR clone detected; adding workarounds and force-suspending once...
-2024-10-09T01:29:45.705581-03:00 r2d2 kernel: Bluetooth: hci1: CSR: Couldn't
-suspend the device for our Barrot 8041a02 receive-issue workaround
-2024-10-09T01:29:45.705588-03:00 r2d2 kernel: Bluetooth: hci1: HCI Delete
-Stored Link Key command is advertised, but not supported.
-2024-10-09T01:29:45.705594-03:00 r2d2 kernel: Bluetooth: hci1: HCI Read Def=
-ault
-Erroneous Data Reporting command is advertised, but not supported.
-2024-10-09T01:29:45.705602-03:00 r2d2 kernel: Bluetooth: hci1: HCI Set Event
-Filter command not supported.
-2024-10-09T01:29:45.716675-03:00 r2d2 systemd[1]: Starting
-systemd-rfkill.service - Load/Save RF Kill Switch Status...
-2024-10-09T01:29:45.793744-03:00 r2d2 systemd[1]: Started
-systemd-rfkill.service - Load/Save RF Kill Switch Status.
-2024-10-09T01:29:47.774485-03:00 r2d2 kernel: Bluetooth: hci1: Opcode 0x1004
-failed: -110
-2024-10-09T01:29:47.774559-03:00 r2d2 kernel: Bluetooth: hci1: command 0x10=
-04
-tx timeout
-2024-10-09T01:29:50.804490-03:00 r2d2 systemd[1]: systemd-rfkill.service:
-Deactivated successfully.
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202410091240.Pm3POYhz-lkp@intel.com/
 
+All warnings (new ones prefixed by >>):
 
-
-The dongle used: Bus 001 Device 004: ID 0a12:0001 Cambridge Silicon Radio, =
-Ltd
-Bluetooth Dongle (HCI mode)
-
-
-It works fine under Windows and kernel 6.11.1
-
-
-
-I have to copy the following files from 6.11.1 and rebuild the kernel to ma=
-ke
-the dongle work with 6.11.2
-
-drivers/bluetooth/btusb.c
-include/net/bluetooth/hci_core.h
-net/bluetooth/hci_conn.c
-net/bluetooth/hci_sync.c
-net/bluetooth/mgmt.c
-
-Theses files were changed from the following commits between 6.11.1 and 6.1=
-1.2
-
-
-
-5 days  Bluetooth: btusb: Fix not handling ZPL/short-transfer   Luiz Augusto
-von Dentz  1       -1/+4
-
-[ Upstream commit 7b05933340f4490ef5b09e84d644d12484b05fdf ]
-
-Requesting transfers of the exact same size of wMaxPacketSize may result
-in ZPL/short-transfer since the USB stack cannot handle it as we are
-limiting the buffer size to be the same as wMaxPacketSize.
-
-Also, in terms of throughput this change has the same effect to
-interrupt endpoint as 290ba200815f "Bluetooth: Improve USB driver throughput
-by increasing the frame size" had for the bulk endpoint, so users of the
-advertisement bearer (e.g. BT Mesh) may benefit from this change.
-
-Fixes: 5e23b923da03 ("[Bluetooth] Add generic driver for Bluetooth USB
-devices")
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Tested-by: Kiran K <kiran.k@intel.com>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
+   In file included from include/linux/kernel.h:31,
+                    from include/linux/rfkill.h:33,
+                    from net/bluetooth/hci_core.c:29:
+   net/bluetooth/hci_core.c: In function 'hci_scodata_packet':
+>> include/net/bluetooth/bluetooth.h:280:16: warning: format '%s' expects argument of type 'char *', but argument 4 has type 'unsigned int' [-Wformat=]
+     280 |         BT_DBG("%s: " fmt, bt_dev_name(hdev), ##__VA_ARGS__)
+         |                ^~~~~~
+   include/linux/printk.h:355:21: note: in definition of macro 'pr_fmt'
+     355 | #define pr_fmt(fmt) fmt
+         |                     ^~~
+   include/linux/dynamic_debug.h:248:9: note: in expansion of macro '__dynamic_func_call_cls'
+     248 |         __dynamic_func_call_cls(__UNIQUE_ID(ddebug), cls, fmt, func, ##__VA_ARGS__)
+         |         ^~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/dynamic_debug.h:250:9: note: in expansion of macro '_dynamic_func_call_cls'
+     250 |         _dynamic_func_call_cls(_DPRINTK_CLASS_DFLT, fmt, func, ##__VA_ARGS__)
+         |         ^~~~~~~~~~~~~~~~~~~~~~
+   include/linux/dynamic_debug.h:269:9: note: in expansion of macro '_dynamic_func_call'
+     269 |         _dynamic_func_call(fmt, __dynamic_pr_debug,             \
+         |         ^~~~~~~~~~~~~~~~~~
+   include/linux/printk.h:589:9: note: in expansion of macro 'dynamic_pr_debug'
+     589 |         dynamic_pr_debug(fmt, ##__VA_ARGS__)
+         |         ^~~~~~~~~~~~~~~~
+   include/net/bluetooth/bluetooth.h:268:33: note: in expansion of macro 'pr_debug'
+     268 | #define BT_DBG(fmt, ...)        pr_debug(fmt "\n", ##__VA_ARGS__)
+         |                                 ^~~~~~~~
+   include/net/bluetooth/bluetooth.h:280:9: note: in expansion of macro 'BT_DBG'
+     280 |         BT_DBG("%s: " fmt, bt_dev_name(hdev), ##__VA_ARGS__)
+         |         ^~~~~~
+   net/bluetooth/hci_core.c:3825:9: note: in expansion of macro 'bt_dev_dbg'
+    3825 |         bt_dev_dbg(hdev, "%s len %d handle 0x%4.4x flags 0x%4.4x", skb->len,
+         |         ^~~~~~~~~~
+>> include/net/bluetooth/bluetooth.h:280:16: warning: format '%x' expects a matching 'unsigned int' argument [-Wformat=]
+     280 |         BT_DBG("%s: " fmt, bt_dev_name(hdev), ##__VA_ARGS__)
+         |                ^~~~~~
+   include/linux/printk.h:355:21: note: in definition of macro 'pr_fmt'
+     355 | #define pr_fmt(fmt) fmt
+         |                     ^~~
+   include/linux/dynamic_debug.h:248:9: note: in expansion of macro '__dynamic_func_call_cls'
+     248 |         __dynamic_func_call_cls(__UNIQUE_ID(ddebug), cls, fmt, func, ##__VA_ARGS__)
+         |         ^~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/dynamic_debug.h:250:9: note: in expansion of macro '_dynamic_func_call_cls'
+     250 |         _dynamic_func_call_cls(_DPRINTK_CLASS_DFLT, fmt, func, ##__VA_ARGS__)
+         |         ^~~~~~~~~~~~~~~~~~~~~~
+   include/linux/dynamic_debug.h:269:9: note: in expansion of macro '_dynamic_func_call'
+     269 |         _dynamic_func_call(fmt, __dynamic_pr_debug,             \
+         |         ^~~~~~~~~~~~~~~~~~
+   include/linux/printk.h:589:9: note: in expansion of macro 'dynamic_pr_debug'
+     589 |         dynamic_pr_debug(fmt, ##__VA_ARGS__)
+         |         ^~~~~~~~~~~~~~~~
+   include/net/bluetooth/bluetooth.h:268:33: note: in expansion of macro 'pr_debug'
+     268 | #define BT_DBG(fmt, ...)        pr_debug(fmt "\n", ##__VA_ARGS__)
+         |                                 ^~~~~~~~
+   include/net/bluetooth/bluetooth.h:280:9: note: in expansion of macro 'BT_DBG'
+     280 |         BT_DBG("%s: " fmt, bt_dev_name(hdev), ##__VA_ARGS__)
+         |         ^~~~~~
+   net/bluetooth/hci_core.c:3825:9: note: in expansion of macro 'bt_dev_dbg'
+    3825 |         bt_dev_dbg(hdev, "%s len %d handle 0x%4.4x flags 0x%4.4x", skb->len,
+         |         ^~~~~~~~~~
 
 
-5 days  Bluetooth: hci_sync: Ignore errors from HCI_OP_REMOTE_NAME_REQ_CANC=
-EL=20=20
-Luiz Augusto von Dentz  1       -1/+4
+vim +280 include/net/bluetooth/bluetooth.h
 
-[ Upstream commit cfbfeee61582e638770a1a10deef866c9adb38f5 ]
+9b392e0e0b6d02 Luiz Augusto von Dentz 2022-03-03  272  
+6f558b70fb39fc Loic Poulain           2015-08-30  273  #define bt_dev_info(hdev, fmt, ...)				\
+9b392e0e0b6d02 Luiz Augusto von Dentz 2022-03-03  274  	BT_INFO("%s: " fmt, bt_dev_name(hdev), ##__VA_ARGS__)
+594b31ea7dc610 Frederic Danis         2015-09-23  275  #define bt_dev_warn(hdev, fmt, ...)				\
+9b392e0e0b6d02 Luiz Augusto von Dentz 2022-03-03  276  	BT_WARN("%s: " fmt, bt_dev_name(hdev), ##__VA_ARGS__)
+6f558b70fb39fc Loic Poulain           2015-08-30  277  #define bt_dev_err(hdev, fmt, ...)				\
+9b392e0e0b6d02 Luiz Augusto von Dentz 2022-03-03  278  	BT_ERR("%s: " fmt, bt_dev_name(hdev), ##__VA_ARGS__)
+6f558b70fb39fc Loic Poulain           2015-08-30  279  #define bt_dev_dbg(hdev, fmt, ...)				\
+9b392e0e0b6d02 Luiz Augusto von Dentz 2022-03-03 @280  	BT_DBG("%s: " fmt, bt_dev_name(hdev), ##__VA_ARGS__)
+6f558b70fb39fc Loic Poulain           2015-08-30  281  
 
-This ignores errors from HCI_OP_REMOTE_NAME_REQ_CANCEL since it
-shouldn't interfere with the stopping of discovery and in certain
-conditions it seems to be failing.
-
-Link: https://github.com/bluez/bluez/issues/575
-Fixes: d0b137062b2d ("Bluetooth: hci_sync: Rework init stages")
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
-
-
-5 days  Bluetooth: hci_core: Fix sending MGMT_EV_CONNECT_FAILED Luiz Augusto
-von Dentz  3       -10/+13
-
-[ Upstream commit d47da6bd4cfa982fe903f33423b9e2ec541e9496 ]
-
-If HCI_CONN_MGMT_CONNECTED has been set then the event shall be
-HCI_CONN_MGMT_DISCONNECTED.
-
-Fixes: b644ba336997 ("Bluetooth: Update device_connected and device_found
-events to latest API")
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
-
-
-Maybe is one or all commits has caused the regression on my BT dongle
-
---=20
-You may reply to this email to add a comment.
-
-You are receiving this mail because:
-You are the assignee for the bug.=
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
