@@ -1,120 +1,73 @@
-Received: from out162-62-57-49.mail.qq.com (out162-62-57-49.mail.qq.com [162.62.57.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f200.google.com (mail-il1-f200.google.com [209.85.166.200])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5DDB9476;
-	Wed,  9 Oct 2024 01:07:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.62.57.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69EF918EB0
+	for <linux-bluetooth@vger.kernel.org>; Wed,  9 Oct 2024 01:36:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.200
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728436073; cv=none; b=hSjrqME2VKq1u0mzLEcyQA/aPz5IVFrUb1OtLKRRPKG7U3LY6C14I+HFTTUZ95hhVlccP66c2ZR5sERo2RE7/S8+FU4YEHpO7zavrpizv6d+6QOSjYe7ncReAFkbG8LMH9gwplnFvW4dgsESiJmAGlWlJcYXQzJ8lTiSTGq/8D0=
+	t=1728437767; cv=none; b=UeJ/vZMDArrL9uNS3SIdM+cWCaGPjbygPbPgCIkQ8kGJ1yg5+4qrdU7w+CVtlmTgx2cRXD+5itoeO4lsokOxW+JFg8/awPpXSbDrtYihUZ9BVFnNX0wmcaWcK5vZF/vzLcFM3Ml+JJa4yVm86RwFaTmL6uSvfHoklrqhFS0oaxM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728436073; c=relaxed/simple;
-	bh=lmSiH5GO4/xrxhmIoORrQIcuLgAwwiSvkvHN/NIFYUU=;
-	h=Message-ID:From:To:Cc:Subject:Date:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=nDmvPSp907JsduVfsHBPXvzbH0pf5W1gzIh34OEwC7wkXZYXL0a7IATN9X4txcnOd0k1m7I79sxjckXO/yUuGSVXbO2is+Kuj91ADvAoAWuI8WRdEFMoKCFHye6qx11YiXXfGAIssenQZYerA1O1baRwQscZcd+QAUSahcpZ5VE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com; spf=pass smtp.mailfrom=qq.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=FnCxK0nX; arc=none smtp.client-ip=162.62.57.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="FnCxK0nX"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
-	t=1728436064; bh=lx/LOvs5VZqqX/WqTY32oczWkgglNbzujdXqEPWPowc=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=FnCxK0nXICbVHh7KThUz6drM1l6TC58shrZnjG1a4uLDmvosYjGeRqcJVkBlVA3f8
-	 dqV4UtHrR4a7qxxRpTEf+vaeB/X6cNXZSPwLkC/JGibaN+VhuVXgmRUYzUpi55rYwh
-	 aiJY61K4SMbfVlX/fz6jNU8OOzEDT0NRhxKJxIiA=
-Received: from pek-lxu-l1.wrs.com ([111.198.224.50])
-	by newxmesmtplogicsvrszb16-1.qq.com (NewEsmtp) with SMTP
-	id 1E9A1E78; Wed, 09 Oct 2024 09:07:41 +0800
-X-QQ-mid: xmsmtpt1728436061t7n1c3cin
-Message-ID: <tencent_68B1AEF2EEC20C9C27C246DAD2F2C6568906@qq.com>
-X-QQ-XMAILINFO: MqswyhUqVe0Ch1K6qSHmuL7OfSg4k3PSsyxtBR5+Qb35X0Y183fmg7wqJq610G
-	 VYqNR3HpecQicRK8Fx7gw9CkZncMl9+feABJAvnrL1AE7xyVGWT3iU2OHuZ4jGOZttHA30lW2AFJ
-	 lOtEXaXOE8Fsm0N+6+6uRXSV9ZR/kNPGPYFxMtgMRglhrUdMM+Pjcjac1T2e9Txa3WIh34XHEuO5
-	 m4WFPOVPX+KxB+uRKhnc+1tQNTpJnIzfgGU0FIV7D5NZ1uFNPbRwzkJt9dBxlEtiZsZY28GHoJ1t
-	 WXJ4OU48kQO0aNionOTWhQ9WrbCBxVC/8P5N0fJbQaeedbsthrzNriGOdJx5a9DIslPf94J7O0LH
-	 nOslpDp9wYLiNjfpesv+YCVHpL1VMPj2YUmQvSBfD8waZy2drrrQ3iwoXBJeiI95rKdRQ3vs2nkn
-	 26VhKokzHhClr6wR1/FzjbgsQMY9ec3dEyMnQ1wMqINnfZbV9isl0d0ja0oLs0twzYDAlKMXT5GY
-	 namBy99cbRYP7SkMsDyjkVRvMIlZw4XbkzttocssG2JKmQ7K4mlx5A48JSO40C/2OI8RMbNEuLU3
-	 L5hq5jLVOfCsGr8GLcZMJiuwXWghEI7s900lt3xZU/ob3pWbe7LWXIsKyLxVW0KSH5wNzh1B9wd/
-	 s/ufiVIi/t8SuM8y57k6L4RdFrqw4PM5bSNIugxgEKkK+lTGfh/0DvtMNzKjslvM80IQYpS3TfYS
-	 Vfao/onRy6yB0Z09FZOmgOgFeJsUtJ6rw879PUsarggrkMwWdIsh2o6dBlp6Z2veF833cPOXGh1U
-	 1XHMabGI8iqpp7/4dvo4EkHjUh1J301BrfNfdWZSeZWTGYbtld5yfjDaClm3kP5VBhzIe5fmbj3/
-	 V4IgH3PLZeZKrTZ2g0opyd3j+Q2eSlggZ9ZlrPSz14ouw6AjRb2ksqUumFbRf5l+nfgnt/J8wf9F
-	 EF823a9UW0czENFToUUUfC4vjM4Q3YhDit7jsPkK0=
-X-QQ-XMRINFO: M/715EihBoGSf6IYSX1iLFg=
-From: Edward Adam Davis <eadavis@qq.com>
-To: luiz.dentz@gmail.com
-Cc: eadavis@qq.com,
-	johan.hedberg@gmail.com,
-	linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	marcel@holtmann.org,
-	syzbot+6ea290ba76d8c1eb1ac2@syzkaller.appspotmail.com,
-	syzkaller-bugs@googlegroups.com
-Subject: Re: [PATCH] Bluetooth: hci_core: remove acl hdr handle error message
-Date: Wed,  9 Oct 2024 09:07:40 +0800
-X-OQ-MSGID: <20241009010741.780475-2-eadavis@qq.com>
-X-Mailer: git-send-email 2.46.0
-In-Reply-To: <CABBYNZKiNBxqZbS7hcBrpiwHRRwAe9gXvHWNvi63qBfykR=SVg@mail.gmail.com>
-References: <CABBYNZKiNBxqZbS7hcBrpiwHRRwAe9gXvHWNvi63qBfykR=SVg@mail.gmail.com>
+	s=arc-20240116; t=1728437767; c=relaxed/simple;
+	bh=fv6teWhfUYzzexM3JzXVxL3Zyi4dV0yeBLI4wMP1T7I=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=nhA0iBca7cJZogNuOJOzXUVwKZ0Eu0raRb2DFvRrEGyI0K7CUO18VyDdwjOLNHOo0kcdIddoAJU+fLSvk6v/Ed+b7YS2iy4NN6qVMQq3YB6jqd6kiPY9/SWmoxryqSieewcqV11xWaRS6CS8WbUEVBc2fy3ZzDNNhQUVeeAzmUE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.200
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f200.google.com with SMTP id e9e14a558f8ab-3a34ebe595bso76160715ab.2
+        for <linux-bluetooth@vger.kernel.org>; Tue, 08 Oct 2024 18:36:06 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728437765; x=1729042565;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=EMbmcc0NEDOLCs27tEkuL3iXogO6pI54JQAcH1O+sTk=;
+        b=TT8Ug6fZzqy32dSkGFEqw2YEl4lk/BgOUheyaFCs0hJ35/bbp4/xqGXdIa6iKHDhAN
+         tYPVXXhBMR/Oj6ZmhY1CFdQXsnXWeQ1krNFHJRBOlskSq+hxrZhQn1Vb/snwrjrIb7dj
+         xiytzZ6dJaZKHAML0a40JhvMqygWZbRImSiKKRl3xEL2BZomiSNMYUTj2ES0SADVqRJr
+         4P+rWDTcPqSoFUSp7+nZuD1VyS4QApmTvbFyShdQ3sb2ftPJb93+uIuiUtejTKeOBA3y
+         j10UBJE5pTdJCySYsjIoWBjGBfv4aeo3mv+H61+Opa/7G4vF7PYj0yhGI3+fQvbw2xQQ
+         cjFA==
+X-Forwarded-Encrypted: i=1; AJvYcCUktQXJ7f4gPbI/hIpmTPrPZoNNVGMxG8HRyItsFuSYyWiEtPsMVCzk+JxmM2pl2Hzl1ujFHsKOapD7o8eocO8=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz4IBfMRWA4YgrHaxJgEMhvmYgzxrPEg1s9oQXDK8L6Kjw/Qgg4
+	GfpFl/z3VJ+Cz10J3fCEoZJ0GUUCo05TQAu1/gGADlLM/NAUPD//MME6dDho++/aiSvVWNHnbSM
+	91yxCYuLB2f9BhAJ97ZAi5tnaYp0MHyF3qxgx81r6rOIpFCNTEqT5NbE=
+X-Google-Smtp-Source: AGHT+IGuVo1kX9zuPtjY7LcZi5euNxlBM2LcUmWbNR5GryfJrVBtMJoqvazkjnbS2g2wxjB+LdygH9KyOYDO7S7PNkcBH3dRILiW
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+X-Received: by 2002:a05:6e02:2141:b0:39d:4c8a:370d with SMTP id
+ e9e14a558f8ab-3a397d1123fmr7435775ab.18.1728437765641; Tue, 08 Oct 2024
+ 18:36:05 -0700 (PDT)
+Date: Tue, 08 Oct 2024 18:36:05 -0700
+In-Reply-To: <tencent_68B1AEF2EEC20C9C27C246DAD2F2C6568906@qq.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6705de05.050a0220.840ef.000d.GAE@google.com>
+Subject: Re: [syzbot] [bluetooth?] KMSAN: uninit-value in hci_rx_work
+From: syzbot <syzbot+6ea290ba76d8c1eb1ac2@syzkaller.appspotmail.com>
+To: eadavis@qq.com, johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, luiz.dentz@gmail.com, marcel@holtmann.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Tue, 8 Oct 2024 10:12:34 -0400, Luiz Augusto von Dentz wrote:
-> On Tue, Oct 8, 2024 at 6:47 AM Edward Adam Davis <eadavis@qq.com> wrote:
-> >
-> > Syzbot reported a uninit-value in hci_rx_work.This is because l2cap didn't
-> > execute the corresponding connection request to call l2cap_send_cmd() or
-> > l2cap_do_send(), and ultimately called hci_add_acl_hdr() to set hdr->handle.
-> 
-> What are you talking about here, what these functions have to do with
-> a local handle variable?
-> 
-> > Therefore, when calling the thread callback function hci_rx_work() to call
-> > hci_acldata_packet, hdr->handle should not be used directly.
-> 
-> It is not being used directly, the handle is a local variable which
-> get assigned:
-> 
->     handle = __le16_to_cpu(hdr->handle);
-> 
-> If what you are saying is that there is no guarantee that skb->len >=
-> HCI_ACL_HDR_SIZE then we probably want to replace skb_pull with
-> skb_pull_data.
-You are right, skb->len is too small.
-But, skb_pull is ok, maybe just need to add a check.
+Hello,
 
-#syz test
+syzbot has tested the proposed patch and the reproducer did not trigger any issue:
 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index d6976db02c06..cfb828452a13 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -3769,7 +3769,11 @@ static void hci_acldata_packet(struct hci_dev *hdev, struct sk_buff *skb)
- 	struct hci_conn *conn;
- 	__u16 handle, flags;
- 
--	skb_pull(skb, HCI_ACL_HDR_SIZE);
-+	if (!skb_pull(skb, HCI_ACL_HDR_SIZE)) {
-+		BT_ERR("ACL data packet %d, smaller than ACL HEADER Size %d\n",
-+			skb->len, HCI_ACL_HDR_SIZE);
-+		goto out;
-+	}
- 
- 	handle = __le16_to_cpu(hdr->handle);
- 	flags  = hci_flags(handle);
-@@ -3795,6 +3799,7 @@ static void hci_acldata_packet(struct hci_dev *hdev, struct sk_buff *skb)
- 			   handle);
- 	}
- 
-+out:
- 	kfree_skb(skb);
- }
- 
+Reported-by: syzbot+6ea290ba76d8c1eb1ac2@syzkaller.appspotmail.com
+Tested-by: syzbot+6ea290ba76d8c1eb1ac2@syzkaller.appspotmail.com
 
+Tested on:
+
+commit:         75b607fa Merge tag 'sched_ext-for-6.12-rc2-fixes' of g..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=1415f380580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=981fe2ff8a1e457a
+dashboard link: https://syzkaller.appspot.com/bug?extid=6ea290ba76d8c1eb1ac2
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+patch:          https://syzkaller.appspot.com/x/patch.diff?x=12e37707980000
+
+Note: testing is done by a robot and is best-effort only.
