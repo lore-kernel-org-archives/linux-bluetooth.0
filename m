@@ -1,38 +1,38 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5FC83E479
-	for <linux-bluetooth@vger.kernel.org>; Thu, 10 Oct 2024 03:05:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B65AE188A0D
+	for <linux-bluetooth@vger.kernel.org>; Thu, 10 Oct 2024 03:08:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728529537; cv=none; b=HNYn/ayJL+dTV9wCZNdkrt+RBzXY1CIkT3b7wvSzMZKZa3mAuVom6qSXKJxqD6kKuNymb9WlyEUm8n8ieuYLYO4BZf1iKbd+FYWJaA0HVmDdj8/LGShM84Ch86gzhFeLsA+ir+dxoky/9DK/I+bPPDsiY9j3t+rU/OwrQ56PJ7c=
+	t=1728529739; cv=none; b=BAYhfGXBCrV/pblfPXAMr6NKYzlC8Xp19m/LJsKaE/1kaf/caMemYerF37G3SqmTd58KcNMEXW/e0Jc2iUfhSPnBCJoLxe4GtbM9mrKAJ0TyGBjM9/VkqcG5dzvAtoV8e0p5UFGaiLrxFxAFBMAyV6Bwk6KXMehmUDVnHyVq/5o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728529537; c=relaxed/simple;
-	bh=4MdDR7Jnj7sbj4UC+yQE24HLtU7POYUSVRhokX0IsgQ=;
+	s=arc-20240116; t=1728529739; c=relaxed/simple;
+	bh=tP5SwicIvQWwq8RSfsOEoOIlVaflgn3Ed2jdmWWKIi8=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=hsRGTqH0UVNMYBQ2AoElvkdwukBw4vmgdNx6cKrA0K/pSWtANeGfLBEgyMWENmIS4B29Rzp1SWmoX1GMSJlYIbSu/Ct8IZIznaNjcAUcpnT2w1DmnnpUB5UxBx1afJiQU79prY6fJkThdGH9PVjbHjKMF6Sa8J/AqheraUmb3bI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GNfGR0pB; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:MIME-Version; b=J0y6J3P97Iz6HbgFy0acWqp6OaYzZWkm9Y5BomtTx4V91u+E8Y7dAxWN+fnMp1rc/cyQ+jGpQYvr5Bx/ahuhlTzXDpx8GEgvz3Ww4Pwk0m+PXSgTlz+qkDZ99qJCOfbG7Kddi1Mpp4wdtYbvyKI98Arim+y1Tx9NY7BVuJe6Yhk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lN7OvNLd; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GNfGR0pB"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 3C89AC4CECF
-	for <linux-bluetooth@vger.kernel.org>; Thu, 10 Oct 2024 03:05:37 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lN7OvNLd"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 49C81C4CED0
+	for <linux-bluetooth@vger.kernel.org>; Thu, 10 Oct 2024 03:08:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728529537;
-	bh=4MdDR7Jnj7sbj4UC+yQE24HLtU7POYUSVRhokX0IsgQ=;
+	s=k20201202; t=1728529739;
+	bh=tP5SwicIvQWwq8RSfsOEoOIlVaflgn3Ed2jdmWWKIi8=;
 	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=GNfGR0pB8UREipIBqr6fvhDRgWUkuv1EurPbi3YpMDCFiSe7Hm20omh1/eMV4U/gt
-	 M6dYH/qSua++B85b/ZfsF5p4PCz6X3XiKAhLzAX8x9rjApEplaZxPSXz4dS6fdXSPT
-	 tOorFcM4CfP9ZRFDMFZU/wIuewx+nRCS4aqygytCVWUnu849Eofg+nl1aNV8/x5jkR
-	 1mkBqmqDlWREfGAnQw+1/ogwR5T+psxB9CJH6WuOwXAoiqweldF7US8SEEgouoWq59
-	 L9YwW+KENYKt9yF+hnMY2HzxmDUstBS6dlzU2vowoDeR2NyZJzktK+2ChbhaQqlhnz
-	 aSmXwGCfVNP8A==
+	b=lN7OvNLdPxiwG56nZw+i+e9zTSBGrmErkNzW6e5MTRxwVoWYvjbHln7S0FRbfpmsW
+	 X6BBSxGVnAlfUyyxOlDudCB93hp8eItQImXRq0k+rP2CgR6Ij7pERId6Zgvf3weDIY
+	 NZFF6G3CXvhQ4s+eifVdcmubyk8r+ytGrMta6NxenEDexFod4em8wwLqWeJzGAQc1P
+	 YpNCxJlhVywZRVj5aIiE0ayOwkRIKrdS711iRgCGKprgx07f8LLh1Aq/4K2Olb42Hv
+	 eY9l20Hv1iFtW8Z1GrGa1axfRKhoQ888lYgmduez1Phdv9cw/oV2OH+qEAScLh3SyJ
+	 TCnN7woIAoucw==
 Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id 3561FC53BCB; Thu, 10 Oct 2024 03:05:37 +0000 (UTC)
+	id 3D6C3C53BCB; Thu, 10 Oct 2024 03:08:59 +0000 (UTC)
 From: bugzilla-daemon@kernel.org
 To: linux-bluetooth@vger.kernel.org
 Subject: [Bug 219365] USB bluetooth dongle stop working after upgrade from
  6.11.1 to 6.11.2
-Date: Thu, 10 Oct 2024 03:05:36 +0000
+Date: Thu, 10 Oct 2024 03:08:59 +0000
 X-Bugzilla-Reason: AssignedTo
 X-Bugzilla-Type: changed
 X-Bugzilla-Watch-Reason: None
@@ -47,8 +47,8 @@ X-Bugzilla-Resolution:
 X-Bugzilla-Priority: P3
 X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
 X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: attachments.created
-Message-ID: <bug-219365-62941-AQeh0k4lKh@https.bugzilla.kernel.org/>
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-219365-62941-JCisi38NTt@https.bugzilla.kernel.org/>
 In-Reply-To: <bug-219365-62941@https.bugzilla.kernel.org/>
 References: <bug-219365-62941@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
@@ -64,14 +64,21 @@ MIME-Version: 1.0
 
 https://bugzilla.kernel.org/show_bug.cgi?id=3D219365
 
---- Comment #8 from Adilson Dantas (adilson@adilson.net.br) ---
-Created attachment 306998
-  --> https://bugzilla.kernel.org/attachment.cgi?id=3D306998&action=3Dedit
-Trace usbmon file from a kernel with the fault commit.
+--- Comment #9 from Adilson Dantas (adilson@adilson.net.br) ---
+(In reply to Luiz Von Dentz from comment #6)
+> I guess we need to USB traces to check if that really what is at play sin=
+ce
+> we are giving a bigger buffer to the USB stack perhaps it expecting the Z=
+LP
+> to finish the transfer but it never happens for some reason.
 
-Trace usbmon file from a kernel with the fault commit.
+I upload two traces from usbmon module.
 
-My BT Dongle fails when it is plugged.
+One from a kernel without the fault commit. So it is working fine.=20
+
+And another from a  kernel with the fault commit. It fails when is plugged.
+
+I hope that theses files should help
 
 --=20
 You may reply to this email to add a comment.
