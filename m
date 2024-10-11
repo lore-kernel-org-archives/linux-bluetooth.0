@@ -1,142 +1,87 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E40F2198A30
-	for <linux-bluetooth@vger.kernel.org>; Fri, 11 Oct 2024 16:58:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C4D5193436
+	for <linux-bluetooth@vger.kernel.org>; Fri, 11 Oct 2024 18:32:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728665910; cv=none; b=AQvf2A0WBTlVHfCPIBE/yo98Y1gkoq3L3aHnvoj3LxRDWdW3V8KG2ur3BDL8ZR8edE/x2ZhOx8MCwz0lr2WLP4NcjAHjCrn+Oogs0KhGRjFmD1c1xjt7BB3O2iAiJocZKpKVZx/PmmQVs9zwWtvBW3UxS2nvSQphnOAYXvLbag8=
+	t=1728671545; cv=none; b=HWo8LQG4L1lDV/+78NocUkltge9fLOCgDjkIMTMEhNHsk1unjKsipdhISP/y2Ed0fhJ+2kxzkgf7obpMvGKZO0BMPd1bvbGWNE59Z5nKYhsFc4MvYk0fu1Eai1jnA/d7dfIFRTkQYPzaR2J2JUYAYvcDyZqB2FCXiV/ZHxXZaGk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728665910; c=relaxed/simple;
-	bh=EiEJxctOOCn5A5BQvV65RfraGcViaPPoKW8bXHLAdLo=;
-	h=Date:From:To:Cc:Subject:Message-ID; b=bE3w9PEIxHgGwAtlUhjqdu0p3ZfjhWi8Kvm2s+BLmq9o8p0bJ7sdbeCVZAHtmqv5wPGNyRXpGPLW8Ix0J8+mpHDSpAGV9Mb8iWyKothc3QrocrfeoGjToe3/2VCdvETHC5xF0ZfZ+j2l8dhKxz4RDeU19DxC31t3rA3QVV8jxJ4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=lbEDh0rz; arc=none smtp.client-ip=198.175.65.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1728671545; c=relaxed/simple;
+	bh=qkNXACsxHNsEpuXD79bUysg6EHA5xbZpSUOB3KSpY2A=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=m738/cZBPkVlNdNod3knXoT7/xBqZAeapNY02w9yb/ck6yvXDwBL66CcSR1U26RgGwi5CNAXrAtS3MvjWOBERPoj18nWvVscJbCKqtS679gRBJRad416N3xJr35HoJkc//OVohG9FBKOVyQIhE1HFU5cxgQxpQ5RMivjRTDLw5A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=czTzHxrw; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="lbEDh0rz"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1728665909; x=1760201909;
-  h=date:from:to:cc:subject:message-id;
-  bh=EiEJxctOOCn5A5BQvV65RfraGcViaPPoKW8bXHLAdLo=;
-  b=lbEDh0rzHsUhAjsEpEIi3v4vsESMnJYOJqnZf9t1SmQmXr63ocnKJfdm
-   U/eV06pz+KmLtt7CPJ3T7MhaIo0IUiPVxj2ztQdF5cyoNhCIKMnQBBeqD
-   juz2ojxrlCm5BhNBM2cdAj35NFPisqNOBRpMZJDr2uN/kG3VP5ccT7vDJ
-   dE7+kOHp+9q3kb2UR5jzmTMXnvKK9yEM6nfe6+VFnUi9zFGNyFU97FtRN
-   L+NOFcnLY78BLp6hYmKR6ZZRAgBpbJsmfGZk/twr+bFCX0rH/iphQSksT
-   BzsGcNj6HBnCwmHk3Fvz+QqKAQ1WLSxahbEqE3LOtEG8j16Zumji4dsya
-   A==;
-X-CSE-ConnectionGUID: g4Yu94paSx2bJyFHB1iI+A==
-X-CSE-MsgGUID: 5lpKY0OEQpe5Gzgb/Axe9A==
-X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="39198327"
-X-IronPort-AV: E=Sophos;i="6.11,196,1725346800"; 
-   d="scan'208";a="39198327"
-Received: from fmviesa008.fm.intel.com ([10.60.135.148])
-  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Oct 2024 09:58:28 -0700
-X-CSE-ConnectionGUID: jNrLZ/OlTNm1EwSpX418CA==
-X-CSE-MsgGUID: hm6NASQ8RzG5tBNuGPhsWA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,196,1725346800"; 
-   d="scan'208";a="77060634"
-Received: from lkp-server01.sh.intel.com (HELO a48cf1aa22e8) ([10.239.97.150])
-  by fmviesa008.fm.intel.com with ESMTP; 11 Oct 2024 09:58:27 -0700
-Received: from kbuild by a48cf1aa22e8 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1szIy9-000CWN-0B;
-	Fri, 11 Oct 2024 16:58:25 +0000
-Date: Sat, 12 Oct 2024 00:57:45 +0800
-From: kernel test robot <lkp@intel.com>
-To: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: [bluetooth-next:master] BUILD SUCCESS
- 7285f89d6a95ef21dcd5b918364ab4aa6e5fd3ed
-Message-ID: <202410120033.A2wMIOQz-lkp@intel.com>
-User-Agent: s-nail v14.9.24
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="czTzHxrw"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5C65AC4CEC3;
+	Fri, 11 Oct 2024 18:32:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1728671545;
+	bh=qkNXACsxHNsEpuXD79bUysg6EHA5xbZpSUOB3KSpY2A=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=czTzHxrwgmJkFqXyRZGTa3iwimVyZbHSroCc40sl6Droz34puSRZ4hU08WrOFbJlT
+	 kmrswq3xDCqUveXVWgxdK+EJUlMAtK9ZZ6enqg02HDrxVaB+IZFiNUaqHLkLz21FRg
+	 IsY3YQtQkczFzwey7A43368hqOjFv7Uy5LghaG8mX9x8EP4mQpVVT4ysOWBxWDh/bl
+	 xDX/hE+HrE6+BMJjMwXfu37SfnLsDTAIaIwjEWoU4w6LIG9PGfuM9ooQReqdmOUdEJ
+	 do8RGnzl1aOuEgLYddddoGMQDJxZcIARNuCIYkYuwJgK52zIDlp599dl61tWCIfXkI
+	 vKs57M2MTjhWw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33C38380DBC0;
+	Fri, 11 Oct 2024 18:32:31 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v1 1/2] Bluetooth: btintel_pcie: Add handshake between driver
+ and firmware
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <172867154974.2893426.13679059675627500735.git-patchwork-notify@kernel.org>
+Date: Fri, 11 Oct 2024 18:32:29 +0000
+References: <20241001104451.626964-1-kiran.k@intel.com>
+In-Reply-To: <20241001104451.626964-1-kiran.k@intel.com>
+To: K@aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org,
+	Kiran <kiran.k@intel.com>
+Cc: linux-bluetooth@vger.kernel.org, ravishankar.srivatsa@intel.com,
+ chethan.tumkur.narayan@intel.com, chandrashekar.devegowda@intel.com
 
-tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
-branch HEAD: 7285f89d6a95ef21dcd5b918364ab4aa6e5fd3ed  Bluetooth: hci_core: Fix not checking skb length on hci_scodata_packet
+Hello:
 
-elapsed time: 984m
+This series was applied to bluetooth/bluetooth-next.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-configs tested: 65
-configs skipped: 2
+On Tue,  1 Oct 2024 16:14:50 +0530 you wrote:
+> The following handshake mechanism needs be followed after firmware
+> download is completed to bring the firmware to running state.
+> 
+> After firmware fragments of Operational image are downloaded and
+> secure sends result of the image succeeds,
+> 
+> 1. Driver sends HCI Intel reset with boot option #1 to switch FW image.
+> 2. FW sends Alive GP[0] MSIx
+> 3. Driver enables data path (doorbell 0x460 for RBDs, etc...)
+> 4. Driver gets Bootup event from firmware
+> 5. Driver performs D0 entry to device (WRITE to IPC_Sleep_Control =0x0)
+> 6. FW sends Alive GP[0] MSIx
+> 7. Device host interface is fully set for BT protocol stack operation.
+> 8. Driver may optionally get debug event with ID 0x97 which can be dropped
+> 
+> [...]
 
-The following configs have been built successfully.
-More configs may be tested in the coming days.
+Here is the summary with links:
+  - [v1,1/2] Bluetooth: btintel_pcie: Add handshake between driver and firmware
+    https://git.kernel.org/bluetooth/bluetooth-next/c/5ea625845b0f
+  - [v1,2/2] Bluetooth: btintel_pcie: Add recovery mechanism
+    (no matching commit)
 
-tested configs:
-alpha            allnoconfig    gcc-14.1.0
-alpha           allyesconfig    clang-20
-arc             allmodconfig    clang-20
-arc              allnoconfig    gcc-14.1.0
-arc             allyesconfig    clang-20
-arm             allmodconfig    clang-20
-arm              allnoconfig    gcc-14.1.0
-arm             allyesconfig    clang-20
-arm64           allmodconfig    clang-20
-arm64            allnoconfig    gcc-14.1.0
-csky             allnoconfig    gcc-14.1.0
-hexagon         allmodconfig    clang-20
-hexagon          allnoconfig    gcc-14.1.0
-hexagon         allyesconfig    clang-20
-i386            allmodconfig    clang-18
-i386             allnoconfig    clang-18
-i386            allyesconfig    clang-18
-i386               defconfig    clang-18
-loongarch       allmodconfig    gcc-14.1.0
-loongarch        allnoconfig    gcc-14.1.0
-m68k            allmodconfig    gcc-14.1.0
-m68k             allnoconfig    gcc-14.1.0
-m68k            allyesconfig    gcc-14.1.0
-microblaze      allmodconfig    gcc-14.1.0
-microblaze       allnoconfig    gcc-14.1.0
-microblaze      allyesconfig    gcc-14.1.0
-mips             allnoconfig    gcc-14.1.0
-nios2            allnoconfig    gcc-14.1.0
-openrisc         allnoconfig    clang-20
-openrisc        allyesconfig    gcc-14.1.0
-openrisc           defconfig    gcc-12
-parisc          allmodconfig    gcc-14.1.0
-parisc           allnoconfig    clang-20
-parisc          allyesconfig    gcc-14.1.0
-parisc             defconfig    gcc-12
-powerpc         allmodconfig    gcc-14.1.0
-powerpc          allnoconfig    clang-20
-powerpc         allyesconfig    gcc-14.1.0
-riscv           allmodconfig    gcc-14.1.0
-riscv            allnoconfig    clang-20
-riscv           allyesconfig    gcc-14.1.0
-riscv              defconfig    gcc-12
-s390            allmodconfig    gcc-14.1.0
-s390             allnoconfig    clang-20
-s390            allyesconfig    gcc-14.1.0
-s390               defconfig    gcc-12
-sh              allmodconfig    gcc-14.1.0
-sh               allnoconfig    gcc-14.1.0
-sh              allyesconfig    gcc-14.1.0
-sh                 defconfig    gcc-12
-sparc           allmodconfig    gcc-14.1.0
-sparc64            defconfig    gcc-12
-um              allmodconfig    clang-20
-um               allnoconfig    clang-20
-um              allyesconfig    clang-20
-um                 defconfig    gcc-12
-um            i386_defconfig    gcc-12
-um          x86_64_defconfig    gcc-12
-x86_64           allnoconfig    clang-18
-x86_64          allyesconfig    clang-18
-x86_64             defconfig    clang-18
-x86_64                 kexec    gcc-12
-x86_64              rhel-8.3    gcc-12
-x86_64         rhel-8.3-rust    clang-18
-xtensa           allnoconfig    gcc-14.1.0
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
---
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+
