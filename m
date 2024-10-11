@@ -1,60 +1,60 @@
-Received: from mail-ej1-f46.google.com (mail-ej1-f46.google.com [209.85.218.46])
+Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F8961D0DF2
-	for <linux-bluetooth@vger.kernel.org>; Fri, 11 Oct 2024 19:43:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 890D01D0E3E
+	for <linux-bluetooth@vger.kernel.org>; Fri, 11 Oct 2024 19:44:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728675838; cv=none; b=UueLfanHtfOgeyCTzbkFot2/WJZ/iApjaEyx5mRlUuaxzGm9l1fARmgd8emJlPCyZUkTv4TJfbZm7qKXKgcFoOXmm88z2GqHfmwmTp5iWvOKPrMed+x6vERufokrkh9sg0XG4bewcrI3SD3XJvNCSjvAQoDLQRLY0TW3LfTvA8E=
+	t=1728675884; cv=none; b=hBcWu+Mkja4iQdd3liDuVhAJMCY3U9FpJXH9eFjUWO7vnGxA7elKHw51T542cDWXy8EZHY9vKbPBqEAsdjgEj+4w/g16XJ7xCHj+pOgcaO2YQJUN1fmbNcIJ8zdvy0gQhHA+GVGa7CDalsAjQksK+y1gHp2m0VOtKRlU1JnWj9U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728675838; c=relaxed/simple;
-	bh=UEieaCly8CsTMP8Slw84ziyizZtR2owvtScXAa06vJQ=;
+	s=arc-20240116; t=1728675884; c=relaxed/simple;
+	bh=kFcEgB2CJz1FrrqLKgnOJDaEQEuUwWWISZ0wGWciTZ0=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Q+pDUwFWyBBFHa5blka/vwgGPymBqsREcxEALgegRM+RJIFW8W5BPUaHrBmmuK7e/cP6voE3E/ae4Ek3gtE/C+DZE6rpxrwOMNanujtiVpb03S1qt3E0JGN7CcjuY0ZTbGuCYp5DBzZMdIxpNGI8a5TbMu4dmvF6w5Hd4269yNU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AI39zKFC; arc=none smtp.client-ip=209.85.218.46
+	 In-Reply-To:Content-Type; b=tzk87gaxtojTL1cCTazhaFXW2cIsPWAmLRSTIrDUD0MgjO3nguiGmPdzBY69v49usTcBGexwPj0XJXOaVEsYcspBqgl7ANC5aT2Hs1Rz9IIOsFmAyX7W/h95OaNJ4OOvBaYCB0glJB9aNcxJ2ON616y0DSfa4ETCsDCA96/u7OY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MOSRNjA6; arc=none smtp.client-ip=209.85.208.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AI39zKFC"
-Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-a99422c796eso387875466b.3
-        for <linux-bluetooth@vger.kernel.org>; Fri, 11 Oct 2024 12:43:56 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MOSRNjA6"
+Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-5c941623a5aso3039582a12.0
+        for <linux-bluetooth@vger.kernel.org>; Fri, 11 Oct 2024 12:44:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1728675835; x=1729280635; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1728675881; x=1729280681; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:autocrypt:from
          :content-language:references:cc:to:subject:user-agent:mime-version
          :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=SDigYJRs9s0cqrPs337ykIC/lJ5lY/aTkzkKnAbaowc=;
-        b=AI39zKFCAzSFHv0it/LT30fcCIXGIlID4mYvBWzkpP80as8loGn0w39UIqH/uj3wEA
-         xRS8G2GexFlXfWguMVPNnB3yLacehhzxX943jy0PLcEQPXnYXLP6JRmv0USx3BS4NSnF
-         4znNGDRjNoeDog7zJMyc1YDrCWcj0XtPh4WitCmpW4Ezfa36ZtAMxGgB4IATQkG63H+r
-         QRB2ney1vnwnD5RP+haSAwqg55LIO2L029TTkum2XRfmBZWDc+zuMkdXioF9APvU3mqu
-         PcOGqbjBvMSe8hbCWHqWOr2Mj0yAL44GF7J5edzTxIjnjRS4HiJioXNA9LCg24dINij8
-         JObw==
+        bh=jJvDHt4YK6Cs4sDBMvCrEy0TKVBA6CD4Wb+UBS13S9Q=;
+        b=MOSRNjA6MqGVBUalc1yLxC2MAWrJeILeydoySQzI2ge6x0Fxx5k1IcJuyzsP4Ts5Fr
+         1kTggoGiMzswDgZMiudSXkNwliSsJS/R5QmT+D/27X4eleMeTjF3/qzxka8xgGU9/28y
+         Y2zPu4SFRTGVKiIvMiGEXvX4FKZhNQBjgX6Fvpdjwn3EA4iEENENhnhG/xAV7gi3VnUW
+         lY68PR3cvjL8Pya2FOaGlGQv0XTV5f8D7GgfTo4a5HhAEae8n6vJ0orLLbGU9ZexcfDz
+         5FYNie86SD8KomSkPrPGKOJe4Dz0kIl27mlWelL6FtzYf5Kp1nixqO717ovQF6r4Jnrg
+         GdMg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728675835; x=1729280635;
+        d=1e100.net; s=20230601; t=1728675881; x=1729280681;
         h=content-transfer-encoding:in-reply-to:autocrypt:from
          :content-language:references:cc:to:subject:user-agent:mime-version
          :date:message-id:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=SDigYJRs9s0cqrPs337ykIC/lJ5lY/aTkzkKnAbaowc=;
-        b=kzJ8X8KUxxquK4O7mGWw/pvwhXvi/d6OD29EO19jZJMzeQ5Q5bvnompPU+ErB6ur0H
-         SDeQtAuM0TyZs9Yql4pxnmOzNfSF36iGh5RByCeCqEKISglIHCX7ESc8//rZw8TVZHXp
-         wC+mAXfxRaJ9yepvIsRKvWFLdJD6b7ahr18Koghw1NTG3X/TB3+APKF2SCpQwY+LC8xk
-         v77WD9yWYBg6/+QKTM970r9dB+wGCnr22EWwlpv5iB1TA6sfWM8QmuCoDkFswWVwhZI2
-         yP5iZjvUx9OhFdvjHcfcKw8444+ddaoqVR4ZjuDLipc+xPuMqc5RXfkotPUlHRsgnMr+
-         F4NA==
-X-Forwarded-Encrypted: i=1; AJvYcCWyeSQpVLzh5/zUicuWs9NENB/T0lQQnPxYasH2hHPlP+e8rtQIBH12DsLeDEdMCohzvP5FFjySXSPCsW1zmLI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzyO0bWIllaMiIImayL980zaQHgH4T1qvMfnUYrqyS6fDecKkgW
-	05bZ5C5plvbbKt4KSATi6Uue0xiKnW9knEJVSYOZP9kQnlJX1wPUjQlenw==
-X-Google-Smtp-Source: AGHT+IGdOGTLB8Cc1bYv+sgcalnhpwMYMfdhifiQT5yXy/lxxw+s2l/2okNtJ9C2cl61WUFjSqp8VQ==
-X-Received: by 2002:a17:907:36c8:b0:a99:89e9:a43d with SMTP id a640c23a62f3a-a99b940f030mr398909066b.39.1728675834490;
-        Fri, 11 Oct 2024 12:43:54 -0700 (PDT)
+        bh=jJvDHt4YK6Cs4sDBMvCrEy0TKVBA6CD4Wb+UBS13S9Q=;
+        b=o2lYpcYQmBoH1WeqALRogRW5x8G/1Ke5hgBtMAFAxy0D0Edqrxfp2BNzL6RreWfkPJ
+         rOLJN6CM4sm3o3PA742uevhL7Iw7NBAYQJ8H3Qv8oYXibWHmZokvtiDjIdiCMG3wOqGb
+         AKInpx4iHUHt0ZAD2loV7wVc4DnwdkmM9EcjsiGIHrDlriVogtG8S0FTdj6zvAB7+gzw
+         mep4Q3+VsF/dUne7rqG2cqu3lp2hHKN26VRfyeFwxdc0o7XltK4L3vlRvnouxonaS+Md
+         tYxu91Lnj5CVFWv+dMG9KGzWYdSsyBGH4VlXDACF88+eaqW6qno9tK7tsBQN8Npih/24
+         WOTA==
+X-Forwarded-Encrypted: i=1; AJvYcCUZrMKlh2d456IkotRggjk1R9MrbS1bQo8VF2OE6fcXsP4vwvq4DL6e/u6gbMx5gE/tJQyThO62eYm0A/iKgAg=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzh3uOc1YjjZvxmkocJ3AdFhdgp3TFKg6sZOaOTCCfHi5ncmw+x
+	JmvUQ+4puE6pYhyYc7SES+YdUh6EvffRW1/hfXxkyG+dkpfzzRwi
+X-Google-Smtp-Source: AGHT+IHov9pO7rlIARUSE2FKkpxlxralWHqkeoj+Grm53dE0BP/HM9mQqALvj7zluyOczNVV79gvOg==
+X-Received: by 2002:a05:6402:5ca:b0:5c4:aea:5833 with SMTP id 4fb4d7f45d1cf-5c9475942d2mr3274813a12.18.1728675880608;
+        Fri, 11 Oct 2024 12:44:40 -0700 (PDT)
 Received: from ?IPV6:2a02:3100:afd7:9a00:94ac:542a:1cd2:c9ce? (dynamic-2a02-3100-afd7-9a00-94ac-542a-1cd2-c9ce.310.pool.telefonica.de. [2a02:3100:afd7:9a00:94ac:542a:1cd2:c9ce])
-        by smtp.googlemail.com with ESMTPSA id 4fb4d7f45d1cf-5c9370d273fsm2286003a12.16.2024.10.11.12.43.52
+        by smtp.googlemail.com with ESMTPSA id 4fb4d7f45d1cf-5c937260c5esm2207067a12.76.2024.10.11.12.44.38
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 11 Oct 2024 12:43:53 -0700 (PDT)
-Message-ID: <020c69d7-ad86-44d3-a508-22ff949ee7ec@gmail.com>
-Date: Fri, 11 Oct 2024 21:43:52 +0200
+        Fri, 11 Oct 2024 12:44:39 -0700 (PDT)
+Message-ID: <d85205ed-dd47-4690-99a3-8f20ea7ab237@gmail.com>
+Date: Fri, 11 Oct 2024 21:44:38 +0200
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -72,6 +72,7 @@ References: <595efd8b-e0fe-4a87-90b1-4b579f3cc876@gmail.com>
  <CABBYNZJMWni33VQ2sX9EDcNbsFbX7pjAFj4QLri9N7jyLY0HvQ@mail.gmail.com>
  <c8b5c842-463e-4c30-b7e0-f41bf1d59305@gmail.com>
  <CABBYNZ+kcwgPvCNFZHZZok_a6ZNXEPNABNefb4iaSNDNm4wPVA@mail.gmail.com>
+ <CABBYNZKbXE4unZi3MPP2LPzYcv0OLHoaqqey02N1qUzSR=4PhQ@mail.gmail.com>
 Content-Language: en-US
 From: Heiner Kallweit <hkallweit1@gmail.com>
 Autocrypt: addr=hkallweit1@gmail.com; keydata=
@@ -117,47 +118,81 @@ Autocrypt: addr=hkallweit1@gmail.com; keydata=
  H/0Z53okMykVs3a8tECPHIxnre2UxKdTbCEkjkR4V6JyplTS47oWMw3zyI7zkaadfzVFBxk2
  lo/Tny+FX1Azea3Ce7oOnRUEZtWSsUidtIjmL8YUQFZYm+JUIgfRmSpMFq8JP4VH43GXpB/S
  OCrl+/xujzvoUBFV/cHKjEQYBxo+MaiQa1U54ykM2W4DnHb1UiEf5xDkFd4=
-In-Reply-To: <CABBYNZ+kcwgPvCNFZHZZok_a6ZNXEPNABNefb4iaSNDNm4wPVA@mail.gmail.com>
+In-Reply-To: <CABBYNZKbXE4unZi3MPP2LPzYcv0OLHoaqqey02N1qUzSR=4PhQ@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-On 11.10.2024 21:05, Luiz Augusto von Dentz wrote:
+On 11.10.2024 21:26, Luiz Augusto von Dentz wrote:
 > Hi Heiner,
 > 
-> On Fri, Oct 11, 2024 at 2:52 PM Heiner Kallweit <hkallweit1@gmail.com> wrote:
+> On Fri, Oct 11, 2024 at 3:05 PM Luiz Augusto von Dentz
+> <luiz.dentz@gmail.com> wrote:
 >>
->> On 11.10.2024 18:36, Luiz Augusto von Dentz wrote:
->>> Hi Heiner,
+>> Hi Heiner,
+>>
+>> On Fri, Oct 11, 2024 at 2:52 PM Heiner Kallweit <hkallweit1@gmail.com> wrote:
 >>>
->>> On Fri, Oct 11, 2024 at 6:49 AM Heiner Kallweit <hkallweit1@gmail.com> wrote:
+>>> On 11.10.2024 18:36, Luiz Augusto von Dentz wrote:
+>>>> Hi Heiner,
 >>>>
->>>> Since linux-next from Oct 4th my bt speaker fails to connect if I switch it on.
->>>> It just hangs trying. Manually connecting it via bluetoothctl works though.
->>>> With this patch reverted it auto-connects again.
->>>> If you need additional details, please let me know.
+>>>> On Fri, Oct 11, 2024 at 6:49 AM Heiner Kallweit <hkallweit1@gmail.com> wrote:
+>>>>>
+>>>>> Since linux-next from Oct 4th my bt speaker fails to connect if I switch it on.
+>>>>> It just hangs trying. Manually connecting it via bluetoothctl works though.
+>>>>> With this patch reverted it auto-connects again.
+>>>>> If you need additional details, please let me know.
+>>>>
+>>>> I suspect something is trying to suspend the controller then, it
+>>>> shouldn't be USB auto-suspend since that should behave as it
+>>>> previously but if there is something externally (aka. userspace)
+>>>> trying to suspend then it will force it to suspend.
+>>>>
+>>> On the host side it's a combined WiFi/BT PCIe adapter (RTL8822CE).
+>>> Runtime PM is enabled, so this may kick in. I'm not aware of any
+>>> userspace tool which may try to suspend the WiFi/BT adapter.
+>>> Disabling Runtime PM may be a workaround, but I don't think that's
+>>> the actual solution.
 >>>
->>> I suspect something is trying to suspend the controller then, it
->>> shouldn't be USB auto-suspend since that should behave as it
->>> previously but if there is something externally (aka. userspace)
->>> trying to suspend then it will force it to suspend.
->>>
->> On the host side it's a combined WiFi/BT PCIe adapter (RTL8822CE).
->> Runtime PM is enabled, so this may kick in. I'm not aware of any
->> userspace tool which may try to suspend the WiFi/BT adapter.
->> Disabling Runtime PM may be a workaround, but I don't think that's
->> the actual solution.
 >>
+>> Well I assume it still using USB as transport, not PCIe, otherwise it
+>> wouldn't be using btusb. Regarding runtime PM, I assume it still means
+>> PMSG_IS_AUTO Documentation/driver-api/usb/power-management.rst:
+>>
+>>      'External suspend calls should never be allowed to fail in this way,
+>>      only autosuspend calls.  The driver can tell them apart by applying
+>>      the :c:func:`PMSG_IS_AUTO` macro to the message argument to the
+>>      ``suspend`` method; it will return True for internal PM events'
+>>
+>> --
+>> Luiz Augusto von Dentz
 > 
-> Well I assume it still using USB as transport, not PCIe, otherwise it
-> wouldn't be using btusb. Regarding runtime PM, I assume it still means
-
-Right, it's a M.2 adapter which utilizes PCIe and USB.
-
-> PMSG_IS_AUTO Documentation/driver-api/usb/power-management.rst:
+> Perhaps there is a double call to the likes of hci_suspend_dev due to
+> system suspend and device suspend acting together, so maybe we need
+> something like the following:
 > 
->      'External suspend calls should never be allowed to fail in this way,
->      only autosuspend calls.  The driver can tell them apart by applying
->      the :c:func:`PMSG_IS_AUTO` macro to the message argument to the
->      ``suspend`` method; it will return True for internal PM events'
+> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+> index 779c4aeaef22..c257759ae2f4 100644
+> --- a/net/bluetooth/hci_core.c
+> +++ b/net/bluetooth/hci_core.c
+> @@ -2812,7 +2812,7 @@ int hci_suspend_dev(struct hci_dev *hdev)
 > 
+>         /* Suspend should only act on when powered. */
+>         if (!hdev_is_powered(hdev) ||
+> -           hci_dev_test_flag(hdev, HCI_UNREGISTER))
+> +           hci_dev_test_flag(hdev, HCI_UNREGISTER) || hdev->suspended)
+>                 return 0;
+> 
+>         /* If powering down don't attempt to suspend */
+> @@ -2843,7 +2843,7 @@ int hci_resume_dev(struct hci_dev *hdev)
+> 
+>         /* Resume should only act on when powered. */
+>         if (!hdev_is_powered(hdev) ||
+> -           hci_dev_test_flag(hdev, HCI_UNREGISTER))
+> +           hci_dev_test_flag(hdev, HCI_UNREGISTER) || !hdev->suspended)
+>                 return 0;
+> 
+>         /* If powering down don't attempt to resume */
+> 
+> 
+No change in behavior with this change.
 
