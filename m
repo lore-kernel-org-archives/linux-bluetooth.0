@@ -1,159 +1,130 @@
-Received: from mail-il1-f198.google.com (mail-il1-f198.google.com [209.85.166.198])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B20E720C471
-	for <linux-bluetooth@vger.kernel.org>; Fri, 11 Oct 2024 09:06:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.198
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77C242030A
+	for <linux-bluetooth@vger.kernel.org>; Fri, 11 Oct 2024 09:16:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728637590; cv=none; b=jYxvS+bwUIEgWzzZrJcNMiGAiGZnduT5YP2A7Cy/w9JMWw2pWcqjAqL21nCeGgotD1bmD/xO7KJgnT12DJl0teHnzI1unasJZ46hw0+PwZQ2de/g9w7ygm0wVEpQe5k15B0qBmBy6xALkmgcHegyWAdYqQrewL/zIMdPkUzUMTU=
+	t=1728638169; cv=none; b=aDJNWEpcMTOnXLa4VAjZ8bDpVRIw/8xn53YVZJXN6Kdw15d2I4aI+Nwfh+VXt+YC9JOkrDeeFMbJ+QV9tTNASM2awJ/72lz0wCvKzGiJ0/2BPftgC9e9Oc5YnxNmE/Y3U6YxDn07HIzbp9ga4dn2zyZdf3vxysWfB9D06OuTS+A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728637590; c=relaxed/simple;
-	bh=D4tQlJrxIt8JE3Brlv7FNBlcByS3WOpRjp6AMALX7Ss=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=NcBYCyvQZ05arPqPbc0pgxu8Y43gq36aKehIU87R+xKMkV3k7v73tyDoiO/ghXTJlQvDDKqSU09Ed/irWp8sLdM+oBB2HuKAHhSIX+a9aatfJzJbEx6n1kQRSPNGNNecHDqiabo5ivZC3Zx05XlFVsiyeEqAAD3+8od6pTwAge8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.198
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-3a1e69f6f51so13063395ab.1
-        for <linux-bluetooth@vger.kernel.org>; Fri, 11 Oct 2024 02:06:27 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728637587; x=1729242387;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=hIiVSdutQo15lTZycG8yedUYHgfynuVIWO/qrN1n35o=;
-        b=vT3S+fLhjPynTKOgv+jrVLWYhe+54tLURscL6AvXt6VPq6GJ6WeRI8Kgrk4JNd64Ll
-         jko7ed9XmGIc5ewsoO0WMAnInyfOUvNAMKvjQ3KCQCXN84wJotgnzFgWmZ56Ih+Ra0kR
-         VH4sqJbMtBjtL3yB9lnfm+fg+rff6l3W5me6PgOum074IoCvbE/i+LJVsoe6iXj2kMR+
-         2G4p30iteQd/vx8I8rDv0N5vPFyPLwlIEPiweOTbmLTJqL/pytHCEiW2mFewtUxXzqrk
-         Q/jyZKgIYMz70r53DWI71rb2/NJo4pSYLm3wshVeV/MOhxv7bi+1Rmt7iozIUnwdKsri
-         JyDA==
-X-Forwarded-Encrypted: i=1; AJvYcCXjT2eaBfMTWBg/Sjnos75+jWW+h1h7tqBH3kTFH8VfJXZ/ZReR+K3xZ14FNLW4xBq+saX0cM+HJS4AvWI/yBE=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yymo6XIOvF3cYEGLoiKctHoka8LhxTqIYsTc8RjYnXOSLQXAhci
-	ySXxEf36UIP0LI7ey6pTsy5JnbP8UK97cYJltPYk8Fd/1nDc1ajFKmUtClO/I61DuP2znaXANhz
-	VqP1YDZzsHk8wJiKX3XinnKXvvRBfK1+jMRUSrY32ibOx/59PiViNezc=
-X-Google-Smtp-Source: AGHT+IHNmDxvd5ZHgwdTyKHe+5+EfOz816CA0aYN19ccznaQHUNgQYfxhbUU3voWaLTNFed44KwFoFYiHi4rD2b42LhtvJ5zD/Ms
+	s=arc-20240116; t=1728638169; c=relaxed/simple;
+	bh=Gta4L6vCQPXC/um40gEtqHuHXdvU2Je5H7IilpkI+GI=;
+	h=Message-ID:Date:MIME-Version:From:To:Subject:Content-Type; b=rsyfdaFEqgcDaiFek2cO98vb8UkX7A+sjidsTd/h4Z7uzp64Qlq+D2hU36xQTKNtEhUmRXXYRIE3jwctCFlfAxTOVzYfa8i6sPOtJAej3MnjYqFlG4nt/veoRvcll0LSa8UaEeKSA9R8nVTVM8ty2+z5+sOojp8zlrWoK7jXQ1w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=nPFCX1qC; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="nPFCX1qC"
+Received: from pps.filterd (m0279862.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 49B50ohl029089
+	for <linux-bluetooth@vger.kernel.org>; Fri, 11 Oct 2024 09:16:06 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=qcppdkim1; bh=rUqKN9kkztDy1ZbkV12VT5
+	2dwAL+tjsEJMiYw6C1/5I=; b=nPFCX1qCbSFu9voOaOJx9UTSaN8oL0Vlc14iy/
+	M6uOCw1kC5ImZ9Xs0YPvWJfvbT2LhhIOTJdpFS0nNgfLYSgcrTkkSCwKwt8P/yhf
+	DriJoDst9Y8+MEDptqTjYRLmIqjNbw346SurnEDbg0gll2asdOASjux8urFyBwlX
+	xUFp19SFn447NHB9vSDrp75NNz5v+A3fq3Gwg7xqhja6TtZCtG2um6tsjhPSqQd4
+	nLYVzzbwcf/HPrb+zZF7fbxv5/bLsufYooyGw5+jaiSlBBXi0D421eJyvQyxLPpi
+	hj3Rk/ESJ/t+DlEy8koaAQWIde5QSp1vs86TAh+Iqwmdf1jA==
+Received: from nalasppmta02.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 426g6nam35-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <linux-bluetooth@vger.kernel.org>; Fri, 11 Oct 2024 09:16:06 +0000 (GMT)
+Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
+	by NALASPPMTA02.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 49B9G5Jw013023
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <linux-bluetooth@vger.kernel.org>; Fri, 11 Oct 2024 09:16:05 GMT
+Received: from [10.218.8.166] (10.80.80.8) by nalasex01c.na.qualcomm.com
+ (10.47.97.35) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Fri, 11 Oct
+ 2024 02:16:04 -0700
+Message-ID: <a1062c42-9e58-465b-ba27-079d3c18af11@quicinc.com>
+Date: Fri, 11 Oct 2024 14:45:30 +0530
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:b2e:b0:3a0:378a:884b with SMTP id
- e9e14a558f8ab-3a3b5f20906mr10187795ab.3.1728637586776; Fri, 11 Oct 2024
- 02:06:26 -0700 (PDT)
-Date: Fri, 11 Oct 2024 02:06:26 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6708ea92.050a0220.4cbc0.0000.GAE@google.com>
-Subject: [syzbot] [bluetooth?] possible deadlock in touch_wq_lockdep_map (2)
-From: syzbot <syzbot+7386bb3da86fa8113f70@syzkaller.appspotmail.com>
-To: johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, luiz.dentz@gmail.com, marcel@holtmann.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Content-Language: en-GB
+From: Raghavender Reddy Bujala <quic_rbujala@quicinc.com>
+To: <linux-bluetooth@vger.kernel.org>
+Subject: AVDTP connection timer is not allowing to wait for send
+ setconfiguration error code response
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nalasex01c.na.qualcomm.com (10.47.97.35)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: uMS-HLEVH28RB2zx9V1i3y9wVvcr_I7x
+X-Proofpoint-GUID: uMS-HLEVH28RB2zx9V1i3y9wVvcr_I7x
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
+ definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0
+ lowpriorityscore=0 bulkscore=0 adultscore=0 impostorscore=0
+ mlxlogscore=999 mlxscore=0 spamscore=0 phishscore=0 malwarescore=0
+ clxscore=1011 priorityscore=1501 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.19.0-2409260000 definitions=main-2410110063
 
-Hello,
+Hi,
 
-syzbot found the following issue on:
+We are trying to verify the below PTS usecase, where remote initiates 
+the connection and sends AVDTP setconfiguration with unknown sampling
+frequency.
 
-HEAD commit:    75b607fab38d Merge tag 'sched_ext-for-6.12-rc2-fixes' of g..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=1494b7d0580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=7cd9e7e4a8a0a15b
-dashboard link: https://syzkaller.appspot.com/bug?extid=7386bb3da86fa8113f70
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+PTS case: A2DP/SNK/AVP/BI-03-C
 
-Unfortunately, I don't have any reproducer for this issue yet.
+Description:
+Verify that the SNK IUT, acting as an AVDTP Acceptor, returns error 
+codes when the Lower Tester, acting as an A2DP SRC and an AVDTP INT, 
+configures a stream using an invalid configuration 
+(INVALID_SAMPLING_FREQUENCY).
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/001d5437d70d/disk-75b607fa.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/4c93454dd9e4/vmlinux-75b607fa.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/dc2a448f02b5/bzImage-75b607fa.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+7386bb3da86fa8113f70@syzkaller.appspotmail.com
-
-Bluetooth: hci1: Controller not accepting commands anymore: ncmd = 0
-Bluetooth: hci1: Injecting HCI hardware error event
-Bluetooth: hci1: hardware error 0x00
-============================================
-WARNING: possible recursive locking detected
-6.12.0-rc2-syzkaller-00058-g75b607fab38d #0 Not tainted
---------------------------------------------
-kworker/u9:1/9530 is trying to acquire lock:
-ffff888037f87148 ((wq_completion)hci1){+.+.}-{0:0}, at: touch_wq_lockdep_map+0xb1/0x170 kernel/workqueue.c:3880
-
-but task is already holding lock:
-ffff888037f87148 ((wq_completion)hci1){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3204 [inline]
-ffff888037f87148 ((wq_completion)hci1){+.+.}-{0:0}, at: process_scheduled_works+0x93b/0x1850 kernel/workqueue.c:3310
-
-other info that might help us debug this:
- Possible unsafe locking scenario:
-
-       CPU0
-       ----
-  lock((wq_completion)hci1);
-  lock((wq_completion)hci1);
-
- *** DEADLOCK ***
-
- May be due to missing lock nesting notation
-
-2 locks held by kworker/u9:1/9530:
- #0: ffff888037f87148 ((wq_completion)hci1){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3204 [inline]
- #0: ffff888037f87148 ((wq_completion)hci1){+.+.}-{0:0}, at: process_scheduled_works+0x93b/0x1850 kernel/workqueue.c:3310
- #1: ffffc900043e7d00 ((work_completion)(&hdev->error_reset)){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3205 [inline]
- #1: ffffc900043e7d00 ((work_completion)(&hdev->error_reset)){+.+.}-{0:0}, at: process_scheduled_works+0x976/0x1850 kernel/workqueue.c:3310
-
-stack backtrace:
-CPU: 0 UID: 0 PID: 9530 Comm: kworker/u9:1 Not tainted 6.12.0-rc2-syzkaller-00058-g75b607fab38d #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/13/2024
-Workqueue: hci1 hci_error_reset
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:94 [inline]
- dump_stack_lvl+0x241/0x360 lib/dump_stack.c:120
- print_deadlock_bug+0x483/0x620 kernel/locking/lockdep.c:3037
- check_deadlock kernel/locking/lockdep.c:3089 [inline]
- validate_chain+0x15e2/0x5920 kernel/locking/lockdep.c:3891
- __lock_acquire+0x1384/0x2050 kernel/locking/lockdep.c:5202
- lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5825
- touch_wq_lockdep_map+0xc7/0x170 kernel/workqueue.c:3880
- __flush_workqueue+0x14f/0x1600 kernel/workqueue.c:3922
- drain_workqueue+0xc9/0x3a0 kernel/workqueue.c:4086
- destroy_workqueue+0xba/0xc40 kernel/workqueue.c:5830
- hci_release_dev+0x169/0x16b0 net/bluetooth/hci_core.c:2733
- bt_host_release+0x83/0x90 net/bluetooth/hci_sysfs.c:94
- device_release+0x9b/0x1c0
- kobject_cleanup lib/kobject.c:689 [inline]
- kobject_release lib/kobject.c:720 [inline]
- kref_put include/linux/kref.h:65 [inline]
- kobject_put+0x231/0x480 lib/kobject.c:737
- process_one_work kernel/workqueue.c:3229 [inline]
- process_scheduled_works+0xa65/0x1850 kernel/workqueue.c:3310
- worker_thread+0x870/0xd30 kernel/workqueue.c:3391
- kthread+0x2f2/0x390 kernel/kthread.c:389
- ret_from_fork+0x4d/0x80 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
- </TASK>
+(TSPC_A2DP_15b_1 AND (TSPC_A2DP_5_6 OR TSPC_A2DP_5_4 OR TSPC_A2DP_5_1)) 
+OR TSPC_ALL
 
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+User prompt:
+Please prepare the IUT to reject an AVDTP SET CONFIGURATION command with 
+error code INVALID_SAMPLING_FREQUENCY,
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
+then press 'OK 'to continue."
 
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
 
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
+Results:
 
-If you want to undo deduplication, reply with:
-#syz undup
+Expectation: DUT needs to reject the setconfiguration with invalid 
+sampling frequency error code.
+
+Behavior: When PTS asks for user prompt to prepare and press ok to 
+continue. it is failing, because in bluez there is a 1 second timer for 
+connection. this timer is getting expired and avdtp signalling(DISCOVER 
+procedure) starting again from dut.
+
+diconnect timer source link:
+https://github.com/bluez/bluez/blob/5.65/profiles/audio/avdtp.c#L1202
+
+due to this behaviour we were unable to send setconfiguration with 
+invalid sampling frequency error code from dut.
+
+Is there any workaround for this to fix?
+
+Bluez version: 5.65
+pulseaudio version: 15.0
+kernel version: 6.6.38
+
+Note: We are observing avdtp connection failure with iphone due to this 
+timer sometimes.
+
+
+Thanks & Regards,
+Raghavender
+
+
+
+
