@@ -1,46 +1,57 @@
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f173.google.com (mail-lj1-f173.google.com [209.85.208.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77C242030A
-	for <linux-bluetooth@vger.kernel.org>; Fri, 11 Oct 2024 09:16:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D6B76F31E
+	for <linux-bluetooth@vger.kernel.org>; Fri, 11 Oct 2024 10:49:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728638169; cv=none; b=aDJNWEpcMTOnXLa4VAjZ8bDpVRIw/8xn53YVZJXN6Kdw15d2I4aI+Nwfh+VXt+YC9JOkrDeeFMbJ+QV9tTNASM2awJ/72lz0wCvKzGiJ0/2BPftgC9e9Oc5YnxNmE/Y3U6YxDn07HIzbp9ga4dn2zyZdf3vxysWfB9D06OuTS+A=
+	t=1728643753; cv=none; b=ukxTYTLn2t92T6D+GRKdhl6RfAiXBlG3gzmEhT/kVAVJt0tqKvhvH1bAgpENhLqck2rF77hWMTsqTStPgxr2PHlWoNhH1MMFift/s58V0E0IQFUJZ7nNHU0W6DRE6YAuJMP/5u+/KxEd64kswKMLv+8U0CnbWxD/BNi1FcwmDv8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728638169; c=relaxed/simple;
-	bh=Gta4L6vCQPXC/um40gEtqHuHXdvU2Je5H7IilpkI+GI=;
-	h=Message-ID:Date:MIME-Version:From:To:Subject:Content-Type; b=rsyfdaFEqgcDaiFek2cO98vb8UkX7A+sjidsTd/h4Z7uzp64Qlq+D2hU36xQTKNtEhUmRXXYRIE3jwctCFlfAxTOVzYfa8i6sPOtJAej3MnjYqFlG4nt/veoRvcll0LSa8UaEeKSA9R8nVTVM8ty2+z5+sOojp8zlrWoK7jXQ1w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=nPFCX1qC; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+	s=arc-20240116; t=1728643753; c=relaxed/simple;
+	bh=zt+xH72XysRPKEJVWtH7FU+lmnSjHcQwLMEulVxnOeY=;
+	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=JlaFBPpWUz5VkPs2Vg+rDLeKFqw15+3dko5+l6X6rQOAKGI81tNe2YY7jJJYbfLr7YmKrfip5J81p96Y1Q0vA0l8I7+8U8ktnJ0XjWQAF02twxGqya5lI5Ubi5JJovmhGp2sZ8KZ9URvpWCFbN9DyU44qi+FPG5o9LpdK3flFpg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RSIqEJ5G; arc=none smtp.client-ip=209.85.208.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="nPFCX1qC"
-Received: from pps.filterd (m0279862.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 49B50ohl029089
-	for <linux-bluetooth@vger.kernel.org>; Fri, 11 Oct 2024 09:16:06 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	content-transfer-encoding:content-type:date:from:message-id
-	:mime-version:subject:to; s=qcppdkim1; bh=rUqKN9kkztDy1ZbkV12VT5
-	2dwAL+tjsEJMiYw6C1/5I=; b=nPFCX1qCbSFu9voOaOJx9UTSaN8oL0Vlc14iy/
-	M6uOCw1kC5ImZ9Xs0YPvWJfvbT2LhhIOTJdpFS0nNgfLYSgcrTkkSCwKwt8P/yhf
-	DriJoDst9Y8+MEDptqTjYRLmIqjNbw346SurnEDbg0gll2asdOASjux8urFyBwlX
-	xUFp19SFn447NHB9vSDrp75NNz5v+A3fq3Gwg7xqhja6TtZCtG2um6tsjhPSqQd4
-	nLYVzzbwcf/HPrb+zZF7fbxv5/bLsufYooyGw5+jaiSlBBXi0D421eJyvQyxLPpi
-	hj3Rk/ESJ/t+DlEy8koaAQWIde5QSp1vs86TAh+Iqwmdf1jA==
-Received: from nalasppmta02.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 426g6nam35-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <linux-bluetooth@vger.kernel.org>; Fri, 11 Oct 2024 09:16:06 +0000 (GMT)
-Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
-	by NALASPPMTA02.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 49B9G5Jw013023
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <linux-bluetooth@vger.kernel.org>; Fri, 11 Oct 2024 09:16:05 GMT
-Received: from [10.218.8.166] (10.80.80.8) by nalasex01c.na.qualcomm.com
- (10.47.97.35) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Fri, 11 Oct
- 2024 02:16:04 -0700
-Message-ID: <a1062c42-9e58-465b-ba27-079d3c18af11@quicinc.com>
-Date: Fri, 11 Oct 2024 14:45:30 +0530
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RSIqEJ5G"
+Received: by mail-lj1-f173.google.com with SMTP id 38308e7fff4ca-2fad15b3eeeso16761981fa.2
+        for <linux-bluetooth@vger.kernel.org>; Fri, 11 Oct 2024 03:49:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1728643750; x=1729248550; darn=vger.kernel.org;
+        h=content-transfer-encoding:autocrypt:subject:from:cc:to
+         :content-language:user-agent:mime-version:date:message-id:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=zt+xH72XysRPKEJVWtH7FU+lmnSjHcQwLMEulVxnOeY=;
+        b=RSIqEJ5GgjFFuh0GHmJg/NB77DdnqcSHwajuBFcxFB0NrZOoPU+Ku1ZnIwOb/bRbGh
+         vh1zgCko3HsXBN52oToXUIjNjUl8NbcN7M1ZdN9CW22SJewSmuUBAxZo3BHRQvIb/Psv
+         w8310ZgKqNYkcPbnBB/TNQWl1IehzQ9Bo+Nflylc6OZLzi+eYVtC5IpJVz6/0F7FQ8dC
+         jQxYqo2WHLacPk0ajqBHOHb1ssMUvsG01M3H5lfawjrjRjrdNG4ud4juHgwYXSTprbG5
+         xTl2v0CWFcSaPmBrtUgpfRJimtuuFymqAm3ArCXIZp5CPpeqADSHtth4EMgSzbhOHZbm
+         yPSA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728643750; x=1729248550;
+        h=content-transfer-encoding:autocrypt:subject:from:cc:to
+         :content-language:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=zt+xH72XysRPKEJVWtH7FU+lmnSjHcQwLMEulVxnOeY=;
+        b=cPP0zpCCApqkciiGrRkf7HYTZ34HgkSolmD1Ui3mewgd3/I1WftMKpI9xWHACxBfM1
+         FIahKMw4MA44zIgJRTRTbA+xduEgJ0oxVTFWpFWzLEXrn4w1jPJOXwShz6FARXKY1gE+
+         ETgEdhVJ5LrAoJvBVebQC4uBQwCDXggMj82ARQ7OAPN7S/0aJkqxJNy0cwRnYVSrlmjz
+         6Aq1zSJiMEbbdbRBPGum2XPfse0Ie93zsUZ+84uIPI+pHjOtcmRHkpBGSDP3D9jmTBGT
+         p1LeF5/sCVWMf0F3pG876y/QPSsDlH24n7hCuT9kuDcg8CjqOpPNQAknDidxb5O7NGxm
+         pETA==
+X-Gm-Message-State: AOJu0YyEvCOzmQTmdcLnJIQ5PwEZNWLohqnFGM7HfZkPfoBauH/IDipN
+	O7uK9ZYNm6/XNpMIOd7OSM5qdGXuYVVQ4YuL0Wm5m3/BVMgtcdUrEdQfeA==
+X-Google-Smtp-Source: AGHT+IGIdtwv/vXykderbUoiI4JE3o71HzPIKOUpveLh/c9zNSbHQmkhL73+lpdpLCKudyzssV/iwg==
+X-Received: by 2002:a2e:80a:0:b0:2f7:7ea4:2a1e with SMTP id 38308e7fff4ca-2fb327b5608mr8633331fa.28.1728643749852;
+        Fri, 11 Oct 2024 03:49:09 -0700 (PDT)
+Received: from ?IPV6:2a02:3100:afd7:9a00:c812:cea1:cecd:d47e? (dynamic-2a02-3100-afd7-9a00-c812-cea1-cecd-d47e.310.pool.telefonica.de. [2a02:3100:afd7:9a00:c812:cea1:cecd:d47e])
+        by smtp.googlemail.com with ESMTPSA id 4fb4d7f45d1cf-5c9370d2251sm1810529a12.12.2024.10.11.03.49.08
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 11 Oct 2024 03:49:08 -0700 (PDT)
+Message-ID: <595efd8b-e0fe-4a87-90b1-4b579f3cc876@gmail.com>
+Date: Fri, 11 Oct 2024 12:49:09 +0200
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -48,83 +59,60 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Content-Language: en-GB
-From: Raghavender Reddy Bujala <quic_rbujala@quicinc.com>
-To: <linux-bluetooth@vger.kernel.org>
-Subject: AVDTP connection timer is not allowing to wait for send
- setconfiguration error code response
-Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Language: en-US
+To: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>,
+ Kiran K <kiran.k@intel.com>
+From: Heiner Kallweit <hkallweit1@gmail.com>
+Subject: Connection issue since 81b3e33bb054 ("Bluetooth: btusb: Don't fail
+ external suspend requests")
+Autocrypt: addr=hkallweit1@gmail.com; keydata=
+ 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
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nalasex01c.na.qualcomm.com (10.47.97.35)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: uMS-HLEVH28RB2zx9V1i3y9wVvcr_I7x
-X-Proofpoint-GUID: uMS-HLEVH28RB2zx9V1i3y9wVvcr_I7x
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
- definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0
- lowpriorityscore=0 bulkscore=0 adultscore=0 impostorscore=0
- mlxlogscore=999 mlxscore=0 spamscore=0 phishscore=0 malwarescore=0
- clxscore=1011 priorityscore=1501 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.19.0-2409260000 definitions=main-2410110063
 
-Hi,
-
-We are trying to verify the below PTS usecase, where remote initiates 
-the connection and sends AVDTP setconfiguration with unknown sampling
-frequency.
-
-PTS case: A2DP/SNK/AVP/BI-03-C
-
-Description:
-Verify that the SNK IUT, acting as an AVDTP Acceptor, returns error 
-codes when the Lower Tester, acting as an A2DP SRC and an AVDTP INT, 
-configures a stream using an invalid configuration 
-(INVALID_SAMPLING_FREQUENCY).
-
-(TSPC_A2DP_15b_1 AND (TSPC_A2DP_5_6 OR TSPC_A2DP_5_4 OR TSPC_A2DP_5_1)) 
-OR TSPC_ALL
-
-
-
-User prompt:
-Please prepare the IUT to reject an AVDTP SET CONFIGURATION command with 
-error code INVALID_SAMPLING_FREQUENCY,
-
-then press 'OK 'to continue."
-
-
-Results:
-
-Expectation: DUT needs to reject the setconfiguration with invalid 
-sampling frequency error code.
-
-Behavior: When PTS asks for user prompt to prepare and press ok to 
-continue. it is failing, because in bluez there is a 1 second timer for 
-connection. this timer is getting expired and avdtp signalling(DISCOVER 
-procedure) starting again from dut.
-
-diconnect timer source link:
-https://github.com/bluez/bluez/blob/5.65/profiles/audio/avdtp.c#L1202
-
-due to this behaviour we were unable to send setconfiguration with 
-invalid sampling frequency error code from dut.
-
-Is there any workaround for this to fix?
-
-Bluez version: 5.65
-pulseaudio version: 15.0
-kernel version: 6.6.38
-
-Note: We are observing avdtp connection failure with iphone due to this 
-timer sometimes.
-
-
-Thanks & Regards,
-Raghavender
-
-
-
-
+Since linux-next from Oct 4th my bt speaker fails to connect if I switch it on.
+It just hangs trying. Manually connecting it via bluetoothctl works though.
+With this patch reverted it auto-connects again.
+If you need additional details, please let me know.
