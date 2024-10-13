@@ -1,247 +1,136 @@
-Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBC5E80BFF
-	for <linux-bluetooth@vger.kernel.org>; Sat, 12 Oct 2024 21:22:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.46
+Received: from angie.orcam.me.uk (angie.orcam.me.uk [78.133.224.34])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F869143C5D;
+	Sun, 13 Oct 2024 14:53:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.133.224.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728768168; cv=none; b=SB9Lo3qBlTwYJnrvzcpyI5Eh69qxRtD0oxOZPNeYlEb3hB0AUsICuQsD88ctak4r1bTxlMgolQ55Uf7TzYIp5kGJ5Tk0kTZ3OleB28ZG47N47+ZdGkakQHXhq+yn4oiDmtujFR+S4buPUDohqh2Lh14yD8dJ8ZMWQQGGAeyHD10=
+	t=1728831211; cv=none; b=cbUNlTSAPvH7MQJ3dYh49oE5m+xPdZQ7suoKqlG57BUPXQavl6I0yyhjjs8ZypltenbzCnhvfplRLrq+y1rgRlMB3GMhmYOM21fhsSefo+R/g68p4RVsFw+thutfLpbcM998mC7pAy2y3iyJvoYYVI9xNPZZbRYEnwr4mtTqL20=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728768168; c=relaxed/simple;
-	bh=3a3wOYjDqhVDslgmBGakj894kpqUL4UajFBZ4s3Z4Os=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=pxtFhFj9Hp7cVvAYeJ7CaSDi0LzrWGLuYbTXLbnboXU1guaBZFekixwgD8YY9Nu5hJsZgzvgQ0vBnWCp001KnqYjDj7/aonw76TN71u9fV+upKzs/d0faQa9uQEbSwqXoFu3QpIuyaYzKbJRbNTHjK2/s6SHrReqtnptbNR4T04=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=m/xAcjkb; arc=none smtp.client-ip=209.85.208.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="m/xAcjkb"
-Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-5c962c3e97dso634950a12.0
-        for <linux-bluetooth@vger.kernel.org>; Sat, 12 Oct 2024 14:22:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1728768165; x=1729372965; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=PhzSifK2ivcGwsy9b4W3SV0fTYamh8saianjd76i8c4=;
-        b=m/xAcjkbHH7YRfPFhpTiDgxtR5kIhfn9Io5+yxtzgXMlg6ttpkbx9CYDXyOTDZxdhi
-         1jxcmUhy0Bb9ccrDAE2Fo+aRQ+Z7Zh7wzoNHP2jsHa0LaL8cCvn0qcE0QV1XnZcC2KVM
-         nYFZYizsRmisRboVgYRU2Rp5xvzh/d968n2bML1D4raGMxNjENPokEbN5FShxqgbI5/e
-         Vz0OsbwzIJwWceXqsEHzbSrCYE8/P6uQXWkB5Ft44qUWol2XhS8ZPmIXrAvXtFmAPP4E
-         k7QKZiViG+vSiuGEuZH9Mw82UahouKVgdXoLHQ9oHcwYvQ2jhcD9KEGIyL2p8ALZOEIg
-         cQRw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728768165; x=1729372965;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=PhzSifK2ivcGwsy9b4W3SV0fTYamh8saianjd76i8c4=;
-        b=NoO28qEP3FkmB+ilwC7HgNOUjSFNmfhfdxiArCQ0AO8rUnktUfqG1xbWsRl9ZloOlM
-         15gOGwDaRNJsq+L7CGkaQAZQEjOCd0Idy7uhKKkxIgK1qkb/nVKhkzhkbRhfqib9U+nR
-         ESwV85LFDrhpFPLyw0jrS6H1KZMOISPAV1XnK9rQuS7lrt/mGGer4kEjVrbXOCUJYd4z
-         Gptlr6sY/aPG2TeI4cAyvZQNMjfnVbHcDgeBfuDqYs2xfEzGz6XqdBzkRHnYJidtZ9i5
-         dMiDVFwlgwHzYJqIIyl6AL1c0VnF9IG5YvQNq63/iY1Bbj+w9hBDmLzPsdj3Ai/BiXqq
-         KY6A==
-X-Forwarded-Encrypted: i=1; AJvYcCUKRjW4euW4S++CRxuaSYUHu6Fl+PQ6iHcB56THNXeEv99DylO8DoYtApoPJGE+3ty0g9GgKtyujwFGY2B79RM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyTrmP/KQzwH8B8xYFn98H5+YN5kUHjDqytMSYamuAultcR/1kH
-	Sve0IEynQmYM1NHPPHxVpze55OX3PuvpPA1gGSa6wXK+VVUAd77K
-X-Google-Smtp-Source: AGHT+IGt4SRkxsZBdYNhOFahHPMavOT4Rb5UbQmzU4671TT/c0zqqrAgAze1Y7RPjA9ZqZMOeFsPLw==
-X-Received: by 2002:a05:6402:254f:b0:5c9:362f:142 with SMTP id 4fb4d7f45d1cf-5c948cca996mr4440578a12.21.1728768164848;
-        Sat, 12 Oct 2024 14:22:44 -0700 (PDT)
-Received: from ?IPV6:2a02:3100:9cf5:9500:7452:8738:f913:7c31? (dynamic-2a02-3100-9cf5-9500-7452-8738-f913-7c31.310.pool.telefonica.de. [2a02:3100:9cf5:9500:7452:8738:f913:7c31])
-        by smtp.googlemail.com with ESMTPSA id 4fb4d7f45d1cf-5c93729adcdsm3189125a12.89.2024.10.12.14.22.41
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 12 Oct 2024 14:22:42 -0700 (PDT)
-Message-ID: <b2654526-5304-4a7b-b3ea-08055e294ae5@gmail.com>
-Date: Sat, 12 Oct 2024 23:22:41 +0200
+	s=arc-20240116; t=1728831211; c=relaxed/simple;
+	bh=rBhr3YEB0lNOJfF03W35HV8jztKMVPnLGNDZbrm4Ci0=;
+	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=Cac7vzXlnRZKCFQDgqG3+kQwVjBK1kPZDMiZU7gXM7t6R8MLQEzrXBVe/+LnTLv1uT6RYYlSKd0S2wn5cc2WxPfraXjflphEnnn4Lqu/kLyqgrYr5SHBFOl/mRdO2EaIH+Fg1B6riB28klGWtuzO4k2fE4ZzmfDtU/NNWh9RluI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=orcam.me.uk; spf=none smtp.mailfrom=orcam.me.uk; arc=none smtp.client-ip=78.133.224.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=orcam.me.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=orcam.me.uk
+Received: by angie.orcam.me.uk (Postfix, from userid 500)
+	id 4DC4292009C; Sun, 13 Oct 2024 16:53:21 +0200 (CEST)
+Received: from localhost (localhost [127.0.0.1])
+	by angie.orcam.me.uk (Postfix) with ESMTP id 45D3F92009B;
+	Sun, 13 Oct 2024 15:53:21 +0100 (BST)
+Date: Sun, 13 Oct 2024 15:53:21 +0100 (BST)
+From: "Maciej W. Rozycki" <macro@orcam.me.uk>
+To: Niklas Schnelle <schnelle@linux.ibm.com>
+cc: Brian Cain <bcain@quicinc.com>, Marcel Holtmann <marcel@holtmann.org>, 
+    Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
+    Patrik Jakobsson <patrik.r.jakobsson@gmail.com>, 
+    Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, 
+    Maxime Ripard <mripard@kernel.org>, 
+    Thomas Zimmermann <tzimmermann@suse.de>, David Airlie <airlied@gmail.com>, 
+    Simona Vetter <simona@ffwll.ch>, Dave Airlie <airlied@redhat.com>, 
+    Gerd Hoffmann <kraxel@redhat.com>, 
+    Lucas De Marchi <lucas.demarchi@intel.com>, 
+    =?UTF-8?Q?Thomas_Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>, 
+    Rodrigo Vivi <rodrigo.vivi@intel.com>, 
+    Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+    Jiri Slaby <jirislaby@kernel.org>, Arnd Bergmann <arnd@arndb.de>, 
+    Heiko Carstens <hca@linux.ibm.com>, linux-kernel@vger.kernel.org, 
+    linux-hexagon@vger.kernel.org, linux-bluetooth@vger.kernel.org, 
+    dri-devel@lists.freedesktop.org, virtualization@lists.linux.dev, 
+    spice-devel@lists.freedesktop.org, intel-xe@lists.freedesktop.org, 
+    linux-serial@vger.kernel.org, linux-arch@vger.kernel.org, 
+    Arnd Bergmann <arnd@kernel.org>
+Subject: Re: [PATCH v6 4/5] tty: serial: handle HAS_IOPORT dependencies
+In-Reply-To: <46d81b40dda20ada3b5847353a866172b419c811.camel@linux.ibm.com>
+Message-ID: <alpine.DEB.2.21.2410081606420.30973@angie.orcam.me.uk>
+References: <20241007-b4-has_ioport-v6-0-03f7240da6e5@linux.ibm.com>  <20241007-b4-has_ioport-v6-4-03f7240da6e5@linux.ibm.com>  <alpine.DEB.2.21.2410072109130.30973@angie.orcam.me.uk> <46d81b40dda20ada3b5847353a866172b419c811.camel@linux.ibm.com>
+User-Agent: Alpine 2.21 (DEB 202 2017-01-01)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: Connection issue since 81b3e33bb054 ("Bluetooth: btusb: Don't
- fail external suspend requests")
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
- BlueZ development <linux-bluetooth@vger.kernel.org>,
- Kiran K <kiran.k@intel.com>
-References: <595efd8b-e0fe-4a87-90b1-4b579f3cc876@gmail.com>
- <CABBYNZJMWni33VQ2sX9EDcNbsFbX7pjAFj4QLri9N7jyLY0HvQ@mail.gmail.com>
- <c8b5c842-463e-4c30-b7e0-f41bf1d59305@gmail.com>
- <CABBYNZ+kcwgPvCNFZHZZok_a6ZNXEPNABNefb4iaSNDNm4wPVA@mail.gmail.com>
- <CABBYNZKbXE4unZi3MPP2LPzYcv0OLHoaqqey02N1qUzSR=4PhQ@mail.gmail.com>
- <d85205ed-dd47-4690-99a3-8f20ea7ab237@gmail.com>
- <CABBYNZL7BJq57iJEm8y6D1JWikymC-gSP-N6jHXpgBjgWC_B6A@mail.gmail.com>
- <4492450a-aa01-49ae-9ff4-ef3641a6b6f2@gmail.com>
- <CABBYNZJPHc3-An5hB7HOtNRCP62=uUF9UckSPOF04kLVawu-MA@mail.gmail.com>
-Content-Language: en-US
-From: Heiner Kallweit <hkallweit1@gmail.com>
-Autocrypt: addr=hkallweit1@gmail.com; keydata=
- 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
-In-Reply-To: <CABBYNZJPHc3-An5hB7HOtNRCP62=uUF9UckSPOF04kLVawu-MA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
 
-On 12.10.2024 00:19, Luiz Augusto von Dentz wrote:
-> Hi Heiner,
-> 
-> On Fri, Oct 11, 2024 at 4:56 PM Heiner Kallweit <hkallweit1@gmail.com> wrote:
->>
->> On 11.10.2024 22:06, Luiz Augusto von Dentz wrote:
->>> Hi Heiner,
->>>
->>> On Fri, Oct 11, 2024 at 3:44 PM Heiner Kallweit <hkallweit1@gmail.com> wrote:
->>>>
->>>> On 11.10.2024 21:26, Luiz Augusto von Dentz wrote:
->>>>> Hi Heiner,
->>>>>
->>>>> On Fri, Oct 11, 2024 at 3:05 PM Luiz Augusto von Dentz
->>>>> <luiz.dentz@gmail.com> wrote:
->>>>>>
->>>>>> Hi Heiner,
->>>>>>
->>>>>> On Fri, Oct 11, 2024 at 2:52 PM Heiner Kallweit <hkallweit1@gmail.com> wrote:
->>>>>>>
->>>>>>> On 11.10.2024 18:36, Luiz Augusto von Dentz wrote:
->>>>>>>> Hi Heiner,
->>>>>>>>
->>>>>>>> On Fri, Oct 11, 2024 at 6:49 AM Heiner Kallweit <hkallweit1@gmail.com> wrote:
->>>>>>>>>
->>>>>>>>> Since linux-next from Oct 4th my bt speaker fails to connect if I switch it on.
->>>>>>>>> It just hangs trying. Manually connecting it via bluetoothctl works though.
->>>>>>>>> With this patch reverted it auto-connects again.
->>>>>>>>> If you need additional details, please let me know.
->>>>>>>>
->>>>>>>> I suspect something is trying to suspend the controller then, it
->>>>>>>> shouldn't be USB auto-suspend since that should behave as it
->>>>>>>> previously but if there is something externally (aka. userspace)
->>>>>>>> trying to suspend then it will force it to suspend.
->>>>>>>>
->>>>>>> On the host side it's a combined WiFi/BT PCIe adapter (RTL8822CE).
->>>>>>> Runtime PM is enabled, so this may kick in. I'm not aware of any
->>>>>>> userspace tool which may try to suspend the WiFi/BT adapter.
->>>>>>> Disabling Runtime PM may be a workaround, but I don't think that's
->>>>>>> the actual solution.
->>>>>>>
->>>>>>
->>>>>> Well I assume it still using USB as transport, not PCIe, otherwise it
->>>>>> wouldn't be using btusb. Regarding runtime PM, I assume it still means
->>>>>> PMSG_IS_AUTO Documentation/driver-api/usb/power-management.rst:
->>>>>>
->>>>>>      'External suspend calls should never be allowed to fail in this way,
->>>>>>      only autosuspend calls.  The driver can tell them apart by applying
->>>>>>      the :c:func:`PMSG_IS_AUTO` macro to the message argument to the
->>>>>>      ``suspend`` method; it will return True for internal PM events'
->>>>>>
->>>>>> --
->>>>>> Luiz Augusto von Dentz
->>>>>
->>>>> Perhaps there is a double call to the likes of hci_suspend_dev due to
->>>>> system suspend and device suspend acting together, so maybe we need
->>>>> something like the following:
->>>>>
->>>>> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
->>>>> index 779c4aeaef22..c257759ae2f4 100644
->>>>> --- a/net/bluetooth/hci_core.c
->>>>> +++ b/net/bluetooth/hci_core.c
->>>>> @@ -2812,7 +2812,7 @@ int hci_suspend_dev(struct hci_dev *hdev)
->>>>>
->>>>>         /* Suspend should only act on when powered. */
->>>>>         if (!hdev_is_powered(hdev) ||
->>>>> -           hci_dev_test_flag(hdev, HCI_UNREGISTER))
->>>>> +           hci_dev_test_flag(hdev, HCI_UNREGISTER) || hdev->suspended)
->>>>>                 return 0;
->>>>>
->>>>>         /* If powering down don't attempt to suspend */
->>>>> @@ -2843,7 +2843,7 @@ int hci_resume_dev(struct hci_dev *hdev)
->>>>>
->>>>>         /* Resume should only act on when powered. */
->>>>>         if (!hdev_is_powered(hdev) ||
->>>>> -           hci_dev_test_flag(hdev, HCI_UNREGISTER))
->>>>> +           hci_dev_test_flag(hdev, HCI_UNREGISTER) || !hdev->suspended)
->>>>>                 return 0;
->>>>>
->>>>>         /* If powering down don't attempt to resume */
->>>>>
->>>>>
->>>> No change in behavior with this change.
->>>
->>> Ok, I guess we can rule out system suspend then, does commenting out
->>> the call to hci_suspend_dev makes it works again? If it does it means
->>> the device is suspending and it appears the likes of
->>> HCI_FLT_CONN_SETUP either doesn't work or is not being set to the
->>> controller to allow incoming connections, since it is an Audio device
->>> I think the problem is that we don't set HCI_CONN_FLAG_REMOTE_WAKEUP,
->>> only input device do set it, so we may need to treat device suspend
->>> and system suspend differently.
->>>
->>
->> The following makes it work again.
->>
->> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
->> index 7860750ec..33fd65d49 100644
->> --- a/net/bluetooth/hci_core.c
->> +++ b/net/bluetooth/hci_core.c
->> @@ -2808,6 +2808,8 @@ int hci_suspend_dev(struct hci_dev *hdev)
->>  {
->>         int ret;
->>
->> +       return 0;
->> +
->>         bt_dev_dbg(hdev, "");
->>
->>         /* Suspend should only act on when powered. */
->>
-> 
-> Can you try with the following changes:
-> 
-> https://gist.github.com/Vudentz/52c0cf8b9472a03b8eb447951be13811
-> 
-In this patch all tabs have been replaced with spaces, therefore it
-didn't apply and I had to apply the changes manually.
-Unfortunately the changes don't fix the issue for me.
+On Tue, 8 Oct 2024, Niklas Schnelle wrote:
 
+> > > +static __always_inline bool is_upf_fourport(struct uart_port *port)
+> > > +{
+> > > +	if (!IS_ENABLED(CONFIG_HAS_IOPORT))
+> > > +		return false;
+> > > +
+> > > +	return port->flags & UPF_FOURPORT;
+> > > +}
+> > 
+> >  Can we perhaps avoid adding this helper and then tweaking code throughout 
+> > by having:
+> > 
+> > #ifdef CONFIG_SERIAL_8250_FOURPORT
+> > #define UPF_FOURPORT		((__force upf_t) ASYNC_FOURPORT       /* 1  */ )
+> > #else
+> > #define UPF_FOURPORT		0
+> > #endif
+> > 
+> > in include/linux/serial_core.h instead?  I can see the flag is reused by 
+> > drivers/tty/serial/sunsu.c, but from a glance over it seems rubbish to me 
+> > and such a change won't hurt the driver anyway.
+> 
+> I'll look at this, do you think this is okay regarding matching the
+> user-space definitions in include/uapi/linux/tty_flags.h?
+
+ With this change UAPI stays the same and setting ASYNC_FOURPORT (with 
+`setserial', etc.) will just do nothing with non-port-I/O platforms, as 
+expected.  Arguably being able to set it for any serial port and cause the 
+driver to poke at random I/O locations is already asking for trouble, but 
+that the price of legacy.
+
+> > > @@ -1174,7 +1201,7 @@ static void autoconfig(struct uart_8250_port *up)
+> > >  		 */
+> > >  		scratch = serial_in(up, UART_IER);
+> > >  		serial_out(up, UART_IER, 0);
+> > > -#ifdef __i386__
+> > > +#if defined(__i386__) && defined(CONFIG_HAS_IOPORT)
+> > >  		outb(0xff, 0x080);
+> > >  #endif
+> > >  		/*
+> > > @@ -1183,7 +1210,7 @@ static void autoconfig(struct uart_8250_port *up)
+> > >  		 */
+> > >  		scratch2 = serial_in(up, UART_IER) & UART_IER_ALL_INTR;
+> > >  		serial_out(up, UART_IER, UART_IER_ALL_INTR);
+> > > -#ifdef __i386__
+> > > +#if defined(__i386__) && defined(CONFIG_HAS_IOPORT)
+> > >  		outb(0, 0x080);
+> > >  #endif
+> > >  		scratch3 = serial_in(up, UART_IER) & UART_IER_ALL_INTR;
+> > 
+> >  Nah, i386 does have machine OUTB instructions, it has the port I/O 
+> > address space in the ISA, so these two changes make no sense to me.  
+> > 
+> >  Though this #ifdef should likely be converted to CONFIG_X86_32 via a 
+> > separate change.
+> 
+> This is needed for Usermode Linux (UM) which sets __i386__ but also
+> doesn't have CONFIG_HAS_IOPORT. This was spotted by the kernel test bot
+> here: https://lore.kernel.org/all/202410031712.BwfGjrQY-lkp@intel.com/
+
+ Odd, but I'm not into UML so I need to accept your justification.  My 
+reservation about relying on compiler's __i386__ predefine rather than our 
+CONFIG_X86_32 setting still stands, but that's beyond the scope of your 
+change (as is switching from `#if ...' to `if (...)').  Thanks for your 
+attention to such details.
+
+ NB these `outb' calls look to me remarkably like remains of `outb_p' and 
+I wonder if they could be abstracted somehow.  For those who don't know: 
+the port I/O location 0x80 in the IBM PC address space was reserved for 
+use as a diagnostic port.  Despite being in the mainboard's address space 
+its chip select line was left floating and one could obtain an ISA option 
+card that decoded this location and showed data values written to it on a 
+hex display.  As it was a location known to cause no side effect (beyond 
+that optional hex display) it was commonly used to incur a small delay in 
+execution.  It was also used by BIOS POST to indicate progress.
+
+ I've skimmed over v8 and it seems good to go as far as I'm concerned.  
+Any fallout can be dealt with on a case-by-case basis.  Thank you for 
+working on these improvements.
+
+  Maciej
