@@ -1,101 +1,83 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f45.google.com (mail-lf1-f45.google.com [209.85.167.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94BAD142623
-	for <linux-bluetooth@vger.kernel.org>; Mon, 14 Oct 2024 08:30:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85ED81474A4
+	for <linux-bluetooth@vger.kernel.org>; Mon, 14 Oct 2024 08:37:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728894637; cv=none; b=dBlLxkaEqymqzdZQ0ZAH5i73Csm9ka3DcVm7H/xJv2TS8TXtYV3JiHC7fAlKhiXadbBsbVwyoXgXlMbD0njpevNme7DCwJ/V+Yn2Hz/fc4VgodoKKiCVmQ1Yd19oM6T6/AroBA8BmVOogCI3gS8PPWPyn98xwPeiwNQygsQKYq4=
+	t=1728895031; cv=none; b=uhi8tc+zKKD87vJSt6h489PEQWO+A6WUNpJPBYLi1s8pyb73KERJyIubV343IIFpJJ6DiR8Z1zegRM5HJDGao2Uyl+ViizpZ8sG8kP/s/Su1ULH+va3HyUKT3pTE80GIxNCp3AjoTO+gx04KELAqUdYBPtDUdl/yHNB5PEzaWq0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728894637; c=relaxed/simple;
-	bh=Vojh/h4Tw66LtWt6d3NOM9yEB0C5uO1In/wXiJjq9UU=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=TBBEL+FJUmYP0ymbKdGsXApboQLJW3Qg3FS5QpebI/kOB0LxL+hHqNbkUzGMoRCP5AX/Pd4LaEGNeZDhjxP/yBjTo7ecYGowhWhTA5IlWO0OVwH0DH8Pd6pIjKlAO5Os5lsfeRv60BBsCTueyc5YKL/SMQ5zhAqxmlwXJ081RHc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VSFxa0pf; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1728895031; c=relaxed/simple;
+	bh=iv8PlZLe++xkk0m32dJ0EmQo0KOn2VYLdArmI+nYxAw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=lJTFeFr5E0GyhAol8xxfu6jOxyyEsu9Bb3ZtjbxNVf5AvcOKPp/sL+DRlLan8EswW2yGyJWG4b0AwKAX22mh4PcBTA2K9F8QEkdhBf4HtDopckylsDgKbsacsLLKENP61jf0KOnE1nlWnsmqCoBAMCRRpQ9a/82ELLE1Pi3pKjM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=iTmhk7/q; arc=none smtp.client-ip=209.85.167.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VSFxa0pf"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 2E318C4CECE
-	for <linux-bluetooth@vger.kernel.org>; Mon, 14 Oct 2024 08:30:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728894637;
-	bh=Vojh/h4Tw66LtWt6d3NOM9yEB0C5uO1In/wXiJjq9UU=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=VSFxa0pfHDC7pUsF/TaCXcyvaHeKa1s901XMqIyAsyoU6HmSASuZ7GejLqTwdc7cc
-	 HtZoIS5d8JV5i82oM1nK/TeTLCPfkF8/T0iKJpenIeuoAT2pJw7LFGCxSAaHYXeDz9
-	 BsYHxTHKcPeO65e0L7Mql8XxijuqnV5VttnhEbaSky000w9evWghwF8j/buUBUI8rk
-	 pczUs3yAjOU8+f4BISdMHd++xZFkp5x3Z/osFabwEZleG53QC0vAkNu8NrXNdn/SgW
-	 VM3+QJZnZuUpzeY6lh+9WKRaJRhzSrQf6S5QWpct9Y98OnIh0/fNSXvrpf2GOfWz/7
-	 Jijz6yI3uJtJQ==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id 24767C53BC2; Mon, 14 Oct 2024 08:30:37 +0000 (UTC)
-From: bugzilla-daemon@kernel.org
-To: linux-bluetooth@vger.kernel.org
-Subject: [Bug 219385] BT mouse can not be found and/or connected in 6.12-rc3
-Date: Mon, 14 Oct 2024 08:30:36 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: pmenzel+bugzilla.kernel.org@molgen.mpg.de
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P3
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: cc
-Message-ID: <bug-219385-62941-A0LuROcb0y@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-219385-62941@https.bugzilla.kernel.org/>
-References: <bug-219385-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="iTmhk7/q"
+Received: by mail-lf1-f45.google.com with SMTP id 2adb3069b0e04-539e8607c2aso1540447e87.3
+        for <linux-bluetooth@vger.kernel.org>; Mon, 14 Oct 2024 01:37:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1728895028; x=1729499828; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=iv8PlZLe++xkk0m32dJ0EmQo0KOn2VYLdArmI+nYxAw=;
+        b=iTmhk7/qw81o6OQdTc7Vd8tni5SBMVU4JIFFKqX8BgQgjS/QJJzYlF2mEsL9MVg8Kp
+         E0MdPULACVh1nqjT+qtnOCeo8yfpluY9HhLSvepcdhFvD0N8m0wwbkqkeoJO41rZ3EQA
+         D+yygDRAztGdigjPeMdzCTKsLjTbdtEZxwpcBl4Akbyp3X5QPRgtIWOVOKIic0w0GFLz
+         Lqd7uNj1wepPvrp5JDQItPsVwlLmYRxgmQqDiOnh1MAtOSFpT1gynQoP9xMGaufXz/wE
+         2V66pSYAq0GO92WRBi73GX8wV/8A4kIJLlHHwZiXM6hFJSbe+FuvpTRzjmkHsWypeaVH
+         9z9g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728895028; x=1729499828;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=iv8PlZLe++xkk0m32dJ0EmQo0KOn2VYLdArmI+nYxAw=;
+        b=awMtCEdk2Z1pwaS8lRMnn/KZf2jhDr7WOhtIuOuku5NbeDn7OWtxI+s4eZqXuLsqjZ
+         z0tr/MT+p8jKPZByc8ZPK1Dcr80MMQyvwrQ+T9U2VAWz00E65u+VkLJIXAYkj5EJ7G+R
+         gSDJaTYkn9aRPgsxJ9bEwWPQVG9nZjuMo6ZkLlgwSnRzIzGRgd37Aw4ChAlB4l2UVd2P
+         PJuoFbnqMqvtMbcngc9ro3bnsvsUQ0/osMOfmILp+xvu+N93Fdfh1HHMX2SmgQXFDoep
+         oh9+j5qi8D1m5mjERM1RTKL/HvP0Vrr2f0IJJ92i845TSjdzuqEXtEqoiHsdb8dD3Qeg
+         4MJw==
+X-Gm-Message-State: AOJu0Ywa6PTQMR3LcD7Q9tPTFBIq3b5HDhEUKCc1lPgvyuXmDJ9henC8
+	hpbN3UqSJTyv0x18oQ8bkPN4ZvGqkA0ywkYMQyq48S1AuWtLTZ7CUqM+4MmAtiEvEQF5/QwsBEx
+	4UcUUkDLpY3nHMwwzdLqKz+8gjcAHEGa8RVLiFg==
+X-Google-Smtp-Source: AGHT+IGmwX4RUF9yi5GZQf3FK7ogVT2hx77a4BAjx/AyRr9zcJ5FNCqQj6Ns4j4UPtygQNm1AUkTia8xfUs9MVDiPKE=
+X-Received: by 2002:ac2:4e16:0:b0:536:554a:24c2 with SMTP id
+ 2adb3069b0e04-539da3c5ee1mr5336025e87.13.1728895027606; Mon, 14 Oct 2024
+ 01:37:07 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+References: <20240930080938.12505-1-brgl@bgdev.pl>
+In-Reply-To: <20240930080938.12505-1-brgl@bgdev.pl>
+From: Bartosz Golaszewski <brgl@bgdev.pl>
+Date: Mon, 14 Oct 2024 10:36:56 +0200
+Message-ID: <CAMRc=Mew5uRyWZvtv75MWRKxqgb7qbyrYxQd9hXZ4-b0ZHGo_g@mail.gmail.com>
+Subject: Re: [RESEND PATCH] Bluetooth: hci_qca: use devm_clk_get_optional_enabled_with_rate()
+To: Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D219385
+On Mon, Sep 30, 2024 at 10:09=E2=80=AFAM Bartosz Golaszewski <brgl@bgdev.pl=
+> wrote:
+>
+> From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+>
+> Use the new devm_clk_get_optional_enabled_with_rate() clock helper to
+> shrink the code a bit.
+>
+> Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+> ---
 
-Paul Menzel (pmenzel+bugzilla.kernel.org@molgen.mpg.de) changed:
+It's been two weeks, gentle ping.
 
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-                 CC|                            |pmenzel+bugzilla.kernel.org
-                   |                            |@molgen.mpg.de,
-                   |                            |regressions@leemhuis.info
-
---- Comment #1 from Paul Menzel (pmenzel+bugzilla.kernel.org@molgen.mpg.de)=
- ---
-Mark, thank you for the report. There are two more reports on the list with=
- the
-same findings as you:
-
-1.  Connection issue since 81b3e33bb054 ("Bluetooth: btusb: Don't fail exte=
-rnal
-suspend requests")
-2.  Commit 610712298b11 ("btusb: Don't fail external suspend requests") bre=
-aks
-BT upon resume on my laptop
-
-I think, the plan is to revert the commit.
-
-
-[1]:
-https://lore.kernel.org/linux-bluetooth/020c69d7-ad86-44d3-a508-22ff949ee7e=
-c@gmail.com/T/#t
-[2]:
-https://lore.kernel.org/linux-bluetooth/a34d2761-dad4-4ae7-8787-6bbf0553831=
-8@panix.com/T/#t
-
---=20
-You may reply to this email to add a comment.
-
-You are receiving this mail because:
-You are the assignee for the bug.=
+Bart
