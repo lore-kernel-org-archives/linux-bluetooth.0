@@ -1,109 +1,148 @@
-Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99FC01AAE02
-	for <linux-bluetooth@vger.kernel.org>; Mon, 14 Oct 2024 15:22:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E7741AAC4
+	for <linux-bluetooth@vger.kernel.org>; Mon, 14 Oct 2024 15:38:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728919350; cv=none; b=TO4ibuSbczjNR0cFtP8uP4Fw9C/eKb+LJzlr5ECfqze/7OexY9MvGWb5CZjdUSXLuuBzLLZAwbiFw4W6GrDJp7dGxX3+WidqiMFp/W4DsD2CHT7Kr4q48WGUjR7I8plTkVpe4wNCkZ5AUNpVCRSoaNY7vun60UTZr7zBi4KbKy8=
+	t=1728920304; cv=none; b=f85TlNJKOD3L5YNFa3oKPXKvayla9SV/ejKg2byojChSj9llv8HnmWzRV/GkDkvsfIHyf8BnHg/N+1j9WEWFr+1axechepiTyrOJ4Bf/Hkr0RFhrP3QoXxa7U1baDwsfVzYmKn/5vuv/lcVJwo3z8YC7O0QXI8EmwlEQ4TpF/so=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728919350; c=relaxed/simple;
-	bh=E6oq2yfjMtwqMzR04MRXeShcM1pOwofotTGEl6KhoUI=;
-	h=From:To:Subject:Date:Message-Id:MIME-Version:Content-Type; b=PYY3tgT68Lt0FAME58NkOz2cVLQzLk3nElF2O3HN83rwCw+YIluzR4L4DH5LWnTEAMuz69YwJnmO7X4mzxw3bw4XRF60+H1/dEhxLf5ldNATpfCi3CwGYWjoaezYszY2IthzYgLGfAyriCx+zIh62xIo10P5jnuj3jnKiJo8U34=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=bwR7oG6J; arc=none smtp.client-ip=148.251.105.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+	s=arc-20240116; t=1728920304; c=relaxed/simple;
+	bh=wnFLfn5BeeZ3wPCN20V30mk4CTpYaz6K85DjdS+HiHk=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=VWT0TCBDX1S9tOoyPsVJzYMQCQhpUcHRU+PjD1N9uZe3BGUFn1LV58gTQ+rNe/iVgw6hBnoCsXsf7oP7b0bbVhZ2NbWLI4vLLsSCMeHdcL88NXmkLpBgr8O8omTvKBtfdqW9L/0UQoBqNDdheqd9knTwuJ3BhjZowC1+xqaS2KQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=JJP39igI; arc=none smtp.client-ip=209.85.128.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="bwR7oG6J"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1728919346;
-	bh=E6oq2yfjMtwqMzR04MRXeShcM1pOwofotTGEl6KhoUI=;
-	h=From:To:Subject:Date:From;
-	b=bwR7oG6JfMbxiW1AN3xY9lddjpQwUJzNCgyWJ5iZh12ryvP4vx13snj48sw8/k3eb
-	 6SzhCnqv6Sd0ZdFXcSwboXI/PlYCf1UlOOOxrgspR4eSB9Cn5xmv6uHd1t7LrxIyiI
-	 xngBXYQX75ZJkWQ5q0ZQrpSnpUNZnVH93oVtdxmxQDYZbxMcAIr1rLx2CjpIC4P9Ox
-	 zvGoZTP1gsveS4afqHTpyOJv5pv8jFv3wC3ch8iBSukCtllwnvARM1+LTUi+jY5NRr
-	 gs4nQaqVJNHzkgG3/bBYL/6oeSbSbRcvEHUPWOCLJkTHVV3TmCpUydjYsJtgPWEsYg
-	 sonzOF5yhaBMA==
-Received: from fdanis-XPS-13-9370.. (67.227.121.78.rev.sfr.net [78.121.227.67])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: fdanis)
-	by bali.collaboradmins.com (Postfix) with ESMTPSA id 7DE1017E360F
-	for <linux-bluetooth@vger.kernel.org>; Mon, 14 Oct 2024 17:22:26 +0200 (CEST)
-From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?= <frederic.danis@collabora.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] tools/obexctl: Add support to connect using PSM port
-Date: Mon, 14 Oct 2024 17:22:05 +0200
-Message-Id: <20241014152205.66120-1-frederic.danis@collabora.com>
-X-Mailer: git-send-email 2.34.1
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="JJP39igI"
+Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-4311420b63fso33469445e9.2
+        for <linux-bluetooth@vger.kernel.org>; Mon, 14 Oct 2024 08:38:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloudflare.com; s=google09082023; t=1728920301; x=1729525101; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=xHzMyBjSo/EDcGPVYKinoicVUAUc6s3aklub75jR0Lw=;
+        b=JJP39igIjYtLhphYpdRanLZToLY8t29Od5fQ3cNLQlpEtOkd70DfFC9y2+RTae+bf/
+         aGVv38VnD8A/SqcDsvUB/2BaO4erZMEjqzUJTY2KpYzbHuFneqWqkJuemj8nwmZcywRg
+         UOCD+2/xcVoVam8A3vbALfUroDSUzcsxEmmai47j0QhHr71NgDnMoD2ExQH60Lp5zOcg
+         Jl0E66/VWFg7fO78E5BF3Gk8VErtbtmOjWj29ARCWialCcNVlkzSobpBUPeQ4T1wCgy2
+         UXPw5QLbPyTIQ6JRQZcW5gG9Sj8QYq4k9NSULBc8Z8XBshDd3nEv4B+g3If1kjidm9o9
+         uakA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728920301; x=1729525101;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=xHzMyBjSo/EDcGPVYKinoicVUAUc6s3aklub75jR0Lw=;
+        b=DZ6LjrWNg+ONR9fbez+xmcJ+h3fHADTrz6fW1EdaOJW39z35LaXACRKj3Rw9UxUP7g
+         GdiPJrUYyQnqptsBdyc0HqLrxL3tpUpuCP/fW24Zy+Z7T89HU2YEjeXvp/rLEunf2BxK
+         nISkg0lw3pCcW9oELF1863juntJqWts6wrCtrzscNxgQlc1vcn2tdZQ6kHb7Ukt67W7y
+         u4iQ99TqqtwFqPD4YeBTCjnvZUfaK9F1qhnBKHMv03bPDGhuaKDJCSpvAgtWlg0VDRlo
+         Jtc5ANs6hIYDw53301mno/2xCmsulvaJochIJppCLqWtpvJiYHyjzPP7Q4U3p/vpogVT
+         p5kw==
+X-Forwarded-Encrypted: i=1; AJvYcCWWB+dTnoJkgOUlbpMyHC8NCi3FWwZv49Hmrg4bwa7bThaxwDrnVFyi6SLIwTDLKNr2xMzVOzwaCszo/bGJ6rA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwsHqomILfGfahGLDMEppVLQEVM7DpdAhGRcuRd1jxZeq+XTgbb
+	/cPL3abX1cjlkPO++qf570StH0KcZyMG7CA08mckxvZ26I6QkqCmWwQyeuDMFg0qGM6mAe9NW7o
+	vHmALCS3Q
+X-Google-Smtp-Source: AGHT+IFTv9Ec0x1pgYaAzfXLeF4AIIb/MZM5qOa/pOg2VUZq5MjMIBM3l7s9Bf7wq9KEq9mdpqLhRg==
+X-Received: by 2002:adf:f686:0:b0:37d:5232:a963 with SMTP id ffacd0b85a97d-37d5fef48abmr5709371f8f.14.1728920300822;
+        Mon, 14 Oct 2024 08:38:20 -0700 (PDT)
+Received: from localhost.localdomain ([2a09:bac5:50cb:432::6b:93])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-37d4b6a8940sm11725913f8f.6.2024.10.14.08.38.19
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Mon, 14 Oct 2024 08:38:20 -0700 (PDT)
+From: Ignat Korchagin <ignat@cloudflare.com>
+To: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Oliver Hartkopp <socketcan@hartkopp.net>,
+	Marc Kleine-Budde <mkl@pengutronix.de>,
+	Alexander Aring <alex.aring@gmail.com>,
+	Stefan Schmidt <stefan@datenfreihafen.org>,
+	Miquel Raynal <miquel.raynal@bootlin.com>,
+	David Ahern <dsahern@kernel.org>,
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+	linux-bluetooth@vger.kernel.org,
+	linux-can@vger.kernel.org,
+	linux-wpan@vger.kernel.org
+Cc: kernel-team@cloudflare.com,
+	kuniyu@amazon.com,
+	alibuda@linux.alibaba.com,
+	Ignat Korchagin <ignat@cloudflare.com>
+Subject: [PATCH net-next v3 0/9] do not leave dangling sk pointers in pf->create functions
+Date: Mon, 14 Oct 2024 16:37:59 +0100
+Message-Id: <20241014153808.51894-1-ignat@cloudflare.com>
+X-Mailer: git-send-email 2.39.5 (Apple Git-154)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 
-Since 5d7d3ac25bd56684f4f8c7378b3ec2db0b0ce1ae obexd supports to connect
-the session using a L2CAP PSM.
----
- tools/obexctl.c | 19 ++++++++++++-------
- 1 file changed, 12 insertions(+), 7 deletions(-)
+Some protocol family create() implementations have an error path after
+allocating the sk object and calling sock_init_data(). sock_init_data()
+attaches the allocated sk object to the sock object, provided by the
+caller.
 
-diff --git a/tools/obexctl.c b/tools/obexctl.c
-index 56a76915c..3dfb72856 100644
---- a/tools/obexctl.c
-+++ b/tools/obexctl.c
-@@ -114,7 +114,7 @@ static void connect_reply(DBusMessage *message, void *user_data)
- struct connect_args {
- 	char *dev;
- 	char *target;
--	uint8_t channel;
-+	uint16_t channel;
- };
- 
- static void connect_args_free(void *data)
-@@ -144,9 +144,14 @@ static void connect_setup(DBusMessageIter *iter, void *user_data)
- 		g_dbus_dict_append_entry(&dict, "Target",
- 					DBUS_TYPE_STRING, &args->target);
- 
--	if (args->channel)
--		g_dbus_dict_append_entry(&dict, "Channel",
--					DBUS_TYPE_BYTE, &args->channel);
-+	if (args->channel) {
-+		if (args->channel > 31)
-+			g_dbus_dict_append_entry(&dict, "PSM",
-+						DBUS_TYPE_UINT16, &args->channel);
-+		else
-+			g_dbus_dict_append_entry(&dict, "Channel",
-+						DBUS_TYPE_BYTE, &args->channel);
-+	}
- 
- 	dbus_message_iter_close_container(iter, &dict);
- }
-@@ -169,8 +174,8 @@ static void cmd_connect(int argc, char *argv[])
- 		char *endptr = NULL;
- 
- 		channel = strtol(argv[3], &endptr, 0);
--		if (!endptr || *endptr != '\0' || channel > UINT8_MAX) {
--			bt_shell_printf("Invalid channel\n");
-+		if (!endptr || *endptr != '\0' || channel > UINT16_MAX) {
-+			bt_shell_printf("Invalid channel or PSM\n");
- 			return bt_shell_noninteractive_quit(EXIT_FAILURE);
- 		}
- 	}
-@@ -1846,7 +1851,7 @@ static void cmd_mkdir(int argc, char *argv[])
- static const struct bt_shell_menu main_menu = {
- 	.name = "main",
- 	.entries = {
--	{ "connect",      "<dev> [uuid] [channel]", cmd_connect,
-+	{ "connect",      "<dev> [uuid] [channel|PSM]", cmd_connect,
- 						"Connect session" },
- 	{ "disconnect",   "[session]", cmd_disconnect, "Disconnect session",
- 						session_generator },
+If the create() implementation errors out after calling sock_init_data(),
+it releases the allocated sk object, but the caller ends up having a
+dangling sk pointer in its sock object on return. Subsequent manipulations
+on this sock object may try to access the sk pointer, because it is not
+NULL thus creating a use-after-free scenario.
+
+We have implemented a stable hotfix in commit 631083143315
+("net: explicitly clear the sk pointer, when pf->create fails"), but this
+series aims to fix it properly by going through each of the pf->create()
+implementations and making sure they all don't return a sock object with
+a dangling pointer on error.
+
+Changes in V3:
+  * retargeted the series to net-next
+  * dropped the hotfix patch, which was merged into net already
+  * replaced the hotfix code with DEBUG_NET_WARN_ON_ONCE() to catch future
+    violations
+
+Changes in V2:
+  * reverted the change introduced in 6cd4a78d962b ("net: do not leave a
+    dangling sk pointer, when socket creation fails")
+  * added optional commits to all pf->create implementaions to clear the
+    sk pointer on error after sock_init_data()
+
+Ignat Korchagin (9):
+  af_packet: avoid erroring out after sock_init_data() in
+    packet_create()
+  Bluetooth: L2CAP: do not leave dangling sk pointer on error in
+    l2cap_sock_create()
+  Bluetooth: RFCOMM: avoid leaving dangling sk pointer in
+    rfcomm_sock_alloc()
+  net: af_can: do not leave a dangling sk pointer in can_create()
+  net: ieee802154: do not leave a dangling sk pointer in
+    ieee802154_create()
+  net: inet: do not leave a dangling sk pointer in inet_create()
+  net: inet6: do not leave a dangling sk pointer in inet6_create()
+  net: warn, if pf->create does not clear sock->sk on error
+  Revert "net: do not leave a dangling sk pointer, when socket creation
+    fails"
+
+ net/bluetooth/l2cap_sock.c  |  1 +
+ net/bluetooth/rfcomm/sock.c | 10 +++++-----
+ net/can/af_can.c            |  1 +
+ net/core/sock.c             |  3 ---
+ net/ieee802154/socket.c     | 12 +++++++-----
+ net/ipv4/af_inet.c          | 22 ++++++++++------------
+ net/ipv6/af_inet6.c         | 22 ++++++++++------------
+ net/packet/af_packet.c      | 12 ++++++------
+ net/socket.c                |  4 ++--
+ 9 files changed, 42 insertions(+), 45 deletions(-)
+
 -- 
-2.34.1
+2.39.5
 
