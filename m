@@ -1,83 +1,138 @@
-Received: from mail-lf1-f45.google.com (mail-lf1-f45.google.com [209.85.167.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85ED81474A4
-	for <linux-bluetooth@vger.kernel.org>; Mon, 14 Oct 2024 08:37:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 054E01474A5
+	for <linux-bluetooth@vger.kernel.org>; Mon, 14 Oct 2024 08:40:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728895031; cv=none; b=uhi8tc+zKKD87vJSt6h489PEQWO+A6WUNpJPBYLi1s8pyb73KERJyIubV343IIFpJJ6DiR8Z1zegRM5HJDGao2Uyl+ViizpZ8sG8kP/s/Su1ULH+va3HyUKT3pTE80GIxNCp3AjoTO+gx04KELAqUdYBPtDUdl/yHNB5PEzaWq0=
+	t=1728895257; cv=none; b=C0DGsx4pO1yMbY8G0XvJTxJeQ3BSQaAVuSanU0ft032C1ePAc30JQriYVMPJrR+ot0BKmvwqBqoSEC3KX6AUhgEab7Mq5NjH/uoKunMOF90C6l0zwUY2UXhVo3DiWj/hxOxwNCjgPbEa2oHxIOW2xc34Xpuopm3M+OGuWPexGz8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728895031; c=relaxed/simple;
-	bh=iv8PlZLe++xkk0m32dJ0EmQo0KOn2VYLdArmI+nYxAw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=lJTFeFr5E0GyhAol8xxfu6jOxyyEsu9Bb3ZtjbxNVf5AvcOKPp/sL+DRlLan8EswW2yGyJWG4b0AwKAX22mh4PcBTA2K9F8QEkdhBf4HtDopckylsDgKbsacsLLKENP61jf0KOnE1nlWnsmqCoBAMCRRpQ9a/82ELLE1Pi3pKjM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=iTmhk7/q; arc=none smtp.client-ip=209.85.167.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
+	s=arc-20240116; t=1728895257; c=relaxed/simple;
+	bh=4SgHT9i1JeLb+7xHKMaY1ksupXJEiJKd8k27dMYDjQw=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=NR1i8ge9YKdee8Day1DeHSIBWVmwq+C2VI0s7mWjX8lVzyUd6eSiSMMuUDUb6sOCEWDb60vfUOwZhWHV9zR/SU75+QkD0oiEq22wQ2JF1kRfEES9U23ugwuaPLP5oLMY8CTap6FyWRY2fMcglqzeEqjpIiWG4qgMf0mqkPOguZs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=alQFKUcy; arc=none smtp.client-ip=198.175.65.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="iTmhk7/q"
-Received: by mail-lf1-f45.google.com with SMTP id 2adb3069b0e04-539e8607c2aso1540447e87.3
-        for <linux-bluetooth@vger.kernel.org>; Mon, 14 Oct 2024 01:37:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1728895028; x=1729499828; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=iv8PlZLe++xkk0m32dJ0EmQo0KOn2VYLdArmI+nYxAw=;
-        b=iTmhk7/qw81o6OQdTc7Vd8tni5SBMVU4JIFFKqX8BgQgjS/QJJzYlF2mEsL9MVg8Kp
-         E0MdPULACVh1nqjT+qtnOCeo8yfpluY9HhLSvepcdhFvD0N8m0wwbkqkeoJO41rZ3EQA
-         D+yygDRAztGdigjPeMdzCTKsLjTbdtEZxwpcBl4Akbyp3X5QPRgtIWOVOKIic0w0GFLz
-         Lqd7uNj1wepPvrp5JDQItPsVwlLmYRxgmQqDiOnh1MAtOSFpT1gynQoP9xMGaufXz/wE
-         2V66pSYAq0GO92WRBi73GX8wV/8A4kIJLlHHwZiXM6hFJSbe+FuvpTRzjmkHsWypeaVH
-         9z9g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728895028; x=1729499828;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=iv8PlZLe++xkk0m32dJ0EmQo0KOn2VYLdArmI+nYxAw=;
-        b=awMtCEdk2Z1pwaS8lRMnn/KZf2jhDr7WOhtIuOuku5NbeDn7OWtxI+s4eZqXuLsqjZ
-         z0tr/MT+p8jKPZByc8ZPK1Dcr80MMQyvwrQ+T9U2VAWz00E65u+VkLJIXAYkj5EJ7G+R
-         gSDJaTYkn9aRPgsxJ9bEwWPQVG9nZjuMo6ZkLlgwSnRzIzGRgd37Aw4ChAlB4l2UVd2P
-         PJuoFbnqMqvtMbcngc9ro3bnsvsUQ0/osMOfmILp+xvu+N93Fdfh1HHMX2SmgQXFDoep
-         oh9+j5qi8D1m5mjERM1RTKL/HvP0Vrr2f0IJJ92i845TSjdzuqEXtEqoiHsdb8dD3Qeg
-         4MJw==
-X-Gm-Message-State: AOJu0Ywa6PTQMR3LcD7Q9tPTFBIq3b5HDhEUKCc1lPgvyuXmDJ9henC8
-	hpbN3UqSJTyv0x18oQ8bkPN4ZvGqkA0ywkYMQyq48S1AuWtLTZ7CUqM+4MmAtiEvEQF5/QwsBEx
-	4UcUUkDLpY3nHMwwzdLqKz+8gjcAHEGa8RVLiFg==
-X-Google-Smtp-Source: AGHT+IGmwX4RUF9yi5GZQf3FK7ogVT2hx77a4BAjx/AyRr9zcJ5FNCqQj6Ns4j4UPtygQNm1AUkTia8xfUs9MVDiPKE=
-X-Received: by 2002:ac2:4e16:0:b0:536:554a:24c2 with SMTP id
- 2adb3069b0e04-539da3c5ee1mr5336025e87.13.1728895027606; Mon, 14 Oct 2024
- 01:37:07 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="alQFKUcy"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1728895256; x=1760431256;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=4SgHT9i1JeLb+7xHKMaY1ksupXJEiJKd8k27dMYDjQw=;
+  b=alQFKUcyOZLV5NwrJtv1S+gmyFTkNQpWq/5YyerinNeQ1LECS06Kr5ad
+   mLoeH5HD3JLHobzaPXPfZRvD8A5gesg4fWuORRMytWXu+Av2+vtF4+jBo
+   pvethiILSWRCpoeqr+NJwiC++lh8suQtF6rxtCO9XsoAxxI/QgOTw0Icv
+   ShLl9/a45Uuq/h7D63+WCS3K/w+rbWFwgBtYaOCC8melYTmLGeP92Dtcz
+   oDLY8NxMZkyfmWKycXddZlycHRQO6XUZYwOCf5qN7Jucs8ABm9zBer5FY
+   ioOtt8pi6MOwSJlDx4zxXNKnTVvY3TYgjePyXHuWQWbC/tLKw6hRZE7cb
+   w==;
+X-CSE-ConnectionGUID: Q2z2a1sORQGr7wok3ku5/w==
+X-CSE-MsgGUID: YrhdVrb+SpiJXk82CFdyoQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="50761430"
+X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
+   d="scan'208";a="50761430"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Oct 2024 01:40:55 -0700
+X-CSE-ConnectionGUID: /t/ncqXCQLeje399ipcTQw==
+X-CSE-MsgGUID: 0ahOA/7eTOm3KwkseCEj8Q==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,202,1725346800"; 
+   d="scan'208";a="114958027"
+Received: from intel-lenovo-legion-y540-15irh-pg0.iind.intel.com ([10.224.186.95])
+  by orviesa001.jf.intel.com with ESMTP; 14 Oct 2024 01:40:54 -0700
+From: Kiran K <kiran.k@intel.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: ravishankar.srivatsa@intel.com,
+	chethan.tumkur.narayan@intel.com,
+	chandrashekar.devegowda@intel.com,
+	Kiran K <kiran.k@intel.com>
+Subject: [PATCH v1] Bluetooth:btintel: Do no pass vendor events to stack
+Date: Mon, 14 Oct 2024 14:26:02 +0530
+Message-Id: <20241014085602.711258-1-kiran.k@intel.com>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240930080938.12505-1-brgl@bgdev.pl>
-In-Reply-To: <20240930080938.12505-1-brgl@bgdev.pl>
-From: Bartosz Golaszewski <brgl@bgdev.pl>
-Date: Mon, 14 Oct 2024 10:36:56 +0200
-Message-ID: <CAMRc=Mew5uRyWZvtv75MWRKxqgb7qbyrYxQd9hXZ4-b0ZHGo_g@mail.gmail.com>
-Subject: Re: [RESEND PATCH] Bluetooth: hci_qca: use devm_clk_get_optional_enabled_with_rate()
-To: Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Mon, Sep 30, 2024 at 10:09=E2=80=AFAM Bartosz Golaszewski <brgl@bgdev.pl=
-> wrote:
->
-> From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
->
-> Use the new devm_clk_get_optional_enabled_with_rate() clock helper to
-> shrink the code a bit.
->
-> Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-> ---
+During firmware download, vendor specific events like boot up and
+secure send result are generated. These events can be safely processed at
+the driver level. Passing on these events to stack prints unnecessary
+below warning log.
 
-It's been two weeks, gentle ping.
+--
+Bluetooth: hci0: Malformed MSFT vendor event: 0x02
+--
 
-Bart
+Signed-off-by: Kiran K <kiran.k@intel.com>
+---
+ drivers/bluetooth/btintel.c      | 6 ++++--
+ drivers/bluetooth/btintel_pcie.c | 9 ++++++---
+ 2 files changed, 10 insertions(+), 5 deletions(-)
+
+diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
+index 432f723e3869..652a5595fb16 100644
+--- a/drivers/bluetooth/btintel.c
++++ b/drivers/bluetooth/btintel.c
+@@ -3383,7 +3383,8 @@ int btintel_recv_event(struct hci_dev *hdev, struct sk_buff *skb)
+ 				 * indicating that the bootup completed.
+ 				 */
+ 				btintel_bootup(hdev, ptr, len);
+-				break;
++				kfree_skb(skb);
++				return 0;
+ 			case 0x06:
+ 				/* When the firmware loading completes the
+ 				 * device sends out a vendor specific event
+@@ -3391,7 +3392,8 @@ int btintel_recv_event(struct hci_dev *hdev, struct sk_buff *skb)
+ 				 * loading.
+ 				 */
+ 				btintel_secure_send_result(hdev, ptr, len);
+-				break;
++				kfree_skb(skb);
++				return 0;
+ 			}
+ 		}
+ 
+diff --git a/drivers/bluetooth/btintel_pcie.c b/drivers/bluetooth/btintel_pcie.c
+index d581a539d439..b2eeb6838247 100644
+--- a/drivers/bluetooth/btintel_pcie.c
++++ b/drivers/bluetooth/btintel_pcie.c
+@@ -551,7 +551,8 @@ static int btintel_pcie_recv_event(struct hci_dev *hdev, struct sk_buff *skb)
+ 				if (btintel_pcie_in_op(data)) {
+ 					btintel_pcie_wr_sleep_cntrl(data, BTINTEL_PCIE_STATE_D0);
+ 					data->alive_intr_ctxt = BTINTEL_PCIE_INTEL_HCI_RESET2;
+-					break;
++					kfree_skb(skb);
++					return 0;
+ 				}
+ 
+ 				if (btintel_pcie_in_iml(data)) {
+@@ -568,7 +569,8 @@ static int btintel_pcie_recv_event(struct hci_dev *hdev, struct sk_buff *skb)
+ 						btintel_wake_up_flag(data->hdev,
+ 								     INTEL_WAIT_FOR_D0);
+ 				}
+-				break;
++				kfree_skb(skb);
++				return 0;
+ 			case 0x06:
+ 				/* When the firmware loading completes the
+ 				 * device sends out a vendor specific event
+@@ -576,7 +578,8 @@ static int btintel_pcie_recv_event(struct hci_dev *hdev, struct sk_buff *skb)
+ 				 * loading.
+ 				 */
+ 				btintel_secure_send_result(hdev, ptr, len);
+-				break;
++				kfree_skb(skb);
++				return 0;
+ 			}
+ 		}
+ 
+-- 
+2.40.1
+
