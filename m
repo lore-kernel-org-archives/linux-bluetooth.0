@@ -1,123 +1,110 @@
-Received: from mail-pj1-f48.google.com (mail-pj1-f48.google.com [209.85.216.48])
+Received: from mail-lj1-f182.google.com (mail-lj1-f182.google.com [209.85.208.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3948912C54B
-	for <linux-bluetooth@vger.kernel.org>; Sun, 13 Oct 2024 19:27:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFBF64A24
+	for <linux-bluetooth@vger.kernel.org>; Mon, 14 Oct 2024 01:20:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728847641; cv=none; b=RBJneKsuguBVCYrhxf1GpA2dgO1KclztZEc9vidHjyzIYXru7Gg02jizDfz05rsBZzGHlGcuHydfgyL0DU4Tkds7hLjoxnynurv5ba5MTeTatL6nMnDsew4pIJEOoAWi+9F5pkDQS0pF04wCUBl6/DSUgjsCd7FF8ZR1oaJkivk=
+	t=1728868855; cv=none; b=O8xl8ZqAYnrTGrsS7ZYq9as+Ri83MmfBuNYHKydssoHkoub1K+RZyQHj3CK+amg8xbPwQw7SE597dI7NxpzydPJCnB18sqWnSLMROkvFCNYdPublLiRD9kIvQaHDrOKPKw4RGu7Tu7EwgGmg8YkAWk6+jrUanEznCmMSyzuwWBU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728847641; c=relaxed/simple;
-	bh=gwTHUNzKPFqhVSJh6MkECQS7LwDRonipHdDNck7OJS4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=UBtQwKVqAzsaX4t6vNVYQN4pttMTHwLznDVBhOnDgnN1/6Pf0UL5WBi0xa0H2xIrAqM93viymvjg4Drn1dUUpmH1TALdEORk9Hb+9r2JZChMZJ08vZl4SBDg3ZthRurt5k53GC+LWCXqgoQSIPR9aIr0d71GAtEb3TVzrRhqDUM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HE6x5/Cb; arc=none smtp.client-ip=209.85.216.48
+	s=arc-20240116; t=1728868855; c=relaxed/simple;
+	bh=XlGanDNPXYXzHscGM9Y/ZeFm388Gr/6sDbKfuEcp86M=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=dAVhPmDTuzJToCupzMZDkB4KzLCbALDrPDDhbrB111ITW07yEPv1XH4JgbckkebHhd3LqIHhcwHVG/UQ1vQrGb9Zq37z5DnKCRe5mKNOopBRE2mNAXaWNhNEr/utajadQGQ0WeIRK614i21VpKb2ddqmtCnC/3ANHiSvR39TIyE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SqYM+9ay; arc=none smtp.client-ip=209.85.208.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HE6x5/Cb"
-Received: by mail-pj1-f48.google.com with SMTP id 98e67ed59e1d1-2e31af47681so931891a91.2
-        for <linux-bluetooth@vger.kernel.org>; Sun, 13 Oct 2024 12:27:20 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SqYM+9ay"
+Received: by mail-lj1-f182.google.com with SMTP id 38308e7fff4ca-2fb4af0b6beso5081311fa.3
+        for <linux-bluetooth@vger.kernel.org>; Sun, 13 Oct 2024 18:20:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1728847639; x=1729452439; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=DTYfXIOPxpGSQ1U9BLbigkK6xZ9C+Jk4uJzMJaFv0LQ=;
-        b=HE6x5/Cbew2dk1mNqxD+WBugHHQOb8djNf6hwCAxuyStc7qGwJ9XJSspfddwB8MvU0
-         CAcQDkA6BReKWVU2svave3KEfEnpbaLj9NGJgF3t8fZzBkRyD6ASTLsIo18BGiHcZka9
-         6ZIMMjuFvaNe+LB87SwDwb/foZ4jS+gMvn6mKdiY8Kt7hss4NWNs30lD8xvnW2wfhMsV
-         n8gQ7C0rPNvUHf815cIP3YIYo4n199DdK+ay7V+vWmYZBXMFRlqz2ulTasVhCi2/xGwc
-         3Ugh1/M/qsSxR1E5j1Fdd+v6M3Ac5TNNVJ2tGmiDIlUh7kqqbYEIuOtXHUrHalz6n4Or
-         CPZQ==
+        d=gmail.com; s=20230601; t=1728868852; x=1729473652; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=rC/qXYO1BIIROI/3fm3cta6oH+jygr1MsDTGNpe5RYs=;
+        b=SqYM+9ayidBiflcS2o456luQW8mK027YbAR9NwMSqe9aKqDOVnCaaYhLuplfLiIDa4
+         /gjJyd7hK2LysqDeaQXrz6Y0S+3YyDRj4cThtg98qhddseFy8O6UzSyA8yjzCaRN5vIJ
+         TwQebNGxWoFx0qz3RcDQ8OtzAthQ/eL8zTTOHcsWUvmlHj1MEHp791C/rkD48VM34/gm
+         SBccjeKR2LTw4RDWQToOGqwbLyD36jOX66HFgoH0RkEf+grkJ+6SlaE5LE4MdiexnHDq
+         xmKfpuPKlRBIKCysdAWpdm6OpJJBi3KWxdfqxCgp8es9GUWFd66wAq/2Le0D6NBeg9UP
+         fluw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728847639; x=1729452439;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=DTYfXIOPxpGSQ1U9BLbigkK6xZ9C+Jk4uJzMJaFv0LQ=;
-        b=ApMcf7GQHdm1dM1lLak8p93xvwdSUoh8wcMc6XSTO91vN7xrtsqSsxQtwmgWlf62RE
-         pwXOSNlUI2vpqJIZal9IPa3q6abBrv9LVELc7ojtBKBjiCcY7cJlPzcbJwSgYpSaRsdr
-         zNZSOZ7ao6NflEPBF25jCCs/gwAoxKYPvt/xZVB9TCow0ACsDynV3w4NyG1uQmrKUMiP
-         Icga8xvwWpFhIE/lLPlMpd6n1XtEbMaLQJd8KB0YftlblVpuoZx0ltyaKqrkXFvtgmpb
-         dEX20iB9t3QSISEdyr1nYkTBTOeoy27ytRpKfsWPD5jLW7X2Sp7FS/6AGYqRzlrmtbws
-         hMtw==
-X-Forwarded-Encrypted: i=1; AJvYcCXSLv9RmMiVw7A1GdMCtr1DTLUcupJ2fK+QpYEOX6kmOTER64eXeLxqdAYtoHZnf4sM57BZ9sUhUab96J4tBjg=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz0+nbF+nfyqoGh0Zl3DFKXcPeQkLc2HcY70ZQ/s8OwOn2zgszu
-	KH/wvZVsbSC/HqMLRAiQfMZ9qURhiNQjSgrDg9VJVuPzzG0i4tPvHndTfdyp
-X-Google-Smtp-Source: AGHT+IECJ+sTCFhIjx8GQG85CuAevgC1+MH0rpUE7k9MAwkuhbFsavq4MnkWsvhCoU7/UF+o7gGpJA==
-X-Received: by 2002:a17:90a:f3c9:b0:2e2:b6ef:1611 with SMTP id 98e67ed59e1d1-2e2f0b00201mr11159211a91.18.1728847639430;
-        Sun, 13 Oct 2024 12:27:19 -0700 (PDT)
-Received: from [192.168.7.229] (97-126-102-147.tukw.qwest.net. [97.126.102.147])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2e2d177b8dasm7151465a91.45.2024.10.13.12.27.18
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 13 Oct 2024 12:27:18 -0700 (PDT)
-Message-ID: <b34b48bb-bf86-4a50-90fb-b0ff147c1be8@gmail.com>
-Date: Sun, 13 Oct 2024 12:27:18 -0700
+        d=1e100.net; s=20230601; t=1728868852; x=1729473652;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=rC/qXYO1BIIROI/3fm3cta6oH+jygr1MsDTGNpe5RYs=;
+        b=SvaWDLJV6LoeKccqq7plgJpLLRuxCcuiygdzVMmTP1LeeAQPUS4sOL/bu3BhmGV75N
+         cpDh/q9hoeswSLHwRhTMW7AD8osMQlY5fVF4uQfo9f0Ze7gEKiv/QO44mfdbVeIQJFrp
+         VR1QpVZSCJ/4pV3NPS4D96YLTVF4TDFJq8JXObnf2vzLloBQKiGNjmPmgPO0aoxesfH+
+         saq1XRdCWkd66BSVKfc93UIXvzlVdWja0X2LI5vA5/HqX7LXIU7YbZBD6/XvAdj/4Y6i
+         M7pthM8AGsGxcEC3OcTAri8dUxaAywCB86akCEgB1cdQySFcKkCExYCIes8ZA6o+M5DE
+         vOXg==
+X-Gm-Message-State: AOJu0YxusNvk6/+7/qMV1bSZV0BQFApJdMaB6+LidEqsCZXnHPtGIDbe
+	siB6aSjx0msvJYfmB5CsOOxiFLnJRrlaw/pd5k/7b+J5XcynHvRnUDudWT6GH2GkBO5f9DlAy3Z
+	/r6mhb3tOZ3SwmOwRpNX04tNZEuQ=
+X-Google-Smtp-Source: AGHT+IFadJQGDR4rNOUmDqs5gy1DGK+MhkvMxBnu8T640hCviWxtNGaxCaoJNrdnW3fotoa+ryQDwKbECRFQ6OjTjHk=
+X-Received: by 2002:a2e:be23:0:b0:2fa:fdd1:be23 with SMTP id
+ 38308e7fff4ca-2fb3f2c7269mr21736721fa.28.1728868851521; Sun, 13 Oct 2024
+ 18:20:51 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH BlueZ 1/4] mesh: Implement lower transport layer for
- segmentation and reassembly
-To: Junho Lee <tot0roprog@gmail.com>, linux-bluetooth@vger.kernel.org
-References: <66ff99e5.630a0220.2b5d14.8e61@mx.google.com>
-Content-Language: en-US
-From: Brian Gix <bggixx@gmail.com>
-In-Reply-To: <66ff99e5.630a0220.2b5d14.8e61@mx.google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+References: <202410131540.49DFer5C020925@randytool.net>
+In-Reply-To: <202410131540.49DFer5C020925@randytool.net>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Sun, 13 Oct 2024 21:20:29 -0400
+Message-ID: <CABBYNZK9W64viuGnvQRtgfwTiOCdZXYVrnUOTN_UMEu0tN96BA@mail.gmail.com>
+Subject: Re: src/plugin.c:init_plugin() System does not support ccp plugin
+To: rbell@alumni.caltech.edu
+Cc: "The excellent bluez mailing list!!" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Junho,
+Hi,
 
-There are some check-patch failures on your patchset.
+On Sun, Oct 13, 2024 at 11:41=E2=80=AFAM <rbell@alumni.caltech.edu> wrote:
+>
+>         bluetooth stopped recognizing any of my controllers Saturday
+> morning.  (They work on a different computer.)  I get:
+>
+>         Oct 11 09:59:12 mydomain kernel: Bluetooth: hci0: CSR: Unbranded =
+CSR clone detected; adding workarounds and force-suspending once...
+>         Oct 11 09:59:12 mydomain kernel: Bluetooth: hci0: CSR: Couldn't s=
+uspend the device for our Barrot 8041a02 receive-issue workaround
+>         Oct 11 09:59:12 mydomain kernel: Bluetooth: hci0: HCI Delete Stor=
+ed Link Key command is advertised, but not supported.
+>         Oct 11 09:59:12 mydomain kernel: Bluetooth: hci0: HCI Read Defaul=
+t Erroneous Data Reporting command is advertised, but not supported.
+>         Oct 11 09:59:12 mydomain kernel: Bluetooth: hci0: HCI Set Event F=
+ilter command not supported.
+>         Oct 11 09:59:15 mydomain kernel: Bluetooth: hci0: Opcode 0x1004 f=
+ailed: -110
+>         Oct 11 09:59:15 mydomain kernel: Bluetooth: hci0: command 0x1004 =
+tx timeout
+>         Oct 11 09:59:25 mydomain bluetoothd[30412]: src/plugin.c:init_plu=
+gin() System does not support ccp plugin
+>         Oct 11 09:59:36 mydomain kernel: Bluetooth: hci0: CSR: Local vers=
+ion failed (-110)
 
-Can you fix these (and any others you find with check-patch) and resubmit?
-The ones below are only from patch 1 of 4...  patch 3 applied cleanly, 
-but 2 and 4 also could not be applied until patch 1 is fixed.
+Probably related to: https://bugzilla.kernel.org/show_bug.cgi?id=3D219365
 
-Thanks,
-Brian
+>
+>         What does the ccp plugin do?  What support could it be missing?
 
-On 10/4/24 12:31 AM, Junho Lee wrote:
-> -			send_net_ack(net, sar_in, expected);
-> +		if (sar->flags == expected) {
-> +			/*
-> +			 * According to MshPRTv1.1: 3.5.3.4, if the destination
-> +			 * is a unicast address and a segment is received for a
-> +			 * completed message, it sends one acknowledgment within
-> +			 * a period of:
-> +			 *	[acknowledgment delay increment * segment reception interval]
-WARNING:LONG_LINE_COMMENT: line over 80 characters
-#774: FILE: mesh/net.c:2207:
-+             *    [acknowledgment delay increment * segment reception 
-interval]
+Not really related, ccp is experimental and requires hardware support
+which old CSR dongles don't have.
 
-
->   	/* Msg length only definitive on last segment */
->   	if (segO == segN)
-> -		sar_in->len = segN * MAX_SEG_LEN + size;
-> +		sar->len = segN * MAX_SEG_LEN + size;
-> +
-> +	/* Send ACK only if DST is unicast address. */
-> +	if(IS_UNICAST(dst)) {
-ERROR:SPACING: space required before the open parenthesis '('
-#875: FILE: mesh/net.c:2283:
-+    if(IS_UNICAST(dst)) {
-
-> +	 * segmented. Flush if it is not segmented or if the transmission
-> +	 * failed.
-> +	 */
-> +	if (result && segmented) {
-> +		struct mesh_sar_tx *sar_tx = mesh_sar_tx_new();
-> +		bool is_unicast = IS_UNICAST(dst);
-> +		sar_tx->ack_received = false;
-WARNING:LINE_SPACING: Missing a blank line after declarations
-#1010: FILE: mesh/net.c:3565:
-+        bool is_unicast = IS_UNICAST(dst);
-+        sar_tx->ack_received = false;
+>         Thanks for your attention.
+>
+> russell bell
+>
 
 
+--=20
+Luiz Augusto von Dentz
