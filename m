@@ -1,88 +1,127 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0D051B85C2;
-	Mon, 14 Oct 2024 18:27:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26E541AC45F
+	for <linux-bluetooth@vger.kernel.org>; Mon, 14 Oct 2024 18:38:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728930448; cv=none; b=OxnpDfENP52Wo9CkYoA7H6TS0+CxGD2VAwbU+AqWoPneVAAnLLBocejx9L2PVICiESbSF+kZ/DXEvQpsDd21j2aYKrn6ZdwPNReSyHri/+DwFWOMhJqnSoxoSj4RjL7Pnd3H7ZnqIA1EtujqGPkaOvlZN8rgdCLLdHEryH/pswY=
+	t=1728931116; cv=none; b=tye8ttyWqm6l8J6FaGYaJQsZo/qmMRFUCJ5OD4KFJ7WMdc3CF6dfiq8b+Hab2/tiys4p9BoGmd2Fhb9xNY2wOpqvABam2FraNgTPqJgXRWVzwFdapgd3I0d7YGAeG52qKJ3C4i1LDoJL30uKcYoiTYZ41CA37FOpKKrZjCPZFEs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728930448; c=relaxed/simple;
-	bh=fXfCE7WI7+mHKeiyEDfExAmGaPiTf3I45abPqUtrN40=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=okXJ0IDRIpmlwoHrk4EPpJ1GdfZhnESZvXOpMJQizKre1vsh7qQcyFpLjzKO+crXFiIri3+n3mkHegWs4VwVMe1N85idSfb6EbKC5L7EzWpMHRYaJY/+nDPxv7hwJx9w1GiHNbspp6lUKplgA0dGOjIuPssiK8WIQaEPLwRlt4M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=P+FjAwvN; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1728931116; c=relaxed/simple;
+	bh=vPZADj3C+RN5aLkmgx/5u2rzO5D54ZeqTgP4xCGQMnM=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=gy9OuZxGulduyd02z5wuzlmQQ182PqhoCT6NlzyJ4Z6sQjQCOyBxq4U3BOO6Ly5BxxdVnpYDpwULvFdxlL5hZzq4n4afHF5q1+lnuaXJqKFGjODUKMEyKIc6kOMIji6s8Vr1U9aYoDTyjk8Vy6LCNPYxlGVcXlIA22oiHGx3g/s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kNsxN4Km; arc=none smtp.client-ip=209.85.214.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="P+FjAwvN"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6DCC7C4CECF;
-	Mon, 14 Oct 2024 18:27:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728930445;
-	bh=fXfCE7WI7+mHKeiyEDfExAmGaPiTf3I45abPqUtrN40=;
-	h=From:Date:Subject:To:Cc:From;
-	b=P+FjAwvNw9vBEQw82WMJPEHQkhawda96SXMUhomniuz37B3a0Mhz+358nkZoWqC7Z
-	 9BC1z8VnaHLqGMLvk2UBwbNv0JBfye3YTI/gNa91cashFJhAWMAFB1QCM/H8BEaqrC
-	 1gcHqMJk+Sdl+HPJpocxH+ygQWYPhSEw69qoFK3mAxE74GQYoQjfYFYm3KKYGbAMnc
-	 TAz9prGIxoisU3kY4SKvoG0cMHJ7Hg42yqnveNHOhSow3fxLUBSONYUf13OJBZJjWR
-	 aGoMyyMmZMlHHEZO5IpIkEEUiLWJfBqdnn6goZRaFUQEDx+L2LeWJ+wajcbKSAkvLK
-	 jJugqocR2aeqg==
-Received: by mail-oa1-f44.google.com with SMTP id 586e51a60fabf-28862804c9dso1878728fac.0;
-        Mon, 14 Oct 2024 11:27:25 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCV+fp7k/3veSos6oP9AbYmJesVNNBdtp/9KaEBC6/Qe2AFmD+iVJ7zUGw8FefVk7uIHdJdcu8U9kWrr7i75@vger.kernel.org, AJvYcCV1t8XTj+Py1uHFIee1OzIrvAM++/np752CvN1b6QqNos9dtPONhfgoWm/xDR3eq/lPCcIcZ7y8uciMLbCTgag=@vger.kernel.org, AJvYcCXW6aD4NWiDTgLy+RVbspBOMqKakpTTY1/BVSQotbeLsm2ExILerDpJ4wgwKBjto4ZNoETkxcRfiAA=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz6CO3V28qrMqCbFppnBko8++iz7++MVLSZcuewLwZO8w/Dqx+C
-	znpPd9ezYFnU27aBPt9yAtJ/zOb/pt08iMMBIVy1r7/vmPUYKhPl30IZSBPjaJJVEWfMJIYJ3eO
-	zgee4hGz+lo7qpvAf9we17a7fswg=
-X-Google-Smtp-Source: AGHT+IFTWWgl+GBmolpvS4W4rvEi5ORqA0DGptCX3RMlU9+wEN8cGeiMojpsi//3rfxBRyuRG30ThN54PNZ/9WZzjTo=
-X-Received: by 2002:a05:6870:7d18:b0:27b:a693:fa11 with SMTP id
- 586e51a60fabf-2884d52d010mr10928051fac.19.1728930444636; Mon, 14 Oct 2024
- 11:27:24 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kNsxN4Km"
+Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-20b5affde14so26706965ad.3
+        for <linux-bluetooth@vger.kernel.org>; Mon, 14 Oct 2024 11:38:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1728931114; x=1729535914; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=fn0e1qHcia84mbrAMMwfWmByjKTMmBPewnig9UVIAsE=;
+        b=kNsxN4Km5/FA3mrG2CIvFuv6jAEM199gCuN/d06mgUhU/8HvrCsg4gSJawOvIenb1c
+         3QkzylmwDbr+J4cXZ21qGmPjDo+bP9HN32gIeqZibIdmP5oknpiL8QNeiHKuAtJKBilW
+         EP7M/sNey39bNH8/SMQ/rdBOQ284xlgXe3d7hKgn9A9n2cg9B9GMr1xpYax0bdSel9qf
+         L6goiG5PXrPBfd8H2AQWJaMaQ1/wuE2zrCpjVuL4bD/VTWNlVwXEfkEFWx1cujbqZ6wb
+         sKwqhE7Y/POS5ATV6yrxPINkO9vq9WnCMzVaRGRkBFAq+4XNujwftSs6sB8t8ggF12cL
+         AWwA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728931114; x=1729535914;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=fn0e1qHcia84mbrAMMwfWmByjKTMmBPewnig9UVIAsE=;
+        b=Y51p1KLhaj6tNKsdjepBMcrqc8TEj0dfdAK5pINhIIk2uxnQp7MZp32rt5sDcPxgi5
+         WozPrpFwbWlyGWhgsDAkEh/8yD4HPo3OVAoiNhoCohGee1H8ZqQP20+D9HZfHZh8auo+
+         FljzT0lmnoAKfzgWkUD1fDX9RWx80mJrtDNjwtgGZyHKEGJRut3XrXicRmjxVq6M9RUF
+         DmcIMnSUaOi9U/W9BRZbSDY0QXn9+//m1aBfVaeXYDaLmQNxowzE17j19XxRPca67Esq
+         h4myv9XuReZ6ozrVXiSBAGuEC2tt+ZKibb063EQiTSusJ+94W4lnkNYd4WAkDLiA4eZ+
+         hfoQ==
+X-Gm-Message-State: AOJu0YzL7lhQI1Pql8ezf0bSFQUQ3OzQQ87eIVNA7f2vWwe6yeL0rIYC
+	UO/QjJ4H8V78eClYolm6oES/LFc9SwQhDdjCSpIOzLdS5zOpSCx8HA01Ig==
+X-Google-Smtp-Source: AGHT+IEDn+XEwWw6TmpdEZ2jLMS1h55G13CjJWo+JpxGUstn2UTbrsgFfcxiYKucPQYG2NEhN29tTA==
+X-Received: by 2002:a17:902:ec91:b0:20c:9821:69a4 with SMTP id d9443c01a7336-20ca1423b4bmr192332645ad.6.1728931114034;
+        Mon, 14 Oct 2024 11:38:34 -0700 (PDT)
+Received: from [172.17.0.2] ([52.234.26.94])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20c8c0eb470sm69094815ad.126.2024.10.14.11.38.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 14 Oct 2024 11:38:33 -0700 (PDT)
+Message-ID: <670d6529.170a0220.17ab24.3439@mx.google.com>
+Date: Mon, 14 Oct 2024 11:38:33 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============4835387026025959291=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: "Rafael J. Wysocki" <rafael@kernel.org>
-Date: Mon, 14 Oct 2024 20:27:13 +0200
-X-Gmail-Original-Message-ID: <CAJZ5v0iUaszpE=J3_wLhdmBrrDdTSL1Rs-mgjL8koC1kk4apOA@mail.gmail.com>
-Message-ID: <CAJZ5v0iUaszpE=J3_wLhdmBrrDdTSL1Rs-mgjL8koC1kk4apOA@mail.gmail.com>
-Subject: [Regression] Bluetooth mouse broken in 6.12-rc3
-To: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Cc: Kiran K <kiran.k@intel.com>, 
-	"Thorsten Leemhuis (regressions address)" <regressions@leemhuis.info>, Linux PM <linux-pm@vger.kernel.org>, 
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, 
-	"open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>, Marcel Holtmann <marcel@holtmann.org>
-Content-Type: text/plain; charset="UTF-8"
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, frederic.danis@collabora.com
+Subject: RE: [BlueZ,v2] tools/obexctl: Add support to connect using PSM port
+In-Reply-To: <20241014171058.75235-1-frederic.danis@collabora.com>
+References: <20241014171058.75235-1-frederic.danis@collabora.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Hi Luiz,
+--===============4835387026025959291==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Unfortunately, commit 610712298b11 ("Bluetooth: btusb: Don't fail
-external suspend requests") from you that appeared in 6.12-rc3
-prevents my Logitech Bluetooth mouse from connecting to the host
-(btusb).  The LED activity on the mouse indicates that it tries to
-associate, but there is no response.  It looks like the host is
-suspended before the device can connect to it and it cannot be woken
-up for some reason.
+This is automated email and please do not reply to this email!
 
-It worked no problem in 6.12-rc2 and the above commit is the only BT
-one in 6.12-rc3.  Also reverting it makes things work again.
+Dear submitter,
 
-In the "good" case (for example, in 6.12-rc3 with the above commit
-reverted), the following messages are present in the kernel log:
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=899000
 
-[  251.748734] Bluetooth: HIDP (Human Interface Emulation) ver 1.2
-[  251.748763] Bluetooth: HIDP socket layer initialized
-[  251.773010] hid-generic 0005:046D:B016.0001: unknown main item tag 0x0
-[  251.774432] input: Bluetooth Mouse M336/M337/M535 Mouse as
-/devices/pci0000:00/0000:00:14.0/usb1/1-7/1-7:1.0/bluetooth/hci0/hci0:1/0005:046D:B016.0001/input/input14
-[  251.775733] input: Bluetooth Mouse M336/M337/M535 Consumer Control
-as /devices/pci0000:00/0000:00:14.0/usb1/1-7/1-7:1.0/bluetooth/hci0/hci0:1/0005:046D:B016.0001/input/input15
-[  251.777163] input: Bluetooth Mouse M336/M337/M535 Keyboard as
-/devices/pci0000:00/0000:00:14.0/usb1/1-7/1-7:1.0/bluetooth/hci0/hci0:1/0005:046D:B016.0001/input/input18
-[  251.815905] hid-generic 0005:046D:B016.0001: input,hidraw0:
-BLUETOOTH HID v12.03 Mouse [Bluetooth Mouse M336/M337/M535] on
-9c:b6:d0:96:8e:c8
+---Test result---
 
-In the "bad" case (for example, in unmodified 6.12-rc3) they are not
-there at all.
+Test Summary:
+CheckPatch                    FAIL      0.57 seconds
+GitLint                       PASS      0.18 seconds
+BuildEll                      PASS      24.55 seconds
+BluezMake                     PASS      1596.25 seconds
+MakeCheck                     PASS      13.23 seconds
+MakeDistcheck                 PASS      178.98 seconds
+CheckValgrind                 PASS      254.85 seconds
+CheckSmatch                   PASS      357.12 seconds
+bluezmakeextell               PASS      120.50 seconds
+IncrementalBuild              PASS      1418.40 seconds
+ScanBuild                     PASS      1019.71 seconds
 
-Thanks!
+Details
+##############################
+Test: CheckPatch - FAIL
+Desc: Run checkpatch.pl script
+Output:
+[BlueZ,v2] tools/obexctl: Add support to connect using PSM port
+WARNING:UNKNOWN_COMMIT_ID: Unknown commit id '5d7d3ac25bd5', maybe rebased or not pulled?
+#68: 
+Since commit 5d7d3ac25bd5 ("obexd: Add PSM support to session create")
+
+/github/workspace/src/src/13835327.patch total: 0 errors, 1 warnings, 42 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/src/13835327.patch has style problems, please review.
+
+NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============4835387026025959291==--
