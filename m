@@ -1,64 +1,64 @@
-Received: from mail-vk1-f175.google.com (mail-vk1-f175.google.com [209.85.221.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-fw-80009.amazon.com (smtp-fw-80009.amazon.com [99.78.197.220])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A28731D0797
-	for <linux-bluetooth@vger.kernel.org>; Mon, 14 Oct 2024 20:24:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B6921D0E3E;
+	Mon, 14 Oct 2024 21:14:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.220
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728937447; cv=none; b=JqBYtU/UOMhWu+oHWfe0849jJZQzGvXlFo9lxj65qunltc3EaJLB8b9ujlIuNZZ76fEhM3gGe4L33iM6WZIGjYAEUqEix0jjqyq5IAw2CLai1tZYlOu4ItTn0UuOzzdzIumgbcQ2gBJstVe5uBr9Q/XtoEcOqXlJC4DrWqU81f4=
+	t=1728940496; cv=none; b=WdQB4wNs5in5vSy78NH/OT47/igLow6TKHy9YKtQENXXJ3TXb/pjkgWEbyhNhOlb4FH6djCu41lXiI9FBjO2oyZ/uS7OEK7ezB5JvJywrMgu/H8rQeavnCNHNk5AmfAg1wBpWbpCdRD+ID9HAD8ruJT4VTRQIkm3enihMKk78xg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728937447; c=relaxed/simple;
-	bh=O5p3F1OIxumPqpJZc9gc4XMNE1NRb2y2QLbD4zRdOPU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=RIkCPDNz1qRfYc+nvnEWGenigMrj9xtfWCaGy9dGbN+BHUggd0UZ3TxrqXXgAJJg+a51zMMZWLVsiaBDTraAgehGrUCT9YN72AMX6C5lZAN7UFkvSdAW7oP2s8G467CptuIVvkz0v0JOqxmIyW1Oefx9Jt52vMMoM6NHZdytc1E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TnDQI4d0; arc=none smtp.client-ip=209.85.221.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1728940496; c=relaxed/simple;
+	bh=rvIywEjogCiwXVzlP8g7B4K28/cFU0k/kLvToB8437w=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=eJkDJ8xuZCH8P6qCRJS0pmCyh1hVxLPygRXl0LImjdD3xJcTh8Eg2QD+N+QQYZQIxkloU2x8p8E0efPiTQHKmACBcsrv1w6NCZCr2UykFJLIE/gMy6d3tGZQGSE8w+5YILvXFAlakdxXmcxxXvC+njPiPPkZ3vrzLfL3VWCAQ4Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=rsEBMNO2; arc=none smtp.client-ip=99.78.197.220
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TnDQI4d0"
-Received: by mail-vk1-f175.google.com with SMTP id 71dfb90a1353d-50d3365c29cso1496911e0c.0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 14 Oct 2024 13:24:05 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="rsEBMNO2"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1728937444; x=1729542244; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=sUS24RtZD/E0WCxqOPekOobIh8npUWejjoPCpZ+N4Zw=;
-        b=TnDQI4d0LSxIT3zxDtJcc0O7yR2WGD10OY5GODmTPW6M3Rmwr+b62qpSfmdlIhvE0r
-         kM2SgNkgapDKnCpFVfVhs60rCfxRGNmLahT+2YpRW9f/HIx5KqxgGDKS+wVcxOCRRAUl
-         8lKQ3d3Shq6GYYpt2xLGs/P8Lu6SO6lLEppd4TybOkaDWD23SjjuIuwvVJ2ADIvqk4mp
-         K0QIr5/e/5hC5w/a5fnaU4WPGaYUBVtVuyM2+qmRXkD4kTGp70StfZhoMDSivAWQpzXS
-         BcsB+obGTSYCe/qFb2vJIlPKMk/IaB1w+ogNtKnDvV6n9zGC4P4p1nFFzh3MXWqOTBea
-         RYRw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728937444; x=1729542244;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=sUS24RtZD/E0WCxqOPekOobIh8npUWejjoPCpZ+N4Zw=;
-        b=sxauFFqrJm09rODsPZ9BSDxcqIdaHwmzPc9syWaIy7Ia1AjTnyczt4kl337MGU5s0k
-         7LmF6UFqMJJnxFFQ350xzairSEcv066QIDzU47dvn2YK3ryE56/YQWRoWItgJXn+CDHa
-         7YKUJVDc6kaLMqUa1xMRy3fOmuF0uFgdjW7sV64Giekbfe2eH6wCDKOR984JeKkShk6Z
-         Z4rSATlxgXUK6jCZa6B8p05zJsHdbmtbZgdYbVmLZ5fgQ9wouYMnNHbhI3L7Sg3pZtOu
-         Hyg02WjLkv/cgj0hCUBtzywlnNjKkgYxwtjMWx736DzCZylrWMv4s35RjDt/I+ygACAO
-         NjuQ==
-X-Gm-Message-State: AOJu0Yxl/CISg84u6oiOa9OZcwlEespaCSxvBrcJst8uJFAwRY7lyKyn
-	WP8NUyOghinFcV+gnbcJKcrYKH+MmyeXvaULgH5KF6T97YnzUCPxKkfh3A==
-X-Google-Smtp-Source: AGHT+IEzAKAZK/HA0qevkPgKYySAsiKllnsV3M3g0Dxr0tTjZ5FClQ2FcuZAl9aX1sTZSY1RIvFf2Q==
-X-Received: by 2002:a05:6122:2027:b0:50d:34fe:fef0 with SMTP id 71dfb90a1353d-50d34ff01cemr7250652e0c.6.1728937443734;
-        Mon, 14 Oct 2024 13:24:03 -0700 (PDT)
-Received: from lvondent-mobl5.. (syn-107-146-107-067.res.spectrum.com. [107.146.107.67])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-50d278e3dfcsm1136492e0c.33.2024.10.14.13.24.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 14 Oct 2024 13:24:03 -0700 (PDT)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Kenneth Crudup <kenny@panix.com>
-Subject: [PATCH v1] Bluetooth: btusb: Fix not being able to reconnect after suspend
-Date: Mon, 14 Oct 2024 16:23:26 -0400
-Message-ID: <20241014202326.381559-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.47.0
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1728940495; x=1760476495;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=lm1nlbhRFalml+XjwqIVmMPssVpEVAP0w03w1PajwV0=;
+  b=rsEBMNO2kFFaMZCX0/4GanWBnD4I7v7M9VK1dwghRZLUW2QgJvXk3EWI
+   Ts/Zf7LCaI8PiIWjbaINwzYnvOohv+jBv/8NKvd23hO2qr3UrYjIGIw0x
+   mncJuF9ihRHViFruPG36pa5URlVDyy3NogyLSfPtQT3Ifgdvq/MAKWML7
+   s=;
+X-IronPort-AV: E=Sophos;i="6.11,203,1725321600"; 
+   d="scan'208";a="138023042"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
+  by smtp-border-fw-80009.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Oct 2024 21:14:53 +0000
+Received: from EX19MTAUWC002.ant.amazon.com [10.0.7.35:20116]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.5.202:2525] with esmtp (Farcaster)
+ id 8bc78cd4-9c40-4b9c-b747-d35989fc65d1; Mon, 14 Oct 2024 21:14:53 +0000 (UTC)
+X-Farcaster-Flow-ID: 8bc78cd4-9c40-4b9c-b747-d35989fc65d1
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Mon, 14 Oct 2024 21:14:52 +0000
+Received: from 6c7e67c6786f.amazon.com (10.106.101.44) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
+ Mon, 14 Oct 2024 21:14:47 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <ignat@cloudflare.com>
+CC: <alex.aring@gmail.com>, <alibuda@linux.alibaba.com>,
+	<davem@davemloft.net>, <dsahern@kernel.org>, <edumazet@google.com>,
+	<johan.hedberg@gmail.com>, <kernel-team@cloudflare.com>, <kuba@kernel.org>,
+	<kuniyu@amazon.com>, <linux-bluetooth@vger.kernel.org>,
+	<linux-can@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<linux-wpan@vger.kernel.org>, <luiz.dentz@gmail.com>, <marcel@holtmann.org>,
+	<miquel.raynal@bootlin.com>, <mkl@pengutronix.de>, <netdev@vger.kernel.org>,
+	<pabeni@redhat.com>, <socketcan@hartkopp.net>, <stefan@datenfreihafen.org>,
+	<willemdebruijn.kernel@gmail.com>
+Subject: Re: [PATCH net-next v3 1/9] af_packet: avoid erroring out after sock_init_data() in packet_create()
+Date: Mon, 14 Oct 2024 14:14:42 -0700
+Message-ID: <20241014211442.96478-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.39.5 (Apple Git-154)
+In-Reply-To: <20241014153808.51894-2-ignat@cloudflare.com>
+References: <20241014153808.51894-2-ignat@cloudflare.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -66,68 +66,18 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D043UWA003.ant.amazon.com (10.13.139.31) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+From: Ignat Korchagin <ignat@cloudflare.com>
+Date: Mon, 14 Oct 2024 16:38:00 +0100
+> After sock_init_data() the allocated sk object is attached to the provided
+> sock object. On error, packet_create() frees the sk object leaving the
+> dangling pointer in the sock object on return. Some other code may try
+> to use this pointer and cause use-after-free.
+> 
+> Suggested-by: Eric Dumazet <edumazet@google.com>
+> Signed-off-by: Ignat Korchagin <ignat@cloudflare.com>
 
-Calls to hci_suspend_dev assumes the system-suspend which doesn't work
-well when just the device is being suspended because wakeup flag is only
-set for remote devices that can wakeup the system.
-
-Reported-by: Rafael J. Wysocki <rafael@kernel.org>
-Reported-by: Heiner Kallweit <hkallweit1@gmail.com>
-Reported-by: Kenneth Crudup <kenny@panix.com>
-Fixes: 81b3e33bb054 ("Bluetooth: btusb: Don't fail external suspend requests")
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
----
- drivers/bluetooth/btusb.c | 14 --------------
- 1 file changed, 14 deletions(-)
-
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index d14b941bfde8..c0b6ef8ee5da 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -4075,7 +4075,6 @@ static void btusb_disconnect(struct usb_interface *intf)
- static int btusb_suspend(struct usb_interface *intf, pm_message_t message)
- {
- 	struct btusb_data *data = usb_get_intfdata(intf);
--	int err;
- 
- 	BT_DBG("intf %p", intf);
- 
-@@ -4088,16 +4087,6 @@ static int btusb_suspend(struct usb_interface *intf, pm_message_t message)
- 	if (data->suspend_count++)
- 		return 0;
- 
--	/* Notify Host stack to suspend; this has to be done before stopping
--	 * the traffic since the hci_suspend_dev itself may generate some
--	 * traffic.
--	 */
--	err = hci_suspend_dev(data->hdev);
--	if (err) {
--		data->suspend_count--;
--		return err;
--	}
--
- 	spin_lock_irq(&data->txlock);
- 	if (!(PMSG_IS_AUTO(message) && data->tx_in_flight)) {
- 		set_bit(BTUSB_SUSPENDING, &data->flags);
-@@ -4105,7 +4094,6 @@ static int btusb_suspend(struct usb_interface *intf, pm_message_t message)
- 	} else {
- 		spin_unlock_irq(&data->txlock);
- 		data->suspend_count--;
--		hci_resume_dev(data->hdev);
- 		return -EBUSY;
- 	}
- 
-@@ -4226,8 +4214,6 @@ static int btusb_resume(struct usb_interface *intf)
- 	spin_unlock_irq(&data->txlock);
- 	schedule_work(&data->work);
- 
--	hci_resume_dev(data->hdev);
--
- 	return 0;
- 
- failed:
--- 
-2.47.0
-
+Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
