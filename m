@@ -1,88 +1,93 @@
-Received: from smtp-fw-52003.amazon.com (smtp-fw-52003.amazon.com [52.119.213.152])
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8746A26296;
-	Mon, 14 Oct 2024 21:42:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.152
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5E101ADFFD;
+	Mon, 14 Oct 2024 22:00:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728942173; cv=none; b=Wh1Y97xoFk/cNFKZ7Op//k3plb9sGLp5eIjtaQ+5nxpGWBgKggzKwWxQO0F180tw1H+HunnT8c+lVvXiQsFD0GvUqb8TC1EosiaQNsDTl6cf6xEgfXhUOP4NApFuTqLTVf3L7L3Zt3+0c+uNVzhub85YxEB5Ndb81dWm/dnXSLc=
+	t=1728943231; cv=none; b=clnhqH0+UMsrsMlr2ZM5mx5cnYc3IQFQ0rPm0n4uPCuGazrXON6eJw4vacXiPw3VT+5tMETviPxhlPEQf9/tj1AmCD7hku1TX3SDq98WXYbFK48iX7YoVVYj0U3+iKAQ0dmQtix3Aj58cZSmJxem7j94ZJzKWBaQDrl01+MGEGQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728942173; c=relaxed/simple;
-	bh=R8TLXuDeZ/MYISPWdcvYZ2Bu1EAnbjLogEwVptKbAUs=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=j75xeKOnmoh3dmAST+6/ykYMW+YLBzb1gYKcOh3/CW5qN5J/yH1i5j6lOaEqqqtidaPv08uWnnwBVIkm3RtOfKfGJWUMCaQy9ZHLHMYRfpeYr0z8ee8f1UISLJ1y5jHDS2MHELTyegVPfaJ3dmo5ySa/yiSDgtnTGHl3TOgA21I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=DD4/OUrS; arc=none smtp.client-ip=52.119.213.152
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="DD4/OUrS"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1728942173; x=1760478173;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=38tSf7bWxW+kNdx5AoLI8mlMpML3oA826XH6AyrChzQ=;
-  b=DD4/OUrSTY6/0T2KoqkgDEYMV4sBOvWtRVas2Ni2BVaEusydwX6wEG75
-   KDMrr44OtRASa+KKAVUvryKFeL3kA8QB5QFI8PLR9x2T2gSa9anQfVnI9
-   qVzG6gqYLofWkY4+OQPh9d36l3ivUSxUlp10RlawcDd6Gmry5EuAkk96V
-   w=;
-X-IronPort-AV: E=Sophos;i="6.11,203,1725321600"; 
-   d="scan'208";a="33178660"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-52003.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Oct 2024 21:42:48 +0000
-Received: from EX19MTAUWA002.ant.amazon.com [10.0.7.35:26950]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.24.95:2525] with esmtp (Farcaster)
- id 74ac6199-0006-44ac-aa20-580d5d9f7a7d; Mon, 14 Oct 2024 21:42:46 +0000 (UTC)
-X-Farcaster-Flow-ID: 74ac6199-0006-44ac-aa20-580d5d9f7a7d
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Mon, 14 Oct 2024 21:42:45 +0000
-Received: from 6c7e67c6786f.amazon.com (10.106.101.44) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
- Mon, 14 Oct 2024 21:42:40 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <ignat@cloudflare.com>
-CC: <alex.aring@gmail.com>, <alibuda@linux.alibaba.com>,
-	<davem@davemloft.net>, <dsahern@kernel.org>, <edumazet@google.com>,
-	<johan.hedberg@gmail.com>, <kernel-team@cloudflare.com>, <kuba@kernel.org>,
-	<kuniyu@amazon.com>, <linux-bluetooth@vger.kernel.org>,
-	<linux-can@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<linux-wpan@vger.kernel.org>, <luiz.dentz@gmail.com>, <marcel@holtmann.org>,
-	<miquel.raynal@bootlin.com>, <mkl@pengutronix.de>, <netdev@vger.kernel.org>,
-	<pabeni@redhat.com>, <socketcan@hartkopp.net>, <stefan@datenfreihafen.org>,
-	<willemdebruijn.kernel@gmail.com>
-Subject: Re: [PATCH net-next v3 9/9] Revert "net: do not leave a dangling sk pointer, when socket creation fails"
-Date: Mon, 14 Oct 2024 14:42:36 -0700
-Message-ID: <20241014214236.99604-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.39.5 (Apple Git-154)
-In-Reply-To: <20241014153808.51894-10-ignat@cloudflare.com>
-References: <20241014153808.51894-10-ignat@cloudflare.com>
+	s=arc-20240116; t=1728943231; c=relaxed/simple;
+	bh=pYgGOj6FKnoBwOhBKDzGMGMj4olpmixvu1h54P2Wz4I=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=FaPrzwO2Di0ThC/sfmw8YVGj+pLHdxTzW4moBOJgOrRkFBK4RJkxpuhTE9cgBOKvGYUJvbHvY8wf6hwSBfGw8hXbTG9fVmCycRls5C4GTqY7D2zv0QNRfcJKcpl/eMoqKEyu8RdIpAgzUpnosFygDeyxuczVg6/emAdVl7QYots=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
+Received: from [192.168.0.53] (ip5f5ae805.dynamic.kabel-deutschland.de [95.90.232.5])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id AE4D661E5FE05;
+	Mon, 14 Oct 2024 23:59:44 +0200 (CEST)
+Message-ID: <403e0c87-4619-4349-96fa-36f56f15b8aa@molgen.mpg.de>
+Date: Mon, 14 Oct 2024 23:59:43 +0200
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D037UWB003.ant.amazon.com (10.13.138.115) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Regression] Bluetooth mouse broken in 6.12-rc3
+To: "Rafael J. Wysocki" <rafael@kernel.org>
+Cc: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
+ Kiran K <kiran.k@intel.com>,
+ "Thorsten Leemhuis (regressions address)" <regressions@leemhuis.info>,
+ linux-pm@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-bluetooth@vger.kernel.org, Marcel Holtmann <marcel@holtmann.org>
+References: <CAJZ5v0iUaszpE=J3_wLhdmBrrDdTSL1Rs-mgjL8koC1kk4apOA@mail.gmail.com>
+Content-Language: en-US
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <CAJZ5v0iUaszpE=J3_wLhdmBrrDdTSL1Rs-mgjL8koC1kk4apOA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-From: Ignat Korchagin <ignat@cloudflare.com>
-Date: Mon, 14 Oct 2024 16:38:08 +0100
-> This reverts commit 6cd4a78d962bebbaf8beb7d2ead3f34120e3f7b2.
-> 
-> inet/inet6->create() implementations have been fixed to explicitly NULL the
-> allocated sk object on error.
-> 
-> A warning was put in place to make sure any future changes will not leave
-> a dangling pointer in pf->create() implementations.
-> 
-> So this code is now redundant.
-> 
-> Suggested-by: Kuniyuki Iwashima <kuniyu@amazon.com>
-> Signed-off-by: Ignat Korchagin <ignat@cloudflare.com>
+Dear Rafael,
 
-Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+
+Thank you for reporting the regression.
+
+
+Am 14.10.24 um 20:27 schrieb Rafael J. Wysocki:
+
+> Unfortunately, commit 610712298b11 ("Bluetooth: btusb: Don't fail
+> external suspend requests") from you that appeared in 6.12-rc3
+> prevents my Logitech Bluetooth mouse from connecting to the host
+> (btusb).  The LED activity on the mouse indicates that it tries to
+> associate, but there is no response.  It looks like the host is
+> suspended before the device can connect to it and it cannot be woken
+> up for some reason.
+> 
+> It worked no problem in 6.12-rc2 and the above commit is the only BT
+> one in 6.12-rc3.  Also reverting it makes things work again.
+> 
+> In the "good" case (for example, in 6.12-rc3 with the above commit
+> reverted), the following messages are present in the kernel log:
+> 
+> [  251.748734] Bluetooth: HIDP (Human Interface Emulation) ver 1.2
+> [  251.748763] Bluetooth: HIDP socket layer initialized
+> [  251.773010] hid-generic 0005:046D:B016.0001: unknown main item tag 0x0
+> [  251.774432] input: Bluetooth Mouse M336/M337/M535 Mouse as /devices/pci0000:00/0000:00:14.0/usb1/1-7/1-7:1.0/bluetooth/hci0/hci0:1/0005:046D:B016.0001/input/input14
+> [  251.775733] input: Bluetooth Mouse M336/M337/M535 Consumer Control as /devices/pci0000:00/0000:00:14.0/usb1/1-7/1-7:1.0/bluetooth/hci0/hci0:1/0005:046D:B016.0001/input/input15
+> [  251.777163] input: Bluetooth Mouse M336/M337/M535 Keyboard as /devices/pci0000:00/0000:00:14.0/usb1/1-7/1-7:1.0/bluetooth/hci0/hci0:1/0005:046D:B016.0001/input/input18
+> [  251.815905] hid-generic 0005:046D:B016.0001: input,hidraw0: BLUETOOTH HID v12.03 Mouse [Bluetooth Mouse M336/M337/M535] on 9c:b6:d0:96:8e:c8
+> 
+> In the "bad" case (for example, in unmodified 6.12-rc3) they are not
+> there at all.
+
+This regression has been reported three times already [1][2][3].
+
+
+Kind regards,
+
+Paul
+
+
+
+[1]: 
+https://lore.kernel.org/linux-bluetooth/020c69d7-ad86-44d3-a508-22ff949ee7ec@gmail.com/T/#t
+[2]: 
+https://lore.kernel.org/linux-bluetooth/a34d2761-dad4-4ae7-8787-6bbf05538318@panix.com/T/#t
+[3]: https://bugzilla.kernel.org/show_bug.cgi?id=219385
