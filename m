@@ -1,96 +1,96 @@
-Received: from mail-lj1-f169.google.com (mail-lj1-f169.google.com [209.85.208.169])
+Received: from mail-il1-f199.google.com (mail-il1-f199.google.com [209.85.166.199])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C3301C2439
-	for <linux-bluetooth@vger.kernel.org>; Tue, 15 Oct 2024 08:11:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9F3418BBA2
+	for <linux-bluetooth@vger.kernel.org>; Tue, 15 Oct 2024 08:33:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728979913; cv=none; b=Z4GZcLGIANPpdHCOke9GgK7DPvGeVN9/gvhtS2p301MysE0qV9HrROjGcnU0i74Ifu27b2/1AG6oEsqri1oG2fCBc5Rx4BIVgDRLuX3pt2IE1YmEo3b8fr9M6EStGxFnD6EKQqsRfgyeyheaZ7wxnxRCffV1eqhek6yP6t8lLwA=
+	t=1728981208; cv=none; b=OoL17MyC/Xi6vJ5pcgVAeoo9o8LcWyT+cqvQrHsq/9/EsCMBitN3osa5mz1T40qDNe4IdRxEs21GcfiLZrwCMaq7JQKPia7OmrtePZim8QHv4Js+LttW9LO2E/nY/VzDdHxh4KIyY6xqYSgpWLoCwWSSJMdYHdhqoY2GfhlG/7U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728979913; c=relaxed/simple;
-	bh=9NcOTU6qq0FlGfURYtVioeJftguPvhg86hg1W7zVGMA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=WQ8D6HGWbigkqqKTZmhHyoLkGs+witgTKVG4bBAhsoaZuRVZcsjieyOPw8g5UbDLsm36wyscfm3B6ClpSmue/zzGjtUvW2zPXJ7zbmGNlX7g0ldkWk+P24f2fhNWkZaKqYTQzO/XKENWrrnASX+i2vF/ZqEeuJz1Iqth4FUue4k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=gjeQi3FA; arc=none smtp.client-ip=209.85.208.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="gjeQi3FA"
-Received: by mail-lj1-f169.google.com with SMTP id 38308e7fff4ca-2fabb837ddbso62250761fa.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 15 Oct 2024 01:11:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1728979910; x=1729584710; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=9NcOTU6qq0FlGfURYtVioeJftguPvhg86hg1W7zVGMA=;
-        b=gjeQi3FA1LPuIM9vKeLAPPz8FeCHW5chgYoutX887TPlfwBaFr6PFgE5Qh99SPunQO
-         5e9noCgl4IDCfG6etdfnf1bF2tiUuiVqQr6LU9GV8uLJY3AWZBAGEqfu5ECzgtpn/idD
-         YWPsSLKLMv3yVQDN9sPmrj50t/Y8RAFxZBHyX43/1sb0NdVLq5Y5YPgFmonh3usJaxGi
-         ntUbcZtA7dFyqBNRT/2GWqGE1XCcxooSF6480H3b110sFgKLvviu8iAkTnwans0WM0XF
-         qV++aCBee5vUGpL0NEtLmr0OTTS6IWwGx++DMe90KOoZcGgcI+/mA2CVl1iX32M5Z/5C
-         NtDw==
+	s=arc-20240116; t=1728981208; c=relaxed/simple;
+	bh=brGXm5QGlWX/75RpntS9S7a9tixHTLH1SjkC/et3nG8=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=J7MgJBvEiwlHiuO7l5ao9hzT3xcDPrUZCWiLTIw8q7a9VIzWAtFFTIyE2N0envPNgDpd8NLgTGKVh1luLXEB0p9aa0RLD58MXoi0/n7ZB4fVKoBAr9j9djjEx2c55hJzsOx4Td35mAkb9FzZEu7TTDHh2BjsYxDAYlCH0/6eeM8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.199
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f199.google.com with SMTP id e9e14a558f8ab-3a3ae775193so37837285ab.1
+        for <linux-bluetooth@vger.kernel.org>; Tue, 15 Oct 2024 01:33:25 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728979910; x=1729584710;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=9NcOTU6qq0FlGfURYtVioeJftguPvhg86hg1W7zVGMA=;
-        b=qLDZdrUh5YyhE+uIH8bmNwlZGM9NVQPwqykByPq4wp5Ed5c8sNddpERT/iAEgNGc2/
-         PFB7K1ofTyWLYY86xrsNIA3en53K0L1rSLlTHPRSnbqnsn71RbqcAf2DNQMdvKDbsITt
-         9OvJIPQH1tbKjuzkqKFiJRRC9bw5Jef2nrrPDFOQbqywI+gkswwJOCsf9XqRtJF5P1/W
-         SotLr62IYESzKF3NCMsB4B8W3BTwCo9VhAYYut1co9XbXyAjHOlJROdqWWWFxDUfoeeB
-         3RG+I/pFZ3lr4N2PV3IjJUWv39rZbICWC2K6fg+GBdES7XHqGQ+vxRqCG0UrLcB8smEj
-         Rf4Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUYS7z+ChAlaNMscPa3pDzI8j2HSTInodwBUG3aB+u0Tm9LHst5CV400DaPKiCqEGNfLMvFNGWrjCrguAneRRc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzms4EKmHcQt0C1oF907Rusypj9qe9sbGa6K9PTIrIAublITscE
-	zOCNtN/fDt33+eJdUZ4gqf3dvQ8Ij6pdnGGfJg04japzvWHwO/fUnbepF0aigRL9aW7Mh42Havg
-	4Be4fr6R9o4nfnZtF47nV+Cq6R7v5F2o1JF/z
-X-Google-Smtp-Source: AGHT+IE7U1ZYMuHbOPDHIlOennm7tEkVNs4JgQdtOjRQ9FAo6Y4X7PA4zb2GEV3g2QArJvnXo+KXR6rAxY9lnX9/hZk=
-X-Received: by 2002:a2e:be9c:0:b0:2fa:c5d9:105b with SMTP id
- 38308e7fff4ca-2fb3f16fabcmr64166371fa.2.1728979909944; Tue, 15 Oct 2024
- 01:11:49 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1728981205; x=1729586005;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=wJ+92rKJpzc7gFGhxIcfKPxEEBkRlPMq6apblhq+LxY=;
+        b=WeGGdVaHxBg9cmxGXW/ktqGXQUp/cvdU4+F55XWonlrOZYDlw9YtfRFgSgJ/1bSfm9
+         Vv3T2LJyN4rBPXd1fl5rh6yYoV6eHnC2fQUtCFpEt8bZkhBM6rA8BGhrH8O0eqHyuM+Z
+         /GEU947mp6yK0GcHATuwyPa+D/2kmZeWjg2SFnsC7GG8/EdNHGSdGvRYpW5baZFoSk+n
+         +UqSOGx+XKgm6nHwc3eGeuTKukmfEdIbbjbyXub4UsOADkbZsyRrl5sxEasilZZK87WV
+         EE/XjmJx1mzQY3XZtzWu6mneN2Mq4eJ1/bNpw5kcF3h/ixrPFnQV76HWF90jUjvl4a1H
+         LYWg==
+X-Gm-Message-State: AOJu0Yw96xQeASYARjkTwYW51JIoAR6vU+1KNIuiaCR4qc99/okhzV1a
+	zamkeiqj5/MAuju4ysWGyNsm0272eYk64hHqH0uz9MSvuSJlgI2KnEUM8162KEWIm4DKevlHRwq
+	ZIdhpaxAHgOEsUvb2GtLNmlPqj9QluAk6uPuJLIcHWLMiUkJy0PRXID8=
+X-Google-Smtp-Source: AGHT+IG61fSjJUpq0XydR2YAsm8DLx453GM2CbssO1bSfKVnVPORJxKdimQF+PztK/jVwgMTGcLN3LB7eQxAYzPEMyRxQJnnpjgh
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241014153808.51894-8-ignat@cloudflare.com> <20241014213848.99389-1-kuniyu@amazon.com>
-In-Reply-To: <20241014213848.99389-1-kuniyu@amazon.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 15 Oct 2024 10:11:36 +0200
-Message-ID: <CANn89iKhpjhwAqD9PXs2fw5PUDXejRz8S9VOn7Syubo1EQq9+A@mail.gmail.com>
-Subject: Re: [PATCH net-next v3 7/9] net: inet6: do not leave a dangling sk
- pointer in inet6_create()
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: ignat@cloudflare.com, alex.aring@gmail.com, alibuda@linux.alibaba.com, 
-	davem@davemloft.net, dsahern@kernel.org, johan.hedberg@gmail.com, 
-	kernel-team@cloudflare.com, kuba@kernel.org, linux-bluetooth@vger.kernel.org, 
-	linux-can@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-wpan@vger.kernel.org, luiz.dentz@gmail.com, marcel@holtmann.org, 
-	miquel.raynal@bootlin.com, mkl@pengutronix.de, netdev@vger.kernel.org, 
-	pabeni@redhat.com, socketcan@hartkopp.net, stefan@datenfreihafen.org, 
-	willemdebruijn.kernel@gmail.com
+X-Received: by 2002:a05:6e02:b2d:b0:3a1:a5dc:aa4e with SMTP id
+ e9e14a558f8ab-3a3bcdbb661mr77680745ab.8.1728981204935; Tue, 15 Oct 2024
+ 01:33:24 -0700 (PDT)
+Date: Tue, 15 Oct 2024 01:33:24 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <670e28d4.050a0220.f16b.0006.GAE@google.com>
+Subject: [syzbot] Monthly bluetooth report (Oct 2024)
+From: syzbot <syzbot+list1d979a49215bb9d63dc5@syzkaller.appspotmail.com>
+To: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	luiz.dentz@gmail.com, marcel@holtmann.org, syzkaller-bugs@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Mon, Oct 14, 2024 at 11:39=E2=80=AFPM Kuniyuki Iwashima <kuniyu@amazon.c=
-om> wrote:
->
-> From: Ignat Korchagin <ignat@cloudflare.com>
-> Date: Mon, 14 Oct 2024 16:38:06 +0100
-> > sock_init_data() attaches the allocated sk pointer to the provided sock
-> > object. If inet6_create() fails later, the sk object is released, but t=
-he
-> > sock object retains the dangling sk pointer, which may cause use-after-=
-free
-> > later.
-> >
-> > Clear the sock sk pointer on error.
-> >
-> > Signed-off-by: Ignat Korchagin <ignat@cloudflare.com>
->
-> Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+Hello bluetooth maintainers/developers,
 
-Reviewed-by: Eric Dumazet <edumazet@google.com>
+This is a 31-day syzbot report for the bluetooth subsystem.
+All related reports/information can be found at:
+https://syzkaller.appspot.com/upstream/s/bluetooth
+
+During the period, 6 new issues were detected and 2 were fixed.
+In total, 47 issues are still open and 72 have been fixed so far.
+
+Some of the still happening issues:
+
+Ref  Crashes Repro Title
+<1>  13649   Yes   possible deadlock in rfcomm_dlc_exists
+                   https://syzkaller.appspot.com/bug?extid=b69a625d06e8ece26415
+<2>  4263    Yes   WARNING in call_timer_fn
+                   https://syzkaller.appspot.com/bug?extid=6fb78d577e89e69602f9
+<3>  345     Yes   general protection fault in lock_sock_nested
+                   https://syzkaller.appspot.com/bug?extid=d3ccfb78a0dc16ffebe3
+<4>  175     Yes   BUG: sleeping function called from invalid context in hci_le_create_big_complete_evt
+                   https://syzkaller.appspot.com/bug?extid=2fb0835e0c9cefc34614
+<5>  130     Yes   KASAN: slab-use-after-free Read in l2cap_recv_frame
+                   https://syzkaller.appspot.com/bug?extid=5c915dc5dd417b83b348
+<6>  85      Yes   KASAN: slab-use-after-free Write in sco_conn_del
+                   https://syzkaller.appspot.com/bug?extid=6b9277cad941daf126a2
+<7>  57      Yes   BUG: sleeping function called from invalid context in lock_sock_nested (3)
+                   https://syzkaller.appspot.com/bug?extid=55cd5225f71c5cff7f6f
+<8>  46      Yes   WARNING: ODEBUG bug in put_device
+                   https://syzkaller.appspot.com/bug?extid=a9290936c6e87b3dc3c2
+<9>  45      No    KASAN: slab-use-after-free Read in skb_queue_purge_reason (2)
+                   https://syzkaller.appspot.com/bug?extid=683f8cb11b94b1824c77
+<10> 36      No    WARNING in l2cap_chan_send
+                   https://syzkaller.appspot.com/bug?extid=b6919040d9958e2fc1ae
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+To disable reminders for individual bugs, reply with the following command:
+#syz set <Ref> no-reminders
+
+To change bug's subsystems, reply with:
+#syz set <Ref> subsystems: new-subsystem
+
+You may send multiple commands in a single email message.
