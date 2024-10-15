@@ -1,113 +1,118 @@
-Received: from mail-yb1-f176.google.com (mail-yb1-f176.google.com [209.85.219.176])
+Received: from mail-il1-f177.google.com (mail-il1-f177.google.com [209.85.166.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98CA221E3D6
-	for <linux-bluetooth@vger.kernel.org>; Tue, 15 Oct 2024 21:43:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE20921E3DB
+	for <linux-bluetooth@vger.kernel.org>; Tue, 15 Oct 2024 22:27:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729028602; cv=none; b=kgthsAnT4wcJpQMsYo6/jiXse29f4L6ZCcmq9tgVmUeoEo846ZgiEH+o78tITTNasIhVOSg6B7eTHFiO6t0UrkozT3N8YzCDryxrKbPycNlo22MnIjjddHIRxrRYQJApk3mUF8v96U8xu15DhI5FdZNno+lTh5ch+fQOu1IOS1I=
+	t=1729031250; cv=none; b=IMJkIGlFybND5vusfQuxX5+WcGHtlhdwKyF9j1OlIUdcnqeHfUMGmeznth/EvhNbVcVF+tZ6kP1ysm/da0gkFuL8MaY4JbdI1N7v0cM7d7U6rD5lb+/N6A+U+WL1Jk8DVpImgmmLkyNFHuRI/l97c7F0qEuQhX+PBDHLqQGf1hU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729028602; c=relaxed/simple;
-	bh=6ro5+0Jlr1JnGngNpf9Q/r5jlmZp9av1/0ui4T1QND8=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=XIll1+9lQouIL+C1G+LDYKCeMCiSngYt0q2GmrqGzKbiF75AP0IW1CERwu2IONxsWO7kkzy/mcKIwVmE3EeKOa8KlQZQ/9G0IcXW8NiswTNTrpmEHzn4bU+0H21VeOLtY/my8AIA26QWlAfKiXiQF2XGNhHB6Y8SJooAtXsgYrQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MAnwfA7x; arc=none smtp.client-ip=209.85.219.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1729031250; c=relaxed/simple;
+	bh=xVhvvC5KYY4SRqxAEOGfcTdYI8AtS4CtPdx9l9AtehY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=VUcVyBVqh8RIqNg6gayDFBAVdvYAKqxqwam5RmrFFk1TkNUeGqHRaX99to6xJNqKIpjajuad31m9aESjvBO4piPUAQWyKCd5LdJlZDN0Do3LmXJzY6twiWSnsuEsQh0w/iWsVAlZ5LtNxtDNCtArXyO7Fj+AEjPdRm+D13d1Ypo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linuxfoundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=UaxgXqsd; arc=none smtp.client-ip=209.85.166.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linuxfoundation.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MAnwfA7x"
-Received: by mail-yb1-f176.google.com with SMTP id 3f1490d57ef6-e2903a48ef7so5628854276.2
-        for <linux-bluetooth@vger.kernel.org>; Tue, 15 Oct 2024 14:43:20 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="UaxgXqsd"
+Received: by mail-il1-f177.google.com with SMTP id e9e14a558f8ab-3a3bb6a01eeso16307395ab.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 15 Oct 2024 15:27:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1729028599; x=1729633399; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=b9Dl19kaEp6cgjuIK9vRdV6Abt/YV57iwOJc5oSQ898=;
-        b=MAnwfA7x4hGKRLliEJxTgN2OdRb7atGVPMEG7Gu4tQF7tfRiy4UWn7UtebdvMqtm1R
-         gSdSh5U0qZ2hslyhsh3za/4mk7OxuJVI+AbabklLCS6doaOVlWscEX4Taz1GK7c8Rv5q
-         UDOEgQUY0vTsavKxGBC/Y5nb7fxg+2XFONkD0HIXf+Ox47HC/3D1vIUZiPB9B43BaV56
-         yQrI3LirROuMMX+ijklSzThMylHLZKyYL8Twr87+qok6x0K55e5Tmd2bbi1vf4pENHWc
-         cRvQdwy8jU2rctQkMu4N3vqZaXUoo3atgbxOem630VwIQCrdf/w8WGR051p6iQQHWetT
-         1teQ==
+        d=linuxfoundation.org; s=google; t=1729031248; x=1729636048; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=AbqYbvbPHC7jsWcXXkq+myvuos/TZJsUv956mH28u+g=;
+        b=UaxgXqsdceQ6joCiLq8pO5hN9qUlKClgJ5UgVX5qWYbQM4pZDD5+j7e7d9fQP5S6ER
+         T3QVe0IdHg3HW73r24LR9eYlUFv7ck6b9nKxumZ/YhMZNsVb96RQtakdh7Zs3L4Luwxp
+         3Gnq+6hgqC9u1/yuttSgj3zSGEJukEh7/mkoU=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729028599; x=1729633399;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=b9Dl19kaEp6cgjuIK9vRdV6Abt/YV57iwOJc5oSQ898=;
-        b=k90NnOFM15U0Kzp1wgYe77ZxSbQ4UsHgXVdo9cO6VuXJCbh3fRhzP2KFToC0wWSDpo
-         uTw+R1TlJP6rqfn3K+S8i50W21YRXq/imRfW061cQrgVeCwm1vyWp6+TvlXpwWR/ZFap
-         IUVkTIduN4q9rtPty1wDdAveNrxODJCSmGIZ/edH+gCJFRzavrZiupMXKWDK0jY1Fmnl
-         m5jUmIPZ0cBfQRPpgLix/SaerDPqYQ/w9INR8wpGpqYTY6X1uUyECrNErPZeBnz2GDWp
-         h+hIAHK0NQO8BL1rBjWziASJW+JlzOF67Q+bIZq45EJBq0wa7iPf880/BN7V6XS8wwCD
-         oA9A==
-X-Gm-Message-State: AOJu0YyvsDNGN/uCRgCL6M1a5vWLlRwRzaJlXOh4G8uLY7JzmmBPdcE0
-	7//BGypED2i0eXL+fqAP/jI7cm7OrEqZFjSGj02RI701YAgD5fHTKJJ0cA==
-X-Google-Smtp-Source: AGHT+IHb4AFuNtlhPOXvhSv9t0mjG3JkUTruzgz0cSZ5qlJuCg4CRCdzu9LQf/Xw9DkuKB6Ox8yPWQ==
-X-Received: by 2002:a25:d84a:0:b0:e29:2466:c821 with SMTP id 3f1490d57ef6-e292466ca74mr10745084276.34.1729028599267;
-        Tue, 15 Oct 2024 14:43:19 -0700 (PDT)
-Received: from [172.17.0.2] ([40.76.181.124])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6cc2295acd5sm11018686d6.97.2024.10.15.14.43.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 15 Oct 2024 14:43:18 -0700 (PDT)
-Message-ID: <670ee1f6.d40a0220.211c63.5523@mx.google.com>
-Date: Tue, 15 Oct 2024 14:43:18 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============0318850145048346027=="
+        d=1e100.net; s=20230601; t=1729031248; x=1729636048;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=AbqYbvbPHC7jsWcXXkq+myvuos/TZJsUv956mH28u+g=;
+        b=aamo/yA7ycP5o8+cslzgcFGGpVq85EyoX0k2VXrAlGN3thT5kUYbkeppJiz9XiFpXI
+         EFN3YWrUiP2I8wXyx9gM+aNwnK8zSAMGBGu0N5HOkJJJH1BkduyBMB5sOuFmf1h4uQFC
+         EFUwtuvNGGVTsGJZHSes7tK8uHirrMi8hTPPTWAlD4CmLSD9SSaTBuVXEs2tO5fEiPc3
+         dbe6YvbmfsIeQFK1LTtroETpbvyd2NSAp/dPrlPlj/YYiZCLjM3ZwG8kIBzB+MSCgj7j
+         zVVijLW00w1zfogJtO9Q/tuWnvq0KzFZbDMAbxLe/yGydZzl8RfKX7uPtGr3T+hwkXrb
+         rrig==
+X-Forwarded-Encrypted: i=1; AJvYcCWw32RqX7vHPDv8ApY1qfgE/sO1JhnhRXQgH6F4if3PNGckCL/SUUKlK/KHFvqg2nU43eCN5wwahN5zvrzBdsI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyOW29OFKmk940LvmJbvmfyrCoNW5f8oF6cab1N99F4EyMXHnEA
+	9hdm9KsUCq2XlIn+JEam/IL2lqE0wA9JDGFIwEfoRaC5ekrJ0wAl8vIOvIj+kC4=
+X-Google-Smtp-Source: AGHT+IE5if0ZnJaMCA5ubjPTpbcHWlT2DX0oWEry1+1YMZ0iEPhjqRzrVg9N4kV0pU85MnDBXLpQPg==
+X-Received: by 2002:a05:6e02:160e:b0:396:e8b8:88d with SMTP id e9e14a558f8ab-3a3b5f61a5emr157523925ab.11.1729031248033;
+        Tue, 15 Oct 2024 15:27:28 -0700 (PDT)
+Received: from [192.168.1.128] ([38.175.170.29])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4dbecb38cb5sm515234173.114.2024.10.15.15.27.27
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 15 Oct 2024 15:27:27 -0700 (PDT)
+Message-ID: <f7c92929-dcda-43f5-a163-9a167abf0de6@linuxfoundation.org>
+Date: Tue, 15 Oct 2024 16:27:26 -0600
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [BlueZ,v1] avdtp: Fix triggering disconnect_timeout while discovering capabilities
-In-Reply-To: <20241015194254.543683-1-luiz.dentz@gmail.com>
-References: <20241015194254.543683-1-luiz.dentz@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
-
---===============0318850145048346027==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH V3][next] Bluetooth: btintel_pcie: Remove structually
+ deadcode
+To: "Everest K.C." <everestkc@everestkc.com.np>, marcel@holtmann.org,
+ luiz.dentz@gmail.com, Dan Carpenter <dan.carpenter@linaro.org>
+Cc: kernel-janitors@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Shuah Khan <skhan@linuxfoundation.org>
+References: <20241015193013.16790-1-everestkc@everestkc.com.np>
+Content-Language: en-US
+From: Shuah Khan <skhan@linuxfoundation.org>
+In-Reply-To: <20241015193013.16790-1-everestkc@everestkc.com.np>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-This is automated email and please do not reply to this email!
+On 10/15/24 13:30, Everest K.C. wrote:
+> The switch case statement has a default branch. Thus, the return
+> statement at the end of the function can never be reached.
+> Fix it by removing the return statement at the end of the
+> function.
+> 
+> This issue was reported by Coverity Scan.
 
-Dear submitter,
+You forgot to fix the typo Dan pointed out in the short log.
+Don't forget to include reviewers when you send new version
+based on their comments.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=899479
++ Adding Dan
+> 
+> Fixes: 5ea625845b0f ("Bluetooth: btintel_pcie: Add handshake between driver and firmware")
+> Signed-off-by: Everest K.C. <everestkc@everestkc.com.np>
+> ---
+> V2 -> V3: - Removed that the change was successfully built
+> 	  - Removed the link to Coverity Scan report
+> V1 -> V2: - Changed "Fixing" to "Fix" in the changelog
+>            - Added that the change was successfully built
+>            - Added kernel-janitors mailing list to CC
+>   
+>   drivers/bluetooth/btintel_pcie.c | 1 -
+>   1 file changed, 1 deletion(-)
+> 
+> diff --git a/drivers/bluetooth/btintel_pcie.c b/drivers/bluetooth/btintel_pcie.c
+> index e4ae8c898dfd..660496e55276 100644
+> --- a/drivers/bluetooth/btintel_pcie.c
+> +++ b/drivers/bluetooth/btintel_pcie.c
+> @@ -391,7 +391,6 @@ static inline char *btintel_pcie_alivectxt_state2str(u32 alive_intr_ctxt)
+>   	default:
+>   		return "unknown";
+>   	}
+> -	return "null";
+>   }
+>   
+>   /* This function handles the MSI-X interrupt for gp0 cause (bit 0 in
 
----Test result---
+With the typo fixed:
 
-Test Summary:
-CheckPatch                    PASS      0.44 seconds
-GitLint                       FAIL      0.53 seconds
-BuildEll                      PASS      27.53 seconds
-BluezMake                     PASS      1671.68 seconds
-MakeCheck                     PASS      12.96 seconds
-MakeDistcheck                 PASS      182.32 seconds
-CheckValgrind                 PASS      256.64 seconds
-CheckSmatch                   PASS      360.94 seconds
-bluezmakeextell               PASS      120.32 seconds
-IncrementalBuild              PASS      1424.95 seconds
-ScanBuild                     PASS      1010.25 seconds
+Reviewed-by: Shuah Khan <skhan@linuxfoundation.org>
 
-Details
-##############################
-Test: GitLint - FAIL
-Desc: Run gitlint
-Output:
-[BlueZ,v1] avdtp: Fix triggering disconnect_timeout while discovering capabilities
-
-WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
-1: T1 Title exceeds max length (82>80): "[BlueZ,v1] avdtp: Fix triggering disconnect_timeout while discovering capabilities"
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============0318850145048346027==--
+thanks,
+-- Shuah
