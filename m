@@ -1,107 +1,95 @@
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f180.google.com (mail-lj1-f180.google.com [209.85.208.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65DB246B8
-	for <linux-bluetooth@vger.kernel.org>; Tue, 15 Oct 2024 06:22:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23C491AB538
+	for <linux-bluetooth@vger.kernel.org>; Tue, 15 Oct 2024 08:01:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728973324; cv=none; b=H0hZVuvIV+ekkFV9uayI4Ysq6mmVjpro2f0/E2Q9pTnNU4qD8N4zft50rFqQcnKCIrn8OPKwamKOpdbOJkMH2/qjJUrWvbqrh5rDHWsxAxylbXeu0LuG/pGtxMsfHDQmNRlszcUqFG/IFhgoy+Ibr2m44PpvlQvTYwoWMzwxzK0=
+	t=1728979293; cv=none; b=ZqRTHrDvh6ZCKnAV7uR+1/2CmLMbCNSHurtSlUOBsngptEwTSXv+lgNzZBWWeVMl+SeDxuho2BpL1wx0zP0vfhbo/Hj072AOB16jo8fvP0Ykcai1Ezw3EKd/0TIXfrSv9XUhbdM2VRFRwA68BEdHH9WNb4ie5ITLLvG6q47MFWU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728973324; c=relaxed/simple;
-	bh=F0nO1ju9yrHwcLaUuiotyknrNbm/NPjEBqUywm3szCU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XlZb6HIzkcjOQAvgGmVFQkiaSYBd5gIZC0AsGm46KW2fYJ+iotJcWeFtQ0jRL3OzlywpoVrBB455eBz+vDEg6Hwrs7dc2oxpE4fJW5OxCaRFo/e9eVE8HPUG4w80tshKrOVgWpJB2y3xFLsoxpwLm3ra01KOs0Dj3hB7Mf5bXEo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1t0aw2-0008D4-5Z; Tue, 15 Oct 2024 08:21:34 +0200
-Received: from [2a0a:edc0:0:b01:1d::7b] (helo=bjornoya.blackshift.org)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1t0avx-001xwW-6v; Tue, 15 Oct 2024 08:21:29 +0200
-Received: from pengutronix.de (pd9e595f8.dip0.t-ipconnect.de [217.229.149.248])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	(Authenticated sender: mkl-all@blackshift.org)
-	by smtp.blackshift.org (Postfix) with ESMTPSA id B1B32352EC0;
-	Tue, 15 Oct 2024 06:21:28 +0000 (UTC)
-Date: Tue, 15 Oct 2024 08:21:28 +0200
-From: Marc Kleine-Budde <mkl@pengutronix.de>
-To: Ignat Korchagin <ignat@cloudflare.com>
-Cc: "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg <johan.hedberg@gmail.com>, 
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Oliver Hartkopp <socketcan@hartkopp.net>, 
-	Alexander Aring <alex.aring@gmail.com>, Stefan Schmidt <stefan@datenfreihafen.org>, 
-	Miquel Raynal <miquel.raynal@bootlin.com>, David Ahern <dsahern@kernel.org>, 
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, linux-bluetooth@vger.kernel.org, linux-can@vger.kernel.org, 
-	linux-wpan@vger.kernel.org, kernel-team@cloudflare.com, kuniyu@amazon.com, 
-	alibuda@linux.alibaba.com, Vincent Mailhol <mailhol.vincent@wanadoo.fr>
-Subject: Re: [PATCH net-next v3 4/9] net: af_can: do not leave a dangling sk
- pointer in can_create()
-Message-ID: <20241015-fast-smilodon-of-maturity-c983eb-mkl@pengutronix.de>
-References: <20241014153808.51894-1-ignat@cloudflare.com>
- <20241014153808.51894-5-ignat@cloudflare.com>
+	s=arc-20240116; t=1728979293; c=relaxed/simple;
+	bh=zj3VWhc1JXRNGK9CsDmZf0eapyKovX4dwjoqx2Q9Dio=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=I0WwuS4BjXK6sEieiq+aQPAtI3Z8WUsHNZv42v7kUg3XLOqY/2AUFpvkxpmuLRqHc6Yg6T3JF2zGMRWplraqILnnA4X4vdf8Rch90VQKIi7Yk640Co4Ab1xdau2khVEeaRZ7Sr0FXjD2+b3sBXS2ALu7c+MLdH4tnmWo+neips0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=vdladWKj; arc=none smtp.client-ip=209.85.208.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vdladWKj"
+Received: by mail-lj1-f180.google.com with SMTP id 38308e7fff4ca-2fb57f97d75so13112281fa.2
+        for <linux-bluetooth@vger.kernel.org>; Tue, 15 Oct 2024 01:01:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1728979289; x=1729584089; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=zj3VWhc1JXRNGK9CsDmZf0eapyKovX4dwjoqx2Q9Dio=;
+        b=vdladWKjT8WI2KeXleLj+/RcHhaLevl3oykRwHEj/ZVgkBv+hL95RJrvL0saG80l/8
+         hvx+1Bb1fYt8letMQFveFcCn/7Bv4jMkKa0GTSDnD3WgpUDQmfKAbHlR90919YTxYlWp
+         /MKxgZxRQSW5cvW6EI7vce1MPENxpdKmJ6vR1xTOZ56Myl5y/gBhADKnF2ML2nSNJBuo
+         0CKgDhB/60XRjW7udytqDzU1zPwXbgv1lbIUxq2RuRGLH7WPD8QszDkoRbRkvyjXEJKE
+         TyOi2XajDVnvWzSjxTBBTQUyU6PTe4QPzhkBn9L++TPSKc9bEbq5VQX4T7pRQg6sYw9v
+         cyGg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728979289; x=1729584089;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=zj3VWhc1JXRNGK9CsDmZf0eapyKovX4dwjoqx2Q9Dio=;
+        b=PGbgpt0D7kHGG0rk4InonpyGAcCRlrcuMJjaOTM6wdJU+dcQHHjBqxRj2fbY10Hv4K
+         bywuTl1gA0ZggPAP9cE9nvTOXYZeXA5stkpgWjVyy0g6diWT5eM6FtJJ21aJkE19famB
+         Td4+F4dHZ8zIm9v4GiFjeL7DhXRBQVWE0ptzDdghddl4vFIkdpSGXOwrOPtA2u9PFKQL
+         g0U4Vsebkw/XQdIE0tRbgrva8rHoM9H5lTyWrU0eDCVmT5FwzV3GCJKcUpPB5Y/C+TDK
+         qWyDOqd/V+ycnaczCUd01uUHUCI9lEUFnsamxfSObKjLH2E3W900U+Z1SqYAhZwzAP+t
+         AJKw==
+X-Forwarded-Encrypted: i=1; AJvYcCWUwdR9IS/OtasvytEQGaRLIUpQQ78ZU+gNdWYDvq7aj1jggdTBaef/5Zz9EV+xE27f6F5PSx7bbUKrZak9/Fg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwgNSI9y+qjX3/eCzgTCH7iVKCjlmVftY2vz8CRZGMSp1crZizB
+	GjDv8wHdelUdob1gGbKLPQddT0wredu/Q9+pyt9PilMtyj3cxJJgdvQQt7gJQbt3HsDWYbX/fwa
+	frOOsDIIImm9k+yajw81QVymtQ8LLemC1RFtl
+X-Google-Smtp-Source: AGHT+IHxfKaPProiszu4hPKA2JsWyWKW8QC7WkdMfm3qCN+vO+7OHhDa8OoE6YIicZSOeQRLIab3tjlWn0zyThhZ2QU=
+X-Received: by 2002:a05:651c:2120:b0:2fb:5d8a:4cd3 with SMTP id
+ 38308e7fff4ca-2fb5d8a4f7cmr6486501fa.0.1728979289048; Tue, 15 Oct 2024
+ 01:01:29 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="ozf36irfkpdfb4wj"
-Content-Disposition: inline
-In-Reply-To: <20241014153808.51894-5-ignat@cloudflare.com>
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: mkl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: linux-bluetooth@vger.kernel.org
-
-
---ozf36irfkpdfb4wj
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+References: <20241014153808.51894-1-ignat@cloudflare.com> <20241014153808.51894-2-ignat@cloudflare.com>
+In-Reply-To: <20241014153808.51894-2-ignat@cloudflare.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Tue, 15 Oct 2024 10:01:17 +0200
+Message-ID: <CANn89iJ0i+k_wHn-aoafY1V+mJ8TAS1DzQKnu1KkjusAWLNuyg@mail.gmail.com>
+Subject: Re: [PATCH net-next v3 1/9] af_packet: avoid erroring out after
+ sock_init_data() in packet_create()
+To: Ignat Korchagin <ignat@cloudflare.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg <johan.hedberg@gmail.com>, 
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Oliver Hartkopp <socketcan@hartkopp.net>, 
+	Marc Kleine-Budde <mkl@pengutronix.de>, Alexander Aring <alex.aring@gmail.com>, 
+	Stefan Schmidt <stefan@datenfreihafen.org>, Miquel Raynal <miquel.raynal@bootlin.com>, 
+	David Ahern <dsahern@kernel.org>, Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+	linux-bluetooth@vger.kernel.org, linux-can@vger.kernel.org, 
+	linux-wpan@vger.kernel.org, kernel-team@cloudflare.com, kuniyu@amazon.com, 
+	alibuda@linux.alibaba.com
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On 14.10.2024 16:38:03, Ignat Korchagin wrote:
-> On error can_create() frees the allocated sk object, but sock_init_data()
-> has already attached it to the provided sock object. This will leave a
-> dangling sk pointer in the sock object and may cause use-after-free later.
->=20
+On Mon, Oct 14, 2024 at 5:38=E2=80=AFPM Ignat Korchagin <ignat@cloudflare.c=
+om> wrote:
+>
+> After sock_init_data() the allocated sk object is attached to the provide=
+d
+> sock object. On error, packet_create() frees the sk object leaving the
+> dangling pointer in the sock object on return. Some other code may try
+> to use this pointer and cause use-after-free.
+>
+> Suggested-by: Eric Dumazet <edumazet@google.com>
 > Signed-off-by: Ignat Korchagin <ignat@cloudflare.com>
-> Reviewed-by: Vincent Mailhol <mailhol.vincent@wanadoo.fr>
+> ---
 
-Reviewed-by: Marc Kleine-Budde <mkl@pengutronix.de>
+Reviewed-by: Eric Dumazet <edumazet@google.com>
 
-regards,
-Marc
-
---=20
-Pengutronix e.K.                 | Marc Kleine-Budde          |
-Embedded Linux                   | https://www.pengutronix.de |
-Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
-Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
-
---ozf36irfkpdfb4wj
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEUEC6huC2BN0pvD5fKDiiPnotvG8FAmcOCeYACgkQKDiiPnot
-vG/xXAf+LTXGlSudJMf/9rFosFeT91u30bZgRzlfS9tfAK9w2089Upi/Exhd/ogn
-fV/Auin/lIVDdcenPoVsSApA5kWdKLvfP+pu/RPXN38IrDQV8rwel0JjEDCzSYOL
-6KkFDtfEOHrDoikDtf1v+4wHX4Gy0hVXD8ODTIkXFwGolFBXK7+RTQx3O1H+Rw3p
-6oMv4Ve2xrP/5i8Lh/5emQVq7M5XqkapXUwmyOImTRwCqrnCtjZYEiy8GqYDcbes
-zGW5n5UvJOpiY6IM+tNdjOT5aEioR5XeuR/s0ORBiAppNrKjuIDgkkIC6gARZbzZ
-hqMhoIOx2Mu2d0iEy8By7FqJ48ZoVg==
-=wmsj
------END PGP SIGNATURE-----
-
---ozf36irfkpdfb4wj--
+Thanks.
