@@ -1,146 +1,97 @@
-Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26D8B757FC
-	for <linux-bluetooth@vger.kernel.org>; Tue, 15 Oct 2024 08:46:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36B2A1C9B68
+	for <linux-bluetooth@vger.kernel.org>; Tue, 15 Oct 2024 09:48:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728981964; cv=none; b=MFPfPbVTpubzWLlQBC5zOCnELY1Q4OWnOi6h3YMITC3voqvkYVSDmExKCWh0cWxU+XVE64XH+/vjHtTdCmoZf4AkcOXuDKAjCKISrXj+ueYJCDNo/EtyKQeIn3XTOrWINua6+jhh7LLtdxRzyzLtYfCAT0+izKhRAhgJuKR85JI=
+	t=1728985722; cv=none; b=c9jaZQnx47cYPOW9GBG/iv/TkyXxDWqbfSJ7zmQVjUiiFoncFW7dMSM2lNzOf8JBVwyqFMo3jhx69M11QPnKrYaFGU2NlqssBFs/2PoCsDWtFP8PyLoJTng20tB7hOPyXUELKt48k+cAUwSvQHrBWpr043j3BcCwbX0h/SoHdJY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728981964; c=relaxed/simple;
-	bh=7vHIM87eNaX3ejUjqfIM2HsQR797Aj6VtuCHdl+ICYE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=nsYL/wnuY9Cw+YgWIgA5pP8afEM4GZ5/XAHy8Ec01uVws2IWDZ1NjTBHPdPxso+Jnbxi0WpmJ1RqZZ2h+d4KLAdfURAa/h6iiHLRnZCwOq5IANirzxeG+i19vB+eKrEsIy0p9umLY25faube0U8T6jxztgn3FVlP3mlWLy1BSZ0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=eS1gMytK; arc=none smtp.client-ip=148.251.105.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+	s=arc-20240116; t=1728985722; c=relaxed/simple;
+	bh=yYb9sb5AxiXLVlD3bVkK64FKKxtA8VrXUNvbw1gtuts=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Jarius+8/B5YIrXR9nahzWEcQUBvk6mjvh9zBum2DjycSq+XT5nc9rMGh8fbjjPjcyE4FYB2iSCz0l4xp8bbw4v5tt9lxskgd/UVDCx+9i3Gv+ODZRdkOrwj07vvZDXNFdUUcNiY3osuuU08MgraWWEi8Agh0EdJO4UAs+u4Cjk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=iwDMg2Qt; arc=none smtp.client-ip=209.85.218.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="eS1gMytK"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1728981961;
-	bh=7vHIM87eNaX3ejUjqfIM2HsQR797Aj6VtuCHdl+ICYE=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=eS1gMytK/UkljJJVHSCeaQIbsyRBquDiJfBUWJ/am1MjvKN4hx42JaWncX4mjQcV8
-	 Xr1JOmxl/FerSNfczs1nQXoAsV3I+2/mWYw2fqffgyTNrVtTnVG0xye0jtlv7FS9u7
-	 x5DT7MEtXOoJVM0kFOCppXXGVrMqf4MJYNUR6OjzF8scFdcQRLRM18KoUgdz7sCLJn
-	 +HLj727BEmeg6sYkH/1mkQvRwD0GJUATssOcooQ9MJ2JF13h4OfQ8kgYAA6maan0Ln
-	 IA2ZZMjkZsIgv9AcB9AMOjAjd8Zz/LE/GghuiGItvNPZcu0Cipc0ErANr7hzwxBNUI
-	 1RHvRfgyPMoHA==
-Received: from [192.168.1.100] (2-237-20-237.ip236.fastwebnet.it [2.237.20.237])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits))
-	(No client certificate requested)
-	(Authenticated sender: kholk11)
-	by bali.collaboradmins.com (Postfix) with ESMTPSA id 2AB9417E1167;
-	Tue, 15 Oct 2024 10:46:01 +0200 (CEST)
-Message-ID: <f0b77d1a-b2b6-46a3-a6a1-44dc601e8584@collabora.com>
-Date: Tue, 15 Oct 2024 10:46:00 +0200
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="iwDMg2Qt"
+Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-a994ecf79e7so788310466b.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 15 Oct 2024 02:48:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1728985718; x=1729590518; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=1teDS0JJcna/90ckTpcvCS/IaGCA4XWx1Jz7qyJi5jg=;
+        b=iwDMg2QteR0yvQQM8Nr9teOoWqzj45RezjE8fzK0xcJK1mpdZzVBOXiw5YrjND2Gn2
+         Mqo4KoPBtdmjzEThnKdagd4ypoBC1COy25D+624kMRHZ1ld7KlairyjXLUxkrFDxUPtS
+         vruKcjH7YHyLWQxFtKOHarjn1uv6vBJw8+vdesNq4GN6ZPXgB79JKynZt3eVoYBO8PhR
+         09kKyjNo2F9CjbYkdI7+/hYOWMLeZ0Trn1zpeYwX31stqr7HpVxhHMnw1nmRAsDhkXzn
+         By/WZbBBG8VJglj34kTh+hry6tBMoV00Lz4x0fwIiqPvW8kgqApwOMdzap/i6WjR2+Gf
+         hytQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728985718; x=1729590518;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=1teDS0JJcna/90ckTpcvCS/IaGCA4XWx1Jz7qyJi5jg=;
+        b=JUsiz/1Eah4ei8fTi+xggs/5iK8tL+Bpbn64vm8xXVCRkt1ZUdQfUirCR4k+cV0SY0
+         ppZbonHKX2DL73XXv58BFY3IGIKQTVU7sKgyPfdAD+YIJxMzEeJ13iKBBbvSD0EcmKGI
+         sSx4oTuAghMEXBwlYtN6srGa9snMC1MDD6jo5LnD+yE+2tvZiu5Wn7mMQldSlSHLzGtC
+         9Xlwcbr9nQ3g0gLW5BWso/YcTx4w4tOw9H1G/o/XwA4y66DK9tjFMbzNblLON/lS4dvu
+         J9rwBIBiH4MnU2abVRjU8TW28kmiTS1FgDnRcpS0oi9ke3rC0YUvwoIy/ej56IZM5MAK
+         gvdQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXk636a/73BmoncZaQ0OBfUADnuwuS4aQCaABtZrnKqF5n7N+s19GwfJ9qPq6m3aUmyUVZgisfRww0JklRfdcw=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxa0kGJrAIgl47xKn84CrOpybBQy1OANG0a62iUDcAt4NjPbvrq
+	WlHIVsNUPiTUBnUAbtmVcfXASGGfb2qlld4I4R1awm52SvRXmtqUNOA/1SAiObZoXjoVt1rn/8N
+	G
+X-Google-Smtp-Source: AGHT+IHVV5gB4sO2s8rG8UOt0XzDKS6ScXRIKX4PKjbNf6jNN37IksWraaka1Knc+QX36AetoAcjJg==
+X-Received: by 2002:a17:907:869f:b0:a99:fc3d:7c76 with SMTP id a640c23a62f3a-a99fc3d7e78mr723129666b.37.1728985718522;
+        Tue, 15 Oct 2024 02:48:38 -0700 (PDT)
+Received: from localhost ([196.207.164.177])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a9a29850a36sm49903666b.181.2024.10.15.02.48.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 15 Oct 2024 02:48:38 -0700 (PDT)
+Date: Tue, 15 Oct 2024 12:48:34 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: "Everest K.C." <everestkc@everestkc.com.np>
+Cc: marcel@holtmann.org, luiz.dentz@gmail.com, skhan@linuxfoundation.org,
+	kernel-janitors@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH V2][next] Bluetooth: btintel_pcie: Remove structually
+ deadcode
+Message-ID: <8a4a8915-d59a-407d-9f93-f047370cca62@stanley.mountain>
+References: <20241015045843.20134-1-everestkc@everestkc.com.np>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RESEND] Bluetooth: btmtksdio: Lookup device node only as
- fallback
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
- Chen-Yu Tsai <wenst@chromium.org>
-Cc: Marcel Holtmann <marcel@holtmann.org>, Sean Wang <sean.wang@kernel.org>,
- linux-bluetooth@vger.kernel.org, linux-mediatek@lists.infradead.org
-References: <20241008082721.4004100-1-wenst@chromium.org>
- <CABBYNZ+UGx8TtW+aXZer_j=L79NYEP28+FcSeRqT3BKN7L+CGw@mail.gmail.com>
-From: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
-Content-Language: en-US
-In-Reply-To: <CABBYNZ+UGx8TtW+aXZer_j=L79NYEP28+FcSeRqT3BKN7L+CGw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241015045843.20134-1-everestkc@everestkc.com.np>
 
-Il 08/10/24 15:39, Luiz Augusto von Dentz ha scritto:
-> Hi,
-> 
-> On Tue, Oct 8, 2024 at 4:27 AM Chen-Yu Tsai <wenst@chromium.org> wrote:
->>
->> If the device tree is properly written, the SDIO function device node
->> should be correctly defined, and the mmc core in Linux should correctly
->> tie it to the device being probed.
->>
->> Only fall back to searching for the device node by compatible if the
->> original device node tied to the device is incorrect, as seen in older
->> device trees.
->>
->> Signed-off-by: Chen-Yu Tsai <wenst@chromium.org>
-> 
-> I was hoping to see some Reviewed-by/Tested-by here, were the mediatek
-> made aware of these changes?
+The subject has a typo.  s/structually/structurally/
+
+> The intel bluetooth module was successfully built after the change
+> without any errors.
 > 
 
-Sorry I didn't see this patch in my .. rather big .. stack of patches :-D
+Delete this sentence.  It should just be assumed that changes don't break the
+build.  You can put that code isn't tested under the --- cut off line, if you
+want to put a warning message.  But we don't need this in the permanent git log.
 
-I can confirm
 
-Tested-by: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com> # 
-MT8186 Corsola
-
-Reviewed-by: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
-
-Cheers,
-Angelo
-
->> ---
->> Resending after three and a half months.
->>
->> This follows up on the MT7921S bluetooth binding and DT fixup patches [1].
->> This should not be backported.
->>
->> [1] https://lore.kernel.org/linux-bluetooth/20240412073046.1192744-1-wenst@chromium.org/
->>
->>   drivers/bluetooth/btmtksdio.c | 17 +++++++++++++++--
->>   1 file changed, 15 insertions(+), 2 deletions(-)
->>
->> diff --git a/drivers/bluetooth/btmtksdio.c b/drivers/bluetooth/btmtksdio.c
->> index cc097aedc1e1..a1dfcfe43d3a 100644
->> --- a/drivers/bluetooth/btmtksdio.c
->> +++ b/drivers/bluetooth/btmtksdio.c
->> @@ -1328,6 +1328,8 @@ static int btmtksdio_probe(struct sdio_func *func,
->>   {
->>          struct btmtksdio_dev *bdev;
->>          struct hci_dev *hdev;
->> +       struct device_node *old_node;
->> +       bool restore_node;
->>          int err;
->>
->>          bdev = devm_kzalloc(&func->dev, sizeof(*bdev), GFP_KERNEL);
->> @@ -1411,13 +1413,24 @@ static int btmtksdio_probe(struct sdio_func *func,
->>          if (err)
->>                  bt_dev_err(hdev, "failed to initialize device wakeup");
->>
->> -       bdev->dev->of_node = of_find_compatible_node(NULL, NULL,
->> -                                                    "mediatek,mt7921s-bluetooth");
->> +       restore_node = false;
->> +       if (!of_device_is_compatible(bdev->dev->of_node, "mediatek,mt7921s-bluetooth")) {
->> +               restore_node = true;
->> +               old_node = bdev->dev->of_node;
->> +               bdev->dev->of_node = of_find_compatible_node(NULL, NULL,
->> +                                                            "mediatek,mt7921s-bluetooth");
->> +       }
->> +
->>          bdev->reset = devm_gpiod_get_optional(bdev->dev, "reset",
->>                                                GPIOD_OUT_LOW);
->>          if (IS_ERR(bdev->reset))
->>                  err = PTR_ERR(bdev->reset);
->>
->> +       if (restore_node) {
->> +               of_node_put(bdev->dev->of_node);
->> +               bdev->dev->of_node = old_node;
->> +       }
->> +
->>          return err;
->>   }
->>
->> --
->> 2.47.0.rc0.187.ge670bccf7e-goog
->>
+> This issue was reported by Coverity Scan.
+> https://scan7.scan.coverity.com/#/project-view/51525/11354?selectedIssue=1600709
 > 
-> 
+> Fixes: 5ea625845b0f ("Bluetooth: btintel_pcie: Add handshake between driver and firmware")
+> Signed-off-by: Everest K.C. <everestkc@everestkc.com.np>
+> ---
+  ^^^
+Cut off line.
+
+regards,
+dan carpenter
 
