@@ -1,68 +1,68 @@
-Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
+Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0307A1AC420
-	for <linux-bluetooth@vger.kernel.org>; Tue, 15 Oct 2024 08:05:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EA011AB512
+	for <linux-bluetooth@vger.kernel.org>; Tue, 15 Oct 2024 08:06:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728979560; cv=none; b=efHZGQHy1yKiLqBix+jhMcH8jQ0HhuABnnmh1zayz6zPu1beDc9F/7Z+EGMac5viOC06XwXtxGxiO/qskGn/FQ87MGNHzpyEjorjFEc76NGX42HHkqo00dh8T3voJTU8jR14KLZmz9JawjyL9gbQcYXf7b7rE7gdejyCt7oIBus=
+	t=1728979605; cv=none; b=ayxOyoH4T0pMp0o6RcjfKUpscneqIoF/cSVOWSZCp91Iyl1UGBCY2d1vnJ2wK64eNbWt+GNYslRMd7HTTi6AV268A8jvH93Gai8uzhy7GlLs4grHgW5RPEoUnyJ+HAfCjHrIZGyCuh+Xlrq2ZZUsVIyL6qQkdrF84+Wa8x2vJM0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728979560; c=relaxed/simple;
-	bh=Hf5sbom+1tJSI+T1tEa2calPUSzRvUp/AGZZU7Rgx/4=;
+	s=arc-20240116; t=1728979605; c=relaxed/simple;
+	bh=MnUQlUTrmLKSN5pDHrMF08s+M/AmbbftkUAMLC0mhYI=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=SEk4nTgmfbucvRiPVbLPbMC7h+ydo+qPMEbk7+1hzbFSSZQSU5B33KC7Pifx2SkUrJvNR05HZo5uCa1rhxX1hGRxjTyRGTQnXj0rP8pBMTmj43IfZRFQzgNVV4WRIqoGQ7gZNDKSxSlt51d+Or8GSqLAv2XzmCholudeTMKVdR8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=uIy00g5u; arc=none smtp.client-ip=209.85.208.47
+	 To:Cc:Content-Type; b=XMic/wTr6D944cRmvwHXc6221AAwK5DPB+msLkzjhZWu/HFksr2shhbsT9RF7BApnChShYch2AoHXDexUcezyFqDrD7blAGoUiKIZJ55sXQQE2LayuwaL++ZrfYjr8wbmhwdexZCutcFGTjHPP6gZGGyVi2pocC4ja+l7Wt7ikA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=lr94FdLR; arc=none smtp.client-ip=209.85.208.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="uIy00g5u"
-Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-5c42f406e29so6720176a12.2
-        for <linux-bluetooth@vger.kernel.org>; Tue, 15 Oct 2024 01:05:57 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="lr94FdLR"
+Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-5c937b5169cso7345057a12.1
+        for <linux-bluetooth@vger.kernel.org>; Tue, 15 Oct 2024 01:06:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1728979556; x=1729584356; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1728979602; x=1729584402; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Hf5sbom+1tJSI+T1tEa2calPUSzRvUp/AGZZU7Rgx/4=;
-        b=uIy00g5uc5/MNXBoMMXjv/FkTQ1e2ymwkzCw8jBH62o4ZHiIODDL+m6fGgbnWboRLB
-         jxX6arD5E7wtF4tCumoAth6sQ85E8Gqna2bh71o23NDFzITPk7/P1MXWYYCY5ypkMBuB
-         A0XfS4mObQ1jxr6aX0dCL3HkR6vx44zSut4FqLYFAqx9IU9nvLNjhjoS4IMAvp9P/UXx
-         Ewt8HiLpOlUwz4bJ26VmBxRSeox6KxaC22AHY3Z249mGHo3e7MbPZfAKICQ7ZeFPJQPk
-         wr5j+wbfWp89DquCFjB/z6CHFiIAYlTt8clpVCFq6yEY4Bf83H+y1OtpMGVC4L60arSS
-         z4wQ==
+        bh=MnUQlUTrmLKSN5pDHrMF08s+M/AmbbftkUAMLC0mhYI=;
+        b=lr94FdLRow5MpDSV69VaIs5JmCt6yA3bF5N+2cuNzTNVxeZ5cyu9iFXK8Nuxr+0bS8
+         m/rPR4N4bAYeelgljVzkabv/4WBXiEYO41dZT4lL0rSL986fAGiQ7hdx4gBY86etmC3O
+         MnAVF2dAMR131qOR4+bu2E57CYPFXXTeH/Gj/n1/KjFm5eRI2SuHYPALwDHrbbxLqRxv
+         zV64fsEI1GgVBIFeGqpxVGHQh5gVicixv2SoVUIxFrE6NKzTlE8ROEkWYVLqdKyVwlfL
+         /XbTfKFF5GGMNKUlpUgI/0mH55vnol7kzJfxQTc9xW3qEKHaUfzotThbljaIE23TE5c5
+         DKPQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728979556; x=1729584356;
+        d=1e100.net; s=20230601; t=1728979602; x=1729584402;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=Hf5sbom+1tJSI+T1tEa2calPUSzRvUp/AGZZU7Rgx/4=;
-        b=kRDIM8Af11Zhff4NzFbqARhKcbCBph+jXBdKStyCf1NMXtl1+vU3n1qUf8FnqIvNUz
-         AAumUr2/bZlGnbje9J2KCdN53ygJBkmAKZhV+7oIDpp6yNd0eDgThbVZ4EZhcdCVW4PW
-         mKzgAQezIxuJhv9h/4l0f+IZ4Nuz2+8Cd+Pyl/1/5oyPVyK+HFZdJvjFgjFF75oKksd6
-         1aG75Qgkl9i0M1dFpgwxph/pzbOpFmA7iTt5cRtOCMc5mnoO/TYMp147oArjEy/xqyc5
-         D7yG4aSV8WaBPR9zsMIZrUFSUDi5BQhkwp9+CSYCdatOTZCcfJtqgVwFw5xn2+yb5wwb
-         RUhA==
-X-Forwarded-Encrypted: i=1; AJvYcCWtn2tu2XbgkrQKFYXu9uL8+zB7niXBLZgkgRh90P/0Y74xgKgcv29Z9XENSWlVrE624l5B0nrWzIG9kC61fyA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyYIV8R5OPrAeNOUs8Yrn1UEryjZOu4qRoBcu7n61GbMq+o+lxF
-	ySspxrXBQneM5Cx7XlCuQj4LgeciZw0j4gaKFPHMDJ0BbGzbr/X0RoxNi6Zc/CEvnSHZmW70TlG
-	4NxDCTJpxQ9lGniaW+RlHtOxPUH5fO4Vid0T5
-X-Google-Smtp-Source: AGHT+IF0xxh48FLIEsnDmDAKak+sCF3RjcMU7ZWLhjOUWb3x23/TajMFkARYnF26YLJz7ZmTIiE7WFXReASZlV8NFgM=
-X-Received: by 2002:a05:6402:2690:b0:5c8:9f3d:391b with SMTP id
- 4fb4d7f45d1cf-5c948d4faa2mr11526448a12.28.1728979556044; Tue, 15 Oct 2024
- 01:05:56 -0700 (PDT)
+        bh=MnUQlUTrmLKSN5pDHrMF08s+M/AmbbftkUAMLC0mhYI=;
+        b=L623SBxFb7eVQPNTyS0vTwIE6/kgBJVdZ2mlF0Du6iAT68w4yDI2rDLoX+3YyL/huK
+         NQSU3hg5JmuSMIwpLBPlOeT92NrpFyTEnci9SvSGx7NwiI0054qNzs4ZLOEv/hx3v0q4
+         QLbGsRNDfjX+2cQSYS02ye5LN3YrQJWhxVa8mXrHxSOaJ0ULjrJzLprhAxJM/Sd8Uwi1
+         cl4eySvbe9fdx425R/QnmOODHvm79jd29wecM2WroCIE41IfoVLLLSXYAj6lha1WTUYf
+         bhRmVBpmTPuA+PXhd/KrTkf/iP3Wzq3RH0Fd5ZBqoD9cbUE4VuTXZNggmS+bs4Gk6R8K
+         GfjA==
+X-Forwarded-Encrypted: i=1; AJvYcCVe1vGZfrhaVNxz3M4a/C5+RmmpRyjyY7WWd6yTjLSfrvqc0M+zDLEZRvEFcDnoxqUrQ9ruj1fsl7cPtplXSk0=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz6WgRnOgrgi/S6DtSBHp/6MzvWeBzN8Vi05GI6fmcIqg9YOnZ4
+	K7ZQ/o1W49NeFBsNcVNzb4t5lUDPUaQQy0V83ODt2CG9FAFs3vouCW454hSjL0CMS8HNBHmeu9P
+	TS9c9YeAtUY4rfFan/YK6eHSzWUmwGyVicqpm
+X-Google-Smtp-Source: AGHT+IHX6XMf3AiOgHYusjY2hNGSXpUuy0ABfjJ3dJvLGNh+47L9g5T2krprPD/SxUBg5s4JP85Vt3VKjMD2UkK3OMo=
+X-Received: by 2002:a05:6402:5251:b0:5c8:9f3e:5efc with SMTP id
+ 4fb4d7f45d1cf-5c933544887mr15998193a12.6.1728979601480; Tue, 15 Oct 2024
+ 01:06:41 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241014153808.51894-7-ignat@cloudflare.com> <20241014213705.99272-1-kuniyu@amazon.com>
-In-Reply-To: <20241014213705.99272-1-kuniyu@amazon.com>
+References: <20241014153808.51894-9-ignat@cloudflare.com> <20241014214046.99495-1-kuniyu@amazon.com>
+In-Reply-To: <20241014214046.99495-1-kuniyu@amazon.com>
 From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 15 Oct 2024 10:05:44 +0200
-Message-ID: <CANn89iLMgdebS-EZHo4mcQtgrG1AmvK7xKTmPL4PNEmK1PzDVA@mail.gmail.com>
-Subject: Re: [PATCH net-next v3 6/9] net: inet: do not leave a dangling sk
- pointer in inet_create()
+Date: Tue, 15 Oct 2024 10:06:30 +0200
+Message-ID: <CANn89iJdmrOEYy3sH2A-1rBE8sVyDJq2yx3jVy1GmKoeqr8cTw@mail.gmail.com>
+Subject: Re: [PATCH net-next v3 8/9] net: warn, if pf->create does not clear
+ sock->sk on error
 To: Kuniyuki Iwashima <kuniyu@amazon.com>
 Cc: ignat@cloudflare.com, alex.aring@gmail.com, alibuda@linux.alibaba.com, 
 	davem@davemloft.net, dsahern@kernel.org, johan.hedberg@gmail.com, 
@@ -75,19 +75,18 @@ Cc: ignat@cloudflare.com, alex.aring@gmail.com, alibuda@linux.alibaba.com,
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Oct 14, 2024 at 11:37=E2=80=AFPM Kuniyuki Iwashima <kuniyu@amazon.c=
+On Mon, Oct 14, 2024 at 11:40=E2=80=AFPM Kuniyuki Iwashima <kuniyu@amazon.c=
 om> wrote:
 >
 > From: Ignat Korchagin <ignat@cloudflare.com>
-> Date: Mon, 14 Oct 2024 16:38:05 +0100
-> > sock_init_data() attaches the allocated sk object to the provided sock
-> > object. If inet_create() fails later, the sk object is freed, but the
-> > sock object retains the dangling pointer, which may create use-after-fr=
-ee
-> > later.
+> Date: Mon, 14 Oct 2024 16:38:07 +0100
+> > All pf->create implementations have been fixed now to clear sock->sk on
+> > error, when they deallocate the allocated sk object.
 > >
-> > Clear the sk pointer in the sock object on error.
+> > Put a warning in place to make sure we don't break this promise in the
+> > future.
 > >
+> > Suggested-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 > > Signed-off-by: Ignat Korchagin <ignat@cloudflare.com>
 >
 > Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
