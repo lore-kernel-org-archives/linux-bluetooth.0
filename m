@@ -1,106 +1,121 @@
-Received: from mail-qk1-f179.google.com (mail-qk1-f179.google.com [209.85.222.179])
+Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FB531BF58;
-	Tue, 15 Oct 2024 00:52:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09F8B4428
+	for <linux-bluetooth@vger.kernel.org>; Tue, 15 Oct 2024 04:52:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728953554; cv=none; b=IGm+Re2b+cgUP7S0dwylLfW4U9VLw9+qe0oYtfv//bkcoR/zFRgIThXQXRO6Cw0Nf3+nFdieVaebvJgrnfcWkZfDcyebhzk/Lrjja28OMEXISPYMH4PBek5U2RYD1ti5+szxTzf3OBl+n1SsjkICJ0hXoOf5wSUJRDbMzdMm95o=
+	t=1728967961; cv=none; b=tUIJr4uoyooYhP0i8/3cMFY/asm0WcnZXY3r1k68eE0E9Bn3xTe6rBYtGSVKnhwOWNaYu3uHpRAFyYfKxqpBtc8kvxKpPqrnrfDHdZtUAR4fvXSnt8K2zfuffMCs6DS3DFPLPG+b9qNGrx3jJa/KErL77SxZb5Pjw6X23EK0O84=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728953554; c=relaxed/simple;
-	bh=aVKfZJ4eEpOYJu+6LVskjGJAV3K8Q656V8WpGjiOEso=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=UeFhEpwFUyw5JGSdzxk/anLOQBubDnmAytmoAtZ5halNo1YmHFiA9LhN7Kvmb1UCbB8nelbwgsbBNSlfsFNwykdZmhhjkhiqO84J/qoN40Y1/A3ZVkE5qw/KayjZ0zWmBzBckwVGwpAj2NsiBXIk1taw6bV1DKSFYctCngW2HI4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MUsV0w4f; arc=none smtp.client-ip=209.85.222.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1728967961; c=relaxed/simple;
+	bh=RPykLgYMdLDxPzBE22J0+SM2QnMSSPWqRX74HBp54NI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=FUC3pFN/HvYwIiHTCs7fxRrlhRpVrOVFppHpooJABwoTkJ+F9YVFXPFEXg2mlw9/DanZnLIusFS5hbgKw/GwWRYkL7GuYpDMiM5EJewpuJ9uBgDuOjK1DuBOe8W3mMBUZCDGrDMAUt7NU3FaapvvfWrG1BVfTtBz9bL3YWUba0c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=everestkc.com.np; spf=pass smtp.mailfrom=everestkc.com.np; dkim=pass (2048-bit key) header.d=everestkc-com-np.20230601.gappssmtp.com header.i=@everestkc-com-np.20230601.gappssmtp.com header.b=OQqs7p2u; arc=none smtp.client-ip=209.85.208.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=everestkc.com.np
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=everestkc.com.np
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MUsV0w4f"
-Received: by mail-qk1-f179.google.com with SMTP id af79cd13be357-7ac83a98e5eso408703385a.0;
-        Mon, 14 Oct 2024 17:52:33 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=everestkc-com-np.20230601.gappssmtp.com header.i=@everestkc-com-np.20230601.gappssmtp.com header.b="OQqs7p2u"
+Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-5c95a962c2bso3635208a12.2
+        for <linux-bluetooth@vger.kernel.org>; Mon, 14 Oct 2024 21:52:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1728953552; x=1729558352; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+        d=everestkc-com-np.20230601.gappssmtp.com; s=20230601; t=1728967956; x=1729572756; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=2aYX219RK+CaWry4o0T9wVu7qlr1XF5G4zHAtaRKlIU=;
-        b=MUsV0w4fomBWYZr05GqjfEN2mIhs41pygkqZknQ5f2nELAV/Dc4r3ZszWbYSN8ctuv
-         nNo190AyPvNUG9FlMsggLnKmb0ZyffKTffsM3G7IDPrd9rkCVe8qlIPFSnYJQRZK1dZy
-         z7mo9VjL2OT7d/biUqaIWSTOBovnQMuHXDrVDkXr2IJgKrVDGjgQK2VoVkTq9vP8TG1n
-         o2IJBVtyivvPEGAFURHhSmhp2o+JOaNrKHsJ3mCH0I91T2R0iTI1ijj/DbO1OlNwjYeM
-         KIw+gbA7bizbYuOhKtkSvHHqxdC/8aOzvLt6ANUcBmYhl8s0RYMHLxgoQj7+c3pXhHZG
-         T9CQ==
+        bh=3tWqqKxhh0W/7ivNqGTlKJCb3/UvZfM/VJDc1l0Xb14=;
+        b=OQqs7p2uTdQ/utQkYhiIbxreYb2A3+8/6w6S5NCQl4WF4vc/wOS4CCyu9T7PqLzQeB
+         c/lPtxllcUb0STZr5AuZJB008Msrs+eUBlyIcyIw7Y+4H7TUnLnoUik7DnvpOjYKgL5i
+         9UnNCVep+GxANE0TKG0QBtddxaEoIdr3XVdWbGJQcnfNnmFDtQ+CaC/j9331eHtsTgOA
+         efYo2NiIUq0Qn6ww0sBC2f9d51dbYgMNw8roonZDugalyN+H1QqeeqS31H9yQ7jJz8dl
+         l7PWYZ3H+38LZBvxnOhdKM2C7uQOYyiIO5cBsvNBKs/W+Eg57bbPdKjYrrt33XI6Ea2n
+         PUTw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728953552; x=1729558352;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=2aYX219RK+CaWry4o0T9wVu7qlr1XF5G4zHAtaRKlIU=;
-        b=nxLEvpyS9nQ15NgCqhs26915V0Ulvf9lxS2nnS0RIlxvDPtifChiNnXUpH4Ip++rsX
-         bcZKAbUznHJNrdRZPE+jUmFekLsK7cVRr9mvYaDKXGrhrJ+8E66XYp2jwcJWvtW8noJd
-         tGCA2pIMdJW4ydik7qJxsPGmljRRuFIH/etsthfiwVwBoRT/A2dRFxQAEbGHMaLSiMf4
-         K5TYDN5jVRVsUm+3ESHxUQB3z9G3W4HCgROZzFTmtCSYb3LnlNrFCd3HWVLkhi/QjQ1n
-         mL6vI7OkFaMwHvZA/doAo/SiwTxwew7pSGN2a3tFIlCoVwI5PgzX6nunnUlsXzv3YmMr
-         CFSw==
-X-Forwarded-Encrypted: i=1; AJvYcCVkh8FHx7kviVPlsD4wzc4NJ4qhaHgAdIBd2cT4mW877Zi+Bzz2Z27lWlkmo5EUvSX4kh31UH2KZhJJ+w==@vger.kernel.org, AJvYcCW4RaElOADJvGC2q8eAuSpyJT6XKS9+5VqO5weVvuXZMRBzkh1M0B586kVD+Gl5yGAC9nrsH8UAu7aWCCMgt5g=@vger.kernel.org, AJvYcCWR0gXHZvcEdNYzk0ypKdnJvLGu12tgaDNPilEw3SqsmH5TtCzcwAKhaAjQseor6ozXW9Sdb/8g@vger.kernel.org, AJvYcCWYSm2RNw3rC8aINeKyQhCq22S37et+10ZSnhW9T9rdnq4iRmvr1nAcruln3ARtAvIJGbbQqqR5VnEckYQG@vger.kernel.org, AJvYcCXriFA686ew/qLj+B6BF8jLMFQVYYoUjAxx0W9NE3EXX0vI7n7MEaimtGimbjOSmvm6HmePtpZ6g1XU@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy5kTrr6bmtmOiFMUzCzbSXCXhtWQleeoW/hoy4cjl6rcJEkDfw
-	QnWK73E6BJeKzBwnnVApeh8ERaX/FxIIaEIs5h8hoHPJ3hK0LZey
-X-Google-Smtp-Source: AGHT+IFbmtgU86GpXLnwWNb+P/+we0eWd+N28TohoCcxIS9tuL/e9rBJv8T+QvMJ+TVmhykYKs2KDg==
-X-Received: by 2002:a05:620a:4547:b0:7ac:e8bf:894a with SMTP id af79cd13be357-7b112517b5cmr2674571185a.20.1728953552152;
-        Mon, 14 Oct 2024 17:52:32 -0700 (PDT)
-Received: from localhost (86.235.150.34.bc.googleusercontent.com. [34.150.235.86])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7b13616735fsm10528285a.19.2024.10.14.17.52.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 14 Oct 2024 17:52:31 -0700 (PDT)
-Date: Mon, 14 Oct 2024 20:52:31 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Ignat Korchagin <ignat@cloudflare.com>, 
- "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, 
- netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, 
- Marcel Holtmann <marcel@holtmann.org>, 
- Johan Hedberg <johan.hedberg@gmail.com>, 
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
- Oliver Hartkopp <socketcan@hartkopp.net>, 
- Marc Kleine-Budde <mkl@pengutronix.de>, 
- Alexander Aring <alex.aring@gmail.com>, 
- Stefan Schmidt <stefan@datenfreihafen.org>, 
- Miquel Raynal <miquel.raynal@bootlin.com>, 
- David Ahern <dsahern@kernel.org>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
- linux-bluetooth@vger.kernel.org, 
- linux-can@vger.kernel.org, 
- linux-wpan@vger.kernel.org
-Cc: kernel-team@cloudflare.com, 
- kuniyu@amazon.com, 
- alibuda@linux.alibaba.com, 
- Ignat Korchagin <ignat@cloudflare.com>
-Message-ID: <670dbccfd4c2_2e17422947e@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20241014153808.51894-2-ignat@cloudflare.com>
-References: <20241014153808.51894-1-ignat@cloudflare.com>
- <20241014153808.51894-2-ignat@cloudflare.com>
-Subject: Re: [PATCH net-next v3 1/9] af_packet: avoid erroring out after
- sock_init_data() in packet_create()
+        d=1e100.net; s=20230601; t=1728967956; x=1729572756;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=3tWqqKxhh0W/7ivNqGTlKJCb3/UvZfM/VJDc1l0Xb14=;
+        b=S8NHcRN7HzrE61DVIZKASH5HYkg2btcllf7l3mgFz9TTMoX4kkcLYylcNhN+43B+F9
+         e47vhTRSYIrcTmcaphrMwgL95+ILeIT3qMjq0vG8X1WGop754ahWPYiu5XGv02AVnw1d
+         m9EGE7/WpmphKbZAcxR4M4iFmydOvdxxlRUkSEGSThIQM+cRPtAKHYfnSAht14tFUpvx
+         ffx8IGctC6jeBg0h7JhXBbMw25NkIvRMClw9GEea7BJ0UJfoL/VosgwZrH/9dh48fLV4
+         HUosj31hAHqyzAzj6TXK45MHrJq0NG87cZeQNebTwGdz1p99LrEUmhIm7QTB3rU9o29Y
+         GIIw==
+X-Forwarded-Encrypted: i=1; AJvYcCUNLnlyXXjVueA9UbFeJBm9g6xPLHvjABAqPFIYetjOXI9pkP3RpfLuzWaSB8r3ie6jfvNYVzRZd9gsNtwBbnk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxMo6VSDUZDG4knbzsrfDjBq8P2+YyT5kR6v3UJQi9/6qiswK/F
+	+5HYYOZODV6Xj3oaL1/zFE4SILnc4gJWQgnDCnTTbNekOCrQtB2OCXBHiF61jX/nhrvAX06Qu2E
+	Omf+X3qDqGNSgxNsPWYO4i+hv8kz4h/p25prmMQ==
+X-Google-Smtp-Source: AGHT+IEU/y1a6FgQfI8YjfSVfdTShpUrSSTkz/b0IuV43k0+CLIh2c64950510hjkg2XerOUrGRbQTlqPjI3HimJE0Y=
+X-Received: by 2002:a05:6402:5c9:b0:5c8:a0fd:63d6 with SMTP id
+ 4fb4d7f45d1cf-5c948d24835mr10997520a12.20.1728967956209; Mon, 14 Oct 2024
+ 21:52:36 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+References: <20241014163001.4537-1-everestkc@everestkc.com.np> <31a73bb7-47ec-496c-8a65-02e331051e0e@linuxfoundation.org>
+In-Reply-To: <31a73bb7-47ec-496c-8a65-02e331051e0e@linuxfoundation.org>
+From: "Everest K.C." <everestkc@everestkc.com.np>
+Date: Mon, 14 Oct 2024 22:52:23 -0600
+Message-ID: <CAEO-vhEg_whKPkWmym99+a1Lx2kU5CcBCYrz6unKANbCbV9dHg@mail.gmail.com>
+Subject: Re: [PATCH][next] Bluetooth: btintel_pcie: Remove structually deadcode
+To: Shuah Khan <skhan@linuxfoundation.org>
+Cc: marcel@holtmann.org, luiz.dentz@gmail.com, linux-bluetooth@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Ignat Korchagin wrote:
-> After sock_init_data() the allocated sk object is attached to the provided
-> sock object. On error, packet_create() frees the sk object leaving the
-> dangling pointer in the sock object on return. Some other code may try
-> to use this pointer and cause use-after-free.
-> 
-> Suggested-by: Eric Dumazet <edumazet@google.com>
-> Signed-off-by: Ignat Korchagin <ignat@cloudflare.com>
-
-Reviewed-by: Willem de Bruijn <willemb@google.com>
+On Mon, Oct 14, 2024 at 6:02=E2=80=AFPM Shuah Khan <skhan@linuxfoundation.o=
+rg> wrote:
+>
+> On 10/14/24 10:30, Everest K.C. wrote:
+> > The switch case statement has a default branch. Thus, the return
+> > statement at the end of the function can never be reached.
+> > Fixing it by removing the return statement at the end of the
+>
+> Change "Fixing" to "Fix it"
+Will fix it in V2.
+> > function.
+> >
+> > This issue was reported by Coverity Scan.
+> > https://scan7.scan.coverity.com/#/project-view/51525/11354?selectedIssu=
+e=3D1600709
+>
+> Please include the output from the scan. People can't see this report
+> without logging in.
+The issue is no longer visible in Coverity. Though the code is still
+the same. The issue hasn't
+been fixed. Should I remove the link too ?
+> >
+> > Fixes: 5ea625845b0f ("Bluetooth: btintel_pcie: Add handshake between dr=
+iver and firmware")
+> > Signed-off-by: Everest K.C. <everestkc@everestkc.com.np>
+> > ---
+> >   drivers/bluetooth/btintel_pcie.c | 1 -
+> >   1 file changed, 1 deletion(-)
+> >
+> > diff --git a/drivers/bluetooth/btintel_pcie.c b/drivers/bluetooth/btint=
+el_pcie.c
+> > index e4ae8c898dfd..660496e55276 100644
+> > --- a/drivers/bluetooth/btintel_pcie.c
+> > +++ b/drivers/bluetooth/btintel_pcie.c
+> > @@ -391,7 +391,6 @@ static inline char *btintel_pcie_alivectxt_state2st=
+r(u32 alive_intr_ctxt)
+> >       default:
+> >               return "unknown";
+> >       }
+> > -     return "null";
+>
+> What happens when you build your patch with -Werror?
+> Do you see any build errors?
+I compiled the intel bluetooth module without error. Will mention that
+in V2 patch too.
+> >   }
+> >
+> >   /* This function handles the MSI-X interrupt for gp0 cause (bit 0 in
+>
+> thanks,
+> -- Shuah
