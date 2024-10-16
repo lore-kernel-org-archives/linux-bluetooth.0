@@ -1,125 +1,92 @@
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A560187855
-	for <linux-bluetooth@vger.kernel.org>; Wed, 16 Oct 2024 05:12:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17DD1B67E
+	for <linux-bluetooth@vger.kernel.org>; Wed, 16 Oct 2024 05:51:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729055578; cv=none; b=RS4HqWDsPhT6f1+mm4ClGoSTny4yqcjXK4i6wxdkgqOko844huYB4lcdcrqAV2iM2aCgWOFH+l82d7aLjMVdwRRDM/YhI3F9RJ9f8v1y4jsAU8t1ZEQXqHpaZjVsSYstJciJ4WnJWBWwY/YoU5q5T6637D9OjRJbHAHu84dPgn4=
+	t=1729057895; cv=none; b=EJi1jOLygjnCIcWNrrG3la9Gdaii/5FffSGb1zGzsHKbjGU9oMcZMOouCvEr+KsGNlkEFjYrAEa9pPqN03NSxwAo8+vwQqlJ7KLooGw5gcxkYovRq0hgH2+D0xVs6D78Qa4ZvuOucSdAR5GqRbK81x3sxjAyHRpWI4a/+Q+0I0s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729055578; c=relaxed/simple;
-	bh=QgioZlMoxbFbzXpSKENqC416TIvL8bHE9aSuk7mOjds=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=LobcYmL6mKDRV8WwW26RrACHuO7dPwxcW/aHWqRQXdV/f6FtYrIqDB0i1g40ioHQTzlFWWY469wW0Wp8EbP9mbNgeCVrMX3rgj7p+2FSrNj2Pj6CGdaLhRCmmp/b/1kVab6ZtrkndGyZcK1rVLRUziFgdjEKSPBVbKr614sz7Lk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from [192.168.0.224] (ip5f5ae84f.dynamic.kabel-deutschland.de [95.90.232.79])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 3D26761E5FE05;
-	Wed, 16 Oct 2024 07:12:33 +0200 (CEST)
-Message-ID: <36e9550a-3b45-4489-8370-afdc4f2fa6b5@molgen.mpg.de>
-Date: Wed, 16 Oct 2024 07:12:32 +0200
+	s=arc-20240116; t=1729057895; c=relaxed/simple;
+	bh=Uvj7oIBzg3vnN2/Cb7RF9LmOmht12Teu62O6OWHu5jQ=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=tQpZ43V/iEUgskJ6gj9GjdzSBF2/hHJMLJxbc7AE7DVsYScwpiLPUi+ddGFJLKybhXxg0V1jPTs3zcz4uZKdjuuphZqH8jL4qkPeJFyuIHYDhbdQtUfA8wN3RZ7Is0RSMlLiyBDHjddcwv8lihxh57WV2VuZ1Y7QFOpTUpko5gI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pkGILkDw; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pkGILkDw"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 053D5C4CEC5
+	for <linux-bluetooth@vger.kernel.org>; Wed, 16 Oct 2024 05:51:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1729057894;
+	bh=Uvj7oIBzg3vnN2/Cb7RF9LmOmht12Teu62O6OWHu5jQ=;
+	h=From:To:Subject:Date:In-Reply-To:References:From;
+	b=pkGILkDwydv8m1sEaFpYKd3Kjf3ctncHbRhGyCJbY6ZTlwkjU2JBfte5FulfCT27M
+	 1WTJdLE20GkWedbyHj5vPRw0XnNv/7V0NoXKd9h/gNRk6U3GsqcQI8yaTUKR0/Gnms
+	 gnDw/vuSKm1jsCmrLg9kRm/8fq3Z7ZuEo37HPIVpIidjvpn4K809otUr5ffKNUz0+W
+	 CgbtprYjH46wPB42EiAbOGlKB8cG1bJ97kYSPXhu5MKcfRrhVNhI3JH2AD6K8kpq5N
+	 ERVkwdUM1if8mwCIhdjhRZhXGuLp5XiCLTxZMMLzFVS6prt/YsK0Ejruh+ajI2nZ+n
+	 fgFolIQhB+VPQ==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+	id EF934C53BCA; Wed, 16 Oct 2024 05:51:33 +0000 (UTC)
+From: bugzilla-daemon@kernel.org
+To: linux-bluetooth@vger.kernel.org
+Subject: [Bug 219387] Bluetooth: hci0: Reading supported features failed
+ (-16)
+Date: Wed, 16 Oct 2024 05:51:33 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: regressions@leemhuis.info
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P3
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: cc
+Message-ID: <bug-219387-62941-lDclbCBrmZ@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-219387-62941@https.bugzilla.kernel.org/>
+References: <bug-219387-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1] Bluetooth: btusb: Fix not being able to reconnect
- after suspend
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org,
- Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
- "Rafael J. Wysocki" <rafael@kernel.org>,
- Heiner Kallweit <hkallweit1@gmail.com>, Kenneth Crudup <kenny@panix.com>
-References: <20241014202326.381559-1-luiz.dentz@gmail.com>
-Content-Language: en-US
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <20241014202326.381559-1-luiz.dentz@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
 
-Dear Luiz,
+https://bugzilla.kernel.org/show_bug.cgi?id=3D219387
 
+The Linux kernel's regression tracker (Thorsten Leemhuis) (regressions@leem=
+huis.info) changed:
 
-Thank you for the patch.
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+                 CC|                            |regressions@leemhuis.info
 
+--- Comment #1 from The Linux kernel's regression tracker (Thorsten Leemhui=
+s) (regressions@leemhuis.info) ---
+A few questions:
 
-Am 14.10.24 um 22:23 schrieb Luiz Augusto von Dentz:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> 
-> Calls to hci_suspend_dev assumes the system-suspend which doesn't work
-> well when just the device is being suspended because wakeup flag is only
-> set for remote devices that can wakeup the system.
+* Are you testing with vanilla kernels? That "Host: centos Kernel:
+5.14.0-514.el9.x86_64" is likely just from a sysinfo query, but looks a bit
+suspicious.
 
-Please mention that you revert most parts of the problematic commit.
+* Did this happen with earlier kernels as well? Or which was the last one t=
+hat
+used to work fine?
 
-> Reported-by: Rafael J. Wysocki <rafael@kernel.org>
-> Reported-by: Heiner Kallweit <hkallweit1@gmail.com>
-> Reported-by: Kenneth Crudup <kenny@panix.com>
-> Fixes: 81b3e33bb054 ("Bluetooth: btusb: Don't fail external suspend requests")
+* Did you update the kernel, or the firmware files as well?
 
-That commit is not in the master branch, 
-610712298b11b2914be00b35abe9326b5dbb62c8 is.
+--=20
+You may reply to this email to add a comment.
 
-> Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> ---
->   drivers/bluetooth/btusb.c | 14 --------------
->   1 file changed, 14 deletions(-)
-> 
-> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> index d14b941bfde8..c0b6ef8ee5da 100644
-> --- a/drivers/bluetooth/btusb.c
-> +++ b/drivers/bluetooth/btusb.c
-> @@ -4075,7 +4075,6 @@ static void btusb_disconnect(struct usb_interface *intf)
->   static int btusb_suspend(struct usb_interface *intf, pm_message_t message)
->   {
->   	struct btusb_data *data = usb_get_intfdata(intf);
-> -	int err;
->   
->   	BT_DBG("intf %p", intf);
->   
-> @@ -4088,16 +4087,6 @@ static int btusb_suspend(struct usb_interface *intf, pm_message_t message)
->   	if (data->suspend_count++)
->   		return 0;
->   
-> -	/* Notify Host stack to suspend; this has to be done before stopping
-> -	 * the traffic since the hci_suspend_dev itself may generate some
-> -	 * traffic.
-> -	 */
-> -	err = hci_suspend_dev(data->hdev);
-> -	if (err) {
-> -		data->suspend_count--;
-> -		return err;
-> -	}
-> -
->   	spin_lock_irq(&data->txlock);
->   	if (!(PMSG_IS_AUTO(message) && data->tx_in_flight)) {
->   		set_bit(BTUSB_SUSPENDING, &data->flags);
-> @@ -4105,7 +4094,6 @@ static int btusb_suspend(struct usb_interface *intf, pm_message_t message)
->   	} else {
->   		spin_unlock_irq(&data->txlock);
->   		data->suspend_count--;
-> -		hci_resume_dev(data->hdev);
->   		return -EBUSY;
->   	}
->   
-> @@ -4226,8 +4214,6 @@ static int btusb_resume(struct usb_interface *intf)
->   	spin_unlock_irq(&data->txlock);
->   	schedule_work(&data->work);
->   
-> -	hci_resume_dev(data->hdev);
-> -
->   	return 0;
->   
->   failed:
-
-
-Kind regards,
-
-Paul
+You are receiving this mail because:
+You are the assignee for the bug.=
