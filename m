@@ -1,140 +1,90 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48052206059
-	for <linux-bluetooth@vger.kernel.org>; Wed, 16 Oct 2024 12:04:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB4EE206059
+	for <linux-bluetooth@vger.kernel.org>; Wed, 16 Oct 2024 12:06:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729080275; cv=none; b=r6q+9TkXC70XY71J49EOWXbw2WqEesJr0lRIe5fO3Pc05TUU9kMFYh0odXLvkHa/bmtHv6f0gxRhE8Dyyx9o552tRG13e0JMFTi57IgwxEFtyZxMYE9JLHP3C67usUJXYHTSlapU9i71l7I5mZs2TEfu3HMZvFGnNxihqDhlaRg=
+	t=1729080389; cv=none; b=Tx1fU0WFCyjUMS7HovGoUtdfyD5trWm685/8D6CIEV0HiZnE/2kErqk9PkHmN8EiyDDW1axrOCZKXavE0/3DK3m1CF3wE/KHcBaDtrymWmb+AoHGQvMSQkJs9GY+LJ6GAkLmjj9YUKvgBnBQHV5colCAmn+HSP1mPNjkB4NKRH0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729080275; c=relaxed/simple;
-	bh=e4B9W5YZWAeL2lSGydllhfk65MFqYLAnvYVXg0a/Y6o=;
+	s=arc-20240116; t=1729080389; c=relaxed/simple;
+	bh=4SN5X0bez2mgGWMgG/3SzrmV/uR+JHsw64U1/RLOqNI=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=nxGIc+owdKvAV87jt7i8PhCRsHi4j2aMJMndiH+uYjFi/T2wc55pn6cHHZk7gStG6j4ayLN1TQoS+ur6bJ4BvQO7mo2LKFt6CIPyGJk3DexJevkW7dwHALWDmYCbb8/OZLugBNKj5tJJwS4xZkqHONiUz6uYkiDtUglqnalof5M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gG3+POpe; arc=none smtp.client-ip=10.30.226.201
+	 To:Cc:Content-Type; b=SZ37dBldEu7Y1JJUQKdHg9C3kL6gyZeW6sirKEmNDyR5KaO3WUCqqomftLVIBk13Y/Xejk8W5Bk8cBMuJP0a9iC4FuXTBGogD/nUceeToIYKdSvLIsvUvD+T4qFJeKUgMAMH3GLLUE2CQ+Rtib8RE28FREvCyHej93iU/ngGN6s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WHM24hvh; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gG3+POpe"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C17ABC4CED1
-	for <linux-bluetooth@vger.kernel.org>; Wed, 16 Oct 2024 12:04:34 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WHM24hvh"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8AD78C4AF09
+	for <linux-bluetooth@vger.kernel.org>; Wed, 16 Oct 2024 12:06:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1729080274;
-	bh=e4B9W5YZWAeL2lSGydllhfk65MFqYLAnvYVXg0a/Y6o=;
+	s=k20201202; t=1729080387;
+	bh=4SN5X0bez2mgGWMgG/3SzrmV/uR+JHsw64U1/RLOqNI=;
 	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=gG3+POpet/uh52H2PMS7p+Qr6UzAwNtneYuVuEST2EImUnWB27PYnn2t0gtcZ1yGB
-	 mRTEwptlyfUr6s1Xd8OqwiWJvfXRRPJ8opFVouX9Xis4dvfA4zt7RdekUl+r7gqbtK
-	 MZ7l6eDMFWEL8wp93KfJ3q9qGL8WYSoMDMO4llJhfkqTEbt1JjXBCOe0HQ3joPYeKA
-	 TbnMC+KHSVungiyfcG6ynKPkhqqUwXXljRFeIXgc+02mPOVk5itlmtAMGF87+k20YB
-	 PDMqm7JdB77pY44Y5AZpjcXiDguqtXuNZfa8kPQ0aQJ8m3/dPt4ZRWBcVcTUayd/fL
-	 77iwxxs2/gCGA==
-Received: by mail-oa1-f48.google.com with SMTP id 586e51a60fabf-288642376bcso2959787fac.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 16 Oct 2024 05:04:34 -0700 (PDT)
-X-Gm-Message-State: AOJu0Yy6/AIa/zvmoPVcYh6CynGhFp6m9h+Yq1TCtAKQUQsmDRS/wbUT
-	Q/y3ifrsMpiQewjgFnjLsVdDZjiN0y9LtGsh6am5+/x8PKyFoTWKft35fhV2iFrQxDE73bgB1Va
-	iLTuw71wOIsXmR/Ei9BZneHLcySY=
-X-Google-Smtp-Source: AGHT+IHq6P9q9n/Du6i4s+BJMxoQiOBFAx5yoEfFpRBCGczSxOKoJmira3tE0pgTTwuJ2DLtOeIzbarvhrANaflsAdY=
-X-Received: by 2002:a05:6870:89a4:b0:286:f9c3:ed78 with SMTP id
- 586e51a60fabf-28887477421mr8952706fac.36.1729080274035; Wed, 16 Oct 2024
- 05:04:34 -0700 (PDT)
+	b=WHM24hvhZNzqG8g6DyhPAZa+OvK8mMR4suTqqJQxUDXBGbwIJG1SFdqTpW1ZOuttT
+	 WQDafF4Zlll1Wz/ZiI5a/q02UYbCZgaBGpjnGzkNqht4C2vXbWryMZguTXTr1MKyB3
+	 WhT5tIjZCl+nbErSeHGiJxaN/rewqJO/qMgl1CSPKeFSgrvP0Ua740/vvg1uymIVyd
+	 fgfTahpxO0WWc7wJjyNMCNLX6I6jmFyYovL/AfpRP7KN4bLg2fhIYo+fkPbHUnAvCl
+	 z777XJGPjymFCCNrf5QoMHfqyb7L6TiLQyTH3Mc+jgtEACutIVafl63YO++RhO1Esg
+	 saJcBzIYnxRWQ==
+Received: by mail-oa1-f54.google.com with SMTP id 586e51a60fabf-27beb2496f4so1712934fac.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 16 Oct 2024 05:06:27 -0700 (PDT)
+X-Gm-Message-State: AOJu0YyZap5VIUKmltRTm1NfJL60gaHX2IpND+/DJlPoHhdtWSLQFthj
+	N7AS8/7l7Q3l7q2ZOaDkJyHMomRKlNSVx93asmQnZerxzuYGhUAZ1Dlv36+Ax1YGidE+sCIHmpT
+	qXfBpZHDwwPA73sZBjmDWz9R1btc=
+X-Google-Smtp-Source: AGHT+IF8IwDbv9a7wpg1OvVbK0nx6zsS7xUpNJoNGtSHzhypwhJ3cuCezuV7E/7xB1NJ9YwElHDfP4OAGlj4g4dDqDY=
+X-Received: by 2002:a05:6871:72b:b0:277:f51d:3ed3 with SMTP id
+ 586e51a60fabf-28887344cc5mr8732415fac.16.1729080386887; Wed, 16 Oct 2024
+ 05:06:26 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241014202326.381559-1-luiz.dentz@gmail.com>
-In-Reply-To: <20241014202326.381559-1-luiz.dentz@gmail.com>
+References: <20241014202326.381559-1-luiz.dentz@gmail.com> <36e9550a-3b45-4489-8370-afdc4f2fa6b5@molgen.mpg.de>
+In-Reply-To: <36e9550a-3b45-4489-8370-afdc4f2fa6b5@molgen.mpg.de>
 From: "Rafael J. Wysocki" <rafael@kernel.org>
-Date: Wed, 16 Oct 2024 14:04:22 +0200
-X-Gmail-Original-Message-ID: <CAJZ5v0it7=wbAfNZxFQw2tia4W2FfA_sAnL1nvu8aKmATbWOPg@mail.gmail.com>
-Message-ID: <CAJZ5v0it7=wbAfNZxFQw2tia4W2FfA_sAnL1nvu8aKmATbWOPg@mail.gmail.com>
+Date: Wed, 16 Oct 2024 14:06:15 +0200
+X-Gmail-Original-Message-ID: <CAJZ5v0hE_MVn2OJomHQzFK1Ft1hA4LWqp4KEauQYLt1CZmPopg@mail.gmail.com>
+Message-ID: <CAJZ5v0hE_MVn2OJomHQzFK1Ft1hA4LWqp4KEauQYLt1CZmPopg@mail.gmail.com>
 Subject: Re: [PATCH v1] Bluetooth: btusb: Fix not being able to reconnect
  after suspend
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Paul Menzel <pmenzel@molgen.mpg.de>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org, 
 	Luiz Augusto von Dentz <luiz.von.dentz@intel.com>, "Rafael J. Wysocki" <rafael@kernel.org>, 
 	Heiner Kallweit <hkallweit1@gmail.com>, Kenneth Crudup <kenny@panix.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Oct 14, 2024 at 10:24=E2=80=AFPM Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
+On Wed, Oct 16, 2024 at 7:12=E2=80=AFAM Paul Menzel <pmenzel@molgen.mpg.de>=
+ wrote:
 >
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> Dear Luiz,
 >
-> Calls to hci_suspend_dev assumes the system-suspend which doesn't work
-> well when just the device is being suspended because wakeup flag is only
-> set for remote devices that can wakeup the system.
 >
-> Reported-by: Rafael J. Wysocki <rafael@kernel.org>
+> Thank you for the patch.
+>
+>
+> Am 14.10.24 um 22:23 schrieb Luiz Augusto von Dentz:
+> > From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> >
+> > Calls to hci_suspend_dev assumes the system-suspend which doesn't work
+> > well when just the device is being suspended because wakeup flag is onl=
+y
+> > set for remote devices that can wakeup the system.
+>
+> Please mention that you revert most parts of the problematic commit.
 
-First of all, the patch works here, so
+Yes, it would be good to say in the changelog that this is a partial revert=
+.
 
-Tested-by: Rafael J. Wysocki <rafael@kernel.org>
+> > Reported-by: Rafael J. Wysocki <rafael@kernel.org>
+> > Reported-by: Heiner Kallweit <hkallweit1@gmail.com>
+> > Reported-by: Kenneth Crudup <kenny@panix.com>
+> > Fixes: 81b3e33bb054 ("Bluetooth: btusb: Don't fail external suspend req=
+uests")
+>
+> That commit is not in the master branch,
+> 610712298b11b2914be00b35abe9326b5dbb62c8 is.
 
-> Reported-by: Heiner Kallweit <hkallweit1@gmail.com>
-> Reported-by: Kenneth Crudup <kenny@panix.com>
-> Fixes: 81b3e33bb054 ("Bluetooth: btusb: Don't fail external suspend reque=
-sts")
-
-However, this is not the commit ID referred to in my report, as
-already mentioned by Paul.
-
-> Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> ---
->  drivers/bluetooth/btusb.c | 14 --------------
->  1 file changed, 14 deletions(-)
->
-> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> index d14b941bfde8..c0b6ef8ee5da 100644
-> --- a/drivers/bluetooth/btusb.c
-> +++ b/drivers/bluetooth/btusb.c
-> @@ -4075,7 +4075,6 @@ static void btusb_disconnect(struct usb_interface *=
-intf)
->  static int btusb_suspend(struct usb_interface *intf, pm_message_t messag=
-e)
->  {
->         struct btusb_data *data =3D usb_get_intfdata(intf);
-> -       int err;
->
->         BT_DBG("intf %p", intf);
->
-> @@ -4088,16 +4087,6 @@ static int btusb_suspend(struct usb_interface *int=
-f, pm_message_t message)
->         if (data->suspend_count++)
->                 return 0;
->
-> -       /* Notify Host stack to suspend; this has to be done before stopp=
-ing
-> -        * the traffic since the hci_suspend_dev itself may generate some
-> -        * traffic.
-> -        */
-> -       err =3D hci_suspend_dev(data->hdev);
-> -       if (err) {
-> -               data->suspend_count--;
-> -               return err;
-> -       }
-> -
->         spin_lock_irq(&data->txlock);
->         if (!(PMSG_IS_AUTO(message) && data->tx_in_flight)) {
->                 set_bit(BTUSB_SUSPENDING, &data->flags);
-> @@ -4105,7 +4094,6 @@ static int btusb_suspend(struct usb_interface *intf=
-, pm_message_t message)
->         } else {
->                 spin_unlock_irq(&data->txlock);
->                 data->suspend_count--;
-> -               hci_resume_dev(data->hdev);
->                 return -EBUSY;
->         }
->
-> @@ -4226,8 +4214,6 @@ static int btusb_resume(struct usb_interface *intf)
->         spin_unlock_irq(&data->txlock);
->         schedule_work(&data->work);
->
-> -       hci_resume_dev(data->hdev);
-> -
->         return 0;
->
->  failed:
-> --
-> 2.47.0
->
+Right.
