@@ -1,81 +1,107 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f177.google.com (mail-lj1-f177.google.com [209.85.208.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16349186E54
-	for <linux-bluetooth@vger.kernel.org>; Wed, 16 Oct 2024 16:00:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A84B516E86F
+	for <linux-bluetooth@vger.kernel.org>; Wed, 16 Oct 2024 18:51:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729094428; cv=none; b=QKyYQnCgYCiMztTovWldeANbcOZCgyvXhGi1cOVE/8GmlIHCkR9TmY0zkjVJTjtYjFetXkB9S56+FvLhXMu9UlDMxmTyD5szkhMNO4NAD8K78vHuNw+MX/t9uoBQmpnMLFDuaBVj/xVDQ7gd34TKNPDvrWFHX0jByvhpAkwz0y0=
+	t=1729104683; cv=none; b=LqeEbH8Jb9g5Xx/FVgDsoNGmDXwYNwJXC/yYpP5OiZgd5zOg7ZByq0B+rmPndduZnkFFinLC+jY9EcoKxJ0MFb+XRXkC8WSwvymspcMUwtSQOCD85tstI53KOBQF0tVvpMeqjbNwgwO6LQnrzNd5AK50RWRS7ljxVlkWhb7tJGs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729094428; c=relaxed/simple;
-	bh=CYQIqXSapne0SrF8559hvBQJuvSxbQsowGJGBoilNwk=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=nL4n6yDFuBT0+KKN8y3ap+9Yz+0VAe73/oLJONOgkSa6THYNHPzR0h4Q4rbOXPXCWYh8oN3bty5ShhsgRIYt9gfEH+VHh/kUkM+C8vK+sdlxlZKz8ueGAwAxEK6GV+83fbF8XSSDtdzJG4SBeYam6zdNk+mP7XzKWb3RPPFiTRY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Akb6Lfh4; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1729104683; c=relaxed/simple;
+	bh=OS6e+CjkI4NyGpW3tC62Mr63Mc7IIVLhDs9F9msjJbY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=FJ30HrvIjD8j64jFblBK44Fw8cKiVDrV69msoAT5Yme1W6QEuah3g9CzrL6Si65Hl2iOK1bbKuHpHzYX7q2LMof5TUanrnO2IwF5aEM/yYY1dxK77YJ0/3kmb2lxcGTz64yJdKQU651ZxB8osyyUF8571GdJSXIyeTuRTiBtFDA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=f9EzXYRZ; arc=none smtp.client-ip=209.85.208.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Akb6Lfh4"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 36BC2C4CEC5;
-	Wed, 16 Oct 2024 16:00:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1729094426;
-	bh=CYQIqXSapne0SrF8559hvBQJuvSxbQsowGJGBoilNwk=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Akb6Lfh46Ik8yVzmjm3BxRCGVV1S4mw3gJ+35yQIUmd2j+k4ryfYMvwEtu2I5PopE
-	 pKMnJDGdZhLUE5tI69PWvqsZeinZXWwQr+V0n+jG/0M9VdfARKmG02ieKDHpg5i8Wr
-	 gscJJoaIwiLTVHqgQ4h62nblVnpxz05j1FHvKBjoZbsU/abXY5g+kaNzPPhDtML6IT
-	 zbFDl/dO+/EIZb6uYl+Vdm3Y6MfAFlRGDS7xtxSH4m0Bal9/wsFG6SwMp1xP00CXyu
-	 TInp2/V0TfwMlx5Io82vhyu4TjdJ6Ti4HfjyyjbWdWwhvYWUMwnO1kqbsnl1HGadvJ
-	 CCiGMMd2qlqIw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADCE63822D30;
-	Wed, 16 Oct 2024 16:00:32 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="f9EzXYRZ"
+Received: by mail-lj1-f177.google.com with SMTP id 38308e7fff4ca-2fabb837ddbso2730941fa.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 16 Oct 2024 11:51:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1729104680; x=1729709480; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=KdmqZ1gid2nrcqceKA2afnlwQTBt0CD1Z9NPEggCkx0=;
+        b=f9EzXYRZVgCLrfVDxEOtDkdFS4SOfnvw9r9/zAmyFHfDnmFa7PpuCcqycofYli0JjI
+         YnHV1CWGI1huK/fezcOMyojwMErZWepm1SjTtXKMqTE7YnVWuk24WyOGeSvdYoMo6S2W
+         Nu3j7lTHgNPHzpEYl601fcRjXQ8GXl4pCmXq85Fzlef1ZH+pdtW+u2ZZxYuKkxRxZz2q
+         8GBY4MB5P404lxYBrpv1YeFRgNDOScseWwwLs4t3pVH2RZpmJB+PXrG9Ej0LbtCOzrER
+         g2PxmeZFtGcR0GZeU6rmhmb7FaiqRIazcCpGaLGtXiTKAdQJOe56BLuCmAX3GvTGHTaf
+         TKuw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1729104680; x=1729709480;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=KdmqZ1gid2nrcqceKA2afnlwQTBt0CD1Z9NPEggCkx0=;
+        b=ixoUg7mZEVuP5m2YlBSXEGxj9A1tchtdOpPBNciy5mn0bgTfsaBiqMaizkw+OUeHtL
+         kD7L9WUSGzvgsFcDlV5pBhyfHm3QadZKfa0uwkaZgJ1ezUMgmY7mXm5US88jq1gbODN0
+         mAQsS00i/x7bn5mWSwjz5m16kdyA3mymv/G9YNQ6Ea716naiJMOu4aTgth0TMf/iMvJp
+         aEueM3UB4UCU3MHBSbyNvnSAim4iYOLOfthExEwFJJCZxlGf3uWfcOQ4dJJrYTXmsG1h
+         J5wkqGz0fjfWAPRV45XOlVzw8tWEaxw0mGn4FLgfIJsbmC7RLvKi+O0lPx9txjdwxwb9
+         v29Q==
+X-Gm-Message-State: AOJu0YyOF9nKPgedKskdzR1WeWFEjaH5Apoj8gxODWymlJTujmk5mv93
+	GSIEm6bJZwhU5pxjYkVFXGDk47DtsvTMhw/5QRa2PDkq70ZQhVLilutfFYOQythPGw8wLAHwNT8
+	4UXKlEb25W8aRrLFpxhz4MVwLVuNeAX/rgjs=
+X-Google-Smtp-Source: AGHT+IHnsW/WrmGed+aZGS2xwAc++xTFrRDhA8itVumE7xAHjbKsfD1UOold50/Kz8ZkDxhzwL/yB5M7Z3l/yyYaHVc=
+X-Received: by 2002:a2e:be23:0:b0:2fa:fdd1:be23 with SMTP id
+ 38308e7fff4ca-2fb3f2c7269mr96104251fa.28.1729104679393; Wed, 16 Oct 2024
+ 11:51:19 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] Bluetooth: bnep: fix wild-memory-access in proto_unregister
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <172909443152.1863747.16466588010493150746.git-patchwork-notify@kernel.org>
-Date: Wed, 16 Oct 2024 16:00:31 +0000
-References: <20241014090708.3818916-1-yebin@huaweicloud.com>
-In-Reply-To: <20241014090708.3818916-1-yebin@huaweicloud.com>
-To: Ye Bin <yebin@huaweicloud.com>
-Cc: marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
- ricardo@marliere.net, linux-bluetooth@vger.kernel.org,
- viro@zeniv.linux.org.uk, yebin10@huawei.com, zhangxiaoxu5@huawei.com
+References: <CAAhaqxrW=0g9E2qWdEXTGkjv5cxZLAu-6UGDO5tGLxZDdQXvJg@mail.gmail.com>
+In-Reply-To: <CAAhaqxrW=0g9E2qWdEXTGkjv5cxZLAu-6UGDO5tGLxZDdQXvJg@mail.gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Wed, 16 Oct 2024 14:51:06 -0400
+Message-ID: <CABBYNZKu465GRDOCGepyckgrk4CZF4tOwbzUN6HQyG8ZKfg=8w@mail.gmail.com>
+Subject: Re: Bluetooth not working on 13d3:3585 IMC Networks Wireless_Device
+To: Grimoire April <aprilgrimoire@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hello:
+Hi Grimoire,
 
-This patch was applied to bluetooth/bluetooth-next.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+On Wed, Oct 16, 2024 at 3:28=E2=80=AFAM Grimoire April <aprilgrimoire@gmail=
+.com> wrote:
+>
+> Hi. I have a laptop with an integrated bluetooth adaptor recognized as
+> a usb device. However, it fails to initialize properly. Searching for
+> other instances on bugzilla, it seems others had success with
+> 13d3:3585 adaptors.
+>
+> (base) =E2=9E=9C  ~ sudo dmesg | grep Bluetooth
+> [    0.422244] Bluetooth: Core ver 2.22
+> [    0.422254] Bluetooth: HCI device and connection manager initialized
+> [    0.422257] Bluetooth: HCI socket layer initialized
+> [    0.422261] Bluetooth: L2CAP socket layer initialized
+> [    0.422265] Bluetooth: SCO socket layer initialized
+> [    0.530052] Bluetooth: HCI UART driver ver 2.3
+> [    0.535346] Bluetooth: HIDP (Human Interface Emulation) ver 1.2
+> [    0.535355] Bluetooth: HIDP socket layer initialized
+> [    3.556068] Bluetooth: hci0: Opcode 0x0c03 failed: -110
+>
+> https://bugzilla.kernel.org/show_bug.cgi?id=3D218472
+>
+> I updated to 6.11.1 and the issue persists.
 
-On Mon, 14 Oct 2024 17:07:08 +0800 you wrote:
-> From: Ye Bin <yebin10@huawei.com>
-> 
-> There's issue as follows:
->   KASAN: maybe wild-memory-access in range [0xdead...108-0xdead...10f]
->   CPU: 3 UID: 0 PID: 2805 Comm: rmmod Tainted: G        W
->   RIP: 0010:proto_unregister+0xee/0x400
->   Call Trace:
->    <TASK>
->    __do_sys_delete_module+0x318/0x580
->    do_syscall_64+0xc1/0x1d0
->    entry_SYSCALL_64_after_hwframe+0x77/0x7f
-> 
-> [...]
-
-Here is the summary with links:
-  - Bluetooth: bnep: fix wild-memory-access in proto_unregister
-    https://git.kernel.org/bluetooth/bluetooth-next/c/7902a76b54e3
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+Well it looks like the reset command is timing out, but the issue was
+originally the PID:VID was not supported in btusb so perhaps something
+else is happening, perhaps another manufacturer that don't support
+short-transfer which was introduced by 7b05933340f4 ("Bluetooth:
+btusb: Fix not handling ZPL/short-transfer") so try reverting that to
+see if it helps.
 
 
+> Thank you.
+>
+
+
+--=20
+Luiz Augusto von Dentz
