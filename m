@@ -1,95 +1,135 @@
-Received: from mail-qt1-f175.google.com (mail-qt1-f175.google.com [209.85.160.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [80.237.130.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D9B1137932
-	for <linux-bluetooth@vger.kernel.org>; Thu, 17 Oct 2024 03:05:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBC3A29A5
+	for <linux-bluetooth@vger.kernel.org>; Thu, 17 Oct 2024 05:33:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.237.130.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729134314; cv=none; b=uInucAlMyv6Zot78TJd9i+YkfbxHuKfpJKlYfnjjeWVTKLhwcP1qsoNuQfwfeD8gekE1ZHLlZN6gsAnoEuF3Mur/Dnab9DEo3tyCcxjM2VEhA7MrHPe7S4Fpyhs+SNO0SxX0sqIhKwvPQ+qNA1udFbjewu/PCXmdTPi0ZcMtfpo=
+	t=1729143192; cv=none; b=kENWT+NFhI+azMWrW6Z883KrFjurCKJbAz7+aGKoFwjinPz1dMQ6t7R6jFgCdumPXOf+oYF/TaNwiu2SXCTHencKEgMwlkH/AszrZecmj8NWyNaB3klo5vF8ZLWeHvkV9xpTaurZFPjs9TK3zkkpoDdKqrAdD56gNR5qy+xQkYs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729134314; c=relaxed/simple;
-	bh=KNplimBP1NDosfi8hpIVMADmMp2TXquikdKnV+6pfwk=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=NAd92vBRGH0obOPAShXMLGgjN/rhemmG1d6Wgo7yYUr8OlJSwsVodT5TNwRa4UNADz88wLaWiVHrX5NJbkv/FF713KOyeQCeuJ+qP+PgdjM8nWqUiYUzfWqU430ZMt2BoaRrpc3+Fs8AxTqj4zCmXz58bgOydCvX7x4zfnDM4j0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=g7VaU9XK; arc=none smtp.client-ip=209.85.160.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1729143192; c=relaxed/simple;
+	bh=8jdunE+T2+Z/f73MahG5I3JWl359g9AQhz+HXdKrmaY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=HvQjzohyLamNTcecXOHXliK4npfS+0q8b/lTWL+5I1SXJx35wnoIjJVeyp4x8K8Rb8fcxPqH15sTfVsJrY7PYn3RWer4kFANWKwDvSV2tAnOut/T+N/+5A3uM3qdGJhR4kQQcp0fuyv86wRpxx1H0zQUjkY6I81fcgVWYzkNOfU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=leemhuis.info; spf=pass smtp.mailfrom=leemhuis.info; dkim=pass (2048-bit key) header.d=leemhuis.info header.i=@leemhuis.info header.b=skiFBa4r; arc=none smtp.client-ip=80.237.130.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=leemhuis.info
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=leemhuis.info
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="g7VaU9XK"
-Received: by mail-qt1-f175.google.com with SMTP id d75a77b69052e-4609d75e2f8so3195451cf.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 16 Oct 2024 20:05:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1729134311; x=1729739111; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=KNplimBP1NDosfi8hpIVMADmMp2TXquikdKnV+6pfwk=;
-        b=g7VaU9XKvu0KdMaLjL6s8TLX+tcpxXOLE3d0xYpvrjgWfUFmfWyDpB6LaY4ggJ134R
-         YI/ijnvk/mM6aD+5qEpme54x+j086XFL7nB7+L4K6fQ/w9A5GOx0rhkAO/sBqlLeHbi6
-         oXww6me682ny9XPzDySu/+Xwp9m6/i9jMQPsjwELCNZuE4wCOrQqT+yFc/mfiZXAJR7Q
-         3fvkhCLABfxsgVe7XoIzQgDBKJHittmvp2CKekUXwJ28CAQRyRCLMkMITN//Aq3t23Ly
-         MGEIyaQtiYSHwwNwOrYIBCcJdaQXO1ye5vxUWKPMmABflVTEnV7uneTX399RpBL/uR3H
-         yNIA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729134311; x=1729739111;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=KNplimBP1NDosfi8hpIVMADmMp2TXquikdKnV+6pfwk=;
-        b=lIhKLSLHdMtEveVgX/kxN1vNG6BR9Gq1wTvD/AjY1qCdRpdgr0g/zHk83mVRtlIrdN
-         fyVkJWbNqEbqQuVJzxdbfSh4dw+eHTl0jAn0Ijuuan2UvZWdspKMd1wl+iybQ0pbjbJz
-         tb2J+MkW9kN1bJEB9oPYyxn7HujNSS5ZCSzLmdbEcCNBR8MvtTeEP+M613Ihy5hAyNPx
-         Ve6AhDUqQ2zoHisTot7qaMOCc6DIdd4GMeKXvlhuAdOflxMeSv/KKPLmjy+5uNdZF4Y+
-         W9x/LSFlBBDUrj4TtLwB0ZW+TL58Eih75RGesNVd6kzmDQAdyKNKAF7glNPRMzncG7RQ
-         2tOw==
-X-Gm-Message-State: AOJu0YxSMxCuNkIoD1yY8c2+VzkD9GluzLzmBwx5JLe3OiKbJcSFtsO9
-	eBntQdm4WTG6ufLFyz0vv0IIXVb7xwDfTS3lWEj5GkFULRW3F+F62JvR3Q==
-X-Google-Smtp-Source: AGHT+IF32gOkCIKXnhWB7UzlgFOLfKxdcPFZNH+Bxrm6hk5kcutcGi5PV7l9u+kR5lEWKwAqaHA0Tg==
-X-Received: by 2002:a05:622a:506:b0:460:8e30:75fa with SMTP id d75a77b69052e-4609b4eda43mr31570911cf.28.1729134311127;
-        Wed, 16 Oct 2024 20:05:11 -0700 (PDT)
-Received: from [172.17.0.2] ([20.55.46.117])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4607b123e13sm23799171cf.44.2024.10.16.20.05.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 16 Oct 2024 20:05:10 -0700 (PDT)
-Message-ID: <67107ee6.050a0220.1fd6a4.ad22@mx.google.com>
-Date: Wed, 16 Oct 2024 20:05:10 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============1015084380257431279=="
+	dkim=pass (2048-bit key) header.d=leemhuis.info header.i=@leemhuis.info header.b="skiFBa4r"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=leemhuis.info; s=he214686; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:From:
+	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
+	Content-Transfer-Encoding:Content-ID:Content-Description:In-Reply-To:
+	References; bh=0AY5hrTFuNbBnDoy56Pd4pHj7TkEsF6iaAjF+WAlDco=; t=1729143188;
+	x=1729575188; b=skiFBa4rODyd6Yml85r/m7NwJViYAPwzinJYfR586FQAMXrXjfc/Gyv4C+hUp
+	d+8os9GrnUW/axpt0Sf5Rpdk/2kElsIRoTi6ZPauCPPJu8xLbeVNIhfOX4ob/xc7Ll3ToGu0BHI5h
+	7TjiO40KQ6cdww7AnACd74rGpz+1FA4jgqOyVzEEMm30bD/0yy0AXrtZnqhQpc58j0I/Y+C2MebUx
+	F2Ipnvtf/4xyWHyUlIg106pOZ/tIxoLPwMfh9AGby9b80Yg/eUikwJpnjDfW7HJfMkbJapn9YTkjH
+	Tu+YUsU0r8xKCzvzSiwPQl85nnWT3adQNvKVtUQISwtgC1OI7A==;
+Received: from [2a02:8108:8980:2478:8cde:aa2c:f324:937e]; authenticated
+	by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
+	id 1t1J87-0005Ig-1Y; Thu, 17 Oct 2024 07:32:59 +0200
+Message-ID: <5711b892-593e-42d0-8186-39e5e611d43d@leemhuis.info>
+Date: Thu, 17 Oct 2024 07:32:55 +0200
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, wangyuli@uniontech.com
-Subject: RE: [RESEND.,v2] Bluetooth: btusb: Add MT7925 support for ID 0x13d3:0x3608
-In-Reply-To: <3DBBE09166DE4374+20241017022433.50800-1-wangyuli@uniontech.com>
-References: <3DBBE09166DE4374+20241017022433.50800-1-wangyuli@uniontech.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+User-Agent: Mozilla Thunderbird
+Subject: Re: dedicated -fixes branch in the bt tree
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org,
+ Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
+ "Rafael J. Wysocki" <rafael@kernel.org>,
+ Heiner Kallweit <hkallweit1@gmail.com>, Kenneth Crudup <kenny@panix.com>,
+ Stephen Rothwell <sfr@canb.auug.org.au>, Paul Menzel <pmenzel@molgen.mpg.de>
+References: <20241014202326.381559-1-luiz.dentz@gmail.com>
+ <36e9550a-3b45-4489-8370-afdc4f2fa6b5@molgen.mpg.de>
+ <cdc7072b-239b-491b-a1c5-ff9eaf4d5222@leemhuis.info>
+ <CABBYNZLC17+si9FLXHO5ujH_OzmTgdWDpMmSStyCnZsEmkthSA@mail.gmail.com>
+From: Thorsten Leemhuis <regressions@leemhuis.info>
+Content-Language: en-US, de-DE
+In-Reply-To: <CABBYNZLC17+si9FLXHO5ujH_OzmTgdWDpMmSStyCnZsEmkthSA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-bounce-key: webpack.hosteurope.de;regressions@leemhuis.info;1729143188;e20b91f6;
+X-HE-SMSGID: 1t1J87-0005Ig-1Y
 
---===============1015084380257431279==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+On 16.10.24 21:01, Luiz Augusto von Dentz wrote:
+> On Wed, Oct 16, 2024 at 2:29 AM Thorsten Leemhuis
+> <regressions@leemhuis.info> wrote:
+>> On 16.10.24 07:12, Paul Menzel wrote:
+>>>
+>>> Thank you for the patch.
+>> +1
+>>
+>>>> Fixes: 81b3e33bb054 ("Bluetooth: btusb: Don't fail external suspend
+>>>> requests")
+>>>
+>>> That commit is not in the master branch,
+>>> 610712298b11b2914be00b35abe9326b5dbb62c8 is.
+>>
+>> Luiz, please allow me to ask: is there a reason why the bluetooth tree
+>> does not use a dedicated "-fixes" branch like many other subsystems do?
+>> That would avoid mishaps like the one above and all those "duplicate
+>> patches in the bluetooth tree" messages Stephen has to sent every few
+>> weeks
+>> (https://lore.kernel.org/all/?q=f%3Astephen+duplicate+%22bluetooth+tree%22
+>> ); reminder, you can have both your -fixes and your -for-next branch in
+>> linux-next for test coverage.
+> 
+> Not sure I follow, we do have bluetooth tree
+> (https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git)
+> for fixes during the RC phase,
 
-This is an automated email and please do not reply to this email.
+Ahh, I see, you have two different trees, and not different branches in
+one tree. Sorry, should have noticed that.
 
-Dear Submitter,
+> or are you saying the fixes for RC
+> shall not be integrated thru bluetooth-next but directly into
+> bluetooth tree and then once merged they are pulled into
+> bluetooth-next by rebasing to avoid changing the hash?
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
+I'm no expert here, but subsystems use different strategies afaics. Most
+afaics have two branches in one tree or (like you) two trees. Both are
+in next. And they only merge the -fixes branch into their -next tree
+when there is a need, not regularly (that iirc would upset Linus).
 
------ Output -----
+> While possible
+> this would be hard with our CI which only tests patches against
+> bluetooth-next tree
 
-error: patch failed: drivers/bluetooth/btusb.c:512
-error: drivers/bluetooth/btusb.c: patch does not apply
-hint: Use 'git am --show-current-patch' to see the failed patch
+Can't that be changed? Also: that sounds (but I might be wrong there!)
+like -fixes you send to Linus don't get tested independently. Wouldn't
+that be better?
 
-Please resolve the issue and submit the patches again.
+> so by not integrating the RC fixes we may be able
+> to detect similar changes.
+> 
+> Regarding the duplicate detection, I wonder if that really a problem
+> or some script failing to detect it is just a hash change, because git
+> seems fine with those and in most cases it will just say it has
+> already been applied and move on.
 
+Stephen might be the better one to answer that, but from his mails and
+my understanding of it it's more like "if duplicates happen occasionally
+(for example because some change queued for -next turns out needs to be
+send through -fixes quickly), it's not a problem. But it shouldn't be
+something that happens due to the regular workflow.
 
----
-Regards,
-Linux Bluetooth
+I've also seen a few people including Greg complain about Fixes: tags
+for commits that don't exist -- which is the case until the duplicate
+commit (like the 81b3e33bb054 that triggered this discussion) lands
+during the next merge window. But during that time window it can easily
+confuse people I guess.
 
+Anyway, maybe I shouldn't have send anything, this is not my area of
+expertise. It's just that I noticed the mails from Stephen, the
+complains from Greg, and that one discussion at maintainers summit or
+LPC where "more trees should have their -fixes branch in next" very
+briefly came up.
 
---===============1015084380257431279==--
+Ciao, Thorsten
