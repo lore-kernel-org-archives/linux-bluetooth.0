@@ -1,137 +1,138 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1540134A8
-	for <linux-bluetooth@vger.kernel.org>; Thu, 17 Oct 2024 11:36:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D2AE1D517D
+	for <linux-bluetooth@vger.kernel.org>; Thu, 17 Oct 2024 12:20:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729165011; cv=none; b=tgbDx+mLhFo8rXe4jrCwAeQoqz2ZpP99PZuSACu368QTiJy1n7soAwp2IpFefh2jtZld0qYqwH4ptWu+2MvLRttFzys5G6wRC4GpUkfYc6DBAr8jIUYAzrfNp52ml8kKaTg7hcPuYGgqt/dN4Xp1fWRNr6QvjlRIVFp/meYgeAE=
+	t=1729167607; cv=none; b=XXGN5oL3kRKSmgUYM7+LbSW1lDg/aDU7xMrP7U/J3+vVUQ3xEAw52yqP1B+nO5s/zNgfHDnZQPcfBBEPyHYvN+Q/7ZlZVBoTlT8++lZVEemIML5fwZykIOoS3ZKeBZ1+OQ0MTUnNTw6vkTrmdjsUinRy8At9FFkNVrBsjAA9v1E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729165011; c=relaxed/simple;
-	bh=LLOJICgVu0Un28rAjmEYdCj1PNmCSD15gVU7LEQw0Ec=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=jWkKeyRQJZt/CuRIpNB4955AdmLod0K6dgt/q068W6WTO04ziKxJ0clzAoM/bUyhpMrCGecfA7wFwo9zpn6iFV1Ke2VUWYgbkppBg3uI3fOsNlLF399fFmuKt7dwaj6PEEn8BioqFhari9681jwd8a+0ICJ/DEqWoNRBZ8khJlM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ed6QkzUo; arc=none smtp.client-ip=192.198.163.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1729167607; c=relaxed/simple;
+	bh=ZditjE1IcN0brx+ct3scfO3VvQYdwgSmVXseE2ZDkF8=;
+	h=From:To:CC:Subject:Date:Message-ID:Content-Type:MIME-Version; b=ulc2EzcaR2cJ4gV2ck60xxvMIRcNy/yPDs/BOoHOfQfuVeiZGApw85QCpx74HMlS5XxHud29eI13iEQpbCK9z8Usf2Ohr/RZzAU5SE7pEbRujE8vewQDQJiH1iWSYwxnizlb7Qpbi7PEwBO2Hva7cwHpuhX/X6nWEY4ucEAqebU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=T64sVir9; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ed6QkzUo"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1729165009; x=1760701009;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=LLOJICgVu0Un28rAjmEYdCj1PNmCSD15gVU7LEQw0Ec=;
-  b=ed6QkzUoUzyncPaU910JlErVADsbF6JMM3DNRKJh5nhqG7cTjKndtDJN
-   vaAs+Jo/9zurBz/KdcgwxtweO0p23oaKzDd623+3FhsoJSEm2uI/ATzr8
-   3wPI/s+aMD5q3c2KQss2gOYWFdN6bmMXXEYuR0Smw4mOIZhSqG+Hid0c4
-   B/ZG4Az2d6NOZwQIgmWyDhR21d5d/MX7rHRGCweDUOJrYC/bzHiPHgrXQ
-   T+RXfSkMmkuqCim0Ul70xY+Bap0m08uQT00mzD0SUJW9JbBK+wxwDz3tS
-   k+IJvNwSG3AGUAWiREtW96iO6MBeOIMokKT9g2Kgu5HdripI5N2GoDZKj
-   g==;
-X-CSE-ConnectionGUID: RDanRHZoR2iERoEctOxxKw==
-X-CSE-MsgGUID: 28Q1rx2zTaiktTbK1XVzWg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11227"; a="39235822"
-X-IronPort-AV: E=Sophos;i="6.11,210,1725346800"; 
-   d="scan'208";a="39235822"
-Received: from fmviesa010.fm.intel.com ([10.60.135.150])
-  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Oct 2024 04:36:48 -0700
-X-CSE-ConnectionGUID: h6VSBYYtSZycGMHJVRq7NA==
-X-CSE-MsgGUID: 7ijbFKgNSrqaua3I7rxUpw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,210,1725346800"; 
-   d="scan'208";a="78865262"
-Received: from intel-lenovo-legion-y540-15irh-pg0.iind.intel.com ([10.224.186.95])
-  by fmviesa010.fm.intel.com with ESMTP; 17 Oct 2024 04:36:46 -0700
-From: Kiran K <kiran.k@intel.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: ravishankar.srivatsa@intel.com,
-	chethan.tumkur.narayan@intel.com,
-	chandrashekar.devegowda@intel.com,
-	Kiran K <kiran.k@intel.com>
-Subject: [PATCH v3] Bluetooth: btintel: Do no pass vendor events to stack
-Date: Thu, 17 Oct 2024 17:21:56 +0530
-Message-Id: <20241017115156.733062-1-kiran.k@intel.com>
-X-Mailer: git-send-email 2.40.1
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="T64sVir9"
+Received: from pps.filterd (m0279866.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 49HALllZ017422
+	for <linux-bluetooth@vger.kernel.org>; Thu, 17 Oct 2024 12:20:05 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=qcppdkim1; bh=lH8GWn12HlqomvDTMWhuRU
+	izTIbSBEnJMtjihHf3q4M=; b=T64sVir9TaUQ7HHoj7KBiXhVOuHpTALHpQKd75
+	n90XlTbtP765tScIyDqLDtOgrSYQ/yNZJNHliGoXzsm6S1AA+gdylvoLJs0NUmxn
+	xd5v+kvpvgt6clriOvCrgKK6nkch+IelO5SJpYOSsJjOes56xw2Qy/q3F+fhow9j
+	Jn0VspUQPNpeMnnp8ztqfBk5TN1ZslaVXc/8cWIhbrNHsouWuUcBchD9xR7qP5vi
+	mmSDm2FlyMp3SB1WpXrS/IU1Hn3AMhf2kIXfz+9tKA4YCyKdiO+lQ8+KBjGR3aJB
+	czp3FH4k+aXWVmJ3EPjS4TLPc1Mn19cfS7LMJYToyQ3TaWUw==
+Received: from nasanppmta04.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 42b0rx0ahm-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <linux-bluetooth@vger.kernel.org>; Thu, 17 Oct 2024 12:20:05 +0000 (GMT)
+Received: from nasanex01a.na.qualcomm.com (nasanex01a.na.qualcomm.com [10.52.223.231])
+	by NASANPPMTA04.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 49HCK4Dn028914
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <linux-bluetooth@vger.kernel.org>; Thu, 17 Oct 2024 12:20:04 GMT
+Received: from nasanex01c.na.qualcomm.com (10.45.79.139) by
+ nasanex01a.na.qualcomm.com (10.52.223.231) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.9; Thu, 17 Oct 2024 05:20:04 -0700
+Received: from nasanex01c.na.qualcomm.com ([fe80::cfa9:539b:fb6d:d257]) by
+ nasanex01c.na.qualcomm.com ([fe80::cfa9:539b:fb6d:d257%13]) with mapi id
+ 15.02.1544.009; Thu, 17 Oct 2024 05:20:03 -0700
+From: "Amisha Jain (QUIC)" <quic_amisjain@quicinc.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+CC: "Mohammed Sameer Mulla (QUIC)" <quic_mohamull@quicinc.com>,
+        "Harish Bandi
+ (QUIC)" <quic_hbandi@quicinc.com>
+Subject: Unable to send PBAP(PCE) pull request with specific parameters from
+ obexctl tool
+Thread-Topic: Unable to send PBAP(PCE) pull request with specific parameters
+ from obexctl tool
+Thread-Index: AdsgjnPROWqIhNUESK6xbaOCbQLofg==
+Date: Thu, 17 Oct 2024 12:20:03 +0000
+Message-ID: <e18457d80cbd4c6aa6136c12ebf1e444@quicinc.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: NfcUOhvuiL-mwPxFklTTgqKoLl0QWZkj
+X-Proofpoint-ORIG-GUID: NfcUOhvuiL-mwPxFklTTgqKoLl0QWZkj
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
+ definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 clxscore=1015
+ mlxscore=0 priorityscore=1501 spamscore=0 suspectscore=0 impostorscore=0
+ mlxlogscore=999 malwarescore=0 lowpriorityscore=0 adultscore=0
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2409260000 definitions=main-2410170084
 
-During firmware download, vendor specific events like boot up and
-secure send result are generated. These events can be safely processed at
-the driver level. Passing on these events to stack prints unnecessary
-log as below.
+Hi,
 
-    Bluetooth: hci0: Malformed MSFT vendor event: 0x02
+We are trying to verify the below PTS testcases in PBAP Client profile, whe=
+re DUT initiates the connection.=20
 
-Fixes: 3368aa357f3b ("Bluetooth: msft: Handle MSFT Monitor Device Event")
-Signed-off-by: Kiran K <kiran.k@intel.com>
----
- drivers/bluetooth/btintel.c      | 6 ++++--
- drivers/bluetooth/btintel_pcie.c | 9 ++++++---
- 2 files changed, 10 insertions(+), 5 deletions(-)
+1. PBAP/PCE/PBB/BV-03-C   -   PBAB server(PTS) is expecting the PullvCardLi=
+sting request with MaxListCount =3D 0 (can be variable).
 
-diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
-index 2be6d48a2a65..e122dff855ba 100644
---- a/drivers/bluetooth/btintel.c
-+++ b/drivers/bluetooth/btintel.c
-@@ -3395,7 +3395,8 @@ int btintel_recv_event(struct hci_dev *hdev, struct sk_buff *skb)
- 				 * indicating that the bootup completed.
- 				 */
- 				btintel_bootup(hdev, ptr, len);
--				break;
-+				kfree_skb(skb);
-+				return 0;
- 			case 0x06:
- 				/* When the firmware loading completes the
- 				 * device sends out a vendor specific event
-@@ -3403,7 +3404,8 @@ int btintel_recv_event(struct hci_dev *hdev, struct sk_buff *skb)
- 				 * loading.
- 				 */
- 				btintel_secure_send_result(hdev, ptr, len);
--				break;
-+				kfree_skb(skb);
-+				return 0;
- 			}
- 		}
- 
-diff --git a/drivers/bluetooth/btintel_pcie.c b/drivers/bluetooth/btintel_pcie.c
-index e4ae8c898dfd..deed8052b482 100644
---- a/drivers/bluetooth/btintel_pcie.c
-+++ b/drivers/bluetooth/btintel_pcie.c
-@@ -551,7 +551,8 @@ static int btintel_pcie_recv_event(struct hci_dev *hdev, struct sk_buff *skb)
- 				if (btintel_pcie_in_op(data)) {
- 					btintel_pcie_wr_sleep_cntrl(data, BTINTEL_PCIE_STATE_D0);
- 					data->alive_intr_ctxt = BTINTEL_PCIE_INTEL_HCI_RESET2;
--					break;
-+					kfree_skb(skb);
-+					return 0;
- 				}
- 
- 				if (btintel_pcie_in_iml(data)) {
-@@ -568,7 +569,8 @@ static int btintel_pcie_recv_event(struct hci_dev *hdev, struct sk_buff *skb)
- 						btintel_wake_up_flag(data->hdev,
- 								     INTEL_WAIT_FOR_D0);
- 				}
--				break;
-+				kfree_skb(skb);
-+				return 0;
- 			case 0x06:
- 				/* When the firmware loading completes the
- 				 * device sends out a vendor specific event
-@@ -576,7 +578,8 @@ static int btintel_pcie_recv_event(struct hci_dev *hdev, struct sk_buff *skb)
- 				 * loading.
- 				 */
- 				btintel_secure_send_result(hdev, ptr, len);
--				break;
-+				kfree_skb(skb);
-+				return 0;
- 			}
- 		}
- 
--- 
-2.40.1
+ Description : Verify that the PCE can obtain at any time Phone Book size i=
+nformation from the PSE.
+ ((TSPC_PBAP_2_2 AND TSPC_PBAP_2_4) AND TSPC_PBAP_1_1) OR TSPC_ALL
 
+User prompt:
+Send a PullvCardListing request with MaxListCount =3D 0  for phonebook pb
+
+Results:
+Failed to receive the Get operation with correct parameters for x-bt/vcard-=
+listing
+
+Expectation:
+Pass verdict
+The IUT issues a PullvCardListing command with the MaxListCount header set =
+to 0.
+
+Behavior : Bydefault MaxListCount value will be set to 65535 for every pull=
+ operation and we don't have the option in obexctl to modify the value, Hen=
+ce testcase is failing.
+
+
+2. PBAP/PCE/PBB/BV-05-C    -    PBAB server(PTS) is expecting the PullvCard=
+Entry request with specific filters defined in Bluetooth spec.
+
+Description : Verify that the PCE can retrieve a Phone Book entry from a PS=
+E using the PullvCardEntry function with a simple filter.
+((TSPC_PBAP_2_2 AND TSPC_PBAP_2_4) AND TSPC_PBAP_1_1) OR TSPC_ALL
+
+User prompt:
+Send a PullvCardEntry request which filter for Name (N) and Telephone (TEL)
+
+Results:
+Failed to receive the Get operation with correct parameters for x-bt/vcard
+
+Expectation:
+Pass verdict
+The IUT receives the requested Phone Book entry. The received entry contain=
+s only the VERSION, N, TEL, and for vCard, 3.0 FN.
+
+Behavior : Bydefault no filters will be set for pull vcard operation and we=
+ don't have the option in obexctl to add filters in the pull request, Hence=
+ testcase is failing.
+
+
+Is there any tool/fix to pass above testcases?
+Bluez version: 5.65
+
+Thanks,
+Amisha
