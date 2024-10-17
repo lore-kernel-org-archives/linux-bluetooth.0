@@ -1,87 +1,158 @@
-Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f174.google.com (mail-lj1-f174.google.com [209.85.208.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19FB71DE2B6;
-	Thu, 17 Oct 2024 13:47:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 808A81DE4EA
+	for <linux-bluetooth@vger.kernel.org>; Thu, 17 Oct 2024 14:34:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729172836; cv=none; b=h4HnEbMxo9/pYIWlnAPvTVh5hP+UtDQ3o/wJFKtWwu/JEwA+iFWWVR/6/QTpVc/2V7axnCiCosZtkJPX/1YDdhPT+uWz6RsSVOMKxng9j3nepfFgmifPQscwqkHNrXkAdG4m8/oBTBDgb9HEosunWOxBkN1ArHZYRTWE7JTGbRo=
+	t=1729175685; cv=none; b=AaZT0KqzxdIL512OBPHkPe6aVzcdzSKPGXCW4JB/D/ineIp+ku33/ElhXz0qZ2IQev6oebhwcJpuYcbdDMBDlxXfDL0ZtbqLFcVBWYBw+spUpFs9gDlY4C//NyYyvY0J3Yt7RTr0y/z5fN9MO4iGvPwmZoK7mKrmrgxICy8MkLY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729172836; c=relaxed/simple;
-	bh=wAgx7NQSaDA+Q1cPdWZM+QeAuPDAlF1WphFS/446Co0=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=pkt6vMBCcnHkqtV8/gWRku7hDgcNqI+ernYNdh0dEK7i3HYPYKCIykGDgT6uYg13JCzfXegR3kaWD5LmQV3noudkB5sDzEeLnuzyNR+CQnUbmq3Zgo1Vpr76S4x9Bi1WmRbU4AKFVp1yz34TTMyRRhi20gqUbb3Z/GIPSHp5iAI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.co.uk; spf=pass smtp.mailfrom=collabora.co.uk; dkim=temperror (0-bit key) header.d=collabora.co.uk header.i=@collabora.co.uk header.b=XhGRtdwR; arc=none smtp.client-ip=148.251.105.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.co.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.co.uk
+	s=arc-20240116; t=1729175685; c=relaxed/simple;
+	bh=XZXCuEYNxCDeXmQlzHHtX2qrKp3+NZmSuuM9Baje2OM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=PuFjj6Fp+2/dbZhcrPGgPFOu2EWRouQckPmbymEyTUrdon6HYOHj9Kqv69mDHqSYtIt1xDov2fiCZwgLCLPNKzNf4UrFppP8bVWz0vbc9ltUAZy/Rih2yf5cetRH6AKcdI/bYE2ayHgCXVEksOm9Jv69ZqdJZweo110JNWnYrUo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Nzg1XmL6; arc=none smtp.client-ip=209.85.208.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=temperror (0-bit key) header.d=collabora.co.uk header.i=@collabora.co.uk header.b="XhGRtdwR"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.co.uk;
-	s=mail; t=1729172832;
-	bh=wAgx7NQSaDA+Q1cPdWZM+QeAuPDAlF1WphFS/446Co0=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=XhGRtdwRZ5IUQb2vfklPHyssadN/SCuUfdizEBtt5teb/gmJ9ChSDF6VXDPzUMHij
-	 kByvCO8cgEPvrpQEprqPznj5F4Pgl7/1Bq4hno/81kiIL8e8P4uaj+HxeJfpYxJcxL
-	 t2FWKLQwSY/6LWillNzbj1pyo2Lc7cAyy93g0+upf55Gk8PgVUKNtctMcoyYIR2Rbu
-	 MGnYy7YebSXiEutD0JxqkH/v55c8EQk/QDvIcp9W9996KojmlsnHnKR2UskAcDQ98g
-	 70Jr0roaWm0UKmqG10iWlXyVm83T194lJQIQJD0zan8Ag8tUxAi09+r5hmQSnmJ2I+
-	 QTUjQfOcLNHAQ==
-Received: from nuevo (unknown [IPv6:2a01:c846:1a49:2b00:4bd7:ad27:a4f1:789c])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: andrewsh)
-	by bali.collaboradmins.com (Postfix) with ESMTPSA id F18F317E360B;
-	Thu, 17 Oct 2024 15:47:11 +0200 (CEST)
-Date: Thu, 17 Oct 2024 15:46:54 +0200
-From: Andrej Shadura <andrew.shadura@collabora.co.uk>
-To: linux-bluetooth@vger.kernel.org
-Cc: Nathan Chancellor <nathan@kernel.org>, Justin Stitt
- <justinstitt@google.com>, Aleksei Vetrov <vvvvvv@google.com>,
- llvm@lists.linux.dev, kernel@collabora.com, George Burgess
- <gbiv@chromium.org>, stable@vger.kernel.org
-Subject: Re: [PATCH v2] Bluetooth: Fix type of len in
- rfcomm_sock_getsockopt{,_old}()
-Message-ID: <1e450049-d173-4a6f-b857-71b7c6f50e6f@collabora.co.uk>
-In-Reply-To: <20241009121424.1472485-1-andrew.shadura@collabora.co.uk>
-References: <20241009121424.1472485-1-andrew.shadura@collabora.co.uk>
-Organization: Collabora
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.41; x86_64-pc-linux-gnu)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Nzg1XmL6"
+Received: by mail-lj1-f174.google.com with SMTP id 38308e7fff4ca-2f75c56f16aso11258791fa.0
+        for <linux-bluetooth@vger.kernel.org>; Thu, 17 Oct 2024 07:34:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1729175679; x=1729780479; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=MrEeKotPweiFAhx/DXep6pHdZjZHTfrbrQ9uQdA201M=;
+        b=Nzg1XmL6M5w2XCFN3EMIQBmEdIOeUGb8rAB6IwcY2odYVvPnKoY6bQHqwYAUkzaBlF
+         4kjbVSw0pYJr8PuDZTcE/n1/Z9rUTBnv9cQ93QVfUIxHFjH8RdmwlHc+IXhyJCvUvHul
+         vDrWPVL/nU6ClR5G9wOXIZ1MV8N2FJ3czOmhm1PzA6cFFvV0RRrYnc2Ub27NCtPTROZ0
+         HqL3CDS3Gb5HGjVea35EtEdwE3TDpsHAUjaUZZtL04DAoAtCincZk7CoMwiNkeozRL8C
+         Ecps7faCFGKyf8zhJ20YVzuVJ82gsPhMQK14kEZEsXzlzV4o6RjA+46yvXyKett9CXDP
+         X5RA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1729175679; x=1729780479;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=MrEeKotPweiFAhx/DXep6pHdZjZHTfrbrQ9uQdA201M=;
+        b=bRa1Bo8sC4T3XAtoe5aChwitkImXGMbDweXDhgm/L3tVm4U7XMvgA+m16Dsri1mYn6
+         QEqDVq+58j7ihuHTOy246RLWFLbe8m8lxjPz4Z7+O8CLQmexmQpkLZDcmB+KBnutJxZN
+         Ki4iS/tti0v7fKft/f+H1XmvdmSbf3Q3T2beoOxFKMPCPR1+mlWKCss5VJVnjw5TjZok
+         ZrSFjcbTVsg5ceScrJ/VDA0NN7Dkg6r0EbwSi71SIr6XoR9uNyO6TPFBng7YMlnbuIOV
+         4mN1oAggiZjmgSHTx4TNv3160IG0Wo45IPXpBKZRuz4HhD/BQY9EqtkOfq+DmSDttidk
+         op4g==
+X-Gm-Message-State: AOJu0YxmbsPoYm2/bozlizLOf2nKv4WzJu8OvEjQfBWx7F7lZlK42v1I
+	KyEfJxFEC+7JwCXnYdauVY7EHDlSo+o6V/02LhCq94WbC1/zFAuWz2qQLNjANgBQ03Ng8rCHDZl
+	injHX4mvrFVEikkKrd0hJWX84esXjvXve
+X-Google-Smtp-Source: AGHT+IEhwNWpXeSLixjsMvHz0MuoPgMQeTRojx4V/qpVuGhYaMHs18Uct5TYnlcUANg7MoM7wimCSjNSLj49JIizetg=
+X-Received: by 2002:a05:651c:551:b0:2fb:6394:d6bd with SMTP id
+ 38308e7fff4ca-2fb6394d91cmr34097451fa.12.1729175678185; Thu, 17 Oct 2024
+ 07:34:38 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <e18457d80cbd4c6aa6136c12ebf1e444@quicinc.com>
+In-Reply-To: <e18457d80cbd4c6aa6136c12ebf1e444@quicinc.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Thu, 17 Oct 2024 10:34:25 -0400
+Message-ID: <CABBYNZ+V_n+x8_m_7m1VJJS5CttZErzEFBBHgf3JjTWgUVkBRg@mail.gmail.com>
+Subject: Re: Unable to send PBAP(PCE) pull request with specific parameters
+ from obexctl tool
+To: "Amisha Jain (QUIC)" <quic_amisjain@quicinc.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>, 
+	"Mohammed Sameer Mulla (QUIC)" <quic_mohamull@quicinc.com>, "Harish Bandi (QUIC)" <quic_hbandi@quicinc.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 09/10/2024 14:14, Andrej Shadura wrote:
-> Commit 9bf4e919ccad worked around an issue introduced after an
-> innocuous optimisation change in LLVM main:
-> 
->> len is defined as an 'int' because it is assigned from
->> '__user int *optlen'. However, it is clamped against the result of
->> sizeof(), which has a type of 'size_t' ('unsigned long' for 64-bit
->> platforms). This is done with min_t() because min() requires
->> compatible types, which results in both len and the result of
->> sizeof() being casted to 'unsigned int', meaning len changes signs
->> and the result of sizeof() is truncated. From there, len is passed
->> to copy_to_user(), which has a third parameter type of 'unsigned
->> long', so it is widened and changes signs again. This excessive
->> casting in combination with the KCSAN instrumentation causes LLVM to
->> fail to eliminate the __bad_copy_from() call, failing the build.
-> 
-> The same issue occurs in rfcomm in functions rfcomm_sock_getsockopt
-> and rfcomm_sock_getsockopt_old.
-> 
-> Change the type of len to size_t in both rfcomm_sock_getsockopt and
-> rfcomm_sock_getsockopt_old and replace min_t() with min().
+Hi Amisha,
 
-Any more reviews please? It would be great to have this fix merged :)
+On Thu, Oct 17, 2024 at 8:20=E2=80=AFAM Amisha Jain (QUIC)
+<quic_amisjain@quicinc.com> wrote:
+>
+> Hi,
+>
+> We are trying to verify the below PTS testcases in PBAP Client profile, w=
+here DUT initiates the connection.
+>
+> 1. PBAP/PCE/PBB/BV-03-C   -   PBAB server(PTS) is expecting the PullvCard=
+Listing request with MaxListCount =3D 0 (can be variable).
+>
+>  Description : Verify that the PCE can obtain at any time Phone Book size=
+ information from the PSE.
+>  ((TSPC_PBAP_2_2 AND TSPC_PBAP_2_4) AND TSPC_PBAP_1_1) OR TSPC_ALL
+>
+> User prompt:
+> Send a PullvCardListing request with MaxListCount =3D 0  for phonebook pb
+>
+> Results:
+> Failed to receive the Get operation with correct parameters for x-bt/vcar=
+d-listing
+>
+> Expectation:
+> Pass verdict
+> The IUT issues a PullvCardListing command with the MaxListCount header se=
+t to 0.
+>
+> Behavior : Bydefault MaxListCount value will be set to 65535 for every pu=
+ll operation and we don't have the option in obexctl to modify the value, H=
+ence testcase is failing.
 
-Thanks in advance.
+Looks like we didn't add any option to command 'ls' to be able to set
+the MaxCount filter:
 
--- 
-Cheers,
-   Andrej
+https://github.com/bluez/bluez/blob/master/doc/org.bluez.obex.PhonebookAcce=
+ss.rst#arraystring-vcard-string-name-listdict-filters
+
+So we will likely need to change that if you intend to use obexctl to
+perform this test.
+
+>
+> 2. PBAP/PCE/PBB/BV-05-C    -    PBAB server(PTS) is expecting the PullvCa=
+rdEntry request with specific filters defined in Bluetooth spec.
+>
+> Description : Verify that the PCE can retrieve a Phone Book entry from a =
+PSE using the PullvCardEntry function with a simple filter.
+> ((TSPC_PBAP_2_2 AND TSPC_PBAP_2_4) AND TSPC_PBAP_1_1) OR TSPC_ALL
+>
+> User prompt:
+> Send a PullvCardEntry request which filter for Name (N) and Telephone (TE=
+L)
+>
+> Results:
+> Failed to receive the Get operation with correct parameters for x-bt/vcar=
+d
+>
+> Expectation:
+> Pass verdict
+> The IUT receives the requested Phone Book entry. The received entry conta=
+ins only the VERSION, N, TEL, and for vCard, 3.0 FN.
+>
+> Behavior : Bydefault no filters will be set for pull vcard operation and =
+we don't have the option in obexctl to add filters in the pull request, Hen=
+ce testcase is failing.
+
+This would be performed with command 'cp' but like in the other test
+obexctl don't have the ability to set any Filter for Pull or PullAll:
+
+https://github.com/bluez/bluez/blob/master/doc/org.bluez.obex.PhonebookAcce=
+ss.rst#object-dict-pullallstring-targetfile-dict-filters
+
+>
+> Is there any tool/fix to pass above testcases?
+> Bluez version: 5.65
+
+Hmm, why are you attempting to qualify such an old version? If we are
+to add some support to setting those filters required for
+qualification purposes they would have to be merged upstream first.
+
+> Thanks,
+> Amisha
+>
+
+
+--=20
+Luiz Augusto von Dentz
