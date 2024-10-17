@@ -1,138 +1,104 @@
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f173.google.com (mail-qt1-f173.google.com [209.85.160.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B3E91791ED
-	for <linux-bluetooth@vger.kernel.org>; Thu, 17 Oct 2024 06:13:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 884531DAC9B
+	for <linux-bluetooth@vger.kernel.org>; Thu, 17 Oct 2024 08:03:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729145641; cv=none; b=KgFRYy2m06qmv1PQBj6XQwomEBaz9puAH954qJdTlFTpUXPIQxguf4vm6hp15k3vLpVssndjrzoKL9ins9ISNmgdGdRrWkuI02oX2f6pY/U63wQUwpHl2ABpLdx3XURP0BrRV799+XlL/FJ6XBW27SNcTDcB4uW4FrYERGhQDgw=
+	t=1729152215; cv=none; b=Pg3vRG6pc9xnPHIdDR/Eg5xAOapMd7QfewI7zsrNbfImRXtkuQmmmZWHxEWjzORuqFPe57ZzgcK1IyuW0G7aU+jrOEdMm15bzDJQyJY4txmxQEhf9fFxuFZZwy6ZacR9BG7iqP3Ix/RuL3VPuiOJhghDYPBkqsenpmmNI4eZahM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729145641; c=relaxed/simple;
-	bh=78tnzJMXAgtS8Og81n1LdtNdhMA+EuI7IKi7HFhmYZw=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=uoRCueDStxWoGrbFaPZiO+63dYVxjV3YOPTmcoZupSIXD/P5mYSKs9gDJXwfx+ivRa6jVLfK6LUUwtfmInWxIxSf4goiidjgALinDWKIkYk3viOwj2MSTrl5TEbGC7FvMepLr+sSqC8ZQ41PJzJh9VXreX0sfjrNQMgMd4zjKRc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=MVZTPZ5h; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+	s=arc-20240116; t=1729152215; c=relaxed/simple;
+	bh=i+KaXQoxy9qJ4KRSPxEyKoum1/UcCV1Ta6bxo8S0UnU=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=Z29YAvGuWxL+I/XTCHXoImxCnaAW5+3VfKnzegJVTbu5xYf/bOd+RHA5q14KZpuQ+NSk6QUxlE1yt63DM+Ny4yHoKcCDbxpq9BObeHoj8c99BYzcerYFURU7uzqWefmdWvI2mm6c+8SIHVlUqTB8WCqvJW/Z1+Q5sj6PIaKYcV4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OsBGlwuV; arc=none smtp.client-ip=209.85.160.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="MVZTPZ5h"
-Received: from pps.filterd (m0279870.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 49GLAPDQ011275
-	for <linux-bluetooth@vger.kernel.org>; Thu, 17 Oct 2024 06:13:59 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:message-id
-	:mime-version:subject:to; s=qcppdkim1; bh=RXNL6cBS3tWGiUZ6FONTfM
-	YbSuM9BfXmeqIOmbzMtnw=; b=MVZTPZ5hzul8GpVQAzAYoN42OX3JNuqNgg3Qbg
-	UWVyXeoewDh+1TB3O3yRkgF8SoPS2xMyX8Q8jLJqP9uSr3iHglK2EwpXnbcayGnx
-	rB7bz7ubsMO79Peaf6xgIT+gtlZw60/hT7hk9AdJOHruHrhwyhBC7LLEFuXjId1g
-	NIXoCGwprZkBvwSG/scI0R/bNSnV1G/uA/PwjonYB26dg5fKZUCRgIO+DIw4P2Tz
-	GFNMaFLD3j7wDd1/Xy/Sc+xVdN0CdzZOJYpW8WJ829GtkzNjZAPXU0V+sJu1Ue9C
-	m2Clhn0f5xUm5Z3AxJGMtv0IvtP7EzkgnINYuoYvBPQ4s0Lg==
-Received: from nasanppmta05.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 42abm5jxkx-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <linux-bluetooth@vger.kernel.org>; Thu, 17 Oct 2024 06:13:58 +0000 (GMT)
-Received: from nasanex01c.na.qualcomm.com (nasanex01c.na.qualcomm.com [10.45.79.139])
-	by NASANPPMTA05.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 49H6DvNO025721
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <linux-bluetooth@vger.kernel.org>; Thu, 17 Oct 2024 06:13:57 GMT
-Received: from hu-amisjain-hyd.qualcomm.com (10.80.80.8) by
- nasanex01c.na.qualcomm.com (10.45.79.139) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.9; Wed, 16 Oct 2024 23:13:56 -0700
-From: Amisha Jain <quic_amisjain@quicinc.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: <quic_mohamull@quicinc.com>, <quic_hbandi@quicinc.com>,
-        <quic_anubhavg@quicinc.com>
-Subject: [PATCH v1] obex: Move size emit signal to plugins instead of obex.c
-Date: Thu, 17 Oct 2024 11:43:31 +0530
-Message-ID: <20241017061331.2097436-1-quic_amisjain@quicinc.com>
-X-Mailer: git-send-email 2.34.1
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OsBGlwuV"
+Received: by mail-qt1-f173.google.com with SMTP id d75a77b69052e-4608564478bso7094791cf.1
+        for <linux-bluetooth@vger.kernel.org>; Thu, 17 Oct 2024 01:03:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1729152212; x=1729757012; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=zooXwQxCn1/Ma2x2/oPxoYAxFafX73CEkoy4rSLCpfk=;
+        b=OsBGlwuV7tYkC0iV4LrSLu6VShEyO1WXCAtHGZzR75cg/1+iFJav0mH3qN+sK/m9zF
+         h4bOSlgrWzDbExCuQkTjfdRENWDyaV7ShIy5JQrCG1OKbXwFnafm1iuq290dm2hdBauV
+         /3Q/EWi1cKpAsnb45n9utcW43LFuKH1W3/vAGTJm7ViYBZKrGwdYozkAuqh5yst6ywyx
+         A6VcxRf00491QYXFG01RdBpXgWprnm+uzBUD1p9QKdcG+zBlUEukxu1yyMr+7cE9YOUk
+         MT1QJic9DW99NSP1Fm0JQcvxGFIR17XkYKMKjCzT2IbS7TJM19DQwEMfG8C1GhlD5ofX
+         3WVA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1729152212; x=1729757012;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=zooXwQxCn1/Ma2x2/oPxoYAxFafX73CEkoy4rSLCpfk=;
+        b=LF6YYgTz6DcTOeIasTCl1moFu39tt2cTarCnUzOFbRPMy29gU4oOXF4liJqpBMHLBS
+         MPljU1F2mme+/WMx2kf+2QEK6HU6VPE7JcYVXpGJkKxJ3McsuIHAlReEpo26hV0lHkRv
+         rpy1955i/iUYQnO4g/NEzaDxptMktGxWR6Fpqq6fPORC/v+A6o0g/lWifHaQyosBfJsx
+         0U5W9Z7VCT2TWbYatBz/OzX77mvA5QfumKVZ60gmFYFnu6wZZZThCaeKQWW5MfvjFRbu
+         Y4JTEyqxU32eiMKt6HUYhKyNhKsihmm0ERxFT5a+LhkdAuRWemv7s+9Ls/pXfO5BS6zU
+         LwfQ==
+X-Gm-Message-State: AOJu0YzOu2uCVgDerVOGXJTUm/ZyCmgTBftm+zefL09DiVUa55gp7QRT
+	3y0D5KP1Cx0FOChlaTGeas4mO6xgy5Xuy3xinY4yqp86GP7wSW3oDWQHbw==
+X-Google-Smtp-Source: AGHT+IF1ll0XDyWpTcqT88N3KUuY0BGt8wr6dOikpV2HqsyqgRT4ul19nLTvLFtBPRXOodudIwumFQ==
+X-Received: by 2002:ac8:578a:0:b0:458:2c22:e696 with SMTP id d75a77b69052e-460584c3a90mr296909301cf.56.1729152211872;
+        Thu, 17 Oct 2024 01:03:31 -0700 (PDT)
+Received: from [172.17.0.2] ([20.109.39.241])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4609aca53bdsm7394371cf.54.2024.10.17.01.03.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 17 Oct 2024 01:03:31 -0700 (PDT)
+Message-ID: <6710c4d3.050a0220.47c85.307d@mx.google.com>
+Date: Thu, 17 Oct 2024 01:03:31 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============7874107862548044489=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nasanex01c.na.qualcomm.com (10.45.79.139)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: kl-mmO5eFb0hVnfoisMnP_E9l3A2L0AD
-X-Proofpoint-GUID: kl-mmO5eFb0hVnfoisMnP_E9l3A2L0AD
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
- definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 adultscore=0
- clxscore=1011 impostorscore=0 mlxscore=0 bulkscore=0 suspectscore=0
- lowpriorityscore=0 phishscore=0 priorityscore=1501 spamscore=0
- mlxlogscore=945 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2409260000 definitions=main-2410170040
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, quic_amisjain@quicinc.com
+Subject: RE: [v1] obex: Move size emit signal to plugins instead of obex.c
+In-Reply-To: <20241017061331.2097436-1-quic_amisjain@quicinc.com>
+References: <20241017061331.2097436-1-quic_amisjain@quicinc.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Instead of emitting the property "Size" from obex_put_stream_start(),
-Call the function manager_emit_transfer_property() from plugins/*.c
-wherever plugin has transfer object present.
-Remove the code from obex.c which is generic for all profiles.
+--===============7874107862548044489==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-This change resolves the type mismatch issue when calling the
-manager_emit_transfer_property from obex.c. We are passing
-'os->service_data' of plugin session type but the
-manager_emit_transfer_property() expects the 'obex_transfer'
-type, therefore size is not set properly and might cause
-crash/disconnection.
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=900075
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.58 seconds
+GitLint                       PASS      0.29 seconds
+BuildEll                      PASS      24.62 seconds
+BluezMake                     PASS      1607.82 seconds
+MakeCheck                     PASS      12.84 seconds
+MakeDistcheck                 PASS      179.74 seconds
+CheckValgrind                 PASS      259.12 seconds
+CheckSmatch                   PASS      386.74 seconds
+bluezmakeextell               PASS      132.54 seconds
+IncrementalBuild              PASS      2172.38 seconds
+ScanBuild                     PASS      1212.41 seconds
+
+
+
 ---
- obexd/plugins/ftp.c | 5 +++++
- obexd/plugins/opp.c | 5 +++++
- obexd/src/obex.c    | 3 ---
- 3 files changed, 10 insertions(+), 3 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/obexd/plugins/ftp.c b/obexd/plugins/ftp.c
-index 874fe2b8b..6c841d207 100644
---- a/obexd/plugins/ftp.c
-+++ b/obexd/plugins/ftp.c
-@@ -175,6 +175,11 @@ int ftp_chkput(struct obex_session *os, void *user_data)
- 
- 	ret = obex_put_stream_start(os, path);
- 
-+	if (ret == 0 && obex_get_size(os) != OBJECT_SIZE_DELETE &&
-+				obex_get_size(os) != OBJECT_SIZE_UNKNOWN) {
-+		manager_emit_transfer_property(ftp->transfer, "Size");
-+	}
-+
- 	if (ret == 0)
- 		manager_emit_transfer_started(ftp->transfer);
- 
-diff --git a/obexd/plugins/opp.c b/obexd/plugins/opp.c
-index 777f5f8ed..2220efd49 100644
---- a/obexd/plugins/opp.c
-+++ b/obexd/plugins/opp.c
-@@ -87,6 +87,11 @@ skip_auth:
- 
- 	err = obex_put_stream_start(os, path);
- 
-+	if (err == 0 && obex_get_size(os) != OBJECT_SIZE_DELETE &&
-+				obex_get_size(os) != OBJECT_SIZE_UNKNOWN) {
-+		manager_emit_transfer_property(user_data, "Size");
-+	}
-+
- 	g_free(path);
- 
- 	if (err < 0)
-diff --git a/obexd/src/obex.c b/obexd/src/obex.c
-index 98d6245a4..370bfac9e 100644
---- a/obexd/src/obex.c
-+++ b/obexd/src/obex.c
-@@ -716,9 +716,6 @@ int obex_put_stream_start(struct obex_session *os, const char *filename)
- 		return err;
- 	}
- 
--	if (os->size != OBJECT_SIZE_DELETE && os->size != OBJECT_SIZE_UNKNOWN)
--		manager_emit_transfer_property(os->service_data, "Size");
--
- 	os->path = g_strdup(filename);
- 
- 	return 0;
--- 
-2.34.1
 
+--===============7874107862548044489==--
