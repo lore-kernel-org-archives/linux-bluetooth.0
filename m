@@ -1,79 +1,82 @@
-Received: from mail-il1-f199.google.com (mail-il1-f199.google.com [209.85.166.199])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCB6F173
-	for <linux-bluetooth@vger.kernel.org>; Sat, 19 Oct 2024 22:03:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56EE02904
+	for <linux-bluetooth@vger.kernel.org>; Sun, 20 Oct 2024 02:14:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729375385; cv=none; b=faGDSU3VYBIYOCN4Ts6+dAw01aw71RReRoUkqICHTQsR32mR5JuDJpoG4UWfmTmYy5VNyICgk7Xv73F2lxYGUpF/YYB1c69Qq3E3htlZLSeZkpzsSJPWlF3MnUax80dm0GMTiqc9v8JjtzfevtN1bYEio3zc+16cd/JouMVR1Bg=
+	t=1729390493; cv=none; b=VKqwqNZycPvkbj/tZr2pf6QVYFqvv3ZVFSxXX/7GT6SS0wWI/0r8knoFQtp6aHhAZA7QRyrRHR+OiFO/AIMp/gOjMVxVkV8Jj93JG/Tblxz1IZ2aiE8OsECDS+aCKLC++E/81CPQCcc+2ATJJAKQjrx+feaNU7yH7ycEnHtXjKU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729375385; c=relaxed/simple;
-	bh=4r/dnSU2iv58zYZkcF3J2NBOOcfh+f3piDebouy/9IA=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=Oc9JFjDx2RYRDNdoa8sxKvo6hn+AsqSaI5TjxxILdecbEa9iyzgHqIOcy/AkXWzlnOcZOkheKAokndyv7ZTR7Buc1tzJfhgac0078IHckVriUMbYMBwH6CUa1p83VNJlrIG8U5d8UssH23NASwlecIK/Bl7aghkL12lzFu6mScY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f199.google.com with SMTP id e9e14a558f8ab-3a3c8853d76so33856355ab.2
-        for <linux-bluetooth@vger.kernel.org>; Sat, 19 Oct 2024 15:03:03 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729375383; x=1729980183;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=7RLqbF/44Rgljiqe7gmVwXbfdAgdxhslKmNZMh8Pfbw=;
-        b=SVIXoUJ5l3/0FC7iN0ibD1iyh7qYPTGlq9vKDPgOD7jpfZ1g9HLYBQaB+gdpgqRVMB
-         I5FTFUB92b28BgYnzQaK9yFsgXBbw8W2Ubvdl34lP9syib6cezHQgqumItT8BK/H5nP5
-         X0hU9xBl/jb45B0tmG2N2p+yrjCSa6WEMoGxgsXlVEGfwm3G/LfKOcE5F1LWOkehSlDB
-         UdtgI6MpwGP7/icLpzSo8Fy9pN0CgkcgcnZfWzVcTfjiahExaS+Cfva2n6GcOv7OgHt6
-         8nqs7CRNI7AkLYRioXTEj0Fxo24kR6NqK/DwnH/9mw19PTEPdn5cYGkyLLs1qcHYS7Dq
-         AsAA==
-X-Forwarded-Encrypted: i=1; AJvYcCX6bCMdPc11Qhjfq6MTx+xnNrMELY5Ex0xucH6UVS1k0Le/NFAaFWuEYrWFrDU8a2NjlC+0yLoVqwVPO1vgdYY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxVy5wKdCFSw7ka5evJ8vBltqePvvvW1PgqV3x8u6zrh1tYELME
-	odWbdluzlckwCcmq3RVSc+2hjr56HoLYqtFcpPjqS/eW30tifXgAEWhq1NdKSKSztyz867njbQk
-	5ey0K1F7p2CDV7LCgcpWuQmE9k8wKK0CxL8JlCW/FSNZketwTwSF24hI=
-X-Google-Smtp-Source: AGHT+IE96T6mtPOXUI/WweupFLsfamKoYzsTZ0Bbhwr3/cBXtjGsDjI/N0hiSqdkU1zKkxy1ivao0cGe6sBEuVvyhhqrBErxxqXc
+	s=arc-20240116; t=1729390493; c=relaxed/simple;
+	bh=BlSqh7E324S/zf5b7TcRt+jBZVSG7+deUkHF0eKgwik=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=BYpnTgLxEf4ZY5fCb+DAqJ3tXpDCYQq0pchu45bA2lYghgVyI8M0vY8GHbVXu2tu+qDf3oa1ltxSbo0LoH8RpcEK4yTe7RQUkuBGeethuRri6pBp4BC6LOlkCQrvljgV2PWPltMhIV3xQQrL1etcIxKVVzHW/m1B7IF9GAOerx4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QvOu9CiQ; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QvOu9CiQ"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id D436BC4CED0
+	for <linux-bluetooth@vger.kernel.org>; Sun, 20 Oct 2024 02:14:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1729390492;
+	bh=BlSqh7E324S/zf5b7TcRt+jBZVSG7+deUkHF0eKgwik=;
+	h=From:To:Subject:Date:In-Reply-To:References:From;
+	b=QvOu9CiQGrAcPCFaVsBb/osgBCN+m8DHZGZEB6SJrg0Px7arjKom6RMXdguypDW2C
+	 paCEbsSzorYiLG1gKR0sDA5C7bgB6+qCryqqSyczVBIhEnuJUrPIEIuRgLlkljlXpt
+	 3IZdQ91MvPe0jRRZUByweRJnBIDvrlsHWLxRS1r0jewhBkbqScc09Ze3zmpvdyD4UH
+	 Pp8mI+RwA1TaXrOy/ytfqQ+MaoCncKTiTGAowIUhsVTVPXirLBmEwQBJwEn5GnBWxz
+	 LNz0bNEhFUyhEKhANLYPSI/vpJ4Udbakchfw3wLd7YiRgum2VaUuLJ3Mm2pCnIgZGh
+	 l4gdaz+fspMAA==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+	id C4A53C53BCB; Sun, 20 Oct 2024 02:14:52 +0000 (UTC)
+From: bugzilla-daemon@kernel.org
+To: linux-bluetooth@vger.kernel.org
+Subject: [Bug 219385] BT mouse can not be found and/or connected in 6.12-rc3
+Date: Sun, 20 Oct 2024 02:14:52 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: matoro_bugzilla_kernel@matoro.tk
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P3
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: cc
+Message-ID: <bug-219385-62941-APaOgSSk8w@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-219385-62941@https.bugzilla.kernel.org/>
+References: <bug-219385-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:18c6:b0:3a0:8c5f:90c0 with SMTP id
- e9e14a558f8ab-3a3f4054723mr65915665ab.10.1729375382809; Sat, 19 Oct 2024
- 15:03:02 -0700 (PDT)
-Date: Sat, 19 Oct 2024 15:03:02 -0700
-In-Reply-To: <00000000000087e83e061dd271bd@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <67142c96.050a0220.10f4f4.0021.GAE@google.com>
-Subject: Re: [syzbot] [kernfs?] INFO: task hung in eventpoll_release_file (2)
-From: syzbot <syzbot+63ab1a905aebbf410bb7@syzkaller.appspotmail.com>
-To: brauner@kernel.org, gregkh@linuxfoundation.org, isdn@linux-pingi.de, 
-	jack@suse.cz, johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org, 
-	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	luiz.dentz@gmail.com, luiz.von.dentz@intel.com, marcel@holtmann.org, 
-	netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com, tj@kernel.org, 
-	viro@zeniv.linux.org.uk
-Content-Type: text/plain; charset="UTF-8"
 
-syzbot suspects this issue was fixed by commit:
+https://bugzilla.kernel.org/show_bug.cgi?id=3D219385
 
-commit 0023d340ba86cfe50b935829a73adea57ec2c629
-Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Date:   Tue Sep 10 14:22:36 2024 +0000
+matoro (matoro_bugzilla_kernel@matoro.tk) changed:
 
-    Bluetooth: CMTP: Mark BT_CMTP as DEPRECATED
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+                 CC|                            |matoro_bugzilla_kernel@mato
+                   |                            |ro.tk
 
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=1594c430580000
-start commit:   b31c44928842 Merge tag 'linux_kselftest-kunit-fixes-6.11-r..
-git tree:       upstream
-kernel config:  https://syzkaller.appspot.com/x/.config?x=58a85aa6925a8b78
-dashboard link: https://syzkaller.appspot.com/bug?extid=63ab1a905aebbf410bb7
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=10662bc7980000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=137bba00580000
+--- Comment #6 from matoro (matoro_bugzilla_kernel@matoro.tk) ---
+Confirming that this patch applied to 6.11.4 also fixes bluetooth on my Int=
+el
+AX210.
 
-If the result looks correct, please mark the issue as fixed by replying with:
+--=20
+You may reply to this email to add a comment.
 
-#syz fix: Bluetooth: CMTP: Mark BT_CMTP as DEPRECATED
-
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+You are receiving this mail because:
+You are the assignee for the bug.=
