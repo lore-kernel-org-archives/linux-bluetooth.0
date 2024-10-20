@@ -1,37 +1,37 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6B6A1DFDE
-	for <linux-bluetooth@vger.kernel.org>; Sun, 20 Oct 2024 14:27:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C7CB187FE4
+	for <linux-bluetooth@vger.kernel.org>; Sun, 20 Oct 2024 15:25:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729434478; cv=none; b=msSRVesmQEfdEfUrAgv0zJI3r85cg7JpTK7HU7rFNGiC3sO2YLzlw4qXJdxp13UnK31hIbUnTiVflOTC/Ou+OubsZfUxJTSzLyqwWjXoWnpPAd+Ckz2hU6OaY9whPv9WwnTUZjoesqGImquRHKI1BUaYLS87TOOR6412x31/d8g=
+	t=1729437934; cv=none; b=HB2qIXHZXewPZzh3BdjVepM7qZeDDkMPl8gS+q0MKSWP1rPC1i8R42ON0rFBVZmiWOeSMYsy1MOTY9KXiRJosaBOlQqLTXJ7kypmF5HFnHPYKEXQB/20TgbucXUKVQArKKdj1/c2HJNWL6ycuEkhOaChi33y1/ofQ8dPOBVJB9A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729434478; c=relaxed/simple;
-	bh=iuaNMv4uJ/w9fOKr3PFZylhB1wVjKuCLWGnvRWL3/gg=;
+	s=arc-20240116; t=1729437934; c=relaxed/simple;
+	bh=4zeKy/cDhCTAm2BpOVwjHGhLrV/zIOBdINzDV+EDD2A=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=bLXSdIkm9rC/KmCz7iyhyC8QD/TN7y4QfGFEyMraNFuVQTi0oyOWvhg4WhQipWaEiJfbzCMsrg3GEnD4XUffwtXsNPNirtBEjQdJRkIouaOYfqIgbkdEsi/9W0Az3q5WXtiKs5XHgYP7PSrnpAzno755du3T2FDo4A6tKr093hc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rBCfy13s; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:MIME-Version; b=ADVQC+Pz2SxOAMWx2+m/HeoL71A3XTyN7VjxcrCCCBrqn0l19C+8fKWiTR1gaMc63vvKDxmDWidVLdklZMJU6yHQx5ZKkXt2n4lDqX9VaZYoqgX2n44w4nEqz6uiqCThIaPtO5Q83uk0jmmqD4wYzWIXjxQKgmwgZQyfcioYFQc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=D/+HTHkq; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rBCfy13s"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 47FE1C4CEC6
-	for <linux-bluetooth@vger.kernel.org>; Sun, 20 Oct 2024 14:27:58 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="D/+HTHkq"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 8DF5FC4CEC6
+	for <linux-bluetooth@vger.kernel.org>; Sun, 20 Oct 2024 15:25:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1729434478;
-	bh=iuaNMv4uJ/w9fOKr3PFZylhB1wVjKuCLWGnvRWL3/gg=;
+	s=k20201202; t=1729437933;
+	bh=4zeKy/cDhCTAm2BpOVwjHGhLrV/zIOBdINzDV+EDD2A=;
 	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=rBCfy13sn4iyUXxS8LGRoHUX/qnujnECGOBCyP/T1efV6wJh1UO5TnuZ1QG/cSr/w
-	 iKF3fSL7mgJbF4UVR1fmdOULrMH+3ojJDHB9cK3bdKHDwltB8ZpdsXBx9ftuZlwb1u
-	 Yq5LYO7atJSOwqXAqrZhV46E9arRUDYwUYN8MwRCrygg5EbTzIV8XEGXtOYLhYQyW2
-	 WYNTEiHGngec5S1XL6sp18ZDg5jJCajhF/vYKqdoCV74+z/TTibXv9ggMpExzE9m/A
-	 nC8r0nAdXcWBLU0Q5TW8ZQV3KGx6KSRLOsbyFUS6ogKjqa2hb7l7CWI0uf68WueDs2
-	 8r5UMO8B4pDeg==
+	b=D/+HTHkqBFCNQahMm3WK52F8lvbchg/FmymJfT1c8xXj2tzrx/3rmvG+/N3b5nVkm
+	 mCGbjna/B0Bm5FVQf23iPHJDyFEFGqX7H7x2vmtuiIiDo59Xcs9HjBCfxlFgpYy5PV
+	 uQrY6V2mziB584kVP++dWdU78iNwX6qbzSw12avQ1ffcPzSYkv4ZjlSUM/twfr0Ta4
+	 yae5SOwnUog4s9zpjx154HGcw1PGuhldKVQ4SPwqpphvOgU0fgoR8jWbnsvqft63rM
+	 ZfgMXiBNfuMa2GAliHwG68BUseo0+8XjHJko/Nm8K7w5dRF1FvAA32P6xIhGc+/J+N
+	 AkehHRZtCZmVA==
 Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id 33681C53BC4; Sun, 20 Oct 2024 14:27:58 +0000 (UTC)
+	id 7A6D3C53BC4; Sun, 20 Oct 2024 15:25:33 +0000 (UTC)
 From: bugzilla-daemon@kernel.org
 To: linux-bluetooth@vger.kernel.org
 Subject: [Bug 219404] mt7922: bluetooth can't find any devices
-Date: Sun, 20 Oct 2024 14:27:58 +0000
+Date: Sun, 20 Oct 2024 15:25:33 +0000
 X-Bugzilla-Reason: AssignedTo
 X-Bugzilla-Type: changed
 X-Bugzilla-Watch-Reason: None
@@ -46,8 +46,8 @@ X-Bugzilla-Resolution:
 X-Bugzilla-Priority: P3
 X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
 X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: cf_kernel_version
-Message-ID: <bug-219404-62941-hv3q1LWeUr@https.bugzilla.kernel.org/>
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-219404-62941-44RXpb9hl3@https.bugzilla.kernel.org/>
 In-Reply-To: <bug-219404-62941@https.bugzilla.kernel.org/>
 References: <bug-219404-62941@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
@@ -63,11 +63,12 @@ MIME-Version: 1.0
 
 https://bugzilla.kernel.org/show_bug.cgi?id=3D219404
 
-Georg (g.wenzel@gmail.com) changed:
-
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-     Kernel Version|                            |6.11.4
+--- Comment #1 from Georg (g.wenzel@gmail.com) ---
+Completely crazy. If I connect to a device like Bluetooth headphones and th=
+en
+search for other devices, it works fine.
+But without any connection it finds nothing and I get the error message:
+[bluetooth]# Failed to start discovery: org.bluez.Error.InProgress
 
 --=20
 You may reply to this email to add a comment.
