@@ -1,82 +1,69 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-28.smtp.github.com (out-28.smtp.github.com [192.30.252.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C7371C8FD6
-	for <linux-bluetooth@vger.kernel.org>; Mon, 21 Oct 2024 21:10:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 478F519923C
+	for <linux-bluetooth@vger.kernel.org>; Mon, 21 Oct 2024 21:16:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729545024; cv=none; b=NTKOlOWHVOp5CSPh56cp2MXYoR+4F3mnLb/Fw1HyGIXYtVZB5rUrgfk1p7bBYiKKnGAcJhdnyLKb57e2/96Egh5nJEPkpCTrFXrL06tnLYJIX1WD77vVuDVVzuUgtxv/W9VwWYQxMPKpHDp0oCBCcRI1/I8tJWKNOcyXhTk3ZLU=
+	t=1729545365; cv=none; b=XlSHUUOOIJkqGmzHFQA6L/B1W2mch1wJS4/Jn+XLILCsCl0QK0lRaw8OwzkED7C5wjo2QWjeoYAJfxearkmQ0Qdpg5B/luQFqLfibRQ6Kgfs6LRefi0qbprD93BbORlVnqy/q54Xzw+vXn9UV6PcH3CZuRG1/9e4dqKmojCsUxM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729545024; c=relaxed/simple;
-	bh=9jAXS5OhtXQuDbT2LYHsFayRz9DUjPh6ZxvYefilsY0=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=WZV1BYIioGqsplxbvFNHolW7ULNXuCIz4r76ROxRHpmi1Tep0amOk9CYD0EpaG9spxKY7dj7B34T2zY44qHhTVG+TJ6VRqHdLY7xFKJEaFBJm76qS/RgLPvikLgh76mawXI/IgKqk+QdMORlT96cZAW6+ueIaM0cFURbcfr4wFI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hv8VHJLS; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1729545365; c=relaxed/simple;
+	bh=EIZOtP3cI32i09LoVcrr0AacGq/+vDWZuhkQ2UKHIbM=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=jD2RHBvSu2mS+Cw5VJ/aTXMJiPCAm2PYFrdpdt8W1n1bNizMMYRzJKwYc5aSIhlqtwQU63VW44gowdmGuGeCI0FPwXjJm4k+YM73rOfWCb0wmrk3FOjGvs7Miw/UmHIjFBMnzj+MYal1PuN8DcGZ9UU1sbGT6C81YiuBmRTe+g4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=TLLh6Ag0; arc=none smtp.client-ip=192.30.252.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hv8VHJLS"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DD4FFC4CEC3;
-	Mon, 21 Oct 2024 21:10:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1729545023;
-	bh=9jAXS5OhtXQuDbT2LYHsFayRz9DUjPh6ZxvYefilsY0=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=hv8VHJLS9UZamJDyDqOITzyxjjsKD+XkuiSdo2z1zE5yGYlLJ6XCC/Wt59V7RqYV7
-	 3KCcWXQf+P8xLwhNWAAeenGJxN4pQNQ5F3lJ+IiIYvWv2eFRIfKRii06HXtEZ/zN4c
-	 LAHdu6AUAvkNwYKtlpXeCzZVjsYkHmamGseENrPk+Z5Geqp7qBfW4IrKWd63fhEXXP
-	 dI27e4w+lm4L+ZLRBcXumAICAulPogG1roBID7NUrbfrsbwhIFbBXqF+AG507DEuS1
-	 ihzoxHHl822I8ER3Gt8QmPkmsy0rlRbHHQdTs70KcqvBX4TweNWAOiT2L+KWWq+Kms
-	 yuEhxwr50SwiA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33C963809A8A;
-	Mon, 21 Oct 2024 21:10:31 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="TLLh6Ag0"
+Received: from github.com (hubbernetes-node-a9ec292.ash1-iad.github.net [10.56.173.19])
+	by smtp.github.com (Postfix) with ESMTPA id 6C83F6C105F
+	for <linux-bluetooth@vger.kernel.org>; Mon, 21 Oct 2024 14:16:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1729545363;
+	bh=ChV6l+KHnzpUdTG7zfYZ5nrAaLTpw8EOzeGUXqgCXy8=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=TLLh6Ag0oFu7tpsMaG54kZ8AbNT6yil8Mn9IfOyh1bEXq+hEPLLdnKkutohJ0fuie
+	 h4tdR4WPzA5oZ4mMSIUteow0hYsCplMFD981caasOXHZ7pBVLM2zTuPNNPVTjDbX6O
+	 pvcLhxReEafRycSlbqP2+R3Sw+CsPx/qvldCft8o=
+Date: Mon, 21 Oct 2024 14:16:03 -0700
+From: Luiz Augusto von Dentz <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/master/8baabd-29174d@github.com>
+Subject: [bluez/bluez] 29174d: build: Fix make distcheck
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH 0/3] Bluetooth: btusb: Add quirks for ATS2851
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <172954503001.445881.1439242520713535031.git-patchwork-notify@kernel.org>
-Date: Mon, 21 Oct 2024 21:10:30 +0000
-References: <20241021122246.1569235-1-danstiv404@gmail.com>
-In-Reply-To: <20241021122246.1569235-1-danstiv404@gmail.com>
-To: Danil Pylaev <danstiv404@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org, uhrmar@gmail.com,
- raul.cheleguini@gmail.com, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
- marcel@holtmann.org
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-Hello:
+  Branch: refs/heads/master
+  Home:   https://github.com/bluez/bluez
+  Commit: 29174df0042ac1438ad7d00e6111c74031f1ac29
+      https://github.com/bluez/bluez/commit/29174df0042ac1438ad7d00e6111c74031f1ac29
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2024-10-21 (Mon, 21 Oct 2024)
 
-This series was applied to bluetooth/bluetooth-next.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+  Changed paths:
+    M Makefile.am
+    M doc/mgmt-api.txt
+    M src/btd.h
+    M src/main.c
+    M src/main.conf
 
-On Mon, 21 Oct 2024 12:22:43 +0000 you wrote:
-> The controller based on ATS2851 advertises support for the "LE
-> Extended Create Connection" command, but it does not actually
-> implement it. This issue is blocking the pairing process from
-> beginning.
-> 
-> To resolve this, add the quirk HCI_QUIRK_BROKEN_EXT_CREATE_CONN.
-> This will avoid the unsupported command and instead send a regular "LE
-> Create Connection" command.
-> 
-> [...]
+  Log Message:
+  -----------
+  build: Fix make distcheck
 
-Here is the summary with links:
-  - [1/3] Bluetooth: Add new quirks for ATS2851
-    https://git.kernel.org/bluetooth/bluetooth-next/c/ff4565bd7117
-  - [2/3] Bluetooth: Support new quirks for ATS2851
-    https://git.kernel.org/bluetooth/bluetooth-next/c/90f7f7538d07
-  - [3/3] Bluetooth: Set quirks for ATS2851
-    https://git.kernel.org/bluetooth/bluetooth-next/c/017dced0da79
+This fixes the following error:
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+make[2]: *** No rule to make target 'doct/hci.7', needed by 'distdir-am'.
 
 
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
