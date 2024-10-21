@@ -1,39 +1,40 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 937A21E3762
-	for <linux-bluetooth@vger.kernel.org>; Mon, 21 Oct 2024 09:29:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 152641E2608
+	for <linux-bluetooth@vger.kernel.org>; Mon, 21 Oct 2024 09:35:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729502961; cv=none; b=E19qqNb1QPpOsH3Lq/iPVdqP2d09XcU/sOmEhiio1/1NoHuyH995k3hUz7rovQpcxFsCSPAtrlg1JUbPrVunw0phzQJX018mbi3qspsuWTZ0XibVtoyJ9xq1sgF0jTvBDcVhb90PpOSSX8FLHLsv3hsnTR07fHZXru5YufXRnvc=
+	t=1729503337; cv=none; b=heTq6ame0vzhLAiyH3bu7tvLNyx7ecoMPlmbtI9uBLT3hHrhiZEgTBzgOWkhrxdOiht6p19UmQ+khK0gSuh4gqBb8JI1j/gY2lZzKj+NGJdNjtxCqTT+c3/OzSl+CegCfgfXtMz3rgiJGQuXJJXb8ZgXfwI4LHTuybkrd74h5NE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729502961; c=relaxed/simple;
-	bh=OsH5t3HmSrwXO93kIZN24MXlgAqaxl4UZ41g6yyZqiU=;
-	h=From:To:Subject:Date:Message-ID:Content-Type:MIME-Version; b=kK4a1kO3M1vdNsfqCdsA1CWMVYD+SkmMkAFXX8W/pG6dmKt7pmvxrLgRHIO5GA6R1+2mUrdV/N+aTOpsURLTiO5Tic9Uhs9ugkZ5eHTiDYGdfSIq68NQ6Xl5fwQfLgC9RvVuRROb0W87rMMrk8yStG1obzKbgeTWEAgQruH05nQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=s8iAS3YQ; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1729503337; c=relaxed/simple;
+	bh=HJFM7Gx3zbh7xamWcJ7Wp2VlZx/+zNr7NFYVT+WQrKw=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=RkPzVGBjdXqM9Pw8CK42VicuxHqwEgquoQHRLJ4V+R4nZrQjUxRn+TKI1LRjMBCa0v/MY1dszF4Q0cnut+RJvWAsUlALrb6VAsNClcrJwLcQp44XL/UPJPx/mf6pyJFJTs5YiIquKKSeq3kmAghMLcHawQ0yiPS8ANd9757ZKkc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=D1D5/4y/; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="s8iAS3YQ"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 2A7C4C4CEC3
-	for <linux-bluetooth@vger.kernel.org>; Mon, 21 Oct 2024 09:29:21 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="D1D5/4y/"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id A016AC4CEC3
+	for <linux-bluetooth@vger.kernel.org>; Mon, 21 Oct 2024 09:35:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1729502961;
-	bh=OsH5t3HmSrwXO93kIZN24MXlgAqaxl4UZ41g6yyZqiU=;
-	h=From:To:Subject:Date:From;
-	b=s8iAS3YQ+9Q32GQz7JLaVn3/6CWTy+JrHDGh0vmA3hIupvDRsvMHKAVO+0YaEXLMb
-	 UzV70XlDPq0wK8ybJL5K2oO4JZvNHJGRf/0fZotjYNYEhfqNRrzVJpSjrM4aXpLRHd
-	 eDu0Ec7TCHlj5o2iJ7JWFfcfSEK4J8OF+dhfz1mKhpmDMt4B81Ny71ilEM3gDwgCeg
-	 CjrmNgiJ9e4RZqm+v9naLJ+UHmTKbDVmGnAuSP/AJZBQddHUs0VsJyRQwsfQa5kD7R
-	 U7LXpz489/wDDITxX3bykPG58otunRUuSMGFXKFmoSTpq9+OtS2xpvr2K/40VOezWC
-	 i6mlfWjy3OUjw==
+	s=k20201202; t=1729503336;
+	bh=HJFM7Gx3zbh7xamWcJ7Wp2VlZx/+zNr7NFYVT+WQrKw=;
+	h=From:To:Subject:Date:In-Reply-To:References:From;
+	b=D1D5/4y/hVol/VqHESwlEQZDWXg32UXDwI0jxwrAylBiPfGOHKqA+oqyfXw85BGJD
+	 /Wp/Ihs3Jxt1wSnylznHBDvn0lt7trcil7wbWUOd3DdeFcJK3ozB+ijhoTVe5ikI/z
+	 mqOADE8OGQKmltFvCEA6HhKsJbax8W9deOIL/1SIqiilQuTNvqSaFgjtfFlBnjMEyV
+	 UOAqD8aSDRuCv9/tEI2UdJ+qpZMjYGEXW+40oXcFMrSl4GCdl4J/bV0zxQQGticjmZ
+	 8gdiifJbTU4jc5mxaOii8MVpH209LEAOrOvRAJC+W9XoEDBEptW9RmhKbRxvAIahOB
+	 V6e0663ZlTt6Q==
 Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id 16E1AC53BC2; Mon, 21 Oct 2024 09:29:21 +0000 (UTC)
+	id 8AD55C53BC2; Mon, 21 Oct 2024 09:35:36 +0000 (UTC)
 From: bugzilla-daemon@kernel.org
 To: linux-bluetooth@vger.kernel.org
-Subject: [Bug 219405] New: [regression] mt7922 bluetooth scanning does not
- work in 6.11.4
-Date: Mon, 21 Oct 2024 09:29:20 +0000
+Subject: [Bug 219405] [regression] mt7922 bluetooth scanning does not work in
+ 6.11.4
+Date: Mon, 21 Oct 2024 09:35:36 +0000
 X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: new
+X-Bugzilla-Type: changed
 X-Bugzilla-Watch-Reason: None
 X-Bugzilla-Product: Drivers
 X-Bugzilla-Component: Bluetooth
@@ -46,10 +47,10 @@ X-Bugzilla-Resolution:
 X-Bugzilla-Priority: P3
 X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
 X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: bug_id short_desc product version rep_platform
- op_sys bug_status bug_severity priority component assigned_to reporter
- cf_regression
-Message-ID: <bug-219405-62941@https.bugzilla.kernel.org/>
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-219405-62941-Kb0LepCEBw@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-219405-62941@https.bugzilla.kernel.org/>
+References: <bug-219405-62941@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-Bugzilla-URL: https://bugzilla.kernel.org/
@@ -63,62 +64,115 @@ MIME-Version: 1.0
 
 https://bugzilla.kernel.org/show_bug.cgi?id=3D219405
 
-            Bug ID: 219405
-           Summary: [regression] mt7922 bluetooth scanning does not work
-                    in 6.11.4
-           Product: Drivers
-           Version: 2.5
-          Hardware: AMD
-                OS: Linux
-            Status: NEW
-          Severity: normal
-          Priority: P3
-         Component: Bluetooth
-          Assignee: linux-bluetooth@vger.kernel.org
-          Reporter: eugene.shalygin@gmail.com
-        Regression: No
-
-6.11.3 -> 6.11.4 update broke bluetooth scanning for mt7922.=20
-
-09:00.0 Network controller: MEDIATEK Corp. MT7922 802.11ax PCI Express Wire=
-less
-Network Adapter
-    Subsystem: Foxconn International, Inc. Device e0cd
-    Kernel driver in use: mt7921e
-    Kernel modules: mt7921e
-
-With 6.11.3:
-$ dmesg| grep -i bluetooth=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20
+--- Comment #1 from Eugene Shalygin (eugene.shalygin@gmail.com) ---
+With 6.11.4
+# btmon
+Bluetooth monitor ver 5.78
+btmon[3582]: =3D Note: Linux version 6.11.4-gentoo (x86_64)=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
 =20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
 =20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
 =20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
 =20=20=20=20
-                                                                [    5.1705=
-54]
-Bluetooth: Core ver 2.22
-[    5.170762] NET: Registered PF_BLUETOOTH protocol family
-[    5.170949] Bluetooth: HCI device and connection manager initialized
-[    5.171130] Bluetooth: HCI socket layer initialized
-[    5.171313] Bluetooth: L2CAP socket layer initialized
-[    5.171495] Bluetooth: SCO socket layer initialized
-[    6.574657] Bluetooth: hci0: HW/SW Version: 0x008a008a, Build Time:
-20240716163633
-[    6.614305] Bluetooth: BNEP (Ethernet Emulation) ver 1.3
-[    6.614311] Bluetooth: BNEP filters: protocol multicast
-[    6.614316] Bluetooth: BNEP socket layer initialized
-[   27.410062] Bluetooth: hci0: Device setup in 20480957 usecs
-[   27.410070] Bluetooth: hci0: HCI Enhanced Setup Synchronous Connection
-command is advertised, but not supported.
-[   27.687794] Bluetooth: hci0: AOSP extensions version v1.00
-[   27.687800] Bluetooth: hci0: AOSP quality report is supported
-[   27.687914] Bluetooth: MGMT ver 1.23
-[   27.687951] Bluetooth: ISO socket layer initialized
-[   27.784423] Bluetooth: RFCOMM TTY layer initialized
-[   27.784430] Bluetooth: RFCOMM socket layer initialized
-[   27.784432] Bluetooth: RFCOMM ver 1.11
-[   27.955038] Bluetooth: hci0: Invalid LTK for a8:79:8d:fe:ef:cb
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20
+  0.553232
+btmon[3582]: =3D Note: Bluetooth subsystem version 2.22=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20
+  0.553233
+=3D New Index: 10:B1:DF:B8:17:42 (Primary,USB,hci0)=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
+[hci0] 0.553234
+=3D Open Index: 10:B1:DF:B8:17:42=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
+[hci0] 0.553234
+=3D Index Info: 10:B1:DF:B8:17:42 (MediaTek, Inc.)=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
+[hci0] 0.553234
+bluetoothd[1187]: @ MGMT Open: bluetoothd (privileged) version 1.23=20=20=
+=20=20=20=20=20=20=20=20=20=20
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
+{0x0001} 0.553235
+bluetoothd[1187]: @ MGMT Command: Start Discovery (0x0023) plen 1=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20
+                                                                 {0x0001}
+[hci0] 12.563728
+        Address type: 0x07
+          BR/EDR
+          LE Public
+          LE Random
+@ MGMT Event: Command Complete (0x0001) plen 4=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20
+                                                                 {0x0001}
+[hci0] 12.563758
+      Start Discovery (0x0023) plen 1
+        Status: Success (0x00)
+        Address type: 0x07
+          BR/EDR
+          LE Public
+          LE Random
+@ MGMT Event: Discovering (0x0013) plen 2=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20
+                                                                 {0x0001}
+[hci0] 12.563764
+        Address type: 0x07
+          BR/EDR
+          LE Public
+          LE Random
+        Discovery: Enabled (0x01)
+
+And nothing more appears.
 
 --=20
 You may reply to this email to add a comment.
