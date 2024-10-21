@@ -1,38 +1,39 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93D9A1FAF0A
-	for <linux-bluetooth@vger.kernel.org>; Mon, 21 Oct 2024 18:42:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBEB5173
+	for <linux-bluetooth@vger.kernel.org>; Mon, 21 Oct 2024 18:45:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729536144; cv=none; b=I8OWIH67AmAxLfZJOGSITQ5CQcAep0KTl21r0QmtJ8PZ9+xMLSEGeTNyVDEAEiWmDIuZQH0xW1KcuCXI0xzDsy2DeanxoBmBXh2Z9sL2AieRAlC7xSuZNCeRi0Oc6pFxpbIHII/iSHv8k5Z21v42QOC4R5axFCeRBRsVD5DpYhA=
+	t=1729536318; cv=none; b=QoPRpUVIVS7QpY10jlzMuk4sIUA6a5VV91mVXaA9SDlBtCHSv/xDTCh3j1QmIrysDQzRLt6nXw2/ZH9J4BG7wkSsakuhljVk/bpzvsv3ItFoSuMzgYjBUnMdCJZhXcwO+btC+1EjiVIgDw4vCsWZuqddGDBLuKyvZKnkW4hnG9Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729536144; c=relaxed/simple;
-	bh=27SwHX0iwAC1qUoU3dl6bANpUwNJ0kKySn1ZOUuhypE=;
-	h=From:To:Subject:Date:Message-ID:Content-Type:MIME-Version; b=NtIy46czScCl1fFwO+byItdw+I4We4kPoVathPzOTV/4bwrfF/Gwktph8PzoRf+xeRWHKYE3zRxVuD1CzAYTnlsV/knQE0Tk7IlMKp3pw7jibiHLvpGmp7EPqWfqvhpXPDYEpEmMnBcRsRs+a20DsJ3sKbYX7VSZzM3JPM5t1ik=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FWjhbFQf; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1729536318; c=relaxed/simple;
+	bh=5tXVoezfznoWWAbpYCyGSl+UmtNvDRmszBpeLF6pD+A=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=ZBwEHyiw828j7Pekk+R6iAXh3gKv1Tt8hemmzHova+CuINbK9Yp5jFX+oWd7N5GaoYGLPdi1AxibLwe1wU9AZutCv7/PgfNNwoECGa/BIzIQslaJU7RnQW7NR9vVqEjC5hRiY23w9pEFMeyg44ZKH1HmGK2yChS00IVBhpYzEGQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qVPr/g5r; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FWjhbFQf"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 24982C4CEE5
-	for <linux-bluetooth@vger.kernel.org>; Mon, 21 Oct 2024 18:42:24 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qVPr/g5r"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 8F1DAC4CEC3
+	for <linux-bluetooth@vger.kernel.org>; Mon, 21 Oct 2024 18:45:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1729536144;
-	bh=27SwHX0iwAC1qUoU3dl6bANpUwNJ0kKySn1ZOUuhypE=;
-	h=From:To:Subject:Date:From;
-	b=FWjhbFQfmCJBa5yw2Jspp/xYlgBmD1TT289h1KJ5IkEjAo6vDCC8hrdEE0JI1/WYh
-	 SaDeCF9QWvTexrc4inEX6tpZxtLw3BUwpQM8j+RRM57jrB4WD0/29naNXeCWa/sdTu
-	 /8Hv0HxKhB7Twnv5uRw7l1VESbp4s7K3S3c5HPpNF5M9g7AZUKlJaiNvFq/2GA2CQE
-	 YdWhwY3kHtpS4TYSyjpQUk+8jzEgVdkHS/QLtkKi/i5bK5F2HWjQAbY3kMjQWm2sOt
-	 3QnYdJNuxO9iY6mgTze6+c1SFhM2gQOtqgTZ0c7GieAJ/tu/aV9XzT7IFnyuImTkg/
-	 Bge9tCBmpEt+A==
+	s=k20201202; t=1729536318;
+	bh=5tXVoezfznoWWAbpYCyGSl+UmtNvDRmszBpeLF6pD+A=;
+	h=From:To:Subject:Date:In-Reply-To:References:From;
+	b=qVPr/g5rmtkwWsvUAPW55qckwTc5jJNvLuJjj0QovqF6k1sRbJICYMTqsB22BTAP+
+	 3sShZ/7BX8kz7Q0eXr9eR962utVZoVUJC2nLaQzHT8GJt+3YF+/6MsQFJgkzOWF/KC
+	 RtX8zWYXKnWGFT+S6WErysuastHjy5aIVS/jD+GAkTGFx+nSF3npCiNuniJqt7DYah
+	 ruu3Y3IzkAEaN8HcrjGn7N/UrAn5GukSEGZ6L1k5li2qV8lT77QuMT9PxZzRDalqC/
+	 k1zDPfPvihN5BRN20mU43DDgt7iuPOTlo4WGfYfJ6+ngqDc0ACxTBpFiXCZYVmW40c
+	 8zH1pJTD+3m0g==
 Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id 0E5D9C53BC2; Mon, 21 Oct 2024 18:42:24 +0000 (UTC)
+	id 7A545C53BBF; Mon, 21 Oct 2024 18:45:18 +0000 (UTC)
 From: bugzilla-daemon@kernel.org
 To: linux-bluetooth@vger.kernel.org
-Subject: [Bug 219410] New: Need help with Product: CSR8510 A10
-Date: Mon, 21 Oct 2024 18:42:23 +0000
+Subject: [Bug 219410] Need help with Product: CSR8510 A10
+Date: Mon, 21 Oct 2024 18:45:18 +0000
 X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: new
+X-Bugzilla-Type: changed
 X-Bugzilla-Watch-Reason: None
 X-Bugzilla-Product: Drivers
 X-Bugzilla-Component: Bluetooth
@@ -45,10 +46,10 @@ X-Bugzilla-Resolution:
 X-Bugzilla-Priority: P3
 X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
 X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: bug_id short_desc product version rep_platform
- op_sys bug_status bug_severity priority component assigned_to reporter
- cf_regression
-Message-ID: <bug-219410-62941@https.bugzilla.kernel.org/>
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-219410-62941-twSMieMkM4@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-219410-62941@https.bugzilla.kernel.org/>
+References: <bug-219410-62941@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-Bugzilla-URL: https://bugzilla.kernel.org/
@@ -62,63 +63,44 @@ MIME-Version: 1.0
 
 https://bugzilla.kernel.org/show_bug.cgi?id=3D219410
 
-            Bug ID: 219410
-           Summary: Need help with Product: CSR8510 A10
-           Product: Drivers
-           Version: 2.5
-          Hardware: AMD
-                OS: Linux
-            Status: NEW
-          Severity: normal
-          Priority: P3
-         Component: Bluetooth
-          Assignee: linux-bluetooth@vger.kernel.org
-          Reporter: hhsnakeg@gmail.com
-        Regression: No
+--- Comment #1 from hhsnake (hhsnakeg@gmail.com) ---
+Added output  cat /sys/kernel/debug/usb/devices
 
-Help please, who can tell me what changes to the code need to be made to ma=
-ke
-the bluetooth device work
-I can provide any data, command output/dumps of device operation
-
-At the moment the output of the dmesg command:
-
-[41142.022157] usb 5-2.1: new full-speed USB device number 17 using xhci_hcd
-[41142.229393] usb 5-2.1: New USB device found, idVendor=3D0a12, idProduct=
-=3D0001,
-bcdDevice=3D25.20
-[41142.229405] usb 5-2.1: New USB device strings: Mfr=3D0, Product=3D2,
-SerialNumber=3D0
-[41142.229410] usb 5-2.1: Product: CSR8510 A10
-[41142.241228] Bluetooth: hci0: CSR: Setting up dongle with HCI ver=3D9 rev=
-=3D3120
-[41142.241244] Bluetooth: hci0: LMP ver=3D9 subver=3D22bb; manufacturer=3D10
-[41142.241249] Bluetooth: hci0: CSR: Unbranded CSR clone detected; adding
-workarounds and force-suspending once...
-[41152.439058] usb 5-2.1: Failed to suspend device, error -110
-[41152.439073] Bluetooth: hci0: CSR: Couldn't suspend the device for our Ba=
-rrot
-8041a02 receive-issue workaround
-[41152.439149] Bluetooth: hci0: HCI Delete Stored Link Key command is
-advertised, but not supported.
-[41152.439153] Bluetooth: hci0: HCI Read Default Erroneous Data Reporting
-command is advertised, but not supported.
-[41152.439156] Bluetooth: hci0: HCI Set Event Filter command not supported.
-[41154.453944] Bluetooth: hci0: Opcode 0x0c03 failed: -110
-
-I tried changing the flags in the btusb.c file that are in the Barrot 8041a=
-02
-block.
-but obviously my knowledge is not enough, if anyone is willing to help, I w=
-ould
-be grateful.
-
-the device comes with a disk for windows7 and works well, also under window=
-s10
-install the drivers without the disk, the device works as well
-
-If it is possible to customize the device, these fixes can be put into
-bluetooth drivers for all users who have this device
+T:  Bus=3D05 Lev=3D02 Prnt=3D03 Port=3D00 Cnt=3D01 Dev#=3D 17 Spd=3D12   Mx=
+Ch=3D 0
+D:  Ver=3D 2.00 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 MxPS=3D64 #Cfgs=3D  1
+P:  Vendor=3D0a12 ProdID=3D0001 Rev=3D25.20
+S:  Product=3DCSR8510 A10
+C:* #Ifs=3D 2 Cfg#=3D 1 Atr=3Da0 MxPwr=3D100mA
+I:* If#=3D 0 Alt=3D 0 #EPs=3D 3 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 Driver=
+=3Dbtusb
+E:  Ad=3D83(I) Atr=3D03(Int.) MxPS=3D  16 Ivl=3D1ms
+E:  Ad=3D01(O) Atr=3D02(Bulk) MxPS=3D  64 Ivl=3D0ms
+E:  Ad=3D81(I) Atr=3D02(Bulk) MxPS=3D  64 Ivl=3D0ms
+I:* If#=3D 1 Alt=3D 0 #EPs=3D 2 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 Driver=
+=3Dbtusb
+E:  Ad=3D02(O) Atr=3D01(Isoc) MxPS=3D   0 Ivl=3D1ms
+E:  Ad=3D82(I) Atr=3D01(Isoc) MxPS=3D   0 Ivl=3D1ms
+I:  If#=3D 1 Alt=3D 1 #EPs=3D 2 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 Driver=
+=3Dbtusb
+E:  Ad=3D02(O) Atr=3D01(Isoc) MxPS=3D   9 Ivl=3D1ms
+E:  Ad=3D82(I) Atr=3D01(Isoc) MxPS=3D   9 Ivl=3D1ms
+I:  If#=3D 1 Alt=3D 2 #EPs=3D 2 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 Driver=
+=3Dbtusb
+E:  Ad=3D02(O) Atr=3D01(Isoc) MxPS=3D  17 Ivl=3D1ms
+E:  Ad=3D82(I) Atr=3D01(Isoc) MxPS=3D  17 Ivl=3D1ms
+I:  If#=3D 1 Alt=3D 3 #EPs=3D 2 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 Driver=
+=3Dbtusb
+E:  Ad=3D02(O) Atr=3D01(Isoc) MxPS=3D  25 Ivl=3D1ms
+E:  Ad=3D82(I) Atr=3D01(Isoc) MxPS=3D  25 Ivl=3D1ms
+I:  If#=3D 1 Alt=3D 4 #EPs=3D 2 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 Driver=
+=3Dbtusb
+E:  Ad=3D02(O) Atr=3D01(Isoc) MxPS=3D  33 Ivl=3D1ms
+E:  Ad=3D82(I) Atr=3D01(Isoc) MxPS=3D  33 Ivl=3D1ms
+I:  If#=3D 1 Alt=3D 5 #EPs=3D 2 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 Driver=
+=3Dbtusb
+E:  Ad=3D02(O) Atr=3D01(Isoc) MxPS=3D  49 Ivl=3D1ms
+E:  Ad=3D82(I) Atr=3D01(Isoc) MxPS=3D  49 Ivl=3D1ms
 
 --=20
 You may reply to this email to add a comment.
