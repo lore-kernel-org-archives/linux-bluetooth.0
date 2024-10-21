@@ -1,95 +1,73 @@
-Received: from mail-qk1-f178.google.com (mail-qk1-f178.google.com [209.85.222.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [80.237.130.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C02657485
-	for <linux-bluetooth@vger.kernel.org>; Sun, 20 Oct 2024 23:37:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F92A197531;
+	Mon, 21 Oct 2024 03:28:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.237.130.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729467434; cv=none; b=OLj/o/xyK/fvOBsaenvLkg0QROzifMZxM+EJoHZhcirH+dI7/JjENNspkr4A7kdv3VwM3fAV7HQOumYU9Ohxb7C1amVxh/N/66qMEpkeHRPS/W3Rv9NDM4DrUMJeIusAqI9vC7GF43JCSStuIa8KdNFOWeoLdKCCvOVuKLlEJpw=
+	t=1729481310; cv=none; b=dVp3yoUfTTYvnBBXqecX9eLyOqUSwtlgcfFh6t3AAye7puCc5Wn7xckLIYurMK2T3ZAiCuCj3LQgbu9O4ifgj29FEEfbWynPCr3I0OQ73mnTjurq1JlJSu3yO+xeUZVSMvDlbOmW3/DEyuCFbMYs7EwkymMSumTLgONSHbuZiqg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729467434; c=relaxed/simple;
-	bh=2Uc27D4XztUP2QqccsqZhRmq2b+5QLyQtmWfrNreA6Y=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=OISy/k3CFNX8/a/8cDs+Tp8UOd7iBdbmMCQa/b11YmsivmMiBRW5lmiljd6juHJnTXfvLIXyryaDhZheUjUwgSNiV7RaYhck2F1AZqFWQB0s8EL8/uY6yCJe/NG0Sr23SZC+kgltXSfwTBe43V7XNC2VeeuWa/HlflaNuQceLMY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BUQCCN+Q; arc=none smtp.client-ip=209.85.222.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1729481310; c=relaxed/simple;
+	bh=WoyJUMtHDLbZHs8erOMKOVbMxOKaZr9THOlDK5ZZCfQ=;
+	h=Message-ID:Date:MIME-Version:From:To:Cc:Subject:Content-Type; b=I6BS/MxFdS14/lILoSRl9hiFMIYYv4mc5i/eNqcp2hpLgbhgbDdJ2Xl+zyYUdqnfO+odIiLu6qOK7YsToZI1tu0K4zPG5hQGJeF4ZrBuOIk91fsTrsbbZc2wfbAqSNxCHKok3psg4Ez1IyqWWl4AeuUqnwQH7nOxSGdIkGm+xGU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=leemhuis.info; spf=pass smtp.mailfrom=leemhuis.info; dkim=pass (2048-bit key) header.d=leemhuis.info header.i=@leemhuis.info header.b=de0dWJBn; arc=none smtp.client-ip=80.237.130.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=leemhuis.info
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=leemhuis.info
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BUQCCN+Q"
-Received: by mail-qk1-f178.google.com with SMTP id af79cd13be357-7b15d7b7a32so183779985a.1
-        for <linux-bluetooth@vger.kernel.org>; Sun, 20 Oct 2024 16:37:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1729467431; x=1730072231; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=2Uc27D4XztUP2QqccsqZhRmq2b+5QLyQtmWfrNreA6Y=;
-        b=BUQCCN+QcSQsZTyK1wZct38Izg64rdIQyirvfnNjqqi31f6PvtLKRm0YI/ZQbqz5XR
-         l2LoeUnTSu9G7T7yaQpu5Fd5f+focjhESwjPWVDruGnquWwZ5zBov3Og+uklDU1dVolE
-         Sz+yiq9XFVWam5pZewSQ+V18wqxmXUnmIBlguME5U/BfjBD0i7LCXoyX78Ly0hKwR9O7
-         h31VFC+VKe91E2hd8SSQs7YfgJyf9IxzEO/bTu51JJ/dSSSEX5onryFq0ZL1zlXCQK8Q
-         9n4x2WjDTv5RsssA1h0c7ayBBkaYMHnz4KDTzVJMnBZgTQFPUpsTq/FRVX3I3WPWOgYF
-         Dskw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729467431; x=1730072231;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=2Uc27D4XztUP2QqccsqZhRmq2b+5QLyQtmWfrNreA6Y=;
-        b=eDyJtsNm5G8Z+cLAu+Foeolc5qQlFz/tnXrqnuTN6t2N/H9ujZUrSED7ZMydqRrcg1
-         BmqRcK5KMuJhqAZ+cuMfk+6to8sTRu4gH5SEUeBGdNYui5LwCAGW5vo39Ebx/lswgoQj
-         iQwvkgvXH6FMFqB1NumoMfkYqStFoTMAKwjvZhl6xnHkDvV04prMaB/ZIMk2Ch2tkdfx
-         +0Zw2PBJH/bs4QXFyI/1gMdIrxvVfImtsjcetd4Qi+3Ev2TYreve2oMKqR8PKztwKMzV
-         loHgsX/E8sPrXJZOlkHsyTALfTpaht35YXj/3MJxWYadSu5ZwxGSOf5DV13F6L+0KOqw
-         bZEg==
-X-Gm-Message-State: AOJu0Yxh4nbmsHiKLlOzpzGImvW9m3oHEKrdRVMwd33VwD2QpJhIG/d5
-	2nCmmaNvi1Vy+WK2bYBqUqVIjz+YN9JlzNptK9wbgDmD6ZomvCmNMvdqMw==
-X-Google-Smtp-Source: AGHT+IHYfOcwYKHkAQJIxSlHbWgdKS6K1OdZZ3xcqH3UVsYehycfqDFoVSD1z9Pgt9E53ziQWs2JLA==
-X-Received: by 2002:a05:620a:28d5:b0:7b1:4436:cf1d with SMTP id af79cd13be357-7b157b6ad45mr1282257285a.31.1729467431335;
-        Sun, 20 Oct 2024 16:37:11 -0700 (PDT)
-Received: from [172.17.0.2] ([172.183.52.214])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7b165a78cd9sm117350685a.111.2024.10.20.16.37.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 20 Oct 2024 16:37:10 -0700 (PDT)
-Message-ID: <67159426.050a0220.34a86c.27e8@mx.google.com>
-Date: Sun, 20 Oct 2024 16:37:10 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============6868361035929094415=="
+	dkim=pass (2048-bit key) header.d=leemhuis.info header.i=@leemhuis.info header.b="de0dWJBn"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=leemhuis.info; s=he214686; h=Content-Transfer-Encoding:Content-Type:Subject
+	:Cc:To:From:MIME-Version:Date:Message-ID:From:Sender:Reply-To:Subject:Date:
+	Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:In-Reply-To:References;
+	bh=WoyJUMtHDLbZHs8erOMKOVbMxOKaZr9THOlDK5ZZCfQ=; t=1729481308; x=1729913308;
+	 b=de0dWJBnDacWB6TbOYzSppT7vv8j9Dos/07rwvsAJa6IJUUG/lEptAhTiBGXK6LX818HfMW0PM
+	jzIcYbPyWbZz6ViKdKpOchgy5EiTf9dgCZUGgSCEJtvIDWfrH8BZhBZaKVU+/LWbNtyUQXORtWKDK
+	i+w9vfKwqv1S+3i9ecWc896FlfaM/7BjZjOsXaNaapuVGl2YPHTlyx0dfBt+CylfoTi1S5/at9+Tu
+	HzWCl7QOzfInIxXCRFw4iXxGcCsFmVFpPc9L+0pKOw2v4LJYAZ2hy/td2V8yK4RDNFx1B9aBHZ91F
+	VMkGS/PcDnW/ji+nQlKqt6VLSwwShx6/PPUUQ==;
+Received: from [2a02:8108:8980:2478:8cde:aa2c:f324:937e]; authenticated
+	by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
+	id 1t2j5l-0002lk-Qn; Mon, 21 Oct 2024 05:28:25 +0200
+Message-ID: <2fad9d09-c328-4353-be0b-cfcfef33ed01@leemhuis.info>
+Date: Mon, 21 Oct 2024 05:28:25 +0200
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, tot0roprog@gmail.com
-Subject: RE: Test information on BlueZ mesh SAR segmentation
-In-Reply-To: <67159293.630a0220.14043a.3c56@mx.google.com>
-References: <67159293.630a0220.14043a.3c56@mx.google.com>
-Reply-To: linux-bluetooth@vger.kernel.org
-
---===============6868361035929094415==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+From: Thorsten Leemhuis <regressions@leemhuis.info>
+Content-Language: en-US, de-DE
+To: Greg KH <gregkh@linuxfoundation.org>
+Cc: "stable@vger.kernel.org" <stable@vger.kernel.org>,
+ Sasha Levin <sashal@kernel.org>,
+ Linux kernel regressions list <regressions@lists.linux.dev>,
+ LKML <linux-kernel@vger.kernel.org>,
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+ linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
+Subject: Pls pick up two bluetooth fixes
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
+X-bounce-key: webpack.hosteurope.de;regressions@leemhuis.info;1729481308;323c1754;
+X-HE-SMSGID: 1t2j5l-0002lk-Qn
 
-This is an automated email and please do not reply to this email.
+Hi Greg! Please consider picking up the following two bluetooth fixes
+for the next round of stable updates, they fix problems quite a few
+users hit in various stable series due to backports:
 
-Dear Submitter,
+4084286151fc91 ("Bluetooth: btusb: Fix not being able to reconnect after
+suspend") [v6.12-rc4] for 6.11.y
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
+and
 
------ Output -----
+2c1dda2acc4192 ("Bluetooth: btusb: Fix regression with fake CSR
+controllers 0a12:0001") [v6.12-rc4] for 5.10.y and later
 
-error: patch failed: mesh/net.c:2358
-error: mesh/net.c: patch does not apply
-hint: Use 'git am --show-current-patch' to see the failed patch
+For details see also:
+https://lore.kernel.org/all/CABBYNZL0_j4EDWzDS=kXc1Vy0D6ToU+oYnP_uBWTKoXbEagHhw@mail.gmail.com/
 
-Please resolve the issue and submit the patches again.
+tia!
 
-
----
-Regards,
-Linux Bluetooth
-
-
---===============6868361035929094415==--
+Ciao, Thorsten
