@@ -1,128 +1,127 @@
-Received: from mail-ej1-f46.google.com (mail-ej1-f46.google.com [209.85.218.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92DDA1FBF41
-	for <linux-bluetooth@vger.kernel.org>; Mon, 21 Oct 2024 18:07:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93D9A1FAF0A
+	for <linux-bluetooth@vger.kernel.org>; Mon, 21 Oct 2024 18:42:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729534027; cv=none; b=Yq8KZs9h3T+u+dKe/6Zx+GNVEcYEng4UKrZVLaXXzjWWtwO3MppFBb6KDZWj15RsMXCCFiY98IgxTJOwnoyQ+e9dO4og/Anfi/DShXy2ib9DgJi+yd309lE9oXGglt1dIPkwBNQfxSBAUOCVKqvoeOccjh1PhLJSDc+4JCQEpk4=
+	t=1729536144; cv=none; b=I8OWIH67AmAxLfZJOGSITQ5CQcAep0KTl21r0QmtJ8PZ9+xMLSEGeTNyVDEAEiWmDIuZQH0xW1KcuCXI0xzDsy2DeanxoBmBXh2Z9sL2AieRAlC7xSuZNCeRi0Oc6pFxpbIHII/iSHv8k5Z21v42QOC4R5axFCeRBRsVD5DpYhA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729534027; c=relaxed/simple;
-	bh=M4kM5lUArydv5dJlC3xGAgRG9sLdyI57ghLl58KLUck=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Se2msG/MgUA6HVjV4YAcvSfkGYjrAZlMGdlx7c8fnEJSuqKbzA27OLTXuxV9yap2MBG5lMuq5TB8MyrtcHH0JGoVZPFTcQbkk7/UDkK9BtCaqyYXJp02uAA0XK+x3gFsUdWv7dECsgdXnAo1TOSNiV19ou3zyzlhhsxEnsd8vGA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=CjxSxoAx; arc=none smtp.client-ip=209.85.218.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
+	s=arc-20240116; t=1729536144; c=relaxed/simple;
+	bh=27SwHX0iwAC1qUoU3dl6bANpUwNJ0kKySn1ZOUuhypE=;
+	h=From:To:Subject:Date:Message-ID:Content-Type:MIME-Version; b=NtIy46czScCl1fFwO+byItdw+I4We4kPoVathPzOTV/4bwrfF/Gwktph8PzoRf+xeRWHKYE3zRxVuD1CzAYTnlsV/knQE0Tk7IlMKp3pw7jibiHLvpGmp7EPqWfqvhpXPDYEpEmMnBcRsRs+a20DsJ3sKbYX7VSZzM3JPM5t1ik=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FWjhbFQf; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="CjxSxoAx"
-Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-a99f3a5a44cso557109666b.3
-        for <linux-bluetooth@vger.kernel.org>; Mon, 21 Oct 2024 11:07:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google; t=1729534024; x=1730138824; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=Vxq8+fnWQoCNUD9nqgZ6L3cBMv3ogByZUUYEqazDFpU=;
-        b=CjxSxoAxokDhPQrE2NUWmOL/53p46LMNtF0yhhaelzBJEC8YsioLY4rLJoqWFaWetK
-         uoQ7Qt++AwN2LlZajO90F3c5X4+QEClgrGsYaNYxadbdJr6E1Sf2dJp0pEmD64P0lZ6O
-         ZEZ/kxeIRURITvPtuJDH6YW7DVtefJWpovpQA=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729534024; x=1730138824;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Vxq8+fnWQoCNUD9nqgZ6L3cBMv3ogByZUUYEqazDFpU=;
-        b=XR1fFHhgYwBfDCv4kz+HZRYLqhiXN5aSz+VLYIMn1n8oifZ+QnU45wdRS2vwRV9Ro1
-         je1CsQHrAOuuHUPmOKdMGki25a36Cu10ttAY/PO0HWSA2DjnSD+e1ZcS30PEErM/1kZe
-         oI8v9kSTXEvRHf4to+kGSIrDeXXeSnk1dM5Tq0Sot721ZDY7WVPqP/Hhk0qlhA12hNyZ
-         VhtyAMZg6l3hrH0xD3X+wDo2nvDDk9sXhp3B9ljf++bbauwaa0GASDsFibAvtpprHNEP
-         /Y7CEEnwvCvh3u0+6dwuW7ralH1FLvFXeKl7MYTCECJhNNbZm3rq1ghRJRgYs/bGx6dB
-         p/Mw==
-X-Forwarded-Encrypted: i=1; AJvYcCX1Uxjzh90EzRBgUePmrQ5GfMKd39ZGboxhULAYf4Y3/sgr5BPp2OGvRQZTKWo6vEegqblwODjlehXmwh/rdNQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwJp2WdcwABShUtoTKJ3Cy34gTw/cBbspuKufEURiDDl5goOKsR
-	ydh4KxeZEiGLps8cAonhOqbJ6HBXtVjcd8gMMFCkZFv7h/IJUprmn5qw2CfCu89UZXwB6qXef4g
-	ZFqA=
-X-Google-Smtp-Source: AGHT+IGqjdTthZlSNseNBZ+2MBw88ulmr7v4+p8iQFjZP1yOYtbUTp4oHsZWWNUtYIDZmhYw3WhYZA==
-X-Received: by 2002:a17:907:980f:b0:a99:fa4e:ba97 with SMTP id a640c23a62f3a-a9a69bad21fmr1187877866b.39.1729534023566;
-        Mon, 21 Oct 2024 11:07:03 -0700 (PDT)
-Received: from mail-ej1-f44.google.com (mail-ej1-f44.google.com. [209.85.218.44])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a9a915724fdsm236584166b.166.2024.10.21.11.07.02
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 21 Oct 2024 11:07:02 -0700 (PDT)
-Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-a99f3a5a44cso557104966b.3
-        for <linux-bluetooth@vger.kernel.org>; Mon, 21 Oct 2024 11:07:02 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCWNoK1nTsaBSsCp2pSBgTRQnzxTF16e7BqYJHbwhoq/fP7UhniNPxJ4B6Y20+yaFGQ1NXtMZCsN6kKyP723vfk=@vger.kernel.org
-X-Received: by 2002:a17:907:1b84:b0:a99:e4a2:1cda with SMTP id
- a640c23a62f3a-a9a69ccfc7amr827335866b.56.1729534022017; Mon, 21 Oct 2024
- 11:07:02 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FWjhbFQf"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 24982C4CEE5
+	for <linux-bluetooth@vger.kernel.org>; Mon, 21 Oct 2024 18:42:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1729536144;
+	bh=27SwHX0iwAC1qUoU3dl6bANpUwNJ0kKySn1ZOUuhypE=;
+	h=From:To:Subject:Date:From;
+	b=FWjhbFQfmCJBa5yw2Jspp/xYlgBmD1TT289h1KJ5IkEjAo6vDCC8hrdEE0JI1/WYh
+	 SaDeCF9QWvTexrc4inEX6tpZxtLw3BUwpQM8j+RRM57jrB4WD0/29naNXeCWa/sdTu
+	 /8Hv0HxKhB7Twnv5uRw7l1VESbp4s7K3S3c5HPpNF5M9g7AZUKlJaiNvFq/2GA2CQE
+	 YdWhwY3kHtpS4TYSyjpQUk+8jzEgVdkHS/QLtkKi/i5bK5F2HWjQAbY3kMjQWm2sOt
+	 3QnYdJNuxO9iY6mgTze6+c1SFhM2gQOtqgTZ0c7GieAJ/tu/aV9XzT7IFnyuImTkg/
+	 Bge9tCBmpEt+A==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+	id 0E5D9C53BC2; Mon, 21 Oct 2024 18:42:24 +0000 (UTC)
+From: bugzilla-daemon@kernel.org
+To: linux-bluetooth@vger.kernel.org
+Subject: [Bug 219410] New: Need help with Product: CSR8510 A10
+Date: Mon, 21 Oct 2024 18:42:23 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: new
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: hhsnakeg@gmail.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P3
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: bug_id short_desc product version rep_platform
+ op_sys bug_status bug_severity priority component assigned_to reporter
+ cf_regression
+Message-ID: <bug-219410-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241016204258.821965-1-luiz.dentz@gmail.com> <4e1977ca-6166-4891-965e-34a6f319035f@leemhuis.info>
- <CABBYNZL0_j4EDWzDS=kXc1Vy0D6ToU+oYnP_uBWTKoXbEagHhw@mail.gmail.com>
- <CAHk-=wh3rQ+w0NKw62PM37oe6yFVFxY1DrW-SDkvXqOBAGGmCA@mail.gmail.com> <9e03dba5-1aed-46b3-8aee-c5bde6d4eaec@leemhuis.info>
-In-Reply-To: <9e03dba5-1aed-46b3-8aee-c5bde6d4eaec@leemhuis.info>
-From: Linus Torvalds <torvalds@linux-foundation.org>
-Date: Mon, 21 Oct 2024 11:06:45 -0700
-X-Gmail-Original-Message-ID: <CAHk-=wgQhFPvneqAVXjUZDq=ahpATdgfg6LZ9n07MSSUGkQWuA@mail.gmail.com>
-Message-ID: <CAHk-=wgQhFPvneqAVXjUZDq=ahpATdgfg6LZ9n07MSSUGkQWuA@mail.gmail.com>
-Subject: Re: pull request: bluetooth 2024-10-16
-To: Thorsten Leemhuis <regressions@leemhuis.info>
-Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>, davem@davemloft.net, kuba@kernel.org, 
-	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org, 
-	Linux kernel regressions list <regressions@lists.linux.dev>, Eric Dumazet <edumazet@google.com>, 
-	Paolo Abeni <pabeni@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
 
-On Mon, 21 Oct 2024 at 01:22, Thorsten Leemhuis
-<regressions@leemhuis.info> wrote:
->
-> Just to clarify: I assume it's the "taking things directly and thus
-> bypassing -net" that is the problem here?
+https://bugzilla.kernel.org/show_bug.cgi?id=3D219410
 
-Well, it's not a *problem* per se. It's just not something I want to
-be a regular occurrence, because then the lines of responsibility get
-less clear.
+            Bug ID: 219410
+           Summary: Need help with Product: CSR8510 A10
+           Product: Drivers
+           Version: 2.5
+          Hardware: AMD
+                OS: Linux
+            Status: NEW
+          Severity: normal
+          Priority: P3
+         Component: Bluetooth
+          Assignee: linux-bluetooth@vger.kernel.org
+          Reporter: hhsnakeg@gmail.com
+        Regression: No
 
-And we've seen (many times) how that causes a kind of "bystander
-effect" where everybody kind of just expects somebody else to handle
-it, and things start falling through the cracks.
+Help please, who can tell me what changes to the code need to be made to ma=
+ke
+the bluetooth device work
+I can provide any data, command output/dumps of device operation
 
-IOW: having clear lines of "this goes here" just avoids a lot of waffling.
+At the moment the output of the dmesg command:
 
-So that's actually one of the main things about being a maintainer:
-sure, there's the whole "enough technical knowledge to be able to
-handle it", but a *lot* of maintainership is literally just about
-being responsible (and responsive) for some area, and people _knowing_
-you're responsible for that area, so that there is less of the "who
-should take care of this patch" confusion.
+[41142.022157] usb 5-2.1: new full-speed USB device number 17 using xhci_hcd
+[41142.229393] usb 5-2.1: New USB device found, idVendor=3D0a12, idProduct=
+=3D0001,
+bcdDevice=3D25.20
+[41142.229405] usb 5-2.1: New USB device strings: Mfr=3D0, Product=3D2,
+SerialNumber=3D0
+[41142.229410] usb 5-2.1: Product: CSR8510 A10
+[41142.241228] Bluetooth: hci0: CSR: Setting up dongle with HCI ver=3D9 rev=
+=3D3120
+[41142.241244] Bluetooth: hci0: LMP ver=3D9 subver=3D22bb; manufacturer=3D10
+[41142.241249] Bluetooth: hci0: CSR: Unbranded CSR clone detected; adding
+workarounds and force-suspending once...
+[41152.439058] usb 5-2.1: Failed to suspend device, error -110
+[41152.439073] Bluetooth: hci0: CSR: Couldn't suspend the device for our Ba=
+rrot
+8041a02 receive-issue workaround
+[41152.439149] Bluetooth: hci0: HCI Delete Stored Link Key command is
+advertised, but not supported.
+[41152.439153] Bluetooth: hci0: HCI Read Default Erroneous Data Reporting
+command is advertised, but not supported.
+[41152.439156] Bluetooth: hci0: HCI Set Event Filter command not supported.
+[41154.453944] Bluetooth: hci0: Opcode 0x0c03 failed: -110
 
-That said, in situations like this, where some small part missed a
-regular subsystem pull request, I don't think it's problematic to just
-go "let's bypass the subsystem, and get just this thing fixed asap".
+I tried changing the flags in the btusb.c file that are in the Barrot 8041a=
+02
+block.
+but obviously my knowledge is not enough, if anyone is willing to help, I w=
+ould
+be grateful.
 
-Not when it happens rarely (like this time), and not when it happens
-in a way where everybody is aware of it (like this time).
+the device comes with a disk for windows7 and works well, also under window=
+s10
+install the drivers without the disk, the device works as well
 
-So I think in this case it was probably *better* to just pull a very
-small and targeted fix for bluetooth issues, than have the networking
-tree send me out-of-sequence pull request that had other things too in
-addition to a high-priority bluetooth fix.
+If it is possible to customize the device, these fixes can be put into
+bluetooth drivers for all users who have this device
 
-Put another way: having clear lines of maintainership is important,
-but it's also important to not make things *too* black-and-white.
+--=20
+You may reply to this email to add a comment.
 
-Exceptions are fine, as long as they clearly remain the unusual case
-and people explain them.
-
-(That is basically true of pretty much everything. A lot of the
-development rules like "don't rebase" are things where the occasional
-exception with an _explanation_ for why it happened is perfectly fine)
-
-Developers are people. Black-and-white rules are for machines.
-
-                Linus
+You are receiving this mail because:
+You are the assignee for the bug.=
