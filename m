@@ -1,33 +1,81 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8D471E0DD7;
-	Mon, 21 Oct 2024 07:50:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 578221D12F0;
+	Mon, 21 Oct 2024 07:52:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729497051; cv=none; b=MpkfQMpArNzZxmBjfg4VYavDnABXILRfksulDBVrjdxBkNFu7EV7oLMqVlbekn5EYSFyS6R2uNVeEz44rzHFoT4xqZC5dDWjM7oNL8f71a57jYObtmApWp0meM4N/xceN6/AfdWyR4Y67YjrdaAgWhuT3H6N2hnfAm4j0r3Kjy8=
+	t=1729497168; cv=none; b=eaH+y9FqR+Wauyl2vSeXNPOOOs7A7bNiVNNGtV44vMp9lWLY3R5SvWUr/qHFPD9m8PzNb8hymrByAJS9j5Ogj9syEEuuRh4EHE2RfoQhxsIMMpDlW27LjYGZH+Yhe0uad2FBbq2WwhOv/n9kzPgLeRbb1sONdVO0uBWnflCOLTw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729497051; c=relaxed/simple;
-	bh=5yG1wAUGt/ltY2yssfS8ZkIcj1BmS/igZ8q9ZvX+qCA=;
+	s=arc-20240116; t=1729497168; c=relaxed/simple;
+	bh=pHF/oNXziLvw1gVrt+PZXgx884BvfRhHiXxgowYHu8o=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Lh9pO/vvn3o8y0W/nfJek/guCcLM2Zs7VQaRRRnlDu+KWa48ANAGw09/1gDyyn31PRlyEu8OeCeR6ONLiPJGyHlRvf2qyk9DghpRCPcCtWQPo8g3EKxuadVihq6dit2QC8fl6NITwWK7U/urojxQYe4pnixWw1WZJQMlWZA0SLY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tN4Rl7Jf; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:Content-Type; b=idptleOnJSvLlyFtktQ4GxKxy3Pr2qEU/b02v4GaQsTfGxUTN33rs0X/EShjiSfRyJ3BrZbxJpMahoF8jVk9KBfokzRVVdE0ddXMo+OGZ7KqWJIf6jgLVkf6SMB/ksouUV9e9WymlmHvIh5wBEh6sV/Mc1RUaH7mqE8/RuktHBg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=gu3P+rke; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=BsbbZXLH; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=gu3P+rke; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=BsbbZXLH; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tN4Rl7Jf"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3ECA4C4CEC3;
-	Mon, 21 Oct 2024 07:50:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1729497051;
-	bh=5yG1wAUGt/ltY2yssfS8ZkIcj1BmS/igZ8q9ZvX+qCA=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=tN4Rl7JfV8AzD26b8U3sBe9Ud+AlD5PCsT1c/FiXxb9a3LsIVnLKfxbamrTl7f0ML
-	 U3MBOVQCQH2rxywGWVk0acPs6qZyra1JAMtIpoxwHB9tb9Sr9vTSuG/7CpwZCYLa0H
-	 L1x35Tnrx1y8X8DwUl9NgV3LOszGfQojQpaDrHj0uebncjy1SPqU50HIpo1rx2v1w6
-	 F5F126ViY2CR0Ie5H+sxbfSJqoZbv4MQnDmvTFkqNTl1mCYaLJiP0q3WqlFDCWxF5T
-	 mn/l+9+0I4xY90BHNfW8Wk/ybC2qE7uWKfaicHAbljDoTX4k9TRUWTr6g0s0/zEqhW
-	 7VIuqXNZrQuog==
-Message-ID: <bb34f4ae-92b3-48b7-b0d6-5937756cdbb9@kernel.org>
-Date: Mon, 21 Oct 2024 09:50:42 +0200
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="gu3P+rke";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="BsbbZXLH";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="gu3P+rke";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="BsbbZXLH"
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 8E71D21C8B;
+	Mon, 21 Oct 2024 07:52:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1729497164; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=bXWhUoNB23Y9fn9mmx7c9jTXn4fLCljjY288raDMPls=;
+	b=gu3P+rke6FChZ+iL9iQ+lLmlJ6Ea+1DKxZ09E0WYsi+YXzqU2jfPvc8nepMXe7WlQkEHb/
+	cRWORXyGWetASL/F+MRr05w8KEsH+sOeZM00efOJXI2E+uYLptGTsEm0aBKdtVv/Q2FwRw
+	Pe2UlWBaX1U78BEfeKWx3mkspGFO3Q0=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1729497164;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=bXWhUoNB23Y9fn9mmx7c9jTXn4fLCljjY288raDMPls=;
+	b=BsbbZXLHFFBenHj04BVjnKQqAydVYkEXeRJZraeFiS0+UAY9sFs7MSQRVxTpTyCCP4J0cr
+	r0nVCkV8dS9dXkDw==
+Authentication-Results: smtp-out1.suse.de;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=gu3P+rke;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=BsbbZXLH
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1729497164; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=bXWhUoNB23Y9fn9mmx7c9jTXn4fLCljjY288raDMPls=;
+	b=gu3P+rke6FChZ+iL9iQ+lLmlJ6Ea+1DKxZ09E0WYsi+YXzqU2jfPvc8nepMXe7WlQkEHb/
+	cRWORXyGWetASL/F+MRr05w8KEsH+sOeZM00efOJXI2E+uYLptGTsEm0aBKdtVv/Q2FwRw
+	Pe2UlWBaX1U78BEfeKWx3mkspGFO3Q0=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1729497164;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=bXWhUoNB23Y9fn9mmx7c9jTXn4fLCljjY288raDMPls=;
+	b=BsbbZXLHFFBenHj04BVjnKQqAydVYkEXeRJZraeFiS0+UAY9sFs7MSQRVxTpTyCCP4J0cr
+	r0nVCkV8dS9dXkDw==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id CE3FD139E0;
+	Mon, 21 Oct 2024 07:52:43 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id qnn/MEsIFmdPVwAAD6G6ig
+	(envelope-from <tzimmermann@suse.de>); Mon, 21 Oct 2024 07:52:43 +0000
+Message-ID: <64cc9c8f-fff3-4845-bb32-d7f1046ef619@suse.de>
+Date: Mon, 21 Oct 2024 09:52:43 +0200
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -35,141 +83,280 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/2] dt-bindings: net: bluetooth: nxp: add support for
- supply and reset
-To: Marco Felsch <m.felsch@pengutronix.de>
-Cc: POPESCU Catalin <catalin.popescu@leica-geosystems.com>,
- Sherry Sun <sherry.sun@nxp.com>, Amitkumar Karwar
- <amitkumar.karwar@nxp.com>, Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>,
- "marcel@holtmann.org" <marcel@holtmann.org>,
- "luiz.dentz@gmail.com" <luiz.dentz@gmail.com>,
- "robh@kernel.org" <robh@kernel.org>, "krzk+dt@kernel.org"
- <krzk+dt@kernel.org>, "conor+dt@kernel.org" <conor+dt@kernel.org>,
- "p.zabel@pengutronix.de" <p.zabel@pengutronix.de>,
- "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
- "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- GEO-CHHER-bsp-development <bsp-development.geo@leica-geosystems.com>
-References: <20241004113557.2851060-1-catalin.popescu@leica-geosystems.com>
- <DB9PR04MB8429B4535422D3AE07D8EE79927C2@DB9PR04MB8429.eurprd04.prod.outlook.com>
- <3fa35cd2-e52c-4873-8a7f-db459b016a97@kernel.org>
- <2b7f61a8-e91a-4b32-be1d-753a19e4d81f@leica-geosystems.com>
- <0d460226-4ea7-4a9b-a119-468343727996@kernel.org>
- <20241021064129.trchqa2oickna7pc@pengutronix.de>
-From: Krzysztof Kozlowski <krzk@kernel.org>
+Subject: Re: [PATCH v8 3/5] drm: handle HAS_IOPORT dependencies
+To: Niklas Schnelle <schnelle@linux.ibm.com>, Brian Cain <bcain@quicinc.com>,
+ Marcel Holtmann <marcel@holtmann.org>,
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+ Patrik Jakobsson <patrik.r.jakobsson@gmail.com>,
+ Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+ Maxime Ripard <mripard@kernel.org>, David Airlie <airlied@gmail.com>,
+ Simona Vetter <simona@ffwll.ch>, Dave Airlie <airlied@redhat.com>,
+ Gerd Hoffmann <kraxel@redhat.com>, Lucas De Marchi
+ <lucas.demarchi@intel.com>,
+ =?UTF-8?Q?Thomas_Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>,
+ Rodrigo Vivi <rodrigo.vivi@intel.com>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Jiri Slaby <jirislaby@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
+ "Maciej W. Rozycki" <macro@orcam.me.uk>, Heiko Carstens <hca@linux.ibm.com>
+Cc: linux-kernel@vger.kernel.org, linux-hexagon@vger.kernel.org,
+ linux-bluetooth@vger.kernel.org, dri-devel@lists.freedesktop.org,
+ virtualization@lists.linux.dev, spice-devel@lists.freedesktop.org,
+ intel-xe@lists.freedesktop.org, linux-serial@vger.kernel.org,
+ linux-arch@vger.kernel.org, Arnd Bergmann <arnd@kernel.org>
+References: <20241008-b4-has_ioport-v8-0-793e68aeadda@linux.ibm.com>
+ <20241008-b4-has_ioport-v8-3-793e68aeadda@linux.ibm.com>
 Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- xsFNBFVDQq4BEAC6KeLOfFsAvFMBsrCrJ2bCalhPv5+KQF2PS2+iwZI8BpRZoV+Bd5kWvN79
- cFgcqTTuNHjAvxtUG8pQgGTHAObYs6xeYJtjUH0ZX6ndJ33FJYf5V3yXqqjcZ30FgHzJCFUu
- JMp7PSyMPzpUXfU12yfcRYVEMQrmplNZssmYhiTeVicuOOypWugZKVLGNm0IweVCaZ/DJDIH
- gNbpvVwjcKYrx85m9cBVEBUGaQP6AT7qlVCkrf50v8bofSIyVa2xmubbAwwFA1oxoOusjPIE
- J3iadrwpFvsZjF5uHAKS+7wHLoW9hVzOnLbX6ajk5Hf8Pb1m+VH/E8bPBNNYKkfTtypTDUCj
- NYcd27tjnXfG+SDs/EXNUAIRefCyvaRG7oRYF3Ec+2RgQDRnmmjCjoQNbFrJvJkFHlPeHaeS
- BosGY+XWKydnmsfY7SSnjAzLUGAFhLd/XDVpb1Een2XucPpKvt9ORF+48gy12FA5GduRLhQU
- vK4tU7ojoem/G23PcowM1CwPurC8sAVsQb9KmwTGh7rVz3ks3w/zfGBy3+WmLg++C2Wct6nM
- Pd8/6CBVjEWqD06/RjI2AnjIq5fSEH/BIfXXfC68nMp9BZoy3So4ZsbOlBmtAPvMYX6U8VwD
- TNeBxJu5Ex0Izf1NV9CzC3nNaFUYOY8KfN01X5SExAoVTr09ewARAQABzSVLcnp5c3p0b2Yg
- S296bG93c2tpIDxrcnprQGtlcm5lbC5vcmc+wsGVBBMBCgA/AhsDBgsJCAcDAgYVCAIJCgsE
- FgIDAQIeAQIXgBYhBJvQfg4MUfjVlne3VBuTQ307QWKbBQJgPO8PBQkUX63hAAoJEBuTQ307
- QWKbBn8P+QFxwl7pDsAKR1InemMAmuykCHl+XgC0LDqrsWhAH5TYeTVXGSyDsuZjHvj+FRP+
- gZaEIYSw2Yf0e91U9HXo3RYhEwSmxUQ4Fjhc9qAwGKVPQf6YuQ5yy6pzI8brcKmHHOGrB3tP
- /MODPt81M1zpograAC2WTDzkICfHKj8LpXp45PylD99J9q0Y+gb04CG5/wXs+1hJy/dz0tYy
- iua4nCuSRbxnSHKBS5vvjosWWjWQXsRKd+zzXp6kfRHHpzJkhRwF6ArXi4XnQ+REnoTfM5Fk
- VmVmSQ3yFKKePEzoIriT1b2sXO0g5QXOAvFqB65LZjXG9jGJoVG6ZJrUV1MVK8vamKoVbUEe
- 0NlLl/tX96HLowHHoKhxEsbFzGzKiFLh7hyboTpy2whdonkDxpnv/H8wE9M3VW/fPgnL2nPe
- xaBLqyHxy9hA9JrZvxg3IQ61x7rtBWBUQPmEaK0azW+l3ysiNpBhISkZrsW3ZUdknWu87nh6
- eTB7mR7xBcVxnomxWwJI4B0wuMwCPdgbV6YDUKCuSgRMUEiVry10xd9KLypR9Vfyn1AhROrq
- AubRPVeJBf9zR5UW1trJNfwVt3XmbHX50HCcHdEdCKiT9O+FiEcahIaWh9lihvO0ci0TtVGZ
- MCEtaCE80Q3Ma9RdHYB3uVF930jwquplFLNF+IBCn5JRzsFNBFVDXDQBEADNkrQYSREUL4D3
- Gws46JEoZ9HEQOKtkrwjrzlw/tCmqVzERRPvz2Xg8n7+HRCrgqnodIYoUh5WsU84N03KlLue
- MNsWLJBvBaubYN4JuJIdRr4dS4oyF1/fQAQPHh8Thpiz0SAZFx6iWKB7Qrz3OrGCjTPcW6ei
- OMheesVS5hxietSmlin+SilmIAPZHx7n242u6kdHOh+/SyLImKn/dh9RzatVpUKbv34eP1wA
- GldWsRxbf3WP9pFNObSzI/Bo3kA89Xx2rO2roC+Gq4LeHvo7ptzcLcrqaHUAcZ3CgFG88CnA
- 6z6lBZn0WyewEcPOPdcUB2Q7D/NiUY+HDiV99rAYPJztjeTrBSTnHeSBPb+qn5ZZGQwIdUW9
- YegxWKvXXHTwB5eMzo/RB6vffwqcnHDoe0q7VgzRRZJwpi6aMIXLfeWZ5Wrwaw2zldFuO4Dt
- 91pFzBSOIpeMtfgb/Pfe/a1WJ/GgaIRIBE+NUqckM+3zJHGmVPqJP/h2Iwv6nw8U+7Yyl6gU
- BLHFTg2hYnLFJI4Xjg+AX1hHFVKmvl3VBHIsBv0oDcsQWXqY+NaFahT0lRPjYtrTa1v3tem/
- JoFzZ4B0p27K+qQCF2R96hVvuEyjzBmdq2esyE6zIqftdo4MOJho8uctOiWbwNNq2U9pPWmu
- 4vXVFBYIGmpyNPYzRm0QPwARAQABwsF8BBgBCgAmAhsMFiEEm9B+DgxR+NWWd7dUG5NDfTtB
- YpsFAmA872oFCRRflLYACgkQG5NDfTtBYpvScw/9GrqBrVLuJoJ52qBBKUBDo4E+5fU1bjt0
- Gv0nh/hNJuecuRY6aemU6HOPNc2t8QHMSvwbSF+Vp9ZkOvrM36yUOufctoqON+wXrliEY0J4
- ksR89ZILRRAold9Mh0YDqEJc1HmuxYLJ7lnbLYH1oui8bLbMBM8S2Uo9RKqV2GROLi44enVt
- vdrDvo+CxKj2K+d4cleCNiz5qbTxPUW/cgkwG0lJc4I4sso7l4XMDKn95c7JtNsuzqKvhEVS
- oic5by3fbUnuI0cemeizF4QdtX2uQxrP7RwHFBd+YUia7zCcz0//rv6FZmAxWZGy5arNl6Vm
- lQqNo7/Poh8WWfRS+xegBxc6hBXahpyUKphAKYkah+m+I0QToCfnGKnPqyYIMDEHCS/RfqA5
- t8F+O56+oyLBAeWX7XcmyM6TGeVfb+OZVMJnZzK0s2VYAuI0Rl87FBFYgULdgqKV7R7WHzwD
- uZwJCLykjad45hsWcOGk3OcaAGQS6NDlfhM6O9aYNwGL6tGt/6BkRikNOs7VDEa4/HlbaSJo
- 7FgndGw1kWmkeL6oQh7wBvYll2buKod4qYntmNKEicoHGU+x91Gcan8mCoqhJkbqrL7+nXG2
- 5Q/GS5M9RFWS+nYyJh+c3OcfKqVcZQNANItt7+ULzdNJuhvTRRdC3g9hmCEuNSr+CLMdnRBY fv0=
-In-Reply-To: <20241021064129.trchqa2oickna7pc@pengutronix.de>
-Content-Type: text/plain; charset=UTF-8
+From: Thomas Zimmermann <tzimmermann@suse.de>
+Autocrypt: addr=tzimmermann@suse.de; keydata=
+ xsBNBFs50uABCADEHPidWt974CaxBVbrIBwqcq/WURinJ3+2WlIrKWspiP83vfZKaXhFYsdg
+ XH47fDVbPPj+d6tQrw5lPQCyqjwrCPYnq3WlIBnGPJ4/jreTL6V+qfKRDlGLWFjZcsrPJGE0
+ BeB5BbqP5erN1qylK9i3gPoQjXGhpBpQYwRrEyQyjuvk+Ev0K1Jc5tVDeJAuau3TGNgah4Yc
+ hdHm3bkPjz9EErV85RwvImQ1dptvx6s7xzwXTgGAsaYZsL8WCwDaTuqFa1d1jjlaxg6+tZsB
+ 9GluwvIhSezPgnEmimZDkGnZRRSFiGP8yjqTjjWuf0bSj5rUnTGiyLyRZRNGcXmu6hjlABEB
+ AAHNJ1Rob21hcyBaaW1tZXJtYW5uIDx0emltbWVybWFubkBzdXNlLmRlPsLAjgQTAQgAOAIb
+ AwULCQgHAgYVCgkICwIEFgIDAQIeAQIXgBYhBHIX+6yM6c9jRKFo5WgNwR1TC3ojBQJftODH
+ AAoJEGgNwR1TC3ojx1wH/0hKGWugiqDgLNXLRD/4TfHBEKmxIrmfu9Z5t7vwUKfwhFL6hqvo
+ lXPJJKQpQ2z8+X2vZm/slsLn7J1yjrOsoJhKABDi+3QWWSGkaGwRJAdPVVyJMfJRNNNIKwVb
+ U6B1BkX2XDKDGffF4TxlOpSQzdtNI/9gleOoUA8+jy8knnDYzjBNOZqLG2FuTdicBXblz0Mf
+ vg41gd9kCwYXDnD91rJU8tzylXv03E75NCaTxTM+FBXPmsAVYQ4GYhhgFt8S2UWMoaaABLDe
+ 7l5FdnLdDEcbmd8uLU2CaG4W2cLrUaI4jz2XbkcPQkqTQ3EB67hYkjiEE6Zy3ggOitiQGcqp
+ j//OwE0EWznS4AEIAMYmP4M/V+T5RY5at/g7rUdNsLhWv1APYrh9RQefODYHrNRHUE9eosYb
+ T6XMryR9hT8XlGOYRwKWwiQBoWSDiTMo/Xi29jUnn4BXfI2px2DTXwc22LKtLAgTRjP+qbU6
+ 3Y0xnQN29UGDbYgyyK51DW3H0If2a3JNsheAAK+Xc9baj0LGIc8T9uiEWHBnCH+RdhgATnWW
+ GKdDegUR5BkDfDg5O/FISymJBHx2Dyoklv5g4BzkgqTqwmaYzsl8UxZKvbaxq0zbehDda8lv
+ hFXodNFMAgTLJlLuDYOGLK2AwbrS3Sp0AEbkpdJBb44qVlGm5bApZouHeJ/+n+7r12+lqdsA
+ EQEAAcLAdgQYAQgAIAIbDBYhBHIX+6yM6c9jRKFo5WgNwR1TC3ojBQJftOH6AAoJEGgNwR1T
+ C3ojVSkIALpAPkIJPQoURPb1VWjh34l0HlglmYHvZszJWTXYwavHR8+k6Baa6H7ufXNQtThR
+ yIxJrQLW6rV5lm7TjhffEhxVCn37+cg0zZ3j7zIsSS0rx/aMwi6VhFJA5hfn3T0TtrijKP4A
+ SAQO9xD1Zk9/61JWk8OysuIh7MXkl0fxbRKWE93XeQBhIJHQfnc+YBLprdnxR446Sh8Wn/2D
+ Ya8cavuWf2zrB6cZurs048xe0UbSW5AOSo4V9M0jzYI4nZqTmPxYyXbm30Kvmz0rYVRaitYJ
+ 4kyYYMhuULvrJDMjZRvaNe52tkKAvMevcGdt38H4KSVXAylqyQOW5zvPc4/sq9c=
+In-Reply-To: <20241008-b4-has_ioport-v8-3-793e68aeadda@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
+X-Rspamd-Queue-Id: 8E71D21C8B
+X-Spam-Level: 
+X-Spamd-Result: default: False [-3.01 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	SUSPICIOUS_RECIPS(1.50)[];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	NEURAL_HAM_SHORT(-0.20)[-0.996];
+	MIME_GOOD(-0.10)[text/plain];
+	MX_GOOD(-0.01)[];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	FREEMAIL_TO(0.00)[linux.ibm.com,quicinc.com,holtmann.org,gmail.com,linux.intel.com,kernel.org,ffwll.ch,redhat.com,intel.com,linuxfoundation.org,arndb.de,orcam.me.uk];
+	ARC_NA(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[29];
+	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	MIME_TRACE(0.00)[0:+];
+	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	FREEMAIL_ENVRCPT(0.00)[gmail.com];
+	RCVD_TLS_ALL(0.00)[];
+	DKIM_TRACE(0.00)[suse.de:+];
+	RCVD_COUNT_TWO(0.00)[2];
+	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_EQ_ENVFROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[];
+	R_RATELIMIT(0.00)[to_ip_from(RLtfyjk8sg4x43ngtem9djprcp)];
+	ASN(0.00)[asn:25478, ipnet:::/0, country:RU];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns]
+X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
+X-Rspamd-Action: no action
+X-Spam-Score: -3.01
+X-Spam-Flag: NO
 
-On 21/10/2024 08:41, Marco Felsch wrote:
-> On 24-10-07, Krzysztof Kozlowski wrote:
->> On 07/10/2024 14:58, POPESCU Catalin wrote:
->>>>>>
->>>>>> +  vcc-supply:
->>>>>> +    description:
->>>>>> +      phandle of the regulator that provides the supply voltage.
->>>>>> +
->>>>>> +  reset-gpios:
->>>>>> +    description:
->>>>>> +      Chip powerdown/reset signal (PDn).
->>>>>> +
->>>>> Hi Catalin,
->>>>>
->>>>> For NXP WIFI/BT chip, WIFI and BT share the one PDn pin, which means that both wifi and BT controller will be powered on and off at the same time.
->>>>> Taking the M.2 NXP WIFI/BT module as an example, pin56(W_DISABLE1) is connected to the WIFI/BT chip PDn pin, we has already controlled this pin in the corresponding PCIe/SDIO controller dts nodes.
->>>>> It is not clear to me what exactly pins for vcc-supply and reset-gpios you describing here. Can you help understand the corresponding pins on M.2 interface as an example? Thanks.
->>>
->>> Hi Sherry,
->>>
->>> Regulators and reset controls being refcounted, we can then implement 
->>> powerup sequence in both bluetooth/wlan drivers and have the drivers 
->>> operate independently. This way bluetooth driver would has no dependance 
->>> on the wlan driver for :
->>>
->>> - its power supply
->>>
->>> - its reset pin (PDn)
->>>
->>> - its firmware (being downloaded as part of the combo firmware)
->>>
->>> For the wlan driver we use mmc power sequence to drive the chip reset 
->>> pin and there's another patchset that adds support for reset control 
->>> into the mmc pwrseq simple driver.
->>>
->>>> Please wrap your replies.
->>>>
->>>> It seems you need power sequencing just like Bartosz did for Qualcomm WCN.
->>>
->>> Hi Krzysztof,
->>>
->>> I'm not familiar with power sequencing, but looks like way more 
->>> complicated than reset controls. So, why power sequencing is recommended 
->>> here ? Is it b/c a supply is involved ?
->>
->> Based on earlier message:
->>
->> "For NXP WIFI/BT chip, WIFI and BT share the one PDn pin, which means
->> that both wifi and BT controller will be powered on and off at the same
->> time."
->>
->> but maybe that's not needed. No clue, I don't know the hardware. But be
->> carefully what you write in the bindings, because then it will be ABI.
-> 
-> We noticed the new power-sequencing infrastructure which is part of 6.11
-> too but I don't think that this patch is wrong. The DT ABI won't break
-> if we switch to the power-sequencing later on since the "reset-gpios"
-> are not marked as required. So it is up to the driver to handle it
-> either via a separate power-sequence driver or via "power-supply" and
-> "reset-gpios" directly.
+Hi
 
-That's not the point. We expect correct hardware description. If you say
-now it has "reset-gpios" but later say "actually no, because it has
-PMU", I respond: no. Describe the hardware, not current Linux.
+Am 08.10.24 um 14:39 schrieb Niklas Schnelle:
+> In a future patch HAS_IOPORT=n will disable inb()/outb() and friends at
+> compile time. We thus need to add HAS_IOPORT as dependency for those
+> drivers using them. In the bochs driver there is optional MMIO support
+> detected at runtime, warn if this isn't taken when HAS_IOPORT is not
+> defined.
+>
+> There is also a direct and hard coded use in cirrus.c which according to
+> the comment is only necessary during resume.  Let's just skip this as
+> for example s390 which doesn't have I/O port support also doesen't
+> support suspend/resume.
+>
+> Co-developed-by: Arnd Bergmann <arnd@kernel.org>
+> Signed-off-by: Arnd Bergmann <arnd@kernel.org>
+> Signed-off-by: Niklas Schnelle <schnelle@linux.ibm.com>
 
-Best regards,
-Krzysztof
+I feel like I reviewed this before, but can't find it.
+
+> ---
+>   drivers/gpu/drm/gma500/Kconfig |  2 +-
+>   drivers/gpu/drm/qxl/Kconfig    |  1 +
+>   drivers/gpu/drm/tiny/bochs.c   | 17 +++++++++++++++++
+>   drivers/gpu/drm/tiny/cirrus.c  |  2 ++
+>   drivers/gpu/drm/xe/Kconfig     |  2 +-
+>   5 files changed, 22 insertions(+), 2 deletions(-)
+>
+> diff --git a/drivers/gpu/drm/gma500/Kconfig b/drivers/gpu/drm/gma500/Kconfig
+> index efb4a2dd2f80885cb59c925d09401002278d7d61..23b7c14de5e29238ece939d5822d8a9ffc4675cc 100644
+> --- a/drivers/gpu/drm/gma500/Kconfig
+> +++ b/drivers/gpu/drm/gma500/Kconfig
+> @@ -1,7 +1,7 @@
+>   # SPDX-License-Identifier: GPL-2.0-only
+>   config DRM_GMA500
+>   	tristate "Intel GMA500/600/3600/3650 KMS Framebuffer"
+> -	depends on DRM && PCI && X86 && MMU
+> +	depends on DRM && PCI && X86 && MMU && HAS_IOPORT
+>   	select DRM_KMS_HELPER
+>   	select FB_IOMEM_HELPERS if DRM_FBDEV_EMULATION
+>   	select I2C
+> diff --git a/drivers/gpu/drm/qxl/Kconfig b/drivers/gpu/drm/qxl/Kconfig
+> index ca3f51c2a8fe1a383f8a2479f04b5c0b3fb14e44..d0e0d440c8d96564cb7b8ffd2385c44fc43f873d 100644
+> --- a/drivers/gpu/drm/qxl/Kconfig
+> +++ b/drivers/gpu/drm/qxl/Kconfig
+> @@ -2,6 +2,7 @@
+>   config DRM_QXL
+>   	tristate "QXL virtual GPU"
+>   	depends on DRM && PCI && MMU
+> +	depends on HAS_IOPORT
+
+Is there a difference between this style (multiple 'depends on') and the 
+one used for gma500 (&& && &&)?
+
+>   	select DRM_KMS_HELPER
+>   	select DRM_TTM
+>   	select DRM_TTM_HELPER
+> diff --git a/drivers/gpu/drm/tiny/bochs.c b/drivers/gpu/drm/tiny/bochs.c
+> index 31fc5d839e106ea4d5c8fe42d1bfc3c70291e3fb..0ed78d3d5774778f91de972ac27056938036e722 100644
+> --- a/drivers/gpu/drm/tiny/bochs.c
+> +++ b/drivers/gpu/drm/tiny/bochs.c
+> @@ -2,6 +2,7 @@
+>   
+>   #include <linux/module.h>
+>   #include <linux/pci.h>
+> +#include <linux/bug.h>
+
+Alphabetic sorting please.
+
+>   
+>   #include <drm/drm_aperture.h>
+>   #include <drm/drm_atomic_helper.h>
+> @@ -105,7 +106,9 @@ static void bochs_vga_writeb(struct bochs_device *bochs, u16 ioport, u8 val)
+>   
+>   		writeb(val, bochs->mmio + offset);
+>   	} else {
+> +#ifdef CONFIG_HAS_IOPORT
+>   		outb(val, ioport);
+> +#endif
+
+Could you provide empty defines for the out() interfaces at the top of 
+the file?
+
+>   	}
+>   }
+>   
+> @@ -119,7 +122,11 @@ static u8 bochs_vga_readb(struct bochs_device *bochs, u16 ioport)
+>   
+>   		return readb(bochs->mmio + offset);
+>   	} else {
+> +#ifdef CONFIG_HAS_IOPORT
+>   		return inb(ioport);
+> +#else
+> +		return 0xff;
+> +#endif
+
+And the in() interfaces could be defined to 0xff[ff].
+
+I assume that you don't want to provide such empty macros in the 
+kernel's io.h header?
+
+>   	}
+>   }
+>   
+> @@ -132,8 +139,12 @@ static u16 bochs_dispi_read(struct bochs_device *bochs, u16 reg)
+>   
+>   		ret = readw(bochs->mmio + offset);
+>   	} else {
+> +#ifdef CONFIG_HAS_IOPORT
+>   		outw(reg, VBE_DISPI_IOPORT_INDEX);
+>   		ret = inw(VBE_DISPI_IOPORT_DATA);
+> +#else
+> +		ret = 0xffff;
+> +#endif
+>   	}
+>   	return ret;
+>   }
+> @@ -145,8 +156,10 @@ static void bochs_dispi_write(struct bochs_device *bochs, u16 reg, u16 val)
+>   
+>   		writew(val, bochs->mmio + offset);
+>   	} else {
+> +#ifdef CONFIG_HAS_IOPORT
+>   		outw(reg, VBE_DISPI_IOPORT_INDEX);
+>   		outw(val, VBE_DISPI_IOPORT_DATA);
+> +#endif
+>   	}
+>   }
+>   
+> @@ -229,6 +242,10 @@ static int bochs_hw_init(struct drm_device *dev)
+>   			return -ENOMEM;
+>   		}
+>   	} else {
+> +		if (!IS_ENABLED(CONFIG_HAS_IOPORT)) {
+> +			DRM_ERROR("I/O ports are not supported\n");
+> +			return -EIO;
+> +		}
+
+It would be nicer to use an "} else if(IOPORT) {" here and put the 
+"return -EIO" into a trailing else branch.
+
+If you want to add an error message, please don't use DRM_ERROR(). In 
+this case, dev_err(dev->dev, "...\n") seems appropriate.
+
+Best regards
+Thomas
+
+>   		ioaddr = VBE_DISPI_IOPORT_INDEX;
+>   		iosize = 2;
+>   		if (!request_region(ioaddr, iosize, "bochs-drm")) {
+> diff --git a/drivers/gpu/drm/tiny/cirrus.c b/drivers/gpu/drm/tiny/cirrus.c
+> index 751326e3d9c374baf72115492aeefff2b73869f0..e31e1df029ab0272c4a1ff0ab3eb026ca679b560 100644
+> --- a/drivers/gpu/drm/tiny/cirrus.c
+> +++ b/drivers/gpu/drm/tiny/cirrus.c
+> @@ -509,8 +509,10 @@ static void cirrus_crtc_helper_atomic_enable(struct drm_crtc *crtc,
+>   
+>   	cirrus_mode_set(cirrus, &crtc_state->mode);
+>   
+> +#ifdef CONFIG_HAS_IOPORT
+>   	/* Unblank (needed on S3 resume, vgabios doesn't do it then) */
+>   	outb(VGA_AR_ENABLE_DISPLAY, VGA_ATT_W);
+> +#endif
+>   
+>   	drm_dev_exit(idx);
+>   }
+> diff --git a/drivers/gpu/drm/xe/Kconfig b/drivers/gpu/drm/xe/Kconfig
+> index 7bbe46a98ff1f449bc2af30686585a00e9e8af93..116f58774135fc3a9f37d6d72d41340f5c812297 100644
+> --- a/drivers/gpu/drm/xe/Kconfig
+> +++ b/drivers/gpu/drm/xe/Kconfig
+> @@ -49,7 +49,7 @@ config DRM_XE
+>   
+>   config DRM_XE_DISPLAY
+>   	bool "Enable display support"
+> -	depends on DRM_XE && DRM_XE=m
+> +	depends on DRM_XE && DRM_XE=m && HAS_IOPORT
+>   	select FB_IOMEM_HELPERS
+>   	select I2C
+>   	select I2C_ALGOBIT
+>
+
+-- 
+--
+Thomas Zimmermann
+Graphics Driver Developer
+SUSE Software Solutions Germany GmbH
+Frankenstrasse 146, 90461 Nuernberg, Germany
+GF: Ivo Totev, Andrew Myers, Andrew McDonald, Boudien Moerman
+HRB 36809 (AG Nuernberg)
 
