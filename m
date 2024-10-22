@@ -1,104 +1,70 @@
-Received: from mail-qk1-f178.google.com (mail-qk1-f178.google.com [209.85.222.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay2-d.mail.gandi.net (relay2-d.mail.gandi.net [217.70.183.194])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A354619DF8E
-	for <linux-bluetooth@vger.kernel.org>; Tue, 22 Oct 2024 12:07:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7316B196DA2
+	for <linux-bluetooth@vger.kernel.org>; Tue, 22 Oct 2024 12:24:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.194
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729598857; cv=none; b=RKL7zf+X2rX4c0FS1BSPkUt5FwuQzRKfPfO7G4R9bhVA9g0SiNmS/BswhSBi4wPxdKB+6eU92Y0RDZuMJvQvLbPhaegiFoVsoTLuUZIlYJqJp5g1Ur4V0nOUWBNBMcyAICGmt9HLJLea70mY8O43EcGWjX09E1xFLyMwoEBlvHw=
+	t=1729599864; cv=none; b=Mia5z4sg1S10hUSRwOCyueZ58OaHzChKE2D22RD1sU9yR5idYKaHgRwOrrTw7/vkusHz2rCttWRI4taBHKYkqePweYaDdrco0eyv1gIKyUP9XEpM4DfmgvE7Nn8zgIu9xOIzZntlp5r+txRdlV4n9mfjo6wCRaX/1BSmaILHaHo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729598857; c=relaxed/simple;
-	bh=qghP9xxaMp5hzSUv7bdHlp69tks/o4eZn9WUFnx3fsk=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=DLFxWdoq8ZN6DgNZpXyJl9norgsLxyovbTAYGGjUjTupO6tJ82Y8Lm7jI2BlVFY5JOkaVB6QsgVFEadyQXJyzM7OH8ezVIINtxqBsMHHLxoLm0fXw9rdxm8jfYoyAE39PM04E1vsYbgIkLfKWXzFEOsp5LbEWbo77wJs/VV6nQ8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QqkHXxj0; arc=none smtp.client-ip=209.85.222.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QqkHXxj0"
-Received: by mail-qk1-f178.google.com with SMTP id af79cd13be357-7b14df8f821so475502285a.2
-        for <linux-bluetooth@vger.kernel.org>; Tue, 22 Oct 2024 05:07:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1729598854; x=1730203654; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=rwA4JU7oSOH0lZRtsZyD+yav94NL5hiVglF6GcmovGw=;
-        b=QqkHXxj00304jtHNd5vFch+a4Jqih4Mk4eJK1AV5H6QLGgnzaHJ/vqmacvBejkbL6F
-         nAM88tOIpDEHNy0c+Wq2I0nSX02F+mwlDxQLAwziq1z2v4llPSViorl8DkGo1WBvxeOf
-         bPTADSzP2wjWlO22Icp1+9J6oO6G9RfBduS2XBzFHqh4TPP6GQ78o+WLLjy5qDPeto8O
-         9N+X03z/2uMW05exhriElR+HbdMXaTfu1pX8xMPeQrv3qSTAPIgZ3wDRfSDuKWcZz4eL
-         z2Of4UHgat1d1aBa6Ju7zxZkrveIwdhe1v95FNLPlVtd8jgnAI6ryk7xytOq9Sp6JemC
-         VD5A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729598854; x=1730203654;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=rwA4JU7oSOH0lZRtsZyD+yav94NL5hiVglF6GcmovGw=;
-        b=lG+ZbFYD/Jn8rx5OcpU8AKfIonEYdRF050l9jLTMry9Lgbh5i7pjT/GnFmsD8/0oS4
-         7PVbydI5flA75+5SLLFcgT+cpLE+IXZbZBwfPc9vuyLyty3ZaQ8iObGOtF4tC3yK5SQZ
-         qcSU7EpnWjLEU1NGsqYpp86S33kfyNmPQIcmsTsifYKDeFwRmAH7EDNXBCquzbWZKiyu
-         8arHo4Af/GsctrVEKFODVCZll5ZLsp4U4n78sV63UiBDZ+b9vJiU86+i/YTfdfzMC2IB
-         1YQZYM4UqwDvi9kHlfInY3eQuAImdpK8hZ2OI1+yGffpZd3CQr14xZyuwiFdyJ7rxBnK
-         7aJg==
-X-Gm-Message-State: AOJu0YxMs86BQi9HtuNa5pHjycqr/7n7/uaRdyeB1JbuqRA32TZ8+D09
-	lVAzJpvebSjofRfESjcokYFPe++0TprE99QItpfpuY0ElMSI3i5wCl7QFA==
-X-Google-Smtp-Source: AGHT+IEqA9To7Ud0BpGvcYkxzn4HXlZEIcVCI/nwEKbfZtYMbAG2zCMv7R/3BrYElkc/ngjhnBTsSQ==
-X-Received: by 2002:a05:620a:1710:b0:7b1:4fab:4418 with SMTP id af79cd13be357-7b157be08d6mr1952103985a.49.1729598854218;
-        Tue, 22 Oct 2024 05:07:34 -0700 (PDT)
-Received: from [172.17.0.2] ([172.183.53.34])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6ce0099c337sm28216736d6.97.2024.10.22.05.07.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 22 Oct 2024 05:07:33 -0700 (PDT)
-Message-ID: <67179585.0c0a0220.439e0.7eb4@mx.google.com>
-Date: Tue, 22 Oct 2024 05:07:33 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============3092079153029372041=="
+	s=arc-20240116; t=1729599864; c=relaxed/simple;
+	bh=DbfET96DUO08kmGkJPokrrFmsArFdhdqYg+kny4hass=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=l4pvdACJsSj5gWgx9IreG9F1vcizQtbBaAKwCeoe+kB0ZP16VGk/yNnP8Y0cwa1EcUFsmnx/YsRFcx8Ch9YKlBt/LuV5VZuKZIzafP71obktd17R/Uy1HMITfNjt2RxkGvlgsc+1GQeRunp1rYqC6g/PsbIzoP2gQA8CpYHV4Xs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.183.194
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hadess.net
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 9C38C40003;
+	Tue, 22 Oct 2024 12:24:20 +0000 (UTC)
+Message-ID: <6d920d0d89a20adee6794d3342e7342b0d7fd0ff.camel@hadess.net>
+Subject: Re: [BlueZ 3/3] shared/shell: Exit after printing the help
+From: Bastien Nocera <hadess@hadess.net>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Date: Tue, 22 Oct 2024 14:24:20 +0200
+In-Reply-To: <CABBYNZLNDSsJmb=JpY=ObK-1DeJ2gc3L0pAaDN3sSP8BOzCC0g@mail.gmail.com>
+References: <20240912092253.119754-1-hadess@hadess.net>
+	 <20240912092253.119754-4-hadess@hadess.net>
+	 <CABBYNZLNDSsJmb=JpY=ObK-1DeJ2gc3L0pAaDN3sSP8BOzCC0g@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: base64
+User-Agent: Evolution 3.52.4 (3.52.4-1.fc40) 
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, quic_amisjain@quicinc.com
-Subject: RE: [v2] obex: Resolve SRM issue for PTS testcases
-In-Reply-To: <20241022102222.279614-1-quic_amisjain@quicinc.com>
-References: <20241022102222.279614-1-quic_amisjain@quicinc.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+X-GND-Sasl: hadess@hadess.net
 
---===============3092079153029372041==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+T24gVGh1LCAyMDI0LTA5LTEyIGF0IDExOjExIC0wNDAwLCBMdWl6IEF1Z3VzdG8gdm9uIERlbnR6
+IHdyb3RlOgo+IEhpIEJhc3RpZW4sCj4gCj4gT24gVGh1LCBTZXAgMTIsIDIwMjQgYXQgNToyOeKA
+r0FNIEJhc3RpZW4gTm9jZXJhIDxoYWRlc3NAaGFkZXNzLm5ldD4KPiB3cm90ZToKPiA+IAo+ID4g
+RXhpdCBhZnRlciBoYW5kbGluZyAtLWhlbHAsIHNvIGFzIHRvIGF2b2lkIHRoZSBkYWVtb24gd2Fp
+dGluZyB0bwo+ID4gY29tbXVuaWNhdGUgd2l0aCBhIEQtQnVzIHNlcnZpY2UgdGhhdCBtaWdodCBu
+b3QgYmUgcnVubmluZy4KPiA+IC0tLQo+ID4gwqBzcmMvc2hhcmVkL3NoZWxsLmMgfCA0ICstLS0K
+PiA+IMKgMSBmaWxlIGNoYW5nZWQsIDEgaW5zZXJ0aW9uKCspLCAzIGRlbGV0aW9ucygtKQo+ID4g
+Cj4gPiBkaWZmIC0tZ2l0IGEvc3JjL3NoYXJlZC9zaGVsbC5jIGIvc3JjL3NoYXJlZC9zaGVsbC5j
+Cj4gPiBpbmRleCBjMzE0ODcxOTBkMGYuLmY3ZThiMzMwMDM3MyAxMDA2NDQKPiA+IC0tLSBhL3Ny
+Yy9zaGFyZWQvc2hlbGwuYwo+ID4gKysrIGIvc3JjL3NoYXJlZC9zaGVsbC5jCj4gPiBAQCAtMTMy
+NCw5ICsxMzI0LDcgQEAgdm9pZCBidF9zaGVsbF9pbml0KGludCBhcmdjLCBjaGFyICoqYXJndiwK
+PiA+IGNvbnN0IHN0cnVjdCBidF9zaGVsbF9vcHQgKm9wdCkKPiA+IMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgcmV0dXJuOwo+ID4gwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgIGNhc2UgJ2gnOgo+ID4gwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoCB1c2FnZShhcmdjLCBhcmd2LCBvcHQpOwo+ID4gLcKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIGRhdGEuYXJnYyA9IDE7Cj4gPiAt
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgZGF0YS5hcmd2ID0g
+JmNtcGx0Owo+ID4gLcKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+IGRhdGEubW9kZSA9IDE7Cj4gPiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqAgZXhpdChFWElUX1NVQ0NFU1MpOwo+IAo+IFRoaXMgd291bGQgdW5kbyBzaGFyZWQv
+c2hlbGw6IFByaW50IGNvbW1hbmRzIHdoZW4gLS1oZWxwIG9wdGlvbiBpcwo+IGdpdmVuLCBzbyB5
+b3UgbWlnaHQgd2FudCB0byBhZGQgcHJpbnRfY21kcyBjYWxsLgoKVGhhdCB3YXNuJ3QgZW5vdWdo
+LCBiZWNhdXNlIHRoZSBtZW51IGluZm8gaXNuJ3QgcG9wdWxhdGVkIGF0IHRoaXMKcG9pbnQsIHNv
+IHdlJ2Qgb25seSBnZXQgdGhlIHRvcC1sZXZlbCBoZWxwLiBJdCB3YXMgcXVpdGUgYSBiaXQgbW9y
+ZQppbnZvbHZlZCwgYnV0IEkgaG9wZSBJIGdvdCBhbGwgdmFyaWFudHMgY292ZXJlZCBpbiB0aGUg
+djIgcGF0Y2hzZXQuCgpDaGVlcnMKCj4gCj4gPiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgIGdvdG8gZG9uZTsKPiA+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoCBjYXNlICdzJzoKPiA+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqAgaWYgKG9wdGFyZyAmJiBkYXRhLmluaXRfZmQgPCAwKSB7Cj4gPiAtLQo+ID4g
+Mi40Ni4wCj4gPiAKPiA+IAo+IAo+IAoK
 
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=901785
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      0.39 seconds
-GitLint                       PASS      0.28 seconds
-BuildEll                      PASS      25.15 seconds
-BluezMake                     PASS      1662.17 seconds
-MakeCheck                     PASS      13.12 seconds
-MakeDistcheck                 PASS      181.06 seconds
-CheckValgrind                 PASS      255.14 seconds
-CheckSmatch                   PASS      358.32 seconds
-bluezmakeextell               PASS      120.60 seconds
-IncrementalBuild              PASS      1454.48 seconds
-ScanBuild                     PASS      1047.25 seconds
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============3092079153029372041==--
