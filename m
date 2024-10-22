@@ -1,60 +1,65 @@
-Received: from mail-vk1-f177.google.com (mail-vk1-f177.google.com [209.85.221.177])
+Received: from mail-vk1-f172.google.com (mail-vk1-f172.google.com [209.85.221.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 238D11CBE96
-	for <linux-bluetooth@vger.kernel.org>; Tue, 22 Oct 2024 20:34:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 679251CC15D
+	for <linux-bluetooth@vger.kernel.org>; Tue, 22 Oct 2024 20:34:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729629268; cv=none; b=tDCY95Q5WHSV2sHe7Jbe8VWIaX5y2l0VvDfwx0/k/noprVzHS7G+Lv0sw2uKH9q1HZ8GgrK1anlfa2W6+Ba2Tay5kIJZb18dGlWherNWlcTHm4DA4cgROMZEiBCzlpXZRXXyoF1wKs5Yhop2WYOEpJpX+nc2BNb7jbQf9BVEgxM=
+	t=1729629270; cv=none; b=mKKC6Bi3vtK/fSOG+0jy3LL1sKOD9o8oTj5R/9c7n4qywu8gUl+yHdYXOmHy23zTd9TlbP3Xe50jXLxVzLzJfJerx9pdwMvyHPrVlXhcC/YlDmTkcyUdmmfClBEXh5vwZR2WHfGJtoTbrmzygBz2/5B3VMzI+TGleHzG7kVXyaE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729629268; c=relaxed/simple;
-	bh=FbnWDlGzQwSTuWjYQkL8SYulg/1Mlfc73PgFxJGVYuE=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=seSrRY3aPOzihZCeNrfbPbpRakBwIzoVukHs04U0iyEhD/m3sXS4KJPq0FYnYwOtq9m66ygGqx56LbLiKcrlqUuYja/IGozjsAQlPqcuWRS42B7FPBal98AfaJeRMWgOTzHcmqggrEKvouGvL13HM0qZOYbz4IP90VLZMcCSMqE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=P/MCpxFU; arc=none smtp.client-ip=209.85.221.177
+	s=arc-20240116; t=1729629270; c=relaxed/simple;
+	bh=9/iTX2jG97Dk7t/mgUJXBDBHW7LbDhsgJ/gzpLi1C0A=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=HU3r0SnyVDJsZOgtdfStoZDza+jWCW8l0O20Z7dHwzr991gc48PbsyoxGhZea+34h9T/wNfyN7fNdZ560fOJZ3j409IMbd1NX9hAHO7l8WkfTypa3drezuBCdTxE7YFAIePpLzHn1/Ei0bUwh+0D0ymmWh5scZtGSxu9kBxWQwA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PVFrckO6; arc=none smtp.client-ip=209.85.221.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="P/MCpxFU"
-Received: by mail-vk1-f177.google.com with SMTP id 71dfb90a1353d-50d399891d6so1529325e0c.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 22 Oct 2024 13:34:26 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PVFrckO6"
+Received: by mail-vk1-f172.google.com with SMTP id 71dfb90a1353d-50d3998923dso2062347e0c.2
+        for <linux-bluetooth@vger.kernel.org>; Tue, 22 Oct 2024 13:34:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1729629265; x=1730234065; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=lBZRz5isBD+ib4HWMibbG72kcJJ6+vF1lUB/8NcHIbc=;
-        b=P/MCpxFUw2m9PzoYfiGDOtxEke/NiPuPyZq51F96wnvvWkabgfAfidttPl46Ko7wE1
-         JKacfNsNQ31+cqkoLNvIr2O0sSgP5exKl1dcibE3Yw3a2KClWYAYpX8GWNwVaRFdzkOq
-         kEnj9ClX8wcRCfi2RrC+YlgXpjJLZr/LvcI5sa5s5uDC1XCdo8cpUyCrM98FEh0TDsgs
-         Kk6IFfo1UqVsskI0ycTRgTBmRMNdkPvKauXn4/EHvZjFycjwoP3sapjmGmVasnTdp/Ka
-         mTS6JDJK8ipJhFjKfUy7lkkj0vPMJ41Lm3zI7zKtrEhvEbQJEt77GiCRb5fiG4NyClOb
-         T6xA==
+        d=gmail.com; s=20230601; t=1729629267; x=1730234067; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=1KG94hjXvosBZhhpCApfNd8l4CTGNZbXs+ebt8jHsEQ=;
+        b=PVFrckO6sGgWGVkyMhHp3k6KEOUo7wVyrb+M+rvWx6KKO2XSdBIyEkFVJDREwklpWC
+         dgXV96zns/2214SA+HpQRVSi3dHNgYT4ciIqrEhZCjE48gFQXR5CTM9yjDeLrAA38WLs
+         KFdVj8NgXAupdcjGSJskhFie3+FAqCR6QFQE/McrJWUwGToKsk3/v5iwZ87VAFxMrdEy
+         lJgqF55m4cCTl/cL9y+P8TVUrhQhO9eT+yYjYdYMJBSZUazVauwLSy31XFnWx3ETTtEL
+         g8OEOzSeYd+QVITK1titWMtWiAKrtgCxWWlJNLJ9/Tyszzr5MMSGZhmFM9QFZxs6zV3V
+         zSRw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729629265; x=1730234065;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=lBZRz5isBD+ib4HWMibbG72kcJJ6+vF1lUB/8NcHIbc=;
-        b=O4XMaD+t5PUw5oS5pIbrIp7VuldoySVX/Tou5aEzcjgWSI4TnJ4Ito1AASa78sEC8g
-         acjR0KZ1g+BdUzPR+cHcYu3POEG3HGQAF3MPTscbCHvlGsjZdjdhnc8YdX/HowcIOQbv
-         fkOlK877XO/rOaPjFEg+UtJ0+JkSE3AAcTyndb400aytD5TV7DF92vkV5XH0qUJBGeyV
-         E1YNlex29D2urdq5bYvL4x7rxqv83lnqQqKH0mlCIp0cX3CcdQ9qZgjgiMk+o8kimYYJ
-         quAxbkbOkBtZmkD4s7ln+TDKdZ7EYwFagOMJIIbLGhUtAtHw6291sw8mwGGBITSL6wxl
-         LiyA==
-X-Gm-Message-State: AOJu0Yx1yJa4z1egRuQOqClVB04Eq677EvOO5wm4jDcZG9U6tb4pMbtT
-	U3DHeezfkYuQHrxpwHO2rUe+zP8riEf/kqbbd03MK66YDRFuooZL8ia10Q==
-X-Google-Smtp-Source: AGHT+IFs+BPOsXAFoi2JbQgHOuINcDQhyPl3BkS2IcoedrggHPw2hGxAlF/SgTvDGiOwPNL/Rfm+6Q==
-X-Received: by 2002:a05:6122:3bcc:b0:50c:55f4:b529 with SMTP id 71dfb90a1353d-50fd0313353mr557055e0c.8.1729629265210;
-        Tue, 22 Oct 2024 13:34:25 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1729629267; x=1730234067;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=1KG94hjXvosBZhhpCApfNd8l4CTGNZbXs+ebt8jHsEQ=;
+        b=O2NEb/uetJrdycMsrMtot0bC7TNGxcM8MpfeLPq2iq2U3YPszxgd0pehX2zCzOjAYI
+         85QqRyBIx0jnvMSGHchXfvZtYwjOfBIEevqg18CurWPsKsWaBKkLioGT1+QiRRisUnbJ
+         AIC667evePZjf/J17xo7gMvf9V2SU0lUo85JOKYKFThbvREKQ6ZFrjOpCyjYdpslSLNF
+         QMOJpcB1ygmlGVSAaYIuyyU1Amc2lfoCl3/poXwbOo5y3Ze8YQJOJiOBg2dnfaI7dzUx
+         u3RlPaD/UB2DShpY/AqW+xffiWQ3vhbknQ7UFiGRbPp0LHbBB15uc6dDT7UDwB8ansXw
+         CXDg==
+X-Gm-Message-State: AOJu0YyUjCF010pxqvgWsRWDSNlnNqdmyUqBkE6on3g4mgbYMsV2+3hA
+	ahfgOzRC3VOkrlcNd0cfJ6BCgaZURnoq1pniCDmBnV8g2WogTCawRAHj4A==
+X-Google-Smtp-Source: AGHT+IFmITv3TSNXyU+ohW4X5uV1ZrNUvZSeJ1Fcqyzxhucvk3hDhXLPe0qIqgy/aHsGseI6q6BGdg==
+X-Received: by 2002:a05:6122:178f:b0:50d:bfd3:c834 with SMTP id 71dfb90a1353d-50fd020eb5fmr605557e0c.4.1729629267542;
+        Tue, 22 Oct 2024 13:34:27 -0700 (PDT)
 Received: from lvondent-mobl5.. (syn-107-146-107-067.res.spectrum.com. [107.146.107.67])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-50e19e0dc78sm834971e0c.2.2024.10.22.13.34.22
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-50e19e0dc78sm834971e0c.2.2024.10.22.13.34.25
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 22 Oct 2024 13:34:23 -0700 (PDT)
+        Tue, 22 Oct 2024 13:34:26 -0700 (PDT)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 1/2] Bluetooth: SCO: Fix UAF on sco_sock_timeout
-Date: Tue, 22 Oct 2024 16:34:20 -0400
-Message-ID: <20241022203421.2126673-1-luiz.dentz@gmail.com>
+Subject: [PATCH v2 2/2] Bluetooth: ISO: Fix UAF on iso_sock_timeout
+Date: Tue, 22 Oct 2024 16:34:21 -0400
+Message-ID: <20241022203421.2126673-2-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.47.0
+In-Reply-To: <20241022203421.2126673-1-luiz.dentz@gmail.com>
+References: <20241022203421.2126673-1-luiz.dentz@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -65,77 +70,27 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-conn->sk maybe have been unlinked/freed while waiting for sco_conn_lock
+conn->sk maybe have been unlinked/freed while waiting for iso_conn_lock
 so this checks if the conn->sk is still valid by checking if it part of
-sco_sk_list.
+iso_sk_list.
 
-Reported-by: syzbot+4c0d0c4cde787116d465@syzkaller.appspotmail.com
-Tested-by: syzbot+4c0d0c4cde787116d465@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=4c0d0c4cde787116d465
-Fixes: ba316be1b6a0 ("Bluetooth: schedule SCO timeouts with delayed_work")
+Fixes: ccf74f2390d6 ("Bluetooth: Add BTPROTO_ISO socket type")
 Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 ---
- include/net/bluetooth/bluetooth.h |  1 +
- net/bluetooth/af_bluetooth.c      | 22 ++++++++++++++++++++++
- net/bluetooth/sco.c               | 18 ++++++++++++------
- 3 files changed, 35 insertions(+), 6 deletions(-)
+ net/bluetooth/iso.c | 18 ++++++++++++------
+ 1 file changed, 12 insertions(+), 6 deletions(-)
 
-diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
-index 5d655e109b2c..f66bc85c6411 100644
---- a/include/net/bluetooth/bluetooth.h
-+++ b/include/net/bluetooth/bluetooth.h
-@@ -403,6 +403,7 @@ int  bt_sock_register(int proto, const struct net_proto_family *ops);
- void bt_sock_unregister(int proto);
- void bt_sock_link(struct bt_sock_list *l, struct sock *s);
- void bt_sock_unlink(struct bt_sock_list *l, struct sock *s);
-+bool bt_sock_linked(struct bt_sock_list *l, struct sock *s);
- struct sock *bt_sock_alloc(struct net *net, struct socket *sock,
- 			   struct proto *prot, int proto, gfp_t prio, int kern);
- int  bt_sock_recvmsg(struct socket *sock, struct msghdr *msg, size_t len,
-diff --git a/net/bluetooth/af_bluetooth.c b/net/bluetooth/af_bluetooth.c
-index e39fba5565c5..0b4d0a8bd361 100644
---- a/net/bluetooth/af_bluetooth.c
-+++ b/net/bluetooth/af_bluetooth.c
-@@ -185,6 +185,28 @@ void bt_sock_unlink(struct bt_sock_list *l, struct sock *sk)
- }
- EXPORT_SYMBOL(bt_sock_unlink);
+diff --git a/net/bluetooth/iso.c b/net/bluetooth/iso.c
+index c9eefb43bf47..7a83e400ac77 100644
+--- a/net/bluetooth/iso.c
++++ b/net/bluetooth/iso.c
+@@ -93,6 +93,16 @@ static struct sock *iso_get_sock(bdaddr_t *src, bdaddr_t *dst,
+ #define ISO_CONN_TIMEOUT	(HZ * 40)
+ #define ISO_DISCONN_TIMEOUT	(HZ * 2)
  
-+bool bt_sock_linked(struct bt_sock_list *l, struct sock *s)
++static struct sock *iso_sock_hold(struct iso_conn *conn)
 +{
-+	struct sock *sk;
-+
-+	if (!l || !s)
-+		return false;
-+
-+	read_lock(&l->lock);
-+
-+	sk_for_each(sk, &l->head) {
-+		if (s == sk) {
-+			read_unlock(&l->lock);
-+			return true;
-+		}
-+	}
-+
-+	read_unlock(&l->lock);
-+
-+	return false;
-+}
-+EXPORT_SYMBOL(bt_sock_linked);
-+
- void bt_accept_enqueue(struct sock *parent, struct sock *sk, bool bh)
- {
- 	const struct cred *old_cred;
-diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
-index a5ac160c592e..1c7252a36866 100644
---- a/net/bluetooth/sco.c
-+++ b/net/bluetooth/sco.c
-@@ -76,6 +76,16 @@ struct sco_pinfo {
- #define SCO_CONN_TIMEOUT	(HZ * 40)
- #define SCO_DISCONN_TIMEOUT	(HZ * 2)
- 
-+static struct sock *sco_sock_hold(struct sco_conn *conn)
-+{
-+	if (!conn || !bt_sock_linked(&sco_sk_list, conn->sk))
++	if (!conn || !bt_sock_linked(&iso_sk_list, conn->sk))
 +		return NULL;
 +
 +	sock_hold(conn->sk);
@@ -143,29 +98,29 @@ index a5ac160c592e..1c7252a36866 100644
 +	return conn->sk;
 +}
 +
- static void sco_sock_timeout(struct work_struct *work)
+ static void iso_sock_timeout(struct work_struct *work)
  {
- 	struct sco_conn *conn = container_of(work, struct sco_conn,
-@@ -87,9 +97,7 @@ static void sco_sock_timeout(struct work_struct *work)
- 		sco_conn_unlock(conn);
- 		return;
- 	}
+ 	struct iso_conn *conn = container_of(work, struct iso_conn,
+@@ -100,9 +110,7 @@ static void iso_sock_timeout(struct work_struct *work)
+ 	struct sock *sk;
+ 
+ 	iso_conn_lock(conn);
 -	sk = conn->sk;
 -	if (sk)
 -		sock_hold(sk);
-+	sk = sco_sock_hold(conn);
- 	sco_conn_unlock(conn);
++	sk = iso_sock_hold(conn);
+ 	iso_conn_unlock(conn);
  
  	if (!sk)
-@@ -194,9 +202,7 @@ static void sco_conn_del(struct hci_conn *hcon, int err)
+@@ -209,9 +217,7 @@ static void iso_conn_del(struct hci_conn *hcon, int err)
  
  	/* Kill socket */
- 	sco_conn_lock(conn);
+ 	iso_conn_lock(conn);
 -	sk = conn->sk;
 -	if (sk)
 -		sock_hold(sk);
-+	sk = sco_sock_hold(conn);
- 	sco_conn_unlock(conn);
++	sk = iso_sock_hold(conn);
+ 	iso_conn_unlock(conn);
  
  	if (sk) {
 -- 
