@@ -1,30 +1,27 @@
 Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [217.70.183.197])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EDC9199252
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64580197A81
 	for <linux-bluetooth@vger.kernel.org>; Tue, 22 Oct 2024 12:00:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.197
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729598461; cv=none; b=A7Fgco+kastSeZ14jSsFly+/Rm64wMSsk/t4TirDOQWH86uJkKnsDHp3ca84BhV5OseAnBBKv2QdgcpgVA7hFINTrRMvfZMBxFv08L9hik9L/y6+xDEJKrbKDfREF7ilrM38USOak/XvsLHUU0lK+RtR/fvbTBHv6X+GaGkQtAc=
+	t=1729598461; cv=none; b=At3XLC+fk2OxVB5b+2q2fmhSjXjMH4P5yOspOLog5wf2SGWnIiHydpkOX2RidnMSfL3NNGMy745/pW726YtM1OL8DIVTq7KAJG9fJl7vtDCqM/vM7YpvAIxdxY3rZiLYiqY9laq+5NlapTV22+QBnMIswWvmBiR3pnTBCGnstuE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1729598461; c=relaxed/simple;
-	bh=stdfC0w+a9QqvorW0UmHP3AKTvUwMz74Z/gkoW1AZao=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=pTwV84zdB7oGQ5Qv/KR5hHbt8iaGZeU0khHUB1h+Du+nd1bV2y2VfjiIH32T9PA3ysTeNkoHA7zSDFpR7wwnffxkXMxbOwQHG4dN3f0q8KHpOJ7gaqh6c/L+RSByDy0vnWRGaySI6s6KSMCmxNKexYdGm99SoQFd4vt9JxIBz3I=
+	bh=x99X1GJwq0ouMT67e7vEJPRaAGNClLb1vABALUa7mtA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=PXzd30Uf91PqYLxV/oS0XKLnzv0dZDqGmiOd50Xj+8nfRIgVlxOAWYuICt8xzNHoxgwRlewZJRmjwDVzPzvpHJ6uFDNRqB9QIiBAiEqtuYjAec05TQDrwlSQ9ZaYWD0qComhKaFGqsGAKuAQ60gRZnQsiWlMQ71K6vYCVc9yn/w=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.183.197
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hadess.net
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 525851C0021;
-	Tue, 22 Oct 2024 12:00:52 +0000 (UTC)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id B98E01C0017;
+	Tue, 22 Oct 2024 12:00:51 +0000 (UTC)
 From: Bastien Nocera <hadess@hadess.net>
 To: linux-bluetooth@vger.kernel.org
 Cc: Bastien Nocera <hadess@hadess.net>
-Subject: [BlueZ v2 2/7] client: Use g_clear_pointer() to clean up menus
-Date: Tue, 22 Oct 2024 13:58:32 +0200
-Message-ID: <20241022120051.123888-3-hadess@hadess.net>
+Subject: [BlueZ v2 0/7] Fix bluetoothctl --help hanging if daemon isn't running
+Date: Tue, 22 Oct 2024 13:58:30 +0200
+Message-ID: <20241022120051.123888-1-hadess@hadess.net>
 X-Mailer: git-send-email 2.47.0
-In-Reply-To: <20241022120051.123888-1-hadess@hadess.net>
-References: <20241022120051.123888-1-hadess@hadess.net>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -34,77 +31,34 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-GND-Sasl: hadess@hadess.net
 
-This would avoid warnings should the client be NULL.
----
- client/admin.c     | 5 ++---
- client/assistant.c | 5 ++---
- client/player.c    | 4 ++--
- 3 files changed, 6 insertions(+), 8 deletions(-)
+v2, this one can print all the submenus without requiring bluetoothd
+to be running.
 
-diff --git a/client/admin.c b/client/admin.c
-index cd9af6f955da..9d48867bc1d7 100644
---- a/client/admin.c
-+++ b/client/admin.c
-@@ -191,7 +191,7 @@ static void proxy_removed(GDBusProxy *proxy, void *user_data)
- 		admin_policy_status_removed(proxy);
- }
- 
--static GDBusClient *client;
-+static GDBusClient *client = NULL;
- 
- static void disconnect_handler(DBusConnection *connection, void *user_data)
- {
-@@ -215,6 +215,5 @@ void admin_add_submenu(void)
- 
- void admin_remove_submenu(void)
- {
--	g_dbus_client_unref(client);
--	client = NULL;
-+	g_clear_pointer(&client, g_dbus_client_unref);
- }
-diff --git a/client/assistant.c b/client/assistant.c
-index 16e94664a5c3..94052e26fd59 100644
---- a/client/assistant.c
-+++ b/client/assistant.c
-@@ -390,7 +390,7 @@ static const struct bt_shell_menu assistant_menu = {
- 	{} },
- };
- 
--static GDBusClient * client;
-+static GDBusClient * client = NULL;
- 
- void assistant_add_submenu(void)
- {
-@@ -409,7 +409,6 @@ void assistant_add_submenu(void)
- 
- void assistant_remove_submenu(void)
- {
--	g_dbus_client_unref(client);
--	client = NULL;
-+	g_clear_pointer(&client, g_dbus_client_unref);
- }
- 
-diff --git a/client/player.c b/client/player.c
-index 188378175486..dea5922d56db 100644
---- a/client/player.c
-+++ b/client/player.c
-@@ -5694,7 +5694,7 @@ static const struct bt_shell_menu transport_menu = {
- 	{} },
- };
- 
--static GDBusClient *client;
-+static GDBusClient *client = NULL;
- 
- void player_add_submenu(void)
- {
-@@ -5715,6 +5715,6 @@ void player_add_submenu(void)
- 
- void player_remove_submenu(void)
- {
--	g_dbus_client_unref(client);
-+	g_clear_pointer(&client, g_dbus_client_unref);
- 	queue_destroy(ios, transport_free);
- }
+Bastien Nocera (7):
+  configure.ac: Update requirement to glib 2.34
+  client: Use g_clear_pointer() to clean up menus
+  client: Split installing submenu and doing I/O
+  client: Install submenus before contacting bluez daemon
+  shell: Document "mode" variable
+  shared/shell: Add function to handle early help calls
+  client: Fix --help hanging if bluetoothd is not running
+
+ acinclude.m4       |  4 ++--
+ client/admin.c     |  8 +++++---
+ client/admin.h     |  1 +
+ client/assistant.c |  8 +++++---
+ client/assistant.h |  1 +
+ client/main.c      | 14 ++++++++++----
+ client/mgmt.c      | 11 +++++++----
+ client/mgmt.h      |  3 ++-
+ client/player.c    |  7 +++++--
+ client/player.h    |  1 +
+ configure.ac       |  2 +-
+ src/shared/shell.c | 12 +++++++++++-
+ src/shared/shell.h |  2 ++
+ tools/btmgmt.c     |  3 ++-
+ 14 files changed, 55 insertions(+), 22 deletions(-)
+
 -- 
 2.47.0
 
