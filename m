@@ -1,45 +1,45 @@
 Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D10951E515;
-	Tue, 22 Oct 2024 18:53:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69D271C460E;
+	Tue, 22 Oct 2024 18:54:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729623182; cv=none; b=ALeOWof7QHPatVIPPiFY807jmaLw69nHRFhJUMmK65FV30kJgpU6gNqSpsgWpy8kNZUS0+uPnMx/lw7tURL6eFwujPSsop8vV8RaZ6PfHwjTUdZty5cYdKsQIKozQ1nfUnf5zHZSKwCvCyoEJv5aLca6+Ca0A8VgThIKGGRP41w=
+	t=1729623241; cv=none; b=CSmzQtC1VzgqxCamZnLhdR5AKxxHsI9BL9XDELKqwPNDz13xSBc66cWY+lSvbJchwVlIv/JqKmve8/LRiS2h4aWu21hMRnUgpB9fFk46IXIYlttYgssmm6h0QVJxli44DWV5rDgwh9GbLmH1ekCMXgdzXQwmz2J+h4EtQ/53PDE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729623182; c=relaxed/simple;
+	s=arc-20240116; t=1729623241; c=relaxed/simple;
 	bh=ZRajgVrhJySL80fRpZUOov5be1ZeZ5/Urojgatl320E=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=q010USIRL6hCumdg5CxMhXpwNonN2V2EWz54NkIaOHUQY49hr+LU5Ef4aKfdkxH1HZdQ4g4q05/V4o15TsTDIbrW9wlO69qq0xp8EN3t8VBjO/Wd95e6uGIpTnzJFu6FE2nJ9d3ojkCJjNBpNROuzyYYw7tIBN7v+Lqhdzl16iQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=G5UxsCEq; arc=none smtp.client-ip=13.77.154.182
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=N1nQ/OQUPt/ZMMlDBFQKHzDano5zpTf/yY4WXLtqIxO+f2A8R44oYTIzh4qq9ZaIo/jg1GsobKL4YRtnybTRqHS3EhC4tOQbqf9fDGnYtk7ijFPS4yVQ/iDB11Gdp6SeEWJvxV6s+8rIldgBl9nyaWViHWji9ZSIxUvRgl8kZRQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=Gcx/WplC; arc=none smtp.client-ip=13.77.154.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="G5UxsCEq"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="Gcx/WplC"
 Received: from eahariha-devbox.5bhznamrcrmeznzvghz2s0u2eh.xx.internal.cloudapp.net (unknown [40.91.112.99])
-	by linux.microsoft.com (Postfix) with ESMTPSA id 40EB7210FBBD;
-	Tue, 22 Oct 2024 11:53:00 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 40EB7210FBBD
+	by linux.microsoft.com (Postfix) with ESMTPSA id 1A482210FBBD;
+	Tue, 22 Oct 2024 11:54:00 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 1A482210FBBD
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1729623180;
+	s=default; t=1729623240;
 	bh=CnXC+PCkG//lbC/zwe39ZMC1UuIDogzzgL1iMHAP9fs=;
 	h=From:To:Cc:Subject:Date:From;
-	b=G5UxsCEqY+ofsFa6AOzndZiXo+vLoQp/3s6k+sxJ7eDVaZu/OUWTa+S+aQT7m+7lD
-	 sC7ksmMmt+VBw0qWesQxwYPgW9lJp7kv64ZaX2GW9IrREZ0OvzDtabAGB2P8y5qxeO
-	 GDcMeX0kwcVtMct+M/O5OPAN8AKBQYzFYEMjG0gg=
+	b=Gcx/WplCGorSonlJyKO4jekXbMEJ47wHVNj8MomUFZV2KXS78RGEZJ+3Sp9olOrnO
+	 RU2r9Az6+X2fQ5EfQw+NeOIhJctbp65MVUJlEAO2Y6/tKzEBPmzmkmV0pkagcbVMR6
+	 swwM/YN+V++9ZJeALxsuxyNdhOtT3ex7kfw+qJVA=
 From: Easwar Hariharan <eahariha@linux.microsoft.com>
 To: lkp@intel.com,
 	Marcel Holtmann <marcel@holtmann.org>,
 	Johan Hedberg <johan.hedberg@gmail.com>,
 	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Anna-Maria Behnsen <anna-maria@linutronix.de>,
 	Thomas Gleixner <tglx@linutronix.de>,
-	Easwar Hariharan <eahariha@linux.microsoft.com>,
+	Anna-Maria Behnsen <anna-maria@linutronix.de>,
 	Geert Uytterhoeven <geert@linux-m68k.org>,
+	Easwar Hariharan <eahariha@linux.microsoft.com>,
 	linux-kernel@vger.kernel.org (open list),
 	linux-bluetooth@vger.kernel.org (open list:BLUETOOTH SUBSYSTEM)
 Cc: Naman Jain <namjain@linux.microsoft.com>,
 	Michael Kelley <mhklinux@outlook.com>
 Subject: [PATCH 1/2] jiffies: Define secs_to_jiffies()
-Date: Tue, 22 Oct 2024 18:52:30 +0000
-Message-Id: <20241022185233.2079261-1-eahariha@linux.microsoft.com>
+Date: Tue, 22 Oct 2024 18:53:49 +0000
+Message-Id: <20241022185353.2080021-1-eahariha@linux.microsoft.com>
 X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
