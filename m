@@ -1,33 +1,33 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2F4913AD0;
-	Tue, 22 Oct 2024 07:31:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74CE513E03A;
+	Tue, 22 Oct 2024 07:32:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729582266; cv=none; b=TCcqMp/p80hNSekm4VgFhOyCh820SrY4y/gr53rQ09GmIhccf5mwsyQVC9XSNcPdcU4Vk2gsz1y1Y4QeIToW+9UW6uLvoQQPwx1+HDShh8pJ91hjrNkW/nM7EtJ8QEhwvtz1kdBMdx+H4rGvknX639qfQwRAPJj0P53Jb6RBoDs=
+	t=1729582344; cv=none; b=RnBl2bOJlkB8GzTp1NKSE846NdJvOhjk4/AEF0LsCFLa7JcAjfhGHzkIEVLn5/fPAuYE2DVuJ68DuCXpTLTrggQgYWdmJ7BZwbeiKyxtyJ4I0agU9t4sY6KqDW5bXzOPJJRL//lNSZ1HCHiqgUwwjN+8e4ydRo5oIPg2i5ABPgM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729582266; c=relaxed/simple;
-	bh=HCIa2AkrfDM2CEGtzVKU7MNYVqPZuefnJ8Ahx7FIIUM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=TDO9+zbvb8y5MX4GCHNBOsA+I8Pc3iiseOMnRx5gk0oUmK1GRkKut+4t977kfx4Wy4keWnTjmpS7G0kFW9zsJONT7TYP7o4u2XyE543xGXuxUt5ub1b/tIw+bbvbFg3Kmd4oGYcVvTIRlmnRf28vfVH/t7PYxOCUj7QoYeoKMBU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rUyQdqqT; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1729582344; c=relaxed/simple;
+	bh=wYgdEskwISkyw2iFXCx2Ht/6RxnOK5Vwd9hXrJsKpb4=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=gKnnhTILCCcJrCHUPcGj+aCaIfEj5eGqD0Bblg6PN/0b5sxmGH5+XYE5CDe6t1l5klgxQ2uFmnd+DvXfv6IkudQpm0xMf38pY4258ceEajGTJSn59+r6NRrKx7U9cuZW07VpS7Wq/GSRiL2gCawW/WQdQc/Z0h1Ky15l91XNonk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PtzBAKNW; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rUyQdqqT"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 242D7C4CEE3;
-	Tue, 22 Oct 2024 07:30:58 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PtzBAKNW"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B1BAEC4CEC3;
+	Tue, 22 Oct 2024 07:32:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1729582265;
-	bh=HCIa2AkrfDM2CEGtzVKU7MNYVqPZuefnJ8Ahx7FIIUM=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=rUyQdqqTkBWDOn0RGwPmIsXUqU71/6fpNBw6IAOpIVsBuNW1S0dasyOjjLF5AOTit
-	 mE59TEkO8GvQSSbrIp6HnVNld4u7xhOTlwsCtKu5u7JNbbgKj+ALpheqrHDdCDG2Hk
-	 MpzN2Qh9/B3Xq0Brf1pytyXazH71JLBGnmOWIidpZ8WavR2Ks5oYkvtFuBOq+MSTWW
-	 7bvZGCV0CxFBoDaEMTN/LYTvWjTB9oP8K+IjVe3yKlumMiyApbwW+q8C1bRhvvJWAd
-	 powHexKja+nLAhEFjrp9K40oytorWEMfpkoEfmHn8nu6xn4Y26+V6Rf3I2gkFDaxzo
-	 n5wKIdNpKHX2A==
-Message-ID: <66d33097-37ed-4e89-a356-285eda743a5c@kernel.org>
-Date: Tue, 22 Oct 2024 09:30:56 +0200
+	s=k20201202; t=1729582344;
+	bh=wYgdEskwISkyw2iFXCx2Ht/6RxnOK5Vwd9hXrJsKpb4=;
+	h=Date:Subject:From:To:Cc:References:In-Reply-To:From;
+	b=PtzBAKNW/sve1UwzZH2A/w8DjHsU5QrvBX/0QSWr+0IK8Z56fgYw3OyWw7lgXXpAc
+	 lpIBGK6ikbQiJWV0s9mlPv3ygU8piPFriJ2ZgUC03SHBiRdX9tnneXbxnfXY+nxvO8
+	 o0hh7RZEfwPmnWxBpm93uVS6UiSICENYcgGgOzaHkLf26TKyscMx+BqH7WHELdHey8
+	 HgS66B7DHe9wG/2KiY+VYPin0txNYFO3BCwmaAe0H8Rzwv18hHijjHMrfU4KcSd78d
+	 BdzIXdyBLvYhejoiDqftaCl1fRLeXhaqcvB8Z0VKHAtM9W8Lu85m1hjeeRBFjEpfGQ
+	 iHFeW317yak2A==
+Message-ID: <a11cf72d-3878-4af1-89c5-c66d55794ea6@kernel.org>
+Date: Tue, 22 Oct 2024 09:32:15 +0200
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -37,6 +37,7 @@ MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Subject: Re: [PATCH 1/2] dt-bindings: net: bluetooth: nxp: add support for
  supply and reset
+From: Krzysztof Kozlowski <krzk@kernel.org>
 To: Marco Felsch <m.felsch@pengutronix.de>
 Cc: POPESCU Catalin <catalin.popescu@leica-geosystems.com>,
  Sherry Sun <sherry.sun@nxp.com>, Amitkumar Karwar
@@ -60,7 +61,7 @@ References: <20241004113557.2851060-1-catalin.popescu@leica-geosystems.com>
  <20241021102558.rfnz7nxcg5knibxs@pengutronix.de>
  <e7a1622e-6406-478f-bd3e-08a8490d4db0@kernel.org>
  <20241022071208.lgk2rpl2c2qpytfa@pengutronix.de>
-From: Krzysztof Kozlowski <krzk@kernel.org>
+ <66d33097-37ed-4e89-a356-285eda743a5c@kernel.org>
 Content-Language: en-US
 Autocrypt: addr=krzk@kernel.org; keydata=
  xsFNBFVDQq4BEAC6KeLOfFsAvFMBsrCrJ2bCalhPv5+KQF2PS2+iwZI8BpRZoV+Bd5kWvN79
@@ -105,99 +106,110 @@ Autocrypt: addr=krzk@kernel.org; keydata=
  uZwJCLykjad45hsWcOGk3OcaAGQS6NDlfhM6O9aYNwGL6tGt/6BkRikNOs7VDEa4/HlbaSJo
  7FgndGw1kWmkeL6oQh7wBvYll2buKod4qYntmNKEicoHGU+x91Gcan8mCoqhJkbqrL7+nXG2
  5Q/GS5M9RFWS+nYyJh+c3OcfKqVcZQNANItt7+ULzdNJuhvTRRdC3g9hmCEuNSr+CLMdnRBY fv0=
-In-Reply-To: <20241022071208.lgk2rpl2c2qpytfa@pengutronix.de>
+In-Reply-To: <66d33097-37ed-4e89-a356-285eda743a5c@kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 22/10/2024 09:12, Marco Felsch wrote:
-> On 24-10-22, Krzysztof Kozlowski wrote:
->> On 21/10/2024 12:25, Marco Felsch wrote:
->>> On 24-10-21, Krzysztof Kozlowski wrote:
->>>> On 21/10/2024 08:41, Marco Felsch wrote:
->>>>> On 24-10-07, Krzysztof Kozlowski wrote:
-> 
-> ...
-> 
->>>>>> Based on earlier message:
->>>>>>
->>>>>> "For NXP WIFI/BT chip, WIFI and BT share the one PDn pin, which means
->>>>>> that both wifi and BT controller will be powered on and off at the same
->>>>>> time."
->>>>>>
->>>>>> but maybe that's not needed. No clue, I don't know the hardware. But be
->>>>>> carefully what you write in the bindings, because then it will be ABI.
->>>>>
->>>>> We noticed the new power-sequencing infrastructure which is part of 6.11
->>>>> too but I don't think that this patch is wrong. The DT ABI won't break
->>>>> if we switch to the power-sequencing later on since the "reset-gpios"
->>>>> are not marked as required. So it is up to the driver to handle it
->>>>> either via a separate power-sequence driver or via "power-supply" and
->>>>> "reset-gpios" directly.
->>>>
->>>> That's not the point. We expect correct hardware description. If you say
->>>> now it has "reset-gpios" but later say "actually no, because it has
->>>> PMU", I respond: no. Describe the hardware, not current Linux.
->>>
->>> I know that DT abstracts the HW. That said I don't see the problem with
->>> this patch. The HW is abstracted just fine:
->>>
->>> shared PDn          -> reset-gpios
->>> shared power-supply -> vcc-supply
->>>
->>> Right now the DT ABI for the BT part is incomplete since it assume a
->>> running WLAN part or some hog-gpios to pull the device out-of-reset
->>> which is addressed by this patchset.
->>>
->>> Making use of the new power-sequencing fw is a Linux detail and I don't
->>> see why the DT can't be extended later on. We always extend the DT if
->>> something is missing or if we found a better way to handle devices.
+On 22/10/2024 09:30, Krzysztof Kozlowski wrote:
+> On 22/10/2024 09:12, Marco Felsch wrote:
+>> On 24-10-22, Krzysztof Kozlowski wrote:
+>>> On 21/10/2024 12:25, Marco Felsch wrote:
+>>>> On 24-10-21, Krzysztof Kozlowski wrote:
+>>>>> On 21/10/2024 08:41, Marco Felsch wrote:
+>>>>>> On 24-10-07, Krzysztof Kozlowski wrote:
 >>
->> Sure, although I am not really confident that you understand the
->> implications - you will not be able to switch to proper power-sequencing
->> with above bindings, because it will not be just possible without
->> breaking the ABI or changing hardware description (which you say it is
->> "fine", so complete/done). I am fine with it, just mind the implications.
+>> ...
+>>
+>>>>>>> Based on earlier message:
+>>>>>>>
+>>>>>>> "For NXP WIFI/BT chip, WIFI and BT share the one PDn pin, which means
+>>>>>>> that both wifi and BT controller will be powered on and off at the same
+>>>>>>> time."
+>>>>>>>
+>>>>>>> but maybe that's not needed. No clue, I don't know the hardware. But be
+>>>>>>> carefully what you write in the bindings, because then it will be ABI.
+>>>>>>
+>>>>>> We noticed the new power-sequencing infrastructure which is part of 6.11
+>>>>>> too but I don't think that this patch is wrong. The DT ABI won't break
+>>>>>> if we switch to the power-sequencing later on since the "reset-gpios"
+>>>>>> are not marked as required. So it is up to the driver to handle it
+>>>>>> either via a separate power-sequence driver or via "power-supply" and
+>>>>>> "reset-gpios" directly.
+>>>>>
+>>>>> That's not the point. We expect correct hardware description. If you say
+>>>>> now it has "reset-gpios" but later say "actually no, because it has
+>>>>> PMU", I respond: no. Describe the hardware, not current Linux.
+>>>>
+>>>> I know that DT abstracts the HW. That said I don't see the problem with
+>>>> this patch. The HW is abstracted just fine:
+>>>>
+>>>> shared PDn          -> reset-gpios
+>>>> shared power-supply -> vcc-supply
+>>>>
+>>>> Right now the DT ABI for the BT part is incomplete since it assume a
+>>>> running WLAN part or some hog-gpios to pull the device out-of-reset
+>>>> which is addressed by this patchset.
+>>>>
+>>>> Making use of the new power-sequencing fw is a Linux detail and I don't
+>>>> see why the DT can't be extended later on. We always extend the DT if
+>>>> something is missing or if we found a better way to handle devices.
+>>>
+>>> Sure, although I am not really confident that you understand the
+>>> implications - you will not be able to switch to proper power-sequencing
+>>> with above bindings, because it will not be just possible without
+>>> breaking the ABI or changing hardware description (which you say it is
+>>> "fine", so complete/done). I am fine with it, just mind the implications.
+>>
+>> Sorry can you please share your concerns? I don't get the point yet why
+>> we do break the DT ABI if we are going from
 > 
-> Sorry can you please share your concerns? I don't get the point yet why
-> we do break the DT ABI if we are going from
+> Not necessarily breaking ABI, but changing the description.
+>>
+>> bt {
+>> 	reset-gpios = <&gpio 4 0>;
+>> 	vcc-supply = <&supply>;
+>> };
+>>
+>> to
+>>
+>> bt {
+>> 	vcc-supply = <&pmu_supply>;
+> 
+> ...because you just removed reset-gpios which is a property of this device.
+> 
+>> };
+>>
+>> or:
+>>
+>> bt {
+>> 	pmu = <&pmu>;
 
-Not necessarily breaking ABI, but changing the description.
-> 
-> bt {
-> 	reset-gpios = <&gpio 4 0>;
-> 	vcc-supply = <&supply>;
-> };
-> 
-> to
-> 
-> bt {
-> 	vcc-supply = <&pmu_supply>;
+Ah, and I forgot here: this also might not be correct, because if you
+have PMU, then the PMU consumes VCC, not the Bluetooth. Therefore both
+of above two solutions might be inaccurate description if you decide to
+go with PMU.
 
-...because you just removed reset-gpios which is a property of this device.
-
-> };
+>> };
+>>
+>> Of course the driver need to support all 2/3 cases due to backward
+>> compatibility but from DT pov I don't see any breakage since we already
+>> need to define the power handling properties (gpio & supply) as
+>> optional.
 > 
-> or:
+> Either existing binding is complete or not. Not half-done.
 > 
-> bt {
-> 	pmu = <&pmu>;
-> };
+>>
+>> That beeing said I don't see the need for a PMU driver for this WLAN/BT
+>> combi chip which is way simpler than the Qualcomm one from Bartosz. Also
+>> there is physically no PMU device which powers the chip unlike the
+>> Qualcomm one. I'm not sure if you would accept virtual PMU devices.
 > 
-> Of course the driver need to support all 2/3 cases due to backward
-> compatibility but from DT pov I don't see any breakage since we already
-> need to define the power handling properties (gpio & supply) as
-> optional.
-
-Either existing binding is complete or not. Not half-done.
-
+> Virtual PMU, of course not. I would like to have complete hardware
+> description, not something which matches your current driver model.
 > 
-> That beeing said I don't see the need for a PMU driver for this WLAN/BT
-> combi chip which is way simpler than the Qualcomm one from Bartosz. Also
-> there is physically no PMU device which powers the chip unlike the
-> Qualcomm one. I'm not sure if you would accept virtual PMU devices.
-
-Virtual PMU, of course not. I would like to have complete hardware
-description, not something which matches your current driver model.
+> Best regards,
+> Krzysztof
+> 
 
 Best regards,
 Krzysztof
