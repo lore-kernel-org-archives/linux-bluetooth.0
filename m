@@ -1,81 +1,104 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEE801C8FCF
-	for <linux-bluetooth@vger.kernel.org>; Tue, 22 Oct 2024 22:49:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9AEE1CDFBF;
+	Tue, 22 Oct 2024 22:58:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729637397; cv=none; b=pq6DojfMNob/DRWtyaWs6461d97u+0VOulK4OtQcNiC1Dg2txQJ82HON33Tbqskh5NTHL6aT+LCikBB71mh0BB+LNjPaqMpL5Fu+EDHIqfcp+Xdx7iFTgvWe9ZXa7L+4qz4j0GmFF0iywYSRhQhSRXVRXcVyXJ6A+1mSJTD4j10=
+	t=1729637892; cv=none; b=O90BZpDKkKheLmniRZz+iN/rp1ArzFWuih7Vf/pCG2xJ30q23MvtGBJ6SqFiW/eLt5lk9XBLgp7LLuh8Ghr3tJ7rpFP9OHhf1Wa+QuCkm48kjZkVS8cp+zWn5a8pSa5fleh9O2JLEQzigusNdbeKBIq+d28QwL1pcg6Bt8xYOY4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729637397; c=relaxed/simple;
-	bh=//PtBz3FfAVS8W8n2apBU+N42FYvFm9Vra2yUe8ri1c=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=XErbLOrJltqgvTaN4FRBJ2GFG8H25V9yncU5cWwG2OVK70PWVFx7fKAs8PqSBJo6nmhfUV+ZJzC+QhRmYZPQneI/zT7pEB3XzvYFtPDbX4zWkaiEGAacrqAYCnskSVRvPnVRsR419MwqoQXbN8/Bk/KVTJ4n2gvnyujJ2zrPpF4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=H3rCqPin; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1729637892; c=relaxed/simple;
+	bh=AOaeQ/JIrGG6hVU/F59SW5zbpMK6YqCThcfIwLGdMu4=;
+	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=OGpZykFtqDiSSBoBxtDGtlgkWqsNvXrvxeGtwKX+2gplmaKIlCkzRKr3C4fgArTBICUOjlcClpTkqlOpfRIUEAnFYNqayBFXf9nwSqzjD+MGAfPAJtHfdPf7XUE46RftOfSs2YNZ08szpyUu7UM582pROpWLSYJIimBiuEpI1wo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=src16h4f; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="H3rCqPin"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 94D08C4CEE6
-	for <linux-bluetooth@vger.kernel.org>; Tue, 22 Oct 2024 22:49:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1729637397;
-	bh=//PtBz3FfAVS8W8n2apBU+N42FYvFm9Vra2yUe8ri1c=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=H3rCqPin8pFmEk55k4KjXcrRCrcDO1SSoAxbsPJ0U5fk9bg3V2T+OGsF0Kh0nxNIu
-	 fC0Hq5zGOMJdxdkivMbkwwBZfNsbtjlTzh6wOAzHVuPadUvugBCkagbZI6yBGGaNRt
-	 RlsXMsSZrD6nuDilWPWJgq7OXinBHJIiYhbYJotuRLDQDJBFFoPMtYGgLTJMr9HfF2
-	 OK95QdhbUm5ksEyPTSSidGm5pPLtbrT6QOi5Q3rvhZUHkH4cAeDanohPgwNnop6qN0
-	 EqtAd/TPm7WAYsZIHIo2cMUgny5A3oX+DNljQ5WzvwDvOg9kAbWNEQMQ4kiGM4yg9t
-	 22Kp5k/BK+MEA==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id 89866C53BCB; Tue, 22 Oct 2024 22:49:57 +0000 (UTC)
-From: bugzilla-daemon@kernel.org
-To: linux-bluetooth@vger.kernel.org
-Subject: [Bug 219365] USB bluetooth dongle stop working after upgrade from
- 6.11.1 to 6.11.2
-Date: Tue, 22 Oct 2024 22:49:56 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: adilson@adilson.net.br
-X-Bugzilla-Status: RESOLVED
-X-Bugzilla-Resolution: IMPLEMENTED
-X-Bugzilla-Priority: P3
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: bug_status resolution
-Message-ID: <bug-219365-62941-SdiGlarp5f@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-219365-62941@https.bugzilla.kernel.org/>
-References: <bug-219365-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="src16h4f"
+Received: from [100.65.66.184] (unknown [20.236.11.29])
+	by linux.microsoft.com (Postfix) with ESMTPSA id 2A8FD21112EF;
+	Tue, 22 Oct 2024 15:58:10 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 2A8FD21112EF
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1729637890;
+	bh=2QQm/IH+Y8dbs5DxBwqLr/A9c7L7ikg8eZ/If3zOwmI=;
+	h=Date:Cc:Subject:To:References:From:In-Reply-To:From;
+	b=src16h4fKcPufvHf+a4/l9zZ598jjOFJ+msduFTYVgo4IXECIVmFkRq1J6yOBqitr
+	 hPkTw/IEMSIeAARlAq2FdLc1xCrvW61+Cuz/aGfzkFzDNamus0jqijwp6NycfalL8z
+	 0ltBw+9TKmhBgiDbUJBGih/Gna5t8d3/QDnJMYYQ=
+Message-ID: <112aed61-2c4d-450e-9a44-cba33e2a017f@linux.microsoft.com>
+Date: Tue, 22 Oct 2024 15:58:10 -0700
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Cc: eahariha@linux.microsoft.com, Naman Jain <namjain@linux.microsoft.com>,
+ Michael Kelley <mhklinux@outlook.com>
+Subject: Re: [PATCH 1/2] jiffies: Define secs_to_jiffies()
+To: lkp@intel.com, Marcel Holtmann <marcel@holtmann.org>,
+ Johan Hedberg <johan.hedberg@gmail.com>,
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+ Thomas Gleixner <tglx@linutronix.de>,
+ Anna-Maria Behnsen <anna-maria@linutronix.de>,
+ Geert Uytterhoeven <geert@linux-m68k.org>,
+ open list <linux-kernel@vger.kernel.org>,
+ "open list:BLUETOOTH SUBSYSTEM" <linux-bluetooth@vger.kernel.org>,
+ "K. Y. Srinivasan" <kys@microsoft.com>,
+ Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>,
+ Dexuan Cui <decui@microsoft.com>, Linux-HyperV <linux-hyperv@vger.kernel.org>
+References: <20241022185353.2080021-1-eahariha@linux.microsoft.com>
+Content-Language: en-US
+From: Easwar Hariharan <eahariha@linux.microsoft.com>
+In-Reply-To: <20241022185353.2080021-1-eahariha@linux.microsoft.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D219365
+On 10/22/2024 11:53 AM, Easwar Hariharan wrote:
+> There are ~500 usages of msecs_to_jiffies() that either use a multiplier
+> value of 1000 or equivalently MSEC_PER_SEC. Define secs_to_jiffies() to
+> allow such code to be less clunky.
+> 
+> Suggested-by: Michael Kelley <mhklinux@outlook.com>
+> Signed-off-by: Easwar Hariharan <eahariha@linux.microsoft.com>
+> ---
+>  include/linux/jiffies.h   | 2 ++
+>  net/bluetooth/hci_event.c | 2 --
+>  2 files changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/include/linux/jiffies.h b/include/linux/jiffies.h
+> index 1220f0fbe5bf..50dba516fd2f 100644
+> --- a/include/linux/jiffies.h
+> +++ b/include/linux/jiffies.h
+> @@ -526,6 +526,8 @@ static __always_inline unsigned long msecs_to_jiffies(const unsigned int m)
+>  	}
+>  }
+>  
+> +#define secs_to_jiffies(_secs) msecs_to_jiffies((_secs) * MSEC_PER_SEC)
+> +
+>  extern unsigned long __usecs_to_jiffies(const unsigned int u);
+>  #if !(USEC_PER_SEC % HZ)
+>  static inline unsigned long _usecs_to_jiffies(const unsigned int u)
+> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+> index 0bbad90ddd6f..7b35c58bbbeb 100644
+> --- a/net/bluetooth/hci_event.c
+> +++ b/net/bluetooth/hci_event.c
+> @@ -42,8 +42,6 @@
+>  #define ZERO_KEY "\x00\x00\x00\x00\x00\x00\x00\x00" \
+>  		 "\x00\x00\x00\x00\x00\x00\x00\x00"
+>  
+> -#define secs_to_jiffies(_secs) msecs_to_jiffies((_secs) * 1000)
+> -
+>  /* Handle HCI Event packets */
+>  
+>  static void *hci_ev_skb_pull(struct hci_dev *hdev, struct sk_buff *skb,
 
-Adilson Dantas (adilson@adilson.net.br) changed:
+Sorry, I should have combined distribution lists for the two patches, so
+everyone received both patches. Combining the lists with this email.
 
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-             Status|NEW                         |RESOLVED
-         Resolution|---                         |IMPLEMENTED
+Here's the lore link for the series:
+https://lore.kernel.org/all/20241022185353.2080021-1-eahariha@linux.microsoft.com/
 
---- Comment #12 from Adilson Dantas (adilson@adilson.net.br) ---
-Closing it since this regression is resolved with kernel 6.11.5.
-
---=20
-You may reply to this email to add a comment.
-
-You are receiving this mail because:
-You are the assignee for the bug.=
+Thanks,
+Easwar
