@@ -1,168 +1,110 @@
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B86884A22
-	for <linux-bluetooth@vger.kernel.org>; Tue, 22 Oct 2024 07:23:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E93B84A22
+	for <linux-bluetooth@vger.kernel.org>; Tue, 22 Oct 2024 07:24:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729581797; cv=none; b=Oug/ij9KW9xuTYZ1jmWWDH1COJlFRL4VQYNjj6oy9ryQ6ESAWLI+Wyfj8k2W5jupNFHKFIFJ78nNtkiyRBNIH18zwQOI/P+VgwRBiq6TSV/w3ePoB7yqwCBaR8HEBnsl6p2xIYT8Dfuap1Xo39bxMhlXfEDLNriTI9h1ytdUtrk=
+	t=1729581888; cv=none; b=NfLmHR06YHcWSLifx6FcYJv1w67RxwEcGr2mtMZP+ZesvUYVd8KBwKgItoPDElNX6BCCLj+fv3hFk4EL7zTuFse8y+jCrcOpmp79M4kyt37vrT0A5mCCKzs9tmWDAqPlAg1oXSHAsrYCM22ns/lzsYN6zEDzpAxRIgU5hEOId/o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729581797; c=relaxed/simple;
-	bh=hOKrI3GQqLEYrRGRQ4W1xaNqTzfZ590TisBLQIuIizQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Sa4ZJ7z5i+28xcki6TMuYp0gaEKnRkQMr691qMCT6NBYN0UJjdsUCfQYjc1fYOrkn6bjVX7SueH4mujGWPWVv60g/maxU0r/aLNBJGG6ucziIi9Ish6g3v+ZQaHvc3O9rmwMwFvsbaeIEpWINwiMO+dyebgl2x+ypeUwePV+1nE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <mfe@pengutronix.de>)
-	id 1t39EW-0003v3-2i; Tue, 22 Oct 2024 09:23:12 +0200
-Received: from [2a0a:edc0:2:b01:1d::c5] (helo=pty.whiteo.stw.pengutronix.de)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <mfe@pengutronix.de>)
-	id 1t39EV-000pEO-1c;
-	Tue, 22 Oct 2024 09:23:11 +0200
-Received: from mfe by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <mfe@pengutronix.de>)
-	id 1t39EV-007Vcd-1H;
-	Tue, 22 Oct 2024 09:23:11 +0200
-Date: Tue, 22 Oct 2024 09:23:11 +0200
-From: Marco Felsch <m.felsch@pengutronix.de>
-To: Sherry Sun <sherry.sun@nxp.com>
-Cc: POPESCU Catalin <catalin.popescu@leica-geosystems.com>,
-	Amitkumar Karwar <amitkumar.karwar@nxp.com>,
-	Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>,
-	"marcel@holtmann.org" <marcel@holtmann.org>,
-	"luiz.dentz@gmail.com" <luiz.dentz@gmail.com>,
-	"robh@kernel.org" <robh@kernel.org>,
-	"krzk+dt@kernel.org" <krzk+dt@kernel.org>,
-	"conor+dt@kernel.org" <conor+dt@kernel.org>,
-	"p.zabel@pengutronix.de" <p.zabel@pengutronix.de>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	GEO-CHHER-bsp-development <bsp-development.geo@leica-geosystems.com>,
-	Krzysztof Kozlowski <krzk@kernel.org>
-Subject: Re: [PATCH 1/2] dt-bindings: net: bluetooth: nxp: add support for
- supply and reset
-Message-ID: <20241022072311.ubh2sia5lwgvebsg@pengutronix.de>
-References: <20241004113557.2851060-1-catalin.popescu@leica-geosystems.com>
- <DB9PR04MB8429B4535422D3AE07D8EE79927C2@DB9PR04MB8429.eurprd04.prod.outlook.com>
- <3fa35cd2-e52c-4873-8a7f-db459b016a97@kernel.org>
- <2b7f61a8-e91a-4b32-be1d-753a19e4d81f@leica-geosystems.com>
- <0d460226-4ea7-4a9b-a119-468343727996@kernel.org>
- <20241021064129.trchqa2oickna7pc@pengutronix.de>
- <bb34f4ae-92b3-48b7-b0d6-5937756cdbb9@kernel.org>
- <20241021102558.rfnz7nxcg5knibxs@pengutronix.de>
- <DB9PR04MB842939900805C080F2CC32B2924C2@DB9PR04MB8429.eurprd04.prod.outlook.com>
+	s=arc-20240116; t=1729581888; c=relaxed/simple;
+	bh=sbTqdKY0dxaFB7r3wb+gisp5JGqP4dbRVR5dkGFYps8=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=gs77uXKa6keUaWevsXhhr48zNbUH0TTbo/Ju2e7WLyjLLCAkLBvB2s7myZ/9PEkchDs5jjR6utxYB+wqBWtbUsR7V2036T32Zv+g2Y/P23z3PRm0RYJG63fXDsKd0TulWYzkEMGujiroeIM6zff76meASAUKYDipW2ofykGeZEQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=aEroBrgE; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="aEroBrgE"
+Received: from pps.filterd (m0279868.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 49LGiJ3Y014452
+	for <linux-bluetooth@vger.kernel.org>; Tue, 22 Oct 2024 07:24:45 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=qcppdkim1; bh=4a0p3IfEcHgj85rVOboxjW
+	ak3T9L0uaVbkMP3cSTpDY=; b=aEroBrgEJCr8H//VQeuhVNlHLFCl1i5XIkMyfe
+	WImpmEVwATCmbN7zdFUt0wC8JGxVml/LAaJ4J0sWF32fh6idoZBVP87PrmS5jHR4
+	8h0kQcyixHyItZf2PASAPYRLO3UEZJo523fQ/yfDKwRKITk4eYg4SuQISOBLOcLJ
+	uNsb9MYnrxV3Oi1jihtWKEe/xRsGL8cXZMTeHD+7mMgm2PAzroXtkJ4Z2GbSiMmb
+	TPgs8IGs7lHQi7T3bxgnevPOrYltsTylISZyyS1KHFAkcvwvzQfI50qpLELtnhEl
+	WOcNI3yVWPWNMpXMYwZZYx/gy34fxGFnnZiX+P0sUcoalSsA==
+Received: from nasanppmta04.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 42dkhd3h6s-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <linux-bluetooth@vger.kernel.org>; Tue, 22 Oct 2024 07:24:45 +0000 (GMT)
+Received: from nasanex01c.na.qualcomm.com (nasanex01c.na.qualcomm.com [10.45.79.139])
+	by NASANPPMTA04.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 49M7OheL022170
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <linux-bluetooth@vger.kernel.org>; Tue, 22 Oct 2024 07:24:43 GMT
+Received: from hu-amisjain-hyd.qualcomm.com (10.80.80.8) by
+ nasanex01c.na.qualcomm.com (10.45.79.139) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.9; Tue, 22 Oct 2024 00:24:42 -0700
+From: Amisha Jain <quic_amisjain@quicinc.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: <quic_mohamull@quicinc.com>, <quic_hbandi@quicinc.com>,
+        <quic_anubhavg@quicinc.com>
+Subject: [PATCH v1] obex: Resolve SRM issue for PTS testcases
+Date: Tue, 22 Oct 2024 12:54:23 +0530
+Message-ID: <20241022072423.4080043-1-quic_amisjain@quicinc.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <DB9PR04MB842939900805C080F2CC32B2924C2@DB9PR04MB8429.eurprd04.prod.outlook.com>
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: mfe@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nasanex01c.na.qualcomm.com (10.45.79.139)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: mtqMONBhbwsWkjQOTgIU17Qc8PGG8kes
+X-Proofpoint-GUID: mtqMONBhbwsWkjQOTgIU17Qc8PGG8kes
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
+ definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 adultscore=0
+ phishscore=0 spamscore=0 clxscore=1015 priorityscore=1501 impostorscore=0
+ mlxscore=0 suspectscore=0 lowpriorityscore=0 bulkscore=0 mlxlogscore=703
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2409260000
+ definitions=main-2410220046
 
-On 24-10-22, Sherry Sun wrote:
-> > On 24-10-21, Krzysztof Kozlowski wrote:
-> > > On 21/10/2024 08:41, Marco Felsch wrote:
-> > > > On 24-10-07, Krzysztof Kozlowski wrote:
-> > > >> On 07/10/2024 14:58, POPESCU Catalin wrote:
-> > > >>>>>>
-> > > >>>>>> +  vcc-supply:
-> > > >>>>>> +    description:
-> > > >>>>>> +      phandle of the regulator that provides the supply voltage.
-> > > >>>>>> +
-> > > >>>>>> +  reset-gpios:
-> > > >>>>>> +    description:
-> > > >>>>>> +      Chip powerdown/reset signal (PDn).
-> > > >>>>>> +
-> > > >>>>> Hi Catalin,
-> > > >>>>>
-> > > >>>>> For NXP WIFI/BT chip, WIFI and BT share the one PDn pin, which
-> > means that both wifi and BT controller will be powered on and off at the
-> > same time.
-> > > >>>>> Taking the M.2 NXP WIFI/BT module as an example,
-> > pin56(W_DISABLE1) is connected to the WIFI/BT chip PDn pin, we has already
-> > controlled this pin in the corresponding PCIe/SDIO controller dts nodes.
-> > > >>>>> It is not clear to me what exactly pins for vcc-supply and reset-gpios
-> > you describing here. Can you help understand the corresponding pins on M.2
-> > interface as an example? Thanks.
-> > > >>>
-> > > >>> Hi Sherry,
-> > > >>>
-> > > >>> Regulators and reset controls being refcounted, we can then
-> > > >>> implement powerup sequence in both bluetooth/wlan drivers and have
-> > > >>> the drivers operate independently. This way bluetooth driver would
-> > > >>> has no dependance on the wlan driver for :
-> > > >>>
-> > > >>> - its power supply
-> > > >>>
-> > > >>> - its reset pin (PDn)
-> > > >>>
-> > > >>> - its firmware (being downloaded as part of the combo firmware)
-> > > >>>
-> > > >>> For the wlan driver we use mmc power sequence to drive the chip
-> > > >>> reset pin and there's another patchset that adds support for reset
-> > > >>> control into the mmc pwrseq simple driver.
-> > > >>>
-> > > >>>> Please wrap your replies.
-> > > >>>>
-> > > >>>> It seems you need power sequencing just like Bartosz did for
-> > Qualcomm WCN.
-> > > >>>
-> > > >>> Hi Krzysztof,
-> > > >>>
-> > > >>> I'm not familiar with power sequencing, but looks like way more
-> > > >>> complicated than reset controls. So, why power sequencing is
-> > > >>> recommended here ? Is it b/c a supply is involved ?
-> > > >>
-> > > >> Based on earlier message:
-> > > >>
-> > > >> "For NXP WIFI/BT chip, WIFI and BT share the one PDn pin, which
-> > > >> means that both wifi and BT controller will be powered on and off
-> > > >> at the same time."
-> > > >>
-> > > >> but maybe that's not needed. No clue, I don't know the hardware.
-> > > >> But be carefully what you write in the bindings, because then it will be
-> > ABI.
-> > > >
-> > > > We noticed the new power-sequencing infrastructure which is part of
-> > > > 6.11 too but I don't think that this patch is wrong. The DT ABI
-> > > > won't break if we switch to the power-sequencing later on since the
-> > "reset-gpios"
-> > > > are not marked as required. So it is up to the driver to handle it
-> > > > either via a separate power-sequence driver or via "power-supply"
-> > > > and "reset-gpios" directly.
-> > >
-> > > That's not the point. We expect correct hardware description. If you
-> > > say now it has "reset-gpios" but later say "actually no, because it
-> > > has PMU", I respond: no. Describe the hardware, not current Linux.
-> > 
-> > I know that DT abstracts the HW. That said I don't see the problem with this
-> > patch. The HW is abstracted just fine:
-> > 
-> > shared PDn          -> reset-gpios
-> > shared power-supply -> vcc-supply
-> 
-> Actually we should use vcc-supply to control the PDn pin, this is the
-> power supply for NXP wifi/BT.
+Add check for unknown/undefined srm value.
 
-Please don't since this is regular pin on the wlan/bt device not the
-regulator. People often do that for GPIOs if the driver is missing the
-support to pull the reset/pdn/enable gpio but the enable-gpio on the
-regulator is to enable the regulator and _not_ the bt/wlan device.
+This fix is required to pass the below the PTS testcases :
+1. OPP/SR/GOEP/SRM/BI-02-C
+2. FTP/SR/GOEP/SRM/BI-02-C
+3. PBAP/PSE/GOEP/SRM/BI-05-C
 
-Therefore the implementation Catalin provided is the correct one.
+Description - Verify that the Server ignores a SRM header with an invalid
+value in the PUT/GET request and carries on with the PUT/GET operation with SRM disabled.
 
-Regards,
-  Marco
+Current Behaviour - Server is sending SRM enable in the response even
+though recieving the unknown SRM value.
+
+To fix this, I have added the check to verify the valid SRM values
+before continuing with SRM enable.
+
+Change-Id: I399b1daacdcfa118137dc9798529514d36fd78ed
+---
+ gobex/gobex.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/gobex/gobex.c b/gobex/gobex.c
+index 40d6b8129..4dc3d8b23 100644
+--- a/gobex/gobex.c
++++ b/gobex/gobex.c
+@@ -317,6 +317,9 @@ static void set_srm(GObex *obex, guint8 op, guint8 srm)
+ 	struct srm_config *config = obex->srm;
+ 	gboolean enable;
+ 
++	if(srm != G_OBEX_SRM_DISABLE && srm != G_OBEX_SRM_ENABLE && srm != G_OBEX_SRM_INDICATE)
++	      return; //unknown srm value
++
+ 	if (config == NULL) {
+ 		if (srm == G_OBEX_SRM_DISABLE)
+ 			return;
+-- 
+2.34.1
+
