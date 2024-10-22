@@ -1,27 +1,27 @@
 Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [217.70.183.193])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 722C919F471
-	for <linux-bluetooth@vger.kernel.org>; Tue, 22 Oct 2024 14:11:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD13819F133
+	for <linux-bluetooth@vger.kernel.org>; Tue, 22 Oct 2024 14:11:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.193
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729606283; cv=none; b=f6h0jO/e4h3qwAjUmFo/7a8VlzImRSe6bS082WJJMI8kvzVgdABlEaMj3teLwv69rIKScns7beDjAs5+B57VRkXH+HN7oAjPuYvqEqEivRL18gnx+bwU6AL1384rXZmdal0KIgx1fY7io6307z7ooMoJjnBlDI0F+SAUugAHGY4=
+	t=1729606283; cv=none; b=jQBhNFcYLdIvqIlwEs7kvmZpdP0zteitU6qwqFCoEyNFrcuzv99EczJfjRgIGEMoOj0DGJ6WPDRmbpZRyjYZW+FwaJEvEn40GYLCyA5XPGoLTw48iWaD1r4AdPugVNqC+j0Hi0AAfaXfrHqZKro/O83f1dewKTQZuNAnWla/t0Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1729606283; c=relaxed/simple;
-	bh=wWA/M+qQ+CdbyhZDTYQSa/woqJEvSmt7Is5V992jisg=;
+	bh=stdfC0w+a9QqvorW0UmHP3AKTvUwMz74Z/gkoW1AZao=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=i70VFFUaXdcGJIiYstAyGNlNBCJdVFkire4bMn7NKVav3NgQVVI08wh9th9z9i7JOj3x70Rve+ToOBOxfxtZUetJKQurtWVrSWlu9ZqqB3/flV6kF9zL/Yjj0JllvMi26sGliW7pOlihm1KEccmoSuGBFvtkEFQVS1diqMXk/Q4=
+	 MIME-Version; b=Tjuii2eRJoDKpxJAgWrfwI1s1A36D+AIZ1Tksl1iEStwIZZoHUBbS//s6G4g0dMA3PP/eQRZJwLg4NjjzbyOC3DMYFoOzQY9uWZyGOGw2/vIEkeTIg3yZIfcOhbwP2BksaT/HxSpm2KJdqZOqFGkQudxwXzjdN8VLWinyITvy1w=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.183.193
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hadess.net
-Received: by mail.gandi.net (Postfix) with ESMTPSA id C2ED0240008;
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 38A9F240004;
 	Tue, 22 Oct 2024 14:11:19 +0000 (UTC)
 From: Bastien Nocera <hadess@hadess.net>
 To: linux-bluetooth@vger.kernel.org
 Cc: Bastien Nocera <hadess@hadess.net>
-Subject: [BlueZ v3 4/7] client: Install submenus before contacting bluez daemon
-Date: Tue, 22 Oct 2024 16:10:35 +0200
-Message-ID: <20241022141118.150143-5-hadess@hadess.net>
+Subject: [BlueZ v3 2/7] client: Use g_clear_pointer() to clean up menus
+Date: Tue, 22 Oct 2024 16:10:33 +0200
+Message-ID: <20241022141118.150143-3-hadess@hadess.net>
 X-Mailer: git-send-email 2.47.0
 In-Reply-To: <20241022141118.150143-1-hadess@hadess.net>
 References: <20241022141118.150143-1-hadess@hadess.net>
@@ -34,40 +34,77 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-GND-Sasl: hadess@hadess.net
 
-So that the submenus are installed even if bluez isn't available.
+This would avoid warnings should the client be NULL.
 ---
- client/main.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ client/admin.c     | 5 ++---
+ client/assistant.c | 5 ++---
+ client/player.c    | 4 ++--
+ 3 files changed, 6 insertions(+), 8 deletions(-)
 
-diff --git a/client/main.c b/client/main.c
-index 17af62000f6d..f60bef1a6d3a 100644
---- a/client/main.c
-+++ b/client/main.c
-@@ -3187,6 +3187,10 @@ int main(int argc, char *argv[])
- 	bt_shell_add_submenu(&advertise_monitor_menu);
- 	bt_shell_add_submenu(&scan_menu);
- 	bt_shell_add_submenu(&gatt_menu);
-+	admin_add_submenu();
-+	player_add_submenu();
-+	mgmt_add_submenu();
-+	assistant_add_submenu();
- 	bt_shell_set_prompt(PROMPT_OFF, NULL);
+diff --git a/client/admin.c b/client/admin.c
+index cd9af6f955da..9d48867bc1d7 100644
+--- a/client/admin.c
++++ b/client/admin.c
+@@ -191,7 +191,7 @@ static void proxy_removed(GDBusProxy *proxy, void *user_data)
+ 		admin_policy_status_removed(proxy);
+ }
  
- 	if (agent_option)
-@@ -3203,13 +3207,9 @@ int main(int argc, char *argv[])
- 		bt_shell_set_env("AUTO_REGISTER_ENDPOINT",
- 					(void *)endpoint_option);
+-static GDBusClient *client;
++static GDBusClient *client = NULL;
  
--	admin_add_submenu();
- 	admin_enable_submenu();
--	player_add_submenu();
- 	player_enable_submenu();
--	mgmt_add_submenu();
- 	mgmt_enable_submenu();
--	assistant_add_submenu();
- 	assistant_enable_submenu();
+ static void disconnect_handler(DBusConnection *connection, void *user_data)
+ {
+@@ -215,6 +215,5 @@ void admin_add_submenu(void)
  
- 	client = g_dbus_client_new(dbus_conn, "org.bluez", "/org/bluez");
+ void admin_remove_submenu(void)
+ {
+-	g_dbus_client_unref(client);
+-	client = NULL;
++	g_clear_pointer(&client, g_dbus_client_unref);
+ }
+diff --git a/client/assistant.c b/client/assistant.c
+index 16e94664a5c3..94052e26fd59 100644
+--- a/client/assistant.c
++++ b/client/assistant.c
+@@ -390,7 +390,7 @@ static const struct bt_shell_menu assistant_menu = {
+ 	{} },
+ };
+ 
+-static GDBusClient * client;
++static GDBusClient * client = NULL;
+ 
+ void assistant_add_submenu(void)
+ {
+@@ -409,7 +409,6 @@ void assistant_add_submenu(void)
+ 
+ void assistant_remove_submenu(void)
+ {
+-	g_dbus_client_unref(client);
+-	client = NULL;
++	g_clear_pointer(&client, g_dbus_client_unref);
+ }
+ 
+diff --git a/client/player.c b/client/player.c
+index 188378175486..dea5922d56db 100644
+--- a/client/player.c
++++ b/client/player.c
+@@ -5694,7 +5694,7 @@ static const struct bt_shell_menu transport_menu = {
+ 	{} },
+ };
+ 
+-static GDBusClient *client;
++static GDBusClient *client = NULL;
+ 
+ void player_add_submenu(void)
+ {
+@@ -5715,6 +5715,6 @@ void player_add_submenu(void)
+ 
+ void player_remove_submenu(void)
+ {
+-	g_dbus_client_unref(client);
++	g_clear_pointer(&client, g_dbus_client_unref);
+ 	queue_destroy(ios, transport_free);
+ }
 -- 
 2.47.0
 
