@@ -1,111 +1,183 @@
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FF8E198E7A
-	for <linux-bluetooth@vger.kernel.org>; Tue, 22 Oct 2024 10:22:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E8FF19924A;
+	Tue, 22 Oct 2024 10:55:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729592565; cv=none; b=IX0J+V9p/kft7VipG/P9gB5jEVUq3jt4AWC+2mc90MIyvGZrLbqMnTIVNf2EbE8+lCn3f+NypFkXKgqE6VWmTn5vX60MO14bAneS4z+c0D20CFoT081/bZGwElTQmSfndX9XWDaaxcfwKRxCQgcsPzT9vocl+YPqNa80u0F34L4=
+	t=1729594525; cv=none; b=aFjowi9bk1O0296RKL/h4/OPF9ck+g9ubl4Zd3U7nO3Pwcr/NQObNS2+uQoAp8DWqer+MZeqhSWFPA/BvLp3HU5z9v5z+eOqegkGEUvWNNsE3/hAbz7F+JjyiZOL1lNFN2Kq2uFOOW01LLmKeOvDmwtB9cSgqM/P27MCCzmjuYY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729592565; c=relaxed/simple;
-	bh=RF7caUZFMp/+5Ae3vSq+VW9kRzV7Asz20Gl3TtoPbk0=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=ou6hPPvVLXQPnRyVmFsrZ+TK6r2+vPI2On4OFDvnPx0hrNBvmmpoyBkgvDBjrSzexZ5H2iHS0d7k5DOCiwXPyLiEC8ldsT+ZIiyi7iwTKPummjtlgYiB0C1+vLNuX8Na3MHYlWvq+6dB6sUEgGiVa1md41FZM0ogRRNIyJps+zc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=pYxSkvbj; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+	s=arc-20240116; t=1729594525; c=relaxed/simple;
+	bh=ZutgxfYWu007tyr81o9qTOUfRHXWns04G0vwIgAPdD4=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=iDI5g+yU9R8Rw/MJpi7G7QoqH0qTqc5bimX913xNYhM1J2E9ShetG4+3TSS/y+WLs66gs1lAC1ZbqFNi8mDtXnSHEzG1AAHjYEjvRRU7x66EExbowLYny9nK52u7TlDFz4TqqxASEsA8StP0n7Nx9fXNgNdw21cOBWbCu5GYXes=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=qN5VJWqU; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=kKINBKKU; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=qN5VJWqU; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=kKINBKKU; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="pYxSkvbj"
-Received: from pps.filterd (m0279868.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 49M6W3Os014410
-	for <linux-bluetooth@vger.kernel.org>; Tue, 22 Oct 2024 10:22:43 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:message-id
-	:mime-version:subject:to; s=qcppdkim1; bh=oHJd7tM7g+CwYwKQLxZ+cR
-	oooJj0seoJ4kNq+Q5v5DI=; b=pYxSkvbjlwgqXemW8/JagYXOUT8dD2yl2i68P3
-	0yM6J6bi94/aMnLVQV000DGXwmGXxr+M9t3yLVH5T9t4XE4Bbzr4CAPiBLddw6A/
-	GGIxMdreSrpm5zTubYf8DATIZ+VskzZlobwhMHCkR6hersGQJ+CA9RcRfJjKcvN7
-	amRnR8i7/hhvcIg8pQZygw5yvNtufHsXBFMVIrKEaIU4pWs8SyXsbjOIpcJAtgkC
-	opHd2hGjqveMOBtR3r5+8Wg8CrDxDugBtuUaPir3uB6BF0nEwEIVlMRZrWrfWzrB
-	N4faB1NXDXfMsIsY8ItnwpS1wXquhtFPGrvkPV6i1LVJXQ9g==
-Received: from nasanppmta05.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 42dkhd41u0-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <linux-bluetooth@vger.kernel.org>; Tue, 22 Oct 2024 10:22:42 +0000 (GMT)
-Received: from nasanex01c.na.qualcomm.com (nasanex01c.na.qualcomm.com [10.45.79.139])
-	by NASANPPMTA05.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 49MAMfCC006517
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <linux-bluetooth@vger.kernel.org>; Tue, 22 Oct 2024 10:22:41 GMT
-Received: from hu-amisjain-hyd.qualcomm.com (10.80.80.8) by
- nasanex01c.na.qualcomm.com (10.45.79.139) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.9; Tue, 22 Oct 2024 03:22:39 -0700
-From: Amisha Jain <quic_amisjain@quicinc.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: <quic_mohamull@quicinc.com>, <quic_hbandi@quicinc.com>,
-        <quic_anubhavg@quicinc.com>
-Subject: [PATCH v2] obex: Resolve SRM issue for PTS testcases
-Date: Tue, 22 Oct 2024 15:52:22 +0530
-Message-ID: <20241022102222.279614-1-quic_amisjain@quicinc.com>
-X-Mailer: git-send-email 2.34.1
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="qN5VJWqU";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="kKINBKKU";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="qN5VJWqU";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="kKINBKKU"
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 5176621ED2;
+	Tue, 22 Oct 2024 10:55:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1729594522; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=iIVthrBRayCR9P3OzqnXu2rlaXyTF5KOjNEVPFTU07o=;
+	b=qN5VJWqUEJsDLYzBoAbtorm9JDXhQuHw3KD8+gAwVY7bz2O5dst/QOkwUlZcLXOFXB6Ut+
+	5NpT5FcoeC0pBe3u1hzMME58fl5bXMbpo5h8fcHIb1RAe82DPl4mz8YiMciO/IEpjmkBvU
+	dvmvhQTrVHhcLUTp4goKeL7ekUZ/0cQ=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1729594522;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=iIVthrBRayCR9P3OzqnXu2rlaXyTF5KOjNEVPFTU07o=;
+	b=kKINBKKUFp5/X+oOBmO5GK/Bw281blSB7U0xpcNBfP9A7DYYG3+iJAT1f3EADt+WQ88MzH
+	0bTdcgAwteMM3iBg==
+Authentication-Results: smtp-out1.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1729594522; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=iIVthrBRayCR9P3OzqnXu2rlaXyTF5KOjNEVPFTU07o=;
+	b=qN5VJWqUEJsDLYzBoAbtorm9JDXhQuHw3KD8+gAwVY7bz2O5dst/QOkwUlZcLXOFXB6Ut+
+	5NpT5FcoeC0pBe3u1hzMME58fl5bXMbpo5h8fcHIb1RAe82DPl4mz8YiMciO/IEpjmkBvU
+	dvmvhQTrVHhcLUTp4goKeL7ekUZ/0cQ=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1729594522;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=iIVthrBRayCR9P3OzqnXu2rlaXyTF5KOjNEVPFTU07o=;
+	b=kKINBKKUFp5/X+oOBmO5GK/Bw281blSB7U0xpcNBfP9A7DYYG3+iJAT1f3EADt+WQ88MzH
+	0bTdcgAwteMM3iBg==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 15F3813894;
+	Tue, 22 Oct 2024 10:55:22 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id QaNABJqEF2coLAAAD6G6ig
+	(envelope-from <tiwai@suse.de>); Tue, 22 Oct 2024 10:55:22 +0000
+Date: Tue, 22 Oct 2024 12:56:22 +0200
+Message-ID: <87iktk4d9l.wl-tiwai@suse.de>
+From: Takashi Iwai <tiwai@suse.de>
+To: Linux regressions mailing list <regressions@lists.linux.dev>,
+	"Linux regression tracking (Thorsten Leemhuis)"
+ <regressions@leemhuis.info>
+Cc: =?ISO-2022-JP?B?IkNocmlzIEx1ICgbJEJOJkNVXXcbKEIpIg==?=
+ <Chris.Lu@mediatek.com>,	"luiz.dentz@gmail.com" <luiz.dentz@gmail.com>,
+	"marc.payne@mdpsys.co.uk" <marc.payne@mdpsys.co.uk>,	"marcel@holtmann.org"
+ <marcel@holtmann.org>,	"linux-mediatek@lists.infradead.org"
+ <linux-mediatek@lists.infradead.org>,	"linux-kernel@vger.kernel.org"
+ <linux-kernel@vger.kernel.org>,	"linux-bluetooth@vger.kernel.org"
+ <linux-bluetooth@vger.kernel.org>,	=?EUC-KR?B?IkRlcmVuIFd1ICjZ69Ps7NIp?=
+ =?EUC-KR?B?Ig==?= <Deren.Wu@mediatek.com>,	"johan.hedberg@gmail.com"
+ <johan.hedberg@gmail.com>,	=?ISO-2022-JP?B?IlN0ZXZlIExlZSAoGyRCTXsbKEI=?=
+ =?ISO-2022-JP?B?GyRCO2tAPxsoQiki?= <steve.lee@mediatek.com>,	Sean Wang
+ <Sean.Wang@mediatek.com>,	=?ISO-2022-JP?B?IkFhcm9uIEhvdSAoGyRCOHQbKEI=?=
+ =?ISO-2022-JP?B?GyRCPVM2RBsoQiki?= <Aaron.Hou@mediatek.com>,
+	=?ISO-2022-JP?B?IkhhbyBRaW4gKBskQj9BOUAbKEIpIg==?= <Hao.Qin@mediatek.com>
+Subject: Re: [PATCH] Bluetooth: btmtk: Remove resetting mt7921 before downloading the fw
+In-Reply-To: <ff502f63-2d87-4dee-a893-cce53353df8b@leemhuis.info>
+References: <20240822052310.25220-1-hao.qin@mediatek.com>
+	<ZuB3omUkdUHLggYu@mdpsys.co.uk>
+	<790e542aa9d08c7efeee6ef298fce2a87d8035e4.camel@mediatek.com>
+	<ZuneSM4SvyUFX86j@mdpsys.co.uk>
+	<9bfbbf24ac2480d94d3455f7e33e4b5502b38ced.camel@mediatek.com>
+	<CABBYNZKYsL9jcF2n9TsA1BjU-CjXOdXu7MDLP9Sz_Ly8hBAf1w@mail.gmail.com>
+	<c01e6dfa730dd10a7d4dba60fe31e82b9c296b37.camel@mediatek.com>
+	<Zuyk1c6Gkxx3G0PB@mdpsys.co.uk>
+	<f9e8688ebe559e10c019d0cbab4e8b1f5a7d2339.camel@mediatek.com>
+	<ff502f63-2d87-4dee-a893-cce53353df8b@leemhuis.info>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) Emacs/27.2 Mule/6.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nasanex01c.na.qualcomm.com (10.45.79.139)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: ab0xBLBRs1h04o7hP4GppWAAN-1sQB8E
-X-Proofpoint-GUID: ab0xBLBRs1h04o7hP4GppWAAN-1sQB8E
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
- definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 adultscore=0
- phishscore=0 spamscore=0 clxscore=1015 priorityscore=1501 impostorscore=0
- mlxscore=0 suspectscore=0 lowpriorityscore=0 bulkscore=0 mlxlogscore=919
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2409260000
- definitions=main-2410220066
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=ISO-2022-JP
+X-Spam-Score: -1.80
+X-Spamd-Result: default: False [-1.80 / 50.00];
+	BAYES_HAM(-3.00)[99.99%];
+	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	TAGGED_RCPT(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	ARC_NA(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[15];
+	RCVD_TLS_ALL(0.00)[];
+	FREEMAIL_ENVRCPT(0.00)[gmail.com];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[mediatek.com,gmail.com,mdpsys.co.uk,holtmann.org,lists.infradead.org,vger.kernel.org];
+	TO_DN_SOME(0.00)[];
+	FROM_EQ_ENVFROM(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.com:url,suse.de:mid]
+X-Spam-Flag: NO
+X-Spam-Level: 
 
-Add check for unknown/undefined srm value.
+On Mon, 14 Oct 2024 11:29:40 +0200,
+Linux regression tracking (Thorsten Leemhuis) wrote:
+> 
+> On 20.09.24 08:27, Chris Lu (陸稚泓) wrote:
+> > On Thu, 2024-09-19 at 23:25 +0100, marc.payne@mdpsys.co.uk wrote:
+> >>  	 
+> >> External email : Please do not click links or open attachments until
+> >> you have verified the sender or the content.
+> >>  Hi Chris and Luiz,
+> >>
+> >> What were your thoughts on the findings in my email dated 18th
+> >> September?
+> > 
+> > Thanks for your suggestion.
+> > 
+> > I've prepared the same environment (Kernel v6.11 + MT7921AUN dongle) to
+> > reproduce the issue, collected necessary logs locally and also
+> > initiated an internal discussion to clarify the root cause of this
+> > symptom. We'll review the changes between two firmware
+> > (20230526/20231109) if it's a bug or not.
+> > 
+> > It may take some time to investigate. I'll let you know if there is any
+> > progress.
+> 
+> Just wondering: Chris Lu, and Marc, what's the status here? From here it
+> looks like there was no progress to fix this regression for a while, but
+> it's easy to miss something, that's why I ask.
+> 
+> Ciao, Thorsten
 
-This fix is required to pass the below the PTS testcases :
-1. OPP/SR/GOEP/SRM/BI-02-C
-2. FTP/SR/GOEP/SRM/BI-02-C
-3. PBAP/PSE/GOEP/SRM/BI-05-C
+FWIW, the similar bug was reported for the recent 6.11.x kernel on
+openSUSE Tumbleweed, and this patch was confirmed to work around the
+crash at boot:
+  https://bugzilla.suse.com/show_bug.cgi?id=1231599
 
-Description - Verify that the Server ignores a SRM header with an
-invalid value in the PUT/GET request and carries on with the
-PUT/GET operation with SRM disabled.
+It'd be great if you can go ahead and merge the proper fix to the
+upstream.
 
-Current Behaviour - Server is sending SRM enable in the response even
-though receiving the unknown SRM value.
+Let me know if you have another patch to test.  Then I can create a
+test kernel package and ask the bug reporter for testing.
 
-To fix this, I have added the check to verify the valid SRM values
-before continuing with SRM enable.
 
----
- gobex/gobex.c | 4 ++++
- 1 file changed, 4 insertions(+)
+thanks,
 
-diff --git a/gobex/gobex.c b/gobex/gobex.c
-index 40d6b8129..e072205ea 100644
---- a/gobex/gobex.c
-+++ b/gobex/gobex.c
-@@ -317,6 +317,10 @@ static void set_srm(GObex *obex, guint8 op, guint8 srm)
- 	struct srm_config *config = obex->srm;
- 	gboolean enable;
- 
-+	if (srm != G_OBEX_SRM_DISABLE && srm != G_OBEX_SRM_ENABLE
-+			&& srm != G_OBEX_SRM_INDICATE)
-+		return; //unknown srm value
-+
- 	if (config == NULL) {
- 		if (srm == G_OBEX_SRM_DISABLE)
- 			return;
--- 
-2.34.1
-
+Takashi
