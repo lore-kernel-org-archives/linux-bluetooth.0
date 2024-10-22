@@ -1,64 +1,73 @@
-Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [217.70.183.197])
+Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [217.70.183.193])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C96651537D9
-	for <linux-bluetooth@vger.kernel.org>; Tue, 22 Oct 2024 12:40:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.197
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 722C919F471
+	for <linux-bluetooth@vger.kernel.org>; Tue, 22 Oct 2024 14:11:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.193
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729600848; cv=none; b=CWtD7fUWSGxxr17VlVTXpOylJjt28L8+6ygsbIpLrbVWVvnaWTmxVV+FpbM1+6akziPoGGYcISoYPRC1OthaaNtX//+0q4FavUA1goGotn9LFsEoOEr4Q4tyt77pBhieSAs/u4CN6SR/EUgAN6cTpYXWETlZwj6C+KezFGZvYT8=
+	t=1729606283; cv=none; b=f6h0jO/e4h3qwAjUmFo/7a8VlzImRSe6bS082WJJMI8kvzVgdABlEaMj3teLwv69rIKScns7beDjAs5+B57VRkXH+HN7oAjPuYvqEqEivRL18gnx+bwU6AL1384rXZmdal0KIgx1fY7io6307z7ooMoJjnBlDI0F+SAUugAHGY4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729600848; c=relaxed/simple;
-	bh=kI1+uZOioEPRSX/vdG9LZAi3pENhri2kR4tftDIcnRY=;
-	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=XxpBJaQXU/c2td3ReEty7qxFyPfO9HQLaj0TodTic5qk6P8tQwJZdKoVCId//gBppOFAARdSqsPwxH8WRAgBq9qGOwu8pqzQAiY5Z8e6vfMOPoFUJ2dUMEEDKe+rgJ6F2x7hZbgJOVHezk0q+fYFbAjzw56XnJ/xz2pZ7YxrLpM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.183.197
+	s=arc-20240116; t=1729606283; c=relaxed/simple;
+	bh=wWA/M+qQ+CdbyhZDTYQSa/woqJEvSmt7Is5V992jisg=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=i70VFFUaXdcGJIiYstAyGNlNBCJdVFkire4bMn7NKVav3NgQVVI08wh9th9z9i7JOj3x70Rve+ToOBOxfxtZUetJKQurtWVrSWlu9ZqqB3/flV6kF9zL/Yjj0JllvMi26sGliW7pOlihm1KEccmoSuGBFvtkEFQVS1diqMXk/Q4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.183.193
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hadess.net
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 275B61C000B
-	for <linux-bluetooth@vger.kernel.org>; Tue, 22 Oct 2024 12:40:44 +0000 (UTC)
-Message-ID: <013c686bccaeed4984d9f102d9849926dc1df811.camel@hadess.net>
-Subject: Re: Fix bluetoothctl --help hanging if daemon isn't running
+Received: by mail.gandi.net (Postfix) with ESMTPSA id C2ED0240008;
+	Tue, 22 Oct 2024 14:11:19 +0000 (UTC)
 From: Bastien Nocera <hadess@hadess.net>
 To: linux-bluetooth@vger.kernel.org
-Date: Tue, 22 Oct 2024 14:40:43 +0200
-In-Reply-To: <67179b3a.c80a0220.2e9cba.83c8@mx.google.com>
-References: <20241022120051.123888-2-hadess@hadess.net>
-	 <67179b3a.c80a0220.2e9cba.83c8@mx.google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.52.4 (3.52.4-1.fc40) 
+Cc: Bastien Nocera <hadess@hadess.net>
+Subject: [BlueZ v3 4/7] client: Install submenus before contacting bluez daemon
+Date: Tue, 22 Oct 2024 16:10:35 +0200
+Message-ID: <20241022141118.150143-5-hadess@hadess.net>
+X-Mailer: git-send-email 2.47.0
+In-Reply-To: <20241022141118.150143-1-hadess@hadess.net>
+References: <20241022141118.150143-1-hadess@hadess.net>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 X-GND-Sasl: hadess@hadess.net
 
-On Tue, 2024-10-22 at 05:31 -0700, bluez.test.bot@gmail.com wrote:
-> This is an automated email and please do not reply to this email.
->=20
-> Dear Submitter,
->=20
-> Thank you for submitting the patches to the linux bluetooth mailing
-> list.
-> While preparing the CI tests, the patches you submitted couldn't be
-> applied to the current HEAD of the repository.
->=20
-> ----- Output -----
->=20
-> error: patch failed: client/main.c:3187
-> error: client/main.c: patch does not apply
-> hint: Use 'git am --show-current-patch' to see the failed patch
->=20
-> Please resolve the issue and submit the patches again.
+So that the submenus are installed even if bluez isn't available.
+---
+ client/main.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-Which patch is that for? The error message doesn't say.
-
->=20
->=20
-> ---
-> Regards,
-> Linux Bluetooth
->=20
+diff --git a/client/main.c b/client/main.c
+index 17af62000f6d..f60bef1a6d3a 100644
+--- a/client/main.c
++++ b/client/main.c
+@@ -3187,6 +3187,10 @@ int main(int argc, char *argv[])
+ 	bt_shell_add_submenu(&advertise_monitor_menu);
+ 	bt_shell_add_submenu(&scan_menu);
+ 	bt_shell_add_submenu(&gatt_menu);
++	admin_add_submenu();
++	player_add_submenu();
++	mgmt_add_submenu();
++	assistant_add_submenu();
+ 	bt_shell_set_prompt(PROMPT_OFF, NULL);
+ 
+ 	if (agent_option)
+@@ -3203,13 +3207,9 @@ int main(int argc, char *argv[])
+ 		bt_shell_set_env("AUTO_REGISTER_ENDPOINT",
+ 					(void *)endpoint_option);
+ 
+-	admin_add_submenu();
+ 	admin_enable_submenu();
+-	player_add_submenu();
+ 	player_enable_submenu();
+-	mgmt_add_submenu();
+ 	mgmt_enable_submenu();
+-	assistant_add_submenu();
+ 	assistant_enable_submenu();
+ 
+ 	client = g_dbus_client_new(dbus_conn, "org.bluez", "/org/bluez");
+-- 
+2.47.0
 
