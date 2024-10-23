@@ -1,65 +1,60 @@
-Received: from mail-vk1-f181.google.com (mail-vk1-f181.google.com [209.85.221.181])
+Received: from mail-vk1-f182.google.com (mail-vk1-f182.google.com [209.85.221.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0EB81D041B
-	for <linux-bluetooth@vger.kernel.org>; Wed, 23 Oct 2024 20:47:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11DBB13AA2B
+	for <linux-bluetooth@vger.kernel.org>; Wed, 23 Oct 2024 20:56:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729716444; cv=none; b=YbPRJcGS1b0cq1LKcYAV9sKTvFrX665zEm7+UnFw/Du9CDf2rNi5eX2Sr/SDbN3fsNs0+LHCUMtWRlb2CBFQWXCPwUIqdSIfqt9KThs8kVFEtlC6AC5GpwY1ElQPFsC6l+N7DfY4jfAhmKgM9X9BypnJTrFDETwMaPeYEXhStVI=
+	t=1729716964; cv=none; b=OdPr/awVJZ8UVb73HLHBgUslQaKcB2t/Cg2ItC2JzzMj7esN6VhFAyvU9hzG1b/h8ZzJ4/BFzcocRoNJcfY3E1kDr6q5hfqkFLLxpl3BhLwVS/cWxK7w3FW5xFjjVOK6Kss6FpoaNlj+nzhl+guhxOJsUQrW5lUC/gHFKuvoidw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729716444; c=relaxed/simple;
-	bh=rRjSjYzmSlQoRZv6OFJRwoa2rYMglZ4crQnGyMkT7eY=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=RekcBw+SKcvX2JK0XH19QfdBpWp7ph2u80qq5b7RaC6/9PjIHBrG1VW7vrS7EF3iXbriFCmbSLBDwG+dujvVOvw1vkgh357Aw1Mdd1cVAag9tsc0qG5J6bTdqoDsv/PZBghihOAYHuC2WKLdKXFm6Xjgm/ZZr5rGIOcswmXJ5pE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ieodzwY1; arc=none smtp.client-ip=209.85.221.181
+	s=arc-20240116; t=1729716964; c=relaxed/simple;
+	bh=MNje4lVwfTi7itVUA51CkiV616DfgK13LHESsNg/0T4=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=CvrVbJXMloCos6+oQmvgMgpY6c9VVJ6myGU7QYKjsBBbgKzIi025NQn7qjedf556kFTxnS+kETJMMlVjYXbaxA9SywGtRxUrww1WXaxHx3QlQpqunWxcKNFpX4Li0KdS/i9dbTxzzuS3+fz1YH5p6SmhJzCau7O8bRgThK9g24E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=e2PCb5QZ; arc=none smtp.client-ip=209.85.221.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ieodzwY1"
-Received: by mail-vk1-f181.google.com with SMTP id 71dfb90a1353d-50d399891d6so47711e0c.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 23 Oct 2024 13:47:22 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="e2PCb5QZ"
+Received: by mail-vk1-f182.google.com with SMTP id 71dfb90a1353d-50d525be53eso63626e0c.0
+        for <linux-bluetooth@vger.kernel.org>; Wed, 23 Oct 2024 13:56:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1729716441; x=1730321241; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=OirxWHKjdKpWRDBbeAPd2l1jC+J3Pjl0j2pDjl1Tywg=;
-        b=ieodzwY1KjSFrt3dVuNputJF9yWkWzj2HzYnbcae/L+Ey78Moo09ZaG/z+S7uFFADr
-         Ld0UPCIvXtBWLpNOkx5xPaC4geZkDhjc+nCb7O32iK8mIj+Sg+Ru3NWcb5QP0F2xUeDu
-         oh7ckMpTTLdi7VVSJJq1SKq/77YI2l32c/TtfyG4eKkM0wmT4hZdnzibHCFxOBOVyySO
-         vXNkVeqRS+FQ6ObbD9WvM2hT/lL5K6yB/j1E5PPX/5HRs0vpLHD5+/KJFJs/Gxm9XKO9
-         NpAmbjTPBODa5PEmJ8letNCbQSme0TwNwE6l6T36PyKCUFzGj3r6WU6v2Ij3h57OcVGR
-         d3fw==
+        d=gmail.com; s=20230601; t=1729716961; x=1730321761; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=RW+dCYMaZc/VV1QA2sZoDMhk8vjQIqeTqQZy2asMuio=;
+        b=e2PCb5QZ2zVpER2+8D89JJzmq4ZGBfoaaJSsxtwjRjhXfQHJRpIp96unQxJ/oE6mBS
+         pqal0uqmOq92UNc+YSykgav7xCXX1ClJqLE5xFl6SJEXdWXPztIr3280TUsPIFuzKXjo
+         dbGQ1WFLsQMDpE/rWrI5CUVkOCU2QokvLtpWUAnZueOC8jlBoVMHv+CjOgSoF9yQ2FkA
+         Qq3FU+VQvUVvzYGgIqG1p5ylb0XhI5KTuF4B9BrbThN/uACnXAmhg9H1AKNBTJyYTUsQ
+         gtKc9o1fjKzhE4a7A90WXv/FYbqOiEjG+yG0YkkhxPb5IL1XO1N1+6Wa8rkgtmp6vV3j
+         xKjQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729716441; x=1730321241;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=OirxWHKjdKpWRDBbeAPd2l1jC+J3Pjl0j2pDjl1Tywg=;
-        b=ULpMW2YV3PxXbYmfr0BMORTZ7sfi8br8HALQu/Rdk2nr2ifcI0BCN9cJuTAwfQsnAz
-         qwOs6F1tuMgAQn/eTKWt5+kiig6DgHa4NsullNJiHMkCQ+ZIv/5ji82wcQg1PTYEB+wQ
-         diohrIaQQUWBCVlLxNfJ42nqA2rJROrbo+xBjpSHFbyl6B4Bjp3P4Iu6IGapStj/ZXQt
-         mBeAKDtGvnYhvZFTqUUFt78C1yUZTLs9pN426omSUsPKXkMqvUHMGYVufndh/OR/pWsU
-         StUlG2TAXHp3C5cu2UC1974vTTU+XVqJE+5uxZpn5/2W4fueJJfOxZNpupBjVMdJDTf3
-         aG2Q==
-X-Gm-Message-State: AOJu0YxCOPPfxv5KIcWEXCoteyl89WfR2/sioI8RgDLYeU2/ph9Psvhc
-	P4yNjwW7/ED2nzMDscnEMP6VqxPcixGLKmzEzBYGQEzWPh4nWKvZV9r8xg==
-X-Google-Smtp-Source: AGHT+IGOliKWi6GAERLF3PWIDI6JLJSX6BqWes7SE2U8JxsgcdYYMzyC1ZDrhH7y0x6TUbPil0eyFA==
-X-Received: by 2002:a05:6122:3bcc:b0:50c:55f4:b529 with SMTP id 71dfb90a1353d-50fd0313353mr4543894e0c.8.1729716440639;
-        Wed, 23 Oct 2024 13:47:20 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1729716961; x=1730321761;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=RW+dCYMaZc/VV1QA2sZoDMhk8vjQIqeTqQZy2asMuio=;
+        b=hRruBzLMtMjGXxEXfAvnkuCIalrudjiDMzmTasxEdwEmrK/mBb7IBpvvNPoNmU/h4M
+         Inu+9JHicOJPE0hypSd6A17q4GxKVr6DpUKV7JikDYDFZuF8c7kzJRXJjNyBefVwPDXh
+         deZD27K5am7BN1NIBUMWMoaIf4U8j1l09q857QcpHyFTnVRSKHUivpULsJpJORdEAQ/K
+         qFmVf43a5zJY/Fz0yqtdTs0ABuFIUc4laju7c4h0pGI0pil32RoQTtz56ymS8wl/zMMX
+         omGhtFYdcsb+ltKsFa2c8rPeVZb2XmM1rE/KlrQrZgE2GsgJFWHxHtlvlUlVil8d3/wy
+         4zsQ==
+X-Gm-Message-State: AOJu0YydCjTxh+uXt1xDCA4jRXoGrWit8IP8l+W8lmASp9wrz/TVPNZA
+	DGhe+QENhrjLqZiiIeHuiJLVNIyEtUDN6r1vk1NZw5liGyI7iBAOQu2DeQ==
+X-Google-Smtp-Source: AGHT+IFziYQY+J3GgrIupzg4CqpahNW8wTRnppe8+fBnpkj1n7lhgvdKDcnK33OO0ar5U2wpC99lxw==
+X-Received: by 2002:a05:6122:2013:b0:50d:7a14:ddf7 with SMTP id 71dfb90a1353d-50fd0328b0dmr4985425e0c.8.1729716961212;
+        Wed, 23 Oct 2024 13:56:01 -0700 (PDT)
 Received: from lvondent-mobl5.. (syn-107-146-107-067.res.spectrum.com. [107.146.107.67])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-50e19e0dbe9sm1168436e0c.3.2024.10.23.13.47.17
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-50e19ea1829sm1159775e0c.31.2024.10.23.13.55.58
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 23 Oct 2024 13:47:18 -0700 (PDT)
+        Wed, 23 Oct 2024 13:55:59 -0700 (PDT)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFC v1 5/5] client/mgmt: Add hci-cmd command
-Date: Wed, 23 Oct 2024 16:47:05 -0400
-Message-ID: <20241023204705.2422998-5-luiz.dentz@gmail.com>
+Subject: [RFC v1] Bluetooth: MGMT: Add initial implementation of MGMT_OP_HCI_CMD_SYNC
+Date: Wed, 23 Oct 2024 16:55:57 -0400
+Message-ID: <20241023205557.2425924-1-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.47.0
-In-Reply-To: <20241023204705.2422998-1-luiz.dentz@gmail.com>
-References: <20241023204705.2422998-1-luiz.dentz@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -70,155 +65,151 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This adds hci-cmd command which uses the MGMT_OP_HCI_CMD_SYNC:
+This adds the initial implementation of MGMT_OP_HCI_CMD_SYNC as
+documented in mgmt-api (BlueZ tree):
 
-bluetoothctl> mgmt.hci-send 0xffff
-bluetoothctl[44]: @ MGMT Com..nd (0x005b) plen 6  {0x0002}
-        Opcode: 0xffff
-        Event: 0x00
-        Timeout: 0 seconds
-        Parameters Length: 0
-        Parameters[0]:
-< HCI Command: Vendor (0x3f|0x03ff) plen 0
-> HCI Event: Command Status (0x0f) plen 4
-      Vendor (0x3f|0x03ff) ncmd 1
-        Status: Unknown HCI Command (0x01)
-@ MGMT Event: Command Status (0x0002) plen 3    {0x0002}
-      Send HCI command and wait for event (0x005b)
-        Status: Failed (0x03)
+Send HCI command and wait for event Command
+===========================================
+
+	Command Code:		0x005B
+	Controller Index:	<controller id>
+	Command Parameters:	Opcode (2 Octets)
+				Event (1 Octet)
+				Timeout (1 Octet)
+				Parameter Length (2 Octets)
+				Parameter (variable)
+	Return Parameters:	Response (1-variable Octets)
+
+	This command may be used to send a HCI command and wait for an
+	(optional) event.
+
+	The HCI command is specified by the Opcode, any arbitrary is supported
+	including vendor commands, but contrary to the like of
+	Raw/User channel it is run as an HCI command send by the kernel
+	since it uses its command synchronization thus it is possible to wait
+	for a specific event as a response.
+
+	Setting event to 0x00 will cause the command to wait for either
+	HCI Command Status or HCI Command Complete.
+
+	Timeout is specified in seconds, setting it to 0 will cause the
+	default timeout to be used.
+
+	Possible errors:	Failed
+				Invalid Parameters
+
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 ---
- client/mgmt.c | 111 ++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 111 insertions(+)
+ include/net/bluetooth/mgmt.h | 10 ++++++
+ net/bluetooth/mgmt.c         | 60 ++++++++++++++++++++++++++++++++++++
+ 2 files changed, 70 insertions(+)
 
-diff --git a/client/mgmt.c b/client/mgmt.c
-index 602b92228ab8..59dcb3135344 100644
---- a/client/mgmt.c
-+++ b/client/mgmt.c
-@@ -2338,6 +2338,115 @@ static void cmd_set_flags(int argc, char **argv)
+diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
+index d382679efd2b..affac861efdc 100644
+--- a/include/net/bluetooth/mgmt.h
++++ b/include/net/bluetooth/mgmt.h
+@@ -878,6 +878,16 @@ struct mgmt_cp_mesh_send_cancel {
+ } __packed;
+ #define MGMT_MESH_SEND_CANCEL_SIZE	1
  
- }
- 
-+static uint8_t *str2bytearray(char *arg, uint8_t *val, long *val_len)
-+{
-+	char *entry;
-+	unsigned int i;
++#define MGMT_OP_HCI_CMD_SYNC		0x005B
++struct mgmt_cp_hci_cmd_sync {
++	__le16 opcode;
++	__u8   event;
++	__u8   timeout;
++	__le16 params_len;
++	__u8   params[];
++} __packed;
++#define MGMT_HCI_CMD_SYNC_SIZE		6
 +
-+	for (i = 0; (entry = strsep(&arg, " \t")) != NULL; i++) {
-+		long v;
-+		char *endptr = NULL;
-+
-+		if (*entry == '\0')
-+			continue;
-+
-+		if (i >= *val_len) {
-+			bt_shell_printf("Too much data\n");
-+			return NULL;
-+		}
-+
-+		v = strtol(entry, &endptr, 0);
-+		if (!endptr || *endptr != '\0' || v > UINT8_MAX) {
-+			bt_shell_printf("Invalid value at index %d\n", i);
-+			return NULL;
-+		}
-+
-+		val[i] = v;
-+	}
-+
-+	*val_len = i;
-+
-+	return val;
-+}
-+
-+static void hci_cmd_rsp(uint8_t status, uint16_t len, const void *param,
-+							void *user_data)
-+{
-+	if (status != 0) {
-+		error("HCI command failed with status 0x%02x (%s)",
-+						status, mgmt_errstr(status));
-+		bt_shell_noninteractive_quit(EXIT_FAILURE);
-+	}
-+
-+	if (len > 0) {
-+		bt_shell_printf("Response: ");
-+		bt_shell_hexdump(param, len);
-+	}
-+
-+	bt_shell_noninteractive_quit(EXIT_SUCCESS);
-+}
-+
-+static void cmd_hci_cmd(int argc, char **argv)
-+{
-+	struct {
-+		struct mgmt_cp_hci_cmd_sync cp;
-+		uint8_t data[UINT8_MAX];
-+	} pkt;
-+	char *endptr = NULL;
-+	long value;
-+	uint16_t index;
-+
-+	value = strtoul(argv[1], &endptr, 0);
-+	if (!endptr || *endptr != '\0' || value > UINT16_MAX) {
-+		bt_shell_printf("Invalid opcode: %s", argv[1]);
-+		return bt_shell_noninteractive_quit(EXIT_FAILURE);
-+	}
-+
-+	memset(&pkt, 0, sizeof(pkt));
-+	pkt.cp.opcode = cpu_to_le16(value);
-+
-+	if (argc > 2) {
-+		endptr = NULL;
-+		value = strtoul(argv[2], &endptr, 0);
-+		if (!endptr || *endptr != '\0' || value > UINT8_MAX) {
-+			bt_shell_printf("Invalid event: %s", argv[2]);
-+			return bt_shell_noninteractive_quit(EXIT_FAILURE);
-+		}
-+
-+		pkt.cp.event = value;
-+	}
-+
-+	if (argc > 3) {
-+		endptr = NULL;
-+		value = strtoul(argv[3], &endptr, 0);
-+		if (!endptr || *endptr != '\0' || value > UINT8_MAX) {
-+			bt_shell_printf("Invalid timeout: %s", argv[2]);
-+			return bt_shell_noninteractive_quit(EXIT_FAILURE);
-+		}
-+
-+		pkt.cp.timeout = value;
-+	}
-+
-+	if (argc > 4) {
-+		value = sizeof(pkt.data);
-+		if (!str2bytearray(argv[4], pkt.data, &value))
-+			return bt_shell_noninteractive_quit(EXIT_FAILURE);
-+
-+		pkt.cp.params_len = value;
-+	}
-+
-+	index = mgmt_index;
-+	if (index == MGMT_INDEX_NONE)
-+		index = 0;
-+
-+	if (mgmt_send(mgmt, MGMT_OP_HCI_CMD_SYNC, index,
-+			sizeof(pkt.cp) + pkt.cp.params_len, &pkt,
-+			hci_cmd_rsp, NULL, NULL) == 0) {
-+		error("Unable to send HCI command");
-+		return bt_shell_noninteractive_quit(EXIT_FAILURE);
-+	}
-+}
-+
- /* Wrapper to get the index and opcode to the response callback */
- struct command_data {
- 	uint16_t id;
-@@ -6016,6 +6125,8 @@ static const struct bt_shell_menu mgmt_menu = {
- 		cmd_get_flags,		"Get device flags"		},
- 	{ "set-flags",		"[-f flags] [-t type] <address>",
- 		cmd_set_flags,		"Set device flags"		},
-+	{ "hci-cmd",		"<opcode> [event] [timeout] [param...]",
-+		cmd_hci_cmd,	"Send HCI Command and wait for Event"	},
- 	{} },
+ #define MGMT_EV_CMD_COMPLETE		0x0001
+ struct mgmt_ev_cmd_complete {
+ 	__le16	opcode;
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index a429661b676a..1f6d083682b8 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -132,6 +132,7 @@ static const u16 mgmt_commands[] = {
+ 	MGMT_OP_MESH_READ_FEATURES,
+ 	MGMT_OP_MESH_SEND,
+ 	MGMT_OP_MESH_SEND_CANCEL,
++	MGMT_OP_HCI_CMD_SYNC,
  };
  
+ static const u16 mgmt_events[] = {
+@@ -2515,6 +2516,64 @@ static int set_le(struct sock *sk, struct hci_dev *hdev, void *data, u16 len)
+ 	return err;
+ }
+ 
++static int send_hci_cmd_sync(struct hci_dev *hdev, void *data)
++{
++	struct mgmt_pending_cmd *cmd = data;
++	struct mgmt_cp_hci_cmd_sync *cp = cmd->param;
++	struct sk_buff *skb;
++
++	skb = __hci_cmd_sync_ev(hdev, le16_to_cpu(cp->opcode),
++				le16_to_cpu(cp->params_len), cp->params,
++				cp->event, cp->timeout ?
++				msecs_to_jiffies(cp->timeout * 1000) :
++				HCI_CMD_TIMEOUT);
++	if (IS_ERR(skb)) {
++		mgmt_cmd_status(cmd->sk, hdev->id, MGMT_OP_HCI_CMD_SYNC,
++				mgmt_status(PTR_ERR(skb)));
++		goto done;
++	}
++
++	mgmt_cmd_complete(cmd->sk, hdev->id, MGMT_OP_HCI_CMD_SYNC, 0,
++			  skb->data, skb->len);
++
++	kfree_skb(skb);
++
++done:
++	mgmt_pending_free(cmd);
++
++	return 0;
++}
++
++static int mgmt_hci_cmd_sync(struct sock *sk, struct hci_dev *hdev,
++			     void *data, u16 len)
++{
++	struct mgmt_cp_hci_cmd_sync *cp = data;
++	struct mgmt_pending_cmd *cmd;
++	int err;
++
++	if (len < sizeof(*cp))
++		return mgmt_cmd_status(sk, hdev->id, MGMT_OP_HCI_CMD_SYNC,
++				       MGMT_STATUS_INVALID_PARAMS);
++
++	hci_dev_lock(hdev);
++	cmd = mgmt_pending_new(sk, MGMT_OP_HCI_CMD_SYNC, hdev, data, len);
++	if (!cmd)
++		err = -ENOMEM;
++	else
++		err = hci_cmd_sync_queue(hdev, send_hci_cmd_sync, cmd, NULL);
++
++	if (err < 0) {
++		err = mgmt_cmd_status(sk, hdev->id, MGMT_OP_HCI_CMD_SYNC,
++				      MGMT_STATUS_FAILED);
++
++		if (cmd)
++			mgmt_pending_free(cmd);
++	}
++
++	hci_dev_unlock(hdev);
++	return err;
++}
++
+ /* This is a helper function to test for pending mgmt commands that can
+  * cause CoD or EIR HCI commands. We can only allow one such pending
+  * mgmt command at a time since otherwise we cannot easily track what
+@@ -9371,6 +9430,7 @@ static const struct hci_mgmt_handler mgmt_handlers[] = {
+ 	{ mesh_send,               MGMT_MESH_SEND_SIZE,
+ 						HCI_MGMT_VAR_LEN },
+ 	{ mesh_send_cancel,        MGMT_MESH_SEND_CANCEL_SIZE },
++	{ mgmt_hci_cmd_sync,       MGMT_HCI_CMD_SYNC_SIZE, HCI_MGMT_VAR_LEN },
+ };
+ 
+ void mgmt_index_added(struct hci_dev *hdev)
 -- 
 2.47.0
 
