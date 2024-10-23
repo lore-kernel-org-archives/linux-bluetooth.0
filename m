@@ -1,107 +1,204 @@
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15F0F1CACEB;
-	Wed, 23 Oct 2024 18:01:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9F4B1B86DC
+	for <linux-bluetooth@vger.kernel.org>; Wed, 23 Oct 2024 19:13:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729706519; cv=none; b=P2Dh+9qa5c0FqBE/TeF3WF3SZkFIaPf3HJBWZP2pS9/T4BPyULakMyOgt4ytsUCzvP6PW9HRBy9d9hN+NbhaVcCXlV5TfAbAINo9Y3sk0id3Y/zcjl5MexLCPIwv+6JNOEuIKDWk3U7BlxZFc1/CDZYc5v/9HsvfU7PKXbdz2Dk=
+	t=1729710835; cv=none; b=byO8Wie1/JuUck5jazWnl45CY8NUK0djIAMRqTdDrOn611p16PfLjyoIZKF8kXWiOjxp3ZqCEflONDz5t+T2FaxM6VLvh1FEP2GR8/Rfqt0ZeKnG1mLJKHaVibMIl4WlLaFmN3KRLUu9Sy0CGeleNV9pUwj3Ag2rHGcyDP5g+0c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729706519; c=relaxed/simple;
-	bh=I4ACWuI3n//844emNhkHmFAsuW4VmmJSm0tQ+SRlj3g=;
-	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=eh30rhKOliuIz5ijQNXuCKYHoYLaAzdbdkyLJ8Mh2PvFGEv1jPJT5GpYwz1RP77i1Eoz5ijvNu5kk2VYQUvrX1ovpvV8k/b0YTOZJ4GfGTOXIxg3pqz/eROBaRU2mY7VIkaUbGtOeVQjbD9006pnfMzN0lG2FkwAtSBU0gCWQfE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=HT2Y2LN4; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+	s=arc-20240116; t=1729710835; c=relaxed/simple;
+	bh=OPFssXs14O65PPHPAv1YE+Fbm37GrrOx5H5ka7irrvQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To; b=ofj7Uk5BaZlh+yDuC/raVLFHfTr8C6IopusfeGUc1ntbMeWF2GKwQORocKVo9wVqvY1WUg0GbKJfjj002D9lMNUm0i8/Tx/2EIK12r96ioMafj6dypedlTxy11S2uj7Gw6X1N0HXkWrBUmDNF9n1Yyedmz1nMaktfoG4SJM22IU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XFrM2K26; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="HT2Y2LN4"
-Received: from [10.16.80.132] (unknown [131.107.174.132])
-	by linux.microsoft.com (Postfix) with ESMTPSA id 6232C210EF5C;
-	Wed, 23 Oct 2024 11:01:57 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 6232C210EF5C
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1729706517;
-	bh=Pd0YmvTZ9O7FYi5bes/feEPtOCby6koWSsHELkx9c4M=;
-	h=Date:Cc:Subject:To:References:From:In-Reply-To:From;
-	b=HT2Y2LN4iLDg0zAAzh9RS2T5g37f+n0GamzE1kh1LlsJEU/nCflhQ0hmytXgboFjG
-	 mqjXE5avKBwTjjISt/8UU2rKC0lNbwZihU2gZym5gGX811UgO43xWqgaJKN5suqU55
-	 LhmhqxfmI+a3R6CQ+XXMJJceUX2N06js2V4eK+x8=
-Message-ID: <e7a96b43-6d01-49ae-ad0d-4cb75ea69822@linux.microsoft.com>
-Date: Wed, 23 Oct 2024 11:02:00 -0700
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XFrM2K26"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 20F51C4CEC6;
+	Wed, 23 Oct 2024 19:13:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1729710835;
+	bh=OPFssXs14O65PPHPAv1YE+Fbm37GrrOx5H5ka7irrvQ=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:From;
+	b=XFrM2K260RlVWgN4zdprjzeii/lP65/cAiYRVZduc8d1rd1uj3Dj8PWmlCIju9eXf
+	 2JBIGJ4bBa9eraMcj6cHC8ZOsLqQXOL2Z8uqxdRg7Ra7RzeF9RR+TxTMXg6gMlLLV5
+	 mMwiW2dlOp05XrqilpJDapRvU/kki2k9rxgTRJtPpQWOr+dwdXZpzDgBm5ino2ZHqR
+	 7VL0riIedtI7wU78xBIBB6uzmfAvkVZaT810SvSpVUVdzOTscRUUBpVh/z/1J+7qCg
+	 YZM8xYl1usYg8rkPWoUu4ieHTlVSEZ0+OTuD46Q03biqdPC4rJj8MiWCc1uQ2L42gE
+	 lWLNhH47amaDg==
+Date: Wed, 23 Oct 2024 14:13:52 -0500
+From: Bjorn Helgaas <helgaas@kernel.org>
+To: ChandraShekar <chandrashekar.devegowda@intel.com>
+Cc: linux-bluetooth@vger.kernel.org, ravishankar.srivatsa@intel.com,
+	chethan.tumkur.narayan@intel.com, Kiran K <kiran.k@intel.com>,
+	Paul Menzel <pmenzel@molgen.mpg.de>
+Subject: Re: [PATCH v1] Bluetooth: btintel_pcie: Device suspend-resume
+ support added
+Message-ID: <20241023191352.GA924610@bhelgaas>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Cc: eahariha@linux.microsoft.com, Naman Jain <namjain@linux.microsoft.com>,
- Michael Kelley <mhklinux@outlook.com>
-Subject: Re: [PATCH 1/2] jiffies: Define secs_to_jiffies()
-To: Anna-Maria Behnsen <anna-maria@linutronix.de>, lkp@intel.com,
- Marcel Holtmann <marcel@holtmann.org>,
- Johan Hedberg <johan.hedberg@gmail.com>,
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
- Thomas Gleixner <tglx@linutronix.de>,
- Geert Uytterhoeven <geert@linux-m68k.org>,
- open list <linux-kernel@vger.kernel.org>,
- "open list:BLUETOOTH SUBSYSTEM" <linux-bluetooth@vger.kernel.org>
-References: <20241022185353.2080021-1-eahariha@linux.microsoft.com>
- <8734kngfni.fsf@somnus>
-Content-Language: en-US
-From: Easwar Hariharan <eahariha@linux.microsoft.com>
-In-Reply-To: <8734kngfni.fsf@somnus>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241023114647.1011886-1-chandrashekar.devegowda@intel.com>
 
-On 10/23/2024 5:36 AM, Anna-Maria Behnsen wrote:
-> Easwar Hariharan <eahariha@linux.microsoft.com> writes:
-> 
->> There are ~500 usages of msecs_to_jiffies() that either use a multiplier
->> value of 1000 or equivalently MSEC_PER_SEC. Define secs_to_jiffies() to
->> allow such code to be less clunky.
-> 
-> Can you please provide a proper cover letter for a series (also if it is
-> a series with only 2 patches)?
+[+cc Paul]
 
-Yes, apologies, this isn't my usual mode of operations.
-
+On Wed, Oct 23, 2024 at 02:46:47PM +0300, ChandraShekar wrote:
+> This patch contains the changes in driver to support the suspend and
+> resume i.e move the controller to D3 state when the platform is entering
+> into suspend and move the controller to D0 on resume.
 > 
-> Regarding your commit message: secs_to_jiffies() is defined in hci_event
-> and cannot be reused by other callsites and this is why it's valuable to
-> move it into core code. Especially because there are ~500 users which do
-> the multiplier thing and there are also several users which use (secs *
-> HZ).
+> Signed-off-by: Kiran K <kiran.k@intel.com>
+> Signed-off-by: ChandraShekar <chandrashekar.devegowda@intel.com>
+> ---
+>  drivers/bluetooth/btintel_pcie.c | 52 ++++++++++++++++++++++++++++++++
+>  drivers/bluetooth/btintel_pcie.h |  4 +++
+>  2 files changed, 56 insertions(+)
 > 
-> What do you think about converting the other users e.g. using
-> Coccinelle?
+> diff --git a/drivers/bluetooth/btintel_pcie.c b/drivers/bluetooth/btintel_pcie.c
+> index fd4a8bd056fa..f2c44b9d7328 100644
+> --- a/drivers/bluetooth/btintel_pcie.c
+> +++ b/drivers/bluetooth/btintel_pcie.c
+> @@ -273,6 +273,12 @@ static int btintel_pcie_reset_bt(struct btintel_pcie_data *data)
+>  	return reg == 0 ? 0 : -ENODEV;
+>  }
+>  
+> +static void btintel_pcie_set_persistence_mode(struct btintel_pcie_data *data)
+> +{
+> +	btintel_pcie_set_reg_bits(data, BTINTEL_PCIE_CSR_HW_BOOT_CONFIG,
+> +				  BTINTEL_PCIE_CSR_HW_BOOT_CONFIG_KEEP_ON);
+> +}
+> +
+>  /* This function enables BT function by setting BTINTEL_PCIE_CSR_FUNC_CTRL_MAC_INIT bit in
+>   * BTINTEL_PCIE_CSR_FUNC_CTRL_REG register and wait for MSI-X with
+>   * BTINTEL_PCIE_MSIX_HW_INT_CAUSES_GP0.
+> @@ -297,6 +303,8 @@ static int btintel_pcie_enable_bt(struct btintel_pcie_data *data)
+>  	 */
+>  	data->boot_stage_cache = 0x0;
+>  
+> +	btintel_pcie_set_persistence_mode(data);
+> +
+>  	/* Set MAC_INIT bit to start primary bootloader */
+>  	reg = btintel_pcie_rd_reg32(data, BTINTEL_PCIE_CSR_FUNC_CTRL_REG);
+>  	reg &= ~(BTINTEL_PCIE_CSR_FUNC_CTRL_FUNC_INIT |
+> @@ -1653,11 +1661,55 @@ static void btintel_pcie_remove(struct pci_dev *pdev)
+>  	pci_set_drvdata(pdev, NULL);
+>  }
+>  
+> +static int btintel_pcie_suspend(struct device *dev)
+> +{
+> +	struct btintel_pcie_data *data;
+> +	int err;
+> +	struct  pci_dev *pdev = to_pci_dev(dev);
+> +
+> +	data = pci_get_drvdata(pdev);
+> +	btintel_pcie_wr_sleep_cntrl(data, BTINTEL_PCIE_STATE_D3_HOT);
+> +	data->gp0_received = false;
+> +	err = wait_event_timeout(data->gp0_wait_q, data->gp0_received,
+> +				 msecs_to_jiffies(BTINTEL_DEFAULT_INTR_TIMEOUT_MS));
+
+The generic power management code already knows how to put standard
+PCI devices in D3 at suspend.  So if you have to use device-specific
+code like this, I guess the implication is that this device is not
+spec-compliant?  That would surprise me a little bit since Intel is
+pretty good about making their devices work correctly.
+
+Some detail about exactly how this device is non-compliant would be
+helpful here and in the commit log.
+
+It looks wrong to me that you call btintel_pcie_wr_sleep_cntrl()
+(which I assume starts something that will result in an interrupt that
+causes gp0_received to be set to "true") *before* you set gp0_received
+to "false".
+
+That looks like a race because the interrupt could happen before
+"data->gp0_received = false", and you would return -EBUSY when you
+shouldn't.  You could test this by inserting a delay before setting
+"data->gp0_received = false".  Adding a delay should never break this
+functionality.
+
+It looks to me like f4c8e876ef6b ("Bluetooth: btintel_pcie: Add
+handshake between driver and firmware") (currently in linux-next) has
+the same race, where btintel_pcie_send_frame() starts something that
+will result in an interrupt, then sets "data->gp0_received = false".
+
+But I don't understand the workings of this hardware or the driver.
+
+> +	if (!err) {
+> +		bt_dev_err(data->hdev, "failed to receive gp0 interrupt for suspend");
+> +		goto fail;
+> +	}
+> +	return 0;
+> +fail:
+> +	return -EBUSY;
+
+Since there's no cleanup, you could just return -EBUSY directly above
+and there would be no need for the goto or the "fail" label.
+
+> +}
+> +
+> +static int btintel_pcie_resume(struct device *dev)
+> +{
+> +	struct btintel_pcie_data *data;
+> +	struct  pci_dev *pdev = to_pci_dev(dev);
+> +	int err;
+> +
+> +	data = pci_get_drvdata(pdev);
+> +	btintel_pcie_wr_sleep_cntrl(data, BTINTEL_PCIE_STATE_D0);
+> +	data->gp0_received = false;
+> +	err = wait_event_timeout(data->gp0_wait_q, data->gp0_received,
+> +				 msecs_to_jiffies(BTINTEL_DEFAULT_INTR_TIMEOUT_MS));
+
+Same potential race here.  And of course I'm still dubious about the
+need for this device-specific code in the first place.
+
+> +	if (!err) {
+> +		bt_dev_err(data->hdev, "failed to receive gp0 interrupt for resume");
+> +		goto fail;
+> +	}
+> +	return 0;
+> +fail:
+> +	return -EBUSY;
+> +}
+> +
+> +static SIMPLE_DEV_PM_OPS(btintel_pcie_pm_ops, btintel_pcie_suspend,
+> +		btintel_pcie_resume);
+> +
+>  static struct pci_driver btintel_pcie_driver = {
+>  	.name = KBUILD_MODNAME,
+>  	.id_table = btintel_pcie_table,
+>  	.probe = btintel_pcie_probe,
+>  	.remove = btintel_pcie_remove,
+> +	.driver.pm = &btintel_pcie_pm_ops,
+>  };
+>  module_pci_driver(btintel_pcie_driver);
+>  
+> diff --git a/drivers/bluetooth/btintel_pcie.h b/drivers/bluetooth/btintel_pcie.h
+> index f9aada0543c4..38d0c8ea2b6f 100644
+> --- a/drivers/bluetooth/btintel_pcie.h
+> +++ b/drivers/bluetooth/btintel_pcie.h
+> @@ -8,6 +8,7 @@
+>  
+>  /* Control and Status Register(BTINTEL_PCIE_CSR) */
+>  #define BTINTEL_PCIE_CSR_BASE			(0x000)
+> +#define BTINTEL_PCIE_CSR_HW_BOOT_CONFIG		(BTINTEL_PCIE_CSR_BASE + 0x000)
+>  #define BTINTEL_PCIE_CSR_FUNC_CTRL_REG		(BTINTEL_PCIE_CSR_BASE + 0x024)
+>  #define BTINTEL_PCIE_CSR_HW_REV_REG		(BTINTEL_PCIE_CSR_BASE + 0x028)
+>  #define BTINTEL_PCIE_CSR_RF_ID_REG		(BTINTEL_PCIE_CSR_BASE + 0x09C)
+> @@ -48,6 +49,9 @@
+>  #define BTINTEL_PCIE_CSR_MSIX_IVAR_BASE		(BTINTEL_PCIE_CSR_MSIX_BASE + 0x0880)
+>  #define BTINTEL_PCIE_CSR_MSIX_IVAR(cause)	(BTINTEL_PCIE_CSR_MSIX_IVAR_BASE + (cause))
+>  
+> +/* CSR HW BOOT CONFIG Register */
+> +#define BTINTEL_PCIE_CSR_HW_BOOT_CONFIG_KEEP_ON		(BIT(31))
+> +
+>  /* Causes for the FH register interrupts */
+>  enum msix_fh_int_causes {
+>  	BTINTEL_PCIE_MSIX_FH_INT_CAUSES_0	= BIT(0),	/* cause 0 */
+> -- 
+> 2.34.1
 > 
-
-I intended to follow up this series with such. I'm not super familiar
-with Coccinelle and am occupied by commercial work, so that may take longer.
-
->> Suggested-by: Michael Kelley <mhklinux@outlook.com>
->> Signed-off-by: Easwar Hariharan <eahariha@linux.microsoft.com>
->> ---
->>  include/linux/jiffies.h   | 2 ++
->>  net/bluetooth/hci_event.c | 2 --
->>  2 files changed, 2 insertions(+), 2 deletions(-)
->>
->> diff --git a/include/linux/jiffies.h b/include/linux/jiffies.h
->> index 1220f0fbe5bf..50dba516fd2f 100644
->> --- a/include/linux/jiffies.h
->> +++ b/include/linux/jiffies.h
->> @@ -526,6 +526,8 @@ static __always_inline unsigned long msecs_to_jiffies(const unsigned int m)
->>  	}
->>  }
->>  
->> +#define secs_to_jiffies(_secs) msecs_to_jiffies((_secs) * MSEC_PER_SEC)
->> +
-> 
-> Why not only doing
-> 
-> #define secs_to_jiffies(s) (s * HZ)
-
-Yes, fair enough, I can change accordingly.
-
-Thanks,
-Easwar
