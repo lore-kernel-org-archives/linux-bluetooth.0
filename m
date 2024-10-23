@@ -1,59 +1,56 @@
-Received: from mailgw02.mediatek.com (unknown [210.61.82.184])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FAE6134BD;
-	Wed, 23 Oct 2024 11:37:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.61.82.184
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEBE53FD4;
+	Wed, 23 Oct 2024 12:36:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729683434; cv=none; b=uErLoCTtBd2uSPP9uYfQUVLz2ppK4myc11d+Mp5hAjyTGSfVCtcGuEM9fYsIf0nARvQ8GCo0wzB42aZzH/2Oyr1g6pIl9blq1jQYtoOt1MB6+y7QAkhU6pmNNjIia159wCHVbYAr0co8jN7dXdvVe6mlFoqNZjzYkYKgFAo4ekw=
+	t=1729686982; cv=none; b=ewjpF/mHmLFfXzs2dwEDd5ALuU0d8CtrBU6UP8Uv9SEHuvaG2YreVsOW63e7YKJc0+YH/fEpB3yfyx/9rnpk0CiqHisADKrtjdDF+exZ3DRZj8Z0Zij+K/YrcGPvkmT4qDS8CxKMh6QHqPXhogrrADvf1cavEICImBX6ZdtpLq0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729683434; c=relaxed/simple;
-	bh=mZrEOKndn1ubO1KyDFbGQ7nCrbe5by9dY9IAUlOdyc0=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=HI0tPU/8frQqSkwxxO+R2qVRsg8BrfoiW33SyTDfMUS8MIo8E7D2pddb8GZuo4eNJw9jOxQW95UzHW/UUGUUvUULTWNZ4/xDMiyo4ndHtIieleI/bFPaA9nwmh7Q6msd/eh7WUy9ccGzjuERyIyGMHLttl/ZIbQ9QB6TZ39BVmI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com; spf=pass smtp.mailfrom=mediatek.com; dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b=bkcZMLmw; arc=none smtp.client-ip=210.61.82.184
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mediatek.com
+	s=arc-20240116; t=1729686982; c=relaxed/simple;
+	bh=NvsJE6+70r058CqDZmm0zhoJg5vg9HC6I+sdV1QinMk=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=e2H87cTiaK5QZdUE2/57EooAiHMZTxmUK04GVjiLAt/lZ8YrybzJaOV21cuNnETRWXgqpuEP5NMaOk1NSOT7t3ybIem0Fy/yln06eQRSm5q01iHDuIF+2i/jASh4DtBxKXJMggyM77UrRca6Go9FSqLoFjU0t5VR+NnJcbBiZM8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=0xXpMY4k; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=6RCBy6TO; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b="bkcZMLmw"
-X-UUID: 1da3d004913311efbd192953cf12861f-20241023
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
-	h=Content-Type:MIME-Version:Message-ID:Date:Subject:CC:To:From; bh=mvzEvHiDHJCSQ9OPPoA+/DQ5g+AxJier5h97qmDMLdE=;
-	b=bkcZMLmwbHMDE2hb5JlIxG0W4yUtg5Djo6AemnuScBdnl5zseL9BtOG0d8QgBZgtZFxZaZN8ODXHnzW9aAEEwyW7+VbUSVoEewHPAozpCQMRQTiIZ5yIGo3Px87XFDh5WOawvjP4hjmfYtxEADapzh/9rYCklTnBuoqti+pmlV8=;
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.1.42,REQID:b39d38b6-ca0e-4b16-865f-02b6b96a9b38,IP:0,U
-	RL:0,TC:0,Content:-5,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION
-	:release,TS:-5
-X-CID-META: VersionHash:b0fcdc3,CLOUDID:a979fd2d-a7a0-4b06-8464-80be82133975,B
-	ulkID:nil,BulkQuantity:0,Recheck:0,SF:102,TC:nil,Content:0,EDM:-3,IP:nil,U
-	RL:11|1,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES
-	:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
-X-CID-BVR: 0,NGT
-X-CID-BAS: 0,NGT,0,_
-X-CID-FACTOR: TF_CID_SPAM_SNR,TF_CID_SPAM_ULN
-X-UUID: 1da3d004913311efbd192953cf12861f-20241023
-Received: from mtkmbs09n2.mediatek.inc [(172.21.101.94)] by mailgw02.mediatek.com
-	(envelope-from <chris.lu@mediatek.com>)
-	(Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
-	with ESMTP id 792397769; Wed, 23 Oct 2024 19:36:59 +0800
-Received: from mtkmbs11n1.mediatek.inc (172.21.101.185) by
- mtkmbs13n2.mediatek.inc (172.21.101.108) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.26; Wed, 23 Oct 2024 19:36:58 +0800
-Received: from mtksdccf07.mediatek.inc (172.21.84.99) by
- mtkmbs11n1.mediatek.inc (172.21.101.73) with Microsoft SMTP Server id
- 15.2.1118.26 via Frontend Transport; Wed, 23 Oct 2024 19:36:58 +0800
-From: Chris Lu <chris.lu@mediatek.com>
-To: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg
-	<johan.hedberg@gmail.com>, Luiz Von Dentz <luiz.dentz@gmail.com>
-CC: Sean Wang <sean.wang@mediatek.com>, Aaron Hou <aaron.hou@mediatek.com>,
-	Steve Lee <steve.lee@mediatek.com>, linux-bluetooth
-	<linux-bluetooth@vger.kernel.org>, linux-kernel
-	<linux-kernel@vger.kernel.org>, linux-mediatek
-	<linux-mediatek@lists.infradead.org>, Chris Lu <chris.lu@mediatek.com>
-Subject: [PATCH v1] Bluetooth: btmtk: adjust the position to init iso data anchor
-Date: Wed, 23 Oct 2024 19:36:26 +0800
-Message-ID: <20241023113626.12236-1-chris.lu@mediatek.com>
-X-Mailer: git-send-email 2.18.0
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="0xXpMY4k";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="6RCBy6TO"
+From: Anna-Maria Behnsen <anna-maria@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1729686978;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=+nQSjfJGOGf1mrKKvQ32s12pZQzwn91hTdN/0eRPA0Q=;
+	b=0xXpMY4k8cRYFEX3kTypsLX3mAnvzVbNiXpPynffj/2zEaIaducig2wJEGso+5wQzKYqnV
+	qE3WP9/ooMuIaoJFMOcrzE2+yHZidtLmbP0x8WVpCpTQgTPjtg7myxg9HUWo6c43HLqUbh
+	ZK13Krr1WhfJGqawTc6IykWVIY1CLxm/2PFm7yw1GEb9rlcMlJ6YBNfIoSk3HwDW0dc589
+	HuQov475yhfy8NulMtgHGBJ7tbn/krVKAl4CGU48etFw1Xhyzc7zL+2nyAYTqYy0Zkjlar
+	mw76klzECFfyhtl6KrQ6QqsQYvcM43OEzbZ3FWA+Ye2rHeRP1S0BmErVcVvhIA==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1729686978;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=+nQSjfJGOGf1mrKKvQ32s12pZQzwn91hTdN/0eRPA0Q=;
+	b=6RCBy6TO/Hm5dZzzZBuNaFBs8yW8T/L3RBcebEVE0PFsd5Yz3e5fUN5O78Ew4TzrImcy5x
+	7nAbGGV38Mq53ICw==
+To: Easwar Hariharan <eahariha@linux.microsoft.com>, lkp@intel.com, Marcel
+ Holtmann <marcel@holtmann.org>, Johan Hedberg <johan.hedberg@gmail.com>,
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Thomas Gleixner
+ <tglx@linutronix.de>, Geert Uytterhoeven <geert@linux-m68k.org>, Easwar
+ Hariharan <eahariha@linux.microsoft.com>, open list
+ <linux-kernel@vger.kernel.org>, "open list:BLUETOOTH SUBSYSTEM"
+ <linux-bluetooth@vger.kernel.org>
+Cc: Naman Jain <namjain@linux.microsoft.com>, Michael Kelley
+ <mhklinux@outlook.com>
+Subject: Re: [PATCH 1/2] jiffies: Define secs_to_jiffies()
+In-Reply-To: <20241022185353.2080021-1-eahariha@linux.microsoft.com>
+References: <20241022185353.2080021-1-eahariha@linux.microsoft.com>
+Date: Wed, 23 Oct 2024 14:36:17 +0200
+Message-ID: <8734kngfni.fsf@somnus>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -62,44 +59,64 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain
 
-MediaTek iso data anchor init should be move to where MediaTek
-claims iso data interface.
-If there is an unexpected usb disconnect during setup flow,
-it will cause a NULL pointer crash issue when releasing iso
-anchor since the anchor wan't been init yet. Adjust the position
-to do iso data anchor init.
+Easwar Hariharan <eahariha@linux.microsoft.com> writes:
 
-Signed-off-by: Chris Lu <chris.lu@mediatek.com>
----
- drivers/bluetooth/btmtk.c | 1 -
- drivers/bluetooth/btusb.c | 2 ++
- 2 files changed, 2 insertions(+), 1 deletion(-)
+> There are ~500 usages of msecs_to_jiffies() that either use a multiplier
+> value of 1000 or equivalently MSEC_PER_SEC. Define secs_to_jiffies() to
+> allow such code to be less clunky.
 
-diff --git a/drivers/bluetooth/btmtk.c b/drivers/bluetooth/btmtk.c
-index b7fc14aafc74..8a3f7c3fcfec 100644
---- a/drivers/bluetooth/btmtk.c
-+++ b/drivers/bluetooth/btmtk.c
-@@ -1215,7 +1215,6 @@ static int btmtk_usb_isointf_init(struct hci_dev *hdev)
- 	struct sk_buff *skb;
- 	int err;
- 
--	init_usb_anchor(&btmtk_data->isopkt_anchor);
- 	spin_lock_init(&btmtk_data->isorxlock);
- 
- 	__set_mtk_intr_interface(hdev);
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 9970470c9d15..15c0885c37cd 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -2628,6 +2628,8 @@ static void btusb_mtk_claim_iso_intf(struct btusb_data *data)
- 	struct btmtk_data *btmtk_data = hci_get_priv(data->hdev);
- 	int err;
- 
-+	init_usb_anchor(&btmtk_data->isopkt_anchor);
-+
- 	err = usb_driver_claim_interface(&btusb_driver,
- 					 btmtk_data->isopkt_intf, data);
- 	if (err < 0) {
--- 
-2.18.0
+Can you please provide a proper cover letter for a series (also if it is
+a series with only 2 patches)?
+
+Regarding your commit message: secs_to_jiffies() is defined in hci_event
+and cannot be reused by other callsites and this is why it's valuable to
+move it into core code. Especially because there are ~500 users which do
+the multiplier thing and there are also several users which use (secs *
+HZ).
+
+What do you think about converting the other users e.g. using
+Coccinelle?
+
+> Suggested-by: Michael Kelley <mhklinux@outlook.com>
+> Signed-off-by: Easwar Hariharan <eahariha@linux.microsoft.com>
+> ---
+>  include/linux/jiffies.h   | 2 ++
+>  net/bluetooth/hci_event.c | 2 --
+>  2 files changed, 2 insertions(+), 2 deletions(-)
+>
+> diff --git a/include/linux/jiffies.h b/include/linux/jiffies.h
+> index 1220f0fbe5bf..50dba516fd2f 100644
+> --- a/include/linux/jiffies.h
+> +++ b/include/linux/jiffies.h
+> @@ -526,6 +526,8 @@ static __always_inline unsigned long msecs_to_jiffies(const unsigned int m)
+>  	}
+>  }
+>  
+> +#define secs_to_jiffies(_secs) msecs_to_jiffies((_secs) * MSEC_PER_SEC)
+> +
+
+Why not only doing
+
+#define secs_to_jiffies(s) (s * HZ)
+
+>  extern unsigned long __usecs_to_jiffies(const unsigned int u);
+>  #if !(USEC_PER_SEC % HZ)
+>  static inline unsigned long _usecs_to_jiffies(const unsigned int u)
+> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+> index 0bbad90ddd6f..7b35c58bbbeb 100644
+> --- a/net/bluetooth/hci_event.c
+> +++ b/net/bluetooth/hci_event.c
+> @@ -42,8 +42,6 @@
+>  #define ZERO_KEY "\x00\x00\x00\x00\x00\x00\x00\x00" \
+>  		 "\x00\x00\x00\x00\x00\x00\x00\x00"
+>  
+> -#define secs_to_jiffies(_secs) msecs_to_jiffies((_secs) * 1000)
+> -
+>  /* Handle HCI Event packets */
+>  
+>  static void *hci_ev_skb_pull(struct hci_dev *hdev, struct sk_buff *skb,
+
+Thanks,
+
+	Anna-Maria
 
