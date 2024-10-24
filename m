@@ -1,326 +1,168 @@
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f182.google.com (mail-lj1-f182.google.com [209.85.208.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD7111FF7B6;
-	Thu, 24 Oct 2024 17:56:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2116122B642
+	for <linux-bluetooth@vger.kernel.org>; Thu, 24 Oct 2024 19:25:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729792604; cv=none; b=JVX84zxroEnUx9klbU0+pibiCUlpdxtrfrYBKuApiicQYXLTflL/qCZHOnHl71PhIqpNPultGk4j1lFbs2oncKYOl2JLFBZDzEQDqOohn0ZqADUZOxwqFRz7ZzVma5Hcw6HDMIDj6PsvmpFeQVDx0jwRuanuPw0NiGU5mvkjgDQ=
+	t=1729797906; cv=none; b=XJg+HcOvhU74WuufWWejcsumAljgtqqzBoMf3O45Wgwhnm6319EyDu63h8MTZW0tn814Q2SxKU14VQisqvTLhIVjNpvIkMYhWEcZC4g0TZSbDW1bIlDzFcmxl/ZBxx8p6HQPgoC2IDDAhPPRC/5CT9mk+D8bSOhhrwwQdBFGZjI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729792604; c=relaxed/simple;
-	bh=9pbUyl42Nhcqma6QZmYcdpbw5sT9z3q1sa7WhPr42iw=;
-	h=From:Date:Subject:Content-Type:Message-Id:References:In-Reply-To:
-	 To:Cc:MIME-Version; b=TxlxQbQOx8oQ1STwn/BFBC2Y4a8f+PkCUcUTwnEwdo0lxey/kFtypMunuECc3qvaO8mWDVLR5fNOaXOY7A1uktNemd4rtQbBNLHj2YqM9pUAFosIhrymx9SkNByleKQIon6VzZYag6je0JgypBsMEZLR9HqyYWwZYfskdTK+KD8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=J5KIJnSG; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1729797906; c=relaxed/simple;
+	bh=MXv+xBBeu+ccI9STbcqnEkbkww5eD7oxw/yME5ZMGoI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=B6cNvk/RZUTtqjOaoAxYvcv0PArFPIUgsydL5nVA7jeUi0y+rWMyFTPICLzDfNYLuzm/kvEeL1Etb79rv/8f+mHAYS8z0YL4y9toHow5V+HH/qlnigtgvOu9FZvN+wSQDVaxbGnN2CMNDsAqn8gY5SFel1XI1AcYtPudVoIUrDg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HwFR+eKK; arc=none smtp.client-ip=209.85.208.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="J5KIJnSG"
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 49OHc4Zr026032;
-	Thu, 24 Oct 2024 17:56:22 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=OpUSHB
-	MEwdUyF98w9KKfMMv1aen5S0miB4aePTMDh+c=; b=J5KIJnSGSY4CoaL38tnBR0
-	eECCOwFoDOO1plP9pj9gTGTuzy1JFvfrkyet7luu11SeTBf/YI6nlD1QnOCpGbhn
-	OnYMJgLqhduS1mlHbDPqaQOutqKnKHCOgH/lGRrfOBB8eR0dXoFG60unHRH9fN1Q
-	/lzkfc4AGl7ROXF6P8pa+2+3rUOTb1LbNcB0Gaiwcul98DtnjVXFT8Jw0AaR5B4P
-	8AKRdsG5nmH48Mi4KkyyPm8LZ9B0e5yJFGhaurjTbnpxFG0VbbcDYpexIJT1EXpe
-	cVb6RRQmLPS1oJq2JzEU38jMZpOIoxxdAaC0I8EGRvDCXPlGZ4TwUJ40qnCHrDUg
-	==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 42fhxnu2ca-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 24 Oct 2024 17:56:22 +0000 (GMT)
-Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 49OHtJcg001432;
-	Thu, 24 Oct 2024 17:56:21 GMT
-Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 42fhxnu2c4-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 24 Oct 2024 17:56:21 +0000 (GMT)
-Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 49OHpfIT006862;
-	Thu, 24 Oct 2024 17:56:19 GMT
-Received: from smtprelay07.dal12v.mail.ibm.com ([172.16.1.9])
-	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 42emjd1ney-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 24 Oct 2024 17:56:19 +0000
-Received: from smtpav03.wdc07v.mail.ibm.com (smtpav03.wdc07v.mail.ibm.com [10.39.53.230])
-	by smtprelay07.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 49OHuIFd47251950
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 24 Oct 2024 17:56:18 GMT
-Received: from smtpav03.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 6680358054;
-	Thu, 24 Oct 2024 17:56:18 +0000 (GMT)
-Received: from smtpav03.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id B1C025805A;
-	Thu, 24 Oct 2024 17:56:13 +0000 (GMT)
-Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
-	by smtpav03.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Thu, 24 Oct 2024 17:56:13 +0000 (GMT)
-From: Niklas Schnelle <schnelle@linux.ibm.com>
-Date: Thu, 24 Oct 2024 19:54:44 +0200
-Subject: [PATCH v9 5/5] asm-generic/io.h: Remove I/O port accessors for
- HAS_IOPORT=n
-Content-Type: text/plain; charset="utf-8"
-Message-Id: <20241024-b4-has_ioport-v9-5-6a6668593f71@linux.ibm.com>
-References: <20241024-b4-has_ioport-v9-0-6a6668593f71@linux.ibm.com>
-In-Reply-To: <20241024-b4-has_ioport-v9-0-6a6668593f71@linux.ibm.com>
-To: Brian Cain <bcain@quicinc.com>, Marcel Holtmann <marcel@holtmann.org>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Patrik Jakobsson <patrik.r.jakobsson@gmail.com>,
-        Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
-        Maxime Ripard <mripard@kernel.org>,
-        Thomas Zimmermann <tzimmermann@suse.de>,
-        David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
-        Dave Airlie <airlied@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
-        Lucas De Marchi <lucas.demarchi@intel.com>,
-        =?utf-8?q?Thomas_Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>,
-        Rodrigo Vivi <rodrigo.vivi@intel.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Jiri Slaby <jirislaby@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
-        "Maciej W. Rozycki" <macro@orcam.me.uk>,
-        Heiko Carstens <hca@linux.ibm.com>
-Cc: linux-kernel@vger.kernel.org, linux-hexagon@vger.kernel.org,
-        linux-bluetooth@vger.kernel.org, dri-devel@lists.freedesktop.org,
-        virtualization@lists.linux.dev, spice-devel@lists.freedesktop.org,
-        intel-xe@lists.freedesktop.org, linux-serial@vger.kernel.org,
-        linux-arch@vger.kernel.org, Niklas Schnelle <schnelle@linux.ibm.com>,
-        Arnd Bergmann <arnd@kernel.org>
-X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=openpgp-sha256; l=5763;
- i=schnelle@linux.ibm.com; h=from:subject:message-id;
- bh=9pbUyl42Nhcqma6QZmYcdpbw5sT9z3q1sa7WhPr42iw=;
- b=owGbwMvMwCX2Wz534YHOJ2GMp9WSGNKluqRD5oe6lHZ/Cup7FcEvVHjh5cp1ghWfN6j/UM47f
- +7EqwUxHaUsDGJcDLJiiiyLupz91hVMMd0T1N8BM4eVCWQIAxenAEzkSQ3DP9v/i07uPvviZagZ
- j72b49JrIo8OWVXU3L475+z3dok6tURGhu6y5Nl2wUVHXfotbtUUvd92XS958c81/lOv1TqVWq9
- IYQcA
-X-Developer-Key: i=schnelle@linux.ibm.com; a=openpgp;
- fpr=9DB000B2D2752030A5F72DDCAFE43F15E8C26090
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: BKscxSdustK8FLrIBOPouReXKLg57F74
-X-Proofpoint-GUID: luNKqXQhiDnO6MaN0akZJiYpxhRMSLIC
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HwFR+eKK"
+Received: by mail-lj1-f182.google.com with SMTP id 38308e7fff4ca-2fb498a92f6so13208791fa.1
+        for <linux-bluetooth@vger.kernel.org>; Thu, 24 Oct 2024 12:25:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1729797902; x=1730402702; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=heykgG0STshDLSkWqybEGBlUjt54oonFokG1fqROFjo=;
+        b=HwFR+eKKBdetfHRlilCaa/+k0nMym/FNc7odSnnLS4u8MOu8iNR8VYHyTl20q+LGLX
+         dI9oIPYoi4kIsbLlqIS2MJqo+a9JZihuQk5mGyf7f4HEDh95FhsNkSP7ZOHne8n/917w
+         ntGhNudhjOil5FO5InE9CP5xe3ScxCo4uhYbpkDs/C6yqra6NTCRF5bdFtBl7LinMmIt
+         tzOxAkZge7jJ8/Q5LVyfvS7hMKDzDw4t3QYbH5UNZUPnIf00/tRvPxnQFpRen0Lu0AHN
+         m/S189MTWhnj6N3efSGw4FvUhj2VFITUYAPbDXZVW2Rkcbmjq2GFUupxDTzyrDya2MEf
+         aFAQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1729797902; x=1730402702;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=heykgG0STshDLSkWqybEGBlUjt54oonFokG1fqROFjo=;
+        b=U6Zolzh9nx5RKZLDv7V4jQdjNYlY953W9OmRa0o94oqdE8SN/W2ODY7GjYvX1yekUz
+         sG8S8yQeoLpE5rg/FWchTtG6I+2xwqwWAhQuKeKvI9WfV+H70AZitNokk2fUeC6nMifX
+         0rA2VIalaapRPMRRZf4Q0ltPxvtOIXfZW9wNIy0GL3gSJEfdEz0QxQ+fZsu4b8F0BLcS
+         i5nGC3U0SzmdiR48dV1z5raVK3zyFWdyECU86gBnaC7R3SKtkWi8i28zZVO+0bwvlZBU
+         yKQiBzPus365r/SKGllCHRu4bEtK9nIL0haWDOZf7Z9yxReze+T6iT7wkT6P4v4cWIrc
+         M0pg==
+X-Gm-Message-State: AOJu0Yz/6Rw8yH8OQsnHF0mbQLm+QFp3ce/D4UBWCL5Z+/L54ewNDLHM
+	ctf0qOxbV7Yzqrgu6FRyad3LDxkJz0zZ5oW7fyNCr7bExGv7gsoaQoEhqtabVc3UgxPu10eFLJn
+	m2bOoOGt0WOL39yUFauBl6WPA03uGhA==
+X-Google-Smtp-Source: AGHT+IEVOA6Zs9c7SiBGmSJfmeWegUD9NVYtJAdL4T9V/miVh7bYbv6J9ACEIs4sO6uHnfuoVeESj0Nd1PpDz/c4fbc=
+X-Received: by 2002:a05:651c:b0a:b0:2fc:9550:d658 with SMTP id
+ 38308e7fff4ca-2fca822b384mr24019651fa.24.1729797901877; Thu, 24 Oct 2024
+ 12:25:01 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
- definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 adultscore=0
- mlxlogscore=999 malwarescore=0 impostorscore=0 bulkscore=0
- priorityscore=1501 mlxscore=0 suspectscore=0 lowpriorityscore=0
- phishscore=0 clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2409260000 definitions=main-2410240145
+References: <20241024110223.77254-1-iulia.tanasescu@nxp.com> <20241024110223.77254-5-iulia.tanasescu@nxp.com>
+In-Reply-To: <20241024110223.77254-5-iulia.tanasescu@nxp.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Thu, 24 Oct 2024 15:24:46 -0400
+Message-ID: <CABBYNZL+P7ik7wA4HQ9jCdHRJGdRcr8nHLCsEQUkLgC9dY4NaQ@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 04/14] shared/bap: Use enabling state for bcast sink streams
+To: Iulia Tanasescu <iulia.tanasescu@nxp.com>
+Cc: linux-bluetooth@vger.kernel.org, claudia.rosu@nxp.com, 
+	mihai-octavian.urzica@nxp.com, andrei.istodorescu@nxp.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-With all subsystems and drivers either declaring their dependence on
-HAS_IOPORT or fencing I/O port specific code sections we can finally
-make inb()/outb() and friends compile-time dependent on HAS_IOPORT as
-suggested by Linus in the linked mail. The main benefit of this is that
-on platforms such as s390 which have no meaningful way of implementing
-inb()/outb() their use without the proper HAS_IOPORT dependency will
-result in easy to catch and fix compile-time errors instead of compiling
-code that can never work.
+Hi Iulia,
 
-Link: https://lore.kernel.org/lkml/CAHk-=wg80je=K7madF4e7WrRNp37e3qh6y10Svhdc7O8SZ_-8g@mail.gmail.com/
-Co-developed-by: Arnd Bergmann <arnd@kernel.org>
-Signed-off-by: Arnd Bergmann <arnd@kernel.org>
-Signed-off-by: Niklas Schnelle <schnelle@linux.ibm.com>
----
- include/asm-generic/io.h | 60 ++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 60 insertions(+)
+On Thu, Oct 24, 2024 at 7:03=E2=80=AFAM Iulia Tanasescu <iulia.tanasescu@nx=
+p.com> wrote:
+>
+> This updates the stream state transition from CONFIG to ENABLING,
+> on enable for Broadcast Sink streams. This is done to differentiate
+> between streams discovered in the BASE after short-lived PA sync
+> and streams that have been selected and enabled by the user.
+> ---
+>  profiles/audio/bap.c | 7 +++----
+>  src/shared/bap.c     | 2 +-
+>  unit/test-bap.c      | 7 ++++---
+>  3 files changed, 8 insertions(+), 8 deletions(-)
+>
+> diff --git a/profiles/audio/bap.c b/profiles/audio/bap.c
+> index c45717ef2..4d250db52 100644
+> --- a/profiles/audio/bap.c
+> +++ b/profiles/audio/bap.c
+> @@ -1020,7 +1020,6 @@ static void iso_bcast_confirm_cb(GIOChannel *io, GE=
+rror *err, void *user_data)
+>         free(req);
+>
+>         if (bt_bap_stream_set_io(setup->stream, fd)) {
+> -               bt_bap_stream_start(setup->stream, NULL, NULL);
+>                 g_io_channel_set_close_on_unref(io, FALSE);
+>                 return;
+>         }
+> @@ -2676,13 +2675,13 @@ static void bap_state_bcast_sink(struct bt_bap_st=
+ream *stream,
+>         case BT_BAP_STREAM_STATE_CONFIG:
+>                 if (!setup)
+>                         break;
+> -               if (old_state =3D=3D
+> -                               BT_BAP_STREAM_STATE_CONFIG)
+> -                       setup_create_io(data, setup, stream, defer);
+>                 if (old_state =3D=3D
+>                                 BT_BAP_STREAM_STATE_STREAMING)
+>                         setup_io_close(setup, NULL);
+>                 break;
 
-diff --git a/include/asm-generic/io.h b/include/asm-generic/io.h
-index 80de699bf6af4b7b77f582c0469c43e978f67a43..1027be6a62bcbcd5f6797e0fa42035208d0ca79f 100644
---- a/include/asm-generic/io.h
-+++ b/include/asm-generic/io.h
-@@ -540,6 +540,7 @@ static inline void writesq(volatile void __iomem *addr, const void *buffer,
- 
- #if !defined(inb) && !defined(_inb)
- #define _inb _inb
-+#ifdef CONFIG_HAS_IOPORT
- static inline u8 _inb(unsigned long addr)
- {
- 	u8 val;
-@@ -549,10 +550,15 @@ static inline u8 _inb(unsigned long addr)
- 	__io_par(val);
- 	return val;
- }
-+#else
-+u8 _inb(unsigned long addr)
-+	__compiletime_error("inb()) requires CONFIG_HAS_IOPORT");
-+#endif
- #endif
- 
- #if !defined(inw) && !defined(_inw)
- #define _inw _inw
-+#ifdef CONFIG_HAS_IOPORT
- static inline u16 _inw(unsigned long addr)
- {
- 	u16 val;
-@@ -562,10 +568,15 @@ static inline u16 _inw(unsigned long addr)
- 	__io_par(val);
- 	return val;
- }
-+#else
-+u16 _inw(unsigned long addr)
-+	__compiletime_error("inw() requires CONFIG_HAS_IOPORT");
-+#endif
- #endif
- 
- #if !defined(inl) && !defined(_inl)
- #define _inl _inl
-+#ifdef CONFIG_HAS_IOPORT
- static inline u32 _inl(unsigned long addr)
- {
- 	u32 val;
-@@ -575,36 +586,55 @@ static inline u32 _inl(unsigned long addr)
- 	__io_par(val);
- 	return val;
- }
-+#else
-+u32 _inl(unsigned long addr)
-+	__compiletime_error("inl() requires CONFIG_HAS_IOPORT");
-+#endif
- #endif
- 
- #if !defined(outb) && !defined(_outb)
- #define _outb _outb
-+#ifdef CONFIG_HAS_IOPORT
- static inline void _outb(u8 value, unsigned long addr)
- {
- 	__io_pbw();
- 	__raw_writeb(value, PCI_IOBASE + addr);
- 	__io_paw();
- }
-+#else
-+void _outb(u8 value, unsigned long addr)
-+	__compiletime_error("outb() requires CONFIG_HAS_IOPORT");
-+#endif
- #endif
- 
- #if !defined(outw) && !defined(_outw)
- #define _outw _outw
-+#ifdef CONFIG_HAS_IOPORT
- static inline void _outw(u16 value, unsigned long addr)
- {
- 	__io_pbw();
- 	__raw_writew((u16 __force)cpu_to_le16(value), PCI_IOBASE + addr);
- 	__io_paw();
- }
-+#else
-+void _outw(u16 value, unsigned long addr)
-+	__compiletime_error("outw() requires CONFIG_HAS_IOPORT");
-+#endif
- #endif
- 
- #if !defined(outl) && !defined(_outl)
- #define _outl _outl
-+#ifdef CONFIG_HAS_IOPORT
- static inline void _outl(u32 value, unsigned long addr)
- {
- 	__io_pbw();
- 	__raw_writel((u32 __force)cpu_to_le32(value), PCI_IOBASE + addr);
- 	__io_paw();
- }
-+#else
-+void _outl(u32 value, unsigned long addr)
-+	__compiletime_error("outl() requires CONFIG_HAS_IOPORT");
-+#endif
- #endif
- 
- #include <linux/logic_pio.h>
-@@ -688,53 +718,83 @@ static inline void outl_p(u32 value, unsigned long addr)
- 
- #ifndef insb
- #define insb insb
-+#ifdef CONFIG_HAS_IOPORT
- static inline void insb(unsigned long addr, void *buffer, unsigned int count)
- {
- 	readsb(PCI_IOBASE + addr, buffer, count);
- }
-+#else
-+void insb(unsigned long addr, void *buffer, unsigned int count)
-+	__compiletime_error("insb() requires HAS_IOPORT");
-+#endif
- #endif
- 
- #ifndef insw
- #define insw insw
-+#ifdef CONFIG_HAS_IOPORT
- static inline void insw(unsigned long addr, void *buffer, unsigned int count)
- {
- 	readsw(PCI_IOBASE + addr, buffer, count);
- }
-+#else
-+void insw(unsigned long addr, void *buffer, unsigned int count)
-+	__compiletime_error("insw() requires HAS_IOPORT");
-+#endif
- #endif
- 
- #ifndef insl
- #define insl insl
-+#ifdef CONFIG_HAS_IOPORT
- static inline void insl(unsigned long addr, void *buffer, unsigned int count)
- {
- 	readsl(PCI_IOBASE + addr, buffer, count);
- }
-+#else
-+void insl(unsigned long addr, void *buffer, unsigned int count)
-+	__compiletime_error("insl() requires HAS_IOPORT");
-+#endif
- #endif
- 
- #ifndef outsb
- #define outsb outsb
-+#ifdef CONFIG_HAS_IOPORT
- static inline void outsb(unsigned long addr, const void *buffer,
- 			 unsigned int count)
- {
- 	writesb(PCI_IOBASE + addr, buffer, count);
- }
-+#else
-+void outsb(unsigned long addr, const void *buffer, unsigned int count)
-+	__compiletime_error("outsb() requires HAS_IOPORT");
-+#endif
- #endif
- 
- #ifndef outsw
- #define outsw outsw
-+#ifdef CONFIG_HAS_IOPORT
- static inline void outsw(unsigned long addr, const void *buffer,
- 			 unsigned int count)
- {
- 	writesw(PCI_IOBASE + addr, buffer, count);
- }
-+#else
-+void outsw(unsigned long addr, const void *buffer, unsigned int count)
-+	__compiletime_error("outsw() requires HAS_IOPORT");
-+#endif
- #endif
- 
- #ifndef outsl
- #define outsl outsl
-+#ifdef CONFIG_HAS_IOPORT
- static inline void outsl(unsigned long addr, const void *buffer,
- 			 unsigned int count)
- {
- 	writesl(PCI_IOBASE + addr, buffer, count);
- }
-+#else
-+void outsl(unsigned long addr, const void *buffer, unsigned int count)
-+	__compiletime_error("outsl() requires HAS_IOPORT");
-+#endif
- #endif
- 
- #ifndef insb_p
+Since we are going with a state that is not documented in the spec for
+broadcast then we should document what it means internally so latter
+on someone don't assume it is a mistake or needs changing due to not
+adhering to the spec.
 
--- 
-2.45.2
+> +       case BT_BAP_STREAM_STATE_ENABLING:
+> +               setup_create_io(data, setup, stream, defer);
+> +               break;
+>         }
+>  }
+>
+> diff --git a/src/shared/bap.c b/src/shared/bap.c
+> index 46ed490d1..6a2e12577 100644
+> --- a/src/shared/bap.c
+> +++ b/src/shared/bap.c
+> @@ -2186,7 +2186,7 @@ static unsigned int bap_bcast_sink_enable(struct bt=
+_bap_stream *stream,
+>                                         bt_bap_stream_func_t func,
+>                                         void *user_data)
+>  {
+> -       stream_set_state(stream, BT_BAP_STREAM_STATE_CONFIG);
+> +       stream_set_state(stream, BT_BAP_STREAM_STATE_ENABLING);
+>
+>         return 1;
+>  }
+> diff --git a/unit/test-bap.c b/unit/test-bap.c
+> index 9cfc8c403..0c190d7fe 100644
+> --- a/unit/test-bap.c
+> +++ b/unit/test-bap.c
+> @@ -6419,14 +6419,15 @@ static void bsnk_state_str(struct bt_bap_stream *=
+stream, uint8_t old_state,
+>
+>                         /* Enable stream */
+>                         bt_bap_stream_enable(stream, true, NULL, NULL, NU=
+LL);
+> -               } else if (old_state =3D=3D BT_BAP_STREAM_STATE_CONFIG) {
+> -                       /* Start stream */
+> -                       bt_bap_stream_start(stream, NULL, NULL);
+>                 } else {
+>                         /* Other state transitions are invalid */
+>                         tester_test_failed();
+>                 }
+>
+> +               break;
+> +       case BT_BAP_STREAM_STATE_ENABLING:
+> +               /* Start stream */
+> +               bt_bap_stream_start(stream, NULL, NULL);
+>                 break;
+>         case BT_BAP_STREAM_STATE_STREAMING:
+>                 queue_foreach(data->streams, stream_count_streaming, &num=
+);
+> --
+> 2.43.0
+>
 
+
+--=20
+Luiz Augusto von Dentz
