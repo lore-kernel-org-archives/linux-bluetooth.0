@@ -1,129 +1,341 @@
-Received: from mail-lj1-f181.google.com (mail-lj1-f181.google.com [209.85.208.181])
+Received: from mail-lj1-f176.google.com (mail-lj1-f176.google.com [209.85.208.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0CEE1D63D8;
-	Thu, 24 Oct 2024 14:47:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F2C01EABD2
+	for <linux-bluetooth@vger.kernel.org>; Thu, 24 Oct 2024 15:04:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729781256; cv=none; b=YxCMetHAHzixcDe9nXovAXX+wIFMHqEzv3hWZZ4eQE7LC+lG04kgqTKV71Qj6tCJJsmP4Jf4jVN6rG4thX41VyoRWjjpMX/QIk0ZOEUOe279ODEXf3qGDkgG/qSYGDyZP7+jfNoJ5Y6ilB0fAtd0TqHtvVDa0sEVA9dO32CJDKM=
+	t=1729782246; cv=none; b=sR8lgfdYdHWM14FF1usNcbSfgOdRRityEbRgKr56AxFXFMESOR3WQ12QuozuLEwKngzHHdYmYS+wbDUd6N+z8wX0z/Ne5+R9fjhmmUkSvdnGdJAe+cDmg8Dt+nQrcjGTV8+eLFFkhxx43IpMy8nYspfMUrI4v1WcEolha3Qrpuc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729781256; c=relaxed/simple;
-	bh=/wUrcsMJVoooubxWmLRAaXefBHzQh8V+SDPSaLoqxdQ=;
+	s=arc-20240116; t=1729782246; c=relaxed/simple;
+	bh=ETN7VRShkt+5EnId9a4gwv7VdaLh0qnkn49LlRf2TpM=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=CLelId0D+p5/ogaCYSafuwvuBPufIe5PWAZo8RMagspaUn4TRHTJdgXooFhYDqHqRNvLzWmmGsuCPXGceqNUzlVg7ZomvkE3yqJQJU/OdhtnMCKs+I5cKkrlVSoqZDqFR9nLSi2whrBPdHYomR1FSkVjyevPAKULrtClPEyakY4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Vm7oT4CQ; arc=none smtp.client-ip=209.85.208.181
+	 To:Cc:Content-Type; b=AZv6pxKsKhLd+ToRgajgVuWD/UMOFovppEiIZKUBSSfdoPheXJiwReXqLAb8cNSOj4GwuSMIjENDSJwh46JG7UO1n7hcTXfMogbBC+jr7dHLLghb2gq6YJyUxzavwDzL76M4FI9aToCLz8XZkQH6KE9UmtocpPCahO4i/IR/XFY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EF6yI9zE; arc=none smtp.client-ip=209.85.208.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Vm7oT4CQ"
-Received: by mail-lj1-f181.google.com with SMTP id 38308e7fff4ca-2fb584a8f81so9930531fa.3;
-        Thu, 24 Oct 2024 07:47:33 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EF6yI9zE"
+Received: by mail-lj1-f176.google.com with SMTP id 38308e7fff4ca-2fc968b3545so10773501fa.2
+        for <linux-bluetooth@vger.kernel.org>; Thu, 24 Oct 2024 08:04:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1729781252; x=1730386052; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1729782241; x=1730387041; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=ObLFhkfilDgkeJ8S/DOzsvtKeCP3rongHSO0w7aoSKI=;
-        b=Vm7oT4CQrdbpMDVujGySCgPWjjPudOz4nFNtKnqA175UcBWA+Gs3eNaDa73S4U+0TI
-         uj4AxIY1lLCKevkOd37v8mk9ciSJdqVvRxX2dUgVLTPk6gIidGbB8PGUSTB3LU4dj/wf
-         ljQCGKkC0EY+4rVfQH2jr09st39QOrtV48U+CbNij+syfXXI86laeI4oimSwrGPFyvqh
-         lGHiOvXqkiR7QBBvNBPjOCViEeK1RItC5UHU0uGHWt9Usr/2Pdhvryr9PueaZgbNa6X7
-         Qj4rvrnsjzT2EqJdlb/ImYqe7whHdAe93o8zC4NqWxjcctHWESHfScMengstTK3AxWEr
-         7QKw==
+        bh=OeEzum1HaCdHE/28KJWO79dKsZlptFhz7DJ5mK3q9zo=;
+        b=EF6yI9zE3YUiGs1DiWn/uKXtJcFHZxeGE+2WW0mXIzE+H2ZR8z1QFJMqppUFStcXbs
+         aQEvq7XGXpyVXJVE0HJQ58HPK8MXnNRWH/47ASm/lzRe+6Hl1gp9cEdxA2wBZcRyXhi3
+         AlHWsANgWqfp+ToNFL65TwY8UV+61pFvZ+tcImF2jT0CkIsPe0dUdN4YHDTWAGIxnI7O
+         7IgzkWid02KAm4oHexveJLVAHgWjE61HEO7NM3fLCtok80PllDwdD8P7FFPXUstC6G8H
+         S0mq2N8Of4KmvXv59t6ScwiP0HVH/HRQYUHYA+mCuKdeSpehiaL5ko8VaSxIMtbZwr3M
+         2yDA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729781252; x=1730386052;
+        d=1e100.net; s=20230601; t=1729782241; x=1730387041;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=ObLFhkfilDgkeJ8S/DOzsvtKeCP3rongHSO0w7aoSKI=;
-        b=SE83p3UFJkpt/FCDZ6oc586QDa7pg/peWBjLAFrOU8K60ju2goWAU2rkDxkjZQcpr5
-         bLmegwS1MqrP0g8iabJlUZQqxi2GuR6no7/KanRndg+eAqzt2BGpI6eeVT2DNvEnYK4H
-         LpQNtjflQ4stRnF6EA1+XqFobI0wcDvuPmvvSpTtOByZAb2MD6Uat0Wbe8hOz7Xg57Qk
-         b1aXL5EVfJD+au/vozQ5l4cZ0ounRFW+8UhtcPiwKtzA8wV7sC979r9faqy/5dXjfuko
-         HK8+oMfvVsVmbdqI99K5lSnzk0iP8l3E3dYYVmtK95sVAAZQZ127f1V82QEDY1b9Og1F
-         HC1Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUutcZumFeb49jlm1TENYUiM11IUhNjxRho+sfhNg25UhLAae6/YMSMICTqxhlVtP2G0HLwvX7uegLQ0A+8@vger.kernel.org, AJvYcCWxeNzOZ7/CaZQu8RgpX/yaSfr/5PEOat8pneqQLe0TtwUOOszSrx1JcUlnWLfV67OagB83dchHyDrgP0lmoWc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx+bsCYtPM+8dXZvn8wuAaS03DpwA/dwHzXyZITg+/PxfjHC2gP
-	SLa8wblhsSrEx4VPQTelS1568M9FpO6doeGgccHGFhQ176bHs7sYs2qsYNZV92thZ7ZAuxY4yEh
-	0G8o7PfQ1kDzrS0gqmGDxwE8u8s8=
-X-Google-Smtp-Source: AGHT+IEhbTehtHKBddJu+7LbhCF86DQkzEp93FtdZ2l7+F3VCRGEUWQWdfUNYvEcj3Aq130BBZJzRw2RGRA3wyZ/KUI=
-X-Received: by 2002:a2e:4609:0:b0:2fb:6198:d230 with SMTP id
- 38308e7fff4ca-2fca8201182mr11805571fa.18.1729781251392; Thu, 24 Oct 2024
- 07:47:31 -0700 (PDT)
+        bh=OeEzum1HaCdHE/28KJWO79dKsZlptFhz7DJ5mK3q9zo=;
+        b=GwdCWneQSnwhQakhRg9yA/NR63WSturfqhFFMAPq6aFvRDrZuqQaheW18/UbSpObku
+         gBI+8mmbNJDVRUWiRHed1x/dDYK0bY885L3HCP7VqYasgEFi6vnIh3o7DV5CdLwInDes
+         LHAr1Axg3VJKSw3XNa8LhpUjn0g09yohuOEEkgUs5YPPxiVxg9l+0hvlADhWWu26K/7t
+         Ige22XuZ+9CvGiQjfW17gls/w3vVoQ8ZH9wsMuiPPWJpsWrWBD7UAFry8o958KKrTcIM
+         39EHgXxghyCckmRMgUDdteYFPshMR4Le8ImhvbDLzaTnbZ0VyrAOMT7PkD9TszH62/OX
+         qnzw==
+X-Gm-Message-State: AOJu0YxePDlCTI+tj9Y/z6LCAlXFI96MBAT4kRM4SRaDaKiUtGdrKL97
+	R5dUCbEbFRWOAoYO6rcV5wthythTvKihY0WhcuzHleMNh0KPP30ZozEQF4X/Amnjht72F2oSc+c
+	AqWHJExs/g6ToiT3rUS7Z/hzjQdXc4ocb
+X-Google-Smtp-Source: AGHT+IEJ8OTWHmMwF1gpVT+hEjKvBL9RC5PYn+xKVP3HQ6Htr5cQQB4uAvhFnuudR3IgqYYSjtz0IvwJWlfEx1mQXtI=
+X-Received: by 2002:a2e:4e1a:0:b0:2fb:6027:7bfd with SMTP id
+ 38308e7fff4ca-2fc9d345dbdmr27707881fa.27.1729782240590; Thu, 24 Oct 2024
+ 08:04:00 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241023113626.12236-1-chris.lu@mediatek.com>
-In-Reply-To: <20241023113626.12236-1-chris.lu@mediatek.com>
+References: <20240723112505.3019642-1-quic_dgangire@quicinc.com>
+In-Reply-To: <20240723112505.3019642-1-quic_dgangire@quicinc.com>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Thu, 24 Oct 2024 10:47:17 -0400
-Message-ID: <CABBYNZLpMCTy8z8ObEU90gqenb58VoB2EZKbZJfWK_J=h45Qew@mail.gmail.com>
-Subject: Re: [PATCH v1] Bluetooth: btmtk: adjust the position to init iso data anchor
-To: Chris Lu <chris.lu@mediatek.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg <johan.hedberg@gmail.com>, 
-	Sean Wang <sean.wang@mediatek.com>, Aaron Hou <aaron.hou@mediatek.com>, 
-	Steve Lee <steve.lee@mediatek.com>, linux-bluetooth <linux-bluetooth@vger.kernel.org>, 
-	linux-kernel <linux-kernel@vger.kernel.org>, 
-	linux-mediatek <linux-mediatek@lists.infradead.org>
+Date: Thu, 24 Oct 2024 11:03:46 -0400
+Message-ID: <CABBYNZ+SA6BmRQju16PtsUB+CxCEKvGfYXxdRXG+s0T5ky1QUQ@mail.gmail.com>
+Subject: Re: [PATCH BlueZ v1] obexd: Add system bus support for obexd
+To: quic_dgangire@quicinc.com
+Cc: linux-bluetooth@vger.kernel.org, quic_mohamull@quicinc.com, 
+	quic_hbandi@quicinc.com, quic_anubhavg@quicinc.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi Chris,
+Hi,
 
-On Wed, Oct 23, 2024 at 7:37=E2=80=AFAM Chris Lu <chris.lu@mediatek.com> wr=
-ote:
+On Tue, Jul 23, 2024 at 7:25=E2=80=AFAM <quic_dgangire@quicinc.com> wrote:
 >
-> MediaTek iso data anchor init should be move to where MediaTek
-> claims iso data interface.
-> If there is an unexpected usb disconnect during setup flow,
-> it will cause a NULL pointer crash issue when releasing iso
-> anchor since the anchor wan't been init yet. Adjust the position
-> to do iso data anchor init.
+> From: Damodar Reddy GangiReddy <quic_dgangire@quicinc.com>
 >
-> Signed-off-by: Chris Lu <chris.lu@mediatek.com>
+> Currently obexd uses session bus.
+> Distros  where session bus is not supported and still obex profiles
+> are required in that case use system bus instead of session bus
+> which can be configured with new optional feature
 
-Please add the backtrace or a Link tag if there is an issue/bug open.
-Also it is important to always include a Fixes tag with tha hash that
-introduced the problem, specially in case of a crash since it might be
-a good idea to backport to fix.
+Well system bus is normally used by daemon that require root(like)
+access, having obexd running as a system service is sort of dangerous
+since it means remote access as root to part of the filesystem
+(similar to allowing FTP access as root user).
+
+> Additional optional feature has been added to achieve this
+> with name --enable-use-systembus-for-obexd
+>
+> steps to configure system bus
+> ./configure --enable-use-systembus-for-obexd
+
+If we allow such a thing I'd like to have it as a runtime option, not
+just as a build-time one, since we might want to be able to run obexd
+under test-runner for testing automation, but for example the
+test-runner environment currently doesn't start any session bus.
+
+Btw, if you guys are after a stable environment for test
+automation/qualification I highly recommend looking into the
+test-runner:
+
+https://github.com/bluez/bluez/blob/master/doc/test-runner.rst
 
 > ---
->  drivers/bluetooth/btmtk.c | 1 -
->  drivers/bluetooth/btusb.c | 2 ++
->  2 files changed, 2 insertions(+), 1 deletion(-)
+>  Makefile.obexd          | 14 ++++++++++++++
+>  configure.ac            |  9 +++++++++
+>  obexd/client/ftp.c      |  3 ++-
+>  obexd/client/map.c      |  3 ++-
+>  obexd/client/opp.c      |  3 ++-
+>  obexd/client/pbap.c     |  3 ++-
+>  obexd/client/session.c  |  3 ++-
+>  obexd/client/sync.c     |  3 ++-
+>  obexd/plugins/pcsuite.c |  3 ++-
+>  obexd/src/manager.c     |  3 ++-
+>  src/bluetooth.conf      | 12 ++++++++++++
+>  tools/obexctl.c         |  3 ++-
+>  12 files changed, 53 insertions(+), 9 deletions(-)
 >
-> diff --git a/drivers/bluetooth/btmtk.c b/drivers/bluetooth/btmtk.c
-> index b7fc14aafc74..8a3f7c3fcfec 100644
-> --- a/drivers/bluetooth/btmtk.c
-> +++ b/drivers/bluetooth/btmtk.c
-> @@ -1215,7 +1215,6 @@ static int btmtk_usb_isointf_init(struct hci_dev *h=
-dev)
->         struct sk_buff *skb;
->         int err;
+> diff --git a/Makefile.obexd b/Makefile.obexd
+> index b7e9f2d33..87432cc37 100644
+> --- a/Makefile.obexd
+> +++ b/Makefile.obexd
+> @@ -2,6 +2,19 @@
+>  if OBEX
 >
-> -       init_usb_anchor(&btmtk_data->isopkt_anchor);
->         spin_lock_init(&btmtk_data->isorxlock);
->
->         __set_mtk_intr_interface(hdev);
-> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> index 9970470c9d15..15c0885c37cd 100644
-> --- a/drivers/bluetooth/btusb.c
-> +++ b/drivers/bluetooth/btusb.c
-> @@ -2628,6 +2628,8 @@ static void btusb_mtk_claim_iso_intf(struct btusb_d=
-ata *data)
->         struct btmtk_data *btmtk_data =3D hci_get_priv(data->hdev);
->         int err;
->
-> +       init_usb_anchor(&btmtk_data->isopkt_anchor);
+>  if SYSTEMD
 > +
->         err =3D usb_driver_claim_interface(&btusb_driver,
->                                          btmtk_data->isopkt_intf, data);
->         if (err < 0) {
+> +if USE_SYSTEMBUS_FOR_OBEXD
+> +
+> +systemdsystemunit_DATA +=3D obexd/src/obex.service
+> +dbussystembus_DATA +=3D obexd/src/org.bluez.obex.service
+> +
+> +obexd-add-service-symlink:
+> +       $(LN_S) -f obex.service $(DESTDIR)$(SYSTEMD_SYSTEMUNITDIR)/dbus-o=
+rg.bluez.obex.service
+> +
+> +obexd-remove-service-symlink:
+> +       rm -f $(DESTDIR)$(SYSTEMD_SYSTEMUNITDIR)/dbus-org.bluez.obex.serv=
+ice
+> +else
+> +
+>  systemduserunitdir =3D $(SYSTEMD_USERUNITDIR)
+>  systemduserunit_DATA =3D obexd/src/obex.service
+>
+> @@ -13,6 +26,7 @@ obexd-add-service-symlink:
+>
+>  obexd-remove-service-symlink:
+>         rm -f $(DESTDIR)$(SYSTEMD_USERUNITDIR)/dbus-org.bluez.obex.servic=
+e
+> +endif
+>  else
+>  obexd-add-service-symlink:
+>  obexd-remove-service-symlink:
+> diff --git a/configure.ac b/configure.ac
+> index d31eb1656..cc9a55f4c 100644
+> --- a/configure.ac
+> +++ b/configure.ac
+> @@ -283,6 +283,15 @@ if (test "${enable_obex}" !=3D "no"); then
+>  fi
+>  AM_CONDITIONAL(OBEX, test "${enable_obex}" !=3D "no")
+>
+> +AC_ARG_ENABLE(use-systembus-for-obexd, AS_HELP_STRING([--enable-use-syst=
+embus-for-obexd],
+> +               [enable systembus for obexd]), [enable_use_systembus_for_=
+obexd=3D${enableval}])
+> +AM_CONDITIONAL(USE_SYSTEMBUS_FOR_OBEXD, test "${enable_use_systembus_for=
+_obexd}" =3D "yes")
+> +if (test "${enable_use_systembus_for_obexd}" =3D "yes"); then
+> +       AC_DEFINE(USE_SYSTEMBUS_FOR_OBEXD, 1, [Define to 1 if you want to=
+ use system bus for obexd.])
+> +else
+> +       AC_DEFINE(USE_SYSTEMBUS_FOR_OBEXD, 0, [Define to 0 if you want to=
+ use session bus for obexd.])
+> +fi
+> +
+>  AC_ARG_ENABLE(btpclient, AS_HELP_STRING([--enable-btpclient],
+>                 [enable BTP client]), [enable_btpclient=3D${enableval}])
+>  AM_CONDITIONAL(BTPCLIENT, test "${enable_btpclient}" =3D "yes")
+> diff --git a/obexd/client/ftp.c b/obexd/client/ftp.c
+> index 160e0636a..e3cef32f6 100644
+> --- a/obexd/client/ftp.c
+> +++ b/obexd/client/ftp.c
+> @@ -463,7 +463,8 @@ int ftp_init(void)
+>
+>         DBG("");
+>
+> -       conn =3D dbus_bus_get(DBUS_BUS_SESSION, NULL);
+> +       conn =3D dbus_bus_get(USE_SYSTEMBUS_FOR_OBEXD ?
+> +                       DBUS_BUS_SYSTEM : DBUS_BUS_SESSION, NULL);
+>         if (!conn)
+>                 return -EIO;
+>
+> diff --git a/obexd/client/map.c b/obexd/client/map.c
+> index 513dcaf14..815806f52 100644
+> --- a/obexd/client/map.c
+> +++ b/obexd/client/map.c
+> @@ -2063,7 +2063,8 @@ int map_init(void)
+>
+>         DBG("");
+>
+> -       conn =3D dbus_bus_get(DBUS_BUS_SESSION, NULL);
+> +       conn =3D dbus_bus_get(USE_SYSTEMBUS_FOR_OBEXD ?
+> +                       DBUS_BUS_SYSTEM : DBUS_BUS_SESSION, NULL);
+>         if (!conn)
+>                 return -EIO;
+>
+> diff --git a/obexd/client/opp.c b/obexd/client/opp.c
+> index 90d0c0c8e..4889a3a0f 100644
+> --- a/obexd/client/opp.c
+> +++ b/obexd/client/opp.c
+> @@ -178,7 +178,8 @@ int opp_init(void)
+>
+>         DBG("");
+>
+> -       conn =3D dbus_bus_get(DBUS_BUS_SESSION, NULL);
+> +       conn =3D dbus_bus_get(USE_SYSTEMBUS_FOR_OBEXD ?
+> +                       DBUS_BUS_SYSTEM : DBUS_BUS_SESSION, NULL);
+>         if (!conn)
+>                 return -EIO;
+>
+> diff --git a/obexd/client/pbap.c b/obexd/client/pbap.c
+> index 2d2aa9508..1658c853a 100644
+> --- a/obexd/client/pbap.c
+> +++ b/obexd/client/pbap.c
+> @@ -1303,7 +1303,8 @@ int pbap_init(void)
+>
+>         DBG("");
+>
+> -       conn =3D dbus_bus_get(DBUS_BUS_SESSION, NULL);
+> +       conn =3D dbus_bus_get(USE_SYSTEMBUS_FOR_OBEXD ?
+> +                       DBUS_BUS_SYSTEM : DBUS_BUS_SESSION, NULL);
+>         if (!conn)
+>                 return -EIO;
+>
+> diff --git a/obexd/client/session.c b/obexd/client/session.c
+> index 7d8ebb04e..4e447e8eb 100644
+> --- a/obexd/client/session.c
+> +++ b/obexd/client/session.c
+> @@ -583,7 +583,8 @@ struct obc_session *obc_session_create(const char *so=
+urce,
+>         if (driver =3D=3D NULL)
+>                 return NULL;
+>
+> -       conn =3D dbus_bus_get(DBUS_BUS_SESSION, NULL);
+> +       conn =3D dbus_bus_get(USE_SYSTEMBUS_FOR_OBEXD ?
+> +                       DBUS_BUS_SYSTEM : DBUS_BUS_SESSION, NULL);
+>         if (conn =3D=3D NULL)
+>                 return NULL;
+>
+> diff --git a/obexd/client/sync.c b/obexd/client/sync.c
+> index 92faf4434..bd339adfa 100644
+> --- a/obexd/client/sync.c
+> +++ b/obexd/client/sync.c
+> @@ -224,7 +224,8 @@ int sync_init(void)
+>
+>         DBG("");
+>
+> -       conn =3D dbus_bus_get(DBUS_BUS_SESSION, NULL);
+> +       conn =3D dbus_bus_get(USE_SYSTEMBUS_FOR_OBEXD ?
+> +                       DBUS_BUS_SYSTEM : DBUS_BUS_SESSION, NULL);
+>         if (!conn)
+>                 return -EIO;
+>
+> diff --git a/obexd/plugins/pcsuite.c b/obexd/plugins/pcsuite.c
+> index 07c444ff2..5daed2abb 100644
+> --- a/obexd/plugins/pcsuite.c
+> +++ b/obexd/plugins/pcsuite.c
+> @@ -322,7 +322,8 @@ static gboolean send_backup_dbus_message(const char *=
+oper,
+>
+>         file_size =3D size ? *size : 0;
+>
+> -       conn =3D g_dbus_setup_bus(DBUS_BUS_SESSION, NULL, NULL);
+> +       conn =3D g_dbus_setup_bus(USE_SYSTEMBUS_FOR_OBEXD ?
+> +                       DBUS_BUS_SYSTEM : DBUS_BUS_SESSION, NULL, NULL);
+>
+>         if (conn =3D=3D NULL)
+>                 return FALSE;
+> diff --git a/obexd/src/manager.c b/obexd/src/manager.c
+> index 3c0c2a7cc..dd83f056d 100644
+> --- a/obexd/src/manager.c
+> +++ b/obexd/src/manager.c
+> @@ -488,7 +488,8 @@ gboolean manager_init(void)
+>
+>         dbus_error_init(&err);
+>
+> -       connection =3D g_dbus_setup_bus(DBUS_BUS_SESSION, OBEXD_SERVICE, =
+&err);
+> +       connection =3D g_dbus_setup_bus(USE_SYSTEMBUS_FOR_OBEXD ?
+> +               DBUS_BUS_SYSTEM : DBUS_BUS_SESSION, OBEXD_SERVICE, &err);
+>         if (connection =3D=3D NULL) {
+>                 if (dbus_error_is_set(&err) =3D=3D TRUE) {
+>                         fprintf(stderr, "%s\n", err.message);
+> diff --git a/src/bluetooth.conf b/src/bluetooth.conf
+> index b6c614908..f8879c8bb 100644
+> --- a/src/bluetooth.conf
+> +++ b/src/bluetooth.conf
+> @@ -21,10 +21,22 @@
+>      <allow send_interface=3D"org.freedesktop.DBus.ObjectManager"/>
+>      <allow send_interface=3D"org.freedesktop.DBus.Properties"/>
+>      <allow send_interface=3D"org.mpris.MediaPlayer2.Player"/>
+> +    <allow own=3D"org.bluez.obex"/>
+> +    <allow send_destination=3D"org.bluez.obex"/>
+> +    <allow send_interface=3D"org.bluez.obex.Agent1"/>
+> +    <allow send_interface=3D"org.bluez.obex.Client1"/>
+> +    <allow send_interface=3D"org.bluez.obex.Session1"/>
+> +    <allow send_interface=3D"org.bluez.obex.Transfer1"/>
+> +    <allow send_interface=3D"org.bluez.obex.ObjectPush1"/>
+> +    <allow send_interface=3D"org.bluez.obex.PhonebookAccess1"/>
+> +    <allow send_interface=3D"org.bluez.obex.Synchronization1"/>
+> +    <allow send_interface=3D"org.bluez.obex.MessageAccess1"/>
+> +    <allow send_interface=3D"org.bluez.obex.Message1"/>
+>    </policy>
+>
+>    <policy context=3D"default">
+>      <allow send_destination=3D"org.bluez"/>
+> +    <allow send_destination=3D"org.bluez.obex"/>
+>    </policy>
+>
+>  </busconfig>
+> diff --git a/tools/obexctl.c b/tools/obexctl.c
+> index 56a76915c..07dc1ae6b 100644
+> --- a/tools/obexctl.c
+> +++ b/tools/obexctl.c
+> @@ -2154,7 +2154,8 @@ int main(int argc, char *argv[])
+>         bt_shell_set_menu(&main_menu);
+>         bt_shell_set_prompt(PROMPT_OFF);
+>
+> -       dbus_conn =3D g_dbus_setup_bus(DBUS_BUS_SESSION, NULL, NULL);
+> +       dbus_conn =3D g_dbus_setup_bus(USE_SYSTEMBUS_FOR_OBEXD ?
+> +                               DBUS_BUS_SYSTEM : DBUS_BUS_SESSION, NULL,=
+ NULL);
+>
+>         client =3D g_dbus_client_new(dbus_conn, "org.bluez.obex",
+>                                                         "/org/bluez/obex"=
+);
 > --
-> 2.18.0
+> 2.34.1
+>
 >
 
 
