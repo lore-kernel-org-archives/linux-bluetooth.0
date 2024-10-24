@@ -1,46 +1,46 @@
-Received: from EUR02-DB5-obe.outbound.protection.outlook.com (mail-db5eur02on2060.outbound.protection.outlook.com [40.107.249.60])
+Received: from AS8PR04CU009.outbound.protection.outlook.com (mail-westeuropeazon11011044.outbound.protection.outlook.com [52.101.70.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F145C1CACC9
-	for <linux-bluetooth@vger.kernel.org>; Thu, 24 Oct 2024 11:03:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.249.60
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29B3B1CACE9
+	for <linux-bluetooth@vger.kernel.org>; Thu, 24 Oct 2024 11:03:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.70.44
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729767791; cv=fail; b=K0nwSPn4yiLwkyZhX8CF6gLCvEqV/6XFCb4JhUNdjVvUJZmkeQCriqVZlP/tBrswagRjGuQ2AMiHg7zcdQwLfEXEOoiH8v/z9LaUzGYwnjl8SbgrqfEVsRMuCIyJdBZdY7dxPTDybn44d7ZbyM4ublhNZVGoGcG/hy7OlqPb2Hk=
+	t=1729767793; cv=fail; b=bEXjRuXs6vnq7s9sy/baQhqvBmyo1WeZbrE3PpxTZnYMAwLXqsfR28nwWtD1tqKDkK8EQSVn109A5rJ2rihfFCH+aea7hTpSKPtPGInrB/QKrlWC8bEN2ZBcVKefESN3kXRY/Ttv4fjsm/nU9kYD0S7+OoTBy2F1CnFf6rA9I6w=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729767791; c=relaxed/simple;
-	bh=Y+Tp06REaj1ZhgxLQ9xgZOrTOq9JjDdglNUd3ZuumY4=;
+	s=arc-20240116; t=1729767793; c=relaxed/simple;
+	bh=riagUk8Xxr0Cktzk4sHScUpvK/r5x0fMe64DRNDzWgU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=CZEnyQxyErN/SuWChzIfeDqqEZTUtST4ToaJZVRy4hWHjO6qD/j1ehz2AlKAois1fnbi4LCX7UEEQnoXCL26QROV0rM9cKGk3hyMbjXrjGFG01SNDytAP5iAMNNVTIcsu6YCD4uLzMHJ6ur+2Iv8a6usO+b9kkjWkrs6e+bore4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=Wi59HJF9; arc=fail smtp.client-ip=40.107.249.60
+	 Content-Type:MIME-Version; b=ZpSn+Qukpi2/6YCtGqolbFe5tGU6l2G81FjcsZNQOnqArMA3Y8L9IvsXQaanslMxFtNNmTsE//i4XY54wqKpTEZXcGQSHeo0VrwOpyu8ypHySFycqzZj0+rZk0MgS6W7mJZ1kO236VEuX+WObPWB7gKSKwNkFiCNgpPyk2WRrN4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=bJEGPmbL; arc=fail smtp.client-ip=52.101.70.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="Wi59HJF9"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="bJEGPmbL"
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=EQ0HRPDwUsnkrqrA1SlprfVA0MB6UtkGESXXG9MDZ2Co76Ux9spPkegL1zISHTMFxTXbvRKP/vuzlmaLAKPudvwn9Yh9oiL8M1wlZ3OU+f13/JyZgmZY0SOtcubXdyhvpIA3HktewN63zSXRUR5rFLjkWYEBTYnALiWuNrQm2bjgO6zM67oau4Hwe9to1hJTbvV7qI3P2+DJqS67yyC86UDB/U1ruKGemIFvcmlPtrI7qdrJRr0tHjFkiUc7uAjR1xV0RKdhRdUrXDF8Xq5nNSwJrg49bTvid2GrEjTD84mSQcvQSABLd9zkEW/HOaHgBAM023xQL9Wxso+ZTqZcKQ==
+ b=Xq7zjcnEW+VQJjdQXtmaMbXX+t1Y32QhcJQhtXcQxXY7eJPab+6UAKNnKzBEDguiZda/c7AU34M+MnjivS07enIfyJQCqkqWwFKbTOH2pHQnFrhBsannGGrHBgFmnne4Xg5C6MCf6MTEEYyNZCLZ2z3+MPeQGV/wRteQXSlR2qNHlLddPlYEExnQPArMM6L95mW+H6+wEcYLiDwfYDdEIeEk+pgD3k8WyaPvfkKlU6hbOvvPyuW1AwPGoZ8A+qVKqME9IgM8HHfaqToxk8KFcYjZjYW8PhpT3hejrcMjlnhfIDjbE09MoLLyY89t2lTZ/A/qeM8obLoLoAYIJt9eiw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=VC6Yq2BvZVY7sLR6HMyH2kJTyj9o2gTdDAX53tA16Lo=;
- b=dqegDN6mqjx3wfWKnhCzaA02k6lmzV9fj9fHLvDZfZ8y3U34/XDU23Zr2AeG04/DZTTeCFo89ssJSO9y76y7y0Ns/h/53MbFb8F8IWstQfhKwOV0GjktVc/MvH1OtYZF3xGpkRHjwhqnYca/WTJQHNxXwEVb27hn+n6egYkhZR9pm4/UjiWi9abMdc9Gjs+inLzB4MEUeLna8MzhscsQOGLZCEPHymrtAJ2nmPyj2obyAl+IdagUmON0+wuZcl8OjFJzx+SX1D354yYmNlV2H2TXXOKcKdOrdxm3+KgJm/L5bnufWcHZi4A12Jqj7/s6UASH1Yq+KoPFPf78SXfokg==
+ bh=0NhqylQQdv+u6MmA4OBs5PD9do0FH9Ogit451oRFxG8=;
+ b=ipNEs8MFOrBj41NJrs+Ft3XykHYD64e9H3CVe9sx+rlHY3/oKkkrYeO7iPgXdoAyB+fgaeaifpBkmc5j5PFlyG73+iZDPSX92S8UvfUxw5wzx1Z3OP0xNhJO/fMEsmA5ilBtFdkBRe/AgNuLuuFnfD14EkR53mNkxGKTOYxSfLEUFzhZjeTDqRXi+iNm0tVWCLoxxk6HVnX2qAdsoIotThawWuMo7/noTe0iDrffVuMqgGre6oLy1DUV7qWkQBvBp6vjtT5U8YZFn3eA6PnnWGg73hZIprbb5yioMNYngOaIuEdAqMIRxZIO/ojHIQqKNGTXMZZtwI0sjzySJgeNxw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
  header.d=nxp.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=VC6Yq2BvZVY7sLR6HMyH2kJTyj9o2gTdDAX53tA16Lo=;
- b=Wi59HJF9jzVu+Z8rSISixzyL+aZlc56kc5tSIplpZcPM+A7jlp9Th77opznO2EFvRJnXrpWZcw6/Go8UsiGlo/jC1VSE6e7C7XvoeBSPZMSQCS5u+vObKWq+DHOp/Zke4gWu7nmPiQqStuomsJ58oRcYQAhOWGfL9872xCFbPFD8soGbIVE6FEVWBKvRRZ3UbIDJKsaL4wR7KBdioH1OA94UkIIIDZtwVQYIbNEoibDpm1dU1jjygel5x92wh/dp4pwmJ79qbF6QvtE4JS/7w0S6PM9Pd2H3X4f45ZYW4Vy2sErmBo5cYBbFfbYcBBz1i6KE4At3D9ip2KhbK6yh3w==
+ bh=0NhqylQQdv+u6MmA4OBs5PD9do0FH9Ogit451oRFxG8=;
+ b=bJEGPmbLoUhlbSHrK/vPDyBy/g3QwsCCIZhNlAutp7plnoiszyCRmJTuQx8/VcjTnYS8HLq7ebVUMsX9D4EL2RmrFIEDhqQ8NtouBw4Thj/1TSk6w580S4CJPYWS6vQa0OFk1SYSeey1fhgWEZA5uFifzWqZUOiiRL6P2Yfozfm3rA92J7YduCL/EJ37uqeOi9eGjof5TSjNse/FYmwXfumH0sAkOLQFxUrofmfb68fV4kS1Co6rWoY/XZ/ZKk3EBmqBAG2wBUx2XQSSQ8Z2onQKDkJXCSdXGomZnC24tOVvvkm46Hq4iscmSYjuoDTx19MXeLPtDzwLtZLIk8+E1A==
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=nxp.com;
 Received: from AS8PR04MB8898.eurprd04.prod.outlook.com (2603:10a6:20b:42d::15)
- by AS4PR04MB9622.eurprd04.prod.outlook.com (2603:10a6:20b:4cc::20) with
+ by DB9PR04MB9964.eurprd04.prod.outlook.com (2603:10a6:10:4c1::21) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8069.26; Thu, 24 Oct
- 2024 11:03:00 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8093.16; Thu, 24 Oct
+ 2024 11:03:06 +0000
 Received: from AS8PR04MB8898.eurprd04.prod.outlook.com
  ([fe80::5e22:869c:33c:9654]) by AS8PR04MB8898.eurprd04.prod.outlook.com
  ([fe80::5e22:869c:33c:9654%4]) with mapi id 15.20.8093.014; Thu, 24 Oct 2024
- 11:03:00 +0000
+ 11:03:06 +0000
 From: Iulia Tanasescu <iulia.tanasescu@nxp.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: claudia.rosu@nxp.com,
@@ -48,9 +48,9 @@ Cc: claudia.rosu@nxp.com,
 	andrei.istodorescu@nxp.com,
 	luiz.dentz@gmail.com,
 	Iulia Tanasescu <iulia.tanasescu@nxp.com>
-Subject: [PATCH BlueZ 05/14] bap: Add support for syncing to multiple BISes
-Date: Thu, 24 Oct 2024 14:02:14 +0300
-Message-ID: <20241024110223.77254-6-iulia.tanasescu@nxp.com>
+Subject: [PATCH BlueZ 09/14] doc/media: Update Links property for broadcast
+Date: Thu, 24 Oct 2024 14:02:18 +0300
+Message-ID: <20241024110223.77254-10-iulia.tanasescu@nxp.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20241024110223.77254-1-iulia.tanasescu@nxp.com>
 References: <20241024110223.77254-1-iulia.tanasescu@nxp.com>
@@ -66,367 +66,100 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AS8PR04MB8898:EE_|AS4PR04MB9622:EE_
-X-MS-Office365-Filtering-Correlation-Id: 9fa382b8-2141-44a6-6620-08dcf41b6c83
+X-MS-TrafficTypeDiagnostic: AS8PR04MB8898:EE_|DB9PR04MB9964:EE_
+X-MS-Office365-Filtering-Correlation-Id: 52fbcb76-b0e3-40da-daf3-08dcf41b7011
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|52116014|376014|1800799024|366016|38350700014;
+	BCL:0;ARA:13230040|52116014|366016|1800799024|376014|38350700014;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?P6QOomn8Gq6mKv0q+anPIG5skE6y6gRwyxWwXi57/mXWk00Tb8LXumBgCjaE?=
- =?us-ascii?Q?x6LOI7rE1b6gcCqEnWefWsRyHT8slJSqrz5qH05R1vVSp5pokegKrjsAL3PZ?=
- =?us-ascii?Q?9WRGfjKMAAc49ua1q5yKdMscgx/IRVMseMMfQsEpEEI3hWsF84XKNmGiLuxZ?=
- =?us-ascii?Q?VJo6hhJ8TlKN5Ft2oZQb+6WL/XspNcQpzHnfCf4H97byRU1rvvce54PjUq/U?=
- =?us-ascii?Q?2XZqr9giN1/r/08O/cCuHleT2sA4Z6S9ahmCLsF1apn42gaFWX02z4ZsPRKU?=
- =?us-ascii?Q?M1gTPhYa2Q8gxqCRDyEdAz82FaWynNnH9HkbmZjWloMlExvCcHk8YFVW955O?=
- =?us-ascii?Q?zozix9oYI+8TcAeJgl8KoOBlH5OOHJxEuUsbhXCOIGCXVXoQGMJ0Tlf/uE8H?=
- =?us-ascii?Q?YuFvoR0rPe7h8qzM7ikZ24AUPYW0P5You7joPN3WtgsP92OXXV79bycqfuc9?=
- =?us-ascii?Q?AcO7gFmKrFVrYm6jG3QZ7grFkNEs+JEiSK3+WJuxwkG00W/ihO1rptyURwkp?=
- =?us-ascii?Q?qSm3+TjRMnEiFJvMKZB6YgBwAyvQZHSRYrKGLqrk2QsjIGkij6hxxLhnAZ9D?=
- =?us-ascii?Q?9lIugGcnONBNcPWWNZimiISgo3J2CFGwZUmfNXMFd4DRciH7KaZpKHd/CzBN?=
- =?us-ascii?Q?WobsHYOspaYdi4JjylueKpYah3BL8O9Z/sN5WXO0OT9b4D5XqhQYukgY1Kvf?=
- =?us-ascii?Q?BIgUZTTFEMY/xM8O6YDUhGUGxDkkK1E++xjuwkpzsdnsUpPF98+IIZlSFpJv?=
- =?us-ascii?Q?x90lxnNrntAxKaw/b3lVV6cXsONgkXFtlTxJvfoGtR0b/OhnH9CVUOAXaNsS?=
- =?us-ascii?Q?HgzSxO9AevDG3v8pX84tJJvNQ5KrINXvuzJyLki5sVlLhJgiQL7v4ARvmUAb?=
- =?us-ascii?Q?IpoYwOXrES3EW7xtwIHE8QiSLUfzqqHY2DPH7vhM7Hy4xAfwVVTGwximtFec?=
- =?us-ascii?Q?uJ+WZRdGUhSJHSCWnf16F6/09t5J9ba2wfMBu2FGmo/k7FPESHhCeAuZH5mo?=
- =?us-ascii?Q?q84Gi0CXZ/CIsBCea46JbLlSaAKNjKCLZ2XXPEieyjwfuHNbJg+2kpGn2Qdc?=
- =?us-ascii?Q?u0OW7yeBiIplizvbF/GCFuR/7il+i2EE+i3gj9ha88D4O5X+EuKZbo00iht4?=
- =?us-ascii?Q?qsVqYQ0K2kIM76H4YqQSddqsJd/JL4euLQxJs4+atS8+AxnGGQ0fKvI48D4G?=
- =?us-ascii?Q?0WHhlU9UPOsTQPzoIw6JSBC18Z8ALWNYDVlNi/oBlEVshAoUhV1x06Qgocw2?=
- =?us-ascii?Q?BUENAVH1zHWaMaKWfy9pNyJ1bvDCSAwlGD6cdx67/t+ZG//Z1VoKxtFd2zUK?=
- =?us-ascii?Q?7dd9tUBG4/wS1Wk5XhIJTxyOhldTRX1WDW73ebulhl5HPkfZnnr3TsSjVVY0?=
- =?us-ascii?Q?ifmXu+4=3D?=
+	=?us-ascii?Q?sWuOjT0ZKuK3NpMm3mzA0DS3qdtKd5GXHw83Z8IIGxdvNo+jFsGQ1WSlbhqQ?=
+ =?us-ascii?Q?O8sMAE3PDbXTM9LMeMz2iGwqvCzouR3r2unLlgbc9Hrgakm5F76DuC7/ebYj?=
+ =?us-ascii?Q?OYhoLLZ1Ywpt0UuRy9qB4z9dkuP+h6FnHUVq8b1JKQP2U1B60TP7JQgk+0UZ?=
+ =?us-ascii?Q?oDEEn93g87+C480dJrDgO8lmWd2ugDlnEsy/RR84Pgv7jjBm6Zfugenj/dZz?=
+ =?us-ascii?Q?0heKgwTo7DQVHNmOadgRYzM9rN525qD+/A7JNJy5GiTDh15Kxnu7TImevr1f?=
+ =?us-ascii?Q?eNMlBVGbGTGH9U5lHxv0DTvAoAnby0XPLcsHizUwEHUWia8y8XsoYafDPbjL?=
+ =?us-ascii?Q?GQpV1B++96JS+5r+ZJHmaKih50et39jEGaYVpEUf4+WYFiba+HcBvcltUXgT?=
+ =?us-ascii?Q?o4movZLMjIYh32EO38+Wfy7oM5WdrMVbGqOubvr93EClHlcvC2KRtgRRSiJR?=
+ =?us-ascii?Q?XlEOX1+oBFruH4oUEdXtPbJpzs9BSvj4Q7ZRNqLfEbGWgG2lrR5CJ179tnyI?=
+ =?us-ascii?Q?uGUVyUMJR3RTGrMcIe4TVHqLUBbqgprOPpwCo8O6obs4aEL5mvcPkEwgWV0G?=
+ =?us-ascii?Q?hacIO/BvC6YApE7buIxciJcBreptESavIxGmdwQwdQANz/HdVnm78rXQkzb+?=
+ =?us-ascii?Q?zlkU7dVV0NGYQG4qBwMAbeWkcqLx/o+dVSgU05Kkmcpx/oW7RKDBQHuKzmse?=
+ =?us-ascii?Q?oNscYYlh6lO6CQVLRJif5gVXXKoD3Mylo9CvMBgY4zAPPobDi7p3fcusBnYG?=
+ =?us-ascii?Q?2EXeoGQxreGcxEACImMtg77MqXJEr67PiCZvv6Ao7LLNO+KXrrLqn04qM0UI?=
+ =?us-ascii?Q?9rqNvRONi3r8EyZEMzhaHTY7yJoTg2PKwrdtkAPa0q9NK/c6U0wvSX0xdbsn?=
+ =?us-ascii?Q?e3QK1Sr+lB5TsPgIHfMrijS6I1jY09Of8MRNjXDuzwiBJwXg3pyR1VmSSFJR?=
+ =?us-ascii?Q?7Lgp4yOcc3XlZ292GfyApwwV7pyp5HOJQFK4f8nql3Yt0aH4lL8m2xFLGkIn?=
+ =?us-ascii?Q?4shOfAeaNH8B1MLwM8Yq2yN+68Nhuzq/csNb0US2Hr3yOYHCppQ098Q3LhWW?=
+ =?us-ascii?Q?4dd7whFAlTm1fZmx0jL7eRh4vPRq+69cEFa06UwNpn/B83XKNWf9g9FjygPV?=
+ =?us-ascii?Q?45KC3FHdTtvCpFWy6lUbFj9f46Mu/L/SecUYJ25P/y/wABonEkTuprJL7Ng9?=
+ =?us-ascii?Q?L5i+iA8cT5zcKCZrYdR39viVPCN7IxamSrljEKN7dSVnXAJA088RKPnHhe/B?=
+ =?us-ascii?Q?wkTVRtjlXxUnvVjcP+dP58Bvx5TIpD8MMpJ3Men+SCY/mpDWNgQhQRbrXvUI?=
+ =?us-ascii?Q?DBVaP6rht5DyjTD7/SNPcuMSe2oXyUmdlgiUtMG88W9S110NQAab+fc3xWA3?=
+ =?us-ascii?Q?Gq+aOIE=3D?=
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AS8PR04MB8898.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(52116014)(376014)(1800799024)(366016)(38350700014);DIR:OUT;SFP:1101;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AS8PR04MB8898.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(52116014)(366016)(1800799024)(376014)(38350700014);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?MEyS+jDFownKCnv6Xv71vpS9j7TJbzV694q6LubOJoqcsHy3oqrP95Nngkfr?=
- =?us-ascii?Q?s26Jf4MHBTO2/dXQWGAqJwmfO+zH2N4Bt2cJ3lQj/Wz1P5JGL79KbQGBUdaR?=
- =?us-ascii?Q?1lgQ5CtNiiiLGAROnLJ1bvV1NMKm2cpNdiA1x9bzb5VvbU+KETb4yjmgrv57?=
- =?us-ascii?Q?21aYSr8ESiXF12AfnRH+dSx+ebTkqLhCxdYTfqHjwudvyOV9s7rvUOBUyuFr?=
- =?us-ascii?Q?KUl2LOTZu7UDua3qecXgqVgrzMw6ocItEq+DFSu8+/o7WKaO/fX2DhF+3vyq?=
- =?us-ascii?Q?yNiMjtRZgoNnBSQoRqCOO8q0Bsses2NK1N+SVYG/CItjYj8hqHvXP0bJobWQ?=
- =?us-ascii?Q?J6hYz4abTdBRb37tvlR8XBcH2Wj/TMNAPDeVYxonqmn+Fh9qP3GURcFMFsmO?=
- =?us-ascii?Q?NKUNTzveMPnDYZmXF8ov/NTQhsBU4vUOzCv+U+f9U/9wLK8Hfc5nN0kPz6KY?=
- =?us-ascii?Q?WjQwkBvP6syu1UPUY+X2Xa45QduVn+udQjtNPbq3nCx97CrXUCFOZZuqmgcI?=
- =?us-ascii?Q?LhFsQwyvbv6mVLHo7Ntpc76VAssHwofMgfBfsPyvRyJOi5zrTYQEg5Eo14kt?=
- =?us-ascii?Q?Q6Ed5MB3OqxYVGfOn1VFY6E2fb3wq2Pp7aig5KF7cvlWm/OHkpsmFIF1Cjj9?=
- =?us-ascii?Q?91fFgsgnG/XTM4CbtXlx16sXkJhc5ruY9v6LqtqfLhdL889SLkGeIXInHr+E?=
- =?us-ascii?Q?O6y0Xc6syVFSoR3q4wHoSWGKiQ7zQX5MQ+GlKzq7StSHzEWRWmtR2eQintR7?=
- =?us-ascii?Q?J7ecjBZyImicYnYGGtOqNSpWWq2Cl0Bh+qgHipqjG0Ntciqhzq6p6/w3YxUc?=
- =?us-ascii?Q?NUJqJFrgvn61C+12jh1fGPeG+1xdrRqsIY4AKVjoaIZhxAfwxzpxFiT4iI3M?=
- =?us-ascii?Q?rRsmoaYJsDqwJQEqBCIeWTOFgeV0s4rH0fh6rj0S2OiTpl/anfPKQoQXsyIW?=
- =?us-ascii?Q?xrKuEZYowMw/oMAPYCpfqbMJWQHTi4OCMJJFb86OsCidmvs9Qrzfth5oSY+Z?=
- =?us-ascii?Q?XTmOaAqZIpO1VNH4NzXOqdL4kjJCkriI28gmc+L1lsdo3v7oCVy/ErF+AoTk?=
- =?us-ascii?Q?lKEIaJPCwyrx+AD9a1Sb49Sz7s9FLkzZzBVdE4u6u70EsguClr2k2SL6A0LE?=
- =?us-ascii?Q?Ob2vay0xPQklVOPjrWhrdJUGB7rK6gi2dUK25tV9HWq7ogIixSXjnJV1L3Qo?=
- =?us-ascii?Q?/hGkZ5kHc1paNO7Qq814CbR61hDZVeeF+R4S2IofTlCpD+jAofoRackdScze?=
- =?us-ascii?Q?lAbBggzey+Z2DHWKyZAiWb+pZ0OoF4ngy8aHnKOdw60LTjJk4ZLJ/53xJJgh?=
- =?us-ascii?Q?No9p1neSjwydPc8Sn6lqmoOr2sh3pc/NfgNUF1BfcOZDx8Qs7KiQdbExxLvv?=
- =?us-ascii?Q?Ni/7j9+5M4LtITr+DsDEZPp3dpEcP8Cg/ro2DimcI1BCKBCt5sywBcPCc1Il?=
- =?us-ascii?Q?8sEMHNPUZzpCQfNKyeQK4TCuE0XnaYlXrEn6Vti8bdnnMhdC1uQQCrTo383R?=
- =?us-ascii?Q?tExM3U3lDYNlsnW5Ryw/PWXw3W+t/cfxUElQV8RLlFTXFm6gCVCNfenvrRUr?=
- =?us-ascii?Q?iAZ1jEf+cgPfD1klZQYo5up8Dsy5EwphISCHRXvUW/fdlaCh8DNTiriJexSp?=
- =?us-ascii?Q?/Q=3D=3D?=
+	=?us-ascii?Q?mQ1tzCsf17V7QhFjGDdeArsTYp6dqzYwFbvhEom/LzcVREeoaLvrzzzM6A16?=
+ =?us-ascii?Q?A4O2iUkK2x7VnlEGI7MNSn+5VSEQzcrkF6xW5t/SS/Dp9QUS6WuHse1wTX5g?=
+ =?us-ascii?Q?DAEFhpZaFHMC8XINsdyrRHfNnfc2U1b3QLDoEpD+d692ETeFiXSFfwOFG7Ir?=
+ =?us-ascii?Q?b39+7VFA7ssuZaslhGrh9cJfy/pK80iwMls7Gc+0MCMjgPA8zGW/hOaQeZpg?=
+ =?us-ascii?Q?Jx4Us/0YSRwW4dK3y1Dd5fgGBK1DBTdm15ut8mdhVG3kuk0dr3hGlvonxQug?=
+ =?us-ascii?Q?ZLLSRe5qBZO+Gg0ruMjF6SovSdWI6Nsg4L8rvf08LQ2zv4aPzELwyiPx6Ljq?=
+ =?us-ascii?Q?9J8xh2iblRm3TlyTU9SG5KUDMysHRfgboZmZLRA0i66MuZB0Mu68o/425zYX?=
+ =?us-ascii?Q?Wn7PikAOrgMfv1mD+mii5aCkne1mJIIFw0AIzLTDlcTJmtmX6Es8Ts7SxwQ3?=
+ =?us-ascii?Q?acCoyaGD1tvb/4zTvb7R/lPfVibUCykzXDfkNRo3i9YIopEkU0I6feeSpaVO?=
+ =?us-ascii?Q?hEGZofdHJ6UkjkyQO4FoDSDyE7rhdTzc8GCI1cmqpWFcA9Cm94bYFzWf7+lZ?=
+ =?us-ascii?Q?a791pNXAcnBNzGVcp+139x0sCXaJNnkNpJdGiZi/kmyYdd3o/xCErSTM541/?=
+ =?us-ascii?Q?XEJ0VvwOkRRSbz8AFNAWVVKSOqsRQuSqQcv7ThoDC+2+uAkUF0oemT4GHEXv?=
+ =?us-ascii?Q?yIW396yciOmPgCKNE4Nwnmdjren4ay1aVCldJFbJVkExsVdCIZJmjjXAaM+b?=
+ =?us-ascii?Q?0Xvpli2I4D7FY/HfrTppe4Y9vBrwS4qYlBvXAzBTO541vXUQFjor8hrnO5aW?=
+ =?us-ascii?Q?R1n1Y5B03VWIQWHIS6FmEoWOAHXYXso6x8Z/Y1jHE7N/bWGpWoGnDRp0a9RZ?=
+ =?us-ascii?Q?v9EmZVD5v77gulyXDWB1jt4jTV2ZyzQd9L1Et4KbjRN/LjVvUNeyeLQfHBkj?=
+ =?us-ascii?Q?z01dFmpYveh/FduBAHDlwSrwOvVBl0dq5GYCOZ3FVc3aBApkHyQoI4Z5w2cZ?=
+ =?us-ascii?Q?1yZZnaVoIUXshte7YBjnugNZ8cWbuN7b+ftXpOqpaH5dHk31U4MJRFEmFKNF?=
+ =?us-ascii?Q?IMEifIR68VauBBoeaCQLBmPvdCVhTkJwWneE559Icv/CNVg5T8TmFknqBy7j?=
+ =?us-ascii?Q?LkbftVHgWSC7aSU2Z8NlzCwqY2tTspEvUl02Zk/cqzquvSYsiDee+jbng+k9?=
+ =?us-ascii?Q?CuszS+4HbhP7UKeowd9OHjF9h8nGFSUhaZrNYvYeUMU6JE5n2H8PT1ZVBOKH?=
+ =?us-ascii?Q?TCznJdVKsgmRPEMYIoib1yLzBk2HhI9peokYXZNPgrqu4MfJL9ulgCzfzyp8?=
+ =?us-ascii?Q?3Qtuyc8HbOlmS0T682Nb3iphZtcAX5Zczaz8i0KYtd6JwEBCOsfARl3Q/UEl?=
+ =?us-ascii?Q?tMEcQOe1S0K31I1WjScV/bKh4NwuxIwU8ocm4neYoTYtetpHxNzGtZro70Dk?=
+ =?us-ascii?Q?Epbi0LeQzS4c33YSIQ7/V1ouxwgv1/SxolSohzAQYDxZVGi6NsFeRO3QMfpO?=
+ =?us-ascii?Q?AkPAGNBQnYGwaG9sWhrRZeACKBpkr9eQ5pcEMBEQlyePK98NtMs3WpIGodxc?=
+ =?us-ascii?Q?inK8IBCy07TYxhM6z/VpdEH+0CGLwSKKqq43SYsk7Z9JGb2lM79kj6uoz9+q?=
+ =?us-ascii?Q?VA=3D=3D?=
 X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9fa382b8-2141-44a6-6620-08dcf41b6c83
+X-MS-Exchange-CrossTenant-Network-Message-Id: 52fbcb76-b0e3-40da-daf3-08dcf41b7011
 X-MS-Exchange-CrossTenant-AuthSource: AS8PR04MB8898.eurprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Oct 2024 11:03:00.2611
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Oct 2024 11:03:06.2422
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: k/+WKtG0kLWolMLZ5rNIcj1XNUG8svouq5VgLNRRfcXU6GuO0HpZGaxLkzN7SGVYo13E/kVYsVs6IU0wIiR7Dg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS4PR04MB9622
+X-MS-Exchange-CrossTenant-UserPrincipalName: UAcQ9o3aLjU9cfLf7JbgCTio9XYBOks7AZG0V/xlRpS7Os0er7BdZMc15VoSVKA5oz1yq0hQk9n7qP9zr6r/bw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB9PR04MB9964
 
-This adds support for a Broadcast Sink to synchronize to multiple BISes
-from a Source.
-
-BISes selected by the user need to be linked together and then enabled one
-by one. The first enabled stream will enqueue all its links in a request
-for PA and BIG sync. After BIG sync is established, the confirm callback
-will be called for each BIS io created in the kernel. Each fd will be set
-inside the corresponding link, even the links that have not yet been
-enabled. The enabled links will be started as soon as the fds are ready.
+This adds details about the "Links" property for broadcast.
 ---
- profiles/audio/bap.c | 169 +++++++++++++++++++++++++++----------------
- 1 file changed, 108 insertions(+), 61 deletions(-)
+ doc/org.bluez.MediaTransport.rst | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/profiles/audio/bap.c b/profiles/audio/bap.c
-index 4d250db52..a02c58d13 100644
---- a/profiles/audio/bap.c
-+++ b/profiles/audio/bap.c
-@@ -134,11 +134,13 @@ enum {
- struct bap_bcast_pa_req {
- 	uint8_t type;
- 	bool in_progress;
-+	struct bap_data *bap_data;
- 	union {
- 		struct btd_service *service;
--		struct bap_setup *setup;
-+		struct queue *setups;
- 	} data;
- 	unsigned int io_id;	/* io_id for BIG Info watch */
-+	GIOChannel *io;
- };
+diff --git a/doc/org.bluez.MediaTransport.rst b/doc/org.bluez.MediaTransport.rst
+index 4d998b2a8..2173e0177 100644
+--- a/doc/org.bluez.MediaTransport.rst
++++ b/doc/org.bluez.MediaTransport.rst
+@@ -149,6 +149,9 @@ array{object} Links [readonly, optional, ISO only, experimental]
  
- static struct queue *sessions;
-@@ -997,27 +999,34 @@ static DBusMessage *set_configuration(DBusConnection *conn, DBusMessage *msg,
- static void iso_bcast_confirm_cb(GIOChannel *io, GError *err, void *user_data)
- {
- 	struct bap_bcast_pa_req *req = user_data;
--	struct bap_setup *setup = req->data.setup;
-+	struct bap_setup *setup;
- 	int fd;
--	struct bt_bap *bt_bap = bt_bap_stream_get_session(setup->stream);
--	struct btd_service *btd_service = bt_bap_get_user_data(bt_bap);
--	struct bap_data *bap_data = btd_service_get_user_data(btd_service);
-+	struct bap_data *bap_data = req->bap_data;
+ 	Linked transport objects which the transport is associated with.
  
- 	DBG("BIG Sync completed");
- 
--	if (setup->io) {
--		g_io_channel_unref(setup->io);
--		g_io_channel_shutdown(setup->io, TRUE, NULL);
--		setup->io = NULL;
--	}
-+	/* The order of the BIS fds notified from kernel corresponds
-+	 * to the order of the BISes that were enqueued before
-+	 * calling bt_io_bcast_accept.
-+	 */
-+	setup = queue_pop_head(req->data.setups);
- 
--	/* This device is no longer needed */
--	btd_service_connecting_complete(bap_data->service, 0);
-+	if (queue_isempty(req->data.setups)) {
-+		/* All fds have been notified. Mark service as connected. */
-+		btd_service_connecting_complete(bap_data->service, 0);
- 
--	fd = g_io_channel_unix_get_fd(io);
-+		if (req->io) {
-+			g_io_channel_unref(req->io);
-+			g_io_channel_shutdown(req->io, TRUE, NULL);
-+			req->io = NULL;
-+		}
- 
--	queue_remove(bap_data->adapter->bcast_pa_requests, req);
--	free(req);
-+		queue_remove(bap_data->adapter->bcast_pa_requests, req);
-+		queue_destroy(req->data.setups, NULL);
-+		free(req);
-+	}
++	For Broadcast transports, the property is writable and it is
++	not optional.
 +
-+	fd = g_io_channel_unix_get_fd(io);
+ dict QoS [readwrite, optional, ISO only, experimental]
+ ``````````````````````````````````````````````````````
  
- 	if (bt_bap_stream_set_io(setup->stream, fd)) {
- 		g_io_channel_set_close_on_unref(io, FALSE);
-@@ -2265,6 +2274,8 @@ static void setup_accept_io_broadcast(struct bap_data *data,
- {
- 	struct bap_bcast_pa_req *req = new0(struct bap_bcast_pa_req, 1);
- 	struct bap_adapter *adapter = data->adapter;
-+	struct queue *links = bt_bap_stream_io_get_links(setup->stream);
-+	const struct queue_entry *entry;
- 
- 	/* Timer could be stopped if all other requests were treated.
- 	 * Check the state of the timer and turn it on so that this request
-@@ -2281,7 +2292,21 @@ static void setup_accept_io_broadcast(struct bap_data *data,
- 	 */
- 	req->type = BAP_PA_BIG_SYNC_REQ;
- 	req->in_progress = FALSE;
--	req->data.setup = setup;
-+	req->bap_data = data;
-+
-+	req->data.setups = queue_new();
-+
-+	/* Enqueue all linked setups to the request */
-+	queue_push_tail(req->data.setups, setup);
-+
-+	for (entry = queue_get_entries(links); entry;
-+							entry = entry->next) {
-+		struct bt_bap_stream *stream = entry->data;
-+
-+		queue_push_tail(req->data.setups,
-+				bap_find_setup_by_stream(data, stream));
-+	}
-+
- 	queue_push_tail(adapter->bcast_pa_requests, req);
- }
- 
-@@ -2647,6 +2672,15 @@ static void bap_state_bcast_src(struct bt_bap_stream *stream, uint8_t old_state,
- 	}
- }
- 
-+static bool link_enabled(const void *data, const void *match_data)
-+{
-+	struct bt_bap_stream *stream = (struct bt_bap_stream *)data;
-+	uint8_t state = bt_bap_stream_get_state(stream);
-+
-+	return ((state == BT_BAP_STREAM_STATE_ENABLING) ||
-+			bt_bap_stream_get_io(stream));
-+}
-+
- static void bap_state_bcast_sink(struct bt_bap_stream *stream,
- 				uint8_t old_state, uint8_t new_state,
- 				void *user_data)
-@@ -2680,7 +2714,17 @@ static void bap_state_bcast_sink(struct bt_bap_stream *stream,
- 			setup_io_close(setup, NULL);
- 		break;
- 	case BT_BAP_STREAM_STATE_ENABLING:
--		setup_create_io(data, setup, stream, defer);
-+		/* Create stream io if not already created and if no
-+		 * link has been enabled or started.
-+		 *
-+		 * The first enabled link will create and set fds for
-+		 * all links.
-+		 */
-+		if (!bt_bap_stream_get_io(stream) &&
-+			!queue_find(bt_bap_stream_io_get_links(stream),
-+							link_enabled, NULL))
-+			setup_create_io(data, setup, stream, defer);
-+
- 		break;
- 	}
- }
-@@ -3044,63 +3088,69 @@ static int pa_sync(struct bap_bcast_pa_req *req)
- 	return 0;
- }
- 
--static void iso_do_big_sync(GIOChannel *io, void *user_data)
-+static void append_setup(void *data, void *user_data)
- {
--	GError *err = NULL;
--	struct bap_bcast_pa_req *req = user_data;
--	struct bap_setup *setup = req->data.setup;
--	struct bt_bap *bt_bap = bt_bap_stream_get_session(setup->stream);
--	struct btd_service *btd_service = bt_bap_get_user_data(bt_bap);
--	struct bap_data *data = btd_service_get_user_data(btd_service);
--	struct sockaddr_iso_bc iso_bc_addr;
--	struct bt_iso_qos qos;
--	char *path;
--	int bis_index = 1;
-+	struct bap_setup *setup = data;
-+	struct sockaddr_iso_bc *addr = user_data;
-+	char *path = bt_bap_stream_get_user_data(setup->stream);
-+	int bis = 1;
- 	int s_err;
- 	const char *strbis = NULL;
- 
--	DBG("PA Sync done");
--
--	if (setup->io) {
--		g_io_channel_unref(setup->io);
--		g_io_channel_shutdown(setup->io, TRUE, NULL);
--		setup->io = io;
--		g_io_channel_ref(setup->io);
--	}
--
--	/* TODO
--	 * We can only synchronize with a single BIS to a BIG.
--	 * In order to have multiple BISes targeting this BIG we need to have
--	 * all the BISes before doing bt_io_bcast_accept.
--	 * This request comes from a transport "Acquire" call.
--	 * For multiple BISes in the same BIG we need to either wait for all
--	 * transports in the same BIG to be acquired or tell when to do the
--	 * bt_io_bcast_accept by other means
--	 */
--	path = bt_bap_stream_get_user_data(setup->stream);
--
- 	strbis = strstr(path, "/bis");
--	if (strbis == NULL) {
-+	if (!strbis) {
- 		DBG("bis index cannot be found");
- 		return;
- 	}
- 
--	s_err = sscanf(strbis, "/bis%d", &bis_index);
-+	s_err = sscanf(strbis, "/bis%d", &bis);
- 	if (s_err == -1) {
- 		DBG("sscanf error");
- 		return;
- 	}
- 
--	DBG("Do BIG Sync with BIS %d", bis_index);
-+	DBG("Do BIG Sync with BIS %d", bis);
-+
-+	addr->bc_bis[addr->bc_num_bis] = bis;
-+	addr->bc_num_bis++;
-+}
-+
-+static void setup_refresh_qos(void *data, void *user_data)
-+{
-+	struct bap_setup *setup = data;
-+
-+	setup->qos = *bt_bap_stream_get_qos(setup->stream);
-+}
-+
-+static void iso_do_big_sync(GIOChannel *io, void *user_data)
-+{
-+	GError *err = NULL;
-+	struct bap_bcast_pa_req *req = user_data;
-+	struct queue *setups = req->data.setups;
-+	struct bap_setup *setup = queue_peek_head(setups);
-+	struct bap_data *data = req->bap_data;
-+	struct sockaddr_iso_bc iso_bc_addr = {0};
-+	struct bt_iso_qos qos;
-+
-+	DBG("PA Sync done");
-+
-+	if (req->io) {
-+		g_io_channel_unref(req->io);
-+		g_io_channel_shutdown(req->io, TRUE, NULL);
-+		req->io = io;
-+		g_io_channel_ref(req->io);
-+	}
- 
- 	iso_bc_addr.bc_bdaddr_type = btd_device_get_bdaddr_type(data->device);
- 	memcpy(&iso_bc_addr.bc_bdaddr, device_get_address(data->device),
- 			sizeof(bdaddr_t));
--	iso_bc_addr.bc_bis[0] = bis_index;
--	iso_bc_addr.bc_num_bis = 1;
- 
--	/* Refresh qos stored in setup */
--	setup->qos = *bt_bap_stream_get_qos(setup->stream);
-+	/* Append each linked BIS to the BIG sync request */
-+	queue_foreach(setups, append_setup, &iso_bc_addr);
-+
-+	/* Refresh qos stored in setups */
-+	queue_foreach(setups, setup_refresh_qos, NULL);
-+
- 	/* Set the user requested QOS */
- 	memset(&qos, 0, sizeof(qos));
- 	qos.bcast.big = setup->qos.bcast.big;
-@@ -3142,10 +3192,7 @@ static void iso_do_big_sync(GIOChannel *io, void *user_data)
- static void pa_and_big_sync(struct bap_bcast_pa_req *req)
- {
- 	GError *err = NULL;
--	struct bap_setup *setup = req->data.setup;
--	struct bt_bap *bt_bap = bt_bap_stream_get_session(setup->stream);
--	struct btd_service *btd_service = bt_bap_get_user_data(bt_bap);
--	struct bap_data *bap_data = btd_service_get_user_data(btd_service);
-+	struct bap_data *bap_data = req->bap_data;
- 
- 	req->in_progress = TRUE;
- 
-@@ -3160,7 +3207,7 @@ static void pa_and_big_sync(struct bap_bcast_pa_req *req)
- 	}
- 
- 	DBG("Create PA sync with this source");
--	setup->io = bt_io_listen(NULL, iso_do_big_sync, req,
-+	req->io = bt_io_listen(NULL, iso_do_big_sync, req,
- 			NULL, &err,
- 			BT_IO_OPT_SOURCE_BDADDR,
- 			btd_adapter_get_address(bap_data->adapter->adapter),
-@@ -3171,7 +3218,7 @@ static void pa_and_big_sync(struct bap_bcast_pa_req *req)
- 			BT_IO_OPT_MODE, BT_IO_MODE_ISO,
- 			BT_IO_OPT_QOS, &bap_sink_pa_qos,
- 			BT_IO_OPT_INVALID);
--	if (!setup->io) {
-+	if (!req->io) {
- 		error("%s", err->message);
- 		g_error_free(err);
- 	}
 -- 
 2.43.0
 
