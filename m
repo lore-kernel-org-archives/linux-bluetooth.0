@@ -1,46 +1,46 @@
 Received: from EUR02-DB5-obe.outbound.protection.outlook.com (mail-db5eur02on2060.outbound.protection.outlook.com [40.107.249.60])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 901A81CACCE
-	for <linux-bluetooth@vger.kernel.org>; Thu, 24 Oct 2024 11:02:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E82B91C879E
+	for <linux-bluetooth@vger.kernel.org>; Thu, 24 Oct 2024 11:02:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.249.60
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729767779; cv=fail; b=OklHqMaBlGKDUI547F6h/TMp9/mSrj3a2JCWUF/idOzeqT59UoL9D34PpXxHJFYrgYg8xeX2CP8nZSH08Rza+7rszNAHO0dsabtvpWPk2NAeNEMZHyLQpNCQYAzrgmfnCcwygnU0vff8kwvoP3pXuDRP4tVi7Wb3zTrYgDW61to=
+	t=1729767783; cv=fail; b=RyOd08vpNr5k85eYcLShLVJekC6wn7ZGjKonWDM4Ovg8fWpj6nWlQ1CkWix3cdOSYzC9El6ndfweXTOlaIaxERXZgHkP3b9OgIYVdHfzVF7UxmHzpaKTXSkZtIfkSe2qio6njCkENwKZf3DNEir21fUsxw4UnJBnawBeklPZr1Q=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729767779; c=relaxed/simple;
-	bh=vGoYHrV9It3hSCFhh0q5y6vymuna8Qe7Qal+Y+1Ry5I=;
+	s=arc-20240116; t=1729767783; c=relaxed/simple;
+	bh=ucefT6OfmipidtrcCAGm5IVbEdm5IZbQNQOOVJ5jnR0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=WAtAfEiOs2REe95aA97JP4/KQZogeY1ewymdHSZA4D0vA4CaEZRaHvpk963QWT4QcuWiOO4J01hJb17GjYP/lyAS4eNXq1WqJAR2V1l9i6NcTgrwNrYiSg1pdegl6HX8UQq3uX4vVEPoEwe7Siho9IlOkT7/Z2EDvnpSsiueoQU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=B286stF/; arc=fail smtp.client-ip=40.107.249.60
+	 Content-Type:MIME-Version; b=Te2QSPksE1unBpiDwWDkEOZPjNub21vtetGvK8nQDRgKNLcBZWZ9OAdLOQifP7cTm24bY6HU1hJGlEIZ0PhU3XqHvLKCeIVGdVn+ZVtf8StJm2cC+enThpVhNHcjlAtEs7YolNGU/cxKtHxhmH9ZAd7fZElFkUwsThzKxq8+H+E=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=k2croH/g; arc=fail smtp.client-ip=40.107.249.60
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="B286stF/"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="k2croH/g"
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=og2bSSwssZ1c94h//NB6fpJ3eJXtiaaojxyZsUQVqJZwICgiFR9LHEPZmCyMo1MNGA5WNuQ4bAw/u+IvYNttoLcZpmj4ePiMpxLYY9bSqznR2q9sZohuaGCOWvtajGeHaoFcBEX7RdKLl/g4cTlQOx0IzsjxyGBra++Igq5a8ZfByScuzgY5LNu84XvOlirlvmGvinLvDadgNJwmtpq20wYv3eV8l9d7j5tAxhRg6K9PrVtNwODc+VcYOno6pNOp1j0Me7sIsozHtO+5mTZVLpVcB/04jNg1E6PXIXnDia+hu3x7rNUJ6OqXc2RpXqlN0ViLzOGZ1sV0PX3jSW3MHA==
+ b=J2Yv7lUTNCAjDD0r4JhzmF8/nl4R2/UXoJvfpLtP11hvEyH1ClcOY6irpQGBuyZEQEWxuOqsbJV4zX2jwcuyV1cCNEPpURayIoS5x6zgkLRMQdBBT7x6OETtaGHc44wMOf+5edE4F8fH49yFZvEufYSMJmYgSPeCQcecqEoe64LP5Bu/3qIgSaGsFRIHVBunZjenzd2QE7TZxjnr01sph55AtP8oDwE+qZ7IGHoj2SnWSfJe6a8U2jHdcGkU9qzVpd3Hr+n0KBQnnSgnubhUoQS2bLlLB9gA2DmWOwo3SPVa+5qT032es3/2qMp84qy2xJeGYR/FO/asRuNDwE2tCQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=JwtOVH5eehtjp/++jGhxfvvjytHVqR+38TKX8bsnJdc=;
- b=ouitVyBwRVhPEmp6io4tqUjQ+deGbowLEGgk1SCD01WbBwbVOLXA6Qz1xjjkT4C5FgM6frejqjDGRhD36aH8nM6yd5IcKInhmSolcttuDGu3hqakZCnOhR0OZHxgGdx9QvdXZz5orm5glbxcYZ7JwI3lOgebHQR4zfk6OUMlxCBpSc3Zehv1tREND/KnXpZTICujly3zmKcUkbVcW2IAqx75n5/x3rSVhbbkSpsWwWjI30lCon47z5LNm8NVYJMpOhaRwFmyPEjo3b69WQg6DXCDSfAE95iUDjiq+BXbZk21c99lqr4q0TWIJOVYP0kFl639yF6TrzS6B+hT4IYdvw==
+ bh=GGv+Jqne9+oFo07LZMbU2TJ4o4hsoXrrxD4gv2nRhI8=;
+ b=CKgeSYSn0AXc+y0jNbescu5xnDrDHj5zNq2r/046ywzXs2ruKuxiuND9gMDiruyLUCjjr094nfZWlBew0fRJrkxu18svRE0eEwYPQfDqRJnu1qmv8+0W/gqt5Z98CDOmlQ+Gi5zrndh9cBo/DwNkd9bTKAzzzVMzDu1duKmzyBss57/sfAQf6YdJv9GRddL6AOIGZtSd/WrdogPGRG8pf3Trd0M+eKd6reSkPRMjRiL/ziUtP7cwSu2ra6zw9C5O/77aTePB57nxituY0Lw0C1ozt0j1ILdLK5fbv6aJYk7agUYmGHdQoKQfu93SZPmoUwkH/gOe73wFerxjX/8F4A==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
  header.d=nxp.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=JwtOVH5eehtjp/++jGhxfvvjytHVqR+38TKX8bsnJdc=;
- b=B286stF/ws8cidl74L9EFJb13D4dXLvFrtPcGr0qHhxxJWUXoy6kEzsaC69EBiJ4XwEBo5sWhHrczsCWAcTnfUlzS/gS3Kh+Cucy+3R2M1gYt8UqN5RK2+0DLHVBJ8NKalGRacSYPviPxzMXAAg2kJPrCgD64OD0tm3yNRSj9ioyvX7aO0+C21zmrmjxdb/ZRYC6+BOa2l/+cytjzK6wZ3fCrVtTbwjwzu6H6Qc6iKzpTrFknsoX0SsWJZl52Bc++LIDLqXyJkW4IWvrrt2JMO5FXrNrW4PiO9Vym3/KwqZgwyfvMA8G0weJdJdoCTaCbK+vfcvID0B16uaUvGHprg==
+ bh=GGv+Jqne9+oFo07LZMbU2TJ4o4hsoXrrxD4gv2nRhI8=;
+ b=k2croH/gnqtG83oSVcqzU75XCKlXIeqleXOCKSSHi2+7Ohe6vFhlk1Fnc3DBKNuWACl556Ase+WKKwLFfuA/gpmmd21/WNKov9frWyXp7WpFMiIu6sc2sS/CLR47ppoFLcMmDboiJHadAebILMGC3WpVnQWoPu3tBvzRIWr6j26AmiIbNqEStb62t/awM4dhVf96MU3PhCwmeaHvrhVnLAlwK7nskdozxBhgP8ycke2gF9Ylg86uLw70ugx1yN4gPiqVV8Lzr7uh1WH+1qULhoaN9xeNrxLk0YyYhpxc418zkqUP+GUBU2QNQoExXSBpzuqebmaFDpralfoDeEeUgg==
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=nxp.com;
 Received: from AS8PR04MB8898.eurprd04.prod.outlook.com (2603:10a6:20b:42d::15)
  by AS4PR04MB9622.eurprd04.prod.outlook.com (2603:10a6:20b:4cc::20) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8069.26; Thu, 24 Oct
- 2024 11:02:52 +0000
+ 2024 11:02:54 +0000
 Received: from AS8PR04MB8898.eurprd04.prod.outlook.com
  ([fe80::5e22:869c:33c:9654]) by AS8PR04MB8898.eurprd04.prod.outlook.com
  ([fe80::5e22:869c:33c:9654%4]) with mapi id 15.20.8093.014; Thu, 24 Oct 2024
- 11:02:52 +0000
+ 11:02:54 +0000
 From: Iulia Tanasescu <iulia.tanasescu@nxp.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: claudia.rosu@nxp.com,
@@ -48,9 +48,9 @@ Cc: claudia.rosu@nxp.com,
 	andrei.istodorescu@nxp.com,
 	luiz.dentz@gmail.com,
 	Iulia Tanasescu <iulia.tanasescu@nxp.com>
-Subject: [PATCH BlueZ 01/14] shared/bap: Allow multiple links per stream
-Date: Thu, 24 Oct 2024 14:02:10 +0300
-Message-ID: <20241024110223.77254-2-iulia.tanasescu@nxp.com>
+Subject: [PATCH BlueZ 02/14] shared/bap: Add support for handling broadcast links
+Date: Thu, 24 Oct 2024 14:02:11 +0300
+Message-ID: <20241024110223.77254-3-iulia.tanasescu@nxp.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20241024110223.77254-1-iulia.tanasescu@nxp.com>
 References: <20241024110223.77254-1-iulia.tanasescu@nxp.com>
@@ -67,358 +67,223 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: AS8PR04MB8898:EE_|AS4PR04MB9622:EE_
-X-MS-Office365-Filtering-Correlation-Id: 7ac12da1-13a4-497e-bd39-08dcf41b67c9
+X-MS-Office365-Filtering-Correlation-Id: 602b95a3-ceeb-4b81-55b3-08dcf41b6907
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
 	BCL:0;ARA:13230040|52116014|376014|1800799024|366016|38350700014;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?4ZFhdFUbEhXPHurTj+YdszQN8PNCoYqNAS+gtQ7FFG1F7+/BIhIWMrcuX1su?=
- =?us-ascii?Q?XOdK0n2ZJujni5q66nrolpcoPJLTSwn7FkU1QoY/Wl+rivyDJd27Q6BlMRuT?=
- =?us-ascii?Q?ucd00Xe275WS/30e9Pjd7FS4NbJ1I87WqwOKZ/F73dzCQ0F6NTw83fE1aSO3?=
- =?us-ascii?Q?fP8YxPP8uUZA1cVB1IJvQWkSGJlSEL0INnEt+xMnECpjXaZ+Q4xVodEqQWFr?=
- =?us-ascii?Q?xo0k+lQfejYwezgt0sXAlk2e21cBuuHfUy28PcZ8dn99ZnSS3+e3d1DfjhTm?=
- =?us-ascii?Q?CJSD+NTF7IFF175A+jqZ+zFjwnQyLOiyujiEAtHt3Hk3qA2mJTO4AiQaW4sq?=
- =?us-ascii?Q?jtbWlpZzj1A0DB8YS6PVJXApHEOXQYFrSOaxaLKMGX8W6FgxEw0qeLoXFNiq?=
- =?us-ascii?Q?dltszlHy1uZZDjCIOGX7YBkBA+UA6JAxXQF8r+aaq51p0HpD9p66BFyxXwuP?=
- =?us-ascii?Q?a0oYpV7XYfRMP4r9vIvdTxaFoPnLgMYmyHIJSH+w0eEC0lV2Xl+a5g+vcE4B?=
- =?us-ascii?Q?w+1mMvAJgl9S3mviT7LE9QsERXpfigwNz374S7rHTr06dQ5pMfl11zR3iBkP?=
- =?us-ascii?Q?NQXuk0LEhd1sxgBudU+vk5LsuTweQhV58bVyi+tpcmhYz4KPIPhCz30Kwsac?=
- =?us-ascii?Q?bjXC1xS0WqB+Dwc2oi87ftzLR5KrgAxjS221Zyvhf/eip09A8CYAv4SEnJj8?=
- =?us-ascii?Q?VB1bEQTImOfb5TeWF1ZQtrGP2TF7M4zEEvG+G0uSCMGBkhbvRw9lOH1Zfmzc?=
- =?us-ascii?Q?zl/9ePG6nWfbzBCLOAy6CaXWpPQ53+FT4Pg6TdElvnJ2B8/6gt0GwGUDQ/B4?=
- =?us-ascii?Q?OsfpA4tzCX5w7qkijdlnHlXVNh9yJc8H7qPcQo4J9iJxHGcdsoJFpFASyFcR?=
- =?us-ascii?Q?ws87Xjwv9Q/jIssa5hJS1q60jf54F9CS/kvweNOJ3rlhM4A4Ak0NE9buNJdT?=
- =?us-ascii?Q?aBnh7gqhafkv1Q+tm2OzAVAICRZURhaw1wz0dj2vZxgZvf0kf7YidSErwgmQ?=
- =?us-ascii?Q?HXf/BBZmNJ6xKhXJIA0VTcYVoc9Wa5R8JNxm12x9LllHHm3oHXnqrv79ARmJ?=
- =?us-ascii?Q?nA4rN4Vffvss5jf3/C0l/fc4L+vx54WFJ+yLz+7WTyV+tCACNYLWRoalc25n?=
- =?us-ascii?Q?Zl/boEOO6ewbD3GuD0RNbPqPTQdhN0CQWTImN+RbvwGJAMrjjiBja9Q+XGYK?=
- =?us-ascii?Q?IAMb7PJs8lrEw7HOXZRcKjvqNaEBGGHPBW/uBTQ9eBQSAxQMLogqNRmM7NWQ?=
- =?us-ascii?Q?+DR38LytY7wGjwOSNonvOABvuVNTilum7wOwcKUQZdEVQ6EgCHggMTmdxZAb?=
- =?us-ascii?Q?/yfq9WvezonGFXSQnQo4F+BuO/CZHKKKc2v+D1xNyc10oINKpiW3uXhuQscU?=
- =?us-ascii?Q?z1cOZFQ=3D?=
+	=?us-ascii?Q?reej14q6oI23S+gSXFKoIXwr/wlwgPPRG5php9qPJ147SMizrtVcFuypiOGk?=
+ =?us-ascii?Q?cpaDTSGy3v1d1XxZLLuFc73oBQ/24heaALsHZu6220y3eMRUQgc/ThyhOhC2?=
+ =?us-ascii?Q?fi+6Sz38PxagCsbq5lfJbKOQwcNP6BZQsrslBdwh59KUyCQVMiqx343TFlmj?=
+ =?us-ascii?Q?4WWLKwatBrlcOlRbfs99o8g+owrkqa6xEReHLugJ43ukON2JRucBhsAveGhm?=
+ =?us-ascii?Q?xRhsnrO08sIRfZ53k8BRB5a3XByJbCfA2PbMXn42ICkE+sWpvwkT/e+hhkxg?=
+ =?us-ascii?Q?xkIurfJNC9xto57UUqumS48/AodLuIccrAN5+39jW3kDk0N28PoCxe+THhpm?=
+ =?us-ascii?Q?JJN+N8KthcA1lW1WYNYKvH8eWsNzqbt4X3A8jsQmcidCwSIOY7Zh0ojrarj3?=
+ =?us-ascii?Q?FIeXyo27zm0XQjpoHi0SVxCpal4E5zQ0KUPq7FnCVIGgX3IaG5B9lhRH2X1g?=
+ =?us-ascii?Q?PqMdGXaF8xysYEl6aD0QD0j3J2IgFYKADXACRb+U8YdLH1zWclPj0iVr2FKr?=
+ =?us-ascii?Q?wO5LdrNzJl5g8EmtPjpAYiI3elLUw4hGeUjcjl801Hn4mV+uPpvqeubND2mX?=
+ =?us-ascii?Q?z6dVJVQ0wKBiOVKx0IIcoQ7UKo41NfHgkBfRqDgOCZc9YH4/V/7zHYaKddHD?=
+ =?us-ascii?Q?xY1cR6qiy6//AkS17vGAGem2OnH1q5pmrD6KthJg0A9bH+FpBDxDi2noj35C?=
+ =?us-ascii?Q?BaBGHbtUaJ4ELQEagwmMkkhPE+4hNPcWmEszFEgfuClS+/qfrWh7Xc0S9Nvq?=
+ =?us-ascii?Q?lgRqWaVbe2qdsA7cTOGrt5vayKfaKcv1ozYES4Gg8scaPmK+OFvsNP3wA+Sx?=
+ =?us-ascii?Q?Wf2+M3i+/ZRpg59KbiTz0DrrHo1hSJ8IvTeHBRrzeuzC7ZY1qTXc1TehQzSG?=
+ =?us-ascii?Q?1fMlbdCoxYIZ9sgdPCjHANXGPL7pRqjlYkLynUmPXlij5J6c3ZzD90p5sOc3?=
+ =?us-ascii?Q?XwRbX4OhnAt2TlIY6QbWJZctur1P6VuSb1bhKMr4QKUjxkQ/ZtYkPVY+Aar6?=
+ =?us-ascii?Q?sJEsaXLQB2h1B9Onmp3DJ6RnN6UyVxBQMHSgy0eXWDrwoIhyGgfIX177g3qJ?=
+ =?us-ascii?Q?L3fFKFFdwbFQdoECuZb9p9dQ1s8N15t36bbNIrSIf2lHfBNGPkDEHaNYp76s?=
+ =?us-ascii?Q?IVgpDsswXilHEZ70epfWAn4//XMWLoVLXBcFc8KQCHsawpS9UrKTFNIdKVwY?=
+ =?us-ascii?Q?CezlnRvYMsxBkuqbkaYw/p5SZGFY2c209bOEFTbrQ7WUTwIRUJV8QTL/PMWA?=
+ =?us-ascii?Q?JJM/9g91ahsnf6CDFjihSz6gYFjGQhpFPq64WWC+/8B5/MESFR5TJb5u0960?=
+ =?us-ascii?Q?93/NJOMw+6YPGhAAr2P/OJNZHjWJ/JP6WZjWDRZf04yIiVU3vGr0sznZ2zAR?=
+ =?us-ascii?Q?eSX1kfk=3D?=
 X-Forefront-Antispam-Report:
 	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AS8PR04MB8898.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(52116014)(376014)(1800799024)(366016)(38350700014);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?jQcFkoutC4NOAU4+858RFj+wZodOa8FrhnZtFYAE1w+c2GHNhbDxIhszA4LI?=
- =?us-ascii?Q?/PfTcRVO9xHuM2H6Ql3CR3qc+YHHsQ1yw8D3QkTCNsqWF3MJGOhIFWwmzrg4?=
- =?us-ascii?Q?dzvOxvHtrH5zVWXdATHtgj5o+hOEZqk0crQ+ERu0Tnj0UphYqQK9mJWv3AKD?=
- =?us-ascii?Q?8pI61I160jovcyk57ymGlvc8knZHxrv5AnZ4LD9NJyMeuxOtbV2gpv7LnHFP?=
- =?us-ascii?Q?vnff+Xsj4/SgISNvW9GD4rWnrEBAPbu0I/ta3llx+ge39Cg+zuj4XOacMdx4?=
- =?us-ascii?Q?O6V2sMxImC4t1ifgcl+QBBdgiJ0oZQIZiGUcwWgERV9GqvjHRl7ODtMc0nGT?=
- =?us-ascii?Q?QjfkpOpaTqKdbl1MuPywmITXsgOe63FxYh3sCPZCSAVOYLXuBg5ZAlheWnGE?=
- =?us-ascii?Q?a+qrlCY6dTY3ySMNJK2XefdE/p7ytq0UicHyijNozJSRQPul6D+TkMyk6ve4?=
- =?us-ascii?Q?gCmumgwVwByE5Q8XZlBv6HdudAgcXTsqneswEaC4lNevpZrE22qVjI6vsyvY?=
- =?us-ascii?Q?RB0hgjL+U7mBwqvEMXZvvBTi9/2lih9rmy99Io3yI+OiVbXM6bsup72C3Iin?=
- =?us-ascii?Q?9EhKU8kcleZi9g2QKgGUPepHPv4Vmt9Mi4SBOfS4hZdQG9HhGmGknSomXLD6?=
- =?us-ascii?Q?dpG3DNLhBiWzWQxAKgQDzyhM6P21rD3U8N3ogGHS5tVBlrWlTWEfZbaacuMa?=
- =?us-ascii?Q?fe9CAyPwWzE1oOA2QHaZEuejzflIiWnJ/iE5siDLSjBRCG9rWYjHxmSbfRaf?=
- =?us-ascii?Q?XUIiyKvIIgVslG34+UdDveigtvqrXJy1+Z24P70QO2quzzjP0k3q73TKorry?=
- =?us-ascii?Q?F6bs4HxTsiWWdFgou9UZBrT9TYZR/txIFDxk3OYg9bJOaxdaxW+KPJMe3Na+?=
- =?us-ascii?Q?4fYpEo/OS7ZvBPEsmvhrBq7hf4DcFyRWa/MwCVvHmZKb/58vf849J0+GvDAA?=
- =?us-ascii?Q?DxZBlzptG0El2CTQwayCK3XZhpM+vQN6v+LX9FLJcRnRWrvJx+Ou59AdI7C3?=
- =?us-ascii?Q?fU4Fnkko5w/mohPOqtjzH62pZg/03BE2speC/R0PS4aMpOSpqEYE5eCmpYXi?=
- =?us-ascii?Q?1zDGaLkD/ZZsuEQ+Ya/Am4N03QS+PsHDJdvGzewMYFQppHlIdv856HSYzcmw?=
- =?us-ascii?Q?X0Rur6joDfX8L6Xp1P09Nne6rDLvL8EDh6dk4KsyTAX+nFNfcUVnge2mYMwE?=
- =?us-ascii?Q?mcjxXOIJyOLeM5E1rOAy+6VQ8b8+7IRgp43/Ec3CSxGKVWD5w3xcTUrtH9XG?=
- =?us-ascii?Q?xUHeqQTCpWk4o9pdeCMalhoR2bgSCnIj0MowFlwSQro8rwrYsW26cTHhvH3i?=
- =?us-ascii?Q?pVPhehzDzfI3zVtsxT850XTpODybp3qYbANMDh0kiQhzVJ9RRYFfRlwvRWZp?=
- =?us-ascii?Q?dZuWtfH1GYGRPQ8SpwgAC/ODhB+i38S13YOrZoP8O8/nR5tZZSbcAgqRO1cL?=
- =?us-ascii?Q?Mw9Sj5wzSWJGXBykaVTGykKjuA2MiH5AvCeyFdXHZauoqfGod4C0ECbD94Mm?=
- =?us-ascii?Q?EBMwQUwZ8NjQbkqSBnxVv1oWMKdk/5ZcdSokVcs4CYDpZssGsLTJMwJMlJ6y?=
- =?us-ascii?Q?ySSyjAZrPn+ZsPNWVYbjF0J824Z6K38Y1BOT7RBKqTm705p0SfDXhJVJT2/M?=
- =?us-ascii?Q?xw=3D=3D?=
+	=?us-ascii?Q?1LBUjcIAxbBHlGec0QYe4OvZiWf9VbF2k4LsDW/gGh07RbX82TPVk37IlYKV?=
+ =?us-ascii?Q?VPsvM4mfNOspb15+rWSw9IbkThVQ8nHMpBcvSMd6oWcabwemUBI68oRUkO9+?=
+ =?us-ascii?Q?nBFThHi+WXumFR3+/fb0sxLb/FhxQ8WNZBt6utFbWxKzwijqDjPuXkeJDCL7?=
+ =?us-ascii?Q?tiYsxz54MbhCCigSShtaaXj3A9ktqqmaNcPR8rLJvdm+VsFd5nTgJECWbkmK?=
+ =?us-ascii?Q?FkV1nQCbA9PfkA7+ZRkYpiKioMS6mfdQUDuJ+Qd2+RX7u3JKSyH4jwKNWk2O?=
+ =?us-ascii?Q?4EP4le+xE2lhq4BmxC+zgcMMK9c9ybBVwWXQaZoDJTpZX2t4qqnP0ZfwmDh2?=
+ =?us-ascii?Q?z5GoXaODT4yOU+nNiVfhUKYCCTRDYFrMOIJm7yjuJj8B0Yz2PgVQ48jFIocd?=
+ =?us-ascii?Q?lT+Rfz/CIyuSN52b3odAFPpiizs5Yih4r0ZOu9uo8tJtQA/pUSSPkMtjJXQ3?=
+ =?us-ascii?Q?BCD7GTNudpoxkIBjOjwCTiWxqMgTHw6PrQ7ZZgkicOGlqu5Y1d0R/rWCM3ly?=
+ =?us-ascii?Q?3LEZAmIHr80Iqkg68lR5ZeX/tMuS3AMNk9d6jqtbsoTQMs6gfngX0qJhPm40?=
+ =?us-ascii?Q?lo36RdRepdrDDK/qUSGjJ5AJf3P3b4AUJupbO0wRR5ce9UPc2ez88r1MsK3v?=
+ =?us-ascii?Q?1yjlqUBHeiXIC/5ussDWoVHm1sLO0tujZ/r3CEbmIwrvd1b03KbeI84WEYEX?=
+ =?us-ascii?Q?0ds4e6zn3YfFaY2srvZE0kbqw+dDU1UBROkVaMdH8XgRRZPQ0A2+JIKTAVCw?=
+ =?us-ascii?Q?wdHu3bxwy0FAwMUWzZdcs7kD5usnNpzPyiyxVBcRHYq2Bhg1vD2dbs9OhXJ7?=
+ =?us-ascii?Q?qt49PtgSv/kYTzqCiJTOOV01LoBsGw8XaaUqnwmuGSIRGl2KYZT9hxYykfOW?=
+ =?us-ascii?Q?sIkK+Qc0bPhF2QXproy56y+0f3tv7wKR8lFZYQtEJNN6BEddS8VRwmrlwhRF?=
+ =?us-ascii?Q?d2TVyNissDrGp2kldLDinaEOlj7d7ACuNwygxSMA2M8HlZQ9+UJApF4q2Hpt?=
+ =?us-ascii?Q?XeSY15PLVgEwNRXpn6g7Tt5xKh9NK0zLeixCBaUoa8IgPwTARevPpHQYBp9W?=
+ =?us-ascii?Q?XaRlsagdEq3rycAPU1FKhlp3ldv16S4dzlhwUtOb0psQZWlLAaCOvtXlZSQA?=
+ =?us-ascii?Q?Nz3ItznAIdm2msMR0a3w87nd1Djq9ZgA5cFN/v5ScuRTuHHctti7fl4ng9Zn?=
+ =?us-ascii?Q?CKIj1QBROZiEqQQ/Fz8viSY04xV8dEhoD9MuZ81OJRJsYrzK0xs4MV20HWvp?=
+ =?us-ascii?Q?C3GTmZmeKg78ElNuALpc2rGRIUhurtxBgYDYXrY1jnFssLGAFwllifNNztCD?=
+ =?us-ascii?Q?KP2CTCSWFyKJJlX23GigS1ZYX3OI84FX54EHEvgBr4FYHsTC2GEoSxWDTUEi?=
+ =?us-ascii?Q?y7jwpiFq9M2YxPf1ZGg8y7x4Zhg332XR13aIHahSUtFjvi27TcRuZ+AxJ7M9?=
+ =?us-ascii?Q?kB1mVjygzu2F9rqnrpa71MJnpWCsrKdV2mFWR1Q0RAPxPWWjLaR6Y9kYWyhh?=
+ =?us-ascii?Q?jgpHRAg+30iNEOglBlxKJXQBo5urfchujb49rFyKA90EEel+5tGD+Dmc2B66?=
+ =?us-ascii?Q?XihU8WbyV0nsh+N4pYYjKErnVdLJD8OrJ50tT69vPKUPu9CWpIlqpovcTBZm?=
+ =?us-ascii?Q?Iw=3D=3D?=
 X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7ac12da1-13a4-497e-bd39-08dcf41b67c9
+X-MS-Exchange-CrossTenant-Network-Message-Id: 602b95a3-ceeb-4b81-55b3-08dcf41b6907
 X-MS-Exchange-CrossTenant-AuthSource: AS8PR04MB8898.eurprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Oct 2024 11:02:52.3868
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Oct 2024 11:02:54.5767
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 3c+QPECeKMpQbmaMKNv5DbGDIWMLw1pDry1T3qIcByliMelLTGk4lrkdmF/1Cclaf83zTJ8EtipQpF9YRQ8m0Q==
+X-MS-Exchange-CrossTenant-UserPrincipalName: eSTLMQp/6JNRQv1X0Xz4oYuxRFwBeqM2CM7OZaoSF3Uk/7IVRWx93/l/pDIyzic6cCYr7SLqnsk7oIWM4TTnyg==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS4PR04MB9622
 
-This commit adds support to link multiple streams together, creating
-the foundation for implementing broadcast links: for Broadcast Sinks,
-the user could select multiple streams to receive audio from. All
-selected streams need to be linked together and considered when
-creating BIG sync.
----
- profiles/audio/transport.c |  38 ++++++--------
- src/shared/bap.c           | 104 +++++++++++++++++++++++++++++--------
- src/shared/bap.h           |   2 +-
- 3 files changed, 97 insertions(+), 47 deletions(-)
+This commit implements io handling functions as stream ops, since
+broadcast links need to be handled differently than unicast:
+Unicast links share the same IO, while broadcast links stand for
+separate BISes with independent IOs. Unicast links have different
+directions, while broadcast links share the same one.
 
-diff --git a/profiles/audio/transport.c b/profiles/audio/transport.c
-index 68192bae6..d71013077 100644
---- a/profiles/audio/transport.c
-+++ b/profiles/audio/transport.c
-@@ -330,12 +330,9 @@ static void transport_bap_remove_owner(struct media_transport *transport,
- {
- 	struct bap_transport *bap = transport->data;
- 
--	if (bap && bap->linked) {
--		struct bt_bap_stream *link;
--
--		link = bt_bap_stream_io_get_link(bap->stream);
--		linked_transport_remove_owner(link, owner);
--	}
-+	if (bap && bap->linked)
-+		queue_foreach(bt_bap_stream_io_get_links(bap->stream),
-+				linked_transport_remove_owner, owner);
- }
- 
- static void media_transport_remove_owner(struct media_transport *transport)
-@@ -581,12 +578,9 @@ static void transport_bap_set_owner(struct media_transport *transport,
- {
- 	struct bap_transport *bap = transport->data;
- 
--	if (bap && bap->linked) {
--		struct bt_bap_stream *link;
--
--		link = bt_bap_stream_io_get_link(bap->stream);
--		linked_transport_set_owner(link, owner);
--	}
-+	if (bap && bap->linked)
-+		queue_foreach(bt_bap_stream_io_get_links(bap->stream),
-+				linked_transport_set_owner, owner);
- }
- 
- static void media_transport_set_owner(struct media_transport *transport,
-@@ -1129,14 +1123,14 @@ static gboolean get_links(const GDBusPropertyTable *property,
- {
- 	struct media_transport *transport = data;
- 	struct bap_transport *bap = transport->data;
--	struct bt_bap_stream *link = bt_bap_stream_io_get_link(bap->stream);
-+	struct queue *links = bt_bap_stream_io_get_links(bap->stream);
- 	DBusMessageIter array;
- 
- 	dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY,
- 					DBUS_TYPE_OBJECT_PATH_AS_STRING,
- 					&array);
- 
--	append_link(link, &array);
-+	queue_foreach(links, append_link, &array);
- 
- 	dbus_message_iter_close_container(iter, &array);
- 
-@@ -1572,15 +1566,15 @@ static bool match_link_transport(const void *data, const void *user_data)
- static void bap_update_links(const struct media_transport *transport)
- {
- 	struct bap_transport *bap = transport->data;
--	struct bt_bap_stream *link = bt_bap_stream_io_get_link(bap->stream);
-+	struct queue *links = bt_bap_stream_io_get_links(bap->stream);
- 
--	if (bap->linked == (!!link))
-+	if (bap->linked == !queue_isempty(links))
- 		return;
- 
--	bap->linked = link ? true : false;
-+	bap->linked = !queue_isempty(links);
- 
- 	/* Check if the links transport has been create yet */
--	if (bap->linked && !match_link_transport(link, NULL)) {
-+	if (bap->linked && !queue_find(links, match_link_transport, NULL)) {
- 		bap->linked = false;
- 		return;
- 	}
-@@ -1757,15 +1751,13 @@ static void transport_bap_set_state(struct media_transport *transport,
- 					transport_state_t state)
- {
- 	struct bap_transport *bap = transport->data;
--	struct bt_bap_stream *link;
- 
- 	if (!bap->linked)
- 		return;
- 
--	link = bt_bap_stream_io_get_link(bap->stream);
--
--	/* Update link */
--	link_set_state(link, UINT_TO_PTR(state));
-+	/* Update links */
-+	queue_foreach(bt_bap_stream_io_get_links(bap->stream), link_set_state,
-+							UINT_TO_PTR(state));
- }
- 
- static void bap_state_changed(struct bt_bap_stream *stream, uint8_t old_state,
+This also adds a function for unlinking broadcast streams.
+---
+ src/shared/bap.c | 336 ++++++++++++++++++++++++++++++++++++++++-------
+ src/shared/bap.h |   2 +
+ 2 files changed, 291 insertions(+), 47 deletions(-)
+
 diff --git a/src/shared/bap.c b/src/shared/bap.c
-index 00c3b9ff6..1b70df4d5 100644
+index 1b70df4d5..ddf8ab84d 100644
 --- a/src/shared/bap.c
 +++ b/src/shared/bap.c
-@@ -262,7 +262,7 @@ struct bt_bap_stream {
- 	struct iovec *cc;
- 	struct iovec *meta;
- 	struct bt_bap_qos qos;
--	struct bt_bap_stream *link;
-+	struct queue *links;
- 	struct bt_bap_stream_io *io;
- 	const struct bt_bap_stream_ops *ops;
- 	uint8_t old_state;
-@@ -1101,6 +1101,14 @@ static void stream_io_unref(struct bt_bap_stream_io *io)
- 	stream_io_free(io);
- }
+@@ -252,6 +252,13 @@ struct bt_bap_stream_ops {
+ 	unsigned int (*release)(struct bt_bap_stream *stream,
+ 				bt_bap_stream_func_t func, void *user_data);
+ 	void (*detach)(struct bt_bap_stream *stream);
++	bool (*set_io)(struct bt_bap_stream *stream, int fd);
++	struct bt_bap_stream_io* (*get_io)(struct bt_bap_stream *stream);
++	uint8_t (*io_dir)(struct bt_bap_stream *stream);
++	int (*io_link)(struct bt_bap_stream *stream,
++					struct bt_bap_stream *link);
++	int (*io_unlink)(struct bt_bap_stream *stream,
++					struct bt_bap_stream *link);
+ };
  
-+static void bap_stream_unlink(void *data, void *user_data)
-+{
-+	struct bt_bap_stream *stream = data;
-+	struct bt_bap_stream *link = user_data;
+ struct bt_bap_stream {
+@@ -324,6 +331,13 @@ static struct queue *bap_db;
+ static struct queue *bap_cbs;
+ static struct queue *sessions;
+ 
++static void bap_stream_set_io(void *data, void *user_data);
++static void stream_find_io(void *data, void *user_data);
++static void bap_stream_get_dir(void *data, void *user_data);
++static struct bt_bap_stream_io *stream_io_ref(struct bt_bap_stream_io *io);
++static int bap_bcast_io_unlink(struct bt_bap_stream *stream,
++				struct bt_bap_stream *link);
 +
-+	queue_remove(stream->links, link);
-+}
-+
- static void bap_stream_free(void *data)
+ static bool bap_db_match(const void *data, const void *match_data)
  {
- 	struct bt_bap_stream *stream = data;
-@@ -1110,8 +1118,8 @@ static void bap_stream_free(void *data)
- 	if (stream->ep)
- 		stream->ep->stream = NULL;
- 
--	if (stream->link)
--		stream->link->link = NULL;
-+	queue_foreach(stream->links, bap_stream_unlink, stream);
-+	queue_destroy(stream->links, NULL);
- 
- 	stream_io_unref(stream->io);
- 	util_iov_free(stream->cc, 1);
-@@ -1246,6 +1254,17 @@ static void bap_stream_update_io_links(struct bt_bap_stream *stream)
- 	queue_find(bap->streams, bap_stream_io_link, stream);
- }
- 
-+static bool match_stream_io(const void *data, const void *user_data)
-+{
-+	const struct bt_bap_stream *stream = data;
-+	const struct bt_bap_stream_io *io = user_data;
-+
-+	if (!stream->io)
-+		return false;
-+
-+	return stream->io == io;
-+}
-+
- static bool bap_stream_io_detach(struct bt_bap_stream *stream)
- {
- 	struct bt_bap_stream *link;
-@@ -1259,7 +1278,7 @@ static bool bap_stream_io_detach(struct bt_bap_stream *stream)
- 	io = stream->io;
- 	stream->io = NULL;
- 
--	link = stream->link;
-+	link = queue_find(stream->links, match_stream_io, io);
- 	if (link) {
- 		/* Detach link if in QoS state */
- 		if (link->ep->state == BT_ASCS_ASE_STATE_QOS)
-@@ -1803,6 +1822,14 @@ static unsigned int bap_bcast_config(struct bt_bap_stream *stream,
+ 	const struct bt_bap_db *bdb = data;
+@@ -2238,9 +2252,194 @@ static unsigned int bap_bcast_release(struct bt_bap_stream *stream,
  	return 1;
  }
  
-+static void bap_stream_enable_link(void *data, void *user_data)
++static bool bap_ucast_set_io(struct bt_bap_stream *stream, int fd)
 +{
-+	struct bt_bap_stream *stream = data;
-+	struct iovec *metadata = user_data;
++	if (!stream || (fd >= 0 && stream->io && !stream->io->connecting))
++		return false;
 +
-+	bap_stream_metadata(stream, BT_ASCS_ENABLE, metadata, NULL, NULL);
++	bap_stream_set_io(stream, INT_TO_PTR(fd));
++
++	queue_foreach(stream->links, bap_stream_set_io, INT_TO_PTR(fd));
++
++	return true;
 +}
 +
- static unsigned int bap_ucast_enable(struct bt_bap_stream *stream,
- 					bool enable_links, struct iovec *data,
- 					bt_bap_stream_func_t func,
-@@ -1821,9 +1848,7 @@ static unsigned int bap_ucast_enable(struct bt_bap_stream *stream,
- 	if (!ret || !enable_links)
- 		return ret;
- 
--	if (stream->link)
--		bap_stream_metadata(stream->link, BT_ASCS_ENABLE, data,
--					NULL, NULL);
-+	queue_foreach(stream->links, bap_stream_enable_link, data);
- 
- 	return ret;
- }
-@@ -1872,6 +1897,13 @@ static unsigned int bap_ucast_start(struct bt_bap_stream *stream,
- 	return req->id;
- }
- 
-+static void bap_stream_disable_link(void *data, void *user_data)
++static bool bap_bcast_set_io(struct bt_bap_stream *stream, int fd)
 +{
-+	struct bt_bap_stream *stream = data;
++	if (!stream || (fd >= 0 && stream->io && !stream->io->connecting))
++		return false;
 +
-+	bt_bap_stream_disable(stream, false, NULL, NULL);
++	bap_stream_set_io(stream, INT_TO_PTR(fd));
++
++	return true;
 +}
 +
- static unsigned int bap_ucast_disable(struct bt_bap_stream *stream,
- 					bool disable_links,
- 					bt_bap_stream_func_t func,
-@@ -1895,7 +1927,7 @@ static unsigned int bap_ucast_disable(struct bt_bap_stream *stream,
- 	}
- 
- 	if (disable_links)
--		bt_bap_stream_disable(stream->link, false, NULL, NULL);
-+		queue_foreach(stream->links, bap_stream_disable_link, NULL);
- 
- 	return req->id;
- }
-@@ -2327,18 +2359,30 @@ static struct bt_bap_stream_io *stream_io_new(struct bt_bap *bap, int fd)
- 	return stream_io_ref(sio);
- }
- 
-+static void stream_find_io(void *data, void *user_data)
++static struct bt_bap_stream_io *bap_ucast_get_io(struct bt_bap_stream *stream)
 +{
-+	struct bt_bap_stream *stream = data;
-+	struct bt_bap_stream_io **io = user_data;
-+
-+	if (*io)
-+		return;
-+
-+	*io = stream->io;
-+}
-+
- static struct bt_bap_stream_io *stream_get_io(struct bt_bap_stream *stream)
- {
 +	struct bt_bap_stream_io *io = NULL;
 +
- 	if (!stream)
- 		return NULL;
- 
- 	if (stream->io)
- 		return stream->io;
- 
--	if (stream->link)
--		return stream->link->io;
++	if (!stream)
++		return NULL;
++
++	if (stream->io)
++		return stream->io;
++
 +	queue_foreach(stream->links, stream_find_io, &io);
- 
--	return NULL;
++
 +	return io;
- }
- 
- static bool stream_io_disconnected(struct io *io, void *user_data);
-@@ -5846,8 +5890,7 @@ bool bt_bap_stream_set_io(struct bt_bap_stream *stream, int fd)
- 
- 	bap_stream_set_io(stream, INT_TO_PTR(fd));
- 
--	if (stream->link)
--		bap_stream_set_io(stream->link, INT_TO_PTR(fd));
-+	queue_foreach(stream->links, bap_stream_set_io, INT_TO_PTR(fd));
- 
- 	return true;
- }
-@@ -5902,7 +5945,8 @@ int bt_bap_stream_io_link(struct bt_bap_stream *stream,
- 
- 	bap = stream->bap;
- 
--	if (stream->link || link->link)
++}
++
++static struct bt_bap_stream_io *bap_bcast_get_io(struct bt_bap_stream *stream)
++{
++	if (!stream)
++		return NULL;
++
++	return stream->io;
++}
++
++static uint8_t bap_ucast_io_dir(struct bt_bap_stream *stream)
++{
++	uint8_t dir;
++
++	if (!stream)
++		return 0x00;
++
++	dir = stream->ep->dir;
++
++	queue_foreach(stream->links, bap_stream_get_dir, &dir);
++
++	return dir;
++}
++
++static uint8_t bap_bcast_io_dir(struct bt_bap_stream *stream)
++{
++	uint8_t dir;
++	uint8_t pac_type = bt_bap_pac_get_type(stream->lpac);
++
++	if (!stream)
++		return 0x00;
++
++	if (pac_type == BT_BAP_BCAST_SINK)
++		dir = BT_BAP_BCAST_SOURCE;
++	else
++		dir = BT_BAP_BCAST_SINK;
++
++	return dir;
++}
++
++static int bap_ucast_io_link(struct bt_bap_stream *stream,
++				struct bt_bap_stream *link)
++{
++	struct bt_bap *bap;
++
++	if (!stream || !link || stream == link)
++		return -EINVAL;
++
++	bap = stream->bap;
++
 +	if (queue_find(stream->links, NULL, link) ||
 +		queue_find(link->links, NULL, stream))
- 		return -EALREADY;
- 
- 	if (stream->client != link->client ||
-@@ -5911,8 +5955,14 @@ int bt_bap_stream_io_link(struct bt_bap_stream *stream,
- 			stream->ep->dir == link->ep->dir)
- 		return -EINVAL;
- 
--	stream->link = link;
--	link->link = stream;
++		return -EALREADY;
++
++	if (stream->client != link->client ||
++			stream->qos.ucast.cig_id != link->qos.ucast.cig_id ||
++			stream->qos.ucast.cis_id != link->qos.ucast.cis_id ||
++			stream->ep->dir == link->ep->dir)
++		return -EINVAL;
++
 +	if (!stream->links)
 +		stream->links = queue_new();
 +
@@ -427,86 +292,330 @@ index 00c3b9ff6..1b70df4d5 100644
 +
 +	queue_push_tail(stream->links, link);
 +	queue_push_tail(link->links, stream);
- 
- 	/* Link IOs if already set on stream/link */
- 	if (stream->io && !link->io)
-@@ -5925,12 +5975,12 @@ int bt_bap_stream_io_link(struct bt_bap_stream *stream,
- 	return 0;
- }
- 
--struct bt_bap_stream *bt_bap_stream_io_get_link(struct bt_bap_stream *stream)
-+struct queue *bt_bap_stream_io_get_links(struct bt_bap_stream *stream)
- {
- 	if (!stream)
- 		return NULL;
- 
--	return stream->link;
-+	return stream->links;
- }
- 
- static void bap_stream_get_in_qos(void *data, void *user_data)
-@@ -5973,11 +6023,11 @@ bool bt_bap_stream_io_get_qos(struct bt_bap_stream *stream,
- 	switch (stream->ep->dir) {
- 	case BT_BAP_SOURCE:
- 		bap_stream_get_in_qos(stream, in);
--		bap_stream_get_out_qos(stream->link, out);
-+		queue_foreach(stream->links, bap_stream_get_out_qos, out);
- 		break;
- 	case BT_BAP_SINK:
- 		bap_stream_get_out_qos(stream, out);
--		bap_stream_get_in_qos(stream->link, in);
-+		queue_foreach(stream->links, bap_stream_get_in_qos, in);
- 		break;
- 	default:
- 		return false;
-@@ -5988,6 +6038,14 @@ bool bt_bap_stream_io_get_qos(struct bt_bap_stream *stream,
- 	return in && out;
- }
- 
-+static void bap_stream_get_dir(void *data, void *user_data)
-+{
-+	struct bt_bap_stream *stream = data;
-+	uint8_t *dir = user_data;
 +
-+	*dir |= stream->ep->dir;
++	/* Link IOs if already set on stream/link */
++	if (stream->io && !link->io)
++		link->io = stream_io_ref(stream->io);
++	else if (link->io && !stream->io)
++		stream->io = stream_io_ref(link->io);
++
++	DBG(bap, "stream %p link %p", stream, link);
++
++	return 0;
 +}
 +
++static void stream_link(void *data, void *user_data)
++{
++	struct bt_bap_stream *stream = (void *)data;
++	struct bt_bap_stream *link = (void *)user_data;
++
++	bt_bap_stream_io_link(stream, link);
++}
++
++static int bap_bcast_io_link(struct bt_bap_stream *stream,
++				struct bt_bap_stream *link)
++{
++	struct bt_bap *bap;
++
++	if (!stream || !link || stream == link)
++		return -EINVAL;
++
++	bap = stream->bap;
++
++	if (queue_find(stream->links, NULL, link) ||
++		queue_find(link->links, NULL, stream))
++		return -EALREADY;
++
++	if (!stream->links)
++		stream->links = queue_new();
++
++	if (!link->links)
++		link->links = queue_new();
++
++	queue_push_tail(stream->links, link);
++	queue_push_tail(link->links, stream);
++
++	DBG(bap, "stream %p link %p", stream, link);
++
++	queue_foreach(stream->links, stream_link, link);
++
++	return 0;
++}
++
++static void stream_unlink(void *data, void *user_data)
++{
++	struct bt_bap_stream *stream = (void *)data;
++	struct bt_bap_stream *link = (void *)user_data;
++
++	bap_bcast_io_unlink(stream, link);
++}
++
++static int bap_bcast_io_unlink(struct bt_bap_stream *stream,
++				struct bt_bap_stream *link)
++{
++	struct bt_bap *bap;
++
++	if (!stream || !link || stream == link)
++		return -EINVAL;
++
++	bap = stream->bap;
++
++	if (!queue_find(stream->links, NULL, link) ||
++		!queue_find(link->links, NULL, stream))
++		return -EALREADY;
++
++	queue_remove(stream->links, link);
++	queue_remove(link->links, stream);
++
++	DBG(bap, "stream %p unlink %p", stream, link);
++
++	queue_foreach(stream->links, stream_unlink, link);
++
++	return 0;
++}
++
+ #define STREAM_OPS(_type, _set_state, _get_state, _config, _qos, _enable, \
+ 	_start, _disable, _stop, _metadata, _get_dir, _get_loc, _release, \
+-	_detach) \
++	_detach, _set_io, _get_io, _io_dir, _io_link, _io_unlink) \
+ { \
+ 	.type = _type, \
+ 	.set_state = _set_state, \
+@@ -2256,6 +2455,11 @@ static unsigned int bap_bcast_release(struct bt_bap_stream *stream,
+ 	.get_loc = _get_loc, \
+ 	.release = _release, \
+ 	.detach = _detach, \
++	.set_io = _set_io, \
++	.get_io = _get_io, \
++	.io_dir = _io_dir, \
++	.io_link = _io_link, \
++	.io_unlink = _io_unlink, \
+ }
+ 
+ static const struct bt_bap_stream_ops stream_ops[] = {
+@@ -2265,28 +2469,40 @@ static const struct bt_bap_stream_ops stream_ops[] = {
+ 			bap_ucast_start, bap_ucast_disable, bap_ucast_stop,
+ 			bap_ucast_metadata, bap_ucast_get_dir,
+ 			bap_ucast_get_location,
+-			bap_ucast_release, bap_ucast_detach),
++			bap_ucast_release, bap_ucast_detach,
++			bap_ucast_set_io, bap_ucast_get_io,
++			bap_ucast_io_dir, bap_ucast_io_link,
++			NULL),
+ 	STREAM_OPS(BT_BAP_SOURCE, bap_ucast_set_state,
+ 			bap_ucast_get_state,
+ 			bap_ucast_config, bap_ucast_qos, bap_ucast_enable,
+ 			bap_ucast_start, bap_ucast_disable, bap_ucast_stop,
+ 			bap_ucast_metadata, bap_ucast_get_dir,
+ 			bap_ucast_get_location,
+-			bap_ucast_release, bap_ucast_detach),
++			bap_ucast_release, bap_ucast_detach,
++			bap_ucast_set_io, bap_ucast_get_io,
++			bap_ucast_io_dir, bap_ucast_io_link,
++			NULL),
+ 	STREAM_OPS(BT_BAP_BCAST_SINK, bap_bcast_set_state,
+ 			bap_bcast_get_state,
+ 			bap_bcast_config, bap_bcast_qos, bap_bcast_sink_enable,
+ 			bap_bcast_start, bap_bcast_disable, NULL,
+ 			bap_bcast_metadata, bap_bcast_sink_get_dir,
+ 			bap_bcast_get_location,
+-			bap_bcast_release, bap_bcast_sink_detach),
++			bap_bcast_release, bap_bcast_sink_detach,
++			bap_bcast_set_io, bap_bcast_get_io,
++			bap_bcast_io_dir, bap_bcast_io_link,
++			bap_bcast_io_unlink),
+ 	STREAM_OPS(BT_BAP_BCAST_SOURCE, bap_bcast_set_state,
+ 			bap_bcast_get_state,
+ 			bap_bcast_config, bap_bcast_qos, bap_bcast_src_enable,
+ 			bap_bcast_start, bap_bcast_disable, NULL,
+ 			bap_bcast_metadata, bap_bcast_src_get_dir,
+ 			bap_bcast_get_location,
+-			bap_bcast_release, bap_bcast_src_detach),
++			bap_bcast_release, bap_bcast_src_detach,
++			bap_bcast_set_io, bap_bcast_get_io,
++			bap_bcast_io_dir, bap_bcast_io_link,
++			bap_bcast_io_unlink),
+ };
+ 
+ static const struct bt_bap_stream_ops *
+@@ -2372,15 +2588,23 @@ static void stream_find_io(void *data, void *user_data)
+ 
+ static struct bt_bap_stream_io *stream_get_io(struct bt_bap_stream *stream)
+ {
+-	struct bt_bap_stream_io *io = NULL;
++	struct bt_bap_stream_io *io;
++	struct bt_bap *bap;
+ 
+-	if (!stream)
++	if (!bap_stream_valid(stream))
+ 		return NULL;
+ 
+-	if (stream->io)
+-		return stream->io;
++	if (!stream->ops || !stream->ops->get_io)
++		return NULL;
+ 
+-	queue_foreach(stream->links, stream_find_io, &io);
++	if (!bt_bap_ref_safe(stream->bap))
++		return NULL;
++
++	bap = stream->bap;
++
++	io = stream->ops->get_io(stream);
++
++	bt_bap_unref(bap);
+ 
+ 	return io;
+ }
+@@ -5885,14 +6109,25 @@ static bool stream_io_disconnected(struct io *io, void *user_data)
+ 
+ bool bt_bap_stream_set_io(struct bt_bap_stream *stream, int fd)
+ {
+-	if (!stream || (fd >= 0 && stream->io && !stream->io->connecting))
++	bool ret;
++	struct bt_bap *bap;
++
++	if (!bap_stream_valid(stream))
+ 		return false;
+ 
+-	bap_stream_set_io(stream, INT_TO_PTR(fd));
++	if (!stream->ops || !stream->ops->set_io)
++		return false;
+ 
+-	queue_foreach(stream->links, bap_stream_set_io, INT_TO_PTR(fd));
++	if (!bt_bap_ref_safe(stream->bap))
++		return false;
+ 
+-	return true;
++	bap = stream->bap;
++
++	ret = stream->ops->set_io(stream, fd);
++
++	bt_bap_unref(bap);
++
++	return ret;
+ }
+ 
+ static bool match_req_id(const void *data, const void *match_data)
+@@ -5938,41 +6173,49 @@ int bt_bap_stream_cancel(struct bt_bap_stream *stream, unsigned int id)
+ int bt_bap_stream_io_link(struct bt_bap_stream *stream,
+ 				struct bt_bap_stream *link)
+ {
++	int ret;
+ 	struct bt_bap *bap;
+ 
+-	if (!stream || !link || stream == link)
++	if (!bap_stream_valid(stream))
++		return -EINVAL;
++
++	if (!stream->ops || !stream->ops->io_link)
++		return -EINVAL;
++
++	if (!bt_bap_ref_safe(stream->bap))
+ 		return -EINVAL;
+ 
+ 	bap = stream->bap;
+ 
+-	if (queue_find(stream->links, NULL, link) ||
+-		queue_find(link->links, NULL, stream))
+-		return -EALREADY;
++	ret = stream->ops->io_link(stream, link);
+ 
+-	if (stream->client != link->client ||
+-			stream->qos.ucast.cig_id != link->qos.ucast.cig_id ||
+-			stream->qos.ucast.cis_id != link->qos.ucast.cis_id ||
+-			stream->ep->dir == link->ep->dir)
++	bt_bap_unref(bap);
++
++	return ret;
++}
++
++int bt_bap_stream_io_unlink(struct bt_bap_stream *stream,
++				struct bt_bap_stream *link)
++{
++	int ret;
++	struct bt_bap *bap;
++
++	if (!bap_stream_valid(stream))
+ 		return -EINVAL;
+ 
+-	if (!stream->links)
+-		stream->links = queue_new();
++	if (!stream->ops || !stream->ops->io_unlink)
++		return -EINVAL;
+ 
+-	if (!link->links)
+-		link->links = queue_new();
++	if (!bt_bap_ref_safe(stream->bap))
++		return -EINVAL;
+ 
+-	queue_push_tail(stream->links, link);
+-	queue_push_tail(link->links, stream);
++	bap = stream->bap;
+ 
+-	/* Link IOs if already set on stream/link */
+-	if (stream->io && !link->io)
+-		link->io = stream_io_ref(stream->io);
+-	else if (link->io && !stream->io)
+-		stream->io = stream_io_ref(link->io);
++	ret = stream->ops->io_unlink(stream, link);
+ 
+-	DBG(bap, "stream %p link %p", stream, link);
++	bt_bap_unref(bap);
+ 
+-	return 0;
++	return ret;
+ }
+ 
+ struct queue *bt_bap_stream_io_get_links(struct bt_bap_stream *stream)
+@@ -6049,23 +6292,22 @@ static void bap_stream_get_dir(void *data, void *user_data)
  uint8_t bt_bap_stream_io_dir(struct bt_bap_stream *stream)
  {
  	uint8_t dir;
-@@ -6007,8 +6065,7 @@ uint8_t bt_bap_stream_io_dir(struct bt_bap_stream *stream)
++	struct bt_bap *bap;
  
- 	}
+-	if (!stream)
+-		return 0x00;
++	if (!bap_stream_valid(stream))
++		return 0;
  
--	if (stream->link)
--		dir |= stream->link->ep->dir;
-+	queue_foreach(stream->links, bap_stream_get_dir, &dir);
+-	if (stream->ep)
+-		dir = stream->ep->dir;
+-	else {
+-		uint8_t pac_type = bt_bap_pac_get_type(stream->lpac);
++	if (!stream->ops || !stream->ops->set_io)
++		return 0;
+ 
+-		if (pac_type == BT_BAP_BCAST_SINK)
+-			dir = BT_BAP_BCAST_SOURCE;
+-		else
+-			dir = BT_BAP_BCAST_SINK;
++	if (!bt_bap_ref_safe(stream->bap))
++		return 00;
+ 
+-	}
++	bap = stream->bap;
+ 
+-	queue_foreach(stream->links, bap_stream_get_dir, &dir);
++	dir = stream->ops->io_dir(stream);
++
++	bt_bap_unref(bap);
  
  	return dir;
  }
-@@ -6043,7 +6100,8 @@ int bt_bap_stream_io_connecting(struct bt_bap_stream *stream, int fd)
- 		return -EINVAL;
- 
- 	bap_stream_io_connecting(stream, INT_TO_PTR(fd));
--	bap_stream_io_connecting(stream->link, INT_TO_PTR(fd));
-+
-+	queue_foreach(stream->links, bap_stream_io_connecting, INT_TO_PTR(fd));
- 
- 	return 0;
- }
 diff --git a/src/shared/bap.h b/src/shared/bap.h
-index bf928bc2d..cd5ea2eba 100644
+index cd5ea2eba..126348e81 100644
 --- a/src/shared/bap.h
 +++ b/src/shared/bap.h
-@@ -231,7 +231,7 @@ int bt_bap_stream_cancel(struct bt_bap_stream *stream, unsigned int id);
+@@ -231,6 +231,8 @@ int bt_bap_stream_cancel(struct bt_bap_stream *stream, unsigned int id);
  
  int bt_bap_stream_io_link(struct bt_bap_stream *stream,
  					struct bt_bap_stream *link);
--struct bt_bap_stream *bt_bap_stream_io_get_link(struct bt_bap_stream *stream);
-+struct queue *bt_bap_stream_io_get_links(struct bt_bap_stream *stream);
++int bt_bap_stream_io_unlink(struct bt_bap_stream *stream,
++					struct bt_bap_stream *link);
+ struct queue *bt_bap_stream_io_get_links(struct bt_bap_stream *stream);
  bool bt_bap_stream_io_get_qos(struct bt_bap_stream *stream,
  					struct bt_bap_qos **in,
- 					struct bt_bap_qos **out);
 -- 
 2.43.0
 
