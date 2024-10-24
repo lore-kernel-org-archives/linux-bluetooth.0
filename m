@@ -1,110 +1,270 @@
-Received: from mail-qt1-f172.google.com (mail-qt1-f172.google.com [209.85.160.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08D1D19A
-	for <linux-bluetooth@vger.kernel.org>; Thu, 24 Oct 2024 00:30:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6673823CB;
+	Thu, 24 Oct 2024 09:06:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729729808; cv=none; b=JSrmTrEWZl37g+p7gr7en8mJ+drggghWAFv9y0hIe/r5IK3xUsHFYe0MMwLbqRin4d6ltmKBkgLg5kD61GOnndao1bSxXo5Dz+p1FQkNOikwMFxnS4A8+GGl3h6WKhBmKSUC1YouTQL8/rQqXwYWealn0F5ZulVtQv7M5JYW2TU=
+	t=1729760802; cv=none; b=eh+cfxPub+YDAfIYhx/fB/jPQ5f492kR8hNLT9MOputj40oYaRg0Z4RRMx6TdrYQfEtEFJwTU9fat4bEbz0m5F+kPQ51HTHMRPUJ8R5ITuD+V8U9rKcB3AU2MwUVarH4iJqzIoi5mkF10TcS+KciX5AjQcuUjXqocC1k0P75VLM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729729808; c=relaxed/simple;
-	bh=CpkY1ZkGKzh64OJLPG3VQ1reB3v5pnsIFBFXbHD3R2Q=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=CfzhEbYq7oQ214CUs9oApRKZ7dlScHai/uMShfm3QWFLFkA4+wE+4SS+yc0qW9449q9An3jVEqJUg49rKpAsscORKRmhV6j7mjK+3zLGSEvtC4IOkeLUHhJjZOIPYQ222AmUTNWrSKkdXzdYaXYWWyjQf/drsXrPM4m/hKmkjWE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QZsnNOSR; arc=none smtp.client-ip=209.85.160.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1729760802; c=relaxed/simple;
+	bh=TPgnv4Jvv6YLw54D9uhWHUaz2XEBir0T5CcHTTI9fpU=;
+	h=From:Date:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=EODDqLAKqt3yN+u/uC0IcEnDML8J+R5I4++h04FgxGE8LNiIlVcapMDTypGkbtSGi1wLB/h3Ls4gvM7DeuXuCNjKKACUlW33reB/zOTIBDhQpB7CjtrZPvOYEsNjM/KYgHH+rxFMK7bWUOGZZrMakU5XevyXml9npgk1gvngKKo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=cKwa/7xo; arc=none smtp.client-ip=192.198.163.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QZsnNOSR"
-Received: by mail-qt1-f172.google.com with SMTP id d75a77b69052e-46098928354so2036561cf.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 23 Oct 2024 17:30:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1729729806; x=1730334606; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=yMZ6LNpRXao/o5KcRCvdqn+VRyowpm4zBwxo5Xpb/o8=;
-        b=QZsnNOSRxLMzVC4sqKEas8GWpbcbDxeWvh/+E1s5Lunc2UGl8ye3M4AWG1RwkZ4TuX
-         /VJs4J/v2NSI3OTgUEVxGUq8JVxP6dSUGLZea2Y7IFy0opbRyRc78F2Ld2P/Igkh2GPr
-         fBvNIsOEAdo+lQR2ujqW7P6qljFR3KK1T2M+8G3AV6JHL0osHuOg9CehPG2NtVTxH7f/
-         slV8U2Oik1cHAxdtpFHL9nFoqJ6gqWTQpJ5lBeMfJU+kXx93eTt81BP9eOcFs+YsNaOA
-         pf2sqYvboIY/bIFBcKscRglJD9sStkhgDknY73VkIsSXv8gt47cBSklUpr6wC3FfLxZe
-         RWsw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729729806; x=1730334606;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=yMZ6LNpRXao/o5KcRCvdqn+VRyowpm4zBwxo5Xpb/o8=;
-        b=f6eM4CkP3Hl+FelyYwY4QsQ161lZUPawndcUc4IKAUXGTCCKo8gyMFOPpKjBnOLy7J
-         AFgg7iptR1hMy1binPvAgnKMxBEhikJ72D+4iSsCR6hvqtLWoIGRPKbZ/pvAsRkY/GQp
-         yX1iu0Tps2ZSOlLS/BFQELoaQHStsKEm78wTN22x7D5YzGxiQ2kbE8cFCtzwHhYJDluQ
-         NWuWWz90anDauUvWFAImol1xL3cc480XytCuvy2+SQ41lwLGSEnfjpYpfq3nx1MLDZc8
-         5CUnkfAg/vCx2iv0kCTpXedIJgOZspcIlN3X0S6zarQ5UaP0MkqSQzH0MYY80DjqHJZj
-         PGEw==
-X-Gm-Message-State: AOJu0YxU5u8HsO/ujP1rpmXfo1cTifSznNvLnHll2YQIgx/qCiQTPbgW
-	ddJZ1vXskCSPXnQ7zTmlq6slh/duxgiZvUfmGlzDANTrTp1onUpfmi9www==
-X-Google-Smtp-Source: AGHT+IHelYE3tt6zjFKCj7TScjPPDOrtNPKwEgHldGrZf/6ka/ocKWsX9tnWaPel/mKPUDUvpE28fA==
-X-Received: by 2002:ac8:574b:0:b0:461:1c70:616 with SMTP id d75a77b69052e-4611c700c69mr34657571cf.51.1729729805653;
-        Wed, 23 Oct 2024 17:30:05 -0700 (PDT)
-Received: from [172.17.0.2] ([40.67.142.65])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-460d3c62e9esm45526151cf.27.2024.10.23.17.30.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 23 Oct 2024 17:30:05 -0700 (PDT)
-Message-ID: <6719950d.c80a0220.3200b1.0062@mx.google.com>
-Date: Wed, 23 Oct 2024 17:30:05 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============6058162563198662869=="
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="cKwa/7xo"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1729760801; x=1761296801;
+  h=from:date:to:cc:subject:in-reply-to:message-id:
+   references:mime-version;
+  bh=TPgnv4Jvv6YLw54D9uhWHUaz2XEBir0T5CcHTTI9fpU=;
+  b=cKwa/7xoJT7bBjoVhSQoBP6h4ZccN6ExQvkFOT7IGBbugd8YqT9zICZb
+   GfJTlOvccOuhFtAj+usFvzFAU5L/bj5eIw6Xr9+t8wv5HjxSKJn0JUF0C
+   hmLKjQWFQoaWMkMghj5zfkpbPW0nFXq0lx96Ds7A3gljbs4EmVSeM50rR
+   URZxP8j2OhKoEvuDaF2rPCd1RjYOVd42p6DBfmcmYwr4pAXpaX+OamVdu
+   FBwsdbWThTGuu0IuCDwRK3oqQDBG9Ewj1zx5jLg+jK83XWF5gibZLTerJ
+   qthiaqJ34RocOSu5T/aClkuuzI59A42+EL1igF/Yq7RtO11o1PLD+qvZ5
+   Q==;
+X-CSE-ConnectionGUID: b+gz9RcCTie6aZcW7d6n9w==
+X-CSE-MsgGUID: rt8tMDTZQ9K5PJ0KvuV0Mg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11234"; a="29600161"
+X-IronPort-AV: E=Sophos;i="6.11,228,1725346800"; 
+   d="scan'208";a="29600161"
+Received: from fmviesa004.fm.intel.com ([10.60.135.144])
+  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Oct 2024 02:06:40 -0700
+X-CSE-ConnectionGUID: RmzCAQGtT4Cj7Y05wqUuzQ==
+X-CSE-MsgGUID: js3TqFB2T322E0iMyIHJvA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,228,1725346800"; 
+   d="scan'208";a="85141746"
+Received: from ijarvine-mobl1.ger.corp.intel.com (HELO localhost) ([10.245.245.193])
+  by fmviesa004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Oct 2024 02:06:36 -0700
+From: =?UTF-8?q?Ilpo=20J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>
+Date: Thu, 24 Oct 2024 12:06:33 +0300 (EEST)
+To: Paul Menzel <pmenzel@molgen.mpg.de>, 
+    ChandraShekar <chandrashekar.devegowda@intel.com>
+cc: Kiran K <kiran.k@intel.com>, linux-bluetooth@vger.kernel.org, 
+    ravishankar.srivatsa@intel.com, chethan.tumkur.narayan@intel.com, 
+    Bjorn Helgaas <bhelgaas@google.com>, linux-pci@vger.kernel.org
+Subject: Re: [PATCH v1] Bluetooth: btintel_pcie: Device suspend-resume support
+ added
+In-Reply-To: <e6bd065d-0b9b-4c37-958c-fc2a09ea0475@molgen.mpg.de>
+Message-ID: <472e30e8-a886-a268-3105-75379f722ce4@linux.intel.com>
+References: <20241023114647.1011886-1-chandrashekar.devegowda@intel.com> <e6bd065d-0b9b-4c37-958c-fc2a09ea0475@molgen.mpg.de>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [RFC,v1,1/5] mgmt-api: Add Send HCI command and wait for event Command
-In-Reply-To: <20241023204705.2422998-1-luiz.dentz@gmail.com>
-References: <20241023204705.2422998-1-luiz.dentz@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Type: multipart/mixed; boundary="8323328-338810278-1729760793=:1315"
 
---===============6058162563198662869==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+  This message is in MIME format.  The first part should be readable text,
+  while the remaining parts are likely unreadable without MIME-aware tools.
 
-This is automated email and please do not reply to this email!
+--8323328-338810278-1729760793=:1315
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
 
-Dear submitter,
+On Wed, 23 Oct 2024, Paul Menzel wrote:
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=902407
+> [Cc: +Bjorn, +linux-pci]
+>=20
+> Dear Chandra,
+>=20
+>=20
+> Thank you for the patch.
+>=20
+> First something minor: Should there be a space in your name?
+>=20
+> ChandraShekar =E2=86=92 Chandra Shekar
+>=20
+> `git config --global user.name "=E2=80=A6"` can configure this for your g=
+it setup.
+>=20
+> Also for the summary/title, it=E2=80=99d be great if you used a statement=
+ by using a
+> verb (in imperative mood):
+>=20
+> Add device suspend-resume support
+>=20
+> or shorter
+>=20
+> Support suspend-resume
+>=20
+> Am 23.10.24 um 13:46 schrieb ChandraShekar:
+> > This patch contains the changes in driver to support the suspend and
+> > resume i.e move the controller to D3 state when the platform is enterin=
+g
+> > into suspend and move the controller to D0 on resume.
+>=20
+> It=E2=80=99d be great if you elaborated. Please start by the history, sin=
+ce when Intel
+> Bluetooth PCIe have been there, and why until now this support was missin=
+g.
+>=20
+> Then please describe, what is needed, and what documentation you used to
+> implement the support.
+>=20
+> Also, please document, how you tested this, including the log messages, a=
+nd
+> also the time it takes to resume.
+>=20
+> Is it also possible to use Bluetooth as a wakeup source from suspend?
+>=20
+> > Signed-off-by: Kiran K <kiran.k@intel.com>
+> > Signed-off-by: ChandraShekar <chandrashekar.devegowda@intel.com>
+> > ---
+> >   drivers/bluetooth/btintel_pcie.c | 52 +++++++++++++++++++++++++++++++=
++
+> >   drivers/bluetooth/btintel_pcie.h |  4 +++
+> >   2 files changed, 56 insertions(+)
+> >=20
+> > diff --git a/drivers/bluetooth/btintel_pcie.c
+> > b/drivers/bluetooth/btintel_pcie.c
+> > index fd4a8bd056fa..f2c44b9d7328 100644
+> > --- a/drivers/bluetooth/btintel_pcie.c
+> > +++ b/drivers/bluetooth/btintel_pcie.c
+> > @@ -273,6 +273,12 @@ static int btintel_pcie_reset_bt(struct
+> > btintel_pcie_data *data)
+> >   =09return reg =3D=3D 0 ? 0 : -ENODEV;
+> >   }
+> >   +static void btintel_pcie_set_persistence_mode(struct btintel_pcie_da=
+ta
+> > *data)
+> > +{
+> > +=09btintel_pcie_set_reg_bits(data, BTINTEL_PCIE_CSR_HW_BOOT_CONFIG,
+> > +=09=09=09=09  BTINTEL_PCIE_CSR_HW_BOOT_CONFIG_KEEP_ON);
+> > +}
+> > +
+> >   /* This function enables BT function by setting
+> > BTINTEL_PCIE_CSR_FUNC_CTRL_MAC_INIT bit in
+> >    * BTINTEL_PCIE_CSR_FUNC_CTRL_REG register and wait for MSI-X with
+> >    * BTINTEL_PCIE_MSIX_HW_INT_CAUSES_GP0.
+> > @@ -297,6 +303,8 @@ static int btintel_pcie_enable_bt(struct
+> > btintel_pcie_data *data)
+> >   =09 */
+> >   =09data->boot_stage_cache =3D 0x0;
+> >   +=09btintel_pcie_set_persistence_mode(data);
+> > +
+> >   =09/* Set MAC_INIT bit to start primary bootloader */
+> >   =09reg =3D btintel_pcie_rd_reg32(data, BTINTEL_PCIE_CSR_FUNC_CTRL_REG=
+);
+> >   =09reg &=3D ~(BTINTEL_PCIE_CSR_FUNC_CTRL_FUNC_INIT |
+> > @@ -1653,11 +1661,55 @@ static void btintel_pcie_remove(struct pci_dev
+> > *pdev)
+> >   =09pci_set_drvdata(pdev, NULL);
+> >   }
+> >   +static int btintel_pcie_suspend(struct device *dev)
+> > +{
+> > +=09struct btintel_pcie_data *data;
+> > +=09int err;
+> > +=09struct  pci_dev *pdev =3D to_pci_dev(dev);
 
----Test result---
+Extra space.
 
-Test Summary:
-CheckPatch                    PASS      2.33 seconds
-GitLint                       PASS      1.58 seconds
-BuildEll                      PASS      25.09 seconds
-BluezMake                     PASS      1735.43 seconds
-MakeCheck                     PASS      13.38 seconds
-MakeDistcheck                 PASS      182.52 seconds
-CheckValgrind                 PASS      255.39 seconds
-CheckSmatch                   WARNING   361.74 seconds
-bluezmakeextell               PASS      121.78 seconds
-IncrementalBuild              PASS      7884.83 seconds
-ScanBuild                     PASS      1024.08 seconds
+> > +
+> > +=09data =3D pci_get_drvdata(pdev);
+> > +=09btintel_pcie_wr_sleep_cntrl(data, BTINTEL_PCIE_STATE_D3_HOT);
+> > +=09data->gp0_received =3D false;
+> > +=09err =3D wait_event_timeout(data->gp0_wait_q, data->gp0_received,
+> > +
+> > msecs_to_jiffies(BTINTEL_DEFAULT_INTR_TIMEOUT_MS));
+> > +=09if (!err) {
+> > +=09=09bt_dev_err(data->hdev, "failed to receive gp0 interrupt for
+> > suspend");
+>=20
+> Please include the timeout in the message.
+>=20
+> > +=09=09goto fail;
+> > +=09}
+> > +=09return 0;
+> > +fail:
+> > +=09return -EBUSY;
+> > +}
+> > +
+> > +static int btintel_pcie_resume(struct device *dev)
+> > +{
+> > +=09struct btintel_pcie_data *data;
+> > +=09struct  pci_dev *pdev =3D to_pci_dev(dev);
 
-Details
-##############################
-Test: CheckSmatch - WARNING
-Desc: Run smatch tool with source
-Output:
-monitor/packet.c: note: in included file:monitor/display.h:82:26: warning: Variable length array is used.monitor/packet.c:1868:26: warning: Variable length array is used.monitor/packet.c: note: in included file:monitor/bt.h:3606:52: warning: array of flexible structuresmonitor/bt.h:3594:40: warning: array of flexible structuresmonitor/packet.c: note: in included file:monitor/display.h:82:26: warning: Variable length array is used.monitor/packet.c:1868:26: warning: Variable length array is used.monitor/packet.c: note: in included file:monitor/bt.h:3606:52: warning: array of flexible structuresmonitor/bt.h:3594:40: warning: array of flexible structures
+Ditto.
+
+> > +=09int err;
+
+Why's the order inconsistent compared with suspend func local vars?
+
+> > +
+> > +=09data =3D pci_get_drvdata(pdev);
+> > +=09btintel_pcie_wr_sleep_cntrl(data, BTINTEL_PCIE_STATE_D0);
+> > +=09data->gp0_received =3D false;
+> > +=09err =3D wait_event_timeout(data->gp0_wait_q, data->gp0_received,
+> > +
+> > msecs_to_jiffies(BTINTEL_DEFAULT_INTR_TIMEOUT_MS));
+> > +=09if (!err) {
+> > +=09=09bt_dev_err(data->hdev, "failed to receive gp0 interrupt for
+> > resume");
+>=20
+> Ditto.
+>=20
+> > +=09=09goto fail;
+> > +=09}
+> > +=09return 0;
+> > +fail:
+> > +=09return -EBUSY;
+
+Quite much common code here compared with the suspend side. Perhaps a=20
+helper function would be useful?
+
+> > +}
+> > +
+> > +static SIMPLE_DEV_PM_OPS(btintel_pcie_pm_ops, btintel_pcie_suspend,
+> > +=09=09btintel_pcie_resume);
+> > +
+> >   static struct pci_driver btintel_pcie_driver =3D {
+> >   =09.name =3D KBUILD_MODNAME,
+> >   =09.id_table =3D btintel_pcie_table,
+> >   =09.probe =3D btintel_pcie_probe,
+> >   =09.remove =3D btintel_pcie_remove,
+> > +=09.driver.pm =3D &btintel_pcie_pm_ops,
+> >   };
+> >   module_pci_driver(btintel_pcie_driver);
+> >   diff --git a/drivers/bluetooth/btintel_pcie.h
+> > b/drivers/bluetooth/btintel_pcie.h
+> > index f9aada0543c4..38d0c8ea2b6f 100644
+> > --- a/drivers/bluetooth/btintel_pcie.h
+> > +++ b/drivers/bluetooth/btintel_pcie.h
+> > @@ -8,6 +8,7 @@
+> >     /* Control and Status Register(BTINTEL_PCIE_CSR) */
+> >   #define BTINTEL_PCIE_CSR_BASE=09=09=09(0x000)
+> > +#define BTINTEL_PCIE_CSR_HW_BOOT_CONFIG=09=09(BTINTEL_PCIE_CSR_BASE
+> > + 0x000)
+> >   #define BTINTEL_PCIE_CSR_FUNC_CTRL_REG=09=09(BTINTEL_PCIE_CSR_BASE
+> > + 0x024)
+> >   #define BTINTEL_PCIE_CSR_HW_REV_REG=09=09(BTINTEL_PCIE_CSR_BASE +
+> > 0x028)
+> >   #define BTINTEL_PCIE_CSR_RF_ID_REG=09=09(BTINTEL_PCIE_CSR_BASE +
+> > 0x09C)
+> > @@ -48,6 +49,9 @@
+> >   #define BTINTEL_PCIE_CSR_MSIX_IVAR_BASE
+> > (BTINTEL_PCIE_CSR_MSIX_BASE + 0x0880)
+> >   #define BTINTEL_PCIE_CSR_MSIX_IVAR(cause)
+> > (BTINTEL_PCIE_CSR_MSIX_IVAR_BASE + (cause))
+> >   +/* CSR HW BOOT CONFIG Register */
+> > +#define BTINTEL_PCIE_CSR_HW_BOOT_CONFIG_KEEP_ON=09=09(BIT(31))
+
+Extra parenthesis.
+
+--=20
+ i.
 
 
----
-Regards,
-Linux Bluetooth
-
-
---===============6058162563198662869==--
+> > +
+> >   /* Causes for the FH register interrupts */
+> >   enum msix_fh_int_causes {
+> >   =09BTINTEL_PCIE_MSIX_FH_INT_CAUSES_0=09=3D BIT(0),=09/* cause 0 */
+--8323328-338810278-1729760793=:1315--
