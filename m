@@ -1,45 +1,56 @@
-Received: from forward102a.mail.yandex.net (forward102a.mail.yandex.net [178.154.239.85])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD1E720103F
-	for <linux-bluetooth@vger.kernel.org>; Fri, 25 Oct 2024 11:40:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.154.239.85
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFFF922B668
+	for <linux-bluetooth@vger.kernel.org>; Fri, 25 Oct 2024 12:17:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729856436; cv=none; b=ZU8oHwOnpIVTRnjMcGdCoEEs/Od2vPucwUZ38gw3F6DoNLHJLcR7p6rrP9V3Pok8vibbQH+muKzc2eKpSWfTSCPHf6L/tmD6lHzRv/jAKDcOCjO+52MasoS06nyQqTspTHjglTAllDCRSDtKDKHlalU4k+zLOfXqa3Q3ud6LsuE=
+	t=1729858653; cv=none; b=KZaCnnyJLKYYrynA85e+Kq7kvwGFc3x2XVXluT1x18SCxno3Ud/0cRVQXz0K8iPal7QLNYDO7VqN45jSukRboXOkve8A0krAVeFMXXpu51TjEt97Z84OZGxOf9viMHNpzig1uIUwF6Cdp5prIZmmoweNiiPce1aNTEBsQQ/Ufc0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729856436; c=relaxed/simple;
-	bh=BaSNYLDn5CaKf66hrsneBs0SFxrfIqFx8IhK3M98mNw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=qWagq0+XVaU23N1DbZtHP9Wwm5zIFoAmtHpqqjePS9rFUa7eHYPhKbHqxaPXRmqrVtUB1hRA02re6W5PpaRPDAVajrbf/2mj3yveRAbL3Cowcj6QjRVquSU7atZjCeM7tmAydWxZC6o4PWjDUS3D6WyMZ1mSGAzV6YgOrD15u0U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru; spf=pass smtp.mailfrom=yandex.ru; dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b=Qq9yMMzD; arc=none smtp.client-ip=178.154.239.85
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yandex.ru
+	s=arc-20240116; t=1729858653; c=relaxed/simple;
+	bh=ed+AmCZlbHVQvLbgD9Zf+jsQc7spWw8eTYK6RUMI9h4=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=tStW/CIWbBYyPIkjeU2OhU5Ur0qF5I5sEWeWs+mFQ3yp1qFZI9pjsNhXyE5WiOFG1uWOSwQTpEuMzLTYWaeZGAMxVdEfURazXJ2erTeqyJYDowuNLrHxH9pttukeGohgIOTNdOrFEhRAaMD43gWU4QfhqVY5QpNUdr7QrT2nRMU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=RLm3bp1L; arc=none smtp.client-ip=198.175.65.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b="Qq9yMMzD"
-Received: from mail-nwsmtp-smtp-production-main-38.myt.yp-c.yandex.net (mail-nwsmtp-smtp-production-main-38.myt.yp-c.yandex.net [IPv6:2a02:6b8:c12:519b:0:640:6288:0])
-	by forward102a.mail.yandex.net (Yandex) with ESMTPS id C9F8660D2E;
-	Fri, 25 Oct 2024 14:40:23 +0300 (MSK)
-Received: by mail-nwsmtp-smtp-production-main-38.myt.yp-c.yandex.net (smtp/Yandex) with ESMTPSA id KeTsSg7oEGk0-FZjSg9ue;
-	Fri, 25 Oct 2024 14:40:22 +0300
-X-Yandex-Fwd: 1
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex.ru; s=mail;
-	t=1729856423; bh=A/Iq8FpRcnCxhMgvI3KA98eWjUxlaBWpnJJDUjOrFUg=;
-	h=Message-ID:Date:Cc:Subject:To:From;
-	b=Qq9yMMzD9I8/5Mg+x/SGGX1A3m2SA3aZx5k8kPoST3raG9BprOn/xF+/f+J941pBT
-	 2KWZcAYO9XzLOmnGHVnnsUHkh+uyzFI4zG/j7VW1Mw9QIXRt8crGh7DFP26UQqUzgG
-	 J9Zd6PihV+H09QZg6eWm6PA6mbqbB5WbI2W/3qE4=
-Authentication-Results: mail-nwsmtp-smtp-production-main-38.myt.yp-c.yandex.net; dkim=pass header.i=@yandex.ru
-From: Dmitry Antipov <dmantipov@yandex.ru>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	linux-bluetooth@vger.kernel.org,
-	lvc-project@linuxtesting.org,
-	Dmitry Antipov <dmantipov@yandex.ru>,
-	syzbot+6cf5652d3df49fae2e3f@syzkaller.appspotmail.com
-Subject: [PATCH] Bluetooth: fix use-after-free in device_for_each_child()
-Date: Fri, 25 Oct 2024 14:40:18 +0300
-Message-ID: <20241025114018.574041-1-dmantipov@yandex.ru>
-X-Mailer: git-send-email 2.47.0
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="RLm3bp1L"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1729858650; x=1761394650;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=ed+AmCZlbHVQvLbgD9Zf+jsQc7spWw8eTYK6RUMI9h4=;
+  b=RLm3bp1LfdmRXUD1lWe/F7kuvpkoKlAtiXN2bvhbs5VZGAIVqvX5Iaz8
+   q8wshydGwR1SF3f+nIQDNs6ogr0/uru/bVlvD3FZfRaMMozur9k6kTTgW
+   RyBTncrwHoEqcl00ku0L13kv4itNzpcmaj+iRr1j2Ll71aHzT8mRO88Rr
+   dRdp+ugryMxa9r9FG+sQCbH+VK5ESKRRpSqAwuDDUlMUdEp6vO/IaNGMD
+   MQDSqmPsVc6hT57i2PT4jNCEKfXRrDZdbhhgvhHUCZMUlfO33cKq095SV
+   A8yeqmijMmb/LXYR387NOyTb18QkGhd+BeINE+le+W+HmyFhsI0vJL3cD
+   A==;
+X-CSE-ConnectionGUID: CLLutyriSr+3SL090TF0nA==
+X-CSE-MsgGUID: Qm/w8INRRECdnWk5IvvttA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="46990053"
+X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
+   d="scan'208";a="46990053"
+Received: from fmviesa003.fm.intel.com ([10.60.135.143])
+  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Oct 2024 05:17:30 -0700
+X-CSE-ConnectionGUID: MbrhRzOtR1qHL0GS7bKRQA==
+X-CSE-MsgGUID: FuXrVuI+TMOKUpWLvO2NXA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,231,1725346800"; 
+   d="scan'208";a="84859289"
+Received: from bswm3002.iind.intel.com ([10.66.185.33])
+  by fmviesa003.fm.intel.com with ESMTP; 25 Oct 2024 05:17:27 -0700
+From: Vijay Satija <vijay.satija@intel.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: ravishankar.srivatsa@intel.com,
+	kiran.k@intel.com,
+	Vijay Satija <vijay.satija@intel.com>
+Subject: [PATCH v1] Bluetooth: btintel: Add support to configure TX power
+Date: Fri, 25 Oct 2024 17:47:16 +0530
+Message-Id: <20241025121716.1913833-1-vijay.satija@intel.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -48,124 +59,410 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Syzbot has reported the following KASAN splat:
+Bluetooth has regulatory limitations which prohibit or allow usage
+of certain bands or channels or limiting Tx power. The Tx power
+values can be configured in ACPI table. This patch reads from ACPI entry
+and configures the TX power to be used accordingly.
 
-BUG: KASAN: slab-use-after-free in device_for_each_child+0x18f/0x1a0
-Read of size 8 at addr ffff88801f605308 by task kbnepd bnep0/4980
-
-CPU: 0 UID: 0 PID: 4980 Comm: kbnepd bnep0 Not tainted 6.12.0-rc4-00161-gae90f6a6170d #1
-Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.16.3-2.fc40 04/01/2014
-Call Trace:
- <TASK>
- dump_stack_lvl+0x100/0x190
- ? device_for_each_child+0x18f/0x1a0
- print_report+0x13a/0x4cb
- ? __virt_addr_valid+0x5e/0x590
- ? __phys_addr+0xc6/0x150
- ? device_for_each_child+0x18f/0x1a0
- kasan_report+0xda/0x110
- ? device_for_each_child+0x18f/0x1a0
- ? __pfx_dev_memalloc_noio+0x10/0x10
- device_for_each_child+0x18f/0x1a0
- ? __pfx_device_for_each_child+0x10/0x10
- pm_runtime_set_memalloc_noio+0xf2/0x180
- netdev_unregister_kobject+0x1ed/0x270
- unregister_netdevice_many_notify+0x123c/0x1d80
- ? __mutex_trylock_common+0xde/0x250
- ? __pfx_unregister_netdevice_many_notify+0x10/0x10
- ? trace_contention_end+0xe6/0x140
- ? __mutex_lock+0x4e7/0x8f0
- ? __pfx_lock_acquire.part.0+0x10/0x10
- ? rcu_is_watching+0x12/0xc0
- ? unregister_netdev+0x12/0x30
- unregister_netdevice_queue+0x30d/0x3f0
- ? __pfx_unregister_netdevice_queue+0x10/0x10
- ? __pfx_down_write+0x10/0x10
- unregister_netdev+0x1c/0x30
- bnep_session+0x1fb3/0x2ab0
- ? __pfx_bnep_session+0x10/0x10
- ? __pfx_lock_release+0x10/0x10
- ? __pfx_woken_wake_function+0x10/0x10
- ? __kthread_parkme+0x132/0x200
- ? __pfx_bnep_session+0x10/0x10
- ? kthread+0x13a/0x370
- ? __pfx_bnep_session+0x10/0x10
- kthread+0x2b7/0x370
- ? __pfx_kthread+0x10/0x10
- ret_from_fork+0x48/0x80
- ? __pfx_kthread+0x10/0x10
- ret_from_fork_asm+0x1a/0x30
- </TASK>
-
-Allocated by task 4974:
- kasan_save_stack+0x30/0x50
- kasan_save_track+0x14/0x30
- __kasan_kmalloc+0xaa/0xb0
- __kmalloc_noprof+0x1d1/0x440
- hci_alloc_dev_priv+0x1d/0x2820
- __vhci_create_device+0xef/0x7d0
- vhci_write+0x2c7/0x480
- vfs_write+0x6a0/0xfc0
- ksys_write+0x12f/0x260
- do_syscall_64+0xc7/0x250
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-Freed by task 4979:
- kasan_save_stack+0x30/0x50
- kasan_save_track+0x14/0x30
- kasan_save_free_info+0x3b/0x60
- __kasan_slab_free+0x4f/0x70
- kfree+0x141/0x490
- hci_release_dev+0x4d9/0x600
- bt_host_release+0x6a/0xb0
- device_release+0xa4/0x240
- kobject_put+0x1ec/0x5a0
- put_device+0x1f/0x30
- vhci_release+0x81/0xf0
- __fput+0x3f6/0xb30
- task_work_run+0x151/0x250
- do_exit+0xa79/0x2c30
- do_group_exit+0xd5/0x2a0
- get_signal+0x1fcd/0x2210
- arch_do_signal_or_restart+0x93/0x780
- syscall_exit_to_user_mode+0x140/0x290
- do_syscall_64+0xd4/0x250
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-Fix this by doing 'device_del()' later and immediately before
-freeing its 'struct hci_dev' container. Otherwise the former
-might race against 'unregister_netdev()' innards called when
-'bnep_session()' is going to terminate.
-
-Reported-by: syzbot+6cf5652d3df49fae2e3f@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=6cf5652d3df49fae2e3f
-Fixes: bdc3e0f1d201 ("Bluetooth: Move device_add handling into hci_register_dev")
-Signed-off-by: Dmitry Antipov <dmantipov@yandex.ru>
+Signed-off-by: Vijay Satija <vijay.satija@intel.com>
+Signed-off-by: Kiran K <kiran.k@intel.com>
 ---
- net/bluetooth/hci_core.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ drivers/bluetooth/btintel.c | 313 ++++++++++++++++++++++++++++++++++++
+ drivers/bluetooth/btintel.h |  35 ++++
+ 2 files changed, 348 insertions(+)
 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 96d097b21d13..f1195b110495 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -2716,7 +2716,6 @@ void hci_unregister_dev(struct hci_dev *hdev)
- 		rfkill_destroy(hdev->rfkill);
- 	}
+diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
+index d496cf2c3411..aa4ebe230cc5 100644
+--- a/drivers/bluetooth/btintel.c
++++ b/drivers/bluetooth/btintel.c
+@@ -29,6 +29,11 @@
  
--	device_del(&hdev->dev);
- 	/* Actual cleanup is deferred until hci_release_dev(). */
- 	hci_dev_put(hdev);
- }
-@@ -2756,6 +2755,8 @@ void hci_release_dev(struct hci_dev *hdev)
- 	kfree_skb(hdev->sent_cmd);
- 	kfree_skb(hdev->req_skb);
- 	kfree_skb(hdev->recv_event);
+ #define BTINTEL_EFI_DSBR	L"UefiCnvCommonDSBR"
+ 
++#define BTINTEL_BT_DOMAIN		0x12
++#define BTINTEL_SAR_LEGACY		0
++#define BTINTEL_SAR_INC_PWR		1
++#define BTINTEL_SAR_INC_PWR_SUPPORTED	0
 +
-+	device_del(&hdev->dev);
- 	kfree(hdev);
+ enum {
+ 	DSM_SET_WDISABLE2_DELAY = 1,
+ 	DSM_SET_RESET_METHOD = 3,
+@@ -2799,6 +2804,311 @@ static int btintel_set_dsbr(struct hci_dev *hdev, struct intel_version_tlv *ver)
+ 	return 0;
  }
- EXPORT_SYMBOL(hci_release_dev);
+ 
++#ifdef CONFIG_ACPI
++static acpi_status btintel_evaluate_acpi_method(struct hci_dev *hdev,
++						acpi_string method,
++						union acpi_object **ptr,
++						u8 pkg_size)
++{
++	struct acpi_buffer buffer = { ACPI_ALLOCATE_BUFFER, NULL };
++	union acpi_object *p;
++	acpi_status status;
++	acpi_handle handle;
++
++	handle = ACPI_HANDLE(GET_HCIDEV_DEV(hdev));
++	if (!handle) {
++		bt_dev_dbg(hdev, "ACPI-BT: No ACPI support for Bluetooth device");
++		return AE_NOT_EXIST;
++	}
++
++	status = acpi_evaluate_object(handle, method, NULL, &buffer);
++
++	if (ACPI_FAILURE(status)) {
++		bt_dev_dbg(hdev, "ACPI-BT: ACPI Failure: %s method: %s",
++			   acpi_format_exception(status), method);
++		return status;
++	}
++
++	p = buffer.pointer;
++
++	if (p->type != ACPI_TYPE_PACKAGE || p->package.count < pkg_size) {
++		bt_dev_warn(hdev, "ACPI-BT: Invalid object type: %d or package count: %d",
++			    p->type, p->package.count);
++		kfree(buffer.pointer);
++		return AE_ERROR;
++	}
++
++	*ptr = buffer.pointer;
++	return 0;
++}
++
++static union acpi_object *btintel_acpi_get_bt_pkg(union acpi_object *buffer)
++{
++	union acpi_object *domain, *bt_pkg;
++	int i;
++
++	for (i = 1; i < buffer->package.count; i++) {
++		bt_pkg = &buffer->package.elements[i];
++		domain = &bt_pkg->package.elements[0];
++		if (domain->type == ACPI_TYPE_INTEGER &&
++		    domain->integer.value == BTINTEL_BT_DOMAIN)
++			return bt_pkg;
++	}
++	return ERR_PTR(-ENOENT);
++}
++
++static int btintel_send_sar_ddc(struct hci_dev *hdev, struct btintel_cp_ddc_write *data, u8 len)
++{
++	struct sk_buff *skb;
++
++	skb = __hci_cmd_sync(hdev, 0xfc8b, len, data, HCI_CMD_TIMEOUT);
++	if (IS_ERR(skb)) {
++		bt_dev_warn(hdev, "Failed to send sar ddc id:0x%4.4x (%ld)",
++			    le16_to_cpu(data->id), PTR_ERR(skb));
++		return PTR_ERR(skb);
++	}
++	kfree_skb(skb);
++	return 0;
++}
++
++static int btintel_set_legacy_sar(struct hci_dev *hdev,
++				  struct btintel_sar_inc_pwr *sar)
++{
++	struct btintel_cp_ddc_write *cmd;
++	u8 buffer[64];
++	int ret;
++
++	cmd = (void *)buffer;
++	cmd->len = 3;
++	cmd->id = cpu_to_le16(0x0131);
++	cmd->data[0] = sar->br >> 3;
++	ret = btintel_send_sar_ddc(hdev, cmd, 4);
++	if (ret)
++		return ret;
++
++	cmd->len = 3;
++	cmd->id = cpu_to_le16(0x0132);
++	cmd->data[0] = sar->br >> 3;
++	ret = btintel_send_sar_ddc(hdev, cmd, 4);
++	if (ret)
++		return ret;
++
++	cmd->len = 3;
++	cmd->id = cpu_to_le16(0x0133);
++	cmd->data[0] = min3(sar->le, sar->le_lr, sar->le_2mhz) >> 3;
++	ret = btintel_send_sar_ddc(hdev, cmd, 4);
++	if (ret)
++		return ret;
++
++	cmd->len = 5;
++	cmd->id = cpu_to_le16(0x0137);
++	cmd->data[0] = sar->br >> 3;
++	cmd->data[1] = sar->edr2 >> 3;
++	cmd->data[2] = sar->edr3 >> 3;
++	ret = btintel_send_sar_ddc(hdev, cmd, 6);
++	if (ret)
++		return ret;
++
++	cmd->len = 5;
++	cmd->id = cpu_to_le16(0x0138);
++	cmd->data[0] = sar->br >> 3;
++	cmd->data[1] = sar->edr2 >> 3;
++	cmd->data[2] = sar->edr3 >> 3;
++	ret = btintel_send_sar_ddc(hdev, cmd, 6);
++	if (ret)
++		return ret;
++
++	cmd->len = 5;
++	cmd->id = cpu_to_le16(0x013b);
++	cmd->data[0] = sar->br >> 3;
++	cmd->data[1] = sar->edr2 >> 3;
++	cmd->data[2] = sar->edr3 >> 3;
++	ret = btintel_send_sar_ddc(hdev, cmd, 6);
++	if (ret)
++		return ret;
++
++	cmd->len = 5;
++	cmd->id = cpu_to_le16(0x013c);
++	cmd->data[0] = sar->br >> 3;
++	cmd->data[1] = sar->edr2 >> 3;
++	cmd->data[2] = sar->edr3 >> 3;
++	ret = btintel_send_sar_ddc(hdev, cmd, 6);
++
++	return ret;
++}
++
++static int btintel_set_mutual_sar(struct hci_dev *hdev,
++				  struct btintel_sar_inc_pwr *sar)
++{
++	struct btintel_cp_ddc_write *cmd;
++	struct sk_buff *skb;
++	u8 buffer[64];
++	bool enable;
++	int ret;
++
++	cmd = (void *)buffer;
++
++	cmd->len = 3;
++	cmd->id = cpu_to_le16(0x019e);
++
++	if (sar->revision == BTINTEL_SAR_INC_PWR &&
++	    sar->inc_power_mode == BTINTEL_SAR_INC_PWR_SUPPORTED)
++		cmd->data[0] = 0x01;
++	else
++		cmd->data[0] = 0x00;
++
++	ret = btintel_send_sar_ddc(hdev, cmd, 4);
++	if (ret)
++		return ret;
++
++	if (sar->revision == BTINTEL_SAR_INC_PWR &&
++	    sar->inc_power_mode == BTINTEL_SAR_INC_PWR_SUPPORTED) {
++		cmd->len = 3;
++		cmd->id = cpu_to_le16(0x019f);
++		cmd->data[0] = sar->sar_2400_chain_a;
++
++		ret = btintel_send_sar_ddc(hdev, cmd, 4);
++		if (ret)
++			return ret;
++	}
++
++	cmd->len = 3;
++	cmd->id = cpu_to_le16(0x01a0);
++	cmd->data[0] = sar->br;
++	ret = btintel_send_sar_ddc(hdev, cmd, 4);
++	if (ret)
++		return ret;
++
++	cmd->len = 3;
++	cmd->id = cpu_to_le16(0x01a1);
++	cmd->data[0] = sar->edr2;
++	ret = btintel_send_sar_ddc(hdev, cmd, 4);
++	if (ret)
++		return ret;
++
++	cmd->len = 3;
++	cmd->id = cpu_to_le16(0x01a2);
++	cmd->data[0] = sar->edr3;
++	ret = btintel_send_sar_ddc(hdev, cmd, 4);
++	if (ret)
++		return ret;
++
++	cmd->len = 3;
++	cmd->id = cpu_to_le16(0x01a3);
++	cmd->data[0] = min3(sar->le, sar->le_lr, sar->le_2mhz);
++	ret = btintel_send_sar_ddc(hdev, cmd, 4);
++	if (ret)
++		return ret;
++
++	enable = true;
++	skb = __hci_cmd_sync(hdev, 0xfe25, 1, &enable, HCI_CMD_TIMEOUT);
++	if (IS_ERR(skb)) {
++		bt_dev_warn(hdev, "Failed to send Intel SAR Enable (%ld)", PTR_ERR(skb));
++		return PTR_ERR(skb);
++	}
++
++	kfree_skb(skb);
++	return 0;
++}
++
++static int btintel_sar_send_to_device(struct hci_dev *hdev, struct btintel_sar_inc_pwr *sar,
++				      struct intel_version_tlv *ver)
++{
++	u16 cnvi, cnvr;
++	int ret;
++
++	cnvi = ver->cnvi_top & 0xfff;
++	cnvr = ver->cnvr_top & 0xfff;
++
++	if (cnvi < BTINTEL_CNVI_BLAZARI && cnvr < BTINTEL_CNVR_FMP2) {
++		bt_dev_info(hdev, "Applying legacy Bluetooth SAR");
++		ret = btintel_set_legacy_sar(hdev, sar);
++	} else if (cnvi == BTINTEL_CNVI_GAP || cnvr == BTINTEL_CNVR_FMP2) {
++		bt_dev_info(hdev, "Applying  Mutual Bluetooth SAR");
++		ret = btintel_set_mutual_sar(hdev, sar);
++	} else {
++		ret = -EOPNOTSUPP;
++	}
++
++	return ret;
++}
++
++static int btintel_acpi_set_sar(struct hci_dev *hdev, struct intel_version_tlv *ver)
++{
++	union acpi_object *bt_pkg, *buffer = NULL;
++	struct btintel_sar_inc_pwr sar;
++	acpi_status status;
++	u8 revision;
++	int ret;
++
++	status = btintel_evaluate_acpi_method(hdev, "BRDS", &buffer, 2);
++	if (ACPI_FAILURE(status))
++		return -ENOENT;
++
++	bt_pkg = btintel_acpi_get_bt_pkg(buffer);
++
++	if (IS_ERR(bt_pkg)) {
++		ret = PTR_ERR(bt_pkg);
++		goto error;
++	}
++
++	revision = buffer->package.elements[0].integer.value;
++
++	if (revision > BTINTEL_SAR_INC_PWR) {
++		bt_dev_dbg(hdev, "BT_SAR: revision: 0x%2.2x not supported", revision);
++		ret = -EOPNOTSUPP;
++		goto error;
++	}
++
++	if (revision == BTINTEL_SAR_LEGACY && bt_pkg->package.count != 7) {
++		sar.revision = revision;
++		sar.bt_sar_bios = (u32)bt_pkg->package.elements[1].integer.value;
++		sar.br = (u8)bt_pkg->package.elements[2].integer.value;
++		sar.edr2 = (u8)bt_pkg->package.elements[3].integer.value;
++		sar.edr3 = (u8)bt_pkg->package.elements[4].integer.value;
++		sar.le = (u8)bt_pkg->package.elements[5].integer.value;
++		sar.le_2mhz = (u8)bt_pkg->package.elements[6].integer.value;
++		sar.le_lr  = (u8)bt_pkg->package.elements[7].integer.value;
++
++	} else if (revision == BTINTEL_SAR_INC_PWR && bt_pkg->package.count != 9) {
++		sar.revision = revision;
++		sar.bt_sar_bios = (u32)bt_pkg->package.elements[1].integer.value;
++		sar.inc_power_mode = (u32)bt_pkg->package.elements[2].integer.value;
++		sar.sar_2400_chain_a = (u8)bt_pkg->package.elements[3].integer.value;
++		sar.br = (u8)bt_pkg->package.elements[4].integer.value;
++		sar.edr2 = (u8)bt_pkg->package.elements[5].integer.value;
++		sar.edr3 = (u8)bt_pkg->package.elements[6].integer.value;
++		sar.le = (u8)bt_pkg->package.elements[7].integer.value;
++		sar.le_2mhz = (u8)bt_pkg->package.elements[8].integer.value;
++		sar.le_lr  = (u8)bt_pkg->package.elements[9].integer.value;
++	} else {
++		ret = -EINVAL;
++		goto error;
++	}
++
++	/* Apply only if it is enabled in BIOS */
++	if (sar.bt_sar_bios != 1) {
++		bt_dev_dbg(hdev, "Bluetooth SAR is not enabled");
++		ret = -EOPNOTSUPP;
++		goto error;
++	}
++
++	ret = btintel_sar_send_to_device(hdev, &sar, ver);
++error:
++	kfree(buffer);
++	return ret;
++}
++#endif /* CONFIG_ACPI */
++
++static int btintel_set_specific_absorption_rate(struct hci_dev *hdev,
++						struct intel_version_tlv *ver)
++{
++#ifdef CONFIG_ACPI
++	return btintel_acpi_set_sar(hdev, ver);
++#endif
++	return 0;
++}
++
+ int btintel_bootloader_setup_tlv(struct hci_dev *hdev,
+ 				 struct intel_version_tlv *ver)
+ {
+@@ -2876,6 +3186,9 @@ int btintel_bootloader_setup_tlv(struct hci_dev *hdev,
+ 
+ 	hci_dev_clear_flag(hdev, HCI_QUALITY_REPORT);
+ 
++	/* Send sar values to controller */
++	btintel_set_specific_absorption_rate(hdev, ver);
++
+ 	/* Set PPAG feature */
+ 	btintel_set_ppag(hdev, ver);
+ 
+diff --git a/drivers/bluetooth/btintel.h b/drivers/bluetooth/btintel.h
+index fa43eb137821..0b355cb49836 100644
+--- a/drivers/bluetooth/btintel.h
++++ b/drivers/bluetooth/btintel.h
+@@ -56,7 +56,10 @@ struct intel_tlv {
+ #define BTINTEL_CNVI_BLAZARIW		0x901
+ #define BTINTEL_CNVI_GAP		0x910
+ #define BTINTEL_CNVI_BLAZARU		0x930
++#define BTINTEL_CNVI_GAP		0x910
+ 
++/* CNVR */
++#define BTINTEL_CNVR_FMP2		0x910
+ #define BTINTEL_IMG_BOOTLOADER		0x01	/* Bootloader image */
+ #define BTINTEL_IMG_IML			0x02	/* Intermediate image */
+ #define BTINTEL_IMG_OP			0x03	/* Operational image */
+@@ -164,6 +167,38 @@ struct hci_ppag_enable_cmd {
+ #define INTEL_TLV_DEBUG_EXCEPTION	0x02
+ #define INTEL_TLV_TEST_EXCEPTION	0xDE
+ 
++struct btintel_cp_ddc_write {
++	u8	len;
++	__le16	id;
++	u8	data[];
++} __packed;
++
++/* Bluetooth SAR feature (BRDS), Revision 0 */
++struct btintel_sar {
++	u8	revision;
++	u32	bt_sar_bios; /* Mode of SAR control to be used, 1:enabled in bios */
++	u8	br;
++	u8	edr2;
++	u8      edr3;
++	u8      le;
++	u8      le_2mhz;
++	u8      le_lr;
++} __packed;
++
++/* Bluetooth SAR feature (BRDS), Revision 1 */
++struct btintel_sar_inc_pwr {
++	u8	revision;
++	u32	bt_sar_bios;
++	u32	inc_power_mode;  /* Increased power mode */
++	u8	sar_2400_chain_a; /* Sar power restriction LB */
++	u8	br;
++	u8	edr2;
++	u8	edr3;
++	u8	le;
++	u8	le_2mhz;
++	u8	le_lr;
++} __packed;
++
+ #define INTEL_HW_PLATFORM(cnvx_bt)	((u8)(((cnvx_bt) & 0x0000ff00) >> 8))
+ #define INTEL_HW_VARIANT(cnvx_bt)	((u8)(((cnvx_bt) & 0x003f0000) >> 16))
+ #define INTEL_CNVX_TOP_TYPE(cnvx_top)	((cnvx_top) & 0x00000fff)
 -- 
-2.47.0
+2.40.1
 
