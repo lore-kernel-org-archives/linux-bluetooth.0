@@ -1,333 +1,165 @@
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from EUR02-VI1-obe.outbound.protection.outlook.com (mail-vi1eur02on2050.outbound.protection.outlook.com [40.107.241.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2701B13A879;
-	Fri, 25 Oct 2024 13:52:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729864376; cv=none; b=l/kW0uUXUu9Tq9KQqxNAQa74pL9104NL9gREGMJ/3ukDzsr+OUdL/Jfm5Tbb3nyrugD9AgjAv4uWxQABTY8xNoQw0dHKYlqAL+V8J+pke2HRHMZPlmElMlPQdj9fTYdgjl9XxVflyT/QIPCAGK/XJJwTvWIo8MV7fj7eNTTE/zM=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729864376; c=relaxed/simple;
-	bh=TZ4Q18noK/5XG/g0vNsCTv4Y1JPXuVsI5u/4GQ8VABY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=gZ59F9KWMRniVh8s66Z7Ig3NC/AKXpPj5jgX+Mj7cJMud6frRWLAvqdVZJ0GnNh0ptWgBzFzKIKgo55sdCArsVaLdLAd8fFoT8hHIz1ZiRgOBvktTxV52UKpK4aLbY7HXCT1PrIzYVxgBP8Cu02QsHiKmp6uCellLB380p4fZGo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=I4DKF/WH; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=OcrFsjgS; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=I4DKF/WH; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=OcrFsjgS; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 997501FB8AE
+	for <linux-bluetooth@vger.kernel.org>; Fri, 25 Oct 2024 14:29:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.241.50
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1729866548; cv=fail; b=PEMzkkca6QPcI7TKrpQZgWnl7se5twcl67keZnOAKPV0eJqvZdQLR77VTyqixdM6eRUK4WqLKeqA0nA1Rr7QlyuO9t0oHE0NmxCkP1fQi6StvqatpQ/f5Dxpvols9Buver0qReoQ25jzWP1FvmOaZUdDO4H235QVlusVwwzNj1A=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1729866548; c=relaxed/simple;
+	bh=xbolBX1FSBLMw9eukgaYF1szLiJ2VlYZ5/SLfb+mveY=;
+	h=From:To:Cc:Subject:Date:Message-ID:Content-Type:MIME-Version; b=m5yDo5Tz4Z3HAj0H6mH/sfnFy8uIsJKCCPFTtWT8bzUtoD2+HAp7alHNOLLaWGywtLmu3eNzg3wpmZkd5kYK036qAvPZ7tXCxKY0OG70SuChLaGPIAUTZUdeGolLm0QF+zx/pjfXRk9WNyAZ9ghSN2da0QP1m0pfOzR61S6Jtwk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=KZniHOBT; arc=fail smtp.client-ip=40.107.241.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="I4DKF/WH";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="OcrFsjgS";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="I4DKF/WH";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="OcrFsjgS"
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 35B3C1FE29;
-	Fri, 25 Oct 2024 13:52:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1729864372; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=hVp2BM2ZsW3qQ4gbDue0mRie0l4ERoGo2ToJZjkRdfc=;
-	b=I4DKF/WHSXYyxn9maUAO0lJ/ctGVP/AYnNxz0kVTglnATwZNEEoSOqTCtbBsc5AaFrsPf9
-	VKd6sqG1NM2MeA6E+cN/uWyVww8IMrVIy3nT11nM9Dsa1XBwO4/K0hxFfVjvZDSMCmsait
-	pjmtbTrb+J2Qu5FI9v42Wme88r7a9U0=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1729864372;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=hVp2BM2ZsW3qQ4gbDue0mRie0l4ERoGo2ToJZjkRdfc=;
-	b=OcrFsjgS7DaKcptOnqNC2t0mP+LyutfOa+nfevufxH7FlLbS0QTriUFrEo8D8xNd4ruF6r
-	o9Fvj97SA+cuslBA==
-Authentication-Results: smtp-out2.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1729864372; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=hVp2BM2ZsW3qQ4gbDue0mRie0l4ERoGo2ToJZjkRdfc=;
-	b=I4DKF/WHSXYyxn9maUAO0lJ/ctGVP/AYnNxz0kVTglnATwZNEEoSOqTCtbBsc5AaFrsPf9
-	VKd6sqG1NM2MeA6E+cN/uWyVww8IMrVIy3nT11nM9Dsa1XBwO4/K0hxFfVjvZDSMCmsait
-	pjmtbTrb+J2Qu5FI9v42Wme88r7a9U0=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1729864372;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=hVp2BM2ZsW3qQ4gbDue0mRie0l4ERoGo2ToJZjkRdfc=;
-	b=OcrFsjgS7DaKcptOnqNC2t0mP+LyutfOa+nfevufxH7FlLbS0QTriUFrEo8D8xNd4ruF6r
-	o9Fvj97SA+cuslBA==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 76601132D3;
-	Fri, 25 Oct 2024 13:52:51 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id GXqhG7OiG2eqTwAAD6G6ig
-	(envelope-from <tzimmermann@suse.de>); Fri, 25 Oct 2024 13:52:51 +0000
-Message-ID: <50017007-d2c3-4964-9cc4-ff26961e3809@suse.de>
-Date: Fri, 25 Oct 2024 15:52:51 +0200
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="KZniHOBT"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=g2YfIagO6h1LSQTYfTyGhq0qAdAyIBNugpX5nusQb03X3gU0CmOVhlGK/AToIAiUpX1A8fwGADhtSGD/KJBlA4yuHjJtTTgoh5ON44WBlYUbGoU/bkuce7zYsnpXRBwQQSsxvHji3MCGh/0habL9czP4LQlOI5ySXXcYHmnn6X941GhzfWYEncgCBlnYPQZttmKdqO9gCDVCZY96089eByaZEXeQzA5RGKwPL7W/iOKSz8yU4PXXOd/HuQPZ6l7miV4qQdDga0A8PZH3YQlADuQHYhQf1kk/8X+IJufyKZ+Zu1sbTsiVC3oXB81jw93Nu1uG7m8RjzKQkGlPr5qvqg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=XlJJhqtxFfD2Swbn14ThlGFPchtbjB28uLieAboDENk=;
+ b=MP1+Zgh6k+UsA3VVzLHPJ5k0729et9eVW5eFvcCFLVZSqUzmrbxXFK5G2uuwh3pK3FA87Nss3PYbA+HegD/bZ+6NZdh6bHgvisdSzRWmp0ZQz94MCBqj/p5eoxxTRGyeGrZm7GbFlKiOvA/WERKaLomPWiUJQyTsXocAQtZBVaQWMGYFkbuQNEGzL2MdPHTX6YenUsYyBCMgPALq9G8ybSlvaBjuO7ENIhoTeQmb9jJWawb3MXhUkxFyD9ZHzUwehT8ZijlImxxazrKW/imSzyHKz7KvMLOqRp7nLz82YnDh21IHifSkY6hOSqX9ObXp0C4dL4FiYneBC3eKbHTWWA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=XlJJhqtxFfD2Swbn14ThlGFPchtbjB28uLieAboDENk=;
+ b=KZniHOBTMpK7Pf/Uv7tnn+Gmp3uQhu2xVbsDZXYsxqjvQlmtXHp1ZjLANaLdGnK8LHTm5tBkv/y6fp1mK2i+LupRpJWf1YBaNM5Mu7wBvUDuuZREtwJOec8p0QX/FVseSPz3Y17xUfvVUwUm6fXbWpjzS3K1TUFKOna0cfmK8VtaHrwX5O+aaaZ6gaYDOQi540duuEFyuY4jIu2ql8xOTQ99EAW0yuoCQOqInbUDXDBhO7EpaRl9mddSNark0WfTSI6BOyRzpHBUtTr0MK0WXQYwf72Q0pI6j5So0So3Sa4Xy//1S+t822x+JWiL0TE29yJK16FwbH3CKBnCOZ4zTA==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from AS8PR04MB8898.eurprd04.prod.outlook.com (2603:10a6:20b:42d::15)
+ by GVXPR04MB9830.eurprd04.prod.outlook.com (2603:10a6:150:113::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8093.20; Fri, 25 Oct
+ 2024 14:29:02 +0000
+Received: from AS8PR04MB8898.eurprd04.prod.outlook.com
+ ([fe80::5e22:869c:33c:9654]) by AS8PR04MB8898.eurprd04.prod.outlook.com
+ ([fe80::5e22:869c:33c:9654%4]) with mapi id 15.20.8093.014; Fri, 25 Oct 2024
+ 14:29:02 +0000
+From: Iulia Tanasescu <iulia.tanasescu@nxp.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: claudia.rosu@nxp.com,
+	mihai-octavian.urzica@nxp.com,
+	andrei.istodorescu@nxp.com,
+	luiz.dentz@gmail.com,
+	Iulia Tanasescu <iulia.tanasescu@nxp.com>
+Subject: [PATCH BlueZ 0/2] transport: Fix select/unselect reply missing
+Date: Fri, 25 Oct 2024 17:28:40 +0300
+Message-ID: <20241025142842.46566-1-iulia.tanasescu@nxp.com>
+X-Mailer: git-send-email 2.43.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: AM8P191CA0020.EURP191.PROD.OUTLOOK.COM
+ (2603:10a6:20b:21a::25) To AS8PR04MB8898.eurprd04.prod.outlook.com
+ (2603:10a6:20b:42d::15)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v9 3/5] drm: handle HAS_IOPORT dependencies
-To: Niklas Schnelle <schnelle@linux.ibm.com>, Brian Cain <bcain@quicinc.com>,
- Marcel Holtmann <marcel@holtmann.org>,
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
- Patrik Jakobsson <patrik.r.jakobsson@gmail.com>,
- Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
- Maxime Ripard <mripard@kernel.org>, David Airlie <airlied@gmail.com>,
- Simona Vetter <simona@ffwll.ch>, Dave Airlie <airlied@redhat.com>,
- Gerd Hoffmann <kraxel@redhat.com>, Lucas De Marchi
- <lucas.demarchi@intel.com>,
- =?UTF-8?Q?Thomas_Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>,
- Rodrigo Vivi <rodrigo.vivi@intel.com>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- Jiri Slaby <jirislaby@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
- "Maciej W. Rozycki" <macro@orcam.me.uk>, Heiko Carstens <hca@linux.ibm.com>
-Cc: linux-kernel@vger.kernel.org, linux-hexagon@vger.kernel.org,
- linux-bluetooth@vger.kernel.org, dri-devel@lists.freedesktop.org,
- virtualization@lists.linux.dev, spice-devel@lists.freedesktop.org,
- intel-xe@lists.freedesktop.org, linux-serial@vger.kernel.org,
- linux-arch@vger.kernel.org, Arnd Bergmann <arnd@kernel.org>
-References: <20241024-b4-has_ioport-v9-0-6a6668593f71@linux.ibm.com>
- <20241024-b4-has_ioport-v9-3-6a6668593f71@linux.ibm.com>
-Content-Language: en-US
-From: Thomas Zimmermann <tzimmermann@suse.de>
-Autocrypt: addr=tzimmermann@suse.de; keydata=
- xsBNBFs50uABCADEHPidWt974CaxBVbrIBwqcq/WURinJ3+2WlIrKWspiP83vfZKaXhFYsdg
- XH47fDVbPPj+d6tQrw5lPQCyqjwrCPYnq3WlIBnGPJ4/jreTL6V+qfKRDlGLWFjZcsrPJGE0
- BeB5BbqP5erN1qylK9i3gPoQjXGhpBpQYwRrEyQyjuvk+Ev0K1Jc5tVDeJAuau3TGNgah4Yc
- hdHm3bkPjz9EErV85RwvImQ1dptvx6s7xzwXTgGAsaYZsL8WCwDaTuqFa1d1jjlaxg6+tZsB
- 9GluwvIhSezPgnEmimZDkGnZRRSFiGP8yjqTjjWuf0bSj5rUnTGiyLyRZRNGcXmu6hjlABEB
- AAHNJ1Rob21hcyBaaW1tZXJtYW5uIDx0emltbWVybWFubkBzdXNlLmRlPsLAjgQTAQgAOAIb
- AwULCQgHAgYVCgkICwIEFgIDAQIeAQIXgBYhBHIX+6yM6c9jRKFo5WgNwR1TC3ojBQJftODH
- AAoJEGgNwR1TC3ojx1wH/0hKGWugiqDgLNXLRD/4TfHBEKmxIrmfu9Z5t7vwUKfwhFL6hqvo
- lXPJJKQpQ2z8+X2vZm/slsLn7J1yjrOsoJhKABDi+3QWWSGkaGwRJAdPVVyJMfJRNNNIKwVb
- U6B1BkX2XDKDGffF4TxlOpSQzdtNI/9gleOoUA8+jy8knnDYzjBNOZqLG2FuTdicBXblz0Mf
- vg41gd9kCwYXDnD91rJU8tzylXv03E75NCaTxTM+FBXPmsAVYQ4GYhhgFt8S2UWMoaaABLDe
- 7l5FdnLdDEcbmd8uLU2CaG4W2cLrUaI4jz2XbkcPQkqTQ3EB67hYkjiEE6Zy3ggOitiQGcqp
- j//OwE0EWznS4AEIAMYmP4M/V+T5RY5at/g7rUdNsLhWv1APYrh9RQefODYHrNRHUE9eosYb
- T6XMryR9hT8XlGOYRwKWwiQBoWSDiTMo/Xi29jUnn4BXfI2px2DTXwc22LKtLAgTRjP+qbU6
- 3Y0xnQN29UGDbYgyyK51DW3H0If2a3JNsheAAK+Xc9baj0LGIc8T9uiEWHBnCH+RdhgATnWW
- GKdDegUR5BkDfDg5O/FISymJBHx2Dyoklv5g4BzkgqTqwmaYzsl8UxZKvbaxq0zbehDda8lv
- hFXodNFMAgTLJlLuDYOGLK2AwbrS3Sp0AEbkpdJBb44qVlGm5bApZouHeJ/+n+7r12+lqdsA
- EQEAAcLAdgQYAQgAIAIbDBYhBHIX+6yM6c9jRKFo5WgNwR1TC3ojBQJftOH6AAoJEGgNwR1T
- C3ojVSkIALpAPkIJPQoURPb1VWjh34l0HlglmYHvZszJWTXYwavHR8+k6Baa6H7ufXNQtThR
- yIxJrQLW6rV5lm7TjhffEhxVCn37+cg0zZ3j7zIsSS0rx/aMwi6VhFJA5hfn3T0TtrijKP4A
- SAQO9xD1Zk9/61JWk8OysuIh7MXkl0fxbRKWE93XeQBhIJHQfnc+YBLprdnxR446Sh8Wn/2D
- Ya8cavuWf2zrB6cZurs048xe0UbSW5AOSo4V9M0jzYI4nZqTmPxYyXbm30Kvmz0rYVRaitYJ
- 4kyYYMhuULvrJDMjZRvaNe52tkKAvMevcGdt38H4KSVXAylqyQOW5zvPc4/sq9c=
-In-Reply-To: <20241024-b4-has_ioport-v9-3-6a6668593f71@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Score: -2.80
-X-Spamd-Result: default: False [-2.80 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	SUSPICIOUS_RECIPS(1.50)[];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ARC_NA(0.00)[];
-	FREEMAIL_ENVRCPT(0.00)[gmail.com];
-	MIME_TRACE(0.00)[0:+];
-	TAGGED_RCPT(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[29];
-	FREEMAIL_TO(0.00)[linux.ibm.com,quicinc.com,holtmann.org,gmail.com,linux.intel.com,kernel.org,ffwll.ch,redhat.com,intel.com,linuxfoundation.org,arndb.de,orcam.me.uk];
-	MID_RHS_MATCH_FROM(0.00)[];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	R_RATELIMIT(0.00)[to_ip_from(RLykjg6e7ifkwtw7jmpw7b9yio)];
-	RCVD_TLS_ALL(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,suse.de:mid,suse.de:email,intel.com:email]
-X-Spam-Flag: NO
-X-Spam-Level: 
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AS8PR04MB8898:EE_|GVXPR04MB9830:EE_
+X-MS-Office365-Filtering-Correlation-Id: ca8af5aa-88e3-4869-fd46-08dcf5015f59
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|366016|376014|52116014|38350700014;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?1CBtBuBgg+b5R+1w+aWJUWSuPzHH2go6lyt2OQEqIH5/TnOEPgTdf8hN1jcG?=
+ =?us-ascii?Q?H5vS02RQkui78BgKP3TayulVy94IQyFx8r5xJFm3bXEvIKSwgUr7PQgglnX9?=
+ =?us-ascii?Q?K9alo31dH8q1BY/j2LbWFHllW/p1OxYEyV/vRGHVAXKlFYT9Csiwj90IlE1+?=
+ =?us-ascii?Q?bU2DplG93xLFtRWmnQ6qPfWV6pPS8l8oiSU9DMY34vxTZgKtXHDu52duegvM?=
+ =?us-ascii?Q?CHPqnUJpfvpm99zn4DDX/wFl2Bgxvwdbf5CkszjP2HImJ3DxsmgRjbpiRlZX?=
+ =?us-ascii?Q?9ozyESx21FxrgUV3OS/7d4Xvm/YuY323X2DeipV8MKhKP1eG/VjaJnpRtAfa?=
+ =?us-ascii?Q?wWNFdPaPn0P4ktJF+yzEAn+uCXOcYqNwFxuJvMevg/o2VlXPweEA0HqMCg/R?=
+ =?us-ascii?Q?DaJgwQdVhcosKnHwgK01ERzEQCQI1FjFXZeHAwRFkQVhWMtdmRmD0t+QuN5Q?=
+ =?us-ascii?Q?AILJ4Cgzx3Mi71sEblJoQPoGwnbIXV0/5C6pzTYQwImjbqYEg9+rt7IUCIuT?=
+ =?us-ascii?Q?AlnabcUVf4EoejOAnKxk27IoYN/LaPPOJvogyoF+uVWb4jOHnzptG1HcFsXp?=
+ =?us-ascii?Q?Jj4ahh1Zl0THlXEl1IPkt0NLwi76Dk+87JrgnOq1KcuTAXxy0CM91koqW8X1?=
+ =?us-ascii?Q?LalSV64mvXq4wveoNa+5cLWeSvquiBmUhbba19ZeQs3aix8S17OJqpsCBqZV?=
+ =?us-ascii?Q?Yf0mRyv6xkGSjCTFamxgbYz/tjC0Aolkw/93sNaljb4H25JmQpjlXEuuHhDx?=
+ =?us-ascii?Q?ypdSqpIbUOJVCR5kwEEmDm2OJ662ijYGBb6aX5lT99XMqejPfYyDsxv4xZhA?=
+ =?us-ascii?Q?iQl6mpKgRSXTfgwcTJltT9S4ldVZ3+NK6deGvx7lYlwuNwfAPH27mhrwO7+C?=
+ =?us-ascii?Q?0kNb6OB3W7QNoXOxHxQJcklaEIwiNJvIuNX5F2r6GMeWH7M5DEX8+qcVV0k1?=
+ =?us-ascii?Q?0O+nEsoKuR1EXr0pruUcp8PXBeMxCJTva6ut3WKzyTqd80Uc3sxBTfyTb4aS?=
+ =?us-ascii?Q?zGLNZ4OqAgmIs76RbVeZ/BO3A1c5d4VIrBpdjJpOh6SXmNusbKXC9LM7h+Su?=
+ =?us-ascii?Q?OuOPm37Y5yDbKC8WG0xxlEteafrSgC1VWpUMuCdQKTkWy2Fb04dOP4cYfa/B?=
+ =?us-ascii?Q?FlFp99pEuDDJeI5Tcgfd6vzWNeZleXJHsiN0A5kYVtl0k8eN1GhC2Z3U5RnM?=
+ =?us-ascii?Q?K/TDT3XEEPP7X0iiyhBKczsDiufIzf7LwuLOvQFSBjE9gDqzfhR/oYQyFDAD?=
+ =?us-ascii?Q?sWJEONXIV5w6iQDw2jxnAFY9zM/jqvyveBzD8lLDNkUDu/wPFIyeDcXnJabX?=
+ =?us-ascii?Q?LHnTGQmGJJdxDLAXMqgcqwysXboEnPSai5TJhePrGpsG6inMSOs4vYgzeyEU?=
+ =?us-ascii?Q?6yDWQ5E=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AS8PR04MB8898.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(52116014)(38350700014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?wB1UjSCdOPT0irg0/28Ao6T8Z+jMwNLG2EbVVqagb21aHGOyZcdW6V9OA/Sg?=
+ =?us-ascii?Q?7xBcUqXnaoMFEbg9az+SRXvjCnwV0OWYt07vXXN324yg3FT/pNSW/kSpHulg?=
+ =?us-ascii?Q?1Qb07Sp1IjUY96Cry+4Kvv8d1sTDNGQQTr38zgxnSHWf7t+c+fVRX32SqUK7?=
+ =?us-ascii?Q?ond6f8xJ20PUqtOM+3psIu1PluSTiD+nMKzFd2P7zw4gIt2gkm07yr97jxnG?=
+ =?us-ascii?Q?Wp4/WYQYtsH9gzVS2htrtj1UoyMI58NdrBF4gxEzy/J2oXB3bPcyA4XtVlEI?=
+ =?us-ascii?Q?EhKxLYV3v59Evdeeq8f0/d+6x9z6CDN94OrzxVPlkmhG/MdvybuJ93vbQjEZ?=
+ =?us-ascii?Q?2ra3mu5wr2mJhDDe5Ln4hogCQaU2MQE0FrVirKE9pmPLPV1gvuoAJRwidG8g?=
+ =?us-ascii?Q?ntDNObVqBPfMtNu7uIocpGT3dDZaiQfYER4PxIBx6OuNTaXtTGVrw83TN1tj?=
+ =?us-ascii?Q?Dw7OgXyMph1pvnJEs9P21wRotqhiYXoIoAD8GrIlqYhE59J948bsphQ3RV9+?=
+ =?us-ascii?Q?AbI6E7p4VVKiEJvFbSjId8JXLLxHWA5/mAYmJ9JHUCJF5lj/brRT9TpKyGUI?=
+ =?us-ascii?Q?WbyIoWYGqMCGog/yPIX2cKvYbaHwA9pHaF9LJPn8uQf+awLQ5VwGJkiXCeVQ?=
+ =?us-ascii?Q?uintZY1lPu2RNJHXo+X6t0bH2UufLs3pB7W5n49g9h6NqCZYTHFhqygJdSTk?=
+ =?us-ascii?Q?WIgD2gof23MlMqiEXrTu0mjEJF/22kGGDIBs+WWvcFZo0PrhYSMdA9QQRW0d?=
+ =?us-ascii?Q?F3AEpyFXkd04bh7vm6PcNfoIh8GgV+J5z3stCQCmFgB4XmITL+Piwv/1vBaR?=
+ =?us-ascii?Q?l1ab7Pe/1MNjTKu/7fh9ahniIuLX0AKr5tekdVcrxu7jSM8NS/oIITd9uXuf?=
+ =?us-ascii?Q?ymz/6kd0qEe9ELUZszpZF2fpO4dPeiB/KuaGg+u5T9EwWiZF7duQ0lP7t0GM?=
+ =?us-ascii?Q?RZ+cDeh4zazLdZMNhmgXuv8IXhPlCFrvn7D6ZdAFX4yHtlWNmID7/SmuyRyX?=
+ =?us-ascii?Q?9QCsF1lh85CsspK0dCtd9iFiYAZb1y2Qd6WVeyRFR0S6MbszwerjLzJnr1Xc?=
+ =?us-ascii?Q?w6ZS+U4pgfXpAUYOU8sz0TEYMwlKZTKFBimLkOVUScPCEpg53j/EVvRWIDXu?=
+ =?us-ascii?Q?+BoOSdvyafBPRe5WnaYw3KzYOMS48PmhKVfBGgtoCLFhaSGI2tjJPWCQ3FP2?=
+ =?us-ascii?Q?iBE+L+KWgylIHHU3ChiYdJewRRFhQHnatBjyvBKQn7ptz4C9nMie8Cmeh5Ab?=
+ =?us-ascii?Q?EKXU5Lb1DWv2HncN1lRQptfkXSGKzqq8yNRhoi/bvePjDn4Elh499c71OlL7?=
+ =?us-ascii?Q?RjmUld3+PW8eeMwoEeCT8YrMyv1mnptzeLfcCwNTOO4WAu50xpQTe3raphrj?=
+ =?us-ascii?Q?m8vgFne+HR2PCZFVcZHYovG4f/4n+1NLWVsdLt63+Dixx72rRqm/ro6+ZiJV?=
+ =?us-ascii?Q?3UtkdaUJQ4w0c6zIKgs/yMx/rt7lTl5eum9frlzrdjr4Xat4ovBsLbtnJ+b3?=
+ =?us-ascii?Q?dIXmlg4t+JnuAmPcjlkT6HSfzjoV5dBTK8G0am8gaVEhVW07t5wywc0iCXbn?=
+ =?us-ascii?Q?Kw6JSEMpsX9Xj5nOqeRg2rfAOlvADQGvocVtWzvtZt0uC+0LJ+f1QCxgcBNX?=
+ =?us-ascii?Q?rQ=3D=3D?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: ca8af5aa-88e3-4869-fd46-08dcf5015f59
+X-MS-Exchange-CrossTenant-AuthSource: AS8PR04MB8898.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Oct 2024 14:29:02.4745
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 0R2RZod3Yxq2CJa+jy7m2LhI6thfafbyc9uN/z9v79xDHThJPO2mptBZlXOyts3VpMrYOo57qRzRotZwIPd/OQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: GVXPR04MB9830
+
+When a transport is selected from bluetoothctl, a reply is expected.
+Currently, if the method call is successful, no reply is sent, causing
+the following error message in bluetoothctl:
+
+transport.Failed to select: org.freedesktop.DBus.Error.NoReply
+
+The same error can be reproduced for the unselect method.
+
+This patch updates the select and unselect methods to send reply
+messages. It also fixes the shell prints in client/player.c,
+when the replies for select/unselect are received.
+
+Iulia Tanasescu (2):
+  transport: Send reply to select/unselect
+  client/player: Fix select/unselect reply prints
+
+ client/player.c            | 4 ++--
+ profiles/audio/transport.c | 4 ++--
+ 2 files changed, 4 insertions(+), 4 deletions(-)
 
 
-
-Am 24.10.24 um 19:54 schrieb Niklas Schnelle:
-> In a future patch HAS_IOPORT=n will disable inb()/outb() and friends at
-> compile time. We thus need to add HAS_IOPORT as dependency for those
-> drivers using them. In the bochs driver there is optional MMIO support
-> detected at runtime, warn if this isn't taken when HAS_IOPORT is not
-> defined.
->
-> There is also a direct and hard coded use in cirrus.c which according to
-> the comment is only necessary during resume.  Let's just skip this as
-> for example s390 which doesn't have I/O port support also doesen't
-> support suspend/resume.
->
-> Co-developed-by: Arnd Bergmann <arnd@kernel.org>
-> Signed-off-by: Arnd Bergmann <arnd@kernel.org>
-> Acked-by: Lucas De Marchi <lucas.demarchi@intel.com> # xe
-> Signed-off-by: Niklas Schnelle <schnelle@linux.ibm.com>
-
-Reviewed-by: Thomas Zimmermann <tzimmermann@suse.de>
-
-> ---
->   drivers/gpu/drm/gma500/Kconfig |  2 +-
->   drivers/gpu/drm/qxl/Kconfig    |  2 +-
->   drivers/gpu/drm/tiny/bochs.c   | 19 ++++++++++++++-----
->   drivers/gpu/drm/tiny/cirrus.c  |  2 ++
->   drivers/gpu/drm/xe/Kconfig     |  2 +-
->   5 files changed, 19 insertions(+), 8 deletions(-)
->
-> diff --git a/drivers/gpu/drm/gma500/Kconfig b/drivers/gpu/drm/gma500/Kconfig
-> index efb4a2dd2f80885cb59c925d09401002278d7d61..23b7c14de5e29238ece939d5822d8a9ffc4675cc 100644
-> --- a/drivers/gpu/drm/gma500/Kconfig
-> +++ b/drivers/gpu/drm/gma500/Kconfig
-> @@ -1,7 +1,7 @@
->   # SPDX-License-Identifier: GPL-2.0-only
->   config DRM_GMA500
->   	tristate "Intel GMA500/600/3600/3650 KMS Framebuffer"
-> -	depends on DRM && PCI && X86 && MMU
-> +	depends on DRM && PCI && X86 && MMU && HAS_IOPORT
->   	select DRM_KMS_HELPER
->   	select FB_IOMEM_HELPERS if DRM_FBDEV_EMULATION
->   	select I2C
-> diff --git a/drivers/gpu/drm/qxl/Kconfig b/drivers/gpu/drm/qxl/Kconfig
-> index ca3f51c2a8fe1a383f8a2479f04b5c0b3fb14e44..17d6927e5e23402786117fd0f99186978956c1c2 100644
-> --- a/drivers/gpu/drm/qxl/Kconfig
-> +++ b/drivers/gpu/drm/qxl/Kconfig
-> @@ -1,7 +1,7 @@
->   # SPDX-License-Identifier: GPL-2.0-only
->   config DRM_QXL
->   	tristate "QXL virtual GPU"
-> -	depends on DRM && PCI && MMU
-> +	depends on DRM && PCI && MMU && HAS_IOPORT
->   	select DRM_KMS_HELPER
->   	select DRM_TTM
->   	select DRM_TTM_HELPER
-> diff --git a/drivers/gpu/drm/tiny/bochs.c b/drivers/gpu/drm/tiny/bochs.c
-> index 31fc5d839e106ea4d5c8fe42d1bfc3c70291e3fb..e738bb85831667f55c436e21e761435def113b9a 100644
-> --- a/drivers/gpu/drm/tiny/bochs.c
-> +++ b/drivers/gpu/drm/tiny/bochs.c
-> @@ -1,5 +1,6 @@
->   // SPDX-License-Identifier: GPL-2.0-or-later
->   
-> +#include <linux/bug.h>
->   #include <linux/module.h>
->   #include <linux/pci.h>
->   
-> @@ -95,12 +96,17 @@ struct bochs_device {
->   
->   /* ---------------------------------------------------------------------- */
->   
-> +static __always_inline bool bochs_uses_mmio(struct bochs_device *bochs)
-> +{
-> +	return !IS_ENABLED(CONFIG_HAS_IOPORT) || bochs->mmio;
-> +}
-> +
->   static void bochs_vga_writeb(struct bochs_device *bochs, u16 ioport, u8 val)
->   {
->   	if (WARN_ON(ioport < 0x3c0 || ioport > 0x3df))
->   		return;
->   
-> -	if (bochs->mmio) {
-> +	if (bochs_uses_mmio(bochs)) {
->   		int offset = ioport - 0x3c0 + 0x400;
->   
->   		writeb(val, bochs->mmio + offset);
-> @@ -114,7 +120,7 @@ static u8 bochs_vga_readb(struct bochs_device *bochs, u16 ioport)
->   	if (WARN_ON(ioport < 0x3c0 || ioport > 0x3df))
->   		return 0xff;
->   
-> -	if (bochs->mmio) {
-> +	if (bochs_uses_mmio(bochs)) {
->   		int offset = ioport - 0x3c0 + 0x400;
->   
->   		return readb(bochs->mmio + offset);
-> @@ -127,7 +133,7 @@ static u16 bochs_dispi_read(struct bochs_device *bochs, u16 reg)
->   {
->   	u16 ret = 0;
->   
-> -	if (bochs->mmio) {
-> +	if (bochs_uses_mmio(bochs)) {
->   		int offset = 0x500 + (reg << 1);
->   
->   		ret = readw(bochs->mmio + offset);
-> @@ -140,7 +146,7 @@ static u16 bochs_dispi_read(struct bochs_device *bochs, u16 reg)
->   
->   static void bochs_dispi_write(struct bochs_device *bochs, u16 reg, u16 val)
->   {
-> -	if (bochs->mmio) {
-> +	if (bochs_uses_mmio(bochs)) {
->   		int offset = 0x500 + (reg << 1);
->   
->   		writew(val, bochs->mmio + offset);
-> @@ -228,7 +234,7 @@ static int bochs_hw_init(struct drm_device *dev)
->   			DRM_ERROR("Cannot map mmio region\n");
->   			return -ENOMEM;
->   		}
-> -	} else {
-> +	} else if (IS_ENABLED(CONFIG_HAS_IOPORT)) {
->   		ioaddr = VBE_DISPI_IOPORT_INDEX;
->   		iosize = 2;
->   		if (!request_region(ioaddr, iosize, "bochs-drm")) {
-> @@ -236,6 +242,9 @@ static int bochs_hw_init(struct drm_device *dev)
->   			return -EBUSY;
->   		}
->   		bochs->ioports = 1;
-> +	} else {
-> +		dev_err(dev->dev, "I/O ports are not supported\n");
-> +		return -EIO;
->   	}
->   
->   	id = bochs_dispi_read(bochs, VBE_DISPI_INDEX_ID);
-> diff --git a/drivers/gpu/drm/tiny/cirrus.c b/drivers/gpu/drm/tiny/cirrus.c
-> index 751326e3d9c374baf72115492aeefff2b73869f0..e31e1df029ab0272c4a1ff0ab3eb026ca679b560 100644
-> --- a/drivers/gpu/drm/tiny/cirrus.c
-> +++ b/drivers/gpu/drm/tiny/cirrus.c
-> @@ -509,8 +509,10 @@ static void cirrus_crtc_helper_atomic_enable(struct drm_crtc *crtc,
->   
->   	cirrus_mode_set(cirrus, &crtc_state->mode);
->   
-> +#ifdef CONFIG_HAS_IOPORT
->   	/* Unblank (needed on S3 resume, vgabios doesn't do it then) */
->   	outb(VGA_AR_ENABLE_DISPLAY, VGA_ATT_W);
-> +#endif
->   
->   	drm_dev_exit(idx);
->   }
-> diff --git a/drivers/gpu/drm/xe/Kconfig b/drivers/gpu/drm/xe/Kconfig
-> index 7bbe46a98ff1f449bc2af30686585a00e9e8af93..116f58774135fc3a9f37d6d72d41340f5c812297 100644
-> --- a/drivers/gpu/drm/xe/Kconfig
-> +++ b/drivers/gpu/drm/xe/Kconfig
-> @@ -49,7 +49,7 @@ config DRM_XE
->   
->   config DRM_XE_DISPLAY
->   	bool "Enable display support"
-> -	depends on DRM_XE && DRM_XE=m
-> +	depends on DRM_XE && DRM_XE=m && HAS_IOPORT
->   	select FB_IOMEM_HELPERS
->   	select I2C
->   	select I2C_ALGOBIT
->
-
+base-commit: 806a552d53c787c0ddea9328a09b0ef124bca26e
 -- 
---
-Thomas Zimmermann
-Graphics Driver Developer
-SUSE Software Solutions Germany GmbH
-Frankenstrasse 146, 90461 Nuernberg, Germany
-GF: Ivo Totev, Andrew Myers, Andrew McDonald, Boudien Moerman
-HRB 36809 (AG Nuernberg)
+2.43.0
 
