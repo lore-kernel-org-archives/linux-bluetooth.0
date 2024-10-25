@@ -1,199 +1,148 @@
-Received: from DB3PR0202CU003.outbound.protection.outlook.com (mail-northeuropeazon11011002.outbound.protection.outlook.com [52.101.65.2])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f198.google.com (mail-il1-f198.google.com [209.85.166.198])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A46F1FB8BB
-	for <linux-bluetooth@vger.kernel.org>; Fri, 25 Oct 2024 14:29:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.65.2
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729866552; cv=fail; b=Yy3Kb7n6+5sKyPD/fVafvZHKXcOwY8lsI1GeSStx0LlDO0ZSby8/VGoXHkMEm1fX+APkRXdyDCY8Bvcr/1WIExdp2tKa+QZKxHFGA7RwgZfkcbGhMezUzOszs28pBnLeQXXnPgJxIpp94pEPljXlNAeGAWvoeMrNiK796qCHLTo=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729866552; c=relaxed/simple;
-	bh=+Cg52JgZpTyFa3xpu0DCKrd7cBkj1fKCUXxW9U2BCzY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=bi0wFL+yH9KHrzKUUC43Rv643VtjUmrrlBlAtypKaf+yMQ2iEioEpZ1zHCdXpM1fzV2xYXZqtIdKkjYjtQP0VUc4VlLH7ouR8KD4ofQ4Od5jDFPJOYvHBwkKlyBh+x3aZmV65dmpqC7BvS894QkGGB1mxO7pUCgzUGz9bh3nrs4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=lJCGz1Ll; arc=fail smtp.client-ip=52.101.65.2
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="lJCGz1Ll"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Ao8i9JUJIqhJll5OQVWvuk4cksw8uQLnGAqnmsfspMX5hSszsjfJq5I5L8Lv89weruplCwK8GEU91J0LGtimU4ToWw2eTfAf5vXxyi6IiIqxt+9bpZSS+Jkcn4kYjgExFvdX0UdVrSlkwY8GFffytTZRk3ojBTI+W4JiXlei6Zr82WdlNw8pbxrRdZuaazhcuQuJ+8K7huSTeDKJXZYAc47Nw32S1uQTe9NDI9YwIZ1osSgPLwxVuklTeBB2nvRQ6MLd0QsRkaTz3o51QIFtUa6fmv37ZZMexGGSf4CpiUGX03GmWSaqphkvWM73cR3wtV7Gb9rxftJ2TtkJ2QoJdQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=d1h52PkuAXPF4cHSIQ1j50LIxazIYFvfJP/DygbF1vQ=;
- b=ribSD305WWWZcOUls0TBtKntkCnAi5oQHuoB0evzGKYxkq8ykzEeX80Yvl0D5Fzd2K5FmCXDFaAYGYLqpwQRzT8KUS5gCilcs6XB5qs+yCKOQWTbMzMiUhArta2q9ciRksDKiU24Rc+7ZOGDCYxx9FydUS4JdaV21z63U8jpJwP2hKStaTFxHJ8AmSDLkx2MHkWK3ks8g9uPrjot07FTQCkWj8rTkWXBGNICx2/p/tnZ5nKAXOpF/DvGXZ0nHrvqWA9hMqh/rVTr2iVcRwwthhKplbvcVIHfky674z5UMI78AwB8MUPKFTfGdcO3a/tM0+v2nzAIfhY1YDG0ST9jxA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=d1h52PkuAXPF4cHSIQ1j50LIxazIYFvfJP/DygbF1vQ=;
- b=lJCGz1LldN6KiGQkvtTwNZDUEfNCCCml2X0EyrQAbyjkK7GhhERc3ykWZcb8rYo3GLlfRcgxVpaxeahwHenyGxwIOLnu0ncEAIgv2J9QFCTOKA8GGFeX8UFLJZK0wB02RrJhi9jMy4ZxFoG8JpYb6cK1M3DgTrAWP/KZConSfpANGuEdfj/x0YzTbqKLBmMu0aI9u3F5T70gW+849I+DGiR8ziJILL//rOUNkX+PJ9XdYoKLqFQROIQLITp9hvqVCSXXtaqnJiJ5pQqjBAGT7GHT99vXxgxHEaJBI+5Tk1vz0cmEYKT3A94ObWe3Jr0Hb0Ala8MkKA1HEG2+JfaEvQ==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from AS8PR04MB8898.eurprd04.prod.outlook.com (2603:10a6:20b:42d::15)
- by DBAPR04MB7254.eurprd04.prod.outlook.com (2603:10a6:10:1a4::5) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8093.21; Fri, 25 Oct
- 2024 14:29:06 +0000
-Received: from AS8PR04MB8898.eurprd04.prod.outlook.com
- ([fe80::5e22:869c:33c:9654]) by AS8PR04MB8898.eurprd04.prod.outlook.com
- ([fe80::5e22:869c:33c:9654%4]) with mapi id 15.20.8093.014; Fri, 25 Oct 2024
- 14:29:06 +0000
-From: Iulia Tanasescu <iulia.tanasescu@nxp.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: claudia.rosu@nxp.com,
-	mihai-octavian.urzica@nxp.com,
-	andrei.istodorescu@nxp.com,
-	luiz.dentz@gmail.com,
-	Iulia Tanasescu <iulia.tanasescu@nxp.com>
-Subject: [PATCH BlueZ 2/2] client/player: Fix select/unselect reply prints
-Date: Fri, 25 Oct 2024 17:28:42 +0300
-Message-ID: <20241025142842.46566-3-iulia.tanasescu@nxp.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20241025142842.46566-1-iulia.tanasescu@nxp.com>
-References: <20241025142842.46566-1-iulia.tanasescu@nxp.com>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: AM8P191CA0020.EURP191.PROD.OUTLOOK.COM
- (2603:10a6:20b:21a::25) To AS8PR04MB8898.eurprd04.prod.outlook.com
- (2603:10a6:20b:42d::15)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 007891FB8BC
+	for <linux-bluetooth@vger.kernel.org>; Fri, 25 Oct 2024 14:39:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.198
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1729867178; cv=none; b=bGtezixbLWNvJANlJaS5rm8ol8qJdZQ+8bgFbY9GZeQ1EqxWjWLSpkTsG4SJButyEU5YMpMI43v6TU3yyaKWTXqdlH1l4SgsSkEI8GRzZuqH6z46BZVwZ38rbSy4iJI8cDfvH3l1abEJqcrTWfLiLAATNtq2O7jXiPT/9lBVMQg=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1729867178; c=relaxed/simple;
+	bh=qyoNb4gFNWAKzMfRXUhVvi8eghxxKxX5bRlKKiDfpTs=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=JngN3hN12GB30Kj9CtGVUqfsSsp1yJf3PDOjHeD062zb6nnCUxosi5eylT6Qzt3VyWi9h7XmPhqpKesxUQsgUmipStbGlQo2GVmn9/mEb/KV26sSknY3fokdEs6Qr9MPCJkmqMzr27Gec1UDcsrokpRpqvM2xw6rBjv4mHPFma8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.198
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-3a4e52b6577so8959695ab.3
+        for <linux-bluetooth@vger.kernel.org>; Fri, 25 Oct 2024 07:39:34 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1729867174; x=1730471974;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=rKl93ItWUSNrBvfWKQMOqbQF7/2yw2Cr9mseQ1DUXyU=;
+        b=JThdbzFtf8WiGmwaqQHHZY7fvbMgsQXgagDL1Pgq3qtJSLAsi1D2oe8ok5I8uUdWvb
+         b1Hkj/5mKbuGlXqVOcB2DkJpDUd9li3+9T45MZEbjCjFxozQGimG29BMb0cNdI4w9Ze/
+         zus+0ONGSRPz9wolmXHi+PtVjPzXVjKyVYGLvnIwSFLJsbEVKIWicClJy6UE0z+D20f+
+         gd8XkrV64wTVbV3T0wBci04Jo0/qcMFAt7HAYTRms+69zZK2xtU8p90myaEGZFOqruod
+         qqK1p6LhhKjKc8UdpyuXnax8+pzGIVyNkL8Bx4CKWuoUw7gD9R+w1h8KO80iQWwbHwcl
+         nspg==
+X-Forwarded-Encrypted: i=1; AJvYcCWH5HO9Fm5eCXjVXqGGZWWTIq0yIHy3xYiVzMXjMlF1czGxLEFFEaeweNMk9bK0lcW7AgsnTTWPHvS/846bnTU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxjNN3kkHKt5/75uTpCe2RR/lqceFenvR3a5YFfjsYFr7wXmUZU
+	aa17IsJ3IoPCsagFllTtqRK3WUPKlJDq10nXzU0UEE4XyFJDHvMpF6ogJBEnPyZpLoc+q+qdxIY
+	HrC9mkNAfOzVXV2jBxv5L2xd9OunsYCaw9Jb/HzperEjdiVxxy7LQ3Go=
+X-Google-Smtp-Source: AGHT+IF5X01qRaytUlYxWlPuPfkPH7I6f9pfWsBOQ8fw82TWis59znWK9kYgR6tC62F/EalL5FCBW769pgdsfIG5z8JCRhFzKTpG
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AS8PR04MB8898:EE_|DBAPR04MB7254:EE_
-X-MS-Office365-Filtering-Correlation-Id: b4cfab1b-b8e2-4738-6215-08dcf50161ef
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|376014|52116014|366016|38350700014;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?mhzFgEDkYzjryOiC973qekZU3yNBOyagKTQhJ5g7RrGrxGA09HIfl3fQprqo?=
- =?us-ascii?Q?3wGZ/aFqDzhratbxE4lXAaAY+dL4AoA1r0oTWDQHOERhYvDtNg0DZr+gdZQg?=
- =?us-ascii?Q?JXEJ8P206LDR5MqMGijot4ye3Z1pPwG/AKi842uDLLRnl70kFlG3Zzao+2a2?=
- =?us-ascii?Q?sF9zacRfVfMAAeoi6ovQ8OV/yZVOrIEf11JvBovKXNK+xBKa8n0ffqF/yTu0?=
- =?us-ascii?Q?Ke1M0WGKZDc9Y67fRa9EPJs9bUr75oAkEg+vext4b8K4icz1C7JTVTdf0LYK?=
- =?us-ascii?Q?NdBbk8G65oH48OMmBnC8q+Eprwzx2nImCf/6VLOUmTJVz1xKS3Quu0//TAh/?=
- =?us-ascii?Q?fTg6P9M6zy0uObxCbvjExMUXBg2Q8mXEy88h3OBZ4hsikIafZZ7msQO9/Mmg?=
- =?us-ascii?Q?4IX80eOpTtgiC+QVzgdaNoU2O1gVd9o1H3rPIgj6k91UPoC3dUwPQB3y47GW?=
- =?us-ascii?Q?HVTHDDW1XOgkFUHkQbBjckdC110QkeSR1g67O+u+7RoTUJejPJrSocLSndBU?=
- =?us-ascii?Q?swgVenAiZ0ONbnWfi6kZU7if9C4NF/3KeIWLAIQl3ojbmGYek3w4j3jAYKCs?=
- =?us-ascii?Q?wT5QxFUMatm1fvkkvyC7gNy9VJcCys108QsthbOmKeu2qC3BvWC4znz/shyo?=
- =?us-ascii?Q?rLGGalb47d1/QdOi60TeTyJHdo/YJ8WSQGNYJICV/sYHzjC0af9DcUTeeqjq?=
- =?us-ascii?Q?T7l9bBZ80hAy5hcmcG0fZCShBDs41lD2bPbDPx/Dwljtj2tLIooXs5BL7NPW?=
- =?us-ascii?Q?IJVIEMuxefg9Y6ppIlKzRgSBzPHU2gODDGaWRvQ75yzaOVoPVJsw/qmHa93l?=
- =?us-ascii?Q?soPm9Vp75XVCY8r2GrkqxlJMc/Zq2J9hmj3Q4+9pM9WZpJ96mJiRLNrtAxkQ?=
- =?us-ascii?Q?xZeMZVcwcyPRfC6h1WoU+g+G3iksc7D77q5YKbGOymWQGzJusHjIyiA6Gsr9?=
- =?us-ascii?Q?exhY15sfHzRPNfQvEVE7vU+GCBzHnOiboMtcvHfNDHZKTTTtFy/WVyaDR2Pf?=
- =?us-ascii?Q?KSc82yxxrtS0IGgemf80lvZLLwUQa6yMlwVVTugKTHrQfkFR6euDBq9a/7OG?=
- =?us-ascii?Q?RYTN49j2SSZpDaHzh8uxbyfP9pgArbMh1bHREHR+VLIj2X3Cw45i0AgWO0I9?=
- =?us-ascii?Q?Xq0j8aofoTpruYG6Es21VEGu3jsieCWezVUmOF+OEUig+XczkumLWr2GXkh0?=
- =?us-ascii?Q?7Th8ELNTUeCJsql/geXkuY07Zy/LSouNW6tfj/iqqaIm9OwbzwPZQyp1g9lC?=
- =?us-ascii?Q?ATc7pPu3yYE6/Q1AEFunne1zZSJ+f8XyXgaZ0eVpzkoQm32D321UQ7RB3T9v?=
- =?us-ascii?Q?KAIDAUTOOicOgeMgvyALoBpIMLqJehX4jQdVBommwOyPcppO8EU/oNCXZVDn?=
- =?us-ascii?Q?PbT0FG4=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AS8PR04MB8898.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(52116014)(366016)(38350700014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?cgEUUNDkHBP3kZnt+K0Jj5/9DtiyiO+IQvX6OanMD+QWKi8hra2LEgsh3UdU?=
- =?us-ascii?Q?tFpFbX4kznY9HJ/7e2OjZEiC8yqB+kw6iZQQRyaIBfRvsGzP17HYthpguODM?=
- =?us-ascii?Q?Pp8n5daZydQUWJd09ynhdrya1US3m6HuYCTK+0pdc99Vp7jEN3fxoEVOLh3I?=
- =?us-ascii?Q?9jzMiFWNXKkhQChSetI43Qjcxz8U4l10yFrGtvILZSX7bwm61Pl9f412wZzW?=
- =?us-ascii?Q?Vc6diB5Blw3nT1IoMzPYR0O2fDY7lYQky7bmlJlb8i3G3LBs3/xoQrWDTg5T?=
- =?us-ascii?Q?GJO7iv9ib1+zfM6YFAbJ1JrY/VxIP7lieWsrm3fyJBMPE35kO1q+qFcZlakS?=
- =?us-ascii?Q?PHS4rk1zCUDVkM/UvT7hXWm1tjWAxQ12PVegFiI/0jfJqFB1EsOHDFHjIAn3?=
- =?us-ascii?Q?f8Xos7fcc1oRWOADtZhs80eMj6a9OT2ozU8lS0N7Wmd8LbauGcu8PjcsEQ4P?=
- =?us-ascii?Q?HFjbYwixik9i9gQU2m4TUMdxyaMpIu5Hc7fhM0bYS9wV+3ufao8YjKPS9NwV?=
- =?us-ascii?Q?dxTofivuzVSVCiCXuIzrVM94jN9i/lhQvP3lH/SZir2DviSRkx4MSeW0SHLZ?=
- =?us-ascii?Q?W+3vZG/lFa/KrQSLYgMziFQeJM4elmpJmSgAXJW0MZszOcFdd0BzdSk+o22q?=
- =?us-ascii?Q?5L9AKnFHiFCG0vnAKb0vHKXIbg4cMb3rvWSZc253AHR3nLbSEQtSjlkh+QMT?=
- =?us-ascii?Q?5cc7Nlb1EKHmENnR4xGebCPW9yaTU3haTwW7S9OXJHS8ZAtwDBvoig+tohJA?=
- =?us-ascii?Q?Tn5HFdy7SnoDybArlUSXpKyBdQVcI5okFGDjpiWlPfAZWqGndyCeJ8ynnfIa?=
- =?us-ascii?Q?w+FTw/H6kiugMM8ajiM70GnfQ3CTvEnGVfl6tReAtxQKeDjGs0p3amBD2GQd?=
- =?us-ascii?Q?Yiq/xdDow4Uq/CjutGOxJOl/VGvQDQ6eF/LI4RGSgF7qSAzzVUFw3lQEGF/H?=
- =?us-ascii?Q?Ub9OVHsZLNUbyDqHr286lrUr57eGe8Xd1rHpNa3ZsJTNaa96yBr5y6hMPN+F?=
- =?us-ascii?Q?d39rufu60/x7glCPgPKAvZ4lvOwvY93KQCe2+ahIrpTWBVToQR5uFZFRTQrL?=
- =?us-ascii?Q?24xOUqlswpYa8fkped8hrDcw6+146eDGB4pz2gTFBw4fDYAE5ic2QznBZyGf?=
- =?us-ascii?Q?B+YzHuUJDEHREu0S9tLiuv8+XYb/8s7082NLtGL+AM6bhXQmzJJNPIlMsBia?=
- =?us-ascii?Q?cL3Mc2q2FBUnZaNEr+nXYnRQrdYn5utkYWw6EQSPB0snSQpmp/VP8sRzbXOM?=
- =?us-ascii?Q?Uz+rOf8AGyejJZrjjnTmWW3Xo09Q/SuHcel/y4KsHBo+uObKXhK7fcRR+Xcs?=
- =?us-ascii?Q?MkyJGW29pDwOTHG90WfifR9NTt95+Cbc0yRZldlS4nLZHHaf9Rv9SBOCzFyw?=
- =?us-ascii?Q?LtTIk7n6+/YOXtEJ8ko5/M04jceg37nzphPQ5s0lmpcxisShkqlnB+dQitU8?=
- =?us-ascii?Q?sWMUdUxSFAQ1dAHCUPOHB5UW66UysoqVdgsJCy94aR+pJw/7uxeNoyZN7YeF?=
- =?us-ascii?Q?t/hBwmBNmUoe1VlyKT1aGUcysaNWT5Inj30/5XrAE2A6EyeGsnQQesQOehfJ?=
- =?us-ascii?Q?Wi/Nd3sjzZv8y0MUyX7Kz+pFgBDjHefGrCVB5HXn+sHgdvX1CWvfzV7FwBL3?=
- =?us-ascii?Q?Tg=3D=3D?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: b4cfab1b-b8e2-4738-6215-08dcf50161ef
-X-MS-Exchange-CrossTenant-AuthSource: AS8PR04MB8898.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Oct 2024 14:29:06.8074
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 38dX9IOdkzmc7Mwy6yIOm/09MuqBjFopW+vkDV7CHVn5RmurKbi17eySMZO7RpbBBViGrsG1tZg+WAhIFxhh+g==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DBAPR04MB7254
+X-Received: by 2002:a92:cd88:0:b0:3a3:b4ec:b3ea with SMTP id
+ e9e14a558f8ab-3a4de80b5dbmr67873115ab.16.1729867174092; Fri, 25 Oct 2024
+ 07:39:34 -0700 (PDT)
+Date: Fri, 25 Oct 2024 07:39:34 -0700
+In-Reply-To: <000000000000cfe4e90618c6d17c@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <671bada6.050a0220.2e773.0007.GAE@google.com>
+Subject: Re: [syzbot] [bluetooth?] possible deadlock in mgmt_set_connectable_complete
+From: syzbot <syzbot+b1752fcfa8658bb8984a@syzkaller.appspotmail.com>
+To: johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, luiz.dentz@gmail.com, marcel@holtmann.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-This updates the shell print messages for the transport select/unselect
-method replies. The bluetoothctl log below shows the fixed result:
+syzbot has found a reproducer for the following issue on:
 
-client/bluetoothctl
-[bluetooth]# endpoint.register 00001851-0000-1000-8000-00805f9b34fb 0x06
-[/local/endpoint/ep0] Auto Accept (yes/no): y
-[/local/endpoint/ep0] Max Transports (auto/value): a
-[/local/endpoint/ep0] Locations: 1
-[/local/endpoint/ep0] Supported Context (value): 1
-Capabilities:
-  03 01 ff 00 02 02 03 05 04 1a 00 f0 00 02 03 01
-Metadata:
-[bluetooth]# Endpoint /local/endpoint/ep0 registered
-[bluetooth]# scan on
-[bluetooth]# [NEW] Device 17:7A:80:64:A7:93 17-7A-80-64-A7-93
-[17-7A-80-64-A7-93]# [NEW] Transport
-                /org/bluez/hci0/dev_17_7A_80_64_A7_93/bis1/fd0
-[17-7A-80-64-A7-93]# transport.select
-                /org/bluez/hci0/dev_17_7A_80_64_A7_93/bis1/fd0
-[17-7A-80-64-A7-93]# [CHG] Transport
-    /org/bluez/hci0/dev_17_7A_80_64_A7_93/bis1/fd0 State: broadcasting
-[17-7A-80-64-A7-93]# Select successful
-[17-7A-80-64-A7-93]# transport.unselect
-                /org/bluez/hci0/dev_17_7A_80_64_A7_93/bis1/fd0
-[17-7A-80-64-A7-93]# [CHG] Transport
-    /org/bluez/hci0/dev_17_7A_80_64_A7_93/bis1/fd0 State: idle
-[17-7A-80-64-A7-93]# Unselect successful
+HEAD commit:    ae90f6a6170d Merge tag 'bpf-fixes' of git://git.kernel.org..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=10bc8230580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=309bb816d40abc28
+dashboard link: https://syzkaller.appspot.com/bug?extid=b1752fcfa8658bb8984a
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=11fab287980000
+
+Downloadable assets:
+disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/7feb34a89c2a/non_bootable_disk-ae90f6a6.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/c242e171fdc8/vmlinux-ae90f6a6.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/a180678c27b3/bzImage-ae90f6a6.xz
+mounted in repro: https://storage.googleapis.com/syzbot-assets/2fbc68333ee1/mount_0.gz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+b1752fcfa8658bb8984a@syzkaller.appspotmail.com
+
+============================================
+WARNING: possible recursive locking detected
+6.12.0-rc4-syzkaller-00161-gae90f6a6170d #0 Not tainted
+--------------------------------------------
+syz.4.19/5588 is trying to acquire lock:
+ffff888058a28078 (&hdev->lock){+.+.}-{3:3}, at: mgmt_set_connectable_complete+0xaf/0x500 net/bluetooth/mgmt.c:1690
+
+but task is already holding lock:
+ffff888058a28078 (&hdev->lock){+.+.}-{3:3}, at: hci_dev_close_sync+0x5c8/0x11c0 net/bluetooth/hci_sync.c:5189
+
+other info that might help us debug this:
+ Possible unsafe locking scenario:
+
+       CPU0
+       ----
+  lock(&hdev->lock);
+  lock(&hdev->lock);
+
+ *** DEADLOCK ***
+
+ May be due to missing lock nesting notation
+
+3 locks held by syz.4.19/5588:
+ #0: ffff888058a28d80 (&hdev->req_lock){+.+.}-{3:3}, at: hci_dev_do_close net/bluetooth/hci_core.c:481 [inline]
+ #0: ffff888058a28d80 (&hdev->req_lock){+.+.}-{3:3}, at: hci_dev_close+0x10a/0x210 net/bluetooth/hci_core.c:508
+ #1: ffff888058a28078 (&hdev->lock){+.+.}-{3:3}, at: hci_dev_close_sync+0x5c8/0x11c0 net/bluetooth/hci_sync.c:5189
+ #2: ffff888058a28690 (&hdev->cmd_sync_work_lock){+.+.}-{3:3}, at: hci_cmd_sync_dequeue+0x44/0x3d0 net/bluetooth/hci_sync.c:883
+
+stack backtrace:
+CPU: 0 UID: 0 PID: 5588 Comm: syz.4.19 Not tainted 6.12.0-rc4-syzkaller-00161-gae90f6a6170d #0
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:94 [inline]
+ dump_stack_lvl+0x241/0x360 lib/dump_stack.c:120
+ print_deadlock_bug+0x483/0x620 kernel/locking/lockdep.c:3037
+ check_deadlock kernel/locking/lockdep.c:3089 [inline]
+ validate_chain+0x15e2/0x5920 kernel/locking/lockdep.c:3891
+ __lock_acquire+0x1384/0x2050 kernel/locking/lockdep.c:5202
+ lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5825
+ __mutex_lock_common kernel/locking/mutex.c:608 [inline]
+ __mutex_lock+0x136/0xd70 kernel/locking/mutex.c:752
+ mgmt_set_connectable_complete+0xaf/0x500 net/bluetooth/mgmt.c:1690
+ _hci_cmd_sync_cancel_entry net/bluetooth/hci_sync.c:641 [inline]
+ hci_cmd_sync_dequeue+0x22b/0x3d0 net/bluetooth/hci_sync.c:886
+ cmd_complete_rsp+0x4c/0x180 net/bluetooth/mgmt.c:1461
+ mgmt_pending_foreach+0xd1/0x130 net/bluetooth/mgmt_util.c:259
+ __mgmt_power_off+0x183/0x430 net/bluetooth/mgmt.c:9474
+ hci_dev_close_sync+0x6c4/0x11c0 net/bluetooth/hci_sync.c:5197
+ hci_dev_do_close net/bluetooth/hci_core.c:483 [inline]
+ hci_dev_close+0x112/0x210 net/bluetooth/hci_core.c:508
+ sock_do_ioctl+0x158/0x460 net/socket.c:1227
+ sock_ioctl+0x626/0x8e0 net/socket.c:1346
+ vfs_ioctl fs/ioctl.c:51 [inline]
+ __do_sys_ioctl fs/ioctl.c:907 [inline]
+ __se_sys_ioctl+0xf9/0x170 fs/ioctl.c:893
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f404e97e719
+Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007f404e3ff038 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+RAX: ffffffffffffffda RBX: 00007f404eb35f80 RCX: 00007f404e97e719
+RDX: 0000000000000000 RSI: 00000000400448ca RDI: 0000000000000005
+RBP: 00007f404e9f132e R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 0000000000000000 R14: 00007f404eb35f80 R15: 00007ffde86e4688
+ </TASK>
+
+
 ---
- client/player.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/client/player.c b/client/player.c
-index 188378175..7a0631d2e 100644
---- a/client/player.c
-+++ b/client/player.c
-@@ -4870,7 +4870,7 @@ static void select_reply(DBusMessage *message, void *user_data)
- 		return bt_shell_noninteractive_quit(EXIT_FAILURE);
- 	}
- 
--	bt_shell_printf("Select successful");
-+	bt_shell_printf("Select successful\n");
- 
- 	return bt_shell_noninteractive_quit(EXIT_SUCCESS);
- }
-@@ -4887,7 +4887,7 @@ static void unselect_reply(DBusMessage *message, void *user_data)
- 		return bt_shell_noninteractive_quit(EXIT_FAILURE);
- 	}
- 
--	bt_shell_printf("Select successful");
-+	bt_shell_printf("Unselect successful\n");
- 
- 	return bt_shell_noninteractive_quit(EXIT_SUCCESS);
- }
--- 
-2.43.0
-
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
