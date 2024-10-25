@@ -1,46 +1,46 @@
-Received: from EUR02-AM0-obe.outbound.protection.outlook.com (mail-am0eur02on2083.outbound.protection.outlook.com [40.107.247.83])
+Received: from EUR02-DB5-obe.outbound.protection.outlook.com (mail-db5eur02on2066.outbound.protection.outlook.com [40.107.249.66])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 001EA20263B
-	for <linux-bluetooth@vger.kernel.org>; Fri, 25 Oct 2024 12:22:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.247.83
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE37B1F9431
+	for <linux-bluetooth@vger.kernel.org>; Fri, 25 Oct 2024 12:22:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.249.66
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729858961; cv=fail; b=T5ugUuePgwgoPGIXEicHKdCJ90YVO7zq4Dg7OoZ2jtUYmTbeJMtkkeL/UYIqdSNMF0+kDVz6baGzjoiPUJMnTKWyHXWJ4X0XhfU5IJ+1mDauhdP63oMvV/qbqlD+FBs1Cv9ShAOyKScj08C7Neu92ZQS25U5e/ygoTo64o+XCCQ=
+	t=1729858963; cv=fail; b=BE/RoXHLUjVQ4cQ46icn/TIYG6yc/OVgMw8OxShDLz7ep4pON8uWB98ENx3K6ZL6fkRmRC/8BJ2UuhluKLGgJGJCO4sgyIs/qofwXoEqyGeKfSXUeXzUJrJGCUo27RCADqq1G8A2BzmWyXmOvFdYHBUjIQbtr+6UENE9EPfFt1w=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729858961; c=relaxed/simple;
-	bh=DBjw1HuhG9Hc1TTXpFthYCiqbR6nNuTPlts6WlPno80=;
+	s=arc-20240116; t=1729858963; c=relaxed/simple;
+	bh=DgyPv53iHdnTPOrLt2LwIbzrvEY19ZYNPyeIZR3Sbas=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=BOf2xCV1aaz5VqlYxR5w2tOUEAklDrOxfNKakuvY/+fa+Y9N564ZF0yN40Z2RldrwGle/cEmBfOjGzlTLY1JGb69mhbnWf3yjiUrYkEIa60wZtQNusw2znV2NNWY4XXPAQfKUPyy3lPSJ0U48qYHVKsi9xT/dT+PuV2hOAj7Pdc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=QGPA03EC; arc=fail smtp.client-ip=40.107.247.83
+	 Content-Type:MIME-Version; b=Prhm+KQRdARslre6spyRVSZPyxAJ7o9g0/4sea6PTBII3gnPqqq8P8+X7QKHrBfvK8tjPUaMpY58rzrRsNPWR0TW2rcF2h2OFolj2NmVVScj7RBuzQkgr47BK+zl6gjdwO0/A3hdUO0BBsELJX3B+NFLDjyFYMFKRYnOepgcPQ8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=bZ28z84n; arc=fail smtp.client-ip=40.107.249.66
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="QGPA03EC"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="bZ28z84n"
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=sQ9WuSFxuAjG3zO/mqWrZxdyxldnHzdR1S8x+6aAqz+KlJZOccuHN5JPfMoqxWVsh/B5Rh+yyVejCXacOn6cIp2LJ4GybpqeR+HGaw6Qi2BhZuOAUtZtaxdZ29/+F8p0Q0vi0Z5YGaMaGTOXme4k77hI9L03GNQQcy8yf7kCJ1WYKUYSHgAzMRkC7LocY7xLaUCfasUxdXI2Hm9WibS5Fm70u/ZSDzh9mpCz9Hg19tFR16upfcCe6q5ZT9Wl2TL+VfH2hiuXODhRHmOT3jTqOTfstfVH/kbJefj34ZH2k3x13E2Aig+vAqIqifXwV/v8HKkOd9wpxaPCBv59983chw==
+ b=as+k3WK/Q0t/sESu2PkRSBXgzFctihyFD1CYC0Jv2tajASez+PP6K3iraSjS/FgXUPVbehvoNk+srG2lXs5LoFjsNfUUcyYlrG+SJnXC8WI1TawKsEvSKWlsURNe9rXchnesHj471QVmrHA1Qb1hrRitSjBnUAkciHHUQRiau0AHDwouqDxMnaI8XSojz6oaaf2OmIE5iWbanyNv2qydwYZeGQZWq8vXUNPZi7knTPZEkYLqbJJHgCAAq+aNj7rEkxnNNvEVZDGnXoX9m6+/PGA1jU8KR1tfmZQ3IJHjKMacvOvbHaeWtdhQXMSN9jAlGpHuZvoZ619LMSm5/5US+g==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=kwWf7rVpAhkvNGcoWH8mWav+kcSOW7QebguyLx4xXQE=;
- b=hcepwA8cwNjYOGI/W6cbx06BpwrN0/ziIeeH5d3kyHYRIjGRYbV3vTjOWdQCB2p+OiWmtKHLl3tWA9iyEx6zjIsHJWD1jlmaGne/M+UvuOByPs8mTuoCQDryOj3xUKpntu1mtLUZ6HSkWFnypy6wf9buZgLz3crgc4/0mosfKviOfRDVC9E5bRqV/Dur08oybvMFhx0+WNCEYYkvq5PwrUawmxjYt26T1Zl2nodfaTIz+eAoWEZWZNhYmYnlu7XTpXTrFMCZiDeDfZL5PxyE3b+j7b4w7Gi/2OxdHsSDzuY3TmlFpFsWIykwqbN854131J24vXvecS+7LGvbris6Fg==
+ bh=StK26AHiMKpFaYLOHxcQCIgxucrxIA3twyNPzY8kVIM=;
+ b=gBWUssjzjJ7Y16PvlO5WOqgoLG9oOdVYT7XZ/9eCPkeNwhBzykkF8XUtxP9JPmhRVytEzwKr+Ysgqv8bIAip23CvmHoJoy+3nWQs6v82vTv0n3LM3WFAqyG1k34Fw2KMa5iSexhAQMKoWu4KUv22m2pJdG4G65kcdYDwuy8Tic/W1UcsaDgUcFRbQ/f0bXvWcLyuoifjUGosPvTpWJI6FapW3ow+THy4fH/J0SmYGZeevxwIDXDn5TBoverGer8DiQxOI0NHwmi7cx0JlWR+TuEG7d53DnqnHPpG4Ey0VVqw4MvaQO19cfYYsuWZ/uY8TsBOjoz7Whxz48MDOWA7Og==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
  header.d=nxp.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=kwWf7rVpAhkvNGcoWH8mWav+kcSOW7QebguyLx4xXQE=;
- b=QGPA03ECiUKFkEXnGotwmGnH4J32Q0kouoQUHlHzOTQhCMmLSKo4j3QXZkrrG1h0Tiyhf65SEHFkzFr2SX7UG8LoEcz5jSICUeXrOSqxKJ6ti4cYqt/a6+uNarLXhvaJUCnGFJTv0I8bMcZSUkJaNN10nfM98ohmWVZfW3X2hM+v8BjHKo8NQPRToPHRCTxSmksNKEfG+eCHN90qsZRWVzfzPfxtGTUqUc/9rfc0G+1JAcwLGGTvPQ1KsF0xeBghvCZgGQxWitz/NE2t5qqFiiRclvINNyA8TMPook3xnAMWobE5dkeHdJPNz93jSSTMl2tR+eiKnPkVZxeEq+A7UA==
+ bh=StK26AHiMKpFaYLOHxcQCIgxucrxIA3twyNPzY8kVIM=;
+ b=bZ28z84nHXu3jGWhacWGtKHByr9NygbBuvaBuePxPylnvHdGL31w09WjEvT0vEj7dcSU3gXHkA5gWzYpbJKjbu5mGngYZSPIiKCt1AfZAZRKTBbKaZl4BIOiPNFGWj5/fy3wcyOgObPmuT/XEN5Flro0/jpw8PSZB27AjPEGsVNLMkXm807GbiTzbrzftgWqjDv/aXaPXHPPrY8i1+zRCQY6smwbWuGz4jCNS0i3V168bkIjffAwo7mKwe7MPvbUCekEZZqDXssd0bLWnnh21T9aklTfNWHrWLJTr0Z/is7BRYfOMXYlls7ENvkyah7PTXDRbqWvZoNrcdaiaQN+7A==
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=nxp.com;
 Received: from AS8PR04MB8898.eurprd04.prod.outlook.com (2603:10a6:20b:42d::15)
  by VI2PR04MB11052.eurprd04.prod.outlook.com (2603:10a6:800:272::19) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8093.17; Fri, 25 Oct
- 2024 12:22:32 +0000
+ 2024 12:22:33 +0000
 Received: from AS8PR04MB8898.eurprd04.prod.outlook.com
  ([fe80::5e22:869c:33c:9654]) by AS8PR04MB8898.eurprd04.prod.outlook.com
  ([fe80::5e22:869c:33c:9654%4]) with mapi id 15.20.8093.014; Fri, 25 Oct 2024
- 12:22:31 +0000
+ 12:22:33 +0000
 From: Iulia Tanasescu <iulia.tanasescu@nxp.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: claudia.rosu@nxp.com,
@@ -48,9 +48,9 @@ Cc: claudia.rosu@nxp.com,
 	andrei.istodorescu@nxp.com,
 	luiz.dentz@gmail.com,
 	Iulia Tanasescu <iulia.tanasescu@nxp.com>
-Subject: [PATCH BlueZ v2 10/14] transport: Set bap_update_links as transport op
-Date: Fri, 25 Oct 2024 15:21:42 +0300
-Message-ID: <20241025122146.17925-11-iulia.tanasescu@nxp.com>
+Subject: [PATCH BlueZ v2 11/14] transport: Make transport_bap_set_state part of BAP_OPS
+Date: Fri, 25 Oct 2024 15:21:43 +0300
+Message-ID: <20241025122146.17925-12-iulia.tanasescu@nxp.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20241025122146.17925-1-iulia.tanasescu@nxp.com>
 References: <20241025122146.17925-1-iulia.tanasescu@nxp.com>
@@ -67,197 +67,120 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: AS8PR04MB8898:EE_|VI2PR04MB11052:EE_
-X-MS-Office365-Filtering-Correlation-Id: 57217cc0-ca19-44c4-d0a4-08dcf4efb30e
+X-MS-Office365-Filtering-Correlation-Id: 3522a52e-04d4-4eaf-919b-08dcf4efb3e7
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
 	BCL:0;ARA:13230040|52116014|1800799024|376014|366016|38350700014;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?qZUiFMmDCRWnxQaR3gG/j6Jj/HyUN7BjIeMA0wsNtpDe1fHPG0SKftoRMWPJ?=
- =?us-ascii?Q?Por4e9e+H8qTIYF03OUUFdoIW0PdqYxTWBAhgzzt02GAtBfabacyYbbkeZ9A?=
- =?us-ascii?Q?VzJC0W5zso+MCasnh2SjraW9Qc0pPS9n2yz6A2PnI1WuetDqVMcFOMLBX57E?=
- =?us-ascii?Q?DGPd1+elM3NLallhwoHHVG6JQsOYJCBIT9M1KyoF3fj9KRLY0/gIcQwwEnAr?=
- =?us-ascii?Q?zzZkf+33+5wW7XxPY7/BsWIoVDfaT8EHCTcoCt0XmTwhtHDzQdyfscj93oWK?=
- =?us-ascii?Q?MO//Z42as7EJAxnzQs1IcbRQzrDDyqdhpqQ5mbgvZeTslPnj5KBtG6WFrtws?=
- =?us-ascii?Q?tVAy1KloWP/J0BZRQpMgdFlsVou2rUo9WOBpn1tbvIoimGwsS0WzBbbBuMPK?=
- =?us-ascii?Q?BC4+QY+3OLhPiP99GJfdykLHDDmxGiq61przIuMRWzyptcVlNwzDgTMPhO1x?=
- =?us-ascii?Q?W3DCyo42gSW8So5/qx+FOBgSxM+mZHrhDMyoxNpfGQ+G4MzHfOn+EraFOIXP?=
- =?us-ascii?Q?mZcYnTa74FREkN/9RE2FMnjh8MET7kmf4XdI7A29YNygpukFXb5DUxZrn8Sq?=
- =?us-ascii?Q?LLfoz9KALvAHeTcFsjfvIdmIZ51kixhgC5ttZi1PKLQKxTr6YhA2FjFwSZJi?=
- =?us-ascii?Q?Gf+tjhKvvFDDG0ODCTYY9gOrf+Eoz27ZhRSTii1XlA5bmIWX/9CyxYaYfWV2?=
- =?us-ascii?Q?6dxMTzXwvKS7TxWs9I1eUwaDdYXVvM+DAFKgmZuD1xDtx9/Yi/FpjgvZ2i76?=
- =?us-ascii?Q?q4LPVvEIT+RuYQ5jGLY8Q8CR+9HIghay0LtAmiiq6gT7JOD4N1t+KlneTAdd?=
- =?us-ascii?Q?EkuoabJ2DHMwM7TXVQPL/8iau7YVDNRPiUh31se4NOg8bVIDxDriJGQtunMY?=
- =?us-ascii?Q?NQJwJJh5j+v9/0huMUn7mebrZ2ildaCZCWI23gz36w6oUw7ONSFXnvpXMO2h?=
- =?us-ascii?Q?BXXPsLbqIw+NPJwCmIlwSKgYR6oToobMpA4WBCAZBZPdYeVffYQd5jbRZqrj?=
- =?us-ascii?Q?fzSbs87Rcx+/Jl/I1b1r5bYATxP8DmEKurQxZM85zxc/BwglGtTxdLW8Yov2?=
- =?us-ascii?Q?4swporU3xsZhicEGkO3j/ERGBYkecRej46yzlo5vSSzYlxe5u0g5c16wDVyA?=
- =?us-ascii?Q?lLTZLFFx0MwvQlwlzF2oi/Bd0/cCcLkfrD4otvG33rtZMoksY4SBnKsJtC7I?=
- =?us-ascii?Q?3/iZSxiAsMUoOr1aG8UnyGbxPmdE3qYfRjtdIo7JYFQifmUT/2UHie6skN+X?=
- =?us-ascii?Q?w+IyvFQS9QcO9fyWRmZ6v/3vb0KrDWjkfxXxzUa6ZroiJRVGqt5RZtP8YV6I?=
- =?us-ascii?Q?jqOW866Y8+KvH4x3GqS1gfL+v7Bzj0OuiWQQq21+9pJNSPdqyYfG1IQL01q1?=
- =?us-ascii?Q?5rXzJic=3D?=
+	=?us-ascii?Q?R3HSlg3yYDdN2W/4VXr7HV7s2Mk0E16xHxgNHvNEoFazN6+OaY5gD35Lma1b?=
+ =?us-ascii?Q?/5g3GmyNxRal+ws8UhgBg3zHcxuvMfoS+Hkg1V3V9Ek50nhkS5ghf0QT3iWK?=
+ =?us-ascii?Q?UFC07T0nUWo+EUNXXcnjnGBo2rzzZa/z1EpL4Pm/eJSzDJpkBaVgM1NqZa4w?=
+ =?us-ascii?Q?9j7hYhdP+vh5GJH5ytKbqDf/2+yTcniB+33Hjjn4KK7u4TT1C6IIYEKvLXxN?=
+ =?us-ascii?Q?urnxNYaU+lDnA13stfNb9tgabXCgvbC8t2t/aadrO2XyAwUpkOJ7EWqwTcH6?=
+ =?us-ascii?Q?TyszmTuXHnPl4UPzCzg3LFyYuUVmFc0E+8lXDWtaF4peL05ZpgcEl4xmOo8y?=
+ =?us-ascii?Q?kymdxGMkqsdjOhvk5J9xDM/3+tsNLz4NyGFrGL/eglh24GYCkacE7DRit1Ho?=
+ =?us-ascii?Q?VNuf+7Ak7963z3mWVk22FKRUQ4nvCjBQVZ0ayHkTbGtmkOiWVSxG+Cbp/Dkk?=
+ =?us-ascii?Q?Yq2YzAuabXVU09ve8d7YY/OWZZFy42YBPEyTTKf96gXCtBTZbrk+GlmyOH2v?=
+ =?us-ascii?Q?rHjmcpEwj1tDEcRMyFmdOZ1l/tydiGFDf2vM/X8+Cdzxbg+yN9KIGyU0thI4?=
+ =?us-ascii?Q?KV+DRh6JcJRsV4GjRFesQqpXwuN7C3PN+BmLtZKEMvCVCmLa48Df3Wcur8v3?=
+ =?us-ascii?Q?1pltAaBLDdlJwlL04SiTU8v/CcYrXF/8gdkXb8qW6sQtiqjNOzot3D8+yIWT?=
+ =?us-ascii?Q?UPT3CuXrfiT7SbBXQ1vGSXMj5J8anhPQ52nRMe69MQWfaXEzP+DRHiYOi/e0?=
+ =?us-ascii?Q?iXNGhYKR3GyRI7F/qn7yHRQO7zjoYIzDIZNOFmvRkoQoACes/AHSg/3uNXVY?=
+ =?us-ascii?Q?nXCg5opuhTqqaz6X+jUXgzy+YOCI+qq3A4jdFUqL1XE2vDzIzhTPso4WNSgx?=
+ =?us-ascii?Q?6cGDjzdvOdYBXa1eMD/JD9LxoNef3E/fDmYg76R2SrL4+045ITO321VatJ+D?=
+ =?us-ascii?Q?7gnAAOX+neJdDQ52pbvP5yYylf+gZUzJgYUUuUnlWS7Yc8PbrKyv19uGAIFW?=
+ =?us-ascii?Q?kln4fWC6PN33lHUUTzDpV+FhwXrP/bWWAP6VnwPaEZ9X195DZI2G2kS5GRy6?=
+ =?us-ascii?Q?gjUJYTySKjItMxKpVG7jixS7VJxGOEQ+lbfjcIazhLk4bg3vs5lEhQ8dx9d5?=
+ =?us-ascii?Q?+/ebQlmWAqGIzyVp8P9h5llwbSEdk/lDjNHT8Yo7ChP1BHJFg98HUNYMU5X4?=
+ =?us-ascii?Q?wX3JQzALtUcxUFJsouk0F3jkaSeYbt00Bkm/he8B4DtAKIaEzXiHww3RzoQn?=
+ =?us-ascii?Q?KHSb+YB46sLJHznJ/K8YD4+IItEePlg09GzKWCtyWDp/sfVDcF+OcI1gSjwL?=
+ =?us-ascii?Q?mJC8fpwDxc0hLbpZsQghgl8x08B+e27DrmrnW6/OGzPrNxPRNo5uzw4fwYn4?=
+ =?us-ascii?Q?MIFOUjQ=3D?=
 X-Forefront-Antispam-Report:
 	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AS8PR04MB8898.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(52116014)(1800799024)(376014)(366016)(38350700014);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?x8RiH6+LXChgontwqEOYpEp4Q/+gpR3r9wUqHG9ZMWNP1D9TTwvcaAR2wtVh?=
- =?us-ascii?Q?7SaKYr4S2+gRs89rJG/z9EuatvUnORXH1TQGEHfxfcR6ZUNIsELaPIR2OULX?=
- =?us-ascii?Q?5ViLo8My/JX1yrrhDil3kYUFbIavE50vWH7q9ceTMFDkfeRbiFEFoSpemYNE?=
- =?us-ascii?Q?D4qNs3FYXeV/bZRV4FG2oZLAQiyep4JpzP1JtM39o2/FfMLUnIjlPbq83/2x?=
- =?us-ascii?Q?CtNUnuGFpcbIn7O1eB/8MHVqG/RsPxc2B4fT6yTUqa16lSc/y08UlZHLKAPj?=
- =?us-ascii?Q?TxY+OdjHw+bWQ6IWjPQEvjnJ1+JtjTqc6YFZxyw24gPvWqz7sPBrOsvUtQrQ?=
- =?us-ascii?Q?6yfB38RTyTXXrdjCRje77Qa3rcAmgV5SSuj4SRv33EiNCTpmir27p99oKSE2?=
- =?us-ascii?Q?M5f2ZJ0jXIQesSEEWeeFiJnXORj1qWJyz21k6U7d3gPyAaLA7ecOlapvjfyd?=
- =?us-ascii?Q?jTjKn7SnDNQssC34qeDEEaNrsP++YztbRYyabVRG4goiDTBSBquGm4/KmBqF?=
- =?us-ascii?Q?ripFKhgLsrrsTRb6OnyzwyLoSW8ZS7IF6JSwpfiDUWoA87MzOUyw22zqzLXV?=
- =?us-ascii?Q?/JSy03VbkolZFgII59XTyaqaVEzJAutJJBUKPLZUyDgQM/r4ffSj1XnDYiNp?=
- =?us-ascii?Q?EkkhCSd2TLt9P2OxuGLt3tLiPGBlUyU3kQVCKaZwvAY9LOloZ/w09tFGSRlw?=
- =?us-ascii?Q?N5GXImGi2xjfUJh8NUwkowkp1ZGwYVrgRvafTRoK6t/P/H3o54CyH5D2FT53?=
- =?us-ascii?Q?RmfEdOaSBZg3yJdnCxANfnagHow8AVPpbzRwpgk0uDQxLlN2aRjEGAO1RL4o?=
- =?us-ascii?Q?XK3dsk4Ht7Eo/C0PxdHrGS/JOjK0hPN+tlbAgNTsGVCupPCrCxxvrOHprVSG?=
- =?us-ascii?Q?Xyhtq74GO4ZVZct4lT4QfnvyT2dKcQyzVrNuCYCGbijy2sicw6Kx5aK+vpA+?=
- =?us-ascii?Q?biOIgIUot6MBEGZUFLeHnePuTxKzI7SLOJB4PHl4ejGXjblkvo+Vc5DU/sNU?=
- =?us-ascii?Q?rhCLjBA341tlPLUDrqhKsNw9boOoLBFLD6hTNWjyB/tV9clBU/IBhMbOS6Xd?=
- =?us-ascii?Q?lc9xxDGTdW7DuxPklXktc3MD6iQnjF95N8ZFo+rwrD9mPtOdmgzRX2o4tS1F?=
- =?us-ascii?Q?85YK/Tu6Gy3wXjkx8jPryB1bbRrgtGpkHuLhAGG3A+0EFXgFG1jZOzL6HfiR?=
- =?us-ascii?Q?zZvSjx3lGVBDTEPfui+7TpDF912pB6FUwjHZ+644vz3090nyKRE3Ton6Dbqz?=
- =?us-ascii?Q?DpkrITftSICOiq/tonuKnDND5eNueVTLgypQBLZuwjGVZW2TiopceDXYHCiJ?=
- =?us-ascii?Q?Pfbaz9riE4l/mslldgesVE3JIVGmu/1kUDnnYLf+hUDvDTQlwWO+Lwe9EP89?=
- =?us-ascii?Q?WjikAdwAeDS1qIA4lnShF2cCmvvP8/sSqtTYxnH9i1cqCj4QtpcS9p9OOdFv?=
- =?us-ascii?Q?Lfn4HidtLYY2jsFJKu7pmnPwGz1IG6T9vQyru/nKUAUywdWpcBAMpCl/1ER4?=
- =?us-ascii?Q?inZpGqn6vID8AX4t9FXgufOgELPQdwr/O5xXOco9hNPgoTnZUwjRzuDSRirz?=
- =?us-ascii?Q?BXu4KrY9d0vPjILoaKErqipvynJFJokEEsPhpByjyHNSsfr66E5MvngqHytn?=
- =?us-ascii?Q?lg=3D=3D?=
+	=?us-ascii?Q?5D5GcmFJCoBVmMTIT6vzavlFylrx+tX/wbBmoaK0RW2DnFvVwx7+4Ae4zvzK?=
+ =?us-ascii?Q?U+iQ7/h4NOmDeZkyfhZvchxRFT7VVOL1hGPBls/BoEoGCXn5gJeDVjgikWfh?=
+ =?us-ascii?Q?RL02pCU0ulUeA7skUJ9XhaBcrZ4Ynq2FjgaNJqanFkGNBDcLcCW1AEyvdOeY?=
+ =?us-ascii?Q?00M/y2kNF6KAvVrSPMHibzWxqpkgP+xUmXVXmaRZmQkW7TEmBFE8yuDuri4/?=
+ =?us-ascii?Q?DO/+g5r4QfGNID2Jn1lDXGVL/nujiGb0BfJGBs7usW8loZYfS0Yld1BjVfNP?=
+ =?us-ascii?Q?H0SRn/pyNkT49jEfZ0wNJOyWLZ22xS//hJtl0EAzPoxpeHBhsM7VGFUQWX0g?=
+ =?us-ascii?Q?uGTzrZeCzOQzt+wHjmIyg2zPYJ1P8Ybo3eT4fOoe6Win9SjBY0aw6PP6RfYi?=
+ =?us-ascii?Q?jJFCYTgzoSh5JscQ95bGIZkbmD5iZMfqHCgFSjQjiSNnVwgqO2YKSywIefnf?=
+ =?us-ascii?Q?2jxc5siUFAtFCOx7eOZPOxmOx+1WYkAIoEjejaicSj4tMOwG3yWj0veJdRYM?=
+ =?us-ascii?Q?S4MAOxbd3Vi0HbFGO28eyOywXkNny2stAksLyOoyRWMz0/7W9byD/Wg40ROT?=
+ =?us-ascii?Q?U5P3WEGmNUDWowdZw1eKo4LfVCrkXA0D2UMm1FIJXpHXisjGSg3zVq+8bSu5?=
+ =?us-ascii?Q?ift9j3zy7DmIpFkbsAJeQl2kXcNn/Vum7y5PYNicnpUIoIFb6N9pQx38lG4N?=
+ =?us-ascii?Q?Pi6ID013s287tWXVKHCg94i8j1PflTKSFe0Sf7QD5B7XtYdooxBmnC96jqH+?=
+ =?us-ascii?Q?tIRFq6gBq2yugCijxxhvhPse8ydO/wXnhmurE8ykQ87FAxnOlSo2XbgQU3rL?=
+ =?us-ascii?Q?BcHPfYRNY2zMumXCOwccGJD2eSDxCL/bnnUNgqLlJHQimI5yUBa/3ChFRm7V?=
+ =?us-ascii?Q?nazYLONrLVwQ7g2BV3Oma4aaoImK1ORlv1qz7B/DfQvRvX3nNMCYkcVpQVAr?=
+ =?us-ascii?Q?frEJ7tgfDL4eoLEWxL8e/duCbUq8cFk844UtGEvZDRTlc9i4J5YOAgw7BirR?=
+ =?us-ascii?Q?7+ptBp3wodZpDwbclOxUDVaNkg0uoni0ltNwtQF9+fux1jeGifgD36pfDiuJ?=
+ =?us-ascii?Q?QuYeP08FQBB/EjXyQjJD2A2tRNF4AWUjER3Asg9kj9XTHxNtoZ3m6OMe1F/s?=
+ =?us-ascii?Q?PXsGtp6rOMaKwAtPmj6am3KA1d1Z1HYlJOMFnZ35/9FDbJY+oiqiiCZFKuOy?=
+ =?us-ascii?Q?1i77am7r2FzH0EbQmwFkXH9yxMQYzmsCq4E3y3SwgVcpzFuLMlOMf8h35O4D?=
+ =?us-ascii?Q?jO2JVCatYcHgns8O0ZjTobFcAJuZnJi/PlkX2VHSA+yhxEZvsbdhEVsdi5jn?=
+ =?us-ascii?Q?/PVCEJh2l8yzqIp2lEpGI3J1+oPEvrVn7v1MG/f5+akkFCEOvsH2nEa3y7gG?=
+ =?us-ascii?Q?fVla9t+RNa6ANFh7TwA+WPSs/C6KY9nHm+VVmVzB2+Wc89tX0AIcvy+jLTTv?=
+ =?us-ascii?Q?pNjNuxMsFFOyxN5eP/CHgFqxD1ZnEK6Mwd9ZI8VtCbqmX8YiiTF2qrWwz2lu?=
+ =?us-ascii?Q?x1b1QcPrDlXwrgV8M9MiD/BANaEDiVgfJccJMgSwwTabIlM/wsS/+UDYzyi9?=
+ =?us-ascii?Q?PLcVfgcrmeVFringGV39YESJ2qJVdmc8pDmFwljz72NxJAWWcTYxwwHuRVt6?=
+ =?us-ascii?Q?5A=3D=3D?=
 X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 57217cc0-ca19-44c4-d0a4-08dcf4efb30e
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3522a52e-04d4-4eaf-919b-08dcf4efb3e7
 X-MS-Exchange-CrossTenant-AuthSource: AS8PR04MB8898.eurprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Oct 2024 12:22:31.9196
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Oct 2024 12:22:33.3224
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Y/pDI1POgs9F6qpcoBomQtVmarVhK9c+Wu3MknMeUbXYKjCNslRDtgs2C8Py9mTBJT3QO2bmAf0O0bjYekzaqQ==
+X-MS-Exchange-CrossTenant-UserPrincipalName: Sj9goLR6DISRaNpKtdy8XweLDRJ/GokHgrugzj3gDvUsn6C/3FCqa5roQKmkdlACYJqYLD7gwoA0cZ8z5FuSYA==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI2PR04MB11052
 
-This implements bap_update_links as transport op, since broadcast links
-need to be handled differently for unicast, which only allows one link.
-For broadcast, the property changed signal should be emitted everytime
-a new link is added or removed.
+This splits the transport set_state operation for unicast and broadcast,
+by implementing it as a transport op. Unlike unicast, broadcast transports
+need to be acquired/released separately, so changes in a transport state
+should not affect its links.
 ---
- profiles/audio/transport.c | 45 +++++++++++++++++++++++++++++++-------
- 1 file changed, 37 insertions(+), 8 deletions(-)
+ profiles/audio/transport.c | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
 
 diff --git a/profiles/audio/transport.c b/profiles/audio/transport.c
-index b3bcbaa19..2f5ff6de0 100644
+index 2f5ff6de0..bb2ce8a4a 100644
 --- a/profiles/audio/transport.c
 +++ b/profiles/audio/transport.c
-@@ -116,6 +116,7 @@ struct media_transport_ops {
- 	void *(*get_stream)(struct media_transport *transport);
- 	int8_t (*get_volume)(struct media_transport *transport);
- 	int (*set_volume)(struct media_transport *transport, int8_t level);
-+	void (*update_links)(const struct media_transport *transport);
- 	GDestroyNotify destroy;
- };
- 
-@@ -1628,7 +1629,8 @@ static bool match_link_transport(const void *data, const void *user_data)
- 	return true;
- }
- 
--static void bap_update_links(const struct media_transport *transport)
-+static void transport_bap_update_links_uc(
-+	const struct media_transport *transport)
- {
- 	struct bap_transport *bap = transport->data;
- 	struct queue *links = bt_bap_stream_io_get_links(bap->stream);
-@@ -1651,6 +1653,30 @@ static void bap_update_links(const struct media_transport *transport)
- 	DBG("stream %p linked %s", bap->stream, bap->linked ? "true" : "false");
- }
- 
-+static void transport_bap_update_links_bc(
-+	const struct media_transport *transport)
-+{
-+	struct bap_transport *bap = transport->data;
-+	struct queue *links = bt_bap_stream_io_get_links(bap->stream);
-+
-+	if (!queue_isempty(links))
-+		bap->linked = true;
-+	else
-+		bap->linked = false;
-+
-+	g_dbus_emit_property_changed(btd_get_dbus_connection(), transport->path,
-+						MEDIA_TRANSPORT_INTERFACE,
-+						"Links");
-+
-+	DBG("stream %p linked %s", bap->stream, bap->linked ? "true" : "false");
-+}
-+
-+static void bap_update_links(const struct media_transport *transport)
-+{
-+	if (transport->ops && transport->ops->update_links)
-+		transport->ops->update_links(transport);
-+}
-+
- static void bap_update_qos(const struct media_transport *transport)
- {
- 	struct bap_transport *bap = transport->data;
-@@ -2105,7 +2131,7 @@ static void *transport_asha_init(struct media_transport *transport, void *data)
- 
- #define TRANSPORT_OPS(_uuid, _props, _set_owner, _remove_owner, _init, \
- 		      _resume, _suspend, _cancel, _set_state, _get_stream, \
--		      _get_volume, _set_volume, _destroy) \
-+		      _get_volume, _set_volume, _update_links, _destroy) \
- { \
- 	.uuid = _uuid, \
- 	.properties = _props, \
-@@ -2119,6 +2145,7 @@ static void *transport_asha_init(struct media_transport *transport, void *data)
- 	.get_stream = _get_stream, \
- 	.get_volume = _get_volume, \
- 	.set_volume = _set_volume, \
-+	.update_links = _update_links, \
- 	.destroy = _destroy \
- }
- 
-@@ -2127,22 +2154,24 @@ static void *transport_asha_init(struct media_transport *transport, void *data)
- 			transport_a2dp_resume, transport_a2dp_suspend, \
- 			transport_a2dp_cancel, NULL, \
+@@ -2156,22 +2156,23 @@ static void *transport_asha_init(struct media_transport *transport, void *data)
  			transport_a2dp_get_stream, transport_a2dp_get_volume, \
--			_set_volume, _destroy)
-+			_set_volume, NULL, _destroy)
+ 			_set_volume, NULL, _destroy)
  
--#define BAP_OPS(_uuid, _props, _set_owner, _remove_owner) \
-+#define BAP_OPS(_uuid, _props, _set_owner, _remove_owner, _update_links) \
+-#define BAP_OPS(_uuid, _props, _set_owner, _remove_owner, _update_links) \
++#define BAP_OPS(_uuid, _props, _set_owner, _remove_owner, _update_links, \
++		_set_state) \
  	TRANSPORT_OPS(_uuid, _props, _set_owner, _remove_owner,\
  			transport_bap_init, \
  			transport_bap_resume, transport_bap_suspend, \
- 			transport_bap_cancel, transport_bap_set_state, \
--			transport_bap_get_stream, NULL, NULL, \
-+			transport_bap_get_stream, NULL, NULL, _update_links, \
+-			transport_bap_cancel, transport_bap_set_state, \
++			transport_bap_cancel, _set_state, \
+ 			transport_bap_get_stream, NULL, NULL, _update_links, \
  			transport_bap_destroy)
  
  #define BAP_UC_OPS(_uuid) \
  	BAP_OPS(_uuid, transport_bap_uc_properties, \
--			transport_bap_set_owner, transport_bap_remove_owner)
-+			transport_bap_set_owner, transport_bap_remove_owner, \
-+			transport_bap_update_links_uc)
+ 			transport_bap_set_owner, transport_bap_remove_owner, \
+-			transport_bap_update_links_uc)
++			transport_bap_update_links_uc, transport_bap_set_state)
  
  #define BAP_BC_OPS(_uuid) \
--	BAP_OPS(_uuid, transport_bap_bc_properties, NULL, NULL)
-+	BAP_OPS(_uuid, transport_bap_bc_properties, NULL, NULL, \
-+			transport_bap_update_links_bc)
+ 	BAP_OPS(_uuid, transport_bap_bc_properties, NULL, NULL, \
+-			transport_bap_update_links_bc)
++			transport_bap_update_links_bc, NULL)
  
  #define ASHA_OPS(_uuid) \
  	TRANSPORT_OPS(_uuid, transport_asha_properties, NULL, NULL, \
-@@ -2150,7 +2179,7 @@ static void *transport_asha_init(struct media_transport *transport, void *data)
- 			transport_asha_resume, transport_asha_suspend, \
- 			transport_asha_cancel, NULL, NULL, \
- 			transport_asha_get_volume, transport_asha_set_volume, \
--			NULL)
-+			NULL, NULL)
- 
- static const struct media_transport_ops transport_ops[] = {
- 	A2DP_OPS(A2DP_SOURCE_UUID, transport_a2dp_src_init,
 -- 
 2.43.0
 
