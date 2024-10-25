@@ -1,240 +1,114 @@
-Received: from mail-ua1-f42.google.com (mail-ua1-f42.google.com [209.85.222.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-23.smtp.github.com (out-23.smtp.github.com [192.30.252.206])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D0FA1865FC
-	for <linux-bluetooth@vger.kernel.org>; Fri, 25 Oct 2024 19:30:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F0F01925AB
+	for <linux-bluetooth@vger.kernel.org>; Fri, 25 Oct 2024 19:36:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.206
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729884622; cv=none; b=KvNw4ddTaK30yNofwVVV6xEhiydpjhdEgS8p6715oc0ElAadz7OXZue4VZ1/W14r4L6Ov+S4FbqA36unATLV1hSDsjzM+UEe8o/N9ji1i7V4TAQrzOHmIFlk324V+2ZZHNRRQ/bHv8w0uU0pa+JvfjY/AMv+QTvJcMn7ftwNjNQ=
+	t=1729885019; cv=none; b=LL+3tWjGhGUupCRRFIh8CJ+2Ek/PEdIaGuWz6tgCPAZp8bcXKuPHwVSlJDk5jeEXXkLhQxbfGS02hRyEE92JdJoxfEMd5EcEbyv4Jl93oVxr0jS9snx1Jk1Y0XSDFMO3Df8KQ4xfdOuTiepxe6hzeVlMY7WOLpNICRICpkQ0dPM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729884622; c=relaxed/simple;
-	bh=5u/T0uPbxr7ZcoBViKcz8hL+K37eu48UfYe3S02QteE=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=ixe0bQoH2jkAHZrjs1zAcWoHa2fTm0sySp/eETwFxizzRnf2quvaiMEHmMEmrfOd+LAmgvPaosBIiyqRcTbxd9iGis6OCMTl3WZC+fkFX1H+lIHpR+dZbcmyjbDhpub8X74IqpogzfON2C1h5xbYOA6uSAFZvBwxwMXhx0LWUq4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IhHBr9ac; arc=none smtp.client-ip=209.85.222.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1729885019; c=relaxed/simple;
+	bh=Mb6Y7V4QRQEyqAE7HiKnF+KCl/HpUuxrkNLy7pkmcmU=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=HqEqqUwhO8THfdImyh9r9X0FrqnkAaIiY8WB5HyTvTgeCM9hEPk0Z/nwH6m+10rFBAunbJy+oRhgomNyGaQArX8j9OqRGzOgL38i/7m15ADMv/0rQVlT9RZC90txcWDGuosO0MB9nmBvwYcM/1Vcv0TwmyfLqc9a9+Mtrcv5K7M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=fb48jNmF; arc=none smtp.client-ip=192.30.252.206
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IhHBr9ac"
-Received: by mail-ua1-f42.google.com with SMTP id a1e0cc1a2514c-851d2a36e6dso1728913241.0
-        for <linux-bluetooth@vger.kernel.org>; Fri, 25 Oct 2024 12:30:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1729884616; x=1730489416; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=v1dciNIzS0A4XHx5HEcxV1E05R48YXALnpiVpHqE90s=;
-        b=IhHBr9ackmNu7ZiMZNlsNdCKZOxZZC8W2kmNQB3bbW2z5EXkhMmYlbyKpXQdHiG03+
-         AyzhKqBeTA9bWOLGXHC1UKkrcIMdJ3XmkTVvRFo38cg9RJwPlepKRMuur/NXeBTflrDJ
-         C+YgP6AEsQPLCdEg2u7EsUujJez+i8GbSg/7bwmV/X2YrFFi6EvfIoxfmVG6usDwmcJn
-         dMIfGmKTwRUENh/vCvPI989sjCpqvV1w+Ki/6v3nLkcMTTpforPIky6DTvib2251vzst
-         Vb1jto0zxTO3OuazNHCUbna3lD5AVaXGGKGCZK7AMEEmRMkErMDuPKEV2UekCc7IStf9
-         UNJQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729884616; x=1730489416;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=v1dciNIzS0A4XHx5HEcxV1E05R48YXALnpiVpHqE90s=;
-        b=QHeJc8zpXx5nLN+MS3Wvllgn2AKToFvX91/JMxvr1WAUUBoi9wWJ9PiIVnhJ+aGUpq
-         8INA99eXPfXT/v0rc9bbNIHdDaOzrHKFqdCwKHKQzgK8pKtCQc/NPhklsl3+JsJjZqch
-         CSWm1V2Z4/C9xAk1Yz6fEmvopTozrvggXBQZsLy7+ngTm1pGCc8NDEEFE7wF6YrRYRtP
-         Bm/LGCYUCg9wWk6QC3EMsTODjpn7HkMIOW5S2qGjJa/MFxc37Cel5/kVmH4y/BSs7glO
-         1YnCVX9poyI32VxaRaNzE7uRcEzmbcsU/v3VDymBv9nLBi2upYh6mW9PasGNjcVZoVZ2
-         NAfQ==
-X-Gm-Message-State: AOJu0YxhoLj/hybjQ4Qw0CN5Gp2jR/ayhH1/9cvJivpNAtRr5qpOqSlq
-	FWQB1uQ40gTtVKnZixW5oxpJF/Kxnfl59TimrBSz9paXlMDNFXCLe7CzHw==
-X-Google-Smtp-Source: AGHT+IEZS8mw3DLX+uc4nJQGicWGBeM3bFep5aU9T9FyGAzWKIZOlecA2bEO5PaWsySlU0RjF4SZcA==
-X-Received: by 2002:a05:6122:4881:b0:50d:4925:555d with SMTP id 71dfb90a1353d-50feb48417cmr7288138e0c.5.1729884615904;
-        Fri, 25 Oct 2024 12:30:15 -0700 (PDT)
-Received: from lvondent-mobl5.. (syn-107-146-107-067.res.spectrum.com. [107.146.107.67])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-51004361d42sm234860e0c.8.2024.10.25.12.30.12
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 25 Oct 2024 12:30:13 -0700 (PDT)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="fb48jNmF"
+Received: from github.com (hubbernetes-node-0978f51.ac4-iad.github.net [10.52.152.31])
+	by smtp.github.com (Postfix) with ESMTPA id 858D65E036B
+	for <linux-bluetooth@vger.kernel.org>; Fri, 25 Oct 2024 12:36:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1729885016;
+	bh=D7W0j8VPkrw+io3jO1BPsMDSn5HFfl7W7wDs/QyoNmY=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=fb48jNmFxl59TiSKZtCLw3dAlsHAiw15pwbJmM3m8j3p4ZKlCDE0nFFgJ3hazc/vG
+	 8IVRo6JpNOM820qbZBHGS+T8kcYnYYTrIjJK01R3P3/+ejbmvHviy7o/mSWegnkhyO
+	 XCZk5wsKyOu0F3XkOiMQP++Lvo3WqbCSw8dt4zN0=
+Date: Fri, 25 Oct 2024 12:36:56 -0700
+From: iulia-tanasescu <noreply@github.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v1] input: Add support for UserspaceHID=persist
-Date: Fri, 25 Oct 2024 15:30:11 -0400
-Message-ID: <20241025193011.3035565-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.47.0
+Message-ID: <bluez/bluez/push/refs/heads/master/06c94f-8c8ca7@github.com>
+Subject: [bluez/bluez] 36b262: transport: Send reply to select/unselect
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Branch: refs/heads/master
+  Home:   https://github.com/bluez/bluez
+  Commit: 36b26283cee31af9509ee372f9787f94830a85b7
+      https://github.com/bluez/bluez/commit/36b26283cee31af9509ee372f9787f94830a85b7
+  Author: Iulia Tanasescu <iulia.tanasescu@nxp.com>
+  Date:   2024-10-25 (Fri, 25 Oct 2024)
 
-This adds support supportfor persist mode via input.conf:UserspaceHID
-but don't default to it since this appears to create more problems than
-it solves.
+  Changed paths:
+    M profiles/audio/transport.c
 
-Fixes: https://github.com/bluez/bluez/issues/983
-Fixes: https://github.com/bluez/bluez/issues/977
-Fixes: https://github.com/bluez/bluez/issues/949
----
- profiles/input/device.c   | 27 ++++++++++++++++++++++-----
- profiles/input/device.h   |  9 ++++++++-
- profiles/input/hog.c      |  5 ++++-
- profiles/input/input.conf |  6 +++++-
- profiles/input/manager.c  | 11 ++++++-----
- 5 files changed, 45 insertions(+), 13 deletions(-)
+  Log Message:
+  -----------
+  transport: Send reply to select/unselect
 
-diff --git a/profiles/input/device.c b/profiles/input/device.c
-index b162c0bc7572..8cf8e5ea78e1 100644
---- a/profiles/input/device.c
-+++ b/profiles/input/device.c
-@@ -89,7 +89,7 @@ struct input_device {
- };
- 
- static int idle_timeout = 0;
--static bool uhid_enabled = true;
-+static uhid_state_t uhid_state = UHID_ENABLED;
- static bool classic_bonded_only = true;
- 
- void input_set_idle_timeout(int timeout)
-@@ -97,9 +97,23 @@ void input_set_idle_timeout(int timeout)
- 	idle_timeout = timeout;
- }
- 
--void input_enable_userspace_hid(bool state)
-+void input_set_userspace_hid(char *state)
- {
--	uhid_enabled = state;
-+	if (!strcasecmp(state, "false") || !strcasecmp(state, "no") ||
-+			!strcasecmp(state, "off"))
-+		uhid_state = UHID_DISABLED;
-+	else if (!strcasecmp(state, "true") || !strcasecmp(state, "yes") ||
-+			!strcasecmp(state, "on"))
-+		uhid_state = UHID_ENABLED;
-+	else if (!strcasecmp(state, "persist"))
-+		uhid_state = UHID_PERSIST;
-+	else
-+		error("Unknown value '%s'", state);
-+}
-+
-+uint8_t input_get_userspace_hid(void)
-+{
-+	return uhid_state;
- }
- 
- void input_set_classic_bonded_only(bool state)
-@@ -179,6 +193,9 @@ static int uhid_disconnect(struct input_device *idev, bool force)
- 	if (idev->virtual_cable_unplug && !force)
- 		force = true;
- 
-+	if (!force && uhid_state != UHID_PERSIST)
-+		force = true;
-+
- 	err = bt_uhid_destroy(idev->uhid, force);
- 	if (err < 0) {
- 		error("bt_uhid_destroy: %s", strerror(-err));
-@@ -1507,7 +1524,7 @@ int input_device_register(struct btd_service *service)
- 	if (!idev)
- 		return -EINVAL;
- 
--	if (uhid_enabled) {
-+	if (uhid_state) {
- 		idev->uhid = bt_uhid_new_default();
- 		if (!idev->uhid) {
- 			error("bt_uhid_new_default: failed");
-@@ -1605,7 +1622,7 @@ int input_device_set_channel(const bdaddr_t *src, const bdaddr_t *dst, int psm,
- 	if (!idev)
- 		return -ENOENT;
- 
--	if (uhid_enabled)
-+	if (uhid_state)
- 		cond |= G_IO_IN;
- 
- 	switch (psm) {
-diff --git a/profiles/input/device.h b/profiles/input/device.h
-index cf03894178f7..7b87ce590337 100644
---- a/profiles/input/device.h
-+++ b/profiles/input/device.h
-@@ -11,11 +11,18 @@
- #define L2CAP_PSM_HIDP_CTRL	0x11
- #define L2CAP_PSM_HIDP_INTR	0x13
- 
-+typedef enum {
-+	UHID_DISABLED = 0,
-+	UHID_ENABLED,
-+	UHID_PERSIST
-+} uhid_state_t;
-+
- struct input_device;
- struct input_conn;
- 
- void input_set_idle_timeout(int timeout);
--void input_enable_userspace_hid(bool state);
-+void input_set_userspace_hid(char *state);
-+uint8_t input_get_userspace_hid(void);
- void input_set_classic_bonded_only(bool state);
- bool input_get_classic_bonded_only(void);
- void input_set_auto_sec(bool state);
-diff --git a/profiles/input/hog.c b/profiles/input/hog.c
-index bc1b89e57fbd..017e320f0781 100644
---- a/profiles/input/hog.c
-+++ b/profiles/input/hog.c
-@@ -208,7 +208,10 @@ static int hog_disconnect(struct btd_service *service)
- {
- 	struct hog_device *dev = btd_service_get_user_data(service);
- 
--	bt_hog_detach(dev->hog, false);
-+	if (input_get_userspace_hid() == UHID_PERSIST)
-+		bt_hog_detach(dev->hog, false);
-+	else
-+		bt_hog_detach(dev->hog, true);
- 
- 	btd_service_disconnecting_complete(service, 0);
- 
-diff --git a/profiles/input/input.conf b/profiles/input/input.conf
-index 273e15bc9c80..d555d423e43c 100644
---- a/profiles/input/input.conf
-+++ b/profiles/input/input.conf
-@@ -10,7 +10,11 @@
- #IdleTimeout=0
- 
- # Enable HID protocol handling in userspace input profile
--# Defaults to true (Use UHID instead of kernel HIDP)
-+# Possible values:
-+#  - persist: Use UHID in persistent mode (keyboard only)
-+#  - true: Use UHID instead
-+#  - false: User kernel HIDP
-+# Defaults to true
- #UserspaceHID=true
- 
- # Limit HID connections to bonded devices
-diff --git a/profiles/input/manager.c b/profiles/input/manager.c
-index f4598bcd4e47..1c4442ef847f 100644
---- a/profiles/input/manager.c
-+++ b/profiles/input/manager.c
-@@ -83,7 +83,8 @@ static int input_init(void)
- 	config = load_config_file(CONFIGDIR "/input.conf");
- 	if (config) {
- 		int idle_timeout;
--		gboolean uhid_enabled, classic_bonded_only, auto_sec;
-+		gboolean classic_bonded_only, auto_sec;
-+		char *uhid_enabled;
- 
- 		idle_timeout = g_key_file_get_integer(config, "General",
- 							"IdleTimeout", &err);
-@@ -93,12 +94,12 @@ static int input_init(void)
- 		} else
- 			g_clear_error(&err);
- 
--		uhid_enabled = g_key_file_get_boolean(config, "General",
-+		uhid_enabled = g_key_file_get_string(config, "General",
- 							"UserspaceHID", &err);
- 		if (!err) {
--			DBG("input.conf: UserspaceHID=%s", uhid_enabled ?
--							"true" : "false");
--			input_enable_userspace_hid(uhid_enabled);
-+			DBG("input.conf: UserspaceHID=%s", uhid_enabled);
-+			input_set_userspace_hid(uhid_enabled);
-+			free(uhid_enabled);
- 		} else
- 			g_clear_error(&err);
- 
--- 
-2.47.0
+When a transport is selected from bluetoothctl, a reply is expected.
+Currently, if the method call is successful, no reply is sent, causing
+the following error message in bluetoothctl:
 
+transport.Failed to select: org.freedesktop.DBus.Error.NoReply
+
+The same error can be reproduced for the unselect method.
+
+This commit updates the select and unselect methods to send reply
+messages.
+
+
+  Commit: 8c8ca715e05fe8b8105a2646d87440e1271e6237
+      https://github.com/bluez/bluez/commit/8c8ca715e05fe8b8105a2646d87440e1271e6237
+  Author: Iulia Tanasescu <iulia.tanasescu@nxp.com>
+  Date:   2024-10-25 (Fri, 25 Oct 2024)
+
+  Changed paths:
+    M client/player.c
+
+  Log Message:
+  -----------
+  client/player: Fix select/unselect reply prints
+
+This updates the shell print messages for the transport select/unselect
+method replies. The bluetoothctl log below shows the fixed result:
+
+client/bluetoothctl
+[bluetooth]# endpoint.register 00001851-0000-1000-8000-00805f9b34fb 0x06
+[/local/endpoint/ep0] Auto Accept (yes/no): y
+[/local/endpoint/ep0] Max Transports (auto/value): a
+[/local/endpoint/ep0] Locations: 1
+[/local/endpoint/ep0] Supported Context (value): 1
+Capabilities:
+  03 01 ff 00 02 02 03 05 04 1a 00 f0 00 02 03 01
+Metadata:
+[bluetooth]# Endpoint /local/endpoint/ep0 registered
+[bluetooth]# scan on
+[bluetooth]# [NEW] Device 17:7A:80:64:A7:93 17-7A-80-64-A7-93
+[17-7A-80-64-A7-93]# [NEW] Transport
+                /org/bluez/hci0/dev_17_7A_80_64_A7_93/bis1/fd0
+[17-7A-80-64-A7-93]# transport.select
+                /org/bluez/hci0/dev_17_7A_80_64_A7_93/bis1/fd0
+[17-7A-80-64-A7-93]# [CHG] Transport
+    /org/bluez/hci0/dev_17_7A_80_64_A7_93/bis1/fd0 State: broadcasting
+[17-7A-80-64-A7-93]# Select successful
+[17-7A-80-64-A7-93]# transport.unselect
+                /org/bluez/hci0/dev_17_7A_80_64_A7_93/bis1/fd0
+[17-7A-80-64-A7-93]# [CHG] Transport
+    /org/bluez/hci0/dev_17_7A_80_64_A7_93/bis1/fd0 State: idle
+[17-7A-80-64-A7-93]# Unselect successful
+
+
+Compare: https://github.com/bluez/bluez/compare/06c94f0ac055...8c8ca715e05f
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
