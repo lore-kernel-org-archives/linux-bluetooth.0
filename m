@@ -1,431 +1,104 @@
-Received: from out-28.smtp.github.com (out-28.smtp.github.com [192.30.252.211])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oi1-f178.google.com (mail-oi1-f178.google.com [209.85.167.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70278189F45
-	for <linux-bluetooth@vger.kernel.org>; Fri, 25 Oct 2024 16:21:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7290221A4C6
+	for <linux-bluetooth@vger.kernel.org>; Fri, 25 Oct 2024 16:37:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729873267; cv=none; b=ltF31/Zar64nH6sEhFQVrUNJb3DFA5MdpN1r6TLXPuXIKicQ9GEb6FfE7aKWab+35jxmeUo4N1OOWFlgaFQyh/YEo/+9/jZ36sLJyi0rFTU58q7aJDv/ktmPGn3FiW+wMevyJVGE5HSvqAGHWDQKG87GqQ5/IJn7f5iHvwY3THQ=
+	t=1729874258; cv=none; b=QVkD47Cr0Nb2/HrbmA30YB5BL8L2GFhrJm2XKnhyrW8X/HadhSqlR9UQ4NcUvQfJCz9Htse4PQtkqiRfQOwgd5p/4Lwgoj4R2ea9CcLR88mphonMstEg0umhNaFWITuHKeqCJNDc5eEoak6CIuuBSr7izAei06NaJuM7KEEyH2U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729873267; c=relaxed/simple;
-	bh=YSc/2/Tn4rb5hDMLaoL0j8MX5DaoRjOltHxZk+JAAR8=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=q/QyYF9BJxzDSrJxm3JsNgPhcIGAdAGW9tLCOcuWVFqpXHZu9x3cGW+Wy0IQCqpusRlnBavND5QzFc1cEkC6bDKMAYOe5InQeqppDzNw0urj/AwD8ZymDHMfXnsY6W0xCAnd3sosFEIzgRFVgJ6Nwoy0jmMSCJhBi9nF+NOTiYw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=LzYcKPXR; arc=none smtp.client-ip=192.30.252.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1729874258; c=relaxed/simple;
+	bh=loC/+799xTM8FFFpmRZVJ6D3Tuyj8RjtAwtq0Kp+dqU=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=oVVrm2QVxc87OSf2T/6AG6dfmbVxPSaCokdmx5Q41dcRti7xLTKwIv3R7ljAsWJhDgNv1TPKAas7ESNdrUqny8jCkUzk6UoBg2R87XMSPO+SGCYSC2SwXEvMTS94pXFq8pjWQddF6aJiWsMC5oTip1M0Hv8FDVIfvbjDPJHVAMg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CTX92TdJ; arc=none smtp.client-ip=209.85.167.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="LzYcKPXR"
-Received: from github.com (hubbernetes-node-afc22be.ash1-iad.github.net [10.56.168.38])
-	by smtp.github.com (Postfix) with ESMTPA id 7A5076C04BA
-	for <linux-bluetooth@vger.kernel.org>; Fri, 25 Oct 2024 09:21:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1729873263;
-	bh=FFkD/gfwRkcBFZPaU2PBST8Iq/PynVAvAtBfYJSTuI8=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=LzYcKPXRdw0LpMc0NxBoWgKJh6bP48QwdluurjStkt7g4GLEb/zbIJLMwXD779HEq
-	 rVRlLwuvTyrjKh14jyESkxOxLbQzjnYdhUmS7VLoZo7PrIZTh1fQVCfyay1ZZR2Psu
-	 /x4SzZIenUJ4mwWdqiSUNYx4F8Koc3krAeAtOkkc=
-Date: Fri, 25 Oct 2024 09:21:03 -0700
-From: iulia-tanasescu <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/master/806a55-06c94f@github.com>
-Subject: [bluez/bluez] 7ff51d: shared/bap: Allow multiple links per stream
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CTX92TdJ"
+Received: by mail-oi1-f178.google.com with SMTP id 5614622812f47-3e6104701ffso1435930b6e.0
+        for <linux-bluetooth@vger.kernel.org>; Fri, 25 Oct 2024 09:37:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1729874255; x=1730479055; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=UabgMGDi4Fv7LBdqr/F29uC+HjUGRK85zPYrPWNDd/0=;
+        b=CTX92TdJYrFyybPlfAqtLCCT9g4b806msAxeb0S/dC3/g9hdIe3NinVaQDg3NefiQi
+         UW/0uWkoFkyACPzgLpU68SoR73CGdmtG1m1pqihfar0JXy3uqzCtLoLhnEwD1fWx4u3Q
+         I9i6X6jdnubp1eY++lGustNSvWs6upXD0+jfVkIlcvm0ybp1g2eU9pHmvdaASau8nicx
+         23+srxIWMv7FsHMWBt/8UBWgWAWQ8he+zTTHKYfMKnCMEpee06+zcfpPArnQLQCgZ7CF
+         SqmZ0IBiqghbo9C2ETkmpf9KK97ZHYZ29I7+Ivlo26T9rpNFT9f6l6eVuvZlqlfWxJQ6
+         H9ng==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1729874255; x=1730479055;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=UabgMGDi4Fv7LBdqr/F29uC+HjUGRK85zPYrPWNDd/0=;
+        b=iaZ88NBPUdn0XeqyKy8bwQ8SriCcPKPOHGiKO0axKnbWFBHPNS+zux3VC7AEhGLbkY
+         4Qd9AAZ2Q2L2HmU6Y9l0TmrC2ZX2e5KoV//59DCOeRY+q+H7NYtZlzRV/aGG2dyNg/BA
+         qm2GXFC7fOqNtKni4yrgQ4dwICAjUFHTXWHQg0/o60lV6Pjl1JFKU9ETlTzhiebQLEmX
+         toGUZIK2bIbreW3O4TE8rH4/xbGXAr+NOA6o8MOyfBBKh1UMexnL4BFkiQZ0s6ChcZqE
+         oJFZD8v5HkR9PiGVbV/4t6uwpKBwFO9B1EskpGXePAgdxk9cBBHBHfnsVKRXdCLll7lF
+         ic7Q==
+X-Gm-Message-State: AOJu0YzWYIj/l6iQ9fockTxPrf1EeppERllrNF0hNSKaaq5PM5l5O1K3
+	dZqzHfqqa1683zu02/hi2/ui4QoHkiz0W2OwaDZKPJbHpiNFL8SDJXn0Mw==
+X-Google-Smtp-Source: AGHT+IHZQavsY8POXV2Tp1Fx347N8Q1QHyZxE8NHM58joGZcfAWrqkJ3cSO9dvlQ15si2PZhZbLPGg==
+X-Received: by 2002:a05:6870:4723:b0:289:ae2:b580 with SMTP id 586e51a60fabf-29051bf9628mr40684fac.19.1729874255124;
+        Fri, 25 Oct 2024 09:37:35 -0700 (PDT)
+Received: from [172.17.0.2] ([172.190.111.163])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7b18d27be4csm69350185a.15.2024.10.25.09.37.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 25 Oct 2024 09:37:34 -0700 (PDT)
+Message-ID: <671bc94e.050a0220.1b9853.2b1d@mx.google.com>
+Date: Fri, 25 Oct 2024 09:37:34 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============1926953095208884374=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
+MIME-Version: 1.0
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, iulia.tanasescu@nxp.com
+Subject: RE: transport: Fix select/unselect reply missing
+In-Reply-To: <20241025142842.46566-2-iulia.tanasescu@nxp.com>
+References: <20241025142842.46566-2-iulia.tanasescu@nxp.com>
+Reply-To: linux-bluetooth@vger.kernel.org
+
+--===============1926953095208884374==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
 
-  Branch: refs/heads/master
-  Home:   https://github.com/bluez/bluez
-  Commit: 7ff51d684956cf3e063ea341ea0a98c40452af5d
-      https://github.com/bluez/bluez/commit/7ff51d684956cf3e063ea341ea0a98c40452af5d
-  Author: Iulia Tanasescu <iulia.tanasescu@nxp.com>
-  Date:   2024-10-25 (Fri, 25 Oct 2024)
+This is automated email and please do not reply to this email!
 
-  Changed paths:
-    M profiles/audio/transport.c
-    M src/shared/bap.c
-    M src/shared/bap.h
+Dear submitter,
 
-  Log Message:
-  -----------
-  shared/bap: Allow multiple links per stream
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=903164
 
-This commit adds support to link multiple streams together, creating
-the foundation for implementing broadcast links: for Broadcast Sinks,
-the user could select multiple streams to receive audio from. All
-selected streams need to be linked together and considered when
-creating BIG sync.
+---Test result---
 
+Test Summary:
+CheckPatch                    PASS      0.86 seconds
+GitLint                       PASS      0.62 seconds
+BuildEll                      PASS      24.79 seconds
+BluezMake                     PASS      1751.11 seconds
+MakeCheck                     PASS      12.97 seconds
+MakeDistcheck                 PASS      181.16 seconds
+CheckValgrind                 PASS      254.25 seconds
+CheckSmatch                   PASS      360.17 seconds
+bluezmakeextell               PASS      123.96 seconds
+IncrementalBuild              PASS      3214.92 seconds
+ScanBuild                     PASS      1042.41 seconds
 
-  Commit: 85bee521c7375d48be96dc2de88a8ec2a173fc57
-      https://github.com/bluez/bluez/commit/85bee521c7375d48be96dc2de88a8ec2a173fc57
-  Author: Iulia Tanasescu <iulia.tanasescu@nxp.com>
-  Date:   2024-10-25 (Fri, 25 Oct 2024)
 
-  Changed paths:
-    M src/shared/bap.c
-    M src/shared/bap.h
 
-  Log Message:
-  -----------
-  shared/bap: Add support for handling broadcast links
+---
+Regards,
+Linux Bluetooth
 
-This commit implements io handling functions as stream ops, since
-broadcast links need to be handled differently than unicast:
-Unicast links share the same IO, while broadcast links stand for
-separate BISes with independent IOs. Unicast links have different
-directions, while broadcast links share the same one.
 
-This also adds a function for unlinking broadcast streams.
-
-
-  Commit: 71d19c6c84162ea5f46c850d30561a4ec6b25fce
-      https://github.com/bluez/bluez/commit/71d19c6c84162ea5f46c850d30561a4ec6b25fce
-  Author: Iulia Tanasescu <iulia.tanasescu@nxp.com>
-  Date:   2024-10-25 (Fri, 25 Oct 2024)
-
-  Changed paths:
-    M src/shared/bap.c
-
-  Log Message:
-  -----------
-  shared/bap: Fix broadcast set state
-
-When a stream changes state, the update is notified to other drivers
-that registered a state changed callback. These callbacks might further
-change the stream state, leading to the stream being freed. To avoid
-use after free errors post notifications, this commit adds support to
-ref/unref streams, to make sure that the stream is kept alive until all
-processing is completed. This also updates the switch condition post
-notifications, to handle the stream based on its current state.
-
-
-  Commit: eaff473cd263b4780e5f73ea7638a35f49ea830a
-      https://github.com/bluez/bluez/commit/eaff473cd263b4780e5f73ea7638a35f49ea830a
-  Author: Iulia Tanasescu <iulia.tanasescu@nxp.com>
-  Date:   2024-10-25 (Fri, 25 Oct 2024)
-
-  Changed paths:
-    M profiles/audio/bap.c
-    M src/shared/bap.c
-    M unit/test-bap.c
-
-  Log Message:
-  -----------
-  shared/bap: Use enabling state for bcast sink streams
-
-This updates the stream state transition from CONFIG to ENABLING,
-on enable for Broadcast Sink streams. This is done to differentiate
-between streams discovered in the BASE after short-lived PA sync
-and streams that have been selected and enabled by the user.
-
-
-  Commit: 0b5cfc1badf061f7f8977212f819be23075ba5e1
-      https://github.com/bluez/bluez/commit/0b5cfc1badf061f7f8977212f819be23075ba5e1
-  Author: Iulia Tanasescu <iulia.tanasescu@nxp.com>
-  Date:   2024-10-25 (Fri, 25 Oct 2024)
-
-  Changed paths:
-    M profiles/audio/bap.c
-
-  Log Message:
-  -----------
-  bap: Add support for syncing to multiple BISes
-
-This adds support for a Broadcast Sink to synchronize to multiple BISes
-from a Source.
-
-BISes selected by the user need to be linked together and then enabled one
-by one. The first enabled stream will enqueue all its links in a request
-for PA and BIG sync. After BIG sync is established, the confirm callback
-will be called for each BIS io created in the kernel. Each fd will be set
-inside the corresponding link, even the links that have not yet been
-enabled. The enabled links will be started as soon as the fds are ready.
-
-
-  Commit: b92b857f2fb022f89dce3e1d495c226187668567
-      https://github.com/bluez/bluez/commit/b92b857f2fb022f89dce3e1d495c226187668567
-  Author: Iulia Tanasescu <iulia.tanasescu@nxp.com>
-  Date:   2024-10-25 (Fri, 25 Oct 2024)
-
-  Changed paths:
-    M src/shared/bap.c
-
-  Log Message:
-  -----------
-  shared/bap: Handle multiple bcast sink streams
-
-This adds shared/bap support for enabling and starting multiple Broadcast
-Sink streams. Stream enabling should fail if any other Broadcast Sink
-streams are in the process of enabling or have been enabled for the same
-source. Also, a stream that has been enabled and already has the fd set
-should be started on the spot.
-
-
-  Commit: 47da1efdc5843294cfaf9522624b3876e8ab2972
-      https://github.com/bluez/bluez/commit/47da1efdc5843294cfaf9522624b3876e8ab2972
-  Author: Iulia Tanasescu <iulia.tanasescu@nxp.com>
-  Date:   2024-10-25 (Fri, 25 Oct 2024)
-
-  Changed paths:
-    M profiles/audio/transport.c
-
-  Log Message:
-  -----------
-  transport: Unset transport owner before owner free
-
-This sets the transport owner back to NULL, before the owner object
-is freed.
-
-
-  Commit: e0e3c922f715aec65a1edcc7f78fe914203cee82
-      https://github.com/bluez/bluez/commit/e0e3c922f715aec65a1edcc7f78fe914203cee82
-  Author: Iulia Tanasescu <iulia.tanasescu@nxp.com>
-  Date:   2024-10-25 (Fri, 25 Oct 2024)
-
-  Changed paths:
-    M profiles/audio/transport.c
-
-  Log Message:
-  -----------
-  transport: Add Links property for broadcast transports
-
-This adds the "Links" property for broadcast transports, which allows
-upper layer applications to write and link transports together.
-
-
-  Commit: 5b1dfd2721e25ee190b46dfc7a81240ab7652a5c
-      https://github.com/bluez/bluez/commit/5b1dfd2721e25ee190b46dfc7a81240ab7652a5c
-  Author: Iulia Tanasescu <iulia.tanasescu@nxp.com>
-  Date:   2024-10-25 (Fri, 25 Oct 2024)
-
-  Changed paths:
-    M doc/org.bluez.MediaTransport.rst
-
-  Log Message:
-  -----------
-  doc/media: Document Links property for broadcast
-
-This adds the "Links" property for broadcast.
-
-
-  Commit: 3bafab44663605bc64d7022fbad2881392016162
-      https://github.com/bluez/bluez/commit/3bafab44663605bc64d7022fbad2881392016162
-  Author: Iulia Tanasescu <iulia.tanasescu@nxp.com>
-  Date:   2024-10-25 (Fri, 25 Oct 2024)
-
-  Changed paths:
-    M profiles/audio/transport.c
-
-  Log Message:
-  -----------
-  transport: Set bap_update_links as transport op
-
-This implements bap_update_links as transport op, since broadcast links
-need to be handled differently for unicast, which only allows one link.
-For broadcast, the property changed signal should be emitted everytime
-a new link is added or removed.
-
-
-  Commit: 2ec04e02601fbd6233501fdb74d9976a24995e52
-      https://github.com/bluez/bluez/commit/2ec04e02601fbd6233501fdb74d9976a24995e52
-  Author: Iulia Tanasescu <iulia.tanasescu@nxp.com>
-  Date:   2024-10-25 (Fri, 25 Oct 2024)
-
-  Changed paths:
-    M profiles/audio/transport.c
-
-  Log Message:
-  -----------
-  transport: Make transport_bap_set_state part of BAP_OPS
-
-This splits the transport set_state operation for unicast and broadcast,
-by implementing it as a transport op. Unlike unicast, broadcast transports
-need to be acquired/released separately, so changes in a transport state
-should not affect its links.
-
-
-  Commit: 7b63fe6bd4d01de09a51641bf9e87e1efb653b1f
-      https://github.com/bluez/bluez/commit/7b63fe6bd4d01de09a51641bf9e87e1efb653b1f
-  Author: Iulia Tanasescu <iulia.tanasescu@nxp.com>
-  Date:   2024-10-25 (Fri, 25 Oct 2024)
-
-  Changed paths:
-    M client/player.c
-
-  Log Message:
-  -----------
-  client/player: Handle acquiring broadcast links
-
-This adds support for acquiring linked broadacast transports: Each link
-should be acquired separately, unlike unicast.
-
-
-  Commit: 3075a9c17d161e45d1006bd091f0b5af9d09726b
-      https://github.com/bluez/bluez/commit/3075a9c17d161e45d1006bd091f0b5af9d09726b
-  Author: Iulia Tanasescu <iulia.tanasescu@nxp.com>
-  Date:   2024-10-25 (Fri, 25 Oct 2024)
-
-  Changed paths:
-    M client/player.c
-
-  Log Message:
-  -----------
-  client/player: Add support to select multiple transports
-
-This updates transport select to link transports together before calling
-the "Select" method for each of them.
-
-The bluetoothctl log below shows a Broadcast Sink detecting
-2 streams from a source and selecting both of them. After the
-first transport is acquired, the link is created and the first
-transport goes active.
-
-client/bluetoothctl
-[bluetooth]# endpoint.register 00001851-0000-1000-8000-00805f9b34fb 0x06
-[/local/endpoint/ep0] Auto Accept (yes/no): y
-[/local/endpoint/ep0] Max Transports (auto/value): a
-[/local/endpoint/ep0] Locations: 1
-[/local/endpoint/ep0] Supported Context (value): 1
-Capabilities:
-  03 01 ff 00 02 02 03 05 04 1a 00 f0 00 02 03 01
-Metadata:
-[bluetooth]# Endpoint /local/endpoint/ep0 registered
-[bluetooth]# scan on
-[bluetooth]# [NEW] Device 17:7A:80:64:A7:93 17-7A-80-64-A7-93
-[17-7A-80-64-A7-93]# [NEW] Transport
-                /org/bluez/hci0/dev_17_7A_80_64_A7_93/bis1/fd0
-[17-7A-80-64-A7-93]# [NEW] Transport
-                /org/bluez/hci0/dev_17_7A_80_64_A7_93/bis2/fd1
-[17-7A-80-64-A7-93]# transport.select
-                /org/bluez/hci0/dev_17_7A_80_64_A7_93/bis1/fd0
-                /org/bluez/hci0/dev_17_7A_80_64_A7_93/bis2/fd1
-[17-7A-80-64-A7-93]# [CHG] Transport
-    /org/bluez/hci0/dev_17_7A_80_64_A7_93/bis1/fd0 State: broadcasting
-[17-7A-80-64-A7-93]# [CHG] Transport
-    /org/bluez/hci0/dev_17_7A_80_64_A7_93/bis2/fd1 State: broadcasting
-[17-7A-80-64-A7-93]# transport.acquire
-                /org/bluez/hci0/dev_17_7A_80_64_A7_93/bis1/fd0
-[17-7A-80-64-A7-93]# [CHG] Transport
-                /org/bluez/hci0/dev_17_7A_80_64_A7_93/bis1/fd0
-                Links: /org/bluez/hci0/dev_17_7A_80_64_A7_93/bis2/fd1
-[17-7A-80-64-A7-93]# Transport
-    /org/bluez/hci0/dev_17_7A_80_64_A7_93/bis1/fd0 acquiring complete
-[17-7A-80-64-A7-93]# Acquire successful: fd 8 MTU 40:0
-[17-7A-80-64-A7-93]# [CHG] Transport
-    /org/bluez/hci0/dev_17_7A_80_64_A7_93/bis1/fd0 State: active
-
-The btmon log shows that sync has been established with both BISes:
-
-< HCI Command: LE Broadcast Isochronous Group Create Sync (0x08|0x006b)
-        BIG Handle: 0x00
-        BIG Sync Handle: 0x0000
-        Encryption: Unencrypted (0x00)
-        Broadcast Code[16]: 00000000000000000000000000000000
-        Maximum Number Subevents: 0x00
-        Timeout: 20000 ms (0x07d0)
-        Number of BIS: 2
-        BIS ID: 0x01
-        BIS ID: 0x02
-> HCI Event: Command Status (0x0f) plen 4
-      LE Broadcast Isochronous Group Create Sync (0x08|0x006b) ncmd 1
-        Status: Success (0x00)
-> HCI Event: LE Meta Event (0x3e) plen 19
-      LE Broadcast Isochronous Group Sync Estabilished (0x1d)
-        Status: Success (0x00)
-        BIG Handle: 0x00
-        Transport Latency: 0 us (0x000000)
-        NSE: 3
-        BN: 1
-        PTO: 1
-        IRC: 3
-        Maximum PDU: 40
-        ISO Interval: 10.00 msec (0x0008)
-        Connection Handle #0: 6
-        Connection Handle #1: 7
-< HCI Command: LE Setup Isochronous Data Path (0x08|0x006e) plen 13
-        Handle: 6
-        Data Path Direction: Output (Controller to Host) (0x01)
-        Data Path: HCI (0x00)
-        Coding Format: Transparent (0x03)
-        Company Codec ID: Ericsson Technology Licensing (0)
-        Vendor Codec ID: 0
-        Controller Delay: 0 us (0x000000)
-        Codec Configuration Length: 0
-        Codec Configuration[0]:
-> HCI Event: Command Complete (0x0e) plen 6
-      LE Setup Isochronous Data Path (0x08|0x006e) ncmd 1
-        Status: Success (0x00)
-        Handle: 6
-< HCI Command: LE Setup Isochronous Data Path (0x08|0x006e) plen 13
-        Handle: 7
-        Data Path Direction: Output (Controller to Host) (0x01)
-        Data Path: HCI (0x00)
-        Coding Format: Transparent (0x03)
-        Company Codec ID: Ericsson Technology Licensing (0)
-        Vendor Codec ID: 0
-        Controller Delay: 0 us (0x000000)
-        Codec Configuration Length: 0
-        Codec Configuration[0]:
-> HCI Event: Command Complete (0x0e) plen 6
-      LE Setup Isochronous Data Path (0x08|0x006e) ncmd 1
-        Status: Success (0x00)
-        Handle: 7
-
-The second transport can then be acquired and it will go straight
-to active, since the fd has already been set:
-
-[17-7A-80-64-A7-93]# transport.acquire
-                /org/bluez/hci0/dev_17_7A_80_64_A7_93/bis2/fd1
-[17-7A-80-64-A7-93]# [CHG] Transport
-                /org/bluez/hci0/dev_17_7A_80_64_A7_93/bis2/fd1
-                Links: /org/bluez/hci0/dev_17_7A_80_64_A7_93/bis1/fd0
-[17-7A-80-64-A7-93]# Transport
-    /org/bluez/hci0/dev_17_7A_80_64_A7_93/bis2/fd1 acquiring complete
-[17-7A-80-64-A7-93]# Acquire successful: fd 9 MTU 40:0
-[17-7A-80-64-A7-93]# [CHG] Transport
-    /org/bluez/hci0/dev_17_7A_80_64_A7_93/bis2/fd1 State: active
-
-The transports can them be released one by one:
-
-[17-7A-80-64-A7-93]# transport.release
-                /org/bluez/hci0/dev_17_7A_80_64_A7_93/bis1/fd0
-[17-7A-80-64-A7-93]# Transport fd disconnected
-[17-7A-80-64-A7-93]# [CHG] Transport
-    /org/bluez/hci0/dev_17_7A_80_64_A7_93/bis1/fd0 State: idle
-[17-7A-80-64-A7-93]# Release successful
-[17-7A-80-64-A7-93]# transport.release
-                /org/bluez/hci0/dev_17_7A_80_64_A7_93/bis2/fd1
-[17-7A-80-64-A7-93]# Transport fd disconnected
-[17-7A-80-64-A7-93]# [CHG] Transport
-    /org/bluez/hci0/dev_17_7A_80_64_A7_93/bis2/fd1 State: idle
-[17-7A-80-64-A7-93]# Release successful
-
-
-  Commit: 06c94f0ac0558bd937f10486536da5c256643432
-      https://github.com/bluez/bluez/commit/06c94f0ac0558bd937f10486536da5c256643432
-  Author: Iulia Tanasescu <iulia.tanasescu@nxp.com>
-  Date:   2024-10-25 (Fri, 25 Oct 2024)
-
-  Changed paths:
-    M profiles/audio/transport.c
-
-  Log Message:
-  -----------
-  transport: Unlink broadcast transport at release
-
-This updates broadcast transport release to unlink stream from all its
-links.
-
-
-Compare: https://github.com/bluez/bluez/compare/806a552d53c7...06c94f0ac055
-
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
+--===============1926953095208884374==--
