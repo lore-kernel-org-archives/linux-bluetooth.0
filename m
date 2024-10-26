@@ -1,142 +1,97 @@
-Received: from mailgw02.mediatek.com (unknown [210.61.82.184])
+Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [185.185.170.37])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA236A94D;
-	Sat, 26 Oct 2024 03:18:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.61.82.184
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729912721; cv=none; b=sfFY0+tcZOtYy8zt77Jva29sCGWxX/EHrXpEfIuPLVIpXFCHK+B/CS5Ee1UzCZht762Rr65BvZjJnBf71hwaNTOZNvEdIYfmM1blWfBjax43iDS2CT7FEENwZHjNoSUdflo19wvpta5PslCyDTCMA4wkbZI9vXSlcltek6Pm0xM=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729912721; c=relaxed/simple;
-	bh=07HWbef7b5GiXBa7Yne1ubxe5jueyGqd2HLZ7CWtJ3k=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=KvaGhugUjz2I17kbg1QqBh9Vf751rlGGLOa8O0EsVvO/bMvTBvQb9V1dOGOV1Cbwi1Edpqz/uBKjCSOYOIx15oR4uLBCIXIP8TiBAse6GRD2Lq0D4UtvTrhrrz2WPF2nJwYXefCh0RLsoYZNfjXQWTwA6yFPbYSpSY2TiykkQrk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com; spf=pass smtp.mailfrom=mediatek.com; dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b=dD3MwYxE; arc=none smtp.client-ip=210.61.82.184
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mediatek.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C5FD217F3F
+	for <linux-bluetooth@vger.kernel.org>; Sat, 26 Oct 2024 10:13:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=185.185.170.37
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1729937638; cv=pass; b=T89W69kXKtTsfM29TmfqOR3NIgN9nI/kX8ePm4Kr8Porxd6CHwv90EjXoHbhRhJudyEtL9pE5ZLhRY7E2LLoUg2iEovuR6G7ikJbERgd4w5DLrLyqAz2hFIlwPt9pO6iMl+MV4eZgTDjzWnSXT8eQGXgSZm+FVCKotXTtr6vMAc=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1729937638; c=relaxed/simple;
+	bh=dM+rci0j5uyvmDcdVxUWmLY0OzgYOAisgBYUx9/5jH8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=csmCyyrqvHivYr6Y/pTyQlRDUQqbZ45IQNV3QfwHulRSe3JtyMVxEnUGzcXa2++JUGyuLycmPxtJazX7xPh20tNhsNP+1B3HTbHvDCjDbCxuh9q00UopXBpG3FvJc3xfHhV8Z0+DQdzjB22BfOOMTt8Uif3/CNNDAVzSa9gcUeg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=KznpLjn3; arc=pass smtp.client-ip=185.185.170.37
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b="dD3MwYxE"
-X-UUID: f75f2d04934811efbd192953cf12861f-20241026
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
-	h=Content-Type:MIME-Version:Message-ID:Date:Subject:CC:To:From; bh=KcLQSd+mgrbzJFWCcO3CfOZmlLEIfHwCgqownyLI03k=;
-	b=dD3MwYxEf9LyLYhnET3DNkDiB5bpqB0/HxC5+yhy+9d/IXxLZWgRcyjw83FVdXg1sjRVrl9aHt8vxO7z6y+jJz5jCrzRiNLE9OviyYHHPxn/ShPzbDRiufACinUIzUNqtKnns+XmjgR/pGHV6Rc/GHhPgoUlUQkSpgS+bruT2lI=;
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.1.42,REQID:94ce4fb2-f5d6-4fe8-a974-a42779428fca,IP:0,U
-	RL:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
-	release,TS:0
-X-CID-META: VersionHash:b0fcdc3,CLOUDID:95e4da41-8751-41b2-98dd-475503d45150,B
-	ulkID:nil,BulkQuantity:0,Recheck:0,SF:102,TC:nil,Content:0,EDM:-3,IP:nil,U
-	RL:0,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES:1,
-	SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
-X-CID-BVR: 0
-X-CID-BAS: 0,_,0,_
-X-CID-FACTOR: TF_CID_SPAM_SNR
-X-UUID: f75f2d04934811efbd192953cf12861f-20241026
-Received: from mtkmbs10n2.mediatek.inc [(172.21.101.183)] by mailgw02.mediatek.com
-	(envelope-from <hao.qin@mediatek.com>)
-	(Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
-	with ESMTP id 1090913706; Sat, 26 Oct 2024 11:18:26 +0800
-Received: from mtkmbs13n2.mediatek.inc (172.21.101.108) by
- mtkmbs10n2.mediatek.inc (172.21.101.183) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.26; Sat, 26 Oct 2024 11:18:24 +0800
-Received: from mhfsdcap04.gcn.mediatek.inc (10.17.3.154) by
- mtkmbs13n2.mediatek.inc (172.21.101.73) with Microsoft SMTP Server id
- 15.2.1118.26 via Frontend Transport; Sat, 26 Oct 2024 11:18:23 +0800
-From: Hao Qin <hao.qin@mediatek.com>
-To: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg
-	<johan.hedberg@gmail.com>, Luiz Von Dentz <luiz.dentz@gmail.com>
-CC: Sean Wang <sean.wang@mediatek.com>, Deren Wu <deren.Wu@mediatek.com>,
-	Aaron Hou <aaron.hou@mediatek.com>, Chris Lu <chris.lu@mediatek.com>, "Steve
- Lee" <steve.lee@mediatek.com>, linux-bluetooth
-	<linux-bluetooth@vger.kernel.org>, linux-kernel
-	<linux-kernel@vger.kernel.org>, linux-mediatek
-	<linux-mediatek@lists.infradead.org>, Hao Qin <hao.qin@mediatek.com>
-Subject: [PATCH] Bluetooth: btusb: Add new VID/PID 0489/e111 for MT7925
-Date: Sat, 26 Oct 2024 11:18:18 +0800
-Message-ID: <20241026031818.14719-1-hao.qin@mediatek.com>
-X-Mailer: git-send-email 2.18.0
+	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="KznpLjn3"
+Received: from monolith.lan (unknown [193.138.7.198])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pav)
+	by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4XbFqD6yWwz49Q0G;
+	Sat, 26 Oct 2024 13:13:44 +0300 (EEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
+	t=1729937625;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=mJ9urVXaIOp+bFVO7VVgQy/ihb/ArmoNmQYBRI6dgZY=;
+	b=KznpLjn3eZNd8Ce0Kyy+q1a59WwoyqaTYFpT5kjZClPWed/DBiQZFz1TxoSR1zNM8wAXmF
+	8/xEyrMgksONFcb6qRDftHOcqxO1k5EXjINqAcIaQFGjlGOxsgxDmvcU8GRTf2uyWUzKbF
+	f9AwlpjfClL5TJ7pDTo4mS7L6lieeRDpLgWrTKTfwFVnn/EleSTOtptrpoW9M/F5RaKSI4
+	RsM9lxPqlGQdfIAClxSwvGY56kHGGV0W/qAvYtedoFFxnKddtZApevGSfy4fGGexb3lSTt
+	OqnOBiRBodjRrdwbBW8QKuwWt5hopTMIjCtsEKAshMVdw5kh3Z8PcESdq2XLRQ==
+ARC-Seal: i=1; s=lahtoruutu; d=iki.fi; t=1729937625; a=rsa-sha256;
+	cv=none;
+	b=l5RvtAcR5vnk7AX3rQTOMvQOAKZNT5k309YG2//t885owEaNfjjNV3oxRXXtLpLh9afvRL
+	lKhPCB0XYn3vux2wDlafpNW+SYMGBDic69GuWy4xHFzNTY5ldArkujv82pTNK/ZAuM4Mzl
+	lTUFC5jFN7C0prqMIdiNUgqsBI9C78v57hRlhxXsWJedV7EF7ajjuKnDB1QRMI2+jy5X0b
+	77WaPujgj0Lwd0e/tYDaev6zPHewOC2R3tqU+uzeZwI9gfPw3iz1NR+Hp2M+yNaPNqOhCS
+	zatRoV0DAMHMIERaEM+i0mlCRz89wS4oFUgyEQ8ljmBG90C8/ThDGSSdNkbUXA==
+ARC-Authentication-Results: i=1;
+	ORIGINATING;
+	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
+	s=lahtoruutu; t=1729937625;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=mJ9urVXaIOp+bFVO7VVgQy/ihb/ArmoNmQYBRI6dgZY=;
+	b=eVEcg8L4VXohpYjbgIugWeIaOCo2KC/F6PYLIBFyXf+2RHCIKZygeFTtbUMt+3buUK9eJk
+	DWT+ZsW9uiQM7qpVGoeM6FtQ2Cq01TzWfl9bEnCX21EA9VjCbQ3P1TdvIypr+Zcy7oMotY
+	2PPekBe2WIY3B3qU6ldrHOouEWawuR1CxalNqJj8TPVE92r7mcohkbRU34/0AZr0Z2TSm3
+	Jfp2jlB9lGVv4g/51+wyRcLUZSUoGi1lR34oWt/hZNUxV7o2RMKKDPPMzXTkenH6cX/9h6
+	xIwlFVFTlfUdO7BUBom/i4EktX5ULFbdhbvgfL8Ygf5nB+GSp/zXwoVLPd1GKQ==
+From: Pauli Virtanen <pav@iki.fi>
+To: linux-bluetooth@vger.kernel.org
+Cc: Pauli Virtanen <pav@iki.fi>
+Subject: [PATCH BlueZ] shared/bap: ucast streams can only have one link
+Date: Sat, 26 Oct 2024 13:13:39 +0300
+Message-ID: <b0eeb28d794adca98f4a246cb368e68022e06e0e.1729937570.git.pav@iki.fi>
+X-Mailer: git-send-email 2.47.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-TM-AS-Product-Ver: SMEX-14.0.0.3152-9.1.1006-23728.005
-X-TM-AS-Result: No-10--5.230900-8.000000
-X-TMASE-MatchedRID: wDTc/wNgEcOOv/EKrwzF6CbMb0f5D0uqMApqy5cfknU2/UwdvFG5IgBu
-	o8M5Nxn42OsYla+9EV0T3bJgA9T/DR/TUHYtYA4Dbc297PAGtWak2H/b/X5aJd9RlPzeVuQQ3oz
-	JRX7b4Nk6ipv+KnW5/IAy6p60ZV62fJ5/bZ6npdjKayT/BQTiGmpLYSIdl6JxTibWIkykmaMV/7
-	NhwEFVMQrL8WGOzaM3wUWMyoUd5uE=
-X-TM-AS-User-Approved-Sender: No
-X-TM-AS-User-Blocked-Sender: No
-X-TMASE-Result: 10--5.230900-8.000000
-X-TMASE-Version: SMEX-14.0.0.3152-9.1.1006-23728.005
-X-TM-SNTS-SMTP: 09859DE5732F654A41973E9833A1D16B011FA20721F1BE589D58842152CAB37E2000:8
+Content-Transfer-Encoding: 8bit
 
-Add VID 0489 & PID e111 for MediaTek MT7925 USB Bluetooth chip.
+In unicast, linked streams mean bidirectional CIS.  Ucast stream can
+have at most one linked stream.
 
-The information in /sys/kernel/debug/usb/devices about the Bluetooth
-device is listed as the below.
-
-T:  Bus=02 Lev=02 Prnt=02 Port=04 Cnt=02 Dev#=  4 Spd=480  MxCh= 0
-D:  Ver= 2.10 Cls=ef(misc ) Sub=02 Prot=01 MxPS=64 #Cfgs=  1
-P:  Vendor=0489 ProdID=e111 Rev= 1.00
-S:  Manufacturer=MediaTek Inc.
-S:  Product=Wireless_Device
-S:  SerialNumber=000000000
-C:* #Ifs= 3 Cfg#= 1 Atr=e0 MxPwr=100mA
-A:  FirstIf#= 0 IfCount= 3 Cls=e0(wlcon) Sub=01 Prot=01
-I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=125us
-E:  Ad=82(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-E:  Ad=02(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-I:  If#= 1 Alt= 6 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  63 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  63 Ivl=1ms
-I:* If#= 2 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
-E:  Ad=8a(I) Atr=03(Int.) MxPS=  64 Ivl=125us
-E:  Ad=0a(O) Atr=03(Int.) MxPS=  64 Ivl=125us
-I:  If#= 2 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
-E:  Ad=8a(I) Atr=03(Int.) MxPS= 512 Ivl=125us
-E:  Ad=0a(O) Atr=03(Int.) MxPS= 512 Ivl=125us
-
-Signed-off-by: Hao Qin <hao.qin@mediatek.com>
+Fix ucast streams to have only single link. This fixes eg. configuring
+for AC 11(i).
 ---
- drivers/bluetooth/btusb.c | 2 ++
- 1 file changed, 2 insertions(+)
+ src/shared/bap.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 9970470c9d15..33513428712b 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -648,6 +648,8 @@ static const struct usb_device_id quirks_table[] = {
- 						     BTUSB_WIDEBAND_SPEECH },
+diff --git a/src/shared/bap.c b/src/shared/bap.c
+index dad510aec..658ee1370 100644
+--- a/src/shared/bap.c
++++ b/src/shared/bap.c
+@@ -2422,8 +2422,7 @@ static int bap_ucast_io_link(struct bt_bap_stream *stream,
  
- 	/* Additional MediaTek MT7925 Bluetooth devices */
-+	{ USB_DEVICE(0x0489, 0xe111), .driver_info = BTUSB_MEDIATEK |
-+						     BTUSB_WIDEBAND_SPEECH },
- 	{ USB_DEVICE(0x0489, 0xe113), .driver_info = BTUSB_MEDIATEK |
- 						     BTUSB_WIDEBAND_SPEECH },
- 	{ USB_DEVICE(0x0489, 0xe118), .driver_info = BTUSB_MEDIATEK |
+ 	bap = stream->bap;
+ 
+-	if (queue_find(stream->links, NULL, link) ||
+-		queue_find(link->links, NULL, stream))
++	if (!queue_isempty(stream->links) || !queue_isempty(link->links))
+ 		return -EALREADY;
+ 
+ 	if (stream->client != link->client ||
 -- 
-2.18.0
+2.47.0
 
