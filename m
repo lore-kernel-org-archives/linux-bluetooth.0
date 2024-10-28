@@ -1,76 +1,109 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo1-f51.google.com (mail-oo1-f51.google.com [209.85.161.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3348618FC75
-	for <linux-bluetooth@vger.kernel.org>; Mon, 28 Oct 2024 21:00:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7C6A1E0095
+	for <linux-bluetooth@vger.kernel.org>; Mon, 28 Oct 2024 21:06:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730149225; cv=none; b=PeJMVz56IdGT1BpDm29ltPrAnR5q3Pnj5jSm2L9kRB/Y2c1YsmwUJo/q6A1RsNbLx2KWadFwed5wG/yk7v/Oa9ATGoKPFFfHfcECT/EvobSVuxc67f27JvYzJNz4sk7YOHYdHTJUplGXzu/FAzy2bPRo6/bhlPmhNamkW2+TmUc=
+	t=1730149573; cv=none; b=XMPSsl/OlX2mW3alr1tGq/2StsGIwzsNNQR1uyINtIB4qKPqfHPI7ObWf1Bq3EnWAT9NgddRV4vscWGm4QJ83RQnVzNUvdrDI94cvRIJjfjtEKCxcbIOG6OT7jZpDCQT4byKfaIsIl9bn1IrK7nUKzshbW1m4JBdetQy4WihKG4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730149225; c=relaxed/simple;
-	bh=bSJ1/4LGL2AYhvTDH3ONgHfqpVc7cjiSelQiTgmHRJ8=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=iqxMiFFR7gxgrRz3yT+rIQtXsxmesQ594YHnFaHywsqQBrVPJ79vd3Se+DRkusn+Gl+EwFnVslUCQFFtXmchIdNLLSTYKqHabtk/SAY6oHQPoR3Uh7gcffDBkhA/LXY3UhzPmms4eZH1RaWAWnBMCgpN96RiICbtE73xFdWjig4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TnUuuGAB; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1730149573; c=relaxed/simple;
+	bh=wJLandP4QeGUSHAH+Ui+QN7al+ttMEpqKpmfJloz/eI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=mGd8h2eFLWVpM/tEYqlj1Tj9Ew8iH09xV7Uw0ZzZGjgWDlyJ5gCBdC3yDjiim75020qiSHVFERT2S77ivBsu1dRL3hoVc6JmY8uHIoX2fDABOHyg7fPQ2J6/WsTU9if29VxWJCaiOE+Akw4KRcXg8844mX9bqcmxU8HzOojm5WI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iI+sFIjZ; arc=none smtp.client-ip=209.85.161.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TnUuuGAB"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D81EAC4CEC3;
-	Mon, 28 Oct 2024 21:00:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730149224;
-	bh=bSJ1/4LGL2AYhvTDH3ONgHfqpVc7cjiSelQiTgmHRJ8=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=TnUuuGABJIRu/90Xw76kyPnGxF5bKcuB3XNvqdB7xcqVZFMNfZAophAQptbB7Hm4v
-	 vP5Stb6EG20hRATVQ9eXGPFdVq/z+yCv6oayC3VwY9hxuV67LZDg5ztZRiD3/6TwBT
-	 7Ov+Np6LPOTAXj+tCwnViD61ooG9oJl5MHxl6JyWK61jwYpqW9a0SiQCyBBL3M8+c3
-	 R7ECiiAEq69b31GcZ/yqQQsF4h9yrlldplwNZa7NdHcPkYrh5+ZNygBPJHhBHRcPyi
-	 wyGatVtdXOwFwWdTfuHuAo2483ZXhRPRGojPi/2MIa0v7stYHwAX3aahaH759UdL9S
-	 4EMJ9Nu6tJLSg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 7130F380AC1C;
-	Mon, 28 Oct 2024 21:00:33 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iI+sFIjZ"
+Received: by mail-oo1-f51.google.com with SMTP id 006d021491bc7-5ec1ee25504so1320895eaf.3
+        for <linux-bluetooth@vger.kernel.org>; Mon, 28 Oct 2024 14:06:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1730149571; x=1730754371; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=iFRyuHhWuKlP592AdGgKrWeAA584/pLcm8LCiOs3N3g=;
+        b=iI+sFIjZEDhshGipfuvDFvfgoL+VM2gUMvRc95oixQX+1+omgkfsVLYdnhOQua/+dY
+         JVQVBEgJ1CDiDYpLwMtY3yJVJKeZeIdD2OESbJ1DuZIm3He9De3mSU+QQIv3CsLCdCsY
+         ybAxoJBOPUtCqFUPG6M5eQK5v5xBR6OzwMyfUWjQsrHi7uDtOsToVmrVK38pfJ0ecVIP
+         lhUNxerjtiYu2wzx0VpZocDdw1JAu+BNGBKlSGymeApJUGEQhf+BDxIeC9d8kkRgeuc1
+         +wLDIg1SpuhqIR5Px2qavXCJC8XUY0qM+S80ILD33n5IOKGHY7pXfGeo32iSkyjmDqby
+         tD3Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730149571; x=1730754371;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=iFRyuHhWuKlP592AdGgKrWeAA584/pLcm8LCiOs3N3g=;
+        b=WUIDS3hexx3TlyDxax91yfG+QwZvx1VVJSQbc6RNXQ6SXgi9qgnY7MbrLnMeEKvyJU
+         6+cC8zQraEb2XmUz3+cKM4BrIEqD1h49+fJF3ZBY+0cRtevQU8+GyJYnpEraYJw6BhbZ
+         +8cxPJj4mmYCWhuYwUKEmTFApnonAwT/uBgGd6b7xi743W49vXlNsa3tCw/0w4tQdOxv
+         nTi23juwoiW5wCQy1A2+7L3hrLIyf2ZIwg/hxh8Z5DmRSKYBvdhm7wWDOdFiu7D5RDYd
+         E3oOJLPsFdUkX+RkI6wtdSfhlS1uEkZspkgpol/N7X4LWRj2JdfGjHIQoQR2lVnd738x
+         R6Lw==
+X-Gm-Message-State: AOJu0YzudSrjUjLKKI0Xs1BrgOztg2d5fsM0a3HrlBUnt/IQkFIjIPfF
+	fFRpv9rDNG+UTAWRxGelCK/LxHYyP6NbmA7WjBRE4H2f1bFINzPzW9JObssD+GBB8qZ2s4UiTBz
+	sGzyFJ22wsv+8YjxSFKNhK9iHva7eIqAb
+X-Google-Smtp-Source: AGHT+IGUAt3ffaadzHRkDM1pc3eUCGT+JyMi+2ONpGboEX4xZyAsjVDkGjx+aoJGOD55Ig3CJiVX3WFdqLZ9PyllL60=
+X-Received: by 2002:a05:6820:16a5:b0:5eb:c5dc:a636 with SMTP id
+ 006d021491bc7-5ec237f0068mr6615602eaf.2.1730149570804; Mon, 28 Oct 2024
+ 14:06:10 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH BlueZ 1/2] sink: clean up outstanding AVDTP requests if the
- stream goes away.
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <173014923227.180964.11197247154659321608.git-patchwork-notify@kernel.org>
-Date: Mon, 28 Oct 2024 21:00:32 +0000
-References: <20241025202141.158946-1-daniel.beer@igorinstitute.com>
-In-Reply-To: <20241025202141.158946-1-daniel.beer@igorinstitute.com>
-To: Daniel Beer <daniel.beer@igorinstitute.com>
+References: <20241026191434.556716-1-arkadiusz.bokowy@gmail.com>
+ <20241026191434.556716-2-arkadiusz.bokowy@gmail.com> <CABBYNZJk9jrmHwAgCR4LH2Y7+M9GWNdgSFqC7K9YtEGVDZ1QTw@mail.gmail.com>
+ <CAGFh026BwotTDPmvTbyzLrjev8j9Jxv3fGWUV436SpqN5+SN=g@mail.gmail.com> <CABBYNZ+fzEkcL1u9uct3+UC4u+7XBY1uNozojKB=VGomTjQfug@mail.gmail.com>
+In-Reply-To: <CABBYNZ+fzEkcL1u9uct3+UC4u+7XBY1uNozojKB=VGomTjQfug@mail.gmail.com>
+From: Arkadiusz Bokowy <arkadiusz.bokowy@gmail.com>
+Date: Mon, 28 Oct 2024 22:05:19 +0100
+Message-ID: <CAGFh025H4pK9ddaWoGF4CMwv88OTONjBb3U=Cgsb-DU5ZKo3Xg@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 2/2] transport: Allow to set A2DP transport delay property
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-Hello:
+> > > > +static void set_delay_report(const GDBusPropertyTable *property,
+> > > > +                               DBusMessageIter *iter, GDBusPendingPropertySet id,
+> > > > +                               void *data)
+> > > > +{
+> > > > +       struct media_transport *transport = data;
+> > > > +       uint16_t arg;
+> > > > +       int err;
+> > >
+> > > This really needs to check that sender is the owner of the transport.
+> >
+> > The problem is that currently there is no mechanism which will allow
+> > to get the sender name in the property get/set callback (at least I
+> > couldn't find any). The statement "this property is only writable when
+> > the transport was acquired by the sender" is also for the Volume
+> > property, but as for Delay (which currently lacks the setter) it's not
+> > implemented. So, now the question is whether you would like to fix
+> > that as well (or amend the doc)? Some users might say that allowing
+> > others to control volume might be a feature. For the Delay I'm not
+> > sure... Probably you are right that the Delay is more intrinsic to the
+> > transport, and external manipulation would not be desired.
+> >
+> > As for the design of this authorization check I can see two possibilities:
+> >
+> > 1. Pass `message` to the `property->set()` in the
+> > "dbus/objects.c:properties_set()". But this will require updates in
+> > all setters (and maybe for symmetry the getter should also receive the
+> > original message?).
+> > 2. Add a dedicated callback for setter/getter authorization, in a
+> > similar way the `exists()` works.
+> >
+> > In either way I think that this should be a separate patch, applied
+> > either before or after the Delay work.
+>
+> Right, or we could just implement something like get_sender_by_id then
+> the callback can just call it to check who is the sender, that way we
+> don't need to modify existing code if it doesn't care about it.
 
-This series was applied to bluetooth/bluez.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
-
-On Sat, 26 Oct 2024 09:21:40 +1300 you wrote:
-> If the stream goes IDLE while we have an outstanding request, connect_id
-> stays non-zero and is never cleared via a completion callback. As a
-> consequence, the profile on this device will never be connected
-> successfully again until BlueZ restarts.
-> ---
->  profiles/audio/sink.c | 5 +++++
->  1 file changed, 5 insertions(+)
-
-Here is the summary with links:
-  - [BlueZ,1/2] sink: clean up outstanding AVDTP requests if the stream goes away.
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=fa1f2e5ee14d
-  - [BlueZ,2/2] source: clean up outstanding AVDTP requests if the stream goes away.
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=d7bb2abed626
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Yeap, that was my 3rd idea, but I thought that it would be a bit
+hackish since the `pending_property_set` seems to be kinda private.
+But OK, I can make it that way. It would be definitely the easiest
+way.
