@@ -1,98 +1,121 @@
-Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
+Received: from mail-lj1-f181.google.com (mail-lj1-f181.google.com [209.85.208.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 141751DFDB1
-	for <linux-bluetooth@vger.kernel.org>; Mon, 28 Oct 2024 20:51:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C94FA1DFDBE
+	for <linux-bluetooth@vger.kernel.org>; Mon, 28 Oct 2024 20:53:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730148691; cv=none; b=apGfaGnrIFE5rpyOvWwhfaIXlw22J/gZ+m18exHPZABqvb+T9qvfehaByxwdH9Eq87IUG+y1ODG5WXkDv+cBuhuQA3y5/xtvgUSpZrg7bFI2J6/bchpBThp5fMo5ZoX4JCC8j4JwRrcgU7mK0JQEXk0b+sVYiLvd7G9+z/XBLdQ=
+	t=1730148787; cv=none; b=q/bTyuOv7OvqcMTbl4fsNMsa3zk6gLcE/bSonUxAMTt0FX/Wyj+gkrwqsTqMMl9MAqxVdbd6hch+hbpIAdO8E+V5wOGy/Q5FX1aRfobwkcu6Idxre7o1Ote7c9Ge8Sy1XgB/EwpX87LIo2qq+foW+NTQJu/KJtSa/RDPXaW/EUc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730148691; c=relaxed/simple;
-	bh=ARzfwaP5/S/8O6r4MRu/7ERevkqY2uTZC+pi5zW+/Ss=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DPtC5JdlzYoiwooy8vVqqInBkPuKnm1gcimFSHBpXhyvxxMWx/bw9OpDYGFGkuaH8I7g4HSAOSCryYzsddB7r/tiXVYYZxhsq/AVKs43Q1JvyUXxrOvMRxjQvmnuTQ90QZ3K0TcztBdPIyDI1eJDPIqRCaAQtmNsytcF4TrYjTM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=igorinstitute.com; spf=none smtp.mailfrom=igorinstitute.com; dkim=pass (2048-bit key) header.d=igorinstitute-com.20230601.gappssmtp.com header.i=@igorinstitute-com.20230601.gappssmtp.com header.b=I8YedQ5R; arc=none smtp.client-ip=209.85.214.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=igorinstitute.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=igorinstitute.com
+	s=arc-20240116; t=1730148787; c=relaxed/simple;
+	bh=A199YsPChxJd7e2ip0WBxFoRzhgUFqukZgXFeFDPQ7Q=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=iSVmxs/4PNKNpLvyDnRCVUcNTuEi1QkLmKoHy6LVAEy84VV1Yu/OhQI4D9QhyGhX+XYKCBoMdeGBMftW6wlSBphzV09zrqTm7hcesTLv7q8Hf7TkQCZCS3xlOvDGqM07cpdUh1sUm8VV018wTUFtcz52YklWAhWnguvl2H6i6hk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=m9bLc2Ix; arc=none smtp.client-ip=209.85.208.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=igorinstitute-com.20230601.gappssmtp.com header.i=@igorinstitute-com.20230601.gappssmtp.com header.b="I8YedQ5R"
-Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-20c9978a221so50574365ad.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 28 Oct 2024 13:51:29 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="m9bLc2Ix"
+Received: by mail-lj1-f181.google.com with SMTP id 38308e7fff4ca-2fc968b3545so46164341fa.2
+        for <linux-bluetooth@vger.kernel.org>; Mon, 28 Oct 2024 13:53:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=igorinstitute-com.20230601.gappssmtp.com; s=20230601; t=1730148689; x=1730753489; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=hfmZt0R7/zET+vxilvTiOuZs1nD7DgUBbF7JxQILOPA=;
-        b=I8YedQ5RZL4m+vsGl/JO85m0tm+shIHa5dVgSFrVDRX1Zlaj07k4FhNYQo+8lJzXUo
-         w+PvZwloMEdp7uFoo782GQHhCSFzvSPA70QsDIjNJ/RAtvWVFAz6VSMVhu9lZtjLuk7H
-         CnFSmW9wokGGA7IWsuoYtdGvRF+wRdCZRSWgCc4BZtiSWZcFMwiB5COsvIJY4j2Vr3/O
-         hOYJrFFFhWgQc+rrKS3efN/AYQ1ecEbuJzvLbzLSrFY0N2YPA24CtioDSX16By5NNqd5
-         e0fZCgd6d9GGPa1+M78vQ7fEp5ml9KX8T71Z2pROippqupM3UkMuGAdBPaOV5iOCeSEM
-         mr3Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730148689; x=1730753489;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1730148784; x=1730753584; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=hfmZt0R7/zET+vxilvTiOuZs1nD7DgUBbF7JxQILOPA=;
-        b=GyTJr9pm3SMcGP36MCCZh8BXyVuREoOAqAfunpyE+akX6alkvRT40wtCJXgo7TFZFt
-         YZmi5xTf57zCjD4ATXKVMElmHkG/l4UIAQ0Zn2ppGSe+VglA+KXqAXKve+jDblw6pCML
-         KQGeSn+E1hv2Aq3/ESIhZf6Lda7rIHfiMBZurTI8BW5cISR7T4v6lxkJRc2zRrCDW3Fa
-         tEb+7Z2FFghlMOIEotpPAihNjcadHAcMoPT+02EDmzXxGDKU99aZvIvJOeKIqSeXxcb3
-         3Bi9wGETzd+Pc+7K05ukWv38cFNePFyEbc7nHC18Eg75XJhUoQLpP4kM0JVk0eZQXBdN
-         7FSw==
-X-Gm-Message-State: AOJu0YwoNUfJ7B0Rr9SNSaHs/ur0hkSrJ+KAt1tSDmhy0iZoXQ4LULsU
-	vE5iDxm2ul2TUaIzVP4brqKeq1yz6NMDz+Rz49a1eMSRACBmDG8PCRTYp8wOESE=
-X-Google-Smtp-Source: AGHT+IE/9A9WmS650q0HHDlxqih4CBA14hjYWhLqeTAv/wddFbUO1Txr5PaS3r4yxhLYt9lqECvGDA==
-X-Received: by 2002:a17:903:183:b0:20c:fa0b:5297 with SMTP id d9443c01a7336-210c6b011b2mr103208165ad.26.1730148689212;
-        Mon, 28 Oct 2024 13:51:29 -0700 (PDT)
-Received: from localhost (118-92-78-251.dsl.dyn.ihug.co.nz. [118.92.78.251])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-210bc08883esm55377505ad.301.2024.10.28.13.51.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 28 Oct 2024 13:51:28 -0700 (PDT)
-Date: Tue, 29 Oct 2024 09:51:23 +1300
-From: Daniel Beer <daniel.beer@igorinstitute.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ 2/2] source: clean up outstanding AVDTP requests if
- the stream goes away.
-Message-ID: <Zx/5S32GbBsV+any@fermat.nev>
-References: <20241025202141.158946-1-daniel.beer@igorinstitute.com>
- <20241025202141.158946-2-daniel.beer@igorinstitute.com>
- <CABBYNZLjNgTe6E0f6oKuap+VLttiaGse3_vP3ZYFxiO7mmNfog@mail.gmail.com>
- <Zx/Ft7upRYfGVD4f@fermat.nev>
- <CABBYNZ+=chpkTNhB=P2RM2c2V7Vxe9wUDdrWi-KkqOmc2wmV5Q@mail.gmail.com>
+        bh=dYNL+1H7B1RqHSveXFZyqktSNG2Hkp2wCCMopzE8VoE=;
+        b=m9bLc2IxBRqejWBvk2/gqrvcUPJvPYyTuYB9UH1XaUNhK3h9GkeJl5E8NPo5npSf9q
+         j9r4xbroUjwrmaj2CqCnK246ybmgO/RWmA/F+e8BNPxpfO4cV17GR+r/BmB+NkPYjMxq
+         R2ACbYRGHBHizRNrGjIA1xh1YB9kBau/RZ4NZ7IYqgfJudG56RACHj+fCwzHHycCPmYW
+         CYv15Xfc6WKleC8nB8NBfcwHeBBm7mv3CAQGPi7WWm6e9SWZT3rRwylQ/iPUT9e51jYj
+         Gq+F709MJy8lpJBOh3VyWxYlggfgQfDA/wzzFnndNGut/TF9GitDxzcwmWH+tZ44RM4n
+         ZAig==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730148784; x=1730753584;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=dYNL+1H7B1RqHSveXFZyqktSNG2Hkp2wCCMopzE8VoE=;
+        b=wbyEH2qXehRItovoJv2XEmajndIuK8WzgVk7j+PDWBMBbxzjg/MD1AOO3NezRlEPLL
+         WRZn9bRzgfeUa54jo0YU8rOQ2kLoP98kBDsgpmmk/78WTndANJ27IIHs4ZLPD9YgLBIT
+         gWN3YuTKql8ioFagQCu4U0YbFjMQNk+ckV0URFoi9JVM/DSl1Buuk/M//a4RDTGVOMcJ
+         wedXa8fmGKBoc7iHfb5ofJm0tCBFRts9LC7//PXSSCOLLval3GonTiskO3PEnzkL5WE8
+         obslc5FlhEGtTsYinbVxCiWlNJXSqbRy+OkmsZmGgyVlAsr/lAxctPhOYwVtZH+TFfAP
+         TzkA==
+X-Gm-Message-State: AOJu0Yxnw9kcpmnlq+bHEtsKZuNsdsSo8l4Myu4v75p3LAv8QMfIcXOO
+	3ImmmyNS56wEN4r2KBsempZu7X+6z05K5cdthlJWxio9TpqxMvbzVLRgLTqQNT4JQRaDbabdJHD
+	LZnxN2vTvykLKl0JeqvLD7KjIlQg=
+X-Google-Smtp-Source: AGHT+IHzZPplRupEE9XnE0LXEMuzZFmL0N7lAZJs61AARbRFmtS3ECUKdW4KN/XLY3Ugtv8QIkDOoeMUc+8AjJNAAPI=
+X-Received: by 2002:a2e:802:0:b0:2fb:4b40:1e1c with SMTP id
+ 38308e7fff4ca-2fcbe095f21mr34676131fa.36.1730148783606; Mon, 28 Oct 2024
+ 13:53:03 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CABBYNZ+=chpkTNhB=P2RM2c2V7Vxe9wUDdrWi-KkqOmc2wmV5Q@mail.gmail.com>
+References: <20241026191434.556716-1-arkadiusz.bokowy@gmail.com>
+ <20241026191434.556716-2-arkadiusz.bokowy@gmail.com> <CABBYNZJk9jrmHwAgCR4LH2Y7+M9GWNdgSFqC7K9YtEGVDZ1QTw@mail.gmail.com>
+ <CAGFh026BwotTDPmvTbyzLrjev8j9Jxv3fGWUV436SpqN5+SN=g@mail.gmail.com>
+In-Reply-To: <CAGFh026BwotTDPmvTbyzLrjev8j9Jxv3fGWUV436SpqN5+SN=g@mail.gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Mon, 28 Oct 2024 16:52:50 -0400
+Message-ID: <CABBYNZ+fzEkcL1u9uct3+UC4u+7XBY1uNozojKB=VGomTjQfug@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 2/2] transport: Allow to set A2DP transport delay property
+To: Arkadiusz Bokowy <arkadiusz.bokowy@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Oct 28, 2024 at 01:37:30PM -0400, Luiz Augusto von Dentz wrote:
-> Ok, then perhaps it is a good idea to have these applied, that said it
-> would have been great to have this type of test automation upstream in
-> the future so we can catch regressions if we ever change this logic
-> for some reason.
+Hi Arkadiusz,
 
-Hi Luiz,
+On Mon, Oct 28, 2024 at 4:33=E2=80=AFPM Arkadiusz Bokowy
+<arkadiusz.bokowy@gmail.com> wrote:
+>
+> > > +static void set_delay_report(const GDBusPropertyTable *property,
+> > > +                               DBusMessageIter *iter, GDBusPendingPr=
+opertySet id,
+> > > +                               void *data)
+> > > +{
+> > > +       struct media_transport *transport =3D data;
+> > > +       uint16_t arg;
+> > > +       int err;
+> >
+> > This really needs to check that sender is the owner of the transport.
+>
+> The problem is that currently there is no mechanism which will allow
+> to get the sender name in the property get/set callback (at least I
+> couldn't find any). The statement "this property is only writable when
+> the transport was acquired by the sender" is also for the Volume
+> property, but as for Delay (which currently lacks the setter) it's not
+> implemented. So, now the question is whether you would like to fix
+> that as well (or amend the doc)? Some users might say that allowing
+> others to control volume might be a feature. For the Delay I'm not
+> sure... Probably you are right that the Delay is more intrinsic to the
+> transport, and external manipulation would not be desired.
+>
+> As for the design of this authorization check I can see two possibilities=
+:
+>
+> 1. Pass `message` to the `property->set()` in the
+> "dbus/objects.c:properties_set()". But this will require updates in
+> all setters (and maybe for symmetry the getter should also receive the
+> original message?).
+> 2. Add a dedicated callback for setter/getter authorization, in a
+> similar way the `exists()` works.
+>
+> In either way I think that this should be a separate patch, applied
+> either before or after the Delay work.
 
-I would like to be able to share the test setup, but unfortunately it's
-a difficult-to-replicate hardware setup plus some proprietary control
-pieces.
+Right, or we could just implement something like get_sender_by_id then
+the callback can just call it to check who is the sender, that way we
+don't need to modify existing code if it doesn't care about it.
 
-I see that the patches failed a lint check due to the trailing period in
-the commit message. Would you like me to resubmit, or are you happy to
-edit those?
+> Regards,
+> Arek
 
-Cheers,
-Daniel
 
--- 
-Daniel Beer
-Director of Firmware Engineering at Igor Institute
-daniel.beer@igorinstitute.com or +64-27-420-8101
-Offices in Seattle, San Francisco, and Vancouver BC or (206) 494-3312
+
+--=20
+Luiz Augusto von Dentz
