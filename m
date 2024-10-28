@@ -1,410 +1,301 @@
-Received: from EUR02-AM0-obe.outbound.protection.outlook.com (mail-am0eur02on2041.outbound.protection.outlook.com [40.107.247.41])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F9EEA59;
-	Mon, 28 Oct 2024 04:28:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.247.41
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730089685; cv=fail; b=Qa3SlgkP+NTsRc+Pw2XtUpuJAgmIzJaoPcP5hX5DOqvd4rUZkKavPEGsZUa7nAKXJ4PyAjt7aAcwndxf/n5dlEbLwxVymzFSRXN7cCjv8rFKrpRTQrIyt2bwQt0cm9mKHXe+a+wXzFTlPb8hMdxM1sductYI2kjHQYuZhEx209M=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730089685; c=relaxed/simple;
-	bh=G11jDw1bJZOTHu0P/j61e50ItQCa29Uk7739D3boak4=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=O15g+QR2fpnvHQwOINuXNKg9DztTrhOCM/dKbH0pcVMZw+VUOQeU0HwCFhr1TYtxRZs+UWWN2GeQCs0qwfSxDjaenoCAqcAqutC+yT+C/aUY+9a7NdvduS4MwzO/AmhSHAbcRjrAPDmZc+CVweaggG78H4E+9+EW49BmjuV2IKU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=hVczwnsC; arc=fail smtp.client-ip=40.107.247.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00A751922F9
+	for <linux-bluetooth@vger.kernel.org>; Mon, 28 Oct 2024 07:41:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1730101302; cv=none; b=F326CjDUPG4wcB/xm2hgUPQsuC/GEB/ifKNB0bi6BSBIUFnlmGHN25nBYgeiHGPdsEsX1MN4uAd9es5xxm9BJpqcBvFhwU9lYZfkWvFWB+Pjd069Xrg2LH2Nub0Z1C/8DdQl/Dfp5DlJ8vZ5Wl+7cXfd6fvW3180e+3BiKbt4zM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1730101302; c=relaxed/simple;
+	bh=sd2hZ19m3w6zeS6VNz/ngjXZDcL+GeHZR/J5MJlMTG4=;
+	h=From:To:Subject:Date:Message-ID:Content-Type:MIME-Version; b=sJ/hrS9vaL8PQiASmiqys7wMbbQHOrmfPyD5lOVPc2YK67xMEORa3dJcRbupnw69KVIf5y0vWANxPTX1Tcfcpe00GHd4RL6wi5hICxdqpr+tOfVv8MwIlbZSPQP1a4dZNBm5qYgd1uXXH4tb9LJOzZ4tku6WPdRd4GWLakj6SEo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=avLisv9u; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="hVczwnsC"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=By0HuJZVIl6oeAtPS6UvjK/RR8rOmXcJSo/T7YKHEKFL9XhdYRVefHSDtdIi47sovHPxSmbjnXgpqw1k9J/PgaDkPb8SLylrGXsm5iiA5axSTA4U0sSsU5evq9fyECPEMZkbfvnj/9zXiJvw7mGUNgPH3vlfLYUB0lnCC4g0mIf6+BznwemNWoM0kGkxNbn457e8t6niijQexQC5pd5YKVLg2C/J6iwo5NYp87LmeigyeSQM0KjkrJ4IBjKbvZfLn83IpQ7sbRo9JWI1HIs3vCLr7SBoJrrP/dDfm+dSdwgKYZ2rFKuMB6KdjV4/4lzWhkz6hJBZ9YHCF0Cen6bMzw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=wuNcvemUTwAlCHcMK014vU3QAfiYNthku1tWUtEyDP4=;
- b=Z2TC9Z/peMfpq7ukOmslis1ORrYbsv2An2ts3jK4oVu4mP5NHKR7/K4gHuBY6ekxOAWXGI9kXNo3Vesi0uMsUuKksVQKFPmuf189SQ4FskTu68ToV+5yTyg5zmdN3Wt29dorCFUVUPuGdTiLY9fF32HF8XKa8XyfIZKiVpEAc0db4Grq/OeqXuWNdcLQRnC5pA45aqB9ildOa0/7MqhJoWafMBjI68xqb1TbO9VpYvTwHYC0/pw58u6cA1qNvgVY3GIEkvgB64kR8w99Doppx3bZk2LJTW3Aw3U260m+ZidD4avpev7rXpblqbAQxI3DS+uUqYkGWpTY6v9Pw56eig==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=wuNcvemUTwAlCHcMK014vU3QAfiYNthku1tWUtEyDP4=;
- b=hVczwnsCWJNM4lCEpL/+P5FqtFytaDEmzhQp27eXzmuS2MKbBk1fvUBiWqItAU+XsBkt3dFGMHSlLc/3elSfN7lf3bAIfeWeK4+B/8rcMeo/THc4z/tTjmV0wmmXOjBhmmc32UWhOBYuIzzxiRBqk9sorFJTdlFB7LGCLwOApmDqK83STNMa7B+i+SX2D42avlGYtgivcV9mdxL/hoIuWK/XI825vWc/EtMPaCLW4FQbRkyQ+8nZI/i5gIujSEwK5CNc8ScVlZtutapp8PdQnhgOSOPwYoKHBMatAPe0qg392PlyqJVOCV+9Fhx50qE9EZ8QLoCdam7E6MDyO/EKxw==
-Received: from DB9PR04MB8429.eurprd04.prod.outlook.com (2603:10a6:10:242::19)
- by AM9PR04MB7698.eurprd04.prod.outlook.com (2603:10a6:20b:282::5) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8093.23; Mon, 28 Oct
- 2024 04:27:59 +0000
-Received: from DB9PR04MB8429.eurprd04.prod.outlook.com
- ([fe80::2edf:edc4:794f:4e37]) by DB9PR04MB8429.eurprd04.prod.outlook.com
- ([fe80::2edf:edc4:794f:4e37%5]) with mapi id 15.20.8093.024; Mon, 28 Oct 2024
- 04:27:59 +0000
-From: Sherry Sun <sherry.sun@nxp.com>
-To: POPESCU Catalin <catalin.popescu@leica-geosystems.com>, Marco Felsch
-	<m.felsch@pengutronix.de>
-CC: Amitkumar Karwar <amitkumar.karwar@nxp.com>, Neeraj Sanjay Kale
-	<neeraj.sanjaykale@nxp.com>, "marcel@holtmann.org" <marcel@holtmann.org>,
-	"luiz.dentz@gmail.com" <luiz.dentz@gmail.com>, "robh@kernel.org"
-	<robh@kernel.org>, "krzk+dt@kernel.org" <krzk+dt@kernel.org>,
-	"conor+dt@kernel.org" <conor+dt@kernel.org>, "p.zabel@pengutronix.de"
-	<p.zabel@pengutronix.de>, "linux-bluetooth@vger.kernel.org"
-	<linux-bluetooth@vger.kernel.org>, "devicetree@vger.kernel.org"
-	<devicetree@vger.kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, GEO-CHHER-bsp-development
-	<bsp-development.geo@leica-geosystems.com>, Krzysztof Kozlowski
-	<krzk@kernel.org>
-Subject: RE: [PATCH 1/2] dt-bindings: net: bluetooth: nxp: add support for
- supply and reset
-Thread-Topic: [PATCH 1/2] dt-bindings: net: bluetooth: nxp: add support for
- supply and reset
-Thread-Index:
- AQHbFlGi4L5ELajEYECFBoJDru1aa7J5aBLQgAAySQCAAao9AIAAIGOAgBV25oCAABNWAIAAK2IAgAE1RoCAACn9gIAACuYQgAAFzACAAF/eYIAAHNsAgAF25gCAAAeCgIAHLv0A
-Date: Mon, 28 Oct 2024 04:27:59 +0000
-Message-ID:
- <DB9PR04MB842929186683C1DF13DCBD92924A2@DB9PR04MB8429.eurprd04.prod.outlook.com>
-References:
- <DB9PR04MB8429B4535422D3AE07D8EE79927C2@DB9PR04MB8429.eurprd04.prod.outlook.com>
- <3fa35cd2-e52c-4873-8a7f-db459b016a97@kernel.org>
- <2b7f61a8-e91a-4b32-be1d-753a19e4d81f@leica-geosystems.com>
- <0d460226-4ea7-4a9b-a119-468343727996@kernel.org>
- <20241021064129.trchqa2oickna7pc@pengutronix.de>
- <bb34f4ae-92b3-48b7-b0d6-5937756cdbb9@kernel.org>
- <20241021102558.rfnz7nxcg5knibxs@pengutronix.de>
- <DB9PR04MB842939900805C080F2CC32B2924C2@DB9PR04MB8429.eurprd04.prod.outlook.com>
- <20241022072311.ubh2sia5lwgvebsg@pengutronix.de>
- <DB9PR04MB8429657FCB48ACAD74FDD471924C2@DB9PR04MB8429.eurprd04.prod.outlook.com>
- <20241022082256.nzfxqp67tdaxtn56@pengutronix.de>
- <DB9PR04MB84292445D0FEDB8211ED52C3924C2@DB9PR04MB8429.eurprd04.prod.outlook.com>
- <9b09774e-d0ed-4c97-b6a0-e976580b5bb5@leica-geosystems.com>
- <DB9PR04MB8429CF700571FE42C997FB9C924D2@DB9PR04MB8429.eurprd04.prod.outlook.com>
- <1b8864e5-0ec7-49c4-932a-89cfbaeacc9f@leica-geosystems.com>
-In-Reply-To: <1b8864e5-0ec7-49c4-932a-89cfbaeacc9f@leica-geosystems.com>
-Accept-Language: zh-CN, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DB9PR04MB8429:EE_|AM9PR04MB7698:EE_
-x-ms-office365-filtering-correlation-id: c3693c00-bd49-4eb1-de82-08dcf708e73d
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|1800799024|376014|7416014|366016|38070700018;
-x-microsoft-antispam-message-info:
- =?us-ascii?Q?BbLMbZmF/HCmMGRDW4i+skY+JTkkxk1E3+up3w26b1+f0rS/4+fWHY8PWOA9?=
- =?us-ascii?Q?DLUVi5TgQtKNeWnXcdC/jHh7rYwVh9YFRffCp/uV1/wfB39s5YeIX13vYj5J?=
- =?us-ascii?Q?v9Ah+WRJbA7UXnWsh1ZwCQ0wzBt2daYASVDLmdO2vhwUJhxiUkXIYEl4VQ/R?=
- =?us-ascii?Q?pH8FypufazF2lLDDiOZAJUpD5eHHGG6fmHWbpcSWsM1lEQo0uvKabJg2i8qG?=
- =?us-ascii?Q?uXe1N3Vqzp/K/1He0Py45kZO55S0PrNIa/GzW6P1woRtGkg1FWBZJmbE9l0Y?=
- =?us-ascii?Q?gC3NtMmwVJ6Rs1c183FHz2coZl4Uh/BCjhRMaKBmPPz1DXJTTSBIXL3LtCJp?=
- =?us-ascii?Q?eVYiL3BlI3kX26qeuj05ADyQ7A1YF4WIsVvf0E7Qu1s0aOJPAFvzHtQDrrJ4?=
- =?us-ascii?Q?K+ITpwh9+xBScI8VFQmhLohAbR0pFc6kKfC3eD8/wcMTy00VHd6AZR8ur3Ya?=
- =?us-ascii?Q?y1o2fqVHd33KeY1md9hhPMAbslqMKKOTMZdRhN0eMgWJHvEhj4U+/CcAzeQc?=
- =?us-ascii?Q?dsWI7ffGiTQvT9QYz7dUkMDOaxo7phyCPpG1ofRcom0dKkX2S4aH6p+xpKuQ?=
- =?us-ascii?Q?ybB4/lLhahqKNEpt3Zwe7dK2AkCIZQ6uGxUSeuH7EaB6CHHSKnejhyRk3kif?=
- =?us-ascii?Q?ceeR1tIIvJReO25jEUxUBcl7/ykkbVXJuF28KR3m1LN1BzuAEYhFAbTS7GS1?=
- =?us-ascii?Q?AjbMrz5SIAL33TA3w+xHPyw1o4V9/8PoN/SoTNqLtszVg49RILnOwbS32n1q?=
- =?us-ascii?Q?3OBXTpIem/5bOjwHwJwkBef1cIdiR/EQC9fyYaPm5n4kcQj1cgMTm3r5CrKv?=
- =?us-ascii?Q?JnPkl7uugQZtcbwWXp+JuK6uWyr0ZCStGw4y8mqsfBJJdxGi8Ge7looJ71gR?=
- =?us-ascii?Q?TkA7asiWRA6h3uldkcfj5qJ/hHO5YKb63EnisoDcD1fg9gWbg8vap0GJLWEl?=
- =?us-ascii?Q?QYWllBZc6xvsYNUEECjI8j3s1p2zcSh1jJ36guQ+BGs4zGzFAcydLlzFDmA5?=
- =?us-ascii?Q?YLH8+N+yuyK0osnkVFMNz68Jo4nW0Oi/naCnrAdESn8/Vw3JSp2rQ175Msgs?=
- =?us-ascii?Q?FPAUgyELhYMYRfOd7X9kJcsA7tiYBiAX/rQVr8BlszlDH4QQzifSv1UDuNDR?=
- =?us-ascii?Q?XBFrfVzmhc0ftNX5KeMWkJfjDNAfZiz99srYC/8ppeAJ85p37GGxcXlNXPkB?=
- =?us-ascii?Q?Iqf6Jda7rOqcXx592PqnSsT0Xm08XVaxUZJ3FwMt9zvF1i0zlCQVtsB3+R6s?=
- =?us-ascii?Q?PRe77FZWJM01d8jQ4L+8G1rxxorZK9ccQzHtkjgW2u/cGyfCCtl/5ZNPUtob?=
- =?us-ascii?Q?3KU6jCeLDX6fTm8YOfAZzkF2?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DB9PR04MB8429.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(7416014)(366016)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?7C5LV1hra0MpyJdukvLQSGjrCuByUUC8D7LStrKDy4APRukdUt5QWJxfDEBf?=
- =?us-ascii?Q?l3yg7PeQQ33EIQj8nBKETeJpJx51UZocfr6w8QWjybuicLthv4+QMV6uwi8H?=
- =?us-ascii?Q?StmKNMDavGPhPYHPRHI9a5q08u5iNO8VmRVJQu0ukNmajjveqcGBIVoN+VFv?=
- =?us-ascii?Q?FzpMpa47kMig5yhhEn4E5Mcd14ATNhsCP2deD5e0QQ9liC7BBjUCyYtu8Zcw?=
- =?us-ascii?Q?C8XiXy+Zkr5qf9fRNm3ZpOKtW8aSgErvXVt562j5vRo/ASG2HP8fxBsoTR1v?=
- =?us-ascii?Q?1wNTgOlVY7Ced3XlIp9ogAw2w+biiu7hCpzHwMjmvoWc85/TfuAkfvTUdW8N?=
- =?us-ascii?Q?GDrsu92/rUon/FNYMnO9ccWri8uX2ZICmQWqEY2+gxNcZznK5vb29ZLAkIrv?=
- =?us-ascii?Q?wnj2NNG/aIDO9t764WJ6595jrFWLaxk2fCsDlxJkuYbg0v488MYmN824W9Nr?=
- =?us-ascii?Q?6PVQrsU0wXItGh3QAnDqBh0Ipmn62Dgy1KbI5n5zrnWFMC3MQM2fTeYLUoQL?=
- =?us-ascii?Q?S1UBTp7Bo2KKuo7Z0T/345cFKGjhXQFgdmFQ3U8oLOOKGueBL4qyoxgwEtXg?=
- =?us-ascii?Q?n6YJuQ9EIi21Lu3vxwNGD0rk3nBU4aDPj1QsOFEvb+8zrEZwxkl1mwN1nyh/?=
- =?us-ascii?Q?/h4Hmu0wC8+OQQUAVW5A0pDA0BurjWnuE4amgnCMVUQ3lgK/8FourgITpe+O?=
- =?us-ascii?Q?k2oP3I2d6D2guKcLFw9/CHcek9g3F5LmxKRkEpgJCIIxObUL3efhPnmPaltP?=
- =?us-ascii?Q?4y6yiHVakuzMkwWYdk/2wKTYAQvJ3yRyU8vi+XVC+BDiuOMjxi3k+S52uVJH?=
- =?us-ascii?Q?D9SpV/oV/Y9En9NkaDs6H6CziYfnpyB8XyZBlRJCpqNqxjfJviirco195Ukg?=
- =?us-ascii?Q?cmMwsaEF79Dxqy7FhWZy1D1Q0Jh49PP+8fk+j1D9zCfwK1JNw20smqZhauPT?=
- =?us-ascii?Q?i72+kGxhJvv07QmlRroiJOowfV8/N8fyP/MOe/QVH1RURF/zefWSNEq9nPLD?=
- =?us-ascii?Q?njVJPy5nc2B6Qud9a6ofsDEYOLlTqEP/ms56PJeRKuq9dcpX3jT8rWUjN6QG?=
- =?us-ascii?Q?DBKR4v8LaeSVeEQNcnJHL7EkVV3Ti1/3yAeyynZJBXjCFjFzXP93Nvx1hJS9?=
- =?us-ascii?Q?YiB8tuf0cKGgiFcB2bkWETtKmukQZ9Nch8X9wh6G+GP/nWDc0LJn2AmJuIHR?=
- =?us-ascii?Q?cHAreiuVywotAW717/8fgpPK2UtofXKxG39QcnWAcsILedW1hiTFJrz8HgaE?=
- =?us-ascii?Q?osrC5azrwU8pKLr+xUMQ8tQ6t9PP8fnZyEINAs00nOtXCv45lHp9RrNs0Wx4?=
- =?us-ascii?Q?Xjrh9Q35Gv8e+Gw/noNmNC1k0Ql8hInxSTuoPlHo10DqQD651yWFYkL2ahvO?=
- =?us-ascii?Q?C5ka9dOopIUi8OHnsQEaPg4fnoeDChy4F+aeHbAyjS61ZCVI2etRzRxIb+1U?=
- =?us-ascii?Q?7gK0t5g/gojAIyoz+6UzCSRMFpUJT3SJYXPFKfjJLDwc44HyUx3UigYNr2yS?=
- =?us-ascii?Q?ssZ595jKOLWvyJtjtc4epo9phaHWM1xPlmhS53cqltR3GMUd3xOrLN6bWS80?=
- =?us-ascii?Q?qrLf++QKgtOk7GMeuyKr0lfjOchdYF5puPFRsjSd?=
-Content-Type: text/plain; charset="us-ascii"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="avLisv9u"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 771E5C4CEC7
+	for <linux-bluetooth@vger.kernel.org>; Mon, 28 Oct 2024 07:41:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1730101301;
+	bh=sd2hZ19m3w6zeS6VNz/ngjXZDcL+GeHZR/J5MJlMTG4=;
+	h=From:To:Subject:Date:From;
+	b=avLisv9ueIW4KpwI1zex7PWiEM+yXZ396myAysrytHeIMuO/1zb9d33vL/TxMLBI2
+	 J1TMxS+jk71K0VR78IqpBayGiJXAT/4KTBP4pZ0SqXL2BgsNT3SrA+9PtLNZmDfrqU
+	 93h3Tatijxw0Q5nBpyFOj1jurgjPceL5PEwHBrC7LmMnyIwNcebAhS5esNuMWeq7lt
+	 k7uk9L63SQqqyQlGiME2Uoj6lHI9OKMEQUda4OtbCXJxcrPlOlfTo+oB6BLDO9upQo
+	 qqVHXoCU4H0/juYo7cTYimAJyKDfqKJRDNBlMHUSKl7u5kkrA1M7dcVn+aczDp8vrr
+	 mRTrrhpHHxZcw==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+	id 6430AC53BC2; Mon, 28 Oct 2024 07:41:41 +0000 (UTC)
+From: bugzilla-daemon@kernel.org
+To: linux-bluetooth@vger.kernel.org
+Subject: [Bug 219433] New: RIP: 0010:btusb_suspend+0x1b/0x1d0 [btusb]
+Date: Mon, 28 Oct 2024 07:41:41 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: new
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: ionut_n2001@yahoo.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P3
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: bug_id short_desc product version rep_platform
+ op_sys bug_status bug_severity priority component assigned_to reporter
+ cf_regression
+Message-ID: <bug-219433-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DB9PR04MB8429.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c3693c00-bd49-4eb1-de82-08dcf708e73d
-X-MS-Exchange-CrossTenant-originalarrivaltime: 28 Oct 2024 04:27:59.0959
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: cF1oEu+lUT2/Tr70mH17dh1KKHfbrAdZ1Q891OU6xwoU++aWuOC9a4JHghqIbvJBo+94HaUvmQq9BGSo1ntn4w==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM9PR04MB7698
+
+https://bugzilla.kernel.org/show_bug.cgi?id=3D219433
+
+            Bug ID: 219433
+           Summary: RIP: 0010:btusb_suspend+0x1b/0x1d0 [btusb]
+           Product: Drivers
+           Version: 2.5
+          Hardware: All
+                OS: Linux
+            Status: NEW
+          Severity: normal
+          Priority: P3
+         Component: Bluetooth
+          Assignee: linux-bluetooth@vger.kernel.org
+          Reporter: ionut_n2001@yahoo.com
+        Regression: No
+
+Hello Kernel Team,
+
+I notice today this:
 
 
+[    8.592547] Bluetooth: hci0: Device setup in 3533529 usecs
+[    8.592553] Bluetooth: hci0: HCI Enhanced Setup Synchronous Connection
+command is advertised, but not supported.
+[   10.689336] BUG: kernel NULL pointer dereference, address: 0000000000000=
+000
+[   10.689341] #PF: supervisor read access in kernel mode
+[   10.689344] #PF: error_code(0x0000) - not-present page
+[   10.689346] PGD 0 P4D 0
+[   10.689351] Oops: Oops: 0000 [#1] PREEMPT SMP NOPTI
+[   10.689355] CPU: 13 UID: 0 PID: 145 Comm: kworker/13:1 Not tainted
+6.11.2-lowlatency-sunlight1 #1-NixOS=20
+[   10.689361] Hardware name: ASUSTeK COMPUTER INC. ROG Zephyrus G14
+GA401QM_GA401QM/GA401QM, BIOS GA401QM.415 08/11/2023
+[   10.689363] Workqueue: pm pm_runtime_work
+[   10.689371] RIP: 0010:btusb_suspend+0x1b/0x1d0 [btusb]
+[   10.689380] Code: 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 f3 0f 1e =
+fa
+0f 1f 44 00 00 41 54 55 89 f5 53 48 8b 9f c8 00 00 00 0f 1f 44 00 00 <48> 8=
+b 13
+8b 82 bc 09 00 00 03 82 b8 09 00 00 03 82 c4 09 00 00 03
+[   10.689383] RSP: 0018:ffffb8b08077fca0 EFLAGS: 00010206
+[   10.689386] RAX: ffffffffc2959a50 RBX: 0000000000000000 RCX:
+0000000000000003
+[   10.689388] RDX: ffff9ace8d78d400 RSI: 0000000000000402 RDI:
+ffff9ace80df3c00
+[   10.689391] RBP: 0000000000000402 R08: 0000000000000000 R09:
+0000000000000000
+[   10.689393] R10: 0000000000000000 R11: 0000000000000000 R12:
+0000000000000402
+[   10.689395] R13: 0000000000000003 R14: 0000000000000000 R15:
+ffff9ace8e712000
+[   10.689397] FS:  0000000000000000(0000) GS:ffff9ad54e880000(0000)
+knlGS:0000000000000000
+[   10.689400] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[   10.689402] CR2: 0000000000000000 CR3: 00000006ec222000 CR4:
+0000000000f50ef0
+[   10.689404] PKRU: 55555554
+[   10.689406] Call Trace:
+[   10.689409]  <TASK>
+[   10.689414]  ? __die+0x23/0x80
+[   10.689423]  ? page_fault_oops+0x173/0x5b0
+[   10.689434]  ? exc_page_fault+0x71/0x160
+[   10.689441]  ? asm_exc_page_fault+0x26/0x30
+[   10.689449]  ? __pfx_btusb_suspend+0x10/0x10 [btusb]
+[   10.689455]  ? btusb_suspend+0x1b/0x1d0 [btusb]
+[   10.689461]  usb_suspend_both+0x97/0x290
+[   10.689467]  ? srso_alias_return_thunk+0x5/0xfbef5
+[   10.689474]  usb_runtime_suspend+0x2e/0x80
+[   10.689479]  ? __pfx_usb_runtime_suspend+0x10/0x10
+[   10.689483]  __rpm_callback+0x44/0x170
+[   10.689488]  ? __pfx_usb_runtime_suspend+0x10/0x10
+[   10.689493]  rpm_callback+0x59/0x70
+[   10.689497]  ? __pfx_usb_runtime_suspend+0x10/0x10
+[   10.689501]  rpm_suspend+0xe8/0x5e0
+[   10.689506]  ? srso_alias_return_thunk+0x5/0xfbef5
+[   10.689511]  ? psi_task_switch+0x122/0x240
+[   10.689516]  ? srso_alias_return_thunk+0x5/0xfbef5
+[   10.689521]  ? finish_task_switch.isra.0+0x9c/0x310
+[   10.689529]  __pm_runtime_suspend+0x3c/0xd0
+[   10.689535]  ? __pfx_usb_runtime_idle+0x10/0x10
+[   10.689539]  usb_runtime_idle+0x39/0x50
+[   10.689543]  rpm_idle+0xc0/0x280
+[   10.689548]  pm_runtime_work+0x84/0xb0
+[   10.689554]  process_one_work+0x192/0x3b0
+[   10.689560]  worker_thread+0x230/0x340
+[   10.689563]  ? __pfx_worker_thread+0x10/0x10
+[   10.689568]  ? __pfx_worker_thread+0x10/0x10
+[   10.689571]  kthread+0xd0/0x100
+[   10.689577]  ? __pfx_kthread+0x10/0x10
+[   10.689582]  ret_from_fork+0x34/0x50
+[   10.689587]  ? __pfx_kthread+0x10/0x10
+[   10.689591]  ret_from_fork_asm+0x1a/0x30
+[   10.689600]  </TASK>
+[   10.689602] Modules linked in: xt_CHECKSUM xt_MASQUERADE ipt_REJECT
+nf_reject_ipv4 nft_chain_nat af_packet input_leds xt_conntrack
+snd_sof_amd_acp63 snd_sof_amd_vangogh snd_sof_amd_rembrandt ip6t_rpfilter
+snd_sof_amd_renoir ipt_rpfilter snd_sof_amd_acp snd_sof_pci snd_sof_xtensa_=
+dsp
+snd_usb_audio btusb mt7921e nls_iso8859_1 snd_sof btrtl nls_cp437 xt_pkttype
+btintel mt7921_common vfat snd_usbmidi_lib btbcm btmtk snd_ump
+snd_hda_codec_realtek fat mt792x_lib snd_sof_utils snd_rawmidi xt_LOG bluet=
+ooth
+hid_asus snd_seq_device nf_log_syslog mt76_connac_lib snd_hda_codec_generic
+snd_pci_ps snd_hda_scodec_component snd_hda_codec_hdmi xt_tcpudp
+snd_amd_sdw_acpi amdgpu nft_compat mt76 soundwire_amd
+soundwire_generic_allocation nf_tables soundwire_bus nouveau sch_fq_codel
+snd_soc_core mac80211 msr uinput snd_compress atkbd ac97_bus libps2
+snd_pcm_dmaengine vivaldi_fmap snd_rpl_pci_acp6x loop edac_mce_amd edac_core
+xt_nat snd_acp_pci nf_nat amd_atl intel_rapl_msr snd_acp_legacy_common
+snd_hda_intel intel_rapl_common nf_conntrack
+[   10.689706]  crct10dif_pclmul mxm_wmi snd_intel_dspcfg polyval_clmulni
+joydev amdxcp drm_gpuvm snd_intel_sdw_acpi polyval_generic snd_hda_codec
+mousedev snd_pci_acp6x ghash_clmulni_intel nf_defrag_ipv6 drm_exec sha512_s=
+sse3
+drm_buddy snd_hda_core asus_nb_wmi cfg80211 nf_defrag_ipv4 snd_pci_acp5x ee=
+1004
+sha256_ssse3 gpu_sched libcrc32c drm_suballoc_helper crc32c_generic asus_wmi
+snd_hwdep sha1_ssse3 drm_ttm_helper br_netfilter platform_profile
+snd_rn_pci_acp3x aesni_intel snd_pcm veth drm_display_helper gf128mul
+snd_acp_config i8042 ucsi_acpi crypto_simd snd_soc_acpi tun i2c_piix4
+hid_multitouch typec_ucsi snd_timer cryptd i2c_algo_bit sparse_keymap wmi_b=
+mof
+rfkill evdev mac_hid snd video rapl typec tiny_power_button libarc4 crc16
+soundcore i2c_smbus k10temp snd_pci_acp3x thermal roles wmi ac battery butt=
+on
+backlight tpm_crb tap asus_wireless i2c_hid_acpi macvlan amd_pmc i2c_hid
+tpm_tis led_class tpm_tis_core serio bridge stp llc kvm_amd ccp kvm fuse
+efi_pstore configfs nfnetlink efivarfs tpm libaescfb ecdh_generic ecc
+[   10.689836]  rng_core dmi_sysfs ip_tables x_tables autofs4 f2fs
+crc32_generic lz4hc_compress lz4_compress hid_generic usbhid xhci_pci
+xhci_pci_renesas nvme xhci_hcd nvme_core crc32_pclmul crc32c_intel nvme_auth
+rtc_cmos dm_mod dax
+[   10.689867] CR2: 0000000000000000
+[   10.689870] ---[ end trace 0000000000000000 ]---
+[   12.854962] RIP: 0010:btusb_suspend+0x1b/0x1d0 [btusb]
+[   12.854967] Code: 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 f3 0f 1e =
+fa
+0f 1f 44 00 00 41 54 55 89 f5 53 48 8b 9f c8 00 00 00 0f 1f 44 00 00 <48> 8=
+b 13
+8b 82 bc 09 00 00 03 82 b8 09 00 00 03 82 c4 09 00 00 03
+[   12.854969] RSP: 0018:ffffb8b08077fca0 EFLAGS: 00010206
+[   12.854972] RAX: ffffffffc2959a50 RBX: 0000000000000000 RCX:
+0000000000000003
+[   12.854973] RDX: ffff9ace8d78d400 RSI: 0000000000000402 RDI:
+ffff9ace80df3c00
+[   12.854974] RBP: 0000000000000402 R08: 0000000000000000 R09:
+0000000000000000
+[   12.854975] R10: 0000000000000000 R11: 0000000000000000 R12:
+0000000000000402
+[   12.854976] R13: 0000000000000003 R14: 0000000000000000 R15:
+ffff9ace8e712000
+[   12.854977] FS:  0000000000000000(0000) GS:ffff9ad54e880000(0000)
+knlGS:0000000000000000
+[   12.854979] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[   12.854980] CR2: 0000000000000000 CR3: 0000000103768000 CR4:
+0000000000f50ef0
+[   12.854982] PKRU: 55555554
+[   12.854983] note: kworker/13:1[145] exited with irqs disabled
 
-> -----Original Message-----
-> From: POPESCU Catalin <catalin.popescu@leica-geosystems.com>
-> Sent: Wednesday, October 23, 2024 10:38 PM
-> To: Sherry Sun <sherry.sun@nxp.com>; Marco Felsch
-> <m.felsch@pengutronix.de>
-> Cc: Amitkumar Karwar <amitkumar.karwar@nxp.com>; Neeraj Sanjay Kale
-> <neeraj.sanjaykale@nxp.com>; marcel@holtmann.org;
-> luiz.dentz@gmail.com; robh@kernel.org; krzk+dt@kernel.org;
-> conor+dt@kernel.org; p.zabel@pengutronix.de; linux-
-> bluetooth@vger.kernel.org; devicetree@vger.kernel.org; linux-
-> kernel@vger.kernel.org; GEO-CHHER-bsp-development <bsp-
-> development.geo@leica-geosystems.com>; Krzysztof Kozlowski
-> <krzk@kernel.org>
-> Subject: Re: [PATCH 1/2] dt-bindings: net: bluetooth: nxp: add support fo=
-r
-> supply and reset
->
-> On 23/10/2024 16:16, Sherry Sun wrote:
-> > This email is not from Hexagon's Office 365 instance. Please be careful=
- while
-> clicking links, opening attachments, or replying to this email.
-> >
-> >
-> >>>> -----Original Message-----
-> >>>> From: Marco Felsch <m.felsch@pengutronix.de>
-> >>>> Sent: Tuesday, October 22, 2024 4:23 PM
-> >>>> To: Sherry Sun <sherry.sun@nxp.com>
-> >>>> Cc: POPESCU Catalin <catalin.popescu@leica-geosystems.com>;
-> >> Amitkumar
-> >>>> Karwar <amitkumar.karwar@nxp.com>; Neeraj Sanjay Kale
-> >>>> <neeraj.sanjaykale@nxp.com>; marcel@holtmann.org;
-> >>>> luiz.dentz@gmail.com; robh@kernel.org; krzk+dt@kernel.org;
-> >>>> conor+dt@kernel.org; p.zabel@pengutronix.de; linux-
-> >>>> bluetooth@vger.kernel.org; devicetree@vger.kernel.org; linux-
-> >>>> kernel@vger.kernel.org; GEO-CHHER-bsp-development <bsp-
-> >>>> development.geo@leica-geosystems.com>; Krzysztof Kozlowski
-> >>>> <krzk@kernel.org>
-> >>>> Subject: Re: [PATCH 1/2] dt-bindings: net: bluetooth: nxp: add
-> >>>> support for supply and reset
-> >>>>
-> >>>> On 24-10-22, Sherry Sun wrote:
-> >>>>>> -----Original Message-----
-> >>>>>> From: Marco Felsch <m.felsch@pengutronix.de>
-> >>>>>> Sent: Tuesday, October 22, 2024 3:23 PM
-> >>>>>> To: Sherry Sun <sherry.sun@nxp.com>
-> >>>>>> Cc: POPESCU Catalin <catalin.popescu@leica-geosystems.com>;
-> >>>>>> Amitkumar Karwar <amitkumar.karwar@nxp.com>; Neeraj Sanjay
-> Kale
-> >>>>>> <neeraj.sanjaykale@nxp.com>; marcel@holtmann.org;
-> >>>>>> luiz.dentz@gmail.com; robh@kernel.org; krzk+dt@kernel.org;
-> >>>>>> conor+dt@kernel.org; p.zabel@pengutronix.de; linux-
-> >>>>>> bluetooth@vger.kernel.org; devicetree@vger.kernel.org; linux-
-> >>>>>> kernel@vger.kernel.org; GEO-CHHER-bsp-development <bsp-
-> >>>>>> development.geo@leica-geosystems.com>; Krzysztof Kozlowski
-> >>>>>> <krzk@kernel.org>
-> >>>>>> Subject: Re: [PATCH 1/2] dt-bindings: net: bluetooth: nxp: add
-> >>>>>> support for supply and reset
-> >>>>>>
-> >>>>>> On 24-10-22, Sherry Sun wrote:
-> >>>>>>>> On 24-10-21, Krzysztof Kozlowski wrote:
-> >>>>>>>>> On 21/10/2024 08:41, Marco Felsch wrote:
-> >>>>>>>>>> On 24-10-07, Krzysztof Kozlowski wrote:
-> >>>>>>>>>>> On 07/10/2024 14:58, POPESCU Catalin wrote:
-> >>>>>>>>>>>>>>> +  vcc-supply:
-> >>>>>>>>>>>>>>> +    description:
-> >>>>>>>>>>>>>>> +      phandle of the regulator that provides the supply
-> >>>> voltage.
-> >>>>>>>>>>>>>>> +
-> >>>>>>>>>>>>>>> +  reset-gpios:
-> >>>>>>>>>>>>>>> +    description:
-> >>>>>>>>>>>>>>> +      Chip powerdown/reset signal (PDn).
-> >>>>>>>>>>>>>>> +
-> >>>>>>>>>>>>>> Hi Catalin,
-> >>>>>>>>>>>>>>
-> >>>>>>>>>>>>>> For NXP WIFI/BT chip, WIFI and BT share the one PDn pin,
-> >>>>>>>>>>>>>> which
-> >>>>>>>> means that both wifi and BT controller will be powered on and
-> >>>>>>>> off at the same time.
-> >>>>>>>>>>>>>> Taking the M.2 NXP WIFI/BT module as an example,
-> >>>>>>>> pin56(W_DISABLE1) is connected to the WIFI/BT chip PDn pin, we
-> >>>>>>>> has already controlled this pin in the corresponding PCIe/SDIO
-> >>>>>>>> controller dts
-> >>>>>> nodes.
-> >>>>>>>>>>>>>> It is not clear to me what exactly pins for vcc-supply
-> >>>>>>>>>>>>>> and reset-gpios
-> >>>>>>>> you describing here. Can you help understand the corresponding
-> >>>>>>>> pins on M.2 interface as an example? Thanks.
-> >>>>>>>>>>>> Hi Sherry,
-> >>>>>>>>>>>>
-> >>>>>>>>>>>> Regulators and reset controls being refcounted, we can then
-> >>>>>>>>>>>> implement powerup sequence in both bluetooth/wlan drivers
-> >> and
-> >>>>>>>>>>>> have the drivers operate independently. This way bluetooth
-> >>>>>>>>>>>> driver would has no dependance on the wlan
-> >>>> driver for :
-> >>>>>>>>>>>> - its power supply
-> >>>>>>>>>>>>
-> >>>>>>>>>>>> - its reset pin (PDn)
-> >>>>>>>>>>>>
-> >>>>>>>>>>>> - its firmware (being downloaded as part of the combo
-> >>>>>>>>>>>> firmware)
-> >>>>>>>>>>>>
-> >>>>>>>>>>>> For the wlan driver we use mmc power sequence to drive the
-> >>>>>>>>>>>> chip reset pin and there's another patchset that adds
-> >>>>>>>>>>>> support for reset control into the mmc pwrseq simple driver.
-> >>>>>>>>>>>>
-> >>>>>>>>>>>>> Please wrap your replies.
-> >>>>>>>>>>>>>
-> >>>>>>>>>>>>> It seems you need power sequencing just like Bartosz did
-> >>>>>>>>>>>>> for
-> >>>>>>>> Qualcomm WCN.
-> >>>>>>>>>>>> Hi Krzysztof,
-> >>>>>>>>>>>>
-> >>>>>>>>>>>> I'm not familiar with power sequencing, but looks like way
-> >>>>>>>>>>>> more complicated than reset controls. So, why power
-> >>>>>>>>>>>> sequencing is recommended here ? Is it b/c a supply is
-> >>>> involved ?
-> >>>>>>>>>>> Based on earlier message:
-> >>>>>>>>>>>
-> >>>>>>>>>>> "For NXP WIFI/BT chip, WIFI and BT share the one PDn pin,
-> >>>>>>>>>>> which means that both wifi and BT controller will be powered
-> >>>>>>>>>>> on and off at the same time."
-> >>>>>>>>>>>
-> >>>>>>>>>>> but maybe that's not needed. No clue, I don't know the
-> hardware.
-> >>>>>>>>>>> But be carefully what you write in the bindings, because
-> >>>>>>>>>>> then it will be
-> >>>>>>>> ABI.
-> >>>>>>>>>> We noticed the new power-sequencing infrastructure which is
-> >>>>>>>>>> part of
-> >>>>>>>>>> 6.11 too but I don't think that this patch is wrong. The DT
-> >>>>>>>>>> ABI won't break if we switch to the power-sequencing later on
-> >>>>>>>>>> since the
-> >>>>>>>> "reset-gpios"
-> >>>>>>>>>> are not marked as required. So it is up to the driver to
-> >>>>>>>>>> handle it either via a separate power-sequence driver or via
-> >>>> "power-supply"
-> >>>>>>>>>> and "reset-gpios" directly.
-> >>>>>>>>> That's not the point. We expect correct hardware description.
-> >>>>>>>>> If you say now it has "reset-gpios" but later say "actually
-> >>>>>>>>> no, because it has PMU", I respond: no. Describe the hardware,
-> >>>>>>>>> not current
-> >>>>>> Linux.
-> >>>>>>>> I know that DT abstracts the HW. That said I don't see the
-> >>>>>>>> problem with this patch. The HW is abstracted just fine:
-> >>>>>>>>
-> >>>>>>>> shared PDn          -> reset-gpios
-> >>>>>>>> shared power-supply -> vcc-supply
-> >>>>>>> Actually we should use vcc-supply to control the PDn pin, this
-> >>>>>>> is the power supply for NXP wifi/BT.
-> >>>>>> Please don't since this is regular pin on the wlan/bt device not
-> >>>>>> the
-> >>>> regulator.
-> >>>>>> People often do that for GPIOs if the driver is missing the
-> >>>>>> support to pull the reset/pdn/enable gpio but the enable-gpio on
-> >>>>>> the regulator is to enable the regulator and _not_ the bt/wlan dev=
-ice.
-> >>>>>>
-> >>>>>> Therefore the implementation Catalin provided is the correct one.
-> >>>>>>
-> >>>>> For NXP wifi/BT, the PDn is the only power control pin, no
-> >>>>> specific regulator, per my understanding, it is a common way to
-> >>>>> configure this pin as the vcc-supply for the wifi interface(SDIO or=
- PCIe).
-> >>>> NACK. Each active external chip needs power, this is supplied via
-> >>>> an
-> >>>> supply- rail and this is what vcc/vdd/va/vdio/v***-supply are used f=
-or.
-> >>>>
-> >>>> The PDn is a digital input signal which tells the chip to go into
-> >>>> power- down/reset mode or not.
-> >>>>
-> >>>>> reg_usdhc3_vmmc: regulator-usdhc3 {
-> >>>>>            compatible =3D "regulator-fixed";
-> >>>>>            regulator-name =3D "WLAN_EN";
-> >>>>>            regulator-min-microvolt =3D <3300000>;
-> >>>>>            regulator-max-microvolt =3D <3300000>;
-> >>>>>            gpio =3D <&pcal6524 20 GPIO_ACTIVE_HIGH>;
-> >>>>>            enable-active-high;
-> >>>>> };
-> >>>> This is what I meant previously, you do use a regualtor device for
-> >>>> switching the PDn signal. This is not correct, albeit a lot of
-> >>>> people are doing this because they don't want to adapt the driver. T=
-he
-> 'gpio'
-> >>>> within this regualtor should enable/disable this particular
-> >>>> physical
-> >> regualtor.
-> >>> Sorry I see it differently. I checked the datasheet of NXP wifi
-> >>> chip(taking IW612 as an example), the PDn pin is not the BT reset
-> >>> pin, we usually take it as the PMIC_EN/WL_REG_ON pin to control the
-> >>> whole
-> >> chip power supply.
-> >>> I think the reset-gpio added here should control the IND_RST_BT pin
-> >>> (Independent software reset for Bluetooth), similar for the
-> >>> IND_RST_WL pin(Independent software reset for Wi-Fi).
-> >>>
-> >>> Best Regards
-> >>> Sherry
-> >> PDn is not the BT reset :
-> >>
-> >> - PDn is a chip reset and is shared b/w BT and WIFI : hence, it needs
-> >> to be managed as a reset control
-> >>
-> > Ok, so can you please also send out the corresponding wifi driver
-> > changes for the reset control for reference? Otherwise I suppose the
-> > wifi part will be powered off unexpectedly if unload the BT driver with=
- your
-> patch.
-> >
-> > Best Regards
-> > Sherry
->
-> We use the NXP downstream driver mwifiex which doesn't have support for
-> regulator or PDn.
->
-> However, regulator is already supported by the MMC core (vmmc-supply).
->
-> For PDn, we use mmc pwrseq simple driver that has been patched to add
-> support for reset-control.
->
-> Please check :
-> https://lore.ke/
-> rnel.org%2Fall%2F20241017131957.1171323-1-catalin.popescu%40leica-
-> geosystems.com%2F&data=3D05%7C02%7Csherry.sun%40nxp.com%7C89459f5
-> c23724f1bf16308dcf3704ce0%7C686ea1d3bc2b4c6fa92cd99c5c301635%7C0%
-> 7C0%7C638652910876819305%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4
-> wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C0%7C%7
-> C%7C&sdata=3D6Kz7Fh1e%2F8iRZtTmb%2BHEWDeaTsG0D9tBa4TQjotZJwY%3D
-> &reserved=3D0
->
 
-Ok, thanks, the mmc change looks good for me, so there is no problem with t=
-he NXP SDIO wifi.
-But how do you plan to handle the NXP PCIe wifi? We also need to make sure =
-the BT patch won't break the PCIe wifi function.
+# lspci
+00:00.0 Host bridge: Advanced Micro Devices, Inc. [AMD] Renoir/Cezanne Root
+Complex
+00:00.2 IOMMU: Advanced Micro Devices, Inc. [AMD] Renoir/Cezanne IOMMU
+00:01.0 Host bridge: Advanced Micro Devices, Inc. [AMD] Renoir PCIe Dummy H=
+ost
+Bridge
+00:01.1 PCI bridge: Advanced Micro Devices, Inc. [AMD] Renoir PCIe GPP Brid=
+ge
+00:02.0 Host bridge: Advanced Micro Devices, Inc. [AMD] Renoir PCIe Dummy H=
+ost
+Bridge
+00:02.2 PCI bridge: Advanced Micro Devices, Inc. [AMD] Renoir/Cezanne PCIe =
+GPP
+Bridge
+00:02.4 PCI bridge: Advanced Micro Devices, Inc. [AMD] Renoir/Cezanne PCIe =
+GPP
+Bridge
+00:08.0 Host bridge: Advanced Micro Devices, Inc. [AMD] Renoir PCIe Dummy H=
+ost
+Bridge
+00:08.1 PCI bridge: Advanced Micro Devices, Inc. [AMD] Renoir Internal PCIe=
+ GPP
+Bridge to Bus
+00:14.0 SMBus: Advanced Micro Devices, Inc. [AMD] FCH SMBus Controller (rev=
+ 51)
+00:14.3 ISA bridge: Advanced Micro Devices, Inc. [AMD] FCH LPC Bridge (rev =
+51)
+00:18.0 Host bridge: Advanced Micro Devices, Inc. [AMD] Cezanne Data Fabric;
+Function 0
+00:18.1 Host bridge: Advanced Micro Devices, Inc. [AMD] Cezanne Data Fabric;
+Function 1
+00:18.2 Host bridge: Advanced Micro Devices, Inc. [AMD] Cezanne Data Fabric;
+Function 2
+00:18.3 Host bridge: Advanced Micro Devices, Inc. [AMD] Cezanne Data Fabric;
+Function 3
+00:18.4 Host bridge: Advanced Micro Devices, Inc. [AMD] Cezanne Data Fabric;
+Function 4
+00:18.5 Host bridge: Advanced Micro Devices, Inc. [AMD] Cezanne Data Fabric;
+Function 5
+00:18.6 Host bridge: Advanced Micro Devices, Inc. [AMD] Cezanne Data Fabric;
+Function 6
+00:18.7 Host bridge: Advanced Micro Devices, Inc. [AMD] Cezanne Data Fabric;
+Function 7
+01:00.0 VGA compatible controller: NVIDIA Corporation GA106M [GeForce RTX 3=
+060
+Mobile / Max-Q] (rev a1)
+01:00.1 Audio device: NVIDIA Corporation GA106 High Definition Audio Contro=
+ller
+(rev a1)
+02:00.0 Network controller: MEDIATEK Corp. MT7921 802.11ax PCI Express Wire=
+less
+Network Adapter
+03:00.0 Non-Volatile memory controller: Samsung Electronics Co Ltd NVMe SSD
+Controller PM9A1/PM9A3/980PRO
+04:00.0 VGA compatible controller: Advanced Micro Devices, Inc. [AMD/ATI]
+Cezanne [Radeon Vega Series / Radeon Vega Mobile Series] (rev c4)
+04:00.1 Audio device: Advanced Micro Devices, Inc. [AMD/ATI] Renoir Radeon =
+High
+Definition Audio Controller
+04:00.2 Encryption controller: Advanced Micro Devices, Inc. [AMD] Family 17h
+(Models 10h-1fh) Platform Security Processor
+04:00.3 USB controller: Advanced Micro Devices, Inc. [AMD] Renoir/Cezanne U=
+SB
+3.1
+04:00.4 USB controller: Advanced Micro Devices, Inc. [AMD] Renoir/Cezanne U=
+SB
+3.1
+04:00.5 Multimedia controller: Advanced Micro Devices, Inc. [AMD]
+ACP/ACP3X/ACP6x Audio Coprocessor (rev 01)
+04:00.6 Audio device: Advanced Micro Devices, Inc. [AMD] Family 17h/19h HD
+Audio Controller
 
-Best Regards
-Sherry
+--=20
+You may reply to this email to add a comment.
+
+You are receiving this mail because:
+You are the assignee for the bug.=
