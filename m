@@ -1,184 +1,116 @@
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f178.google.com (mail-lj1-f178.google.com [209.85.208.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B029713D539
-	for <linux-bluetooth@vger.kernel.org>; Mon, 28 Oct 2024 15:00:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CC0E1DE2CC
+	for <linux-bluetooth@vger.kernel.org>; Mon, 28 Oct 2024 15:04:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730127656; cv=none; b=W9EtXvilijKylvV37oSdytIggwaXJctQoCkMihVZ9QckfuIqNJkxiNs5HepKVQtwndHKW7vrb9QDQz9nA35DOIKOunY9V1H6lvwi6R3H979O/aJMvDuDQVOP07SJVQwtTDxmsYM9K2NuePyzGvcl3lrKqfa55ea7CAjBWManX78=
+	t=1730127880; cv=none; b=ZR/5TtwxGZ0nyzlwnF1QJ7aTDCdgymOSIX8E97+GdiLbxRWMVNRG1ggS1O4oNukdNVmjSRySdMQNO6S5ConXp5XqoU4GNCp9VBbNHCNmgSYkXoeVteBRGoNdrE468/9YkwfAzLHXHl3xaL90Fd0GCLYv5ZEr7hWuIyopDcaAH0w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730127656; c=relaxed/simple;
-	bh=E22snKOiwORKipQzrXfVGm9Ej7rTAa7fAhHXIBaGcaI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qVF1s+aR5ojJOTOD4RqaOBWeCAdxz518LSlgMMtJlJtB8+y0xWWoQOsuxs5xIxQqHAUI4qFPFYerZN5nSQASBwL4YLOadmlTsNsEcTQ2gskbmZDYDQCoAXYFCOCOHsvlwQZpN/DTIKCap/HhVwIGKpLxAxHfXW+zlLcM0FWYYNw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <mfe@pengutronix.de>)
-	id 1t5REf-0006vD-4J; Mon, 28 Oct 2024 16:00:49 +0100
-Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <mfe@pengutronix.de>)
-	id 1t5REe-000sIi-1t;
-	Mon, 28 Oct 2024 16:00:48 +0100
-Received: from mfe by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <mfe@pengutronix.de>)
-	id 1t5REe-000n3t-1Y;
-	Mon, 28 Oct 2024 16:00:48 +0100
-Date: Mon, 28 Oct 2024 16:00:48 +0100
-From: Marco Felsch <m.felsch@pengutronix.de>
-To: Sherry Sun <sherry.sun@nxp.com>
-Cc: POPESCU Catalin <catalin.popescu@leica-geosystems.com>,
-	Amitkumar Karwar <amitkumar.karwar@nxp.com>,
-	Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>,
-	"marcel@holtmann.org" <marcel@holtmann.org>,
-	"luiz.dentz@gmail.com" <luiz.dentz@gmail.com>,
-	"robh@kernel.org" <robh@kernel.org>,
-	"krzk+dt@kernel.org" <krzk+dt@kernel.org>,
-	"conor+dt@kernel.org" <conor+dt@kernel.org>,
-	"p.zabel@pengutronix.de" <p.zabel@pengutronix.de>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	GEO-CHHER-bsp-development <bsp-development.geo@leica-geosystems.com>,
-	Krzysztof Kozlowski <krzk@kernel.org>
-Subject: Re: [PATCH 1/2] dt-bindings: net: bluetooth: nxp: add support for
- supply and reset
-Message-ID: <20241028150048.qnqjxntns6quy7py@pengutronix.de>
-References: <20241022082256.nzfxqp67tdaxtn56@pengutronix.de>
- <DB9PR04MB84292445D0FEDB8211ED52C3924C2@DB9PR04MB8429.eurprd04.prod.outlook.com>
- <9b09774e-d0ed-4c97-b6a0-e976580b5bb5@leica-geosystems.com>
- <DB9PR04MB8429CF700571FE42C997FB9C924D2@DB9PR04MB8429.eurprd04.prod.outlook.com>
- <1b8864e5-0ec7-49c4-932a-89cfbaeacc9f@leica-geosystems.com>
- <DB9PR04MB842929186683C1DF13DCBD92924A2@DB9PR04MB8429.eurprd04.prod.outlook.com>
- <20241028090028.x6rzopvpcdvgouqv@pengutronix.de>
- <DB9PR04MB842960A18BB8570B04A64BEA924A2@DB9PR04MB8429.eurprd04.prod.outlook.com>
- <20241028115150.fgvqaem36lwxwvjh@pengutronix.de>
- <DB9PR04MB8429B10FA73E5333685103FB924A2@DB9PR04MB8429.eurprd04.prod.outlook.com>
+	s=arc-20240116; t=1730127880; c=relaxed/simple;
+	bh=y14zLqKQA7KGv5Rh1L1qEIv9XGWkw/cEsEEi77mDlm0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Od2DbAkQs+nbYiIwyvFcZodf4lNN+nLxgPGNMwLX1jCUdQaevpE6x1kxKsQdUCOHphT8NuXcrCKMC+0c6AHFXFd7Nhq7+PP2NvbbiW0owdVrrqR7BVD1PUb9+9zK1QgZP0Df004ymLsTf/J41+Tos53eV3L50HSF4mABwpsgBBI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WUx8g9dZ; arc=none smtp.client-ip=209.85.208.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WUx8g9dZ"
+Received: by mail-lj1-f178.google.com with SMTP id 38308e7fff4ca-2fb498a92f6so41947891fa.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 28 Oct 2024 08:04:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1730127876; x=1730732676; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=UkG/js8BcANsL/wgDsYRzcmWd04CR6lCPIcNLPCLc4Q=;
+        b=WUx8g9dZ53DCtpII1xn43XoJdzMv5B5s1mUFcMzTaBad66p1h7TrBeUZv92npFJW4s
+         uz1dXww9yonR7zrmXGMacjkwW+OJ6rg2Np3+YeKe1C2rAUHIfwAR3p6+lrh16xXsg9iR
+         IQc7vG7SPRcZI8RNEkWQG02tDF2V20v/zrT6iQ0TIgf7BPxJHRE6a43XHO6G3xzd0TMv
+         91Y8M/vWPfDiWFhAva2i7G2MPf2bjeTfc5cTtivvCcSH0zq89ESMM+KYy4UCVZkt2QqH
+         uNXDj0GMenMIVHyyNWqWGOh9i4ZYGvC4GdfcsgY1g+L7RSQ4Cb3pBlXkaHYWLJS0VzCJ
+         nTqA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730127876; x=1730732676;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=UkG/js8BcANsL/wgDsYRzcmWd04CR6lCPIcNLPCLc4Q=;
+        b=rAzDvnQMYSvxOwPRbBcJkh7mp+j4HQezcqPmVRb40D+oBmIT3155EWszwl3vLZrLMp
+         Vup+x+VeEZ0LYQXNy//RAe9nr8uCeU+KKlcnQFAi5wuHG/bb+EHE+Zt4HPHX+4AIwMSu
+         Ja8uNaLlIRpWPatGmvKE17sle4dImfYHAePvGRTYaMDIZYgofVpdBmDEMbSZg+JMgDev
+         YMUN/LnT84Dlk4gwO99c6CNWeTdYmq2JsiVGJaZD9GJaTytvGb8vLD6ow1x0LGQmmyT6
+         ifnw5OHgXdBUeHgN9YFSCtTCLCqWB67dk6VJ/z11V8JF2enusLKfQq44Z/+5rWWyLH9+
+         ZuXw==
+X-Gm-Message-State: AOJu0YzDBhMeA9EdTmTjt0daijHGSZJo/r6QdhQF9kADNJqSdLtT7W2y
+	udWowtQLb5UkfkX/g83ylAxfiwQViry6v2qwMZAEZfr6Kk27PgOGhLSOTKq9YwAMbCY2H/+S9gO
+	HUSTx0Oi+8ju7M/WdPyPYwGRPZY8=
+X-Google-Smtp-Source: AGHT+IHY1z8pqPA/2604CkzxtezioU3Rdv3cbTxifnVNXsY55wjqwswkdx7b8TwTjgpASrXPKe+wwkXTnioWfplZvvs=
+X-Received: by 2002:a2e:b88d:0:b0:2fb:3d86:d932 with SMTP id
+ 38308e7fff4ca-2fcbdfaea70mr30774981fa.12.1730127875539; Mon, 28 Oct 2024
+ 08:04:35 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <DB9PR04MB8429B10FA73E5333685103FB924A2@DB9PR04MB8429.eurprd04.prod.outlook.com>
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: mfe@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: linux-bluetooth@vger.kernel.org
+References: <20241025202141.158946-1-daniel.beer@igorinstitute.com> <20241025202141.158946-2-daniel.beer@igorinstitute.com>
+In-Reply-To: <20241025202141.158946-2-daniel.beer@igorinstitute.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Mon, 28 Oct 2024 11:04:20 -0400
+Message-ID: <CABBYNZLjNgTe6E0f6oKuap+VLttiaGse3_vP3ZYFxiO7mmNfog@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 2/2] source: clean up outstanding AVDTP requests if
+ the stream goes away.
+To: Daniel Beer <daniel.beer@igorinstitute.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 24-10-28, Sherry Sun wrote:
-> 
-> > From: Marco Felsch <m.felsch@pengutronix.de>
-> > 
-> > On 24-10-28, Sherry Sun wrote:
-> > >
-> > > > From: Marco Felsch <m.felsch@pengutronix.de>
-> > > >
-> > > > Hi,
-> > > >
-> > > > On 24-10-28, Sherry Sun wrote:
-> > > > >
-> > > > > > From: POPESCU Catalin <catalin.popescu@leica-geosystems.com>
-> > > > > >
-> > > > > > We use the NXP downstream driver mwifiex which doesn't have
-> > > > > > support for regulator or PDn.
-> > > > > >
-> > > > > > However, regulator is already supported by the MMC core (vmmc-
-> > supply).
-> > > > > >
-> > > > > > For PDn, we use mmc pwrseq simple driver that has been patched
-> > > > > > to add support for reset-control.
-> > > > >
-> > > > > Ok, thanks, the mmc change looks good for me, so there is no
-> > > > > problem with the NXP SDIO wifi.
-> > > > >
-> > > > > But how do you plan to handle the NXP PCIe wifi? We also need to
-> > > > > make sure the BT patch won't break the PCIe wifi function.
-> > > >
-> > > > Can you please elaborate how this could break the PCIe use-case?
-> > >
-> > > Similar to the SDIO wifi, if no corresponding reset control for the
-> > > PDn pin in PCIe wifi driver, the wifi part will be unexpectedly
-> > > powered off when removing the BT driver.
-> > 
-> > Nope it's not that easy for PCIe case since the phy + link layer handling is
-> > much more complex compared to the MMC case. For the PCIe case the intial
-> > handling is very strict according to the PCIe spec and we can't handle the BT
-> > device independently.
-> > 
-> > _BUT_ this patch doesn't cause any regression for the PCIe use-case since the
-> > support added by Catalin is optional which means that the user don't have to
-> > use these options.
-> > 
-> > To sum up:
-> > 
-> > WLAN (PCIe) used + BT (UART) used -> no independent handling
-> >                                      possible. BT depends on WLAN.
-> > 
-> > WLAN (PCIe) not used + BT (UART) used -> This patchset allow us to
-> >                                          handle BT. Without the patchset
-> > 					 this is not possible.
-> > 
-> > WLAN (SDIO) + BT (UART) -> This patchset and the mmc-power-seq patchset
-> >                            allow us to handle WLAN and BT independently
-> > 			   regardless if BT or WLAN is used or not.
-> 
-> If we add the reset-gpios property in the BT dts node when using the
-> SDIO wifi chip, my concern is for some host platforms, taking
-> i.MX95-19x19-EVK as an example, it supports both SDIO and PCIe
-> interface wifi chip through the M.2 connector, when customers want to
-> plug in the PCIe wifi chip, they have to remove the reset-gpios in the
-> BT dts node to avoid the PCIe WLAN been affected by BT, right?
+Hi Daniel,
 
-I don't know the i.MX95-19x19-EVK platform since it is not upstream. If
-you want to support both:
+On Fri, Oct 25, 2024 at 4:30=E2=80=AFPM Daniel Beer
+<daniel.beer@igorinstitute.com> wrote:
+>
+> If the stream goes IDLE while we have an outstanding request, connect_id
+> stays non-zero and is never cleared via a completion callback. As a
+> consequence, the profile on this device will never be connected
+> successfully again until BlueZ restarts.
+> ---
+>  profiles/audio/source.c | 5 +++++
+>  1 file changed, 5 insertions(+)
+>
+> diff --git a/profiles/audio/source.c b/profiles/audio/source.c
+> index 9fac352c8..db777e86d 100644
+> --- a/profiles/audio/source.c
+> +++ b/profiles/audio/source.c
+> @@ -134,6 +134,11 @@ static void stream_state_changed(struct avdtp_stream=
+ *stream,
+>         case AVDTP_STATE_IDLE:
+>                 btd_service_disconnecting_complete(source->service, 0);
+>
+> +               if (source->connect_id > 0) {
+> +                       a2dp_cancel(source->connect_id);
+> +                       source->connect_id =3D 0;
+> +               }
+> +
 
-> > WLAN (PCIe) used + BT (UART) used -> no independent handling
-> >                                      possible. BT depends on WLAN.
+Is this really happening or is more of a fix based on disconnect_id?
+If that really is happening then we need to fix the sink as well since
+it appears to be doing the same, that said connect_id may be set with
+a2dp_discover which can happen in AVDTP_STATE_IDLE so in theory that
+can still be ongoing, anyway this code hasn't change in very long time
+so I wonder if this is sort of workaround to specific model or
+use-case we haven't tried before?
 
-and
+>                 if (source->disconnect_id > 0) {
+>                         a2dp_cancel(source->disconnect_id);
+>                         source->disconnect_id =3D 0;
+> --
+> 2.43.0
+>
+>
 
-> > WLAN (SDIO) + BT (UART) -> This patchset and the mmc-power-seq patchset
-> >                            allow us to handle WLAN and BT independently
-> > 			   regardless if BT or WLAN is used or not.
 
-you need to stick with the dependent handling which is no problem once
-this patchset get applied if your system support hot-plug. If hot-plug
-is not possible you could consider unsing overlays.
-
-However, this patchset does _NOT_ cause any regression neither for the
-MMC nor the PCIe use-case, and you don't have to touch your DTS files. It
-would be an improvement for platforms (not speaking of NXP EVK
-platforms) which utilize the MMC+UART interfaces only.
-
-> And it looks strange that we can only add the reset-gpios BT property
-> to the hosts that only support SDIO WLAN, we hope there is a solution
-> for the PCIe WLAN too.
-
-"We hope there is a solution" <-- This is not how upstream work.
-
-Also as said: The WLAN PCIe interface must/should be compatible with the
-PCIe Spec. There is no way that we can handle both devices
-independent since the PCIe spec specifies the power-up-sequence very
-strict.
-
-If for example, we do handle it independent and the BT part brings the
-device out-of-reset while the PCIe bus is not yet ready, the device's
-WLAN PCIe subsystem may get confused.
-
-There are two solution NXP could provide:
-
- - The PCIe WLAN/BT devices exposes all devices WLAN + BT via PCIe, this
-   would eliminate the UART part.
- - All new WLAN/BT devices do have a separate hw reset line for each
-   radio the device supports.
-
-Regards,
-  Marco
+--=20
+Luiz Augusto von Dentz
