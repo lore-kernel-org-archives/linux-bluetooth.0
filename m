@@ -1,142 +1,78 @@
-Received: from mail-lj1-f173.google.com (mail-lj1-f173.google.com [209.85.208.173])
+Received: from mail-oi1-f174.google.com (mail-oi1-f174.google.com [209.85.167.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0A821D86CB
-	for <linux-bluetooth@vger.kernel.org>; Mon, 28 Oct 2024 15:55:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 531391DED7C
+	for <linux-bluetooth@vger.kernel.org>; Mon, 28 Oct 2024 16:33:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730130905; cv=none; b=iarrVXsxcabKqxuRw8m231lgTJbPQ9onKsLddgoTc8vIkDdBLly9+Qa7y2JQUvfkCowXKXwgOx6gJ7KBdsF2BPIv96tAtu6DM96cNimM2MnI1Y1f6iaiyfAuQDsck9E5+sQgIJhXaORGw5oShXoMJoXisL4X77zcxHNAaHIQUG8=
+	t=1730133221; cv=none; b=auwiaqEF1a4sLnArf4S4EmKaLs2kIt0FBB2oU+DIgBKxULjUYichlxUEmRer37rSpMiUiZraf+p6+IOGzz9pP9Rogf+sC0M5/m7x5hwBCbUfUIAuUJYLoYXWwMtLTMR4CDoqdstrFzTXWti4Bj0bH5iCf35tRIJ4TPxnr7s2rLw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730130905; c=relaxed/simple;
-	bh=+5kVm7u0CDJNQISM/i42/NwMVkQ+nI5uipUZ7dwm/6c=;
+	s=arc-20240116; t=1730133221; c=relaxed/simple;
+	bh=FbGm8I24d6rLYFTSo3ZDP4RDPJV4yK9HMrrKFbShLbE=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=YWhPUMeVS5ChDrL+lNVe4/bivxWUgqiFsqyG+w+m0G4jFZDZS/okji8/3nkpB+/dYR7DMDdZsOqEgBR4A2Phl6TXJtURspqSizWDc7U5GmxbopTb7cXxUXuPEM71GK14OblD/aHQzLrw84lSAdQvMQ9igrn1fRU/+9h6cas8x3w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CySnOgbZ; arc=none smtp.client-ip=209.85.208.173
+	 To:Cc:Content-Type; b=QG+sOn708o6YLffCWPZKX9U0C7JW1LIOPJ/7cCBDc+KA3botkXbtthz0N/mIL5KNjheyYHmQ0ys/TE8JPeHWlHfbPBSQZosbto2j1wyYMPmHeqvBqsTfphx5YlfPUehSViATxWZia67Dut+JkeXRH34GP5fSG1pK7E18t4Oyj68=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=K8xix5t4; arc=none smtp.client-ip=209.85.167.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CySnOgbZ"
-Received: by mail-lj1-f173.google.com with SMTP id 38308e7fff4ca-2fb51e00c05so64758751fa.0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 28 Oct 2024 08:55:03 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="K8xix5t4"
+Received: by mail-oi1-f174.google.com with SMTP id 5614622812f47-3e5fbc40239so2569584b6e.3
+        for <linux-bluetooth@vger.kernel.org>; Mon, 28 Oct 2024 09:33:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1730130902; x=1730735702; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=qXBnvsPSv3Wi51jh/3xEwL1sFmwykFtrb4JgbdjgSuQ=;
-        b=CySnOgbZ/fT2NxZWq1BIDC/SfQu/SvPGcRTJ1L8fRBMSr0aG5O2ez7hQ+gSiwgou+J
-         EH02ZEwvM2ZgdRaJe5nZLSwpOoNFXyvDBsge0P5acQ7jjMuiUROJBqDeOf0ImBtH3NKK
-         8/vrBCcY29sKLgMHFJTjP0Tflgov2n9r+oJHj8EmRGs4UkAP1njD1ekj0gJFafhG6zdU
-         PJWczAsGSZO54NG/mrBT5DIRXAcgLUYL8GtbkBJqFgyOT4kbfo9D862PYaRGv966ph1z
-         PlEJfILnE1qHCiOE7WGSXvDMmNMZtfds6CRf7HZ7p6bU1L1JWAPIAa5E4zDgEZmdsMwt
-         gq0w==
+        d=gmail.com; s=20230601; t=1730133217; x=1730738017; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=sA+lJtcYDLxuowgxxa1JBBRiCYzBSv6/erkXPLeHw8Y=;
+        b=K8xix5t44UILnd9/2la2ggIrASW7tx/ilBMw6WITEdIEQPs+6FyiBn6gFsvtGU39C0
+         nQ2LZylWnNiLXw4phdyoj2Juj+s2il4Zc8Qm+F0wY6hEl5ySBzdswuY0MaCg33UAB4xw
+         njMbdvPjNaHMLwJCCekhnBoxakt0DQ1b7+21QWO+my32dYlWly5KV+2aQqhVgeteQkO/
+         DPLn0vQsvSsqUW0Jwci2yjE1KpWFwa//QjRgV4sdJe5FEY5IfsxMdk1DSnGjfJr9I5bw
+         1icot5Wf9k3ANVcJrlcP4VBAYayldJ3se6wrfyvcKckXpZTNanzqz6cZ7VTwsZWSwpum
+         trBQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730130902; x=1730735702;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=qXBnvsPSv3Wi51jh/3xEwL1sFmwykFtrb4JgbdjgSuQ=;
-        b=eDcUG34McJv5FTa2vBcv3lpYQK0zZ/G6e8kWsNyZ+7U0cGt14UVOfo4D8V0TzchlJV
-         wcmgmvgIlX4JT9zMfRK3oNEp5gmryeX4uL1EK/tHoC/1KMFLmkM+X1I/ZsAYwdoX+BOu
-         1hjJ/8q3utagOyOj++SegraTNex5nINzOUxImt1ytkVnHMTTVE2FCX3TT5yJikO3d/eR
-         cmIIASNq0hL909S3LqjM92ZQlvMv3cPM2MnalMwtVvqSNQYyeWWQF3XYHpRlKi73nY5l
-         608sJBJTzaKjx6iDZ4WhOfencPtUWT0OtlpUQzsx0U/EklEjtqoi4rtl3/paMGvDkNgg
-         9m4w==
-X-Gm-Message-State: AOJu0YzDUemJNxHTLxzxCpSCvZ/tmuBLeAgi+Anfz+OCn+LiAXK19Lhr
-	1PjfoZS9Mi0zPuobB9zwzyWkf1piAec9jMUfFJBRbAGYAIYVx7MQFxI0BhV+miXb5qWmfHNOBRJ
-	3w8m0OpItr25kydTyCE4JhLZN1unQsQ==
-X-Google-Smtp-Source: AGHT+IGwBFDlRTp3CmLPQmaLiEQ+AaF45xLGm0QKQnRBwyTs3T2RL9Rw57qN4UViWPnU6KkWYOw7Q4n9weZErmGScQo=
-X-Received: by 2002:a05:651c:b0d:b0:2fa:d604:e519 with SMTP id
- 38308e7fff4ca-2fcbdf7db48mr55811331fa.11.1730130901461; Mon, 28 Oct 2024
- 08:55:01 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1730133217; x=1730738017;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=sA+lJtcYDLxuowgxxa1JBBRiCYzBSv6/erkXPLeHw8Y=;
+        b=N+NLpoZUSYFIFJ+WtgDqCK7zzwVi3usWqSua9zuPSIJoy4uf7zncgEaSLh5H0jd4sZ
+         81wvsh8SrK4baMMRK//9By4Jdk8ap3QMBO8qP4dKZ8eIH8wCKS4xh42LU9yt3mq+Timu
+         myO3m4ORikzoLOJnUlC7E8RN0cOnOk6rI7UlNOvzCgBxkyLFRu299uC4ZPeJyweRFs57
+         V53JR41KZMyGm+Y63UH+nF7z5aUGSDorvhyMS2Y4xav6DQ4gpkBfKoNeqSZQS9C5XmBX
+         VJm5mnM+MdHeh3aK7Dk4GXEZa+UtNUXTyPPs7lXl9sccrTRN+yoMHbZx+jmpRETqx6Z+
+         5TSw==
+X-Gm-Message-State: AOJu0YzZOiSSztkHMh0wXbH08kZRTsqogEtxtalSz688HQaIS1Wrrlca
+	v7h9pwBn2xZoYYjtKTomQTZDIVfs+g1/OKMADd99YZFdqk7UmijMcI9/Rr/H4BVjHLS7qvReJtR
+	LM9uJdNNi64aRwjR4jNLSO7YRCTpZZmz9
+X-Google-Smtp-Source: AGHT+IE3ibcSlAeJNVZeq+6/5nALFQjLpLPNxuYgMIcm0ZxS3bXqnzJMV6C2y28SMw6MxduMT9ttDLfXvVS573MtqU8=
+X-Received: by 2002:a05:6808:1506:b0:3e5:d11d:5314 with SMTP id
+ 5614622812f47-3e6384ad59dmr6552685b6e.46.1730133215997; Mon, 28 Oct 2024
+ 09:33:35 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241022141118.150143-1-hadess@hadess.net> <20241022141118.150143-8-hadess@hadess.net>
- <CABBYNZ+aMaDp0BC6F0yG+mJU9hgkeNtbOxNwYx1D7Yj3rU8bzw@mail.gmail.com> <2d19a91da040a9298402303377ddc8c02a6a2c9a.camel@hadess.net>
-In-Reply-To: <2d19a91da040a9298402303377ddc8c02a6a2c9a.camel@hadess.net>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 28 Oct 2024 11:54:48 -0400
-Message-ID: <CABBYNZKRBwdP_R6yKwcXNEg+O5HXDDd3NZ+bncWecvRUmQqfLg@mail.gmail.com>
-Subject: Re: [BlueZ v3 7/7] client: Fix --help hanging if bluetoothd is not running
-To: Bastien Nocera <hadess@hadess.net>
+References: <20241026191434.556716-1-arkadiusz.bokowy@gmail.com> <CABBYNZKs5JNZJV17gZ_Nrbj_f-NbFJVfrBy5tuWcKk1yq58uMg@mail.gmail.com>
+In-Reply-To: <CABBYNZKs5JNZJV17gZ_Nrbj_f-NbFJVfrBy5tuWcKk1yq58uMg@mail.gmail.com>
+From: Arkadiusz Bokowy <arkadiusz.bokowy@gmail.com>
+Date: Mon, 28 Oct 2024 17:32:45 +0100
+Message-ID: <CAGFh0257uWwvACrcnOJYW5VB8LtAa0917u_pgEzWVPX-Szu6aw@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 1/2] transport: Expose DelayReporting on
+ MediaTransport interface
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-Hi Bastien,
-
-On Mon, Oct 28, 2024 at 11:35=E2=80=AFAM Bastien Nocera <hadess@hadess.net>=
- wrote:
->
-> On Thu, 2024-10-24 at 12:08 -0400, Luiz Augusto von Dentz wrote:
-> > Hi Bastien,
 > >
-> > On Tue, Oct 22, 2024 at 10:11=E2=80=AFAM Bastien Nocera <hadess@hadess.=
-net>
-> > wrote:
-> > >
-> > > Exit after printing all the main and submenu commands.
-> > > ---
-> > >  client/main.c | 2 ++
-> > >  1 file changed, 2 insertions(+)
-> > >
-> > > diff --git a/client/main.c b/client/main.c
-> > > index f60bef1a6d3a..f5ed9f9f5297 100644
-> > > --- a/client/main.c
-> > > +++ b/client/main.c
-> > > @@ -3193,6 +3193,8 @@ int main(int argc, char *argv[])
-> > >         assistant_add_submenu();
-> > >         bt_shell_set_prompt(PROMPT_OFF, NULL);
-> > >
-> > > +       bt_shell_handle_non_interactive_help();
-> > > +
-> > >         if (agent_option)
-> > >                 auto_register_agent =3D g_strdup(agent_option);
-> > >         else
-> > > --
-> > > 2.47.0
-> > >
-> >
-> > Having some thoughts about how to do this is more clean way, perhaps
-> > we should do this as part of bt_shell_run and then introduce .run
-> > callback to bt_shell_menu so it is called as part of bt_shell_run,
-> > under the .run callback the menu can place e.g. DBUS connection
-> > setup,
-> > etc, but before it reaches that we can check if it just a help
-> > pending.
+> > +boolean DelayReporting [readonly]
+> > +
+> > +       Indicates if the endpoint associated with the transport supports Delay
+> > +       Reporting.
 >
-> We need to:
-> 1) set the top menu
-> 2) populate the submenus without any D-Bus IO
-> 3) turn off the prompt
-> 4) print the help and exit if that's what was requested
-> 5) setup IO for submenus
-> 6) run the mainloop
->
-> I guess I could do 2) with a callback from bt_shell_set_menu()
-> and then do 4) and 5) from a bt_shell_run() callback.
+> The presence of Delay indicates delay reporting is supported, so no
+> need to add another property for it.
 
-Yep.
-
-> Is that what you expected?
-> Do you have preferred names for the callback functions?
-
-Id call it .run since it should be the result of bt_shell_run
-
-> I think that we can still use the function split from 3/7, did you have
-> a better name for the functions?
-
-Not sure I follow, there will be a split between adding submenus and
-.run to achieve the 2 stages, or are you talking about some other
-split?
-
-> Cheers
->
-
-
---=20
-Luiz Augusto von Dentz
+Yes, after a patch which allows 0 to be returned that totally makes
+sense. I have not thought about that!
