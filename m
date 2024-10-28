@@ -1,145 +1,102 @@
-Received: from mail-lj1-f181.google.com (mail-lj1-f181.google.com [209.85.208.181])
+Received: from mail-oo1-f45.google.com (mail-oo1-f45.google.com [209.85.161.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8081C155A52;
-	Mon, 28 Oct 2024 19:25:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EA8B1E1A25
+	for <linux-bluetooth@vger.kernel.org>; Mon, 28 Oct 2024 20:33:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730143539; cv=none; b=p9D0hkl54640stvUmwRKi0w4I8t6HZ+t0s+iLLDB0fEcorPyk/MIvzxh1pqMruJMq9gXcutpRUc5yU1+w2oh1BdVg3wdgu1P9fsyTDsvhVCiwqrXAI2U8+myjVHd5YH80zvXmnYkMQujFq7n6p0s0jKqsCLDPhFA35JGWWn7t9o=
+	t=1730147610; cv=none; b=LaY5J7xuOBrQtYlmUm5VUy0LJJ5MBbEUK+SpIO+Ksix5IsatJv9jceFlwpojWjhErwwwKt7u4Q3QVNTtbpi87GvqIggv1OT/GXp5LGHw3NrIyBs25vgFRsZ5T9sxc3cyEdXR9ZKHAyNguHHtMwcw8ZbbZcmY/s1OnCSHioaqWeU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730143539; c=relaxed/simple;
-	bh=C7V4jnM///u5m7Dt/3VK+yG1FD4ImKYx2jbvgvZuoBY=;
+	s=arc-20240116; t=1730147610; c=relaxed/simple;
+	bh=MKf1ybovE8O+VMbgMU8aqHdEgk/0KrJ3KpNRKnI0lhc=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=A8oRelb4cAirDimPijo6hD+KBPshbi13vcAqnIcBFpBr1dEY+HVegGBwOB831UxL5s0gpzcInlCmiFP9zMFPPhrg6JiDlTsTSJp5eq3m8XToeKIhoAgALW5BH+Zc3lASi8DdVi9NGm9mVvPPxw8JPQJ1zWz7iGrnecGtNcQ7ExM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=J47FdrG1; arc=none smtp.client-ip=209.85.208.181
+	 To:Cc:Content-Type; b=kYsdpjMKWj030rKv9SQQS0iqdsSpABFm6lyA0bt0mMecwV4XLWoUOIekp1N/WOsTDZMMij556/GQWv1ZC7Iw/Z3IV08JSzjx6gS1/6M4qmYHFhs6POLzFXAO6Tx/LhEdhGSvJR0taFrKjNxM9LlDnfZL0oBFMFDmbuNHD5T9s2k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UE3Y9d4T; arc=none smtp.client-ip=209.85.161.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="J47FdrG1"
-Received: by mail-lj1-f181.google.com with SMTP id 38308e7fff4ca-2fb49510250so45670841fa.0;
-        Mon, 28 Oct 2024 12:25:37 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UE3Y9d4T"
+Received: by mail-oo1-f45.google.com with SMTP id 006d021491bc7-5ebc1af9137so2550869eaf.2
+        for <linux-bluetooth@vger.kernel.org>; Mon, 28 Oct 2024 13:33:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1730143536; x=1730748336; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=MkQAJayFU9AcTexWWwk6v3avyn7IpkTY2pfgXXCLGk0=;
-        b=J47FdrG1v2i3qIWTOEbVl81Jmp1mhPqbL5itVE3MQDsUwyxPBdDn5eC4vmZsyyVWCu
-         KYqJUbkR3QpeDxZoT+ZZkrwb8Snb83W7bpUd2rHp2CdQQAQTGyR7f6h4TrwskAmUoK1z
-         96rCXa5GFIP32IUsayumu2j19uOhlM9vL/ZZV0p6wIdWUYQ/sfwwIKRj96U5YL4QPz8w
-         pht3T4hKm61I+RVmTCDDdUC5cl91MR9bSRVeBbRKyi6tk8P0dDN69xk06XDGm/ziHKGR
-         r2YQZVfc8f5rsXC+FlcwDKFa7SwZ9f9nJFDOb2lJ2WzK1C8JNqPwbUq6qBM5UZay6End
-         gQTA==
+        d=gmail.com; s=20230601; t=1730147607; x=1730752407; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=DaMBFBUMZdn7/BAHvfDBXuU09JGy4R/6FLeD+A0CgsI=;
+        b=UE3Y9d4TJXD2eUlP6G1FWzNOis41x3T3cUGuNJr+OG9Iw+4kD8rrHT/VKBfViQA495
+         zxLGfoAgsd4nQIAJW9qxzVAqWAgyAxlbgIJf9E7VthUjwyYt/w4XTMcEw+xMRJlpUClK
+         d7p8Yy7WcfEuwJGMlkItuWKEOFB1Wr2CcMvkMYcfPgPWaBnBsMEkJWPGtyYj6PfMuQP/
+         N9u1b/jr5K3RQdql7oStAItdpFnEBbu3D1POPzece4YQbj7korCUVA7uoMkHbKLFRYwG
+         Vq6JiiDNwMm7QJ+awwzGuwbDFC2U2QemnQjt4M5vCAgwNBF6LE8pEwpU/gacery29UUK
+         J+EA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730143536; x=1730748336;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=MkQAJayFU9AcTexWWwk6v3avyn7IpkTY2pfgXXCLGk0=;
-        b=THV+V0bpX0oWsCsyfnTZEcjHS7rHkVSsDEiJYludy/1Hi6ZHd5dSS7hSqDUqixV6kg
-         HM7vznuttQG1YgDr8SvuUFa3jJZJpt46Gv3GYI6trSbajNVdux1nye5sBNqF2M8bcf5+
-         ML3OfuaLbFGQxfYg4S2UTv8aiw5SIoAg9gJUgIjxgMkT5MLOpVIgygK6uybW1RLY7d1H
-         o0yZU2kA5aOPrphk0U2CqyOPLjB26//0L1wGWUdvfzuSVl/PZDSBxBjNpCSelPVoa8qF
-         rxH0C7zOGyiBq3LT2u2RpVuFlyuRSBBPG2vlvjIxcApujoLOIHoJHE/tFguEH7k8YtGB
-         ev9w==
-X-Forwarded-Encrypted: i=1; AJvYcCU5ds4y85bJfWLsCEBoiHb+UWjOkdxEy/xj5fVPibieahorrnrlOmW/ELnheI/9tovuSH7wNhoxKPVRZf8m@vger.kernel.org, AJvYcCVgG8XviHPrAXolDL4hYBmSS1E/gUHms2LSPedo56EPFvl+ahsFOg7tU/TaEwveJp+Bi5U87/OJ8/SrmG5/10w=@vger.kernel.org, AJvYcCXIvmIanQmWQFmxDwiSt4o7pDmQzp3/RnPl9YO0zCdYIWzkyumZtzZwcikhHnRbopoHgAvwUzdrYHIMQXv2@vger.kernel.org
-X-Gm-Message-State: AOJu0YzT2gha0i3CFB6hC1jlRyladPiUWp0VziMeArvepSI8yN6Rhzwk
-	Kryz9eSfU/z41nXZImONG8nF92/EARNGOZl/9YwmhtBcoSZKYViqKKqzoRAU4ixtRjXTBn69+Sc
-	PoimzOWcyK+PUiD7c0sTshCPBf5dOxwKH
-X-Google-Smtp-Source: AGHT+IEbRBQz+aQnxjwPcgER2o0cmQl54BbDEvkwXLGVRUcu8aNdMAp2W46P/aczgqbSSUb/5YPaFdBUuD0aZ/SM5fA=
-X-Received: by 2002:a2e:6112:0:b0:2fb:4b0d:909b with SMTP id
- 38308e7fff4ca-2fcbdfc9d2emr36473061fa.26.1730143535209; Mon, 28 Oct 2024
- 12:25:35 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1730147607; x=1730752407;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=DaMBFBUMZdn7/BAHvfDBXuU09JGy4R/6FLeD+A0CgsI=;
+        b=VKoZSkvEbupxXe1rNMOEzCXW52PnzCEISm/YNVP10vlm6TyoNboYBgXhCmH0DJgdWj
+         B2vy4uJ+By+M13+rICd4lbRXR0xQ97v/+AGShLRX/l1mCW1aSWvZ7Qhoj39J6e0VA0tR
+         eXrzQBQc7WImttRw3cifUiZybzNjPR70i3A8sdT2UTVslqsdAL/k/Zfe9ztUc3bav/HQ
+         tYJoFxDafUAU7wI/BMoFg5EQQTYZUqywT7yasTk1pCB7AnjPZWVbQnvKHvlvz/A5JW47
+         AdKxBqaOgGhp9DlgsDE3yqRumpxZcCELjLtAgQvq4ZOzJHflAmEDyF72T3UaNLW2ZvI/
+         5I2A==
+X-Gm-Message-State: AOJu0YzKDeMJ+O3ISfEIwXZsKbRIayHutibj7dRcOAX6qXFDQ7p/faxW
+	E6fB+L6W+2VrP0j6Ux8wzYk3+8SZOMMC2Vi5FnhnLpshaW5xU+mEHqtOmMYQUu43iiiVikpwb9a
+	w/Yn3SGv4OxwnNArsigb7YIsLK6c=
+X-Google-Smtp-Source: AGHT+IFzhk3zGYOCM9giZVhI1BAOtxeflJv2OLMYMGG/5Z7X0cvLqNCaqoELAufmfxHG/sF+LRHqlGUEZ1CV7cKocN4=
+X-Received: by 2002:a05:6820:1629:b0:5eb:827b:9bbb with SMTP id
+ 006d021491bc7-5ec23a6971emr6415253eaf.5.1730147607308; Mon, 28 Oct 2024
+ 13:33:27 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241028-open-coded-timeouts-v2-0-c7294bb845a1@linux.microsoft.com>
- <20241028-open-coded-timeouts-v2-1-c7294bb845a1@linux.microsoft.com>
-In-Reply-To: <20241028-open-coded-timeouts-v2-1-c7294bb845a1@linux.microsoft.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 28 Oct 2024 15:25:21 -0400
-Message-ID: <CABBYNZ+=W-PG5RqVVuoT=TVrcQ3qYaF79TfBP6nAzG1R4DaoAw@mail.gmail.com>
-Subject: Re: [PATCH v2 1/2] jiffies: Define secs_to_jiffies()
-To: Easwar Hariharan <eahariha@linux.microsoft.com>
-Cc: "K. Y. Srinivasan" <kys@microsoft.com>, Haiyang Zhang <haiyangz@microsoft.com>, 
-	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>, linux-hyperv@vger.kernel.org, 
-	Anna-Maria Behnsen <anna-maria@linutronix.de>, Thomas Gleixner <tglx@linutronix.de>, 
-	Geert Uytterhoeven <geert@linux-m68k.org>, Marcel Holtmann <marcel@holtmann.org>, 
-	Johan Hedberg <johan.hedberg@gmail.com>, linux-bluetooth@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Michael Kelley <mhklinux@outlook.com>
+References: <20241026191434.556716-1-arkadiusz.bokowy@gmail.com>
+ <20241026191434.556716-2-arkadiusz.bokowy@gmail.com> <CABBYNZJk9jrmHwAgCR4LH2Y7+M9GWNdgSFqC7K9YtEGVDZ1QTw@mail.gmail.com>
+In-Reply-To: <CABBYNZJk9jrmHwAgCR4LH2Y7+M9GWNdgSFqC7K9YtEGVDZ1QTw@mail.gmail.com>
+From: Arkadiusz Bokowy <arkadiusz.bokowy@gmail.com>
+Date: Mon, 28 Oct 2024 21:32:35 +0100
+Message-ID: <CAGFh026BwotTDPmvTbyzLrjev8j9Jxv3fGWUV436SpqN5+SN=g@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 2/2] transport: Allow to set A2DP transport delay property
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-Hi Easwar,
+> > +static void set_delay_report(const GDBusPropertyTable *property,
+> > +                               DBusMessageIter *iter, GDBusPendingPropertySet id,
+> > +                               void *data)
+> > +{
+> > +       struct media_transport *transport = data;
+> > +       uint16_t arg;
+> > +       int err;
+>
+> This really needs to check that sender is the owner of the transport.
 
-On Mon, Oct 28, 2024 at 3:11=E2=80=AFPM Easwar Hariharan
-<eahariha@linux.microsoft.com> wrote:
->
-> secs_to_jiffies() is defined in hci_event.c and cannot be reused by
-> other call sites. Hoist it into the core code to allow conversion of the
-> ~1150 usages of msecs_to_jiffies() that either:
-> - use a multiplier value of 1000 or equivalently MSEC_PER_SEC, or
-> - have timeouts that are denominated in seconds (i.e. end in 000)
->
-> This will also allow conversion of yet more sites that use (sec * HZ)
-> directly, and improve their readability.
->
-> TO: "K. Y. Srinivasan" <kys@microsoft.com>
-> TO: Haiyang Zhang <haiyangz@microsoft.com>
-> TO: Wei Liu <wei.liu@kernel.org>
-> TO: Dexuan Cui <decui@microsoft.com>
-> TO: linux-hyperv@vger.kernel.org
-> TO: Anna-Maria Behnsen <anna-maria@linutronix.de>
-> TO: Thomas Gleixner <tglx@linutronix.de>
-> TO: Geert Uytterhoeven <geert@linux-m68k.org>
-> TO: Marcel Holtmann <marcel@holtmann.org>
-> TO: Johan Hedberg <johan.hedberg@gmail.com>
-> TO: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-> TO: linux-bluetooth@vger.kernel.org
-> TO: linux-kernel@vger.kernel.org
-> Suggested-by: Michael Kelley <mhklinux@outlook.com>
-> Signed-off-by: Easwar Hariharan <eahariha@linux.microsoft.com>
-> ---
->  include/linux/jiffies.h   | 2 ++
->  net/bluetooth/hci_event.c | 2 --
->  2 files changed, 2 insertions(+), 2 deletions(-)
->
-> diff --git a/include/linux/jiffies.h b/include/linux/jiffies.h
-> index 1220f0fbe5bf..e5256bb5f851 100644
-> --- a/include/linux/jiffies.h
-> +++ b/include/linux/jiffies.h
-> @@ -526,6 +526,8 @@ static __always_inline unsigned long msecs_to_jiffies=
-(const unsigned int m)
->         }
->  }
->
-> +#define secs_to_jiffies(_secs) ((_secs) * HZ)
-> +
->  extern unsigned long __usecs_to_jiffies(const unsigned int u);
->  #if !(USEC_PER_SEC % HZ)
->  static inline unsigned long _usecs_to_jiffies(const unsigned int u)
-> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> index 0bbad90ddd6f..7b35c58bbbeb 100644
-> --- a/net/bluetooth/hci_event.c
-> +++ b/net/bluetooth/hci_event.c
-> @@ -42,8 +42,6 @@
->  #define ZERO_KEY "\x00\x00\x00\x00\x00\x00\x00\x00" \
->                  "\x00\x00\x00\x00\x00\x00\x00\x00"
->
-> -#define secs_to_jiffies(_secs) msecs_to_jiffies((_secs) * 1000)
-> -
->  /* Handle HCI Event packets */
->
->  static void *hci_ev_skb_pull(struct hci_dev *hdev, struct sk_buff *skb,
->
-> --
-> 2.34.1
->
+The problem is that currently there is no mechanism which will allow
+to get the sender name in the property get/set callback (at least I
+couldn't find any). The statement "this property is only writable when
+the transport was acquired by the sender" is also for the Volume
+property, but as for Delay (which currently lacks the setter) it's not
+implemented. So, now the question is whether you would like to fix
+that as well (or amend the doc)? Some users might say that allowing
+others to control volume might be a feature. For the Delay I'm not
+sure... Probably you are right that the Delay is more intrinsic to the
+transport, and external manipulation would not be desired.
 
-Reviewed-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+As for the design of this authorization check I can see two possibilities:
 
---=20
-Luiz Augusto von Dentz
+1. Pass `message` to the `property->set()` in the
+"dbus/objects.c:properties_set()". But this will require updates in
+all setters (and maybe for symmetry the getter should also receive the
+original message?).
+2. Add a dedicated callback for setter/getter authorization, in a
+similar way the `exists()` works.
+
+In either way I think that this should be a separate patch, applied
+either before or after the Delay work.
+
+Regards,
+Arek
