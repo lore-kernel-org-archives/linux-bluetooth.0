@@ -1,123 +1,204 @@
-Received: from mail-lj1-f172.google.com (mail-lj1-f172.google.com [209.85.208.172])
+Received: from mail-lj1-f177.google.com (mail-lj1-f177.google.com [209.85.208.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 173B91DC734
-	for <linux-bluetooth@vger.kernel.org>; Mon, 28 Oct 2024 14:13:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1787D1DDA20
+	for <linux-bluetooth@vger.kernel.org>; Mon, 28 Oct 2024 14:19:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730124803; cv=none; b=BGXohkGQRfjT6FYdxyivSE0j9QZj8sBCAPcxT4DKwjUMnBAZHrtEnDrUASQWaxQViRD0tVVKLFnDXgmvdGWPKMWPLQGtoDdCznvv5ST61kgJTwx3UhkODXLuFExKfCWDGuSUugewm1BRLs1bBQH3COpjtSKEFpzBcllC5VVt3Ms=
+	t=1730125152; cv=none; b=iueal4JlZ/ZRxdLvFi53Kfr2KXmL0O0uwhEMI7jbsFo0UxgECpwd011U1jjcdQDVY2ZU/8UKOt8I3Tlt+q8HS4ur65bf44rmNcvnoEuYfORXHUWdsvBNt/nMYK0LiySNgGXMfYj5SnJlJNo0UHEZXbXSK2u0jVh7MY1vpyKS2TQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730124803; c=relaxed/simple;
-	bh=nUMRW2H7/R7YxOVdHAcOy8nvm2KFo9qCcWH6ryPpCB8=;
+	s=arc-20240116; t=1730125152; c=relaxed/simple;
+	bh=a51ZI5X0y9OUr7As7GW72ES1NC+BadVLjoT4NrYa2UE=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=rQJDEX46lv9gn2vtZ3/FobePIZyhrM75nRVz09dDFVUfk61kTNoB23Uk9RQHgZ+PzbBUmtUFfLA98PK8TBMc71Vq1KPfl7WjChwSqnmRNvgnLTbY5f3dEbe2xHyIoGMTikVyMLLotwxy7vM8mqn476N8V80s+PoA/IrXx2DkNSE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gMTPYzaj; arc=none smtp.client-ip=209.85.208.172
+	 To:Cc:Content-Type; b=kbtooF6JLHrz1H3xM/WXvSkj1m24Hk7ibmsvh8IiU4HNiT+mzrvGtOgXwYN/RjI3ZHNgySDXb1ONy3Ge1g4IBxYEGE0C6ByuaINS8R0jewPUTSyrU04h4EWjqnYmPL6x8ErnazmuXEvDYKTsEKEWpAEJ1oZzpF74rvx3P8IXyKY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YdupUiy0; arc=none smtp.client-ip=209.85.208.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gMTPYzaj"
-Received: by mail-lj1-f172.google.com with SMTP id 38308e7fff4ca-2fb5be4381dso40602751fa.2
-        for <linux-bluetooth@vger.kernel.org>; Mon, 28 Oct 2024 07:13:20 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YdupUiy0"
+Received: by mail-lj1-f177.google.com with SMTP id 38308e7fff4ca-2fb51f39394so42458941fa.2
+        for <linux-bluetooth@vger.kernel.org>; Mon, 28 Oct 2024 07:19:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1730124799; x=1730729599; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1730125148; x=1730729948; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Bp6RNlxk7XpxIVj56j5NLRoFDh24LFdOQSV24nEM5Vg=;
-        b=gMTPYzajqjtOTUheUhvFriz7hDWvwgtn/4OYdkT/FRG8NrilImtDWiMUG1ap0+pFBP
-         6WhB4MKK1k48WLDSVcSHvM9Bb4hNu8jhgPGJs5nayPvWFo0M/AXL549IOGXA8rxWsisV
-         UJXPm877SyMatgzuL3xX+3+scO5USHkmM3R/4d948oj4TQZmlQRG4TMZ12u7L2pLGnrO
-         0cZx8j9MlEelp8P5MmqS8Md4Uf/t1oOSl/a9/rXn38S4rCSZML9/3JRt9WFYR2Fy31lZ
-         DI9MH9xqhAFJMDU3E/of9tnenzFsfQoa+kWlHZbBanJSVAXpu2wYr4x8pvw97sFX08nD
-         63jw==
+        bh=u8xwU3CCsjWE5RI8Tgzg4/h6OIaI7RSAUf4s7U6enRw=;
+        b=YdupUiy0MrlLXssDXH94v10UDPBTyw6oWsXXfOt55CWWHN5mRPK9Ami2CXH5cc9lMG
+         +SyxKY2NrCw2WgvtnB9leDI8rAzGx2zPTvPcMzz2BkgzvUeXfvUzD1TPrOkMgDt3/3UT
+         xJrUJpd2LYVvAdFRRVRFePFswxhMrxsI6lPCticVOzFsUw8jkfUKyzaxS17XbWdH4wCE
+         G4QLgdch71qBK5MCM+8VzwaLW9gGmZc5WQozozqDypktJFam7apZ/1TD/ucdNUzclXVi
+         mlF/iM9sNd3zhHCgiVeoejQlvLwQIlVDyWXYsKe6/971876mz+9zPcaJFJRDtqoQ5iZi
+         RFmw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730124799; x=1730729599;
+        d=1e100.net; s=20230601; t=1730125148; x=1730729948;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=Bp6RNlxk7XpxIVj56j5NLRoFDh24LFdOQSV24nEM5Vg=;
-        b=V2RvxZZmpPPRPMofYWf5/JbNRaiV82+xFpX4P7GrBTY0BzoH6cOO/SetROJ+nkwx8R
-         bH5Y9T6CwoPDkW3AwqaPG26ahJltV8eq4C4D9zazUAjlUOojPGG8QSOIy6l9z9gs0ghm
-         Fb7MeySAnqATDglLqeERudwP5yT5JAZyvwGLcFJG6Ex1yiSC2sMpfhFhhdzSDJ19rKfx
-         52WFaucL6fwOadFhYd4mDa96gMOVnLK229Px56vzwizlQsL1q1WdwNQ8X3lD8Qme5vvJ
-         /iadHTfEyxUa+7amwbYkCxQ7JK2gH4CBQWyxobqlXdF1P6UvPC3k/gOFFDleHYUohB0Q
-         854A==
-X-Gm-Message-State: AOJu0YzwfMn25JDMSpvxhXhu5oORWqCN+NYMiVM0ubck0BdDiv658dRt
-	4mVGX0bAtY2OAKZdQIlhkAiSBeZkwvjuGThziOuI/V8MidQzy/WvP1vSP2voKM+VZm8vAA/Pwko
-	5BNFTybD/ZCHarF9ooE6Wx//Ifa8JPg==
-X-Google-Smtp-Source: AGHT+IGlQ9WRZUjRJNRDEgaAbOiha8PRWo7vY458qJCVjK3mkZgvyP13wyLZuKkF2ZO5kYHDXYJZ94SABG6r3lbS3cg=
-X-Received: by 2002:a2e:be84:0:b0:2fb:4f2e:5be7 with SMTP id
- 38308e7fff4ca-2fcbdfe4a77mr33334571fa.24.1730124798548; Mon, 28 Oct 2024
- 07:13:18 -0700 (PDT)
+        bh=u8xwU3CCsjWE5RI8Tgzg4/h6OIaI7RSAUf4s7U6enRw=;
+        b=nhxr2kYoUcEEK5NQ473s5z1Q2EGDbhLmYByFlW2cQBjozxB9wbyUGei/7NPL5kTEPa
+         hQv0GBVliXJzCajhEVnvrBRa60tKVagYoAqit6jyjPKL84tvQt+oldZrlr3x2IdUEyFE
+         WTlvzaKazIEay4XJxB7TXBBJtcwcCM6QueLEum7DZcBqwu1o1lLVgWlG4tD5CyMqlRen
+         5dhcpdcGvK2biaGF6bWUxHD+XX5a2wGbx3iWnLgcQKTQt2m46Hej9iyw6wTPe8cmKnNi
+         x4pWnTHP08gyusvEb5TDBzbmlrvmrFuEuCcCX+yUvqKKHJwncUfMOy7z4JPzveSV5mF9
+         xuEw==
+X-Gm-Message-State: AOJu0Ywb+4UOAjyq64Opj1egIzPP7I3P01xZhcFUSCEQKESYAp2zAxsP
+	WK9X0qWPpDwu+tFewGLQv/CbMgaz6SyX4uVMpi4qTqZ741VJ8yAD7sv10gV0SC/atpJA4UKUqUT
+	F3awnMQEOPU5ikU2BSJs1qlkMx2k6Jw==
+X-Google-Smtp-Source: AGHT+IHNc8Rd4HY4hQ3ZMmq4laYUx667UFRzaeT0H2IEZyI58IVx30wBCWsCDQkDkm/b0yYgeUkRfX82FDoAKl3O1+c=
+X-Received: by 2002:a05:651c:2209:b0:2ef:17f7:6e1d with SMTP id
+ 38308e7fff4ca-2fcbdf689acmr33512831fa.4.1730125147851; Mon, 28 Oct 2024
+ 07:19:07 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241028113643.1012491-1-quic_chejiang@quicinc.com>
-In-Reply-To: <20241028113643.1012491-1-quic_chejiang@quicinc.com>
+References: <20241026191434.556716-1-arkadiusz.bokowy@gmail.com>
+In-Reply-To: <20241026191434.556716-1-arkadiusz.bokowy@gmail.com>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 28 Oct 2024 10:13:05 -0400
-Message-ID: <CABBYNZJC1WO1K_1USRFjh3CHP=3hzChwoKpQMkXN8v2i6i9CGA@mail.gmail.com>
-Subject: Re: [PATCH v1] device: only use the address type selection algorithm
- when remote device is a dual-mode device when pair device
-To: Cheng Jiang <quic_chejiang@quicinc.com>
+Date: Mon, 28 Oct 2024 10:18:55 -0400
+Message-ID: <CABBYNZKs5JNZJV17gZ_Nrbj_f-NbFJVfrBy5tuWcKk1yq58uMg@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 1/2] transport: Expose DelayReporting on
+ MediaTransport interface
+To: Arkadiusz Bokowy <arkadiusz.bokowy@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi Cheng,
+Hi Arkadiusz,
 
-On Mon, Oct 28, 2024 at 7:37=E2=80=AFAM Cheng Jiang <quic_chejiang@quicinc.=
-com> wrote:
+On Sat, Oct 26, 2024 at 3:15=E2=80=AFPM Arkadiusz Bokowy
+<arkadiusz.bokowy@gmail.com> wrote:
 >
+> Exposing DelayReporting property on the MediaTransport interface will
+> allow media application to get the information about the delay reporting
+> feature during the SetConfiguration call in a similar way the profile
+> UUID and transport codec are provided. Otherwise, the application would
+> need to check the associated endpoint which might not be convenient.
 > ---
->  src/device.c | 19 ++++++++++++++-----
->  1 file changed, 14 insertions(+), 5 deletions(-)
+>  doc/org.bluez.MediaTransport.rst | 10 ++++++++--
+>  profiles/audio/transport.c       | 30 ++++++++++++++++++++++++++++--
+>  2 files changed, 36 insertions(+), 4 deletions(-)
 >
-> diff --git a/src/device.c b/src/device.c
-> index 7585184de..71fdbb145 100644
-> --- a/src/device.c
-> +++ b/src/device.c
-> @@ -3077,12 +3077,21 @@ static DBusMessage *pair_device(DBusConnection *c=
-onn, DBusMessage *msg,
->         if (device->bonding)
->                 return btd_error_in_progress(msg);
+> diff --git a/doc/org.bluez.MediaTransport.rst b/doc/org.bluez.MediaTransp=
+ort.rst
+> index 4838d69d0..5da13b3b5 100644
+> --- a/doc/org.bluez.MediaTransport.rst
+> +++ b/doc/org.bluez.MediaTransport.rst
+> @@ -115,11 +115,17 @@ string State [readonly]
+>                 created by a broadcast sink
+>         :"active": streaming and acquired
 >
-> -       if (device->bredr_state.bonded)
-> +       /* Only use this selection algorithms when device is combo
-> +        * chip. Ohterwise, it will use the wrong bearer to establish
-> +        * a connection if the device is already paired. which will
-> +        * stall the pairing procedure.
-> +        */
-> +       if (device->bredr && device->le) {
-> +               if (device->bredr_state.bonded)
-> +                       bdaddr_type =3D device->bdaddr_type;
-> +               else if (device->le_state.bonded)
-> +                       bdaddr_type =3D BDADDR_BREDR;
-> +               else
-> +                       bdaddr_type =3D select_conn_bearer(device);
-> +       } else {
->                 bdaddr_type =3D device->bdaddr_type;
-> -       else if (device->le_state.bonded)
-> -               bdaddr_type =3D BDADDR_BREDR;
-> -       else
-> -               bdaddr_type =3D select_conn_bearer(device);
-> +       }
+> +boolean DelayReporting [readonly]
+> +
+> +       Indicates if the endpoint associated with the transport supports =
+Delay
+> +       Reporting.
 
-This seems weird without there being a bug with the state itself, for
-instance how would it select the wrong bearer if it is not supported?
-Also the lack of proper explanation in the commit message doesn't help
-to grasp what is going on here, so please have backtrace or something
-attached since we need to understand why it would be selecting the
-wrong bearer, or perhaps the bearer is being advertised as supported
-when in fact it isn't?
+The presence of Delay indicates delay reporting is supported, so no
+need to add another property for it.
 
->         state =3D get_state(device, bdaddr_type);
+>  uint16 Delay [readwrite, optional]
+>  ``````````````````````````````````
 >
+> -       Transport delay in 1/10 of millisecond, this property is only wri=
+teable
+> -       when the transport was acquired by the sender.
+> +       Transport delay in 1/10 of millisecond.
+> +       This property is available only if the DelayReporting is true and=
+ is
+> +       writeable only when the transport was acquired by the sender.
+
+Again no need to add another property just to indicate its support
+since its presence shall already indicate that.
+
+>  uint16 Volume [readwrite, optional]
+>  ```````````````````````````````````
+> diff --git a/profiles/audio/transport.c b/profiles/audio/transport.c
+> index 0f7909a94..dd6878427 100644
+> --- a/profiles/audio/transport.c
+> +++ b/profiles/audio/transport.c
+> @@ -860,6 +860,22 @@ static gboolean get_state(const GDBusPropertyTable *=
+property,
+>         return TRUE;
+>  }
+>
+> +static gboolean get_delay_reporting(const GDBusPropertyTable *property,
+> +                                       DBusMessageIter *iter, void *data=
+)
+> +{
+> +       struct media_transport *transport =3D data;
+> +       struct avdtp_stream *stream;
+> +
+> +       stream =3D media_transport_get_stream(transport);
+> +       if (stream =3D=3D NULL)
+> +               return FALSE;
+> +
+> +       gboolean value =3D avdtp_stream_has_delay_reporting(stream);
+> +       dbus_message_iter_append_basic(iter, DBUS_TYPE_BOOLEAN, &value);
+> +
+> +       return TRUE;
+> +}
+> +
+>  static gboolean delay_reporting_exists(const GDBusPropertyTable *propert=
+y,
+>                                                         void *data)
+>  {
+> @@ -873,7 +889,7 @@ static gboolean delay_reporting_exists(const GDBusPro=
+pertyTable *property,
+>         return avdtp_stream_has_delay_reporting(stream);
+>  }
+>
+> -static gboolean get_delay_reporting(const GDBusPropertyTable *property,
+> +static gboolean get_delay_report(const GDBusPropertyTable *property,
+>                                         DBusMessageIter *iter, void *data=
+)
+>  {
+>         struct media_transport *transport =3D data;
+> @@ -1019,7 +1035,8 @@ static const GDBusPropertyTable transport_a2dp_prop=
+erties[] =3D {
+>         { "Codec", "y", get_codec },
+>         { "Configuration", "ay", get_configuration },
+>         { "State", "s", get_state },
+> -       { "Delay", "q", get_delay_reporting, NULL, delay_reporting_exists=
+ },
+> +       { "DelayReporting", "b", get_delay_reporting },
+> +       { "Delay", "q", get_delay_report, NULL, delay_reporting_exists },
+>         { "Volume", "q", get_volume, set_volume, volume_exists },
+>         { "Endpoint", "o", get_endpoint, NULL, endpoint_exists,
+>                                 G_DBUS_PROPERTY_FLAG_EXPERIMENTAL },
+> @@ -1359,6 +1376,14 @@ static const GDBusPropertyTable transport_bap_bc_p=
+roperties[] =3D {
+>         { }
+>  };
+>
+> +static gboolean get_asha_delay_reporting(const GDBusPropertyTable *prope=
+rty,
+> +                                       DBusMessageIter *iter, void *data=
+)
+> +{
+> +       gboolean value =3D TRUE;
+> +       dbus_message_iter_append_basic(iter, DBUS_TYPE_BOOLEAN, &value);
+> +       return TRUE;
+> +}
+> +
+>  static gboolean get_asha_delay(const GDBusPropertyTable *property,
+>                                         DBusMessageIter *iter, void *data=
+)
+>  {
+> @@ -1380,6 +1405,7 @@ static const GDBusPropertyTable transport_asha_prop=
+erties[] =3D {
+>         { "UUID", "s", get_uuid },
+>         { "Codec", "y", get_codec },
+>         { "State", "s", get_state },
+> +       { "DelayReporting", "b", get_asha_delay_reporting },
+>         { "Delay", "q", get_asha_delay },
+>         { "Volume", "q", get_volume, set_volume, volume_exists },
+>         { }
 > --
-> 2.25.1
+> 2.39.5
 >
 >
 
