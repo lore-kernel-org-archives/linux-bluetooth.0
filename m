@@ -1,93 +1,99 @@
-Received: from out-22.smtp.github.com (out-22.smtp.github.com [192.30.252.205])
+Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [217.70.183.196])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB3FE1DE2A2
-	for <linux-bluetooth@vger.kernel.org>; Mon, 28 Oct 2024 15:19:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.205
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31E2A12F585
+	for <linux-bluetooth@vger.kernel.org>; Mon, 28 Oct 2024 15:35:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.196
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730128748; cv=none; b=O+x6Oxk8P1dWyTE7GpWJrek/REKwsk7O+RQRHkr3CJ181rA5vdR1N4HS5PNGi3OY5Lp4f45VqS82aQEiExhv0XGc5Bq9HUhKkOix0lLRRSvcJAYVQr9nOqSTQgzdsh/lH+Ya1W+LXckhi5/DAYvehlKXeb3r0T+Wv/j+54Gxofs=
+	t=1730129741; cv=none; b=e4oK3qQFkUttd/H6IAqZKZa91ZiM/gHqhB4u2ehoqaWbQYW9qC+YikbWm4AaW1JI9CKRqWoccAQiV+iSfX7km4NsDeC12KjK/WXadoBHP8pPbOiHkMISeKZCQew6iSZtXhTGT72eqd8NdYP+AXCb2pltHpwrjpdkUqimC0WIf4U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730128748; c=relaxed/simple;
-	bh=AGI0u4i0exvwbTWgSkQ+hDqphAfXYwYLGs/FD1c4C9o=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=pse7F3kcjyez3Vt+HJZ/mNIgv5qYEAvNj0defgaTYss7olnfMKhV+KqF8qJzemKJ+R9m99paaNroQFEB1fZfyJgADOZmDFD7UYIYIUCSyK1Y337GmropfGYRcne9VQsGUs13gba7JdMZ64fFCUVk0VrNc2SMswOGsLipAhQLRw4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=HWZhsnL7; arc=none smtp.client-ip=192.30.252.205
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="HWZhsnL7"
-Received: from github.com (hubbernetes-node-17fba82.ac4-iad.github.net [10.52.208.93])
-	by smtp.github.com (Postfix) with ESMTPA id B25635E142C
-	for <linux-bluetooth@vger.kernel.org>; Mon, 28 Oct 2024 08:19:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1730128745;
-	bh=J8ChXn9nAJLD9qeHZP4S322a5GCJ41KAu2lrRnzqrqQ=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=HWZhsnL7/ePGI236PohXEOCTSNfY3Mchu/WhIvIJPbebBk7mtiMb8OpL3RWwq8wDr
-	 4ZfbI0AEp06lq3emxNhokgLUcknhVv/80HeyREjHi6CCG23JAAyiZvKmyu0Sh8C8n8
-	 u3WJf6DKcTSMPDZJToxusQx0UqBd/AUFtiY7A1A8=
-Date: Mon, 28 Oct 2024 08:19:05 -0700
-From: Pauli Virtanen <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/master/8c8ca7-c009be@github.com>
-Subject: [bluez/bluez] 1782bf: input: Add support for UserspaceHID=persist
+	s=arc-20240116; t=1730129741; c=relaxed/simple;
+	bh=yNNGiPThcprUIftKV1IrCtUCLrzyi91CA6uMShBo9Qg=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=ZTLZ52c3OItldbz+xV09l2xV3tSLqxNydQUWgDfTfeHWv2gvE0cyLeRMK+kWOkPYluq/M9m0rMiuOQolOcxuAFcOLX+9hEMK47FFSdvhCBnB36MPNhci/AMPXUFVMRoSLjTAWPbIpuOQuFJNQyNo/P+nDBdaVhsPuFNNB+5/ITM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.183.196
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hadess.net
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 6FD98E0002;
+	Mon, 28 Oct 2024 15:35:36 +0000 (UTC)
+Message-ID: <2d19a91da040a9298402303377ddc8c02a6a2c9a.camel@hadess.net>
+Subject: Re: [BlueZ v3 7/7] client: Fix --help hanging if bluetoothd is not
+ running
+From: Bastien Nocera <hadess@hadess.net>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Date: Mon, 28 Oct 2024 16:35:36 +0100
+In-Reply-To: <CABBYNZ+aMaDp0BC6F0yG+mJU9hgkeNtbOxNwYx1D7Yj3rU8bzw@mail.gmail.com>
+References: <20241022141118.150143-1-hadess@hadess.net>
+	 <20241022141118.150143-8-hadess@hadess.net>
+	 <CABBYNZ+aMaDp0BC6F0yG+mJU9hgkeNtbOxNwYx1D7Yj3rU8bzw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.52.4 (3.52.4-1.fc40) 
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+X-GND-Sasl: hadess@hadess.net
 
-  Branch: refs/heads/master
-  Home:   https://github.com/bluez/bluez
-  Commit: 1782bfd791f76317a3f3ded2884606c1b5b164eb
-      https://github.com/bluez/bluez/commit/1782bfd791f76317a3f3ded2884606c1b5b164eb
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2024-10-28 (Mon, 28 Oct 2024)
+On Thu, 2024-10-24 at 12:08 -0400, Luiz Augusto von Dentz wrote:
+> Hi Bastien,
+>=20
+> On Tue, Oct 22, 2024 at 10:11=E2=80=AFAM Bastien Nocera <hadess@hadess.ne=
+t>
+> wrote:
+> >=20
+> > Exit after printing all the main and submenu commands.
+> > ---
+> > =C2=A0client/main.c | 2 ++
+> > =C2=A01 file changed, 2 insertions(+)
+> >=20
+> > diff --git a/client/main.c b/client/main.c
+> > index f60bef1a6d3a..f5ed9f9f5297 100644
+> > --- a/client/main.c
+> > +++ b/client/main.c
+> > @@ -3193,6 +3193,8 @@ int main(int argc, char *argv[])
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 assistant_add_submenu();
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bt_shell_set_prompt(PROMPT_O=
+FF, NULL);
+> >=20
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bt_shell_handle_non_interactive_h=
+elp();
+> > +
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (agent_option)
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 auto_register_agent =3D g_strdup(agent_option);
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 else
+> > --
+> > 2.47.0
+> >=20
+>=20
+> Having some thoughts about how to do this is more clean way, perhaps
+> we should do this as part of bt_shell_run and then introduce .run
+> callback to bt_shell_menu so it is called as part of bt_shell_run,
+> under the .run callback the menu can place e.g. DBUS connection
+> setup,
+> etc, but before it reaches that we can check if it just a help
+> pending.
 
-  Changed paths:
-    M profiles/input/device.c
-    M profiles/input/device.h
-    M profiles/input/hog.c
-    M profiles/input/input.conf
-    M profiles/input/manager.c
+We need to:
+1) set the top menu
+2) populate the submenus without any D-Bus IO
+3) turn off the prompt
+4) print the help and exit if that's what was requested
+5) setup IO for submenus
+6) run the mainloop
 
-  Log Message:
-  -----------
-  input: Add support for UserspaceHID=persist
+I guess I could do 2) with a callback from bt_shell_set_menu()
+and then do 4) and 5) from a bt_shell_run() callback.
 
-This adds support for persist mode via input.conf:UserspaceHID but
-don't default to it since this appears to create more problems than
-it solves.
+Is that what you expected?
+Do you have preferred names for the callback functions?
 
-Fixes: https://github.com/bluez/bluez/issues/983
-Fixes: https://github.com/bluez/bluez/issues/977
-Fixes: https://github.com/bluez/bluez/issues/949
+I think that we can still use the function split from 3/7, did you have
+a better name for the functions?
 
+Cheers
 
-  Commit: c009be5c5973eeef7783903ec02e359d5b035654
-      https://github.com/bluez/bluez/commit/c009be5c5973eeef7783903ec02e359d5b035654
-  Author: Pauli Virtanen <pav@iki.fi>
-  Date:   2024-10-28 (Mon, 28 Oct 2024)
-
-  Changed paths:
-    M src/shared/bap.c
-
-  Log Message:
-  -----------
-  shared/bap: ucast streams can only have one link
-
-In unicast, linked streams mean bidirectional CIS.  Ucast stream can
-have at most one linked stream.
-
-Fix ucast streams to have only single link. This fixes eg. configuring
-for AC 11(i).
-
-
-Compare: https://github.com/bluez/bluez/compare/8c8ca715e05f...c009be5c5973
-
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
