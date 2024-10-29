@@ -1,413 +1,159 @@
-Received: from mail-lj1-f182.google.com (mail-lj1-f182.google.com [209.85.208.182])
+Received: from mail-yw1-f179.google.com (mail-yw1-f179.google.com [209.85.128.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23F421DDA2D
-	for <linux-bluetooth@vger.kernel.org>; Tue, 29 Oct 2024 19:39:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9CE720606D;
+	Tue, 29 Oct 2024 19:47:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730230750; cv=none; b=rXSpeacE6nndt3ZvDCafqoyrLsiEhA64u+K3+3CIkybfUOLyH5j7cxhtU4ubclN6SdB8MKfEuHLuhFmazyaFW930RdFI8r0JyDUxHAPSv8EAVKWsibQdEmnqbmFj2CzEJX9vjQ8Xdc+ZK+Zn/YriZfrhaNuW40ZlnzJZvuvgwIs=
+	t=1730231256; cv=none; b=YSck0yQqd5SyiV6sPz3Vu+sooonsbh//qcjVIPtcVT908BUfIzycMJ4uoCo3c36jBibNS94G0n2V2Kn0gLPUDnXnu+AYIV4E0S6o5JoZzxc4+ELdzHx2h5d5XPUYig0QNDu8Zvo9/kN5YncpMLhqDZq+7ozoikdc0Rwo+9zIf1A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730230750; c=relaxed/simple;
-	bh=7fOCqvX8WXyMaW9vPqKu44v65gxdeYI0QuXIi8uDeBU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=HWjgdi020oiShLrOtaqWHbhn81xPUET+2OSCO1CD+GcLsb+9VraK3/dZw2y9HUqCgKMLCWhxhlY4RALHChqO2t0QRKwPZzKghidIKYPNdqizkKKn87NzoEXwUk+zJ58uZZz9I1GzZPcuIsYxEsDSehJFIldoDRohlays/3EC/S8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GrRfFxWA; arc=none smtp.client-ip=209.85.208.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+	s=arc-20240116; t=1730231256; c=relaxed/simple;
+	bh=3cZeqCLHBMhECRg9kEM70AUFfXRiDjWGNpFY4l/a1gY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ckUM3R9uPd+AyiyVFLv6jA+1tjd7RlSE/xVMOR658lzQcUDrK90yczzoq0e827LGhG4lq5tgNNXeZtcnUffC5KPjA1mfE7PpVrS4MLssNIoFwXYC7I7S6vOR+cSlQC7uXYUhkAtzj4hvqlIUXsI1IjFSOPxPkQOIu/5V0a6F/TU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=sung-woo.kim; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.128.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=sung-woo.kim
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GrRfFxWA"
-Received: by mail-lj1-f182.google.com with SMTP id 38308e7fff4ca-2fb58980711so52689861fa.0
-        for <linux-bluetooth@vger.kernel.org>; Tue, 29 Oct 2024 12:39:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1730230745; x=1730835545; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=WBbFrKFvcyOhi8cDFH/fXl+p9UBsYi92mnRFUM53Iik=;
-        b=GrRfFxWARdujIjb6wxDSxU12VYpD2R9+/eNOF5l801dLINB3egQeCjvf4XP7o+GFLe
-         s29Gc1ce39kG+VPHXDwwavx1yGhzQsSG0vXqOP03KDifxf/3f05UYE8qw40AKraL5nzj
-         P/kH6VAuAbETLEa3RR8t0sCLNkrm3c4KgsQl6W+/3HSC+uJTdY5eKGvbuLW0Xw3RSB4t
-         W+mV0Ng3syoZBn9VnwUAoPsBgiBRLSu06ff3bhw5SYAsExpUTiI7Hxey3jdeJjbDTeCF
-         xVCr8RR/yU0BPK2zodVXTvN9X9sbh58DrY5TIpnK7wN/2VNgIr2kg7xEFqZ3w7sWEGja
-         PVsg==
+Received: by mail-yw1-f179.google.com with SMTP id 00721157ae682-6ea11b32ab4so1981477b3.0;
+        Tue, 29 Oct 2024 12:47:33 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730230745; x=1730835545;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=WBbFrKFvcyOhi8cDFH/fXl+p9UBsYi92mnRFUM53Iik=;
-        b=g4ZuJVvBIN4RN4cuWj06XfT/GmVd7kS6Jw942MphsZUzi0AWvjm2XLZWg2YS4RagLA
-         itJXHtUbvvUfpuvXxn8Heq9XWIqxBjqbJc8ZmqB4azPyXgAdhY8veVFXGaQLQQNqVc6v
-         0wOOaTIhfBW8mTtnnSBW9S7WGSEkvcV1MOuO5644PSalV9al5jlBbU/C9TqVvUdxBz0B
-         2Zlu4av9F867M5ah24aXWz2QYb/M8VbAR219jG+YbNwAwFu/yFwxAL5+85COw43RErwk
-         da00GPM3L8uNqmxzHQEHefodK7VWorx9/2QF/bkI+nxJ83CB8PmuPKdN/L/74iQ/ooSM
-         B/vA==
-X-Gm-Message-State: AOJu0Yy9Gn5RAYxzLm1IDDTUJaV7tmkEewcgW8kbaQP58tST/IzmHV+t
-	TQeQvvOWMhduQzJiV01BvNxDXL7Bi0s1W/k87IorC+H7+xWoU7FSAFKwze/eO4PLAGXSq2h0S1n
-	Y6cYxhGsrJ0ImP9K4XoIT7zZd6Hel8Q==
-X-Google-Smtp-Source: AGHT+IEAESCuVXybX97JIKeTB5i1HbdrzN1PwZOdD++bl3MIGfQ4nGZfKEiUz1KHIlwB8Bab5CZ2YhKSfrsuJe+kE7I=
-X-Received: by 2002:a2e:b53b:0:b0:2fb:6110:c5d5 with SMTP id
- 38308e7fff4ca-2fcbe096067mr46245731fa.43.1730230744867; Tue, 29 Oct 2024
- 12:39:04 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1730231253; x=1730836053;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=PSXt0bPWptzeFjc/V3fxmhGgzYcRQVIhaPLOnFaRxT0=;
+        b=po9qOh0WdZmJvgXinsAxtdaJ+yhUQip8pZnxtAj7NojpC3TIgN6emBacyuM424GZi6
+         AN1aSmN4QnvznS0cmr9/xhdHhadUmv8+RBLEtGj3hTR5i4Qd1t/6HESWa7pBzL7DvBP/
+         vtrlEguMLTfdHflfFWWrn7PQT3pORPXGo71m1bl6iEqs36VbEbKMuMd42m19iMwraEY+
+         pGLMTbKdZpC5on/7oxBmdsVD/223lT0w0EN/Y1whfTwIEoQapv5Lt2kYvLgsD8vjk9Wv
+         I3GhNzz9zGkxbdFlYhvW3O/sXqLYJF6GgIwVKesg6UuFmw8Yw3HQclzZDVLUb5fEgnTI
+         yELg==
+X-Forwarded-Encrypted: i=1; AJvYcCUSR7oTVVUiegvhXYy4Kfabtfz9Gf8koBXShVotwJFcCL3+Ogeuoh08c/l6u5eIuOS42Tuz6JJYnvURMMFu7CI=@vger.kernel.org, AJvYcCXe4k96/7pAMOzAJF4yuTwHIFjct8lip/dBCbaBA0TltE1WcFoNtZ3/5u5x7/218uOVgmxCuxqP1cga43qt@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx8Y1sfZMAfqLUJAZI1WGsscaFb3yLH7IWaMvJAIrdnZLGFqaI3
+	v1Y0bR/FN9EXAs9C4M9sutjaVJ+BvCOgtxVpkG2Z5m0ouKO/VPp5
+X-Google-Smtp-Source: AGHT+IGESn08yCct6swgl0EFfH1Gdg2/NCOl3miUz3hNf2Zg1dK7HiEgZOHy2IiC60OrHIASBCfgnA==
+X-Received: by 2002:a05:690c:f93:b0:6ea:1230:2467 with SMTP id 00721157ae682-6ea2bf552f8mr28322007b3.2.1730231252732;
+        Tue, 29 Oct 2024 12:47:32 -0700 (PDT)
+Received: from tofu.cs.purdue.edu ([128.210.0.165])
+        by smtp.googlemail.com with ESMTPSA id 00721157ae682-6ea1229a15dsm9425967b3.136.2024.10.29.12.47.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 29 Oct 2024 12:47:31 -0700 (PDT)
+From: Sungwoo Kim <iam@sung-woo.kim>
+To: luiz.dentz@gmail.com
+Cc: daveti@purdue.edu,
+	benquike@gmail.com,
+	Sungwoo Kim <iam@sung-woo.kim>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v3] Bluetooth: hci: fix null-ptr-deref in hci_read_supported_codecs
+Date: Tue, 29 Oct 2024 19:44:41 +0000
+Message-ID: <20241029194505.2094645-2-iam@sung-woo.kim>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAGFh025H4pK9ddaWoGF4CMwv88OTONjBb3U=Cgsb-DU5ZKo3Xg@mail.gmail.com>
- <20241029190500.578032-1-arkadiusz.bokowy@gmail.com>
-In-Reply-To: <20241029190500.578032-1-arkadiusz.bokowy@gmail.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Tue, 29 Oct 2024 15:38:52 -0400
-Message-ID: <CABBYNZJyrKnWGcFb9k2YbucPub0hkhG-OH=RWEhdKPJKLVLfpA@mail.gmail.com>
-Subject: Re: [PATCH BlueZ v2] transport: Allow to set A2DP transport delay property
-To: Arkadiusz Bokowy <arkadiusz.bokowy@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-Hi Arkadiusz,
+Fix __hci_cmd_sync_sk() to return not NULL for unknown opcodes.
 
-On Tue, Oct 29, 2024 at 3:05=E2=80=AFPM Arkadiusz Bokowy
-<arkadiusz.bokowy@gmail.com> wrote:
->
-> In order to properly synchronize audio/video playback it is required
-> to report audio delay to the A2DP source. This commit allows connected
-> media application to update the Delay property of the A2DP transport
-> which will inform remote source about the playback delay.
->
-> In case when the transport is not acquired, everyone is allowed to set
-> the delay. However, when the transport is acquired only the owner can
-> modify the delay. This restriction is here to prevent interference
-> caused by 3rd party actors.
->
-> The functionality was tested by streaming audio between two hosts
-> running BlueZ Bluetooth stack.
-> ---
->  doc/org.bluez.MediaTransport.rst |   3 +-
->  gdbus/gdbus.h                    |   1 +
->  gdbus/object.c                   |  33 +++++++---
->  profiles/audio/transport.c       | 103 ++++++++++++++++++++++++++++---
->  4 files changed, 124 insertions(+), 16 deletions(-)
+__hci_cmd_sync_sk() returns NULL if a command returns a status event.
+However, it also returns NULL where an opcode doesn't exist in the
+hci_cc table because hci_cmd_complete_evt() assumes status = skb->data[0]
+for unknown opcodes.
+This leads to null-ptr-deref in cmd_sync for HCI_OP_READ_LOCAL_CODECS as
+there is no hci_cc for HCI_OP_READ_LOCAL_CODECS, which always assumes
+status = skb->data[0].
 
-Please split the changes of gdbus, doc and transport.
+KASAN: null-ptr-deref in range [0x0000000000000070-0x0000000000000077]
+CPU: 1 PID: 2000 Comm: kworker/u9:5 Not tainted 6.9.0-ga6bcb805883c-dirty #10
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.15.0-1 04/01/2014
+Workqueue: hci7 hci_power_on
+RIP: 0010:hci_read_supported_codecs+0xb9/0x870 net/bluetooth/hci_codec.c:138
+Code: 08 48 89 ef e8 b8 c1 8f fd 48 8b 75 00 e9 96 00 00 00 49 89 c6 48 ba 00 00 00 00 00 fc ff df 4c 8d 60 70 4c 89 e3 48 c1 eb 03 <0f> b6 04 13 84 c0 0f 85 82 06 00 00 41 83 3c 24 02 77 0a e8 bf 78
+RSP: 0018:ffff888120bafac8 EFLAGS: 00010212
+RAX: 0000000000000000 RBX: 000000000000000e RCX: ffff8881173f0040
+RDX: dffffc0000000000 RSI: ffffffffa58496c0 RDI: ffff88810b9ad1e4
+RBP: ffff88810b9ac000 R08: ffffffffa77882a7 R09: 1ffffffff4ef1054
+R10: dffffc0000000000 R11: fffffbfff4ef1055 R12: 0000000000000070
+R13: 0000000000000000 R14: 0000000000000000 R15: ffff88810b9ac000
+FS:  0000000000000000(0000) GS:ffff8881f6c00000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f6ddaa3439e CR3: 0000000139764003 CR4: 0000000000770ef0
+PKRU: 55555554
+Call Trace:
+ <TASK>
+ hci_read_local_codecs_sync net/bluetooth/hci_sync.c:4546 [inline]
+ hci_init_stage_sync net/bluetooth/hci_sync.c:3441 [inline]
+ hci_init4_sync net/bluetooth/hci_sync.c:4706 [inline]
+ hci_init_sync net/bluetooth/hci_sync.c:4742 [inline]
+ hci_dev_init_sync net/bluetooth/hci_sync.c:4912 [inline]
+ hci_dev_open_sync+0x19a9/0x2d30 net/bluetooth/hci_sync.c:4994
+ hci_dev_do_open net/bluetooth/hci_core.c:483 [inline]
+ hci_power_on+0x11e/0x560 net/bluetooth/hci_core.c:1015
+ process_one_work kernel/workqueue.c:3267 [inline]
+ process_scheduled_works+0x8ef/0x14f0 kernel/workqueue.c:3348
+ worker_thread+0x91f/0xe50 kernel/workqueue.c:3429
+ kthread+0x2cb/0x360 kernel/kthread.c:388
+ ret_from_fork+0x4d/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
 
->
-> diff --git a/doc/org.bluez.MediaTransport.rst b/doc/org.bluez.MediaTransp=
-ort.rst
-> index 4838d69d0..78789bc80 100644
-> --- a/doc/org.bluez.MediaTransport.rst
-> +++ b/doc/org.bluez.MediaTransport.rst
-> @@ -119,7 +119,8 @@ uint16 Delay [readwrite, optional]
->  ``````````````````````````````````
->
->         Transport delay in 1/10 of millisecond, this property is only wri=
-teable
-> -       when the transport was acquired by the sender.
-> +       when the transport corresponds to a sink endpoint and it was acqu=
-ired by
-> +       the sender.
->
->  uint16 Volume [readwrite, optional]
->  ```````````````````````````````````
-> diff --git a/gdbus/gdbus.h b/gdbus/gdbus.h
-> index d7be17661..c1b182adb 100644
-> --- a/gdbus/gdbus.h
-> +++ b/gdbus/gdbus.h
-> @@ -308,6 +308,7 @@ guint g_dbus_add_properties_watch(DBusConnection *con=
-nection,
->  gboolean g_dbus_remove_watch(DBusConnection *connection, guint tag);
->  void g_dbus_remove_all_watches(DBusConnection *connection);
->
-> +const char *g_dbus_pending_property_get_sender(GDBusPendingPropertySet i=
-d);
->  void g_dbus_pending_property_success(GDBusPendingPropertySet id);
->  void g_dbus_pending_property_error_valist(GDBusPendingReply id,
->                         const char *name, const char *format, va_list arg=
-s);
-> diff --git a/gdbus/object.c b/gdbus/object.c
-> index 72d2d46e3..e40c7c5bc 100644
-> --- a/gdbus/object.c
-> +++ b/gdbus/object.c
-> @@ -430,28 +430,45 @@ static gboolean check_privilege(DBusConnection *con=
-n, DBusMessage *msg,
->  static GDBusPendingPropertySet next_pending_property =3D 1;
->  static GSList *pending_property_set;
->
-> +static int pending_property_data_compare_id(const void *data,
-> +                                               const void *user_data)
-> +{
-> +       const struct property_data *propdata =3D data;
-> +       const GDBusPendingPropertySet *id =3D user_data;
-> +       return propdata->id - *id;
-> +}
-> +
->  static struct property_data *remove_pending_property_data(
->                                                 GDBusPendingPropertySet i=
-d)
->  {
->         struct property_data *propdata;
->         GSList *l;
->
-> -       for (l =3D pending_property_set; l !=3D NULL; l =3D l->next) {
-> -               propdata =3D l->data;
-> -               if (propdata->id !=3D id)
-> -                       continue;
-> -
-> -               break;
-> -       }
-> -
-> +       l =3D g_slist_find_custom(pending_property_set, &id,
-> +                               pending_property_data_compare_id);
->         if (l =3D=3D NULL)
->                 return NULL;
->
-> +       propdata =3D l->data;
->         pending_property_set =3D g_slist_delete_link(pending_property_set=
-, l);
->
->         return propdata;
->  }
->
-> +const char *g_dbus_pending_property_get_sender(GDBusPendingPropertySet i=
-d)
-> +{
-> +       struct property_data *propdata;
-> +       GSList *l;
-> +
-> +       l =3D g_slist_find_custom(pending_property_set, &id,
-> +                                       pending_property_data_compare_id)=
-;
-> +       if (l =3D=3D NULL)
-> +               return NULL;
-> +
-> +       propdata =3D l->data;
-> +       return dbus_message_get_sender(propdata->message);
-> +}
-> +
->  void g_dbus_pending_property_success(GDBusPendingPropertySet id)
->  {
->         struct property_data *propdata;
-> diff --git a/profiles/audio/transport.c b/profiles/audio/transport.c
-> index 0f7909a94..dad8604eb 100644
-> --- a/profiles/audio/transport.c
-> +++ b/profiles/audio/transport.c
-> @@ -116,6 +116,7 @@ struct media_transport_ops {
->         void *(*get_stream)(struct media_transport *transport);
->         int8_t (*get_volume)(struct media_transport *transport);
->         int (*set_volume)(struct media_transport *transport, int8_t level=
-);
-> +       int (*set_delay)(struct media_transport *transport, uint16_t dela=
-y);
->         void (*update_links)(const struct media_transport *transport);
->         GDestroyNotify destroy;
->  };
-> @@ -551,6 +552,36 @@ static int transport_a2dp_snk_set_volume(struct medi=
-a_transport *transport,
->         return avrcp_set_volume(transport->device, level, notify);
->  }
->
-> +static int transport_a2dp_snk_set_delay(struct media_transport *transpor=
-t,
-> +                                       uint16_t delay)
-> +{
-> +       struct a2dp_transport *a2dp =3D transport->data;
-> +       struct avdtp_stream *stream;
-> +
-> +       if (a2dp->delay =3D=3D delay)
-> +               return 0;
-> +
-> +       if (a2dp->session =3D=3D NULL) {
-> +               a2dp->session =3D a2dp_avdtp_get(transport->device);
-> +               if (a2dp->session =3D=3D NULL)
-> +                       return -EIO;
-> +       }
-> +
-> +       stream =3D media_transport_get_stream(transport);
-> +       if (stream =3D=3D NULL)
-> +               return -EIO;
-> +
-> +       if (a2dp->watch) {
-> +               a2dp->delay =3D delay;
-> +               g_dbus_emit_property_changed(btd_get_dbus_connection(),
-> +                                               transport->path,
-> +                                               MEDIA_TRANSPORT_INTERFACE=
-,
-> +                                               "Delay");
-> +       }
-> +
-> +       return avdtp_delay_report(a2dp->session, stream, delay);
-> +}
-> +
->  static void media_owner_exit(DBusConnection *connection, void *user_data=
-)
->  {
->         struct media_owner *owner =3D user_data;
-> @@ -873,7 +904,7 @@ static gboolean delay_reporting_exists(const GDBusPro=
-pertyTable *property,
->         return avdtp_stream_has_delay_reporting(stream);
->  }
->
-> -static gboolean get_delay_reporting(const GDBusPropertyTable *property,
-> +static gboolean get_delay_report(const GDBusPropertyTable *property,
->                                         DBusMessageIter *iter, void *data=
-)
->  {
->         struct media_transport *transport =3D data;
-> @@ -884,6 +915,61 @@ static gboolean get_delay_reporting(const GDBusPrope=
-rtyTable *property,
->         return TRUE;
->  }
->
-> +static int media_transport_set_delay(struct media_transport *transport,
-> +                                       uint16_t delay)
-> +{
-> +       DBG("Transport %s delay %d", transport->path, delay);
-> +
-> +       if (transport->ops && transport->ops->set_delay)
-> +               return transport->ops->set_delay(transport, delay);
-> +
-> +       return 0;
-> +}
-> +
-> +static void set_delay_report(const GDBusPropertyTable *property,
-> +                               DBusMessageIter *iter, GDBusPendingProper=
-tySet id,
-> +                               void *data)
-> +{
-> +       struct media_transport *transport =3D data;
-> +       struct media_owner *owner =3D transport->owner;
-> +       const char *sender;
-> +       uint16_t arg;
-> +       int err;
-> +
-> +       if (owner !=3D NULL) {
-> +               /* If the transport is acquired, do not allow to modify
-> +                * the delay anyone but the owner. */
-> +               sender =3D g_dbus_pending_property_get_sender(id);
-> +               if (g_strcmp0(owner->name, sender) !=3D 0) {
-> +                       g_dbus_pending_property_error(id,
-> +                                       ERROR_INTERFACE ".NotAuthorized",
-> +                                       "Operation Not Authorized");
-> +                       return;
-> +               }
-> +       }
-> +
-> +       if (dbus_message_iter_get_arg_type(iter) !=3D DBUS_TYPE_UINT16) {
-> +               g_dbus_pending_property_error(id,
-> +                               ERROR_INTERFACE ".InvalidArguments",
-> +                               "Expected UINT16");
-> +               return;
-> +       }
-> +
-> +       dbus_message_iter_get_basic(iter, &arg);
-> +
-> +       err =3D media_transport_set_delay(transport, arg);
-> +       if (err) {
-> +               error("Unable to set delay: %s (%d)", strerror(-err), err=
-);
-> +               g_dbus_pending_property_error(id,
-> +                                               ERROR_INTERFACE ".Failed"=
-,
-> +                                               "Internal error %s (%d)",
-> +                                               strerror(-err), err);
-> +               return;
-> +       }
-> +
-> +       g_dbus_pending_property_success(id);
-> +}
-> +
->  static gboolean volume_exists(const GDBusPropertyTable *property, void *=
-data)
->  {
->         struct media_transport *transport =3D data;
-> @@ -1019,7 +1105,7 @@ static const GDBusPropertyTable transport_a2dp_prop=
-erties[] =3D {
->         { "Codec", "y", get_codec },
->         { "Configuration", "ay", get_configuration },
->         { "State", "s", get_state },
-> -       { "Delay", "q", get_delay_reporting, NULL, delay_reporting_exists=
- },
-> +       { "Delay", "q", get_delay_report, set_delay_report, delay_reporti=
-ng_exists },
->         { "Volume", "q", get_volume, set_volume, volume_exists },
->         { "Endpoint", "o", get_endpoint, NULL, endpoint_exists,
->                                 G_DBUS_PROPERTY_FLAG_EXPERIMENTAL },
-> @@ -2170,7 +2256,7 @@ static void *transport_asha_init(struct media_trans=
-port *transport, void *data)
->
->  #define TRANSPORT_OPS(_uuid, _props, _set_owner, _remove_owner, _init, \
->                       _resume, _suspend, _cancel, _set_state, _get_stream=
-, \
-> -                     _get_volume, _set_volume, _update_links, _destroy) =
-\
-> +                     _get_volume, _set_volume, _set_delay, _update_links=
-, _destroy) \
->  { \
->         .uuid =3D _uuid, \
->         .properties =3D _props, \
-> @@ -2184,16 +2270,17 @@ static void *transport_asha_init(struct media_tra=
-nsport *transport, void *data)
->         .get_stream =3D _get_stream, \
->         .get_volume =3D _get_volume, \
->         .set_volume =3D _set_volume, \
-> +       .set_delay =3D _set_delay, \
->         .update_links =3D _update_links, \
->         .destroy =3D _destroy \
->  }
->
-> -#define A2DP_OPS(_uuid, _init, _set_volume, _destroy) \
-> +#define A2DP_OPS(_uuid, _init, _set_volume, _set_delay, _destroy) \
->         TRANSPORT_OPS(_uuid, transport_a2dp_properties, NULL, NULL, _init=
-, \
->                         transport_a2dp_resume, transport_a2dp_suspend, \
->                         transport_a2dp_cancel, NULL, \
->                         transport_a2dp_get_stream, transport_a2dp_get_vol=
-ume, \
-> -                       _set_volume, NULL, _destroy)
-> +                       _set_volume, _set_delay, NULL, _destroy)
->
->  #define BAP_OPS(_uuid, _props, _set_owner, _remove_owner, _update_links,=
- \
->                 _set_state) \
-> @@ -2201,7 +2288,7 @@ static void *transport_asha_init(struct media_trans=
-port *transport, void *data)
->                         transport_bap_init, \
->                         transport_bap_resume, transport_bap_suspend, \
->                         transport_bap_cancel, _set_state, \
-> -                       transport_bap_get_stream, NULL, NULL, _update_lin=
-ks, \
-> +                       transport_bap_get_stream, NULL, NULL, NULL, _upda=
-te_links, \
->                         transport_bap_destroy)
->
->  #define BAP_UC_OPS(_uuid) \
-> @@ -2219,14 +2306,16 @@ static void *transport_asha_init(struct media_tra=
-nsport *transport, void *data)
->                         transport_asha_resume, transport_asha_suspend, \
->                         transport_asha_cancel, NULL, NULL, \
->                         transport_asha_get_volume, transport_asha_set_vol=
-ume, \
-> -                       NULL, NULL)
-> +                       NULL, NULL, NULL)
->
->  static const struct media_transport_ops transport_ops[] =3D {
->         A2DP_OPS(A2DP_SOURCE_UUID, transport_a2dp_src_init,
->                         transport_a2dp_src_set_volume,
-> +                       NULL,
->                         transport_a2dp_src_destroy),
->         A2DP_OPS(A2DP_SINK_UUID, transport_a2dp_snk_init,
->                         transport_a2dp_snk_set_volume,
-> +                       transport_a2dp_snk_set_delay,
->                         transport_a2dp_snk_destroy),
->         BAP_UC_OPS(PAC_SOURCE_UUID),
->         BAP_UC_OPS(PAC_SINK_UUID),
-> --
-> 2.39.5
->
->
+Fixes: abfeea476c68 ("Bluetooth: hci_sync: Convert MGMT_OP_START_DISCOVERY")
 
+Signed-off-by: Sungwoo Kim <iam@sung-woo.kim>
+---
+v1 -> v2: make __hci_cmd_sync_sk() not return NULL
+v2 -> v3: elaborate reasoning
 
---=20
-Luiz Augusto von Dentz
+ net/bluetooth/hci_sync.c | 18 +++++++++++-------
+ 1 file changed, 11 insertions(+), 7 deletions(-)
+
+diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+index 9482bd562..c86f4e42e 100644
+--- a/net/bluetooth/hci_sync.c
++++ b/net/bluetooth/hci_sync.c
+@@ -206,6 +206,12 @@ struct sk_buff *__hci_cmd_sync_sk(struct hci_dev *hdev, u16 opcode, u32 plen,
+ 		return ERR_PTR(err);
+ 	}
+ 
++	/* If command return a status event skb will be set to NULL as there are
++	 * no parameters.
++	 */
++	if (!skb)
++		return ERR_PTR(-ENODATA);
++
+ 	return skb;
+ }
+ EXPORT_SYMBOL(__hci_cmd_sync_sk);
+@@ -255,6 +261,11 @@ int __hci_cmd_sync_status_sk(struct hci_dev *hdev, u16 opcode, u32 plen,
+ 	u8 status;
+ 
+ 	skb = __hci_cmd_sync_sk(hdev, opcode, plen, param, event, timeout, sk);
++
++	/* If command return a status event, skb will be set to -ENODATA */
++	if (skb == ERR_PTR(-ENODATA))
++		return 0;
++
+ 	if (IS_ERR(skb)) {
+ 		if (!event)
+ 			bt_dev_err(hdev, "Opcode 0x%4.4x failed: %ld", opcode,
+@@ -262,13 +273,6 @@ int __hci_cmd_sync_status_sk(struct hci_dev *hdev, u16 opcode, u32 plen,
+ 		return PTR_ERR(skb);
+ 	}
+ 
+-	/* If command return a status event skb will be set to NULL as there are
+-	 * no parameters, in case of failure IS_ERR(skb) would have be set to
+-	 * the actual error would be found with PTR_ERR(skb).
+-	 */
+-	if (!skb)
+-		return 0;
+-
+ 	status = skb->data[0];
+ 
+ 	kfree_skb(skb);
+-- 
+2.43.0
+
