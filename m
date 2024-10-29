@@ -1,136 +1,197 @@
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f181.google.com (mail-lj1-f181.google.com [209.85.208.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81B707464
-	for <linux-bluetooth@vger.kernel.org>; Tue, 29 Oct 2024 11:59:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C66512114;
+	Tue, 29 Oct 2024 14:00:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730203145; cv=none; b=LsA8Qy4+K9WvuQ0ZmAcpt9o6yPMV+a5SB/wgCzLoyeGrWpwVz5Mz3J2i4oP3ytwLXl1098fTaGwRedBws8U0Vs5hGzzL/A8tDL85SqvFH3boyPGz1osXA4H32tuaxBG0ITN4DB6c35GdRmfHZQxnOJpH5WgGbFVnvHTH1JFIKZQ=
+	t=1730210449; cv=none; b=kk9qaR4XBEiLr5WafAzWaOs5NnuhVcGKoxxXBcj7RoY6fLGmtbTeiAlTddlb1bj0dkBfIKCwvvDtM94i9ir0rlK4rrAgQPHwHzpoW58glOC7TpxPWu/Qwwf9KaBXBqfCmruKUMZjUk0q3rtqtW/BrTAldRZspq5PvSFoFBVhBuU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730203145; c=relaxed/simple;
-	bh=bDyb5Rwxq3Cy+8JGVN2dneh9+lJGIoWCSXwFaaulY2M=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=AobZMfxmDbk5NjbGsnuEE8VUCgzr+78bnNTDpTgNl2dAiirGVao3me6sJS5GVhoF2NZmoHOBvSbg6IEUhpRKg5E2MwI7DFhw103ptOPbBzqcra2FEAdb8DCqXwv6pGxG4NvGftsUTWC6BKeKM0ENkotQTp8R3Fb19w7hsau7I4g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=FkT0aSrH; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+	s=arc-20240116; t=1730210449; c=relaxed/simple;
+	bh=lHwjzQwwi2GIbhYJDSVVMLbyCXgotdotxz1qHcAHyCE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=RADgbwZ/Qu6G73WjBbfetiHt2xtOXC4CyaYZxrvUyk479/yvne+3WtKpBr9rZ/gtG+Q3llKZeHvykQpmORJJRaAWVjFuAlxfs80uvGw7N4ld+TTP3a3EpN3dIY0HVp9mAjxhy0pxJnXTSQm17rs6Jm/6HVZy7uNuswcFR8RcdJs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EpwdL1ZH; arc=none smtp.client-ip=209.85.208.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="FkT0aSrH"
-Received: from pps.filterd (m0279868.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 49TATZkG017467;
-	Tue, 29 Oct 2024 11:59:01 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	bDyb5Rwxq3Cy+8JGVN2dneh9+lJGIoWCSXwFaaulY2M=; b=FkT0aSrH4a9Jb3eq
-	fjfLBVSY5xLREOcga4IlptDLV6JkEvuqm8e19KtGX+gP/79AJkNOLrDpxI7A7P8k
-	RKt52D7dOUI71yEf6kbDRjmurArlKCJ3fxG7r+o5UJ47b0WlitcluYD1/MIseXDw
-	fke+7+xUkj93kzxS5oxEJ1GZxusL+vezDM7mrygZdkCwW351p2ekUkYTcvGYkA9M
-	uOXU1jrlT1TK0vexF/yqIVtVFyJMDZIP7ApOFi3MToxgzt8MSdSexMqhzYaNNzKs
-	u/fTWOyoyudP93lO71WdMeDNZhzfB5Qa6e7raSYVgNN5FstF5apSX648/1KRLWdj
-	UsszOw==
-Received: from nasanppmta01.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 42gqrgr7p7-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 29 Oct 2024 11:59:01 +0000 (GMT)
-Received: from nasanex01b.na.qualcomm.com (nasanex01b.na.qualcomm.com [10.46.141.250])
-	by NASANPPMTA01.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 49TBx0Xx018952
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 29 Oct 2024 11:59:00 GMT
-Received: from nasanex01c.na.qualcomm.com (10.45.79.139) by
- nasanex01b.na.qualcomm.com (10.46.141.250) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.9; Tue, 29 Oct 2024 04:59:00 -0700
-Received: from nasanex01c.na.qualcomm.com ([fe80::cfa9:539b:fb6d:d257]) by
- nasanex01c.na.qualcomm.com ([fe80::cfa9:539b:fb6d:d257%13]) with mapi id
- 15.02.1544.009; Tue, 29 Oct 2024 04:58:59 -0700
-From: "Amisha Jain (QUIC)" <quic_amisjain@quicinc.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-CC: "Mohammed Sameer Mulla (QUIC)" <quic_mohamull@quicinc.com>,
-        "Harish Bandi
- (QUIC)" <quic_hbandi@quicinc.com>,
-        "Anubhav Gupta (QUIC)"
-	<quic_anubhavg@quicinc.com>
-Subject: RE: [PATCH v1] obex : Fix for PBAP GET request in PTS testing
-Thread-Topic: [PATCH v1] obex : Fix for PBAP GET request in PTS testing
-Thread-Index: AQHbKSoIN1jpndj60EOJZSA+JzT4a7KcreMAgAFo/gA=
-Date: Tue, 29 Oct 2024 11:58:59 +0000
-Message-ID: <bb86f6f947174e85813b225d8a51f101@quicinc.com>
-References: <20241028105326.3159618-1-quic_amisjain@quicinc.com>
- <CABBYNZKj+pr5yLmrOEcDH9LCDBpvaq0XeBuN8nDzB1SnkNbY-Q@mail.gmail.com>
-In-Reply-To: <CABBYNZKj+pr5yLmrOEcDH9LCDBpvaq0XeBuN8nDzB1SnkNbY-Q@mail.gmail.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EpwdL1ZH"
+Received: by mail-lj1-f181.google.com with SMTP id 38308e7fff4ca-2fb5743074bso44777711fa.1;
+        Tue, 29 Oct 2024 07:00:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1730210445; x=1730815245; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ojZC2nOVUDIw/kk3Ky4Vr0ESQa/hg/6z1X5oOfns3vs=;
+        b=EpwdL1ZHNQHx4PhBcgfB1Iy/Lme1z1YZI9HZfG7KPO+YoS3nEjtSUIVgDfEIQefpOm
+         eiQNU0GBdqj1rI7N0l90EqC3Ob8EDFAPf7zjET2Sp8DeeXQK5LcBrhP8dGm7QuXKic1z
+         14pdm0PkenOwmciXxJyTzEcBl4J7m28+lnso/vo0Qo/ViCYQj5IeI7uICnasYVEEp1tw
+         sqD2QDDx1MVhZgV53HQ0XiIxUXlRUFZWZmjF3OonnRSlQGzTY+kMyKGyMRQfO3ukGVhk
+         v/GMecScCdWUVEiMRMMwD44/BuB+mdKADd5851DeFKPvM7n0e4ywDWi70xL1cLEYeogl
+         DF6w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730210445; x=1730815245;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ojZC2nOVUDIw/kk3Ky4Vr0ESQa/hg/6z1X5oOfns3vs=;
+        b=vdES1E2WWY3GKnw76zIXaGXbodUgGXehOFMu1Bj4QDrBOfnGGrhjtX2mWDi4IhoUxI
+         i3uIPxQ2OPyYB3BlfLVGy0hYjJtzGReVgJa4ilwZYsRyC7WqQzARe7pNU7WAwxxshbKr
+         cc7S34wrEXL+MQpap059k+Nfab7VVkEYr6B9g0AsbQh17IpRrCLCokByna5nt/kxLxGe
+         evC0SUXkANlevolKgxtskEhyNGivvb+RhekDCxVACP7854njZHxBhO/Bx0S37qRWMgv2
+         9SQBFBzfRPqw/6Y1LaX3KGyxXXb8f2lZxQd2VPOe6APZKgSoT8PplBi6YUulIy8YERfU
+         nPlw==
+X-Forwarded-Encrypted: i=1; AJvYcCWT+W7vaJec15jW3blRt3+01kyFy7hrPWNoCa7hrNbFNljMdAMII3lbSgtYXkuj+TqCvZBuM7DA1zGWR5zP@vger.kernel.org, AJvYcCX45TVC8vbQJkq2jR2yr57Szfd/dD+AEtuDrYUc4xioDt3Ln/yaiPOCcqh56fE6aVPYmLbLx2Dot7sNZXOVAzE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyvHeq4G1C20L7+nyFUL2HAhWoq+gaW08Y3K5h41cmzgOoS4fhZ
+	Na/XB5zpT+YMT6mNGtQUHZJGAI5X7GZ9l51jsD0Od3+380BNzAfirGSMulptmF7JZn1nzbZ0Y85
+	s718ea8N1He6M/fOlof8sHLq4GHk=
+X-Google-Smtp-Source: AGHT+IGyLicUjMryDek+bmwKdouHVchiYaZzGyv6G1gDH2j/bTbYVOYl/80NFLgKqsCXy4pIKu4L6SRBQzYsw7rj3+c=
+X-Received: by 2002:a2e:a983:0:b0:2fb:5d19:4689 with SMTP id
+ 38308e7fff4ca-2fcdc7604b2mr7487751fa.1.1730210444584; Tue, 29 Oct 2024
+ 07:00:44 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: j5-CERsAFWlrRHjDu4fjTXIahM-SAtS8
-X-Proofpoint-GUID: j5-CERsAFWlrRHjDu4fjTXIahM-SAtS8
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
- definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 malwarescore=0
- clxscore=1015 impostorscore=0 suspectscore=0 spamscore=0 mlxscore=0
- adultscore=0 priorityscore=1501 mlxlogscore=999 phishscore=0
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2409260000 definitions=main-2410290093
+References: <20240706225124.1247944-1-iam@sung-woo.kim> <CAJNyHp+2eAeau9peWPL7J2Mq3p26FdFzk8mPOCchxCw+26sevA@mail.gmail.com>
+In-Reply-To: <CAJNyHp+2eAeau9peWPL7J2Mq3p26FdFzk8mPOCchxCw+26sevA@mail.gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Tue, 29 Oct 2024 10:00:31 -0400
+Message-ID: <CABBYNZJp102JWcUt-qke0QYB1Tfta6C+hYAStCcopDckgT_EUw@mail.gmail.com>
+Subject: Re: [PATCH v2] Bluetooth: hci: fix null-ptr-deref in hci_read_supported_codecs
+To: Sungwoo Kim <iam@sung-woo.kim>
+Cc: daveti@purdue.edu, benquike@gmail.com, 
+	Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg <johan.hedberg@gmail.com>, 
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-SGkgTHVpeiwNClRoZSBkZWZhdWx0IHBhcmFtIGFkZGVkIGhlcmUgaXMgY29ycmVzcG9uZGluZyB0
-byAnTWF4bGlzdENvdW50JyBhdHRyaWJ1dGUgKHRhZyBpZCAtIDB4MDQpIHdoaWNoIHNob3VsZCBi
-ZSA2NTUzNSBpZiBpdCBpcyBub3Qgc3BlY2lmaWVkIGJ5IGNsaWVudCBhcyBwZXIgdGhlIFBCQVAg
-c3BlYy4gVGhlIHZhbHVlIDY1NTM1IG1lYW5zIHRoYXQgdGhlIG51bWJlciBvZiBlbnRyaWVzIGlz
-IG5vdCByZXN0cmljdGVkLg0KSGVyZSBpcyB0aGUgZXhwbGFuYXRpb24gb2YgYXBwbGljYXRpb24g
-cGFyYW1ldGVyIGhlYWRlciAtIA0KZGVmYXVsdF9hcHBhcmFtc1tdID0geyAweDA0LCAweDAyLCAw
-eGZmLCAweGZmIH0NCg0KICAgICAgMHgwNCAtIFRhZyBpZCAoZm9yIE1heGxpc3RDb3VudCkNCiAg
-ICAgIDB4MDIgLSBsZW5ndGgNCiAgICAgIG5leHQgMiBieXRlcyBhcmUgdmFsdWUgLSAweGZmZmYN
-Cg0KVGhhbmtzLA0KQW1pc2hhDQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJv
-bTogTHVpeiBBdWd1c3RvIHZvbiBEZW50eiA8bHVpei5kZW50ekBnbWFpbC5jb20+DQo+IFNlbnQ6
-IE1vbmRheSwgT2N0b2JlciAyOCwgMjAyNCA3OjU3IFBNDQo+IFRvOiBBbWlzaGEgSmFpbiAoUVVJ
-QykgPHF1aWNfYW1pc2phaW5AcXVpY2luYy5jb20+DQo+IENjOiBsaW51eC1ibHVldG9vdGhAdmdl
-ci5rZXJuZWwub3JnOyBNb2hhbW1lZCBTYW1lZXIgTXVsbGEgKFFVSUMpDQo+IDxxdWljX21vaGFt
-dWxsQHF1aWNpbmMuY29tPjsgSGFyaXNoIEJhbmRpIChRVUlDKQ0KPiA8cXVpY19oYmFuZGlAcXVp
-Y2luYy5jb20+OyBBbnViaGF2IEd1cHRhIChRVUlDKQ0KPiA8cXVpY19hbnViaGF2Z0BxdWljaW5j
-LmNvbT4NCj4gU3ViamVjdDogUmU6IFtQQVRDSCB2MV0gb2JleCA6IEZpeCBmb3IgUEJBUCBHRVQg
-cmVxdWVzdCBpbiBQVFMgdGVzdGluZw0KPiANCj4gV0FSTklORzogVGhpcyBlbWFpbCBvcmlnaW5h
-dGVkIGZyb20gb3V0c2lkZSBvZiBRdWFsY29tbS4gUGxlYXNlIGJlIHdhcnkNCj4gb2YgYW55IGxp
-bmtzIG9yIGF0dGFjaG1lbnRzLCBhbmQgZG8gbm90IGVuYWJsZSBtYWNyb3MuDQo+IA0KPiBIaSBB
-bWlzaGEsDQo+IA0KPiBPbiBNb24sIE9jdCAyOCwgMjAyNCBhdCA3OjEw4oCvQU0gQW1pc2hhIEph
-aW4gPHF1aWNfYW1pc2phaW5AcXVpY2luYy5jb20+DQo+IHdyb3RlOg0KPiA+DQo+ID4gVGhpcyBj
-aGFuZ2UgaXMgcmVxdWlyZWQgZm9yIHBhc3NpbmcgYmVsb3cgUFRTIHRlc3RjYXNlcyAtIDEuDQo+
-ID4gUEJBUC9QU0UvUEJEL0JWLTAyLUMgMi4gUEJBUC9QU0UvUEJEL0JWLTAzLUMgMy4gUEJBUC9Q
-U0UvUEJEL0JJLTAxLUMNCj4gPiA0LiBQQkFQL1BTRS9QQkQvQlYtMTMtQyA1LiBQQkFQL1BTRS9Q
-QkQvQlYtMTQtQyA2Lg0KPiA+IFBCQVAvUFNFL1BCRC9CVi0xNy1DDQo+ID4NCj4gPiBGb3IgYWxs
-IHRoZSBHRVQgcGhvbmVib29rIHJlcXVlc3Qgc2VudCBieSBQVFMgaGFzIG5vIGV4dHJhIHBhcmFt
-cw0KPiA+IGFkZGVkIGluIGl0LCB0aGVyZWZvcmUgUEJBUCBzZXJ2ZXIgaXMgcmVqZWN0aW5nIHRo
-ZSByZXF1ZXN0IGJ5IHNlbmRpbmcNCj4gPiAnQmFkIFJlcXVlc3QnIGFzIHJlc3BvbnNlLg0KPiA+
-IFNvIGFwcGVuZGluZyBmZXcgZGVmYXVsdCBwYXJhbXMgaW4gR0VUIHJlcXVlc3QgdG8gYXZvaWQg
-dGVzdGNhc2UNCj4gPiBmYWlsdXJlLg0KPiA+DQo+ID4gLS0tDQo+ID4gIG9iZXhkL3BsdWdpbnMv
-cGJhcC5jIHwgNSArKysrKw0KPiA+ICAxIGZpbGUgY2hhbmdlZCwgNSBpbnNlcnRpb25zKCspDQo+
-ID4NCj4gPiBkaWZmIC0tZ2l0IGEvb2JleGQvcGx1Z2lucy9wYmFwLmMgYi9vYmV4ZC9wbHVnaW5z
-L3BiYXAuYyBpbmRleA0KPiA+IDQxNzVmOWRlOC4uM2MyMzgxNWJhIDEwMDY0NA0KPiA+IC0tLSBh
-L29iZXhkL3BsdWdpbnMvcGJhcC5jDQo+ID4gKysrIGIvb2JleGQvcGx1Z2lucy9wYmFwLmMNCj4g
-PiBAQCAtNTI0LDYgKzUyNCwxMSBAQCBzdGF0aWMgaW50IHBiYXBfZ2V0KHN0cnVjdCBvYmV4X3Nl
-c3Npb24gKm9zLCB2b2lkDQo+ICp1c2VyX2RhdGEpDQo+ID4gICAgICAgICAgICAgICAgIH07DQo+
-ID4gICAgICAgICAgICAgICAgIGJ1ZmZlciA9IGRlZmF1bHRfYXBwYXJhbXM7DQo+ID4gICAgICAg
-ICAgICAgICAgIHJzaXplID0gc2l6ZW9mKGRlZmF1bHRfYXBwYXJhbXMpOw0KPiA+ICsgICAgICAg
-fSBlbHNlIGlmICghcnNpemUgJiYgZ19hc2NpaV9zdHJjYXNlY21wKHR5cGUsIFBIT05FQk9PS19U
-WVBFKQ0KPiA+ICsgPT0gMCkgew0KPiANCj4gSG1tLCB3aGVyZSBkbyB0aGVzZSB2YWx1ZXMgY29t
-ZSBmcm9tIHRob3VnaD8gQXJlIHRoZXkgZGVmaW5lZCBpbiB0aGUNCj4gUEJBUCBzcGVjLCBpZiB0
-aGV5IGFyZSB0aGVuIHdlIGNhbiBwcm9iYWJseSBxdW90ZSB0aGUgc3BlYy4NCj4gDQo+ID4gKyAg
-ICAgICAgICAgICAgIHN0YXRpYyBjb25zdCB1aW50OF90IGRlZmF1bHRfYXBwYXJhbXNbXSA9IHsN
-Cj4gPiArICAgICAgICAgICAgICAgICAgICAgICAweDA0LCAweDAyLCAweGZmLCAweGZmIH07DQo+
-ID4gKyAgICAgICAgICAgICAgIGJ1ZmZlciA9IGRlZmF1bHRfYXBwYXJhbXM7DQo+ID4gKyAgICAg
-ICAgICAgICAgIHJzaXplID0gc2l6ZW9mKGRlZmF1bHRfYXBwYXJhbXMpOw0KPiA+ICAgICAgICAg
-fQ0KPiA+DQo+ID4gICAgICAgICBwYXJhbXMgPSBwYXJzZV9hcGFyYW0oYnVmZmVyLCByc2l6ZSk7
-DQo+ID4gLS0NCj4gPiAyLjM0LjENCj4gPg0KPiA+DQo+IA0KPiANCj4gLS0NCj4gTHVpeiBBdWd1
-c3RvIHZvbiBEZW50eg0K
+Hi Sungwoo,
+
+On Mon, Oct 28, 2024 at 10:41=E2=80=AFPM Sungwoo Kim <iam@sung-woo.kim> wro=
+te:
+>
+> Dear Luiz, could you review this? This bug and fix are still valid but
+> have been forgotten for some reason.
+
+Please resend.
+
+> On Sat, Jul 6, 2024 at 6:53=E2=80=AFPM Sungwoo Kim <iam@sung-woo.kim> wro=
+te:
+> >
+> > __hci_cmd_sync_sk() returns NULL if a command returns a status event
+> > as there are no parameters.
+> > Fix __hci_cmd_sync_sk() to not return NULL.
+> >
+> > KASAN: null-ptr-deref in range [0x0000000000000070-0x0000000000000077]
+> > CPU: 1 PID: 2000 Comm: kworker/u9:5 Not tainted 6.9.0-ga6bcb805883c-dir=
+ty #10
+> > Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.15.0-1 04=
+/01/2014
+> > Workqueue: hci7 hci_power_on
+> > RIP: 0010:hci_read_supported_codecs+0xb9/0x870 net/bluetooth/hci_codec.=
+c:138
+> > Code: 08 48 89 ef e8 b8 c1 8f fd 48 8b 75 00 e9 96 00 00 00 49 89 c6 48=
+ ba 00 00 00 00 00 fc ff df 4c 8d 60 70 4c 89 e3 48 c1 eb 03 <0f> b6 04 13 =
+84 c0 0f 85 82 06 00 00 41 83 3c 24 02 77 0a e8 bf 78
+> > RSP: 0018:ffff888120bafac8 EFLAGS: 00010212
+> > RAX: 0000000000000000 RBX: 000000000000000e RCX: ffff8881173f0040
+> > RDX: dffffc0000000000 RSI: ffffffffa58496c0 RDI: ffff88810b9ad1e4
+> > RBP: ffff88810b9ac000 R08: ffffffffa77882a7 R09: 1ffffffff4ef1054
+> > R10: dffffc0000000000 R11: fffffbfff4ef1055 R12: 0000000000000070
+> > R13: 0000000000000000 R14: 0000000000000000 R15: ffff88810b9ac000
+> > FS:  0000000000000000(0000) GS:ffff8881f6c00000(0000) knlGS:00000000000=
+00000
+> > CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> > CR2: 00007f6ddaa3439e CR3: 0000000139764003 CR4: 0000000000770ef0
+> > PKRU: 55555554
+> > Call Trace:
+> >  <TASK>
+> >  hci_read_local_codecs_sync net/bluetooth/hci_sync.c:4546 [inline]
+> >  hci_init_stage_sync net/bluetooth/hci_sync.c:3441 [inline]
+> >  hci_init4_sync net/bluetooth/hci_sync.c:4706 [inline]
+> >  hci_init_sync net/bluetooth/hci_sync.c:4742 [inline]
+> >  hci_dev_init_sync net/bluetooth/hci_sync.c:4912 [inline]
+> >  hci_dev_open_sync+0x19a9/0x2d30 net/bluetooth/hci_sync.c:4994
+> >  hci_dev_do_open net/bluetooth/hci_core.c:483 [inline]
+> >  hci_power_on+0x11e/0x560 net/bluetooth/hci_core.c:1015
+> >  process_one_work kernel/workqueue.c:3267 [inline]
+> >  process_scheduled_works+0x8ef/0x14f0 kernel/workqueue.c:3348
+> >  worker_thread+0x91f/0xe50 kernel/workqueue.c:3429
+> >  kthread+0x2cb/0x360 kernel/kthread.c:388
+> >  ret_from_fork+0x4d/0x80 arch/x86/kernel/process.c:147
+> >  ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
+> >
+> > Fixes: abfeea476c68 ("Bluetooth: hci_sync: Convert MGMT_OP_START_DISCOV=
+ERY")
+> >
+> > Signed-off-by: Sungwoo Kim <iam@sung-woo.kim>
+> > ---
+> > v1 -> v2: make __hci_cmd_sync_sk() not return NULL
+> >
+> >  net/bluetooth/hci_sync.c | 18 +++++++++++-------
+> >  1 file changed, 11 insertions(+), 7 deletions(-)
+> >
+> > diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+> > index 76b283b8e..c4e4abc6e 100644
+> > --- a/net/bluetooth/hci_sync.c
+> > +++ b/net/bluetooth/hci_sync.c
+> > @@ -201,6 +201,12 @@ struct sk_buff *__hci_cmd_sync_sk(struct hci_dev *=
+hdev, u16 opcode, u32 plen,
+> >                 return ERR_PTR(err);
+> >         }
+> >
+> > +       /* If command return a status event skb will be set to NULL as =
+there are
+> > +        * no parameters.
+> > +        */
+> > +       if (!skb)
+> > +               return ERR_PTR(-ENODATA);
+> > +
+> >         return skb;
+> >  }
+> >  EXPORT_SYMBOL(__hci_cmd_sync_sk);
+> > @@ -250,6 +256,11 @@ int __hci_cmd_sync_status_sk(struct hci_dev *hdev,=
+ u16 opcode, u32 plen,
+> >         u8 status;
+> >
+> >         skb =3D __hci_cmd_sync_sk(hdev, opcode, plen, param, event, tim=
+eout, sk);
+> > +
+> > +       /* If command return a status event, skb will be set to -ENODAT=
+A */
+> > +       if (skb =3D=3D ERR_PTR(-ENODATA))
+> > +               return 0;
+> > +
+> >         if (IS_ERR(skb)) {
+> >                 if (!event)
+> >                         bt_dev_err(hdev, "Opcode 0x%4.4x failed: %ld", =
+opcode,
+> > @@ -257,13 +268,6 @@ int __hci_cmd_sync_status_sk(struct hci_dev *hdev,=
+ u16 opcode, u32 plen,
+> >                 return PTR_ERR(skb);
+> >         }
+> >
+> > -       /* If command return a status event skb will be set to NULL as =
+there are
+> > -        * no parameters, in case of failure IS_ERR(skb) would have be =
+set to
+> > -        * the actual error would be found with PTR_ERR(skb).
+> > -        */
+> > -       if (!skb)
+> > -               return 0;
+> > -
+> >         status =3D skb->data[0];
+> >
+> >         kfree_skb(skb);
+> > --
+> > 2.34.1
+> >
+
+
+
+--=20
+Luiz Augusto von Dentz
