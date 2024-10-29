@@ -1,245 +1,108 @@
-Received: from mail-lj1-f172.google.com (mail-lj1-f172.google.com [209.85.208.172])
+Received: from mail-yw1-f176.google.com (mail-yw1-f176.google.com [209.85.128.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACF1F195F22
-	for <linux-bluetooth@vger.kernel.org>; Tue, 29 Oct 2024 16:11:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4552A199E80;
+	Tue, 29 Oct 2024 16:23:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730218289; cv=none; b=lAIFctXJQyRREf199QDdZYkNxA6SecxQ64zjf3SqSx+HEbo2jsZnwulZpKULO+muB/fehu6Guo5cNd9+M58v2ONV7cHfoUtN5pD3bdIdBf13zMmWBv8rweebvi7rn/Vh8h+j2acBF1+Dm+vtDeIY8WhKJaGMJjiivANAIbnLSYM=
+	t=1730218985; cv=none; b=VNgyul50vI3eaEwOx9PSvHbwikMkSHV7qnAzChj3j8mGKaxcPJMfP9jHR3p08eJAAPYMNSLLoKhP6H7dRSqc8p6bQPAgNC0Hq20eXIECiZo7TAHHlOg5aUMEeziyf0uahinDbcVXaT1sedwIHeAuufKHzoG2rTvfMW7aD+08lCc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730218289; c=relaxed/simple;
-	bh=RfaqQw7QDXfvQQupw+KFQEoJZBbJOiOz+XshJxUYUt4=;
+	s=arc-20240116; t=1730218985; c=relaxed/simple;
+	bh=hnw3a4Xz8giAfeEUrg7HVp4lhnxcTB5sn16ndm/j+k4=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=P5+Z1SF4h/N35OTjLJERyz5R8WaxtYTI0f7WoZp8K7KhvMc19NF5o5k5WJnkQhXG9cbnGu74X7BbSR9Y3Eki+BH9aQcuqaPrvzloAFRmTysDH3wH6e9wGdQBZiVrypUDkbkPOIi/Lsx1cCw6sMvJ07PlQFZabwFCtIYcAmXL2KI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=F/aVu025; arc=none smtp.client-ip=209.85.208.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+	 To:Cc:Content-Type; b=lGNZ5jIRbELIuW5txmZ1TS9FSqwfuXdo2zbGjt8nzq+28f9ZKRXorQq76CqB3meqMftT/jFRdVThuzB+A9C+SGpkA+YFYPiBH+PhNgRlpycPCWjRV1Mz6v6S9kJ31h7qyLGhYnRjroeM05eRUndrHhoMtRgUzXMQJNrUZHnmKt4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.128.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="F/aVu025"
-Received: by mail-lj1-f172.google.com with SMTP id 38308e7fff4ca-2fb49510250so56400831fa.0
-        for <linux-bluetooth@vger.kernel.org>; Tue, 29 Oct 2024 09:11:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1730218285; x=1730823085; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=mGKSf1RQDoq4leQF9plpKCObOb5uYapRxzL7RO8b8jg=;
-        b=F/aVu025Mb3VLOjiXP6LPWCZE0p14D3GzpDpd9SREW6LwmJyehTA91a0YJlsUM33WR
-         G4GcnLZgXZwnsvdQlnkb3m8U1XUlFxvHjQwryBZrPNkNoUXGoHwChKTKkg+bTrh95+aK
-         fKSwTs3XeibarRYnzUSMHoGmuBBJYNdO0c8eaFyCM0cUO3NfhTmRFAVwHM1TacsizUb8
-         cHRze9LRyWacNZvdsSPD+B3LLneBYpTGLYjKCaIa/zcjOauI7vkwlISQoNt+I+fLD1Sm
-         KpQE+Ps6Iun4thBMoliTKsQU+Tg/ZAz98drm1mUFqV3AetkqAlTLcT4gy4w45EYVUNki
-         48jA==
+Received: by mail-yw1-f176.google.com with SMTP id 00721157ae682-6ea051d04caso20386167b3.0;
+        Tue, 29 Oct 2024 09:23:03 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730218285; x=1730823085;
+        d=1e100.net; s=20230601; t=1730218980; x=1730823780;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=mGKSf1RQDoq4leQF9plpKCObOb5uYapRxzL7RO8b8jg=;
-        b=eHD+SFugKphDyp29bZCTFLoGhxKpeZD/uyRYN9pESbGmXnhUCuE9bRQBBlDwqJisNf
-         i992EXLV/pFlcoEozIFwkSxZf0K9XmZbkleauzy0SOKxM3FcIhO3/P0jHcVju4B6RiMb
-         d20x7k5wgF6vtAO4373GoBffdg/uFTyQQV20Y4ZJhGsV/VoOgJ1mqTz6BGscHBlZZeJB
-         S8LHSec6E26Fjr79yrMmFQ3qNwsCJ+8FlByJybPhkmdpbeZItEVvgDK+uCyURbRAX6Ay
-         E63Yv01tSOaNswyks/zVolsClLkVbF7CdFM2mpzI5obD7+yeYfQ67ZExteVMpCkZ4UBh
-         5pLQ==
-X-Gm-Message-State: AOJu0YzRMFKGTgbvjD/twEfIWOreF7ZeDH25/+2Trq3ZFXh3LRhi6n2a
-	74Ef4HdT+eD/qz6SjSfZnxy/Pb2WcPiWqQZqzPgWb3Hh8/jEP41oe9U+noOm4/hv0feIQsHOend
-	OD/DxzSqnmyJys55p1ohDXKR/5JBXDQ==
-X-Google-Smtp-Source: AGHT+IFQ3Xqd35Swwo0jTdiBNeNfV/ZKD076hI/SmiH7op8atLW47unHGDYEvAKM8lPfkaHKgkSVk08aqU0vKDK4TnQ=
-X-Received: by 2002:a05:651c:2226:b0:2fb:51f3:9212 with SMTP id
- 38308e7fff4ca-2fcbdf5fa27mr65313661fa.6.1730218284702; Tue, 29 Oct 2024
- 09:11:24 -0700 (PDT)
+        bh=ROSe2v3U/1vSKBR72rtEBk3p8buCmeo4JYHedEhiUX8=;
+        b=VeWUUKRTPd/D66AKb+4KT3nswjq5Dhd6PI065BceAQmMApAtCluXkIzyNjYAx3hkUH
+         2EtvdCqG3wm/25D0nwwQ098FJ9MuCyKbp9ow9/0PRVZWpYWqL0Ug84KDzf34T6lXxxpk
+         xa8Z+P7ZSPo6bDlUJjqVF5vLLw3Imwq2NDuUkODqQGifjqIes+c8wJ0BsSBxi73IlGru
+         rTzy6LLopmLTerF3fCz5BscCI3zFI1xPntQiw1SCBY/M8VmqTmbaVUah8FyvzBAZ8TwJ
+         c79hr2Tlio6xnX9HPJAwLxE+D9ujCuzdImfgNL+x0j3AYMjbp/Ko3KwsKSdYtjyXsiOE
+         nazw==
+X-Forwarded-Encrypted: i=1; AJvYcCUTHplA4DGtCeblf3JpTODtajLRqcFmlNJsZ1MCeHeQyGMsZ8OBfv8MAIwpDDAmmN2jTki3e4EYdMtr/Tgs@vger.kernel.org, AJvYcCWQALwzlZWzdEm77yBFJJ7Xii2490dy/eQe3qvKu6vbcNv1bAza6HB2T/gaOgTyhkj9liKhOs7SNsUNMQUIfhs=@vger.kernel.org, AJvYcCWmLKFNg2UHgarc1Kj6UDXjCFokT9z/IRpws0tP7+z0CXhbrMjrbBtzsWfq1DcuiuSlKIW2MGLE/rQQFSxc@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyy71aOv5gKXCV8deOHu9WBy5lcxj4ed2ZYopTaSy5RWgFY5BLN
+	YirntAKmTUgHGCjNPS8WTZtmFd/IstDKF7MNAJGslOiX3yc1dMvEksfcBnXH
+X-Google-Smtp-Source: AGHT+IEiJzMtBL2USODF9wB49pZtOjVi7QAC4ridp46IJDGW+slkjk9Xsih4ve2PBsxn8bpOMq5UdQ==
+X-Received: by 2002:a05:690c:6085:b0:6d5:7b2f:60a0 with SMTP id 00721157ae682-6e9d8afb26dmr131442847b3.34.1730218980363;
+        Tue, 29 Oct 2024 09:23:00 -0700 (PDT)
+Received: from mail-yw1-f169.google.com (mail-yw1-f169.google.com. [209.85.128.169])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-6e9c6c193b6sm20001877b3.66.2024.10.29.09.22.59
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 29 Oct 2024 09:22:59 -0700 (PDT)
+Received: by mail-yw1-f169.google.com with SMTP id 00721157ae682-6ea051d04caso20385607b3.0;
+        Tue, 29 Oct 2024 09:22:59 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCUkIyt1iOsZ8/lmwDQE4HSNwnIxEKdjV9AU5+tJYLFdOd94g2oEqxC1L/CLvZXrOeMB5SUdDWSMbspX2k3O@vger.kernel.org, AJvYcCVtgarZtNV5XeVSPDi8+JDYNYZmLQfy/0Q5LZ2Er66wkK+kHCJJw7b5kjdGrHfLqdlEkpjlJScB+HwgX1cG@vger.kernel.org, AJvYcCWGC1JusvWfaC8ok+B25eeldXRhu7NqTCXAXJeG285DjNnvusAkK7Q2a/so5UkyZDnPg22qeeiaOWtUpwkOLOo=@vger.kernel.org
+X-Received: by 2002:a05:690c:60c1:b0:6e3:36cc:eb74 with SMTP id
+ 00721157ae682-6e9d8afa635mr145747877b3.32.1730218979252; Tue, 29 Oct 2024
+ 09:22:59 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241029151647.1282872-1-hadess@hadess.net> <CABBYNZJ9=2sahn9ELk9rm76fs4jY=ObxMEANN5NLghz4CWGy_A@mail.gmail.com>
- <d788531f9118d22b447e8fcc83e7caef10cc4a9b.camel@hadess.net>
-In-Reply-To: <d788531f9118d22b447e8fcc83e7caef10cc4a9b.camel@hadess.net>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Tue, 29 Oct 2024 12:11:11 -0400
-Message-ID: <CABBYNZKj9AwCzT8J4TvPzNk1VR-Z2Jj1X4+DQT_uqYVXhYR-wg@mail.gmail.com>
-Subject: Re: [BlueZ] device: Better "Connect" debug
-To: Bastien Nocera <hadess@hadess.net>
-Cc: linux-bluetooth@vger.kernel.org
+References: <20241028-open-coded-timeouts-v2-0-c7294bb845a1@linux.microsoft.com>
+ <20241028-open-coded-timeouts-v2-1-c7294bb845a1@linux.microsoft.com> <87wmhq28o6.ffs@tglx>
+In-Reply-To: <87wmhq28o6.ffs@tglx>
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Date: Tue, 29 Oct 2024 17:22:47 +0100
+X-Gmail-Original-Message-ID: <CAMuHMdWFAgfgM0uCrG4uMz77-Y8CFSnpL-YM_VEFuvKTPNKZ5w@mail.gmail.com>
+Message-ID: <CAMuHMdWFAgfgM0uCrG4uMz77-Y8CFSnpL-YM_VEFuvKTPNKZ5w@mail.gmail.com>
+Subject: Re: [PATCH v2 1/2] jiffies: Define secs_to_jiffies()
+To: Thomas Gleixner <tglx@linutronix.de>
+Cc: Easwar Hariharan <eahariha@linux.microsoft.com>, "K. Y. Srinivasan" <kys@microsoft.com>, 
+	Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>, 
+	Dexuan Cui <decui@microsoft.com>, linux-hyperv@vger.kernel.org, 
+	Anna-Maria Behnsen <anna-maria@linutronix.de>, Marcel Holtmann <marcel@holtmann.org>, 
+	Johan Hedberg <johan.hedberg@gmail.com>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Michael Kelley <mhklinux@outlook.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi Bastien,
+Hi Thomas,
 
-On Tue, Oct 29, 2024 at 12:03=E2=80=AFPM Bastien Nocera <hadess@hadess.net>=
- wrote:
+On Tue, Oct 29, 2024 at 5:08=E2=80=AFPM Thomas Gleixner <tglx@linutronix.de=
+> wrote:
+> On Mon, Oct 28 2024 at 19:11, Easwar Hariharan wrote:
+> > diff --git a/include/linux/jiffies.h b/include/linux/jiffies.h
+> > index 1220f0fbe5bf..e5256bb5f851 100644
+> > --- a/include/linux/jiffies.h
+> > +++ b/include/linux/jiffies.h
+> > @@ -526,6 +526,8 @@ static __always_inline unsigned long msecs_to_jiffi=
+es(const unsigned int m)
+> >       }
+> >  }
+> >
+> > +#define secs_to_jiffies(_secs) ((_secs) * HZ)
 >
-> On Tue, 2024-10-29 at 11:36 -0400, Luiz Augusto von Dentz wrote:
-> > Hi Bastien,
-> >
-> > On Tue, Oct 29, 2024 at 11:17=E2=80=AFAM Bastien Nocera <hadess@hadess.=
-net>
-> > wrote:
-> > >
-> > > Output clearer debug information so that it's possible to follow
-> > > the
-> > > decisions made by the bluetoothd daemon when a client such as
-> > > bluetoothctl or the GNOME Bluetooth settings ask it to connect to a
-> > > device.
-> > > ---
-> > >  src/device.c | 39 ++++++++++++++++++++++++++++++++-------
-> > >  1 file changed, 32 insertions(+), 7 deletions(-)
-> > >
-> > > diff --git a/src/device.c b/src/device.c
-> > > index 7585184de50c..8756aef41aab 100644
-> > > --- a/src/device.c
-> > > +++ b/src/device.c
-> > > @@ -2462,10 +2462,13 @@ static DBusMessage *connect_profiles(struct
-> > > btd_device *dev, uint8_t bdaddr_type
-> > >         DBG("%s %s, client %s", dev->path, uuid ? uuid : "(all)",
-> > >
-> > > dbus_message_get_sender(msg));
-> > >
-> > > -       if (dev->pending || dev->connect || dev->browse)
-> > > +       if (dev->pending || dev->connect || dev->browse) {
-> > > +               DBG("Cannot connect, connection busy");
-> > >                 return btd_error_in_progress_str(msg,
-> > > ERR_BREDR_CONN_BUSY);
-> >
-> > I think for this type of debug we are better off introducing directly
-> > into our gdbus lib so we get the information of both method calls and
-> > replies when debug is enabled, thoughts?
->
-> I don't really mind leaving the debug messages that are already
-> associated with a return value out of the patch.
+> Can you please make that a static inline, as there is no need for macro
+> magic like in the other conversions, and add a kernel doc comment which
+> documents this?
 
-Let's do that then, so we don't pollute the source with more debug
-messages that would be removed later.
+Note that a static inline means it cannot be used in e.g. struct initialize=
+rs,
+which are substantial users of  "<value> * HZ".
 
-> What did you have in mind for modifying gdbus? Stashing debug messages
-> in the reply?
+Gr{oetje,eeting}s,
 
-There is already a message as part of the reply in case of error so we
-would just print it on reply.
-
-> >
-> > > +       }
-> > >
-> > >         if (!btd_adapter_get_powered(dev->adapter)) {
-> > > +               DBG("Cannot connect, adapter is not powered");
-> > >                 return btd_error_not_ready_str(msg,
-> > >
-> > > ERR_BREDR_CONN_ADAPTER_NOT_POWERED);
-> > >         }
-> > > @@ -2482,8 +2485,10 @@ static DBusMessage *connect_profiles(struct
-> > > btd_device *dev, uint8_t bdaddr_type
-> > >                                                         "Connect")
-> > > &&
-> > >                                 find_service_with_state(dev-
-> > > >services,
-> > >
-> > > BTD_SERVICE_STATE_CONNECTED)) {
-> > > +                               DBG("Already connected to
-> > > services");
-> > >                                 return
-> > > dbus_message_new_method_return(msg);
-> > >                         } else {
-> > > +                               DBG("Exhausted the list of BR/EDR
-> > > profiles to connect to");
-> > >                                 return
-> > > btd_error_not_available_str(msg,
-> > >
-> > > ERR_BREDR_CONN_PROFILE_UNAVAILABLE);
-> > >                         }
-> > > @@ -2494,8 +2499,10 @@ static DBusMessage *connect_profiles(struct
-> > > btd_device *dev, uint8_t bdaddr_type
-> > >
-> > >         err =3D connect_next(dev);
-> > >         if (err < 0) {
-> > > -               if (err =3D=3D -EALREADY)
-> > > +               if (err =3D=3D -EALREADY) {
-> > > +                       DBG("Already connected");
-> > >                         return dbus_message_new_method_return(msg);
-> > > +               }
-> > >                 return btd_error_failed(msg,
-> > >
-> > > btd_error_bredr_conn_from_errno(err));
-> > >         }
-> > > @@ -2568,12 +2575,20 @@ static uint8_t select_conn_bearer(struct
-> > > btd_device *dev)
-> > >         return dev->bdaddr_type;
-> > >  }
-> > >
-> > > +static const char *bdaddr_type_strs[] =3D {
-> > > +       "BR/EDR",
-> > > +       "LE public",
-> > > +       "LE random"
-> > > +};
-> > > +
-> > >  static DBusMessage *dev_connect(DBusConnection *conn, DBusMessage
-> > > *msg,
-> > >                                                         void
-> > > *user_data)
-> > >  {
-> > >         struct btd_device *dev =3D user_data;
-> > >         uint8_t bdaddr_type;
-> > >
-> > > +       DBG("Calling \"Connect\" for device %s", dev->path);
-> > > +
-> > >         if (dev->bredr_state.connected) {
-> > >                 /*
-> > >                  * Check if services have been resolved and there
-> > > is at least
-> > > @@ -2581,20 +2596,30 @@ static DBusMessage
-> > > *dev_connect(DBusConnection *conn, DBusMessage *msg,
-> > >                  */
-> > >                 if (dev->bredr_state.svc_resolved &&
-> > >                         find_service_with_state(dev->services,
-> > > -
-> > > BTD_SERVICE_STATE_CONNECTED))
-> > > +
-> > > BTD_SERVICE_STATE_CONNECTED)) {
-> > >                         bdaddr_type =3D dev->bdaddr_type;
-> > > -               else
-> > > +                       DBG("Selecting address type %s, as BR/EDR
-> > > services are resolved "
-> > > +                           " and connected", bdaddr_type_strs[dev-
-> > > >bdaddr_type]);
-> > > +               } else {
-> > >                         bdaddr_type =3D BDADDR_BREDR;
-> > > -       } else if (dev->le_state.connected && dev->bredr)
-> > > +                       DBG("Selecting address type BR/EDR, as
-> > > services not resolved "
-> > > +                           "or not connected");
-> > > +               }
-> > > +       } else if (dev->le_state.connected && dev->bredr) {
-> > >                 bdaddr_type =3D BDADDR_BREDR;
-> > > -       else
-> > > +               DBG("Selecting address type BR/EDR, as LE already
-> > > connected");
-> > > +       } else {
-> > >                 bdaddr_type =3D select_conn_bearer(dev);
-> > > +               DBG("Selecting address type %s",
-> > > bdaddr_type_strs[dev->bdaddr_type]);
-> > > +       }
-> > >
-> > >         if (bdaddr_type !=3D BDADDR_BREDR) {
-> > >                 int err;
-> > >
-> > > -               if (dev->le_state.connected)
-> > > +               if (dev->le_state.connected) {
-> > > +                       DBG("Device already connected through LE");
-> > >                         return dbus_message_new_method_return(msg);
-> > > +               }
-> > >
-> > >                 btd_device_set_temporary(dev, false);
-> > >
-> > > --
-> > > 2.47.0
-> > >
-> > >
-> >
-> >
->
-
+                        Geert
 
 --=20
-Luiz Augusto von Dentz
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k=
+.org
+
+In personal conversations with technical people, I call myself a hacker. Bu=
+t
+when I'm talking to journalists I just say "programmer" or something like t=
+hat.
+                                -- Linus Torvalds
