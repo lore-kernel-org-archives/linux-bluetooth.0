@@ -1,123 +1,61 @@
-Received: from relay9-d.mail.gandi.net (relay9-d.mail.gandi.net [217.70.183.199])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from ukraine.onlinesales.wheatseed.shop (mx.ukraine.onlinesales.wheatseed.shop [205.185.126.254])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FA471EE021
-	for <linux-bluetooth@vger.kernel.org>; Mon, 28 Oct 2024 21:53:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD8D1D51C
+	for <linux-bluetooth@vger.kernel.org>; Tue, 29 Oct 2024 02:26:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.185.126.254
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730152413; cv=none; b=o9RuxeSwZBwvUyX9EALNbFs8y8MnSAKcE8dA4tLoHrI9BGKwrCWkn/MQxCMH2mIsYMmE5boNt17bcsRYTRc9SWsOSLB7Y3aqSblq0O2KTCnrrSMUAgcZs1sRwbXBeR6tHr2HmopBdv6qBErRbI6rwDhynSIWswnRYUoH8JkJZxU=
+	t=1730168769; cv=none; b=R4xoxgGcl52AGAv1o9oQj5A/XAFyqmMzRFq6NTmn9ckJyje0BTTtWOsprgljFH72ZyZJ7WGs5o1wmCZwLQ+U4myH+tOFf+0cOr24rTUvj99b4P0xgLFgQNcJqPSbjRTvh/q+3T1w8Qu+uTT0TxWRNTRgTR3z1h6FwBcxYYBFPTg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730152413; c=relaxed/simple;
-	bh=BCL7A0zNArd6tdV6Y98BkPOfnvwIUMuK3ro4YcQR+cw=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=jFVlHbdrmL4LFE1jA3fiXSe2unyJ0z++PYDMRtEiCA1+/4NZUZXD4aOg+BQDHbZGFSXqK/aBowvU3e0RkHoLaqHGiVsSSS20EBOBv8KImmrQJcP1KqOL6GGeaiu9H7Td6j31LiuN0WbK73Kmt2XRfs3zePRnQz9W0mRt0iofzag=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.183.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hadess.net
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 443A6FF803;
-	Mon, 28 Oct 2024 21:53:27 +0000 (UTC)
-Message-ID: <11654905883ae9c832b30005391ef647fd395e46.camel@hadess.net>
-Subject: Re: [BlueZ v3 7/7] client: Fix --help hanging if bluetoothd is not
- running
-From: Bastien Nocera <hadess@hadess.net>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Date: Mon, 28 Oct 2024 22:53:26 +0100
-In-Reply-To: <CABBYNZKRBwdP_R6yKwcXNEg+O5HXDDd3NZ+bncWecvRUmQqfLg@mail.gmail.com>
-References: <20241022141118.150143-1-hadess@hadess.net>
-	 <20241022141118.150143-8-hadess@hadess.net>
-	 <CABBYNZ+aMaDp0BC6F0yG+mJU9hgkeNtbOxNwYx1D7Yj3rU8bzw@mail.gmail.com>
-	 <2d19a91da040a9298402303377ddc8c02a6a2c9a.camel@hadess.net>
-	 <CABBYNZKRBwdP_R6yKwcXNEg+O5HXDDd3NZ+bncWecvRUmQqfLg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.52.4 (3.52.4-1.fc40) 
+	s=arc-20240116; t=1730168769; c=relaxed/simple;
+	bh=+5vh7IMjqeg3OgZBQNuRDxCjJXPgdVT6rqCrcGbGT80=;
+	h=Content-Type:MIME-Version:Subject:To:From:Date:Message-ID; b=X1Sb5M6oCBqwuClpjBgOlhExtW31A/tyZA682I5APkE/7iiBnH9VHRCwZMNFrAFsFqrlgB3vHnLUZnNFDfcVvc21ZvOuJKt4GkVK1RpR5TxItNje04pP5qzObwPiC7hT4sExAOe0FpPHZdZdiMTXQL03mbNLS5fnYNL945qeyFA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ukraine.onlinesales.wheatseed.shop; spf=pass smtp.mailfrom=ukraine.onlinesales.wheatseed.shop; arc=none smtp.client-ip=205.185.126.254
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ukraine.onlinesales.wheatseed.shop
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ukraine.onlinesales.wheatseed.shop
+Received: from [205.185.126.254] ([127.0.0.1]) by ukraine.onlinesales.wheatseed.shop with Microsoft SMTPSVC(8.5.9600.16384);
+	 Mon, 28 Oct 2024 19:25:50 -0700
+Content-Type: text/plain; charset="iso-8859-1"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-GND-Sasl: hadess@hadess.net
+Content-Transfer-Encoding: quoted-printable
+Content-Description: Mail message body
+Subject: Re: Dear Respectable, I wait for your response to this my message
+To: linux-bluetooth@vger.kernel.org
+From: "Evan Bohdan" <evanbohdan@ukraine.onlinesales.wheatseed.shop>
+Date: Mon, 28 Oct 2024 19:25:49 -0700
+Reply-To: evanbohdan@gmail.com
+Message-ID: <WINDOWS-UO5E16EmR1s00032e8b@ukraine.onlinesales.wheatseed.shop>
+X-OriginalArrivalTime: 29 Oct 2024 02:25:50.0047 (UTC) FILETIME=[DEB976F0:01DB29A9]
 
-On Mon, 2024-10-28 at 11:54 -0400, Luiz Augusto von Dentz wrote:
-> Hi Bastien,
->=20
-> On Mon, Oct 28, 2024 at 11:35=E2=80=AFAM Bastien Nocera <hadess@hadess.ne=
-t>
-> wrote:
-> >=20
-> > On Thu, 2024-10-24 at 12:08 -0400, Luiz Augusto von Dentz wrote:
-> > > Hi Bastien,
-> > >=20
-> > > On Tue, Oct 22, 2024 at 10:11=E2=80=AFAM Bastien Nocera
-> > > <hadess@hadess.net>
-> > > wrote:
-> > > >=20
-> > > > Exit after printing all the main and submenu commands.
-> > > > ---
-> > > > =C2=A0client/main.c | 2 ++
-> > > > =C2=A01 file changed, 2 insertions(+)
-> > > >=20
-> > > > diff --git a/client/main.c b/client/main.c
-> > > > index f60bef1a6d3a..f5ed9f9f5297 100644
-> > > > --- a/client/main.c
-> > > > +++ b/client/main.c
-> > > > @@ -3193,6 +3193,8 @@ int main(int argc, char *argv[])
-> > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 assistant_add_submenu();
-> > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bt_shell_set_prompt(PROM=
-PT_OFF, NULL);
-> > > >=20
-> > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bt_shell_handle_non_interacti=
-ve_help();
-> > > > +
-> > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (agent_option)
-> > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0 auto_register_agent =3D g_strdup(agent_option);
-> > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 else
-> > > > --
-> > > > 2.47.0
-> > > >=20
-> > >=20
-> > > Having some thoughts about how to do this is more clean way,
-> > > perhaps
-> > > we should do this as part of bt_shell_run and then introduce .run
-> > > callback to bt_shell_menu so it is called as part of
-> > > bt_shell_run,
-> > > under the .run callback the menu can place e.g. DBUS connection
-> > > setup,
-> > > etc, but before it reaches that we can check if it just a help
-> > > pending.
-> >=20
-> > We need to:
-> > 1) set the top menu
-> > 2) populate the submenus without any D-Bus IO
-> > 3) turn off the prompt
-> > 4) print the help and exit if that's what was requested
-> > 5) setup IO for submenus
-> > 6) run the mainloop
-> >=20
-> > I guess I could do 2) with a callback from bt_shell_set_menu()
-> > and then do 4) and 5) from a bt_shell_run() callback.
->=20
-> Yep.
->=20
-> > Is that what you expected?
-> > Do you have preferred names for the callback functions?
->=20
-> Id call it .run since it should be the result of bt_shell_run
->=20
-> > I think that we can still use the function split from 3/7, did you
-> > have
-> > a better name for the functions?
->=20
-> Not sure I follow, there will be a split between adding submenus and
-> .run to achieve the 2 stages, or are you talking about some other
-> split?
+Good day,
 
-We still need to split the functions called in .run between the bits
-that populate the submenu, and the bits that will make D-Bus I/O, so
-patch number 3 still needs to be exist.
+My name is Evan from Ukraine.I have tried to reach you but find it difficul=
+t due to internet scarcity here in this town.
+I am contacting you because I want to come over to your country,I have some=
+ huge funds I plan to invest in your country because I want to relocate my =
+Late Father business due to ongoing war in my country Ukraine and visit you=
+r country to set up new investment business you may advice profitable in yo=
+ur area.
+I also have some millions of dollars belonging to my late father that i wan=
+t to invest and 995kg of 24+carat 99.9% purity gold I want to ship to your =
+country and establish gold jewelry manufacturing company.
 
-Is assistant_add_submenu() and assistant_enable_submenu() OK, or did
-you want a different name?
+I will offer you good monetary rewards for your help,due to how russian dro=
+ne bombards this town frequently,internet network is disrupted because of a=
+ttacks on network installations,please for fast discussion, you can add me =
+on whatsapp and let's talk faster as i want to leave this war zone as soon =
+as possible,this is my whatsapp number below.
++380-672575220
+Email:evanbohdan@gmail.com
+
+I wait for your earliest response.
+
+Regards,
+Evan
+Whatsapp/Tel:+380-672575220
+Email:evanbohdan@gmail.com
