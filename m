@@ -1,214 +1,168 @@
-Received: from mail-lj1-f173.google.com (mail-lj1-f173.google.com [209.85.208.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [217.70.183.193])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E36F192D73
-	for <linux-bluetooth@vger.kernel.org>; Tue, 29 Oct 2024 15:36:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0147C19309C
+	for <linux-bluetooth@vger.kernel.org>; Tue, 29 Oct 2024 16:03:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.193
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730216220; cv=none; b=gaVdyFWKnlhpZ9N74W/IMhlgnj8Mfa0OxGC4rq0NWcHm1HX1l92sRT8HsPUW12PnCI0CRJltTAGw3yczADCmRADLiEbICivLpRiNKYRGQ5sHBRrilklM0BW4VWyxvaMzeNm62+ZVFyquZ986sPTgjoN8bMJW0iQdC0aleyW5FL0=
+	t=1730217799; cv=none; b=IoscsQxMgvLYEfKqKZQ2QMPdM3yUlqbSNm8mdY/o0vOR+8pRr0aPMRSozOfnfMqwxGlJo1qXvQXQ4VbxTw/oWhTZtHZbysOp4Ag17O/Az6hu33ImlENoiFTc1xO28I3NYnqz4DIQ460pipG0hhR02dcYtLfRU8YN/sSyoK5RY7I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730216220; c=relaxed/simple;
-	bh=DPTAjdoHbMKF2Px8VgLWA8f3SUFCoINMGUpmnszNtT4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Moke6ih7KDmoTpfvYceDH5itO607Epa/DbsiBOxTN4fwiM0f9FmPHm+4rIgvbTrFCUlT7QpwE2CdjPNKIl6GRixvGFN8UX21IWEfLVkDDwYkzNEQ5UqPXuhrjcSEC5cxQ45uK4Gzgsyibu28EVgEa+Zjpgn3Gwo9G8kSsiHfD7c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MAoaYBrK; arc=none smtp.client-ip=209.85.208.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MAoaYBrK"
-Received: by mail-lj1-f173.google.com with SMTP id 38308e7fff4ca-2fb470a8b27so59539791fa.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 29 Oct 2024 08:36:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1730216217; x=1730821017; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=wHG7OXI+IfpMlSxzp0jXeLhhhuwdvVE/tddntwUwZ8U=;
-        b=MAoaYBrKgsYlKqeB4+2/reuSLHVf5MYhc3hnyFJedCVphiRgj2PtEbCVqq1444xa+L
-         b0qX9q2x1d26CSr8AkUSnlCJ/xnGAlOBL8c1ll2esivCGLLJIkyZsK28yPqByF9BJI8k
-         fV5477U9TKjMyKFB09GRr3RIeOIJOQeVBqbNQG+b9yNyDL9h4rSjYK2sYNhJanI+Sn5R
-         n0yF2f4BbOQJFFmMeL2eqeNx+lk9RTubmgUR4y0ZVNshd7nXmAS05Qt3Ki6VcblZ4RKt
-         ajKSZ7eTj2oQJPf3GujWp71QLVndQXZvAL1fxTzOig7iW6OEiqrMJ993MapZXkPFJ86S
-         Mxig==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730216217; x=1730821017;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=wHG7OXI+IfpMlSxzp0jXeLhhhuwdvVE/tddntwUwZ8U=;
-        b=t3/1N7RWsa0RU33Gsrd1aLapVB0bEqopd6fDVjeGDqBnofI5cEl+IIOxXrvFdItZTt
-         KDGehD2nrxSgKQe0F8TR9r87v5d1W+Sf8+2EN7hmy0vmgs5dWuj+UPDkPAHBcMGDGd37
-         IfT+GGfxpIdrQr61x6M/rPz/Ah5O9mupEKY5FIJxQ9xn7fWZSYctqsKLvKs8adSmQWrk
-         BJIAP9d5iRsOcsYXIN/QDuYcDjUrSR9q1/MuEahmLRh7Xqc5+8AQ0Os4tvMQ49avaqGJ
-         bt8+iHE6DgX6ZmZzy+QArz1tmf4lPurBmuvYzz5emWzu/u2r18NMP/wr33m1bi4XSUYC
-         FO/g==
-X-Gm-Message-State: AOJu0YwZvaQPPvantsn8mngh6HTvXMjgIHCNzhXckBsRM+RuPJTM1R6D
-	c20Vv+apqqsSVgxexfscdS7vr6yTnsZMyA/Ec4cQ+Iawe+kHGqJOXRQuy+VBdqc8Qk3BWjouwO9
-	C28dK4GnHpzP1fF4doVmWLjf+PHRZ/g==
-X-Google-Smtp-Source: AGHT+IFQ5OUqqD+XVAH06ZFYLtqgutL5mcYud43h0nI0sNYvtioDmmWUTjj8jWrijUGW8nR9fLeRkmsGhdHllHJ3r5M=
-X-Received: by 2002:a2e:be86:0:b0:2fb:597e:28f5 with SMTP id
- 38308e7fff4ca-2fcdc760b08mr9237171fa.2.1730216216385; Tue, 29 Oct 2024
- 08:36:56 -0700 (PDT)
+	s=arc-20240116; t=1730217799; c=relaxed/simple;
+	bh=smfyXFFfK0f9cEsK14FLHbGA45UGAITxhMF/9Tzx14Y=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=Qj7ga0YRIk0P3O6pN5Yfu3mBZPYLP2+NKcSlgs45KrXOlHrtnVJO4Hsz/xqoTPNYtwTsmyJ4EDGQ/kKfWzpieB64BhMViChJidJ+7+Qgg7QGeGwnwnWKp67N9eOuJXtObD5N/7kjeLVij+ips+d6/RsWWHzbOhfbarRed27Olkg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.183.193
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hadess.net
+Received: by mail.gandi.net (Postfix) with ESMTPSA id DE371240003;
+	Tue, 29 Oct 2024 16:03:13 +0000 (UTC)
+Message-ID: <d788531f9118d22b447e8fcc83e7caef10cc4a9b.camel@hadess.net>
+Subject: Re: [BlueZ] device: Better "Connect" debug
+From: Bastien Nocera <hadess@hadess.net>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Date: Tue, 29 Oct 2024 17:03:13 +0100
+In-Reply-To: <CABBYNZJ9=2sahn9ELk9rm76fs4jY=ObxMEANN5NLghz4CWGy_A@mail.gmail.com>
+References: <20241029151647.1282872-1-hadess@hadess.net>
+	 <CABBYNZJ9=2sahn9ELk9rm76fs4jY=ObxMEANN5NLghz4CWGy_A@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: base64
+User-Agent: Evolution 3.52.4 (3.52.4-1.fc40) 
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241029151647.1282872-1-hadess@hadess.net>
-In-Reply-To: <20241029151647.1282872-1-hadess@hadess.net>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Tue, 29 Oct 2024 11:36:43 -0400
-Message-ID: <CABBYNZJ9=2sahn9ELk9rm76fs4jY=ObxMEANN5NLghz4CWGy_A@mail.gmail.com>
-Subject: Re: [BlueZ] device: Better "Connect" debug
-To: Bastien Nocera <hadess@hadess.net>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-GND-Sasl: hadess@hadess.net
 
-Hi Bastien,
+T24gVHVlLCAyMDI0LTEwLTI5IGF0IDExOjM2IC0wNDAwLCBMdWl6IEF1Z3VzdG8gdm9uIERlbnR6
+IHdyb3RlOgo+IEhpIEJhc3RpZW4sCj4gCj4gT24gVHVlLCBPY3QgMjksIDIwMjQgYXQgMTE6MTfi
+gK9BTSBCYXN0aWVuIE5vY2VyYSA8aGFkZXNzQGhhZGVzcy5uZXQ+Cj4gd3JvdGU6Cj4gPiAKPiA+
+IE91dHB1dCBjbGVhcmVyIGRlYnVnIGluZm9ybWF0aW9uIHNvIHRoYXQgaXQncyBwb3NzaWJsZSB0
+byBmb2xsb3cKPiA+IHRoZQo+ID4gZGVjaXNpb25zIG1hZGUgYnkgdGhlIGJsdWV0b290aGQgZGFl
+bW9uIHdoZW4gYSBjbGllbnQgc3VjaCBhcwo+ID4gYmx1ZXRvb3RoY3RsIG9yIHRoZSBHTk9NRSBC
+bHVldG9vdGggc2V0dGluZ3MgYXNrIGl0IHRvIGNvbm5lY3QgdG8gYQo+ID4gZGV2aWNlLgo+ID4g
+LS0tCj4gPiDCoHNyYy9kZXZpY2UuYyB8IDM5ICsrKysrKysrKysrKysrKysrKysrKysrKysrKysr
+KysrLS0tLS0tLQo+ID4gwqAxIGZpbGUgY2hhbmdlZCwgMzIgaW5zZXJ0aW9ucygrKSwgNyBkZWxl
+dGlvbnMoLSkKPiA+IAo+ID4gZGlmZiAtLWdpdCBhL3NyYy9kZXZpY2UuYyBiL3NyYy9kZXZpY2Uu
+Ywo+ID4gaW5kZXggNzU4NTE4NGRlNTBjLi44NzU2YWVmNDFhYWIgMTAwNjQ0Cj4gPiAtLS0gYS9z
+cmMvZGV2aWNlLmMKPiA+ICsrKyBiL3NyYy9kZXZpY2UuYwo+ID4gQEAgLTI0NjIsMTAgKzI0NjIs
+MTMgQEAgc3RhdGljIERCdXNNZXNzYWdlICpjb25uZWN0X3Byb2ZpbGVzKHN0cnVjdAo+ID4gYnRk
+X2RldmljZSAqZGV2LCB1aW50OF90IGJkYWRkcl90eXBlCj4gPiDCoMKgwqDCoMKgwqDCoCBEQkco
+IiVzICVzLCBjbGllbnQgJXMiLCBkZXYtPnBhdGgsIHV1aWQgPyB1dWlkIDogIihhbGwpIiwKPiA+
+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAKPiA+IGRidXNfbWVzc2FnZV9n
+ZXRfc2VuZGVyKG1zZykpOwo+ID4gCj4gPiAtwqDCoMKgwqDCoMKgIGlmIChkZXYtPnBlbmRpbmcg
+fHwgZGV2LT5jb25uZWN0IHx8IGRldi0+YnJvd3NlKQo+ID4gK8KgwqDCoMKgwqDCoCBpZiAoZGV2
+LT5wZW5kaW5nIHx8IGRldi0+Y29ubmVjdCB8fCBkZXYtPmJyb3dzZSkgewo+ID4gK8KgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqAgREJHKCJDYW5ub3QgY29ubmVjdCwgY29ubmVjdGlvbiBidXN5
+Iik7Cj4gPiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgcmV0dXJuIGJ0ZF9lcnJvcl9p
+bl9wcm9ncmVzc19zdHIobXNnLAo+ID4gRVJSX0JSRURSX0NPTk5fQlVTWSk7Cj4gCj4gSSB0aGlu
+ayBmb3IgdGhpcyB0eXBlIG9mIGRlYnVnIHdlIGFyZSBiZXR0ZXIgb2ZmIGludHJvZHVjaW5nIGRp
+cmVjdGx5Cj4gaW50byBvdXIgZ2RidXMgbGliIHNvIHdlIGdldCB0aGUgaW5mb3JtYXRpb24gb2Yg
+Ym90aCBtZXRob2QgY2FsbHMgYW5kCj4gcmVwbGllcyB3aGVuIGRlYnVnIGlzIGVuYWJsZWQsIHRo
+b3VnaHRzPwoKSSBkb24ndCByZWFsbHkgbWluZCBsZWF2aW5nIHRoZSBkZWJ1ZyBtZXNzYWdlcyB0
+aGF0IGFyZSBhbHJlYWR5CmFzc29jaWF0ZWQgd2l0aCBhIHJldHVybiB2YWx1ZSBvdXQgb2YgdGhl
+IHBhdGNoLgoKV2hhdCBkaWQgeW91IGhhdmUgaW4gbWluZCBmb3IgbW9kaWZ5aW5nIGdkYnVzPyBT
+dGFzaGluZyBkZWJ1ZyBtZXNzYWdlcwppbiB0aGUgcmVwbHk/Cgo+IAo+ID4gK8KgwqDCoMKgwqDC
+oCB9Cj4gPiAKPiA+IMKgwqDCoMKgwqDCoMKgIGlmICghYnRkX2FkYXB0ZXJfZ2V0X3Bvd2VyZWQo
+ZGV2LT5hZGFwdGVyKSkgewo+ID4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgREJHKCJD
+YW5ub3QgY29ubmVjdCwgYWRhcHRlciBpcyBub3QgcG93ZXJlZCIpOwo+ID4gwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgIHJldHVybiBidGRfZXJyb3Jfbm90X3JlYWR5X3N0cihtc2csCj4g
+PiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAKPiA+IEVSUl9CUkVEUl9DT05OX0FEQVBURVJfTk9UX1BP
+V0VSRUQpOwo+ID4gwqDCoMKgwqDCoMKgwqAgfQo+ID4gQEAgLTI0ODIsOCArMjQ4NSwxMCBAQCBz
+dGF0aWMgREJ1c01lc3NhZ2UgKmNvbm5lY3RfcHJvZmlsZXMoc3RydWN0Cj4gPiBidGRfZGV2aWNl
+ICpkZXYsIHVpbnQ4X3QgYmRhZGRyX3R5cGUKPiA+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgICJDb25uZWN0IikKPiA+ICYmCj4gPiDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBm
+aW5kX3NlcnZpY2Vfd2l0aF9zdGF0ZShkZXYtCj4gPiA+c2VydmljZXMsCj4gPiDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgCj4gPiBCVERfU0VSVklDRV9TVEFURV9DT05ORUNU
+RUQpKSB7Cj4gPiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgIERCRygiQWxyZWFkeSBjb25uZWN0ZWQgdG8KPiA+IHNlcnZpY2VzIik7
+Cj4gPiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoCByZXR1cm4KPiA+IGRidXNfbWVzc2FnZV9uZXdfbWV0aG9kX3JldHVybihtc2cp
+Owo+ID4gwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCB9IGVs
+c2Ugewo+ID4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoCBEQkcoIkV4aGF1c3RlZCB0aGUgbGlzdCBvZiBCUi9FRFIKPiA+IHByb2Zp
+bGVzIHRvIGNvbm5lY3QgdG8iKTsKPiA+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHJldHVybgo+ID4gYnRkX2Vycm9yX25vdF9h
+dmFpbGFibGVfc3RyKG1zZywKPiA+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoAo+ID4gRVJSX0JSRURS
+X0NPTk5fUFJPRklMRV9VTkFWQUlMQUJMRSk7Cj4gPiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgIH0KPiA+IEBAIC0yNDk0LDggKzI0OTksMTAgQEAgc3RhdGlj
+IERCdXNNZXNzYWdlICpjb25uZWN0X3Byb2ZpbGVzKHN0cnVjdAo+ID4gYnRkX2RldmljZSAqZGV2
+LCB1aW50OF90IGJkYWRkcl90eXBlCj4gPiAKPiA+IMKgwqDCoMKgwqDCoMKgIGVyciA9IGNvbm5l
+Y3RfbmV4dChkZXYpOwo+ID4gwqDCoMKgwqDCoMKgwqAgaWYgKGVyciA8IDApIHsKPiA+IC3CoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIGlmIChlcnIgPT0gLUVBTFJFQURZKQo+ID4gK8KgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgaWYgKGVyciA9PSAtRUFMUkVBRFkpIHsKPiA+ICvCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBEQkcoIkFscmVhZHkgY29u
+bmVjdGVkIik7Cj4gPiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgIHJldHVybiBkYnVzX21lc3NhZ2VfbmV3X21ldGhvZF9yZXR1cm4obXNnKTsKPiA+ICvCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIH0KPiA+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoCByZXR1cm4gYnRkX2Vycm9yX2ZhaWxlZChtc2csCj4gPiDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqAKPiA+IGJ0ZF9lcnJvcl9icmVkcl9jb25uX2Zyb21fZXJybm8oZXJyKSk7Cj4gPiDCoMKgwqDC
+oMKgwqDCoCB9Cj4gPiBAQCAtMjU2OCwxMiArMjU3NSwyMCBAQCBzdGF0aWMgdWludDhfdCBzZWxl
+Y3RfY29ubl9iZWFyZXIoc3RydWN0Cj4gPiBidGRfZGV2aWNlICpkZXYpCj4gPiDCoMKgwqDCoMKg
+wqDCoCByZXR1cm4gZGV2LT5iZGFkZHJfdHlwZTsKPiA+IMKgfQo+ID4gCj4gPiArc3RhdGljIGNv
+bnN0IGNoYXIgKmJkYWRkcl90eXBlX3N0cnNbXSA9IHsKPiA+ICvCoMKgwqDCoMKgwqAgIkJSL0VE
+UiIsCj4gPiArwqDCoMKgwqDCoMKgICJMRSBwdWJsaWMiLAo+ID4gK8KgwqDCoMKgwqDCoCAiTEUg
+cmFuZG9tIgo+ID4gK307Cj4gPiArCj4gPiDCoHN0YXRpYyBEQnVzTWVzc2FnZSAqZGV2X2Nvbm5l
+Y3QoREJ1c0Nvbm5lY3Rpb24gKmNvbm4sIERCdXNNZXNzYWdlCj4gPiAqbXNnLAo+ID4gwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgdm9pZAo+ID4g
+KnVzZXJfZGF0YSkKPiA+IMKgewo+ID4gwqDCoMKgwqDCoMKgwqAgc3RydWN0IGJ0ZF9kZXZpY2Ug
+KmRldiA9IHVzZXJfZGF0YTsKPiA+IMKgwqDCoMKgwqDCoMKgIHVpbnQ4X3QgYmRhZGRyX3R5cGU7
+Cj4gPiAKPiA+ICvCoMKgwqDCoMKgwqAgREJHKCJDYWxsaW5nIFwiQ29ubmVjdFwiIGZvciBkZXZp
+Y2UgJXMiLCBkZXYtPnBhdGgpOwo+ID4gKwo+ID4gwqDCoMKgwqDCoMKgwqAgaWYgKGRldi0+YnJl
+ZHJfc3RhdGUuY29ubmVjdGVkKSB7Cj4gPiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAg
+LyoKPiA+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgICogQ2hlY2sgaWYgc2Vydmlj
+ZXMgaGF2ZSBiZWVuIHJlc29sdmVkIGFuZCB0aGVyZQo+ID4gaXMgYXQgbGVhc3QKPiA+IEBAIC0y
+NTgxLDIwICsyNTk2LDMwIEBAIHN0YXRpYyBEQnVzTWVzc2FnZQo+ID4gKmRldl9jb25uZWN0KERC
+dXNDb25uZWN0aW9uICpjb25uLCBEQnVzTWVzc2FnZSAqbXNnLAo+ID4gwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqAgKi8KPiA+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBp
+ZiAoZGV2LT5icmVkcl9zdGF0ZS5zdmNfcmVzb2x2ZWQgJiYKPiA+IMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgZmluZF9zZXJ2aWNlX3dpdGhfc3RhdGUoZGV2
+LT5zZXJ2aWNlcywKPiA+IC3CoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoAo+ID4g
+QlREX1NFUlZJQ0VfU1RBVEVfQ09OTkVDVEVEKSkKPiA+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoAo+ID4gQlREX1NFUlZJQ0VfU1RBVEVfQ09OTkVDVEVEKSkgewo+ID4gwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBiZGFkZHJfdHlwZSA9
+IGRldi0+YmRhZGRyX3R5cGU7Cj4gPiAtwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBlbHNl
+Cj4gPiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgREJHKCJT
+ZWxlY3RpbmcgYWRkcmVzcyB0eXBlICVzLCBhcyBCUi9FRFIKPiA+IHNlcnZpY2VzIGFyZSByZXNv
+bHZlZCAiCj4gPiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoCAiIGFuZCBjb25uZWN0ZWQiLCBiZGFkZHJfdHlwZV9zdHJzW2Rldi0KPiA+ID5iZGFk
+ZHJfdHlwZV0pOwo+ID4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgfSBlbHNlIHsKPiA+
+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgYmRhZGRyX3R5
+cGUgPSBCREFERFJfQlJFRFI7Cj4gPiAtwqDCoMKgwqDCoMKgIH0gZWxzZSBpZiAoZGV2LT5sZV9z
+dGF0ZS5jb25uZWN0ZWQgJiYgZGV2LT5icmVkcikKPiA+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBEQkcoIlNlbGVjdGluZyBhZGRyZXNzIHR5cGUgQlIvRURS
+LCBhcwo+ID4gc2VydmljZXMgbm90IHJlc29sdmVkICIKPiA+ICvCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgICJvciBub3QgY29ubmVjdGVkIik7Cj4g
+PiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCB9Cj4gPiArwqDCoMKgwqDCoMKgIH0gZWxz
+ZSBpZiAoZGV2LT5sZV9zdGF0ZS5jb25uZWN0ZWQgJiYgZGV2LT5icmVkcikgewo+ID4gwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIGJkYWRkcl90eXBlID0gQkRBRERSX0JSRURSOwo+ID4g
+LcKgwqDCoMKgwqDCoCBlbHNlCj4gPiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBEQkco
+IlNlbGVjdGluZyBhZGRyZXNzIHR5cGUgQlIvRURSLCBhcyBMRSBhbHJlYWR5Cj4gPiBjb25uZWN0
+ZWQiKTsKPiA+ICvCoMKgwqDCoMKgwqAgfSBlbHNlIHsKPiA+IMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoCBiZGFkZHJfdHlwZSA9IHNlbGVjdF9jb25uX2JlYXJlcihkZXYpOwo+ID4gK8Kg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgREJHKCJTZWxlY3RpbmcgYWRkcmVzcyB0eXBlICVz
+IiwKPiA+IGJkYWRkcl90eXBlX3N0cnNbZGV2LT5iZGFkZHJfdHlwZV0pOwo+ID4gK8KgwqDCoMKg
+wqDCoCB9Cj4gPiAKPiA+IMKgwqDCoMKgwqDCoMKgIGlmIChiZGFkZHJfdHlwZSAhPSBCREFERFJf
+QlJFRFIpIHsKPiA+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBpbnQgZXJyOwo+ID4g
+Cj4gPiAtwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBpZiAoZGV2LT5sZV9zdGF0ZS5jb25u
+ZWN0ZWQpCj4gPiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBpZiAoZGV2LT5sZV9zdGF0
+ZS5jb25uZWN0ZWQpIHsKPiA+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoCBEQkcoIkRldmljZSBhbHJlYWR5IGNvbm5lY3RlZCB0aHJvdWdoIExFIik7Cj4gPiDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHJldHVybiBkYnVz
+X21lc3NhZ2VfbmV3X21ldGhvZF9yZXR1cm4obXNnKTsKPiA+ICvCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgIH0KPiA+IAo+ID4gwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIGJ0ZF9k
+ZXZpY2Vfc2V0X3RlbXBvcmFyeShkZXYsIGZhbHNlKTsKPiA+IAo+ID4gLS0KPiA+IDIuNDcuMAo+
+ID4gCj4gPiAKPiAKPiAKCg==
 
-On Tue, Oct 29, 2024 at 11:17=E2=80=AFAM Bastien Nocera <hadess@hadess.net>=
- wrote:
->
-> Output clearer debug information so that it's possible to follow the
-> decisions made by the bluetoothd daemon when a client such as
-> bluetoothctl or the GNOME Bluetooth settings ask it to connect to a
-> device.
-> ---
->  src/device.c | 39 ++++++++++++++++++++++++++++++++-------
->  1 file changed, 32 insertions(+), 7 deletions(-)
->
-> diff --git a/src/device.c b/src/device.c
-> index 7585184de50c..8756aef41aab 100644
-> --- a/src/device.c
-> +++ b/src/device.c
-> @@ -2462,10 +2462,13 @@ static DBusMessage *connect_profiles(struct btd_d=
-evice *dev, uint8_t bdaddr_type
->         DBG("%s %s, client %s", dev->path, uuid ? uuid : "(all)",
->                                                 dbus_message_get_sender(m=
-sg));
->
-> -       if (dev->pending || dev->connect || dev->browse)
-> +       if (dev->pending || dev->connect || dev->browse) {
-> +               DBG("Cannot connect, connection busy");
->                 return btd_error_in_progress_str(msg, ERR_BREDR_CONN_BUSY=
-);
-
-I think for this type of debug we are better off introducing directly
-into our gdbus lib so we get the information of both method calls and
-replies when debug is enabled, thoughts?
-
-> +       }
->
->         if (!btd_adapter_get_powered(dev->adapter)) {
-> +               DBG("Cannot connect, adapter is not powered");
->                 return btd_error_not_ready_str(msg,
->                                         ERR_BREDR_CONN_ADAPTER_NOT_POWERE=
-D);
->         }
-> @@ -2482,8 +2485,10 @@ static DBusMessage *connect_profiles(struct btd_de=
-vice *dev, uint8_t bdaddr_type
->                                                         "Connect") &&
->                                 find_service_with_state(dev->services,
->                                                 BTD_SERVICE_STATE_CONNECT=
-ED)) {
-> +                               DBG("Already connected to services");
->                                 return dbus_message_new_method_return(msg=
-);
->                         } else {
-> +                               DBG("Exhausted the list of BR/EDR profile=
-s to connect to");
->                                 return btd_error_not_available_str(msg,
->                                         ERR_BREDR_CONN_PROFILE_UNAVAILABL=
-E);
->                         }
-> @@ -2494,8 +2499,10 @@ static DBusMessage *connect_profiles(struct btd_de=
-vice *dev, uint8_t bdaddr_type
->
->         err =3D connect_next(dev);
->         if (err < 0) {
-> -               if (err =3D=3D -EALREADY)
-> +               if (err =3D=3D -EALREADY) {
-> +                       DBG("Already connected");
->                         return dbus_message_new_method_return(msg);
-> +               }
->                 return btd_error_failed(msg,
->                                         btd_error_bredr_conn_from_errno(e=
-rr));
->         }
-> @@ -2568,12 +2575,20 @@ static uint8_t select_conn_bearer(struct btd_devi=
-ce *dev)
->         return dev->bdaddr_type;
->  }
->
-> +static const char *bdaddr_type_strs[] =3D {
-> +       "BR/EDR",
-> +       "LE public",
-> +       "LE random"
-> +};
-> +
->  static DBusMessage *dev_connect(DBusConnection *conn, DBusMessage *msg,
->                                                         void *user_data)
->  {
->         struct btd_device *dev =3D user_data;
->         uint8_t bdaddr_type;
->
-> +       DBG("Calling \"Connect\" for device %s", dev->path);
-> +
->         if (dev->bredr_state.connected) {
->                 /*
->                  * Check if services have been resolved and there is at l=
-east
-> @@ -2581,20 +2596,30 @@ static DBusMessage *dev_connect(DBusConnection *c=
-onn, DBusMessage *msg,
->                  */
->                 if (dev->bredr_state.svc_resolved &&
->                         find_service_with_state(dev->services,
-> -                                               BTD_SERVICE_STATE_CONNECT=
-ED))
-> +                                               BTD_SERVICE_STATE_CONNECT=
-ED)) {
->                         bdaddr_type =3D dev->bdaddr_type;
-> -               else
-> +                       DBG("Selecting address type %s, as BR/EDR service=
-s are resolved "
-> +                           " and connected", bdaddr_type_strs[dev->bdadd=
-r_type]);
-> +               } else {
->                         bdaddr_type =3D BDADDR_BREDR;
-> -       } else if (dev->le_state.connected && dev->bredr)
-> +                       DBG("Selecting address type BR/EDR, as services n=
-ot resolved "
-> +                           "or not connected");
-> +               }
-> +       } else if (dev->le_state.connected && dev->bredr) {
->                 bdaddr_type =3D BDADDR_BREDR;
-> -       else
-> +               DBG("Selecting address type BR/EDR, as LE already connect=
-ed");
-> +       } else {
->                 bdaddr_type =3D select_conn_bearer(dev);
-> +               DBG("Selecting address type %s", bdaddr_type_strs[dev->bd=
-addr_type]);
-> +       }
->
->         if (bdaddr_type !=3D BDADDR_BREDR) {
->                 int err;
->
-> -               if (dev->le_state.connected)
-> +               if (dev->le_state.connected) {
-> +                       DBG("Device already connected through LE");
->                         return dbus_message_new_method_return(msg);
-> +               }
->
->                 btd_device_set_temporary(dev, false);
->
-> --
-> 2.47.0
->
->
-
-
---=20
-Luiz Augusto von Dentz
