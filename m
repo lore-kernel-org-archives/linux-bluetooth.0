@@ -1,143 +1,90 @@
-Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [217.70.183.193])
+Received: from out-19.smtp.github.com (out-19.smtp.github.com [192.30.252.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BEDD10957
-	for <linux-bluetooth@vger.kernel.org>; Tue, 29 Oct 2024 15:16:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.193
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E3EA18C936
+	for <linux-bluetooth@vger.kernel.org>; Tue, 29 Oct 2024 15:18:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730215018; cv=none; b=jbsjBPpqsQxihESrZv0jYhCfeLa0PFMXTPw+nJxiP/0zs3/wkWhqU3lURb1NgiDYzMCXPg7xUwEZ1AhysE9qLuZ4CG7Vjt9L6DMAplKxj3Ui8Kn/+IxDncVPY4wybhoCeXMBfle6nsk3R/aj92MVd20OJ2JZLZ4+O1cbu1FRTiA=
+	t=1730215129; cv=none; b=RTuR5A/ITVZ8l0KBLG/86H7A7rSnQyHeKtcm5yOv6vNp8kSRJQF3R2CsQ85PgQEPtEtdPBKXFndlHqBBovJD/CygUuiCec0x9a5xjQxAdDnToJcs8UZTFsJXLJGHAzSCcTXyiz+KcQx4X4H9LWitbaSfiy1Kp2qWANlF6CaL/6M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730215018; c=relaxed/simple;
-	bh=YRdfHX1ltJ1MxTRB33bJ2Ab9v3wk6y1VAm4I5fTTT9M=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=VdTE9Y9SUK/7shxjd/RcnF+C0ZyzB+FxVrDWeecPD3IPnzq7xT1n/PpGLlHomcy7srOE20uAOKQ1gLofy4vNt1Wc2Iv2/i+t/gO9K2qt7pkmUwim3cwuiThVjvs7ibqGPm60djzT0hB6zKd0EqB8texG7ON9AzsVSGcJYzqY/eo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net; spf=pass smtp.mailfrom=hadess.net; arc=none smtp.client-ip=217.70.183.193
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hadess.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hadess.net
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 60672240002;
-	Tue, 29 Oct 2024 15:16:48 +0000 (UTC)
-From: Bastien Nocera <hadess@hadess.net>
+	s=arc-20240116; t=1730215129; c=relaxed/simple;
+	bh=nYx6AKOpoOnB5cpjrC+eqj8Y7Nyc3HtSMTDhA0e2JoA=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=FSTLwZQVBkiNbEiPOvmoovWAjlmyKq7NlUeETfmWffLRXDqGf6iJ7XkA+dXABl4E7cODcHHvXxHGeUty9NFbjBAGb5w1SVRp/cLOzgtSUzVxQM46JdfhPieGVMpWmwl2+vqs7Nl0u35jg2+AN3+vyhtCxcCtpZcBzfkiGWCQyX0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=kUXsPYkR; arc=none smtp.client-ip=192.30.252.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="kUXsPYkR"
+Received: from github.com (hubbernetes-node-d77acae.va3-iad.github.net [10.48.139.20])
+	by smtp.github.com (Postfix) with ESMTPA id 99D1CE0435
+	for <linux-bluetooth@vger.kernel.org>; Tue, 29 Oct 2024 08:18:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1730215126;
+	bh=u1k5eZkv0OPF8REnv4cD36A0dhq1aPKv+ZI+xJicXfI=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=kUXsPYkRNSyQZ9UuIPuKH2qK+3MmLJAHHX0FsTz4QmrKirOF4XYA5+MlzWl7HLHgJ
+	 qpudSw+9FbqPWDdPX6vqQHYHnm+3s54GJvs3zG8I9qo8t0/k4IiFr8/x9+4BASIqwm
+	 A4VLVvDefonn+xo0V+N0RDwShL6XZtKrJev44ybg=
+Date: Tue, 29 Oct 2024 08:18:46 -0700
+From: BluezTestBot <noreply@github.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Bastien Nocera <hadess@hadess.net>
-Subject: [BlueZ] device: Better "Connect" debug
-Date: Tue, 29 Oct 2024 16:16:36 +0100
-Message-ID: <20241029151647.1282872-1-hadess@hadess.net>
-X-Mailer: git-send-email 2.47.0
+Message-ID: <bluez/bluez/push/refs/heads/master/d7bb2a-6d55c7@github.com>
+Subject: [bluez/bluez] 6d55c7: device: Fix Device.Pair using wrong address
+ type
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-GND-Sasl: hadess@hadess.net
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-Output clearer debug information so that it's possible to follow the
-decisions made by the bluetoothd daemon when a client such as
-bluetoothctl or the GNOME Bluetooth settings ask it to connect to a
-device.
----
- src/device.c | 39 ++++++++++++++++++++++++++++++++-------
- 1 file changed, 32 insertions(+), 7 deletions(-)
+  Branch: refs/heads/master
+  Home:   https://github.com/bluez/bluez
+  Commit: 6d55c7d7fd0da6bea7adbabac09cae2023a62fcd
+      https://github.com/bluez/bluez/commit/6d55c7d7fd0da6bea7adbabac09cae2023a62fcd
+  Author: Cheng Jiang <quic_chejiang@quicinc.com>
+  Date:   2024-10-29 (Tue, 29 Oct 2024)
 
-diff --git a/src/device.c b/src/device.c
-index 7585184de50c..8756aef41aab 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -2462,10 +2462,13 @@ static DBusMessage *connect_profiles(struct btd_device *dev, uint8_t bdaddr_type
- 	DBG("%s %s, client %s", dev->path, uuid ? uuid : "(all)",
- 						dbus_message_get_sender(msg));
- 
--	if (dev->pending || dev->connect || dev->browse)
-+	if (dev->pending || dev->connect || dev->browse) {
-+		DBG("Cannot connect, connection busy");
- 		return btd_error_in_progress_str(msg, ERR_BREDR_CONN_BUSY);
-+	}
- 
- 	if (!btd_adapter_get_powered(dev->adapter)) {
-+		DBG("Cannot connect, adapter is not powered");
- 		return btd_error_not_ready_str(msg,
- 					ERR_BREDR_CONN_ADAPTER_NOT_POWERED);
- 	}
-@@ -2482,8 +2485,10 @@ static DBusMessage *connect_profiles(struct btd_device *dev, uint8_t bdaddr_type
- 							"Connect") &&
- 				find_service_with_state(dev->services,
- 						BTD_SERVICE_STATE_CONNECTED)) {
-+				DBG("Already connected to services");
- 				return dbus_message_new_method_return(msg);
- 			} else {
-+				DBG("Exhausted the list of BR/EDR profiles to connect to");
- 				return btd_error_not_available_str(msg,
- 					ERR_BREDR_CONN_PROFILE_UNAVAILABLE);
- 			}
-@@ -2494,8 +2499,10 @@ static DBusMessage *connect_profiles(struct btd_device *dev, uint8_t bdaddr_type
- 
- 	err = connect_next(dev);
- 	if (err < 0) {
--		if (err == -EALREADY)
-+		if (err == -EALREADY) {
-+			DBG("Already connected");
- 			return dbus_message_new_method_return(msg);
-+		}
- 		return btd_error_failed(msg,
- 					btd_error_bredr_conn_from_errno(err));
- 	}
-@@ -2568,12 +2575,20 @@ static uint8_t select_conn_bearer(struct btd_device *dev)
- 	return dev->bdaddr_type;
- }
- 
-+static const char *bdaddr_type_strs[] = {
-+	"BR/EDR",
-+	"LE public",
-+	"LE random"
-+};
-+
- static DBusMessage *dev_connect(DBusConnection *conn, DBusMessage *msg,
- 							void *user_data)
- {
- 	struct btd_device *dev = user_data;
- 	uint8_t bdaddr_type;
- 
-+	DBG("Calling \"Connect\" for device %s", dev->path);
-+
- 	if (dev->bredr_state.connected) {
- 		/*
- 		 * Check if services have been resolved and there is at least
-@@ -2581,20 +2596,30 @@ static DBusMessage *dev_connect(DBusConnection *conn, DBusMessage *msg,
- 		 */
- 		if (dev->bredr_state.svc_resolved &&
- 			find_service_with_state(dev->services,
--						BTD_SERVICE_STATE_CONNECTED))
-+						BTD_SERVICE_STATE_CONNECTED)) {
- 			bdaddr_type = dev->bdaddr_type;
--		else
-+			DBG("Selecting address type %s, as BR/EDR services are resolved "
-+			    " and connected", bdaddr_type_strs[dev->bdaddr_type]);
-+		} else {
- 			bdaddr_type = BDADDR_BREDR;
--	} else if (dev->le_state.connected && dev->bredr)
-+			DBG("Selecting address type BR/EDR, as services not resolved "
-+			    "or not connected");
-+		}
-+	} else if (dev->le_state.connected && dev->bredr) {
- 		bdaddr_type = BDADDR_BREDR;
--	else
-+		DBG("Selecting address type BR/EDR, as LE already connected");
-+	} else {
- 		bdaddr_type = select_conn_bearer(dev);
-+		DBG("Selecting address type %s", bdaddr_type_strs[dev->bdaddr_type]);
-+	}
- 
- 	if (bdaddr_type != BDADDR_BREDR) {
- 		int err;
- 
--		if (dev->le_state.connected)
-+		if (dev->le_state.connected) {
-+			DBG("Device already connected through LE");
- 			return dbus_message_new_method_return(msg);
-+		}
- 
- 		btd_device_set_temporary(dev, false);
- 
--- 
-2.47.0
+  Changed paths:
+    M src/device.c
 
+  Log Message:
+  -----------
+  device: Fix Device.Pair using wrong address type
+
+For a BLE-only device, if the device is already paired and the upper
+layer attempts to pair it again, the bdaddr_type will be set to
+BDADDR_BREDR since the LE connection is already bonded. This causes the
+device to use the BR/EDR bearer, which stalls the pairing procedure and
+requires waiting for the pairing timeout.
+
+The bluetoothctl log below shows the error result:
+
+[bluetooth]# pair ED:8E:0E:B3:85:C1
+Attempting to pair with ED:8E:0E:B3:85:C1
+Pairing successful
+[RAPOO BleMouse]# disconnect ED:8E:0E:B3:85:C1
+Attempting to disconnect from ED:8E:0E:B3:85:C1
+[RAPOO BleMouse]#
+[bluetooth]# devices Paired
+Device ED:8E:0E:B3:85:C1 RAPOO BleMouse
+[bluetooth]# scan le
+SetDiscoveryFilter success
+Discovery started
+[CHG] Controller 8C:FD:F0:21:84:17 Discovering: yes
+[CHG] Device ED:8E:0E:B3:85:C1 RSSI: -38
+[bluetooth]# scan off
+Discovery stopped
+[bluetooth]# pair ED:8E:0E:B3:85:C1
+Attempting to pair with ED:8E:0E:B3:85:C1
+[bluetooth]#
+Failed to pair: org.freedesktop.DBus.Error.NoReply
+
+
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
