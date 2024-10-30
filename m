@@ -1,54 +1,61 @@
-Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EE6B1990C5;
-	Wed, 30 Oct 2024 08:43:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6C8615B0F7;
+	Wed, 30 Oct 2024 08:57:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730277838; cv=none; b=e23c1uz7m6gpc0oNWygswTYWXy+VHspZqbn1kAjiVeZbNJHFOd7/evz8t2nTHPBpLl9FOqTHXGmVdhwQJNgC8oiGXB0k9kc8mQfIpGEGCG7/BBix7aFLvd5cAVugBOS3UovyOnjIw2rJlr1MG3BXRzremOk20xj3/O+2UB2yGLA=
+	t=1730278660; cv=none; b=ArXJ8Ic9P/Y7cFE+UzQ63q9Dsk+TlK83YFQHdGivsKVbK/+Ab+oXLjAo58g+B/HgNgztgN4GGQwq4YEbBAVMp9OShc6OPKRu75z+GxHxDh1PlgZt1E/I/1A0MDj684xj6C2GH0omXzsLO/3U8/9REXUP/j5Kzr8vuJvo/yPHOXc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730277838; c=relaxed/simple;
-	bh=nON4sMqSAvd9n8ClRLG37QnCL3NBJJRIXO1tYAucTZc=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=TyD94GBJrfta+fjBR5e7VZyfhnPIoBKJsKvNZdXi5+vcvp29YdAVJo/S1g5takqsq49ufwapAs6VY6KZvOD0wOV1vE8yEQVj3euL5j+emsSjqCjx2FyX9ESUbhbT7z8/sdg28VHK4v/uKhAeDAdywFlYLzYHVXDl0aFQiGJpQUk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com; spf=pass smtp.mailfrom=realtek.com; dkim=temperror (0-bit key) header.d=realtek.com header.i=@realtek.com header.b=XA00ENYD; arc=none smtp.client-ip=211.75.126.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realtek.com
+	s=arc-20240116; t=1730278660; c=relaxed/simple;
+	bh=A9gGyIPOptUM9cqyU8nnJCycIpuhm1BRbY05dMApQcY=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=XrB5lvKAN3MyH5GlTag3IzUIF+qBFM8y6+4GQBedpsiCdet2VjgVC5lQy5nwkZvFyY4gh7wfTMZW0Lpqt4v/kT60UGnCj5XFJdfPWmnngRce756dJ27bshewImzWCNxHDPFlUC0/KEavdqozNEBXiWOUKFLsVeULCBiW3K4v3j0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=UNYkzHLd; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=temperror (0-bit key) header.d=realtek.com header.i=@realtek.com header.b="XA00ENYD"
-X-SpamFilter-By: ArmorX SpamTrap 5.78 with qID 49U8hgeX73761067, This message is accepted by code: ctloc85258
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=realtek.com; s=dkim;
-	t=1730277822; bh=nON4sMqSAvd9n8ClRLG37QnCL3NBJJRIXO1tYAucTZc=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:
-	 Content-Transfer-Encoding:Content-Type;
-	b=XA00ENYDcchY15J824PGOCtZ5gcb24VLSi2zGEGNbFLjLml7bwaa0996b1lPOxr4p
-	 QC4Oxw3sVx/SfqvhZ/DNKMbgRsUPinO6TdzC9U10PcoZ2uA87r/gddWWEINmRNF3lj
-	 KKsRWOJFeco5LJOfcVn3gKEPsgN3sH2EjhwpvGlj5ZZe8upjNfEZC8cdl1VeIQV7mo
-	 igcO0TG2qM8ZLPyhNhs69BjXsYdbT1EdxpnhYu7y0qpe6BRfudW8eB9rVrjAeT2xGN
-	 Ujbg7XICRjHNWBQkU5G+U2zy6NYIOszONxBOb/GJ1aTZMm3kjTR5SE1ujg02nhuUl+
-	 vx0e7FDx/IY0g==
-Received: from mail.realtek.com (rtexh36506.realtek.com.tw[172.21.6.27])
-	by rtits2.realtek.com.tw (8.15.2/3.06/5.92) with ESMTPS id 49U8hgeX73761067
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 30 Oct 2024 16:43:42 +0800
-Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
- RTEXH36506.realtek.com.tw (172.21.6.27) with Microsoft SMTP Server
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="UNYkzHLd"
+Received: from pps.filterd (m0279873.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 49U5QLfh027500;
+	Wed, 30 Oct 2024 08:57:33 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=qcppdkim1; bh=QOaIU9mHLZnIwSmndmYtgl
+	Tgm552NDslIVfUmss4qTE=; b=UNYkzHLdZbY9AU1Oh91Gtk9UZ8mjwAZiBgsn4Q
+	7iDZa2DnG8E7/BnTHF9/txp9Sfl53QmwjgHGUZ6NEC7gJlVuFUjdIFNG171doIM1
+	3Mizhp7YDp5OXdgxh4bLVjrrCgXpEbVNqLw7CXSm18MmTcqSUoGCvqVJ0aGGCXHP
+	pWYW0VOfV8oIHLmac7XFb5GCzGTwnM/s+oE5ZLO+WYcKb3ewbVaz8Mv4rodYxjLS
+	R/cYoUA+oYzmEE0FhF/5mDV4jUCBRWxugSqx0iG2II6ZJMXLaYxfc3snq+zQMU77
+	7sL66GXuC5O4GL4swooP47qGhWGAIotb1E+UCs1bKCUSkDZA==
+Received: from nalasppmta01.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 42k1p32nh7-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 30 Oct 2024 08:57:33 +0000 (GMT)
+Received: from nalasex01b.na.qualcomm.com (nalasex01b.na.qualcomm.com [10.47.209.197])
+	by NALASPPMTA01.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 49U8vWm3016313
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 30 Oct 2024 08:57:32 GMT
+Received: from chejiang-gv.qualcomm.com (10.80.80.8) by
+ nalasex01b.na.qualcomm.com (10.47.209.197) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Wed, 30 Oct 2024 16:43:42 +0800
-Received: from localhost.localhost (172.21.132.53) by RTEXMBS04.realtek.com.tw
- (172.21.6.97) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.35; Wed, 30 Oct
- 2024 16:43:41 +0800
-From: Hilda Wu <hildawu@realtek.com>
-To: <marcel@holtmann.org>
-CC: <luiz.dentz@gmail.com>, <linux-bluetooth@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <max.chou@realtek.com>,
-        <alex_lu@realsil.com.cn>, <kidman@realtek.com>,
-        <howardchung@google.com>, <apusaka@chromium.org>,
-        <yinghsu@chromium.org>, <johnlai@google.com>
-Subject: [PATCH v3] Bluetooth: btrtl: Decrease HCI_OP_RESET timeout from 10 s to 2 s
-Date: Wed, 30 Oct 2024 16:43:34 +0800
-Message-ID: <20241030084334.2740513-1-hildawu@realtek.com>
-X-Mailer: git-send-email 2.34.1
+ 15.2.1544.9; Wed, 30 Oct 2024 01:57:29 -0700
+From: Cheng Jiang <quic_chejiang@quicinc.com>
+To: Marcel Holtmann <marcel@holtmann.org>,
+        Luiz Augusto von Dentz
+	<luiz.dentz@gmail.com>,
+        Rob Herring <robh@kernel.org>,
+        Krzysztof Kozlowski
+	<krzk+dt@kernel.org>,
+        Conor Dooley <conor+dt@kernel.org>,
+        "Balakrishna
+ Godavarthi" <quic_bgodavar@quicinc.com>,
+        Rocky Liao <quic_rjliao@quicinc.com>
+CC: <linux-bluetooth@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <quic_chejiang@quicinc.com>
+Subject: [PATCH v1] dt-bindings: bluetooth: Add qca6698 compatible string
+Date: Wed, 30 Oct 2024 16:57:14 +0800
+Message-ID: <20241030085714.1712454-1-quic_chejiang@quicinc.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -57,35 +64,40 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: RTEXH36506.realtek.com.tw (172.21.6.27) To
- RTEXMBS04.realtek.com.tw (172.21.6.97)
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nalasex01b.na.qualcomm.com (10.47.209.197)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: 9n9lGArXtDZWwCORaHr4Bq3B3Io-AMd_
+X-Proofpoint-ORIG-GUID: 9n9lGArXtDZWwCORaHr4Bq3B3Io-AMd_
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
+ definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ adultscore=0 spamscore=0 lowpriorityscore=0 mlxscore=0 malwarescore=0
+ phishscore=0 clxscore=1011 impostorscore=0 mlxlogscore=971 suspectscore=0
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2409260000 definitions=main-2410300069
 
-The original timeout setting for HCI Reset on shutdown is 10 seconds.
-HCI Reset shouldn't take 10 seconds to complete so instead use the
-default timeout for commands.
+Add QCA6698 qcom,qca6698-bt compatible strings.
 
-Signed-off-by: Hilda Wu <hildawu@realtek.com>
+Signed-off-by: Cheng Jiang <quic_chejiang@quicinc.com>
 ---
-V2 -> V3: Update commit message
-V1 -> V2: Modify commit message and summary
----
----
- drivers/bluetooth/btrtl.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ .../devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml    | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/drivers/bluetooth/btrtl.c b/drivers/bluetooth/btrtl.c
-index 2d95b3ea046d..7128a8a0ba25 100644
---- a/drivers/bluetooth/btrtl.c
-+++ b/drivers/bluetooth/btrtl.c
-@@ -1371,7 +1371,7 @@ int btrtl_shutdown_realtek(struct hci_dev *hdev)
- 	/* According to the vendor driver, BT must be reset on close to avoid
- 	 * firmware crash.
- 	 */
--	skb = __hci_cmd_sync(hdev, HCI_OP_RESET, 0, NULL, HCI_INIT_TIMEOUT);
-+	skb = __hci_cmd_sync(hdev, HCI_OP_RESET, 0, NULL, HCI_CMD_TIMEOUT);
- 	if (IS_ERR(skb)) {
- 		ret = PTR_ERR(skb);
- 		bt_dev_err(hdev, "HCI reset during shutdown failed");
+diff --git a/Documentation/devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml b/Documentation/devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml
+index 7bb68311c609..8ae1827e6a70 100644
+--- a/Documentation/devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml
++++ b/Documentation/devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml
+@@ -24,6 +24,7 @@ properties:
+       - qcom,wcn3991-bt
+       - qcom,wcn3998-bt
+       - qcom,qca6390-bt
++      - qcom,qca6698-bt
+       - qcom,wcn6750-bt
+       - qcom,wcn6855-bt
+       - qcom,wcn7850-bt
 -- 
-2.34.1
+2.25.1
 
