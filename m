@@ -1,92 +1,177 @@
-Received: from mail-ua1-f42.google.com (mail-ua1-f42.google.com [209.85.222.42])
+Received: from mail-lj1-f173.google.com (mail-lj1-f173.google.com [209.85.208.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2E038C1F;
-	Wed, 30 Oct 2024 19:22:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF82C1D1E7C
+	for <linux-bluetooth@vger.kernel.org>; Wed, 30 Oct 2024 20:14:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730316132; cv=none; b=C1LSGHiIZ6ZAb2KbCLccqtiLa2YKM+J9d6qIjuWhA78bycte8Rh1P5K45zAMxLxMAkWorgQX0qbiGGx7DiiTUrsjTHgD94y5jLE5pmcIbdR+TOM9keRZqueeZKbUERaUdXx4SnQe9W5HvM53GcbJjKkhGwXkVvXO6rey6FCd1x4=
+	t=1730319243; cv=none; b=AtPf/LpiN+w/jqGTqjwl/7pIbNQyl41Pepz9cClAF31uO8WGMszXZZN/6M6FKdlXOMecV6YLKgHEf/TRxPyLjsPPUOF5D4IWunv+RiL/8WDPDagiZ4Yt/Wuzk6OJdlgVhULIx6ZZZM5yexWrL9+qRiBgZ+8LNE5anCvpBNSKgjM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730316132; c=relaxed/simple;
-	bh=20YiWshwGqPi6EqRGa2V2wZdThZPQZc7P9R2zk6JTDA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=erbSu1QjZAXSMTocTeeZ5j9AJdjtHVzzJR8dcEQkm1Fu5XQvEO/g72tmQURBeklmuZeA8W5yHAa02V2T/qEvNmirXRyZI3RWzcpaO9AMC1UG1vznI2d+oD0ws8PzRZ++a4K2EgKmMA2FKrHZje1rGPOcoKZkEOsbZyuszeV1NRE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RRy1aNvv; arc=none smtp.client-ip=209.85.222.42
+	s=arc-20240116; t=1730319243; c=relaxed/simple;
+	bh=1MSWCxepsAoQ8WikjMPGQlz3CaiFPZQaev87yzy9wBc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=cc3A0JfVz+0myn0d7ZKivsFqNp2REtpE9oEOsxpcj5sCztB1rjOtVV6zHevmSkaKxOb0gNOIlXz3+tzBPwJZffpjAD5lLLnqji9sDWezZmpqG7+4JuwDruXwVIAIo8LGHntYOiO1h1eOBaTkkp1pLv2F3b7tYJqHSZfQrWZnslI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YVQKTr7r; arc=none smtp.client-ip=209.85.208.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RRy1aNvv"
-Received: by mail-ua1-f42.google.com with SMTP id a1e0cc1a2514c-84fdb038aaaso19571241.3;
-        Wed, 30 Oct 2024 12:22:10 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YVQKTr7r"
+Received: by mail-lj1-f173.google.com with SMTP id 38308e7fff4ca-2fb443746b8so1972961fa.0
+        for <linux-bluetooth@vger.kernel.org>; Wed, 30 Oct 2024 13:14:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1730316129; x=1730920929; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=7KtXB2ifDIWOa6mGWGS93FJVDdAa3M1hw2PYhtDXBHw=;
-        b=RRy1aNvv/qkCvbTXTImwe0pQFgVvsEQnTZGIU/lx/yw66FtbEiimvsjBZNdjEBl0ha
-         YBc/SGTpHa3cHVwrfucgVMMf2dzCXmdXlGSillkAzVid5l2nCRLAS91/VuQmMSfmT4dC
-         aHntzpzk8pO35yTQNAZ1uuLvDWow3EMLVx9lfioj0eme7WsBXc5gBeWCNd3nNr1TBATG
-         sI5c7JsInMtn7Cq6xB56i4r6odDHdeN9uJd5xa2sA/4SrgNIgVYyzbZaes28eR0kIslr
-         Nv8DwiQR3YWOnHFrcLginC9JNKQbIVOnhUc3pSr7lne64xNmSELPHRX9NWd1V8SZFEdH
-         eOWw==
+        d=gmail.com; s=20230601; t=1730319239; x=1730924039; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=+lyxdvIZJtYUtofs63l2EHmfFczjS1c6af7PehmrMuo=;
+        b=YVQKTr7ryvhbPgsfOITcdbzW1xbZZ/DaWSHOAUNko12ZcQCTZ+qoVtCONHw0WWMnAS
+         cFpvZBwwhjS9lUx84RkEoo57anozIZhq+Wjw0t5UhjCEPNn/+KnQEM5YXrn7A1aoENUk
+         lmIv6TQNsDfqLlLaBnIe2q36tBuOCAZXT43JsXw5I0efr46NAjH0JUjwIroCyoliwhlc
+         wgb0mKNIVrFZhTzpwD7jJ6av3XM4Ly6raxISS6bNMNcxYbgaD8qlTwWA6a0AHXcbNyDO
+         tF1JTiq0CeFqaNJJibBrySMDCggBwRXKI/7UmAHAhmYmR2IwQVA+0TC46hTitb7nqlTG
+         oOHQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730316129; x=1730920929;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=7KtXB2ifDIWOa6mGWGS93FJVDdAa3M1hw2PYhtDXBHw=;
-        b=jL6oBLXT6vKndFvZr8US3J4STDEqiCywIEPxSRu4GxqJiHOZBdH9N466EkhAz+zHIL
-         NJ1B69KujKV/LT2uheJ9lO7ub+f1fyjolRxza16vplv/8WL+YOykRAHYDZnDmWOO7hu/
-         2lHl0D7yT1spFOUKSu/zyB/rBOU2tx8PY7N7gZaKkPGIJLof70XRHhpKsM4e4Y8qaIGs
-         F7oLrlJ8gPggKd0AYEik+uznCcQC0aNqp/5+qhiohUmUKx1iKxhbvtyjcR779nH3ngUP
-         8pyOjHIeQH4ClCW/SMO/D76vZDTGdsQzYgLdhXx/UX0E6Bpv5FPcaoaeO1W3ZNjJKyzr
-         PuIQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWjFw+SZ/iZa7x0/LT3szftHNehYlcbG+GZmZHLgicvTbKzcVGw1293wCZ48Z/WAZPYkIQwN+Y=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxkEUDD6E/7Bv6Zp5Cg7zLzJum5LtEFhrCGJ5brguxPSfRRXfBW
-	gur4ZRkQttM8wYc4X8QRmSHbTC8LlVPRC5zbOifNZr+v6sNlgfWfA5mc8w==
-X-Google-Smtp-Source: AGHT+IGhoT1ij29i/Qh8/RPaqQpOkqMiD6/poSiI0uDx4uJIVUeNzsAMD12RAqYQ8uKE+Co1Ewg6tQ==
-X-Received: by 2002:a05:6102:dd2:b0:4a4:8287:6c34 with SMTP id ada2fe7eead31-4a8cfb681c6mr16033541137.17.1730316129462;
-        Wed, 30 Oct 2024 12:22:09 -0700 (PDT)
-Received: from lvondent-mobl5.. (syn-107-146-107-067.res.spectrum.com. [107.146.107.67])
-        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-85580ab7a5asm1611661241.23.2024.10.30.12.22.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 30 Oct 2024 12:22:07 -0700 (PDT)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: davem@davemloft.net,
-	kuba@kernel.org
-Cc: linux-bluetooth@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: pull request: bluetooth 2024-10-30
-Date: Wed, 30 Oct 2024 15:22:05 -0400
-Message-ID: <20241030192205.38298-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.47.0
+        d=1e100.net; s=20230601; t=1730319239; x=1730924039;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=+lyxdvIZJtYUtofs63l2EHmfFczjS1c6af7PehmrMuo=;
+        b=RVzlKbjx39AgWJpe6ZmP9LIEVo2FWQRswCEXDcn3ZbE6RbMqlKBwPhYn5H5TubaUw+
+         naxejuoWtvoH2epwDlrNvxg1/MG80BiXm3Nk2GQGyiBZxnzNmXLYVg3vHtMImFakCEiG
+         zeloP9KnYYVW1AGmLwmVSQpAhEL1TNC+H4Ai4HVx8oJ3x1HXt9Z4eSNcHdqmvuK5VzyM
+         czrrsed2Gb3q50+nh/tHmJ7GfYNB5pma6akKGQDZijWb7HJgSTdYrtX6xLKiHQ4vQn5C
+         M8PuSeSFlz/0aJbZMqNcSX2pspbuwV0Mvm2e6VLhFPkMxhUhGDlOK0o5E438cOD9s4+6
+         kPxg==
+X-Gm-Message-State: AOJu0YzbrO/3CGc96Te3pIevlddoccKwSb3I07mzMtZaXSox53dKg1DU
+	RZF8gx7fPxes9LGqgSgLQkUMfjFsnrk9nYzf/Xnt2WIT4/oy8CXVKRxN+E0h7ADc5I9xUXxVwsT
+	fubUO0/BhKFwf/Byp1T2UCfolmOH6iaaf
+X-Google-Smtp-Source: AGHT+IEIIl7fbRrBIG/YJTQNphy6sBHKjKg0QJ0k0Lg95N25309NqsCPLmdLp6hPzMjVQ9VRWtuun4WUxqTrDL4QkZg=
+X-Received: by 2002:a05:651c:1989:b0:2fb:b8a:7abb with SMTP id
+ 38308e7fff4ca-2fcbdff7529mr80070121fa.21.1730319238466; Wed, 30 Oct 2024
+ 13:13:58 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20241030083803.153001-1-quic_amisjain@quicinc.com>
+In-Reply-To: <20241030083803.153001-1-quic_amisjain@quicinc.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Wed, 30 Oct 2024 16:13:46 -0400
+Message-ID: <CABBYNZ+yxUkr=S-PZPYWw4SSkvf+43w1mXrDcLiDg6TmdOGayw@mail.gmail.com>
+Subject: Re: [PATCH v3] obex : Fix for PBAP GET request in PTS testing
+To: Amisha Jain <quic_amisjain@quicinc.com>
+Cc: linux-bluetooth@vger.kernel.org, quic_mohamull@quicinc.com, 
+	quic_hbandi@quicinc.com, quic_anubhavg@quicinc.com, 
+	Hannu Mallat <hmallat@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-The following changes since commit c05c62850a8f035a267151dd86ea3daf887e28b8:
+Hi Amisha,
 
-  Merge tag 'wireless-2024-10-29' of https://git.kernel.org/pub/scm/linux/kernel/git/wireless/wireless (2024-10-29 18:57:12 -0700)
+On Wed, Oct 30, 2024 at 4:38=E2=80=AFAM Amisha Jain <quic_amisjain@quicinc.=
+com> wrote:
+>
+> This change is required for passing below PTS testcases -
+> 1. PBAP/PSE/PBD/BV-02-C
+> 2. PBAP/PSE/PBD/BV-03-C
+> 3. PBAP/PSE/PBD/BI-01-C
+> 4. PBAP/PSE/PBD/BV-13-C
+> 5. PBAP/PSE/PBD/BV-14-C
+> 6. PBAP/PSE/PBD/BV-17-C
+>
+> For all the GET phonebook request sent by PTS has no extra params
+> added in it, therefore PBAP server is rejecting the request
+> by sending 'Bad Request' as response.
+> So appending few default params in GET request to avoid
+> testcase failure.
+> This params are already added for Vcardlisting and Vcardentry
+> operations.
+>
+> ---
+>  obexd/plugins/pbap.c | 22 +++++++++++++++++++++-
+>  1 file changed, 21 insertions(+), 1 deletion(-)
+>
+> diff --git a/obexd/plugins/pbap.c b/obexd/plugins/pbap.c
+> index 4175f9de8..ae39d25b6 100644
+> --- a/obexd/plugins/pbap.c
+> +++ b/obexd/plugins/pbap.c
+> @@ -511,7 +511,22 @@ static int pbap_get(struct obex_session *os, void *u=
+ser_data)
+>                 rsize =3D 0;
+>         }
+>
+> -       /* Workaround for PTS client not sending mandatory apparams */
+> +       /* Workaround for PTS client not sending mandatory apparams
+> +        *
+> +        * Add MaxListCount attribute, description as per PBAP spec
+> +        *
+> +        * 5.1.4.3 MaxListCount :
+> +        * This header is used to indicate the maximum number of
+> +        * entries of the <x-bt/phonebook> object that the PCE
+> +        * can handle. The value 65535 means that the number of
+> +        * entries is not restricted. The maximum number of entries
+> +        * shall be 65,535 if this header is not specified.
+> +        *
+> +        * 0x04 - Tag id
+> +        * 0x02 - length
+> +        * next 2 bytes are value - 0xffff
+> +        * */
+> +
+>         if (!rsize && g_ascii_strcasecmp(type, VCARDLISTING_TYPE) =3D=3D =
+0) {
+>                 static const uint8_t default_apparams[] =3D {
+>                         0x04, 0x02, 0xff, 0xff
+> @@ -524,6 +539,11 @@ static int pbap_get(struct obex_session *os, void *u=
+ser_data)
+>                 };
+>                 buffer =3D default_apparams;
+>                 rsize =3D sizeof(default_apparams);
+> +       } else if (!rsize && g_ascii_strcasecmp(type, PHONEBOOK_TYPE) =3D=
+=3D 0) {
+> +               static const uint8_t default_apparams[] =3D {
+> +                       0x04, 0x02, 0xff, 0xff };
+> +               buffer =3D default_apparams;
+> +               rsize =3D sizeof(default_apparams);
+>         }
+>
+>         params =3D parse_aparam(buffer, rsize);
+> --
+> 2.34.1
 
-are available in the Git repository at:
+I'm thinking we should do this a little differently:
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2024-10-30
+https://gist.github.com/Vudentz/4fd0ec9cff098a0470869bc99264d7c0
 
-for you to fetch changes up to 1e67d8641813f1876a42eeb4f532487b8a7fb0a8:
+We had already been setting params->maxlistcount:
 
-  Bluetooth: hci: fix null-ptr-deref in hci_read_supported_codecs (2024-10-30 14:49:09 -0400)
+    /*
+     * As per spec when client doesn't include MAXLISTCOUNT_TAG then it
+     * should be assume as Maximum value in vcardlisting 65535
+     */
+    param->maxlistcount =3D UINT16_MAX
 
-----------------------------------------------------------------
-bluetooth pull request for net:
+But this code didn't account for not having any header and then we introduc=
+ed:
 
- - hci: fix null-ptr-deref in hci_read_supported_codecs
+commit bb27e5e1be7cbaac09aef5ff7a79f71a2ad8d113
+Author: Hannu Mallat <hmallat@gmail.com>
+Date:   Fri Jul 23 15:58:24 2021 +0200
 
-----------------------------------------------------------------
-Sungwoo Kim (1):
-      Bluetooth: hci: fix null-ptr-deref in hci_read_supported_codecs
+    obexd: phonebook: Set default apparams for PTS clients
 
- net/bluetooth/hci_sync.c | 18 +++++++++++-------
- 1 file changed, 11 insertions(+), 7 deletions(-)
+    Some PTS clients do not send all the mandatory apparams
+    when retrieving the phonebook. Clients such as car multimedia systems
+    cannot be fixed, therefore working around this issue by inserting
+    default apparams which makes these clients work as well.
+
+Looking in retrospect was the wrong call since we shouldn't need to
+fabricate the headers if PBAP says they are the default then it is
+parse_aparam that needs fixing so we just don't fail if there are no
+headers. Now the only thing I don't get is why we introduce the
+default to vCard 3.0 rather than vCard 2.1, or does PTS require that
+for some reason?
+
+--=20
+Luiz Augusto von Dentz
