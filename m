@@ -1,179 +1,80 @@
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A9F419A288;
-	Wed, 30 Oct 2024 17:47:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C0471BD9F4;
+	Wed, 30 Oct 2024 18:30:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730310478; cv=none; b=s7gpJPqTZPiPDu/+fMbYJkdndytM/FAlEYn3wL3oxEv4J3A+jCoMH+raq7Qfi1Lst2Q5PDtfra8XjQKoQ4+JMvmexz5PLTIAKb1LuXBL29bWdEj2pX5RN3n7abiY9mMEzdtuLv0/hKOw4CiO6PxLqG5dCdRKKLzZYhfH3i/M1pI=
+	t=1730313025; cv=none; b=OdMi6xqbpnLLucWS0CMaQllOSIT5x24D4vxBFgh2aC4ngxIREfoHo0BSFh18B88s4gv9Q42Ry85+iZkD0FC+CakI7/iG3erRz5jvZaKXbCe9so0oCEnp9fcyDMzPf1f/hvLSjOBdc6uDRfMM4HK4x3+t/zHi8MUchdzTj4hJkfk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730310478; c=relaxed/simple;
-	bh=Y412xZzNOO5MY5f54d4tqDx7k+RoU/X0XQaCOxzYaA0=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=K0Cs8d/1wCr/l3AFSdI8ukiqyj6OMs86Tvg/afmZs67AXuEXBnTTfbFYEZWLCI9gW7bYUjfD1TZsGziAEqhXBSZSZ4KbFvP3p/kSjOyT3HR/4cFJyrcqr/4pW/b30XIoejHacafNNNF1r9ZKOlBhg5WX8cWkNLrD4XVq4TOuNeo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=UgCdEVzu; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+	s=arc-20240116; t=1730313025; c=relaxed/simple;
+	bh=5dhRFS3XnB+S3QVFTb8wGy1KKoP3Le/rBZZgA4M1pvQ=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=ElmcF6d24FTHuPTGuJxZTX8VqZJg1NuHp2W8xP8ejIcsdbAPGumX21ffpz4+bxSszqxmycoxkc/6Vo3y36IJfwQ4d6b0ANaW+MHBaTYCjyctQFfFwd1s3jZE38UjLBV8Pl6t4Q382FblsLlmM7JG06qv/317QHLoSocIOSlKC+Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=A+n+fQPF; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="UgCdEVzu"
-Received: from eahariha-devbox.internal.cloudapp.net (unknown [40.91.112.99])
-	by linux.microsoft.com (Postfix) with ESMTPSA id B85E72054B69;
-	Wed, 30 Oct 2024 10:47:50 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com B85E72054B69
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1730310470;
-	bh=bwsyKqQWUa0Kwp+K5MBC5j2XBjYIf72PRYb9FH/rEwY=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=UgCdEVzurzBU+c8+arct7OHOSd0yrqb5/vHvfhed2xVDqVDS4AomkKuo0NGX43Epj
-	 TK6Fn8unpF00LFLpdszi5GI6gi2r9zrl0tS/xupPDbqZ/gweAA68JB02GhPal18H1b
-	 RNWS9USCx69f4ue8YEpBMHgt2hPJpSsxri4qqVzw=
-From: Easwar Hariharan <eahariha@linux.microsoft.com>
-Date: Wed, 30 Oct 2024 17:47:36 +0000
-Subject: [PATCH v3 2/2] drivers: hv: Convert open-coded timeouts to
- secs_to_jiffies()
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="A+n+fQPF"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B5173C4CECE;
+	Wed, 30 Oct 2024 18:30:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1730313024;
+	bh=5dhRFS3XnB+S3QVFTb8wGy1KKoP3Le/rBZZgA4M1pvQ=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=A+n+fQPFbR4tUtKOYDE1sQRCqMBf5pD02fonwDqCH1iSmewlkM413VDlD3swiwZWF
+	 8ei7l/C/i+zyFzGwYyYwWtOaC4oFPobSsNPEo9bNN1CQromp977jquxKWVHw6jwOgC
+	 vYq0c78Wvu24H3dSIh1vqDGmcArUsaK+4+IB9arTEWFr+nifnnPsDpnQ8zEwGPkW1K
+	 7RkvZtu0bi1s8mdPs/R0Tl91odnRyaEvCSZo4LYmsaafFNI2isYMeeqzQ/hQNtzDJO
+	 cZnzH8zC2x4b/ch02gK1IJED7WRO+EYv0nfwkOw9uS1F6Wgod80iIk1isNn54oboqI
+	 I05+aJD9C5/Xw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADEB4380AC22;
+	Wed, 30 Oct 2024 18:30:33 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20241030-open-coded-timeouts-v3-2-9ba123facf88@linux.microsoft.com>
-References: <20241030-open-coded-timeouts-v3-0-9ba123facf88@linux.microsoft.com>
-In-Reply-To: <20241030-open-coded-timeouts-v3-0-9ba123facf88@linux.microsoft.com>
-To: "K. Y. Srinivasan" <kys@microsoft.com>, 
- Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>, 
- Dexuan Cui <decui@microsoft.com>, linux-hyperv@vger.kernel.org, 
- Anna-Maria Behnsen <anna-maria@linutronix.de>, 
- Thomas Gleixner <tglx@linutronix.de>, 
- Geert Uytterhoeven <geert@linux-m68k.org>, 
- Marcel Holtmann <marcel@holtmann.org>, 
- Johan Hedberg <johan.hedberg@gmail.com>, 
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
- linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
- Praveen Kumar <kumarpraveen@linux.microsoft.com>, 
- Naman Jain <namjain@linux.microsoft.com>
-Cc: Michael Kelley <mhklinux@outlook.com>, 
- Easwar Hariharan <eahariha@linux.microsoft.com>
-X-Mailer: b4 0.14.2
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v3] Bluetooth: hci: fix null-ptr-deref in
+ hci_read_supported_codecs
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <173031303250.1428768.6665281054491873346.git-patchwork-notify@kernel.org>
+Date: Wed, 30 Oct 2024 18:30:32 +0000
+References: <20241029194505.2094645-2-iam@sung-woo.kim>
+In-Reply-To: <20241029194505.2094645-2-iam@sung-woo.kim>
+To: Sungwoo Kim <iam@sung-woo.kim>
+Cc: luiz.dentz@gmail.com, daveti@purdue.edu, benquike@gmail.com,
+ marcel@holtmann.org, johan.hedberg@gmail.com,
+ linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
 
-We have several places where timeouts are open-coded as N (seconds) * HZ,
-but best practice is to use the utility functions from jiffies.h. Convert
-the timeouts to be compliant. This doesn't fix any bugs, it's a simple code
-improvement.
+Hello:
 
-TO: "K. Y. Srinivasan" <kys@microsoft.com>
-TO: Haiyang Zhang <haiyangz@microsoft.com>
-TO: Wei Liu <wei.liu@kernel.org>
-TO: Dexuan Cui <decui@microsoft.com>
-TO: linux-hyperv@vger.kernel.org
-TO: Anna-Maria Behnsen <anna-maria@linutronix.de>
-TO: Thomas Gleixner <tglx@linutronix.de>
-TO: Geert Uytterhoeven <geert@linux-m68k.org>
-TO: Marcel Holtmann <marcel@holtmann.org>
-TO: Johan Hedberg <johan.hedberg@gmail.com>
-TO: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-TO: linux-bluetooth@vger.kernel.org
-TO: linux-kernel@vger.kernel.org
-CC: Michael Kelley <mhklinux@outlook.com>
-Signed-off-by: Easwar Hariharan <eahariha@linux.microsoft.com>
----
- drivers/hv/hv_balloon.c  | 9 +++++----
- drivers/hv/hv_kvp.c      | 4 ++--
- drivers/hv/hv_snapshot.c | 3 ++-
- drivers/hv/vmbus_drv.c   | 2 +-
- 4 files changed, 10 insertions(+), 8 deletions(-)
+This patch was applied to bluetooth/bluetooth-next.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-diff --git a/drivers/hv/hv_balloon.c b/drivers/hv/hv_balloon.c
-index c38dcdfcb914dcc3515be100cba0beb4a3f9b975..a99112e6f0b8534cf5c8c963e343019061bd34f6 100644
---- a/drivers/hv/hv_balloon.c
-+++ b/drivers/hv/hv_balloon.c
-@@ -756,7 +756,7 @@ static void hv_mem_hot_add(unsigned long start, unsigned long size,
- 		 * adding succeeded, it is ok to proceed even if the memory was
- 		 * not onlined in time.
- 		 */
--		wait_for_completion_timeout(&dm_device.ol_waitevent, 5 * HZ);
-+		wait_for_completion_timeout(&dm_device.ol_waitevent, secs_to_jiffies(5));
- 		post_status(&dm_device);
- 	}
- }
-@@ -1373,7 +1373,8 @@ static int dm_thread_func(void *dm_dev)
- 	struct hv_dynmem_device *dm = dm_dev;
- 
- 	while (!kthread_should_stop()) {
--		wait_for_completion_interruptible_timeout(&dm_device.config_event, 1 * HZ);
-+		wait_for_completion_interruptible_timeout(&dm_device.config_event,
-+								secs_to_jiffies(1));
- 		/*
- 		 * The host expects us to post information on the memory
- 		 * pressure every second.
-@@ -1748,7 +1749,7 @@ static int balloon_connect_vsp(struct hv_device *dev)
- 	if (ret)
- 		goto out;
- 
--	t = wait_for_completion_timeout(&dm_device.host_event, 5 * HZ);
-+	t = wait_for_completion_timeout(&dm_device.host_event, secs_to_jiffies(5));
- 	if (t == 0) {
- 		ret = -ETIMEDOUT;
- 		goto out;
-@@ -1806,7 +1807,7 @@ static int balloon_connect_vsp(struct hv_device *dev)
- 	if (ret)
- 		goto out;
- 
--	t = wait_for_completion_timeout(&dm_device.host_event, 5 * HZ);
-+	t = wait_for_completion_timeout(&dm_device.host_event, secs_to_jiffies(5));
- 	if (t == 0) {
- 		ret = -ETIMEDOUT;
- 		goto out;
-diff --git a/drivers/hv/hv_kvp.c b/drivers/hv/hv_kvp.c
-index d35b60c0611486c8c909d2f8f7c730ff913df30d..29e01247a0870fdb9eebd92bdd16fd371450240c 100644
---- a/drivers/hv/hv_kvp.c
-+++ b/drivers/hv/hv_kvp.c
-@@ -655,7 +655,7 @@ void hv_kvp_onchannelcallback(void *context)
- 		if (host_negotiatied == NEGO_NOT_STARTED) {
- 			host_negotiatied = NEGO_IN_PROGRESS;
- 			schedule_delayed_work(&kvp_host_handshake_work,
--				      HV_UTIL_NEGO_TIMEOUT * HZ);
-+						secs_to_jiffies(HV_UTIL_NEGO_TIMEOUT));
- 		}
- 		return;
- 	}
-@@ -724,7 +724,7 @@ void hv_kvp_onchannelcallback(void *context)
- 		 */
- 		schedule_work(&kvp_sendkey_work);
- 		schedule_delayed_work(&kvp_timeout_work,
--					HV_UTIL_TIMEOUT * HZ);
-+				      secs_to_jiffies(HV_UTIL_TIMEOUT));
- 
- 		return;
- 
-diff --git a/drivers/hv/hv_snapshot.c b/drivers/hv/hv_snapshot.c
-index 0d2184be16912559a8cfa784c762e6418ebd3279..86d87486ed40b3ca9f6674650e5a86a7184e2fa6 100644
---- a/drivers/hv/hv_snapshot.c
-+++ b/drivers/hv/hv_snapshot.c
-@@ -193,7 +193,8 @@ static void vss_send_op(void)
- 	vss_transaction.state = HVUTIL_USERSPACE_REQ;
- 
- 	schedule_delayed_work(&vss_timeout_work, op == VSS_OP_FREEZE ?
--			VSS_FREEZE_TIMEOUT * HZ : HV_UTIL_TIMEOUT * HZ);
-+				secs_to_jiffies(VSS_FREEZE_TIMEOUT) :
-+				secs_to_jiffies(HV_UTIL_TIMEOUT));
- 
- 	rc = hvutil_transport_send(hvt, vss_msg, sizeof(*vss_msg), NULL);
- 	if (rc) {
-diff --git a/drivers/hv/vmbus_drv.c b/drivers/hv/vmbus_drv.c
-index 9b15f7daf5059750e17ea3607b52dee967c1c059..7db30881e83ad4b406413641413d68329fc663e2 100644
---- a/drivers/hv/vmbus_drv.c
-+++ b/drivers/hv/vmbus_drv.c
-@@ -2507,7 +2507,7 @@ static int vmbus_bus_resume(struct device *dev)
- 	vmbus_request_offers();
- 
- 	if (wait_for_completion_timeout(
--		&vmbus_connection.ready_for_resume_event, 10 * HZ) == 0)
-+		&vmbus_connection.ready_for_resume_event, secs_to_jiffies(10)) == 0)
- 		pr_err("Some vmbus device is missing after suspending?\n");
- 
- 	/* Reset the event for the next suspend. */
+On Tue, 29 Oct 2024 19:44:41 +0000 you wrote:
+> Fix __hci_cmd_sync_sk() to return not NULL for unknown opcodes.
+> 
+> __hci_cmd_sync_sk() returns NULL if a command returns a status event.
+> However, it also returns NULL where an opcode doesn't exist in the
+> hci_cc table because hci_cmd_complete_evt() assumes status = skb->data[0]
+> for unknown opcodes.
+> This leads to null-ptr-deref in cmd_sync for HCI_OP_READ_LOCAL_CODECS as
+> there is no hci_cc for HCI_OP_READ_LOCAL_CODECS, which always assumes
+> status = skb->data[0].
+> 
+> [...]
 
+Here is the summary with links:
+  - [v3] Bluetooth: hci: fix null-ptr-deref in hci_read_supported_codecs
+    https://git.kernel.org/bluetooth/bluetooth-next/c/af524ed29eee
+
+You are awesome, thank you!
 -- 
-2.34.1
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
