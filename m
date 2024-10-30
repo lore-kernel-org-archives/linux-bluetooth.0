@@ -1,119 +1,115 @@
 Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C57282C6A3;
-	Wed, 30 Oct 2024 09:45:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DE47192D76;
+	Wed, 30 Oct 2024 09:47:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730281510; cv=none; b=rFjLu/01qGUUzeuAlhxZogNURFBCX+9J90AKqelVrCKTNu3ApaR4u0OROx+fR72D/xF8eQTTHqoAimxLUSTsFg8a+UDdOV9CxS4DHvzKOvdNGPBT7LRG13J/ZmdBb7r1ZUdzhRbnxO0gw85b0peMU8NNHD6jGV67AKH3F/PTbcE=
+	t=1730281669; cv=none; b=AFWsOqVrtv7wMykbgpNAWu/DsVCyzlo8Cp1kViURVT8JyeTQABp/XZ2+TcXJbYH5d0GiCJjix+KEuxY48J9pespLvdcvAP+ob+r95jWpLmmyBiaMo/7m2aDjkgIiIlD1JVg8fyP0Lwg0/lP3cwQX9JlDK2AA0xdwWHfCSv1+n/U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730281510; c=relaxed/simple;
-	bh=DcfLXZMdyguicjxslWmG0tQU/gpyKc8jDYUhtVhpXMc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=aukYg6scMcjfNjy8HyUGLH+X0h/6IN+X1PaVqwx7nveVmFbgmSY53zblsZ5UTETXbvB4oBDwzjT8tERs5Y8TOi7wqGdW9fxkC6z3k7YjSJkjAzBs1wGpJd3BqidJ7U9ZkDzo8qBMEBB8v5E784I9qtaa3c5NeMEW/kGf8hWZw8c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=RYNDBJnU; arc=none smtp.client-ip=205.220.168.131
+	s=arc-20240116; t=1730281669; c=relaxed/simple;
+	bh=fgQ8HPJMOhDVDvtNZIRo1EcUE4/mp8/GcyyDZDCyufI=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=hFq2Cx5/r5kNGPRx3Azdzf4wu+IRng+ilfYC+78zV1mrPz/S/zwPCLiKYor1kSreEw6gBK0vgJY9tjW9TJrPZwcVchG25NNulustBRCyZi1cv4WPk9dTw+e15jOJJNxwKqq0EDKb9hW6XrOo8sSC5NIPPjplnavYNAQGvgjA2ic=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=J5n+9OhU; arc=none smtp.client-ip=205.220.168.131
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="RYNDBJnU"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="J5n+9OhU"
 Received: from pps.filterd (m0279862.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 49TNeRu8009284;
-	Wed, 30 Oct 2024 09:45:02 GMT
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 49U0dLci008776;
+	Wed, 30 Oct 2024 09:47:41 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	ecNXfS87uQXt17NqlNBGsyUw3SzU4L6dRLMjRUbAHEY=; b=RYNDBJnU6ZVuEFw1
-	T/LQKerNr3CCgkO3xaUUfZddcz5x7q72qtzgk9TZ6p6u1BxQRv+J5rxRLPKuVkpN
-	mAXLeIsX/sG3xZR3Ai3GrhEFj1HGi7fl5gm2XF4HRZJebZy/Ed2PYZiDtSsvT2fx
-	WA0yqloAly2QPKnORS8m5In5ExVe8vmMyvBiYYKjpXgy0oSDMphqL5bIKz9jwJl7
-	LqU52R6bnBvkd5Ed6Cdiz4QF1qD05QNfJuA16Zugdrm5qOKytDmYpCxBFh/1b4Ip
-	dDfk0cwlOCVYvj3qPw3VO0QoiHhg2ouni06ARnIKx5VBhpwDUKLDZQihf91uIQXc
-	d4lb+Q==
-Received: from nalasppmta03.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 42jxa8baq8-1
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=qcppdkim1; bh=Jnd7WRijSd4x0aizijKlG5
+	KEkMdD2qcJ5Lpw78Ikn90=; b=J5n+9OhUbamgtcZrHHcEj/VPAlZ7BwnGlipmPY
+	J1NUXhi6w90PqXr3jeA8exn9hcTbJhRZMJiufHExbtcouJ6IiVm3a2HDuRt/MOJZ
+	F1akAspIV5Db9vw49n/shWav7LI+gKQoTl2GNIJhQLl/5tV7cFq4ZzyDdgyg9x4z
+	1iYhJdBRSEn7KKnExzcZLPXw/s6Q9JiC1jx/WpAZA4ZeaH2wJZzh621Chm/dhy2Y
+	6h70+xGVwYiaEG4YE9u1umEqCNEEdiJplHfjcDtUR9nariZjtwU5eiXJ+rSwRhZ/
+	91Ko7OTlmwcpOrX9MXeK8XSO1LKsCvhfQXYDrhiI3xkjNbvQ==
+Received: from nalasppmta05.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 42jxa8bawa-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 30 Oct 2024 09:45:02 +0000 (GMT)
+	Wed, 30 Oct 2024 09:47:41 +0000 (GMT)
 Received: from nalasex01b.na.qualcomm.com (nalasex01b.na.qualcomm.com [10.47.209.197])
-	by NALASPPMTA03.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 49U9j1c9025614
+	by NALASPPMTA05.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 49U9lecw015241
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 30 Oct 2024 09:45:01 GMT
-Received: from [10.231.216.175] (10.80.80.8) by nalasex01b.na.qualcomm.com
- (10.47.209.197) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Wed, 30 Oct
- 2024 02:44:58 -0700
-Message-ID: <1c7fb392-101e-4c28-be4c-dc8534a5b28a@quicinc.com>
-Date: Wed, 30 Oct 2024 17:44:55 +0800
+	Wed, 30 Oct 2024 09:47:41 GMT
+Received: from chejiang-gv.qualcomm.com (10.80.80.8) by
+ nalasex01b.na.qualcomm.com (10.47.209.197) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.9; Wed, 30 Oct 2024 02:47:38 -0700
+From: Cheng Jiang <quic_chejiang@quicinc.com>
+To: Marcel Holtmann <marcel@holtmann.org>,
+        Luiz Augusto von Dentz
+	<luiz.dentz@gmail.com>,
+        Rob Herring <robh@kernel.org>,
+        Krzysztof Kozlowski
+	<krzk+dt@kernel.org>,
+        Conor Dooley <conor+dt@kernel.org>,
+        "Balakrishna
+ Godavarthi" <quic_bgodavar@quicinc.com>,
+        Rocky Liao <quic_rjliao@quicinc.com>
+CC: <linux-bluetooth@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <quic_chejiang@quicinc.com>
+Subject: [PATCH v2] dt-bindings: bluetooth: Add qca6698 compatible string
+Date: Wed, 30 Oct 2024 17:47:28 +0800
+Message-ID: <20241030094728.1714034-1-quic_chejiang@quicinc.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1] dt-bindings: bluetooth: Add qca6698 compatible string
-To: Krzysztof Kozlowski <krzk@kernel.org>,
-        Marcel Holtmann
-	<marcel@holtmann.org>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        "Rob
- Herring" <robh@kernel.org>,
-        Krzysztof Kozlowski <krzk+dt@kernel.org>,
-        "Conor
- Dooley" <conor+dt@kernel.org>,
-        Balakrishna Godavarthi
-	<quic_bgodavar@quicinc.com>,
-        Rocky Liao <quic_rjliao@quicinc.com>
-CC: <linux-bluetooth@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>
-References: <20241030085714.1712454-1-quic_chejiang@quicinc.com>
- <1e7d2b10-f170-4996-9ac5-3104cfff21d5@kernel.org>
-Content-Language: en-US
-From: Cheng Jiang <quic_chejiang@quicinc.com>
-In-Reply-To: <1e7d2b10-f170-4996-9ac5-3104cfff21d5@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
  nalasex01b.na.qualcomm.com (10.47.209.197)
 X-QCInternal: smtphost
 X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: 7kHAdUd9E0h8QqZTC8QoSf7XEIEXG1CD
-X-Proofpoint-ORIG-GUID: 7kHAdUd9E0h8QqZTC8QoSf7XEIEXG1CD
+X-Proofpoint-GUID: BrMy4tjZDvYySx_r0m2wQ8QCIDtPm8sQ
+X-Proofpoint-ORIG-GUID: BrMy4tjZDvYySx_r0m2wQ8QCIDtPm8sQ
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
  definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 suspectscore=0
  bulkscore=0 priorityscore=1501 lowpriorityscore=0 spamscore=0
- malwarescore=0 impostorscore=0 phishscore=0 mlxlogscore=999 mlxscore=0
- clxscore=1011 classifier=spam adjust=0 reason=mlx scancount=1
+ malwarescore=0 impostorscore=0 phishscore=0 mlxlogscore=945 mlxscore=0
+ clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.19.0-2409260000 definitions=main-2410300075
 
-Hi Krzysztof,
+Add QCA6698 qcom,qca6698-bt compatible strings.
 
-Sorry, I miss the compatibility part and will submit a new version. 
+Signed-off-by: Cheng Jiang <quic_chejiang@quicinc.com>
+---
+Changes in v2:
+- Add the compatibility for qcom,qca6698-bt
 
-On 10/30/2024 5:26 PM, Krzysztof Kozlowski wrote:
-> On 30/10/2024 09:57, Cheng Jiang wrote:
->> Add QCA6698 qcom,qca6698-bt compatible strings.
->>
->> Signed-off-by: Cheng Jiang <quic_chejiang@quicinc.com>
->> ---
->>  .../devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml    | 1 +
->>  1 file changed, 1 insertion(+)
->>
->> diff --git a/Documentation/devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml b/Documentation/devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml
->> index 7bb68311c609..8ae1827e6a70 100644
->> --- a/Documentation/devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml
->> +++ b/Documentation/devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml
->> @@ -24,6 +24,7 @@ properties:
->>        - qcom,wcn3991-bt
->>        - qcom,wcn3998-bt
->>        - qcom,qca6390-bt
->> +      - qcom,qca6698-bt
-> 
-> This looks incomplete. Does this device has really all these supplies?
-> Look at the binding.
-> 
-> Best regards,
-> Krzysztof
-> 
+---
+ .../devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml   | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/Documentation/devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml b/Documentation/devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml
+index 7bb68311c609..f8eb5c09c1bf 100644
+--- a/Documentation/devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml
++++ b/Documentation/devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml
+@@ -18,6 +18,7 @@ properties:
+     enum:
+       - qcom,qca2066-bt
+       - qcom,qca6174-bt
++      - qcom,qca6698-bt
+       - qcom,qca9377-bt
+       - qcom,wcn3988-bt
+       - qcom,wcn3990-bt
+@@ -169,6 +170,7 @@ allOf:
+         compatible:
+           contains:
+             enum:
++              - qcom,qca6698-bt
+               - qcom,wcn6855-bt
+     then:
+       required:
+-- 
+2.25.1
 
