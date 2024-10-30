@@ -1,51 +1,53 @@
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 704911E0DAA
-	for <linux-bluetooth@vger.kernel.org>; Wed, 30 Oct 2024 08:38:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EE6B1990C5;
+	Wed, 30 Oct 2024 08:43:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730277503; cv=none; b=EOkSWwDcKFt6jY3lWoP4ffEKI9tcNwGvDBTiMbaFxWhMc6j6DoTzSIYDcZHq+QQb59WF7wH7vZ+QU9v/tlU4u/EN5qH/mMq5xZUAN/7r3DlA6XUL5xRg7YYkTfq9yzcCbs9gRpzBkk5tEVj3Oa2MH7viHd+dVouYoTpogv1N5rQ=
+	t=1730277838; cv=none; b=e23c1uz7m6gpc0oNWygswTYWXy+VHspZqbn1kAjiVeZbNJHFOd7/evz8t2nTHPBpLl9FOqTHXGmVdhwQJNgC8oiGXB0k9kc8mQfIpGEGCG7/BBix7aFLvd5cAVugBOS3UovyOnjIw2rJlr1MG3BXRzremOk20xj3/O+2UB2yGLA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730277503; c=relaxed/simple;
-	bh=7ppvx6BKPqEoy0XnlTBzJnlbypn2qgEMq0cII8WnAH8=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=tYRv+gR/c+kheBuQReDSQsoDpGdn89xg/FM/FVelJOvYwMZer7SF7Vyjqd8LKaJA/ktFnzAxfofBENjE1AlexGW7QNKB7+JRmIdxrMvDCTrkfN1mX8FMh5iZqU2mpqNwjwS2DX9RQpcbmrFrI0+EUjrcoWRXipys8PrXEcfqZAE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=kPWAdNvC; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+	s=arc-20240116; t=1730277838; c=relaxed/simple;
+	bh=nON4sMqSAvd9n8ClRLG37QnCL3NBJJRIXO1tYAucTZc=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=TyD94GBJrfta+fjBR5e7VZyfhnPIoBKJsKvNZdXi5+vcvp29YdAVJo/S1g5takqsq49ufwapAs6VY6KZvOD0wOV1vE8yEQVj3euL5j+emsSjqCjx2FyX9ESUbhbT7z8/sdg28VHK4v/uKhAeDAdywFlYLzYHVXDl0aFQiGJpQUk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com; spf=pass smtp.mailfrom=realtek.com; dkim=temperror (0-bit key) header.d=realtek.com header.i=@realtek.com header.b=XA00ENYD; arc=none smtp.client-ip=211.75.126.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realtek.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="kPWAdNvC"
-Received: from pps.filterd (m0279865.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 49TMqW0B030997
-	for <linux-bluetooth@vger.kernel.org>; Wed, 30 Oct 2024 08:38:20 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:message-id
-	:mime-version:subject:to; s=qcppdkim1; bh=orF+wmQBAN0QLrtHUQhKtV
-	9LrPeEo4yYTP7GPDPyQSQ=; b=kPWAdNvCjR82T4ofkgonj9p7CZyurkFGTysCAZ
-	FNO+VchC5gXwGlRINxLySaZeXL1dKNI4BwIH+VJz+j+y/a783ixKUgyqe857OQQZ
-	NJ+RtdjNxY3f+cBYzjwJCTyFlKvrYMhsD5alNanJYLuIKC3mwhZwH6I25LmfRnmf
-	4MAYAJlBUclO9hSz+7rjm2L0Q03eEH3/FQmBaCpduEdMZ7QsaArE7WoHoXFkJI57
-	f3kUONAzgMDbnxP3w++H6NtpJksYf6PdO0P8GKU4x9q90ZaBOrEcKYPI54GRsYpC
-	aXySQChaGw9t1eWX0nTxJgYpH/xMxoPuewQyUqIlQ6S1CVNQ==
-Received: from nasanppmta04.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 42gqcqubk8-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <linux-bluetooth@vger.kernel.org>; Wed, 30 Oct 2024 08:38:20 +0000 (GMT)
-Received: from nasanex01c.na.qualcomm.com (nasanex01c.na.qualcomm.com [10.45.79.139])
-	by NASANPPMTA04.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 49U8cJd4030755
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <linux-bluetooth@vger.kernel.org>; Wed, 30 Oct 2024 08:38:19 GMT
-Received: from hu-amisjain-hyd.qualcomm.com (10.80.80.8) by
- nasanex01c.na.qualcomm.com (10.45.79.139) with Microsoft SMTP Server
+	dkim=temperror (0-bit key) header.d=realtek.com header.i=@realtek.com header.b="XA00ENYD"
+X-SpamFilter-By: ArmorX SpamTrap 5.78 with qID 49U8hgeX73761067, This message is accepted by code: ctloc85258
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=realtek.com; s=dkim;
+	t=1730277822; bh=nON4sMqSAvd9n8ClRLG37QnCL3NBJJRIXO1tYAucTZc=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:
+	 Content-Transfer-Encoding:Content-Type;
+	b=XA00ENYDcchY15J824PGOCtZ5gcb24VLSi2zGEGNbFLjLml7bwaa0996b1lPOxr4p
+	 QC4Oxw3sVx/SfqvhZ/DNKMbgRsUPinO6TdzC9U10PcoZ2uA87r/gddWWEINmRNF3lj
+	 KKsRWOJFeco5LJOfcVn3gKEPsgN3sH2EjhwpvGlj5ZZe8upjNfEZC8cdl1VeIQV7mo
+	 igcO0TG2qM8ZLPyhNhs69BjXsYdbT1EdxpnhYu7y0qpe6BRfudW8eB9rVrjAeT2xGN
+	 Ujbg7XICRjHNWBQkU5G+U2zy6NYIOszONxBOb/GJ1aTZMm3kjTR5SE1ujg02nhuUl+
+	 vx0e7FDx/IY0g==
+Received: from mail.realtek.com (rtexh36506.realtek.com.tw[172.21.6.27])
+	by rtits2.realtek.com.tw (8.15.2/3.06/5.92) with ESMTPS id 49U8hgeX73761067
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 30 Oct 2024 16:43:42 +0800
+Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
+ RTEXH36506.realtek.com.tw (172.21.6.27) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.9; Wed, 30 Oct 2024 01:38:17 -0700
-From: Amisha Jain <quic_amisjain@quicinc.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: <quic_mohamull@quicinc.com>, <quic_hbandi@quicinc.com>,
-        <quic_anubhavg@quicinc.com>
-Subject: [PATCH v3] obex : Fix for PBAP GET request in PTS testing
-Date: Wed, 30 Oct 2024 14:08:03 +0530
-Message-ID: <20241030083803.153001-1-quic_amisjain@quicinc.com>
+ 15.1.2507.39; Wed, 30 Oct 2024 16:43:42 +0800
+Received: from localhost.localhost (172.21.132.53) by RTEXMBS04.realtek.com.tw
+ (172.21.6.97) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.35; Wed, 30 Oct
+ 2024 16:43:41 +0800
+From: Hilda Wu <hildawu@realtek.com>
+To: <marcel@holtmann.org>
+CC: <luiz.dentz@gmail.com>, <linux-bluetooth@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <max.chou@realtek.com>,
+        <alex_lu@realsil.com.cn>, <kidman@realtek.com>,
+        <howardchung@google.com>, <apusaka@chromium.org>,
+        <yinghsu@chromium.org>, <johnlai@google.com>
+Subject: [PATCH v3] Bluetooth: btrtl: Decrease HCI_OP_RESET timeout from 10 s to 2 s
+Date: Wed, 30 Oct 2024 16:43:34 +0800
+Message-ID: <20241030084334.2740513-1-hildawu@realtek.com>
 X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -55,81 +57,35 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nasanex01c.na.qualcomm.com (10.45.79.139)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: j7S5R5OxS3Ecc_U68pw4FaL1SLTgvRhx
-X-Proofpoint-GUID: j7S5R5OxS3Ecc_U68pw4FaL1SLTgvRhx
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
- definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- malwarescore=0 suspectscore=0 bulkscore=0 adultscore=0 spamscore=0
- phishscore=0 impostorscore=0 clxscore=1015 priorityscore=1501 mlxscore=0
- mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2409260000 definitions=main-2410300067
+X-ClientProxiedBy: RTEXH36506.realtek.com.tw (172.21.6.27) To
+ RTEXMBS04.realtek.com.tw (172.21.6.97)
 
-This change is required for passing below PTS testcases -
-1. PBAP/PSE/PBD/BV-02-C
-2. PBAP/PSE/PBD/BV-03-C
-3. PBAP/PSE/PBD/BI-01-C
-4. PBAP/PSE/PBD/BV-13-C
-5. PBAP/PSE/PBD/BV-14-C
-6. PBAP/PSE/PBD/BV-17-C
+The original timeout setting for HCI Reset on shutdown is 10 seconds.
+HCI Reset shouldn't take 10 seconds to complete so instead use the
+default timeout for commands.
 
-For all the GET phonebook request sent by PTS has no extra params
-added in it, therefore PBAP server is rejecting the request
-by sending 'Bad Request' as response.
-So appending few default params in GET request to avoid
-testcase failure.
-This params are already added for Vcardlisting and Vcardentry
-operations.
-
+Signed-off-by: Hilda Wu <hildawu@realtek.com>
 ---
- obexd/plugins/pbap.c | 22 +++++++++++++++++++++-
- 1 file changed, 21 insertions(+), 1 deletion(-)
+V2 -> V3: Update commit message
+V1 -> V2: Modify commit message and summary
+---
+---
+ drivers/bluetooth/btrtl.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/obexd/plugins/pbap.c b/obexd/plugins/pbap.c
-index 4175f9de8..ae39d25b6 100644
---- a/obexd/plugins/pbap.c
-+++ b/obexd/plugins/pbap.c
-@@ -511,7 +511,22 @@ static int pbap_get(struct obex_session *os, void *user_data)
- 		rsize = 0;
- 	}
- 
--	/* Workaround for PTS client not sending mandatory apparams */
-+	/* Workaround for PTS client not sending mandatory apparams
-+	 *
-+	 * Add MaxListCount attribute, description as per PBAP spec
-+	 *
-+	 * 5.1.4.3 MaxListCount :
-+	 * This header is used to indicate the maximum number of
-+	 * entries of the <x-bt/phonebook> object that the PCE
-+	 * can handle. The value 65535 means that the number of
-+	 * entries is not restricted. The maximum number of entries
-+	 * shall be 65,535 if this header is not specified.
-+	 *
-+	 * 0x04 - Tag id
-+	 * 0x02 - length
-+	 * next 2 bytes are value - 0xffff
-+	 * */
-+
- 	if (!rsize && g_ascii_strcasecmp(type, VCARDLISTING_TYPE) == 0) {
- 		static const uint8_t default_apparams[] = {
- 			0x04, 0x02, 0xff, 0xff
-@@ -524,6 +539,11 @@ static int pbap_get(struct obex_session *os, void *user_data)
- 		};
- 		buffer = default_apparams;
- 		rsize = sizeof(default_apparams);
-+	} else if (!rsize && g_ascii_strcasecmp(type, PHONEBOOK_TYPE) == 0) {
-+		static const uint8_t default_apparams[] = {
-+			0x04, 0x02, 0xff, 0xff };
-+		buffer = default_apparams;
-+		rsize = sizeof(default_apparams);
- 	}
- 
- 	params = parse_aparam(buffer, rsize);
+diff --git a/drivers/bluetooth/btrtl.c b/drivers/bluetooth/btrtl.c
+index 2d95b3ea046d..7128a8a0ba25 100644
+--- a/drivers/bluetooth/btrtl.c
++++ b/drivers/bluetooth/btrtl.c
+@@ -1371,7 +1371,7 @@ int btrtl_shutdown_realtek(struct hci_dev *hdev)
+ 	/* According to the vendor driver, BT must be reset on close to avoid
+ 	 * firmware crash.
+ 	 */
+-	skb = __hci_cmd_sync(hdev, HCI_OP_RESET, 0, NULL, HCI_INIT_TIMEOUT);
++	skb = __hci_cmd_sync(hdev, HCI_OP_RESET, 0, NULL, HCI_CMD_TIMEOUT);
+ 	if (IS_ERR(skb)) {
+ 		ret = PTR_ERR(skb);
+ 		bt_dev_err(hdev, "HCI reset during shutdown failed");
 -- 
 2.34.1
 
