@@ -1,33 +1,33 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D91D19AD73;
-	Thu, 31 Oct 2024 11:44:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9037319ABC2;
+	Thu, 31 Oct 2024 11:46:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730375061; cv=none; b=Q5suPZfEKQVjXb0QcB+4xfzpxBzN1yAYMugyDsAk2vBfsfPbLCp5EifWYnhGlm+0GMKrxnyPMu44oOU0DM6009RPLskjhbSy9JhqmWqn6f6pT96JE4+AnMBVO/I+tU2oDItqXv/THljfjs5bUxrGuktwZ7VEYx0JOnVB9uVyLng=
+	t=1730375188; cv=none; b=iYAzSYp/0/FMzYiNBmIwJhRPDvP41umujrlvCRvPjGH5szO1e9PpTXobeTO0E0iLtAwzm/A/RPxKJBNMm1ZjK6zhxl4OUOUcdC2sf4zQQyicUsOkispQyj338DEIqzlfb9q8VvzF3L33cQHXS3xTSMayskwNiIsHJhKlagyWN6s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730375061; c=relaxed/simple;
-	bh=j85F4sMCrRDS06295zHmXpZSGutEPgPNuu6qD8Hg1GI=;
+	s=arc-20240116; t=1730375188; c=relaxed/simple;
+	bh=1jKG/ZtSe2X1u9yvpJEpArPI5jFJt8rVIUMOW8xcXkg=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=FlitTB0LzITW0zmDVxBLChALj9u4TNZ7+hJy9k6gevKU/f74TChn6bat14yK7Z9pNRRanO2OVty2xyhkSZmmG+K2jWUEtbAhtAeY5Aoks8XBQJ/g+/jZeLMfjuo1NR9mdPkuqTLTl2Y1UfF9og7GKvtu7U8qgNwP5RabrtRCKhE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rD8hgzQ+; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:Content-Type; b=oGzl5W3by+CpC8JYj6mLFqAdNhbx9zwEiMKCtQ23QaxVvS+isCVmeTtJdiR/2+iZRkI7EdaCI1LqUR3dfAHqbyoZBqGcI7y2fvnJ2wwSkx6T7C9YTQDOB28M8qsbcjZYjwpZzlhWl1yj60LQ0TaWpOUCEPVJoJ2SoEyRH/cbgr4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=clgaYSXp; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rD8hgzQ+"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2F108C4CED3;
-	Thu, 31 Oct 2024 11:44:16 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="clgaYSXp"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 59078C4CED2;
+	Thu, 31 Oct 2024 11:46:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730375059;
-	bh=j85F4sMCrRDS06295zHmXpZSGutEPgPNuu6qD8Hg1GI=;
+	s=k20201202; t=1730375187;
+	bh=1jKG/ZtSe2X1u9yvpJEpArPI5jFJt8rVIUMOW8xcXkg=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=rD8hgzQ+mm0px9KAWjoaDeEuQJc3vfQPjI536rYvYO226aGRXuxAYMWbZDv3SB+cc
-	 k647HxepLynD150f/k5IJbyuDjXKD2StJPbLR1GQlaxg+0xxbsmUe0OrcvERO9EUzc
-	 Zld8sbwcP1yKXbwUUj+xbDMy2SLceA0YR8Vchbh56p0TwF6NonKlWmiOll31gBDd+A
-	 Inh1EYLQzMFX4uINeIEfzmAMvFpbgIDs3+qy7Lmj1RYD/XKAQRcppcBNyPLSr5FtYI
-	 pvs/j6qfaaEDvfBPJkB7h1KLPnOBlza8Q45wpl9LugWQeUGhvbJjsSScuzJ47ofZyn
-	 mNqh4cPd1CAAw==
-Message-ID: <6db7798c-6bd0-459a-bd73-ae8115736872@kernel.org>
-Date: Thu, 31 Oct 2024 12:44:15 +0100
+	b=clgaYSXpeDVyfYuO45fv7TfP+JvPICNt0aYoi09jAXWYkcGLndpFQncY5BiDxJijK
+	 G/VMHvLhE3TUQzg9zw5bl/ofvqVO00+mF+n7sKZqzQkTa6KEZoI6vpH/Ns9wFM6dgw
+	 BthjWCD2sWnaaIWC/C0Zslh2QNCmb0q1rZygSsZjR65BbeqgU5gd4wdoqsCf0vvwj+
+	 fIln5lO5Y7mrcq3UPPV9sJs3tLM+2T/GwHn3iO6COtGzhDf6PvrdAOR3UmOpoaLbBo
+	 uVp3MW/u0azdy0gZCiShIUjuPBjkY/KLW/pOBsExeJi/FIXiJrbRANHt7BrlCJ/3ZE
+	 RchTpZXOS5Idw==
+Message-ID: <91b55df5-b023-4fbd-925e-7ac97f287ac4@kernel.org>
+Date: Thu, 31 Oct 2024 12:46:21 +0100
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -47,7 +47,8 @@ References: <20241030-bluetooth-btbcm-node-cleanup-v1-0-fdc4b9df9fe3@gmail.com>
  <aab34ae4-0f6b-4720-b14e-69add0355daa@kernel.org>
  <07eef877-622a-4651-8a15-9e507146642c@gmail.com>
  <79c00d2c-8062-4c65-9bdf-1a87e7624e8b@kernel.org>
- <f5663347-d15b-4400-b81d-e4d156d9e918@gmail.com>
+ <d9fcd228-8198-4e4c-8752-e950ab598013@kernel.org>
+ <26d090ef-5630-4afd-8e77-e20019cd018a@gmail.com>
 From: Krzysztof Kozlowski <krzk@kernel.org>
 Content-Language: en-US
 Autocrypt: addr=krzk@kernel.org; keydata=
@@ -93,88 +94,96 @@ Autocrypt: addr=krzk@kernel.org; keydata=
  uZwJCLykjad45hsWcOGk3OcaAGQS6NDlfhM6O9aYNwGL6tGt/6BkRikNOs7VDEa4/HlbaSJo
  7FgndGw1kWmkeL6oQh7wBvYll2buKod4qYntmNKEicoHGU+x91Gcan8mCoqhJkbqrL7+nXG2
  5Q/GS5M9RFWS+nYyJh+c3OcfKqVcZQNANItt7+ULzdNJuhvTRRdC3g9hmCEuNSr+CLMdnRBY fv0=
-In-Reply-To: <f5663347-d15b-4400-b81d-e4d156d9e918@gmail.com>
+In-Reply-To: <26d090ef-5630-4afd-8e77-e20019cd018a@gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 31/10/2024 12:29, Javier Carrasco wrote:
-> On 31/10/2024 12:14, Krzysztof Kozlowski wrote:
->> On 31/10/2024 12:10, Javier Carrasco wrote:
->>> On 31/10/2024 12:08, Krzysztof Kozlowski wrote:
->>>> On 30/10/2024 16:46, Javier Carrasco wrote:
->>>>> Switch to a more robust approach by automating the node release when it
->>>>> goes out of scope, removing the need for explicit calls to
->>>>> of_node_put().
+On 31/10/2024 12:41, Javier Carrasco wrote:
+> On 31/10/2024 12:30, Krzysztof Kozlowski wrote:
+>> On 31/10/2024 12:14, Krzysztof Kozlowski wrote:
+>>> On 31/10/2024 12:10, Javier Carrasco wrote:
+>>>> On 31/10/2024 12:08, Krzysztof Kozlowski wrote:
+>>>>> On 30/10/2024 16:46, Javier Carrasco wrote:
+>>>>>> Switch to a more robust approach by automating the node release when it
+>>>>>> goes out of scope, removing the need for explicit calls to
+>>>>>> of_node_put().
+>>>>>>
+>>>>>> Signed-off-by: Javier Carrasco <javier.carrasco.cruz@gmail.com>
+>>>>>> ---
+>>>>>>  drivers/bluetooth/btbcm.c | 8 ++------
+>>>>>>  1 file changed, 2 insertions(+), 6 deletions(-)
+>>>>>>
+>>>>>> diff --git a/drivers/bluetooth/btbcm.c b/drivers/bluetooth/btbcm.c
+>>>>>> index 400c2663d6b0..a1153ada74d2 100644
+>>>>>> --- a/drivers/bluetooth/btbcm.c
+>>>>>> +++ b/drivers/bluetooth/btbcm.c
+>>>>>> @@ -541,23 +541,19 @@ static const struct bcm_subver_table bcm_usb_subver_table[] = {
+>>>>>>  static const char *btbcm_get_board_name(struct device *dev)
+>>>>>>  {
+>>>>>>  #ifdef CONFIG_OF
+>>>>>> -	struct device_node *root;
+>>>>>> +	struct device_node *root __free(device_node) = of_find_node_by_path("/");
+>>>>>>  	char *board_type;
+>>>>>>  	const char *tmp;
+>>>>>>  
+>>>>>> -	root = of_find_node_by_path("/");
+>>>>>>  	if (!root)
+>>>>>>  		return NULL;
+>>>>>>  
+>>>>>> -	if (of_property_read_string_index(root, "compatible", 0, &tmp)) {
+>>>>>> -		of_node_put(root);
 >>>>>
->>>>> Signed-off-by: Javier Carrasco <javier.carrasco.cruz@gmail.com>
->>>>> ---
->>>>>  drivers/bluetooth/btbcm.c | 8 ++------
->>>>>  1 file changed, 2 insertions(+), 6 deletions(-)
+>>>>> You just added this. Don't add code which is immediately removed. It's a
+>>>>> noop or wrong code.
 >>>>>
->>>>> diff --git a/drivers/bluetooth/btbcm.c b/drivers/bluetooth/btbcm.c
->>>>> index 400c2663d6b0..a1153ada74d2 100644
->>>>> --- a/drivers/bluetooth/btbcm.c
->>>>> +++ b/drivers/bluetooth/btbcm.c
->>>>> @@ -541,23 +541,19 @@ static const struct bcm_subver_table bcm_usb_subver_table[] = {
->>>>>  static const char *btbcm_get_board_name(struct device *dev)
->>>>>  {
->>>>>  #ifdef CONFIG_OF
->>>>> -	struct device_node *root;
->>>>> +	struct device_node *root __free(device_node) = of_find_node_by_path("/");
->>>>>  	char *board_type;
->>>>>  	const char *tmp;
->>>>>  
->>>>> -	root = of_find_node_by_path("/");
->>>>>  	if (!root)
->>>>>  		return NULL;
->>>>>  
->>>>> -	if (of_property_read_string_index(root, "compatible", 0, &tmp)) {
->>>>> -		of_node_put(root);
+>>>>>
+>>>>>
+>>>>> Best regards,
+>>>>> Krzysztof
+>>>>>
 >>>>
->>>> You just added this. Don't add code which is immediately removed. It's a
->>>> noop or wrong code.
->>>>
->>>>
->>>>
->>>> Best regards,
->>>> Krzysztof
->>>>
+>>>> Exactly, I added that code to fix the issue in stable kernels that don't
 >>>
->>> Exactly, I added that code to fix the issue in stable kernels that don't
+>>> Then send backport for stable.
+>>>
+>>>> support the __free() macro, and then I removed it to use a safer
+>>>> approach from now on.
+>>>
+>>> This is not correct approach. We work here on mainline and in mainline
+>>> this is one logical change: fixing issue. Whether you fix issue with
+>>> of_node_put or cleanup or by removing of_find_node_by_path() call, it
+>>> does not matter. All of these are fixing the same, one issue.
+>>>
+>>> If you think about stable kernels, then work on backports, not inflate
+>>> mainline kernel with multiple commits doing the same, creating
+>>> artificial history.
+>>>
 >>
->> Then send backport for stable.
+>> And to clarify even more: these stable backports are close to useless,
+>> because it does not matter for them. No impact, not much benefits,
+>> nothing improved for users/developers. There is no need to backport
+>> them, although of course there is no loss by doing so. Therefore entire
+>> dance affects mainline kernel without any real benefits for stable.
 >>
->>> support the __free() macro, and then I removed it to use a safer
->>> approach from now on.
->>
->> This is not correct approach. We work here on mainline and in mainline
->> this is one logical change: fixing issue. Whether you fix issue with
->> of_node_put or cleanup or by removing of_find_node_by_path() call, it
->> does not matter. All of these are fixing the same, one issue.
->>
+>> Your split suggests you don't really know what this dropping reference
+>> is for.
 > 
-> I fixed an issue as one logical change, and tagged it for stable kernels
-> so it can be automatically applied. Then a second logical change
-> switched to the new approach, removing the old solution. If that
-> happened with a few weeks in between, it would be ok, right? And no one
-> would have to choose the fixes to backport for a given stable kernel.
+> Such splits were suggested in other threads, and they came exactly for
 
-I did not address this.
+You mention it third time, but never provided a link. I tried to look
+briefly for it but failed. Can you share a lore link?
 
-That's the same with every work in the kernel. You create a driver and
-you send it. It's one commit, for regular cases of drivers (not too
-big). You do not send two commits:
-1. Add basic driver, built-in because supporting module is difficult.
-2. Add some feature, like converting built-in to module.
+> those reasons: they could not be applied to stable. That was not my
+> first approach, which was just using __free() to fix the issue. I am not
+> looking forward to inflating any history, as that's in the end more work
+> for me.
+> 
+> If a simple patch that adds the cleanup attribute is enough, that's
+> awesome. I will go for that approach for all cases then, and use your
+> explanation as a reference if I am asked to split the fix again.
 
-Now, because we all release early, release often you could release first
-built-in driver and then come later (*later*) and develop second patch
-improving it, e.g. converting to module.
-
-It's exactly the same here. You fix issue. If you want to split your
-contributions and release fixes early, sure, go on. It's different than
-you know and you have the code ready which makes the first fix totally
-obsolete.
+If maintainer asks you to split trivial things like of_node_put() for
+simple patches, feel free to Cc me, so I can provide counter arguments.
 
 Best regards,
 Krzysztof
