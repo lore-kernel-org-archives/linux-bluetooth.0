@@ -1,526 +1,241 @@
-Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [185.185.170.37])
+Received: from CH1PR05CU001.outbound.protection.outlook.com (mail-northcentralusazolkn19010002.outbound.protection.outlook.com [52.103.20.2])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1FC11991DF
-	for <linux-bluetooth@vger.kernel.org>; Wed, 30 Oct 2024 22:03:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=185.185.170.37
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63E3317557;
+	Thu, 31 Oct 2024 02:03:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.103.20.2
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730325840; cv=pass; b=hI0h4klhvy0DvkBibBgZFqsNqCZtsyRXJTQ/XWKLTS4qkl99zXZX0HmV1p9DIr/F/UQ0syKdJopTjEVagaT7iEh3zG3Pogfa6J3rBRXU0KavIeQr2dIzFygG93ENEk/Ssj5lKWxqmumQQdN0NpavdOa1tuzM6S/P45IiMYsKCZc=
+	t=1730340238; cv=fail; b=DsVi0pI3+ne4s6bBIsPkM5TAowaoqJw8Pk670T4gE005jDHJfJ5KNwvggXqUwmu4kxiBuq4eTyeZMXaJtQQAcjC+mxHbnsS4dSKViws2lEg8mU90oV9hQ5rP80DXVO4sNPgAKZAHmHeE63wyDwQ3kNO2wMPRC6viBFY7xHqAAqE=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730325840; c=relaxed/simple;
-	bh=IO2H+ANsjQWvGlAshEhPdO5nwArRbUM7j3sVc6qg2QM=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=GLMB/CmddwIYePqzYHRc+HFjX+vsR4sXUr+lf4rD2jTwHivb3eYtwaIlmQHytoKLOrLgUdeprBhrYGNzP4nk2mAyQ3JZ7/D1koTKlWcDIIxqwqal2nXUHK1dnUW0dqz9gz6yE+rTTjnf1BDLN05PqGbN0T1asih9r1jP/Idhh+E=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=vMJT7w94; arc=pass smtp.client-ip=185.185.170.37
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
+	s=arc-20240116; t=1730340238; c=relaxed/simple;
+	bh=HlVyq9t/qVlsIe9F0m3bwJo+pG3l6KqaoC0s3m3biGY=;
+	h=From:To:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=tcMGYNlROZ0wefVK24B/A+UhcQsmiXCN2+HSD99769hhxWsnCpBxWSA0XP5Ez25N83dAPaqaqmVz6vwF9Xnz0LGkt6BcvBiwAZP20NO459HU4mSgrDPSCXSqjGsRTajcfNLRVAJNUmWOMAr7+dpqNqwosf42cmxDpI9KSkgzgZw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com; spf=pass smtp.mailfrom=outlook.com; dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b=cyTtNGSF; arc=fail smtp.client-ip=52.103.20.2
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=outlook.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="vMJT7w94"
-Received: from [192.168.1.195] (unknown [IPv6:2a0c:f040:0:2790::a03d])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pav@iki.fi)
-	by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4Xf1Np0B7Rz49Q5X;
-	Thu, 31 Oct 2024 00:03:53 +0200 (EET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
-	t=1730325834;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=bzvVDo1oFNAoyuD+UrQvBHzdZ69hPGSsjI8QmDp3G8g=;
-	b=vMJT7w94n//krMYsO21uTrlN2YOD/xtYiRiM4/mKmn7GWSlhNc0wgMI4ZgxO+rDIcDBEvl
-	geUAZcuTWNmn+ULj91H43X7x9Ki8EgGBASvUW/WJUCTdosTAdPWB4cPSsqFia9MIV1k4fv
-	CkGMfnUNycKaGSGepmb7VIBFkXDQHuzN30wbBmYs0mNNE7XHFjD46ZeRUUfIhcBHiUrVoc
-	h9VoktMPNkC15r7HDbqVqRQABVZelYcYpbPPEogZckSMC+cifhRDa1iA//RzG2rm6NZ1Ek
-	p5zUr30e0NlXY2PPxlcGKWyl/3Q0gCs+LnjrqPCTAOkG4OrZPj3JYuy5KeoxxQ==
-ARC-Seal: i=1; s=lahtoruutu; d=iki.fi; t=1730325834; a=rsa-sha256;
-	cv=none;
-	b=l9dCndlZ0P/As+LePNLchQ1q6t2E4QdsV2EP5cLXyCYATfjEpWMDgchK3JIvKGdDxLx+Jt
-	2/EE5D0bQdKWaDq/E3CwGBCMTywpiyEszqWIiPyD08sYcCSq8vJV9Ys2aw+DU8mlMZBjCq
-	wzw2LxNJ/HOOnvFnFpDYRd8LaRFBFr4DPZNPCKzsvF7Ch79jwtyn9hcUtbQl3hrnxQ/KhN
-	mhBKABrMrSRwBgP9/VzACME4+wuaVUEPclTbklAhHk8cO8XJEDwx0yFhQfjcP+Y9tlAXcm
-	oJoLISASkNFySbFWefpB8XAJ55MbbFEcPU2gUEShnR3G/avmFXnWkHSDSAcfnQ==
-ARC-Authentication-Results: i=1;
-	ORIGINATING;
-	auth=pass smtp.auth=pav@iki.fi smtp.mailfrom=pav@iki.fi
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=lahtoruutu; t=1730325834;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=bzvVDo1oFNAoyuD+UrQvBHzdZ69hPGSsjI8QmDp3G8g=;
-	b=u/+Ue8Ho9YZakMPl+Fr1Iy238ZQvLZL0m+LhjCnsox2sVe1+5G+dQvVNVx5oSYricmu2oh
-	RNbOILzBPEyqsYi+cpsnV5AUW+H5nv5TEN85aWGvLmstSSKskijYgYUDVWui2X9AWJdnMM
-	8g3XtnrVUr+X6ID8kSE7gfObMd8h81IigxKJJ0TZVlhhBA8FhXe2D/Wx/OO2zSGeYEJrC/
-	kNr1oIqMQrtZVBClq3YR4TjfnELcafeWJiIbjKaotG+9ST8N+YGmYq8GPAydT/KxYHRPvP
-	9fqGyWdTvl8mi0O7BxqMsGbDFNz2ldfwDINui4AG9JcPNoLxvur/9WTf1kvy8A==
-Message-ID: <29fb92f81fed9f8a1f292641fe738dae47f8569d.camel@iki.fi>
-Subject: Re: [PATCH BlueZ] transport: don't disconnect A2DP if canceling
- Acquire() with Release()
-From: Pauli Virtanen <pav@iki.fi>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Date: Thu, 31 Oct 2024 00:03:52 +0200
-In-Reply-To: <5e5ab20671f3b6260ddc7e8aafe3971dd1c9fc9f.camel@iki.fi>
-References: 
-	<7a256931b2a2f2fa860e8cc33d21f5100468e40f.1729939092.git.pav@iki.fi>
-		 <CABBYNZJ-c9zWOr4br8TuMhRam4ue+o0s1e-RzfzRvLbq9cXodw@mail.gmail.com>
-		 <4bf0aaa3129f29c84fd78ccfc423a63e4c0a8d90.camel@iki.fi>
-		 <CABBYNZK_TgFHAWa7p_ph_DFFTb3N23_oeN6shc42_RwnWf-Ynw@mail.gmail.com>
-	 <5e5ab20671f3b6260ddc7e8aafe3971dd1c9fc9f.camel@iki.fi>
-Autocrypt: addr=pav@iki.fi; prefer-encrypt=mutual;
- keydata=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
- bzyGkKh2h8XdrYhtDjw9LmrprPQ==
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.54.1 (3.54.1-1.fc41) 
+	dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b="cyTtNGSF"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=RQz1Y364+Noy361n2kZ//QGeC/Wdai/RJh2bCzzU7xuPpnRyJ7bTW9wT2Lne/HJlwU5KTpAmYfCYCTZhZOeXPdLFLdzv9a/2cJQ36lVpo6rjArTdRGssLkX0s+tBdYOEfeBnNsULA1K3sn+jx3csUNmbcEsBoo0uLlVkSBhO2+AOAfNTT30xdI/yisVUrcfD2Q3oNCRJo5VQ/TBz3r89i1CXLxHum1b7Mzp+X89Nr6uCtCspzd7keAgVABEfmXfdmiEnOxfvNxueyOGlg2P1ykveB9CkVVqFg7JmS2ms8WMC3EU2FGKhd+0X7KP33Z19t5ii90tnFbnuoUstKKbqPg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=HlVyq9t/qVlsIe9F0m3bwJo+pG3l6KqaoC0s3m3biGY=;
+ b=dRv0LKJl14ugLX2R/sevmwyatCTSH8vJ7tiCicBckJdxdlHHeMtOuKZheKStfFcl6F+xnF/eB1esNkMswPiEaV0/bzLMnkJKePovr6EmBYa//o6uOjSqEMb9xApxRouCKhdjdM8zG+yNi4pF8sB9bn9Q7I6Yw3xyf8J1HtHsfikXx+D7PZnS8neggYIrTcZQRl7PoVPMYxfbHtc5ih2kEqcCJp09Tv8r0zlnTRwJ4DRUNnGszRYJA1yVVN35Ryjet5X4lamKTuo/27/KcqDCuMHdOZSr/Ruf7SIBeDKrEEBCykOmJIRgMAvdgco8yuuMf9vAwjSudNbVwAs0PWUUrQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
+ dkim=none; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=HlVyq9t/qVlsIe9F0m3bwJo+pG3l6KqaoC0s3m3biGY=;
+ b=cyTtNGSFl03rRauv6AQ62Yb14yaPn5LX96tW35q6tcHuRnjb5cDg4V/ZpVJkpeoaHjeLCVHEfQv4VgrGfEK7/ehZISmc8I886SVcVMrlFZe5NYM+RvOU18QZ+d/vowebBYB6wJeDamE2JqfCktykARTBfbeSbNw0z4jMipYvlCn/BR07/il1paOfqXNmZJhAUMFSRdB7QkzaZWL3ZRLa+xEnIMhGkcCMFOWAN+1Q2/6xuAug9NeR61hZA5mrkYE2NEwrzVbcThbqVE257T13AJLObXMufysKJxhu7HG7bATMYkex+ob/sspafkOM7kVoUD0Bl1QxBZWodeRjopyhtg==
+Received: from SN6PR02MB4157.namprd02.prod.outlook.com (2603:10b6:805:33::23)
+ by DM6PR02MB6986.namprd02.prod.outlook.com (2603:10b6:5:22e::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8093.27; Thu, 31 Oct
+ 2024 02:03:54 +0000
+Received: from SN6PR02MB4157.namprd02.prod.outlook.com
+ ([fe80::cedd:1e64:8f61:b9df]) by SN6PR02MB4157.namprd02.prod.outlook.com
+ ([fe80::cedd:1e64:8f61:b9df%4]) with mapi id 15.20.8114.015; Thu, 31 Oct 2024
+ 02:03:53 +0000
+From: Michael Kelley <mhklinux@outlook.com>
+To: Easwar Hariharan <eahariha@linux.microsoft.com>, "K. Y. Srinivasan"
+	<kys@microsoft.com>, Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu
+	<wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
+	"linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>, Anna-Maria
+ Behnsen <anna-maria@linutronix.de>, Thomas Gleixner <tglx@linutronix.de>,
+	Geert Uytterhoeven <geert@linux-m68k.org>, Marcel Holtmann
+	<marcel@holtmann.org>, Johan Hedberg <johan.hedberg@gmail.com>, Luiz Augusto
+ von Dentz <luiz.dentz@gmail.com>, "linux-bluetooth@vger.kernel.org"
+	<linux-bluetooth@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, Praveen Kumar
+	<kumarpraveen@linux.microsoft.com>, Naman Jain <namjain@linux.microsoft.com>
+Subject: RE: [PATCH v3 2/2] drivers: hv: Convert open-coded timeouts to
+ secs_to_jiffies()
+Thread-Topic: [PATCH v3 2/2] drivers: hv: Convert open-coded timeouts to
+ secs_to_jiffies()
+Thread-Index: AQHbKvPZcTSOhM6HKUa6ajSMFhass7KgG2Sw
+Date: Thu, 31 Oct 2024 02:03:53 +0000
+Message-ID:
+ <SN6PR02MB4157B87089C2A561146F0CE7D4552@SN6PR02MB4157.namprd02.prod.outlook.com>
+References:
+ <20241030-open-coded-timeouts-v3-0-9ba123facf88@linux.microsoft.com>
+ <20241030-open-coded-timeouts-v3-2-9ba123facf88@linux.microsoft.com>
+In-Reply-To:
+ <20241030-open-coded-timeouts-v3-2-9ba123facf88@linux.microsoft.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: SN6PR02MB4157:EE_|DM6PR02MB6986:EE_
+x-ms-office365-filtering-correlation-id: 18978083-49f3-4ad8-e881-08dcf9504567
+x-microsoft-antispam:
+ BCL:0;ARA:14566002|19110799003|15080799006|461199028|8062599003|8060799006|56899033|102099032|440099028|3412199025;
+x-microsoft-antispam-message-info:
+ =?utf-8?B?V0hKR0gwZ09GTFRoYWpnMEViRytDcDU2cFBtVUM5K2x4dVdRWWIyaWF3b0tI?=
+ =?utf-8?B?Q1ZmQ0Yzb3laTGg1QXhLWk5CUVU0YlQ4OXZRRVdkUlNRNWw3YkRVSWxoQWFk?=
+ =?utf-8?B?eSs5L09ibktscE40Q1ZBeXJsOS9ScXBpNVpZdGI2RUJOZTR3N0tXc3RnZEJY?=
+ =?utf-8?B?TXdpcGFGOEZjQnVUL0xNanhrNDNGa1NzNHNOQktSdlZWbnNOUWRBRURCenla?=
+ =?utf-8?B?Vmc3bkFQYi94NzNDdTNrTGo0UlJobkk3cFE2OER3RlRlYmZkL3VOQlNSejBJ?=
+ =?utf-8?B?eHhkVWIrK1VRY3J3OVVrWkNJK3pGcnJUWHV6bWpwajVNY2VDZmI2NzVNRDlI?=
+ =?utf-8?B?c0dDRjVQcS9ObE9pVkgzQnp2Y2o5b1BmTE9QSXkyOC9RemVCZVJOZ1dXa09p?=
+ =?utf-8?B?UUpRY000SXdxU0tyZjNnNHlnYjdQQzhPQmk4OEpaVUdMand2czBRdkQ4WnU2?=
+ =?utf-8?B?YU9KVjg1UUFtWEpMVDhHSUc0WS9BSUVRMGhHMkN6VFVqRkRuWityMlZMbjdH?=
+ =?utf-8?B?dUlmTVU3OE5sNzJmZ3AyZTJlK0hMUWU5UEJDRkFxNTNVdXpZSDM4TmJjZTdm?=
+ =?utf-8?B?b0NYWE1ZQ1lZcTZ4SDBvSWhZQlVIV1NkYmdZRUtuWDA4QjB5dFpkVUlXbnMz?=
+ =?utf-8?B?Q3JjRUVFMVQxN0JOWE8rb1Z6c2VBdjloTU54UVBnNms1UWhWSHN4TVNiSEF6?=
+ =?utf-8?B?NE8rcmxkVEhQU2RTeXA0TXVSYmhXZEFOWjcySEtMZFB1OWhMMHdqRUdVcDlr?=
+ =?utf-8?B?ZHptTy9GbTI0Y1Rlc2VtRnlVcHVhaExUOHZ3NW9yQVFwNkFCK1EwVEFGUWdO?=
+ =?utf-8?B?QWplOTMxKzhoWmJFdWZWMS9aenh4ZExQaVVuejhsK2tTeURZWHBEN2pscnRy?=
+ =?utf-8?B?Zkg4MDBVZmE3VCtjR215K1BkY1pybll1bzBFNEd3WXBQdFdqMkw2dW1ZNTJN?=
+ =?utf-8?B?TER5OWZHcCtCeFNBUGJIT0ZBRmI5OFM5VVZRT1V0MHQrYnorN0lLQXh2azNP?=
+ =?utf-8?B?eTdodEZPK1kvSHREVFBjS1RKQk92blRGREJWUjIycVRQanVqOE9xMUpUNEJS?=
+ =?utf-8?B?R2tTY0M4cnJsNmNvbHRtVTZaZ1V3a1ptOGlTR2djZEg2eHBwR2JHVVorQzJk?=
+ =?utf-8?B?V2F0ZGNwRnQ2UWJBbmNBU3lYSDh2NG1hbndpQlRFR1ppSkVVQ1FaSWt1ajlD?=
+ =?utf-8?B?ZHhaUnZyWFlzVlBtMlJKTHlNV3VhMXFKV0lFY252a1ozeTBZMEZab1lwcldC?=
+ =?utf-8?B?UDhUQTBuZHVHaC9rUG9LS3JrVC9BZFFxamlnc24wMUxuaEZ3NExsdzVJZXJv?=
+ =?utf-8?B?TnNJZmZzeUQ5V2tsYStaZVRVMVY4cS9JZnBmR0NPOW1WWWkvSGF4RGFNeGU4?=
+ =?utf-8?B?NWszRU1lTnZmOXc9PQ==?=
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?utf-8?B?M0R0bVhQbWVObzRnNlJhckR2YWdxd1Rja2J5cE05V3VqRlhOc0doVjh2UU0y?=
+ =?utf-8?B?NzlQNkZUbW1uNXdmUVIrRmZ0di82U05ydCtkK1laWjhRWE9HM0dEWGNrdW9O?=
+ =?utf-8?B?a1Q2ZVA5VDFEQUNaOFhzV0FSckpYR1dKcmlLbjFObVd5OEFWQVJML0RidTE4?=
+ =?utf-8?B?M0lTRm5CWnhoRWxKSVBYczNNT2JCSDc3a2lCOFdMcGpheG5nS2lmbGU5MitS?=
+ =?utf-8?B?MFZrNU9Ua0tiMk8vVXJud2xWUkxjUjZXWE00aTVSem9IK2RVWC9ZMFlWbXlT?=
+ =?utf-8?B?WHM3ZmJZMy9jWHBOdWRnOWp2dnFqRkcvWlFGUTA0VzBDRUVDQ01WeXVXajFl?=
+ =?utf-8?B?cmVveHJ4L2lVZFRmTFhLZlJqODRMVkgvdGZ5cmtMNUlqa0h5SStGelFxT1Qr?=
+ =?utf-8?B?VjNMNkpzSkt0eDkyY29ENEl2cHd3YWhnMXhvTlZOMlhmYjlsSWR4MWhiZCtp?=
+ =?utf-8?B?RjRpL08rcldtL3pqYkwvYkNaRDU4MTRQOTE3NVBERGpaaC9RdVlzcWVjL05D?=
+ =?utf-8?B?Y3ZDQ1QrMUcwVjMrOXJuY2hNTXdpRUtxYWVucHl4SzRzZTBFSjVmb0pVOU8x?=
+ =?utf-8?B?c2c4aGgrWVAxN29KeHdXSmNSMjhiQ0FGODl2QVJ6alZGclV1dlhlTnNlRFls?=
+ =?utf-8?B?QWgrMGhUVFdPdXduUXFWZlRhTzJQNDcrQ3B4djRiUkRXeDJNS1ZWbWFpVTlj?=
+ =?utf-8?B?RTRxdFFqY3hQL2k2eEZFTWpIRmV6bVJlK2UrYXdXNWM1VXhTdEg1ZjBNN1M3?=
+ =?utf-8?B?V3p2a1JjY2owQTliR0VtdW1hSVJwWlZuUm9Xem13cWpLUExETnFRNGtINlhF?=
+ =?utf-8?B?RjNFeTN3VXVIUTBuVW1rTVNNYlllWThRbXNsdkwxWWFrRUhrL2I4aFV3WHRG?=
+ =?utf-8?B?NUlEQ1p1NUM4aERJbnAvd3p3a2pZaW9ZZ3haVDEzd1E2WUJIcXJ3RjRyN3g4?=
+ =?utf-8?B?NExlZ1hVdS9KR1pUb3U5Q0VzWUpoVmVKYVBtbGgvdkdFaFdmK01hYmtuS3pJ?=
+ =?utf-8?B?b0dVcndHUXJpRldwYWNib29IU0pjK0E4eGpQYlhKc3RuNlZPYml5cEtyTHI0?=
+ =?utf-8?B?U0Q2ZGtDOXdOemxjTHBEM0JIZDJ3ZjVJRzdIQmxlOWhHSFExeXlYekwraElQ?=
+ =?utf-8?B?RjNmN0dtdGd1bjY1am9zOGYvdUw4Zmp1ZkVZcERUZ25pVHdkQUxWclNxQ3B3?=
+ =?utf-8?B?VEFxQWhETDF2bkJYK2E2ZjlsNUE2OXE2Yk9sVzEyS3NJVmtWNDNrZ3JyUXRD?=
+ =?utf-8?B?K3BvOHlURmM2aGoxdE9Dc3pBVjRaR21vK3ZoelFZUm12QmtaZEU3Vnd3VXhz?=
+ =?utf-8?B?QU9FdEhBenErbFZrWkdvVC90YkdRTFBuY0NlSHp6MEM3UlNQbitucmJScnpP?=
+ =?utf-8?B?aCtwYk5tc3d3cTlVajBYTHBBOWhhWjdDT2QwdFVvV1h0VGJwcXBGc0sxSldS?=
+ =?utf-8?B?UmtLVnAxWkJJRVVZOEpvckRTalZXWEp3VDhwcFNyWUhZRFMxY2k5Rklja0Vy?=
+ =?utf-8?B?cVNteTNJeWlNRFpYa0MzeFV6cHI0QjBPY3d0M3BSRjE5QmFZY0lhM2Q5Rmtv?=
+ =?utf-8?B?anA2VWEwSnBWejViQVZKZ05JcVlHdFNtVHUxUWNHSWN1NlVuUHNzZkh4SFln?=
+ =?utf-8?Q?zjGknuJXkr6StjAzp7eqY6guQPtWh5yUWUcdDS9laKrA=3D?=
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+X-OriginatorOrg: outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SN6PR02MB4157.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg: 00000000-0000-0000-0000-000000000000
+X-MS-Exchange-CrossTenant-Network-Message-Id: 18978083-49f3-4ad8-e881-08dcf9504567
+X-MS-Exchange-CrossTenant-rms-persistedconsumerorg: 00000000-0000-0000-0000-000000000000
+X-MS-Exchange-CrossTenant-originalarrivaltime: 31 Oct 2024 02:03:53.6872
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR02MB6986
 
-ke, 2024-10-30 kello 23:46 +0200, Pauli Virtanen kirjoitti:
-> Hi Luiz,
->=20
-> ke, 2024-10-30 kello 16:56 -0400, Luiz Augusto von Dentz kirjoitti:
-> > Hi Pauli,
-> >=20
-> > On Mon, Oct 28, 2024 at 1:48=E2=80=AFPM Pauli Virtanen <pav@iki.fi> wro=
-te:
-> > >=20
-> > > Hi Luiz,
-> > >=20
-> > > ma, 2024-10-28 kello 10:39 -0400, Luiz Augusto von Dentz kirjoitti:
-> > > > On Sat, Oct 26, 2024 at 6:41=E2=80=AFAM Pauli Virtanen <pav@iki.fi>=
- wrote:
-> > > > >=20
-> > > > > User can cancel transport acquire by calling Release() while Acqu=
-ire()
-> > > > > is in progress. This calls a2dp_cancel() which sends AVDTP_ABORT_=
-CMD,
-> > > > > forcing AVDTP state transition to IDLE, and disconnecting A2DP pr=
-ofile,
-> > > > > which is not desired.
-> > > > >=20
-> > > > > Fix by instead waiting until START completes and then send SUSPEN=
-D. Make
-> > > > > Release() reply only after the whole sequence completes.
-> > > >=20
-> > > > Hmm, but assumes the client is not reconfiguring to another endpoin=
-t
-> > > > or just giving up on the transport since it doesn't intend to use i=
-t
-> > > > anymore, anyway we can't really send anything else other than abort=
- if
-> > > > we don't want to wait so I think this would be better to be handled=
- by
-> > >=20
-> > > I guess you have in mind
-> > >=20
-> > >         Acquire(t1)
-> > >         Release(t1)  # canceling acquire
-> > >         SetConfiguration(ep2)
-> > >=20
-> > > I don't think this works right in current BlueZ master branch either,
-> > > the Release() results to removing the DBus endpoints & AVDTP
-> > > disconnect, so nothing to SetConfigure() after abort completes.
-> > > SetConfiguration() probably fails also if called while Abort_Cfm is
-> > > pending, since it cannot then close the existing stream.
-> > >=20
-> > > I think (but did not test) that with the patch here, it would end up
-> > > doing START -> CLOSE -> reconfigure, so indeed has to wait for START
-> > > completion.
-> >=20
-> > I guess you are saying that we don't want the stream to transit to
-> > idle since that would cause the AVDTP session to be disconnected? It
-> > seems this is the result of session->dc_timeout being set to 0 on
-> > avdtp_abort, anyway now looking a little more in detail it seems
-> > clearer that the transport methods shouldn't affect the state machine
-> > other than for suspend/resume procedures, that said then we need to
-> > check what happens if those methods are called in quick succession e.g
-> > Acquire -> Release -> Acquire.
->=20
-> It should be possible to make it work so that SetConfiguration() while
-> either Acquire() or Release() is pending sends ABORT if needed, but
-> Acquire()+Release() alone only does OPEN->STREAMING->OPEN.
->=20
-> The code that closes/aborts the existing stream in a2dp:a2dp_reconfig()
-> may need some tuning, I'll need to test this race condition to make
-> sure.
-
-For the rapid Acquire() / Release() / Acquire() the intended behavior
-probably is:
-
-- while Acquire() call pending:
-
-  Release() makes the pending Acquire() return error, and suspends
-  after pending resume completes
-
-  Acquire() returns error
-
-- while Release() call pending:
-
-  Release() returns error
-
-  Acquire() makes the pending Release() return error, and resumes
-  after pending suspend completes
-
-so they just control the target state, and the state machine emits
-START/SUSPEND as needed to reach the target.
-
-(In this patch pending Release() was supposed to block Acquire() but
-maybe we want it to instead work symmetrically like above.)
-
->=20
-> > > > the application if it intends to suspend then it should wait acquir=
-e
-> > > > to complete and then release.
-> > >=20
-> > > I think it's a bug in BlueZ that calling Release() on transport resul=
-t
-> > > to disconnect of A2DP, instead of suspend.
-> > >=20
-> > > I have another version of this patch that does send ABORT, but recall=
-s
-> > > it was due to canceled suspend and reconnects the sink/source when
-> > > getting to IDLE.
-> > >=20
-> > > > > Fix also sending error reply to the canceled Acquire() call, whic=
-h was
-> > > > > missing previously.
-> > > > > ---
-> > > > >=20
-> > > > > Notes:
-> > > > >     In theory we could also send ABORT and reconfigure the SEP ag=
-ain after
-> > > > >     that. It's more hairy though as with how the code currently w=
-orks, we
-> > > > >     may need to complete discovery first. This is a corner case a=
-nyway, so
-> > > > >     just waiting a bit should be easier.
-> > > > >=20
-> > > > >  profiles/audio/transport.c | 152 +++++++++++++++++++++++++++----=
-------
-> > > > >  1 file changed, 110 insertions(+), 42 deletions(-)
-> > > > >=20
-> > > > > diff --git a/profiles/audio/transport.c b/profiles/audio/transpor=
-t.c
-> > > > > index 0f7909a94..4d5afe022 100644
-> > > > > --- a/profiles/audio/transport.c
-> > > > > +++ b/profiles/audio/transport.c
-> > > > > @@ -88,6 +88,9 @@ struct a2dp_transport {
-> > > > >         uint16_t                delay;
-> > > > >         int8_t                  volume;
-> > > > >         guint                   watch;
-> > > > > +       guint                   resume_id;
-> > > > > +       gboolean                cancel_resume;
-> > > > > +       guint                   cancel_id;
-> > > > >  };
-> > > > >=20
-> > > > >  struct bap_transport {
-> > > > > @@ -393,22 +396,82 @@ static void *transport_a2dp_get_stream(stru=
-ct media_transport *transport)
-> > > > >         return a2dp_sep_get_stream(sep);
-> > > > >  }
-> > > > >=20
-> > > > > +static void a2dp_suspend_complete(struct avdtp *session, int err=
-,
-> > > > > +                                                       void *use=
-r_data)
-> > > > > +{
-> > > > > +       struct media_owner *owner =3D user_data;
-> > > > > +       struct media_transport *transport =3D owner->transport;
-> > > > > +       struct a2dp_transport *a2dp =3D transport->data;
-> > > > > +       struct a2dp_sep *sep =3D media_endpoint_get_sep(transport=
-->endpoint);
-> > > > > +
-> > > > > +       /* Release always succeeds */
-> > > > > +       if (owner->pending) {
-> > > > > +               owner->pending->id =3D 0;
-> > > > > +               media_request_reply(owner->pending, 0);
-> > > > > +               media_owner_remove(owner);
-> > > > > +       }
-> > > > > +
-> > > > > +       a2dp_sep_unlock(sep, a2dp->session);
-> > > > > +       transport_set_state(transport, TRANSPORT_STATE_IDLE);
-> > > > > +       media_transport_remove_owner(transport);
-> > > > > +}
-> > > > > +
-> > > > > +static guint transport_a2dp_suspend(struct media_transport *tran=
-sport,
-> > > > > +                                               struct media_owne=
-r *owner)
-> > > > > +{
-> > > > > +       struct a2dp_transport *a2dp =3D transport->data;
-> > > > > +       struct media_endpoint *endpoint =3D transport->endpoint;
-> > > > > +       struct a2dp_sep *sep =3D media_endpoint_get_sep(endpoint)=
-;
-> > > > > +
-> > > > > +       if (a2dp->cancel_resume)
-> > > > > +               return a2dp->resume_id;
-> > > > > +
-> > > > > +       if (owner !=3D NULL)
-> > > > > +               return a2dp_suspend(a2dp->session, sep, a2dp_susp=
-end_complete,
-> > > > > +                                                                =
-       owner);
-> > > > > +
-> > > > > +       transport_set_state(transport, TRANSPORT_STATE_IDLE);
-> > > > > +       a2dp_sep_unlock(sep, a2dp->session);
-> > > > > +
-> > > > > +       return 0;
-> > > > > +}
-> > > > > +
-> > > > > +static gboolean a2dp_cancel_resume_cb(void *user_data)
-> > > > > +{
-> > > > > +       struct media_owner *owner =3D user_data;
-> > > > > +       struct media_transport *transport =3D owner->transport;
-> > > > > +       struct a2dp_transport *a2dp =3D transport->data;
-> > > > > +
-> > > > > +       a2dp->cancel_id =3D 0;
-> > > > > +       a2dp->cancel_resume =3D FALSE;
-> > > > > +       owner->pending->id =3D transport_a2dp_suspend(transport, =
-owner);
-> > > > > +       return FALSE;
-> > > > > +}
-> > > > > +
-> > > > >  static void a2dp_resume_complete(struct avdtp *session, int err,
-> > > > >                                                         void *use=
-r_data)
-> > > > >  {
-> > > > >         struct media_owner *owner =3D user_data;
-> > > > >         struct media_request *req =3D owner->pending;
-> > > > >         struct media_transport *transport =3D owner->transport;
-> > > > > +       struct a2dp_transport *a2dp =3D transport->data;
-> > > > >         struct avdtp_stream *stream;
-> > > > >         int fd;
-> > > > >         uint16_t imtu, omtu;
-> > > > >         gboolean ret;
-> > > > >=20
-> > > > > +       a2dp->resume_id =3D 0;
-> > > > >         req->id =3D 0;
-> > > > >=20
-> > > > >         if (err)
-> > > > >                 goto fail;
-> > > > >=20
-> > > > > +       if (a2dp->cancel_resume) {
-> > > > > +               DBG("cancel resume");
-> > > > > +               a2dp->cancel_id =3D g_idle_add(a2dp_cancel_resume=
-_cb, owner);
-> > > > > +               return;
-> > > > > +       }
-> > > > > +
-> > > > >         stream =3D transport_a2dp_get_stream(transport);
-> > > > >         if (stream =3D=3D NULL)
-> > > > >                 goto fail;
-> > > > > @@ -445,15 +508,21 @@ static guint transport_a2dp_resume(struct m=
-edia_transport *transport,
-> > > > >         struct a2dp_sep *sep =3D media_endpoint_get_sep(endpoint)=
-;
-> > > > >         guint id;
-> > > > >=20
-> > > > > +       if (a2dp->resume_id || a2dp->cancel_id)
-> > > > > +               return -EBUSY;
-> > > > > +
-> > > > >         if (a2dp->session =3D=3D NULL) {
-> > > > >                 a2dp->session =3D a2dp_avdtp_get(transport->devic=
-e);
-> > > > >                 if (a2dp->session =3D=3D NULL)
-> > > > >                         return 0;
-> > > > >         }
-> > > > >=20
-> > > > > -       if (state_in_use(transport->state))
-> > > > > -               return a2dp_resume(a2dp->session, sep, a2dp_resum=
-e_complete,
-> > > > > +       if (state_in_use(transport->state)) {
-> > > > > +               id =3D a2dp_resume(a2dp->session, sep, a2dp_resum=
-e_complete,
-> > > > >                                                                  =
-       owner);
-> > > > > +               a2dp->resume_id =3D id;
-> > > > > +               return id;
-> > > > > +       }
-> > > > >=20
-> > > > >         if (a2dp_sep_lock(sep, a2dp->session) =3D=3D FALSE)
-> > > > >                 return 0;
-> > > > > @@ -468,51 +537,47 @@ static guint transport_a2dp_resume(struct m=
-edia_transport *transport,
-> > > > >         if (transport->state =3D=3D TRANSPORT_STATE_IDLE)
-> > > > >                 transport_set_state(transport, TRANSPORT_STATE_RE=
-QUESTING);
-> > > > >=20
-> > > > > +       a2dp->resume_id =3D id;
-> > > > >         return id;
-> > > > >  }
-> > > > >=20
-> > > > > -static void a2dp_suspend_complete(struct avdtp *session, int err=
-,
-> > > > > -                                                       void *use=
-r_data)
-> > > > > -{
-> > > > > -       struct media_owner *owner =3D user_data;
-> > > > > -       struct media_transport *transport =3D owner->transport;
-> > > > > -       struct a2dp_transport *a2dp =3D transport->data;
-> > > > > -       struct a2dp_sep *sep =3D media_endpoint_get_sep(transport=
-->endpoint);
-> > > > > -
-> > > > > -       /* Release always succeeds */
-> > > > > -       if (owner->pending) {
-> > > > > -               owner->pending->id =3D 0;
-> > > > > -               media_request_reply(owner->pending, 0);
-> > > > > -               media_owner_remove(owner);
-> > > > > -       }
-> > > > > -
-> > > > > -       a2dp_sep_unlock(sep, a2dp->session);
-> > > > > -       transport_set_state(transport, TRANSPORT_STATE_IDLE);
-> > > > > -       media_transport_remove_owner(transport);
-> > > > > -}
-> > > > > -
-> > > > > -static guint transport_a2dp_suspend(struct media_transport *tran=
-sport,
-> > > > > -                                               struct media_owne=
-r *owner)
-> > > > > -{
-> > > > > -       struct a2dp_transport *a2dp =3D transport->data;
-> > > > > -       struct media_endpoint *endpoint =3D transport->endpoint;
-> > > > > -       struct a2dp_sep *sep =3D media_endpoint_get_sep(endpoint)=
-;
-> > > > > -
-> > > > > -       if (owner !=3D NULL)
-> > > > > -               return a2dp_suspend(a2dp->session, sep, a2dp_susp=
-end_complete,
-> > > > > -                                                                =
-       owner);
-> > > > > -
-> > > > > -       transport_set_state(transport, TRANSPORT_STATE_IDLE);
-> > > > > -       a2dp_sep_unlock(sep, a2dp->session);
-> > > > > -
-> > > > > -       return 0;
-> > > > > -}
-> > > > > -
-> > > > >  static void transport_a2dp_cancel(struct media_transport *transp=
-ort, guint id)
-> > > > >  {
-> > > > > +       struct a2dp_transport *a2dp =3D transport->data;
-> > > > > +
-> > > > > +       if (a2dp->resume_id && a2dp->resume_id =3D=3D id) {
-> > > > > +               /* a2dp_cancel() results to ABORT->IDLE->disconne=
-ct. Canceling
-> > > > > +                * START can be triggered by user via Release(), =
-and it's better
-> > > > > +                * to not drop the A2DP connection then, so we ju=
-st suspend
-> > > > > +                * after resume completes.
-> > > > > +                */
-> > > > > +               a2dp->cancel_resume =3D TRUE;
-> > > > > +               return;
-> > > > > +       }
-> > > > > +
-> > > > >         a2dp_cancel(id);
-> > > > >  }
-> > > > >=20
-> > > > > +static void transport_a2dp_remove_owner(struct media_transport *=
-transport,
-> > > > > +                                       struct media_owner *owner=
-)
-> > > > > +{
-> > > > > +       struct a2dp_transport *a2dp =3D transport->data;
-> > > > > +
-> > > > > +       /* Clean up callbacks that refer to the owner */
-> > > > > +
-> > > > > +       if (a2dp->cancel_id) {
-> > > > > +               g_source_remove(a2dp->cancel_id);
-> > > > > +               a2dp->cancel_id =3D 0;
-> > > > > +       }
-> > > > > +
-> > > > > +       if (a2dp->resume_id) {
-> > > > > +               a2dp_cancel(a2dp->resume_id);
-> > > > > +               a2dp->resume_id =3D 0;
-> > > > > +       }
-> > > > > +
-> > > > > +       a2dp->cancel_resume =3D FALSE;
-> > > > > +}
-> > > > > +
-> > > > >  static int8_t transport_a2dp_get_volume(struct media_transport *=
-transport)
-> > > > >  {
-> > > > >         struct a2dp_transport *a2dp =3D transport->data;
-> > > > > @@ -773,10 +838,12 @@ static DBusMessage *release(DBusConnection =
-*conn, DBusMessage *msg,
-> > > > >=20
-> > > > >                 member =3D dbus_message_get_member(owner->pending=
-->msg);
-> > > > >                 /* Cancel Acquire request if that exist */
-> > > > > -               if (g_str_equal(member, "Acquire"))
-> > > > > +               if (g_str_equal(member, "Acquire")) {
-> > > > > +                       media_request_reply(owner->pending, ECANC=
-ELED);
-> > > > >                         media_owner_remove(owner);
-> > > > > -               else
-> > > > > +               } else {
-> > > > >                         return btd_error_in_progress(msg);
-> > > > > +               }
-> > > > >         }
-> > > > >=20
-> > > > >         transport_set_state(transport, TRANSPORT_STATE_SUSPENDING=
-);
-> > > > > @@ -2189,7 +2256,8 @@ static void *transport_asha_init(struct med=
-ia_transport *transport, void *data)
-> > > > >  }
-> > > > >=20
-> > > > >  #define A2DP_OPS(_uuid, _init, _set_volume, _destroy) \
-> > > > > -       TRANSPORT_OPS(_uuid, transport_a2dp_properties, NULL, NUL=
-L, _init, \
-> > > > > +       TRANSPORT_OPS(_uuid, transport_a2dp_properties, NULL, \
-> > > > > +                       transport_a2dp_remove_owner, _init, \
-> > > > >                         transport_a2dp_resume, transport_a2dp_sus=
-pend, \
-> > > > >                         transport_a2dp_cancel, NULL, \
-> > > > >                         transport_a2dp_get_stream, transport_a2dp=
-_get_volume, \
-> > > > > --
-> > > > > 2.47.0
-> > > > >=20
-> > > > >=20
-> > > >=20
-> > > >=20
-> > >=20
-> >=20
-> >=20
->=20
-
+RnJvbTogRWFzd2FyIEhhcmloYXJhbiA8ZWFoYXJpaGFAbGludXgubWljcm9zb2Z0LmNvbT4gU2Vu
+dDogV2VkbmVzZGF5LCBPY3RvYmVyIDMwLCAyMDI0IDEwOjQ4IEFNDQo+IA0KPiBXZSBoYXZlIHNl
+dmVyYWwgcGxhY2VzIHdoZXJlIHRpbWVvdXRzIGFyZSBvcGVuLWNvZGVkIGFzIE4gKHNlY29uZHMp
+ICogSFosDQo+IGJ1dCBiZXN0IHByYWN0aWNlIGlzIHRvIHVzZSB0aGUgdXRpbGl0eSBmdW5jdGlv
+bnMgZnJvbSBqaWZmaWVzLmguIENvbnZlcnQNCj4gdGhlIHRpbWVvdXRzIHRvIGJlIGNvbXBsaWFu
+dC4gVGhpcyBkb2Vzbid0IGZpeCBhbnkgYnVncywgaXQncyBhIHNpbXBsZSBjb2RlDQo+IGltcHJv
+dmVtZW50Lg0KPiANCj4gVE86ICJLLiBZLiBTcmluaXZhc2FuIiA8a3lzQG1pY3Jvc29mdC5jb20+
+DQo+IFRPOiBIYWl5YW5nIFpoYW5nIDxoYWl5YW5nekBtaWNyb3NvZnQuY29tPg0KPiBUTzogV2Vp
+IExpdSA8d2VpLmxpdUBrZXJuZWwub3JnPg0KPiBUTzogRGV4dWFuIEN1aSA8ZGVjdWlAbWljcm9z
+b2Z0LmNvbT4NCj4gVE86IGxpbnV4LWh5cGVydkB2Z2VyLmtlcm5lbC5vcmcNCj4gVE86IEFubmEt
+TWFyaWEgQmVobnNlbiA8YW5uYS1tYXJpYUBsaW51dHJvbml4LmRlPg0KPiBUTzogVGhvbWFzIEds
+ZWl4bmVyIDx0Z2x4QGxpbnV0cm9uaXguZGU+DQo+IFRPOiBHZWVydCBVeXR0ZXJob2V2ZW4gPGdl
+ZXJ0QGxpbnV4LW02OGsub3JnPg0KPiBUTzogTWFyY2VsIEhvbHRtYW5uIDxtYXJjZWxAaG9sdG1h
+bm4ub3JnPg0KPiBUTzogSm9oYW4gSGVkYmVyZyA8am9oYW4uaGVkYmVyZ0BnbWFpbC5jb20+DQo+
+IFRPOiBMdWl6IEF1Z3VzdG8gdm9uIERlbnR6IDxsdWl6LmRlbnR6QGdtYWlsLmNvbT4NCj4gVE86
+IGxpbnV4LWJsdWV0b290aEB2Z2VyLmtlcm5lbC5vcmcNCj4gVE86IGxpbnV4LWtlcm5lbEB2Z2Vy
+Lmtlcm5lbC5vcmcNCj4gQ0M6IE1pY2hhZWwgS2VsbGV5IDxtaGtsaW51eEBvdXRsb29rLmNvbT4N
+Cj4gU2lnbmVkLW9mZi1ieTogRWFzd2FyIEhhcmloYXJhbiA8ZWFoYXJpaGFAbGludXgubWljcm9z
+b2Z0LmNvbT4NCj4gLS0tDQo+ICBkcml2ZXJzL2h2L2h2X2JhbGxvb24uYyAgfCA5ICsrKysrLS0t
+LQ0KPiAgZHJpdmVycy9odi9odl9rdnAuYyAgICAgIHwgNCArKy0tDQo+ICBkcml2ZXJzL2h2L2h2
+X3NuYXBzaG90LmMgfCAzICsrLQ0KPiAgZHJpdmVycy9odi92bWJ1c19kcnYuYyAgIHwgMiArLQ0K
+PiAgNCBmaWxlcyBjaGFuZ2VkLCAxMCBpbnNlcnRpb25zKCspLCA4IGRlbGV0aW9ucygtKQ0KPiAN
+Cj4gZGlmZiAtLWdpdCBhL2RyaXZlcnMvaHYvaHZfYmFsbG9vbi5jIGIvZHJpdmVycy9odi9odl9i
+YWxsb29uLmMNCj4gaW5kZXgNCj4gYzM4ZGNkZmNiOTE0ZGNjMzUxNWJlMTAwY2JhMGJlYjRhM2Y5
+Yjk3NS4uYTk5MTEyZTZmMGI4NTM0Y2Y1YzhjOTYzZTM0MzANCj4gMTkwNjFiZDM0ZjYgMTAwNjQ0
+DQo+IC0tLSBhL2RyaXZlcnMvaHYvaHZfYmFsbG9vbi5jDQo+ICsrKyBiL2RyaXZlcnMvaHYvaHZf
+YmFsbG9vbi5jDQo+IEBAIC03NTYsNyArNzU2LDcgQEAgc3RhdGljIHZvaWQgaHZfbWVtX2hvdF9h
+ZGQodW5zaWduZWQgbG9uZyBzdGFydCwgdW5zaWduZWQgbG9uZyBzaXplLA0KPiAgCQkgKiBhZGRp
+bmcgc3VjY2VlZGVkLCBpdCBpcyBvayB0byBwcm9jZWVkIGV2ZW4gaWYgdGhlIG1lbW9yeSB3YXMN
+Cj4gIAkJICogbm90IG9ubGluZWQgaW4gdGltZS4NCj4gIAkJICovDQo+IC0JCXdhaXRfZm9yX2Nv
+bXBsZXRpb25fdGltZW91dCgmZG1fZGV2aWNlLm9sX3dhaXRldmVudCwgNSAqIEhaKTsNCj4gKwkJ
+d2FpdF9mb3JfY29tcGxldGlvbl90aW1lb3V0KCZkbV9kZXZpY2Uub2xfd2FpdGV2ZW50LCBzZWNz
+X3RvX2ppZmZpZXMoNSkpOw0KPiAgCQlwb3N0X3N0YXR1cygmZG1fZGV2aWNlKTsNCj4gIAl9DQo+
+ICB9DQo+IEBAIC0xMzczLDcgKzEzNzMsOCBAQCBzdGF0aWMgaW50IGRtX3RocmVhZF9mdW5jKHZv
+aWQgKmRtX2RldikNCj4gIAlzdHJ1Y3QgaHZfZHlubWVtX2RldmljZSAqZG0gPSBkbV9kZXY7DQo+
+IA0KPiAgCXdoaWxlICgha3RocmVhZF9zaG91bGRfc3RvcCgpKSB7DQo+IC0JCXdhaXRfZm9yX2Nv
+bXBsZXRpb25faW50ZXJydXB0aWJsZV90aW1lb3V0KCZkbV9kZXZpY2UuY29uZmlnX2V2ZW50LCAx
+ICogSFopOw0KPiArCQl3YWl0X2Zvcl9jb21wbGV0aW9uX2ludGVycnVwdGlibGVfdGltZW91dCgm
+ZG1fZGV2aWNlLmNvbmZpZ19ldmVudCwNCj4gKwkJCQkJCQkJc2Vjc190b19qaWZmaWVzKDEpKTsN
+Cj4gIAkJLyoNCj4gIAkJICogVGhlIGhvc3QgZXhwZWN0cyB1cyB0byBwb3N0IGluZm9ybWF0aW9u
+IG9uIHRoZSBtZW1vcnkNCj4gIAkJICogcHJlc3N1cmUgZXZlcnkgc2Vjb25kLg0KPiBAQCAtMTc0
+OCw3ICsxNzQ5LDcgQEAgc3RhdGljIGludCBiYWxsb29uX2Nvbm5lY3RfdnNwKHN0cnVjdCBodl9k
+ZXZpY2UgKmRldikNCj4gIAlpZiAocmV0KQ0KPiAgCQlnb3RvIG91dDsNCj4gDQo+IC0JdCA9IHdh
+aXRfZm9yX2NvbXBsZXRpb25fdGltZW91dCgmZG1fZGV2aWNlLmhvc3RfZXZlbnQsIDUgKiBIWik7
+DQo+ICsJdCA9IHdhaXRfZm9yX2NvbXBsZXRpb25fdGltZW91dCgmZG1fZGV2aWNlLmhvc3RfZXZl
+bnQsIHNlY3NfdG9famlmZmllcyg1KSk7DQo+ICAJaWYgKHQgPT0gMCkgew0KPiAgCQlyZXQgPSAt
+RVRJTUVET1VUOw0KPiAgCQlnb3RvIG91dDsNCj4gQEAgLTE4MDYsNyArMTgwNyw3IEBAIHN0YXRp
+YyBpbnQgYmFsbG9vbl9jb25uZWN0X3ZzcChzdHJ1Y3QgaHZfZGV2aWNlICpkZXYpDQo+ICAJaWYg
+KHJldCkNCj4gIAkJZ290byBvdXQ7DQo+IA0KPiAtCXQgPSB3YWl0X2Zvcl9jb21wbGV0aW9uX3Rp
+bWVvdXQoJmRtX2RldmljZS5ob3N0X2V2ZW50LCA1ICogSFopOw0KPiArCXQgPSB3YWl0X2Zvcl9j
+b21wbGV0aW9uX3RpbWVvdXQoJmRtX2RldmljZS5ob3N0X2V2ZW50LCBzZWNzX3RvX2ppZmZpZXMo
+NSkpOw0KPiAgCWlmICh0ID09IDApIHsNCj4gIAkJcmV0ID0gLUVUSU1FRE9VVDsNCj4gIAkJZ290
+byBvdXQ7DQo+IGRpZmYgLS1naXQgYS9kcml2ZXJzL2h2L2h2X2t2cC5jIGIvZHJpdmVycy9odi9o
+dl9rdnAuYw0KPiBpbmRleA0KPiBkMzViNjBjMDYxMTQ4NmM4YzkwOWQyZjhmN2M3MzBmZjkxM2Rm
+MzBkLi4yOWUwMTI0N2EwODcwZmRiOWVlYmQ5MmJkZDE2Zg0KPiBkMzcxNDUwMjQwYyAxMDA2NDQN
+Cj4gLS0tIGEvZHJpdmVycy9odi9odl9rdnAuYw0KPiArKysgYi9kcml2ZXJzL2h2L2h2X2t2cC5j
+DQo+IEBAIC02NTUsNyArNjU1LDcgQEAgdm9pZCBodl9rdnBfb25jaGFubmVsY2FsbGJhY2sodm9p
+ZCAqY29udGV4dCkNCj4gIAkJaWYgKGhvc3RfbmVnb3RpYXRpZWQgPT0gTkVHT19OT1RfU1RBUlRF
+RCkgew0KPiAgCQkJaG9zdF9uZWdvdGlhdGllZCA9IE5FR09fSU5fUFJPR1JFU1M7DQo+ICAJCQlz
+Y2hlZHVsZV9kZWxheWVkX3dvcmsoJmt2cF9ob3N0X2hhbmRzaGFrZV93b3JrLA0KPiAtCQkJCSAg
+ICAgIEhWX1VUSUxfTkVHT19USU1FT1VUICogSFopOw0KPiArCQkJCQkJc2Vjc190b19qaWZmaWVz
+KEhWX1VUSUxfTkVHT19USU1FT1VUKSk7DQo+ICAJCX0NCj4gIAkJcmV0dXJuOw0KPiAgCX0NCj4g
+QEAgLTcyNCw3ICs3MjQsNyBAQCB2b2lkIGh2X2t2cF9vbmNoYW5uZWxjYWxsYmFjayh2b2lkICpj
+b250ZXh0KQ0KPiAgCQkgKi8NCj4gIAkJc2NoZWR1bGVfd29yaygma3ZwX3NlbmRrZXlfd29yayk7
+DQo+ICAJCXNjaGVkdWxlX2RlbGF5ZWRfd29yaygma3ZwX3RpbWVvdXRfd29yaywNCj4gLQkJCQkJ
+SFZfVVRJTF9USU1FT1VUICogSFopOw0KPiArCQkJCSAgICAgIHNlY3NfdG9famlmZmllcyhIVl9V
+VElMX1RJTUVPVVQpKTsNCj4gDQo+ICAJCXJldHVybjsNCj4gDQo+IGRpZmYgLS1naXQgYS9kcml2
+ZXJzL2h2L2h2X3NuYXBzaG90LmMgYi9kcml2ZXJzL2h2L2h2X3NuYXBzaG90LmMNCj4gaW5kZXgN
+Cj4gMGQyMTg0YmUxNjkxMjU1OWE4Y2ZhNzg0Yzc2MmU2NDE4ZWJkMzI3OS4uODZkODc0ODZlZDQw
+YjNjYTlmNjY3NDY1MGU1DQo+IGE4NmE3MTg0ZTJmYTYgMTAwNjQ0DQo+IC0tLSBhL2RyaXZlcnMv
+aHYvaHZfc25hcHNob3QuYw0KPiArKysgYi9kcml2ZXJzL2h2L2h2X3NuYXBzaG90LmMNCj4gQEAg
+LTE5Myw3ICsxOTMsOCBAQCBzdGF0aWMgdm9pZCB2c3Nfc2VuZF9vcCh2b2lkKQ0KPiAgCXZzc190
+cmFuc2FjdGlvbi5zdGF0ZSA9IEhWVVRJTF9VU0VSU1BBQ0VfUkVROw0KPiANCj4gIAlzY2hlZHVs
+ZV9kZWxheWVkX3dvcmsoJnZzc190aW1lb3V0X3dvcmssIG9wID09IFZTU19PUF9GUkVFWkUgPw0K
+PiAtCQkJVlNTX0ZSRUVaRV9USU1FT1VUICogSFogOiBIVl9VVElMX1RJTUVPVVQgKiBIWik7DQo+
+ICsJCQkJc2Vjc190b19qaWZmaWVzKFZTU19GUkVFWkVfVElNRU9VVCkgOg0KPiArCQkJCXNlY3Nf
+dG9famlmZmllcyhIVl9VVElMX1RJTUVPVVQpKTsNCj4gDQo+ICAJcmMgPSBodnV0aWxfdHJhbnNw
+b3J0X3NlbmQoaHZ0LCB2c3NfbXNnLCBzaXplb2YoKnZzc19tc2cpLCBOVUxMKTsNCj4gIAlpZiAo
+cmMpIHsNCj4gZGlmZiAtLWdpdCBhL2RyaXZlcnMvaHYvdm1idXNfZHJ2LmMgYi9kcml2ZXJzL2h2
+L3ZtYnVzX2Rydi5jDQo+IGluZGV4DQo+IDliMTVmN2RhZjUwNTk3NTBlMTdlYTM2MDdiNTJkZWU5
+NjdjMWMwNTkuLjdkYjMwODgxZTgzYWQ0YjQwNjQxMzY0MTQxMw0KPiBkNjgzMjlmYzY2M2UyIDEw
+MDY0NA0KPiAtLS0gYS9kcml2ZXJzL2h2L3ZtYnVzX2Rydi5jDQo+ICsrKyBiL2RyaXZlcnMvaHYv
+dm1idXNfZHJ2LmMNCj4gQEAgLTI1MDcsNyArMjUwNyw3IEBAIHN0YXRpYyBpbnQgdm1idXNfYnVz
+X3Jlc3VtZShzdHJ1Y3QgZGV2aWNlICpkZXYpDQo+ICAJdm1idXNfcmVxdWVzdF9vZmZlcnMoKTsN
+Cj4gDQo+ICAJaWYgKHdhaXRfZm9yX2NvbXBsZXRpb25fdGltZW91dCgNCj4gLQkJJnZtYnVzX2Nv
+bm5lY3Rpb24ucmVhZHlfZm9yX3Jlc3VtZV9ldmVudCwgMTAgKiBIWikgPT0gMCkNCj4gKwkJJnZt
+YnVzX2Nvbm5lY3Rpb24ucmVhZHlfZm9yX3Jlc3VtZV9ldmVudCwgc2Vjc190b19qaWZmaWVzKDEw
+KSkgPT0gMCkNCj4gIAkJcHJfZXJyKCJTb21lIHZtYnVzIGRldmljZSBpcyBtaXNzaW5nIGFmdGVy
+IHN1c3BlbmRpbmc/XG4iKTsNCj4gDQo+ICAJLyogUmVzZXQgdGhlIGV2ZW50IGZvciB0aGUgbmV4
+dCBzdXNwZW5kLiAqLw0KPiANCg0KUmV2aWV3ZWQtYnk6IE1pY2hhZWwgS2VsbGV5IDxtaGtsaW51
+eEBvdXRsb29rLmNvbT4NCg==
