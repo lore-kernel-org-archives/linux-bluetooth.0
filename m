@@ -1,337 +1,199 @@
-Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [80.237.130.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f169.google.com (mail-lj1-f169.google.com [209.85.208.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA2AD19F43B;
-	Fri,  1 Nov 2024 14:22:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.237.130.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BA2A3EA98
+	for <linux-bluetooth@vger.kernel.org>; Fri,  1 Nov 2024 15:01:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730470950; cv=none; b=S5hF/++TgGFQkLhZwYj22PChldlud8ZpV4wXB+QoI5m7Mr53PdEZr+J5747Qwchbc8qBUUaiQ3/c6Pl2ACYk6PCr7YTXAqtLEoqmVi5R2C6rCqCS3XErAzidmboHumx4qUTaj6l6eRCBsK5+npefmckdEnV+mGdnChPvPzLA4HI=
+	t=1730473312; cv=none; b=GX0HgmTGRipYtMw8owIh5AuS1aKvjXXyMUWSNevJHXI3baETUN4iAIo5/e6ZQxCTRi+8j/FlahrgZi1Hsq5ERFtd9bykbI35Gixn1jRoDmz5rKXSYW2U6K12diR+vPV4PAJseuA/qTmdk/1jGpQe65BtC0hDO/XgUZrgpEmPYg0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730470950; c=relaxed/simple;
-	bh=xvqWFDeiVTe2e42fGCsP8A+AOPXXCAUGnOXdHgjceyc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=jYPVnTJwt1hcrY+DQbtuQzKwF8+2WXtg6AlqXXnBOrHqeCa5je6cEmrn1pFdPBqou9t5KyREM3VuVVYRbISkzfKvNVv6JUrDlLY5Tb1oJHGd5NbKMqumes7YDVnigU9u+an1AJ496iwtopcM5ScMvgONJK2UOkI845BQE+bF95A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=leemhuis.info; spf=pass smtp.mailfrom=leemhuis.info; dkim=pass (2048-bit key) header.d=leemhuis.info header.i=@leemhuis.info header.b=pMmvMnin; arc=none smtp.client-ip=80.237.130.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=leemhuis.info
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=leemhuis.info
+	s=arc-20240116; t=1730473312; c=relaxed/simple;
+	bh=Zz+o/LDGqTSztdvSL3+oz10JtZH/jc4qzMhuHAGd0ww=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=OPMkzMw+h4A3SIsPYOOe+geD7cd34p49pQfhaY0NO6f7WX2FxOP/UEVRlmMdlC9C3E35j3Efb1sisCjrJ4CfpQE2hrL8K9bb/6ygRp7HnORzqkoeaSzRxrAAFHqrrMO5kzzGTPjuq98rkVDmUq7FStMDSQ0Nq6YxWrSlmOxZ+JI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XQJf1FFY; arc=none smtp.client-ip=209.85.208.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=leemhuis.info header.i=@leemhuis.info header.b="pMmvMnin"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=leemhuis.info; s=he214686; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:From:
-	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:In-Reply-To:
-	References; bh=xDypH/qw5wQR/LwFJJEG6yEgwj2L2NnuQUbw+c8OVnw=; t=1730470946;
-	x=1730902946; b=pMmvMninuowEHuuCs6UBVm7/By5LfR6zj/6+la0eb1F8Xtjl1x72pq9aPCKa1
-	khhxF3rOj0/BiMqqrePjd2T22y6hGvEFTY0VSbBFnJ9uWAq5GAuO8qUezI+iH3Yz0SMm/JOrzXsVq
-	Av36G+YZ2xAKOixH5NR2dvIim33tL3nn0I814mVn4lFjtuTk1rflhbpUpg2MXx5B5iIS5pPKzRODF
-	H5ZWKrLgt8x9oUNpK4+miuQHko8dr9G2wAjpi14eaIRdhLy56MiOrW57y5JoxLpKdsrdhbF/DWiog
-	yZ/wIveO7oNFHXjlqrFGasHxy7jirwhXeG5EIfOaDsBfHoYbAg==;
-Received: from [2a02:8108:8980:2478:87e9:6c79:5f84:367d]; authenticated
-	by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
-	id 1t6sXW-0003Mv-6m; Fri, 01 Nov 2024 15:22:14 +0100
-Message-ID: <643d8055-5a9f-4f5b-865b-830d33651dfe@leemhuis.info>
-Date: Fri, 1 Nov 2024 15:22:13 +0100
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XQJf1FFY"
+Received: by mail-lj1-f169.google.com with SMTP id 38308e7fff4ca-2fb57f97d75so21202581fa.2
+        for <linux-bluetooth@vger.kernel.org>; Fri, 01 Nov 2024 08:01:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1730473308; x=1731078108; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Vub5KUQpmiSwTfKjyJVVnGv+W9QJr+Nq10XirqsaTAs=;
+        b=XQJf1FFYnpraSVIuDk8ZFQboEkuDFl2Tmuv7ovVJMk0lN6bvqIgNfWYdzgaLthomvB
+         suGxMgE/EIlz6IjJGrTC8K9cQsODHijRzsVZW7I3gMH7T1p6K9YarjfN+jSAP4wGy/xL
+         ID0MxzUdFYPuV8Lhzt5eSIJjTG0KPWvI+RfFubrRJ5Fdg9kEYTVL8X8+r6xW+5LYfuFU
+         UvdKI5Zco/5UdFalQ0cro7WsHQ/4CF/9hf7nX6ytKlH/LWBldXiIJwdsOf3mtcRC1Mht
+         FT6NCIYOpr/95XLlhDI46lQ+17d4gCOlxGg4SDCbJT9dNRI9aiE7e0Eg71pnYbLdQ/e/
+         2yFw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730473308; x=1731078108;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Vub5KUQpmiSwTfKjyJVVnGv+W9QJr+Nq10XirqsaTAs=;
+        b=RwSeDKRgbr7Eo1Y3qirbckq/EMFVwVAlz52fDBp+J/VGks58KjIDXuoHwsn2rOez0E
+         di8bQPESo21NBB7TAZlM428oZrbqVx8aLnFAATMxWQ4CjHQpdFUYpPIT+mhKlLEJat5t
+         7PkVXW0oJT281NiTe6mzkDXCiZVEU5zVBSD4As0dikwhvbHGrNBLctz+mabwAAfbjpvv
+         TK18GMuvxPXUZepmI/QSERmuh2+kr3trjBNfSpUEfSDfLVkeJ+z/iP0tWifWeMKkL2G0
+         1dmb/ELJutUn51qjX7BNP9uImFm4mkRJgKy0E/aEraimzycbuNSosGiqPagsUuuPq4RP
+         1xug==
+X-Forwarded-Encrypted: i=1; AJvYcCX5XHxn0/aK9D4/hdEsYeJUBllI1ZxfBc2k1FSIYPiw2WLAHR1/A09ZhDe1c7r3SLojYSDocWAwnfLoAfn20O0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzRxmpDEIpkJcGAa2I+rVsrWUa1g6LSd+yNy4oYnddp3XsdnTjh
+	RL6BN3/+4PMdEkDFFu1lxhAFldL2LpUw0qNQ8VwSGgXk5KBbojK6cgFdEJ3D8DA5Y5zi3Ua/SEE
+	zlBmWPCzLrAuH31RNJ7oVW1PyD1c=
+X-Google-Smtp-Source: AGHT+IFHVyTHkH2Dgj0ai60KygQ+mHogz2weILiWNeS3q+5QrRy9t20lE9pg8M09PUlLcmNn1JIBkgOZn8I7hLxahog=
+X-Received: by 2002:a05:651c:507:b0:2fc:a347:6d90 with SMTP id
+ 38308e7fff4ca-2fcbdfe2dcbmr112598571fa.27.1730473307563; Fri, 01 Nov 2024
+ 08:01:47 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] Bluetooth: btmtk: Remove resetting mt7921 before
- downloading the fw
-To: "luiz.dentz@gmail.com" <luiz.dentz@gmail.com>,
- "tiwai@suse.de" <tiwai@suse.de>
-Cc: "marcel@holtmann.org" <marcel@holtmann.org>,
- "linux-mediatek@lists.infradead.org" <linux-mediatek@lists.infradead.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
- =?UTF-8?B?RGVyZW4gV3UgKOatpuW+t+S7gSk=?= <Deren.Wu@mediatek.com>,
- "regressions@lists.linux.dev" <regressions@lists.linux.dev>,
- "johan.hedberg@gmail.com" <johan.hedberg@gmail.com>,
- =?UTF-8?B?U3RldmUgTGVlICjmnY7oppboqqAp?= <steve.lee@mediatek.com>,
- "marc.payne@mdpsys.co.uk" <marc.payne@mdpsys.co.uk>,
- Sean Wang <Sean.Wang@mediatek.com>, =?UTF-8?B?QWFyb24gSG91ICjkvq/kv4rku7Ap?=
- <Aaron.Hou@mediatek.com>, =?UTF-8?B?Q2hyaXMgTHUgKOmZuOeomuazkyk=?=
- <Chris.Lu@mediatek.com>, =?UTF-8?B?SGFvIFFpbiAo56em5rWpKQ==?=
- <Hao.Qin@mediatek.com>
-References: <20240822052310.25220-1-hao.qin@mediatek.com>
- <ZuB3omUkdUHLggYu@mdpsys.co.uk>
- <790e542aa9d08c7efeee6ef298fce2a87d8035e4.camel@mediatek.com>
- <ZuneSM4SvyUFX86j@mdpsys.co.uk>
- <9bfbbf24ac2480d94d3455f7e33e4b5502b38ced.camel@mediatek.com>
- <CABBYNZKYsL9jcF2n9TsA1BjU-CjXOdXu7MDLP9Sz_Ly8hBAf1w@mail.gmail.com>
- <c01e6dfa730dd10a7d4dba60fe31e82b9c296b37.camel@mediatek.com>
- <Zuyk1c6Gkxx3G0PB@mdpsys.co.uk>
- <f9e8688ebe559e10c019d0cbab4e8b1f5a7d2339.camel@mediatek.com>
- <ff502f63-2d87-4dee-a893-cce53353df8b@leemhuis.info>
- <87iktk4d9l.wl-tiwai@suse.de>
- <75f671b6-ce2a-4404-b662-2c9c7d28a598@leemhuis.info>
- <d0f70e662f5e9329cff43f92a5c191601cc599f1.camel@mediatek.com>
- <0a988691-8c18-4dca-ac78-94e36a9b8b37@leemhuis.info>
- <f3c6f6f857d19c867941c86c644042fa195621ac.camel@mediatek.com>
-From: Thorsten Leemhuis <regressions@leemhuis.info>
-Content-Language: en-MW
-In-Reply-To: <f3c6f6f857d19c867941c86c644042fa195621ac.camel@mediatek.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-bounce-key: webpack.hosteurope.de;regressions@leemhuis.info;1730470946;3d013d36;
-X-HE-SMSGID: 1t6sXW-0003Mv-6m
+References: <20241101114410.234311-1-dmantipov@yandex.ru>
+In-Reply-To: <20241101114410.234311-1-dmantipov@yandex.ru>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Fri, 1 Nov 2024 11:01:34 -0400
+Message-ID: <CABBYNZK=H9JtzaQudQ1b7TGU5VaJ_qX_bbSJhKSwWKh+5_1uUQ@mail.gmail.com>
+Subject: Re: [PATCH v2] Bluetooth: fix use-after-free in device_for_each_child()
+To: Dmitry Antipov <dmantipov@yandex.ru>
+Cc: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg <johan.hedberg@gmail.com>, 
+	linux-bluetooth@vger.kernel.org, lvc-project@linuxtesting.org, 
+	syzbot+6cf5652d3df49fae2e3f@syzkaller.appspotmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi. Top-posting for once, to make this easily accessible to everyone.
+#syz test
 
-Thx for the insights, but it feels like this is not the complete story.
-From Takashi's mail earlier in the thread it appears to me that there is
-a regression that the patch at the start of the thread fixes:
-https://lore.kernel.org/all/87iktk4d9l.wl-tiwai@suse.de/
+On Fri, Nov 1, 2024 at 7:44=E2=80=AFAM Dmitry Antipov <dmantipov@yandex.ru>=
+ wrote:
+>
+> Syzbot has reported the following KASAN splat:
+>
+> BUG: KASAN: slab-use-after-free in device_for_each_child+0x18f/0x1a0
+> Read of size 8 at addr ffff88801f605308 by task kbnepd bnep0/4980
+>
+> CPU: 0 UID: 0 PID: 4980 Comm: kbnepd bnep0 Not tainted 6.12.0-rc4-00161-g=
+ae90f6a6170d #1
+> Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.16.3-2.fc40=
+ 04/01/2014
+> Call Trace:
+>  <TASK>
+>  dump_stack_lvl+0x100/0x190
+>  ? device_for_each_child+0x18f/0x1a0
+>  print_report+0x13a/0x4cb
+>  ? __virt_addr_valid+0x5e/0x590
+>  ? __phys_addr+0xc6/0x150
+>  ? device_for_each_child+0x18f/0x1a0
+>  kasan_report+0xda/0x110
+>  ? device_for_each_child+0x18f/0x1a0
+>  ? __pfx_dev_memalloc_noio+0x10/0x10
+>  device_for_each_child+0x18f/0x1a0
+>  ? __pfx_device_for_each_child+0x10/0x10
+>  pm_runtime_set_memalloc_noio+0xf2/0x180
+>  netdev_unregister_kobject+0x1ed/0x270
+>  unregister_netdevice_many_notify+0x123c/0x1d80
+>  ? __mutex_trylock_common+0xde/0x250
+>  ? __pfx_unregister_netdevice_many_notify+0x10/0x10
+>  ? trace_contention_end+0xe6/0x140
+>  ? __mutex_lock+0x4e7/0x8f0
+>  ? __pfx_lock_acquire.part.0+0x10/0x10
+>  ? rcu_is_watching+0x12/0xc0
+>  ? unregister_netdev+0x12/0x30
+>  unregister_netdevice_queue+0x30d/0x3f0
+>  ? __pfx_unregister_netdevice_queue+0x10/0x10
+>  ? __pfx_down_write+0x10/0x10
+>  unregister_netdev+0x1c/0x30
+>  bnep_session+0x1fb3/0x2ab0
+>  ? __pfx_bnep_session+0x10/0x10
+>  ? __pfx_lock_release+0x10/0x10
+>  ? __pfx_woken_wake_function+0x10/0x10
+>  ? __kthread_parkme+0x132/0x200
+>  ? __pfx_bnep_session+0x10/0x10
+>  ? kthread+0x13a/0x370
+>  ? __pfx_bnep_session+0x10/0x10
+>  kthread+0x2b7/0x370
+>  ? __pfx_kthread+0x10/0x10
+>  ret_from_fork+0x48/0x80
+>  ? __pfx_kthread+0x10/0x10
+>  ret_from_fork_asm+0x1a/0x30
+>  </TASK>
+>
+> Allocated by task 4974:
+>  kasan_save_stack+0x30/0x50
+>  kasan_save_track+0x14/0x30
+>  __kasan_kmalloc+0xaa/0xb0
+>  __kmalloc_noprof+0x1d1/0x440
+>  hci_alloc_dev_priv+0x1d/0x2820
+>  __vhci_create_device+0xef/0x7d0
+>  vhci_write+0x2c7/0x480
+>  vfs_write+0x6a0/0xfc0
+>  ksys_write+0x12f/0x260
+>  do_syscall_64+0xc7/0x250
+>  entry_SYSCALL_64_after_hwframe+0x77/0x7f
+>
+> Freed by task 4979:
+>  kasan_save_stack+0x30/0x50
+>  kasan_save_track+0x14/0x30
+>  kasan_save_free_info+0x3b/0x60
+>  __kasan_slab_free+0x4f/0x70
+>  kfree+0x141/0x490
+>  hci_release_dev+0x4d9/0x600
+>  bt_host_release+0x6a/0xb0
+>  device_release+0xa4/0x240
+>  kobject_put+0x1ec/0x5a0
+>  put_device+0x1f/0x30
+>  vhci_release+0x81/0xf0
+>  __fput+0x3f6/0xb30
+>  task_work_run+0x151/0x250
+>  do_exit+0xa79/0x2c30
+>  do_group_exit+0xd5/0x2a0
+>  get_signal+0x1fcd/0x2210
+>  arch_do_signal_or_restart+0x93/0x780
+>  syscall_exit_to_user_mode+0x140/0x290
+>  do_syscall_64+0xd4/0x250
+>  entry_SYSCALL_64_after_hwframe+0x77/0x7f
+>
+> In 'hci_conn_del_sysfs()', 'device_unregister()' may be called when
+> an underlying (kobject) reference counter is greater than 1. This
+> means that reparenting (happened when the device is actually freed)
+> is delayed and, during that delay, parent controller device (hciX)
+> may be deleted. Since the latter may create a dangling pointer to
+> freed parent, avoid that scenario by reparenting to NULL explicitly.
+>
+> Reported-by: syzbot+6cf5652d3df49fae2e3f@syzkaller.appspotmail.com
+> Closes: https://syzkaller.appspot.com/bug?extid=3D6cf5652d3df49fae2e3f
+> Fixes: a85fb91e3d72 ("Bluetooth: Fix double free in hci_conn_cleanup")
+> Signed-off-by: Dmitry Antipov <dmantipov@yandex.ru>
+> ---
+> v2: reparent per-connection 'struct device' explicitly
+> ---
+>  net/bluetooth/hci_sysfs.c | 2 ++
+>  1 file changed, 2 insertions(+)
+>
+> diff --git a/net/bluetooth/hci_sysfs.c b/net/bluetooth/hci_sysfs.c
+> index 367e32fe30eb..80ac537fa500 100644
+> --- a/net/bluetooth/hci_sysfs.c
+> +++ b/net/bluetooth/hci_sysfs.c
+> @@ -73,6 +73,8 @@ void hci_conn_del_sysfs(struct hci_conn *conn)
+>                 return;
+>         }
+>
+> +       device_move(&conn->dev, NULL, DPM_ORDER_DEV_LAST);
+> +
+>         while (1) {
+>                 struct device *dev;
+>
+> --
+> 2.47.0
+>
 
-So it appears to me (please correct me if I'm wrong, which I might be)
-there is some regression that must be fixed independently of any
-firmware changes; not sure, maybe it's a different regression that the
-one Marc saw.
 
-I just don't know what's the best way forward to resolve the regresson.
-A revert of the culprit? The patch at the start of this thread?
-Something else?
-
-Takashi, Luiz, can you help me out here? I guess I otherwise soon will
-have to involve higher level maintainers to sort this out (e.g. the -net
-maintainers and/or Linus).
-
-Ciao, Thorsten
-
-On 01.11.24 08:11, Chris Lu (陸稚泓) wrote:
-> Hi Thorsten,
-> 
-> On Wed, 2024-10-30 at 12:29 +0100, Thorsten Leemhuis wrote:
->> External email : Please do not click links or open attachments until
->> you have verified the sender or the content.
->> 
->> 
->> On 30.10.24 12:03, Chris Lu (陸稚泓) wrote:
->> > 
->> > Let me recap and update the status of this problem.
->> 
->> Many thx!
->> 
->> > Marc feedback that he has some problem with MT7921AUN usb module.
->> > Originally, we thought it was caused by the change "Fixes:
->> > ccfc8948d7e4d9 ("Bluetooth: btusb: mediatek: reset the controller
->> > before downloading the fw")". The change is mainly for MT7922, we
->> > found some problem with MT7921 on specific platform internally. As
->> > a result, Hao sent another patch to remove MT7921 from that
->> > rule(Bluetooth: btmtk: Remove resetting mt7921 before downloading
->> > the fw).
->> > 
->> > However, Marc also mentioned that BT is able to work if changing
->> > back
->> > to an old firmware bin. Based on the clue, we found it was caused
->> > by a
->> > firmware change that specific MT7921 model will not able to setup
->> > successfully. (In fact, we didn't expect that MT7921AUN can be get
->> > by
->> > normal user.)
->> > 
->> > Since we can't predict which model user use and Luiz also suggests
->> > MediaTek to fix it if that model can work before, we have prepared
->> > a
->> > solution. I've verified the solution locally that MT7921AUN model
->> > can
->> > work normally on Ubuntu PC. It will be a firmware modification. We
->> > plan
->> > to submit new firmware with this modification in 2024 Nov.
->> 
->> Great, but due to the kernel's "no regressions" rule this is mostly
->> irrelevant, as the regression must be fixed in a way that does not
->> require users to change their firmware.
->> 
-> 
-> Marc's module(MT7921AUN) is not working is due to a change in specific
-> firmware uploaded last year and we plan to revert that in the next
-> firmware release. Since it's related to controller's behavior, it's
-> quite hard to cover in software side.
-> Additionally, MT7921AUN is an external usb dongle. MediaTek official PC
-> project doesn't use this type of MT7921 model. We uses another type for
-> PC projects that it can be guaranteed bluetooth works normally with any
-> firmware we upload to Kernel. As a result, we believe the impact is
-> minimal to general user.
-> 
->> So is any such solution in sight? Or should we just revert
->> ccfc8948d7e4d9 and any related follow up patches for now? Or would
->> that
->> just cause regressions for other users?
->> 
-> 
-> Actually, it's not related to ccfc8948d7e4d9 which make bluetooth can't
-> setup normally if using MT7921AUN model + mismatched firmware. We
-> thought it was the same issue in the beginning, but it's not eventually
-> after getting more and more clue/logs.
-> I think we can keep the change because it's necessary to the change
-> submitter-Hao's project.
-> 
-> Chris Lu
-> 
->> Ciao, Thorsten
->> 
->> > On Wed, 2024-10-30 at 10:21 +0100, Thorsten Leemhuis wrote:
->> > > External email : Please do not click links or open attachments
->> > > until
->> > > you have verified the sender or the content.
->> > > 
->> > > 
->> > > Hi, Thorsten here, the Linux kernel's regression tracker. Top-
->> > > posting
->> > > for once, to make this easily accessible to everyone.
->> > > 
->> > > I'm a bit lost here, but maybe I'm missing something.
->> > > 
->> > > Luiz, can you help out here? Is there a reason why this patch is
->> > > not
->> > > making any process?
->> > > 
->> > > Chris Lu and/or Hao Qin: Can you maybe help out as well as well
->> > > and
->> > > help
->> > > with resolving some open questions that might or might not be
->> > > relevant
->> > > (see below).
->> > > 
->> > > From Takashi reply, the bugzilla ticket he linked to, and the
->> > > mail
->> > > from
->> > > the MediaTek folks
->> > > (
->> > > 
-> https://lore.kernel.org/lkml/12a344e25b31ec00fe8b57814d43fcb166e71be5.camel@mediatek.com/
->> > > ) it from the outside looks like this patch should really be
->> > > merged
->> > > rather sooner that later as it fixes regressions for some people.
->> > > Afaics it should get a "Fixes: ccfc8948d7e4d9 ("Bluetooth: btusb:
->> > > mediatek: reset the controller before downloading the fw")" tag,
->> > > as
->> > > it's
->> > > afaics that commit that causes the regression that is known since
->> > > more
->> > > than three months now
->> > > (https://lore.kernel.org/all/ZsTh7Jyug7MbZsLE@mdpsys.co.uk/ ).
->> > > 
->> > > But note, it seems it does not fix the regression completely
->> > > according
->> > > to Marc's testing.
->> > > https://lore.kernel.org/all/ZuCB98DSdtKCgxaL@mdpsys.co.uk/
->> > > 
->> > > Marc: Is that still how things are with current mainline?
->> > > 
->> > > Ciao, Thorsten
->> > > 
->> > > 
->> > > On 22.10.24 12:56, Takashi Iwai wrote:
->> > > > On Mon, 14 Oct 2024 11:29:40 +0200,
->> > > > Linux regression tracking (Thorsten Leemhuis) wrote:
->> > > > > 
->> > > > > On 20.09.24 08:27, Chris Lu (陸稚泓) wrote:
->> > > > > > On Thu, 2024-09-19 at 23:25 +0100, marc.payne@mdpsys.co.uk
->> > > > > > wrote:
->> > > > > > > 
->> > > > > > > External email : Please do not click links or open
->> > > > > > > attachments until
->> > > > > > > you have verified the sender or the content.
->> > > > > > >  Hi Chris and Luiz,
->> > > > > > > 
->> > > > > > > What were your thoughts on the findings in my email dated
->> > > > > > > 18th
->> > > > > > > September?
->> > > > > > 
->> > > > > > Thanks for your suggestion.
->> > > > > > 
->> > > > > > I've prepared the same environment (Kernel v6.11 +
->> > > > > > MT7921AUN
->> > > > > > dongle) to
->> > > > > > reproduce the issue, collected necessary logs locally and
->> > > > > > also
->> > > > > > initiated an internal discussion to clarify the root cause
->> > > > > > of
->> > > > > > this
->> > > > > > symptom. We'll review the changes between two firmware
->> > > > > > (20230526/20231109) if it's a bug or not.
->> > > > > > 
->> > > > > > It may take some time to investigate. I'll let you know if
->> > > > > > there is any
->> > > > > > progress.
->> > > > > 
->> > > > > Just wondering: Chris Lu, and Marc, what's the status here?
->> > > > > From
->> > > > > here it
->> > > > > looks like there was no progress to fix this regression for a
->> > > > > while, but
->> > > > > it's easy to miss something, that's why I ask.
->> > > > > 
->> > > > > Ciao, Thorsten
->> > > > 
->> > > > FWIW, the similar bug was reported for the recent 6.11.x kernel
->> > > > on
->> > > > openSUSE Tumbleweed, and this patch was confirmed to work
->> > > > around
->> > > > the
->> > > > crash at boot:
->> > > > 
->> > > > 
-> https://urldefense.com/v3/__https://bugzilla.suse.com/show_bug.cgi?id=1231599__;!!CTRNKA9wMg0ARbw!jYyH2oubBEtIKXmKl9cI2rrmK-7kSdaiIJQ8xH4NZa5i5YCTQDHaoOxCBhMgdAAY6ROIPAoPwbOV-LNeMRJBlR6u-As$
->> > > > 
->> > > > It'd be great if you can go ahead and merge the proper fix to
->> > > > the
->> > > > upstream.
->> > > > 
->> > > > Let me know if you have another patch to test.  Then I can
->> > > > create a
->> > > > test kernel package and ask the bug reporter for testing.
->> > > > 
->> > > > 
->> > > > thanks,
->> > > > 
->> > > > Takashi
->> > > > 
->> > > 
->> > > 
->> > 
->> > ************* MEDIATEK Confidentiality Notice ********************
->> > The information contained in this e-mail message (including any
->> > attachments) may be confidential, proprietary, privileged, or
->> > otherwise
->> > exempt from disclosure under applicable laws. It is intended to be
->> > conveyed only to the designated recipient(s). Any use,
->> > dissemination,
->> > distribution, printing, retaining or copying of this e-mail
->> > (including its
->> > attachments) by unintended recipient(s) is strictly prohibited and
->> > may
->> > be unlawful. If you are not an intended recipient of this e-mail,
->> > or believe
->> > that you have received this e-mail in error, please notify the
->> > sender
->> > immediately (by replying to this e-mail), delete any and all copies
->> > of
->> > this e-mail (including any attachments) from your system, and do
->> > not
->> > disclose the content of this e-mail to any other person. Thank you!
->> > 
->> 
->> 
-> 
-> ************* MEDIATEK Confidentiality Notice
->  ********************
-> The information contained in this e-mail message (including any 
-> attachments) may be confidential, proprietary, privileged, or otherwise
-> exempt from disclosure under applicable laws. It is intended to be 
-> conveyed only to the designated recipient(s). Any use, dissemination, 
-> distribution, printing, retaining or copying of this e-mail (including its 
-> attachments) by unintended recipient(s) is strictly prohibited and may 
-> be unlawful. If you are not an intended recipient of this e-mail, or believe
->  
-> that you have received this e-mail in error, please notify the sender 
-> immediately (by replying to this e-mail), delete any and all copies of 
-> this e-mail (including any attachments) from your system, and do not
-> disclose the content of this e-mail to any other person. Thank you!
-> 
-
+--=20
+Luiz Augusto von Dentz
