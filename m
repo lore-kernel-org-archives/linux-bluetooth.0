@@ -1,115 +1,225 @@
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 914F41531E3
-	for <linux-bluetooth@vger.kernel.org>; Fri,  1 Nov 2024 07:20:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8271955896
+	for <linux-bluetooth@vger.kernel.org>; Fri,  1 Nov 2024 07:35:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730445602; cv=none; b=Zo0UEPw7NjAl+XgdRWL99AR9jIAXKqHbS0dtUylQMo1KfywTZzAvxxsRGOnZUSBZ/YesuYzZDHumSB3vxFXCCUxiIIpKML/MxrNuNWcxysKMzYfZhgvAWJJ9ZhcF+QljFlL72dG8+pZoPfFQXruLsA3JOLBXOO85xT3mm2/7Sp4=
+	t=1730446516; cv=none; b=U4NP1Vfo9pdrbuB/I/b+UOUbUO8JxoZN4Lkmjji4gPEynV6d5bkqa1XmRObp4tskFXBeBeMWBdnPNrSqJhMbYstLj1fVbLNhyjw3NKbDMll/rlLN3L45lEAQOYUUqnIJQbD7ENN5huqKooUWOMpeYtJTcxqdihQTfGn1n+0tOmg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730445602; c=relaxed/simple;
-	bh=0sp4nnWT2z0EGC+tm9qIRolkfOnvNYOdIswZ3IMeTbQ=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=Fd/0SZg/mJ4gyFosCm/1dCbWPaMgAQj/zjqoDxkr2ekRikSe7c6PjdOlIf88ebBie5qCQ2ZEqpSZEF0zUUaAn2Ral1iPaWHM8tB467iDdK4htajBmmtEgSvhOz82/sE1iRGVw1uFehjzA4+C9yRNK6/s07sjVJ7krpqwDKgMgXw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--howardchung.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=A+KFELI3; arc=none smtp.client-ip=209.85.128.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--howardchung.bounces.google.com
+	s=arc-20240116; t=1730446516; c=relaxed/simple;
+	bh=ZH/oFT4NdLs5ZnzE0cqwBHayataRVDeK09BHN0UCcfk=;
+	h=Date:From:To:Cc:Subject:Message-ID; b=oe+EJPj98LDQqcyLzoUS/oz2BSk3bcihl+9r0Z+rmlWtL1zeou95i95Onmi1tnt/FqjDuA7QksTZknepn8jKmHX812n0SP58aBCVRtK1B7DQ0How8BCt49QcMcyYHIWLJCPePuVqZSR8UuArEhduvQUhAdqP/HPrjMpxRSFUd/Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=k6cljyk9; arc=none smtp.client-ip=192.198.163.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="A+KFELI3"
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-6e3497c8eb0so22948297b3.0
-        for <linux-bluetooth@vger.kernel.org>; Fri, 01 Nov 2024 00:20:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1730445599; x=1731050399; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=98vUBPXsrM1q9ndKg9WjYLEgprci7OjqQjAo2hYSXmI=;
-        b=A+KFELI3iAJkxgv6r2HCJqX2TfN+EMxXnSOhAONuixReTtJqewWRPx8jpHdB+IUK6h
-         MsDuWEQm3RCfyg10y8wQMiDuKv3SyGPCRq/6v3qF3V72gxlCenyTIuCBeNYf12qaOCFB
-         u5m3ib0L5FNEFW2aT78W2Pu7d0b06BR8ny7jehW1IBdgCcD2hltSaMfOSNciYTi9Wl4n
-         gq6vJtA+DsjcGiLQXgc4rOP9TO1Nyfcig7FeH1Rwi3y1iDgsAV75my9SpDQ6/72DDojD
-         YS64nJ+IvYrZcqL8SBzDhvgAkvaNT5EdH2KRdcQuzYIYib6KsK6wV7skg06DZLsUvyMg
-         a1sA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730445599; x=1731050399;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=98vUBPXsrM1q9ndKg9WjYLEgprci7OjqQjAo2hYSXmI=;
-        b=YJDVIExPGBbbvkgxStmfddqWM9lVkwyACItK3cVgGkgUOyCvfV7IWrCLCs4ahmpqsB
-         UXvfjBL+ihOhX62NEfu4+dX9nFt2vwo1B6YgAUx/mnTNbhjlS/zA6IHfe1eDq6n4Q4ms
-         fJJkiX2lAulqF3bLeOcTR+XySvOOckgsLHe31KUJldk16wfEv95+yWClFkXaz+a/V2gl
-         yeslIsKFrcw1a7B17GklzfRo6BUbDgTzzVMWbcJ4yVUerd3ukjXhHGpVGHy6pemmm/IQ
-         CvryitZwgEpBPn2J+2hDFzX1JPw55IzyGu8wga22jkYxY500gfm/IlK6PPlwNlzIdYzi
-         RVQw==
-X-Gm-Message-State: AOJu0YyltNxKzcmbYPuHxHmPz7ycQDy7JdzVGT8LUVrml621Wufx8yCA
-	HymnulkeKxJlWcAQ0DFjUVZrmXDLici5zE67rsI57UXS5rnHXptTWRwqLabu3VnH7GBIOfSFgkB
-	CKlS/YBf0u9us5Rm/TdJkiFcD9UteIIw4/3u4WQ9jKq2NkUDafPQYczliMhlVubQWG+RFZib7vb
-	QpELd7JD82rCDGxBQypGHHpuUmX0ZjNx5uiLqm+Ybl6IjBPAyHDIMRxos/aDkW9oE4oXoJqGQ=
-X-Google-Smtp-Source: AGHT+IHt5sTRH00PPUKi6Oul+WuKOhVGDi+mDHDYu1zmHopgRiywnYVYWXl0eO/iDf3BLWx+NYHeiA7gqTaq40/ieQ==
-X-Received: from howardchung-p920.tpe.corp.google.com ([2401:fa00:1:17:5b55:2633:e9da:b2ac])
- (user=howardchung job=sendgmr) by 2002:a05:690c:200f:b0:6e2:ac0a:8982 with
- SMTP id 00721157ae682-6ea6413e043mr373317b3.0.1730445599497; Fri, 01 Nov 2024
- 00:19:59 -0700 (PDT)
-Date: Fri,  1 Nov 2024 15:19:39 +0800
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="k6cljyk9"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1730446515; x=1761982515;
+  h=date:from:to:cc:subject:message-id;
+  bh=ZH/oFT4NdLs5ZnzE0cqwBHayataRVDeK09BHN0UCcfk=;
+  b=k6cljyk9Yxw+o1zShkHdotf4bUgOi/9XkTTy2/6Q8vO6e2N3dbEAbI5T
+   0/DlyTDhPJ8tZe1xW/pYjM0p0gRcbVMqfcic61ekQmncIRS417Bt0em6t
+   in73ET2c2gkJEUMV3po5SBKp7qK1tTOP3+Mi5/qE3a+DeibnovdJoQCIR
+   p08R29e/yoZWt7P23EjYloSMIzKxQtWvtBaofE7tqP9NBfe7smm4vkYfY
+   +t9N393VGh5mviF++X+YRvE1lnZ7f3DNWGJN4aeXGZSWpQu5LB+qrLCyz
+   ys0/sxzoGeVW3yypmJMlu+Sl2emS3G5erOp8WlBudL6IKsQfBSIm6GLFT
+   g==;
+X-CSE-ConnectionGUID: yCWIFAUlRW+7Iato1ZLRfg==
+X-CSE-MsgGUID: avUGZHguQBif4mxNbAyRIQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11242"; a="40838688"
+X-IronPort-AV: E=Sophos;i="6.11,249,1725346800"; 
+   d="scan'208";a="40838688"
+Received: from orviesa006.jf.intel.com ([10.64.159.146])
+  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Nov 2024 00:35:13 -0700
+X-CSE-ConnectionGUID: cAQraQW0QoiUKxLEgu+B3w==
+X-CSE-MsgGUID: k9BoxUojTMmEwwzFMnzS8A==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,249,1725346800"; 
+   d="scan'208";a="83038284"
+Received: from lkp-server01.sh.intel.com (HELO a48cf1aa22e8) ([10.239.97.150])
+  by orviesa006.jf.intel.com with ESMTP; 01 Nov 2024 00:35:11 -0700
+Received: from kbuild by a48cf1aa22e8 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1t6mBZ-000hGb-1f;
+	Fri, 01 Nov 2024 07:35:09 +0000
+Date: Fri, 01 Nov 2024 15:34:59 +0800
+From: kernel test robot <lkp@intel.com>
+To: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: [bluetooth-next:master] BUILD SUCCESS
+ dff8a64238a3f951dbf0930bac915eec7cae8200
+Message-ID: <202411011546.4uDL2WnS-lkp@intel.com>
+User-Agent: s-nail v14.9.24
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.47.0.163.g1226f6d8fa-goog
-Message-ID: <20241101151939.Bluez.v3.1.Ia122d85386d6c2fc69f5b3d7ea7a7169f73756e4@changeid>
-Subject: [Bluez PATCH v3] textfile: Fix possible bad memory access in find_key
-From: Howard Chung <howardchung@google.com>
-To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Cc: Yun-Hao Chung <howardchung@google.com>
-Content-Type: text/plain; charset="UTF-8"
 
-From: Yun-Hao Chung <howardchung@google.com>
+tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
+branch HEAD: dff8a64238a3f951dbf0930bac915eec7cae8200  Bluetooth: btrtl: Decrease HCI_OP_RESET timeout from 10 s to 2 s
 
-If the searched key is a prefix of the first key in the textfile,
-the code will assume it's not the first line which is wrong.
+elapsed time: 841m
 
-The issue can be reproduced by a fuzzer. More context can be found in
-https://issues.oss-fuzz.com/issues/42515619
+configs tested: 148
+configs skipped: 4
 
-To reproduce the issue, please kindly follow the instructions in
-https://google.github.io/oss-fuzz/advanced-topics/reproducing/
+The following configs have been built successfully.
+More configs may be tested in the coming days.
 
-Stack trace:
-    #0 0x55e1c450e7ce in find_key /src/bluez/src/textfile.c:133:9
-    #1 0x55e1c450e7ce in write_key /src/bluez/src/textfile.c:244:8
-    #2 0x55e1c450dc33 in LLVMFuzzerTestOneInput /src/fuzz_textfile.c:61:3
-    (...trace in fuzzer)
----
-This is reproduced by https://issues.oss-fuzz.com/issues/42515619
+tested configs:
+alpha                             allnoconfig    gcc-14.1.0
+alpha                            allyesconfig    clang-20
+alpha                               defconfig    gcc-14.1.0
+arc                              allmodconfig    clang-20
+arc                               allnoconfig    gcc-14.1.0
+arc                              allyesconfig    clang-20
+arc                                 defconfig    gcc-14.1.0
+arc                   randconfig-001-20241101    gcc-14.1.0
+arc                   randconfig-002-20241101    gcc-14.1.0
+arm                              allmodconfig    clang-20
+arm                               allnoconfig    gcc-14.1.0
+arm                              allyesconfig    clang-20
+arm                                 defconfig    gcc-14.1.0
+arm                          ixp4xx_defconfig    gcc-14.1.0
+arm                          moxart_defconfig    gcc-14.1.0
+arm                       netwinder_defconfig    gcc-14.1.0
+arm                           omap1_defconfig    gcc-14.1.0
+arm                          pxa3xx_defconfig    gcc-14.1.0
+arm                   randconfig-001-20241101    gcc-14.1.0
+arm                   randconfig-002-20241101    gcc-14.1.0
+arm                   randconfig-003-20241101    gcc-14.1.0
+arm                   randconfig-004-20241101    gcc-14.1.0
+arm                        spear6xx_defconfig    gcc-14.1.0
+arm64                            allmodconfig    clang-20
+arm64                             allnoconfig    gcc-14.1.0
+arm64                               defconfig    gcc-14.1.0
+arm64                 randconfig-001-20241101    gcc-14.1.0
+arm64                 randconfig-002-20241101    gcc-14.1.0
+arm64                 randconfig-003-20241101    gcc-14.1.0
+arm64                 randconfig-004-20241101    gcc-14.1.0
+csky                              allnoconfig    gcc-14.1.0
+csky                                defconfig    gcc-14.1.0
+csky                  randconfig-001-20241101    gcc-14.1.0
+csky                  randconfig-002-20241101    gcc-14.1.0
+hexagon                          allmodconfig    clang-20
+hexagon                           allnoconfig    gcc-14.1.0
+hexagon                          allyesconfig    clang-20
+hexagon                             defconfig    gcc-14.1.0
+hexagon               randconfig-001-20241101    gcc-14.1.0
+hexagon               randconfig-002-20241101    gcc-14.1.0
+i386                             allmodconfig    clang-19
+i386                              allnoconfig    clang-19
+i386                             allyesconfig    clang-19
+i386        buildonly-randconfig-001-20241101    gcc-12
+i386        buildonly-randconfig-002-20241101    gcc-12
+i386        buildonly-randconfig-003-20241101    gcc-12
+i386        buildonly-randconfig-004-20241101    gcc-12
+i386        buildonly-randconfig-005-20241101    gcc-12
+i386        buildonly-randconfig-006-20241101    gcc-12
+i386                                defconfig    clang-19
+i386                  randconfig-001-20241101    gcc-12
+i386                  randconfig-002-20241101    gcc-12
+i386                  randconfig-003-20241101    gcc-12
+i386                  randconfig-004-20241101    gcc-12
+i386                  randconfig-005-20241101    gcc-12
+i386                  randconfig-006-20241101    gcc-12
+i386                  randconfig-011-20241101    gcc-12
+i386                  randconfig-012-20241101    gcc-12
+i386                  randconfig-013-20241101    gcc-12
+i386                  randconfig-014-20241101    gcc-12
+i386                  randconfig-015-20241101    gcc-12
+i386                  randconfig-016-20241101    gcc-12
+loongarch                        allmodconfig    gcc-14.1.0
+loongarch                         allnoconfig    gcc-14.1.0
+loongarch                           defconfig    gcc-14.1.0
+loongarch             randconfig-001-20241101    gcc-14.1.0
+loongarch             randconfig-002-20241101    gcc-14.1.0
+m68k                             allmodconfig    gcc-14.1.0
+m68k                              allnoconfig    gcc-14.1.0
+m68k                             allyesconfig    gcc-14.1.0
+m68k                                defconfig    gcc-14.1.0
+m68k                          sun3x_defconfig    gcc-14.1.0
+m68k                           virt_defconfig    gcc-14.1.0
+microblaze                       allmodconfig    gcc-14.1.0
+microblaze                        allnoconfig    gcc-14.1.0
+microblaze                       allyesconfig    gcc-14.1.0
+microblaze                          defconfig    gcc-14.1.0
+mips                              allnoconfig    gcc-14.1.0
+mips                           gcw0_defconfig    gcc-14.1.0
+mips                           ip28_defconfig    gcc-14.1.0
+mips                        maltaup_defconfig    gcc-14.1.0
+mips                         rt305x_defconfig    gcc-14.1.0
+nios2                             allnoconfig    gcc-14.1.0
+nios2                               defconfig    gcc-14.1.0
+nios2                 randconfig-001-20241101    gcc-14.1.0
+nios2                 randconfig-002-20241101    gcc-14.1.0
+openrisc                          allnoconfig    clang-20
+openrisc                         allyesconfig    gcc-14.1.0
+openrisc                            defconfig    gcc-12
+parisc                           allmodconfig    gcc-14.1.0
+parisc                            allnoconfig    clang-20
+parisc                           allyesconfig    gcc-14.1.0
+parisc                              defconfig    gcc-12
+parisc                randconfig-001-20241101    gcc-14.1.0
+parisc                randconfig-002-20241101    gcc-14.1.0
+parisc64                            defconfig    gcc-14.1.0
+powerpc                          allmodconfig    gcc-14.1.0
+powerpc                           allnoconfig    clang-20
+powerpc                          allyesconfig    gcc-14.1.0
+powerpc                   motionpro_defconfig    gcc-14.1.0
+powerpc                 mpc8315_rdb_defconfig    gcc-14.1.0
+powerpc               randconfig-001-20241101    gcc-14.1.0
+powerpc               randconfig-002-20241101    gcc-14.1.0
+powerpc               randconfig-003-20241101    gcc-14.1.0
+powerpc64             randconfig-001-20241101    gcc-14.1.0
+powerpc64             randconfig-002-20241101    gcc-14.1.0
+powerpc64             randconfig-003-20241101    gcc-14.1.0
+riscv                            allmodconfig    gcc-14.1.0
+riscv                             allnoconfig    clang-20
+riscv                            allyesconfig    gcc-14.1.0
+riscv                               defconfig    gcc-12
+riscv                 randconfig-001-20241101    gcc-14.1.0
+riscv                 randconfig-002-20241101    gcc-14.1.0
+s390                             allmodconfig    gcc-14.1.0
+s390                              allnoconfig    clang-20
+s390                             allyesconfig    gcc-14.1.0
+s390                                defconfig    gcc-12
+s390                  randconfig-001-20241101    gcc-14.1.0
+s390                  randconfig-002-20241101    gcc-14.1.0
+sh                               allmodconfig    gcc-14.1.0
+sh                                allnoconfig    gcc-14.1.0
+sh                               allyesconfig    gcc-14.1.0
+sh                                  defconfig    gcc-12
+sh                    randconfig-001-20241101    gcc-14.1.0
+sh                    randconfig-002-20241101    gcc-14.1.0
+sparc                            allmodconfig    gcc-14.1.0
+sparc64                          alldefconfig    gcc-14.1.0
+sparc64                             defconfig    gcc-12
+sparc64               randconfig-001-20241101    gcc-14.1.0
+sparc64               randconfig-002-20241101    gcc-14.1.0
+um                               allmodconfig    clang-20
+um                                allnoconfig    clang-20
+um                               allyesconfig    clang-20
+um                                  defconfig    gcc-12
+um                             i386_defconfig    gcc-12
+um                    randconfig-001-20241101    gcc-14.1.0
+um                    randconfig-002-20241101    gcc-14.1.0
+um                           x86_64_defconfig    gcc-12
+x86_64                            allnoconfig    clang-19
+x86_64                           allyesconfig    clang-19
+x86_64                              defconfig    clang-19
+x86_64                                  kexec    clang-19
+x86_64                                  kexec    gcc-12
+x86_64                               rhel-8.3    gcc-12
+xtensa                            allnoconfig    gcc-14.1.0
+xtensa                  audio_kc705_defconfig    gcc-14.1.0
+xtensa                randconfig-001-20241101    gcc-14.1.0
+xtensa                randconfig-002-20241101    gcc-14.1.0
 
-Changes in v3:
-- Add fuzzer url to the commit message
-
-Changes in v2:
-- Add stack trace in commit message
-
- src/textfile.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
-
-diff --git a/src/textfile.c b/src/textfile.c
-index 313098f38..8188d2ebe 100644
---- a/src/textfile.c
-+++ b/src/textfile.c
-@@ -127,10 +127,10 @@ static inline char *find_key(char *map, size_t size, const char *key, size_t len
- 	while (ptrlen > len + 1) {
- 		int cmp = (icase) ? strncasecmp(ptr, key, len) : strncmp(ptr, key, len);
- 		if (cmp == 0) {
--			if (ptr == map && *(ptr + len) == ' ')
--				return ptr;
--
--			if ((*(ptr - 1) == '\r' || *(ptr - 1) == '\n') &&
-+			if (ptr == map) {
-+				if (*(ptr + len) == ' ')
-+					return ptr;
-+			} else if ((*(ptr - 1) == '\r' || *(ptr - 1) == '\n') &&
- 							*(ptr + len) == ' ')
- 				return ptr;
- 		}
--- 
-2.47.0.163.g1226f6d8fa-goog
-
+--
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
