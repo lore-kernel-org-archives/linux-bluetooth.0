@@ -1,97 +1,92 @@
-Received: from forward500b.mail.yandex.net (forward500b.mail.yandex.net [178.154.239.144])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f41.google.com (mail-lf1-f41.google.com [209.85.167.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9DDA19F43B
-	for <linux-bluetooth@vger.kernel.org>; Fri,  1 Nov 2024 15:11:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.154.239.144
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACF9C1B4F30
+	for <linux-bluetooth@vger.kernel.org>; Fri,  1 Nov 2024 15:12:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730473913; cv=none; b=Th9vzo5cLChKF88Qb9nnYUOcCMcmeQVG+5RcK1MTa4xtdBl/mzHL6DRajCFayYm63H0RpKzqYUJzbwsJjnUUamBCRKeG1T4lsRDBfxPOON6Vo/EGlsN3v8GFcNgtT+xFopk0S8Gw5EuVygWLVsmcEZUwU9NPHpdmrYq4LXDHCtw=
+	t=1730473973; cv=none; b=q+GAQqZNbLMqlH/sgfJstDQzHP1GOxN3twiyyJCBX24dP74G9lH/yOJwoeoGlK6abQeix18Vn8TBXNAUGKll4IKXHglex43ZZB3kVP8XUZOiiVeP8rrQhbeC073gYgFi2eabKWV780xZCzeVEGC8SwiF8lxxRE41ndgnABItnao=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730473913; c=relaxed/simple;
-	bh=KBoIMip+u6FcEv1z+1DvnGvGWQDKlW53xILHX7mVzB0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=g03qbmJ7t9j0vdMB/C+0wDmzX7RCGuVp4G4gHBuyQ72Hrob84OfqwkWwKzZRvTCabn+shyT6uHL8qTesr5rz75tjeSmQHZ9xH6x2TghfZm458KZkQ2/3IgCYhfy2ntAfJlmbLnNIGeWMYLv0GUWDgCQq6Acg0L56+jv1QYcJ8R8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru; spf=pass smtp.mailfrom=yandex.ru; dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b=R8WN1XR5; arc=none smtp.client-ip=178.154.239.144
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yandex.ru
+	s=arc-20240116; t=1730473973; c=relaxed/simple;
+	bh=LAVGIz/MWd8yKe9hQ/HGkrnJQKsw//2bcLdVixpg9pU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=U+JouEhqNt2M5vrf6QQnt3V3dtfDancaCUCAVBAYj2XeyWZW2I871FsIe+gxe0YVYvSZZigpLC7cUwMRFsHhpCPHHt2cE6z/sMqmByMU0U54EGjG+fnEPcQaXfekD903ngE5CWkmDHgigAT1JFejiEifoUXGIxAotT2bG56gP8o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TcUlfLiX; arc=none smtp.client-ip=209.85.167.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b="R8WN1XR5"
-Received: from mail-nwsmtp-smtp-production-main-87.sas.yp-c.yandex.net (mail-nwsmtp-smtp-production-main-87.sas.yp-c.yandex.net [IPv6:2a02:6b8:c16:201c:0:640:301d:0])
-	by forward500b.mail.yandex.net (Yandex) with ESMTPS id 1507061484;
-	Fri,  1 Nov 2024 18:06:20 +0300 (MSK)
-Received: by mail-nwsmtp-smtp-production-main-87.sas.yp-c.yandex.net (smtp/Yandex) with ESMTPSA id I6e79RAc54Y0-NFE3lZEo;
-	Fri, 01 Nov 2024 18:06:19 +0300
-X-Yandex-Fwd: 1
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex.ru; s=mail;
-	t=1730473579; bh=KBoIMip+u6FcEv1z+1DvnGvGWQDKlW53xILHX7mVzB0=;
-	h=In-Reply-To:To:From:Cc:Date:References:Subject:Message-ID;
-	b=R8WN1XR5bxhnszi7TCjStdrrJzLlI7a0ck3lHluR1ToiHojFDAlS8AsbhAN1yt8WK
-	 MgES29o1AoSVsQVxKHhpzTdI5A5mwcfN65ccOTksG/IWr61uWsvvm4IqTwhJDTn+Yi
-	 pqeXrLZAMAmhIn+4oBsUwmUKRnzmF2ooGAhv9Q2Y=
-Authentication-Results: mail-nwsmtp-smtp-production-main-87.sas.yp-c.yandex.net; dkim=pass header.i=@yandex.ru
-Message-ID: <5cc24ab9-80c0-4280-8c4c-d8b052524e1d@yandex.ru>
-Date: Fri, 1 Nov 2024 18:06:18 +0300
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TcUlfLiX"
+Received: by mail-lf1-f41.google.com with SMTP id 2adb3069b0e04-539f72c8fc1so3549612e87.1
+        for <linux-bluetooth@vger.kernel.org>; Fri, 01 Nov 2024 08:12:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1730473970; x=1731078770; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=LAVGIz/MWd8yKe9hQ/HGkrnJQKsw//2bcLdVixpg9pU=;
+        b=TcUlfLiXQFYxQOWceizcNYHhfhTc7dRZd+gQLjlEhLO24A3QrUgMPDEr4DKOgBr70D
+         lnRQlEeJSssUxVUOk0Lvm1vPY9XQEE8SlVsUYh7mHVwtkn6c1kcpD9WH9SsDAx//S5Ax
+         MwUD5lFV7a/ML7UyzxilqnDGHolrmhmW3nyVGZuHiJC69XueXXnANchxkKKTelC0qURu
+         jC/55YjMulCy3XHsmNe6GOEQTmoCyE2rQYb2EXyBStomcTZ4dBByyZEPIfTPcg4UnMkY
+         DO25yT3h2tgsvQHAfXahVjNTz4vM8k3TWaojWRAVH9W+UtmluFSGEIKmdqhEJ2h39ieH
+         2BDA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730473970; x=1731078770;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=LAVGIz/MWd8yKe9hQ/HGkrnJQKsw//2bcLdVixpg9pU=;
+        b=FSLUAORViBCdI8lmSYuNFK4JwFkKkghzaXQcg3Lsd6OYOkj6Y/ULWtegXYhS0/i1oc
+         OryD+bWIKFsavXdUGVqvhmYjpGbsr+286vQRP/9gbFsCiysDFyyi5EE7VFQng/m52FCg
+         vZRbhQ6xfHbiuquRk3aZxmRzb9U7xD52ef+OyCQoQvWo8jkcZrekhda4HZnutA2P/trU
+         cZ3ql0gteJTRt9KSxHnzUKZ/R/aSZwVYpehgDj9Cw1WdyjTk3BOhjtbC8SAxpR99a/yP
+         E+hQy1DwnCysRUo1cU/afIdWslujERAnM+6ogjLPoxTrm+RTGQj4MNi1MQ8pfKnKw3yW
+         I+Ow==
+X-Forwarded-Encrypted: i=1; AJvYcCVV7+dnIKAGDgtBSVDF0OkgY/nwbPYWzEGasKnwxbrCMsaktGQb6eCcaD4ZF2dnR/lETmjwhjLye2cukoBfKOQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YysC3j5SG4oFRn/y5m06mbmfeHKlJQdbmnJHeK5ie3mg9NPB5j8
+	gnOxqCwUZi3SVdY78yGAC+0gPbGe8u6GbawyXz36Ize6lWK4iPuQGwhq8cXzdogzAvmXLjfXKnT
+	swWiEp/Bk2mIVrPmIhuWCSMPI9h0=
+X-Google-Smtp-Source: AGHT+IGkhRxB1r8Nnde/PNfnZMLGeGNF1K8bDkSjkuDwkOs8QdsDn9eqvhvbGU+Q2IgjEo0EvNIM9HTRbuMxUBE3D3Y=
+X-Received: by 2002:a2e:d12:0:b0:2fa:d978:a6a2 with SMTP id
+ 38308e7fff4ca-2fd05973ed9mr53849341fa.27.1730473969632; Fri, 01 Nov 2024
+ 08:12:49 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2] Bluetooth: fix use-after-free in
- device_for_each_child()
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
- Johan Hedberg <johan.hedberg@gmail.com>, linux-bluetooth@vger.kernel.org,
- lvc-project@linuxtesting.org,
- syzbot+6cf5652d3df49fae2e3f@syzkaller.appspotmail.com
-References: <20241101114410.234311-1-dmantipov@yandex.ru>
- <CABBYNZK=H9JtzaQudQ1b7TGU5VaJ_qX_bbSJhKSwWKh+5_1uUQ@mail.gmail.com>
-Content-Language: en-MW
-From: Dmitry Antipov <dmantipov@yandex.ru>
-Autocrypt: addr=dmantipov@yandex.ru; keydata=
- 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
- A/UwwXBRuvydGV0=
-In-Reply-To: <CABBYNZK=H9JtzaQudQ1b7TGU5VaJ_qX_bbSJhKSwWKh+5_1uUQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20241101114410.234311-1-dmantipov@yandex.ru> <CABBYNZK=H9JtzaQudQ1b7TGU5VaJ_qX_bbSJhKSwWKh+5_1uUQ@mail.gmail.com>
+ <5cc24ab9-80c0-4280-8c4c-d8b052524e1d@yandex.ru>
+In-Reply-To: <5cc24ab9-80c0-4280-8c4c-d8b052524e1d@yandex.ru>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Fri, 1 Nov 2024 11:12:36 -0400
+Message-ID: <CABBYNZKvP3u+7juqNNUHOS0PTb=QVzxob+rC3PVq-XXu9vGU+A@mail.gmail.com>
+Subject: Re: [PATCH v2] Bluetooth: fix use-after-free in device_for_each_child()
+To: Dmitry Antipov <dmantipov@yandex.ru>
+Cc: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg <johan.hedberg@gmail.com>, 
+	linux-bluetooth@vger.kernel.org, lvc-project@linuxtesting.org, 
+	syzbot+6cf5652d3df49fae2e3f@syzkaller.appspotmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 11/1/24 6:01 PM, Luiz Augusto von Dentz wrote:
+Hi Dmitry,
 
-> #syz test
+On Fri, Nov 1, 2024 at 11:06=E2=80=AFAM Dmitry Antipov <dmantipov@yandex.ru=
+> wrote:
+>
+> On 11/1/24 6:01 PM, Luiz Augusto von Dentz wrote:
+>
+> > #syz test
+>
+> Please see at https://syzkaller.appspot.com/bug?extid=3D6cf5652d3df49fae2=
+e3f just as usual.
 
-Please see at https://syzkaller.appspot.com/bug?extid=6cf5652d3df49fae2e3f just as usual.
+There is no Tested-by thus why I assumed it wasn't tested by syzbot yet.
 
-Dmitry
+> Dmitry
+>
 
+
+--=20
+Luiz Augusto von Dentz
