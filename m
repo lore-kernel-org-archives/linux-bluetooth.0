@@ -1,104 +1,136 @@
-Received: from mail-qv1-f49.google.com (mail-qv1-f49.google.com [209.85.219.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 644A115697B
-	for <linux-bluetooth@vger.kernel.org>; Fri,  1 Nov 2024 09:03:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EEA315CD42
+	for <linux-bluetooth@vger.kernel.org>; Fri,  1 Nov 2024 09:33:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730451790; cv=none; b=ljBL2S9VmkqNZhUKlG+LJkgcJTRBGBMgH/cABUqEtzUfXq2VufewzZdHFcKh2Tx1VRAvmeF3eKyHDDSKofOE/WTVsCdsXQS7Zxd6xVuaJx1tjY/2urWVEOiHZE9LVqCAaKSho8gkj8iRhLBy9PLexT8SoFoLWWlUzT+u/oDNV/Y=
+	t=1730453613; cv=none; b=slfZGat0KIvtMRV0hHXB3RWL7oy6iHQNvD1sNriFb+h/hkOprqJSLQRdIvMIpSQUB/cGzk+ZzxtWoVm46YfTU4iqO8r2wN2hJOvNSsqh3PUkvTDlcNxOJSCpoQvRG5RMihLXJCKqX23eNv/85BHBNMBj9rb+7HhflG/Fnuk+kOE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730451790; c=relaxed/simple;
-	bh=kH6EVAG34ChQNJYjkBW3cSCrMOFNHcC3SqE1rMrytns=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=nkrq9ULu+nRalratskPvDQVaXWw5YoNp/8jbDO+rn5BOxAJHpax8nVMJfG2qkKlSYWjAYf9ri75gK11CrmvrAWmsWZ8XX/blB1wD/kosjnpUt8ixLhd/BxHhOKCZbLI25yF51Kw1hxN49SAfP2TGoo4C68XbadOBeEX6prhjykM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PerEBrj5; arc=none smtp.client-ip=209.85.219.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1730453613; c=relaxed/simple;
+	bh=BhZFzrmFk9g6vdeDu0M2sYVk+00qgRK4wrGrDBa8UG8=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=cyngKfMgH/bMppo5TfjBBwiO9Fpjlh7GeBHgaXDriM1lrKQPlbCjuyRftKOvJuAfJxejOKKNB4VNtYY8Pv+L2v34HofoqNvvO+Tn3WV5j7NXQkrbl+/9uAO3sjXMsKLLsHya89+4sAJXnYUp9M1EUz8V7i0py9CtKjWj2hVbAsU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=J3AHcoAI; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PerEBrj5"
-Received: by mail-qv1-f49.google.com with SMTP id 6a1803df08f44-6cbd57cc35bso24073946d6.1
-        for <linux-bluetooth@vger.kernel.org>; Fri, 01 Nov 2024 02:03:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1730451787; x=1731056587; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=JiH0Sg6UYj3q1UVIZtTI1pSa5LkKJwXcMVvLbZT41nY=;
-        b=PerEBrj5aA0IBG4CgXe5Dh9tPQYFG3XmTjqNmRhRDxT1nq4TeeKD7kkGlIWZLpw/kD
-         BCub2howGlybrEZUAgYTKypX+rCBS/dYJ0qBMJ6TYsUM8fbzpq5uFYLGgRwlhecsB/Yy
-         o75Pi/YIfc6MU/XkvOh3q5AIEac2pQmRMjg34/CZWbYRxD0WrFv0tviznhmgMvsPPOS9
-         QYXRMcagqE2HPy4L0Rd7XeLMa4Lsnce7YabhEhirB3heeZw40F+9qx+rYOkAkRzF/1QF
-         KxjRb0GF4ZtcGm0PQG0xFSanfBvJCOLNM50rAHNILlErayFHcCljYY2SfXwYkLMZvlie
-         /Y1Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730451787; x=1731056587;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=JiH0Sg6UYj3q1UVIZtTI1pSa5LkKJwXcMVvLbZT41nY=;
-        b=qpWfmhLKKyNo14UumHOXh35LCuhHirkmpcFnREcNpj3Tvvzk7u+Awi5Yb8NU2eek9+
-         mignoNCr8/8N42hIK500nxRzWiM1M1yOCb/Dg0NCjeK5Ryz5ee1lRUA3WLHP52m77CkY
-         3nKPZg2RTDK3uI7r5q/Po+nbR0hJZG12o/w078eNuLEt8CYyl9oYvdIsM1etcIQUsk3V
-         aHzIeWaWDVASAUrf2ybyz1zfBZKrOro0HYtTwWMK/kH0kBFsaOS9vFXey0DrD59JO0Yy
-         IyPs3ETU7EJ7VaUVaWjOG2XAcWO3Czoz/eLnb6RQUGzAoSmM0SfjNQr98ZMgtUPiqKlj
-         WXUg==
-X-Gm-Message-State: AOJu0YzSgBYa8NS7P5y+hsQuF5gXKgMSIql3PfhswyUbcAel/8eoNHdm
-	3wM3XZ+tUdDHqOBVExjixX5dzBiKvWjMbUaH0T7rl8vs6P++ywyjnV9ADg==
-X-Google-Smtp-Source: AGHT+IHOsD4h7sEEZN9y5Bwf+AEQimC7DoGp6GfezZcyjb0qkVxw0/1XMLoK7rWLT5FgKBuwSjGTlg==
-X-Received: by 2002:a05:6214:5d0e:b0:6d1:9f1b:b669 with SMTP id 6a1803df08f44-6d3542eddbbmr93012506d6.15.1730451787024;
-        Fri, 01 Nov 2024 02:03:07 -0700 (PDT)
-Received: from [172.17.0.2] ([172.183.154.251])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6d354178071sm17109606d6.116.2024.11.01.02.03.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 01 Nov 2024 02:03:06 -0700 (PDT)
-Message-ID: <6724994a.0c0a0220.1c010d.5590@mx.google.com>
-Date: Fri, 01 Nov 2024 02:03:06 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============7115094863404059668=="
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="J3AHcoAI"
+Received: from pps.filterd (m0279871.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4A117bd6012647
+	for <linux-bluetooth@vger.kernel.org>; Fri, 1 Nov 2024 09:33:30 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=qcppdkim1; bh=1cNQsw67xTZBkTsqfSfV8r
+	5KFIsoLx9sujc1VjpT2J8=; b=J3AHcoAIhWuKLHrpUxh5YP1eT3/gMbQTjSpH6B
+	3OglugiIzmNYNtFId4f9zGCoTo6qgU4dqdDtJuRQN3Y1ZcZOyCJZzmwl4H/7kiR5
+	SGAr3zLIitjOgXLG+534qwqjgRDEf38hmNihvSQbiGnBJ0f0csQgmcBXP4mGK9MW
+	gnl/TljegtsIjcu6QBJGby9prf4OdiHPZsdaGh7cA07oiszJ5bhfBap8e9kPJzpV
+	Td+sYoiSeUqR8xv/cveY+He1EIs1OZOLp7G5itG3JRrDSXbSU/0xoNW3lXB6V5g+
+	lMbdgiIOPtpdVtswb04AfpxE7lMBKrfcmsb8VBFrT+6tAD+Q==
+Received: from nasanppmta03.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 42ky6rctpa-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <linux-bluetooth@vger.kernel.org>; Fri, 01 Nov 2024 09:33:29 +0000 (GMT)
+Received: from nasanex01c.na.qualcomm.com (nasanex01c.na.qualcomm.com [10.45.79.139])
+	by NASANPPMTA03.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 4A19XSjR004133
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <linux-bluetooth@vger.kernel.org>; Fri, 1 Nov 2024 09:33:28 GMT
+Received: from hu-amisjain-hyd.qualcomm.com (10.80.80.8) by
+ nasanex01c.na.qualcomm.com (10.45.79.139) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.9; Fri, 1 Nov 2024 02:33:26 -0700
+From: Amisha Jain <quic_amisjain@quicinc.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: <quic_mohamull@quicinc.com>, <quic_hbandi@quicinc.com>,
+        <quic_anubhavg@quicinc.com>
+Subject: [PATCH v4] obex : Fix for PBAP GET request in PTS testing
+Date: Fri, 1 Nov 2024 15:03:04 +0530
+Message-ID: <20241101093304.1631217-1-quic_amisjain@quicinc.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, howardchung@google.com
-Subject: RE: [Bluez,v3] textfile: Fix possible bad memory access in find_key
-In-Reply-To: <20241101151939.Bluez.v3.1.Ia122d85386d6c2fc69f5b3d7ea7a7169f73756e4@changeid>
-References: <20241101151939.Bluez.v3.1.Ia122d85386d6c2fc69f5b3d7ea7a7169f73756e4@changeid>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nasanex01c.na.qualcomm.com (10.45.79.139)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: -xqlJN-oW_AtJrcdwt2U-7X0-Hij6C2q
+X-Proofpoint-ORIG-GUID: -xqlJN-oW_AtJrcdwt2U-7X0-Hij6C2q
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
+ definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 spamscore=0
+ clxscore=1015 phishscore=0 mlxscore=0 impostorscore=0 bulkscore=0
+ priorityscore=1501 mlxlogscore=999 lowpriorityscore=0 adultscore=0
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2409260000 definitions=main-2411010067
 
---===============7115094863404059668==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+This change is required for passing below PTS testcases -
+1. PBAP/PSE/PBD/BV-02-C
+2. PBAP/PSE/PBD/BV-03-C
+3. PBAP/PSE/PBD/BI-01-C
+4. PBAP/PSE/PBD/BV-13-C
+5. PBAP/PSE/PBD/BV-14-C
+6. PBAP/PSE/PBD/BV-17-C
 
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=905285
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      0.38 seconds
-GitLint                       PASS      0.28 seconds
-BuildEll                      PASS      24.94 seconds
-BluezMake                     PASS      1647.13 seconds
-MakeCheck                     PASS      13.70 seconds
-MakeDistcheck                 PASS      180.49 seconds
-CheckValgrind                 PASS      255.74 seconds
-CheckSmatch                   PASS      359.28 seconds
-bluezmakeextell               PASS      121.22 seconds
-IncrementalBuild              PASS      1464.70 seconds
-ScanBuild                     PASS      1018.25 seconds
-
-
+For all the GET phonebook request sent by PTS has no extra params
+added in it, therefore PBAP server is rejecting the request
+by sending 'Bad Request' as response.
+So appending few default params in GET request to avoid
+testcase failure.
+This params are already added for Vcardlisting and Vcardentry
+operations.
 
 ---
-Regards,
-Linux Bluetooth
+ obexd/plugins/pbap.c | 23 ++++++++++++++++++++++-
+ 1 file changed, 22 insertions(+), 1 deletion(-)
 
+diff --git a/obexd/plugins/pbap.c b/obexd/plugins/pbap.c
+index 4175f9de8..f70a17cdf 100644
+--- a/obexd/plugins/pbap.c
++++ b/obexd/plugins/pbap.c
+@@ -511,7 +511,23 @@ static int pbap_get(struct obex_session *os, void *user_data)
+ 		rsize = 0;
+ 	}
+ 
+-	/* Workaround for PTS client not sending mandatory apparams */
++	/*
++	 * Workaround for PTS client not sending mandatory apparams
++	 *
++	 * Add MaxListCount attribute, description as per PBAP spec
++	 *
++	 * 5.1.4.3 MaxListCount :
++	 * This header is used to indicate the maximum number of
++	 * entries of the <x-bt/phonebook> object that the PCE
++	 * can handle. The value 65535 means that the number of
++	 * entries is not restricted. The maximum number of entries
++	 * shall be 65,535 if this header is not specified.
++	 *
++	 * 0x04 - Tag id
++	 * 0x02 - length
++	 * next 2 bytes are value - 0xffff
++	 */
++
+ 	if (!rsize && g_ascii_strcasecmp(type, VCARDLISTING_TYPE) == 0) {
+ 		static const uint8_t default_apparams[] = {
+ 			0x04, 0x02, 0xff, 0xff
+@@ -524,6 +540,11 @@ static int pbap_get(struct obex_session *os, void *user_data)
+ 		};
+ 		buffer = default_apparams;
+ 		rsize = sizeof(default_apparams);
++	} else if (!rsize && g_ascii_strcasecmp(type, PHONEBOOK_TYPE) == 0) {
++		static const uint8_t default_apparams[] = {
++			0x04, 0x02, 0xff, 0xff };
++		buffer = default_apparams;
++		rsize = sizeof(default_apparams);
+ 	}
+ 
+ 	params = parse_aparam(buffer, rsize);
+-- 
+2.34.1
 
---===============7115094863404059668==--
