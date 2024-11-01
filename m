@@ -1,96 +1,125 @@
-Received: from mail-lj1-f178.google.com (mail-lj1-f178.google.com [209.85.208.178])
+Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0330D4644E
-	for <linux-bluetooth@vger.kernel.org>; Fri,  1 Nov 2024 15:31:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6454B2CAB
+	for <linux-bluetooth@vger.kernel.org>; Fri,  1 Nov 2024 15:47:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730475083; cv=none; b=kjraSJ+7Tkwo8ieYPcCP0iB1KEZ3il5axArmh+FAZ14i6chaMdsPif/zMZ+0KdC3RIUBXLExBSKMX/XgYdyAkN49Jb+f4AnBAPJ2fRXxBunMzqySb1rDad8okzyd9+4nqb8TMOIhZ/mNXO2tyZSkJQrx2L/mJmHPV6TGspSFhZ8=
+	t=1730476038; cv=none; b=pHSHZ6lPk2FHFMUjUhrRnWMD3NmbJ7aKTWpayx7Yxi3Yfzp80uryapNq62cMiAyxE5ZrbTtBckOEOdwkpWOjiPwBJKxHK2a/S7F4XRNQ6OtnATMIev56pjT+XwTksgWsJ9tCZuOTrFSAxl3usg9VrFj9KrwAVIXx2ENHnb1oA8A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730475083; c=relaxed/simple;
-	bh=8mzLShjVx9yxfsk6ndndnOwQ8UUV5QSG9kPmM7NMPZA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=hfnI1tOzqLW4/ZUI5c/0K/na23GdpWoldJErGJYtPNW+WcO3m0RVHs+zcAODfo+p9ivOAU9EHCqZmzEJQAFsZ66n/+UGpbfiVoNtBRii2WN+s1xXO4EGypdS61bURj+QNMrCoQVHfu6G6K7en1VkCfEhC0OrPt1O7/daytl+IXo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=N5hcPJOU; arc=none smtp.client-ip=209.85.208.178
+	s=arc-20240116; t=1730476038; c=relaxed/simple;
+	bh=LSW2PYvvC6uFtEZ9IZj4S+4pHndyWtiJ+uvMhuyBGaE=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=MU0VxW9uSGZNQ7rgbmrTd1p+fwzlVjbDfiv7ygYHM5ChDJol0ouec3y1tcvUffRNPBASsg3QonYMVRFX5TRyI8Hez3S8VL5HgGpSyHYiV8a8+iffEYS/Tn3coWpuDpYjAa5/hfKijvfmqqfjkfgt8pjdD2Eptnl9C/0IK6tBws0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FzxI0CmY; arc=none smtp.client-ip=209.85.214.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="N5hcPJOU"
-Received: by mail-lj1-f178.google.com with SMTP id 38308e7fff4ca-2fb3c3d5513so19039591fa.1
-        for <linux-bluetooth@vger.kernel.org>; Fri, 01 Nov 2024 08:31:19 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FzxI0CmY"
+Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-20c714cd9c8so22997645ad.0
+        for <linux-bluetooth@vger.kernel.org>; Fri, 01 Nov 2024 08:47:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1730475078; x=1731079878; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=8mzLShjVx9yxfsk6ndndnOwQ8UUV5QSG9kPmM7NMPZA=;
-        b=N5hcPJOU4YGtgQtdizrGYhebqnQRFq0P0Uv2ItG4e75kAOb0KsUCtwhSWDBkwsry15
-         KkxwJTYRNrpgmWfxeEHxUmEjbjMRqmmsY6WJe6uimgQxhi2pf5+C4sinMFNRnXBsGcgl
-         f1uSQNTKmGwKodhrbX5BCV4Z4AY/cES/S2iPz/TpjJ9rH7/8w27eP9g4XH4+7DKzqUZG
-         lR6qyXk35ZxgAkFKuj0iBGtXIHnf1AiCWyPW+vymvErXObuK3SBaJYpy5J+DFzD/j1KX
-         NKBoq5S7j2F6+cv8/rfAry4BxH6abgc4xUSvwzQBhZZyEcADyVSq7nw+N7fi+C/mrHOk
-         kUVg==
+        d=gmail.com; s=20230601; t=1730476035; x=1731080835; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=dxm1TTIDJLEUOAB+duSxieq4GMtPgB1dOuuWCyToLws=;
+        b=FzxI0CmY9KERc/m3mpaFiAmbvVkFea+W0MtiecypFQuvpautEMaU6463FajUXctX3N
+         goz24p0dnXYc7+KXRpu9cLenFMDrIYlr9mUj7VJ89mM0ttbbcWMQRwKI1Yhx9axQWy1n
+         jVMCug+k6tEE/v4GmWrXioEO9N98vxfee9YjzjLSFsloLeDyW9YTauV25qL/+fKNrknO
+         Ne2YHSFiMaqbQMNNXd7+fqyIRj2BHdqhfvIGo5Dz/ySEsbrXAsIqx19ShpOibzeQtCe+
+         7EX0eMbCofYqsQQZzOpRb+tz9kBa6hifh0595OJfNhppNN1aAvp5Oplp9sR9dJsEBIhT
+         +V3w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730475078; x=1731079878;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=8mzLShjVx9yxfsk6ndndnOwQ8UUV5QSG9kPmM7NMPZA=;
-        b=BX60hEWVGNG/6RcQJQEmIGK216gnXSVStoTONVa/+kUAn+Ez6PbZj4LgrY79EtF7Cy
-         XeMtGfJ8XEDOqR1lVuQGX1QDAmPcJ9YSh4Ct3d3pWekMq9thsVSpWhuCj+OzSPR6m410
-         yaLdTWJmQO+fyZ7shwMi5sGZmTMoIS6H7rl9TtWbAYJSDowZZOYXC5TQ6HTvmBHfGDp3
-         rnaz3SCk7sUruA9RFai/Mvgu3Po6ZRpRMHbpn2EVuawEjZpKwRNLkw99Pk6hYXeI+y4W
-         kck+jngdrWdcjAMnA7U+BTS6ZxDQC0e9RZY851awRU7sIAg9/8FXPLr6NENXkBvFulZC
-         duuA==
-X-Forwarded-Encrypted: i=1; AJvYcCX+TYHGpXp4AEcwKdMG4xU1Dd08twVtUvm4OacYbxa+tKZz8ygbiARQfAFsMlMa7whHkKYaDGFb1o1OSXdddO4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzYe0V2dXm0DLJo6ECJHPlRp0Gog+Y2nIDKOdg27COqxe5EGwOa
-	rSYpLbEM2f/N5kMu6NC0HZPICJWcaF6Ix9+P9llDYqy2oKD2PidbH5dJgko830I8ON6wAC/KyYx
-	nJdd0Tm58vw00K9vCvx2lemoylpE=
-X-Google-Smtp-Source: AGHT+IHabEBRix0XkB8orhDVa7W3soWDndFapnqnOEZtLOuSfp/ZSEB53btY2/rTsLqCMfFMzWPeTgH86ZedqG2F/U8=
-X-Received: by 2002:a2e:a90c:0:b0:2fb:6027:7bfd with SMTP id
- 38308e7fff4ca-2fdf4688e1bmr36769781fa.27.1730475077595; Fri, 01 Nov 2024
- 08:31:17 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1730476035; x=1731080835;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=dxm1TTIDJLEUOAB+duSxieq4GMtPgB1dOuuWCyToLws=;
+        b=ujhJi//jiOJiww+P8Az8NhzHmuNL7ibjJhlVTVlnHBxLzVsgn9KKr7xt48jZW+0kMs
+         /6Rvt6XkN2y8SW0chq6+NGyabsWRL11CrVVjuOcEjfrqA/jWXNysIl3H7rOyIte5qegr
+         QV3tmautAt3taOBZ4jMtBrmV3ojF2dCQASP88CBPmoJAN5nlZWj55TTufd30sH349AGf
+         ROAWXcymaQFQQA31htjC3XSNbvIBYwJk2rvwlxRimo0QbJbmpLYTr7SgkBT8llb4u4u7
+         NY2h96NMfphkIGwSe1ah3ownM+lM86OZA3zjaD84gpNhQF/U60/818ThtUy3lTgtSDv0
+         juDA==
+X-Gm-Message-State: AOJu0YxE6aAJ+fEPLasBCSQR2AbLy1OdlhO4H38pTeHnqgOEqSaC8Kxy
+	uNG04t6mIdsCdMg9uS0X6fD42cOv4sqHZox906OLwTv+ltd6VNPtx8BPVg==
+X-Google-Smtp-Source: AGHT+IFXpPKSCFPJOYbW//zt0Qf3fOsWgfn/baD6sKBov3MS6BtvLub9h8r9YsM49s9r5V3ZzuNWtQ==
+X-Received: by 2002:a17:902:e849:b0:20c:7485:891c with SMTP id d9443c01a7336-2111b01c70cmr50839865ad.54.1730476035118;
+        Fri, 01 Nov 2024 08:47:15 -0700 (PDT)
+Received: from [172.17.0.2] ([52.234.26.210])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-211057bf377sm22692445ad.184.2024.11.01.08.47.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 01 Nov 2024 08:47:14 -0700 (PDT)
+Message-ID: <6724f802.170a0220.17313b.cae0@mx.google.com>
+Date: Fri, 01 Nov 2024 08:47:14 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============6373397314945302464=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241101114410.234311-1-dmantipov@yandex.ru> <CABBYNZK=H9JtzaQudQ1b7TGU5VaJ_qX_bbSJhKSwWKh+5_1uUQ@mail.gmail.com>
- <5cc24ab9-80c0-4280-8c4c-d8b052524e1d@yandex.ru> <CABBYNZKvP3u+7juqNNUHOS0PTb=QVzxob+rC3PVq-XXu9vGU+A@mail.gmail.com>
- <fe1588ee-1f00-429c-a917-d1c5e08f3831@yandex.ru>
-In-Reply-To: <fe1588ee-1f00-429c-a917-d1c5e08f3831@yandex.ru>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Fri, 1 Nov 2024 11:31:04 -0400
-Message-ID: <CABBYNZJiYHWgtBExZ2jbuemJdyo6inpiYMGF7qc9Xbjqu__L7w@mail.gmail.com>
-Subject: Re: [PATCH v2] Bluetooth: fix use-after-free in device_for_each_child()
-To: Dmitry Antipov <dmantipov@yandex.ru>
-Cc: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg <johan.hedberg@gmail.com>, 
-	linux-bluetooth@vger.kernel.org, lvc-project@linuxtesting.org, 
-	syzbot+6cf5652d3df49fae2e3f@syzkaller.appspotmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, iulia.tanasescu@nxp.com
+Subject: RE: iso-tester: Add tests for Broadcast Receiver sync to 2 BIGs
+In-Reply-To: <20241101115118.43891-2-iulia.tanasescu@nxp.com>
+References: <20241101115118.43891-2-iulia.tanasescu@nxp.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Hi Dmitry,
+--===============6373397314945302464==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-On Fri, Nov 1, 2024 at 11:17=E2=80=AFAM Dmitry Antipov <dmantipov@yandex.ru=
-> wrote:
->
-> On 11/1/24 6:12 PM, Luiz Augusto von Dentz wrote:
->
-> > There is no Tested-by thus why I assumed it wasn't tested by syzbot yet=
-.
->
-> Ugh. Until today I've assumed that Tested-by: is applicable to human-driv=
-en
-> testing only :-).
+This is automated email and please do not reply to this email!
 
-Nope, in fact it is very handy to have syzbot test your changes since
-it may hit other problems as well.
+Dear submitter,
 
-> Dmitry
->
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=905388
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      1.62 seconds
+GitLint                       PASS      0.95 seconds
+BuildEll                      PASS      24.64 seconds
+BluezMake                     PASS      1641.57 seconds
+MakeCheck                     PASS      12.98 seconds
+MakeDistcheck                 PASS      179.56 seconds
+CheckValgrind                 PASS      254.58 seconds
+CheckSmatch                   WARNING   358.27 seconds
+bluezmakeextell               PASS      120.52 seconds
+IncrementalBuild              PASS      8125.02 seconds
+ScanBuild                     WARNING   1010.64 seconds
+
+Details
+##############################
+Test: CheckSmatch - WARNING
+Desc: Run smatch tool with source
+Output:
+emulator/btdev.c:448:29: warning: Variable length array is used.emulator/btdev.c:448:29: warning: Variable length array is used.
+##############################
+Test: ScanBuild - WARNING
+Desc: Run Scan Build
+Output:
+emulator/btdev.c:1122:10: warning: Although the value stored to 'conn' is used in the enclosing expression, the value is never actually read from 'conn'
+        while ((conn = queue_find(dev->conns, match_handle,
+                ^      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+emulator/btdev.c:1409:24: warning: Access to field 'link' results in a dereference of a null pointer (loaded from variable 'conn')
+        pending_conn_del(dev, conn->link->dev);
+                              ^~~~~~~~~~
+emulator/btdev.c:1531:13: warning: Access to field 'dev' results in a dereference of a null pointer (loaded from variable 'conn')
+        send_event(conn->dev, BT_HCI_EVT_AUTH_COMPLETE, &ev, sizeof(ev));
+                   ^~~~~~~~~
+3 warnings generated.
 
 
---=20
-Luiz Augusto von Dentz
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============6373397314945302464==--
