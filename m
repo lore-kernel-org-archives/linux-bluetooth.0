@@ -1,117 +1,76 @@
-Received: from mail-lj1-f175.google.com (mail-lj1-f175.google.com [209.85.208.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F4FA1C2DA4
-	for <linux-bluetooth@vger.kernel.org>; Thu, 31 Oct 2024 21:10:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E177F4436E;
+	Fri,  1 Nov 2024 01:20:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730409062; cv=none; b=IfPHBtSITgrkDyJDbjlwpNu1YF+J2rwPPhafdRPfsGYWMSIrNRacDk4ttu+Cco6BCmaUwYrb4aXwzXh1zm2fb96BNfxnBJ949uLbxW2EYcCjmqTLCxktIa99icVOC1aY1ah8KzxTzlyZshRrlRSHtJU3dnOOsRvEm04jwilR5NE=
+	t=1730424054; cv=none; b=hjJd3xJq/SDE1qCxkpluKOWiMijZAf1dgZi+aPnVkhF7j7NEgCJsaxj8zDQpYWBnjrTSkwais9nrliH5GnsCAW9e1j4CLWy+NSgmSr3dpd8xQQMcyBGn6v5cHyEs9kR/V836RSHOaIQeAS4fMhDssXJywfLv7JLcds/lEHp8Klk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730409062; c=relaxed/simple;
-	bh=jE0MEM+lSKoKms0s4FHuIha24ipwszopeDBoFHp6SCk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Za586oTGyENYjrL7hGmHxLa3BgyjRcAlRSSCsRFOFfIPIocg+A+y1nLt/8h7xVH6NjKZvcB2gd0oU5LnYpoQ+dKYkY9DRbLtCKg4iigj4vIjabTZhBRJjBTGCjFXnusws1v1e8tsEqTT88S9LVFeBsvYsx8QoT17BvLuUPuYEmE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MDeBYQyE; arc=none smtp.client-ip=209.85.208.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1730424054; c=relaxed/simple;
+	bh=7XT1bikHvrBgnQnx5iQ2rG4eHIhIrqPvFQRufIB4Hck=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=u9/HeqisarvvqEpLDHn0JjwJT8MhLVvOrWYa7oVD6AgQnncPIvmiP9jEe6dOcguKfS7vY1XWM6n60FUM5sjK+zVGUxGt8YCV8+3JXtPNfYBjggssaY+w6laVDdHHixXXEVO/O02gv82pz8/zpggZhz2H9n6SwUTl4XDvnUgkwVk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YTroap8U; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MDeBYQyE"
-Received: by mail-lj1-f175.google.com with SMTP id 38308e7fff4ca-2fb4af0b6beso22451461fa.3
-        for <linux-bluetooth@vger.kernel.org>; Thu, 31 Oct 2024 14:10:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1730409054; x=1731013854; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=tnFOMCgCCUqVz/e3xfGSZ4WxhltUSIfjmzBBDVRplpE=;
-        b=MDeBYQyEStPpYUMkKbrIcxoSwvQX9EBzx7kpp1GlUOPGL/LbdrVUehD7PGrxdDeG+g
-         kQF4hjlhdXhjnXz9KWJS40Te34r9tqJcRYSHtdW8v/U0WXCvFnKpPMUw59C4hJh6lZR3
-         8UnXsFNR5SAKP1mSOWzDUz5Qlhdk1vQxTU5yZQ4WdZceEEzq3Cc9kXR+yTDvYUocES0J
-         WQj7/qIvJM+2Tm+BNCuPSslYaoVGDGMUlWA4vcAdHFmVj33HY3hT5rnSWan+broZ9Jip
-         68eMSWEdxB9OJCnafIo3/DBVIfA4BxTwzkBhtjMWrFbiNjQ53WQcyq/3XwsDTWLPh/jv
-         UMwQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730409054; x=1731013854;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=tnFOMCgCCUqVz/e3xfGSZ4WxhltUSIfjmzBBDVRplpE=;
-        b=dAGyJIjrigk7k5Irq+S6rhojHTPJWIIQcyqXopulci+ibdQHh+XvNBBhjQ3HvTkhTx
-         rMucac6SoELo5kg+TQePHeCcsz89UeEUVb7R95uWNgDTtdm/5vfNdtAX/oHYTtOEnntI
-         MfkzBRBJWke7FKGJ4BsP0xprS8OoRWAiH2P/EeWQb9vkK4imXR0OK96gQ4DYuu6OvOdt
-         dlGUn2+TlZRfmFoHO9hxmhpJq+t9RMlt2foJetGChQi6u9AHWbD24xK9ix88W71TvGcR
-         ivyyFyvSbjjX/KOD/fCieqECZu84thI68bcufSGh0PjYkDOB+McxrxjBvLMBpJ5l9lbB
-         kpgg==
-X-Gm-Message-State: AOJu0Yxm+o0AunSYq4ljFL4HwFtgzR28U4z2LWcG7tGP/v2j44zLz4AY
-	vA+M1NLDP+qH5pmrUlBWph7MHm+iNg7o6wDq+vL7Xt+DqyQqqBwGjJCVZwL5fIRYsY9koJ6Vgw0
-	IKDNazfos1PX2shP4Sd4iirn/aqQ=
-X-Google-Smtp-Source: AGHT+IGY9QpIP4NQ43NM+e7tHnWauXLU+7JARFU3yYt5O5VwrwkWyGchEITiHq6OJnNp9L2W9Y1dj888lwTldnPRew8=
-X-Received: by 2002:a05:651c:2123:b0:2fa:c0c2:d311 with SMTP id
- 38308e7fff4ca-2fedb794b2dmr11939761fa.5.1730409054120; Thu, 31 Oct 2024
- 14:10:54 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YTroap8U"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B8716C4CEC3;
+	Fri,  1 Nov 2024 01:20:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1730424053;
+	bh=7XT1bikHvrBgnQnx5iQ2rG4eHIhIrqPvFQRufIB4Hck=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=YTroap8UuZ+zdkqYu2H9sBnu9JCMry4MH9M0Dr6jbjcrZGjAq3ZPjsp2ssiVIksdV
+	 zXy1nZmkSIqWwhUX0QNW3CYkp7cXw6NCkmqrQg/Oy/kQOTx+fpXTN0uX0b3Yieudkc
+	 jXtdu4fBh9Fhz9LATDNtLDJ68e9zOHvOf2Brchh4RpKRS1gvWTy/KNGgV/Hz0nDpdH
+	 llKWVrXMxNB5FP4lKtAF80MLWdFH7sLdISpEJaPUZPCvYA9I5e2PisR7I4XB/7zCVt
+	 qvhMHzyjuUVjbpP9qdFpbNFfahCVa5W2Me+eCmFxlYoDoFKC5+aqRVVTSRg3LmWp7h
+	 RjVEpZNCe40CQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAD9C380AC02;
+	Fri,  1 Nov 2024 01:21:02 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241031120259.Bluez.v1.1.Ia122d85386d6c2fc69f5b3d7ea7a7169f73756e4@changeid>
-In-Reply-To: <20241031120259.Bluez.v1.1.Ia122d85386d6c2fc69f5b3d7ea7a7169f73756e4@changeid>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Thu, 31 Oct 2024 17:10:42 -0400
-Message-ID: <CABBYNZJD57tZQy=Frm701bO5S8LKre-6Rr2Ha85PF-zbYiDA-Q@mail.gmail.com>
-Subject: Re: [Bluez PATCH v1] textfile: Fix possible bad memory access in find_key
-To: Howard Chung <howardchung@google.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Subject: Re: pull request: bluetooth 2024-10-30
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <173042406149.2143055.5240050402461915225.git-patchwork-notify@kernel.org>
+Date: Fri, 01 Nov 2024 01:21:01 +0000
+References: <20241030192205.38298-1-luiz.dentz@gmail.com>
+In-Reply-To: <20241030192205.38298-1-luiz.dentz@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: davem@davemloft.net, kuba@kernel.org, linux-bluetooth@vger.kernel.org,
+ netdev@vger.kernel.org
 
-Hi Howard,
+Hello:
 
-On Thu, Oct 31, 2024 at 12:04=E2=80=AFAM Howard Chung <howardchung@google.c=
-om> wrote:
->
-> From: Yun-Hao Chung <howardchung@google.com>
->
-> If the searched key is a prefix of the first key in the textfile,
-> the code will assume it's not the first line which is wrong.
+This pull request was applied to netdev/net-next.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-We might want to include a backtrace if there is one.
+On Wed, 30 Oct 2024 15:22:05 -0400 you wrote:
+> The following changes since commit c05c62850a8f035a267151dd86ea3daf887e28b8:
+> 
+>   Merge tag 'wireless-2024-10-29' of https://git.kernel.org/pub/scm/linux/kernel/git/wireless/wireless (2024-10-29 18:57:12 -0700)
+> 
+> are available in the Git repository at:
+> 
+>   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2024-10-30
+> 
+> [...]
 
-> ---
-> This is reproduced by fuzzer: https://issues.oss-fuzz.com/issues/42515619
->
->  src/textfile.c | 8 ++++----
->  1 file changed, 4 insertions(+), 4 deletions(-)
->
-> diff --git a/src/textfile.c b/src/textfile.c
-> index 313098f38..8188d2ebe 100644
-> --- a/src/textfile.c
-> +++ b/src/textfile.c
-> @@ -127,10 +127,10 @@ static inline char *find_key(char *map, size_t size=
-, const char *key, size_t len
->         while (ptrlen > len + 1) {
->                 int cmp =3D (icase) ? strncasecmp(ptr, key, len) : strncm=
-p(ptr, key, len);
->                 if (cmp =3D=3D 0) {
-> -                       if (ptr =3D=3D map && *(ptr + len) =3D=3D ' ')
-> -                               return ptr;
-> -
-> -                       if ((*(ptr - 1) =3D=3D '\r' || *(ptr - 1) =3D=3D =
-'\n') &&
-> +                       if (ptr =3D=3D map) {
-> +                               if (*(ptr + len) =3D=3D ' ')
-> +                                       return ptr;
-> +                       } else if ((*(ptr - 1) =3D=3D '\r' || *(ptr - 1) =
-=3D=3D '\n') &&
->                                                         *(ptr + len) =3D=
-=3D ' ')
->                                 return ptr;
->                 }
-> --
-> 2.47.0.163.g1226f6d8fa-goog
->
+Here is the summary with links:
+  - pull request: bluetooth 2024-10-30
+    https://git.kernel.org/netdev/net-next/c/ee802a49545a
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
---=20
-Luiz Augusto von Dentz
