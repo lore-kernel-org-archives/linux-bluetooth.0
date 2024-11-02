@@ -1,144 +1,113 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BED3157A6B
-	for <linux-bluetooth@vger.kernel.org>; Sat,  2 Nov 2024 22:26:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69CC8157A6B
+	for <linux-bluetooth@vger.kernel.org>; Sat,  2 Nov 2024 22:29:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730586412; cv=none; b=t2oTXwcJ/LlM3GANa1RrYbgEsCO247Jf19Zlp+S9qhMMvV7PTQVkxGnwfD7zqHcKaAX0mCK/VOTTKrdv5XFvgL74BHySaYefDvcpwaeDLOkez3BsXSviABzQatn4vUmHYqQARbEK1l19hUtsDlfoCCorAg69/WQfzhxoY1k8bjA=
+	t=1730586547; cv=none; b=sxUFQ5/9u85SqfVDqxYEfUT8xeA0APWtGfvdOzhWx/sHoy0l5nyNhIrk6i4xVi+ZhFx9Ky2+kBPSOzeHXbpOE46YvRm48uLd0cndBVpB3F2NkmCE63Kxv8hrE3NHIMSfpdYSyLWeAb2aS3tObR0a2+lzNStDeryJzkC3U6jCaVc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730586412; c=relaxed/simple;
-	bh=6GFY93GwHgRY0jkNP6nWfH62aVoVxk5t3IGuBDYEtqw=;
-	h=From:To:Subject:Date:Message-ID:Content-Type:MIME-Version; b=ZUw7I7WXhv4tXrfzzvXA+sAEQg63rkbFObeXM7Z0F1fzZkn436sOwTZR0jDBW90szVr+wAF2CxJbUKlJ/lIxyMRptnp892mhfaoORTXcoElmNHA9UJMRlJUEQrlZxOrOTuOAJHAWm6i80cOZ+eDebZOZx0yW4A5p3WI7covrKQg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BZ4wpdBJ; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1730586547; c=relaxed/simple;
+	bh=Kehap0Jrid1OekccOy32TRBel6PbQPFxCH9kuwCHwn8=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=lJNZHzBxvRwrhi3XqQcO4Ks1ZGU4WFuIMJtHQ7Kg3DSbKlau6E5kVJyxFGyLOx4uAKxoxfB4yW5pldnfNsHn0b/fgWLwRJvqPMoJ96up0r0JA9uB1Tx9U2zVOGGE2e9nn4WctW4rqYYxzdOKIElaOy9tbnzkt917laqNiO2D5TA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nRu9MkkO; arc=none smtp.client-ip=209.85.214.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BZ4wpdBJ"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 177B3C4CEC3
-	for <linux-bluetooth@vger.kernel.org>; Sat,  2 Nov 2024 22:26:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730586412;
-	bh=6GFY93GwHgRY0jkNP6nWfH62aVoVxk5t3IGuBDYEtqw=;
-	h=From:To:Subject:Date:From;
-	b=BZ4wpdBJcpgLic76Nd+dE3qUSyeLMia5wZZbYbu8MlCNvOlLdChWp5M4nMiJha4+r
-	 9vy+VyVNOdILLS3pw19sIZujHjHktNgUWjfBGeLBSLvlflOmcp3Vv5oGzQf3rtzqUU
-	 1eF+ZBNsNo01JtXxx9g/AM4mtpkb/cROhx0M24qHRKO0y4HvlBCj/MKAckAVs8q9Zm
-	 JBlPtE71SZwiLN4gnOLk/55GYYoeZx8NcYjq3WISg+DPid/guYrFoW+7tppEtqukE2
-	 tSezCCmGP+6MIvLWPgkvtc2sQo6tSCXnbcgWnJTMAfoDHcxKxzyDXppyDxm3Cc/5GF
-	 fv1Qla7cPbLlA==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id 07D05C53BC2; Sat,  2 Nov 2024 22:26:52 +0000 (UTC)
-From: bugzilla-daemon@kernel.org
-To: linux-bluetooth@vger.kernel.org
-Subject: [Bug 219458] New: bluetooth connection fails after L2CAP: Fix uaf in
- l2cap_connect patch
-Date: Sat, 02 Nov 2024 22:26:51 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: new
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: ghibo@mageia.org
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P3
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: bug_id short_desc product version rep_platform
- op_sys bug_status bug_severity priority component assigned_to reporter
- cf_regression
-Message-ID: <bug-219458-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nRu9MkkO"
+Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-20ce65c8e13so34207055ad.1
+        for <linux-bluetooth@vger.kernel.org>; Sat, 02 Nov 2024 15:29:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1730586545; x=1731191345; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=8W/7EeBmhI37UmuodH2iXQOXqfMHdtfTO1JG6y0xp2U=;
+        b=nRu9MkkOIHR27tAchk4tgmGEOFI4kWi6tV6+pfxZy/doDxZlO3laQ0fGoAZTwHC+ff
+         N4IqKrRC8JzAuplpF70+ZvY+bQ3SJxaSimhj6lq+BkKixIKS6uA7IDbFSQxUAOSGZn7f
+         c99ot2AHKuCK/K/oU1rMBVsGr6y2+Cl8IoGzmZtlPFrPGDquZqzrsBbjkHTM5f3WmFnE
+         iyIZp6dG4qxokfDq1sPN1nFZPDdOFG8XfCF/AApShulCDFBKx30v09e67Kq1W3DxauWo
+         DwDsrT9KMsXmUaHryEgM5LVXJj5IHk7twAZFy1/DICzLGLy/kC7aepeMXfHuuata+QLK
+         aJgg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730586545; x=1731191345;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=8W/7EeBmhI37UmuodH2iXQOXqfMHdtfTO1JG6y0xp2U=;
+        b=n/5kl2tnc5ZeQU1/qwXmLcgrIbmzacNSSwb7QrW3Ym9J45xtGrg2Lwtit9ZofaF7rM
+         gPx8jQkTxSZXg9lH6GZijo43XqFhmFe5aVMWqZQzUwUP+g8UMKVmTaHZw8n29NYyjfoh
+         K3+vwYCGMaSTS0Riw4vEZqq30EOJqLXcZRzFS1f189iae0uL03SfOHt3h3ySX3Zn1fpT
+         bATaRpk7jCIP0EwVlaLfba55wGfs0Vn/ZpurDDeoSwFTsIFSy/iwtqwAwtRzRECe1Dhk
+         NSSgUGBDSVgvYL/etfhRdYKdMSXBiWyYQ4dT3gQuBY2+uDUDeFLB2jWOkihS7QQK/WB7
+         1I3Q==
+X-Gm-Message-State: AOJu0Yz+TSxqgkVfaZ7D7S/Zfs4RsMnL+TeqvVSgeKPjUL4kbtYZrMxj
+	2j/CQo7sLGlF+RbyOmncJc0uKWL58WNe93zyuLtwtcgGsj8APM3fgAFuRw==
+X-Google-Smtp-Source: AGHT+IH5EYoG0nDiRQWbykhQxObag0OuImbUVYn+Nshjl5UwGsIH9+v2tG59TVSw+3qYlV2/T2gWGg==
+X-Received: by 2002:a17:90b:4a47:b0:2e0:d1fa:fdd7 with SMTP id 98e67ed59e1d1-2e93c1d3996mr14551528a91.27.1730586545332;
+        Sat, 02 Nov 2024 15:29:05 -0700 (PDT)
+Received: from [172.17.0.2] ([52.234.38.79])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2e92fa0f6edsm7104923a91.1.2024.11.02.15.29.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 02 Nov 2024 15:29:04 -0700 (PDT)
+Message-ID: <6726a7b0.170a0220.3367bc.2a63@mx.google.com>
+Date: Sat, 02 Nov 2024 15:29:04 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============1292635020782708255=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, pav@iki.fi
+Subject: RE: transport: don't disconnect A2DP if canceling Acquire() with Release()
+In-Reply-To: <e96a0f052fd93f65a24e82d44249b2aa0169cb21.1730579026.git.pav@iki.fi>
+References: <e96a0f052fd93f65a24e82d44249b2aa0169cb21.1730579026.git.pav@iki.fi>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D219458
+--===============1292635020782708255==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-            Bug ID: 219458
-           Summary: bluetooth connection fails after L2CAP: Fix uaf in
-                    l2cap_connect patch
-           Product: Drivers
-           Version: 2.5
-          Hardware: All
-                OS: Linux
-            Status: NEW
-          Severity: normal
-          Priority: P3
-         Component: Bluetooth
-          Assignee: linux-bluetooth@vger.kernel.org
-          Reporter: ghibo@mageia.org
-        Regression: No
+This is automated email and please do not reply to this email!
 
-Hi guys.
+Dear submitter,
 
-After a recent kernel update I get problems in bluetooth connectivity. Most=
-ly
-some bluetooth audio devices (like speakers or headphones) are getting very
-difficult to connect, even if already paired. And when the connection is
-finally established they do not seem to do it in the correct way, to the ex=
-tent
-that the devices are not later correctly attached to pulseaudio or pipewire,
-and not listed there. I thought the problem could be in bluez's bluetoothd,=
- so
-I tried several version of bluez, up to 5.78, including the current git
-version, but mostly the behaviour hadn't changed.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=905703
 
-I noticed this behaviour in 6.6.59 (including up to the current stable-queue
-for 6.6.59 as of today, which will be merged into next 6.6.60). Ditto for
-kernel series 6.11.x, in particular 6.11.5 and 6.11.6 show the same behavio=
-ur.
+---Test result---
 
-After a long series of attempts, I found the culprit can be traced back to
-these single patch with subject "Bluetooth: L2CAP: Fix uaf in l2cap_connect=
-":
+Test Summary:
+CheckPatch                    PASS      0.62 seconds
+GitLint                       FAIL      0.65 seconds
+BuildEll                      PASS      24.56 seconds
+BluezMake                     PASS      1700.09 seconds
+MakeCheck                     PASS      12.86 seconds
+MakeDistcheck                 PASS      180.81 seconds
+CheckValgrind                 PASS      254.34 seconds
+CheckSmatch                   PASS      357.50 seconds
+bluezmakeextell               PASS      120.63 seconds
+IncrementalBuild              PASS      2973.52 seconds
+ScanBuild                     PASS      1015.67 seconds
 
-https://git.kernel.org/pub/scm/linux/kernel/git/stable/stable-queue.git/tre=
-e/releases/6.6.55/bluetooth-l2cap-fix-uaf-in-l2cap_connect.patch
+Details
+##############################
+Test: GitLint - FAIL
+Desc: Run gitlint
+Output:
+[BlueZ,v2,1/2] transport: don't disconnect A2DP if canceling Acquire() with Release()
 
-and
+WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
+1: T1 Title exceeds max length (85>80): "[BlueZ,v2,1/2] transport: don't disconnect A2DP if canceling Acquire() with Release()"
 
-https://git.kernel.org/pub/scm/linux/kernel/git/stable/stable-queue.git/tre=
-e/releases/6.11.3/bluetooth-l2cap-fix-uaf-in-l2cap_connect.patch
 
-which were included starting from kernels 6.6.55 and 6.11.3.
+---
+Regards,
+Linux Bluetooth
 
-By reverting this patch, the connection with the device gets back working a=
-gain
-like a breeze, either at connecting and disconnecting several times in a ro=
-w,
-while before this reverting the connection was pretty clumsy.
 
-Apparently this patch was for a security fix, but probably it's still
-incomplete, as there is this side effect.
-
-Difficult to track in logs, as logsa are pretty verbose anyway, as even in a
-situation where a connection working there are a lot of warnings; mostly in=
- a
-broken connection with the patch included, logs are like:
-
-bluetoothd[10741]: Failed to set mode: Failed (0x03)
-bluetoothd[10741]: No matching connection for device
-bluetoothd[10741]: No matching connection for device
-
-while in a working connection, with the patch reverted, logs are like:
-
-bluetoothd[10863]: Failed to set mode: Failed (0x03)
-...
-bluetoothd[10863]: No matching connection for device
-...
-bluetoothd[10863]: /org/bluez/hci0/dev_<mac_address>/sep2/fd2: fd(42) ready
-
---=20
-You may reply to this email to add a comment.
-
-You are receiving this mail because:
-You are the assignee for the bug.=
+--===============1292635020782708255==--
