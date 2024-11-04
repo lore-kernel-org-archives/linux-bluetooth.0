@@ -1,122 +1,119 @@
-Received: from mail-oi1-f178.google.com (mail-oi1-f178.google.com [209.85.167.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mailgw02.mediatek.com (unknown [210.61.82.184])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A2A8469D
-	for <linux-bluetooth@vger.kernel.org>; Mon,  4 Nov 2024 14:51:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB0271B85D3;
+	Mon,  4 Nov 2024 14:59:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.61.82.184
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730731916; cv=none; b=nOcn0WSJl6sBhIJJFH2MQCV526a4w6T/glzln+Z+C0t8mMhLDdI78+xKuXOlGK0AL9v6ItB7ygNxcxxvIoty6YHWNDyqDNvmhFXzgyUJ6jmXZcQuXNhcpF1Lz75zfzwsNYX3WxEl2V9NKb5qNik4B+j9HkWSAhDljHgI7n6fW0c=
+	t=1730732390; cv=none; b=TjAuQlrKrrr3OHuo31ZrDeoo6tV9aV4Apx8gQ4WMHk3WdGV9korvv/3Qp8W32BINenFq6rkJbqrmg6S3e8w0cN43qVjRxEvO3536j7E0pR8F1+PMMRnaxhL6KQlVq1cu+IEj+AHAvmp4i3tcRRUt1BZ/1FdpIRvRLNq21az3vE0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730731916; c=relaxed/simple;
-	bh=O2ieQHZzE+gR8D4EGMN4YSQaFrBGDCfMm/6e4bOgvsI=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=Kz+Pfmy8lniycw6QrZy2oOAYD/2KzN188hodzkk60BgoAeT0NWJJQ6wl9LPjVmlJKlAK18DWrCq0zpupiRzn7LGVRycQp+1VTKgVEmydFiI4JL/G7XTVWz5hhIyWr5EA9mz7gjZgbDQnMxyHEDEyc1yTQ2nT9oW9hZj6peKwOT4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Wv+lvNPh; arc=none smtp.client-ip=209.85.167.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1730732390; c=relaxed/simple;
+	bh=oeNmNK0dYc8t6V2/25L14+/mBAwWJ1xGyC99VvNsU7Y=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=dS72gswWTaOAiQpRSPPI0n4WJeeZzTsXnThHBe4aSkff6fdUgeMyEyJuPLVotbVM9mQ2l9TlKMiF7I2iWjTswnCyefIe/0oYO1f5F4mVE+XAj3zfMPGSisg81uCnHljZrS+W/TPBdkCVvGe1fPogqbrK5N/rHUTo/q/iCpG1UVM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com; spf=pass smtp.mailfrom=mediatek.com; dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b=cbKUqh6w; arc=none smtp.client-ip=210.61.82.184
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mediatek.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Wv+lvNPh"
-Received: by mail-oi1-f178.google.com with SMTP id 5614622812f47-3e601b6a33aso2367710b6e.0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 04 Nov 2024 06:51:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1730731914; x=1731336714; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=e0hUY3njOYd0o7h5PbdhRUA66PYtepghzRiQHUrtmWg=;
-        b=Wv+lvNPhj0UrYUd09U2lsDOmLirTJwSJNKOPFx4e4185xu5I223pQfjW//t+iA71xK
-         ETNfSz4PH7utK4PASEqF07RTVCi53pmTy5DrjctViKyPPt9QxpbebNzS8sLjIvYclcot
-         MAduO8bZs55SwcJb2DuSRSIwIYbeI1I3PeU0gaFzuSb8/vn5eAuDWma+kAHwM/QkfCgk
-         xMka79j2pZX0BKmWzw91u49saeU+aaHB1dW3i3BysPGhWI31eW+jvWM75tEtKR/6TtBb
-         NPY3BbdXlAWXauQDOTvzAI7Z9+F83/5vTT12uTltVUe5XIpbD8OZ4CwtSDb9f//k9wj1
-         Qafg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730731914; x=1731336714;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=e0hUY3njOYd0o7h5PbdhRUA66PYtepghzRiQHUrtmWg=;
-        b=v51G2VXvGtNEqzXqUubduHX6ctxLJjIp8nWyEPnrcTV543rVKIndfl9Rd7+KfZvvqG
-         p/pZWfHQ16qMYy5MRoAZ6lMv9kQfmm3IVb+W56Ip3ilaKoCqi1IQtS65ucNpwrcCzJY/
-         FWb5u+CPKHT0q7mMY1jP26BOzUXyopDnZXRvdDD6CSPoYwRvjUQWADdUpenvUr2/2Wig
-         E6GaLJLi9U/dgob6s8wsYUtwj2UDgIJSsaYxTrnrtt0FeWYK0s+z84ivNb8ZVHRjQbhq
-         kt7oHlT0/gjG5cLJnmOlSqNl7MSFD9tawXO+Wk18MDNQ2kDkkuugGNI/lh1hswKz0q2q
-         Dk1g==
-X-Gm-Message-State: AOJu0YxmGGAtrPAcD/+qq2J1j5GQlpZflyllSsTVF9iYBsnrHpegxqxD
-	/LqL7zjOPu0eLWHv1sl0u0X/vyZwkMdG4mNawEfiTxFBif5uNXz2A3HbWg==
-X-Google-Smtp-Source: AGHT+IFaiZIu1n9++wf4t4p9t9qyab8QJN8tEUxq4n6dP5VBI15/oNJ9HnvvdfN4DKbK0XRmRNXNxw==
-X-Received: by 2002:a05:6808:14d6:b0:3e6:5522:b333 with SMTP id 5614622812f47-3e6608d3252mr11323006b6e.22.1730731913961;
-        Mon, 04 Nov 2024 06:51:53 -0800 (PST)
-Received: from [172.17.0.2] ([172.190.111.173])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6d367e69bc8sm25972826d6.71.2024.11.04.06.51.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 04 Nov 2024 06:51:53 -0800 (PST)
-Message-ID: <6728df89.0c0a0220.192da7.7d4a@mx.google.com>
-Date: Mon, 04 Nov 2024 06:51:53 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============4911044520201471999=="
+	dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b="cbKUqh6w"
+X-UUID: 6b25ba669abd11efbd192953cf12861f-20241104
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
+	h=Content-Type:MIME-Version:Message-ID:Date:Subject:CC:To:From; bh=wL3aJ4YgoHQx51/oO0lGR3G+JG5M0wbwEKmePjrNr0E=;
+	b=cbKUqh6wHVcmGDUj+JHwde/5LZhQiB8xCZ/93fvsrpFB2c7k5v4aaXuPDRZnaUEYEZSxyYraqO9nxJPke+Xo2YjZyu1Hmx3RpN6h1hfy3D5kC/EnVf6K+BaYd2cjK/6jkZDRw69o/vKxe7A2fUoozREa7wkNETJagFEKK6o4cEc=;
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.1.42,REQID:f7508108-1d00-41f3-b7f7-8727afb3e824,IP:0,U
+	RL:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
+	release,TS:0
+X-CID-META: VersionHash:b0fcdc3,CLOUDID:c26e8507-7990-429c-b1a0-768435f03014,B
+	ulkID:nil,BulkQuantity:0,Recheck:0,SF:102,TC:nil,Content:1,EDM:-3,IP:nil,U
+	RL:11|1,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES
+	:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
+X-CID-BVR: 0
+X-CID-BAS: 0,_,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR,TF_CID_SPAM_ULN
+X-UUID: 6b25ba669abd11efbd192953cf12861f-20241104
+Received: from mtkmbs10n1.mediatek.inc [(172.21.101.34)] by mailgw02.mediatek.com
+	(envelope-from <jiande.lu@mediatek.com>)
+	(Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
+	with ESMTP id 540822242; Mon, 04 Nov 2024 22:59:40 +0800
+Received: from mtkmbs13n2.mediatek.inc (172.21.101.108) by
+ mtkmbs13n2.mediatek.inc (172.21.101.108) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.26; Mon, 4 Nov 2024 22:59:39 +0800
+Received: from mtksdccf07.mediatek.inc (172.21.84.99) by
+ mtkmbs13n2.mediatek.inc (172.21.101.73) with Microsoft SMTP Server id
+ 15.2.1118.26 via Frontend Transport; Mon, 4 Nov 2024 22:59:39 +0800
+From: Jiande Lu <jiande.lu@mediatek.com>
+To: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg
+	<johan.hedberg@gmail.com>, Luiz Von Dentz <luiz.dentz@gmail.com>
+CC: Sean Wang <sean.wang@mediatek.com>, Chris Lu <chris.lu@mediatek.com>,
+	Deren Wu <deren.Wu@mediatek.com>, Aaron Hou <aaron.hou@mediatek.com>, Steve
+ Lee <steve.lee@mediatek.com>, linux-bluetooth
+	<linux-bluetooth@vger.kernel.org>, linux-kernel
+	<linux-kernel@vger.kernel.org>, linux-mediatek
+	<linux-mediatek@lists.infradead.org>, Jiande Lu <jiande.lu@mediatek.com>
+Subject: [PATCH v2] Bluetooth: btusb: Add 3 HWIDs for MT7925
+Date: Mon, 4 Nov 2024 22:59:31 +0800
+Message-ID: <20241104145931.5019-1-jiande.lu@mediatek.com>
+X-Mailer: git-send-email 2.18.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, quic_dgangire@quicinc.com
-Subject: RE: [BlueZ,v3] obexd: Add system bus support for obexd
-In-Reply-To: <20241104124517.4112676-1-quic_dgangire@quicinc.com>
-References: <20241104124517.4112676-1-quic_dgangire@quicinc.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain
+X-MTK: N
 
---===============4911044520201471999==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Add below HWIDs for MediaTek MT7925 USB Bluetooth chip.
+VID 0x0489, PID 0xe14f
+VID 0x0489, PID 0xe150
+VID 0x0489, PID 0xe151
 
-This is automated email and please do not reply to this email!
+Patch has been tested successfully and controller is recognized
+device pair successfully.
 
-Dear submitter,
+MT7925 module bring up message as below.
+Bluetooth: Core ver 2.22
+Bluetooth: HCI device and connection manager initialized
+Bluetooth: HCI socket layer initialized
+Bluetooth: L2CAP socket layer initialized
+Bluetooth: SCO socket layer initialized
+Bluetooth: hci0: HW/SW Version: 0x00000000, Build Time: 20240816133202
+Bluetooth: hci0: Device setup in 286558 usecs
+Bluetooth: hci0: HCI Enhanced Setup Synchronous Connection command is advertised, but not supported.
+Bluetooth: hci0: AOSP extensions version v1.00
+Bluetooth: BNEP (Ethernet Emulation) ver 1.3
+Bluetooth: BNEP filters: protocol multicast
+Bluetooth: BNEP socket layer initialized
+Bluetooth: MGMT ver 1.22
+Bluetooth: RFCOMM TTY layer initialized
+Bluetooth: RFCOMM socket layer initialized
+Bluetooth: RFCOMM ver 1.11
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=906048
+v2: update commit message.
 
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      0.54 seconds
-GitLint                       FAIL      0.51 seconds
-BuildEll                      PASS      24.76 seconds
-BluezMake                     PASS      1718.51 seconds
-MakeCheck                     PASS      13.67 seconds
-MakeDistcheck                 PASS      181.53 seconds
-CheckValgrind                 PASS      256.28 seconds
-CheckSmatch                   PASS      359.14 seconds
-bluezmakeextell               PASS      121.55 seconds
-IncrementalBuild              PASS      1448.49 seconds
-ScanBuild                     WARNING   1020.13 seconds
-
-Details
-##############################
-Test: GitLint - FAIL
-Desc: Run gitlint
-Output:
-[BlueZ,v3] obexd: Add system bus support for obexd
-
-WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
-12: B3 Line contains hard tab characters (\t): "				"Use System bus "},"
-##############################
-Test: ScanBuild - WARNING
-Desc: Run Scan Build
-Output:
-obexd/src/main.c:286:6: warning: Array access (from variable 'option_root') results in a null pointer dereference
-        if (option_root[0] != '/') {
-            ^~~~~~~~~~~~~~
-1 warning generated.
-
-
-
+Signed-off-by: Jiande Lu <jiande.lu@mediatek.com>
 ---
-Regards,
-Linux Bluetooth
+ drivers/bluetooth/btusb.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 6dc5a7e76558..77b8500f8e9b 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -658,6 +658,12 @@ static const struct usb_device_id quirks_table[] = {
+ 						     BTUSB_WIDEBAND_SPEECH },
+ 	{ USB_DEVICE(0x0489, 0xe139), .driver_info = BTUSB_MEDIATEK |
+ 						     BTUSB_WIDEBAND_SPEECH },
++	{ USB_DEVICE(0x0489, 0xe14f), .driver_info = BTUSB_MEDIATEK |
++						     BTUSB_WIDEBAND_SPEECH },
++	{ USB_DEVICE(0x0489, 0xe150), .driver_info = BTUSB_MEDIATEK |
++						     BTUSB_WIDEBAND_SPEECH },
++	{ USB_DEVICE(0x0489, 0xe151), .driver_info = BTUSB_MEDIATEK |
++						     BTUSB_WIDEBAND_SPEECH },
+ 	{ USB_DEVICE(0x13d3, 0x3602), .driver_info = BTUSB_MEDIATEK |
+ 						     BTUSB_WIDEBAND_SPEECH },
+ 	{ USB_DEVICE(0x13d3, 0x3603), .driver_info = BTUSB_MEDIATEK |
+-- 
+2.45.2
 
---===============4911044520201471999==--
