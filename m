@@ -1,99 +1,118 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mailgw02.mediatek.com (unknown [210.61.82.184])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DA5A1B85D0
-	for <linux-bluetooth@vger.kernel.org>; Mon,  4 Nov 2024 13:07:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B6F7C147;
+	Mon,  4 Nov 2024 13:19:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.61.82.184
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730725627; cv=none; b=imvxmHgmW+0QVtzKWT/9rgyBVdjPxwmN6GuN7o/+mMOanAeJhXb8NuhAvDKzs97UG/MxhHRfD3jzwyJlEFgjo4/3zF4S3hLq19tWp7RawK1BcLNa0gM4RYKXbHIDUC+xxMtJ22fRNsrIsWAW4Yjn2piFanCuBotMZ4V3WwG2aAI=
+	t=1730726367; cv=none; b=Pxb7f/1k8awF91llcBJ0G5AOP5XYuy8AlvC/hPtx/kAIdbBgrTUZdhRRJ1Kxmyl9vJErHr+FO2hMGxtjIMxrstKm2QtGosTfAmowzTHer6Vl2Gt8jTsKls3POne4KHm74azrmFzVmkrLou7Km6lygJbuzKCXO7ZiCVWhto8B2VM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730725627; c=relaxed/simple;
-	bh=PeACPRvajNFLvGPYx0QWUR+2a9g11uSXAcaN/fvLvrw=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=W4AUMamrx0FSFpb6YvTKNRY4rrDowQBSGSbmJt+31XF5RYBNd8EsRO4chylbDc4ykahayVrZIz5G3q3AvUB9eU8Ubr4pT1s2eaAWiS+nKqDuq2gV3pCsA7xRJny7dWpX0grjgjtseGklBuq9abYlTyXbxhMZ2de5b6ckGQiqisE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QNNZ/vLi; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1730726367; c=relaxed/simple;
+	bh=LgxM5kKiuJVH380x9xQZPbZVK2R4UXZj0OIKNXudn3Q=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=FJBF5dArPBu/rOjl1MupjoBzjXegOEjpQ6EjwfgQDavydvw/Pc6OaZe47ASJif5i9iGghjvojajDgcLOChtGFOKl5f5doKIRq/8m9qrhUjoSXMwZjTy/I6IzKynX03F3+/TFWV9sy7wLsvqbL1KrZysJCq3DJzHgKvT69fKejeE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com; spf=pass smtp.mailfrom=mediatek.com; dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b=cnvNVFxq; arc=none smtp.client-ip=210.61.82.184
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mediatek.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QNNZ/vLi"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 22F2FC4CED1
-	for <linux-bluetooth@vger.kernel.org>; Mon,  4 Nov 2024 13:07:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730725627;
-	bh=PeACPRvajNFLvGPYx0QWUR+2a9g11uSXAcaN/fvLvrw=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=QNNZ/vLiAHsMnqqvyQCl9AXo232oTcuBRsMZsnBzwYnLtnYpiSAxHqVLQQ8bx5aRJ
-	 Ue6o+d1SlU7197qRF09C/MSmkU8MfEgFrzwcwSdfVkCoPcmnmNcv3fRBkeFOnWe+b/
-	 IWMaONGzPimdgTsn+FlmoYFw6u5E8cT6Zu/Sta1y2GPE3Gys0BKqUOm+eT8uRUtmAX
-	 MVSX1PDsjAmMjv2tjMRNWtuFluvAK6I7/6A/G+kpPaRMb+nCV/2zy0M0d5unin6rqA
-	 pY6Dg3DRvdO2Nc5Hsrwl7l+WjRFEGskR+ysNUPmbE7kRNsLOv14apfHuak+aibATgK
-	 rTkE18VgMjcMQ==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id 19660C53BCA; Mon,  4 Nov 2024 13:07:07 +0000 (UTC)
-From: bugzilla-daemon@kernel.org
-To: linux-bluetooth@vger.kernel.org
-Subject: [Bug 219387] Bluetooth: hci0: Reading supported features failed
- (-16)
-Date: Mon, 04 Nov 2024 13:07:06 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: pmenzel+bugzilla.kernel.org@molgen.mpg.de
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P3
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-219387-62941-wWzaFsbMCe@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-219387-62941@https.bugzilla.kernel.org/>
-References: <bug-219387-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+	dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b="cnvNVFxq"
+X-UUID: 65d14dea9aaf11efbd192953cf12861f-20241104
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
+	h=Content-Type:MIME-Version:Message-ID:Date:Subject:CC:To:From; bh=uyuQl4If6PgIXdcSHju38Abi0PGTAXYJUn1ddS+07qs=;
+	b=cnvNVFxqszDb7vpYT31CDZITLuRJ8Ust555nqiTq9oA0Y73R/S3IGcRw7KRpe5n+sjGftQdd0qdFMFQOBaNa+nfTDEQGyMD9mrz7Jh0P1k0nZAQM6oU1XcL3mB3eimT8S+4KkxS4/x/LJjZrxK1v5Q/NYfCO8EdJxs7ft6pKpLw=;
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.1.42,REQID:d1398b46-b7a5-45c9-97fc-105d23ee6de4,IP:0,U
+	RL:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
+	release,TS:0
+X-CID-META: VersionHash:b0fcdc3,CLOUDID:ccad8407-7990-429c-b1a0-768435f03014,B
+	ulkID:nil,BulkQuantity:0,Recheck:0,SF:102,TC:nil,Content:1,EDM:-3,IP:nil,U
+	RL:11|1,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES
+	:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
+X-CID-BVR: 0
+X-CID-BAS: 0,_,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR,TF_CID_SPAM_ULN
+X-UUID: 65d14dea9aaf11efbd192953cf12861f-20241104
+Received: from mtkmbs11n1.mediatek.inc [(172.21.101.185)] by mailgw02.mediatek.com
+	(envelope-from <jiande.lu@mediatek.com>)
+	(Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
+	with ESMTP id 1169929036; Mon, 04 Nov 2024 21:19:18 +0800
+Received: from mtkmbs11n1.mediatek.inc (172.21.101.185) by
+ MTKMBS09N2.mediatek.inc (172.21.101.94) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.26; Mon, 4 Nov 2024 05:19:17 -0800
+Received: from mtksdccf07.mediatek.inc (172.21.84.99) by
+ mtkmbs11n1.mediatek.inc (172.21.101.73) with Microsoft SMTP Server id
+ 15.2.1118.26 via Frontend Transport; Mon, 4 Nov 2024 21:19:17 +0800
+From: Jiande Lu <jiande.lu@mediatek.com>
+To: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg
+	<johan.hedberg@gmail.com>, Luiz Von Dentz <luiz.dentz@gmail.com>
+CC: Sean Wang <sean.wang@mediatek.com>, Chris Lu <chris.lu@mediatek.com>,
+	Deren Wu <deren.Wu@mediatek.com>, Aaron Hou <aaron.hou@mediatek.com>, Steve
+ Lee <steve.lee@mediatek.com>, linux-bluetooth
+	<linux-bluetooth@vger.kernel.org>, linux-kernel
+	<linux-kernel@vger.kernel.org>, linux-mediatek
+	<linux-mediatek@lists.infradead.org>, Jiande Lu <jiande.lu@mediatek.com>
+Subject: [PATCH] Bluetooth: btusb: Add new HWIDs for MT7925
+Date: Mon, 4 Nov 2024 21:19:04 +0800
+Message-ID: <20241104131904.30447-1-jiande.lu@mediatek.com>
+X-Mailer: git-send-email 2.18.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain
+X-MTK: N
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D219387
+Add below HWIDs for MediaTek MT7925 USB Bluetooth chip.
+VID 0x0489, PID 0xe14f
+VID 0x0489, PID 0xe150
+VID 0x0489, PID 0xe151
 
---- Comment #8 from Paul Menzel (pmenzel+bugzilla.kernel.org@molgen.mpg.de)=
- ---
-The error is logged by `btintel_read_debug_features()` in
-`drivers/bluetooth/btintel.c`.
+Patch has been tested successfully and controller is recognized
+device pair successfully.
 
-```
-static int btintel_read_debug_features(struct hci_dev *hdev,
-                                       struct intel_debug_features *feature=
-s)
-{
-        struct sk_buff *skb;=20
-        u8 page_no =3D 1;
+MT7925 module bring up message as below.
+Bluetooth: Core ver 2.22
+Bluetooth: HCI device and connection manager initialized
+Bluetooth: HCI socket layer initialized
+Bluetooth: L2CAP socket layer initialized
+Bluetooth: SCO socket layer initialized
+Bluetooth: hci0: HW/SW Version: 0x00000000, Build Time: 20240816133202
+Bluetooth: hci0: Device setup in 286558 usecs
+Bluetooth: hci0: HCI Enhanced Setup Synchronous
+Connection command is advertised, but not supported.
+Bluetooth: hci0: AOSP extensions version v1.00
+Bluetooth: BNEP (Ethernet Emulation) ver 1.3
+Bluetooth: BNEP filters: protocol multicast
+Bluetooth: BNEP socket layer initialized
+Bluetooth: MGMT ver 1.22
+Bluetooth: RFCOMM TTY layer initialized
+Bluetooth: RFCOMM socket layer initialized
+Bluetooth: RFCOMM ver 1.11
 
-        /* Intel controller supports two pages, each page is of 128-bit
-         * feature bit mask. And each bit defines specific feature support
-         */
-        skb =3D __hci_cmd_sync(hdev, 0xfca6, sizeof(page_no), &page_no,
-                             HCI_INIT_TIMEOUT);
-        if (IS_ERR(skb)) {
-                bt_dev_err(hdev, "Reading supported features failed (%ld)",
-                           PTR_ERR(skb));
-                return PTR_ERR(skb);
-        }
+Signed-off-by: Jiande Lu <jiande.lu@mediatek.com>
+---
+ drivers/bluetooth/btusb.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-[=E2=80=A6]
-}
-```
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 6dc5a7e76558..77b8500f8e9b 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -658,6 +658,12 @@ static const struct usb_device_id quirks_table[] = {
+ 						     BTUSB_WIDEBAND_SPEECH },
+ 	{ USB_DEVICE(0x0489, 0xe139), .driver_info = BTUSB_MEDIATEK |
+ 						     BTUSB_WIDEBAND_SPEECH },
++	{ USB_DEVICE(0x0489, 0xe14f), .driver_info = BTUSB_MEDIATEK |
++						     BTUSB_WIDEBAND_SPEECH },
++	{ USB_DEVICE(0x0489, 0xe150), .driver_info = BTUSB_MEDIATEK |
++						     BTUSB_WIDEBAND_SPEECH },
++	{ USB_DEVICE(0x0489, 0xe151), .driver_info = BTUSB_MEDIATEK |
++						     BTUSB_WIDEBAND_SPEECH },
+ 	{ USB_DEVICE(0x13d3, 0x3602), .driver_info = BTUSB_MEDIATEK |
+ 						     BTUSB_WIDEBAND_SPEECH },
+ 	{ USB_DEVICE(0x13d3, 0x3603), .driver_info = BTUSB_MEDIATEK |
+-- 
+2.45.2
 
---=20
-You may reply to this email to add a comment.
-
-You are receiving this mail because:
-You are the assignee for the bug.=
