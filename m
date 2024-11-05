@@ -1,114 +1,82 @@
-Received: from mail-oo1-f46.google.com (mail-oo1-f46.google.com [209.85.161.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A226B1D3199
-	for <linux-bluetooth@vger.kernel.org>; Tue,  5 Nov 2024 13:58:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 326C73BBC9
+	for <linux-bluetooth@vger.kernel.org>; Tue,  5 Nov 2024 14:10:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730815089; cv=none; b=nWfl5L8KKB+Nq2fTcrHYV5NgLdeVR3qmBEC1wHOmcswruLyr8uK3b/F5YjPZl1RJmnH8o+o9XHnaoWSJB39ACjpyq6u0v2R/stHg4uxFhzGQR8ZEjctdwoBk/8QdJB1ASx8YRiQKsgVt/wsVumvkjIq0KmL/qVbMFExIR/aTGjc=
+	t=1730815824; cv=none; b=th5NkjqYQaMMir01SJrBEHoJ0rH+A27riq9bC27UZCM110fjDtSNYXjpfptuRx5wAmNR3hFPWmPlfcxntwjbWcOIdkpINo+RE3au0Yt1pDFqcdP8h9ObDJYHKgt+NKLvTKCUC1bJCU4qYwlg2Wnl9sbAPYU5u1p36jOqCu74hn0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730815089; c=relaxed/simple;
-	bh=j66DA2ZhU5Dfyb/UV2kzJvZWtuuEqF22h2JtZoKSUhc=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=AV9K5GVcq6RC81Ok4kC2W4fRUQUDXWXSq9BShkxIVjjXygx/UVz7T3LUmlClk3I6IXpJ0GNUDBmbuOPB4YxdhUsEx5RbpnDJldKgTSH85/G0DcRv7x9TmkOqKd7qDvq5xWSxQnqX7nvxJ3BKI0HngqHzmqQ4ZTNw5xxC9+vhV1g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XyGLRHxB; arc=none smtp.client-ip=209.85.161.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1730815824; c=relaxed/simple;
+	bh=8RYyf5p4nwC+svfA5jdFU25joTpS8F2edJYnQCphGB8=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=knsacE3M2V/d+A3Pcu9EirKS7I2Wwdxo+Dx3c986qs17r6RM0HuTumuveo4XanQQgl7luwTOJ6YcuYvRSjsuwNzaImPhTYRAvlPs7LvrYhZDEeqViVIlpjcafu7WKm2jW+XGnFncl9QvEJh33bDK7X8ruJxOfZjww2EGAy30Di8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sK3ITK8V; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XyGLRHxB"
-Received: by mail-oo1-f46.google.com with SMTP id 006d021491bc7-5ebc1af8e91so2502384eaf.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 05 Nov 2024 05:58:07 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1730815086; x=1731419886; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=XRbZpYF9p/1NPuWA0DjphUsuMiW0qJvYAu0RzCN2HzM=;
-        b=XyGLRHxBPh7H6JHUkoZL58YYcmfD9X904pMSHJVczU9ZOCKhtVm47n4O73fBz/VqxS
-         Uyh2ZopnbkaIxWHby9TA8XC9BaZbkZpk9OQdX3ZkNirZzobIFL2mv88FvZFfiOPDC1rG
-         C1smoaBC+RPcmSYyKzixgk9XbYu2NLebR4HmN5eRcfBsv8OeuNxyqC/mBFGCPW8h+yfl
-         ABo6+pTNoUi85CB4wTkcruqfJWs8/HsUExqDFrzbjOaXngBIab5nVxlNpUudbiiLo4Ql
-         GjDV+oPxkkoDbZOsll0wARfGAlQPVKuR6Kw8zHMkkIcLXvpvwR/duPBsuBoGTn1VMOub
-         0iDQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730815086; x=1731419886;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=XRbZpYF9p/1NPuWA0DjphUsuMiW0qJvYAu0RzCN2HzM=;
-        b=JKet9R6mqWuN5l3324wjdzwKoqRJzCmRq6580VhmmAAoKtRJnBIDO015nwQeVX3u9Y
-         kPtRJbfcvhd60nbpJcMHXmcfcCkH/Z06nIDJLfRV6+CyKvX2N9Ha5CIrB7HFawcKx+4D
-         KyA0o1iGmpZ7KRPiSiZsjhGfMufQF2y4W7QdR1Kq3VVjwmmFkdxPJnBIddLnXi/LwzE8
-         kNvw3eFEtKMgm55M88dAN8Z13UjJxw7rCP/2aGWBnMu2V6/amFq1CP/LJfqfj3YoKTw3
-         rfASZeGY4FO6fnQkHTRjrSdmKQrMfS2AxuxS8u78cpmNJor7M6BLRPe9kVYz3qqWKgZc
-         BDuw==
-X-Gm-Message-State: AOJu0Yxgrw14PX9MVl8Sk3PNH6e/BIF4/MpW21gWT1alVRt8P42L42n9
-	9BN0wAoB9p2l9wagRPQ6WC3mZBwc4D+HjHC+/xSGq7hgS0X1WwYXtLA+uw==
-X-Google-Smtp-Source: AGHT+IFwf19JhEa2OD/otcJOSjKcmbgdA109aqa+0fuBrlneVvX3J/NJ+0DlOx4nyP1pP7vaoKLfpg==
-X-Received: by 2002:a05:6358:719:b0:1bc:2d21:ae79 with SMTP id e5c5f4694b2df-1c3f9f674f4mr1637193655d.20.1730815086319;
-        Tue, 05 Nov 2024 05:58:06 -0800 (PST)
-Received: from [172.17.0.2] ([20.88.15.112])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6d353f9f991sm59365956d6.28.2024.11.05.05.58.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 05 Nov 2024 05:58:05 -0800 (PST)
-Message-ID: <672a246d.0c0a0220.2d89fd.3f1e@mx.google.com>
-Date: Tue, 05 Nov 2024 05:58:05 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============0435024012421439840=="
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sK3ITK8V"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B1A8EC4CECF;
+	Tue,  5 Nov 2024 14:10:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1730815823;
+	bh=8RYyf5p4nwC+svfA5jdFU25joTpS8F2edJYnQCphGB8=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=sK3ITK8VQTmtBur1uirCypSxgX+PFkiBjyrq/gSFU+QxJvYi+7gb2+IM80t3L+f/e
+	 R7MZ/OddKUgYp1zKWtH9bCBCdHHQ2kxiDjaXl1nTb/hZLuY487DLTo2AoBV+EW4/0E
+	 CGuDxshKW1lEkdisvdfVoI6HiOFQaK6CxAZH48LNYQ/gcMjwNYAK51l3A40ZCmO53e
+	 rCezcTqcT1r1szgWrxoj3rIKF7Yqxv5FMG8sV5/q2xY/jstkoOiCEOdFvuYGybtSpK
+	 8HuwiIVeTNsRKkHclUBZCtr45Ew3DpntUQ5eV2FSRx1R1bDP7bXVKn5MKdwOH4PlzY
+	 /aqwScAM/9ppw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADF123809A80;
+	Tue,  5 Nov 2024 14:10:33 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, quic_dgangire@quicinc.com
-Subject: RE: [BlueZ,v4] obexd: Add system bus support for obexd
-In-Reply-To: <20241105120417.475589-1-quic_dgangire@quicinc.com>
-References: <20241105120417.475589-1-quic_dgangire@quicinc.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH 0/4] Bluetooth: ISO: Order PA/BIG sync commands
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <173081583250.569661.8923194940419140058.git-patchwork-notify@kernel.org>
+Date: Tue, 05 Nov 2024 14:10:32 +0000
+References: <20241101082339.4278-1-iulia.tanasescu@nxp.com>
+In-Reply-To: <20241101082339.4278-1-iulia.tanasescu@nxp.com>
+To: Iulia Tanasescu <iulia.tanasescu@nxp.com>
+Cc: linux-bluetooth@vger.kernel.org, claudia.rosu@nxp.com,
+ mihai-octavian.urzica@nxp.com, andrei.istodorescu@nxp.com,
+ luiz.dentz@gmail.com
 
---===============0435024012421439840==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hello:
 
-This is automated email and please do not reply to this email!
+This series was applied to bluetooth/bluetooth-next.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-Dear submitter,
+On Fri,  1 Nov 2024 10:23:35 +0200 you wrote:
+> If the Host issues the HCI_LE_Periodic_Advertising_Create_Sync
+> command while another is pending, the Controller shall return the
+> error code Command Disallowed (0x0C) (Bluetooth Core spec 5.3,
+> Vol 4, Part E, page 2493). The same applies for the HCI_LE_BIG_
+> Create_Sync command (Bluetooth Core spec 5.3, Vol 4, Part E,
+> page 2586).
+> 
+> [...]
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=906477
+Here is the summary with links:
+  - [1/4] Bluetooth: ISO: Do not emit LE PA Create Sync if previous is pending
+    https://git.kernel.org/bluetooth/bluetooth-next/c/763c133ff07b
+  - [2/4] Bluetooth: ISO: Fix matching parent socket for BIS slave
+    https://git.kernel.org/bluetooth/bluetooth-next/c/b6ac0f1db378
+  - [3/4] Bluetooth: ISO: Do not emit LE BIG Create Sync if previous is pending
+    https://git.kernel.org/bluetooth/bluetooth-next/c/6243e598bc64
+  - [4/4] Bluetooth: ISO: Update hci_conn_hash_lookup_big for Broadcast slave
+    https://git.kernel.org/bluetooth/bluetooth-next/c/ff3fd60725a0
 
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      0.48 seconds
-GitLint                       PASS      0.27 seconds
-BuildEll                      PASS      24.70 seconds
-BluezMake                     PASS      1692.61 seconds
-MakeCheck                     PASS      12.94 seconds
-MakeDistcheck                 PASS      179.79 seconds
-CheckValgrind                 PASS      254.73 seconds
-CheckSmatch                   PASS      358.82 seconds
-bluezmakeextell               PASS      120.85 seconds
-IncrementalBuild              PASS      1575.99 seconds
-ScanBuild                     WARNING   1036.33 seconds
-
-Details
-##############################
-Test: ScanBuild - WARNING
-Desc: Run Scan Build
-Output:
-obexd/src/main.c:303:6: warning: Array access (from variable 'option_root') results in a null pointer dereference
-        if (option_root[0] != '/') {
-            ^~~~~~~~~~~~~~
-1 warning generated.
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
-
----
-Regards,
-Linux Bluetooth
-
-
---===============0435024012421439840==--
