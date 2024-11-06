@@ -1,167 +1,151 @@
-Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [185.185.170.37])
+Received: from stravinsky.debian.org (stravinsky.debian.org [82.195.75.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 680A31D2B34
-	for <linux-bluetooth@vger.kernel.org>; Tue,  5 Nov 2024 23:17:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=185.185.170.37
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730848651; cv=pass; b=K/t0qrjOEIuedxHcI5y8xdL1kZ/TERIWupR/A2xw8VnlgtWu5EX7AVEcQU7I8az2x7hZog2WN5c1I8/UoxrvSxiUWjOTxa+Jv/2/m0tRtLnGg/iZ7FSRZnUaJx8FGTyw9yCB/ZWO/AvBWXGLAb5L2bSiIXF4ryYaUg6qyPCIwJs=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730848651; c=relaxed/simple;
-	bh=AtkbDNvlzJb8WQDaVHFho/XKlip+NHkhpblRQnASECg=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=hdxIFPU5Ye4A8tPg8uCdaSWe308S5Ugy0s10c7VKH3boDOI1XzKPxwOKCUxY/xfRvLjhoMGcZcUMgA/5EiczOtDBKrRpGk0AN6xjyvTV4KcQVcra4D+D+5cfw4jPBw0+mTUxi3tUbyxykVUBKa2+ruegkO0H/Gfi0qUS4l/4GNs=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=LILDW/IC; arc=pass smtp.client-ip=185.185.170.37
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84D701C1AD2;
+	Wed,  6 Nov 2024 07:23:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=82.195.75.108
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1730877811; cv=none; b=s4HTrnMTCyaHQn6EqlU8P09UC2EDXF9ibuyvXV0CGBZhjwyl084cgjZmjdmfHUOQrq3/mrNeZAOvqFnkmT+YpxWCuiFTIKLyuc87oCPMH5A12Cuyex6NLpfKjdXaoHaN0nVy5G0AUwFPxsnTnuefr2zwktC84GckHDTHfV353z4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1730877811; c=relaxed/simple;
+	bh=ASAoilxWckc5MdLsdk/Gt9RrC2fpKKq3cQAY2tADBNM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=XPBOTRtOmqMH7gGcWmasxzbPPBS0sgH8PLYVaS1zcfsmpVBesuvapoqMqBL7wSAYZv5uIgzhiYexwYfifFTNsXBlok2Sk6MdIo2j0mXBN/fNEb2muZUSxDNyqIV6CV2RassXfZmBmPjXFWsX74HKk5ePAJcPn6IMY5e5Ahp2elw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=none smtp.mailfrom=debian.org; dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b=a7eD+yFS; arc=none smtp.client-ip=82.195.75.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=debian.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="LILDW/IC"
-Received: from [192.168.1.195] (unknown [IPv6:2a02:ed04:3581:3::d001])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pav@iki.fi)
-	by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4Xjkkp2GVXz49Q02;
-	Wed,  6 Nov 2024 01:17:22 +0200 (EET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
-	t=1730848644;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=p4azzaHQjA8Cuc9WrESvyyxG3oaigvEHCVqgi8hDyJc=;
-	b=LILDW/ICzBr5Usm3EiBOMhKpWHYoIq4RZTLuS+sXqHGxWEkR8hHTWLUT+oeyL1DO43+ENx
-	LyKLmtZEz9nbN+TQ9o0sgp64q+agzOi98Ua/IZfZwZq2Cl/XGGLEcuIpmj0eVdK/COY7Wh
-	GfZWlOsHwvI+7ucb2qcnn7NwDOWEMHrJ11xiTK80NJhLJYIqIH7r8Maah3rRu85x1AAMQo
-	FKZXl1DZkjCqKADwEgfyUQgWHegUXVn/LZ8MkQsnvyBgqW/4Yrgzq1SJquBtLM0B7JXtuV
-	Wc4i9hculBD+RxYhyw2bKobyZve5ERLyH9vnQP/uw7gfFtFPxfSubAOOaxfzyQ==
-ARC-Seal: i=1; s=lahtoruutu; d=iki.fi; t=1730848644; a=rsa-sha256;
-	cv=none;
-	b=eQ9N562jtvFZI3QNpMo1mokfq19IYbrYsTfSNJPiyR1lkL7cweSTCyJ5l1uOJpyeVBRZkJ
-	BtUPldt8lr7K9mFWdtWKzyVeX0jV9NOF2PVrGpbMuOAS7Ledw0cil7u8dvktNdMZFoL+9A
-	is4cYje1le4y9HCpe13pSEe4t5sER0OzKcdW1WIcVYg8TryzsSoYJ4/MU2IKELyerkWLeq
-	Dp2ZY0q9LzDQ+JJkiJ7aABkqP21Gr0qkO191jLd5DPpdofdXxYxwtXXb0Ixs9HSzp085tK
-	U/hFMMpdMvpO+i9woqshde/P1TIpRdSpNadCldfURECAT0e2uEh8lR56JHJgwg==
-ARC-Authentication-Results: i=1;
-	ORIGINATING;
-	auth=pass smtp.auth=pav@iki.fi smtp.mailfrom=pav@iki.fi
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=lahtoruutu; t=1730848644;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=p4azzaHQjA8Cuc9WrESvyyxG3oaigvEHCVqgi8hDyJc=;
-	b=NYqn2PCwi7qWRglQV6nFC8S86suIArZGz0Ny8egF/AO9l9Hr9OEesVPOpz6xbq3PUH/myW
-	P9YZ3c4Q5XvyI0ptt5O9xcQP8JZ1HVx2ycuOhVdK38dfczRm2ZfnS0Be4xoMwE6a33BJN+
-	y9gv+HXcoKWokCXb7bUSwMW5lz4BndQfLKSkk6w658dVHQPN4r4pcz497saVQXXszRKmln
-	QDYdXs41tmN3m0MHOBCNKFA63gllTOkN20TVWd1EbxDP0tGS8IdFTPDzzlv1wZ3sg+gWCP
-	q55sXaK3jyCDHQcGs/h15yrL10tOApYdTsZSfaOGHk39wnU+V8j3OdOIsZlZWQ==
-Message-ID: <99fa2643e4911947fc3b72df683dd88ee9f9ab4e.camel@iki.fi>
-Subject: Re: [PATCH 1/4] Bluetooth: ISO: Do not emit LE PA Create Sync if
- previous is pending
-From: Pauli Virtanen <pav@iki.fi>
-To: Iulia Tanasescu <iulia.tanasescu@nxp.com>, 
-	linux-bluetooth@vger.kernel.org
-Cc: claudia.rosu@nxp.com, mihai-octavian.urzica@nxp.com, 
-	andrei.istodorescu@nxp.com, luiz.dentz@gmail.com
-Date: Wed, 06 Nov 2024 01:17:18 +0200
-In-Reply-To: <20241101082339.4278-2-iulia.tanasescu@nxp.com>
-References: <20241101082339.4278-1-iulia.tanasescu@nxp.com>
-	 <20241101082339.4278-2-iulia.tanasescu@nxp.com>
-Autocrypt: addr=pav@iki.fi; prefer-encrypt=mutual;
- keydata=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
- bzyGkKh2h8XdrYhtDjw9LmrprPQ==
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.54.1 (3.54.1-1.fc41) 
+	dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b="a7eD+yFS"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=debian.org;
+	s=smtpauto.stravinsky; h=X-Debian-User:In-Reply-To:Content-Transfer-Encoding:
+	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:
+	Reply-To:Content-ID:Content-Description;
+	bh=iw2rQVrHpSXDXT1BJhDIQjcX6rB+tehBnAF7Pn72/uM=; b=a7eD+yFS9smWNw5yfNxn+XkIL5
+	zXHU7pv/mNF4EvT3kkLKZGpuKfBy5CWj8Oi1EBXKuBuqfVMwzPzRqHwE9vUmZFxLxqUnUVgllPB6p
+	haEt5SeWYShbOGs7CTi1U5Y547w9k7b3+8e9Bh+Ig/e4b60sxNTkGDphibSFj5WQn72MiskcJJOJW
+	uhm7XI/p+qOI6n01NeF34WPvwoEAvp2PlzD8jLUCslFLWYhPdtASysVxsHD7gr0E7QRaGqxYo21Ed
+	kp4qXrukBC5MCm5fE7+m5ACTTY0c2h7HKFvi5V+b+PC94h05ivzMey6l5l+SLXmO1T44E2nW8TnJM
+	FSazKoaQ==;
+Received: from authenticated user
+	by stravinsky.debian.org with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.94.2)
+	(envelope-from <carnil@debian.org>)
+	id 1t8aNq-00DlTP-89; Wed, 06 Nov 2024 07:23:18 +0000
+Received: by eldamar.lan (Postfix, from userid 1000)
+	id 00FA4BE2DE0; Wed, 06 Nov 2024 08:23:16 +0100 (CET)
+Date: Wed, 6 Nov 2024 08:23:16 +0100
+From: Salvatore Bonaccorso <carnil@debian.org>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Thorsten Leemhuis <regressions@leemhuis.info>,
+	Mike <user.service2016@gmail.com>,
+	"stable@vger.kernel.org" <stable@vger.kernel.org>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	linux-bluetooth@vger.kernel.org,
+	Paul Menzel <pmenzel@molgen.mpg.de>,
+	Sasha Levin <sashal@kernel.org>,
+	Jeremy =?iso-8859-1?Q?Lain=E9?= <jeremy.laine@m4x.org>,
+	Linux regressions mailing list <regressions@lists.linux.dev>,
+	Greg KH <gregkh@linuxfoundation.org>
+Subject: Re: Bluetooth kernel BUG with Intel AX211 (regression in 6.1.83)
+Message-ID: <ZysZZK8udCI1hNLs@eldamar.lan>
+References: <30f4b18f-4b96-403c-a0ab-d81809d9888a@gmail.com>
+ <c09d4f5b-0c4b-4f57-8955-28a963cc7e16@leemhuis.info>
+ <2024061258-boxy-plaster-7219@gregkh>
+ <d5aa11c9-6326-4096-9c29-d9f0d11f83b4@leemhuis.info>
+ <ZyMkvAkZXuoTHFtd@eldamar.lan>
+ <ab5e25d8-3381-452e-ad13-5d65c0e12306@leemhuis.info>
+ <CABBYNZKQAJGzA8th8A7Foiy7YaSFZDpLvLZqDFsVJ3Yzn8C_5g@mail.gmail.com>
+ <Zypwz65wRM-FMXte@eldamar.lan>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <Zypwz65wRM-FMXte@eldamar.lan>
+X-Debian-User: carnil
 
-Hi,
+Hi Luiz,
 
-pe, 2024-11-01 kello 10:23 +0200, Iulia Tanasescu kirjoitti:
-[clip]
-> +	rcu_read_lock();
-> +
-> +	/* The spec allows only one pending LE Periodic Advertising Create
-> +	 * Sync command at a time. If the command is pending now, don't do
-> +	 * anything. We check for pending connections after each PA Sync
-> +	 * Established event.
-> +	 *
-> +	 * BLUETOOTH CORE SPECIFICATION Version 5.3 | Vol 4, Part E
-> +	 * page 2493:
-> +	 *
-> +	 * If the Host issues this command when another HCI_LE_Periodic_
-> +	 * Advertising_Create_Sync command is pending, the Controller shall
-> +	 * return the error code Command Disallowed (0x0C).
-> +	 */
-> +	list_for_each_entry_rcu(conn, &hdev->conn_hash.list, list) {
-> +		if (test_bit(HCI_CONN_CREATE_PA_SYNC, &conn->flags))
-> +			goto unlock;
->  	}
-> =20
-> -	return hci_update_passive_scan_sync(hdev);
-> +	list_for_each_entry_rcu(conn, &hdev->conn_hash.list, list) {
-> +		if (hci_conn_check_create_pa_sync(conn)) {
-> +			struct bt_iso_qos *qos =3D &conn->iso_qos;
-> +
-> +			cp =3D kzalloc(sizeof(*cp), GFP_KERNEL);
+On Tue, Nov 05, 2024 at 08:23:59PM +0100, Salvatore Bonaccorso wrote:
+> Hi Luiz,
+> 
+> On Tue, Nov 05, 2024 at 12:53:50PM -0500, Luiz Augusto von Dentz wrote:
+> > Hi,
+> > 
+> > On Tue, Nov 5, 2024 at 12:29 PM Thorsten Leemhuis
+> > <regressions@leemhuis.info> wrote:
+> > >
+> > > On 31.10.24 07:33, Salvatore Bonaccorso wrote:
+> > > > On Tue, Jun 18, 2024 at 12:30:18PM +0200, Thorsten Leemhuis wrote:
+> > > >> On 12.06.24 14:04, Greg KH wrote:
+> > > >>> On Thu, Jun 06, 2024 at 12:18:18PM +0200, Thorsten Leemhuis wrote:
+> > > >>>> On 03.06.24 22:03, Mike wrote:
+> > > >>>>> On 29.05.24 11:06, Thorsten Leemhuis wrote:
+> > > >>>>> [...]
+> > > >>>>> I understand that 6.9-rc5[1] worked fine, but I guess it will take some
+> > > >>>>> time to be
+> > > >>>>> included in Debian stable, so having a patch for 6.1.x will be much
+> > > >>>>> appreciated.
+> > > >>>>> I do not have the time to follow the vanilla (latest) release as is
+> > > >>>>> likely the case for
+> > > >>>>> many other Linux users.
+> > > >>>>>
+> > > >>>> Still no reaction from the bluetooth developers. Guess they are busy
+> > > >>>> and/or do not care about 6.1.y. In that case:
+> > > >>>>
+> > > >>>> @Greg: do you might have an idea how the 6.1.y commit a13f316e90fdb1
+> > > >>>> ("Bluetooth: hci_conn: Consolidate code for aborting connections") might
+> > > >>>> cause this or if it's missing some per-requisite? If not I wonder if
+> > > >>>> reverting that patch from 6.1.y might be the best move to resolve this
+> > > >>>> regression. Mike earlier in
+> > > >>>> https://lore.kernel.org/all/c947e600-e126-43ea-9530-0389206bef5e@gmail.com/
+> > > >>>> confirmed that this fixed the problem in tests. Jeremy (who started the
+> > > >>>> thread and afaics has the same problem) did not reply.
+> > > >>>
+> > > >>> How was this reverted?  I get a bunch of conflicts as this commit was
+> > > >>> added as a dependency of a patch later in the series.
+> > > >>>
+> > > >>> So if this wants to be reverted from 6.1.y, can someone send me the
+> > > >>> revert that has been tested to work?
+> > > >>
+> > > >> Mike, can you help out here, as you apparently managed a revert earlier?
+> > > >> Without you or someone else submitting a revert I fear this won't be
+> > > >> resolved...
+> > > >
+> > > > Trying to reboostrap this, as people running 6.1.112 based kernel
+> > > > seems still hitting the issue, but have not asked yet if it happens as
+> > > > well for 6.114.
+> > > >
+> > > > https://bugs.debian.org/1086447
+> > > >
+> > > > Mike, since I guess you are still as well affected as well, does the
+> > > > issue trigger on 6.1.114 for you and does reverting changes from
+> > > > a13f316e90fdb1 still fix the issue? Can you send your
+> > > > backport/changes?
+> > >
+> > > Hmmm, no reply. Is there maybe someone in that bug that could create and
+> > > test a new revert to finally get this resolved upstream? Seem we
+> > > otherwise are kinda stuck here.
+> > 
+> > Looks like we didn't tag things like 5af1f84ed13a ("Bluetooth:
+> > hci_sync: Fix UAF on hci_abort_conn_sync") and a239110ee8e0
+> > ("Bluetooth: hci_sync: always check if connection is alive before
+> > deleting") that are actually fixes to a13f316e90fdb1.
+> 
+> Ah good I see :). None of those were yet applied to the 6.1.y series
+> were the issue is still presend. Would you be up to provide the needed
+> changes to the stable team?  That would be very much appreciated for
+> those affected running the 6.1.y series. 
+> 
+> Thanks a lot for pointing out the fixes!
 
-AFAIK sleeping alloc in rcu critical section is not allowed, I suspect
-this produces:
+Tried to apply those fixes on top of 6.1.115, but they do not apply
+clearnly. Could you help to get those backported?
 
-BUG: sleeping function called from invalid context at include/linux/sched/m=
-m.h:321
-
-if you run it on kernel compiled with CONFIG_DEBUG_ATOMIC_SLEEP=3Dy.
-
-I've found the following useful when testing:
-
-CONFIG_DEBUG_KERNEL=3Dy
-CONFIG_LOCKDEP_SUPPORT=3Dy
-CONFIG_DEBUG_SPINLOCK=3Dy
-CONFIG_DEBUG_LOCK_ALLOC=3Dy
-CONFIG_DEBUG_ATOMIC_SLEEP=3Dy
-CONFIG_PROVE_LOCKING=3Dy
-CONFIG_PROVE_RCU=3Dy
-CONFIG_LOCKDEP=3Dy
-CONFIG_DEBUG_MUTEXES=3Dy
-CONFIG_KASAN=3Dy
-
---=20
-Pauli Virtanen
+Regards,
+Salvatore
