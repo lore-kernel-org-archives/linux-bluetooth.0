@@ -1,59 +1,59 @@
 Received: from mail-vk1-f172.google.com (mail-vk1-f172.google.com [209.85.221.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4941F202F6C
-	for <linux-bluetooth@vger.kernel.org>; Wed,  6 Nov 2024 14:51:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B0B72010E6
+	for <linux-bluetooth@vger.kernel.org>; Wed,  6 Nov 2024 14:56:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730904667; cv=none; b=YgJYuCqm752M6Q3obvkFu2V3H5Kt1S98g42S7LLu6WHvc77N6PxRo7adjjf6BdyFBwOSbWGOUxZLHpni/XVrgb76yKKijbXKnI/kyySSvEg5tOYEkGLb3YYV3HMqwO5YxUzVD8CtQ93bE77QoLqfyPCiwiFeRSC4qCthrg127Ds=
+	t=1730904972; cv=none; b=Nn2a5YLnb9EgEbo1sBm8zdEx3d5gyQh5p+SBxgtWQxjOGuJb5i87+7bjbtF1R2FM34vvNucV/S3g8LzEHaEZ/x282xiA5H3grLn94+WgBNIpHi2EORzH0AELqketIrg0ErK9jYfYi6kdigFg3YV2ib4bESVXgyJnFkwgBHZCGWE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730904667; c=relaxed/simple;
-	bh=KYEBIpv6VgtOcQPm+QWMBc1JkAPQr1m9F9RFtH7SubY=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=GCEQUZjFaa0vYZJi4KGuU4xnifD1RAQrqnvcIdyAGkyUe805j9tFJCYNXYj8kCfJm20d5cOUmvzVyc12Mi/ABXN/RP4rBYMP/boIKkgJ3KWPJANxf7lb73WQJWRBXkhYCwfwlnJH/LH5JC7iCHAQyjvDLBRW04Z4ghmmVGzjVZs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MX/afkd/; arc=none smtp.client-ip=209.85.221.172
+	s=arc-20240116; t=1730904972; c=relaxed/simple;
+	bh=F45sEqN0rJWhPPO/kWd3AyX4ZiGzxruk+SkEnqFdZeE=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=YQrvwHz+OfRxBUG6w1kntc5Xsr1nyBzSVs1bdc5WO0mzQg0x8B14OA5Y5oaS+T4Ax8yiekwxSFzyY0PPMPg0I+kRSqZzNra5tTjTpI4Jb+4an09J69lDA2B3/G40Ea3moHfCDXJmMtCRYv0JZ2967TL3ZmwnoNZR0LCjuG+iuZA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Mz5OdSwU; arc=none smtp.client-ip=209.85.221.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MX/afkd/"
-Received: by mail-vk1-f172.google.com with SMTP id 71dfb90a1353d-50fc0345155so816056e0c.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 06 Nov 2024 06:51:06 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Mz5OdSwU"
+Received: by mail-vk1-f172.google.com with SMTP id 71dfb90a1353d-5139cd0032cso1736301e0c.2
+        for <linux-bluetooth@vger.kernel.org>; Wed, 06 Nov 2024 06:56:10 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1730904664; x=1731509464; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1730904968; x=1731509768; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:to
          :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=JZrCm9XK4sCY8ccc88nmkD8XGx2aVf9n5k2P64pFCIg=;
-        b=MX/afkd/xdLtSJMmkEmBfY/RYgtiY4LWCVC6uf7JySbgR9Zi4+j+KUvdSHtz4mfDd1
-         y+tk1eQpUNX5NZX1VNjqbz3jRynLsun61lsqVTEoQu+gVQJe4KSHT999KvcJkzS2RraE
-         +iQ6o45n7DJszX9gb7P9Fr3zhAQFZZh7BJPl43bAbo7cl6hPoi77E9vmDajXr3jI6j4n
-         XvP+pxEtqCeZw/47N6ESxVN60k1UWeHTi2RMXOR/N07ZNvWX5CUUQgS4AOz9RjcyPkY2
-         OG6FyArQ2r0r5Qe1MceIhovI8DFnD3Xuq6ie67zrwFw7mlMe9NFmfOBB/2cyBlyREgWF
-         bD4g==
+        bh=Jx3CSQOc7+5s2CAjtSLKaK0eVpDPQu2ZmqZH0T43R/w=;
+        b=Mz5OdSwUrVIgLNLOwrUT5cgADCUAM5qxe4nbOSt2gVhpqHv/BZcist+/Swj2LcfZD6
+         J62Xvy1kyseBGDJsyBubjnU8lSr/EXD6j24FdWeqNwauT5+aZWWDs2m32O59B3OafmS5
+         yxHpP1kVap1QBJEnHSH9TgB1pwA4ovp4qFDl2kiO7OxQd1xfHFlsqeI4VHXCWSQV5fni
+         OvMC+wjHVdphLGv4SYhB2yyfIcjzLDJcV3KeXmjntSrVRDr6F8bnf1SIf271Qx609onY
+         wHxNkftawqxmJtA/+AKto5FtqGB10u7mntcZ5PgILjVUQkmKNUJHVVL7SHsu6H2fuQdB
+         czuQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730904664; x=1731509464;
+        d=1e100.net; s=20230601; t=1730904968; x=1731509768;
         h=content-transfer-encoding:mime-version:message-id:date:subject:to
          :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=JZrCm9XK4sCY8ccc88nmkD8XGx2aVf9n5k2P64pFCIg=;
-        b=SdyWOjNg/JQCfOfleFOOJizM69vUL3McafCGpQfPcWdWznAW2rmJFi+ZJqyGMV2tHL
-         6G3Dja7G07qWk56R/UDENIxz7w/+XfF8tgX1UzgVniyjpYhahhUqYziK5klMiaSdjICD
-         ei8qGmo5ggZBYDy6i3D1xiyHxC2smwP+lshXec4lFCXBJP4FKShgiBKLR4dGF0xi9eoU
-         ypO84P8mqd8UIMMFmh+yFYwFxkN/MCbaJyJZg2DkBVOOFVSx+xmXLb9OUPPptKFRwfwf
-         3NBNlkUasSUB9KT6QE4ZerJ8/Ve4M62Yw3rK+mtKxytjNCGbnha+1mXavAs25hUXTJc5
-         McPg==
-X-Gm-Message-State: AOJu0YzrYhkBK4dGMbOf/7eXNTuHVFz8HnjmL7EaEdPG3R6kRWTgRruL
-	aFKZWMpddgxj9la9cDoFnDPuqb5JfZTxmp8L+BqqOWJFcT9dgEqFxWCDnA==
-X-Google-Smtp-Source: AGHT+IH+xjTJBx7aMx2evAdsxOpmzu4vuyMyg+r8udckJomakJHwvzJdyzWY4T3Es/FnaOllItB+fQ==
-X-Received: by 2002:a05:6122:da4:b0:50d:45e1:f32c with SMTP id 71dfb90a1353d-513e30eaabfmr1716755e0c.2.1730904664403;
-        Wed, 06 Nov 2024 06:51:04 -0800 (PST)
+        bh=Jx3CSQOc7+5s2CAjtSLKaK0eVpDPQu2ZmqZH0T43R/w=;
+        b=Kt4molEUzI/ljfd5rwpmzDn7CMIT6wpqnyNMRzaxJ1pd73c434mUlSjF1L2a5KmdmO
+         bgJ4gOKb0XOYCBtOeCNO2uaztyC9xe2Pk676BWEoG0dquhtDdvRUCZEOVPwtzsmFl+Ri
+         whg1DKCKvbkJaUGqJ7ZqjJTh3kyUpp/yotKoTQ86DUpaIT+mKc0UO3IPByZJrJd1sXHV
+         4JaDBaBUFx92Et5s+c7h9EkoAuReRDJ701c5DIlqnRC9N+InVp0HUPkOIRkyN+yEMGij
+         YTUrK6O9Z/trHdL/FMloPHBj8LI11MfU03W4MV/J8Wkgzi4PoEpn/Mvr4b1lExGrngoX
+         mhgw==
+X-Gm-Message-State: AOJu0YzjUiEjKHIYz7ph0VOUj6nDVhZASRy5lg1Vb2bF7efZZSX72DtT
+	+57qHZeWiLno08EzvT+7Z2V95ExHKzoyJJ0wwVOmZNT+TdOUlyD4+lsyIg==
+X-Google-Smtp-Source: AGHT+IGg4wQEbmK9WaGTH9cy6c9xU5qC9IBh3i4fILkIG4kNYTgw4aO8+ME/YaetuIHTaVlmW1uYnQ==
+X-Received: by 2002:a05:6122:893:b0:50d:2317:5b61 with SMTP id 71dfb90a1353d-5106b15d8edmr23019203e0c.6.1730904968651;
+        Wed, 06 Nov 2024 06:56:08 -0800 (PST)
 Received: from lvondent-mobl5.. (syn-107-146-107-067.res.spectrum.com. [107.146.107.67])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5106f2f55f9sm2642666e0c.22.2024.11.06.06.51.01
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5106f2cb578sm2642474e0c.14.2024.11.06.06.56.05
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 06 Nov 2024 06:51:02 -0800 (PST)
+        Wed, 06 Nov 2024 06:56:07 -0800 (PST)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v1] lib: Add IPC bus type
-Date: Wed,  6 Nov 2024 09:51:00 -0500
-Message-ID: <20241106145100.42889-1-luiz.dentz@gmail.com>
+Subject: [PATCH v1] Bluetooth: HCI: Add IPC(11) bus type
+Date: Wed,  6 Nov 2024 09:56:05 -0500
+Message-ID: <20241106145605.44408-1-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.47.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -66,68 +66,27 @@ Content-Transfer-Encoding: 8bit
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
 Zephyr(1) has been using the same bus defines as Linux so tools likes of
-btmon, etc, are able to decode the bus under HCI, so this attempts to
-synchronize the definitions by adding the missing bus type IPC(11) and its
-decoding string.
+btmon, etc, are able to decode the bus used by the driver to transport
+HCI packets.
 
-[1] https://github.com/zephyrproject-rtos/zephyr/pull/80808
+Link: https://github.com/zephyrproject-rtos/zephyr/pull/80808
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 ---
- doc/mgmt-api.txt     | 1 +
- lib/hci.c            | 2 ++
- lib/hci.h            | 1 +
- src/shared/btsnoop.h | 2 ++
- 4 files changed, 6 insertions(+)
+ include/net/bluetooth/hci.h | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
-index 59e61d361dc2..01a23526a4ef 100644
---- a/doc/mgmt-api.txt
-+++ b/doc/mgmt-api.txt
-@@ -2500,6 +2500,7 @@ Read Extended Controller Index List Command
- 		0x08	I2C
- 		0x09	SMD
- 		0x0A	VIRTIO
-+		0x0B	IPC
- 
- 	Controllers marked as RAW only operation are currently not listed
- 	by this command.
-diff --git a/lib/hci.c b/lib/hci.c
-index 937e65d48aa5..acf63f182953 100644
---- a/lib/hci.c
-+++ b/lib/hci.c
-@@ -152,6 +152,8 @@ const char *hci_bustostr(int bus)
- 		return "SMD";
- 	case HCI_VIRTIO:
- 		return "VIRTIO";
-+	case HCI_IPC:
-+		return "IPC";
- 	default:
- 		return "Unknown";
- 	}
-diff --git a/lib/hci.h b/lib/hci.h
-index 50f385c1ebf7..c39a72cefa9b 100644
---- a/lib/hci.h
-+++ b/lib/hci.h
-@@ -47,6 +47,7 @@ extern "C" {
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index 5bb4eaa52e14..6203bd8663b7 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -68,6 +68,7 @@
  #define HCI_I2C		8
  #define HCI_SMD		9
  #define HCI_VIRTIO	10
 +#define HCI_IPC		11
  
- /* HCI controller types */
- #define HCI_PRIMARY	0x00
-diff --git a/src/shared/btsnoop.h b/src/shared/btsnoop.h
-index 80f0d5d8209c..c24755d56729 100644
---- a/src/shared/btsnoop.h
-+++ b/src/shared/btsnoop.h
-@@ -58,6 +58,8 @@
- #define BTSNOOP_BUS_SPI		7
- #define BTSNOOP_BUS_I2C		8
- #define BTSNOOP_BUS_SMD		9
-+#define BTSNOOP_BUS_VIRTIO	10
-+#define BTSNOOP_BUS_IPC		11
- 
- struct btsnoop_opcode_new_index {
- 	uint8_t  type;
+ /* HCI device quirks */
+ enum {
 -- 
 2.47.0
 
