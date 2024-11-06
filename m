@@ -1,42 +1,33 @@
-Received: from stravinsky.debian.org (stravinsky.debian.org [82.195.75.108])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84D701C1AD2;
-	Wed,  6 Nov 2024 07:23:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=82.195.75.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C138192580;
+	Wed,  6 Nov 2024 07:26:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730877811; cv=none; b=s4HTrnMTCyaHQn6EqlU8P09UC2EDXF9ibuyvXV0CGBZhjwyl084cgjZmjdmfHUOQrq3/mrNeZAOvqFnkmT+YpxWCuiFTIKLyuc87oCPMH5A12Cuyex6NLpfKjdXaoHaN0nVy5G0AUwFPxsnTnuefr2zwktC84GckHDTHfV353z4=
+	t=1730877984; cv=none; b=GuJdu9sPtrK0y/xlKdLFa9oNMp/HNQ9mYsjyPSKtrz57REEgm9/AeY7gEobZocrSS7FGvB0BlQj9EXjLu/GaELmyhGakRyfjpNo+/1tZry6Ktm03KFjcSM6sq74Z7A1I1WY31gzEi0S0gBgWFBw8CBHoq5kuyJoue5cXx+Sp5ys=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730877811; c=relaxed/simple;
-	bh=ASAoilxWckc5MdLsdk/Gt9RrC2fpKKq3cQAY2tADBNM=;
+	s=arc-20240116; t=1730877984; c=relaxed/simple;
+	bh=T/zpViMUVPQxJyrMKg/1IlU8jjVtE0X9HMEuHdkY5mA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XPBOTRtOmqMH7gGcWmasxzbPPBS0sgH8PLYVaS1zcfsmpVBesuvapoqMqBL7wSAYZv5uIgzhiYexwYfifFTNsXBlok2Sk6MdIo2j0mXBN/fNEb2muZUSxDNyqIV6CV2RassXfZmBmPjXFWsX74HKk5ePAJcPn6IMY5e5Ahp2elw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=none smtp.mailfrom=debian.org; dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b=a7eD+yFS; arc=none smtp.client-ip=82.195.75.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=debian.org
+	 Content-Type:Content-Disposition:In-Reply-To; b=gBT7y7wNo8eiz4Y08CZxipu+bdY1Pmx/sp6wzARSA08EN3Ap850wnFf/xfdE7vZ69hiIW48gC5f3pPf8wHHuTiI08bdmt/oL9i100GQJbcDjv3V/FQz6W72Ecp9yKH7mBTw1XHNfeVHi/WR5qPru6KMAKpNB7e8SV1KEG1I5/CU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=qJyNgN8w; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=debian.org header.i=@debian.org header.b="a7eD+yFS"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=debian.org;
-	s=smtpauto.stravinsky; h=X-Debian-User:In-Reply-To:Content-Transfer-Encoding:
-	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:
-	Reply-To:Content-ID:Content-Description;
-	bh=iw2rQVrHpSXDXT1BJhDIQjcX6rB+tehBnAF7Pn72/uM=; b=a7eD+yFS9smWNw5yfNxn+XkIL5
-	zXHU7pv/mNF4EvT3kkLKZGpuKfBy5CWj8Oi1EBXKuBuqfVMwzPzRqHwE9vUmZFxLxqUnUVgllPB6p
-	haEt5SeWYShbOGs7CTi1U5Y547w9k7b3+8e9Bh+Ig/e4b60sxNTkGDphibSFj5WQn72MiskcJJOJW
-	uhm7XI/p+qOI6n01NeF34WPvwoEAvp2PlzD8jLUCslFLWYhPdtASysVxsHD7gr0E7QRaGqxYo21Ed
-	kp4qXrukBC5MCm5fE7+m5ACTTY0c2h7HKFvi5V+b+PC94h05ivzMey6l5l+SLXmO1T44E2nW8TnJM
-	FSazKoaQ==;
-Received: from authenticated user
-	by stravinsky.debian.org with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.94.2)
-	(envelope-from <carnil@debian.org>)
-	id 1t8aNq-00DlTP-89; Wed, 06 Nov 2024 07:23:18 +0000
-Received: by eldamar.lan (Postfix, from userid 1000)
-	id 00FA4BE2DE0; Wed, 06 Nov 2024 08:23:16 +0100 (CET)
-Date: Wed, 6 Nov 2024 08:23:16 +0100
-From: Salvatore Bonaccorso <carnil@debian.org>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Thorsten Leemhuis <regressions@leemhuis.info>,
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="qJyNgN8w"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 781BDC4CECD;
+	Wed,  6 Nov 2024 07:26:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1730877984;
+	bh=T/zpViMUVPQxJyrMKg/1IlU8jjVtE0X9HMEuHdkY5mA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=qJyNgN8wUgxRML5AZQwZgG6G2u4a6WXZGbVgbSSaxgL1m+bY9Wi1FPEriRVBCXEVe
+	 xgCdgIOZjjevRNAqcOtDZHMr860UXr0tKf1TjzdH/97PjTM+0vXEcaOowbyFc2ge1p
+	 O0xLWIntwwlP9l9FCsc6IVtnJFoFkFV2m68Tain8=
+Date: Wed, 6 Nov 2024 08:26:05 +0100
+From: Greg KH <gregkh@linuxfoundation.org>
+To: Salvatore Bonaccorso <carnil@debian.org>
+Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Thorsten Leemhuis <regressions@leemhuis.info>,
 	Mike <user.service2016@gmail.com>,
 	"stable@vger.kernel.org" <stable@vger.kernel.org>,
 	Marcel Holtmann <marcel@holtmann.org>,
@@ -45,10 +36,9 @@ Cc: Thorsten Leemhuis <regressions@leemhuis.info>,
 	Paul Menzel <pmenzel@molgen.mpg.de>,
 	Sasha Levin <sashal@kernel.org>,
 	Jeremy =?iso-8859-1?Q?Lain=E9?= <jeremy.laine@m4x.org>,
-	Linux regressions mailing list <regressions@lists.linux.dev>,
-	Greg KH <gregkh@linuxfoundation.org>
+	Linux regressions mailing list <regressions@lists.linux.dev>
 Subject: Re: Bluetooth kernel BUG with Intel AX211 (regression in 6.1.83)
-Message-ID: <ZysZZK8udCI1hNLs@eldamar.lan>
+Message-ID: <2024110652-blooming-deck-f0d9@gregkh>
 References: <30f4b18f-4b96-403c-a0ab-d81809d9888a@gmail.com>
  <c09d4f5b-0c4b-4f57-8955-28a963cc7e16@leemhuis.info>
  <2024061258-boxy-plaster-7219@gregkh>
@@ -67,9 +57,6 @@ Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
 In-Reply-To: <Zypwz65wRM-FMXte@eldamar.lan>
-X-Debian-User: carnil
-
-Hi Luiz,
 
 On Tue, Nov 05, 2024 at 08:23:59PM +0100, Salvatore Bonaccorso wrote:
 > Hi Luiz,
@@ -141,11 +128,9 @@ On Tue, Nov 05, 2024 at 08:23:59PM +0100, Salvatore Bonaccorso wrote:
 > were the issue is still presend. Would you be up to provide the needed
 > changes to the stable team?  That would be very much appreciated for
 > those affected running the 6.1.y series. 
-> 
-> Thanks a lot for pointing out the fixes!
 
-Tried to apply those fixes on top of 6.1.115, but they do not apply
-clearnly. Could you help to get those backported?
+We would need backports for these as they do not apply cleanly :(
 
-Regards,
-Salvatore
+thanks,
+
+greg k-h
