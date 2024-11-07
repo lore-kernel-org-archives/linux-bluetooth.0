@@ -1,159 +1,391 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6967523BB;
-	Thu,  7 Nov 2024 04:38:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D2781E9083
+	for <linux-bluetooth@vger.kernel.org>; Thu,  7 Nov 2024 10:26:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730954312; cv=none; b=a2UKSNyCFM/L5Atqdw2LzJiRdYq+VfP22BSStGVPW1TZtkZ9bL3ZeM/BFI/TaBY/qkadopmJ5HSueTWj0xtU186qaWzUjg7pvRbAI6l1ajs5tK+HuG8MDDnLZR1PPpN91VcYp9WpnnZRwz3g7FW2ARdUyvsz6Ec0wT+XXmx20YU=
+	t=1730975214; cv=none; b=Oqv1qIVeGGdveXfzY4Rd7dZS5hy8xE3Ny9+ASx1oqqPiLjobK348imrht9kIdxnCvJPw9AeRMRpGiJBsyubFWcJd26NIBmeW2zv4vsoKO2s4pMruwfR/clhWUkzduwWKQ/ytJeYAuGfOF9m+4qLhPa5iIcsiSV8QFfi1HT5qeIc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730954312; c=relaxed/simple;
-	bh=zMXTRqRBuZZMWyspIeaUYuiuLtF3opIWBYFLpPk76rc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PAAggqXxfGoOnXLN6E0bH2RL31BSWc/mv2re/t1xfx/QlwAfQOaLCYjdOn8DN0fx3XY+GLLq9iLgFVs3SBpGLz+F/BFxWN11uINXovL0IuExUeBD50Td+ESYSQNlW/X7KWt1A9cueKO0JaS6D+Lm24HLHFcY7Qw2BQHSpkXXIEg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=YYDYDQV3; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1730975214; c=relaxed/simple;
+	bh=VT4q4C1x60QPt7JBu0uwbFnsZDAvT9gavFOHNAcZM8o=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=O+awBg796tF+7dQmu4VMVyUsvZx0yBIuCFNHqR5AcXu0u0FRg0Z9crOzZlwAaPNbHQLw65D11Xa1u8GtpqeSCUBntf8CJoTWyBPC9RjdRmFBnnGBRMLXV4SJ5eveqzhn17npW7zUXwNtXQI9+BW1oj2deXI8vi2xKJEsFq13wrA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=o5kT0hYY; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="YYDYDQV3"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B1757C4CECC;
-	Thu,  7 Nov 2024 04:38:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1730954312;
-	bh=zMXTRqRBuZZMWyspIeaUYuiuLtF3opIWBYFLpPk76rc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=YYDYDQV3+24xqsQ7rT6aWD71802w00pQMPxC0sboTIaK3Ipv9inOTDIYLJumur+6A
-	 MAe7Sa0SMqsp0lnMJVXRde0fE6yFbakiFvJ1KZchO+dWnPLm+qRmNccoP1/SQdy55V
-	 aL/tDMFJSQr8sX2wBd1/53UJh0AQILqHb7zsQhKk=
-Date: Thu, 7 Nov 2024 05:38:13 +0100
-From: Greg KH <gregkh@linuxfoundation.org>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Salvatore Bonaccorso <carnil@debian.org>,
-	Thorsten Leemhuis <regressions@leemhuis.info>,
-	Mike <user.service2016@gmail.com>,
-	"stable@vger.kernel.org" <stable@vger.kernel.org>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	linux-bluetooth@vger.kernel.org,
-	Paul Menzel <pmenzel@molgen.mpg.de>,
-	Sasha Levin <sashal@kernel.org>,
-	Jeremy =?iso-8859-1?Q?Lain=E9?= <jeremy.laine@m4x.org>,
-	Linux regressions mailing list <regressions@lists.linux.dev>
-Subject: Re: Bluetooth kernel BUG with Intel AX211 (regression in 6.1.83)
-Message-ID: <2024110703-subsoil-jasmine-fcaa@gregkh>
-References: <c09d4f5b-0c4b-4f57-8955-28a963cc7e16@leemhuis.info>
- <2024061258-boxy-plaster-7219@gregkh>
- <d5aa11c9-6326-4096-9c29-d9f0d11f83b4@leemhuis.info>
- <ZyMkvAkZXuoTHFtd@eldamar.lan>
- <ab5e25d8-3381-452e-ad13-5d65c0e12306@leemhuis.info>
- <CABBYNZKQAJGzA8th8A7Foiy7YaSFZDpLvLZqDFsVJ3Yzn8C_5g@mail.gmail.com>
- <Zypwz65wRM-FMXte@eldamar.lan>
- <2024110652-blooming-deck-f0d9@gregkh>
- <Zysdc3wJy0jAYHzA@eldamar.lan>
- <CABBYNZKz_5bnBxrBC3SoaGc1MTXXYsgdOXB42B0x+2dcPRkJyw@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="o5kT0hYY"
+Received: from pps.filterd (m0279869.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4A77DjRo013243
+	for <linux-bluetooth@vger.kernel.org>; Thu, 7 Nov 2024 10:26:51 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=qcppdkim1; bh=U0IrQDChLltqkgsiHLGIPB
+	mUGzfB54eKwuI69P+0AVE=; b=o5kT0hYY6ewSB/t22BqYn5SdVwZqpv/Z4717M7
+	+kHqjkAKMzObE6A3iyQI7Jcs8WAUltbGV9W8gb2jkOc+aarVW5mOI1IzYyW1Hu2d
+	Ncty7TBau86BBFPYjOB3doVjD0YlS1BxN59Pe5rN061mbkewpzngY+Bs85zRHxxS
+	ywLKru+md/IJu5V13OcOBnJ8LSlS07XJsBFN+jt5fSvhJ/asuFv/5z01qUkcaZGW
+	pV9Mut8+Zpi+3cqy82nqY6ROTCbUVGF53JtFzD7wmJJO5YClhzdH0yi4okKi+2lO
+	wFgQrs6SP+tqJldJo3rzTmdfDGcRkMY19IVtUW1Rf8yD9vJQ==
+Received: from nalasppmta02.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 42qp2rwxwv-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <linux-bluetooth@vger.kernel.org>; Thu, 07 Nov 2024 10:26:51 +0000 (GMT)
+Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
+	by NALASPPMTA02.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 4A7AQoZv021882
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <linux-bluetooth@vger.kernel.org>; Thu, 7 Nov 2024 10:26:50 GMT
+Received: from hu-dgangire-hyd.qualcomm.com (10.80.80.8) by
+ nalasex01c.na.qualcomm.com (10.47.97.35) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.9; Thu, 7 Nov 2024 02:26:48 -0800
+From: <quic_dgangire@quicinc.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: <quic_mohamull@quicinc.com>, <quic_hbandi@quicinc.com>,
+        <quic_anubhavg@quicinc.com>
+Subject: [PATCH BlueZ v6] obexd: Add system bus support for obexd
+Date: Thu, 7 Nov 2024 15:56:28 +0530
+Message-ID: <20241107102628.537015-1-quic_dgangire@quicinc.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CABBYNZKz_5bnBxrBC3SoaGc1MTXXYsgdOXB42B0x+2dcPRkJyw@mail.gmail.com>
+Content-Type: text/plain
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nalasex01c.na.qualcomm.com (10.47.97.35)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: hkJ44M0H9vvNrEaAPWcZNUb8RE7K43nN
+X-Proofpoint-ORIG-GUID: hkJ44M0H9vvNrEaAPWcZNUb8RE7K43nN
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
+ definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 clxscore=1015
+ bulkscore=0 priorityscore=1501 impostorscore=0 lowpriorityscore=0
+ mlxlogscore=999 suspectscore=0 spamscore=0 mlxscore=0 phishscore=0
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2409260000 definitions=main-2411070080
 
-On Wed, Nov 06, 2024 at 10:02:40AM -0500, Luiz Augusto von Dentz wrote:
-> Hi Salvatore,
-> 
-> On Wed, Nov 6, 2024 at 2:40 AM Salvatore Bonaccorso <carnil@debian.org> wrote:
-> >
-> > Hi Greg,
-> >
-> > On Wed, Nov 06, 2024 at 08:26:05AM +0100, Greg KH wrote:
-> > > On Tue, Nov 05, 2024 at 08:23:59PM +0100, Salvatore Bonaccorso wrote:
-> > > > Hi Luiz,
-> > > >
-> > > > On Tue, Nov 05, 2024 at 12:53:50PM -0500, Luiz Augusto von Dentz wrote:
-> > > > > Hi,
-> > > > >
-> > > > > On Tue, Nov 5, 2024 at 12:29 PM Thorsten Leemhuis
-> > > > > <regressions@leemhuis.info> wrote:
-> > > > > >
-> > > > > > On 31.10.24 07:33, Salvatore Bonaccorso wrote:
-> > > > > > > On Tue, Jun 18, 2024 at 12:30:18PM +0200, Thorsten Leemhuis wrote:
-> > > > > > >> On 12.06.24 14:04, Greg KH wrote:
-> > > > > > >>> On Thu, Jun 06, 2024 at 12:18:18PM +0200, Thorsten Leemhuis wrote:
-> > > > > > >>>> On 03.06.24 22:03, Mike wrote:
-> > > > > > >>>>> On 29.05.24 11:06, Thorsten Leemhuis wrote:
-> > > > > > >>>>> [...]
-> > > > > > >>>>> I understand that 6.9-rc5[1] worked fine, but I guess it will take some
-> > > > > > >>>>> time to be
-> > > > > > >>>>> included in Debian stable, so having a patch for 6.1.x will be much
-> > > > > > >>>>> appreciated.
-> > > > > > >>>>> I do not have the time to follow the vanilla (latest) release as is
-> > > > > > >>>>> likely the case for
-> > > > > > >>>>> many other Linux users.
-> > > > > > >>>>>
-> > > > > > >>>> Still no reaction from the bluetooth developers. Guess they are busy
-> > > > > > >>>> and/or do not care about 6.1.y. In that case:
-> > > > > > >>>>
-> > > > > > >>>> @Greg: do you might have an idea how the 6.1.y commit a13f316e90fdb1
-> > > > > > >>>> ("Bluetooth: hci_conn: Consolidate code for aborting connections") might
-> > > > > > >>>> cause this or if it's missing some per-requisite? If not I wonder if
-> > > > > > >>>> reverting that patch from 6.1.y might be the best move to resolve this
-> > > > > > >>>> regression. Mike earlier in
-> > > > > > >>>> https://lore.kernel.org/all/c947e600-e126-43ea-9530-0389206bef5e@gmail.com/
-> > > > > > >>>> confirmed that this fixed the problem in tests. Jeremy (who started the
-> > > > > > >>>> thread and afaics has the same problem) did not reply.
-> > > > > > >>>
-> > > > > > >>> How was this reverted?  I get a bunch of conflicts as this commit was
-> > > > > > >>> added as a dependency of a patch later in the series.
-> > > > > > >>>
-> > > > > > >>> So if this wants to be reverted from 6.1.y, can someone send me the
-> > > > > > >>> revert that has been tested to work?
-> > > > > > >>
-> > > > > > >> Mike, can you help out here, as you apparently managed a revert earlier?
-> > > > > > >> Without you or someone else submitting a revert I fear this won't be
-> > > > > > >> resolved...
-> > > > > > >
-> > > > > > > Trying to reboostrap this, as people running 6.1.112 based kernel
-> > > > > > > seems still hitting the issue, but have not asked yet if it happens as
-> > > > > > > well for 6.114.
-> > > > > > >
-> > > > > > > https://bugs.debian.org/1086447
-> > > > > > >
-> > > > > > > Mike, since I guess you are still as well affected as well, does the
-> > > > > > > issue trigger on 6.1.114 for you and does reverting changes from
-> > > > > > > a13f316e90fdb1 still fix the issue? Can you send your
-> > > > > > > backport/changes?
-> > > > > >
-> > > > > > Hmmm, no reply. Is there maybe someone in that bug that could create and
-> > > > > > test a new revert to finally get this resolved upstream? Seem we
-> > > > > > otherwise are kinda stuck here.
-> > > > >
-> > > > > Looks like we didn't tag things like 5af1f84ed13a ("Bluetooth:
-> > > > > hci_sync: Fix UAF on hci_abort_conn_sync") and a239110ee8e0
-> > > > > ("Bluetooth: hci_sync: always check if connection is alive before
-> > > > > deleting") that are actually fixes to a13f316e90fdb1.
-> > > >
-> > > > Ah good I see :). None of those were yet applied to the 6.1.y series
-> > > > were the issue is still presend. Would you be up to provide the needed
-> > > > changes to the stable team?  That would be very much appreciated for
-> > > > those affected running the 6.1.y series.
-> > >
-> > > We would need backports for these as they do not apply cleanly :(
-> >
-> > Looks our mails overlapped, yes came to the same conclusion as I tried
-> > to apply them on top of 6.1.y. I hope Luiz can help here.
-> >
-> > We have defintively users in Debian affected by this, and two
-> > confirmed that using a newer kernel which contains naturally those
-> > fixes do not expose the problem. If we have backports I might be able
-> > to convice those affected users to test our 6.1.115-1 + patches to
-> > verify the issue is gone.
-> 
-> Then perhaps it is easier to just revert that change?
+From: Damodar Reddy GangiReddy <quic_dgangire@quicinc.com>
 
-Please send a revert then.
+Currently obexd uses session bus.
+Distros  where session bus is not supported and still obex profiles
+are required in that case use system bus instead of session bus
+which can be configured at run time.
 
-thanks,
+An Command line option has been added to achieve it.
+{ "system-bus", 's', 0, G_OPTION_ARG_NONE, &option_system_bus,
+"Use System bus "}
 
-greg k-h
+we can use option obexd -s to use system bus.
+
+---
+ Makefile.am             |  6 +++++-
+ obexd/client/ftp.c      |  3 ++-
+ obexd/client/map.c      |  3 ++-
+ obexd/client/opp.c      |  3 ++-
+ obexd/client/pbap.c     |  3 ++-
+ obexd/client/session.c  |  3 ++-
+ obexd/client/sync.c     |  3 ++-
+ obexd/plugins/pcsuite.c |  2 +-
+ obexd/src/main.c        | 25 +++++++++++++++++++++++++
+ obexd/src/manager.c     |  2 +-
+ obexd/src/obex.conf     | 28 ++++++++++++++++++++++++++++
+ obexd/src/obexd.h       |  5 +++++
+ 12 files changed, 77 insertions(+), 9 deletions(-)
+ create mode 100644 obexd/src/obex.conf
+
+diff --git a/Makefile.am b/Makefile.am
+index f639f7f8b..297d0774c 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -39,6 +39,10 @@ if DATAFILES
+ dbusdir = $(DBUS_CONFDIR)/dbus-1/system.d
+ dbus_DATA = src/bluetooth.conf
+ 
++if OBEX
++dbus_DATA += obexd/src/obex.conf
++endif
++
+ conf_DATA = src/main.conf
+ conf_DATA += profiles/input/input.conf
+ conf_DATA += profiles/network/network.conf
+@@ -421,7 +425,7 @@ manual_pages += doc/org.bluez.obex.Client.5 doc/org.bluez.obex.Session.5 \
+ 
+ EXTRA_DIST += src/genbuiltin src/bluetooth.conf \
+ 			src/main.conf profiles/network/network.conf \
+-			profiles/input/input.conf
++			profiles/input/input.conf obexd/src/obex.conf
+ 
+ test_scripts =
+ unit_tests =
+diff --git a/obexd/client/ftp.c b/obexd/client/ftp.c
+index 160e0636a..b61f5bb87 100644
+--- a/obexd/client/ftp.c
++++ b/obexd/client/ftp.c
+@@ -19,6 +19,7 @@
+ #include "gdbus/gdbus.h"
+ 
+ #include "obexd/src/log.h"
++#include "obexd/src/obexd.h"
+ #include "transfer.h"
+ #include "session.h"
+ #include "driver.h"
+@@ -463,7 +464,7 @@ int ftp_init(void)
+ 
+ 	DBG("");
+ 
+-	conn = dbus_bus_get(DBUS_BUS_SESSION, NULL);
++	conn = obex_get_dbus_connection();
+ 	if (!conn)
+ 		return -EIO;
+ 
+diff --git a/obexd/client/map.c b/obexd/client/map.c
+index 513dcaf14..29b0ed96e 100644
+--- a/obexd/client/map.c
++++ b/obexd/client/map.c
+@@ -27,6 +27,7 @@
+ #include "gdbus/gdbus.h"
+ 
+ #include "obexd/src/log.h"
++#include "obexd/src/obexd.h"
+ #include "obexd/src/map_ap.h"
+ #include "map-event.h"
+ 
+@@ -2063,7 +2064,7 @@ int map_init(void)
+ 
+ 	DBG("");
+ 
+-	conn = dbus_bus_get(DBUS_BUS_SESSION, NULL);
++	conn = obex_get_dbus_connection();
+ 	if (!conn)
+ 		return -EIO;
+ 
+diff --git a/obexd/client/opp.c b/obexd/client/opp.c
+index 90d0c0c8e..c22e919ba 100644
+--- a/obexd/client/opp.c
++++ b/obexd/client/opp.c
+@@ -17,6 +17,7 @@
+ #include "gdbus/gdbus.h"
+ 
+ #include "obexd/src/log.h"
++#include "obexd/src/obexd.h"
+ 
+ #include "transfer.h"
+ #include "session.h"
+@@ -178,7 +179,7 @@ int opp_init(void)
+ 
+ 	DBG("");
+ 
+-	conn = dbus_bus_get(DBUS_BUS_SESSION, NULL);
++	conn = obex_get_dbus_connection();
+ 	if (!conn)
+ 		return -EIO;
+ 
+diff --git a/obexd/client/pbap.c b/obexd/client/pbap.c
+index 2d2aa9508..bc3fdcf9f 100644
+--- a/obexd/client/pbap.c
++++ b/obexd/client/pbap.c
+@@ -27,6 +27,7 @@
+ #include "gdbus/gdbus.h"
+ 
+ #include "obexd/src/log.h"
++#include "obexd/src/obexd.h"
+ 
+ #include "transfer.h"
+ #include "session.h"
+@@ -1303,7 +1304,7 @@ int pbap_init(void)
+ 
+ 	DBG("");
+ 
+-	conn = dbus_bus_get(DBUS_BUS_SESSION, NULL);
++	conn = obex_get_dbus_connection();
+ 	if (!conn)
+ 		return -EIO;
+ 
+diff --git a/obexd/client/session.c b/obexd/client/session.c
+index 13a834e14..2770b9261 100644
+--- a/obexd/client/session.c
++++ b/obexd/client/session.c
+@@ -27,6 +27,7 @@
+ #include "gobex/gobex.h"
+ 
+ #include "obexd/src/log.h"
++#include "obexd/src/obexd.h"
+ #include "transfer.h"
+ #include "session.h"
+ #include "driver.h"
+@@ -591,7 +592,7 @@ struct obc_session *obc_session_create(const char *source,
+ 	if (driver == NULL)
+ 		return NULL;
+ 
+-	conn = dbus_bus_get(DBUS_BUS_SESSION, NULL);
++	conn = obex_get_dbus_connection();
+ 	if (conn == NULL)
+ 		return NULL;
+ 
+diff --git a/obexd/client/sync.c b/obexd/client/sync.c
+index 92faf4434..fe70b9135 100644
+--- a/obexd/client/sync.c
++++ b/obexd/client/sync.c
+@@ -21,6 +21,7 @@
+ #include "gdbus/gdbus.h"
+ 
+ #include "obexd/src/log.h"
++#include "obexd/src/obexd.h"
+ 
+ #include "transfer.h"
+ #include "session.h"
+@@ -224,7 +225,7 @@ int sync_init(void)
+ 
+ 	DBG("");
+ 
+-	conn = dbus_bus_get(DBUS_BUS_SESSION, NULL);
++	conn = obex_get_dbus_connection();
+ 	if (!conn)
+ 		return -EIO;
+ 
+diff --git a/obexd/plugins/pcsuite.c b/obexd/plugins/pcsuite.c
+index 07c444ff2..1755ffbbb 100644
+--- a/obexd/plugins/pcsuite.c
++++ b/obexd/plugins/pcsuite.c
+@@ -322,7 +322,7 @@ static gboolean send_backup_dbus_message(const char *oper,
+ 
+ 	file_size = size ? *size : 0;
+ 
+-	conn = g_dbus_setup_bus(DBUS_BUS_SESSION, NULL, NULL);
++	conn = obex_setup_dbus_connection(NULL, NULL);
+ 
+ 	if (conn == NULL)
+ 		return FALSE;
+diff --git a/obexd/src/main.c b/obexd/src/main.c
+index 151574afa..f0b85672e 100644
+--- a/obexd/src/main.c
++++ b/obexd/src/main.c
+@@ -41,6 +41,8 @@
+ #define DEFAULT_CAP_FILE CONFIGDIR "/capability.xml"
+ 
+ static GMainLoop *main_loop = NULL;
++static DBusConnection *connection;
++
+ 
+ static gboolean signal_handler(GIOChannel *channel, GIOCondition cond,
+ 							gpointer user_data)
+@@ -126,6 +128,7 @@ static char *option_noplugin = NULL;
+ 
+ static gboolean option_autoaccept = FALSE;
+ static gboolean option_symlinks = FALSE;
++static gboolean option_system_bus = FALSE;
+ 
+ static gboolean parse_debug(const char *key, const char *value,
+ 				gpointer user_data, GError **error)
+@@ -164,6 +167,8 @@ static const GOptionEntry options[] = {
+ 				"scripts", "FILE" },
+ 	{ "auto-accept", 'a', 0, G_OPTION_ARG_NONE, &option_autoaccept,
+ 				"Automatically accept push requests" },
++	{ "system-bus", 's', 0, G_OPTION_ARG_NONE, &option_system_bus,
++				"Use System bus "},
+ 	{ NULL },
+ };
+ 
+@@ -227,6 +232,26 @@ static gboolean root_folder_setup(char *root, char *root_setup)
+ 	return is_dir(root);
+ }
+ 
++DBusConnection *obex_get_dbus_connection(void)
++{
++	if (!connection)
++		connection = dbus_bus_get(option_system_bus ?
++				DBUS_BUS_SYSTEM : DBUS_BUS_SESSION, NULL);
++
++	return connection;
++}
++
++DBusConnection *obex_setup_dbus_connection(const char *name,
++					DBusError *error)
++{
++	DBusConnection *connection =
++		g_dbus_setup_bus(option_system_bus ?
++				DBUS_BUS_SYSTEM : DBUS_BUS_SESSION,
++				name, error);
++
++	return connection;
++}
++
+ int main(int argc, char *argv[])
+ {
+ 	GOptionContext *context;
+diff --git a/obexd/src/manager.c b/obexd/src/manager.c
+index 3c0c2a7cc..5a6fd9b4b 100644
+--- a/obexd/src/manager.c
++++ b/obexd/src/manager.c
+@@ -488,7 +488,7 @@ gboolean manager_init(void)
+ 
+ 	dbus_error_init(&err);
+ 
+-	connection = g_dbus_setup_bus(DBUS_BUS_SESSION, OBEXD_SERVICE, &err);
++	connection = obex_setup_dbus_connection(OBEXD_SERVICE, &err);
+ 	if (connection == NULL) {
+ 		if (dbus_error_is_set(&err) == TRUE) {
+ 			fprintf(stderr, "%s\n", err.message);
+diff --git a/obexd/src/obex.conf b/obexd/src/obex.conf
+new file mode 100644
+index 000000000..114bdb882
+--- /dev/null
++++ b/obexd/src/obex.conf
+@@ -0,0 +1,28 @@
++<!-- This configuration file specifies the required security policies
++     for Bluetooth core daemon to work. -->
++
++<!DOCTYPE busconfig PUBLIC "-//freedesktop//DTD D-BUS Bus Configuration 1.0//EN"
++ "http://www.freedesktop.org/standards/dbus/1.0/busconfig.dtd">
++<busconfig>
++
++  <!-- ../system.conf have denied everything, so we just punch some holes -->
++
++  <policy user="root">
++    <allow own="org.bluez.obex"/>
++    <allow send_destination="org.bluez.obex"/>
++    <allow send_interface="org.bluez.obex.Agent1"/>
++    <allow send_interface="org.bluez.obex.Client1"/>
++    <allow send_interface="org.bluez.obex.Session1"/>
++    <allow send_interface="org.bluez.obex.Transfer1"/>
++    <allow send_interface="org.bluez.obex.ObjectPush1"/>
++    <allow send_interface="org.bluez.obex.PhonebookAccess1"/>
++    <allow send_interface="org.bluez.obex.Synchronization1"/>
++    <allow send_interface="org.bluez.obex.MessageAccess1"/>
++    <allow send_interface="org.bluez.obex.Message1"/>
++  </policy>
++
++  <policy context="default">
++    <allow send_destination="org.bluez.obex"/>
++  </policy>
++
++</busconfig>
+diff --git a/obexd/src/obexd.h b/obexd/src/obexd.h
+index af5265da5..5e5edc4de 100644
+--- a/obexd/src/obexd.h
++++ b/obexd/src/obexd.h
+@@ -8,6 +8,8 @@
+  *
+  */
+ 
++#include <dbus/dbus.h>
++
+ #define OBEX_OPP	(1 << 1)
+ #define OBEX_FTP	(1 << 2)
+ #define OBEX_BIP	(1 << 3)
+@@ -28,3 +30,6 @@ gboolean obex_option_auto_accept(void);
+ const char *obex_option_root_folder(void);
+ gboolean obex_option_symlinks(void);
+ const char *obex_option_capability(void);
++DBusConnection *obex_get_dbus_connection(void);
++DBusConnection *obex_setup_dbus_connection(const char *name,
++					DBusError *error);
+-- 
+2.34.1
+
