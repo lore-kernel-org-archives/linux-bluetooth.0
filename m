@@ -1,37 +1,38 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35F372170A3
-	for <linux-bluetooth@vger.kernel.org>; Thu,  7 Nov 2024 19:05:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97841194C92
+	for <linux-bluetooth@vger.kernel.org>; Thu,  7 Nov 2024 20:46:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731006334; cv=none; b=AgaqvyBcdPrJyE95y5GJwBkeDKm0nv8wg7lCTDrOGQ94+w9I24NKxDkH3FFlYOSA5eFGQtzw+Wzyg5oB6a+5hLJo4cwmw6ZbB6Ib+BnT7gVvughulwV7LCZatvsXttC2KXO3GJp7Lx8RkJOCIZGi0ZiT4TFMl9974go62K9NqT8=
+	t=1731012392; cv=none; b=uFBjF2yWphnwMOBHZlMC2HBLL7uvUVGUiWNIkoJIzk7NGYhYApFiAEwnHm0fXDF7FYD4vXPTBWXo0+xN5G4Ek0PxeFNAQFonLPiUjHJykWKoKOS23vnPeX4CweUwUMPGhTPYZYlIVR+jPEfTEaKxZYwEu2Pv3/EBr2IwWlzSyPo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731006334; c=relaxed/simple;
-	bh=BMogcKNqOphXUnaoSSp4R01LUNTH/nCn3OHoWxi5eu8=;
+	s=arc-20240116; t=1731012392; c=relaxed/simple;
+	bh=VX/jQUtPgqZ/dAH1VUpmtjkaR1j2ypc0WJiBHNrXHY0=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=LavEt7SwbolIYvt+tvKWVCZDIAzpICGLqdzFsFi7HQwSKvStwtv1uzUekwgCNZyEyDy0pBG8OKSY9JA/oeGHTVskVNtkwUr4DYGNwaayZKkwMPg4Kpj5Rs5FYQD4VOEN42xb0lXfTeevqUwtNT1IC9K3pffHuEXhXg5mumkbzUg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aI6dfcxy; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:MIME-Version; b=j3V1Nbj4P1c+xmOpaCow0WVE8jiyGP1TuojCdRvTs1qV/COn+jGT2te8h7vwmroYTdQKkfGXS7mjGlSBOwPCVUmrVpJhvgAXAncVCUt/e/OcWRNdVFemdqufCyzco6+d/SAepDsWUiHdqkb+nBOCMWMMvIXvr98CepD9L8+ocoo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=P82KpZmo; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aI6dfcxy"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 17660C4CED3
-	for <linux-bluetooth@vger.kernel.org>; Thu,  7 Nov 2024 19:05:34 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="P82KpZmo"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 14E6AC4CED3
+	for <linux-bluetooth@vger.kernel.org>; Thu,  7 Nov 2024 20:46:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1731006334;
-	bh=BMogcKNqOphXUnaoSSp4R01LUNTH/nCn3OHoWxi5eu8=;
+	s=k20201202; t=1731012392;
+	bh=VX/jQUtPgqZ/dAH1VUpmtjkaR1j2ypc0WJiBHNrXHY0=;
 	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=aI6dfcxyRwg8+ofev7oeygegcvJ4wIzbaK0bypa9Au4QENw8jNXjB/1il6cYuKp3L
-	 gs9nYky6JGsGv+kH4GwVKtG5H1wKCZAd5CtA22y0ikhCCTxFqiMPR3/vgy/dOHVQ1J
-	 mNajsm3pU0bHRt7weUtR5dunyODZY9N5fgCCLrJJBtf86ptZM9/13bNRHUZOpB0O8q
-	 hX7NUKP7TqISj8YV00Cz2fC3ZolLezUwm4L8nXZzbQ2ubfrC4Qh4hUwaWEywne8oZW
-	 b3tJeQQWx43DCUR31lWfoPeA4KQukFugG2HG8kAwldzy4KiapJCMlUOzS3WFgDXWAs
-	 pBxzj1vQ4WAhQ==
+	b=P82KpZmo1sm7m766wSTy7Uhg6ffgfMf7+fWWLor4Z9Xf/PWk/Z2tPBmyNNpxwdYlu
+	 7xU1NdgR8QpSoU3szBFHWjPfG0xyK64ZXAhhf2L4uicib2UQnsvtoTfhLzyyukNh8p
+	 KKRgSlzpYLYk0WV+xkB9pQGzP3jeayqENejNDqtWd6P5IBHkFmaOQPa7ELFLIZFaF5
+	 cI5ejEZPadhnhauJpG0Vwvl3DhkmBehAKeokrzfiBdyIk0czYWh8AB2b6PhWz2Ay/b
+	 Jbf0gntgglZJcWN7eLuf+BbQjEr7XN3dxMxcAp+A8NG1zheMa/mkc6NUm4MRkDuBw/
+	 uhunRFblzR7ow==
 Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id 0C7C6C53BC9; Thu,  7 Nov 2024 19:05:34 +0000 (UTC)
+	id 0A535C53BC7; Thu,  7 Nov 2024 20:46:32 +0000 (UTC)
 From: bugzilla-daemon@kernel.org
 To: linux-bluetooth@vger.kernel.org
-Subject: [Bug 219481] Buffer overflow vulnerability in btusb_write()
-Date: Thu, 07 Nov 2024 19:05:33 +0000
+Subject: [Bug 219458] bluetooth connection fails after L2CAP: Fix uaf in
+ l2cap_connect patch
+Date: Thu, 07 Nov 2024 20:46:31 +0000
 X-Bugzilla-Reason: AssignedTo
 X-Bugzilla-Type: changed
 X-Bugzilla-Watch-Reason: None
@@ -40,16 +41,16 @@ X-Bugzilla-Component: Bluetooth
 X-Bugzilla-Version: 2.5
 X-Bugzilla-Keywords: 
 X-Bugzilla-Severity: normal
-X-Bugzilla-Who: aros@gmx.com
-X-Bugzilla-Status: RESOLVED
-X-Bugzilla-Resolution: INVALID
+X-Bugzilla-Who: ghibo@mageia.org
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
 X-Bugzilla-Priority: P3
 X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
 X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-219481-62941-SkWXab6SbY@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-219481-62941@https.bugzilla.kernel.org/>
-References: <bug-219481-62941@https.bugzilla.kernel.org/>
+X-Bugzilla-Changed-Fields: attachments.created
+Message-ID: <bug-219458-62941-RxxXiLiIDU@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-219458-62941@https.bugzilla.kernel.org/>
+References: <bug-219458-62941@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-Bugzilla-URL: https://bugzilla.kernel.org/
@@ -61,15 +62,12 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D219481
+https://bugzilla.kernel.org/show_bug.cgi?id=3D219458
 
---- Comment #2 from Artem S. Tashkinov (aros@gmx.com) ---
-The only reference to this function that google finds is=20
-
-http://www.datashed.science/misc/bcm/gpl/broadcom-sdk-416L05/bcmdrivers/ope=
-nsource/char/btusb/impl1/src/btusb_dev.c
-
-This is not found in the current Linux kernel.
+--- Comment #2 from Giuseppe Ghib=C3=B2 (ghibo@mageia.org) ---
+Created attachment 307181
+  --> https://bugzilla.kernel.org/attachment.cgi?id=3D307181&action=3Dedit
+btmon output (connection working)
 
 --=20
 You may reply to this email to add a comment.
