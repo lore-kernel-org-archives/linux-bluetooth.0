@@ -1,65 +1,64 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 473CB1991BD;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BC8018B09;
 	Fri,  8 Nov 2024 16:55:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731084918; cv=none; b=GYUr/Te5x0kN4FZHW4bt0l7fB8uK34ypHyHea4Q06TiMr3YvbWVsLAiuNE/wi4C0xKyVi0OQ7hR8zQlgVbwHJttsISUnATflTacjQmhNizhsirPE6UpiWkSmj7BE1jYErBLpfbuqntJdIKHSqpxneSJGr7rgwbmDowIef3qDZSc=
+	t=1731084919; cv=none; b=uEpBcRoUzA/4InSzKwCysU56c695K/xHq5yjmevf4k6B3LLprh62LhLfMsbwwXm5VPOle60aocD1mWc24Gyh6epRSv0sIuxoQkUV+6enP54oNw04qQJOfctsvPrfgfzM6XZLA3ZZprmusQq/SUGjmcqGwGdsmLFj2lazJ/qKXlA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731084918; c=relaxed/simple;
-	bh=yDGibwZd8NUsG9TSW9LVB1DialBc85Qgux+fEkmxHPI=;
+	s=arc-20240116; t=1731084919; c=relaxed/simple;
+	bh=GRbln0yjS3KfimQEJ10yKUKgm3AFUkA3SiodUHiTHLI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rM+f3S8tl7iyPC3bCe/x4LHAalbp0uBLDo3NH67tLXc9fKFu3wESHUW9hBfHLKbyVk5qC962VS2Y6umVrAYh+QWiYRr4IwcJemmd9ijvfLlj3LylHdlY7c158CjVqapSao+El0lhy4Jb63nre26yPeWAOu1i87AZ1W+mkUyPvZs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=lSczsqL+; arc=none smtp.client-ip=192.198.163.15
+	 Content-Type:Content-Disposition:In-Reply-To; b=O0ZQs3jkgOLUW1Yk5HDTnTywrWcb0pwEw3Jk/e6F6Jm/Bd60MgsM4bK0N2mC3SdVkIMu9VRCfyfqH10X2OVutBZnuvWatub4pf3N921goyeD9pexuD3+m+wjpGFaJEE2yPjzt8g/SEGFNCuDuQp6MWKof60qjmH3LGVIpWUmSH8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=EBLAGAxL; arc=none smtp.client-ip=192.198.163.12
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="lSczsqL+"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="EBLAGAxL"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1731084916; x=1762620916;
+  t=1731084917; x=1762620917;
   h=date:from:to:cc:subject:message-id:references:
    mime-version:in-reply-to;
-  bh=yDGibwZd8NUsG9TSW9LVB1DialBc85Qgux+fEkmxHPI=;
-  b=lSczsqL+bLczkPxQ+kZpOTXJh+hUIBVrcsEDwoR5fi+N+MBNvX2uNtTu
-   9+W4cxeRrD3nVxpa0vl1eySZt/ELHXucDp4FR1bTVzSe62x/5eSaxjoHB
-   8UDVLFkYbElBQ7L/sJlGGakZc/9T/YK6TDa5zpxzj15+MFajs2KlLXD1v
-   esp4gvRr75ar59+EqjZ9vMprhKmfxs5BHRR44XQAW1P/SU92orETBuI8p
-   8N+QTtNRuyUgPurQd7RoJ0aT7fBpWhUdlaupB9D7vpmnRxX3jJsGW4KLo
-   ejKaKeytk3oj7SyqCLRmrqOuBq+vjHOw19wJ7+dt+BdNy04g2Vh+Z0CQO
+  bh=GRbln0yjS3KfimQEJ10yKUKgm3AFUkA3SiodUHiTHLI=;
+  b=EBLAGAxLfd2mmWdz+20zuYFS+eGJpvRvlL4Ah5rRAum6PkVmcOivxGVw
+   CeQfgHmky/lSoFOdmt16KeQSqbVTKUr+1i9opkb/OxcF9dqRkT4QqSPHI
+   jIrLVRLxxMZRiXyONA5vWD+UenqALaVbd38xRPhzghb4pRBoPByYydK2c
+   /LZQyVGZBxOWBkD6U730guI+NPaaR9jCipZwNHFkVCt0LXvMXZSVQ9bfe
+   rUD7AlH+6p2hhXWcFIAlzbYzuPxrI4fALEf6rhhZu4TDDl2s91rExTN3u
+   p2fOSRqGk82IwSlVFqaLSqXLm4csLndvWn77UtsEN6DwnTHN2E95xlv8Y
    Q==;
-X-CSE-ConnectionGUID: pB/FBPGOQseVDX5bm4FMNw==
-X-CSE-MsgGUID: 1m1+4Nk1T0mehO0xc2nKiQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11250"; a="31076724"
+X-CSE-ConnectionGUID: Pfj8QjQ3QTycB4C+jlfHcg==
+X-CSE-MsgGUID: Uce4qprUQmClkYFJaNVv5w==
+X-IronPort-AV: E=McAfee;i="6700,10204,11250"; a="34912879"
 X-IronPort-AV: E=Sophos;i="6.12,138,1728975600"; 
-   d="scan'208";a="31076724"
-Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Nov 2024 08:55:16 -0800
-X-CSE-ConnectionGUID: 2s+XMJX6R+i4Eoyc9eeVtw==
-X-CSE-MsgGUID: jJ1US8FUTL2U01oOJy8Jww==
+   d="scan'208";a="34912879"
+Received: from orviesa002.jf.intel.com ([10.64.159.142])
+  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Nov 2024 08:55:16 -0800
+X-CSE-ConnectionGUID: hJJjxcdOR4inBSjew0a91Q==
+X-CSE-MsgGUID: +6+VVZ+CQ3WT80Zew+oxTw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.12,138,1728975600"; 
-   d="scan'208";a="90256268"
+   d="scan'208";a="116466753"
 Received: from lkp-server01.sh.intel.com (HELO a48cf1aa22e8) ([10.239.97.150])
-  by fmviesa004.fm.intel.com with ESMTP; 08 Nov 2024 08:55:12 -0800
+  by orviesa002.jf.intel.com with ESMTP; 08 Nov 2024 08:55:12 -0800
 Received: from kbuild by a48cf1aa22e8 with local (Exim 4.96)
 	(envelope-from <lkp@intel.com>)
-	id 1t9SGL-000rco-2n;
+	id 1t9SGL-000rcq-2r;
 	Fri, 08 Nov 2024 16:55:09 +0000
-Date: Sat, 9 Nov 2024 00:54:46 +0800
+Date: Sat, 9 Nov 2024 00:54:54 +0800
 From: kernel test robot <lkp@intel.com>
 To: WangYuli <wangyuli@uniontech.com>, marcel@holtmann.org,
 	luiz.dentz@gmail.com, johan.hedberg@gmail.com,
 	matthias.bgg@gmail.com, hello@felixjara.me
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
+Cc: oe-kbuild-all@lists.linux.dev, linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
 	linux-mediatek@lists.infradead.org, guanwentao@uniontech.com,
 	zhanjun@uniontech.com, aaron.ma@canonical.com
 Subject: Re: [PATCH v3] Bluetooth: btusb: Add MT7925 support for ID
  0x13d3:0x3608
-Message-ID: <202411090003.bXXzsmNP-lkp@intel.com>
+Message-ID: <202411090012.ZFED5Eyp-lkp@intel.com>
 References: <D3E1285F7DBFAB3E+20241108082418.187499-1-wangyuli@uniontech.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -85,32 +84,24 @@ url:    https://github.com/intel-lab-lkp/linux/commits/WangYuli/Bluetooth-btusb-
 base:   https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git master
 patch link:    https://lore.kernel.org/r/D3E1285F7DBFAB3E%2B20241108082418.187499-1-wangyuli%40uniontech.com
 patch subject: [PATCH v3] Bluetooth: btusb: Add MT7925 support for ID 0x13d3:0x3608
-config: x86_64-buildonly-randconfig-002-20241108 (https://download.01.org/0day-ci/archive/20241109/202411090003.bXXzsmNP-lkp@intel.com/config)
-compiler: clang version 19.1.3 (https://github.com/llvm/llvm-project ab51eccf88f5321e7c60591c5546b254b6afab99)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20241109/202411090003.bXXzsmNP-lkp@intel.com/reproduce)
+config: x86_64-buildonly-randconfig-001-20241108 (https://download.01.org/0day-ci/archive/20241109/202411090012.ZFED5Eyp-lkp@intel.com/config)
+compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20241109/202411090012.ZFED5Eyp-lkp@intel.com/reproduce)
 
 If you fix the issue in a separate patch/commit (i.e. not just a new version of
 the same patch/commit), kindly add following tags
 | Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202411090003.bXXzsmNP-lkp@intel.com/
+| Closes: https://lore.kernel.org/oe-kbuild-all/202411090012.ZFED5Eyp-lkp@intel.com/
 
 All errors (new ones prefixed by >>):
 
-   In file included from drivers/bluetooth/btusb.c:17:
-   In file included from include/linux/suspend.h:5:
-   In file included from include/linux/swap.h:9:
-   In file included from include/linux/memcontrol.h:21:
-   In file included from include/linux/mm.h:2213:
-   include/linux/vmstat.h:518:36: warning: arithmetic between different enumeration types ('enum node_stat_item' and 'enum lru_list') [-Wenum-enum-conversion]
-     518 |         return node_stat_name(NR_LRU_BASE + lru) + 3; // skip "nr_"
-         |                               ~~~~~~~~~~~ ^ ~~~
->> drivers/bluetooth/btusb.c:651:12: error: use of undeclared identifier 'BTUSB_VALID_LE_STATES'
+>> drivers/bluetooth/btusb.c:651:54: error: 'BTUSB_VALID_LE_STATES' undeclared here (not in a function); did you mean 'BTUSB_INVALID_LE_STATES'?
      651 |                                                      BTUSB_VALID_LE_STATES },
-         |                                                      ^
-   1 warning and 1 error generated.
+         |                                                      ^~~~~~~~~~~~~~~~~~~~~
+         |                                                      BTUSB_INVALID_LE_STATES
 
 
-vim +/BTUSB_VALID_LE_STATES +651 drivers/bluetooth/btusb.c
+vim +651 drivers/bluetooth/btusb.c
 
    177	
    178	static const struct usb_device_id quirks_table[] = {
