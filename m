@@ -1,51 +1,51 @@
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD58855C29
-	for <linux-bluetooth@vger.kernel.org>; Mon, 11 Nov 2024 12:31:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B523F19F113
+	for <linux-bluetooth@vger.kernel.org>; Mon, 11 Nov 2024 12:55:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731328304; cv=none; b=ZR5+llV0MmHaxMZfa/XKezPcvlAdHowCjTlFFSqldIRqd1VuWnd47jZ2j5jMSjXTvnoGKwHiNIK6P3xLGNF5RB2qLAsc16Aah6mGii1si5/FGrMJTB67EM1gBxK2uN/OS2uyzvUF4D+6dWX7oo3wMBfrNSTljG5Th+qmdmlgMhw=
+	t=1731329734; cv=none; b=Tt8rRcqXGrMoeSXqDff01YaEgMZsiU4KcQLS7sWxqG18egnriTusfUISaQzpeM6mzWFI0TWvs4LkJRQmu/rVsSpvhjcQXWt8tTYDlQs2k6kLc4EesMQaBZQtOQu3oa1BYqOZ0v0LFkWA7fvQEildwPgCEKAwom9PJ+VhWT69Tag=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731328304; c=relaxed/simple;
-	bh=8bT+CA0r5j6kpOiOfcchQDOyCpVafm5lOwJ/yQa5t+A=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=EUZtdkagl36aNQumB8I3OZggv9shIMHsptdUrApUv+O4mjaAIA7+nuMqnc+T/1eJMftJxkb3wdDyeJ2OuV/xxfx6Q6GoZYaAJ0RTbEeu7g6Zg+Ws2N8yHJzKpsWCbcmXF2RTPGzDU2fCvnLxIrXRZhc+qUUmFOTApm3Eg7qnMlo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=hAP/YPw6; arc=none smtp.client-ip=205.220.180.131
+	s=arc-20240116; t=1731329734; c=relaxed/simple;
+	bh=Aw6XArLmsnlEJXalplei2dff3DGKkM4fxlReO9CUF3w=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=L9MI4j2i6RS6AZ2bCR4Uw/z9ALwD53AN5fGSLYcxbjU+UMztnj9ySH2AxtZdbCJNuKb0MB5upX6AToocomKdR0ta58aVbvtv/j4DzVRCOz2X9M0/NOLTdEsdVHLaHdDWNm2Itdzy8D83AHxqmS7JjqGzAOavZErbppRgF5Z+TeA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=Gaf6B8EP; arc=none smtp.client-ip=205.220.168.131
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="hAP/YPw6"
-Received: from pps.filterd (m0279873.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4AAMvrP5018965
-	for <linux-bluetooth@vger.kernel.org>; Mon, 11 Nov 2024 12:31:41 GMT
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="Gaf6B8EP"
+Received: from pps.filterd (m0279862.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4ABBmXMB000954
+	for <linux-bluetooth@vger.kernel.org>; Mon, 11 Nov 2024 12:55:32 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
 	cc:content-transfer-encoding:content-type:date:from:message-id
-	:mime-version:subject:to; s=qcppdkim1; bh=MPK1dfXQ+OWR0ExRWQqh8v
-	jUZJNiKzjoBQyK8OYiXd0=; b=hAP/YPw6+yLdNySP8k4tKUsD90ZTpcg85QN53d
-	92pgSLQv3kI24jFiTC6tz4GUQJGxd8LT5rjx0R3X0r5SM9B/ogD4TC5t6M77Yoze
-	7+8vHZREVo91d+SpQK1+vr0HTRVsGDT5Go+ui9QNvwLGAWRv/AyOz3QOyhrGGx7k
-	oZJq2XbSm11WTxThvk3zo2f7xgH1V0o3Kzinbn09cL5ZL6BFClgR9DxnFb8c9QNP
-	CECa+6N/apM5zNW2oJuaA+DTWDk37stikgGZjZj7SADo7ooZJ06I9tjSaVST1TND
-	Tn4XZqT3VR0CIxvasVir7ZluILxuVlTQ9C1d1r+v3QvLC68g==
-Received: from nasanppmta01.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 42sw3m4df1-1
+	:mime-version:subject:to; s=qcppdkim1; bh=TDTwirWrzIBfCeNQ4JrPCz
+	Q55M42I3MrvREdOWGkWss=; b=Gaf6B8EPbN5AlBG5gahhy9qsLNAYGiL8WiuaFI
+	F2TnGoNCOfIb43vPRf1FRw1Dfzc7vdDb/pQtS2f4vCmmPheqVMv91cx9fjmv5jcb
+	wQSe9R5CK2WiOukmEhHIdn9AJ90hoVK0HUMYbG8y206moQsdbuHe/hO7D9/thuLc
+	W4MWTg/XsqsKcu+aAHVvhlDen8zGUnGyhveuDEXBUuvY8vI2aIPiaHgBrMryNSfF
+	HJ/iuXescWfUKPSpkExB7J2t5hMvujb19+MNq5FI/Vxvl3SJULMGeTx0n7RML3Tp
+	gJyFDNht72GeeYOD4Pr5PVmJZS0crnxCnLRIayza7aK8ZfgA==
+Received: from nasanppmta02.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 42t0gkv5qv-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <linux-bluetooth@vger.kernel.org>; Mon, 11 Nov 2024 12:31:41 +0000 (GMT)
+	for <linux-bluetooth@vger.kernel.org>; Mon, 11 Nov 2024 12:55:31 +0000 (GMT)
 Received: from nasanex01c.na.qualcomm.com (nasanex01c.na.qualcomm.com [10.45.79.139])
-	by NASANPPMTA01.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 4ABCVehQ005567
+	by NASANPPMTA02.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 4ABCtVJ6005989
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <linux-bluetooth@vger.kernel.org>; Mon, 11 Nov 2024 12:31:40 GMT
+	for <linux-bluetooth@vger.kernel.org>; Mon, 11 Nov 2024 12:55:31 GMT
 Received: from hu-amisjain-hyd.qualcomm.com (10.80.80.8) by
  nasanex01c.na.qualcomm.com (10.45.79.139) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.9; Mon, 11 Nov 2024 04:31:38 -0800
+ 15.2.1544.9; Mon, 11 Nov 2024 04:55:29 -0800
 From: Amisha Jain <quic_amisjain@quicinc.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: <quic_mohamull@quicinc.com>, <quic_hbandi@quicinc.com>,
         <quic_anubhavg@quicinc.com>
-Subject: [PATCH v1] obex: Check for supported features bit value for legacy server
-Date: Mon, 11 Nov 2024 18:01:25 +0530
-Message-ID: <20241111123125.2034898-1-quic_amisjain@quicinc.com>
+Subject: [PATCH v1] obex: Add Newmissedcalls tag in PBAP GET response
+Date: Mon, 11 Nov 2024 18:25:18 +0530
+Message-ID: <20241111125518.2039073-1-quic_amisjain@quicinc.com>
 X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -55,60 +55,70 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
  nasanex01c.na.qualcomm.com (10.45.79.139)
 X-QCInternal: smtphost
 X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: GRH0tKy4jCRJpHfBMY3e-SBUY-DszJ_N
-X-Proofpoint-ORIG-GUID: GRH0tKy4jCRJpHfBMY3e-SBUY-DszJ_N
+X-Proofpoint-ORIG-GUID: 95LT1jBHOEsH44GMJCK4-ZY0nhq2AI5W
+X-Proofpoint-GUID: 95LT1jBHOEsH44GMJCK4-ZY0nhq2AI5W
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
  definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- lowpriorityscore=0 mlxscore=0 impostorscore=0 suspectscore=0 clxscore=1015
- spamscore=0 mlxlogscore=999 bulkscore=0 adultscore=0 malwarescore=0
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2409260000 definitions=main-2411110104
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 phishscore=0
+ spamscore=0 clxscore=1015 mlxscore=0 mlxlogscore=999 lowpriorityscore=0
+ impostorscore=0 adultscore=0 priorityscore=1501 malwarescore=0 bulkscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2409260000
+ definitions=main-2411110107
 
-This fix is required for below PTS testcase:
+This fix is required for passing below PTS testcases:
 
-1. PBAP/PCE/SSM/BV-10-C
-Description - Verify that the PCE does not share its
-PbapSupportedFeatures bits with a legacy server.
+1. PBAP/PSE/PBD/BV-05-C
+2. PBAP/PSE/PBD/BV-17-C
+3. PBAP/PSE/PBB/BV-11-C
 
-Incase of legacy server, check for 'supported features bit'
-uint_32_t value instead of directly checking the pointer
-holding the attribute.
-As pointer 'data' won't be null as PbapSupportedFeatures
-attribute is present in SDP record but it's value is zero.
+Even if the new missed calls value is zero, send it in GET response.
+As per the PBAP spec, it is mandatory to include Newmissedcalls
+tag in response incase of object name is 'mch.vcf' or 'cch.vcf'.
+It will be better to include it in all GET response.
 
 ---
- obexd/client/pbap.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ obexd/plugins/pbap.c | 10 ++++------
+ 1 file changed, 4 insertions(+), 6 deletions(-)
 
-diff --git a/obexd/client/pbap.c b/obexd/client/pbap.c
-index bc3fdcf9f..09d3fd425 100644
---- a/obexd/client/pbap.c
-+++ b/obexd/client/pbap.c
-@@ -1219,6 +1219,7 @@ static void *pbap_supported_features(struct obc_session *session)
- {
- 	const void *data;
- 	uint16_t version;
-+	uint32_t features;
+diff --git a/obexd/plugins/pbap.c b/obexd/plugins/pbap.c
+index 64641c798..74976890d 100644
+--- a/obexd/plugins/pbap.c
++++ b/obexd/plugins/pbap.c
+@@ -184,12 +184,11 @@ static void phonebook_size_result(const char *buffer, size_t bufsize,
  
- 	/* Version */
- 	data = obc_session_get_attribute(session, SDP_ATTR_PFILE_DESC_LIST);
-@@ -1233,7 +1234,9 @@ static void *pbap_supported_features(struct obc_session *session)
- 	/* Supported Feature Bits */
- 	data = obc_session_get_attribute(session,
- 					SDP_ATTR_PBAP_SUPPORTED_FEATURES);
--	if (!data)
-+
-+	features = *(uint32_t *) data;
-+	if (!features)
- 		return NULL;
+ 	if (missed > 0)	{
+ 		DBG("missed %d", missed);
++	}
  
- 	return g_obex_apparam_set_uint32(NULL, SUPPORTED_FEATURES_TAG,
+-		pbap->obj->apparam = g_obex_apparam_set_uint16(
+-							pbap->obj->apparam,
++	pbap->obj->apparam = g_obex_apparam_set_uint16(pbap->obj->apparam,
+ 							NEWMISSEDCALLS_TAG,
+ 							missed);
+-	}
+ 
+ 	obex_object_set_io_flags(pbap->obj, G_IO_IN, 0);
+ }
+@@ -223,12 +222,11 @@ static void query_result(const char *buffer, size_t bufsize, int vcards,
+ 		DBG("missed %d", missed);
+ 
+ 		pbap->obj->firstpacket = TRUE;
++	}
+ 
+-		pbap->obj->apparam = g_obex_apparam_set_uint16(
+-							pbap->obj->apparam,
++	pbap->obj->apparam = g_obex_apparam_set_uint16(pbap->obj->apparam,
+ 							NEWMISSEDCALLS_TAG,
+ 							missed);
+-	}
+ 
+ 	obex_object_set_io_flags(pbap->obj, G_IO_IN, 0);
+ }
 -- 
 2.34.1
 
