@@ -1,82 +1,546 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f46.google.com (mail-ot1-f46.google.com [209.85.210.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B466B1A254F
-	for <linux-bluetooth@vger.kernel.org>; Mon, 11 Nov 2024 16:10:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6237F19C569
+	for <linux-bluetooth@vger.kernel.org>; Mon, 11 Nov 2024 16:32:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731341425; cv=none; b=TFlGXrhUG5GShbDBBeaybu5y4QeREA/u4Yez+43K4aOUraMrIfjYIG8WhWk8oaVOynZRAEKszKGmIiv8+3C7v9QQo0IYHCgd3hgGoVsAWSlL5SF1TH1R65dSj1IlAMhYp6Z6r55PGPqgN3ejjUc1AGXMJQsMZFYojWpO0g89MVY=
+	t=1731342735; cv=none; b=PVBsqeEC9Zs3bY2E61H4s6S47cSyKAn1x0lORhecm7PflFvdgY3J/FxUOefJ/hq8Wff86CC4NPKZDO6ciYLK+zGGkY4cbfN5RCTLoAq3l9gJqykiXJPulcRYM14jfQUMUMPPQ0yOaLSN4/m5BB4c337fqWJ/zPyJvH9eH82QHQU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731341425; c=relaxed/simple;
-	bh=qpBRynZUz3qbREk3DVYGI7aoYXWk2WwJl9AJWGObZwc=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=ADsevkS1rOnDwjA2nyJQeTjp40zuPnxk+0fugF1Jw6F3qQeAeahOzKXyWh9Uy61JKxdJigNMl4AkN4Boq49tTfjROLizwILoh9BO3UPnnWqu/8WzXTxBf6VB+Kne2z5Xj45X/b5zR42y2s+/A3YWLv6sF8sPwx8Xerboh6hpCXE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VVp0YTEF; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1731342735; c=relaxed/simple;
+	bh=+BCIOXT/I7uM93UC7tt9A0P4cM6Pbeg86QmCodmUETM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=p5RvZI0+T4jPUuYhPGVex9cCiiVTOD7RBe0gbNB0fR1P5Yq6dYbaZb6ZDBNN7rbu74RJWPlTyNNH/O36K1TtbOGoYPDqf42BzOo65KdIj9OeuMOWFraPm6qAr1n2O6GpGOSIp2vdMw3qXo9hhGaR5TsQxNB7WEvansXIzzj6wFQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=f/S/QbOm; arc=none smtp.client-ip=209.85.210.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VVp0YTEF"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3C722C4CED6;
-	Mon, 11 Nov 2024 16:10:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1731341425;
-	bh=qpBRynZUz3qbREk3DVYGI7aoYXWk2WwJl9AJWGObZwc=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=VVp0YTEFSfI97p6+DxtMhprt575SrUWAmWhXh54malAp6y8LpLaQnkCW9JLTokr26
-	 GCWK7yhj5gTHC8Ng5Oh6bJdQwemrHNQUikI08xbPHpZiTCuz8dZAII9P14vNBxEA51
-	 j0bIjPLztoYWS4Y95ELffYmUnVzLdIFwYHM4zCIfkOm6YSAClh1rcoDVstu/AlPfQa
-	 URdeFrQtIunxTSArD6Mmc9WFQvzpPIHBWNF+f7RIICJ+7xAfVnS0yZPGkloSwqL+FK
-	 IBnQ9k8TE11MudLBzZ3gevoNCNKQwiG1yV0DvbHH2hmexHs5qBM/xsNAx0DopDQm7A
-	 EYbyXGFKys2/g==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 716D83809A80;
-	Mon, 11 Nov 2024 16:10:36 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="f/S/QbOm"
+Received: by mail-ot1-f46.google.com with SMTP id 46e09a7af769-7183a3f3beaso2497877a34.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 11 Nov 2024 08:32:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1731342732; x=1731947532; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=fHXA5z45c7Yg6iJ+/Eu/yNn4T/7zp+iU26SNLh6guMs=;
+        b=f/S/QbOmol41K3njX0p7HcE8u4/x8N9Sqy7gzKHUvdcsAWjl08M/hqf6c2+TmuHMos
+         7fjDOQpf/DXDscykUV6zfbXxqs56B91xzvpzuEQAdc5krX7srChsnF0S09bYWpN3QR/z
+         xypjFtdyT05/UDfnDtWaLNygCqPDv8a/ZOC9w8/usCzTde0aF4z6DU7ryr1PBQyWQUcD
+         zJ5cZxCTUNUIyTV0Zk2PIW5hXCbacyiYa5/dRDPXlwVTzN6IulZapLpgQk++WlJdru84
+         aPlji8L9pgBVX6ZERzFShzadd6dFnE7S0795HL3fXhjNnOextPJ2gU9/AmIFoLXzSpb4
+         BM+A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731342732; x=1731947532;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=fHXA5z45c7Yg6iJ+/Eu/yNn4T/7zp+iU26SNLh6guMs=;
+        b=cEwOCQqpRzVMsIbODPFAfXPrtIB3ib400dN6nRcm14rM4qeV2UO5xvi3J2L6/l2eYj
+         9lXRy76cF9wmTf/G33RBrbCtADSNwfdiDJ4wOaqXQomiVmQ6o0rYkAt+BtwWgr7HV9f2
+         wYGYW/lRIbDm3p17KPglqMeQR+wMGQWU+6YASM9wUywe18TrE8LowdQ76UUcJ1IUXR9y
+         QxeAQAeZZm4Z0MsI61H0z019RoADdSXJLxBhqHq/5z6fonckVG0DrjTjnLbD/MWemJ0f
+         1snl4Y9a5heFNvLJ5JiHylIfb9PsHyYeNkJOOtZziq5QC3fVMuH5Z3uUCdpqR6op584r
+         mmAw==
+X-Gm-Message-State: AOJu0YwkuHeDd247G06yvF/7WU/z5mttYv7MhbdV0UF8fWljxOrxO3Ii
+	kDvNA1E+GzzoNQ9kBSQc0wOCplTKQbnmW4VPsZkG/GW36W0gruxHa++PO9RYQ161mQUpOwlSUOf
+	UMwHnm8PPUnmmkzCMA4qJr/1sXdIuif9uuXY=
+X-Google-Smtp-Source: AGHT+IEPMpsq44gbo2Vi1HaxF7jDwaG7SLR+q4Qyiait77qDE29RGEo+7llfiykIYZEv1DMFMp88Vy+B7SCQgdXS1ek=
+X-Received: by 2002:a05:6830:d13:b0:718:9df:997f with SMTP id
+ 46e09a7af769-71a1c2307ddmr12306000a34.14.1731342732246; Mon, 11 Nov 2024
+ 08:32:12 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2 0/2] Bluetooth: ISO: PA/BIG sync fixes
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <173134143512.4081786.7823892458368075561.git-patchwork-notify@kernel.org>
-Date: Mon, 11 Nov 2024 16:10:35 +0000
-References: <20241111114708.10722-1-iulia.tanasescu@nxp.com>
-In-Reply-To: <20241111114708.10722-1-iulia.tanasescu@nxp.com>
-To: Iulia Tanasescu <iulia.tanasescu@nxp.com>
-Cc: linux-bluetooth@vger.kernel.org, claudia.rosu@nxp.com,
- mihai-octavian.urzica@nxp.com, andrei.istodorescu@nxp.com,
- luiz.dentz@gmail.com
+References: <20241111135250.2319622-1-yuxinwang9999@gmail.com> <CABBYNZKoDQxd9__tzZVeJwUQ0ZDQVRgRPG-XAvkoWqm+mVCp9Q@mail.gmail.com>
+In-Reply-To: <CABBYNZKoDQxd9__tzZVeJwUQ0ZDQVRgRPG-XAvkoWqm+mVCp9Q@mail.gmail.com>
+From: Yuxin Wang <yuxinwang9999@gmail.com>
+Date: Tue, 12 Nov 2024 00:32:52 +0800
+Message-ID: <CAPGQxBRbaj4tpciULLTKZ6h77FU3VT7shewa6u7-fbMJWwm4_Q@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] advertising: Add scan response properties to LEAdvertisement1
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hello:
+Hi Luiz,
 
-This series was applied to bluetooth/bluetooth-next.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+I would ideally like to use Extended Advertising (EA) as well.
+However, EA is an optional feature that not all BLE 5.0 devices
+support, such as the Raspberry Pi 4. For devices that do not support
+EA, including BLE 4.2 devices, using Scan Response Data is the only
+option to advertise more content.
 
-On Mon, 11 Nov 2024 13:47:06 +0200 you wrote:
-> This adds a fix for the following BUG message, caused by alloc
-> inside critical section in create_pa_sync:
-> 
-> BUG: sleeping function called from invalid context at
-> include/linux/sched/mm.h:321
-> 
-> This also adds a fix for the LE BIG create sync command, which
-> is sent dirrectly via hci_send_cmd, instead of being submitted
-> to the cmd_sync_work, causing ordering issues with other
-> commands.
-> 
-> [...]
+In my scenario, the advertising data is about 50 bytes. Therefore,
+using Scan Response Data is a reasonable solution to be compatible
+with all devices.
 
-Here is the summary with links:
-  - [v2,1/2] Bluetooth: hci_conn: Remove alloc from critical section
-    https://git.kernel.org/bluetooth/bluetooth-next/c/4b704b1b0afd
-  - [v2,2/2] Bluetooth: ISO: Send BIG Create Sync via hci_sync
-    https://git.kernel.org/bluetooth/bluetooth-next/c/f2da2b5cf76d
+I'm not sure how useful the Scan Response Data is, but there may be
+others looking for this feature:
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+- https://www.linux.org/threads/bluez-how-to-fully-use-adv-and-scan-resp-pa=
+ckets.53468/
+- https://github.com/bluez/bluez/issues/667
+
+The Scan Response Data is also mentioned in the Matter Core
+Specification, which states, "Note that if additional vendor-specific
+information is to be conveyed and does not fit within the Advertising
+Data, it may be included in the Scan Response Data."
+
+While advanced users may manipulate Scan Response Data via the
+Management Socket or btmgmt, these methods are less user-friendly.
+Setting Scan Response Data has already been implemented in the
+underlying code but has not yet been made accessible via DBus.
 
 
+On Mon, Nov 11, 2024 at 10:26=E2=80=AFPM Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+>
+> Hi Yuxin,
+>
+> On Mon, Nov 11, 2024 at 8:53=E2=80=AFAM Yuxin Wang <yuxinwang9999@gmail.c=
+om> wrote:
+> >
+> > This update introduces a few properties to org.bluez.LEAdvertisement1
+> > for manipulating Scan Response Data, similar to the existing properties
+> > for Advertising Data.
+>
+> Why would it matter if it's part of the scan data or not? Also ever
+> since the introduction of extended advertising (EA) these fields are
+> no longer separated so introducing these fields now is not really
+> solving any problem in my opinion.
+>
+> > Resolves: https://github.com/bluez/bluez/issues/667
+> > ---
+> >  doc/org.bluez.LEAdvertisement.rst |  37 ++++++++-
+> >  src/advertising.c                 | 132 ++++++++++++++++++++++--------
+> >  2 files changed, 130 insertions(+), 39 deletions(-)
+> >
+> > diff --git a/doc/org.bluez.LEAdvertisement.rst b/doc/org.bluez.LEAdvert=
+isement.rst
+> > index d3f9cc4..40be2ff 100644
+> > --- a/doc/org.bluez.LEAdvertisement.rst
+> > +++ b/doc/org.bluez.LEAdvertisement.rst
+> > @@ -75,13 +75,14 @@ dict ManufacturerData
+> >  array{string} SolicitUUIDs
+> >  ``````````````````````````
+> >
+> > -       Array of UUIDs to include in "Service Solicitation" Advertiseme=
+nt Data.
+> > +       List of UUIDs to include in the "Service Solicitation" field of=
+ the
+> > +       Advertising Data.
+> >
+> >  dict ServiceData
+> >  ````````````````
+> >
+> > -       Service Data elements to include. The keys are the UUID to asso=
+ciate
+> > -       with the data.
+> > +       Service Data elements to include in the Advertising Data. The k=
+eys
+> > +       are the UUID to associate with the data.
+> >
+> >  dict Data
+> >  `````````
+> > @@ -101,6 +102,36 @@ dict Data
+> >                 <Transport Discovery> <Organization Flags...>
+> >                 0x26                   0x01         0x01...
+> >
+> > +array{string} ScanResponseServiceUUIDs
+> > +``````````````````````````````````````
+> > +
+> > +       List of UUIDs to include in the "Service UUID" field of the Sca=
+n
+> > +       Response Data.
+> > +
+> > +dict ScanResponseManufacturerData
+> > +`````````````````````````````````
+> > +
+> > +       Manufacturer Data fields to include in the Scan Response Data. =
+Keys
+> > +       are the Manufacturer ID to associate with the data.
+> > +
+> > +array{string} ScanResponseSolicitUUIDs
+> > +``````````````````````````````````````
+> > +
+> > +       List of UUIDs to include in the "Service Solicitation" field of=
+ the
+> > +       Scan Response Data.
+> > +
+> > +dict ScanResponseServiceData
+> > +````````````````````````````
+> > +
+> > +       Service Data elements to include in the Scan Response Data. The=
+ keys
+> > +       are the UUID to associate with the data.
+> > +
+> > +dict ScanResponseData
+> > +`````````````````````
+> > +
+> > +       Scan Response Data to include. Key is the advertising type and =
+value is
+> > +       the data as byte array.
+> > +
+> >  bool Discoverable
+> >  `````````````````
+> >
+> > diff --git a/src/advertising.c b/src/advertising.c
+> > index bd121e5..ba70419 100644
+> > --- a/src/advertising.c
+> > +++ b/src/advertising.c
+> > @@ -255,13 +255,12 @@ static bool parse_type(DBusMessageIter *iter, str=
+uct btd_adv_client *client)
+> >         return false;
+> >  }
+> >
+> > -static bool parse_service_uuids(DBusMessageIter *iter,
+> > -                                       struct btd_adv_client *client)
+> > +static bool parse_service_uuids(DBusMessageIter *iter, struct bt_ad *a=
+d)
+> >  {
+> >         DBusMessageIter ariter;
+> >
+> >         if (!iter) {
+> > -               bt_ad_clear_service_uuid(client->data);
+> > +               bt_ad_clear_service_uuid(ad);
+> >                 return true;
+> >         }
+> >
+> > @@ -270,7 +269,7 @@ static bool parse_service_uuids(DBusMessageIter *it=
+er,
+> >
+> >         dbus_message_iter_recurse(iter, &ariter);
+> >
+> > -       bt_ad_clear_service_uuid(client->data);
+> > +       bt_ad_clear_service_uuid(ad);
+> >
+> >         while (dbus_message_iter_get_arg_type(&ariter) =3D=3D DBUS_TYPE=
+_STRING) {
+> >                 const char *uuid_str;
+> > @@ -283,7 +282,7 @@ static bool parse_service_uuids(DBusMessageIter *it=
+er,
+> >                 if (bt_string_to_uuid(&uuid, uuid_str) < 0)
+> >                         goto fail;
+> >
+> > -               if (!bt_ad_add_service_uuid(client->data, &uuid))
+> > +               if (!bt_ad_add_service_uuid(ad, &uuid))
+> >                         goto fail;
+> >
+> >                 dbus_message_iter_next(&ariter);
+> > @@ -292,17 +291,28 @@ static bool parse_service_uuids(DBusMessageIter *=
+iter,
+> >         return true;
+> >
+> >  fail:
+> > -       bt_ad_clear_service_uuid(client->data);
+> > +       bt_ad_clear_service_uuid(ad);
+> >         return false;
+> >  }
+> >
+> > -static bool parse_solicit_uuids(DBusMessageIter *iter,
+> > +static bool parse_service_uuids_ad(DBusMessageIter *iter,
+> > +                                       struct btd_adv_client *client)
+> > +{
+> > +       return parse_service_uuids(iter, client->data);
+> > +}
+> > +
+> > +static bool parse_service_uuids_sr(DBusMessageIter *iter,
+> >                                         struct btd_adv_client *client)
+> > +{
+> > +       return parse_service_uuids(iter, client->scan);
+> > +}
+> > +
+> > +static bool parse_solicit_uuids(DBusMessageIter *iter, struct bt_ad *a=
+d)
+> >  {
+> >         DBusMessageIter ariter;
+> >
+> >         if (!iter) {
+> > -               bt_ad_clear_solicit_uuid(client->data);
+> > +               bt_ad_clear_solicit_uuid(ad);
+> >                 return true;
+> >         }
+> >
+> > @@ -311,7 +321,7 @@ static bool parse_solicit_uuids(DBusMessageIter *it=
+er,
+> >
+> >         dbus_message_iter_recurse(iter, &ariter);
+> >
+> > -       bt_ad_clear_solicit_uuid(client->data);
+> > +       bt_ad_clear_solicit_uuid(ad);
+> >
+> >         while (dbus_message_iter_get_arg_type(&ariter) =3D=3D DBUS_TYPE=
+_STRING) {
+> >                 const char *uuid_str;
+> > @@ -324,7 +334,7 @@ static bool parse_solicit_uuids(DBusMessageIter *it=
+er,
+> >                 if (bt_string_to_uuid(&uuid, uuid_str) < 0)
+> >                         goto fail;
+> >
+> > -               if (!bt_ad_add_solicit_uuid(client->data, &uuid))
+> > +               if (!bt_ad_add_solicit_uuid(ad, &uuid))
+> >                         goto fail;
+> >
+> >                 dbus_message_iter_next(&ariter);
+> > @@ -333,17 +343,28 @@ static bool parse_solicit_uuids(DBusMessageIter *=
+iter,
+> >         return true;
+> >
+> >  fail:
+> > -       bt_ad_clear_solicit_uuid(client->data);
+> > +       bt_ad_clear_solicit_uuid(ad);
+> >         return false;
+> >  }
+> >
+> > -static bool parse_manufacturer_data(DBusMessageIter *iter,
+> > +static bool parse_solicit_uuids_ad(DBusMessageIter *iter,
+> >                                         struct btd_adv_client *client)
+> > +{
+> > +       return parse_solicit_uuids(iter, client->data);
+> > +}
+> > +
+> > +static bool parse_solicit_uuids_sr(DBusMessageIter *iter,
+> > +                                       struct btd_adv_client *client)
+> > +{
+> > +       return parse_solicit_uuids(iter, client->scan);
+> > +}
+> > +
+> > +static bool parse_manufacturer_data(DBusMessageIter *iter, struct bt_a=
+d *ad)
+> >  {
+> >         DBusMessageIter entries;
+> >
+> >         if (!iter) {
+> > -               bt_ad_clear_manufacturer_data(client->data);
+> > +               bt_ad_clear_manufacturer_data(ad);
+> >                 return true;
+> >         }
+> >
+> > @@ -352,7 +373,7 @@ static bool parse_manufacturer_data(DBusMessageIter=
+ *iter,
+> >
+> >         dbus_message_iter_recurse(iter, &entries);
+> >
+> > -       bt_ad_clear_manufacturer_data(client->data);
+> > +       bt_ad_clear_manufacturer_data(ad);
+> >
+> >         while (dbus_message_iter_get_arg_type(&entries)
+> >                                                 =3D=3D DBUS_TYPE_DICT_E=
+NTRY) {
+> > @@ -383,7 +404,7 @@ static bool parse_manufacturer_data(DBusMessageIter=
+ *iter,
+> >
+> >                 DBG("Adding ManufacturerData for %04x", manuf_id);
+> >
+> > -               if (!bt_ad_add_manufacturer_data(client->data, manuf_id=
+,
+> > +               if (!bt_ad_add_manufacturer_data(ad, manuf_id,
+> >                                                         manuf_data, len=
+))
+> >                         goto fail;
+> >
+> > @@ -393,17 +414,28 @@ static bool parse_manufacturer_data(DBusMessageIt=
+er *iter,
+> >         return true;
+> >
+> >  fail:
+> > -       bt_ad_clear_manufacturer_data(client->data);
+> > +       bt_ad_clear_manufacturer_data(ad);
+> >         return false;
+> >  }
+> >
+> > -static bool parse_service_data(DBusMessageIter *iter,
+> > +static bool parse_manufacturer_data_ad(DBusMessageIter *iter,
+> > +                                       struct btd_adv_client *client)
+> > +{
+> > +       return parse_manufacturer_data(iter, client->data);
+> > +}
+> > +
+> > +static bool parse_manufacturer_data_sr(DBusMessageIter *iter,
+> >                                         struct btd_adv_client *client)
+> > +{
+> > +       return parse_manufacturer_data(iter, client->scan);
+> > +}
+> > +
+> > +static bool parse_service_data(DBusMessageIter *iter, struct bt_ad *ad=
+)
+> >  {
+> >         DBusMessageIter entries;
+> >
+> >         if (!iter) {
+> > -               bt_ad_clear_service_data(client->data);
+> > +               bt_ad_clear_service_data(ad);
+> >                 return true;
+> >         }
+> >
+> > @@ -412,7 +444,7 @@ static bool parse_service_data(DBusMessageIter *ite=
+r,
+> >
+> >         dbus_message_iter_recurse(iter, &entries);
+> >
+> > -       bt_ad_clear_service_data(client->data);
+> > +       bt_ad_clear_service_data(ad);
+> >
+> >         while (dbus_message_iter_get_arg_type(&entries)
+> >                                                 =3D=3D DBUS_TYPE_DICT_E=
+NTRY) {
+> > @@ -447,7 +479,7 @@ static bool parse_service_data(DBusMessageIter *ite=
+r,
+> >
+> >                 DBG("Adding ServiceData for %s", uuid_str);
+> >
+> > -               if (!bt_ad_add_service_data(client->data, &uuid, servic=
+e_data,
+> > +               if (!bt_ad_add_service_data(ad, &uuid, service_data,
+> >                                                                        =
+ len))
+> >                         goto fail;
+> >
+> > @@ -457,10 +489,22 @@ static bool parse_service_data(DBusMessageIter *i=
+ter,
+> >         return true;
+> >
+> >  fail:
+> > -       bt_ad_clear_service_data(client->data);
+> > +       bt_ad_clear_service_data(ad);
+> >         return false;
+> >  }
+> >
+> > +static bool parse_service_data_ad(DBusMessageIter *iter,
+> > +                                       struct btd_adv_client *client)
+> > +{
+> > +       return parse_service_data(iter, client->data);
+> > +}
+> > +
+> > +static bool parse_service_data_sr(DBusMessageIter *iter,
+> > +                                       struct btd_adv_client *client)
+> > +{
+> > +       return parse_service_data(iter, client->scan);
+> > +}
+> > +
+> >  static bool set_rsi(struct btd_adv_client *client)
+> >  {
+> >         struct bt_crypto *crypto;
+> > @@ -667,12 +711,12 @@ static bool parse_timeout(DBusMessageIter *iter,
+> >         return true;
+> >  }
+> >
+> > -static bool parse_data(DBusMessageIter *iter, struct btd_adv_client *c=
+lient)
+> > +static bool parse_data(DBusMessageIter *iter, struct bt_ad *ad)
+> >  {
+> >         DBusMessageIter entries;
+> >
+> >         if (!iter) {
+> > -               bt_ad_clear_data(client->data);
+> > +               bt_ad_clear_data(ad);
+> >                 return true;
+> >         }
+> >
+> > @@ -681,7 +725,7 @@ static bool parse_data(DBusMessageIter *iter, struc=
+t btd_adv_client *client)
+> >
+> >         dbus_message_iter_recurse(iter, &entries);
+> >
+> > -       bt_ad_clear_data(client->data);
+> > +       bt_ad_clear_data(ad);
+> >
+> >         while (dbus_message_iter_get_arg_type(&entries)
+> >                                                 =3D=3D DBUS_TYPE_DICT_E=
+NTRY) {
+> > @@ -712,7 +756,7 @@ static bool parse_data(DBusMessageIter *iter, struc=
+t btd_adv_client *client)
+> >
+> >                 DBG("Adding Data for type 0x%02x len %u", type, len);
+> >
+> > -               if (!bt_ad_add_data(client->data, type, data, len))
+> > +               if (!bt_ad_add_data(ad, type, data, len))
+> >                         goto fail;
+> >
+> >                 dbus_message_iter_next(&entries);
+> > @@ -721,10 +765,22 @@ static bool parse_data(DBusMessageIter *iter, str=
+uct btd_adv_client *client)
+> >         return true;
+> >
+> >  fail:
+> > -       bt_ad_clear_data(client->data);
+> > +       bt_ad_clear_data(ad);
+> >         return false;
+> >  }
+> >
+> > +static bool parse_data_ad(DBusMessageIter *iter,
+> > +                                       struct btd_adv_client *client)
+> > +{
+> > +       return parse_data(iter, client->data);
+> > +}
+> > +
+> > +static bool parse_data_sr(DBusMessageIter *iter,
+> > +                                       struct btd_adv_client *client)
+> > +{
+> > +       return parse_data(iter, client->scan);
+> > +}
+> > +
+> >  static bool set_flags(struct btd_adv_client *client, uint8_t flags)
+> >  {
+> >         /* Set BR/EDR Not Supported for LE only */
+> > @@ -832,15 +888,14 @@ static uint8_t *generate_adv_data(struct btd_adv_=
+client *client,
+> >  static uint8_t *generate_scan_rsp(struct btd_adv_client *client,
+> >                                                 uint32_t *flags, size_t=
+ *len)
+> >  {
+> > -       if (!client->name) {
+> > +       if (client->name) {
+> > +               *flags &=3D ~MGMT_ADV_FLAG_LOCAL_NAME;
+> > +               bt_ad_add_name(client->scan, client->name);
+> > +       } else if (bt_ad_is_empty(client->scan)) {
+> >                 *len =3D 0;
+> >                 return NULL;
+> >         }
+> >
+> > -       *flags &=3D ~MGMT_ADV_FLAG_LOCAL_NAME;
+> > -
+> > -       bt_ad_add_name(client->scan, client->name);
+> > -
+> >         return bt_ad_generate(client->scan, len);
+> >  }
+> >
+> > @@ -1212,16 +1267,21 @@ static struct adv_parser {
+> >         bool (*func)(DBusMessageIter *iter, struct btd_adv_client *clie=
+nt);
+> >  } parsers[] =3D {
+> >         { "Type", parse_type },
+> > -       { "ServiceUUIDs", parse_service_uuids },
+> > -       { "SolicitUUIDs", parse_solicit_uuids },
+> > -       { "ManufacturerData", parse_manufacturer_data },
+> > -       { "ServiceData", parse_service_data },
+> > +       { "ServiceUUIDs", parse_service_uuids_ad },
+> > +       { "ScanResponseServiceUUIDs", parse_service_uuids_sr },
+> > +       { "SolicitUUIDs", parse_solicit_uuids_ad },
+> > +       { "ScanResponseSolicitUUIDs", parse_solicit_uuids_sr },
+> > +       { "ManufacturerData", parse_manufacturer_data_ad },
+> > +       { "ScanResponseManufacturerData", parse_manufacturer_data_sr },
+> > +       { "ServiceData", parse_service_data_ad },
+> > +       { "ScanResponseServiceData", parse_service_data_sr },
+> >         { "Includes", parse_includes },
+> >         { "LocalName", parse_local_name },
+> >         { "Appearance", parse_appearance },
+> >         { "Duration", parse_duration },
+> >         { "Timeout", parse_timeout },
+> > -       { "Data", parse_data },
+> > +       { "Data", parse_data_ad },
+> > +       { "ScanResponseData", parse_data_sr },
+> >         { "Discoverable", parse_discoverable },
+> >         { "DiscoverableTimeout", parse_discoverable_timeout },
+> >         { "SecondaryChannel", parse_secondary },
+> > --
+> > 2.39.5
+> >
+>
+>
+> --
+> Luiz Augusto von Dentz
