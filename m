@@ -1,124 +1,104 @@
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f171.google.com (mail-qk1-f171.google.com [209.85.222.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B523F19F113
-	for <linux-bluetooth@vger.kernel.org>; Mon, 11 Nov 2024 12:55:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0557519D881
+	for <linux-bluetooth@vger.kernel.org>; Mon, 11 Nov 2024 13:02:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731329734; cv=none; b=Tt8rRcqXGrMoeSXqDff01YaEgMZsiU4KcQLS7sWxqG18egnriTusfUISaQzpeM6mzWFI0TWvs4LkJRQmu/rVsSpvhjcQXWt8tTYDlQs2k6kLc4EesMQaBZQtOQu3oa1BYqOZ0v0LFkWA7fvQEildwPgCEKAwom9PJ+VhWT69Tag=
+	t=1731330174; cv=none; b=GTpXDbtud0TWXf9fiQExyj2Biv7PF6yhBSXF/gNbOZLZ+w2UipsCorCb8PxvxIoLfJp2C9WX2ZP3jYmgNm60i8mWiVIfot7b87rbEfIuaF/l/Qfhte8Gw7uNtsoKn1EpZjUfNElNudL7luYSIXDC1+IZQlSuHWcjqbgNioYk+LQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731329734; c=relaxed/simple;
-	bh=Aw6XArLmsnlEJXalplei2dff3DGKkM4fxlReO9CUF3w=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=L9MI4j2i6RS6AZ2bCR4Uw/z9ALwD53AN5fGSLYcxbjU+UMztnj9ySH2AxtZdbCJNuKb0MB5upX6AToocomKdR0ta58aVbvtv/j4DzVRCOz2X9M0/NOLTdEsdVHLaHdDWNm2Itdzy8D83AHxqmS7JjqGzAOavZErbppRgF5Z+TeA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=Gaf6B8EP; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+	s=arc-20240116; t=1731330174; c=relaxed/simple;
+	bh=X85KGziPFwOsHzdjSATT5HtRNHusg4Ls6oRv1KwK0qA=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=QvlZHdi9pi0lywFB3yJyqGYPK7n8JqgSjyocHUI7jGFSfWrlA8UUKadQoSA8RYEGF7AOWjjqqQdnHmtCUiheSh7trJp1l+6Id2iuX8XN64W/1WPkA+8iwwbGAP3lrKNyr7ujo1HpcntGNitACGSfyiXYeJEo9X/z7i8zGT25K8E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=M6+plZfK; arc=none smtp.client-ip=209.85.222.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="Gaf6B8EP"
-Received: from pps.filterd (m0279862.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4ABBmXMB000954
-	for <linux-bluetooth@vger.kernel.org>; Mon, 11 Nov 2024 12:55:32 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:message-id
-	:mime-version:subject:to; s=qcppdkim1; bh=TDTwirWrzIBfCeNQ4JrPCz
-	Q55M42I3MrvREdOWGkWss=; b=Gaf6B8EPbN5AlBG5gahhy9qsLNAYGiL8WiuaFI
-	F2TnGoNCOfIb43vPRf1FRw1Dfzc7vdDb/pQtS2f4vCmmPheqVMv91cx9fjmv5jcb
-	wQSe9R5CK2WiOukmEhHIdn9AJ90hoVK0HUMYbG8y206moQsdbuHe/hO7D9/thuLc
-	W4MWTg/XsqsKcu+aAHVvhlDen8zGUnGyhveuDEXBUuvY8vI2aIPiaHgBrMryNSfF
-	HJ/iuXescWfUKPSpkExB7J2t5hMvujb19+MNq5FI/Vxvl3SJULMGeTx0n7RML3Tp
-	gJyFDNht72GeeYOD4Pr5PVmJZS0crnxCnLRIayza7aK8ZfgA==
-Received: from nasanppmta02.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 42t0gkv5qv-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <linux-bluetooth@vger.kernel.org>; Mon, 11 Nov 2024 12:55:31 +0000 (GMT)
-Received: from nasanex01c.na.qualcomm.com (nasanex01c.na.qualcomm.com [10.45.79.139])
-	by NASANPPMTA02.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 4ABCtVJ6005989
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <linux-bluetooth@vger.kernel.org>; Mon, 11 Nov 2024 12:55:31 GMT
-Received: from hu-amisjain-hyd.qualcomm.com (10.80.80.8) by
- nasanex01c.na.qualcomm.com (10.45.79.139) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.9; Mon, 11 Nov 2024 04:55:29 -0800
-From: Amisha Jain <quic_amisjain@quicinc.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: <quic_mohamull@quicinc.com>, <quic_hbandi@quicinc.com>,
-        <quic_anubhavg@quicinc.com>
-Subject: [PATCH v1] obex: Add Newmissedcalls tag in PBAP GET response
-Date: Mon, 11 Nov 2024 18:25:18 +0530
-Message-ID: <20241111125518.2039073-1-quic_amisjain@quicinc.com>
-X-Mailer: git-send-email 2.34.1
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="M6+plZfK"
+Received: by mail-qk1-f171.google.com with SMTP id af79cd13be357-7b157c9ad12so310891385a.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 11 Nov 2024 05:02:52 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1731330172; x=1731934972; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=3iq/S10AQR37MrRsX15xylS582/xLXCjcNgGV3Hy4Uo=;
+        b=M6+plZfKdmcaSucb/o8887RVVCmBoKIy+5efBmQmuKFbIYxB81CzKi2oZU2vKs2U1t
+         P7+ygNhCtiQaDcsFmO/pjfL1N+wnvGAB7hK6W9J5O4YLut7thhR+ZiO+qr+cjfvu/qvS
+         xZGBAon0eWVlVXfHEexyyy0PW0294KMuKY0iHWU9wO7pd9zV9bxVrEKHYBOtO+jEz5eP
+         8RDoAjLLUM/ErBq3TpDrEA2x1eLHhe5rMZw+ckBRE1QgOwR9dVtR51nyoOZN2fvvlXy/
+         g56x2dIli1PmhLjXiaIuhoFWe/WWweK8JfOGFhH2W4zXrhDPThEL4FRdmzmoWYpJAUua
+         NSiQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731330172; x=1731934972;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=3iq/S10AQR37MrRsX15xylS582/xLXCjcNgGV3Hy4Uo=;
+        b=c3Jg/SqEVdcO+Jc+z90czM5zbubOAIyFYIaAc9QgHs2tVw+THOvj6w2/r+YQ0hgc5w
+         9yH4mJC+p5YS34DAu9CM1Zxvt5sps2a4mKZyd/pAi5+1V2isrLRCkSx8bhdAprpSneEw
+         +xd+d/lB+fNmog72nm2ln8VclXqlWKLv4epvMO/gM9IaDuOCbEZgQdG9L7FCP23SUeI2
+         uQ+jlNsLZnBa1sIdV+Xp7fjuBbMgAtKTQu/adXdNrksVvzNyBUJ2AKVzZXz9z9ChLK8v
+         dV1ZWtRIoolGoe6JyZyPT9aVy36AqP3oaomFK9R2VgN7nUd34Lme7KQDY9+pfJxdSWnA
+         XPRw==
+X-Gm-Message-State: AOJu0YxUniE91ngeSTfrct5uB6hL34jKiR+eDmg4stVcfZaYvEDOdnqA
+	IONpaT4wVTSB0BF1b7jG9DMmhSylVQK/iQNBhqu1O3MVNRZMaXJHHJseVQ==
+X-Google-Smtp-Source: AGHT+IFDwJrhO/YLxdd3cX3rV/0n6RLA/UgYXfOpHF0mXdHS5U/+/lLvIz8anwyT1DdV4JaC779Dkw==
+X-Received: by 2002:a05:620a:4608:b0:7b1:8dc0:761e with SMTP id af79cd13be357-7b331ec8e57mr1790591185a.35.1731330171626;
+        Mon, 11 Nov 2024 05:02:51 -0800 (PST)
+Received: from [172.17.0.2] ([20.109.37.2])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7b32accb211sm489671885a.98.2024.11.11.05.02.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 11 Nov 2024 05:02:51 -0800 (PST)
+Message-ID: <6732007b.050a0220.3c574f.c96e@mx.google.com>
+Date: Mon, 11 Nov 2024 05:02:51 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============1858968710230291109=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nasanex01c.na.qualcomm.com (10.45.79.139)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: 95LT1jBHOEsH44GMJCK4-ZY0nhq2AI5W
-X-Proofpoint-GUID: 95LT1jBHOEsH44GMJCK4-ZY0nhq2AI5W
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
- definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 phishscore=0
- spamscore=0 clxscore=1015 mlxscore=0 mlxlogscore=999 lowpriorityscore=0
- impostorscore=0 adultscore=0 priorityscore=1501 malwarescore=0 bulkscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2409260000
- definitions=main-2411110107
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, quic_amisjain@quicinc.com
+Subject: RE: [v1] obex: Fix the PBAP GET request in PTS testing
+In-Reply-To: <20241111111625.1887695-1-quic_amisjain@quicinc.com>
+References: <20241111111625.1887695-1-quic_amisjain@quicinc.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-This fix is required for passing below PTS testcases:
+--===============1858968710230291109==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-1. PBAP/PSE/PBD/BV-05-C
-2. PBAP/PSE/PBD/BV-17-C
-3. PBAP/PSE/PBB/BV-11-C
+This is automated email and please do not reply to this email!
 
-Even if the new missed calls value is zero, send it in GET response.
-As per the PBAP spec, it is mandatory to include Newmissedcalls
-tag in response incase of object name is 'mch.vcf' or 'cch.vcf'.
-It will be better to include it in all GET response.
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=908365
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.47 seconds
+GitLint                       PASS      0.33 seconds
+BuildEll                      PASS      24.95 seconds
+BluezMake                     PASS      1688.10 seconds
+MakeCheck                     PASS      13.07 seconds
+MakeDistcheck                 PASS      183.09 seconds
+CheckValgrind                 PASS      255.34 seconds
+CheckSmatch                   PASS      362.03 seconds
+bluezmakeextell               PASS      123.68 seconds
+IncrementalBuild              PASS      1435.02 seconds
+ScanBuild                     PASS      1020.19 seconds
+
+
 
 ---
- obexd/plugins/pbap.c | 10 ++++------
- 1 file changed, 4 insertions(+), 6 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/obexd/plugins/pbap.c b/obexd/plugins/pbap.c
-index 64641c798..74976890d 100644
---- a/obexd/plugins/pbap.c
-+++ b/obexd/plugins/pbap.c
-@@ -184,12 +184,11 @@ static void phonebook_size_result(const char *buffer, size_t bufsize,
- 
- 	if (missed > 0)	{
- 		DBG("missed %d", missed);
-+	}
- 
--		pbap->obj->apparam = g_obex_apparam_set_uint16(
--							pbap->obj->apparam,
-+	pbap->obj->apparam = g_obex_apparam_set_uint16(pbap->obj->apparam,
- 							NEWMISSEDCALLS_TAG,
- 							missed);
--	}
- 
- 	obex_object_set_io_flags(pbap->obj, G_IO_IN, 0);
- }
-@@ -223,12 +222,11 @@ static void query_result(const char *buffer, size_t bufsize, int vcards,
- 		DBG("missed %d", missed);
- 
- 		pbap->obj->firstpacket = TRUE;
-+	}
- 
--		pbap->obj->apparam = g_obex_apparam_set_uint16(
--							pbap->obj->apparam,
-+	pbap->obj->apparam = g_obex_apparam_set_uint16(pbap->obj->apparam,
- 							NEWMISSEDCALLS_TAG,
- 							missed);
--	}
- 
- 	obex_object_set_io_flags(pbap->obj, G_IO_IN, 0);
- }
--- 
-2.34.1
 
+--===============1858968710230291109==--
