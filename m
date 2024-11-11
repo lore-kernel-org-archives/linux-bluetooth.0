@@ -1,94 +1,130 @@
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3818C136A;
-	Mon, 11 Nov 2024 07:21:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1007E545
+	for <linux-bluetooth@vger.kernel.org>; Mon, 11 Nov 2024 07:39:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731309693; cv=none; b=hkT6Wo01I3xaNj8IwAUD6kS4WwYE3z40wWn0Rp1mlP9Bo8cETdQOW47AzjeSQ5NDBOB3AZZgg8lxk7elAufNGRfY29UofPUupd99mJfIEGinc3pM+G0NfUXs7+3TR5vYZyovWnQaD0J3hPpUVntRd+P8yt7ib9q9XFjYfAExcc8=
+	t=1731310769; cv=none; b=EsuWb8qDNzo0KxYO4p+ABOhpjz7IvYUQjRyerTZhMn0DE6B6vyknhpY5GzRyE+3DBU2oev0jkGj9AQ3DJWhlhoCdU6YK9QHPIch1wsZ63/yAT78sznJx37JlMeOmiDnIlTUlOPkLnvevgCfDbDeb8GZu/uxcHUyKVKR4jwFw93E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731309693; c=relaxed/simple;
-	bh=fOsAPC1aCReILnAtNZ8hxSF319BoJu3a3LVc+79V7pw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=VvNXJwBduUCH9em/2DlrFkOKY2O9m+gd2pT6ZedMOpmcIJ0rrIdvgGjlH7wn9/bK5AGhOF3VDOdlNF9f/JjR+cxb4n1qvZT5RTCecWq81ZHf6bSm3vvkMmJXUt9DXi8d12jdid6CfBxqooE5cBh79uVGjl/DLy4HGkXvoAq8VbU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from [192.168.0.53] (unknown [95.90.237.237])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 8F3C661E5FE05;
-	Mon, 11 Nov 2024 08:21:05 +0100 (CET)
-Message-ID: <cb38ef85-363d-47aa-bc01-55a3fef5b0af@molgen.mpg.de>
-Date: Mon, 11 Nov 2024 08:21:04 +0100
+	s=arc-20240116; t=1731310769; c=relaxed/simple;
+	bh=bcpYGhATuRAhFhjEHuKdOTwcuo9maMSbJRbRYf+cnkI=;
+	h=Message-ID:Date:From:To:Cc:Subject:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=QZDiK9loSl/HX6tA6rSH68kgKC9K70XWAh3UJmsYKF+LwOZVgYYBHE8/YB+z8AjsISotHZOelf8J8VTfFl0DqXJKVXYK3DsqMPqEdgtxisWTDO+KTfE0FTHgESLLP4nKYVbQLg7888S+rhrlrIySAltbgRPtiVjv84XXnF39qMg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aSpy1Tbn; arc=none smtp.client-ip=209.85.216.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aSpy1Tbn"
+Received: by mail-pj1-f41.google.com with SMTP id 98e67ed59e1d1-2e2e87153a3so3036610a91.3
+        for <linux-bluetooth@vger.kernel.org>; Sun, 10 Nov 2024 23:39:25 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1731310765; x=1731915565; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:subject:cc:to:from:date:message-id:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=LJS7SELkN70hLPBiDvwCr7Cz4XYhGyHp9b9QIRMYdtI=;
+        b=aSpy1TbnEcYGUxqlv7W9KkyHpbVU4qIBDjRNFu+igfuYDaefU532dmcwKvtrxVmofV
+         5awiYawJdGzhSHCLJSYm4ikS+my7LmJLtvpmAQZQ7aI5sYqvpVg246zjGzteEsYrfs3Z
+         CenSPEv/r+Z3Xjw6dJiA+Ws+Y31Uzo7aEyiOltwoM4w7OuZdofNeAYQD0HOM8HQUmKS9
+         rMvhmTn15t+KFR8wzDZfwD9OAisq9W3IhysQw3btrb00AUUOWiEG2buGwB+Uvbqj1zvC
+         oVSDQNpv9RjC8I6xQTXNbtYuT0bAjnQgMtzxmet6kBZI4H4SClTnMy+Forzlj3cDXSyU
+         3mFw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731310765; x=1731915565;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:subject:cc:to:from:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=LJS7SELkN70hLPBiDvwCr7Cz4XYhGyHp9b9QIRMYdtI=;
+        b=Iyb30Wfif0kgJQSQDXnsbCPQuK/LoopGulkjF9g9Trm2lv3MSL+90y8Ld1PR3pzV1e
+         GfMUZtLesktF4dmIq/BzAvlFjhPgb4MgIPhqaxeLa6XpZEnhoI/Jmkvw04op11LU3ET8
+         y6v8+vIP3s7iCPAT3oKzDP9dEZg0iT63YAGsY/vCwhJtENOlp2GVbRsIELFXaG6x0DUU
+         /JxPBCHCFJzSjx1emBsytYIifGnbWsGM2b8Efc/OmCrqGvZ5vmC7hceL+fxQoG83bt2z
+         2/imrZ7jO80yCcBDpKu+Gb95Yr3u+PBmgsg8jPm7lBfHpYgmW8kCth6C9keLLfrmMG2s
+         lLKQ==
+X-Gm-Message-State: AOJu0Yw46zdEPUzYKqjof+HFz2ZvRnP4CPot4JM23+39x5eQ6+pUq9Eq
+	t/ol6lgOK84eIqFK4g7U2ItOzR2i5dQjKRaTi9v0nZnK4HHN/l3i
+X-Google-Smtp-Source: AGHT+IHyDGlRh4c54+K24vosN8ktufPDxzliGAzEn2vK4Awdo25eU/GvMSM7msifMuG5JOagPQtTfQ==
+X-Received: by 2002:a17:90b:1d50:b0:2e1:ce7b:6069 with SMTP id 98e67ed59e1d1-2e9b178ee2dmr16344182a91.33.1731310764985;
+        Sun, 10 Nov 2024 23:39:24 -0800 (PST)
+Received: from JUNHO-NEOSTACK. ([221.154.134.3])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2e9b2b4cd58sm5858002a91.20.2024.11.10.23.39.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 10 Nov 2024 23:39:24 -0800 (PST)
+Message-ID: <6731b4ac.170a0220.1c6739.5561@mx.google.com>
+X-Google-Original-Message-ID: <ZzG0qZ2BlzlfOdTR@JUNHO-NEOSTACK.>
+Date: Mon, 11 Nov 2024 16:39:21 +0900
+From: Junho Lee <tot0roprog@gmail.com>
+To: bggixx@gmail.com
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: mesh: Fix segmentation behavior of Lower transport layer
+References: <670cce2d.050a0220.14053.42b2@mx.google.com>
+ <670cfbcf.050a0220.18e738.ce82@mx.google.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2] Bluetooth: btintel_pcie: Support suspend-resume
-To: Chandrashekar Devegowda <chandrashekar.devegowda@intel.com>
-Cc: linux-bluetooth@vger.kernel.org,
- Ravishankar Srivatsa <ravishankar.srivatsa@intel.com>,
- Chethan Tumkur Narayan <chethan.tumkur.narayan@intel.com>,
- Kiran K <kiran.k@intel.com>, Bjorn Helgaas <bhelgaas@google.com>,
- linux-pci@vger.kernel.org
-References: <20241108143931.2422947-1-chandrashekar.devegowda@intel.com>
- <693d09b6-edab-4ed4-8df5-11ca74bb02e6@molgen.mpg.de>
- <PH0PR11MB5952C7090EAA4F6B75145611FC582@PH0PR11MB5952.namprd11.prod.outlook.com>
-Content-Language: en-US
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <PH0PR11MB5952C7090EAA4F6B75145611FC582@PH0PR11MB5952.namprd11.prod.outlook.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <670cfbcf.050a0220.18e738.ce82@mx.google.com>
 
-Dear Chandrashekar,
+Hello Brian,
 
+Thank you for taking the time to review the patch despite your busy schedule.
 
-Thank you for your space.
+The patch I sent over relates to the Segmentation section within BlueZ. Since
+it’s been nearly a month without a response, I wanted to follow up as a reminder.
+If you encounter any issues during the review or see any areas that need
+improvement, please feel free to reach out.
 
+As I mentioned in my previous email, I aimed to keep any refactoring or
+optimization changes to a minimum, focusing primarily on the modified logic
+itself to ease the review process. However, if additional optimization or
+refactoring is required, I’m happy to provide further patches as needed.
 
-Am 11.11.24 um 07:33 schrieb Devegowda, Chandrashekar:
+Best regards,
+Junho Lee
 
->> -----Original Message-----
-
->> Sent: Friday, November 08, 2024 2:49 PM
->> To: Devegowda, Chandrashekar <chandrashekar.devegowda@intel.com>
-
-[…]
-
->> Am 08.11.24 um 15:39 schrieb ChandraShekar Devegowda:
->>
->> The space in your name is still missing.
+On Mon, Oct 14, 2024 at 04:09:03AM -0700, bluez.test.bot@gmail.com wrote:
+> This is automated email and please do not reply to this email!
 > 
-> I have added my second name, my first name doesn’t have a space so
-> please consider ChandraShekar as a single name.
-Thank you. In your email you now do *not* use CamelCase, which is more 
-common in Western culture. (Of course you can write your name as you 
-want, and I just pointed it out.)
-
->>> This patch contains the changes in driver for vendor specific handshake
->>> during enter of D3 and D0 exit.
->>
->> Please document the datasheet name and revision.
+> Dear submitter,
 > 
-> Datasheet is internal to Intel, sorry wouldn't  be able to share at
-> the moment.
+> Thank you for submitting the patches to the linux bluetooth mailing list.
+> This is a CI test results with your patch series:
+> PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=898733
+> 
+> ---Test result---
+> 
+> Test Summary:
+> CheckPatch                    PASS      2.12 seconds
+> GitLint                       FAIL      1.27 seconds
+> BuildEll                      PASS      24.90 seconds
+> BluezMake                     PASS      1680.91 seconds
+> MakeCheck                     PASS      13.10 seconds
+> MakeDistcheck                 PASS      182.16 seconds
+> CheckValgrind                 PASS      256.27 seconds
+> CheckSmatch                   PASS      361.24 seconds
+> bluezmakeextell               PASS      122.15 seconds
+> IncrementalBuild              PASS      6303.61 seconds
+> ScanBuild                     PASS      1060.98 seconds
+> 
+> Details
+> ##############################
+> Test: GitLint - FAIL
+> Desc: Run gitlint
+> Output:
+> [BlueZ,v3,1/4] mesh: Implement lower transport layer for segmentation and reassembly
+> 
+> WARNING: I3 - ignore-body-lines: gitlint will be switching from using Python regex 'match' (match beginning) to 'search' (match anywhere) semantics. Please review your ignore-body-lines.regex option accordingly. To remove this warning, set general.regex-style-search=True. More details: https://jorisroovers.github.io/gitlint/configuration/#regex-style-search
+> 1: T1 Title exceeds max length (84>80): "[BlueZ,v3,1/4] mesh: Implement lower transport layer for segmentation and reassembly"
+> 
+> 
+> ---
+> Regards,
+> Linux Bluetooth
+> 
 
-Although it is not public, the name would still be good to have. Intel 
-employees can probably get access more easily, and non-Intel folks could 
-directly approach with the name, and in the future it might be even made 
-public.
-
-[…]
-
-Thank you for acknowledging the other comments.
-
-
-Kind regards
-
-Paul
