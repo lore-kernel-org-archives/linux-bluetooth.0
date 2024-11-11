@@ -1,104 +1,173 @@
-Received: from mail-qk1-f176.google.com (mail-qk1-f176.google.com [209.85.222.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-23.smtp.github.com (out-23.smtp.github.com [192.30.252.206])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BCAA1E481
-	for <linux-bluetooth@vger.kernel.org>; Mon, 11 Nov 2024 15:06:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCD6425777
+	for <linux-bluetooth@vger.kernel.org>; Mon, 11 Nov 2024 15:17:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.206
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731337574; cv=none; b=WYEp2BJ7Z9eNl3WCTtOTMQnPm2QxUoyBHkS4VtEsW9T4xlyh9hpoE1kNh1EJ/YguOX2AUCrzRrPQ3DLXcrbufHKVebDMKazf3bkwtacp295R4ISKXPRgL7NnW5cCyKspIELZWOnB4ANyR74NsFWUa6r42112K7/TMYJ1RkvM/G8=
+	t=1731338259; cv=none; b=F/9Tf7rBJNihskyNNtpntDoWkHOYMLfvap9jfEUcg/OtViuP0aQ6BwVhU7jen7Mem7CUIFZjJMj4yYPngT+YIBzxxd1LGKr1JDMtXT45/uOM5eWK+WunJutL7Io5VEyKwsPi/FPcQF8RR7Z7whcmfb7LPin5kTwy5vgk4JnbFfw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731337574; c=relaxed/simple;
-	bh=cNmwx/Tc1dwFYfG9uG7QXX2RvMKD9PxqLJXSatBTmz0=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=WHYCcOCCo1OltXa7vpajX/LMkwzoaddOmEY+jKvMeIBcyG/70ihqa+UGnQrbmBSojaszKiv3gZVhib6eFTo27haJ/kNGw5RNkxi3WqJz1QogtwsWcRuqw2GaXyOgSmKJY6ywYpWjctowgvey71Afj3D2K+dIaOdCYKUWymVi3HU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BCXow9tA; arc=none smtp.client-ip=209.85.222.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1731338259; c=relaxed/simple;
+	bh=4Qcn95Yhdv8twHfjVVTUwbCj0QnsHfHEhqdYNsOH7i0=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=pWMzBc47Vkk06eF4F77dpnWqTrsQU5fmUXCj0FuPy7ZlFlo6zqQkG0+r0lh4UV2X8IlfsCHdx0AP1GYYjkIVBo7RXYXSH3l9nEaKr/QOXI9m+Yj/G0y+wiOd+9aE7SKIo2yaINT+rwLCRq6KANdJPzDXNeDlwAMQQjQ6B0kbqTQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=BR7zn78W; arc=none smtp.client-ip=192.30.252.206
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BCXow9tA"
-Received: by mail-qk1-f176.google.com with SMTP id af79cd13be357-7b1418058bbso314184785a.3
-        for <linux-bluetooth@vger.kernel.org>; Mon, 11 Nov 2024 07:06:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1731337571; x=1731942371; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=P88pHuZPCBIQmD4HrJNI2GueRiWD6cblQ3DIznrrQPc=;
-        b=BCXow9tALNE8wvPdV82IjwfDaBPZ+bhjHm38wG6Y7LnhJkzDgUVoly8EHQ20Go+sYF
-         aqbhzFfO3umsv1G9kzqvvfoD9tRFq2W4YyFviXPFd0muBhb4LW2jK1mpp5y3miXLkR6Q
-         q8KnSd4obJQconv91tNULp0+8EnRgm/dEqn1gpMwDry7wRyk7ymjsJHec7Te+AVhf8Et
-         SzcQM8OCcCRWJiHPufqge25M9y2S4UYdxVLHZsqMOy+ka5Ldn/Ot+v8bSsUXOD28DPvs
-         NEfhcnaKAuGLTq3J2mlYYZyx1cfYFjSjuNZDHsG63GW0TzxH/PGvKDgICDUF5knEIVaH
-         pPoA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731337571; x=1731942371;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=P88pHuZPCBIQmD4HrJNI2GueRiWD6cblQ3DIznrrQPc=;
-        b=OGosAo9JDUxXqrXIwedkYpOzAZhowh7Qv77tPTSAEbTWrTkX7Eqi7mNz/LKeqAz8ap
-         dntLHAVkY7TZgY1yuA4G6VCYPSDAQ+NWUE6nAN1ZxW6m1pWm87h3Nrg1xydVjXQ3xbsT
-         zJFAoq/qAcFwWSMqhxVe6ZZQdkhRHRnn2TqyHLXyQNJnFiX3J66k3shgS3tCgGIO3csE
-         LKXmOEcBscJo0T/FI/QEDOw3CMKS6hTPDUYW5myTQIhFE2RToF8wTeCfQZvZ0UIGCgGS
-         021FFfX1hS7sH91elIEISsb8IpD90iXr7SmN8m9DS1kD1MC+g1c5lKqFVSLYi+CIZNcr
-         AxIg==
-X-Gm-Message-State: AOJu0YwzNCB4eiT/0xrbHQI48HsA3kcuvgNtgZtw/JDoL3lkmWP/voDy
-	s7r/0zUaCWhBCc6asq2aihBaaONUzdKNL/Yw1U6DJVf+kywl5TFgetwsnw==
-X-Google-Smtp-Source: AGHT+IGLVqnCxqhamlM9fV7mpsLobPYlC5bpA53Ge7wncKHB6GLyotpn2VYMCoVq93vXdOg2Sa4wzg==
-X-Received: by 2002:a05:620a:469f:b0:7b1:4869:38db with SMTP id af79cd13be357-7b331ec5fc3mr1904069485a.32.1731337571079;
-        Mon, 11 Nov 2024 07:06:11 -0800 (PST)
-Received: from [172.17.0.2] ([172.183.161.216])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7b32ac2da70sm505792785a.1.2024.11.11.07.06.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 Nov 2024 07:06:10 -0800 (PST)
-Message-ID: <67321d62.050a0220.165dd7.d35f@mx.google.com>
-Date: Mon, 11 Nov 2024 07:06:10 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============5457016420815119628=="
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="BR7zn78W"
+Received: from github.com (hubbernetes-node-66b26a4.ac4-iad.github.net [10.52.142.27])
+	by smtp.github.com (Postfix) with ESMTPA id D390C5E08A1
+	for <linux-bluetooth@vger.kernel.org>; Mon, 11 Nov 2024 07:17:36 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1731338256;
+	bh=FYlWKTV/yEvmnFgA7KhSrZMWBDWdajmYUb7vpXQ8udU=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=BR7zn78WneKN4Z27oPPeLxXluIHCsZ5FsAVO7K3Rjt7DZyP3ZBBu6IUfcQHzjo9rz
+	 zn+Fp3wj6xq8Z1YrRa8EfhJ838SehEPk5i+Dh6PDYEAm5e3p64c0zCr1Gsqi4D0nTR
+	 LHFNTsTO0Gpwod9CWgRi2wJXOIVufv8TBQdKslpM=
+Date: Mon, 11 Nov 2024 07:17:36 -0800
+From: BluezTestBot <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/master/de1b3a-f0302d@github.com>
+Subject: [bluez/bluez] 774ad9: transport: fix AVRCP volume in reconfigured
+ transp...
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, quic_amisjain@quicinc.com
-Subject: RE: [v1] obex: Update the FTP version to 1.3 in SDP record
-In-Reply-To: <20241111132238.2162878-1-quic_amisjain@quicinc.com>
-References: <20241111132238.2162878-1-quic_amisjain@quicinc.com>
-Reply-To: linux-bluetooth@vger.kernel.org
-
---===============5457016420815119628==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
 Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-This is automated email and please do not reply to this email!
+  Branch: refs/heads/master
+  Home:   https://github.com/bluez/bluez
+  Commit: 774ad9fdd96a522f944a1d09fe374f6a88e61807
+      https://github.com/bluez/bluez/commit/774ad9fdd96a522f944a1d09fe374f6a88e61807
+  Author: Pauli Virtanen <pav@iki.fi>
+  Date:   2024-11-11 (Mon, 11 Nov 2024)
 
-Dear submitter,
+  Changed paths:
+    M profiles/audio/transport.c
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=908415
+  Log Message:
+  -----------
+  transport: fix AVRCP volume in reconfigured transports
 
----Test result---
+We no longer reconnect AVRCP session on AVDTP transport reconfiguration.
+This breaks AVRCP volume after reconfiguration, since there's no volume
+update event incoming.
 
-Test Summary:
-CheckPatch                    PASS      0.36 seconds
-GitLint                       PASS      0.27 seconds
-BuildEll                      PASS      24.85 seconds
-BluezMake                     PASS      1702.13 seconds
-MakeCheck                     PASS      12.99 seconds
-MakeDistcheck                 PASS      182.68 seconds
-CheckValgrind                 PASS      256.64 seconds
-CheckSmatch                   PASS      360.20 seconds
-bluezmakeextell               PASS      122.13 seconds
-IncrementalBuild              PASS      1454.19 seconds
-ScanBuild                     PASS      1026.58 seconds
+Fix by keeping track of the latest volume in btd_device volume.  It was
+introduced to track volume changes that arrive when there are no
+transports/players, but we should track all volume changes otherwise the
+value can be out of date when we want to use it.
 
-
-
----
-Regards,
-Linux Bluetooth
+Fixes: 469a75ae182a ("sink: Fix transitioning to BTD_SERVICE_STATE_DISCONNECTED on idle")
 
 
---===============5457016420815119628==--
+  Commit: 639fb80032cd7eb4d59e4a71e5235c647edf2af5
+      https://github.com/bluez/bluez/commit/639fb80032cd7eb4d59e4a71e5235c647edf2af5
+  Author: Amisha Jain <quic_amisjain@quicinc.com>
+  Date:   2024-11-11 (Mon, 11 Nov 2024)
+
+  Changed paths:
+    M obexd/plugins/pbap.c
+
+  Log Message:
+  -----------
+  obex: Add Newmissedcalls tag in PBAP GET response
+
+This fix is required for passing below PTS testcases:
+
+1. PBAP/PSE/PBD/BV-05-C
+2. PBAP/PSE/PBD/BV-17-C
+3. PBAP/PSE/PBB/BV-11-C
+
+Even if the new missed calls value is zero, send it in GET response.
+As per the PBAP spec, it is mandatory to include Newmissedcalls
+tag in response incase of object name is 'mch.vcf' or 'cch.vcf'.
+It will be better to include it in all GET response.
+
+
+  Commit: 486aeafd87bc23bb7969671b06ceaafc124dea84
+      https://github.com/bluez/bluez/commit/486aeafd87bc23bb7969671b06ceaafc124dea84
+  Author: Amisha Jain <quic_amisjain@quicinc.com>
+  Date:   2024-11-11 (Mon, 11 Nov 2024)
+
+  Changed paths:
+    M obexd/client/pbap.c
+
+  Log Message:
+  -----------
+  obex: Check for supported features bit value for legacy server
+
+This fix is required for below PTS testcase:
+
+1. PBAP/PCE/SSM/BV-10-C
+Description - Verify that the PCE does not share its
+PbapSupportedFeatures bits with a legacy server.
+
+Incase of legacy server, check for 'supported features bit'
+uint_32_t value instead of directly checking the pointer
+holding the attribute.
+As pointer 'data' won't be null as PbapSupportedFeatures
+attribute is present in SDP record but it's value is zero.
+
+
+  Commit: b22bbf873f819ceef4d50feabcebe907f309c68a
+      https://github.com/bluez/bluez/commit/b22bbf873f819ceef4d50feabcebe907f309c68a
+  Author: Amisha Jain <quic_amisjain@quicinc.com>
+  Date:   2024-11-11 (Mon, 11 Nov 2024)
+
+  Changed paths:
+    M obexd/plugins/pbap.c
+
+  Log Message:
+  -----------
+  obex: Fix the PBAP GET request in PTS testing
+
+This change is required for passing below PTS testcases:
+1. PBAP/PSE/PBD/BV-02-C
+2. PBAP/PSE/PBD/BV-03-C
+3. PBAP/PSE/PBD/BI-01-C
+4. PBAP/PSE/PBD/BV-13-C
+5. PBAP/PSE/PBD/BV-14-C
+6. PBAP/PSE/PBD/BV-17-C
+
+PTS sends all the GET phonebook requests without extra params.
+Therefore, the PBAP server is rejecting the requests with a
+'Bad Request' response.
+So append 'maxlistcount' as default param in GET request to
+avoid testcase failure.
+
+
+  Commit: f0302d90a1db2b2b504819bba61f99681f3bdb72
+      https://github.com/bluez/bluez/commit/f0302d90a1db2b2b504819bba61f99681f3bdb72
+  Author: Amisha Jain <quic_amisjain@quicinc.com>
+  Date:   2024-11-11 (Mon, 11 Nov 2024)
+
+  Changed paths:
+    M doc/supported-features.txt
+    M src/profile.c
+
+  Log Message:
+  -----------
+  obex: Update the FTP version to 1.3 in SDP record
+
+This change is required in below PTS testcase:
+1. FTP/SR/SGSIT/ATTR/BV-02-C
+Attribute GSIT - Bluetooth Profile Descriptor List
+
+Current FTP version 1.2 is being deprecated and withdrawn
+from BT Sig, so it is mandatory to update the version to 1.3.
+
+No additional changes are needed for supporting the new version.
+
+
+Compare: https://github.com/bluez/bluez/compare/de1b3a5ac399...f0302d90a1db
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
