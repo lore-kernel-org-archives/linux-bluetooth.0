@@ -1,104 +1,115 @@
-Received: from mail-qk1-f171.google.com (mail-qk1-f171.google.com [209.85.222.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0557519D881
-	for <linux-bluetooth@vger.kernel.org>; Mon, 11 Nov 2024 13:02:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1241215746E
+	for <linux-bluetooth@vger.kernel.org>; Mon, 11 Nov 2024 13:22:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731330174; cv=none; b=GTpXDbtud0TWXf9fiQExyj2Biv7PF6yhBSXF/gNbOZLZ+w2UipsCorCb8PxvxIoLfJp2C9WX2ZP3jYmgNm60i8mWiVIfot7b87rbEfIuaF/l/Qfhte8Gw7uNtsoKn1EpZjUfNElNudL7luYSIXDC1+IZQlSuHWcjqbgNioYk+LQ=
+	t=1731331373; cv=none; b=S9yit2PjvX+enRGoCWdrvUvTovVqzoEd/JdeUaKWU8c+WIdMrZwiCY/dvpmS4bdf1sDZoeP4axPL0OJexYe0EaWkx9eNyK15HY7Mn2cPxcwUYZCh0yiJ70zkbew4ODePrvn2eDyDZxeQutf6RZsJBuREMbkzHEqkO6bKs4flOsU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731330174; c=relaxed/simple;
-	bh=X85KGziPFwOsHzdjSATT5HtRNHusg4Ls6oRv1KwK0qA=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=QvlZHdi9pi0lywFB3yJyqGYPK7n8JqgSjyocHUI7jGFSfWrlA8UUKadQoSA8RYEGF7AOWjjqqQdnHmtCUiheSh7trJp1l+6Id2iuX8XN64W/1WPkA+8iwwbGAP3lrKNyr7ujo1HpcntGNitACGSfyiXYeJEo9X/z7i8zGT25K8E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=M6+plZfK; arc=none smtp.client-ip=209.85.222.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1731331373; c=relaxed/simple;
+	bh=Ai3nQePRy6cV0HMP1HzH73ywj9NuMjNqF9W6X3dDJeA=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=dfFaO0ohoFcYbRfMbrsNUH+zbKZfCcVr2ebQu5tDi+x8ntMntUS7ji9YVr6HIv9+CoJjHWc8yuniGd5dyXUtlbKeTj6Ve774yQQi4QaHdN5r8hrZRC3SkTBgGRHErnJrdep+FfbfadEaB33vpihdQV7q5MPKHvmw18tIQcriuMo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=AoIQfmzq; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="M6+plZfK"
-Received: by mail-qk1-f171.google.com with SMTP id af79cd13be357-7b157c9ad12so310891385a.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 11 Nov 2024 05:02:52 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1731330172; x=1731934972; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=3iq/S10AQR37MrRsX15xylS582/xLXCjcNgGV3Hy4Uo=;
-        b=M6+plZfKdmcaSucb/o8887RVVCmBoKIy+5efBmQmuKFbIYxB81CzKi2oZU2vKs2U1t
-         P7+ygNhCtiQaDcsFmO/pjfL1N+wnvGAB7hK6W9J5O4YLut7thhR+ZiO+qr+cjfvu/qvS
-         xZGBAon0eWVlVXfHEexyyy0PW0294KMuKY0iHWU9wO7pd9zV9bxVrEKHYBOtO+jEz5eP
-         8RDoAjLLUM/ErBq3TpDrEA2x1eLHhe5rMZw+ckBRE1QgOwR9dVtR51nyoOZN2fvvlXy/
-         g56x2dIli1PmhLjXiaIuhoFWe/WWweK8JfOGFhH2W4zXrhDPThEL4FRdmzmoWYpJAUua
-         NSiQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731330172; x=1731934972;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=3iq/S10AQR37MrRsX15xylS582/xLXCjcNgGV3Hy4Uo=;
-        b=c3Jg/SqEVdcO+Jc+z90czM5zbubOAIyFYIaAc9QgHs2tVw+THOvj6w2/r+YQ0hgc5w
-         9yH4mJC+p5YS34DAu9CM1Zxvt5sps2a4mKZyd/pAi5+1V2isrLRCkSx8bhdAprpSneEw
-         +xd+d/lB+fNmog72nm2ln8VclXqlWKLv4epvMO/gM9IaDuOCbEZgQdG9L7FCP23SUeI2
-         uQ+jlNsLZnBa1sIdV+Xp7fjuBbMgAtKTQu/adXdNrksVvzNyBUJ2AKVzZXz9z9ChLK8v
-         dV1ZWtRIoolGoe6JyZyPT9aVy36AqP3oaomFK9R2VgN7nUd34Lme7KQDY9+pfJxdSWnA
-         XPRw==
-X-Gm-Message-State: AOJu0YxUniE91ngeSTfrct5uB6hL34jKiR+eDmg4stVcfZaYvEDOdnqA
-	IONpaT4wVTSB0BF1b7jG9DMmhSylVQK/iQNBhqu1O3MVNRZMaXJHHJseVQ==
-X-Google-Smtp-Source: AGHT+IFDwJrhO/YLxdd3cX3rV/0n6RLA/UgYXfOpHF0mXdHS5U/+/lLvIz8anwyT1DdV4JaC779Dkw==
-X-Received: by 2002:a05:620a:4608:b0:7b1:8dc0:761e with SMTP id af79cd13be357-7b331ec8e57mr1790591185a.35.1731330171626;
-        Mon, 11 Nov 2024 05:02:51 -0800 (PST)
-Received: from [172.17.0.2] ([20.109.37.2])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7b32accb211sm489671885a.98.2024.11.11.05.02.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 Nov 2024 05:02:51 -0800 (PST)
-Message-ID: <6732007b.050a0220.3c574f.c96e@mx.google.com>
-Date: Mon, 11 Nov 2024 05:02:51 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============1858968710230291109=="
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="AoIQfmzq"
+Received: from pps.filterd (m0279866.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4ABCKNpj031792
+	for <linux-bluetooth@vger.kernel.org>; Mon, 11 Nov 2024 13:22:51 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=qcppdkim1; bh=FSzwrcGuMxpV6D4eGzam+W
+	umKqpJwpLuB+Vtcr4EQKU=; b=AoIQfmzqf/h07SCwk6lvr0HIVd40IITV4PEXYw
+	jQaiXkRD19jPRmwILMwK/AlWK5yz/AvOxA2WxszgMbDG08893i3nqVV8AG2bZkpc
+	qA7Sn/XnPx4PhzRK6bscrwj8eN13BE4vn6Qz8AobfCivD2/YtzIOEoYzeadgrPef
+	2etp6ouNKC4UGpLROkNYs1cI6qiShgiEqxSuC42jZpvAjQrbVeg+hnO/NnPjGcT2
+	6bCEUXBudm653p/ZVqr4vRRO41thgixDEj9J3o3Tuphif/i3Hw0v2y5HcP0p8Jal
+	orYN9V6cdLrnMxl5juR4jSZYsUxEo3xtcTp3M84HpGjtgpYA==
+Received: from nasanppmta05.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 42t11846yp-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <linux-bluetooth@vger.kernel.org>; Mon, 11 Nov 2024 13:22:51 +0000 (GMT)
+Received: from nasanex01c.na.qualcomm.com (nasanex01c.na.qualcomm.com [10.45.79.139])
+	by NASANPPMTA05.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 4ABDMoR7000905
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <linux-bluetooth@vger.kernel.org>; Mon, 11 Nov 2024 13:22:50 GMT
+Received: from hu-amisjain-hyd.qualcomm.com (10.80.80.8) by
+ nasanex01c.na.qualcomm.com (10.45.79.139) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.9; Mon, 11 Nov 2024 05:22:48 -0800
+From: Amisha Jain <quic_amisjain@quicinc.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: <quic_mohamull@quicinc.com>, <quic_hbandi@quicinc.com>,
+        <quic_anubhavg@quicinc.com>
+Subject: [PATCH v1] obex: Update the FTP version to 1.3 in SDP record
+Date: Mon, 11 Nov 2024 18:52:38 +0530
+Message-ID: <20241111132238.2162878-1-quic_amisjain@quicinc.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, quic_amisjain@quicinc.com
-Subject: RE: [v1] obex: Fix the PBAP GET request in PTS testing
-In-Reply-To: <20241111111625.1887695-1-quic_amisjain@quicinc.com>
-References: <20241111111625.1887695-1-quic_amisjain@quicinc.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nasanex01c.na.qualcomm.com (10.45.79.139)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: XTffwxPyrl7MYUistX9ziz-3uMQ80Pup
+X-Proofpoint-GUID: XTffwxPyrl7MYUistX9ziz-3uMQ80Pup
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
+ definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 mlxscore=0
+ bulkscore=0 mlxlogscore=999 lowpriorityscore=0 malwarescore=0
+ clxscore=1015 priorityscore=1501 adultscore=0 suspectscore=0 spamscore=0
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2409260000 definitions=main-2411110111
 
---===============1858968710230291109==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+This change is required in below PTS testcase:
+1. FTP/SR/SGSIT/ATTR/BV-02-C
+Attribute GSIT - Bluetooth Profile Descriptor List
 
-This is automated email and please do not reply to this email!
+Current FTP version 1.2 is being deprecated and withdrawn
+from BT Sig, so it is mandatory to update the version to 1.3.
 
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=908365
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      0.47 seconds
-GitLint                       PASS      0.33 seconds
-BuildEll                      PASS      24.95 seconds
-BluezMake                     PASS      1688.10 seconds
-MakeCheck                     PASS      13.07 seconds
-MakeDistcheck                 PASS      183.09 seconds
-CheckValgrind                 PASS      255.34 seconds
-CheckSmatch                   PASS      362.03 seconds
-bluezmakeextell               PASS      123.68 seconds
-IncrementalBuild              PASS      1435.02 seconds
-ScanBuild                     PASS      1020.19 seconds
-
-
+No additional changes are needed for supporting the new version.
 
 ---
-Regards,
-Linux Bluetooth
+ doc/supported-features.txt | 2 +-
+ src/profile.c              | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
+diff --git a/doc/supported-features.txt b/doc/supported-features.txt
+index f04cf4a2f..8b71bfe17 100644
+--- a/doc/supported-features.txt
++++ b/doc/supported-features.txt
+@@ -36,7 +36,7 @@ AVCTP			1.3		CT, TG
+ AVRCP			1.5		CT, TG
+ 
+ GOEP			2.0		Client, Server
+-FTP			1.2		Client, Server
++FTP			1.3		Client, Server
+ OPP			1.2		Client, Server
+ SYNCH			1.1		Client
+ PBAP			1.1		Client, Server
+diff --git a/src/profile.c b/src/profile.c
+index c62224af9..6bc6778de 100644
+--- a/src/profile.c
++++ b/src/profile.c
+@@ -2126,7 +2126,7 @@ static struct default_settings {
+ 		.mode		= BT_IO_MODE_ERTM,
+ 		.authorize	= true,
+ 		.get_record	= get_ftp_record,
+-		.version	= 0x0102,
++		.version	= 0x0103,
+ 	}, {
+ 		.uuid		= OBEX_SYNC_UUID,
+ 		.name		= "Synchronization",
+-- 
+2.34.1
 
---===============1858968710230291109==--
