@@ -1,104 +1,137 @@
-Received: from mail-qv1-f54.google.com (mail-qv1-f54.google.com [209.85.219.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F92880034
-	for <linux-bluetooth@vger.kernel.org>; Mon, 11 Nov 2024 15:41:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA9B11C01
+	for <linux-bluetooth@vger.kernel.org>; Mon, 11 Nov 2024 15:54:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731339682; cv=none; b=XiJHfBGSywOl4iXZcOnwDlgvE3wsMqgrKhdv5keJoGUbTeWMrPRzx+mb/1tp9qzgKkRQac88ZGW/oWm/vIQlA3iJYBmpsHZSl/ArsKCZivVSjwxKn3+K2zCh1KP/SGT9v0jzdXhzDOxVxRQkaFk091KVv2sAH4udI346Qz0Imss=
+	t=1731340477; cv=none; b=YK8RFodTD692fFQdsBdYTxjynz75Q2KBYwsNfAp+hF12+QHVl5zd2D5ZJbTaNc7s8hQHwu1QkvKnDii5zP7k8EPrBgt005odTLUfsgq69Swzz7FGgU4wQ185mLL9ADRepdhXAEPW/d7TL/nSdYRXvI6kbVtVtcyfOWfW29cZ0RY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731339682; c=relaxed/simple;
-	bh=3G8iunY+ZkcKLc/53Q4Rm0r/tM5E6jklIWYJ0ZkL+4g=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=OvUh18KdqFJ2mZwDGLYFD2UQIQWNsWLUckDYM3brLchPeJyZQhhakwbpGOMnmRKmMKxGso5foZA92g+2nwBfrTJIyCwz+cRRKQCKV3fTwRoCpyA+C1BWdxDkl2MbBIb3R6sy3o43ZQVJ3LWbgele6SZedKJB3KMjLues2HsjzvU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Mb2o5lBi; arc=none smtp.client-ip=209.85.219.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1731340477; c=relaxed/simple;
+	bh=XooXvHMMs1uuaBkcLgrhBEN/C/SKxtl6Ur+vSYnxu9g=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=S19yTIH/xpncej6QC4i41uQqm7WOYgHUfzeI1epCJUOEL5e2QMEzNQ+qT8u5B/kWZSj72xSttXv0oBFs2KovOODjmbEn1Rvml0gZ2tGZP3KpY2ptwYxUgeK87PuOZehj5PLNqR8E95TSbkVVE8s834MEe+3y8YnIEUUeU8Q8dmE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=XONh68YM; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Mb2o5lBi"
-Received: by mail-qv1-f54.google.com with SMTP id 6a1803df08f44-6cbd550b648so36108816d6.0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 11 Nov 2024 07:41:20 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1731339680; x=1731944480; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=h/yL4jLacqYfYSLsA7OsxU/R9ckHUeOV/2NS7SXhWRo=;
-        b=Mb2o5lBiDd5OzJPkFtxxkRggm8Qx/D3y/OHKfqiySB1Ou4wb/x93W9pQgjsXYQuxmR
-         dyCv5xUslny6lOZC1oigEI6eDnZwuwdd6JQNFZ9mHDh7+W+CgvzyBdlIzqaHOzsPU9yH
-         1Wz8NDZ9UgdSuSM6WzNcMmiBqdFVv5B5VNXDFzpnO4CdWHmgKuxEVdAyi+9i7GX9uDWe
-         cXq2uf3kgDSecC+Eirny9nf+lgDNtQiHRZRX3o/cjHyJGWuVQyqlvG2Fi5jlG6Up+F+a
-         CeupM6mf9n4zGLCsWuZxJYz35naKD6BauHJ347W53ug7ZK2KRehHeTVNapyVHEN0Rwud
-         tbAw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731339680; x=1731944480;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=h/yL4jLacqYfYSLsA7OsxU/R9ckHUeOV/2NS7SXhWRo=;
-        b=B7UrYf60ReREI9iiSiG2r8AI4McUighBvsW9pKz0U5fLJU9CgMkqmI1piCsmw7Og6u
-         8NBtH0pWnmEcT/ZsdNrwhPo1b+rmtl1XAKFuap5fzliyEaI0e4xvsGvCAdkDU9zDYLrs
-         reHr/TPdP4TY2BBClZ1cCx+Q9POQEHrd0u5eOeiaJZxKWzg2R/RRJjeEe95obxFJsoCX
-         MfPhqDvy/kDnMcrmgwOSNN4FlAk8w82ztZlsfJ4idF/f3YJfJG0hKgeU2nWFt+oXYIRt
-         kSYFt/l6+F7AW4IeLlQ5ns2dPq1Hpt8P10WMiL2Okd55/ha6jMxuMPpSrSaVIMeASsp7
-         F5eA==
-X-Gm-Message-State: AOJu0Yy9Q7nhFmSU8TCczAKYQ7LmDVNNYXtHFBERAgxIEK/zrLAt4x/I
-	wlgd8oKyNv8C8AOK/8abjglXbu0HP3DW5bP2+f3R5IeTwbkak4K8fkj9gA==
-X-Google-Smtp-Source: AGHT+IFy0oXQ0cxJ7TOKr9RWKSdMmom2pkvFFLxdlc41rLiqOqp3xb1Jkynh5HQRk6SG1cfw9knzKg==
-X-Received: by 2002:a05:6214:5710:b0:6cc:1fe2:18f9 with SMTP id 6a1803df08f44-6d39e125704mr201410316d6.14.1731339679827;
-        Mon, 11 Nov 2024 07:41:19 -0800 (PST)
-Received: from [172.17.0.2] ([20.161.78.62])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7b32ac42c36sm507904385a.31.2024.11.11.07.41.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 Nov 2024 07:41:19 -0800 (PST)
-Message-ID: <6732259f.050a0220.1a135d.d21e@mx.google.com>
-Date: Mon, 11 Nov 2024 07:41:19 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============7149040786107680157=="
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="XONh68YM"
+Received: from pps.filterd (m0279871.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4ABCF1td014837
+	for <linux-bluetooth@vger.kernel.org>; Mon, 11 Nov 2024 15:54:33 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=qcppdkim1; bh=teYnekODRUlfeoMlMe7UGs
+	m8hUGQgAkP7gUNXL9TrTk=; b=XONh68YM7xIcg2kS4ODABX5UwXgzWKQvft0s/7
+	cKsEAlcW73RNsouzeQV4NXYOpgCZP/xCgPJ+UBnyElXMtz3gg5hawuXQ6YcE6jP3
+	iO9IWHX8+uHO+r1BDt0+WdNpnwsXit+izg131c0ABECSQbA3fKQfqkafFoAvSS7Q
+	YPIr8fscAUHAnipzjDR6WjrDMI3alG1aQvBd+w+GvzaNy8JGaAgbVcwTO5twT/rK
+	txTG/D/sTfdTXc9JBWmhfWbXaFt0Hm29UxMIz8uVgcm+AD/HWdPBLWWEnUNYg9Za
+	dbx6eF8ywraWdRGYhxpkh7OTyfDeAy12D+71Nn7nVcjCOafg==
+Received: from nalasppmta01.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 42syax4nr1-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <linux-bluetooth@vger.kernel.org>; Mon, 11 Nov 2024 15:54:33 +0000 (GMT)
+Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
+	by NALASPPMTA01.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 4ABFsWub029884
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <linux-bluetooth@vger.kernel.org>; Mon, 11 Nov 2024 15:54:32 GMT
+Received: from hu-dgangire-hyd.qualcomm.com (10.80.80.8) by
+ nalasex01c.na.qualcomm.com (10.47.97.35) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.9; Mon, 11 Nov 2024 07:54:30 -0800
+From: <quic_dgangire@quicinc.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: <quic_mohamull@quicinc.com>, <quic_hbandi@quicinc.com>,
+        <quic_anubhavg@quicinc.com>
+Subject: [PATCH BlueZ v1] tools/obexctl: Add command line options to support session/system bus
+Date: Mon, 11 Nov 2024 21:24:17 +0530
+Message-ID: <20241111155417.2439689-1-quic_dgangire@quicinc.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, yuxinwang9999@gmail.com
-Subject: RE: [BlueZ] advertising: Add scan response properties to LEAdvertisement1
-In-Reply-To: <20241111135250.2319622-1-yuxinwang9999@gmail.com>
-References: <20241111135250.2319622-1-yuxinwang9999@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nalasex01c.na.qualcomm.com (10.47.97.35)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: IBd7W__inCZFQlqcOOrLu-nGJOi-BuXW
+X-Proofpoint-GUID: IBd7W__inCZFQlqcOOrLu-nGJOi-BuXW
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
+ definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 adultscore=0
+ bulkscore=0 malwarescore=0 spamscore=0 suspectscore=0 mlxlogscore=999
+ lowpriorityscore=0 priorityscore=1501 clxscore=1015 phishscore=0
+ mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2409260000 definitions=main-2411110130
 
---===============7149040786107680157==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+From: Damodar Reddy GangiReddy <quic_dgangire@quicinc.com>
 
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=908428
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      0.54 seconds
-GitLint                       PASS      1.62 seconds
-BuildEll                      PASS      24.69 seconds
-BluezMake                     PASS      1656.56 seconds
-MakeCheck                     PASS      14.26 seconds
-MakeDistcheck                 PASS      180.46 seconds
-CheckValgrind                 PASS      254.63 seconds
-CheckSmatch                   PASS      357.24 seconds
-bluezmakeextell               PASS      120.99 seconds
-IncrementalBuild              PASS      1413.64 seconds
-ScanBuild                     PASS      1014.12 seconds
-
-
+Currently obexctl only uses session bus.
+As obexd has been enabled support for both session and system bus.
+Configuring obexctl to use session/system bus during the runtime
+with command line options.
+./obexctl --bustype=system or --bustype=session.
+By Default session bus will be used.
 
 ---
-Regards,
-Linux Bluetooth
+ tools/obexctl.c | 30 ++++++++++++++++++++++++++++--
+ 1 file changed, 28 insertions(+), 2 deletions(-)
 
+diff --git a/tools/obexctl.c b/tools/obexctl.c
+index a398b095b..21abfc6f0 100644
+--- a/tools/obexctl.c
++++ b/tools/obexctl.c
+@@ -2149,16 +2149,42 @@ static void property_changed(GDBusProxy *proxy, const char *name,
+ 		session_property_changed(proxy, name, iter);
+ }
+ 
++static const char * const help[] = {
++		"Configures either session or system bus.By Default session bus is used",
++};
++
++static const char *bustype_option;
++
++static const char **optargs[] = {
++		&bustype_option
++};
++
++static const struct option options[] = {
++		{ "bustype", required_argument, 0, 'b' },
++		{ 0, 0, 0, 0 }
++};
++
++static const struct bt_shell_opt opt = {
++		.options = options,
++		.optno = sizeof(options) / sizeof(struct option),
++		.optstr = "b",
++		.optarg = optargs,
++		.help = help,
++};
++
+ int main(int argc, char *argv[])
+ {
+ 	GDBusClient *client;
+ 	int status;
+ 
+-	bt_shell_init(argc, argv, NULL);
++	bt_shell_init(argc, argv, &opt);
+ 	bt_shell_set_menu(&main_menu);
+ 	bt_shell_set_prompt(PROMPT, NULL);
+ 
+-	dbus_conn = g_dbus_setup_bus(DBUS_BUS_SESSION, NULL, NULL);
++	if (bustype_option && !(strcmp(bustype_option, "system")))
++		dbus_conn = g_dbus_setup_bus(DBUS_BUS_SYSTEM, NULL, NULL);
++	else
++		dbus_conn = g_dbus_setup_bus(DBUS_BUS_SESSION, NULL, NULL);
+ 
+ 	client = g_dbus_client_new(dbus_conn, "org.bluez.obex",
+ 							"/org/bluez/obex");
+-- 
+2.34.1
 
---===============7149040786107680157==--
