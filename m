@@ -1,137 +1,127 @@
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f46.google.com (mail-qv1-f46.google.com [209.85.219.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89AA54C91
-	for <linux-bluetooth@vger.kernel.org>; Tue, 12 Nov 2024 04:50:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00AE71EBFFD
+	for <linux-bluetooth@vger.kernel.org>; Tue, 12 Nov 2024 06:41:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731387050; cv=none; b=XWH38j2Qu5xwW0uOgCYJsdrtFGrPCNPcSyscPw099E9GWcpjjvCt5clpzdDIFJTqMYaj54zpw9QcTGtVCmoYS1K8PLGnJn4Ra0jDNibeVoE4ITwsgWQiA2Kc9CIIWSosMBQKZvlrlpgbgeP51PXOQDgMeOZvMCQBAZmw4Oh3hH8=
+	t=1731393662; cv=none; b=X0gJrBOoitMfwSmiJ8mxXa7zfW+5/lJmDFSxRH1luDRk/vTBDRqraOV8bjEIWUgsI4CTpN/KqW1aQgY7jCF3euZOMGWk5yASrROlgCKwAWA8pLaUz4M36rCxhoxfdJsI47NQcWnltVAx9czMfnn6OjL/vxn1s3KnlmX6+okpL0w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731387050; c=relaxed/simple;
-	bh=yYj8Hr69aFja5vBNP8TkIuKXByteTOFTeY5BUWtEe8k=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=TRCRQ8VtX4SwMYGrX1sx31uoVU+nf8qFwO7ID/zTDDkkPGOP7aAk32AG3To9G3vYQnu0DKGooTJrEtld11LVOZpTktVO94lUbgI6Vhyby8ZSYNhm6nOjBZbPtibyareUxXt1Zfe1RCi+ouE6DJSP8R5IxDwVaVg3wuoa+QJabDA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=X2krD5e2; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+	s=arc-20240116; t=1731393662; c=relaxed/simple;
+	bh=C+iTWFmYFB2/Vt0TvTVTPsDXdhA98NlI10nCz9unxnw=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=tKq6gEWrQ1mwEirMXI8Ui4La3ptITK/O60LuhMFRBGW2UZdc1Z++/vJVChbrofgDzeHoAKkLLEagaHgzX1f8A5i+mDD+S/pOMXkXNrzygIyL3WmqYHGfSqgd6KORhPHLbz4jKwrB2xxQ+XmGNc5JvrlTIpSFbBMvUpdLvSVEBN8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=N9A4SaM2; arc=none smtp.client-ip=209.85.219.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="X2krD5e2"
-Received: from pps.filterd (m0279866.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4AC2DHji003882
-	for <linux-bluetooth@vger.kernel.org>; Tue, 12 Nov 2024 04:50:41 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:message-id
-	:mime-version:subject:to; s=qcppdkim1; bh=/amOirFSA5zRj2ZA3/QDHx
-	s42tbZ7pzcp1MPkXbCPGI=; b=X2krD5e2JM1h3pzjtyzycJC4BbdckFJV9oHLjQ
-	cR0VtwC4M9hB95qDoYZ6ovqyNYSDsMfndoC5q/coI5wdZ+hszSA5Pjus3NCBqcpX
-	wctsjOHWilaJBvR3L1fdrkSNqANLSlz6zLBhl5PIeqkeIA768XNyZetHh8HJeREs
-	WQ2c4ejG9dYmb+P4JqyL8E66FfhlWXzziTVWljLD5hZR1+WPubTinLviNvcDX/Sr
-	J54iuss+hZ4rmgDpzvJmLiMON3aGiJqdFSzMyNWX09nGi7nWCaY077Vj+fGum6Iq
-	XSjlakX6Ilp8cpWsvFdk+B4FVE2KiDiwsu8qjwIAPn6TgYOQ==
-Received: from nalasppmta01.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 42t11862ru-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <linux-bluetooth@vger.kernel.org>; Tue, 12 Nov 2024 04:50:41 +0000 (GMT)
-Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
-	by NALASPPMTA01.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 4AC4oedY027357
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <linux-bluetooth@vger.kernel.org>; Tue, 12 Nov 2024 04:50:40 GMT
-Received: from hu-dgangire-hyd.qualcomm.com (10.80.80.8) by
- nalasex01c.na.qualcomm.com (10.47.97.35) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.9; Mon, 11 Nov 2024 20:50:38 -0800
-From: <quic_dgangire@quicinc.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: <quic_mohamull@quicinc.com>, <quic_hbandi@quicinc.com>,
-        <quic_anubhavg@quicinc.com>
-Subject: [PATCH BlueZ v2] tools/obexctl: Add command line options to support session/system bus
-Date: Tue, 12 Nov 2024 10:20:22 +0530
-Message-ID: <20241112045022.2743723-1-quic_dgangire@quicinc.com>
-X-Mailer: git-send-email 2.34.1
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="N9A4SaM2"
+Received: by mail-qv1-f46.google.com with SMTP id 6a1803df08f44-6cbd550b648so40837446d6.0
+        for <linux-bluetooth@vger.kernel.org>; Mon, 11 Nov 2024 22:41:00 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1731393659; x=1731998459; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=kwF3md95tGWavfQFPe/QOuOKivnbESyiCaWdO7ca5SU=;
+        b=N9A4SaM2qfemo1Gm6l/dG6nCccJW9it6Ka3QKgPVTiugiv0JsFrrD3Uztw+7z4jjkk
+         qWYOaUXSmOYQ4BIzVzHk9GNAi+/vDbWa67OA93VFycSWhtzd73amFt6B9sFA4a90X8T3
+         6RiKEaWJwO2GKQQrFJkseDHDmwq6+SyPqHMjmJpLRuNljqNUy6uGT6OjF0oaMUrZEdgb
+         0IzPzMXm99vATzrxReeLpQFSRbgFQe+s6Az6SwXFx2npyGuhiKC9Rihd/V7C6mUkoZtg
+         M3FC4AJGrp1sIX4x0FiQwH+vuNtfVXrOXiqmWbHVKbftB9BDaKGDLUeVCnxVM9lru1zJ
+         OfVQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731393659; x=1731998459;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=kwF3md95tGWavfQFPe/QOuOKivnbESyiCaWdO7ca5SU=;
+        b=ru4nOqKdVjd9hWYWKTcZtbWxFGn9Tt3VqWEKXYSzWCGyTHYOlW0p5mjoLryNjEGBTs
+         mNvgxeRpUfkW1++CA1mB6dKmmjg7Irm/sJ8+3hiV1FhNn0PtA017xlT+U6kjexLkjLoO
+         QIPSFjMxRJPwjOsuc6uMeOXT4Np5wRIo2idDS+vUIPXG9HRRuCWmI0qik1/oOyf8Cuts
+         0BfhGcshLBx2mdsqzAb5QHJsEuBvWNeb7AGWof5pBT0K8ireuJGUKXgFr5L1D/t53qBd
+         Qv7MXPpY2pmyMPG3XCAJ5FhxOUitqgercc5U3ZGnyYqpYRG6VbiBEtSoOsa35mTTshRO
+         dHNw==
+X-Gm-Message-State: AOJu0Yw+HodX/KoARxSEdNBjS6SqsVGTGaoW/V9sCYPYaGGoP7Dxk+Hi
+	GGxUrENgadSItHWVJlrC3faiU8nvLKZkM0G70uc/nKoOfz7NIxPq6AdF7Q==
+X-Google-Smtp-Source: AGHT+IHTDswFQij/UE66Bs4D9OhYFY+eNp+lVe4FmlzJyzZ6tWQX3SyC6fzPDUe4R2fot42kkyCQvg==
+X-Received: by 2002:a05:6214:498e:b0:6cc:2cd6:24 with SMTP id 6a1803df08f44-6d39e1a5c68mr232323726d6.36.1731393659421;
+        Mon, 11 Nov 2024 22:40:59 -0800 (PST)
+Received: from [172.17.0.2] ([20.51.206.1])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6d3961df2d2sm68353396d6.25.2024.11.11.22.40.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 11 Nov 2024 22:40:58 -0800 (PST)
+Message-ID: <6732f87a.d40a0220.11c383.2ad0@mx.google.com>
+Date: Mon, 11 Nov 2024 22:40:58 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============6164480435107100101=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nalasex01c.na.qualcomm.com (10.47.97.35)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: lHH1MPXpooBqfrzmaAky7jdszkYq6JAO
-X-Proofpoint-GUID: lHH1MPXpooBqfrzmaAky7jdszkYq6JAO
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
- definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 mlxscore=0
- bulkscore=0 mlxlogscore=999 lowpriorityscore=0 malwarescore=0
- clxscore=1015 priorityscore=1501 adultscore=0 suspectscore=0 spamscore=0
- impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2409260000 definitions=main-2411120039
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, quic_dgangire@quicinc.com
+Subject: RE: [BlueZ,v2] tools/obexctl: Add command line options to support session/system bus
+In-Reply-To: <20241112045022.2743723-1-quic_dgangire@quicinc.com>
+References: <20241112045022.2743723-1-quic_dgangire@quicinc.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-From: Damodar Reddy GangiReddy <quic_dgangire@quicinc.com>
+--===============6164480435107100101==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Currently obexctl only uses session bus.
-As obexd has been enabled support for both session and system bus.
-Configuring obexctl to use session/system bus during the runtime
-with command line options.
-./obexctl --bustype=system or --bustype=session.
-By Default session bus will be used.
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=908663
+
+---Test result---
+
+Test Summary:
+CheckPatch                    FAIL      7.37 seconds
+GitLint                       PASS      0.30 seconds
+BuildEll                      PASS      24.44 seconds
+BluezMake                     PASS      1687.47 seconds
+MakeCheck                     PASS      13.18 seconds
+MakeDistcheck                 PASS      178.69 seconds
+CheckValgrind                 PASS      253.09 seconds
+CheckSmatch                   PASS      356.69 seconds
+bluezmakeextell               PASS      120.05 seconds
+IncrementalBuild              PASS      1412.88 seconds
+ScanBuild                     PASS      1008.18 seconds
+
+Details
+##############################
+Test: CheckPatch - FAIL
+Desc: Run checkpatch.pl script
+Output:
+[BlueZ,v2] tools/obexctl: Add command line options to support session/system bus
+WARNING:STATIC_CONST_CHAR_ARRAY: static const char * array should probably be static const char * const
+#115: FILE: tools/obexctl.c:2152:
++static const char *help[] = {
+
+/github/workspace/src/src/13871714.patch total: 0 errors, 1 warnings, 44 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/src/13871714.patch has style problems, please review.
+
+NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+
 
 ---
- tools/obexctl.c | 30 ++++++++++++++++++++++++++++--
- 1 file changed, 28 insertions(+), 2 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/tools/obexctl.c b/tools/obexctl.c
-index a398b095b..d88ffc9fe 100644
---- a/tools/obexctl.c
-+++ b/tools/obexctl.c
-@@ -2149,16 +2149,42 @@ static void property_changed(GDBusProxy *proxy, const char *name,
- 		session_property_changed(proxy, name, iter);
- }
- 
-+static const char *help[] = {
-+		"Configures either session or system bus.By Default session bus is used",
-+};
-+
-+static const char *bustype_option;
-+
-+static const char **optargs[] = {
-+		&bustype_option
-+};
-+
-+static const struct option options[] = {
-+		{ "bustype", required_argument, 0, 'b' },
-+		{ 0, 0, 0, 0 }
-+};
-+
-+static const struct bt_shell_opt opt = {
-+		.options = options,
-+		.optno = sizeof(options) / sizeof(struct option),
-+		.optstr = "b",
-+		.optarg = optargs,
-+		.help = help,
-+};
-+
- int main(int argc, char *argv[])
- {
- 	GDBusClient *client;
- 	int status;
- 
--	bt_shell_init(argc, argv, NULL);
-+	bt_shell_init(argc, argv, &opt);
- 	bt_shell_set_menu(&main_menu);
- 	bt_shell_set_prompt(PROMPT, NULL);
- 
--	dbus_conn = g_dbus_setup_bus(DBUS_BUS_SESSION, NULL, NULL);
-+	if (bustype_option && !(strcmp(bustype_option, "system")))
-+		dbus_conn = g_dbus_setup_bus(DBUS_BUS_SYSTEM, NULL, NULL);
-+	else
-+		dbus_conn = g_dbus_setup_bus(DBUS_BUS_SESSION, NULL, NULL);
- 
- 	client = g_dbus_client_new(dbus_conn, "org.bluez.obex",
- 							"/org/bluez/obex");
--- 
-2.34.1
 
+--===============6164480435107100101==--
