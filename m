@@ -1,38 +1,38 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF5191E884
-	for <linux-bluetooth@vger.kernel.org>; Tue, 12 Nov 2024 01:18:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19BA12040A8
+	for <linux-bluetooth@vger.kernel.org>; Tue, 12 Nov 2024 02:10:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731374322; cv=none; b=VvVaDpGizIbKf+Whe3u0nYeTujVlwspUmVBzdPW3AnkCrSdrZnVTKSwz0ODz1F5mi3eQ4u4VvhOapVr1btYU0RyACvZrk6AL2JwccYStwGcS4Ce5zWo6VAOitAdybH/5BqHOmaBJJdymDzZTMWvfBlH0YuTzBa9HBmOXU5rpAJQ=
+	t=1731377430; cv=none; b=HXk79vLe0lYohJ4HREm97eJVRmV9+PHAzD5bg0QYySMNZGSYDErQhTyUYnCoOUscU0y8a1FOJOz3I4gltYMe3Isks33l1ugrz1YOmcSeUsNfGt989EPnydMfZOaKj540YuTTDH9kYdq4HKfrkbSuaQ/NzkJys3uHsj3MHEaArls=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731374322; c=relaxed/simple;
-	bh=whY8Tuw8KhRoQk+ZEABjH16i/nqz1SESnVJBZ/hEbjI=;
+	s=arc-20240116; t=1731377430; c=relaxed/simple;
+	bh=V7ziUw3EI8uib/lA8Qh6r8GnqcsI5Rzp8nm6q92uLuE=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=RJij6pF45XQPdnpYlPGite224sIGWte7NiM8F3UYsoXJHthW3WkYS+ZbmOR1nfM9RxDZnhGeOeDYF+a+kB4FRP4wKUeYfPCp/ePv0aZfiITMemF3Su/ByOtc4R9Zt/g18hFdsaqu27FajCW8kg/jFcK73p673MFbqPUTDM7vDIE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oCnxcRzB; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:MIME-Version; b=jai9C61s+aawqm6EL+tdigKeWsamkFJJw9yrmbjhYtrzhUX8CCJXC1z5IHee3i4nGz3eyi+5y3irJrk4FB06NSAJuxBCWi7IwrdNavdjtlCdGgf+yKD8SND1ITO0fqiRMHudebdeoc+EogOEi9RBxOrdc1oJYUkxkdLcr2mg2X8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AWTe7RHE; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oCnxcRzB"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 7CB02C4CED0
-	for <linux-bluetooth@vger.kernel.org>; Tue, 12 Nov 2024 01:18:42 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AWTe7RHE"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 89A7AC4CED7
+	for <linux-bluetooth@vger.kernel.org>; Tue, 12 Nov 2024 02:10:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1731374322;
-	bh=whY8Tuw8KhRoQk+ZEABjH16i/nqz1SESnVJBZ/hEbjI=;
+	s=k20201202; t=1731377429;
+	bh=V7ziUw3EI8uib/lA8Qh6r8GnqcsI5Rzp8nm6q92uLuE=;
 	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=oCnxcRzBONRyZtu44bDPw0wDz/mpNFz0c5eoNqmiaXtP06UW/+c3ie7Xwao782f3L
-	 kDjO632DtLrLL/UyBgMv1J5AY5ZUfMAEiXKsMUCqO6IFDElufGr6HJ+SK/CIP2EJGc
-	 rxjEdk95beDTE0yphAxNhyVGPkBvzzlUWXVMUgnm5AToNrqZCvd51zcJLSuEPpP9Sj
-	 Ga+tH+pJcMPD3OBjr0+da3wvgJY4UPx4+gs7fKzYT1cb5/CFZUX+JuZJ9Y2IAvMx2L
-	 0cJVHiI7FavdIZzrCLLAG1zdOupB31+ygdQq5v9etNqdsEZNDfzjOeKTUnN6RUcwQ9
-	 UUci9pZ2o500A==
+	b=AWTe7RHEXMpNv+BnALIdTvmjvVkmLY2IbV9Od9dB07Xbsv1uvobrJqunNNjUvXVal
+	 Wly2yrjuBdFGN7M5ypGspVGT3jsoV4N3z+mZWZCCBoAjHK//ZlFWy1B84yrMyMC/DP
+	 OufebMVCaTndFVz7DjeNqbpBvZwJRnAaWf70qMXxt/a9xNIDshJ6MeZeRGYbCvgxSp
+	 ckxgAW+B/9N45ULVGzZmFTHc6IoTpkqIYER1WY7Qill9rc9cMd9d5emvCMPZbRVbpi
+	 TVFuxpxfcAfT6TtilB3oD12+N6ViKj36T1PWKONc55rDh+x+Jmb1CgcWrL9SEvbFF1
+	 HrMnxdr/4mz4Q==
 Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id 4DFABC53BC5; Tue, 12 Nov 2024 01:18:42 +0000 (UTC)
+	id 5F9D9C53BC2; Tue, 12 Nov 2024 02:10:29 +0000 (UTC)
 From: bugzilla-daemon@kernel.org
 To: linux-bluetooth@vger.kernel.org
 Subject: [Bug 219458] bluetooth connection fails after L2CAP: Fix uaf in
  l2cap_connect patch
-Date: Tue, 12 Nov 2024 01:18:41 +0000
+Date: Tue, 12 Nov 2024 02:10:28 +0000
 X-Bugzilla-Reason: AssignedTo
 X-Bugzilla-Type: changed
 X-Bugzilla-Watch-Reason: None
@@ -41,14 +41,14 @@ X-Bugzilla-Component: Bluetooth
 X-Bugzilla-Version: 2.5
 X-Bugzilla-Keywords: 
 X-Bugzilla-Severity: normal
-X-Bugzilla-Who: ghibo@mageia.org
+X-Bugzilla-Who: shaoran@sakuranohana.org
 X-Bugzilla-Status: NEW
 X-Bugzilla-Resolution: 
 X-Bugzilla-Priority: P3
 X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
 X-Bugzilla-Flags: 
 X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-219458-62941-p0FcsC5BZ0@https.bugzilla.kernel.org/>
+Message-ID: <bug-219458-62941-5UTMK10rFL@https.bugzilla.kernel.org/>
 In-Reply-To: <bug-219458-62941@https.bugzilla.kernel.org/>
 References: <bug-219458-62941@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
@@ -64,43 +64,19 @@ MIME-Version: 1.0
 
 https://bugzilla.kernel.org/show_bug.cgi?id=3D219458
 
---- Comment #8 from Giuseppe Ghib=C3=B2 (ghibo@mageia.org) ---
-(In reply to Luiz Von Dentz from comment #6)
-> (In reply to Giuseppe Ghib=C3=B2 from comment #4)
-> > btmon output added. As you can see in the working case the behaviour
-> > diverges from packet #16 (in the first case, working) and after packet =
-#94
-> > in the "not working" case, both calls ACL Data RX with L2CAP: Informati=
-on
-> > Request:, but in the working case it's followed by HCI Event: Read
-> Remote...
-> > and other commands, while in the not working case it's immediately foll=
-owed
-> > by "MGMT Event: Device Connected", like if something was truncated.
-> >=20
-> > [working]
-> > > ACL Data RX: Handle 256 flags 0x02 dlen 10              #16 [hci0]
-> > 413.700565
-> >       L2CAP: Information Request (0x0a) ident 1 len 2
-> >         Type: Extended features supported (0x0002)
-> > > HCI Event: Read Remote Extended Featu.. (0x23) plen 13  #17 [hci0]
-> > 413.700588
-> >=20
-> >=20
-> > [not working]
-> > > ACL Data RX: Handle 256 flags 0x02 dlen 10               #94 [hci0]
-> > 20.205711
-> >       L2CAP: Information Request (0x0a) ident 7 len 2
-> >         Type: Extended features supported (0x0002)
-> > @ MGMT Event: Device Connected (0x000b) plen 13       {0x0001} [hci0]
-> > 20.205764
-> >         BR/EDR Address: AA:BB:CC:DD:EE:FF (Company)
->=20
-> Any chance to check with the patch above?
+--- Comment #9 from Pablo Yanez (shaoran@sakuranohana.org) ---
+Hi Luiz
 
-Yes, just finished applying the patch (and not reverting the previous) to
-current 6.6.60+stable-queue as of today, and it didn't show the previous
-problem anymore.
+Like Guiseppe, on 6.6.58 I didn't revert the original commit and applied the
+patch (thus removing only the if clause and the mgmt_device_connected call)=
+ and
+it seems that the problem is gone.
+
+I was able to connect and disconnect multiple times in succession, I was ab=
+le
+to remove my USB-Bluetooth device and insert it again and was able to conne=
+ct
+again, I tried that several times and it always worked. Now it seems fine.
 
 --=20
 You may reply to this email to add a comment.
