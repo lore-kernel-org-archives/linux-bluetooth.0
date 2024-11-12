@@ -1,60 +1,89 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7EB51A2567
-	for <linux-bluetooth@vger.kernel.org>; Mon, 11 Nov 2024 18:41:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAF11201012
+	for <linux-bluetooth@vger.kernel.org>; Tue, 12 Nov 2024 00:53:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731350488; cv=none; b=ICx+Chmq77Cn1RFHpilaIrbgoQHJ8vepI2vC6Cj0fpHr2VibK466MfAMIpl6IcBfz5Y6GU6UwmIVdSzluw4x6VQzu025sMD7kEkOG3MJWytLHs/aVL5DkEtRXZZ/uvWy10d2LcisuLKdiOvpAk9Nvc0LiaZpNjU8UUc0TzL5YYs=
+	t=1731372795; cv=none; b=LoNjgKINzZfz9W38fhcL5pE7OhfiG047BBuP3tSnVm+A7gx+Ib9gPE3y4hAuC2N91CUBv1iD9nyK1/kfomrK20nEX2juLALus617C+636HPN4iLYEtzBAHjJB5tH8+JPtfadZIRNS+UF+Ib/T/BhHjA3P2/lMpFN3UGE52zouX8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731350488; c=relaxed/simple;
-	bh=7kYiJsHLRtWt64/ro/9Ft8TeTVJJgjlPyJXkJe7kz8w=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To; b=IymFxFYfw4KnXTPRBEtfaR+rXb/0BFdnOEev5YHM/Qks42a8htgw/qkGuCScOa0Igwz1A7fz8kVZ6+MvPlQWNZ1WfHpQWEmkbxIvQqS0R1qhG7CvnYVGHMESYrjUw8B8YVjnMh2cvUXiti6NX70BScor0jQGaSe17PgXzDVJGmU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jTGsx0VX; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1731372795; c=relaxed/simple;
+	bh=fg9+REHJSkB8W2xlihOxydS2EDNBGSAK08e+WDwWTTU=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=hrJwAEzJz2xplNKXccaxKQnif8vTLFwy+cjWmkEyd2sqE7uh8SpADlZ2ibcnb10azLrHwFlORxEvHhBLeIjOizLygwlz8VGg0/6Dpgr35gu2jBkLhd0kUkPQogHDNLs1ArMSyhOwUOrk95Ipxc0G2dJklh2OtGJQQ2wWbEoyM+A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UHvUsd4N; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jTGsx0VX"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 445FCC4CECF;
-	Mon, 11 Nov 2024 18:41:28 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UHvUsd4N"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 36FFDC4CED0
+	for <linux-bluetooth@vger.kernel.org>; Tue, 12 Nov 2024 00:53:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1731350488;
-	bh=7kYiJsHLRtWt64/ro/9Ft8TeTVJJgjlPyJXkJe7kz8w=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:From;
-	b=jTGsx0VXBbuhJg0S0mtzcH3zpBatZq0h8+4EPLm26/yqfRZQN6rvGssrjG3jWvqus
-	 vv05LiQ+dIV0pwJajnyxrzj5K5NMEAykdu7yxnZGeoFduw/9jn8WSQ9cn0z039VSKM
-	 CT1n41NqViAPk7UOCnk4UbBBI7myGT22p3XE1NVCDsPiURNZ5y2ChrryZnu5nl8qIG
-	 5QM+Uj9Q5WXDcnu27B3aJ0gDcVhUqUigeULM/EjT2j7TLer4GPlHxndAXqAxEmLP5B
-	 CY+/5UfTH/cOqeuVQkC/Tf6EE/B5sLUrb7J3OzQdFewQRGg4XwSKBoIj5cG70hgy9k
-	 96GEO+cVEIsxw==
-Date: Mon, 11 Nov 2024 12:41:26 -0600
-From: Bjorn Helgaas <helgaas@kernel.org>
-To: Paul Menzel <pmenzel@molgen.mpg.de>
-Cc: Chandra Shekar Devegowda <chandrashekar.devegowda@intel.com>,
-	linux-bluetooth@vger.kernel.org, ravishankar.srivatsa@intel.com,
-	chethan.tumkur.narayan@intel.com, Kiran K <kiran.k@intel.com>
-Subject: Re: [PATCH v2] Bluetooth: btintel_pcie: Support suspend-resume
-Message-ID: <20241111184126.GA1805689@bhelgaas>
+	s=k20201202; t=1731372795;
+	bh=fg9+REHJSkB8W2xlihOxydS2EDNBGSAK08e+WDwWTTU=;
+	h=From:To:Subject:Date:In-Reply-To:References:From;
+	b=UHvUsd4Ny3ZqhvHFKlcXEYU3lTxSrSfV4NIOZ8jy5NREzdMdgQW0aGNr0cIs2GE+7
+	 zUKl4UzeS/Ag0sOIGaq4G5CymZiDaQb+pCkFkVJZH7RLPvEjjdrL1Uu3PLSgfgNxsO
+	 +Uy3xcvlyluiaUIMOO/UYPpst0KzQLXaDuC9AD/85xCKYHCdZvWXkrWLHxbKe80RBe
+	 X6nLkFwItURFHs8J/E+86VcR3r348IZ6y/QwLee+6tQbd5aimfTqhx/ptguS7AQtfn
+	 hRnRY9FMh/H83pATXAmMJl+ErrkshrCYZ3JfpiXo5hnGzceTiZe654i3u4C7wKqIla
+	 n+JjqzqsHw+eQ==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+	id 08C66CAB782; Tue, 12 Nov 2024 00:53:14 +0000 (UTC)
+From: bugzilla-daemon@kernel.org
+To: linux-bluetooth@vger.kernel.org
+Subject: [Bug 219458] bluetooth connection fails after L2CAP: Fix uaf in
+ l2cap_connect patch
+Date: Tue, 12 Nov 2024 00:53:13 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: shaoran@sakuranohana.org
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P3
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: cc
+Message-ID: <bug-219458-62941-wefoj1OQ2R@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-219458-62941@https.bugzilla.kernel.org/>
+References: <bug-219458-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <693d09b6-edab-4ed4-8df5-11ca74bb02e6@molgen.mpg.de>
 
-On Fri, Nov 08, 2024 at 10:18:54AM +0100, Paul Menzel wrote:
-> Am 08.11.24 um 15:39 schrieb ChandraShekar Devegowda:
-> > This patch contains the changes in driver for vendor specific handshake
-> > during enter of D3 and D0 exit.
-> 
-> Please document the datasheet name and revision.
+https://bugzilla.kernel.org/show_bug.cgi?id=3D219458
 
-Please also include a section reference for this vendor-specific
-handshake required for transitions between D0 and D3hot.
+Pablo Yanez (shaoran@sakuranohana.org) changed:
 
-Most devices don't require this kind of code, and its existence is a
-hint that extra work will be needed to maintain it.
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+                 CC|                            |shaoran@sakuranohana.org
 
-Bjorn
+--- Comment #7 from Pablo Yanez (shaoran@sakuranohana.org) ---
+Hi Luiz
+
+I can check the patch. I ran on the same problem (when Updating from 6.6.52=
+ to
+6.6.58 on Gentoo) and I submitted a bug report there. They asked me to do a=
+ git
+bisect of linux-vanilla and my bisect also reported that patch.
+
+I'll try applying the patch and let you know if this solves the problem for=
+ me.
+
+--=20
+You may reply to this email to add a comment.
+
+You are receiving this mail because:
+You are the assignee for the bug.=
