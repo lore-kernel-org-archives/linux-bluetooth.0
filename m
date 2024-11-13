@@ -1,207 +1,139 @@
-Received: from mail-ua1-f49.google.com (mail-ua1-f49.google.com [209.85.222.49])
+Received: from mail-lj1-f174.google.com (mail-lj1-f174.google.com [209.85.208.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F8A31632F3
-	for <linux-bluetooth@vger.kernel.org>; Wed, 13 Nov 2024 16:09:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A44C31632E3
+	for <linux-bluetooth@vger.kernel.org>; Wed, 13 Nov 2024 16:23:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731514197; cv=none; b=UWPqVXYnGErJG+99ACSotk3Rm+moN0MQLGgAfkN9m4j8DMsSu23N6vJ0pkbso4UKgh+SjXMB8vRvj/iyjY3vRUzifBqHEvOIBEmszsHapCEmXMvKaW+iytt0vXzLokdkJobO5mXoUBAeP1eM6zTR0W3Dcb5tK5ZUepu3cTXI6eQ=
+	t=1731515012; cv=none; b=lT2JFztCb8Sl5rXmv/SK43WpUxv93Uwm79yasxpMuve0xC5P/WRAcYPItv2sP/gB2Yn7ytwaTd7sU6QWJjjHbuNh3gqSF2wbuovl4B2iiieZI2mN/B4Yf/L/8D6XTqnmrmdrDd+3hmTLTSFTvATJuR8a83rMBLPO5D06BzR98zc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731514197; c=relaxed/simple;
-	bh=EiXNRcvL5jaHQly5ZEDqbgNS4xz/LhUJaLQLM1q4dzA=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=njefk+I2MLqiL/KabLPwgR0Li8TKoOeUUhyjKzuILL2FxXyCAaQX1PAtyiyvgJRX32gC/4WVhk7AEOdj5mRcxgr3x3qHIabt4lWvl5GNhipGHuzTqjcfLL1TbRN244/ubKmihdMmYli7hSuYoxDLDD0GIPDw2VLJ0uR6kqyKVJs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=G33MR8W4; arc=none smtp.client-ip=209.85.222.49
+	s=arc-20240116; t=1731515012; c=relaxed/simple;
+	bh=ut1rOtVFQw1mkh3d/DspwnRJTOe02Iyge/mnhV5W2VI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=IyWENXaY0cL6LZP2J9Qk/9ZrPBjy6JpCX8WxgKhotp0QP/7n/wslwZ8ekrWGcOUwBYIwgmGzCb3pKIM7f84jnBy84ziLmoZvKz1Rdrf8AkOPlEJbEx5VrrvNtvhCuvoPcdjFfRuSc8cZroDWL/7hbbLp/9W0I00d5UjgpIxMgrQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BRYpoF6e; arc=none smtp.client-ip=209.85.208.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="G33MR8W4"
-Received: by mail-ua1-f49.google.com with SMTP id a1e0cc1a2514c-84fd616acf0so3082965241.0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 13 Nov 2024 08:09:54 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BRYpoF6e"
+Received: by mail-lj1-f174.google.com with SMTP id 38308e7fff4ca-2fb5fa911aaso97456661fa.2
+        for <linux-bluetooth@vger.kernel.org>; Wed, 13 Nov 2024 08:23:30 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1731514193; x=1732118993; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=vemY0lJXGvPatcII90iJ+Tr+KqxdWgIgA6ivYzOER3I=;
-        b=G33MR8W4wrMVH/MxpxDaFSG38RZAVp1aRluahlHFj+OhPn+7E+utXJBoXVIOdgs/SF
-         eDWqP+QNU0kG0PO9FDK/qA2apU/AWYe1l2swC6NtpCq/wD5JuM4CRPoQ5/yBSGPJYad9
-         OhaTfvia8axpPTrfWwhgzsve+FflcDdgC2EPkJgRU7+bKTw65SoT9TVY8A+YTcvMMR6W
-         ZOIwxl3uynw7K0ONcxZeHmyn8IomOu5wIAHuzlt7iGE+vMQ8aQ2LnLlkn3lTqHHqJYyl
-         R0F/pZX8R6M/0hm/U7Z4SRB8VKI5gdUBSvksBYnrz214X/t4w3sRWWOBIdKKlnwaI/82
-         k0wA==
+        d=gmail.com; s=20230601; t=1731515009; x=1732119809; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=IXInHd7VD8gtgLXVBlRzh7W0vbq2MFWqbJMEpOB9XSc=;
+        b=BRYpoF6ei5bDq0ef9pVwizGr3cQNTEM5uNE1S2iy8oq5jPupVg2ffLDMUCR7KN3sSV
+         Hh5GZ5fpRJ5968L9FBLIrXJye97jWbE2Yd2e1GYDkF3hl4fhAyIYIEQaPXIdMHp5flG5
+         cTU8TEMG2NzMMtXYLrTh468gt6BTQrWTdp3Ud1mSURx8gIU1sSmn9ctkFZsTx7Ufst3d
+         hkBLQrsDVf5eSiQbDk4Cg+TDw096R1x9hsrzXXkzqzVnlmJfUSLlqaUi4NujkiuNqsgA
+         lMQiSZvFYRmuq6POJj+jpr9u7j3e/3/VKyQ37yM3YSvL/3EvKdc1/IIgleFUVnzKQBfG
+         sSBQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731514193; x=1732118993;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=vemY0lJXGvPatcII90iJ+Tr+KqxdWgIgA6ivYzOER3I=;
-        b=Tw097fBAIQXTRZt5gholhexjYxuSy1eRvndTuY7v42qn6ePhH6vP/+CSADkrDJf6ks
-         DyaygjL3Ly282rP8T6hGSUmwlmRvTyYogFzK3aAS0pnq9Oi6/0AMnqhAON2mWdALQIuN
-         MXgwPdBlJp1Mt4WNKiLON7alKfezBYupizVNu1fyxjZ0nspGQ8lGtIX5IQ0Wat2pKf3x
-         2J3xKWpNjJscZAMxMTe0oDwKK/K94sOomztVIWkxjUnIOICtqMVtSli/ldZXdXt3/VhL
-         qg8e4UV4Pxr5MoLeqbjSnlaL3i46HmSGy+tK4YhLGWkLwvVF7Joqw9ikN1KRl3/j+N/B
-         u59A==
-X-Gm-Message-State: AOJu0Yy7JyfRA0LO1ngNnfVFMorqNFWhQIVDmnQ9Dtd1Pcn51jWSKpu1
-	AshFM0Ls1sfPyrZ92CTkZDUnyTJMscnJcn6SWEDYtR4I05XyDKUMndgsxQ==
-X-Google-Smtp-Source: AGHT+IGc0fSngAnAx92PUiOo8Xp7kaPTEv0BGBYMobUfJeteQ9rvV5aEexExTkVC/qmEy7RwzvMnGg==
-X-Received: by 2002:a05:6102:c07:b0:4a9:555b:fb50 with SMTP id ada2fe7eead31-4ac2987d3b0mr8078934137.20.1731514193008;
-        Wed, 13 Nov 2024 08:09:53 -0800 (PST)
-Received: from lvondent-mobl5.. (syn-107-146-107-067.res.spectrum.com. [107.146.107.67])
-        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-4aa9efe5984sm2107480137.25.2024.11.13.08.09.50
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 Nov 2024 08:09:51 -0800 (PST)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v3] Bluetooth: fix use-after-free in device_for_each_child()
-Date: Wed, 13 Nov 2024 11:09:49 -0500
-Message-ID: <20241113160949.1325502-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.47.0
+        d=1e100.net; s=20230601; t=1731515009; x=1732119809;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=IXInHd7VD8gtgLXVBlRzh7W0vbq2MFWqbJMEpOB9XSc=;
+        b=rNNRZHfv6Nmq9DmwNRdkch2cY4DmiwjLg48pfefEGOexYR3BvX09wEjzqPmwD/ZuZX
+         gCzmcFGP4vSB55K7GmHKnN49PQm758agS/QrK5V8uROzHUhkQPMdfTOgn26Oa/SCJfgq
+         zVFeBRf0EayLQKZHBPNL5GBqk/jwOHPyAqllGPc7Adv1BhiK2xUvn6lMEwgym1SBvNoK
+         4JxyWTHYXSQwZcUb2RUzZxUt46Bjv3SVdT7z0+1jmscZwtv33w4aZKIre5JNbA0Y5jfN
+         J+E7piDWbq5D9hSEW790LDi28XEjxtK3b7pz4O5LfRrE+npC92gCqgefAjC2D+4yVTzA
+         9pFQ==
+X-Gm-Message-State: AOJu0YyLSSMySdU9RfBjlNc7scHgfxC0RLcR1btAFCFApUMfPW+lNblh
+	+0sPySuZPec44fEYAvf6DDjKxV+aGjxxpKQEyrZ81C6UDBcBKp44UrodenoS0DVh39fuPAKHmkK
+	X+RLuVtc5T5lZ/NAcdyFeU/g7GEfKIw==
+X-Google-Smtp-Source: AGHT+IHI5NGCQ84Oit2/eyiNuY2+KQXLTtZudf42ksV32ghcu8kmT5gPvpU4/+kY2g67cpeCy3K6yx82XeOozKsgTfY=
+X-Received: by 2002:a05:651c:1551:b0:2fc:9674:60b5 with SMTP id
+ 38308e7fff4ca-2ff2028afd3mr172841061fa.25.1731515008428; Wed, 13 Nov 2024
+ 08:23:28 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20241112152020.147178-1-frederic.danis@collabora.com>
+In-Reply-To: <20241112152020.147178-1-frederic.danis@collabora.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Wed, 13 Nov 2024 11:23:16 -0500
+Message-ID: <CABBYNZJ1RiT53navDpTiCx+jo1Ynsobs7cggk=7Jibry+iJpwg@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: SCO: Add support for 16 bits transparent voice setting
+To: =?UTF-8?B?RnLDqWTDqXJpYyBEYW5pcw==?= <frederic.danis@collabora.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Dmitry Antipov <dmantipov@yandex.ru>
+Hi Fr=C3=A9d=C3=A9ric,
 
-Syzbot has reported the following KASAN splat:
+On Tue, Nov 12, 2024 at 10:31=E2=80=AFAM Fr=C3=A9d=C3=A9ric Danis
+<frederic.danis@collabora.com> wrote:
+>
+> The BCM4349B1 supports 16 bits transparent data on its I2S port.
 
-BUG: KASAN: slab-use-after-free in device_for_each_child+0x18f/0x1a0
-Read of size 8 at addr ffff88801f605308 by task kbnepd bnep0/4980
+Ok, but what difference does it make if transparent data or transparent 16 =
+bits?
 
-CPU: 0 UID: 0 PID: 4980 Comm: kbnepd bnep0 Not tainted 6.12.0-rc4-00161-gae90f6a6170d #1
-Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.16.3-2.fc40 04/01/2014
-Call Trace:
- <TASK>
- dump_stack_lvl+0x100/0x190
- ? device_for_each_child+0x18f/0x1a0
- print_report+0x13a/0x4cb
- ? __virt_addr_valid+0x5e/0x590
- ? __phys_addr+0xc6/0x150
- ? device_for_each_child+0x18f/0x1a0
- kasan_report+0xda/0x110
- ? device_for_each_child+0x18f/0x1a0
- ? __pfx_dev_memalloc_noio+0x10/0x10
- device_for_each_child+0x18f/0x1a0
- ? __pfx_device_for_each_child+0x10/0x10
- pm_runtime_set_memalloc_noio+0xf2/0x180
- netdev_unregister_kobject+0x1ed/0x270
- unregister_netdevice_many_notify+0x123c/0x1d80
- ? __mutex_trylock_common+0xde/0x250
- ? __pfx_unregister_netdevice_many_notify+0x10/0x10
- ? trace_contention_end+0xe6/0x140
- ? __mutex_lock+0x4e7/0x8f0
- ? __pfx_lock_acquire.part.0+0x10/0x10
- ? rcu_is_watching+0x12/0xc0
- ? unregister_netdev+0x12/0x30
- unregister_netdevice_queue+0x30d/0x3f0
- ? __pfx_unregister_netdevice_queue+0x10/0x10
- ? __pfx_down_write+0x10/0x10
- unregister_netdev+0x1c/0x30
- bnep_session+0x1fb3/0x2ab0
- ? __pfx_bnep_session+0x10/0x10
- ? __pfx_lock_release+0x10/0x10
- ? __pfx_woken_wake_function+0x10/0x10
- ? __kthread_parkme+0x132/0x200
- ? __pfx_bnep_session+0x10/0x10
- ? kthread+0x13a/0x370
- ? __pfx_bnep_session+0x10/0x10
- kthread+0x2b7/0x370
- ? __pfx_kthread+0x10/0x10
- ret_from_fork+0x48/0x80
- ? __pfx_kthread+0x10/0x10
- ret_from_fork_asm+0x1a/0x30
- </TASK>
+> Signed-off-by: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
+> ---
+>  include/net/bluetooth/bluetooth.h | 1 +
+>  net/bluetooth/sco.c               | 7 +++++--
+>  2 files changed, 6 insertions(+), 2 deletions(-)
+>
+> diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bl=
+uetooth.h
+> index f66bc85c6411..21e93640c229 100644
+> --- a/include/net/bluetooth/bluetooth.h
+> +++ b/include/net/bluetooth/bluetooth.h
+> @@ -123,6 +123,7 @@ struct bt_voice {
+>
+>  #define BT_VOICE_TRANSPARENT                   0x0003
+>  #define BT_VOICE_CVSD_16BIT                    0x0060
+> +#define BT_VOICE_TRANSPARENT_16BIT             0x0063
+>
+>  #define BT_SNDMTU              12
+>  #define BT_RCVMTU              13
+> diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
+> index 1b8e468d24cf..baaac4d65a5a 100644
+> --- a/net/bluetooth/sco.c
+> +++ b/net/bluetooth/sco.c
+> @@ -319,7 +319,8 @@ static int sco_connect(struct sock *sk)
+>         else
+>                 type =3D SCO_LINK;
+>
+> -       if (sco_pi(sk)->setting =3D=3D BT_VOICE_TRANSPARENT &&
+> +       if ((sco_pi(sk)->setting =3D=3D BT_VOICE_TRANSPARENT ||
+> +            sco_pi(sk)->setting =3D=3D BT_VOICE_TRANSPARENT_16BIT) &&
+>             (!lmp_transp_capable(hdev) || !lmp_esco_capable(hdev))) {
+>                 err =3D -EOPNOTSUPP;
+>                 goto unlock;
+> @@ -922,6 +923,7 @@ static int sco_sock_setsockopt(struct socket *sock, i=
+nt level, int optname,
+>
+>                 /* Explicitly check for these values */
+>                 if (voice.setting !=3D BT_VOICE_TRANSPARENT &&
+> +                   voice.setting !=3D BT_VOICE_TRANSPARENT_16BIT &&
+>                     voice.setting !=3D BT_VOICE_CVSD_16BIT) {
+>                         err =3D -EINVAL;
+>                         break;
+> @@ -935,7 +937,8 @@ static int sco_sock_setsockopt(struct socket *sock, i=
+nt level, int optname,
+>                         break;
+>                 }
+>                 if (enhanced_sync_conn_capable(hdev) &&
+> -                   voice.setting =3D=3D BT_VOICE_TRANSPARENT)
+> +                   (voice.setting =3D=3D BT_VOICE_TRANSPARENT ||
+> +                    voice.setting =3D=3D BT_VOICE_TRANSPARENT_16BIT))
+>                         sco_pi(sk)->codec.id =3D BT_CODEC_TRANSPARENT;
+>                 hci_dev_put(hdev);
+>                 break;
+> --
+> 2.34.1
+>
+>
 
-Allocated by task 4974:
- kasan_save_stack+0x30/0x50
- kasan_save_track+0x14/0x30
- __kasan_kmalloc+0xaa/0xb0
- __kmalloc_noprof+0x1d1/0x440
- hci_alloc_dev_priv+0x1d/0x2820
- __vhci_create_device+0xef/0x7d0
- vhci_write+0x2c7/0x480
- vfs_write+0x6a0/0xfc0
- ksys_write+0x12f/0x260
- do_syscall_64+0xc7/0x250
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
 
-Freed by task 4979:
- kasan_save_stack+0x30/0x50
- kasan_save_track+0x14/0x30
- kasan_save_free_info+0x3b/0x60
- __kasan_slab_free+0x4f/0x70
- kfree+0x141/0x490
- hci_release_dev+0x4d9/0x600
- bt_host_release+0x6a/0xb0
- device_release+0xa4/0x240
- kobject_put+0x1ec/0x5a0
- put_device+0x1f/0x30
- vhci_release+0x81/0xf0
- __fput+0x3f6/0xb30
- task_work_run+0x151/0x250
- do_exit+0xa79/0x2c30
- do_group_exit+0xd5/0x2a0
- get_signal+0x1fcd/0x2210
- arch_do_signal_or_restart+0x93/0x780
- syscall_exit_to_user_mode+0x140/0x290
- do_syscall_64+0xd4/0x250
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-In 'hci_conn_del_sysfs()', 'device_unregister()' may be called when
-an underlying (kobject) reference counter is greater than 1. This
-means that reparenting (happened when the device is actually freed)
-is delayed and, during that delay, parent controller device (hciX)
-may be deleted. Since the latter may create a dangling pointer to
-freed parent, avoid that scenario by reparenting to NULL explicitly.
-
-Reported-by: syzbot+6cf5652d3df49fae2e3f@syzkaller.appspotmail.com
-Tested-by: syzbot+6cf5652d3df49fae2e3f@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=6cf5652d3df49fae2e3f
-Fixes: a85fb91e3d72 ("Bluetooth: Fix double free in hci_conn_cleanup")
-Signed-off-by: Dmitry Antipov <dmantipov@yandex.ru>
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
----
- net/bluetooth/hci_sysfs.c | 15 ++++-----------
- 1 file changed, 4 insertions(+), 11 deletions(-)
-
-diff --git a/net/bluetooth/hci_sysfs.c b/net/bluetooth/hci_sysfs.c
-index 367e32fe30eb..4b54dbbf0729 100644
---- a/net/bluetooth/hci_sysfs.c
-+++ b/net/bluetooth/hci_sysfs.c
-@@ -21,16 +21,6 @@ static const struct device_type bt_link = {
- 	.release = bt_link_release,
- };
- 
--/*
-- * The rfcomm tty device will possibly retain even when conn
-- * is down, and sysfs doesn't support move zombie device,
-- * so we should move the device before conn device is destroyed.
-- */
--static int __match_tty(struct device *dev, void *data)
--{
--	return !strncmp(dev_name(dev), "rfcomm", 6);
--}
--
- void hci_conn_init_sysfs(struct hci_conn *conn)
- {
- 	struct hci_dev *hdev = conn->hdev;
-@@ -73,10 +63,13 @@ void hci_conn_del_sysfs(struct hci_conn *conn)
- 		return;
- 	}
- 
-+	/* If there are devices using the connection as parent reset it to NULL
-+	 * before unregistering the device.
-+	 */
- 	while (1) {
- 		struct device *dev;
- 
--		dev = device_find_child(&conn->dev, NULL, __match_tty);
-+		dev = device_find_any_child(&conn->dev);
- 		if (!dev)
- 			break;
- 		device_move(dev, NULL, DPM_ORDER_DEV_LAST);
--- 
-2.47.0
-
+--=20
+Luiz Augusto von Dentz
