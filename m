@@ -1,186 +1,181 @@
-Received: from EUR02-VI1-obe.outbound.protection.outlook.com (mail-vi1eur02on2084.outbound.protection.outlook.com [40.107.241.84])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4192A54723
-	for <linux-bluetooth@vger.kernel.org>; Wed, 13 Nov 2024 14:13:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.241.84
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731507202; cv=fail; b=U9K+0p6vf5qBO19ODxuC5N2EsL4K+Fbt4zQTlyZ7Qi2Hfj+1CzFvSzqvg/eqAxWiPMMyklp0n9/iDsqKkkxnSidq4qChEcowtTx+LH+oMHqCFMELwgqYMg2FYJk4brBOOFCxdG5UuK2FEjGVdlnn5OT8z1Sw2FRCvDuY56ASOps=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731507202; c=relaxed/simple;
-	bh=PeQJLakcV8Hy+Su6BPt8kF57XfrnPuy5Lyq/DYM/b9Q=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Ek7N7nKKj0A7989Cr5TF7UunyuKTCRfj459x6ZbP1/TGttgNUUeaFg/yCLe0Du4POUWn88H5G9GHyoisZcWMiCY2vqbPfnM4oGEJBO8BxhiN2UlGFi2zIod0SUX7vtAi+3GrcJJUA01LincSYzFAjuAxgff1vGB70OqWvQLZ6VM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=axis.com; spf=pass smtp.mailfrom=axis.com; dkim=pass (1024-bit key) header.d=axis.com header.i=@axis.com header.b=oCIQi3MZ; arc=fail smtp.client-ip=40.107.241.84
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=axis.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=axis.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F22167C0BE;
+	Wed, 13 Nov 2024 15:10:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1731510629; cv=none; b=mdn8gzzSh6VJy8aex6qSVd4v+Jjn9Ctx841FK++KGcSnKHKUgdMy+3jfDc0NOaDhUXfGAuExuCPQtwy76dyIq/b5u2J0qthpOEi5sJxJIEFz6Z4GPPza1WLUd/mnuF4aVErGibPeuC2gq4ixjfP0nW5KkLVLKkXij7FvQCI+uqc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1731510629; c=relaxed/simple;
+	bh=QYFSOYDdVLfS5YvraGarwe6E2kpCYK3vhWADsFqc9sY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=cmsl6FdUdb8a4Miu8aKWyjfMfH2p/5Wk/DYSB551n3wwBgyfBp9uBZrgjlNJfqdzQUGLleO6PUP0vg6jGXL/F+3phVGUsiTwzwM/Cwm1aOtfeC9H/56aXN+Fsy8LKxdW4ZkCN35c/fkMeB81rFvFVHD/dOXVB5AVHuM8LxX5KHY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=0gX/QZvp; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=axis.com header.i=@axis.com header.b="oCIQi3MZ"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=MKgtZmHhmNyQc7clJjlEsXZRKaIZvlQu0p2DG1/jpYTehIcn+9ldOEtWzbEwOLT5Oj/NNja0VpqUuL+L55T2ujuwN5/U+yeTRKYqgRT8YaTbXjHR8bKszUNjPqxqvjIkTdeMnsbAbb7/uhIrcxeiIT0t/72GbasVLp0V/0QoZOs6mIuBkPKASJzeL4sP4L+aMMC9x0iwWU0gkRYCygiws9/QMdrX4UcKRm+Dyl6vxEtdjGMzU/7LL1p77OA0cVjdy29qdTNiSG6m/02d5QJ9gHls2zvgTxmAsql764plixib2NQwBk9vbiM4bIQ6+8dVCJMmOEsdo5LyefNreviRsg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=f0jQ6tsHr+OIYg0ABAhBjYzXNTFVyRba+WACKmsiz6w=;
- b=Ksp8sD+v+ShI745u1AlY3gBygU7a6NvSnMnnrmZPhyorx38cVRfeBm0V9F2cHRlFgiaKA5IkhV69PFdD6RaWsBhLwS9NzcSoeCbWoWwGG8y/dSUS4MWxn2WPK553RprCMkFKuezGEhr9TMYuAuidBQf+t7oahpLdLLPRO1sMosNe3q31Kyi2UFsBzZKO6bhISPT6wVzYDNUAPeJRDjl0EPZuyKyxfICBiaP0WWWPC/q82wkFPHVweDyJXMGBFTGJSPxf9a2MXbhhM32HsH2nfvEpy1FZDco7Oldyf/R1IOHxcnAc6BWUsdh36cFRwxG8b4s4BAnkWD8X25FPbN54tQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 195.60.68.100) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=axis.com;
- dmarc=pass (p=none sp=none pct=100) action=none header.from=axis.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=axis.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=f0jQ6tsHr+OIYg0ABAhBjYzXNTFVyRba+WACKmsiz6w=;
- b=oCIQi3MZcHOLlKv0xG2dWX1dAWTcmPEWlQbeF5+qLLkQsLiaUYNYx3tMXGf3OxhTSc1nEq1cwi1CAlvr0K6tepH50UrliRvP/nQXdqWocn3kdAFBO6etiIPZsJTta7eF9++0ZK2o6Ut+qD5B9cRTJC3Y+W6a89/Ba01WFnMWnf8=
-Received: from AS9PR01CA0033.eurprd01.prod.exchangelabs.com
- (2603:10a6:20b:542::19) by DBBPR02MB10890.eurprd02.prod.outlook.com
- (2603:10a6:10:531::20) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8158.17; Wed, 13 Nov
- 2024 14:13:13 +0000
-Received: from AMS1EPF00000047.eurprd04.prod.outlook.com
- (2603:10a6:20b:542:cafe::6e) by AS9PR01CA0033.outlook.office365.com
- (2603:10a6:20b:542::19) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8158.17 via Frontend
- Transport; Wed, 13 Nov 2024 14:13:13 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 195.60.68.100)
- smtp.mailfrom=axis.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=axis.com;
-Received-SPF: Pass (protection.outlook.com: domain of axis.com designates
- 195.60.68.100 as permitted sender) receiver=protection.outlook.com;
- client-ip=195.60.68.100; helo=mail.axis.com; pr=C
-Received: from mail.axis.com (195.60.68.100) by
- AMS1EPF00000047.mail.protection.outlook.com (10.167.16.135) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.8158.14 via Frontend Transport; Wed, 13 Nov 2024 14:13:13 +0000
-Received: from SE-MAIL21W.axis.com (10.20.40.16) by se-mail02w.axis.com
- (10.20.40.8) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Wed, 13 Nov
- 2024 15:13:13 +0100
-Received: from se-mail01w.axis.com (10.20.40.7) by SE-MAIL21W.axis.com
- (10.20.40.16) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Wed, 13 Nov
- 2024 15:13:12 +0100
-Received: from se-intmail01x.se.axis.com (10.4.0.28) by se-mail01w.axis.com
- (10.20.40.7) with Microsoft SMTP Server id 15.1.2507.39 via Frontend
- Transport; Wed, 13 Nov 2024 15:13:12 +0100
-Received: from pc57895-2408.se.axis.com (pc57895-2408.se.axis.com [10.93.175.8])
-	by se-intmail01x.se.axis.com (Postfix) with ESMTP id C35701A6;
-	Wed, 13 Nov 2024 15:13:12 +0100 (CET)
-Received: by pc57895-2408.se.axis.com (Postfix, from userid 9907)
-	id C00EA40D204E; Wed, 13 Nov 2024 15:13:12 +0100 (CET)
-From: Marcus Prebble <marcus.prebble@axis.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Marcus Prebble <marcus.prebble@axis.com>
-Subject: [PATCH BlueZ] rfkill: Do not log errors for missing device path
-Date: Wed, 13 Nov 2024 15:12:56 +0100
-Message-ID: <20241113141256.602066-1-marcus.prebble@axis.com>
-X-Mailer: git-send-email 2.39.5
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="0gX/QZvp"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 970A7C4CEC3;
+	Wed, 13 Nov 2024 15:10:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1731510627;
+	bh=QYFSOYDdVLfS5YvraGarwe6E2kpCYK3vhWADsFqc9sY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=0gX/QZvpbG6fUp8FTLfnOoMwoiH1B1SJ4akmGr52ZQdoF3fTBeovk0LUBhV6PRpEQ
+	 w6ZLrZ6ZcZgPOH6gXj5klZdEICyu5oBQgVsn87EKoPszhEw4ewOYxWcgRZzLAphjQj
+	 kn8+oKUp+u97p5cajiMw72S5kcCSaE3ekzWeRkBo=
+Date: Wed, 13 Nov 2024 16:10:23 +0100
+From: Greg KH <gregkh@linuxfoundation.org>
+To: Thorsten Leemhuis <regressions@leemhuis.info>
+Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Salvatore Bonaccorso <carnil@debian.org>,
+	Mike <user.service2016@gmail.com>,
+	"stable@vger.kernel.org" <stable@vger.kernel.org>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	linux-bluetooth@vger.kernel.org,
+	Paul Menzel <pmenzel@molgen.mpg.de>,
+	Sasha Levin <sashal@kernel.org>,
+	Jeremy =?iso-8859-1?Q?Lain=E9?= <jeremy.laine@m4x.org>,
+	Linux regressions mailing list <regressions@lists.linux.dev>
+Subject: Re: Bluetooth kernel BUG with Intel AX211 (regression in 6.1.83)
+Message-ID: <2024111358-catching-unclog-31f3@gregkh>
+References: <ZyMkvAkZXuoTHFtd@eldamar.lan>
+ <ab5e25d8-3381-452e-ad13-5d65c0e12306@leemhuis.info>
+ <CABBYNZKQAJGzA8th8A7Foiy7YaSFZDpLvLZqDFsVJ3Yzn8C_5g@mail.gmail.com>
+ <Zypwz65wRM-FMXte@eldamar.lan>
+ <2024110652-blooming-deck-f0d9@gregkh>
+ <Zysdc3wJy0jAYHzA@eldamar.lan>
+ <CABBYNZKz_5bnBxrBC3SoaGc1MTXXYsgdOXB42B0x+2dcPRkJyw@mail.gmail.com>
+ <2024110703-subsoil-jasmine-fcaa@gregkh>
+ <4f8542be-5175-4cf1-9c39-1809a899601c@leemhuis.info>
+ <2024111225-regulate-ruckus-1a46@gregkh>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AMS1EPF00000047:EE_|DBBPR02MB10890:EE_
-X-MS-Office365-Filtering-Correlation-Id: da01bbe3-3e6c-4ab9-abde-08dd03ed4f99
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|36860700013|376014|82310400026;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?Jj0R3I83x6InPplzUGrshEij818i+9N1KK2aNfFdwVKJGuHSLT9WU2i0n4QI?=
- =?us-ascii?Q?jqhSZt8qHGmlG3pXpmAyzg7/XHfpRSsyk66kT4n8lZ+5wunRPuyV9Rj7/+JT?=
- =?us-ascii?Q?fjsQUQxvtDF3OLOXY3C8jK2Smxy7MUKL/dYbhJ5zNJ0sOvWAIstVrw3ueTvT?=
- =?us-ascii?Q?PDVPE6d8EjUTruoHDk3VpO0o5oHNscoRLvgnFNcih90XeuLXRzYkIotwSZzj?=
- =?us-ascii?Q?ebWJIM9+3YrSrChyA4e9HBBxEmBA68ibxRpdapg5wkCmUx2CWZsfgdHo67Zh?=
- =?us-ascii?Q?JUC7D/J9rolIEnaRDc2tgM//fBAKg4chZtcvrW2CxY7oYIY2Qh5qduCdNMHD?=
- =?us-ascii?Q?23fOoEyVs8EnVR6J/CKQeMXo9aJqunaseqt3p7tZKTB0W46iBklbZrnMgK+W?=
- =?us-ascii?Q?4FpJAEEAA5NZPDDRRgfgyswDkVGMhON1vFBSski5ZX8JjkoSWkf3WsTxG9vp?=
- =?us-ascii?Q?Hu55w3+RhkMW8ha/1y+Iao6kwFzrhW6ViYXZLbCMLq+YPvWcZw0ugKHMOkcy?=
- =?us-ascii?Q?P1b2IbxKsVBp71TvavcWXjuX6qMs0UXShGOZkAcLMB5Aj5iZ6ZlE90kG4Yt5?=
- =?us-ascii?Q?unUfFhdDpW3sbhDD7pvmsiUkCf7wIXKNvJagL+H0TuGu6B87TXA77D94MQJ1?=
- =?us-ascii?Q?oUwc5i0YqagJ85ya4Q4ux8k9HlwljokgPORa7NaNI7M9RLzOcAyyRG1M07+/?=
- =?us-ascii?Q?IUe7p4YDC8BENFGHZL+QuXiHIAfJkaeLhtnQg2ocHIzJL+8MaoiiCQ5QoWAG?=
- =?us-ascii?Q?O8sC6htbcRkXvRQsGJ0Hu144VIheTNfj8z2nsE6aAayZN8MCUCtmFb9tk7Ca?=
- =?us-ascii?Q?0PGcbP4rvugEXi+3oIACH1hzloxcfottT+GLaffpVT4kbFS4EPSZ6x+GxXdR?=
- =?us-ascii?Q?UaH4g+yovQO3Db5X0KByAJxXaFTfltDSZCfcaC4UclQ2HSkZCdOrZEY0Vkcu?=
- =?us-ascii?Q?mgebRJryAn8mnjd2AoS+4C9VPmCPRR1CgYcwprLiaiLCpsnpYgPdtGAaogHH?=
- =?us-ascii?Q?LMpB2mOxvaobayQZZeRr3yFfnbENOsgenhoIZGcXZxUnMt+FV/U1gWuhzEVU?=
- =?us-ascii?Q?fYemEHG8RaBY657KIFoiOi32JV8kezDUq75B2YikC1W4uTllqjYmhO06VG55?=
- =?us-ascii?Q?BohF7XP2d6nDsDsim+ng4cP3PCPmzymR9Mruc5gMtrpwxCRf1hwhompLPpDr?=
- =?us-ascii?Q?8Ile76GsPCU1ysCGvfSIL4/s5gm5PGq+34B5Daj/oAtgT6J1eiloLwvhfIdm?=
- =?us-ascii?Q?+cQ/om4rWcuQ1WgLpWX9ck1w4lCHAT+83CsBD/fmSbaEJmI1djBAEsXl6098?=
- =?us-ascii?Q?odVE+g1dWNyCXaqB4QozYq1xa6LypLIHKJ5ZhKe0XZvhijKrSeciJ1cWPKcV?=
- =?us-ascii?Q?4SxHHlnaffZ5dWA9LP6duG2GmU8sIF1a29WRdza10QGWyfiT5A=3D=3D?=
-X-Forefront-Antispam-Report:
-	CIP:195.60.68.100;CTRY:SE;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.axis.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(1800799024)(36860700013)(376014)(82310400026);DIR:OUT;SFP:1101;
-X-OriginatorOrg: axis.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Nov 2024 14:13:13.3613
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: da01bbe3-3e6c-4ab9-abde-08dd03ed4f99
-X-MS-Exchange-CrossTenant-Id: 78703d3c-b907-432f-b066-88f7af9ca3af
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=78703d3c-b907-432f-b066-88f7af9ca3af;Ip=[195.60.68.100];Helo=[mail.axis.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	AMS1EPF00000047.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DBBPR02MB10890
+In-Reply-To: <2024111225-regulate-ruckus-1a46@gregkh>
 
-In the case of our products, we lack a physical RFKILL switch and do
-not have the rfkill module enabled in the kernel which resulted in an
-error message each time bluetoothd was started.
+On Tue, Nov 12, 2024 at 01:04:03PM +0100, Greg KH wrote:
+> On Tue, Nov 12, 2024 at 12:54:46PM +0100, Thorsten Leemhuis wrote:
+> > On 07.11.24 05:38, Greg KH wrote:
+> > > On Wed, Nov 06, 2024 at 10:02:40AM -0500, Luiz Augusto von Dentz wrote:
+> > >> On Wed, Nov 6, 2024 at 2:40 AM Salvatore Bonaccorso <carnil@debian.org> wrote:
+> > >>> On Wed, Nov 06, 2024 at 08:26:05AM +0100, Greg KH wrote:
+> > >>>> On Tue, Nov 05, 2024 at 08:23:59PM +0100, Salvatore Bonaccorso wrote:
+> > >>>>> On Tue, Nov 05, 2024 at 12:53:50PM -0500, Luiz Augusto von Dentz wrote:
+> > >>>>>> On Tue, Nov 5, 2024 at 12:29 PM Thorsten Leemhuis
+> > >>>>>> <regressions@leemhuis.info> wrote:
+> > >>>>>>> On 31.10.24 07:33, Salvatore Bonaccorso wrote:
+> > >>>>>>>> On Tue, Jun 18, 2024 at 12:30:18PM +0200, Thorsten Leemhuis wrote:
+> > >>>>>>>>> On 12.06.24 14:04, Greg KH wrote:
+> > >>>>>>>>>> On Thu, Jun 06, 2024 at 12:18:18PM +0200, Thorsten Leemhuis wrote:
+> > >>>>>>>>>>> On 03.06.24 22:03, Mike wrote:
+> > >>>>>>>>>>>> On 29.05.24 11:06, Thorsten Leemhuis wrote:
+> > >>>>>>>>>>>> [...]
+> > >>>>>>>>>>>> I understand that 6.9-rc5[1] worked fine, but I guess it will take some
+> > >>>>>>>>>>>> time to be
+> > >>>>>>>>>>>> included in Debian stable, so having a patch for 6.1.x will be much
+> > >>>>>>>>>>>> appreciated.
+> > >>>>>>>>>>>> I do not have the time to follow the vanilla (latest) release as is
+> > >>>>>>>>>>>> likely the case for
+> > >>>>>>>>>>>> many other Linux users.
+> > >>>>>>>>>>>>
+> > >>>>>>>>>>> Still no reaction from the bluetooth developers. Guess they are busy
+> > >>>>>>>>>>> and/or do not care about 6.1.y. In that case:
+> > >>>>>>>>>>>
+> > >>>>>>>>>>> @Greg: do you might have an idea how the 6.1.y commit a13f316e90fdb1
+> > >>>>>>>>>>> ("Bluetooth: hci_conn: Consolidate code for aborting connections") might
+> > >>>>>>>>>>> cause this or if it's missing some per-requisite? If not I wonder if
+> > >>>>>>>>>>> reverting that patch from 6.1.y might be the best move to resolve this
+> > >>>>>>>>>>> regression. Mike earlier in
+> > >>>>>>>>>>> https://lore.kernel.org/all/c947e600-e126-43ea-9530-0389206bef5e@gmail.com/
+> > >>>>>>>>>>> confirmed that this fixed the problem in tests. Jeremy (who started the
+> > >>>>>>>>>>> thread and afaics has the same problem) did not reply.
+> > >>>>>>>>>>
+> > >>>>>>>>>> How was this reverted?  I get a bunch of conflicts as this commit was
+> > >>>>>>>>>> added as a dependency of a patch later in the series.
+> > >>>>>>>>>>
+> > >>>>>>>>>> So if this wants to be reverted from 6.1.y, can someone send me the
+> > >>>>>>>>>> revert that has been tested to work?
+> > >>>>>>>>>
+> > >>>>>>>>> Mike, can you help out here, as you apparently managed a revert earlier?
+> > >>>>>>>>> Without you or someone else submitting a revert I fear this won't be
+> > >>>>>>>>> resolved...
+> > >>>>>>>>
+> > >>>>>>>> Trying to reboostrap this, as people running 6.1.112 based kernel
+> > >>>>>>>> seems still hitting the issue, but have not asked yet if it happens as
+> > >>>>>>>> well for 6.114.
+> > >>>>>>>>
+> > >>>>>>>> https://bugs.debian.org/1086447
+> > >>>>>>>>
+> > >>>>>>>> Mike, since I guess you are still as well affected as well, does the
+> > >>>>>>>> issue trigger on 6.1.114 for you and does reverting changes from
+> > >>>>>>>> a13f316e90fdb1 still fix the issue? Can you send your
+> > >>>>>>>> backport/changes?
+> > >>>>>>>
+> > >>>>>>> Hmmm, no reply. Is there maybe someone in that bug that could create and
+> > >>>>>>> test a new revert to finally get this resolved upstream? Seem we
+> > >>>>>>> otherwise are kinda stuck here.
+> > >>>>>>
+> > >>>>>> Looks like we didn't tag things like 5af1f84ed13a ("Bluetooth:
+> > >>>>>> hci_sync: Fix UAF on hci_abort_conn_sync") and a239110ee8e0
+> > >>>>>> ("Bluetooth: hci_sync: always check if connection is alive before
+> > >>>>>> deleting") that are actually fixes to a13f316e90fdb1.
+> > >>>>>
+> > >>>>> Ah good I see :). None of those were yet applied to the 6.1.y series
+> > >>>>> were the issue is still presend. Would you be up to provide the needed
+> > >>>>> changes to the stable team?  That would be very much appreciated for
+> > >>>>> those affected running the 6.1.y series.
+> > >>>>
+> > >>>> We would need backports for these as they do not apply cleanly :(
+> > >>>
+> > >>> Looks our mails overlapped, yes came to the same conclusion as I tried
+> > >>> to apply them on top of 6.1.y. I hope Luiz can help here.
+> > >>>
+> > >>> We have defintively users in Debian affected by this, and two
+> > >>> confirmed that using a newer kernel which contains naturally those
+> > >>> fixes do not expose the problem. If we have backports I might be able
+> > >>> to convice those affected users to test our 6.1.115-1 + patches to
+> > >>> verify the issue is gone.
+> > >>
+> > >> Then perhaps it is easier to just revert that change?
+> > > 
+> > > Please send a revert then.
+> > 
+> > We afaics are kinda stuck here .
+> > 
+> > Seems Mike (who apparently had a local revert that worked) does not care
+> > anymore.
+> > 
+> > It looks like Luiz does not care about 6.1.y either, which is fine, as
+> > participation in stable is optional.
+> > 
+> > And looks like nobody else cares enough and has the skills to
+> > prepare and submit a revert.
+> > 
+> > In the end the one that asked for the changes to be included in the
+> > 6.1.y series thus submit one. Not sure who that is, though, a very quick
+> > search on Lore gave no answer. :-/
+> > 
+> > There is also still the question "might a revert now cause another
+> > regression for users of the 6.1.y series, as the change might improved
+> > things for other users".
+> > 
+> > :-(
+> 
+> I care as this affects Debian, which is the largest user of Linux
+> outside of Android.  I'll try to do a local version of the revert to
+> unstick this...
 
-This commit looks at the errno code after failing to open the RFKILL
-device and only logs an error if it is something other than ENOENT
-(No such file or directory).
+Ok, I have a series of reverts that seems to build properly for 6.1.y
+that I'll queue up after this round of stable releases goes out
+tomorrrow to hopefully resolve this.
 
-Fixes: https://github.com/bluez/bluez/issues/792
----
- src/rfkill.c | 14 +++++++++++---
- 1 file changed, 11 insertions(+), 3 deletions(-)
+thanks,
 
-diff --git a/src/rfkill.c b/src/rfkill.c
-index 88cad1c9e..ac4a48d0a 100644
---- a/src/rfkill.c
-+++ b/src/rfkill.c
-@@ -55,6 +55,7 @@ struct rfkill_event {
- 	uint8_t  hard;
- };
- #define RFKILL_EVENT_SIZE_V1    8
-+#define RFKILL_DEVICE_PATH      "/dev/rfkill"
- 
- static int get_adapter_id_for_rfkill(uint32_t rfkill_id)
- {
-@@ -88,7 +89,7 @@ int rfkill_get_blocked(uint16_t index)
- 	int fd;
- 	int blocked = -1;
- 
--	fd = open("/dev/rfkill", O_RDWR);
-+	fd = open(RFKILL_DEVICE_PATH, O_RDWR);
- 	if (fd < 0) {
- 		DBG("Failed to open RFKILL control device");
- 		return -1;
-@@ -178,9 +179,16 @@ void rfkill_init(void)
- 	int fd;
- 	GIOChannel *channel;
- 
--	fd = open("/dev/rfkill", O_RDWR);
-+	errno = 0;
-+	fd = open(RFKILL_DEVICE_PATH, O_RDWR);
- 	if (fd < 0) {
--		error("Failed to open RFKILL control device");
-+		if (errno == ENOENT) {
-+			DBG("No RFKILL device available at '%s'",
-+				RFKILL_DEVICE_PATH);
-+		} else {
-+			error("Failed to open RFKILL control device: %s",
-+				strerror(errno));
-+		}
- 		return;
- 	}
- 
--- 
-2.39.2
-
+greg k-h
