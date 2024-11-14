@@ -1,150 +1,82 @@
-Received: from out-21.smtp.github.com (out-21.smtp.github.com [192.30.252.204])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22438BE4E
-	for <linux-bluetooth@vger.kernel.org>; Thu, 14 Nov 2024 20:39:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.204
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC76CBE4E
+	for <linux-bluetooth@vger.kernel.org>; Thu, 14 Nov 2024 20:40:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731616773; cv=none; b=M5qhUAG0N21gka0Fg58n9XvlYNrwejE5rBmscgqszte85qMJCm0kt7DwHD1AGMbSyC8g0WrOCxitSzbV6HnGadgTeGf9z3t2gKDn8ecWrx+hLsTFGU8Q9BytOl2m8WGTGgh0IL/yaTkKKwiEsUGi1CgxZM2Xdwi7w8/mpcBE+6A=
+	t=1731616818; cv=none; b=PwGWRmspYPqxtUUwc09Pk+GhfeWcdhCtfndfVS5cRcyB/fSqqQcDbENwtmHM45DhZHvGrnI1viS4LvQnkkAphBB+FJymKjlGJ0q5xSVUL/E5SK5yvMzVdIYm8d1eGnctWBVZCZzl1DLEpBH0U26ge6g/Ks/b7AeLc3rZjgZtizI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731616773; c=relaxed/simple;
-	bh=GAqJMVVD5ToxD/FHbWAGScyN2RDGsKqSWpehd/2uqAM=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=ig6q9nJgEtLtqdImk9vwUPmQX4iVEybymisIxsrXpG4cEKjcxoIAxhY52BXT95dtWdQwmxB1pVI8/YFR3zTQP6lt+J6TpvHm92IjP5eM01Wq4pWtvBwZSl239pUSNG4bjnA8UKj6AQWrL2skGZtIC9RnmlHKLjRwN9v54nru7kY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=jfWyB2pp; arc=none smtp.client-ip=192.30.252.204
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1731616818; c=relaxed/simple;
+	bh=R8+IUNPP3zb47jk4lQA+8VxsUwawU8cxk8TcrL2qW+A=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=epgcJ11pQ66qPLBFbEztRdz/y1Z6F4R2+cG1Z6nRImibmEtuBbvv8S3/czOZSvu3mzqPZ1Uq6WReQ9Oo3goAdunLrHGmwD0hkZpK48L00VOlBb9f/2SZWs+bNUylxI007QrFN+95kUKLzIzUIab8Z9+mZ7SjweNfKgpNp0C/JZY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=g3qprrOQ; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="jfWyB2pp"
-Received: from github.com (hubbernetes-node-e3a920b.ac4-iad.github.net [10.52.134.27])
-	by smtp.github.com (Postfix) with ESMTPA id 48BED70104B
-	for <linux-bluetooth@vger.kernel.org>; Thu, 14 Nov 2024 12:39:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1731616771;
-	bh=RANIA1m+RSa+OVZX4pCQMqOkwUSlURWERlIESVCrSLQ=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=jfWyB2ppHf147DeDlsOCW0oKaNKmwR6itjFeb9Q6rGwDadJmKlcTtfTOEjGb+BuCu
-	 qznEpN3z93BoUVZzOh/lZXDyaLrsm0vU4z8hcng3NiN1Ihox2Vc9eEg+4kNY0IWggS
-	 x5lHOkAGiVyh1M14HI5RDskN0gpJYs9S2Q7lOPRM=
-Date: Thu, 14 Nov 2024 12:39:31 -0800
-From: Luiz Augusto von Dentz <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/master/63f1ab-95e89c@github.com>
-Subject: [bluez/bluez] fe1296: mgmt-api: Add Send HCI command and wait for
- event ...
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="g3qprrOQ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5F475C4CECD;
+	Thu, 14 Nov 2024 20:40:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1731616818;
+	bh=R8+IUNPP3zb47jk4lQA+8VxsUwawU8cxk8TcrL2qW+A=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=g3qprrOQXPAuffYtpXZ6THr+MmR+ichkRbPCLykaPFKzakLlP/1j1okLFgpCj2QAC
+	 YwEx25JNj9W9qWiMLG0J36q64go7GR67G1YydLxKeuTcWeBODdLV5PsrFeb6IwsiH4
+	 I9oF0dy9+WGVcnmFgSn6cCYT1ozje5neHqzW/GVasQT1QDD2efaX2BhSrhxGiWI93m
+	 K0RcxPyS58UGGPL7l4RyAHB5Adxc3yhLZeqrA/uljFnoQ9ydY1L6mjlEzpyegX3gwm
+	 TosuZ5a+tLnHEVGqhB72WXPlIkyt7UO0ZAXt3NMIKsNG4WyqPRRJ+ECoEIW1TpovnO
+	 697rhLpC5ecMw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 3427C3809A80;
+	Thu, 14 Nov 2024 20:40:30 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH BlueZ v2 1/5] mgmt-api: Add Send HCI command and wait for
+ event Command
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <173161682901.2049385.11435509102865762627.git-patchwork-notify@kernel.org>
+Date: Thu, 14 Nov 2024 20:40:29 +0000
+References: <20241114192524.1856334-1-luiz.dentz@gmail.com>
+In-Reply-To: <20241114192524.1856334-1-luiz.dentz@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
 
-  Branch: refs/heads/master
-  Home:   https://github.com/bluez/bluez
-  Commit: fe1296cb1156f252e5011bb00fe1186ddfd19ad6
-      https://github.com/bluez/bluez/commit/fe1296cb1156f252e5011bb00fe1186ddfd19ad6
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2024-11-14 (Thu, 14 Nov 2024)
+Hello:
 
-  Changed paths:
-    M doc/mgmt-api.txt
+This series was applied to bluetooth/bluez.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-  Log Message:
-  -----------
-  mgmt-api: Add Send HCI command and wait for event Command
+On Thu, 14 Nov 2024 14:25:20 -0500 you wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> 
+> This adds Send HCI command and wait for event Command initial
+> documentation.
+> ---
+>  doc/mgmt-api.txt | 30 ++++++++++++++++++++++++++++++
+>  1 file changed, 30 insertions(+)
 
-This adds Send HCI command and wait for event Command initial
-documentation.
+Here is the summary with links:
+  - [BlueZ,v2,1/5] mgmt-api: Add Send HCI command and wait for event Command
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=fe1296cb1156
+  - [BlueZ,v2,2/5] monitor: Fix opcode for MGMT_OP_MESH_SEND_CANCEL
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=2e981e1a9498
+  - [BlueZ,v2,3/5] monitor: Add decoding of MGMT_OP_HCI_CMD_SYNC
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=d395c6b1c7d4
+  - [BlueZ,v2,4/5] lib/mgmt: Add definitions of MGMT_OP_HCI_CMD_SYNC
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=0580dc4bb64f
+  - [BlueZ,v2,5/5] client/mgmt: Add hci-cmd command
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=95e89cd2e4f8
 
-
-  Commit: 2e981e1a9498448a05900ccfd891ceb320e81034
-      https://github.com/bluez/bluez/commit/2e981e1a9498448a05900ccfd891ceb320e81034
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2024-11-14 (Thu, 14 Nov 2024)
-
-  Changed paths:
-    M monitor/packet.c
-
-  Log Message:
-  -----------
-  monitor: Fix opcode for MGMT_OP_MESH_SEND_CANCEL
-
-MGMT_OP_MESH_SEND_CANCEL opcode is 0x005A not 0x0056.
-
-
-  Commit: d395c6b1c7d4087ba6de7641c5932dc91cf1b210
-      https://github.com/bluez/bluez/commit/d395c6b1c7d4087ba6de7641c5932dc91cf1b210
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2024-11-14 (Thu, 14 Nov 2024)
-
-  Changed paths:
-    M monitor/packet.c
-
-  Log Message:
-  -----------
-  monitor: Add decoding of MGMT_OP_HCI_CMD_SYNC
-
-@ MGMT Com..nd (0x005b) plen 6  {0x0002}
-        Opcode: 0xffff
-        Event: 0x00
-        Timeout: 0 seconds
-        Parameters Length: 0
-        Parameters[0]:
-@ MGMT Event: Command Status (0x0002) plen 3    {0x0002}
-        Send HCI command and wait for event (0x005b)
-          Status: Failed (0x03)
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
-  Commit: 0580dc4bb64f143da3897f78f7734fbd0f64df1b
-      https://github.com/bluez/bluez/commit/0580dc4bb64f143da3897f78f7734fbd0f64df1b
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2024-11-14 (Thu, 14 Nov 2024)
-
-  Changed paths:
-    M lib/mgmt.h
-
-  Log Message:
-  -----------
-  lib/mgmt: Add definitions of MGMT_OP_HCI_CMD_SYNC
-
-This adds the definition of MGMT_OP_HCI_CMD_SYNC and its packet
-structure.
-
-
-  Commit: 95e89cd2e4f84773dc78415bf33758a7456827c9
-      https://github.com/bluez/bluez/commit/95e89cd2e4f84773dc78415bf33758a7456827c9
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2024-11-14 (Thu, 14 Nov 2024)
-
-  Changed paths:
-    M client/mgmt.c
-
-  Log Message:
-  -----------
-  client/mgmt: Add hci-cmd command
-
-This adds hci-cmd command which uses the MGMT_OP_HCI_CMD_SYNC:
-
-bluetoothctl> mgmt.hci-send 0xffff
-bluetoothctl[44]: @ MGMT Com..nd (0x005b) plen 6  {0x0002}
-        Opcode: 0xffff
-        Event: 0x00
-        Timeout: 0 seconds
-        Parameters Length: 0
-        Parameters[0]:
-< HCI Command: Vendor (0x3f|0x03ff) plen 0
-> HCI Event: Command Status (0x0f) plen 4
-      Vendor (0x3f|0x03ff) ncmd 1
-        Status: Unknown HCI Command (0x01)
-@ MGMT Event: Command Status (0x0002) plen 3    {0x0002}
-      Send HCI command and wait for event (0x005b)
-        Status: Failed (0x03)
-
-
-Compare: https://github.com/bluez/bluez/compare/63f1ab560c42...95e89cd2e4f8
-
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
