@@ -1,143 +1,137 @@
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f182.google.com (mail-qt1-f182.google.com [209.85.160.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 246F51D86CB;
-	Thu, 14 Nov 2024 09:49:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31509262A3
+	for <linux-bluetooth@vger.kernel.org>; Thu, 14 Nov 2024 15:01:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731577781; cv=none; b=pHDYpc+ai17APAe00Q8qEb6mihwSKVzmgC7QT/nXFca70IZYRl/uzY4EXJMOupu1fIfHqaFHrUaeI4anS5WNSmW3A6ntL4Z9od79ONDrzlHfG1bukGBcGnEtHjnaiuRbG3X7boawg3Rn+p+eXR1tsV/kkK3E/iFHAY/26hns1mQ=
+	t=1731596479; cv=none; b=d0g46qZucF8WhA7oiDd8w+qhHZ+EYTjD5Oi9OdKArsrP6nl01ShMzPjcC+xijSg7Y4uG7gIXdD9uKEDxnH0PAjk8n/xBgzfaRFMkIjXNckkwHcFBKhUR+RK63QcasKgtKbvayoSLRaHMo8i5Uun1AqsyJaD39vMEZ5sywd4uvqE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731577781; c=relaxed/simple;
-	bh=ay4FsFVDTkCF1UTnaiaMDigRwTDvh81WbxFK1vwsbnA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=fx7slUfwF0w2stZi8c7b0CNoe6m3LH2LcPF1aTSoP3vuPwI49zHHVQcxgs6V1uw/LyrfHkjiaDCcpuCrpGbMemKzGnueNeb3pjOK0ind3CV+dyc/sZSVIaAXuvy8TQsVmZgOnhITqnn+/Z2/ydBWfHbbdyI75swiWxXSRPB0dig=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from [141.14.220.45] (g45.guest.molgen.mpg.de [141.14.220.45])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 0250061E5FE05;
-	Thu, 14 Nov 2024 10:49:06 +0100 (CET)
-Message-ID: <4d973d61-27be-4830-880a-a3d74c4bbbc7@molgen.mpg.de>
-Date: Thu, 14 Nov 2024 10:49:05 +0100
+	s=arc-20240116; t=1731596479; c=relaxed/simple;
+	bh=YrGAnM5FWpje4t+lXAnl4kWVIYxMcwdGV2CIasfroNo=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=JyHoX64N1xFr5G84Bp3bWj/9hrOAUoZUcexNPb+BILMHEPqrTlFhAfC+KhWf2Z7kpefxb0+IOwOsgW8QmSCfX20FMYSihe+ge0Sq6cXh4dYDUQk0r7D4BNQFzKinXXmH5T8h77raJdCO6Uo/NImpGiq1G6PVFQF0ldV5YPM9r44=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=d7+y9t+S; arc=none smtp.client-ip=209.85.160.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="d7+y9t+S"
+Received: by mail-qt1-f182.google.com with SMTP id d75a77b69052e-46098928354so4395081cf.1
+        for <linux-bluetooth@vger.kernel.org>; Thu, 14 Nov 2024 07:01:17 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1731596477; x=1732201277; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=Ff8zh3Z1xg0rwl6kU5FZe+S96apHEoGDf4yI5QwLqmY=;
+        b=d7+y9t+SuHQrxqAZ9uKgBcpW4IbdMrv6fwtlJsAdQ1rx7SrWEsAdg9aZepULT6Zuvt
+         PetQNH0P2t8EmfaNETBpyA5irj8cbT4zSCNlRqtDJwJPgKSCblo9FctA6+QREVtvJ/fQ
+         tOSo1Bfrhbq+MJQQUZ7b5VOYVGBB1xbB/sBdhDKNruRMF0blEvp2csc9rpwcf+9BPDs4
+         GSn78tqbnRFjIuBnYby1ENHKTLY9czuVCSj4PN5ev90ZKdAzrSQXmAF72sesphPvbqSt
+         GMIiDOg4oSRIu/UUCtvqieNt4+yUNraMgwUPfnn/LIWFlJusIyKXkGw0LuqSKZwtjRar
+         gB3A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731596477; x=1732201277;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Ff8zh3Z1xg0rwl6kU5FZe+S96apHEoGDf4yI5QwLqmY=;
+        b=XoNUlxOoQ6rt8O1ceYo1jB0Ml81fsewVvyzhdHVKtbIT+7HXec2wqO0fVMByZAQ1c0
+         2tS2Rtl6kOLZ6wK6FUY4WpaZAXNWYZn+ptlL0+AY9FW+AxJuFWmlMWkuqdhlmKXB67/D
+         4IBhIbvORN51uaXjuDW5d4An2qoqYqWgQmnlP9M9UxPXWxMZPsldXVEg1w2eym/L6ZUm
+         lAnZES5klaWZa7h877554cqD75bP9dsvxGkWiV8FqHBJsRamff1q3koBtiBZ0XRFmMVe
+         4mV7rfmt79lhB4rsximGCDBwDlRBGWppwIqWwKDvOS6heqNxm588wrSBjTcINBer45Iy
+         Dj9w==
+X-Gm-Message-State: AOJu0YyP3A8oq8AvjlO6gmXysfBTdW6htJHn1nFvJY3TFa5yeEV0o2m6
+	V4mCRRm87EW9qYp9EDB9CvBxeVkabk7F0Q+YZYmh/op2trZokTs6qhXGhA==
+X-Google-Smtp-Source: AGHT+IF/LwI6NN9pGXjXHRXddTS7bIsjsLmCeFP+Snfshfj34KVh0gVHSFuB19e/a7uP8v4KvjVC/A==
+X-Received: by 2002:ac8:5845:0:b0:460:ae0f:470c with SMTP id d75a77b69052e-46358ff273dmr24728641cf.47.1731596476751;
+        Thu, 14 Nov 2024 07:01:16 -0800 (PST)
+Received: from [172.17.0.2] ([20.102.46.208])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4635ab24f73sm6355271cf.61.2024.11.14.07.01.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 14 Nov 2024 07:01:16 -0800 (PST)
+Message-ID: <673610bc.c80a0220.31d1ad.2c30@mx.google.com>
+Date: Thu, 14 Nov 2024 07:01:16 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============0615246121835236279=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] Bluetooth: qca: Support downloading board id specific NVM
- for WCN6855
-To: Zijun Hu <quic_zijuhu@quicinc.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Zijun Hu
- <zijun_hu@icloud.com>, linux-bluetooth@vger.kernel.org,
- linux-kernel@vger.kernel.org, Bjorn Andersson <bjorande@quicinc.com>,
- Aiqun Yu <quic_aiquny@quicinc.com>, Cheng Jiang <quic_chejiang@quicinc.com>,
- Johan Hovold <johan@kernel.org>,
- Jens Glathe <jens.glathe@oldschoolsolutions.biz>,
- Steev Klimaszewski <steev@kali.org>
-References: <20241113-x13s_wcn6855_fix-v1-1-15af0aa2549c@quicinc.com>
-Content-Language: en-US
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <20241113-x13s_wcn6855_fix-v1-1-15af0aa2549c@quicinc.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [v3] Bluetooth: fix use-after-free in device_for_each_child()
+In-Reply-To: <20241113160949.1325502-1-luiz.dentz@gmail.com>
+References: <20241113160949.1325502-1-luiz.dentz@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
+
+--===============0615246121835236279==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
 
-Dear Zijun,
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=909346
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PENDING   0.37 seconds
+GitLint                       PENDING   0.19 seconds
+SubjectPrefix                 PASS      0.12 seconds
+BuildKernel                   PASS      25.59 seconds
+CheckAllWarning               PASS      27.37 seconds
+CheckSparse                   PASS      34.08 seconds
+BuildKernel32                 PASS      24.67 seconds
+TestRunnerSetup               PASS      449.74 seconds
+TestRunner_l2cap-tester       PASS      25.07 seconds
+TestRunner_iso-tester         FAIL      32.59 seconds
+TestRunner_bnep-tester        PASS      4.83 seconds
+TestRunner_mgmt-tester        PASS      127.95 seconds
+TestRunner_rfcomm-tester      PASS      8.19 seconds
+TestRunner_sco-tester         PASS      12.69 seconds
+TestRunner_ioctl-tester       PASS      8.48 seconds
+TestRunner_mesh-tester        PASS      6.25 seconds
+TestRunner_smp-tester         PASS      7.92 seconds
+TestRunner_userchan-tester    PASS      4.98 seconds
+IncrementalBuild              PENDING   0.80 seconds
+
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
+
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
+
+##############################
+Test: TestRunner_iso-tester - FAIL
+Desc: Run iso-tester with test-runner
+Output:
+WARNING: possible circular locking dependency detected
+Total: 124, Passed: 119 (96.0%), Failed: 1, Not Run: 4
+
+Failed Test Cases
+ISO Connect2 Suspend - Success                       Failed       4.238 seconds
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
 
 
-Thank you for your patch.
 
-Am 14.11.24 um 07:26 schrieb Zijun Hu:
-> Download board id specific NVM instead of default for WCN6855 if board
-> id is available, and that is required by Lenovo ThinkPad X13s.
-
-Could you please start by describing the problem/motivation. What does 
-not work with the Lenovo ThinkPad X13s before your pacth.
-
-What is variant *g*?
-
-Maybe also describe the file naming convention in the commit message.
-
-> Cc: Bjorn Andersson <bjorande@quicinc.com>
-> Cc: Aiqun Yu (Maria) <quic_aiquny@quicinc.com>
-> Cc: Cheng Jiang <quic_chejiang@quicinc.com>
-> Cc: Johan Hovold <johan@kernel.org>
-> Cc: Jens Glathe <jens.glathe@oldschoolsolutions.biz>
-> Cc: Steev Klimaszewski <steev@kali.org>
-> Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
-> ---
->   drivers/bluetooth/btqca.c | 35 ++++++++++++++++++++++++++++++++---
->   1 file changed, 32 insertions(+), 3 deletions(-)
-> 
-> diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
-> index dfbbac92242a..4f8576cbbab9 100644
-> --- a/drivers/bluetooth/btqca.c
-> +++ b/drivers/bluetooth/btqca.c
-> @@ -717,6 +717,29 @@ static void qca_generate_hsp_nvm_name(char *fwname, size_t max_size,
->   		snprintf(fwname, max_size, "qca/hpnv%02x%s.%x", rom_ver, variant, bid);
->   }
->   
-> +static void qca_get_hsp_nvm_name_generic(struct qca_fw_config *cfg,
-> +					 struct qca_btsoc_version ver,
-> +					 u8 rom_ver, u16 bid)
-> +{
-> +	const char *variant;
-> +
-> +	/* hsp gf chip */
-> +	if ((le32_to_cpu(ver.soc_id) & QCA_HSP_GF_SOC_MASK) == QCA_HSP_GF_SOC_ID)
-> +		variant = "g";
-> +	else
-> +		variant = "";
-> +
-> +	if (bid == 0x0)
-> +		snprintf(cfg->fwname, sizeof(cfg->fwname), "qca/hpnv%02x%s.bin",
-> +			 rom_ver, variant);
-> +	else if (bid & 0xff00)
-> +		snprintf(cfg->fwname, sizeof(cfg->fwname), "qca/hpnv%02x%s.b%x",
-> +			 rom_ver, variant, bid);
-> +	else
-> +		snprintf(cfg->fwname, sizeof(cfg->fwname), "qca/hpnv%02x%s.b%02x",
-> +			 rom_ver, variant, bid);
-> +}
-> +
->   static inline void qca_get_nvm_name_generic(struct qca_fw_config *cfg,
->   					    const char *stem, u8 rom_ver, u16 bid)
->   {
-> @@ -810,8 +833,15 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
->   	/* Give the controller some time to get ready to receive the NVM */
->   	msleep(10);
->   
-> -	if (soc_type == QCA_QCA2066 || soc_type == QCA_WCN7850)
-> +	switch (soc_type) {
-> +	case QCA_QCA2066:
-> +	case QCA_WCN6855:
-> +	case QCA_WCN7850:
->   		qca_read_fw_board_id(hdev, &boardid);
-> +		break;
-> +	default:
-> +		break;
-> +	}
->   
->   	/* Download NVM configuration */
->   	config.type = TLV_TYPE_NVM;
-> @@ -848,8 +878,7 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
->   				 "qca/msnv%02x.bin", rom_ver);
->   			break;
->   		case QCA_WCN6855:
-> -			snprintf(config.fwname, sizeof(config.fwname),
-> -				 "qca/hpnv%02x.bin", rom_ver);
-> +			qca_get_hsp_nvm_name_generic(&config, ver, rom_ver, boardid);
->   			break;
->   		case QCA_WCN7850:
->   			qca_get_nvm_name_generic(&config, "hmt", rom_ver, boardid);
+---
+Regards,
+Linux Bluetooth
 
 
-Kind regards,
-
-Paul
+--===============0615246121835236279==--
