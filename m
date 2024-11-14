@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC76CBE4E
-	for <linux-bluetooth@vger.kernel.org>; Thu, 14 Nov 2024 20:40:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D4442905;
+	Thu, 14 Nov 2024 21:24:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731616818; cv=none; b=PwGWRmspYPqxtUUwc09Pk+GhfeWcdhCtfndfVS5cRcyB/fSqqQcDbENwtmHM45DhZHvGrnI1viS4LvQnkkAphBB+FJymKjlGJ0q5xSVUL/E5SK5yvMzVdIYm8d1eGnctWBVZCZzl1DLEpBH0U26ge6g/Ks/b7AeLc3rZjgZtizI=
+	t=1731619446; cv=none; b=YaSNiNXyQNPcEOBpI2zJKadr0WK2T30uMN4T7rOMPDCfZZLdV6Ucs3SZYUCSNXAnzN4i5Q3m0i1+zMBTDv2cXm5F6cpS/BEvsy95sB1GsjoRMOKkGIMnZ2iREh9QkClqXrbegDBTpXxgaNsMHsw1R2hxO5p9wHp+GUUxX3fog/s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731616818; c=relaxed/simple;
-	bh=R8+IUNPP3zb47jk4lQA+8VxsUwawU8cxk8TcrL2qW+A=;
+	s=arc-20240116; t=1731619446; c=relaxed/simple;
+	bh=Fdf2fRh/fa4AAA9KsPcO38qEhdZaoYYJ7Kgp4azxid8=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=epgcJ11pQ66qPLBFbEztRdz/y1Z6F4R2+cG1Z6nRImibmEtuBbvv8S3/czOZSvu3mzqPZ1Uq6WReQ9Oo3goAdunLrHGmwD0hkZpK48L00VOlBb9f/2SZWs+bNUylxI007QrFN+95kUKLzIzUIab8Z9+mZ7SjweNfKgpNp0C/JZY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=g3qprrOQ; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=pA5JTs6fJXXTNVOgx+Bg6zZAlIxaRta7EnQP7U1gYIahumUresvJ3rCzexM1J+bh2ldiIbfLZ7yUYwHK66RC/kn+TnZ0Enb5d3ugjoq80MoWhlary4pwKCQm4hirfhT/21UX4a2RJOxzd6pB2qzqfE7+9Sqnb6YjlNcruN8kQ6U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UGLr2cQE; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="g3qprrOQ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5F475C4CECD;
-	Thu, 14 Nov 2024 20:40:18 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UGLr2cQE"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A340AC4CECD;
+	Thu, 14 Nov 2024 21:24:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1731616818;
-	bh=R8+IUNPP3zb47jk4lQA+8VxsUwawU8cxk8TcrL2qW+A=;
+	s=k20201202; t=1731619445;
+	bh=Fdf2fRh/fa4AAA9KsPcO38qEhdZaoYYJ7Kgp4azxid8=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=g3qprrOQXPAuffYtpXZ6THr+MmR+ichkRbPCLykaPFKzakLlP/1j1okLFgpCj2QAC
-	 YwEx25JNj9W9qWiMLG0J36q64go7GR67G1YydLxKeuTcWeBODdLV5PsrFeb6IwsiH4
-	 I9oF0dy9+WGVcnmFgSn6cCYT1ozje5neHqzW/GVasQT1QDD2efaX2BhSrhxGiWI93m
-	 K0RcxPyS58UGGPL7l4RyAHB5Adxc3yhLZeqrA/uljFnoQ9ydY1L6mjlEzpyegX3gwm
-	 TosuZ5a+tLnHEVGqhB72WXPlIkyt7UO0ZAXt3NMIKsNG4WyqPRRJ+ECoEIW1TpovnO
-	 697rhLpC5ecMw==
+	b=UGLr2cQErowDjHxrG+z/Tz8lS8/vvNYI5cVqUixIqCjyJ9wQlHHvUKQfcf6+jbbHY
+	 NNDuXlXubPIOGDPz8PeV+DR9/HvM/L0brIJFIwD+ve7RLOvx78zpcBdjX/VAQBVs+R
+	 6LSGe57YT9l/co9VuC7J975LgcyeA4b7PZ9D362MKCTkOuHoKhl0rEzxp/3kJyU4Ng
+	 1cLCxBNRHcHgmfq6snsG07sAPtFlF9lYV0CXne01GVU79OE5E49ljjk/aHtBX5211d
+	 dFMg4lbI+N47McDBlLh+IwgF4EdNZMMcZfeOYfOkWaCUjgygDI4oQa0Z3LcDt2gE8I
+	 A2Lp0R3UU5tOQ==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 3427C3809A80;
-	Thu, 14 Nov 2024 20:40:30 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70E8E3809A80;
+	Thu, 14 Nov 2024 21:24:17 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -37,42 +37,36 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH BlueZ v2 1/5] mgmt-api: Add Send HCI command and wait for
- event Command
+Subject: Re: pull request: bluetooth 2024-10-23
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <173161682901.2049385.11435509102865762627.git-patchwork-notify@kernel.org>
-Date: Thu, 14 Nov 2024 20:40:29 +0000
-References: <20241114192524.1856334-1-luiz.dentz@gmail.com>
-In-Reply-To: <20241114192524.1856334-1-luiz.dentz@gmail.com>
+ <173161945626.2058902.16590652041720850482.git-patchwork-notify@kernel.org>
+Date: Thu, 14 Nov 2024 21:24:16 +0000
+References: <20241030185633.34818-1-luiz.dentz@gmail.com>
+In-Reply-To: <20241030185633.34818-1-luiz.dentz@gmail.com>
 To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
+Cc: davem@davemloft.net, kuba@kernel.org, linux-bluetooth@vger.kernel.org,
+ netdev@vger.kernel.org
 
 Hello:
 
-This series was applied to bluetooth/bluez.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+This pull request was applied to bluetooth/bluetooth-next.git (master)
+by Paolo Abeni <pabeni@redhat.com>:
 
-On Thu, 14 Nov 2024 14:25:20 -0500 you wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+On Wed, 30 Oct 2024 14:56:33 -0400 you wrote:
+> The following changes since commit c05c62850a8f035a267151dd86ea3daf887e28b8:
 > 
-> This adds Send HCI command and wait for event Command initial
-> documentation.
-> ---
->  doc/mgmt-api.txt | 30 ++++++++++++++++++++++++++++++
->  1 file changed, 30 insertions(+)
+>   Merge tag 'wireless-2024-10-29' of https://git.kernel.org/pub/scm/linux/kernel/git/wireless/wireless (2024-10-29 18:57:12 -0700)
+> 
+> are available in the Git repository at:
+> 
+>   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2024-10-30
+> 
+> [...]
 
 Here is the summary with links:
-  - [BlueZ,v2,1/5] mgmt-api: Add Send HCI command and wait for event Command
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=fe1296cb1156
-  - [BlueZ,v2,2/5] monitor: Fix opcode for MGMT_OP_MESH_SEND_CANCEL
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=2e981e1a9498
-  - [BlueZ,v2,3/5] monitor: Add decoding of MGMT_OP_HCI_CMD_SYNC
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=d395c6b1c7d4
-  - [BlueZ,v2,4/5] lib/mgmt: Add definitions of MGMT_OP_HCI_CMD_SYNC
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=0580dc4bb64f
-  - [BlueZ,v2,5/5] client/mgmt: Add hci-cmd command
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=95e89cd2e4f8
+  - pull request: bluetooth 2024-10-23
+    https://git.kernel.org/bluetooth/bluetooth-next/c/ee802a49545a
 
 You are awesome, thank you!
 -- 
