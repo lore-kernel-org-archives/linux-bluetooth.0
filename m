@@ -1,134 +1,189 @@
-Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
+Received: from mail-lj1-f171.google.com (mail-lj1-f171.google.com [209.85.208.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 580E81D45F2
-	for <linux-bluetooth@vger.kernel.org>; Fri, 15 Nov 2024 16:35:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FA1E1D54EE;
+	Fri, 15 Nov 2024 16:40:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731688536; cv=none; b=iiaMqDqww8J27wm6SfrPUEqd0jehQZJC0y1b+HODWsgg8VBCLvPns1n0zrJVSySCZAzkkqw9q9Vn8rCSmYm9TUY8JKCjyNSmOWrahb77HkKYwDSvd9CitrSXg1apjeIdLE4WAlvMZcWzow0q9bWQSHNzV9+CezCTRjLr7w8QUpg=
+	t=1731688856; cv=none; b=dhceJw0ZAHF4eZt9WKxRKVtXL3bH+1h/9cje/7Wj681QEK6DXYX+2F66vlpzGjKQWM3EaxIseKPBnVW/PefhtUVZBlQJSaEwnky16hMliaiRHqpC8GqldN0Y84ZFEhhy+D0Zd/mgKLpV32kbdMgtbDMgjJB/qtXA8BGmdCOkY7Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731688536; c=relaxed/simple;
-	bh=fN7sKgiiKWh9e9IVMnitu2PFFq5hgaXdrHeG9iEUTn4=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=oQC/62Vo80XRpYLdw/5c1ghMqWWCqueFNOcmTivAyp8hkgSk4y4tQOZJnstZ5CeC9s31z0/7UBY1WxBamuhBm4MBtRQuOsmriyeq512KTj74wEsXtUAJjMIelyCaM6sF5mVL3BdGuaN9eFUee85HIHAJD27zZKuH7gWdd8MAcoI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BIRPcTd7; arc=none smtp.client-ip=209.85.214.169
+	s=arc-20240116; t=1731688856; c=relaxed/simple;
+	bh=E5iRXdzyicHiAPnJsHv4IUWYR3Ho3H41AOg7TUPVqXs=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=iecL8EN4zB31cx/ogr2AYQQo5mhJOmSznkGYgPUwNC0Abks/j1MXswonc6EnFt8wSdWSSAvYnnLnHcqEZyyxntfop1VCVCnw3RCIl2yvUyl+mdILri0TyDxsURJeHygdf2eqD1s0CI1eg8RD8nc+H5sAOKIPd67BD0iNhCnUuoM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=I1oc5JNk; arc=none smtp.client-ip=209.85.208.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BIRPcTd7"
-Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-20cf6eea3c0so22133525ad.0
-        for <linux-bluetooth@vger.kernel.org>; Fri, 15 Nov 2024 08:35:34 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="I1oc5JNk"
+Received: by mail-lj1-f171.google.com with SMTP id 38308e7fff4ca-2fb56cb61baso7488811fa.1;
+        Fri, 15 Nov 2024 08:40:55 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1731688530; x=1732293330; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=0KW6vlPkq1YEoz9Fjec1Q3fW9dZFypE7U0FzM+ViRLo=;
-        b=BIRPcTd7aVkGcwz7oY5JojNBGAIGZmpLauG177iEFFh2VHpkiWv5lG053GuwiIIG8n
-         bU5gGG8NoOgQOknsxw7D2KbXh/gg8uoqs682fMNIXwouuhQGvxaMCtMDBmGqMUJjMbR+
-         XUWvfPzRMavA33O4S+UNN6vp3zeXqu3v5N9jV5xMNBqT54fEDc3dKGSdGAHUgxRFZZhk
-         lULL81FLI0d4eW+GSwszOV1sZ5QQCfAZzfnMUSPxHlhAoE2pJWPTheGRHC+DpV3yeswF
-         oN/iuLsArDisvdhdwVIoavLLHE0edDnICxL/mA005Y5MECsp29Qa1IER4YiAOxWaTwgf
-         LDGw==
+        d=gmail.com; s=20230601; t=1731688853; x=1732293653; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=MWM1zhBUaIEICsvvUOeD60alRnVicILRnIGqkspauLA=;
+        b=I1oc5JNkYusY7EgB5KkhCj5Jqlse7V7N8yAbKNXr/JwcHgF9f06aXudr5QlsuYsYdn
+         GmaJ9y01GV8xMLeWPczq9NMNXBmft7uPqaNb1rHLoDJPf33iXZpyNduF5YavJjaI6kGa
+         r/rdgcVrRpv9NKwNZ+AU9H+W6b9roGkVeTfAQIUiYs2Eoi4S8K+9iN9DU+mfo7RQJ0MB
+         JJCzN9hX+JNlA3VF62NSuQW0vbbMmb+Rcg+umuXgfjZeZkOGKrw1rcIH8s/3upThWxjQ
+         V2KLBYDazmZAZc8dQ4i0FUwqznnYz2/rP16ajODUGmDhA3bh0PI15TIpDWSUOw5oxtDo
+         +nJA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731688530; x=1732293330;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=0KW6vlPkq1YEoz9Fjec1Q3fW9dZFypE7U0FzM+ViRLo=;
-        b=kZl3DC4elhjxpWJ7jrUjg1YLeG3GJDi/M5iK2pHzAd4q9rjMdldnpqe9Qm7FScsw9u
-         9ontWdCQd+jMoONrikWaM6/mKYCxqmId0uwwBaNHzdGSmnTkPLQlYiGQQPL6C8/jAOVq
-         uFBWWnjOKhz7wSStk6Lj8kAQIvgpiYKmTd0ha6RDUwjS/pVtDVgon+5Vm/DYqHiZSxrW
-         tkRCQxgXoWbJpKn6Xbe92Cg5NkY1S9f80VdLOq8RY4CITw+Kj+O0bWoEpYTu/DWguJcB
-         zBgeNNtuDxrTOmBCKJJ8neY2hmtjs8kbuqLbUYZakSmOqxDpNBkhZudKDEugOJz8ajtU
-         UaPg==
-X-Gm-Message-State: AOJu0YxhkvcH79OMTSHrgu27lp+hZxJL8Q4iAhiajM8DOnCLJul0ph5b
-	rqTJXqglWXjFc9qfTL1X3UrjMCbVcWQ6j8FCkD5DfTxcryZvA1AIHRroGw==
-X-Google-Smtp-Source: AGHT+IGbllcRNDX6Nr6taRCrv35RhTrsctqdBdQf7CwbZb+wHh581g8SYYUMfN8WCXmvBIyZjaoapw==
-X-Received: by 2002:a17:902:6acc:b0:211:6b21:73d9 with SMTP id d9443c01a7336-211d0ebf447mr32249845ad.37.1731688529858;
-        Fri, 15 Nov 2024 08:35:29 -0800 (PST)
-Received: from [172.17.0.2] ([4.227.114.111])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-211d0dc5c94sm14315875ad.17.2024.11.15.08.35.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 15 Nov 2024 08:35:29 -0800 (PST)
-Message-ID: <67377851.170a0220.34a7d6.9468@mx.google.com>
-Date: Fri, 15 Nov 2024 08:35:29 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============2995186767259218065=="
+        d=1e100.net; s=20230601; t=1731688853; x=1732293653;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=MWM1zhBUaIEICsvvUOeD60alRnVicILRnIGqkspauLA=;
+        b=YROBGBi0nY21H6HjtwOFAuIyMj4BbOr4sssyHtF/B2SIs52JUPOPLBHj0J5a+MzgK+
+         kw3096S056mYZeSwLutUsKQzveUGEeyvIruAB8oE14D/beVinh5OlfxP3ZYDf33vpixp
+         bmzXS/58KkYPcTm9yaowAl8T/Xc0gawsogNm61HFpYTGJG+RMDPaiGcUF2qv6DqXszVO
+         /t4R+HA4G/dA6+bshYYUtf4qTrxIvCQVQmBCgaSiEeuFb19FvMLwFlycwpwascedvcIP
+         LjK4CRppTnkftMqc87DpqOzC2Rf7G29nS75TcL/76pRlDpfKFnGG+O/mB8m7mN6Q9HAY
+         ZiRg==
+X-Forwarded-Encrypted: i=1; AJvYcCUDGkjUWqwAYUzqemJqyWYhBm/4O20DPt8ZNNaZQSx0R1Ruv1JkVta2eIECBQT8x5p2ZuZ2wRukljmDCUH+@vger.kernel.org, AJvYcCVUzCEL7bCS3/AwcgVtPT6V0+6noDe2zHkhOoE5OlGRr3deKaS6N6+j9N/obqZKKxshNIfAfj16PcNpU324h94=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzlc8Nz+56Y1Dc61w87z2fAXZy1a0MU9PZP/gm8SWnW62x0pIgL
+	58cEy5nrshFz1pIPgw6OVbu9Gth5mrsIBJ5daCDfHNqVAtc8qCArxCWn9qslYmzUmCyfGCIEJuC
+	8Ms3inBxKhiQuZDxAf2TdV/DrmTc=
+X-Google-Smtp-Source: AGHT+IEfHFXTrkX4iU2zxXCc93wTO6nasnQ1J9wNeeFUeckOF1/IPATFBdPtOSE1zu0AQdyczMDScHT12VmyJrYxFB4=
+X-Received: by 2002:a05:651c:400a:b0:2ff:6298:ecc0 with SMTP id
+ 38308e7fff4ca-2ff6298ed90mr9510421fa.18.1731688851618; Fri, 15 Nov 2024
+ 08:40:51 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [v1] Bluetooth: MGMT: Fix slab-use-after-free Read in set_powered_sync
-In-Reply-To: <20241115155941.2118683-1-luiz.dentz@gmail.com>
-References: <20241115155941.2118683-1-luiz.dentz@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+References: <20241113-x13s_wcn6855_fix-v1-1-15af0aa2549c@quicinc.com>
+In-Reply-To: <20241113-x13s_wcn6855_fix-v1-1-15af0aa2549c@quicinc.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Fri, 15 Nov 2024 11:40:39 -0500
+Message-ID: <CABBYNZJQGCnsKtdKaByLJkgV715oOorOQLLK8Z+g1BYz9YovNQ@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: qca: Support downloading board id specific NVM
+ for WCN6855
+To: Zijun Hu <quic_zijuhu@quicinc.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>, Zijun Hu <zijun_hu@icloud.com>, 
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Bjorn Andersson <bjorande@quicinc.com>, "Aiqun Yu (Maria)" <quic_aiquny@quicinc.com>, 
+	Cheng Jiang <quic_chejiang@quicinc.com>, Johan Hovold <johan@kernel.org>, 
+	Jens Glathe <jens.glathe@oldschoolsolutions.biz>, Steev Klimaszewski <steev@kali.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
---===============2995186767259218065==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi Zijun,
 
-This is automated email and please do not reply to this email!
+On Thu, Nov 14, 2024 at 1:27=E2=80=AFAM Zijun Hu <quic_zijuhu@quicinc.com> =
+wrote:
+>
+> Download board id specific NVM instead of default for WCN6855 if board
+> id is available, and that is required by Lenovo ThinkPad X13s.
+>
+> Cc: Bjorn Andersson <bjorande@quicinc.com>
+> Cc: Aiqun Yu (Maria) <quic_aiquny@quicinc.com>
+> Cc: Cheng Jiang <quic_chejiang@quicinc.com>
+> Cc: Johan Hovold <johan@kernel.org>
+> Cc: Jens Glathe <jens.glathe@oldschoolsolutions.biz>
+> Cc: Steev Klimaszewski <steev@kali.org>
+> Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
 
-Dear submitter,
+How about adding the following:
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=910054
+Fixes: 095327fede00 ("Bluetooth: hci_qca: Add support for QTI
+Bluetooth chip wcn6855")
 
----Test result---
+Not sure if this would be simple to backport given that there are
+things like 691d54d0f7cb ("Bluetooth: qca: use switch case for soc
+type behavior") that may have to be backported as well.
 
-Test Summary:
-CheckPatch                    PENDING   0.55 seconds
-GitLint                       PENDING   0.29 seconds
-SubjectPrefix                 PASS      0.07 seconds
-BuildKernel                   PASS      26.06 seconds
-CheckAllWarning               PASS      27.99 seconds
-CheckSparse                   PASS      31.45 seconds
-BuildKernel32                 PASS      25.42 seconds
-TestRunnerSetup               PASS      447.59 seconds
-TestRunner_l2cap-tester       PASS      20.79 seconds
-TestRunner_iso-tester         FAIL      32.84 seconds
-TestRunner_bnep-tester        PASS      4.84 seconds
-TestRunner_mgmt-tester        PASS      121.93 seconds
-TestRunner_rfcomm-tester      PASS      7.70 seconds
-TestRunner_sco-tester         PASS      11.49 seconds
-TestRunner_ioctl-tester       PASS      8.23 seconds
-TestRunner_mesh-tester        PASS      6.04 seconds
-TestRunner_smp-tester         PASS      7.25 seconds
-TestRunner_userchan-tester    PASS      5.13 seconds
-IncrementalBuild              PENDING   0.89 seconds
+> ---
+>  drivers/bluetooth/btqca.c | 35 ++++++++++++++++++++++++++++++++---
+>  1 file changed, 32 insertions(+), 3 deletions(-)
+>
+> diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
+> index dfbbac92242a..4f8576cbbab9 100644
+> --- a/drivers/bluetooth/btqca.c
+> +++ b/drivers/bluetooth/btqca.c
+> @@ -717,6 +717,29 @@ static void qca_generate_hsp_nvm_name(char *fwname, =
+size_t max_size,
+>                 snprintf(fwname, max_size, "qca/hpnv%02x%s.%x", rom_ver, =
+variant, bid);
+>  }
+>
+> +static void qca_get_hsp_nvm_name_generic(struct qca_fw_config *cfg,
+> +                                        struct qca_btsoc_version ver,
+> +                                        u8 rom_ver, u16 bid)
+> +{
+> +       const char *variant;
+> +
+> +       /* hsp gf chip */
+> +       if ((le32_to_cpu(ver.soc_id) & QCA_HSP_GF_SOC_MASK) =3D=3D QCA_HS=
+P_GF_SOC_ID)
+> +               variant =3D "g";
+> +       else
+> +               variant =3D "";
+> +
+> +       if (bid =3D=3D 0x0)
+> +               snprintf(cfg->fwname, sizeof(cfg->fwname), "qca/hpnv%02x%=
+s.bin",
+> +                        rom_ver, variant);
+> +       else if (bid & 0xff00)
+> +               snprintf(cfg->fwname, sizeof(cfg->fwname), "qca/hpnv%02x%=
+s.b%x",
+> +                        rom_ver, variant, bid);
+> +       else
+> +               snprintf(cfg->fwname, sizeof(cfg->fwname), "qca/hpnv%02x%=
+s.b%02x",
+> +                        rom_ver, variant, bid);
+> +}
+> +
+>  static inline void qca_get_nvm_name_generic(struct qca_fw_config *cfg,
+>                                             const char *stem, u8 rom_ver,=
+ u16 bid)
+>  {
+> @@ -810,8 +833,15 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t bau=
+drate,
+>         /* Give the controller some time to get ready to receive the NVM =
+*/
+>         msleep(10);
+>
+> -       if (soc_type =3D=3D QCA_QCA2066 || soc_type =3D=3D QCA_WCN7850)
+> +       switch (soc_type) {
+> +       case QCA_QCA2066:
+> +       case QCA_WCN6855:
+> +       case QCA_WCN7850:
+>                 qca_read_fw_board_id(hdev, &boardid);
+> +               break;
+> +       default:
+> +               break;
+> +       }
+>
+>         /* Download NVM configuration */
+>         config.type =3D TLV_TYPE_NVM;
+> @@ -848,8 +878,7 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baud=
+rate,
+>                                  "qca/msnv%02x.bin", rom_ver);
+>                         break;
+>                 case QCA_WCN6855:
+> -                       snprintf(config.fwname, sizeof(config.fwname),
+> -                                "qca/hpnv%02x.bin", rom_ver);
+> +                       qca_get_hsp_nvm_name_generic(&config, ver, rom_ve=
+r, boardid);
+>                         break;
+>                 case QCA_WCN7850:
+>                         qca_get_nvm_name_generic(&config, "hmt", rom_ver,=
+ boardid);
+>
+> ---
+> base-commit: e88b020190bf5bc3e7ce5bd8003fc39b23cc95fe
+> change-id: 20241113-x13s_wcn6855_fix-53c573ff7878
+>
+> Best regards,
+> --
+> Zijun Hu <quic_zijuhu@quicinc.com>
+>
 
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
 
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: TestRunner_iso-tester - FAIL
-Desc: Run iso-tester with test-runner
-Output:
-WARNING: possible circular locking dependency detected
-Total: 124, Passed: 120 (96.8%), Failed: 0, Not Run: 4
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============2995186767259218065==--
+--=20
+Luiz Augusto von Dentz
