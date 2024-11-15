@@ -1,141 +1,213 @@
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f71.google.com (mail-io1-f71.google.com [209.85.166.71])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14201193067;
-	Fri, 15 Nov 2024 23:20:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8242C16631C
+	for <linux-bluetooth@vger.kernel.org>; Fri, 15 Nov 2024 23:32:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.71
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731712849; cv=none; b=Yqny0HZ3VwYzs1sKJOB5ctqlsHOB+mV8KUgeKS4Kw40j4uaiWv9JNlM/Pk0NOknX/7ftkn1sQamElJJYD2R23KUUVBz5KMEwc/73KCzs1UDwrpMkcPX5o1kJYjJO9cE5k9T2xTYKxhoKsugUM0MFTE3CI6vShg2izrn+ej+Ui7Y=
+	t=1731713526; cv=none; b=kaf1BDtPpzwYK+O0yr/kinmQp6LeP4EzxDga8px1t/Vwnx38KvZNP9d2Xp0xkgOY6UIHqV1j9HI7yl2CoiidifytqHakiXjJ1NPwTu8Np+PpFC5o77D+CJTnXJhLRP0qXV+Hs7+3GTS2+TASqRAVfaG3Yv3gIp5fQ7GsHixUo5c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731712849; c=relaxed/simple;
-	bh=aHBaGiFTzA9hi/c3ULYVgr+MH6ar7nzsPVpxqhlR3d0=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=qReqhrbXA4BTNdYF06GnI1OqwyA+VAcVP2a9b+CeH7jsEZ1KpILmr9Wi2pmU34ZR6F5odXwsXVFkAVzYmYO/lGPIAlh9okqpQ+fqTGk6iXdrNNmVMvi+UMATpaAzeizp0J/0ELOX6RPLGpseXn2CqrzAB8PqkQXp3VNs1888tBQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=SaYzzMZW; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=o0jZxjqE; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="SaYzzMZW";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="o0jZxjqE"
-From: Thomas Gleixner <tglx@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1731712845;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ocF2UaqffllWgiGWdH3dEXBRLSQ8zx6v3UTSvYUEWBM=;
-	b=SaYzzMZW0ZsY0TGo8HlsbXzuUvCi20iDEgp+8ohYBSE4TZQXRHLKLbged2BOetLpsx4OkO
-	tbZB0k+QLCEJmNzJNJ7TX06kODrXybKEr0MN0pB2oucYCsCZhXwiPTvkrVYx4d0RSom1W9
-	M5V6DhOs4++KN4sHh/UkGD4PfYSgL/msvq0en1H26aBKpf6quxCthUWooMmyaT4o/QkfC2
-	lCNSo4ipp434fYIwklbWGy8m/kIcsHAL1J9mGF0JwBaNElltRXstfx+KSUKFTEf5oJlO1l
-	imvGv9XAnBM1fMHYuOdaaDvDY2O6X0pakSlzfvsLT9wL98INhCHIDkaV3HsBDQ==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1731712845;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ocF2UaqffllWgiGWdH3dEXBRLSQ8zx6v3UTSvYUEWBM=;
-	b=o0jZxjqE/bb/KZAxT0liDWVEJtakeTQr/m7JfpgliBKuwvw5FjJoNIULPPZ+hcCbxwHCjD
-	VmO8h0eWyvF8dzAA==
-To: Easwar Hariharan <eahariha@linux.microsoft.com>, Jeff Johnson
- <quic_jjohnson@quicinc.com>
-Cc: eahariha@linux.microsoft.com, netfilter-devel@vger.kernel.org,
- coreteam@netfilter.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, cocci@inria.fr,
- linux-arm-kernel@lists.infradead.org, linux-s390@vger.kernel.org,
- dri-devel@lists.freedesktop.org, intel-xe@lists.freedesktop.org,
- linux-scsi@vger.kernel.org, xen-devel@lists.xenproject.org,
- linux-block@vger.kernel.org, linux-wireless@vger.kernel.org,
- ath11k@lists.infradead.org, linux-mm@kvack.org,
- linux-bluetooth@vger.kernel.org, linux-staging@lists.linux.dev,
- linux-rpi-kernel@lists.infradead.org, ceph-devel@vger.kernel.org,
- live-patching@vger.kernel.org, linux-sound@vger.kernel.org,
- etnaviv@lists.freedesktop.org, oss-drivers@corigine.com,
- linuxppc-dev@lists.ozlabs.org, Anna-Maria Behnsen
- <anna-maria@linutronix.de>, Madhavan Srinivasan <maddy@linux.ibm.com>,
- Naveen N Rao <naveen@kernel.org>, Christophe Leroy
- <christophe.leroy@csgroup.eu>, Louis Peens <louis.peens@corigine.com>,
- Nicholas Piggin <npiggin@gmail.com>, Michael Ellerman
- <mpe@ellerman.id.au>, Christian Gmeiner <christian.gmeiner@gmail.com>,
- Russell King <linux+etnaviv@armlinux.org.uk>, Lucas Stach
- <l.stach@pengutronix.de>, Takashi Iwai <tiwai@suse.com>, Jaroslav Kysela
- <perex@perex.cz>, Petr Mladek <pmladek@suse.com>, Joe Lawrence
- <joe.lawrence@redhat.com>, Miroslav Benes <mbenes@suse.cz>, Jiri Kosina
- <jikos@kernel.org>, Josh Poimboeuf <jpoimboe@kernel.org>, Ilya Dryomov
- <idryomov@gmail.com>, Xiubo Li <xiubli@redhat.com>, Broadcom internal
- kernel review list <bcm-kernel-feedback-list@broadcom.com>, Scott Branden
- <sbranden@broadcom.com>, Ray Jui <rjui@broadcom.com>, Florian Fainelli
- <florian.fainelli@broadcom.com>, Greg Kroah-Hartman
- <gregkh@linuxfoundation.org>, Luiz Augusto von Dentz
- <luiz.dentz@gmail.com>, Johan Hedberg <johan.hedberg@gmail.com>, Jens
- Axboe <axboe@kernel.dk>, Marcel Holtmann <marcel@holtmann.org>, Kalle Valo
- <kvalo@kernel.org>, Jeff Johnson <jjohnson@kernel.org>, Catalin Marinas
- <catalin.marinas@arm.com>, Roger Pau =?utf-8?Q?Monn=C3=A9?=
- <roger.pau@citrix.com>, Jack
- Wang <jinpu.wang@cloud.ionos.com>, Andrew Morton
- <akpm@linux-foundation.org>, "Martin K. Petersen"
- <martin.petersen@oracle.com>, Praveen Kaligineedi
- <pkaligineedi@google.com>, Andrew Lunn <andrew+netdev@lunn.ch>, James
- Smart <james.smart@broadcom.com>, Dick Kennedy
- <dick.kennedy@broadcom.com>, "James E.J. Bottomley"
- <James.Bottomley@HansenPartnership.com>, Maxime Ripard
- <mripard@kernel.org>, David Airlie <airlied@gmail.com>, Simona Vetter
- <simona@ffwll.ch>, Jeroen de Borst <jeroendb@google.com>, Shailend Chand
- <shailend@google.com>, Thomas Zimmermann <tzimmermann@suse.de>, Maarten
- Lankhorst <maarten.lankhorst@linux.intel.com>, Rodrigo Vivi
- <rodrigo.vivi@intel.com>, Thomas =?utf-8?Q?Hellstr=C3=B6m?=
- <thomas.hellstrom@linux.intel.com>, Lucas De Marchi
- <lucas.demarchi@intel.com>, Oded Gabbay <ogabbay@kernel.org>, Ofir Bitton
- <obitton@habana.ai>, Sven Schnelle <svens@linux.ibm.com>, Christian
- Borntraeger <borntraeger@linux.ibm.com>, Alexander Gordeev
- <agordeev@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>, Heiko
- Carstens <hca@linux.ibm.com>, Russell King <linux@armlinux.org.uk>, Robert
- Jarzmik <robert.jarzmik@free.fr>, Haojian Zhuang
- <haojian.zhuang@gmail.com>, Daniel Mack <daniel@zonque.org>, Nicolas Palix
- <nicolas.palix@imag.fr>, Julia Lawall <Julia.Lawall@inria.fr>, Simon
- Horman <horms@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski
- <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, "David S. Miller"
- <davem@davemloft.net>, Jozsef Kadlecsik <kadlec@netfilter.org>, Pablo
- Neira Ayuso <pablo@netfilter.org>
-Subject: Re: [PATCH v2 00/21] Converge on using secs_to_jiffies()
-In-Reply-To: <8127a2e6-fa62-4c85-b7ed-24748cc9e285@linux.microsoft.com>
-References: <20241115-converge-secs-to-jiffies-v2-0-911fb7595e79@linux.microsoft.com>
- <10ee4e8f-d8b4-4502-a5e2-0657802aeb11@linux.microsoft.com>
- <3ac480f5-549b-4449-baa9-f766e074c409@quicinc.com>
- <8127a2e6-fa62-4c85-b7ed-24748cc9e285@linux.microsoft.com>
-Date: Sat, 16 Nov 2024 00:20:50 +0100
-Message-ID: <87plmwytgt.ffs@tglx>
+	s=arc-20240116; t=1731713526; c=relaxed/simple;
+	bh=QaY1+eOShqdZYsJt1gBTHrSsu/twfRY16Xo6KXA70hA=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=jg0iTL2V9voQK/pr7YStCkBdH7s0IScZS2E1rD58DtSoAhnhhyHBEavP/zgLbZy1XkIbPWKsjYrQ2kzc67FTNkTjdJmygKuY7rZHJ1qakxhFSwzOFkx0ppavP5fnKj8j2NPHfr8d5wR93VurBZFM8SzQPNjuBaqqXqatAMKiwLM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.71
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f71.google.com with SMTP id ca18e2360f4ac-83acb657f91so145070939f.0
+        for <linux-bluetooth@vger.kernel.org>; Fri, 15 Nov 2024 15:32:04 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731713523; x=1732318323;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=OvnrS+/ZIKsu3TcsmUpnsL4BnZ/QK1VFYhp71xUYT7w=;
+        b=qw6IFDkx/wPx2zuh/e/nr/siFH0Teo58YeDyH+JU+9DoyZa6yCfDiwu2y19TK1WLjN
+         yW5w/SkdGF4EPqDWvrqgbBYPdLu31vzVi4gOTmwAUQ8wCucfOIdiUBcQmwqvZbdy7c6Q
+         /wst2l7eH4H8DeIIFPsdjK+gKzqUq+ZbwYt4NS1AF6WOwh0Neg8BVms7BZ3u8jKIcFYI
+         syVSsi98A5XerloD2S0UOGMVqhI9EZ2Mvx/4JRMa2TtT6IAxaHGHu9vFsdHIiFqG5asz
+         jJfRo86LPVSnP+0K3pnO/Pv4jOwOj3LQJw8x0pfISbE0nK5aOsVEvMP2cDq94sWETllu
+         4n6A==
+X-Gm-Message-State: AOJu0YwcERaqUNbakdhdGDRfIMMsb9aNBQKNFnWBQMliA498OIsHF82g
+	M17TWGLq2bbnze47p9WRtSX5SIlU16xK4yxxvcTQrQsqHPDqqFw2Pg4NqN3cFGZM0nZz7Jt29Q2
+	hSGowaTzAUKu2IdCk/IqdjeW/NtHa6dag/zFjPaJWW2FBW4zPcaIduFU=
+X-Google-Smtp-Source: AGHT+IFa8xBYjj6+ddkwtVrbrdCXfH9nmyILlda4MQJuVlOsh/+LQIbRBqn8outzyVyj4K8dJoq5+/GgvjuSN5qOfZEhyWdljXNg
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+X-Received: by 2002:a92:cda3:0:b0:3a0:a070:b81 with SMTP id
+ e9e14a558f8ab-3a748084dcdmr51746305ab.23.1731713523674; Fri, 15 Nov 2024
+ 15:32:03 -0800 (PST)
+Date: Fri, 15 Nov 2024 15:32:03 -0800
+In-Reply-To: <CABBYNZLatZOTP3B68PPdm0E7y-t4qAzCDmaB8vxKZu-o3ncmgQ@mail.gmail.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6737d9f3.050a0220.57553.0042.GAE@google.com>
+Subject: Re: [syzbot] [bluetooth?] KASAN: slab-use-after-free Read in set_powered_sync
+From: syzbot <syzbot+03d6270b6425df1605bf@syzkaller.appspotmail.com>
+To: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	luiz.dentz@gmail.com, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Fri, Nov 15 2024 at 14:15, Easwar Hariharan wrote:
-> On 11/15/2024 1:41 PM, Jeff Johnson wrote:
->> 
->> How do you expect this series to land since it overlaps a large number of
->> maintainer trees? Do you have a maintainer who has volunteered to take the
->> series and the maintainers should just ack? Or do you want the maintainers to
->> take the individual patches that are applicable to them?
->> 
->> /jeff
->
-> I am hoping for tglx to take it through his tree since the patch
-> introducing secs_to_jiffies() is in his tree, so sequencing of
-> dependencies would not be an issue.
+Hello,
 
-Right, but it's two days before the merge window opens, so no.
+syzbot has tested the proposed patch but the reproducer is still triggering an issue:
+KASAN: slab-use-after-free Read in set_powered_sync
 
-> But if tglx won't, we could push it out another cycle and individual
-> maintainers can take the patches that are applicable to their tree for
-> the series.
+==================================================================
+BUG: KASAN: slab-use-after-free in set_powered_sync+0x3a/0xc0 net/bluetooth/mgmt.c:1354
+Read of size 8 at addr ffff8880791bd518 by task kworker/u9:0/54
 
-That's the easiest way forward as it does not create conflicts and all
-maintainers will have the base patch in their trees after rc1.
+CPU: 1 UID: 0 PID: 54 Comm: kworker/u9:0 Not tainted 6.12.0-rc7-syzkaller-01627-g6bbdb903db08 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/30/2024
+Workqueue: hci0 hci_cmd_sync_work
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:94 [inline]
+ dump_stack_lvl+0x241/0x360 lib/dump_stack.c:120
+ print_address_description mm/kasan/report.c:377 [inline]
+ print_report+0x169/0x550 mm/kasan/report.c:488
+ kasan_report+0x143/0x180 mm/kasan/report.c:601
+ set_powered_sync+0x3a/0xc0 net/bluetooth/mgmt.c:1354
+ hci_cmd_sync_work+0x22b/0x400 net/bluetooth/hci_sync.c:332
+ process_one_work kernel/workqueue.c:3229 [inline]
+ process_scheduled_works+0xa63/0x1850 kernel/workqueue.c:3310
+ worker_thread+0x870/0xd30 kernel/workqueue.c:3391
+ kthread+0x2f0/0x390 kernel/kthread.c:389
+ ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
+ </TASK>
 
-Thanks,
+Allocated by task 6105:
+ kasan_save_stack mm/kasan/common.c:47 [inline]
+ kasan_save_track+0x3f/0x80 mm/kasan/common.c:68
+ poison_kmalloc_redzone mm/kasan/common.c:377 [inline]
+ __kasan_kmalloc+0x98/0xb0 mm/kasan/common.c:394
+ kasan_kmalloc include/linux/kasan.h:257 [inline]
+ __kmalloc_cache_noprof+0x19c/0x2c0 mm/slub.c:4295
+ kmalloc_noprof include/linux/slab.h:878 [inline]
+ kzalloc_noprof include/linux/slab.h:1014 [inline]
+ mgmt_pending_new+0x65/0x250 net/bluetooth/mgmt_util.c:269
+ mgmt_pending_add+0x36/0x120 net/bluetooth/mgmt_util.c:296
+ set_powered+0x3cd/0x5e0 net/bluetooth/mgmt.c:1395
+ hci_mgmt_cmd+0xc47/0x11d0 net/bluetooth/hci_sock.c:1712
+ hci_sock_sendmsg+0x7b8/0x11c0 net/bluetooth/hci_sock.c:1832
+ sock_sendmsg_nosec net/socket.c:729 [inline]
+ __sock_sendmsg+0x221/0x270 net/socket.c:744
+ sock_write_iter+0x2d7/0x3f0 net/socket.c:1165
+ new_sync_write fs/read_write.c:590 [inline]
+ vfs_write+0xaeb/0xd30 fs/read_write.c:683
+ ksys_write+0x183/0x2b0 fs/read_write.c:736
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
 
-        tglx
+Freed by task 6099:
+ kasan_save_stack mm/kasan/common.c:47 [inline]
+ kasan_save_track+0x3f/0x80 mm/kasan/common.c:68
+ kasan_save_free_info+0x40/0x50 mm/kasan/generic.c:579
+ poison_slab_object mm/kasan/common.c:247 [inline]
+ __kasan_slab_free+0x59/0x70 mm/kasan/common.c:264
+ kasan_slab_free include/linux/kasan.h:230 [inline]
+ slab_free_hook mm/slub.c:2342 [inline]
+ slab_free mm/slub.c:4579 [inline]
+ kfree+0x1a0/0x440 mm/slub.c:4727
+ settings_rsp+0x2bc/0x390 net/bluetooth/mgmt.c:1444
+ mgmt_pending_foreach+0xd1/0x130 net/bluetooth/mgmt_util.c:259
+ __mgmt_power_off+0x106/0x430 net/bluetooth/mgmt.c:9520
+ hci_dev_close_sync+0x6c4/0x11c0 net/bluetooth/hci_sync.c:5208
+ hci_dev_do_close net/bluetooth/hci_core.c:483 [inline]
+ hci_dev_close+0x112/0x210 net/bluetooth/hci_core.c:508
+ sock_do_ioctl+0x158/0x460 net/socket.c:1227
+ sock_ioctl+0x626/0x8e0 net/socket.c:1346
+ vfs_ioctl fs/ioctl.c:51 [inline]
+ __do_sys_ioctl fs/ioctl.c:907 [inline]
+ __se_sys_ioctl+0xf9/0x170 fs/ioctl.c:893
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+The buggy address belongs to the object at ffff8880791bd500
+ which belongs to the cache kmalloc-96 of size 96
+The buggy address is located 24 bytes inside of
+ freed 96-byte region [ffff8880791bd500, ffff8880791bd560)
+
+The buggy address belongs to the physical page:
+page: refcount:1 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x791bd
+ksm flags: 0xfff00000000000(node=0|zone=1|lastcpupid=0x7ff)
+page_type: f5(slab)
+raw: 00fff00000000000 ffff88801ac41280 ffffea0001eb13c0 dead000000000003
+raw: 0000000000000000 0000000080200020 00000001f5000000 0000000000000000
+page dumped because: kasan: bad access detected
+page_owner tracks the page as allocated
+page last allocated via order 0, migratetype Unmovable, gfp_mask 0x52820(GFP_ATOMIC|__GFP_NOWARN|__GFP_NORETRY|__GFP_COMP), pid 5386, tgid 5386 (kworker/0:5), ts 68941935893, free_ts 68939759623
+ set_page_owner include/linux/page_owner.h:32 [inline]
+ post_alloc_hook+0x1f3/0x230 mm/page_alloc.c:1556
+ prep_new_page mm/page_alloc.c:1564 [inline]
+ get_page_from_freelist+0x3649/0x3790 mm/page_alloc.c:3474
+ __alloc_pages_noprof+0x292/0x710 mm/page_alloc.c:4750
+ alloc_pages_mpol_noprof+0x3e8/0x680 mm/mempolicy.c:2265
+ alloc_slab_page+0x6a/0x140 mm/slub.c:2412
+ allocate_slab+0x5a/0x2f0 mm/slub.c:2578
+ new_slab mm/slub.c:2631 [inline]
+ ___slab_alloc+0xcd1/0x14b0 mm/slub.c:3818
+ __slab_alloc+0x58/0xa0 mm/slub.c:3908
+ __slab_alloc_node mm/slub.c:3961 [inline]
+ slab_alloc_node mm/slub.c:4122 [inline]
+ __kmalloc_cache_noprof+0x1d5/0x2c0 mm/slub.c:4290
+ kmalloc_noprof include/linux/slab.h:878 [inline]
+ dst_cow_metrics_generic+0x56/0x1c0 net/core/dst.c:185
+ dst_metrics_write_ptr include/net/dst.h:133 [inline]
+ dst_metric_set include/net/dst.h:194 [inline]
+ icmp6_dst_alloc+0x270/0x420 net/ipv6/route.c:3288
+ mld_sendpack+0x6a3/0xdb0 net/ipv6/mcast.c:1808
+ mld_send_cr net/ipv6/mcast.c:2120 [inline]
+ mld_ifc_work+0x7d9/0xd90 net/ipv6/mcast.c:2651
+ process_one_work kernel/workqueue.c:3229 [inline]
+ process_scheduled_works+0xa63/0x1850 kernel/workqueue.c:3310
+ worker_thread+0x870/0xd30 kernel/workqueue.c:3391
+ kthread+0x2f0/0x390 kernel/kthread.c:389
+page last free pid 5386 tgid 5386 stack trace:
+ reset_page_owner include/linux/page_owner.h:25 [inline]
+ free_pages_prepare mm/page_alloc.c:1127 [inline]
+ free_unref_page+0xdf9/0x1140 mm/page_alloc.c:2657
+ rcu_do_batch kernel/rcu/tree.c:2567 [inline]
+ rcu_core+0xaaa/0x17a0 kernel/rcu/tree.c:2823
+ handle_softirqs+0x2c5/0x980 kernel/softirq.c:554
+ do_softirq+0x11b/0x1e0 kernel/softirq.c:455
+ __local_bh_enable_ip+0x1bb/0x200 kernel/softirq.c:382
+ ipv6_get_lladdr+0x295/0x3d0 net/ipv6/addrconf.c:1936
+ mld_newpack+0x337/0xaf0 net/ipv6/mcast.c:1755
+ add_grhead net/ipv6/mcast.c:1850 [inline]
+ add_grec+0x1492/0x19a0 net/ipv6/mcast.c:1988
+ mld_send_cr net/ipv6/mcast.c:2114 [inline]
+ mld_ifc_work+0x691/0xd90 net/ipv6/mcast.c:2651
+ process_one_work kernel/workqueue.c:3229 [inline]
+ process_scheduled_works+0xa63/0x1850 kernel/workqueue.c:3310
+ worker_thread+0x870/0xd30 kernel/workqueue.c:3391
+ kthread+0x2f0/0x390 kernel/kthread.c:389
+ ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
+
+Memory state around the buggy address:
+ ffff8880791bd400: 00 00 00 00 00 00 00 00 00 fc fc fc fc fc fc fc
+ ffff8880791bd480: fa fb fb fb fb fb fb fb fb fb fb fb fc fc fc fc
+>ffff8880791bd500: fa fb fb fb fb fb fb fb fb fb fb fb fc fc fc fc
+                            ^
+ ffff8880791bd580: 00 00 00 00 00 00 00 00 00 fc fc fc fc fc fc fc
+ ffff8880791bd600: fa fb fb fb fb fb fb fb fb fb fb fb fc fc fc fc
+==================================================================
+
+
+Tested on:
+
+commit:         6bbdb903 dt-bindings: net: dsa: microchip,ksz: Drop un..
+git tree:       net-next
+console output: https://syzkaller.appspot.com/x/log.txt?x=178b3cc0580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=d9e1e43bf6b46a4d
+dashboard link: https://syzkaller.appspot.com/bug?extid=03d6270b6425df1605bf
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+
+Note: no patches were applied.
