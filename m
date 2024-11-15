@@ -1,187 +1,186 @@
-Received: from mail-lj1-f171.google.com (mail-lj1-f171.google.com [209.85.208.171])
+Received: from mail-lj1-f180.google.com (mail-lj1-f180.google.com [209.85.208.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FA1E1D54EE;
-	Fri, 15 Nov 2024 16:40:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F7C21D5158
+	for <linux-bluetooth@vger.kernel.org>; Fri, 15 Nov 2024 16:42:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731688856; cv=none; b=dhceJw0ZAHF4eZt9WKxRKVtXL3bH+1h/9cje/7Wj681QEK6DXYX+2F66vlpzGjKQWM3EaxIseKPBnVW/PefhtUVZBlQJSaEwnky16hMliaiRHqpC8GqldN0Y84ZFEhhy+D0Zd/mgKLpV32kbdMgtbDMgjJB/qtXA8BGmdCOkY7Q=
+	t=1731688934; cv=none; b=IDL+kK3La8h0vDgT8A9fyLpY4j9YI5x3NiE+DkpXDKjO/aTVMLL5kosy2qshMJtzq6cSx6kV4k+prjks+FE74OSpOLnrTYvVf8ZOEFtqx0o0e3cQd4pndfr98rXwOJYiMVqrezxFgcONx3SPJOwBKuTiWx7rDCi7mArftnej7Fs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731688856; c=relaxed/simple;
-	bh=E5iRXdzyicHiAPnJsHv4IUWYR3Ho3H41AOg7TUPVqXs=;
+	s=arc-20240116; t=1731688934; c=relaxed/simple;
+	bh=FFrMLawfAsjZms4r/DV2EroqE4AUfP6dw10+4NvmhNA=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=iecL8EN4zB31cx/ogr2AYQQo5mhJOmSznkGYgPUwNC0Abks/j1MXswonc6EnFt8wSdWSSAvYnnLnHcqEZyyxntfop1VCVCnw3RCIl2yvUyl+mdILri0TyDxsURJeHygdf2eqD1s0CI1eg8RD8nc+H5sAOKIPd67BD0iNhCnUuoM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=I1oc5JNk; arc=none smtp.client-ip=209.85.208.171
+	 To:Cc:Content-Type; b=ZoDm4L4Ww89XRbSbvBUQlMvMA7sYIfTErVCJcCza5aV3XbWD+WU+BosBSGsFQUNdnN+DyoHsQ8eBVbV5ae+AKlTql0V2IxNQiFmYwvMjedTi3mGEw2scKIuG0l902r/TPe+jDVFibukLgTJul0Uf5/moW9kyl1uMfLqTLW8IfSU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IXC30ah+; arc=none smtp.client-ip=209.85.208.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="I1oc5JNk"
-Received: by mail-lj1-f171.google.com with SMTP id 38308e7fff4ca-2fb56cb61baso7488811fa.1;
-        Fri, 15 Nov 2024 08:40:55 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IXC30ah+"
+Received: by mail-lj1-f180.google.com with SMTP id 38308e7fff4ca-2fb50e84ec7so16615311fa.1
+        for <linux-bluetooth@vger.kernel.org>; Fri, 15 Nov 2024 08:42:12 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1731688853; x=1732293653; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1731688930; x=1732293730; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=MWM1zhBUaIEICsvvUOeD60alRnVicILRnIGqkspauLA=;
-        b=I1oc5JNkYusY7EgB5KkhCj5Jqlse7V7N8yAbKNXr/JwcHgF9f06aXudr5QlsuYsYdn
-         GmaJ9y01GV8xMLeWPczq9NMNXBmft7uPqaNb1rHLoDJPf33iXZpyNduF5YavJjaI6kGa
-         r/rdgcVrRpv9NKwNZ+AU9H+W6b9roGkVeTfAQIUiYs2Eoi4S8K+9iN9DU+mfo7RQJ0MB
-         JJCzN9hX+JNlA3VF62NSuQW0vbbMmb+Rcg+umuXgfjZeZkOGKrw1rcIH8s/3upThWxjQ
-         V2KLBYDazmZAZc8dQ4i0FUwqznnYz2/rP16ajODUGmDhA3bh0PI15TIpDWSUOw5oxtDo
-         +nJA==
+        bh=cKtgeZL0lI9SBbjAgSXnzBUljs3N5w5ZflMC60zo8c0=;
+        b=IXC30ah+SeqfeCKV9MfZxjY28VNOoeJR0uCwB05SSckpjNEnypR/Ds13NwP8voAHKr
+         fgYG8A/zTexxfuu8kWTWKQ8+fyXMK6DnO6J44yS471odGObs4kOXkPbxPJTRMY4g/2vl
+         NwmDfQ+EWryGBBMFdGa8NYhcjIXcIdWeHkVtxt0bSqV8y8lF/9HgTtbigXoW/fFETU8Q
+         /WCzsncFqDurYDx8/3ElQGpRlcC7Y6VP0YIhwMVXrr1xu5OcGcDkSB8adL9CqDnPoXbX
+         u5AU/XoHFWnzuwlHIu6EthgkALT1e886fEfyJutNZ5D9l594rm6aZ137Vo94uzzlFUv7
+         TyGA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731688853; x=1732293653;
+        d=1e100.net; s=20230601; t=1731688930; x=1732293730;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=MWM1zhBUaIEICsvvUOeD60alRnVicILRnIGqkspauLA=;
-        b=YROBGBi0nY21H6HjtwOFAuIyMj4BbOr4sssyHtF/B2SIs52JUPOPLBHj0J5a+MzgK+
-         kw3096S056mYZeSwLutUsKQzveUGEeyvIruAB8oE14D/beVinh5OlfxP3ZYDf33vpixp
-         bmzXS/58KkYPcTm9yaowAl8T/Xc0gawsogNm61HFpYTGJG+RMDPaiGcUF2qv6DqXszVO
-         /t4R+HA4G/dA6+bshYYUtf4qTrxIvCQVQmBCgaSiEeuFb19FvMLwFlycwpwascedvcIP
-         LjK4CRppTnkftMqc87DpqOzC2Rf7G29nS75TcL/76pRlDpfKFnGG+O/mB8m7mN6Q9HAY
-         ZiRg==
-X-Forwarded-Encrypted: i=1; AJvYcCUDGkjUWqwAYUzqemJqyWYhBm/4O20DPt8ZNNaZQSx0R1Ruv1JkVta2eIECBQT8x5p2ZuZ2wRukljmDCUH+@vger.kernel.org, AJvYcCVUzCEL7bCS3/AwcgVtPT6V0+6noDe2zHkhOoE5OlGRr3deKaS6N6+j9N/obqZKKxshNIfAfj16PcNpU324h94=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzlc8Nz+56Y1Dc61w87z2fAXZy1a0MU9PZP/gm8SWnW62x0pIgL
-	58cEy5nrshFz1pIPgw6OVbu9Gth5mrsIBJ5daCDfHNqVAtc8qCArxCWn9qslYmzUmCyfGCIEJuC
-	8Ms3inBxKhiQuZDxAf2TdV/DrmTc=
-X-Google-Smtp-Source: AGHT+IEfHFXTrkX4iU2zxXCc93wTO6nasnQ1J9wNeeFUeckOF1/IPATFBdPtOSE1zu0AQdyczMDScHT12VmyJrYxFB4=
-X-Received: by 2002:a05:651c:400a:b0:2ff:6298:ecc0 with SMTP id
- 38308e7fff4ca-2ff6298ed90mr9510421fa.18.1731688851618; Fri, 15 Nov 2024
- 08:40:51 -0800 (PST)
+        bh=cKtgeZL0lI9SBbjAgSXnzBUljs3N5w5ZflMC60zo8c0=;
+        b=S9d8lO1oxlbYXCz+e6zCCW9p3uxpPx6AdxpFQQ1K3nXnuFH8Qe1iBAaqZD1mBiaWTj
+         3yKujfC+VF8Su9SEhoYDKlloeDpwdQrxO6k2UYayBUUcQghjfqe3YV+yBg06CYi2Ri6W
+         wOA+x4nin01w2eZ/BvuuXm90CM/sDgkddiIFT85DKx82JHCKNj6TEQwS8K1cDcyq8iXy
+         a0gWkZDoV9KPqT8UyIAyq6Mi/CFVc0x+N/cT9hFz12/Lmved/ZQKqlBfnzv4dHBZptcX
+         927Tk8BCXwMPUdcrqUQwgu4gyN/tOeOFrOXJwb8Urrr2Iql/PV+H078DuvyG4E+yqZMU
+         3R+A==
+X-Gm-Message-State: AOJu0YxZTz5e1ElzfIXKStbHtV6ctZ8ra23nJCzVMRxD1LHyYXltfbyS
+	Q7oIab7IR8Ta3jdmOnJxJAQaG4U8H0hJy9PkGg5Xkz2n5x/DEnY7+mOpUupCivjQXehI4lPoCsK
+	/mit00obDBBWnE3zjyr6BcEiSd8zDcsSv
+X-Google-Smtp-Source: AGHT+IEdfU4iWGnvIGiYFkABAK9ZRemxdZ8TB7vsi3ZnuWeL0r0qs9Sm90sO8Wj47f9IemhkA4YPFAzDLgWXDfSguj8=
+X-Received: by 2002:a05:651c:245:b0:2fb:4f2e:5be7 with SMTP id
+ 38308e7fff4ca-2ff6096b5cbmr21281981fa.24.1731688929451; Fri, 15 Nov 2024
+ 08:42:09 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241113-x13s_wcn6855_fix-v1-1-15af0aa2549c@quicinc.com>
-In-Reply-To: <20241113-x13s_wcn6855_fix-v1-1-15af0aa2549c@quicinc.com>
+References: <20241115155941.2118683-1-luiz.dentz@gmail.com>
+In-Reply-To: <20241115155941.2118683-1-luiz.dentz@gmail.com>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Fri, 15 Nov 2024 11:40:39 -0500
-Message-ID: <CABBYNZJQGCnsKtdKaByLJkgV715oOorOQLLK8Z+g1BYz9YovNQ@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: qca: Support downloading board id specific NVM
- for WCN6855
-To: Zijun Hu <quic_zijuhu@quicinc.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>, Zijun Hu <zijun_hu@icloud.com>, 
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Bjorn Andersson <bjorande@quicinc.com>, "Aiqun Yu (Maria)" <quic_aiquny@quicinc.com>, 
-	Cheng Jiang <quic_chejiang@quicinc.com>, Johan Hovold <johan@kernel.org>, 
-	Jens Glathe <jens.glathe@oldschoolsolutions.biz>, Steev Klimaszewski <steev@kali.org>
+Date: Fri, 15 Nov 2024 11:41:57 -0500
+Message-ID: <CABBYNZLatZOTP3B68PPdm0E7y-t4qAzCDmaB8vxKZu-o3ncmgQ@mail.gmail.com>
+Subject: Re: [PATCH v1] Bluetooth: MGMT: Fix slab-use-after-free Read in set_powered_sync
+To: linux-bluetooth@vger.kernel.org
+Cc: syzbot <syzbot+03d6270b6425df1605bf@syzkaller.appspotmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi Zijun,
+#syz test
 
-On Thu, Nov 14, 2024 at 1:27=E2=80=AFAM Zijun Hu <quic_zijuhu@quicinc.com> =
-wrote:
+On Fri, Nov 15, 2024 at 10:59=E2=80=AFAM Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
 >
-> Download board id specific NVM instead of default for WCN6855 if board
-> id is available, and that is required by Lenovo ThinkPad X13s.
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 >
-> Cc: Bjorn Andersson <bjorande@quicinc.com>
-> Cc: Aiqun Yu (Maria) <quic_aiquny@quicinc.com>
-> Cc: Cheng Jiang <quic_chejiang@quicinc.com>
-> Cc: Johan Hovold <johan@kernel.org>
-> Cc: Jens Glathe <jens.glathe@oldschoolsolutions.biz>
-> Cc: Steev Klimaszewski <steev@kali.org>
-> Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
-
-How about adding the following:
-
-Fixes: 095327fede00 ("Bluetooth: hci_qca: Add support for QTI
-Bluetooth chip wcn6855")
-
-Not sure if this would be simple to backport given that there are
-things like 691d54d0f7cb ("Bluetooth: qca: use switch case for soc
-type behavior") that may have to be backported as well.
-
+> This fixes the following crash:
+>
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> BUG: KASAN: slab-use-after-free in set_powered_sync+0x3a/0xc0 net/bluetoo=
+th/mgmt.c:1353
+> Read of size 8 at addr ffff888029b4dd18 by task kworker/u9:0/54
+>
+> CPU: 1 UID: 0 PID: 54 Comm: kworker/u9:0 Not tainted 6.11.0-rc6-syzkaller=
+-01155-gf723224742fc #0
+> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS G=
+oogle 08/06/2024
+> Workqueue: hci0 hci_cmd_sync_work
+> Call Trace:
+>  <TASK>
+>  __dump_stack lib/dump_stack.c:93 [inline]
+>  dump_stack_lvl+0x241/0x360 lib/dump_stack.c:119
+>  print_address_description mm/kasan/report.c:377 [inline]
+>  print_report+0x169/0x550 mm/kasan/report.c:488
+> q kasan_report+0x143/0x180 mm/kasan/report.c:601
+>  set_powered_sync+0x3a/0xc0 net/bluetooth/mgmt.c:1353
+>  hci_cmd_sync_work+0x22b/0x400 net/bluetooth/hci_sync.c:328
+>  process_one_work kernel/workqueue.c:3231 [inline]
+>  process_scheduled_works+0xa2c/0x1830 kernel/workqueue.c:3312
+>  worker_thread+0x86d/0xd10 kernel/workqueue.c:3389
+>  kthread+0x2f0/0x390 kernel/kthread.c:389
+>  ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
+>  ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
+>  </TASK>
+>
+> Allocated by task 5247:
+>  kasan_save_stack mm/kasan/common.c:47 [inline]
+>  kasan_save_track+0x3f/0x80 mm/kasan/common.c:68
+>  poison_kmalloc_redzone mm/kasan/common.c:370 [inline]
+>  __kasan_kmalloc+0x98/0xb0 mm/kasan/common.c:387
+>  kasan_kmalloc include/linux/kasan.h:211 [inline]
+>  __kmalloc_cache_noprof+0x19c/0x2c0 mm/slub.c:4193
+>  kmalloc_noprof include/linux/slab.h:681 [inline]
+>  kzalloc_noprof include/linux/slab.h:807 [inline]
+>  mgmt_pending_new+0x65/0x250 net/bluetooth/mgmt_util.c:269
+>  mgmt_pending_add+0x36/0x120 net/bluetooth/mgmt_util.c:296
+>  set_powered+0x3cd/0x5e0 net/bluetooth/mgmt.c:1394
+>  hci_mgmt_cmd+0xc47/0x11d0 net/bluetooth/hci_sock.c:1712
+>  hci_sock_sendmsg+0x7b8/0x11c0 net/bluetooth/hci_sock.c:1832
+>  sock_sendmsg_nosec net/socket.c:730 [inline]
+>  __sock_sendmsg+0x221/0x270 net/socket.c:745
+>  sock_write_iter+0x2dd/0x400 net/socket.c:1160
+>  new_sync_write fs/read_write.c:497 [inline]
+>  vfs_write+0xa72/0xc90 fs/read_write.c:590
+>  ksys_write+0x1a0/0x2c0 fs/read_write.c:643
+>  do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+>  do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
+>  entry_SYSCALL_64_after_hwframe+0x77/0x7f
+>
+> Freed by task 5246:
+>  kasan_save_stack mm/kasan/common.c:47 [inline]
+>  kasan_save_track+0x3f/0x80 mm/kasan/common.c:68
+>  kasan_save_free_info+0x40/0x50 mm/kasan/generic.c:579
+>  poison_slab_object+0xe0/0x150 mm/kasan/common.c:240
+>  __kasan_slab_free+0x37/0x60 mm/kasan/common.c:256
+>  kasan_slab_free include/linux/kasan.h:184 [inline]
+>  slab_free_hook mm/slub.c:2256 [inline]
+>  slab_free mm/slub.c:4477 [inline]
+>  kfree+0x149/0x360 mm/slub.c:4598
+>  settings_rsp+0x2bc/0x390 net/bluetooth/mgmt.c:1443
+>  mgmt_pending_foreach+0xd1/0x130 net/bluetooth/mgmt_util.c:259
+>  __mgmt_power_off+0x112/0x420 net/bluetooth/mgmt.c:9455
+>  hci_dev_close_sync+0x665/0x11a0 net/bluetooth/hci_sync.c:5191
+>  hci_dev_do_close net/bluetooth/hci_core.c:483 [inline]
+>  hci_dev_close+0x112/0x210 net/bluetooth/hci_core.c:508
+>  sock_do_ioctl+0x158/0x460 net/socket.c:1222
+>  sock_ioctl+0x629/0x8e0 net/socket.c:1341
+>  vfs_ioctl fs/ioctl.c:51 [inline]
+>  __do_sys_ioctl fs/ioctl.c:907 [inline]
+>  __se_sys_ioctl+0xfc/0x170 fs/ioctl.c:893
+>  do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+>  do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83gv
+>  entry_SYSCALL_64_after_hwframe+0x77/0x7f
+>
+> Reported-by: syzbot+03d6270b6425df1605bf@syzkaller.appspotmail.com
+> Closes: https://syzkaller.appspot.com/bug?extid=3D03d6270b6425df1605bf
+> Fixes: 275f3f648702 ("Bluetooth: Fix not checking MGMT cmd pending queue"=
+)
+> Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 > ---
->  drivers/bluetooth/btqca.c | 35 ++++++++++++++++++++++++++++++++---
->  1 file changed, 32 insertions(+), 3 deletions(-)
+>  net/bluetooth/mgmt.c | 4 ++++
+>  1 file changed, 4 insertions(+)
 >
-> diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
-> index dfbbac92242a..4f8576cbbab9 100644
-> --- a/drivers/bluetooth/btqca.c
-> +++ b/drivers/bluetooth/btqca.c
-> @@ -717,6 +717,29 @@ static void qca_generate_hsp_nvm_name(char *fwname, =
-size_t max_size,
->                 snprintf(fwname, max_size, "qca/hpnv%02x%s.%x", rom_ver, =
-variant, bid);
+> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+> index 1f6d083682b8..6a26c1ea0d04 100644
+> --- a/net/bluetooth/mgmt.c
+> +++ b/net/bluetooth/mgmt.c
+> @@ -1441,6 +1441,10 @@ static void settings_rsp(struct mgmt_pending_cmd *=
+cmd, void *data)
+>                 sock_hold(match->sk);
+>         }
+>
+> +       /* dequeue cmd_sync entries using cmd as data as that is about to=
+ be
+> +        * removed/freed.
+> +        */
+> +       hci_cmd_sync_dequeue(match->hdev, NULL, cmd, NULL);
+>         mgmt_pending_free(cmd);
 >  }
 >
-> +static void qca_get_hsp_nvm_name_generic(struct qca_fw_config *cfg,
-> +                                        struct qca_btsoc_version ver,
-> +                                        u8 rom_ver, u16 bid)
-> +{
-> +       const char *variant;
-> +
-> +       /* hsp gf chip */
-> +       if ((le32_to_cpu(ver.soc_id) & QCA_HSP_GF_SOC_MASK) =3D=3D QCA_HS=
-P_GF_SOC_ID)
-> +               variant =3D "g";
-> +       else
-> +               variant =3D "";
-> +
-> +       if (bid =3D=3D 0x0)
-> +               snprintf(cfg->fwname, sizeof(cfg->fwname), "qca/hpnv%02x%=
-s.bin",
-> +                        rom_ver, variant);
-> +       else if (bid & 0xff00)
-> +               snprintf(cfg->fwname, sizeof(cfg->fwname), "qca/hpnv%02x%=
-s.b%x",
-> +                        rom_ver, variant, bid);
-> +       else
-> +               snprintf(cfg->fwname, sizeof(cfg->fwname), "qca/hpnv%02x%=
-s.b%02x",
-> +                        rom_ver, variant, bid);
-> +}
-> +
->  static inline void qca_get_nvm_name_generic(struct qca_fw_config *cfg,
->                                             const char *stem, u8 rom_ver,=
- u16 bid)
->  {
-> @@ -810,8 +833,15 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t bau=
-drate,
->         /* Give the controller some time to get ready to receive the NVM =
-*/
->         msleep(10);
->
-> -       if (soc_type =3D=3D QCA_QCA2066 || soc_type =3D=3D QCA_WCN7850)
-> +       switch (soc_type) {
-> +       case QCA_QCA2066:
-> +       case QCA_WCN6855:
-> +       case QCA_WCN7850:
->                 qca_read_fw_board_id(hdev, &boardid);
-> +               break;
-> +       default:
-> +               break;
-> +       }
->
->         /* Download NVM configuration */
->         config.type =3D TLV_TYPE_NVM;
-> @@ -848,8 +878,7 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baud=
-rate,
->                                  "qca/msnv%02x.bin", rom_ver);
->                         break;
->                 case QCA_WCN6855:
-> -                       snprintf(config.fwname, sizeof(config.fwname),
-> -                                "qca/hpnv%02x.bin", rom_ver);
-> +                       qca_get_hsp_nvm_name_generic(&config, ver, rom_ve=
-r, boardid);
->                         break;
->                 case QCA_WCN7850:
->                         qca_get_nvm_name_generic(&config, "hmt", rom_ver,=
- boardid);
->
-> ---
-> base-commit: e88b020190bf5bc3e7ce5bd8003fc39b23cc95fe
-> change-id: 20241113-x13s_wcn6855_fix-53c573ff7878
->
-> Best regards,
 > --
-> Zijun Hu <quic_zijuhu@quicinc.com>
+> 2.47.0
 >
 
 
