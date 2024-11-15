@@ -1,96 +1,261 @@
-Received: from mail-il1-f198.google.com (mail-il1-f198.google.com [209.85.166.198])
+Received: from mail-lj1-f182.google.com (mail-lj1-f182.google.com [209.85.208.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD69F1CEE92
-	for <linux-bluetooth@vger.kernel.org>; Fri, 15 Nov 2024 14:41:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.198
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64E261BE87C
+	for <linux-bluetooth@vger.kernel.org>; Fri, 15 Nov 2024 15:18:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731681691; cv=none; b=kSxApr4A4E9iNdcEzbenDO8BHpD6cYfmfI0XRF9GdFOcrcHNTx6GXi6AUmfTU2fyLO85WdQnuJH+I91v7274gRfjM1oCcecraYTznpoMYaBkr4oSq8zoebH0fgyuqR4Twh2Pab/22XhE3ThwPGZCqSyJB7WsgVIHOVBljTce/7Q=
+	t=1731683915; cv=none; b=frVGM9I3a2RyMWqUaCe7pxl5M2+1AtZp0HWMT8Jkid1+XHygnYU/b6Zbk9Lxhg80KEg9MIw6dmVs5RM7MnA8+TP8kF+VCVBtCTJ+T9ZRcc2IqsPibF5ydYkpEYXOy3gIPu87+4GjdEFMdRazX+Fvjz2fxB62r7Ti/beV8dkIWNk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731681691; c=relaxed/simple;
-	bh=TvfAFGSsHmqIZByRKIp5Su5P4ciacTcybzgpExC/o/s=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=EMk/NriTGz4ayLDEHsoRkd+5O9Jk9aVavOHdYNlC6I3kI3pvSiLKs0OmIz1OJcC+koTgTU2UHcgNjg5W/N85k9YRGS7RfMI/a/TIMAf8sarBiJ3oWsuXEmGkEPUUWx2a43WcWueHpROP8GfvdXR9f0ZyvG1bkC+mTeme3bj0jHM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.198
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-3a6b7974696so21330855ab.1
-        for <linux-bluetooth@vger.kernel.org>; Fri, 15 Nov 2024 06:41:29 -0800 (PST)
+	s=arc-20240116; t=1731683915; c=relaxed/simple;
+	bh=RgYWg/IKD2njDonpgOYoFtk2dMs04KUTAu7MCvIEfdc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=jMSbfJAVrgLWCierGjlN1rI6+o7AIjtwARRyXPTBCqoRnWeT0DWcgoBdjtYLNdxeaUk8AC88MJie+IZcRsIEAXZHSVrmLGE0PG0Kxztjx43AwqkyKrYJWnKc230Uk/vv9NWYVTKK69sD4zE825utio4d7fpfOpx1Wzd+b5hmov4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GsiAsN0e; arc=none smtp.client-ip=209.85.208.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GsiAsN0e"
+Received: by mail-lj1-f182.google.com with SMTP id 38308e7fff4ca-2fb3c3d5513so8218211fa.1
+        for <linux-bluetooth@vger.kernel.org>; Fri, 15 Nov 2024 07:18:33 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1731683911; x=1732288711; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=uU5ktrLPaU7n3xA0LZ/GgCkgwxk9VR3HxELTIbS14Rw=;
+        b=GsiAsN0e5wQ9I+8gGSu7X8JBV22KxXzHNRkjzAmq7xIvC6tbdtuFK6DEY9agbFYxl9
+         Qkn0Opki6+5L0isMOHvv3HRFqb44vf8aqWgkxsRhkwG29rz3r79k+688IKQRi49KsS5p
+         MY8Wv2HLoqIIDpm+lLOlh7O36sRPwQ6Ddz3HXQMGxWABOzcchxkjY8+UYQUDHHLDhqVv
+         Y6ui1vA5nBDF3MX02xKDxvk3n5VjqHpCf4MzKfViz6rpD3uj/pNMtvjSrb3fE3S1DRPp
+         yjL5+McOOxOCrQbtxwgAbisxXJXEe7d5tKtpwn7Z+8TujWrwyOGbQNEqjKNc9lTmreBt
+         1/3Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731681689; x=1732286489;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=uJQdBFgI5sJta5zrwY7MqKRjkyY24HYi+MEoJE1gW0A=;
-        b=nwxMP6AW6HBxfQu6nkss22FfcfrFyweAeDcYgqMUdRh3O0A7UaMTtK2BrC29YAUdjl
-         OVxzmzFbsldd4Vyidkkk07Muc3FOaMaxk51lO5OSYZ2N1Iv66zXj0vqfCkRXnFffH5a9
-         jm4aGGR7+Zwx1mre6cf/FkYlE4sh3v5bnhBOKX7VmJi1xylsJ3Uxbl8IuhDHtn7QoQs6
-         LH4kTHSL1aFqSD7Qa5L/GTU1ebs/MI9CcE8NRL3gA3f4Kj8DMZC5NLDIrRTnPRLCkBow
-         EXUO+LUJzN9KSLJXYf9uKAXTb7LlHBlSHfzgSfPBLwGm8GuKAKWxpv/FtVWmSZmWh2l4
-         DVug==
-X-Gm-Message-State: AOJu0YybzynJQVoFTdtWJVdvXtnK6PX7HOa9s7UJV6ybh44/1vpPzjjO
-	O2dhjC5FdhlScwSYIkflVK6ofAsm7KTbTRMH1igOHaDV/AZ7D/I6guzt/gDgSVu2Jv9thTsOc6T
-	U14/Y10PXhNQPkTJe4SbnTKvP4PsWTZ5YVGVjcXaL/Iph7eJQyef7IFM=
-X-Google-Smtp-Source: AGHT+IF+BwSfWGlw5VRacUhCrNIruqTUZNyQkcZ1dfBEACe6DCBAL4TM3xlxmBthlqiAd7wDqTEkNZTksWbPlj8jk3KQc7W0OFFO
+        d=1e100.net; s=20230601; t=1731683911; x=1732288711;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=uU5ktrLPaU7n3xA0LZ/GgCkgwxk9VR3HxELTIbS14Rw=;
+        b=fXNh0v+o/8ImCOML2YwV77Ej9Q/9tNWDTepNOoxwp4WVSPt2gZqRT/rrHli3aBXmjG
+         WeBrLH+Jcpn6Ekh868FsTIuaBglLgegqvEAoswu/hCti0OOsZ4r3tmdiO9FtPO5qY4Lb
+         PW0pHYk5LwlN4kqqfxHr7CiZxokJ8YpQM47ET2tZymlorbPxzF0aQtDN6+cMvs0qVjD6
+         zxIKGo86tJCZQsgmbHpfFVZA16pW5aqHKygwoDwfXR9q7tGz9vq1PDcbTPkH0dDWB5YE
+         w9cI8VXQpjS0EnjAV5X0G0WLTNFMDBntFEzyNEXM+G7XYpqiwY5Su04cmmHYShVZ8Vdh
+         2FLA==
+X-Gm-Message-State: AOJu0YyvF+yoRpwoRU+cw8JNcVPqVwmVJXxwLMg4FilUucTOKGQDVn0B
+	gwewRR2ZU7d41tEcq2eYTRyWM3iWRY7+BhRomw/3/zc8qiwnTWcryshMTy96WordX27PivehlNK
+	5RBUC1S8gQg31f/ndNio8eeBrAdI=
+X-Google-Smtp-Source: AGHT+IFDQolgnRQxJ4lKOkyZVjHP5Awejfwj8SDy19gpMKE6Am1CmbttY5ns2G/uJTYnUvnXEnSFSdo2pcB6vpR4Y4g=
+X-Received: by 2002:a05:651c:160a:b0:2fc:a507:19c6 with SMTP id
+ 38308e7fff4ca-2ff606a84e2mr19271321fa.22.1731683911048; Fri, 15 Nov 2024
+ 07:18:31 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a92:ca06:0:b0:3a7:1b72:f36 with SMTP id
- e9e14a558f8ab-3a748088836mr28545775ab.21.1731681689035; Fri, 15 Nov 2024
- 06:41:29 -0800 (PST)
-Date: Fri, 15 Nov 2024 06:41:29 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <67375d99.050a0220.bb738.0001.GAE@google.com>
-Subject: [syzbot] Monthly bluetooth report (Nov 2024)
-From: syzbot <syzbot+listb55ee1602b5d90b0989f@syzkaller.appspotmail.com>
-To: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	luiz.dentz@gmail.com, marcel@holtmann.org, syzkaller-bugs@googlegroups.com
+References: <20241115103825.19761-1-iulia.tanasescu@nxp.com> <20241115103825.19761-2-iulia.tanasescu@nxp.com>
+In-Reply-To: <20241115103825.19761-2-iulia.tanasescu@nxp.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Fri, 15 Nov 2024 10:18:18 -0500
+Message-ID: <CABBYNZ+RuRAJpAum-S2EmVtgf5jKiZLVMwjPmv_9U5jQwtg=ZA@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 1/6] bap: Rework parse_base
+To: Iulia Tanasescu <iulia.tanasescu@nxp.com>
+Cc: linux-bluetooth@vger.kernel.org, claudia.rosu@nxp.com, 
+	mihai-octavian.urzica@nxp.com, andrei.istodorescu@nxp.com
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hello bluetooth maintainers/developers,
+Hi Iulia,
 
-This is a 31-day syzbot report for the bluetooth subsystem.
-All related reports/information can be found at:
-https://syzkaller.appspot.com/upstream/s/bluetooth
+On Fri, Nov 15, 2024 at 5:38=E2=80=AFAM Iulia Tanasescu <iulia.tanasescu@nx=
+p.com> wrote:
+>
+> This makes BAP parse_base public, so other plugins can reuse the logic
+> (BASS should also parse BASE internally for the Scan Delegator
+> implementation).
 
-During the period, 6 new issues were detected and 0 were fixed.
-In total, 48 issues are still open and 72 have already been fixed.
+For this sort of dependency should be handled by shared libraries,
+otherwise we create interdependencies of plugins.
 
-Some of the still happening issues:
+> Since different plugins need to handle BISes differently, this commit
+> also reworks parse_base to receive a BIS handler callback which will be
+> called for each parsed BIS.
 
-Ref  Crashes Repro Title
-<1>  695     Yes   general protection fault in skb_release_data (2)
-                   https://syzkaller.appspot.com/bug?extid=ccfa5775bc1bda21ddd1
-<2>  452     Yes   general protection fault in lock_sock_nested
-                   https://syzkaller.appspot.com/bug?extid=d3ccfb78a0dc16ffebe3
-<3>  346     Yes   BUG: sleeping function called from invalid context in hci_le_create_big_complete_evt
-                   https://syzkaller.appspot.com/bug?extid=2fb0835e0c9cefc34614
-<4>  141     Yes   KASAN: slab-use-after-free Read in set_powered_sync
-                   https://syzkaller.appspot.com/bug?extid=03d6270b6425df1605bf
-<5>  76      Yes   BUG: sleeping function called from invalid context in lock_sock_nested (3)
-                   https://syzkaller.appspot.com/bug?extid=55cd5225f71c5cff7f6f
-<6>  52      Yes   WARNING: ODEBUG bug in put_device
-                   https://syzkaller.appspot.com/bug?extid=a9290936c6e87b3dc3c2
-<7>  50      No    KASAN: slab-use-after-free Read in skb_queue_purge_reason (2)
-                   https://syzkaller.appspot.com/bug?extid=683f8cb11b94b1824c77
-<8>  42      No    WARNING in l2cap_chan_del
-                   https://syzkaller.appspot.com/bug?extid=3272785b7a1fc9b510f6
-<9>  33      Yes   possible deadlock in mgmt_set_connectable_complete
-                   https://syzkaller.appspot.com/bug?extid=b1752fcfa8658bb8984a
-<10> 9       Yes   general protection fault in l2cap_chan_timeout (3)
-                   https://syzkaller.appspot.com/bug?extid=f0908ddc8b64b86e81f2
+The idea itself is good though, but I suggest we put this under
+shared/bap.h, also it would be great to create some unit tests for it,
+perhaps one test per supported AC or something like that, anyway this
+can be added later on a separate set.
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+> ---
+>  profiles/audio/bap.c | 78 +++++++++++++++++++++++---------------------
+>  profiles/audio/bap.h |  8 +++++
+>  2 files changed, 48 insertions(+), 38 deletions(-)
+>
+> diff --git a/profiles/audio/bap.c b/profiles/audio/bap.c
+> index df685c6d3..98b28f15a 100644
+> --- a/profiles/audio/bap.c
+> +++ b/profiles/audio/bap.c
+> @@ -1086,8 +1086,42 @@ static void create_stream_for_bis(struct bap_data =
+*bap_data,
+>                         NULL, NULL);
+>  }
+>
+> -static bool parse_base(struct bap_data *bap_data, struct bt_iso_base *ba=
+se,
+> -               struct bt_iso_qos *qos, util_debug_func_t func)
+> +static void bis_handler(uint8_t bis, uint8_t sgrp, struct iovec *caps,
+> +       struct iovec *meta, struct bt_iso_qos *qos, void *user_data)
+> +{
+> +       struct bap_data *data =3D user_data;
+> +       struct bt_bap_pac *lpac;
+> +       char *path;
+> +
+> +       bass_add_stream(data->device, meta, caps, qos, sgrp, bis);
+> +
+> +       if (!bass_check_bis(data->device, bis))
+> +               /* If this Broadcast Sink is acting as a Scan
+> +                * Delegator, only attempt to create streams
+> +                * for the BISes required by the peer Broadcast
+> +                * Assistant.
+> +                */
+> +               return;
+> +
+> +       /* Check if this BIS matches any local PAC */
+> +       bt_bap_verify_bis(data->bap, bis,
+> +                       caps, &lpac);
+> +
+> +       if (!lpac)
+> +               return;
+> +
+> +       if (asprintf(&path, "%s/bis%d",
+> +                       device_get_path(data->device),
+> +                       bis) < 0)
+> +               return;
+> +
+> +       create_stream_for_bis(data, lpac, qos,
+> +                       caps, meta, path);
+> +}
+> +
+> +bool parse_base(struct bt_iso_base *base, struct bt_iso_qos *qos,
+> +               util_debug_func_t func, bap_stream_cb_t handler,
+> +               void *user_data)
+>  {
+>         struct iovec iov =3D {
+>                 .iov_base =3D base->base,
+> @@ -1167,9 +1201,6 @@ static bool parse_base(struct bap_data *bap_data, s=
+truct bt_iso_base *base,
+>                         uint8_t bis_index;
+>                         struct iovec *l3_caps;
+>                         struct iovec *merged_caps;
+> -                       struct bt_bap_pac *matched_lpac;
+> -                       char *path;
+> -                       int err;
+>
+>                         if (!util_iov_pull_u8(&iov, &bis_index)) {
+>                                 ret =3D false;
+> @@ -1177,18 +1208,12 @@ static bool parse_base(struct bap_data *bap_data,=
+ struct bt_iso_base *base,
+>                         }
+>
+>                         util_debug(func, NULL, "BIS #%d", bis_index);
+> -                       err =3D asprintf(&path, "%s/bis%d",
+> -                                       device_get_path(bap_data->device)=
+,
+> -                                       bis_index);
+> -                       if (err < 0)
+> -                               continue;
+>
+>                         /* Read Codec Specific Configuration */
+>                         l3_caps =3D new0(struct iovec, 1);
+>                         if (!util_iov_pull_u8(&iov,
+>                                                 (void *)&l3_caps->iov_len=
+)) {
+>                                 free(l3_caps);
+> -                               free(path);
+>                                 ret =3D false;
+>                                 goto group_fail;
+>                         }
+> @@ -1206,34 +1231,11 @@ static bool parse_base(struct bap_data *bap_data,=
+ struct bt_iso_base *base,
+>                                         func);
+>
+>                         merged_caps =3D bt_bap_merge_caps(l2_caps, l3_cap=
+s);
+> -                       if (!merged_caps) {
+> -                               free(path);
+> +                       if (!merged_caps)
+>                                 continue;
+> -                       }
+> -
+> -                       bass_add_stream(bap_data->device, meta, merged_ca=
+ps,
+> -                                               qos, idx, bis_index);
+> -
+> -                       if (!bass_check_bis(bap_data->device, bis_index))=
+ {
+> -                               /* If this Broadcast Sink is acting as a =
+Scan
+> -                                * Delegator, only attempt to create stre=
+ams
+> -                                * for the BISes required by the peer Bro=
+adcast
+> -                                * Assistant.
+> -                                */
+> -                               continue;
+> -                       }
+> -
+> -                       /* Check if this BIS matches any local PAC */
+> -                       bt_bap_verify_bis(bap_data->bap, bis_index,
+> -                                       merged_caps, &matched_lpac);
+> -
+> -                       if (matched_lpac =3D=3D NULL) {
+> -                               free(path);
+> -                               continue;
+> -                       }
+>
+> -                       create_stream_for_bis(bap_data, matched_lpac, qos=
+,
+> -                                       merged_caps, meta, path);
+> +                       handler(bis_index, idx, merged_caps, meta,
+> +                                                       qos, user_data);
+>                 }
+>
+>  group_fail:
+> @@ -1299,7 +1301,7 @@ static gboolean big_info_report_cb(GIOChannel *io, =
+GIOCondition cond,
+>         /* Analyze received BASE data and create remote media endpoints f=
+or each
+>          * BIS matching our capabilities
+>          */
+> -       parse_base(data, &base, &qos, bap_debug);
+> +       parse_base(&base, &qos, bap_debug, bis_handler, data);
+>
+>         service_set_connecting(req->data.service);
+>
+> diff --git a/profiles/audio/bap.h b/profiles/audio/bap.h
+> index cfe633311..cf2593db8 100644
+> --- a/profiles/audio/bap.h
+> +++ b/profiles/audio/bap.h
+> @@ -7,5 +7,13 @@
+>   *
+>   */
+>
+> +typedef void (*bap_stream_cb_t)(uint8_t bis, uint8_t sgrp,
+> +               struct iovec *caps, struct iovec *meta,
+> +               struct bt_iso_qos *qos, void *user_data);
+> +
+>  struct bt_bap *bap_get_session(struct btd_device *device);
+>  void bap_scan_delegator_probe(struct btd_device *device);
+> +
+> +bool parse_base(struct bt_iso_base *base, struct bt_iso_qos *qos,
+> +               util_debug_func_t func, bap_stream_cb_t handler,
+> +               void *user_data);
+> --
+> 2.43.0
+>
 
-To disable reminders for individual bugs, reply with the following command:
-#syz set <Ref> no-reminders
 
-To change bug's subsystems, reply with:
-#syz set <Ref> subsystems: new-subsystem
-
-You may send multiple commands in a single email message.
+--=20
+Luiz Augusto von Dentz
