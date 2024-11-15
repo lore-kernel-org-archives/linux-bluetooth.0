@@ -1,164 +1,161 @@
-Received: from mail-qv1-f51.google.com (mail-qv1-f51.google.com [209.85.219.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A911B204F68
-	for <linux-bluetooth@vger.kernel.org>; Fri, 15 Nov 2024 21:55:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.51
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B95D418801A;
+	Fri, 15 Nov 2024 22:15:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731707704; cv=none; b=nmkj0+XUsoXRQnJubyn5Fh08ETmYqHgcMnGphFaUoAK9DUyDLDf0D+adhwkzxHm5LAgIaFxDPF8NT8M4f9fnYjTBBchnLAMFbalM1pv3ok8BKBGFa+iQgV/wI0H1gJw+2l2lWtkLt6tcIJi+mZ+/LNSKnuamUj1/xFY7GK672TM=
+	t=1731708913; cv=none; b=d5mwFry7xPy638MBJ6WFHmDGtUXbpSdbU6j90rcI9eX98LiErim7E8z77mrSC+ggVHkToyzixVAUIozfnITIuDCvvANRRwDCC1lUAwCJVqeg4xRuV+eb4a3xBTj/XlZt4Fx5OirNPVRoDG9OGWvuXe3Pc3w3XW8Dnu7hebmk+o4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731707704; c=relaxed/simple;
-	bh=95mhyehturg/SafntE2lz+KXjZqatxtzcuZYQx1K32s=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=e7Agmelqhjh/qHAJJQ5gd6vyGrDKwcFnC4e75YPQX6T/sDBjB8Bw/Mk18VZpmCp0qHKBK+9qhAEJ9fmC/LH/GUFHAV+yh0Bbd41w1FTqdKQgcwl1Zk9lWJy3/qfFcPhAVcc9Goqx5hqpz2fx1ZKoxevBw0gp4+HS8mSlK3R2HmU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CEnZTWHL; arc=none smtp.client-ip=209.85.219.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1731708913; c=relaxed/simple;
+	bh=/gM5S2JpghDM0ugec1ktyfCAqRVYpBpjvyLdIODChSQ=;
+	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=DCi0vMXQQNvWBwWPqW5lylvzY1Y5mijf6PaVmTesdKttTR4QwDaNvyQqyIdgqT35CzJ7uKHkhlV8p1cRaDaIGNSzRQY7bQWAEFPIoDo+SBUFqbp9mi7yUWqhXzIZLRMeSUtpld0m+Mi51PwZV21lQcijDUI2UhYJY+eRTexUNp4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=N1g55SdN; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CEnZTWHL"
-Received: by mail-qv1-f51.google.com with SMTP id 6a1803df08f44-6d3f5fd139cso11354806d6.2
-        for <linux-bluetooth@vger.kernel.org>; Fri, 15 Nov 2024 13:55:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1731707701; x=1732312501; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=uRhbhJXhmk1qQ4uYKcbWtfCyAaYpVy80TtXSNWMcwmo=;
-        b=CEnZTWHL9ji7cugxy26YECnbN1UlQzhyTc/x6xNi81CPeqeOwp3BaPxzT4A2j2h24A
-         9sr/i5Z/7gugiiWXyJIy4tczLDjF/Ix58qD2dEWuNCqbozPN4pK13SoG/qunKdFdGxsE
-         p7X5SD9IOiswJg4jNVOxib0CUEoV4iSrYqbDsQdPDAyfiFHCluIljiUEoQ6Q4x0RNPl9
-         HUSkvzCxSWJEuonJGyOuyTkFTIdFeVPsdfuJXjsaLAikNY6sD/gYngHQ2PzpefvTObZx
-         TxHYfhTjD08YMx4fjm57mB06UsLftZTe1ovrFZ721DBSBztBZpX9fIzG34whT9R3c05E
-         T2Qg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731707701; x=1732312501;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=uRhbhJXhmk1qQ4uYKcbWtfCyAaYpVy80TtXSNWMcwmo=;
-        b=UUuq2AB+Cm3hjgJwXu/GXjkhqpu9EaQ30CMU/Vrt6OTGDOhRA0NhCyfnw0pkB9utJ4
-         4erAUZQ1yzYnUXPgJAB2pGomfxsA1yxNMZtDpuQU+oQYjDY00He7QrzqDwqG1sO8TODN
-         NReFjOJXccNKsXHsZbY83S1gTae7IfDNDinKdVcDISqwWNsNdmUOoiU/Q02mTGX8eW1l
-         Oro7fx0vboQqnCX0VBxy4nJMTFL3aGKdet5jRV3BUA5XY0Xr2GnWI7lNf+AKdhXgBHSN
-         5LDKbKVn7zTHrbx5i/1gEP4MPoFqbN2aRcdma1wVg7MjW24tlzwDG/6pxpb7rh90exd/
-         kiBw==
-X-Gm-Message-State: AOJu0YxGdp2wVGj56/LmlF4hdAaHvX8FBsNKRMv3oW78CSgsLiPrTxpZ
-	6h+11JDi71wX5+qpRNq1JBW7jG0u+7fJuD2X4N0Ihc2i9HaE/xrKaDA2SQ==
-X-Google-Smtp-Source: AGHT+IHqfMwvfYFqwa31iVPqBY3YgTMoXNXlGkvTpWFKm+dceXNqKvsSfBIgaPwqAF0t6A8wyL80wQ==
-X-Received: by 2002:a05:6214:54c3:b0:6cc:567:d595 with SMTP id 6a1803df08f44-6d3fb78ede8mr55032196d6.7.1731707701125;
-        Fri, 15 Nov 2024 13:55:01 -0800 (PST)
-Received: from [172.17.0.2] ([20.55.223.226])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6d40dd380cdsm1374566d6.85.2024.11.15.13.55.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 15 Nov 2024 13:55:00 -0800 (PST)
-Message-ID: <6737c334.0c0a0220.2862ba.08d5@mx.google.com>
-Date: Fri, 15 Nov 2024 13:55:00 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============7672147778086807484=="
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="N1g55SdN"
+Received: from [192.168.35.166] (c-73-118-245-227.hsd1.wa.comcast.net [73.118.245.227])
+	by linux.microsoft.com (Postfix) with ESMTPSA id C2E092064AEB;
+	Fri, 15 Nov 2024 14:15:08 -0800 (PST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com C2E092064AEB
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1731708911;
+	bh=3z7ywabUJ27i2rb14B4LEGDccer8KYu9+MGXqf4uX30=;
+	h=Date:Cc:Subject:To:References:From:In-Reply-To:From;
+	b=N1g55SdNOAVrXtoAUWPnvUkB3x2fHI9b6jafO92eRdbbD4Gte6s/kvOokfmkgYHJe
+	 Frz5kbgdiLksPpFFaWRXGFZ7VcwJJIP77+3HbEyB4bGSyYhL140G+m7AP2fdg7ax7k
+	 BFhXHlM0RPRrW6JGtgd18IntrfjEtsdFiu0GVoGc=
+Message-ID: <8127a2e6-fa62-4c85-b7ed-24748cc9e285@linux.microsoft.com>
+Date: Fri, 15 Nov 2024 14:15:08 -0800
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, eahariha@linux.microsoft.com
-Subject: RE: Converge on using secs_to_jiffies()
-In-Reply-To: <20241115-converge-secs-to-jiffies-v1-1-19aadc34941b@linux.microsoft.com>
-References: <20241115-converge-secs-to-jiffies-v1-1-19aadc34941b@linux.microsoft.com>
-Reply-To: linux-bluetooth@vger.kernel.org
-
---===============7672147778086807484==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Cc: eahariha@linux.microsoft.com, netfilter-devel@vger.kernel.org,
+ coreteam@netfilter.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, cocci@inria.fr,
+ linux-arm-kernel@lists.infradead.org, linux-s390@vger.kernel.org,
+ dri-devel@lists.freedesktop.org, intel-xe@lists.freedesktop.org,
+ linux-scsi@vger.kernel.org, xen-devel@lists.xenproject.org,
+ linux-block@vger.kernel.org, linux-wireless@vger.kernel.org,
+ ath11k@lists.infradead.org, linux-mm@kvack.org,
+ linux-bluetooth@vger.kernel.org, linux-staging@lists.linux.dev,
+ linux-rpi-kernel@lists.infradead.org, ceph-devel@vger.kernel.org,
+ live-patching@vger.kernel.org, linux-sound@vger.kernel.org,
+ etnaviv@lists.freedesktop.org, oss-drivers@corigine.com,
+ linuxppc-dev@lists.ozlabs.org, Anna-Maria Behnsen
+ <anna-maria@linutronix.de>, Madhavan Srinivasan <maddy@linux.ibm.com>,
+ Naveen N Rao <naveen@kernel.org>,
+ Christophe Leroy <christophe.leroy@csgroup.eu>,
+ Louis Peens <louis.peens@corigine.com>, Nicholas Piggin <npiggin@gmail.com>,
+ Michael Ellerman <mpe@ellerman.id.au>,
+ Christian Gmeiner <christian.gmeiner@gmail.com>,
+ Russell King <linux+etnaviv@armlinux.org.uk>,
+ Lucas Stach <l.stach@pengutronix.de>, Takashi Iwai <tiwai@suse.com>,
+ Jaroslav Kysela <perex@perex.cz>, Petr Mladek <pmladek@suse.com>,
+ Joe Lawrence <joe.lawrence@redhat.com>, Miroslav Benes <mbenes@suse.cz>,
+ Jiri Kosina <jikos@kernel.org>, Josh Poimboeuf <jpoimboe@kernel.org>,
+ Ilya Dryomov <idryomov@gmail.com>, Xiubo Li <xiubli@redhat.com>,
+ Broadcom internal kernel review list
+ <bcm-kernel-feedback-list@broadcom.com>,
+ Scott Branden <sbranden@broadcom.com>, Ray Jui <rjui@broadcom.com>,
+ Florian Fainelli <florian.fainelli@broadcom.com>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+ Johan Hedberg <johan.hedberg@gmail.com>, Jens Axboe <axboe@kernel.dk>,
+ Marcel Holtmann <marcel@holtmann.org>, Kalle Valo <kvalo@kernel.org>,
+ Jeff Johnson <jjohnson@kernel.org>, Catalin Marinas
+ <catalin.marinas@arm.com>, =?UTF-8?Q?Roger_Pau_Monn=C3=A9?=
+ <roger.pau@citrix.com>, Jack Wang <jinpu.wang@cloud.ionos.com>,
+ Andrew Morton <akpm@linux-foundation.org>,
+ "Martin K. Petersen" <martin.petersen@oracle.com>,
+ Praveen Kaligineedi <pkaligineedi@google.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, James Smart <james.smart@broadcom.com>,
+ Dick Kennedy <dick.kennedy@broadcom.com>,
+ "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>,
+ Maxime Ripard <mripard@kernel.org>, David Airlie <airlied@gmail.com>,
+ Simona Vetter <simona@ffwll.ch>, Jeroen de Borst <jeroendb@google.com>,
+ Shailend Chand <shailend@google.com>, Thomas Zimmermann
+ <tzimmermann@suse.de>, Maarten Lankhorst
+ <maarten.lankhorst@linux.intel.com>, Rodrigo Vivi <rodrigo.vivi@intel.com>,
+ =?UTF-8?Q?Thomas_Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>,
+ Lucas De Marchi <lucas.demarchi@intel.com>, Oded Gabbay
+ <ogabbay@kernel.org>, Ofir Bitton <obitton@habana.ai>,
+ Sven Schnelle <svens@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@linux.ibm.com>,
+ Alexander Gordeev <agordeev@linux.ibm.com>, Vasily Gorbik
+ <gor@linux.ibm.com>, Heiko Carstens <hca@linux.ibm.com>,
+ Russell King <linux@armlinux.org.uk>, Robert Jarzmik
+ <robert.jarzmik@free.fr>, Haojian Zhuang <haojian.zhuang@gmail.com>,
+ Daniel Mack <daniel@zonque.org>, Nicolas Palix <nicolas.palix@imag.fr>,
+ Julia Lawall <Julia.Lawall@inria.fr>, Simon Horman <horms@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+ Eric Dumazet <edumazet@google.com>, "David S. Miller" <davem@davemloft.net>,
+ Jozsef Kadlecsik <kadlec@netfilter.org>,
+ Pablo Neira Ayuso <pablo@netfilter.org>
+Subject: Re: [PATCH v2 00/21] Converge on using secs_to_jiffies()
+To: Jeff Johnson <quic_jjohnson@quicinc.com>,
+ Thomas Gleixner <tglx@linutronix.de>
+References: <20241115-converge-secs-to-jiffies-v2-0-911fb7595e79@linux.microsoft.com>
+ <10ee4e8f-d8b4-4502-a5e2-0657802aeb11@linux.microsoft.com>
+ <3ac480f5-549b-4449-baa9-f766e074c409@quicinc.com>
+Content-Language: en-US
+From: Easwar Hariharan <eahariha@linux.microsoft.com>
+In-Reply-To: <3ac480f5-549b-4449-baa9-f766e074c409@quicinc.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-This is automated email and please do not reply to this email!
+On 11/15/2024 1:41 PM, Jeff Johnson wrote:
+> On 11/15/2024 1:29 PM, Easwar Hariharan wrote:
+>> On 11/15/2024 1:26 PM, Easwar Hariharan wrote:
+>>> This is a series that follows up on my previous series to introduce
+>>> secs_to_jiffies() and convert a few initial users.[1] In the review for
+>>> that series, Anna-Maria requested converting other users with
+>>> Coccinelle. This is part 1 that converts users of msecs_to_jiffies()
+>>> that use the multiply pattern of either of:
+>>> - msecs_to_jiffies(N*1000), or
+>>> - msecs_to_jiffies(N*MSEC_PER_SEC)
+>>>
+>>> The entire conversion is made with Coccinelle in the script added in
+>>> patch 2. Some changes suggested by Coccinelle have been deferred to
+>>> later parts that will address other possible variant patterns.
+>>>
+>>> CC: Anna-Maria Behnsen <anna-maria@linutronix.de>
+>>> Signed-off-by: Easwar Hariharan <eahariha@linux.microsoft.com>
+>>>
+>>> [1] https://lore.kernel.org/all/20241030-open-coded-timeouts-v3-0-9ba123facf88@linux.microsoft.com/
+>>> [2] https://lore.kernel.org/all/8734kngfni.fsf@somnus/
+>>>
+>>> ---
+>>> Changes in v2:
+>>> - EDITME: describe what is new in this series revision.
+>>> - EDITME: use bulletpoints and terse descriptions.
+>>> - Link to v1: https://lore.kernel.org/r/20241115-converge-secs-to-jiffies-v1-0-19aadc34941b@linux.microsoft.com
+>>>
+>>
+>> Apologies, I missed out on editing the changelog here. v1 included a
+>> patch that's already been accepted, there are no other changes in v2.
+>>
+>> Thanks,
+>> Easwar
+> 
+> How do you expect this series to land since it overlaps a large number of
+> maintainer trees? Do you have a maintainer who has volunteered to take the
+> series and the maintainers should just ack? Or do you want the maintainers to
+> take the individual patches that are applicable to them?
+> 
+> /jeff
 
-Dear submitter,
+I am hoping for tglx to take it through his tree since the patch
+introducing secs_to_jiffies() is in his tree, so sequencing of
+dependencies would not be an issue.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=910166
+But if tglx won't, we could push it out another cycle and individual
+maintainers can take the patches that are applicable to their tree for
+the series.
 
----Test result---
-
-Test Summary:
-CheckPatch                    PENDING   0.26 seconds
-GitLint                       PENDING   0.19 seconds
-SubjectPrefix                 FAIL      2.72 seconds
-BuildKernel                   PASS      25.17 seconds
-CheckAllWarning               PASS      27.86 seconds
-CheckSparse                   WARNING   34.15 seconds
-BuildKernel32                 PASS      24.83 seconds
-TestRunnerSetup               PASS      442.19 seconds
-TestRunner_l2cap-tester       PASS      22.72 seconds
-TestRunner_iso-tester         FAIL      28.83 seconds
-TestRunner_bnep-tester        PASS      4.87 seconds
-TestRunner_mgmt-tester        PASS      122.87 seconds
-TestRunner_rfcomm-tester      PASS      7.71 seconds
-TestRunner_sco-tester         PASS      11.54 seconds
-TestRunner_ioctl-tester       PASS      8.34 seconds
-TestRunner_mesh-tester        PASS      6.05 seconds
-TestRunner_smp-tester         PASS      7.33 seconds
-TestRunner_userchan-tester    PASS      5.06 seconds
-IncrementalBuild              PENDING   0.56 seconds
-
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: SubjectPrefix - FAIL
-Desc: Check subject contains "Bluetooth" prefix
-Output:
-"Bluetooth: " prefix is not specified in the subject
-"Bluetooth: " prefix is not specified in the subject
-"Bluetooth: " prefix is not specified in the subject
-"Bluetooth: " prefix is not specified in the subject
-"Bluetooth: " prefix is not specified in the subject
-"Bluetooth: " prefix is not specified in the subject
-"Bluetooth: " prefix is not specified in the subject
-"Bluetooth: " prefix is not specified in the subject
-"Bluetooth: " prefix is not specified in the subject
-"Bluetooth: " prefix is not specified in the subject
-"Bluetooth: " prefix is not specified in the subject
-"Bluetooth: " prefix is not specified in the subject
-"Bluetooth: " prefix is not specified in the subject
-"Bluetooth: " prefix is not specified in the subject
-"Bluetooth: " prefix is not specified in the subject
-"Bluetooth: " prefix is not specified in the subject
-"Bluetooth: " prefix is not specified in the subject
-"Bluetooth: " prefix is not specified in the subject
-"Bluetooth: " prefix is not specified in the subject
-"Bluetooth: " prefix is not specified in the subject
-"Bluetooth: " prefix is not specified in the subject
-##############################
-Test: CheckSparse - WARNING
-Desc: Run sparse tool with linux kernel
-Output:
-net/bluetooth/hci_event.c: note: in included file (through include/net/bluetooth/hci_core.h):
-##############################
-Test: TestRunner_iso-tester - FAIL
-Desc: Run iso-tester with test-runner
-Output:
-WARNING: possible circular locking dependency detected
-Total: 124, Passed: 120 (96.8%), Failed: 0, Not Run: 4
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============7672147778086807484==--
+Thanks,
+Easwar
