@@ -1,146 +1,96 @@
-Received: from mail-qk1-f182.google.com (mail-qk1-f182.google.com [209.85.222.182])
+Received: from mail-il1-f198.google.com (mail-il1-f198.google.com [209.85.166.198])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 922921DDA20
-	for <linux-bluetooth@vger.kernel.org>; Fri, 15 Nov 2024 13:46:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD69F1CEE92
+	for <linux-bluetooth@vger.kernel.org>; Fri, 15 Nov 2024 14:41:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.198
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731678381; cv=none; b=Z/W62B6/ASUdU5BTmR2f3O/ULeAiogK9cohDEsD06fgz/tj8f8YFjj1JhmnvPRmuyg99eVZx3TxQOZ/k8VNlAdPBNE4kR5tOu4ejOqz3CJ0Vi3K7XnTR1wPcWUkRlnfHJARSKv/gMllwnuaLor1YQySO5QIHeM67wmSdF5G4Pec=
+	t=1731681691; cv=none; b=kSxApr4A4E9iNdcEzbenDO8BHpD6cYfmfI0XRF9GdFOcrcHNTx6GXi6AUmfTU2fyLO85WdQnuJH+I91v7274gRfjM1oCcecraYTznpoMYaBkr4oSq8zoebH0fgyuqR4Twh2Pab/22XhE3ThwPGZCqSyJB7WsgVIHOVBljTce/7Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731678381; c=relaxed/simple;
-	bh=Cv2pppKLSBzZvErdeBp4+24Y8wFf6GNoW5zwbH0tJ90=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=FGeKvbBUaionaw/6JWTv98T5GWkw2sMM7rcqmXz1SEBMlghBahZZveYssrN7JrNiQYAZJNpE0dNMfEQKadrJqMPQHaSR7t3NIVFBbvU7rAQZ29hNeAa/bc1EcjodQV8Q69MXmKdgXVu7VUOhAW5lHWhBtSyInq7FFsHiFiVFeSE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=A+sHdvOq; arc=none smtp.client-ip=209.85.222.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="A+sHdvOq"
-Received: by mail-qk1-f182.google.com with SMTP id af79cd13be357-7b148919e82so46639085a.0
-        for <linux-bluetooth@vger.kernel.org>; Fri, 15 Nov 2024 05:46:19 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1731678378; x=1732283178; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=PWjtB38wOx5hPXDOkH6apQP/JaUnl8U/6xq8isP+DLA=;
-        b=A+sHdvOqoHJS3KQI332V0acJGJBlvQ+TDs0egisCLIR3GQ09er5XVpt2Z4i1MBk6GT
-         Fgm59kPflb9FO5Vik/+6gtrzO3nQkUkPjtISJU4MM7cGFUw9b/P9i1YmXflYzOAra5cw
-         xaZ7L06smF9mhh69nsLY/jD2bG3siyT1YOkAgfF6Flfuz43djant8RN59M+pcPKQoxoV
-         NVIlav5qOmBosrDDw8kGahJ2Na6+bwUhyF95E7IjkkvEWftIuVMASPs28vMg4NTuITr0
-         0J46Jx4T5jc+cIvyvP/0yTI9vwHcH/LnBRgX5idca2/uWhUOO/YqlWJTRi737pRl3qYS
-         pi/g==
+	s=arc-20240116; t=1731681691; c=relaxed/simple;
+	bh=TvfAFGSsHmqIZByRKIp5Su5P4ciacTcybzgpExC/o/s=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=EMk/NriTGz4ayLDEHsoRkd+5O9Jk9aVavOHdYNlC6I3kI3pvSiLKs0OmIz1OJcC+koTgTU2UHcgNjg5W/N85k9YRGS7RfMI/a/TIMAf8sarBiJ3oWsuXEmGkEPUUWx2a43WcWueHpROP8GfvdXR9f0ZyvG1bkC+mTeme3bj0jHM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.198
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-3a6b7974696so21330855ab.1
+        for <linux-bluetooth@vger.kernel.org>; Fri, 15 Nov 2024 06:41:29 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731678378; x=1732283178;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=PWjtB38wOx5hPXDOkH6apQP/JaUnl8U/6xq8isP+DLA=;
-        b=wjcbAtkOzAEMweFWhRAJ2tJdNHg49nikybENlMxbU5u6lf+5/Lk5JDPiCLwUrNx2QI
-         hmWFHCQbwW/T22g5/cFfmjrCA5XZyIxHu4cTN6vYWIJzSSHC0cL1mI8b5tZI7KEu6GJ1
-         l7UYOR1tWwzPGhFadO7SL/6LDi/++WyohAqVkPRofBZWyqkqU/t7TD5vreDwAK+nCaWO
-         QVbFKqU7WqsgM/mj64x9VgdWzPVXrhr0I/TSdusawBq8bt4k4Nmej6gqMI4Apu/Npq3F
-         1bfgfFvaS0Pw+RsnAT8OvIPgjutB4j9kCdOAY35/aAAKTDDYZJb4Js4lNfj6T94p0Z9Y
-         lecg==
-X-Gm-Message-State: AOJu0Yw5lRihG8TqQmvmnlTYzbzwLf9/oU8IxWcvL3e6QGxJB5lvfa0a
-	aGuxwbx7qi2JNnn3XXdWi+IlASKEATh5V4GCSlSnl/YZnCJ2uWcbEgHNaA==
-X-Google-Smtp-Source: AGHT+IG1RAjwx+3cH679B0KKX34MO+MCH42K1We4nc3lXZvsJZxVXvL4ZujMpAARE2WHYXWOHBr+VA==
-X-Received: by 2002:a05:620a:17a3:b0:7ac:abb0:2317 with SMTP id af79cd13be357-7b3622df8f4mr421658385a.37.1731678378195;
-        Fri, 15 Nov 2024 05:46:18 -0800 (PST)
-Received: from [172.17.0.2] ([40.76.119.162])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7b35c984531sm159878285a.22.2024.11.15.05.46.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 15 Nov 2024 05:46:17 -0800 (PST)
-Message-ID: <673750a9.050a0220.23c208.5d64@mx.google.com>
-Date: Fri, 15 Nov 2024 05:46:17 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============2461319306978907893=="
+        d=1e100.net; s=20230601; t=1731681689; x=1732286489;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=uJQdBFgI5sJta5zrwY7MqKRjkyY24HYi+MEoJE1gW0A=;
+        b=nwxMP6AW6HBxfQu6nkss22FfcfrFyweAeDcYgqMUdRh3O0A7UaMTtK2BrC29YAUdjl
+         OVxzmzFbsldd4Vyidkkk07Muc3FOaMaxk51lO5OSYZ2N1Iv66zXj0vqfCkRXnFffH5a9
+         jm4aGGR7+Zwx1mre6cf/FkYlE4sh3v5bnhBOKX7VmJi1xylsJ3Uxbl8IuhDHtn7QoQs6
+         LH4kTHSL1aFqSD7Qa5L/GTU1ebs/MI9CcE8NRL3gA3f4Kj8DMZC5NLDIrRTnPRLCkBow
+         EXUO+LUJzN9KSLJXYf9uKAXTb7LlHBlSHfzgSfPBLwGm8GuKAKWxpv/FtVWmSZmWh2l4
+         DVug==
+X-Gm-Message-State: AOJu0YybzynJQVoFTdtWJVdvXtnK6PX7HOa9s7UJV6ybh44/1vpPzjjO
+	O2dhjC5FdhlScwSYIkflVK6ofAsm7KTbTRMH1igOHaDV/AZ7D/I6guzt/gDgSVu2Jv9thTsOc6T
+	U14/Y10PXhNQPkTJe4SbnTKvP4PsWTZ5YVGVjcXaL/Iph7eJQyef7IFM=
+X-Google-Smtp-Source: AGHT+IF+BwSfWGlw5VRacUhCrNIruqTUZNyQkcZ1dfBEACe6DCBAL4TM3xlxmBthlqiAd7wDqTEkNZTksWbPlj8jk3KQc7W0OFFO
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, mhal@rbox.co
-Subject: RE: net: Fix some callers of copy_from_sockptr()
-In-Reply-To: <20241115-sockptr-copy-fixes-v2-1-9b1254c18b7a@rbox.co>
-References: <20241115-sockptr-copy-fixes-v2-1-9b1254c18b7a@rbox.co>
-Reply-To: linux-bluetooth@vger.kernel.org
+X-Received: by 2002:a92:ca06:0:b0:3a7:1b72:f36 with SMTP id
+ e9e14a558f8ab-3a748088836mr28545775ab.21.1731681689035; Fri, 15 Nov 2024
+ 06:41:29 -0800 (PST)
+Date: Fri, 15 Nov 2024 06:41:29 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <67375d99.050a0220.bb738.0001.GAE@google.com>
+Subject: [syzbot] Monthly bluetooth report (Nov 2024)
+From: syzbot <syzbot+listb55ee1602b5d90b0989f@syzkaller.appspotmail.com>
+To: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	luiz.dentz@gmail.com, marcel@holtmann.org, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
---===============2461319306978907893==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hello bluetooth maintainers/developers,
 
-This is automated email and please do not reply to this email!
+This is a 31-day syzbot report for the bluetooth subsystem.
+All related reports/information can be found at:
+https://syzkaller.appspot.com/upstream/s/bluetooth
 
-Dear submitter,
+During the period, 6 new issues were detected and 0 were fixed.
+In total, 48 issues are still open and 72 have already been fixed.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=909980
+Some of the still happening issues:
 
----Test result---
-
-Test Summary:
-CheckPatch                    PENDING   0.20 seconds
-GitLint                       PENDING   0.18 seconds
-SubjectPrefix                 FAIL      0.68 seconds
-BuildKernel                   PASS      25.03 seconds
-CheckAllWarning               PASS      28.08 seconds
-CheckSparse                   WARNING   32.00 seconds
-BuildKernel32                 PASS      25.33 seconds
-TestRunnerSetup               PASS      452.91 seconds
-TestRunner_l2cap-tester       PASS      21.30 seconds
-TestRunner_iso-tester         FAIL      33.60 seconds
-TestRunner_bnep-tester        PASS      5.04 seconds
-TestRunner_mgmt-tester        PASS      120.99 seconds
-TestRunner_rfcomm-tester      PASS      7.93 seconds
-TestRunner_sco-tester         PASS      11.58 seconds
-TestRunner_ioctl-tester       PASS      8.54 seconds
-TestRunner_mesh-tester        PASS      6.31 seconds
-TestRunner_smp-tester         PASS      7.28 seconds
-TestRunner_userchan-tester    PASS      5.42 seconds
-IncrementalBuild              PENDING   0.40 seconds
-
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: SubjectPrefix - FAIL
-Desc: Check subject contains "Bluetooth" prefix
-Output:
-"Bluetooth: " prefix is not specified in the subject
-"Bluetooth: " prefix is not specified in the subject
-"Bluetooth: " prefix is not specified in the subject
-##############################
-Test: CheckSparse - WARNING
-Desc: Run sparse tool with linux kernel
-Output:
-net/bluetooth/sco.c: note: in included file:./include/net/bluetooth/hci_core.h:147:35: warning: array of flexible structures
-##############################
-Test: TestRunner_iso-tester - FAIL
-Desc: Run iso-tester with test-runner
-Output:
-WARNING: possible circular locking dependency detected
-Total: 124, Passed: 120 (96.8%), Failed: 0, Not Run: 4
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
-
-
+Ref  Crashes Repro Title
+<1>  695     Yes   general protection fault in skb_release_data (2)
+                   https://syzkaller.appspot.com/bug?extid=ccfa5775bc1bda21ddd1
+<2>  452     Yes   general protection fault in lock_sock_nested
+                   https://syzkaller.appspot.com/bug?extid=d3ccfb78a0dc16ffebe3
+<3>  346     Yes   BUG: sleeping function called from invalid context in hci_le_create_big_complete_evt
+                   https://syzkaller.appspot.com/bug?extid=2fb0835e0c9cefc34614
+<4>  141     Yes   KASAN: slab-use-after-free Read in set_powered_sync
+                   https://syzkaller.appspot.com/bug?extid=03d6270b6425df1605bf
+<5>  76      Yes   BUG: sleeping function called from invalid context in lock_sock_nested (3)
+                   https://syzkaller.appspot.com/bug?extid=55cd5225f71c5cff7f6f
+<6>  52      Yes   WARNING: ODEBUG bug in put_device
+                   https://syzkaller.appspot.com/bug?extid=a9290936c6e87b3dc3c2
+<7>  50      No    KASAN: slab-use-after-free Read in skb_queue_purge_reason (2)
+                   https://syzkaller.appspot.com/bug?extid=683f8cb11b94b1824c77
+<8>  42      No    WARNING in l2cap_chan_del
+                   https://syzkaller.appspot.com/bug?extid=3272785b7a1fc9b510f6
+<9>  33      Yes   possible deadlock in mgmt_set_connectable_complete
+                   https://syzkaller.appspot.com/bug?extid=b1752fcfa8658bb8984a
+<10> 9       Yes   general protection fault in l2cap_chan_timeout (3)
+                   https://syzkaller.appspot.com/bug?extid=f0908ddc8b64b86e81f2
 
 ---
-Regards,
-Linux Bluetooth
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
+To disable reminders for individual bugs, reply with the following command:
+#syz set <Ref> no-reminders
 
---===============2461319306978907893==--
+To change bug's subsystems, reply with:
+#syz set <Ref> subsystems: new-subsystem
+
+You may send multiple commands in a single email message.
