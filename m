@@ -1,147 +1,199 @@
-Received: from mailtransmit05.runbox.com (mailtransmit05.runbox.com [185.226.149.38])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 772E24317C;
-	Fri, 15 Nov 2024 08:32:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.38
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEEE01898EA
+	for <linux-bluetooth@vger.kernel.org>; Fri, 15 Nov 2024 09:01:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731659529; cv=none; b=TJQH2CYMl+me2lsvpsZavCT9TShbTSse9mkF5iD4+78JWKjB9scu1NOvd0LZEo0HoUcLvVmYGD3DrlaYZIwgK7OW5lkkt8chBo+mkKM7Fovn/9JVVcwE1+itYGftvEh445gSUnXy8JiYXDsboVKOa1Ew8xbyrzMH0kc5v7DGnmU=
+	t=1731661299; cv=none; b=VuLzGXdpTwPCR6WdOuDqBa4Pa8jrEn8FofXJNbgZDYyFIqkM8sDswWl1Je4c1Yo03bh28pLz3mnfkdEggf34gw+Sbahiwh/6n0ekCuj+bWnkuHlaiUNKunXecbVyLVbm2UvvmrLZ5CRMU3gpPVb8lS4SrkgJdl/25v+JXq0mTtA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731659529; c=relaxed/simple;
-	bh=Ft9o+8IN3dR7zbe+yx515zUiuduyfuQwiMP4dzTo3io=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=NPjOe9gqz0tlzEkp+CH1q7VijHdf5FdR6N0NNUwSoe6muTlaZDtc0sSFmmUj+8vdDk9if84Qs6SGNLYwE8pU9rC+Er6QnbHGvBh6qm3amldRtdq9MkZYSnzBzMmKkHo6EMmEKEiGxvqmtO4qGm5og0/gTdJRquo66O+TAq1iAXs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=GvOBUsev; arc=none smtp.client-ip=185.226.149.38
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
+	s=arc-20240116; t=1731661299; c=relaxed/simple;
+	bh=9dSOjcNyDb/zTukyY98jiQudUtsEr4+7Ty68oWXUJbw=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=istgw41UfL4gXOrlLugCYE1TpXRMgvBq3NxUfZ2tzur5sD8lFzQIE1gwQsiwTMh8M/fNU2soSj/IptVTbd/DsEe9VzoE+qMLKmiaevXKOFNk78/UhDJWlb+9GVCjSI0v9k3/YbQmnUKdIrVeDXQPGC6ChIRTupD0x7j2NukTSc8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=vFLkrEVz; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="GvOBUsev"
-Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
-	by mailtransmit05.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.93)
-	(envelope-from <mhal@rbox.co>)
-	id 1tBrkD-0077UP-P2; Fri, 15 Nov 2024 09:31:57 +0100
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
-	s=selector2; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
-	References:Cc:To:Subject:MIME-Version:Date:Message-ID;
-	bh=yqG1zxisn2LWsL+t6aF9uz0Ph7aK0bj7aXBWlAlzRag=; b=GvOBUsevAtuNwWJLpWYNk68lL4
-	EnEbylUdWFK8pvtoofV+DW2e0g5qGMM4h0wdq0xa8vWyg+ZNTEyaUB1xJ7+K5mTnlx2ki9OOm1F4S
-	RH1gv+d+xw7CA2ImPjL2Djcqd7jqskE6gTjTwqySSv8oqV1B7AGYO/IxAnexJHqgbs2+GgDtxKgKS
-	EuCoBXrg+cK/pdIKCdrUwhPLKNoOCcWBjlchBIg291UqoP96BBvtyVOr1UmQvmc0mBT+YfL20lPtw
-	8nHPnykyWXXqNWHyPk/CRlpMIC8U9wEm2W2UEcgEo6aAHH2Q+V6I5m7HcxHTkFgVXHkfmk1r7V62V
-	jDF+kJ+w==;
-Received: from [10.9.9.74] (helo=submission03.runbox)
-	by mailtransmit03.runbox with esmtp (Exim 4.86_2)
-	(envelope-from <mhal@rbox.co>)
-	id 1tBrkC-0004eG-8g; Fri, 15 Nov 2024 09:31:56 +0100
-Received: by submission03.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.93)
-	id 1tBrju-00AATW-SW; Fri, 15 Nov 2024 09:31:38 +0100
-Message-ID: <02c01b54-ad82-4ae0-b4fd-db1b7687efa0@rbox.co>
-Date: Fri, 15 Nov 2024 09:31:37 +0100
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="vFLkrEVz"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 376BDC4CED4
+	for <linux-bluetooth@vger.kernel.org>; Fri, 15 Nov 2024 09:01:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1731661299;
+	bh=9dSOjcNyDb/zTukyY98jiQudUtsEr4+7Ty68oWXUJbw=;
+	h=From:To:Subject:Date:In-Reply-To:References:From;
+	b=vFLkrEVzXFyst5ZHMKDRYbaIj0dZtx/CXztvQ19ePJz2Y5jI09LRZxzcp11lkUZzK
+	 nrhA6cNi7DXz2RnDVB3/o0STPnmyf7ap98p/zvVeUx1RdHen1sCHtqqwG31MQoNoZK
+	 h8mnPaeBwjuc5qN5p+rX+yh5vNjmoNGqVtEKYp37aWXwKQ0EXNVG9cVGxPSzayy/ng
+	 objiYxL7LRWQG0vRnfT7QhfOfdxbNcqssM3v/tyrpOZpdU/kHq+tDRz6pUNLIc6Jmq
+	 izJXlrcLNvpSzAyBKyocPb8PaX3kMXZs9dHlAoYBRp7DdkDKEmO74RlpCe0QcI7mmO
+	 +3G44d15OtgmA==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+	id 22F75C53BC5; Fri, 15 Nov 2024 09:01:39 +0000 (UTC)
+From: bugzilla-daemon@kernel.org
+To: linux-bluetooth@vger.kernel.org
+Subject: [Bug 219494] Mediatek MT7921U WIFI + bluetooth USB Dongle - System
+ Crash - Cold Boot
+Date: Fri, 15 Nov 2024 09:01:38 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: blocking
+X-Bugzilla-Who: mail@nelsongaspar.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P3
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-219494-62941-KUMF0uNMyQ@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-219494-62941@https.bugzilla.kernel.org/>
+References: <bug-219494-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net 1/4] bluetooth: Improve setsockopt() handling of
- malformed user input
-To: David Wei <dw@davidwei.uk>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
- Johan Hedberg <johan.hedberg@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- David Howells <dhowells@redhat.com>, Marc Dionne <marc.dionne@auristor.com>,
- Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
- linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
- linux-afs@lists.infradead.org, Jakub Kicinski <kuba@kernel.org>
-References: <20241115-sockptr-copy-fixes-v1-0-d183c87fcbd5@rbox.co>
- <20241115-sockptr-copy-fixes-v1-1-d183c87fcbd5@rbox.co>
- <156ce25b-4344-40cd-9c72-1a45e8f77b38@davidwei.uk>
- <CABBYNZLbR22cWaXA4YNwtE8=+VfdGYR5oN6TSJ-MwXCuP3=6hw@mail.gmail.com>
- <970c7945-3dc4-4f07-94d5-19080efb2f21@davidwei.uk>
- <CABBYNZL_awaZOKpsAyOaAbtnJLobJ1bQpF_9JNxpiyQg5P5q1Q@mail.gmail.com>
- <4292b59f-7956-4c37-8909-ecb2261687b1@davidwei.uk>
-Content-Language: pl-PL, en-GB
-From: Michal Luczaj <mhal@rbox.co>
-In-Reply-To: <4292b59f-7956-4c37-8909-ecb2261687b1@davidwei.uk>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
 
-On 11/15/24 04:04, David Wei wrote:
-> On 2024-11-14 18:50, Luiz Augusto von Dentz wrote:
->> Hi David,
->> On Thu, Nov 14, 2024 at 9:30 PM David Wei <dw@davidwei.uk> wrote:
->>> On 2024-11-14 18:15, Luiz Augusto von Dentz wrote:
->>>> Hi David,
->>>> On Thu, Nov 14, 2024 at 7:42 PM David Wei <dw@davidwei.uk> wrote:
->>>>> On 2024-11-14 15:27, Michal Luczaj wrote:
->>>>> ...
->>>>>> diff --git a/net/bluetooth/rfcomm/sock.c b/net/bluetooth/rfcomm/sock.c
->>>>>> index f48250e3f2e103c75d5937e1608e43c123aa3297..1001fb4cc21c0ecc7bcdd3ea9041770ede4f27b8 100644
->>>>>> --- a/net/bluetooth/rfcomm/sock.c
->>>>>> +++ b/net/bluetooth/rfcomm/sock.c
->>>>>> @@ -629,10 +629,9 @@ static int rfcomm_sock_setsockopt_old(struct socket *sock, int optname,
->>>>>>
->>>>>>       switch (optname) {
->>>>>>       case RFCOMM_LM:
->>>>>> -             if (bt_copy_from_sockptr(&opt, sizeof(opt), optval, optlen)) {
->>>>>> -                     err = -EFAULT;
->>>>>> +             err = copy_safe_from_sockptr(&opt, sizeof(opt), optval, optlen);
->>>>>> +             if (err)
->>>>>>                       break;
->>>>>> -             }
->>>>>
->>>>> This will return a positive integer if copy_safe_from_sockptr() fails.
->>>>
->>>> What are you talking about copy_safe_from_sockptr never returns a
->>>> positive value:
->>>>
->>>>  * Returns:
->>>>  *  * -EINVAL: @optlen < @ksize
->>>>  *  * -EFAULT: access to userspace failed.
->>>>  *  * 0 : @ksize bytes were copied
->>>
->>> Isn't this what this series is about? copy_from_sockptr() returns 0 on
->>> success, or a positive integer for number of bytes NOT copied on error.
->>> Patch 4 even updates the docs for copy_from_sockptr().
->>>
->>> copy_safe_from_sockptr()
->>>         -> copy_from_sockptr()
->>>         -> copy_from_sockptr_offset()
->>>         -> memcpy() for kernel to kernel OR
->>>         -> copy_from_user() otherwise
->>
->> Well except the safe version does check what would otherwise cause a
->> positive return by the likes of copy_from_user and returns -EINVAL
->> instead, otherwise the documentation of copy_safe_from_sockptr is just
->> wrong and shall state that it could return positive as well but I
->> guess that would just make it as inconvenient so we might as well
->> detect when a positive value would be returned just return -EFAULT
->> instead.
-> 
-> Yes it checks and returns EINVAL, but not EFAULT which is what my
-> comment on the original patch is about. Most of the calls to
-> bt_copy_from_sockptr() that Michal replaced with
-> copy_safe_from_sockptr() remain incorrect because it is assumed that
-> EFAULT is returned. Only rfcomm_sock_setsockopt_old() was vaguely doing
-> the right thing and the patch changed it back to the incorrect pattern:
-> 
-> err = copy_safe_from_sockptr(...);
-> if (err)
-> 	break;
-> 
-> But I do agree that making copy_safe_from_sockptr() do the right thing
-> and EFAULT will be easier and prevent future problems given that
-> copy_from_sockptr() is meant to be deprecated anyhow.
+https://bugzilla.kernel.org/show_bug.cgi?id=3D219494
 
-Just to be clear: copy_safe_from_sockptr() was recently fixed to return
-EFAULT:
-https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git/commit/?id=eb94b7bb1010
-Sorry, I should have mentioned this series is a follow up to that patch.
+--- Comment #3 from nelsongas (mail@nelsongaspar.com) ---
+Nov 14 20:03:11 darkstar kernel: Bluetooth: hci0: command 0xfd98 tx timeout
+Nov 14 20:03:11 darkstar kernel: Bluetooth: hci0: Failed to apply iso setti=
+ng
+(-110)
+Nov 14 20:03:11 darkstar kernel: Bluetooth: hci0: HCI Enhanced Setup
+Synchronous Connection command is advertised, but not supported.
+Nov 14 20:03:13 darkstar kernel: Bluetooth: hci0: Opcode 0x0c03 failed: -110
+Nov 14 20:03:15 darkstar kernel: Bluetooth: hci0: Failed to read MSFT suppo=
+rted
+features (-110)
+Nov 14 20:03:15 darkstar kernel: Oops: general protection fault, probably f=
+or
+non-canonical address 0xdead000000000108: 0000 [#1] PREEMPT SMP PTI
+Nov 14 20:03:15 darkstar kernel: CPU: 6 UID: 0 PID: 9445 Comm: kworker/6:1
+Tainted: P          IO       6.11.7 #1
+Nov 14 20:03:15 darkstar kernel: Tainted: [P]=3DPROPRIETARY_MODULE,
+[I]=3DFIRMWARE_WORKAROUND, [O]=3DOOT_MODULE
+Nov 14 20:03:15 darkstar kernel: Hardware name: Dell Inc.=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20
+Precision WorkStation 690    /0MY171, BIOS A08 04/25/2008
+Nov 14 20:03:15 darkstar kernel: Workqueue: events __usb_queue_reset_device
+Nov 14 20:03:15 darkstar kernel: RIP: 0010:hci_unregister_dev+0x43/0x190
+[bluetooth]
+Nov 14 20:03:15 darkstar kernel: Code: f0 80 8b e1 0e 00 00 08 48 89 ef e8 =
+47
+10 58 d1 48 c7 c7 a8 86 ea c4 e8 bb 71 58 d1 48 8b 13 48 8b 43 08 48 c7 c7 =
+a8
+86 ea c4 <48> 89 42 08 48 89 10 48 b8 00 01 00 00 00 00 ad
+de 48 89 03 48 83
+Nov 14 20:03:15 darkstar kernel: RSP: 0018:ffff974e43de7d28 EFLAGS: 00010246
+Nov 14 20:03:15 darkstar kernel: RAX: dead000000000122 RBX: ffff88de69aa6000
+RCX: 0000000000000000
+Nov 14 20:03:15 darkstar kernel: RDX: dead000000000100 RSI: ffff88dc1b6d0a10
+RDI: ffffffffc4ea86a8
+Nov 14 20:03:15 darkstar kernel: RBP: ffff88de69aa64d0 R08: 0000000000000001
+R09: 0000000000000000
+Nov 14 20:03:15 darkstar kernel: R10: 0000000080150010 R11: 0000000000000000
+R12: ffff88de69aa6000
+Nov 14 20:03:15 darkstar kernel: R13: ffffffffc4f0c278 R14: ffffffffc4f0c278
+R15: ffff88dc200e8450
+Nov 14 20:03:15 darkstar kernel: FS:  0000000000000000(0000)
+GS:ffff88e31fd80000(0000) knlGS:0000000000000000
+Nov 14 20:03:15 darkstar kernel: CS:  0010 DS: 0000 ES: 0000 CR0:
+0000000080050033
+Nov 14 20:03:15 darkstar kernel: CR2: 00007fa25a5f7cf0 CR3: 000000014dab6000
+CR4: 00000000000006f0
+Nov 14 20:03:15 darkstar kernel: Call Trace:
+Nov 14 20:03:15 darkstar kernel:  <TASK>
+Nov 14 20:03:15 darkstar kernel:  ? die_addr.cold+0x8/0xd
+Nov 14 20:03:15 darkstar kernel:  ? exc_general_protection+0x1c4/0x460
+Nov 14 20:03:15 darkstar kernel:  ? asm_exc_general_protection+0x22/0x30
+Nov 14 20:03:15 darkstar kernel:  ? hci_unregister_dev+0x43/0x190 [bluetoot=
+h]
+Nov 14 20:03:15 darkstar kernel:  ? hci_unregister_dev+0x35/0x190 [bluetoot=
+h]
+Nov 14 20:03:15 darkstar kernel:  btusb_disconnect+0x5e/0x130 [btusb]
+Nov 14 20:03:15 darkstar kernel:  usb_unbind_interface+0x8f/0x280
+Nov 14 20:03:15 darkstar kernel:  device_release_driver_internal+0x198/0x200
+Nov 14 20:03:15 darkstar kernel:  usb_forced_unbind_intf+0x38/0x80
+Nov 14 20:03:15 darkstar kernel:  usb_reset_device+0xe4/0x240
+Nov 14 20:03:15 darkstar kernel:  __usb_queue_reset_device+0x35/0x50
+Nov 14 20:03:15 darkstar kernel:  process_one_work+0x16b/0x320
+Nov 14 20:03:15 darkstar kernel:  worker_thread+0x2da/0x410
+Nov 14 20:03:15 darkstar kernel:  ? _raw_spin_lock_irqsave+0x17/0x50
+Nov 14 20:03:15 darkstar kernel:  ? __pfx_worker_thread+0x10/0x10
+Nov 14 20:03:15 darkstar kernel:  kthread+0xdd/0x110
+Nov 14 20:03:15 darkstar kernel:  ? __pfx_kthread+0x10/0x10
+Nov 14 20:03:15 darkstar kernel:  ret_from_fork+0x30/0x50
+Nov 14 20:03:15 darkstar kernel:  ? __pfx_kthread+0x10/0x10
+Nov 14 20:03:15 darkstar kernel:  ret_from_fork_asm+0x1a/0x30
+Nov 14 20:03:15 darkstar kernel:  </TASK>
+Nov 14 20:03:15 darkstar kernel: Modules linked in: btusb btrtl btintel btb=
+cm
+btmtk bluetooth fuse ipmi_devintf ipmi_msghandler smsc 8021q garp mrp xt_NF=
+LOG
+nfnetlink_log xt_multiport xt_tcpudp iptable_filter ip_tables xt_conntrack =
+qrtr
+x_tables nf_conntrack_tftp nf_conntrack_snmp nf_conntrack_sip nf_conntrack_=
+sane
+nf_conntrack_pptp nf_conntrack_netlink nfnetlink nf_conntrack_netbios_ns
+nf_conntrack_irc nf_conntrack_h323 nf_conntrack_ftp nf_conntrack_broadcast
+ts_kmp nf_conntrack_amanda nf_conntrack_bridge nf_conntrack nf_defrag_ipv6
+nf_defrag_ipv4 bridge stp llc ipv6 nvidia_uvm(PO) sg zram uvcvideo uvc
+snd_usb_audio videobuf2_vmalloc vi
+deobuf2_memops videobuf2_v4l2 snd_usbmidi_lib snd_ump st snd_rawmidi videod=
+ev
+snd_seq_device videobuf2_common joydev mc snd_ctl_led mt7921u mt792x_usb
+mt7921_common mt792x_lib mt76_connac_lib mt76_usb mt76 mac80211
+cfg80211 rfkill hid_generic usbhid uas hid usb_storage nvidia_drm(PO)
+nvidia_modeset(PO) nvidia(PO) snd_hda_codec_idt snd_hda_codec_hdmi
+snd_hda_codec_generic snd_hda_intel coretemp dell_pc
+Nov 14 20:03:15 darkstar kernel:  snd_intel_dspcfg dell_smbios gpio_ich
+dell_wmi_descriptor drm_ttm_helper platform_profile snd_intel_sdw_acpi ppdev
+ttm kvm_intel dcdbas drm_kms_helper snd_hda_codec dell_smm_hwmon kvm
+snd_hda_core sha512_ssse3 drm snd_hwdep i2c_i801 sha256_ssse3 agpgart tg3
+mptsas sha1_ssse3 serio_raw i2c_mux snd_pcm video mptspi xhci_pci mptscsih =
+wmi
+uhci_hcd lpc_ich i2c_smbus xhci_pci_renesas snd_timer i2c_c
+ore snd libphy mfd_core mptbase soundcore i5k_amb ehci_pci xhci_hcd ehci_hcd
+intel_rng tpm_tis parport_pc tpm_tis_core parport evdev loop
+Nov 14 20:03:15 darkstar kernel: ---[ end trace 0000000000000000 ]---
+Nov 14 20:03:15 darkstar kernel: RIP: 0010:hci_unregister_dev+0x43/0x190
+[bluetooth]
+Nov 14 20:03:15 darkstar kernel: Code: f0 80 8b e1 0e 00 00 08 48 89 ef e8 =
+47
+10 58 d1 48 c7 c7 a8 86 ea c4 e8 bb 71 58 d1 48 8b 13 48 8b 43 08 48 c7 c7 =
+a8
+86 ea c4 <48> 89 42 08 48 89 10 48 b8 00 01 00 00 00 00 ad
+de 48 89 03 48 83
+Nov 14 20:03:15 darkstar kernel: RSP: 0018:ffff974e43de7d28 EFLAGS: 00010246
+Nov 14 20:03:15 darkstar kernel: RAX: dead000000000122 RBX: ffff88de69aa6000
+RCX: 0000000000000000
+Nov 14 20:03:15 darkstar kernel: RDX: dead000000000100 RSI: ffff88dc1b6d0a10
+RDI: ffffffffc4ea86a8
+Nov 14 20:03:15 darkstar kernel: RBP: ffff88de69aa64d0 R08: 0000000000000001
+R09: 0000000000000000
+Nov 14 20:03:15 darkstar kernel: R10: 0000000080150010 R11: 0000000000000000
+R12: ffff88de69aa6000
+Nov 14 20:03:15 darkstar kernel: R13: ffffffffc4f0c278 R14: ffffffffc4f0c278
+R15: ffff88dc200e8450
+Nov 14 20:03:15 darkstar kernel: FS:  0000000000000000(0000)
+GS:ffff88e31fd80000(0000) knlGS:0000000000000000
+Nov 14 20:03:15 darkstar kernel: CS:  0010 DS: 0000 ES: 0000 CR0:
+0000000080050033
+Nov 14 20:03:15 darkstar kernel: CR2: 00007fa25a5f7cf0 CR3: 000000014dab6000
+CR4: 00000000000006f0
 
-Thanks,
-Michal
+--=20
+You may reply to this email to add a comment.
 
+You are receiving this mail because:
+You are the assignee for the bug.=
