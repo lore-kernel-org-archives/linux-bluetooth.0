@@ -1,165 +1,99 @@
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+Received: from mout.kundenserver.de (mout.kundenserver.de [212.227.126.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41DA1185924
-	for <linux-bluetooth@vger.kernel.org>; Fri, 15 Nov 2024 06:43:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C8141F95A;
+	Fri, 15 Nov 2024 07:02:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.126.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731653014; cv=none; b=P1wJLkdHvvGrFeNLudcIuVyPOPisZ/VwDm5U715Ejd/EL48/FLht3IXTGmETZcBNLW65B3KGbtQqftqh9bh3YeR1Gxj/O6NUFp91gHeRnRMNMHe5EAtOd1R8VwZrgBO7ney07P8AqgAib+AEhaala8e0RidTyaEt08JHCmdl8fk=
+	t=1731654134; cv=none; b=NoBFNldc+TlLWUtoUkFXJtfu1FgapFNRzDRXCWVrOwreGwiGNk/OCZayybgKij1EYosJ7ZKcQGx2fRtnV9da8/DAAxhTDXXJ5GdxVu82FlitVAYNInioYxveGzPnx2oHHGxC97p+d8QWWx71XcagagiACVMrwWuVVBeaja4GbXA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731653014; c=relaxed/simple;
-	bh=ea9vVYIfwIvdCcScSChqjbhQ6N1l9Zf+D9KnJqrPccw=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=DbqwHaxmaO2UQCqvnPqZAp0KTfhWIxyPQhPs4MPVLOXm/GZ9ZSpFG0Q6N2BTutzJkOM7kfsdikzEvDcBGHoewZd3vjtlXypsiDFteybhtFwaD7AJXRZhJtx15rYFKQHnIb2bJzeJKnjIlA6OJEKJEZOc+ntDATDF2kY4gV4AKak=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=Hu21LAt6; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+	s=arc-20240116; t=1731654134; c=relaxed/simple;
+	bh=5tGM067wa+AlamSiUyUvtOdtPcUbA7Xj4tjlcN8ACzY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=InJGiU0FJikL6oVfbQxFwDoU3azef3L5YdiH94opUr/MQQML4bumGwB9/ltIbgNigu5g7QO1lT3rUNRqWDyKdAbjlmthpTMFR2Lgp3HsMJ2qCN06k9srUIsDb/1Spik6NCgyAJKRl1XLElOya6BcgCZ1SyKEhZGC8LQWV1Up7XY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=oldschoolsolutions.biz; spf=pass smtp.mailfrom=oldschoolsolutions.biz; dkim=pass (2048-bit key) header.d=oldschoolsolutions.biz header.i=jens.glathe@oldschoolsolutions.biz header.b=U40jpFcQ; arc=none smtp.client-ip=212.227.126.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=oldschoolsolutions.biz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oldschoolsolutions.biz
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="Hu21LAt6"
-Received: from pps.filterd (m0279872.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4AF248hL002666
-	for <linux-bluetooth@vger.kernel.org>; Fri, 15 Nov 2024 06:43:31 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:message-id
-	:mime-version:subject:to; s=qcppdkim1; bh=0BtBPgzlGfOZdGX70snLF3
-	A4xFf8iGw2rgVTnp9mCsA=; b=Hu21LAt6VAj/8yjVzePNn2oreK9qq5Z57XtISd
-	HCDyk1E1Vq4YkHmru0wXNx8q3J/7Xaru/LJ/8N7DztafKqsoTI/sCi0fQyLspB35
-	TehsCKoxWOgiPB8XgAPmsyqn1GXcpJIi4cuXPN5RIqUoc/NNlI6LygpXY3aeHhHg
-	M1Cz4RU9y5KHW2tosbSEbzemsyHdzXdPWr5AjwCWO+XTNI4+MeTFIoRGdushM+Ou
-	BBevgWsh3DG09m5ALE2Zqhy2RMyQzmp1crKdY17utDn1Py6QC+gdBy3oIbiLOibD
-	FqFqn9zd3ZAAvhQKAoEJL0yokrJ2zCv43biV+gZJui6/xonw==
-Received: from nalasppmta03.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 42ww6drjvs-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <linux-bluetooth@vger.kernel.org>; Fri, 15 Nov 2024 06:43:30 +0000 (GMT)
-Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
-	by NALASPPMTA03.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 4AF6hTWO024888
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <linux-bluetooth@vger.kernel.org>; Fri, 15 Nov 2024 06:43:29 GMT
-Received: from hu-dgangire-hyd.qualcomm.com (10.80.80.8) by
- nalasex01c.na.qualcomm.com (10.47.97.35) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.9; Thu, 14 Nov 2024 22:43:27 -0800
-From: <quic_dgangire@quicinc.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: <quic_mohamull@quicinc.com>, <quic_hbandi@quicinc.com>,
-        <quic_anubhavg@quicinc.com>
-Subject: [PATCH BlueZ v3] tools/obexctl: Add support for system/session bus
-Date: Fri, 15 Nov 2024 12:13:04 +0530
-Message-ID: <20241115064304.503655-1-quic_dgangire@quicinc.com>
-X-Mailer: git-send-email 2.34.1
+	dkim=pass (2048-bit key) header.d=oldschoolsolutions.biz header.i=jens.glathe@oldschoolsolutions.biz header.b="U40jpFcQ"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=oldschoolsolutions.biz; s=s1-ionos; t=1731654130; x=1732258930;
+	i=jens.glathe@oldschoolsolutions.biz;
+	bh=5tGM067wa+AlamSiUyUvtOdtPcUbA7Xj4tjlcN8ACzY=;
+	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:Subject:To:Cc:
+	 References:From:In-Reply-To:Content-Type:
+	 Content-Transfer-Encoding:cc:content-transfer-encoding:
+	 content-type:date:from:message-id:mime-version:reply-to:subject:
+	 to;
+	b=U40jpFcQkDmDy7VO+9uK1dBRbMvylijWgJQmVu/0DqXKrePCE3Hkw4n4VZd8xPQJ
+	 6ZuA6VzS0y2UuKK4wEQP/4oVjJFoNnJuKVx+GYbv0hZFkKTUk9yLFpx65gxAjhsqk
+	 wgVGN+MOD2Y00/1ECPB1PENhuVLVq9owgcV/Zczcxlf8I6qfssiKBFg6o5pUhWGgg
+	 q+EQPwaPYt/7RhsWfRthfQhHIhBaC05z2QMyea7Mq5ebx9oQ3GSlA6aJgts1vs+Gg
+	 bydnDYRiN9F9tg0MWjx0nesaaJMB56zAEUbthZCyalbX0QmWz6aIhKUZ002PSs7Jm
+	 IeoOWST4Dd3XT3vFDg==
+X-UI-Sender-Class: 55c96926-9e95-11ee-ae09-1f7a4046a0f6
+Received: from [192.168.0.174] ([91.64.229.215]) by mrelayeu.kundenserver.de
+ (mreue011 [212.227.15.167]) with ESMTPSA (Nemesis) id
+ 1MnaTt-1tbEnz3qC5-00dzeD; Fri, 15 Nov 2024 07:49:03 +0100
+Message-ID: <8d26f1f2-8d75-4dec-ae77-28e4cae81ab3@oldschoolsolutions.biz>
+Date: Fri, 15 Nov 2024 07:49:01 +0100
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nalasex01c.na.qualcomm.com (10.47.97.35)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: bh36uABw_99drM_k4NbuFyNElWWnzg34
-X-Proofpoint-GUID: bh36uABw_99drM_k4NbuFyNElWWnzg34
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
- definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501 mlxscore=0
- phishscore=0 malwarescore=0 lowpriorityscore=0 impostorscore=0
- suspectscore=0 clxscore=1015 adultscore=0 mlxlogscore=995 spamscore=0
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2409260000 definitions=main-2411150055
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH RFC] bluetooth: qca: generate nvm fw name from boardid for
+ WCN6855
+To: quic_zijuhu <quic_zijuhu@quicinc.com>,
+ Marcel Holtmann <marcel@holtmann.org>,
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Steev Klimaszewski <steev@kali.org>, Bjorn Andersson <bjorande@quicinc.com>
+References: <20241003-bt-nvm-firmware-v1-1-79028931214f@oldschoolsolutions.biz>
+ <8500baf7-59e4-4d8c-8485-3ef7aa106f16@quicinc.com>
+Content-Language: en-US
+From: Jens Glathe <jens.glathe@oldschoolsolutions.biz>
+In-Reply-To: <8500baf7-59e4-4d8c-8485-3ef7aa106f16@quicinc.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:POfjw7Ee0aU2xz7lJI3a/GQzJrRzifurxdY8BMePB2PZiBu1j0w
+ Ccg89dA5BmAXcFc2TRjTnIvWyU39/k0qaSXecRigNltvACYIMzLXaPs/RM4kGsQStGzDZu0
+ 4ycQkIURY+pzODHIMzoPm/LXUxV0orwagOqk8PI7RaZr6G6ifNAf3jrm1dPxMKd0lANMYu/
+ izCeNoTINn548QnMf/uAA==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:ed7+KrzYIys=;IdcJCvQvXnw/JnCBr4vd9ruLI7R
+ vHWNwSyKYZahVU/3+ltzESoZ6cNxajac3IRVEVf4iVyXRo1ttpXpRui0K+0lrKSBRN0wCIHUu
+ PeyklkO7d1S6buOLjsgkpC9qivP/Ox2sQpeb7vYzUD1TCao66mgcI+cc5u24H5zzuk/0ZBhi8
+ YyK3VJV+bFaIgLRhHiXVkqVHhnHO3PbmDTcHhDVtj9ObgNb8+B5Wf6FHVhmP7Spz8xE53X152
+ XA2TmxM1opdiFkGi+HbiZShCz5i2pBIT8bloGNXgSC+lVpzeOBz+Kablwb1uuIDCNMnfSA5Zt
+ IiAVN/hqgCXGE97G3qG+gJWZBEifOLqyRZg1+FIIYEY9zZFOw+12EFGgnoism7IAjt/QzJP9x
+ B5Co5ViAgxAOE98jmPb5lFSve9TncUDCu6wdmJjHX/yikr75T4WdizmZFnzS3UBTvzgD3VJPK
+ QuyqOlYFErAorpQ39MieX07jF5SfFZSRsTGU2Pkesn7fkSPw5Ai17j9m/cYq0Vy5PiLSsLhpr
+ zLRO87Q5P8PCc4sjvZUq1u+KGQNmbnjFNcW+3D+jE95A3GcRobj9JfU3lLdSsdJyfl5KQ1QKZ
+ 98y/S1mS5+lEl3FTohwI/NZxQ0BfKsMEHiyRve78HreZ8H2z4KLFZ8Pq0z9EzyoURsFQiG8Nt
+ iKlI5appWnBsuILNdCL0kwvDkRixppZHxtkXCbgut1U/dBrg6canXxeICx2GNCEECxKJ01Roq
+ oJcchHLbqBPzS9VFkIpktWKWJi5seTp8Z/SnML+Ses9Xq7cEw9AdsSWALLYPQQdD2/y9JvvuH
+ ugk/1weUxksGNjaa2xDxuGsnGWsJWsXkUiWmhkcsz7JSJhsGXBx9mcy90/aiuXdT9M
 
-From: Damodar Reddy GangiReddy <quic_dgangire@quicinc.com>
+On 14.11.24 07:17, quic_zijuhu wrote:
+> On 10/4/2024 3:21 AM, Jens Glathe wrote:
+> why not to refer to existing qca_get_nvm_name_generic().
+>
+> i will post a patch and cc you.
+>
+Hi Ziju,
 
-Currently obexctl only uses session bus.
-As obexd has been enabled support for both session and system bus.
-Configuring obexctl to use session/system bus during the runtime
-if the name is available over session or system bus.
+tested the patch [1] and works nicely. It is the cleaner solution
+(having dedicated fw name generator functions) than the one I proposed.
+Future-proof.
 
----
- tools/obexctl.c | 45 ++++++++++++++++++++++++++++++++++++++++-----
- 1 file changed, 40 insertions(+), 5 deletions(-)
+with best regards
 
-diff --git a/tools/obexctl.c b/tools/obexctl.c
-index a398b095b..95350358c 100644
---- a/tools/obexctl.c
-+++ b/tools/obexctl.c
-@@ -43,8 +43,10 @@
- #define OBEX_PBAP_INTERFACE "org.bluez.obex.PhonebookAccess1"
- #define OBEX_MAP_INTERFACE "org.bluez.obex.MessageAccess1"
- #define OBEX_MSG_INTERFACE "org.bluez.obex.Message1"
-+#define OBEXD_SERVICE  "org.bluez.obex"
- 
--static DBusConnection *dbus_conn;
-+static DBusConnection *dbus_session_conn;
-+static DBusConnection *dbus_system_conn;
- static GDBusProxy *default_session;
- static GList *sessions = NULL;
- static GList *opps = NULL;
-@@ -2149,6 +2151,22 @@ static void property_changed(GDBusProxy *proxy, const char *name,
- 		session_property_changed(proxy, name, iter);
- }
- 
-+static bool check_obexd_service(DBusConnection *conn)
-+{
-+	DBusError err;
-+
-+	dbus_error_init(&err);
-+
-+	bool has_owner = dbus_bus_name_has_owner(conn, OBEXD_SERVICE, &err);
-+
-+	if (dbus_error_is_set(&err)) {
-+		fprintf(stderr, "D-Bus Error: %s\n", err.message);
-+		dbus_error_free(&err);
-+	}
-+
-+	return has_owner;
-+}
-+
- int main(int argc, char *argv[])
- {
- 	GDBusClient *client;
-@@ -2158,10 +2176,23 @@ int main(int argc, char *argv[])
- 	bt_shell_set_menu(&main_menu);
- 	bt_shell_set_prompt(PROMPT, NULL);
- 
--	dbus_conn = g_dbus_setup_bus(DBUS_BUS_SESSION, NULL, NULL);
-+	bool session_bus_active = false;
-+	bool system_bus_active = false;
-+
-+	dbus_session_conn = g_dbus_setup_bus(DBUS_BUS_SESSION, NULL, NULL);
-+	if (dbus_session_conn)
-+		session_bus_active = check_obexd_service(dbus_session_conn);
- 
--	client = g_dbus_client_new(dbus_conn, "org.bluez.obex",
--							"/org/bluez/obex");
-+	dbus_system_conn = g_dbus_setup_bus(DBUS_BUS_SYSTEM, NULL, NULL);
-+	if (dbus_system_conn)
-+		system_bus_active = check_obexd_service(dbus_system_conn);
-+
-+	if (session_bus_active)
-+		client = g_dbus_client_new(dbus_session_conn, OBEXD_SERVICE,
-+								"/org/bluez/obex");
-+	else if (system_bus_active)
-+		client = g_dbus_client_new(dbus_system_conn, OBEXD_SERVICE,
-+								"/org/bluez/obex");
- 
- 	g_dbus_client_set_connect_watch(client, connect_handler, NULL);
- 	g_dbus_client_set_disconnect_watch(client, disconnect_handler, NULL);
-@@ -2173,7 +2204,11 @@ int main(int argc, char *argv[])
- 
- 	g_dbus_client_unref(client);
- 
--	dbus_connection_unref(dbus_conn);
-+	if (dbus_session_conn)
-+		dbus_connection_unref(dbus_session_conn);
-+
-+	if (dbus_system_conn)
-+		dbus_connection_unref(dbus_system_conn);
- 
- 	return status;
- }
--- 
-2.34.1
+Jens
+
+[1]
+https://lore.kernel.org/all/20241113-x13s_wcn6855_fix-v1-1-15af0aa2549c@qu=
+icinc.com/
 
