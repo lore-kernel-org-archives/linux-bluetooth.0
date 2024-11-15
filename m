@@ -1,188 +1,219 @@
-Received: from mail-lj1-f180.google.com (mail-lj1-f180.google.com [209.85.208.180])
+Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F7C21D5158
-	for <linux-bluetooth@vger.kernel.org>; Fri, 15 Nov 2024 16:42:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68CB31D63FB;
+	Fri, 15 Nov 2024 17:56:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731688934; cv=none; b=IDL+kK3La8h0vDgT8A9fyLpY4j9YI5x3NiE+DkpXDKjO/aTVMLL5kosy2qshMJtzq6cSx6kV4k+prjks+FE74OSpOLnrTYvVf8ZOEFtqx0o0e3cQd4pndfr98rXwOJYiMVqrezxFgcONx3SPJOwBKuTiWx7rDCi7mArftnej7Fs=
+	t=1731693418; cv=none; b=D/9ql+Y+vZs33uDp2ga7jVn1qOLuEyR462S6sYvXEriLmEFaxLqG+HcFRI+JcvY6tMKInYI1Ws9uGl2DTjkvS/rofIlJauv8G7DUUesROkaPuavDlstdxYUB9VwcNk3OapAw585i435weCTDsK6ceAOTjLJD2NuZ/YCx3DelZVQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731688934; c=relaxed/simple;
-	bh=FFrMLawfAsjZms4r/DV2EroqE4AUfP6dw10+4NvmhNA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ZoDm4L4Ww89XRbSbvBUQlMvMA7sYIfTErVCJcCza5aV3XbWD+WU+BosBSGsFQUNdnN+DyoHsQ8eBVbV5ae+AKlTql0V2IxNQiFmYwvMjedTi3mGEw2scKIuG0l902r/TPe+jDVFibukLgTJul0Uf5/moW9kyl1uMfLqTLW8IfSU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IXC30ah+; arc=none smtp.client-ip=209.85.208.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+	s=arc-20240116; t=1731693418; c=relaxed/simple;
+	bh=8G1eQwpfLzzrbWLE731gSlaI/3BoTdKQ9z7j3rLVNJk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=nXEGOdM0S3sNlTJHAeS62Dz7P5Y9CRjgNCETvUxQ0LdK77IqIJ+AJv4shG6SkMok8nuBE//aWH4s2SwIR0IY8tdLuB0yKyS33XLLzTA62FtLFk8HNhFMco8Ql+kqL5jBGZjBSYAiiMBwdktDWbv2qkdS7bbF+SzyuIZUm3Yt+hM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IBjDCOGx; arc=none smtp.client-ip=209.85.208.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IXC30ah+"
-Received: by mail-lj1-f180.google.com with SMTP id 38308e7fff4ca-2fb50e84ec7so16615311fa.1
-        for <linux-bluetooth@vger.kernel.org>; Fri, 15 Nov 2024 08:42:12 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IBjDCOGx"
+Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-5cf8ef104a8so1424560a12.2;
+        Fri, 15 Nov 2024 09:56:56 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1731688930; x=1732293730; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=cKtgeZL0lI9SBbjAgSXnzBUljs3N5w5ZflMC60zo8c0=;
-        b=IXC30ah+SeqfeCKV9MfZxjY28VNOoeJR0uCwB05SSckpjNEnypR/Ds13NwP8voAHKr
-         fgYG8A/zTexxfuu8kWTWKQ8+fyXMK6DnO6J44yS471odGObs4kOXkPbxPJTRMY4g/2vl
-         NwmDfQ+EWryGBBMFdGa8NYhcjIXcIdWeHkVtxt0bSqV8y8lF/9HgTtbigXoW/fFETU8Q
-         /WCzsncFqDurYDx8/3ElQGpRlcC7Y6VP0YIhwMVXrr1xu5OcGcDkSB8adL9CqDnPoXbX
-         u5AU/XoHFWnzuwlHIu6EthgkALT1e886fEfyJutNZ5D9l594rm6aZ137Vo94uzzlFUv7
-         TyGA==
+        d=gmail.com; s=20230601; t=1731693414; x=1732298214; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:sender
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=yszZ/13xovLyV8+6Bm3HMI1O+tb18eMjfobAQVjAREg=;
+        b=IBjDCOGxQHiVNivBpHA0QCdBEu5/drI9ZeiqUo1sjCOopJcI2mmg8Re3axrcz0GRS5
+         GBlHxLf5J6zq2VYd/Y8z+WLqYd1G78L2XJU5iDELliF5StPi3fVfeqet2n7YiW94Fr0o
+         /FAQhYr7cc+PiE+9L30lJu0ARMi7oGNl075S5SYbWee1rzbRY7/87CCctbw6i8xspODM
+         qeKJ5tzTA5HgAVer61xZb0TOgWhUQX7cSH30M1XM4qaavj2JyovN+B2MgOT7PN3w8djm
+         L7A2fieVPeVAESa1F3nKYD508PINpMZy4DCkdPHHQqzbekORwqRGoFrsTgdF/r1DyPUp
+         POJA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731688930; x=1732293730;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=cKtgeZL0lI9SBbjAgSXnzBUljs3N5w5ZflMC60zo8c0=;
-        b=S9d8lO1oxlbYXCz+e6zCCW9p3uxpPx6AdxpFQQ1K3nXnuFH8Qe1iBAaqZD1mBiaWTj
-         3yKujfC+VF8Su9SEhoYDKlloeDpwdQrxO6k2UYayBUUcQghjfqe3YV+yBg06CYi2Ri6W
-         wOA+x4nin01w2eZ/BvuuXm90CM/sDgkddiIFT85DKx82JHCKNj6TEQwS8K1cDcyq8iXy
-         a0gWkZDoV9KPqT8UyIAyq6Mi/CFVc0x+N/cT9hFz12/Lmved/ZQKqlBfnzv4dHBZptcX
-         927Tk8BCXwMPUdcrqUQwgu4gyN/tOeOFrOXJwb8Urrr2Iql/PV+H078DuvyG4E+yqZMU
-         3R+A==
-X-Gm-Message-State: AOJu0YxZTz5e1ElzfIXKStbHtV6ctZ8ra23nJCzVMRxD1LHyYXltfbyS
-	Q7oIab7IR8Ta3jdmOnJxJAQaG4U8H0hJy9PkGg5Xkz2n5x/DEnY7+mOpUupCivjQXehI4lPoCsK
-	/mit00obDBBWnE3zjyr6BcEiSd8zDcsSv
-X-Google-Smtp-Source: AGHT+IEdfU4iWGnvIGiYFkABAK9ZRemxdZ8TB7vsi3ZnuWeL0r0qs9Sm90sO8Wj47f9IemhkA4YPFAzDLgWXDfSguj8=
-X-Received: by 2002:a05:651c:245:b0:2fb:4f2e:5be7 with SMTP id
- 38308e7fff4ca-2ff6096b5cbmr21281981fa.24.1731688929451; Fri, 15 Nov 2024
- 08:42:09 -0800 (PST)
+        d=1e100.net; s=20230601; t=1731693414; x=1732298214;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:sender
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=yszZ/13xovLyV8+6Bm3HMI1O+tb18eMjfobAQVjAREg=;
+        b=KTLfwrrM8dtsZHDbBBeySv97tCSxwxL3GQOYQbvqoCF6h7C9buDHXoqFLMvzdgBJ3w
+         PwSKnszi45/YaG7G3Eajuq9ustwf9mt1j/NZVFIa6GZEusnbjA/qdL8JGpzXBkEJBtSF
+         I8FAANeNSq83weZKPTGAwDQgum1vc1PZ0uXq5oDiDRFDxuIMZ4gKFK3UdwKl3wQjfd/y
+         Qbtw02CPnUkTc5146/InEcGPlRrGhvsDyNCES8J3pz9o8wyeqGWJQrySFRrXHIZ+ZGyb
+         1p3FiLqiS5APhR4P/Kn1E98io6yy9XNEx2MdeyZ/x2DxtdXh0AvLXfiHFI/deHIq41el
+         8mkA==
+X-Forwarded-Encrypted: i=1; AJvYcCVZi3CY3Sd5KEZed72ujDCS2Z4o2I4Y2w43EEis3wub1WRaERiV4CdCcVVJ6/inDzyV6trX7Vy/@vger.kernel.org, AJvYcCXmBXmdn6LYZaAdAZQEzL7agEnmosV6F8mjz4W8MRfxyleW8OalY8Oe23JAhianHQDTCXmMvt9yzmckegHpFYM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwzKt1oMdfu/6/uyBd5XCJVCJTo2/Zf67d4il9oqia6+lCFBG+k
+	hJjuATSFREM/spRwpr7+WxJGiKiyPpOWG89gdrkX+8LnIH4miLlY
+X-Google-Smtp-Source: AGHT+IEfFnEwON+HSzkjwOoBuLCF6zULusBXwx1m/nRkf/7DvatVsNMnOVXjMlCBXNRhwhP6OcMSug==
+X-Received: by 2002:a05:6402:280d:b0:5cf:479a:d8a0 with SMTP id 4fb4d7f45d1cf-5cf8fd2faa8mr2727792a12.26.1731693414322;
+        Fri, 15 Nov 2024 09:56:54 -0800 (PST)
+Received: from eldamar.lan (c-82-192-242-114.customer.ggaweb.ch. [82.192.242.114])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5cf9566be44sm538792a12.40.2024.11.15.09.56.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 15 Nov 2024 09:56:53 -0800 (PST)
+Sender: Salvatore Bonaccorso <salvatore.bonaccorso@gmail.com>
+Received: by eldamar.lan (Postfix, from userid 1000)
+	id 227FABE2EE7; Fri, 15 Nov 2024 18:56:52 +0100 (CET)
+Date: Fri, 15 Nov 2024 18:56:52 +0100
+From: Salvatore Bonaccorso <carnil@debian.org>
+To: Greg KH <gregkh@linuxfoundation.org>
+Cc: Thorsten Leemhuis <regressions@leemhuis.info>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Mike <user.service2016@gmail.com>,
+	"stable@vger.kernel.org" <stable@vger.kernel.org>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	linux-bluetooth@vger.kernel.org,
+	Paul Menzel <pmenzel@molgen.mpg.de>,
+	Sasha Levin <sashal@kernel.org>,
+	Jeremy =?iso-8859-1?Q?Lain=E9?= <jeremy.laine@m4x.org>,
+	Linux regressions mailing list <regressions@lists.linux.dev>
+Subject: Re: Bluetooth kernel BUG with Intel AX211 (regression in 6.1.83)
+Message-ID: <ZzeLZHFWYCT6C8VI@eldamar.lan>
+References: <ab5e25d8-3381-452e-ad13-5d65c0e12306@leemhuis.info>
+ <CABBYNZKQAJGzA8th8A7Foiy7YaSFZDpLvLZqDFsVJ3Yzn8C_5g@mail.gmail.com>
+ <Zypwz65wRM-FMXte@eldamar.lan>
+ <2024110652-blooming-deck-f0d9@gregkh>
+ <Zysdc3wJy0jAYHzA@eldamar.lan>
+ <CABBYNZKz_5bnBxrBC3SoaGc1MTXXYsgdOXB42B0x+2dcPRkJyw@mail.gmail.com>
+ <2024110703-subsoil-jasmine-fcaa@gregkh>
+ <4f8542be-5175-4cf1-9c39-1809a899601c@leemhuis.info>
+ <2024111225-regulate-ruckus-1a46@gregkh>
+ <2024111358-catching-unclog-31f3@gregkh>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241115155941.2118683-1-luiz.dentz@gmail.com>
-In-Reply-To: <20241115155941.2118683-1-luiz.dentz@gmail.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Fri, 15 Nov 2024 11:41:57 -0500
-Message-ID: <CABBYNZLatZOTP3B68PPdm0E7y-t4qAzCDmaB8vxKZu-o3ncmgQ@mail.gmail.com>
-Subject: Re: [PATCH v1] Bluetooth: MGMT: Fix slab-use-after-free Read in set_powered_sync
-To: linux-bluetooth@vger.kernel.org
-Cc: syzbot <syzbot+03d6270b6425df1605bf@syzkaller.appspotmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <2024111358-catching-unclog-31f3@gregkh>
 
-#syz test
+Hi Greg,
 
-On Fri, Nov 15, 2024 at 10:59=E2=80=AFAM Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
->
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->
-> This fixes the following crash:
->
-> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> BUG: KASAN: slab-use-after-free in set_powered_sync+0x3a/0xc0 net/bluetoo=
-th/mgmt.c:1353
-> Read of size 8 at addr ffff888029b4dd18 by task kworker/u9:0/54
->
-> CPU: 1 UID: 0 PID: 54 Comm: kworker/u9:0 Not tainted 6.11.0-rc6-syzkaller=
--01155-gf723224742fc #0
-> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS G=
-oogle 08/06/2024
-> Workqueue: hci0 hci_cmd_sync_work
-> Call Trace:
->  <TASK>
->  __dump_stack lib/dump_stack.c:93 [inline]
->  dump_stack_lvl+0x241/0x360 lib/dump_stack.c:119
->  print_address_description mm/kasan/report.c:377 [inline]
->  print_report+0x169/0x550 mm/kasan/report.c:488
-> q kasan_report+0x143/0x180 mm/kasan/report.c:601
->  set_powered_sync+0x3a/0xc0 net/bluetooth/mgmt.c:1353
->  hci_cmd_sync_work+0x22b/0x400 net/bluetooth/hci_sync.c:328
->  process_one_work kernel/workqueue.c:3231 [inline]
->  process_scheduled_works+0xa2c/0x1830 kernel/workqueue.c:3312
->  worker_thread+0x86d/0xd10 kernel/workqueue.c:3389
->  kthread+0x2f0/0x390 kernel/kthread.c:389
->  ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
->  ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
->  </TASK>
->
-> Allocated by task 5247:
->  kasan_save_stack mm/kasan/common.c:47 [inline]
->  kasan_save_track+0x3f/0x80 mm/kasan/common.c:68
->  poison_kmalloc_redzone mm/kasan/common.c:370 [inline]
->  __kasan_kmalloc+0x98/0xb0 mm/kasan/common.c:387
->  kasan_kmalloc include/linux/kasan.h:211 [inline]
->  __kmalloc_cache_noprof+0x19c/0x2c0 mm/slub.c:4193
->  kmalloc_noprof include/linux/slab.h:681 [inline]
->  kzalloc_noprof include/linux/slab.h:807 [inline]
->  mgmt_pending_new+0x65/0x250 net/bluetooth/mgmt_util.c:269
->  mgmt_pending_add+0x36/0x120 net/bluetooth/mgmt_util.c:296
->  set_powered+0x3cd/0x5e0 net/bluetooth/mgmt.c:1394
->  hci_mgmt_cmd+0xc47/0x11d0 net/bluetooth/hci_sock.c:1712
->  hci_sock_sendmsg+0x7b8/0x11c0 net/bluetooth/hci_sock.c:1832
->  sock_sendmsg_nosec net/socket.c:730 [inline]
->  __sock_sendmsg+0x221/0x270 net/socket.c:745
->  sock_write_iter+0x2dd/0x400 net/socket.c:1160
->  new_sync_write fs/read_write.c:497 [inline]
->  vfs_write+0xa72/0xc90 fs/read_write.c:590
->  ksys_write+0x1a0/0x2c0 fs/read_write.c:643
->  do_syscall_x64 arch/x86/entry/common.c:52 [inline]
->  do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
->  entry_SYSCALL_64_after_hwframe+0x77/0x7f
->
-> Freed by task 5246:
->  kasan_save_stack mm/kasan/common.c:47 [inline]
->  kasan_save_track+0x3f/0x80 mm/kasan/common.c:68
->  kasan_save_free_info+0x40/0x50 mm/kasan/generic.c:579
->  poison_slab_object+0xe0/0x150 mm/kasan/common.c:240
->  __kasan_slab_free+0x37/0x60 mm/kasan/common.c:256
->  kasan_slab_free include/linux/kasan.h:184 [inline]
->  slab_free_hook mm/slub.c:2256 [inline]
->  slab_free mm/slub.c:4477 [inline]
->  kfree+0x149/0x360 mm/slub.c:4598
->  settings_rsp+0x2bc/0x390 net/bluetooth/mgmt.c:1443
->  mgmt_pending_foreach+0xd1/0x130 net/bluetooth/mgmt_util.c:259
->  __mgmt_power_off+0x112/0x420 net/bluetooth/mgmt.c:9455
->  hci_dev_close_sync+0x665/0x11a0 net/bluetooth/hci_sync.c:5191
->  hci_dev_do_close net/bluetooth/hci_core.c:483 [inline]
->  hci_dev_close+0x112/0x210 net/bluetooth/hci_core.c:508
->  sock_do_ioctl+0x158/0x460 net/socket.c:1222
->  sock_ioctl+0x629/0x8e0 net/socket.c:1341
->  vfs_ioctl fs/ioctl.c:51 [inline]
->  __do_sys_ioctl fs/ioctl.c:907 [inline]
->  __se_sys_ioctl+0xfc/0x170 fs/ioctl.c:893
->  do_syscall_x64 arch/x86/entry/common.c:52 [inline]
->  do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83gv
->  entry_SYSCALL_64_after_hwframe+0x77/0x7f
->
-> Reported-by: syzbot+03d6270b6425df1605bf@syzkaller.appspotmail.com
-> Closes: https://syzkaller.appspot.com/bug?extid=3D03d6270b6425df1605bf
-> Fixes: 275f3f648702 ("Bluetooth: Fix not checking MGMT cmd pending queue"=
-)
-> Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> ---
->  net/bluetooth/mgmt.c | 4 ++++
->  1 file changed, 4 insertions(+)
->
-> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-> index 1f6d083682b8..6a26c1ea0d04 100644
-> --- a/net/bluetooth/mgmt.c
-> +++ b/net/bluetooth/mgmt.c
-> @@ -1441,6 +1441,10 @@ static void settings_rsp(struct mgmt_pending_cmd *=
-cmd, void *data)
->                 sock_hold(match->sk);
->         }
->
-> +       /* dequeue cmd_sync entries using cmd as data as that is about to=
- be
-> +        * removed/freed.
-> +        */
-> +       hci_cmd_sync_dequeue(match->hdev, NULL, cmd, NULL);
->         mgmt_pending_free(cmd);
->  }
->
-> --
-> 2.47.0
->
+On Wed, Nov 13, 2024 at 04:10:23PM +0100, Greg KH wrote:
+> On Tue, Nov 12, 2024 at 01:04:03PM +0100, Greg KH wrote:
+> > On Tue, Nov 12, 2024 at 12:54:46PM +0100, Thorsten Leemhuis wrote:
+> > > On 07.11.24 05:38, Greg KH wrote:
+> > > > On Wed, Nov 06, 2024 at 10:02:40AM -0500, Luiz Augusto von Dentz wrote:
+> > > >> On Wed, Nov 6, 2024 at 2:40 AM Salvatore Bonaccorso <carnil@debian.org> wrote:
+> > > >>> On Wed, Nov 06, 2024 at 08:26:05AM +0100, Greg KH wrote:
+> > > >>>> On Tue, Nov 05, 2024 at 08:23:59PM +0100, Salvatore Bonaccorso wrote:
+> > > >>>>> On Tue, Nov 05, 2024 at 12:53:50PM -0500, Luiz Augusto von Dentz wrote:
+> > > >>>>>> On Tue, Nov 5, 2024 at 12:29 PM Thorsten Leemhuis
+> > > >>>>>> <regressions@leemhuis.info> wrote:
+> > > >>>>>>> On 31.10.24 07:33, Salvatore Bonaccorso wrote:
+> > > >>>>>>>> On Tue, Jun 18, 2024 at 12:30:18PM +0200, Thorsten Leemhuis wrote:
+> > > >>>>>>>>> On 12.06.24 14:04, Greg KH wrote:
+> > > >>>>>>>>>> On Thu, Jun 06, 2024 at 12:18:18PM +0200, Thorsten Leemhuis wrote:
+> > > >>>>>>>>>>> On 03.06.24 22:03, Mike wrote:
+> > > >>>>>>>>>>>> On 29.05.24 11:06, Thorsten Leemhuis wrote:
+> > > >>>>>>>>>>>> [...]
+> > > >>>>>>>>>>>> I understand that 6.9-rc5[1] worked fine, but I guess it will take some
+> > > >>>>>>>>>>>> time to be
+> > > >>>>>>>>>>>> included in Debian stable, so having a patch for 6.1.x will be much
+> > > >>>>>>>>>>>> appreciated.
+> > > >>>>>>>>>>>> I do not have the time to follow the vanilla (latest) release as is
+> > > >>>>>>>>>>>> likely the case for
+> > > >>>>>>>>>>>> many other Linux users.
+> > > >>>>>>>>>>>>
+> > > >>>>>>>>>>> Still no reaction from the bluetooth developers. Guess they are busy
+> > > >>>>>>>>>>> and/or do not care about 6.1.y. In that case:
+> > > >>>>>>>>>>>
+> > > >>>>>>>>>>> @Greg: do you might have an idea how the 6.1.y commit a13f316e90fdb1
+> > > >>>>>>>>>>> ("Bluetooth: hci_conn: Consolidate code for aborting connections") might
+> > > >>>>>>>>>>> cause this or if it's missing some per-requisite? If not I wonder if
+> > > >>>>>>>>>>> reverting that patch from 6.1.y might be the best move to resolve this
+> > > >>>>>>>>>>> regression. Mike earlier in
+> > > >>>>>>>>>>> https://lore.kernel.org/all/c947e600-e126-43ea-9530-0389206bef5e@gmail.com/
+> > > >>>>>>>>>>> confirmed that this fixed the problem in tests. Jeremy (who started the
+> > > >>>>>>>>>>> thread and afaics has the same problem) did not reply.
+> > > >>>>>>>>>>
+> > > >>>>>>>>>> How was this reverted?  I get a bunch of conflicts as this commit was
+> > > >>>>>>>>>> added as a dependency of a patch later in the series.
+> > > >>>>>>>>>>
+> > > >>>>>>>>>> So if this wants to be reverted from 6.1.y, can someone send me the
+> > > >>>>>>>>>> revert that has been tested to work?
+> > > >>>>>>>>>
+> > > >>>>>>>>> Mike, can you help out here, as you apparently managed a revert earlier?
+> > > >>>>>>>>> Without you or someone else submitting a revert I fear this won't be
+> > > >>>>>>>>> resolved...
+> > > >>>>>>>>
+> > > >>>>>>>> Trying to reboostrap this, as people running 6.1.112 based kernel
+> > > >>>>>>>> seems still hitting the issue, but have not asked yet if it happens as
+> > > >>>>>>>> well for 6.114.
+> > > >>>>>>>>
+> > > >>>>>>>> https://bugs.debian.org/1086447
+> > > >>>>>>>>
+> > > >>>>>>>> Mike, since I guess you are still as well affected as well, does the
+> > > >>>>>>>> issue trigger on 6.1.114 for you and does reverting changes from
+> > > >>>>>>>> a13f316e90fdb1 still fix the issue? Can you send your
+> > > >>>>>>>> backport/changes?
+> > > >>>>>>>
+> > > >>>>>>> Hmmm, no reply. Is there maybe someone in that bug that could create and
+> > > >>>>>>> test a new revert to finally get this resolved upstream? Seem we
+> > > >>>>>>> otherwise are kinda stuck here.
+> > > >>>>>>
+> > > >>>>>> Looks like we didn't tag things like 5af1f84ed13a ("Bluetooth:
+> > > >>>>>> hci_sync: Fix UAF on hci_abort_conn_sync") and a239110ee8e0
+> > > >>>>>> ("Bluetooth: hci_sync: always check if connection is alive before
+> > > >>>>>> deleting") that are actually fixes to a13f316e90fdb1.
+> > > >>>>>
+> > > >>>>> Ah good I see :). None of those were yet applied to the 6.1.y series
+> > > >>>>> were the issue is still presend. Would you be up to provide the needed
+> > > >>>>> changes to the stable team?  That would be very much appreciated for
+> > > >>>>> those affected running the 6.1.y series.
+> > > >>>>
+> > > >>>> We would need backports for these as they do not apply cleanly :(
+> > > >>>
+> > > >>> Looks our mails overlapped, yes came to the same conclusion as I tried
+> > > >>> to apply them on top of 6.1.y. I hope Luiz can help here.
+> > > >>>
+> > > >>> We have defintively users in Debian affected by this, and two
+> > > >>> confirmed that using a newer kernel which contains naturally those
+> > > >>> fixes do not expose the problem. If we have backports I might be able
+> > > >>> to convice those affected users to test our 6.1.115-1 + patches to
+> > > >>> verify the issue is gone.
+> > > >>
+> > > >> Then perhaps it is easier to just revert that change?
+> > > > 
+> > > > Please send a revert then.
+> > > 
+> > > We afaics are kinda stuck here .
+> > > 
+> > > Seems Mike (who apparently had a local revert that worked) does not care
+> > > anymore.
+> > > 
+> > > It looks like Luiz does not care about 6.1.y either, which is fine, as
+> > > participation in stable is optional.
+> > > 
+> > > And looks like nobody else cares enough and has the skills to
+> > > prepare and submit a revert.
+> > > 
+> > > In the end the one that asked for the changes to be included in the
+> > > 6.1.y series thus submit one. Not sure who that is, though, a very quick
+> > > search on Lore gave no answer. :-/
+> > > 
+> > > There is also still the question "might a revert now cause another
+> > > regression for users of the 6.1.y series, as the change might improved
+> > > things for other users".
+> > > 
+> > > :-(
+> > 
+> > I care as this affects Debian, which is the largest user of Linux
+> > outside of Android.  I'll try to do a local version of the revert to
+> > unstick this...
+> 
+> Ok, I have a series of reverts that seems to build properly for 6.1.y
+> that I'll queue up after this round of stable releases goes out
+> tomorrrow to hopefully resolve this.
 
+Thanks. I have asked affected users which did report the issue in
+Debian if they can test the reverts (hope to get feedback in time
+before the actual 6.1.118 release).
 
---=20
-Luiz Augusto von Dentz
+Regards,
+Salvatore
