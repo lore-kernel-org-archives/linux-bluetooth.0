@@ -1,183 +1,126 @@
-Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mout.kundenserver.de (mout.kundenserver.de [212.227.126.187])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2030514A82
-	for <linux-bluetooth@vger.kernel.org>; Fri, 15 Nov 2024 07:17:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3416D183CC7;
+	Fri, 15 Nov 2024 07:27:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.126.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731655077; cv=none; b=qZCCxEQ46N7NcJ+6gqmIvhA6HHJNPp2l3PBz+Htkh5TYWkIjb6zM7ksGRp7LASidDzgYuOhFAKlfpKoH7ogcRaM1DSQigF89uTh1ufmIn6lrYzpLLYKLTGf5XODDLRCGjgB50jvvkKEr5o+i5aXj6BjO3MZ29wgFTjuhEbkFDQU=
+	t=1731655652; cv=none; b=mgJXYsatIzmKu+mwjZsh3UkJA76Gc07MY1T5C0fmrJ6A2M5z31zNgv8MYHTBXXUnENHSEOTmjtTyVCt6kXOS1GN5j5MHkrl/HBPefwjRe7X1BSH6/G7A2e+67ZCKZll+q53Y7GzzC1xgzuGE0SIW1XVsDFpKBlnlgAvH6oa5lnI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731655077; c=relaxed/simple;
-	bh=c0OikLP5KfrRTZUUlwM+WZ5rK7n22AmpV6gjQI3Stxs=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=oWR9py0gr1V6tQLKIvnx/7NjyXvklbodCXKZlhTqSgHg2ahAB/kRWEjA7LtzxzESDW2TIYobfYXzfggXgYwpEecwQ7K+I8UfaJi4UfsitY7cT/I9FvWutx95ejcopPDnSOdmvPYROqSIKnkChg4Ez9N/2d+QmnN/UqjMxpRo5Wo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=kali.org; spf=pass smtp.mailfrom=kali.org; dkim=pass (2048-bit key) header.d=kali.org header.i=@kali.org header.b=FQ66pPrH; arc=none smtp.client-ip=209.85.208.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=kali.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kali.org
+	s=arc-20240116; t=1731655652; c=relaxed/simple;
+	bh=Sa90FOF3ZCw78OsaCzV54IiZx5tvk9l7aqFRB3SmkUQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=EykTs0vntOBKOTv38HDTWOPbYrURYYVNgEwdqJ7yUG2zVfzaXs7sFVzrSNuOTts9F4IoGtfm6vu0GWRxxqBairE7U2ToOIWqHAvQD5GVlEyLqHGNj5HJvced0glbsUzvZuuj36xdprW9yDu/CMBeUfekc9iZXTmdgdqCtIeJdkM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=oldschoolsolutions.biz; spf=pass smtp.mailfrom=oldschoolsolutions.biz; dkim=pass (2048-bit key) header.d=oldschoolsolutions.biz header.i=jens.glathe@oldschoolsolutions.biz header.b=Q1e3Rx9K; arc=none smtp.client-ip=212.227.126.187
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=oldschoolsolutions.biz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oldschoolsolutions.biz
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kali.org header.i=@kali.org header.b="FQ66pPrH"
-Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-5cf872ecce7so1159292a12.1
-        for <linux-bluetooth@vger.kernel.org>; Thu, 14 Nov 2024 23:17:55 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=oldschoolsolutions.biz header.i=jens.glathe@oldschoolsolutions.biz header.b="Q1e3Rx9K"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kali.org; s=google; t=1731655074; x=1732259874; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=fqPkE9Jgflda7qvILTY5c7eIVr7knIqXFVoTmH6bIGo=;
-        b=FQ66pPrHWmpGeyr/Jnv/loFmRfH6pI+YHPqqNe45MBW8whl/eHgp7K+UdvPnd51GUX
-         Z1PZgcgFPfRHw+qTmyfNaz/RW7k1sBoSD4PmAud47eAg+KII2+e42h4mKBEE4GYy3j3C
-         EJdcBtbZ5d+ZZ94J/A5ZJlGlkQYQO6nlEAbxnXtqoiI4cTyPi6e7pDUBTQFbpeuE/YjJ
-         Jize7HNwG+JwXfJPdY1Q3U9j5kR3rgxP7a0UdNvttme09sxdyuTb4gecTEhzNVJ3ZAMs
-         xupasiOs7QOi3A6rsBPG3/LblXXFfWSWz2wppu/aJK1KyUbxrYVvL2sCNUXG5d3gVgKA
-         XfRA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731655074; x=1732259874;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=fqPkE9Jgflda7qvILTY5c7eIVr7knIqXFVoTmH6bIGo=;
-        b=KFKSodwIdvXit+7j5TBXnqLY/t58ifZ0OQZ39n3yTiWFA15zBF5GM1oG3lwd0Q81t7
-         HhN9UKUvB0sfgavesOOwNuyWaGIzZstCOW7UfM4B1Hrb1x6fj8CsG/B9yXXLr8liNoGJ
-         1cRruOKPqCnuPRy7kKjEtNwL3Uk+8VRxV7Ngutf6t5JEIfmtCH+RPHhrAusgu3MP4O34
-         4A6Eu7XbFPZn1Gyj2EuQlsAipgSzJHGDA+nEZTIPFUIWnghL9/jYoSU4ST+TPFmOn62h
-         nztiCzteOGNvSt8Tps2Sk94nPj19zTdGnnqXucXygumtRhaWxV3UkHt81df1EdDnachM
-         9m1Q==
-X-Forwarded-Encrypted: i=1; AJvYcCXk5FkJ7LQ0EpQDMcYIjBdhZb0CRlYZahQIC7atQxaBsdn4tAqcAS8vEymLfpKCaNw8BiA0iNofSkWobcyBdO8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxOh5YSX1GXLq1EPRAC+zk1VmhsoQVyo6MGxbofnakGSX9Qa9tr
-	7HCE1q3rrbUMDmQLfU2WpfTprUXnaAtyqnS1BW9Y/8z+X5agaKLdrBg2JAkHqBHVwN2/hdkhNHr
-	wGiG6Tbsc28lWHwnA98+RlISE2kUvuaRMQ39imw==
-X-Google-Smtp-Source: AGHT+IHSdLSdda1MpRCy6eQDKdG2cEsNjhbCjStFwK3+8voLxnI7c2NWbDSJsVLzgJHVJAYHe/CAO2DGad6LzgaUYsY=
-X-Received: by 2002:a05:6402:3594:b0:5ce:dfee:7926 with SMTP id
- 4fb4d7f45d1cf-5cf8fceab7cmr1011083a12.24.1731655074282; Thu, 14 Nov 2024
- 23:17:54 -0800 (PST)
+	d=oldschoolsolutions.biz; s=s1-ionos; t=1731655648; x=1732260448;
+	i=jens.glathe@oldschoolsolutions.biz;
+	bh=Sa90FOF3ZCw78OsaCzV54IiZx5tvk9l7aqFRB3SmkUQ=;
+	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:Subject:To:Cc:
+	 References:From:In-Reply-To:Content-Type:
+	 Content-Transfer-Encoding:cc:content-transfer-encoding:
+	 content-type:date:from:message-id:mime-version:reply-to:subject:
+	 to;
+	b=Q1e3Rx9Kpp7Np1ZBlW8Uyx7NOTSmlC6vaA64lW5ldq/bmVyYR1NxUoDDQlQwzs4I
+	 dEHbZcIVEe0ev7EDBCSB1izrRYuHa6EvAIXK06EPjNHdOYdqGBvJcLXw7e4kwLdkV
+	 ftrss57TJNNJFaEZjUqkUOsjNMUkqLmNI7zLQi+Bo8ToGOaT3NC9+fHvAnax4YIoH
+	 xgpYyyzXm4A0sqzZaUKXstYBw0SJ+m1HAmH9MoPkjJw89CkouZim58Bb72g4BJIG4
+	 KC4lueLXWNsxGI0gIYdt6pHGkElINS+hUeXtsdllE+1LBrNXLexW484oOd5NbC8zz
+	 xyMvzrKFOb8lKUSBsA==
+X-UI-Sender-Class: 55c96926-9e95-11ee-ae09-1f7a4046a0f6
+Received: from [192.168.0.174] ([91.64.229.215]) by mrelayeu.kundenserver.de
+ (mreue009 [212.227.15.167]) with ESMTPSA (Nemesis) id
+ 1N17gw-1tvGN43tPO-00vjPP; Fri, 15 Nov 2024 08:13:57 +0100
+Message-ID: <4186566a-0aa5-4413-96df-fb1b7ebd9db2@oldschoolsolutions.biz>
+Date: Fri, 15 Nov 2024 08:13:55 +0100
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241113-x13s_wcn6855_fix-v1-1-15af0aa2549c@quicinc.com>
-In-Reply-To: <20241113-x13s_wcn6855_fix-v1-1-15af0aa2549c@quicinc.com>
-From: Steev Klimaszewski <steev@kali.org>
-Date: Fri, 15 Nov 2024 01:17:43 -0600
-Message-ID: <CAKXuJqg0SSLYW_XaY+vRGko33nR+Tt9BUcGaAvQt0QMAJjYzrw@mail.gmail.com>
+User-Agent: Mozilla Thunderbird
 Subject: Re: [PATCH] Bluetooth: qca: Support downloading board id specific NVM
  for WCN6855
-To: Zijun Hu <quic_zijuhu@quicinc.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
-	Zijun Hu <zijun_hu@icloud.com>, linux-bluetooth@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Bjorn Andersson <bjorande@quicinc.com>, 
-	"Aiqun Yu (Maria)" <quic_aiquny@quicinc.com>, Cheng Jiang <quic_chejiang@quicinc.com>, 
-	Johan Hovold <johan@kernel.org>, Jens Glathe <jens.glathe@oldschoolsolutions.biz>
-Content-Type: text/plain; charset="UTF-8"
+To: Paul Menzel <pmenzel@molgen.mpg.de>, Zijun Hu <quic_zijuhu@quicinc.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Zijun Hu
+ <zijun_hu@icloud.com>, linux-bluetooth@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Bjorn Andersson <bjorande@quicinc.com>,
+ Aiqun Yu <quic_aiquny@quicinc.com>, Cheng Jiang <quic_chejiang@quicinc.com>,
+ Johan Hovold <johan@kernel.org>, Steev Klimaszewski <steev@kali.org>
+References: <20241113-x13s_wcn6855_fix-v1-1-15af0aa2549c@quicinc.com>
+ <4d973d61-27be-4830-880a-a3d74c4bbbc7@molgen.mpg.de>
+Content-Language: en-US
+From: Jens Glathe <jens.glathe@oldschoolsolutions.biz>
+In-Reply-To: <4d973d61-27be-4830-880a-a3d74c4bbbc7@molgen.mpg.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:QDF4apY+T0AwDVjXuiNCoEElOEv+7nq3WiS9e1Fp3AABbpXrT9G
+ Z2r9/6StBxLD62oJpV2slEIQwyl3f6EULx9tsIj3flXbhiKShNooQFNg+n30M/zyc7bDnGm
+ 0JRDZyvXpWNRECY+I2/HGQ6ceh5ZNMi8Hue54miymrXpy+NqDBdHiuerZdL/8YD5/AzTgD3
+ rXS8WfxOOnfzb84iQ05sw==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:gCTczlT7cqc=;zWMK2h1h0R4eXYwxZ/1gW8gJF4n
+ G+FFA66si+X7oxppRLwT8p1IkMuKQWBNM6dsbjAeKDlhxeDUWXJEQgOKkeEv7pNIXWZ8neV20
+ vhanKMXxteoqvtLUGo+BYEGbYoFlYpLYcmoNj93sLw51CldF3qr49Pwg3FdirK+9L8+8xEMfK
+ 5B1YOM782XNRczBs/JD1QgP/d5tggDBIko82nLGxLhsA5jpAQRA4BB4ewuvmlYT6vNjvunbJ5
+ ePtMSABkFXu/FNDTXEm90z0pNQdAnr+uUkc2HF9IoZMAbSuiqSpf5iQViOUhiWH8t6BpILaAy
+ ZtwseP3jBYBwp9kyaY738VdS33VmeDqS5kn7V6XQDUUpM1q1bbi/Y7ElifR0o0ZAKQkud7qyk
+ vFi/Ro5Ymx2DDBIKiyDvMJJ0U5Gm/JkbKTsjyBnshHIMFz7UA8jue4zCedGxluHGkZA0pP3iS
+ /a6esTh05G7ZNQb4yJ9Vf8ebdQskdSB1diBvKGkDrjCOcAD0gcvSIZ/egJYppHXPxzZZ46r+K
+ VVj0vsX6QlO8EOTAbEcDh3LVdMs58Vdx22pyMiMo+gSjHAq/jUjR3/QkrhXRM5tjWCfZqOICn
+ wVQQS92zXcMrIKvoigaBQdzhotRGiKgU8K4oKTuRaLinWgZ8uAtM5/uHUCPHW6gZbmVYJAG+t
+ jXhikkn2QnxsLtT1zJ3aiuMb5RumCEIeHRanFmb7VT3Vr8aOyhVLdHcYJYOT1+E8xc4oqR8Or
+ 3QxLjO9iGYtFliSvCYtQXpZ6Co/xyDA2NUZJZkOSrsdfEuOlGtx4Hdskln5xOX6VhKmy7/DHf
+ jsDjW34URN+OUYACrWTXFJEMdWml85RlLbx8+FG0jT2GLMVXGJU9UUVKJONeXD66gh
 
-Hi Zijun,
+On 14.11.24 10:49, Paul Menzel wrote:
+> Dear Zijun,
+>
+>
+> Thank you for your patch.
+>
+> Am 14.11.24 um 07:26 schrieb Zijun Hu:
+>> Download board id specific NVM instead of default for WCN6855 if board
+>> id is available, and that is required by Lenovo ThinkPad X13s.
+>
+> Could you please start by describing the problem/motivation. What does
+> not work with the Lenovo ThinkPad X13s before your pacth.
+>
+> What is variant *g*?
+>
+> Maybe also describe the file naming convention in the commit message.
+>
+>
+Hi Paul,
 
-On Thu, Nov 14, 2024 at 12:27=E2=80=AFAM Zijun Hu <quic_zijuhu@quicinc.com>=
- wrote:
->
-> Download board id specific NVM instead of default for WCN6855 if board
-> id is available, and that is required by Lenovo ThinkPad X13s.
->
-> Cc: Bjorn Andersson <bjorande@quicinc.com>
-> Cc: Aiqun Yu (Maria) <quic_aiquny@quicinc.com>
-> Cc: Cheng Jiang <quic_chejiang@quicinc.com>
-> Cc: Johan Hovold <johan@kernel.org>
-> Cc: Jens Glathe <jens.glathe@oldschoolsolutions.biz>
-> Cc: Steev Klimaszewski <steev@kali.org>
-> Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
-> ---
->  drivers/bluetooth/btqca.c | 35 ++++++++++++++++++++++++++++++++---
->  1 file changed, 32 insertions(+), 3 deletions(-)
->
-> diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
-> index dfbbac92242a..4f8576cbbab9 100644
-> --- a/drivers/bluetooth/btqca.c
-> +++ b/drivers/bluetooth/btqca.c
-> @@ -717,6 +717,29 @@ static void qca_generate_hsp_nvm_name(char *fwname, =
-size_t max_size,
->                 snprintf(fwname, max_size, "qca/hpnv%02x%s.%x", rom_ver, =
-variant, bid);
->  }
->
-> +static void qca_get_hsp_nvm_name_generic(struct qca_fw_config *cfg,
-> +                                        struct qca_btsoc_version ver,
-> +                                        u8 rom_ver, u16 bid)
-> +{
-> +       const char *variant;
-> +
-> +       /* hsp gf chip */
-> +       if ((le32_to_cpu(ver.soc_id) & QCA_HSP_GF_SOC_MASK) =3D=3D QCA_HS=
-P_GF_SOC_ID)
-> +               variant =3D "g";
-> +       else
-> +               variant =3D "";
-> +
-> +       if (bid =3D=3D 0x0)
-> +               snprintf(cfg->fwname, sizeof(cfg->fwname), "qca/hpnv%02x%=
-s.bin",
-> +                        rom_ver, variant);
-> +       else if (bid & 0xff00)
-> +               snprintf(cfg->fwname, sizeof(cfg->fwname), "qca/hpnv%02x%=
-s.b%x",
-> +                        rom_ver, variant, bid);
-> +       else
-> +               snprintf(cfg->fwname, sizeof(cfg->fwname), "qca/hpnv%02x%=
-s.b%02x",
-> +                        rom_ver, variant, bid);
-> +}
-> +
->  static inline void qca_get_nvm_name_generic(struct qca_fw_config *cfg,
->                                             const char *stem, u8 rom_ver,=
- u16 bid)
->  {
-> @@ -810,8 +833,15 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t bau=
-drate,
->         /* Give the controller some time to get ready to receive the NVM =
-*/
->         msleep(10);
->
-> -       if (soc_type =3D=3D QCA_QCA2066 || soc_type =3D=3D QCA_WCN7850)
-> +       switch (soc_type) {
-> +       case QCA_QCA2066:
-> +       case QCA_WCN6855:
-> +       case QCA_WCN7850:
->                 qca_read_fw_board_id(hdev, &boardid);
-> +               break;
-> +       default:
-> +               break;
-> +       }
->
->         /* Download NVM configuration */
->         config.type =3D TLV_TYPE_NVM;
-> @@ -848,8 +878,7 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baud=
-rate,
->                                  "qca/msnv%02x.bin", rom_ver);
->                         break;
->                 case QCA_WCN6855:
-> -                       snprintf(config.fwname, sizeof(config.fwname),
-> -                                "qca/hpnv%02x.bin", rom_ver);
-> +                       qca_get_hsp_nvm_name_generic(&config, ver, rom_ve=
-r, boardid);
->                         break;
->                 case QCA_WCN7850:
->                         qca_get_nvm_name_generic(&config, "hmt", rom_ver,=
- boardid);
->
-> ---
-> base-commit: e88b020190bf5bc3e7ce5bd8003fc39b23cc95fe
-> change-id: 20241113-x13s_wcn6855_fix-53c573ff7878
->
-> Best regards,
-> --
-> Zijun Hu <quic_zijuhu@quicinc.com>
->
+Zijun was so kind to review my RFC patch [1] and post an alternate
+implementation. The problem is/was that the default firmware patch files
+for WCN6855 don't enable the possible quality and range that you get
+with board specific files, which are now [2] available in
+linux-firmware. It is not only the Lenovo Thinkpad X13s that is
+affected, it is quite a range of devices.
 
-Thank you for this, I'd had something similar written, so it's nice to
-see I was kind of on the right track!  I tested this on my Thinkpad
-X13s with an H2GO bluetooth Speaker and the range I can get is far
-greater when it properly loads the b8c file (with this patch), than
-with the .bin (without this patch).  Thanks again!
+The variant *g* is a SoC variant with some extended capabilities as it
+seems. The X13s doesn't have it, the Windows Dev Kit 2023 and the HP
+Omnibook X14 have it. I have no real information about what the
+difference is, but there is code in btqca.c to generate distinct
+firmware names.
 
-Tested-by: Steev Klimaszewski <steev@kali.org>
+with best regards
+
+Jens
+
+[1]
+https://lore.kernel.org/all/20241003-bt-nvm-firmware-v1-1-79028931214f@old=
+schoolsolutions.biz/
+
+[2]
+https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.gi=
+t/commit/qca?id=3D77a11ffc5a0aaaadc870793d02f6c6781ee9f598
+
