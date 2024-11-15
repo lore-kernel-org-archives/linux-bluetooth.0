@@ -1,46 +1,46 @@
-Received: from EUR02-DB5-obe.outbound.protection.outlook.com (mail-db5eur02on2040.outbound.protection.outlook.com [40.107.249.40])
+Received: from EUR03-VI1-obe.outbound.protection.outlook.com (mail-vi1eur03on2069.outbound.protection.outlook.com [40.107.103.69])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5AF61B395F
-	for <linux-bluetooth@vger.kernel.org>; Fri, 15 Nov 2024 10:38:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.249.40
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEA5918FDDB
+	for <linux-bluetooth@vger.kernel.org>; Fri, 15 Nov 2024 10:38:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.103.69
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731667126; cv=fail; b=VyZYzEanTkRW8nrMd0zpKLSn1nBr9hgIN2irklXv2ZtTtwo6O08l9PTAAF+uzGBgU3DUPQwNB0a53RdV4+tb6wRQyjGYFHiPS9TFZdGSzoCFbPCTHkKYIhxdgjq35SeWDbLATIFcRiLbA0f7Ih/zE9NBaJybtTNpCPK0jS2WV4Y=
+	t=1731667134; cv=fail; b=BSy0/w/pQSBMjEpfACALbd7DyFK6Fzx0beiIYHKmUDmNNbUOwTUbb662nAaR/F64tIEnX2Dwt8rjfL2yeTb4Ue9lO3t3kRA77vsrRcVtfR7V2O4VNu6P5bQJOUvgbeLwRH/RWXSiZLYJ3qTzLlrI54tb5RNtIMsUmiUOnvgvz6Y=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731667126; c=relaxed/simple;
-	bh=X2xniRXMkv+9g0J+1c0zuZqK7CNSU/MD+HHm0GgBMz4=;
+	s=arc-20240116; t=1731667134; c=relaxed/simple;
+	bh=6sfnvi2UZ0xRsZkgqHHQvSmz09FVKeSj1ApvrOnSEBU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=hFrlEmBpxbsVpwg9J4kO+dtRyEeOn0+FfVtEL0ngxvsJIqd7T29qoRfvVp/bc/e/j14Vp61XpVeSaZAYZfJFw/RwV/VGoKzV5PeTItVCgCEg7FNkAy4kLa00593jG9UK1VBAJVB/e3dI0NjBPv/F+7lY6egDLJMIa/l4IZMg6do=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=ANBi7pEm; arc=fail smtp.client-ip=40.107.249.40
+	 Content-Type:MIME-Version; b=Bq/WmdzlIa+kJMNaMuve7VchMoHl0WBvhdctjy/YksZZ0/+aauApcL+1GJn+yCObQacgbwisdoUxcRpCck5v9U0/kZPhu3FE3piE4Y81n1DbUZx1R9nlHK92Zwjh9+oehhbAu4sLOxYZmx61vhdCzJ/CQvgEHqSHyGHpvAlUv+o=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=jzK1CXnF; arc=fail smtp.client-ip=40.107.103.69
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="ANBi7pEm"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="jzK1CXnF"
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=gZi7deLh8eJOTCp02MjJzKlS5WZbyrZpBAsCbQM87EopOebydAxOO5zHme8P2JSuBurGIEKhzOkaDkx8SqSWCzLm+kCtprTwGGJl41Y+h66bCXJlq0apWKwcd5trSlhp/A2ybT/P/CyU24l2WyQkc4kQUg0aKA2cWZTm7gZO2vC2zt8uqa/XpXMmuwtCwn5mwcPZvWTfli4o2gHTRnvq+cGQPSFGGZCGHb7iS6TCGFmnP97436sovw7mwnoLy3IBzDrTOjoz/Tpbs/MA4VLAsGm5r8mh/cNiij+HhWENHwdf84Mjh6hWf1XqkhxYGwVSoMhn2QS6+PgIPQPtPjg/Aw==
+ b=bX0AhwgFpfXPAxCf9gVDJft7n7VeKtcZ3Xh5pPCN0Y9qvr4iNl6euQaFQt67I1gzhGQ1jwkIdJS+uwoV22X0/8wFjdPIs0peN600Aw13P7S5BbV2SAN4E3UC+rV1Uswbv7mDtyw/KYPx9hoiwCMU2YeAldiXXn5ofxpNrBcBOV+WZ/CsKGrqDtgn6NKuPw3Bs5sNvcFjfooTHjqKmF3FIyjzxkiEEAvtRkEGh3sP2KHkxR2xJr9oL7Dx/vFORfHtgg6viQFipI/3vLiOkKxzVfx8s3W+0klV88AUeQ5tDQ/o/sxeLSXLXV48+COzz22vNlC7nl4I0B9JI2agEclrEQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=mcrZJh1RhZ+GNE7Doep2ScydcWMjfplntHedbZn1P7Y=;
- b=M426Zi49ISB9xXCXo4/f87bHpjni43LNJ8NbEuFzTFvLzxChtWMGFkxRlEZoEalr5qp1UL52/TRzuWGwa6D24OQpA7jPpIa0+woTiJyl24wrLAQur5BIpzxs1QW7K7kmW2X7JPOIUFyzQimnBCv0LyGWSfG3HI2aAJAilRlREfi/l5ivGgxY2oOUSvJ/vDlWryrhYD7xQO8BjkNMjrbv5ROaLK1fSgN+ZFVfHzqpS5EIsOEaW7Zr5506U5zD2xo+zEaRyR04l786mbfm4ztPJa0Kloq1+ioe4E5JsmAVBS0C3j/28eZxoHeyOnpNxDIuL/kr371qkMXMMFOs8587jg==
+ bh=k4uugzXthhrM3auc+WFqqLF8g8zQF/FpSguKSElC1JU=;
+ b=vxmPTy+Bm7T0pqmpDRVB6JB0K0hTwUu7SO4yvNkOtIMe+k2Z05WO/Kw+B//CViQF07yoyjyJrNgUY0CaUHG2iV+U6QKmEsum+x6RccCqqeON3zvX4WGaV4PSAMDZqNO3bde38ODJuuQlKEj11P9LPMRcniBUNTOlK4Al/rHfIYlBq9AJB9Bt+rtH22vyDOg795xOcWL7Bq3xBTVUq9Tkjx2fJvfak1gRzWZLepN4Db0kkgoBWiA0auGI3hMzq8pYyojklmKgnEkNTX52FGX8+7OEJGzKloTu1i/x+Y5ZBsQrkF9f3N/VTY3HdddewZ+vrsq/SDEthHONgllPvq+LDQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
  header.d=nxp.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=mcrZJh1RhZ+GNE7Doep2ScydcWMjfplntHedbZn1P7Y=;
- b=ANBi7pEmDHL/4Y9TRX5a07eqQvNJWfRCBwo/X4/JdHJLjrlX91euoH4i8GoUEVX+cbg7sGUuskN9EQpq9MDUAvMla19AkkIxcPuMaSDMXWofLyDnupK/nnSZvFvRzmprCTAW977AG56aFFluhg9BbTnrH+oWG3iVatWAxW4yR7XvjQxMg8lEoyjTTlbIYjMoDhvp60Mmrv9rwFBoVr75/aEE8pU1RgwOF8djt7KXYfLt6bhQ34rrb3xs5KEH8cFmDG35CLzYippBxjJ7iaQNhcc0XF0lmtjQBaxZY/2dF9YxwXygFhUYpYcECeyCTp/vBuivttuRUZy03TCqkP1kDg==
+ bh=k4uugzXthhrM3auc+WFqqLF8g8zQF/FpSguKSElC1JU=;
+ b=jzK1CXnFQNKpwVOVcWAKraz27Tur+dcZkI47k70Mz0HWIYwRLQyQmvPuyvIC8xoKjNcpVxveTtvw4AN0TLJRHxVjtBVaHtqCVX6e/iz3w8loWT1mj2pEgWpNSyF9pigrA/E/v+jo1+MoHicCvzypg5NhjpADa7+0Dxm14xKhY+fvMQnwq5nE/zvk/ycxVQDqUwPmA7no/cBaNhI4eOy5yDs5ErvEqoFOfhTPpe3DGfD2pXPEM49wbS6aifX+5YOZtha5J2UwISJfmVzhfobyIhUEYH38T7ClD6t5pa9ECDfmsxB0tRAxe2OZREgeqrQmfaf+R0b2SysqNXYwfFVIjQ==
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=nxp.com;
 Received: from AS8PR04MB8898.eurprd04.prod.outlook.com (2603:10a6:20b:42d::15)
- by DU2PR04MB8776.eurprd04.prod.outlook.com (2603:10a6:10:2e3::5) with
+ by AM9PR04MB7714.eurprd04.prod.outlook.com (2603:10a6:20b:2dd::6) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8158.19; Fri, 15 Nov
- 2024 10:38:41 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8137.29; Fri, 15 Nov
+ 2024 10:38:44 +0000
 Received: from AS8PR04MB8898.eurprd04.prod.outlook.com
  ([fe80::5e22:869c:33c:9654]) by AS8PR04MB8898.eurprd04.prod.outlook.com
  ([fe80::5e22:869c:33c:9654%4]) with mapi id 15.20.8158.017; Fri, 15 Nov 2024
- 10:38:41 +0000
+ 10:38:44 +0000
 From: Iulia Tanasescu <iulia.tanasescu@nxp.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: claudia.rosu@nxp.com,
@@ -48,16 +48,16 @@ Cc: claudia.rosu@nxp.com,
 	andrei.istodorescu@nxp.com,
 	luiz.dentz@gmail.com,
 	Iulia Tanasescu <iulia.tanasescu@nxp.com>
-Subject: [PATCH BlueZ 3/6] bap: Add helpers to convert iso_qos to/from bap_qos
-Date: Fri, 15 Nov 2024 12:38:21 +0200
-Message-ID: <20241115103825.19761-4-iulia.tanasescu@nxp.com>
+Subject: [PATCH BlueZ 4/6] bass: Rework Scan Delegator to handle BAP streams
+Date: Fri, 15 Nov 2024 12:38:22 +0200
+Message-ID: <20241115103825.19761-5-iulia.tanasescu@nxp.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20241115103825.19761-1-iulia.tanasescu@nxp.com>
 References: <20241115103825.19761-1-iulia.tanasescu@nxp.com>
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: AS4P251CA0014.EURP251.PROD.OUTLOOK.COM
- (2603:10a6:20b:5d2::14) To AS8PR04MB8898.eurprd04.prod.outlook.com
+X-ClientProxiedBy: AS4P251CA0006.EURP251.PROD.OUTLOOK.COM
+ (2603:10a6:20b:5d2::15) To AS8PR04MB8898.eurprd04.prod.outlook.com
  (2603:10a6:20b:42d::15)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -66,219 +66,531 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AS8PR04MB8898:EE_|DU2PR04MB8776:EE_
-X-MS-Office365-Filtering-Correlation-Id: 231e932c-5d4c-484d-2db4-08dd0561ac23
+X-MS-TrafficTypeDiagnostic: AS8PR04MB8898:EE_|AM9PR04MB7714:EE_
+X-MS-Office365-Filtering-Correlation-Id: db17b700-eb63-4fb4-c0fc-08dd0561ad93
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|1800799024;
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|1800799024|366016;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?q3c6sYoabQa/BJ6PBp44EPAH8OTmiHjSvB8VZ5QkavuFjneMybAILFey5Ybh?=
- =?us-ascii?Q?zvVNKyJkOr8bUS3l09OJVyTkTL5fV9QmcsZlEFPXC1byJpQFq17B777+27PI?=
- =?us-ascii?Q?LYoG5Av9NM1PfsYFXNmObjZ7UCt2cOhrPzSj+KBLdG3VDRZGJKBu+WJdV1PB?=
- =?us-ascii?Q?mDIZhcnlXQfcDFKcckzVxMSH6SQi2KK1/jfbcP2T6lsYPP7zpf9zx8r4KnnX?=
- =?us-ascii?Q?F8/XRbeZd7ZHHTQ1zXXBrFlXpHIB97VwD//98pbrLTxLgjXBmU1d5uD5dAGm?=
- =?us-ascii?Q?aa3KBlOSvQ9GbSGdxPjc/AI9QAuvgtnXu2aivbIGg49UUK2FMGb5rba+hf5L?=
- =?us-ascii?Q?3V+0PBFnkkTt5JzFgweVa6vXE+M/RCehEtMu1NHGBB5w4C9y6xkM2DZ8Vsd/?=
- =?us-ascii?Q?/RLksC3f2I23vs/bu3Vs/xgkd7sHcpVRowhaLpXpaDrgtlZUOf2L+8HbgmZR?=
- =?us-ascii?Q?ZRPs+rgROTbEjx2jG+9Aujj9AgcfcKX0OotWt4WJorsnIT5bS8SUx1u3ReNp?=
- =?us-ascii?Q?NlI7sBzxEWn8P+3zI0uMxc2G6DM9ymvjco4efhskJIwOrwoONrSAvS6oz4x3?=
- =?us-ascii?Q?b76A4y8aDVSTS4V8gW2X02wJ0SpxbWKyi2LcEjHQWH8K5CbMKmVMxgKmrNEE?=
- =?us-ascii?Q?xTtEIiUMg36zXvN/Rdc0yGWadacgcxFeFUffdsI5jdDDr0I8zL4yip1le7dF?=
- =?us-ascii?Q?DRk7xjettGIZK9wivBuorqzwcEKlQMmc3BBUpzd4O5aBJQYJMnxIuX+TxLHF?=
- =?us-ascii?Q?+fPBf2wGy8A86B57m0xYVb+ZEHiEuIjWy6Ai7Fzj3NN0xrTNW8Zqz57JNXZC?=
- =?us-ascii?Q?WEnGmK15zaoJTJwnB6lkBBOjwkRuuXYLs3f2XVaanmfqf9gRwYQkKSnforXr?=
- =?us-ascii?Q?sIiK3WZSYBUoA+u2rJlDU1grrqW35kHD032WFAEToCsmHyJZAiozpwoNIZZx?=
- =?us-ascii?Q?9GFXBYdZpoIYzd8QpEuXxqzIc8iP8ufbkc3vneLsOuGm0PQM1Z45Qg+RFcGV?=
- =?us-ascii?Q?ZuKpqdymFiN4O45+9RYc/vZS6TYUMQkU9WG2Ggyhx3GOexld8bZVM+8ayRiS?=
- =?us-ascii?Q?APe+zxMhMys5jZcaB9L208/BAYIE1D9c20V2B2Yxtx1vzwwfcL4wLG4lGzwu?=
- =?us-ascii?Q?RQEWgn8mGJXXrbzAF8S40y3sGPP8KDxd7RbSO9L82lWGzYH6D1yzZy7qcflu?=
- =?us-ascii?Q?b2I++ZpQQj93SdEzsQS9p7GyDv+KJhBRVaM9PcYCTpVRg53CbLWcQxZWqViQ?=
- =?us-ascii?Q?aMHuWwvvBj2Is1/d4D9+R7FXXrvbIlDNbKpMXQeNqAIQOJkLD5hrfTVvychY?=
- =?us-ascii?Q?pcUK8xlSB5kkjGApF5UcZsXn?=
+	=?us-ascii?Q?grDarMHsC1s30I2iewWu/SGFVdCNHy28eTOueTVb3BAlyqLP1v7bnhg1iIBS?=
+ =?us-ascii?Q?w1qQGNzxVZpk7wwCaQAcooVTIBbikXYpzNzHa/MVqjGYdiPRxH6/Z6dxB0sz?=
+ =?us-ascii?Q?4YGt0E63AcRlmtLhZ4n2lo4KYMFV+lc7QrkHGCmAV75XAnkOKyktaAbjXd3V?=
+ =?us-ascii?Q?r1/A7GYiOYISJrElCSjXcKXG+GKOV8tG6lU2M3QIsgg0SaVTOMi8PyDYbvwn?=
+ =?us-ascii?Q?wPfjC1fQSKQ3f2VyVztylboP8YG5uS+Qxb1jir5GxPNYtnp7gsz2zthcWXLq?=
+ =?us-ascii?Q?KBN5KqHQ+hE/dPdsHF81XydO9pa1KPN08b2ThZW79mRIDGjsRUfhtZ6ostJV?=
+ =?us-ascii?Q?LoBKnG6Uj2GmXA594lXIll+832ax/1qzi5GdQb7syN9z8moT41ZXeIKriDDc?=
+ =?us-ascii?Q?cRxIcA8Z/DuvqYSb1tY9bi0d+BSRRg7LT4Uoq5HCZ68a4Nr3VLelt6kJmtW/?=
+ =?us-ascii?Q?j4Wvv+orrPzwLsRq8Y8gvQFpqU8Hy/t7PEYbpVIGe9OubVUV5GAlEc69+Vck?=
+ =?us-ascii?Q?R8zCPo08bUqSvk23elNojhCyP4P5f4GnqToK62VqybbYt48uI3OtRK4hWFKx?=
+ =?us-ascii?Q?DUOnthXz6+j6W1/DGhseFNwE/RMvHt9JziKdCvmCHlK1FT0mXPVZSam8lUif?=
+ =?us-ascii?Q?PRXbs7zwEtRoSbH7zj2LI4+K5KBuqM9tIpO5N6QoIZ+5IYui5sYLevKJK0ov?=
+ =?us-ascii?Q?AOOyv2Qpm9SWJ1t0Xv7kXjsOvZ3uCTuQdhCY6HR1Y2zPcEYFhhERdN8HvOV4?=
+ =?us-ascii?Q?l+iBG95LC59QTuQ3cj9Vuda2nDvoXFJbMWGP4aDGEnt8PqvSkOdbMQ78Wk4K?=
+ =?us-ascii?Q?2FnMF7NdjIsu+Xaq+tbi9maovvOjzsrPrS3zM6gl6haUCsVA7NFNzOqlhgCE?=
+ =?us-ascii?Q?fGGbSgJmpYOjQm5NNFM2TqKTFiTryhiK/bnDmCOV1lhRaM2fA6rs/cpDIzkf?=
+ =?us-ascii?Q?cNlC6brwZE8keT+AGprvJExcPwdudYigzFmMRwQ4oVO1u6BcITw0wfZCwusG?=
+ =?us-ascii?Q?XFYdxKZ7e/iE2poUPM6hcylxCzxlNUidThCePhCOhSCfx0liXkiB/Y7BcosR?=
+ =?us-ascii?Q?WZlhanHXCQRC8QCZkMMNp4hAYplEtw/iGrsVfC2CMCFIOmAF0OsUFY9hIDjj?=
+ =?us-ascii?Q?ysaYFiHFlWNPZg8m7dfmrH31Bdw3NeXkjh7CtuJI6REBTgMZ8etLHPEMleYZ?=
+ =?us-ascii?Q?27hRZ7jFIbUjzL6Q9+fgFf4MNAx/WTgJYHbSr2ZpXPlZW6bpiVmMCMCa8yTP?=
+ =?us-ascii?Q?UJ6WPs9GW9/icIOx/WUhQTV0l97ngqoJtF2/y+rD+DcwJfTLKCr2+/2t9B5H?=
+ =?us-ascii?Q?sL/UvokanV8VOd9TrzTTLv0d?=
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AS8PR04MB8898.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024);DIR:OUT;SFP:1101;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AS8PR04MB8898.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?Mae0fKFq1Ai7EwCYbXoEEmoEUMD/+o2B2GuV9TVVYB2bjR0nHEjbJFxajL/M?=
- =?us-ascii?Q?cWRFZrBQAf8NBimiYm2QaJm6osVnTl6u4gP/aUghZM/uxv5FLEgGNQ06iPBq?=
- =?us-ascii?Q?cz3NfC+eSorC4XP9UJOrhvOdvMO/kvEdPDLVX4EAoxtYdEFDIp9p6fyOfJDs?=
- =?us-ascii?Q?cvi1GwMQXvh+xsQHnHq3cK2tXzOkjEOLVtUvEbZFz4z9ayRWNobUF1PL5IKe?=
- =?us-ascii?Q?jje9CcyLKjFtNHFmAlgvK5l00itGiS/0uAblZ4G2IMrDp1F6Ug/q/P3ITnHf?=
- =?us-ascii?Q?rQWTsA/FGLI0lsV330Uyu7ctt06bKYjhheb+YiaOO0HBTWHpRv35R0xem2Tz?=
- =?us-ascii?Q?Xa5A2xv0xQx8Gz9cBdl86vCUk1rvktLh97oF2Yn0RdSvjdc9HeYpPtuBfnO9?=
- =?us-ascii?Q?hXEMIaDBwlK5qGceDRpTAurWFHIuAmkXm+bO5IbfD+zmWHPjV6UqEIBQZyNA?=
- =?us-ascii?Q?NvrYYtRdzucx/e7apj0+Kliz2J8ApfnVtcqdn3dmw8MGi66VUypFdOs9wqo4?=
- =?us-ascii?Q?FqGj/p64BRZ7bJoX7H99YbsE1M3gYLf5yl7WVRSDrIcVfUClLpqkzDmvHtqH?=
- =?us-ascii?Q?MJuMwkYfWtaMVZozVZ86J89+sq8DMMUX/4GI8T/bnfB8CmpqMwldYBu3mHoz?=
- =?us-ascii?Q?otF0iH0b4uRoN5JP/EE9eLIEmFCB3P/kvNXzH/c41ZLfGF1IQtg+G0K739II?=
- =?us-ascii?Q?DqezMINdsmHn83HKY5NQhUk263HOlKTEMdpRrEihaxFGcbxUL8jzbwT3XgHx?=
- =?us-ascii?Q?D6zihYNoYynQqHxzMBp4N+3Wy6X5uA66pIJF5XG7TVFmmj+o0o7BajfX/5H4?=
- =?us-ascii?Q?61gprqc9MKZrFoefgvsE+Y6lTMiHBd8DQvENsQtaKFPhsmsHWwI8Dp2YZHi8?=
- =?us-ascii?Q?FDibVV0XxBVIb7KYi/kQvlSp+cnNhVBUfnb7pXKiNlMD01YmYLEqKVASmg9B?=
- =?us-ascii?Q?P38dXBSfmQlXyqvh4NTpydjTAqoKyumHqUkwZWh6wUB+rXvVscc4PmYKP5vf?=
- =?us-ascii?Q?LyQo8H3WfgIiNX5FrQOKS/SKEJUUHfyWp9YozIRNAZOldODFVeibGJVFHNyN?=
- =?us-ascii?Q?P3KJTopKpSzeRYrKgBCpun2rrnd4HmCEArAOg85NuVDuyBFysEN0mIlN3De5?=
- =?us-ascii?Q?nfn4yS3I3eUNSpNgZij1yFukhR3vbRaQqdpsmM7u6FbH8NvaeoLpE16jCOwt?=
- =?us-ascii?Q?Nec9fITty2eyV/ttqd5dcyVC1/phRwLPmJySry1tcxcdIhR+oYB2JMCx8o+B?=
- =?us-ascii?Q?Xbuw0sFx/dspAPyJjqRqzTN/YbK6yZi8gVbcxsl+xlIqfq21lQ2Wn7Ik0Oxd?=
- =?us-ascii?Q?fQT+x95LBLDo3aZr1YngNFjjDBKpJse7NZVLeLpcC7AxoYUmJNdYIjVCiLKR?=
- =?us-ascii?Q?K0X9s3Kk27jOIAhTB49irj0QlZqYtJK9WUa/yzpRqcGTxQsa7TaGl7IV1iwp?=
- =?us-ascii?Q?MprxjidyfE2zh+ytAtN2ZJm70yf3b2wKI6cyQZzSAAfxDCr6isb9H4PY4s77?=
- =?us-ascii?Q?s+JOHHKdDbvASCHZK8FDCHIVvIGUhbCsYjEjap8wNu8BrpGhyvo/TvAXtoyB?=
- =?us-ascii?Q?sO+DkZnPuB3X+uS7e4ED39FCBO9sPiMGDG05myJdwiLukRJxn2JRkJ/QyHcH?=
- =?us-ascii?Q?9A=3D=3D?=
+	=?us-ascii?Q?Y/NoeF2Taa7HCCqSHw3SvrdKHitolJTqgAQu2ogwB0KY+SX12o7UUwbQ4N14?=
+ =?us-ascii?Q?Oeg7JqGG/I5xCqAv/9kxmpiESlpq3A0eFX+Q3ylQDX9uGZ9P+wcwGR4m44R3?=
+ =?us-ascii?Q?/iw9HBNVAX0vqVWBDWMf3wlg20Ulm3T9O28b/M2v3GMDy1b6zLMO9Tj+v2b/?=
+ =?us-ascii?Q?lQlbM+yXryInsqxfqoPdG1YeuA3jp58bEVGPxC51DH+xZ+phfIQrHLlAfh7d?=
+ =?us-ascii?Q?0ZgrmxeIHfdXO7Xp8SYZPosQAdJ6pm8Y2013xUw88PgnSWUhoEq1UoTF4Ql6?=
+ =?us-ascii?Q?VU2k71E4I4zZNPaztcTQrQeRF/aWvW6uIF7oBPVEnDJl5eiqwTaeTsR/SnaR?=
+ =?us-ascii?Q?iNvtPbtnqUiF/XKUVR0pQkpRzIghzdmui3tdsfbgJWOAlnDboqMf8hkDCXfs?=
+ =?us-ascii?Q?76eNO9s54AvtXPhlW/EzsYqsKOdo3Xp19ecoC5wogeL+cND0GdRnhVphdIoi?=
+ =?us-ascii?Q?qlyx2BDzTZ6w5AjeacCdKEQsR5M/haeE/jpTbdjbQFkruC9Xj4sJLUL7CQw6?=
+ =?us-ascii?Q?wLcoyE1wNHkjysP2DEtOsJ5YzsH/Ccc9MkTgNsRLyvrS6z2fE3gTF/hggNFR?=
+ =?us-ascii?Q?Bdbf5CpjB+YO9a2zKLfeM/9htAqGJKq0wGUKsWnEG1Olcsw4PX/J3PtK3Hkq?=
+ =?us-ascii?Q?LJeQZIaa/kw0JRzlEC00Vwrz29Xzz48rKoqhPpkqGXlWZCwbsdTepZaS+RBQ?=
+ =?us-ascii?Q?yW0xnWvhk7vMEkP9hVxGmMd8RX5Xo5j2C6YC0IRHRrYjs8OR3fajA5WxikFK?=
+ =?us-ascii?Q?GC76Ublf9SFkMX7pWkSt1Kw7PUIj9tuWTklRrPTS547gtDr1qEAvgQj0k8uQ?=
+ =?us-ascii?Q?wZ20+yf/ZtTi2X5COeRa6kwVHJWXcBRV0EkJNEFhK72dkMvNrjObC5AfXL6E?=
+ =?us-ascii?Q?MWCw9GJ8u+n9Ab/qPAOyFTStdKVMvdb/UFgoFOwijS6jhZpQOVOJws1ztzI3?=
+ =?us-ascii?Q?uyjFi3DhP3cVs92jKCwDO89Gxv64HeOtVB5mHrayvRIxyTwM93iP8IzDDgBo?=
+ =?us-ascii?Q?0xV8yEHf+C9QHw3U5OfcNSwKtfgZTVoYlo3z7Md9mSQ4tgEFTDuXOFemPHGs?=
+ =?us-ascii?Q?XLF3LWk2uT9XiQn0iNbjT1/Gfkz0Z1VUDnmf8/VHHQdeDSIOUUdF7w9W0U/w?=
+ =?us-ascii?Q?HlV9hH22d7nXhCZ0PmrzFxVHrdIOclz+GVd3QdKbJS3soivmXU1c+1/NnONZ?=
+ =?us-ascii?Q?CQu5x2Ogl8wrLP+Pop9VCLyRufHuIQeIOuEEeQ6wAjnJj2m8cD6N6zx23w4r?=
+ =?us-ascii?Q?dmOjX4qqSkjW9cEkXLfyM2ExuKExH92dXBinRwsn5a1cugZ7EOWUxYOOlwzT?=
+ =?us-ascii?Q?g7NZUKbhftfbkobNP0rGV1KGgphAlfhZfRVmAv/uzkHfw5kbdLTHDjpr+eVW?=
+ =?us-ascii?Q?gIiSpga61/xGx7cYqfgmzYdetpfl+RKVK27/t6aSorMtjWzq0UYxftJJ9AAW?=
+ =?us-ascii?Q?WNOa+MCV4BXnMR0t5wpUpkak/TRa+kzU5psS5fA2ZyKvnEHyqRAubR2Gwm/m?=
+ =?us-ascii?Q?BSs+flgxDM8LVXnD8RsYgqy2K0GXpfw7euqI/JPebcUsl7EHWlzaTChJSuxE?=
+ =?us-ascii?Q?ZIvESbpR54ZdOHEj42wgciU5OPDjhMW7d/FYamWqLkxyhy68ml/k4BJcQxxY?=
+ =?us-ascii?Q?nQ=3D=3D?=
 X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 231e932c-5d4c-484d-2db4-08dd0561ac23
+X-MS-Exchange-CrossTenant-Network-Message-Id: db17b700-eb63-4fb4-c0fc-08dd0561ad93
 X-MS-Exchange-CrossTenant-AuthSource: AS8PR04MB8898.eurprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Nov 2024 10:38:41.6904
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Nov 2024 10:38:44.1702
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: A2pc6ToCPwjXdct7J82gT01GYUWEz1yGlhct3Fn/ZJ7hcau2q9ktvWKktByy8x6+fZ+lXiXt1CAs7xPJeQDqPA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DU2PR04MB8776
+X-MS-Exchange-CrossTenant-UserPrincipalName: nJw18SHWkWHW+BrO8hj+HoInh1GLcEdh/ebJNT8HaSo79IsuY2FS2BKkWl+ZipXyQvS+1zHd9blmv29o7aYYOA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM9PR04MB7714
 
-This adds public BAP helpers to convert iso_qos to bap_qos and reversed.
-This is needed for the BASS plugin to handle the Scan Delegator (BASS
-Server) role internally (to create/handle BAP streams when receiving the
-Add Source command from a Broadcast Assistant).
+This updates the Scan Delegator implementation to be handled internally in
+BASS: The BASS Server is responsible to handle Write Commands for the Add
+Source operation by creating long-lived PA sync, parsing the BASE,
+creating and configuring BAP streams, as well as enabling them.
 ---
- profiles/audio/bap.c | 93 +++++++++++++++++++++++++-------------------
- profiles/audio/bap.h |  5 +++
- 2 files changed, 58 insertions(+), 40 deletions(-)
+ profiles/audio/bap.c  |  18 ++-
+ profiles/audio/bass.c | 264 ++++++++++++++++++++++++++++++++++++------
+ profiles/audio/bass.h |   4 +-
+ 3 files changed, 237 insertions(+), 49 deletions(-)
 
 diff --git a/profiles/audio/bap.c b/profiles/audio/bap.c
-index dbea59776..8635c383d 100644
+index 8635c383d..6e6d68b57 100644
 --- a/profiles/audio/bap.c
 +++ b/profiles/audio/bap.c
-@@ -1041,6 +1041,57 @@ static void print_ltv(size_t i, uint8_t l, uint8_t t, uint8_t *v,
- 	util_hexdump(' ', v, l, user_data, NULL);
+@@ -1125,14 +1125,6 @@ static void bis_handler(uint8_t bis, uint8_t sgrp, struct iovec *caps,
+ 
+ 	bass_add_stream(data->device, meta, caps, qos, sgrp, bis);
+ 
+-	if (!bass_check_bis(data->device, bis))
+-		/* If this Broadcast Sink is acting as a Scan
+-		 * Delegator, only attempt to create streams
+-		 * for the BISes required by the peer Broadcast
+-		 * Assistant.
+-		 */
+-		return;
+-
+ 	/* Check if this BIS matches any local PAC */
+ 	bt_bap_verify_bis(data->bap, bis,
+ 			caps, &lpac);
+@@ -1325,9 +1317,6 @@ static gboolean big_info_report_cb(GIOChannel *io, GIOCondition cond,
+ 		g_io_channel_shutdown(io, TRUE, NULL);
+ 	}
+ 
+-	/* Notify the BASS plugin about the session. */
+-	bass_bcast_probe(data->device, data->bap);
+-
+ 	/* Analyze received BASE data and create remote media endpoints for each
+ 	 * BIS matching our capabilities
+ 	 */
+@@ -2729,6 +2718,8 @@ static void bap_state_bcast_sink(struct bt_bap_stream *stream,
+ 		return;
+ 
+ 	setup = bap_find_setup_by_stream(data, stream);
++	if (!setup)
++		return;
+ 
+ 	switch (new_state) {
+ 	case BT_BAP_STREAM_STATE_IDLE:
+@@ -3276,6 +3267,7 @@ static int bap_bcast_probe(struct btd_service *service)
+ 	struct bap_bcast_pa_req *req;
+ 	uint8_t type = BAP_PA_LONG_REQ;
+ 	struct bap_data *data;
++	int ret = 0;
+ 
+ 	if (!btd_adapter_has_exp_feature(adapter, EXP_FEAT_ISO_SOCKET)) {
+ 		error("BAP requires ISO Socket which is not enabled");
+@@ -3329,6 +3321,10 @@ static int bap_bcast_probe(struct btd_service *service)
+ 
+ 	bt_bap_set_user_data(data->bap, service);
+ 
++	if (bass_bcast_probe(service, &ret))
++		/* Return if probed device was handled inside BASS. */
++		return ret;
++
+ 	/* Start the PA timer if it hasn't been started yet */
+ 	if (data->adapter->pa_timer_id == 0)
+ 		data->adapter->pa_timer_id = g_timeout_add_seconds(
+diff --git a/profiles/audio/bass.c b/profiles/audio/bass.c
+index 6237f5acc..e53241a1a 100644
+--- a/profiles/audio/bass.c
++++ b/profiles/audio/bass.c
+@@ -29,6 +29,7 @@
+ 
+ #include "lib/bluetooth.h"
+ #include "lib/uuid.h"
++#include "lib/iso.h"
+ 
+ #include "src/dbus-common.h"
+ #include "src/shared/util.h"
+@@ -42,6 +43,7 @@
+ #include "src/shared/bap.h"
+ #include "src/shared/ad.h"
+ 
++#include "btio/btio.h"
+ #include "src/plugin.h"
+ #include "src/gatt-database.h"
+ #include "src/device.h"
+@@ -101,12 +103,16 @@ struct bass_assistant {
+ 
+ struct bass_delegator {
+ 	struct btd_device *device;	/* Broadcast source device */
++	struct btd_service *service;
+ 	struct bt_bcast_src *src;
+ 	struct bt_bap *bap;
+ 	unsigned int state_id;
+ 	uint8_t *bcode;
+ 	unsigned int timeout;
+ 	struct queue *bcode_reqs;
++	struct queue *streams;
++	unsigned int io_id;
++	GIOChannel *io;
+ };
+ 
+ struct bass_bcode_req {
+@@ -218,18 +224,58 @@ static bool delegator_match_device(const void *data, const void *match_data)
+ 	return dg->device == device;
  }
  
-+void bap_qos_to_iso_qos(struct bt_bap_qos *bap_qos,
-+				struct bt_iso_qos *iso_qos)
-+{
-+	memset(iso_qos, 0, sizeof(*iso_qos));
-+
-+	iso_qos->bcast.big = bap_qos->bcast.big;
-+	iso_qos->bcast.bis = bap_qos->bcast.bis;
-+	iso_qos->bcast.sync_factor = bap_qos->bcast.sync_factor;
-+	iso_qos->bcast.packing = bap_qos->bcast.packing;
-+	iso_qos->bcast.framing = bap_qos->bcast.framing;
-+	iso_qos->bcast.encryption = bap_qos->bcast.encryption;
-+	if (bap_qos->bcast.bcode && bap_qos->bcast.bcode->iov_base)
-+		memcpy(iso_qos->bcast.bcode, bap_qos->bcast.bcode->iov_base,
-+				bap_qos->bcast.bcode->iov_len);
-+	iso_qos->bcast.options = bap_qos->bcast.options;
-+	iso_qos->bcast.skip = bap_qos->bcast.skip;
-+	iso_qos->bcast.sync_timeout = bap_qos->bcast.sync_timeout;
-+	iso_qos->bcast.sync_cte_type = bap_qos->bcast.sync_cte_type;
-+	iso_qos->bcast.mse = bap_qos->bcast.mse;
-+	iso_qos->bcast.timeout = bap_qos->bcast.timeout;
-+	memcpy(&iso_qos->bcast.out, &bap_qos->bcast.io_qos,
-+			sizeof(struct bt_iso_io_qos));
+-bool bass_check_bis(struct btd_device *device, uint8_t bis)
++static int stream_get_bis(struct bt_bap_stream *stream)
+ {
+-	struct bass_delegator *dg;
++	char *path = bt_bap_stream_get_user_data(stream);
++	const char *strbis;
++	int bis;
+ 
+-	dg = queue_find(delegators, delegator_match_device, device);
+-	if (!dg)
+-		return true;
++	strbis = strstr(path, "/bis");
++	if (!strbis)
++		return 0;
+ 
+-	if (!bt_bass_check_bis(dg->src, bis))
+-		return false;
++	if (sscanf(strbis, "/bis%d", &bis) < 0)
++		return 0;
+ 
+-	return true;
++	return bis;
 +}
 +
-+void bap_iso_qos_to_bap_qos(struct bt_iso_qos *iso_qos,
-+				struct bt_bap_qos *bap_qos)
++static void append_stream(void *data, void *user_data)
 +{
-+	bap_qos->bcast.big = iso_qos->bcast.big;
-+	bap_qos->bcast.bis = iso_qos->bcast.bis;
-+	bap_qos->bcast.sync_factor = iso_qos->bcast.sync_factor;
-+	bap_qos->bcast.packing = iso_qos->bcast.packing;
-+	bap_qos->bcast.framing = iso_qos->bcast.framing;
-+	bap_qos->bcast.encryption = iso_qos->bcast.encryption;
-+	if (bap_qos->bcast.encryption)
-+		bap_qos->bcast.bcode = util_iov_new(iso_qos->bcast.bcode,
-+						sizeof(iso_qos->bcast.bcode));
-+	bap_qos->bcast.options = iso_qos->bcast.options;
-+	bap_qos->bcast.skip = iso_qos->bcast.skip;
-+	bap_qos->bcast.sync_timeout = iso_qos->bcast.sync_timeout;
-+	bap_qos->bcast.sync_cte_type =
-+			iso_qos->bcast.sync_cte_type;
-+	bap_qos->bcast.mse = iso_qos->bcast.mse;
-+	bap_qos->bcast.timeout = iso_qos->bcast.timeout;
-+	bap_qos->bcast.io_qos.interval =
-+			iso_qos->bcast.in.interval;
-+	bap_qos->bcast.io_qos.latency = iso_qos->bcast.in.latency;
-+	bap_qos->bcast.io_qos.phy = iso_qos->bcast.in.phy;
-+	bap_qos->bcast.io_qos.rtn = iso_qos->bcast.in.rtn;
-+	bap_qos->bcast.io_qos.sdu = iso_qos->bcast.in.sdu;
++	struct bt_bap_stream *stream = data;
++	struct sockaddr_iso_bc *addr = user_data;
++	uint8_t bis = stream_get_bis(stream);
++
++	DBG("%d", bis);
++
++	addr->bc_bis[addr->bc_num_bis] = bis;
++	addr->bc_num_bis++;
 +}
 +
- static void create_stream_for_bis(struct bap_data *bap_data,
- 		struct bt_bap_pac *lpac, struct bt_iso_qos *qos,
- 		struct iovec *caps, struct iovec *meta, char *path)
-@@ -1050,28 +1101,7 @@ static void create_stream_for_bis(struct bap_data *bap_data,
- 	setup = setup_new(NULL);
- 
- 	/* Create BAP QoS structure */
--	setup->qos.bcast.big = qos->bcast.big;
--	setup->qos.bcast.bis = qos->bcast.bis;
--	setup->qos.bcast.sync_factor = qos->bcast.sync_factor;
--	setup->qos.bcast.packing = qos->bcast.packing;
--	setup->qos.bcast.framing = qos->bcast.framing;
--	setup->qos.bcast.encryption = qos->bcast.encryption;
--	if (setup->qos.bcast.encryption)
--		setup->qos.bcast.bcode = util_iov_new(qos->bcast.bcode,
--						sizeof(qos->bcast.bcode));
--	setup->qos.bcast.options = qos->bcast.options;
--	setup->qos.bcast.skip = qos->bcast.skip;
--	setup->qos.bcast.sync_timeout = qos->bcast.sync_timeout;
--	setup->qos.bcast.sync_cte_type =
--			qos->bcast.sync_cte_type;
--	setup->qos.bcast.mse = qos->bcast.mse;
--	setup->qos.bcast.timeout = qos->bcast.timeout;
--	setup->qos.bcast.io_qos.interval =
--			qos->bcast.in.interval;
--	setup->qos.bcast.io_qos.latency = qos->bcast.in.latency;
--	setup->qos.bcast.io_qos.phy = qos->bcast.in.phy;
--	setup->qos.bcast.io_qos.rtn = qos->bcast.in.rtn;
--	setup->qos.bcast.io_qos.sdu = qos->bcast.in.sdu;
-+	bap_iso_qos_to_bap_qos(qos, &setup->qos);
- 
- 	queue_push_tail(bap_data->bcast_snks, setup);
- 
-@@ -3160,24 +3190,7 @@ static void iso_do_big_sync(GIOChannel *io, void *user_data)
- 	queue_foreach(setups, setup_refresh_qos, NULL);
- 
- 	/* Set the user requested QOS */
--	memset(&qos, 0, sizeof(qos));
--	qos.bcast.big = setup->qos.bcast.big;
--	qos.bcast.bis = setup->qos.bcast.bis;
--	qos.bcast.sync_factor = setup->qos.bcast.sync_factor;
--	qos.bcast.packing = setup->qos.bcast.packing;
--	qos.bcast.framing = setup->qos.bcast.framing;
--	qos.bcast.encryption = setup->qos.bcast.encryption;
--	if (setup->qos.bcast.bcode && setup->qos.bcast.bcode->iov_base)
--		memcpy(qos.bcast.bcode, setup->qos.bcast.bcode->iov_base,
--				setup->qos.bcast.bcode->iov_len);
--	qos.bcast.options = setup->qos.bcast.options;
--	qos.bcast.skip = setup->qos.bcast.skip;
--	qos.bcast.sync_timeout = setup->qos.bcast.sync_timeout;
--	qos.bcast.sync_cte_type = setup->qos.bcast.sync_cte_type;
--	qos.bcast.mse = setup->qos.bcast.mse;
--	qos.bcast.timeout = setup->qos.bcast.timeout;
--	memcpy(&qos.bcast.out, &setup->qos.bcast.io_qos,
--			sizeof(struct bt_iso_io_qos));
-+	bap_qos_to_iso_qos(&setup->qos, &qos);
- 
- 	if (!bt_io_set(io, &err,
- 			BT_IO_OPT_QOS, &qos,
-diff --git a/profiles/audio/bap.h b/profiles/audio/bap.h
-index 98bea558c..ab35a3775 100644
---- a/profiles/audio/bap.h
-+++ b/profiles/audio/bap.h
-@@ -19,3 +19,8 @@ void bap_scan_delegator_probe(struct btd_device *device);
- bool parse_base(struct bt_iso_base *base, struct bt_iso_qos *qos,
- 		util_debug_func_t func, bap_stream_cb_t handler,
- 		void *user_data);
++static bool link_io_unset(const void *data, const void *match_data)
++{
++	struct bt_bap_stream *link = (struct bt_bap_stream *)data;
 +
-+void bap_iso_qos_to_bap_qos(struct bt_iso_qos *iso_qos,
-+				struct bt_bap_qos *bap_qos);
-+void bap_qos_to_iso_qos(struct bt_bap_qos *bap_qos,
-+				struct bt_iso_qos *iso_qos);
++	return !bt_bap_stream_get_io(link);
++}
++
++static void connect_cb(GIOChannel *io, GError *err, void *user_data)
++{
++	struct bt_bap_stream *stream = user_data;
++	struct queue *links = bt_bap_stream_io_get_links(stream);
++	int fd;
++
++	DBG("");
++
++	/* Set fds for the stream and all its links. */
++	if (bt_bap_stream_get_io(stream))
++		stream = queue_find(links, link_io_unset, NULL);
++
++	fd = g_io_channel_unix_get_fd(io);
++
++	if (bt_bap_stream_set_io(stream, fd)) {
++		g_io_channel_set_close_on_unref(io, FALSE);
++	}
+ }
+ 
+ static void bap_state_changed(struct bt_bap_stream *stream, uint8_t old_state,
+@@ -237,31 +283,54 @@ static void bap_state_changed(struct bt_bap_stream *stream, uint8_t old_state,
+ {
+ 	struct bass_delegator *dg = user_data;
+ 	int bis;
+-	char *path = bt_bap_stream_get_user_data(stream);
+ 	struct bt_bap *bap = bt_bap_stream_get_session(stream);
+-	const char *strbis;
+-	int err;
++	struct sockaddr_iso_bc iso_bc_addr = {0};
++	struct queue *links;
++	GError *gerr = NULL;
++	struct bt_bap_qos *bap_qos = bt_bap_stream_get_qos(stream);
++	struct bt_iso_qos qos;
+ 
+ 	if (dg->bap != bap)
+ 		return;
+ 
+-	strbis = strstr(path, "/bis");
+-	if (strbis == NULL) {
+-		DBG("bis index cannot be found");
+-		return;
+-	}
+-
+-	err = sscanf(strbis, "/bis%d", &bis);
+-	if (err < 0) {
+-		DBG("sscanf error");
+-		return;
+-	}
++	bis = stream_get_bis(stream);
+ 
+ 	DBG("stream %p: %s(%u) -> %s(%u)", stream,
+ 			bt_bap_stream_statestr(old_state), old_state,
+ 			bt_bap_stream_statestr(new_state), new_state);
+ 
+ 	switch (new_state) {
++	case BT_BAP_STREAM_STATE_ENABLING:
++		iso_bc_addr.bc_bdaddr_type =
++				btd_device_get_bdaddr_type(dg->device);
++		memcpy(&iso_bc_addr.bc_bdaddr, device_get_address(dg->device),
++				sizeof(bdaddr_t));
++
++		append_stream(stream, &iso_bc_addr);
++
++		links = bt_bap_stream_io_get_links(stream);
++
++		queue_foreach(links, append_stream, &iso_bc_addr);
++
++		bap_qos_to_iso_qos(bap_qos, &qos);
++
++		if (!bt_io_set(dg->io, &gerr,
++				BT_IO_OPT_QOS, &qos,
++				BT_IO_OPT_INVALID)) {
++			error("bt_io_set: %s", gerr->message);
++			g_error_free(gerr);
++			break;
++		}
++
++		if (!bt_io_bcast_accept(dg->io,
++				connect_cb, stream, NULL, &gerr,
++				BT_IO_OPT_ISO_BC_NUM_BIS,
++				iso_bc_addr.bc_num_bis, BT_IO_OPT_ISO_BC_BIS,
++				iso_bc_addr.bc_bis, BT_IO_OPT_INVALID)) {
++			error("bt_io_bcast_accept: %s", gerr->message);
++			g_error_free(gerr);
++		}
++		break;
+ 	case BT_BAP_STREAM_STATE_STREAMING:
+ 		/* BAP stream was started. Mark BIS index as synced inside the
+ 		 * Broadcast Receive State characteristic and notify peers about
+@@ -280,17 +349,79 @@ static void bap_state_changed(struct bt_bap_stream *stream, uint8_t old_state,
+ 	}
+ }
+ 
+-bool bass_bcast_probe(struct btd_device *device, struct bt_bap *bap)
++static void bis_handler(uint8_t bis, uint8_t sgrp, struct iovec *caps,
++	struct iovec *meta, struct bt_iso_qos *qos, void *user_data)
+ {
+-	struct bass_delegator *dg;
++	struct bass_delegator *dg = user_data;
++	struct bt_bap_pac *lpac;
++	char *path;
++	struct bt_bap_stream *stream;
++	struct bt_bap_qos bap_qos = {0};
+ 
+-	dg = queue_find(delegators, delegator_match_device, device);
+-	if (!dg)
+-		return false;
++	/* Only handle streams required by the Brodcast Assistant. */
++	if (!bt_bass_check_bis(dg->src, bis))
++		return;
+ 
+-	DBG("%p", dg);
++	/* Check if this stream caps match any local PAC */
++	bt_bap_verify_bis(dg->bap, bis, caps, &lpac);
++	if (!lpac)
++		return;
++
++	if (asprintf(&path, "%s/bis%d", device_get_path(dg->device), bis) < 0)
++		return;
++
++	bap_iso_qos_to_bap_qos(qos, &bap_qos);
++
++	stream = bt_bap_stream_new(dg->bap, lpac, NULL, &bap_qos, caps);
++	if (!stream)
++		return;
++
++	queue_push_tail(dg->streams, stream);
++
++	bt_bap_stream_set_user_data(stream, path);
++	bt_bap_stream_config(stream, &bap_qos,
++			caps, NULL, NULL);
++	bt_bap_stream_metadata(stream, meta,
++			NULL, NULL);
++}
++
++static gboolean big_info_cb(GIOChannel *io, GIOCondition cond,
++							gpointer user_data)
++{
++	struct bass_delegator *dg = user_data;
++	GError *err = NULL;
++	struct bt_iso_base base;
++	struct bt_iso_qos qos;
++
++	dg->io_id = 0;
++
++	bt_io_get(io, &err,
++			BT_IO_OPT_BASE, &base,
++			BT_IO_OPT_QOS, &qos,
++			BT_IO_OPT_INVALID);
++	if (err) {
++		error("%s", err->message);
++		g_error_free(err);
++		return FALSE;
++	}
++
++	parse_base(&base, &qos, bass_debug, bis_handler, dg);
++
++	return FALSE;
++}
++
++static void confirm_cb(GIOChannel *io, void *user_data)
++{
++	struct bass_delegator *dg = user_data;
++
++	DBG("");
+ 
+-	dg->bap = bap;
++	/* Close the listen io */
++	g_io_channel_shutdown(dg->io, TRUE, NULL);
++	g_io_channel_unref(dg->io);
++
++	g_io_channel_ref(io);
++	dg->io = io;
+ 
+ 	/* Update Broadcast Receive State characteristic value and notify
+ 	 * peers.
+@@ -298,15 +429,64 @@ bool bass_bcast_probe(struct btd_device *device, struct bt_bap *bap)
+ 	if (bt_bass_set_pa_sync(dg->src, BT_BASS_SYNCHRONIZED_TO_PA))
+ 		DBG("Failed to update Broadcast Receive State characteristic");
+ 
+-	/* Register BAP stream state changed callback, to keep up to
+-	 * date with BIG/PA sync state.
+-	 */
+-	dg->state_id = bt_bap_state_register(bap, bap_state_changed,
++	/* Register BAP stream state changed callback. */
++	dg->state_id = bt_bap_state_register(dg->bap, bap_state_changed,
+ 			NULL, dg, NULL);
+ 
++	dg->io_id = g_io_add_watch(io, G_IO_OUT, big_info_cb, dg);
++}
++
++bool bass_bcast_probe(struct btd_service *service, int *ret)
++{
++	struct btd_device *device = btd_service_get_device(service);
++	struct btd_adapter *adapter = device_get_adapter(device);
++	struct bass_delegator *dg;
++	GError *err = NULL;
++
++	dg = queue_find(delegators, delegator_match_device, device);
++	if (!dg)
++		/* Only probe devices added via Broadcast Assistants */
++		return false;
++
++	if (dg->service) {
++		/* Service has already been probed */
++		*ret = -EINVAL;
++		return true;
++	}
++
++	dg->service = service;
++	dg->bap = bap_get_session(device);
++
++	dg->io = bt_io_listen(NULL, confirm_cb, dg,
++		NULL, &err,
++		BT_IO_OPT_SOURCE_BDADDR,
++		btd_adapter_get_address(adapter),
++		BT_IO_OPT_SOURCE_TYPE,
++		btd_adapter_get_address_type(adapter),
++		BT_IO_OPT_DEST_BDADDR,
++		device_get_address(device),
++		BT_IO_OPT_DEST_TYPE,
++		btd_device_get_bdaddr_type(device),
++		BT_IO_OPT_MODE, BT_IO_MODE_ISO,
++		BT_IO_OPT_QOS, &bap_sink_pa_qos,
++		BT_IO_OPT_INVALID);
++	if (!dg->io) {
++		error("%s", err->message);
++		*ret = -err->code;
++		g_error_free(err);
++	}
++
+ 	return true;
+ }
+ 
++static void stream_clear(void *data, void *user_data)
++{
++	struct bt_bap_stream *stream = data;
++	struct bass_delegator *dg = user_data;
++
++	bt_bass_clear_bis_sync(dg->src, stream_get_bis(stream));
++}
++
+ bool bass_bcast_remove(struct btd_device *device)
+ {
+ 	struct bass_delegator *dg;
+@@ -317,6 +497,17 @@ bool bass_bcast_remove(struct btd_device *device)
+ 
+ 	DBG("%p", dg);
+ 
++	if (dg->io_id)
++		g_source_remove(dg->io_id);
++
++	if (dg->io) {
++		g_io_channel_shutdown(dg->io, TRUE, NULL);
++		g_io_channel_unref(dg->io);
++	}
++
++	queue_foreach(dg->streams, stream_clear, dg);
++	queue_destroy(dg->streams, NULL);
++
+ 	/* Update Broadcast Receive State characteristic value and notify
+ 	 * peers.
+ 	 */
+@@ -895,6 +1086,7 @@ probe:
+ 	dg->device = device;
+ 	dg->src = bcast_src;
+ 	dg->bcode_reqs = queue_new();
++	dg->streams = queue_new();
+ 
+ 	if (!delegators)
+ 		delegators = queue_new();
+@@ -903,8 +1095,10 @@ probe:
+ 
+ 	DBG("delegator %p", dg);
+ 
+-	/* Probe device with BAP. */
+-	bap_scan_delegator_probe(device);
++	/* Add Broadcast Audio Announcement Service UUID
++	 * to device and probe service.
++	 */
++	btd_device_add_uuid(device, BCAAS_UUID_STR);
+ 
+ 	return 0;
+ }
+diff --git a/profiles/audio/bass.h b/profiles/audio/bass.h
+index 257346374..f299ac029 100644
+--- a/profiles/audio/bass.h
++++ b/profiles/audio/bass.h
+@@ -12,11 +12,9 @@ void bass_add_stream(struct btd_device *device, struct iovec *meta,
+ 			uint8_t sgrp, uint8_t bis);
+ void bass_remove_stream(struct btd_device *device);
+ 
+-bool bass_bcast_probe(struct btd_device *device, struct bt_bap *bap);
++bool bass_bcast_probe(struct btd_service *service, int *ret);
+ bool bass_bcast_remove(struct btd_device *device);
+ 
+-bool bass_check_bis(struct btd_device *device, uint8_t bis);
+-
+ typedef void (*bt_bass_bcode_func_t)(void *user_data, int err);
+ 
+ void bass_req_bcode(struct bt_bap_stream *stream,
 -- 
 2.43.0
 
