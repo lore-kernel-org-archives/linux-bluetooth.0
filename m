@@ -1,59 +1,59 @@
-Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
+Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58DD75227
-	for <linux-bluetooth@vger.kernel.org>; Sat, 16 Nov 2024 00:23:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19CD38827
+	for <linux-bluetooth@vger.kernel.org>; Sat, 16 Nov 2024 00:59:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731716616; cv=none; b=cfIfY2PSBzeWbkgfQjstRojxN8JTKy7KTLVTGE73ZwZ/Z39L07Z3TL4vbveuaCc5lBgDQiKn48bOg6Cf547yYURIMmr/MzxbcZKpeChRXomw0ZUlcMDkxtR4GhsCzWO0r0/xNcHFGnJrrqMHFKNSnteSl5BuRqbLxsBCYENgIWw=
+	t=1731718761; cv=none; b=U0Np5IObxjUmuChaf0swH/dsoA2nyRF/PsDo0gzg052Ku55wveRfIQgVcz1Zqe2ve9InarLQM8v0s8oyOWLU0E10TO+pku7o9RW/pwCZqQzMDOPhaZvTEEfrQLZjyoIxhGsY+oa5uBcp6WZ9QVz0nsUzbqCTysZzunumf0JLE7U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731716616; c=relaxed/simple;
-	bh=JHjYbyuXvlHLZZewgCnEEwRmKMcy0SlmUIcpWHs0BPE=;
+	s=arc-20240116; t=1731718761; c=relaxed/simple;
+	bh=dvD0hKQXuAc6G67gWLjt1nhZyW29a1C2X3NQA33HeR8=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=HrhsbsF9g8jCzkuNRTXnPfWkjB58Udw6pHmrdT9GIeNa5K45nLaI9pLxkVs1xwFRvqzWGetfU2lmdDaE+YJLjc0acG4Wsn+2n1tfbaCLOZhtXywfReQag1g2+IFvuRXQxpneFJeyAZZqAZjVNd3xrFyKXLlpKPqagllP10lr+s8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=giStubcr; arc=none smtp.client-ip=209.85.210.182
+	 In-Reply-To:Content-Type; b=ikS5luxDZAGMqISHV1s908iuSlvJmp4qLMiNFqF5g7YKuvZPXwVMuCnwle/AP5WjVoeJ47FdkOqk6ZLA6ovuxp3j37JoOxavZqBLX05/0Pnbu3UmRQOebwMnvs6WaUozftDvFerbD9jCG/EgJmo9O1SMTjZysj6MZxcMSPkH1IQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=XTStq81d; arc=none smtp.client-ip=209.85.210.170
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="giStubcr"
-Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-7240d93fffdso1092976b3a.2
-        for <linux-bluetooth@vger.kernel.org>; Fri, 15 Nov 2024 16:23:33 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="XTStq81d"
+Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-72041ff06a0so133003b3a.2
+        for <linux-bluetooth@vger.kernel.org>; Fri, 15 Nov 2024 16:59:19 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1731716612; x=1732321412; darn=vger.kernel.org;
+        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1731718759; x=1732323559; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=ULbS/hpYsvRo0TIPldUC1cfxLOZl+GUWBs9UxV2jrCE=;
-        b=giStubcrHYVTCCv8c8ZxfNmPFKOOG01OEVVKfGRLapmnYvswQ3NOtpGuY8qUKvfT1i
-         YpikA2nL0W8WvCPK5j8Sv2N5fZcr45ItHMQb48AqTJUqku4bsKcODWUjyaHegu6JbBTi
-         rCS9887dmFZddlFYGT5KQCXOftSDm8iM1cGKjdwfnjJSVZaNx3kypgvL4lm3goWhZ8Y/
-         JyeP72Ngbu+CH65NKyi9r9xWlBI+7D+1XNEiJEm8decYK1VbmhZW1BmFwIs3sLMBPDTp
-         R6dB0vb1NCBCP2c7/lfNPP8iV72ApUSPlzGFeJqe4cwIiQVP9ygwC4HTKstZr+c9f8BA
-         aUVA==
+        bh=Z0COtCpxXPmcydvtIOZbiJQIN65FajXQuXUIvSDmfP8=;
+        b=XTStq81duJqj1UUI74+mUL31E9NQ3D4Z7G4INCJwD7DMiY/+LFgS/AIAwkJOE9Ipqg
+         iA3XN8MSOICq7Ny8U8U11FWe0zkflgJnaoLkHDGnoA70ZUuGuRVjIzVleTH4E6iWgqrt
+         dKMyJ52TV4AfanUBBHlNCSKdmkGEAtCA/jaZvs8BcpgzjaRSc+/qlvf1Cz0u59y0hLLj
+         Zu0A15rKKE7rUFTa0cV9IGoNQ2PuoZ/vwtm1lDNp430GJj4xQfxVzaQbaZgm1iAu7u02
+         JzDn9K6Q/BuXqy1tZ2dY/l9F5MZAcmcvbRcra0DGKdyl75FS1JZ3w2oDkr92WORJqhyr
+         BHfA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731716612; x=1732321412;
+        d=1e100.net; s=20230601; t=1731718759; x=1732323559;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ULbS/hpYsvRo0TIPldUC1cfxLOZl+GUWBs9UxV2jrCE=;
-        b=Psgt5ShvUjUxJboCBsiyjlS89iuzAAqDAuCoTL32spfLGDnm9cjW9RUms0K7jEsXxw
-         EjWOVvGfQvG7ovgMsaOBNLX2ZYjDTI2Ry7wQJFixmcPjUEobQgOSuCGCUeagPgB5p5qB
-         4l/B9YyisebCn13/WyOvupYEneS0GNqxKpYFRCmubIKccnGxdIxC+IWVaZ+FB08yLKj1
-         I4B/WGnLBPxX7IifY0VvMZMbNZu37V8n4wWeeJTvU1B2TVk5QbK5sKE1R0YGuSU+70Kj
-         USY8Ws1kwfRQeAJdGNiipp7QZtcJDZnJTSwmId2L+aEHLD/+JmqD+svgv29byfGSFDhA
-         V+lA==
-X-Forwarded-Encrypted: i=1; AJvYcCXkVo8mdNdzfkrKTa6CfFjcJaIKXeXb7StDcNgUOI2hvMAaf42Y1NamDU8AKQHaoistKJ4wRv3mAuc2DMRHp7w=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzhbVgk7kjIx1szFhwi0ZPgTGZNJcL6CJiSSIq+LQdBJb4+Eg5Q
-	tCGXB+CYJgh+jbo97TtmHfdv3Q7/bP3b7FAnWYpGjVwUDtaoktHARgXBMmVTdSo=
-X-Google-Smtp-Source: AGHT+IGS+OSUkrh/ZOU7NJRo8z/Ff9XeU5b3tiqT/w306XrjbJk+iIYeORLW8IwMPXBfl3KSdX4PiQ==
-X-Received: by 2002:a05:6a00:238b:b0:71e:8049:4730 with SMTP id d2e1a72fcca58-72476b72171mr6448191b3a.3.1731716611056;
-        Fri, 15 Nov 2024 16:23:31 -0800 (PST)
+        bh=Z0COtCpxXPmcydvtIOZbiJQIN65FajXQuXUIvSDmfP8=;
+        b=MS61UtyUS42kPsJezUaE2RJH0IkRZLbYpphP+Ua2yPLnCV0CNlZnESR5rKo6dTh+ny
+         Uv1obZGgQAi6WSq1micD9A1Zve8hf7RkiExg4ap4C120qOFfVBJwEZds+ldWq9+PQoe+
+         JDNoaCV6mCue6G37ysReP+gaK26DHS1y4Idmd1UTRJPITLBfowFN2mc0G2NMXiRmhwq/
+         TSGqlRNxOkvbl9XKIHq4z+NhbQf5ujwMDozCrjFzf9nUdwKeQ1xj67Hgs9GxSVwrGsYW
+         X/jek95JAsvPqHGzaQEFKeWf5Zd3D2PkVLxcgMsthipw7G4D2F0dC+7pKJeJ8b5NRyVI
+         trXw==
+X-Forwarded-Encrypted: i=1; AJvYcCVaB3xXE3htvu2Na+eUzHLtX00gGVk99LQVd0me7kW/e5SBd1HLpdo/xViY9MJVpqJ0Y8FH1R59MLDViWPP1go=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwaK89zWE4QnxPc0reix7oKASK97hMmc59QaXJvAuVylBzS2xG4
+	DQois3Dh9f2QzFsV5R7ZDkv3EIHZv0A/EHHMpRo+vxn5uoklJyFeLzmGxAu8r+o=
+X-Google-Smtp-Source: AGHT+IGtxObPJ6gJ6RNKsEBFXvORdYFbtVM6yAWK+WhBXrNUGxJxbkOBSpwitGd986AzhoQ24ld42w==
+X-Received: by 2002:a05:6a00:3a18:b0:724:680d:d12c with SMTP id d2e1a72fcca58-72476bbab62mr6093027b3a.12.1731718759365;
+        Fri, 15 Nov 2024 16:59:19 -0800 (PST)
 Received: from [192.168.1.10] (71-212-14-56.tukw.qwest.net. [71.212.14.56])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7247713517csm1992167b3a.82.2024.11.15.16.23.29
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-724770ee8c6sm2024622b3a.4.2024.11.15.16.59.18
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 15 Nov 2024 16:23:30 -0800 (PST)
-Message-ID: <5d852741-0514-49c2-9c00-ec46860bbaf6@davidwei.uk>
-Date: Fri, 15 Nov 2024 16:23:29 -0800
+        Fri, 15 Nov 2024 16:59:18 -0800 (PST)
+Message-ID: <84e5987e-ff03-4fab-a042-679f76f341e9@davidwei.uk>
+Date: Fri, 15 Nov 2024 16:59:17 -0800
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -61,110 +61,57 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net 1/4] bluetooth: Improve setsockopt() handling of
+Subject: Re: [PATCH net v2 2/4] llc: Improve setsockopt() handling of
  malformed user input
 Content-Language: en-GB
-To: Michal Luczaj <mhal@rbox.co>,
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
+To: Michal Luczaj <mhal@rbox.co>, Marcel Holtmann <marcel@holtmann.org>,
  Johan Hedberg <johan.hedberg@gmail.com>,
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
  "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
  Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- David Howells <dhowells@redhat.com>, Marc Dionne <marc.dionne@auristor.com>,
- Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
+ David Howells <dhowells@redhat.com>, Marc Dionne <marc.dionne@auristor.com>
+Cc: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
  linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
  linux-afs@lists.infradead.org, Jakub Kicinski <kuba@kernel.org>
-References: <20241115-sockptr-copy-fixes-v1-0-d183c87fcbd5@rbox.co>
- <20241115-sockptr-copy-fixes-v1-1-d183c87fcbd5@rbox.co>
- <156ce25b-4344-40cd-9c72-1a45e8f77b38@davidwei.uk>
- <CABBYNZLbR22cWaXA4YNwtE8=+VfdGYR5oN6TSJ-MwXCuP3=6hw@mail.gmail.com>
- <970c7945-3dc4-4f07-94d5-19080efb2f21@davidwei.uk>
- <CABBYNZL_awaZOKpsAyOaAbtnJLobJ1bQpF_9JNxpiyQg5P5q1Q@mail.gmail.com>
- <4292b59f-7956-4c37-8909-ecb2261687b1@davidwei.uk>
- <02c01b54-ad82-4ae0-b4fd-db1b7687efa0@rbox.co>
+References: <20241115-sockptr-copy-fixes-v2-0-9b1254c18b7a@rbox.co>
+ <20241115-sockptr-copy-fixes-v2-2-9b1254c18b7a@rbox.co>
 From: David Wei <dw@davidwei.uk>
-In-Reply-To: <02c01b54-ad82-4ae0-b4fd-db1b7687efa0@rbox.co>
+In-Reply-To: <20241115-sockptr-copy-fixes-v2-2-9b1254c18b7a@rbox.co>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 
-On 2024-11-15 00:31, Michal Luczaj wrote:
-> On 11/15/24 04:04, David Wei wrote:
->> On 2024-11-14 18:50, Luiz Augusto von Dentz wrote:
->>> Hi David,
->>> On Thu, Nov 14, 2024 at 9:30 PM David Wei <dw@davidwei.uk> wrote:
->>>> On 2024-11-14 18:15, Luiz Augusto von Dentz wrote:
->>>>> Hi David,
->>>>> On Thu, Nov 14, 2024 at 7:42 PM David Wei <dw@davidwei.uk> wrote:
->>>>>> On 2024-11-14 15:27, Michal Luczaj wrote:
->>>>>> ...
->>>>>>> diff --git a/net/bluetooth/rfcomm/sock.c b/net/bluetooth/rfcomm/sock.c
->>>>>>> index f48250e3f2e103c75d5937e1608e43c123aa3297..1001fb4cc21c0ecc7bcdd3ea9041770ede4f27b8 100644
->>>>>>> --- a/net/bluetooth/rfcomm/sock.c
->>>>>>> +++ b/net/bluetooth/rfcomm/sock.c
->>>>>>> @@ -629,10 +629,9 @@ static int rfcomm_sock_setsockopt_old(struct socket *sock, int optname,
->>>>>>>
->>>>>>>       switch (optname) {
->>>>>>>       case RFCOMM_LM:
->>>>>>> -             if (bt_copy_from_sockptr(&opt, sizeof(opt), optval, optlen)) {
->>>>>>> -                     err = -EFAULT;
->>>>>>> +             err = copy_safe_from_sockptr(&opt, sizeof(opt), optval, optlen);
->>>>>>> +             if (err)
->>>>>>>                       break;
->>>>>>> -             }
->>>>>>
->>>>>> This will return a positive integer if copy_safe_from_sockptr() fails.
->>>>>
->>>>> What are you talking about copy_safe_from_sockptr never returns a
->>>>> positive value:
->>>>>
->>>>>  * Returns:
->>>>>  *  * -EINVAL: @optlen < @ksize
->>>>>  *  * -EFAULT: access to userspace failed.
->>>>>  *  * 0 : @ksize bytes were copied
->>>>
->>>> Isn't this what this series is about? copy_from_sockptr() returns 0 on
->>>> success, or a positive integer for number of bytes NOT copied on error.
->>>> Patch 4 even updates the docs for copy_from_sockptr().
->>>>
->>>> copy_safe_from_sockptr()
->>>>         -> copy_from_sockptr()
->>>>         -> copy_from_sockptr_offset()
->>>>         -> memcpy() for kernel to kernel OR
->>>>         -> copy_from_user() otherwise
->>>
->>> Well except the safe version does check what would otherwise cause a
->>> positive return by the likes of copy_from_user and returns -EINVAL
->>> instead, otherwise the documentation of copy_safe_from_sockptr is just
->>> wrong and shall state that it could return positive as well but I
->>> guess that would just make it as inconvenient so we might as well
->>> detect when a positive value would be returned just return -EFAULT
->>> instead.
->>
->> Yes it checks and returns EINVAL, but not EFAULT which is what my
->> comment on the original patch is about. Most of the calls to
->> bt_copy_from_sockptr() that Michal replaced with
->> copy_safe_from_sockptr() remain incorrect because it is assumed that
->> EFAULT is returned. Only rfcomm_sock_setsockopt_old() was vaguely doing
->> the right thing and the patch changed it back to the incorrect pattern:
->>
->> err = copy_safe_from_sockptr(...);
->> if (err)
->> 	break;
->>
->> But I do agree that making copy_safe_from_sockptr() do the right thing
->> and EFAULT will be easier and prevent future problems given that
->> copy_from_sockptr() is meant to be deprecated anyhow.
+On 2024-11-15 05:21, Michal Luczaj wrote:
+> copy_from_sockptr()'s non-zero result represents the number of bytes that
+> could not be copied. Turn that into EFAULT.
 > 
-> Just to be clear: copy_safe_from_sockptr() was recently fixed to return
-> EFAULT:
-> https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git/commit/?id=eb94b7bb1010
-> Sorry, I should have mentioned this series is a follow up to that patch.
-
-I missed that, sorry. In which case this patch looks good.
-
-Reviewed-by: David Wei <dw@davidwei.uk>
-
+> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+> Signed-off-by: Michal Luczaj <mhal@rbox.co>
+> ---
+>  net/llc/af_llc.c | 8 ++++----
+>  1 file changed, 4 insertions(+), 4 deletions(-)
 > 
-> Thanks,
-> Michal
+> diff --git a/net/llc/af_llc.c b/net/llc/af_llc.c
+> index 4eb52add7103b0f83d6fe7318abf1d1af533d254..711c8a7a423f1cf1b03e684a6e23c8eefbab830f 100644
+> --- a/net/llc/af_llc.c
+> +++ b/net/llc/af_llc.c
+> @@ -1096,12 +1096,12 @@ static int llc_ui_setsockopt(struct socket *sock, int level, int optname,
+>  	int rc = -EINVAL;
+>  
+>  	lock_sock(sk);
+> -	if (unlikely(level != SOL_LLC || optlen != sizeof(int)))
+> +	if (unlikely(level != SOL_LLC || optlen != sizeof(opt)))
+>  		goto out;
+> -	rc = copy_from_sockptr(&opt, optval, sizeof(opt));
+> -	if (rc)
+> +	if (copy_from_sockptr(&opt, optval, sizeof(opt))) {
+> +		rc = -EFAULT;
+>  		goto out;
+> -	rc = -EINVAL;
+> +	}
+>  	switch (optname) {
+>  	case LLC_OPT_RETRY:
+>  		if (opt > LLC_OPT_MAX_RETRY)
 > 
+
+Can copy_from_sockptr() be deprecated here in favour of
+copy_safe_from_sockptr()?
