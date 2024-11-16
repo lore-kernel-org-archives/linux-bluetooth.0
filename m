@@ -1,146 +1,75 @@
-Received: from mail-io1-f70.google.com (mail-io1-f70.google.com [209.85.166.70])
+Received: from mail-pl1-f195.google.com (mail-pl1-f195.google.com [209.85.214.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E28313A26F
-	for <linux-bluetooth@vger.kernel.org>; Sat, 16 Nov 2024 13:13:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.70
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2D808BE8
+	for <linux-bluetooth@vger.kernel.org>; Sat, 16 Nov 2024 15:40:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731762805; cv=none; b=KS2N9qQhmHh/nmIHVHfPA+S8JCneWrcS3+3ZpsxUC5KffHcvVnHtxh0c3VrR+4fI9r+HEqWGGO4PRtTkXXqTRuZDJZKQTpRl9h0GOKDoGUlNda9LMq8QQCb1MA5dfYnBksUm0M2BnwB3uieLfJqGuCm5FkoeSolOCMQpuRqe61I=
+	t=1731771631; cv=none; b=tERMEcDjd4t6utyqbXjHU1TdgKdzp0M14YMUw6lr/DX9Ex5DDqsi9otPTdvPL1H7Mgq9/Fu54ZcG7O6YJk8hg52wDdrQMneGun41X+czsi/u3QK9J+VAYtbgAJI7wOicoIT2sDPKJJrnP1fWgp0pI61rzqYGOO3a8EI4PC9rUeo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731762805; c=relaxed/simple;
-	bh=HmIJf5oq0Ta9gbPSfpdKvplD9gOOwXRsb1Ne99WGRnc=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=Mm85jl3uQJXlvqb2r/uwCBt5hKONwAHCIAOLxrCNqzq5mOWVnx7mALVnHh+ntgK6NgY8gTNU1mKUqWHP36pkzJDsGS5ISqhCC+TE6D8+78jkbVFd0Lh+6fGGHRDghBjQcOtu9zra1MQKzS9YGNotN4BT+Bhyi+Eoe0eNNXlnjrc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.70
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-83abe8804a5so272445739f.2
-        for <linux-bluetooth@vger.kernel.org>; Sat, 16 Nov 2024 05:13:24 -0800 (PST)
+	s=arc-20240116; t=1731771631; c=relaxed/simple;
+	bh=Wd+7kLQISUZlzyPvYmSUTVOb8NV4Vyd3OpsFXw6X7a0=;
+	h=From:Message-ID:To:Subject:Date:MIME-Version:Content-Type; b=jdOLXbSQAAohUNsdRM17K7l0ClA6UvKmPAdQEKMuSOEcOzEwXAFOiD6lT2Fzg5Va3FNJSGVmjLhRulx3hJSR894j1lS7n1QFWyBDJCzN5GzJ0vWD2e7h6dOTmm/Pe1RNwEzfH7BxWLS2Ps1FYbnNRnGxTdCCH1ziwm7mg+dHAY0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=a6H5r982; arc=none smtp.client-ip=209.85.214.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="a6H5r982"
+Received: by mail-pl1-f195.google.com with SMTP id d9443c01a7336-211985ed4c3so2866675ad.2
+        for <linux-bluetooth@vger.kernel.org>; Sat, 16 Nov 2024 07:40:29 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1731771624; x=1732376424; darn=vger.kernel.org;
+        h=mime-version:date:subject:to:reply-to:message-id:from:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=XHEOkgJ64rwJ+cv0sVIqPUmbc8l+iTifR7HzGzNced0=;
+        b=a6H5r982JeS1cnKzgDhgoIIer4+NQGa98sxHjjUenfgEsQzzAOza9oBDQxZYWDlW9Z
+         VgyDHH54XQI3P9IH4A9iDSDE5OZbBJzcxRM2XZWjmkWlw2ISVk0MCDDekm4znJDCKW/v
+         d0FsWWNUeN+1/Bi2f6R2rR/+bpM9CtOFl8KWl0WIkARfXhaAWdzfeGx3T/goCWOozmVP
+         v2ENBlGRDqVFDHuT79igDFPdbHmHlgWQWMjdLyn0Ic9THxD+zyJ+1EYvtWeAH3MoLJDX
+         0VMNkw9r2reS/CCM+9cwr91F4Akvt7onfVGOitMzDSXPgXXAUxEfj+P5s3BCcuhsgwi3
+         KcVA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731762803; x=1732367603;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=ABsb/moOV6pCjySDHZbyYwJBpCe4I9gMuXMFEMDpgZg=;
-        b=XkOkSWTwNWKMyosT9M/kvhSk5OtyHN0UNTs7aPmxJqEyqrVH63yv47eFsb1Ahila99
-         9MbiKuUL1mc3aDgUpVKPSWVYvPE0pT2hqOBnPAWRyUw4SjxFvbT6EJVYGZwg3Zf0Iy/G
-         6UBwKpucFHXhrfOK+D0drDRCBnzOsV4uLSj5UNAThQ6xY2lYMxOULQo5h7ILEIfHVuCS
-         sdkYdeE/ioEFtlNOdfsuHF4yx+n7aY14CyQjga6t46Yw344pO4sH2L9uZhiYxLdy9yrf
-         RuphRF2to8ZMuweRdpCUXKfH7iiXQRPhH4cuGGvrLFqlHKEOs+MCDEBFNvqjN/5Jrolk
-         wU5w==
-X-Forwarded-Encrypted: i=1; AJvYcCVXvyHDm9bp30dmCo+sc4U/V8wwrGWsDF5mDhxsi1tGExTTq/M1M0j7A9cwh/n92X1PSFS+38NL+te4GQgLmkc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyR0EKY7HW0RKptNAqmWH8Cmrz11mB48Suy7LIQ11DlisFEeDaU
-	c3iGaaGNGzdAuK3kFfTiEhCJZc2WHSetcUsH34zCwTFhnsaMxEFWDJeLmyGSpktEe6B14eE8qNb
-	83zrjgSiF59WLjeQJU3nAqsKTT0e4SIDDwU7NRZ4TlM1bZfS7+NIF4r8=
-X-Google-Smtp-Source: AGHT+IHWhev16VILb5Y75Z+PMmUrYfwmu2wKvXzc/BlWClFJuE51ISU9lEJjKfGDegpW2dMWFHXrzGjnWwVwhxrrqxtGWXkcGwk0
+        d=1e100.net; s=20230601; t=1731771624; x=1732376424;
+        h=mime-version:date:subject:to:reply-to:message-id:from
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=XHEOkgJ64rwJ+cv0sVIqPUmbc8l+iTifR7HzGzNced0=;
+        b=EHGHy/l6+bZ9S4RQ3IFcmKkAQNV20ssanMa0WT5cER2XEYlDgyLM0wzqzPdrtJ/TQl
+         0NnWAr0+a4OhAcpWR3wDbkOJ4sc9WnU3Uq67UqNFJFy1BGd/Dgi9aoel4YNfF+XbNwxH
+         2c8dMJ4w0L2xuNBwtzLq5tFew+oHsfceYY7bE1QxsErScNu7XduW+RbWNA8Cdyqrnuro
+         1e+G34NY1Rk73YWWf/VjFGsodijwbALzZH6mgiNF1kzs2MJgc4a1nVaqox7wzLucnhuj
+         S/lIcjPuLkv5H9hxt0sA7ArnNRhX32GwgDKrnC8OKPLWxhn1QMGc5h+mdVfdmyZxMKD/
+         /yGA==
+X-Gm-Message-State: AOJu0YwNk75h9i9sj6ph3NwP5iLWMe9v61S3yOiohy/AuhjkqeadLYUs
+	nSeeX9oCn/BYCt29loLCkgTAQ5D4Bco8FPK2JNWJZjvFlbAEZPcoKMORkgzF
+X-Google-Smtp-Source: AGHT+IGEb9QzZvcwe9bHwIiTjeVNjgNII6p7jt8FBY3V+EZAvmZlFpSQSxUTC1xes7yymf+wEbN+WA==
+X-Received: by 2002:a17:903:2b06:b0:20c:92ce:35b3 with SMTP id d9443c01a7336-211d0d635demr38370065ad.2.1731771624066;
+        Sat, 16 Nov 2024 07:40:24 -0800 (PST)
+Received: from [103.67.163.162] ([103.67.163.162])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-211d0f4690bsm29150535ad.194.2024.11.16.07.40.22
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Sat, 16 Nov 2024 07:40:23 -0800 (PST)
+From: "Van. HR" <maniaakannxbxn@gmail.com>
+X-Google-Original-From: "Van. HR" <infodesk@information.com>
+Message-ID: <12a80f411b2bfc4419d4dd9bcdba016c61b1eedd8654c30e939171fc6dcb9a0b@mx.google.com>
+Reply-To: dirofdptvancollin@gmail.com
+To: linux-bluetooth@vger.kernel.org
+Subject: Nov:16:24
+Date: Sat, 16 Nov 2024 10:40:20 -0500
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:12c4:b0:3a1:f549:7272 with SMTP id
- e9e14a558f8ab-3a7480a0777mr57715705ab.23.1731762803512; Sat, 16 Nov 2024
- 05:13:23 -0800 (PST)
-Date: Sat, 16 Nov 2024 05:13:23 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <67389a73.050a0220.bb738.000a.GAE@google.com>
-Subject: [syzbot] [bluetooth?] KMSAN: uninit-value in hci_cmd_complete_evt
-From: syzbot <syzbot+a9a4bedfca6aa9d7fa24@syzkaller.appspotmail.com>
-To: johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, luiz.dentz@gmail.com, marcel@holtmann.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
 
 Hello,
+I am a private investment consultant representing the interest of a multinational  conglomerate that wishes to place funds into a trust management portfolio.
 
-syzbot found the following issue on:
+Please indicate your interest for additional information.
 
-HEAD commit:    2d5404caa8c7 Linux 6.12-rc7
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=1357fe30580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=dcca673786a14715
-dashboard link: https://syzkaller.appspot.com/bug?extid=a9a4bedfca6aa9d7fa24
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+Regards,
 
-Unfortunately, I don't have any reproducer for this issue yet.
+Van Collin.
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/a2910755fac8/disk-2d5404ca.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/a135257837ee/vmlinux-2d5404ca.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/3f8930906164/bzImage-2d5404ca.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+a9a4bedfca6aa9d7fa24@syzkaller.appspotmail.com
-
-=====================================================
-BUG: KMSAN: uninit-value in hci_cmd_complete_evt+0xd7b/0xeb0 net/bluetooth/hci_event.c:4221
- hci_cmd_complete_evt+0xd7b/0xeb0 net/bluetooth/hci_event.c:4221
- hci_event_func net/bluetooth/hci_event.c:7440 [inline]
- hci_event_packet+0x11df/0x1c20 net/bluetooth/hci_event.c:7495
- hci_rx_work+0x9d1/0x11f0 net/bluetooth/hci_core.c:4031
- process_one_work kernel/workqueue.c:3229 [inline]
- process_scheduled_works+0xae0/0x1c40 kernel/workqueue.c:3310
- worker_thread+0xea7/0x14f0 kernel/workqueue.c:3391
- kthread+0x3e2/0x540 kernel/kthread.c:389
- ret_from_fork+0x6d/0x90 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
-
-Uninit was stored to memory at:
- hci_cmd_complete_evt+0xaf4/0xeb0
- hci_event_func net/bluetooth/hci_event.c:7440 [inline]
- hci_event_packet+0x11df/0x1c20 net/bluetooth/hci_event.c:7495
- hci_rx_work+0x9d1/0x11f0 net/bluetooth/hci_core.c:4031
- process_one_work kernel/workqueue.c:3229 [inline]
- process_scheduled_works+0xae0/0x1c40 kernel/workqueue.c:3310
- worker_thread+0xea7/0x14f0 kernel/workqueue.c:3391
- kthread+0x3e2/0x540 kernel/kthread.c:389
- ret_from_fork+0x6d/0x90 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
-
-Uninit was created at:
- slab_post_alloc_hook mm/slub.c:4091 [inline]
- slab_alloc_node mm/slub.c:4134 [inline]
- kmem_cache_alloc_node_noprof+0x6bf/0xb80 mm/slub.c:4186
- kmalloc_reserve+0x13d/0x4a0 net/core/skbuff.c:587
- __alloc_skb+0x363/0x7b0 net/core/skbuff.c:678
- alloc_skb include/linux/skbuff.h:1322 [inline]
- bt_skb_alloc include/net/bluetooth/bluetooth.h:494 [inline]
- vhci_get_user drivers/bluetooth/hci_vhci.c:487 [inline]
- vhci_write+0x127/0x900 drivers/bluetooth/hci_vhci.c:607
- new_sync_write fs/read_write.c:590 [inline]
- vfs_write+0xb2b/0x1540 fs/read_write.c:683
- ksys_write+0x24f/0x4c0 fs/read_write.c:736
- __do_sys_write fs/read_write.c:748 [inline]
- __se_sys_write fs/read_write.c:745 [inline]
- __x64_sys_write+0x93/0xe0 fs/read_write.c:745
- x64_sys_call+0x306a/0x3ba0 arch/x86/include/generated/asm/syscalls_64.h:2
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xcd/0x1e0 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-CPU: 0 UID: 0 PID: 5791 Comm: kworker/u9:2 Not tainted 6.12.0-rc7-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/30/2024
-Workqueue: hci1 hci_rx_work
-=====================================================
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
