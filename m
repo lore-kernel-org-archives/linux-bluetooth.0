@@ -1,117 +1,194 @@
-Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
+Received: from smtp.smtpout.orange.fr (smtp-17.smtpout.orange.fr [80.12.242.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19CD38827
-	for <linux-bluetooth@vger.kernel.org>; Sat, 16 Nov 2024 00:59:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4802E18D625;
+	Sat, 16 Nov 2024 06:06:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.12.242.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731718761; cv=none; b=U0Np5IObxjUmuChaf0swH/dsoA2nyRF/PsDo0gzg052Ku55wveRfIQgVcz1Zqe2ve9InarLQM8v0s8oyOWLU0E10TO+pku7o9RW/pwCZqQzMDOPhaZvTEEfrQLZjyoIxhGsY+oa5uBcp6WZ9QVz0nsUzbqCTysZzunumf0JLE7U=
+	t=1731737173; cv=none; b=MhxAwLJ2c1bpXvkXFyPUWLWbMk5H5y/haIGtdEYd4iQbAknb+GSEMQYasmbp78A3RjR1TsJS8jXUngAPyDURDY8Pk7ra7nm+Cs1Jz3ynDnGsIa5S5mYGkV7T2ivR44KEYdEB7TSMYVtTqMG0oQ2QpvNVj0t7nwxikF6VxcjDEl8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731718761; c=relaxed/simple;
-	bh=dvD0hKQXuAc6G67gWLjt1nhZyW29a1C2X3NQA33HeR8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ikS5luxDZAGMqISHV1s908iuSlvJmp4qLMiNFqF5g7YKuvZPXwVMuCnwle/AP5WjVoeJ47FdkOqk6ZLA6ovuxp3j37JoOxavZqBLX05/0Pnbu3UmRQOebwMnvs6WaUozftDvFerbD9jCG/EgJmo9O1SMTjZysj6MZxcMSPkH1IQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=XTStq81d; arc=none smtp.client-ip=209.85.210.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
+	s=arc-20240116; t=1731737173; c=relaxed/simple;
+	bh=pH1vRRZ7ypbK8ig19ve8VTJ681CoPKnEt+e4Gii8zqE=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=U5Xy6Fwq6+crFGvk27H3N5sGM046RWmreh5emx+b7pPCAl9NcnhggLl1ZJYsnJ1/RX2LhebezU6rBNhL5H5fP1SKd7QcdIkgh92pGJWHDDXrb8SQMfX2dXOlvZI9bBre535hjVqQ7MomH0oCUDkGS+a8+FD6dG5vhxMEF8n5uZQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=wanadoo.fr; dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b=mL98MjzV; arc=none smtp.client-ip=80.12.242.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wanadoo.fr
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="XTStq81d"
-Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-72041ff06a0so133003b3a.2
-        for <linux-bluetooth@vger.kernel.org>; Fri, 15 Nov 2024 16:59:19 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1731718759; x=1732323559; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Z0COtCpxXPmcydvtIOZbiJQIN65FajXQuXUIvSDmfP8=;
-        b=XTStq81duJqj1UUI74+mUL31E9NQ3D4Z7G4INCJwD7DMiY/+LFgS/AIAwkJOE9Ipqg
-         iA3XN8MSOICq7Ny8U8U11FWe0zkflgJnaoLkHDGnoA70ZUuGuRVjIzVleTH4E6iWgqrt
-         dKMyJ52TV4AfanUBBHlNCSKdmkGEAtCA/jaZvs8BcpgzjaRSc+/qlvf1Cz0u59y0hLLj
-         Zu0A15rKKE7rUFTa0cV9IGoNQ2PuoZ/vwtm1lDNp430GJj4xQfxVzaQbaZgm1iAu7u02
-         JzDn9K6Q/BuXqy1tZ2dY/l9F5MZAcmcvbRcra0DGKdyl75FS1JZ3w2oDkr92WORJqhyr
-         BHfA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731718759; x=1732323559;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Z0COtCpxXPmcydvtIOZbiJQIN65FajXQuXUIvSDmfP8=;
-        b=MS61UtyUS42kPsJezUaE2RJH0IkRZLbYpphP+Ua2yPLnCV0CNlZnESR5rKo6dTh+ny
-         Uv1obZGgQAi6WSq1micD9A1Zve8hf7RkiExg4ap4C120qOFfVBJwEZds+ldWq9+PQoe+
-         JDNoaCV6mCue6G37ysReP+gaK26DHS1y4Idmd1UTRJPITLBfowFN2mc0G2NMXiRmhwq/
-         TSGqlRNxOkvbl9XKIHq4z+NhbQf5ujwMDozCrjFzf9nUdwKeQ1xj67Hgs9GxSVwrGsYW
-         X/jek95JAsvPqHGzaQEFKeWf5Zd3D2PkVLxcgMsthipw7G4D2F0dC+7pKJeJ8b5NRyVI
-         trXw==
-X-Forwarded-Encrypted: i=1; AJvYcCVaB3xXE3htvu2Na+eUzHLtX00gGVk99LQVd0me7kW/e5SBd1HLpdo/xViY9MJVpqJ0Y8FH1R59MLDViWPP1go=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwaK89zWE4QnxPc0reix7oKASK97hMmc59QaXJvAuVylBzS2xG4
-	DQois3Dh9f2QzFsV5R7ZDkv3EIHZv0A/EHHMpRo+vxn5uoklJyFeLzmGxAu8r+o=
-X-Google-Smtp-Source: AGHT+IGtxObPJ6gJ6RNKsEBFXvORdYFbtVM6yAWK+WhBXrNUGxJxbkOBSpwitGd986AzhoQ24ld42w==
-X-Received: by 2002:a05:6a00:3a18:b0:724:680d:d12c with SMTP id d2e1a72fcca58-72476bbab62mr6093027b3a.12.1731718759365;
-        Fri, 15 Nov 2024 16:59:19 -0800 (PST)
-Received: from [192.168.1.10] (71-212-14-56.tukw.qwest.net. [71.212.14.56])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-724770ee8c6sm2024622b3a.4.2024.11.15.16.59.18
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 15 Nov 2024 16:59:18 -0800 (PST)
-Message-ID: <84e5987e-ff03-4fab-a042-679f76f341e9@davidwei.uk>
-Date: Fri, 15 Nov 2024 16:59:17 -0800
+	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="mL98MjzV"
+Received: from localhost.localdomain ([90.11.132.44])
+	by smtp.orange.fr with ESMTPA
+	id CBwItlkEVyQmhCBwItrt0n; Sat, 16 Nov 2024 07:06:02 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
+	s=t20230301; t=1731737162;
+	bh=1GOO379j5kHelQgT13xeDCIW+pFPJCeiM7WSIuvag78=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version;
+	b=mL98MjzVZSShtzisX9zbjDjIb7KE72buAzIx9jorkgCEIlxacBGBiKDqnznYupede
+	 vEhaEvssP8Otw+abSwd4UipThVl5qw3v6w8RixuAXgrl/p9FBRiYmldRfZZljgK0OD
+	 FX0UB9px2S9OjhfpAHnQggpK1elWNH8UBNVIvO5x+AsAiYtyf4oGwInz8jFtqh7DDu
+	 OMNwG4GURPpChqfcVzLVhpacwz+NEqWf9xIvmwF/gxmCGy7nRrRkaf4TeGrlu6c0Ll
+	 o9NHONgP90fIf7c6ZsyFFLJ/v2i9NFywx5+jxHfxBiA3eBfpU5DKAu5obNXbrUQywu
+	 rI95zY+eQlUcg==
+X-ME-Helo: localhost.localdomain
+X-ME-Auth: Y2hyaXN0b3BoZS5qYWlsbGV0QHdhbmFkb28uZnI=
+X-ME-Date: Sat, 16 Nov 2024 07:06:02 +0100
+X-ME-IP: 90.11.132.44
+From: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+To: eahariha@linux.microsoft.com
+Cc: James.Bottomley@HansenPartnership.com,
+	Julia.Lawall@inria.fr,
+	agordeev@linux.ibm.com,
+	airlied@gmail.com,
+	akpm@linux-foundation.org,
+	andrew+netdev@lunn.ch,
+	anna-maria@linutronix.de,
+	ath11k@lists.infradead.org,
+	axboe@kernel.dk,
+	bcm-kernel-feedback-list@broadcom.com,
+	borntraeger@linux.ibm.com,
+	catalin.marinas@arm.com,
+	ceph-devel@vger.kernel.org,
+	christian.gmeiner@gmail.com,
+	christophe.leroy@csgroup.eu,
+	cocci@inria.fr,
+	coreteam@netfilter.org,
+	daniel@zonque.org,
+	davem@davemloft.net,
+	dick.kennedy@broadcom.com,
+	dri-devel@lists.freedesktop.org,
+	edumazet@google.com,
+	etnaviv@lists.freedesktop.org,
+	florian.fainelli@broadcom.com,
+	gor@linux.ibm.com,
+	gregkh@linuxfoundation.org,
+	haojian.zhuang@gmail.com,
+	hca@linux.ibm.com,
+	horms@kernel.org,
+	idryomov@gmail.com,
+	intel-xe@lists.freedesktop.org,
+	james.smart@broadcom.com,
+	jeroendb@google.com,
+	jikos@kernel.org,
+	jinpu.wang@cloud.ionos.com,
+	jjohnson@kernel.org,
+	joe.lawrence@redhat.com,
+	johan.hedberg@gmail.com,
+	jpoimboe@kernel.org,
+	kadlec@netfilter.org,
+	kuba@kernel.org,
+	kvalo@kernel.org,
+	l.stach@pengutronix.de,
+	linux+etnaviv@armlinux.org.uk,
+	linux-arm-kernel@lists.infradead.org,
+	linux-block@vger.kernel.org,
+	linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-mm@kvack.org,
+	linux-rpi-kernel@lists.infradead.org,
+	linux-s390@vger.kernel.org,
+	linux-scsi@vger.kernel.org,
+	linux-sound@vger.kernel.org,
+	linux-staging@lists.linux.dev,
+	linux-wireless@vger.kernel.org,
+	linux@armlinux.org.uk,
+	linuxppc-dev@lists.ozlabs.org,
+	live-patching@vger.kernel.org,
+	louis.peens@corigine.com,
+	lucas.demarchi@intel.com,
+	luiz.dentz@gmail.com,
+	maarten.lankhorst@linux.intel.com,
+	maddy@linux.ibm.com,
+	marcel@holtmann.org,
+	martin.petersen@oracle.com,
+	mbenes@suse.cz,
+	mpe@ellerman.id.au,
+	mripard@kernel.org,
+	naveen@kernel.org,
+	netdev@vger.kernel.org,
+	netfilter-devel@vger.kernel.org,
+	nicolas.palix@imag.fr,
+	npiggin@gmail.com,
+	obitton@habana.ai,
+	ogabbay@kernel.org,
+	oss-drivers@corigine.com,
+	pabeni@redhat.com,
+	pablo@netfilter.org,
+	perex@perex.cz,
+	pkaligineedi@google.com,
+	pmladek@suse.com,
+	rjui@broadcom.com,
+	robert.jarzmik@free.fr,
+	rodrigo.vivi@intel.com,
+	roger.pau@citrix.com,
+	sbranden@broadcom.com,
+	shailend@google.com,
+	simona@ffwll.ch,
+	svens@linux.ibm.com,
+	thomas.hellstrom@linux.intel.com,
+	tiwai@suse.com,
+	tzimmermann@suse.de,
+	xen-devel@lists.xenproject.org,
+	xiubli@redhat.com
+Subject: Re: [PATCH v2 02/21] coccinelle: misc: Add secs_to_jiffies script
+Date: Sat, 16 Nov 2024 07:05:40 +0100
+Message-ID: <20241116060541.5798-1-christophe.jaillet@wanadoo.fr>
+X-Mailer: git-send-email 2.47.0
+In-Reply-To: <20241115-converge-secs-to-jiffies-v2-2-911fb7595e79@linux.microsoft.com>
+References: <20241115-converge-secs-to-jiffies-v2-2-911fb7595e79@linux.microsoft.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v2 2/4] llc: Improve setsockopt() handling of
- malformed user input
-Content-Language: en-GB
-To: Michal Luczaj <mhal@rbox.co>, Marcel Holtmann <marcel@holtmann.org>,
- Johan Hedberg <johan.hedberg@gmail.com>,
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- David Howells <dhowells@redhat.com>, Marc Dionne <marc.dionne@auristor.com>
-Cc: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
- linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
- linux-afs@lists.infradead.org, Jakub Kicinski <kuba@kernel.org>
-References: <20241115-sockptr-copy-fixes-v2-0-9b1254c18b7a@rbox.co>
- <20241115-sockptr-copy-fixes-v2-2-9b1254c18b7a@rbox.co>
-From: David Wei <dw@davidwei.uk>
-In-Reply-To: <20241115-sockptr-copy-fixes-v2-2-9b1254c18b7a@rbox.co>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 2024-11-15 05:21, Michal Luczaj wrote:
-> copy_from_sockptr()'s non-zero result represents the number of bytes that
-> could not be copied. Turn that into EFAULT.
-> 
-> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-> Signed-off-by: Michal Luczaj <mhal@rbox.co>
+Le 15/11/2024 à 22:26, Easwar Hariharan a écrit :
+> Suggested-by: Anna-Maria Behnsen <anna-maria@linutronix.de>
+> Signed-off-by: Easwar Hariharan <eahariha@linux.microsoft.com>
 > ---
->  net/llc/af_llc.c | 8 ++++----
->  1 file changed, 4 insertions(+), 4 deletions(-)
+>   scripts/coccinelle/misc/secs_to_jiffies.cocci | 21 +++++++++++++++++++++
+>   1 file changed, 21 insertions(+)
 > 
-> diff --git a/net/llc/af_llc.c b/net/llc/af_llc.c
-> index 4eb52add7103b0f83d6fe7318abf1d1af533d254..711c8a7a423f1cf1b03e684a6e23c8eefbab830f 100644
-> --- a/net/llc/af_llc.c
-> +++ b/net/llc/af_llc.c
-> @@ -1096,12 +1096,12 @@ static int llc_ui_setsockopt(struct socket *sock, int level, int optname,
->  	int rc = -EINVAL;
->  
->  	lock_sock(sk);
-> -	if (unlikely(level != SOL_LLC || optlen != sizeof(int)))
-> +	if (unlikely(level != SOL_LLC || optlen != sizeof(opt)))
->  		goto out;
-> -	rc = copy_from_sockptr(&opt, optval, sizeof(opt));
-> -	if (rc)
-> +	if (copy_from_sockptr(&opt, optval, sizeof(opt))) {
-> +		rc = -EFAULT;
->  		goto out;
-> -	rc = -EINVAL;
-> +	}
->  	switch (optname) {
->  	case LLC_OPT_RETRY:
->  		if (opt > LLC_OPT_MAX_RETRY)
+> diff --git a/scripts/coccinelle/misc/secs_to_jiffies.cocci b/scripts/coccinelle/misc/secs_to_jiffies.cocci
+> new file mode 100644
+> index 0000000000000000000000000000000000000000..af762b1c0aac8f044f21150bfaafd9efc834ee87
+> --- /dev/null
+> +++ b/scripts/coccinelle/misc/secs_to_jiffies.cocci
+> @@ -0,0 +1,21 @@
+> +// SPDX-License-Identifier: GPL-2.0-only
+> +///
+> +/// Find usages of:
+> +/// - msecs_to_jiffies(value*1000)
+> +/// - msecs_to_jiffies(value*MSEC_PER_SEC)
+> +///
+> +// Confidence: High
+> +// Copyright: (C) 2024 Easwar Hariharan Microsoft
+> +//
+> +// Keywords: secs, seconds, jiffies
+> +//
+> +
+> +@@ constant C; @@
+> +
+> +- msecs_to_jiffies(C * 1000)
+> ++ secs_to_jiffies(C)
+> +
+> +@@ constant C; @@
+> +
+> +- msecs_to_jiffies(C * MSEC_PER_SEC)
+> ++ secs_to_jiffies(C)
 > 
+Hi,
 
-Can copy_from_sockptr() be deprecated here in favour of
-copy_safe_from_sockptr()?
+	@@ constant C =~ "000"; @@
+
+	* msecs_to_jiffies(C)
+
+also spots things like msecs_to_jiffies(1000)
+
+I'm not sure that coccinelle is enable to capture part of the regex to automate the removal of the 000 when converting from ms to s.
+
+Just my 2c,
+
+CJ
