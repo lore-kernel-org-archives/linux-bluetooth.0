@@ -1,163 +1,109 @@
-Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mailtransmit04.runbox.com (mailtransmit04.runbox.com [185.226.149.37])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 326A8192B75
-	for <linux-bluetooth@vger.kernel.org>; Sat, 16 Nov 2024 07:59:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 059194C8F;
+	Sat, 16 Nov 2024 09:25:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.37
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731743978; cv=none; b=ligoa/rpFfuMFRTkIhuF/WpSbi/jTGX6OWoYtXJDgD/b2z6o7Hsfo6EN++fG+5/vv+Y3N7d5C63UOuIuGtjh8PKOWRWvx7IKsOBzqIG2enKioEYcQ+aQHkh6Znl/QwzoRq6MIiQYSt9YU6faqrJ1f4HhB1LhvVuCUQalIehn1Zs=
+	t=1731749126; cv=none; b=S3lJM87W3nCGuG376Lo/Z+8XB0wxWRd+0vY4Fc0sYijfVAvQIqGWoBHpHFWmzp8R0eXEq6n8K70NjXSw7hkzYZysR2buK+SkVEdnWDbUrfH3IgJAnjlmg9OSWn3UHz6HyfWIovlNm6vzhW4Z+YyyM6oa+fZAo2gmQppmGwwScis=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731743978; c=relaxed/simple;
-	bh=syAVCylnhi0AytBImEtkvzButQ9wsAguk45yhcS0NNc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EOY2qm1QETPYvAKMBQMflfnqB9jYikZUevX4wttMEF688Y2Yo0fJS52u05OSaDMYAcN4Ixe1QxUY4W0OszD3WW+dI2aJwNW7ZhxhH6CmtL5wYqK1nLNpc//Nttams3CjgVMhTQhaPl+ghRI88H1E+voTU9OOHdICWxw9KlKMGbA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=r5iZGNuE; arc=none smtp.client-ip=209.85.128.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	s=arc-20240116; t=1731749126; c=relaxed/simple;
+	bh=Zk1O9SUr1w34Gb7epIOzlc9m2eqC/jwsnWdOWs97jTQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ZHoinpFHwQAkMfMZJV8mAESvcafSI+r2b6bXzhGn7O3U2U+wTF7kATZFTLBZ2EIHorQVvm+2gOCd2K1RnTANfgP9mj0d67I60+IrrKUHc4ezKYSMptsRdo9ubS+5UNQ1D6nXRgIl4TLao6v2SJuwPNDPjG3MvNbWtyZ+l2Lh7kA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=UntmjAAj; arc=none smtp.client-ip=185.226.149.37
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="r5iZGNuE"
-Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-431616c23b5so14427505e9.0
-        for <linux-bluetooth@vger.kernel.org>; Fri, 15 Nov 2024 23:59:34 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1731743973; x=1732348773; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=xrsdExZKqTlwoTRHJD0ZdQo7yx2uU25FrNS0bU2S5+Y=;
-        b=r5iZGNuEOfNWbi26gs/0hDufWiKU9glpkrz83hfYdk20o+8yDMVRsyZ6+cPIv/oaQN
-         1kDE9R6Vr8IhLeyXsibSIWi+i5grPibUr8CgcnTKyayifBg26F0iK5NCf/Zk+pdy13Hu
-         08u3dXU0sR2s59y+fza8gG5ZMw0Hfg8Sa3w3izBxsCrCB2Hfi3yWK+5VciZPLCvYZRaJ
-         Cm3dD99wasOBV+Vb4KvuHLxcD9cr9PRrdBxQ3n8LlNaCQDaVlvqQLTJ3YxibOJsA3aud
-         mNDVaqD9+G+4jwsF6k6bmfL3lgB8UhWpAIV/7hICAk042PQXjY0vP86Sl31MhmWRTiq6
-         Ag5Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731743973; x=1732348773;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=xrsdExZKqTlwoTRHJD0ZdQo7yx2uU25FrNS0bU2S5+Y=;
-        b=YPHSLVsFY5VjhQp2wCvD2IIOdA1kXzSn2EUp8531vcIKUjrEj1MfwYSsznsBR9txTS
-         euGaq+GpUcRJqrT9zobUS40qvlce+kPBtxkV6uCHpXqSnjsoCLosTjrsC36fo1tKyHHo
-         dggtN21LCXx9yWn/cCvX4ynDN6wXBOyTPfS4XEhWBLsFCPoUG1+EEWfJla3dAlB8qMkv
-         wy8Tyqf2WKE0qPomxirLS/pq22QN9r4CeDm7QmG/gLc40d1N5R5PmoGy0Iv80Pdgnesw
-         MDTmCG0zty3MJBexXgC53SfTSobzu4K5x9quI/yBUWnyK/ftcveu8STt0I3Cjblw/CZr
-         s2uw==
-X-Forwarded-Encrypted: i=1; AJvYcCX9lA4hbZ8sTDMA8U5eovizuugqLmdyAF8Gnq0CX92931saYF2kzPtlf7nLt3I1baWhUKPYZT4iBDddqG0XTdc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwC80o0pO344lDBjmJ1Yk3kMRhQnS6pgrQvPUrNppdPkjh47rlp
-	hMPzmwInSg7T+Ze3sXAqES2kmFLNqh3RSc3GXXzCVeuv5iuMxL2XwisPOt+jG/w=
-X-Google-Smtp-Source: AGHT+IHwPca/r8TengkDOJBkzNMy5+IC+M/DjfY5vaIp0XwfqGKX+JdkORZRtZVKPaDZkydKQ4+r2A==
-X-Received: by 2002:a05:600c:19cb:b0:431:559d:4103 with SMTP id 5b1f17b1804b1-432defe3203mr49400585e9.7.1731743973417;
-        Fri, 15 Nov 2024 23:59:33 -0800 (PST)
-Received: from localhost ([196.207.164.177])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-432dab806e1sm81445685e9.20.2024.11.15.23.59.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 15 Nov 2024 23:59:32 -0800 (PST)
-Date: Sat, 16 Nov 2024 10:59:29 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: Easwar Hariharan <eahariha@linux.microsoft.com>
-Cc: Pablo Neira Ayuso <pablo@netfilter.org>,
-	Jozsef Kadlecsik <kadlec@netfilter.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Julia Lawall <Julia.Lawall@inria.fr>,
-	Nicolas Palix <nicolas.palix@imag.fr>,
-	Daniel Mack <daniel@zonque.org>,
-	Haojian Zhuang <haojian.zhuang@gmail.com>,
-	Robert Jarzmik <robert.jarzmik@free.fr>,
-	Russell King <linux@armlinux.org.uk>,
-	Heiko Carstens <hca@linux.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Sven Schnelle <svens@linux.ibm.com>,
-	Ofir Bitton <obitton@habana.ai>, Oded Gabbay <ogabbay@kernel.org>,
-	Lucas De Marchi <lucas.demarchi@intel.com>,
-	Thomas =?iso-8859-1?Q?Hellstr=F6m?= <thomas.hellstrom@linux.intel.com>,
-	Rodrigo Vivi <rodrigo.vivi@intel.com>,
-	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
-	Maxime Ripard <mripard@kernel.org>,
-	Thomas Zimmermann <tzimmermann@suse.de>,
-	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
-	Jeroen de Borst <jeroendb@google.com>,
-	Praveen Kaligineedi <pkaligineedi@google.com>,
-	Shailend Chand <shailend@google.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	James Smart <james.smart@broadcom.com>,
-	Dick Kennedy <dick.kennedy@broadcom.com>,
-	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	Roger Pau =?iso-8859-1?Q?Monn=E9?= <roger.pau@citrix.com>,
-	Jens Axboe <axboe@kernel.dk>, Kalle Valo <kvalo@kernel.org>,
-	Jeff Johnson <jjohnson@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Jack Wang <jinpu.wang@cloud.ionos.com>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	Ray Jui <rjui@broadcom.com>, Scott Branden <sbranden@broadcom.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	Xiubo Li <xiubli@redhat.com>, Ilya Dryomov <idryomov@gmail.com>,
-	Josh Poimboeuf <jpoimboe@kernel.org>,
-	Jiri Kosina <jikos@kernel.org>, Miroslav Benes <mbenes@suse.cz>,
-	Petr Mladek <pmladek@suse.com>,
-	Joe Lawrence <joe.lawrence@redhat.com>,
-	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
-	Lucas Stach <l.stach@pengutronix.de>,
-	Russell King <linux+etnaviv@armlinux.org.uk>,
-	Christian Gmeiner <christian.gmeiner@gmail.com>,
-	Louis Peens <louis.peens@corigine.com>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Nicholas Piggin <npiggin@gmail.com>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Naveen N Rao <naveen@kernel.org>,
-	Madhavan Srinivasan <maddy@linux.ibm.com>,
-	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	cocci@inria.fr, linux-arm-kernel@lists.infradead.org,
-	linux-s390@vger.kernel.org, dri-devel@lists.freedesktop.org,
-	intel-xe@lists.freedesktop.org, linux-scsi@vger.kernel.org,
-	xen-devel@lists.xenproject.org, linux-block@vger.kernel.org,
-	linux-wireless@vger.kernel.org, ath11k@lists.infradead.org,
-	linux-mm@kvack.org, linux-bluetooth@vger.kernel.org,
-	linux-staging@lists.linux.dev, linux-rpi-kernel@lists.infradead.org,
-	ceph-devel@vger.kernel.org, live-patching@vger.kernel.org,
-	linux-sound@vger.kernel.org, etnaviv@lists.freedesktop.org,
-	oss-drivers@corigine.com, linuxppc-dev@lists.ozlabs.org,
-	Anna-Maria Behnsen <anna-maria@linutronix.de>
-Subject: Re: [PATCH 19/22] livepatch: Convert timeouts to secs_to_jiffies()
-Message-ID: <896c656f-6d8c-4337-8464-7557c43a80ab@stanley.mountain>
-References: <20241115-converge-secs-to-jiffies-v1-0-19aadc34941b@linux.microsoft.com>
- <20241115-converge-secs-to-jiffies-v1-19-19aadc34941b@linux.microsoft.com>
+	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="UntmjAAj"
+Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
+	by mailtransmit04.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.93)
+	(envelope-from <mhal@rbox.co>)
+	id 1tCF38-00AKCl-Qn; Sat, 16 Nov 2024 10:25:02 +0100
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
+	s=selector2; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
+	References:Cc:To:Subject:MIME-Version:Date:Message-ID;
+	bh=xVQ7NElMWJv2muZgQTJ/fGMoxQ9I1cEMsg3js05cbQM=; b=UntmjAAj/s8OVVjhQdjCHmGnTa
+	KsduCeN6XnUcn/2Jv1hYKJ2Kud6YUl33f3jtzz0tQ3i/g/Q24hycj1HV28eUqhik9L118uRhuhHiq
+	jBH0YZLRR6HqBD1q4+utGTaCy4PDzckHsGV/Z5BvKUbHAMCIpzpIPv3zSlR0+PtmNP+I1hqihjy4i
+	UU+iXTFzh9iOuhOa/WODf0e5DMqxXuoGFvUKA9JKCfWE8Rbx0PymmiXlSWr8EUh6JHD++UusmD04G
+	SuSSK4ZTYu8cjbG+ZlT7BwyePtMcDd078Z6/4ULRF9iVvcyWt5tDLdZCJ/uctJX/xGlPWpCPqZH5l
+	W4pYdgog==;
+Received: from [10.9.9.74] (helo=submission03.runbox)
+	by mailtransmit03.runbox with esmtp (Exim 4.86_2)
+	(envelope-from <mhal@rbox.co>)
+	id 1tCF36-0000rQ-G9; Sat, 16 Nov 2024 10:25:00 +0100
+Received: by submission03.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.93)
+	id 1tCF33-00GPSH-Ma; Sat, 16 Nov 2024 10:24:57 +0100
+Message-ID: <368a3808-f774-4aaa-9658-bf19db891f8f@rbox.co>
+Date: Sat, 16 Nov 2024 10:24:55 +0100
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241115-converge-secs-to-jiffies-v1-19-19aadc34941b@linux.microsoft.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v2 2/4] llc: Improve setsockopt() handling of
+ malformed user input
+To: David Wei <dw@davidwei.uk>, Marcel Holtmann <marcel@holtmann.org>,
+ Johan Hedberg <johan.hedberg@gmail.com>,
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ David Howells <dhowells@redhat.com>, Marc Dionne <marc.dionne@auristor.com>
+Cc: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
+ linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+ linux-afs@lists.infradead.org, Jakub Kicinski <kuba@kernel.org>
+References: <20241115-sockptr-copy-fixes-v2-0-9b1254c18b7a@rbox.co>
+ <20241115-sockptr-copy-fixes-v2-2-9b1254c18b7a@rbox.co>
+ <84e5987e-ff03-4fab-a042-679f76f341e9@davidwei.uk>
+Content-Language: pl-PL, en-GB
+From: Michal Luczaj <mhal@rbox.co>
+In-Reply-To: <84e5987e-ff03-4fab-a042-679f76f341e9@davidwei.uk>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Fri, Nov 15, 2024 at 09:22:49PM +0000, Easwar Hariharan wrote:
-> diff --git a/samples/livepatch/livepatch-callbacks-busymod.c b/samples/livepatch/livepatch-callbacks-busymod.c
-> index 378e2d40271a9717d09eff51d3d3612c679736fc..d0fd801a7c21b7d7939c29d83f9d993badcc9aba 100644
-> --- a/samples/livepatch/livepatch-callbacks-busymod.c
-> +++ b/samples/livepatch/livepatch-callbacks-busymod.c
-> @@ -45,7 +45,7 @@ static int livepatch_callbacks_mod_init(void)
->  {
->  	pr_info("%s\n", __func__);
->  	schedule_delayed_work(&work,
-> -		msecs_to_jiffies(1000 * 0));
-> +		secs_to_jiffies(0));
+On 11/16/24 01:59, David Wei wrote:
+> On 2024-11-15 05:21, Michal Luczaj wrote:
+>> copy_from_sockptr()'s non-zero result represents the number of bytes that
+>> could not be copied. Turn that into EFAULT.
+>>
+>> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+>> Signed-off-by: Michal Luczaj <mhal@rbox.co>
+>> ---
+>>  net/llc/af_llc.c | 8 ++++----
+>>  1 file changed, 4 insertions(+), 4 deletions(-)
+>>
+>> diff --git a/net/llc/af_llc.c b/net/llc/af_llc.c
+>> index 4eb52add7103b0f83d6fe7318abf1d1af533d254..711c8a7a423f1cf1b03e684a6e23c8eefbab830f 100644
+>> --- a/net/llc/af_llc.c
+>> +++ b/net/llc/af_llc.c
+>> @@ -1096,12 +1096,12 @@ static int llc_ui_setsockopt(struct socket *sock, int level, int optname,
+>>  	int rc = -EINVAL;
+>>  
+>>  	lock_sock(sk);
+>> -	if (unlikely(level != SOL_LLC || optlen != sizeof(int)))
+>> +	if (unlikely(level != SOL_LLC || optlen != sizeof(opt)))
+>>  		goto out;
+>> -	rc = copy_from_sockptr(&opt, optval, sizeof(opt));
+>> -	if (rc)
+>> +	if (copy_from_sockptr(&opt, optval, sizeof(opt))) {
+>> +		rc = -EFAULT;
+>>  		goto out;
+>> -	rc = -EINVAL;
+>> +	}
+>>  	switch (optname) {
+>>  	case LLC_OPT_RETRY:
+>>  		if (opt > LLC_OPT_MAX_RETRY)
+>>
+> 
+> Can copy_from_sockptr() be deprecated here in favour of
+> copy_safe_from_sockptr()?
 
-Better to just call schedule_delayed_work(&work, 0);
+Yeah, good point. I'll wait a bit and send v3.
 
->  	return 0;
->  }
+Thanks!
 
-regards,
-dan carpenter
