@@ -1,164 +1,146 @@
-Received: from mail3-relais-sop.national.inria.fr (mail3-relais-sop.national.inria.fr [192.134.164.104])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f70.google.com (mail-io1-f70.google.com [209.85.166.70])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A986D74E09;
-	Sat, 16 Nov 2024 11:26:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.134.164.104
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E28313A26F
+	for <linux-bluetooth@vger.kernel.org>; Sat, 16 Nov 2024 13:13:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.70
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731756370; cv=none; b=mCA2+79yaTCe8jqTba2wBQK9qzEkdsLHkPc3W2Lpsidk4c0MrW+vRcs0rHdCPC1YiXjI9jqrQyzjrXklVWUjYMW15zln5a4paxsNqHUILEWCEGYpky1Hi5Vh6wHolQznk3OrmUhCIVDYdxxLmXBuV00zWoBmTrl+eCYVLVMr6DI=
+	t=1731762805; cv=none; b=KS2N9qQhmHh/nmIHVHfPA+S8JCneWrcS3+3ZpsxUC5KffHcvVnHtxh0c3VrR+4fI9r+HEqWGGO4PRtTkXXqTRuZDJZKQTpRl9h0GOKDoGUlNda9LMq8QQCb1MA5dfYnBksUm0M2BnwB3uieLfJqGuCm5FkoeSolOCMQpuRqe61I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731756370; c=relaxed/simple;
-	bh=sHo8qF+AvE8oVJvwFjFrtdRWHM4ZdMC/331/xYQY13M=;
-	h=Content-Type:From:Mime-Version:Subject:Date:Message-Id:References:
-	 Cc:In-Reply-To:To; b=Y3VriLnM/AXjiNMpHe2hEinCnXV/BaqfqfZ8j9b/yQeTrzE3GoNBl/ICJbWah4edlQugzrEbZ9dQIfZLSAdWIGJEnc9xRU3GAdtd9g9S9Rye86YDUJxKtbH9P7ZEnBAgHUZVO4OQsBODXCbxNcZkTJNDCzFbl9o+yd+tDFn4h4o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=inria.fr; spf=pass smtp.mailfrom=inria.fr; dkim=pass (1024-bit key) header.d=inria.fr header.i=@inria.fr header.b=e6HMrvPi; arc=none smtp.client-ip=192.134.164.104
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=inria.fr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=inria.fr
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=inria.fr header.i=@inria.fr header.b="e6HMrvPi"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=inria.fr; s=dc;
-  h=content-transfer-encoding:from:mime-version:subject:date:
-   message-id:references:cc:in-reply-to:to;
-  bh=anlUiHWGDGyJ8xswjmMdLXKoB6PZ+VXioMuGFa77dbg=;
-  b=e6HMrvPibM0Fbpr/ONm0hFVcMKT8wC0+mQJzKmTLL/6XVEyPLKe8HZWV
-   9C9LRPkcO6Hd6rCjzjqag+sCK6WeODO+KGVznFmYkAs5A6UnqgiSZB6Nc
-   xXNWMuA+9KGLx3MmUi1yOamiphAXkkAK5LOz38Lay2oYzEJOtPfPHDOwT
-   E=;
-Authentication-Results: mail3-relais-sop.national.inria.fr; dkim=none (message not signed) header.i=none; spf=SoftFail smtp.mailfrom=Julia.Lawall@inria.fr; dmarc=fail (p=none dis=none) d=inria.fr
-X-IronPort-AV: E=Sophos;i="6.12,159,1728943200"; 
-   d="scan'208";a="101793166"
-Received: from 105.39.22.93.rev.sfr.net (HELO smtpclient.apple) ([93.22.39.105])
-  by mail3-relais-sop.national.inria.fr with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Nov 2024 12:24:33 +0100
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-From: Julia Lawall <Julia.Lawall@inria.fr>
+	s=arc-20240116; t=1731762805; c=relaxed/simple;
+	bh=HmIJf5oq0Ta9gbPSfpdKvplD9gOOwXRsb1Ne99WGRnc=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=Mm85jl3uQJXlvqb2r/uwCBt5hKONwAHCIAOLxrCNqzq5mOWVnx7mALVnHh+ntgK6NgY8gTNU1mKUqWHP36pkzJDsGS5ISqhCC+TE6D8+78jkbVFd0Lh+6fGGHRDghBjQcOtu9zra1MQKzS9YGNotN4BT+Bhyi+Eoe0eNNXlnjrc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.70
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-83abe8804a5so272445739f.2
+        for <linux-bluetooth@vger.kernel.org>; Sat, 16 Nov 2024 05:13:24 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731762803; x=1732367603;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=ABsb/moOV6pCjySDHZbyYwJBpCe4I9gMuXMFEMDpgZg=;
+        b=XkOkSWTwNWKMyosT9M/kvhSk5OtyHN0UNTs7aPmxJqEyqrVH63yv47eFsb1Ahila99
+         9MbiKuUL1mc3aDgUpVKPSWVYvPE0pT2hqOBnPAWRyUw4SjxFvbT6EJVYGZwg3Zf0Iy/G
+         6UBwKpucFHXhrfOK+D0drDRCBnzOsV4uLSj5UNAThQ6xY2lYMxOULQo5h7ILEIfHVuCS
+         sdkYdeE/ioEFtlNOdfsuHF4yx+n7aY14CyQjga6t46Yw344pO4sH2L9uZhiYxLdy9yrf
+         RuphRF2to8ZMuweRdpCUXKfH7iiXQRPhH4cuGGvrLFqlHKEOs+MCDEBFNvqjN/5Jrolk
+         wU5w==
+X-Forwarded-Encrypted: i=1; AJvYcCVXvyHDm9bp30dmCo+sc4U/V8wwrGWsDF5mDhxsi1tGExTTq/M1M0j7A9cwh/n92X1PSFS+38NL+te4GQgLmkc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyR0EKY7HW0RKptNAqmWH8Cmrz11mB48Suy7LIQ11DlisFEeDaU
+	c3iGaaGNGzdAuK3kFfTiEhCJZc2WHSetcUsH34zCwTFhnsaMxEFWDJeLmyGSpktEe6B14eE8qNb
+	83zrjgSiF59WLjeQJU3nAqsKTT0e4SIDDwU7NRZ4TlM1bZfS7+NIF4r8=
+X-Google-Smtp-Source: AGHT+IHWhev16VILb5Y75Z+PMmUrYfwmu2wKvXzc/BlWClFJuE51ISU9lEJjKfGDegpW2dMWFHXrzGjnWwVwhxrrqxtGWXkcGwk0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (1.0)
-Subject: Re: [PATCH v2 05/21] powerpc/papr_scm: Convert timeouts to secs_to_jiffies()
-Date: Sat, 16 Nov 2024 06:24:20 -0500
-Message-Id: <272B86FC-5CC9-4A3A-ACE0-F268E4E61C3D@inria.fr>
-References: <e4872a15-ff3d-4619-9b03-c7f0b6230934@stanley.mountain>
-Cc: Christophe Leroy <christophe.leroy@csgroup.eu>,
- Easwar Hariharan <eahariha@linux.microsoft.com>,
- Pablo Neira Ayuso <pablo@netfilter.org>,
- Jozsef Kadlecsik <kadlec@netfilter.org>,
- "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- Nicolas Palix <nicolas.palix@imag.fr>, Daniel Mack <daniel@zonque.org>,
- Haojian Zhuang <haojian.zhuang@gmail.com>,
- Robert Jarzmik <robert.jarzmik@free.fr>,
- Russell King <linux@armlinux.org.uk>, Heiko Carstens <hca@linux.ibm.com>,
- Vasily Gorbik <gor@linux.ibm.com>,
- Alexander Gordeev <agordeev@linux.ibm.com>,
- Christian Borntraeger <borntraeger@linux.ibm.com>,
- Sven Schnelle <svens@linux.ibm.com>, Ofir Bitton <obitton@habana.ai>,
- Oded Gabbay <ogabbay@kernel.org>,
- Lucas De Marchi <lucas.demarchi@intel.com>,
- =?utf-8?Q?Thomas_Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>,
- Rodrigo Vivi <rodrigo.vivi@intel.com>,
- Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
- Maxime Ripard <mripard@kernel.org>,
- Thomas Zimmermann <tzimmermann@suse.de>, David Airlie <airlied@gmail.com>,
- Simona Vetter <simona@ffwll.ch>, Jeroen de Borst <jeroendb@google.com>,
- Praveen Kaligineedi <pkaligineedi@google.com>,
- Shailend Chand <shailend@google.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- James Smart <james.smart@broadcom.com>,
- Dick Kennedy <dick.kennedy@broadcom.com>,
- "James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
- "Martin K. Petersen" <martin.petersen@oracle.com>,
- =?utf-8?Q?Roger_Pau_Monn=C3=A9?= <roger.pau@citrix.com>,
- Jens Axboe <axboe@kernel.dk>, Kalle Valo <kvalo@kernel.org>,
- Jeff Johnson <jjohnson@kernel.org>,
- Catalin Marinas <catalin.marinas@arm.com>,
- Andrew Morton <akpm@linux-foundation.org>,
- Jack Wang <jinpu.wang@cloud.ionos.com>,
- Marcel Holtmann <marcel@holtmann.org>,
- Johan Hedberg <johan.hedberg@gmail.com>,
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- Florian Fainelli <florian.fainelli@broadcom.com>,
- Ray Jui <rjui@broadcom.com>, Scott Branden <sbranden@broadcom.com>,
- Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
- Xiubo Li <xiubli@redhat.com>, Ilya Dryomov <idryomov@gmail.com>,
- Josh Poimboeuf <jpoimboe@kernel.org>, Jiri Kosina <jikos@kernel.org>,
- Miroslav Benes <mbenes@suse.cz>, Petr Mladek <pmladek@suse.com>,
- Joe Lawrence <joe.lawrence@redhat.com>, Jaroslav Kysela <perex@perex.cz>,
- Takashi Iwai <tiwai@suse.com>, Lucas Stach <l.stach@pengutronix.de>,
- Russell King <linux+etnaviv@armlinux.org.uk>,
- Christian Gmeiner <christian.gmeiner@gmail.com>,
- Louis Peens <louis.peens@corigine.com>,
- Michael Ellerman <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>,
- Naveen N Rao <naveen@kernel.org>,
- Madhavan Srinivasan <maddy@linux.ibm.com>, netfilter-devel@vger.kernel.org,
- coreteam@netfilter.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- cocci@inria.fr, linux-arm-kernel@lists.infradead.org,
- linux-s390@vger.kernel.org, dri-devel@lists.freedesktop.org,
- intel-xe@lists.freedesktop.org, linux-scsi@vger.kernel.org,
- xen-devel@lists.xenproject.org, linux-block@vger.kernel.org,
- linux-wireless@vger.kernel.org, ath11k@lists.infradead.org,
- linux-mm@kvack.org, linux-bluetooth@vger.kernel.org,
- linux-staging@lists.linux.dev, linux-rpi-kernel@lists.infradead.org,
- ceph-devel@vger.kernel.org, live-patching@vger.kernel.org,
- linux-sound@vger.kernel.org, etnaviv@lists.freedesktop.org,
- oss-drivers@corigine.com, linuxppc-dev@lists.ozlabs.org,
- Anna-Maria Behnsen <anna-maria@linutronix.de>
-In-Reply-To: <e4872a15-ff3d-4619-9b03-c7f0b6230934@stanley.mountain>
-To: Dan Carpenter <dan.carpenter@linaro.org>
-X-Mailer: iPhone Mail (21E236)
+MIME-Version: 1.0
+X-Received: by 2002:a05:6e02:12c4:b0:3a1:f549:7272 with SMTP id
+ e9e14a558f8ab-3a7480a0777mr57715705ab.23.1731762803512; Sat, 16 Nov 2024
+ 05:13:23 -0800 (PST)
+Date: Sat, 16 Nov 2024 05:13:23 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <67389a73.050a0220.bb738.000a.GAE@google.com>
+Subject: [syzbot] [bluetooth?] KMSAN: uninit-value in hci_cmd_complete_evt
+From: syzbot <syzbot+a9a4bedfca6aa9d7fa24@syzkaller.appspotmail.com>
+To: johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, luiz.dentz@gmail.com, marcel@holtmann.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
+
+Hello,
+
+syzbot found the following issue on:
+
+HEAD commit:    2d5404caa8c7 Linux 6.12-rc7
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=1357fe30580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=dcca673786a14715
+dashboard link: https://syzkaller.appspot.com/bug?extid=a9a4bedfca6aa9d7fa24
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+
+Unfortunately, I don't have any reproducer for this issue yet.
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/a2910755fac8/disk-2d5404ca.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/a135257837ee/vmlinux-2d5404ca.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/3f8930906164/bzImage-2d5404ca.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+a9a4bedfca6aa9d7fa24@syzkaller.appspotmail.com
+
+=====================================================
+BUG: KMSAN: uninit-value in hci_cmd_complete_evt+0xd7b/0xeb0 net/bluetooth/hci_event.c:4221
+ hci_cmd_complete_evt+0xd7b/0xeb0 net/bluetooth/hci_event.c:4221
+ hci_event_func net/bluetooth/hci_event.c:7440 [inline]
+ hci_event_packet+0x11df/0x1c20 net/bluetooth/hci_event.c:7495
+ hci_rx_work+0x9d1/0x11f0 net/bluetooth/hci_core.c:4031
+ process_one_work kernel/workqueue.c:3229 [inline]
+ process_scheduled_works+0xae0/0x1c40 kernel/workqueue.c:3310
+ worker_thread+0xea7/0x14f0 kernel/workqueue.c:3391
+ kthread+0x3e2/0x540 kernel/kthread.c:389
+ ret_from_fork+0x6d/0x90 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
+
+Uninit was stored to memory at:
+ hci_cmd_complete_evt+0xaf4/0xeb0
+ hci_event_func net/bluetooth/hci_event.c:7440 [inline]
+ hci_event_packet+0x11df/0x1c20 net/bluetooth/hci_event.c:7495
+ hci_rx_work+0x9d1/0x11f0 net/bluetooth/hci_core.c:4031
+ process_one_work kernel/workqueue.c:3229 [inline]
+ process_scheduled_works+0xae0/0x1c40 kernel/workqueue.c:3310
+ worker_thread+0xea7/0x14f0 kernel/workqueue.c:3391
+ kthread+0x3e2/0x540 kernel/kthread.c:389
+ ret_from_fork+0x6d/0x90 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
+
+Uninit was created at:
+ slab_post_alloc_hook mm/slub.c:4091 [inline]
+ slab_alloc_node mm/slub.c:4134 [inline]
+ kmem_cache_alloc_node_noprof+0x6bf/0xb80 mm/slub.c:4186
+ kmalloc_reserve+0x13d/0x4a0 net/core/skbuff.c:587
+ __alloc_skb+0x363/0x7b0 net/core/skbuff.c:678
+ alloc_skb include/linux/skbuff.h:1322 [inline]
+ bt_skb_alloc include/net/bluetooth/bluetooth.h:494 [inline]
+ vhci_get_user drivers/bluetooth/hci_vhci.c:487 [inline]
+ vhci_write+0x127/0x900 drivers/bluetooth/hci_vhci.c:607
+ new_sync_write fs/read_write.c:590 [inline]
+ vfs_write+0xb2b/0x1540 fs/read_write.c:683
+ ksys_write+0x24f/0x4c0 fs/read_write.c:736
+ __do_sys_write fs/read_write.c:748 [inline]
+ __se_sys_write fs/read_write.c:745 [inline]
+ __x64_sys_write+0x93/0xe0 fs/read_write.c:745
+ x64_sys_call+0x306a/0x3ba0 arch/x86/include/generated/asm/syscalls_64.h:2
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xcd/0x1e0 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+CPU: 0 UID: 0 PID: 5791 Comm: kworker/u9:2 Not tainted 6.12.0-rc7-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/30/2024
+Workqueue: hci1 hci_rx_work
+=====================================================
 
 
-Sent from my iPhone
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-> On 16 Nov 2024, at 05:40, Dan Carpenter <dan.carpenter@linaro.org> wrote:
->=20
-> =EF=BB=BFOn Sat, Nov 16, 2024 at 11:06:55AM +0100, Christophe Leroy wrote:=
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
->>> diff --git a/arch/powerpc/platforms/pseries/papr_scm.c b/arch/powerpc/pl=
-atforms/pseries/papr_scm.c
->>> index 9e297f88adc5d97d4dc7b267b0bfebd58e5cf193..9e8086ec66e0f0e555ac2793=
-3854c06cfcf91a04 100644
->>> --- a/arch/powerpc/platforms/pseries/papr_scm.c
->>> +++ b/arch/powerpc/platforms/pseries/papr_scm.c
->>> @@ -543,7 +543,7 @@ static int drc_pmem_query_health(struct papr_scm_pri=
-v *p)
->>>=20
->>>         /* Jiffies offset for which the health data is assumed to be sam=
-e */
->>>         cache_timeout =3D p->lasthealth_jiffies +
->>> -               msecs_to_jiffies(MIN_HEALTH_QUERY_INTERVAL * 1000);
->>> +               secs_to_jiffies(MIN_HEALTH_QUERY_INTERVAL);
->>=20
->> Wouldn't it now fit on a single line ?
->>=20
->=20
-> Some maintainers still prefer to put a line break at 80 characters. =20
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
 
-Coccinelle tries for 80 chars. It may have a command line option to specify s=
-omething else.
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
 
-Julia
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
 
-> It's kind
-> of a nightmare for an automated script like this to figure out everyone's
-> preferences.  In this particular
-> file, there are some lines which go over 80
-> characters so sure.  Earlier in the patchset one of these introduced a lin=
-e
-> break that wasn't there before so I think maybe Coccinelle is applying the=
- 80
-> character line break rule?
->=20
-> There are sometimes where the 80 character rule really hurts readability, b=
-ut
-> here it doesn't make any difference.
->=20
-> regards,
-> dan carpenter
->=20
-
+If you want to undo deduplication, reply with:
+#syz undup
