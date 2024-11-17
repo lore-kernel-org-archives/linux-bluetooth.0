@@ -1,141 +1,79 @@
-Received: from mail-il1-f198.google.com (mail-il1-f198.google.com [209.85.166.198])
+Received: from mail-il1-f199.google.com (mail-il1-f199.google.com [209.85.166.199])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DC5B2B9A5
-	for <linux-bluetooth@vger.kernel.org>; Sun, 17 Nov 2024 07:17:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.198
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 568941D8A0B
+	for <linux-bluetooth@vger.kernel.org>; Sun, 17 Nov 2024 14:03:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731827845; cv=none; b=QkI3BVKLNiTLP3XHSARjVSJmgjVEqqhxg+2NUGIKI/RSWIy3HVAE+k24Su9TIWRrKVs6IiCIpNvcBnUa0hPNUdJvtnpwQy70Ljn9tWv6Hobbwgs6ulUBszAAlURX0wAew3HU02xKwo9dU2dVvnEB0GVeHoNdS/qEBiFqNzYzpNI=
+	t=1731852185; cv=none; b=N6ykIpf8Ee3HH7+DrAPxbCGyxVyeaXhqHhAOMHRlNzGQKM2Od2kWK/PpgWUlkr0CmD1aGIJPS1vDKi3LwetWcypuabqJns0Ix60Sjw2MjMg2xDOpZOacEsOrL/6C2Yg/hpojxEWs+hDDLB0tC0dNvaHE3A7osHxO/rq5AJj02kw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731827845; c=relaxed/simple;
-	bh=J9xo0eDjjWl6nYWn3GkKYXXbRW+xqRQnTm0Dylsv+W0=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=BgLPebpLt9CD25eYjfx2bqNea/iZ6bzoyuJ6C9E0NdZsHtDFC5Xk7BUxFUtN4JbOqyhHq/JroYCPdWNmf0FxA2cpxrRtx5QYpipHzL1AqnBl1aeBW+tYD6ltYUOgK0+m5oN/OKSj4D4tdYAHsgc0d04baCs35lM8sO5FWMOp1Ec=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.198
+	s=arc-20240116; t=1731852185; c=relaxed/simple;
+	bh=t2uHVMYp7iXp+o0/F+cYkAZoh2d2psBzk/GeopJjg0M=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=XYZGxEPA4OJMOm++YSv8xPYHn/xwkGSWzawDT+rldPmoIiS2b1P9PC/aC3MMRJ0C0R61QWq8vVx74eci3cusVqOlNkAyb9UUG1h+5dGoMQ8s3ICZGIjkK28VJN4aQ2f/G4fBb6qkbgZALuHd7uGqfnH5CBdGxScHQeMtV1N2upc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.199
 Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-3a4f3d7d13fso25183315ab.0
-        for <linux-bluetooth@vger.kernel.org>; Sat, 16 Nov 2024 23:17:24 -0800 (PST)
+Received: by mail-il1-f199.google.com with SMTP id e9e14a558f8ab-3a7191aa79cso25187095ab.1
+        for <linux-bluetooth@vger.kernel.org>; Sun, 17 Nov 2024 06:03:04 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731827843; x=1732432643;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=9g9FL2vtw746ImnieEUrrscr7c4cCXXlHJDI8dzEecs=;
-        b=fgeqNKwm8FevADMXvaIcTzAB9FOmkU+9iNFeKtgyU1PpxhrzTOt5JhJ1JW6rudRZ8y
-         xrjf6aNrsevFKVKnK3SrNyVeFe+9UivY8tVLaQwTaCDY//BmNbTCeZACrLrrn1avWY8g
-         qjfjot/HK3HnIbVSnr+XUu/IE6tcST8iXOvW9+bJ+spNynENxN6zz6oUXBvMNfFiPg7m
-         9VF+aS3Rqd0PhUReyCIGwwX12yK6MzyADM5FruoUWk3laAv2upafUoV0071y8izSdWOA
-         CmTAbQim3EudU7+HPXyvLTt38sjZCef8S3tsXoVW3QNDAAjgT2lvUPhFztF+tmwqA2J/
-         Q4vQ==
-X-Gm-Message-State: AOJu0YwgBTuUFmGmyqCvpZLiUYHTQUOuTCIBQ259hJKCdHZVs+MXNACC
-	Urjay5m7pAH2dOHL0C3WrGRieX6NS320NsixzwKOhgLpYKLyOPvt7GzAvIQtFMP/OKGO2D8zeUR
-	j4Mkhn341e3la2WFwkZl2KU6ACox6nvcCsLXh0gZoVwEZpedUCef9TvQ=
-X-Google-Smtp-Source: AGHT+IFP3Is8EwEVSWbcBxUXcFQ8uqHZie0oXoS31tzssqe3YWdGOm9OwUtOr9Y5yPw3mF6DxRyEmVAaReMKLjtoFXxbHYuZcgHg
+        d=1e100.net; s=20230601; t=1731852183; x=1732456983;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=NUssD4OF1/0W4ulVXXYWglqzpn1NTprdCx53eur2zFw=;
+        b=G7zz0X7i+JttA7+8ghwz7ZiG0xH2fBtcTCAlz+0LArdxpoeNPI6s6J3wtNRYrS4whg
+         07xTv8Ftkxe6/YskLTnH6O0Lh1sd6Fw5vxJGj0ywEeTkU9DWCdcER7KGNyNMVRUJuxOw
+         hLGlypqHZI933eiUKl9LWxuqxsCqZj4JYmvWjxPVVwYfAl9R7GbDDGj5bGspEUh41kJb
+         X2m+S4s0MZP7pIM5Y92Bm6dXWt+I34MgSONDQ+2B1UUjdKsdTFkaVyjrwnvFD0g80IBZ
+         DgsQ3lu3q5Z4X9uHqdGiGYRZq+nTz9RYcU7VU88dviPvmxuunx8qvmXNibs47sJ56qg3
+         gu2w==
+X-Forwarded-Encrypted: i=1; AJvYcCUXDKWnMsyhwUdvIhvpMuK/1MYeny4pwQqsD2E/FkYqHYVQsstYe65k5Y+ne308VcRx7p0fYjIEdaW+C30SdO0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwT8AMh8J+NRxExKQI6yMooTCby+9HDIdTyZHGdidPmQWBoLmzb
+	eeM0GvsyucC5sIiwBZtJEgmrDcNmswanGAHkXAeYH/Sr22+PbvDY7dejoIebZyhNURGq5rlTZdA
+	ITqXM4MQI70n/X6XQdEEdc3FhTaQB1ne4sarSpZTo2g5ZyOuAU7fBlPo=
+X-Google-Smtp-Source: AGHT+IGpPscsTKcEqBtvy667IuN2y2ojokY1wvLLrtmso7y8ucb+MsA5Aa7h+kCOP7Ws8bgrOxutXJzm1W2hGXSN+35UuaRYEzFV
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1a8d:b0:3a6:b445:dc9c with SMTP id
- e9e14a558f8ab-3a747ff7fc7mr106747335ab.3.1731827843528; Sat, 16 Nov 2024
- 23:17:23 -0800 (PST)
-Date: Sat, 16 Nov 2024 23:17:23 -0800
+X-Received: by 2002:a05:6e02:1aaf:b0:3a6:aa64:dc9 with SMTP id
+ e9e14a558f8ab-3a74802f569mr80874525ab.13.1731852183560; Sun, 17 Nov 2024
+ 06:03:03 -0800 (PST)
+Date: Sun, 17 Nov 2024 06:03:03 -0800
+In-Reply-To: <0000000000006477b305f2b48b58@google.com>
 X-Google-Appengine-App-Id: s~syzkaller
 X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <67399883.050a0220.e1c64.0010.GAE@google.com>
-Subject: [syzbot] [net?] WARNING: locking bug in try_to_wake_up (2)
-From: syzbot <syzbot+6ac735cc9f9ce6ec2f74@syzkaller.appspotmail.com>
-To: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	luiz.dentz@gmail.com, marcel@holtmann.org, netdev@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com
+Message-ID: <6739f797.050a0220.87769.000f.GAE@google.com>
+Subject: Re: [syzbot] [bluetooth?] possible deadlock in rfcomm_dlc_exists
+From: syzbot <syzbot+b69a625d06e8ece26415@syzkaller.appspotmail.com>
+To: axboe@kernel.dk, davem@davemloft.net, edumazet@google.com, 
+	hdanton@sina.com, johan.hedberg@gmail.com, kuba@kernel.org, 
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	luiz.dentz@gmail.com, luiz.von.dentz@intel.com, marcel@holtmann.org, 
+	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com, 
+	yangyingliang@huawei.com
 Content-Type: text/plain; charset="UTF-8"
 
-Hello,
+syzbot suspects this issue was fixed by commit:
 
-syzbot found the following issue on:
+commit 08d1914293dae38350b8088980e59fbc699a72fe
+Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Date:   Mon Sep 30 17:26:21 2024 +0000
 
-HEAD commit:    e8bdb3c8be08 Merge tag 'riscv-for-linus-6.12-rc8' of git:/..
+    Bluetooth: RFCOMM: FIX possible deadlock in rfcomm_sk_state_change
+
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=11bcdb5f980000
+start commit:   5847c9777c30 Merge tag 'cgroup-for-6.8-rc7-fixes' of git:/..
 git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=11231378580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=d2aeec8c0b2e420c
-dashboard link: https://syzkaller.appspot.com/bug?extid=6ac735cc9f9ce6ec2f74
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+kernel config:  https://syzkaller.appspot.com/x/.config?x=70429b75d4a1a401
+dashboard link: https://syzkaller.appspot.com/bug?extid=b69a625d06e8ece26415
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1097b049180000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=168a5bde180000
 
-Unfortunately, I don't have any reproducer for this issue yet.
+If the result looks correct, please mark the issue as fixed by replying with:
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/e2da80861e22/disk-e8bdb3c8.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/e048d2585df1/vmlinux-e8bdb3c8.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/203d0f852ba3/bzImage-e8bdb3c8.xz
+#syz fix: Bluetooth: RFCOMM: FIX possible deadlock in rfcomm_sk_state_change
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+6ac735cc9f9ce6ec2f74@syzkaller.appspotmail.com
-
-Bluetooth: hci4: unexpected cc 0x1001 length: 249 > 9
-------------[ cut here ]------------
-DEBUG_LOCKS_WARN_ON(1)
-WARNING: CPU: 0 PID: 5857 at kernel/locking/lockdep.c:232 hlock_class kernel/locking/lockdep.c:232 [inline]
-WARNING: CPU: 0 PID: 5857 at kernel/locking/lockdep.c:232 check_wait_context kernel/locking/lockdep.c:4826 [inline]
-WARNING: CPU: 0 PID: 5857 at kernel/locking/lockdep.c:232 __lock_acquire+0x58c/0x2050 kernel/locking/lockdep.c:5152
-Modules linked in:
-CPU: 0 UID: 0 PID: 5857 Comm: kworker/u9:7 Not tainted 6.12.0-rc7-syzkaller-00189-ge8bdb3c8be08 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/30/2024
-Workqueue: hci4 hci_cmd_work
-RIP: 0010:hlock_class kernel/locking/lockdep.c:232 [inline]
-RIP: 0010:check_wait_context kernel/locking/lockdep.c:4826 [inline]
-RIP: 0010:__lock_acquire+0x58c/0x2050 kernel/locking/lockdep.c:5152
-Code: 00 00 83 3d b5 db ac 0e 00 75 23 90 48 c7 c7 60 c9 0a 8c 48 c7 c6 00 cc 0a 8c e8 0f 7d e5 ff 48 ba 00 00 00 00 00 fc ff df 90 <0f> 0b 90 90 90 31 db 48 81 c3 c4 00 00 00 48 89 d8 48 c1 e8 03 0f
-RSP: 0018:ffffc90004d17670 EFLAGS: 00010046
-RAX: 8e05c886ad1f6a00 RBX: 0000000000000d68 RCX: ffff88803572bc00
-RDX: dffffc0000000000 RSI: 0000000000000000 RDI: 0000000000000000
-RBP: 0000000000000014 R08: ffffffff8155e312 R09: 1ffff110170c519a
-R10: dffffc0000000000 R11: ffffed10170c519b R12: ffff88803572bc00
-R13: 0000000000000d68 R14: 1ffff11006ae58f4 R15: ffff88803572c7a0
-FS:  0000000000000000(0000) GS:ffff8880b8600000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000001b30b1eff8 CR3: 000000006d8fc000 CR4: 0000000000350ef0
-Call Trace:
- <TASK>
- lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5825
- _raw_spin_lock_nested+0x31/0x40 kernel/locking/spinlock.c:378
- raw_spin_rq_lock_nested+0x2a/0x140 kernel/sched/core.c:598
- raw_spin_rq_lock kernel/sched/sched.h:1506 [inline]
- rq_lock kernel/sched/sched.h:1805 [inline]
- ttwu_queue kernel/sched/core.c:3951 [inline]
- try_to_wake_up+0x81e/0x14b0 kernel/sched/core.c:4281
- autoremove_wake_function+0x16/0x110 kernel/sched/wait.c:384
- __wake_up_common kernel/sched/wait.c:89 [inline]
- __wake_up_common_lock+0x132/0x1e0 kernel/sched/wait.c:106
- vhci_send_frame+0xe1/0x150 drivers/bluetooth/hci_vhci.c:83
- hci_send_frame+0x1fb/0x380 net/bluetooth/hci_core.c:3042
- hci_send_cmd_sync net/bluetooth/hci_core.c:4069 [inline]
- hci_cmd_work+0x123/0x6c0 net/bluetooth/hci_core.c:4098
- process_one_work kernel/workqueue.c:3229 [inline]
- process_scheduled_works+0xa65/0x1850 kernel/workqueue.c:3310
- worker_thread+0x870/0xd30 kernel/workqueue.c:3391
- kthread+0x2f2/0x390 kernel/kthread.c:389
- ret_from_fork+0x4d/0x80 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
- </TASK>
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
