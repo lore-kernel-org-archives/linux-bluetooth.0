@@ -1,59 +1,59 @@
-Received: from mail-ua1-f43.google.com (mail-ua1-f43.google.com [209.85.222.43])
+Received: from mail-oi1-f169.google.com (mail-oi1-f169.google.com [209.85.167.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B3BE1F5FD
-	for <linux-bluetooth@vger.kernel.org>; Mon, 18 Nov 2024 15:33:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 148971BCA0C
+	for <linux-bluetooth@vger.kernel.org>; Mon, 18 Nov 2024 15:36:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731943989; cv=none; b=rY2x+0yL1XfmVRX/B4WrrhRkjVD/a6Z2WBSGD+JHZ73dEfEuYlV+RXoRw/reDDUexY39S0ppqng36p2yEXX3qrrJe0/pOD6XW6HQHndGBDWGh/dM6Upz7JNLFZMe86wS/rR7to4LcKNPIbLnsnHBDKPZK573zfSpY+VO0qBWd9M=
+	t=1731944209; cv=none; b=pCDlKOHXxNuSL7cDYFt3UTSHQ/JC4DzzB9n5AJw1XIjc3s0OXnOsS0bErQLtRvxLY/rKBubekjY3v5PnZi8jVWsUqdtiUdtHJiiCv+cifHEThvyqOt+PqNODpomNyhesmP5x4u2awD8G+AEhR8ivyJSClqEJCLmzDXR7SF5SVmo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731943989; c=relaxed/simple;
-	bh=WeWEyqPco65zNeCLaWdQnz6H98zOqpCIWHuPK7oz1KM=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=scc+fV0DTXOch6oFKiF3C+5eskBu2RvNKlIJAAQGj/8C22GL3vGngoMBnBTrtPE0hk4YwPYyIbNLLmmLdsXqz5EhrH84TOmuQnv7oOQf7gKuBIJh8MMV9N2b22noL0bbpMmgCtgpV5kBWxuLIVBPZzF8K/TP6NYhFf6BONeYAyk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bo/bOivE; arc=none smtp.client-ip=209.85.222.43
+	s=arc-20240116; t=1731944209; c=relaxed/simple;
+	bh=KOjcnLAstGvalK0Fobd+UQZ7ScA0oUwIupYUucImEDw=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=HuSSTCIRFeVDMvE7C5ysIMKBNjras0ZQmp6DsAZMtm52C8xH/tNhteWgDfdTSS/oAnjUfJBpLG56qkiVRuizdoBteezFdxWWn/ghievpRFVUe1+US4itapYXMXHysiRy5RNiioTJIEibd0OnSPM/T6Egaz0nSK8VyGR4Smk6zRM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KxLQBc5I; arc=none smtp.client-ip=209.85.167.169
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bo/bOivE"
-Received: by mail-ua1-f43.google.com with SMTP id a1e0cc1a2514c-85700242ca1so636422241.0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 18 Nov 2024 07:33:07 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KxLQBc5I"
+Received: by mail-oi1-f169.google.com with SMTP id 5614622812f47-3e786167712so2044843b6e.3
+        for <linux-bluetooth@vger.kernel.org>; Mon, 18 Nov 2024 07:36:47 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1731943986; x=1732548786; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1731944206; x=1732549006; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:to
          :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=WKQv6O56HBAF6Jgwvmpw1mpzMKrszcW4k2nMZ00ze+A=;
-        b=bo/bOivEeXC8djskhmiucmweXT9jSxS6lAq5Vv91X/cGmLEiVWM7Z+zhc6MGfI4h8S
-         Rhvc6QMZvlWpiV6ZGWcqGEzcCziHMWRP+j7BH4h1TUKh0VSG7/WRUCkMktDZFhif4l/7
-         d7Yv+g7Oo960vfWE5AjCJTbDircymcOLPE2V4U2U/fQN+6IYtu7eV0o6h/IzFbQuPzNH
-         lLhEsVEPz2jZtX96HfDkR+rv3FoM/M+VMTELkZk2hYUiejl5MEs6OtND8j2Sb1PFvwm/
-         tS8r57jxfXm+Ig9vMIwYEKuge4WWSc1/mt0mki00cpF7/rZ/MF9Bv6ob6l25UJfAHyWV
-         KM4w==
+        bh=/e3eIyMeNape+bRUQa5dhH4WiZpLi13dggxUq1lZwMs=;
+        b=KxLQBc5Iyo5sSwTfqOlICtnzCrTe1DHWmkvbmMSdIdt/Rry4BgflrrmTvAEGMDFu3j
+         ieRr6SKdqROVz0oKhmEjNN2nGGEEzjsresosuGhJ+MGP5Qx4s3Ga0VB7csBhw+TiXcyG
+         a5yIch5YBiy0b4JWGd6fcpntfuw3aHNgsmOI3K2zBnTsLjX/FGMsBGkO0GlCiTp7pHIX
+         NfUIvjCzLuiEKrfF/iC7x+9y11NPCtHeX5pOqyq4na6swJkHqVew8Tl3v3JV/u5ipzUl
+         Dd+Fc2wZskxGnNgcQHHGVkzkW2vaBMAi6EDCvTq9ofAx8hbka8tJ1W8S29x4F9nKi8Hd
+         nv+g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731943986; x=1732548786;
+        d=1e100.net; s=20230601; t=1731944206; x=1732549006;
         h=content-transfer-encoding:mime-version:message-id:date:subject:to
          :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=WKQv6O56HBAF6Jgwvmpw1mpzMKrszcW4k2nMZ00ze+A=;
-        b=uZmcCpi8vWJ3M/Iz2wobkUGj+qaleCxZsnFaQ3aj9CCO6Jl2vdVhsaxYPoZt7vuE1i
-         a4pALphvZD3LQj0W36jl4UoZVFpjJTFZmhu0fmzg5ajha9xpavQlKMkcJNdA+Q08HcE+
-         9PgKbZv6Xtc6ey8ODjZkkdJFfX5ubB/elQG+Qijdl2qHL+ExAyFg0KWgqMsInT6Uk3Sv
-         oD35y7CRiFRMnvbO9AMnNIsqFs4SVCVQzYMduZ6ogDnKK+xLIF8xzjGC0Olu/Am05CWg
-         jIbTYq95FCb9ESVs2uI0vQx0e0ZrjRx+kvJmRy/41Gi6QmIqbFD5sOYpRL7YovEIEknK
-         5DDw==
-X-Gm-Message-State: AOJu0YzZWjgyFMKubhAfbOsVShYchj7vREseSt2gd5QVhiZCpLJndTcc
-	/QSKb6qllu7j6xxoSUEQNSlqReRymME8cQoV9ht5O6eURaFt5ICrYhMklw==
-X-Google-Smtp-Source: AGHT+IE3fkDA5avEmLxDuwbSlwlLJQHR606LxJj9hvZIrqYkrQeM63vjCtlia7EQBkz8Zs+s6YhPrw==
-X-Received: by 2002:a67:cb03:0:b0:4ad:6367:c7d8 with SMTP id ada2fe7eead31-4ad63680653mr8733766137.20.1731943985622;
-        Mon, 18 Nov 2024 07:33:05 -0800 (PST)
+        bh=/e3eIyMeNape+bRUQa5dhH4WiZpLi13dggxUq1lZwMs=;
+        b=Y24HB+rNFydPambVZEHRuGc4wGzjRi+uPP8l06lG8CVMNRo44kJI+6VlJJ1pGDtPNg
+         xJdYp7FYBpMU4pECnjTZnbcxxh94nCeLFwdYKczd9zJn7KYqGDy6j+6wVEcHjytgdmh9
+         /dCXrQndLX9xWWWXe6CqGH8QuJF4heJr3/SoFhKN4OsnBkgDMWdv7V8FbrjVftto1vBn
+         aM6o3Jed1WJ4XqD7+dS+APF0a2wZTnqs32yAKvyHfJFYStRSagiFqx3JqW9wgunaChNz
+         boln2xqzAV5vI0aAsiRXA47exODKw98PyLABBXm3rx7l+PF8ohIS9KDhAkQHjEs4MPQj
+         BIFw==
+X-Gm-Message-State: AOJu0YymVxbbMFTKnQ2E3VhphGhZqGlxBiyloItF4KW9TR9g6J7qsHER
+	3Tdkf2+I4or6uo7WXOvbbTPy/gEIoP1ZJ6LDbt5tItAUHin0jQzOkb7EFA==
+X-Google-Smtp-Source: AGHT+IGBLDmRXsqWDtVqfmIuNbFZMRsqWzOPf/dTUAklhpilMgTnk+jqP3GAHyJgzvSbnGHkygBZOA==
+X-Received: by 2002:a05:6808:10d2:b0:3e6:60e9:5f8c with SMTP id 5614622812f47-3e7bc84bb19mr9957223b6e.36.1731944205828;
+        Mon, 18 Nov 2024 07:36:45 -0800 (PST)
 Received: from lvondent-mobl5.. (syn-107-146-107-067.res.spectrum.com. [107.146.107.67])
-        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-4ad648c61a2sm1077069137.25.2024.11.18.07.33.02
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-514798259f4sm846880e0c.0.2024.11.18.07.36.43
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 18 Nov 2024 07:33:04 -0800 (PST)
+        Mon, 18 Nov 2024 07:36:44 -0800 (PST)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2] Bluetooth: MGMT: Fix slab-use-after-free Read in set_powered_sync
-Date: Mon, 18 Nov 2024 10:33:01 -0500
-Message-ID: <20241118153301.2603131-1-luiz.dentz@gmail.com>
+Subject: [PATCH v3] Bluetooth: MGMT: Fix slab-use-after-free Read in set_powered_sync
+Date: Mon, 18 Nov 2024 10:36:42 -0500
+Message-ID: <20241118153642.2604036-1-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.47.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -149,7 +149,7 @@ Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
  1 file changed, 12 insertions(+), 1 deletion(-)
 
 diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 1f6d083682b8..1fe72d1f96f8 100644
+index 1f6d083682b8..3ec79c69b0ee 100644
 --- a/net/bluetooth/mgmt.c
 +++ b/net/bluetooth/mgmt.c
 @@ -1351,7 +1351,13 @@ static void mgmt_set_powered_complete(struct hci_dev *hdev, void *data, int err)
@@ -161,7 +161,7 @@ index 1f6d083682b8..1fe72d1f96f8 100644
 +
 +	/* Make sure cmd still outstanding. */
 +	if (cmd != pending_find(MGMT_OP_SET_POWERED, hdev))
-+		return;
++		return -ECANCELED;
 +
 +	cp = cmd->param;
  
