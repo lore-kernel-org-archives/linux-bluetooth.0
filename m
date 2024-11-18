@@ -1,190 +1,115 @@
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCF6317BEA2;
-	Mon, 18 Nov 2024 08:27:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A36541C71
+	for <linux-bluetooth@vger.kernel.org>; Mon, 18 Nov 2024 08:37:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731918440; cv=none; b=T7HQ/l74ZOipqG0NwEmR4b6iFQKq4dvsoTx6V7vgzq2qmFRWWa0QN0LTQYxW59tEd5vhcw1PW2Qq5PI+pyt5famgM2pR129QfQVVTejJggt5CS/oIOWdSNgqG9EmcVR/furP707OMnLXvC9vEkN/kR16AfAI1ufkei36q2Szx9Q=
+	t=1731919057; cv=none; b=O/JmL2CUhVLAF0eyCZulMLwjBrzHSE+V9UJheB/gCkjL5C2kDumWoMUFZY7EHLsmFL1LDvkv2Pbqp+Tlbmhb249u6jH/9OMNMbGoQq47Nd7TWu6brFKQDY4Iejs6vsWcVe10k7YTCcN8XHqeAbdhjrkfBLJMA9BCLZV6hJ1NA/U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731918440; c=relaxed/simple;
-	bh=u+X9RPFT3w+sPXWt7gaBbAtIUXtN5oRIXDWvsAzav18=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FbBt4xOCG9BMTNQZuGic69z+MhyZuokfAEB+6GlYz12sXOuUSWKDln3gnYSh5QTqD7rv1Yy3chmgh64k2bg+bdfDE27Dwn3m40s5FjIFr/ieDjPQU/V3Y8h7vSBFqEwaUYSpYZyhwgppObM8tKy9wDlawbnlbNy+HU+rIdnnaeQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=pVJ5a4Sb; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1731919057; c=relaxed/simple;
+	bh=VhnScgCaSUGttz6kiW1NF6OH1MGF757R+9i7YQukVL8=;
+	h=From:To:Subject:Date:Message-Id:MIME-Version:Content-Type:
+	 Content-Type; b=ZvIhoxvZsH1PuoRahJqZa/q1BKVHMipPG86hc5rmXQg/+UZrzdyrOXDQQ/y8OSXADzQFv4vdMfJ65rscbgc7HYa7OKAKsLBolMg7XF8N3nrGvA9KzbichWY/2JlRoqvqDBfreuixs9w3R3bAYz9xIj9oNAmVARr5RDVXAD0smOk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=kiJr3HQa; arc=none smtp.client-ip=148.251.105.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="pVJ5a4Sb"
-Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4AHJiO3Y023687;
-	Mon, 18 Nov 2024 08:26:16 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=pp1; bh=pofVBIDpbmPXxKdXBZzlW6SKJ1mpQg
-	5f+nyOC0P54ZU=; b=pVJ5a4SbiQLc7KmL6NMVUat1TeAb+E4P6v1BT086o1mEhk
-	asPz+d9pnH3oUetVu+XCwbjmIJgCChQ2Yg76ElBtpMc3MPIe4GEIJkdBOh3EDOTs
-	BshLlGoNMECAtRDAXjrNjk0/DJ4p9T1LW6K46OwdwtMNuLDXUx7tw7C0oS59z+J9
-	QShMh32WGNHKvTgEgpik3EK5hVK4TsghRPVpOZt4uDmXgH2LYgfrkGGFgYTal2qH
-	dz0ScnJgPbYohwDb0fe9yXNM0o6w8EzUNqyOgMmUN0w1gT6xXC0tgw+yBkjkz/Fh
-	q242Ut9KG7OxmdBC6tktol2tQuFTw331MM4YUGlg==
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 42xgtt0eh7-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 18 Nov 2024 08:26:15 +0000 (GMT)
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 4AI73j1E030931;
-	Mon, 18 Nov 2024 08:26:14 GMT
-Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 42y63y27mu-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 18 Nov 2024 08:26:14 +0000
-Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
-	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 4AI8QAR549479982
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 18 Nov 2024 08:26:10 GMT
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id BD6AD20043;
-	Mon, 18 Nov 2024 08:26:10 +0000 (GMT)
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id A867E20040;
-	Mon, 18 Nov 2024 08:26:06 +0000 (GMT)
-Received: from osiris (unknown [9.171.77.223])
-	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-	Mon, 18 Nov 2024 08:26:06 +0000 (GMT)
-Date: Mon, 18 Nov 2024 09:26:05 +0100
-From: Heiko Carstens <hca@linux.ibm.com>
-To: Easwar Hariharan <eahariha@linux.microsoft.com>
-Cc: Pablo Neira Ayuso <pablo@netfilter.org>,
-        Jozsef Kadlecsik <kadlec@netfilter.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
-        Julia Lawall <Julia.Lawall@inria.fr>,
-        Nicolas Palix <nicolas.palix@imag.fr>, Daniel Mack <daniel@zonque.org>,
-        Haojian Zhuang <haojian.zhuang@gmail.com>,
-        Robert Jarzmik <robert.jarzmik@free.fr>,
-        Russell King <linux@armlinux.org.uk>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>, Ofir Bitton <obitton@habana.ai>,
-        Oded Gabbay <ogabbay@kernel.org>,
-        Lucas De Marchi <lucas.demarchi@intel.com>,
-        Thomas =?iso-8859-1?Q?Hellstr=F6m?= <thomas.hellstrom@linux.intel.com>,
-        Rodrigo Vivi <rodrigo.vivi@intel.com>,
-        Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
-        Maxime Ripard <mripard@kernel.org>,
-        Thomas Zimmermann <tzimmermann@suse.de>,
-        David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
-        Jeroen de Borst <jeroendb@google.com>,
-        Praveen Kaligineedi <pkaligineedi@google.com>,
-        Shailend Chand <shailend@google.com>,
-        Andrew Lunn <andrew+netdev@lunn.ch>,
-        James Smart <james.smart@broadcom.com>,
-        Dick Kennedy <dick.kennedy@broadcom.com>,
-        "James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Roger Pau =?iso-8859-1?Q?Monn=E9?= <roger.pau@citrix.com>,
-        Jens Axboe <axboe@kernel.dk>, Kalle Valo <kvalo@kernel.org>,
-        Jeff Johnson <jjohnson@kernel.org>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Jack Wang <jinpu.wang@cloud.ionos.com>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Florian Fainelli <florian.fainelli@broadcom.com>,
-        Ray Jui <rjui@broadcom.com>, Scott Branden <sbranden@broadcom.com>,
-        Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-        Xiubo Li <xiubli@redhat.com>, Ilya Dryomov <idryomov@gmail.com>,
-        Josh Poimboeuf <jpoimboe@kernel.org>, Jiri Kosina <jikos@kernel.org>,
-        Miroslav Benes <mbenes@suse.cz>, Petr Mladek <pmladek@suse.com>,
-        Joe Lawrence <joe.lawrence@redhat.com>,
-        Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
-        Lucas Stach <l.stach@pengutronix.de>,
-        Russell King <linux+etnaviv@armlinux.org.uk>,
-        Christian Gmeiner <christian.gmeiner@gmail.com>,
-        Louis Peens <louis.peens@corigine.com>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Nicholas Piggin <npiggin@gmail.com>,
-        Christophe Leroy <christophe.leroy@csgroup.eu>,
-        Naveen N Rao <naveen@kernel.org>,
-        Madhavan Srinivasan <maddy@linux.ibm.com>,
-        netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org, cocci@inria.fr,
-        linux-arm-kernel@lists.infradead.org, linux-s390@vger.kernel.org,
-        dri-devel@lists.freedesktop.org, intel-xe@lists.freedesktop.org,
-        linux-scsi@vger.kernel.org, xen-devel@lists.xenproject.org,
-        linux-block@vger.kernel.org, linux-wireless@vger.kernel.org,
-        ath11k@lists.infradead.org, linux-mm@kvack.org,
-        linux-bluetooth@vger.kernel.org, linux-staging@lists.linux.dev,
-        linux-rpi-kernel@lists.infradead.org, ceph-devel@vger.kernel.org,
-        live-patching@vger.kernel.org, linux-sound@vger.kernel.org,
-        etnaviv@lists.freedesktop.org, oss-drivers@corigine.com,
-        linuxppc-dev@lists.ozlabs.org,
-        Anna-Maria Behnsen <anna-maria@linutronix.de>
-Subject: Re: [PATCH v2 04/21] s390: kernel: Convert timeouts to use
- secs_to_jiffies()
-Message-ID: <20241118082605.17002-A-hca@linux.ibm.com>
-References: <20241115-converge-secs-to-jiffies-v2-0-911fb7595e79@linux.microsoft.com>
- <20241115-converge-secs-to-jiffies-v2-4-911fb7595e79@linux.microsoft.com>
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="kiJr3HQa"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+	s=mail; t=1731919053;
+	bh=VhnScgCaSUGttz6kiW1NF6OH1MGF757R+9i7YQukVL8=;
+	h=From:To:Subject:Date:From;
+	b=kiJr3HQa+S1o1lHbWAuvkDnCM34CbbT3/S8ONOb1fpQIbvCai2UUcVWMHDtuyS/O6
+	 gguMeyMqKmPdBFiVuy7C0lFG+DNoGC1GgDw2zlNz+5CNJjALtWwO44zeDK2CTxMa8h
+	 pOhNxEhCfKcrl0RfRQKWUuSCChHWqI8MNONV/h4Dly1A+5ahilAvzgySjbpl9Xgs07
+	 ot+yfpZnOyg+ZyK5yXmew8rs2GKimFUMo8fmkV+02hw41nflSaH3NP2sZhhkXkkGrd
+	 OA5W1O/9HqdQ6NpmfuwmV/v6hlqbIbd9DiI7f5+GikioS5InHX6AKltjeedSzdi8al
+	 N/bwex1SB/46w==
+Received: from fdanis-XPS-13-9370.. (67.227.121.78.rev.sfr.net [78.121.227.67])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: fdanis)
+	by bali.collaboradmins.com (Postfix) with ESMTPSA id 1031717E14D5
+	for <linux-bluetooth@vger.kernel.org>; Mon, 18 Nov 2024 09:37:33 +0100 (CET)
+From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?= <frederic.danis@collabora.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH v2] Bluetooth: SCO: Add support for 16 bits transparent voice setting
+Date: Mon, 18 Nov 2024 09:37:24 +0100
+Message-Id: <20241118083724.25632-1-frederic.danis@collabora.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241115-converge-secs-to-jiffies-v2-4-911fb7595e79@linux.microsoft.com>
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: QBYvLy3JNa8evFseixOVfcUMyMppMmNG
-X-Proofpoint-ORIG-GUID: QBYvLy3JNa8evFseixOVfcUMyMppMmNG
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
- definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011 phishscore=0
- mlxscore=0 malwarescore=0 mlxlogscore=858 adultscore=0 priorityscore=1501
- bulkscore=0 impostorscore=0 spamscore=0 lowpriorityscore=0 suspectscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2409260000
- definitions=main-2411180066
+Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 
-On Fri, Nov 15, 2024 at 09:26:21PM +0000, Easwar Hariharan wrote:
-> Changes made with the following Coccinelle rules:
-> 
-> @@ constant C; @@
-> 
-> - msecs_to_jiffies(C * 1000)
-> + secs_to_jiffies(C)
-> 
-> @@ constant C; @@
-> 
-> - msecs_to_jiffies(C * MSEC_PER_SEC)
-> + secs_to_jiffies(C)
-> 
-> Signed-off-by: Easwar Hariharan <eahariha@linux.microsoft.com>
-> ---
->  arch/s390/kernel/lgr.c      | 3 ++-
->  arch/s390/kernel/time.c     | 4 ++--
->  arch/s390/kernel/topology.c | 2 +-
->  3 files changed, 5 insertions(+), 4 deletions(-)
+The voice setting is used by sco_connect() or sco_conn_defer_accept()
+after being set by sco_sock_setsockopt().
 
-...
+The BCM4349B1 supports 16 bits transparent data on its I2S port.
+If BT_VOICE_TRANSPARENT is used when accepting a SCO connection, this
+gives only garbage audio while using BT_VOICE_TRANSPARENT_16BIT gives
+correct audio.
+This has been tested with connection to iPhone 14 and Samsung S24.
 
-> diff --git a/arch/s390/kernel/lgr.c b/arch/s390/kernel/lgr.c
-> index 6652e54cf3db9fbdd8cfb06f8a0dc1d4c05ae7d7..68021cb38574b122bbe3d9f70e9168305360017b 100644
-> --- a/arch/s390/kernel/lgr.c
-> +++ b/arch/s390/kernel/lgr.c
-> @@ -166,7 +166,8 @@ static struct timer_list lgr_timer;
->   */
->  static void lgr_timer_set(void)
->  {
-> -	mod_timer(&lgr_timer, jiffies + msecs_to_jiffies(LGR_TIMER_INTERVAL_SECS * MSEC_PER_SEC));
-> +	mod_timer(&lgr_timer,
-> +		  jiffies + secs_to_jiffies(LGR_TIMER_INTERVAL_SECS));
->  }
+Signed-off-by: Frédéric Danis <frederic.danis@collabora.com>
+---
+v1 -> v2: Enhance commit message
 
-Please don't add a new line break, especially not if the new line
-would be shorter than the old one.
+ include/net/bluetooth/bluetooth.h | 1 +
+ net/bluetooth/sco.c               | 7 +++++--
+ 2 files changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
+index f66bc85c6411..21e93640c229 100644
+--- a/include/net/bluetooth/bluetooth.h
++++ b/include/net/bluetooth/bluetooth.h
+@@ -123,6 +123,7 @@ struct bt_voice {
+ 
+ #define BT_VOICE_TRANSPARENT			0x0003
+ #define BT_VOICE_CVSD_16BIT			0x0060
++#define BT_VOICE_TRANSPARENT_16BIT		0x0063
+ 
+ #define BT_SNDMTU		12
+ #define BT_RCVMTU		13
+diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
+index 1b8e468d24cf..baaac4d65a5a 100644
+--- a/net/bluetooth/sco.c
++++ b/net/bluetooth/sco.c
+@@ -319,7 +319,8 @@ static int sco_connect(struct sock *sk)
+ 	else
+ 		type = SCO_LINK;
+ 
+-	if (sco_pi(sk)->setting == BT_VOICE_TRANSPARENT &&
++	if ((sco_pi(sk)->setting == BT_VOICE_TRANSPARENT ||
++	     sco_pi(sk)->setting == BT_VOICE_TRANSPARENT_16BIT) &&
+ 	    (!lmp_transp_capable(hdev) || !lmp_esco_capable(hdev))) {
+ 		err = -EOPNOTSUPP;
+ 		goto unlock;
+@@ -922,6 +923,7 @@ static int sco_sock_setsockopt(struct socket *sock, int level, int optname,
+ 
+ 		/* Explicitly check for these values */
+ 		if (voice.setting != BT_VOICE_TRANSPARENT &&
++		    voice.setting != BT_VOICE_TRANSPARENT_16BIT &&
+ 		    voice.setting != BT_VOICE_CVSD_16BIT) {
+ 			err = -EINVAL;
+ 			break;
+@@ -935,7 +937,8 @@ static int sco_sock_setsockopt(struct socket *sock, int level, int optname,
+ 			break;
+ 		}
+ 		if (enhanced_sync_conn_capable(hdev) &&
+-		    voice.setting == BT_VOICE_TRANSPARENT)
++		    (voice.setting == BT_VOICE_TRANSPARENT ||
++		     voice.setting == BT_VOICE_TRANSPARENT_16BIT))
+ 			sco_pi(sk)->codec.id = BT_CODEC_TRANSPARENT;
+ 		hci_dev_put(hdev);
+ 		break;
+-- 
+2.34.1
+
