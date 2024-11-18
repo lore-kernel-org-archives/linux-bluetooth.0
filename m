@@ -1,128 +1,184 @@
-Received: from mail-lj1-f178.google.com (mail-lj1-f178.google.com [209.85.208.178])
+Received: from mail-ua1-f43.google.com (mail-ua1-f43.google.com [209.85.222.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37C1C196C7C;
-	Mon, 18 Nov 2024 15:28:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B3BE1F5FD
+	for <linux-bluetooth@vger.kernel.org>; Mon, 18 Nov 2024 15:33:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731943731; cv=none; b=bZW8WZjxJcMpFwGfKR2upPNdHzZDk9yA4P7hGMV7hQG/vLGENYEhTGsSqRt7CwTmsmlk9maiE0Gq1AqxGlvye9g9mDwRkYdrIn6l1/XkFRC6T5Ap6xqMLPyFHOXEeN/XFZHf4+5rvCvTH86SqXqnOZqxSrItGgTBvDIh+bRKfpE=
+	t=1731943989; cv=none; b=rY2x+0yL1XfmVRX/B4WrrhRkjVD/a6Z2WBSGD+JHZ73dEfEuYlV+RXoRw/reDDUexY39S0ppqng36p2yEXX3qrrJe0/pOD6XW6HQHndGBDWGh/dM6Upz7JNLFZMe86wS/rR7to4LcKNPIbLnsnHBDKPZK573zfSpY+VO0qBWd9M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731943731; c=relaxed/simple;
-	bh=DKSXMzCHRuQc16Dm4kX+dYr2VQCzqmllGk2Y0Ca5f6E=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Yfa43MoR+nQwPP14nUY5xrqfzbJldkko2ChC3X6Xs3qOg+EB1H0oP2HLfnkzD9C+8yZmPOpXmjJK1QPDX3IBxICJkfvexEQIWepo5CDJVPvDqmzR41lOCValCqIbbWnipZS4r6Bfym3DVseQk7k4RJ2ccKg3RI4t/7aLWE/Eh8A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AFDbpEYw; arc=none smtp.client-ip=209.85.208.178
+	s=arc-20240116; t=1731943989; c=relaxed/simple;
+	bh=WeWEyqPco65zNeCLaWdQnz6H98zOqpCIWHuPK7oz1KM=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=scc+fV0DTXOch6oFKiF3C+5eskBu2RvNKlIJAAQGj/8C22GL3vGngoMBnBTrtPE0hk4YwPYyIbNLLmmLdsXqz5EhrH84TOmuQnv7oOQf7gKuBIJh8MMV9N2b22noL0bbpMmgCtgpV5kBWxuLIVBPZzF8K/TP6NYhFf6BONeYAyk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bo/bOivE; arc=none smtp.client-ip=209.85.222.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AFDbpEYw"
-Received: by mail-lj1-f178.google.com with SMTP id 38308e7fff4ca-2fb5111747cso30117471fa.2;
-        Mon, 18 Nov 2024 07:28:49 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bo/bOivE"
+Received: by mail-ua1-f43.google.com with SMTP id a1e0cc1a2514c-85700242ca1so636422241.0
+        for <linux-bluetooth@vger.kernel.org>; Mon, 18 Nov 2024 07:33:07 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1731943728; x=1732548528; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=+54sMoaEOpYpUQrCt1Qn/OWUSNClUalft8bTtiFvPy4=;
-        b=AFDbpEYwqTU0h2wPtu389y9EXl86ePV6YMze+uf54lnk4lHbNAatsKK/KFLkTzw64X
-         KlA8mMWLpWgMttnKiHOyGZX3ATXzUt8lDYO5GyVRYj9vnZlOVmpWt5zrtCQy9V475fCN
-         UOdQnPrbdQV7rnk+W6CU6xF2OCTzIvviLvmxYy5fAhPRXV1xVKPhmEkqJq1SAr7uR8qA
-         aYqbChQjXK+2jX8biWKeXz5XfoVp7gcxUO1l1+xJs5UbHFqdEwOC1TLGL4OwFx4OGgyt
-         7K52ps8UhslC3RU3lXhBS7ycpYJj7+olkVsWnuR+j/NoBOoUjAiwaIKjJpZoU3hfjpHa
-         pmgg==
+        d=gmail.com; s=20230601; t=1731943986; x=1732548786; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=WKQv6O56HBAF6Jgwvmpw1mpzMKrszcW4k2nMZ00ze+A=;
+        b=bo/bOivEeXC8djskhmiucmweXT9jSxS6lAq5Vv91X/cGmLEiVWM7Z+zhc6MGfI4h8S
+         Rhvc6QMZvlWpiV6ZGWcqGEzcCziHMWRP+j7BH4h1TUKh0VSG7/WRUCkMktDZFhif4l/7
+         d7Yv+g7Oo960vfWE5AjCJTbDircymcOLPE2V4U2U/fQN+6IYtu7eV0o6h/IzFbQuPzNH
+         lLhEsVEPz2jZtX96HfDkR+rv3FoM/M+VMTELkZk2hYUiejl5MEs6OtND8j2Sb1PFvwm/
+         tS8r57jxfXm+Ig9vMIwYEKuge4WWSc1/mt0mki00cpF7/rZ/MF9Bv6ob6l25UJfAHyWV
+         KM4w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731943728; x=1732548528;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=+54sMoaEOpYpUQrCt1Qn/OWUSNClUalft8bTtiFvPy4=;
-        b=l6bWHNnvbxXthfIIAeuxTIOIPn6rJ/Y9qiREnePSRZUhbrS8F3xRK3WZWPot51NKHk
-         6R+Aot+QCMcVIu2wDZvA6YBsED9W0o1+e2IGNKjOgWmp0xTniUcFlVYnNfj6K5eqSYkd
-         J5uH/aTJgQfIH8ZjW1qknyLz9zqsfr7J3pKSDg97vysX6+tnu64Ef8lWfYkq+SOdB2EK
-         WRatghe+BOWF6el0bqRdjrKntCWZNoDzHZziHeI4sNgCAj8wZKsvDZoNU1CA8ru4VjS8
-         cwH39bu9MMMeC8RHAdkI4F8XpryHS6giBZJ86NvKoVJoNdAOglslohd1AcAcI/Ud7I/M
-         AV/A==
-X-Forwarded-Encrypted: i=1; AJvYcCVl7onVZqXJw4dRvJcNG4ui2vIstQCO44oAULfYvzbugw72u03YZZkLtSlRH1GrB5Pu5k2qLkM+GQcDl7za@vger.kernel.org, AJvYcCW2j2hC/+q9MMuIpUN969j7/l6Rcp8hF+7DxCmznsZlce+VWTFRQj/Ucv4qeDpiamtCFRY4j+ebRu/s9TN68iM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxoccAdc71ocPMvkZa22fRSoKAiZu1Z4SGy4ef0/3aM1P+sKlor
-	E/4xcANyw1K6eAObkP/Bim2oLKE3alaw/Lp/fy/8x9tx2+fOUY/yu1fmZ/ChsgxLpgVEK6AXqgC
-	BZ0xz8NbOLV9LXWFvd/rXQX6QdHo=
-X-Google-Smtp-Source: AGHT+IGqC9FeISx2roYOZCNm1FPTQHZcluBhzAV1Fx3I/aYTIm0ZSY55bj9h8zChIDBVNkyyDjiAKkhqLt+TR10yJcQ=
-X-Received: by 2002:a05:651c:245:b0:2fa:c59d:1af3 with SMTP id
- 38308e7fff4ca-2ff606933a3mr57292651fa.20.1731943728018; Mon, 18 Nov 2024
- 07:28:48 -0800 (PST)
+        d=1e100.net; s=20230601; t=1731943986; x=1732548786;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=WKQv6O56HBAF6Jgwvmpw1mpzMKrszcW4k2nMZ00ze+A=;
+        b=uZmcCpi8vWJ3M/Iz2wobkUGj+qaleCxZsnFaQ3aj9CCO6Jl2vdVhsaxYPoZt7vuE1i
+         a4pALphvZD3LQj0W36jl4UoZVFpjJTFZmhu0fmzg5ajha9xpavQlKMkcJNdA+Q08HcE+
+         9PgKbZv6Xtc6ey8ODjZkkdJFfX5ubB/elQG+Qijdl2qHL+ExAyFg0KWgqMsInT6Uk3Sv
+         oD35y7CRiFRMnvbO9AMnNIsqFs4SVCVQzYMduZ6ogDnKK+xLIF8xzjGC0Olu/Am05CWg
+         jIbTYq95FCb9ESVs2uI0vQx0e0ZrjRx+kvJmRy/41Gi6QmIqbFD5sOYpRL7YovEIEknK
+         5DDw==
+X-Gm-Message-State: AOJu0YzZWjgyFMKubhAfbOsVShYchj7vREseSt2gd5QVhiZCpLJndTcc
+	/QSKb6qllu7j6xxoSUEQNSlqReRymME8cQoV9ht5O6eURaFt5ICrYhMklw==
+X-Google-Smtp-Source: AGHT+IE3fkDA5avEmLxDuwbSlwlLJQHR606LxJj9hvZIrqYkrQeM63vjCtlia7EQBkz8Zs+s6YhPrw==
+X-Received: by 2002:a67:cb03:0:b0:4ad:6367:c7d8 with SMTP id ada2fe7eead31-4ad63680653mr8733766137.20.1731943985622;
+        Mon, 18 Nov 2024 07:33:05 -0800 (PST)
+Received: from lvondent-mobl5.. (syn-107-146-107-067.res.spectrum.com. [107.146.107.67])
+        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-4ad648c61a2sm1077069137.25.2024.11.18.07.33.02
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 18 Nov 2024 07:33:04 -0800 (PST)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH v2] Bluetooth: MGMT: Fix slab-use-after-free Read in set_powered_sync
+Date: Mon, 18 Nov 2024 10:33:01 -0500
+Message-ID: <20241118153301.2603131-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.47.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241118151947.3323927-1-andre.groenewald@streamunlimited.com>
-In-Reply-To: <20241118151947.3323927-1-andre.groenewald@streamunlimited.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 18 Nov 2024 10:28:35 -0500
-Message-ID: <CABBYNZJPG+-m5WwDLOBMpw-O+a-GY9RmNV6hiz7AQv_4=m66kQ@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: hci_sync: fix LE init stage 3 failure
-To: =?UTF-8?Q?Andr=C3=A9_Groenewald?= <andre.groenewald@streamunlimited.com>
-Cc: marcel@holtmann.org, johan.hedberg@gmail.com, 
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-Hi Andr=C3=A9,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Mon, Nov 18, 2024 at 10:19=E2=80=AFAM Andr=C3=A9 Groenewald
-<andre.groenewald@streamunlimited.com> wrote:
->
-> A controller may indicate support for the extended advertising feature bu=
-t
-> doesn't support the HCI_LE_Read_Number_of_Supported_Advertising_Sets
-> command, which will cause the initialization to fail.
+This fixes the following crash:
 
-It might be a good idea to mention the model and include the HCI trace
-so it is easier for others to find out there is a fix for this
-controller.
+==================================================================
+BUG: KASAN: slab-use-after-free in set_powered_sync+0x3a/0xc0 net/bluetooth/mgmt.c:1353
+Read of size 8 at addr ffff888029b4dd18 by task kworker/u9:0/54
 
-> Signed-off-by: Andr=C3=A9 Groenewald <andre.groenewald@streamunlimited.co=
-m>
-> ---
->  net/bluetooth/hci_sync.c | 9 +++++++++
->  1 file changed, 9 insertions(+)
->
-> diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-> index c86f4e42e69c..c07be5813113 100644
-> --- a/net/bluetooth/hci_sync.c
-> +++ b/net/bluetooth/hci_sync.c
-> @@ -4416,6 +4416,15 @@ static int hci_le_read_num_support_adv_sets_sync(s=
-truct hci_dev *hdev)
->         if (!ext_adv_capable(hdev))
->                 return 0;
->
-> +       /* Checking for extended advertising capabilities is not enough; =
-refine
-> +        * by checking if the HCI_LE_Read_Number_of_Supported_Advertising=
-_Sets
-> +        * command is supported. Since this command is part of the LE ini=
-t
-> +        * stage 3, the initialization will fail whenever the command is =
-not
-> +        * supported for devices that indicate extended advertising featu=
-res.
-> +        */
-> +       if (!(hdev->commands[36] & 0x80))
-> +               return 0;
+CPU: 1 UID: 0 PID: 54 Comm: kworker/u9:0 Not tainted 6.11.0-rc6-syzkaller-01155-gf723224742fc #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 08/06/2024
+Workqueue: hci0 hci_cmd_sync_work
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:93 [inline]
+ dump_stack_lvl+0x241/0x360 lib/dump_stack.c:119
+ print_address_description mm/kasan/report.c:377 [inline]
+ print_report+0x169/0x550 mm/kasan/report.c:488
+q kasan_report+0x143/0x180 mm/kasan/report.c:601
+ set_powered_sync+0x3a/0xc0 net/bluetooth/mgmt.c:1353
+ hci_cmd_sync_work+0x22b/0x400 net/bluetooth/hci_sync.c:328
+ process_one_work kernel/workqueue.c:3231 [inline]
+ process_scheduled_works+0xa2c/0x1830 kernel/workqueue.c:3312
+ worker_thread+0x86d/0xd10 kernel/workqueue.c:3389
+ kthread+0x2f0/0x390 kernel/kthread.c:389
+ ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
+ </TASK>
 
-Is this enough though? How can we figure the number of sets supported?
-Or we shall assume it is just 1? Otherwise it might be better to just
-revert to using legacy advertising commands instead.
+Allocated by task 5247:
+ kasan_save_stack mm/kasan/common.c:47 [inline]
+ kasan_save_track+0x3f/0x80 mm/kasan/common.c:68
+ poison_kmalloc_redzone mm/kasan/common.c:370 [inline]
+ __kasan_kmalloc+0x98/0xb0 mm/kasan/common.c:387
+ kasan_kmalloc include/linux/kasan.h:211 [inline]
+ __kmalloc_cache_noprof+0x19c/0x2c0 mm/slub.c:4193
+ kmalloc_noprof include/linux/slab.h:681 [inline]
+ kzalloc_noprof include/linux/slab.h:807 [inline]
+ mgmt_pending_new+0x65/0x250 net/bluetooth/mgmt_util.c:269
+ mgmt_pending_add+0x36/0x120 net/bluetooth/mgmt_util.c:296
+ set_powered+0x3cd/0x5e0 net/bluetooth/mgmt.c:1394
+ hci_mgmt_cmd+0xc47/0x11d0 net/bluetooth/hci_sock.c:1712
+ hci_sock_sendmsg+0x7b8/0x11c0 net/bluetooth/hci_sock.c:1832
+ sock_sendmsg_nosec net/socket.c:730 [inline]
+ __sock_sendmsg+0x221/0x270 net/socket.c:745
+ sock_write_iter+0x2dd/0x400 net/socket.c:1160
+ new_sync_write fs/read_write.c:497 [inline]
+ vfs_write+0xa72/0xc90 fs/read_write.c:590
+ ksys_write+0x1a0/0x2c0 fs/read_write.c:643
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
 
->         return __hci_cmd_sync_status(hdev,
->                                      HCI_OP_LE_READ_NUM_SUPPORTED_ADV_SET=
-S,
->                                      0, NULL, HCI_CMD_TIMEOUT);
-> --
-> 2.34.1
->
+Freed by task 5246:
+ kasan_save_stack mm/kasan/common.c:47 [inline]
+ kasan_save_track+0x3f/0x80 mm/kasan/common.c:68
+ kasan_save_free_info+0x40/0x50 mm/kasan/generic.c:579
+ poison_slab_object+0xe0/0x150 mm/kasan/common.c:240
+ __kasan_slab_free+0x37/0x60 mm/kasan/common.c:256
+ kasan_slab_free include/linux/kasan.h:184 [inline]
+ slab_free_hook mm/slub.c:2256 [inline]
+ slab_free mm/slub.c:4477 [inline]
+ kfree+0x149/0x360 mm/slub.c:4598
+ settings_rsp+0x2bc/0x390 net/bluetooth/mgmt.c:1443
+ mgmt_pending_foreach+0xd1/0x130 net/bluetooth/mgmt_util.c:259
+ __mgmt_power_off+0x112/0x420 net/bluetooth/mgmt.c:9455
+ hci_dev_close_sync+0x665/0x11a0 net/bluetooth/hci_sync.c:5191
+ hci_dev_do_close net/bluetooth/hci_core.c:483 [inline]
+ hci_dev_close+0x112/0x210 net/bluetooth/hci_core.c:508
+ sock_do_ioctl+0x158/0x460 net/socket.c:1222
+ sock_ioctl+0x629/0x8e0 net/socket.c:1341
+ vfs_ioctl fs/ioctl.c:51 [inline]
+ __do_sys_ioctl fs/ioctl.c:907 [inline]
+ __se_sys_ioctl+0xfc/0x170 fs/ioctl.c:893
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83gv
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
 
+Reported-by: syzbot+03d6270b6425df1605bf@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=03d6270b6425df1605bf
+Fixes: 275f3f648702 ("Bluetooth: Fix not checking MGMT cmd pending queue")
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+---
+ net/bluetooth/mgmt.c | 13 ++++++++++++-
+ 1 file changed, 12 insertions(+), 1 deletion(-)
 
---=20
-Luiz Augusto von Dentz
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 1f6d083682b8..1fe72d1f96f8 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -1351,7 +1351,13 @@ static void mgmt_set_powered_complete(struct hci_dev *hdev, void *data, int err)
+ static int set_powered_sync(struct hci_dev *hdev, void *data)
+ {
+ 	struct mgmt_pending_cmd *cmd = data;
+-	struct mgmt_mode *cp = cmd->param;
++	struct mgmt_mode *cp;
++
++	/* Make sure cmd still outstanding. */
++	if (cmd != pending_find(MGMT_OP_SET_POWERED, hdev))
++		return;
++
++	cp = cmd->param;
+ 
+ 	BT_DBG("%s", hdev->name);
+ 
+@@ -1432,6 +1438,11 @@ static void settings_rsp(struct mgmt_pending_cmd *cmd, void *data)
+ {
+ 	struct cmd_lookup *match = data;
+ 
++	/* dequeue cmd_sync entries using cmd as data as that is about to be
++	 * removed/freed.
++	 */
++	hci_cmd_sync_dequeue(match->hdev, NULL, cmd, NULL);
++
+ 	send_settings_rsp(cmd->sk, cmd->opcode, match->hdev);
+ 
+ 	list_del(&cmd->list);
+-- 
+2.47.0
+
