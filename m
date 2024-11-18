@@ -1,133 +1,132 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f180.google.com (mail-lj1-f180.google.com [209.85.208.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57D0D190468;
-	Mon, 18 Nov 2024 12:43:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 720C31AF0D9
+	for <linux-bluetooth@vger.kernel.org>; Mon, 18 Nov 2024 15:13:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731933821; cv=none; b=ufa6UZz8b2N8+OrhCnNqM+LrmyLfr66892VrNU0b9F3QGit5JfuIpsR1wIZ4CDp0TwyP4g5X7NcqEvhUsZui4qcryrq+LAV8uswRMP4Z6zTvqao/orIVKpvLBkLwitp9iiKwpTHFyNx1WOLDuHl9uoeqpxpec75ANzUjXbRBXVk=
+	t=1731942803; cv=none; b=krcS0xnCYYm0cGLm3J7QgVHq82IiEdhpFlps74v0BVboCDhvhJwScSmVkrOgv/PpOKqEja1PgE2PpPI5pcd0yNHErxphTksLMXXjrZhKVM1Cezw5HydM4QLV5PAkqq9Yob/YgsFk7gyWN0YU5exzvyWFnzjyWSv2djooATXQgkA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731933821; c=relaxed/simple;
-	bh=P33LpuhdOaOsy6SERvgsmmUyXLkRAXCmjvEKqwplfY4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WBAQeugNYckz7y3JnYx0U8wbF+FBGl2/LQkbyH1LildaP8RSMoS7JvUwpaHQf9hP0/Xlp8a08gWBpkGexygaftWWysSaZe1TN2eyOendS6AzkcK07sOadx/sxpAvTKk3oDTuCJb4oLiTCRG1s2E54etnmJ3yC9CbNDZsZ0ZpH1o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=S5Isaf9/; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1731942803; c=relaxed/simple;
+	bh=avN3GioXm1eL7bNyB87xcuXUuv0kk64fCD9wj5IR5Zs=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=VLYoV2aMeGx7v5hKmsxjKJEAiHfGFsgPefhJmRpgB0Ga72CoZY+cDFh1Vx8Kyf3kTV0YT9V8g6yRQDC0XEZvwEUiC80wwzEuQR/w7dA0sTP1ZoEOU4XNAbYukpWI+fD8+86dcr6ojQEh2HnLNDP8o8hMnD96h3I7owku0w+usnU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jhOIr7xn; arc=none smtp.client-ip=209.85.208.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="S5Isaf9/"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CFFABC4CECC;
-	Mon, 18 Nov 2024 12:43:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1731933820;
-	bh=P33LpuhdOaOsy6SERvgsmmUyXLkRAXCmjvEKqwplfY4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=S5Isaf9/icUMnPspKQTNYNG3FeD9iqRpejGzi+r1UnIf8CZh6mfYuPECYxEA62MLl
-	 9RvgHdQYfLGzoKqooDkfys8MTXAjoXwcbb3w/GVnKsNb3fES7EndW8S4wN4RpU6jgZ
-	 NvoehrqpjhqlhjJBFeuulZHCJepAB7EbjPF/T3QggVK/wfP9BsOueyfR7zqmSCrCue
-	 P2yt+gW4H1XjGs7AznZL276rg/vYX4CI81FdjywhjYlMLqD72nNaZyIQMX7dSoN4Ni
-	 jBVOiV5zIeqctOupyA2ZPmFdH6DtZfVjZpXPF8s2lIHUrR1K+UNdVBySOWH/WGNzly
-	 +g1kIx/y+4VSQ==
-Received: from johan by xi.lan with local (Exim 4.97.1)
-	(envelope-from <johan@kernel.org>)
-	id 1tD16F-0000000008J-3cQ2;
-	Mon, 18 Nov 2024 13:43:28 +0100
-Date: Mon, 18 Nov 2024 13:43:27 +0100
-From: Johan Hovold <johan@kernel.org>
-To: Zijun Hu <quic_zijuhu@quicinc.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Steev Klimaszewski <steev@kali.org>,
-	Paul Menzel <pmenzel@molgen.mpg.de>, Zijun Hu <zijun_hu@icloud.com>,
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
-	Bjorn Andersson <bjorande@quicinc.com>,
-	"Aiqun Yu (Maria)" <quic_aiquny@quicinc.com>,
-	Cheng Jiang <quic_chejiang@quicinc.com>,
-	Jens Glathe <jens.glathe@oldschoolsolutions.biz>,
-	stable@vger.kernel.org, Johan Hovold <johan+linaro@kernel.org>
-Subject: Re: [PATCH v2] Bluetooth: qca: Support downloading board ID specific
- NVM for WCN6855
-Message-ID: <Zzs2b6y-DPY3v8ty@hovoldconsulting.com>
-References: <20241116-x13s_wcn6855_fix-v2-1-c08c298d5fbf@quicinc.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jhOIr7xn"
+Received: by mail-lj1-f180.google.com with SMTP id 38308e7fff4ca-2fb388e64b0so40612021fa.0
+        for <linux-bluetooth@vger.kernel.org>; Mon, 18 Nov 2024 07:13:21 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1731942799; x=1732547599; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ipYtt9HA3eBM852gso8nAe0a1Vhm1aHUt9sOEPLDNmI=;
+        b=jhOIr7xnSsvHfFjy3Ny+gGzI8xrj4Bz55ZptBe3ekYaR3GGUhc8d7OnPPjgKvWHPG2
+         GAMm8Zd5vJbolTerG9bZ1tnIDWglX9jYgjl+v6YawhbkX+8bzt8P06+IuC3vmYjMX93Q
+         uk61Jg7r5ufTXJOtvmZYC+CUrc5Rrtuvp0Zc/Mbf8YT53vFjuggvnftSUBjsYdWrv19U
+         DAvstjhzklUajBthEjLWqZyM8ZpPJgBc5O77bFWYVCkPTONk8jq0twQ9WnXHGGdbTCzu
+         NdazSsdTmUzIMKoiDrgZ8qlo8YtV6eh+ekqQJGz6/KAhhUu3d6OpEmCCkg2uNxiRRHG5
+         Gg5Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731942799; x=1732547599;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ipYtt9HA3eBM852gso8nAe0a1Vhm1aHUt9sOEPLDNmI=;
+        b=uyhIzD05EIkh6I/z4nHCNg2LdkGp9VF3+QqpK1nxLRaaSnigTQvOSGTQWop5hCxxBy
+         qyusw7W7EzzJV1A6BeqkIH4HZ2uX7zxx0AiXPii1CaqgVG+H3+Cx7gmW22G0EnUvKaCd
+         naF/Tqd8YrNNjJBC5YlhgXMxEmTaYVmXukwjps2GcK0Wlf4ZTslCzh6UbJ3bjjJ3UBzj
+         Av662gh8e8YXSD2Kr/kMo6z1Tl8OouIse0aquZPiPj4Rm3fmKEA9NuqLASRjTuW/771C
+         UOdvR2hX/J1Ek+/e2kmiKS8PzmpXm/LIHZdJ2KqCuY0K214N8gnJarGhUwlWOzlaRd5T
+         d4zQ==
+X-Gm-Message-State: AOJu0Ywm4A9HdYXzh7yhDBip0H15TmR05FS/x/d4tZ7IOfzp4AA5wjgk
+	FhN4N8qu/F61DBlm1ovfgrG5THsH2QyEC1Ums9tSnAQe56y1mPFn/2l9fKOuvXO0ZvmmNOTcgzU
+	McEdJz8fxmHVFieS5eJeYBjQHHIDbX3RO
+X-Google-Smtp-Source: AGHT+IEX3/L3p0veX5s9JWGuwkmJ/2gbYn1Q/C+pbdCA+JHhjgrHUiKKIVolEdSOeGQXB8BCkbEMZhDVFEFLRrPf/+I=
+X-Received: by 2002:a2e:a80f:0:b0:2ef:20ae:d113 with SMTP id
+ 38308e7fff4ca-2ff606fdb02mr52584681fa.40.1731942799198; Mon, 18 Nov 2024
+ 07:13:19 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20241116-x13s_wcn6855_fix-v2-1-c08c298d5fbf@quicinc.com>
+References: <20241118094907.2673431-1-quic_jiaymao@quicinc.com>
+In-Reply-To: <20241118094907.2673431-1-quic_jiaymao@quicinc.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Mon, 18 Nov 2024 10:13:06 -0500
+Message-ID: <CABBYNZK9Z2fKiFmfnptUsX+yrvaKNW+b_BfQyidM=z2YU499nQ@mail.gmail.com>
+Subject: Re: [PATCH v1] hog: Check security level before setting
+To: Jiayang Mao <quic_jiaymao@quicinc.com>
+Cc: linux-bluetooth@vger.kernel.org, quic_chejiang@quicinc.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Sat, Nov 16, 2024 at 07:49:23AM -0800, Zijun Hu wrote:
-> For WCN6855, board ID specific NVM needs to be downloaded once board ID
-> is available, but the default NVM is always downloaded currently, and
-> the wrong NVM causes poor RF performance which effects user experience.
-> 
-> Fix by downloading board ID specific NVM if board ID is available.
-> 
-> Cc: Bjorn Andersson <bjorande@quicinc.com>
-> Cc: Aiqun Yu (Maria) <quic_aiquny@quicinc.com>
-> Cc: Cheng Jiang <quic_chejiang@quicinc.com>
-> Cc: Johan Hovold <johan@kernel.org>
-> Cc: Jens Glathe <jens.glathe@oldschoolsolutions.biz>
-> Cc: Steev Klimaszewski <steev@kali.org>
-> Cc: Paul Menzel <pmenzel@molgen.mpg.de>
+Hi Jiayang,
 
-Nit: These Cc tags should typically not be here in the commit message,
-and should at least not be needed for people who git-send-email will
-already include because of Tested-by and Reviewed-by tags.
+On Mon, Nov 18, 2024 at 4:49=E2=80=AFAM Jiayang Mao <quic_jiaymao@quicinc.c=
+om> wrote:
+>
+> bt_gatt_client_set_security could fail if the security level is
+> already BT_ATT_SECURITY_MEDIUM. So, get and check the security
+> level before setting it.
 
-If they help with your workflow then perhaps you can just put them below
-the cut-off (---) line.
+Seems a bit strange that this is not handled by the kernel, can you
+elaborate on the conditions to trigger it?
 
-> Fixes: 095327fede00 ("Bluetooth: hci_qca: Add support for QTI Bluetooth chip wcn6855")
-> Cc: stable@vger.kernel.org # 6.4
-> Reviewed-by: Johan Hovold <johan+linaro@kernel.org>
+> Signed-off-by: Jiayang Mao <quic_jiaymao@quicinc.com>
+> ---
+>  profiles/input/hog.c | 6 ++++--
+>  1 file changed, 4 insertions(+), 2 deletions(-)
+>
+> diff --git a/profiles/input/hog.c b/profiles/input/hog.c
+> index 017e320f0..011cc0a88 100644
+> --- a/profiles/input/hog.c
+> +++ b/profiles/input/hog.c
+> @@ -191,8 +191,10 @@ static int hog_accept(struct btd_service *service)
+>                         return -ECONNREFUSED;
+>
+>                 client =3D btd_device_get_gatt_client(device);
+> -               if (!bt_gatt_client_set_security(client,
+> -                                               BT_ATT_SECURITY_MEDIUM))
+> +               if (BT_ATT_SECURITY_MEDIUM !=3D
+> +                       bt_gatt_client_get_security(client) &&
+> +                   !bt_gatt_client_set_security(client,
+> +                                                BT_ATT_SECURITY_MEDIUM))
+>                         return -ECONNREFUSED;
 
-When making non-trivial changes, like the addition of the fallback NVM
-feature in v2, you should probably have dropped any previous Reviewed-by
-tags.
 
-The fallback handling looks good to me though (and also works as
-expected).
+Definitely not the right way to fix this since there might be other
+places that do attempt to set the security, so Id got with something
+like the following:
 
-> Tested-by: Johan Hovold <johan+linaro@kernel.org>
-> Tested-by: Steev Klimaszewski <steev@kali.org>
-> Tested-by: Jens Glathe <jens.glathe@oldschoolsolutions.biz>
-> Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
+diff --git a/src/shared/att.c b/src/shared/att.c
+index 4a406f4b91a4..dabbdb4315eb 100644
+--- a/src/shared/att.c
++++ b/src/shared/att.c
+@@ -727,6 +727,9 @@ static bool bt_att_chan_set_security(struct
+bt_att_chan *chan, int level)
+ {
+        struct bt_security sec;
 
-> Changes in v2:
-> - Correct subject and commit message
-> - Temporarily add nvm fallback logic to speed up backport.
-> — Add fix/stable tags as suggested by Luiz and Johan
-> - Link to v1: https://lore.kernel.org/r/20241113-x13s_wcn6855_fix-v1-1-15af0aa2549c@quicinc.com
- 
-> +download_nvm:
->  	err = qca_download_firmware(hdev, &config, soc_type, rom_ver);
->  	if (err < 0) {
->  		bt_dev_err(hdev, "QCA Failed to download NVM (%d)", err);
-> +		if (err == -ENOENT && boardid != 0 &&
-> +		    soc_type == QCA_WCN6855) {
-> +			boardid = 0;
-> +			qca_get_hsp_nvm_name_generic(&config, ver,
-> +						     rom_ver, boardid);
-> +			bt_dev_warn(hdev, "QCA fallback to default NVM");
-> +			goto download_nvm;
-> +		}
->  		return err;
++       if (level =3D=3D bt_att_chan_get_security(chan))
++               return true;
++
+        if (chan->type =3D=3D BT_ATT_LOCAL) {
+                chan->sec_level =3D level;
+                return true;
 
-If you think it's ok for people to continue using the wrong (default)
-NVM file for a while still until their distros ship the board-specific
-ones, then this looks good to me and should ease the transition:
+>         }
+>
+> --
+> 2.25.1
+>
+>
 
-[    6.125626] Bluetooth: hci0: QCA Downloading qca/hpnv21g.b8c
-[    6.126730] bluetooth hci0: Direct firmware load for qca/hpnv21g.b8c failed with error -2
-[    6.126826] Bluetooth: hci0: QCA Failed to request file: qca/hpnv21g.b8c (-2)
-[    6.126894] Bluetooth: hci0: QCA Failed to download NVM (-2)
-[    6.126951] Bluetooth: hci0: QCA fallback to default NVM
-[    6.127003] Bluetooth: hci0: QCA Downloading qca/hpnv21g.bin
-[    6.309322] Bluetooth: hci0: QCA setup on UART is completed
 
-Johan
+--=20
+Luiz Augusto von Dentz
