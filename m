@@ -1,92 +1,120 @@
-Received: from mail-ua1-f44.google.com (mail-ua1-f44.google.com [209.85.222.44])
+Received: from mail-ot1-f41.google.com (mail-ot1-f41.google.com [209.85.210.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27C2413C83D
-	for <linux-bluetooth@vger.kernel.org>; Tue, 19 Nov 2024 16:37:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE32814A615
+	for <linux-bluetooth@vger.kernel.org>; Tue, 19 Nov 2024 17:43:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732034258; cv=none; b=iKsmsHdDI5nhIAUlLMYDcFcR+CbbtFaQhfR2f/ErOT1zobflPPypMOjZzqfgz0lEdJ2e/gXm0aydu5Kbs8GkldxjvBwl9pojakVXICQR5t4B8jhTzj50a/LvCdNeVOs1CUwit4GICd92e9AX6V5FXIvfeDDtldnDVqv3HJZcUFM=
+	t=1732038213; cv=none; b=iZiKZoh+53+tskXSyxKLjcGo+DrugvXvXMEplTt3kz3Lnr1xdxD/IN9yUvbZQx4Fv+l7rgnIVmZBEz/6lEH99M/04vp9vwDV9E8Ad6sT1a0/behExlHByjpa0OYCJTbkcNYSo41NMH9N0Crg316rbceQTO9VjzcTEscOaE3e68g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732034258; c=relaxed/simple;
-	bh=4mAdIHasTa0M/Z4A2+Vr4fJzlXo3fURmQd33BVPkmmU=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=VRcTX92MEcfYs1coqDoAMMYRe+Gq+xRyLyD+Hl5sYOFx+G76jgiif3VpAfBQMK5jbjlFmMuVkJmOasxH0psYwV8/uM9PEpdSrdGCqah52DB/YhAYkMYAxCO7BS2GYx82YC0MdXrPbUv923/YC8ihI2xwyL+xz9WY2LBgrlF5EgU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nEp4NiB4; arc=none smtp.client-ip=209.85.222.44
+	s=arc-20240116; t=1732038213; c=relaxed/simple;
+	bh=kj/ypkJIc8kM9jX3fCZLPA1/ieiaEWptpSlynF5SdgY=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=kwITXfcz/y9ZGJCXEryyn1z5XJsOf3KTs9YapAgTglMaQEATt84lR3UVKno8FmUd7jecYgcHmPKmxfrTzG/6vrkMi24Gwqc+5prqNezm576++qDfBhectW3XXny1MarEFybIiCAlhfTCzNFcLfXcJi5spCLTdChl3JgEFGH7UL4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LD210i7a; arc=none smtp.client-ip=209.85.210.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nEp4NiB4"
-Received: by mail-ua1-f44.google.com with SMTP id a1e0cc1a2514c-857004f7846so1011410241.2
-        for <linux-bluetooth@vger.kernel.org>; Tue, 19 Nov 2024 08:37:36 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LD210i7a"
+Received: by mail-ot1-f41.google.com with SMTP id 46e09a7af769-71815313303so723900a34.1
+        for <linux-bluetooth@vger.kernel.org>; Tue, 19 Nov 2024 09:43:31 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1732034255; x=1732639055; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=IR0HL+1n5dfggbHGIivUvRuUdxexR6Csn+7bcVkbIHM=;
-        b=nEp4NiB482IA0vqtvYDsSi1dVVVkjRGBg8DpRcFbfMBBxpqREmvsHD2LZl9qLY1pjO
-         wre7m7cEsiaiMlif/Px+OdPU/bDxoLQw8Xygs0NBNgRwjvo7dErY+8RfaxORpufxnShP
-         plqfsqgjXRTGn/gPekY5W9za9uXfKQ9B9uIFdFNA+m+EZP652SsZgJsrREZsnmvRJiHW
-         UqQ4T/AkX81WVYPWF+i4m5pJAg8qUfpIxFzMhziUmpeiUmQ8Ps4yeSF04xdVdi6ilKeJ
-         3bVmodXRqvn6Odvp/boD4l4VyQzsD7f7zERLOWSNx7YZGg58QESzaYn6IkbKDcrWIP/4
-         Yfww==
+        d=gmail.com; s=20230601; t=1732038211; x=1732643011; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=SOAZu8ehC88eXogTziWWCMmoJ4S235RNDet9BIilwXQ=;
+        b=LD210i7ah+Ut6bciF3vVDfD5O0qgRnaath0RoL+OUEEsWq8WKuBweukS+HvOKHeiz8
+         ZiFwNxAhqBg0S+E8NARLeAmS6axKVrbSctHrJKwRkQNBbYvOO5k+5JJIERjmrV2M6sdW
+         8wfSbbbjeUo5ri3vtWXnTEl67dZuSV3A1/gaT27krUJg76RL1VuXCj1LIt0qqdRBWx+S
+         uASg3JiSLLjmTEyPphabJtdiFVruLWP5awNWFkaYQhN+AfuD6T2FQ2p0JbqRDc2b5cK8
+         CgXyujCu7lP+Tpnh4j4YeFts1f9ZK6ZcqaBAH6EuvTPgYjYiZi5yhFCEO3Q1f4x0L5DL
+         RTWA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732034255; x=1732639055;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=IR0HL+1n5dfggbHGIivUvRuUdxexR6Csn+7bcVkbIHM=;
-        b=XDvVqab5cEc8SPTjU755maEWvSb+dqM2uEbYTpmwro9cC3GgQY8oqXGEwgk2ewUsL/
-         koJaNCbbaUAmJySSWo7/03ZU84Gf/pCTkzZZModM/YntGYPgtcKBqhtdK0WNpsWfKF7H
-         jkIgNwg3nEldknyVlS3t2RhyDUR630q1qW3UugLU1w9yRaG1HuYQqZXWHisTNPYhXX38
-         XhiF5dFVMojw8T1iGRwwqxt9k8prfjTeyFijFtmFw/xEeAYdkwQ/h3eShflH/60slJxl
-         r2/huUGuYkHFM16qTxOICo2WeVYy9UVWFoyYzGg+RbxR6N9bF8UG4+l5o66RloXzagk8
-         gu4Q==
-X-Gm-Message-State: AOJu0Yzi3v3D8qMUwuzpqQYC+5PHBIW+b6e+O4YObyr6i6Ysd1P8CJOJ
-	wsRkrgLEKAreq7iWJPcGipv+9+P2Qq2wsSBm4e7tvB7ogkh4+ZiBHSPQNg==
-X-Google-Smtp-Source: AGHT+IGgy9Ts1tTbh8HkMFFZM8Gmppys+nEopRER4F/aGlOw5eLDDN12Q9/R537WACWsPVwuyNeTzA==
-X-Received: by 2002:a05:6102:38d3:b0:4a4:94f3:7de4 with SMTP id ada2fe7eead31-4ad62d19b6fmr12956655137.22.1732034255365;
-        Tue, 19 Nov 2024 08:37:35 -0800 (PST)
-Received: from lvondent-mobl5.. (syn-107-146-107-067.res.spectrum.com. [107.146.107.67])
-        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-4ad64bfdaf7sm1501457137.6.2024.11.19.08.37.32
-        for <linux-bluetooth@vger.kernel.org>
+        d=1e100.net; s=20230601; t=1732038211; x=1732643011;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=SOAZu8ehC88eXogTziWWCMmoJ4S235RNDet9BIilwXQ=;
+        b=tQ5IoY+LFIzORCiKK2PKGn1z2xPb3Fmdv26lRolivTGwbKPuRZ7IzRPnRla+sFKhNx
+         qVBUi4HY3SVPIRwyJ7cnJzZKtMInvKO1LAPvNSgdtMhOFBKdtGlSNkOh3Hc6UYBkyZuk
+         PN4U5iUg5YEIgAHU5KAB7yxhafm1bj4t9TwmUx+U7zsBGfyNZGxHzseDSTTWzHxWpo+p
+         PKn6j7vP6q3S+XhVGzyK7yTrEX2/sytpLomxjfOvmwylvvgCb9KeXQPjzMQ7tV6pHpxN
+         2DoIgLQMCSFeesbZNJFlmug8uvLdpdbzFXA+d42VhUeiiJHmjH8U4+6TRHf1sGm5/2Y+
+         H7ow==
+X-Gm-Message-State: AOJu0YxScZEzWPYGZO/rmSXuCgPisj7Kl9ZIBbYzry2LFsd0HRcQGbxG
+	hLprlV2G6leZLqVWcrm5jVBKoyz94KmV82qiunYjaWNidHbQyfEzB4v8iA==
+X-Google-Smtp-Source: AGHT+IEhj1YXFy76Ib2TGGaw4gHZvXDg8tJdtmitkZlhdwOauW3XxhAJ/srnf7WO9e+hsHCO5WDn8A==
+X-Received: by 2002:a05:6358:ed1b:b0:1c5:e2f3:b9f8 with SMTP id e5c5f4694b2df-1c6cd205726mr795499955d.4.1732038210750;
+        Tue, 19 Nov 2024 09:43:30 -0800 (PST)
+Received: from [172.17.0.2] ([20.49.54.18])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-46392baa970sm13505671cf.20.2024.11.19.09.43.29
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 19 Nov 2024 08:37:33 -0800 (PST)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v1] shared/att: Fix failing to set security level
-Date: Tue, 19 Nov 2024 11:37:31 -0500
-Message-ID: <20241119163731.2767660-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.47.0
+        Tue, 19 Nov 2024 09:43:29 -0800 (PST)
+Message-ID: <673cce41.c80a0220.324ef4.527a@mx.google.com>
+Date: Tue, 19 Nov 2024 09:43:29 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============0646971901397682471=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [BlueZ,v1] shared/att: Fix failing to set security level
+In-Reply-To: <20241119163731.2767660-1-luiz.dentz@gmail.com>
+References: <20241119163731.2767660-1-luiz.dentz@gmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+--===============0646971901397682471==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-bt_att_chan_set_security attempts to set BT_SECURITY without first
-checking what is the current security level which may cause errors
-since the kernel does actually return -EINVAL when the security doesn't
-change.
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=911015
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PENDING   0.25 seconds
+GitLint                       PENDING   0.23 seconds
+BuildEll                      PASS      21.09 seconds
+BluezMake                     PASS      1713.45 seconds
+MakeCheck                     PASS      13.66 seconds
+MakeDistcheck                 PASS      164.68 seconds
+CheckValgrind                 PASS      219.81 seconds
+CheckSmatch                   PASS      279.14 seconds
+bluezmakeextell               PASS      101.44 seconds
+IncrementalBuild              PENDING   0.26 seconds
+ScanBuild                     PASS      878.10 seconds
+
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
+
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
+
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
+
+
+
 ---
- src/shared/att.c | 3 +++
- 1 file changed, 3 insertions(+)
+Regards,
+Linux Bluetooth
 
-diff --git a/src/shared/att.c b/src/shared/att.c
-index 4a406f4b91a4..dabbdb4315eb 100644
---- a/src/shared/att.c
-+++ b/src/shared/att.c
-@@ -727,6 +727,9 @@ static bool bt_att_chan_set_security(struct bt_att_chan *chan, int level)
- {
- 	struct bt_security sec;
- 
-+	if (level == bt_att_chan_get_security(chan))
-+		return true;
-+
- 	if (chan->type == BT_ATT_LOCAL) {
- 		chan->sec_level = level;
- 		return true;
--- 
-2.47.0
 
+--===============0646971901397682471==--
