@@ -1,249 +1,180 @@
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D6CD8C0B;
-	Tue, 19 Nov 2024 01:44:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF7093FF1;
+	Tue, 19 Nov 2024 02:14:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731980656; cv=none; b=KfNrHKZEei9ZD4c0ENmele3Ywid3w8kmW+TCbrN48sO44Nrz26w1V9rH6GTbypQ5muU6fkJ7T5ltoGiLPm0k1uNS8Qbey41JxbgAO/JDlcZN5ohMDv7zD96runQ+Bu1P/0v+RwaBy1ClMlHyySSCpaO3m0tWs45kug9Ovnzvalc=
+	t=1731982498; cv=none; b=SGJE+YswprrhgRatAvRNdatIDBTtpnkjfG08m+UAA+UsTwjAZ8Jx0xdYR/saBk6b5yr0v4XlXHEwIxAPEv1MYRum4caBw8wZo4yteychj+07m/4CHghWsYsPugx7LiIrShqMZAthmjfJQOw5SbcedEztmvyPKk8/gIJM0Cvvg/U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731980656; c=relaxed/simple;
-	bh=R1qQ0OBQz6CUZbICIx1Jgof2nor6NIrbN2iL+Kv4Iss=;
-	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
-	 Message-Id:References:To; b=eF/EdBcIpioHKsDpSvZpaPtmVjKlmQInti5v3nJ4FufIFkYjJKneAffEjqmvxTEcRenuMX5tS+ot3TqOdUP27N/hB161eG8ZO6DThWXvRJrcOxY0QHFCG6ILE7IjgC4kIIgeFL93TPTbKmB2vKfATh5S/Ct/1IiUnGxM+QrUuvk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kRdxe+/o; arc=none smtp.client-ip=209.85.214.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1731982498; c=relaxed/simple;
+	bh=BedYYDpjc/af53IHCSEAPMTd8HnUhH3pfXCO6vleV4I=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=sVLP0yDlBGY7uVXcoa/043dadXvDGBoMmdjWA7XUVEalBP2NoAZsafQggxw2oEt6aJOkJU1CqqQvZ3ppguz5G+vFaUiCF9epPS8yogLExtkzPd2PXYxHzDYaPkREPPYPrDDgsQycMw/lgRIOWJLg5r9fEuMCYCNWKXY+2L1o8ZE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=G2dnsOJ1; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kRdxe+/o"
-Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-20cb47387ceso3237695ad.1;
-        Mon, 18 Nov 2024 17:44:13 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1731980653; x=1732585453; darn=vger.kernel.org;
-        h=to:references:message-id:content-transfer-encoding:cc:date
-         :in-reply-to:from:subject:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=6TLGZPhgwiSdTuoKO9EIOhX+7x+wgHfPfCEdlENWql4=;
-        b=kRdxe+/oWM72BSHOOAqNjFVH9JHNDsq7mL8ToCrJJwB9d631NbdUrbouRb+UiyZY81
-         ljVpT/h9gUjNSHJsK/fRJvETkYCFizUxFCaZCg4uh4cYkKkoCMKwXhwXLkC549SsKTZi
-         q8R2LCG4kgajXDeA8/pAiHKoTadfdzzatWkFQf0cmVNg9+MR1URnQNoGYqVHaqriddtT
-         hNVEDQwdX5rXRJps5mxvoG3XpkmECef8gzff8S3gxSoZtFbmRDRq7m2PH2LbYePnVPAD
-         S9s3KZC/pr8z9q+kweJ7cusUmg6J8lGz4fLG4dRa1EdQekg02tnv3JOoWc1pX+BmzX+9
-         edHw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731980653; x=1732585453;
-        h=to:references:message-id:content-transfer-encoding:cc:date
-         :in-reply-to:from:subject:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=6TLGZPhgwiSdTuoKO9EIOhX+7x+wgHfPfCEdlENWql4=;
-        b=LUsckyVXoSytBIwxb0o/PKCOb2uwYRi0YcRAiyU//AdZU5bg2Y+CN/NjXCPtEEXR+y
-         C3yBxhLWZ1tYdfUHXkvJ+IIMoL0rn/OjjbIiWbxaJGPcDCWK1mvuNlxpsmc0dAo1fbgs
-         Y+5M3vHpt92A8wxoRcoRUAv3/+wDs54q0rE259fA5x/VLgE3K4x1QJBvwKmh+JQst6yW
-         MTBHXT4bYfclu0kEDT6YMFNR+jD9J+UrBb2EqJKaeWOjgZsjV2o+HZLeu2bZhdFYeOck
-         +k5vCH9CQ75aHvadjakWzy0WdLgupZX/Y8u5ShGfa/uO8WL00t+s8WenkdT4XYe+5dGd
-         Q8eg==
-X-Forwarded-Encrypted: i=1; AJvYcCUU0DtkWJtfKEDlBfRIzEuGUG8jqyxHgcmGWxRO/6FMrYjbLie2ux+Hkfn1JChm75LhzghzWunlBArQWJyyvLwQ@vger.kernel.org, AJvYcCUhf/QuDv+um6sovVPElJ6vXQ7Jc/k3pzOr69RbqLpHnKiE2e9jQHi3W6QsDuUZNP1Ou7ninAJX8DesWLc=@vger.kernel.org, AJvYcCUiTyaQ8DQlLAxEzfOsxecjghsc4H+kihMxxMB9IdhG4GuDo3/pJ+ho76Nk/NLkPFAAC6BDLN3f@vger.kernel.org, AJvYcCUpe7MmNoHeD+ko7v3lCmrgJPmlyZ0o35XJsWdZ6ktIHmLz5vGUrYX10ctUS+xfwirCkZ26/023VZ45A2XP@vger.kernel.org, AJvYcCUwEL/1dRAdNcilO8jQAYSQlaDi4XcDvU3IkP5hBEDPmjUEH5P2Es0sNFrKCkjMHAP1jF0TK+VQDTNFGpIWlQ==@vger.kernel.org, AJvYcCVZqNh1hY2Ba9cAE/MsL9Ous1pdie0DJzPY7vOSfrJ/Zn/xBNexNlK0P46SSr+rgBhK3J/4b3JC/rWK@vger.kernel.org, AJvYcCVksf6ZoypxieCEKzGz1kA2IfFUi0lBzhZ66SrgKZOn95zuSgitsjuD4CMsz/ellZkGKSeq+RGqMhrZH6A=@vger.kernel.org, AJvYcCVvcQMn8DzPL91B1qFSnNgUjKfv41XrUneDXY1ncpPaGr0kXKgqIVdpIGMHH37PbKzpHEDmomJqkJMriw==@vger.kernel.org, AJvYcCWQpZ3PMi3KvKWEb9VUeuDMibxA97iuzi9RImvKGGJysgLg3VItDT13PycPzXLeFCL3a0iKrL/IIA7BBGfqrMOP@vger.kernel.org, AJvYcCWqPebWEWvOTRhyz2vajRYvV3qjJTl+ox+wTwfjrlOGHdJBgixm+d+6Xn8eOzJbgf4lLQmWfxWikjMgAQ==@vger.kernel.org, AJvYcCWt2jF65xK7QSjQEymY23W7sAC8RQ2Kuw1YUqP1Dr/c9ARvZKDbu44rqv+rcIYCINvz/gpEpd0NSBdRwvBB1ek=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyBvoNMEoRPtJeri/z7snPp8hU3EUt+JXrJnieYOeGYKorNiBNJ
-	st13yqQ0kWqsItJXSaUczWIgTwmWdxmPCpiMfKZgNjHnDGYx7gUK
-X-Google-Smtp-Source: AGHT+IGKOuuVyAvdbfIttKIxJSv7PNCbNBMgaHYEIodVhJO4YNPmnFai9XI15Qs6QZqqMPXdK5RTjA==
-X-Received: by 2002:a17:903:186:b0:212:46c2:632e with SMTP id d9443c01a7336-21246c26707mr25423135ad.15.1731980653295;
-        Mon, 18 Nov 2024 17:44:13 -0800 (PST)
-Received: from smtpclient.apple ([198.11.178.15])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-211d0f6182bsm62977715ad.277.2024.11.18.17.43.45
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 18 Nov 2024 17:44:12 -0800 (PST)
-Content-Type: text/plain;
-	charset=utf-8
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="G2dnsOJ1"
+Received: from pps.filterd (m0279870.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4AIGGdvj026837;
+	Tue, 19 Nov 2024 02:14:21 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	BPcr82EtHYQQGwGC3z55Hjcvd38ESCNNpseVzITcESM=; b=G2dnsOJ1j+aR+zNv
+	LhSdQsvmYwyirUZjsTh8pxWSV9JlwzRVThK2Wa6QAz+Iv5YwIOGHII3ax/qDycAr
+	CvtQMCx+1ONmkzhK99fQWmnu8P8MjaXxv6K1BNuHDBe63+RZyXxMtDSJVzcuvCZ4
+	9acaaW2wNBHhpwwSFQl6jGA/7pr4dKvXyUDGFSLdrQturAgcc3NNH9T7K5nNGiQr
+	jw/9EHBUWI7bftZjvpZIx1UeecteT64QQ7bDnENGTHc4j5sosAcaikye4vspM9rq
+	SYLVxyK2HSKFGaBaVSvg3vhaGSWwksA4KWcLVCl2ikHUMD+6s45oqFHnHrQjrPkj
+	l3ofug==
+Received: from nasanppmta05.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4308y7s53g-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 19 Nov 2024 02:14:20 +0000 (GMT)
+Received: from nasanex01a.na.qualcomm.com (nasanex01a.na.qualcomm.com [10.52.223.231])
+	by NASANPPMTA05.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 4AJ2DJ28016969
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 19 Nov 2024 02:13:19 GMT
+Received: from [10.253.8.237] (10.80.80.8) by nasanex01a.na.qualcomm.com
+ (10.52.223.231) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Mon, 18 Nov
+ 2024 18:13:13 -0800
+Message-ID: <d382b377-e824-4728-8acd-784757dde210@quicinc.com>
+Date: Tue, 19 Nov 2024 10:13:11 +0800
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3774.500.171.1.1\))
-Subject: Re: [PATCH v2 19/21] livepatch: Convert timeouts to secs_to_jiffies()
-From: zhang warden <zhangwarden@gmail.com>
-In-Reply-To: <96f3b51b-c28c-4ea8-b61e-a4982196215f@linux.microsoft.com>
-Date: Tue, 19 Nov 2024 09:43:32 +0800
-Cc: Petr Mladek <pmladek@suse.com>,
- Christophe Leroy <christophe.leroy@csgroup.eu>,
- Pablo Neira Ayuso <pablo@netfilter.org>,
- Jozsef Kadlecsik <kadlec@netfilter.org>,
- "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>,
- Julia Lawall <Julia.Lawall@inria.fr>,
- Nicolas Palix <nicolas.palix@imag.fr>,
- Daniel Mack <daniel@zonque.org>,
- Haojian Zhuang <haojian.zhuang@gmail.com>,
- Robert Jarzmik <robert.jarzmik@free.fr>,
- Russell King <linux@armlinux.org.uk>,
- Heiko Carstens <hca@linux.ibm.com>,
- Vasily Gorbik <gor@linux.ibm.com>,
- Alexander Gordeev <agordeev@linux.ibm.com>,
- Christian Borntraeger <borntraeger@linux.ibm.com>,
- Sven Schnelle <svens@linux.ibm.com>,
- Ofir Bitton <obitton@habana.ai>,
- Oded Gabbay <ogabbay@kernel.org>,
- Lucas De Marchi <lucas.demarchi@intel.com>,
- =?utf-8?Q?Thomas_Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>,
- Rodrigo Vivi <rodrigo.vivi@intel.com>,
- Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
- Maxime Ripard <mripard@kernel.org>,
- Thomas Zimmermann <tzimmermann@suse.de>,
- David Airlie <airlied@gmail.com>,
- Simona Vetter <simona@ffwll.ch>,
- Jeroen de Borst <jeroendb@google.com>,
- Praveen Kaligineedi <pkaligineedi@google.com>,
- Shailend Chand <shailend@google.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>,
- James Smart <james.smart@broadcom.com>,
- Dick Kennedy <dick.kennedy@broadcom.com>,
- "James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
- "Martin K. Petersen" <martin.petersen@oracle.com>,
- =?utf-8?Q?Roger_Pau_Monn=C3=A9?= <roger.pau@citrix.com>,
- Jens Axboe <axboe@kernel.dk>,
- Kalle Valo <kvalo@kernel.org>,
- Jeff Johnson <jjohnson@kernel.org>,
- Catalin Marinas <catalin.marinas@arm.com>,
- Andrew Morton <akpm@linux-foundation.org>,
- Jack Wang <jinpu.wang@cloud.ionos.com>,
- Marcel Holtmann <marcel@holtmann.org>,
- Johan Hedberg <johan.hedberg@gmail.com>,
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- Florian Fainelli <florian.fainelli@broadcom.com>,
- Ray Jui <rjui@broadcom.com>,
- Scott Branden <sbranden@broadcom.com>,
- Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
- Xiubo Li <xiubli@redhat.com>,
- Ilya Dryomov <idryomov@gmail.com>,
- Josh Poimboeuf <jpoimboe@kernel.org>,
- Jiri Kosina <jikos@kernel.org>,
- Miroslav Benes <mbenes@suse.cz>,
- Joe Lawrence <joe.lawrence@redhat.com>,
- Jaroslav Kysela <perex@perex.cz>,
- Takashi Iwai <tiwai@suse.com>,
- Lucas Stach <l.stach@pengutronix.de>,
- Russell King <linux+etnaviv@armlinux.org.uk>,
- Christian Gmeiner <christian.gmeiner@gmail.com>,
- Louis Peens <louis.peens@corigine.com>,
- Michael Ellerman <mpe@ellerman.id.au>,
- Nicholas Piggin <npiggin@gmail.com>,
- Naveen N Rao <naveen@kernel.org>,
- Madhavan Srinivasan <maddy@linux.ibm.com>,
- netfilter-devel@vger.kernel.org,
- coreteam@netfilter.org,
- netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org,
- cocci@inria.fr,
- linux-arm-kernel@lists.infradead.org,
- linux-s390@vger.kernel.org,
- dri-devel@lists.freedesktop.org,
- intel-xe@lists.freedesktop.org,
- linux-scsi@vger.kernel.org,
- xen-devel@lists.xenproject.org,
- linux-block@vger.kernel.org,
- linux-wireless@vger.kernel.org,
- ath11k@lists.infradead.org,
- linux-mm@kvack.org,
- linux-bluetooth@vger.kernel.org,
- linux-staging@lists.linux.dev,
- linux-rpi-kernel@lists.infradead.org,
- ceph-devel@vger.kernel.org,
- live-patching@vger.kernel.org,
- linux-sound@vger.kernel.org,
- etnaviv@lists.freedesktop.org,
- oss-drivers@corigine.com,
- linuxppc-dev@lists.ozlabs.org,
- Anna-Maria Behnsen <anna-maria@linutronix.de>
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <99755FD2-270C-4122-8A22-6C73A81028F6@gmail.com>
-References: <20241115-converge-secs-to-jiffies-v2-0-911fb7595e79@linux.microsoft.com>
- <20241115-converge-secs-to-jiffies-v2-19-911fb7595e79@linux.microsoft.com>
- <718febc4-59ee-4701-ad62-8b7a8fa7a910@csgroup.eu>
- <Zzsfuuv3AVomkMxn@pathway.suse.cz>
- <96f3b51b-c28c-4ea8-b61e-a4982196215f@linux.microsoft.com>
-To: Easwar Hariharan <eahariha@linux.microsoft.com>
-X-Mailer: Apple Mail (2.3774.500.171.1.1)
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2] Bluetooth: qca: Support downloading board ID specific
+ NVM for WCN6855
+To: Johan Hovold <johan@kernel.org>
+CC: Marcel Holtmann <marcel@holtmann.org>,
+        Luiz Augusto von Dentz
+	<luiz.dentz@gmail.com>,
+        Bjorn Andersson <andersson@kernel.org>,
+        "Steev
+ Klimaszewski" <steev@kali.org>,
+        Paul Menzel <pmenzel@molgen.mpg.de>, Zijun Hu
+	<zijun_hu@icloud.com>,
+        <linux-bluetooth@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        Luiz Augusto von Dentz
+	<luiz.von.dentz@intel.com>,
+        Bjorn Andersson <bjorande@quicinc.com>,
+        "Aiqun Yu
+ (Maria)" <quic_aiquny@quicinc.com>,
+        Cheng Jiang <quic_chejiang@quicinc.com>,
+        Jens Glathe <jens.glathe@oldschoolsolutions.biz>,
+        <stable@vger.kernel.org>, Johan Hovold <johan+linaro@kernel.org>
+References: <20241116-x13s_wcn6855_fix-v2-1-c08c298d5fbf@quicinc.com>
+ <Zzs2b6y-DPY3v8ty@hovoldconsulting.com>
+Content-Language: en-US
+From: quic_zijuhu <quic_zijuhu@quicinc.com>
+In-Reply-To: <Zzs2b6y-DPY3v8ty@hovoldconsulting.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nasanex01a.na.qualcomm.com (10.52.223.231)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: a0D1d30FwmA5Gt0yuqebd2TdZpImMgqD
+X-Proofpoint-GUID: a0D1d30FwmA5Gt0yuqebd2TdZpImMgqD
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
+ definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 spamscore=0
+ mlxlogscore=999 clxscore=1015 suspectscore=0 adultscore=0
+ priorityscore=1501 phishscore=0 impostorscore=0 bulkscore=0
+ lowpriorityscore=0 malwarescore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.19.0-2409260000 definitions=main-2411190017
 
+On 11/18/2024 8:43 PM, Johan Hovold wrote:
+> On Sat, Nov 16, 2024 at 07:49:23AM -0800, Zijun Hu wrote:
+>> For WCN6855, board ID specific NVM needs to be downloaded once board ID
+>> is available, but the default NVM is always downloaded currently, and
+>> the wrong NVM causes poor RF performance which effects user experience.
+>>
+>> Fix by downloading board ID specific NVM if board ID is available.
+>>
+>> Cc: Bjorn Andersson <bjorande@quicinc.com>
+>> Cc: Aiqun Yu (Maria) <quic_aiquny@quicinc.com>
+>> Cc: Cheng Jiang <quic_chejiang@quicinc.com>
+>> Cc: Johan Hovold <johan@kernel.org>
+>> Cc: Jens Glathe <jens.glathe@oldschoolsolutions.biz>
+>> Cc: Steev Klimaszewski <steev@kali.org>
+>> Cc: Paul Menzel <pmenzel@molgen.mpg.de>
+> 
+> Nit: These Cc tags should typically not be here in the commit message,
+> and should at least not be needed for people who git-send-email will
+> already include because of Tested-by and Reviewed-by tags.
+> 
+> If they help with your workflow then perhaps you can just put them below
+> the cut-off (---) line.
+> 
 
+thank you for pointing out this and sharing good suggestions
+will follow these suggestions for further patches.
 
-> On Nov 19, 2024, at 02:18, Easwar Hariharan =
-<eahariha@linux.microsoft.com> wrote:
->=20
-> On 11/18/2024 3:06 AM, Petr Mladek wrote:
->> On Sat 2024-11-16 11:10:52, Christophe Leroy wrote:
->>>=20
->>>=20
->>> Le 15/11/2024 =C3=A0 22:26, Easwar Hariharan a =C3=A9crit :
->>>> [Vous ne recevez pas souvent de courriers de =
-eahariha@linux.microsoft.com. D=C3=A9couvrez pourquoi ceci est important =
-=C3=A0 https://aka.ms/LearnAboutSenderIdentification ]
->>>>=20
->>>> Changes made with the following Coccinelle rules:
->>>>=20
->>>> @@ constant C; @@
->>>>=20
->>>> - msecs_to_jiffies(C * 1000)
->>>> + secs_to_jiffies(C)
->>>>=20
->>>> @@ constant C; @@
->>>>=20
->>>> - msecs_to_jiffies(C * MSEC_PER_SEC)
->>>> + secs_to_jiffies(C)
->>>>=20
->>>> Signed-off-by: Easwar Hariharan <eahariha@linux.microsoft.com>
->>>> ---
->>>>  samples/livepatch/livepatch-callbacks-busymod.c |  2 +-
->>>>  samples/livepatch/livepatch-shadow-fix1.c       |  2 +-
->>>>  samples/livepatch/livepatch-shadow-mod.c        | 10 +++++-----
->>>>  3 files changed, 7 insertions(+), 7 deletions(-)
->>>>=20
->>>> diff --git a/samples/livepatch/livepatch-callbacks-busymod.c =
-b/samples/livepatch/livepatch-callbacks-busymod.c
->>>> index =
-378e2d40271a9717d09eff51d3d3612c679736fc..d0fd801a7c21b7d7939c29d83f9d993b=
-adcc9aba 100644
->>>> --- a/samples/livepatch/livepatch-callbacks-busymod.c
->>>> +++ b/samples/livepatch/livepatch-callbacks-busymod.c
->>>> @@ -45,7 +45,7 @@ static int livepatch_callbacks_mod_init(void)
->>>>  {
->>>>         pr_info("%s\n", __func__);
->>>>         schedule_delayed_work(&work,
->>>> -               msecs_to_jiffies(1000 * 0));
->>>> +               secs_to_jiffies(0));
->>>=20
->>> Using secs_to_jiffies() is pointless, 0 is universal, should become
->>> schedule_delayed_work(&work, 0);
->>=20
->> Yes, schedule_delayed_work(&work, 0) looks like the right solution.
->>=20
->> Or even better, it seems that the delayed work might get replaced by
->> a normal workqueue work.
->>=20
->> Anyway, I am working on a patchset which would remove this sample
->> module. There is no need to put much effort into the clean up
->> of this particular module. Do whatever is easiest for you.
->>=20
->> Best Regards,
->> Petr
->=20
-> If we're removing the module, I'll drop it from the series. Just to
-> clarify, do you mean to remove all of samples/livepatch/* or some
-> particular file(s)?
->=20
-> Thanks,
-> Easwar
->=20
+>> Fixes: 095327fede00 ("Bluetooth: hci_qca: Add support for QTI Bluetooth chip wcn6855")
+>> Cc: stable@vger.kernel.org # 6.4
+>> Reviewed-by: Johan Hovold <johan+linaro@kernel.org>
+> 
+> When making non-trivial changes, like the addition of the fallback NVM
+> feature in v2, you should probably have dropped any previous Reviewed-by
+> tags.
+> 
 
-Hi Easwar!
+make sense. will notice these aspects for further patches.
 
-I think Petr is going to remove just this module away. Anyway, I don't =
-think
-removing all of them is a good idea.
+> The fallback handling looks good to me though (and also works as
+> expected).
+> 
 
-Thanks.
-Wardenjohn.=20
+so, is it okay to make this patch still keep tags given by you ?
+
+>> Tested-by: Johan Hovold <johan+linaro@kernel.org>
+>> Tested-by: Steev Klimaszewski <steev@kali.org>
+>> Tested-by: Jens Glathe <jens.glathe@oldschoolsolutions.biz>
+>> Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
+> 
+>> Changes in v2:
+>> - Correct subject and commit message
+>> - Temporarily add nvm fallback logic to speed up backport.
+>> — Add fix/stable tags as suggested by Luiz and Johan
+>> - Link to v1: https://lore.kernel.org/r/20241113-x13s_wcn6855_fix-v1-1-15af0aa2549c@quicinc.com
+>  
+>> +download_nvm:
+>>  	err = qca_download_firmware(hdev, &config, soc_type, rom_ver);
+>>  	if (err < 0) {
+>>  		bt_dev_err(hdev, "QCA Failed to download NVM (%d)", err);
+>> +		if (err == -ENOENT && boardid != 0 &&
+>> +		    soc_type == QCA_WCN6855) {
+>> +			boardid = 0;
+>> +			qca_get_hsp_nvm_name_generic(&config, ver,
+>> +						     rom_ver, boardid);
+>> +			bt_dev_warn(hdev, "QCA fallback to default NVM");
+>> +			goto download_nvm;
+>> +		}
+>>  		return err;
+> 
+> If you think it's ok for people to continue using the wrong (default)
+> NVM file for a while still until their distros ship the board-specific
+> ones, then this looks good to me and should ease the transition:
+> 
+
+yes. i think it is okay now.
+
+> [    6.125626] Bluetooth: hci0: QCA Downloading qca/hpnv21g.b8c
+> [    6.126730] bluetooth hci0: Direct firmware load for qca/hpnv21g.b8c failed with error -2
+> [    6.126826] Bluetooth: hci0: QCA Failed to request file: qca/hpnv21g.b8c (-2)
+> [    6.126894] Bluetooth: hci0: QCA Failed to download NVM (-2)
+> [    6.126951] Bluetooth: hci0: QCA fallback to default NVM
+> [    6.127003] Bluetooth: hci0: QCA Downloading qca/hpnv21g.bin
+> [    6.309322] Bluetooth: hci0: QCA setup on UART is completed
+> 
+> Johan
 
