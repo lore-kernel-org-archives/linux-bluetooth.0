@@ -1,262 +1,335 @@
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from EUR05-VI1-obe.outbound.protection.outlook.com (mail-vi1eur05on2057.outbound.protection.outlook.com [40.107.21.57])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F77314F9E7;
-	Tue, 19 Nov 2024 09:09:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732007400; cv=none; b=lU+W41mnMqaAhgWt1gKu5IVxEhY91gqMALW6qTmiynVTAr3NFfbUUZJ504hv+5/Ou54EpnVOeF5MGlRrV6J/32sg9hR6hufWaUurxoi59Ja6ZZ2KYy1qG4HhaUZsz/9xRdpdyAdTGH05LRSYe0LDSGyCR6PabMgSC+8bqRKvCOY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732007400; c=relaxed/simple;
-	bh=rTSC72Q3RUvCXGNxls7pNO6M4v16CSV9HDax5AEJtQA=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=SSVe9AvJk0beZ/AsUxIRSj8xfF6CFTOiTyX2xwVbaocG1s7CPVxT3ckllwKTgJEMrp5FsXMawQHAT59numAyi+TIumk6LHtF3Slsha1rGN0XTDdxjMSCM8idy7d1xYr/VaRnZ9qDYMInpYmQpTH7YWS43U/wwF9XxnoRhBX1DgM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=SIRiPqoh; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=eLQee8Kl; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=SIRiPqoh; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=eLQee8Kl; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57AA9198A35;
+	Tue, 19 Nov 2024 10:09:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.21.57
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1732010981; cv=fail; b=nlnW7bCnfYNs71AKxwkfVjp5IZga9aJF7CbI7xcB9SM7bXaY/b9LjfJm48vA+SUK3FoPBKfecHMoPEMntj528iuPXF/xR6Lmj58qc11p2e6WkgVJwo+d7xUIYXxVGCci1J2l66QX05ZZZkrZdd4tvMdWf2fBKwK1lNV3aA+MfbY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1732010981; c=relaxed/simple;
+	bh=GDkmxSWmRs960x7rYqRCqLuVgDAZ1zv3g1PVGo2Wnko=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=HM6Ns/fNyv9Uga5aZ7MuxZRfYgoloTDTUmDCCONOJYF6OxmpnAtqaoTTv0xylExbEI1IV4tmeqaspML/v3qzQV/i1yFToXK6R05ekugb4O7Lim+NBgWkkaQYiAWBNaUsZtgdWHEPgPLJvs2FV+ZjcWlwcIotKiTaeFuJDy/cCW0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=bVWT3H2d; arc=fail smtp.client-ip=40.107.21.57
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="SIRiPqoh";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="eLQee8Kl";
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="SIRiPqoh";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="eLQee8Kl"
-Received: from pobox.suse.cz (unknown [10.100.2.14])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id D475321901;
-	Tue, 19 Nov 2024 09:09:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1732007396; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=d3ZUiM0v/u9S5PwB6Ydqo1vhiAlHB49FGA/7ikHpEDE=;
-	b=SIRiPqohnfZsfiR8rWfugglV6kBt9WZNkpsbbr+OOaRL3B/gLbNYdP82bjB0S/Sjpyp4Dh
-	6DaUo1iD8tvsOcOGm8MLnAkvlYyhNoN/BKk+Nu5/yLAfPrF9/Eu//yrmX3tKwCADYf1zxx
-	7juTShWa4+8m5I6ysJKabU6DZBznQQA=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1732007396;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=d3ZUiM0v/u9S5PwB6Ydqo1vhiAlHB49FGA/7ikHpEDE=;
-	b=eLQee8Kl//Z+uAJMSQ8O/3uMhn0cIi08Nnfcslit1gjRhYGbaqZ6swdcVqziESyeoUyf0K
-	N0AZng7gJdnO9PAg==
-Authentication-Results: smtp-out1.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1732007396; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=d3ZUiM0v/u9S5PwB6Ydqo1vhiAlHB49FGA/7ikHpEDE=;
-	b=SIRiPqohnfZsfiR8rWfugglV6kBt9WZNkpsbbr+OOaRL3B/gLbNYdP82bjB0S/Sjpyp4Dh
-	6DaUo1iD8tvsOcOGm8MLnAkvlYyhNoN/BKk+Nu5/yLAfPrF9/Eu//yrmX3tKwCADYf1zxx
-	7juTShWa4+8m5I6ysJKabU6DZBznQQA=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1732007396;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=d3ZUiM0v/u9S5PwB6Ydqo1vhiAlHB49FGA/7ikHpEDE=;
-	b=eLQee8Kl//Z+uAJMSQ8O/3uMhn0cIi08Nnfcslit1gjRhYGbaqZ6swdcVqziESyeoUyf0K
-	N0AZng7gJdnO9PAg==
-Date: Tue, 19 Nov 2024 10:09:55 +0100 (CET)
-From: Miroslav Benes <mbenes@suse.cz>
-To: Petr Mladek <pmladek@suse.com>
-cc: Easwar Hariharan <eahariha@linux.microsoft.com>, 
-    Christophe Leroy <christophe.leroy@csgroup.eu>, 
-    Pablo Neira Ayuso <pablo@netfilter.org>, 
-    Jozsef Kadlecsik <kadlec@netfilter.org>, 
-    "David S. Miller" <davem@davemloft.net>, 
-    Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-    Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-    Julia Lawall <Julia.Lawall@inria.fr>, 
-    Nicolas Palix <nicolas.palix@imag.fr>, Daniel Mack <daniel@zonque.org>, 
-    Haojian Zhuang <haojian.zhuang@gmail.com>, 
-    Robert Jarzmik <robert.jarzmik@free.fr>, 
-    Russell King <linux@armlinux.org.uk>, Heiko Carstens <hca@linux.ibm.com>, 
-    Vasily Gorbik <gor@linux.ibm.com>, 
-    Alexander Gordeev <agordeev@linux.ibm.com>, 
-    Christian Borntraeger <borntraeger@linux.ibm.com>, 
-    Sven Schnelle <svens@linux.ibm.com>, Ofir Bitton <obitton@habana.ai>, 
-    Oded Gabbay <ogabbay@kernel.org>, 
-    Lucas De Marchi <lucas.demarchi@intel.com>, 
-    =?ISO-8859-15?Q?Thomas_Hellstr=F6m?= <thomas.hellstrom@linux.intel.com>, 
-    Rodrigo Vivi <rodrigo.vivi@intel.com>, 
-    Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, 
-    Maxime Ripard <mripard@kernel.org>, 
-    Thomas Zimmermann <tzimmermann@suse.de>, David Airlie <airlied@gmail.com>, 
-    Simona Vetter <simona@ffwll.ch>, Jeroen de Borst <jeroendb@google.com>, 
-    Praveen Kaligineedi <pkaligineedi@google.com>, 
-    Shailend Chand <shailend@google.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-    James Smart <james.smart@broadcom.com>, 
-    Dick Kennedy <dick.kennedy@broadcom.com>, 
-    "James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>, 
-    "Martin K. Petersen" <martin.petersen@oracle.com>, 
-    =?ISO-8859-15?Q?Roger_Pau_Monn=E9?= <roger.pau@citrix.com>, 
-    Jens Axboe <axboe@kernel.dk>, Kalle Valo <kvalo@kernel.org>, 
-    Jeff Johnson <jjohnson@kernel.org>, 
-    Catalin Marinas <catalin.marinas@arm.com>, 
-    Andrew Morton <akpm@linux-foundation.org>, 
-    Jack Wang <jinpu.wang@cloud.ionos.com>, 
-    Marcel Holtmann <marcel@holtmann.org>, 
-    Johan Hedberg <johan.hedberg@gmail.com>, 
-    Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
-    Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
-    Florian Fainelli <florian.fainelli@broadcom.com>, 
-    Ray Jui <rjui@broadcom.com>, Scott Branden <sbranden@broadcom.com>, 
-    Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, 
-    Xiubo Li <xiubli@redhat.com>, Ilya Dryomov <idryomov@gmail.com>, 
-    Josh Poimboeuf <jpoimboe@kernel.org>, Jiri Kosina <jikos@kernel.org>, 
-    Joe Lawrence <joe.lawrence@redhat.com>, Jaroslav Kysela <perex@perex.cz>, 
-    Takashi Iwai <tiwai@suse.com>, Lucas Stach <l.stach@pengutronix.de>, 
-    Russell King <linux+etnaviv@armlinux.org.uk>, 
-    Christian Gmeiner <christian.gmeiner@gmail.com>, 
-    Louis Peens <louis.peens@corigine.com>, 
-    Michael Ellerman <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>, 
-    Naveen N Rao <naveen@kernel.org>, 
-    Madhavan Srinivasan <maddy@linux.ibm.com>, netfilter-devel@vger.kernel.org, 
-    coreteam@netfilter.org, netdev@vger.kernel.org, 
-    linux-kernel@vger.kernel.org, cocci@inria.fr, 
-    linux-arm-kernel@lists.infradead.org, linux-s390@vger.kernel.org, 
-    dri-devel@lists.freedesktop.org, intel-xe@lists.freedesktop.org, 
-    linux-scsi@vger.kernel.org, xen-devel@lists.xenproject.org, 
-    linux-block@vger.kernel.org, linux-wireless@vger.kernel.org, 
-    ath11k@lists.infradead.org, linux-mm@kvack.org, 
-    linux-bluetooth@vger.kernel.org, linux-staging@lists.linux.dev, 
-    linux-rpi-kernel@lists.infradead.org, ceph-devel@vger.kernel.org, 
-    live-patching@vger.kernel.org, linux-sound@vger.kernel.org, 
-    etnaviv@lists.freedesktop.org, oss-drivers@corigine.com, 
-    linuxppc-dev@lists.ozlabs.org, 
-    Anna-Maria Behnsen <anna-maria@linutronix.de>
-Subject: Re: [PATCH v2 19/21] livepatch: Convert timeouts to
- secs_to_jiffies()
-In-Reply-To: <ZzxR3uAcWFEPUIUK@pathway.suse.cz>
-Message-ID: <alpine.LSU.2.21.2411191006340.15289@pobox.suse.cz>
-References: <20241115-converge-secs-to-jiffies-v2-0-911fb7595e79@linux.microsoft.com> <20241115-converge-secs-to-jiffies-v2-19-911fb7595e79@linux.microsoft.com> <718febc4-59ee-4701-ad62-8b7a8fa7a910@csgroup.eu> <Zzsfuuv3AVomkMxn@pathway.suse.cz>
- <96f3b51b-c28c-4ea8-b61e-a4982196215f@linux.microsoft.com> <ZzxR3uAcWFEPUIUK@pathway.suse.cz>
-User-Agent: Alpine 2.21 (LSU 202 2017-01-01)
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="bVWT3H2d"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=FdTj9/OcvTdbwXXtgKByK40/lRef6H7sGmV23ixGZF0hT2dhxzBEzS3OBGYX/AlX4E0uMeyQOTlrp9msFxj+5XRNoq+vq2ATBRcwJsr1dY+bMWYuo7yaa8kDPTLqtMCeZiIjzFdH4HBSTfuygnyx1AQpuvpnUSLz1z5R0YYhJB/3Bf+rQGh44k2TdhZRdp4kqwPSljxijeyoMQhj5yd4IS2apfEmOQNY5ReCag5cZXeamf6pZ4Lx1skVioAAdNs7g/YTJFyDp2KCPeQvk1dDo+IEIVKhCNiH9pajt2+lohCwSgK1wOBvRjkNsttXNsFvK0SIHgEkk//RPjFVArKNbg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Sl9wH0MyqV3H5GCCcHc+nf+CuIeE1SqooAHDu6qoutQ=;
+ b=JguJdYB7eQEO3FLw3ZZs/qTUMeK8d+FWlQd74kkCmp8pEvC1BNg+MOftwRbn7j1UrJ7vfYeFR2VE/UKKLTIePPtyaau/A7zXnPT9yIa8V0TbgdyysmeehfdfJqG9kMh1WIcZ/sXVwy89eg2xnAQGOP+ckbVjMiUZhAZNoNXmd/G6TSsxCwiJip+ScLABXumO8LIaANuiUwlkrDKxZdeu6a+F0xDSoT+ryMk8WLN2XBjLKGgQn/gAGLgnR0nvSULkjXG2IsxvyFH7vq7pj3QVq0sB2w7UYeQVTMM/HiSTb8hkb8sU1JlaT/qTGsKPINepSQaRR3voQ1MLpwBa+u+VAQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Sl9wH0MyqV3H5GCCcHc+nf+CuIeE1SqooAHDu6qoutQ=;
+ b=bVWT3H2dN/FSFkPgIFBftIJStR6ac82LXqiZltrNw73DSLagW++JBSqKWDDKDDo5Q8nKpAea49Al9aK+dHJib4kbflkvbi5aQiHwmAMLmZQnmrzpjgK8P6aqJDei29gkq9AfEC4v2nE+HoDSpRq6gimOpmX4RunHGhJOMoMp/wCp/cWpB1fJN8ONeiMsyXdTP2DFUdWy4/UWEdW90T+0S6NCHRUWaFFKr+P2NW5+G/v8B7gfqBr1LSKaoEb6Nn0HCM++O6k+PwRifSJHyzC4vcnLHgf2bhyg67WforCwvnZMMKwiDpS2rDs9Jvt0kVT+Bf00KSsHedITi4rOqrd9wQ==
+Received: from DB9PR04MB8429.eurprd04.prod.outlook.com (2603:10a6:10:242::19)
+ by AS8PR04MB8851.eurprd04.prod.outlook.com (2603:10a6:20b:42e::6) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8182.14; Tue, 19 Nov
+ 2024 10:09:36 +0000
+Received: from DB9PR04MB8429.eurprd04.prod.outlook.com
+ ([fe80::2edf:edc4:794f:4e37]) by DB9PR04MB8429.eurprd04.prod.outlook.com
+ ([fe80::2edf:edc4:794f:4e37%5]) with mapi id 15.20.8158.017; Tue, 19 Nov 2024
+ 10:09:35 +0000
+From: Sherry Sun <sherry.sun@nxp.com>
+To: Marco Felsch <m.felsch@pengutronix.de>, Bough Chen <haibo.chen@nxp.com>
+CC: POPESCU Catalin <catalin.popescu@leica-geosystems.com>, Amitkumar Karwar
+	<amitkumar.karwar@nxp.com>, Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>,
+	"marcel@holtmann.org" <marcel@holtmann.org>, "luiz.dentz@gmail.com"
+	<luiz.dentz@gmail.com>, "robh@kernel.org" <robh@kernel.org>,
+	"krzk+dt@kernel.org" <krzk+dt@kernel.org>, "conor+dt@kernel.org"
+	<conor+dt@kernel.org>, "p.zabel@pengutronix.de" <p.zabel@pengutronix.de>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	GEO-CHHER-bsp-development <bsp-development.geo@leica-geosystems.com>,
+	Krzysztof Kozlowski <krzk@kernel.org>, Shenwei Wang <shenwei.wang@nxp.com>,
+	Jun Li <jun.li@nxp.com>
+Subject: RE: [PATCH 1/2] dt-bindings: net: bluetooth: nxp: add support for
+ supply and reset
+Thread-Topic: [PATCH 1/2] dt-bindings: net: bluetooth: nxp: add support for
+ supply and reset
+Thread-Index:
+ AQHbFlGi4L5ELajEYECFBoJDru1aa7J5aBLQgAAySQCAAao9AIAAIGOAgBV25oCAABNWAIAAK2IAgAE1RoCAACn9gIAACuYQgAAFzACAAF/eYIAAHNsAgAF25gCAAAeCgIAHLv0AgABOWwCAAA5OQIAAIZMAgAAR48CAACLpAIAhexuAgAC8FGA=
+Date: Tue, 19 Nov 2024 10:09:35 +0000
+Message-ID:
+ <DB9PR04MB84299E3E1776C60F5D1F0FF792202@DB9PR04MB8429.eurprd04.prod.outlook.com>
+References:
+ <DB9PR04MB84292445D0FEDB8211ED52C3924C2@DB9PR04MB8429.eurprd04.prod.outlook.com>
+ <9b09774e-d0ed-4c97-b6a0-e976580b5bb5@leica-geosystems.com>
+ <DB9PR04MB8429CF700571FE42C997FB9C924D2@DB9PR04MB8429.eurprd04.prod.outlook.com>
+ <1b8864e5-0ec7-49c4-932a-89cfbaeacc9f@leica-geosystems.com>
+ <DB9PR04MB842929186683C1DF13DCBD92924A2@DB9PR04MB8429.eurprd04.prod.outlook.com>
+ <20241028090028.x6rzopvpcdvgouqv@pengutronix.de>
+ <DB9PR04MB842960A18BB8570B04A64BEA924A2@DB9PR04MB8429.eurprd04.prod.outlook.com>
+ <20241028115150.fgvqaem36lwxwvjh@pengutronix.de>
+ <DB9PR04MB8429B10FA73E5333685103FB924A2@DB9PR04MB8429.eurprd04.prod.outlook.com>
+ <20241028150048.qnqjxntns6quy7py@pengutronix.de>
+ <20241118221759.wvrkvxeh4iop6jtt@pengutronix.de>
+In-Reply-To: <20241118221759.wvrkvxeh4iop6jtt@pengutronix.de>
+Accept-Language: zh-CN, en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: DB9PR04MB8429:EE_|AS8PR04MB8851:EE_
+x-ms-office365-filtering-correlation-id: 9a1aba44-f6fb-445b-7e82-08dd08824545
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|376014|7416014|1800799024|366016|38070700018;
+x-microsoft-antispam-message-info:
+ =?us-ascii?Q?93jsuavvE/b+vRvpnnkZBNHsyoyWy6GLJPEDburOYI2lWsK2d8/uORc/zNGq?=
+ =?us-ascii?Q?Msh0rBzb2DePkwhMEDDeBQ51w4vl+bZKMv3vshZmnDIDwoiBgInKKNh0iniA?=
+ =?us-ascii?Q?nPDA82XmTXfyPCKKOKkYqJAgSnDB3jNifMdlFg9waeDO+DjtbXHevge42UJb?=
+ =?us-ascii?Q?P9whrs9qMLAJsvqR7CnwmIRLydqEOecz3xxiOU1CfgsKxoAnwETt9vz/acYU?=
+ =?us-ascii?Q?uWXUtMrr01UEpKnyl2Fis4LYQD8ZtTutREvTQ1dsTAvx03ufF8dsOOlsz5tY?=
+ =?us-ascii?Q?o2ZagN72ddASQImR2vsISzffqXa2S39g6pTsR5LjL7Neb+CG37RwnN07Y05y?=
+ =?us-ascii?Q?SWNzOBS304TjmmijR1Dx7mJiuZ+R0XzdH3xAyXRtxJhhUbTXP80HEAjX2Naz?=
+ =?us-ascii?Q?g6gxuSSKFKnBLn91hI9UehyAgidtQMiEoqt8xmgB4huw6zFieZ971svUzAII?=
+ =?us-ascii?Q?8sRyp6jXeZMpUmhXhd08NgGMN/3kE+MFlFqxBBgoXUerEVAQ/RpfuGjkpOlX?=
+ =?us-ascii?Q?XO97r4LPQrWUCDYLQpXnRQMW6LcfnIKLWHkRGREbw8soj89ObsRUtglQQQhG?=
+ =?us-ascii?Q?RFaAy3XhADLn4/UfNKftClQSzDOY2xnqdy2VY6vlNZtWj52EiTQvpLOANZkX?=
+ =?us-ascii?Q?9Fop91zK4xm0l2GevHASeB2qNHGhlGCHokRwEdHafoC8lvxRYX9vQNZK8svS?=
+ =?us-ascii?Q?GRhbQXw5g6CYXVH0eVcmQ3AFcCUV2tqu3npLxAae+yrJ7t37lDp4a7b8d7h6?=
+ =?us-ascii?Q?uuTVObSzkEgdUVwxuLTmdpKCJMkVsaeqXhKsDKFf2N/aKbE9u5gPJdH95GgG?=
+ =?us-ascii?Q?8uYALuFzoU6PaavM7tqEzrUvdtlir+Pf6XQCxVAm0zT3baTo1iTlQN8OFavT?=
+ =?us-ascii?Q?StVvRxknjPZdJkvldPZU+t2hwURT1ee/uxG6Xka/m0HqbUb91ngItmKi+3JY?=
+ =?us-ascii?Q?dX+Y/2ga4eAMPGU4lAet07o+tdVlwzBBjN4RsW6UPdjBnr+H4ZvUizvVPHLG?=
+ =?us-ascii?Q?9wJhnLlLsIUzJcCLeGSt6GM9H29cpbma7jMJsqHpuuxSvsz/thUwHv04KSeY?=
+ =?us-ascii?Q?7ednehJDEz51OH/P85MeknZ31ePal6jTq+gl2sitdN3vRrvMv4gqXUV2GcfP?=
+ =?us-ascii?Q?/3L0QFS2M/cPyEZCtnUl/JZhM+0iRM1tIpk+S43C1hl1EFDNRL6K8LfE8KjA?=
+ =?us-ascii?Q?sGitf3Be/3DHFXLR2+OatQP4JggnkEc718SW6J7IfYIww9ARg0GKjfXSTCR6?=
+ =?us-ascii?Q?/qCXvso4wnEduE5EKvgqc7KcTWNl7798PKyIw00ASx2KyXVpNW3tkZgbZYQb?=
+ =?us-ascii?Q?t17exwdF1/qETTYvEwBpbinZNaRHddx5jxvg597ZvOUuAMCi7raezmJrUPt3?=
+ =?us-ascii?Q?QwDftGE=3D?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DB9PR04MB8429.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(1800799024)(366016)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?cbq2sc8QEYztqKqK6riFwOCwTUvjLTdWcXCxk7K3HAaLdUr4Mkxqv4Tn5pn8?=
+ =?us-ascii?Q?/TfZCjsbFdvnHMF4pIrHKBqUvluYJxd45WmAlTAYNLNy8pP26jgQL+kO87/O?=
+ =?us-ascii?Q?g5FVGGenqwPMIJe8g0BRA71t3elDtMkg/Mg1Vx67kK9rzxVk9fVcQ2metp2W?=
+ =?us-ascii?Q?QkVVOJR8kAdr2TQEF249zT/K6sNrPso3+ItGiLAIlHSLIzGi+hbyVqjLDNgV?=
+ =?us-ascii?Q?0HnvKD36y/MgSgt1tjObTXJjYDvU9Bbpz33hqbwmIIETKmgNA8nOISszsw04?=
+ =?us-ascii?Q?eCrE6nVleuxSgCNM8C65uEqkJ4AiFRUOQmcn57DAXbDTzCkCyupjwd+qt+ql?=
+ =?us-ascii?Q?EgHWe4Y5dsYslUwEdvFlEDpiZF/k1xRIlRMaq1+2zjMl7l5QeiY6IDLe/LyQ?=
+ =?us-ascii?Q?cDKk+vE296Ac0bAQBMJkEav/qdBxxv188h3fwM8G2PyMLio7y9GyOQEnhvvd?=
+ =?us-ascii?Q?7fd1PqO2uTJn5n3u8qCJ4sqZ6ZKhn7p4n4Ab3Bi3wgHXZ2PcPjn8rKFkzKCh?=
+ =?us-ascii?Q?E58ydvDZn2rZIEBYwCyyxkcv5ARfKO+wudER3TIEeaUc/qQ+RIkbGb6nNrWA?=
+ =?us-ascii?Q?EQvfzu0o8awvcpUF0NhDdNuyU04wjpWW5dnFX5oqvcBa8w8nTKmtMBVTBoqb?=
+ =?us-ascii?Q?6c0UM5o7U3G386nokekFpzHpLHeHdEvycr9mmt6TN6LEQ5qNbnGAzZ+NE+1N?=
+ =?us-ascii?Q?Ad6B9woq5TbSBtgTmMDnzZZ3Msuz9d1xbyi8Ssio5fG+C4q4WpziRNpBRQNF?=
+ =?us-ascii?Q?RJ6CO8GFKMk1hxjjOuRzu7SunaUv/TcexJn5FtHgRTPez8BOYCiQ/vt/8bMo?=
+ =?us-ascii?Q?+bkQchzNhVHHXkq7oxu2mLuhsqiX5LBjvnhPPutk68HcsaWV/iV0FY8Mv3at?=
+ =?us-ascii?Q?MWfwHgF+dQovPE2qq6Q4ARaAxUAzDG9UjxncaeGyFhQ1mep3vSPT+pQrkY/W?=
+ =?us-ascii?Q?0x4LxECMgUMRO9JF8GW1vIS1ya25IAXjj3vrpWvxnTabypX49H8MT2v85Ikb?=
+ =?us-ascii?Q?xVlBo9Oa8cCzSnjsoWtKUktCjpBsOmhpL0vj6ebZOpJ/BnVPaNchXsnLpElA?=
+ =?us-ascii?Q?bt41d3pOpe8d5hnVW0jaF9CrqTYW4SEjDcfbVkyDo8mD7dyIinijuCEVlfnZ?=
+ =?us-ascii?Q?aOl4UCD8NNfnACEcie2WU3p844UuEM5v8IIUiUvlHOlERbxTgEEmDRh7VohX?=
+ =?us-ascii?Q?RtTu0U+TrsXPFr/UpzTVAtWhiiCLVXtuA9TINq/NotDrWkQkvnnj2MGbnHaU?=
+ =?us-ascii?Q?eozgKbBdr8Zi2rehwc7RRruu1mw9xxVYbdfkx1+jXfIxGpeQkepe1PZfv09l?=
+ =?us-ascii?Q?Rx5rSKqYtTIdkuXWGoFFrZPI1AK9knAaTqVEsdfGQNLfIG43wEOU8On4TvEK?=
+ =?us-ascii?Q?I2yF8Ea5/jpJBjRx4/w1qokLWZn5E4R6qOGSDe83pJyj3j8GMG2Ej8AhTMvH?=
+ =?us-ascii?Q?fZa2j9irXL84mRViNc9owKF7j+Z2bnxHCOT+a2PXyRTg0V/NHTpu5zemJgIi?=
+ =?us-ascii?Q?gekOyOTt/R3dK7pkrwvqQhEPaDQf9KtbzqA7fL2bsZaRSp71zN1A84M8DPKv?=
+ =?us-ascii?Q?218OAj+ZPlCBEaEF8GA=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; BOUNDARY="1678380546-1247530484-1732007229=:15289"
-Content-ID: <alpine.LSU.2.21.2411191007130.15289@pobox.suse.cz>
-X-Spam-Level: 
-X-Spamd-Result: default: False [-5.80 / 50.00];
-	REPLY(-4.00)[];
-	BAYES_HAM(-3.00)[100.00%];
-	SUSPICIOUS_RECIPS(1.50)[];
-	CTYPE_MIXED_BOGUS(1.00)[];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	NEURAL_HAM_SHORT(-0.20)[-0.998];
-	MIME_GOOD(-0.10)[multipart/mixed,text/plain];
-	FROM_EQ_ENVFROM(0.00)[];
-	ARC_NA(0.00)[];
-	REDIRECTOR_URL(0.00)[aka.ms];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[linux.microsoft.com,csgroup.eu,netfilter.org,davemloft.net,google.com,kernel.org,redhat.com,inria.fr,imag.fr,zonque.org,gmail.com,free.fr,armlinux.org.uk,linux.ibm.com,habana.ai,intel.com,linux.intel.com,suse.de,ffwll.ch,lunn.ch,broadcom.com,hansenpartnership.com,oracle.com,citrix.com,kernel.dk,arm.com,linux-foundation.org,cloud.ionos.com,holtmann.org,linuxfoundation.org,perex.cz,suse.com,pengutronix.de,corigine.com,ellerman.id.au,vger.kernel.org,lists.infradead.org,lists.freedesktop.org,lists.xenproject.org,kvack.org,lists.linux.dev,lists.ozlabs.org,linutronix.de];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+,1:+];
-	TO_MATCH_ENVRCPT_SOME(0.00)[];
-	TAGGED_RCPT(0.00)[netdev,etnaviv];
-	MID_RHS_MATCH_FROMTLD(0.00)[];
-	RCPT_COUNT_GT_50(0.00)[94];
-	RCVD_COUNT_ZERO(0.00)[0];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	R_RATELIMIT(0.00)[to_ip_from(RLst1ywfnn8h7y4sspo7cfrpds)];
-	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	FREEMAIL_ENVRCPT(0.00)[gmail.com,free.fr]
-X-Spam-Score: -5.80
-X-Spam-Flag: NO
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DB9PR04MB8429.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9a1aba44-f6fb-445b-7e82-08dd08824545
+X-MS-Exchange-CrossTenant-originalarrivaltime: 19 Nov 2024 10:09:35.7013
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: kSEHhMUJRDMxS/uEgFFfQMCfFtzwoLdaMYMz9B+D6/msDKp6R3xdcoESEjP3Mgt/xJRfF0Is9cSs/TonnP3Y2w==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR04MB8851
 
-  This message is in MIME format.  The first part should be readable text,
-  while the remaining parts are likely unreadable without MIME-aware tools.
 
---1678380546-1247530484-1732007229=:15289
-Content-Type: text/plain; CHARSET=ISO-8859-15
-Content-Transfer-Encoding: 8BIT
-Content-ID: <alpine.LSU.2.21.2411191007131.15289@pobox.suse.cz>
 
-On Tue, 19 Nov 2024, Petr Mladek wrote:
+> -----Original Message-----
+> From: Marco Felsch <m.felsch@pengutronix.de>
+> Sent: Tuesday, November 19, 2024 6:18 AM
+> To: Sherry Sun <sherry.sun@nxp.com>
+> Cc: POPESCU Catalin <catalin.popescu@leica-geosystems.com>; Amitkumar
+> Karwar <amitkumar.karwar@nxp.com>; Neeraj Sanjay Kale
+> <neeraj.sanjaykale@nxp.com>; marcel@holtmann.org; luiz.dentz@gmail.com;
+> robh@kernel.org; krzk+dt@kernel.org; conor+dt@kernel.org;
+> p.zabel@pengutronix.de; linux-bluetooth@vger.kernel.org;
+> devicetree@vger.kernel.org; linux-kernel@vger.kernel.org; GEO-CHHER-bsp-
+> development <bsp-development.geo@leica-geosystems.com>; Krzysztof
+> Kozlowski <krzk@kernel.org>
+> Subject: Re: [PATCH 1/2] dt-bindings: net: bluetooth: nxp: add support fo=
+r supply
+> and reset
+>=20
+> Hi,
+>=20
+> gentle ping on this discussion since I'm still convinced that this the co=
+rrect
+> approach to add the reset mechanism and handle the power.
 
-> On Mon 2024-11-18 10:18:49, Easwar Hariharan wrote:
-> > On 11/18/2024 3:06 AM, Petr Mladek wrote:
-> > > On Sat 2024-11-16 11:10:52, Christophe Leroy wrote:
-> > >>
-> > >>
-> > >> Le 15/11/2024 à 22:26, Easwar Hariharan a écrit :
-> > >>> [Vous ne recevez pas souvent de courriers de eahariha@linux.microsoft.com. Découvrez pourquoi ceci est important à https://aka.ms/LearnAboutSenderIdentification ]
-> > >>>
-> > >>> Changes made with the following Coccinelle rules:
-> > >>>
-> > >>> @@ constant C; @@
-> > >>>
-> > >>> - msecs_to_jiffies(C * 1000)
-> > >>> + secs_to_jiffies(C)
-> > >>>
-> > >>> @@ constant C; @@
-> > >>>
-> > >>> - msecs_to_jiffies(C * MSEC_PER_SEC)
-> > >>> + secs_to_jiffies(C)
-> > >>>
-> > >>> Signed-off-by: Easwar Hariharan <eahariha@linux.microsoft.com>
-> > >>> ---
-> > >>>   samples/livepatch/livepatch-callbacks-busymod.c |  2 +-
-> > >>>   samples/livepatch/livepatch-shadow-fix1.c       |  2 +-
-> > >>>   samples/livepatch/livepatch-shadow-mod.c        | 10 +++++-----
-> > >>>   3 files changed, 7 insertions(+), 7 deletions(-)
-> > >>>
-> > >>> diff --git a/samples/livepatch/livepatch-callbacks-busymod.c b/samples/livepatch/livepatch-callbacks-busymod.c
-> > >>> index 378e2d40271a9717d09eff51d3d3612c679736fc..d0fd801a7c21b7d7939c29d83f9d993badcc9aba 100644
-> > >>> --- a/samples/livepatch/livepatch-callbacks-busymod.c
-> > >>> +++ b/samples/livepatch/livepatch-callbacks-busymod.c
-> > >>> @@ -45,7 +45,7 @@ static int livepatch_callbacks_mod_init(void)
-> > >>>   {
-> > >>>          pr_info("%s\n", __func__);
-> > >>>          schedule_delayed_work(&work,
-> > >>> -               msecs_to_jiffies(1000 * 0));
-> > >>> +               secs_to_jiffies(0));
-> > >>
-> > >> Using secs_to_jiffies() is pointless, 0 is universal, should become
-> > >> schedule_delayed_work(&work, 0);
-> > > 
-> > > Yes, schedule_delayed_work(&work, 0) looks like the right solution.
-> > > 
-> > > Or even better, it seems that the delayed work might get replaced by
-> > > a normal workqueue work.
-> > > 
-> > > Anyway, I am working on a patchset which would remove this sample
-> > > module. There is no need to put much effort into the clean up
-> > > of this particular module. Do whatever is easiest for you.
-> > > 
-> > > Best Regards,
-> > > Petr
-> > 
-> > If we're removing the module, I'll drop it from the series. Just to
-> > clarify, do you mean to remove all of samples/livepatch/* or some
-> > particular file(s)?
-> 
-> To be precise, I am going to replace:
-> 
-> 	samples/livepatch/livepatch-callbacks-demo.c
-> 	samples/livepatch/livepatch-callbacks-mod.c
-> 	samples/livepatch/livepatch-callbacks-busymod.c
-> 
-> with a completely different modules because I am reworking the
-> callbacks API.
-> 
-> All other sample modules are going to stay.
-> 
-> Feel free to remove livepatch-callbacks-busymod.c from the patchset.
-> But also feel free to keep it. The API rework goes slowly. I am not
-> sure if it would be ready for 6.14.
+Hi Marco,
 
-I would propose that Easwar goes on with his work and prepares an updated 
-version of the patch based on Christophe's feedback. That is, disregarding 
-Petr's rework for now. The patch set has a higher chance to be merged 
-sooner. Petr can then easily rebase. If there is a conflict, we will 
-handle it as usual. What do you think?
+Sorry for the late reply. After internal discussion, we still have some con=
+fusion regarding this new feature.
+This patch do improve the independent handling of wifi/BT, but with the con=
+trolling granularity segmentation, many different wifi/BT use cases need to=
+ be considered.
+For the case -- WLAN (SDIO) not used + BT (UART) used:
+The ideal behavior of BT should be reset and the standalone BT FW should be=
+ re-downloaded when unloading and re-loading the BT driver.
+However, due to the regulator control and PDn reset control are bound to th=
+e SDIO bus instead of the WLAN device, the SDIO bus may be ready after kern=
+el boot up. Although the WLAN is not used(WLAN driver is not loaded and WLA=
+N FW is not downloaded), the corresponding regulator count and PDn reset co=
+unt are both incremented by 1 through MMC pwrseq. Then with the BT driver r=
+emove & re-probe, the PDn reset cannot truly reset the BT chip due to the c=
+ount been +1 by MMC pwrseq. So the BT will not reset and BT FW won't be re-=
+downloaded when re-loading the BT driver, right?
 
-Miroslav
---1678380546-1247530484-1732007229=:15289--
+Best Regards
+Sherry
+>=20
+> Regards,
+>   Marco
+>=20
+> On 24-10-28, Marco Felsch wrote:
+> > On 24-10-28, Sherry Sun wrote:
+> > >
+> > > > From: Marco Felsch <m.felsch@pengutronix.de>
+> > > >
+> > > > On 24-10-28, Sherry Sun wrote:
+> > > > >
+> > > > > > From: Marco Felsch <m.felsch@pengutronix.de>
+> > > > > >
+> > > > > > Hi,
+> > > > > >
+> > > > > > On 24-10-28, Sherry Sun wrote:
+> > > > > > >
+> > > > > > > > From: POPESCU Catalin
+> > > > > > > > <catalin.popescu@leica-geosystems.com>
+> > > > > > > >
+> > > > > > > > We use the NXP downstream driver mwifiex which doesn't
+> > > > > > > > have support for regulator or PDn.
+> > > > > > > >
+> > > > > > > > However, regulator is already supported by the MMC core
+> > > > > > > > (vmmc-
+> > > > supply).
+> > > > > > > >
+> > > > > > > > For PDn, we use mmc pwrseq simple driver that has been
+> > > > > > > > patched to add support for reset-control.
+> > > > > > >
+> > > > > > > Ok, thanks, the mmc change looks good for me, so there is no
+> > > > > > > problem with the NXP SDIO wifi.
+> > > > > > >
+> > > > > > > But how do you plan to handle the NXP PCIe wifi? We also
+> > > > > > > need to make sure the BT patch won't break the PCIe wifi func=
+tion.
+> > > > > >
+> > > > > > Can you please elaborate how this could break the PCIe use-case=
+?
+> > > > >
+> > > > > Similar to the SDIO wifi, if no corresponding reset control for
+> > > > > the PDn pin in PCIe wifi driver, the wifi part will be
+> > > > > unexpectedly powered off when removing the BT driver.
+> > > >
+> > > > Nope it's not that easy for PCIe case since the phy + link layer
+> > > > handling is much more complex compared to the MMC case. For the
+> > > > PCIe case the intial handling is very strict according to the PCIe
+> > > > spec and we can't handle the BT device independently.
+> > > >
+> > > > _BUT_ this patch doesn't cause any regression for the PCIe
+> > > > use-case since the support added by Catalin is optional which
+> > > > means that the user don't have to use these options.
+> > > >
+> > > > To sum up:
+> > > >
+> > > > WLAN (PCIe) used + BT (UART) used -> no independent handling
+> > > >                                      possible. BT depends on WLAN.
+> > > >
+> > > > WLAN (PCIe) not used + BT (UART) used -> This patchset allow us to
+> > > >                                          handle BT. Without the pat=
+chset
+> > > > 					 this is not possible.
+> > > >
+> > > > WLAN (SDIO) + BT (UART) -> This patchset and the mmc-power-seq
+> patchset
+> > > >                            allow us to handle WLAN and BT independe=
+ntly
+> > > > 			   regardless if BT or WLAN is used or not.
+> > >
+> > > If we add the reset-gpios property in the BT dts node when using the
+> > > SDIO wifi chip, my concern is for some host platforms, taking
+> > > i.MX95-19x19-EVK as an example, it supports both SDIO and PCIe
+> > > interface wifi chip through the M.2 connector, when customers want
+> > > to plug in the PCIe wifi chip, they have to remove the reset-gpios
+> > > in the BT dts node to avoid the PCIe WLAN been affected by BT, right?
+> >
+> > I don't know the i.MX95-19x19-EVK platform since it is not upstream.
+> > If you want to support both:
+> >
+> > > > WLAN (PCIe) used + BT (UART) used -> no independent handling
+> > > >                                      possible. BT depends on WLAN.
+> >
+> > and
+> >
+> > > > WLAN (SDIO) + BT (UART) -> This patchset and the mmc-power-seq
+> patchset
+> > > >                            allow us to handle WLAN and BT independe=
+ntly
+> > > > 			   regardless if BT or WLAN is used or not.
+> >
+> > you need to stick with the dependent handling which is no problem once
+> > this patchset get applied if your system support hot-plug. If hot-plug
+> > is not possible you could consider unsing overlays.
+> >
+> > However, this patchset does _NOT_ cause any regression neither for the
+> > MMC nor the PCIe use-case, and you don't have to touch your DTS files.
+> > It would be an improvement for platforms (not speaking of NXP EVK
+> > platforms) which utilize the MMC+UART interfaces only.
+> >
+> > > And it looks strange that we can only add the reset-gpios BT
+> > > property to the hosts that only support SDIO WLAN, we hope there is
+> > > a solution for the PCIe WLAN too.
+> >
+> > "We hope there is a solution" <-- This is not how upstream work.
+> >
+> > Also as said: The WLAN PCIe interface must/should be compatible with
+> > the PCIe Spec. There is no way that we can handle both devices
+> > independent since the PCIe spec specifies the power-up-sequence very
+> > strict.
+> >
+> > If for example, we do handle it independent and the BT part brings the
+> > device out-of-reset while the PCIe bus is not yet ready, the device's
+> > WLAN PCIe subsystem may get confused.
+> >
+> > There are two solution NXP could provide:
+> >
+> >  - The PCIe WLAN/BT devices exposes all devices WLAN + BT via PCIe, thi=
+s
+> >    would eliminate the UART part.
+> >  - All new WLAN/BT devices do have a separate hw reset line for each
+> >    radio the device supports.
+> >
+> > Regards,
+> >   Marco
