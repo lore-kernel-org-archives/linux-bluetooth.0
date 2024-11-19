@@ -1,92 +1,186 @@
-Received: from mailtransmit05.runbox.com (mailtransmit05.runbox.com [185.226.149.38])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B2391CC161;
-	Tue, 19 Nov 2024 13:32:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.38
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 055471CBE8D
+	for <linux-bluetooth@vger.kernel.org>; Tue, 19 Nov 2024 13:37:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732023149; cv=none; b=TTh90B1O+65/wsBaQIjQT4Lty/EDuvOmbqdTedYOBeMgZdmBq7yogutnoXBciqEzCbvNVJObM3k0ICrvkQzh3B9Oqtcv5BIjOCBphfjhl8S5x34X4sfIOVXSHbzCsvcKYrm+EZbAIUhD+fwSlj7M3SNhyLPD1uHo93pJVKCtg+8=
+	t=1732023475; cv=none; b=PvqIKCHdltw63EsnALiUekW5A7JgYL+gYNLxlT62C1KQLnUNsCpcXPD7vCAJpb/l7gSkvjNX+Za0tJYUsNjOSQeZsDFDtxGVjwzsyXUaJFIwjLRbtv/cdQ+VhZnRV1a6/RuAzY53hiw+RlxSofq+ZeBj8zFJiSftWmX1Tat2lWQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732023149; c=relaxed/simple;
-	bh=gprTeoy7X/Wjqtvvoz0adWqYsbyBH37Bx0rOKOG0ctk=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=XEQAq6BZWrI5ljsde4iyyCFnJHr7Tnc6xkqgzVr09icnTfXXtp7gYQJChmT4MHrzddFExFYxonqeX/m8kz1os1JKxVerxD4wNuaKOVLolTjVGbRJLtS80O0qR0DueJzvdkJv4OAK9j23bPJa9whMHsyJQalMGWuC/b1T32ILem8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=mJ56papW; arc=none smtp.client-ip=185.226.149.38
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
+	s=arc-20240116; t=1732023475; c=relaxed/simple;
+	bh=1F8uwUl+6S5iEjVHltlfn0T581dXWmy6qtmjmykhODQ=;
+	h=Date:From:To:Cc:Subject:Message-ID; b=o6QBNzYC8hJUodnWlrVfgu+7iL+drWOsPKUXqDW23/AeXaqvZFOgdwMppO4rx34sBfIx3FduhzWL9y1g/ROvosZV80UavAiZX5EvREkL2eYQFoTUZglJ5SFqcAheczSx7wNbyuIlbMYSOVdSgnEu7s3A/SA5+DgcEWMvb5ko5fk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=foGPY5sb; arc=none smtp.client-ip=198.175.65.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="mJ56papW"
-Received: from mailtransmit02.runbox ([10.9.9.162] helo=aibo.runbox.com)
-	by mailtransmit05.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.93)
-	(envelope-from <mhal@rbox.co>)
-	id 1tDOL4-0024Sf-Fy; Tue, 19 Nov 2024 14:32:18 +0100
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
-	s=selector2; h=Cc:To:In-Reply-To:References:Message-Id:
-	Content-Transfer-Encoding:Content-Type:MIME-Version:Subject:Date:From;
-	bh=plGZttL9jrxvU+XUBlrhk9Z1MsQem1Esym1JxdfFUxc=; b=mJ56papW9RMQMmygxVbsQsG8J0
-	aOMv8cHvg7vJ+giqvQKrgknqtXxcur6zCNR1MKcwTmQGuKLoGnx0h6W5gVY0s7oXPU7XI5qYA4ggT
-	o0fF4vRHgtDJXS6t83NZYHYyS3N+DwDr0sjBtcXzk0YWQ+RxU1KoZPD2Ez/aTk6P+g2R4Mq0oEc/x
-	2P+Yum5vQ8fe/su2pQImq6D5xsSiGNJNeQdAZlBULrwAYu5Eg4X/pGIaCX4Wopc4kqokw6mMDzy8+
-	dlO8dltsoaKmddV/XtE4ygEkitGosOOqKgLlRKByQqnAxeJozpGiAeCdcI3Cjij5Op0QWQKaDzL3Q
-	8Bfc3M1g==;
-Received: from [10.9.9.72] (helo=submission01.runbox)
-	by mailtransmit02.runbox with esmtp (Exim 4.86_2)
-	(envelope-from <mhal@rbox.co>)
-	id 1tDOKy-0006NX-R5; Tue, 19 Nov 2024 14:32:13 +0100
-Received: by submission01.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.93)
-	id 1tDOKl-000XIx-TX; Tue, 19 Nov 2024 14:31:59 +0100
-From: Michal Luczaj <mhal@rbox.co>
-Date: Tue, 19 Nov 2024 14:31:43 +0100
-Subject: [PATCH net v3 4/4] net: Comment copy_from_sockptr() explaining its
- behaviour
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="foGPY5sb"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1732023473; x=1763559473;
+  h=date:from:to:cc:subject:message-id;
+  bh=1F8uwUl+6S5iEjVHltlfn0T581dXWmy6qtmjmykhODQ=;
+  b=foGPY5sbx8fJqu51krK4scVWpMEuOtoV1N0KLOB4PgUsYCzxece6/cuw
+   zE0ZN5hreoCVFML9RDjLzxLLoC3wNKJWFgeZRJcA8tms8XC1lk/RxvE60
+   aYaP8/lefKzHZZB0zaobY66JGi8tmQgb20ys1dhUdjgorhrXwNzbCqkJy
+   NPkUzMqjkp7DHw9o9+DmPq9C642DwIkxlsREzl+4nmaNvmF+R6yCFfTMI
+   1UqUYeX2AwqEzF4fqf+8lWYCvL8SV8rmjeWJT3Pd1An6kKSWE64qjOWzz
+   xbsFUYMNDBZTIINwh5wejBCkKLC91Tp+y7En5iIkMlsc1feABZKvzCsEB
+   g==;
+X-CSE-ConnectionGUID: UMTk5cO3TZe1/+a8CkuHUQ==
+X-CSE-MsgGUID: vxcz2X45SwGCpIetRUjy9A==
+X-IronPort-AV: E=McAfee;i="6700,10204,11261"; a="35691268"
+X-IronPort-AV: E=Sophos;i="6.12,166,1728975600"; 
+   d="scan'208";a="35691268"
+Received: from orviesa009.jf.intel.com ([10.64.159.149])
+  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Nov 2024 05:37:53 -0800
+X-CSE-ConnectionGUID: i77X9W7pQHeqLxUu2y+JWA==
+X-CSE-MsgGUID: Kh8iK3YvQJqvPBmdNwsEpQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,166,1728975600"; 
+   d="scan'208";a="89571190"
+Received: from lkp-server01.sh.intel.com (HELO 8122d2fc1967) ([10.239.97.150])
+  by orviesa009.jf.intel.com with ESMTP; 19 Nov 2024 05:37:52 -0800
+Received: from kbuild by 8122d2fc1967 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1tDOQO-00005G-2X;
+	Tue, 19 Nov 2024 13:37:48 +0000
+Date: Tue, 19 Nov 2024 20:24:42 +0800
+From: kernel test robot <lkp@intel.com>
+To: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: [bluetooth-next:master] BUILD SUCCESS
+ 4f562bec2bbf8068714098d21c8637c5c73393f8
+Message-ID: <202411192032.uWJrib8h-lkp@intel.com>
+User-Agent: s-nail v14.9.24
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20241119-sockptr-copy-fixes-v3-4-d752cac4be8e@rbox.co>
-References: <20241119-sockptr-copy-fixes-v3-0-d752cac4be8e@rbox.co>
-In-Reply-To: <20241119-sockptr-copy-fixes-v3-0-d752cac4be8e@rbox.co>
-To: Marcel Holtmann <marcel@holtmann.org>, 
- Johan Hedberg <johan.hedberg@gmail.com>, 
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
- David Howells <dhowells@redhat.com>, Marc Dionne <marc.dionne@auristor.com>
-Cc: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>, 
- linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org, 
- linux-afs@lists.infradead.org, Jakub Kicinski <kuba@kernel.org>, 
- Michal Luczaj <mhal@rbox.co>
-X-Mailer: b4 0.14.2
 
-copy_from_sockptr() has a history of misuse. Add a comment explaining that
-the function follows API of copy_from_user(), i.e. returns 0 for success,
-or number of bytes not copied on error.
+tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
+branch HEAD: 4f562bec2bbf8068714098d21c8637c5c73393f8  Bluetooth: MGMT: Fix slab-use-after-free Read in set_powered_sync
 
-Signed-off-by: Michal Luczaj <mhal@rbox.co>
----
- include/linux/sockptr.h | 2 ++
- 1 file changed, 2 insertions(+)
+elapsed time: 851m
 
-diff --git a/include/linux/sockptr.h b/include/linux/sockptr.h
-index 195debe2b1dbc5abf768aa806eb6c73b99421e27..3e6c8e9d67aef66e8ac5a4e474c278ac08244163 100644
---- a/include/linux/sockptr.h
-+++ b/include/linux/sockptr.h
-@@ -53,6 +53,8 @@ static inline int copy_from_sockptr_offset(void *dst, sockptr_t src,
- /* Deprecated.
-  * This is unsafe, unless caller checked user provided optlen.
-  * Prefer copy_safe_from_sockptr() instead.
-+ *
-+ * Returns 0 for success, or number of bytes not copied on error.
-  */
- static inline int copy_from_sockptr(void *dst, sockptr_t src, size_t size)
- {
+configs tested: 109
+configs skipped: 4
 
--- 
-2.46.2
+The following configs have been built successfully.
+More configs may be tested in the coming days.
 
+tested configs:
+alpha                             allnoconfig    gcc-14.2.0
+alpha                            allyesconfig    clang-20
+alpha                               defconfig    gcc-14.2.0
+arc                              allmodconfig    clang-20
+arc                               allnoconfig    gcc-14.2.0
+arc                              allyesconfig    clang-20
+arc                                 defconfig    gcc-14.2.0
+arc                        vdk_hs38_defconfig    clang-20
+arc                    vdk_hs38_smp_defconfig    clang-20
+arm                              allmodconfig    clang-20
+arm                               allnoconfig    gcc-14.2.0
+arm                              allyesconfig    clang-20
+arm                                 defconfig    gcc-14.2.0
+arm                         nhk8815_defconfig    clang-20
+arm                             pxa_defconfig    clang-20
+arm                       spear13xx_defconfig    clang-20
+arm64                            allmodconfig    clang-20
+arm64                             allnoconfig    gcc-14.2.0
+arm64                               defconfig    gcc-14.2.0
+csky                              allnoconfig    gcc-14.2.0
+csky                                defconfig    gcc-14.2.0
+hexagon                          allmodconfig    clang-20
+hexagon                           allnoconfig    gcc-14.2.0
+hexagon                          allyesconfig    clang-20
+hexagon                             defconfig    gcc-14.2.0
+i386                             allmodconfig    clang-19
+i386                              allnoconfig    clang-19
+i386                             allyesconfig    clang-19
+i386        buildonly-randconfig-001-20241119    clang-19
+i386        buildonly-randconfig-002-20241119    clang-19
+i386        buildonly-randconfig-003-20241119    clang-19
+i386        buildonly-randconfig-004-20241119    clang-19
+i386        buildonly-randconfig-005-20241119    clang-19
+i386        buildonly-randconfig-006-20241119    clang-19
+i386                                defconfig    clang-19
+i386                  randconfig-001-20241119    clang-19
+i386                  randconfig-002-20241119    clang-19
+i386                  randconfig-003-20241119    clang-19
+i386                  randconfig-004-20241119    clang-19
+i386                  randconfig-005-20241119    clang-19
+i386                  randconfig-006-20241119    clang-19
+i386                  randconfig-011-20241119    clang-19
+i386                  randconfig-012-20241119    clang-19
+i386                  randconfig-013-20241119    clang-19
+i386                  randconfig-014-20241119    clang-19
+i386                  randconfig-015-20241119    clang-19
+i386                  randconfig-016-20241119    clang-19
+loongarch                         allnoconfig    gcc-14.2.0
+loongarch                           defconfig    gcc-14.2.0
+m68k                              allnoconfig    gcc-14.2.0
+m68k                                defconfig    gcc-14.2.0
+m68k                       m5208evb_defconfig    clang-20
+m68k                       m5249evb_defconfig    clang-20
+m68k                        m5307c3_defconfig    clang-20
+m68k                            mac_defconfig    clang-20
+m68k                            q40_defconfig    clang-20
+microblaze                        allnoconfig    gcc-14.2.0
+microblaze                          defconfig    gcc-14.2.0
+mips                              allnoconfig    gcc-14.2.0
+mips                      bmips_stb_defconfig    clang-20
+mips                       rbtx49xx_defconfig    clang-20
+nios2                             allnoconfig    gcc-14.2.0
+nios2                               defconfig    gcc-14.2.0
+openrisc                          allnoconfig    clang-20
+openrisc                          allnoconfig    gcc-14.2.0
+openrisc                         allyesconfig    gcc-14.2.0
+openrisc                            defconfig    gcc-12
+parisc                           allmodconfig    gcc-14.2.0
+parisc                            allnoconfig    clang-20
+parisc                            allnoconfig    gcc-14.2.0
+parisc                           allyesconfig    gcc-14.2.0
+parisc                              defconfig    gcc-12
+parisc64                            defconfig    gcc-14.2.0
+powerpc                          allmodconfig    gcc-14.2.0
+powerpc                           allnoconfig    clang-20
+powerpc                           allnoconfig    gcc-14.2.0
+powerpc                          allyesconfig    gcc-14.2.0
+powerpc                      tqm8xx_defconfig    clang-20
+riscv                            allmodconfig    gcc-14.2.0
+riscv                             allnoconfig    clang-20
+riscv                             allnoconfig    gcc-14.2.0
+riscv                            allyesconfig    gcc-14.2.0
+riscv                               defconfig    gcc-12
+riscv             nommu_k210_sdcard_defconfig    clang-20
+s390                             allmodconfig    gcc-14.2.0
+s390                              allnoconfig    clang-20
+s390                             allyesconfig    gcc-14.2.0
+s390                                defconfig    gcc-12
+sh                               allmodconfig    gcc-14.2.0
+sh                                allnoconfig    gcc-14.2.0
+sh                               allyesconfig    gcc-14.2.0
+sh                                  defconfig    gcc-12
+sh                 kfr2r09-romimage_defconfig    clang-20
+sh                        sh7763rdp_defconfig    clang-20
+sparc                            allmodconfig    gcc-14.2.0
+sparc64                             defconfig    gcc-12
+um                               allmodconfig    clang-20
+um                                allnoconfig    clang-17
+um                                allnoconfig    clang-20
+um                               allyesconfig    clang-20
+um                                  defconfig    gcc-12
+um                             i386_defconfig    gcc-12
+um                           x86_64_defconfig    gcc-12
+x86_64                            allnoconfig    clang-19
+x86_64                           allyesconfig    clang-19
+x86_64                              defconfig    clang-19
+x86_64                                  kexec    clang-19
+x86_64                               rhel-9.4    gcc-12
+xtensa                            allnoconfig    gcc-14.2.0
+
+--
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
