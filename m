@@ -1,144 +1,116 @@
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from mailtransmit05.runbox.com (mailtransmit05.runbox.com [185.226.149.38])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EC281C1AD1
-	for <linux-bluetooth@vger.kernel.org>; Tue, 19 Nov 2024 12:51:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 532E71CC17D
+	for <linux-bluetooth@vger.kernel.org>; Tue, 19 Nov 2024 13:32:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.38
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732020698; cv=none; b=YB35AV3E90SMVoeew1a662MZmgYvLF83ZzPggWCOVXNln5Ws4Bu1xdpiPquYZCsmdUK1itOE8zzOSAblOj1orlmvCsbUFGQmkXIkfCsiepXmEPCQjs3+AGMGtFpUhyyhB1nJm+lxlahq1Z/ZJKqDEwITF6NWvvHY/3Y/fGqWqB4=
+	t=1732023136; cv=none; b=R+N4ndYDxQTs47s3Oa0+T4CzUsh9fr/OJ6yQB4nnMi8r8kS6Vrlrih6GLYJio8+qCy28kB1OACsHicGgoJTcLu0UcT8FcMsPBri4WBZQlsmLX5P1nveHbodcrthq2/eblzJv7Px1NqJb/TY7zslwFy9Rox6RICd+JxbaSe0oZfM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732020698; c=relaxed/simple;
-	bh=8+kO+hmaFU9f3uoEfpMUg23Td4M9jDSb8ePHUvCGZKk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Mk6iU+rMLoMu4h40Q3qwMB/cvAxsGfAW92ifrcgAaCTFufZvzMvL0aL4dyYGk/h0nlRnQ6pz9EraKmSZoFyYVUO1svxPXWBeGpZWWIk5vYcwjvBdRrTTSYK12WYLEJVHEXNfTQaB8jOSZ4M+DIFSXgK/hYb27zpwft/kx5ub5MY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <mfe@pengutronix.de>)
-	id 1tDNhc-0003uq-NH; Tue, 19 Nov 2024 13:51:32 +0100
-Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <mfe@pengutronix.de>)
-	id 1tDNhc-001ZKn-0G;
-	Tue, 19 Nov 2024 13:51:32 +0100
-Received: from mfe by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <mfe@pengutronix.de>)
-	id 1tDNhb-003KVN-38;
-	Tue, 19 Nov 2024 13:51:31 +0100
-Date: Tue, 19 Nov 2024 13:51:31 +0100
-From: Marco Felsch <m.felsch@pengutronix.de>
-To: Sherry Sun <sherry.sun@nxp.com>
-Cc: Bough Chen <haibo.chen@nxp.com>,
-	POPESCU Catalin <catalin.popescu@leica-geosystems.com>,
-	Amitkumar Karwar <amitkumar.karwar@nxp.com>,
-	Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>,
-	"marcel@holtmann.org" <marcel@holtmann.org>,
-	"luiz.dentz@gmail.com" <luiz.dentz@gmail.com>,
-	"robh@kernel.org" <robh@kernel.org>,
-	"krzk+dt@kernel.org" <krzk+dt@kernel.org>,
-	"conor+dt@kernel.org" <conor+dt@kernel.org>,
-	"p.zabel@pengutronix.de" <p.zabel@pengutronix.de>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	GEO-CHHER-bsp-development <bsp-development.geo@leica-geosystems.com>,
-	Krzysztof Kozlowski <krzk@kernel.org>,
-	Shenwei Wang <shenwei.wang@nxp.com>, Jun Li <jun.li@nxp.com>
-Subject: Re: [PATCH 1/2] dt-bindings: net: bluetooth: nxp: add support for
- supply and reset
-Message-ID: <20241119125131.pb5lkeryldsl7htq@pengutronix.de>
-References: <DB9PR04MB8429CF700571FE42C997FB9C924D2@DB9PR04MB8429.eurprd04.prod.outlook.com>
- <1b8864e5-0ec7-49c4-932a-89cfbaeacc9f@leica-geosystems.com>
- <DB9PR04MB842929186683C1DF13DCBD92924A2@DB9PR04MB8429.eurprd04.prod.outlook.com>
- <20241028090028.x6rzopvpcdvgouqv@pengutronix.de>
- <DB9PR04MB842960A18BB8570B04A64BEA924A2@DB9PR04MB8429.eurprd04.prod.outlook.com>
- <20241028115150.fgvqaem36lwxwvjh@pengutronix.de>
- <DB9PR04MB8429B10FA73E5333685103FB924A2@DB9PR04MB8429.eurprd04.prod.outlook.com>
- <20241028150048.qnqjxntns6quy7py@pengutronix.de>
- <20241118221759.wvrkvxeh4iop6jtt@pengutronix.de>
- <DB9PR04MB84299E3E1776C60F5D1F0FF792202@DB9PR04MB8429.eurprd04.prod.outlook.com>
+	s=arc-20240116; t=1732023136; c=relaxed/simple;
+	bh=R1N7tuV3toAcK96W6gsrUGEuM8/UuBdRJ2bRHdfTqeQ=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=cFgYKGPLPdjJNBKhZRb+oWUfXBYCn5PE3xUr0uBHNhm9gUOi2rVGc913qooLdW32CB+QzznGExoG70PE5Pt84csPDzWtpYghQkc9AG4gFjJs/dkMmnS/VAt7mkKvk3Cgcyo0hYM0ElfWtR4sOjAFKi8Tm5LlEUJOUcAdtYtIZqQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=saMNt/g0; arc=none smtp.client-ip=185.226.149.38
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="saMNt/g0"
+Received: from mailtransmit02.runbox ([10.9.9.162] helo=aibo.runbox.com)
+	by mailtransmit05.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.93)
+	(envelope-from <mhal@rbox.co>)
+	id 1tDOKv-0024Ri-KL; Tue, 19 Nov 2024 14:32:09 +0100
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
+	s=selector2; h=Cc:To:Content-Transfer-Encoding:Content-Type:MIME-Version:
+	Message-Id:Date:Subject:From; bh=zFb0s9I2ZS6P3vudh9lt5OZE4zI28ib5bkNvsnSR5V4=
+	; b=saMNt/g0vqhrUVcIU0xIw84mf5iSlYd3Wyx6FqVAQiqY4s6/iAH59oxBLFYwZOxBVo7JH2/fr
+	qfba2alj+6T7CoOktEE+C9U9MC/TI/Ut7H5gw0BeDvOhfvVYJ6KyCJ4CuKa3y12g8CiFOKnluHkqd
+	Qx3/t+mY+NCdATz+aiDJWwY9CbksFVldZxL7YPOD8M18tWcs++kJn7NkEDbonbZ7N8/nMhY8BH77Z
+	PWyOyoM00A7ROR9faCWfiXrjZaC5Zt6BHS0xoJrIRLSdrLGPjfgWTrao8D3xf9bm59WA2G67BMkGA
+	KR9L+nFukBg0y6lw3aVigjjO4gDYB1R4QCg8QQ==;
+Received: from [10.9.9.72] (helo=submission01.runbox)
+	by mailtransmit02.runbox with esmtp (Exim 4.86_2)
+	(envelope-from <mhal@rbox.co>)
+	id 1tDOKv-0006N3-0w; Tue, 19 Nov 2024 14:32:09 +0100
+Received: by submission01.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.93)
+	id 1tDOKj-000XIx-0V; Tue, 19 Nov 2024 14:31:57 +0100
+From: Michal Luczaj <mhal@rbox.co>
+Subject: [PATCH net v3 0/4] net: Fix some callers of copy_from_sockptr()
+Date: Tue, 19 Nov 2024 14:31:39 +0100
+Message-Id: <20241119-sockptr-copy-fixes-v3-0-d752cac4be8e@rbox.co>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <DB9PR04MB84299E3E1776C60F5D1F0FF792202@DB9PR04MB8429.eurprd04.prod.outlook.com>
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: mfe@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIADuTPGcC/4XNQQqDMBAF0KuUWXeKExWTrnqP0kUSxxoKRhIJi
+ nj3hlDoptDln89/s0Pk4DjC9bRD4OSi81MO9fkEdtTTk9H1OYOoRENEDUZvX/MS0Pp5w8GtHLF
+ WSrHWkrQmyMM5cCny7g4TL/DIx9HFxYetPEpUqo/Z/jITYYU9ydrKbrCmb2/B+PVifcGS+A+ID
+ ChDom0sSdPpL3AcxxvpusTU+AAAAA==
+X-Change-ID: 20241114-sockptr-copy-fixes-3999eaa81aa1
+To: Marcel Holtmann <marcel@holtmann.org>, 
+ Johan Hedberg <johan.hedberg@gmail.com>, 
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+ David Howells <dhowells@redhat.com>, Marc Dionne <marc.dionne@auristor.com>
+Cc: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>, 
+ linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org, 
+ linux-afs@lists.infradead.org, Jakub Kicinski <kuba@kernel.org>, 
+ Michal Luczaj <mhal@rbox.co>, David Wei <dw@davidwei.uk>
+X-Mailer: b4 0.14.2
 
-On 24-11-19, Sherry Sun wrote:
-> 
-> > -----Original Message-----
-> > From: Marco Felsch <m.felsch@pengutronix.de>
-> > 
-> > Hi,
-> > 
-> > gentle ping on this discussion since I'm still convinced that this the correct
-> > approach to add the reset mechanism and handle the power.
-> 
-> Hi Marco,
-> 
-> Sorry for the late reply. After internal discussion, we still have
-> some confusion regarding this new feature.
-> This patch do improve the independent handling of wifi/BT, but with
-> the controlling granularity segmentation, many different wifi/BT use
-> cases need to be considered.
+Some callers misinterpret copy_from_sockptr()'s return value. The function
+follows copy_from_user(), i.e. returns 0 for success, or the number of
+bytes not copied on error. Simply returning the result in a non-zero case
+isn't usually what was intended.
 
-Sure!
+Compile tested with CONFIG_LLC, CONFIG_AF_RXRPC, CONFIG_BT enabled.
 
-> For the case -- WLAN (SDIO) not used + BT (UART) used:
->
-> The ideal behavior of BT should be reset and the standalone BT FW
-> should be re-downloaded when unloading and re-loading the BT driver.
+Last patch probably belongs more to net-next, if any. Here as an RFC.
 
-To make it clear, I assumed that it's clear that independent
-(sub-)device handling require independent firmware (fw) files, which can
-be the case. NXP already supplies independent FW files for bt and wifi.
-We just need to ensure that the drivers are using these.
+Suggested-by: Jakub Kicinski <kuba@kernel.org>
+Signed-off-by: Michal Luczaj <mhal@rbox.co>
+---
+Changes in v3:
+- rxrpc/llc: Drop the non-essential changes
+- rxrpc/llc: Replace the deprecated copy_from_sockptr() with
+  copy_safe_from_sockptr() [David Wei]
+- Collect Reviewed-by [David Wei]
+- Link to v2: https://lore.kernel.org/r/20241115-sockptr-copy-fixes-v2-0-9b1254c18b7a@rbox.co
 
-That said the bt driver already checks if the fw has to be downloaded.
+Changes in v2:
+- Fix the fix of llc_ui_setsockopt()
+- Switch "bluetooth:" to "Bluetooth:" [bluez.test.bot]
+- Collect Reviewed-by [Luiz Augusto von Dentz]
+- Link to v1: https://lore.kernel.org/r/20241115-sockptr-copy-fixes-v1-0-d183c87fcbd5@rbox.co
 
-> However, due to the regulator control and PDn reset control are bound
-> to the SDIO bus instead of the WLAN device, the SDIO bus may be ready
-> after kernel boot up.
+---
+Michal Luczaj (4):
+      Bluetooth: Improve setsockopt() handling of malformed user input
+      llc: Improve setsockopt() handling of malformed user input
+      rxrpc: Improve setsockopt() handling of malformed user input
+      net: Comment copy_from_sockptr() explaining its behaviour
 
-Right, but this is a separate discussion not belonging to these driver
-changes. Also it's the common chicken-egg issue. You need to power the
-bus and release the device-reset before you can check which device is
-connected and to check if there would be a proper driver.
+ include/linux/sockptr.h           |  2 ++
+ include/net/bluetooth/bluetooth.h |  9 ---------
+ net/bluetooth/hci_sock.c          | 14 +++++++-------
+ net/bluetooth/iso.c               | 10 +++++-----
+ net/bluetooth/l2cap_sock.c        | 20 +++++++++++---------
+ net/bluetooth/rfcomm/sock.c       |  9 ++++-----
+ net/bluetooth/sco.c               | 11 ++++++-----
+ net/llc/af_llc.c                  |  2 +-
+ net/rxrpc/af_rxrpc.c              |  7 ++++---
+ 9 files changed, 40 insertions(+), 44 deletions(-)
+---
+base-commit: 66418447d27b7f4c027587582a133dd0bc0a663b
+change-id: 20241114-sockptr-copy-fixes-3999eaa81aa1
 
-> Although the WLAN is not used(WLAN driver is not loaded and WLAN FW is
-> not downloaded), the corresponding regulator count and PDn reset count
-> are both incremented by 1 through MMC pwrseq. Then with the BT driver
-> remove & re-probe, the PDn reset cannot truly reset the BT chip due to
-> the count been +1 by MMC pwrseq.  So the BT will not reset and BT FW
-> won't be re-downloaded when re-loading the BT driver, right?
+Best regards,
+-- 
+Michal Luczaj <mhal@rbox.co>
 
-You're aware that the btnxpuart.c driver already has the support for an
-independent software based reset? Not sure what this sw-reset does, due
-to the lack of missing documentation, but this is the only option to
-over-come your above mentioned use-case.
-
-I have to ask, is this really a use-case for someone? Either your device
-supports both: WLAN and BT or only one of WLAN/BT. If it would be only
-BT or WLAN you just don't need the specify the other one within your
-devicetree.
-
-Furthermore, this patchset does not break any current use-case you/NXP
-has. You still can use the combined fw version and still can use the not
-so user friendly user-space dependency of: "wlan driver _must_ be
-loaded" before the "bt driver _can_ be loaded" by just not using the
-split power handling. For use-space which wants to use the split version
-because there is no such dependecy.
-
-Regards,
-  Marco
