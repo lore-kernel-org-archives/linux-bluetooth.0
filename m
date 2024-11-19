@@ -1,151 +1,112 @@
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B29A1EA90
-	for <linux-bluetooth@vger.kernel.org>; Tue, 19 Nov 2024 03:23:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C46D154C17;
+	Tue, 19 Nov 2024 07:10:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731986604; cv=none; b=iVhJCoqvXiJ67t5HGvRys2Iu70zYBZyylCSl37yN0+wUY9dQQdGxj+ceDwdBYL3E5AYvRg5pzU59iY33kMBHQkKsIZxgSxE13NsLT2BdfHwpBoKZo1iWelFtsMmEu66kaLMV0Xz8+M45oVbXVNZLmdavVE56yKckttRj+uvIt18=
+	t=1732000246; cv=none; b=Y7x5rHu+WI4zsci8ZT2cJgq1lnIf1K2zYSz1105R2WYOFxJDmvsdgREXSYbiZ01Fn6O4IZPxWXNmGH397Uf9EcZ2caf83leirw2veHnOn93lb8VK0OGkATdrTG4NLvkFJpKu1YjmKgmalGpTgERHBU2wDq1nzNyoS+jLeO4cqTo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731986604; c=relaxed/simple;
-	bh=2jNVecL0wlljCj5IuGdrYLSq/mZcver6DeQnCanvVDs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=dpQcuJVfJZ8Noppb/RL96RI6Wu8HQzNPpym0Lw67yqE1gOch6rcybOQrmAJVf0yUo2ytLR7epr+hs39FixKzmDrEXYt+jhNkBYZVEfqSlAiRKoeUaWzMHUdnLIXA980T59F0TR1HT8cJ4Faun/zTliJXUf9sXuqEBj9AqL9eisM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=KWJZ8GrL; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+	s=arc-20240116; t=1732000246; c=relaxed/simple;
+	bh=shWx6Jcnj1KegI/uJvVbQm45B4OLMQ5bxRUZIgx+ohM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ECESZXyb91AclX3h/EgIJHY1KAeVebJkitnXlu5Eakht6SySQYwWUYH/DOIegmLLQG0H2wmppWgoTRYS+cbDlUkjvlJMpe6FFzeL2xjTdY2maOq6rmiHGac1v9Ubz/sDZJstpsIPAQsWJSWvQHHyv3JFnMoHPSwJxkLAoa9wUH4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=R6OJmIk7; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="KWJZ8GrL"
-Received: from pps.filterd (m0279873.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4AIGLn4M011441;
-	Tue, 19 Nov 2024 03:23:20 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	ojzSOYUnaGd8aVfldc+kNPIrsxYzZhjI5DcUl0qEtDU=; b=KWJZ8GrLhYe3sT9g
-	akNhx9bmSBqM+gNdc8A+jqL8it2rO4To9pLOMv3Zx++xMoYUCFEAS5UpfboBHp6o
-	Hp9bQanKS4OjcClkWlWGViYsDBx2RRBSHt/EWNDpNo+HEtBIESxHah6F9OjrgEoJ
-	HoPSnC/aK9jiNiXF7G05BnvhknnccOz5RKpcYSLNTG60r33BwH10vkyXAWwoV62Y
-	KgnbpIcoFPETN1fKvnHIIYWOnQ8PjM6YvToauac2BGAdQmA3knCaVolgr+lB3dFV
-	a+6f9HIo/jz/Lk69fi873tJH2sd8cHhAhY9Y9/o6mCoS2jkm9mDJurFxnc/Noj+e
-	JmdVeQ==
-Received: from nasanppmta05.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 43091m98xb-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 19 Nov 2024 03:23:20 +0000 (GMT)
-Received: from nasanex01b.na.qualcomm.com (nasanex01b.na.qualcomm.com [10.46.141.250])
-	by NASANPPMTA05.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 4AJ3MJxc026392
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 19 Nov 2024 03:22:19 GMT
-Received: from [10.253.76.47] (10.80.80.8) by nasanex01b.na.qualcomm.com
- (10.46.141.250) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Mon, 18 Nov
- 2024 19:22:06 -0800
-Message-ID: <421ab7ec-dc32-4bac-a3c0-9ed2d48a902c@quicinc.com>
-Date: Tue, 19 Nov 2024 11:22:01 +0800
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="R6OJmIk7"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A4C7BC4CECF;
+	Tue, 19 Nov 2024 07:10:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1732000245;
+	bh=shWx6Jcnj1KegI/uJvVbQm45B4OLMQ5bxRUZIgx+ohM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=R6OJmIk7PIW+zmrq0G5sC5/mbeSlj8LW234oLQBUtfta87oICCg1hvZL/pnG8Kd+V
+	 xwUBDmKlgPRKpnNT2iT6dtBAP/xTY1lV+jRao0ZEzs6Ol4b9xzVE4jz9hYcvRLmZcZ
+	 Xld35W+z8Ov5tHMrGj0xa9PcU/sIyNB2efaI9DM6kMCNMmwBPW+fImbAxRayFPn5ll
+	 kWxXSbHbsBz8qmfUTHp+trnfadLzWyRbHaAyabcT7Qqo8HblFLxnc+i/rGVjXp49DS
+	 ZSpw+vOPVqqJu2rl1Bq/bNBiP1IKgTSL/jO6p7QtDhvK3UiezQV9+xYP2QdmoVwy0a
+	 ePl5Wuzmf1/GA==
+Received: from johan by xi.lan with local (Exim 4.97.1)
+	(envelope-from <johan@kernel.org>)
+	id 1tDINd-000000004L2-2Ya0;
+	Tue, 19 Nov 2024 08:10:33 +0100
+Date: Tue, 19 Nov 2024 08:10:33 +0100
+From: Johan Hovold <johan@kernel.org>
+To: quic_zijuhu <quic_zijuhu@quicinc.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Bjorn Andersson <andersson@kernel.org>,
+	Steev Klimaszewski <steev@kali.org>,
+	Paul Menzel <pmenzel@molgen.mpg.de>, Zijun Hu <zijun_hu@icloud.com>,
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
+	Bjorn Andersson <bjorande@quicinc.com>,
+	"Aiqun Yu (Maria)" <quic_aiquny@quicinc.com>,
+	Cheng Jiang <quic_chejiang@quicinc.com>,
+	Jens Glathe <jens.glathe@oldschoolsolutions.biz>,
+	stable@vger.kernel.org, Johan Hovold <johan+linaro@kernel.org>
+Subject: Re: [PATCH v2] Bluetooth: qca: Support downloading board ID specific
+ NVM for WCN6855
+Message-ID: <Zzw56VwjTmlJ7mpW@hovoldconsulting.com>
+References: <20241116-x13s_wcn6855_fix-v2-1-c08c298d5fbf@quicinc.com>
+ <Zzs2b6y-DPY3v8ty@hovoldconsulting.com>
+ <d382b377-e824-4728-8acd-784757dde210@quicinc.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1] hog: Check security level before setting
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-CC: <linux-bluetooth@vger.kernel.org>, <quic_chejiang@quicinc.com>,
-        "Jiayang
- Mao (QUIC)" <quic_jiaymao@qualcomm.com>
-References: <20241118094907.2673431-1-quic_jiaymao@quicinc.com>
- <CABBYNZK9Z2fKiFmfnptUsX+yrvaKNW+b_BfQyidM=z2YU499nQ@mail.gmail.com>
-Content-Language: en-US
-From: Jiayang Mao <quic_jiaymao@quicinc.com>
-In-Reply-To: <CABBYNZK9Z2fKiFmfnptUsX+yrvaKNW+b_BfQyidM=z2YU499nQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nasanex01b.na.qualcomm.com (10.46.141.250)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: 5kcClsmJJTf_JAvzi-DqZP3_ZmSQ57mh
-X-Proofpoint-GUID: 5kcClsmJJTf_JAvzi-DqZP3_ZmSQ57mh
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
- definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0
- impostorscore=0 spamscore=0 priorityscore=1501 phishscore=0 malwarescore=0
- clxscore=1011 bulkscore=0 mlxlogscore=999 lowpriorityscore=0 adultscore=0
- mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2409260000 definitions=main-2411190027
+In-Reply-To: <d382b377-e824-4728-8acd-784757dde210@quicinc.com>
 
-Hi Luiz,
+On Tue, Nov 19, 2024 at 10:13:11AM +0800, quic_zijuhu wrote:
+> On 11/18/2024 8:43 PM, Johan Hovold wrote:
+> > On Sat, Nov 16, 2024 at 07:49:23AM -0800, Zijun Hu wrote:
+> >> For WCN6855, board ID specific NVM needs to be downloaded once board ID
+> >> is available, but the default NVM is always downloaded currently, and
+> >> the wrong NVM causes poor RF performance which effects user experience.
+> >>
+> >> Fix by downloading board ID specific NVM if board ID is available.
 
-On 2024/11/18 23:13, Luiz Augusto von Dentz wrote:
-> Hi Jiayang,
+> >> Fixes: 095327fede00 ("Bluetooth: hci_qca: Add support for QTI Bluetooth chip wcn6855")
+> >> Cc: stable@vger.kernel.org # 6.4
+> >> Reviewed-by: Johan Hovold <johan+linaro@kernel.org>
+> > 
+> > When making non-trivial changes, like the addition of the fallback NVM
+> > feature in v2, you should probably have dropped any previous Reviewed-by
+> > tags.
 > 
-> On Mon, Nov 18, 2024 at 4:49 AM Jiayang Mao <quic_jiaymao@quicinc.com> wrote:
->>
->> bt_gatt_client_set_security could fail if the security level is
->> already BT_ATT_SECURITY_MEDIUM. So, get and check the security
->> level before setting it.
+> make sense. will notice these aspects for further patches.
 > 
-> Seems a bit strange that this is not handled by the kernel, can you
-> elaborate on the conditions to trigger it?
+> > The fallback handling looks good to me though (and also works as
+> > expected).
 > 
+> so, is it okay to make this patch still keep tags given by you ?
 
-In the kernel, the failure happens when smp_sufficient_security() in
-'net/bluetooth/smp.c' returns true. In some cases, when security level
-is already MEDIUM but long term key is not ready, setting security level
-will fail. Checking security level before setting it can prevent this
-failure.
+Yes, it's fine to keep my Reviewed-by and Tested-by tags.
 
->> Signed-off-by: Jiayang Mao <quic_jiaymao@quicinc.com>
->> ---
->>   profiles/input/hog.c | 6 ++++--
->>   1 file changed, 4 insertions(+), 2 deletions(-)
->>
->> diff --git a/profiles/input/hog.c b/profiles/input/hog.c
->> index 017e320f0..011cc0a88 100644
->> --- a/profiles/input/hog.c
->> +++ b/profiles/input/hog.c
->> @@ -191,8 +191,10 @@ static int hog_accept(struct btd_service *service)
->>                          return -ECONNREFUSED;
->>
->>                  client = btd_device_get_gatt_client(device);
->> -               if (!bt_gatt_client_set_security(client,
->> -                                               BT_ATT_SECURITY_MEDIUM))
->> +               if (BT_ATT_SECURITY_MEDIUM !=
->> +                       bt_gatt_client_get_security(client) &&
->> +                   !bt_gatt_client_set_security(client,
->> +                                                BT_ATT_SECURITY_MEDIUM))
->>                          return -ECONNREFUSED;
-> 
-> 
-> Definitely not the right way to fix this since there might be other
-> places that do attempt to set the security, so Id got with something
-> like the following:
-> 
-> diff --git a/src/shared/att.c b/src/shared/att.c
-> index 4a406f4b91a4..dabbdb4315eb 100644
-> --- a/src/shared/att.c
-> +++ b/src/shared/att.c
-> @@ -727,6 +727,9 @@ static bool bt_att_chan_set_security(struct
-> bt_att_chan *chan, int level)
->   {
->          struct bt_security sec;
-> 
-> +       if (level == bt_att_chan_get_security(chan))
-> +               return true;
-> +
->          if (chan->type == BT_ATT_LOCAL) {
->                  chan->sec_level = level;
->                  return true;
-> 
->>          }
->>
->> --
->> 2.25.1
->>
->>
-> 
-> 
+> >> Tested-by: Johan Hovold <johan+linaro@kernel.org>
+> >> Tested-by: Steev Klimaszewski <steev@kali.org>
+> >> Tested-by: Jens Glathe <jens.glathe@oldschoolsolutions.biz>
+> >> Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
+> > 
+> >> Changes in v2:
+> >> - Correct subject and commit message
+> >> - Temporarily add nvm fallback logic to speed up backport.
+> >> — Add fix/stable tags as suggested by Luiz and Johan
+> >> - Link to v1: https://lore.kernel.org/r/20241113-x13s_wcn6855_fix-v1-1-15af0aa2549c@quicinc.com
 
+> > If you think it's ok for people to continue using the wrong (default)
+> > NVM file for a while still until their distros ship the board-specific
+> > ones, then this looks good to me and should ease the transition:
+> 
+> yes. i think it is okay now.
+
+Then I think this patch is ready to be merged.
+
+Thanks again for your help with this.
+
+Johan
