@@ -1,257 +1,173 @@
-Received: from out-22.smtp.github.com (out-22.smtp.github.com [192.30.252.205])
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4713FA939
-	for <linux-bluetooth@vger.kernel.org>; Wed, 20 Nov 2024 15:38:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.205
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2581D13B59E
+	for <linux-bluetooth@vger.kernel.org>; Wed, 20 Nov 2024 15:47:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732117136; cv=none; b=oYrcyjlR1Hy64R9iXIXJv30cOqknEPDiZ1caWfLLKiDy7y5gKRcvF/VCajlggHJJ8fw5EBYpF0MbqTGDctk7rnyBL71B3CBA5MF8XjwZtFaRA5jQR34cNIyGmXiqP0WB9bCrtWejlIltkWv3U4K4LqIIBOwg+uy1NkGFKvuQgd0=
+	t=1732117675; cv=none; b=NY10UiVoQyZnl/NlxMAH4QOMP18roGE/gbK84YGqAQBEkntd/jZzZ6zvsAIsF1fGY5BJ6X2xyBmynyIvQUhszf9YaKC8s4sXNIfAiO+q62l0xoMWTHKm3/aKnMV+3jXGxacktQkjgIFgD7+UxJv9JQo641knTUMZswPJauPoPzM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732117136; c=relaxed/simple;
-	bh=efj9CyeXNrljWK+H9qh2v3VGZ/eNQ4VFoPbj1wCh1rw=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=ZLB2s2TaKuY1VH1cNtbOa437IoKkulCXmWOVGhOx0tymFITbXIx6pt6fKQfYfSCFCckqbP9SMe3a56Dg/Ykb5mg3eh8cnMTEL0RszGoJPIvz47fgHbyDLq2YYw/AnuJp9mObxjMTh1gwQ5Ia0hRgUuh8vcWFBvCHXpYhECd1N/8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=CRsCapZD; arc=none smtp.client-ip=192.30.252.205
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1732117675; c=relaxed/simple;
+	bh=ztGYnkOV8SHEFCuR2sypGpse8hUz1zpTpp0zWo8ytW0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=RQAMBIfYJ+yEdYplBzKr57gY3lRtLWMNp7DmSKPswZzroekMVLwCa16JKteCVHCh/NsUBzmDHuZU99k4p/TYga6MZHUJB1C6Kph/6YrJIwc8SgybxNHtliJv/CHOuZkPqYshW+89sX1A4fdULRXF8yddmW9QAUF2zIH29dHKdeo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=eTvk9oYA; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="CRsCapZD"
-Received: from github.com (hubbernetes-node-31aca59.ac4-iad.github.net [10.52.137.37])
-	by smtp.github.com (Postfix) with ESMTPA id 65FE85E0AAE
-	for <linux-bluetooth@vger.kernel.org>; Wed, 20 Nov 2024 07:38:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1732117134;
-	bh=v+suTL/P15kUDhn4NOA88tkojiuqMFGB4UFRb3DWdVA=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=CRsCapZDY4T18GvorDLogb7xCZGZU+PXdmNzTZRTeSN3dK4IhQLEWtPNqWPTVTS69
-	 KSwWRK4LJ9WKM6aPAVfyRfqgpVVWIlS91rrcaoBMXLSaMNnLHDvFpykM7/8LVAdP74
-	 3ofSa/jdRsf/yAONMogkS8Gm4XvI2DMMaKRSZ7oU=
-Date: Wed, 20 Nov 2024 07:38:54 -0800
-From: iulia-tanasescu <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/master/5c6535-e59a91@github.com>
-Subject: [bluez/bluez] da5b5b: shared/ad: fix -std=c23 build failure
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="eTvk9oYA"
+Received: from pps.filterd (m0279864.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4AKAjssa004590;
+	Wed, 20 Nov 2024 15:47:52 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	Vrgcx09lChOxJGLeB3K/7nR1CAJ906kI63Nh8q9oosY=; b=eTvk9oYAq70WEmGY
+	9NYHa8fFIczvdeTF95VKMigCEI3r67eHtPPcCHjBtSWvBEFHwj20QxHyHpOsWD2L
+	t8+rD0J49eIbvVULncbr002gwsyPgWp/+X5AeLrn29L5VKQqetkhkLMwYRXSqUSo
+	/fKhvH/iJtlMGoF+VozFyrE2q7+FMVdzloFiS0uZGfrgSKfZKtXBwXxV+A49n26j
+	a65Vyd1Ybm7yRYhhR9RKT7Bj/zoTaEVKzJ4Gunp2siatG2CsPx7I/MOvXPIdTORH
+	OZrumLCy5bC1LRc2X4qRy2LQQyIu/pL+7SoZ28I4EIRrt+I7fy5f6/vhsX7990oL
+	t7JMvQ==
+Received: from nalasppmta04.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 431ea70rjf-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 20 Nov 2024 15:47:52 +0000 (GMT)
+Received: from nalasex01b.na.qualcomm.com (nalasex01b.na.qualcomm.com [10.47.209.197])
+	by NALASPPMTA04.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 4AKFlpsW023758
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 20 Nov 2024 15:47:51 GMT
+Received: from [10.216.48.116] (10.80.80.8) by nalasex01b.na.qualcomm.com
+ (10.47.209.197) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Wed, 20 Nov
+ 2024 07:47:49 -0800
+Message-ID: <7b8d7575-5b50-4794-bc2d-2bf2f6e9c022@quicinc.com>
+Date: Wed, 20 Nov 2024 21:17:46 +0530
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
-
-  Branch: refs/heads/master
-  Home:   https://github.com/bluez/bluez
-  Commit: da5b5b0ecb1ead38676768ef78d46449d404bdc0
-      https://github.com/bluez/bluez/commit/da5b5b0ecb1ead38676768ef78d46449d404bdc0
-  Author: Rudi Heitbaum <rudi@heitbaum.com>
-  Date:   2024-11-20 (Wed, 20 Nov 2024)
-
-  Changed paths:
-    M src/shared/ad.c
-
-  Log Message:
-  -----------
-  shared/ad: fix -std=c23 build failure
-
-gcc-15 switched to -std=c23 by default:
-
-    https://gcc.gnu.org/git/?p=gcc.git;a=commitdiff;h=55e3bd376b2214e200fa76d12b67ff259b06c212
-
-As a result `bluez` fails the build as:
-
-    src/shared/ad.c:1090:24: error: incompatible types when returning type '_Bool' but 'const char *' was expected
-     1090 |                 return false;
-          |                        ^~~~~
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH BlueZ] Fix for broadcast mode, not to add any AD flags in
+ advertise Data
+Content-Language: en-US
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+CC: <linux-bluetooth@vger.kernel.org>, <quic_mohamull@quicinc.com>,
+        <quic_hbandi@quicinc.com>, <quic_anubhavg@quicinc.com>
+References: <20241120144918.11991-1-quic_prathm@quicinc.com>
+ <CABBYNZL=HwZ1rsgghwF90VyfFVmLJwcT2LJEKK0-T__3N1jBaA@mail.gmail.com>
+From: Prathibha Madugonde <quic_prathm@quicinc.com>
+In-Reply-To: <CABBYNZL=HwZ1rsgghwF90VyfFVmLJwcT2LJEKK0-T__3N1jBaA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nalasex01b.na.qualcomm.com (10.47.209.197)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: GhCxoPYk_OK05u32Ye8-3bc_O7IufEI7
+X-Proofpoint-ORIG-GUID: GhCxoPYk_OK05u32Ye8-3bc_O7IufEI7
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
+ definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 adultscore=0
+ bulkscore=0 mlxscore=0 suspectscore=0 lowpriorityscore=0 clxscore=1011
+ priorityscore=1501 impostorscore=0 malwarescore=0 mlxlogscore=999
+ spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2409260000 definitions=main-2411200107
 
 
-  Commit: 4d60826865c760cc4e5718b6414746a394768110
-      https://github.com/bluez/bluez/commit/4d60826865c760cc4e5718b6414746a394768110
-  Author: Rudi Heitbaum <rudi@heitbaum.com>
-  Date:   2024-11-20 (Wed, 20 Nov 2024)
 
-  Changed paths:
-    M src/shared/shell.c
+On 11/20/2024 8:43 PM, Luiz Augusto von Dentz wrote:
+> Hi,
+> 
+> On Wed, Nov 20, 2024 at 10:00 AM <quic_prathm@quicinc.com> wrote:
+>>
+>> From: Prathibha Madugonde <quic_prathm@quicinc.com>
+>>
+>> src/advertising.c
+>> Include check for broadcast mode:
+>> Need not set flags in AD flags of Advertise Data
+> 
+> Please reword the last sentence to something like: "AD flags shall
+> never be set for broadcast", also add traces showing what is
+> happening.
+> 
+Thanks Luiz for the input, re-framing the sentence and sending in 
+upcoming patch.
 
-  Log Message:
-  -----------
-  shared/shell: fix -std=c23 build failure
+Below is the snippet of btmon logs for advertise broadcast failure.
 
-gcc-15 switched to -std=c23 by default:
+*****************************
+@ MGMT Command: Add Extended Advertising Data (0x0055) plen 22 
+ 
+                          {0x0001} [hci0] 160.010453
+         Instance: 1
+         Advertising data length: 3
+         Flags: 0x04
+           BR/EDR Not Supported
+         Scan response length: 8
+         Name (complete): prathm
+@ MGMT Event: Advertising Added (0x0023) plen 1 
+ 
+                          {0x0002} [hci0] 160.010474
+         Instance: 1
+ > HCI Event: Command Complete (0x0e) plen 4 
+ 
+                                #46 [hci0] 160.010849
+       LE Set Extended Advertising Data (0x08|0x0037) ncmd 2
+         Status: Invalid HCI Command Parameters (0x12)
+*******************************
 
-    https://gcc.gnu.org/git/?p=gcc.git;a=commitdiff;h=55e3bd376b2214e200fa76d12b67ff259b06c212
+>> Test steps:
+>>  From DUT, bluetoothctl go to menu advertise
+>> secondary 1M/2M
+>> name on
+>> back
+>> advertise broadcast
+> 
+> In case you don't know it, it is possible to call command from
+> submenus directly:
+> 
+> advertise.secondary 1M/2M
+> advertise.name on
+> advertise broadcast
+> 
 
-As a result `bluez` fails the build as:
+Got it. Thank you for info.
 
-    src/shared/shell.c:365:24: error: incompatible types when returning type '_Bool' but 'struct input *' was expected
-      365 |                 return false;
-          |                        ^~~~~
+Thanks
+Prathibha
 
-
-  Commit: 6f3111eb680df9c13502aacd65554846a9e13a3f
-      https://github.com/bluez/bluez/commit/6f3111eb680df9c13502aacd65554846a9e13a3f
-  Author: Rudi Heitbaum <rudi@heitbaum.com>
-  Date:   2024-11-20 (Wed, 20 Nov 2024)
-
-  Changed paths:
-    M src/shared/gatt-helpers.c
-
-  Log Message:
-  -----------
-  shared/gatt-helpers: fix -std=c23 build failure
-
-gcc-15 switched to -std=c23 by default:
-
-    https://gcc.gnu.org/git/?p=gcc.git;a=commitdiff;h=55e3bd376b2214e200fa76d12b67ff259b06c212
-
-As a result `bluez` fails the build as:
-
-    src/shared/gatt-helpers.c:1136:24: error: incompatible types when returning type '_Bool' but 'struct bt_gatt_request *' was expected
-     1136 |                 return false;
-          |                        ^~~~~
-    src/shared/gatt-helpers.c:1250:24: error: incompatible types when returning type '_Bool' but 'struct bt_gatt_request *' was expected
-     1250 |                 return false;
-          |                        ^~~~~
-    src/shared/gatt-helpers.c:1478:24: error: incompatible types when returning type '_Bool' but 'struct bt_gatt_request *' was expected
-     1478 |                 return false;
-          |                        ^~~~~
-
-
-  Commit: a0aee49df1d8aba8fe81bd6077ae9571ea93e5be
-      https://github.com/bluez/bluez/commit/a0aee49df1d8aba8fe81bd6077ae9571ea93e5be
-  Author: Iulia Tanasescu <iulia.tanasescu@nxp.com>
-  Date:   2024-11-20 (Wed, 20 Nov 2024)
-
-  Changed paths:
-    M src/shared/bap.c
-    M src/shared/bap.h
-
-  Log Message:
-  -----------
-  shared/bap: Add helper to parse BASE
-
-This adds a shared/bap helper to parse BASE. Any plugin that wishes to
-parse a BASE structure can call this helper and provide a callback to
-process each BIS.
-
-
-  Commit: 8054693b0c5b6b201a262b4db7ddd0a4cb239a5c
-      https://github.com/bluez/bluez/commit/8054693b0c5b6b201a262b4db7ddd0a4cb239a5c
-  Author: Iulia Tanasescu <iulia.tanasescu@nxp.com>
-  Date:   2024-11-20 (Wed, 20 Nov 2024)
-
-  Changed paths:
-    M profiles/audio/bap.c
-    M profiles/audio/bap.h
-
-  Log Message:
-  -----------
-  bap: Add helpers to convert iso_qos to/from bap_qos
-
-This adds public BAP helpers to convert iso_qos to bap_qos and reversed.
-This is needed for the BASS plugin to handle the Scan Delegator (BASS
-Server) role internally (to create/handle BAP streams when receiving the
-Add Source command from a Broadcast Assistant).
-
-
-  Commit: 66a83fde5c4932d57e0eb084d35ad1374d331e17
-      https://github.com/bluez/bluez/commit/66a83fde5c4932d57e0eb084d35ad1374d331e17
-  Author: Iulia Tanasescu <iulia.tanasescu@nxp.com>
-  Date:   2024-11-20 (Wed, 20 Nov 2024)
-
-  Changed paths:
-    M profiles/audio/bap.c
-    M profiles/audio/bass.c
-    M profiles/audio/bass.h
-
-  Log Message:
-  -----------
-  bap: Rework BASE parsing
-
-This replaces the internal parse_base with bt_bap_parse_base from
-shared/bap. A bis callback is added to handle parsed streams.
-
-The Broadcast Assistant implementation in the BASS plugin is also
-updated to use bap qos instead of iso qos, since the BISes are
-now parsed along with bap qos structure.
-
-
-  Commit: 3babeefa17b60ff34a4859ab0e7f9b637e307575
-      https://github.com/bluez/bluez/commit/3babeefa17b60ff34a4859ab0e7f9b637e307575
-  Author: Iulia Tanasescu <iulia.tanasescu@nxp.com>
-  Date:   2024-11-20 (Wed, 20 Nov 2024)
-
-  Changed paths:
-    M profiles/audio/bap.c
-    M profiles/audio/bap.h
-
-  Log Message:
-  -----------
-  bap: Make default PA sync QoS public
-
-This make the default BAP QoS parameters for PA Create Sync public,
-to be available to other plugins that might need to listen for
-Broadcasters (like BASS).
-
-
-  Commit: ac56526b7e392453f6d20e18abecfbb8f88bd1d6
-      https://github.com/bluez/bluez/commit/ac56526b7e392453f6d20e18abecfbb8f88bd1d6
-  Author: Iulia Tanasescu <iulia.tanasescu@nxp.com>
-  Date:   2024-11-20 (Wed, 20 Nov 2024)
-
-  Changed paths:
-    M profiles/audio/bap.c
-    M profiles/audio/bass.c
-    M profiles/audio/bass.h
-
-  Log Message:
-  -----------
-  bass: Rework Scan Delegator to handle BAP streams
-
-This updates the Scan Delegator implementation to be handled internally in
-BASS: The BASS Server is responsible to handle Write Commands for the Add
-Source operation by creating long-lived PA sync, parsing the BASE,
-creating and configuring BAP streams, as well as enabling them.
-
-
-  Commit: e618932b968fd021a532588bf26612a64cc3d5fa
-      https://github.com/bluez/bluez/commit/e618932b968fd021a532588bf26612a64cc3d5fa
-  Author: Iulia Tanasescu <iulia.tanasescu@nxp.com>
-  Date:   2024-11-20 (Wed, 20 Nov 2024)
-
-  Changed paths:
-    M profiles/audio/bap.c
-    M profiles/audio/bap.h
-
-  Log Message:
-  -----------
-  bap: Remove API to probe device from BASS
-
-This removes the BAP API to probe broadcasters from BASS, since BASS is
-now directly adding the Broadcast Audio Announcement Service UUID to the
-broadcaster device, and it will internally handle the probe.
-
-
-  Commit: e59a915db9d8e274bc2aa8214a920c8abe72203f
-      https://github.com/bluez/bluez/commit/e59a915db9d8e274bc2aa8214a920c8abe72203f
-  Author: Iulia Tanasescu <iulia.tanasescu@nxp.com>
-  Date:   2024-11-20 (Wed, 20 Nov 2024)
-
-  Changed paths:
-    M profiles/audio/bap.c
-
-  Log Message:
-  -----------
-  bap: Remove PA idle timer logic
-
-This removes BAP support for long-lived PA sync (added for Scan Delegator
-support), since it is now handled inside the BASS plugin. This also
-removes the PA idle timer logic, since PA/BIG sync requests are now
-ordered inside the kernel.
-
-
-Compare: https://github.com/bluez/bluez/compare/5c65356cae64...e59a915db9d8
-
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
+>> ---
+>>   src/advertising.c | 7 ++++++-
+>>   1 file changed, 6 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/src/advertising.c b/src/advertising.c
+>> index bd121e525..2fc6f917d 100644
+>> --- a/src/advertising.c
+>> +++ b/src/advertising.c
+>> @@ -759,10 +759,15 @@ static bool parse_discoverable(DBusMessageIter *iter,
+>>
+>>          dbus_message_iter_get_basic(iter, &discoverable);
+>>
+>> +       /* For broadcast mode, need not add any flags
+>> +        * just return true without adding flags.
+>> +        */
+>>          if (discoverable)
+>>                  flags = BT_AD_FLAG_GENERAL;
+>> -       else
+>> +       else if (client->type != AD_TYPE_BROADCAST)
+>>                  flags = 0x00;
+>> +       else
+>> +               return true;
+>>
+>>          if (!set_flags(client , flags))
+>>                  goto fail;
+>> --
+>> 2.17.1
+>>
+>>
+> 
+> 
