@@ -1,129 +1,95 @@
-Received: from mail-qk1-f181.google.com (mail-qk1-f181.google.com [209.85.222.181])
+Received: from mail-pg1-f181.google.com (mail-pg1-f181.google.com [209.85.215.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3B0116DC36
-	for <linux-bluetooth@vger.kernel.org>; Wed, 20 Nov 2024 11:37:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFDAC19C542
+	for <linux-bluetooth@vger.kernel.org>; Wed, 20 Nov 2024 13:03:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732102674; cv=none; b=iPMlKj2/0jxoljP4Kpr9v8mfOYCogRsmy2aPQglrqtoqJjioDRwk4GIE2htB0/4evtMMhnTCE8gwBLVchFQHlX0mOn2qpAMk5vQwLvFSc1sOIbkIUyLAT3GwZTW3UCw2XGOCdjHOutkytEwh1aQdt9H2uSUSKYA5A1G5aMrBNcc=
+	t=1732107783; cv=none; b=VFjXxRHm/UUzYgekCfMYRTXcdmj+4WqaGJtB3alJgbCDLcsDbcSsiEQ+WEEAs+h49HHmp5y33zZ9Vkq+ev5e3OcrgdJ0QfNA6oAaJCFH/HQPyNXD8fPVxw4MZgC0PsCPNhv7e+UlIwkXTuGERIFRkDLdZO9bd1NEhhTGwxHSGtY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732102674; c=relaxed/simple;
-	bh=cqIt66EpgONn8Ox3k6ACVSJWiX0R70axVxNszF+5+vU=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=QsmrKpaViWx+U4/YW6T0MHrTeiIYi0xDz49wQtYuNjNeHd5oRwwGbOohavzbzPLAiHzVIgpVwpjooI241jpC9dfm2tSrFj52k42Bqw5Fhqw2XThU/gNon7Ip9L9N1UjEkk0eWyCl6YTnTiqvqiWWw897VBTlXHAYChp4bSmihGU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cWzi9Jsa; arc=none smtp.client-ip=209.85.222.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1732107783; c=relaxed/simple;
+	bh=AklO7Ep37Z9t8zPpacdd7LvHYRJG1f+G637csZYAuDc=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=hNXfhQ7SQ7YYJw5hiO+Y2m6QZr5Hj7vTzLNlpqZj9Hp8kWsIo7d6bs8+ur6CbtkYBtdIk8uu+S7kOBwVe4z905TRtyyxVx2EJBARcTfe9LtEfY9rGltGSY/wTq6hmYqeKBX6DACGrNvS63ob2dI+g5d1WOcGo9Z9NeOseZqskVE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=heitbaum.com; spf=pass smtp.mailfrom=heitbaum.com; dkim=pass (1024-bit key) header.d=heitbaum.com header.i=@heitbaum.com header.b=T31AOBYQ; arc=none smtp.client-ip=209.85.215.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=heitbaum.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=heitbaum.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cWzi9Jsa"
-Received: by mail-qk1-f181.google.com with SMTP id af79cd13be357-7b152a23e9aso110847685a.0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 20 Nov 2024 03:37:52 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=heitbaum.com header.i=@heitbaum.com header.b="T31AOBYQ"
+Received: by mail-pg1-f181.google.com with SMTP id 41be03b00d2f7-7ede82dbb63so2622131a12.2
+        for <linux-bluetooth@vger.kernel.org>; Wed, 20 Nov 2024 05:03:01 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1732102671; x=1732707471; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=GOu9d5MVCj+Yw3+jP6Qntd2AMrB0BpH6yxLNdK/mdDk=;
-        b=cWzi9JsaJfLy8gPzNUHmpXFVHTyKEd5c7z48leBbllZcaCJa8F7QHMjkt7Bqojmjlk
-         6IZUM7yx8NFbkFuPn51dIUzDGtBHFF8Ixb/Gzn7S0gu4Fm3YVksZp7AF4QWAchF0XPql
-         qRzQt3UPunRr2/Y0JUIz8JEPF8zYXRAWRQMQUirnyhaPcEwOVj9iwb8uBxd+zcLuXkXj
-         mz8GlRuumb8olX7Yxc5Ccz99tCDVslcE+ur8TgWleeepUE4sQ7nb4RVyeYd2PeDit9aF
-         DcDHDVqcgR07RaP9FuzYHxsxrRviVjeEPKm33hvcbLnWd6ezVLKGuoU2fGC+qiRITAd2
-         9UJw==
+        d=heitbaum.com; s=google; t=1732107780; x=1732712580; darn=vger.kernel.org;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Bq2LOKLCr5boFFSS1gEXMTqxlqLDdnDIUV5osrtgs40=;
+        b=T31AOBYQLfHQCHH6FIUvtvZ0mhXhbUoaVyUfHqV0JHsrcFlmnix0QfzYb2WaznBfB2
+         GG5IqhQJaN5IcbIbL5GUBLB39IxM6pkDasAKI+NjWlQs9/D3zydlv0iTn/jrQPXp0kob
+         7cy29Eq6XlPj7sgLnbpyySSoNXguigtJkAe7M=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732102671; x=1732707471;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=GOu9d5MVCj+Yw3+jP6Qntd2AMrB0BpH6yxLNdK/mdDk=;
-        b=UigG3i7NUdIWhhBoU7V1KOuaL8KGtYo2forzI+D06hyuyLYM793Mp6vVJ/tLQvhs8n
-         Gp6v3FbJC04f0UlsPB/EqrtVYxJW+aAsrPTWlLuku7A0nH6Io89axSBGyL2PhcaoZrE+
-         CPI+PE4GNLPfDHOkwC8b1Sz332Ip25Am5xU22aLyDG+mCRrZcXvNJqJ66Yw97dxMGmLY
-         JrvJpdSvsaHrtj2SHkZLwOw/UCCMEOYKxY4GKdw8JsoXG9P9HhwQu346OAuCTvlU8GCa
-         KeFunJPLAEgQD2qs8+RuagKW7CmwUub9hWbZktb3YP0BhZdAQGlnjZx6UGpcZUd9hvzh
-         YlIA==
-X-Gm-Message-State: AOJu0YziPWv25a89MbsYVwkWT9kn60k2lduFotSDQnhl+tXd/o1WlDqw
-	TzXwROaiKPsOaFTxcZOwTLOC+0yG8k5omhqqRzIsD0Gx8iEYdohAKQi/aQ==
-X-Gm-Gg: ASbGncsLHI/FjpWD0vfuTpCi21jok6pGqmJmyS4fLUTmsbtZvLoXzczObRPzQeNxVg9
-	wZ71c+pWnkZctD0U0ygybpocgtSVEr32djHesVogOoh2f86zBf8ZVy14go+g2IhIR3Azd7RlJ6w
-	X35/0GCkASSfeZmoys4mTRDc4m3MWUnEDep+m/CzBrt2gE74ODbRs2750HncfqIaUtzvvhSiEdP
-	kQ4jHcL7aKsYg0XgbmZ5b6wqG8cc6K+oF28yPWiq5B79x5T8GZT5urn
-X-Google-Smtp-Source: AGHT+IFb0o7MYLdusISc1vCA3UpWEYjwvDqH+1e0ZDlz6YI0Y2Bys7kfRA/GzU2kk8oXrXrkEEuTQA==
-X-Received: by 2002:a05:620a:1917:b0:7b1:1b47:213c with SMTP id af79cd13be357-7b42edb96c3mr372376085a.10.1732102671633;
-        Wed, 20 Nov 2024 03:37:51 -0800 (PST)
-Received: from [172.17.0.2] ([20.97.191.134])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7b479d5f418sm84248285a.34.2024.11.20.03.37.50
+        d=1e100.net; s=20230601; t=1732107780; x=1732712580;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Bq2LOKLCr5boFFSS1gEXMTqxlqLDdnDIUV5osrtgs40=;
+        b=erUe9MK9Fl21K/z3l8EcTf0MLWTvQQLe7PHYHt7zFudlJbYo3n/9TAOfMHTKOpBMCH
+         X7A42TT9KtAxG5pwEgyfq3R48xW+3o+Qmdtw4j35OTJQJFAoyP1pnNFzpJn8lhynFPJA
+         GU85GRvjSpNyjjaS0S1O9CW5o4Z8nPnJYkVOeGJJxnsIWGxL1atVrTI2gaI5kqZAqgvm
+         j/Wd4M7o/5S5lEa7BsK5UW/82ooptZ8iv2BN21jBfSZyMIn0iWxNQasyJxGmgf0ozwGh
+         w6jJuX5BJbTGH/wtuYl9skllx8pjABqmp4NTK6tlZ9Jypk7m7Kq89Gp+DpUSeiFkaxTG
+         i1lg==
+X-Gm-Message-State: AOJu0YyZ82Kl2WwW4NTmn5PEodpmVZMwPpUvMh9oJdbCak6U0xIEKDaJ
+	nhx8Q98No2wnQwks25M6NCtg7cZPGza5gbZ2Zdzt5BBL0AF15Kcc/TnZWlGdAHSRpmQ6BAnknnE
+	M
+X-Google-Smtp-Source: AGHT+IH4CJXdEdagEVqZ5qFNRKnVDKs8r5eWx9hVYa7sB0Al6IMyHeMMbQQGF3CUVxalslJ5t2k01w==
+X-Received: by 2002:a05:6a20:2594:b0:1db:e10b:8a9a with SMTP id adf61e73a8af0-1ddae3e7935mr3620499637.6.1732107780141;
+        Wed, 20 Nov 2024 05:03:00 -0800 (PST)
+Received: from c8d99ad60702 ([122.199.11.121])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-724befb43b1sm1545857b3a.166.2024.11.20.05.02.58
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 20 Nov 2024 03:37:51 -0800 (PST)
-Message-ID: <673dca0f.050a0220.1c5d4e.1b83@mx.google.com>
-Date: Wed, 20 Nov 2024 03:37:51 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============6749216822110130677=="
+        Wed, 20 Nov 2024 05:02:59 -0800 (PST)
+Date: Wed, 20 Nov 2024 13:02:56 +0000
+From: Rudi Heitbaum <rudi@heitbaum.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: rudi@heitbaum.com
+Subject: [PATCH 1/3] shared/ad: fix -std=c23 build failure
+Message-ID: <Zz3eAJcwA--0n5lf@c8d99ad60702>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, iulia.tanasescu@nxp.com
-Subject: RE: bass: Rework Scan Delegator
-In-Reply-To: <20241120102601.38415-2-iulia.tanasescu@nxp.com>
-References: <20241120102601.38415-2-iulia.tanasescu@nxp.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
---===============6749216822110130677==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+gcc-15 switched to -std=c23 by default:
 
-This is automated email and please do not reply to this email!
+    https://gcc.gnu.org/git/?p=gcc.git;a=commitdiff;h=55e3bd376b2214e200fa76d12b67ff259b06c212
 
-Dear submitter,
+As a result `bluez` fails the build as:
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=911224
+    src/shared/ad.c:1090:24: error: incompatible types when returning type '_Bool' but 'const char *' was expected
+     1090 |                 return false;
+          |                        ^~~~~
 
----Test result---
-
-Test Summary:
-CheckPatch                    PENDING   0.23 seconds
-GitLint                       PENDING   0.24 seconds
-BuildEll                      PASS      20.47 seconds
-BluezMake                     PASS      1548.85 seconds
-MakeCheck                     PASS      13.40 seconds
-MakeDistcheck                 PASS      158.35 seconds
-CheckValgrind                 PASS      214.68 seconds
-CheckSmatch                   WARNING   274.03 seconds
-bluezmakeextell               PASS      101.23 seconds
-IncrementalBuild              PENDING   0.22 seconds
-ScanBuild                     PASS      858.25 seconds
-
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: CheckSmatch - WARNING
-Desc: Run smatch tool with source
-Output:
-src/shared/bap.c:296:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structuressrc/shared/bap.c:296:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structuressrc/shared/bap.c:296:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structures
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
-
-
-
+Signed-off-by: Rudi Heitbaum <rudi@heitbaum.com>
 ---
-Regards,
-Linux Bluetooth
+ src/shared/ad.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
+diff --git a/src/shared/ad.c b/src/shared/ad.c
+index d08ce7af9..dac381bbe 100644
+--- a/src/shared/ad.c
++++ b/src/shared/ad.c
+@@ -1087,7 +1087,7 @@ bool bt_ad_add_name(struct bt_ad *ad, const char *name)
+ const char *bt_ad_get_name(struct bt_ad *ad)
+ {
+ 	if (!ad)
+-		return false;
++		return NULL;
+ 
+ 	return ad->name;
+ }
+-- 
+2.43.0
 
---===============6749216822110130677==--
