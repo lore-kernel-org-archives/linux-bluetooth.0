@@ -1,120 +1,122 @@
-Received: from mail-il1-f199.google.com (mail-il1-f199.google.com [209.85.166.199])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC76219F13F
-	for <linux-bluetooth@vger.kernel.org>; Wed, 20 Nov 2024 09:18:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6164219F48D;
+	Wed, 20 Nov 2024 09:55:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732094304; cv=none; b=c3540UNs4eyTQL0TqVIFHQxfxojfH/XxCzZr0Uny4gkMPD6Zz1oo86nAcjSjXdUIKfSkBJthhfnRK1ChnTLFeB4o6tyo15LlSvIB1g9nVoRGG59byGDlVaeSmh/fMZRzWFJPJHvC5LOCAgM1WbJF6H+HZDhiTb8Ith4tzgmuVzk=
+	t=1732096508; cv=none; b=Q4a2qmdzBmrn+8NvLj4IkvEG6z9eQkwNz8PLvPebwfbmJhfcM/8hcGpe9VdZGiKLpFutDoIm7gmVkD3q1jMWMFzqeaM8Hwpopb6Gz5SOv+1KGGCbueCkQRBb+XCrocqEuglE+0Q0vTrqdSvs9ZE/KvzJQGdd4ymVsrEAyBtn6J0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732094304; c=relaxed/simple;
-	bh=6va+wkhwIco1QHZj1VVk17XoJmd99G2rmtvlnGTPN10=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=gfIvHi/sjGnApkJ6N3+gQ2uzGXbceor6p2A90M5tTMxYUewWpMiWktKwj3bdTx6k4/KSmnBbtkpjrfuboyQHpTGfYrJymzqaWUYk09VmL+5kEF6XgKagpFeqdHRMwtflLyU8N7uCdVSqGr9mWfMP3DNhsxeDrO9DU9tsTwFUHwk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f199.google.com with SMTP id e9e14a558f8ab-3a77fad574cso12696825ab.2
-        for <linux-bluetooth@vger.kernel.org>; Wed, 20 Nov 2024 01:18:22 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732094302; x=1732699102;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=jj/krNA+0xga5ye0XvZq56f6vcX0jsGHLzgJT6onnAE=;
-        b=rCiBVOIXn7bwJnLni2gYb81IVrwPU8clQzUhY8v7o1mr7fAiWLiehNUh6BbPiqFT0d
-         DE7RhYuxJxeKviBFtb0IKcV7LCkVzZ7bDI9sGMNrSQX2lN1X7FiNANmJqy947IsDtuZE
-         lHJESqrTq6KewK4uU/LRi3KQ+wBP0Q3Di4J4P6G5g36suX8SqEgluLyrnNgf6sfyTBKB
-         5iL5cLJOFq68+KaKOwsU4zdXOeU+yeHtvPqqCu071Xr9Gr1MZ7v+KSuwnU+YbWBLUwYp
-         Fs3nO1DVbf5LlJ81afaUrNDSTnGbdxklXW/77ldira2KgKdRt+AbUyWqtz73wedVXG3t
-         M3dQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVRciWZLbMUHTThiZVA7gHfkqC2HD7xB7KC9IwXjEnIa6g6IknnMZjx6XUE75wG1nx1F3zjsa2a3NcKEGli6iI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyNqqzIh5wKzRonYjQ9GqBOzsiNXXQXiko84LXnQ5SdK8xIv7v9
-	bnZ+VMbjUqVVVptGr1LjbxatmsLpm4hLafc+YPcgUA9/y/1c6dtw2ZBDgDN9fwuc+vwAe9YL2VD
-	yZ4AaasfF/c0XWfE5kvr4ppwCuPMkV74NRolkBZ771kso2CRIGvOPx4o=
-X-Google-Smtp-Source: AGHT+IFGhL+ZaHQjREBSS6Jq8cwAZgxvMuYLqCBTqKdlETCFNLJh9e6y7Os79E0cHEpNWDnujcHSwBSfpdhvKatD13T+9obGvNe1
+	s=arc-20240116; t=1732096508; c=relaxed/simple;
+	bh=rMW8nx/VGQNImI5wWQKUTTyyBSXKCsWcOxQdXVSDAco=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=dkeevEqF0oX5pW6T9A62N86ydWaQJEUtMVTEuwcm33KoaarLeutEI2he6vEiUvoUt3LV+EVU1oEaozNk0e9mVStP1LeFjeZSCJFGRzycQHrak+lwuVSTwL5RQiSYCJgIabtOFtSQ5pScXrV9O1BawEFjBizDBYUeYqFpsu68Go0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=Oqh5b5iJ; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="Oqh5b5iJ"
+Received: from pps.filterd (m0279869.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4AK9FTDo007981;
+	Wed, 20 Nov 2024 09:55:02 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=qcppdkim1; bh=GTYyLA5p9qWUSkYxsYPQeY
+	6kil5ws7BD6ZDPscuSftY=; b=Oqh5b5iJRjtY3opsu2YUVHUfStNdSTwClBVC/X
+	cdlDc+Ea59cGQ5J5se1soMInw2UnfLIPQPphcvDmvOs7+Uy8nyf45MQ2IJ/3czuX
+	PaCJnvv2NcviFM/2bPakjzL3WISGrR850U5CSDnW93M7wg2BscU/1l3sESSVogSi
+	ELkqnB54iVgjJ0qwt+/9aF3gp+aK3S0hw3Vls8V6bya6+HHPRtMwz9hLsmpv04Lq
+	0g9+AnUjdIGgOwRefL9+ukxQUglPqO3jnzSaFw50pTyFUC6zsuYnbOQKvLsgJU2+
+	p75qbuKiacRvPklENFwU6Iv7UTJ4L7s/FuROJilBFJCS0aVA==
+Received: from nalasppmta03.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4318uvgqhr-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 20 Nov 2024 09:55:01 +0000 (GMT)
+Received: from nalasex01b.na.qualcomm.com (nalasex01b.na.qualcomm.com [10.47.209.197])
+	by NALASPPMTA03.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 4AK9t0rW012582
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 20 Nov 2024 09:55:00 GMT
+Received: from chejiang-gv.qualcomm.com (10.80.80.8) by
+ nalasex01b.na.qualcomm.com (10.47.209.197) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.9; Wed, 20 Nov 2024 01:54:56 -0800
+From: Cheng Jiang <quic_chejiang@quicinc.com>
+To: Marcel Holtmann <marcel@holtmann.org>,
+        Luiz Augusto von Dentz
+	<luiz.dentz@gmail.com>,
+        Rob Herring <robh@kernel.org>,
+        Krzysztof Kozlowski
+	<krzk+dt@kernel.org>,
+        Conor Dooley <conor+dt@kernel.org>,
+        Bjorn Andersson
+	<andersson@kernel.org>,
+        Konrad Dybcio <konradybcio@kernel.org>,
+        "Balakrishna
+ Godavarthi" <quic_bgodavar@quicinc.com>,
+        Rocky Liao
+	<quic_rjliao@quicinc.com>, <quic_zijuhu@quicinc.com>
+CC: <linux-bluetooth@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <linux-arm-msm@vger.kernel.org>,
+        <quic_mohamull@quicinc.com>, <quic_chejiang@quicinc.com>
+Subject: [PATCH v1 0/4] Add qcom,product-variant properties in Qualcomm
+Date: Wed, 20 Nov 2024 17:54:24 +0800
+Message-ID: <20241120095428.1122935-1-quic_chejiang@quicinc.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1789:b0:3a7:4826:b947 with SMTP id
- e9e14a558f8ab-3a78656fd09mr22144355ab.17.1732094302052; Wed, 20 Nov 2024
- 01:18:22 -0800 (PST)
-Date: Wed, 20 Nov 2024 01:18:22 -0800
-In-Reply-To: <00000000000052c1d00616feca15@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <673da95e.050a0220.363a1b.0009.GAE@google.com>
-Subject: Re: [syzbot] [bluetooth?] WARNING in hci_recv_frame
-From: syzbot <syzbot+3e07a461b836821ff70e@syzkaller.appspotmail.com>
-To: johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, luiz.dentz@gmail.com, marcel@holtmann.org, 
-	netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nalasex01b.na.qualcomm.com (10.47.209.197)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: ixUL55i9m1-7_eFAoKm1lKfF197ZotIY
+X-Proofpoint-GUID: ixUL55i9m1-7_eFAoKm1lKfF197ZotIY
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
+ definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 bulkscore=0
+ priorityscore=1501 phishscore=0 adultscore=0 malwarescore=0 mlxscore=0
+ lowpriorityscore=0 mlxlogscore=999 spamscore=0 suspectscore=0
+ clxscore=1011 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2409260000 definitions=main-2411200069
 
-syzbot has found a reproducer for the following issue on:
+Add a new property in qualcom bluetooth dts to identify the product
+information, so the driver can load the proper firmware.
 
-HEAD commit:    a5c93bfec0be Merge tag 'x86-mm-2024-11-18' of git://git.ke..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=1378475f980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=9b5cb37a5a4eda10
-dashboard link: https://syzkaller.appspot.com/bug?extid=3e07a461b836821ff70e
-compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=12694ae8580000
+Several Qualcomm projects will use the same Bluetooth chip, each
+focusing on different features. For instance, consumer projects
+prioritize the A2DP SRC feature, while IoT projects focus on the A2DP
+SINK feature. Due to the patch size, it is not feasible to include all
+features in a single firmware.
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/70daf24cbd5f/disk-a5c93bfe.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/43d73b55bde3/vmlinux-a5c93bfe.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/1742639611a8/bzImage-a5c93bfe.xz
+Therefore, the 'product-variant' devicetree property is used to provide
+product information for the Bluetooth driver to load the appropriate
+firmware.
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+3e07a461b836821ff70e@syzkaller.appspotmail.com
-
-Bluetooth: hci0: Opcode 0x0c03 failed: -112
-------------[ cut here ]------------
-WARNING: CPU: 1 PID: 11474 at kernel/workqueue.c:2257 __queue_work+0xc3a/0x1080 kernel/workqueue.c:2256
-Modules linked in:
-CPU: 1 UID: 0 PID: 11474 Comm: syz.3.1469 Not tainted 6.12.0-syzkaller-01518-ga5c93bfec0be #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/30/2024
-RIP: 0010:__queue_work+0xc3a/0x1080 kernel/workqueue.c:2256
-Code: 07 83 c0 03 38 d0 7c 09 84 d2 74 05 e8 8f 55 98 00 8b 5b 2c 31 ff 83 e3 20 89 de e8 70 79 36 00 85 db 75 60 e8 27 77 36 00 90 <0f> 0b 90 e9 f9 f7 ff ff e8 19 77 36 00 90 0f 0b 90 e9 a8 f7 ff ff
-RSP: 0018:ffffc9000b2b7bf8 EFLAGS: 00010093
-RAX: 0000000000000000 RBX: 0000000000000000 RCX: ffffffff815719b0
-RDX: ffff88802b422440 RSI: ffffffff815719b9 RDI: 0000000000000005
-RBP: ffff8880360a8a80 R08: 0000000000000005 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000000 R12: 0000000000000000
-R13: 0000000000000008 R14: ffff8880123d3000 R15: ffff8880123d3000
-FS:  00007f22bc8606c0(0000) GS:ffff8880b8700000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f38a17baf98 CR3: 000000006114e000 CR4: 00000000003526f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- queue_work_on+0x11a/0x140 kernel/workqueue.c:2390
- queue_work include/linux/workqueue.h:662 [inline]
- hci_recv_frame+0x23f/0x7e0 net/bluetooth/hci_core.c:2946
- vhci_get_user drivers/bluetooth/hci_vhci.c:511 [inline]
- vhci_write+0x385/0x470 drivers/bluetooth/hci_vhci.c:607
- new_sync_write fs/read_write.c:586 [inline]
- vfs_write+0x5ae/0x1150 fs/read_write.c:679
- ksys_write+0x12b/0x250 fs/read_write.c:731
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xcd/0x250 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f22bb97d23f
-Code: 89 54 24 18 48 89 74 24 10 89 7c 24 08 e8 c9 8d 02 00 48 8b 54 24 18 48 8b 74 24 10 41 89 c0 8b 7c 24 08 b8 01 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 31 44 89 c7 48 89 44 24 08 e8 1c 8e 02 00 48
-RSP: 002b:00007f22bc860000 EFLAGS: 00000293 ORIG_RAX: 0000000000000001
-RAX: ffffffffffffffda RBX: 00007f22bbb35f80 RCX: 00007f22bb97d23f
-RDX: 0000000000000007 RSI: 0000000020000000 RDI: 00000000000000ca
-RBP: 00007f22bb9f175e R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000020000000 R11: 0000000000000293 R12: 0000000000000000
-R13: 0000000000000000 R14: 00007f22bbb35f80 R15: 00007ffc1b246d58
- </TASK>
+The driver will parse 'product-variant' to load firmware from different
+directories. If it's not defined in dts, the default firmware will be
+loaded, which is compatible with the existing implementaion.
 
 
----
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
+Cheng Jiang (4):
+  dt-bindings: bluetooth: add 'qcom,product-variant'
+  dt-bindings: bluetooth: Add qca6698 compatible string
+  arm64: dts: qcom: sa8775p-ride: update BT nodes
+  Bluetooth: hci_qca: add qcom,product-variant properties
+
+ .../net/bluetooth/qualcomm-bluetooth.yaml     |   8 +
+ arch/arm64/boot/dts/qcom/sa8775p-ride.dtsi    |   3 +-
+ drivers/bluetooth/btqca.c                     | 142 ++++++++++++++----
+ drivers/bluetooth/btqca.h                     |  11 +-
+ drivers/bluetooth/hci_qca.c                   |  73 +++++----
+ 5 files changed, 174 insertions(+), 63 deletions(-)
+
+
+base-commit: 6fb2fa9805c501d9ade047fc511961f3273cdcb5
+-- 
+2.25.1
+
