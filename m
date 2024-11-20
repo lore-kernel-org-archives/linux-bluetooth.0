@@ -1,112 +1,132 @@
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f182.google.com (mail-lj1-f182.google.com [209.85.208.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B0D31C82F3
-	for <linux-bluetooth@vger.kernel.org>; Wed, 20 Nov 2024 14:49:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2D071AA793
+	for <linux-bluetooth@vger.kernel.org>; Wed, 20 Nov 2024 15:13:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732114177; cv=none; b=EyUDwp/AxSXe9MbA6PUb/bB3ay6P82R6L7EP2Ai7sJu700iEVbrnJWIG6OOc/WYuYlLKoP8obDQCm6LkyvLN98uhWtVRFGZe1iNTCspeeJsk43MTAs14vVBDrrdzes1fuXc4LpsmWJ1couH3NvMWHsB0Qs4E+cejGDzWeRPndYE=
+	t=1732115639; cv=none; b=bHXGGmfz2Z6CgF/KwY/KuVzSk3hWEiM8C8OmzSyz5NWHPh+3d3xVI9s598o/3qgAVkuVhjmQ6FKzOr89dRtTAYrMBlQ9y4qWWhOufdyjwLOzTSzOKjN7oU4Iiirq8LBSpnY4LaPJWosfUnC57nCbk3yPD2HSrGGFulJYAPPOUCE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732114177; c=relaxed/simple;
-	bh=z5oD9wU0rcMRGryzXaBp7X4sZ3RFZQg3VKWFsJ6d6SI=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=RffLjGW8da2QOdrQ6SQBy35lKaLOtFZzD4MKF6kdkDgJcr6TcnmCmoVhDqaz+my+UBV/TpTF7iNbf9JbEjCL1MgtZeg+5vdjTCV4kNxPAP3TyH/1zn8dtY0cWrTDrofKsgIGY8I4B2w5w6LjsgcHqQy+6rcJY0fZAB3B5jPbAyY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=Hrd5k8KO; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+	s=arc-20240116; t=1732115639; c=relaxed/simple;
+	bh=gL7ZCooCxZuw4uX3cLwGzs8B+euK8O6BHQdiGCoJmb4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=a6OZ7+eyX+yNsp11D8Fvw7fQ/G9jV9jofkG1swvHhCNYi620IbeSvv+vSyWrdc3+LeEsEWWhT1Esw2qBc1o/K/5MJiMA/b7c1qBoML2g8XU/Ms1+JqZMi+qalBVQzNOEA+9VwHt0XBOiO3C0IaeukkWn9FFpAP6mfl9Vm69Dqbw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UVLqLNEN; arc=none smtp.client-ip=209.85.208.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="Hrd5k8KO"
-Received: from pps.filterd (m0279873.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4AK9FRHb010571
-	for <linux-bluetooth@vger.kernel.org>; Wed, 20 Nov 2024 14:49:35 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-type:date:from:message-id:mime-version:subject:to; s=
-	qcppdkim1; bh=CJTBiRLB/9PQmB2uh7zrNawjuWhh3TYopCjbkE7mrTE=; b=Hr
-	d5k8KOnBDAaqqCJnpL5POF8SKDaW1ybaOCnc1acnErvGc9ykqTfY0RzVmOcGuc80
-	o109HcFr8MJweLYEg8/CrfLGOlW0Qjou60jDUH2u3o2V0SXPibcJ783fToJt1SMX
-	Mb+qEnvbyNvlw51ZdGKjtpovyP+RBKVWmQWPjddk+ZyFehehjc6GmVByjPkn3+43
-	mmfsDyYnY+b+9xrSRsfMr0221/Gx7dIoVzkwnOt2mSsLE7gxwN5ybtGmfkw4UKps
-	vJhO3mldEH1bK2SPeoGHFpeJn5hzg92HM/50QkRSCXj7TGl19lpntWOP4s73y69l
-	LCG1QryuE3pnMwTEo1nw==
-Received: from nalasppmta04.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 43091me5g7-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <linux-bluetooth@vger.kernel.org>; Wed, 20 Nov 2024 14:49:34 +0000 (GMT)
-Received: from nalasex01b.na.qualcomm.com (nalasex01b.na.qualcomm.com [10.47.209.197])
-	by NALASPPMTA04.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 4AKEnXcS008307
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <linux-bluetooth@vger.kernel.org>; Wed, 20 Nov 2024 14:49:33 GMT
-Received: from hu-prathm-hyd.qualcomm.com (10.80.80.8) by
- nalasex01b.na.qualcomm.com (10.47.209.197) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.9; Wed, 20 Nov 2024 06:49:31 -0800
-From: <quic_prathm@quicinc.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: <quic_mohamull@quicinc.com>, <quic_hbandi@quicinc.com>,
-        <quic_anubhavg@quicinc.com>
-Subject: [PATCH BlueZ] Fix for broadcast mode, not to add any AD flags in advertise Data
-Date: Wed, 20 Nov 2024 20:19:18 +0530
-Message-ID: <20241120144918.11991-1-quic_prathm@quicinc.com>
-X-Mailer: git-send-email 2.17.1
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UVLqLNEN"
+Received: by mail-lj1-f182.google.com with SMTP id 38308e7fff4ca-2ff64e5d31bso24326851fa.0
+        for <linux-bluetooth@vger.kernel.org>; Wed, 20 Nov 2024 07:13:57 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1732115636; x=1732720436; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=X0uyLOwOPOnyASOtKVtTmvH9ztq8azMSS3wSuRKFQhE=;
+        b=UVLqLNEN/NTd0qDfnOP/x/Udp4c52L5iwpZV/X/0SbZ02Sz5jSjcvEnHj+OuUP8xhT
+         4PRAWMvM3RcxKbYKmN7hyPX9NBMKP9vZLL0CuY04Vbt8pkokHlMW83Ho2bNFStDrx4WF
+         UvhjZgngatg5xkOOQd7KUZ5mgsfUK76fFvrVc4p5840wfGaUp8TbJSqMqci0rIb560fq
+         kSOHc7//6G7MshUZp7inGrqNuwsCMZbRW5va4+GZhfQDIIADmXxJCpwqHOalulYvKX3B
+         hEmmsyC1aTYZINDvVvNj3ObZJW/5SE5w3QbLaVmKRXH50R4mYMTZM5X2geJ0QRFbUioS
+         DDyA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1732115636; x=1732720436;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=X0uyLOwOPOnyASOtKVtTmvH9ztq8azMSS3wSuRKFQhE=;
+        b=iHWcwT2Pr2kXz5qfHuf2HZS+0OCDYRAOGB2aDHl4gcdogAYONUUI5sG8qZSEAOA23a
+         63S2QPCwJwjfLrMhgK3J0QfhMS2Gtyy2vhqsNm/4xIAUKTUfeX2SlUn0uva0yzzRe52q
+         Ohr9OIxQrpgEy8/9ePdG000uja1N1X0KsV5RWMo0O1C8FO9JKT/mK4uJx9ZxEBItb/Jr
+         fo0mKXxo2sT1R/JOafd7RCgQvzzzr4qN9v3Rm6IlTnrbe3iWmALc/RGEsZlVhx/lO4QN
+         URgiJD3Rch4ntuv+MMOzQtz+OmQcFYK3rWuYZt0Lp5M+ifhB+C0kJ1b/3umpydnnLYRX
+         YIOQ==
+X-Gm-Message-State: AOJu0YyATp6TjRVHSHBit9p7YJq7CncSz0/P+eSSJUFUK1i5DQiwQWTL
+	Jyv/2WuGBtkb5deJlrS8KKTNiQXYibE4Xo88PMfWpgBhCDvbDjLk1Y41BcBXQ0CiLhVVD06Jdz5
+	+l+IahHnIDO0K0hMp30cVLZPl33GQIfz1
+X-Google-Smtp-Source: AGHT+IEVCnEMl5Rvuv4FSHD2v2Jcx5GJ5KlReZtYkILg+8ZZrdmj3VKtA+t39OjdLr8+VmDg+5QH1EabVaxIWGicLb4=
+X-Received: by 2002:a05:651c:b25:b0:2fa:cc86:f217 with SMTP id
+ 38308e7fff4ca-2ff8dcbabdamr20746971fa.35.1732115635565; Wed, 20 Nov 2024
+ 07:13:55 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nalasex01b.na.qualcomm.com (10.47.209.197)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: ULz_0Zcr4Sze9ibRmnI3ixl42BJ1LG_0
-X-Proofpoint-GUID: ULz_0Zcr4Sze9ibRmnI3ixl42BJ1LG_0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
- definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0
- impostorscore=0 spamscore=0 priorityscore=1501 phishscore=0 malwarescore=0
- clxscore=1011 bulkscore=0 mlxlogscore=627 lowpriorityscore=0 adultscore=0
- mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2409260000 definitions=main-2411200098
+References: <20241120144918.11991-1-quic_prathm@quicinc.com>
+In-Reply-To: <20241120144918.11991-1-quic_prathm@quicinc.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Wed, 20 Nov 2024 10:13:42 -0500
+Message-ID: <CABBYNZL=HwZ1rsgghwF90VyfFVmLJwcT2LJEKK0-T__3N1jBaA@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] Fix for broadcast mode, not to add any AD flags in
+ advertise Data
+To: quic_prathm@quicinc.com
+Cc: linux-bluetooth@vger.kernel.org, quic_mohamull@quicinc.com, 
+	quic_hbandi@quicinc.com, quic_anubhavg@quicinc.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Prathibha Madugonde <quic_prathm@quicinc.com>
+Hi,
 
-src/advertising.c
-Include check for broadcast mode:
-Need not set flags in AD flags of Advertise Data
+On Wed, Nov 20, 2024 at 10:00=E2=80=AFAM <quic_prathm@quicinc.com> wrote:
+>
+> From: Prathibha Madugonde <quic_prathm@quicinc.com>
+>
+> src/advertising.c
+> Include check for broadcast mode:
+> Need not set flags in AD flags of Advertise Data
 
-Test steps:
-From DUT, bluetoothctl go to menu advertise
-secondary 1M/2M
-name on
-back
+Please reword the last sentence to something like: "AD flags shall
+never be set for broadcast", also add traces showing what is
+happening.
+
+> Test steps:
+> From DUT, bluetoothctl go to menu advertise
+> secondary 1M/2M
+> name on
+> back
+> advertise broadcast
+
+In case you don't know it, it is possible to call command from
+submenus directly:
+
+advertise.secondary 1M/2M
+advertise.name on
 advertise broadcast
 
----
- src/advertising.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+> ---
+>  src/advertising.c | 7 ++++++-
+>  1 file changed, 6 insertions(+), 1 deletion(-)
+>
+> diff --git a/src/advertising.c b/src/advertising.c
+> index bd121e525..2fc6f917d 100644
+> --- a/src/advertising.c
+> +++ b/src/advertising.c
+> @@ -759,10 +759,15 @@ static bool parse_discoverable(DBusMessageIter *ite=
+r,
+>
+>         dbus_message_iter_get_basic(iter, &discoverable);
+>
+> +       /* For broadcast mode, need not add any flags
+> +        * just return true without adding flags.
+> +        */
+>         if (discoverable)
+>                 flags =3D BT_AD_FLAG_GENERAL;
+> -       else
+> +       else if (client->type !=3D AD_TYPE_BROADCAST)
+>                 flags =3D 0x00;
+> +       else
+> +               return true;
+>
+>         if (!set_flags(client , flags))
+>                 goto fail;
+> --
+> 2.17.1
+>
+>
 
-diff --git a/src/advertising.c b/src/advertising.c
-index bd121e525..2fc6f917d 100644
---- a/src/advertising.c
-+++ b/src/advertising.c
-@@ -759,10 +759,15 @@ static bool parse_discoverable(DBusMessageIter *iter,
- 
- 	dbus_message_iter_get_basic(iter, &discoverable);
- 
-+	/* For broadcast mode, need not add any flags
-+	 * just return true without adding flags.
-+	 */
- 	if (discoverable)
- 		flags = BT_AD_FLAG_GENERAL;
--	else
-+	else if (client->type != AD_TYPE_BROADCAST)
- 		flags = 0x00;
-+	else
-+		return true;
- 
- 	if (!set_flags(client , flags))
- 		goto fail;
--- 
-2.17.1
 
+--=20
+Luiz Augusto von Dentz
