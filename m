@@ -1,132 +1,89 @@
-Received: from mail-lj1-f182.google.com (mail-lj1-f182.google.com [209.85.208.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2D071AA793
-	for <linux-bluetooth@vger.kernel.org>; Wed, 20 Nov 2024 15:13:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 798EC1EB3D
+	for <linux-bluetooth@vger.kernel.org>; Wed, 20 Nov 2024 15:20:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732115639; cv=none; b=bHXGGmfz2Z6CgF/KwY/KuVzSk3hWEiM8C8OmzSyz5NWHPh+3d3xVI9s598o/3qgAVkuVhjmQ6FKzOr89dRtTAYrMBlQ9y4qWWhOufdyjwLOzTSzOKjN7oU4Iiirq8LBSpnY4LaPJWosfUnC57nCbk3yPD2HSrGGFulJYAPPOUCE=
+	t=1732116022; cv=none; b=ZgJxBDfWaQb1Xr2LJqMPt6Je02fVAC7m4PshFHHFvs865oBIQ+YzPX0YJqP1VIVP4n67hGuRuAuz05LZ5+G9kqOcLI7K4dDPymRK64EbAyxuzqNgWahdJwbVMlWnAUPC9MrZ9Y5cKHgyuZ1Pt1eKvhedb3thaYEE3E0Zbb74xvQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732115639; c=relaxed/simple;
-	bh=gL7ZCooCxZuw4uX3cLwGzs8B+euK8O6BHQdiGCoJmb4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=a6OZ7+eyX+yNsp11D8Fvw7fQ/G9jV9jofkG1swvHhCNYi620IbeSvv+vSyWrdc3+LeEsEWWhT1Esw2qBc1o/K/5MJiMA/b7c1qBoML2g8XU/Ms1+JqZMi+qalBVQzNOEA+9VwHt0XBOiO3C0IaeukkWn9FFpAP6mfl9Vm69Dqbw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UVLqLNEN; arc=none smtp.client-ip=209.85.208.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1732116022; c=relaxed/simple;
+	bh=GPpasXgPBKpgPkrBGEe3DjgBJOla7nJVg2lP3iN70iE=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=gCVNAWM2O8AZViup6/J51DMyml646Et7nZPUWx6QOXZw3goPlOyY5ZNFCreWrBnG52/7QTlpmgbgl7U2yns4sCxdb/Mo8iRCQrMSwJyyfi+be7ZmFZiz+Nbc/6a/wkIr7dfsODR2vxpNoB+Qe+N/zwhvdbCSFd8j2DTAEULR4e4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OXYfdA9z; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UVLqLNEN"
-Received: by mail-lj1-f182.google.com with SMTP id 38308e7fff4ca-2ff64e5d31bso24326851fa.0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 20 Nov 2024 07:13:57 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1732115636; x=1732720436; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=X0uyLOwOPOnyASOtKVtTmvH9ztq8azMSS3wSuRKFQhE=;
-        b=UVLqLNEN/NTd0qDfnOP/x/Udp4c52L5iwpZV/X/0SbZ02Sz5jSjcvEnHj+OuUP8xhT
-         4PRAWMvM3RcxKbYKmN7hyPX9NBMKP9vZLL0CuY04Vbt8pkokHlMW83Ho2bNFStDrx4WF
-         UvhjZgngatg5xkOOQd7KUZ5mgsfUK76fFvrVc4p5840wfGaUp8TbJSqMqci0rIb560fq
-         kSOHc7//6G7MshUZp7inGrqNuwsCMZbRW5va4+GZhfQDIIADmXxJCpwqHOalulYvKX3B
-         hEmmsyC1aTYZINDvVvNj3ObZJW/5SE5w3QbLaVmKRXH50R4mYMTZM5X2geJ0QRFbUioS
-         DDyA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732115636; x=1732720436;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=X0uyLOwOPOnyASOtKVtTmvH9ztq8azMSS3wSuRKFQhE=;
-        b=iHWcwT2Pr2kXz5qfHuf2HZS+0OCDYRAOGB2aDHl4gcdogAYONUUI5sG8qZSEAOA23a
-         63S2QPCwJwjfLrMhgK3J0QfhMS2Gtyy2vhqsNm/4xIAUKTUfeX2SlUn0uva0yzzRe52q
-         Ohr9OIxQrpgEy8/9ePdG000uja1N1X0KsV5RWMo0O1C8FO9JKT/mK4uJx9ZxEBItb/Jr
-         fo0mKXxo2sT1R/JOafd7RCgQvzzzr4qN9v3Rm6IlTnrbe3iWmALc/RGEsZlVhx/lO4QN
-         URgiJD3Rch4ntuv+MMOzQtz+OmQcFYK3rWuYZt0Lp5M+ifhB+C0kJ1b/3umpydnnLYRX
-         YIOQ==
-X-Gm-Message-State: AOJu0YyATp6TjRVHSHBit9p7YJq7CncSz0/P+eSSJUFUK1i5DQiwQWTL
-	Jyv/2WuGBtkb5deJlrS8KKTNiQXYibE4Xo88PMfWpgBhCDvbDjLk1Y41BcBXQ0CiLhVVD06Jdz5
-	+l+IahHnIDO0K0hMp30cVLZPl33GQIfz1
-X-Google-Smtp-Source: AGHT+IEVCnEMl5Rvuv4FSHD2v2Jcx5GJ5KlReZtYkILg+8ZZrdmj3VKtA+t39OjdLr8+VmDg+5QH1EabVaxIWGicLb4=
-X-Received: by 2002:a05:651c:b25:b0:2fa:cc86:f217 with SMTP id
- 38308e7fff4ca-2ff8dcbabdamr20746971fa.35.1732115635565; Wed, 20 Nov 2024
- 07:13:55 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OXYfdA9z"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 03692C4CECD;
+	Wed, 20 Nov 2024 15:20:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1732116022;
+	bh=GPpasXgPBKpgPkrBGEe3DjgBJOla7nJVg2lP3iN70iE=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=OXYfdA9z9AnMrSwQwZSVIinChFKpaENGiDY0dlTgs0ajeITYjMiY2xbfvYV8BblEk
+	 SxmcvkJMNGp/Fvl5PMZ24KFwGV6ZTw6lXTdc5b/+wg1r9IOUJNsYO88GzFj/wtQrGy
+	 VRMNKmAwXuek9aQY9Vmx0yNzp5oISo45v1HMW39UkTQaHBB4Yin58FPTaZKqK/WBQv
+	 4k9ZMQ5ZDbGUQHwTIIZzK4QoSCeK02EwWOlvS8QM03ZWO1AP3WY2ASYQcMz2ZF01cr
+	 rQpf6yuKjKbaR4BpA1m6oJhuFCUsWZ87VvjZxp1forDmL8eIvYTTKNJcXZ3KqHYYW2
+	 6p6uB3OSnDBbg==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB28D3809A80;
+	Wed, 20 Nov 2024 15:20:34 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241120144918.11991-1-quic_prathm@quicinc.com>
-In-Reply-To: <20241120144918.11991-1-quic_prathm@quicinc.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Wed, 20 Nov 2024 10:13:42 -0500
-Message-ID: <CABBYNZL=HwZ1rsgghwF90VyfFVmLJwcT2LJEKK0-T__3N1jBaA@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] Fix for broadcast mode, not to add any AD flags in
- advertise Data
-To: quic_prathm@quicinc.com
-Cc: linux-bluetooth@vger.kernel.org, quic_mohamull@quicinc.com, 
-	quic_hbandi@quicinc.com, quic_anubhavg@quicinc.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH BlueZ v2 0/7] bass: Rework Scan Delegator
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <173211603375.1254308.5361878885594387352.git-patchwork-notify@kernel.org>
+Date: Wed, 20 Nov 2024 15:20:33 +0000
+References: <20241120102601.38415-1-iulia.tanasescu@nxp.com>
+In-Reply-To: <20241120102601.38415-1-iulia.tanasescu@nxp.com>
+To: Iulia Tanasescu <iulia.tanasescu@nxp.com>
+Cc: linux-bluetooth@vger.kernel.org, claudia.rosu@nxp.com,
+ mihai-octavian.urzica@nxp.com, andrei.istodorescu@nxp.com,
+ luiz.dentz@gmail.com
 
-Hi,
+Hello:
 
-On Wed, Nov 20, 2024 at 10:00=E2=80=AFAM <quic_prathm@quicinc.com> wrote:
->
-> From: Prathibha Madugonde <quic_prathm@quicinc.com>
->
-> src/advertising.c
-> Include check for broadcast mode:
-> Need not set flags in AD flags of Advertise Data
+This series was applied to bluetooth/bluez.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-Please reword the last sentence to something like: "AD flags shall
-never be set for broadcast", also add traces showing what is
-happening.
+On Wed, 20 Nov 2024 12:25:54 +0200 you wrote:
+> This patch reworks the Scan Delegator implementation in BASS, to
+> manage BAP streams internally and leave BAP to just handle streams
+> created by autonomous Broadcast Sink.
+> 
+> Thus, this also removes long-lived PA sync support from BAP and
+> also the pa idle timer, since kernel support has been added to
+> order PA/BIG sync requests.
+> 
+> [...]
 
-> Test steps:
-> From DUT, bluetoothctl go to menu advertise
-> secondary 1M/2M
-> name on
-> back
-> advertise broadcast
+Here is the summary with links:
+  - [BlueZ,v2,1/7] shared/bap: Add helper to parse BASE
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=a0aee49df1d8
+  - [BlueZ,v2,2/7] bap: Add helpers to convert iso_qos to/from bap_qos
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=8054693b0c5b
+  - [BlueZ,v2,3/7] bap: Rework BASE parsing
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=66a83fde5c49
+  - [BlueZ,v2,4/7] bap: Make default PA sync QoS public
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=3babeefa17b6
+  - [BlueZ,v2,5/7] bass: Rework Scan Delegator to handle BAP streams
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=ac56526b7e39
+  - [BlueZ,v2,6/7] bap: Remove API to probe device from BASS
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=e618932b968f
+  - [BlueZ,v2,7/7] bap: Remove PA idle timer logic
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=e59a915db9d8
 
-In case you don't know it, it is possible to call command from
-submenus directly:
-
-advertise.secondary 1M/2M
-advertise.name on
-advertise broadcast
-
-> ---
->  src/advertising.c | 7 ++++++-
->  1 file changed, 6 insertions(+), 1 deletion(-)
->
-> diff --git a/src/advertising.c b/src/advertising.c
-> index bd121e525..2fc6f917d 100644
-> --- a/src/advertising.c
-> +++ b/src/advertising.c
-> @@ -759,10 +759,15 @@ static bool parse_discoverable(DBusMessageIter *ite=
-r,
->
->         dbus_message_iter_get_basic(iter, &discoverable);
->
-> +       /* For broadcast mode, need not add any flags
-> +        * just return true without adding flags.
-> +        */
->         if (discoverable)
->                 flags =3D BT_AD_FLAG_GENERAL;
-> -       else
-> +       else if (client->type !=3D AD_TYPE_BROADCAST)
->                 flags =3D 0x00;
-> +       else
-> +               return true;
->
->         if (!set_flags(client , flags))
->                 goto fail;
-> --
-> 2.17.1
->
->
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
---=20
-Luiz Augusto von Dentz
