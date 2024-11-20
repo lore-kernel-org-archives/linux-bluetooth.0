@@ -1,58 +1,58 @@
-Received: from mail-pg1-f181.google.com (mail-pg1-f181.google.com [209.85.215.181])
+Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFDAC19C542
-	for <linux-bluetooth@vger.kernel.org>; Wed, 20 Nov 2024 13:03:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D685288B1
+	for <linux-bluetooth@vger.kernel.org>; Wed, 20 Nov 2024 13:03:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732107783; cv=none; b=VFjXxRHm/UUzYgekCfMYRTXcdmj+4WqaGJtB3alJgbCDLcsDbcSsiEQ+WEEAs+h49HHmp5y33zZ9Vkq+ev5e3OcrgdJ0QfNA6oAaJCFH/HQPyNXD8fPVxw4MZgC0PsCPNhv7e+UlIwkXTuGERIFRkDLdZO9bd1NEhhTGwxHSGtY=
+	t=1732107816; cv=none; b=hCXG09VzOiWSipkaNfKClLEXuFQ9Rl0uI3b14XWCl6QvzC/l5gVUHpHDrsfrLPyqyHLxOqqSAj1lgJex6Zj7UlBoIMYG69uG9a9i4GPYGr7W1jvSwgLc0QNSKoG9NxgBM7x2BULv5X8msvwKNRWQX9G2mdA2LxG9D8M0ODIZL6g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732107783; c=relaxed/simple;
-	bh=AklO7Ep37Z9t8zPpacdd7LvHYRJG1f+G637csZYAuDc=;
+	s=arc-20240116; t=1732107816; c=relaxed/simple;
+	bh=Nl7Uj77zSazbfBxfTeLtOPuIELKoGTxwd0eeBgvEVGg=;
 	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=hNXfhQ7SQ7YYJw5hiO+Y2m6QZr5Hj7vTzLNlpqZj9Hp8kWsIo7d6bs8+ur6CbtkYBtdIk8uu+S7kOBwVe4z905TRtyyxVx2EJBARcTfe9LtEfY9rGltGSY/wTq6hmYqeKBX6DACGrNvS63ob2dI+g5d1WOcGo9Z9NeOseZqskVE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=heitbaum.com; spf=pass smtp.mailfrom=heitbaum.com; dkim=pass (1024-bit key) header.d=heitbaum.com header.i=@heitbaum.com header.b=T31AOBYQ; arc=none smtp.client-ip=209.85.215.181
+	 Content-Disposition; b=lcszVh5lskLi0HDi6e5W1x8ItSJ4toBglw+PuKqFkH0KGVN3bZNH2WoCUULajo81niSVdfIEfsGiXbJEMjAqBUDdy0HUeWc4/thwR2K7WU+G7mLcR8GhVQqn/HwvLckVvuq6QNuXJx/8JvD5XUpT6P1VsKpZjvw6U2VDaFQRk4U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=heitbaum.com; spf=pass smtp.mailfrom=heitbaum.com; dkim=pass (1024-bit key) header.d=heitbaum.com header.i=@heitbaum.com header.b=Zk6crl04; arc=none smtp.client-ip=209.85.214.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=heitbaum.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=heitbaum.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=heitbaum.com header.i=@heitbaum.com header.b="T31AOBYQ"
-Received: by mail-pg1-f181.google.com with SMTP id 41be03b00d2f7-7ede82dbb63so2622131a12.2
-        for <linux-bluetooth@vger.kernel.org>; Wed, 20 Nov 2024 05:03:01 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=heitbaum.com header.i=@heitbaum.com header.b="Zk6crl04"
+Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-21278f3d547so2421015ad.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 20 Nov 2024 05:03:34 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=heitbaum.com; s=google; t=1732107780; x=1732712580; darn=vger.kernel.org;
+        d=heitbaum.com; s=google; t=1732107813; x=1732712613; darn=vger.kernel.org;
         h=content-disposition:mime-version:message-id:subject:cc:to:from:date
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=Bq2LOKLCr5boFFSS1gEXMTqxlqLDdnDIUV5osrtgs40=;
-        b=T31AOBYQLfHQCHH6FIUvtvZ0mhXhbUoaVyUfHqV0JHsrcFlmnix0QfzYb2WaznBfB2
-         GG5IqhQJaN5IcbIbL5GUBLB39IxM6pkDasAKI+NjWlQs9/D3zydlv0iTn/jrQPXp0kob
-         7cy29Eq6XlPj7sgLnbpyySSoNXguigtJkAe7M=
+        bh=3/9EqiUUwupYdHmVhIr5usiRW+faP9ptimY7V0ByCqA=;
+        b=Zk6crl04j+cgel7JrgBaSj2lKNk1LwpxfjNEWSIK9dwj3KQyA4LgjGPhVRg5SPc7xX
+         0oW2PIeeiJrU1nc/Hmf6U+CZ1ivDhIUHBZg4NEivs5UuQAqXt3CojHB6uB+8+7jDJURc
+         wFjsA4rJTXH8OBVG2TC9stUmtSfFLjlUH382o=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732107780; x=1732712580;
+        d=1e100.net; s=20230601; t=1732107813; x=1732712613;
         h=content-disposition:mime-version:message-id:subject:cc:to:from:date
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Bq2LOKLCr5boFFSS1gEXMTqxlqLDdnDIUV5osrtgs40=;
-        b=erUe9MK9Fl21K/z3l8EcTf0MLWTvQQLe7PHYHt7zFudlJbYo3n/9TAOfMHTKOpBMCH
-         X7A42TT9KtAxG5pwEgyfq3R48xW+3o+Qmdtw4j35OTJQJFAoyP1pnNFzpJn8lhynFPJA
-         GU85GRvjSpNyjjaS0S1O9CW5o4Z8nPnJYkVOeGJJxnsIWGxL1atVrTI2gaI5kqZAqgvm
-         j/Wd4M7o/5S5lEa7BsK5UW/82ooptZ8iv2BN21jBfSZyMIn0iWxNQasyJxGmgf0ozwGh
-         w6jJuX5BJbTGH/wtuYl9skllx8pjABqmp4NTK6tlZ9Jypk7m7Kq89Gp+DpUSeiFkaxTG
-         i1lg==
-X-Gm-Message-State: AOJu0YyZ82Kl2WwW4NTmn5PEodpmVZMwPpUvMh9oJdbCak6U0xIEKDaJ
-	nhx8Q98No2wnQwks25M6NCtg7cZPGza5gbZ2Zdzt5BBL0AF15Kcc/TnZWlGdAHSRpmQ6BAnknnE
-	M
-X-Google-Smtp-Source: AGHT+IH4CJXdEdagEVqZ5qFNRKnVDKs8r5eWx9hVYa7sB0Al6IMyHeMMbQQGF3CUVxalslJ5t2k01w==
-X-Received: by 2002:a05:6a20:2594:b0:1db:e10b:8a9a with SMTP id adf61e73a8af0-1ddae3e7935mr3620499637.6.1732107780141;
-        Wed, 20 Nov 2024 05:03:00 -0800 (PST)
+        bh=3/9EqiUUwupYdHmVhIr5usiRW+faP9ptimY7V0ByCqA=;
+        b=KdVW3KpEyNDfzO07EbqUbtmEumLVY44LmOlnx4TDcawHbpCPavmzNf3WIxLpALs7BD
+         //ttOHm6R9GjbNVUfNrGR6oajjgeKnxRjO9Cj+4PJUQBVWgI9AfMzCtDjw2Qdarkb3er
+         pJMl3pY53D4hcvLIZXJN7baFXdYH59CpuVdlBSYAKS9GqHHPT/G+7JXMvjvt/A3qZrHx
+         yFNTCAxqFUYc7ZxdMpBi8DeBaQg5IQq0S0taobLjVI1D1jPHc2rUcg3FAY2t/ZBQlvUr
+         +vibAVZ6um673SmRZdwLo0k6Q3t+Qc4R6pLK6es2qNZwNl6fV9liJDWrpGFCk/cGxUsV
+         Dheg==
+X-Gm-Message-State: AOJu0YzkUZKzhdBAH+Yq46qLEv9qWie+mtmoCB9gqF3uZxEKDJg8GVNR
+	ZSA+N62BCEtw+JHxE+qkNErrsuBRS2Yi/8N0WdmWw0pv9RQx5JlL2DC02BeiTaHG6OatbE1DyJu
+	K
+X-Google-Smtp-Source: AGHT+IG1AkM7DJvK+kuxFB3v5bm57Z+91vRsVmWfdm7tLaH4k1qlTeOLgVIva7tSBgQgTTfDyCjUlg==
+X-Received: by 2002:a17:903:2301:b0:212:4aec:f654 with SMTP id d9443c01a7336-2126a3c1403mr31762425ad.31.1732107813200;
+        Wed, 20 Nov 2024 05:03:33 -0800 (PST)
 Received: from c8d99ad60702 ([122.199.11.121])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-724befb43b1sm1545857b3a.166.2024.11.20.05.02.58
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-211e9c2f343sm74921205ad.122.2024.11.20.05.03.31
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 20 Nov 2024 05:02:59 -0800 (PST)
-Date: Wed, 20 Nov 2024 13:02:56 +0000
+        Wed, 20 Nov 2024 05:03:32 -0800 (PST)
+Date: Wed, 20 Nov 2024 13:03:29 +0000
 From: Rudi Heitbaum <rudi@heitbaum.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: rudi@heitbaum.com
-Subject: [PATCH 1/3] shared/ad: fix -std=c23 build failure
-Message-ID: <Zz3eAJcwA--0n5lf@c8d99ad60702>
+Subject: [PATCH 2/3] shared/shell: fix -std=c23 build failure
+Message-ID: <Zz3eIRBHrG7DHWiO@c8d99ad60702>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -68,28 +68,28 @@ gcc-15 switched to -std=c23 by default:
 
 As a result `bluez` fails the build as:
 
-    src/shared/ad.c:1090:24: error: incompatible types when returning type '_Bool' but 'const char *' was expected
-     1090 |                 return false;
+    src/shared/shell.c:365:24: error: incompatible types when returning type '_Bool' but 'struct input *' was expected
+      365 |                 return false;
           |                        ^~~~~
 
 Signed-off-by: Rudi Heitbaum <rudi@heitbaum.com>
 ---
- src/shared/ad.c | 2 +-
+ src/shared/shell.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/src/shared/ad.c b/src/shared/ad.c
-index d08ce7af9..dac381bbe 100644
---- a/src/shared/ad.c
-+++ b/src/shared/ad.c
-@@ -1087,7 +1087,7 @@ bool bt_ad_add_name(struct bt_ad *ad, const char *name)
- const char *bt_ad_get_name(struct bt_ad *ad)
- {
- 	if (!ad)
+diff --git a/src/shared/shell.c b/src/shared/shell.c
+index a8fa87696..aa6c16c8c 100644
+--- a/src/shared/shell.c
++++ b/src/shared/shell.c
+@@ -362,7 +362,7 @@ static struct input *input_new(int fd)
+ 
+ 	io = io_new(fd);
+ 	if (!io)
 -		return false;
 +		return NULL;
  
- 	return ad->name;
- }
+ 	input = new0(struct input, 1);
+ 	input->io = io;
 -- 
 2.43.0
 
