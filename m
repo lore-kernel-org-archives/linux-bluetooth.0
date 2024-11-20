@@ -1,125 +1,119 @@
-Received: from mail-pj1-f44.google.com (mail-pj1-f44.google.com [209.85.216.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75DA1156F39
-	for <linux-bluetooth@vger.kernel.org>; Wed, 20 Nov 2024 14:21:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C26B3A939
+	for <linux-bluetooth@vger.kernel.org>; Wed, 20 Nov 2024 14:37:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732112517; cv=none; b=sgoS00mT/Kynb82WQJ3XFah96PtClfabmIBeutxSMXWfU66pBgqVuaFdyE7dL6GhHLzbPqreAxU8TZXOzXQhst8Hlrw8SfZWdiyF9Mz7XEYYySqAvQaomaLqlXqtgX84EaeApKhobBUjyx30Afzy8MBtqKJdIc2bAz60l6LF34k=
+	t=1732113456; cv=none; b=t3VaeF3p6laM0Nr+dIygoCcdLf/D2FjqPNJAYkJlFRwDB5INKrwMcH34w6eXmwuyetiGQWAhsWSTE35AN6CWlcvpY0LSZImtCZTUR4Jw/F6Nb2fCyb7hkMaIdAHONRmNMU0UsZWt+IOTkHxAVUUM0vQT0hAxIPInChHeP84b63U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732112517; c=relaxed/simple;
-	bh=G9kXSTVxGOeF95NtX7eISMZrwkrPqCkZFPP5temCld8=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=R3PxZ+nv+3uIFNVkf6JlPHYyQHIJfny8nk5W2JtQ/qFH8JZ0NJKOTKl440BD6JBU+B8/gGoLPt/8FRLCGpuHUqKO7wFsd8AShG0wIORehPgmdoGS4/jXI6EyE29decG17gRiktgQyx5ihT4XFySxqpJCJMPPau1cJm4agj28W/8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SFJFkhGz; arc=none smtp.client-ip=209.85.216.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1732113456; c=relaxed/simple;
+	bh=su7WJmUIZ9jKE5Bez5z4iqyaWrwaXyXQAG01t2jjdJU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=lNLgkoQG8ncNAE9P0s2X9gR1+tQU3kK+x4c2vpO/wh589znPLm9PNsSuiqGeVHu9mk/5rU0x+Uk3I7JZR9ExytO0LxJCNQIKg/kfZHLCXmGJj6AOavit917tIPgv2Gdha6v/EtrdkD2Xt7D1qV/+3IMMpnnUUpL/6LWrsf2UE0g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=S0UYudvY; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SFJFkhGz"
-Received: by mail-pj1-f44.google.com with SMTP id 98e67ed59e1d1-2e3686088c3so5076802a91.0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 20 Nov 2024 06:21:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1732112514; x=1732717314; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=cM/xtoCc7EP3yA+2HE3nLWBUdyI1vRXl61ynk9ZtaDA=;
-        b=SFJFkhGzll+HwGUCkukf7HwD+2c0V29qCN4FCDmPIi+029ZVwENYY9GakT6dYHqlt6
-         u6OnlAJn711sXnm3TYGPGKtRbJv5czcZu25Mja7GDk0GcukcLFvYdZ2pXqGVq++bVCWD
-         5fWIHSVBLb+no0uDiylzvmYR/5yTN3lq8fW4iEwJuVyGVXg2UppPrynVnMxv0+BJ929z
-         myYW3lhc3mMzKLehOLiSyJXFGKOULAVtnREvvy4GKYKI/6mTA55ori5t0erwa9saIVEk
-         PH2UdF60Kl2eDwF2z5Qf85zaJJm5TZ+mFUYtudiywh30BIaRpNpTlgfIqqtQ4EE1jOds
-         qFpA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732112514; x=1732717314;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=cM/xtoCc7EP3yA+2HE3nLWBUdyI1vRXl61ynk9ZtaDA=;
-        b=BwPbtzmqgGKr3kpLdGTi6MbOXstMViakzIDpyoSwullajrb3SZao6+jeecpMAVrAst
-         oyu7bH/y0eUpBikMQGeoxg/3yaztN0Fr0uQrCMm4jQ95goakeQFLAvNhfDow9sUo89p4
-         4OgtkGeEeoY+Mv0Xjk6BWUn5ba7RWPkaM37/+OebttUOZ+iqMMk1EL1P3PbqH/30TLdM
-         WkX2bjJYUjRjKEh7yX76tGhpuBivYt1pX393Z494uSh7iCwB4B+mUvfqbSeaUBzWRPtS
-         mI03BhAhG+m4L6Djzb9TLtNsHjm025xD8bCCQXq6swNnYMPQdAn6j3waUzXWW409j9lq
-         fLlw==
-X-Gm-Message-State: AOJu0Yx5ueEzAd5PmpKgKgjAaB41u+/V5tiKdnfpHmBRNeR6GuyDLFhk
-	BsWOwtczYNXqtEG5AfCY7mZfA8g9SJDAUu2f7Jmzbt7LOeoEVPjy69+/wA==
-X-Google-Smtp-Source: AGHT+IEEfGTYGvDQGzgV70+QHZKbtQWXsDnH2MeQo08UQH3U0z4E6ruIqZG3OYuIziuLIQcueOlVUQ==
-X-Received: by 2002:a17:90b:1651:b0:2ea:853b:276d with SMTP id 98e67ed59e1d1-2eaca737dfdmr3703781a91.17.1732112514285;
-        Wed, 20 Nov 2024 06:21:54 -0800 (PST)
-Received: from [172.17.0.2] ([52.159.137.225])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2ead04f0a83sm1353932a91.43.2024.11.20.06.21.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 20 Nov 2024 06:21:53 -0800 (PST)
-Message-ID: <673df081.170a0220.b0047.4bd3@mx.google.com>
-Date: Wed, 20 Nov 2024 06:21:53 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============7962556169190954872=="
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="S0UYudvY"
+Received: from pps.filterd (m0279863.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4AK9FJXF029732;
+	Wed, 20 Nov 2024 14:37:32 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	AGsU/RdNr7SLDLOKICRVFd66QweLovoaU2c/yIlIvbo=; b=S0UYudvYPHJkBhtq
+	UVrdXf0d26yEa50ZyvHKhZMDr+Cp5uqnUYUQLon1SqwmK2LlAbAcXeOphYJQoVLb
+	LNCrW6CqV2as4ayqL662VssgH6FjJpY2HanCe+eL/omMGnbCNdXVHxXDRX7e5Lmo
+	3FzdNwvehLLx9H/wmxasjq5WiXaHto0eNUk+CiDRc9z07EvZE46/kIp1aIyQP9xZ
+	SOE5s1nZvQ9G2W6c/kf2ShZ/Uo8bsQ0Dyb5iWB/q8XUY7n258iu5YN0ZqB8DbIUn
+	UEqr/tEKZyyROcCw9vNR3fivJjcU+E4znRoB/jveuajdOaw33V67fgaTmKWo2u3c
+	tw++yg==
+Received: from nasanppmta01.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4319529dc8-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 20 Nov 2024 14:37:31 +0000 (GMT)
+Received: from nasanex01a.na.qualcomm.com (nasanex01a.na.qualcomm.com [10.52.223.231])
+	by NASANPPMTA01.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 4AKEbV1t030558
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 20 Nov 2024 14:37:31 GMT
+Received: from [10.253.9.184] (10.80.80.8) by nasanex01a.na.qualcomm.com
+ (10.52.223.231) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Wed, 20 Nov
+ 2024 06:37:30 -0800
+Message-ID: <54817cb6-8e52-491f-b977-77ad712c7588@quicinc.com>
+Date: Wed, 20 Nov 2024 22:37:27 +0800
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, rudi@heitbaum.com
-Subject: RE: [1/3] shared/ad: fix -std=c23 build failure
-In-Reply-To: <Zz3eAJcwA--0n5lf@c8d99ad60702>
-References: <Zz3eAJcwA--0n5lf@c8d99ad60702>
-Reply-To: linux-bluetooth@vger.kernel.org
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v1] att: Check security level before setting
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+CC: <linux-bluetooth@vger.kernel.org>
+References: <20241120080447.233393-1-quic_jiaymao@quicinc.com>
+ <CABBYNZJympX_P4vO1Vg6Y-RKZYJDrSrHRh79NmttyDY8hQRSOQ@mail.gmail.com>
+Content-Language: en-US
+From: Jiayang Mao <quic_jiaymao@quicinc.com>
+In-Reply-To: <CABBYNZJympX_P4vO1Vg6Y-RKZYJDrSrHRh79NmttyDY8hQRSOQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nasanex01a.na.qualcomm.com (10.52.223.231)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: gCRYXM1c2s5Oxty9nvW5ubuUrT5LKK1Z
+X-Proofpoint-GUID: gCRYXM1c2s5Oxty9nvW5ubuUrT5LKK1Z
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
+ definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 phishscore=0
+ adultscore=0 priorityscore=1501 impostorscore=0 suspectscore=0
+ lowpriorityscore=0 mlxscore=0 clxscore=1015 spamscore=0 malwarescore=0
+ mlxlogscore=928 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2409260000 definitions=main-2411200097
 
---===============7962556169190954872==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi Luiz,
 
-This is automated email and please do not reply to this email!
+On 2024/11/20 22:20, Luiz Augusto von Dentz wrote:
+> Hi Jiayang,
+> 
+> On Wed, Nov 20, 2024 at 3:18 AM Jiayang Mao <quic_jiaymao@quicinc.com> wrote:
+>>
+>> bt_gatt_client_set_security could fail if the security level in
+>> kernel is already BT_ATT_SECURITY_MEDIUM but long term key is not
+>> ready. So, get and check the security level before setting it.
+> 
+> Ive already pushed a similar fix.
 
-Dear submitter,
+I just saw your fix. Thank you very much for the update!
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=911278
+> 
+>> Signed-off-by: Jiayang Mao <quic_jiaymao@quicinc.com>
+>> ---
+>>   src/shared/att.c | 3 +++
+>>   1 file changed, 3 insertions(+)
+>>
+>> diff --git a/src/shared/att.c b/src/shared/att.c
+>> index 4a406f4b9..dabbdb431 100644
+>> --- a/src/shared/att.c
+>> +++ b/src/shared/att.c
+>> @@ -727,6 +727,9 @@ static bool bt_att_chan_set_security(struct bt_att_chan *chan, int level)
+>>   {
+>>          struct bt_security sec;
+>>
+>> +       if (level == bt_att_chan_get_security(chan))
+>> +               return true;
+>> +
+>>          if (chan->type == BT_ATT_LOCAL) {
+>>                  chan->sec_level = level;
+>>                  return true;
+>> --
+>> 2.25.1
+>>
+>>
+> 
+> 
 
----Test result---
-
-Test Summary:
-CheckPatch                    PENDING   0.38 seconds
-GitLint                       PENDING   0.31 seconds
-BuildEll                      PASS      20.86 seconds
-BluezMake                     PASS      1659.99 seconds
-MakeCheck                     PASS      13.31 seconds
-MakeDistcheck                 PASS      160.21 seconds
-CheckValgrind                 PASS      215.87 seconds
-CheckSmatch                   WARNING   274.51 seconds
-bluezmakeextell               PASS      99.59 seconds
-IncrementalBuild              PENDING   0.49 seconds
-ScanBuild                     PASS      857.14 seconds
-
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: CheckSmatch - WARNING
-Desc: Run smatch tool with source
-Output:
-src/shared/shell.c: note: in included file (through /usr/include/readline/readline.h):src/shared/shell.c: note: in included file (through /usr/include/readline/readline.h):src/shared/shell.c: note: in included file (through /usr/include/readline/readline.h):src/shared/gatt-helpers.c:768:31: warning: Variable length array is used.src/shared/gatt-helpers.c:830:31: warning: Variable length array is used.src/shared/gatt-helpers.c:1323:31: warning: Variable length array is used.src/shared/gatt-helpers.c:1354:23: warning: Variable length array is used.src/shared/gatt-helpers.c:768:31: warning: Variable length array is used.src/shared/gatt-helpers.c:830:31: warning: Variable length array is used.src/shared/gatt-helpers.c:1323:31: warning: Variable length array is used.src/shared/gatt-helpers.c:1354:23: warning: Variable length array is used.src/shared/gatt-helpers.c:768:31: warning: Variable length array is used.src/shared/gatt-helpers.c:830:31: warning: Variable length array is used.src/shared/gatt-helpers.c:1323:31: warning: Variable length array is used.src/shared/gatt-helpers.c:1354:23: warning: Variable length array is used.
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============7962556169190954872==--
