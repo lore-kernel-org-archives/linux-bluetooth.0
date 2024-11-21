@@ -1,115 +1,141 @@
-Received: from mail-40140.protonmail.ch (mail-40140.protonmail.ch [185.70.40.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f176.google.com (mail-qt1-f176.google.com [209.85.160.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80856188717
-	for <linux-bluetooth@vger.kernel.org>; Thu, 21 Nov 2024 18:07:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.70.40.140
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BA496F06B
+	for <linux-bluetooth@vger.kernel.org>; Thu, 21 Nov 2024 18:37:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732212475; cv=none; b=co7Em+/0qHifRNByiVUCL8yb3wkZe2umTMGj+tEtMc4fCt977fCHDa5kpuycpRfWIoeBNapezh1/tNsKg5XGp3oOqnb4XFVWG7hrNpgmXCVMyINJkbSzGEtordY7NIww7tDp4rXvrLA6kawjYKQUt/qz4i1qN9gELSAfHI5D1ns=
+	t=1732214230; cv=none; b=H/bEVXa5SGcVH8xoL1EeMw2GlBuvn8FgCEPsvsxPrR6UavuQyzJQUI9hxw3fVY/d/TEX/K69QvNzT5tySOhCJ7s0IxL95OOl+cLbmzfIV9hVRLhtadJ/W9wCqvL2Qu2PaJlYECgyjjzMxmtauMNODq+Iw8cCnNRDPSaJy6iKJTc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732212475; c=relaxed/simple;
-	bh=6mFh8aWcmnOx3PFe9wnRnr6usTVWmUmEg15Hs+YLvuM=;
-	h=Date:From:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=NnOctTROxl5LkHj8UXDqnrdpBQyaXMWA89AUe6GTSHZGEZ2Q1Glke7gXPyeymIrtuNNFX0GehSAoJfdZzNcrFT0mZ8KykjI2BnQ/cJmH637hR21LjK3peV6M1QUg4ff8RHXC5ASeHC/m5jUfvziUINhjjFPl0VBsmD5M6rc/2nE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=protonmail.com; spf=pass smtp.mailfrom=protonmail.com; dkim=pass (2048-bit key) header.d=protonmail.com header.i=@protonmail.com header.b=zXxHufkU; arc=none smtp.client-ip=185.70.40.140
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=protonmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=protonmail.com
+	s=arc-20240116; t=1732214230; c=relaxed/simple;
+	bh=xVLd2M4+vg6TKKTXM3mw9stH0fM7Mw/GGlxAywCWYfE=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=YY3YWY3ga59OYEnIq/Acd0L7fnKu5c9R6WgXJgyre4tK9Nz0AdfZo3P8U2dL9D1oEPsoOFYHe5qyN1aXZRSWZOrj8I9+zi5/UQZ7u5jJ9FzCNWyplfSP3UYxYg3q+YF5+Cy9jyzqVeDo8qe2NUHuQ1+Y7LtsCkD3jundshPldKI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=J6t12MAc; arc=none smtp.client-ip=209.85.160.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=protonmail.com header.i=@protonmail.com header.b="zXxHufkU"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=protonmail.com;
-	s=protonmail3; t=1732212471; x=1732471671;
-	bh=r2xvjAwO29eEItBGYM5V6kOh2AA0Ww/PkWx4bG2QwHU=;
-	h=Date:From:Cc:Subject:Message-ID:Feedback-ID:From:To:Cc:Date:
-	 Subject:Reply-To:Feedback-ID:Message-ID:BIMI-Selector:
-	 List-Unsubscribe:List-Unsubscribe-Post;
-	b=zXxHufkUZ1/70iPa3GDVQettmMR+C7MhlxAfe55Pkr/Rfh+0f7dstce9jzyN5g1xR
-	 b2t0gtJBsNW4pUcgz7Q6VQzQkWFnjEeYTpqcf2FTlNhdwumt5O2FFBQueO2efcA5iO
-	 Ejqtb4vmWtPF9VQAGbkZTZkHF8qzGdSrl7jwnodn/5QRJ8A2bAeZzmHmTYLKCTXfXU
-	 E+BxmfOmVBgEuGhE6scUxbaKdwtQO5bQRceA+dyNl3slkx+3+E8WDU2jvDzkAlKH+m
-	 8RDAhE04gAT+bCpkEmwMFZl6vmXBTMEApqLEXC5h+gac0ThXcZgpBsYDn8bfvOPDEC
-	 LLsGUmzDVGnHQ==
-Date: Thu, 21 Nov 2024 18:07:46 +0000
-From: Gregoire Stein <greyxor@protonmail.com>
-Cc: greyxor@protonmail.com, Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH] Bluetooth: btusb: Add one more ID 0x0489:0xe10a for Qualcomm WCN785x
-Message-ID: <20241121180742.156230-1-greyxor@protonmail.com>
-Feedback-ID: 1917010:user:proton
-X-Pm-Message-ID: c4ffef790b6f5c2606d9c24de641d8bed20764df
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="J6t12MAc"
+Received: by mail-qt1-f176.google.com with SMTP id d75a77b69052e-460d2571033so8414301cf.1
+        for <linux-bluetooth@vger.kernel.org>; Thu, 21 Nov 2024 10:37:08 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1732214228; x=1732819028; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=t3MPqIRNyHkF/Azwe2MX8gBSgHi1RNkUxozZ9JVwbkg=;
+        b=J6t12MAcamIxJhKmWSndUzWu4yNacSp/xYQKKFYLejlVg741gQcWucJO7gkMx+y8Ar
+         5AjCZE/SMNeRu0voAeh+qA9VwZg0/yXZFhEhx5z3YmAAz/LxFc5JFPJSX0iEBa4nr8Kb
+         VjlK2Rs2XRjSUHk53DZsHxctuxgQjAfsJ2dmwvbkwleYHBoicPGNhJPQuX/tzII8Bix0
+         rs9+LorOoLecTUrIthtFqXiQQzYXL373zQs/q5xdZrNP3VPbqN8j8z6ri2oZ5xiGbQOF
+         sZ5+LmYdUHjRDAfxjg5yyWarMtZBvTugLHMGMZ8TFm+KeEtiUdJf/nv6C72NXd5xaesV
+         9ihg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1732214228; x=1732819028;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=t3MPqIRNyHkF/Azwe2MX8gBSgHi1RNkUxozZ9JVwbkg=;
+        b=KDlEovYu6aeW56R/b8VfWEFWwfEvF72HTyWf8forP4MV3WYcd7fwoDUAhKV0R8n7HV
+         Vm0ntjSSex8hRmc0qFUGE8Kd5fPoEQneJam/w1eMzXG2EktRrJcbr2XKr3WQcPYPZQSX
+         ixFOhncTfopkBax+S339dkR2HqxGBbXrOhfwkmmhoihDHrT9G8aEW5cgZNhVFt3GAWKR
+         IlfaeIiRLPevED5tzpakrWgIhG1DYmAyfzB+efm5bu7famI1axg2oIi7+C+savnydBP0
+         GtmA5ERFdOjNozXRPWQMsvb61s7s3V0UnAPTGPeK0K6xwZLoxFPYb1zZ4uUkIepighnA
+         oQNw==
+X-Gm-Message-State: AOJu0YyOGqAwTdcS/tXQg+ucskqgnwybwBEC2RJCNvci45DV8TtWQz1p
+	+KvHwi1FNixNpzyQzrFEKT22oZkzv1t3fdioby4ft5hT5NIYV9n0l9JyBg==
+X-Gm-Gg: ASbGnctX8TbLpiBN/TJmgqmknCfK+sjn9FFZ2kVcNl8GcX4i9JvvhbRcBX5eEkexN5L
+	VSsgAgFz8lyXnkRnWxgbp9gN0xV2xcFVsgDd04RUeTDBdNfYwMmxuF0FTn2PU8KKuLOdWYuKPpE
+	tSsoQ/unDMZIVQcOpIzdDmHl4FiIb3xmfaDyZKwpkP5AMN1k17HZLDO04CneitqwF2DnCNtCyoq
+	V2Tmd8RJ/u4cSRBXTbMIrSExIrHbUA7/DNagx3jIYg5lp6vTOfKXzCrxAQ=
+X-Google-Smtp-Source: AGHT+IFzFKNM1IjN3FHztwLQDSd8SG65hXAKJEG9L5jmZ39E2eAayRuzHAUrGre5Zz+J80dg4iomcg==
+X-Received: by 2002:a05:622a:5919:b0:460:7c45:2218 with SMTP id d75a77b69052e-4653d580966mr319071cf.15.1732214227589;
+        Thu, 21 Nov 2024 10:37:07 -0800 (PST)
+Received: from [172.17.0.2] ([172.200.207.224])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4653c3f31d2sm1798351cf.36.2024.11.21.10.37.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 21 Nov 2024 10:37:07 -0800 (PST)
+Message-ID: <673f7dd3.c80a0220.3cb591.0d87@mx.google.com>
+Date: Thu, 21 Nov 2024 10:37:07 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============4887710268098880620=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, greyxor@protonmail.com
+Subject: RE: Bluetooth: btusb: Add one more ID 0x0489:0xe10a for Qualcomm WCN785x
+In-Reply-To: <20241121175851.137414-1-greyxor@protonmail.com>
+References: <20241121175851.137414-1-greyxor@protonmail.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Add an additional entry with ID (0x0489, 0xe10a) to the usb_device_id
-table to support the Qualcomm WCN785x.
-The device information from /sys/kernel/debug/usb/devices is provided below=
-:
+--===============4887710268098880620==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-T:  Bus=3D01 Lev=3D01 Prnt=3D01 Port=3D04 Cnt=3D01 Dev#=3D  2 Spd=3D12   Mx=
-Ch=3D 0
-D:  Ver=3D 1.10 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 MxPS=3D64 #Cfgs=3D  1
-P:  Vendor=3D0489 ProdID=3De10a Rev=3D 0.01
-C:* #Ifs=3D 2 Cfg#=3D 1 Atr=3De0 MxPwr=3D100mA
-I:* If#=3D 0 Alt=3D 0 #EPs=3D 3 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 Driver=
-=3Dbtusb
-E:  Ad=3D81(I) Atr=3D03(Int.) MxPS=3D  16 Ivl=3D1ms
-E:  Ad=3D82(I) Atr=3D02(Bulk) MxPS=3D  64 Ivl=3D0ms
-E:  Ad=3D02(O) Atr=3D02(Bulk) MxPS=3D  64 Ivl=3D0ms
-I:* If#=3D 1 Alt=3D 0 #EPs=3D 2 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 Driver=
-=3Dbtusb
-E:  Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D   0 Ivl=3D1ms
-E:  Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D   0 Ivl=3D1ms
-I:  If#=3D 1 Alt=3D 1 #EPs=3D 2 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 Driver=
-=3Dbtusb
-E:  Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D   9 Ivl=3D1ms
-E:  Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D   9 Ivl=3D1ms
-I:  If#=3D 1 Alt=3D 2 #EPs=3D 2 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 Driver=
-=3Dbtusb
-E:  Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D  17 Ivl=3D1ms
-E:  Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D  17 Ivl=3D1ms
-I:  If#=3D 1 Alt=3D 3 #EPs=3D 2 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 Driver=
-=3Dbtusb
-E:  Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D  25 Ivl=3D1ms
-E:  Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D  25 Ivl=3D1ms
-I:  If#=3D 1 Alt=3D 4 #EPs=3D 2 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 Driver=
-=3Dbtusb
-E:  Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D  33 Ivl=3D1ms
-E:  Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D  33 Ivl=3D1ms
-I:  If#=3D 1 Alt=3D 5 #EPs=3D 2 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 Driver=
-=3Dbtusb
-E:  Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D  49 Ivl=3D1ms
-E:  Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D  49 Ivl=3D1ms
-I:  If#=3D 1 Alt=3D 6 #EPs=3D 2 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 Driver=
-=3Dbtusb
-E:  Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D  63 Ivl=3D1ms
-E:  Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D  63 Ivl=3D1ms
-I:  If#=3D 1 Alt=3D 7 #EPs=3D 2 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 Driver=
-=3Dbtusb
-E:  Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D  65 Ivl=3D1ms
-E:  Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D  65 Ivl=3D1ms
+This is automated email and please do not reply to this email!
 
-Signed-off-by: Gregoire Stein <greyxor@protonmail.com>
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=911571
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PENDING   0.27 seconds
+GitLint                       PENDING   0.22 seconds
+SubjectPrefix                 PASS      0.12 seconds
+BuildKernel                   PASS      24.80 seconds
+CheckAllWarning               PASS      30.40 seconds
+CheckSparse                   PASS      30.40 seconds
+BuildKernel32                 PASS      24.38 seconds
+TestRunnerSetup               PASS      433.83 seconds
+TestRunner_l2cap-tester       PASS      20.39 seconds
+TestRunner_iso-tester         FAIL      30.20 seconds
+TestRunner_bnep-tester        PASS      4.83 seconds
+TestRunner_mgmt-tester        PASS      121.41 seconds
+TestRunner_rfcomm-tester      PASS      7.64 seconds
+TestRunner_sco-tester         PASS      15.38 seconds
+TestRunner_ioctl-tester       PASS      8.01 seconds
+TestRunner_mesh-tester        PASS      6.87 seconds
+TestRunner_smp-tester         PASS      7.04 seconds
+TestRunner_userchan-tester    PASS      5.00 seconds
+IncrementalBuild              PENDING   0.60 seconds
+
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
+
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
+
+##############################
+Test: TestRunner_iso-tester - FAIL
+Desc: Run iso-tester with test-runner
+Output:
+WARNING: possible circular locking dependency detected
+Total: 124, Passed: 119 (96.0%), Failed: 1, Not Run: 4
+
+Failed Test Cases
+ISO Connect2 Suspend - Success                       Failed       4.238 seconds
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
+
+
+
 ---
- drivers/bluetooth/btusb.c | 2 ++
- 1 file changed, 2 insertions(+)
-
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 279fe6c115fa..506e9d30111f 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -375,6 +375,8 @@ static const struct usb_device_id quirks_table[] =3D {
- =09=09=09=09=09=09     BTUSB_WIDEBAND_SPEECH },
- =09{ USB_DEVICE(0x0489, 0xe0f3), .driver_info =3D BTUSB_QCA_WCN6855 |
- =09=09=09=09=09=09     BTUSB_WIDEBAND_SPEECH },
-+=09{ USB_DEVICE(0x0489, 0xe10a), .driver_info =3D BTUSB_QCA_WCN6855 |
-+=09=09=09=09=09=09     BTUSB_WIDEBAND_SPEECH },
- =09{ USB_DEVICE(0x13d3, 0x3623), .driver_info =3D BTUSB_QCA_WCN6855 |
- =09=09=09=09=09=09     BTUSB_WIDEBAND_SPEECH },
-=20
---=20
-2.47.0
+Regards,
+Linux Bluetooth
 
 
+--===============4887710268098880620==--
