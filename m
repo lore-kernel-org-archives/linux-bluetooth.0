@@ -1,43 +1,39 @@
-Received: from mail-40137.protonmail.ch (mail-40137.protonmail.ch [185.70.40.137])
+Received: from mail-40140.protonmail.ch (mail-40140.protonmail.ch [185.70.40.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 925EE84D2B
-	for <linux-bluetooth@vger.kernel.org>; Thu, 21 Nov 2024 17:59:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.70.40.137
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80856188717
+	for <linux-bluetooth@vger.kernel.org>; Thu, 21 Nov 2024 18:07:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.70.40.140
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732211958; cv=none; b=o6Ifrmv2uctXGHCYTjtryQuZDKQeBhj0pusrDoj21tfAmnw+8fRxeK6LUaaUKDPMoyO2xyO8dyaTA5v5yi0Ze0vWytCJ2JD2axNVRHFQDSxvxsE3KQ7k5u+UhNFQ0J2XLGIUXsnknU1OQC/awLeVVulJPXS+AwYocE06VRWWDoU=
+	t=1732212475; cv=none; b=co7Em+/0qHifRNByiVUCL8yb3wkZe2umTMGj+tEtMc4fCt977fCHDa5kpuycpRfWIoeBNapezh1/tNsKg5XGp3oOqnb4XFVWG7hrNpgmXCVMyINJkbSzGEtordY7NIww7tDp4rXvrLA6kawjYKQUt/qz4i1qN9gELSAfHI5D1ns=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732211958; c=relaxed/simple;
-	bh=ClE+5TJLmK6yj9O5XdCVALxnETZTAapG9G+AOIgVqmw=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Rodlj9IxaZphNnO48hxx3+U9YfXDaBDhQvxB0I6JcYqSjsuX8G8JrO7xy905tE2isn3saG3k+8KcOQraf7YKMh19onh/XYM9PQyp+0O8OSFEhGJmTUdJoUmNhOQmAc5/xX1+GER0d4zx2UiLsA15rm8Yu8kTsuRNCLXvc1F7cp0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=protonmail.com; spf=pass smtp.mailfrom=protonmail.com; dkim=pass (2048-bit key) header.d=protonmail.com header.i=@protonmail.com header.b=B3tAmkmn; arc=none smtp.client-ip=185.70.40.137
+	s=arc-20240116; t=1732212475; c=relaxed/simple;
+	bh=6mFh8aWcmnOx3PFe9wnRnr6usTVWmUmEg15Hs+YLvuM=;
+	h=Date:From:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=NnOctTROxl5LkHj8UXDqnrdpBQyaXMWA89AUe6GTSHZGEZ2Q1Glke7gXPyeymIrtuNNFX0GehSAoJfdZzNcrFT0mZ8KykjI2BnQ/cJmH637hR21LjK3peV6M1QUg4ff8RHXC5ASeHC/m5jUfvziUINhjjFPl0VBsmD5M6rc/2nE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=protonmail.com; spf=pass smtp.mailfrom=protonmail.com; dkim=pass (2048-bit key) header.d=protonmail.com header.i=@protonmail.com header.b=zXxHufkU; arc=none smtp.client-ip=185.70.40.140
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=protonmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=protonmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=protonmail.com header.i=@protonmail.com header.b="B3tAmkmn"
+	dkim=pass (2048-bit key) header.d=protonmail.com header.i=@protonmail.com header.b="zXxHufkU"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=protonmail.com;
-	s=protonmail3; t=1732211947; x=1732471147;
-	bh=S2adombCveWtynb5JK0rPvmIBtpUZOSmldP70Ex5d0Q=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
-	 Message-ID:BIMI-Selector:List-Unsubscribe:List-Unsubscribe-Post;
-	b=B3tAmkmn30hNi1bn1F5Sh6/HBzPiinlYacSlPF184+1L2/6ZSYbg5JCVKTwFk4erR
-	 8+pkiP6kez1+NripJ8u1bvSdKJW1yb3M3usnwB6Q2odXnk8xNwhOGn5e8aQEOVEPNy
-	 zvpcF3W1XGR2qMdBhC4D0sEl2KbvYs6y366J7TLFwR2jopB6allcoBEpMP+qviTCKK
-	 /v8lYIm23wVtHABpCTGwJXdDxtZC/jVe3fsc4QsN7fa77kGC9N2grYqJve1XDX8kYy
-	 iyxVL9qJaFAEzwN8UvUYK/0IDnKBwHJ1dJ25lJIyc2tZil6PpIKFSImFVfG7IHEluK
-	 ulz5fxqyYqxHw==
-Date: Thu, 21 Nov 2024 17:59:02 +0000
-To: greyxor@protonmail.com
+	s=protonmail3; t=1732212471; x=1732471671;
+	bh=r2xvjAwO29eEItBGYM5V6kOh2AA0Ww/PkWx4bG2QwHU=;
+	h=Date:From:Cc:Subject:Message-ID:Feedback-ID:From:To:Cc:Date:
+	 Subject:Reply-To:Feedback-ID:Message-ID:BIMI-Selector:
+	 List-Unsubscribe:List-Unsubscribe-Post;
+	b=zXxHufkUZ1/70iPa3GDVQettmMR+C7MhlxAfe55Pkr/Rfh+0f7dstce9jzyN5g1xR
+	 b2t0gtJBsNW4pUcgz7Q6VQzQkWFnjEeYTpqcf2FTlNhdwumt5O2FFBQueO2efcA5iO
+	 Ejqtb4vmWtPF9VQAGbkZTZkHF8qzGdSrl7jwnodn/5QRJ8A2bAeZzmHmTYLKCTXfXU
+	 E+BxmfOmVBgEuGhE6scUxbaKdwtQO5bQRceA+dyNl3slkx+3+E8WDU2jvDzkAlKH+m
+	 8RDAhE04gAT+bCpkEmwMFZl6vmXBTMEApqLEXC5h+gac0ThXcZgpBsYDn8bfvOPDEC
+	 LLsGUmzDVGnHQ==
+Date: Thu, 21 Nov 2024 18:07:46 +0000
 From: Gregoire Stein <greyxor@protonmail.com>
-Cc: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, luiz.dentz@gmail.com, marcel@holtmann.org
+Cc: greyxor@protonmail.com, Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
 Subject: [PATCH] Bluetooth: btusb: Add one more ID 0x0489:0xe10a for Qualcomm WCN785x
-Message-ID: <20241121175851.137414-1-greyxor@protonmail.com>
-In-Reply-To: <20241121163259.180589-1-greyxor@protonmail.com>
-References: <20241121163259.180589-1-greyxor@protonmail.com>
+Message-ID: <20241121180742.156230-1-greyxor@protonmail.com>
 Feedback-ID: 1917010:user:proton
-X-Pm-Message-ID: d4108b9efbb2f7bde0c3c87748ef9a971eb360db
+X-Pm-Message-ID: c4ffef790b6f5c2606d9c24de641d8bed20764df
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -101,18 +97,18 @@ Signed-off-by: Gregoire Stein <greyxor@protonmail.com>
  1 file changed, 2 insertions(+)
 
 diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 279fe6c115fa..b52552a5c13d 100644
+index 279fe6c115fa..506e9d30111f 100644
 --- a/drivers/bluetooth/btusb.c
 +++ b/drivers/bluetooth/btusb.c
-@@ -377,6 +377,8 @@ static const struct usb_device_id quirks_table[] =3D {
+@@ -375,6 +375,8 @@ static const struct usb_device_id quirks_table[] =3D {
  =09=09=09=09=09=09     BTUSB_WIDEBAND_SPEECH },
- =09{ USB_DEVICE(0x13d3, 0x3623), .driver_info =3D BTUSB_QCA_WCN6855 |
+ =09{ USB_DEVICE(0x0489, 0xe0f3), .driver_info =3D BTUSB_QCA_WCN6855 |
  =09=09=09=09=09=09     BTUSB_WIDEBAND_SPEECH },
 +=09{ USB_DEVICE(0x0489, 0xe10a), .driver_info =3D BTUSB_QCA_WCN6855 |
 +=09=09=09=09=09=09     BTUSB_WIDEBAND_SPEECH },
+ =09{ USB_DEVICE(0x13d3, 0x3623), .driver_info =3D BTUSB_QCA_WCN6855 |
+ =09=09=09=09=09=09     BTUSB_WIDEBAND_SPEECH },
 =20
- =09/* Broadcom BCM2035 */
- =09{ USB_DEVICE(0x0a5c, 0x2009), .driver_info =3D BTUSB_BCM92035 },
 --=20
 2.47.0
 
