@@ -1,136 +1,177 @@
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f178.google.com (mail-yb1-f178.google.com [209.85.219.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F6E912B169;
-	Thu, 21 Nov 2024 04:12:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15E8121364
+	for <linux-bluetooth@vger.kernel.org>; Thu, 21 Nov 2024 04:38:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732162352; cv=none; b=cGi7jw39YsFt63ibqMjaZbm2QaFiyem9UHDqF1QWZnjsp7JxaqAZExdTP55ukQZ4Sz/fgO2LrcmxLPu5weij0SQTuCTTK5r3Qck3lwvos2bsfIdjOFrzfmhxX3A3qB0U8uQS6E9Ka29HJOSe544BcRuqW7WUbYfyMyV01nD+VEI=
+	t=1732163927; cv=none; b=EO5FF2WQD3q4mFjNliaYbwgoTcKUWHJemBbpDkZxw/zDZwPm4UjhK10FmVTLggI+guvr/rvAWe+69kSYb4xF4sDhzhQSE/C2x2V+zzdJoIDRz03Tt+0pBhsr2PRQpqzj6Ysi5iEvIeMQExKuejsJI07GmfScRd/G9AZF3Pev6Vw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732162352; c=relaxed/simple;
-	bh=tRxFYv+MD/7TYjDZas1s52wE3uAKqXw+1ECygh1LjFg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=Q4V/v8ujcy3ppYj/k3/dpmRgK1mKa0OXP75RstE6cnedqMWeJ+UPCz6LudRYEnO1kBy4fcAPqiWBCVKKdrOKaCdiKzheZZ2TeOgaQ4rXoWrjXovIJI92ImkNpID2hnUBVNQS/OrvQPKaYR214Q0rBxM6iQNm7tlwsJRgZbED5z0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=fBlF0e2s; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+	s=arc-20240116; t=1732163927; c=relaxed/simple;
+	bh=6R/H2aCpWWe9mDwoGtCzoGDBGd4Em2C16yy77qhvZSA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=mI051QpL5GV4lbJRE2U6EL9672mSLEYeozTyDluAE/t9oV2z5+Ob0XnsVJVEUuFHsxV26qTjBrSDi2ObauCUbPtKAC81B6HKnF6kLpfEjoL4eSiiaea1gUERzhtDe8btZAO9CfguqFkNnlEeoVE4p61oBSDFyU76Cx5rGnJsV0g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=ZSYuPck0; arc=none smtp.client-ip=209.85.219.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="fBlF0e2s"
-Received: from pps.filterd (m0279872.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4AKK26EO005916;
-	Thu, 21 Nov 2024 04:12:25 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	vz/FBwQrY132juxwXiPsTKF6DcwmRg0A7kNHvHSCnIQ=; b=fBlF0e2syz6gDrPJ
-	FaKvjsofVEc/CI8S5xuCVnv2p/lQnkOMAAl8SUMOuyNOrAb5dWksMKxSXBBo7Rll
-	9mGEtiKaeesyS5Tdrm/sq+nl6SikukE0mD/ODnCYjLcElboIwVFGEclhqTqsCQsf
-	RFm+PweMmI3Pt38PY3l4msbUCsabPihvdAjw7QDlNgqy+l4WDtZn4YMVI2g1d7En
-	h8Nmnd8tCgLrkyR33QhXgu7c6TxyR8508nRxjhugbZ9GH/+N0m+rJA2bRwHgKFfO
-	TYP+4RvAy8Ha62j2drzyYp4r0LDwbHNKKvK3RZzlF1GQ8lKk4V1OdRRfx6jQOaQ3
-	26jP9A==
-Received: from nalasppmta01.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4317t23c6p-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 21 Nov 2024 04:12:25 +0000 (GMT)
-Received: from nalasex01b.na.qualcomm.com (nalasex01b.na.qualcomm.com [10.47.209.197])
-	by NALASPPMTA01.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 4AL4COri011429
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 21 Nov 2024 04:12:24 GMT
-Received: from [10.231.216.175] (10.80.80.8) by nalasex01b.na.qualcomm.com
- (10.47.209.197) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Wed, 20 Nov
- 2024 20:12:19 -0800
-Message-ID: <44932c08-000f-4e6c-89b3-d7556a0a7a88@quicinc.com>
-Date: Thu, 21 Nov 2024 12:12:16 +0800
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ZSYuPck0"
+Received: by mail-yb1-f178.google.com with SMTP id 3f1490d57ef6-e388d8850d3so477071276.3
+        for <linux-bluetooth@vger.kernel.org>; Wed, 20 Nov 2024 20:38:44 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1732163924; x=1732768724; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=kHq3g3nEaimpSCWtvuF8a7MUOkKPxPFfmbJ4EXDd6nY=;
+        b=ZSYuPck02Z3xZoMz3/g7zpJ+l0mYnjrS2MBDrJjr5faEibwR5xXBzqvGzAbGaICjBI
+         jIAOA01Y3yNC4+0p1+uxZRfQ70OybJyCsmcXwgtn/psPJsvMiw8AJP9VZZwVE9xZr57g
+         jgG8bx6hPe5HIgvvjyfBVn8/SIQHkgxRF3uvFjeyfkJgSSZuwDSSKyLnwbbAn9O7EkgM
+         HvoJhgq2kuM3Z9o82sYa6s0b1wxB197fAlgBFP4dTDeIDi4pIkrJe+Bem4+8UHn9SXhO
+         xKwJg5rKFQGgK0/3q9EkSiwTE0rUhCMQyngAVaTHPn7EDB6H4z4fkVCHgVVZhKetw1qr
+         K52w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1732163924; x=1732768724;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=kHq3g3nEaimpSCWtvuF8a7MUOkKPxPFfmbJ4EXDd6nY=;
+        b=dzbTr+w2xREpVjXQyvy1G/+DnprOr0DMoPdwXmGXLthF+o5OSFtVuvOJYKce+mK2rJ
+         WbCqSwx/A/enpXD/EpmTLpwytWI8RdYfmNJbU7pVUCTJ7Mw7s+xg6gSWVZIANduNAS8s
+         LvY7GJn34vwSIaWoVSJk7mGjDsdu9HYAhye5i6szHWxw6hEnZtQK1gv7oKRyoGCo9Nje
+         g2P6mYrpEU0s8qBYwLflmlkZfC2jphgdZY0Ci/caWoOfMBXXy4S8gW1PsGcVIiNdtALV
+         1nm7pmgvESOGNOJY9YzcMx5rsxi315iDOVYHzUDaUktTrV/vi6hczr8+tm84NHRkT8Zy
+         FSuw==
+X-Forwarded-Encrypted: i=1; AJvYcCWShVdo5y28tqOEqmhZW99l+t4gqJAu8NgMVSdayvpZv/lO/ZCKWnTWM11cSuKGgKEaMpbgIQ4UMxpEKVwBZqk=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy5z5vUaVLy5DgGc7StCfWknqwTPGNDANZPsy8P6a/f7hUnbVm2
+	yTzgDjTHhCbCj0vaOL9biLq5cO2cozHdvHRRWI8WBB7fr+cYLISm5HqzbY4qrjTHIYCcJCHGE9R
+	T3UFlww64nRqjrGjl/E2ij0Sr9P1+LWhZOyrbVw==
+X-Gm-Gg: ASbGncu1U2nrGhcpH9T6GdQGNXh+5fxqGDGIoEk+b1IiKjXqzpCWgsQl6c+f4y9d8E2
+	tYbfXN+ti9t/C83+nX4V36Gc+uab77Q==
+X-Google-Smtp-Source: AGHT+IGy/j+wiEKXbWpg+rdcMPTv/vGoVdsPjG4eyoPMFGLTqsk3vYC/qn1djx+YzFpaj4sluNr2T8hKE9K+QOCRfe8=
+X-Received: by 2002:a05:6902:2781:b0:e30:c872:176d with SMTP id
+ 3f1490d57ef6-e38cb70ab2fmr5251355276.49.1732163924089; Wed, 20 Nov 2024
+ 20:38:44 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 2/4] dt-bindings: bluetooth: Add qca6698 compatible
- string
-To: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
-CC: Marcel Holtmann <marcel@holtmann.org>,
-        Luiz Augusto von Dentz
-	<luiz.dentz@gmail.com>,
-        Rob Herring <robh@kernel.org>,
-        Krzysztof Kozlowski
-	<krzk+dt@kernel.org>,
-        Conor Dooley <conor+dt@kernel.org>,
-        Bjorn Andersson
-	<andersson@kernel.org>,
-        Konrad Dybcio <konradybcio@kernel.org>,
-        "Balakrishna
- Godavarthi" <quic_bgodavar@quicinc.com>,
-        Rocky Liao
-	<quic_rjliao@quicinc.com>, <quic_zijuhu@quicinc.com>,
-        <linux-bluetooth@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <linux-arm-msm@vger.kernel.org>,
-        <quic_mohamull@quicinc.com>
 References: <20241120095428.1122935-1-quic_chejiang@quicinc.com>
- <20241120095428.1122935-3-quic_chejiang@quicinc.com>
- <smwxrjvdvyxw6tknucl6fb5jpjau2q4jcyjxpunbtt5ep6xsr4@ztuyfkrwgxoo>
-Content-Language: en-US
-From: Cheng Jiang <quic_chejiang@quicinc.com>
-In-Reply-To: <smwxrjvdvyxw6tknucl6fb5jpjau2q4jcyjxpunbtt5ep6xsr4@ztuyfkrwgxoo>
+ <20241120095428.1122935-2-quic_chejiang@quicinc.com> <454tdpuglu23nmxfqqesv42h5rk3vqiji7spo3naf2djqwojqt@6x3ram3lnlkq>
+ <fb5bc38b-83b3-4924-b1d0-39219a2927b4@quicinc.com>
+In-Reply-To: <fb5bc38b-83b3-4924-b1d0-39219a2927b4@quicinc.com>
+From: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
+Date: Thu, 21 Nov 2024 06:38:33 +0200
+Message-ID: <CAA8EJpqAOD_+SLG2LbiodWOs28_rquvMefmSH5CY1yB_rkiZPg@mail.gmail.com>
+Subject: Re: [PATCH v2 1/4] dt-bindings: bluetooth: add 'qcom,product-variant'
+To: Cheng Jiang <quic_chejiang@quicinc.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
+	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Bjorn Andersson <andersson@kernel.org>, Konrad Dybcio <konradybcio@kernel.org>, 
+	Balakrishna Godavarthi <quic_bgodavar@quicinc.com>, Rocky Liao <quic_rjliao@quicinc.com>, 
+	quic_zijuhu@quicinc.com, linux-bluetooth@vger.kernel.org, 
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-arm-msm@vger.kernel.org, quic_mohamull@quicinc.com
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nalasex01b.na.qualcomm.com (10.47.209.197)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: CyerFLAsEMZxIsTgOWsEIZSl2GfwxrX5
-X-Proofpoint-ORIG-GUID: CyerFLAsEMZxIsTgOWsEIZSl2GfwxrX5
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
- definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- suspectscore=0 mlxlogscore=999 spamscore=0 bulkscore=0 lowpriorityscore=0
- mlxscore=0 malwarescore=0 impostorscore=0 phishscore=0 adultscore=0
- clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2409260000 definitions=main-2411210029
 
-Hi Dmitry,
+On Thu, 21 Nov 2024 at 06:02, Cheng Jiang <quic_chejiang@quicinc.com> wrote:
+>
+> Hi Dmitry,
+>
+> On 11/20/2024 6:43 PM, Dmitry Baryshkov wrote:
+> > On Wed, Nov 20, 2024 at 05:54:25PM +0800, Cheng Jiang wrote:
+> >> Several Qualcomm projects will use the same Bluetooth chip, each
+> >> focusing on different features. For instance, consumer projects
+> >> prioritize the A2DP SRC feature, while IoT projects focus on the A2DP
+> >> SINK feature, which may have more optimizations for coexistence when
+> >> acting as a SINK. Due to the patch size, it is not feasible to include
+> >> all features in a single firmware.
+> >>
+> >> Therefore, the 'product-variant' devicetree property is used to provide
+> >> product information for the Bluetooth driver to load the appropriate
+> >> firmware.
+> >>
+> >> If this property is not defined, the default firmware will be loaded,
+> >> ensuring there are no backward compatibility issues with older
+> >> devicetrees.
+> >>
+> >> The product-variant defines like this:
+> >>   0 - 15 (16 bits) are product line specific definitions
+> >>   16 - 23 (8 bits) are for the product line.
+> >>   24 - 31 (8 bits) are reserved for future use, 0 currently
+> >
+> > Please use text strings instead of encoding this information into random
+> > integers and then using just 3 bits out of 32.
+> Ack. Originally intended to make it more flexible for future use. It can be
+> text strings for current requirement.
 
-On 11/20/2024 6:44 PM, Dmitry Baryshkov wrote:
-> On Wed, Nov 20, 2024 at 05:54:26PM +0800, Cheng Jiang wrote:
->> Add QCA6698 qcom,qca6698-bt compatible strings.
-> 
-> Why? Is it the same chip as WCN6855 or a different chip? Is it
-> completely compatible?
-> 
-They are different chips. But it's compatible with WCN6855.
->>
->> Signed-off-by: Cheng Jiang <quic_chejiang@quicinc.com>
->> ---
->>  .../devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml   | 2 ++
->>  1 file changed, 2 insertions(+)
->>
->> diff --git a/Documentation/devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml b/Documentation/devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml
->> index 9019fe7bcdc6..527f947289af 100644
->> --- a/Documentation/devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml
->> +++ b/Documentation/devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml
->> @@ -18,6 +18,7 @@ properties:
->>      enum:
->>        - qcom,qca2066-bt
->>        - qcom,qca6174-bt
->> +      - qcom,qca6698-bt
->>        - qcom,qca9377-bt
->>        - qcom,wcn3988-bt
->>        - qcom,wcn3990-bt
->> @@ -175,6 +176,7 @@ allOf:
->>          compatible:
->>            contains:
->>              enum:
->> +              - qcom,qca6698-bt
->>                - qcom,wcn6855-bt
->>      then:
->>        required:
->> -- 
->> 2.25.1
->>
-> 
+No, fixed-format data isn't flexible. Fine-grained properties are.
+Please define exactly what is necessary rather than leaving empty
+holes "for future expansion".=
 
+> >
+> >>
+> >> |---------------------------------------------------------------------|
+> >> |                       32 Bits                                       |
+> >> |---------------------------------------------------------------------|
+> >> |  31 - 24 (bits)   |    23 - 16 (bits)   | 15 - 0 (16 bits)          |
+> >> |---------------------------------------------------------------------|
+> >> |   Reserved        |    0: default       | 0: default                |
+> >> |                   |    1: CE            |                           |
+> >> |                   |    2: IoT           |                           |
+> >> |                   |    3: Auto          |                           |
+> >> |                   |    4: Reserved      |                           |
+> >> |---------------------------------------------------------------------|
+> >>
+> >> Signed-off-by: Cheng Jiang <quic_chejiang@quicinc.com>
+> >> ---
+> >>  .../bindings/net/bluetooth/qualcomm-bluetooth.yaml          | 6 ++++++
+> >>  1 file changed, 6 insertions(+)
+> >>
+> >> diff --git a/Documentation/devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml b/Documentation/devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml
+> >> index 7bb68311c609..9019fe7bcdc6 100644
+> >> --- a/Documentation/devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml
+> >> +++ b/Documentation/devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml
+> >> @@ -110,6 +110,12 @@ properties:
+> >>      description:
+> >>        boot firmware is incorrectly passing the address in big-endian order
+> >>
+> >> +  qcom,product-variant:
+> >> +    $ref: /schemas/types.yaml#/definitions/uint32
+> >> +    description:
+> >> +      specify the product information for driver to load the appropriate firmware
+> >
+> > DT describes hardware. Is this a hardware property?
+>
+> It has been added to identify the firmware image for the platform. The driver
+> parses it, and then the rampatch is selected from a specify directory. Currently,
+> there is a 'firmware-name' parameter, but it is only used to specify the NVM
+> (config) file. We also need to specify the rampatch (TLV file).
+>
+>
+> Can we re-use the "firmware-name"? add two segments like the following?
+> firmware-name = "rampatch_xx.tlv",  "nvm_xx.bin";
+
+I think this is the better solution
+
+>
+> Or add a new property to specify the rampatch file?
+> rampatch-name = "rampatch_xx.tlv";
+>
+> >
+> >> +
+> >> +
+> >>  required:
+> >>    - compatible
+> >>
+> >> --
+> >> 2.25.1
+> >>
+> >
+>
+
+
+-- 
+With best wishes
+Dmitry
