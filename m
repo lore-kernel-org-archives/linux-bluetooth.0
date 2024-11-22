@@ -1,76 +1,95 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA3B9176FD2
-	for <linux-bluetooth@vger.kernel.org>; Fri, 22 Nov 2024 10:03:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E5A055C29;
+	Fri, 22 Nov 2024 11:19:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732269808; cv=none; b=bAA0TyagBBLctBExgN9zl8VXtl8/zgBAcD/uUa6B4VyOdNvAcwDacYeMbLeOpHttcMGQ4wQJf/TS4XaU31soKyjR7ASvi2Sf/w/mMWTCNaAgJwh+vkQE0rkdaD2zLnZRoKkbAZOI5K9xvRAsVApeX9xHyeS6tvZvn/KuYhb+0R0=
+	t=1732274399; cv=none; b=lFD++TKHSk28NcBV+r6Wx4WYa4a2zEIUSwIMhlLk3OTZJS6Gnz4LlWm7Rmdr+mC+XFfTuDhWxbiaIidyt3+ECa5/8uWw3WYrTwzyFvzNrcVCDp3oimHsq3IcyRdopdQjEB4Ua9TGjBZU7iJD9fDBWX464Qcr9o3eBCf98dc9FlU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732269808; c=relaxed/simple;
-	bh=xdm+lP1P4SKD9Gw31rOf7WDIHZj01tHyhzpD62wjP9U=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=g+fJOwYW+b1DwMrTdfFn3AfomTx34kWUyMDa1zaymIpSI+q8xs0aefspESHdqqbcJXGaKOZ8RlJ1UWZWTvo2r964OVP0X9yID9xH8So1GnvRWpOl6/SrsvetlJesfE9I/6g3uCLHIZhcQ4SUgPfPKunK33wSlBbm+Lr4WDneCjE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dPAXHeCZ; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dPAXHeCZ"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 6180AC4CECE
-	for <linux-bluetooth@vger.kernel.org>; Fri, 22 Nov 2024 10:03:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1732269806;
-	bh=xdm+lP1P4SKD9Gw31rOf7WDIHZj01tHyhzpD62wjP9U=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=dPAXHeCZKRfYwsc/xfme0BVYC5KGUUlASGoZyMddBAuXqf/ZRySD2qm9kY/w51svv
-	 DV8rTM5veZMt9ZPHoXUvEuk/qwFAs97PKIEA8hOY0PTCVBUvYK/OWfSg396hJbcZsF
-	 n98D7EM6PMg3ts+E2XOXuMwytB+Yl84N4JTROk/hUeVlQ6heuNoql2EBAUXvu7XOZI
-	 DtDc7kWdhmBr5Dxl7wrndV1Z3jVya76PtCIdFvNlWXTqHD6IUL53ox3Owyo8B7AjFn
-	 X/CFzpNxPLDpGaeyei9dEx4ylIQO4sIz+lo6r7Kv5aeJtam56IquHQ5aqSqy3Opv6W
-	 q7N1wl3PWV6cA==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id 5964CC53BC5; Fri, 22 Nov 2024 10:03:26 +0000 (UTC)
-From: bugzilla-daemon@kernel.org
-To: linux-bluetooth@vger.kernel.org
-Subject: [Bug 219519] Hibernation Failure on 6.11+ due to btusb
-Date: Fri, 22 Nov 2024 10:03:26 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: lkml@antheas.dev
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P3
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: cf_kernel_version
-Message-ID: <bug-219519-62941-GAg3qONIFa@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-219519-62941@https.bugzilla.kernel.org/>
-References: <bug-219519-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+	s=arc-20240116; t=1732274399; c=relaxed/simple;
+	bh=DkTxg95VblgAot6ZNEDGTHGBHGn1h0iJNL0oEfb5Uzs=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=MtqYIi8XmIiKiV/AmyRwVt66PkxLFGCoqtSM4RHcMRyUfymz+FvQoksFzTa7ktbJXpfk3N8zMHsUQCRl8pMAZyFnzpAUk+fmETY6wC3vasS08nFiWQL7HL3C3oH3Imfhjmp/bnGVSP/5JeBKUvnPwjqVowjtQW8jwnW5RQ7mXsA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
+X-UUID: ad2a44b8a8c311efa216b1d71e6e1362-20241122
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.1.38,REQID:ae42c0b0-a9e7-4546-bd73-4a82017c8aad,IP:0,U
+	RL:0,TC:0,Content:0,EDM:25,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION
+	:release,TS:25
+X-CID-META: VersionHash:82c5f88,CLOUDID:51dafe351e7844d8121b696a02b87639,BulkI
+	D:nil,BulkQuantity:0,Recheck:0,SF:102,TC:nil,Content:0,EDM:5,IP:nil,URL:0,
+	File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES:1,SPR:N
+	O,DKR:0,DKP:0,BRR:0,BRE:0
+X-CID-BVR: 0,NGT
+X-CID-BAS: 0,NGT,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR
+X-UUID: ad2a44b8a8c311efa216b1d71e6e1362-20241122
+Received: from mail.kylinos.cn [(10.44.16.175)] by mailgw.kylinos.cn
+	(envelope-from <zhangheng@kylinos.cn>)
+	(Generic MTA)
+	with ESMTP id 387115066; Fri, 22 Nov 2024 19:19:44 +0800
+Received: from mail.kylinos.cn (localhost [127.0.0.1])
+	by mail.kylinos.cn (NSMail) with SMTP id B1F5CE0080FF;
+	Fri, 22 Nov 2024 19:19:44 +0800 (CST)
+X-ns-mid: postfix-674068D0-48800530
+Received: from kylin-pc.. (unknown [172.25.130.133])
+	by mail.kylinos.cn (NSMail) with ESMTPA id 0C68DE0080FF;
+	Fri, 22 Nov 2024 19:19:41 +0800 (CST)
+From: zhangheng <zhangheng@kylinos.cn>
+To: marcel@holtmann.org,
+	johan.hedberg@gmail.com,
+	luiz.dentz@gmail.com,
+	erick.archer@outlook.com,
+	kees@kernel.org,
+	geert@linux-m68k.org,
+	jirislaby@kernel.org
+Cc: linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	zhangheng <zhangheng@kylinos.cn>
+Subject: [PATCH] tty: rfcomm: use sysfs_emit() instead of sprintf()
+Date: Fri, 22 Nov 2024 19:19:39 +0800
+Message-ID: <20241122111939.3799277-1-zhangheng@kylinos.cn>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D219519
+Follow the advice in Documentation/filesystems/sysfs.rst:
+show() should only use sysfs_emit() or sysfs_emit_at() when formatting
+the value to be returned to user space.
 
-Antheas Kapenekakis (lkml@antheas.dev) changed:
+Signed-off-by: zhangheng <zhangheng@kylinos.cn>
+---
+ net/bluetooth/rfcomm/tty.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-     Kernel Version|                            |6.11+
-
+diff --git a/net/bluetooth/rfcomm/tty.c b/net/bluetooth/rfcomm/tty.c
+index af80d599c337..21a5b5535ebc 100644
+--- a/net/bluetooth/rfcomm/tty.c
++++ b/net/bluetooth/rfcomm/tty.c
+@@ -201,14 +201,14 @@ static ssize_t address_show(struct device *tty_dev,
+ 			    struct device_attribute *attr, char *buf)
+ {
+ 	struct rfcomm_dev *dev =3D dev_get_drvdata(tty_dev);
+-	return sprintf(buf, "%pMR\n", &dev->dst);
++	return sysfs_emit(buf, "%pMR\n", &dev->dst);
+ }
+=20
+ static ssize_t channel_show(struct device *tty_dev,
+ 			    struct device_attribute *attr, char *buf)
+ {
+ 	struct rfcomm_dev *dev =3D dev_get_drvdata(tty_dev);
+-	return sprintf(buf, "%d\n", dev->channel);
++	return sysfs_emit(buf, "%d\n", dev->channel);
+ }
+=20
+ static DEVICE_ATTR_RO(address);
 --=20
-You may reply to this email to add a comment.
+2.45.2
 
-You are receiving this mail because:
-You are the assignee for the bug.=
