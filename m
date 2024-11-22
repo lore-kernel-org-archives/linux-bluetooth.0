@@ -1,142 +1,134 @@
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oa1-f53.google.com (mail-oa1-f53.google.com [209.85.160.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9EDA1D86C4
-	for <linux-bluetooth@vger.kernel.org>; Fri, 22 Nov 2024 13:08:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B98E9BA20;
+	Fri, 22 Nov 2024 13:59:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732280915; cv=none; b=t4O/McF7RH3mFrKVRhN3YsnFmQduGObcYauXtMcspqA0EhHlPbpjGHNWm9za0EnmZpuekYyk3FqkSgWLdzne9O4M+wxee00Y7P6f/01p7nwiRRnBommYdI9onnoHW7bLqYnxLo46BsBjMpWAmpGXzCxZfGAZ6oXm8wwPNlbfItk=
+	t=1732283991; cv=none; b=ctHuAlqE8tmY8v+8G0sUAp5vh1muhTAifbq7G0MbCGBsq2hkxrmUwwT34ub1LFlCueqC/ISO8mOSMiG0Pnnnf8pVzrsHAg9oJHFcNdIbrocockeRmp/udqVrwQwTFNy+bIxxIDwgkuAYeG3SHpm0lYqG1CqKzzijmgp+du0l26Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732280915; c=relaxed/simple;
-	bh=8zfgkMOB71xvZWMcB6lgkVdCix5c+VyWkiNbl8wuEYQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=RnaMy0tzj1UHUij1VHrtFpoJe2XE4V9D7yi8U9uErsY5e4QU+U7lVUFU6jK8BXBLPIMx1IOGM8uKfIr81qbnA6VcHHMJadGXP/EVmcF8i+LR1jn4ysXRc3SM1rMGqfwrKctwLTC8Cm89rC/AtMM+/LVTSTSjed9v3hhMKIZKmMc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=WaG0JXXO; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+	s=arc-20240116; t=1732283991; c=relaxed/simple;
+	bh=TwaPM4jIKoOVtLWxJIV9PGeLmcYKX3ahSJ6uIW+w0FE=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=jl3i5hgOpGfypGIEUIjAvTUVAoiV+1is/uggQCS4Oyo8rY14EbeYHQ2rwrzFTbuNxQoY05sl4K9dkvxJLCqVYbA6pgD9S941XtdzioI0tcmi7+3yjhf9wee2YKlDiQi86Nf/5wW8OYgJXmyNovLBA/6Uhqtr8RuUw5QTP+v8UOU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OZlurkJz; arc=none smtp.client-ip=209.85.160.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="WaG0JXXO"
-Received: from pps.filterd (m0279871.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4AM6HkmZ007165
-	for <linux-bluetooth@vger.kernel.org>; Fri, 22 Nov 2024 13:08:32 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	b3r6S/P72MB1YXDPyc+d2GlJ4kjhnFJ66UPTclc/4bI=; b=WaG0JXXO8wZvJMLk
-	cSOf4jtjbXR3WTSPii3ruWrAG7WTbY/XUkstk2fnHX8zCYWGZn69KrJq/94nKwil
-	Beh6eEABFkkY52TfojsdO+7a+7SYg/fbYJmOC/Dybzgn4XTCJZ6bJ6j5JZiSR419
-	9lOJsfyw54y3FaOnJEzzLKTHRToa8mWb1gWtGb2nuU3fqael2hNpNOVOACKhMSd4
-	9Ild67borkGsZHm4IqNXZYNdGUx552i5CvuEPDxarnjgKb2NjYENyazuPR8kS8WH
-	2H6C/E/NfYz1pb7nbWx4/8JvTRf2u9XSrjCPyLoevl4jlGRP3sIMWtq1rl29xlwl
-	sKIWBQ==
-Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com [209.85.219.72])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 432mjh90t3-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-	for <linux-bluetooth@vger.kernel.org>; Fri, 22 Nov 2024 13:08:32 +0000 (GMT)
-Received: by mail-qv1-f72.google.com with SMTP id 6a1803df08f44-6d41f5ab991so4561956d6.3
-        for <linux-bluetooth@vger.kernel.org>; Fri, 22 Nov 2024 05:08:32 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OZlurkJz"
+Received: by mail-oa1-f53.google.com with SMTP id 586e51a60fabf-2965e65ce89so1413721fac.3;
+        Fri, 22 Nov 2024 05:59:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1732283989; x=1732888789; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=pOzcwXcalhod32cmc84xJL2cjjIFVhql6XvOAWQZepY=;
+        b=OZlurkJzh2cdeNhiBD0IyIdbApq8STAiwUhCOasC1Y4J3D5CVyRxRKOadIs6FwP4bo
+         efoCzCdlIPHSvsbFNt8/z9JA18J2HPW/jZvG6LiPIdnIvm9QFE5EfKjEj5hrRkxJeKMi
+         DVcKf0rt4Qy+J5O3xjO0g2zyXA87I6JzP4tJ1XIkQmE9RLgH0DjLqBJt5OwZIAtoKjiS
+         73c3C/tZTZVV7DWKdRxGVA5WstUj5htIDljOj4jjK0W9p8aRI8rIvn5TSkrPKXCbnl8i
+         bu6WHqHPwiZOOj+idrhcjPA1iD2ImzRwmeYAV3qFRZnR1qanZg73EMPKROHqnpVn26eK
+         X/Kg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732280912; x=1732885712;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=b3r6S/P72MB1YXDPyc+d2GlJ4kjhnFJ66UPTclc/4bI=;
-        b=Z8WQYPBwygWdOlflTM+sB+Ih4EOYRvAtXBasYQi8z9j06lCRdrdmHHGD4n1clZ4sv/
-         +CCfUOKO8AMJQWMXnLmoFCG6dK+yBJ09TTh71yh1TmS0+niYjMvxhiY1K+Du1RFDz+Ng
-         8jdZP1d74o/4zg6N2rABzKSa2WDj2zT/1Y4OJ1mr7rh43APk8MTQMYkz9YsXoN1CEeko
-         v/QuN9zsMHDxlWCKwjWgIcCs4nMcoTt1ahbm0vvYM6CV0HKtGcovDD2VbAD/zY1Z0/a+
-         XSerCrJuRa3rCxeRO4a1CZ4BvxAmdWeC9d2imRJo/GDHzTr+yw+aDh5aO202e4LnqRaP
-         QyTg==
-X-Gm-Message-State: AOJu0Yw0+21MKla9ndgTD34U58rcd5AR1vV7zn11z2GUMin9OzcHOx7A
-	StW5J4XVAfLT0G1K+mclw1K4tuNVyZQdzFFToCnHRYZdz9nXMSCPM/CUaPDwRZbpQTRUXHO2DXu
-	yiu2bfGJAkMa5lTBhQ7ZvqmPA4xroOaakKeqlNsrYsYPSTO1Ds0cSfuwzjBuWvXC6GRQ=
-X-Gm-Gg: ASbGncsK3neAZ4JRmleJcwnYyb5reepvatIAAgD2V6cEPsxc1SmZPCjpwsXsJTlY3nx
-	Y2GVdrdMtifKRoTA3Z0XzYxAoys/OFThYIJHPd5B7SJZIV5ewi/OJM/IfGpcK96QsOuf18rMH2N
-	Tsi9TJQ5NMTyhMHSvdX8b7fDX6JZe/8WT1OqQVkt29FMh4v9ox2Bn94Vsf27x3GiJ2SfsYNQHOk
-	G1eDRaYH2rbergQk6XVVhkrD6rubdoiMHuV+XdG2fmXv6DzVezs/cqvizgPqx+aRq5sQr5Y8Qqq
-	3MIM11WaZ0ymIjq3lBBQcwzZDMTAIGk=
-X-Received: by 2002:a05:620a:1a04:b0:7b1:444a:b679 with SMTP id af79cd13be357-7b5144fad6fmr158600785a.6.1732280911809;
-        Fri, 22 Nov 2024 05:08:31 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFg0PllgxIaZL6+sOj+lXoG4EAwCbAT0zkzQ+OpASPnOcskLg8opeQF2CNdVsHxer0rtYzHww==
-X-Received: by 2002:a05:620a:1a04:b0:7b1:444a:b679 with SMTP id af79cd13be357-7b5144fad6fmr158598385a.6.1732280911470;
-        Fri, 22 Nov 2024 05:08:31 -0800 (PST)
-Received: from [192.168.212.120] (078088045245.garwolin.vectranet.pl. [78.88.45.245])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aa50b52f92fsm98770266b.107.2024.11.22.05.08.29
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 22 Nov 2024 05:08:31 -0800 (PST)
-Message-ID: <37b16448-b62b-4839-ba48-ae599977d71f@oss.qualcomm.com>
-Date: Fri, 22 Nov 2024 14:08:28 +0100
+        d=1e100.net; s=20230601; t=1732283989; x=1732888789;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=pOzcwXcalhod32cmc84xJL2cjjIFVhql6XvOAWQZepY=;
+        b=r5h8BEMvORoVoADCB7sE8PTqlWKVkn3bw7QA2ubMg396ctDh0cZfMc8tOgR4QF+3ci
+         WX0mk474tCwRvwDsXsKj7G9a2vT7NllQ+oh+HEGHI1S0dEZk82DUhHXLOsoKnO8xTUiO
+         NZehj1MRCXzPrffI/A/LSRYoEmqtx3/6G5eKsQHJib+wDEeXjKscrO0miEDsfs5EcOJr
+         W7viYEH0LolQWugGO0JgkulXRW+7+9shN7V22erzcJjey8fwFCdajVqhcaY5BrYN73s1
+         9v5a4iDjqgoevQxouxa/DQ4mCxHjh8EMgDahOsc9j8XhZp7zFh5oNUusgU7ujpZepvlh
+         jXkg==
+X-Forwarded-Encrypted: i=1; AJvYcCVhmxhU/uDZpKahPtw2Itn8fUJ1tLjk6m6sV+kFXYmyP8LpqUjkEMhQZO2LaEVMKmRaUFSj+0wrMI9mYweOWg0=@vger.kernel.org, AJvYcCXc7Vyd4LVyKd4nfkOcrw3dCxeJTU9DP0RQ1Oe5R3dIc0/+78XSkAPwXRn4MbsrRKkAr5Md6HNW1Wt9L619@vger.kernel.org
+X-Gm-Message-State: AOJu0YzB+i7WcMXKpmc8GsnLqx+VmW2wkgK0WUCAUupFVmIb/MDGQwyU
+	M2YBMc6oA+kpTnmnomXZucKquNPbxFi4+RzazIJIVaOJc12CcsJU
+X-Gm-Gg: ASbGncsyQdzIuBpk21uL7ctr7GHq4IB8sTOOrf8J9qQOCKfB+o24BPPafL5A3v30O4n
+	4zcF+3sxX46thYJR45r5FuV/x5vyQtBlvJZEN9U1q7SUmp7Gf76RD0PinuYR6F3NglupiquT6C2
+	qp65rVxKSXdOhiG2wy5uiXy2xDSerL/ul44rao84Z8TdWEQi2nUOML3DQdsURbrbtjK3Q6l+KKR
+	XJcZINSUa/SayjvGvBmM/7KyPhuFWFY5NUeWaD7m43kvmKwWWHft8eHZE3aRNIm
+X-Google-Smtp-Source: AGHT+IFQFSVRu+wDPQgYpx1TU6z+L0eIhB/2YhP/jdm1pO7Zw09B6MplcxZqC+X81NdVr4OpEWq2YQ==
+X-Received: by 2002:a05:6871:4398:b0:296:e288:6567 with SMTP id 586e51a60fabf-29720ad6360mr3053873fac.1.1732283988772;
+        Fri, 22 Nov 2024 05:59:48 -0800 (PST)
+Received: from fabio-Precision-3551.. ([2804:14c:485:4b61:885d:a03e:b4c3:3076])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7fbcc3f8c2fsm1645303a12.75.2024.11.22.05.59.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 22 Nov 2024 05:59:48 -0800 (PST)
+From: Fabio Estevam <festevam@gmail.com>
+To: luiz.dentz@gmail.com
+Cc: amitkumar.karwar@nxp.com,
+	neeraj.sanjaykale@nxp.com,
+	marcel@holtmann.org,
+	linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Fabio Estevam <festevam@denx.de>
+Subject: [PATCH] Bluetooth: btnxpuart: Switch to SYSTEM_SLEEP_PM_OPS
+Date: Fri, 22 Nov 2024 10:59:39 -0300
+Message-Id: <20241122135939.337327-1-festevam@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 1/4] dt-bindings: bluetooth: add 'qcom,product-variant'
-To: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>,
-        Cheng Jiang <quic_chejiang@quicinc.com>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Rob Herring
- <robh@kernel.org>,
-        Krzysztof Kozlowski <krzk+dt@kernel.org>,
-        Conor Dooley <conor+dt@kernel.org>,
-        Bjorn Andersson <andersson@kernel.org>,
-        Konrad Dybcio <konradybcio@kernel.org>,
-        Balakrishna Godavarthi <quic_bgodavar@quicinc.com>,
-        Rocky Liao <quic_rjliao@quicinc.com>, quic_zijuhu@quicinc.com
-Cc: linux-bluetooth@vger.kernel.org, devicetree@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-        quic_mohamull@quicinc.com
-References: <20241120095428.1122935-1-quic_chejiang@quicinc.com>
- <20241120095428.1122935-2-quic_chejiang@quicinc.com>
- <083d53c7-58d9-4e36-93b1-36e5696dd495@oss.qualcomm.com>
-Content-Language: en-US
-From: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
-In-Reply-To: <083d53c7-58d9-4e36-93b1-36e5696dd495@oss.qualcomm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-GUID: Ez_hxPPbs6dnrV2tujzEWu7m27jIenwo
-X-Proofpoint-ORIG-GUID: Ez_hxPPbs6dnrV2tujzEWu7m27jIenwo
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
- definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
- mlxlogscore=999 priorityscore=1501 bulkscore=0 clxscore=1015 phishscore=0
- adultscore=0 impostorscore=0 mlxscore=0 lowpriorityscore=0 spamscore=0
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2409260000 definitions=main-2411220111
+Content-Transfer-Encoding: 8bit
 
-On 22.11.2024 1:49 PM, Konrad Dybcio wrote:
-> On 20.11.2024 10:54 AM, Cheng Jiang wrote:
->> Several Qualcomm projects will use the same Bluetooth chip, each
->> focusing on different features. For instance, consumer projects
->> prioritize the A2DP SRC feature, while IoT projects focus on the A2DP
->> SINK feature, which may have more optimizations for coexistence when
->> acting as a SINK. Due to the patch size, it is not feasible to include
->> all features in a single firmware.
->>
->> Therefore, the 'product-variant' devicetree property is used to provide
->> product information for the Bluetooth driver to load the appropriate
->> firmware.
->>
->> If this property is not defined, the default firmware will be loaded,
->> ensuring there are no backward compatibility issues with older
->> devicetrees.
->>
->> The product-variant defines like this:
->>   0 - 15 (16 bits) are product line specific definitions
->>   16 - 23 (8 bits) are for the product line.
-> 
-> Product lines don't exist in the kernel. Please describe the actual
-> differences between those files instead.
+From: Fabio Estevam <festevam@denx.de>
 
-Ok, so it seems to be feature set. This definitely should be
-userspace-toggleable. We can always reset the device and reload firmware
-at runtime, so I see no point in having to educate the kernel about this.
+Replace SET_SYSTEM_SLEEP_PM_OPS() with its modern SYSTEM_SLEEP_PM_OPS()
+alternative.
 
-I'd say A2DP SRC is probably preferred to be the deafult, as we have
-people running bare upstream on laptops and other consumer devices.
+The combined usage of pm_sleep_ptr() and SYSTEM_SLEEP_PM_OPS() allows
+the compiler to evaluate if the suspend/resume() functions
+are used at build time or are simply dead code.
 
-Konrad
+This allows removing the CONFIG_PM_SLEEP ifdefery from the
+suspend/resume() functions.
+
+Signed-off-by: Fabio Estevam <festevam@denx.de>
+---
+ drivers/bluetooth/btnxpuart.c | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/bluetooth/btnxpuart.c b/drivers/bluetooth/btnxpuart.c
+index 569f5b7d6e46..06c1093c70ab 100644
+--- a/drivers/bluetooth/btnxpuart.c
++++ b/drivers/bluetooth/btnxpuart.c
+@@ -1588,7 +1588,6 @@ static void nxp_serdev_remove(struct serdev_device *serdev)
+ 	hci_free_dev(hdev);
+ }
+ 
+-#ifdef CONFIG_PM_SLEEP
+ static int nxp_serdev_suspend(struct device *dev)
+ {
+ 	struct btnxpuart_dev *nxpdev = dev_get_drvdata(dev);
+@@ -1606,7 +1605,6 @@ static int nxp_serdev_resume(struct device *dev)
+ 	ps_control(psdata->hdev, PS_STATE_AWAKE);
+ 	return 0;
+ }
+-#endif
+ 
+ static struct btnxpuart_data w8987_data __maybe_unused = {
+ 	.helper_fw_name = NULL,
+@@ -1628,7 +1626,7 @@ static const struct of_device_id nxpuart_of_match_table[] __maybe_unused = {
+ MODULE_DEVICE_TABLE(of, nxpuart_of_match_table);
+ 
+ static const struct dev_pm_ops nxp_pm_ops = {
+-	SET_SYSTEM_SLEEP_PM_OPS(nxp_serdev_suspend, nxp_serdev_resume)
++	SYSTEM_SLEEP_PM_OPS(nxp_serdev_suspend, nxp_serdev_resume)
+ };
+ 
+ static struct serdev_device_driver nxp_serdev_driver = {
+@@ -1637,7 +1635,7 @@ static struct serdev_device_driver nxp_serdev_driver = {
+ 	.driver = {
+ 		.name = "btnxpuart",
+ 		.of_match_table = of_match_ptr(nxpuart_of_match_table),
+-		.pm = &nxp_pm_ops,
++		.pm = pm_sleep_ptr(&nxp_pm_ops),
+ 	},
+ };
+ 
+-- 
+2.34.1
+
