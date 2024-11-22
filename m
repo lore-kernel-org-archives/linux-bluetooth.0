@@ -1,162 +1,93 @@
-Received: from mail-yb1-f169.google.com (mail-yb1-f169.google.com [209.85.219.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E597C16BE23
-	for <linux-bluetooth@vger.kernel.org>; Fri, 22 Nov 2024 08:01:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CA15156F3F
+	for <linux-bluetooth@vger.kernel.org>; Fri, 22 Nov 2024 08:38:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732262494; cv=none; b=KB+SLtjW0My8m/uy08UZDluauK3GNKpGiGsHeJRPcfAfu49MtwNn/4rOLmT2tZCX+HtWN/UrfXnpXujh/CKzNsKjvb4Dwu/LcBtTvnihPT05u3JIKtdpSzl8B8t9BMhrOMgIWTm2ladbY2JyDNVYV0N4OGHksdiI24Psu2UGzhU=
+	t=1732264740; cv=none; b=NhStxAWmptBH/AaKLHGH7JB2eews3f1J8fAGArD0cgiRlt6myFaj6bKbn5eVZfFmM70HohlEuVjW0wJ1SOzkwO8+sTlvksj1gFptMeD5w9o5nknYXevIo1sd8OR1LwGKiuXSHWafj4Plsiot0OM5DlF9bU5a3JPxlIvujUopbYQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732262494; c=relaxed/simple;
-	bh=ccGCjoR7OOGsWyQ0kZ2v3mFpY4WQi19CY9Hwz6i8ids=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=JAuv3TKJFFuWdCl0VzAU6Xxt1tY1VBOKMMYFj3GflgRM7yU7eN1T5zx2nlORNGNrrxYA44QBiDMd/+YSb5TC9nLZlWZ2IGKHR/i4XB+8Ux3Bm7IbzHU2RTo+sy1+3gG5klCdwMbUKgWm14s+7SU1d/u2zy8RdL2HG+TU/WMpKX0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=WFybMwWJ; arc=none smtp.client-ip=209.85.219.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="WFybMwWJ"
-Received: by mail-yb1-f169.google.com with SMTP id 3f1490d57ef6-e387afcb162so1887147276.1
-        for <linux-bluetooth@vger.kernel.org>; Fri, 22 Nov 2024 00:01:32 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1732262492; x=1732867292; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=0n9X1zO0xeMvExen0u2qj/zc+VVdF7G7eQjHYHIY33g=;
-        b=WFybMwWJbTEtuZ37Ed+MQ+AJKHSzkouq0lF8XAzplLKSZI7TLuB0IkhiGrWHe/+Diu
-         sFPwXNDdo0uAa0R7+BQwpjtOH6KZwJNohUTC3Q9s/tuig92GJGEHyNjau9nfm6t9WEb6
-         llkLRYBW3udE97j0ChK91eHoSvgt5l/fnkDp4m7FU7XVpVvLEMIYWYxe9xUuR/IJZ4XX
-         uhT5COq+BE6XzqoXc1gP1Zxy+V3/I7VKgBv6HuIzKdbNC1HHHLLcXm1l2SMBVhnis6y+
-         +ay+EEer9Pfkag5DhBEdvWM7/QI+IXW2Y0E3m0gN8UyaetCFxLQoKQ0Et98D0FwvQC5o
-         YT6w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732262492; x=1732867292;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=0n9X1zO0xeMvExen0u2qj/zc+VVdF7G7eQjHYHIY33g=;
-        b=ru0IsmlqC3WamktFSPBHB9ec95jx/otUcHQap5RO+9hvQQuqnXIvsa0QPMs8UTaPkG
-         L6gHJvzwF1U3O9xVqgjVjyY5j+lJxsSpiIQAPUnXkTPaM6klbgBWSRhq/ASPw/WQnI88
-         ZcQTc6hI3DFfDZGtL9QnMchKwSGmB8F0htWk9sV0bhuxttxw9sM6RZJDzaSIqL6/yrvc
-         vIxuEwUOMxt/MAFgs1a6bh1090CINWvbLI20BQG0l3p8Z1X7zWXeDCJtRbhjcRY0tLIb
-         QeEA5FKMZ1XFOyBV0hc1/kNcMz5pvKnus4fDDPT4xJs/Y1nWNiSIUgSR8n04BTteR2Dv
-         V3PA==
-X-Forwarded-Encrypted: i=1; AJvYcCX+PBqML87GonQ9At3iUSDK31CFlziRA4a1ybyRIjQM6WSexrEoRR/g+N6HrJq5qM/+CXSOCnhfzzpu4WscmZg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzH44zkeFNHgUnTk8iWlT7DmZ7vmCi2MHurraO2nqE/zIl3IBUH
-	VMwKIZsJB8K/8RxxTU9fGYAUJZDCi7RN4ze5tq+LriYLP4dXEmu9aC78ZwLUhyyazAceTBk4PHt
-	+vLR2mvjGk5jYazR49y63CxXX/LfQ4Gb2nJCQZg==
-X-Gm-Gg: ASbGncsif2ftiZskrcGFFghHDKYXWEalfyf6I3phrELUbGWjll2m/haAFv6DR+xB9D4
-	Ng8wJoS8n2IZo0/Rx65yx/HZyX7oxbAxUGAKGW4nvzK259Q==
-X-Google-Smtp-Source: AGHT+IFU5ixE8Xx6CZ0SxpuikfRRPTuuMks+1EGpEPYq7zm+H95wFUg/aT+MJnKUnRB2FID0ghRSfJDLOAnf/bPxO5E=
-X-Received: by 2002:a05:6902:2a8f:b0:e38:a031:bbd3 with SMTP id
- 3f1490d57ef6-e38f8bcc9fbmr1727683276.39.1732262491893; Fri, 22 Nov 2024
- 00:01:31 -0800 (PST)
+	s=arc-20240116; t=1732264740; c=relaxed/simple;
+	bh=H/h+2FVqo5tleemtua1RZLVJsD/WqKpZWKO+BhnZGKo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=GLnbeR2f3hZMElIUtxfQEuyEgrwXKsAQW6vW96Z2Bcp96RvBHa46CxJLg1dq0fsRPiv1QfnLe44x9MbfHKdXsiOXuwRo7zpQywIcsXApz0H3LmESGIwLSQZcqA02f21Ymz7J84HU2YPZhrpvTBuo/p+JBxQTtCLdbX4X6eTbooE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
+Received: from [192.168.0.224] (ip5f5aed53.dynamic.kabel-deutschland.de [95.90.237.83])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 34AC561E5FE05;
+	Fri, 22 Nov 2024 09:29:01 +0100 (CET)
+Message-ID: <8e793382-f058-4f88-92b3-bb99b1deaffc@molgen.mpg.de>
+Date: Fri, 22 Nov 2024 09:29:00 +0100
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241120095428.1122935-1-quic_chejiang@quicinc.com>
- <20241120095428.1122935-3-quic_chejiang@quicinc.com> <smwxrjvdvyxw6tknucl6fb5jpjau2q4jcyjxpunbtt5ep6xsr4@ztuyfkrwgxoo>
- <44932c08-000f-4e6c-89b3-d7556a0a7a88@quicinc.com> <CAA8EJpq1u6ngze81LKAcGzQEJz=yJ-u6MjvRMJHdKp3aPVnewg@mail.gmail.com>
- <e8645b6c-7f78-4051-9e29-2276197714ed@quicinc.com>
-In-Reply-To: <e8645b6c-7f78-4051-9e29-2276197714ed@quicinc.com>
-From: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
-Date: Fri, 22 Nov 2024 10:01:21 +0200
-Message-ID: <CAA8EJprmdafDNpjEXg==NA3rQnMYKDxKrYLCoTH0WCv1R265Eg@mail.gmail.com>
-Subject: Re: [PATCH v2 2/4] dt-bindings: bluetooth: Add qca6698 compatible string
-To: "Cheng Jiang (IOE)" <quic_chejiang@quicinc.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
-	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Bjorn Andersson <andersson@kernel.org>, Konrad Dybcio <konradybcio@kernel.org>, 
-	Balakrishna Godavarthi <quic_bgodavar@quicinc.com>, Rocky Liao <quic_rjliao@quicinc.com>, 
-	quic_zijuhu@quicinc.com, linux-bluetooth@vger.kernel.org, 
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-arm-msm@vger.kernel.org, quic_mohamull@quicinc.com
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] Bluetooth: btusb: Ignore Nintendo Wii module
+To: Alan Jones <j.alan.jones@pm.me>
+Cc: linux-bluetooth@vger.kernel.org
+References: <HMjPEtiPDMAaCAIwvxGbpGc-F-pWc_xtxbsY_c8hA6_BLJjW8UJYvD2Znd2q8P21P3O2C4kkrei1ISdn4wBT5FIxf6tO1lr3EVcaFmZJjv4=@pm.me>
+ <20241122051947.716313-1-j.alan.jones@pm.me>
+Content-Language: en-US
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <20241122051947.716313-1-j.alan.jones@pm.me>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Fri, 22 Nov 2024 at 03:55, Cheng Jiang (IOE)
-<quic_chejiang@quicinc.com> wrote:
->
-> Hi Dmitry,
->
-> On 11/22/2024 12:28 AM, Dmitry Baryshkov wrote:
-> > On Thu, 21 Nov 2024 at 06:12, Cheng Jiang <quic_chejiang@quicinc.com> wrote:
-> >>
-> >> Hi Dmitry,
-> >>
-> >> On 11/20/2024 6:44 PM, Dmitry Baryshkov wrote:
-> >>> On Wed, Nov 20, 2024 at 05:54:26PM +0800, Cheng Jiang wrote:
-> >>>> Add QCA6698 qcom,qca6698-bt compatible strings.
-> >>>
-> >>> Why? Is it the same chip as WCN6855 or a different chip? Is it
-> >>> completely compatible?
-> >>>
-> >> They are different chips. But it's compatible with WCN6855.
-> >
-> > So, do we really need new compat? Will/can it use the same firmware?
-> We need to use a different firmware.
-
-Need because of the product needs or need because of the existing
-firmware not working with the chip?
-Wait... your WiFi colleagues were more helpful and they wrote that "it
-has different RF,
-IPA, thermal, RAM size and etc, so new firmware files used." ([1]).
-Please include that information in your commit messages too to let
-reviewers understand  what is going on.
-
-[1] https://lore.kernel.org/linux-arm-msm/20241024002514.92290-1-quic_miaoqing@quicinc.com/
-
-> Let me check if using
-> "firmware-name" allows us to omit the new soc type.
-> From the driver's perspective, the only change is the need to load a
-> different firmware.
-
-If you want to emphasise that it is not just WCN6855, extend schema to
-use fallback compatibles:
-compat = "qcom,qca6698-bt", "qcom,wcn6855-bt"; No driver changes are
-necessary with this approach.
+Dear Alan,
 
 
->
-> >
-> >>>>
-> >>>> Signed-off-by: Cheng Jiang <quic_chejiang@quicinc.com>
-> >>>> ---
-> >>>>  .../devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml   | 2 ++
-> >>>>  1 file changed, 2 insertions(+)
-> >>>>
-> >>>> diff --git a/Documentation/devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml b/Documentation/devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml
-> >>>> index 9019fe7bcdc6..527f947289af 100644
-> >>>> --- a/Documentation/devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml
-> >>>> +++ b/Documentation/devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml
-> >>>> @@ -18,6 +18,7 @@ properties:
-> >>>>      enum:
-> >>>>        - qcom,qca2066-bt
-> >>>>        - qcom,qca6174-bt
-> >>>> +      - qcom,qca6698-bt
-> >>>>        - qcom,qca9377-bt
-> >>>>        - qcom,wcn3988-bt
-> >>>>        - qcom,wcn3990-bt
-> >>>> @@ -175,6 +176,7 @@ allOf:
-> >>>>          compatible:
-> >>>>            contains:
-> >>>>              enum:
-> >>>> +              - qcom,qca6698-bt
-> >>>>                - qcom,wcn6855-bt
-> >>>>      then:
-> >>>>        required:
-> >>>> --
-> >>>> 2.25.1
-> >>>>
-> >>>
-> >>
-> >
-> >
->
+Thank you for your patch.
+
+Am 22.11.24 um 06:20 schrieb Alan Jones:
+> The Nintendo Wii uses a BCM2045 module running proprietary firmware.
+> This adapter is typically managed by emulation software via the raw
+> interface, and is incompatible with standard Bluetooth devices.
+> 
+> Attempting to initialize this adapter breaks synchronization with all
+> previously connected Wii Remotes, requiring applications to
+> re-synchronize the remotes on each usage.
+> 
+> Fix Wii Remote re-synchronization issues with the official Nintendo Wii
+> Bluetooth module by ignoring this adapter.
+
+Out of curiosity, is anything logged by Linux?
+
+> Signed-off-by: Alan Jones <j.alan.jones@pm.me>
+> ---
+>   drivers/bluetooth/btusb.c | 3 +++
+>   1 file changed, 3 insertions(+)
+> 
+> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+> index e9534fbc92e3..11c9ea182ea4 100644
+> --- a/drivers/bluetooth/btusb.c
+> +++ b/drivers/bluetooth/btusb.c
+> @@ -185,6 +185,9 @@ static const struct usb_device_id quirks_table[] = {
+>   	/* Broadcom BCM2045 devices */
+>   	{ USB_DEVICE(0x0a5c, 0x2045), .driver_info = BTUSB_BCM2045 },
+>   
+> +	/* Broadcom BCM2045 with Nintendo Wii firmware */
+> +	{ USB_DEVICE(0x057E, 0x0305), .driver_info = BTUSB_IGNORE },
+
+Could you please write the ids lowercase? Also, sort it above 0x0a5c?
+
+The comment above the existing entry suggests it’s for all BCM2045 
+devices. Could you explain, where the difference in the vendor id comes 
+from?
+
+> +
+>   	/* Atheros 3011 with sflash firmware */
+>   	{ USB_DEVICE(0x0489, 0xe027), .driver_info = BTUSB_IGNORE },
+>   	{ USB_DEVICE(0x0489, 0xe03d), .driver_info = BTUSB_IGNORE },
 
 
---
-With best wishes
-Dmitry
+Kind regards,
+
+Paul
