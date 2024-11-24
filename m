@@ -1,50 +1,49 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF16D1B85C9;
-	Sun, 24 Nov 2024 13:38:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A09061FAC3D;
+	Sun, 24 Nov 2024 13:43:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732455532; cv=none; b=WLCWCuIEHcMWi0G37RpteVVsQz04JRLI3dX5Ms7Kg6j1H0OFo9fs94oCkc75xuLLGH0lvn8CHy7/z89yojufWy6tUOGNl67NjFFh1lSAVhF6kFl6pA9nI95nqdVLWuWCb1mQSav8tcIqFaXHx9tw9M84KfUxJD3UcsNc6P63ttU=
+	t=1732455781; cv=none; b=M11x1yrXaH/58idPoVt2eYAgk50uBg6JHRMBDUas2egsbVFJcgui9aJtESKiVlR/HeftU7j9270muJlYGDXQEZZu8mx0bmVv0bIMGisS86Nh5Bn/4SIn95DCRMCEC8iC+s2IAeQPzYF2lH5IZfOe9d8VDw1ZpoNGD7jOuqVHjhw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732455532; c=relaxed/simple;
-	bh=jEb8q9faF808HFMBLN4NJXQ6d+H5TT+1yF2sXcH8ztY=;
+	s=arc-20240116; t=1732455781; c=relaxed/simple;
+	bh=EiHx87AeMv9RLTj88NFeMze1xpH+0f+7nisEo0+7Tq8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ioBC2d9/n/iG1CqrxCiZE8JOoIZXD+Gv9+R19dDitpDBka00wd3EtcrJBYJBrKfaXB7hCveU3DOL5CPq33DSBG3QTSdva11iMGaVYuvT2/WcnWs5Tb1E6okWPDUCiWXe7H8UzqrJ5xgK4utf8bZSq5BDatKXvDEj24e4/G//DFE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mnpdYw/v; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=RvhNO3HoQXaF2BrIhjWK4qvKdD1VJZlkmxx3ki3p43AyeiR3nHBEa3zwiPXH2cOIqWYi71p4gFEYu3mBvUWyRJ2ZivRwrcFTBmzGfe4i36kZssDLM021SNCo5bS3xIBsBUHnezndJiJqnD0Mqb305h4GzBN73w4d531jsz+iPDk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DhvCFk09; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mnpdYw/v"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 88DECC4CED1;
-	Sun, 24 Nov 2024 13:38:50 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DhvCFk09"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F0A7DC4CED3;
+	Sun, 24 Nov 2024 13:42:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1732455531;
-	bh=jEb8q9faF808HFMBLN4NJXQ6d+H5TT+1yF2sXcH8ztY=;
+	s=k20201202; t=1732455781;
+	bh=EiHx87AeMv9RLTj88NFeMze1xpH+0f+7nisEo0+7Tq8=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=mnpdYw/vIHlq6mTYQW4otconACqrdsBterYppG98AwtxEtyifl+D19A4O14DCHmPL
-	 iLMBY3/e8nz0jKJc7UXoIPpO2o8FFPyL0YPd5lXefV6Dx4/DtFVHvYBBblYCm8N3hK
-	 fCDOHC3e+2Ol7CMVZqqcMhjs0bHA59S9ZCmr3kA8ec95XHaWcRHlPobtAyoI9hyBzR
-	 uu8jz1tMcqvcrl94uV4mjcxCu6aA3IXqnxNfnlgKMkBu1ER4sb/eYQxtnPIHUo0Wpg
-	 ky9xbp/HOQU8fh0asNfx3POpP9SMjaaV6CfSAOSwbBkrS/VB3slXJCMHtOucPLoqBF
-	 qtdkDz7l7IZxQ==
+	b=DhvCFk09DRy9NfWReQQc9RpEGxqlk+d75eJ5nl8E6Imq8pqHl+8KN2eY5qN5Bb92o
+	 pAtcXDr7k/U4cKmoAubfZ8ycvAQUMvpHNVM6ESaf0pUA1FeCyeYNjO9F9oqFN2q6U1
+	 +1VvMhGqGKpMqmitz0MDwPWtyO8prQPsaQeUazGBARU6XMsGV6lAphdSpeOSSVsgYR
+	 ZmFwa5bcuUHihHGozkGOySYcqFZsieEiw2WMR1JI5KsrxYJuCAwEF0C1jq35ehZiMJ
+	 woKtrv7U2Sq7Bc4S8KPi9hkjq8GAhVYaPqPBZRPKaD4tNNc7GRfmdqt1pkLVV6plj5
+	 Ta7hE01dECEUw==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Jiande Lu <jiande.lu@mediatek.com>,
-	Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
+Cc: Ignat Korchagin <ignat@cloudflare.com>,
+	Kuniyuki Iwashima <kuniyu@amazon.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
 	Sasha Levin <sashal@kernel.org>,
 	marcel@holtmann.org,
+	johan.hedberg@gmail.com,
 	luiz.dentz@gmail.com,
-	matthias.bgg@gmail.com,
-	angelogioacchino.delregno@collabora.com,
-	linux-bluetooth@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Subject: [PATCH AUTOSEL 6.12 103/107] Bluetooth: btusb: Add 3 HWIDs for MT7925
-Date: Sun, 24 Nov 2024 08:30:03 -0500
-Message-ID: <20241124133301.3341829-103-sashal@kernel.org>
+	linux-bluetooth@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.11 33/87] Bluetooth: L2CAP: do not leave dangling sk pointer on error in l2cap_sock_create()
+Date: Sun, 24 Nov 2024 08:38:11 -0500
+Message-ID: <20241124134102.3344326-33-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20241124133301.3341829-1-sashal@kernel.org>
-References: <20241124133301.3341829-1-sashal@kernel.org>
+In-Reply-To: <20241124134102.3344326-1-sashal@kernel.org>
+References: <20241124134102.3344326-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -53,63 +52,40 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.12.1
+X-stable-base: Linux 6.11.10
 Content-Transfer-Encoding: 8bit
 
-From: Jiande Lu <jiande.lu@mediatek.com>
+From: Ignat Korchagin <ignat@cloudflare.com>
 
-[ Upstream commit de7dcf9d1df4b0009735756d0a2adff09c3f21d4 ]
+[ Upstream commit 7c4f78cdb8e7501e9f92d291a7d956591bf73be9 ]
 
-Add below HWIDs for MediaTek MT7925 USB Bluetooth chip.
-VID 0x0489, PID 0xe14f
-VID 0x0489, PID 0xe150
-VID 0x0489, PID 0xe151
+bt_sock_alloc() allocates the sk object and attaches it to the provided
+sock object. On error l2cap_sock_alloc() frees the sk object, but the
+dangling pointer is still attached to the sock object, which may create
+use-after-free in other code.
 
-Patch has been tested successfully and controller is recognized
-device pair successfully.
-
-MT7925 module bring up message as below.
-Bluetooth: Core ver 2.22
-Bluetooth: HCI device and connection manager initialized
-Bluetooth: HCI socket layer initialized
-Bluetooth: L2CAP socket layer initialized
-Bluetooth: SCO socket layer initialized
-Bluetooth: hci0: HW/SW Version: 0x00000000, Build Time: 20240816133202
-Bluetooth: hci0: Device setup in 286558 usecs
-Bluetooth: hci0: HCI Enhanced Setup Synchronous Connection command is advertised, but not supported.
-Bluetooth: hci0: AOSP extensions version v1.00
-Bluetooth: BNEP (Ethernet Emulation) ver 1.3
-Bluetooth: BNEP filters: protocol multicast
-Bluetooth: BNEP socket layer initialized
-Bluetooth: MGMT ver 1.22
-Bluetooth: RFCOMM TTY layer initialized
-Bluetooth: RFCOMM socket layer initialized
-Bluetooth: RFCOMM ver 1.11
-
-Signed-off-by: Jiande Lu <jiande.lu@mediatek.com>
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Signed-off-by: Ignat Korchagin <ignat@cloudflare.com>
+Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+Reviewed-by: Eric Dumazet <edumazet@google.com>
+Link: https://patch.msgid.link/20241014153808.51894-3-ignat@cloudflare.com
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/bluetooth/btusb.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+ net/bluetooth/l2cap_sock.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 2a90033c014b7..0dad2ac5914f4 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -654,6 +654,12 @@ static const struct usb_device_id quirks_table[] = {
- 						     BTUSB_WIDEBAND_SPEECH },
- 	{ USB_DEVICE(0x0489, 0xe139), .driver_info = BTUSB_MEDIATEK |
- 						     BTUSB_WIDEBAND_SPEECH },
-+	{ USB_DEVICE(0x0489, 0xe14f), .driver_info = BTUSB_MEDIATEK |
-+						     BTUSB_WIDEBAND_SPEECH },
-+	{ USB_DEVICE(0x0489, 0xe150), .driver_info = BTUSB_MEDIATEK |
-+						     BTUSB_WIDEBAND_SPEECH },
-+	{ USB_DEVICE(0x0489, 0xe151), .driver_info = BTUSB_MEDIATEK |
-+						     BTUSB_WIDEBAND_SPEECH },
- 	{ USB_DEVICE(0x13d3, 0x3602), .driver_info = BTUSB_MEDIATEK |
- 						     BTUSB_WIDEBAND_SPEECH },
- 	{ USB_DEVICE(0x13d3, 0x3603), .driver_info = BTUSB_MEDIATEK |
+diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+index ba437c6f6ee59..18e89e764f3b4 100644
+--- a/net/bluetooth/l2cap_sock.c
++++ b/net/bluetooth/l2cap_sock.c
+@@ -1886,6 +1886,7 @@ static struct sock *l2cap_sock_alloc(struct net *net, struct socket *sock,
+ 	chan = l2cap_chan_create();
+ 	if (!chan) {
+ 		sk_free(sk);
++		sock->sk = NULL;
+ 		return NULL;
+ 	}
+ 
 -- 
 2.43.0
 
