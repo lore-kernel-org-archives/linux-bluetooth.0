@@ -1,91 +1,91 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f174.google.com (mail-pg1-f174.google.com [209.85.215.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDE1624CD6D;
-	Sun, 24 Nov 2024 13:57:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A927C18872F
+	for <linux-bluetooth@vger.kernel.org>; Sun, 24 Nov 2024 16:56:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732456643; cv=none; b=nZ0w30cQsRP4qR5zbvvEaJvG3DjDY+2qD6lUwRCvoymBsUFuOCvrfenXYVFaqkOaz22KIHfL7yEweOxPPK+rJEyrhuavrks1GpUFC3wzooliyDivNlgNQAV+7txzTG+Vwju6tPxn/lx5ZLFVCOjFvsyOdYXtxDnyevOPazKKC74=
+	t=1732467380; cv=none; b=sPYgsujebP/QVQSl0j81ZigguR6pB89G/OaLF9E1tf8jiIPkiEpsAkUYhNlBI3QxkahGEJ6/k/26YnpvxD698P/7Dj3Qjp6Rl8A6mcUC/9jnPwfWYdbRsPRlF1jCLVjmqfJ6K9LvIxbeX35ALFyuzKVIbySOozd6vU59YWC9bQM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732456643; c=relaxed/simple;
-	bh=U6e2xnFycxDT1EdesiOYwuOUuFG13RhEUJmvFb2V1V8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=fIQnFUMm5C8jWkX1WVqOokU0mncqB5dDyE/HQkkM9pv2jfK1G4i/9QymYNxQxZM7KfjWA7pNb7HUHjuywSHDfB6BcAgeUZe0Q1YdipCGzMBhXaI062ib4yA1we+symWNtfaiIZzA10a3TDHOtGlA+6dHZGxqvh1UQpnJTNtsFH4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Jdj0DqqV; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1732467380; c=relaxed/simple;
+	bh=YYZqBRBm0rWyaNBGgGwnZE3W9nk3jTfF8EkfNxZmiSs=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=AdwPnTifk09iuKuzR46afbYMd8gJtP7V82usVx4NqHn47gJReJPkgwBpSdynkm0xOrkp5u7DtWoaGvFJ61KcyPOvQQivVe2Wlk9s7HZvwLKrqhwB0g1E41ZyEHVj71Ar1y5DfPzux6twc/uTG3Jz4OpsL5dyk3tXfDGKBaWAwo4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EFl8kDXu; arc=none smtp.client-ip=209.85.215.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Jdj0DqqV"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A1DC9C4CED3;
-	Sun, 24 Nov 2024 13:57:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1732456642;
-	bh=U6e2xnFycxDT1EdesiOYwuOUuFG13RhEUJmvFb2V1V8=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Jdj0DqqVboG7L1VYHxE+53TqS2JRw1M+rcHuZoyRHFAMEjT3YcZO2dCiaBkegGsrw
-	 rEmP4R6QokgDxEIvgLvS1jZ9tT5epwZ1ffjsMEHQubyGChfjqj1hevwrYd4Y6F7oAp
-	 42JW11D8+XwlNevjq3td9pWLy8xd2TkKEGONaU6bVpqbIwr4tPYbf6AMh+9tXljsPD
-	 u5WJ111CPxWdxyeSVETIscdpEJ7cYpt/bzZrZTFp36rI8J8ceSdrr95r2933MySME9
-	 oWANS5shDJhD+lZYGjmKkslx0VNwjzo5tXGUhVgjZL2KpofiyTK0qEBVabyidg3QRY
-	 1mTcVvV2JTarQ==
-From: Sasha Levin <sashal@kernel.org>
-To: linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Cc: Ignat Korchagin <ignat@cloudflare.com>,
-	Kuniyuki Iwashima <kuniyu@amazon.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Sasha Levin <sashal@kernel.org>,
-	marcel@holtmann.org,
-	johan.hedberg@gmail.com,
-	luiz.dentz@gmail.com,
-	linux-bluetooth@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.19 06/21] Bluetooth: L2CAP: do not leave dangling sk pointer on error in l2cap_sock_create()
-Date: Sun, 24 Nov 2024 08:56:39 -0500
-Message-ID: <20241124135709.3351371-6-sashal@kernel.org>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20241124135709.3351371-1-sashal@kernel.org>
-References: <20241124135709.3351371-1-sashal@kernel.org>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EFl8kDXu"
+Received: by mail-pg1-f174.google.com with SMTP id 41be03b00d2f7-7f71f2b1370so2996788a12.1
+        for <linux-bluetooth@vger.kernel.org>; Sun, 24 Nov 2024 08:56:17 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1732467376; x=1733072176; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=CwcBrsmEDZnt6aalpixZ226v/pEWFHGKMENTA5N1x58=;
+        b=EFl8kDXu1RBFhEDCQmLwKGq5Mb3ECywllvTa57fscFVOOJc7aihWadSRnPiuf80q+i
+         KSIopsc1Ig3bOW9uE+Vt51tRU4sGgMU0qjrZ8XHuRhG1C4EMmUw5cMIz754qzZZOmcZi
+         gU7lbr8/rU3w5C9sdqB0oDhz/FVYZZomQeyxAlOvv4P7w8L9uuuearE8OyCm287QbU//
+         zWShKDDPd+93SFVRjxh9Z+IIzo4BL40gAa8iWvQ1k4wURzPamKCVxTswWW/JUOpqu8Lj
+         Z4BOyvYvY1m3sAqR7KQqkKxMOFeycpdP+pjjObb5oXScyPHNiSGu42+O0g4fBdVq42nm
+         gwIQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1732467376; x=1733072176;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=CwcBrsmEDZnt6aalpixZ226v/pEWFHGKMENTA5N1x58=;
+        b=nnBlsSoPym+unOt6OlI5DkEKJIfE7FkHFn3ypYz8WdjldscG5Vnq6ZUpjathIbQlrC
+         OlH7PzlXrQb2NTJGxa4h7vQ9HZlUTi1QFv3YwdBWKqZhsNidhiKNKsX/72aLYdVXP48Y
+         ZTIi02SoVfrC2GaLhJHw5dDFOnYyTDn90lc35Mm3Zczlzf4dHEShX1ivmE1KTk13wlal
+         /DL9m3lLcoO/Ssi2zcgeey2Hsnr7R7kqxQ9CP+xuhPlJnqfmhbd4BSSU5VFVipLFcWmB
+         9dacbZbeLHisHRuIxe2gHpKIZjyIwokmBdAy0weeoUxxzY9T+xcoezbGb2nJa7e2B0+H
+         +o5A==
+X-Gm-Message-State: AOJu0YywQi6tluu0j5Z1FTIOPhZQcmPt6dwe1ntMAYTJnA7bkmZBpZ70
+	Ev0FxyUDeW/sDvkfvgcq+1Ri1xpWE4omc6f9VsocgYVxe7k2aRDf/g/WxA==
+X-Gm-Gg: ASbGncsrCuSU+LqJsVvpdO7x3Kcmc4RksaMMQQ9qJhGLTmrEL2OR2v9h7jV2hvVLphh
+	QmHEnDKzmaex5FnujIPRRGqrDedCOatMvn0gzDOCBfPNuBIxrQeoPweKuqiZ5BRqfwJUyk5c3m+
+	HUKy9aoWxYh8vg/guXZ8Du3lR0vSLJG3HTe1SXM82Y3PgcipkB8qlOJlk15dR7rU9eYoH8AREHh
+	s98kFhtRAP+PQrtqU6MM1lFZ6Ye4+YDgHzndBHNiFt3dRRgOg==
+X-Google-Smtp-Source: AGHT+IEtuPUedzoOgwinO9Sk7a0RvLbmomYKMVhl8wYqHv2QEqN8lGULk5ZUPS9ndft5EFdOYQQKfg==
+X-Received: by 2002:a05:6a20:9152:b0:1db:dc37:4f4b with SMTP id adf61e73a8af0-1e09e452659mr16624945637.24.1732467376507;
+        Sun, 24 Nov 2024 08:56:16 -0800 (PST)
+Received: from [::1] ([2001:19f0:ac01:93b:5400:4ff:fe77:2098])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7fbcc1e25cesm4986381a12.28.2024.11.24.08.56.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 24 Nov 2024 08:56:16 -0800 (PST)
+From: Yuxin Wang <yuxinwang9999@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Yuxin Wang <yuxinwang9999@gmail.com>
+Subject: [PATCH BlueZ 0/2] advertising: Add scan response data handling
+Date: Sun, 24 Nov 2024 16:55:37 +0000
+Message-Id: <20241124165539.2913146-1-yuxinwang9999@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-X-stable-base: Linux 4.19.324
 Content-Transfer-Encoding: 8bit
 
-From: Ignat Korchagin <ignat@cloudflare.com>
+Scan response is already supported through the mgmt-api. These patches add scan
+response data handling to the DBus API and bluetoothctl.
 
-[ Upstream commit 7c4f78cdb8e7501e9f92d291a7d956591bf73be9 ]
+For related discussions, please see https://github.com/bluez/bluez/pull/1012 .
 
-bt_sock_alloc() allocates the sk object and attaches it to the provided
-sock object. On error l2cap_sock_alloc() frees the sk object, but the
-dangling pointer is still attached to the sock object, which may create
-use-after-free in other code.
+Yuxin Wang (2):
+  advertising: Add scan response properties to LEAdvertisement1
+  advertising: Add scan response support in bluetoothctl
 
-Signed-off-by: Ignat Korchagin <ignat@cloudflare.com>
-Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
-Reviewed-by: Eric Dumazet <edumazet@google.com>
-Link: https://patch.msgid.link/20241014153808.51894-3-ignat@cloudflare.com
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- net/bluetooth/l2cap_sock.c | 1 +
- 1 file changed, 1 insertion(+)
+ client/advertising.c              | 486 +++++++++++++++++++++++-------
+ client/advertising.h              |  25 +-
+ client/bluetoothctl-advertise.rst |  39 +++
+ client/main.c                     |  95 +++++-
+ doc/org.bluez.LEAdvertisement.rst |  37 ++-
+ src/advertising.c                 | 132 +++++---
+ 6 files changed, 645 insertions(+), 169 deletions(-)
 
-diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-index 8dcd3af05d9fc..5a955bd40f7b9 100644
---- a/net/bluetooth/l2cap_sock.c
-+++ b/net/bluetooth/l2cap_sock.c
-@@ -1659,6 +1659,7 @@ static struct sock *l2cap_sock_alloc(struct net *net, struct socket *sock,
- 	chan = l2cap_chan_create();
- 	if (!chan) {
- 		sk_free(sk);
-+		sock->sk = NULL;
- 		return NULL;
- 	}
- 
 -- 
-2.43.0
+2.39.5
 
