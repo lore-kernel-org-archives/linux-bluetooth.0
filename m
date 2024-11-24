@@ -1,46 +1,49 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3F491FECA4;
-	Sun, 24 Nov 2024 13:56:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDE1624CD6D;
+	Sun, 24 Nov 2024 13:57:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732456603; cv=none; b=kAvd9CYFLyv5/YT5RluJG1KJLbiig1mQlmEFNdBA89a6PfoZJKhLBnyIJT/kqdL9vCcwP1wdq9Fs/vAlr32v9YBBFJAuLKqsJleuN7R0NKlwIzcANOjk6phMqaSAPMntRP2Q0PJ0fwffQyQ5CPGmCDhYfUqnZAkA5LTbvEGCqUY=
+	t=1732456643; cv=none; b=nZ0w30cQsRP4qR5zbvvEaJvG3DjDY+2qD6lUwRCvoymBsUFuOCvrfenXYVFaqkOaz22KIHfL7yEweOxPPK+rJEyrhuavrks1GpUFC3wzooliyDivNlgNQAV+7txzTG+Vwju6tPxn/lx5ZLFVCOjFvsyOdYXtxDnyevOPazKKC74=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732456603; c=relaxed/simple;
-	bh=GOPPB6tZGtho5z8palUPGh0OqdF0yoEtVp+W8gTuMSQ=;
+	s=arc-20240116; t=1732456643; c=relaxed/simple;
+	bh=U6e2xnFycxDT1EdesiOYwuOUuFG13RhEUJmvFb2V1V8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=o3tks82G55k09z1yreI1xkJ/dzU2DMRAKYOrF+rzzXRLDi6XjnjOJ8rbdJ1hR8JIcUPHwvUp/p1Id2duTLpxUuayh50V5WehnLmaYGglpzUyXRi+a/l9jZZfO5Z/tUwOrvlek5jNFIGqJxRxk8YXHgPokgt8V7b4jjjhoHaDU5U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cD72Y2qa; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=fIQnFUMm5C8jWkX1WVqOokU0mncqB5dDyE/HQkkM9pv2jfK1G4i/9QymYNxQxZM7KfjWA7pNb7HUHjuywSHDfB6BcAgeUZe0Q1YdipCGzMBhXaI062ib4yA1we+symWNtfaiIZzA10a3TDHOtGlA+6dHZGxqvh1UQpnJTNtsFH4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Jdj0DqqV; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cD72Y2qa"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E8991C4CECC;
-	Sun, 24 Nov 2024 13:56:41 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Jdj0DqqV"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A1DC9C4CED3;
+	Sun, 24 Nov 2024 13:57:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1732456602;
-	bh=GOPPB6tZGtho5z8palUPGh0OqdF0yoEtVp+W8gTuMSQ=;
+	s=k20201202; t=1732456642;
+	bh=U6e2xnFycxDT1EdesiOYwuOUuFG13RhEUJmvFb2V1V8=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=cD72Y2qaTSqSr40waSw48ldKshk3Jl4P+et/OEtV+t5qHSLE/t+tRJBwaBf3icnj+
-	 5HELnd119GtcWXMLY7AtNDSgEWzlhDZIRNubc1NyhScYQdMAi3nUqfyjJ1zUGvno7z
-	 iXkUiw/GnKpqmd3F5M6t0mCekFeil68k5paMHqZL+PhOFW2GTIAXYkACHh4+lyqV0R
-	 MoNzypheXM4mpM6C9uA7jhbPxrz9QhYjC6B/s0dt7p9jZUXsvlBQF7htAq6CI1bt2/
-	 yTiaxcm9m2rOerqYR0KgawR3kCft8hRKoby9P2QBh7LVWan/i50dno2VIKWKe4uOds
-	 jsA2zCuilSivg==
+	b=Jdj0DqqVboG7L1VYHxE+53TqS2JRw1M+rcHuZoyRHFAMEjT3YcZO2dCiaBkegGsrw
+	 rEmP4R6QokgDxEIvgLvS1jZ9tT5epwZ1ffjsMEHQubyGChfjqj1hevwrYd4Y6F7oAp
+	 42JW11D8+XwlNevjq3td9pWLy8xd2TkKEGONaU6bVpqbIwr4tPYbf6AMh+9tXljsPD
+	 u5WJ111CPxWdxyeSVETIscdpEJ7cYpt/bzZrZTFp36rI8J8ceSdrr95r2933MySME9
+	 oWANS5shDJhD+lZYGjmKkslx0VNwjzo5tXGUhVgjZL2KpofiyTK0qEBVabyidg3QRY
+	 1mTcVvV2JTarQ==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Hilda Wu <hildawu@realtek.com>,
-	Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
+Cc: Ignat Korchagin <ignat@cloudflare.com>,
+	Kuniyuki Iwashima <kuniyu@amazon.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
 	Sasha Levin <sashal@kernel.org>,
 	marcel@holtmann.org,
+	johan.hedberg@gmail.com,
 	luiz.dentz@gmail.com,
 	linux-bluetooth@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.4 24/28] Bluetooth: btusb: Add RTL8852BE device 0489:e123 to device tables
-Date: Sun, 24 Nov 2024 08:55:24 -0500
-Message-ID: <20241124135549.3350700-24-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.19 06/21] Bluetooth: L2CAP: do not leave dangling sk pointer on error in l2cap_sock_create()
+Date: Sun, 24 Nov 2024 08:56:39 -0500
+Message-ID: <20241124135709.3351371-6-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20241124135549.3350700-1-sashal@kernel.org>
-References: <20241124135549.3350700-1-sashal@kernel.org>
+In-Reply-To: <20241124135709.3351371-1-sashal@kernel.org>
+References: <20241124135709.3351371-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -49,67 +52,39 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 5.4.286
+X-stable-base: Linux 4.19.324
 Content-Transfer-Encoding: 8bit
 
-From: Hilda Wu <hildawu@realtek.com>
+From: Ignat Korchagin <ignat@cloudflare.com>
 
-[ Upstream commit 69b84ffce260ff13826dc10aeb3c3e5c2288a552 ]
+[ Upstream commit 7c4f78cdb8e7501e9f92d291a7d956591bf73be9 ]
 
-Add the support ID 0489:e123 to usb_device_id table for
-Realtek RTL8852B chip.
+bt_sock_alloc() allocates the sk object and attaches it to the provided
+sock object. On error l2cap_sock_alloc() frees the sk object, but the
+dangling pointer is still attached to the sock object, which may create
+use-after-free in other code.
 
-The device info from /sys/kernel/debug/usb/devices as below.
-
-T:  Bus=01 Lev=01 Prnt=01 Port=07 Cnt=04 Dev#=  7 Spd=12   MxCh= 0
-D:  Ver= 1.00 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-P:  Vendor=0489 ProdID=e123 Rev= 0.00
-S:  Manufacturer=Realtek
-S:  Product=Bluetooth Radio
-S:  SerialNumber=00e04c000001
-C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=500mA
-I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
-E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-
-Signed-off-by: Hilda Wu <hildawu@realtek.com>
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Signed-off-by: Ignat Korchagin <ignat@cloudflare.com>
+Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+Reviewed-by: Eric Dumazet <edumazet@google.com>
+Link: https://patch.msgid.link/20241014153808.51894-3-ignat@cloudflare.com
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/bluetooth/btusb.c | 2 ++
- 1 file changed, 2 insertions(+)
+ net/bluetooth/l2cap_sock.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 6616671dfd32f..9f71f9135f9e3 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -372,6 +372,8 @@ static const struct usb_device_id blacklist_table[] = {
- 						     BTUSB_WIDEBAND_SPEECH },
- 	{ USB_DEVICE(0x13d3, 0x3591), .driver_info = BTUSB_REALTEK |
- 						     BTUSB_WIDEBAND_SPEECH },
-+	{ USB_DEVICE(0x0489, 0xe123), .driver_info = BTUSB_REALTEK |
-+						     BTUSB_WIDEBAND_SPEECH },
- 	{ USB_DEVICE(0x0489, 0xe125), .driver_info = BTUSB_REALTEK |
- 						     BTUSB_WIDEBAND_SPEECH },
+diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+index 8dcd3af05d9fc..5a955bd40f7b9 100644
+--- a/net/bluetooth/l2cap_sock.c
++++ b/net/bluetooth/l2cap_sock.c
+@@ -1659,6 +1659,7 @@ static struct sock *l2cap_sock_alloc(struct net *net, struct socket *sock,
+ 	chan = l2cap_chan_create();
+ 	if (!chan) {
+ 		sk_free(sk);
++		sock->sk = NULL;
+ 		return NULL;
+ 	}
  
 -- 
 2.43.0
