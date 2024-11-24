@@ -1,46 +1,49 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE85B22F65A;
-	Sun, 24 Nov 2024 13:48:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D7B923355B;
+	Sun, 24 Nov 2024 13:50:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732456139; cv=none; b=G4VhEP3take7SA96pmGk3MJDUUL0dLrqGsaCBsdSS//6N0+AWtiuhRBTT50Tt/wr9qeYJrmOLD/Wjc1hsYUPoYAiDRrcAntl87JcdnO3adh7yRQstdpjOqPWgkIUhc/vlY1oQ24xZvVGpChO16IOAXP8MDzutX68oh07Hacz810=
+	t=1732456223; cv=none; b=tGCpMV5AzlBN0YKz+zNRCwncDh6u7n387DEI/T+rprcsHlY9LI5d/J1EKrAn/W9U700XnvJYXfmuHQMJlIPscYDX5RMObzkgAP7eh9jgJMQ/NqWIN2ny9SkoiFK/yPz7B+KAKQ1/CR/8Sx+S3ISmkPdBmTT0lzEQ1MUAFlUhjyc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732456139; c=relaxed/simple;
-	bh=HQu77XFg0aT1U7uWWUflh3GXzswXFL2V0AkWMKKHtoo=;
+	s=arc-20240116; t=1732456223; c=relaxed/simple;
+	bh=w9JPbwdPRzEeAVQYLEJ1St/BssbsSv/B8KXtxIjLXTE=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=eTmQxfQ5MdtJGL+w2YsWI6QIH3P5WOIjDp3bKG7ZOX5JEUaXk0G88Q4DGbST3eNp0evwF0bJEgRPmK7U2ic00M3mDGlAfP8UitySNKAFbi8l2r7DvX0p1F37A2dkL+/63OnpkNWP9uOqV0pRTohMdjON3fFzc7F34hBkjKxXnzE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JBTBqi8G; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=kjHSbdt3Z5ZYECIvR5hn4iwJ0o32BKumAyeSvxWzCd0En7xD8xiPGkp4Lj4ryhKGgUORrCu5wG3TnYNdMKX50KIIYg//vimC4Edft/Zur3cop96DhImxOmp8pF6BuUfwO8JrNNUk5SOG1bLWHigdJsDPCg/Xh11lx6soZcjBXOU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IoNdwaJG; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JBTBqi8G"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 57E4DC4CECC;
-	Sun, 24 Nov 2024 13:48:58 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IoNdwaJG"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E931DC4CED1;
+	Sun, 24 Nov 2024 13:50:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1732456139;
-	bh=HQu77XFg0aT1U7uWWUflh3GXzswXFL2V0AkWMKKHtoo=;
+	s=k20201202; t=1732456223;
+	bh=w9JPbwdPRzEeAVQYLEJ1St/BssbsSv/B8KXtxIjLXTE=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=JBTBqi8Ga9wsGPbsb9qUjM9FCh5/7TUCj/5Vja4t+fySBPldLB+lpFwWqt9I13By6
-	 rBaDcDNYrDsNN2ilI8RmQppyglbiFzvxmwbTyt2t9K24vCZ6DC0KxLcqq0M6hLugnV
-	 AUlk6QcGmAhNmRiSAiv3KGfcLdnIze3z05l+vr/ns6rstMqQ3eoYQo535wpEkw1rnu
-	 wHrLy/7e4zfKxDYhnNk5kylkgtWukrzEgVXp96XPux7umLGWHqUOgJwULLkGrDGzu7
-	 7uapGOAL7kf4GrniaULRmxBWuC797MChpOQ/0kPXbX9eUgp/G/GXY2adLa/5gDBpUH
-	 nKcWeW/emTKIg==
+	b=IoNdwaJGtjeONjmXvjSzakUwXAhJAs/KuBhPwNwNZ3aLr+q6IzQUL01DPbr1UP40W
+	 VixcnqC1Ng1YBqaTLZl+joXGUMYkWtKVUUytv6dF7jvFaELHc+0f94qGaBJibM8Dk9
+	 JOspb9pV/b5Sg2b0ldKDBqmYSO1L6mdVFP+G+l2NjXLGOfwnexqusKeXGe5LCIbwS9
+	 kWOHuEZ3pSSiP2vzJkAFkl/WzAICTkQKhIfisf+swyb6kckNs9DMGc56CVFb6YNh+m
+	 OBxYQVNPqVLJjXdZ5SHqlPMAu8KG3zWowm6wm+ac2DfKEqy98I5yzYHe3LeMFi8669
+	 gGwn3vsw+Lvvg==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Danil Pylaev <danstiv404@gmail.com>,
-	Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
+Cc: Ignat Korchagin <ignat@cloudflare.com>,
+	Kuniyuki Iwashima <kuniyu@amazon.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
 	Sasha Levin <sashal@kernel.org>,
 	marcel@holtmann.org,
+	johan.hedberg@gmail.com,
 	luiz.dentz@gmail.com,
 	linux-bluetooth@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.6 57/61] Bluetooth: Set quirks for ATS2851
-Date: Sun, 24 Nov 2024 08:45:32 -0500
-Message-ID: <20241124134637.3346391-57-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.1 16/48] Bluetooth: L2CAP: do not leave dangling sk pointer on error in l2cap_sock_create()
+Date: Sun, 24 Nov 2024 08:48:39 -0500
+Message-ID: <20241124134950.3348099-16-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20241124134637.3346391-1-sashal@kernel.org>
-References: <20241124134637.3346391-1-sashal@kernel.org>
+In-Reply-To: <20241124134950.3348099-1-sashal@kernel.org>
+References: <20241124134950.3348099-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -49,35 +52,40 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.6.63
+X-stable-base: Linux 6.1.119
 Content-Transfer-Encoding: 8bit
 
-From: Danil Pylaev <danstiv404@gmail.com>
+From: Ignat Korchagin <ignat@cloudflare.com>
 
-[ Upstream commit 677a55ba11a82c2835550a82324cec5fcb2f9e2d ]
+[ Upstream commit 7c4f78cdb8e7501e9f92d291a7d956591bf73be9 ]
 
-This adds quirks for broken ats2851 features.
+bt_sock_alloc() allocates the sk object and attaches it to the provided
+sock object. On error l2cap_sock_alloc() frees the sk object, but the
+dangling pointer is still attached to the sock object, which may create
+use-after-free in other code.
 
-Signed-off-by: Danil Pylaev <danstiv404@gmail.com>
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Signed-off-by: Ignat Korchagin <ignat@cloudflare.com>
+Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+Reviewed-by: Eric Dumazet <edumazet@google.com>
+Link: https://patch.msgid.link/20241014153808.51894-3-ignat@cloudflare.com
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/bluetooth/btusb.c | 2 ++
- 1 file changed, 2 insertions(+)
+ net/bluetooth/l2cap_sock.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 326ef250bab94..fe5e30662017d 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -4490,6 +4490,8 @@ static int btusb_probe(struct usb_interface *intf,
- 		set_bit(HCI_QUIRK_BROKEN_SET_RPA_TIMEOUT, &hdev->quirks);
- 		set_bit(HCI_QUIRK_BROKEN_EXT_SCAN, &hdev->quirks);
- 		set_bit(HCI_QUIRK_BROKEN_READ_ENC_KEY_SIZE, &hdev->quirks);
-+		set_bit(HCI_QUIRK_BROKEN_EXT_CREATE_CONN, &hdev->quirks);
-+		set_bit(HCI_QUIRK_BROKEN_WRITE_AUTH_PAYLOAD_TIMEOUT, &hdev->quirks);
+diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+index b17782dc513b5..4e965916c17c1 100644
+--- a/net/bluetooth/l2cap_sock.c
++++ b/net/bluetooth/l2cap_sock.c
+@@ -1920,6 +1920,7 @@ static struct sock *l2cap_sock_alloc(struct net *net, struct socket *sock,
+ 	chan = l2cap_chan_create();
+ 	if (!chan) {
+ 		sk_free(sk);
++		sock->sk = NULL;
+ 		return NULL;
  	}
  
- 	if (!reset)
 -- 
 2.43.0
 
