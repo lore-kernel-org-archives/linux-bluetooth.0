@@ -1,238 +1,1235 @@
-Received: from mail-il1-f197.google.com (mail-il1-f197.google.com [209.85.166.197])
+Received: from mail-lj1-f174.google.com (mail-lj1-f174.google.com [209.85.208.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0255188A3B
-	for <linux-bluetooth@vger.kernel.org>; Mon, 25 Nov 2024 13:16:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.197
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2E9A191F91
+	for <linux-bluetooth@vger.kernel.org>; Mon, 25 Nov 2024 17:19:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732540583; cv=none; b=lN5jGhzLOcTFxI3jWybYXwXRrc5BUPPywQxnEe9pqMO12mHw8mnyUC+V6GoUa+r54A1Vtpjq5xPN+q2pe6wdYJfSCVBp7DkN+VEmrxlcVzNwMpNQxaJCOkqaieVS+VNX6OGqgzyoFz4QNLB8LiKJ12y73hIhDnfHiu4yK8lP1ps=
+	t=1732555175; cv=none; b=T+dBa1aGdWPp1A441QCytneoJDt92Fl3ozxnYQdH/KCUuBTWDx+gSBKoh+t2ApxG7lK+lzEcMO5/+8mjY2zI8tCyPY3TKZf5XD5NYaNI/zeFOKa5bB+YoEXAI8+4pEgIl0yivhfmKPd3A1iT94i2PSEj19Tdq5agufP3iuTuhts=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732540583; c=relaxed/simple;
-	bh=kavIXEzJWN3qSz/hndy86H+X+t69Vo5JVaoK0T5JFHQ=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=RiQbw+fxBxmUL36TOg9H3kDhnn6806KWo+uz0HpnEub3CIAHP1Pmi7Yl+hjxX4zQ6UiXVWV4GXv/Wr40am8F1+hE2RKQW8iqGAw3ZfEFZOm23KwYZt09CO20hgTr/Zv2vEMSPIrInK9QeMDTKUr8/YDS5VXWL57dmvnN4bMgytE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.197
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-3a77d56e862so37156565ab.3
-        for <linux-bluetooth@vger.kernel.org>; Mon, 25 Nov 2024 05:16:21 -0800 (PST)
+	s=arc-20240116; t=1732555175; c=relaxed/simple;
+	bh=1yGqn08rKjq06qMF+bj/uOaXNr8K05ciaP2AZIaovNc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=f5iwIyyo766pUoRp2ZKfewk42xl8kR3yjePxF28yGoCnZqKnltDMRyBgdf3AwwRhv8bBLQ22dUdHZ5+7ZYyh7643S3NU3z+uUSvWL5hVbd1CdWOeMknNeJyoFb76O678rSEPL5CPvH79+x1pSFHOy0c3WG3SiaMesgVIGaVWL1I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mXP/OKgG; arc=none smtp.client-ip=209.85.208.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mXP/OKgG"
+Received: by mail-lj1-f174.google.com with SMTP id 38308e7fff4ca-2ffc86948dcso8683621fa.2
+        for <linux-bluetooth@vger.kernel.org>; Mon, 25 Nov 2024 09:19:32 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1732555171; x=1733159971; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=kqR2Uvr/4Cd0khPX6IaUTMwjHfajubdml1k0WXZeYyU=;
+        b=mXP/OKgG25k7xknCvJt1AByhDCvXaiWaw518GrcU7MXXRpzSuYv5yjRk3aGnwFycKv
+         Tmug9/FyggBwRubDn7iMIz9aYhCF4jEYPciRNlqmfIzGIwbqRIpTbneT0Vehb4qlPFtd
+         ELveMs0suwnLGhZrxMtRs5YtHcvPHZbBRnSo0Tq5fb4woEeninB6txDIjCgEEV+y/Gao
+         n0LxZxr8W86Qz7mkI7Hcp+kWjKQrvS3RQ17cUBrXeafyl2SDSF4W+vVEBZOTump6FEb0
+         DJmqz1xEKAdFOeeRkzkYu+gOvob+AGY902t9TOIlimA2TU2eifQeQxqWD7R2hEkQx34Z
+         DnjQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732540581; x=1733145381;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=wNDQAV8xQIUCDicmJ8kWu95G4znNJEWeqCR59wPFfsE=;
-        b=a2O04XDUtX1i16TmDGKB0PzXv3lkHOz8HyC+JPJWLQiXeZeGhvhwJaLQkQj/gr3V6J
-         muzUawgUrjOEjWqF9DTztST0nfMoUUKe2P/zu2ilhf9kZO2HYsrl/afWXcq4VddzXwJQ
-         QM0iyUe658vZ2+xCX/zntZNOo5CJx7z8BRqB5V6/NwJMiomjtTgPrf0hKem/JLi9gLLU
-         qihwJFySqaoGc1E86YK1Xhr3Iri3XqW8EeA1ydAzovbv8YN8/MR21bYzqK+Hw/dhKvbm
-         f9V/OTRmwqg7QgwDDhyQ7tC4MW2lZwt2pCHCD/mxlbjGeGVKRkGfPxdvR52Guiby3dYw
-         XzVQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU/yqtMUPU2RXc75cyd/TDLiBBiRUJoFi6ajcU34oE5RSKa1lvtzmD5ZQQh2gipsSDE9ZjwdHUStthHvH+b+uM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzxaTmka2BJJRc5IByLUGlrO6w69Ux1/qib+xIKrlSpDS7D0IZL
-	fg9/WchKwovIjqucvzwTIuzvZAU4XEQiRP2S6cl0jllxztZ0prGVQtUuGIXsfWHq60uIHFhB0Lh
-	VmbkVFIKCXcLmjT0NS/Z9vFHaaMU5dUmqxrWiivh5UbY1dfeFOjJoEsc=
-X-Google-Smtp-Source: AGHT+IEI/mmtZLarB0hw0sSiT5VKM/p/rF6QXYmnnKiZsY2qPda61fWlU3WJyMNSM0F+LKDZCZxgSRTil0TK0m0jQxfW5xIsvbqo
+        d=1e100.net; s=20230601; t=1732555171; x=1733159971;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=kqR2Uvr/4Cd0khPX6IaUTMwjHfajubdml1k0WXZeYyU=;
+        b=HihUAFs3Etz8QGafnhKiD5ieHkAU1em4VEwHiaw6pFfznjDBVX8vw72T9JNXlXEXNp
+         1Fj6gqauEG6Cj5TCDXiUsEPmLbYZG0Lfkaos4N5OP5kmPc65ZYs8PRfFRvDCZeYTM3HZ
+         GHAMVdSqJZT5qomDoVsCf2wjvX2d95Y6EeX18HnnsHDGGeWm03asvpeCKqZIFF4rNVrn
+         u1a7Wnq3QegF7qY8FTkpo7yiDt1NMegVW6Jm742eiwDrr22EFs7CVVMMKYA4Y8UXJqJh
+         qsS9Av/ex1P+SiGbc1ykjnPzZDnxWNyzthZPuvXh73R7VB4Xc1pkOCScvAhbSoHOo3Zf
+         37Kg==
+X-Gm-Message-State: AOJu0YyCiq+zkM++qnDR+ZFvPxZqtFpSEfyp3jMYjMQewmafvbckOXiz
+	eBV9i3PUHtpw6Kny5pHHiqnOutopFn+UGTZvCdK3hLpt11cWp+gq34tSMgkPQz1tbggWJoERcqV
+	fLC4ZJLuVG8TriL0kBjgS5gTYOiUMNw==
+X-Gm-Gg: ASbGncv+WvZP0iV4ODVJVSuhWL9Z9Si3fmCUh0E/91rogWdtPsf8H158ibpSO1Br8VC
+	Qs04LVA+ixNrc4Q8Gbuey+Jgnm5hcpA==
+X-Google-Smtp-Source: AGHT+IEJtslJk9S6AqUzf8lhtfrsaXeTRhj25xc8ixM3Ipc2uzqjXmIjDhgx+jA+gr6puojfQ8YcCvMWXVAsunWA3b0=
+X-Received: by 2002:a05:651c:1145:b0:2fb:591d:3db8 with SMTP id
+ 38308e7fff4ca-2ffa7193bfcmr67382201fa.35.1732555170077; Mon, 25 Nov 2024
+ 09:19:30 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:174b:b0:3a7:ab48:3373 with SMTP id
- e9e14a558f8ab-3a7ab483430mr68394845ab.2.1732540581149; Mon, 25 Nov 2024
- 05:16:21 -0800 (PST)
-Date: Mon, 25 Nov 2024 05:16:21 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <674478a5.050a0220.1cc393.0080.GAE@google.com>
-Subject: [syzbot] [bluetooth?] KASAN: slab-use-after-free Read in sco_sock_connect
-From: syzbot <syzbot+489f78df4709ac2bfdd3@syzkaller.appspotmail.com>
-To: johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, luiz.dentz@gmail.com, marcel@holtmann.org, 
-	syzkaller-bugs@googlegroups.com
+References: <20241124165539.2913146-1-yuxinwang9999@gmail.com> <20241124165539.2913146-3-yuxinwang9999@gmail.com>
+In-Reply-To: <20241124165539.2913146-3-yuxinwang9999@gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Mon, 25 Nov 2024 12:19:17 -0500
+Message-ID: <CABBYNZLoyG+i4ztkbgZNwjp+ReRyakog8BdXT1HVxyvLuJaGAg@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 2/2] advertising: Add scan response support in bluetoothctl
+To: Yuxin Wang <yuxinwang9999@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hello,
+Hi Yuxin,
 
-syzbot found the following issue on:
+On Sun, Nov 24, 2024 at 11:56=E2=80=AFAM Yuxin Wang <yuxinwang9999@gmail.co=
+m> wrote:
+>
+> Add commands in the bluetoothctl advertising submenu to manage
+> scan response data.
+> ---
+>  client/advertising.c              | 486 +++++++++++++++++++++++-------
+>  client/advertising.h              |  25 +-
+>  client/bluetoothctl-advertise.rst |  39 +++
+>  client/main.c                     |  95 +++++-
+>  4 files changed, 515 insertions(+), 130 deletions(-)
+>
+> diff --git a/client/advertising.c b/client/advertising.c
+> index 4a98121..46af2e0 100644
+> --- a/client/advertising.c
+> +++ b/client/advertising.c
+> @@ -59,11 +59,13 @@ static struct ad {
+>         uint16_t duration;
+>         uint16_t timeout;
+>         uint16_t discoverable_to;
+> -       char **uuids;
+> -       size_t uuids_len;
+> -       struct service_data service;
+> -       struct manufacturer_data manufacturer;
+> -       struct data data;
+> +       char **uuids[AD_TYPE_COUNT];
+> +       size_t uuids_len[AD_TYPE_COUNT];
+> +       char **solicit[AD_TYPE_COUNT];
+> +       size_t solicit_len[AD_TYPE_COUNT];
+> +       struct service_data service[AD_TYPE_COUNT];
+> +       struct manufacturer_data manufacturer[AD_TYPE_COUNT];
+> +       struct data data[AD_TYPE_COUNT];
+>         bool discoverable;
+>         bool tx_power;
+>         bool name;
+> @@ -111,7 +113,7 @@ static void register_setup(DBusMessageIter *iter, voi=
+d *user_data)
+>         dbus_message_iter_close_container(iter, &dict);
+>  }
+>
+> -static void print_uuid(const char *uuid)
+> +static void print_uuid(const char *prefix, const char *uuid)
+>  {
+>         const char *text;
+>
+> @@ -130,37 +132,70 @@ static void print_uuid(const char *uuid)
+>                                 str[sizeof(str) - 4] =3D '.';
+>                 }
+>
+> -               bt_shell_printf("UUID: %s(%s)\n", str, uuid);
+> +               bt_shell_printf("%s: %s(%s)\n", prefix, str, uuid);
+>         } else
+> -               bt_shell_printf("UUID: (%s)\n", uuid ? uuid : "");
+> +               bt_shell_printf("%s: (%s)\n", prefix, uuid ? uuid : "");
+> +}
+> +
+> +static const struct {
+> +    const char* uuid[AD_TYPE_COUNT];
+> +    const char* solicit[AD_TYPE_COUNT];
+> +    const char* service[AD_TYPE_COUNT];
+> +    const char* manufacturer[AD_TYPE_COUNT];
+> +    const char* data[AD_TYPE_COUNT];
+> +} ad_names =3D {
+> +    .uuid =3D { "UUID", "Scan Response UUID" },
+> +    .solicit =3D { "Solicit UUID", "Scan Response Solicit UUID" },
+> +    .service =3D { "UUID", "Scan Response UUID" },
+> +    .manufacturer =3D { "Manufacturer", "Scan Response Manufacturer" },
+> +    .data =3D { "Data", "Scan Response Data" }
+> +};
+> +
+> +static void print_ad_uuids(int type)
+> +{
+> +       char **uuid;
+> +
+> +       for (uuid =3D ad.uuids[type]; uuid && *uuid; uuid++)
+> +               print_uuid(ad_names.uuid[type], *uuid);
+>  }
+>
+> -static void print_ad_uuids(void)
+> +static void print_ad_solicit(int type)
+>  {
+>         char **uuid;
+>
+> -       for (uuid =3D ad.uuids; uuid && *uuid; uuid++)
+> -               print_uuid(*uuid);
+> +       for (uuid =3D ad.solicit[type]; uuid && *uuid; uuid++)
+> +               print_uuid(ad_names.solicit[type], *uuid);
+>  }
+>
+>  static void print_ad(void)
+>  {
+> -       print_ad_uuids();
+> +       int type;
+>
+> -       if (ad.service.uuid) {
+> -               print_uuid(ad.service.uuid);
+> -               bt_shell_hexdump(ad.service.data.data, ad.service.data.le=
+n);
+> -       }
+> +       for (type =3D AD_TYPE_AD; type <=3D AD_TYPE_SRD; type++) {
+> +               print_ad_uuids(type);
+> +               print_ad_solicit(type);
+>
+> -       if (ad.manufacturer.data.len) {
+> -               bt_shell_printf("Manufacturer: %u\n", ad.manufacturer.id)=
+;
+> -               bt_shell_hexdump(ad.manufacturer.data.data,
+> -                                               ad.manufacturer.data.len)=
+;
+> -       }
+> +               if (ad.service[type].uuid) {
+> +                       print_uuid(ad_names.service[type],
+> +                                               ad.service[type].uuid);
+> +                       bt_shell_hexdump(ad.service[type].data.data,
+> +                                               ad.service[type].data.len=
+);
+> +               }
+> +
+> +               if (ad.manufacturer[type].data.len) {
+> +                       bt_shell_printf("%s: %u\n", ad_names.manufacturer=
+[type],
+> +                                               ad.manufacturer[type].id)=
+;
+> +                       bt_shell_hexdump(ad.manufacturer[type].data.data,
+> +                                               ad.manufacturer[type].dat=
+a.len);
+> +               }
+>
+> -       if (ad.data.valid) {
+> -               bt_shell_printf("Data Type: 0x%02x\n", ad.data.type);
+> -               bt_shell_hexdump(ad.data.data.data, ad.data.data.len);
+> +               if (ad.data[type].valid) {
+> +                       bt_shell_printf("%s Type: 0x%02x\n",
+> +                                               ad_names.data[type],
+> +                                               ad.data[type].type);
+> +                       bt_shell_hexdump(ad.data[type].data.data,
+> +                                               ad.data[type].data.len);
+> +               }
+>         }
+>
+>         bt_shell_printf("Tx Power: %s\n", ad.tx_power ? "on" : "off");
+> @@ -228,12 +263,13 @@ static gboolean get_type(const GDBusPropertyTable *=
+property,
+>         return TRUE;
+>  }
+>
+> -static gboolean uuids_exists(const GDBusPropertyTable *property, void *d=
+ata)
+> +static gboolean uuids_exists(int type, const GDBusPropertyTable *propert=
+y,
+> +                                                               void *dat=
+a)
+>  {
+> -       return ad.uuids_len !=3D 0;
+> +       return ad.uuids_len[type] !=3D 0;
+>  }
+>
+> -static gboolean get_uuids(const GDBusPropertyTable *property,
+> +static gboolean get_uuids(int type, const GDBusPropertyTable *property,
+>                                 DBusMessageIter *iter, void *user_data)
+>  {
+>         DBusMessageIter array;
+> @@ -241,55 +277,149 @@ static gboolean get_uuids(const GDBusPropertyTable=
+ *property,
+>
+>         dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY, "as", &ar=
+ray);
+>
+> -       for (i =3D 0; i < ad.uuids_len; i++)
+> +       for (i =3D 0; i < ad.uuids_len[type]; i++)
+>                 dbus_message_iter_append_basic(&array, DBUS_TYPE_STRING,
+> -                                                       &ad.uuids[i]);
+> +                                               &ad.uuids[type][i]);
+>
+>         dbus_message_iter_close_container(iter, &array);
+>
+>         return TRUE;
+>  }
+>
+> -static gboolean service_data_exists(const GDBusPropertyTable *property,
+> +static gboolean ad_uuids_exists(const GDBusPropertyTable *property, void=
+ *data)
+> +{
+> +       return uuids_exists(AD_TYPE_AD, property, data);
+> +}
+> +
+> +static gboolean get_ad_uuids(const GDBusPropertyTable *property,
+> +                               DBusMessageIter *iter, void *user_data)
+> +{
+> +       return get_uuids(AD_TYPE_AD, property, iter, user_data);
+> +}
+> +
+> +static gboolean sr_uuids_exists(const GDBusPropertyTable *property, void=
+ *data)
+> +{
+> +       return uuids_exists(AD_TYPE_SRD, property, data);
+> +}
+> +
+> +static gboolean get_sr_uuids(const GDBusPropertyTable *property,
+> +                               DBusMessageIter *iter, void *user_data)
+> +{
+> +       return get_uuids(AD_TYPE_SRD, property, iter, user_data);
+> +}
+> +
+> +static gboolean solicit_uuids_exists(int type,
+> +                               const GDBusPropertyTable *property, void =
+*data)
+> +{
+> +       return ad.solicit_len[type] !=3D 0;
+> +}
+> +
+> +static gboolean get_solicit_uuids(int type, const GDBusPropertyTable *pr=
+operty,
+> +                               DBusMessageIter *iter, void *user_data)
+> +{
+> +       DBusMessageIter array;
+> +       size_t i;
+> +
+> +       dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY, "as", &ar=
+ray);
+> +
+> +       for (i =3D 0; i < ad.solicit_len[type]; i++)
+> +               dbus_message_iter_append_basic(&array, DBUS_TYPE_STRING,
+> +                                               &ad.solicit[type][i]);
+> +
+> +       dbus_message_iter_close_container(iter, &array);
+> +
+> +       return TRUE;
+> +}
+> +
+> +static gboolean ad_solicit_uuids_exists(const GDBusPropertyTable *proper=
+ty,
+> +                                                               void *dat=
+a)
+> +{
+> +       return solicit_uuids_exists(AD_TYPE_AD, property, data);
+> +}
+> +
+> +static gboolean get_ad_solicit_uuids(const GDBusPropertyTable *property,
+> +                               DBusMessageIter *iter, void *user_data)
+> +{
+> +       return get_solicit_uuids(AD_TYPE_AD, property, iter, user_data);
+> +}
+> +
+> +static gboolean sr_solicit_uuids_exists(const GDBusPropertyTable *proper=
+ty,
+>                                                                 void *dat=
+a)
+>  {
+> -       return ad.service.uuid !=3D NULL;
+> +       return solicit_uuids_exists(AD_TYPE_SRD, property, data);
+>  }
+>
+> -static gboolean get_service_data(const GDBusPropertyTable *property,
+> +static gboolean get_sr_solicit_uuids(const GDBusPropertyTable *property,
+> +                               DBusMessageIter *iter, void *user_data)
+> +{
+> +       return get_solicit_uuids(AD_TYPE_SRD, property, iter, user_data);
+> +}
+> +
+> +static gboolean service_data_exists(int type,
+> +                               const GDBusPropertyTable *property, void =
+*data)
+> +{
+> +       return ad.service[type].uuid !=3D NULL;
+> +}
+> +
+> +static gboolean get_service_data(int type, const GDBusPropertyTable *pro=
+perty,
+>                                 DBusMessageIter *iter, void *user_data)
+>  {
+>         DBusMessageIter dict;
+> -       struct ad_data *data =3D &ad.service.data;
+> +       struct ad_data *data =3D &ad.service[type].data;
+>         uint8_t *val =3D data->data;
+>
+>         dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY, "{sv}", &=
+dict);
+>
+> -       g_dbus_dict_append_array(&dict, ad.service.uuid, DBUS_TYPE_BYTE, =
+&val,
+> -                                                               data->len=
+);
+> +       g_dbus_dict_append_array(&dict, ad.service[type].uuid, DBUS_TYPE_=
+BYTE,
+> +                                                       &val, data->len);
+>
+>         dbus_message_iter_close_container(iter, &dict);
+>
+>         return TRUE;
+>  }
+>
+> -static gboolean manufacturer_data_exists(const GDBusPropertyTable *prope=
+rty,
+> +static gboolean ad_service_data_exists(const GDBusPropertyTable *propert=
+y,
+>                                                                 void *dat=
+a)
+>  {
+> -       return ad.manufacturer.id !=3D 0;
+> +       return service_data_exists(AD_TYPE_AD, property, data);
+>  }
+>
+> -static gboolean get_manufacturer_data(const GDBusPropertyTable *property=
+,
+> -                                       DBusMessageIter *iter, void *user=
+_data)
+> +static gboolean get_ad_service_data(const GDBusPropertyTable *property,
+> +                               DBusMessageIter *iter, void *user_data)
+> +{
+> +       return get_service_data(AD_TYPE_AD, property, iter, user_data);
+> +}
+> +
+> +static gboolean sr_service_data_exists(const GDBusPropertyTable *propert=
+y,
+> +                                                               void *dat=
+a)
+> +{
+> +       return service_data_exists(AD_TYPE_SRD, property, data);
+> +}
+> +
+> +static gboolean get_sr_service_data(const GDBusPropertyTable *property,
+> +                               DBusMessageIter *iter, void *user_data)
+> +{
+> +       return get_service_data(AD_TYPE_SRD, property, iter, user_data);
+> +}
+> +
+> +static gboolean manufacturer_data_exists(int type,
+> +                               const GDBusPropertyTable *property, void =
+*data)
+> +{
+> +       return ad.manufacturer[type].id !=3D 0;
+> +}
+> +
+> +static gboolean get_manufacturer_data(int type,
+> +                               const GDBusPropertyTable *property,
+> +                               DBusMessageIter *iter, void *user_data)
+>  {
+>         DBusMessageIter dict;
+> -       struct ad_data *data =3D &ad.manufacturer.data;
+> +       struct ad_data *data =3D &ad.manufacturer[type].data;
+>         uint8_t *val =3D data->data;
+>
+>         dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY, "{qv}", &=
+dict);
+>
+>         g_dbus_dict_append_basic_array(&dict, DBUS_TYPE_UINT16,
+> -                                       &ad.manufacturer.id,
+> +                                       &ad.manufacturer[type].id,
+>                                         DBUS_TYPE_BYTE, &val, data->len);
+>
+>         dbus_message_iter_close_container(iter, &dict);
+> @@ -297,6 +427,30 @@ static gboolean get_manufacturer_data(const GDBusPro=
+pertyTable *property,
+>         return TRUE;
+>  }
+>
+> +static gboolean ad_manufacturer_data_exists(const GDBusPropertyTable *pr=
+operty,
+> +                                                               void *dat=
+a)
+> +{
+> +       return manufacturer_data_exists(AD_TYPE_AD, property, data);
+> +}
+> +
+> +static gboolean get_ad_manufacturer_data(const GDBusPropertyTable *prope=
+rty,
+> +                                       DBusMessageIter *iter, void *user=
+_data)
+> +{
+> +       return get_manufacturer_data(AD_TYPE_AD, property, iter, user_dat=
+a);
+> +}
+> +
+> +static gboolean sr_manufacturer_data_exists(const GDBusPropertyTable *pr=
+operty,
+> +                                                               void *dat=
+a)
+> +{
+> +       return manufacturer_data_exists(AD_TYPE_SRD, property, data);
+> +}
+> +
+> +static gboolean get_sr_manufacturer_data(const GDBusPropertyTable *prope=
+rty,
+> +                                       DBusMessageIter *iter, void *user=
+_data)
+> +{
+> +       return get_manufacturer_data(AD_TYPE_SRD, property, iter, user_da=
+ta);
+> +}
+> +
+>  static gboolean includes_exists(const GDBusPropertyTable *property, void=
+ *data)
+>  {
+>         return ad.tx_power || ad.name || ad.appearance || ad.rsi;
+> @@ -394,28 +548,51 @@ static gboolean get_timeout(const GDBusPropertyTabl=
+e *property,
+>         return TRUE;
+>  }
+>
+> -static gboolean data_exists(const GDBusPropertyTable *property, void *da=
+ta)
+> +static gboolean data_exists(int type, const GDBusPropertyTable *property=
+,
+> +                                                               void *dat=
+a)
+>  {
+> -       return ad.data.valid;
+> +       return ad.data[type].valid;
+>  }
+>
+> -static gboolean get_data(const GDBusPropertyTable *property,
+> +static gboolean get_data(int type, const GDBusPropertyTable *property,
+>                                         DBusMessageIter *iter, void *user=
+_data)
+>  {
+>         DBusMessageIter dict;
+> -       struct ad_data *data =3D &ad.data.data;
+> +       struct ad_data *data =3D &ad.data[type].data;
+>         uint8_t *val =3D data->data;
+>
+>         dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY, "{yv}", &=
+dict);
+>
+> -       g_dbus_dict_append_basic_array(&dict, DBUS_TYPE_BYTE, &ad.data.ty=
+pe,
+> -                                       DBUS_TYPE_BYTE, &val, data->len);
+> +       g_dbus_dict_append_basic_array(&dict, DBUS_TYPE_BYTE,
+> +                       &ad.data[type].type, DBUS_TYPE_BYTE, &val, data->=
+len);
+>
+>         dbus_message_iter_close_container(iter, &dict);
+>
+>         return TRUE;
+>  }
+>
+> +static gboolean ad_data_exists(const GDBusPropertyTable *property, void =
+*data)
+> +{
+> +       return data_exists(AD_TYPE_AD, property, data);
+> +}
+> +
+> +static gboolean get_ad_data(const GDBusPropertyTable *property,
+> +                                       DBusMessageIter *iter, void *user=
+_data)
+> +{
+> +       return get_data(AD_TYPE_AD, property, iter, user_data);
+> +}
+> +
+> +static gboolean sr_data_exists(const GDBusPropertyTable *property, void =
+*data)
+> +{
+> +       return data_exists(AD_TYPE_SRD, property, data);
+> +}
+> +
+> +static gboolean get_sr_data(const GDBusPropertyTable *property,
+> +                                       DBusMessageIter *iter, void *user=
+_data)
+> +{
+> +       return get_data(AD_TYPE_SRD, property, iter, user_data);
+> +}
+> +
+>  static gboolean get_discoverable(const GDBusPropertyTable *property,
+>                                         DBusMessageIter *iter, void *user=
+_data)
+>  {
+> @@ -487,11 +664,23 @@ static gboolean get_max_interval(const GDBusPropert=
+yTable *property,
+>
+>  static const GDBusPropertyTable ad_props[] =3D {
+>         { "Type", "s", get_type },
+> -       { "ServiceUUIDs", "as", get_uuids, NULL, uuids_exists },
+> -       { "ServiceData", "a{sv}", get_service_data, NULL, service_data_ex=
+ists },
+> -       { "ManufacturerData", "a{qv}", get_manufacturer_data, NULL,
+> -                                               manufacturer_data_exists =
+},
+> -       { "Data", "a{yv}", get_data, NULL, data_exists },
+> +       { "ServiceUUIDs", "as", get_ad_uuids, NULL, ad_uuids_exists },
+> +       { "SolicitUUIDs", "as", get_ad_solicit_uuids, NULL,
+> +                                               ad_solicit_uuids_exists }=
+,
+> +       { "ServiceData", "a{sv}", get_ad_service_data, NULL,
+> +                                               ad_service_data_exists },
+> +       { "ManufacturerData", "a{qv}", get_ad_manufacturer_data, NULL,
+> +                                               ad_manufacturer_data_exis=
+ts },
+> +       { "Data", "a{yv}", get_ad_data, NULL, ad_data_exists },
+> +       { "ScanResponseServiceUUIDs", "as", get_sr_uuids, NULL,
+> +                                               sr_uuids_exists },
+> +       { "ScanResponseSolicitUUIDs", "as", get_sr_solicit_uuids, NULL,
+> +                                               sr_solicit_uuids_exists }=
+,
+> +       { "ScanResponseServiceData", "a{sv}", get_sr_service_data, NULL,
+> +                                               sr_service_data_exists },
+> +       { "ScanResponseManufacturerData", "a{qv}", get_sr_manufacturer_da=
+ta,
+> +                                       NULL, sr_manufacturer_data_exists=
+ },
+> +       { "ScanResponseData", "a{yv}", get_sr_data, NULL, sr_data_exists =
+},
+>         { "Discoverable", "b", get_discoverable, NULL, NULL },
+>         { "DiscoverableTimeout", "q", get_discoverable_timeout, NULL,
+>                                                 discoverable_timeout_exis=
+ts },
+> @@ -582,50 +771,109 @@ void ad_unregister(DBusConnection *conn, GDBusProx=
+y *manager)
+>         }
+>  }
+>
+> -static void ad_clear_uuids(void)
+> +static const struct {
+> +    const char* uuid[AD_TYPE_COUNT];
+> +    const char* solicit[AD_TYPE_COUNT];
+> +    const char* service[AD_TYPE_COUNT];
+> +    const char* manufacturer[AD_TYPE_COUNT];
+> +    const char* data[AD_TYPE_COUNT];
+> +} prop_names =3D {
+> +    .uuid =3D { "ServiceUUIDs",  "ScanResponseServiceUUIDs" },
+> +    .solicit =3D { "SolicitUUIDs", "ScanResponseSolicitUUIDs" },
+> +    .service =3D { "ServiceData", "ScanResponseServiceData" },
+> +    .manufacturer =3D { "ManufacturerData", "ScanResponseManufacturerDat=
+a" },
+> +    .data =3D { "Data", "ScanResponseData" }
+> +};
+> +
+> +static void ad_clear_uuids(int type)
+>  {
+> -       g_strfreev(ad.uuids);
+> -       ad.uuids =3D NULL;
+> -       ad.uuids_len =3D 0;
+> +       g_strfreev(ad.uuids[type]);
+> +       ad.uuids[type] =3D NULL;
+> +       ad.uuids_len[type] =3D 0;
+>  }
+>
+> -void ad_advertise_uuids(DBusConnection *conn, int argc, char *argv[])
+> +void ad_advertise_uuids(DBusConnection *conn, int type, int argc, char *=
+argv[])
+>  {
+>         if (argc < 2 || !strlen(argv[1])) {
+> -               print_ad_uuids();
+> +               print_ad_uuids(type);
+>                 return bt_shell_noninteractive_quit(EXIT_SUCCESS);
+>         }
+>
+> -       ad_clear_uuids();
+> +       ad_clear_uuids(type);
+>
+> -       ad.uuids =3D g_strdupv(&argv[1]);
+> -       if (!ad.uuids) {
+> +       ad.uuids[type] =3D g_strdupv(&argv[1]);
+> +       if (!ad.uuids[type]) {
+>                 bt_shell_printf("Failed to parse input\n");
+>                 return bt_shell_noninteractive_quit(EXIT_FAILURE);
+>         }
+>
+> -       ad.uuids_len =3D g_strv_length(ad.uuids);
+> +       ad.uuids_len[type] =3D g_strv_length(ad.uuids[type]);
+>
+> -       g_dbus_emit_property_changed(conn, AD_PATH, AD_IFACE, "ServiceUUI=
+Ds");
+> +       g_dbus_emit_property_changed(conn, AD_PATH, AD_IFACE,
+> +                                                       prop_names.uuid[t=
+ype]);
+>
+>         return bt_shell_noninteractive_quit(EXIT_SUCCESS);
+>  }
+>
+> -void ad_disable_uuids(DBusConnection *conn)
+> +void ad_disable_uuids(DBusConnection *conn, int type)
+>  {
+> -       if (!ad.uuids)
+> +       if (!ad.uuids[type])
+>                 return bt_shell_noninteractive_quit(EXIT_SUCCESS);
+>
+> -       ad_clear_uuids();
+> -       g_dbus_emit_property_changed(conn, AD_PATH, AD_IFACE, "ServiceUUI=
+Ds");
+> +       ad_clear_uuids(type);
+> +       g_dbus_emit_property_changed(conn, AD_PATH, AD_IFACE,
+> +                                                       prop_names.uuid[t=
+ype]);
+>
+>         return bt_shell_noninteractive_quit(EXIT_SUCCESS);
+>  }
+>
+> -static void ad_clear_service(void)
+> +static void ad_clear_solicit(int type)
+>  {
+> -       g_free(ad.service.uuid);
+> -       memset(&ad.service, 0, sizeof(ad.service));
+> +       g_strfreev(ad.solicit[type]);
+> +       ad.solicit[type] =3D NULL;
+> +       ad.solicit_len[type] =3D 0;
+> +}
+> +
+> +void ad_advertise_solicit(DBusConnection *conn, int type,
+> +                                                       int argc, char *a=
+rgv[])
+> +{
+> +       if (argc < 2 || !strlen(argv[1])) {
+> +               print_ad_solicit(type);
+> +               return bt_shell_noninteractive_quit(EXIT_SUCCESS);
+> +       }
+> +
+> +       ad_clear_solicit(type);
+> +
+> +       ad.solicit[type] =3D g_strdupv(&argv[1]);
+> +       if (!ad.solicit[type]) {
+> +               bt_shell_printf("Failed to parse input\n");
+> +               return bt_shell_noninteractive_quit(EXIT_FAILURE);
+> +       }
+> +
+> +       ad.solicit_len[type] =3D g_strv_length(ad.solicit[type]);
+> +
+> +       g_dbus_emit_property_changed(conn, AD_PATH, AD_IFACE,
+> +                                               prop_names.solicit[type])=
+;
+> +
+> +       return bt_shell_noninteractive_quit(EXIT_SUCCESS);
+> +}
+> +
+> +void ad_disable_solicit(DBusConnection *conn, int type)
+> +{
+> +       if (!ad.solicit[type])
+> +               return bt_shell_noninteractive_quit(EXIT_SUCCESS);
+> +
+> +       ad_clear_solicit(type);
+> +       g_dbus_emit_property_changed(conn, AD_PATH, AD_IFACE,
+> +                                               prop_names.solicit[type])=
+;
+> +
+> +       return bt_shell_noninteractive_quit(EXIT_SUCCESS);
+> +}
+> +
+> +static void ad_clear_service(int type)
+> +{
+> +       g_free(ad.service[type].uuid);
+> +       memset(&ad.service[type], 0, sizeof(ad.service[type]));
+>
+>         return bt_shell_noninteractive_quit(EXIT_SUCCESS);
+>  }
+> @@ -658,15 +906,17 @@ static bool ad_add_data(struct ad_data *data, int a=
+rgc, char *argv[])
+>         return true;
+>  }
+>
+> -void ad_advertise_service(DBusConnection *conn, int argc, char *argv[])
+> +void ad_advertise_service(DBusConnection *conn, int type,
+> +                                                       int argc, char *a=
+rgv[])
+>  {
+>         struct ad_data data;
+>
+>         if (argc < 2 || !strlen(argv[1])) {
+> -               if (ad.service.uuid) {
+> -                       print_uuid(ad.service.uuid);
+> -                       bt_shell_hexdump(ad.service.data.data,
+> -                                               ad.service.data.len);
+> +               if (ad.service[type].uuid) {
+> +                       print_uuid(ad_names.service[type],
+> +                                               ad.service[type].uuid);
+> +                       bt_shell_hexdump(ad.service[type].data.data,
+> +                                               ad.service[type].data.len=
+);
+>                 }
+>                 return bt_shell_noninteractive_quit(EXIT_SUCCESS);
+>         }
+> @@ -674,46 +924,49 @@ void ad_advertise_service(DBusConnection *conn, int=
+ argc, char *argv[])
+>         if (!ad_add_data(&data, argc - 2, argv + 2))
+>                 return bt_shell_noninteractive_quit(EXIT_FAILURE);
+>
+> -       ad_clear_service();
+> +       ad_clear_service(type);
+>
+> -       ad.service.uuid =3D g_strdup(argv[1]);
+> -       ad.service.data =3D data;
+> +       ad.service[type].uuid =3D g_strdup(argv[1]);
+> +       ad.service[type].data =3D data;
+>
+> -       g_dbus_emit_property_changed(conn, AD_PATH, AD_IFACE, "ServiceDat=
+a");
+> +       g_dbus_emit_property_changed(conn, AD_PATH, AD_IFACE,
+> +                                               prop_names.service[type])=
+;
+>
+>         return bt_shell_noninteractive_quit(EXIT_SUCCESS);
+>  }
+>
+> -void ad_disable_service(DBusConnection *conn)
+> +void ad_disable_service(DBusConnection *conn, int type)
+>  {
+> -       if (!ad.service.uuid)
+> +       if (!ad.service[type].uuid)
+>                 return bt_shell_noninteractive_quit(EXIT_SUCCESS);
+>
+> -       ad_clear_service();
+> -       g_dbus_emit_property_changed(conn, AD_PATH, AD_IFACE, "ServiceDat=
+a");
+> +       ad_clear_service(type);
+> +       g_dbus_emit_property_changed(conn, AD_PATH, AD_IFACE,
+> +                                               prop_names.service[type])=
+;
+>
+>         return bt_shell_noninteractive_quit(EXIT_SUCCESS);
+>  }
+>
+> -static void ad_clear_manufacturer(void)
+> +static void ad_clear_manufacturer(int type)
+>  {
+> -       memset(&ad.manufacturer, 0, sizeof(ad.manufacturer));
+> +       memset(&ad.manufacturer[type], 0, sizeof(ad.manufacturer[type]));
+>
+>         return bt_shell_noninteractive_quit(EXIT_SUCCESS);
+>  }
+>
+> -void ad_advertise_manufacturer(DBusConnection *conn, int argc, char *arg=
+v[])
+> +void ad_advertise_manufacturer(DBusConnection *conn, int type,
+> +                                                       int argc, char *a=
+rgv[])
+>  {
+>         char *endptr =3D NULL;
+>         long int val;
+>         struct ad_data data;
+>
+>         if (argc < 2 || !strlen(argv[1])) {
+> -               if (ad.manufacturer.data.len) {
+> -                       bt_shell_printf("Manufacturer: %u\n",
+> -                                               ad.manufacturer.id);
+> -                       bt_shell_hexdump(ad.manufacturer.data.data,
+> -                                               ad.manufacturer.data.len)=
+;
+> +               if (ad.manufacturer[type].data.len) {
+> +                       bt_shell_printf("%s: %u\n", ad_names.manufacturer=
+[type],
+> +                                               ad.manufacturer[type].id)=
+;
+> +                       bt_shell_hexdump(ad.manufacturer[type].data.data,
+> +                                               ad.manufacturer[type].dat=
+a.len);
+>                 }
+>
+>                 return bt_shell_noninteractive_quit(EXIT_SUCCESS);
+> @@ -728,45 +981,48 @@ void ad_advertise_manufacturer(DBusConnection *conn=
+, int argc, char *argv[])
+>         if (!ad_add_data(&data, argc - 2, argv + 2))
+>                 return bt_shell_noninteractive_quit(EXIT_FAILURE);
+>
+> -       ad_clear_manufacturer();
+> -       ad.manufacturer.id =3D val;
+> -       ad.manufacturer.data =3D data;
+> +       ad_clear_manufacturer(type);
+> +       ad.manufacturer[type].id =3D val;
+> +       ad.manufacturer[type].data =3D data;
+>
+>         g_dbus_emit_property_changed(conn, AD_PATH, AD_IFACE,
+> -                                                       "ManufacturerData=
+");
+> +                                               prop_names.manufacturer[t=
+ype]);
+>
+>         return bt_shell_noninteractive_quit(EXIT_SUCCESS);
+>  }
+>
+> -void ad_disable_manufacturer(DBusConnection *conn)
+> +void ad_disable_manufacturer(DBusConnection *conn, int type)
+>  {
+> -       if (!ad.manufacturer.id && !ad.manufacturer.data.len)
+> +       if (!ad.manufacturer[type].id && !ad.manufacturer[type].data.len)
+>                 return bt_shell_noninteractive_quit(EXIT_SUCCESS);
+>
+> -       ad_clear_manufacturer();
+> +       ad_clear_manufacturer(type);
+>         g_dbus_emit_property_changed(conn, AD_PATH, AD_IFACE,
+> -                                                       "ManufacturerData=
+");
+> +                                               prop_names.manufacturer[t=
+ype]);
+>
+>         return bt_shell_noninteractive_quit(EXIT_SUCCESS);
+>  }
+>
+> -static void ad_clear_data(void)
+> +static void ad_clear_data(int type)
+>  {
+> -       memset(&ad.data, 0, sizeof(ad.data));
+> +       memset(&ad.data[type], 0, sizeof(ad.data[type]));
+>
+>         return bt_shell_noninteractive_quit(EXIT_SUCCESS);
+>  }
+>
+> -void ad_advertise_data(DBusConnection *conn, int argc, char *argv[])
+> +void ad_advertise_data(DBusConnection *conn, int type, int argc, char *a=
+rgv[])
+>  {
+>         char *endptr =3D NULL;
+>         long int val;
+>         struct ad_data data;
+>
+>         if (argc < 2 || !strlen(argv[1])) {
+> -               if (ad.data.data.len) {
+> -                       bt_shell_printf("Type: 0x%02x\n", ad.data.type);
+> -                       bt_shell_hexdump(ad.data.data.data, ad.data.data.=
+len);
+> +               if (ad.data[type].data.len) {
+> +                       bt_shell_printf("%s Type: 0x%02x\n",
+> +                                                       ad_names.data[typ=
+e],
+> +                                                       ad.data[type].typ=
+e);
+> +                       bt_shell_hexdump(ad.data[type].data.data,
+> +                                                       ad.data[type].dat=
+a.len);
+>                 }
+>
+>                 return bt_shell_noninteractive_quit(EXIT_SUCCESS);
+> @@ -781,23 +1037,25 @@ void ad_advertise_data(DBusConnection *conn, int a=
+rgc, char *argv[])
+>         if (!ad_add_data(&data, argc - 2, argv + 2))
+>                 return bt_shell_noninteractive_quit(EXIT_FAILURE);
+>
+> -       ad_clear_data();
+> -       ad.data.valid =3D true;
+> -       ad.data.type =3D val;
+> -       ad.data.data =3D data;
+> +       ad_clear_data(type);
+> +       ad.data[type].valid =3D true;
+> +       ad.data[type].type =3D val;
+> +       ad.data[type].data =3D data;
+>
+> -       g_dbus_emit_property_changed(conn, AD_PATH, AD_IFACE, "Data");
+> +       g_dbus_emit_property_changed(conn, AD_PATH, AD_IFACE,
+> +                                                       prop_names.data[t=
+ype]);
+>
+>         return bt_shell_noninteractive_quit(EXIT_SUCCESS);
+>  }
+>
+> -void ad_disable_data(DBusConnection *conn)
+> +void ad_disable_data(DBusConnection *conn, int type)
+>  {
+> -       if (!ad.data.type && !ad.data.data.len)
+> +       if (!ad.data[type].type && !ad.data[type].data.len)
+>                 return bt_shell_noninteractive_quit(EXIT_SUCCESS);
+>
+> -       ad_clear_data();
+> -       g_dbus_emit_property_changed(conn, AD_PATH, AD_IFACE, "Data");
+> +       ad_clear_data(type);
+> +       g_dbus_emit_property_changed(conn, AD_PATH, AD_IFACE,
+> +                                                       prop_names.data[t=
+ype]);
+>
+>         return bt_shell_noninteractive_quit(EXIT_SUCCESS);
+>  }
+> diff --git a/client/advertising.h b/client/advertising.h
+> index 145ac80..9d124c7 100644
+> --- a/client/advertising.h
+> +++ b/client/advertising.h
+> @@ -8,15 +8,24 @@
+>   *
+>   */
+>
+> +#define AD_TYPE_AD     0
+> +#define AD_TYPE_SRD    1
+> +#define AD_TYPE_COUNT  2
+> +
+>  void ad_register(DBusConnection *conn, GDBusProxy *manager, const char *=
+type);
+>  void ad_unregister(DBusConnection *conn, GDBusProxy *manager);
+>
+> -void ad_advertise_uuids(DBusConnection *conn, int argc, char *argv[]);
+> -void ad_disable_uuids(DBusConnection *conn);
+> -void ad_advertise_service(DBusConnection *conn, int argc, char *argv[]);
+> -void ad_disable_service(DBusConnection *conn);
+> -void ad_advertise_manufacturer(DBusConnection *conn, int argc, char *arg=
+v[]);
+> -void ad_disable_manufacturer(DBusConnection *conn);
+> +void ad_advertise_uuids(DBusConnection *conn, int type, int argc, char *=
+argv[]);
+> +void ad_disable_uuids(DBusConnection *conn, int type);
+> +void ad_advertise_solicit(DBusConnection *conn, int type,
+> +                                                       int argc, char *a=
+rgv[]);
+> +void ad_disable_solicit(DBusConnection *conn, int type);
+> +void ad_advertise_service(DBusConnection *conn, int type,
+> +                                                       int argc, char *a=
+rgv[]);
+> +void ad_disable_service(DBusConnection *conn, int type);
+> +void ad_advertise_manufacturer(DBusConnection *conn, int type,
+> +                                                       int argc, char *a=
+rgv[]);
+> +void ad_disable_manufacturer(DBusConnection *conn, int type);
+>  void ad_advertise_tx_power(DBusConnection *conn, dbus_bool_t *value);
+>  void ad_advertise_name(DBusConnection *conn, bool value);
+>  void ad_advertise_appearance(DBusConnection *conn, bool value);
+> @@ -24,8 +33,8 @@ void ad_advertise_local_name(DBusConnection *conn, cons=
+t char *name);
+>  void ad_advertise_local_appearance(DBusConnection *conn, long int *value=
+);
+>  void ad_advertise_duration(DBusConnection *conn, long int *value);
+>  void ad_advertise_timeout(DBusConnection *conn, long int *value);
+> -void ad_advertise_data(DBusConnection *conn, int argc, char *argv[]);
+> -void ad_disable_data(DBusConnection *conn);
+> +void ad_advertise_data(DBusConnection *conn, int type, int argc, char *a=
+rgv[]);
+> +void ad_disable_data(DBusConnection *conn, int type);
+>  void ad_advertise_discoverable(DBusConnection *conn, dbus_bool_t *value)=
+;
+>  void ad_advertise_discoverable_timeout(DBusConnection *conn, long int *v=
+alue);
+>  void ad_advertise_secondary(DBusConnection *conn, const char *value);
+> diff --git a/client/bluetoothctl-advertise.rst b/client/bluetoothctl-adve=
+rtise.rst
+> index 4b56324..008f800 100644
+> --- a/client/bluetoothctl-advertise.rst
+> +++ b/client/bluetoothctl-advertise.rst
+> @@ -31,6 +31,12 @@ Set/Get advertise uuids.
+>  :Example: **# uuids 0x12345678**
+>  :Example: **# uuids 90f95193-35de-4306-a6e9-699328f15059**
+>
+> +solicit
+> +-------
+> +
+> +Set/Get advertise solicit uuids.
+> +:Usage: **# solicit [all/uuid1 uuid2 ...]**
+> +
+>  service
+>  -------
+>
+> @@ -71,6 +77,39 @@ To get the currently set data use the command data wit=
+hout any arguments.
+>  :Usage: **# data [type] [data=3Dxx xx ...]**
+>  :Example: **# data 0x0C 01 0x0F 13**
+>
+> +sr-uuids
+> +--------
+> +
+> +Set/Get scan response uuids.
+> +
+> +:Usage: **# sr-uuids [all/uuid1 uuid2 ...]**
+> +
+> +sr-solicit
+> +----------
+> +
+> +Set/Get scan response solicit uuids.
+> +:Usage: **# sr-solicit [all/uuid1 uuid2 ...]**
+> +
+> +sr-service
+> +----------
+> +
+> +Set/Get scan response service data.
+> +
+> +:Usage: **# sr-service [uuid] [data=3Dxx xx ...]**
+> +
+> +sr-manufacturer
+> +---------------
+> +
+> +Set/Get scan response manufacturer data.
+> +
+> +:Usage: **# sr-manufacturer [id] [data=3Dxx xx ...]**
+> +
+> +sr-data
+> +-------
+> +
+> +Set/Get scan response data.
+> +:Usage: **# sr-data [type] [data=3Dxx xx ...]**
+> +
+>  discoverable
+>  ------------
+>
+> diff --git a/client/main.c b/client/main.c
+> index 3f8143d..3485e1a 100644
+> --- a/client/main.c
+> +++ b/client/main.c
+> @@ -2538,22 +2538,52 @@ static char *ad_generator(const char *text, int s=
+tate)
+>
+>  static void cmd_advertise_uuids(int argc, char *argv[])
+>  {
+> -       ad_advertise_uuids(dbus_conn, argc, argv);
+> +       ad_advertise_uuids(dbus_conn, AD_TYPE_AD, argc, argv);
+> +}
+> +
+> +static void cmd_advertise_solicit(int argc, char *argv[])
+> +{
+> +       ad_advertise_solicit(dbus_conn, AD_TYPE_AD, argc, argv);
+>  }
+>
+>  static void cmd_advertise_service(int argc, char *argv[])
+>  {
+> -       ad_advertise_service(dbus_conn, argc, argv);
+> +       ad_advertise_service(dbus_conn, AD_TYPE_AD, argc, argv);
+>  }
+>
+>  static void cmd_advertise_manufacturer(int argc, char *argv[])
+>  {
+> -       ad_advertise_manufacturer(dbus_conn, argc, argv);
+> +       ad_advertise_manufacturer(dbus_conn, AD_TYPE_AD, argc, argv);
+>  }
+>
+>  static void cmd_advertise_data(int argc, char *argv[])
+>  {
+> -       ad_advertise_data(dbus_conn, argc, argv);
+> +       ad_advertise_data(dbus_conn, AD_TYPE_AD, argc, argv);
+> +}
+> +
+> +static void cmd_advertise_sr_uuids(int argc, char *argv[])
+> +{
+> +       ad_advertise_uuids(dbus_conn, AD_TYPE_SRD, argc, argv);
+> +}
+> +
+> +static void cmd_advertise_sr_solicit(int argc, char *argv[])
+> +{
+> +       ad_advertise_solicit(dbus_conn, AD_TYPE_SRD, argc, argv);
+> +}
+> +
+> +static void cmd_advertise_sr_service(int argc, char *argv[])
+> +{
+> +       ad_advertise_service(dbus_conn, AD_TYPE_SRD, argc, argv);
+> +}
+> +
+> +static void cmd_advertise_sr_manufacturer(int argc, char *argv[])
+> +{
+> +       ad_advertise_manufacturer(dbus_conn, AD_TYPE_SRD, argc, argv);
+> +}
+> +
+> +static void cmd_advertise_sr_data(int argc, char *argv[])
+> +{
+> +       ad_advertise_data(dbus_conn, AD_TYPE_SRD, argc, argv);
+>  }
+>
+>  static void cmd_advertise_discoverable(int argc, char *argv[])
+> @@ -2753,22 +2783,52 @@ static void cmd_advertise_rsi(int argc, char *arg=
+v[])
+>
+>  static void ad_clear_uuids(void)
+>  {
+> -       ad_disable_uuids(dbus_conn);
+> +       ad_disable_uuids(dbus_conn, AD_TYPE_AD);
+> +}
+> +
+> +static void ad_clear_solicit(void)
+> +{
+> +       ad_disable_solicit(dbus_conn, AD_TYPE_AD);
+>  }
+>
+>  static void ad_clear_service(void)
+>  {
+> -       ad_disable_service(dbus_conn);
+> +       ad_disable_service(dbus_conn, AD_TYPE_AD);
+>  }
+>
+>  static void ad_clear_manufacturer(void)
+>  {
+> -       ad_disable_manufacturer(dbus_conn);
+> +       ad_disable_manufacturer(dbus_conn, AD_TYPE_AD);
+>  }
+>
+>  static void ad_clear_data(void)
+>  {
+> -       ad_disable_data(dbus_conn);
+> +       ad_disable_data(dbus_conn, AD_TYPE_AD);
+> +}
+> +
+> +static void ad_clear_sr_uuids(void)
+> +{
+> +       ad_disable_uuids(dbus_conn, AD_TYPE_SRD);
+> +}
+> +
+> +static void ad_clear_sr_solicit(void)
+> +{
+> +       ad_disable_solicit(dbus_conn, AD_TYPE_SRD);
+> +}
+> +
+> +static void ad_clear_sr_service(void)
+> +{
+> +       ad_disable_service(dbus_conn, AD_TYPE_SRD);
+> +}
+> +
+> +static void ad_clear_sr_manufacturer(void)
+> +{
+> +       ad_disable_manufacturer(dbus_conn, AD_TYPE_SRD);
+> +}
+> +
+> +static void ad_clear_sr_data(void)
+> +{
+> +       ad_disable_data(dbus_conn, AD_TYPE_SRD);
+>  }
+>
+>  static void ad_clear_tx_power(void)
+> @@ -2819,9 +2879,15 @@ static void ad_clear_interval(void)
+>
+>  static const struct clear_entry ad_clear[] =3D {
+>         { "uuids",              ad_clear_uuids },
+> +       { "solicit",            ad_clear_solicit },
+>         { "service",            ad_clear_service },
+>         { "manufacturer",       ad_clear_manufacturer },
+>         { "data",               ad_clear_data },
+> +       { "sr-uuids",           ad_clear_sr_uuids },
+> +       { "sr-solicit",         ad_clear_sr_solicit },
+> +       { "sr-service",         ad_clear_sr_service },
+> +       { "sr-manufacturer",    ad_clear_sr_manufacturer },
+> +       { "sr-data",            ad_clear_sr_data },
+>         { "tx-power",           ad_clear_tx_power },
+>         { "name",               ad_clear_name },
+>         { "appearance",         ad_clear_appearance },
+> @@ -2922,6 +2988,8 @@ static const struct bt_shell_menu advertise_menu =
+=3D {
+>         .entries =3D {
+>         { "uuids", "[uuid1 uuid2 ...]", cmd_advertise_uuids,
+>                         "Set/Get advertise uuids" },
+> +       { "solicit", "[uuid1 uuid2 ...]", cmd_advertise_solicit,
+> +                       "Set/Get advertise solicit uuids" },
+>         { "service", "[uuid] [data=3Dxx xx ...]", cmd_advertise_service,
+>                         "Set/Get advertise service data" },
+>         { "manufacturer", "[id] [data=3Dxx xx ...]",
+> @@ -2929,6 +2997,17 @@ static const struct bt_shell_menu advertise_menu =
+=3D {
+>                         "Set/Get advertise manufacturer data" },
+>         { "data", "[type] [data=3Dxx xx ...]", cmd_advertise_data,
+>                         "Set/Get advertise data" },
+> +       { "sr-uuids", "[uuid1 uuid2 ...]", cmd_advertise_sr_uuids,
+> +                       "Set/Get scan response uuids" },
+> +       { "sr-solicit", "[uuid1 uuid2 ...]", cmd_advertise_sr_solicit,
+> +                       "Set/Get scan response solicit uuids" },
+> +       { "sr-service", "[uuid] [data=3Dxx xx ...]", cmd_advertise_sr_ser=
+vice,
+> +                       "Set/Get scan response service data" },
+> +       { "sr-manufacturer", "[id] [data=3Dxx xx ...]",
+> +                       cmd_advertise_sr_manufacturer,
+> +                       "Set/Get scan response manufacturer data" },
+> +       { "sr-data", "[type] [data=3Dxx xx ...]", cmd_advertise_sr_data,
+> +                       "Set/Get scan response data" },
 
-HEAD commit:    228a1157fb9f Merge tag '6.13-rc-part1-SMB3-client-fixes' o..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=173469c0580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=2406be795e8a5f4
-dashboard link: https://syzkaller.appspot.com/bug?extid=489f78df4709ac2bfdd3
-compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=179db6e8580000
+We got a few options here:
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/02a2c8cad502/disk-228a1157.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/ad0cba81ae3f/vmlinux-228a1157.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/325bd791039e/bzImage-228a1157.xz
+1. As separate commands
+2. As extra optional argument to existing commands
+3. As mandatory argument that indicates its type to existing commands
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+489f78df4709ac2bfdd3@syzkaller.appspotmail.com
+I think option 2 is the better one if we could skip entering ad with
+an empty array e.g:
 
-==================================================================
-BUG: KASAN: slab-use-after-free in __lock_acquire+0x2d90/0x3c40 kernel/locking/lockdep.c:5089
-Read of size 8 at addr ffff88802e36fc20 by task syz.4.5353/17208
+advertise.data type "" "srd..."
 
-CPU: 0 UID: 0 PID: 17208 Comm: syz.4.5353 Not tainted 6.12.0-syzkaller-08446-g228a1157fb9f #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/13/2024
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:94 [inline]
- dump_stack_lvl+0x116/0x1f0 lib/dump_stack.c:120
- print_address_description mm/kasan/report.c:377 [inline]
- print_report+0xc3/0x620 mm/kasan/report.c:488
- kasan_report+0xd9/0x110 mm/kasan/report.c:601
- __lock_acquire+0x2d90/0x3c40 kernel/locking/lockdep.c:5089
- lock_acquire.part.0+0x11b/0x380 kernel/locking/lockdep.c:5849
- __raw_spin_lock include/linux/spinlock_api_smp.h:133 [inline]
- _raw_spin_lock+0x2e/0x40 kernel/locking/spinlock.c:154
- spin_lock include/linux/spinlock.h:351 [inline]
- sco_chan_add net/bluetooth/sco.c:292 [inline]
- sco_connect net/bluetooth/sco.c:345 [inline]
- sco_sock_connect+0x351/0xbd0 net/bluetooth/sco.c:645
- __sys_connect_file+0x13e/0x1a0 net/socket.c:2055
- __sys_connect+0x14f/0x170 net/socket.c:2074
- __do_sys_connect net/socket.c:2080 [inline]
- __se_sys_connect net/socket.c:2077 [inline]
- __x64_sys_connect+0x72/0xb0 net/socket.c:2077
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xcd/0x250 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f0ec497e819
-Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007f0ec5705038 EFLAGS: 00000246 ORIG_RAX: 000000000000002a
-RAX: ffffffffffffffda RBX: 00007f0ec4b35fa0 RCX: 00007f0ec497e819
-RDX: 0000000000000008 RSI: 0000000020000040 RDI: 0000000000000004
-RBP: 00007f0ec49f175e R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 0000000000000000 R14: 00007f0ec4b35fa0 R15: 00007fffedcfae08
- </TASK>
+Option 3 would break existing scripts since we need to change the
+argument positions, but we don't really care about it since now, so I
+don't think it would be a problem, but since we have option 2 I guess
+that is better in this sense.
 
-Allocated by task 17048:
- kasan_save_stack+0x33/0x60 mm/kasan/common.c:47
- kasan_save_track+0x14/0x30 mm/kasan/common.c:68
- poison_kmalloc_redzone mm/kasan/common.c:377 [inline]
- __kasan_kmalloc+0xaa/0xb0 mm/kasan/common.c:394
- kmalloc_noprof include/linux/slab.h:879 [inline]
- kzalloc_noprof include/linux/slab.h:1015 [inline]
- sco_conn_add net/bluetooth/sco.c:199 [inline]
- sco_conn_add+0xc8/0x410 net/bluetooth/sco.c:184
- sco_connect net/bluetooth/sco.c:336 [inline]
- sco_sock_connect+0x325/0xbd0 net/bluetooth/sco.c:645
- __sys_connect_file+0x13e/0x1a0 net/socket.c:2055
- __sys_connect+0x14f/0x170 net/socket.c:2074
- __do_sys_connect net/socket.c:2080 [inline]
- __se_sys_connect net/socket.c:2077 [inline]
- __x64_sys_connect+0x72/0xb0 net/socket.c:2077
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xcd/0x250 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-Freed by task 17208:
- kasan_save_stack+0x33/0x60 mm/kasan/common.c:47
- kasan_save_track+0x14/0x30 mm/kasan/common.c:68
- kasan_save_free_info+0x3b/0x60 mm/kasan/generic.c:579
- poison_slab_object mm/kasan/common.c:247 [inline]
- __kasan_slab_free+0x51/0x70 mm/kasan/common.c:264
- kasan_slab_free include/linux/kasan.h:230 [inline]
- slab_free_hook mm/slub.c:2342 [inline]
- slab_free mm/slub.c:4579 [inline]
- kfree+0x14f/0x4b0 mm/slub.c:4727
- sco_conn_free net/bluetooth/sco.c:97 [inline]
- kref_put include/linux/kref.h:65 [inline]
- sco_conn_put+0x2cd/0x4c0 net/bluetooth/sco.c:107
- sco_conn_add+0x7b/0x410 net/bluetooth/sco.c:195
- sco_connect net/bluetooth/sco.c:336 [inline]
- sco_sock_connect+0x325/0xbd0 net/bluetooth/sco.c:645
- __sys_connect_file+0x13e/0x1a0 net/socket.c:2055
- __sys_connect+0x14f/0x170 net/socket.c:2074
- __do_sys_connect net/socket.c:2080 [inline]
- __se_sys_connect net/socket.c:2077 [inline]
- __x64_sys_connect+0x72/0xb0 net/socket.c:2077
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xcd/0x250 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-The buggy address belongs to the object at ffff88802e36fc00
- which belongs to the cache kmalloc-256 of size 256
-The buggy address is located 32 bytes inside of
- freed 256-byte region [ffff88802e36fc00, ffff88802e36fd00)
-
-The buggy address belongs to the physical page:
-page: refcount:1 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x2e36e
-head: order:1 mapcount:0 entire_mapcount:0 nr_pages_mapped:0 pincount:0
-ksm flags: 0xfff00000000040(head|node=0|zone=1|lastcpupid=0x7ff)
-page_type: f5(slab)
-raw: 00fff00000000040 ffff88801b041b40 ffffea0001f05700 dead000000000003
-raw: 0000000000000000 0000000000100010 00000001f5000000 0000000000000000
-head: 00fff00000000040 ffff88801b041b40 ffffea0001f05700 dead000000000003
-head: 0000000000000000 0000000000100010 00000001f5000000 0000000000000000
-head: 00fff00000000001 ffffea0000b8db81 ffffffffffffffff 0000000000000000
-head: 0000000000000002 0000000000000000 00000000ffffffff 0000000000000000
-page dumped because: kasan: bad access detected
-page_owner tracks the page as allocated
-page last allocated via order 1, migratetype Unmovable, gfp_mask 0xd20c0(__GFP_IO|__GFP_FS|__GFP_NOWARN|__GFP_NORETRY|__GFP_COMP|__GFP_NOMEMALLOC), pid 1, tgid 1 (swapper/0), ts 8168075657, free_ts 0
- set_page_owner include/linux/page_owner.h:32 [inline]
- post_alloc_hook+0x2d1/0x350 mm/page_alloc.c:1556
- prep_new_page mm/page_alloc.c:1564 [inline]
- get_page_from_freelist+0xfce/0x2f80 mm/page_alloc.c:3474
- __alloc_pages_noprof+0x223/0x25a0 mm/page_alloc.c:4751
- alloc_pages_mpol_noprof+0x2c9/0x610 mm/mempolicy.c:2265
- alloc_slab_page mm/slub.c:2412 [inline]
- allocate_slab mm/slub.c:2578 [inline]
- new_slab+0x2c9/0x410 mm/slub.c:2631
- ___slab_alloc+0xdac/0x1880 mm/slub.c:3818
- __slab_alloc.constprop.0+0x56/0xb0 mm/slub.c:3908
- __slab_alloc_node mm/slub.c:3961 [inline]
- slab_alloc_node mm/slub.c:4122 [inline]
- __do_kmalloc_node mm/slub.c:4263 [inline]
- __kmalloc_node_noprof+0x357/0x430 mm/slub.c:4270
- __kvmalloc_node_noprof+0xad/0x1a0 mm/util.c:658
- v4l2_ctrl_new+0x99a/0x2090 drivers/media/v4l2-core/v4l2-ctrls-core.c:1931
- v4l2_ctrl_new_std+0x1b3/0x280 drivers/media/v4l2-core/v4l2-ctrls-core.c:2068
- handler_new_ref+0x828/0xc60 drivers/media/v4l2-core/v4l2-ctrls-core.c:1689
- v4l2_ctrl_add_handler drivers/media/v4l2-core/v4l2-ctrls-core.c:2212 [inline]
- v4l2_ctrl_add_handler+0x22a/0x310 drivers/media/v4l2-core/v4l2-ctrls-core.c:2186
- vivid_create_controls+0x2eaf/0x3e00 drivers/media/test-drivers/vivid/vivid-ctrls.c:1993
- vivid_create_instance drivers/media/test-drivers/vivid/vivid-core.c:1931 [inline]
- vivid_probe drivers/media/test-drivers/vivid/vivid-core.c:2093 [inline]
- vivid_probe+0x47df/0xae90 drivers/media/test-drivers/vivid/vivid-core.c:2078
- platform_probe+0xff/0x1f0 drivers/base/platform.c:1404
-page_owner free stack trace missing
-
-Memory state around the buggy address:
- ffff88802e36fb00: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
- ffff88802e36fb80: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
->ffff88802e36fc00: fa fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-                               ^
- ffff88802e36fc80: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
- ffff88802e36fd00: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
-==================================================================
+>         { "discoverable", "[on/off]", cmd_advertise_discoverable,
+>                         "Set/Get advertise discoverable" },
+>         { "discoverable-timeout", "[seconds]",
+> --
+> 2.39.5
+>
 
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+--=20
+Luiz Augusto von Dentz
