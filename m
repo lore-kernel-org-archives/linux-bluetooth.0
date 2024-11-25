@@ -1,138 +1,117 @@
-Received: from mail-qk1-f180.google.com (mail-qk1-f180.google.com [209.85.222.180])
+Received: from mail-vk1-f176.google.com (mail-vk1-f176.google.com [209.85.221.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D6AA1B87D1
-	for <linux-bluetooth@vger.kernel.org>; Mon, 25 Nov 2024 18:36:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 775342F2D
+	for <linux-bluetooth@vger.kernel.org>; Mon, 25 Nov 2024 19:21:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732559797; cv=none; b=DvGKYz0V9IshpJSJndaNkFmvyScZjVAXZXYKrJbY51aLLoKA/P1hwsAMhIt0EydJomU1TBPH1HagZjRJz3Be+BYplwe4GvC0YWMRR/g95aDN9yy35efa9GkMgU+1iezkuTXLZBEYgC6Qn1EsLVzlsC/COxe0fNaSSC7dL0DY984=
+	t=1732562516; cv=none; b=uBIhdC8nBX4uraiKagUAo+8jmqNqHqlaOTkmp9iYDrbwxxI/jwGsPnseTQ6nARQYBosYUoFTQVelwyoNQwa0gxnkPRtH0lc8n/YDyu0vQqM2fJ71Gd2jE+dMXZc1m2GtiC6ckLTzklWMyQDsZQe1K3ibI/9r996jXMzKwQlP1DQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732559797; c=relaxed/simple;
-	bh=IBa89x/C5B3r/SPs93QJHAYnaP0d/0X0P2hybrhSAUk=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=CqJHq/WvZfvyfEVlyLe9WSRve96hrQFMrUxYD1GJRaqebLAYl+f8u/A2gZy5kLBXRowTDUYd1BF0ZW2mi6aYYIxwfy2b+MScSidhF3b4+S6XF6A8U4P96xXZsnLEmE4iiPDMhUTtVxGIT+qcOv4M2h7KpuvvjjYfBcpKMaHo7xU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=d1jKgTF3; arc=none smtp.client-ip=209.85.222.180
+	s=arc-20240116; t=1732562516; c=relaxed/simple;
+	bh=4UrHTDrRSccGYVinh6hjFgOQozgftfKuL6SjwClSmYk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=skH+X/59UIRAKO1OhDucXhBvGnfvH06dj0YK3wtCWpstXm20pMCUJAzTz32xjx2QZK0CGq9dhiCnZtF73hVNueYgxErD+vQAP9/lMYkfm2EqqtTWvOTdytlIg7X2aXIKqQJLee3XiAHchsiNgZKDYOFhLFbn3Y8CdaIlc6CyyK4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HA+Vqxla; arc=none smtp.client-ip=209.85.221.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="d1jKgTF3"
-Received: by mail-qk1-f180.google.com with SMTP id af79cd13be357-7b66d20e9ccso54620885a.3
-        for <linux-bluetooth@vger.kernel.org>; Mon, 25 Nov 2024 10:36:35 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HA+Vqxla"
+Received: by mail-vk1-f176.google.com with SMTP id 71dfb90a1353d-51533f41ce1so348788e0c.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 25 Nov 2024 11:21:54 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1732559794; x=1733164594; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=5sWoWiYnnNi8tbgtLuxunELCRWoMf27NC18AZa0nsSc=;
-        b=d1jKgTF3xIK4UFEA9B+RblydXhtJPFqLsUp2Sj/YC7LFRNw7dZkxgtRvYTonfM6mJz
-         UaAM+nXYFmv/d5hBEFsld4+WRw4zF/atVBUWsGk23RDHCY7M6PyGEIu+NnOvlo62+pYk
-         ZT6OkpPqyq8/mvKUEHYVng5Eimh0Ix32y2m1eQ7gYzx0cNdfVwHXkRD6bCB7YrH6pg1F
-         zIvGYuAt1qg6cLXdph0I13YPfZE2ixJyOLz5EZKlaScjYd05/lmpbdke+eNzLWKxOEsT
-         YYvl53EH5ES8IKfazHZbqIeYBDL1a71ux39mkVlnGdo3Ze3dHd7uxOiVwXDfg5MA3uSi
-         4wMw==
+        d=gmail.com; s=20230601; t=1732562513; x=1733167313; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=4UrHTDrRSccGYVinh6hjFgOQozgftfKuL6SjwClSmYk=;
+        b=HA+VqxlaQayLZLw2MPzLDTs/N47a3FM9ZaJSyjORedVeieF+8FpVHucBj5Kn+HS6ih
+         Nf1itoVqTma+hnUU8N2qernPw6PZ6y+OCC3lESGHh/iABiydZoia0Pr6rQKlSMFnB/W5
+         NWqUlaqtSaywj2xTtlC/uIzvydDGAE9WPz+Zz9tc+3Izb/mZXeV5k/0i/ZyE8rD8Xpr5
+         GXj0oAfR6bDfx4fQV0ValeFbPkpWmjeoXaU2ZvXrnhjjfUcLNbvjXWidFzyuZ+VGFrSX
+         UkWTvbLfiAeE7ey3po6Dkx+NmvqTY1zUKRgHyhk/aPG0JgE0OW3Wl3b2XL36LjbBBQFh
+         dlmw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732559794; x=1733164594;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=5sWoWiYnnNi8tbgtLuxunELCRWoMf27NC18AZa0nsSc=;
-        b=ZnhpN92Fzbdzhk53TPdd9b8HVcSC5QVnkO1UcSE7tPFYzYhSBWAXbYUmFX8ij34SCY
-         e4uVNiV0B28oe7N7cselhvtzmxXptJ95fwIkLNnInLzDehxIBjjCAYKcaf3MRuaCbfk+
-         v5Rv9QlXbBPUsiTW8EPzVN2aabUxRl3BelrPY+OzTdA1/Fkr7CBcKTO0fc12vQ1kYnEv
-         jmUW5FGq/YUGSvCDhZ+484T0GdJ0o2GuhnB6l3R/brBffjCe1KCTG6e6sUCgJkakxjcA
-         5yvYpraRHPzjysX9Ts36Ip6oiYG11nvERrbb243Vpel+2ENYMhB1oIc9URsx2O8XbfMq
-         tiRg==
-X-Gm-Message-State: AOJu0Yy5Fh7Ok0zMt9ZT+NjQPe+fbtTMufyIYZjlV2JqYz/8KGG+PB+/
-	H3aHAHezv3ckvNXy9Bt5unHOd+kxMUgOBeEWMCtGpD6WN+pRrKYM4J5uFQ==
-X-Gm-Gg: ASbGnct3C3EcDJdiuXriXSmNQce2bVYMnPjjzNGb5P0KeX80E4dBk1MqX9BHpEMUYn4
-	HsNiD2UBhp9x1tHW9fjalp/+Mqr34jcXXhYXAOygCpWod+r3EozqA+dxF3sUNUE1pwA1dJP5M9R
-	PbUAxYATmn400vjo6DL074RzDqNa6A2nfYbLJqB0aE53lEbNZ2u7u0SrmFkIif0CvyCl7PxjUZl
-	C5h01U40CpTPqAY+opvJN/4WlOwfvp2WBOIkZnsVnLCnTtjG+jH
-X-Google-Smtp-Source: AGHT+IHcrep9TL+qSDipKpzMNX9s5zb8txPC4u8tJ0/Za+M2QtoNJ7GuL+/COzjBh0GsPoO0/+ph+Q==
-X-Received: by 2002:a05:620a:2552:b0:7ae:6ba2:faba with SMTP id af79cd13be357-7b51453eeb1mr1731007485a.28.1732559793988;
-        Mon, 25 Nov 2024 10:36:33 -0800 (PST)
-Received: from [172.17.0.2] ([20.49.54.7])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7b66c8d41d8sm117653485a.95.2024.11.25.10.36.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 25 Nov 2024 10:36:33 -0800 (PST)
-Message-ID: <6744c3b1.050a0220.2479c1.3819@mx.google.com>
-Date: Mon, 25 Nov 2024 10:36:33 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============6629434491539040831=="
+        d=1e100.net; s=20230601; t=1732562513; x=1733167313;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=4UrHTDrRSccGYVinh6hjFgOQozgftfKuL6SjwClSmYk=;
+        b=Wduu1z9RUITQUlIEd7l4nt4D5ZgguPdRAfpJaRqThsF5Xeizv04h+ndivoO0ApdvmR
+         U2Xtuk6t5K4X6kFJCfRrbEu8fgkwkbCKvo6cnGytIbOdCeMrr/HYvdk2JH6jORa3ugFN
+         njW9svbS8QgSte0X2T1Sh6mKQXjz8TRxnxxTF0766dCKMbvM3OjJslEMSoKko8cSk4kF
+         0eeKvw5S1lRkssATHFTFrLPkuvAhi9E0UFcQZTZqlwOrhMN5UeVVruaiJ7OTjzLcO0Mv
+         2itSqG9k3TeYhnEHZ4st0uuGEF9YjhKxVe+HozvoAoPjzG0FwdbJ/rDE/kVlDmvWkdfS
+         Scug==
+X-Gm-Message-State: AOJu0Yyyz53cMVSd8lVtB9amL07c1kJDZN3IW3/CpbyX0uq1IKUZ+b+y
+	LXHBcPc9K/BroadZLyiqwRazW/LetYRqLU6jz9wxBm6vhM6cqKDBfTo0a+xRfGxUE24CbFUZl0A
+	I8IjfcYXC7BUXeB/wlMK7yDExlLc=
+X-Gm-Gg: ASbGncunSs93ppwefWkNqa57UNqNkCalJ+xP40AwzUbVYlx9HP2bHhQDrSlRvjLVF6J
+	/Omr5VyTa/rfSZwlUCTPbjX9yalUKXaM=
+X-Google-Smtp-Source: AGHT+IECoXSNUWGtDj72qEgmu8emWQd4rlm8xIZK53fKGjN3Lu0gXeuf4DBOehacOq+DU6gq2pSZzFVqc1Lbeq1OpAw=
+X-Received: by 2002:a05:6122:1b07:b0:50d:bfb2:4f2f with SMTP id
+ 71dfb90a1353d-515004cc7f7mr13098183e0c.2.1732562513301; Mon, 25 Nov 2024
+ 11:21:53 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, quic_jiaymao@quicinc.com
-Subject: RE: [v1] Bluetooth: hci_sync: clear cmd_sync_work_list when power off
-In-Reply-To: <20241125175111.8598-1-quic_jiaymao@quicinc.com>
-References: <20241125175111.8598-1-quic_jiaymao@quicinc.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+References: <20241124165539.2913146-1-yuxinwang9999@gmail.com>
+ <20241124165539.2913146-3-yuxinwang9999@gmail.com> <CABBYNZLoyG+i4ztkbgZNwjp+ReRyakog8BdXT1HVxyvLuJaGAg@mail.gmail.com>
+In-Reply-To: <CABBYNZLoyG+i4ztkbgZNwjp+ReRyakog8BdXT1HVxyvLuJaGAg@mail.gmail.com>
+From: Yuxin Wang <yuxinwang9999@gmail.com>
+Date: Tue, 26 Nov 2024 03:23:06 +0800
+Message-ID: <CAPGQxBRsz552E2VNhuUvZydTUqk6ZRKjapJhdz1Rj8gTppQ1=g@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 2/2] advertising: Add scan response support in bluetoothctl
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
---===============6629434491539040831==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+On Tue, Nov 26, 2024 at 1:19=E2=80=AFAM Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
 
-This is automated email and please do not reply to this email!
+> We got a few options here:
+>
+> 1. As separate commands
+> 2. As extra optional argument to existing commands
+> 3. As mandatory argument that indicates its type to existing commands
+>
+> I think option 2 is the better one if we could skip entering ad with
+> an empty array e.g:
+>
+> advertise.data type "" "srd..."
+>
+> Option 3 would break existing scripts since we need to change the
+> argument positions, but we don't really care about it since now, so I
+> don't think it would be a problem, but since we have option 2 I guess
+> that is better in this sense.
 
-Dear submitter,
+Option 3 seems somewhat aggressive, in my opinion. From the outset,
+`bluetoothctl` has not offered commands for scan responses, so I
+assume these are not crucial for most developers. Therefore, making it
+a mandatory argument to force all developers to be aware of scan
+responses seems overly aggressive.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=912307
+Option 2 appears more favorable, but I think that writing two
+different datasets in one command is a bit complex. I would prefer to
+set/get two datasets separately:
 
----Test result---
+advertise.data type xx xx xx
+advertise.data srd type yy yy yy
+advertise.data
+advertise.data srd
 
-Test Summary:
-CheckPatch                    PENDING   0.21 seconds
-GitLint                       PENDING   0.20 seconds
-SubjectPrefix                 PASS      0.12 seconds
-BuildKernel                   PASS      24.92 seconds
-CheckAllWarning               PASS      27.10 seconds
-CheckSparse                   PASS      30.41 seconds
-BuildKernel32                 PASS      24.32 seconds
-TestRunnerSetup               PASS      435.36 seconds
-TestRunner_l2cap-tester       PASS      23.17 seconds
-TestRunner_iso-tester         FAIL      30.76 seconds
-TestRunner_bnep-tester        PASS      4.89 seconds
-TestRunner_mgmt-tester        PASS      120.54 seconds
-TestRunner_rfcomm-tester      PASS      7.64 seconds
-TestRunner_sco-tester         PASS      15.60 seconds
-TestRunner_ioctl-tester       PASS      8.23 seconds
-TestRunner_mesh-tester        PASS      6.14 seconds
-TestRunner_smp-tester         PASS      7.08 seconds
-TestRunner_userchan-tester    PASS      5.32 seconds
-IncrementalBuild              PENDING   0.41 seconds
+Option 1 remains my preferred choice because it seems simpler to me.
+It also aligns well with the existing `clear` command:
 
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
+advertise.sr-data type yy yy yy
+advertise.clear sr-data
 
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
+Is there any downside to introducing new commands?
 
-##############################
-Test: TestRunner_iso-tester - FAIL
-Desc: Run iso-tester with test-runner
-Output:
-WARNING: possible circular locking dependency detected
-Total: 124, Passed: 120 (96.8%), Failed: 0, Not Run: 4
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============6629434491539040831==--
+The prefix 'sr-' may be hard to understand without reading the
+documentation, but I haven't found a better abbreviation for 'scan
+response'. Considering `bluetoothctl` is a command-line tool, I opted
+for the shortest prefix.
