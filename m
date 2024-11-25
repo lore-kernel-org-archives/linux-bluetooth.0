@@ -1,65 +1,70 @@
-Received: from mail-vk1-f182.google.com (mail-vk1-f182.google.com [209.85.221.182])
+Received: from mail-vk1-f174.google.com (mail-vk1-f174.google.com [209.85.221.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80BAD1C1F12
-	for <linux-bluetooth@vger.kernel.org>; Mon, 25 Nov 2024 20:42:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B9906F06D
+	for <linux-bluetooth@vger.kernel.org>; Mon, 25 Nov 2024 20:42:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732567339; cv=none; b=hoFs9W5IRjQYStDj/FS1ePqGHVUrBUTK7r3XTVIvJopCiFaI4q43N/gsjmWFvmxZ76R7SXjPseOs6UjJ2JKqWRZa4rh8cSietqhh0xTQqlHQuLBoiCXBwBfq5igEoBx0k3S9ftAuOWD6skb0bwUlnDqQgaEV4q3FE89A9JoPGMs=
+	t=1732567341; cv=none; b=qMq8llCFwPuDxR2wkQqSiTJ/uNcqZPIlWEgw3djcTgdFVeZPdNu0OinJJJ/DUfOtuNOqmKGsZhgiiK9qlvHy4il0PtmVG2a0VIIuaurvWYr1PB1lWc/4+NnvDQi95iRQpczIyRYCeP/iV0YE3/Ii34DiYJA8MZhcFkCJ29z4bwQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732567339; c=relaxed/simple;
-	bh=zajCWDymF2CQVGsHAlaWcUNJiLHBwpFRQfYizjAO4bk=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=juMVLYqgChsGQo4JJQ466oCYCrfryukLm+JoHSZDVcSqdkOo4WBA2M/2JZz25tJLzT17bGJ6yOVzap3MSzmCsADk5XqOuQYQd8W0ycsO6W3dWGtpJG27xrDaSCIrZO6lLVQD6+Qc+DuOE4TkQaxhPi80Gl9AHg/iFTILtLhhVfQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BRMiGm9N; arc=none smtp.client-ip=209.85.221.182
+	s=arc-20240116; t=1732567341; c=relaxed/simple;
+	bh=6f/uBc7n5e8oF8+eJflC6DsobuxMdiQsZGe0L9W3U3c=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=OKQoXZViTA/scHuiXdkTWCLcqUjr5e/nSlDxCjbKy7+inoCXeYw30z9qSCC1kEt5nln+F2eavBzYmP1sK/PA/IG7kC0oYOJjJGYLjiqWIXC1XYMVXtgQ1yIk8Fx/XkC226jlVX+iekecJqhp1R4sadZu/FgNBDryUgA7u1Y7O0Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CoeqrL3v; arc=none smtp.client-ip=209.85.221.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BRMiGm9N"
-Received: by mail-vk1-f182.google.com with SMTP id 71dfb90a1353d-51533f41d84so420036e0c.0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 25 Nov 2024 12:42:17 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CoeqrL3v"
+Received: by mail-vk1-f174.google.com with SMTP id 71dfb90a1353d-515391d9b76so326006e0c.0
+        for <linux-bluetooth@vger.kernel.org>; Mon, 25 Nov 2024 12:42:20 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1732567336; x=1733172136; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=LD8kiPdUDvDi7TDCPzoHKEOZz9o/dvQO3E3SPtcR0TI=;
-        b=BRMiGm9NEqhBRxIaR0iU/fatu2hxYg1h0i968VUumXjfqCp9+q01d7ojpTj533Tl1S
-         jdZOeGzaVGv7I+0bnEdBQL5Gq808NdFKq7fHR6QgH1ITg47FAJWTL6+Spsq5+n6m3KUi
-         3aY3mSeqozG17IEy4Ah4XwTHYYFT9VY948RGzgxnwMpj8SdQnQhZfRV++MzIbbh8Sf70
-         lAEP6dZhoWTRM2groNZwyNAW8OIITFPsa5eyKOwNvwJ8diCWW4xKEsim4q9yj7lo77b2
-         zh6SZwuhEq9CXjF9/e98HUS0bn46AZgcSnUSXOEbWtuQpoNcJD8Q9dQZSyA/ZVe/n214
-         drDg==
+        d=gmail.com; s=20230601; t=1732567338; x=1733172138; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=dh9y/xpYLVKOmP4FcC8zBNA9mfZXS7UcK49A9M1Mj0Y=;
+        b=CoeqrL3vPqCoPOal8ipyP6syxzTUChznDWt1w4NG/QgJfrPGDYKb/nyzWf/JFcfVrr
+         91/1QxqP5wfU4Fb8d+H9p+BNoPWKXmORvIRvxje/t0oYwRumL2Dk3cMPEJbHLLDA+vDv
+         a88+okoTVZhApLjBoYs3hpIpqZnvVs+izv0RVvzkMRIn2m1e7C3HNVK5QZZGEgba5Q6Y
+         T6ABCK9fddIIb1uismPAKhjxX0GfeO0wT9UuJIDf5Bt7DiWnwo6+Fo2TWUWZrtD+gmJY
+         br/C9SKReJitMeKnkLNUkgPVEPQg31iO/dyn0sRS4FryQp+7v7hBuHbuu7SZk7ca6KeB
+         /y6g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732567336; x=1733172136;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=LD8kiPdUDvDi7TDCPzoHKEOZz9o/dvQO3E3SPtcR0TI=;
-        b=t/5AVyns9xcY4ZpUUBCrzuBkjRbDFN52QCr4Y8+we/ztDmF/HagQEj8qWz095z/g5c
-         koTJU0sM0ttgL11GyeJS140OC9EoLletZ25bi/0JplDi94Q2+d//IIrbCRv9/Pgx9drS
-         AmNvHcIHvlTPtQM2no13SZDhAiBF0EUptejBrKkeLzA44Fr+2aauO+m3VT1h84/Uwr6t
-         tQZ/G1W3RsVL1l3FXqWcXjw3vbqpQsMlX82+k7PcYtILmtkQe5R0PLIkt+9kVZcNnrjb
-         Eh21cha8m0kvCctt4Q9HQ21LH0g2OUOn8lYMHxeZEoYvXPeABNRzkniRMXw6ds+sJRHJ
-         3mxQ==
-X-Gm-Message-State: AOJu0Yw41g82G+7laLEIdDoklFeWqNdlrm2OL5E0jwnuHvPp1B2ZlFpM
-	APusJP1eE6W5rLNhUgms9/t3vBtwY0loadkb/YwGteC3SywbXMpsevw+Yg==
-X-Gm-Gg: ASbGncuIE0X7+Kdr6tF5k4efwoe9MvbLYee2Rtl6wCCgRzQhU3p8KaXvazScDbmALnh
-	Y+r9XxKhQOET/iWpxriq1We72LhNZaSIoG1bgjkCugbeUQSW4PW8Thi6baJVM2hG91ALK14JVY4
-	fHx3fAvn0s8mDnBBwdIBVAGR16Y1NGRUL4lUP0H6ujG5wu4X7+kS88DC9CvOOuHnJ9aSiAy+m/u
-	qRplTEWKGi3uX84ftR+IBZ/qFqCM02Lg5BqC3kH7mEZt778WFyAts0O34lydObuXNfwm8ttUmxI
-	PKmj6y+VXGAel/SIKVTNaw==
-X-Google-Smtp-Source: AGHT+IEE0PKIoKfdtXnFXDmL20YBxtjkfnZRa4T4X3UERqrwkdnr7N/lWNa1NwGqeWD0F7JjFyqqHQ==
-X-Received: by 2002:a05:6122:4d0a:b0:50d:918d:4da1 with SMTP id 71dfb90a1353d-515004987c0mr13482995e0c.3.1732567335724;
-        Mon, 25 Nov 2024 12:42:15 -0800 (PST)
+        d=1e100.net; s=20230601; t=1732567338; x=1733172138;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=dh9y/xpYLVKOmP4FcC8zBNA9mfZXS7UcK49A9M1Mj0Y=;
+        b=Lgt1UL9wMHoE/KDhqtGH4ENXBu3IgJcyBv2t1Q3PjCU8ScgY51o+1RULPZO4i17Z1S
+         JvA88gN53lERSzD2tSvpoWuDk/YtBmrwJ10krdRierVslU1njaP9GrtOpBkV4V9KV8Pk
+         6GDv3dAEIbsHFCoP5BKY6bG315D4io9iUzhlv9JMydPclOGnK7Db5ZAtuOeVt5kLz9If
+         dlq92qPWt5O2Ey7/ZMuI62t6yO/3imEk+Cy9Tpjy2zIh9EB6BVaTd90bqSXdPTm7EFEf
+         RD2PJZ9mfuE8enhbqFt7JpDv3cWfItxEpl1FCcG8Z1RIutmnzwcKtHpn7Qb6MESpKDWj
+         k/rA==
+X-Gm-Message-State: AOJu0YwkIgokGtODVfL0D/LEN+L+cSU3CwMLKAJLw3zF08vtTIKLkHjb
+	LtYucxvE9+nEJW+LAs5U8ogZps6aGO9KaxxlYKfLHfg3JfFBKdYKY8JG2g==
+X-Gm-Gg: ASbGncs2qtiaNgrcxwOHajYKO5bVDrMymoO2Ixb62BKJufZuKvAYMEsCgLz16/qb4bE
+	IH1hAeAGoWK615jX4LiO4V+82QLiv2s5CG/+Ws4Uc8u6KY8KrMvEmmPnkQXfhLJmJprr2Lhjrwu
+	MQcYaGEnF/zgWK+IKC+f6AtdsIKdiPwjf3VoJ1Umffu7uK3Y4id3XbsZMFX20Cr2cXWzofnpDyC
+	Au0lKB9rEiayJQHaGdm9z3DKmVbk8uVVmafq9BrjU0zegxBqUZ2DzuZQ6lNGtp6vIwFiKyAPmNB
+	nz2Ea92d56X+aH7iEBUwNQ==
+X-Google-Smtp-Source: AGHT+IHA7xDfRm3Sh+6oiM0H/GQ7EHp/CbcQROhZizitW0U6NS5XH4nftZMAQVBUimNfBtNkI92vCA==
+X-Received: by 2002:a05:6122:4201:b0:514:eeba:517 with SMTP id 71dfb90a1353d-515009a53femr11274758e0c.10.1732567338492;
+        Mon, 25 Nov 2024 12:42:18 -0800 (PST)
 Received: from lvondent-mobl5.. (syn-107-146-107-067.res.spectrum.com. [107.146.107.67])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5154456a62dsm49166e0c.44.2024.11.25.12.42.12
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5154456a62dsm49166e0c.44.2024.11.25.12.42.15
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 25 Nov 2024 12:42:14 -0800 (PST)
+        Mon, 25 Nov 2024 12:42:17 -0800 (PST)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v1 1/3] Bluetooth: hci_sync: Fix not setting Random Address when required
-Date: Mon, 25 Nov 2024 15:42:09 -0500
-Message-ID: <20241125204211.716883-1-luiz.dentz@gmail.com>
+Subject: [PATCH v1 2/3] Bluetooth: MGMT: Fix Add Device to responding before completing
+Date: Mon, 25 Nov 2024 15:42:10 -0500
+Message-ID: <20241125204211.716883-2-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.47.0
+In-Reply-To: <20241125204211.716883-1-luiz.dentz@gmail.com>
+References: <20241125204211.716883-1-luiz.dentz@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -70,69 +75,82 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This fixes errors such as the following when Own address type is set to
-Random Address but it has not been programmed yet due to either be
-advertising or connecting:
+Add Device with LE type requires updating resolving/accept list which
+requires quite a number of commands to complete and each of them may
+fail, so instead of pretending it would always work this checks the
+return of hci_update_passive_scan_sync which indicates if everything
+worked as intended.
 
-< HCI Command: LE Set Exte.. (0x08|0x0041) plen 13
-        Own address type: Random (0x03)
-        Filter policy: Ignore not in accept list (0x01)
-        PHYs: 0x05
-        Entry 0: LE 1M
-          Type: Passive (0x00)
-          Interval: 60.000 msec (0x0060)
-          Window: 30.000 msec (0x0030)
-        Entry 1: LE Coded
-          Type: Passive (0x00)
-          Interval: 180.000 msec (0x0120)
-          Window: 90.000 msec (0x0090)
-> HCI Event: Command Complete (0x0e) plen 4
-      LE Set Extended Scan Parameters (0x08|0x0041) ncmd 1
-        Status: Success (0x00)
-< HCI Command: LE Set Exten.. (0x08|0x0042) plen 6
-        Extended scan: Enabled (0x01)
-        Filter duplicates: Enabled (0x01)
-        Duration: 0 msec (0x0000)
-        Period: 0.00 sec (0x0000)
-> HCI Event: Command Complete (0x0e) plen 4
-      LE Set Extended Scan Enable (0x08|0x0042) ncmd 1
-        Status: Invalid HCI Command Parameters (0x12)
-
-Fixes: c45074d68a9b ("Bluetooth: Fix not generating RPA when required")
+Fixes: e8907f76544f ("Bluetooth: hci_sync: Make use of hci_cmd_sync_queue set 3")
 Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 ---
- net/bluetooth/hci_sync.c | 11 ++++++-----
- 1 file changed, 6 insertions(+), 5 deletions(-)
+ net/bluetooth/mgmt.c | 38 ++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 36 insertions(+), 2 deletions(-)
 
-diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-index c86f4e42e69c..7b2b04d6b856 100644
---- a/net/bluetooth/hci_sync.c
-+++ b/net/bluetooth/hci_sync.c
-@@ -1031,9 +1031,9 @@ static bool adv_use_rpa(struct hci_dev *hdev, uint32_t flags)
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index b31192d473d0..de47ad999d7b 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -7655,6 +7655,24 @@ static void device_added(struct sock *sk, struct hci_dev *hdev,
+ 	mgmt_event(MGMT_EV_DEVICE_ADDED, hdev, &ev, sizeof(ev), sk);
+ }
  
- static int hci_set_random_addr_sync(struct hci_dev *hdev, bdaddr_t *rpa)
++static void add_device_complete(struct hci_dev *hdev, void *data, int err)
++{
++	struct mgmt_pending_cmd *cmd = data;
++	struct mgmt_cp_add_device *cp = cmd->param;
++
++	if (!err) {
++		device_added(cmd->sk, hdev, &cp->addr.bdaddr, cp->addr.type,
++			     cp->action);
++		device_flags_changed(NULL, hdev, &cp->addr.bdaddr,
++				     cp->addr.type, hdev->conn_flags,
++				     PTR_UINT(cmd->user_data));
++	}
++
++	mgmt_cmd_complete(cmd->sk, hdev->id, MGMT_OP_ADD_DEVICE,
++			  mgmt_status(err), &cp->addr, sizeof(cp->addr));
++	mgmt_pending_free(cmd);
++}
++
+ static int add_device_sync(struct hci_dev *hdev, void *data)
  {
--	/* If we're advertising or initiating an LE connection we can't
--	 * go ahead and change the random address at this time. This is
--	 * because the eventual initiator address used for the
-+	/* If a random_addr has been set we're advertising or initiating an LE
-+	 * connection we can't go ahead and change the random address at this
-+	 * time. This is because the eventual initiator address used for the
- 	 * subsequently created connection will be undefined (some
- 	 * controllers use the new address and others the one we had
- 	 * when the operation started).
-@@ -1041,8 +1041,9 @@ static int hci_set_random_addr_sync(struct hci_dev *hdev, bdaddr_t *rpa)
- 	 * In this kind of scenario skip the update and let the random
- 	 * address be updated at the next cycle.
- 	 */
--	if (hci_dev_test_flag(hdev, HCI_LE_ADV) ||
--	    hci_lookup_le_connect(hdev)) {
-+	if (bacmp(&hdev->random_addr, BDADDR_ANY) &&
-+	    (hci_dev_test_flag(hdev, HCI_LE_ADV) ||
-+	    hci_lookup_le_connect(hdev))) {
- 		bt_dev_dbg(hdev, "Deferring random address update");
- 		hci_dev_set_flag(hdev, HCI_RPA_EXPIRED);
- 		return 0;
+ 	return hci_update_passive_scan_sync(hdev);
+@@ -7663,6 +7681,7 @@ static int add_device_sync(struct hci_dev *hdev, void *data)
+ static int add_device(struct sock *sk, struct hci_dev *hdev,
+ 		      void *data, u16 len)
+ {
++	struct mgmt_pending_cmd *cmd;
+ 	struct mgmt_cp_add_device *cp = data;
+ 	u8 auto_conn, addr_type;
+ 	struct hci_conn_params *params;
+@@ -7743,9 +7762,24 @@ static int add_device(struct sock *sk, struct hci_dev *hdev,
+ 			current_flags = params->flags;
+ 	}
+ 
+-	err = hci_cmd_sync_queue(hdev, add_device_sync, NULL, NULL);
+-	if (err < 0)
++	cmd = mgmt_pending_new(sk, MGMT_OP_ADD_DEVICE, hdev, data, len);
++	if (!cmd) {
++		err = -ENOMEM;
+ 		goto unlock;
++	}
++
++	cmd->user_data = UINT_PTR(current_flags);
++
++	err = hci_cmd_sync_queue(hdev, add_device_sync, cmd,
++				 add_device_complete);
++	if (err < 0) {
++		err = mgmt_cmd_complete(sk, hdev->id, MGMT_OP_ADD_DEVICE,
++					MGMT_STATUS_FAILED, &cp->addr,
++					sizeof(cp->addr));
++		mgmt_pending_free(cmd);
++	}
++
++	goto unlock;
+ 
+ added:
+ 	device_added(sk, hdev, &cp->addr.bdaddr, cp->addr.type, cp->action);
 -- 
 2.47.0
 
