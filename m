@@ -1,117 +1,138 @@
-Received: from mail-vk1-f176.google.com (mail-vk1-f176.google.com [209.85.221.176])
+Received: from mail-vk1-f182.google.com (mail-vk1-f182.google.com [209.85.221.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 775342F2D
-	for <linux-bluetooth@vger.kernel.org>; Mon, 25 Nov 2024 19:21:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80BAD1C1F12
+	for <linux-bluetooth@vger.kernel.org>; Mon, 25 Nov 2024 20:42:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732562516; cv=none; b=uBIhdC8nBX4uraiKagUAo+8jmqNqHqlaOTkmp9iYDrbwxxI/jwGsPnseTQ6nARQYBosYUoFTQVelwyoNQwa0gxnkPRtH0lc8n/YDyu0vQqM2fJ71Gd2jE+dMXZc1m2GtiC6ckLTzklWMyQDsZQe1K3ibI/9r996jXMzKwQlP1DQ=
+	t=1732567339; cv=none; b=hoFs9W5IRjQYStDj/FS1ePqGHVUrBUTK7r3XTVIvJopCiFaI4q43N/gsjmWFvmxZ76R7SXjPseOs6UjJ2JKqWRZa4rh8cSietqhh0xTQqlHQuLBoiCXBwBfq5igEoBx0k3S9ftAuOWD6skb0bwUlnDqQgaEV4q3FE89A9JoPGMs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732562516; c=relaxed/simple;
-	bh=4UrHTDrRSccGYVinh6hjFgOQozgftfKuL6SjwClSmYk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=skH+X/59UIRAKO1OhDucXhBvGnfvH06dj0YK3wtCWpstXm20pMCUJAzTz32xjx2QZK0CGq9dhiCnZtF73hVNueYgxErD+vQAP9/lMYkfm2EqqtTWvOTdytlIg7X2aXIKqQJLee3XiAHchsiNgZKDYOFhLFbn3Y8CdaIlc6CyyK4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HA+Vqxla; arc=none smtp.client-ip=209.85.221.176
+	s=arc-20240116; t=1732567339; c=relaxed/simple;
+	bh=zajCWDymF2CQVGsHAlaWcUNJiLHBwpFRQfYizjAO4bk=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=juMVLYqgChsGQo4JJQ466oCYCrfryukLm+JoHSZDVcSqdkOo4WBA2M/2JZz25tJLzT17bGJ6yOVzap3MSzmCsADk5XqOuQYQd8W0ycsO6W3dWGtpJG27xrDaSCIrZO6lLVQD6+Qc+DuOE4TkQaxhPi80Gl9AHg/iFTILtLhhVfQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BRMiGm9N; arc=none smtp.client-ip=209.85.221.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HA+Vqxla"
-Received: by mail-vk1-f176.google.com with SMTP id 71dfb90a1353d-51533f41ce1so348788e0c.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 25 Nov 2024 11:21:54 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BRMiGm9N"
+Received: by mail-vk1-f182.google.com with SMTP id 71dfb90a1353d-51533f41d84so420036e0c.0
+        for <linux-bluetooth@vger.kernel.org>; Mon, 25 Nov 2024 12:42:17 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1732562513; x=1733167313; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=4UrHTDrRSccGYVinh6hjFgOQozgftfKuL6SjwClSmYk=;
-        b=HA+VqxlaQayLZLw2MPzLDTs/N47a3FM9ZaJSyjORedVeieF+8FpVHucBj5Kn+HS6ih
-         Nf1itoVqTma+hnUU8N2qernPw6PZ6y+OCC3lESGHh/iABiydZoia0Pr6rQKlSMFnB/W5
-         NWqUlaqtSaywj2xTtlC/uIzvydDGAE9WPz+Zz9tc+3Izb/mZXeV5k/0i/ZyE8rD8Xpr5
-         GXj0oAfR6bDfx4fQV0ValeFbPkpWmjeoXaU2ZvXrnhjjfUcLNbvjXWidFzyuZ+VGFrSX
-         UkWTvbLfiAeE7ey3po6Dkx+NmvqTY1zUKRgHyhk/aPG0JgE0OW3Wl3b2XL36LjbBBQFh
-         dlmw==
+        d=gmail.com; s=20230601; t=1732567336; x=1733172136; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=LD8kiPdUDvDi7TDCPzoHKEOZz9o/dvQO3E3SPtcR0TI=;
+        b=BRMiGm9NEqhBRxIaR0iU/fatu2hxYg1h0i968VUumXjfqCp9+q01d7ojpTj533Tl1S
+         jdZOeGzaVGv7I+0bnEdBQL5Gq808NdFKq7fHR6QgH1ITg47FAJWTL6+Spsq5+n6m3KUi
+         3aY3mSeqozG17IEy4Ah4XwTHYYFT9VY948RGzgxnwMpj8SdQnQhZfRV++MzIbbh8Sf70
+         lAEP6dZhoWTRM2groNZwyNAW8OIITFPsa5eyKOwNvwJ8diCWW4xKEsim4q9yj7lo77b2
+         zh6SZwuhEq9CXjF9/e98HUS0bn46AZgcSnUSXOEbWtuQpoNcJD8Q9dQZSyA/ZVe/n214
+         drDg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732562513; x=1733167313;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=4UrHTDrRSccGYVinh6hjFgOQozgftfKuL6SjwClSmYk=;
-        b=Wduu1z9RUITQUlIEd7l4nt4D5ZgguPdRAfpJaRqThsF5Xeizv04h+ndivoO0ApdvmR
-         U2Xtuk6t5K4X6kFJCfRrbEu8fgkwkbCKvo6cnGytIbOdCeMrr/HYvdk2JH6jORa3ugFN
-         njW9svbS8QgSte0X2T1Sh6mKQXjz8TRxnxxTF0766dCKMbvM3OjJslEMSoKko8cSk4kF
-         0eeKvw5S1lRkssATHFTFrLPkuvAhi9E0UFcQZTZqlwOrhMN5UeVVruaiJ7OTjzLcO0Mv
-         2itSqG9k3TeYhnEHZ4st0uuGEF9YjhKxVe+HozvoAoPjzG0FwdbJ/rDE/kVlDmvWkdfS
-         Scug==
-X-Gm-Message-State: AOJu0Yyyz53cMVSd8lVtB9amL07c1kJDZN3IW3/CpbyX0uq1IKUZ+b+y
-	LXHBcPc9K/BroadZLyiqwRazW/LetYRqLU6jz9wxBm6vhM6cqKDBfTo0a+xRfGxUE24CbFUZl0A
-	I8IjfcYXC7BUXeB/wlMK7yDExlLc=
-X-Gm-Gg: ASbGncunSs93ppwefWkNqa57UNqNkCalJ+xP40AwzUbVYlx9HP2bHhQDrSlRvjLVF6J
-	/Omr5VyTa/rfSZwlUCTPbjX9yalUKXaM=
-X-Google-Smtp-Source: AGHT+IECoXSNUWGtDj72qEgmu8emWQd4rlm8xIZK53fKGjN3Lu0gXeuf4DBOehacOq+DU6gq2pSZzFVqc1Lbeq1OpAw=
-X-Received: by 2002:a05:6122:1b07:b0:50d:bfb2:4f2f with SMTP id
- 71dfb90a1353d-515004cc7f7mr13098183e0c.2.1732562513301; Mon, 25 Nov 2024
- 11:21:53 -0800 (PST)
+        d=1e100.net; s=20230601; t=1732567336; x=1733172136;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=LD8kiPdUDvDi7TDCPzoHKEOZz9o/dvQO3E3SPtcR0TI=;
+        b=t/5AVyns9xcY4ZpUUBCrzuBkjRbDFN52QCr4Y8+we/ztDmF/HagQEj8qWz095z/g5c
+         koTJU0sM0ttgL11GyeJS140OC9EoLletZ25bi/0JplDi94Q2+d//IIrbCRv9/Pgx9drS
+         AmNvHcIHvlTPtQM2no13SZDhAiBF0EUptejBrKkeLzA44Fr+2aauO+m3VT1h84/Uwr6t
+         tQZ/G1W3RsVL1l3FXqWcXjw3vbqpQsMlX82+k7PcYtILmtkQe5R0PLIkt+9kVZcNnrjb
+         Eh21cha8m0kvCctt4Q9HQ21LH0g2OUOn8lYMHxeZEoYvXPeABNRzkniRMXw6ds+sJRHJ
+         3mxQ==
+X-Gm-Message-State: AOJu0Yw41g82G+7laLEIdDoklFeWqNdlrm2OL5E0jwnuHvPp1B2ZlFpM
+	APusJP1eE6W5rLNhUgms9/t3vBtwY0loadkb/YwGteC3SywbXMpsevw+Yg==
+X-Gm-Gg: ASbGncuIE0X7+Kdr6tF5k4efwoe9MvbLYee2Rtl6wCCgRzQhU3p8KaXvazScDbmALnh
+	Y+r9XxKhQOET/iWpxriq1We72LhNZaSIoG1bgjkCugbeUQSW4PW8Thi6baJVM2hG91ALK14JVY4
+	fHx3fAvn0s8mDnBBwdIBVAGR16Y1NGRUL4lUP0H6ujG5wu4X7+kS88DC9CvOOuHnJ9aSiAy+m/u
+	qRplTEWKGi3uX84ftR+IBZ/qFqCM02Lg5BqC3kH7mEZt778WFyAts0O34lydObuXNfwm8ttUmxI
+	PKmj6y+VXGAel/SIKVTNaw==
+X-Google-Smtp-Source: AGHT+IEE0PKIoKfdtXnFXDmL20YBxtjkfnZRa4T4X3UERqrwkdnr7N/lWNa1NwGqeWD0F7JjFyqqHQ==
+X-Received: by 2002:a05:6122:4d0a:b0:50d:918d:4da1 with SMTP id 71dfb90a1353d-515004987c0mr13482995e0c.3.1732567335724;
+        Mon, 25 Nov 2024 12:42:15 -0800 (PST)
+Received: from lvondent-mobl5.. (syn-107-146-107-067.res.spectrum.com. [107.146.107.67])
+        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5154456a62dsm49166e0c.44.2024.11.25.12.42.12
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 25 Nov 2024 12:42:14 -0800 (PST)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH v1 1/3] Bluetooth: hci_sync: Fix not setting Random Address when required
+Date: Mon, 25 Nov 2024 15:42:09 -0500
+Message-ID: <20241125204211.716883-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.47.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241124165539.2913146-1-yuxinwang9999@gmail.com>
- <20241124165539.2913146-3-yuxinwang9999@gmail.com> <CABBYNZLoyG+i4ztkbgZNwjp+ReRyakog8BdXT1HVxyvLuJaGAg@mail.gmail.com>
-In-Reply-To: <CABBYNZLoyG+i4ztkbgZNwjp+ReRyakog8BdXT1HVxyvLuJaGAg@mail.gmail.com>
-From: Yuxin Wang <yuxinwang9999@gmail.com>
-Date: Tue, 26 Nov 2024 03:23:06 +0800
-Message-ID: <CAPGQxBRsz552E2VNhuUvZydTUqk6ZRKjapJhdz1Rj8gTppQ1=g@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 2/2] advertising: Add scan response support in bluetoothctl
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Tue, Nov 26, 2024 at 1:19=E2=80=AFAM Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-> We got a few options here:
->
-> 1. As separate commands
-> 2. As extra optional argument to existing commands
-> 3. As mandatory argument that indicates its type to existing commands
->
-> I think option 2 is the better one if we could skip entering ad with
-> an empty array e.g:
->
-> advertise.data type "" "srd..."
->
-> Option 3 would break existing scripts since we need to change the
-> argument positions, but we don't really care about it since now, so I
-> don't think it would be a problem, but since we have option 2 I guess
-> that is better in this sense.
+This fixes errors such as the following when Own address type is set to
+Random Address but it has not been programmed yet due to either be
+advertising or connecting:
 
-Option 3 seems somewhat aggressive, in my opinion. From the outset,
-`bluetoothctl` has not offered commands for scan responses, so I
-assume these are not crucial for most developers. Therefore, making it
-a mandatory argument to force all developers to be aware of scan
-responses seems overly aggressive.
+< HCI Command: LE Set Exte.. (0x08|0x0041) plen 13
+        Own address type: Random (0x03)
+        Filter policy: Ignore not in accept list (0x01)
+        PHYs: 0x05
+        Entry 0: LE 1M
+          Type: Passive (0x00)
+          Interval: 60.000 msec (0x0060)
+          Window: 30.000 msec (0x0030)
+        Entry 1: LE Coded
+          Type: Passive (0x00)
+          Interval: 180.000 msec (0x0120)
+          Window: 90.000 msec (0x0090)
+> HCI Event: Command Complete (0x0e) plen 4
+      LE Set Extended Scan Parameters (0x08|0x0041) ncmd 1
+        Status: Success (0x00)
+< HCI Command: LE Set Exten.. (0x08|0x0042) plen 6
+        Extended scan: Enabled (0x01)
+        Filter duplicates: Enabled (0x01)
+        Duration: 0 msec (0x0000)
+        Period: 0.00 sec (0x0000)
+> HCI Event: Command Complete (0x0e) plen 4
+      LE Set Extended Scan Enable (0x08|0x0042) ncmd 1
+        Status: Invalid HCI Command Parameters (0x12)
 
-Option 2 appears more favorable, but I think that writing two
-different datasets in one command is a bit complex. I would prefer to
-set/get two datasets separately:
+Fixes: c45074d68a9b ("Bluetooth: Fix not generating RPA when required")
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+---
+ net/bluetooth/hci_sync.c | 11 ++++++-----
+ 1 file changed, 6 insertions(+), 5 deletions(-)
 
-advertise.data type xx xx xx
-advertise.data srd type yy yy yy
-advertise.data
-advertise.data srd
+diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+index c86f4e42e69c..7b2b04d6b856 100644
+--- a/net/bluetooth/hci_sync.c
++++ b/net/bluetooth/hci_sync.c
+@@ -1031,9 +1031,9 @@ static bool adv_use_rpa(struct hci_dev *hdev, uint32_t flags)
+ 
+ static int hci_set_random_addr_sync(struct hci_dev *hdev, bdaddr_t *rpa)
+ {
+-	/* If we're advertising or initiating an LE connection we can't
+-	 * go ahead and change the random address at this time. This is
+-	 * because the eventual initiator address used for the
++	/* If a random_addr has been set we're advertising or initiating an LE
++	 * connection we can't go ahead and change the random address at this
++	 * time. This is because the eventual initiator address used for the
+ 	 * subsequently created connection will be undefined (some
+ 	 * controllers use the new address and others the one we had
+ 	 * when the operation started).
+@@ -1041,8 +1041,9 @@ static int hci_set_random_addr_sync(struct hci_dev *hdev, bdaddr_t *rpa)
+ 	 * In this kind of scenario skip the update and let the random
+ 	 * address be updated at the next cycle.
+ 	 */
+-	if (hci_dev_test_flag(hdev, HCI_LE_ADV) ||
+-	    hci_lookup_le_connect(hdev)) {
++	if (bacmp(&hdev->random_addr, BDADDR_ANY) &&
++	    (hci_dev_test_flag(hdev, HCI_LE_ADV) ||
++	    hci_lookup_le_connect(hdev))) {
+ 		bt_dev_dbg(hdev, "Deferring random address update");
+ 		hci_dev_set_flag(hdev, HCI_RPA_EXPIRED);
+ 		return 0;
+-- 
+2.47.0
 
-Option 1 remains my preferred choice because it seems simpler to me.
-It also aligns well with the existing `clear` command:
-
-advertise.sr-data type yy yy yy
-advertise.clear sr-data
-
-Is there any downside to introducing new commands?
-
-The prefix 'sr-' may be hard to understand without reading the
-documentation, but I haven't found a better abbreviation for 'scan
-response'. Considering `bluetoothctl` is a command-line tool, I opted
-for the shortest prefix.
