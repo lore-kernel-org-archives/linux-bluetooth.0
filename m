@@ -1,112 +1,138 @@
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f180.google.com (mail-qk1-f180.google.com [209.85.222.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D513541C92;
-	Mon, 25 Nov 2024 17:51:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D6AA1B87D1
+	for <linux-bluetooth@vger.kernel.org>; Mon, 25 Nov 2024 18:36:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732557093; cv=none; b=gHbz32dNdxq7Wv35LfsSCVlC7kwVzPHyls2OnmnoRYpg7yzTZuBwJcu3+qI97/pOUQWP2KRxGONLwaWwJQlK5krN+SHj1te5+i26yB6B9nNHecRiXT1WdWH0YKUwQX//IHBazO7NccvHY1PkuR5jVXEhfHm/medvuGZmx1bDnuw=
+	t=1732559797; cv=none; b=DvGKYz0V9IshpJSJndaNkFmvyScZjVAXZXYKrJbY51aLLoKA/P1hwsAMhIt0EydJomU1TBPH1HagZjRJz3Be+BYplwe4GvC0YWMRR/g95aDN9yy35efa9GkMgU+1iezkuTXLZBEYgC6Qn1EsLVzlsC/COxe0fNaSSC7dL0DY984=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732557093; c=relaxed/simple;
-	bh=lR3jSeY6/Aj1MICcZ//Z56OGkK0iYRaFnBMSFJZXgek=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=L8QGKCkzOm+dPGI+tS9itrAA5fPOjgDuH+QU8cWv63YT/dVqdenM1mSoXJn+aIvZW6Qep3GxSVXBOvrVNqUzOi4LDD3tZjLOFjxWycB6t//AP5r+C2NU5NVhvS4PTYUgKRNov1jteTjCSb/OVP6CGOk5RgdLV1KIRVa3dYaapkU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=MlU5z0nZ; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+	s=arc-20240116; t=1732559797; c=relaxed/simple;
+	bh=IBa89x/C5B3r/SPs93QJHAYnaP0d/0X0P2hybrhSAUk=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=CqJHq/WvZfvyfEVlyLe9WSRve96hrQFMrUxYD1GJRaqebLAYl+f8u/A2gZy5kLBXRowTDUYd1BF0ZW2mi6aYYIxwfy2b+MScSidhF3b4+S6XF6A8U4P96xXZsnLEmE4iiPDMhUTtVxGIT+qcOv4M2h7KpuvvjjYfBcpKMaHo7xU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=d1jKgTF3; arc=none smtp.client-ip=209.85.222.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="MlU5z0nZ"
-Received: from pps.filterd (m0279869.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4APBDkij007724;
-	Mon, 25 Nov 2024 17:51:28 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:message-id
-	:mime-version:subject:to; s=qcppdkim1; bh=oN4EWAUKm0pFB57IHsr3MB
-	r4a/p3Cp7Zp4mWAEIQMgk=; b=MlU5z0nZeDb23hd1n9z++c6NA2mw8cUZxL8GcF
-	2m77u1G3clAyWz1PUWjvZGs8L6kvnoOCd0ueGF92IDmHgCXRpq8zau/Gx0vrVhVj
-	3dT6NM2r+TmYMgqouCsjGr77KsroyQzOQRYMG5LxgwafZpZTEqu+DYlisXqaiNWL
-	4j3IZwbdjaq/EMmIBH4tL6L66cb3f3ePut7qB1fZR1cOMe/8FIn1weDDlZgjqHEM
-	MCgExsM3Mvs9DtnzdoB/YgcDj8S0bs4xeQq24kZmLHWTNGmQR2A4RwfzEEjba0gn
-	wW4GtwEXuVnbVluvsoo6g26TLDGsEGPJRTav5Cdh1IkTWqEw==
-Received: from nalasppmta02.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 433626dn1d-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 25 Nov 2024 17:51:28 +0000 (GMT)
-Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
-	by NALASPPMTA02.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 4APHpRJo032177
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 25 Nov 2024 17:51:27 GMT
-Received: from jiaymao-gv.qualcomm.com (10.80.80.8) by
- nalasex01c.na.qualcomm.com (10.47.97.35) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.9; Mon, 25 Nov 2024 09:51:25 -0800
-From: Jiayang Mao <quic_jiaymao@quicinc.com>
-To: Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg
-	<johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-CC: <linux-bluetooth@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <quic_chejiang@quicinc.com>, <quic_jiaymao@quicinc.com>
-Subject: [PATCH v1] Bluetooth: hci_sync: clear cmd_sync_work_list when power off
-Date: Tue, 26 Nov 2024 01:51:11 +0800
-Message-ID: <20241125175111.8598-1-quic_jiaymao@quicinc.com>
-X-Mailer: git-send-email 2.46.0
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="d1jKgTF3"
+Received: by mail-qk1-f180.google.com with SMTP id af79cd13be357-7b66d20e9ccso54620885a.3
+        for <linux-bluetooth@vger.kernel.org>; Mon, 25 Nov 2024 10:36:35 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1732559794; x=1733164594; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=5sWoWiYnnNi8tbgtLuxunELCRWoMf27NC18AZa0nsSc=;
+        b=d1jKgTF3xIK4UFEA9B+RblydXhtJPFqLsUp2Sj/YC7LFRNw7dZkxgtRvYTonfM6mJz
+         UaAM+nXYFmv/d5hBEFsld4+WRw4zF/atVBUWsGk23RDHCY7M6PyGEIu+NnOvlo62+pYk
+         ZT6OkpPqyq8/mvKUEHYVng5Eimh0Ix32y2m1eQ7gYzx0cNdfVwHXkRD6bCB7YrH6pg1F
+         zIvGYuAt1qg6cLXdph0I13YPfZE2ixJyOLz5EZKlaScjYd05/lmpbdke+eNzLWKxOEsT
+         YYvl53EH5ES8IKfazHZbqIeYBDL1a71ux39mkVlnGdo3Ze3dHd7uxOiVwXDfg5MA3uSi
+         4wMw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1732559794; x=1733164594;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=5sWoWiYnnNi8tbgtLuxunELCRWoMf27NC18AZa0nsSc=;
+        b=ZnhpN92Fzbdzhk53TPdd9b8HVcSC5QVnkO1UcSE7tPFYzYhSBWAXbYUmFX8ij34SCY
+         e4uVNiV0B28oe7N7cselhvtzmxXptJ95fwIkLNnInLzDehxIBjjCAYKcaf3MRuaCbfk+
+         v5Rv9QlXbBPUsiTW8EPzVN2aabUxRl3BelrPY+OzTdA1/Fkr7CBcKTO0fc12vQ1kYnEv
+         jmUW5FGq/YUGSvCDhZ+484T0GdJ0o2GuhnB6l3R/brBffjCe1KCTG6e6sUCgJkakxjcA
+         5yvYpraRHPzjysX9Ts36Ip6oiYG11nvERrbb243Vpel+2ENYMhB1oIc9URsx2O8XbfMq
+         tiRg==
+X-Gm-Message-State: AOJu0Yy5Fh7Ok0zMt9ZT+NjQPe+fbtTMufyIYZjlV2JqYz/8KGG+PB+/
+	H3aHAHezv3ckvNXy9Bt5unHOd+kxMUgOBeEWMCtGpD6WN+pRrKYM4J5uFQ==
+X-Gm-Gg: ASbGnct3C3EcDJdiuXriXSmNQce2bVYMnPjjzNGb5P0KeX80E4dBk1MqX9BHpEMUYn4
+	HsNiD2UBhp9x1tHW9fjalp/+Mqr34jcXXhYXAOygCpWod+r3EozqA+dxF3sUNUE1pwA1dJP5M9R
+	PbUAxYATmn400vjo6DL074RzDqNa6A2nfYbLJqB0aE53lEbNZ2u7u0SrmFkIif0CvyCl7PxjUZl
+	C5h01U40CpTPqAY+opvJN/4WlOwfvp2WBOIkZnsVnLCnTtjG+jH
+X-Google-Smtp-Source: AGHT+IHcrep9TL+qSDipKpzMNX9s5zb8txPC4u8tJ0/Za+M2QtoNJ7GuL+/COzjBh0GsPoO0/+ph+Q==
+X-Received: by 2002:a05:620a:2552:b0:7ae:6ba2:faba with SMTP id af79cd13be357-7b51453eeb1mr1731007485a.28.1732559793988;
+        Mon, 25 Nov 2024 10:36:33 -0800 (PST)
+Received: from [172.17.0.2] ([20.49.54.7])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7b66c8d41d8sm117653485a.95.2024.11.25.10.36.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 25 Nov 2024 10:36:33 -0800 (PST)
+Message-ID: <6744c3b1.050a0220.2479c1.3819@mx.google.com>
+Date: Mon, 25 Nov 2024 10:36:33 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============6629434491539040831=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nalasex01c.na.qualcomm.com (10.47.97.35)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: iykKNNxI1sxT_-MxZluZ08aLeUMGAa6v
-X-Proofpoint-ORIG-GUID: iykKNNxI1sxT_-MxZluZ08aLeUMGAa6v
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
- definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0
- priorityscore=1501 clxscore=1011 phishscore=0 spamscore=0 adultscore=0
- impostorscore=0 mlxscore=0 malwarescore=0 suspectscore=0 mlxlogscore=999
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2409260000 definitions=main-2411250148
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, quic_jiaymao@quicinc.com
+Subject: RE: [v1] Bluetooth: hci_sync: clear cmd_sync_work_list when power off
+In-Reply-To: <20241125175111.8598-1-quic_jiaymao@quicinc.com>
+References: <20241125175111.8598-1-quic_jiaymao@quicinc.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Clear the remaining command in cmd_sync_work_list when BT is
-performing power off. In some cases, this list is not empty after
-power off. BT host will try to send more HCI commands.
-This can cause unexpected results.
+--===============6629434491539040831==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Signed-off-by: Jiayang Mao <quic_jiaymao@quicinc.com>
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=912307
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PENDING   0.21 seconds
+GitLint                       PENDING   0.20 seconds
+SubjectPrefix                 PASS      0.12 seconds
+BuildKernel                   PASS      24.92 seconds
+CheckAllWarning               PASS      27.10 seconds
+CheckSparse                   PASS      30.41 seconds
+BuildKernel32                 PASS      24.32 seconds
+TestRunnerSetup               PASS      435.36 seconds
+TestRunner_l2cap-tester       PASS      23.17 seconds
+TestRunner_iso-tester         FAIL      30.76 seconds
+TestRunner_bnep-tester        PASS      4.89 seconds
+TestRunner_mgmt-tester        PASS      120.54 seconds
+TestRunner_rfcomm-tester      PASS      7.64 seconds
+TestRunner_sco-tester         PASS      15.60 seconds
+TestRunner_ioctl-tester       PASS      8.23 seconds
+TestRunner_mesh-tester        PASS      6.14 seconds
+TestRunner_smp-tester         PASS      7.08 seconds
+TestRunner_userchan-tester    PASS      5.32 seconds
+IncrementalBuild              PENDING   0.41 seconds
+
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
+
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
+
+##############################
+Test: TestRunner_iso-tester - FAIL
+Desc: Run iso-tester with test-runner
+Output:
+WARNING: possible circular locking dependency detected
+Total: 124, Passed: 120 (96.8%), Failed: 0, Not Run: 4
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
+
+
+
 ---
- net/bluetooth/hci_sync.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+Regards,
+Linux Bluetooth
 
-diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-index c86f4e42e..bc622d074 100644
---- a/net/bluetooth/hci_sync.c
-+++ b/net/bluetooth/hci_sync.c
-@@ -5139,6 +5139,7 @@ int hci_dev_close_sync(struct hci_dev *hdev)
- {
- 	bool auto_off;
- 	int err = 0;
-+	struct hci_cmd_sync_work_entry *entry, *tmp;
- 
- 	bt_dev_dbg(hdev, "");
- 
-@@ -5258,6 +5259,11 @@ int hci_dev_close_sync(struct hci_dev *hdev)
- 	clear_bit(HCI_RUNNING, &hdev->flags);
- 	hci_sock_dev_event(hdev, HCI_DEV_CLOSE);
- 
-+	mutex_lock(&hdev->cmd_sync_work_lock);
-+	list_for_each_entry_safe(entry, tmp, &hdev->cmd_sync_work_list, list)
-+		_hci_cmd_sync_cancel_entry(hdev, entry, -ECANCELED);
-+	mutex_unlock(&hdev->cmd_sync_work_lock);
-+
- 	/* After this point our queues are empty and no tasks are scheduled. */
- 	hdev->close(hdev);
- 
--- 
-2.25.1
 
+--===============6629434491539040831==--
