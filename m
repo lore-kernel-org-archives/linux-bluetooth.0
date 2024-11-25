@@ -1,70 +1,65 @@
-Received: from mail-vk1-f181.google.com (mail-vk1-f181.google.com [209.85.221.181])
+Received: from mail-ua1-f54.google.com (mail-ua1-f54.google.com [209.85.222.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F6BF6F06D
-	for <linux-bluetooth@vger.kernel.org>; Mon, 25 Nov 2024 20:42:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D931B1B87DC
+	for <linux-bluetooth@vger.kernel.org>; Mon, 25 Nov 2024 20:47:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732567345; cv=none; b=miTxro84nDznSeyDZv6ZIP3o927x7zks3spUEpunjU8ln3c7/CwyBGsTsDmhRA89oluNfGUphpgFkNTUCjOjUO9SKOI5oGR7nbY2zUij3OHv2K2+NChHJAwA9KpjJ4fcy3p+oga9G77SQZ33xEW9P+E5tTzeu6M30c7r9aGsbNc=
+	t=1732567639; cv=none; b=e0PABJApe39Ln2TkaM1YqWUOefSYF/588c/R8xwjgzWOTGXOmKBjKot3d7CcDfth+B+ELPyLVuaJYPVHlcfK4nWuUb5q80vmKUPji6lBue0s4rF4Na+SZmfesymUFtDxMe0wWm89c2v+CCOt16fRNFG1wiQTwysMiXPmgA/Rc34=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732567345; c=relaxed/simple;
-	bh=zR5QUwzLHb7Nl8KXtQxScth5SoL+uLmVPIPHlIGpL44=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=HCuS5AXhBopQq/y7hGDj9U3lhMrSUirqpEraGO9+yYxt9Ilmb9fOCAC4VWtkiM68lMgKUGpoaq/Emsy7PIIKO67hLEgE11PFwgf7FMEtD+MtgKHIvdMONw13vu6WZcRs2bGKRufxRluvCnGbKLslZmCPe7u/NSkArFeWwK/BmtU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=evwES9R8; arc=none smtp.client-ip=209.85.221.181
+	s=arc-20240116; t=1732567639; c=relaxed/simple;
+	bh=b0Q2GOPLOYa1a7gfFUx2MZY+M0oD+S5EY08rPZGSiD0=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=bH4kuaj8eun/oN2g56BoAgpuVDD7T44NyBoe3uDetWtHa2UuHnt6jJFvlKkgMum7wPeDPaCSdB3wY/lNE1PQlA0iEzZvHu2sJfCi1DFDDPfX92uUWksHFlyhnGviJSOkclCg0+Nw+yIOHtL+WVhBlJ8bnd0FGx4nnkFcB/N7kII=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZahwLd7i; arc=none smtp.client-ip=209.85.222.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="evwES9R8"
-Received: by mail-vk1-f181.google.com with SMTP id 71dfb90a1353d-51511c54c3aso674145e0c.0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 25 Nov 2024 12:42:23 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZahwLd7i"
+Received: by mail-ua1-f54.google.com with SMTP id a1e0cc1a2514c-856e7566b2cso1378863241.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 25 Nov 2024 12:47:16 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1732567341; x=1733172141; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=CDTnA7oSGmzeKrm7GxvDDhEePKbwmfmLxTkQ6XaOpbc=;
-        b=evwES9R87Xlh4TEGKq6IvXsjHa/cCrXDzHK1uzdrkxVU1iQ1Rngd4TWHKiSAhO7DwM
-         bjLkltp3j/KM+1CAfs0WxHoxUF6WmS2CqGcY1VAVFntoTQWPimKq5at9VPfc4niRJVGF
-         YBqnkZOONg2omUDpDW+OEBSy2hTR418euwKNz4saldWjoD2b69wFOOCoju72Bz8didy5
-         GjNajKdnHOnKqbhKHVsmxaIchCbjEKLVEsW9zOKKmQtXju8gRUtIh7G5MuLtKeEjABbO
-         9/7dhGPVimnNtetoKM0dEDbirNjegWzi2F1cGAD/9eBNF5ZWSs2PyTch6aoPwyx0XWwh
-         RwUg==
+        d=gmail.com; s=20230601; t=1732567634; x=1733172434; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=9W+g0++ePsGFTTYR0SaR3E53bonNAuLspg309JKEHQk=;
+        b=ZahwLd7iR2kXibUPb5YBPvexub1zm1vmZsqt7/KYQXcxy438+jDhdquiCEpcYIu+Z9
+         JTwrVbB6FsyULoHt0H4Gl4BE90nN5GcaqKvtvMj3MnI78lh+i0z9hDJGNVuG3s3UjzcE
+         aKLrMH6gJ/4hytV5Bp1eWrXitIlMtkKpN3h46pwB390BaFpI14pwvVCuzvvD384tfBw4
+         o1jeXHGf826maDv910wqM/2d528R6PfPBBxQgUIBG8WPPyWFTLdTWozgW6mqMIhQz5QO
+         Ug8l/J2Hmzu3VE7SGVFTNZa4lBoby4NPjXj3kCov08oAJDXEfv1A4ZwiH3WM6KyUKc+i
+         fYmw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732567341; x=1733172141;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=CDTnA7oSGmzeKrm7GxvDDhEePKbwmfmLxTkQ6XaOpbc=;
-        b=QLegmyYAtz7UGXUCDP+OLH5llylKeBmnjMxwI30udqTMu6Mmk0Mf7JZkg07a8YxXVk
-         2grw7QW1l/5nDyVswprmlz1JFdcWrSwaQ2aA05Bmm3gTP4pzCXZ7tuoR4QUj8nrrmv97
-         s2tvN1T76zX7Tx8PnCUjBzGNVwibF6+afb/eZ4n9CcyUvAVPEYzpCbSl569wzWQqBtvX
-         ETd3bptyRNLHOoYWegz8IYl6O2vAhpYVnI3Q4zsYkMAKqunLgRvyptiREx2GJ0jHCjWC
-         Sw30afnZY/6aY4qRZR4rMdplfWCz8JMtBw9U8ZjazIkR2Ya5LZAF9nRc4/jam/JUu99G
-         A5dA==
-X-Gm-Message-State: AOJu0Yx8TOu0yPAgxCxtEgtmc9vhMk+/C088sdjiyl68rsVJ6l6Z4xhA
-	u1rWMZSDMvQQd0xz/jnVbrfjlMoCH0v4KCTWTBDTRF6ely2KuQrS0Lk2yw==
-X-Gm-Gg: ASbGnctDOFbu+RNcsyKtKySGjFbzW+o+2/x4gZZwHgjU5xEsJLnX0DApfQP/DrffbZx
-	acWtc/zl8wiCYfEeMgHZNNcLmQqg3bAXcEwyEOxP0+A01R+IzwEh/Iz5w6AtkzQ5JJSdg2F9SVh
-	csBqLCPHLZWh+9mEcuamWRs6DXmHVXHRFEq3jXPPykGqWQE2eZC9AayKg9UyLNirXfjMlsQIAID
-	jrZSjj8M/+/prRPOzHyKMiTJuwfH8n8Y4A54DXklJ6yuEQi8jRdkXCcmGLNyNjKbPewja2ZlkDo
-	k/6KGPT5eZKlpx9rCUhpdw==
-X-Google-Smtp-Source: AGHT+IHGpXPCDAkSxqoBp9thL82jWQLZhBe8hxVFXq4+2R/0iLFB+stClC/UuuIYR8wj39KpehWoTw==
-X-Received: by 2002:a05:6122:3906:b0:510:185:5d9c with SMTP id 71dfb90a1353d-51500b04986mr12475187e0c.11.1732567341458;
-        Mon, 25 Nov 2024 12:42:21 -0800 (PST)
+        d=1e100.net; s=20230601; t=1732567634; x=1733172434;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=9W+g0++ePsGFTTYR0SaR3E53bonNAuLspg309JKEHQk=;
+        b=YRgrNIKsMk3hX1L6yn11YJxYBxBuvNTMNDHpyzNk59BYqLZI4Wp21uObEnGqcdSqeb
+         mND+ru+fNyLZu/Je1xGAxtZpq2Lg3B78E8Q8Jjjrw5DAdl0NnGUFofBQB/eFTwhYgaoi
+         FkwuzBvi7+WHm5Cxl/6vdEhMb20SRTokwSKjZzaGkmERdeUd9dSiNsSidDhJusnc65mF
+         nJK0VQoq7UorHY7COwnZu7rDdisPMfoP/NFtbT24zdRQ/qWqUEnaK18Xls5fc3TfoMTV
+         aycbnGvuy9i0ev8uYMb417PxRkjlHohqMCHdcM4NlCfAHZ8/fX2MjBF8TMnkjRFXhTgT
+         stXA==
+X-Gm-Message-State: AOJu0YwiqhLZ5VVb9TMd6VporlCGYm9j6WcpRTJkseF5hyGeS/UfGNCT
+	1HWE5Bawj0s5dQ1lPuJO5Al/TRZB/paDmuWOoVtTOCKrezOtpCnTWxkXtw==
+X-Gm-Gg: ASbGncs5I27lZ5JuNqNBEnum9V0ZDcatUAXU/Um05Duo92diIjQITn5D+wzSTeG7BeL
+	+GqKp2MiMJNC+6XJKHlBV/Z+aDxcs/ZWs9XzmYoKeUAvNA/C6h6cRsuAUrwOolkv8vv6QXC5amO
+	O7za72k5fpL3Qv4+fE4jXE9aZPLFU/RwsU3D8g4C5kOMGuXJKGIGCRvSqRPRoFu9ePsQdWu/FDZ
+	EePpu0m6oOmlK91c3NL9tEbIQmdLOK88XS/yJRdgYOTDfqLGBlk+TPFFK7a5DvuSV7jthbhGive
+	XG+prAndysbJqfTuMiYBEw==
+X-Google-Smtp-Source: AGHT+IG3fvM4vu6FvPT9O1KY0Z96yxclflhvYiHViMySUShw+ABvKqJgzDMsn3WMN5Nl+ByrMBPUsw==
+X-Received: by 2002:a05:6102:3e92:b0:4ad:4fc1:5783 with SMTP id ada2fe7eead31-4addcbd9449mr15246927137.10.1732567634406;
+        Mon, 25 Nov 2024 12:47:14 -0800 (PST)
 Received: from lvondent-mobl5.. (syn-107-146-107-067.res.spectrum.com. [107.146.107.67])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5154456a62dsm49166e0c.44.2024.11.25.12.42.18
+        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-85b4e8205fdsm73829241.1.2024.11.25.12.47.11
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 25 Nov 2024 12:42:19 -0800 (PST)
+        Mon, 25 Nov 2024 12:47:12 -0800 (PST)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v1 3/3] Bluetooth: MGMT: Mark LL Privacy as stable
-Date: Mon, 25 Nov 2024 15:42:11 -0500
-Message-ID: <20241125204211.716883-3-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v1 1/3] main.conf: Add LE.CentralAddressResolution option
+Date: Mon, 25 Nov 2024 15:47:08 -0500
+Message-ID: <20241125204711.719853-1-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.47.0
-In-Reply-To: <20241125204211.716883-1-luiz.dentz@gmail.com>
-References: <20241125204211.716883-1-luiz.dentz@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -75,438 +70,231 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This marks LL Privacy as stable by removing its experimental UUID and
-move its functionality to Device Flag (HCI_CONN_FLAG_ADDRESS_RESOLUTION)
-which can be set by MGMT Device Set Flags so userspace retain control of
-the feature.
+This adds CentralAddressResolution option to LE group which controls the
+GATT attribute of the same name using the new MGMT Device Flag with the
+fallback to LL Privacy experimental UUID.
 
-Link: https://github.com/bluez/bluez/issues/1028
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Fixes: https://github.com/bluez/bluez/issues/1028
 ---
- include/net/bluetooth/hci.h      |   1 -
- include/net/bluetooth/hci_core.h |  11 +--
- net/bluetooth/hci_sync.c         |  52 +++++++-----
- net/bluetooth/mgmt.c             | 133 +------------------------------
- 4 files changed, 35 insertions(+), 162 deletions(-)
+ lib/mgmt.h          |  1 +
+ src/adapter.c       |  6 ++++++
+ src/btd.h           |  2 ++
+ src/device.c        | 23 ++++++++++++++++++++++-
+ src/device.h        |  2 ++
+ src/gatt-database.c | 12 +++++++++++-
+ src/main.c          | 23 +++++++++++++++++++++--
+ src/main.conf       |  6 ++++++
+ 8 files changed, 71 insertions(+), 4 deletions(-)
 
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index 6203bd8663b7..0d51970d809f 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -438,7 +438,6 @@ enum {
- 	HCI_FORCE_BREDR_SMP,
- 	HCI_FORCE_STATIC_ADDR,
- 	HCI_LL_RPA_RESOLUTION,
--	HCI_ENABLE_LL_PRIVACY,
- 	HCI_CMD_PENDING,
- 	HCI_FORCE_NO_MITM,
- 	HCI_QUALITY_REPORT,
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index ea798f07c5a2..e7d70a7d99b5 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -157,8 +157,9 @@ struct bdaddr_list_with_irk {
+diff --git a/lib/mgmt.h b/lib/mgmt.h
+index f784dcada191..6a397645bcf2 100644
+--- a/lib/mgmt.h
++++ b/lib/mgmt.h
+@@ -678,6 +678,7 @@ struct mgmt_rp_get_device_flags {
  
- /* Bitmask of connection flags */
- enum hci_conn_flags {
--	HCI_CONN_FLAG_REMOTE_WAKEUP = 1,
--	HCI_CONN_FLAG_DEVICE_PRIVACY = 2,
-+	HCI_CONN_FLAG_REMOTE_WAKEUP = BIT(0),
-+	HCI_CONN_FLAG_DEVICE_PRIVACY = BIT(1),
-+	HCI_CONN_FLAG_ADDRESS_RESOLUTION = BIT(2),
- };
- typedef u8 hci_conn_flags_t;
+ #define DEVICE_FLAG_REMOTE_WAKEUP	BIT(0)
+ #define DEVICE_FLAG_DEVICE_PRIVACY	BIT(1)
++#define DEVICE_FLAG_ADDRESS_RESOLUTION	BIT(2)
  
-@@ -1920,11 +1921,7 @@ void hci_conn_del_sysfs(struct hci_conn *conn);
+ #define MGMT_OP_SET_DEVICE_FLAGS	0x0050
+ #define MGMT_SET_DEVICE_FLAGS_SIZE	11
+diff --git a/src/adapter.c b/src/adapter.c
+index f422bbaae155..5d4117a49cfd 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -5701,6 +5701,12 @@ void adapter_set_device_flags(struct btd_adapter *adapter,
+ 	if (btd_opts.device_privacy && !(flags & DEVICE_FLAG_DEVICE_PRIVACY))
+ 		flags |= DEVICE_FLAG_DEVICE_PRIVACY & supported & ~pending;
  
- #define ll_privacy_capable(dev) ((dev)->le_features[0] & HCI_LE_LL_PRIVACY)
- 
--/* Use LL Privacy based address resolution if supported */
--#define use_ll_privacy(dev) (ll_privacy_capable(dev) && \
--			     hci_dev_test_flag(dev, HCI_ENABLE_LL_PRIVACY))
--
--#define privacy_mode_capable(dev) (use_ll_privacy(dev) && \
-+#define privacy_mode_capable(dev) (ll_privacy_capable(dev) && \
- 				   (hdev->commands[39] & 0x04))
- 
- #define read_key_size_capable(dev) \
-diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-index 7b2b04d6b856..0badec7120ab 100644
---- a/net/bluetooth/hci_sync.c
-+++ b/net/bluetooth/hci_sync.c
-@@ -1066,7 +1066,7 @@ int hci_update_random_address_sync(struct hci_dev *hdev, bool require_privacy,
- 		/* If Controller supports LL Privacy use own address type is
- 		 * 0x03
- 		 */
--		if (use_ll_privacy(hdev))
-+		if (ll_privacy_capable(hdev))
- 			*own_addr_type = ADDR_LE_DEV_RANDOM_RESOLVED;
- 		else
- 			*own_addr_type = ADDR_LE_DEV_RANDOM;
-@@ -2162,7 +2162,7 @@ static int hci_le_set_scan_enable_sync(struct hci_dev *hdev, u8 val,
- 
- static int hci_le_set_addr_resolution_enable_sync(struct hci_dev *hdev, u8 val)
- {
--	if (!use_ll_privacy(hdev))
-+	if (!ll_privacy_capable(hdev))
- 		return 0;
- 
- 	/* If controller is not/already resolving we are done. */
-@@ -2254,7 +2254,7 @@ static int hci_le_del_resolve_list_sync(struct hci_dev *hdev,
- 	struct hci_cp_le_del_from_resolv_list cp;
- 	struct bdaddr_list_with_irk *entry;
- 
--	if (!use_ll_privacy(hdev))
-+	if (!ll_privacy_capable(hdev))
- 		return 0;
- 
- 	/* Check if the IRK has been programmed */
-@@ -2319,7 +2319,7 @@ static int hci_le_add_resolve_list_sync(struct hci_dev *hdev,
- 	struct bdaddr_list_with_irk *entry;
- 	struct hci_conn_params *p;
- 
--	if (!use_ll_privacy(hdev))
-+	if (!ll_privacy_capable(hdev))
- 		return 0;
- 
- 	/* Attempt to program local identity address, type and irk if params is
-@@ -2332,7 +2332,8 @@ static int hci_le_add_resolve_list_sync(struct hci_dev *hdev,
- 		hci_copy_identity_address(hdev, &cp.bdaddr, &cp.bdaddr_type);
- 		memcpy(cp.peer_irk, hdev->irk, 16);
- 		goto done;
--	}
-+	} else if (!(params->flags & HCI_CONN_FLAG_ADDRESS_RESOLUTION))
-+		return 0;
- 
- 	irk = hci_find_irk_by_addr(hdev, &params->addr, params->addr_type);
- 	if (!irk)
-@@ -2379,6 +2380,10 @@ static int hci_le_set_privacy_mode_sync(struct hci_dev *hdev,
- 	struct hci_cp_le_set_privacy_mode cp;
- 	struct smp_irk *irk;
- 
-+	if (!ll_privacy_capable(hdev) ||
-+	    !(params->flags & HCI_CONN_FLAG_ADDRESS_RESOLUTION))
-+		return 0;
++	/* Set Address Resolution if it has not been set the flag yet. */
++	if (btd_opts.defaults.le.addr_resolution &&
++			device_address_is_private(device) &&
++			!(flags & DEVICE_FLAG_ADDRESS_RESOLUTION))
++		flags |= DEVICE_FLAG_ADDRESS_RESOLUTION & supported & ~pending;
 +
- 	/* If device privacy mode has already been set there is nothing to do */
- 	if (params->privacy_mode == HCI_DEVICE_PRIVACY)
- 		return 0;
-@@ -2428,11 +2433,6 @@ static int hci_le_add_accept_list_sync(struct hci_dev *hdev,
- 	if (*num_entries >= hdev->le_accept_list_size)
- 		return -ENOSPC;
+ 	bdaddr = device_get_address(device);
+ 	bdaddr_type = btd_device_get_bdaddr_type(device);
  
--	/* Accept list can not be used with RPAs */
--	if (!use_ll_privacy(hdev) &&
--	    hci_find_irk_by_addr(hdev, &params->addr, params->addr_type))
--		return -EINVAL;
--
- 	/* Attempt to program the device in the resolving list first to avoid
- 	 * having to rollback in case it fails since the resolving list is
- 	 * dynamic it can probably be smaller than the accept list.
-@@ -2567,7 +2567,7 @@ static int hci_pause_addr_resolution(struct hci_dev *hdev)
- {
- 	int err;
- 
--	if (!use_ll_privacy(hdev))
-+	if (!ll_privacy_capable(hdev))
- 		return 0;
- 
- 	if (!hci_dev_test_flag(hdev, HCI_LL_RPA_RESOLUTION))
-@@ -2671,12 +2671,12 @@ static int hci_le_clear_accept_list_sync(struct hci_dev *hdev)
-  *
-  * Update is done using the following sequence:
-  *
-- * use_ll_privacy((Disable Advertising) -> Disable Resolving List) ->
-+ * ll_privacy_capable((Disable Advertising) -> Disable Resolving List) ->
-  * Remove Devices From Accept List ->
-- * (has IRK && use_ll_privacy(Remove Devices From Resolving List))->
-+ * (has IRK && ll_privacy_capable(Remove Devices From Resolving List))->
-  * Add Devices to Accept List ->
-- * (has IRK && use_ll_privacy(Remove Devices From Resolving List)) ->
-- * use_ll_privacy(Enable Resolving List -> (Enable Advertising)) ->
-+ * (has IRK && ll_privacy_capable(Remove Devices From Resolving List)) ->
-+ * ll_privacy_capable(Enable Resolving List -> (Enable Advertising)) ->
-  * Enable Scanning
-  *
-  * In case of failure advertising shall be restored to its original state and
-@@ -2697,7 +2697,7 @@ static u8 hci_update_accept_list_sync(struct hci_dev *hdev)
- 	/* Pause advertising if resolving list can be used as controllers
- 	 * cannot accept resolving list modifications while advertising.
- 	 */
--	if (use_ll_privacy(hdev)) {
-+	if (ll_privacy_capable(hdev)) {
- 		err = hci_pause_advertising_sync(hdev);
- 		if (err) {
- 			bt_dev_err(hdev, "pause advertising failed: %d", err);
-@@ -2842,7 +2842,7 @@ static u8 hci_update_accept_list_sync(struct hci_dev *hdev)
- 		bt_dev_err(hdev, "Unable to enable LL privacy: %d", err);
- 
- 	/* Resume advertising if it was paused */
--	if (use_ll_privacy(hdev))
-+	if (ll_privacy_capable(hdev))
- 		hci_resume_advertising_sync(hdev);
- 
- 	/* Select filter policy to use accept list */
-@@ -3100,7 +3100,7 @@ static int hci_passive_scan_sync(struct hci_dev *hdev)
-  * If there are devices to scan:
-  *
-  * Disable Scanning -> Update Accept List ->
-- * use_ll_privacy((Disable Advertising) -> Disable Resolving List ->
-+ * ll_privacy_capable((Disable Advertising) -> Disable Resolving List ->
-  * Update Resolving List -> Enable Resolving List -> (Enable Advertising)) ->
-  * Enable Scanning
-  *
-@@ -3454,7 +3454,7 @@ int hci_update_name_sync(struct hci_dev *hdev)
-  *
-  * HCI_SSP_ENABLED(Enable SSP)
-  * HCI_LE_ENABLED(Enable LE)
-- * HCI_LE_ENABLED(use_ll_privacy(Add local IRK to Resolving List) ->
-+ * HCI_LE_ENABLED(ll_privacy_capable(Add local IRK to Resolving List) ->
-  * Update adv data)
-  * Enable Authentication
-  * lmp_bredr_capable(Set Fast Connectable -> Set Scan Type -> Set Class ->
-@@ -4229,6 +4229,14 @@ static int hci_le_set_event_mask_sync(struct hci_dev *hdev)
- 	if (use_enhanced_conn_complete(hdev))
- 		events[1] |= 0x02;	/* LE Enhanced Connection Complete */
- 
-+	/* Mark Device Privacy if Privacy Mode is supported */
-+	if (privacy_mode_capable(hdev))
-+		hdev->conn_flags |= HCI_CONN_FLAG_DEVICE_PRIVACY;
-+
-+	/* Mark Address Resolution if LL Privacy is supported */
-+	if (ll_privacy_capable(hdev))
-+		hdev->conn_flags |= HCI_CONN_FLAG_ADDRESS_RESOLUTION;
-+
- 	/* If the controller supports Extended Scanner Filter
- 	 * Policies, enable the corresponding event.
- 	 */
-@@ -5385,7 +5393,7 @@ int hci_stop_discovery_sync(struct hci_dev *hdev)
- 	}
- 
- 	/* Resume advertising if it was paused */
--	if (use_ll_privacy(hdev))
-+	if (ll_privacy_capable(hdev))
- 		hci_resume_advertising_sync(hdev);
- 
- 	/* No further actions needed for LE-only discovery */
-@@ -5897,7 +5905,7 @@ static int hci_active_scan_sync(struct hci_dev *hdev, uint16_t interval)
- 
- failed:
- 	/* Resume advertising if it was paused */
--	if (use_ll_privacy(hdev))
-+	if (ll_privacy_capable(hdev))
- 		hci_resume_advertising_sync(hdev);
- 
- 	/* Resume passive scanning */
-@@ -6673,7 +6681,7 @@ int hci_get_random_address(struct hci_dev *hdev, bool require_privacy,
- 		/* If Controller supports LL Privacy use own address type is
- 		 * 0x03
- 		 */
--		if (use_ll_privacy(hdev))
-+		if (ll_privacy_capable(hdev))
- 			*own_addr_type = ADDR_LE_DEV_RANDOM_RESOLVED;
- 		else
- 			*own_addr_type = ADDR_LE_DEV_RANDOM;
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index de47ad999d7b..5e46f3764440 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -4417,12 +4417,6 @@ static const u8 le_simultaneous_roles_uuid[16] = {
- 	0x96, 0x46, 0xc0, 0x42, 0xb5, 0x10, 0x1b, 0x67,
+diff --git a/src/btd.h b/src/btd.h
+index 07205aa69486..6af44e3e4857 100644
+--- a/src/btd.h
++++ b/src/btd.h
+@@ -59,6 +59,8 @@ struct btd_br_defaults {
  };
  
--/* 15c0a148-c273-11ea-b3de-0242ac130004 */
--static const u8 rpa_resolution_uuid[16] = {
--	0x04, 0x00, 0x13, 0xac, 0x42, 0x02, 0xde, 0xb3,
--	0xea, 0x11, 0x73, 0xc2, 0x48, 0xa1, 0xc0, 0x15,
--};
--
- /* 6fbaf188-05e0-496a-9885-d6ddfdb4e03e */
- static const u8 iso_socket_uuid[16] = {
- 	0x3e, 0xe0, 0xb4, 0xfd, 0xdd, 0xd6, 0x85, 0x98,
-@@ -4473,17 +4467,6 @@ static int read_exp_features_info(struct sock *sk, struct hci_dev *hdev,
- 		idx++;
- 	}
- 
--	if (hdev && ll_privacy_capable(hdev)) {
--		if (hci_dev_test_flag(hdev, HCI_ENABLE_LL_PRIVACY))
--			flags = BIT(0) | BIT(1);
--		else
--			flags = BIT(1);
--
--		memcpy(rp->features[idx].uuid, rpa_resolution_uuid, 16);
--		rp->features[idx].flags = cpu_to_le32(flags);
--		idx++;
--	}
--
- 	if (hdev && (aosp_has_quality_report(hdev) ||
- 		     hdev->set_quality_report)) {
- 		if (hci_dev_test_flag(hdev, HCI_QUALITY_REPORT))
-@@ -4540,27 +4523,6 @@ static int read_exp_features_info(struct sock *sk, struct hci_dev *hdev,
- 	return status;
+ struct btd_le_defaults {
++	uint8_t		addr_resolution;
++
+ 	uint16_t	min_adv_interval;
+ 	uint16_t	max_adv_interval;
+ 	uint16_t	adv_rotation_interval;
+diff --git a/src/device.c b/src/device.c
+index 2b3d19f552fa..2d3ac71f6878 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -548,7 +548,7 @@ static gboolean store_device_info_cb(gpointer user_data)
+ 	return FALSE;
  }
  
--static int exp_ll_privacy_feature_changed(bool enabled, struct hci_dev *hdev,
--					  struct sock *skip)
--{
--	struct mgmt_ev_exp_feature_changed ev;
--
--	memset(&ev, 0, sizeof(ev));
--	memcpy(ev.uuid, rpa_resolution_uuid, 16);
--	ev.flags = cpu_to_le32((enabled ? BIT(0) : 0) | BIT(1));
--
--	// Do we need to be atomic with the conn_flags?
--	if (enabled && privacy_mode_capable(hdev))
--		hdev->conn_flags |= HCI_CONN_FLAG_DEVICE_PRIVACY;
--	else
--		hdev->conn_flags &= ~HCI_CONN_FLAG_DEVICE_PRIVACY;
--
--	return mgmt_limited_event(MGMT_EV_EXP_FEATURE_CHANGED, hdev,
--				  &ev, sizeof(ev),
--				  HCI_MGMT_EXP_FEATURE_EVENTS, skip);
--
--}
--
- static int exp_feature_changed(struct hci_dev *hdev, const u8 *uuid,
- 			       bool enabled, struct sock *skip)
+-static bool device_address_is_private(struct btd_device *dev)
++bool device_address_is_private(struct btd_device *dev)
  {
-@@ -4601,16 +4563,6 @@ static int set_zero_key_func(struct sock *sk, struct hci_dev *hdev,
- 	}
- #endif
- 
--	if (hdev && use_ll_privacy(hdev) && !hdev_is_powered(hdev)) {
--		bool changed;
--
--		changed = hci_dev_test_and_clear_flag(hdev,
--						      HCI_ENABLE_LL_PRIVACY);
--		if (changed)
--			exp_feature_changed(hdev, rpa_resolution_uuid, false,
--					    sk);
--	}
--
- 	hci_sock_set_flag(sk, HCI_MGMT_EXP_FEATURE_EVENTS);
- 
- 	return mgmt_cmd_complete(sk, hdev ? hdev->id : MGMT_INDEX_NONE,
-@@ -4716,71 +4668,6 @@ static int set_mgmt_mesh_func(struct sock *sk, struct hci_dev *hdev,
- 	return err;
+ 	if (dev->bdaddr_type != BDADDR_LE_RANDOM)
+ 		return false;
+@@ -7338,6 +7338,27 @@ void btd_device_set_pnpid(struct btd_device *device, uint16_t source,
+ 	store_device_info(device);
  }
  
--static int set_rpa_resolution_func(struct sock *sk, struct hci_dev *hdev,
--				   struct mgmt_cp_set_exp_feature *cp,
--				   u16 data_len)
--{
--	struct mgmt_rp_set_exp_feature rp;
--	bool val, changed;
--	int err;
--	u32 flags;
--
--	/* Command requires to use the controller index */
--	if (!hdev)
--		return mgmt_cmd_status(sk, MGMT_INDEX_NONE,
--				       MGMT_OP_SET_EXP_FEATURE,
--				       MGMT_STATUS_INVALID_INDEX);
--
--	/* Changes can only be made when controller is powered down */
--	if (hdev_is_powered(hdev))
--		return mgmt_cmd_status(sk, hdev->id,
--				       MGMT_OP_SET_EXP_FEATURE,
--				       MGMT_STATUS_REJECTED);
--
--	/* Parameters are limited to a single octet */
--	if (data_len != MGMT_SET_EXP_FEATURE_SIZE + 1)
--		return mgmt_cmd_status(sk, hdev->id,
--				       MGMT_OP_SET_EXP_FEATURE,
--				       MGMT_STATUS_INVALID_PARAMS);
--
--	/* Only boolean on/off is supported */
--	if (cp->param[0] != 0x00 && cp->param[0] != 0x01)
--		return mgmt_cmd_status(sk, hdev->id,
--				       MGMT_OP_SET_EXP_FEATURE,
--				       MGMT_STATUS_INVALID_PARAMS);
--
--	val = !!cp->param[0];
--
--	if (val) {
--		changed = !hci_dev_test_and_set_flag(hdev,
--						     HCI_ENABLE_LL_PRIVACY);
--		hci_dev_clear_flag(hdev, HCI_ADVERTISING);
--
--		/* Enable LL privacy + supported settings changed */
--		flags = BIT(0) | BIT(1);
--	} else {
--		changed = hci_dev_test_and_clear_flag(hdev,
--						      HCI_ENABLE_LL_PRIVACY);
--
--		/* Disable LL privacy + supported settings changed */
--		flags = BIT(1);
--	}
--
--	memcpy(rp.uuid, rpa_resolution_uuid, 16);
--	rp.flags = cpu_to_le32(flags);
--
--	hci_sock_set_flag(sk, HCI_MGMT_EXP_FEATURE_EVENTS);
--
--	err = mgmt_cmd_complete(sk, hdev->id,
--				MGMT_OP_SET_EXP_FEATURE, 0,
--				&rp, sizeof(rp));
--
--	if (changed)
--		exp_ll_privacy_feature_changed(val, hdev, sk);
--
--	return err;
--}
--
- static int set_quality_report_func(struct sock *sk, struct hci_dev *hdev,
- 				   struct mgmt_cp_set_exp_feature *cp,
- 				   u16 data_len)
-@@ -5032,7 +4919,6 @@ static const struct mgmt_exp_feature {
- 	EXP_FEAT(debug_uuid, set_debug_func),
- #endif
- 	EXP_FEAT(mgmt_mesh_uuid, set_mgmt_mesh_func),
--	EXP_FEAT(rpa_resolution_uuid, set_rpa_resolution_func),
- 	EXP_FEAT(quality_report_uuid, set_quality_report_func),
- 	EXP_FEAT(offload_codecs_uuid, set_offload_codec_func),
- 	EXP_FEAT(le_simultaneous_roles_uuid, set_le_simultaneous_roles_func),
-@@ -5062,22 +4948,6 @@ static int set_exp_feature(struct sock *sk, struct hci_dev *hdev,
- 			       MGMT_STATUS_NOT_SUPPORTED);
- }
- 
--static u32 get_params_flags(struct hci_dev *hdev,
--			    struct hci_conn_params *params)
--{
--	u32 flags = hdev->conn_flags;
--
--	/* Devices using RPAs can only be programmed in the acceptlist if
--	 * LL Privacy has been enable otherwise they cannot mark
--	 * HCI_CONN_FLAG_REMOTE_WAKEUP.
--	 */
--	if ((flags & HCI_CONN_FLAG_REMOTE_WAKEUP) && !use_ll_privacy(hdev) &&
--	    hci_find_irk_by_addr(hdev, &params->addr, params->addr_type))
--		flags &= ~HCI_CONN_FLAG_REMOTE_WAKEUP;
--
--	return flags;
--}
--
- static int get_device_flags(struct sock *sk, struct hci_dev *hdev, void *data,
- 			    u16 data_len)
++bool btd_device_flags_enabled(struct btd_device *dev, uint32_t flags)
++{
++	const char *ll_privacy = "15c0a148-c273-11ea-b3de-0242ac130004";
++
++	if (!dev)
++		return false;
++
++	if (dev->current_flags & flags)
++		return true;
++
++	/* For backward compatibility check for LL Privacy experimental UUID
++	 * since that shall be equivalent to DEVICE_FLAG_ADDRESS_RESOLUTION on
++	 * older kernels.
++	 */
++	if ((flags & DEVICE_FLAG_ADDRESS_RESOLUTION) &&
++			btd_kernel_experimental_enabled(ll_privacy))
++		return true;
++
++	return false;
++}
++
+ uint32_t btd_device_get_current_flags(struct btd_device *dev)
  {
-@@ -5112,7 +4982,6 @@ static int get_device_flags(struct sock *sk, struct hci_dev *hdev, void *data,
- 		if (!params)
- 			goto done;
+ 	return dev->current_flags;
+diff --git a/src/device.h b/src/device.h
+index 97536774ed5f..2e4a9771d585 100644
+--- a/src/device.h
++++ b/src/device.h
+@@ -28,6 +28,7 @@ bool device_name_known(struct btd_device *device);
+ bool device_is_name_resolve_allowed(struct btd_device *device);
+ void device_name_resolve_fail(struct btd_device *device);
+ void device_set_class(struct btd_device *device, uint32_t class);
++bool device_address_is_private(struct btd_device *dev);
+ void device_set_rpa(struct btd_device *device, bool value);
+ void device_update_addr(struct btd_device *device, const bdaddr_t *bdaddr,
+ 							uint8_t bdaddr_type);
+@@ -189,6 +190,7 @@ struct btd_service *btd_device_get_service(struct btd_device *dev,
+ int device_discover_services(struct btd_device *device);
+ int btd_device_connect_services(struct btd_device *dev, GSList *services);
  
--		supported_flags = get_params_flags(hdev, params);
- 		current_flags = params->flags;
- 	}
++bool btd_device_flags_enabled(struct btd_device *dev, uint32_t flags);
+ uint32_t btd_device_get_current_flags(struct btd_device *dev);
+ uint32_t btd_device_get_supported_flags(struct btd_device *dev);
+ uint32_t btd_device_get_pending_flags(struct btd_device *dev);
+diff --git a/src/gatt-database.c b/src/gatt-database.c
+index a86e528fd0e2..a5a01add40f7 100644
+--- a/src/gatt-database.c
++++ b/src/gatt-database.c
+@@ -22,6 +22,7 @@
+ #include "lib/sdp.h"
+ #include "lib/sdp_lib.h"
+ #include "lib/uuid.h"
++#include "lib/mgmt.h"
+ #include "btio/btio.h"
+ #include "gdbus/gdbus.h"
+ #include "src/shared/util.h"
+@@ -738,10 +739,19 @@ static void gap_car_read_cb(struct gatt_db_attribute *attrib,
+ 					uint8_t opcode, struct bt_att *att,
+ 					void *user_data)
+ {
+-	uint8_t value = 0x01;
++	uint8_t value = 0x00;
  
-@@ -5192,7 +5061,7 @@ static int set_device_flags(struct sock *sk, struct hci_dev *hdev, void *data,
- 		goto unlock;
- 	}
+ 	DBG("GAP Central Address Resolution read request\n");
  
--	supported_flags = get_params_flags(hdev, params);
-+	supported_flags = hdev->conn_flags;
++	if (btd_opts.defaults.le.addr_resolution) {
++		struct btd_device *device;
++
++		device = btd_adapter_find_device_by_fd(bt_att_get_fd(att));
++		if (device)
++			value = btd_device_flags_enabled(device,
++					DEVICE_FLAG_ADDRESS_RESOLUTION);
++	}
++
+ 	gatt_db_attribute_read_result(attrib, id, 0, &value, sizeof(value));
+ }
  
- 	if ((supported_flags | current_flags) != supported_flags) {
- 		bt_dev_warn(hdev, "Bad flag given (0x%x) vs supported (0x%0x)",
+diff --git a/src/main.c b/src/main.c
+index 41c3271a7457..794a51dbf586 100644
+--- a/src/main.c
++++ b/src/main.c
+@@ -109,6 +109,7 @@ static const char *br_options[] = {
+ };
+ 
+ static const char *le_options[] = {
++	"CentralAddressResolution",
+ 	"MinAdvertisementInterval",
+ 	"MaxAdvertisementInterval",
+ 	"MultiAdvertisementRotationInterval",
+@@ -581,6 +582,11 @@ static void parse_br_config(GKeyFile *config)
+ static void parse_le_config(GKeyFile *config)
+ {
+ 	static const struct config_param params[] = {
++		{ "CentralAddressResolution",
++		  &btd_opts.defaults.le.addr_resolution,
++		  sizeof(btd_opts.defaults.le.addr_resolution),
++		  0,
++		  1},
+ 		{ "MinAdvertisementInterval",
+ 		  &btd_opts.defaults.le.min_adv_interval,
+ 		  sizeof(btd_opts.defaults.le.min_adv_interval),
+@@ -708,9 +714,21 @@ static bool match_experimental(const void *data, const void *match_data)
+ bool btd_kernel_experimental_enabled(const char *uuid)
+ {
+ 	if (!btd_opts.kernel)
+-		false;
++		goto done;
+ 
+-	return queue_find(btd_opts.kernel, match_experimental, uuid);
++	if (queue_find(btd_opts.kernel, match_experimental, uuid))
++		return true;
++
++done:
++	/* For backward compatibility set LL Privacy as enabled if
++	 * CentralAddressResolution has been set so old kernel LL Privacy is
++	 * enabled.
++	 */
++	if (!strcmp(uuid, "15c0a148-c273-11ea-b3de-0242ac130004") &&
++			btd_opts.defaults.le.addr_resolution)
++		return true;
++
++	return false;
+ }
+ 
+ static const char *valid_uuids[] = {
+@@ -1205,6 +1223,7 @@ static void init_defaults(void)
+ 	btd_opts.defaults.num_entries = 0;
+ 	btd_opts.defaults.br.page_scan_type = 0xFFFF;
+ 	btd_opts.defaults.br.scan_type = 0xFFFF;
++	btd_opts.defaults.le.addr_resolution = 0x01;
+ 	btd_opts.defaults.le.enable_advmon_interleave_scan = 0xFF;
+ 
+ 	if (sscanf(VERSION, "%hhu.%hhu", &major, &minor) != 2)
+diff --git a/src/main.conf b/src/main.conf
+index fff13ed2ff31..ca45c6ed0e25 100644
+--- a/src/main.conf
++++ b/src/main.conf
+@@ -178,6 +178,12 @@
+ #MaxSniffInterval=
+ 
+ [LE]
++# Enable/Disable Central Address Resolution.
++# 0: disable
++# 1: enable
++# Defaults to 1
++#CentralAddressResolution = 1
++
+ # The following values are used to load default adapter parameters for LE.
+ # BlueZ loads the values into the kernel before the adapter is powered if the
+ # kernel supports the MGMT_LOAD_DEFAULT_PARAMETERS command. If a value isn't
 -- 
 2.47.0
 
