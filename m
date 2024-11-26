@@ -1,132 +1,132 @@
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66AD215E5A6
-	for <linux-bluetooth@vger.kernel.org>; Tue, 26 Nov 2024 08:20:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0516117BB6
+	for <linux-bluetooth@vger.kernel.org>; Tue, 26 Nov 2024 09:00:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732609223; cv=none; b=D1z/swzYs9kosNHW/smGUWwge2ReDECCUnDMNn5WCY2qdktZxjwdKM0m6FFSYAK5QCXbYF48qZ/Dv41c+SEk+n3lAXr1FMz5ABBnyHEegLMizIsXEUudKp+HiQR044RkA8ppKCFDho/A50gqGy7onXeVFaVL0c8RlV8zxzIvt4c=
+	t=1732611629; cv=none; b=NOEj+FqQF8N91teWAOU9K47XlOY3pfgs9pI5qYlMf8oKnlONOzvtdfmNlNuMB7eqwoLmVdsGabURCtX/rSFbeE6r5eNyfpOlTTXqz+V0Xi/iFEmVhP1tyPJstsVoI8zDQlLZbppnSzeaELjsBL0dX6PtWY7Z/AZzqtqRCijv44c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732609223; c=relaxed/simple;
-	bh=TeUQcw4LnfXlLmDOKj9SY0LaAbyyz6oV5lnEGg30/FQ=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Bb0CfMH2bP0EhYh8bboRUv8aRgpWG9rmh+vEb74zQpwyNQVDedrDq7riBNd27/G7qLryIvpqfHW4TRD+yYf5ySycro1iWuI9zwwi/SWoq9IQwY+Rle/i6bOEn9yXRaiyhj6C0ZRsr0BKaJcaK8dUx9yglpZE5Kx66mlWdRp6zfo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=qualcomm.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=JxaI8HEZ; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qualcomm.com
+	s=arc-20240116; t=1732611629; c=relaxed/simple;
+	bh=+7SpuMcrjwJ/YiLx54TrDaZKnKyyL7xaMQsuKK66MEM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=p77lVpDbaRgMhdBDHK9awh6vQNxwzGrKWtHdweRMH/eiG/Xs1NYSaJ92KyiXcifALDGH7yEZ4gydOenQxqLTQOVKdczE73bPpYhdTBAACju0UfrvJrdy0SaaotIOfKz27/GZZqb/rs2+NtFw+rZNLQ0gl+YP8jWnVMSTyIAAi3M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=J+FpmXQi; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="JxaI8HEZ"
-Received: from pps.filterd (m0279868.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4APKChLc012339
-	for <linux-bluetooth@vger.kernel.org>; Tue, 26 Nov 2024 08:20:18 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:date:from:message-id:mime-version
-	:subject:to; s=qcppdkim1; bh=WGE18qfI0E9BYjGeM0QOLCD1PqqV5HcsUiC
-	ZawEUyMY=; b=JxaI8HEZspU87aS3fE+7Zog3jAGxZVbvrdrSpgsL2nQQUAMh6vh
-	YlwxOh+d0g1OThL2/kvZRCh4X2TGFg3AAwvh55rOTajoCJNT+oVtJdv/kKhbsxfG
-	xCHpE/JWYJ9/JO+uZnVVTIr/RaeBEWNbqyTEYRamK6zq8oAH2Xyv3QEGPBKwneQa
-	jlxuy+e/eeEIDrZS4hLiwiIKa3H7QbNEa0MSP64Uf9trg9UN3L1CGAxf2B49CuxR
-	83orWfg73sFqIilw529WwuYsrGFrm4xAfLrKq/K54KhT82TFxfJokfGLULE0G+Ny
-	0S7D1Qjp4zZ3kiK/WZkDzMoDrq6i2CmV9vA==
-Received: from aptaippmta02.qualcomm.com (tpe-colo-wan-fw-bordernet.qualcomm.com [103.229.16.4])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4336cfqey2-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <linux-bluetooth@vger.kernel.org>; Tue, 26 Nov 2024 08:20:18 +0000 (GMT)
-Received: from pps.filterd (APTAIPPMTA02.qualcomm.com [127.0.0.1])
-	by APTAIPPMTA02.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTP id 4AQ8KFMb022374
-	for <linux-bluetooth@vger.kernel.org>; Tue, 26 Nov 2024 08:20:15 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-	by APTAIPPMTA02.qualcomm.com (PPS) with ESMTPS id 43384kfb02-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <linux-bluetooth@vger.kernel.org>; Tue, 26 Nov 2024 08:20:15 +0000
-Received: from APTAIPPMTA02.qualcomm.com (APTAIPPMTA02.qualcomm.com [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 4AQ8KFGZ022371
-	for <linux-bluetooth@vger.kernel.org>; Tue, 26 Nov 2024 08:20:15 GMT
-Received: from bt-iot-sh01-lnx.qualcomm.com ([10.253.136.182])
-	by APTAIPPMTA02.qualcomm.com (PPS) with ESMTPS id 4AQ8KF66022370
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 26 Nov 2024 08:20:15 +0000
-Received: by bt-iot-sh01-lnx.qualcomm.com (Postfix, from userid 4467449)
-	id 179BF255AC; Tue, 26 Nov 2024 16:20:09 +0800 (CST)
-From: Shuai Zhang <quic_shuaz@quicinc.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: quic_shuaz@quicinc.com, quic_chejiang@quicinc.com,
-        quic_jiaymao@quicinc.com, quic_zijuhu@quicinc.com,
-        quic_mohamull@quicinc.com
-Subject: [PATCH v1] BNEP: Fix the BNEP Unknown Control Message in PTS testing
-Date: Tue, 26 Nov 2024 16:20:03 +0800
-Message-Id: <20241126082003.2178783-1-quic_shuaz@quicinc.com>
-X-Mailer: git-send-email 2.25.1
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="J+FpmXQi"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1732611624;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=QAEZZmA0v1k80nlOysurYutIwKXMOWMnay0WZ+kcQrU=;
+	b=J+FpmXQiyzNo1bhtM8jS9WImPTMhjwDoIPhNmj2y2lfT8JLuEIKtQBwpBhaUOIEWXdlUf5
+	kmXopkn/kvRGqggJpX9QJ2OPhzQtbrk1Z3B2DTc5AONt5+oBqwXxwhbDfQbspqJ/7rlCWg
+	6GFY8Vx0NWVV3Cls1Co6D6jfnkV6TEI=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-554-5denDacrPVyX-cUix5BX2g-1; Tue, 26 Nov 2024 04:00:23 -0500
+X-MC-Unique: 5denDacrPVyX-cUix5BX2g-1
+X-Mimecast-MFC-AGG-ID: 5denDacrPVyX-cUix5BX2g
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-385b87aee0aso1426738f8f.3
+        for <linux-bluetooth@vger.kernel.org>; Tue, 26 Nov 2024 01:00:22 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1732611622; x=1733216422;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=QAEZZmA0v1k80nlOysurYutIwKXMOWMnay0WZ+kcQrU=;
+        b=CA+9J0wZWNkor7Ein38Qtb91qiHEO6UMc+LTPVrB0R1nmmxwkPavCGOylDr6wJ2trG
+         RV8kGlcLo1fp9fFwAXTfJ0+4i6sJdPWXKjo1gowqsE9IcVBM2wepreX8pm85eCyOXy7Z
+         EUvJkc9PGcOZ0slvpyoWTfUG8GYdoS+n41zPtoaw37ndTNgjcemzMbeXLAxr8mzF6ERt
+         vQZFl3/3O+abXUUGkrCxi/CG5BeFjmkjt6CeJQhZlGilueYPjvZinEV3DJI/v0dREOja
+         9N4zWTlb3kkiD6k0IW5Uf4NnUmfPBVGiTj/lI8SCTarqyw+t54Ed+tJhyDpyE6ilAveM
+         u6gA==
+X-Forwarded-Encrypted: i=1; AJvYcCVxf5iGqNsLYPsLqNJtoVZhQuGQ9jI0h6GSXtLXvjis/RRDy8gB8Rng7Du3SDo6eGtoxYiqap76QHorK0wBHmA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyVJ9FWgHfG3ybfJOYecuohHY4CFFENBWt8VgvhUD6JmEpHk8Zj
+	ePeYyTNU4mqSHEeuN6Mqmjjt470UTzL5tvfs6U7B624KOcAOcDHEcE/dRUKDMMkoyEsBN0x3zYp
+	k3qB7Vc9hygPn5EpzsxVIAxbA+pOXRWCFLVdMNtXr8mcE39Q+WsSMicJEUXJBmCQYJQ==
+X-Gm-Gg: ASbGnctkg0KIujKni58y1UPheBPh4GHYDdcpmmSREv/wXPWqibj9FfJyJ0ecAVzHpU1
+	aLLciaFTej/UHCTOAelDrNP8/b49sQkCcEfqmy6OwYja4FCq+nGlF92i/B/G3ELJaoPyruxldBa
+	jkrPKukjecUrrwvXVOZ7N4Lkbo2i96kUDfAlLRkauGbqLqlHNgAuhF0QtbWbOjW/0+f62Kb9HrK
+	XAG66TRo9lpg8g1ftEdapB+RaE2rWPZ/8sRv0SXeFSbzxClw/mMYHUxYq3qhxmELxayeodiN8KK
+X-Received: by 2002:a05:6000:4802:b0:37d:4fab:c198 with SMTP id ffacd0b85a97d-38260b69dffmr14125803f8f.26.1732611621650;
+        Tue, 26 Nov 2024 01:00:21 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IH8jYA0GTdG9hgUI38n8Ov8NGoouv5zqqCEPjjl2QpgvmIaQFxgpgIbKOkHE4UlowpkKNfIEg==
+X-Received: by 2002:a05:6000:4802:b0:37d:4fab:c198 with SMTP id ffacd0b85a97d-38260b69dffmr14125762f8f.26.1732611621303;
+        Tue, 26 Nov 2024 01:00:21 -0800 (PST)
+Received: from [192.168.88.24] (146-241-94-87.dyn.eolo.it. [146.241.94.87])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3825fb36612sm12643663f8f.59.2024.11.26.01.00.20
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 26 Nov 2024 01:00:20 -0800 (PST)
+Message-ID: <7f968fde-8a41-4152-8b39-72d5b21a19a2@redhat.com>
+Date: Tue, 26 Nov 2024 10:00:19 +0100
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-QCInternal: smtphost
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: _qCROQt8ju3LACkndTvRqZ1AhKE7Gi6e
-X-Proofpoint-ORIG-GUID: _qCROQt8ju3LACkndTvRqZ1AhKE7Gi6e
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
- definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 impostorscore=0
- spamscore=0 lowpriorityscore=0 phishscore=0 adultscore=0 malwarescore=0
- mlxscore=0 suspectscore=0 mlxlogscore=593 clxscore=1011 priorityscore=1501
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2409260000
- definitions=main-2411260065
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v3 0/4] net: Fix some callers of copy_from_sockptr()
+To: Michal Luczaj <mhal@rbox.co>,
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+ David Howells <dhowells@redhat.com>
+Cc: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
+ linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+ linux-afs@lists.infradead.org, Jakub Kicinski <kuba@kernel.org>,
+ David Wei <dw@davidwei.uk>, Marcel Holtmann <marcel@holtmann.org>,
+ Johan Hedberg <johan.hedberg@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Simon Horman <horms@kernel.org>, Marc Dionne <marc.dionne@auristor.com>
+References: <20241119-sockptr-copy-fixes-v3-0-d752cac4be8e@rbox.co>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20241119-sockptr-copy-fixes-v3-0-d752cac4be8e@rbox.co>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-This change is required for passing below PTS testcase:
-1. BNEP/CTRL/BV-01-C
+On 11/19/24 14:31, Michal Luczaj wrote:
+> Some callers misinterpret copy_from_sockptr()'s return value. The function
+> follows copy_from_user(), i.e. returns 0 for success, or the number of
+> bytes not copied on error. Simply returning the result in a non-zero case
+> isn't usually what was intended.
+> 
+> Compile tested with CONFIG_LLC, CONFIG_AF_RXRPC, CONFIG_BT enabled.
+> 
+> Last patch probably belongs more to net-next, if any. Here as an RFC.
+> 
+> Suggested-by: Jakub Kicinski <kuba@kernel.org>
+> Signed-off-by: Michal Luczaj <mhal@rbox.co>
+> ---
+> Changes in v3:
+> - rxrpc/llc: Drop the non-essential changes
+> - rxrpc/llc: Replace the deprecated copy_from_sockptr() with
+>   copy_safe_from_sockptr() [David Wei]
+> - Collect Reviewed-by [David Wei]
+> - Link to v2: https://lore.kernel.org/r/20241115-sockptr-copy-fixes-v2-0-9b1254c18b7a@rbox.co
+> 
+> Changes in v2:
+> - Fix the fix of llc_ui_setsockopt()
+> - Switch "bluetooth:" to "Bluetooth:" [bluez.test.bot]
+> - Collect Reviewed-by [Luiz Augusto von Dentz]
+> - Link to v1: https://lore.kernel.org/r/20241115-sockptr-copy-fixes-v1-0-d183c87fcbd5@rbox.co
+> 
+> ---
+> Michal Luczaj (4):
+>       Bluetooth: Improve setsockopt() handling of malformed user input
+>       llc: Improve setsockopt() handling of malformed user input
+>       rxrpc: Improve setsockopt() handling of malformed user input
+>       net: Comment copy_from_sockptr() explaining its behaviour
 
-PTS sends an Unknown Control Message with only two bytes,
-which is considered incorrect data. Therefore, the handling of
-the Unknown Control Message is added before validating the data.
+I guess we can apply directly patch 2-4, but patch 1 should go via the
+BT tree. @Luiz, @David, are you ok with that?
 
-Signed-off-by: Shuai Zhang <quic_shuaz@quicinc.com>
----
- profiles/network/server.c | 26 ++++++++++++++++++++++++++
- 1 file changed, 26 insertions(+)
+Thanks,
 
-diff --git a/profiles/network/server.c b/profiles/network/server.c
-index 96738f26c..c1d96cd1c 100644
---- a/profiles/network/server.c
-+++ b/profiles/network/server.c
-@@ -325,6 +325,32 @@ static gboolean bnep_setup(GIOChannel *chan,
- 		return FALSE;
- 	}
- 
-+	/*
-+	 * When benp_control_type is between 0x07 and 0xFF,
-+	 * a reply is also required.
-+	 * However, since the command size is only 2 bytes,
-+	 * it needs to be processed before determining
-+	 * if it is a valid command.
-+	 */
-+	if (req->type == BNEP_CONTROL &&
-+		req->ctrl > BNEP_FILTER_MULT_ADDR_RSP) {
-+		error("bnep: cmd not understood");
-+		int err;
-+		struct bnep_ctrl_cmd_not_understood_cmd rsp;
-+
-+		rsp.type = BNEP_CONTROL;
-+		rsp.ctrl = BNEP_CMD_NOT_UNDERSTOOD;
-+		rsp.unkn_ctrl = (uint8_t) req->ctrl;
-+
-+		err = send(sk, &rsp, sizeof(rsp), 0);
-+
-+		if (err < 0)
-+			error("send not understood ctrl rsp error: %s (%d)",
-+				  strerror(errno), errno);
-+
-+		return FALSE;
-+	}
-+
- 	/*
- 	 * Initial received data packet is BNEP_SETUP_CONNECTION_REQUEST_MSG
- 	 * minimal size of this frame is 3 octets: 1 byte of BNEP Type +
--- 
-2.25.1
+Paolo
 
