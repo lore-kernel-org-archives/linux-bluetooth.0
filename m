@@ -1,130 +1,139 @@
-Received: from mail-lj1-f176.google.com (mail-lj1-f176.google.com [209.85.208.176])
+Received: from mail-lf1-f50.google.com (mail-lf1-f50.google.com [209.85.167.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4991C22334;
-	Tue, 26 Nov 2024 14:57:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD85F78C6D
+	for <linux-bluetooth@vger.kernel.org>; Tue, 26 Nov 2024 15:01:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732633077; cv=none; b=E9417yqWcLQj98KEuo1KEAz140z2hc0DK9fbNW3yO5ftXLXzKVKqqCLEqR4HgiQ3cQWIVZTqU20Y8vcUTXx2+YcJMzZKbgrVUp3cU5FVc1ad6Ysw9exryfn7wMuLosdLzOh5OQNRuSvK4KXTWIs2YO6e+yYCEe1HirsYXLyJaHQ=
+	t=1732633272; cv=none; b=TrxfskpnyhoUQ1LJTepSdSpLXF7tXz93w8ErA/Rmkq08Ic6VR4V9CXdEYs7SpwICUapqkhOZWAYr0jg+eAu/vwuNLoyfA4rEGDNsE/cN1tXmTHMXn2qzc7s8FqoBwifpM2/wkoY/RNIU0PquQ1bgPKwsJCfVQqONFcGInUeY0/w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732633077; c=relaxed/simple;
-	bh=zUBGXZjHem0gkf6lSs5y6g3Uszs4mufd4BEtZVD8khg=;
+	s=arc-20240116; t=1732633272; c=relaxed/simple;
+	bh=1hGQDYtpzb2pItcH8g2Fv2u5rxGjQaN18Z/22Ib+FzA=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=V1Wyxqip3M1o+JrHMxH3cYrLQz9fPJn8yDh1iZ1EpNbznjLryb4fhVCbXyJeFuN0bexxU0bPO6RlzJ1hswGfzdQp2+W5athBH+4XjSJuXgm8i8Vtr2IwdTdHV7W4IPPKzpuucj02CD4yarWMUnS0T1CahPPuY8+nNrPqj/hk3Pw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FE6ybjcb; arc=none smtp.client-ip=209.85.208.176
+	 To:Cc:Content-Type; b=NkIMJEp++02UJH1t+A7oT+1CTeDNfdjwb7Hp5DCSCkx6u2u9oy6R1lsHsw/Z2yIa9gHPA02AkZvaJ+sBTaRmTnp2ETi6m8Kb612u0goOtEN/BsJHH2AZX64KA5AYEvKea0VJv7h2L3TmS/kfAJ3KWNJphiFun0ubhYQlpU2WEPI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ByrZ/5dp; arc=none smtp.client-ip=209.85.167.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FE6ybjcb"
-Received: by mail-lj1-f176.google.com with SMTP id 38308e7fff4ca-2ff99b5ede4so56736991fa.1;
-        Tue, 26 Nov 2024 06:57:54 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ByrZ/5dp"
+Received: by mail-lf1-f50.google.com with SMTP id 2adb3069b0e04-53de84e4005so1540490e87.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 26 Nov 2024 07:01:10 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1732633073; x=1733237873; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1732633269; x=1733238069; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=ckvJIjZdkpd2N85ffKYpm4KEmJwjPaIR1j8uP61d0Ho=;
-        b=FE6ybjcb7TJBjGapAvZtCQswC+RnaSvp4uohOQ1PbcJpHDUUY+DsPGhKAgVP7zZ495
-         cXBxj+2Zo5P83leaffeEOb2iVvqRnBkb3jXToNXimvzurAhb9+ZkasQ4wO1TYkHzqat9
-         wCdfUsYBzzWADCxIDyoit2h9zYSMPfUH+NTGKMiLwZQgpNNffTzUR67a5E5K8cOiF1y4
-         HwcHFxa5UL5u8QcX7Ma9RExw1wKMnJL1FRWkkM2WkgwEK4/ryyejHorQcuc6k6PlX2qE
-         rTZZynGJHLdRH8WwVOhMukNysXjmvIiaO8Q5coKTBrEa3Rg1WECQ4/EC5jhvaU5Erz2r
-         BP9A==
+        bh=AGqO00ImZwvdwrcUB5czYtdu9jeqaTyqapY9WmuoxP0=;
+        b=ByrZ/5dpdmJsT1zN2cWLZkg74DmP3pYmJWtOQpIBguswnWxYUX/clZiAZSvZVCZ6Qv
+         ezf/DbHR2jAhUS0ud0NBKRS9TkccG3CKz/413OSOp2jNEpgyWV3m34tTmQGJo2xux/Np
+         +oqZUhIg2ZtdH42AB8QP3ScmWWtO8s0WbqwM/sn/f+z892J2MTjvlFVfbTvNhe401ESW
+         f9Ni07PtqpQggyXpKcCn3j5j8tSdW8fri+vE9nYhNYR7DHtah/Fsix91BBAp2h1wFAXY
+         mgm+dVLyFcWUzUEVxWRfIawiIeBAfQa8Wj2aBbGn1O14I1lHTb4bcOmANTid0evNT2wC
+         PD6Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732633073; x=1733237873;
+        d=1e100.net; s=20230601; t=1732633269; x=1733238069;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=ckvJIjZdkpd2N85ffKYpm4KEmJwjPaIR1j8uP61d0Ho=;
-        b=oGLX/1qxh4XZf5lD9KXj9XIUALdBSOmEPmUmFBZS8T0LSjFJT7i1SYgrX5ceAamky0
-         wGqqstfUUzOZWtHdxBrjHLsIFkhJ96rh/TthNTyB1Hj6SxsNGv00opssmYNMDK0+V3dS
-         6zYhay/wza9wU/KE2qHrkKrAbg2dYcXl1UBYO6qDDrObWGka0uKuVO+JeEvOIwgNLuuR
-         3pC/HikRke94sZVQ9w0mV5G4YAmn4r+6lxtoqyBcsBf6ZOuTZBdoS2gSO2rKEeYOC3Dv
-         U5v+aj6CM/j3EOyVzvdIKdS9P9kzKN1Zv21V5nXP2n350npRAmid/EQA5JiVLDuxHDBy
-         AK3Q==
-X-Forwarded-Encrypted: i=1; AJvYcCV18laiTR7YSXE6aJZPmmQI/MBziciggGzaCBgsjZzVzU+xfIHpSHWss7nop1GX61KT5FtI4c8VvV6Ehq92ju8=@vger.kernel.org, AJvYcCVqdYFGQk5eAfYoeiahdRp1prgEy0NgbdUUHBvJUwaDPrlLJtOsdHDxbkqSL+fi4RB8JkghrgY2@vger.kernel.org
-X-Gm-Message-State: AOJu0YzVp2WHVruIArq6qtAmpX8ntCRrnaMcfsD8iQmMSR2UkhWA0ZB3
-	3hmt9BY3UtdSSEG+QHrRs1K0nxhCYS4HTS4h1l+/5eybnwkEoy1nB7LJJ0/yH/Wqo5qo/e0WCnf
-	pNR7Byi6RDUej7lVPt/pFI07dxkg=
-X-Gm-Gg: ASbGncuKk049aLvqJSiGfMz+/70hoocTW/Kz6NUaMnW59pSAAklFBsQwvAx6uEFsyN2
-	j+9W5VsIxuidDqACzJu+ckIDEXTzokMSe
-X-Google-Smtp-Source: AGHT+IFfyN4039Knpq36PH+TpFo2xoFGOUn7tSeGfnipAHlLG9ZUzE/zrc6AsiUIeNUF8OV+ByB0gAUfzI8SoMdBfG4=
-X-Received: by 2002:a05:651c:150e:b0:2ff:8f67:bc6a with SMTP id
- 38308e7fff4ca-2ffa6d1e153mr88033001fa.0.1732633073056; Tue, 26 Nov 2024
- 06:57:53 -0800 (PST)
+        bh=AGqO00ImZwvdwrcUB5czYtdu9jeqaTyqapY9WmuoxP0=;
+        b=Wib1ghso8nfIxqdYVuqHPCojntYjhyeIah671MdpcZhnsuwJAiHE9Mq3iP/dwbaQma
+         cqV9pFNgisxUI/sJSuDwcUMbODs5ykqa6paUPL0qsmja+nrkuX8EJW+kbFF1SQ3H84dU
+         kiEUYV3gNtJzAd7JAiAAR8caYux6+i19KXuXe4ChXYYCEkAnee7rhuFxetN3mdCGea6a
+         LuhQP4NsUUsGvArqyB4iqSC7FSiKxwVKCk5gVdVzOCll5Y324wq4bjIbnZQfZTP1Z2YJ
+         fl7aZt00PaVVcGG1cRk7WAU75WUVeBZgTeXKPIfcahasjHj5fgqc7UF7LLwVwcKwswha
+         dNNA==
+X-Gm-Message-State: AOJu0YxtN9apfibS5wDZ2zaMvsc6+EadSdOUr5A0LyBkCdi6nHIVwH2v
+	fL75NvLWHGNvc3YCy71x9eP5JFumz2wdfEGeTjWFvh3RXLKA2NMIDu0gL/pkpTNf0H8iFleikLi
+	DkLz5yoeqmd2ZvhsFliHHkaMS+MQ=
+X-Gm-Gg: ASbGncvaQBpaaZfdVQVdJdfo/jWrGBUtkf1LZzRoUyHIGTME8Xwd+S6hIUL3SKnToHW
+	ie4MO1/IUoaQLY1IvOrR14tcCHN80TlMI
+X-Google-Smtp-Source: AGHT+IF8nxQV+II2j+Tfp8/Q8uLGrtKLsaYouU3XIw/fi12UJU9mRxLRhh+XRzng3enMsrbj6fpED/tNvszx5J6bE7Q=
+X-Received: by 2002:a05:6512:b11:b0:539:fb6f:cb8d with SMTP id
+ 2adb3069b0e04-53dd389cc7bmr7307115e87.27.1732633267240; Tue, 26 Nov 2024
+ 07:01:07 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241119-sockptr-copy-fixes-v3-0-d752cac4be8e@rbox.co> <7f968fde-8a41-4152-8b39-72d5b21a19a2@redhat.com>
-In-Reply-To: <7f968fde-8a41-4152-8b39-72d5b21a19a2@redhat.com>
+References: <20241126082003.2178783-1-quic_shuaz@quicinc.com>
+In-Reply-To: <20241126082003.2178783-1-quic_shuaz@quicinc.com>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Tue, 26 Nov 2024 09:57:40 -0500
-Message-ID: <CABBYNZKyfD5xNrPpfaDpGqwtOf+-ePfAa3njK1w2nrEKtpuavw@mail.gmail.com>
-Subject: Re: [PATCH net v3 0/4] net: Fix some callers of copy_from_sockptr()
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: Michal Luczaj <mhal@rbox.co>, David Howells <dhowells@redhat.com>, 
-	Luiz Augusto von Dentz <luiz.von.dentz@intel.com>, linux-bluetooth@vger.kernel.org, 
-	netdev@vger.kernel.org, linux-afs@lists.infradead.org, 
-	Jakub Kicinski <kuba@kernel.org>, David Wei <dw@davidwei.uk>, Marcel Holtmann <marcel@holtmann.org>, 
-	Johan Hedberg <johan.hedberg@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>, 
-	Marc Dionne <marc.dionne@auristor.com>
+Date: Tue, 26 Nov 2024 10:00:54 -0500
+Message-ID: <CABBYNZKHSj3kVFz3QUnuM_0nmnkohR7aRk=7yPCra1agB8T=gw@mail.gmail.com>
+Subject: Re: [PATCH v1] BNEP: Fix the BNEP Unknown Control Message in PTS testing
+To: Shuai Zhang <quic_shuaz@quicinc.com>
+Cc: linux-bluetooth@vger.kernel.org, quic_chejiang@quicinc.com, 
+	quic_jiaymao@quicinc.com, quic_zijuhu@quicinc.com, quic_mohamull@quicinc.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi Paolo,
+Hi Shuai,
 
-On Tue, Nov 26, 2024 at 4:00=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wro=
-te:
+On Tue, Nov 26, 2024 at 3:20=E2=80=AFAM Shuai Zhang <quic_shuaz@quicinc.com=
+> wrote:
 >
-> On 11/19/24 14:31, Michal Luczaj wrote:
-> > Some callers misinterpret copy_from_sockptr()'s return value. The funct=
-ion
-> > follows copy_from_user(), i.e. returns 0 for success, or the number of
-> > bytes not copied on error. Simply returning the result in a non-zero ca=
-se
-> > isn't usually what was intended.
-> >
-> > Compile tested with CONFIG_LLC, CONFIG_AF_RXRPC, CONFIG_BT enabled.
-> >
-> > Last patch probably belongs more to net-next, if any. Here as an RFC.
-> >
-> > Suggested-by: Jakub Kicinski <kuba@kernel.org>
-> > Signed-off-by: Michal Luczaj <mhal@rbox.co>
-> > ---
-> > Changes in v3:
-> > - rxrpc/llc: Drop the non-essential changes
-> > - rxrpc/llc: Replace the deprecated copy_from_sockptr() with
-> >   copy_safe_from_sockptr() [David Wei]
-> > - Collect Reviewed-by [David Wei]
-> > - Link to v2: https://lore.kernel.org/r/20241115-sockptr-copy-fixes-v2-=
-0-9b1254c18b7a@rbox.co
-> >
-> > Changes in v2:
-> > - Fix the fix of llc_ui_setsockopt()
-> > - Switch "bluetooth:" to "Bluetooth:" [bluez.test.bot]
-> > - Collect Reviewed-by [Luiz Augusto von Dentz]
-> > - Link to v1: https://lore.kernel.org/r/20241115-sockptr-copy-fixes-v1-=
-0-d183c87fcbd5@rbox.co
-> >
-> > ---
-> > Michal Luczaj (4):
-> >       Bluetooth: Improve setsockopt() handling of malformed user input
-> >       llc: Improve setsockopt() handling of malformed user input
-> >       rxrpc: Improve setsockopt() handling of malformed user input
-> >       net: Comment copy_from_sockptr() explaining its behaviour
+> This change is required for passing below PTS testcase:
+> 1. BNEP/CTRL/BV-01-C
 >
-> I guess we can apply directly patch 2-4, but patch 1 should go via the
-> BT tree. @Luiz, @David, are you ok with that?
+> PTS sends an Unknown Control Message with only two bytes,
+> which is considered incorrect data. Therefore, the handling of
+> the Unknown Control Message is added before validating the data.
+>
+> Signed-off-by: Shuai Zhang <quic_shuaz@quicinc.com>
+> ---
+>  profiles/network/server.c | 26 ++++++++++++++++++++++++++
+>  1 file changed, 26 insertions(+)
+>
+> diff --git a/profiles/network/server.c b/profiles/network/server.c
+> index 96738f26c..c1d96cd1c 100644
+> --- a/profiles/network/server.c
+> +++ b/profiles/network/server.c
+> @@ -325,6 +325,32 @@ static gboolean bnep_setup(GIOChannel *chan,
+>                 return FALSE;
+>         }
+>
+> +       /*
+> +        * When benp_control_type is between 0x07 and 0xFF,
+> +        * a reply is also required.
+> +        * However, since the command size is only 2 bytes,
+> +        * it needs to be processed before determining
+> +        * if it is a valid command.
+> +        */
+> +       if (req->type =3D=3D BNEP_CONTROL &&
+> +               req->ctrl > BNEP_FILTER_MULT_ADDR_RSP) {
+> +               error("bnep: cmd not understood");
+> +               int err;
+> +               struct bnep_ctrl_cmd_not_understood_cmd rsp;
 
-Sure, I can apply that one if there is no dependency on the others.
+Id probably memset the rsp to 0 to be safe that we don't respond with
+uninitialized fields.
 
-> Thanks,
+> +               rsp.type =3D BNEP_CONTROL;
+> +               rsp.ctrl =3D BNEP_CMD_NOT_UNDERSTOOD;
+> +               rsp.unkn_ctrl =3D (uint8_t) req->ctrl;
+> +
+> +               err =3D send(sk, &rsp, sizeof(rsp), 0);
+> +
+> +               if (err < 0)
+> +                       error("send not understood ctrl rsp error: %s (%d=
+)",
+> +                                 strerror(errno), errno);
+> +
+> +               return FALSE;
+
+Move this code to its own function so it is easier to reuse.
+
+> +       }
+> +
+>         /*
+>          * Initial received data packet is BNEP_SETUP_CONNECTION_REQUEST_=
+MSG
+>          * minimal size of this frame is 3 octets: 1 byte of BNEP Type +
+> --
+> 2.25.1
 >
-> Paolo
 >
 
 
