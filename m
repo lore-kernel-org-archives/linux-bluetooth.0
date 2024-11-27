@@ -1,136 +1,148 @@
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f179.google.com (mail-yw1-f179.google.com [209.85.128.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0F171E51D;
-	Wed, 27 Nov 2024 13:16:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53EEA1FC0F3
+	for <linux-bluetooth@vger.kernel.org>; Wed, 27 Nov 2024 13:21:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732713377; cv=none; b=JjpaRHDmZEKwq/dTGUhRUDb0KkCCN76YqwVLj2Jv8niQjCY5Xk6oQa7vauJepNnMc9BYnSEFSAOiQjjojvmRdvYEBG/aGWyB5qd6NFrGRj+aN93O6k82bdEzaeiLDgbefAppWOFEHwT/9tGJZxne2PK9N1asp8IcLc1p7SbfBrM=
+	t=1732713670; cv=none; b=LCojma/s1M7iRD2Zi5P7qM2atBpLzO8FRdXMeYm2K5Mc6NQQoXdqoZrJjUwBD1IumvBLf0iMJYF9v9AjtMMNL134vPNz8lZvtPiCgcd8150nZ07GF0s6xPT0uZU0lpRLoF12TlJ2OZNIjJ067r9QfCg73Tw33hugARqshWwp/Fo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732713377; c=relaxed/simple;
-	bh=8eknH6HXT3j6JDaNc/49pIIgqgFs3QKYYO3WJO7uI4Y=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=g8G/hhbu+sEV7yxVVtk1FXjjQHmfzdLpd79JxZscDuC1hri2Qe2wsUplJ7KCtHufumEWoC8yF/rodw4zDYgchfy+izdnKkjsPTQLxn1OT+r0tbb6xz21gMw+uSWPJHyMLV8Mxv4klV3WDe1j62atWKimmB6NC3D7PPk2bd2YeBI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=Y6BxhUiv; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+	s=arc-20240116; t=1732713670; c=relaxed/simple;
+	bh=o0x4+jhY++FBFiKCEfYLSye/uNryy8nRv37g/at/WIs=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=dvtd2zS9bEmLJHTHfHNTpgU5QvdwidhIhR0bMmJhw6Bhe4oTIgRan+49ZG/8zrKFmilqV4OXYGSoHMYDvtvZT8fx0wGDn0ClBWfn+aRi3+YX3a77OM+erc2T0FlBku1Qr5EUxVTcghAm+K1W9RrNFq/fCZ/da+l65ZmfAxOq0OE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OlIVPNfF; arc=none smtp.client-ip=209.85.128.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="Y6BxhUiv"
-Received: from pps.filterd (m0279863.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4ARAgJoh018035;
-	Wed, 27 Nov 2024 13:16:08 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	nXQNR/PhjDT4rqjrOPi0Dkq4eZ2Sql4vyc8VAKlFBVc=; b=Y6BxhUivofZ3/Wbn
-	UNqCtzTiYSODM6w08nJ9vv7Ta4rmtwwdt+r8D8/Yxg2KgfbWk7zGYkVrUPc75P3A
-	WSxM548BADc69gF0d41sz0e4bVAfM0IacI3cRYPO/NhfMe6Ydybz0KCZMgMjDZBC
-	cKCj8b3DLFnqHvOH34mfa9Y1oOGd107CYGQ/KnOOdfjz3fqpqyEE5OuGledloS38
-	mSub1MGep9H6PSSSax3c6Wnm+RQ6PLsxxUp0Bvt4/uD8XapkRgZbSUvg7ayyxLpq
-	LbhhdYOA+0l+6lIRcuLrU0OynlKtscTniQVzmD7td1n1ys5hnNXVWGhP8MpSyw2Z
-	jitO8g==
-Received: from nalasppmta02.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4361wcgexh-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 27 Nov 2024 13:16:06 +0000 (GMT)
-Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
-	by NALASPPMTA02.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 4ARDG5wK015473
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 27 Nov 2024 13:16:05 GMT
-Received: from [10.219.1.29] (10.80.80.8) by nalasex01a.na.qualcomm.com
- (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Wed, 27 Nov
- 2024 05:15:59 -0800
-Message-ID: <c3d3efa7-13cc-4b84-b60f-4d25c272321c@quicinc.com>
-Date: Wed, 27 Nov 2024 18:45:56 +0530
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OlIVPNfF"
+Received: by mail-yw1-f179.google.com with SMTP id 00721157ae682-6eeffdff41dso34053267b3.3
+        for <linux-bluetooth@vger.kernel.org>; Wed, 27 Nov 2024 05:21:08 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1732713668; x=1733318468; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=PhgfXwi96s5ZGpOBJnu/NgkteuBWEpYuMflzyeFRwWg=;
+        b=OlIVPNfFNjCuAsROoQ95h4zy1gZroYTGAkXSJ/BTVVefq3c2l0pOk0XGnWciAGz7sx
+         QXVNyAuVrCXzPpymyBtqQ/RSBg1uVuqYKY0ASXKbUiqVUniAcCY09rkAJWx/7f5G5YdL
+         /zGiQneBUM0UFaLqNSOtpxxPVKMGFaLnztwlh3+fdxc4Lm5xrNCA61TmA8cAAzY4pvMk
+         mHYtP9jAlfUWioagni5KTWlvJQvpVDnl4PDZKjE9+4RTvT/CSFwhovHMTgPe3DfWLk28
+         kJ9kTop4OSIG2CvEPsJd+7amRW0Tbb0mkVqEX0v0S4uhnPMQlzKZpP6RmglGAR2lJYML
+         4NmA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1732713668; x=1733318468;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=PhgfXwi96s5ZGpOBJnu/NgkteuBWEpYuMflzyeFRwWg=;
+        b=YZ+hkKovdZZKHMcUTP7VtO72GSSAO6ycyJd75DHpIFCRA30V7WF05SmG1tzQvxleDO
+         Z1VSS7FVHL2vN7+ZpASchpFUyHMc+WDjFDzeYZ2Dm4x+zMK9n2xyXwpo8YSYM7GLzReB
+         gXNExDpovfiB4PTvMr5Lpf/TU9vc6xnqvk60PSwEF/08qcNFolzGV0ojKNv/MZwRDmFp
+         7jldmrhE4S/b7ediOZXjAV5vztqrF3uBDlWjaXAkTVbux+ieG63CEVhh4ya1yoICdk5Q
+         qynALF1w2Uzsow4Pj//xtFRQ6M2wa6XteDrK5r8f+bzuv4pqUA78s5U5b1pAbaKe5OYi
+         8fjQ==
+X-Gm-Message-State: AOJu0Yz2eMhwchhLusZgk06eDU0y95UyA0+Pt8BqrGU2lHxb5pbYObgn
+	vtNe1508TNmWXWzHkvxa5++FBDHTDeBoWbp9MK1wW7R6oEnlh7NWiJOsRg==
+X-Gm-Gg: ASbGnctSXkxiSaaOiwzgGldSN6e/3nRCa93tf5KJ+wD2WgrqClxlMPQ233HHu4vEBj2
+	rM7E5SOBH9HZEXhqoQuedl2b3ok3WfcDu5f1Md/ktYWofpEdOCNwwguZ3YPCocXNKRl78tlPFT1
+	Cq7Juvj97uC3tlCSF3jNx6sFpYbeWMnCIM/a65FQDzmQ+ZjxRokI26IOD7eb0E3g5XH5yTLNCCw
+	6k96GgGS7JySBobuMrIEW1x3XioDwXlFgFs36eoXAk6WlH+YpHqv9l1UA==
+X-Google-Smtp-Source: AGHT+IGakq1lEct5sxW3is0chWtBzlZhzhanqHRBLc53N4jCHNRJkbtgiA567Ob4MFe6MfwjGkkQ6A==
+X-Received: by 2002:a05:690c:2502:b0:6db:d217:895e with SMTP id 00721157ae682-6ef3728bcf0mr36050187b3.36.1732713667941;
+        Wed, 27 Nov 2024 05:21:07 -0800 (PST)
+Received: from [172.17.0.2] ([172.214.176.91])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-46694366bf0sm35480401cf.12.2024.11.27.05.21.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 27 Nov 2024 05:21:07 -0800 (PST)
+Message-ID: <67471cc3.c80a0220.25d60c.b7d3@mx.google.com>
+Date: Wed, 27 Nov 2024 05:21:07 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============2707138188161866843=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 1/2] arm64: dts: qcom: qcs6490-rb3gen2: enable
- Bluetooth
-To: Bartosz Golaszewski <brgl@bgdev.pl>, Krzysztof Kozlowski <krzk@kernel.org>
-CC: Liam Girdwood <lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>,
-        "Rob
- Herring" <robh@kernel.org>,
-        Krzysztof Kozlowski <krzk+dt@kernel.org>,
-        "Conor
- Dooley" <conor+dt@kernel.org>,
-        Bjorn Andersson <andersson@kernel.org>,
-        "Konrad Dybcio" <konradybcio@kernel.org>,
-        Marcel Holtmann
-	<marcel@holtmann.org>,
-        "Luiz Augusto von Dentz" <luiz.dentz@gmail.com>,
-        <quic_mohamull@quicinc.com>, <quic_hbandi@quicinc.com>,
-        <quic_anubhavg@quicinc.com>,
-        Bartosz Golaszewski
-	<bartosz.golaszewski@linaro.org>,
-        <linux-arm-msm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <devicetree@vger.kernel.org>, <linux-bluetooth@vger.kernel.org>,
-        <linux-pm@vger.kernel.org>
-References: <20241127115107.11549-1-quic_janathot@quicinc.com>
- <20241127115107.11549-2-quic_janathot@quicinc.com>
- <873e45b4-bcca-43fa-ab90-81754b28629f@kernel.org>
- <CAMRc=Mf-cO9M9=P50mhPDvRRBSYVZUDrEVa1jcMvAsjdAq6VLw@mail.gmail.com>
-Content-Language: en-US
-From: Janaki Ramaiah Thota <quic_janathot@quicinc.com>
-In-Reply-To: <CAMRc=Mf-cO9M9=P50mhPDvRRBSYVZUDrEVa1jcMvAsjdAq6VLw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nalasex01a.na.qualcomm.com (10.47.209.196)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: YZdlLkyafYCL5wp0UYVzao7Iasy1tSJn
-X-Proofpoint-ORIG-GUID: YZdlLkyafYCL5wp0UYVzao7Iasy1tSJn
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
- definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 mlxlogscore=999
- malwarescore=0 priorityscore=1501 clxscore=1011 mlxscore=0 phishscore=0
- lowpriorityscore=0 spamscore=0 impostorscore=0 adultscore=0 suspectscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2409260000
- definitions=main-2411270105
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, avkrasnov@salutedevices.com
+Subject: RE: [v1] Bluetooth: hci_uart: fix race during initialization
+In-Reply-To: <a1db0c90-1803-e01c-3e23-d18e4343a4eb@salutedevices.com>
+References: <a1db0c90-1803-e01c-3e23-d18e4343a4eb@salutedevices.com>
+Reply-To: linux-bluetooth@vger.kernel.org
+
+--===============2707138188161866843==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=912808
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PENDING   0.28 seconds
+GitLint                       PENDING   0.25 seconds
+SubjectPrefix                 PASS      0.09 seconds
+BuildKernel                   PASS      24.87 seconds
+CheckAllWarning               PASS      27.04 seconds
+CheckSparse                   PASS      30.44 seconds
+BuildKernel32                 PASS      24.55 seconds
+TestRunnerSetup               PASS      435.17 seconds
+TestRunner_l2cap-tester       PASS      20.15 seconds
+TestRunner_iso-tester         FAIL      28.03 seconds
+TestRunner_bnep-tester        PASS      4.81 seconds
+TestRunner_mgmt-tester        PASS      122.28 seconds
+TestRunner_rfcomm-tester      PASS      7.51 seconds
+TestRunner_sco-tester         PASS      9.32 seconds
+TestRunner_ioctl-tester       PASS      8.01 seconds
+TestRunner_mesh-tester        FAIL      8.07 seconds
+TestRunner_smp-tester         PASS      7.44 seconds
+TestRunner_userchan-tester    PASS      5.00 seconds
+IncrementalBuild              PENDING   0.46 seconds
+
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
+
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
+
+##############################
+Test: TestRunner_iso-tester - FAIL
+Desc: Run iso-tester with test-runner
+Output:
+WARNING: possible circular locking dependency detected
+Total: 124, Passed: 120 (96.8%), Failed: 0, Not Run: 4
+##############################
+Test: TestRunner_mesh-tester - FAIL
+Desc: Run mesh-tester with test-runner
+Output:
+BUG: KASAN: slab-use-after-free in run_timer_softirq+0x76c/0x7d0
+WARNING: CPU: 0 PID: 33 at kernel/workqueue.c:2257 __queue_work+0x687/0xb40
+Total: 10, Passed: 9 (90.0%), Failed: 1, Not Run: 0
+
+Failed Test Cases
+Mesh - Send cancel - 1                               Failed       0.103 seconds
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
 
 
 
-On 11/27/2024 6:38 PM, Bartosz Golaszewski wrote:
-> On Wed, Nov 27, 2024 at 2:05 PM Krzysztof Kozlowski <krzk@kernel.org> wrote:
->>
->> On 27/11/2024 12:51, Janaki Ramaiah Thota wrote:
->>> Add a PMU node for the WCN6750 module present on the qcs6490-rb3gen board
->>> and use the power sequencer for the same.
->>>
->>> Signed-off-by: Janaki Ramaiah Thota <quic_janathot@quicinc.com>
->>> ---
->>>   arch/arm64/boot/dts/qcom/qcs6490-rb3gen2.dts | 174 ++++++++++++++++++-
->>>   drivers/bluetooth/hci_qca.c                  |   2 +-
->>>   drivers/power/sequencing/pwrseq-qcom-wcn.c   |  22 +++
->>>   3 files changed, 196 insertions(+), 2 deletions(-)
->>
->> DTS is always separate and cannot go via the same (driver) tree,
->>
->> Missing bindings.
->>
->> Missing changelog, it's v4 so what happened here?
->>
->> Best regards,
->> Krzysztof
-> 
-> Ah, so this is where the driver change is at.
-> 
-> Janaki: the DT binding lives under the "regulator" namespace so it's
-> Mark Brown who typically takes changes to it via his tree. I pick up
-> driver changes into the pwrseq tree. Bjorn takes the DTS changes. Luiz
-> and Marcel are responsible for Bluetooth changes so you will have to
-> split all these changes into separate commits.
-> 
-> Bart
-
-Thanks Bartosz, will split the patches and update.
-
+---
 Regards,
-Janakiram
+Linux Bluetooth
+
+
+--===============2707138188161866843==--
