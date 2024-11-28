@@ -1,85 +1,80 @@
-Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-relay-internal-0.canonical.com (smtp-relay-internal-0.canonical.com [185.125.188.122])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52D86203706;
-	Wed, 27 Nov 2024 23:14:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92E446F2F2
+	for <linux-bluetooth@vger.kernel.org>; Thu, 28 Nov 2024 03:08:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.122
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732749275; cv=none; b=gT2l3ZDdccNWy8pHhgqIlAXRkR4nRr8l9mvVMWkm7Qbnwbxmt6YbZB5Msq229Sm7sq7DPR1pLZnmIsvfjDJ7OiGGU7aJDQ4J9TzajkV2MihgWjMAKLU+lZ6YAkfZKfKPg+U0vjFEcD8GOD7i9Vi+5tpxOKGxs0+z3IDpmLe+aK8=
+	t=1732763303; cv=none; b=K+fih/ak0FAYssY3xk4Id6K8j2uRQ4Fqp0fQmuGxtBat/E7SCalXIBA1+kGHmPAJnFS30DTWGAoN7POoN37aPknEuVAYfn4Jj/AtSMnzdQc2Xsf2nHrZB1Ky1LPktfacpbDOxf5wU2hsLd6lUkkN1HQOlj0KNngwhWEuBXAgk4U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732749275; c=relaxed/simple;
-	bh=6Ltkmyej5Wke/PPGa8ytesCUrUFYIIc0zVEnWqiEWaI=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=co2zFs0R+LjXxGeK7hOIxcN4C2EAWFHpptGD10t+5ma0dfPGBb0Re15PvhEaaPwC9EJN9KGM0LmXspjbgpI/ab0MBx48fApNLbjRn3lWwjNFbU0zDQTbeldMvEC+zFFrGIQTrXamXE8ETQbsnfQtkgWdwu3HCopL91G/r1ssXT0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Qcx5LKEd; arc=none smtp.client-ip=209.85.214.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1732763303; c=relaxed/simple;
+	bh=fb7jwHbD677k4r3rvO8ob67nTLFq8FEcQ33AYjPJ02Y=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Zmp3MgOqXfGmc3DqLCC2Qg+8fkznabd4hzE3eYhJX1P87OiF0HUN3wJHBrrMpsQKUMuOrgiFiYtSsV0iQhW6LdA0NLM6v4VCcuZ02KrFJUJ46k+qZaQpipN1bdcAZPeF7O1sujVuL37BE7l5CjN/sbthYxr3GhoJqSVyklZY/rw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b=rCmm1blC; arc=none smtp.client-ip=185.125.188.122
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Qcx5LKEd"
-Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-21285c1b196so1923745ad.3;
-        Wed, 27 Nov 2024 15:14:34 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1732749273; x=1733354073; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/Qbsfa3oGMzg1U/98CAfEMqAXTtrg3Szco6BJfPedmc=;
-        b=Qcx5LKEdZQqO0l4AbPlwYLqgd8coEs88Lz7GBSw2bBpvl2XBmY3Fk66a3BhcW30VpR
-         X7WP3q3Jym7dCW5JdChcMUL+DNCUAGi/lIWp6mVXZP7Q70/lEjq34BtBGEoK2DcVJj3c
-         0ldOH2FgcLDjtB34n8CnAoHSypSQCZ63Q7VmUyGudtmPm109gGPFTygZHJTnTfvcxu0t
-         MYQgVlvIbUkc+fXedmJ01PWY1keFQgwRjPgd1NB5nETxQeRbVBPauPgNC6uE2GquS0mN
-         n/hXiFKn601Dk6AFLXdPOQIQN9LLS2kMFNEfr3l8JDqZp0k+lAlN6vH1kmPle+NHAsF9
-         FBjg==
+	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="rCmm1blC"
+Received: from mail-pf1-f197.google.com (mail-pf1-f197.google.com [209.85.210.197])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-relay-internal-0.canonical.com (Postfix) with ESMTPS id 269B83F1CE
+	for <linux-bluetooth@vger.kernel.org>; Thu, 28 Nov 2024 03:08:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
+	s=20210705; t=1732763293;
+	bh=hh3plfOOHgj+Vrrt6DJRbXu7daZvdrxRuUjcKWQCRaU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version;
+	b=rCmm1blCgqqslvyF3AVTN5jNLJFEob7daXPkTFogEc2XK8EkXbZL0voU8jaws2z/m
+	 mlTkNVT3nZ3tb5RZA09ptvWiwCtxJdj8aE0gB9tSpzeHRa6o2q86kfbF6GbBG2HqaX
+	 LsA5EGA36SdhF1THGFfmezKuEZ95/N4vubbNmaHmKNCnM5jHXP9fUUJp9sdWvhXyIm
+	 +oDFeL51CXTLpewMll2qnNwW5Rs1cy7gBZhIr7QhQP8esUOfkoYT+P0D8mIlrZoo4W
+	 nlX5ifLsYf1+3OM1oHyTOD0QRBcrmO86+LfejmivQQPQIIJe9sTZr1qs9iEnk6u/4N
+	 kmxbU/HHhuiIg==
+Received: by mail-pf1-f197.google.com with SMTP id d2e1a72fcca58-725126e7da0so442287b3a.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 27 Nov 2024 19:08:13 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732749273; x=1733354073;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=/Qbsfa3oGMzg1U/98CAfEMqAXTtrg3Szco6BJfPedmc=;
-        b=qsyxtly0oCY36dmLzJFM7XZRQHJKuxKTeriId/W5FvKyuX66c/N3PIJTTCuWGVxLM0
-         zM4I9wuWn6JfXMJCA8kLGILQXobZFzavLhHjnii7d4isrijjHLE+DIybKtDXYBFjTyA0
-         khCGNq5MU16MCEF6VB5sOqE6tjPm2qoiR6iw+wkYb9E/bIYNaF6zge8keoaTHug0Zhg2
-         V6yO1ThZLyikmn/64r8uwbR37h6493hh12mIh5guUl/TPVHN2JyAIMLIk5JGmXmZxkZr
-         uE3acsCe8DDf4kRrGlKO2wfP6+ZqcicqC+o+OLVEBw7ABPbZgOd30TlLyV+lLP6Op9SA
-         C9iw==
-X-Forwarded-Encrypted: i=1; AJvYcCUJhq2MailIj876sua3FGLoB8B0kIa7pZ3k+5kmfRwZmRwOwpjYh970IuwzGiW7V9HiyxwPDIlmSsev5+E9mWo=@vger.kernel.org, AJvYcCVpg9W4/X8vSh9z3649pnBQjkI7Lq08Q3Lx5B3bpu9MTzrNhYsTFXN+ZR8398Z308WKCbcX+wBNBFnSE1SC@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywua2Ffy1U/8Fw6Ey5SXF2wrhncvZLumZ64oBl+EiS5B5Nlq1Re
-	ezHuWUCuSel7IvxGfI5hI2IbIxKPfbhMXSdn3vT0sbRG+YSVSHlP
-X-Gm-Gg: ASbGnctlxWc72sulXGUtlOLLvaGvDmSKUYSSlSGYdwsGDdvZ828P0ZQ8sSc73tTgACd
-	IgYu1KvIqOlsv0T6LKexzENMFcGqljwXK/l7p5/J+/KyaRl3ZKPqZ9f5RKOKrSXVWWncHHo2JG9
-	d+6IeiYSzchVuII2+XInQZizbgc2KrJsNNPAw+5WKH5KTuUPWDDnlLxPFqjj3ohIXb0J+gK4MMO
-	78prQ2qmdZNJ1jYsrQvvZc7wqeXOX7w5wO+PxcxgrnAqhQquISHQSBIcZvBLFbDNSD3ZwOzinHj
-	dvMkwEP0
-X-Google-Smtp-Source: AGHT+IG42zwk9rVSv3JinSJ7jGPo3cY4n7KHciWkVFVdIkqCjPRr7Vl0KdkjQqjmAh8XeOcmAt858A==
-X-Received: by 2002:a17:902:dac4:b0:212:1abb:fe75 with SMTP id d9443c01a7336-21501f64128mr57312355ad.54.1732749273617;
-        Wed, 27 Nov 2024 15:14:33 -0800 (PST)
-Received: from amdora.. (c-76-146-136-228.hsd1.wa.comcast.net. [76.146.136.228])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-215219c49ebsm903255ad.252.2024.11.27.15.14.32
+        d=1e100.net; s=20230601; t=1732763291; x=1733368091;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=hh3plfOOHgj+Vrrt6DJRbXu7daZvdrxRuUjcKWQCRaU=;
+        b=Yg9Jr/d3EdangXsPURP8tQp///24aW6h2YZDTbDCPAN8vkZWkdx1lH9sZn/u0GTcyf
+         2PM9j99+o5adyZAPm1Og88ntOXt6zel0qWhcpJTnhGvcSq/dq4AOlTmCxWx0eA3J6k0/
+         INSp3N+HqwPKmGIbaQeQFN2goU77v+n2RgiSh3yWmzfY7gG5vO8YHZ0Octnf88+iUZIq
+         aOPPlC9zYHz2Ml6ekh1fI8h3vav+mtN3IHl2Ifqr0/LZts9zutEG9Z8Bpy4OqlmRaBw6
+         nFKZuZEqwkFE5zyaPgmRAlGd2HRLdhIJYyIRVnsGtBVRuoK2Ob52kxUjgSD/YAtefKPR
+         6Osg==
+X-Forwarded-Encrypted: i=1; AJvYcCWM2Rfj0v/leHfEJXv1gixHYS6KYwWk5rbTTllaMj43iEFZaP42lPbJndXrqFU8gkA3Vurx3uezCqQb51yYI2Q=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxcdcCDYNpdnl5pnkwUDtD47bTEdAK6CjQwvGpfTXCkWZ7s+UD1
+	uLH5RIfJltdQHW7ShZ7tloT78JYnKGiyiMZ1xvP+Dl1ylr9shNvDBPDhQ5B4RRIKlb9JbnHPtpe
+	041ENwzkFK5b9giAPEj1BMxRCJ96+pHO/1O6CiZgH75jgBaTFy5cDC1PCdfLmpio49xUn0phELJ
+	nbEdQWkw==
+X-Gm-Gg: ASbGncsxN7bQ/4gm+/0Bf6xjO8sWDPznLzaXVfalBQpCxuW2I8MiiOuLMVmhQb5uQZb
+	GpN5p6T3AuxTzD/yIhS1Xguw1RPx4S8HGu4QShW9GkKkA3flr/HyUR0c3NQrDSrSCm4KMpr9he2
+	P0vq1Q8u73cj5Vhz6d46K3RF5FnFSRmyWQ5rzyAX/2Vydith+rTITP2wtVZTwGKDwifd4rj98Ff
+	b/0IXJ1jipISlXwzRuDl7MdtdRvlwYdP+wfKV+WimkXzQ+d+DZkjydwIfAH7vDCNSbXoY0SnQdY
+	hU95jAEeoN+vn1w25sjJzG3IKXKu9aAfSgWCVNHyLUexD6xw8L0J
+X-Received: by 2002:a05:6a00:1390:b0:725:1d37:ebff with SMTP id d2e1a72fcca58-72530141196mr7108416b3a.22.1732763291473;
+        Wed, 27 Nov 2024 19:08:11 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFPP15aoGK8MXiLZNsBlnTwzjjA5FX64jlc3vWaIRjez0atSF0AcLEu2GUfnCjj92mBxogIaw==
+X-Received: by 2002:a05:6a00:1390:b0:725:1d37:ebff with SMTP id d2e1a72fcca58-72530141196mr7108394b3a.22.1732763291104;
+        Wed, 27 Nov 2024 19:08:11 -0800 (PST)
+Received: from rickywu0421-ThinkPad-X1-Carbon-Gen-11.. (118-163-61-247.hinet-ip.hinet.net. [118.163.61.247])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7254176150dsm357506b3a.23.2024.11.27.19.08.09
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 27 Nov 2024 15:14:33 -0800 (PST)
-From: John Glotzer <jglotzer@gmail.com>
-To: regressions@leemhuis.info
-Cc: Aaron.Hou@mediatek.com,
-	Chris.Lu@mediatek.com,
-	Deren.Wu@mediatek.com,
-	Hao.Qin@mediatek.com,
-	Sean.Wang@mediatek.com,
-	johan.hedberg@gmail.com,
-	linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-mediatek@lists.infradead.org,
+        Wed, 27 Nov 2024 19:08:10 -0800 (PST)
+From: En-Wei Wu <en-wei.wu@canonical.com>
+To: marcel@holtmann.org,
 	luiz.dentz@gmail.com,
-	marc.payne@mdpsys.co.uk,
-	marcel@holtmann.org,
-	regressions@lists.linux.dev,
-	steve.lee@mediatek.com,
-	tiwai@suse.de
-Subject: [REGRESSION] bluetooth: mt7921: Crash on Resume From Suspend And Hibernate
-Date: Wed, 27 Nov 2024 15:14:32 -0800
-Message-ID: <20241127231432.8112-1-jglotzer@gmail.com>
-X-Mailer: git-send-email 2.47.0
-In-Reply-To: <643d8055-5a9f-4f5b-865b-830d33651dfe@leemhuis.info>
-References: <643d8055-5a9f-4f5b-865b-830d33651dfe@leemhuis.info>
+	linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: anthony.wong@canonical.com,
+	kuan-ying.lee@canonical.com
+Subject: [PATCH] Bluetooth: btusb: avoid NULL pointer defereference in skb_dequeue()
+Date: Thu, 28 Nov 2024 11:08:07 +0800
+Message-ID: <20241128030807.270581-1-en-wei.wu@canonical.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -88,30 +83,163 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-I've been following this thread since hitting this issue on my AMD Ryzen 5 7600.
+The WCN7851 (0489:e0f3) Bluetooth controller supports firmware crash dump
+collection through devcoredump. During this process, the crash dump data
+is queued to a dump queue as skb for further processing.
 
-People have reported being able to mitigate by either turning off Bluetooth in system settings
-or by using a systemd sleep script like the one below (this is the approach I've taken,
-it works fine.)
+A NULL pointer dereference occurs in skb_dequeue() when processing the
+dump queue due to improper return value handling:
 
-cat /usr/lib/systemd/system-sleep/sleep-fix.sh
-#!/usr/bin/env bash
-case ${1} in
-    pre)
-    rfkill block all
-    echo "Killed wifi/bluetooth"
-    ;;
-    post)
-    rfkill unblock all
-    echo "Started wifi/bluetooth"
-    ;;
-esac
+[ 93.672166] Bluetooth: hci0: ACL memdump size(589824)
 
-In following the related email threads it seems that this particular email thread has
-not had any activity since 10/21/2024. Now the focus seems to be on firmware download which
-in my admittedly non-expert opinion seems to be not clearly related.
+[ 93.672475] BUG: kernel NULL pointer dereference, address: 0000000000000008
+[ 93.672517] Workqueue: hci0 hci_devcd_rx [bluetooth]
+[ 93.672598] RIP: 0010:skb_dequeue+0x50/0x80
 
-There are multiple reports of this issue on various user forums (Fedora, Arch, Redhat, others)
-but it seems that we've lost focus on the kernel side on addressing this regression.
+The issue stems from handle_dump_pkt_qca() returning the wrong value on
+success. It currently returns the value from hci_devcd_init() (0 on success),
+but callers expect > 0 to indicate successful dump handling. This causes
+hci_recv_frame() to free the skb while it's still queued for dump
+processing, leading to the NULL pointer dereference when hci_devcd_rx()
+tries to dequeue it.
 
-Thanks all.
+Fix this by:
+
+1. Extracting dump packet detection into new is_dump_pkt_qca() function
+2. Making handle_dump_pkt_qca() return 0 on success and negative errno
+   on failure, consistent with other kernel interfaces
+
+This prevents premature skb freeing by ensuring proper handling of dump packets.
+
+Fixes: 20981ce2d5a5 ("Bluetooth: btusb: Add WCN6855 devcoredump support")
+Signed-off-by: En-Wei Wu <en-wei.wu@canonical.com>
+---
+ drivers/bluetooth/btusb.c | 75 ++++++++++++++++++++++++---------------
+ 1 file changed, 47 insertions(+), 28 deletions(-)
+
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 279fe6c115fa..8926f8f60e5c 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -2930,22 +2930,16 @@ static void btusb_coredump_qca(struct hci_dev *hdev)
+ 		bt_dev_err(hdev, "%s: triggle crash failed (%d)", __func__, err);
+ }
+ 
+-/*
+- * ==0: not a dump pkt.
+- * < 0: fails to handle a dump pkt
+- * > 0: otherwise.
+- */
++/* Return: 0 on success, negative errno on failure. */
+ static int handle_dump_pkt_qca(struct hci_dev *hdev, struct sk_buff *skb)
+ {
+-	int ret = 1;
++	int ret = 0;
+ 	u8 pkt_type;
+ 	u8 *sk_ptr;
+ 	unsigned int sk_len;
+ 	u16 seqno;
+ 	u32 dump_size;
+ 
+-	struct hci_event_hdr *event_hdr;
+-	struct hci_acl_hdr *acl_hdr;
+ 	struct qca_dump_hdr *dump_hdr;
+ 	struct btusb_data *btdata = hci_get_drvdata(hdev);
+ 	struct usb_device *udev = btdata->udev;
+@@ -2955,30 +2949,14 @@ static int handle_dump_pkt_qca(struct hci_dev *hdev, struct sk_buff *skb)
+ 	sk_len = skb->len;
+ 
+ 	if (pkt_type == HCI_ACLDATA_PKT) {
+-		acl_hdr = hci_acl_hdr(skb);
+-		if (le16_to_cpu(acl_hdr->handle) != QCA_MEMDUMP_ACL_HANDLE)
+-			return 0;
+ 		sk_ptr += HCI_ACL_HDR_SIZE;
+ 		sk_len -= HCI_ACL_HDR_SIZE;
+-		event_hdr = (struct hci_event_hdr *)sk_ptr;
+-	} else {
+-		event_hdr = hci_event_hdr(skb);
+ 	}
+ 
+-	if ((event_hdr->evt != HCI_VENDOR_PKT)
+-		|| (event_hdr->plen != (sk_len - HCI_EVENT_HDR_SIZE)))
+-		return 0;
+-
+ 	sk_ptr += HCI_EVENT_HDR_SIZE;
+ 	sk_len -= HCI_EVENT_HDR_SIZE;
+ 
+ 	dump_hdr = (struct qca_dump_hdr *)sk_ptr;
+-	if ((sk_len < offsetof(struct qca_dump_hdr, data))
+-		|| (dump_hdr->vse_class != QCA_MEMDUMP_VSE_CLASS)
+-	    || (dump_hdr->msg_type != QCA_MEMDUMP_MSG_TYPE))
+-		return 0;
+-
+-	/*it is dump pkt now*/
+ 	seqno = le16_to_cpu(dump_hdr->seqno);
+ 	if (seqno == 0) {
+ 		set_bit(BTUSB_HW_SSR_ACTIVE, &btdata->flags);
+@@ -3052,17 +3030,58 @@ static int handle_dump_pkt_qca(struct hci_dev *hdev, struct sk_buff *skb)
+ 	return ret;
+ }
+ 
++/* Return: true if packet is a dump packet, false otherwise. */
++static bool is_dump_pkt_qca(struct hci_dev *hdev, struct sk_buff *skb)
++{
++	u8 pkt_type;
++	u8 *sk_ptr;
++	unsigned int sk_len;
++
++	struct hci_event_hdr *event_hdr;
++	struct hci_acl_hdr *acl_hdr;
++	struct qca_dump_hdr *dump_hdr;
++
++	pkt_type = hci_skb_pkt_type(skb);
++	sk_ptr = skb->data;
++	sk_len = skb->len;
++
++	if (pkt_type == HCI_ACLDATA_PKT) {
++		acl_hdr = hci_acl_hdr(skb);
++		if (le16_to_cpu(acl_hdr->handle) != QCA_MEMDUMP_ACL_HANDLE)
++			return false;
++		sk_ptr += HCI_ACL_HDR_SIZE;
++		sk_len -= HCI_ACL_HDR_SIZE;
++		event_hdr = (struct hci_event_hdr *)sk_ptr;
++	} else {
++		event_hdr = hci_event_hdr(skb);
++	}
++
++	if ((event_hdr->evt != HCI_VENDOR_PKT)
++		|| (event_hdr->plen != (sk_len - HCI_EVENT_HDR_SIZE)))
++		return false;
++
++	sk_ptr += HCI_EVENT_HDR_SIZE;
++	sk_len -= HCI_EVENT_HDR_SIZE;
++
++	dump_hdr = (struct qca_dump_hdr *)sk_ptr;
++	if ((sk_len < offsetof(struct qca_dump_hdr, data))
++		|| (dump_hdr->vse_class != QCA_MEMDUMP_VSE_CLASS)
++	    || (dump_hdr->msg_type != QCA_MEMDUMP_MSG_TYPE))
++		return false;
++
++	return true;
++}
+ static int btusb_recv_acl_qca(struct hci_dev *hdev, struct sk_buff *skb)
+ {
+-	if (handle_dump_pkt_qca(hdev, skb))
+-		return 0;
++	if (is_dump_pkt_qca(hdev, skb))
++		return handle_dump_pkt_qca(hdev, skb);
+ 	return hci_recv_frame(hdev, skb);
+ }
+ 
+ static int btusb_recv_evt_qca(struct hci_dev *hdev, struct sk_buff *skb)
+ {
+-	if (handle_dump_pkt_qca(hdev, skb))
+-		return 0;
++	if (is_dump_pkt_qca(hdev, skb))
++		return handle_dump_pkt_qca(hdev, skb);
+ 	return hci_recv_frame(hdev, skb);
+ }
+ 
+-- 
+2.43.0
+
