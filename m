@@ -1,199 +1,85 @@
-Received: from mail-io1-f69.google.com (mail-io1-f69.google.com [209.85.166.69])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27EE9145A19
-	for <linux-bluetooth@vger.kernel.org>; Thu, 28 Nov 2024 06:53:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.69
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71B1817C7C;
+	Thu, 28 Nov 2024 07:12:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732776806; cv=none; b=eQ03DNvW6IGIrUUEEDKRYid9t7IZ8Bex1sCJfrJefYFxLH/qeU4rzSHfXcxLcAlzOVoQtEkJRdvB1fXMb7O98VUb91bs3PRLW/qRY4924+26Zw9CnjQ0aU2n8XpDOf0lY0JlI7p8Mt3Ts2sKyAr10aGciz6c4tVKTAd2jrAHlhs=
+	t=1732777941; cv=none; b=rTvGLXV1rFJTJyWu+8Fem82FNNW8OacJgSDExCJdxu2LmkNEjWAKiZmXhD7WJ4uRXOTqI7cfe+KK7O/6JRA7BypT5baTPulpJ8Z1f5cSWTElbGOFcmpzqo1KLxIhLkb0xborB0cBoNK/0LPQ6Z2/5fugblqWnkAV8OOrmCq1FMw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732776806; c=relaxed/simple;
-	bh=cHDFkKvSJUscEYHuTrSLyHkv8Ms7P9PdZlxNSR9ABZ8=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=GhvxgsXd9gzSmizn30AQMpiLeZBK+hq12J4awO9hmr7aC9kDgk+4trTEQsr5a9Nj4lPQfDjuLXaOXJuBb+waulYX9ti4DGduA8DdmjmGdkXb1IzIjGlYJoulqTWZ61pEnNI7sHb+FMoXdo51M93ggIJukwdwwvvCR2MXWNHN3WY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.69
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f69.google.com with SMTP id ca18e2360f4ac-843e86e0b3fso45564239f.3
-        for <linux-bluetooth@vger.kernel.org>; Wed, 27 Nov 2024 22:53:24 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732776804; x=1733381604;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZwH3LaQjZEGUcCoUPc0HwLttjQVoZ4TuaKtivSUPAaM=;
-        b=v4oZEbDYmiaVTpNuO7SSnh4S63vIhYECyNjAr+l7yP3Z5mixJ/To7b0vcjErkKdf59
-         Lc1duZF0v6+nuGckEiHj5oQun17qN5Qu81bhdJ4M1Y/CGO14VXd8KSd8F0Dxx6pN0d1g
-         a6wCWsIPM7ryrlv6c1LpEM8Io8eD6c6eAw601CLUegNZMz1DCIoTt+VubZNrIN3RPADK
-         rLW9cQct+iIglL1yJTn6UhKqev8gtD/O+08tTQP+193TdXgTyGstgBetMvBO86AgKDBt
-         47V5YunrCZjigUc3oo8A0wbS2su2Q8ZBx1PWywWgKB4zhjt7UzCSghvPa8BWibEDVK9e
-         yWyg==
-X-Forwarded-Encrypted: i=1; AJvYcCVbHlHujq4cHZDMNEiYgmoHdjUK/YdgPuNiu3xDfgwOa83yWTovwbb00QP8sT0J8gOGYP3KiDG8A5g2hGRD8Yw=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz8ukKYphHH0oYBurxWerp7B0j+IBCeO9NpmGRluJyQYNN/wair
-	7y6Z7gxVktHP7CDRBwa15V/dM1tP469B7L+XrcMIDgjS7MX2qBxHgvQAmtT+pB14B4eLARyWmHR
-	7qi+oASTo5Y4WBX910WrWScBW/478WS2iUAEVO+n8qbm0OQXg5TqW250=
-X-Google-Smtp-Source: AGHT+IGp5YBHZCt93Hz1WTmdDwObL1bx8jOib/qsrmXMWKLxxofYIElgPBynkIEhqGbkTl9jvT9CZs7Abjewi9oGnAMJiDA9yYKJ
+	s=arc-20240116; t=1732777941; c=relaxed/simple;
+	bh=RXztPqWcga+lFf91NyCRDW4b0oQ6s7jySmyXx8o6G5s=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=a15GJ4F+asPFUbrAP63tfW1lKMEWHj2u1yRuxTyULhgBonNruZ8lEvLWLUHyat7S1JvkvV+6Ish8+4EkImLjwCTeiCZlSZmreVj3cc0ksxf3KLsp5PRfQ7YZNTK8benJdpjVYww4zK5NUYYztKT7EdEg0ByErv8hzZv8VLK1shg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cNFKXpMd; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cNFKXpMd"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4AF01C4CECE;
+	Thu, 28 Nov 2024 07:12:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1732777940;
+	bh=RXztPqWcga+lFf91NyCRDW4b0oQ6s7jySmyXx8o6G5s=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=cNFKXpMdIRcHSTu+UGqT6Mzpd1ARVvK1MtQnUHDa+kEvsfZbxkreJFEQEHt+Ze5fo
+	 WF38+ZCYkPXpIDB2VM4ttbv7+cQ+78aAtzideMiY4acnLoeoyORO68IRaLu35+QoLE
+	 QLPTKYrmr8IEVDnAzCM+8spJ7QLdhctrQ6+MUTfI0UlQLUiijhvYZme96KDZmJ4/hZ
+	 dCP/N6hun2bpILdj9vizf0dO2EAiCbIAlh8BYJYTRJcPG2ZkC+OYHicpvTdBeDAHG1
+	 QDtfYxWdeLuvcyVsGlAG+ipi9nAiw4zDfu5R6MrSkYV5XcO7A4GrMAEd3jzHz6WYSL
+	 jmK7/Qm+WL2WQ==
+Date: Thu, 28 Nov 2024 08:12:16 +0100
+From: Krzysztof Kozlowski <krzk@kernel.org>
+To: Janaki Ramaiah Thota <quic_janathot@quicinc.com>
+Cc: Liam Girdwood <lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>, 
+	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+	Conor Dooley <conor+dt@kernel.org>, Bjorn Andersson <andersson@kernel.org>, 
+	Konrad Dybcio <konradybcio@kernel.org>, Marcel Holtmann <marcel@holtmann.org>, 
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Bartosz Golaszewski <brgl@bgdev.pl>, quic_mohamull@quicinc.com, 
+	quic_hbandi@quicinc.com, quic_anubhavg@quicinc.com, 
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>, linux-arm-msm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	devicetree@vger.kernel.org, linux-bluetooth@vger.kernel.org, linux-pm@vger.kernel.org
+Subject: Re: [PATCH v4 2/2] regulator: dt-bindings: qcom,qca6390-pmu:
+ document WCN6750
+Message-ID: <725gjpoubhbexpah5uch7rgsozgeb4mjc662idf7rmoe2rish5@uar366jby3qm>
+References: <20241127115107.11549-1-quic_janathot@quicinc.com>
+ <20241127115107.11549-3-quic_janathot@quicinc.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a92:cdab:0:b0:3a7:c32f:be58 with SMTP id
- e9e14a558f8ab-3a7c557c7d1mr70401395ab.13.1732776804342; Wed, 27 Nov 2024
- 22:53:24 -0800 (PST)
-Date: Wed, 27 Nov 2024 22:53:24 -0800
-In-Reply-To: <00000000000069859c061dfa7e91@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <67481364.050a0220.253251.0073.GAE@google.com>
-Subject: Re: [syzbot] [bluetooth?] KASAN: slab-use-after-free Read in mgmt_remove_adv_monitor_sync
-From: syzbot <syzbot+479aff51bb361ef5aa18@syzkaller.appspotmail.com>
-To: johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, luiz.dentz@gmail.com, marcel@holtmann.org, 
-	netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20241127115107.11549-3-quic_janathot@quicinc.com>
 
-syzbot has found a reproducer for the following issue on:
+On Wed, Nov 27, 2024 at 05:21:07PM +0530, Janaki Ramaiah Thota wrote:
+> Add description of the PMU node for the WCN6750 module.
+> 
+> Signed-off-by: Janaki Ramaiah Thota <quic_janathot@quicinc.com>
+> ---
+>  .../bindings/regulator/qcom,qca6390-pmu.yaml  | 27 +++++++++++++++++++
+>  1 file changed, 27 insertions(+)
 
-HEAD commit:    5dfd7d940094 Merge branch 'bnxt_en-bug-fixes'
-git tree:       net
-console output: https://syzkaller.appspot.com/x/log.txt?x=1264a3c0580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=83e9a7f9e94ea674
-dashboard link: https://syzkaller.appspot.com/bug?extid=479aff51bb361ef5aa18
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=16348f78580000
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/f4aa5ee37bd1/disk-5dfd7d94.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/d403277896b8/vmlinux-5dfd7d94.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/8ac17fc5f4ae/bzImage-5dfd7d94.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+479aff51bb361ef5aa18@syzkaller.appspotmail.com
-
-==================================================================
-BUG: KASAN: slab-use-after-free in mgmt_remove_adv_monitor_sync+0x3a/0xd0 net/bluetooth/mgmt.c:5532
-Read of size 8 at addr ffff8881446ec698 by task kworker/u9:6/5957
-
-CPU: 1 UID: 0 PID: 5957 Comm: kworker/u9:6 Not tainted 6.12.0-syzkaller-05517-g5dfd7d940094 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/13/2024
-Workqueue: hci0 hci_cmd_sync_work
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:94 [inline]
- dump_stack_lvl+0x241/0x360 lib/dump_stack.c:120
- print_address_description mm/kasan/report.c:377 [inline]
- print_report+0x169/0x550 mm/kasan/report.c:488
- kasan_report+0x143/0x180 mm/kasan/report.c:601
- mgmt_remove_adv_monitor_sync+0x3a/0xd0 net/bluetooth/mgmt.c:5532
- hci_cmd_sync_work+0x22b/0x400 net/bluetooth/hci_sync.c:332
- process_one_work kernel/workqueue.c:3229 [inline]
- process_scheduled_works+0xa63/0x1850 kernel/workqueue.c:3310
- worker_thread+0x870/0xd30 kernel/workqueue.c:3391
- kthread+0x2f0/0x390 kernel/kthread.c:389
- ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
- </TASK>
-
-Allocated by task 14866:
- kasan_save_stack mm/kasan/common.c:47 [inline]
- kasan_save_track+0x3f/0x80 mm/kasan/common.c:68
- poison_kmalloc_redzone mm/kasan/common.c:377 [inline]
- __kasan_kmalloc+0x98/0xb0 mm/kasan/common.c:394
- kasan_kmalloc include/linux/kasan.h:257 [inline]
- __kmalloc_cache_noprof+0x19c/0x2c0 mm/slub.c:4295
- kmalloc_noprof include/linux/slab.h:879 [inline]
- kzalloc_noprof include/linux/slab.h:1015 [inline]
- mgmt_pending_new+0x65/0x250 net/bluetooth/mgmt_util.c:269
- mgmt_pending_add+0x36/0x120 net/bluetooth/mgmt_util.c:296
- remove_adv_monitor+0x102/0x1b0 net/bluetooth/mgmt.c:5557
- hci_mgmt_cmd+0xc47/0x11d0 net/bluetooth/hci_sock.c:1712
- hci_sock_sendmsg+0x7b8/0x11c0 net/bluetooth/hci_sock.c:1832
- sock_sendmsg_nosec net/socket.c:711 [inline]
- __sock_sendmsg+0x221/0x270 net/socket.c:726
- sock_write_iter+0x2d7/0x3f0 net/socket.c:1147
- new_sync_write fs/read_write.c:586 [inline]
- vfs_write+0xaeb/0xd30 fs/read_write.c:679
- ksys_write+0x18f/0x2b0 fs/read_write.c:731
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-Freed by task 14863:
- kasan_save_stack mm/kasan/common.c:47 [inline]
- kasan_save_track+0x3f/0x80 mm/kasan/common.c:68
- kasan_save_free_info+0x40/0x50 mm/kasan/generic.c:579
- poison_slab_object mm/kasan/common.c:247 [inline]
- __kasan_slab_free+0x59/0x70 mm/kasan/common.c:264
- kasan_slab_free include/linux/kasan.h:230 [inline]
- slab_free_hook mm/slub.c:2342 [inline]
- slab_free mm/slub.c:4579 [inline]
- kfree+0x1a0/0x440 mm/slub.c:4727
- mgmt_pending_foreach+0xd1/0x130 net/bluetooth/mgmt_util.c:259
- __mgmt_power_off+0x183/0x430 net/bluetooth/mgmt.c:9534
- hci_dev_close_sync+0x6c4/0x11c0 net/bluetooth/hci_sync.c:5208
- hci_dev_do_close net/bluetooth/hci_core.c:483 [inline]
- hci_dev_close+0x112/0x210 net/bluetooth/hci_core.c:508
- sock_do_ioctl+0x158/0x460 net/socket.c:1209
- sock_ioctl+0x626/0x8e0 net/socket.c:1328
- vfs_ioctl fs/ioctl.c:51 [inline]
- __do_sys_ioctl fs/ioctl.c:906 [inline]
- __se_sys_ioctl+0xf5/0x170 fs/ioctl.c:892
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-The buggy address belongs to the object at ffff8881446ec680
- which belongs to the cache kmalloc-96 of size 96
-The buggy address is located 24 bytes inside of
- freed 96-byte region [ffff8881446ec680, ffff8881446ec6e0)
-
-The buggy address belongs to the physical page:
-page: refcount:1 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x1446ec
-anon flags: 0x57ff00000000000(node=1|zone=2|lastcpupid=0x7ff)
-page_type: f5(slab)
-raw: 057ff00000000000 ffff88801b041280 0000000000000000 dead000000000001
-raw: 0000000000000000 0000000000200020 00000001f5000000 0000000000000000
-page dumped because: kasan: bad access detected
-page_owner tracks the page as allocated
-page last allocated via order 0, migratetype Unmovable, gfp_mask 0x52cc0(GFP_KERNEL|__GFP_NOWARN|__GFP_NORETRY|__GFP_COMP), pid 1, tgid 1 (swapper/0), ts 3620866436, free_ts 0
- set_page_owner include/linux/page_owner.h:32 [inline]
- post_alloc_hook+0x1f3/0x230 mm/page_alloc.c:1556
- prep_new_page mm/page_alloc.c:1564 [inline]
- get_page_from_freelist+0x3649/0x3790 mm/page_alloc.c:3474
- __alloc_pages_noprof+0x292/0x710 mm/page_alloc.c:4751
- alloc_pages_mpol_noprof+0x3e8/0x680 mm/mempolicy.c:2265
- alloc_slab_page+0x6a/0x140 mm/slub.c:2412
- allocate_slab+0x5a/0x2f0 mm/slub.c:2578
- new_slab mm/slub.c:2631 [inline]
- ___slab_alloc+0xcd1/0x14b0 mm/slub.c:3818
- __slab_alloc+0x58/0xa0 mm/slub.c:3908
- __slab_alloc_node mm/slub.c:3961 [inline]
- slab_alloc_node mm/slub.c:4122 [inline]
- __kmalloc_cache_noprof+0x1d5/0x2c0 mm/slub.c:4290
- kmalloc_noprof include/linux/slab.h:879 [inline]
- kzalloc_noprof include/linux/slab.h:1015 [inline]
- acpi_ut_evaluate_object+0x108/0x4a0 drivers/acpi/acpica/uteval.c:50
- acpi_ut_execute_power_methods+0x112/0x270 drivers/acpi/acpica/uteval.c:288
- acpi_get_object_info+0x629/0x1220 drivers/acpi/acpica/nsxfname.c:356
- acpi_set_pnp_ids drivers/acpi/scan.c:1410 [inline]
- acpi_init_device_object+0xbeb/0x31a0 drivers/acpi/scan.c:1829
- acpi_add_single_object+0x106/0x1e00 drivers/acpi/scan.c:1880
- acpi_bus_check_add+0x32b/0x980 drivers/acpi/scan.c:2181
- acpi_ns_walk_namespace+0x294/0x4f0
-page_owner free stack trace missing
-
-Memory state around the buggy address:
- ffff8881446ec580: 00 00 00 00 00 00 00 00 00 00 00 fc fc fc fc fc
- ffff8881446ec600: 00 00 00 00 00 00 00 00 00 00 fc fc fc fc fc fc
->ffff8881446ec680: fa fb fb fb fb fb fb fb fb fb fb fb fc fc fc fc
-                            ^
- ffff8881446ec700: 00 00 00 00 00 00 00 00 00 fc fc fc fc fc fc fc
- ffff8881446ec780: 00 00 00 00 00 00 00 00 00 fc fc fc fc fc fc fc
-==================================================================
-
+Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 
 ---
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
+
+<form letter>
+This is an automated instruction, just in case, because many review tags
+are being ignored. If you know the process, you can skip it (please do
+not feel offended by me posting it here - no bad intentions intended).
+If you do not know the process, here is a short explanation:
+
+Please add Acked-by/Reviewed-by/Tested-by tags when posting new
+versions, under or above your Signed-off-by tag. Tag is "received", when
+provided in a message replied to you on the mailing list. Tools like b4
+can help here. However, there's no need to repost patches *only* to add
+the tags. The upstream maintainer will do that for tags received on the
+version they apply.
+
+https://elixir.bootlin.com/linux/v6.5-rc3/source/Documentation/process/submitting-patches.rst#L577
+</form letter>
+
+Best regards,
+Krzysztof
+
