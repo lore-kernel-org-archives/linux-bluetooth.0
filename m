@@ -1,135 +1,97 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE9E9184F;
-	Fri, 29 Nov 2024 06:57:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5186918A6AC;
+	Fri, 29 Nov 2024 10:27:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732863425; cv=none; b=FbXPy+Tn01IyrqjwOYtzErPs7VDhk59e4+PmEY8ICmiylBhuBop4e2Y6pFAwz21B/S/+V2+PoY08cauKObFlXXign7/Ceo+BFcdAe+9zL9TbwsxKrGnn8KIgAOBFSYmkNYuQGX67Vphw1c/aTe0lV+o6zUO1tnzvcXrCcnj0F1Y=
+	t=1732876055; cv=none; b=WYfP4+NApasF4qPAECOJC7s5h0Cj93vimjyXiKAAOdqkD7Crmhqi9gEwJPDTTMxUdxQ+D3m8gjzODug1a2VePo6alHLtXm9dBTry6amxad6AQzfIkenxhRrlOTGjWnC3J7kyUqD03jodkUSThTxFGVgGKpBJRggJhLkG52C1rss=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732863425; c=relaxed/simple;
-	bh=6rPNYjhfP4z/7KICHAqwiixJj5mvMXg74/wVAQhyYQo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=MvghVEelztPkWi+v2mjRF+0Ig0Rp8WhHYQkTQoe11ssV/jMva+RkT25yUDvSAWqmRMBsNc0JYSy/kUJkgET0Hrq7U5xDSkf1BKjw7HfDgXv7HbSzioWZcLQYVQPaRkXrAEzxgfFlWr9LMoEencgEBUAsmwCuf9o1wr2mYBehmxw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XcAd+aps; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XcAd+aps"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DFF5AC4CECF;
-	Fri, 29 Nov 2024 06:57:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1732863424;
-	bh=6rPNYjhfP4z/7KICHAqwiixJj5mvMXg74/wVAQhyYQo=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=XcAd+apsUdAsjI60PZM4CrLR2Z3RdZz8dve+NFqEpwmhmCtuP87yWpzfIJ2oFsLfn
-	 Pht63r6sEsRcOFaJXOny/9Xq4CJqJslSt8Y1MvPCQvDe6ILCgeDHCTqfU1ikCZsk2p
-	 mEiUzVxWHD5e1TZDjcYv1o5O7ZT2Rs7n/gbbOOs6dGP36vUF6AS4Wc+1nUNJnBJdCN
-	 P1H87uYf6vV7eeRw7qi0OiNCJizlDbJdM8gDnAP2P0PzoLmhTCpUpcsj6rqZ/0pmfs
-	 qLt3uJL314qG/wv+6bA17WxpLfgTEi7kiB7M5Bads8Y33EzBR/GNewiegIdsPi8Rw5
-	 kV1r7lYrA9EYQ==
-Message-ID: <24ff0d8c-461e-470c-a9c7-5c0d5e5e7548@kernel.org>
-Date: Fri, 29 Nov 2024 07:56:57 +0100
+	s=arc-20240116; t=1732876055; c=relaxed/simple;
+	bh=9AauVqi3pNsIbEb+9JtIdeS1sshApVXNvulC6fEMuMo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=k/O/YYX3GDUwzunC9UkQfMie0llsKcSrlI8CWuCT5ckqQ13ZaKoMnG+k8tWtByef20PzIgoHNFvKBftLhpiPM9TDGSw/jRGR0sUdbbweLdwFFOyrz+VC5pk69Cct7CLm0IjqfAs9kJESOE1WOSmGzyfYsOHQHN9BRVwuPfhePpQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
+X-UUID: 82b14a5aae3c11efa216b1d71e6e1362-20241129
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.1.38,REQID:66d1a889-1204-4fd9-ab8c-8b4bec61fb46,IP:0,U
+	RL:0,TC:0,Content:0,EDM:25,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION
+	:release,TS:25
+X-CID-META: VersionHash:82c5f88,CLOUDID:9a5af8ee66d2af270b2ee10a4143a33b,BulkI
+	D:nil,BulkQuantity:0,Recheck:0,SF:102,TC:nil,Content:0,EDM:5,IP:nil,URL:0,
+	File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES:1,SPR:N
+	O,DKR:0,DKP:0,BRR:0,BRE:0
+X-CID-BVR: 0,NGT
+X-CID-BAS: 0,NGT,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR
+X-UUID: 82b14a5aae3c11efa216b1d71e6e1362-20241129
+Received: from mail.kylinos.cn [(10.44.16.175)] by mailgw.kylinos.cn
+	(envelope-from <zhangheng@kylinos.cn>)
+	(Generic MTA)
+	with ESMTP id 2070425658; Fri, 29 Nov 2024 18:27:18 +0800
+Received: from mail.kylinos.cn (localhost [127.0.0.1])
+	by mail.kylinos.cn (NSMail) with SMTP id 5D456E0080FF;
+	Fri, 29 Nov 2024 18:27:18 +0800 (CST)
+X-ns-mid: postfix-674996FC-8168322012
+Received: from kylin-pc.. (unknown [172.25.130.133])
+	by mail.kylinos.cn (NSMail) with ESMTPA id 0623BE0080FF;
+	Fri, 29 Nov 2024 18:27:07 +0800 (CST)
+From: zhangheng <zhangheng@kylinos.cn>
+To: marcel@holtmann.org,
+	johan.hedberg@gmail.com,
+	luiz.dentz@gmail.com,
+	erick.archer@outlook.com,
+	kees@kernel.org,
+	geert@linux-m68k.org,
+	jirislaby@kernel.org
+Cc: linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Heng Zhang <zhangheng@kylinos.cn>
+Subject: [PATCH] tty: rfcomm: use sysfs_emit() instead of sprintf()
+Date: Fri, 29 Nov 2024 18:26:40 +0800
+Message-ID: <20241129102640.499871-1-zhangheng@kylinos.cn>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1 2/3] dt-bindings: net: Add QCA6698 Bluetooth
-To: "Cheng Jiang (IOE)" <quic_chejiang@quicinc.com>,
- Marcel Holtmann <marcel@holtmann.org>,
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Rob Herring
- <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Conor Dooley <conor+dt@kernel.org>, Bjorn Andersson <andersson@kernel.org>,
- Konrad Dybcio <konradybcio@kernel.org>,
- Balakrishna Godavarthi <quic_bgodavar@quicinc.com>,
- Rocky Liao <quic_rjliao@quicinc.com>
-Cc: linux-bluetooth@vger.kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org
-References: <20241128120922.3518582-1-quic_chejiang@quicinc.com>
- <20241128120922.3518582-3-quic_chejiang@quicinc.com>
- <bd4cb046-f0c1-4044-897c-00f30c6e84d2@kernel.org>
- <ca1dbeee-c61f-4309-ae4e-a599b4c245d5@kernel.org>
- <1117756e-a548-4e9d-9e91-116bec43fd2e@quicinc.com>
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 fv0=
-In-Reply-To: <1117756e-a548-4e9d-9e91-116bec43fd2e@quicinc.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: quoted-printable
 
-On 29/11/2024 03:13, Cheng Jiang (IOE) wrote:
-> Hi Krzysztof,
-> 
-> On 11/28/2024 10:41 PM, Krzysztof Kozlowski wrote:
->> On 28/11/2024 15:41, Krzysztof Kozlowski wrote:
->>> On 28/11/2024 13:09, Cheng Jiang wrote:
->>>> Add the compatible for the Bluetooth part of the Qualcomm QCA6698 chipset.
->>>
->>> <form letter>
->>> This is a friendly reminder during the review process.
->>>
->>> It seems my or other reviewer's previous comments were not fully
->>> addressed. Maybe the feedback got lost between the quotes, maybe you
->>> just forgot to apply it. Please go back to the previous discussion and
->>> either implement all requested changes or keep discussing them.
->>>
->>> Thank you.
->>> </form letter>
->>>
->>> Respond to the comment and then implement it.
->>>
->>> Also, version your patches correct and provide changelog. This is v2,
->>> not v1.
->>
->> Wait, no, it's even v3 or v4. You just ask us to the same work twice,
->> don't you?
-> Sorry for this. So the version number should be increased even 
-> solution/implementation is changed? Will follow the rule.  
+From: Heng Zhang <zhangheng@kylinos.cn>
 
-Yes, because you don't want to send the same for review over and over again.
+Follow the advice in Documentation/filesystems/sysfs.rst:
+show() should only use sysfs_emit() or sysfs_emit_at() when formatting
+the value to be returned to user space.
 
-Best regards,
-Krzysztof
+Signed-off-by: Heng Zhang <zhangheng@kylinos.cn>
+---
+ net/bluetooth/rfcomm/tty.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/net/bluetooth/rfcomm/tty.c b/net/bluetooth/rfcomm/tty.c
+index af80d599c337..21a5b5535ebc 100644
+--- a/net/bluetooth/rfcomm/tty.c
++++ b/net/bluetooth/rfcomm/tty.c
+@@ -201,14 +201,14 @@ static ssize_t address_show(struct device *tty_dev,
+ 			    struct device_attribute *attr, char *buf)
+ {
+ 	struct rfcomm_dev *dev =3D dev_get_drvdata(tty_dev);
+-	return sprintf(buf, "%pMR\n", &dev->dst);
++	return sysfs_emit(buf, "%pMR\n", &dev->dst);
+ }
+=20
+ static ssize_t channel_show(struct device *tty_dev,
+ 			    struct device_attribute *attr, char *buf)
+ {
+ 	struct rfcomm_dev *dev =3D dev_get_drvdata(tty_dev);
+-	return sprintf(buf, "%d\n", dev->channel);
++	return sysfs_emit(buf, "%d\n", dev->channel);
+ }
+=20
+ static DEVICE_ATTR_RO(address);
+--=20
+2.45.2
+
