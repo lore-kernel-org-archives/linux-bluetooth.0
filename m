@@ -1,84 +1,80 @@
-Received: from out-23.smtp.github.com (out-23.smtp.github.com [192.30.252.206])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B7C06F30C
-	for <linux-bluetooth@vger.kernel.org>; Mon,  2 Dec 2024 22:40:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.206
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C6201DB940
+	for <linux-bluetooth@vger.kernel.org>; Mon,  2 Dec 2024 22:50:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733179238; cv=none; b=sXt0lQhS5dT/02FISvsW8cN0WMuTQsX2lRNkOcFFck4wmGDBCpulwXYCzdM4wyaPLBuBGzlTcDMPesFK1A5yQ+3p3kf8hW1UkhJo7mh08gHpxtIrPBGee8AiGPWKGQqnz6ymxZK5etw/wvDsDGUVZWhv0ZtZJ0Wmzgw7iVS8ihU=
+	t=1733179816; cv=none; b=Zfo2amhNOaR9arhtwDjbfbKLfOCHQCcQm0a7mTPjzbiQ94UU5QAV3act2MZRdtfQetj1AlWsGgZkqyaYmRUaZC338KC4gDJ1nOumVwFaCfbmmUQI4dgKFYXYP8sLd5Ys0YwYuomGKhK+ygywFwy+sEQntdXvuXDTC2mqtVJxMw4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733179238; c=relaxed/simple;
-	bh=2+KgKXfJ4Tlw5PO47nmNqitU20/W53sOQzq0HeOsAP0=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=GwTlgMFN1VmPjG9gcmHT+O6FFajay5rGeXtBmRjq5LM2SrQXJoZ6ZFhl/4hFDw9NOpQja04CWEhsf16PoaHGL8vDM9147shLP6WOJq97mm5tcra4delxA5cenhLz7y1qAtyS0EEHajpIPbAiPDkhrZ4g384cl24Arnuio6/adQU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=gs6o45Cd; arc=none smtp.client-ip=192.30.252.206
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1733179816; c=relaxed/simple;
+	bh=W3Wl1bXWOrPMB4ic/ab+uVn2vg4WaeoScydRq9MUlrg=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=ErZY/2giCfCjxB7hOeNMTjn+7kUVc/M0n367B+HzSFbeiMRZz5kpOm/AqKZS6ToRz05rgszdlKScevvRUHEZikgX0KtO/j3MbBWBW0CKDazTLy+upXvMsV/+9MRAvAlw+i1wk62YcH+6+nCBDzh43rFUhDrl8TDk/0Xr1epaXZs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qnZKNMrz; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="gs6o45Cd"
-Received: from github.com (hubbernetes-node-2de13cf.ac4-iad.github.net [10.52.208.82])
-	by smtp.github.com (Postfix) with ESMTPA id 42DE65E03CB
-	for <linux-bluetooth@vger.kernel.org>; Mon,  2 Dec 2024 14:40:36 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1733179236;
-	bh=VArEgRsHhgeQa9akdqGjeLFiJ2VPHqM46jd23e4uNgU=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=gs6o45CdrXtbeejEsN4QKnS70ttmuCqw7Xem76k5cQEyPTe7RtzJtPm/RJW8ivAqb
-	 v0F3a6u+pJlwmjOgV88ScWyD9ohqGZHKp61hjwRfGVo6GOAPah65fmow6cKKJRN/8e
-	 DyKPKPI+Zr3Bv4zMKW2Ywi4VL8yCpSIqJj2/Vp1E=
-Date: Mon, 02 Dec 2024 14:40:36 -0800
-From: iulia-tanasescu <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/master/252883-756d69@github.com>
-Subject: [bluez/bluez] 7d84f8: btdev: Unlink local BIS before removing
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qnZKNMrz"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D5E82C4CED2;
+	Mon,  2 Dec 2024 22:50:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1733179815;
+	bh=W3Wl1bXWOrPMB4ic/ab+uVn2vg4WaeoScydRq9MUlrg=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=qnZKNMrzUeVlv9+6L8guLwkbiFjtyEE2Aj452kUNrgV+ZKExUu2II86lsMQIvboC1
+	 AQgGkOddfrNUz1hvsfdRbhGaKbjA27bx+qfBJDVvJwdlTQEtoODRPDZ+5Cqymy3LJI
+	 Ln2OyUO8vVkVulhYF/Ye4TAZlnDInSyfLAWJiMSUpaflWQridM1OJKe3tbHahl9VhX
+	 y42KyLYFIJnb/4q4/GishpulvmDxwePKNFTbuc/lu6fAj2S93nUV72PVDp7E45avj6
+	 GSYfErxydfSGxdh27qnFdGcuaQOUTAV7O73xyakavolyKiu4eT5dY7ChmYucf8ATdP
+	 rXailb3seey1g==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33F153806656;
+	Mon,  2 Dec 2024 22:50:31 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH BlueZ 0/2] iso-tester: Add test for ISO Broadcaster Receiver
+ Defer Reconnect
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <173317983002.3919304.8302027415594883551.git-patchwork-notify@kernel.org>
+Date: Mon, 02 Dec 2024 22:50:30 +0000
+References: <20241128160101.15187-1-iulia.tanasescu@nxp.com>
+In-Reply-To: <20241128160101.15187-1-iulia.tanasescu@nxp.com>
+To: Iulia Tanasescu <iulia.tanasescu@nxp.com>
+Cc: linux-bluetooth@vger.kernel.org, claudia.rosu@nxp.com,
+ mihai-octavian.urzica@nxp.com, andrei.istodorescu@nxp.com,
+ luiz.dentz@gmail.com
 
-  Branch: refs/heads/master
-  Home:   https://github.com/bluez/bluez
-  Commit: 7d84f84cf41c0dd8e74849e3310f1fa028979526
-      https://github.com/bluez/bluez/commit/7d84f84cf41c0dd8e74849e3310f1fa028979526
-  Author: Iulia Tanasescu <iulia.tanasescu@nxp.com>
-  Date:   2024-12-02 (Mon, 02 Dec 2024)
+Hello:
 
-  Changed paths:
-    M emulator/btdev.c
+This series was applied to bluetooth/bluez.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-  Log Message:
-  -----------
-  btdev: Unlink local BIS before removing
+On Thu, 28 Nov 2024 18:00:59 +0200 you wrote:
+> This adds a test for a Broadcast Receiver terminating BIG sync and
+> re-establishing it, while keeping PA sync alive:
+> 
+> ISO Broadcaster Receiver Defer Reconnect - Success
+> 
+> This depends on the kernel support added in
+> https://patchwork.kernel.org/project/bluetooth/patch/20241128155405.14910-2-iulia.tanasescu@nxp.com/
+> 
+> [...]
 
-This unlinks the local BISes from the remote ones before removing them
-in the handler for the LE BIG Terminate Sync command, because, otherwise,
-the remote BISes will also be removed.
+Here is the summary with links:
+  - [BlueZ,1/2] btdev: Unlink local BIS before removing
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=7d84f84cf41c
+  - [BlueZ,2/2] iso-tester: Add test for ISO Broadcaster Receiver Defer Reconnect
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=756d69fd3db8
 
-
-  Commit: 756d69fd3db8c84b88073c1467ba6b282ab5dbdd
-      https://github.com/bluez/bluez/commit/756d69fd3db8c84b88073c1467ba6b282ab5dbdd
-  Author: Iulia Tanasescu <iulia.tanasescu@nxp.com>
-  Date:   2024-12-02 (Mon, 02 Dec 2024)
-
-  Changed paths:
-    M tools/iso-tester.c
-
-  Log Message:
-  -----------
-  iso-tester: Add test for ISO Broadcaster Receiver Defer Reconnect
-
-This adds a test for a Broadcast Receiver terminating BIG sync and
-re-establishing it, while keeping PA sync alive:
-
-ISO Broadcaster Receiver Defer Reconnect - Success
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
-Compare: https://github.com/bluez/bluez/compare/252883241228...756d69fd3db8
-
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
