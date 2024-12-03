@@ -1,137 +1,303 @@
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo1-f47.google.com (mail-oo1-f47.google.com [209.85.161.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51A101FBEA5
-	for <linux-bluetooth@vger.kernel.org>; Tue,  3 Dec 2024 17:47:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2682B2500C5
+	for <linux-bluetooth@vger.kernel.org>; Tue,  3 Dec 2024 21:15:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733248053; cv=none; b=Y4JgqagYzPw1apRsEQrYP4z+jVTGpFcrFlByNmYbuaa31vF0l5/P3cl/Tcb5rvrOn51RQU+50TQfT9JaqqYwgQC9imr2WUuYfEX36QL/BShB/InBNr0ivoy95E4/sWHRDEC5CquObu2chRPxFbg5cR8iQG4vNIXI+MH92s/aNXQ=
+	t=1733260525; cv=none; b=erQfowFkkAMSSEy9MpT9sXOJI0/oNbJbScsAGXxujnNSCoZ1QGgFdy7BbaFGlnuxekXV5+H36/UvelekUOCShxXkKVGMcPdcaVCR9jlfbamLTe1PqEIbHtAFTQRv1sqZRYIT2CRSFYsiHKnFZ1IhAd0pgeBC7u9i9kfwT6O7QnI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733248053; c=relaxed/simple;
-	bh=Q95+gOI7pTAZtpI5+UrdylhdkgXfWijiKSsgRKgGNcI=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=Ea1HY+ZeVQSnh8FuGuw8y0pPQ+ZYgq/3KC6LYvsl7/xZyQZrXa8dtMg7qaXV+JjEBDjA391iZK4hl9TzX/CFQLoj3XbGxCYqSGl9TMLzdC2D2u9nqdO8LwI9p9M7bIsWxTHQ78uqbNddj6D89CDtjv+nKDjae4SktotxQ5nrlQ0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from ptz.office.stw.pengutronix.de ([2a0a:edc0:0:900:1d::77] helo=[IPv6:::1])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <l.stach@pengutronix.de>)
-	id 1tIWyE-0003sq-Mm; Tue, 03 Dec 2024 18:45:58 +0100
-Message-ID: <fc624e3fd4a4a38dedf02e31be9e4f1c85fb40a0.camel@pengutronix.de>
-Subject: Re: [PATCH 09/22] drm/etnaviv: Convert timeouts to secs_to_jiffies()
-From: Lucas Stach <l.stach@pengutronix.de>
-To: Easwar Hariharan <eahariha@linux.microsoft.com>, Pablo Neira Ayuso
- <pablo@netfilter.org>, Jozsef Kadlecsik <kadlec@netfilter.org>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
- Kicinski <kuba@kernel.org>,  Paolo Abeni <pabeni@redhat.com>, Simon Horman
- <horms@kernel.org>, Julia Lawall <Julia.Lawall@inria.fr>,  Nicolas Palix
- <nicolas.palix@imag.fr>, Daniel Mack <daniel@zonque.org>, Haojian Zhuang
- <haojian.zhuang@gmail.com>, Robert Jarzmik <robert.jarzmik@free.fr>,
- Russell King <linux@armlinux.org.uk>, Heiko Carstens <hca@linux.ibm.com>,
- Vasily Gorbik <gor@linux.ibm.com>, Alexander Gordeev
- <agordeev@linux.ibm.com>, Christian Borntraeger
- <borntraeger@linux.ibm.com>, Sven Schnelle <svens@linux.ibm.com>, Ofir
- Bitton <obitton@habana.ai>, Oded Gabbay <ogabbay@kernel.org>, Lucas De
- Marchi <lucas.demarchi@intel.com>, Thomas =?ISO-8859-1?Q?Hellstr=F6m?=
- <thomas.hellstrom@linux.intel.com>, Rodrigo Vivi <rodrigo.vivi@intel.com>, 
- Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, Maxime Ripard
- <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>, David Airlie
- <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, Jeroen de Borst
- <jeroendb@google.com>, Praveen Kaligineedi <pkaligineedi@google.com>,
- Shailend Chand <shailend@google.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- James Smart <james.smart@broadcom.com>, Dick Kennedy
- <dick.kennedy@broadcom.com>, "James E.J. Bottomley"
- <James.Bottomley@HansenPartnership.com>, "Martin K. Petersen"
- <martin.petersen@oracle.com>, Roger Pau =?ISO-8859-1?Q?Monn=E9?=
- <roger.pau@citrix.com>, Jens Axboe <axboe@kernel.dk>, Kalle Valo
- <kvalo@kernel.org>, Jeff Johnson <jjohnson@kernel.org>, Catalin Marinas
- <catalin.marinas@arm.com>, Andrew Morton <akpm@linux-foundation.org>, Jack
- Wang <jinpu.wang@cloud.ionos.com>, Marcel Holtmann <marcel@holtmann.org>,
- Johan Hedberg <johan.hedberg@gmail.com>, Luiz Augusto von Dentz
- <luiz.dentz@gmail.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- Florian Fainelli <florian.fainelli@broadcom.com>, Ray Jui
- <rjui@broadcom.com>, Scott Branden <sbranden@broadcom.com>, Broadcom
- internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, Xiubo
- Li <xiubli@redhat.com>, Ilya Dryomov <idryomov@gmail.com>,  Josh Poimboeuf
- <jpoimboe@kernel.org>, Jiri Kosina <jikos@kernel.org>, Miroslav Benes
- <mbenes@suse.cz>, Petr Mladek <pmladek@suse.com>, Joe Lawrence
- <joe.lawrence@redhat.com>, Jaroslav Kysela <perex@perex.cz>, Takashi Iwai
- <tiwai@suse.com>, Russell King <linux+etnaviv@armlinux.org.uk>, Christian
- Gmeiner <christian.gmeiner@gmail.com>,  Louis Peens
- <louis.peens@corigine.com>, Michael Ellerman <mpe@ellerman.id.au>, Nicholas
- Piggin <npiggin@gmail.com>, Christophe Leroy <christophe.leroy@csgroup.eu>,
- Naveen N Rao <naveen@kernel.org>, Madhavan Srinivasan <maddy@linux.ibm.com>
-Cc: netfilter-devel@vger.kernel.org, coreteam@netfilter.org, 
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, cocci@inria.fr, 
- linux-arm-kernel@lists.infradead.org, linux-s390@vger.kernel.org, 
- dri-devel@lists.freedesktop.org, intel-xe@lists.freedesktop.org, 
- linux-scsi@vger.kernel.org, xen-devel@lists.xenproject.org, 
- linux-block@vger.kernel.org, linux-wireless@vger.kernel.org, 
- ath11k@lists.infradead.org, linux-mm@kvack.org,
- linux-bluetooth@vger.kernel.org,  linux-staging@lists.linux.dev,
- linux-rpi-kernel@lists.infradead.org,  ceph-devel@vger.kernel.org,
- live-patching@vger.kernel.org,  linux-sound@vger.kernel.org,
- etnaviv@lists.freedesktop.org,  oss-drivers@corigine.com,
- linuxppc-dev@lists.ozlabs.org, Anna-Maria Behnsen <anna-maria@linutronix.de>
-Date: Tue, 03 Dec 2024 18:45:50 +0100
-In-Reply-To: <20241115-converge-secs-to-jiffies-v1-9-19aadc34941b@linux.microsoft.com>
-References: 
-	<20241115-converge-secs-to-jiffies-v1-0-19aadc34941b@linux.microsoft.com>
-	 <20241115-converge-secs-to-jiffies-v1-9-19aadc34941b@linux.microsoft.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.52.4 (3.52.4-2.fc40) 
+	s=arc-20240116; t=1733260525; c=relaxed/simple;
+	bh=wirhKRjg8dMmEu8Ol4qjDntVbyIzjdLVGLSASg7E6H8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=oasaQaQ8uTiGF/wnV+XPxCd/K4z/PAPxnLHa5nwb7Eitcdaw6GcADX0qs7NdOYZHfMZ1Z3M0ShbULpB3+2n46aFNcWUTufBq87C3xXMHULrZXt7YBZhB9yLFhOSrsXrpin6OWNnaruJYXRIvuFr3MCFMxyyrxvtFDV3yzIVRQIY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PYTA4JAy; arc=none smtp.client-ip=209.85.161.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PYTA4JAy"
+Received: by mail-oo1-f47.google.com with SMTP id 006d021491bc7-5f1d1fdb328so2399811eaf.3
+        for <linux-bluetooth@vger.kernel.org>; Tue, 03 Dec 2024 13:15:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1733260522; x=1733865322; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=JRGcBJZhHnXtaPUCl8Vyhm9Q7sBPRJygEzHzF+6Mggc=;
+        b=PYTA4JAyvFPuQ7KzZqqktDhObGFenM18+ybOgWQPRC/1HzFyjniFh39U7PKFMnVjn8
+         +FWbTYZLQxOkvXDdbZfmXjqhcm9p5TRIYnMIezuECck0qjn8qiZ1fjCOuRThd0h5i0ba
+         f2i9nanlNDW57NE6ccbTYlW1vCtetDe7/fek/1tMderA/4QEpOilsT5pg0HefXmSQ+gg
+         1+xHvPN7XrRrY8jkVvdNwl5cZhKU6PE3QVY1LppoVUMpG3xTFoMvsZ3z7lAsO29wdwgh
+         vgQ9Vss+P4UU5YS6E5SVIzrYcY05docUEXqJThatiw63tuKmvDwIwoJL8+UC0oONdLRv
+         wvBQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733260522; x=1733865322;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=JRGcBJZhHnXtaPUCl8Vyhm9Q7sBPRJygEzHzF+6Mggc=;
+        b=I/U0d4uOIk4JTkhQMj76shE2dhkEh7AWPXPY7RwTN4TjT7/kzry4mzJkD4DzPN9j8c
+         W7KKNMd1uO12PMl7glXzptlnZHSLl4ylZrayiHSQXTpLPd3isBGqhPga7uoGqBGevHaS
+         CqpDohNEDQ3kYlo4wJM/dbC9k7CquOuwJeLzyc2YOFRU+fGIz4B60GLAXIl+3e5bpRcl
+         5u5Ws86FTf8NK5mKbfRJHe6KDR/jZ9w7jG8yE3aTEEdXxqMjUSyQrB59Ei2qupl2Zmwa
+         YLokbOvUS7v8EEAF/SXWnw0srT0vfE94Q+7W3wFXLOi5CQVNf0/fubVR3bCrdM5hv/H+
+         uXog==
+X-Gm-Message-State: AOJu0Yz/Jb5yEf8Aq07Oy8r/6nyOnG27DeVxzFnDMORVFOVyMureRt/J
+	vA36M7aYx6WNh9c+ctB/J3w0loVlPosdk0qq6UspAECJTLccXR1R3Jp20w==
+X-Gm-Gg: ASbGncsK39nz2bYNy87EBf07dyU4yj0rsU5DX6m5hxK4GPvXpv+BZbENn+hwsRhxWnT
+	H0x8MWzBsBPaRQ2Hxo1dmIIs34hGfmreTTGrKnknI0KbdqCTvA/EgtpIBznXeU25ywfJtsf3QAL
+	6hOus0GJV3xf/S201+fEe3PNKu33teoNIbuGdJUNevyHoHXrOJTfLe5tkFgwaa0k3moW8B1QxxQ
+	LKIqnKdLtd12BNpkZlFx1a0MiFTOwdLv6cmc3Q++/yZGg53kUthronQfqEH/5QGx5TpCetYy44I
+	xPPDhVcXZEq0B/gWw63x4g==
+X-Google-Smtp-Source: AGHT+IFuzSf7TL7joKQ/xq185lvnS/lYU3QGwyUXOOEsA2nGIU+ZIdY+WRaOlluqyXA1ZUpJT604OA==
+X-Received: by 2002:a05:6359:7748:b0:1ca:a1d1:65dd with SMTP id e5c5f4694b2df-1caeabf9143mr319170455d.25.1733260522301;
+        Tue, 03 Dec 2024 13:15:22 -0800 (PST)
+Received: from lvondent-mobl5.. (syn-107-146-107-067.res.spectrum.com. [107.146.107.67])
+        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-85b82a89d5csm2138819241.8.2024.12.03.13.15.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 03 Dec 2024 13:15:20 -0800 (PST)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: syzbot+2fb0835e0c9cefc34614@syzkaller.appspotmail.com,
+	Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Subject: [PATCH v1] Bluetooth: hci_core: Fix sleeping function called from invalid context
+Date: Tue,  3 Dec 2024 16:14:35 -0500
+Message-ID: <20241203211435.194301-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:900:1d::77
-X-SA-Exim-Mail-From: l.stach@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 
-Am Freitag, dem 15.11.2024 um 21:22 +0000 schrieb Easwar Hariharan:
-> Changes made with the following Coccinelle rules:
->=20
-> @@ constant C; @@
->=20
-> - msecs_to_jiffies(C * 1000)
-> + secs_to_jiffies(C)
->=20
-> @@ constant C; @@
->=20
-> - msecs_to_jiffies(C * MSEC_PER_SEC)
-> + secs_to_jiffies(C)
->=20
-Thanks, applied to etnaviv/next.
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Regards,
-Lucas
+This reworks hci_cb_list to not use mutex hci_cb_list_lock to avoid bugs
+like the bellow:
 
-> Signed-off-by: Easwar Hariharan <eahariha@linux.microsoft.com>
-> ---
->  drivers/gpu/drm/etnaviv/etnaviv_cmdbuf.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->=20
-> diff --git a/drivers/gpu/drm/etnaviv/etnaviv_cmdbuf.c b/drivers/gpu/drm/e=
-tnaviv/etnaviv_cmdbuf.c
-> index 721d633aece9d4c81f0019e4c55884f26ee61c60..0f5a2c885d0ab7029c7248e15=
-d6ea3c31823b782 100644
-> --- a/drivers/gpu/drm/etnaviv/etnaviv_cmdbuf.c
-> +++ b/drivers/gpu/drm/etnaviv/etnaviv_cmdbuf.c
-> @@ -100,7 +100,7 @@ int etnaviv_cmdbuf_init(struct etnaviv_cmdbuf_suballo=
-c *suballoc,
->  		mutex_unlock(&suballoc->lock);
->  		ret =3D wait_event_interruptible_timeout(suballoc->free_event,
->  						       suballoc->free_space,
-> -						       msecs_to_jiffies(10 * 1000));
-> +						       secs_to_jiffies(10));
->  		if (!ret) {
->  			dev_err(suballoc->dev,
->  				"Timeout waiting for cmdbuf space\n");
->=20
+BUG: sleeping function called from invalid context at kernel/locking/mutex.c:585
+in_atomic(): 0, irqs_disabled(): 0, non_block: 0, pid: 5070, name: kworker/u9:2
+preempt_count: 0, expected: 0
+RCU nest depth: 1, expected: 0
+4 locks held by kworker/u9:2/5070:
+ #0: ffff888015be3948 ((wq_completion)hci0#2){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3229 [inline]
+ #0: ffff888015be3948 ((wq_completion)hci0#2){+.+.}-{0:0}, at: process_scheduled_works+0x8e0/0x1770 kernel/workqueue.c:3335
+ #1: ffffc90003b6fd00 ((work_completion)(&hdev->rx_work)){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3230 [inline]
+ #1: ffffc90003b6fd00 ((work_completion)(&hdev->rx_work)){+.+.}-{0:0}, at: process_scheduled_works+0x91b/0x1770 kernel/workqueue.c:3335
+ #2: ffff8880665d0078 (&hdev->lock){+.+.}-{3:3}, at: hci_le_create_big_complete_evt+0xcf/0xae0 net/bluetooth/hci_event.c:6914
+ #3: ffffffff8e132020 (rcu_read_lock){....}-{1:2}, at: rcu_lock_acquire include/linux/rcupdate.h:298 [inline]
+ #3: ffffffff8e132020 (rcu_read_lock){....}-{1:2}, at: rcu_read_lock include/linux/rcupdate.h:750 [inline]
+ #3: ffffffff8e132020 (rcu_read_lock){....}-{1:2}, at: hci_le_create_big_complete_evt+0xdb/0xae0 net/bluetooth/hci_event.c:6915
+CPU: 0 PID: 5070 Comm: kworker/u9:2 Not tainted 6.8.0-syzkaller-08073-g480e035fc4c7 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 03/27/2024
+Workqueue: hci0 hci_rx_work
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:88 [inline]
+ dump_stack_lvl+0x241/0x360 lib/dump_stack.c:114
+ __might_resched+0x5d4/0x780 kernel/sched/core.c:10187
+ __mutex_lock_common kernel/locking/mutex.c:585 [inline]
+ __mutex_lock+0xc1/0xd70 kernel/locking/mutex.c:752
+ hci_connect_cfm include/net/bluetooth/hci_core.h:2004 [inline]
+ hci_le_create_big_complete_evt+0x3d9/0xae0 net/bluetooth/hci_event.c:6939
+ hci_event_func net/bluetooth/hci_event.c:7514 [inline]
+ hci_event_packet+0xa53/0x1540 net/bluetooth/hci_event.c:7569
+ hci_rx_work+0x3e8/0xca0 net/bluetooth/hci_core.c:4171
+ process_one_work kernel/workqueue.c:3254 [inline]
+ process_scheduled_works+0xa00/0x1770 kernel/workqueue.c:3335
+ worker_thread+0x86d/0xd70 kernel/workqueue.c:3416
+ kthread+0x2f0/0x390 kernel/kthread.c:388
+ ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:243
+ </TASK>
+
+Reported-by: syzbot+2fb0835e0c9cefc34614@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=2fb0835e0c9cefc34614
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+---
+ include/net/bluetooth/hci_core.h | 89 ++++++++++++++++++++++----------
+ net/bluetooth/hci_core.c         |  9 ++--
+ 2 files changed, 65 insertions(+), 33 deletions(-)
+
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index ea798f07c5a2..95f11f04e24a 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -804,7 +804,6 @@ struct hci_conn_params {
+ extern struct list_head hci_dev_list;
+ extern struct list_head hci_cb_list;
+ extern rwlock_t hci_dev_list_lock;
+-extern struct mutex hci_cb_list_lock;
+ 
+ #define hci_dev_set_flag(hdev, nr)             set_bit((nr), (hdev)->dev_flags)
+ #define hci_dev_clear_flag(hdev, nr)           clear_bit((nr), (hdev)->dev_flags)
+@@ -2029,12 +2028,18 @@ static inline void hci_connect_cfm(struct hci_conn *conn, __u8 status)
+ {
+ 	struct hci_cb *cb;
+ 
+-	mutex_lock(&hci_cb_list_lock);
+-	list_for_each_entry(cb, &hci_cb_list, list) {
+-		if (cb->connect_cfm)
+-			cb->connect_cfm(conn, status);
++	rcu_read_lock();
++	list_for_each_entry_rcu(cb, &hci_cb_list, list) {
++		if (cb->connect_cfm) {
++			struct hci_cb cpy = *cb;
++
++			/* Callback may block so release RCU read lock */
++			rcu_read_unlock();
++			cpy.connect_cfm(conn, status);
++			rcu_read_lock();
++		}
+ 	}
+-	mutex_unlock(&hci_cb_list_lock);
++	rcu_read_unlock();
+ 
+ 	if (conn->connect_cfm_cb)
+ 		conn->connect_cfm_cb(conn, status);
+@@ -2044,12 +2049,18 @@ static inline void hci_disconn_cfm(struct hci_conn *conn, __u8 reason)
+ {
+ 	struct hci_cb *cb;
+ 
+-	mutex_lock(&hci_cb_list_lock);
++	rcu_read_lock();
+ 	list_for_each_entry(cb, &hci_cb_list, list) {
+-		if (cb->disconn_cfm)
+-			cb->disconn_cfm(conn, reason);
++		if (cb->disconn_cfm) {
++			struct hci_cb cpy = *cb;
++
++			/* Callback may block so release RCU read lock */
++			rcu_read_unlock();
++			cpy.disconn_cfm(conn, reason);
++			rcu_read_lock();
++		}
+ 	}
+-	mutex_unlock(&hci_cb_list_lock);
++	rcu_read_unlock();
+ 
+ 	if (conn->disconn_cfm_cb)
+ 		conn->disconn_cfm_cb(conn, reason);
+@@ -2065,12 +2076,18 @@ static inline void hci_auth_cfm(struct hci_conn *conn, __u8 status)
+ 
+ 	encrypt = test_bit(HCI_CONN_ENCRYPT, &conn->flags) ? 0x01 : 0x00;
+ 
+-	mutex_lock(&hci_cb_list_lock);
++	rcu_read_lock();
+ 	list_for_each_entry(cb, &hci_cb_list, list) {
+-		if (cb->security_cfm)
+-			cb->security_cfm(conn, status, encrypt);
++		if (cb->security_cfm) {
++			struct hci_cb cpy = *cb;
++
++			/* Callback may block so release RCU read lock */
++			rcu_read_unlock();
++			cpy.security_cfm(conn, status, encrypt);
++			rcu_read_lock();
++		}
+ 	}
+-	mutex_unlock(&hci_cb_list_lock);
++	rcu_read_unlock();
+ 
+ 	if (conn->security_cfm_cb)
+ 		conn->security_cfm_cb(conn, status);
+@@ -2105,12 +2122,18 @@ static inline void hci_encrypt_cfm(struct hci_conn *conn, __u8 status)
+ 			conn->sec_level = conn->pending_sec_level;
+ 	}
+ 
+-	mutex_lock(&hci_cb_list_lock);
++	rcu_read_lock();
+ 	list_for_each_entry(cb, &hci_cb_list, list) {
+-		if (cb->security_cfm)
+-			cb->security_cfm(conn, status, encrypt);
++		if (cb->security_cfm) {
++			struct hci_cb cpy = *cb;
++
++			/* Callback may block so release RCU read lock */
++			rcu_read_unlock();
++			cpy.security_cfm(conn, status, encrypt);
++			rcu_read_lock();
++		}
+ 	}
+-	mutex_unlock(&hci_cb_list_lock);
++	rcu_read_unlock();
+ 
+ 	if (conn->security_cfm_cb)
+ 		conn->security_cfm_cb(conn, status);
+@@ -2120,12 +2143,18 @@ static inline void hci_key_change_cfm(struct hci_conn *conn, __u8 status)
+ {
+ 	struct hci_cb *cb;
+ 
+-	mutex_lock(&hci_cb_list_lock);
++	rcu_read_lock();
+ 	list_for_each_entry(cb, &hci_cb_list, list) {
+-		if (cb->key_change_cfm)
+-			cb->key_change_cfm(conn, status);
++		if (cb->key_change_cfm) {
++			struct hci_cb cpy = *cb;
++
++			/* Callback may block so release RCU read lock */
++			rcu_read_unlock();
++			cpy.key_change_cfm(conn, status);
++			rcu_read_lock();
++		}
+ 	}
+-	mutex_unlock(&hci_cb_list_lock);
++	rcu_read_unlock();
+ }
+ 
+ static inline void hci_role_switch_cfm(struct hci_conn *conn, __u8 status,
+@@ -2133,12 +2162,18 @@ static inline void hci_role_switch_cfm(struct hci_conn *conn, __u8 status,
+ {
+ 	struct hci_cb *cb;
+ 
+-	mutex_lock(&hci_cb_list_lock);
+-	list_for_each_entry(cb, &hci_cb_list, list) {
+-		if (cb->role_switch_cfm)
+-			cb->role_switch_cfm(conn, status, role);
++	rcu_read_lock();
++	list_for_each_entry_rcu(cb, &hci_cb_list, list) {
++		if (cb->role_switch_cfm) {
++			struct hci_cb cpy = *cb;
++
++			/* Callback may block so release RCU read lock */
++			rcu_read_unlock();
++			cpy.role_switch_cfm(conn, status, role);
++			rcu_read_lock();
++		}
+ 	}
+-	mutex_unlock(&hci_cb_list_lock);
++	rcu_read_unlock();
+ }
+ 
+ static inline bool hci_bdaddr_is_rpa(bdaddr_t *bdaddr, u8 addr_type)
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index f9e19f9cb5a3..25d180d225c1 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -2993,9 +2993,7 @@ int hci_register_cb(struct hci_cb *cb)
+ {
+ 	BT_DBG("%p name %s", cb, cb->name);
+ 
+-	mutex_lock(&hci_cb_list_lock);
+-	list_add_tail(&cb->list, &hci_cb_list);
+-	mutex_unlock(&hci_cb_list_lock);
++	list_add_tail_rcu(&cb->list, &hci_cb_list);
+ 
+ 	return 0;
+ }
+@@ -3005,9 +3003,8 @@ int hci_unregister_cb(struct hci_cb *cb)
+ {
+ 	BT_DBG("%p name %s", cb, cb->name);
+ 
+-	mutex_lock(&hci_cb_list_lock);
+-	list_del(&cb->list);
+-	mutex_unlock(&hci_cb_list_lock);
++	list_del_rcu(&cb->list);
++	synchronize_rcu();
+ 
+ 	return 0;
+ }
+-- 
+2.47.1
 
