@@ -1,195 +1,150 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 534D71E3DD8
-	for <linux-bluetooth@vger.kernel.org>; Tue,  3 Dec 2024 11:17:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67DE41F8EE3;
+	Tue,  3 Dec 2024 17:19:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733224657; cv=none; b=p2pZMe+Sljv1+igsjG+mZde39F6lIzy7up2cXszH97x1n5eTiMAGuBDgLR6ZLiKm7CKhm3hsyraNlDht7SeR9exZNpNvETlHXbtK/GyaF4/v/AbfUlfgDRd7KFrZijYUnqMsQiJkEYqXp8N9DJb70+KZd+Zd7Ns/zhuWAocIIHY=
+	t=1733246386; cv=none; b=ifDDxHGrVwXil4RgOmG//Tmxdan67xsbWWDh66xVkt6bGtSwaUgPaXqyUPH8NcQkK+nE3bd6JX7XZQ5nNIcNFHuds8iYgt+b5gprv5lftKiAKMCRqiapeH5WwxiCX33fGpZqZsZ5WgUV+xT30COdDY1SrjDCM4umxBST7/MF0CM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733224657; c=relaxed/simple;
-	bh=lnZKTASrQsliNCsnBByUPNi51U1/9T34yRz8+Pq6sx0=;
-	h=Date:From:To:Cc:Subject:Message-ID; b=q4W814dCtABDVe4HDePjmhdIzE35sAR9M6HtwodIHyhx+Tt2dDajdIiQXT8Z63ZDpoGe7qBNijg76iaZqvpqGd98lhO6n4VxJUGalMVeDylLbTaNhvwGOQ2CyuaJlaaOUSDn3suUCHJkQRHV5Uqw4vs8rD9f/XA/pXqkPnTdRCA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=JDyMWgNv; arc=none smtp.client-ip=198.175.65.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1733246386; c=relaxed/simple;
+	bh=vI2Y41B4eSxt4ShVp6IB70gQDts0zC7SctHdFa3iT9c=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=WZxE6p9yoenSKUOvCvINcI4iJ9X4hX5CIXAWwXH/dTVQpuSWZMJmv2X59CABicCcnAu6XfQ/wSDCenV6dod9x7fsw1gG4PpAm6iEl+0YPrBAW8wHTz+TgGXf8nmRYx8GdFRVAIveIZwBMlbWizsINRlLmbHP9gbvSf61x0iCr10=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=SsM3N+IC; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="JDyMWgNv"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1733224655; x=1764760655;
-  h=date:from:to:cc:subject:message-id;
-  bh=lnZKTASrQsliNCsnBByUPNi51U1/9T34yRz8+Pq6sx0=;
-  b=JDyMWgNvG4vANGkmtldm8d09S6REB/gUvt0/hZme+xE+YHj3BTTz/2D/
-   m0Vm1ZKgpbOxUsJZLGIsIsZtyPtOSIbfZW56332kLxuHPN+9rdAcyIVJ9
-   EOHCjHW9hR4Jn7EUoikgHiI1KViw/67h+wnHIzgXFD27qxgwynixXComG
-   o3+DzFHzYPeHBDirNC7Z3Hdb1DHazCaVFndh3XXOcSIrhfWQAy7wkZ3Ne
-   WhGcflMv/I0rcSWuujYhZmp0SdRpZdkXuA1xxCAwGCa53W42Rv5RQTjJe
-   NTWGCtcD8ZtdN9XWfAwkElXGK6iHNwbYq9b4kSOptnpQhRQ0K77T8GoJq
-   w==;
-X-CSE-ConnectionGUID: TVgwbUIOTSyCdBG9Rhrp7Q==
-X-CSE-MsgGUID: 2PDrqsYfQNmpgX96CgiBVw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11274"; a="37204374"
-X-IronPort-AV: E=Sophos;i="6.12,205,1728975600"; 
-   d="scan'208";a="37204374"
-Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Dec 2024 03:17:35 -0800
-X-CSE-ConnectionGUID: vbVbBkraRT+Qine7vvECTw==
-X-CSE-MsgGUID: osfVW6zwSaG5QyeICTufHw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,205,1728975600"; 
-   d="scan'208";a="124235675"
-Received: from lkp-server01.sh.intel.com (HELO 388c121a226b) ([10.239.97.150])
-  by orviesa002.jf.intel.com with ESMTP; 03 Dec 2024 03:17:33 -0800
-Received: from kbuild by 388c121a226b with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1tIQuJ-0000Zy-1k;
-	Tue, 03 Dec 2024 11:17:31 +0000
-Date: Tue, 03 Dec 2024 19:14:56 +0800
-From: kernel test robot <lkp@intel.com>
-To: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: [bluetooth-next:master] BUILD SUCCESS
- 47ebf099106eb021cf7dd677720e6469a38785a5
-Message-ID: <202412031946.OuFd0uCB-lkp@intel.com>
-User-Agent: s-nail v14.9.24
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="SsM3N+IC"
+Received: from pps.filterd (m0279868.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4B39qiVd026044;
+	Tue, 3 Dec 2024 17:19:39 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	XX0dL3F2Ta8HItYyJqeOeTw3Nm6TpiJq8N8Zg6ju370=; b=SsM3N+IC3fzdp2MC
+	3VPv7r8AWh6We/DwZIxDwXz99XJuFOgvm3Syv+YA0X02uiwuh3qC+agAViFwnGoI
+	PNynbi7UkHowCORYajrPhp3kH65/vXhSS3uzqdgy1daap5UFMrCHjFyfPX/91i/v
+	SnSAuDVt07eS/BO4XBSS8Irrfa07ym8+KWRPtPt8WtdTyKlUYkdLGEjOOa4T6fDU
+	KtkRzkLKCl/QmhdQbjQE+XbbGT864qc04eqv6zF3BgtfkOeUv4L2Nn1djTnM16wc
+	idchoN1WS3wDOSjsa1xA9R+te/HuprHUBRzYGFqooVmx4eJUvULvvdqyXipyQP+0
+	QQjsmw==
+Received: from nalasppmta03.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 439yr9h3xe-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 03 Dec 2024 17:19:38 +0000 (GMT)
+Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
+	by NALASPPMTA03.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 4B3HJbu4001092
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 3 Dec 2024 17:19:37 GMT
+Received: from [10.253.11.68] (10.80.80.8) by nalasex01c.na.qualcomm.com
+ (10.47.97.35) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Tue, 3 Dec 2024
+ 09:19:34 -0800
+Message-ID: <8107a53f-5967-461b-8c89-773096a316d1@quicinc.com>
+Date: Wed, 4 Dec 2024 01:19:31 +0800
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v1] Bluetooth: hci_sync: clear cmd_sync_work_list when
+ power off
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+CC: Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg
+	<johan.hedberg@gmail.com>,
+        <linux-bluetooth@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <quic_chejiang@quicinc.com>
+References: <20241125175111.8598-1-quic_jiaymao@quicinc.com>
+ <CABBYNZLY_PAA0jPiHwGKUmdd3SKqwViLSHAkNHH0=trdqrDRnQ@mail.gmail.com>
+Content-Language: en-US
+From: Jiayang Mao <quic_jiaymao@quicinc.com>
+In-Reply-To: <CABBYNZLY_PAA0jPiHwGKUmdd3SKqwViLSHAkNHH0=trdqrDRnQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nalasex01c.na.qualcomm.com (10.47.97.35)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: Y8hNViYTvLfTvg8naBHcDqiRRXqurFbe
+X-Proofpoint-GUID: Y8hNViYTvLfTvg8naBHcDqiRRXqurFbe
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
+ definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 impostorscore=0
+ clxscore=1015 priorityscore=1501 mlxlogscore=999 phishscore=0
+ lowpriorityscore=0 malwarescore=0 mlxscore=0 suspectscore=0 adultscore=0
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2411120000 definitions=main-2412030145
 
-tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
-branch HEAD: 47ebf099106eb021cf7dd677720e6469a38785a5  Bluetooth: iso: Allow BIG re-sync
+Hi Luiz,
 
-elapsed time: 749m
+On 2024/12/3 4:41, Luiz Augusto von Dentz wrote:
+> Hi Jiayang,
+> 
+> On Mon, Nov 25, 2024 at 12:51 PM Jiayang Mao <quic_jiaymao@quicinc.com> wrote:
+>>
+>> Clear the remaining command in cmd_sync_work_list when BT is
+>> performing power off. In some cases, this list is not empty after
+>> power off. BT host will try to send more HCI commands.
+>> This can cause unexpected results.
+> 
+> What commands are in the queue?
 
-configs tested: 118
-configs skipped: 14
+If turning off BT during pairing, "hci_acl_create_conn_sync" has chances
+to be left in the queue. Then the driver will try to send the HCI
+command of creating connection but failed.
+> 
+>> Signed-off-by: Jiayang Mao <quic_jiaymao@quicinc.com>
+>> ---
+>>   net/bluetooth/hci_sync.c | 6 ++++++
+>>   1 file changed, 6 insertions(+)
+>>
+>> diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+>> index c86f4e42e..bc622d074 100644
+>> --- a/net/bluetooth/hci_sync.c
+>> +++ b/net/bluetooth/hci_sync.c
+>> @@ -5139,6 +5139,7 @@ int hci_dev_close_sync(struct hci_dev *hdev)
+>>   {
+>>          bool auto_off;
+>>          int err = 0;
+>> +       struct hci_cmd_sync_work_entry *entry, *tmp;
+>>
+>>          bt_dev_dbg(hdev, "");
+>>
+>> @@ -5258,6 +5259,11 @@ int hci_dev_close_sync(struct hci_dev *hdev)
+>>          clear_bit(HCI_RUNNING, &hdev->flags);
+>>          hci_sock_dev_event(hdev, HCI_DEV_CLOSE);
+>>
+>> +       mutex_lock(&hdev->cmd_sync_work_lock);
+>> +       list_for_each_entry_safe(entry, tmp, &hdev->cmd_sync_work_list, list)
+>> +               _hci_cmd_sync_cancel_entry(hdev, entry, -ECANCELED);
+>> +       mutex_unlock(&hdev->cmd_sync_work_lock);
+> 
+> Seems equivalent to hci_cmd_sync_clear, that said we should have been
+> running with that lock already, also if there is a sequence like
+> close/open the close may cancel the subsequent open, so I don't think
+> we should be canceling every subsequent callback like this.
 
-The following configs have been built successfully.
-More configs may be tested in the coming days.
+In hci_cmd_sync_clear, the work cmd_sync_work and reenable_adv_work are
+canceled. hci_cmd_sync_clear is not directly called because these two
+works should not be canceled during power off.
+Do you mean the added code should be moved to other functions to avoid
+the risk of lock?
 
-tested configs:
-alpha                             allnoconfig    gcc-14.2.0
-alpha                            allyesconfig    clang-20
-arc                              allmodconfig    clang-20
-arc                               allnoconfig    gcc-14.2.0
-arc                              allyesconfig    clang-20
-arc                            hsdk_defconfig    gcc-14.2.0
-arc                   randconfig-001-20241203    clang-20
-arc                   randconfig-001-20241203    gcc-13.2.0
-arc                   randconfig-002-20241203    clang-20
-arc                   randconfig-002-20241203    gcc-13.2.0
-arc                    vdk_hs38_smp_defconfig    gcc-14.2.0
-arm                              allmodconfig    clang-20
-arm                               allnoconfig    gcc-14.2.0
-arm                              allyesconfig    clang-20
-arm                         at91_dt_defconfig    gcc-14.2.0
-arm                         mv78xx0_defconfig    gcc-14.2.0
-arm                   randconfig-001-20241203    clang-20
-arm                   randconfig-002-20241203    clang-20
-arm                   randconfig-002-20241203    gcc-14.2.0
-arm                   randconfig-003-20241203    clang-20
-arm                   randconfig-004-20241203    clang-20
-arm                           stm32_defconfig    gcc-14.2.0
-arm64                            allmodconfig    clang-20
-arm64                             allnoconfig    gcc-14.2.0
-arm64                 randconfig-001-20241203    clang-20
-arm64                 randconfig-001-20241203    gcc-14.2.0
-arm64                 randconfig-002-20241203    clang-20
-arm64                 randconfig-002-20241203    gcc-14.2.0
-arm64                 randconfig-003-20241203    clang-20
-arm64                 randconfig-003-20241203    gcc-14.2.0
-arm64                 randconfig-004-20241203    clang-20
-csky                             alldefconfig    gcc-14.2.0
-csky                              allnoconfig    gcc-14.2.0
-hexagon                          allmodconfig    clang-20
-hexagon                           allnoconfig    gcc-14.2.0
-hexagon                          allyesconfig    clang-20
-i386        buildonly-randconfig-001-20241203    clang-19
-i386        buildonly-randconfig-001-20241203    gcc-12
-i386        buildonly-randconfig-002-20241203    clang-19
-i386        buildonly-randconfig-002-20241203    gcc-12
-i386        buildonly-randconfig-003-20241203    clang-19
-i386        buildonly-randconfig-004-20241203    clang-19
-i386        buildonly-randconfig-005-20241203    clang-19
-i386        buildonly-randconfig-006-20241203    clang-19
-i386        buildonly-randconfig-006-20241203    gcc-12
-loongarch                        allmodconfig    gcc-14.2.0
-loongarch                         allnoconfig    gcc-14.2.0
-loongarch                 loongson3_defconfig    gcc-14.2.0
-m68k                             allmodconfig    gcc-14.2.0
-m68k                              allnoconfig    gcc-14.2.0
-m68k                             allyesconfig    gcc-14.2.0
-m68k                          hp300_defconfig    gcc-14.2.0
-m68k                       m5275evb_defconfig    gcc-14.2.0
-m68k                        stmark2_defconfig    gcc-14.2.0
-microblaze                       allmodconfig    gcc-14.2.0
-microblaze                        allnoconfig    gcc-14.2.0
-microblaze                       allyesconfig    gcc-14.2.0
-mips                              allnoconfig    gcc-14.2.0
-mips                  cavium_octeon_defconfig    gcc-14.2.0
-mips                           ip28_defconfig    gcc-14.2.0
-mips                        qi_lb60_defconfig    gcc-14.2.0
-nios2                         3c120_defconfig    gcc-14.2.0
-nios2                             allnoconfig    gcc-14.2.0
-openrisc                         alldefconfig    gcc-14.2.0
-openrisc                          allnoconfig    gcc-14.2.0
-openrisc                         allyesconfig    gcc-14.2.0
-parisc                           allmodconfig    gcc-14.2.0
-parisc                            allnoconfig    gcc-14.2.0
-parisc                           allyesconfig    gcc-14.2.0
-parisc                generic-64bit_defconfig    gcc-14.2.0
-powerpc                          allmodconfig    gcc-14.2.0
-powerpc                           allnoconfig    gcc-14.2.0
-powerpc                          allyesconfig    gcc-14.2.0
-powerpc                      arches_defconfig    gcc-14.2.0
-powerpc                     asp8347_defconfig    gcc-14.2.0
-powerpc                   currituck_defconfig    gcc-14.2.0
-powerpc                       eiger_defconfig    gcc-14.2.0
-powerpc                    ge_imp3a_defconfig    gcc-14.2.0
-powerpc                  iss476-smp_defconfig    gcc-14.2.0
-powerpc                   motionpro_defconfig    gcc-14.2.0
-powerpc                 mpc8315_rdb_defconfig    gcc-14.2.0
-powerpc                     tqm8541_defconfig    gcc-14.2.0
-riscv                            allmodconfig    gcc-14.2.0
-riscv                             allnoconfig    gcc-14.2.0
-riscv                            allyesconfig    gcc-14.2.0
-s390                             allmodconfig    gcc-14.2.0
-s390                              allnoconfig    clang-20
-s390                             allyesconfig    gcc-14.2.0
-sh                               allmodconfig    gcc-14.2.0
-sh                                allnoconfig    gcc-14.2.0
-sh                               allyesconfig    gcc-14.2.0
-sh                        edosk7705_defconfig    gcc-14.2.0
-sh                        edosk7760_defconfig    gcc-14.2.0
-sh                               j2_defconfig    gcc-14.2.0
-sh                          kfr2r09_defconfig    gcc-14.2.0
-sh                            migor_defconfig    gcc-14.2.0
-sh                          r7780mp_defconfig    gcc-14.2.0
-sh                           se7722_defconfig    gcc-14.2.0
-sh                           se7724_defconfig    gcc-14.2.0
-sh                        sh7785lcr_defconfig    gcc-14.2.0
-sparc                            allmodconfig    gcc-14.2.0
-sparc                             allnoconfig    gcc-14.2.0
-um                               allmodconfig    clang-20
-um                                allnoconfig    clang-17
-um                               allyesconfig    clang-20
-x86_64      buildonly-randconfig-001-20241203    clang-19
-x86_64      buildonly-randconfig-001-20241203    gcc-11
-x86_64      buildonly-randconfig-002-20241203    clang-19
-x86_64      buildonly-randconfig-002-20241203    gcc-11
-x86_64      buildonly-randconfig-003-20241203    clang-19
-x86_64      buildonly-randconfig-003-20241203    gcc-11
-x86_64      buildonly-randconfig-004-20241203    gcc-11
-x86_64      buildonly-randconfig-005-20241203    gcc-11
-x86_64      buildonly-randconfig-005-20241203    gcc-12
-x86_64      buildonly-randconfig-006-20241203    clang-19
-x86_64      buildonly-randconfig-006-20241203    gcc-11
-xtensa                            allnoconfig    gcc-14.2.0
-xtensa                         virt_defconfig    gcc-14.2.0
+Yes. This change lacks considering sequence of close/open. I will update
+the implementation to ensure it does not remove the opening and the
+operations after re-opening.
+> 
+>>          /* After this point our queues are empty and no tasks are scheduled. */
+>>          hdev->close(hdev);
+>>
+>> --
+>> 2.25.1
+>>
+> 
+> 
 
---
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
