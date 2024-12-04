@@ -1,132 +1,140 @@
-Received: from mail-lj1-f169.google.com (mail-lj1-f169.google.com [209.85.208.169])
+Received: from mail-lf1-f48.google.com (mail-lf1-f48.google.com [209.85.167.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41A8C18DF73
-	for <linux-bluetooth@vger.kernel.org>; Wed,  4 Dec 2024 20:37:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AA931FA251
+	for <linux-bluetooth@vger.kernel.org>; Wed,  4 Dec 2024 22:59:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733344670; cv=none; b=rZNBxWfI/aIeOqJKhFD8SvHzc2QpwPn8nlGkBBIGZGQi2uDjh1ABOSuXs/kskH3eDPWLiUVuArI0vsQUq8BVOVG+WBMpXj10LhH8duvVxlxL5O+sP8kE9rn3ZnKTd1huCUzF0cNnAKug+aJ0xDSTuXtQcXLRL0oCGDl4Vxd2gfA=
+	t=1733353167; cv=none; b=gAvrsjuVF3eWhziRH/5SelphwskVRK+fymKx2B1fzvcYCAbkoWPwIqmw3FMqVVPqt+ripLArh+GQkputKmnxbmRt9Pu1taUuWwQaGg9of3ffzpUfbCjL+pQkIFAkcM8TYOv8tdkKWdzR00SIg/bwvmHnkQ8bv/zbiKwtKkzk7Ps=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733344670; c=relaxed/simple;
-	bh=sEr7CgEjsXVdfgqKQqRf0NPKg0VJfQ1wB4wN4HiK4Ak=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=kIp3UC/sDLQ2EpLVsW2OuDL1r7RdG5tLliZxxN/WsUqQKseKxPnIVMjhi3iRsTQoMXk3Mqivo1hOyx1NfiFhZmHLplZEn2GOBsHxNNvBsGrHe0k7kBBU/qwMJ6I2CWX+vAwAltlbF/gM/mH7rMhyYe9NOr+7UuLVKky7s61MJvY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=N2caCdbc; arc=none smtp.client-ip=209.85.208.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1733353167; c=relaxed/simple;
+	bh=zu2zn/CG8LATXGnamKjYNIPIAQAZIUfMCZnfMDljbJw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=CaqQFYCeQVWIQOulbmD+BYo2c32ORZEy9Th/Dey6SaHU6n1ejZDwcLAA3TcBfni8bsB5iKfJ4dInaQ5u57A84SG2wU05UBUvXr3T/UGdezmBMAdnTrgWhvT90MsXDW1pLzi7D0FkAGX6qpzGypWjf4ude2y1RjZoFd58mPPJmXc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=IXiSUX49; arc=none smtp.client-ip=209.85.167.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="N2caCdbc"
-Received: by mail-lj1-f169.google.com with SMTP id 38308e7fff4ca-2ffd796ba0aso1284521fa.3
-        for <linux-bluetooth@vger.kernel.org>; Wed, 04 Dec 2024 12:37:49 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="IXiSUX49"
+Received: by mail-lf1-f48.google.com with SMTP id 2adb3069b0e04-53dde5262fdso400857e87.2
+        for <linux-bluetooth@vger.kernel.org>; Wed, 04 Dec 2024 14:59:24 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1733344667; x=1733949467; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ZmUpXiXPKCJKDAPA+VfMgXZ2Lese1oz/pMddoy8YjIk=;
-        b=N2caCdbc4Ct/yMKibioE0l9GGTrLybqXoxpvq4/TD8I7hXMz7D+Tu6TyYy43+tX3Tk
-         tX1RuTUWA6vivz3gzZthMGnTHIynz64rkPHJJCOad+G3KHIaXDWw0/aAkXFD08cX+9EF
-         8KpS7g2TU8xm3BwUOtDGZum4dveSmk2uxRunx6GLQwuEkY+LePrZOX7kfyyqi1sSiJak
-         pXT1n9zK/4X8NjfgGYZgv7wwy3BsP05NVHMESuzgznZCruiCmw/BYPZomfKPGYCxGcCR
-         n4Ggwek+8XCKE4s7nq2FxdTUo3ZtZzBnEw0YuQgJzES2i24I9jFzGXyIib4pc2uGva5R
-         ypkQ==
+        d=linaro.org; s=google; t=1733353163; x=1733957963; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=YTycC8k0POiTYVULvZ4XnFfri7Upa5YgerEMaIs+Jd8=;
+        b=IXiSUX49C5EBU55+Vp5Lm6WBVLlKpOw12VSzXQiQ9BctKqBt2mNbFdy4bApo0/hCL6
+         y/1P++taUn1sfQz75tL3k466L2ZAbQXHbOXbRkbMQ8lp+FjfM9HTWkO/7BM2j4yKfZ6S
+         XJnL2Mc1oJaj3iEzTBGlpjCS+IbsqQcWckJWcvM7qQ5WRGSB8pr0GT/1aRJzELYvB1u4
+         717qhqxcVAKjrFo8pWSqOhcYn+MjtR3MHrn1d4ABUjMe15DpzGI8+A/4Kb4Zf7DMBgqi
+         eM4sUPSErrJ8SO4gOlICgpUtTXcp4cLqlmxuzaEiyHEH4ms1PTjQq3aBi1pO89Ie94ve
+         uzwA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733344667; x=1733949467;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ZmUpXiXPKCJKDAPA+VfMgXZ2Lese1oz/pMddoy8YjIk=;
-        b=QNZ+cEgyxBOI7d5Ec43cZh4ptYhihqbxwxod+xl0zLQbfm+M75svZ+v6JVvaU5ACZ/
-         V6YIXuJFRxmeRbIjdjo1Sr/x9oUFDhKLav8VxiVHZG7gxkki6uiUyIHGQFpbNr/5pad/
-         j39EhuwBBtEoeWbf25Q0eZIhlRAmZkIcNfXp/uyobBQGEMw7n1rRw8gdZsnP6bPHW1L7
-         iTP44hgUV/pvgsNMJ/TYqOukvSFirMoaykm4izYCX/pDycVcP4XowvzPo8gxIVeXGsbc
-         oBWpKrcq1ea0vSfau8nPH9yylHOZemsn2pqUHHpzeiR9vy56HFbLILnd208mGb3ZXUEI
-         Mleg==
-X-Gm-Message-State: AOJu0YyCRqSzj/ErdxMZnxwUhiRsoH3ARY65a+/PJImOAfwKQoR6vp/R
-	FZjqNil+VDWLVvbxRyLA5+qniBM05XhK4eiI1y3OZcs9QBDralaUQgF3O8S7FfgdotWmPn+o/DF
-	Wz049bGQrGMR9nChQvh52lFqj2+21Przu
-X-Gm-Gg: ASbGncsJNcuM1dWPgos0b9G6q6t++arxQjJvDg9nd6vJCG+DNLKUjfRGTb6Zq0/DlVx
-	jhb1wtlj8yiWsDra3jmQrYLDlE3VAMQ==
-X-Google-Smtp-Source: AGHT+IHGRJS6lKdYuFWskkByNB0Y4Og2GYXgFr03svtgoNlzBt0I/5dTbdxW1M4INGAfNs7oBd/UZ0U5fdUhGn8itAQ=
-X-Received: by 2002:a2e:96d4:0:b0:300:160f:7c76 with SMTP id
- 38308e7fff4ca-300160f7da7mr25470571fa.25.1733344667114; Wed, 04 Dec 2024
- 12:37:47 -0800 (PST)
+        d=1e100.net; s=20230601; t=1733353163; x=1733957963;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=YTycC8k0POiTYVULvZ4XnFfri7Upa5YgerEMaIs+Jd8=;
+        b=W2NXM6NlO+cH3bEtx4Pu5vxJBmGR1op2y2je961ZsrDeS3m1GuiE3u9J4PlFmXQ3ZI
+         rBO9idMO2ZvIDOCtJCW9ur2QwhT3AivNiLivNGu0eSUzj/kUsRwodYvKeVpoht1DdD0p
+         THIVUrR9ss78wQInna02j+PN5cAHsBSqsnrwSchOesCEXWXneZ6pOtFmexa3/F3wWWEg
+         xFLE6A3Fiw7vmmAlqqbIrZVujv3zjXpR5yJje314xWGF2VgRGwpL1RPFpQV5ri1iS5iA
+         dafPQMSf/O+TPAeEeRrDIRVzrNhv1mYEqx1yVOlZzRPhs6LNn33vImyfkMSvZs7XVzLP
+         lbsA==
+X-Forwarded-Encrypted: i=1; AJvYcCUdqBdoqdNRXiFuUp1XE+WXhro8qgdqsLsngR3NMC332r6XaipX7+Ghe+F0kSG6hCz8kW0KoHCyTFQHcJM7KF0=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw1rPoM7PKe+2pmwKevcRkXaTQkdxyVprAqufqW44Puabt7QNug
+	4XRhtrl2qiCyVRQOFAVS4AYjMQmW9e2koQ+yNGQJc+8tAvD3452VtVijYjVz5WY=
+X-Gm-Gg: ASbGncsCl9E33nMbCprz1Gvnlxjt7imXwSUfRVeI2TKPy7Idg3HrLf2qS9ljL7OyVak
+	10rAEZRrYK43i799DICFFKzxo9Ex4P/bv3ukgVkLsGly7eTGOwfajJGcdqXvNtp4GCochVDoiw5
+	x7X9kGGXhPkS74x6Enmohtqp5lxiTh5wWf9K41oGRCEgIJ01cfvbs82mHYT7dvNpOR/a7Iakwq6
+	xPMGIZnrU+NaB7jckVl9xpaM9z52qvUGHl+EcGI5gcFXAmqIb1fYQKJx2b+wbq+4hnrsTgsIn//
+	wGBAkh1dgXV+jPivF00SFr0f7mFZrA==
+X-Google-Smtp-Source: AGHT+IFRjL/KhmDcGC8MucpwxgwNr0ZNRoGoJL7sxAYkJFIl0HN1ssgHjTDj9GY1umPdAlN+l8LS0A==
+X-Received: by 2002:a05:6512:2252:b0:53d:d3ff:77f6 with SMTP id 2adb3069b0e04-53e12a22f22mr5085713e87.46.1733353163247;
+        Wed, 04 Dec 2024 14:59:23 -0800 (PST)
+Received: from eriador.lumag.spb.ru (2001-14ba-a0c3-3a00--b8c.rev.dnainternet.fi. [2001:14ba:a0c3:3a00::b8c])
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-53e22947a16sm29976e87.33.2024.12.04.14.59.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 04 Dec 2024 14:59:21 -0800 (PST)
+Date: Thu, 5 Dec 2024 00:59:19 +0200
+From: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
+To: Janaki Ramaiah Thota <quic_janathot@quicinc.com>
+Cc: Liam Girdwood <lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>, 
+	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+	Conor Dooley <conor+dt@kernel.org>, Bjorn Andersson <andersson@kernel.org>, 
+	Konrad Dybcio <konradybcio@kernel.org>, Marcel Holtmann <marcel@holtmann.org>, 
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Bartosz Golaszewski <brgl@bgdev.pl>, quic_mohamull@quicinc.com, 
+	quic_hbandi@quicinc.com, quic_anubhavg@quicinc.com, 
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>, linux-arm-msm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	devicetree@vger.kernel.org, linux-bluetooth@vger.kernel.org, linux-pm@vger.kernel.org
+Subject: Re: [PATCH v4 2/4] arm64: dts: qcom: qcs6490-rb3gen: add and enable
+ BT node
+Message-ID: <pzkijkdswskaq6232uldapz3b6v6zplif7uah24iwq3ymlezft@skbcy2vod3c5>
+References: <20241204131706.20791-1-quic_janathot@quicinc.com>
+ <20241204131706.20791-3-quic_janathot@quicinc.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <5bdab6f5-fe17-4060-8d43-f43754e452f7@gmx.de> <CABBYNZJ5pPNqH2ah9CcoP5Hr2OA0J+Jmo=ai35WDNMuzTNZ7Jg@mail.gmail.com>
-In-Reply-To: <CABBYNZJ5pPNqH2ah9CcoP5Hr2OA0J+Jmo=ai35WDNMuzTNZ7Jg@mail.gmail.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Wed, 4 Dec 2024 15:37:34 -0500
-Message-ID: <CABBYNZJmyNojrLXsqz+VN3jV_NmBatYONK=MMMh75x2=rYM8ZA@mail.gmail.com>
-Subject: Re: Bluez: Read-only config dir install
-To: Fiona Klute <fiona.klute@gmx.de>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241204131706.20791-3-quic_janathot@quicinc.com>
 
-Hi Fiona,
+On Wed, Dec 04, 2024 at 06:47:04PM +0530, Janaki Ramaiah Thota wrote:
+> Add a node for the PMU module of the WCN6750 present on the
+> qcs6490-rb3gen board and assign its power outputs to the Bluetooth
+> module.
+> 
+> Signed-off-by: Janaki Ramaiah Thota <quic_janathot@quicinc.com>
+> ---
+>  arch/arm64/boot/dts/qcom/qcs6490-rb3gen2.dts | 165 ++++++++++++++++++-
+>  1 file changed, 164 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/arm64/boot/dts/qcom/qcs6490-rb3gen2.dts b/arch/arm64/boot/dts/qcom/qcs6490-rb3gen2.dts
+> index 27695bd54220..07650648214e 100644
+> --- a/arch/arm64/boot/dts/qcom/qcs6490-rb3gen2.dts
+> +++ b/arch/arm64/boot/dts/qcom/qcs6490-rb3gen2.dts
+> @@ -1,6 +1,6 @@
+>  // SPDX-License-Identifier: BSD-3-Clause
+>  /*
+> - * Copyright (c) 2023 Qualcomm Innovation Center, Inc. All rights reserved.
+> + * Copyright (c) 2023-2024 Qualcomm Innovation Center, Inc. All rights reserved.
+>   */
+>  
+>  /dts-v1/;
+> @@ -33,6 +33,7 @@
+>  
+>  	aliases {
+>  		serial0 = &uart5;
+> +		serial1 = &uart7;
+>  	};
+>  
+>  	chosen {
+> @@ -217,6 +218,63 @@
+>  		regulator-min-microvolt = <3700000>;
+>  		regulator-max-microvolt = <3700000>;
+>  	};
+> +
+> +	wcn6750-pmu {
+> +		compatible = "qcom,wcn6750-pmu";
+> +		pinctrl-names = "default";
+> +		pinctrl-0 = <&bt_en>;
+> +		vddaon-supply = <&vreg_s7b_0p972>;
+> +		vddasd-supply = <&vreg_l11c_2p8>;
+> +		vddpmu-supply = <&vreg_s7b_0p972>;
+> +		vddrfa0p8-supply = <&vreg_s7b_0p972>;
+> +		vddrfa1p2-supply = <&vreg_s8b_1p272>;
+> +		vddrfa1p7-supply = <&vreg_s1b_1p872>;
+> +		vddrfa2p2-supply = <&vreg_s1c_2p19>;
+> +
+> +		bt-enable-gpios = <&tlmm 85 GPIO_ACTIVE_HIGH>;
 
-On Wed, Dec 4, 2024 at 3:31=E2=80=AFPM Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
->
-> Hi Fiona,
->
-> On Wed, Dec 4, 2024 at 2:51=E2=80=AFPM Fiona Klute <fiona.klute@gmx.de> w=
-rote:
-> >
-> > Hi,
-> >
-> > since February Bluez installs a config directory with mode 0555 [1].
-> > This broke the Buildroot build, because files in that directory cannot
-> > be deleted any more. Buildroot disabled the datafiles installation as a
-> > workaround [2], but at least in my setup this breaks *running*
-> > bluetoothd because the D-bus policy is missing that way.
-> >
-> > The commit message mentions needing specific permission, but does not
-> > explain why /etc/bluetooth can't have mode 0755 (as it does on my Debia=
-n
-> > system, with Bluetooth working just fine).
-> >
-> > So my questions are: Can I just send a patch to change the permissions?
-> > If not, why does it need to be read-only? I think I'll need to
-> > understand that for a proper fix if changing permissions isn't right.
-> >
-> > Kind regards,
-> > Fiona
-> >
-> >
-> > [1]
-> > https://git.kernel.org/pub/scm/bluetooth/bluez.git/commit/?id=3Dbe0e796=
-299b0e7a73bf06c5655b56180588550b0
-> > [2]
-> > https://gitlab.com/buildroot.org/buildroot/-/commit/1a8676aa6e4b0e372a1=
-a744eac6e53c90c03bf0e
->
-> Here is the discussion why end up setting it as 0555:
->
-> https://github.com/bluez/bluez/issues/329#issuecomment-1102459104
->
-> Now the question is why would buildroot delete files under
-> ConfigurationDirectory? Or is the problem that the directory is
-> created empty and then you add custom files later?
+Doesn't WCN6750 also have SW_CTRL and wifi-enable pins?
 
-Ok, sounds like this really is _not_ how the distros are setting it up:
+> +
 
--rw-r--r--. 1 root root  1028 Nov  1 15:25 input.conf
--rw-r--r--. 1 root root 12929 Nov  1 15:25 main.conf
--rw-r--r--. 1 root root   120 Dec 24  2012 network.conf
-
-So I think it should really have been 0755, so the likes of root can
-write/delete it.
-
-> --
-> Luiz Augusto von Dentz
-
-
-
---=20
-Luiz Augusto von Dentz
+-- 
+With best wishes
+Dmitry
