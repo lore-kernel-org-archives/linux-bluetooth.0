@@ -1,77 +1,109 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f45.google.com (mail-lf1-f45.google.com [209.85.167.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 566B31B0F1F;
-	Thu,  5 Dec 2024 11:18:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 816C7217665
+	for <linux-bluetooth@vger.kernel.org>; Thu,  5 Dec 2024 12:00:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733397494; cv=none; b=Ps8g2zHhRW14cz3PyjcXTmO+tqajm3/KwiPxHWRi/3TatJNGO2fZ5dUtqDLzc64I9kI8pzhBSZzssDk6ctxiRS7XVaC9kRavAiwpB4mNQiwO97l2CZzHe74LMKu8rupFTYTOtM2L7vndnquaAHJ9O7EKidtTvQgfcK3bzOAr3DI=
+	t=1733400046; cv=none; b=aXLQiuaUdqbx9ZpruYZ0k5GG3ZgIstQLwrdHwLhkDsiSuDj8Hf0cZ///tYkMqYZQn2/uXZ6xOhdGOiaK4PF+pCIVh4+2ElZWsrvfRtOYD4oBQ51r6UjSpSaCE3bb21+rShZPkfTb40uoXKDVAtD6mbegOXXAtUuk1eZLiXvL85o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733397494; c=relaxed/simple;
-	bh=03418Nmjp7L7uNRQ/VmAj+UPzNS51bahbk7mIDpWr7Q=;
-	h=Date:Content-Type:MIME-Version:From:Cc:To:In-Reply-To:References:
-	 Message-Id:Subject; b=d3AWyIHTyBV0V52sn30464gV3Xeho34CxYbHytWJB8m+cimMf1GaNShcB376c7KUHP9F9W5JxiAUjlMXu5G4jNzKgt26o1qFzm4nU+EqNaOfazhKplqXTu05e2PNnbAIY18c+Dmc08F8Jn+4uKgNrEttwZQVj3Ra+iuwbcj7alc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iN2Guluy; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1733400046; c=relaxed/simple;
+	bh=jy5l1IRkBdan3YFDFpWKY5RXf6f8n9rw8iF2OYMlFTo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=lex3cFaByPsnGvu/5jxqdrQF3iY/HUxwR9q1FzgEJ2Q5BiZAnlOteB4hxfuobC/kzfKQvPFZtKghlHC6OwfTPvE8eluJTjimryaDzrEsR2ChLeZaD9UBxHi0oJZpZb/kJ0JAhARaHRCufaLf0pBlS0COa6Pmkq0XwvHWJiqa6NI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=FCyE4sJF; arc=none smtp.client-ip=209.85.167.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iN2Guluy"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id ABEAFC4CED1;
-	Thu,  5 Dec 2024 11:18:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733397493;
-	bh=03418Nmjp7L7uNRQ/VmAj+UPzNS51bahbk7mIDpWr7Q=;
-	h=Date:From:Cc:To:In-Reply-To:References:Subject:From;
-	b=iN2GuluyByYZ/wLneFG9wJ5ByKuXB2FiMRkddeQp8mBIrvgrr9clb4Gh35KlxCuaZ
-	 FRBvZ95aXOkgVxS66s9CxGKYsNfkdExNH9J5l3/Hdg0mipMXKjp44wEV8Jiu9R0GVW
-	 iY6M5mejSUHPSjWzuX3e3evBzETE0tG1NfRYoFNr6M9JyLq2EHCUDzulqcXPs373UR
-	 Vc00/Xyl5bXBbRg0UFRJM8ooi3o4odpc8IhLzSzeOKhhtOVzfFjpQISzF73fUZ5zLw
-	 SYezLCysfB7ZfDH2NeHiKWcbS84LJo/YBrEjBoRea7gpcPhkYF1agyIjXNzZYepPQS
-	 aC6Pl4VmNV/IA==
-Date: Thu, 05 Dec 2024 05:18:12 -0600
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="FCyE4sJF"
+Received: by mail-lf1-f45.google.com with SMTP id 2adb3069b0e04-53dde5262fdso1068401e87.2
+        for <linux-bluetooth@vger.kernel.org>; Thu, 05 Dec 2024 04:00:44 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1733400042; x=1734004842; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=z6suNLAdL6iq6mhldu8rnJx9YHc+2BLsoEolOU1ixOc=;
+        b=FCyE4sJFf8K6ELnDdfNHX4X2HiBv1huFKjcAE+6mmYfGAYonLqddj3/l5C242PGNP0
+         Vyj+pOFUjW5LJlCgdF06M7gzG4ONiUw9HSTHoTNLBaJ+IdKtaCsixbOZVxDDpK0jtNvv
+         VGRcypgRyoAhfqYJfZuviMKvijq8x97cAJ8DsxBGwL2PWb7XJWj6d9rxQQUgYWI0p0Zt
+         1Lw6gRbaKZEQyMdRIeCwl+wozA0AL+Fyg/DR/dOt2W2+YsGhnUV0oBeY3hKqCfl6GcVx
+         5Pa9qu1AkwhhuRlo96YdChVCsx52q+igeDqm8/LK8o0pozvDp0GSyWWjgFZGz6xv/+0g
+         KCkQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733400042; x=1734004842;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=z6suNLAdL6iq6mhldu8rnJx9YHc+2BLsoEolOU1ixOc=;
+        b=hAnKYbghG5bT2kKF5qH78Sp2T2PTsJaPIl+1dV9Z21pgq3xMCSU7m3f6zQyhN2IdCa
+         nNtnQKJleCCjYWBNdFuZjfv8A1ehqquYBV6Npm9QxlLmg8rokpWMociV3qR9YFlxCZY+
+         MF1Okw5XxXlBnJaV0WpgT1Dt2nBSPTDCunkr/1A/70Kw5k4NawZ2cjt1C6HeA5fqWhTV
+         kSTgrSIU73zgvzjWEgowv24s+vsWjwY2Na3vB01c1L9ukQkpyrX+vuFD/I6sz3gRdbEx
+         vY5+1TzaxcfiIME7euPkzzdkDfxH9KfynXtXswYUL4gi3aUf9ccVEv1isiYlZdJr4Cj3
+         DDOQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWNIa0Gjij3Yf0T3dBPzxbFxGtF72t3z74DLVvFGCZBcXkXP6vM8RWybTylTCku+JcEjQekzaSrgnkjtPuJOL0=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy5T2LG6u0buTgKgPCFjNBOCGvFz+YOYuPd8fWmBORMXZ5w074y
+	sNxMqjEVotynGA+u70w3fnmyFUMPJOuu3pfFXIxrxighxxGV17xLYVcAhvu3E70=
+X-Gm-Gg: ASbGncvgmOa64KmbgDlLytH5ceZfC+QgcsUhgmU1vtfbFIQgk5U1wGl3vE/oq29mLMI
+	JZF1wrD+DL8DI5NSLePTkh/dfMMs5C8ylhe5+2MkX4skgt4RfagiJaLIPDd47la8sPvWizYHYZf
+	cmoAumNDXbT0g8FpMarMUYRLEVrubWajvBU1ysORgZFVxfNnCH2pTx/bRbTvlR0WuyEsTdypNcp
+	0ImZodt0B8SnSmO/cByyDtljhCZC/p6D5BHcmgswMMmKmoIcPfcOvNLY8epQyuAZ4FBA7L2uhTR
+	AgPZYlIdD8MV2OecWdH0flkeHs3BDA==
+X-Google-Smtp-Source: AGHT+IH/jMWnHzHDtVHudJFI//O37YyqyI3jX/kVCBVp/uMI+flmxz6qJJl5fiLYeUGJIvg9QO2hAQ==
+X-Received: by 2002:a05:6512:1324:b0:53e:21c7:dcd0 with SMTP id 2adb3069b0e04-53e21c7dd44mr1221662e87.17.1733400042445;
+        Thu, 05 Dec 2024 04:00:42 -0800 (PST)
+Received: from eriador.lumag.spb.ru (2001-14ba-a0c3-3a00--b8c.rev.dnainternet.fi. [2001:14ba:a0c3:3a00::b8c])
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-53e229ba710sm219360e87.140.2024.12.05.04.00.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 05 Dec 2024 04:00:41 -0800 (PST)
+Date: Thu, 5 Dec 2024 14:00:38 +0200
+From: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
+To: Cheng Jiang <quic_chejiang@quicinc.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>, 
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Rob Herring <robh@kernel.org>, 
+	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Bjorn Andersson <andersson@kernel.org>, Konrad Dybcio <konradybcio@kernel.org>, 
+	Balakrishna Godavarthi <quic_bgodavar@quicinc.com>, Rocky Liao <quic_rjliao@quicinc.com>, 
+	linux-bluetooth@vger.kernel.org, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-arm-msm@vger.kernel.org, quic_jiaymao@quicinc.com, quic_shuaz@quicinc.com, 
+	quic_zijuhu@quicinc.com, quic_mohamull@quicinc.com
+Subject: Re: [PATCH v3 2/3] Bluetooth: qca: Expand firmware-name to load
+ specific nvm and rampatch
+Message-ID: <w7r4itwyrh3jva3rx3kmsm4kqtawqkgkneqrlin4hpjkqb3deo@2qmjd3ijzqn3>
+References: <20241205102213.1281865-1-quic_chejiang@quicinc.com>
+ <20241205102213.1281865-3-quic_chejiang@quicinc.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: "Rob Herring (Arm)" <robh@kernel.org>
-Cc: quic_shuaz@quicinc.com, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
- Conor Dooley <conor+dt@kernel.org>, linux-bluetooth@vger.kernel.org, 
- linux-arm-msm@vger.kernel.org, quic_jiaymao@quicinc.com, 
- Marcel Holtmann <marcel@holtmann.org>, 
- Konrad Dybcio <konradybcio@kernel.org>, 
- Krzysztof Kozlowski <krzk+dt@kernel.org>, quic_zijuhu@quicinc.com, 
- Rocky Liao <quic_rjliao@quicinc.com>, devicetree@vger.kernel.org, 
- Balakrishna Godavarthi <quic_bgodavar@quicinc.com>, 
- Bjorn Andersson <andersson@kernel.org>, quic_mohamull@quicinc.com, 
- linux-kernel@vger.kernel.org
-To: Cheng Jiang <quic_chejiang@quicinc.com>
-In-Reply-To: <20241205102213.1281865-2-quic_chejiang@quicinc.com>
-References: <20241205102213.1281865-1-quic_chejiang@quicinc.com>
- <20241205102213.1281865-2-quic_chejiang@quicinc.com>
-Message-Id: <173339749198.2690453.6235486221062242906.robh@kernel.org>
-Subject: Re: [PATCH v3 1/3] dt-bindings: net: bluetooth: qca: Expand
- firmware-name property
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241205102213.1281865-3-quic_chejiang@quicinc.com>
 
-
-On Thu, 05 Dec 2024 18:22:11 +0800, Cheng Jiang wrote:
-> Expand the firmware-name property to specify the names of NVM and
-> rampatch firmware to load. This update will support loading specific
-> firmware (nvm and rampatch) for certain chips, like the QCA6698
-> Bluetooth chip, which shares the same IP core as the WCN6855 but has
-> different RF components and RAM sizes, requiring new firmware files.
+On Thu, Dec 05, 2024 at 06:22:12PM +0800, Cheng Jiang wrote:
+> The firmware-name property has been expanded to specify the names of NVM
+> and rampatch firmware for certain chips, such as the QCA6698 Bluetooth
+> chip. Although it shares the same IP core as the WCN6855, the QCA6698
+> has different RF components and RAM sizes, necessitating new firmware
+> files. This change allows for the configuration of NVM and rampatch in
+> DT.
 > 
-> We might use different connectivity boards on the same platform. For
+> Different connectivity boards may be attached to the same platform. For
 > example, QCA6698-based boards can support either a two-antenna or
 > three-antenna solution, both of which work on the sa8775p-ride platform.
 > Due to differences in connectivity boards and variations in RF
 > performance from different foundries, different NVM configurations are
 > used based on the board ID.
+
+Two separate commits, one for NVM, another one for RAM patch.
+
 > 
-> So In firmware-name, if the NVM file has an extension, the NVM file will
-> be used. Otherwise, the system will first try the .bNN (board ID) file,
-> and if that fails, it will fall back to the .bin file.
+> Therefore, in the firmware-name property, if the NVM file has an
+> extension, the NVM file will be used. Otherwise, the system will first
+> try the .bNN (board ID) file, and if that fails, it will fall back to
+> the .bin file.
 > 
 > Possible configurations:
 > firmware-name = "QCA6698/hpnv21.bin", "QCA6698/hpbtfw21.tlv";
@@ -80,39 +112,321 @@ On Thu, 05 Dec 2024 18:22:11 +0800, Cheng Jiang wrote:
 > 
 > Signed-off-by: Cheng Jiang <quic_chejiang@quicinc.com>
 > ---
->  .../devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml   | 2 ++
->  1 file changed, 2 insertions(+)
+>  drivers/bluetooth/btqca.c   | 154 ++++++++++++++++++++++++++----------
+>  drivers/bluetooth/btqca.h   |   5 +-
+>  drivers/bluetooth/hci_qca.c |  21 ++++-
+>  3 files changed, 134 insertions(+), 46 deletions(-)
+> 
+> diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
+> index dfbbac922..e8b89b8cc 100644
+> --- a/drivers/bluetooth/btqca.c
+> +++ b/drivers/bluetooth/btqca.c
+> @@ -272,6 +272,31 @@ int qca_send_pre_shutdown_cmd(struct hci_dev *hdev)
+>  }
+>  EXPORT_SYMBOL_GPL(qca_send_pre_shutdown_cmd);
+>  
+> +static int qca_get_alt_nvm_path(char *path, size_t max_size)
+
+int is usually for errors, the code suggests bool return type.
+
+> +{
+> +	char fwname[64];
+> +	const char *suffix;
+> +
+> +	suffix = strrchr(path, '.');
+> +
+> +	if (!suffix)
+> +		return 0;
+> +
+> +	strscpy(fwname, path, strlen(path));
+
+64 bytes ought to be enough for anybody, correct?
+
+> +	fwname[suffix - path] = 0;
+
+with path = "qcom/sc7180/Oh.My.Device/name" this is broken.
+
+> +
+> +	snprintf(fwname, sizeof(fwname), "%s.bin", fwname);
+> +
+> +	/* If nvm file is already the default one, return false to
+> +	 * skip the retry.
+> +	 */
+> +	if (strcmp(fwname, path) == 0)
+> +		return 0;
+> +
+> +	snprintf(path, max_size, "%s", fwname);
+> +	return 1;
+> +}
+> +
+>  static int qca_tlv_check_data(struct hci_dev *hdev,
+>  			       struct qca_fw_config *config,
+>  			       u8 *fw_data, size_t fw_size,
+> @@ -564,6 +589,19 @@ static int qca_download_firmware(struct hci_dev *hdev,
+>  					   config->fwname, ret);
+>  				return ret;
+>  			}
+> +		}
+> +		/* For nvm, if desired nvm file is not present and it's not the
+> +		 * default nvm file(ends with .bin), try to load the default nvm.
+> +		 */
+> +		else if (config->type == TLV_TYPE_NVM &&
+> +			 qca_get_alt_nvm_path(config->fwname, sizeof(config->fwname))) {
+
+Please, don't rewrite the config. The file may be not present now, but
+it will reappear later (e.g. when rootfs gets mounted).
+
+> +			bt_dev_info(hdev, "QCA Downloading %s", config->fwname);
+> +			ret = request_firmware(&fw, config->fwname, &hdev->dev);
+> +			if (ret) {
+> +				bt_dev_err(hdev, "QCA Failed to request file: %s (%d)",
+> +					   config->fwname, ret);
+> +				return ret;
+> +			}
+>  		} else {
+>  			bt_dev_err(hdev, "QCA Failed to request file: %s (%d)",
+>  				   config->fwname, ret);
+> @@ -730,15 +768,38 @@ static inline void qca_get_nvm_name_generic(struct qca_fw_config *cfg,
+>  			 "qca/%snv%02x.b%02x", stem, rom_ver, bid);
+>  }
+>  
+> +static void qca_get_nvm_name_by_board(char *fwname, size_t max_size,
+> +		const char *firmware_name, struct qca_btsoc_version ver,
+> +		enum qca_btsoc_type soc_type, u16 bid)
+> +{
+> +	const char *variant;
+> +
+> +	/* Set the variant to empty by default */
+> +	variant = "";
+> +	/* hsp gf chip */
+> +	if (soc_type == QCA_WCN6855) {
+> +		if ((le32_to_cpu(ver.soc_id) & QCA_HSP_GF_SOC_MASK) == QCA_HSP_GF_SOC_ID)
+> +			variant = "g";
+
+Didn't you get the 'set but unused' here?
+
+> +	}
+> +
+> +	if (bid == 0x0)
+
+0x0 or 0xff?
+
+> +		snprintf(fwname, max_size, "qca/%s.bin", firmware_name);
+> +	else if (bid & 0xff00)
+> +		snprintf(fwname, max_size, "qca/%s.b%x", firmware_name, bid);
+
+Doesn't ".b%02x" work in this case too?
+
+> +	else
+> +		snprintf(fwname, max_size, "qca/%s.b%02x", firmware_name, bid);
+> +}
+> +
+>  int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
+>  		   enum qca_btsoc_type soc_type, struct qca_btsoc_version ver,
+> -		   const char *firmware_name)
+> +		   const char *firmware_name, const char *rampatch_name)
+>  {
+>  	struct qca_fw_config config = {};
+>  	int err;
+>  	u8 rom_ver = 0;
+>  	u32 soc_ver;
+>  	u16 boardid = 0;
+> +	const char *suffix;
+>  
+>  	bt_dev_dbg(hdev, "QCA setup on UART");
+>  
+> @@ -761,44 +822,48 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
+>  
+>  	/* Download rampatch file */
+>  	config.type = TLV_TYPE_PATCH;
+> -	switch (soc_type) {
+> -	case QCA_WCN3990:
+> -	case QCA_WCN3991:
+> -	case QCA_WCN3998:
+> -		snprintf(config.fwname, sizeof(config.fwname),
+> -			 "qca/crbtfw%02x.tlv", rom_ver);
+> -		break;
+> -	case QCA_WCN3988:
+> -		snprintf(config.fwname, sizeof(config.fwname),
+> -			 "qca/apbtfw%02x.tlv", rom_ver);
+> -		break;
+> -	case QCA_QCA2066:
+> -		snprintf(config.fwname, sizeof(config.fwname),
+> -			 "qca/hpbtfw%02x.tlv", rom_ver);
+> -		break;
+> -	case QCA_QCA6390:
+> -		snprintf(config.fwname, sizeof(config.fwname),
+> -			 "qca/htbtfw%02x.tlv", rom_ver);
+> -		break;
+> -	case QCA_WCN6750:
+> -		/* Choose mbn file by default.If mbn file is not found
+> -		 * then choose tlv file
+> -		 */
+> -		config.type = ELF_TYPE_PATCH;
+> -		snprintf(config.fwname, sizeof(config.fwname),
+> -			 "qca/msbtfw%02x.mbn", rom_ver);
+> -		break;
+> -	case QCA_WCN6855:
+> -		snprintf(config.fwname, sizeof(config.fwname),
+> -			 "qca/hpbtfw%02x.tlv", rom_ver);
+> -		break;
+> -	case QCA_WCN7850:
+> -		snprintf(config.fwname, sizeof(config.fwname),
+> -			 "qca/hmtbtfw%02x.tlv", rom_ver);
+> -		break;
+> -	default:
+> -		snprintf(config.fwname, sizeof(config.fwname),
+> -			 "qca/rampatch_%08x.bin", soc_ver);
+> +	if (rampatch_name) {
+> +		snprintf(config.fwname, sizeof(config.fwname), "qca/%s", rampatch_name);
+> +	} else {
+> +		switch (soc_type) {
+> +		case QCA_WCN3990:
+> +		case QCA_WCN3991:
+> +		case QCA_WCN3998:
+> +			snprintf(config.fwname, sizeof(config.fwname),
+> +				 "qca/crbtfw%02x.tlv", rom_ver);
+> +			break;
+> +		case QCA_WCN3988:
+> +			snprintf(config.fwname, sizeof(config.fwname),
+> +				 "qca/apbtfw%02x.tlv", rom_ver);
+> +			break;
+> +		case QCA_QCA2066:
+> +			snprintf(config.fwname, sizeof(config.fwname),
+> +				 "qca/hpbtfw%02x.tlv", rom_ver);
+> +			break;
+> +		case QCA_QCA6390:
+> +			snprintf(config.fwname, sizeof(config.fwname),
+> +				 "qca/htbtfw%02x.tlv", rom_ver);
+> +			break;
+> +		case QCA_WCN6750:
+> +			/* Choose mbn file by default.If mbn file is not found
+> +			 * then choose tlv file
+> +			 */
+> +			config.type = ELF_TYPE_PATCH;
+> +			snprintf(config.fwname, sizeof(config.fwname),
+> +				 "qca/msbtfw%02x.mbn", rom_ver);
+> +			break;
+> +		case QCA_WCN6855:
+> +			snprintf(config.fwname, sizeof(config.fwname),
+> +				 "qca/hpbtfw%02x.tlv", rom_ver);
+> +			break;
+> +		case QCA_WCN7850:
+> +			snprintf(config.fwname, sizeof(config.fwname),
+> +				 "qca/hmtbtfw%02x.tlv", rom_ver);
+> +			break;
+> +		default:
+> +			snprintf(config.fwname, sizeof(config.fwname),
+> +				 "qca/rampatch_%08x.bin", soc_ver);
+> +		}
+>  	}
+>  
+>  	err = qca_download_firmware(hdev, &config, soc_type, rom_ver);
+> @@ -816,8 +881,15 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
+>  	/* Download NVM configuration */
+>  	config.type = TLV_TYPE_NVM;
+>  	if (firmware_name) {
+> -		snprintf(config.fwname, sizeof(config.fwname),
+> -			 "qca/%s", firmware_name);
+> +		/* The firmware name has suffix, use it directly */
+> +		suffix = strrchr(firmware_name, '.');
+> +		if (suffix && *(suffix + 1) != '\0' && *(suffix + 1) != '.') {
+> +			snprintf(config.fwname, sizeof(config.fwname), "qca/%s", firmware_name);
+> +		} else {
+> +			qca_read_fw_board_id(hdev, &boardid);
+> +			qca_get_nvm_name_by_board(config.fwname, sizeof(config.fwname),
+> +				 firmware_name, ver, soc_type, boardid);
+> +		}
+>  	} else {
+>  		switch (soc_type) {
+>  		case QCA_WCN3990:
+> diff --git a/drivers/bluetooth/btqca.h b/drivers/bluetooth/btqca.h
+> index bb5207d7a..9d28c8800 100644
+> --- a/drivers/bluetooth/btqca.h
+> +++ b/drivers/bluetooth/btqca.h
+> @@ -161,7 +161,7 @@ enum qca_btsoc_type {
+>  int qca_set_bdaddr_rome(struct hci_dev *hdev, const bdaddr_t *bdaddr);
+>  int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
+>  		   enum qca_btsoc_type soc_type, struct qca_btsoc_version ver,
+> -		   const char *firmware_name);
+> +		   const char *firmware_name, const char *rampatch_name);
+>  int qca_read_soc_version(struct hci_dev *hdev, struct qca_btsoc_version *ver,
+>  			 enum qca_btsoc_type);
+>  int qca_set_bdaddr(struct hci_dev *hdev, const bdaddr_t *bdaddr);
+> @@ -176,7 +176,8 @@ static inline int qca_set_bdaddr_rome(struct hci_dev *hdev, const bdaddr_t *bdad
+>  static inline int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
+>  				 enum qca_btsoc_type soc_type,
+>  				 struct qca_btsoc_version ver,
+> -				 const char *firmware_name)
+> +				 const char *firmware_name,
+> +				 const char *rampatch_name)
+>  {
+>  	return -EOPNOTSUPP;
+>  }
+> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+> index 37129e6cb..c566d0bf2 100644
+> --- a/drivers/bluetooth/hci_qca.c
+> +++ b/drivers/bluetooth/hci_qca.c
+> @@ -229,6 +229,7 @@ struct qca_serdev {
+>  	u32 oper_speed;
+>  	bool bdaddr_property_broken;
+>  	const char *firmware_name;
+> +	const char *rampatch_name;
+>  };
+>  
+>  static int qca_regulator_enable(struct qca_serdev *qcadev);
+> @@ -264,6 +265,17 @@ static const char *qca_get_firmware_name(struct hci_uart *hu)
+>  	}
+>  }
+>  
+> +static const char *qca_get_rampatch_name(struct hci_uart *hu)
+> +{
+> +	if (hu->serdev) {
+> +		struct qca_serdev *qsd = serdev_device_get_drvdata(hu->serdev);
+> +
+> +		return qsd->rampatch_name;
+> +	} else {
+> +		return NULL;
+> +	}
+> +}
+> +
+>  static void __serial_clock_on(struct tty_struct *tty)
+>  {
+>  	/* TODO: Some chipset requires to enable UART clock on client
+> @@ -1855,6 +1867,7 @@ static int qca_setup(struct hci_uart *hu)
+>  	unsigned int retries = 0;
+>  	enum qca_btsoc_type soc_type = qca_soc_type(hu);
+>  	const char *firmware_name = qca_get_firmware_name(hu);
+> +	const char *rampatch_name = qca_get_rampatch_name(hu);
+>  	int ret;
+>  	struct qca_btsoc_version ver;
+>  	struct qca_serdev *qcadev;
+> @@ -1963,7 +1976,7 @@ static int qca_setup(struct hci_uart *hu)
+>  
+>  	/* Setup patch / NVM configurations */
+>  	ret = qca_uart_setup(hdev, qca_baudrate, soc_type, ver,
+> -			firmware_name);
+> +			firmware_name, rampatch_name);
+>  	if (!ret) {
+>  		clear_bit(QCA_IBS_DISABLED, &qca->flags);
+>  		qca_debugfs_init(hdev);
+> @@ -2309,8 +2322,10 @@ static int qca_serdev_probe(struct serdev_device *serdev)
+>  	qcadev->serdev_hu.serdev = serdev;
+>  	data = device_get_match_data(&serdev->dev);
+>  	serdev_device_set_drvdata(serdev, qcadev);
+> -	device_property_read_string(&serdev->dev, "firmware-name",
+> -					 &qcadev->firmware_name);
+> +	of_property_read_string_index(serdev->dev.of_node, "firmware-name",
+> +					 0, &qcadev->firmware_name);
+> +	of_property_read_string_index(serdev->dev.of_node, "firmware-name",
+> +					 1, &qcadev->rampatch_name);
+>  	device_property_read_u32(&serdev->dev, "max-speed",
+>  				 &qcadev->oper_speed);
+>  	if (!qcadev->oper_speed)
+> -- 
+> 2.25.1
 > 
 
-My bot found errors running 'make dt_binding_check' on your patch:
-
-yamllint warnings/errors:
-./Documentation/devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml:106:5: [error] duplication of key "description" in mapping (key-duplicates)
-
-dtschema/dtc warnings/errors:
-/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml: ignoring, error parsing file
-./Documentation/devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml:106:5: found duplicate key "description" with value "specify the name of rampatch firmware to load" (original value: "specify the name of nvm firmware to load")
-make[2]: *** Deleting file 'Documentation/devicetree/bindings/net/bluetooth/qualcomm-bluetooth.example.dts'
-Documentation/devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml:106:5: found duplicate key "description" with value "specify the name of rampatch firmware to load" (original value: "specify the name of nvm firmware to load")
-make[2]: *** [Documentation/devicetree/bindings/Makefile:26: Documentation/devicetree/bindings/net/bluetooth/qualcomm-bluetooth.example.dts] Error 1
-make[2]: *** Waiting for unfinished jobs....
-make[1]: *** [/builds/robherring/dt-review-ci/linux/Makefile:1506: dt_binding_check] Error 2
-make: *** [Makefile:251: __sub-make] Error 2
-
-doc reference errors (make refcheckdocs):
-
-See https://patchwork.ozlabs.org/project/devicetree-bindings/patch/20241205102213.1281865-2-quic_chejiang@quicinc.com
-
-The base for the series is generally the latest rc1. A different dependency
-should be noted in *this* patch.
-
-If you already ran 'make dt_binding_check' and didn't see the above
-error(s), then make sure 'yamllint' is installed and dt-schema is up to
-date:
-
-pip3 install dtschema --upgrade
-
-Please check and re-submit after running the above command yourself. Note
-that DT_SCHEMA_FILES can be set to your schema file to speed up checking
-your schema. However, it must be unset to test all examples with your schema.
-
+-- 
+With best wishes
+Dmitry
