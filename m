@@ -1,275 +1,141 @@
-Received: from smtp-relay-internal-1.canonical.com (smtp-relay-internal-1.canonical.com [185.125.188.123])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f171.google.com (mail-qk1-f171.google.com [209.85.222.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C1871B218C
-	for <linux-bluetooth@vger.kernel.org>; Thu,  5 Dec 2024 07:17:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.123
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B6641917EE
+	for <linux-bluetooth@vger.kernel.org>; Thu,  5 Dec 2024 07:56:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733383069; cv=none; b=qjeJvpUTXBi0qNOX8txD0W6fN1+V+9VB5t9ro5Az+W8Ft/bNMQ61bOjzaw8ia5rSoawD6/RnNeaTcb8aoaYaBzuFEWchDA55vqboji99H8aRE6sQfwt8uAkUWi/Gsgj2XCuOfZUrhT6rN1f4J+EPxcvfKkzL4HdJbsQEk/2lnmM=
+	t=1733385381; cv=none; b=AD0V8XJesOIexWW4rp767IrDpulhkcNwVc1xJiDL/aPKCNrUDSOb68gxrj9Y/XaDNNrI5wRolQVDI2MF6mGI/U3ncm/09OwNdjBMdNW7t+uvVKh/AfUUWa4hu8yEkGWTvXWPCOUiZVPc8tE4vAkntYYcohHjso7u7cMYhrbJaRw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733383069; c=relaxed/simple;
-	bh=tCAmYwcPUUuakZw/lHI+qHX63POcQUnz7J3kWSWQjRs=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Wz48JXxmn3ZWBQsyQLyuCbyuAmwBlLo7/hNQ8AViYXg85j14647NmVLnBJH17bon3/+R1ZoZskZ5Uy/wIigL4guGg1eS7IUtZsc3wrT7Ec/uuDHxSGTOilQe8qlG/L9X4jBeFUlx3cLQgVAXrnwE23CZW2PJCBai041rVdW78Nk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b=KlyrK9XI; arc=none smtp.client-ip=185.125.188.123
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
+	s=arc-20240116; t=1733385381; c=relaxed/simple;
+	bh=uxWpfG/NXHBm4ssiM3/LOhpBg8la1lGhxcwYXX0bBKc=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=o1fk5sR1QdaB0y997So8oHLtQ2QI6CZ5EcZ+pmOul4Tza0qcY9UZRVu7XA2QMjZ+w8yKKw3kHOgBuLneofYElSVefTVC47Q9g9bL7KofCXILj4MxqeoRg77emYVvDZIPZbZ0vH3NwmgIpF4Yq53p/gwKR+XGhk4XmSPbz3faUTU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RmbSBmaL; arc=none smtp.client-ip=209.85.222.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="KlyrK9XI"
-Received: from mail-ot1-f70.google.com (mail-ot1-f70.google.com [209.85.210.70])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-relay-internal-1.canonical.com (Postfix) with ESMTPS id 601793F766
-	for <linux-bluetooth@vger.kernel.org>; Thu,  5 Dec 2024 07:17:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-	s=20210705; t=1733383057;
-	bh=uafyawx0PXFiUu2BYekHpyweJ4XNWrmQFuMU5DXhLa0=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version;
-	b=KlyrK9XI1n9/TbdXtrrbizxUonwc5sUDl8rRSqn6O6y33+SklOJ39yH8K0NxKYmK9
-	 TxuYwH3SHRuiITKP9Gr9tRO1eDmKGq+UqJJsHtrVni2DFNAxLGPYm2eq3sI07pm5ZH
-	 Xr9CHPlDPcB6oB+PBxRDSPlP2cZMPDakt5LdjqiQVIS5gnDIZlm+Tf6nMM7DZf4IdF
-	 J0M+pjjbFFpiu+LKZCz+Lfizm5V5r2coWbdB2N7ooBnd4QGusDi4+7qK0ikOrjubbS
-	 tSHIqI3F7nIuzNEp85RjNezN4ETVsOWB3N9SBUGwwweux7R8D/lMhwk1YMLAp2RZeh
-	 waXA2GX1Nte1A==
-Received: by mail-ot1-f70.google.com with SMTP id 46e09a7af769-71d46c2ead8so523831a34.3
-        for <linux-bluetooth@vger.kernel.org>; Wed, 04 Dec 2024 23:17:37 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RmbSBmaL"
+Received: by mail-qk1-f171.google.com with SMTP id af79cd13be357-7b66d08d529so60242085a.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 04 Dec 2024 23:56:19 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1733385378; x=1733990178; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=fVMKeG2BU1k+f8hZOsNmEcpXp9HT7LYkGQByxGZdszQ=;
+        b=RmbSBmaLCM6TnUsWEdHvHJJr9rEznSnnu26KAGQlhOt06Lp+40teC+JmKxv3Ut60AI
+         qNr+UCC6AMP61XuFCNDiEvCppQqVkW3mNjlFAsezCWRNtsV7BnCS6+b76++aVofzc/M+
+         1/PuTKPo4AN2ehciYmcVs+c4wOF8Lc7DKg0Ajju5fH4A4DisjFHmFUhd+UyPIpB2Xlf8
+         yEQFCFL4hL4VKc3Do3y7gV6BRjlVY7DIQzZ80G7cteGjjZy2thtmQUMleBia7z4zuxMK
+         rUafbQp9PhvRWSj0XE7HF38TlDhjvgZ1OnnwxqyDCUW2N4Od73S4/GoneKHMjkmk+uiv
+         Axfg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733383055; x=1733987855;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=uafyawx0PXFiUu2BYekHpyweJ4XNWrmQFuMU5DXhLa0=;
-        b=LLusH/MW/gXKEWRH7jdDgYy0oeagW2aQiBa9RW+n4ZwiySr5qBL4j8kLdDI6bD0EP7
-         HrBlMkZ962wdNGC04XKrDfaR0klMPBkDf2xl+6Y7qFUVIkj67APplJZSOFS3MiUI8G+D
-         Vk+JEaXzD0TTwSxPJWHffXB47IF5jvcmn+JHRqQ4EbdfqUyab5E0O65RN4ODzCgOAI6y
-         OGsZ7GsrqHZC7tN5XVrWXWmhzXTQoXDmLcdxiYtes1PoBHdeI18UEuYPdPY+jpp+wXjm
-         cowQyALP9l2NLnelrXptYpjTnSO+//+f01vZ63dyzHG5HIo/czU+LfItdVmz0x3yBS6p
-         hy9Q==
-X-Forwarded-Encrypted: i=1; AJvYcCU3iXa7orUSGuICjqdfSLmKubDDCCouB3cAEpI/5t4zxuj6ibRtkMfsaAXbsR4soMiXDOSyEqoMsBZ+IQmi9uU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxDOgjVtWBXDsPzbQI0GJfwNbR6QIgS/FuOcIdO4t6MdTuZSzL5
-	BgFCJzVABbo3yrvSQUTOMJt7YoXdGvgcbBpzVOl8oLKDhfWOz35O3eShQhAyaKWVDzZbS/QtVuo
-	wZJkQYQj7oP+YRezCkZIF3p1SvifJStCCbZWjWDjXX3OQi5dIdSuf5NhOtCvjwN5PalAs29/XZN
-	m31hurgHiC4G72NA==
-X-Gm-Gg: ASbGncu7ODRQbMNotsV5putdcqo9CaCHNTE5SK3YVBd10eHKtxJ+4+3/vDfEFoQmYNr
-	p6oS8Wo6iv+WtQvU9NdOp+vl2NfB0Y9qCLXOJ0CTBEsEbkhhmUETJGGx6nJWGRqez8ZRx3mWwJc
-	TVkvxVIoykfhNEIkv5wPNGZhHkiPmdOJjgd6tCaWsjLuWnKWfrnGaFCOXeanyvekMGDzyDKphXH
-	NCpCGxTP+1VFcLZT6L2Gli0EHxFOR4PEKPwyuOTyWmYYnFVu6wR30sAijJerQQ0vfzpyUVLpzVZ
-	wJuU6kkPWn8oMSxuByla4nZKadzx4qR0hNg6dlW4Yc59G2l4/Lad
-X-Received: by 2002:a05:6830:264e:b0:71d:5983:8827 with SMTP id 46e09a7af769-71dad6d3bb3mr10216251a34.19.1733383055608;
-        Wed, 04 Dec 2024 23:17:35 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFCd0BmpC+PZMTubC54bMDVhvpw3j3A3q/DZBKccq+qL7noJolQS2hLkQ9G0hYcYL2yXgJzxw==
-X-Received: by 2002:a05:6830:264e:b0:71d:5983:8827 with SMTP id 46e09a7af769-71dad6d3bb3mr10216240a34.19.1733383055300;
-        Wed, 04 Dec 2024 23:17:35 -0800 (PST)
-Received: from rickywu0421-ThinkPad-X1-Carbon-Gen-11.. (118-163-61-247.hinet-ip.hinet.net. [118.163.61.247])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7fd156fb8fcsm573909a12.40.2024.12.04.23.17.33
+        d=1e100.net; s=20230601; t=1733385378; x=1733990178;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=fVMKeG2BU1k+f8hZOsNmEcpXp9HT7LYkGQByxGZdszQ=;
+        b=Wc8DSqAK3ElucMPcH6rNf59NIkTas+NQtAxK4rjKWEUgHzKtCK0BDxduZq7UdwfDZm
+         c8wDmwZIu0vl7DzlILuF8l5Kjm1ef860ZYlCvrbEGoWvqVaWWJ96og6iagWvci5DwK3z
+         9L2ojkfiHA9lZrfIG3EKJ3adqFMLtzd2eesz/fSR/5NFWwxU1MBpj8Vk9nCkIY7fgmNg
+         GOWm1bWkxApEctIKEDOqfuFXg0X49q/DKTM+JxzEPm+eG80F7Q6Cjrsu+PU9HiCJeMt9
+         qQhTQdqp0DZXD70ahOL1k2Tr6wTII4eRqqtcNVpAdxW0GHZCBlwKXR7Ch0310ii9WNFN
+         V7CQ==
+X-Gm-Message-State: AOJu0YwR5NhubF7NBM2zYjB24Od+I8lMTpwFHCcvaIh4FlEBCc/fg/iq
+	p/fvDtxAq8tx7bvUEpXr+mK8USXMebaeuUIDT8jJujNq5oMuB1fHl2feIg==
+X-Gm-Gg: ASbGncsgYkxWBOLm2DT4XWiGMZnSxXKJr1xgkusrpxITG9HElM8tUK6wuOFAgS2ILAa
+	ZNjNxYzEHtMW139FqavNZyglG0II3DkNrU4H+IfCr42tFcYQNSzADNJLb4Ra6TFlWo7zij9ySPh
+	e74ZIx3M07GPrAJZD+HdNhi8urJlD8eq8y082ut9cMqkpk3qoayctImECFEiqUb/AIYfQKUurnj
+	Uw8SGhCInM2Du0BbJ9bZ51O4TzKGTpjuOw1iB/viekfRV7L6tgdzaMd
+X-Google-Smtp-Source: AGHT+IHYRL10on5SzE4++kyXOXd3z+HVORIKOaaZvOTUPh4DimzzC76bgufEJw5lNF2KTBw/Qxx3dQ==
+X-Received: by 2002:a05:620a:3188:b0:7a6:75e6:3c21 with SMTP id af79cd13be357-7b6b414c1d4mr330688285a.1.1733385377996;
+        Wed, 04 Dec 2024 23:56:17 -0800 (PST)
+Received: from [172.17.0.2] ([20.97.191.134])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-46729793741sm5271221cf.61.2024.12.04.23.56.17
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 04 Dec 2024 23:17:34 -0800 (PST)
-From: En-Wei Wu <en-wei.wu@canonical.com>
-To: marcel@holtmann.org,
-	luiz.dentz@gmail.com,
-	linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	pmenzel@molgen.mpg.de
-Cc: quic_tjiang@quicinc.com,
-	kuan-ying.lee@canonical.com,
-	anthony.wong@canonical.com
-Subject: [PATCH v3 1/2] Bluetooth: btusb: avoid NULL pointer dereference in skb_dequeue()
-Date: Thu,  5 Dec 2024 15:17:26 +0800
-Message-ID: <20241205071727.36710-2-en-wei.wu@canonical.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20241205071727.36710-1-en-wei.wu@canonical.com>
-References: <20241205071727.36710-1-en-wei.wu@canonical.com>
+        Wed, 04 Dec 2024 23:56:17 -0800 (PST)
+Message-ID: <67515ca1.c80a0220.2d1dc2.139e@mx.google.com>
+Date: Wed, 04 Dec 2024 23:56:17 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============0403561784702348346=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, en-wei.wu@canonical.com
+Subject: RE: Bluetooth: btusb: Fix QCA dump packet handling and improve SKB safety
+In-Reply-To: <20241205071727.36710-2-en-wei.wu@canonical.com>
+References: <20241205071727.36710-2-en-wei.wu@canonical.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-The WCN7851 (0489:e0f3) Bluetooth controller supports firmware crash dump
-collection through devcoredump. During this process, the crash dump data
-is queued to a dump queue as skb for further processing.
+--===============0403561784702348346==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-A NULL pointer dereference occurs in skb_dequeue() when processing the
-dump queue due to improper return value handling:
+This is automated email and please do not reply to this email!
 
-[ 93.672166] Bluetooth: hci0: ACL memdump size(589824)
+Dear submitter,
 
-[ 93.672475] BUG: kernel NULL pointer dereference, address: 0000000000000008
-[ 93.672517] Workqueue: hci0 hci_devcd_rx [bluetooth]
-[ 93.672598] RIP: 0010:skb_dequeue+0x50/0x80
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=914799
 
-The issue stems from handle_dump_pkt_qca() returning the wrong value on
-success. It currently returns the value from hci_devcd_init() 
-(0 on success), but callers expect > 0 to indicate successful 
-dump handling. This causes hci_recv_frame() to free the skb while 
-it's still queued for dump processing, leading to the NULL pointer 
-dereference when hci_devcd_rx() tries to dequeue it.
+---Test result---
 
-Fix this by:
+Test Summary:
+CheckPatch                    PENDING   0.26 seconds
+GitLint                       PENDING   0.19 seconds
+SubjectPrefix                 PASS      0.22 seconds
+BuildKernel                   PASS      25.86 seconds
+CheckAllWarning               PASS      27.05 seconds
+CheckSparse                   PASS      30.47 seconds
+BuildKernel32                 PASS      24.19 seconds
+TestRunnerSetup               PASS      434.56 seconds
+TestRunner_l2cap-tester       PASS      20.49 seconds
+TestRunner_iso-tester         FAIL      34.54 seconds
+TestRunner_bnep-tester        PASS      4.87 seconds
+TestRunner_mgmt-tester        PASS      121.33 seconds
+TestRunner_rfcomm-tester      PASS      7.74 seconds
+TestRunner_sco-tester         PASS      9.38 seconds
+TestRunner_ioctl-tester       PASS      8.20 seconds
+TestRunner_mesh-tester        PASS      6.11 seconds
+TestRunner_smp-tester         PASS      6.94 seconds
+TestRunner_userchan-tester    PASS      5.06 seconds
+IncrementalBuild              PENDING   0.39 seconds
 
-1. Making handle_dump_pkt_qca() return 0 on success and negative errno
-   on failure, consistent with other kernel interfaces
-2. Splitting dump packet detection into separate ACL and event functions
-   for better code organization and maintainability
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
 
-This prevents premature skb freeing by ensuring proper handling 
-of dump packets.
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
 
-Fixes: 20981ce2d5a5 ("Bluetooth: btusb: Add WCN6855 devcoredump support")
-Signed-off-by: En-Wei Wu <en-wei.wu@canonical.com>
+##############################
+Test: TestRunner_iso-tester - FAIL
+Desc: Run iso-tester with test-runner
+Output:
+WARNING: possible circular locking dependency detected
+Total: 125, Passed: 120 (96.0%), Failed: 1, Not Run: 4
+
+Failed Test Cases
+ISO Connect2 Suspend - Success                       Failed       4.258 seconds
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
+
+
+
 ---
- drivers/bluetooth/btusb.c | 97 ++++++++++++++++++++++++++++-----------
- 1 file changed, 69 insertions(+), 28 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 279fe6c115fa..2bfb915062cf 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -2930,22 +2930,16 @@ static void btusb_coredump_qca(struct hci_dev *hdev)
- 		bt_dev_err(hdev, "%s: triggle crash failed (%d)", __func__, err);
- }
- 
--/*
-- * ==0: not a dump pkt.
-- * < 0: fails to handle a dump pkt
-- * > 0: otherwise.
-- */
-+/* Return: 0 on success, negative errno on failure. */
- static int handle_dump_pkt_qca(struct hci_dev *hdev, struct sk_buff *skb)
- {
--	int ret = 1;
-+	int ret = 0;
- 	u8 pkt_type;
- 	u8 *sk_ptr;
- 	unsigned int sk_len;
- 	u16 seqno;
- 	u32 dump_size;
- 
--	struct hci_event_hdr *event_hdr;
--	struct hci_acl_hdr *acl_hdr;
- 	struct qca_dump_hdr *dump_hdr;
- 	struct btusb_data *btdata = hci_get_drvdata(hdev);
- 	struct usb_device *udev = btdata->udev;
-@@ -2955,30 +2949,14 @@ static int handle_dump_pkt_qca(struct hci_dev *hdev, struct sk_buff *skb)
- 	sk_len = skb->len;
- 
- 	if (pkt_type == HCI_ACLDATA_PKT) {
--		acl_hdr = hci_acl_hdr(skb);
--		if (le16_to_cpu(acl_hdr->handle) != QCA_MEMDUMP_ACL_HANDLE)
--			return 0;
- 		sk_ptr += HCI_ACL_HDR_SIZE;
- 		sk_len -= HCI_ACL_HDR_SIZE;
--		event_hdr = (struct hci_event_hdr *)sk_ptr;
--	} else {
--		event_hdr = hci_event_hdr(skb);
- 	}
- 
--	if ((event_hdr->evt != HCI_VENDOR_PKT)
--		|| (event_hdr->plen != (sk_len - HCI_EVENT_HDR_SIZE)))
--		return 0;
--
- 	sk_ptr += HCI_EVENT_HDR_SIZE;
- 	sk_len -= HCI_EVENT_HDR_SIZE;
- 
- 	dump_hdr = (struct qca_dump_hdr *)sk_ptr;
--	if ((sk_len < offsetof(struct qca_dump_hdr, data))
--		|| (dump_hdr->vse_class != QCA_MEMDUMP_VSE_CLASS)
--	    || (dump_hdr->msg_type != QCA_MEMDUMP_MSG_TYPE))
--		return 0;
--
--	/*it is dump pkt now*/
- 	seqno = le16_to_cpu(dump_hdr->seqno);
- 	if (seqno == 0) {
- 		set_bit(BTUSB_HW_SSR_ACTIVE, &btdata->flags);
-@@ -3052,17 +3030,80 @@ static int handle_dump_pkt_qca(struct hci_dev *hdev, struct sk_buff *skb)
- 	return ret;
- }
- 
-+/* Return: true if the ACL packet is a dump packet, false otherwise. */
-+static bool btqca_acl_pkt_is_dump(struct hci_dev *hdev, struct sk_buff *skb)
-+{
-+	struct hci_event_hdr *event_hdr;
-+	struct hci_acl_hdr *acl_hdr;
-+	struct qca_dump_hdr *dump_hdr;
-+
-+	sk_ptr = skb->data;
-+	sk_len = skb->len;
-+
-+	acl_hdr = hci_acl_hdr(skb);
-+	if (le16_to_cpu(acl_hdr->handle) != QCA_MEMDUMP_ACL_HANDLE)
-+		return false;
-+	sk_ptr += HCI_ACL_HDR_SIZE;
-+	sk_len -= HCI_ACL_HDR_SIZE;
-+	event_hdr = (struct hci_event_hdr *)sk_ptr;
-+
-+	if ((event_hdr->evt != HCI_VENDOR_PKT)
-+		|| (event_hdr->plen != (sk_len - HCI_EVENT_HDR_SIZE)))
-+		return false;
-+
-+	sk_ptr += HCI_EVENT_HDR_SIZE;
-+	sk_len -= HCI_EVENT_HDR_SIZE;
-+
-+	dump_hdr = (struct qca_dump_hdr *)sk_ptr;
-+	if ((sk_len < offsetof(struct qca_dump_hdr, data))
-+		|| (dump_hdr->vse_class != QCA_MEMDUMP_VSE_CLASS)
-+	    || (dump_hdr->msg_type != QCA_MEMDUMP_MSG_TYPE))
-+		return false;
-+
-+	return true;
-+}
-+
-+/* Return: true if the event packet is a dump packet, false otherwise. */
-+static bool btqca_event_pkt_is_dump(struct hci_dev *hdev, struct sk_buff *skb)
-+{
-+	u8 *sk_ptr;
-+	unsigned int sk_len;
-+
-+	struct hci_event_hdr *event_hdr;
-+	struct qca_dump_hdr *dump_hdr;
-+
-+	sk_ptr = skb->data;
-+	sk_len = skb->len;
-+
-+	event_hdr = hci_event_hdr(skb);
-+
-+	if ((event_hdr->evt != HCI_VENDOR_PKT)
-+		|| (event_hdr->plen != (sk_len - HCI_EVENT_HDR_SIZE)))
-+		return false;
-+
-+	sk_ptr += HCI_EVENT_HDR_SIZE;
-+	sk_len -= HCI_EVENT_HDR_SIZE;
-+
-+	dump_hdr = (struct qca_dump_hdr *)sk_ptr;
-+	if ((sk_len < offsetof(struct qca_dump_hdr, data))
-+		|| (dump_hdr->vse_class != QCA_MEMDUMP_VSE_CLASS)
-+	    || (dump_hdr->msg_type != QCA_MEMDUMP_MSG_TYPE))
-+		return false;
-+
-+	return true;
-+}
-+
- static int btusb_recv_acl_qca(struct hci_dev *hdev, struct sk_buff *skb)
- {
--	if (handle_dump_pkt_qca(hdev, skb))
--		return 0;
-+	if (btqca_acl_pkt_is_dump(hdev, skb))
-+		return handle_dump_pkt_qca(hdev, skb);
- 	return hci_recv_frame(hdev, skb);
- }
- 
- static int btusb_recv_evt_qca(struct hci_dev *hdev, struct sk_buff *skb)
- {
--	if (handle_dump_pkt_qca(hdev, skb))
--		return 0;
-+	if (btqca_event_pkt_is_dump(hdev, skb))
-+		return handle_dump_pkt_qca(hdev, skb);
- 	return hci_recv_frame(hdev, skb);
- }
- 
--- 
-2.43.0
 
+--===============0403561784702348346==--
