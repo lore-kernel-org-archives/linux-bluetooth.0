@@ -1,109 +1,121 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7860E21CA1B
-	for <linux-bluetooth@vger.kernel.org>; Thu,  5 Dec 2024 15:50:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A78EE218841
+	for <linux-bluetooth@vger.kernel.org>; Thu,  5 Dec 2024 15:52:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733413821; cv=none; b=SHo9/7A7Q1f61L18DOsWmSg0S0T809ociRwJ481G3KW32AE94l2X55lQMazXVtv+i8ZHa1kgVdtgsLYaqkEhVpAKvLhyIUhR24Hh4b6c8OoxP2KOe/74YISfjTv5UG97ZQr7Q+G/CTkVKpoF1DN/2sk4Tzi85WmCyfNT2BRuINw=
+	t=1733413941; cv=none; b=qj0tvcp2r/YTzily+s495b1ga5wFym9yJmmsH81ixc01xf4qNXrF6JJENY+OlBzpuH2ImAjVdoakHX9z6Qw/cGtCl63k4W/x61O4xBSsrNhfYNzGBYj6ccLoIB+OSqc+ky1DoX2bD2K8dYNgZv3o2fBoTQe/IIz5X8JYa9DkkrI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733413821; c=relaxed/simple;
-	bh=lg6u9TPTvq3CeOlSx8vcUuS7IhWzcEU4lkI2vTLVnLU=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=U8DEcu5pZGGnoTuwXVy+illLZMOsIAr24VZMuYTiOe1oHVIwpG9Ywz4efPwT26mry0q88OMzRMhYtsZuMFolXr9XNBM3Z2t0wfnektJl813a7c2L5dyFQ1X3ZfE8Vl+zMjvqiZwb00bgyVexgImshCI92qbTQiSKwBIP0nfWP90=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PrLpRK+O; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1733413941; c=relaxed/simple;
+	bh=8ufeSyDuvs6sxJitxcao4HoePTUm0YDGR95PtcAhnPs=;
+	h=From:To:Subject:Date:Message-Id:MIME-Version:Content-Type:
+	 Content-Type; b=J4w4ZeNR3ZxABAxvvjd2+4zsdVTC2dHUa61LTdWhM69QE6AxpepXaLKZgmYdJpqYcQwUa0LjkIB7GoaGS1KV/pa5+W+bS+CgmrEVm/v2Dx0YHUzjbDwQB5lufBKEqZn5GDDsN6wmI/m0WSisN5+IdCAxW6JrKE3RSfZFjhIiyQ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=p60YRqeh; arc=none smtp.client-ip=148.251.105.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PrLpRK+O"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 08D83C4CED1;
-	Thu,  5 Dec 2024 15:50:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733413819;
-	bh=lg6u9TPTvq3CeOlSx8vcUuS7IhWzcEU4lkI2vTLVnLU=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=PrLpRK+O5Y3WoemUTA3sXlYX+GxeWQVkFBJ6bmSYziqAFSc7myg6VJwQQGDhjV4Lh
-	 lDf5pyEqv+KagFQ8EQG1DXwqkbrBY3GtbNpTxoaNUnnB2YHAyJRhf6UWmSUorGV6mO
-	 GioL6anyNwaT/FDyQM/HQH30/zSN2zwErIXl+ab2aDSTTXSRkG5v65NidzHDcxJPem
-	 E2arUNdh1tHu4SXIk9zkVORiGYqra/tqUOLrZ3jNqhbAi9tn1j6WVaNZYfXWX8H45T
-	 R6YAb1PmYuBqNw+bOqO4Yy9ttrAU5cvU2xbOksfuE3biHAnRLJcPJjYIE8Fzy1fqJs
-	 bLbT7+0t6Q3Wg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB37E380A951;
-	Thu,  5 Dec 2024 15:50:34 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="p60YRqeh"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+	s=mail; t=1733413931;
+	bh=8ufeSyDuvs6sxJitxcao4HoePTUm0YDGR95PtcAhnPs=;
+	h=From:To:Subject:Date:From;
+	b=p60YRqeh9n3aQab5WcsD8bCYd4xBeXe3BMSpAbBYsPzVdMn43JgM+JGEBOzQ8tOg/
+	 VsojpRrnCghjJazVez3lqbta9zI6dTdgqDM8B4z1XPDg9uv9Ga2VB5iREYFWWX8oUI
+	 /cgrwA2hdSyVavAkLoiODyTSIbHM+/PAAUE8FyOlZLwi/6E9CjJrwGyIdYZ97VMHJX
+	 DNJ05ZlwVw1L7m0emu98oe5TwKO86BlLQBFxAZt9YIavOFNtZGrv4CyO/V4gNKMcDL
+	 i5SQyD6IYq7qky155CW6488LzTTDgTYnfSIJzYl0MjWefk5pU6Ch68UfyDtcZJDUL8
+	 cLRFsU6WRTkRQ==
+Received: from fdanis-XPS-13-9370.. (67.227.121.78.rev.sfr.net [78.121.227.67])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: fdanis)
+	by bali.collaboradmins.com (Postfix) with ESMTPSA id 627D917E3782
+	for <linux-bluetooth@vger.kernel.org>; Thu,  5 Dec 2024 16:52:11 +0100 (CET)
+From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?= <frederic.danis@collabora.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH v3] Bluetooth: SCO: Add support for 16 bits transparent voice setting
+Date: Thu,  5 Dec 2024 16:51:59 +0100
+Message-Id: <20241205155159.461032-1-frederic.danis@collabora.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2] Bluetooth: hci_core: Fix sleeping function called from
- invalid context
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <173341383349.1962790.14997103267506754471.git-patchwork-notify@kernel.org>
-Date: Thu, 05 Dec 2024 15:50:33 +0000
-References: <20241204165849.392564-2-luiz.dentz@gmail.com>
-In-Reply-To: <20241204165849.392564-2-luiz.dentz@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
 
-Hello:
+The voice setting is used by sco_connect() or sco_conn_defer_accept()
+after being set by sco_sock_setsockopt().
 
-This patch was applied to bluetooth/bluetooth-next.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+The PCM part of the voice setting is used for offload mode through PCM
+chipset port.
+This commits add support for mSBC 16 bits offloading, i.e. audio data
+not transported over HCI.
 
-On Wed,  4 Dec 2024 11:58:49 -0500 you wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> 
-> This reworks hci_cb_list to not use mutex hci_cb_list_lock to avoid bugs
-> like the bellow:
-> 
-> BUG: sleeping function called from invalid context at kernel/locking/mutex.c:585
-> in_atomic(): 0, irqs_disabled(): 0, non_block: 0, pid: 5070, name: kworker/u9:2
-> preempt_count: 0, expected: 0
-> RCU nest depth: 1, expected: 0
-> 4 locks held by kworker/u9:2/5070:
->  #0: ffff888015be3948 ((wq_completion)hci0#2){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3229 [inline]
->  #0: ffff888015be3948 ((wq_completion)hci0#2){+.+.}-{0:0}, at: process_scheduled_works+0x8e0/0x1770 kernel/workqueue.c:3335
->  #1: ffffc90003b6fd00 ((work_completion)(&hdev->rx_work)){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3230 [inline]
->  #1: ffffc90003b6fd00 ((work_completion)(&hdev->rx_work)){+.+.}-{0:0}, at: process_scheduled_works+0x91b/0x1770 kernel/workqueue.c:3335
->  #2: ffff8880665d0078 (&hdev->lock){+.+.}-{3:3}, at: hci_le_create_big_complete_evt+0xcf/0xae0 net/bluetooth/hci_event.c:6914
->  #3: ffffffff8e132020 (rcu_read_lock){....}-{1:2}, at: rcu_lock_acquire include/linux/rcupdate.h:298 [inline]
->  #3: ffffffff8e132020 (rcu_read_lock){....}-{1:2}, at: rcu_read_lock include/linux/rcupdate.h:750 [inline]
->  #3: ffffffff8e132020 (rcu_read_lock){....}-{1:2}, at: hci_le_create_big_complete_evt+0xdb/0xae0 net/bluetooth/hci_event.c:6915
-> CPU: 0 PID: 5070 Comm: kworker/u9:2 Not tainted 6.8.0-syzkaller-08073-g480e035fc4c7 #0
-> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 03/27/2024
-> Workqueue: hci0 hci_rx_work
-> Call Trace:
->  <TASK>
->  __dump_stack lib/dump_stack.c:88 [inline]
->  dump_stack_lvl+0x241/0x360 lib/dump_stack.c:114
->  __might_resched+0x5d4/0x780 kernel/sched/core.c:10187
->  __mutex_lock_common kernel/locking/mutex.c:585 [inline]
->  __mutex_lock+0xc1/0xd70 kernel/locking/mutex.c:752
->  hci_connect_cfm include/net/bluetooth/hci_core.h:2004 [inline]
->  hci_le_create_big_complete_evt+0x3d9/0xae0 net/bluetooth/hci_event.c:6939
->  hci_event_func net/bluetooth/hci_event.c:7514 [inline]
->  hci_event_packet+0xa53/0x1540 net/bluetooth/hci_event.c:7569
->  hci_rx_work+0x3e8/0xca0 net/bluetooth/hci_core.c:4171
->  process_one_work kernel/workqueue.c:3254 [inline]
->  process_scheduled_works+0xa00/0x1770 kernel/workqueue.c:3335
->  worker_thread+0x86d/0xd70 kernel/workqueue.c:3416
->  kthread+0x2f0/0x390 kernel/kthread.c:388
->  ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
->  ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:243
->  </TASK>
-> 
-> [...]
+The BCM4349B1 supports 16 bits transparent data on its I2S port.
+If BT_VOICE_TRANSPARENT is used when accepting a SCO connection, this
+gives only garbage audio while using BT_VOICE_TRANSPARENT_16BIT gives
+correct audio.
+This has been tested with connection to iPhone 14 and Samsung S24.
 
-Here is the summary with links:
-  - [v2] Bluetooth: hci_core: Fix sleeping function called from invalid context
-    https://git.kernel.org/bluetooth/bluetooth-next/c/20c9afdfb287
+Signed-off-by: Frédéric Danis <frederic.danis@collabora.com>
+---
+v1 -> v2: Enhance commit message
+v2 -> v3: Enhance commit message
 
-You are awesome, thank you!
+ include/net/bluetooth/bluetooth.h | 1 +
+ net/bluetooth/sco.c               | 7 +++++--
+ 2 files changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
+index e6760c11f007..435250c72d56 100644
+--- a/include/net/bluetooth/bluetooth.h
++++ b/include/net/bluetooth/bluetooth.h
+@@ -123,6 +123,7 @@ struct bt_voice {
+ 
+ #define BT_VOICE_TRANSPARENT			0x0003
+ #define BT_VOICE_CVSD_16BIT			0x0060
++#define BT_VOICE_TRANSPARENT_16BIT		0x0063
+ 
+ #define BT_SNDMTU		12
+ #define BT_RCVMTU		13
+diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
+index 7eb8d3e04ec4..7b54d8826bcc 100644
+--- a/net/bluetooth/sco.c
++++ b/net/bluetooth/sco.c
+@@ -319,7 +319,8 @@ static int sco_connect(struct sock *sk)
+ 	else
+ 		type = SCO_LINK;
+ 
+-	if (sco_pi(sk)->setting == BT_VOICE_TRANSPARENT &&
++	if ((sco_pi(sk)->setting == BT_VOICE_TRANSPARENT ||
++	     sco_pi(sk)->setting == BT_VOICE_TRANSPARENT_16BIT) &&
+ 	    (!lmp_transp_capable(hdev) || !lmp_esco_capable(hdev))) {
+ 		err = -EOPNOTSUPP;
+ 		goto unlock;
+@@ -922,6 +923,7 @@ static int sco_sock_setsockopt(struct socket *sock, int level, int optname,
+ 
+ 		/* Explicitly check for these values */
+ 		if (voice.setting != BT_VOICE_TRANSPARENT &&
++		    voice.setting != BT_VOICE_TRANSPARENT_16BIT &&
+ 		    voice.setting != BT_VOICE_CVSD_16BIT) {
+ 			err = -EINVAL;
+ 			break;
+@@ -935,7 +937,8 @@ static int sco_sock_setsockopt(struct socket *sock, int level, int optname,
+ 			break;
+ 		}
+ 		if (enhanced_sync_conn_capable(hdev) &&
+-		    voice.setting == BT_VOICE_TRANSPARENT)
++		    (voice.setting == BT_VOICE_TRANSPARENT ||
++		     voice.setting == BT_VOICE_TRANSPARENT_16BIT))
+ 			sco_pi(sk)->codec.id = BT_CODEC_TRANSPARENT;
+ 		hci_dev_put(hdev);
+ 		break;
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.34.1
 
