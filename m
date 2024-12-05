@@ -1,111 +1,83 @@
-Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mout.gmx.net (mout.gmx.net [212.227.15.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F1BF218E83;
-	Thu,  5 Dec 2024 12:59:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29D0C218AD0
+	for <linux-bluetooth@vger.kernel.org>; Thu,  5 Dec 2024 13:32:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733403600; cv=none; b=PGl+LhG2vdJwiNcWA8e7PSx3YnbJOPtITDoYp5cxkbWXiyKw5J0P9dMfkAwIsvKSmy85rwRyhodRVQYP8vYdNilJjFSlYs42GrLZ6syG1ig3p+cEjnOiPpEupfHKHeHInD98iX3cFynN9rTxHjLPnpHgvtCSZfLIgFLOnnzZkHU=
+	t=1733405566; cv=none; b=rHY1+rI7eqqZx+2aC9y2jCl7SQt/toqP+y7m0wolgxmiGWEq9fpPsCKnFWuBoJjLMcVBmAehT9SaAvKyOxB2dWAy0YjtC3dAoUnLM8nB0j5HEzFw7Sz713ruRHGQWIyUaUWvdYhVGhbmQNFE5sEdUMfMayYJNzXRrROspbuDfNM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733403600; c=relaxed/simple;
-	bh=3OLFaKBgiFhJWCsDnLEuwFuf20ClzJ0AMK/6ux9BfP4=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=FwS7fvAbLrhjwG+oXenPSbMbxMVEP5w5PMgLhxTIMhsieTS70YqyQvhuq5co6UySMEcLY8qPFKNXfFUshtEd+6rQAqBvQcBjB4Gaq3hJ5bSbjk0oJqtqBA1MuhLLZTTyzjUkTzGARnNwlydVnJdhXReiHFvV75XDcisfNtqUWj4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CvzljZLX; arc=none smtp.client-ip=209.85.208.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1733405566; c=relaxed/simple;
+	bh=hqMGKFMfHCRisggZjF2fWoVlAlP14dS2+ftUiHZ+EGk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=MhgQ6EC8elDoDj1YtPStVOdjbQW2G+rDxqCy2gfzxbczWKpIVrq7qSntj0KyY7cmWDWKUe9n+qW1B6Gu7R7jsrVyqwpBVN3PB9g0AH1FyMPbmym2UiOlaB1u4Y6q4rtZUKEnAkG8BSk0fsFY8ihyjhImjuuHoAI6a11d+/CT2I4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.de; spf=pass smtp.mailfrom=gmx.de; dkim=pass (2048-bit key) header.d=gmx.de header.i=fiona.klute@gmx.de header.b=mdEhSE0H; arc=none smtp.client-ip=212.227.15.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmx.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CvzljZLX"
-Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-5d122cf8dd1so1398288a12.2;
-        Thu, 05 Dec 2024 04:59:58 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1733403597; x=1734008397; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:subject:from:user-agent:mime-version:date:message-id:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=gj8VFVjPSZEkv+oUvBeuosT9Pxl2p7BzaNCPNYLTVfQ=;
-        b=CvzljZLXWMIQuLduEiaHgmdBBsYlvs+EqCCvVlmwOux2wk/Pc82ZETup+iqSKqjr7k
-         HbTBU4j8KGCFXigT6wK+PvQ30yErQu0RKh41GViO5YEyM12EMmI0vtr2oin3svNCt5bt
-         bqqu+N9s/9Q3vjzrpwEnyOi4jd6KKgy1SlAFkYcN4DaujyUJ9WEL3YM5vIQj/9NXrFsu
-         1IFuIH+C5jGit3h2NqlrT+l3kSE1CZuN3fb0G3sYdAPjfzYlDUnJjDjkksMKDhR8KBGC
-         FNbfDBAXILk4layEi3/enLl0i7NP9mw9tU3C4yelygcPGNNjOoFYJ7Q7p8+nXl38nO3m
-         HD9w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733403597; x=1734008397;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:subject:from:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=gj8VFVjPSZEkv+oUvBeuosT9Pxl2p7BzaNCPNYLTVfQ=;
-        b=weKOQH4jvnEaIzUa6F8rejb1KjzRzHrK/7GGytw6/doiGtICHhyeqsTmLGOWb+Q5Ve
-         khslEiQ/QdTLMd9Y6XROit1rqEdlBaN0WcNVKw9zugDtBSN+sGlw12ro2oo3X0WthoSV
-         EbuIj3rRI2PhTX8E9+W+nrl1rUp6YQsPJO4en+u8I22y21x9GAsiV8TuwNHcb33J/yJg
-         67mMVbfn74K69wUf3F+a4HyLd4334/jJTLr5/oiUWcIbmdoa0eR1zDaUGly1ecD35EFJ
-         baZpvSfadKIQmEzlLpGdoJ8sO++UdKofukYPN/Dj8NzVcyM8SbXZnsAVxaIG61Kz2bF5
-         8ovg==
-X-Forwarded-Encrypted: i=1; AJvYcCVdV5Mvd3aOGym0tCeBiNE+1iMqCiUKRb/O0H1LiUVgRcvBzvApKuBrZ6y0ohAqC/uMvHSX42nSlMe/fjVJiMo=@vger.kernel.org, AJvYcCXfeWMZbCC9zGnXfacIV9u5UfrqRgjMjOltlh2t9jELXfoTeVgseKlRAgpD19jzlQx2+mGARxATIEylfB4P@vger.kernel.org
-X-Gm-Message-State: AOJu0YxGVHjXxwpmx09y3zEhibpYCnqnqmPEBnTzAc0/pN15HHr9ZA0H
-	5N3uAPNd3cw7AQpz4UyoqP3OhZGA5ojqnDdEzENGjYd1LKwoY1KC
-X-Gm-Gg: ASbGncupKz9gGotuXf71nRph5zZ74wm0QrJRphetfsgl9nIZ/E74sY+j2cnTaJEiBaC
-	xPDvB54rqgYpOxIbnfG/uUzVz6o4WIk2XmlLIUH/hEYiAOn6moOhblhaDwttSKsSrqs+xLnDX+l
-	MQuFk50GposaSJneFCD+cqj6O/KGwQkaWtpTwnkrS7BSpnniDVg+WlxhW/8TKx1pFhIl2im9BXw
-	PwRsDGACT3J7LKgcM1IsX53xE0KyWyyf/9qFDAWwSWR6d5Kuh+pVs9/PF2HjkJblgdKlbzY7GpD
-	QYtsSV551pjwraT4iHareLzAw9rkRkNlwg==
-X-Google-Smtp-Source: AGHT+IEF+6FFvVmIuxk1MISOcv5BF4xk0eVILKN9vM5sXj6JFuPJooKQkMvDCoXx5Oq1Cpz44ra8Kw==
-X-Received: by 2002:a17:906:9a95:b0:aa6:c55:739a with SMTP id a640c23a62f3a-aa60c5574a7mr571964266b.50.1733403596420;
-        Thu, 05 Dec 2024 04:59:56 -0800 (PST)
-Received: from [155.185.125.95] (wifi-125-dhcprange-125-95.wifi.unimo.it. [155.185.125.95])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aa625e4dc95sm88774466b.38.2024.12.05.04.59.55
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 05 Dec 2024 04:59:56 -0800 (PST)
-Message-ID: <ad78ad62-ebd2-40d7-8a6d-623ae947584c@gmail.com>
-Date: Thu, 5 Dec 2024 13:59:55 +0100
+	dkim=pass (2048-bit key) header.d=gmx.de header.i=fiona.klute@gmx.de header.b="mdEhSE0H"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmx.de;
+	s=s31663417; t=1733405562; x=1734010362; i=fiona.klute@gmx.de;
+	bh=hqMGKFMfHCRisggZjF2fWoVlAlP14dS2+ftUiHZ+EGk=;
+	h=X-UI-Sender-Class:From:To:Cc:Subject:Date:Message-ID:
+	 MIME-Version:Content-Transfer-Encoding:cc:
+	 content-transfer-encoding:content-type:date:from:message-id:
+	 mime-version:reply-to:subject:to;
+	b=mdEhSE0HkrAeLxnGGkPUV69xf8C99kyYmXUWh/4G4OXRMTgxv5IKFxMuLrCS7cCi
+	 S/c+OWpzqzmAo6AHm0fPbKoGcx+viy6k650IQmaCQPagCbaYtZ0tHW9a8X1ATlyEx
+	 INUkW8FeHtch1ebtZ6aJm3YI8IUL+4W4EDWsWmyslL3tJ0/7Peqj0QFGK4gldUujK
+	 BlkipRIhZ9uvvrxn56lFlpBeX4N2mPBE56k27nvno7RVWm9EkbP9zAxurZTwBdUnm
+	 YgoR+gRD/Rd2kS9/KoZNj51HoWxJzL99y2+RNnethHz2J7VOmci/vnLweQsfmGPRK
+	 03Up1J4JZNGKJaK0/Q==
+X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
+Received: from haruka.lan ([85.22.30.37]) by mail.gmx.net (mrgmx005
+ [212.227.17.190]) with ESMTPSA (Nemesis) id 1MmDIo-1u11AH2tii-00eBfj; Thu, 05
+ Dec 2024 14:32:41 +0100
+From: Fiona Klute <fiona.klute@gmx.de>
+To: linux-bluetooth@vger.kernel.org
+Cc: Fiona Klute <fiona.klute@gmx.de>
+Subject: [PATCH BlueZ] Leave config files writable for owner
+Date: Thu,  5 Dec 2024 14:32:33 +0100
+Message-ID: <20241205133233.1738092-1-fiona.klute@gmx.de>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-From: Sergio Callegari <sergio.callegari@gmail.com>
-Subject: Re: [REGRESSION] bluetooth: mt7921: Crash on Resume From Suspend And
- Hibernate
-To: jglotzer@gmail.com
-Cc: Aaron.Hou@mediatek.com, Chris.Lu@mediatek.com, Deren.Wu@mediatek.com,
- Hao.Qin@mediatek.com, Sean.Wang@mediatek.com, johan.hedberg@gmail.com,
- linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-mediatek@lists.infradead.org, luiz.dentz@gmail.com,
- marc.payne@mdpsys.co.uk, marcel@holtmann.org, regressions@leemhuis.info,
- regressions@lists.linux.dev, steve.lee@mediatek.com, tiwai@suse.de
-References: <20241127231432.8112-1-jglotzer@gmail.com>
-Content-Language: it, en-US-large
-In-Reply-To: <20241127231432.8112-1-jglotzer@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: base64
+X-Provags-ID: V03:K1:AfdvcWB3GF9wbH0PLeY218YdaQQpRHdGml4iNg1m+oB6pUtpljH
+ qaEWTxWoE+GI93+i047h4iZ4nfAIkgb/prXohQIYxTK01KOjyHX4S6TBWwGPzpWcrtsDPtj
+ EJaTAoDsnYsJVRzf+C4AaDtebBXwD1zWDP5Pxus9rFOsTNcxTZWx7n57xQGPRe++V7N06Y0
+ ExNVd0Jxxy0lhEjcS0FBg==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:07jauETwhNU=;nMP4qvhA9UMDd0RqvMsKBeYKcSv
+ 4So2G0Oc4cn7yVW6F5HRqkq96Ugm/51kNtkN5qVVduxN0wFfDi4/o9CNiZ9Uh+IniYkkOlr9D
+ hREFnfIyD0OAxzUTh0UdnEJhtkogkVhi49jJR0on/MyB7U8GxFS1f4OrJVMkgHV3nhmRaHaR8
+ UwxSShbL4hd3oYFHaF/ouoMNmw9dDXCbVHf56s5tJMyuRXPJaYVthfsxsdAfVMsYFbC4lbCfp
+ H0XdCSa5j0HC7a3vVYv9Bw8je3y4Tgd4jNY7osQ4PAQlabxdjZ4RpHN6q+XRb3n+7pu6JI5Ie
+ Juk1wn367TQve1Q9N7yQykllQlBNRWwRsdTS4iley2V9LOvE5BfZI7aT9YNHqyWxPu1HaZFLB
+ vRkQw52kv7p9LTvYGTRzO6ogpS8crsXnUJbepJ5htiIQXc/PnVWeDhHJhz8P4AKLG7k6gUfeP
+ UUYYZl0Wh8X7qoHtqHTEehwW4uEumj4imf3bygBrSR0I2k5WCwZYuCgiu21AyMDl9sm3rlGM0
+ dEizwXZasu/svKeF0F49UujM1LIWB7l0xZi+fO3xZyU/pY2P0YvctaoqAFn+lPNgSoPQuYKXB
+ L419cx9xPV9Tf4PeIY0UiiwcBL82WrYfi74ARDi+mRY1fll8kQdTUw5K1f+bkXmUq22q91+5y
+ uqlD+uz5cYQTk4uiuucPGbGspBYglzzq3ZSja/6Ir9tRWI77b7YFz0sf2uidlkf9yAFEBsYNt
+ Zna6FkHZb1BhcGgAIQGtWHIbz3E9Bb+SlaUvpY+egnWV5Mo+KbpiQ0fRcctpFqSRVzAHyYKwx
+ ts3pxPfcQWTmVAjoZee0BakGv9KKc35OqJg05KSQkvOItcMs062YVT+CyLsudLrQe5Cug6PiS
+ fCCEjTHk34ehJMdkciljxca97Wv75iMnHf4BF0oUCmxKaD698y7NtXk+J
 
-John Glotzer <jglotzer@gmail.com> wrote
-
-> In following the related email threads it seems that this particular email thread has
-> not had any activity since 10/21/2024. Now the focus seems to be on firmware download which
-> in my admittedly non-expert opinion seems to be not clearly related.
-
-Since then, it has become apparent that
-
-- The issue affects many laptops that fail to resume from hibernation 
-with recent kernels. It is not just about wifi/bt mt7922 combos attached 
-via USB, but also and most important those attached via PCIe, e.g.
-
-MEDIATEK Corp. MT7922 802.11ax PCI Express Wireless Network Adapter
-
-- The new firmware (241106...) does not seem to solve the issue on all 
-the affected systems.
-
-- it is relatively easy to script actions to kill BT before 
-sleep/hibernation and unkill it after resume, but they are suboptimal. 
-Users will typically set them up after multiple failures to resume, 
-which often means after data loss.
-
-Would it be possible to (at least temporarily) revert the changes 
-occurred from 6.10 to 6.11 that triggered this problem?
-
-Sergio
-
+VGhpcyBpcyBuZWVkZWQgYm90aCBzbyB0aGUgb3duZXIgY2FuIGFkanVzdCBjb25maWcgYXMgbmVl
+ZGVkLCBhbmQgZm9yCmRpc3RyaWJ1dGlvbiBidWlsZHMgdG8gYmUgYWJsZSB0byBtb3ZlL2RlbGV0
+ZSBmaWxlcyBhcyBwYXJ0IG9mIHRoZQpidWlsZCB3aXRob3V0IGFkanVzdGluZyBwZXJtaXNzaW9u
+cyB0aGVtc2VsdmVzLiBMaW1pdGluZyB3cml0ZXMgZnJvbQp0aGUgcnVubmluZyBzZXJ2aWNlIG5l
+ZWRzIHRvIGJlIGRvbmUgaW4gdGhlIHN5c3RlbWQgdW5pdCAoYWxyZWFkeSB0aGUKY2FzZSkgb3Ig
+aW5pdCBzY3JpcHQuCgpTZWUgYWxzbzogaHR0cHM6Ly9sb3JlLmtlcm5lbC5vcmcvbGludXgtYmx1
+ZXRvb3RoLzRkMTIwNmRmLTU5OGItNGE2OC04NjU1LTc0OTgxYjYyZWNjYUBnbXguZGUvVC8KLS0t
+CiBNYWtlZmlsZS5hbSB8IDIgKy0KIDEgZmlsZSBjaGFuZ2VkLCAxIGluc2VydGlvbigrKSwgMSBk
+ZWxldGlvbigtKQoKZGlmZiAtLWdpdCBhL01ha2VmaWxlLmFtIGIvTWFrZWZpbGUuYW0KaW5kZXgg
+Mjk3ZDA3NzRjLi4yOTAxOGE5MWMgMTAwNjQ0Ci0tLSBhL01ha2VmaWxlLmFtCisrKyBiL01ha2Vm
+aWxlLmFtCkBAIC0zMiw3ICszMiw3IEBAIGNvbmZkaXIgPSAkKHN5c2NvbmZkaXIpL2JsdWV0b290
+aAogc3RhdGVkaXIgPSAkKGxvY2Fsc3RhdGVkaXIpL2xpYi9ibHVldG9vdGgKIAogYmx1ZXRvb3Ro
+ZC1maXgtcGVybWlzc2lvbnM6Ci0JaW5zdGFsbCAtZG01NTUgJChERVNURElSKSQoY29uZmRpcikK
+KwlpbnN0YWxsIC1kbTc1NSAkKERFU1RESVIpJChjb25mZGlyKQogCWluc3RhbGwgLWRtNzAwICQo
+REVTVERJUikkKHN0YXRlZGlyKQogCiBpZiBEQVRBRklMRVMKLS0gCjIuNDUuMgoK
