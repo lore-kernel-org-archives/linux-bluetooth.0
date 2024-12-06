@@ -1,130 +1,131 @@
-Received: from mail-pj1-f47.google.com (mail-pj1-f47.google.com [209.85.216.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B18615B102;
-	Fri,  6 Dec 2024 02:29:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D62513A87E;
+	Fri,  6 Dec 2024 02:40:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733452163; cv=none; b=o+mKHgAKQD6LpTjhd0BpPhDu8sFstd+3+/wvVpDEY6KNkhqMtBz8QM5VuA5rUYsxWEOt4E5yj9EcZUkdfV0Ewyg8iuGXh5479o3IyJ2qBRDBkniOI7PT/vjKQvU3Y5dUkUCeQpqZ2Hp9AT6p4IAtL02YhHA4JhprzT8N/IduUbI=
+	t=1733452802; cv=none; b=DYpggNdpmtosrngzryXp3pbAfQSXrGdZJFgR7yyEBxrhZCCjNbNgnqoO8uyzIPhYVBgeQIHo5trfowzNymGVV2P23n0/UrvhPSi2NxAU932WfSZyxY5RorbA8L2AjCXZhHiMeigtXSUbx/dfoCGKf5iJh5sJdSUmxtGFdIbuCxI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733452163; c=relaxed/simple;
-	bh=dZRT2fcSHjnMoU6qnGBH964/9Ps4VyIHK7kAxlb3RMk=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ML5GcSluAsgEjdxoMxWyBYolKPMPD6u4sWu4CeMqC8lLVzbD3DgTJ1HBK+MbR6rGW4rRFhfDlWxMgrjxE0hIqCbbjaQXL8lxjp+KnXnVD5GtIFAVjxJWiy5fcPDjnTlVtCkPn6FoyRacNaU8P84jrTJyGJ7rS3bb3F6zJ/t3cTw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Km/OYkIZ; arc=none smtp.client-ip=209.85.216.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1733452802; c=relaxed/simple;
+	bh=vN7kfYVGX7Ui/e/G8mzCoyKlVgGDsyr4JqQpjh9g4SE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=or086A5V3+yxNX3WzhtdiB7vWeu3KP5Z10K9P6invUZCSCeVbvpcaKWylVDjojDCQ1VuL6l1SdrdIMJtwBW3hfZ+TaG0Rq4QTXuuSIUwrxjSHOZ1I969XJVDJHHhZgWF7i7Ed39g1vXjQ4odGIe1ZdCz0JDb3lE7125tj/rpP8o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=cbMjFzPq; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Km/OYkIZ"
-Received: by mail-pj1-f47.google.com with SMTP id 98e67ed59e1d1-2e56750bb0dso1164669a91.0;
-        Thu, 05 Dec 2024 18:29:22 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1733452161; x=1734056961; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=HTd3s3aluN78Fp6JU1KrhtNeKWaky7LzzZMIynAmPTU=;
-        b=Km/OYkIZaudL12kvx3f36bXxRMECb3KIIe0FxnyiEe1Z3yU0RcanhZklT/ueD7XGoY
-         I4w4jGf09NWFdKejRcpeTiYNfbqyatc5l8YuQKZiExDxZQJhPtOUdg00CLvhoi8sEO0X
-         ORvo+4SggPUmVbZ1uR0/B184eseKHl4IvVfh7JEkm8WyDxFtNcZIbCN1m5go1vYkDPyx
-         AVp+mYDchjoRMgjB+YBVU8hMWT0ERT4P+kd6Phm2fwY5ofllGa/6sY2lX/Z0Idj4iZDN
-         GVznJPcfLUokhAY8/GYCQ1rB9jQMmNJrRZu3OTbCUTNpSuvVbbgW9zs4arEhWFjruy6b
-         9Q2A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733452161; x=1734056961;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=HTd3s3aluN78Fp6JU1KrhtNeKWaky7LzzZMIynAmPTU=;
-        b=ix08x3cz3rvS4NnD5YuFFqT2o2dhjO9L6Lsj8LavmLjOtkNEDptuhXIwf0q90sUdYi
-         Tad7xARxfYj6966FrwFDAAvq7vkg54HI/FpBiqztdzNuZ677DbukSKDzNTWf7Cdwdo2C
-         N0HX4p7X5TGWfgzegWRf+VVMvDb2JV/ScXzH/jh0fsuRn/3d+AEYdcJCuM2UTxHVB9FB
-         p4D90qagYyfZRM3v0JDwENkhhX8Bnp2D7pca4nDYznKvoHlrhjgcti+zinSYLcTJAnnT
-         u4sW0UtxamifEwMwHg1p3uxO64gRvDJ4UiDOqEidCkT0cNQPbvXHZc8swglNoHtmKek9
-         sujg==
-X-Forwarded-Encrypted: i=1; AJvYcCUdua8/+nSDZUnthzHqjV0I/fHwcVDjR/l7QFxLcnTBqmav6aBWYcm73sYpDMBL0cL9AhfZC+TJyrfTUua89iw=@vger.kernel.org, AJvYcCWrqOPllJq8k/t4JvPIp1qSjN9/iWxSDIirKhs59WpzPanH6P02GVsD+uKez0uV61oe31W5KlkbY+AppYsr@vger.kernel.org
-X-Gm-Message-State: AOJu0YwKuDg0A7VkQiMQ8yJhF7dwvzaw7bF1H7yinghY7OJQn9CD5BIZ
-	6uyHYVXnxjcCLBWng+wPpdRp4q+kglDh1sJxfncW3AQ/YazXaVU4
-X-Gm-Gg: ASbGnctMpmINvtHQiiB+Qxzf3iFyaLDKHByMuf526Ja3QQfklMhYCNl2Pm3MTh3PceT
-	0RUIfhHNdyppSKM+rtB2Vz3Puh1WenToBvZlbn260AK1M6gaAdNjwIZqX/fZ0izkqmjQKl4t1Kw
-	Cg1KKITAzD6tZTZgHVyg7nXwjjhuhCnPMexaqXC2wzxCk08FYpRl2xrestyXKUDZqPQyIsE5hf3
-	NQkhZqF3I4uqJLHj9BiaAD21f6pVrH5dFvQAdDe4Idl1TxtM3dRDGmCLeqczBZRGyqhn/D202XS
-	QCbDMDHd
-X-Google-Smtp-Source: AGHT+IENADZamiqnBlD27UzquN0EcS+uEssM9SmnMSUyaY3tEGzNq20fxMu9PeMax023yYnyI0hAAA==
-X-Received: by 2002:a17:90b:254b:b0:2ee:fd53:2b03 with SMTP id 98e67ed59e1d1-2ef6aadb46dmr2207449a91.25.1733452161282;
-        Thu, 05 Dec 2024 18:29:21 -0800 (PST)
-Received: from amdora.. (c-76-146-136-228.hsd1.wa.comcast.net. [76.146.136.228])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2eeffcdd432sm3180613a91.2.2024.12.05.18.29.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 05 Dec 2024 18:29:20 -0800 (PST)
-From: John Glotzer <jglotzer@gmail.com>
-To: sergio.callegari@gmail.com
-Cc: Aaron.Hou@mediatek.com,
-	Chris.Lu@mediatek.com,
-	Deren.Wu@mediatek.com,
-	Hao.Qin@mediatek.com,
-	Sean.Wang@mediatek.com,
-	jglotzer@gmail.com,
-	johan.hedberg@gmail.com,
-	linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-mediatek@lists.infradead.org,
-	luiz.dentz@gmail.com,
-	marc.payne@mdpsys.co.uk,
-	marcel@holtmann.org,
-	regressions@leemhuis.info,
-	regressions@lists.linux.dev,
-	steve.lee@mediatek.com,
-	tiwai@suse.de
-Subject: Re: [REGRESSION] bluetooth: mt7921: Crash on Resume From Suspend And Hibernate
-Date: Thu,  5 Dec 2024 18:29:19 -0800
-Message-ID: <20241206022919.183292-1-jglotzer@gmail.com>
-X-Mailer: git-send-email 2.47.1
-In-Reply-To: <ad78ad62-ebd2-40d7-8a6d-623ae947584c@gmail.com>
-References: <ad78ad62-ebd2-40d7-8a6d-623ae947584c@gmail.com>
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="cbMjFzPq"
+Received: from pps.filterd (m0279864.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4B5HaOZ1003829;
+	Fri, 6 Dec 2024 02:39:55 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	ES+0LLK6o5L5hH4IvB8J17J4xxpqhqjEDDhe1N+9LK8=; b=cbMjFzPqQI6kTw6V
+	dvS3xRb27GFBA4eN5geZzCitwB/0vipL5/BC2kqksT1WnTd4Bg2eSxWbPCciphvH
+	mz40uUITrhNrBiVccacroISs+/ZA+pSOl61Hcu4SdBza7yAhB4rHYwZIXuyFhZ4Z
+	w8dv0Lg6gk2d7L0XFJdDFYs9vL43ai7HhbUFpaxLLJLvwZdJWQSsOwO1eFNBME/W
+	U7BnOsScJ4VGVCuQ2/7Bzkt/Mcndk5evo/m6rJ4EKH7mEfrwhQeau9wNEudqgZQM
+	dm2C1gPRXsXsTJuX0CEJ/N+b8hVSI0O2DabuNoJ6xXFAdtwwpXbMIpSPDqc++y46
+	svvd2w==
+Received: from nalasppmta02.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 43bbqm21ka-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 06 Dec 2024 02:39:54 +0000 (GMT)
+Received: from nalasex01b.na.qualcomm.com (nalasex01b.na.qualcomm.com [10.47.209.197])
+	by NALASPPMTA02.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 4B62dsS4011446
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 6 Dec 2024 02:39:54 GMT
+Received: from [10.233.22.158] (10.80.80.8) by nalasex01b.na.qualcomm.com
+ (10.47.209.197) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Thu, 5 Dec 2024
+ 18:39:49 -0800
+Message-ID: <d46037b0-1654-449a-9e42-3baf57a6feb2@quicinc.com>
+Date: Fri, 6 Dec 2024 10:39:46 +0800
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 3/3] arm64: dts: qcom: sa8775p-ride: Add firmware-name
+ in BT node
+To: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
+CC: Marcel Holtmann <marcel@holtmann.org>,
+        Luiz Augusto von Dentz
+	<luiz.dentz@gmail.com>,
+        Rob Herring <robh@kernel.org>,
+        Krzysztof Kozlowski
+	<krzk+dt@kernel.org>,
+        Conor Dooley <conor+dt@kernel.org>,
+        Bjorn Andersson
+	<andersson@kernel.org>,
+        Konrad Dybcio <konradybcio@kernel.org>,
+        "Balakrishna
+ Godavarthi" <quic_bgodavar@quicinc.com>,
+        Rocky Liao
+	<quic_rjliao@quicinc.com>,
+        <linux-bluetooth@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <linux-arm-msm@vger.kernel.org>,
+        <quic_jiaymao@quicinc.com>, <quic_shuaz@quicinc.com>,
+        <quic_zijuhu@quicinc.com>, <quic_mohamull@quicinc.com>
+References: <20241205102213.1281865-1-quic_chejiang@quicinc.com>
+ <20241205102213.1281865-4-quic_chejiang@quicinc.com>
+ <kgxxykbogtdfsnkyk3f5mpht54o3siqkhkfji5nqo7cyck44rf@x7kb2otqdo7n>
+Content-Language: en-US
+From: "Cheng Jiang (IOE)" <quic_chejiang@quicinc.com>
+In-Reply-To: <kgxxykbogtdfsnkyk3f5mpht54o3siqkhkfji5nqo7cyck44rf@x7kb2otqdo7n>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nalasex01b.na.qualcomm.com (10.47.209.197)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: SP8Y9ZqXSoU9KyGcPf_62QeYC5I2eeXM
+X-Proofpoint-ORIG-GUID: SP8Y9ZqXSoU9KyGcPf_62QeYC5I2eeXM
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
+ definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015
+ lowpriorityscore=0 mlxlogscore=999 spamscore=0 adultscore=0 suspectscore=0
+ malwarescore=0 mlxscore=0 impostorscore=0 bulkscore=0 phishscore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2411120000 definitions=main-2412060018
 
-Sergio,
+Hi Dmitry,
 
-My apologies, I neglected to mention that my setup is PCI, and not USB.
-
-It's an AMD Ryzen 5 7600 CPU on a PRO B650M-A Wifi motherboard. For completeness OS is Fedora 40
-with any kernel starting with 6.11.x.
-
-    $ lspci | grep MEDIATEK
-    0c:00.0 Network controller: MEDIATEK Corp. MT7922 802.11ax PCI Express Wireless Network Adapter
-
-    $lshw -C Network
-       ...
-      *-network
-           description: Wireless interface
-           product: MT7922 802.11ax PCI Express Wireless Network Adapter
-           vendor: MEDIATEK Corp.
-           physical id: 0
-           bus info: pci@0000:0c:00.0
-           logical name: wlp12s0
-           version: 00
-           serial: 0e:80:32:35:2c:9b
-           width: 64 bits
-           clock: 33MHz
-           capabilities: bus_master cap_list ethernet physical wireless
-           configuration: broadcast=yes driver=mt7921e driverversion=6.11.10-200.fc40.x86_64 firmware=____000000-20240716163327
-           ip=192.168.139.211 latency=0 link=yes multicast=yes wireless=IEEE 802.11
-           resources: iomemory:fc0-fbf irq:103 memory:fcf0300000-fcf03fffff memory:f6c00000-f6c07fff
-
-What I am struggling to understand is given how easy this issue is to reproduce -  an AMD CPU, Mediatek MT7922 wifi/bluetooth chip,
-and a 6.11 kernel, you suspend, and then wake up, kernel panics -  I would have thought that the interested parties would
-make this a priority.
-
-I think that a logical first step would be for SW owners to confirm (or deny) the anomalous behavior.
-
-Thanks,
-
-John
+On 12/5/2024 8:13 PM, Dmitry Baryshkov wrote:
+> On Thu, Dec 05, 2024 at 06:22:13PM +0800, Cheng Jiang wrote:
+>> The sa8775p-ride platform uses the QCA6698 Bluetooth chip. While the
+>> QCA6698 shares the same IP core as the WCN6855, it has different RF
+>> components and RAM sizes, requiring new firmware files. Use the
+>> firmware-name property to specify the NVM and rampatch firmware to load.
+>>
+>> Signed-off-by: Cheng Jiang <quic_chejiang@quicinc.com>
+>> ---
+>>  arch/arm64/boot/dts/qcom/sa8775p-ride.dtsi | 1 +
+>>  1 file changed, 1 insertion(+)
+>>
+>> diff --git a/arch/arm64/boot/dts/qcom/sa8775p-ride.dtsi b/arch/arm64/boot/dts/qcom/sa8775p-ride.dtsi
+>> index 3fc62e123..e7fe53d95 100644
+>> --- a/arch/arm64/boot/dts/qcom/sa8775p-ride.dtsi
+>> +++ b/arch/arm64/boot/dts/qcom/sa8775p-ride.dtsi
+>> @@ -857,6 +857,7 @@ &uart17 {
+>>  
+>>  	bluetooth {
+>>  		compatible = "qcom,wcn6855-bt";
+>> +		firmware-name = "QCA6698/hpnv21", "QCA6698/hpbtfw21.tlv";
+> 
+> And the rampatch is not going to be board-specific?
+> 
+Yes, rampatch is chip-specific. 
+>>  
+>>  		vddrfacmn-supply = <&vreg_pmu_rfa_cmn>;
+>>  		vddaon-supply = <&vreg_pmu_aon_0p59>;
+>> -- 
+>> 2.25.1
+>>
+> 
 
