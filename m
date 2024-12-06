@@ -1,157 +1,161 @@
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f172.google.com (mail-lj1-f172.google.com [209.85.208.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2749A193;
-	Fri,  6 Dec 2024 14:45:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 412F52206A5
+	for <linux-bluetooth@vger.kernel.org>; Fri,  6 Dec 2024 18:13:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733496355; cv=none; b=GW9VWemC26a+CS+gRlP/wQeD+FVIcdvGp/4I/UP7vZAXQJ9lnewGWhoz+FGCBVSRWNZ3lEkphqU2n7nerj5U3uQV/2asa0RgDuuYoWaHwNKcTJ+PhrBhujTxSzZG2jfZG2LRMtzmeMiLE8iRLyiNlgPpQ1+lqQasUdUJ1qDaYp4=
+	t=1733508821; cv=none; b=P/69Hh7If3Eyd0uZJ/IM++Dzexqb63e4vgAUi2gkqYIUVUx9+RssLbvmNi0w83QerR3BxZ2B+sn4h+2kH+tbkNRosTUtJ7gKMO3HNYy6w234dwJWPbmHgaSz58TwTxX++4LavKjPBrLFrmb0qWfdpm314TOhwrNQwZOT2OHLr6s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733496355; c=relaxed/simple;
-	bh=RCAerEsBSOduxZ6ChbLto3fB45xJtvmu2G8R9418J60=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=H5b4mmyyo0OOnQtVTahfYCgg6eWi2b63/NOeNC5kOESDWdsozscef3J8MKlZ3mT7KmG4P1g5QqLNq2lW/iXaFnyFk84ngYpFT5ptNyKAgQQgVlpSstK0oQLXeG0XXBOnTuD1LV8p1wilOBcrgzshl3fwInyv0GDipH/IALdBFV8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=KkJZIm+0; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+	s=arc-20240116; t=1733508821; c=relaxed/simple;
+	bh=+y3jeevQsSUOs2LolQMqdndXNvdYAc0atx5Ecyy98Ek=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=CgwiXI92VUSETeRcECUJhFg0dnCzMh00nJU4VYrDnloKzRgcvowfw9KMwHnGDrBd+LemYowo17CuCkaQ8vonowueY3o/wUppiTO57wFA8IMil/aaQcz6mpy9rs5TmN0l2K/veJ9Sw1513AT+Pdw1zKSz07vcLtgzIfutRrrUcx4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=D1YQ5gKv; arc=none smtp.client-ip=209.85.208.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="KkJZIm+0"
-Received: from pps.filterd (m0279872.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4B68a6uD018434;
-	Fri, 6 Dec 2024 14:45:47 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	F6xvmmj4pj78R2BWZJh97FZN7e9Q86pkpxcb1LWqoWA=; b=KkJZIm+0Q9+bKdrF
-	I04Pfw2jwRE5iFhohFyfFgcQBh8BM1BLdPWj/Hipxw3Fao8Qwtsgz+c406CtG/gn
-	DibvlRDr07GCxbd+gHZlyZ7P1Zuq79VWbwRYA30tuOuUdBUOs8D9+DLnKMK7CmOE
-	w4gYrV4Pac53HgdaqWjMWnQzB7b4LOhgdcfhOhR8+y/Unk2IqasNBZ2Nb+r9d8Cc
-	shbOXRZ8b7p827pn0jCin9mygGKZhDf0bKPGQwYGwwLOG995kroWWcOfLO7BZquV
-	eGDgZPa2H0E0Q2FNVVnsKkJBbTxgDmvvziQ8J3S1oIf1dwOjkt+vqsiUUJkshet9
-	6EJt1Q==
-Received: from nalasppmta04.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 43bjk8tmq4-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 06 Dec 2024 14:45:46 +0000 (GMT)
-Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
-	by NALASPPMTA04.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 4B6Ejjfi011238
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 6 Dec 2024 14:45:45 GMT
-Received: from [10.216.17.32] (10.80.80.8) by nalasex01a.na.qualcomm.com
- (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Fri, 6 Dec 2024
- 06:45:38 -0800
-Message-ID: <53d44689-798e-4b5f-a0f1-8a39bea2f19b@quicinc.com>
-Date: Fri, 6 Dec 2024 20:15:35 +0530
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="D1YQ5gKv"
+Received: by mail-lj1-f172.google.com with SMTP id 38308e7fff4ca-2ffc016f301so20529431fa.1
+        for <linux-bluetooth@vger.kernel.org>; Fri, 06 Dec 2024 10:13:38 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1733508817; x=1734113617; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=JpOkqbIggZUUgV7cZ5/IKcq9/+/gEGJeM7LnuaKpuMs=;
+        b=D1YQ5gKvmJuqENJdAZO+LrCvLOn7BWNNku9yvVg6DEoi/uolIMgElwtW01DMC0R1k7
+         s12bmbQcL36yJZ6zFMNmU9WLapjRY107LVtDE6vnZipaXQEDRAFtiLcjzu/6h3YZvvNe
+         uqdVEsmk2Cu0Zh1BlIyeqGVNqlbc+CF6S7iTJe2zajBzz396J8VS/hHFwOgwPpkbHrxP
+         WG9oX/gPrOROJIdqKbMtNL+Yp8HERuAnb8xXUgCQLSo4sPTm0X66zKpgvu2EFM7g7e4F
+         dn0EMyewtVNlKmSQEDc10lYfX8YIuFxKf7xex1x8CUT4EweOQr4mvSlevqyV+nuuO3A+
+         OqxA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733508817; x=1734113617;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=JpOkqbIggZUUgV7cZ5/IKcq9/+/gEGJeM7LnuaKpuMs=;
+        b=MT5wH+dJErMeCTH1tjmjctSrLkIn7FZ5Y5qosxBCoE1WYSCDVpCU8qKQXTYpMGsv98
+         JUoyktHvh08QktjgSKl2HdZRHNjw9fyjaWPN5+Kyf3ShTGdr4zR6LS1qBhE0bsZvWcwS
+         iBbHQ1+dcILGcUgtvBL52vd2xMQzGikm9/5pfG6974xuTr8aOnfff+I/4CUQPm4ww5Xp
+         FVmV7hsbfapPGbcNj6mDS5qATNGNzvv6bgsay4frvNNxwPFv9NVmLKVHKsW4/dzayVc2
+         uH7h51GngVtWyw5XstCz0ttcIkZ9GGsHp3x48bFu/135SmcnWn85Xs87HIGR3mozS4w9
+         AwFw==
+X-Gm-Message-State: AOJu0YwNCdXdtpYIHO66WWw4LnYnDHIjbiRVOyaFEcVJfc1IQXnpyQVs
+	hYTBzYT4GJQaagg+OwI0F/kGspLjRW36V2SQXHSehME8GB+1osXqownYpdsMcQX62UYxWRC+U+O
+	oVysh506qPGy1rtwp/TuldQv0/Hrhd2t9
+X-Gm-Gg: ASbGncuso4cMcdS/pz5m+TefN5ZsprYBL2urYePguCFSka0GQqQIlUZ7wdLLMe1Snqp
+	SwRnhrN9pJx+4B+Kp0mF1XKnROsBQCyFe
+X-Google-Smtp-Source: AGHT+IFmsuFlrHl6ZwC5EV/zyC4Pvrnjj1m+ZdQSojUvkIIOnX+IDSpq8lDXPdJZIjVsPZdNJGZy/AxmQY7Idmm/g20=
+X-Received: by 2002:a05:651c:506:b0:300:28b4:163 with SMTP id
+ 38308e7fff4ca-3002f8c3a34mr11568971fa.9.1733508816992; Fri, 06 Dec 2024
+ 10:13:36 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 2/4] arm64: dts: qcom: qcs6490-rb3gen: add and enable
- BT node
-To: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
-CC: Liam Girdwood <lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>,
-        "Rob
- Herring" <robh@kernel.org>,
-        Krzysztof Kozlowski <krzk+dt@kernel.org>,
-        "Conor
- Dooley" <conor+dt@kernel.org>,
-        Bjorn Andersson <andersson@kernel.org>,
-        "Konrad Dybcio" <konradybcio@kernel.org>,
-        Marcel Holtmann
-	<marcel@holtmann.org>,
-        "Luiz Augusto von Dentz" <luiz.dentz@gmail.com>,
-        Bartosz Golaszewski <brgl@bgdev.pl>, <quic_mohamull@quicinc.com>,
-        <quic_hbandi@quicinc.com>, <quic_anubhavg@quicinc.com>,
-        Bartosz Golaszewski
-	<bartosz.golaszewski@linaro.org>,
-        <linux-arm-msm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <devicetree@vger.kernel.org>, <linux-bluetooth@vger.kernel.org>,
-        <linux-pm@vger.kernel.org>
-References: <20241204131706.20791-1-quic_janathot@quicinc.com>
- <20241204131706.20791-3-quic_janathot@quicinc.com>
- <pzkijkdswskaq6232uldapz3b6v6zplif7uah24iwq3ymlezft@skbcy2vod3c5>
-Content-Language: en-US
-From: Janaki Ramaiah Thota <quic_janathot@quicinc.com>
-In-Reply-To: <pzkijkdswskaq6232uldapz3b6v6zplif7uah24iwq3ymlezft@skbcy2vod3c5>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nalasex01a.na.qualcomm.com (10.47.209.196)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: x4Hfa3zjxpu6CePiOiqZlv4-e8w3wYJE
-X-Proofpoint-GUID: x4Hfa3zjxpu6CePiOiqZlv4-e8w3wYJE
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
- definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
- impostorscore=0 bulkscore=0 phishscore=0 suspectscore=0 spamscore=0
- lowpriorityscore=0 adultscore=0 mlxscore=0 mlxlogscore=999
- priorityscore=1501 clxscore=1015 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.19.0-2411120000 definitions=main-2412060110
+References: <20241205155159.461032-1-frederic.danis@collabora.com>
+In-Reply-To: <20241205155159.461032-1-frederic.danis@collabora.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Fri, 6 Dec 2024 13:13:24 -0500
+Message-ID: <CABBYNZ+tXJDNUdd4Ar-6hCy+uT75MqA3w0FsSyJB1ymfx-tAwA@mail.gmail.com>
+Subject: Re: [PATCH v3] Bluetooth: SCO: Add support for 16 bits transparent
+ voice setting
+To: =?UTF-8?B?RnLDqWTDqXJpYyBEYW5pcw==?= <frederic.danis@collabora.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+Hi Frederic,
+
+On Thu, Dec 5, 2024 at 10:52=E2=80=AFAM Fr=C3=A9d=C3=A9ric Danis
+<frederic.danis@collabora.com> wrote:
+>
+> The voice setting is used by sco_connect() or sco_conn_defer_accept()
+> after being set by sco_sock_setsockopt().
+>
+> The PCM part of the voice setting is used for offload mode through PCM
+> chipset port.
+> This commits add support for mSBC 16 bits offloading, i.e. audio data
+> not transported over HCI.
+>
+> The BCM4349B1 supports 16 bits transparent data on its I2S port.
+> If BT_VOICE_TRANSPARENT is used when accepting a SCO connection, this
+> gives only garbage audio while using BT_VOICE_TRANSPARENT_16BIT gives
+> correct audio.
+> This has been tested with connection to iPhone 14 and Samsung S24.
+>
+> Signed-off-by: Fr=C3=A9d=C3=A9ric Danis <frederic.danis@collabora.com>
+> ---
+> v1 -> v2: Enhance commit message
+> v2 -> v3: Enhance commit message
+>
+>  include/net/bluetooth/bluetooth.h | 1 +
+>  net/bluetooth/sco.c               | 7 +++++--
+>  2 files changed, 6 insertions(+), 2 deletions(-)
+>
+> diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bl=
+uetooth.h
+> index e6760c11f007..435250c72d56 100644
+> --- a/include/net/bluetooth/bluetooth.h
+> +++ b/include/net/bluetooth/bluetooth.h
+> @@ -123,6 +123,7 @@ struct bt_voice {
+>
+>  #define BT_VOICE_TRANSPARENT                   0x0003
+>  #define BT_VOICE_CVSD_16BIT                    0x0060
+> +#define BT_VOICE_TRANSPARENT_16BIT             0x0063
+>
+>  #define BT_SNDMTU              12
+>  #define BT_RCVMTU              13
+> diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
+> index 7eb8d3e04ec4..7b54d8826bcc 100644
+> --- a/net/bluetooth/sco.c
+> +++ b/net/bluetooth/sco.c
+> @@ -319,7 +319,8 @@ static int sco_connect(struct sock *sk)
+>         else
+>                 type =3D SCO_LINK;
+>
+> -       if (sco_pi(sk)->setting =3D=3D BT_VOICE_TRANSPARENT &&
+> +       if ((sco_pi(sk)->setting =3D=3D BT_VOICE_TRANSPARENT ||
+> +            sco_pi(sk)->setting =3D=3D BT_VOICE_TRANSPARENT_16BIT) &&
+>             (!lmp_transp_capable(hdev) || !lmp_esco_capable(hdev))) {
+>                 err =3D -EOPNOTSUPP;
+>                 goto unlock;
+> @@ -922,6 +923,7 @@ static int sco_sock_setsockopt(struct socket *sock, i=
+nt level, int optname,
+>
+>                 /* Explicitly check for these values */
+>                 if (voice.setting !=3D BT_VOICE_TRANSPARENT &&
+> +                   voice.setting !=3D BT_VOICE_TRANSPARENT_16BIT &&
+>                     voice.setting !=3D BT_VOICE_CVSD_16BIT) {
+
+We might need to allow all valid settings here, since there can be
+different PCM settings other than just these which is probably why the
+HCI field is a bitmask, so I suggest we do something like this:
+
+https://gist.github.com/Vudentz/ae1502e6e402ae95aca330bae6096941
+
+>                         err =3D -EINVAL;
+>                         break;
+> @@ -935,7 +937,8 @@ static int sco_sock_setsockopt(struct socket *sock, i=
+nt level, int optname,
+>                         break;
+>                 }
+>                 if (enhanced_sync_conn_capable(hdev) &&
+> -                   voice.setting =3D=3D BT_VOICE_TRANSPARENT)
+> +                   (voice.setting =3D=3D BT_VOICE_TRANSPARENT ||
+> +                    voice.setting =3D=3D BT_VOICE_TRANSPARENT_16BIT))
+>                         sco_pi(sk)->codec.id =3D BT_CODEC_TRANSPARENT;
+>                 hci_dev_put(hdev);
+>                 break;
+> --
+> 2.34.1
+>
+>
 
 
-
-On 12/5/2024 4:29 AM, Dmitry Baryshkov wrote:
-> On Wed, Dec 04, 2024 at 06:47:04PM +0530, Janaki Ramaiah Thota wrote:
->> Add a node for the PMU module of the WCN6750 present on the
->> qcs6490-rb3gen board and assign its power outputs to the Bluetooth
->> module.
->>
->> Signed-off-by: Janaki Ramaiah Thota <quic_janathot@quicinc.com>
->> ---
->>   arch/arm64/boot/dts/qcom/qcs6490-rb3gen2.dts | 165 ++++++++++++++++++-
->>   1 file changed, 164 insertions(+), 1 deletion(-)
->>
->> diff --git a/arch/arm64/boot/dts/qcom/qcs6490-rb3gen2.dts b/arch/arm64/boot/dts/qcom/qcs6490-rb3gen2.dts
->> index 27695bd54220..07650648214e 100644
->> --- a/arch/arm64/boot/dts/qcom/qcs6490-rb3gen2.dts
->> +++ b/arch/arm64/boot/dts/qcom/qcs6490-rb3gen2.dts
->> @@ -1,6 +1,6 @@
->>   // SPDX-License-Identifier: BSD-3-Clause
->>   /*
->> - * Copyright (c) 2023 Qualcomm Innovation Center, Inc. All rights reserved.
->> + * Copyright (c) 2023-2024 Qualcomm Innovation Center, Inc. All rights reserved.
->>    */
->>   
->>   /dts-v1/;
->> @@ -33,6 +33,7 @@
->>   
->>   	aliases {
->>   		serial0 = &uart5;
->> +		serial1 = &uart7;
->>   	};
->>   
->>   	chosen {
->> @@ -217,6 +218,63 @@
->>   		regulator-min-microvolt = <3700000>;
->>   		regulator-max-microvolt = <3700000>;
->>   	};
->> +
->> +	wcn6750-pmu {
->> +		compatible = "qcom,wcn6750-pmu";
->> +		pinctrl-names = "default";
->> +		pinctrl-0 = <&bt_en>;
->> +		vddaon-supply = <&vreg_s7b_0p972>;
->> +		vddasd-supply = <&vreg_l11c_2p8>;
->> +		vddpmu-supply = <&vreg_s7b_0p972>;
->> +		vddrfa0p8-supply = <&vreg_s7b_0p972>;
->> +		vddrfa1p2-supply = <&vreg_s8b_1p272>;
->> +		vddrfa1p7-supply = <&vreg_s1b_1p872>;
->> +		vddrfa2p2-supply = <&vreg_s1c_2p19>;
->> +
->> +		bt-enable-gpios = <&tlmm 85 GPIO_ACTIVE_HIGH>;
-> 
-> Doesn't WCN6750 also have SW_CTRL and wifi-enable pins?
-> 
-
-For Bluetooth, these pins are not needed. We have verified Bluetooth 
-functionality, and it is working fine.
-
-Thanks,
-Janakiram
-
+--=20
+Luiz Augusto von Dentz
