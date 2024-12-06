@@ -1,48 +1,48 @@
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D62513A87E;
-	Fri,  6 Dec 2024 02:40:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B8EE13B79F;
+	Fri,  6 Dec 2024 02:42:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733452802; cv=none; b=DYpggNdpmtosrngzryXp3pbAfQSXrGdZJFgR7yyEBxrhZCCjNbNgnqoO8uyzIPhYVBgeQIHo5trfowzNymGVV2P23n0/UrvhPSi2NxAU932WfSZyxY5RorbA8L2AjCXZhHiMeigtXSUbx/dfoCGKf5iJh5sJdSUmxtGFdIbuCxI=
+	t=1733452959; cv=none; b=s6U9JwgZSD6/KSYQ+gtGw2luUi+8iNIT835wrVeMqCeMjIVJ1RB3FLKhqgVVzIzWDXgTU0vc88YPYvQUfB2hfq7nQklmtY8yXReSbLQ+R8qVLej0AmuI1sRWwijUiEIpZEOevcWaQPPQurQPMOHW2KxpOcNJzWiyhvq0idu03rs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733452802; c=relaxed/simple;
-	bh=vN7kfYVGX7Ui/e/G8mzCoyKlVgGDsyr4JqQpjh9g4SE=;
+	s=arc-20240116; t=1733452959; c=relaxed/simple;
+	bh=oC2bG85aiCBjlKZSmgmEVRxZxOGzCsaTbkfo5G40xm4=;
 	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=or086A5V3+yxNX3WzhtdiB7vWeu3KP5Z10K9P6invUZCSCeVbvpcaKWylVDjojDCQ1VuL6l1SdrdIMJtwBW3hfZ+TaG0Rq4QTXuuSIUwrxjSHOZ1I969XJVDJHHhZgWF7i7Ed39g1vXjQ4odGIe1ZdCz0JDb3lE7125tj/rpP8o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=cbMjFzPq; arc=none smtp.client-ip=205.220.168.131
+	 In-Reply-To:Content-Type; b=pGi9WEihkRkeuiR0H1FTvuU5xzXB6lCgwbPRBO5VQWQSktxc2Utzr2c4ywE1dYIPBL1I6OUKTjKK7kPKxuZbuiD0AY0cMBxw2h6ryiS5OfGTP3p/EUJPj/xo3CgkOwNHZCTJYuwyLuQWYEA1oOOF75LSOChzjZv6rsRTogdOcRI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=BpMpiTDE; arc=none smtp.client-ip=205.220.180.131
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="cbMjFzPq"
-Received: from pps.filterd (m0279864.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4B5HaOZ1003829;
-	Fri, 6 Dec 2024 02:39:55 GMT
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="BpMpiTDE"
+Received: from pps.filterd (m0279871.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4B5HaMOg015782;
+	Fri, 6 Dec 2024 02:42:32 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
 	cc:content-transfer-encoding:content-type:date:from:in-reply-to
 	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	ES+0LLK6o5L5hH4IvB8J17J4xxpqhqjEDDhe1N+9LK8=; b=cbMjFzPqQI6kTw6V
-	dvS3xRb27GFBA4eN5geZzCitwB/0vipL5/BC2kqksT1WnTd4Bg2eSxWbPCciphvH
-	mz40uUITrhNrBiVccacroISs+/ZA+pSOl61Hcu4SdBza7yAhB4rHYwZIXuyFhZ4Z
-	w8dv0Lg6gk2d7L0XFJdDFYs9vL43ai7HhbUFpaxLLJLvwZdJWQSsOwO1eFNBME/W
-	U7BnOsScJ4VGVCuQ2/7Bzkt/Mcndk5evo/m6rJ4EKH7mEfrwhQeau9wNEudqgZQM
-	dm2C1gPRXsXsTJuX0CEJ/N+b8hVSI0O2DabuNoJ6xXFAdtwwpXbMIpSPDqc++y46
-	svvd2w==
-Received: from nalasppmta02.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 43bbqm21ka-1
+	q7mhBVUP/sAwpgVvgJMuXKHJqQpydxz/f3X3B33Og2E=; b=BpMpiTDEgA6oXh96
+	iZk+m9CAhpH5ZvLmLvQ0PkLdQJhHYmHE2vvKpr0U3WVOmhl6x0bcYksQidVK8n1k
+	gV4Q+QMZxxBOvISTHEH+XFDhmXT8oy9aG4eoXosCGiSkH2CYZqYxz8+gLSXDalks
+	NHaWYowmNMl4v3Ht9OHgbExRJat1I37dI0NclyhVBCQUY+th8vUDSg376sTGbOaN
+	wl4VyuUTf451FGfjZlo2KDNATnFTRw6oVLA8mq69rdck/HMoE9lCEWFxaeNmDG5h
+	zubiid8yPGD3giLNP1g9Oy6hyWSEH9L0z5mMsmeMAgLU7c5XG77h3wc/LdPwzhMj
+	j7b3jA==
+Received: from nalasppmta04.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 43bbnmj28p-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 06 Dec 2024 02:39:54 +0000 (GMT)
+	Fri, 06 Dec 2024 02:42:32 +0000 (GMT)
 Received: from nalasex01b.na.qualcomm.com (nalasex01b.na.qualcomm.com [10.47.209.197])
-	by NALASPPMTA02.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 4B62dsS4011446
+	by NALASPPMTA04.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 4B62gVr0008486
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 6 Dec 2024 02:39:54 GMT
+	Fri, 6 Dec 2024 02:42:31 GMT
 Received: from [10.233.22.158] (10.80.80.8) by nalasex01b.na.qualcomm.com
  (10.47.209.197) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Thu, 5 Dec 2024
- 18:39:49 -0800
-Message-ID: <d46037b0-1654-449a-9e42-3baf57a6feb2@quicinc.com>
-Date: Fri, 6 Dec 2024 10:39:46 +0800
+ 18:42:26 -0800
+Message-ID: <0176828a-56c5-4a26-9014-4e9efd2d5efd@quicinc.com>
+Date: Fri, 6 Dec 2024 10:42:24 +0800
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -50,82 +50,68 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 3/3] arm64: dts: qcom: sa8775p-ride: Add firmware-name
- in BT node
-To: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
-CC: Marcel Holtmann <marcel@holtmann.org>,
-        Luiz Augusto von Dentz
-	<luiz.dentz@gmail.com>,
-        Rob Herring <robh@kernel.org>,
-        Krzysztof Kozlowski
-	<krzk+dt@kernel.org>,
-        Conor Dooley <conor+dt@kernel.org>,
-        Bjorn Andersson
-	<andersson@kernel.org>,
-        Konrad Dybcio <konradybcio@kernel.org>,
-        "Balakrishna
- Godavarthi" <quic_bgodavar@quicinc.com>,
-        Rocky Liao
-	<quic_rjliao@quicinc.com>,
-        <linux-bluetooth@vger.kernel.org>, <devicetree@vger.kernel.org>,
+Subject: Re: [PATCH v3 2/3] Bluetooth: qca: Expand firmware-name to load
+ specific nvm and rampatch
+To: Krzysztof Kozlowski <krzk@kernel.org>,
+        Marcel Holtmann
+	<marcel@holtmann.org>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        "Rob
+ Herring" <robh@kernel.org>,
+        Krzysztof Kozlowski <krzk+dt@kernel.org>,
+        "Conor
+ Dooley" <conor+dt@kernel.org>,
+        Bjorn Andersson <andersson@kernel.org>,
+        "Konrad Dybcio" <konradybcio@kernel.org>,
+        Balakrishna Godavarthi
+	<quic_bgodavar@quicinc.com>,
+        Rocky Liao <quic_rjliao@quicinc.com>
+CC: <linux-bluetooth@vger.kernel.org>, <devicetree@vger.kernel.org>,
         <linux-kernel@vger.kernel.org>, <linux-arm-msm@vger.kernel.org>,
         <quic_jiaymao@quicinc.com>, <quic_shuaz@quicinc.com>,
         <quic_zijuhu@quicinc.com>, <quic_mohamull@quicinc.com>
 References: <20241205102213.1281865-1-quic_chejiang@quicinc.com>
- <20241205102213.1281865-4-quic_chejiang@quicinc.com>
- <kgxxykbogtdfsnkyk3f5mpht54o3siqkhkfji5nqo7cyck44rf@x7kb2otqdo7n>
+ <20241205102213.1281865-3-quic_chejiang@quicinc.com>
+ <ce3237d3-e281-4534-ae40-f6762d25a690@kernel.org>
 Content-Language: en-US
 From: "Cheng Jiang (IOE)" <quic_chejiang@quicinc.com>
-In-Reply-To: <kgxxykbogtdfsnkyk3f5mpht54o3siqkhkfji5nqo7cyck44rf@x7kb2otqdo7n>
+In-Reply-To: <ce3237d3-e281-4534-ae40-f6762d25a690@kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
 X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
  nalasex01b.na.qualcomm.com (10.47.209.197)
 X-QCInternal: smtphost
 X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: SP8Y9ZqXSoU9KyGcPf_62QeYC5I2eeXM
-X-Proofpoint-ORIG-GUID: SP8Y9ZqXSoU9KyGcPf_62QeYC5I2eeXM
+X-Proofpoint-ORIG-GUID: SFaYgMsPMiYegXGpdYWn6fAPlqd6Z7fl
+X-Proofpoint-GUID: SFaYgMsPMiYegXGpdYWn6fAPlqd6Z7fl
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
  definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015
- lowpriorityscore=0 mlxlogscore=999 spamscore=0 adultscore=0 suspectscore=0
- malwarescore=0 mlxscore=0 impostorscore=0 bulkscore=0 phishscore=0
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ mlxlogscore=999 priorityscore=1501 spamscore=0 impostorscore=0 bulkscore=0
+ suspectscore=0 adultscore=0 clxscore=1015 phishscore=0 mlxscore=0
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.19.0-2411120000 definitions=main-2412060018
 
-Hi Dmitry,
+Hi Krzysztof,
 
-On 12/5/2024 8:13 PM, Dmitry Baryshkov wrote:
-> On Thu, Dec 05, 2024 at 06:22:13PM +0800, Cheng Jiang wrote:
->> The sa8775p-ride platform uses the QCA6698 Bluetooth chip. While the
->> QCA6698 shares the same IP core as the WCN6855, it has different RF
->> components and RAM sizes, requiring new firmware files. Use the
->> firmware-name property to specify the NVM and rampatch firmware to load.
->>
->> Signed-off-by: Cheng Jiang <quic_chejiang@quicinc.com>
->> ---
->>  arch/arm64/boot/dts/qcom/sa8775p-ride.dtsi | 1 +
->>  1 file changed, 1 insertion(+)
->>
->> diff --git a/arch/arm64/boot/dts/qcom/sa8775p-ride.dtsi b/arch/arm64/boot/dts/qcom/sa8775p-ride.dtsi
->> index 3fc62e123..e7fe53d95 100644
->> --- a/arch/arm64/boot/dts/qcom/sa8775p-ride.dtsi
->> +++ b/arch/arm64/boot/dts/qcom/sa8775p-ride.dtsi
->> @@ -857,6 +857,7 @@ &uart17 {
->>  
->>  	bluetooth {
->>  		compatible = "qcom,wcn6855-bt";
->> +		firmware-name = "QCA6698/hpnv21", "QCA6698/hpbtfw21.tlv";
+On 12/5/2024 10:37 PM, Krzysztof Kozlowski wrote:
+> On 05/12/2024 11:22, Cheng Jiang wrote:
+>> @@ -2309,8 +2322,10 @@ static int qca_serdev_probe(struct serdev_device *serdev)
+>>  	qcadev->serdev_hu.serdev = serdev;
+>>  	data = device_get_match_data(&serdev->dev);
+>>  	serdev_device_set_drvdata(serdev, qcadev);
+>> -	device_property_read_string(&serdev->dev, "firmware-name",
+>> -					 &qcadev->firmware_name);
+>> +	of_property_read_string_index(serdev->dev.of_node, "firmware-name",
+>> +					 0, &qcadev->firmware_name);
+>> +	of_property_read_string_index(serdev->dev.of_node, "firmware-name",
+>> +					 1, &qcadev->rampatch_name);
+> No, that's entirely different API. You are not supposed to drop here
+> device-API and revert to OF. It is not a related change, either.
 > 
-> And the rampatch is not going to be board-specific?
+Ack, Will change this in next version.
 > 
-Yes, rampatch is chip-specific. 
->>  
->>  		vddrfacmn-supply = <&vreg_pmu_rfa_cmn>;
->>  		vddaon-supply = <&vreg_pmu_aon_0p59>;
->> -- 
->> 2.25.1
->>
-> 
+> Best regards,
+> Krzysztof
 
