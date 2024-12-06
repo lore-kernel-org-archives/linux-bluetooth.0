@@ -1,160 +1,252 @@
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f178.google.com (mail-yb1-f178.google.com [209.85.219.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58C2634CDE;
-	Fri,  6 Dec 2024 03:07:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0B441DE891
+	for <linux-bluetooth@vger.kernel.org>; Fri,  6 Dec 2024 08:34:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733454423; cv=none; b=os8YENWO3sd3sFk2pXn816lZnUnrbWGH0lIHVtsHF6GCYxey27NvNoetaXl56W/J04OTakpjxfCZB7V4McCGgFzhiPouOuxupk43+qtArofbKV5VQwuXceRX1eFjKKED0zAzc4qItL41lWh1wMu/uVr2395fZoDDSs6JrF6qUc8=
+	t=1733474058; cv=none; b=rOKAp7LfAx8PxjOm65WuADDm4DcVuNU0pl/Q9Fvb3mHD1d6MMz5ccD2ClML0+9/Ct8krZHmHPAMOXLv550eyKBM1SQgU+iu9cjfSzw39zsNCYF6ktwELg+zwZgm3B9skEVgdQRqXledWthSViqMIG1jTiSTY+GDjs5oJGfSTCfs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733454423; c=relaxed/simple;
-	bh=y4ETJU0hj3FgnNKLiXNJAH9L2d+pIEzCQGYX7P/TFIY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=ONXBFL8yDgQxA5RROA3pFOuHU13fLoqYSV+hK8a97IifS+Fc6V8PycX4RN0+J/WyEqWP1VYdjFkrcBmAoMtW24jXyi2Wa4OZZ2dBzgeDbp9BKEkF8j10s+9ifnqToTddjfyDEt9111EId5DRCWdA3HdLDSSebwzS1s97hH0kJ/w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=FpzjHSV+; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+	s=arc-20240116; t=1733474058; c=relaxed/simple;
+	bh=CzvxH9gkJxMLDmcJg1PiYkIsVIuRDkUPYM3JYP9Eedk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=KMGz+LZEpylP9Ps1+fUnjQrHP9an0efcg6LfJTD91hjFGS4FFTviCTG+AUEQXgTR69tWbNqQQa9AkXcOuST0iGvcJMe9VtBSt6jlwUzfteW9fXQxsGv9w/awgAHWYt19pEVe/nBHJFvKtWMwCJ52LWWOWmVOwcMB6s56oM2Ye9U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=vUARV8Jr; arc=none smtp.client-ip=209.85.219.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="FpzjHSV+"
-Received: from pps.filterd (m0279862.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4B5HaRU2007168;
-	Fri, 6 Dec 2024 03:06:55 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	SCnnyNmXFdCjUq3YP8qX1zzwPVrm/4VHVweOka8kGIo=; b=FpzjHSV+0oZRihnK
-	jvcHCdu8ygqKYLfLG35UTmjt1X4PKDE5cbRpwwF+OFRX1RSnQpAtUGdIgHOA3cY2
-	B0XWCPwTF4X8efT7NJNY1lq1Hicyx4QqT3UOAkxBuYUbxVRR9oV5fq/wBaZhYhFe
-	AottI9BqXWd5eVyidRR2/TDH/u4Al3J9+ouTcHAyHc7feZH6dXSolUqKgMc6BdAx
-	NGhsR5KSLLkGKr12LoYT7lfJNrjSZRobQv+DnBPdDXFfrfPkHoURBYVrt5+FsDW5
-	IUJ0xLLtHqn9EsLm7tjTWSPENYm4ttm+2Zgl7VYWGjZlJnDxGMVwmwKuEG4UH+29
-	G09X4A==
-Received: from nalasppmta01.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 43ben89jqk-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 06 Dec 2024 03:06:55 +0000 (GMT)
-Received: from nalasex01b.na.qualcomm.com (nalasex01b.na.qualcomm.com [10.47.209.197])
-	by NALASPPMTA01.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 4B636snZ028511
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 6 Dec 2024 03:06:54 GMT
-Received: from [10.239.28.113] (10.80.80.8) by nalasex01b.na.qualcomm.com
- (10.47.209.197) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Thu, 5 Dec 2024
- 19:06:49 -0800
-Message-ID: <b4449c99-0fc7-4a12-9861-39c8db3698e7@quicinc.com>
-Date: Fri, 6 Dec 2024 11:06:46 +0800
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="vUARV8Jr"
+Received: by mail-yb1-f178.google.com with SMTP id 3f1490d57ef6-e3985aabf43so1580583276.3
+        for <linux-bluetooth@vger.kernel.org>; Fri, 06 Dec 2024 00:34:16 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1733474055; x=1734078855; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=yXKgcEVb1fAZ9PQ6roP5n37uMrfa9dLkMGVwoJG+NRE=;
+        b=vUARV8JrtoMRQ9wVbILF9ZRta5mKFf9m7Cgt850glTBM57GgbNKCJhtTenWef8Us92
+         0NAp6hx8Z3xIVGII1/M1Zri5sv7VQ0Bi91wc2ejIsFTpeiNoBX/h7Fp0tkExQDpF0ODq
+         I5uyN6QX+4GBY1SxA2kXk35hjB1U38N+xkhB3Gp6Fgzq+68Mn2OwiuN+fEex3pmJVZpV
+         T/QbzruZB2Rm+hFD9FCX2txgjfH2KHTDvB4L5lXMC1J3QXb8i/ojZfTDYNgsW7i+3IxL
+         J62AHAZzMnr2Oq3YKH+/gGhio2E0j9Rv0qmt2ngqGbgxHBKrsqIGkSpYHdUJ1EtxYJT1
+         6/IA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733474055; x=1734078855;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=yXKgcEVb1fAZ9PQ6roP5n37uMrfa9dLkMGVwoJG+NRE=;
+        b=GCHdbYNzlVSi08eJlc25EvTv5yGa6UYLPKrbEDkJ2X8pfxb3/cPM5+6lGppdfATRje
+         f9ee/Yya4l8rO8nhGBBpM88SNHhMCmy9U3+4C8p44RMXtx7Egrm6KBkyxjTMpD9jnw9u
+         HKBjIIrmJp/A+YM8upJiVs58T0PkFyaVJbF3vLJwqAurmjDruBzgRDqWo7Gn+EU2AgkV
+         iBm2TuhTNVY0DNLURILvj7FtKCVO6HnxvYjgRn8mkuI14/cwd7TtbIOCuW6n4t0FeCrI
+         9gEWPmQaTYLc19m+Iv84vu0kpGPJnnvpaO/Ts2QY32BZ414sSevaA8JQWtMEfuommbdS
+         hcbw==
+X-Forwarded-Encrypted: i=1; AJvYcCVaEwREkeRSvjRr4xdNm6NaeuvDdzHeWX/dvB3i3emr5KKG2PyAPKL1TZGgIuF9Pzh6FwhvcDZ5F/aZm7zDfDM=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw4D0DAHvAsbNBH19l2nQp5J2MOIJUIiXLzMaw6u15UYMe0HmXd
+	/Dj86iG1PomMdrS+x0NV0jGoHwnXmthHV3tv434vZACkd6PcqV+70SlxxQWUFwVCYF2Uer8tFfl
+	RhYLHsox7kUq1+8FKvJttY7trL5VKxEusYfTQww==
+X-Gm-Gg: ASbGnctRf9aMgTVaatwclZpXztSfofzzGw4ofuNDKJCAKUesLHikm6/KWUU9DkcUNQx
+	XC4Yao7bG4SUrLvQ7NFlztI4hdTmdKxIE9RcVEBZohbkAQQ==
+X-Google-Smtp-Source: AGHT+IHyXduCRkh45D5lh25sBvKIj/KnqB4qNNwNbS/p4VvHcYUsVzvbtMEVOSG9sGkzLNoSmyaf4A1tpaHlx/4QtSA=
+X-Received: by 2002:a05:6902:c11:b0:e39:9853:e661 with SMTP id
+ 3f1490d57ef6-e3a0b13324emr1756773276.26.1733474055019; Fri, 06 Dec 2024
+ 00:34:15 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 1/3] dt-bindings: net: bluetooth: qca: Expand
- firmware-name property
-To: "Rob Herring (Arm)" <robh@kernel.org>
-CC: <quic_shuaz@quicinc.com>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Conor Dooley <conor+dt@kernel.org>, <linux-bluetooth@vger.kernel.org>,
-        <linux-arm-msm@vger.kernel.org>, <quic_jiaymao@quicinc.com>,
-        Marcel Holtmann
-	<marcel@holtmann.org>,
-        Konrad Dybcio <konradybcio@kernel.org>,
-        "Krzysztof
- Kozlowski" <krzk+dt@kernel.org>, <quic_zijuhu@quicinc.com>,
-        Rocky Liao
-	<quic_rjliao@quicinc.com>, <devicetree@vger.kernel.org>,
-        "Balakrishna
- Godavarthi" <quic_bgodavar@quicinc.com>,
-        Bjorn Andersson
-	<andersson@kernel.org>, <quic_mohamull@quicinc.com>,
-        <linux-kernel@vger.kernel.org>
 References: <20241205102213.1281865-1-quic_chejiang@quicinc.com>
- <20241205102213.1281865-2-quic_chejiang@quicinc.com>
- <173339749198.2690453.6235486221062242906.robh@kernel.org>
-Content-Language: en-US
-From: "Cheng Jiang (IOE)" <quic_chejiang@quicinc.com>
-In-Reply-To: <173339749198.2690453.6235486221062242906.robh@kernel.org>
+ <20241205102213.1281865-3-quic_chejiang@quicinc.com> <w7r4itwyrh3jva3rx3kmsm4kqtawqkgkneqrlin4hpjkqb3deo@2qmjd3ijzqn3>
+ <541a5682-5b99-4793-84ee-a7c9168cb9a0@quicinc.com>
+In-Reply-To: <541a5682-5b99-4793-84ee-a7c9168cb9a0@quicinc.com>
+From: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
+Date: Fri, 6 Dec 2024 10:34:04 +0200
+Message-ID: <CAA8EJppmTSovZKTPb+syrc0Vvfu8U=HoP18tW072OEZ5nYyOgg@mail.gmail.com>
+Subject: Re: [PATCH v3 2/3] Bluetooth: qca: Expand firmware-name to load
+ specific nvm and rampatch
+To: "Cheng Jiang (IOE)" <quic_chejiang@quicinc.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
+	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Bjorn Andersson <andersson@kernel.org>, Konrad Dybcio <konradybcio@kernel.org>, 
+	Balakrishna Godavarthi <quic_bgodavar@quicinc.com>, Rocky Liao <quic_rjliao@quicinc.com>, 
+	linux-bluetooth@vger.kernel.org, devicetree@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
+	quic_jiaymao@quicinc.com, quic_shuaz@quicinc.com, quic_zijuhu@quicinc.com, 
+	quic_mohamull@quicinc.com
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nalasex01b.na.qualcomm.com (10.47.209.197)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: 9edsrctiaV3Y-t5k5ByzkEVCNbHM3jOI
-X-Proofpoint-GUID: 9edsrctiaV3Y-t5k5ByzkEVCNbHM3jOI
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
- definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 phishscore=0
- priorityscore=1501 impostorscore=0 mlxlogscore=999 clxscore=1015
- malwarescore=0 suspectscore=0 spamscore=0 mlxscore=0 lowpriorityscore=0
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2411120000 definitions=main-2412060022
 
-Hi Rob,
+On Fri, 6 Dec 2024 at 05:05, Cheng Jiang (IOE)
+<quic_chejiang@quicinc.com> wrote:
+>
+> Hi Dmitry,
+>
+> On 12/5/2024 8:00 PM, Dmitry Baryshkov wrote:
+> > On Thu, Dec 05, 2024 at 06:22:12PM +0800, Cheng Jiang wrote:
+> >> The firmware-name property has been expanded to specify the names of NVM
+> >> and rampatch firmware for certain chips, such as the QCA6698 Bluetooth
+> >> chip. Although it shares the same IP core as the WCN6855, the QCA6698
+> >> has different RF components and RAM sizes, necessitating new firmware
+> >> files. This change allows for the configuration of NVM and rampatch in
+> >> DT.
+> >>
+> >> Different connectivity boards may be attached to the same platform. For
+> >> example, QCA6698-based boards can support either a two-antenna or
+> >> three-antenna solution, both of which work on the sa8775p-ride platform.
+> >> Due to differences in connectivity boards and variations in RF
+> >> performance from different foundries, different NVM configurations are
+> >> used based on the board ID.
+> >
+> > Two separate commits, one for NVM, another one for RAM patch.
+> >
+> Ack.
+> >>
+> >> Therefore, in the firmware-name property, if the NVM file has an
+> >> extension, the NVM file will be used. Otherwise, the system will first
+> >> try the .bNN (board ID) file, and if that fails, it will fall back to
+> >> the .bin file.
+> >>
+> >> Possible configurations:
+> >> firmware-name = "QCA6698/hpnv21.bin", "QCA6698/hpbtfw21.tlv";
+> >> firmware-name = "QCA6698/hpnv21", "QCA6698/hpbtfw21.tlv";
+> >> firmware-name = "QCA6698/hpnv21.bin";
+> >>
+> >> Signed-off-by: Cheng Jiang <quic_chejiang@quicinc.com>
+> >> ---
+> >>  drivers/bluetooth/btqca.c   | 154 ++++++++++++++++++++++++++----------
+> >>  drivers/bluetooth/btqca.h   |   5 +-
+> >>  drivers/bluetooth/hci_qca.c |  21 ++++-
+> >>  3 files changed, 134 insertions(+), 46 deletions(-)
+> >>
+> >> diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
+> >> index dfbbac922..e8b89b8cc 100644
+> >> --- a/drivers/bluetooth/btqca.c
+> >> +++ b/drivers/bluetooth/btqca.c
+> >> @@ -272,6 +272,31 @@ int qca_send_pre_shutdown_cmd(struct hci_dev *hdev)
+> >>  }
+> >>  EXPORT_SYMBOL_GPL(qca_send_pre_shutdown_cmd);
+> >>
+> >> +static int qca_get_alt_nvm_path(char *path, size_t max_size)
+> >
+> > int is usually for errors, the code suggests bool return type.
+> >
+> Ack.
+> >> +{
+> >> +    char fwname[64];
+> >> +    const char *suffix;
+> >> +
+> >> +    suffix = strrchr(path, '.');
+> >> +
+> >> +    if (!suffix)
+> >> +            return 0;
+> >> +
+> >> +    strscpy(fwname, path, strlen(path));
+> >
+> > 64 bytes ought to be enough for anybody, correct?
+> >
+> Yes, in current driver, the max f/w path length is 64.
+>
+> >> +    fwname[suffix - path] = 0;
+> >
+> > with path = "qcom/sc7180/Oh.My.Device/name" this is broken.
+> >
+> Let me test this and fix in next patch.
+> >> +
+> >> +    snprintf(fwname, sizeof(fwname), "%s.bin", fwname);
+> >> +
+> >> +    /* If nvm file is already the default one, return false to
+> >> +     * skip the retry.
+> >> +     */
+> >> +    if (strcmp(fwname, path) == 0)
+> >> +            return 0;
+> >> +
+> >> +    snprintf(path, max_size, "%s", fwname);
+> >> +    return 1;
+> >> +}
+> >> +
+> >>  static int qca_tlv_check_data(struct hci_dev *hdev,
+> >>                             struct qca_fw_config *config,
+> >>                             u8 *fw_data, size_t fw_size,
+> >> @@ -564,6 +589,19 @@ static int qca_download_firmware(struct hci_dev *hdev,
+> >>                                         config->fwname, ret);
+> >>                              return ret;
+> >>                      }
+> >> +            }
+> >> +            /* For nvm, if desired nvm file is not present and it's not the
+> >> +             * default nvm file(ends with .bin), try to load the default nvm.
+> >> +             */
+> >> +            else if (config->type == TLV_TYPE_NVM &&
+> >> +                     qca_get_alt_nvm_path(config->fwname, sizeof(config->fwname))) {
+> >
+> > Please, don't rewrite the config. The file may be not present now, but
+> > it will reappear later (e.g. when rootfs gets mounted).
+> >
+> This tries to load a default NVM file if the board-specific NVM is not found.
+> It is called when request_firmware fails. It's safe to rewrite the config->fwname
+> here since we have already tried to load the board-specific NVM. The config
+> is a local variable in qca_uart_setup and will return after downloading the NVM.
 
-On 12/5/2024 7:18 PM, Rob Herring (Arm) wrote:
-> 
-> On Thu, 05 Dec 2024 18:22:11 +0800, Cheng Jiang wrote:
->> Expand the firmware-name property to specify the names of NVM and
->> rampatch firmware to load. This update will support loading specific
->> firmware (nvm and rampatch) for certain chips, like the QCA6698
->> Bluetooth chip, which shares the same IP core as the WCN6855 but has
->> different RF components and RAM sizes, requiring new firmware files.
->>
->> We might use different connectivity boards on the same platform. For
->> example, QCA6698-based boards can support either a two-antenna or
->> three-antenna solution, both of which work on the sa8775p-ride platform.
->> Due to differences in connectivity boards and variations in RF
->> performance from different foundries, different NVM configurations are
->> used based on the board ID.
->>
->> So In firmware-name, if the NVM file has an extension, the NVM file will
->> be used. Otherwise, the system will first try the .bNN (board ID) file,
->> and if that fails, it will fall back to the .bin file.
->>
->> Possible configurations:
->> firmware-name = "QCA6698/hpnv21.bin", "QCA6698/hpbtfw21.tlv";
->> firmware-name = "QCA6698/hpnv21", "QCA6698/hpbtfw21.tlv";
->> firmware-name = "QCA6698/hpnv21.bin";
->>
->> Signed-off-by: Cheng Jiang <quic_chejiang@quicinc.com>
->> ---
->>  .../devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml   | 2 ++
->>  1 file changed, 2 insertions(+)
->>
-> 
-> My bot found errors running 'make dt_binding_check' on your patch:
-> 
-> yamllint warnings/errors:
-> ./Documentation/devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml:106:5: [error] duplication of key "description" in mapping (key-duplicates)
-> 
-> dtschema/dtc warnings/errors:
-> /builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml: ignoring, error parsing file
-> ./Documentation/devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml:106:5: found duplicate key "description" with value "specify the name of rampatch firmware to load" (original value: "specify the name of nvm firmware to load")
-> make[2]: *** Deleting file 'Documentation/devicetree/bindings/net/bluetooth/qualcomm-bluetooth.example.dts'
-> Documentation/devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml:106:5: found duplicate key "description" with value "specify the name of rampatch firmware to load" (original value: "specify the name of nvm firmware to load")
-> make[2]: *** [Documentation/devicetree/bindings/Makefile:26: Documentation/devicetree/bindings/net/bluetooth/qualcomm-bluetooth.example.dts] Error 1
-> make[2]: *** Waiting for unfinished jobs....
-> make[1]: *** [/builds/robherring/dt-review-ci/linux/Makefile:1506: dt_binding_check] Error 2
-> make: *** [Makefile:251: __sub-make] Error 2
-> 
-> doc reference errors (make refcheckdocs):
-> 
-> See https://patchwork.ozlabs.org/project/devicetree-bindings/patch/20241205102213.1281865-2-quic_chejiang@quicinc.com
-> 
-> The base for the series is generally the latest rc1. A different dependency
-> should be noted in *this* patch.
-> 
-> If you already ran 'make dt_binding_check' and didn't see the above
-> error(s), then make sure 'yamllint' is installed and dt-schema is up to
-> date:
-> 
-> pip3 install dtschema --upgrade
-> 
-> Please check and re-submit after running the above command yourself. Note
-> that DT_SCHEMA_FILES can be set to your schema file to speed up checking
-> your schema. However, it must be unset to test all examples with your schema.
-> 
-Thank you for the info. I will run the dt_binding_check before next patch. 
+Please read my question before answering it.
 
+> >> +                    bt_dev_info(hdev, "QCA Downloading %s", config->fwname);
+> >> +                    ret = request_firmware(&fw, config->fwname, &hdev->dev);
+> >> +                    if (ret) {
+> >> +                            bt_dev_err(hdev, "QCA Failed to request file: %s (%d)",
+> >> +                                       config->fwname, ret);
+> >> +                            return ret;
+> >> +                    }
+> >>              } else {
+> >>                      bt_dev_err(hdev, "QCA Failed to request file: %s (%d)",
+> >>                                 config->fwname, ret);
+> >> @@ -730,15 +768,38 @@ static inline void qca_get_nvm_name_generic(struct qca_fw_config *cfg,
+> >>                       "qca/%snv%02x.b%02x", stem, rom_ver, bid);
+> >>  }
+> >>
+> >> +static void qca_get_nvm_name_by_board(char *fwname, size_t max_size,
+> >> +            const char *firmware_name, struct qca_btsoc_version ver,
+> >> +            enum qca_btsoc_type soc_type, u16 bid)
+> >> +{
+> >> +    const char *variant;
+> >> +
+> >> +    /* Set the variant to empty by default */
+> >> +    variant = "";
+> >> +    /* hsp gf chip */
+> >> +    if (soc_type == QCA_WCN6855) {
+> >> +            if ((le32_to_cpu(ver.soc_id) & QCA_HSP_GF_SOC_MASK) == QCA_HSP_GF_SOC_ID)
+> >> +                    variant = "g";
+> >
+> > Didn't you get the 'set but unused' here?
+> >
+> Yes, miss this part. Thank you!
+> >> +    }
+> >> +
+> >> +    if (bid == 0x0)
+> >
+> > 0x0 or 0xff?
+> board is set to 0 by default, 0x0 means read board id fails, then we should use
+> the default one.
+
+What is the 'unprogrammed' board_id? On the WiFi side it's usually 0xff.
+
+> >
+> >> +            snprintf(fwname, max_size, "qca/%s.bin", firmware_name);
+> >> +    else if (bid & 0xff00)
+> >> +            snprintf(fwname, max_size, "qca/%s.b%x", firmware_name, bid);
+> >
+> > Doesn't ".b%02x" work in this case too?
+> >
+> No, board id are two bytes, it coudl be 0x0206, then we need .b206. Or it is
+> 0x000a, then we need .b0a.
+
+What will ".b%02x" write in those two cases?
+
+> >> +    else
+> >> +            snprintf(fwname, max_size, "qca/%s.b%02x", firmware_name, bid);
+> >> +}
+> >> +
+
+
+-- 
+With best wishes
+Dmitry
