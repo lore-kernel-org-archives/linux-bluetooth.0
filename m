@@ -1,67 +1,67 @@
-Received: from mail-yb1-f169.google.com (mail-yb1-f169.google.com [209.85.219.169])
+Received: from mail-yb1-f173.google.com (mail-yb1-f173.google.com [209.85.219.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4572319AA63
-	for <linux-bluetooth@vger.kernel.org>; Mon,  9 Dec 2024 20:58:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E32571E515
+	for <linux-bluetooth@vger.kernel.org>; Mon,  9 Dec 2024 20:58:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733777931; cv=none; b=lRdAX1ZDBkSQOyEQ+QYYm/ecv8YxT69kAHFLYFexv3twE7E5RF04Zwj9tlO/bd9PlOqaWwdyKcGD8GCpM/bRzm9VQlZchMfOhENJbskikHHlIFXdnuN35LMRin8+jbwYCqFvUMw8d8kZv1dexFs9fuLJqE9R1Xq6b97kKuzm6zI=
+	t=1733777932; cv=none; b=VIekeTVFcOci7oQIQvH8n11nfYKQFRGLwsudzI5KorM7W4Ihrpg3GnUmYkhT6qi5EBLKTBZ4vo2abRs6TR6Ozd8ZI9oJmdxd72iZlGPtR6llsfh8Ah0GlTrHaVeIYVakqCY5ClQ4C8m9xM0X3wqbJWrDOPPTglugd+JS5bqce1o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733777931; c=relaxed/simple;
-	bh=S7gQYM/Op0F+uU3QgA7rDPFpJw9qEcuHXsqg49KFSYQ=;
+	s=arc-20240116; t=1733777932; c=relaxed/simple;
+	bh=RxEIPpdPTDSlD5uhcmRfAorHwAU5J7cSXd45B0gLdFY=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=GiXpGFMVBWfNALsr6q1oWMMz1/Be/5xEa0t+07fvN+u8PuuqpbcbcjTvyKN2PChyR3hyxNktdMCNx5q3mseq2l+sHsrGkh9UaFrLZYgO6QjByuGC9bYL8fxFXB6XaT4SRizcA8aGxBwnyRZZG00TGutmxHakt213p+dXuT6ereU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IOdr1Q+o; arc=none smtp.client-ip=209.85.219.169
+	 MIME-Version; b=VfO6Bn3mVuTYUh31MtGNHxrIM06SWa2Tynpl7u3XlP/2ISQUesL4oSxw50KP+2AjpZIvyb4cz7lEqUnxG9G6MCYZSFnmFlrvLwoV5RqnsCYCs10ZPXicctX47fs648gwEkQLrOApaXYpIZbLK6WqqJ3Wb10mm/oVYymUETAVi4s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=d3MFkoH6; arc=none smtp.client-ip=209.85.219.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IOdr1Q+o"
-Received: by mail-yb1-f169.google.com with SMTP id 3f1490d57ef6-e3a26de697fso1676744276.3
-        for <linux-bluetooth@vger.kernel.org>; Mon, 09 Dec 2024 12:58:49 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="d3MFkoH6"
+Received: by mail-yb1-f173.google.com with SMTP id 3f1490d57ef6-e3983fe3aadso4615688276.2
+        for <linux-bluetooth@vger.kernel.org>; Mon, 09 Dec 2024 12:58:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1733777927; x=1734382727; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1733777929; x=1734382729; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=X2S5S1i4ryt7vfT0CYbROzGaWy7EJyhEKdAnCABifqg=;
-        b=IOdr1Q+ogN2/sAZmWP4xXq9EAH8qr7sB9KpzfvqDt9/iYRQQAILixdbFbgDTzyGtQL
-         U7L05OSt3g9sxnLVG308+izkzCiK5YK58hEqFDGIF6iEo8DE1ZVJXk9DX3nLYd5+13sK
-         KjrRQnw59dj24fxzxyhvaidZSZeg25t2SDyWyAEC7N0TOwb9Td4KN5oTpdNHfEdNfzaG
-         3hyMf9qEvVumInHKF2Z8ZSKhF+AlgQGrY/rQQNmyGYA+ipQHo1tdIh7z0hqU7Ft82zNv
-         eSYSlKc7CedHFC+EuNox0nxTZTKwHC2a5CK+OC1FMXy96MBnQzVJmIIKaLMZY5Z4/Lwi
-         NwrA==
+        bh=6CbYWb1jlIhdlhwCdhvt+Vz2pjKRNVPktxwN0AQdrEo=;
+        b=d3MFkoH6jEo+kvUg2Z+2W/Lpxr7nmTl93YltWFP4C9WaQhtXzVBGhVhEtkNWQX1imu
+         JFG4sfaKNIbpycOlUnlXuzECg91u+6/s+5GI6qZTkG43Nit7sXRUaT2lLZRfmxScHfSo
+         8H9/3+6apCwBtS2HACGP9eoZ3AESreEBOn96UEyqZbCihSX+4RtvBzZ24ddc/FPynrbQ
+         jybaA1wMuZO2PyKpg8llQJdCBd1/Ow99+UTE3P1hb/L2vM0K5Xlwe9VSjYrIcysSfgNQ
+         hKzjv9Hu7arWK5fD5iUSDma4bk7BgNqKaHLKq/Obd5Yo2r6W6U3mNCEIcU8XZXlYzS+r
+         BdRw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733777927; x=1734382727;
+        d=1e100.net; s=20230601; t=1733777929; x=1734382729;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=X2S5S1i4ryt7vfT0CYbROzGaWy7EJyhEKdAnCABifqg=;
-        b=RUNBkO9iVEZ7G3QsDX/FuF/sGZV0btzcdDvorh821LjNRfGIUOy7XE+Wf9J9hP5TOI
-         JYrJMEtNSLKvN5tqq0Su1W+gCyCPwXKfhSWHILk4rJj8hDgJVOxociaF6os5T/QYTohJ
-         TSibB0aOgOp5gVUygmL7yEJoPS7ErI+BQ10F2Wq6D/3QREJ7UjKbbn/1b6GdQFGW7ADS
-         B3307sBWWLcBQLDd4zjzxmLVFqCYz4wnO0mwBY9eSFdsi6bAPgtlyQbD2pXDvIsMcUve
-         bCSe73/JtZbK8DFpS4QJXRMYu/tq4UTF/6oXbvchUPIT5z7BcBvKfk/JPmS9pWHir49Q
-         PP5A==
-X-Gm-Message-State: AOJu0YzHhLZ3rut0iZWt/pd+J791XmGPxK91XiQEGkmnJNy9vRKmv7bY
-	Z8uxVsxhAd3+TZk7r4qDtdzBMMGW2RDtHRTVRNUubzrsiRoaUEu5jr5xRQ==
-X-Gm-Gg: ASbGncu+mtCBQ5AjmZpL8H4sGGwT+bdu/7yzkzN8/B0SpRkDFvOgCjTQrANSPwiXDoJ
-	xtNANCBwC9wTCuVt2GZZLBEJ71B+Kuw9pRcpGMjWlM7hb48ENeInujrnr7K4boSxMGOyB0EBQvh
-	MDIMk4EpcMTzo5jz7YrAE6PdzD7OzwMOzyyZq5ftrjKXNMUmZBGXbXK3IAgDAgrE9UZmaIYSHuS
-	vGH0cZwdBG583spe/Dt1pGA6LOLOTwPWbRr5Nx4qyS+fycZ5u9aNlO38n3Sjd6Ey/xslrnNpBW4
-	BK13XHT59NHoF5lVoZu7SAR+bQ==
-X-Google-Smtp-Source: AGHT+IHdaI5cANxAMjnRBlzkS3IbeExFqJdERkHIulhlOJtShz8YHUiCGvarVcw8lWVx7h0CV1DGcw==
-X-Received: by 2002:a05:6902:72b:b0:e38:8ded:b008 with SMTP id 3f1490d57ef6-e3a59afe897mr2272119276.13.1733777927519;
-        Mon, 09 Dec 2024 12:58:47 -0800 (PST)
+        bh=6CbYWb1jlIhdlhwCdhvt+Vz2pjKRNVPktxwN0AQdrEo=;
+        b=XQZnejU0BLj0zxzEZ1ifQ1TEXRG0xo9m0SplkAxGQ/D13NUZinQwQVs6m4xRS84vfI
+         In3p4Iq1x5+NayCePiovswcXV5foKnStmMIAx4IuS8NGkBf2u02Pq7vQRXf3hN4kM3lx
+         jHdNtAE1SMTUcZEtVdr3sI6xOrIZh0oYoU++P70InyKfOqOL61OoRClX4vG87DVnfvzu
+         LQlusXzb4VSgeHUympQQ66K9vyw1Ljf1Tz2J03MBpc1GRwKxr1N/48BNKMgH4g309BHO
+         niS9ZL5+roEEe9QRPHW0CLBRL76OGgmLxIO7ZR3BxY/+ZJSS4dRAwp0co/Ko/hVoDNOv
+         7YyQ==
+X-Gm-Message-State: AOJu0Yz3GDFCy/nTqk/cApBDcZJ1ePaj7qb1UGO8scGNBsVN18vcMCOc
+	0hAmlTVqmeYunPBDR15efQburQ8BP74KGw0SsOk7O4ElMb68nxB+z65Iew==
+X-Gm-Gg: ASbGncs+wofbWXTSXurKGxiJSy5Nmcy8clL8i/JCs+7eINYc2T0pAN2pfRT3I5kQVgj
+	RacF7870RsNWbCTr2wwU1TzAx9lVJXDuFrKqfnTvQ1k86z5zbKshI0R9iJGuz661fHRl+io7UX0
+	D8du9aHM6JEyYEcKpWXpsudXu6847CASmHyr7F1nM+gUvvc3nIIVYg48MWCF0cI+L6XPdIClxtq
+	nRLuRoFvtNBQilK/sIHUS5SOuzpcLC0cWn0BvoljCqmp89v1EPoQgy5o3oYaLW5/g/V2kAjJDPc
+	5EZmdaC7r971zX4lwPWfnpjfgA==
+X-Google-Smtp-Source: AGHT+IFwbt+TPVAS6qNVupP5AMmkjemvyCFlgyp7/uqURloUcImBbK95sEPBFY/5TsXf+UlQWM8RkA==
+X-Received: by 2002:a05:6902:1149:b0:e39:83a4:dce6 with SMTP id 3f1490d57ef6-e3a0b1345f8mr11872925276.25.1733777929121;
+        Mon, 09 Dec 2024 12:58:49 -0800 (PST)
 Received: from lvondent-mobl5.. (syn-107-146-107-067.res.spectrum.com. [107.146.107.67])
-        by smtp.gmail.com with ESMTPSA id 3f1490d57ef6-e39f6a42f31sm2556098276.4.2024.12.09.12.58.45
+        by smtp.gmail.com with ESMTPSA id 3f1490d57ef6-e39f6a42f31sm2556098276.4.2024.12.09.12.58.47
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 09 Dec 2024 12:58:46 -0800 (PST)
+        Mon, 09 Dec 2024 12:58:48 -0800 (PST)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v1 2/3] main.conf: Add GATT.ExportClaimedServices
-Date: Mon,  9 Dec 2024 15:58:42 -0500
-Message-ID: <20241209205843.1394081-2-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v1 3/3] monitor: Allow caching of temporary gatt_db
+Date: Mon,  9 Dec 2024 15:58:43 -0500
+Message-ID: <20241209205843.1394081-3-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.47.1
 In-Reply-To: <20241209205843.1394081-1-luiz.dentz@gmail.com>
 References: <20241209205843.1394081-1-luiz.dentz@gmail.com>
@@ -75,236 +75,144 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This adds GATT.ExportClaimedService which can be used to allow access to
-service under control of bluetoothd(1) since often times it should be
-safe to allow read-only access as it shouldn't interfere with each
-other, but this one step further and allow the systems to be configured
-with read-write as well just in case some sort of workaround is needed,
-or for debugging purposes.
+This fixes the problem of not being able to decode GATT traffic when
+reading the traces from a file/offline, the gatt_db would be discarded
+upon the first disconnection so it didn't work if the trace contains
+multiple connections.
 
-Since this is now a proper system policy this removes the expections from
-battery and deviceinfo introduced by 713f6f09f017
-("profile: Add exception to battery profile for external access") and
-0cef5a7996db ("deviceinfo: Enable external flag").
+To fix this btmon would remember gatt_db discovered at runtime so even
+when there multiple connections the same db would be used.
 ---
- profiles/battery/battery.c       |  1 -
- profiles/deviceinfo/deviceinfo.c |  1 -
- src/btd.h                        |  7 ++++++
- src/gatt-client.c                | 37 ++++++++++++++++++++++++++++++--
- src/main.c                       | 30 ++++++++++++++++++++++++++
- src/main.conf                    |  5 +++++
- 6 files changed, 77 insertions(+), 4 deletions(-)
+ monitor/att.c    | 61 ++++++++++++++++++++++++++++++++++++++++++++----
+ monitor/packet.c |  2 +-
+ monitor/packet.h |  2 +-
+ 3 files changed, 58 insertions(+), 7 deletions(-)
 
-diff --git a/profiles/battery/battery.c b/profiles/battery/battery.c
-index 02d024d927ec..5318d40d12b4 100644
---- a/profiles/battery/battery.c
-+++ b/profiles/battery/battery.c
-@@ -327,7 +327,6 @@ static struct btd_profile batt_profile = {
- 	.device_remove	= batt_remove,
- 	.accept		= batt_accept,
- 	.disconnect	= batt_disconnect,
--	.external	= true,
+diff --git a/monitor/att.c b/monitor/att.c
+index 3f41c2bd096f..4358cd7348f7 100644
+--- a/monitor/att.c
++++ b/monitor/att.c
+@@ -63,6 +63,13 @@ struct att_conn_data {
+ 	uint16_t mtu;
  };
  
- static int batt_init(void)
-diff --git a/profiles/deviceinfo/deviceinfo.c b/profiles/deviceinfo/deviceinfo.c
-index b6dc0ab2e207..0cdf2947e0a3 100644
---- a/profiles/deviceinfo/deviceinfo.c
-+++ b/profiles/deviceinfo/deviceinfo.c
-@@ -138,7 +138,6 @@ static int deviceinfo_disconnect(struct btd_service *service)
- static struct btd_profile deviceinfo_profile = {
- 	.name		= "deviceinfo",
- 	.remote_uuid	= DEVICE_INFORMATION_UUID,
--	.external	= true,
- 	.device_probe	= deviceinfo_probe,
- 	.device_remove	= deviceinfo_remove,
- 	.accept		= deviceinfo_accept,
-diff --git a/src/btd.h b/src/btd.h
-index 07205aa69486..a443f66f6cd8 100644
---- a/src/btd.h
-+++ b/src/btd.h
-@@ -42,6 +42,12 @@ enum sc_mode_t {
- 	SC_ONLY,
- };
- 
-+enum bt_gatt_export_t {
-+	BT_GATT_EXPORT_OFF,
-+	BT_GATT_EXPORT_READ_ONLY,
-+	BT_GATT_EXPORT_READ_WRITE,
++struct gatt_cache {
++	bdaddr_t id;
++	struct gatt_db *db;
 +};
 +
- struct btd_br_defaults {
- 	uint16_t	page_scan_type;
- 	uint16_t	page_scan_interval;
-@@ -147,6 +153,7 @@ struct btd_opts {
- 	uint16_t	gatt_mtu;
- 	uint8_t		gatt_channels;
- 	bool		gatt_client;
-+	enum bt_gatt_export_t gatt_export;
- 	enum mps_mode_t	mps;
- 
- 	struct btd_avdtp_opts avdtp;
-diff --git a/src/gatt-client.c b/src/gatt-client.c
-index a67e04eee81e..6f22bbb490a7 100644
---- a/src/gatt-client.c
-+++ b/src/gatt-client.c
-@@ -66,6 +66,7 @@ struct btd_gatt_client {
- struct service {
- 	struct btd_gatt_client *client;
- 	bool primary;
-+	bool claimed;
- 	uint16_t start_handle;
- 	uint16_t end_handle;
- 	bt_uuid_t uuid;
-@@ -616,6 +617,14 @@ static DBusMessage *descriptor_write_value(DBusConnection *conn,
- 	if (parse_options(&iter, &offset, NULL))
- 		return btd_error_invalid_args(msg);
- 
-+	/*
-+	 * Check if service was previously claimed by a plugin and if we shall
-+	 * consider it read-only, in that case return not authorized.
-+	 */
-+	if (desc->chrc->service->claimed &&
-+			btd_opts.gatt_export == BT_GATT_EXPORT_READ_ONLY)
-+		return btd_error_not_authorized(msg);
++static struct queue *cache_list;
 +
- 	/*
- 	 * Don't allow writing to Client Characteristic Configuration
- 	 * descriptors. We achieve this through the StartNotify and StopNotify
-@@ -1046,6 +1055,14 @@ static DBusMessage *characteristic_write_value(DBusConnection *conn,
- 	if (parse_options(&iter, &offset, &type))
- 		return btd_error_invalid_args(msg);
- 
-+	/*
-+	 * Check if service was previously claimed by a plugin and if we shall
-+	 * consider it read-only, in that case return not authorized.
-+	 */
-+	if (chrc->service->claimed &&
-+			btd_opts.gatt_export == BT_GATT_EXPORT_READ_ONLY)
-+		return btd_error_not_authorized(msg);
-+
- 	/*
- 	 * Decide which write to use based on characteristic properties. For now
- 	 * we don't perform signed writes since gatt-client doesn't support them
-@@ -1295,6 +1312,14 @@ static DBusMessage *characteristic_acquire_write(DBusConnection *conn,
- 	if (!gatt)
- 		return btd_error_failed(msg, "Not connected");
- 
-+	/*
-+	 * Check if service was previously claimed by a plugin and if we shall
-+	 * consider it read-only, in that case return not authorized.
-+	 */
-+	if (chrc->service->claimed &&
-+			btd_opts.gatt_export == BT_GATT_EXPORT_READ_ONLY)
-+		return btd_error_not_authorized(msg);
-+
- 	if (chrc->write_io)
- 		return btd_error_not_permitted(msg, "Write acquired");
- 
-@@ -1954,6 +1979,7 @@ static struct service *service_create(struct gatt_db_attribute *attr,
- 	service->chrcs = queue_new();
- 	service->incl_services = queue_new();
- 	service->client = client;
-+	service->claimed = gatt_db_service_get_claimed(attr);
- 
- 	gatt_db_attribute_get_service_data(attr, &service->start_handle,
- 							&service->end_handle,
-@@ -2097,8 +2123,15 @@ static void export_service(struct gatt_db_attribute *attr, void *user_data)
- 	struct btd_gatt_client *client = user_data;
- 	struct service *service;
- 
--	if (gatt_db_service_get_claimed(attr))
--		return;
-+	if (gatt_db_service_get_claimed(attr)) {
-+		switch (btd_opts.gatt_export) {
-+		case BT_GATT_EXPORT_OFF:
-+			return;
-+		case BT_GATT_EXPORT_READ_ONLY:
-+		case BT_GATT_EXPORT_READ_WRITE:
-+			break;
-+		}
-+	}
- 
- 	service = service_create(attr, client);
- 	if (!service)
-diff --git a/src/main.c b/src/main.c
-index 41c3271a7457..b92b22e41d4c 100644
---- a/src/main.c
-+++ b/src/main.c
-@@ -148,6 +148,7 @@ static const char *gatt_options[] = {
- 	"ExchangeMTU",
- 	"Channels",
- 	"Client",
-+	"ExportClaimedServices",
- 	NULL
+ static void print_uuid(const char *label, const void *data, uint16_t size)
+ {
+ 	const char *str;
+@@ -397,10 +404,42 @@ static const struct bitfield_data chrc_prop_table[] = {
+ 	{ }
  };
  
-@@ -1066,6 +1067,33 @@ static void parse_gatt_cache(GKeyFile *config)
- 	g_free(str);
- }
- 
-+static enum bt_gatt_export_t parse_gatt_export_str(const char *str)
+-static void att_conn_data_free(void *data)
++static bool match_cache_id(const void *data, const void *match_data)
 +{
-+	if (!strcmp(str, "no") || !strcmp(str, "false") ||
-+				!strcmp(str, "off")) {
-+		return BT_GATT_EXPORT_OFF;
-+	} else if (!strcmp(str, "read-only")) {
-+		return BT_GATT_EXPORT_READ_ONLY;
-+	} else if (!strcmp(str, "read-write")) {
-+		return BT_GATT_EXPORT_READ_WRITE;
-+	}
++	const struct gatt_cache *cache = data;
++	const bdaddr_t *id = match_data;
 +
-+	DBG("Invalid value for ExportClaimedServices=%s", str);
-+	return BT_GATT_EXPORT_READ_ONLY;
++	return !bacmp(&cache->id, id);
 +}
 +
-+static void parse_gatt_export(GKeyFile *config)
++static void gatt_cache_add(struct packet_conn_data *conn, struct gatt_db *db)
 +{
-+	char *str = NULL;
++	struct gatt_cache *cache;
++	bdaddr_t id;
++	uint8_t id_type;
 +
-+	parse_config_string(config, "GATT", "ExportClaimedServices", &str);
-+	if (!str)
++	if (!keys_resolve_identity(conn->dst, id.b, &id_type))
++		bacpy(&id, (bdaddr_t *)conn->dst);
++
++	if (queue_find(cache_list, match_cache_id, &id))
 +		return;
 +
-+	btd_opts.gatt_export = parse_gatt_export_str(str);
-+	g_free(str);
++	if (!cache_list)
++		cache_list = queue_new();
++
++	cache = new0(struct gatt_cache, 1);
++	bacpy(&cache->id, &id);
++	cache->db = gatt_db_ref(db);
++	queue_push_tail(cache_list, cache);
 +}
 +
- static void parse_gatt(GKeyFile *config)
++static void att_conn_data_free(struct packet_conn_data *conn, void *data)
  {
- 	parse_gatt_cache(config);
-@@ -1075,6 +1103,7 @@ static void parse_gatt(GKeyFile *config)
- 	parse_config_u8(config, "GATT", "Channels", &btd_opts.gatt_channels,
- 				1, 5);
- 	parse_config_bool(config, "GATT", "Client", &btd_opts.gatt_client);
-+	parse_gatt_export(config);
+ 	struct att_conn_data *att_data = data;
+ 
++	if (!gatt_db_isempty(att_data->rdb))
++		gatt_cache_add(conn, att_data->rdb);
++
+ 	gatt_db_unref(att_data->rdb);
+ 	gatt_db_unref(att_data->ldb);
+ 	queue_destroy(att_data->reads, free);
+@@ -456,20 +495,32 @@ static void load_gatt_db(struct packet_conn_data *conn)
+ 	char filename[PATH_MAX];
+ 	char local[18];
+ 	char peer[18];
+-	uint8_t id[6], id_type;
++	bdaddr_t id;
++	uint8_t id_type;
+ 
+ 	ba2str((bdaddr_t *)conn->src, local);
+ 
+-	if (keys_resolve_identity(conn->dst, id, &id_type))
+-		ba2str((bdaddr_t *)id, peer);
+-	else
++	if (keys_resolve_identity(conn->dst, id.b, &id_type)) {
++		ba2str(&id, peer);
++	} else {
++		bacpy(&id, (bdaddr_t *)conn->dst);
+ 		ba2str((bdaddr_t *)conn->dst, peer);
++	}
+ 
+ 	create_filename(filename, PATH_MAX, "/%s/attributes", local);
+ 	gatt_load_db(data->ldb, filename, &data->ldb_mtim);
+ 
+ 	create_filename(filename, PATH_MAX, "/%s/cache/%s", local, peer);
+ 	gatt_load_db(data->rdb, filename, &data->rdb_mtim);
++
++	/* If rdb cannot be loaded from file try local cache */
++	if (gatt_db_isempty(data->rdb)) {
++		struct gatt_cache *cache;
++
++		cache = queue_find(cache_list, match_cache_id, &id);
++		if (cache)
++			data->rdb = cache->db;
++	}
  }
  
- static void parse_csis_sirk(GKeyFile *config)
-@@ -1219,6 +1248,7 @@ static void init_defaults(void)
- 	btd_opts.gatt_mtu = BT_ATT_MAX_LE_MTU;
- 	btd_opts.gatt_channels = 1;
- 	btd_opts.gatt_client = true;
-+	btd_opts.gatt_export = BT_GATT_EXPORT_READ_ONLY;
+ static struct gatt_db *get_db(const struct l2cap_frame *frame, bool rsp)
+diff --git a/monitor/packet.c b/monitor/packet.c
+index f1a42925a8fc..6a2767ae39b3 100644
+--- a/monitor/packet.c
++++ b/monitor/packet.c
+@@ -199,7 +199,7 @@ static struct packet_conn_data *release_handle(uint16_t handle)
  
- 	btd_opts.avdtp.session_mode = BT_IO_MODE_BASIC;
- 	btd_opts.avdtp.stream_mode = BT_IO_MODE_BASIC;
-diff --git a/src/main.conf b/src/main.conf
-index fff13ed2ff31..80e72e18f749 100644
---- a/src/main.conf
-+++ b/src/main.conf
-@@ -262,6 +262,11 @@
- # Default to 1
- #Channels = 1
+ 		if (conn->handle == handle) {
+ 			if (conn->destroy)
+-				conn->destroy(conn->data);
++				conn->destroy(conn, conn->data);
  
-+# Export claimed services by plugins
-+# Possible values: no, read-only, read-write
-+# Default: read-only
-+#ExportClaimedServices = read-only
-+
- [CSIS]
- # SIRK - Set Identification Resolution Key which is common for all the
- # sets. They SIRK key is used to identify its sets. This can be any
+ 			queue_destroy(conn->tx_q, free);
+ 			queue_destroy(conn->chan_q, free);
+diff --git a/monitor/packet.h b/monitor/packet.h
+index 856f74f4db16..964b9a7219fa 100644
+--- a/monitor/packet.h
++++ b/monitor/packet.h
+@@ -50,7 +50,7 @@ struct packet_conn_data {
+ 	struct queue *chan_q;
+ 	struct packet_latency tx_l;
+ 	void     *data;
+-	void     (*destroy)(void *data);
++	void     (*destroy)(struct packet_conn_data *conn, void *data);
+ };
+ 
+ struct packet_conn_data *packet_get_conn_data(uint16_t handle);
 -- 
 2.47.1
 
