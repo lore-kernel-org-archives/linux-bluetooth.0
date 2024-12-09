@@ -1,142 +1,99 @@
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f182.google.com (mail-qk1-f182.google.com [209.85.222.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5382A217F34;
-	Mon,  9 Dec 2024 10:35:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0547F2165F6
+	for <linux-bluetooth@vger.kernel.org>; Mon,  9 Dec 2024 10:47:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733740549; cv=none; b=i8FPPKdJRXShQpE/oxPmwdt590ic+CuwNmqQdBUag/go42tBgdFdoRA7OuggPk7IPP3qy/JPiFvayLP+fgSYJwQXWdvIIe11JN1ikFljraX4MCtNHaFRGe3BMtm6KGzHDfrmfNb1lc7aIZo0ajZRf65IotFJDqoZKJvcK5sn/Rw=
+	t=1733741233; cv=none; b=kcKQZaiHvpaG70ws3yzY8M/KltROIJ0eSN4mljlf4McZAm8wcqnqO6VAi1J0EJToOrTcZQw81fc4nxMfLmZF6txAN+NPv9fbqg/CsB+HDYUJA2dYXJdg+zYzEELOjlMxjjkuA7I3WcM8xEu4RW8Svw7fte7mZEAOIXouE4ZdCY8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733740549; c=relaxed/simple;
-	bh=lO0NSY8LMiuJW05Xvn1QEhsQUDgF7azuqtl0fNHFRuo=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Jyyh1ouwhvbff/PSsgo/7L8OmXD1tPC+pGwFPREfHrQvXBiVXSs/33YX6Ri+WCcEN78iVbd4o55OevSdOhA607Ubl0Fqhwu3vcX+CXbMMtz3KlJmUyCXx2B1oYIkGlnC58+5Z/pqSw/KArL/BxfNA1dOfosYcs6Tht6LwdsPxt8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=KMDK/OqN; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+	s=arc-20240116; t=1733741233; c=relaxed/simple;
+	bh=6bdmLpbEsgT4beZScW2vl5QE0ie8Y14H3DS8jeeiEF8=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=j2R5PtukKIxFBnpifjYKIDaIqS8MsIdQKki85Cj9tzkF50tywg3BBg5wirmJ22+L1CFxRpVENhhYTYyD2kTYuSvj2DUPZ8gyptwYdNus9MexmCOchlQk5ScebitfWkI65Q+OTQCIk4qV940LjRCyVMCwijdEEmH2+DglDZlrFYc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dTck+B+L; arc=none smtp.client-ip=209.85.222.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="KMDK/OqN"
-Received: from pps.filterd (m0279869.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4B9AFEfa011260;
-	Mon, 9 Dec 2024 10:35:42 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=qcppdkim1; bh=qhj1nivFGwsGQuyh9FdQA0o+
-	5GmWqgiquJCRJfoBXuQ=; b=KMDK/OqNn7Shu7BwK8ke3I9GFRd0mKuRjrOB2Ksl
-	RlpIH5RfYv7CcoT/shR1kssAMmJh2afC402j5Ky0XXkvx8YVeoZ9bslYJ2EQgVCo
-	C+d68gn0ArZzoeExnSzKUWhJlH6pu5Vy7r1V8oHlg3lIoexV7bCowfU82Wj7PSJd
-	mYR8hTAOaggx/p6JpE4i0Fw7/V5SxVsXykBvPzK82fzoWD617+NkhdWup/SdbAsm
-	ru8Vhqm6BmXWbCTZ2JX6Bqg+JssRBkPUCEtz3qSi44TXXEatasKFtaoeTGUmAg3E
-	ZZFnZuJYE0v2CR/4VSaKhVWSeu8UG+4tOpzy3cjRIJmPIw==
-Received: from nalasppmta04.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 43cdc6cc7g-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 09 Dec 2024 10:35:42 +0000 (GMT)
-Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
-	by NALASPPMTA04.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 4B9AZfCe009261
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 9 Dec 2024 10:35:41 GMT
-Received: from hu-janathot-hyd.qualcomm.com (10.80.80.8) by
- nalasex01a.na.qualcomm.com (10.47.209.196) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.9; Mon, 9 Dec 2024 02:35:35 -0800
-From: Janaki Ramaiah Thota <quic_janathot@quicinc.com>
-To: Liam Girdwood <lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>,
-        "Rob
- Herring" <robh@kernel.org>,
-        Krzysztof Kozlowski <krzk+dt@kernel.org>,
-        "Conor
- Dooley" <conor+dt@kernel.org>,
-        Bjorn Andersson <andersson@kernel.org>,
-        "Konrad Dybcio" <konradybcio@kernel.org>,
-        Marcel Holtmann
-	<marcel@holtmann.org>,
-        "Luiz Augusto von Dentz" <luiz.dentz@gmail.com>,
-        Bartosz Golaszewski <brgl@bgdev.pl>
-CC: <quic_mohamull@quicinc.com>, <quic_hbandi@quicinc.com>,
-        <quic_anubhavg@quicinc.com>,
-        Bartosz Golaszewski
-	<bartosz.golaszewski@linaro.org>,
-        <linux-arm-msm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <devicetree@vger.kernel.org>, <linux-bluetooth@vger.kernel.org>,
-        <linux-pm@vger.kernel.org>
-Subject: [PATCH v5 4/4] power: sequencing: qcom-wcn: add support for the WCN6750 PMU
-Date: Mon, 9 Dec 2024 16:04:55 +0530
-Message-ID: <20241209103455.9675-5-quic_janathot@quicinc.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20241209103455.9675-1-quic_janathot@quicinc.com>
-References: <20241209103455.9675-1-quic_janathot@quicinc.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dTck+B+L"
+Received: by mail-qk1-f182.google.com with SMTP id af79cd13be357-7b1601e853eso311866185a.2
+        for <linux-bluetooth@vger.kernel.org>; Mon, 09 Dec 2024 02:47:11 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1733741231; x=1734346031; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=6bdmLpbEsgT4beZScW2vl5QE0ie8Y14H3DS8jeeiEF8=;
+        b=dTck+B+LchzzZTN2/opsaO203TPeLOsD+bibbHuncNDhJAOAAu8yGosbSCcg517y3+
+         rQ5kZh/n7aiGU8Uj1DrVdzSIqXUKCs7aQq7Hg1ZCjwTqjayfpd8e4tgLylZhk8IfIEAU
+         y1IylZnjAJ69yyykJSMWjro+Kb5nOt/s29ZO2PW3JUZuwKkUYggvNVwUuVnu+XcjDbRn
+         EHsMhFTEIMgZJf8gCn1SAYu91diEzWR+t3jqvK0nMAv7UB4qdproUO614ZBKbnaIn120
+         806jjepYbKcDogDuC9FN1IlO435Ld9GFjeWYTX47sSUjWJ3NZrSW/RNE74VOTqPogvmz
+         918g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733741231; x=1734346031;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=6bdmLpbEsgT4beZScW2vl5QE0ie8Y14H3DS8jeeiEF8=;
+        b=Ud0vW3kzAgFuscpHTpZuwmScUQhuMiqNqNstaVaBtZf1bjwyr5E4ODKAZVECxw30ju
+         QXdWANcBCg0ec1K/JjEDkCm0MRxTpmbW9vpRqztG7+w/sCQT9cq8nf8sVctVC+nZ4NWl
+         31rTOQkKTXM2v3E3pB1myZ3FuDLzBnR43RJ2Dp9DnPGXdgM5m1Api0OI+BNjfanHHtZU
+         Q/QFpP/E2njg7fkyhH6Kv9IpoOmx+F/yYHMPL+BBhP4ANtIh7rpywrxqTaL4H0gKKote
+         sMYq1Eq6pyteOicRqT6SDMm/An4hTlho8F2d+bBK0ZjtqVAq4RehGEUm1hc1DH41jOZ3
+         SwSA==
+X-Gm-Message-State: AOJu0YzHZcMSNwk5Qq35h57ZAjxEeeV1Wa+6axron2X8g9ve2AlG7qBn
+	yMOvGR6Tyc9aKGBNnqPd2DGwLjXm9F6q17K5/zQwL5zQZJSV22D8dQS/jg==
+X-Gm-Gg: ASbGncshQTMvDg/Psg2z1ZYcydzk9oedSYeeQA4KIbya5fwpBCdmKsGtvb1kzg1U7Ny
+	p+nq/idnAq5p+KWh7B0Gnh1oC1NIF5wY7UD02VI5WLGfXE1rpyVV5TrD54suS2DpUhu8XUmXWUV
+	LhZon5VqaRAwLrAlA5M/0JLE27gpE+VEU1Pmt0cOg3N6mf4j5i9T+kBC7W3N8sb1fLyuHpENadL
+	rBZRN4GUI6tIbYjZel3+yAjUWU6Pm154YAOHYR69F914F52li3AF8v/Nqez
+X-Google-Smtp-Source: AGHT+IF8uAaa/I+CksUwXYv5vX5nyFjn/HuKOZST/lEjhWxtwVpRA5VD8sJv7ZHirQKz/gtKajAItg==
+X-Received: by 2002:a05:622a:254:b0:466:85eb:6123 with SMTP id d75a77b69052e-46734cf3020mr177658351cf.22.1733741230679;
+        Mon, 09 Dec 2024 02:47:10 -0800 (PST)
+Received: from [172.17.0.2] ([13.90.174.207])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-46759b837aasm16650451cf.83.2024.12.09.02.47.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 09 Dec 2024 02:47:10 -0800 (PST)
+Message-ID: <6756caae.c80a0220.267135.41e9@mx.google.com>
+Date: Mon, 09 Dec 2024 02:47:10 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============2803864677137799137=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nalasex01a.na.qualcomm.com (10.47.209.196)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: 125Oze-hPZU82v66ayb2kUqB43xu4-lR
-X-Proofpoint-GUID: 125Oze-hPZU82v66ayb2kUqB43xu4-lR
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
- definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 mlxscore=0
- mlxlogscore=999 malwarescore=0 bulkscore=0 lowpriorityscore=0
- clxscore=1015 suspectscore=0 spamscore=0 phishscore=0 priorityscore=1501
- impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2411120000 definitions=main-2412090082
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, quic_janathot@quicinc.com
+Subject: RE: Enable Bluetooth on qcs6490-rb3gen2 board
+In-Reply-To: <20241209103455.9675-2-quic_janathot@quicinc.com>
+References: <20241209103455.9675-2-quic_janathot@quicinc.com>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Enable support for controlling the power-up sequence of the PMU inside
-the WCN6750 model.
+--===============2803864677137799137==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Signed-off-by: Janaki Ramaiah Thota <quic_janathot@quicinc.com>
+This is an automated email and please do not reply to this email.
+
+Dear Submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
+
+----- Output -----
+
+error: patch failed: drivers/power/sequencing/pwrseq-qcom-wcn.c:272
+error: drivers/power/sequencing/pwrseq-qcom-wcn.c: patch does not apply
+hint: Use 'git am --show-current-patch' to see the failed patch
+
+Please resolve the issue and submit the patches again.
+
+
 ---
- drivers/power/sequencing/pwrseq-qcom-wcn.c | 22 ++++++++++++++++++++++
- 1 file changed, 22 insertions(+)
+Regards,
+Linux Bluetooth
 
-diff --git a/drivers/power/sequencing/pwrseq-qcom-wcn.c b/drivers/power/sequencing/pwrseq-qcom-wcn.c
-index 682a9beac69e..cc03b5aaa8f2 100644
---- a/drivers/power/sequencing/pwrseq-qcom-wcn.c
-+++ b/drivers/power/sequencing/pwrseq-qcom-wcn.c
-@@ -272,6 +272,24 @@ static const struct pwrseq_qcom_wcn_pdata pwrseq_qca6390_of_data = {
- 	.targets = pwrseq_qcom_wcn_targets,
- };
- 
-+static const char *const pwrseq_wcn6750_vregs[] = {
-+	"vddaon",
-+	"vddasd",
-+	"vddpmu",
-+	"vddrfa0p8",
-+	"vddrfa1p2",
-+	"vddrfa1p7",
-+	"vddrfa2p2",
-+};
-+
-+static const struct pwrseq_qcom_wcn_pdata pwrseq_wcn6750_of_data = {
-+	.vregs = pwrseq_wcn6750_vregs,
-+	.num_vregs = ARRAY_SIZE(pwrseq_wcn6750_vregs),
-+	.pwup_delay_ms = 50,
-+	.gpio_enable_delay_ms = 5,
-+	.targets = pwrseq_qcom_wcn_targets,
-+};
-+
- static const char *const pwrseq_wcn6855_vregs[] = {
- 	"vddio",
- 	"vddaon",
-@@ -431,6 +449,10 @@ static const struct of_device_id pwrseq_qcom_wcn_of_match[] = {
- 		.compatible = "qcom,wcn7850-pmu",
- 		.data = &pwrseq_wcn7850_of_data,
- 	},
-+	{
-+		.compatible = "qcom,wcn6750-pmu",
-+		.data = &pwrseq_wcn6750_of_data,
-+	},
- 	{ }
- };
- MODULE_DEVICE_TABLE(of, pwrseq_qcom_wcn_of_match);
--- 
-The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum,
-a Linux Foundation Collaborative Project
 
+--===============2803864677137799137==--
