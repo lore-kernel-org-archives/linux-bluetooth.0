@@ -1,62 +1,62 @@
-Received: from mail-lf1-f49.google.com (mail-lf1-f49.google.com [209.85.167.49])
+Received: from mail-lj1-f182.google.com (mail-lj1-f182.google.com [209.85.208.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D93C194A53
-	for <linux-bluetooth@vger.kernel.org>; Mon,  9 Dec 2024 10:56:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 453F4216E00
+	for <linux-bluetooth@vger.kernel.org>; Mon,  9 Dec 2024 10:56:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733741780; cv=none; b=INBcHIBFzKh0xW2x3bqjnGGJXrFBr2y+cexCyhm5OuDI20nW8XOIHg1pcDMbDHt0gAOOiOGPD0Y6Kzyzz+GtIkqnLgh0ZGw92svh9+IDSM63uU9YBD4ZkJ0UZehdkQtiDiZBmzQJO+EWXMy/WSGBSpj9AzV8cNbQ9jwuP4njsmU=
+	t=1733741819; cv=none; b=BgBE6ygWp1VuIekMB5v2kU4K1Yy/mPzr9bbSS7RHKUmU5BBDgmG/2sE9n3afAWZ2BtNO4wHUq1veE29MqnBSJHe+k2h/VkXFLk5+Uou6vh2jVuAE95pebiI88cKKrqAsFL1IIr8R5Ru/7e8HXM1KxJLeN0wYs5vNdJMJQ02IxXk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733741780; c=relaxed/simple;
-	bh=MvjEr+QmcBYSFD+4yOMfFy5J+y5/erO43wRjxGBp134=;
+	s=arc-20240116; t=1733741819; c=relaxed/simple;
+	bh=+hIqe/S4QmDOQhbBqmZWXMgHf/K5HX6ZKx4rNqDaI+c=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JyZNU8z+y7+UrVX5SJ1ubsBFH+5sJqn3djtef5sSWq4aDb+rp6pakrmYm7rnuzxcWd3kGz5UMplGaEcYOG/9jEkO7HYY/kWa9//n4taz0FZnU4bpTQKPxYP+06EhBJ6qV5vLCohRrrqnPGFeeQPwHi1TzYpSOpjDcxbDQ3hb1xs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=cJ3NfQyg; arc=none smtp.client-ip=209.85.167.49
+	 Content-Type:Content-Disposition:In-Reply-To; b=tCBvAA3CTQSdTCqlzOK95X6QBuiLyXD/hT47TsSUUHlkjnc9Jjy2AEg6+ylV6FLr54k8ZTnnVFYEtLcwf8BpfxsavHHAe+TGpXvS85DHipvUVF4oRo09Uy6lzmrVvpCqA1SGIXTBv1MfI8UbaiIKbsabAx1BRTWq54vU+5i/r+E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=o9sTKXLi; arc=none smtp.client-ip=209.85.208.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="cJ3NfQyg"
-Received: by mail-lf1-f49.google.com with SMTP id 2adb3069b0e04-5401bd6cdb4so1131830e87.2
-        for <linux-bluetooth@vger.kernel.org>; Mon, 09 Dec 2024 02:56:19 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="o9sTKXLi"
+Received: by mail-lj1-f182.google.com with SMTP id 38308e7fff4ca-2ffa49f623cso46896361fa.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 09 Dec 2024 02:56:56 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1733741777; x=1734346577; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1733741815; x=1734346615; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=s1LCGkepE9BNY41wwancZQPMjgbX9qpsMb1C/mBNuBo=;
-        b=cJ3NfQygvrCnHUz1YhqypYJYiFuhT4uUwvhmpez3mjHDRzZZRMBdFD3aBlcQocSGVP
-         QMi9lDv2NlEC9MDche/rEAOuJn0/+NKCZUQaM3JZvP/s0eavqk9x/oZQ4/8i0OwnNJ79
-         y7OWe777vevFgqZ4gsWQJG1FpXm50ZYyihn5tOKOw6sqz/MX7fJW1/rQru9iQDUpLZc2
-         gSgyqQQAM9ODTyP99A1dr+DRz2hUgN5NXcaPNJv7NREy0v+kAma9Zaj3qbG9AqFLpkC/
-         yyrxMf5SSXNA24r+g0+leBQupql+B1aG1LhQANzOnk9wwS880CRLDnL/cUHnEhSPFNmX
-         9w8A==
+        bh=ujaAnVbj3AWarK9qtUD67P4FOEUURSL/PjGWuchpTYY=;
+        b=o9sTKXLiYAY9D6gd+tBUC/DKVB1LSXHY77IFItaRz3YQACOwIi8PWrunjfnC4ZzISG
+         baEpaAf7xWvTWqvKrCL3FNgDrrKuhKDBfqP+6QGy159jkX0qMSGuZ+pWWrCNhIYytPPA
+         0inDWB6cDBbCv3gtF4nMXuE43+ZExKoWfY/h+vNJr64y0nv/4qm1ufJyT3T4tfE8Miac
+         AaJ/YCvR2BJDPfibUmjlEt22horOEswtwINrJJCoWkmyHRcH2ioA8Gfhwx/AWjJbAk+h
+         kJlCU4Kn2opYnLVqs8pQK4mljVLLHcGigNgdFQgp/nP5S5woZRkYW1T0r60HvymGWo0I
+         EqZQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733741777; x=1734346577;
+        d=1e100.net; s=20230601; t=1733741815; x=1734346615;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=s1LCGkepE9BNY41wwancZQPMjgbX9qpsMb1C/mBNuBo=;
-        b=kIKBPb3tuylggrtw//vKea70+jW7WcTS2UCtuOi09bgyqOxVkr5zgfCk+/ubvB9NQc
-         gJfZdmUuiDUBlqYu8WW2lcNNowX+haeTNu4M8sBYTkmiALc9bEubR4+D0l28YQRb9hIv
-         d+1I7W0iheeIDnRZEo5A5Cq2r8iCMHM3c7JKwhhVokzyA4ASR6TzfX0DbZ+LrwN0vVqS
-         kYi6YwuI5V0oRaTDeHV/d2pQrhJfwVk6e5aHkKWHNdSS2+666MEqbfn2FcdlQYAWIYqD
-         bK3zpOAIsJS94miMJDl4YLYgCDBXWg7M3q2e43FJVXASTYzxKCsh3Z6otpGoC67VO1GK
-         LLSQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXoYVpWX7lKf6NuhVjIsT3Rsb7ass69eYBiVqKBdDd93Xrzas91oFitP5X2joZuK6diSd+tqEY84MpM05XcIc0=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx3Pk9n64jE4oUIQ8w5bMS+8doeQUkIdkJwX/t2ExOWgg+tzpHb
-	CSx3bCNWEQ+ahPy1paMyubugktJD5pZ2QT6CncTVDv0LDrCjRRzxcjYq3NX21Qo=
-X-Gm-Gg: ASbGncv2u2aC9084pQdW/FHmdImviqKE7OBHlAd+j8HkiBy/E2ypIKIfod02u5/iQR5
-	WRNSfYGKuXoaBO86/9dKvf+CzBtN0rKr+5kWKIoGFhCCcdXq+gSTD8x6qEO2Ukh5q8LoLI583wK
-	6IeTib8R8W3bZf8TMyOyJ7kGraBf0oDf49Z+p6FESsnXbEdWN8+nw5oRdBDn01lrpz+nZPgq6Rg
-	dPAs3XHWVJdlNXZhfWVim3/giOwAVDVx24KG3qw/ALBgCAA7huwKMoFt13LfixuXxQpxF/K6e5v
-	I1LndVLwRUjV7rJ0hyecZDZGF9Ux9w==
-X-Google-Smtp-Source: AGHT+IHLQhW4yrOheTO3FKBH2BMc3+YO6hNqRhmWtxjdDrWhydjjQ8nuO7eWSOcahHRapkZ5ee4u3A==
-X-Received: by 2002:a05:6512:3990:b0:53d:a321:db74 with SMTP id 2adb3069b0e04-5402411a69cmr1638e87.50.1733741777425;
-        Mon, 09 Dec 2024 02:56:17 -0800 (PST)
+        bh=ujaAnVbj3AWarK9qtUD67P4FOEUURSL/PjGWuchpTYY=;
+        b=L/tYYSKLG4S5sI4zL3WtjKksLC/JDKAF2vKEBOu9N/hTTZVxWppD7Jgzw0mecbR5QL
+         HI7o70wH+nA9n34ETNpqE5Qo1TUPNFjY0vHKM/yQjE6AgRLYwYfbw87yfxu8DW/pna9T
+         E34rfyq0+G1T3bjvh2eSgONddHrf20LsUzd9CU10/sUblJkqDu2T5zzT28liRh/dCyv6
+         vk8YlDKXAKJ96hjk1yC+alsgbC43+75WhTdrCmSIYf2AjD6/2N/CvTM/P76jJ3UQWlqm
+         5t1hDfvdAFwFxdM9NYCGh9hOLPqZkvQkE+sz1sz/1Vj/Bse1/+V8iG+e5fq0tyr8LsOP
+         cuiA==
+X-Forwarded-Encrypted: i=1; AJvYcCWk9CbBwCEWUR5CnK2sRpp7EQktcZcXL1U8rmRmw07itSoDJJFgw5hWbPtEXmi8bhKh84SXR57f2ztDHHUKlYo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzwqaxPDLp3fXyQ3RrGtDpZzpzGwN+XbCIMiuOKlaDGjkiQ8RVx
+	EnZTWhOKb5FmXXdW2geafGiZOBPtSrnMJwK3JgACKpt3N7EcY/Hp3VqSn5sL48g=
+X-Gm-Gg: ASbGncu8rYUTPbrIaPxk6G5/DbyFcrtvUU3tw/JYFFh8wuiH8WCpxdQHd5n5Gn4CXZI
+	N9HnXgw6UOkpaQc8spbbpnb7K33UN9Kj+sY8uU1isP8hkKqtztzs8pcQODHJjFHViuLegyZVePb
+	dN0JK+rFndhE/UdWXTiooqvIneeiCFzvMfzPKDVol7TGzr/WmtvtzwYv/OdDUcktFrzzePVdZzW
+	MByDUR+NkKyh9ANBIMHXfmQZIUaZ/PSNMbfrz9otkyHqQeRC+Oo+MLIcpn1hU+oKLVO5cjmApIS
+	Ca+OCfjfpNaVc8npz6N9HIvaJHjkAw==
+X-Google-Smtp-Source: AGHT+IEe3E3bVz43C381ijw4BD9zV4cmUVA4lOxfc676Po+XiC+s2QUjs8LbA4yvZYwgljPHeTSG/A==
+X-Received: by 2002:a05:6512:b15:b0:540:1ca7:4fe9 with SMTP id 2adb3069b0e04-540240c97b4mr13875e87.22.1733741814988;
+        Mon, 09 Dec 2024 02:56:54 -0800 (PST)
 Received: from eriador.lumag.spb.ru (2001-14ba-a0c3-3a00--b8c.rev.dnainternet.fi. [2001:14ba:a0c3:3a00::b8c])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-53e3745b0bbsm930193e87.185.2024.12.09.02.56.16
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-54020269fdasm214549e87.182.2024.12.09.02.56.53
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 09 Dec 2024 02:56:17 -0800 (PST)
-Date: Mon, 9 Dec 2024 12:56:15 +0200
+        Mon, 09 Dec 2024 02:56:53 -0800 (PST)
+Date: Mon, 9 Dec 2024 12:56:52 +0200
 From: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
 To: Janaki Ramaiah Thota <quic_janathot@quicinc.com>
 Cc: Liam Girdwood <lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>, 
@@ -67,11 +67,11 @@ Cc: Liam Girdwood <lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>,
 	quic_hbandi@quicinc.com, quic_anubhavg@quicinc.com, 
 	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>, linux-arm-msm@vger.kernel.org, linux-kernel@vger.kernel.org, 
 	devicetree@vger.kernel.org, linux-bluetooth@vger.kernel.org, linux-pm@vger.kernel.org
-Subject: Re: [PATCH v5 2/4] arm64: dts: qcom: qcs6490-rb3gen: add and enable
- BT node
-Message-ID: <cros4yf4mwtu24xdpevpixlmtt5si6ywjzacezemhsmkfsomgx@gtjaznwqvjsm>
+Subject: Re: [PATCH v5 3/4] Bluetooth: hci_qca: use the power sequencer for
+ wcn6750
+Message-ID: <heyjpkzb4cxomosg4v5rzco3gi5d32vyecuyfgu2au22p5utat@2db4a3mxtblg>
 References: <20241209103455.9675-1-quic_janathot@quicinc.com>
- <20241209103455.9675-3-quic_janathot@quicinc.com>
+ <20241209103455.9675-4-quic_janathot@quicinc.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -80,20 +80,17 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241209103455.9675-3-quic_janathot@quicinc.com>
+In-Reply-To: <20241209103455.9675-4-quic_janathot@quicinc.com>
 
-On Mon, Dec 09, 2024 at 04:04:53PM +0530, Janaki Ramaiah Thota wrote:
-> Add the PMU node for WCN6750 present on the qcs6490-rb3gen
-> board and assign its power outputs to the Bluetooth module.
-> 
-> In WCN6750 module sw_ctrl and wifi-enable pins are handled
-> in the wifi controller firmware. Therefore, it is not required
-> to have those pins' entries in the PMU node.
+On Mon, Dec 09, 2024 at 04:04:54PM +0530, Janaki Ramaiah Thota wrote:
+> Older boards are having entry "enable-gpios" in dts, we can safely assume
+> latest boards which are supporting PMU node enrty will support power
+> sequencer.
 > 
 > Signed-off-by: Janaki Ramaiah Thota <quic_janathot@quicinc.com>
 > ---
->  arch/arm64/boot/dts/qcom/qcs6490-rb3gen2.dts | 168 ++++++++++++++++++-
->  1 file changed, 167 insertions(+), 1 deletion(-)
+>  drivers/bluetooth/hci_qca.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
 
 Reviewed-by: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
