@@ -1,201 +1,146 @@
-Received: from fanzine2.igalia.com (fanzine.igalia.com [178.60.130.6])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f170.google.com (mail-qt1-f170.google.com [209.85.160.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D36E9204684
-	for <linux-bluetooth@vger.kernel.org>; Tue, 10 Dec 2024 19:36:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.60.130.6
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C96C181B8D
+	for <linux-bluetooth@vger.kernel.org>; Tue, 10 Dec 2024 20:34:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733859397; cv=none; b=n1Su2yPG1a56sWDYTzV7XpDuZwXRV/3DOMpTV0A0KZ/6T0OsIF4zz12nq/YSqB1+eOcPTDGGP42nDTdkJjDiiVRuqp5IZyTTIUi49J96M0pL0BbSPTxmFApHV+8puWwKpjmvB2RQ+jykWtcJ/M26ktnqpMiYrSr9O/10YeHIfdI=
+	t=1733862850; cv=none; b=qIAhnCFxkrD72LRnEV97TEM9fOJV6pyweNxCeG1VsO4rbDZ9IoIh+jcRY8k5VcefsFafwzcJVH9Cv5mO512aM/HzBsSzglHy55APBZcO0MznSyyRzeD7U9/qvaV8C4NBAjZctUPZh2rEush177CmgbBI6OFH77Ergkki3om/eJ4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733859397; c=relaxed/simple;
-	bh=jnGwAb3sJyR6wPnPf/v4qoAr47tDfiy/QgY1p/ireRE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition; b=a1uQcjJUCn89CxgL9rKbhyLR6jnIUE85pgNOAVC6jkHuIftHM0ZjxWoumsYctlwvVUmwtbMWUdDiulTyOdpabRg99CMKYiC3VT9WIqtaMeYEmPUbZ7V+ov49BVNC5PyA9rgWzlPNpZmYp1orNjdRKoInvldv1KHe8gk2Tmz4duE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=igalia.com; spf=pass smtp.mailfrom=igalia.com; dkim=pass (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b=J/rkOfhE; arc=none smtp.client-ip=178.60.130.6
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=igalia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=igalia.com
+	s=arc-20240116; t=1733862850; c=relaxed/simple;
+	bh=AnVJj6kbFbWLYsXspTDdqeDmG/mwQv28XiRxUQWkRS0=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=YNkcJSXgPeSwKo4qOwsEOdCvsqPCE6LaChg8VpcWPUJQHe0LcGB9B3iJP8GFCqx2iiVYzBbV4Qxw8f63HPqNY/UuIHK5DTcUXOnipN3/OiHN16vOtCjEgqy6EFXMN26UVG6/ofXY1fddrQgtzbBY0Qrj7BnnaGo0qZ8PTGtBvDM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mviNXyeF; arc=none smtp.client-ip=209.85.160.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="J/rkOfhE"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
-	s=20170329; h=Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:
-	From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:In-Reply-To:List-Id:List-Help:List-Unsubscribe:
-	List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=2uz5aXtGfG1B0VtJbxm1Nmhune6FGr6+yfn9GwRV5KU=; b=J/rkOfhEbIRX35i22/iayPnvJI
-	NSZpXKJE6yowQ3DBTX3lPrKMM9TzqUuywYAXOs5wUPEs7pYz/dJ5EwS1DDSxSd43yhFEw30syW73w
-	cjXh7M+8lrYJaqtWMfEyuW6u9ATMbzl/EUMAH6P9CBQqga2vmQy2CuFWtZdplVSPWCTh1S2PX9ExY
-	uoe79UNN3RPbjXH3EZtq67LUwTMS5Qlvo3GeBeLv/+xwRGhgvkaD6bsmknb5OAydWsXa8Cvj4zQeI
-	OcpvM/JBtrcVhg5Dn2CG8lTiNm4NJkmdBBIeRrpLn1y9wengD92Q2oxGK3fwkoYSzwNyXVq62DjQq
-	Sep++5mw==;
-Received: from 179-125-79-244-dinamico.pombonet.net.br ([179.125.79.244] helo=quatroqueijos.cascardo.eti.br)
-	by fanzine2.igalia.com with esmtpsa 
-	(Cipher TLS1.3:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256) (Exim)
-	id 1tL61o-001bpV-RK; Tue, 10 Dec 2024 20:36:17 +0100
-Date: Tue, 10 Dec 2024 16:36:10 -0300
-From: Thadeu Lima de Souza Cascardo <cascardo@igalia.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: linux-mediatek@lists.infradead.org,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Jing Cai <jing.cai@mediatek.com>, Chris Lu <chris.lu@mediatek.com>,
-	Sean Wang <sean.wang@mediatek.com>, kernel-dev@igalia.com,
-	Thadeu Lima de Souza Cascardo <cascardo@igalia.com>
-Subject: [PATCH Resend] Bluetooth: btmtk: avoid UAF in btmtk_process_coredump
-Message-ID: <Z1iYKvmenw81i1UG@quatroqueijos.cascardo.eti.br>
-References: <20240731190330.1619718-1-cascardo@igalia.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mviNXyeF"
+Received: by mail-qt1-f170.google.com with SMTP id d75a77b69052e-467838e75ffso8946881cf.3
+        for <linux-bluetooth@vger.kernel.org>; Tue, 10 Dec 2024 12:34:09 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1733862848; x=1734467648; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=cLMuxTdmFm4nM0FqrrWImyS8LvWMJ7+VAsxUCHIlftE=;
+        b=mviNXyeF+DCppsPN9qD3ogNLuqsVUgejK4vUUewQUIWvF0Z/fkzLYbgVhHk1jX/+Fm
+         L4tILbCJiXpHnN6WBjhMov8sbibOmDDJ/+XQth6vS1ZIS09SxULCYTO5OU1R6jpnRiLt
+         1JgS6w8DZoYrcwjfBwFNT4TKgc+sl3Egh8buIUo92+DSB7AiGn7wBtguO7vij5ZD3For
+         j4Mnpy/sKwwHqOhyDoKoL4+I8ueDbEUn3LjmI9lZOoMpG8Ul5y1AV27Ah+s1D4pj+PDl
+         sltZ+wPKSx+x+BPIB8LkjcHmtEHrGRHIl1bNtUb5Yx5B2CcVRt7vqTTeN26hsXCmqqF8
+         msyw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733862848; x=1734467648;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=cLMuxTdmFm4nM0FqrrWImyS8LvWMJ7+VAsxUCHIlftE=;
+        b=XLKqaQbazNLjFrQ6UgONZYTyO/kx3TQX1woAjH6pK4jBbKP87XqOrSwPfiEJw7w3nl
+         mvFpdIiI6lLrK8JlJjY3Z2VMbfFt7LcmvQz350w09FkNweJIJxlqISkIi/NclTBABGIT
+         AUlmZ9Rp3wClTiEW1PfUJlWls0FAQ86+qodD4XMK9p4vo8DXloM/OyMhTdqS0bVR5QvL
+         Rk8Igobd9FRCkIr6aGph5ujdyX6++aEmh1ieRPZQJwUIsGlIhSp2Fy/noWZs4+RDdFNN
+         dMuu4Is0cLWKLO3z+MSsXfA27xXgTp6NpFHGhfPgtyP1zqcytOFFYMnLc89E1HzTl9Ht
+         SXjw==
+X-Gm-Message-State: AOJu0Yyfy3sVD+kkV0Szt+rMxSCM3ZNs0CKLv16vLpDiexevKQB7XM0A
+	Bl7Thv8JdsHFH4M9KxZlVpcdmoykp5jJGUpBo6E/EdTZRBF7Qnp5zFAN+w==
+X-Gm-Gg: ASbGncuD+ELEUh3+ek/ppkwZi1vUXHNKyGvqqLBJyUR60S1LaqoVy7D3JYT+p/UDwuh
+	D+r8Lr7u99zfLz46NaMTl2gW4FNRuF1cJ8q6wOOLdOXTYjggeiBCjohkPGGTahy1WlgwrIyENGO
+	jCyKkmHTbwm8nibHZamcil19YXh+Ue5ojLHd7XRmhQnBK1Hd7bdPBZ1Zb/Zk3de9sQmyLefJ5Ao
+	dp7riHnUuBXHsGCCUiHIc0gf/R5U7R0p8D1DmwVGC4yQEY6/i6I/NnSiYE2
+X-Google-Smtp-Source: AGHT+IEftpiXF1b/vKgwuDOvt5Vm7hcYtWq6IcOcL/HlmGQsjWBMh6PRizNU0/+OhtSqlV/GYtV+Hg==
+X-Received: by 2002:ac8:5947:0:b0:467:83f1:71dc with SMTP id d75a77b69052e-46789391c03mr4888891cf.54.1733862847990;
+        Tue, 10 Dec 2024 12:34:07 -0800 (PST)
+Received: from [172.17.0.2] ([20.161.78.229])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-467594e1d2fsm32474161cf.55.2024.12.10.12.34.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 10 Dec 2024 12:34:06 -0800 (PST)
+Message-ID: <6758a5be.c80a0220.299b03.cf29@mx.google.com>
+Date: Tue, 10 Dec 2024 12:34:06 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============1579185104856657634=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-X-Mailer: git-send-email 2.34.1
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, cascardo@igalia.com
+Subject: RE: [Resend] Bluetooth: btmtk: avoid UAF in btmtk_process_coredump
+In-Reply-To: <Z1iYKvmenw81i1UG@quatroqueijos.cascardo.eti.br>
+References: <Z1iYKvmenw81i1UG@quatroqueijos.cascardo.eti.br>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-hci_devcd_append may lead to the release of the skb, so it cannot be
-accessed once it is called.
+--===============1579185104856657634==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-==================================================================
-BUG: KASAN: slab-use-after-free in btmtk_process_coredump+0x2a7/0x2d0 [btmtk]
-Read of size 4 at addr ffff888033cfabb0 by task kworker/0:3/82
+This is automated email and please do not reply to this email!
 
-CPU: 0 PID: 82 Comm: kworker/0:3 Tainted: G     U             6.6.40-lockdep-03464-g1d8b4eb3060e #1 b0b3c1cc0c842735643fb411799d97921d1f688c
-Hardware name: Google Yaviks_Ufs/Yaviks_Ufs, BIOS Google_Yaviks_Ufs.15217.552.0 05/07/2024
-Workqueue: events btusb_rx_work [btusb]
-Call Trace:
- <TASK>
- dump_stack_lvl+0xfd/0x150
- print_report+0x131/0x780
- kasan_report+0x177/0x1c0
- btmtk_process_coredump+0x2a7/0x2d0 [btmtk 03edd567dd71a65958807c95a65db31d433e1d01]
- btusb_recv_acl_mtk+0x11c/0x1a0 [btusb 675430d1e87c4f24d0c1f80efe600757a0f32bec]
- btusb_rx_work+0x9e/0xe0 [btusb 675430d1e87c4f24d0c1f80efe600757a0f32bec]
- worker_thread+0xe44/0x2cc0
- kthread+0x2ff/0x3a0
- ret_from_fork+0x51/0x80
- ret_from_fork_asm+0x1b/0x30
- </TASK>
+Dear submitter,
 
-Allocated by task 82:
- stack_trace_save+0xdc/0x190
- kasan_set_track+0x4e/0x80
- __kasan_slab_alloc+0x4e/0x60
- kmem_cache_alloc+0x19f/0x360
- skb_clone+0x132/0xf70
- btusb_recv_acl_mtk+0x104/0x1a0 [btusb]
- btusb_rx_work+0x9e/0xe0 [btusb]
- worker_thread+0xe44/0x2cc0
- kthread+0x2ff/0x3a0
- ret_from_fork+0x51/0x80
- ret_from_fork_asm+0x1b/0x30
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=916487
 
-Freed by task 1733:
- stack_trace_save+0xdc/0x190
- kasan_set_track+0x4e/0x80
- kasan_save_free_info+0x28/0xb0
- ____kasan_slab_free+0xfd/0x170
- kmem_cache_free+0x183/0x3f0
- hci_devcd_rx+0x91a/0x2060 [bluetooth]
- worker_thread+0xe44/0x2cc0
- kthread+0x2ff/0x3a0
- ret_from_fork+0x51/0x80
- ret_from_fork_asm+0x1b/0x30
+---Test result---
 
-The buggy address belongs to the object at ffff888033cfab40
- which belongs to the cache skbuff_head_cache of size 232
-The buggy address is located 112 bytes inside of
- freed 232-byte region [ffff888033cfab40, ffff888033cfac28)
+Test Summary:
+CheckPatch                    PENDING   0.24 seconds
+GitLint                       PENDING   0.21 seconds
+SubjectPrefix                 PASS      0.11 seconds
+BuildKernel                   PASS      25.57 seconds
+CheckAllWarning               PASS      27.55 seconds
+CheckSparse                   PASS      31.19 seconds
+BuildKernel32                 PASS      24.98 seconds
+TestRunnerSetup               PASS      440.43 seconds
+TestRunner_l2cap-tester       PASS      20.71 seconds
+TestRunner_iso-tester         FAIL      31.68 seconds
+TestRunner_bnep-tester        PASS      4.86 seconds
+TestRunner_mgmt-tester        FAIL      120.89 seconds
+TestRunner_rfcomm-tester      PASS      7.65 seconds
+TestRunner_sco-tester         PASS      9.48 seconds
+TestRunner_ioctl-tester       PASS      8.28 seconds
+TestRunner_mesh-tester        PASS      6.03 seconds
+TestRunner_smp-tester         PASS      7.08 seconds
+TestRunner_userchan-tester    PASS      5.13 seconds
+IncrementalBuild              PENDING   0.91 seconds
 
-The buggy address belongs to the physical page:
-page:00000000a174ba93 refcount:1 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x33cfa
-head:00000000a174ba93 order:1 entire_mapcount:0 nr_pages_mapped:0 pincount:0
-anon flags: 0x4000000000000840(slab|head|zone=1)
-page_type: 0xffffffff()
-raw: 4000000000000840 ffff888100848a00 0000000000000000 0000000000000001
-raw: 0000000000000000 0000000080190019 00000001ffffffff 0000000000000000
-page dumped because: kasan: bad access detected
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
 
-Memory state around the buggy address:
- ffff888033cfaa80: fb fb fb fb fb fb fb fb fb fb fb fb fb fc fc fc
- ffff888033cfab00: fc fc fc fc fc fc fc fc fa fb fb fb fb fb fb fb
->ffff888033cfab80: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-                                     ^
- ffff888033cfac00: fb fb fb fb fb fc fc fc fc fc fc fc fc fc fc fc
- ffff888033cfac80: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-==================================================================
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
 
-Check if we need to call hci_devcd_complete before calling
-hci_devcd_append. That requires that we check data->cd_info.cnt >=
-MTK_COREDUMP_NUM instead of data->cd_info.cnt > MTK_COREDUMP_NUM, as we
-increment data->cd_info.cnt only once the call to hci_devcd_append
-succeeds.
+##############################
+Test: TestRunner_iso-tester - FAIL
+Desc: Run iso-tester with test-runner
+Output:
+WARNING: possible circular locking dependency detected
+Total: 125, Passed: 121 (96.8%), Failed: 0, Not Run: 4
+##############################
+Test: TestRunner_mgmt-tester - FAIL
+Desc: Run mgmt-tester with test-runner
+Output:
+Total: 492, Passed: 487 (99.0%), Failed: 1, Not Run: 4
 
-Fixes: 0b7015132878 ("Bluetooth: btusb: mediatek: add MediaTek devcoredump support")
-Signed-off-by: Thadeu Lima de Souza Cascardo <cascardo@igalia.com>
----
+Failed Test Cases
+LL Privacy - Start Discovery 2 (Disable RL)          Failed       0.194 seconds
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
 
-Resending as this has not been applied yet.
 
-This has been tested by Chris Lu.
-
-Also, the tests GitLint and CheckPatch are complaining about long lines,
-but those are from dmesg logs, so they are kept as is with no added
-wrapping.
-
-Thanks.
-Cascardo.
 
 ---
- drivers/bluetooth/btmtk.c | 20 ++++++++++++--------
- 1 file changed, 12 insertions(+), 8 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/drivers/bluetooth/btmtk.c b/drivers/bluetooth/btmtk.c
-index b7c348687a77..46f605249df7 100644
---- a/drivers/bluetooth/btmtk.c
-+++ b/drivers/bluetooth/btmtk.c
-@@ -395,6 +395,7 @@ int btmtk_process_coredump(struct hci_dev *hdev, struct sk_buff *skb)
- {
- 	struct btmtk_data *data = hci_get_priv(hdev);
- 	int err;
-+	bool complete = false;
- 
- 	if (!IS_ENABLED(CONFIG_DEV_COREDUMP)) {
- 		kfree_skb(skb);
-@@ -416,19 +417,22 @@ int btmtk_process_coredump(struct hci_dev *hdev, struct sk_buff *skb)
- 		fallthrough;
- 	case HCI_DEVCOREDUMP_ACTIVE:
- 	default:
-+		/* Mediatek coredump data would be more than MTK_COREDUMP_NUM */
-+		if (data->cd_info.cnt >= MTK_COREDUMP_NUM &&
-+		    skb->len > MTK_COREDUMP_END_LEN)
-+			if (!memcmp((char *)&skb->data[skb->len - MTK_COREDUMP_END_LEN],
-+				    MTK_COREDUMP_END, MTK_COREDUMP_END_LEN - 1))
-+				complete = true;
-+
- 		err = hci_devcd_append(hdev, skb);
- 		if (err < 0)
- 			break;
- 		data->cd_info.cnt++;
- 
--		/* Mediatek coredump data would be more than MTK_COREDUMP_NUM */
--		if (data->cd_info.cnt > MTK_COREDUMP_NUM &&
--		    skb->len > MTK_COREDUMP_END_LEN)
--			if (!memcmp((char *)&skb->data[skb->len - MTK_COREDUMP_END_LEN],
--				    MTK_COREDUMP_END, MTK_COREDUMP_END_LEN - 1)) {
--				bt_dev_info(hdev, "Mediatek coredump end");
--				hci_devcd_complete(hdev);
--			}
-+		if (complete) {
-+			bt_dev_info(hdev, "Mediatek coredump end");
-+			hci_devcd_complete(hdev);
-+		}
- 
- 		break;
- 	}
--- 
-2.34.1
 
+--===============1579185104856657634==--
