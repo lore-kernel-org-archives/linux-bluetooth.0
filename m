@@ -1,140 +1,87 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE7692770B;
-	Wed, 11 Dec 2024 07:45:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB5931E9B13;
+	Wed, 11 Dec 2024 08:53:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733903144; cv=none; b=GzDdI8hzaLQn2L/XfHrecY7IjZbvhKwZT7Dd5/iy6ywS2PencOYkUYj+LW0z9lwpbb2MoXTwZyVzeUWJtd6Atz4GySrrr1K7+UGKJLSfYQyACJAhWZa3OVEPKqTcJ1JaHdMRW/3zOnMLdJZi73C/OdpF64/gmLG2JA5gWoDb+Xc=
+	t=1733907204; cv=none; b=Wkz/EG+tQICPKY+7+LPh/acayopgPQZTz6SPJUyV6T0vUGc+0bNHpXLe/aFP36cKKjLjHU0NG/iiHqSZKDLfUXKJFn00Dlq2BQKKwjwfmE1/NCAsxSUTp0hrwDJdr+JxlgH+6YEm7Sho/z5hyaRs3kexmGBN1Hm6qNpqF54OuTI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733903144; c=relaxed/simple;
-	bh=KM5Of7mM53fIwBBiaYiiUQ9BfxtVrpykBzubAzmUdlE=;
-	h=From:To:Cc:Subject:References:Date:In-Reply-To:Message-ID:
-	 MIME-Version:Content-Type; b=Re7CwYGk0kjql/dgwi39nC3/6P1g4Qr2/BpXTFBnYXbW45mzbuTXRJbChPY6v+HMXcylNM54cu2dK2BL28fNR/oinvTj/pj273ukDI4ga6KLK3+U6g2qv4nTxIdNUQ57ljUBIBGcxHRuuORmx9AK2bo+r3bGpZiu+0yzceHYVNw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZaN44Yyj; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1733907204; c=relaxed/simple;
+	bh=GmKklteyfL8iCcHIr+GPCM1D/OeD5zIeRxgPPHhbgi8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=cQLx7z9eOEg2j4BkFho3dQbTLtkb2nTQJbhNaZxufBi7iIgVRTurrNfPpBq3WJTO4OntNBAtCjOByO2ZFz7fkFlNIhQTTY/nE9Gow09A/Rf0d6BzO8kI5pviFOYur9jop4J8GNxsEzqnYSy7I7XgZr1iEYkBn0Hf2HjXYlJfGEk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=K/6e6Rw0; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZaN44Yyj"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D8A77C4CED2;
-	Wed, 11 Dec 2024 07:45:25 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="K/6e6Rw0"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A1FA6C4CED2;
+	Wed, 11 Dec 2024 08:53:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733903143;
-	bh=KM5Of7mM53fIwBBiaYiiUQ9BfxtVrpykBzubAzmUdlE=;
-	h=From:To:Cc:Subject:References:Date:In-Reply-To:From;
-	b=ZaN44YyjhRMRn1ZZ+GmTOS40UgIRbhL4wBsfJy8XjSPG4QXarlwE2h8LLmlSyCwwE
-	 mhsyVMxQDuDVaxW28PxQeU8er7lMNhKnh1DPb1k4CbIDr8a5tkumkBV/uTN9xwnFYp
-	 h1HNwJmQE+rv8LC4BNlfDvTcPd5XXQGZmdVG4PmZqn4aLOwa4oWj50GSY3CEXVAf2K
-	 4s9JO62HtV4AyzHzBTTKIyxerUXbJDme/tcsfk9nrdzoiXAN6SWU/JWU3UcTsBRxgt
-	 rxzg89ETMye2AN+BOVUz+OAR29EzCnQNdPIoMqWIY7xMbpGfvp3pWcUv4qGp3pyh75
-	 7MY47GTKlC4gQ==
-From: Kalle Valo <kvalo@kernel.org>
-To: Easwar Hariharan <eahariha@linux.microsoft.com>
-Cc: Pablo Neira Ayuso <pablo@netfilter.org>,  Jozsef Kadlecsik
- <kadlec@netfilter.org>,  "David S. Miller" <davem@davemloft.net>,  Eric
- Dumazet <edumazet@google.com>,  Jakub Kicinski <kuba@kernel.org>,  Paolo
- Abeni <pabeni@redhat.com>,  Simon Horman <horms@kernel.org>,  Julia Lawall
- <Julia.Lawall@inria.fr>,  Nicolas Palix <nicolas.palix@imag.fr>,  Daniel
- Mack <daniel@zonque.org>,  Haojian Zhuang <haojian.zhuang@gmail.com>,
-  Robert Jarzmik <robert.jarzmik@free.fr>,  Russell King
- <linux@armlinux.org.uk>,  Heiko Carstens <hca@linux.ibm.com>,  Vasily
- Gorbik <gor@linux.ibm.com>,  Alexander Gordeev <agordeev@linux.ibm.com>,
-  Christian Borntraeger <borntraeger@linux.ibm.com>,  Sven Schnelle
- <svens@linux.ibm.com>,  Ofir Bitton <obitton@habana.ai>,  Oded Gabbay
- <ogabbay@kernel.org>,  Lucas De Marchi <lucas.demarchi@intel.com>,  Thomas
- =?utf-8?Q?Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>,  Rodrigo
- Vivi
- <rodrigo.vivi@intel.com>,  Maarten Lankhorst
- <maarten.lankhorst@linux.intel.com>,  Maxime Ripard <mripard@kernel.org>,
-  Thomas Zimmermann <tzimmermann@suse.de>,  David Airlie
- <airlied@gmail.com>,  Simona Vetter <simona@ffwll.ch>,  Jeroen de Borst
- <jeroendb@google.com>,  Praveen Kaligineedi <pkaligineedi@google.com>,
-  Shailend Chand <shailend@google.com>,  Andrew Lunn
- <andrew+netdev@lunn.ch>,  James Smart <james.smart@broadcom.com>,  Dick
- Kennedy <dick.kennedy@broadcom.com>,  "James E.J. Bottomley"
- <James.Bottomley@HansenPartnership.com>,  "Martin K. Petersen"
- <martin.petersen@oracle.com>,  Roger Pau =?utf-8?Q?Monn=C3=A9?=
- <roger.pau@citrix.com>,
-  Jens Axboe <axboe@kernel.dk>,  Jeff Johnson <jjohnson@kernel.org>,
-  Catalin Marinas <catalin.marinas@arm.com>,  Andrew Morton
- <akpm@linux-foundation.org>,  Jack Wang <jinpu.wang@cloud.ionos.com>,
-  Marcel Holtmann <marcel@holtmann.org>,  Johan Hedberg
- <johan.hedberg@gmail.com>,  Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-  Greg Kroah-Hartman <gregkh@linuxfoundation.org>,  Florian Fainelli
- <florian.fainelli@broadcom.com>,  Ray Jui <rjui@broadcom.com>,  Scott
- Branden <sbranden@broadcom.com>,  Broadcom internal kernel review list
- <bcm-kernel-feedback-list@broadcom.com>,  Xiubo Li <xiubli@redhat.com>,
-  Ilya Dryomov <idryomov@gmail.com>,  Josh Poimboeuf <jpoimboe@kernel.org>,
-  Jiri Kosina <jikos@kernel.org>,  Miroslav Benes <mbenes@suse.cz>,  Petr
- Mladek <pmladek@suse.com>,  Joe Lawrence <joe.lawrence@redhat.com>,
-  Jaroslav Kysela <perex@perex.cz>,  Takashi Iwai <tiwai@suse.com>,  Louis
- Peens <louis.peens@corigine.com>,  Michael Ellerman <mpe@ellerman.id.au>,
-  Nicholas Piggin <npiggin@gmail.com>,  Christophe Leroy
- <christophe.leroy@csgroup.eu>,  Naveen N Rao <naveen@kernel.org>,
-  Madhavan Srinivasan <maddy@linux.ibm.com>,
-  netfilter-devel@vger.kernel.org,  coreteam@netfilter.org,
-  netdev@vger.kernel.org,  linux-kernel@vger.kernel.org,  cocci@inria.fr,
-  linux-arm-kernel@lists.infradead.org,  linux-s390@vger.kernel.org,
-  dri-devel@lists.freedesktop.org,  intel-xe@lists.freedesktop.org,
-  linux-scsi@vger.kernel.org,  xen-devel@lists.xenproject.org,
-  linux-block@vger.kernel.org,  linux-wireless@vger.kernel.org,
-  ath11k@lists.infradead.org,  linux-mm@kvack.org,
-  linux-bluetooth@vger.kernel.org,  linux-staging@lists.linux.dev,
-  linux-rpi-kernel@lists.infradead.org,  ceph-devel@vger.kernel.org,
-  live-patching@vger.kernel.org,  linux-sound@vger.kernel.org,
-  oss-drivers@corigine.com,  linuxppc-dev@lists.ozlabs.org,  Anna-Maria
- Behnsen <anna-maria@linutronix.de>,  Jeff Johnson
- <quic_jjohnson@quicinc.com>
-Subject: Re: [PATCH v3 14/19] wifi: ath11k: Convert timeouts to
- secs_to_jiffies()
-References: <20241210-converge-secs-to-jiffies-v3-0-ddfefd7e9f2a@linux.microsoft.com>
-	<20241210-converge-secs-to-jiffies-v3-14-ddfefd7e9f2a@linux.microsoft.com>
-	<87sequr7ho.fsf@kernel.org>
-Date: Wed, 11 Dec 2024 09:45:24 +0200
-In-Reply-To: <87sequr7ho.fsf@kernel.org> (Kalle Valo's message of "Wed, 11 Dec
-	2024 09:42:11 +0200")
-Message-ID: <87o71ir7cb.fsf@kernel.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.2 (gnu/linux)
+	s=k20201202; t=1733907204;
+	bh=GmKklteyfL8iCcHIr+GPCM1D/OeD5zIeRxgPPHhbgi8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=K/6e6Rw0Y41S/zJz4p0ClexCyG0YI4Dwa8Up6AZQ4KlycgOHYVkadRQqa4KOM8r0Y
+	 oopNLqYr01Oqz/pn7LZ45hCXpTPQS35S6VW+gEzup1lAMeyx5dJTjQYRe5b4qJ/jiO
+	 ddKECgCgDe/2AUjOacDAgfmneMo2VIn3wlRfu0clpl5bQ6+Hn8z0alCLs3oM6rdXIM
+	 xESI7D+xGLQ5T3e+4muwpy7s/83fN/hqWOg1ntZDrGw06B+HllcxNnPDCzaG3AgYh/
+	 ydwSMG5WhB1YC+qYF6AUBkz5sB0ZZGqEf0j8EMEbEJ+5ZxowGFXexpQBhTgw0y/3Cz
+	 gAZH2CI+XP5/w==
+Date: Wed, 11 Dec 2024 09:53:20 +0100
+From: Krzysztof Kozlowski <krzk@kernel.org>
+To: Cheng Jiang <quic_chejiang@quicinc.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>, 
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Rob Herring <robh@kernel.org>, 
+	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Bjorn Andersson <andersson@kernel.org>, Konrad Dybcio <konradybcio@kernel.org>, 
+	Balakrishna Godavarthi <quic_bgodavar@quicinc.com>, Rocky Liao <quic_rjliao@quicinc.com>, 
+	linux-bluetooth@vger.kernel.org, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-arm-msm@vger.kernel.org, quic_jiaymao@quicinc.com, quic_shuaz@quicinc.com, 
+	quic_zijuhu@quicinc.com, quic_mohamull@quicinc.com
+Subject: Re: [PATCH v4 0/3] Expand firmware-name property to load specific
+Message-ID: <hzw3ocj7vzmnnqbgpqxd3if3hww5jsvldhre2s67yugbf4xpfo@3lgyxdiket2e>
+References: <20241210151636.2474809-1-quic_chejiang@quicinc.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20241210151636.2474809-1-quic_chejiang@quicinc.com>
 
-Kalle Valo <kvalo@kernel.org> writes:
+On Tue, Dec 10, 2024 at 11:16:32PM +0800, Cheng Jiang wrote:
+> Expand the firmware-name property to specify the names of NVM and
+> rampatch firmware to load.
+> 
+> This update will support loading specific firmware (nvm and rampatch)
+> for certain chips, like the QCA6698 Bluetooth chip, which shares the
+> same IP core as the WCN6855 but has different RF components and RAM
+> sizes, requiring new firmware files.
+> 
+> Different connectivity boards may be attached to the same platform. For
+> example, QCA6698-based boards can support either a two-antenna or
+> three-antenna solution, both of which work on the sa8775p-ride platform.
+> Due to differences in connectivity boards and variations in RF
+> performance from different foundries, different NVM configurations are
+> used based on the board ID.
+> 
+> So In firmware-name, if the NVM file has an extension, the NVM file will
+> be used. Otherwise, the system will first try the .bNN (board ID) file,
+> and if that fails, it will fall back to the .bin file.
+> 
+> Possible configurations:
+> firmware-name = "QCA6698/hpnv21.bin", "QCA6698/hpbtfw21.tlv";
+> firmware-name = "QCA6698/hpnv21", "QCA6698/hpbtfw21.tlv";
+> firmware-name = "QCA6698/hpnv21.bin";
+> 
+> ---
+> v4:
+>   1. Split nvm and rampatch changes to 2 commits
+>   2. Code fix according to review comments
 
-> Easwar Hariharan <eahariha@linux.microsoft.com> writes:
->
->> Commit b35108a51cf7 ("jiffies: Define secs_to_jiffies()") introduced
->> secs_to_jiffies(). As the value here is a multiple of 1000, use
->> secs_to_jiffies() instead of msecs_to_jiffies to avoid the multiplication.
->>
->> This is converted using scripts/coccinelle/misc/secs_to_jiffies.cocci with
->> the following Coccinelle rules:
->>
->> @@ constant C; @@
->>
->> - msecs_to_jiffies(C * 1000)
->> + secs_to_jiffies(C)
->>
->> @@ constant C; @@
->>
->> - msecs_to_jiffies(C * MSEC_PER_SEC)
->> + secs_to_jiffies(C)
->>
->> Acked-by: Jeff Johnson <quic_jjohnson@quicinc.com>
->> Signed-off-by: Easwar Hariharan <eahariha@linux.microsoft.com>
->> ---
->>  drivers/net/wireless/ath/ath11k/debugfs.c | 2 +-
->>  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> I assume we can take this to our ath.git tree, please let us know if
-> that's not the case.
+Which comments? What exactly did you fix? This cannot be vague.
 
-Nevermind, I now saw the discussion in the cover letter and assume that
-this patch will be sent separately.
+Best regards,
+Krzysztof
 
--- 
-https://patchwork.kernel.org/project/linux-wireless/list/
-
-https://wireless.wiki.kernel.org/en/developers/documentation/submittingpatches
