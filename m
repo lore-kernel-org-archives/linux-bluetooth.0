@@ -1,129 +1,158 @@
-Received: from mail-yb1-f175.google.com (mail-yb1-f175.google.com [209.85.219.175])
+Received: from mail-yb1-f176.google.com (mail-yb1-f176.google.com [209.85.219.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC48A1F9F4F;
-	Wed, 11 Dec 2024 17:21:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 125AF1FF5F4
+	for <linux-bluetooth@vger.kernel.org>; Wed, 11 Dec 2024 17:46:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733937683; cv=none; b=uAehxVXDs2gOVrbbDzYmsLeSpfIbvsNc0ncpMVCFLn/3qreRr8Ezeg54Gg2WzgTWEZltouQki3ufQDaXs4G8EDiGj0WePgohemCb9UNzWZJZ9LSQbXzMBSmeDZvtUlVPCMXrEXqwm5jl6KIFVpQiC2q9vxGfg1Zrp6eagCEZxcA=
+	t=1733939215; cv=none; b=AlKWi44UXZvofqVRBazowWQmh1oc9YAe1THQ152T4fbgUx+bwZ0s5GY2QP8h90XxaRBIsUQvPPLsewCLJjljc6c8coyrTgxA5BVXee0zEvBYm2XpZPsUMDOe9OxeAhB+0W2sT6l3twRvuxS4C8nkIFd6pQAgusfykowuZqrtOFc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733937683; c=relaxed/simple;
-	bh=HCJYxvTRRmq3k5mVEdqajQnZizNTzMuQ2W8qNA/olsE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=uCcsyNIR51Ho4+NIFffjPY9vI/Fm7N99NOjS/k5mxai0eYEscYrXXAAJ0P/6eOu1kFSr+GUnPl1j8+6mzKNhBcL4MUdLpQyTo9JCCRCe+6e8Hat7DYCHZwpjYRF41mwKOv4wbxmenB71OKI5zBHyfu/8n/DAq1BR0KdpbwuIMN0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ow+rdAre; arc=none smtp.client-ip=209.85.219.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1733939215; c=relaxed/simple;
+	bh=xKfttj73jG1uTZpJNN82RMi2jpdXNIkxOf7nv7eMMZ0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=asXImXpAh4hbDg5LKYJvOji8Zygo6Pzom81j85Sc3G8dwcgAPaPhEb/ed3ZOwgIUggaszx34QSl/NjNVU4XUuBOYhaAxwbp+oF7cnOlnPAJ98b4EfvSeocVhWHXq7mvXtBIuAhvMNAwzSuzYmSc8t3s6hB0OmrG80RLypfJUPSk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=raspberrypi.com; spf=pass smtp.mailfrom=raspberrypi.com; dkim=pass (2048-bit key) header.d=raspberrypi.com header.i=@raspberrypi.com header.b=iJ1Rv1gP; arc=none smtp.client-ip=209.85.219.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=raspberrypi.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=raspberrypi.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ow+rdAre"
-Received: by mail-yb1-f175.google.com with SMTP id 3f1490d57ef6-e397269c6a6so767119276.1;
-        Wed, 11 Dec 2024 09:21:18 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=raspberrypi.com header.i=@raspberrypi.com header.b="iJ1Rv1gP"
+Received: by mail-yb1-f176.google.com with SMTP id 3f1490d57ef6-e39fb8548e2so5649796276.3
+        for <linux-bluetooth@vger.kernel.org>; Wed, 11 Dec 2024 09:46:51 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1733937677; x=1734542477; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=ktnS24zVG4+DJw+LnflXYB/+/JyuP9RXnASCXY7if1E=;
-        b=Ow+rdArey4ZDfY6iN+fgymg3k9MMLWYFTYeS1H/yE966J1Cuu29H7AJy4dHELZvmlN
-         xSixQ8cb9Ukb15tHNU3n7ZS/1qbLDNg//HRaQHyr5mMjUCwLzqqnYaLhF/f3XP/ryxZl
-         0BY6Rz5aPvp50eS4BikcgYb/+KlAG7uwGn9HVyQaFfjEJRKAmizC7AJ0YXoiTiWG5dsU
-         /qhi4GOAEB5HFc0ZnXZxOLYPwXH7mzzS+gNdeg3mGtsENpbD7m5xlWZsgU6+KiQEVBHz
-         aHraRnggZ0zwd4gsvqefe6qPXpSPeXatnEvlFKucB+TJWw3i7skJY9fJtWxJSWfAGMA3
-         EG/w==
+        d=raspberrypi.com; s=google; t=1733939211; x=1734544011; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=XX4yF9JMGXX3II/VI0ICz4h+LN+8Yz44eu6TfJ04Ugk=;
+        b=iJ1Rv1gPyVXZinfE2j1hskrQVtwOTmifZx892vfPVXmW+A4luks2PdH2B2Tl4HOqN6
+         U9LqS7pYhhesWy/EGPUEEaXNixUTWci5GU5iiVALQSIcaGNrrwa3KRwiY7NIu2Xm5M9O
+         b3bR1JInOlALvNN3xwW/FiAhOLXRWEdfW4VOahL/Xlyp3XRxMh8RsYIj5yDvN6DZJ7Ul
+         iOh4z0HBbsY9FYf1yBBSENjuPtqUFQzg036S66WXVQnVehFi4bWC3djajWjWbKhxsi1b
+         JZ7nHrGpMISaEuXqGNuZ52zlgMmrRhLWgeS7Sg8Hjg+/P5uGHHslF0Tnhj90FCLu3x1z
+         uF0g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733937677; x=1734542477;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20230601; t=1733939211; x=1734544011;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=ktnS24zVG4+DJw+LnflXYB/+/JyuP9RXnASCXY7if1E=;
-        b=rLTddEKQQKEs5fuO4yPr/cxk+67JdnVauhDV14TEX/95tBfKIUvggMZCo4Amy3UvU4
-         J51Ii8OnFjhp9aCfr+JochIPd6hI05d8xNC3ztZtYx5Wmp+45PsHRPH3Q5xczOO9x8eA
-         FQeBSO+FY6mZR8WDTZMVSCMTmw1B9Y/4eqeOzfI/B2sJ9A3gcXoB7ek5UTsxtsLwRG7b
-         3wrgR1NtjIpT2IDcYFLfv97xkSsTu3BiSpF1K8Bb4s/8vEw64s+ns/zfdXO2W1TIF9+G
-         qPEk5IQ9oEtiSlxQjzwrhjXsbnJrMVe3zOnEgMcO5lbjDc10pobAs9hLGVca+GzdsWXj
-         K54g==
-X-Forwarded-Encrypted: i=1; AJvYcCU0MqBaS3EG0McogJXRvs3TcByXEFWdh2n+tj7HrZ6x2s5T+8mjxKqRedgFDQ6xgupOz8IXwXM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwY/sgch4nVPVkhuskgzlRo4OZgUfZm4RHN1fuU1HKQ2Rag2r0P
-	+yj6kx1XLLpWiqWO3ecYWpuekyzul4LGQp7RBSkfyGt3Xl4D12aW
-X-Gm-Gg: ASbGnctcAEi4JL3LbTbkRcuBZoumNMzojep988645kUR2UBWD5pKO85Opt6VRJPR2hm
-	VjaEX2xaKHU9jTGNVDYXDfTBMv3HPPplQVq6npp1GSm3WUs/nxB7Q0CZuoBPFCuRpmsFtCVgjUy
-	bGtKs8cljZShGqkM9b+ybiLIkakn6QX/fyiqRk6Xmca3+SBQv+ukaZmUdtsXHd336UkqTLMcMCT
-	Uohbs8Paq6eNjDv2iQhqmqLGKQtKOpZqpS8TYQ5c7lbuhzHmzls9mUzOR/91I1SwKSTOKWlresS
-	J3ttQ0n6ZUuxyV7RySb9LO0oIQ==
-X-Google-Smtp-Source: AGHT+IHtZqr6sfWLOQawb7qOJaSkjF636DO3SVAp1OKcvcL8kkZfWHRDxr8PXM2RiGoTNK2CVQn65g==
-X-Received: by 2002:a05:690c:4c0f:b0:6ee:5104:f43a with SMTP id 00721157ae682-6f1ba5bb317mr776727b3.20.1733937677255;
-        Wed, 11 Dec 2024 09:21:17 -0800 (PST)
-Received: from lvondent-mobl5.. (syn-107-146-107-067.res.spectrum.com. [107.146.107.67])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-6f14cc84117sm3196047b3.14.2024.12.11.09.21.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 11 Dec 2024 09:21:16 -0800 (PST)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: davem@davemloft.net,
-	kuba@kernel.org
-Cc: linux-bluetooth@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: pull request: bluetooth 2024-12-11
-Date: Wed, 11 Dec 2024 12:21:12 -0500
-Message-ID: <20241211172115.1816733-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.47.1
+        bh=XX4yF9JMGXX3II/VI0ICz4h+LN+8Yz44eu6TfJ04Ugk=;
+        b=sQojy548is2xFhtPMYUcNF5pjYuuCkvNks5Xj/wshE6Y6hdje/ilOW1ehsiTB31cPQ
+         Ko2mh4hUQAPaX6XFwDHKL6ORPvx+gkZyPZhilfz4VhFKlx3D0yyrzyjn29h1jZHh86Sb
+         Q3Qoc7P6R/GckuwpqudZXjMoAyHUr4mNhZyW9ALJFS9HVpK5wYw2JEUMLoXALa+lEOiT
+         t36M0oIpnCRYi96YSGLWxJep9hDeLxKQMVnXY68G3SuK9AwxvJXvjKI7xcNaUV98RXDt
+         IPhknppwuSyvLJjbgH8qjrJDdcWkuwSz7VxKa4nOL+8VsiRvYkIMuOzhKvEmn6LXji8F
+         /TCQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUfam3lryB1VamXJnhxQPtxaujrcHPJ0OMiMOfOmVZcd4Z9rdnlO7bx4P7QGuQ6h8c+X0APKzUgHLFJO/PPJzY=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx1tA4JLqsOi1eR4LXMta4bKU9e2pvsNB4kDatxU2BuqriX7sYk
+	RocFFOcp8M5eFSq2UB1w4NQn3KmNazArc3Cy3eHkPq90VFMBVjSbs/1J91La8UyEwuB7kY0ve+T
+	CPty4Xtj6Vwh/FD3SlBOQujACnQ6nwUIP2DY4tw==
+X-Gm-Gg: ASbGncvJt1qxAYj3QKS3xJB1Rh3jwc4wlogwPxPrhbS2qMgGQja3IdWLNkTFVLsyBlS
+	jP92BQLPPU/iuxpIF9cGGn/gd64bK8w5xaKM=
+X-Google-Smtp-Source: AGHT+IG3lDp6pcc8WpN9DOxtNpymp29steFnShZFR78LeXrDU2v7lqz7zSz8oGrhbnT8m3jrCYcj2LxsZTVFVNmSQds=
+X-Received: by 2002:a05:6902:230d:b0:e39:8a36:5771 with SMTP id
+ 3f1490d57ef6-e3da3158089mr228005276.34.1733939211006; Wed, 11 Dec 2024
+ 09:46:51 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+References: <20241210-converge-secs-to-jiffies-v3-0-ddfefd7e9f2a@linux.microsoft.com>
+ <20241210-converge-secs-to-jiffies-v3-16-ddfefd7e9f2a@linux.microsoft.com>
+In-Reply-To: <20241210-converge-secs-to-jiffies-v3-16-ddfefd7e9f2a@linux.microsoft.com>
+From: Dave Stevenson <dave.stevenson@raspberrypi.com>
+Date: Wed, 11 Dec 2024 17:46:32 +0000
+Message-ID: <CAPY8ntDHcGpsaNytY2up_54e03twqZ2fj1=JTnb8x7LLo3uGDQ@mail.gmail.com>
+Subject: Re: [PATCH v3 16/19] staging: vc04_services: Convert timeouts to secs_to_jiffies()
+To: Easwar Hariharan <eahariha@linux.microsoft.com>
+Cc: Pablo Neira Ayuso <pablo@netfilter.org>, Jozsef Kadlecsik <kadlec@netfilter.org>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Julia Lawall <Julia.Lawall@inria.fr>, Nicolas Palix <nicolas.palix@imag.fr>, 
+	Daniel Mack <daniel@zonque.org>, Haojian Zhuang <haojian.zhuang@gmail.com>, 
+	Robert Jarzmik <robert.jarzmik@free.fr>, Russell King <linux@armlinux.org.uk>, 
+	Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>, 
+	Alexander Gordeev <agordeev@linux.ibm.com>, Christian Borntraeger <borntraeger@linux.ibm.com>, 
+	Sven Schnelle <svens@linux.ibm.com>, Ofir Bitton <obitton@habana.ai>, 
+	Oded Gabbay <ogabbay@kernel.org>, Lucas De Marchi <lucas.demarchi@intel.com>, 
+	=?UTF-8?Q?Thomas_Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>, 
+	Rodrigo Vivi <rodrigo.vivi@intel.com>, 
+	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, Maxime Ripard <mripard@kernel.org>, 
+	Thomas Zimmermann <tzimmermann@suse.de>, David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, 
+	Jeroen de Borst <jeroendb@google.com>, Praveen Kaligineedi <pkaligineedi@google.com>, 
+	Shailend Chand <shailend@google.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	James Smart <james.smart@broadcom.com>, Dick Kennedy <dick.kennedy@broadcom.com>, 
+	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>, 
+	"Martin K. Petersen" <martin.petersen@oracle.com>, =?UTF-8?Q?Roger_Pau_Monn=C3=A9?= <roger.pau@citrix.com>, 
+	Jens Axboe <axboe@kernel.dk>, Kalle Valo <kvalo@kernel.org>, Jeff Johnson <jjohnson@kernel.org>, 
+	Catalin Marinas <catalin.marinas@arm.com>, Andrew Morton <akpm@linux-foundation.org>, 
+	Jack Wang <jinpu.wang@cloud.ionos.com>, Marcel Holtmann <marcel@holtmann.org>, 
+	Johan Hedberg <johan.hedberg@gmail.com>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+	Florian Fainelli <florian.fainelli@broadcom.com>, Ray Jui <rjui@broadcom.com>, 
+	Scott Branden <sbranden@broadcom.com>, 
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, Xiubo Li <xiubli@redhat.com>, 
+	Ilya Dryomov <idryomov@gmail.com>, Josh Poimboeuf <jpoimboe@kernel.org>, Jiri Kosina <jikos@kernel.org>, 
+	Miroslav Benes <mbenes@suse.cz>, Petr Mladek <pmladek@suse.com>, 
+	Joe Lawrence <joe.lawrence@redhat.com>, Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>, 
+	Louis Peens <louis.peens@corigine.com>, Michael Ellerman <mpe@ellerman.id.au>, 
+	Nicholas Piggin <npiggin@gmail.com>, Christophe Leroy <christophe.leroy@csgroup.eu>, 
+	Naveen N Rao <naveen@kernel.org>, Madhavan Srinivasan <maddy@linux.ibm.com>, netfilter-devel@vger.kernel.org, 
+	coreteam@netfilter.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	cocci@inria.fr, linux-arm-kernel@lists.infradead.org, 
+	linux-s390@vger.kernel.org, dri-devel@lists.freedesktop.org, 
+	intel-xe@lists.freedesktop.org, linux-scsi@vger.kernel.org, 
+	xen-devel@lists.xenproject.org, linux-block@vger.kernel.org, 
+	linux-wireless@vger.kernel.org, ath11k@lists.infradead.org, 
+	linux-mm@kvack.org, linux-bluetooth@vger.kernel.org, 
+	linux-staging@lists.linux.dev, linux-rpi-kernel@lists.infradead.org, 
+	ceph-devel@vger.kernel.org, live-patching@vger.kernel.org, 
+	linux-sound@vger.kernel.org, oss-drivers@corigine.com, 
+	linuxppc-dev@lists.ozlabs.org, Anna-Maria Behnsen <anna-maria@linutronix.de>
+Content-Type: text/plain; charset="UTF-8"
 
-The following changes since commit 3dd002f20098b9569f8fd7f8703f364571e2e975:
+On Tue, 10 Dec 2024 at 22:02, Easwar Hariharan
+<eahariha@linux.microsoft.com> wrote:
+>
+> Commit b35108a51cf7 ("jiffies: Define secs_to_jiffies()") introduced
+> secs_to_jiffies(). As the value here is a multiple of 1000, use
+> secs_to_jiffies() instead of msecs_to_jiffies to avoid the multiplication.
+>
+> This is converted using scripts/coccinelle/misc/secs_to_jiffies.cocci with
+> the following Coccinelle rules:
+>
+> @@ constant C; @@
+>
+> - msecs_to_jiffies(C * 1000)
+> + secs_to_jiffies(C)
+>
+> @@ constant C; @@
+>
+> - msecs_to_jiffies(C * MSEC_PER_SEC)
+> + secs_to_jiffies(C)
+>
+> Signed-off-by: Easwar Hariharan <eahariha@linux.microsoft.com>
 
-  net: renesas: rswitch: handle stop vs interrupt race (2024-12-10 19:08:00 -0800)
+Reviewed-by: Dave Stevenson <dave.stevenson@raspberrypi.com>
 
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2024-12-11
-
-for you to fetch changes up to 69e8a8410d7bcd3636091b5915a939b9972f99f1:
-
-  Bluetooth: btmtk: avoid UAF in btmtk_process_coredump (2024-12-11 12:01:13 -0500)
-
-----------------------------------------------------------------
-bluetooth pull request for net:
-
- - SCO: Fix transparent voice setting
- - ISO: Locking fixes
- - hci_core: Fix sleeping function called from invalid context
- - hci_event: Fix using rcu_read_(un)lock while iterating
- - btmtk: avoid UAF in btmtk_process_coredump
-
-----------------------------------------------------------------
-Frédéric Danis (1):
-      Bluetooth: SCO: Add support for 16 bits transparent voice setting
-
-Iulia Tanasescu (4):
-      Bluetooth: iso: Always release hdev at the end of iso_listen_bis
-      Bluetooth: iso: Fix recursive locking warning
-      Bluetooth: iso: Fix circular lock in iso_listen_bis
-      Bluetooth: iso: Fix circular lock in iso_conn_big_sync
-
-Luiz Augusto von Dentz (2):
-      Bluetooth: hci_core: Fix sleeping function called from invalid context
-      Bluetooth: hci_event: Fix using rcu_read_(un)lock while iterating
-
-Michal Luczaj (1):
-      Bluetooth: Improve setsockopt() handling of malformed user input
-
-Thadeu Lima de Souza Cascardo (1):
-      Bluetooth: btmtk: avoid UAF in btmtk_process_coredump
-
- drivers/bluetooth/btmtk.c         |  20 ++++---
- include/net/bluetooth/bluetooth.h |  10 +---
- include/net/bluetooth/hci_core.h  | 108 ++++++++++++++++++++++++--------------
- net/bluetooth/hci_core.c          |   9 ++--
- net/bluetooth/hci_event.c         |  33 ++++--------
- net/bluetooth/hci_sock.c          |  14 ++---
- net/bluetooth/iso.c               |  75 +++++++++++++++++++-------
- net/bluetooth/l2cap_core.c        |  12 ++---
- net/bluetooth/l2cap_sock.c        |  20 +++----
- net/bluetooth/rfcomm/core.c       |   6 +++
- net/bluetooth/rfcomm/sock.c       |   9 ++--
- net/bluetooth/sco.c               |  52 +++++++++---------
- 12 files changed, 215 insertions(+), 153 deletions(-)
+> ---
+>  drivers/staging/vc04_services/bcm2835-audio/bcm2835-vchiq.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/drivers/staging/vc04_services/bcm2835-audio/bcm2835-vchiq.c b/drivers/staging/vc04_services/bcm2835-audio/bcm2835-vchiq.c
+> index dc0d715ed97078ad0f0a41db78428db4f4135a76..0dbe76ee557032d7861acfc002cc203ff2e6971d 100644
+> --- a/drivers/staging/vc04_services/bcm2835-audio/bcm2835-vchiq.c
+> +++ b/drivers/staging/vc04_services/bcm2835-audio/bcm2835-vchiq.c
+> @@ -59,7 +59,7 @@ static int bcm2835_audio_send_msg_locked(struct bcm2835_audio_instance *instance
+>
+>         if (wait) {
+>                 if (!wait_for_completion_timeout(&instance->msg_avail_comp,
+> -                                                msecs_to_jiffies(10 * 1000))) {
+> +                                                secs_to_jiffies(10))) {
+>                         dev_err(instance->dev,
+>                                 "vchi message timeout, msg=%d\n", m->type);
+>                         return -ETIMEDOUT;
+>
+> --
+> 2.43.0
+>
