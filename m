@@ -1,67 +1,67 @@
-Received: from mail-yw1-f176.google.com (mail-yw1-f176.google.com [209.85.128.176])
+Received: from mail-yw1-f175.google.com (mail-yw1-f175.google.com [209.85.128.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72A282594AE
-	for <linux-bluetooth@vger.kernel.org>; Wed, 11 Dec 2024 19:22:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE5BC1FF1AA
+	for <linux-bluetooth@vger.kernel.org>; Wed, 11 Dec 2024 19:22:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733944940; cv=none; b=HQEEyzKuFWSFuUg3Fhj4JT3+q9x2+SX0XHa/CejoRxYgTSAKHzHITtyx89TyKw8jP76coTPXUxDn6YPvrrFYheOmRpNcVtusA/FDHE/oUY3xcjqI766lMxygOW4RY5zOOcv6oo08dHcMi7vgT/GoEZ7R58Bitn1gOx94gSvdfEg=
+	t=1733944941; cv=none; b=FrKXf7WCn1CueHvlJLNw9G4PScFrJWdOTJPrgCzB/V+6oRr+bDd6oIdu8RSEZU9THTpag2ng3PA87t1B+vcMxsv9a+r3CNPT0ZmLAvhhSo47ys0M+j3kvWtX8JAoWPZ8Epbw8OgN0aG2OYVXLbjxp2G0eY5/hmy1BKQJRTr+Y2A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733944940; c=relaxed/simple;
-	bh=NkHwhTQVsWlUvY+IwnwCmvlSKp8pl4GaWsxQO9T5sGs=;
+	s=arc-20240116; t=1733944941; c=relaxed/simple;
+	bh=3TZf2VVPG9j2nRnq7uHoKG76sCAYnh5tmXlrlygtsHE=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=QrB/fpQD/eWdxVp8lBbTRmGY6LdFz8Z0JkBFPAwADi+gG1pqt3uAulFJmPKbWRye5exMi5aAhRHy6tOa5k3vkPUwN5yyRqV+npO+KDOybWJDLKRzNI34POFavCd/LDnwVBhcTN3bfa9ZuD3bOqnyVrqOggROOrGgQfmejklwnWs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IYtLWWXU; arc=none smtp.client-ip=209.85.128.176
+	 MIME-Version; b=oSzchiL2vY5ZvwUD8SjrgIVO03khKMG0TVw1miUywqyMVdO/2QN3yyutF9jxP6DtnVgbi+46LTC1xg3lvmlAToc46wt3B41p7rr9KXHhZm6MOwf9j7TwtuHbeKyFjXj78XW60e0OWuoAzMQlybHvjwN3tQU3wEPss1QlPEHUKi4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UEWxEuJ8; arc=none smtp.client-ip=209.85.128.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IYtLWWXU"
-Received: by mail-yw1-f176.google.com with SMTP id 00721157ae682-6efeb120f4dso42584807b3.0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 11 Dec 2024 11:22:17 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UEWxEuJ8"
+Received: by mail-yw1-f175.google.com with SMTP id 00721157ae682-6ef0ef11aafso64776077b3.2
+        for <linux-bluetooth@vger.kernel.org>; Wed, 11 Dec 2024 11:22:19 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1733944935; x=1734549735; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1733944938; x=1734549738; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=FvFMf69g5E11A9KLuAVexmIpwevquHnCDH9IZeC7pNc=;
-        b=IYtLWWXUCB0sMHbqFYarAxVDwxH3ypV/NfhPlQQxTqHU3PDUo9UOUG48WWqS11To1B
-         qnJUEO836M6JdL29mE1W0mWBcl9I9q2rNJjvFl24JvNvduKMlncItpVeKqQ1ghYC7Ani
-         HVKC6ha8PWRfhRXOT3+rO3LuajNFlX0IFt+pLCgpKoUZaK5W6PhdXS+QQAPRD65SbqIm
-         EUf5NnbbpWkCPSO9zorHhD2EOVrn+DMdbyH7opvCvm51YGL42J6K/bE0CJgHEnPfJ15G
-         yTRNOzHB1aZ51ZUgURI9kQ5zTRRiuWwWI5QTpPsFYLLH88SdCHU+RXMzIGavv7TLf2h2
-         wJfg==
+        bh=pJ6czW7oqxG3C4Lh524NY3ogieEucE1ren2yz0aC2EU=;
+        b=UEWxEuJ86w1yqr5oCA3BGWgUICf/cigP779YefFHbrT5hFiJOIlWWtjH6FQSWe+36k
+         2KCDnqg3OF3NmaJcU83SU6rGZVAtM0gT6/GAkqZgY8tgkmkJvCDdZQw5GwQmVHDPileo
+         VYK0+WC3LNuOriNz0WFrPRFSsUxzDpSk2K0zD732n8Yyg8seSA8bDwrCWJutk9RpoVTE
+         O41w1I6kJAYHRCa3wxDCM4IZXeD35UD147k0OtnuNGQm1IrFydBCVRG4v5jq3zEJiH5z
+         5hFwGoylLWLCM6VFwhPR6PE9D8TnNk3/NI+SrBeqzR4B/UbBuq1v13CasmGn1mfJFYEc
+         1P+A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733944935; x=1734549735;
+        d=1e100.net; s=20230601; t=1733944938; x=1734549738;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=FvFMf69g5E11A9KLuAVexmIpwevquHnCDH9IZeC7pNc=;
-        b=MdUpgnFEkDdl3MXiKmpyWJ0uetvqFmFg9liH0FLhjjra7kX6E/LkykAmTl3OHHZAl3
-         rK9K+QAE9OTxTTLGH/bgUYh4rt69I/j65Fd5K52VXK9OxlF4+QWhFn88KiVI5MV6JmZL
-         oLBNlFGG9HzHNeazzmr4EwqztZRm6mFuhPofucDO4G1IIBJCvAplFH3i3zkGmif0ARk8
-         aj+59bFsEQTFZ5GWxSaXXR7C0vSFmy95pGPmkLmI+Ai5TdJprCJHWK7czTQQHMf6fg4N
-         Q5anVOjuExHtd/7GAnI/oiRkoA/ET0A7dtU/nKM88wM7nr3VmwRzXnWtfS3ZviUMsSyZ
-         HFMQ==
-X-Gm-Message-State: AOJu0YyH0HGLFLhFI/1hQ8O7xTI+wxkmT/D/1s3v/gbOE9Oqz1Ox4hP+
-	J/7t9jxoy6weitognI6POru9C8WAF07RuRdYlHzxOWXHUpsXPmo4xUcBUQ==
-X-Gm-Gg: ASbGncsgwR5fO1GVXorHFpeJge/i/xytkqDHL5BYX2mpkaSyOy1aD2eHRzoXFpkDpMr
-	fBCENLpvEynqO87GCZmTNIRU2UdSHJOglQRRnoWU3A9KNa3ce78WpwvAH2awY7aHo0E4YFlKZ4Q
-	NJZ+LPw3PFKyFao8f04jMuaaOrdSnDgvl8+PgzTQ9anU5WLHjlD66PLPRwRJaxKnSfCGcUFHBAb
-	sc8ZGOprcVMyWzdW7kAAZ77PWOZKEr1VFXocNNIclq//yh8mC7IGr5+H2qJVGfFoxnZDSmyJ7RT
-	YWO03RXFbIdCc4mnCmlX7V8kSw==
-X-Google-Smtp-Source: AGHT+IFwDu8z1gKpUlBDZUlj4/ATzeGCqH/nBfTgDuo/Hj8kPwy1UInsQoS/cJkfC8AnKdj9FmfaBg==
-X-Received: by 2002:a05:690c:dd4:b0:6ef:69c4:4dac with SMTP id 00721157ae682-6f19e4f3f86mr7729637b3.15.1733944934308;
-        Wed, 11 Dec 2024 11:22:14 -0800 (PST)
+        bh=pJ6czW7oqxG3C4Lh524NY3ogieEucE1ren2yz0aC2EU=;
+        b=QaBrWSzXEB2XtrcLzngIooD4v56pXgzaXl0DekC9hSsuomZSq9yZEbgI66lbif8HIw
+         Yxg+avcw3j53/cIaiSSNe7gq1EVjFT3nVY2jgZhEfPCAuyNL02LcE0M6WtpWHgDnsLom
+         ne9cQa8xbLm2athN3ufdbsGXaRiIq3KsPMEqbhe7TYQZGv7QIcKRY3brCalqOfhw/Mzo
+         Sj2amBk59zXCYt3m3vNRnaheNlT3qkCJbzRCfMZwHsgxCHbC37IJPvwm/oymn9r95XH2
+         i73UTkzWbWdyHZrjOmxqu3gEjikFe0ZfZ6nvR348aNdOfeKlPQEstJbIRnan3pUCyTTt
+         WeEg==
+X-Gm-Message-State: AOJu0YzK+NnVv9st4E2Qb5HlcqStHoWtZjhVUZeGLxoqE8VTPIBaw6G0
+	IjLuS4xeJqBfwz86GTH11cemRQUFPaSf74pv4ie1Kk5a3hLTgrUHIxnfhQ==
+X-Gm-Gg: ASbGncvxz97eyN7BdaOXezq4HLH3+T5jATInEfOiArMUjIE6+PgBQLsxjffi8rVx46c
+	mhYLk2dqozComqJSQX2E6GGzpiO8PAkeof04+oM4M67TfISF7Z4giBGM9KcEC4jEVufDMjpeR/D
+	wCuRsqs5Q3cHdjT9zNIlOxuiir4mnQBzOUup+wrUoKt/WuGm7ge3G8ONKAGJWJlgCLLn48ipO7t
+	LbXZqJDSPh4dRPRC+khGVVRAGiKyjSjA0JkQgzjO3qnLCpRwxaVfexBvv33PADU7voOKWlwP0Au
+	YSOSgA4FBvLvkaam9vhMmf22QQ==
+X-Google-Smtp-Source: AGHT+IHTLJVdSvIl4HWQWyz+uZBSapI9w/YugMwbGA8py1Iy2U7Bg5mcuQcou/c9zfRYSJ5sLoGdnQ==
+X-Received: by 2002:a05:690c:ecc:b0:6ef:60f4:3d41 with SMTP id 00721157ae682-6f19e4f5738mr9212517b3.16.1733944937944;
+        Wed, 11 Dec 2024 11:22:17 -0800 (PST)
 Received: from lvondent-mobl5.. (syn-107-146-107-067.res.spectrum.com. [107.146.107.67])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-6f14ce8be30sm3670077b3.79.2024.12.11.11.22.12
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-6f14ce8be30sm3670077b3.79.2024.12.11.11.22.15
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 11 Dec 2024 11:22:13 -0800 (PST)
+        Wed, 11 Dec 2024 11:22:16 -0800 (PST)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v2 2/5] bluetoothctl: Update documentation to use '>' as prompt end marker
-Date: Wed, 11 Dec 2024 14:22:07 -0500
-Message-ID: <20241211192210.1864347-2-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v2 4/5] client: Add HCI submenu
+Date: Wed, 11 Dec 2024 14:22:09 -0500
+Message-ID: <20241211192210.1864347-4-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.47.1
 In-Reply-To: <20241211192210.1864347-1-luiz.dentz@gmail.com>
 References: <20241211192210.1864347-1-luiz.dentz@gmail.com>
@@ -75,1747 +75,441 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This replaces the use of '#' with '>' as prompt end marker since the
-former is used to describe comments on the script which might be
-confused with prompt.
----
- client/bluetoothctl-admin.rst     |   6 +-
- client/bluetoothctl-advertise.rst |  38 ++++----
- client/bluetoothctl-assistant.rst |   4 +-
- client/bluetoothctl-endpoint.rst  | 136 ++++++++++++++--------------
- client/bluetoothctl-gatt.rst      |  42 ++++-----
- client/bluetoothctl-mgmt.rst      | 146 +++++++++++++++---------------
- client/bluetoothctl-monitor.rst   |  16 ++--
- client/bluetoothctl-player.rst    |  38 ++++----
- client/bluetoothctl-scan.rst      |  20 ++--
- client/bluetoothctl-transport.rst |  18 ++--
- client/bluetoothctl.rst           |  48 +++++-----
- 11 files changed, 256 insertions(+), 256 deletions(-)
+This adds HCI submenu:
 
-diff --git a/client/bluetoothctl-admin.rst b/client/bluetoothctl-admin.rst
-index 774af0530e45..fcc0d35c918f 100644
---- a/client/bluetoothctl-admin.rst
-+++ b/client/bluetoothctl-admin.rst
-@@ -26,9 +26,9 @@ allow
+Menu hci:
+Available commands:
+-------------------
+open <index> <chan=raw,user>                      Open HCI channel
+cmd <opcode> [parameters...]                      Send HCI data
+send <type=acl,sco,iso> <handle> [data...]        Send HCI data
+register <event>                                  Register HCI event handler
+unregister <event>                                Unregister HCI event handler
+close                                             Close HCI channel
+
+Examples:
+
+In order to open a user channel the controller needs to be power off
+first:
+bluetooth# power off
+bluetooth# hci.open 0 user
+HCI index 0 user channel opened
+
+Then commands can be sent hci.cmd, so the following is sending HCI reset:
+bluetooth# hci.cmd 0x0c03
+HCI Command complete:
+  00
+
+For sending data packets to specific handle hci.send can be used:
+bluetooth# hci.send acl 0x0000
+---
+ Makefile.tools |   3 +-
+ client/hci.c   | 333 +++++++++++++++++++++++++++++++++++++++++++++++++
+ client/hci.h   |  12 ++
+ client/main.c  |   3 +
+ 4 files changed, 350 insertions(+), 1 deletion(-)
+ create mode 100644 client/hci.c
+ create mode 100644 client/hci.h
+
+diff --git a/Makefile.tools b/Makefile.tools
+index 71033d6388cf..51a5af6af77e 100644
+--- a/Makefile.tools
++++ b/Makefile.tools
+@@ -14,7 +14,8 @@ client_bluetoothctl_SOURCES = client/main.c \
+ 					client/admin.h client/admin.c \
+ 					client/player.h client/player.c \
+ 					client/mgmt.h client/mgmt.c \
+-					client/assistant.h client/assistant.c
++					client/assistant.h client/assistant.c \
++					client/hci.h client/hci.c
+ client_bluetoothctl_LDADD = lib/libbluetooth-internal.la \
+ 			gdbus/libgdbus-internal.la src/libshared-glib.la \
+ 			$(GLIB_LIBS) $(DBUS_LIBS) -lreadline
+diff --git a/client/hci.c b/client/hci.c
+new file mode 100644
+index 000000000000..69fc4ba91707
+--- /dev/null
++++ b/client/hci.c
+@@ -0,0 +1,333 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2024 Intel Corporation
++ *
++ *
++ */
++
++#ifdef HAVE_CONFIG_H
++#include <config.h>
++#endif
++
++#include <stdlib.h>
++#include <string.h>
++
++#include <glib.h>
++
++#include "src/shared/util.h"
++#include "src/shared/queue.h"
++#include "src/shared/shell.h"
++#include "src/shared/hci.h"
++#include "monitor/bt.h"
++#include "hci.h"
++
++static struct bt_hci *hci;
++static struct queue *events;
++
++struct hci_event {
++	uint8_t event;
++	unsigned int id;
++};
++
++static void hci_open(int argc, char *argv[])
++{
++	long index;
++	char *endptr = NULL;
++
++	if (hci) {
++		bt_shell_printf("HCI channel already open\n");
++		return bt_shell_noninteractive_quit(EXIT_FAILURE);
++	}
++
++	index = strtol(argv[1], &endptr, 0);
++	if (!endptr || *endptr != '\0' || index < 0 || index > UINT16_MAX) {
++		bt_shell_printf("Invalid index: %s\n", argv[1]);
++		return bt_shell_noninteractive_quit(EXIT_FAILURE);
++	}
++
++	if (!strcasecmp(argv[2], "raw")) {
++		hci = bt_hci_new_raw_device(index);
++		if (!hci) {
++			bt_shell_printf("Unable to open raw channel\n");
++			return bt_shell_noninteractive_quit(EXIT_FAILURE);
++		}
++	} else if (!strcasecmp(argv[2], "user")) {
++		hci = bt_hci_new_user_channel(index);
++		if (!hci) {
++			bt_shell_printf("Unable to open user channel\n");
++			return bt_shell_noninteractive_quit(EXIT_FAILURE);
++		}
++	} else {
++		bt_shell_printf("Invalid channel: %s\n", argv[2]);
++		return bt_shell_noninteractive_quit(EXIT_FAILURE);
++	}
++
++	bt_shell_printf("HCI index %ld %s channel opened\n", index, argv[2]);
++
++	return bt_shell_noninteractive_quit(EXIT_SUCCESS);
++}
++
++static uint8_t *str2bytearray(char *arg, size_t *val_len)
++{
++	uint8_t value[UINT8_MAX];
++	char *entry;
++	unsigned int i;
++
++	for (i = 0; (entry = strsep(&arg, " \t")) != NULL; i++) {
++		long val;
++		char *endptr = NULL;
++
++		if (*entry == '\0')
++			continue;
++
++		if (i >= G_N_ELEMENTS(value)) {
++			bt_shell_printf("Too much data\n");
++			return NULL;
++		}
++
++		val = strtol(entry, &endptr, 0);
++		if (!endptr || *endptr != '\0' || val > UINT8_MAX) {
++			bt_shell_printf("Invalid value at index %d\n", i);
++			return NULL;
++		}
++
++		value[i] = val;
++	}
++
++	*val_len = i;
++
++	return util_memdup(value, i);
++}
++
++static void hci_cmd_complete(const void *data, uint8_t size, void *user_data)
++{
++	bt_shell_printf("HCI Command complete:\n");
++	bt_shell_hexdump(data, size);
++
++	return bt_shell_noninteractive_quit(EXIT_SUCCESS);
++}
++
++static void hci_cmd(int argc, char *argv[])
++{
++	long opcode;
++	struct iovec iov = {};
++	char *endptr = NULL;
++	unsigned int ret;
++
++	if (!hci) {
++		bt_shell_printf("HCI channel not open\n");
++		return bt_shell_noninteractive_quit(EXIT_FAILURE);
++	}
++
++	opcode = strtol(argv[1], &endptr, 0);
++	if (!endptr || *endptr != '\0' || opcode < 0 || opcode > UINT16_MAX) {
++		bt_shell_printf("Invalid opcode: %s\n", argv[1]);
++		return bt_shell_noninteractive_quit(EXIT_FAILURE);
++	}
++
++	if (argc > 2) {
++		iov.iov_base = str2bytearray(argv[2], &iov.iov_len);
++		if (!iov.iov_base) {
++			bt_shell_printf("Invalid parameters: %s\n", argv[2]);
++			return bt_shell_noninteractive_quit(EXIT_FAILURE);
++		}
++	}
++
++	ret = bt_hci_send(hci, opcode, iov.iov_base, iov.iov_len,
++				hci_cmd_complete, NULL, NULL);
++
++	free(iov.iov_base);
++
++	if (!ret)
++		return bt_shell_noninteractive_quit(EXIT_FAILURE);
++}
++
++static void hci_send(int argc, char *argv[])
++{
++	uint8_t type;
++	long handle;
++	struct iovec iov = {};
++	char *endptr = NULL;
++	bool ret;
++
++	if (!hci) {
++		bt_shell_printf("HCI channel not open\n");
++		return bt_shell_noninteractive_quit(EXIT_FAILURE);
++	}
++
++	if (!strcasecmp(argv[1], "acl")) {
++		type = BT_H4_ACL_PKT;
++	} else if (!strcasecmp(argv[1], "sco")) {
++		type = BT_H4_SCO_PKT;
++	} else if (!strcasecmp(argv[1], "iso")) {
++		type = BT_H4_ISO_PKT;
++	} else {
++		bt_shell_printf("Invalid type: %s\n", argv[1]);
++		return bt_shell_noninteractive_quit(EXIT_FAILURE);
++	}
++
++	handle = strtol(argv[2], &endptr, 0);
++	if (!endptr || *endptr != '\0' || handle < 0 || handle > UINT16_MAX) {
++		bt_shell_printf("Invalid handle: %s\n", argv[2]);
++		return bt_shell_noninteractive_quit(EXIT_FAILURE);
++	}
++
++	if (argc > 3) {
++		iov.iov_base = str2bytearray(argv[3], &iov.iov_len);
++		if (!iov.iov_base) {
++			bt_shell_printf("Invalid data: %s\n", argv[3]);
++			return bt_shell_noninteractive_quit(EXIT_FAILURE);
++		}
++	}
++
++	ret = bt_hci_send_data(hci, type, handle, iov.iov_base, iov.iov_len);
++
++	free(iov.iov_base);
++
++	return bt_shell_noninteractive_quit(ret ? EXIT_SUCCESS : EXIT_FAILURE);
++}
++
++static bool match_event(const void *data, const void *match_data)
++{
++	const struct hci_event *evt = data;
++	uint8_t event = PTR_TO_UINT(match_data);
++
++	return evt->event == event;
++}
++
++static void hci_evt_received(const void *data, uint8_t size, void *user_data)
++{
++	struct hci_event *evt = user_data;
++
++	bt_shell_printf("HCI Event 0x%02x received:\n", evt->event);
++	bt_shell_hexdump(data, size);
++}
++
++static void hci_register(int argc, char *argv[])
++{
++	struct hci_event *evt;
++	long event;
++	char *endptr = NULL;
++
++	if (!hci) {
++		bt_shell_printf("HCI channel not open\n");
++		return bt_shell_noninteractive_quit(EXIT_FAILURE);
++	}
++
++	event = strtol(argv[1], &endptr, 0);
++	if (!endptr || *endptr != '\0' || event < 0 || event > UINT8_MAX) {
++		bt_shell_printf("Invalid event: %s\n", argv[1]);
++		return bt_shell_noninteractive_quit(EXIT_FAILURE);
++	}
++
++	if (!events)
++		events = queue_new();
++
++	evt = queue_find(events, match_event, UINT_TO_PTR(event));
++	if (evt) {
++		bt_shell_printf("Event already registered\n");
++		return bt_shell_noninteractive_quit(EXIT_FAILURE);
++	}
++
++	evt = new0(struct hci_event, 1);
++	evt->event = event;
++	evt->id = bt_hci_register(hci, event, hci_evt_received, evt, NULL);
++
++	if (!evt->id) {
++		free(evt);
++		return bt_shell_noninteractive_quit(EXIT_FAILURE);
++	}
++
++	bt_shell_printf("HCI Event 0x%02x registered\n", (uint8_t)event);
++
++	queue_push_tail(events, evt);
++
++	return bt_shell_noninteractive_quit(EXIT_SUCCESS);
++}
++
++static void hci_unregister(int argc, char *argv[])
++{
++	struct hci_event *evt;
++	long event;
++	char *endptr = NULL;
++
++	if (!hci) {
++		bt_shell_printf("HCI channel not open\n");
++		return bt_shell_noninteractive_quit(EXIT_FAILURE);
++	}
++
++	event = strtol(argv[1], &endptr, 0);
++	if (!endptr || *endptr != '\0' || event < 0 || event > UINT8_MAX) {
++		bt_shell_printf("Invalid event: %s\n", argv[1]);
++		return bt_shell_noninteractive_quit(EXIT_FAILURE);
++	}
++
++	evt = queue_find(events, match_event, UINT_TO_PTR(event));
++	if (!evt) {
++		bt_shell_printf("Event not registered\n");
++		return bt_shell_noninteractive_quit(EXIT_FAILURE);
++	}
++
++	bt_hci_unregister(hci, evt->id);
++	queue_remove(events, evt);
++	free(evt);
++
++	bt_shell_printf("HCI Event 0x%02x unregistered\n", (uint8_t)event);
++
++	return bt_shell_noninteractive_quit(EXIT_SUCCESS);
++}
++
++static void hci_close(int argc, char *argv[])
++{
++	if (!hci) {
++		bt_shell_printf("HCI channel not open\n");
++		return bt_shell_noninteractive_quit(EXIT_FAILURE);
++	}
++
++	bt_hci_unref(hci);
++	hci = NULL;
++
++	bt_shell_printf("HCI channel closed\n");
++
++	return bt_shell_noninteractive_quit(EXIT_SUCCESS);
++}
++
++static const struct bt_shell_menu hci_menu = {
++	.name = "hci",
++	.desc = "HCI Submenu",
++	.entries = {
++	{ "open",        "<index> <chan=raw,user>", hci_open,
++					"Open HCI channel" },
++	{ "cmd",         "<opcode> [parameters...]", hci_cmd,
++					"Send HCI command" },
++	{ "send",        "<type=acl,sco,iso> <handle> [data...]", hci_send,
++					"Send HCI data" },
++	{ "register",    "<event>", hci_register,
++					"Register HCI event handler" },
++	{ "unregister",  "<event>", hci_unregister,
++					"Unregister HCI event handler" },
++	{ "close",         NULL, hci_close, "Close HCI channel" },
++	{} },
++};
++
++void hci_add_submenu(void)
++{
++	bt_shell_add_submenu(&hci_menu);
++}
++
++void hci_remove_submenu(void)
++{
++	if (!hci)
++		return;
++
++	if (events) {
++		queue_destroy(events, free);
++		events = NULL;
++	}
++
++	bt_hci_unref(hci);
++	hci = NULL;
++}
+diff --git a/client/hci.h b/client/hci.h
+new file mode 100644
+index 000000000000..5efd89802452
+--- /dev/null
++++ b/client/hci.h
+@@ -0,0 +1,12 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2024 Intel Corporation
++ *
++ *
++ */
++
++void hci_add_submenu(void);
++void hci_remove_submenu(void);
+diff --git a/client/main.c b/client/main.c
+index 9258b44655dd..c4fc49427021 100644
+--- a/client/main.c
++++ b/client/main.c
+@@ -37,6 +37,7 @@
+ #include "player.h"
+ #include "mgmt.h"
+ #include "assistant.h"
++#include "hci.h"
+ 
+ /* String display constants */
+ #define COLORED_NEW	COLOR_GREEN "NEW" COLOR_OFF
+@@ -3207,6 +3208,7 @@ int main(int argc, char *argv[])
+ 	player_add_submenu();
+ 	mgmt_add_submenu();
+ 	assistant_add_submenu();
++	hci_add_submenu();
+ 
+ 	client = g_dbus_client_new(dbus_conn, "org.bluez", "/org/bluez");
+ 
+@@ -3229,6 +3231,7 @@ int main(int argc, char *argv[])
+ 	player_remove_submenu();
+ 	mgmt_remove_submenu();
+ 	assistant_remove_submenu();
++	hci_remove_submenu();
+ 
+ 	g_dbus_client_unref(client);
  
- Allow service UUIDs and block rest of them.
- 
--:Usage: **# allow [clear/uuid1 uuid2 ...]**
--:Example: **# allow 0x1101 0x1102 0x1103**
--:Example: **# allow clear**
-+:Usage: **> allow [clear/uuid1 uuid2 ...]**
-+:Example: **> allow 0x1101 0x1102 0x1103**
-+:Example: **> allow clear**
- 
- RESOURCES
- =========
-diff --git a/client/bluetoothctl-advertise.rst b/client/bluetoothctl-advertise.rst
-index 4b56324813ba..226ec6605372 100644
---- a/client/bluetoothctl-advertise.rst
-+++ b/client/bluetoothctl-advertise.rst
-@@ -26,17 +26,17 @@ uuids
- 
- Set/Get advertise uuids.
- 
--:Usage: **# uuids [all/uuid1 uuid2 ...]**
--:Example: **# uuids 0x1234**
--:Example: **# uuids 0x12345678**
--:Example: **# uuids 90f95193-35de-4306-a6e9-699328f15059**
-+:Usage: **> uuids [all/uuid1 uuid2 ...]**
-+:Example: **> uuids 0x1234**
-+:Example: **> uuids 0x12345678**
-+:Example: **> uuids 90f95193-35de-4306-a6e9-699328f15059**
- 
- service
- -------
- 
- Set/Get advertise service data.
- 
--:Usage: **# service [uuid] [data=xx xx ...]**
-+:Usage: **> service [uuid] [data=xx xx ...]**
- 
- manufacturer
- ------------
-@@ -50,7 +50,7 @@ maximum has been exceeded so you  may receive an error from bluetoothd that it
- "Failed to register advertisement" which means you need to reduce your
- manufacturer data length.
- 
--:Usage: **# manufacturer [id] [data=xx xx ...]**
-+:Usage: **> manufacturer [id] [data=xx xx ...]**
- 
- data
- ----
-@@ -68,8 +68,8 @@ You can modify the advertising data while it is advertising.
- 
- To get the currently set data use the command data without any arguments.
- 
--:Usage: **# data [type] [data=xx xx ...]**
--:Example: **# data 0x0C 01 0x0F 13**
-+:Usage: **> data [type] [data=xx xx ...]**
-+:Example: **> data 0x0C 01 0x0F 13**
- 
- discoverable
- ------------
-@@ -85,7 +85,7 @@ will be ignored.
- 
- Entering the command by itself will show the status of the setting
- 
--:Usage: **# discoverable [on/off]**
-+:Usage: **> discoverable [on/off]**
- 
- discoverable-timeout
- --------------------
-@@ -101,7 +101,7 @@ discoverable [on] must be set to use this feature.
- 
- Entering the command by itself will show the current value set.
- 
--:Usage: **# discoverable-timeout [seconds]**
-+:Usage: **> discoverable-timeout [seconds]**
- 
- tx-power
- --------
-@@ -119,7 +119,7 @@ This feature can be modified while advertising.
- 
- Entering the command by itself will show the current value set.
- 
--:Usage: **# tx-power [on/off] [power]**
-+:Usage: **> tx-power [on/off] [power]**
- 
- name
- ----
-@@ -133,15 +133,15 @@ If the string is too big to fit into the packet it will be truncated.
- It will either advertise as a complete local name or if it has to be truncated
- then a shortened local name.
- 
--:Usage: **# name [on/off/name]**
--:Example: **# name "0123456789abcdef0123456789abcdef"**
-+:Usage: **> name [on/off/name]**
-+:Example: **> name "0123456789abcdef0123456789abcdef"**
- 
- appearance
- ----------
- 
- Configure custom appearance to be advertised.
- 
--:Usage: **# appearance [on/off/value]**
-+:Usage: **> appearance [on/off/value]**
- 
- duration
- --------
-@@ -172,21 +172,21 @@ The advertising interval is determined by the advertising parameters that are
- set for each Instance. The advertising interval is the maximum of the
- advertising intervals set for each Instance.
- 
--:Usage: **# duration [seconds]**
-+:Usage: **> duration [seconds]**
- 
- timeout
- -------
- 
- Set/Get advertise timeout.
- 
--:Usage: **# timeout [seconds]**
-+:Usage: **> timeout [seconds]**
- 
- secondary
- ---------
- 
- Set/Get advertise secondary channel.
- 
--:Usage: **# secondary [1M/2M/Coded]**
-+:Usage: **> secondary [1M/2M/Coded]**
- 
- interval
- --------
-@@ -213,7 +213,7 @@ set for each Instance.
- The advertising interval is the maximum of the advertising intervals set for
- each Instance.
- 
--:Usage: **# interval [milliseconds]**
-+:Usage: **> interval [milliseconds]**
- 
- clear
- -----
-@@ -226,7 +226,7 @@ If you want to change the advertise configuration while advertising you must
- first clear the advertise configuration and then set the new advertise
- configuration.
- 
--:Usage: **# clear [uuids/service/manufacturer/config-name...]**
-+:Usage: **> clear [uuids/service/manufacturer/config-name...]**
- 
- RESOURCES
- =========
-diff --git a/client/bluetoothctl-assistant.rst b/client/bluetoothctl-assistant.rst
-index fb8c3a0d803f..643476b8c922 100644
---- a/client/bluetoothctl-assistant.rst
-+++ b/client/bluetoothctl-assistant.rst
-@@ -51,8 +51,8 @@ If the auto value is chosen when prompted for the Broadcast
- Code, a zero filled array will be sent to the peer. Otherwise,
- the string entered by the user will be sent as an array of bytes.
- 
--:Usage: **# push <assistant>**
--:Example: | **# push /org/bluez/hci0/src_05_1F_EE_F3_F8_7D/dev_00_60_37_31_7E_3F/bis1**
-+:Usage: **> push <assistant>**
-+:Example: | **> push /org/bluez/hci0/src_05_1F_EE_F3_F8_7D/dev_00_60_37_31_7E_3F/bis1**
-           | **[Assistant] Enter Metadata (auto/value): 0x03 0x02 0x04 0x00**
-           | **[Assistant] Enter Broadcast Code (auto/value): Borne House**
- 
-diff --git a/client/bluetoothctl-endpoint.rst b/client/bluetoothctl-endpoint.rst
-index d13f37cd97e9..a9e973eb0ce3 100644
---- a/client/bluetoothctl-endpoint.rst
-+++ b/client/bluetoothctl-endpoint.rst
-@@ -26,52 +26,52 @@ list
- 
- List available endpoints.
- 
--:Usage: **# list [local]**
-+:Usage: **> list [local]**
- 
- show
- ----
- 
- Endpoint information.
- 
--:Usage: **# show [endpoint]**
-+:Usage: **> show [endpoint]**
- 
- register
- --------
- 
- Register Endpoint.
- 
--:Usage: **# register <UUID> <codec[:company]> [capabilities...]**
-+:Usage: **> register <UUID> <codec[:company]> [capabilities...]**
- :Example LC3 BAP source:
--	 | **#endpoint.register 00002bcb-0000-1000-8000-00805f9b34fb 0x06**
--	 | **#Auto Accept (yes/no):** y
--	 | **#Max Transports (auto/value):** a
--	 | **#Locations:** a
--	 | **#Supported Context (value):** 3
--	 | **#Context (value):** 3
--	 | **#CIG (auto/value):** a
--	 | **#CIS (auto/value):** a
-+	 | **>endpoint.register 00002bcb-0000-1000-8000-00805f9b34fb 0x06**
-+	 | **>Auto Accept (yes/no):** y
-+	 | **>Max Transports (auto/value):** a
-+	 | **>Locations:** a
-+	 | **>Supported Context (value):** 3
-+	 | **>Context (value):** 3
-+	 | **>CIG (auto/value):** a
-+	 | **>CIS (auto/value):** a
- :Example LC3 BAP sink with extra capabilities:
--	 | **#endpoint.register 00002bc9-0000-1000-8000-00805f9b34fb 0x06 "0x03 0xe5 0x03 0x00 0x02 0xe6 0x07"**
--	 | **#Enter Metadata (value/no):** n
--	 | **#Auto Accept (yes/no):** y
--	 | **#Max Transports (auto/value):** a
--	 | **#Locations:** a
--	 | **#Supported Context (value):** 3
--	 | **#Context (value):** 3
--	 | **#CIG (auto/value):** a
--	 | **#CIS (auto/value):** a
-+	 | **>endpoint.register 00002bc9-0000-1000-8000-00805f9b34fb 0x06 "0x03 0xe5 0x03 0x00 0x02 0xe6 0x07"**
-+	 | **>Enter Metadata (value/no):** n
-+	 | **>Auto Accept (yes/no):** y
-+	 | **>Max Transports (auto/value):** a
-+	 | **>Locations:** a
-+	 | **>Supported Context (value):** 3
-+	 | **>Context (value):** 3
-+	 | **>CIG (auto/value):** a
-+	 | **>CIS (auto/value):** a
- :Example LC3 BAP Broadcast source:
--	 | **#endpoint.register 00001852-0000-1000-8000-00805f9b34fb 0x06**
--	 | **#Auto Accept (yes/no):** y
--	 | **#Max Transports (auto/value):** a
--	 | **#Locations:** 3
--	 | **#Supported Context (value):** 1
-+	 | **>endpoint.register 00001852-0000-1000-8000-00805f9b34fb 0x06**
-+	 | **>Auto Accept (yes/no):** y
-+	 | **>Max Transports (auto/value):** a
-+	 | **>Locations:** 3
-+	 | **>Supported Context (value):** 1
- :Example LC3 BAP Broadcast sink:
--	 | **#endpoint.register 00001851-0000-1000-8000-00805f9b34fb 0x06**
--	 | **#Auto Accept (yes/no):** y
--	 | **#Max Transports (auto/value):** a
--	 | **#Locations:** 3
--	 | **#Supported Context (value):** 1
-+	 | **>endpoint.register 00001851-0000-1000-8000-00805f9b34fb 0x06**
-+	 | **>Auto Accept (yes/no):** y
-+	 | **>Max Transports (auto/value):** a
-+	 | **>Locations:** 3
-+	 | **>Supported Context (value):** 1
- 
- Note:
- 
-@@ -85,7 +85,7 @@ unregister
- 
- Unregister Endpoint.
- 
--:Usage: **# unregister <UUID/object>**
-+:Usage: **> unregister <UUID/object>**
- 
- Note:
- 
-@@ -97,7 +97,7 @@ config
- 
- Configure Endpoint.
- 
--:Usage: **# config <endpoint> <local endpoint> [preset]**
-+:Usage: **> config <endpoint> <local endpoint> [preset]**
- 
- Note:
- 
-@@ -109,54 +109,54 @@ presets
- 
- List available presets.
- 
--:Usage: **# presets <endpoint>/<UUID> [codec[:company]] [preset] [codec config] [metadata]**
-+:Usage: **> presets <endpoint>/<UUID> [codec[:company]] [preset] [codec config] [metadata]**
- :Example using endpoint:
--	  | **#presets /local/endpoint/ep0 32_1_1**
--	  | **#presets /local/endpoint/ep0**
-+	  | **>presets /local/endpoint/ep0 32_1_1**
-+	  | **>presets /local/endpoint/ep0**
- 	  | Preset 32_1_1
--	  | Configuration.#0: len 0x02 type 0x01
-+	  | Configuration.**>0: len 0x02 type 0x01
-           | Configuration.Sampling Frequency: 32 Khz (0x06)
--          | Configuration.#1: len 0x02 type 0x02
-+          | Configuration.**>1: len 0x02 type 0x02
-           | Configuration.Frame Duration: 7.5 ms (0x00)
--          | Configuration.#2: len 0x03 type 0x04
-+          | Configuration.**>2: len 0x03 type 0x04
-           | Configuration.Frame Length: 60 (0x003c)
- :Example using UUID:
--	  | **#presets 00002bc9-0000-1000-8000-00805f9b34fb 0x06 32_1_1**
--	  | **#presets 00002bc9-0000-1000-8000-00805f9b34fb 0x06**
-+	  | **>presets 00002bc9-0000-1000-8000-00805f9b34fb 0x06 32_1_1**
-+	  | **>presets 00002bc9-0000-1000-8000-00805f9b34fb 0x06**
- 	  | ...
- 	  | ***32_1_1**
- :Example setting up LC3 custom preset:
--	  | **#presets 00002bc9-0000-1000-8000-00805f9b34fb 0x06 custom**
--	  | **#[Codec] Enter frequency (Khz):** 48
--	  | **#[Codec] Enter frame duration (ms):** 10
--	  | **#[Codec] Enter channel allocation:** 3
--	  | **#[Codec] Enter frame length:** 100
--	  | **#[QoS] Enter Target Latency (Low, Balance, High):** Low
--	  | **#[QoS] Enter SDU Interval (us):** 1000
--	  | **#[QoS] Enter Framing (Unframed, Framed):** Unframed
--	  | **#[QoS] Enter PHY (1M, 2M):** 2M
--	  | **#[QoS] Enter Max SDU:** 200
--	  | **#[QoS] Enter RTN:** 3
--	  | **#[QoS] Enter Max Transport Latency (ms):** 10
--	  | **#[QoS] Enter Presentation Delay (us):** 20000
--	  | **#presets 00002bc9-0000-1000-8000-00805f9b34fb 0x06**
-+	  | **>presets 00002bc9-0000-1000-8000-00805f9b34fb 0x06 custom**
-+	  | **>[Codec] Enter frequency (Khz):** 48
-+	  | **>[Codec] Enter frame duration (ms):** 10
-+	  | **>[Codec] Enter channel allocation:** 3
-+	  | **>[Codec] Enter frame length:** 100
-+	  | **>[QoS] Enter Target Latency (Low, Balance, High):** Low
-+	  | **>[QoS] Enter SDU Interval (us):** 1000
-+	  | **>[QoS] Enter Framing (Unframed, Framed):** Unframed
-+	  | **>[QoS] Enter PHY (1M, 2M):** 2M
-+	  | **>[QoS] Enter Max SDU:** 200
-+	  | **>[QoS] Enter RTN:** 3
-+	  | **>[QoS] Enter Max Transport Latency (ms):** 10
-+	  | **>[QoS] Enter Presentation Delay (us):** 20000
-+	  | **>presets 00002bc9-0000-1000-8000-00805f9b34fb 0x06**
- 	  | ...
- 	  | ***custom**
- :Example setting up LC3 custom preset with extra configuration:
--	  | **#presets 00002bc9-0000-1000-8000-00805f9b34fb 0x06 custom "0x03 0xe8 0x00 0x00 0x02 0xe9 0x00"**
--	  | **#[Codec] Enter frequency (Khz):** 48
--	  | **#[Codec] Enter frame duration (ms):** 10
--	  | **#[Codec] Enter channel allocation:** 3
--	  | **#[Codec] Enter frame length:** 100
--	  | **#[QoS] Enter Target Latency (Low, Balance, High):** Low
--	  | **#[QoS] Enter SDU Interval (us):** 1000
--	  | **#[QoS] Enter Framing (Unframed, Framed):** Unframed
--	  | **#[QoS] Enter PHY (1M, 2M):** 2M
--	  | **#[QoS] Enter Max SDU:** 200
--	  | **#[QoS] Enter RTN:** 3
--	  | **#[QoS] Enter Max Transport Latency (ms):** 10
--	  | **#[QoS] Enter Presentation Delay (us):** 20000
--	  | **#presets 00002bc9-0000-1000-8000-00805f9b34fb 0x06**
-+	  | **>presets 00002bc9-0000-1000-8000-00805f9b34fb 0x06 custom "0x03 0xe8 0x00 0x00 0x02 0xe9 0x00"**
-+	  | **>[Codec] Enter frequency (Khz):** 48
-+	  | **>[Codec] Enter frame duration (ms):** 10
-+	  | **>[Codec] Enter channel allocation:** 3
-+	  | **>[Codec] Enter frame length:** 100
-+	  | **>[QoS] Enter Target Latency (Low, Balance, High):** Low
-+	  | **>[QoS] Enter SDU Interval (us):** 1000
-+	  | **>[QoS] Enter Framing (Unframed, Framed):** Unframed
-+	  | **>[QoS] Enter PHY (1M, 2M):** 2M
-+	  | **>[QoS] Enter Max SDU:** 200
-+	  | **>[QoS] Enter RTN:** 3
-+	  | **>[QoS] Enter Max Transport Latency (ms):** 10
-+	  | **>[QoS] Enter Presentation Delay (us):** 20000
-+	  | **>presets 00002bc9-0000-1000-8000-00805f9b34fb 0x06**
- 	  | ...
- 	  | ***custom**
- 
-diff --git a/client/bluetoothctl-gatt.rst b/client/bluetoothctl-gatt.rst
-index 2a239beca83e..8a157021043f 100644
---- a/client/bluetoothctl-gatt.rst
-+++ b/client/bluetoothctl-gatt.rst
-@@ -27,147 +27,147 @@ list-attributes
- 
- List attributes.
- 
--:Usage: **# list-attributes <attribute/UUID>**
-+:Usage: **> list-attributes <attribute/UUID>**
- 
- select-attribute
- ----------------
- 
- Select attribute.
- 
--:Usage: **# select-attribute <attribute/UUID>**
-+:Usage: **> select-attribute <attribute/UUID>**
- 
- attribute-info
- --------------
- 
- Select attribute.
- 
--:Usage: **# attribute-info [attribute/UUID]**
-+:Usage: **> attribute-info [attribute/UUID]**
- 
- read
- ----
- 
- Read attribute value.
- 
--:Usage: **# read [offset]**
-+:Usage: **> read [offset]**
- 
- write
- -----
- 
- Write attribute value.
- 
--:Usage: **# write <data=xx xx ...> [offset] [type]**
-+:Usage: **> write <data=xx xx ...> [offset] [type]**
- 
- acquire-write
- -------------
- 
- Acquire Write file descriptor.
- 
--:Usage: **# acquire-write**
-+:Usage: **> acquire-write**
- 
- release-write
- -------------
- 
- Release Write file descriptor.
- 
--:Usage: **# release-write**
-+:Usage: **> release-write**
- 
- acquire-notify
- --------------
- 
- Acquire Notify file descriptor.
- 
--:Usage: **# acquire-notify**
-+:Usage: **> acquire-notify**
- 
- release-notify
- --------------
- 
- Release Notify file descriptor.
- 
--:Usage: **# release-notify**
-+:Usage: **> release-notify**
- 
- notify
- ------
- 
- Notify attribute value.
- 
--:Usage: **# notify <on/off>**
-+:Usage: **> notify <on/off>**
- 
- clone
- -----
- 
- Clone a device or attribute.
- 
--:Usage: **# clone [dev/attribute/UUID]**
-+:Usage: **> clone [dev/attribute/UUID]**
- 
- register-application
- --------------------
- 
- Register application.
- 
--:Usage: **# register-application [UUID ...]**
-+:Usage: **> register-application [UUID ...]**
- 
- unregister-application
- ----------------------
- 
- Unregister application
- 
--:Usage: **# unregister-application**
-+:Usage: **> unregister-application**
- 
- register-service
- ----------------
- 
- Register application service.
- 
--:Usage: **# register-service <UUID> [handle]**
-+:Usage: **> register-service <UUID> [handle]**
- 
- unregister-service
- ------------------
- 
- Unregister application service
- 
--:Usage: **# unregister-service <UUID/object>**
-+:Usage: **> unregister-service <UUID/object>**
- 
- register-includes
- -----------------
- 
- Register as Included service.
- 
--:Usage: **#r egister-includes <UUID> [handle]**
-+:Usage: **>r egister-includes <UUID> [handle]**
- 
- unregister-includes
- -------------------
- 
- Unregister Included service.
- 
--:Usage: **# unregister-includes <Service-UUID><Inc-UUID>**
-+:Usage: **> unregister-includes <Service-UUID><Inc-UUID>**
- 
- register-characteristic
- -----------------------
- 
- Register service characteristic.
- 
--:Usage: **# register-characteristic <UUID> <Flags=read,write,notify...> [handle]**
-+:Usage: **> register-characteristic <UUID> <Flags=read,write,notify...> [handle]**
- 
- unregister-characteristic
- -------------------------
- 
- Unregister service characteristic.
- 
--:Usage: **# unregister-characteristic <UUID/object>**
-+:Usage: **> unregister-characteristic <UUID/object>**
- 
- register-descriptor
- -------------------
- 
- Register characteristic descriptor.
- 
--:Usage: **# register-descriptor <UUID> <Flags=read,write...> [handle]**
-+:Usage: **> register-descriptor <UUID> <Flags=read,write...> [handle]**
- 
- unregister-descriptor
- ---------------------
- 
- Unregister characteristic descriptor.
- 
--:Usage: **# unregister-descriptor <UUID/object>**
-+:Usage: **> unregister-descriptor <UUID/object>**
- 
- RESOURCES
- =========
-diff --git a/client/bluetoothctl-mgmt.rst b/client/bluetoothctl-mgmt.rst
-index 4baed6480c14..b82141206f57 100644
---- a/client/bluetoothctl-mgmt.rst
-+++ b/client/bluetoothctl-mgmt.rst
-@@ -26,217 +26,217 @@ select
- 
- Select a different index
- 
--:Usage: **# select <index>**
-+:Usage: **> select <index>**
- 
- revision
- --------
- 
- Get the MGMT Revision
- 
--:Usage: **# revision**
-+:Usage: **> revision**
- 
- commands
- --------
- 
- List supported commands
- 
--:Usage: **# commands**
-+:Usage: **> commands**
- 
- config
- ------
- 
- Show configuration info
- 
--:Usage: **# config**
-+:Usage: **> config**
- 
- info
- ----
- 
- Show controller info
- 
--:Usage: **# info**
-+:Usage: **> info**
- 
- extinfo
- -------
- 
- Show extended controller info
- 
--:Usage: **# extinfo**
-+:Usage: **> extinfo**
- 
- auto-power
- ----------
- 
- Power all available features
- 
--:Usage: **# auto-power**
-+:Usage: **> auto-power**
- 
- power
- -----
- 
- Toggle powered state
- 
--:Usage: **# power <on/off>**
-+:Usage: **> power <on/off>**
- 
- discov
- ------
- 
- Toggle discoverable state
- 
--:Usage: **# discov <yes/no/limited> [timeout]**
-+:Usage: **> discov <yes/no/limited> [timeout]**
- 
- connectable
- -----------
- 
- Toggle connectable state
- 
--:Usage: **# connectable <on/off>**
-+:Usage: **> connectable <on/off>**
- 
- fast-conn
- ---------
- 
- Toggle fast connectable state
- 
--:Usage: **# fast-conn <on/off>**
-+:Usage: **> fast-conn <on/off>**
- 
- bondable
- --------
- 
- Toggle bondable state
- 
--:Usage: **# bondable <on/off>**
-+:Usage: **> bondable <on/off>**
- 
- pairable
- --------
- 
- Toggle bondable state
- 
--:Usage: **# pairable <on/off>**
-+:Usage: **> pairable <on/off>**
- 
- linksec
- -------
- 
- Toggle link level security
- 
--:Usage: **# linksec <on/off>**
-+:Usage: **> linksec <on/off>**
- 
- ssp
- ---
- 
- Toggle SSP mode
- 
--:Usage: **# spp <on/off>**
-+:Usage: **> spp <on/off>**
- 
- sc
- --
- 
- Toggle SC support
- 
--:Usage: **# sc <on/off/only>**
-+:Usage: **> sc <on/off/only>**
- 
- hs
- --
- 
- Toggle HS support
- 
--:Usage: **# hs <on/off>**
-+:Usage: **> hs <on/off>**
- 
- le
- --
- 
- Toggle LE support
- 
--:Usage: **# le <on/off>**
-+:Usage: **> le <on/off>**
- 
- advertising
- -----------
- 
- Toggle LE advertising
- 
--:Usage: **# advertise <on/off>**
-+:Usage: **> advertise <on/off>**
- 
- bredr
- -----
- 
- Toggle BR/EDR support
- 
--:Usage: **# bredr <on/off>**
-+:Usage: **> bredr <on/off>**
- 
- privacy
- -------
- 
- Toggle privacy support
- 
--:Usage: **# privacy <on/off> [irk]**
-+:Usage: **> privacy <on/off> [irk]**
- 
- class
- -----
- 
- Set device major/minor class
- 
--:Usage: **# class <major> <minor>**
-+:Usage: **> class <major> <minor>**
- 
- disconnect
- ----------
- 
- Disconnect device
- 
--:Usage: **# disconnect [-t type] <remote address>**
-+:Usage: **> disconnect [-t type] <remote address>**
- 
- con
- ---
- 
- List connections
- 
--:Usage: **# con**
-+:Usage: **> con**
- 
- find
- ----
- 
- Discover nearby devices
- 
--:Usage: **# find [-l|-b] [-L]**
-+:Usage: **> find [-l|-b] [-L]**
- 
- find-service
- ------------
- 
- Discover nearby service
- 
--:Usage: **# find-service [-u UUID] [-r RSSI_Threshold] [-l|-b]**
-+:Usage: **> find-service [-u UUID] [-r RSSI_Threshold] [-l|-b]**
- 
- stop-find
- ---------
- 
- Stop discovery
- 
--:Usage: **# stop-find [-l|-b]**
-+:Usage: **> stop-find [-l|-b]**
- 
- name
- ----
- 
- Set local name
- 
--:Usage: **# name <name> [shortname]**
-+:Usage: **> name <name> [shortname]**
- 
- pair
- ----
- 
- Pair with a remote device
- 
--:Usage: **# pair [-c cap] [-t type] <remote address>**
-+:Usage: **> pair [-c cap] [-t type] <remote address>**
- 
- cancelpair
- ----------
- 
- Cancel pairing
- 
--:Usage: **# cancelpair [-t type] <remote address>**
-+:Usage: **> cancelpair [-t type] <remote address>**
- 
- unpair
- ------
- 
- Unpair device
- 
--:Usage: **# unpair [-t type] <remote address>**
-+:Usage: **> unpair [-t type] <remote address>**
- 
- keys
- ----
-@@ -250,63 +250,63 @@ ltks
- 
- Load Long Term Keys
- 
--:Usage: **# ltks**
-+:Usage: **> ltks**
- 
- irks
- ----
- 
- Load Identity Resolving Keys
- 
--:Usage: **# irks [--local index] [--file file path]**
-+:Usage: **> irks [--local index] [--file file path]**
- 
- block
- -----
- 
- Block Device
- 
--:Usage: **# block [-t type] <remote address>**
-+:Usage: **> block [-t type] <remote address>**
- 
- unblock
- -------
- 
- Unblock Device
- 
--:Usage: **# unblock [-t type] <remote address>**
-+:Usage: **> unblock [-t type] <remote address>**
- 
- add-uuid
- --------
- 
- Add UUID
- 
--:Usage: **# add-uuid <UUID> <service class hint>**
-+:Usage: **> add-uuid <UUID> <service class hint>**
- 
- rm-uuid
- -------
- 
- Remove UUID
- 
--:Usage: **# rm-uuid <UUID>**
-+:Usage: **> rm-uuid <UUID>**
- 
- clr-uuids
- ---------
- 
- Clear UUIDs
- 
--:Usage: **# clear-uuids**
-+:Usage: **> clear-uuids**
- 
- local-oob
- ---------
- 
- Local OOB data
- 
--:Usage: **# local-oob**
-+:Usage: **> local-oob**
- 
- remote-oob
- ----------
- 
- Remote OOB data
- 
--:Usage: **# remote-oob [-t <addr_type>] [-r <rand192>] [-h <hash192>]
-+:Usage: **> remote-oob [-t <addr_type>] [-r <rand192>] [-h <hash192>]
- 	[-R <rand256>] [-H <hash256>] <addr>**
- 
- did
-@@ -314,161 +314,161 @@ did
- 
- Set Device ID
- 
--:Usage: **# did <source>:<vendor>:<product>:<version>**
-+:Usage: **> did <source>:<vendor>:<product>:<version>**
- 
- static-addr
- -----------
- 
- Set static address
- 
--:Usage: **# static-addr <address>**
-+:Usage: **> static-addr <address>**
- 
- public-addr
- -----------
- 
- Set public address
- 
--:Usage: **# public-addr <address>**
-+:Usage: **> public-addr <address>**
- 
- ext-config
- ----------
- 
- External configuration
- 
--:Usage: **# ext-config <on/off>**
-+:Usage: **> ext-config <on/off>**
- 
- debug-keys
- ----------
- 
- Toggle debug keys
- 
--:Usage: **# debug-keys <on/off>**
-+:Usage: **> debug-keys <on/off>**
- 
- conn-info
- ---------
- 
- Get connection information
- 
--:Usage: **# conn-info [-t type] <remote address>**
-+:Usage: **> conn-info [-t type] <remote address>**
- 
- io-cap
- ------
- 
- Set IO Capability
- 
--:Usage: **# io-cap <cap>**
-+:Usage: **> io-cap <cap>**
- 
- scan-params
- -----------
- 
- Set Scan Parameters
- 
--:Usage: **# scan-params <interval> <window>**
-+:Usage: **> scan-params <interval> <window>**
- 
- get-clock
- ---------
- 
- Get Clock Information
- 
--:Usage: **# get-clock [address]**
-+:Usage: **> get-clock [address]**
- 
- add-device
- ----------
- 
- Add Device
- 
--:Usage: **# add-device [-a action] [-t type] <address>**
-+:Usage: **> add-device [-a action] [-t type] <address>**
- 
- del-device
- ----------
- 
- Remove Device
- 
--:Usage: **# del-device [-t type] <address>**
-+:Usage: **> del-device [-t type] <address>**
- 
- clr-devices
- -----------
- 
- Clear Devices
- 
--:Usage: **# clr-devices**
-+:Usage: **> clr-devices**
- 
- bredr-oob
- ---------
- 
- Local OOB data (BR/EDR)
- 
--:Usage: **# bredr-oob**
-+:Usage: **> bredr-oob**
- 
- le-oob
- ------
- 
- Local OOB data (LE)
- 
--:Usage: **# le-oob**
-+:Usage: **> le-oob**
- 
- advinfo
- -------
- 
- Show advertising features
- 
--:Usage: **# advinfo**
-+:Usage: **> advinfo**
- 
- advsize
- -------
- 
- Show advertising size info
- 
--:Usage: **# advsize [options] <instance_id>**
-+:Usage: **> advsize [options] <instance_id>**
- 
- add-adv
- -------
- 
- Add advertising instance
- 
--:Usage: **# add-adv [options] <instance_id>**
-+:Usage: **> add-adv [options] <instance_id>**
- 
- rm-adv
- ------
- 
- Remove advertising instance
- 
--:Usage: **# rm-adv <instance_id>**
-+:Usage: **> rm-adv <instance_id>**
- 
- clr-adv
- -------
- 
- Clear advertising instances
- 
--:Usage: **# clr-adv**
-+:Usage: **> clr-adv**
- 
- add-ext-adv-params
- ------------------
- 
- Add extended advertising params
- 
--:Usage: **# add-ext-adv-parms [options] <instance_id>**
-+:Usage: **> add-ext-adv-parms [options] <instance_id>**
- 
- add-ext-adv-data
- ----------------
- 
- Add extended advertising data
- 
--:Usage: **# add-ext-adv-data [options] <instance_id>**
-+:Usage: **> add-ext-adv-data [options] <instance_id>**
- 
- appearance
- ----------
- 
- Set appearance
- 
--:Usage: **# appearance <appearance>**
-+:Usage: **> appearance <appearance>**
- 
- phy
- ---
- 
- Get/Set PHY Configuration
- 
--:Usage: **# phy [LE1MTX] [LE1MRX] [LE2MTX] [LE2MRX] [LECODEDTX] [LECODEDRX]
-+:Usage: **> phy [LE1MTX] [LE1MRX] [LE2MTX] [LE2MRX] [LECODEDTX] [LECODEDRX]
- 	[BR1M1SLOT] [BR1M3SLOT] [BR1M5SLOT][EDR2M1SLOT] [EDR2M3SLOT]
- 	[EDR2M5SLOT][EDR3M1SLOT] [EDR3M3SLOT] [EDR3M5SLOT]**
- 
-@@ -477,63 +477,63 @@ wbs
- 
- Toggle Wideband-Speech support
- 
--:Usage: **# wbs <on/off>**
-+:Usage: **> wbs <on/off>**
- 
- secinfo
- -------
- 
- Show security information
- 
--:Usage: **# secinfo**
-+:Usage: **> secinfo**
- 
- expinfo
- -------
- 
- Show experimental features
- 
--:Usage: **# expinfo**
-+:Usage: **> expinfo**
- 
- exp-debug
- ---------
- 
- Set debug feature
- 
--:Usage: **# exp-debug <on/off>**
-+:Usage: **> exp-debug <on/off>**
- 
- exp-privacy
- -----------
- 
- Set LL privacy feature
- 
--:Usage: **# exp-privacy <on/off>**
-+:Usage: **> exp-privacy <on/off>**
- 
- exp-quality
- -----------
- 
- Set bluetooth quality report feature
- 
--:Usage: **# exp-quality <on/off>**
-+:Usage: **> exp-quality <on/off>**
- 
- exp-offload
- -----------
- 
- Toggle codec support
- 
--:Usage: **# exp-offload <on/off>**
-+:Usage: **> exp-offload <on/off>**
- 
- read-sysconfig
- --------------
- 
- Read System Configuration
- 
--:Usage: **# read-sysconfig**
-+:Usage: **> read-sysconfig**
- 
- set-sysconfig
- -------------
- 
- Set System Configuration
- 
--:Usage: **# set-sysconfig <-v|-h> [options...]**
-+:Usage: **> set-sysconfig <-v|-h> [options...]**
- 
- get-flags
- ---------
-@@ -546,7 +546,7 @@ set-flags
- 
- Set device flags
- 
--:Usage: **# set-flags [-f flags] [-t type] <address>**
-+:Usage: **> set-flags [-f flags] [-t type] <address>**
- 
- RESOURCES
- =========
-diff --git a/client/bluetoothctl-monitor.rst b/client/bluetoothctl-monitor.rst
-index 2357a56ace36..98b49dc22eb9 100644
---- a/client/bluetoothctl-monitor.rst
-+++ b/client/bluetoothctl-monitor.rst
-@@ -26,56 +26,56 @@ set-rssi-threshold
- 
- Set RSSI threshold parameter
- 
--:Usage: **# set-rssi-threshold <low_threshold> <high_threshold>**
-+:Usage: **> set-rssi-threshold <low_threshold> <high_threshold>**
- 
- set-rssi-timeout
- ----------------
- 
- Set RSSI timeout parameter
- 
--:Usage: **# set-rssi-timeout <low_timeout> <high_timeout>**
-+:Usage: **> set-rssi-timeout <low_timeout> <high_timeout>**
- 
- set-rssi-sampling-period
- -------------------------
- 
- Set RSSI sampling period parameter
- 
--:Usage: **# set-rssi-timeout <low_timeout> <high_timeout>**
-+:Usage: **> set-rssi-timeout <low_timeout> <high_timeout>**
- 
- add-or-pattern
- --------------
- 
- Register 'or pattern' type monitor with the specified RSSI parameters
- 
--:Usage: **# add-or-pattern [patterns=pattern1 pattern2 ...]**
-+:Usage: **> add-or-pattern [patterns=pattern1 pattern2 ...]**
- 
- get-pattern
- -----------
- 
- Get advertisement monitor
- 
--:Usage: **# get-pattern <monitor-id/all>**
-+:Usage: **> get-pattern <monitor-id/all>**
- 
- remove-pattern
- --------------
- 
- Remove advertisement monitor
- 
--:Usage: **# remove-pattern <monitor-id/all>**
-+:Usage: **> remove-pattern <monitor-id/all>**
- 
- get-supported-info
- ------------------
- 
- Get advertisement manager supported features and supported monitor types
- 
--:Usage: **# get-supported-info**
-+:Usage: **> get-supported-info**
- 
- print-usage
- -----------
- 
- Print the command usage
- 
--:Usage: **# print-usage <add-or-pattern>**
-+:Usage: **> print-usage <add-or-pattern>**
- 
- RESOURCES
- =========
-diff --git a/client/bluetoothctl-player.rst b/client/bluetoothctl-player.rst
-index e45e61a1c5e3..0c446de6ab82 100644
---- a/client/bluetoothctl-player.rst
-+++ b/client/bluetoothctl-player.rst
-@@ -26,133 +26,133 @@ list
- 
- List available players.
- 
--:Usage: **# list**
-+:Usage: **> list**
- 
- show
- ----
- 
- Show player information.
- 
--:Usage: **# show [player]**
-+:Usage: **> show [player]**
- 
- select
- ------
- 
- Select default player.
- 
--:Usage: **# select <player>**
-+:Usage: **> select <player>**
- 
- play
- ----
- 
- Start playback.
- 
--:Usage: **# play [item]**
-+:Usage: **> play [item]**
- 
- pause
- -----
- 
- Pause playback.
- 
--:Usage: **# pause**
-+:Usage: **> pause**
- 
- stop
- ----
- 
- Stop playback.
- 
--:Usage: **# stop**
-+:Usage: **> stop**
- 
- next
- ----
- 
- Jump to next item.
- 
--:Usage: **# next**
-+:Usage: **> next**
- 
- previous
- --------
- 
- Jump to previous item.
- 
--:Usage: **# previous**
-+:Usage: **> previous**
- 
- fast-forward
- ------------
- 
- Fast forward playback.
- 
--:Usage: **# fast-forward**
-+:Usage: **> fast-forward**
- 
- rewind
- ------
- 
- Rewind playback.
- 
--:Usage: **# rewind**
-+:Usage: **> rewind**
- 
- equalizer
- ---------
- 
- Enable/Disable equalizer.
- 
--:Usage: **# equalizer <on/off>**
-+:Usage: **> equalizer <on/off>**
- 
- repeat
- ------
- 
- Set repeat mode.
- 
--:Usage: **# repeat <singletrack/alltrack/group/off>**
-+:Usage: **> repeat <singletrack/alltrack/group/off>**
- 
- shuffle
- -------
- 
- Set shuffle mode.
- 
--:Usage: **# shuffle <alltracks/group/off>**
-+:Usage: **> shuffle <alltracks/group/off>**
- 
- scan
- ----
- 
- Set scan mode.
- 
--:Usage: **# scan <alltracks/group/off>**
-+:Usage: **> scan <alltracks/group/off>**
- 
- change-folder
- -------------
- 
- Change current folder.
- 
--:Usage: **# change-folder <item>**
-+:Usage: **> change-folder <item>**
- 
- list-items
- ----------
- 
- List items of current folder.
- 
--:Usage: **# list-items [start] [end]**
-+:Usage: **> list-items [start] [end]**
- 
- search
- ------
- 
- Search items containing string.
- 
--:Usage: **# search <string>**
-+:Usage: **> search <string>**
- 
- queue
- -----
- 
- Add item to playlist queue.
- 
--:Usage: **# queue <item>**
-+:Usage: **> queue <item>**
- 
- show-item
- ---------
- 
- Show item information.
- 
--:Usage: **# show-item <item>**
-+:Usage: **> show-item <item>**
- 
- RESOURCES
- =========
-diff --git a/client/bluetoothctl-scan.rst b/client/bluetoothctl-scan.rst
-index 54ea2e8fe8e5..23e0637fce55 100644
---- a/client/bluetoothctl-scan.rst
-+++ b/client/bluetoothctl-scan.rst
-@@ -26,7 +26,7 @@ uuids
- 
- Set/Get UUIDs filter.
- 
--:Usage: **# uuids [all/uuid1 uuid2 ...]**
-+:Usage: **> uuids [all/uuid1 uuid2 ...]**
- 
- rssi
- ----
-@@ -40,8 +40,8 @@ The value is in dBm.
- If one or more discovery filters have been set, the RSSI delta-threshold imposed
- by starting discovery by default will not be applied.
- 
--:Usage: **# rssi [rssi]**
--:Example: **# rssi -60**
-+:Usage: **> rssi [rssi]**
-+:Example: **> rssi -60**
- 
- pathloss
- --------
-@@ -54,8 +54,8 @@ The value is in dB.
- If one or more discovery filters have been set, the RSSI delta-threshold
- imposed by starting discovery by default will not be applied.
- 
--:Usage: **# pathloss [pathloss]**
--:Example: **# pathloss 4**
-+:Usage: **> pathloss [pathloss]**
-+:Example: **> pathloss 4**
- 
- transport
- ---------
-@@ -78,7 +78,7 @@ an org.bluez.Error.Failed error will be returned.
- If "auto" transport is requested, the scan will use LE, BREDR, or both,
- depending on what's currently enabled on the controller.
- 
--:Usage: **# transport [auto/bredr/le]**
-+:Usage: **> transport [auto/bredr/le]**
- 
- duplicate-data
- --------------
-@@ -90,7 +90,7 @@ Disables duplicate detection of advertisement data.
- When enabled, PropertiesChanged signals will be generated for ManufacturerData
- and ServiceData every time they are discovered.
- 
--:Usage: **# duplicate-data [on/off]**
-+:Usage: **> duplicate-data [on/off]**
- 
- discoverable
- ------------
-@@ -102,7 +102,7 @@ Makes the adapter discoverable while discovering.
- If the adapter is already discoverable, setting this filter won't have any
- effect.
- 
--:Usage: **# discoverable [on/off]**
-+:Usage: **> discoverable [on/off]**
- 
- pattern
- -------
-@@ -119,7 +119,7 @@ When set, it disregards device discoverable flags.
-        set any pattern, as it works as a logical OR. Also, setting an empty
-        string "" pattern will match any device found.
- 
--:Usage: **# pattern [value]**
-+:Usage: **> pattern [value]**
- 
- 
- clear
-@@ -127,7 +127,7 @@ clear
- 
- Clears discovery filter.
- 
--:Usage: **# clear [uuids/rssi/pathloss/transport/duplicate-data/discoverable/pattern]**
-+:Usage: **> clear [uuids/rssi/pathloss/transport/duplicate-data/discoverable/pattern]**
- 
- RESOURCES
- =========
-diff --git a/client/bluetoothctl-transport.rst b/client/bluetoothctl-transport.rst
-index 96156a8cf87b..c7a57716f7be 100644
---- a/client/bluetoothctl-transport.rst
-+++ b/client/bluetoothctl-transport.rst
-@@ -26,21 +26,21 @@ list
- 
- List available transports.
- 
--:Usage: **# list**
-+:Usage: **> list**
- 
- show
- ----
- 
- Show transport information.
- 
--:Usage: **# show [transport]**
-+:Usage: **> show [transport]**
- 
- acquire
- -------
- 
- Acquire transport.
- 
--:Usage: **# acquire <transport> [transport1...]**
-+:Usage: **> acquire <transport> [transport1...]**
- 
- Note:
- 
-@@ -53,7 +53,7 @@ select
- Select transport. For transports created on a Broadcast Sink device only. This moves
- the transport to the "broadcasting" state, pending acquire.
- 
--:Usage: **# select <transport> [transport1...]**
-+:Usage: **> select <transport> [transport1...]**
- 
- Note:
- If running the setup with an audio server that has LE Audio support (such as PipeWire), it will
-@@ -67,7 +67,7 @@ the transport to the "idle" state, pending release by the audio server. If the t
- was acquired by bluetoothctl it can be released straight away, without having to be
- unselected.
- 
--:Usage: **# unselect <transport> [transport1...]**
-+:Usage: **> unselect <transport> [transport1...]**
- 
- Note:
- If running the setup with an audio server that has LE Audio support (such as PipeWire), it will
-@@ -78,7 +78,7 @@ release
- 
- Release transport.
- 
--:Usage: **# release <transport> [transport1...]**
-+:Usage: **> release <transport> [transport1...]**
- 
- Note:
- 
-@@ -89,21 +89,21 @@ send
- 
- Send contents of a file.
- 
--:Usage: **# send <transport> <filename>**
-+:Usage: **> send <transport> <filename>**
- 
- receive
- -------
- 
- Get/Set file to receive.
- 
--:Usage: **# receive <transport> [filename]**
-+:Usage: **> receive <transport> [filename]**
- 
- volume
- ------
- 
- Get/Set transport volume.
- 
--:Usage: **# volume <transport> [value]**
-+:Usage: **> volume <transport> [value]**
- 
- RESOURCES
- =========
-diff --git a/client/bluetoothctl.rst b/client/bluetoothctl.rst
-index 7454c1d085f8..b6c2efa351d8 100644
---- a/client/bluetoothctl.rst
-+++ b/client/bluetoothctl.rst
-@@ -47,42 +47,42 @@ list
- 
- List available controllers.
- 
--:Usage: **# list**
-+:Usage: **> list**
- 
- show
- ----
- 
- Controller information.
- 
--:Usage: **# show [ctrl]**
-+:Usage: **> show [ctrl]**
- 
- select
- ------
- 
- Select default controller.
- 
--:Usage: **# select <ctrl>**
-+:Usage: **> select <ctrl>**
- 
- devices
- -------
- 
- List available devices, with an optional property as the filter.
- 
--:Usage: **# devices [Paired/Bonded/Trusted/Connected]**
-+:Usage: **> devices [Paired/Bonded/Trusted/Connected]**
- 
- system-alias
- ------------
- 
- Set controller alias.
- 
--:Usage: **# system-alias <name>**
-+:Usage: **> system-alias <name>**
- 
- reset-alias
- -----------
- 
- Reset controller alias.
- 
--:Usage: **# reset-alias**
-+:Usage: **> reset-alias**
- 
- power
- -----
-@@ -92,7 +92,7 @@ Set controller power.
- When the controller is powered off, the USB port the controller is attached to
- is put into a suspend state.
- 
--:Usage: **# power <on/off>**
-+:Usage: **> power <on/off>**
- 
- advertise
- ---------
-@@ -108,14 +108,14 @@ device).
- A device can advertise if it initiated the connection to another advertising
- device.
- 
--:Usage: **# advertise <on/off/type>**
-+:Usage: **> advertise <on/off/type>**
- 
- set-alias
- ---------
- 
- Set device alias.
- 
--:Usage: **# set-alias <alias>**
-+:Usage: **> set-alias <alias>**
- 
- scan
- ----
-@@ -140,7 +140,7 @@ Note the following when scanning:
-   - Device objects found during a scan session will only be persisted if they
-     are connected/paired otherwise they are removed after some time.
- 
--:Usage: **# scan <on/off/bredr/le>**
-+:Usage: **> scan <on/off/bredr/le>**
- 
- pair
- ----
-@@ -161,7 +161,7 @@ connection before pairing.
- Before pairing the agent must be selected to choose the authentication
- mechanism.
- 
--:Usage: **# pair <dev>**
-+:Usage: **> pair <dev>**
- 
- pairable
- --------
-@@ -171,7 +171,7 @@ Set controller pairable mode.
- This enables/disables pairing. If pairing is disabled then the controller will
- not accept any pairing requests.
- 
--:Usage: **# pairable <on/off>**
-+:Usage: **> pairable <on/off>**
- 
- discoverable
- ------------
-@@ -188,7 +188,7 @@ requests.
- It will use a random address if supported by the controller. The length of time
- "discoverable on" is valid is determined by discoverable-timeout command.
- 
--:Usage: **# discoverable <on/off>**
-+:Usage: **> discoverable <on/off>**
- 
- discoverable-timeout
- --------------------
-@@ -197,7 +197,7 @@ Set discoverable timeout.
- 
- The time in seconds that "discoverable on" is valid.
- 
--:Usage: **# discoverable-timeout [value]**
-+:Usage: **> discoverable-timeout [value]**
- 
- agent
- -----
-@@ -210,7 +210,7 @@ for pairing and allows you to choose the IO capabilities of the controller.
- The valid agent capabilities are: DisplayOnly, DisplayYesNo, KeyboardDisplay,
- KeyboardOnly, NoInputNoOutput.
- 
--:Usage: **# agent <on/off/capability>**
-+:Usage: **> agent <on/off/capability>**
- 
- default-agent
- -------------
-@@ -219,41 +219,41 @@ Set current agent as the default one.
- 
- After selecting the agent this will make it the default agent.
- 
--:Usage: **# default-agent**
-+:Usage: **> default-agent**
- 
- trust
- -----
- 
- Trust device.
- 
--:Usage: **# trust <dev>**
-+:Usage: **> trust <dev>**
- 
- untrust
- -------
- 
- Untrust device.
- 
--:Usage: **# untrust <dev>**
-+:Usage: **> untrust <dev>**
- 
- block
- -----
- 
- Block device.
- 
--:Usage: **# block <dev>**
-+:Usage: **> block <dev>**
- 
- unblock
- -------
- Unblock device
- 
--:Usage: **# unblock <dev>**
-+:Usage: **> unblock <dev>**
- 
- remove
- ------
- 
- Remove device.
- 
--:Usage: **# remove <dev>**
-+:Usage: **> remove <dev>**
- 
- connect
- -------
-@@ -269,7 +269,7 @@ If no advertising report is received before the timeout a
- le-connection-abort-by-local error will be issued. In that case either try
- again to connect assuming the device is advertising.
- 
--:Usage: **# connect <dev>**
-+:Usage: **> connect <dev>**
- 
- disconnect
- ----------
-@@ -279,14 +279,14 @@ Disconnect device.
- For LE when disconnecting from an active connection the device address is not
- needed.
- 
--:Usage: **# disconnect <dev>**
-+:Usage: **> disconnect <dev>**
- 
- info
- ----
- 
- Device information.
- 
--:Usage: **# info <dev>**
-+:Usage: **> info <dev>**
- 
- 
- Advertise Submenu
 -- 
 2.47.1
 
