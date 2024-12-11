@@ -1,48 +1,41 @@
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+Received: from pegase2.c-s.fr (pegase2.c-s.fr [93.17.235.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D94702451CC;
-	Wed, 11 Dec 2024 05:53:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A6571BEF75;
+	Wed, 11 Dec 2024 07:00:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.17.235.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733896416; cv=none; b=T1jPEGEeM7P3ETnwYSpLPFWXvTAyDg6fah0ELqYUDmARl4x9A/ItTOkXzMz5yUYsofDHh/Stwm1IWhR24LL1PLzPPs6RpVbH5af0cU4zEuGswY8sT6znW9iry79tUP87O24A1IAH8sShAENYvJVv0s+Cxcy70C78vSIgug1c7F4=
+	t=1733900417; cv=none; b=f0dT4/voX78QtJDqOhY9/1RLKtX564bXHfl0GFtf8hzOqspGM2GSJcCrxgwju3Oop0Mc9CX6uwuRcqlkamJO4VVvfzIg6yKJO/48yB/FQ/phVAZJjw0bPY43woCUsD5v7YKgkDpyOv9QkUxFpFcCXWJCT3XKwhqSKAGREt4uIu4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733896416; c=relaxed/simple;
-	bh=QxRpAVNXkbIAVUiz32iWyuxIOggkmsPVhFGj9HPj798=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=SH9+3554vY1zabAgnIfHZs6JPbZzzZ4knLnb3YQSr8JIINEnmjVj1bqDtVyTyJDEDf4Gq1B3Me6sKzQf0fRf7soVF5M/xcKL9nX4/t3NWr/2KRLHKczQm7zyXk3WoxEI8k9PzAOTYImhYRVHTin5CwMPmhmIpJcUiguMLKBfsgc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=AnEQHZ8s; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="AnEQHZ8s"
-Received: from pps.filterd (m0279863.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4BB4mim3027746;
-	Wed, 11 Dec 2024 05:53:27 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	wJqIu8MlLVnjkO5uOkWhWu+8Cc+eMZUqFilakTEtHnI=; b=AnEQHZ8sxEneL9Ld
-	LIWZA36P9WJU3XgLSLxoslCtKdpnMvNVFfXh3gSXuPsnuOBR4w5TegRgI67Q+2Cx
-	65QpcJsiyg5t5wmYUsfSkbgBZVskv1xLbCXKTjJjR3MhimWI9jjO47sN6y4crZ1q
-	iSlakjeDItoeR7Lsb0A1j0DjV0U3UtpeLPQmbZg8t9HHo08VfFQVUlLEa8YAJZ+O
-	NQfRPq4tbfvwIkib20BVflzH+KKXiiTkmLZLqqB1LfQlQIy9k6M9sKi5H3aJGH6F
-	cq0Z2e/8kKfHoRhCaUqflM3uBjSZO2aYO+W+qRSqG/3T8lEDTrZCgNz6DqWiYNZ+
-	2sjv3w==
-Received: from nalasppmta04.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 43eg9ekn4n-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 11 Dec 2024 05:53:27 +0000 (GMT)
-Received: from nalasex01b.na.qualcomm.com (nalasex01b.na.qualcomm.com [10.47.209.197])
-	by NALASPPMTA04.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 4BB5rQsD000968
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 11 Dec 2024 05:53:26 GMT
-Received: from [10.231.216.175] (10.80.80.8) by nalasex01b.na.qualcomm.com
- (10.47.209.197) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Tue, 10 Dec
- 2024 21:53:21 -0800
-Message-ID: <7eb71706-1393-4e49-996e-1cf9d8c98d16@quicinc.com>
-Date: Wed, 11 Dec 2024 13:53:18 +0800
+	s=arc-20240116; t=1733900417; c=relaxed/simple;
+	bh=B1wGhrvFoDOmFrhgO6ctmjhLDhnpcrjN7YBDBIx3Y40=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Zbkfh3dL1b7iasJkAfL69EL8Qe3d8Q2Sz9+hV9kejnq/UWQXhvsbJlBQIkHRGJUoxh3iycHwuVm2cU5z6INBgR0lUR/QvN1ug4eEh8BN/Ljsj4LlPJ0pO94qkylEnLKlbWi1RGM0oiy5GEVfhBFWEFd7icP5yUEmhUCitxwLwfE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu; spf=pass smtp.mailfrom=csgroup.eu; arc=none smtp.client-ip=93.17.235.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=csgroup.eu
+Received: from localhost (mailhub3.si.c-s.fr [172.26.127.67])
+	by localhost (Postfix) with ESMTP id 4Y7RLj3GV8z9t4d;
+	Wed, 11 Dec 2024 08:00:13 +0100 (CET)
+X-Virus-Scanned: amavisd-new at c-s.fr
+Received: from pegase2.c-s.fr ([172.26.127.65])
+	by localhost (pegase2.c-s.fr [127.0.0.1]) (amavisd-new, port 10024)
+	with ESMTP id c0Dk1hMGM9_h; Wed, 11 Dec 2024 08:00:13 +0100 (CET)
+Received: from messagerie.si.c-s.fr (messagerie.si.c-s.fr [192.168.25.192])
+	by pegase2.c-s.fr (Postfix) with ESMTP id 4Y7RLY2gbNz9t4Z;
+	Wed, 11 Dec 2024 08:00:05 +0100 (CET)
+Received: from localhost (localhost [127.0.0.1])
+	by messagerie.si.c-s.fr (Postfix) with ESMTP id 3FA418B76E;
+	Wed, 11 Dec 2024 08:00:05 +0100 (CET)
+X-Virus-Scanned: amavisd-new at c-s.fr
+Received: from messagerie.si.c-s.fr ([127.0.0.1])
+	by localhost (messagerie.si.c-s.fr [127.0.0.1]) (amavisd-new, port 10023)
+	with ESMTP id lblUBnLQKeTT; Wed, 11 Dec 2024 08:00:05 +0100 (CET)
+Received: from [10.25.209.139] (unknown [10.25.209.139])
+	by messagerie.si.c-s.fr (Postfix) with ESMTP id A13268B763;
+	Wed, 11 Dec 2024 08:00:03 +0100 (CET)
+Message-ID: <07784753-6874-4dda-a080-2d2812f4a10a@csgroup.eu>
+Date: Wed, 11 Dec 2024 08:00:02 +0100
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -50,194 +43,118 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 2/4] Bluetooth: qca: Add support in firmware-name to
- load board specific nvm
-To: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
-CC: Marcel Holtmann <marcel@holtmann.org>,
-        Luiz Augusto von Dentz
-	<luiz.dentz@gmail.com>,
-        Rob Herring <robh@kernel.org>,
-        Krzysztof Kozlowski
-	<krzk+dt@kernel.org>,
-        Conor Dooley <conor+dt@kernel.org>,
-        Bjorn Andersson
-	<andersson@kernel.org>,
-        Konrad Dybcio <konradybcio@kernel.org>,
-        "Balakrishna
- Godavarthi" <quic_bgodavar@quicinc.com>,
-        Rocky Liao
-	<quic_rjliao@quicinc.com>,
-        <linux-bluetooth@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <linux-arm-msm@vger.kernel.org>,
-        <quic_jiaymao@quicinc.com>, <quic_shuaz@quicinc.com>,
-        <quic_zijuhu@quicinc.com>, <quic_mohamull@quicinc.com>
-References: <20241210151636.2474809-1-quic_chejiang@quicinc.com>
- <20241210151636.2474809-3-quic_chejiang@quicinc.com>
- <wxb6oo3f7cri27eq3fnqttbl74lkn3rjo5o5rfttbwz7k5v2ug@w4hlrtig2nza>
-Content-Language: en-US
-From: "Cheng Jiang (IOE)" <quic_chejiang@quicinc.com>
-In-Reply-To: <wxb6oo3f7cri27eq3fnqttbl74lkn3rjo5o5rfttbwz7k5v2ug@w4hlrtig2nza>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nalasex01b.na.qualcomm.com (10.47.209.197)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: EnniXAaPZ-SipArb8z28DOaSyrQ1FHLa
-X-Proofpoint-ORIG-GUID: EnniXAaPZ-SipArb8z28DOaSyrQ1FHLa
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
- definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015
- priorityscore=1501 phishscore=0 spamscore=0 mlxscore=0 suspectscore=0
- bulkscore=0 lowpriorityscore=0 impostorscore=0 adultscore=0
- mlxlogscore=999 malwarescore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.19.0-2411120000 definitions=main-2412110042
+Subject: Re: [PATCH v3 18/19] livepatch: Convert timeouts to secs_to_jiffies()
+To: Easwar Hariharan <eahariha@linux.microsoft.com>,
+ Pablo Neira Ayuso <pablo@netfilter.org>,
+ Jozsef Kadlecsik <kadlec@netfilter.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, Julia Lawall <Julia.Lawall@inria.fr>,
+ Nicolas Palix <nicolas.palix@imag.fr>, Daniel Mack <daniel@zonque.org>,
+ Haojian Zhuang <haojian.zhuang@gmail.com>,
+ Robert Jarzmik <robert.jarzmik@free.fr>, Russell King
+ <linux@armlinux.org.uk>, Heiko Carstens <hca@linux.ibm.com>,
+ Vasily Gorbik <gor@linux.ibm.com>, Alexander Gordeev
+ <agordeev@linux.ibm.com>, Christian Borntraeger <borntraeger@linux.ibm.com>,
+ Sven Schnelle <svens@linux.ibm.com>, Ofir Bitton <obitton@habana.ai>,
+ Oded Gabbay <ogabbay@kernel.org>, Lucas De Marchi
+ <lucas.demarchi@intel.com>,
+ =?UTF-8?Q?Thomas_Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>,
+ Rodrigo Vivi <rodrigo.vivi@intel.com>,
+ Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+ Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>,
+ David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
+ Jeroen de Borst <jeroendb@google.com>,
+ Praveen Kaligineedi <pkaligineedi@google.com>,
+ Shailend Chand <shailend@google.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ James Smart <james.smart@broadcom.com>,
+ Dick Kennedy <dick.kennedy@broadcom.com>,
+ "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>,
+ "Martin K. Petersen" <martin.petersen@oracle.com>,
+ =?UTF-8?Q?Roger_Pau_Monn=C3=A9?= <roger.pau@citrix.com>,
+ Jens Axboe <axboe@kernel.dk>, Kalle Valo <kvalo@kernel.org>,
+ Jeff Johnson <jjohnson@kernel.org>, Catalin Marinas
+ <catalin.marinas@arm.com>, Andrew Morton <akpm@linux-foundation.org>,
+ Jack Wang <jinpu.wang@cloud.ionos.com>, Marcel Holtmann
+ <marcel@holtmann.org>, Johan Hedberg <johan.hedberg@gmail.com>,
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Florian Fainelli <florian.fainelli@broadcom.com>, Ray Jui
+ <rjui@broadcom.com>, Scott Branden <sbranden@broadcom.com>,
+ Broadcom internal kernel review list
+ <bcm-kernel-feedback-list@broadcom.com>, Xiubo Li <xiubli@redhat.com>,
+ Ilya Dryomov <idryomov@gmail.com>, Josh Poimboeuf <jpoimboe@kernel.org>,
+ Jiri Kosina <jikos@kernel.org>, Miroslav Benes <mbenes@suse.cz>,
+ Petr Mladek <pmladek@suse.com>, Joe Lawrence <joe.lawrence@redhat.com>,
+ Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
+ Louis Peens <louis.peens@corigine.com>, Michael Ellerman
+ <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>,
+ Naveen N Rao <naveen@kernel.org>, Madhavan Srinivasan <maddy@linux.ibm.com>
+Cc: netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, cocci@inria.fr,
+ linux-arm-kernel@lists.infradead.org, linux-s390@vger.kernel.org,
+ dri-devel@lists.freedesktop.org, intel-xe@lists.freedesktop.org,
+ linux-scsi@vger.kernel.org, xen-devel@lists.xenproject.org,
+ linux-block@vger.kernel.org, linux-wireless@vger.kernel.org,
+ ath11k@lists.infradead.org, linux-mm@kvack.org,
+ linux-bluetooth@vger.kernel.org, linux-staging@lists.linux.dev,
+ linux-rpi-kernel@lists.infradead.org, ceph-devel@vger.kernel.org,
+ live-patching@vger.kernel.org, linux-sound@vger.kernel.org,
+ oss-drivers@corigine.com, linuxppc-dev@lists.ozlabs.org,
+ Anna-Maria Behnsen <anna-maria@linutronix.de>
+References: <20241210-converge-secs-to-jiffies-v3-0-ddfefd7e9f2a@linux.microsoft.com>
+ <20241210-converge-secs-to-jiffies-v3-18-ddfefd7e9f2a@linux.microsoft.com>
+Content-Language: fr-FR
+From: Christophe Leroy <christophe.leroy@csgroup.eu>
+In-Reply-To: <20241210-converge-secs-to-jiffies-v3-18-ddfefd7e9f2a@linux.microsoft.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-Hi Dmitry, 
 
-On 12/10/2024 11:28 PM, Dmitry Baryshkov wrote:
-> On Tue, Dec 10, 2024 at 11:16:34PM +0800, Cheng Jiang wrote:
->> Different connectivity boards may be attached to the same platform. For
->> example, QCA6698-based boards can support either a two-antenna or
->> three-antenna solution, both of which work on the sa8775p-ride platform.
->> Due to differences in connectivity boards and variations in RF
->> performance from different foundries, different NVM configurations are
->> used based on the board ID.
->>
->> Therefore, in the firmware-name property, if the NVM file has an
->> extension, the NVM file will be used. Otherwise, the system will first
->> try the .bNN (board ID) file, and if that fails, it will fall back to
->> the .bin file.
->>
->> Possible configurations:
->> firmware-name = "QCA6698/hpnv21";
->> firmware-name = "QCA6698/hpnv21.bin";
->>
->> Signed-off-by: Cheng Jiang <quic_chejiang@quicinc.com>
->> ---
->>  drivers/bluetooth/btqca.c | 67 +++++++++++++++++++++++++++++++++++++--
->>  1 file changed, 65 insertions(+), 2 deletions(-)
->>
->> diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
->> index dfbbac922..deb2b1753 100644
->> --- a/drivers/bluetooth/btqca.c
->> +++ b/drivers/bluetooth/btqca.c
->> @@ -272,6 +272,27 @@ int qca_send_pre_shutdown_cmd(struct hci_dev *hdev)
->>  }
->>  EXPORT_SYMBOL_GPL(qca_send_pre_shutdown_cmd);
->>  
->> +static bool qca_get_alt_nvm_path(char *path, size_t max_size)
->> +{
->> +	char fwname[64];
->> +	const char *suffix;
->> +
->> +	suffix = strrchr(path, '.');
->> +
->> +	/* nvm file name has a suffix, replace with .bin */
->> +	if (suffix && suffix != path && *(suffix + 1) != '\0' && strchr(suffix, '/') == NULL) {
->> +		strscpy(fwname, path, suffix - path + 1);
->> +		snprintf(fwname + (suffix - path), sizeof(fwname) - (suffix - path), ".bin");
->> +		/* If nvm file is already the default one, return false to skip the retry. */
->> +		if (strcmp(fwname, path) == 0)
->> +			return false;
->> +
->> +		snprintf(path, max_size, "%s", fwname);
->> +		return true;
->> +	}
->> +	return false;
->> +}
->> +
->>  static int qca_tlv_check_data(struct hci_dev *hdev,
->>  			       struct qca_fw_config *config,
->>  			       u8 *fw_data, size_t fw_size,
->> @@ -564,6 +585,19 @@ static int qca_download_firmware(struct hci_dev *hdev,
->>  					   config->fwname, ret);
->>  				return ret;
->>  			}
->> +		}
->> +		/* For nvm, if desired nvm file is not present and it's not the
->> +		 * default nvm file(ends with .bin), try to load the default nvm.
->> +		 */
->> +		else if (config->type == TLV_TYPE_NVM &&
->> +			 qca_get_alt_nvm_path(config->fwname, sizeof(config->fwname))) {
->> +			bt_dev_info(hdev, "QCA Downloading %s", config->fwname);
->> +			ret = request_firmware(&fw, config->fwname, &hdev->dev);
->> +			if (ret) {
->> +				bt_dev_err(hdev, "QCA Failed to request file: %s (%d)",
->> +					   config->fwname, ret);
->> +				return ret;
->> +			}
->>  		} else {
->>  			bt_dev_err(hdev, "QCA Failed to request file: %s (%d)",
->>  				   config->fwname, ret);
->> @@ -730,6 +764,26 @@ static inline void qca_get_nvm_name_generic(struct qca_fw_config *cfg,
->>  			 "qca/%snv%02x.b%02x", stem, rom_ver, bid);
->>  }
->>  
->> +static void qca_get_nvm_name_by_board(char *fwname, size_t max_size,
->> +		const char *firmware_name, struct qca_btsoc_version ver,
->> +		enum qca_btsoc_type soc_type, u16 bid)
->> +{
->> +	const char *variant;
->> +
->> +	/* Set the variant to empty by default */
->> +	variant = "";
->> +	/* hsp gf chip */
->> +	if (soc_type == QCA_WCN6855) {
->> +		if ((le32_to_cpu(ver.soc_id) & QCA_HSP_GF_SOC_MASK) == QCA_HSP_GF_SOC_ID)
->> +			variant = "g";
->> +	}
->> +
->> +	if (bid == 0x0 || bid == 0xffff)
->> +		snprintf(fwname, max_size, "qca/%s%s.bin", firmware_name, variant);
->> +	else
->> +		snprintf(fwname, max_size, "qca/%s%s.b%02x", firmware_name, variant, bid);
-> 
-> So, we have qca_generate_hsp_nvm_name(), qca_get_nvm_name_generic(), now
-> you are adding a third one. Can we please have a single function that
-> handles that?
-> 
-Ack, will use a single function to handle this.
->> +}
->> +
->>  int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
->>  		   enum qca_btsoc_type soc_type, struct qca_btsoc_version ver,
->>  		   const char *firmware_name)
->> @@ -739,6 +793,7 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
->>  	u8 rom_ver = 0;
->>  	u32 soc_ver;
->>  	u16 boardid = 0;
->> +	const char *suffix;
->>  
->>  	bt_dev_dbg(hdev, "QCA setup on UART");
->>  
->> @@ -816,8 +871,16 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
->>  	/* Download NVM configuration */
->>  	config.type = TLV_TYPE_NVM;
->>  	if (firmware_name) {
->> -		snprintf(config.fwname, sizeof(config.fwname),
->> -			 "qca/%s", firmware_name);
->> +		/* The firmware name has suffix, use it directly */
->> +		suffix = strrchr(firmware_name, '.');
->> +		if (suffix && suffix != firmware_name &&
->> +			*(suffix + 1) != '\0' && strchr(suffix, '/') == NULL) {
-> 
-> The have-suffix code should be extracted to a helper function. You have
-> two copies of it.
-> 
-Ack.
->> +			snprintf(config.fwname, sizeof(config.fwname), "qca/%s", firmware_name);
->> +		} else {
->> +			qca_read_fw_board_id(hdev, &boardid);
->> +			qca_get_nvm_name_by_board(config.fwname, sizeof(config.fwname),
->> +				 firmware_name, ver, soc_type, boardid);
->> +		}
->>  	} else {
->>  		switch (soc_type) {
->>  		case QCA_WCN3990:
->> -- 
->> 2.25.1
->>
-> 
 
+Le 10/12/2024 à 23:02, Easwar Hariharan a écrit :
+> Commit b35108a51cf7 ("jiffies: Define secs_to_jiffies()") introduced
+> secs_to_jiffies(). As the value here is a multiple of 1000, use
+> secs_to_jiffies() instead of msecs_to_jiffies to avoid the multiplication.
+> 
+> This is converted using scripts/coccinelle/misc/secs_to_jiffies.cocci with
+> the following Coccinelle rules:
+> 
+> @@ constant C; @@
+> 
+> - msecs_to_jiffies(C * 1000)
+> + secs_to_jiffies(C)
+> 
+> @@ constant C; @@
+> 
+> - msecs_to_jiffies(C * MSEC_PER_SEC)
+> + secs_to_jiffies(C)
+> 
+> Signed-off-by: Easwar Hariharan <eahariha@linux.microsoft.com>
+> ---
+>   samples/livepatch/livepatch-callbacks-busymod.c |  3 +--
+>   samples/livepatch/livepatch-shadow-fix1.c       |  3 +--
+>   samples/livepatch/livepatch-shadow-mod.c        | 15 +++++----------
+>   3 files changed, 7 insertions(+), 14 deletions(-)
+> 
+> diff --git a/samples/livepatch/livepatch-callbacks-busymod.c b/samples/livepatch/livepatch-callbacks-busymod.c
+> index 378e2d40271a9717d09eff51d3d3612c679736fc..69105596e72e6826aa2815cb2599eea56a0055ba 100644
+> --- a/samples/livepatch/livepatch-callbacks-busymod.c
+> +++ b/samples/livepatch/livepatch-callbacks-busymod.c
+> @@ -44,8 +44,7 @@ static void busymod_work_func(struct work_struct *work)
+>   static int livepatch_callbacks_mod_init(void)
+>   {
+>   	pr_info("%s\n", __func__);
+> -	schedule_delayed_work(&work,
+> -		msecs_to_jiffies(1000 * 0));
+> +	schedule_delayed_work(&work, 0);
+
+This hunk is not in line with the patch description.
+
+This is probably OK to have in this patch, but you should add additional 
+description to mention that special case with a 0 delay.
+
+Allthough you should probably change it to schedule_work() instead of 
+using a 0 delay.
+
+Christophe
