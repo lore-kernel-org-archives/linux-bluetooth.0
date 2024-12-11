@@ -1,203 +1,145 @@
-Received: from mail-yw1-f173.google.com (mail-yw1-f173.google.com [209.85.128.173])
+Received: from mail-lf1-f54.google.com (mail-lf1-f54.google.com [209.85.167.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A27C2594AE
-	for <linux-bluetooth@vger.kernel.org>; Wed, 11 Dec 2024 19:22:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B51D2594B0
+	for <linux-bluetooth@vger.kernel.org>; Wed, 11 Dec 2024 19:28:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733944943; cv=none; b=UXpqHeJrVKoG1IigdyPVTEAYgsCpsDVIAFcFWTjfjTpp4jetplU6vf7pj8AhrgFR1PgklaB8ETuxe+1HohJDCfzBtErpXU5JdQzMrrmpxh6MJBFbc+rASz+Se8nFLoSOwYwJrWPaWecieymRqywyDX3oY2ab2YKBz+jMcQBvcAk=
+	t=1733945335; cv=none; b=LKy4xP37Mhzz7RLrKHK4eT7ojwzcoU7zDGLHMPcW9EOtGC4IoUYfHhe32jSXEreJaRBdXT3wDodPBSZoBOor31eXE/8yvYzEgsUMiMx4FVUPTTbbh1FBV6EGL0idiGw/z6+7ciLXlzNaO4cao1OibHNOCqgCPA7u8wAej2EkETQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733944943; c=relaxed/simple;
-	bh=AjbNtTdS/KXTZrwdXsupcRXxF1muOMCNwwctJF4bcXM=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=up/c8ud5Mv7rk8B/ThfdjzBOHMgdXhbB7XzwDooDTpMZIoFTofNeysisiCvrAfoSHenVLmDFCe8FfGxCdkcaLtwd4mfwg5Y8jbV7mEVeWe92vkAbI/M7G37Wah0ZZ53pq+XH33zXA+mVBzO9iXXgkwjwZ95niHoS9ITM90OHPlY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bcu1QcOy; arc=none smtp.client-ip=209.85.128.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1733945335; c=relaxed/simple;
+	bh=saI+TJ4WwQAKgDdrklhcfnFFyZMNGfi+r+nYwnAQ5lk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ErYlwW+vNT6DJEd52u9pHNuqcma2OLSvqdXfv/rS9mD7QyKU1Q1MpXPWqCsaRZc/L8/O8hTaU777oWMCrjV+dPclbC3lxw9zm374dIablXJgIILwyURAho9aUxSI8H1aPoARq4G4IXISzR86OZZH5thZVmPVub1wfiHgv+6juOs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=BHXkqup9; arc=none smtp.client-ip=209.85.167.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bcu1QcOy"
-Received: by mail-yw1-f173.google.com with SMTP id 00721157ae682-6ef4b6719d1so58728737b3.2
-        for <linux-bluetooth@vger.kernel.org>; Wed, 11 Dec 2024 11:22:21 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="BHXkqup9"
+Received: by mail-lf1-f54.google.com with SMTP id 2adb3069b0e04-5401d3ea5a1so3758954e87.3
+        for <linux-bluetooth@vger.kernel.org>; Wed, 11 Dec 2024 11:28:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1733944940; x=1734549740; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=uPBoz2qEF1fWP1SAvR8FUf06FJch3gclKnfh60XCBnc=;
-        b=bcu1QcOyT3tFBMDQdfxI8XTCjeLhavEE6mtrCnn9q0NKVVkVBAH+Q4SwQ4KYTl9Pp0
-         qJy47P4UOLT0k3n9jrwyVVEvOGWOob1JPp33GKwV6D8SCKnlT2PbN6ivC6DFD81MnUOj
-         Qyn02xwQvxH1B7qLgCExpxGSJhTso2Z8WeopjiEMvzX7d5c8tKhLVoDwm1m+OyaY84gy
-         vVIi6mC/HhCcm1do1f7DD1jrPLCgSsYOY48mzG+SnrLMKdZOw0tEqVZ5xJPB4Y9ZfWbV
-         BJ9q6M9tcW8DiIPe/T7r5+yQ/9C3+46LykGOYOtyWVM0mhbWyEV/qplDZZvA2SdFn9in
-         VxMA==
+        d=linaro.org; s=google; t=1733945332; x=1734550132; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=aNVz/ArW/lLNjVQfl87+kX9B15NlodHN27QuCLAE0kw=;
+        b=BHXkqup9Y/cmRamG56yF+N9RKYHjpfdvEZA40eLUkK4wV74ALF7+EX3b+Mq/wa66W8
+         xGmeGp1cD+f2QWkkm5R6RjjDyINZ+fmcB8m5U3nAKDkJObjt47InkBlZYnQrXShUdOkS
+         DQ8cr+iPdpFeYiLR5yFworFlJKZ9ePZrMPI4HxoX0QSDCoMA1Nv9oq2//POsxzWndCKs
+         DydgprNCHQ23jWUDIuCl82DMHnt+sLh/rEFKI+1M9RVYsoWVKovXsJMcbEgp+Kg8KjGa
+         pLhdPyLWEgIBeoLwmsWPgzAbdVYLfKuXCtivx6eSlH00GjLjdoeelow20g+NeVgOM80y
+         pgpw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733944940; x=1734549740;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=uPBoz2qEF1fWP1SAvR8FUf06FJch3gclKnfh60XCBnc=;
-        b=DaLImgk1ifthlVcaEl296d1TcP3t1fKOkFg2K0OkwA6xudVPu1ggTTb/yY8qFKx/FZ
-         PriQxfwZc3bn9FJ+O5I7afohlrFSVjom5sep63xInuWn83wopsuZno16d0G8ZmLRHnQU
-         LDSGal4hkt2I/nymsTlxiswRcOUu+DM34aHPaWhRNvTI7+WSvtxMrXlkp4NAOvrZJBH0
-         bOgGRLJnS/eBVUz2TzGfDTCfB69x+ezUaRkMh43h0HyN8eimsscTU16lmDyWMmocnKGq
-         anuqI6tP7cTka4gAljuAX71JBLNpvK5o3826RJEc+OyZJP6WLsV5dC9Ps7neQTSnj+lX
-         PHGQ==
-X-Gm-Message-State: AOJu0Yw80+SIXTaey3UDbxFP4qRyGRQ7zoWHQxEEJuxngj/Ib/62BbIw
-	i7NjtX5FgrLVXvtX9v3rGBcB/m5nH/L55f7c911E29bVYVuG70U7uArtlw==
-X-Gm-Gg: ASbGncu/xaQxIgYb9uMUHw4XB/XW5A+MHVCiaHLjx+bZo2LjXQOVrmuQpzEuy9eQ4YH
-	e1JxdGlZgkUlYwRtZGNzxpVcVav2dAZTIxjdmg/UzShpazQqVb5btnn9nfQEeB48lNpNxd5duWG
-	olQ3e+Qf7wZr8eOkGzx9EwkoJSSqeHh0pd4HZywOpJIBIAOe7OqlZRvTl4Z2yVEggcUoRTdl2x2
-	vY1R8YajNIKa5ES02FnGFkB5atoAPkeL+oChbvXWLbPcGc4DVOngY/Cjv1gC6b6CjFdYv4EakwE
-	9DTACats8wpsSXvMU5pbeuphhg==
-X-Google-Smtp-Source: AGHT+IHg6XO2BX94pM90HUCxGrm74vxsmFbgl+Ip5Bn2v6ktQQ+tjF9QdeQLJHzuEmxwRdCWhpK70g==
-X-Received: by 2002:a05:690c:6706:b0:6ef:8c41:defc with SMTP id 00721157ae682-6f19e4edb84mr6612797b3.11.1733944939851;
-        Wed, 11 Dec 2024 11:22:19 -0800 (PST)
-Received: from lvondent-mobl5.. (syn-107-146-107-067.res.spectrum.com. [107.146.107.67])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-6f14ce8be30sm3670077b3.79.2024.12.11.11.22.18
-        for <linux-bluetooth@vger.kernel.org>
+        d=1e100.net; s=20230601; t=1733945332; x=1734550132;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=aNVz/ArW/lLNjVQfl87+kX9B15NlodHN27QuCLAE0kw=;
+        b=MhZde7Ac0/rSyk+TX2uCm6xGS7oUVtQXlDKPpfzLyBKmWBXO2PTVfHGfFXjGR4taQU
+         0a7VWMTDSW7DUB7cWqy6iCtnI4lvRRhbgSn+qR008D728CFB5loXBfYZuU4q1O+zOsuq
+         NoccJ7MsgGEGYqfO5A+Y0HC+QqVTP5o0zrlbXSH+mojkHUmpmrtgOnmtWPcRUDdTSJyj
+         +S2Q4zzkysmy/zDO7BFbXzBA1KgBGsK9tbGisVf+7zbn9j1kcYr9V3MTnYH1ngdYJSFI
+         9qa/80kVkYPTV6tzitEW99d48jBG3M8dZTZl4pk6s0falr2NxPiyaG2Kipa7jH/3z6BZ
+         b4Pg==
+X-Forwarded-Encrypted: i=1; AJvYcCXlK0oZQLym/3jZYfnS6Vg60r6CTcv51olJv0KTSOHWTq55VU7XgJqCjXr35aie0PvVgZyUjmwFrEuXmHbuB9c=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yytasm1/O/BUq/w2sUeEZXgWzIsGJFJP6xf/BoHAZXqKidf0dgF
+	YBKqMCIi3WowLHfy3Rnr1hWliYbhI5rkNblwYIl2smoaaIAnRfXu7NiCD7FPHbhRWgOMkQ5iluT
+	ghp0=
+X-Gm-Gg: ASbGncur8TGbqukKlo0BGZbh1ZuxCTttgcZAV6Ru/wA3etcKW30/f8mvhcYsnj/kQ7D
+	w9LA1oc5pvaqRTmqrJ43qPZliUWpFz5M5HkWzr1SJK+y2BtKyKwV5KvriPevD1IjTS3KmMfvsl6
+	i8Rk9C9tDEePB7k78KuyN34p2qgtGdhYFHFnhKgmIn0CbFNCwXgzYx+bmMCKYD+U9IVKBncsWor
+	bUFe0HphvFbfjdE/VoOccLEOAa3P2WkBOe2olxM52VlhlcRjsCoy44GKZD24L+hrlcG5vqHM7wn
+	pKmSmOnJ+MYnAe3+ODiENVGKB0F6JyPvuQ==
+X-Google-Smtp-Source: AGHT+IGOfbXPT4dn2jZV1RKLOlrX7K+m2akt+BVMHTUk1WVTQ0bQV6RFUx4RBGUDnQfN4dhyAyjPRA==
+X-Received: by 2002:a05:6512:1391:b0:53e:20af:db96 with SMTP id 2adb3069b0e04-5402a5d3993mr1464865e87.10.1733945331546;
+        Wed, 11 Dec 2024 11:28:51 -0800 (PST)
+Received: from eriador.lumag.spb.ru (2001-14ba-a0c3-3a00--b8c.rev.dnainternet.fi. [2001:14ba:a0c3:3a00::b8c])
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-53e2fbbb0c0sm1773317e87.191.2024.12.11.11.28.49
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 11 Dec 2024 11:22:18 -0800 (PST)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v2 5/5] client: Add bluetoothctl-hci.1 man page
-Date: Wed, 11 Dec 2024 14:22:10 -0500
-Message-ID: <20241211192210.1864347-5-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.47.1
-In-Reply-To: <20241211192210.1864347-1-luiz.dentz@gmail.com>
-References: <20241211192210.1864347-1-luiz.dentz@gmail.com>
+        Wed, 11 Dec 2024 11:28:50 -0800 (PST)
+Date: Wed, 11 Dec 2024 21:28:47 +0200
+From: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
+To: "Cheng Jiang (IOE)" <quic_chejiang@quicinc.com>
+Cc: Krzysztof Kozlowski <krzk@kernel.org>, 
+	Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
+	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+	Conor Dooley <conor+dt@kernel.org>, Bjorn Andersson <andersson@kernel.org>, 
+	Konrad Dybcio <konradybcio@kernel.org>, Balakrishna Godavarthi <quic_bgodavar@quicinc.com>, 
+	Rocky Liao <quic_rjliao@quicinc.com>, linux-bluetooth@vger.kernel.org, devicetree@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org, quic_jiaymao@quicinc.com, 
+	quic_shuaz@quicinc.com, quic_zijuhu@quicinc.com, quic_mohamull@quicinc.com
+Subject: Re: [PATCH v4 1/4] dt-bindings: net: bluetooth: qca: Expand
+ firmware-name property
+Message-ID: <dukhhbf22w2hcr32jtjuvminpuzgi3a3tkkux7pd32j4d4gzkx@mvgckzd22she>
+References: <20241210151636.2474809-1-quic_chejiang@quicinc.com>
+ <20241210151636.2474809-2-quic_chejiang@quicinc.com>
+ <vbwg7djb4me6i4ow2q74ltqjxvkxeulhzyq4n6ak7aifhtf36f@x66pjje2iu6u>
+ <62afbaea-67b1-4572-9e78-d1dbe5fae20a@quicinc.com>
+ <f818f089-0490-42da-9aee-1a7006c11978@kernel.org>
+ <65fd0932-4519-44ac-ba9d-55ee97b43233@quicinc.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <65fd0932-4519-44ac-ba9d-55ee97b43233@quicinc.com>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+On Wed, Dec 11, 2024 at 06:16:44PM +0800, Cheng Jiang (IOE) wrote:
+> Hi Krzysztof,
+> 
+> On 12/11/2024 5:48 PM, Krzysztof Kozlowski wrote:
+> > On 11/12/2024 10:39, Cheng Jiang (IOE) wrote:
+> >>>>
+> >>>> diff --git a/Documentation/devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml b/Documentation/devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml
+> >>>> index 7bb68311c..2782d2325 100644
+> >>>> --- a/Documentation/devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml
+> >>>> +++ b/Documentation/devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml
+> >>>> @@ -101,7 +101,10 @@ properties:
+> >>>>    max-speed: true
+> >>>>  
+> >>>>    firmware-name:
+> >>>> -    description: specify the name of nvm firmware to load
+> >>>> +    description:
+> >>>> +      If one item is present, specify the name of the NVM firmware to load.
+> >>>> +      If two items are present, the first item specifies the name of the NVM,
+> >>>> +      and the second specifies the name of the rampatch firmware to load.
+> >>>
+> >>> Don't repeat constraints in free form text. Use proper constraints so
+> >>> you can validate your DTS. And then actually do validate your DTS...
+> >>>
+> >> It seems unnecessary to add this description, so I will drop this change. Is that okay?
+> > 
+> > You need to list the items and describe them. See how all other bindings
+> > do it.
+> > 
+> The firmware names are not fixed strings; they vary depending on the chip, board, or platform.
+> 
+> How about the following description? Thank you!
+> 
+>   firmware-name:
+>     $ref: /schemas/types.yaml#/definitions/string
+>     description: |
+>       List of firmware names. The first item is the name of the NVM firmware
+>       to load. The second item is the name of the rampatch firmware to load,
+>       if present.
+>     minItems: 1
+>     maxItems: 2
 
-This adds bluetoothctl-hci.rst which is then converted to
-bluetoothctl-hci.1 using rst2man.
----
- Makefile.tools              |  5 ++-
- client/bluetoothctl-hci.rst | 86 +++++++++++++++++++++++++++++++++++++
- 2 files changed, 89 insertions(+), 2 deletions(-)
- create mode 100644 client/bluetoothctl-hci.rst
+I think this is better:
 
-diff --git a/Makefile.tools b/Makefile.tools
-index 51a5af6af77e..0dca43327fdd 100644
---- a/Makefile.tools
-+++ b/Makefile.tools
-@@ -354,7 +354,7 @@ man_MANS += tools/rctest.1 tools/l2ping.1 tools/btattach.1 tools/isotest.1 \
- 		client/bluetoothctl-advertise.1 client/bluetoothctl-endpoint.1 \
- 		client/bluetoothctl-gatt.1 client/bluetoothctl-player.1 \
- 		client/bluetoothctl-scan.1 client/bluetoothctl-transport.1 \
--		client/bluetoothctl-assistant.1
-+		client/bluetoothctl-assistant.1 client/bluetoothctl-hci.1
- 
- endif
- 
-@@ -487,7 +487,8 @@ manual_pages += tools/hciattach.1 tools/hciconfig.1 \
- 			client/bluetoothctl-player.1 \
- 			client/bluetoothctl-scan.1 \
- 			client/bluetoothctl-transport.1 \
--			client/bluetoothctl-assistant.1
-+			client/bluetoothctl-assistant.1 \
-+			client/bluetoothctl-hci.1
- 
- if HID2HCI
- udevdir = $(UDEV_DIR)
-diff --git a/client/bluetoothctl-hci.rst b/client/bluetoothctl-hci.rst
-new file mode 100644
-index 000000000000..2002763176b0
---- /dev/null
-+++ b/client/bluetoothctl-hci.rst
-@@ -0,0 +1,86 @@
-+================
-+bluetoothctl-hci
-+================
-+
-+-----------
-+HCI Submenu
-+-----------
-+
-+:Version: BlueZ
-+:Copyright: Free use of this software is granted under ther terms of the GNU
-+            Lesser General Public Licenses (LGPL).
-+:Date: December 2024
-+:Manual section: 1
-+:Manual group: Linux System Administration
-+
-+SYNOPSIS
-+========
-+
-+**bluetoothctl** [--options] [hci.commands]
-+
-+Commands
-+========
-+
-+open
-+----
-+
-+Open HCI channel.
-+
-+:Usage: **> open <index> <chan=raw,user>**
-+:Example open user channel:
-+	| In order to open a user channel the controller needs to be power off
-+	| first:
-+	| > power off
-+	| > hci.open 0 user
-+	| HCI index 0 user channel opened
-+
-+cmd
-+---
-+
-+Send HCI command.
-+
-+:Usage: **> cmd <opcode> [parameters...]**
-+:Example send HCI Reset command:
-+	| > hci.cmd 0x0c03
-+	| HCI Command complete:
-+	|  00
-+
-+send
-+----
-+
-+Send HCI data packet.
-+
-+:Usage: **> send <type=acl,sco,iso> <handle> [data...]**
-+:Example send ACL data packet to connection handle 0x0000:
-+	| > hci.send acl 0x0000
-+
-+register
-+--------
-+
-+Register HCI event handler.
-+
-+:Usage: **> register <event>**
-+
-+unregister
-+----------
-+
-+Unregister HCI event handler.
-+
-+:Usage: **> unregister <event>**
-+
-+close
-+-----
-+
-+Close HCI channel.
-+
-+:Usage: **> close <index>**
-+
-+RESOURCES
-+=========
-+
-+http://www.bluez.org
-+
-+REPORTING BUGS
-+==============
-+
-+linux-bluetooth@vger.kernel.org
+firmware-name:
+  minItems: 1
+  items:
+    - description: NVM firmware to load (extend the desription)
+    - description: rampatch (extend the description)
+
+> > Best regards,
+> > Krzysztof
+> 
+
 -- 
-2.47.1
-
+With best wishes
+Dmitry
