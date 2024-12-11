@@ -1,65 +1,70 @@
-Received: from mail-yw1-f179.google.com (mail-yw1-f179.google.com [209.85.128.179])
+Received: from mail-yw1-f171.google.com (mail-yw1-f171.google.com [209.85.128.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40E052594A5
-	for <linux-bluetooth@vger.kernel.org>; Wed, 11 Dec 2024 19:22:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8D292594A5
+	for <linux-bluetooth@vger.kernel.org>; Wed, 11 Dec 2024 19:22:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733944937; cv=none; b=PdesqNDTU1fH03VTa6jsthXDvcVzeRq1og/+nkGNj0yEr8RF8rkxmK2lPlysA1gDa22KqHnNyOt3yAARfDkeclldBevPwSXcMy4j5IvEzy35qqMhewtCDTq8WhNAesv+dHsE60jumKzD3q6qk/MwRmicewW6tLprCvdISezBx0E=
+	t=1733944939; cv=none; b=pJG/3ve7B1EDRVLyEx5lCIO3732K4EOtrrODhUX6S3tcrFPD4tiQTI2IDgxg8npAMikl3vG9+niD3D+J4Q4kIEOtS3CBrYiXHWvUY8W6Y2HQFtQwi9+5P+ZDT+mJpQvvMjZGihax9vmfRwB1HqT4kJ4pyy8oX+xR4pa+3KKybPk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733944937; c=relaxed/simple;
-	bh=l/5FHLYr04XhlSWBZGOT+CkwGNNbydpoNJppu/IR5nA=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=CM9YFe19C3PPEEMyD/DdpWVDRt9MD9lULBLlWV3zTGg1XROPzRu9K9FbPHm+83DgXWtf/DvfxrnU+l2n4m8DPj201F77UKfJX+IDRXZBfjr9xdppsgQPuFpL+xeb3KG+uRRFK/qUHC2P1Uasmzx9+JAwJ7QpsBxx5xxpG63BQQk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GVaE0lJc; arc=none smtp.client-ip=209.85.128.179
+	s=arc-20240116; t=1733944939; c=relaxed/simple;
+	bh=I0n9LK9zLvKnXaW4qNFNgPI/oHV6vcN6W8qVrw58/zg=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=o+KnQVhqm4UnTRCRMDyKqKrCYAxFAV11+cq+uFiJxRGuyKINxnLgCIT+Of1qFKufpYjVYMmF7vUvUynVau81loY4Wgsb6jKzjpXc7GUHhCPcrCSQ0BdPJMVW6ilqI/GaWG5CHRw+axEtZDPb/Yv57IvOtabZ0lz+FbD2eSaFqYc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EXImVlD3; arc=none smtp.client-ip=209.85.128.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GVaE0lJc"
-Received: by mail-yw1-f179.google.com with SMTP id 00721157ae682-6efe4324f96so48509047b3.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 11 Dec 2024 11:22:14 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EXImVlD3"
+Received: by mail-yw1-f171.google.com with SMTP id 00721157ae682-6eff8289d0eso41247517b3.0
+        for <linux-bluetooth@vger.kernel.org>; Wed, 11 Dec 2024 11:22:17 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1733944932; x=1734549732; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=anHBtQYJ6KQdQcYE7bhg46eOJ1Y2DGanoXn0gMS3LNs=;
-        b=GVaE0lJcwZoCbJkKlTI6imkS3DNRBgbyzzbP+6dSGp/wEIbvpIb68ENJ51iZJqPdBx
-         eUotYCCTVSQAne1CgfVowIN1AXJPClJknS4ohcPN/Nj7Z9B+43nq0D10WrBzhaZH829b
-         3W5ZDCRjGR/cao/8kSn2iE/q8BF18W6o+BJwGzI4vN3QkvfFXgvJLVjC1CzMTVZDR0bn
-         3dN4Sgsqv41C+nJozLOVeSLU1BCeaE10oFo4JLxQWAdwRsdqUWaQjS8egZz32ebjKJLz
-         +GQz8aDLCPsywpzzkSL72XM2+zA0YElzi17MYO3fookDFqFaYDI84ScmWw8do5yt9gcf
-         2pqQ==
+        d=gmail.com; s=20230601; t=1733944936; x=1734549736; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=KqZ+hDDdMqwXULgN8ppCmOgZdkVn2oHoO3C1NkZIkZU=;
+        b=EXImVlD37csdSeINeg4NHOqzduHrrE9P9X1bl/BrJMz5UV2Cy0Czcy9VU8yXRLzcTh
+         +aVWrsRrfY06BpeLKUR1UIxugst8NmijxEGNFKXRg2yIBgMtqi3K0XIIroHzSyoOdPXY
+         1VSh+DDWj7pMKpq2kFkC8pqThCtrAHsup7AxTwCY+sWuMnlFmKQqDOkrXdjae29RF9WI
+         hhnzBadsgG3FpPrwDljr5oCwenSasIGeVT27et9P+oDlMMBBtJhFOoOf5bMcuqO6RaJY
+         fVFmTHlgfhLwzIHw+gVTiGWRTJG/WEU59uaCeP+1pQpCGsoo6XNkiqAl2C7dsvh2x1j8
+         ygTg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733944932; x=1734549732;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=anHBtQYJ6KQdQcYE7bhg46eOJ1Y2DGanoXn0gMS3LNs=;
-        b=YhHKUm8kb+Ic8Pfml5EVwIlOkdxDv2Bf2tahEobrhfk3Be5WSD28zvzgu0XGt3Wl3S
-         HSKxCZ8eaVxgE6KWcurLxoR9i8KEQW9krwJASeP/AfvxZw4O/lgwUbZz7k7ne4PGqOs0
-         VcsNXhQWUt51lFXv/r47r2KHSgg781QZHa282p5Pw1Gv6EtlR323e9tWiBCcmHGd1Npo
-         Racl+OZYtp0/z9x3QDRpbft/tEcmOr+FRjmsP5OA/YN5jmyN5FNgE8twiguuBXBdB4B9
-         WEwNU/ibVW1wNxzz2E6d8G3MaMTiZQKzxOoiQs7WILdsSV2rjuJm9rcjgEtOTaFFiymL
-         DJyg==
-X-Gm-Message-State: AOJu0YwHYFSy3I0JZgFhwb0wVz6JKaJAO73aK/wL4UC5qwFa8Tf2k+SK
-	3GNh/NZfP2mL+Je9+Hz4gwF7UFE3VxcHjq2j66hvFHCCl577KcWuC7i1kg==
-X-Gm-Gg: ASbGncuxKc+MiOtj/bfYtsCJxnIR8Zbp7qsZv/2TKS0+hu9hbGYRLawU72CUnaihXvW
-	XZxEKJ1SArdR49hHWMGq0xtcpHSyf2TY14OTplADND0nSBE7MJ4p3ELjnYcYaHAEoMyAzd3VvTR
-	kyPeYK7Qh06JJ/SmQfa0zsjcSml8d/1XDOdHNhkpO5DB14TN7+Yr6RmDTCrs7KG3wSMqIlPsyyW
-	5Vig5OCMKOlg6ZOMx8M+dEHIakx3EFGcLhmUj5vlIDFhiwBkGQ2fJmqcsdBGmxdHgXbCc4qbrl1
-	DF4NmhZMPepXdihFjeGudjtWGg==
-X-Google-Smtp-Source: AGHT+IE/iPzsJVyhXaDULezfcQ1gW7qdwvSGvNT2VaqdLxNlsDce0ONTFvYBNv4tngv7SJ2Sa7h73A==
-X-Received: by 2002:a05:690c:64c1:b0:6ef:5fee:1cbe with SMTP id 00721157ae682-6f19e86b362mr7168587b3.40.1733944932405;
-        Wed, 11 Dec 2024 11:22:12 -0800 (PST)
+        d=1e100.net; s=20230601; t=1733944936; x=1734549736;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=KqZ+hDDdMqwXULgN8ppCmOgZdkVn2oHoO3C1NkZIkZU=;
+        b=m1gQ9uo0yJ99YyaxQ/Nih39rFING4MZNk3yNUe332YXCWEdLOjF34DXFJ1n/mcRsfe
+         JGvgw99A5Rg78A5KL/74HYVuAaHZtNQUR7ic8KuysEbWRqnvzO4GElkIzbEdN5DaP6YX
+         QtIkaFdRLJWmHd0QgoRaGfboYsJPHpTfl2/4scpXl4Wu7eY3H3wxjTmkW5yuQJhFrg3q
+         ynCAjqGwxFslKJeTNkX2pf+q7gyj2YJpwIZnYxDgO9eerv0d65iRqazd9LwUNPyKFOPN
+         gFQfWtajwTvL1td7Y3Cj9mS5/10qk5TPGYNaZsykaVMVKCj8NKUyzqlH5G0WB4sixDBp
+         C+gQ==
+X-Gm-Message-State: AOJu0YxfycZZ3M8tNmRo2rBPuBcp0om/g7/fdhn22WK7+LaPdMvx8o1P
+	/SxBJY+0/grpKAbKOAyhaYJd5m8pRSKTaLVOenDdJV4chqK2/6iTJAb3LA==
+X-Gm-Gg: ASbGnctMcuzgdVv0zaeaT6Z164MQnKZVQlfSLux0jWfktN8bla8wJqwdnBtkfJq9Lr0
+	SJog5CKAZDrJ2e7wYxrXUGQtRZ8HNnm+YqRxy2FIfPiKtMSQa2hZJtbt29x0e5QJCdQzp7ZM/Gt
+	gZY7rXvhXLvfidpTD6TrHUKm1k/qKvPPrXQL2AVhNCmAUsx5AYqAvze8nZwGztOVh7HIZ2IWzkG
+	Ec2m7P4OWXJxYSJcHp4QYstrZfzbOlD4C5uZBIUgvevnIiqoyPownoQxUgEsz1zkJU2nAEtfWXt
+	bKdFXE1P7yi251xKvfaSUsrfyA==
+X-Google-Smtp-Source: AGHT+IEEA5I2Z5bbD4RqQbjMiIiySjjuHSHIvcqSiCZohjSqGHav3PMQwKMrmnZtqcjlZiqlMu+OMA==
+X-Received: by 2002:a05:690c:d8d:b0:6ef:5013:bfd9 with SMTP id 00721157ae682-6f19e4eea0dmr7828827b3.10.1733944935642;
+        Wed, 11 Dec 2024 11:22:15 -0800 (PST)
 Received: from lvondent-mobl5.. (syn-107-146-107-067.res.spectrum.com. [107.146.107.67])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-6f14ce8be30sm3670077b3.79.2024.12.11.11.22.11
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-6f14ce8be30sm3670077b3.79.2024.12.11.11.22.14
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 11 Dec 2024 11:22:11 -0800 (PST)
+        Wed, 11 Dec 2024 11:22:14 -0800 (PST)
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v2 1/5] tools: Use '>' as prompt end marker
-Date: Wed, 11 Dec 2024 14:22:06 -0500
-Message-ID: <20241211192210.1864347-1-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v2 3/5] share/hci: Introduce bt_hci_send_data
+Date: Wed, 11 Dec 2024 14:22:08 -0500
+Message-ID: <20241211192210.1864347-3-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.47.1
+In-Reply-To: <20241211192210.1864347-1-luiz.dentz@gmail.com>
+References: <20241211192210.1864347-1-luiz.dentz@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -70,162 +75,233 @@ Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This replaces the use of '#' with '>' as prompt end marker since the
-former is used to describe comments on the script which might be
-confused with prompt.
+This introduces bt_hci_send_data which can be used to send ACL, SCO or
+ISO data packets to the underline HCI socket.
 ---
- client/main.c            | 6 +++---
- client/mgmt.c            | 6 +++---
- tools/bluetooth-player.c | 2 +-
- tools/btpclientctl.c     | 2 +-
- tools/mesh-cfgclient.c   | 2 +-
- tools/mesh-gatt/util.c   | 2 +-
- tools/mesh/util.c        | 2 +-
- tools/meshctl.c          | 4 ++--
- 8 files changed, 13 insertions(+), 13 deletions(-)
+ src/shared/hci.c | 112 +++++++++++++++++++++++++++++++++++++++++++----
+ src/shared/hci.h |   3 ++
+ 2 files changed, 106 insertions(+), 9 deletions(-)
 
-diff --git a/client/main.c b/client/main.c
-index 3f8143dde4b8..9258b44655dd 100644
---- a/client/main.c
-+++ b/client/main.c
-@@ -43,7 +43,7 @@
- #define COLORED_CHG	COLOR_YELLOW "CHG" COLOR_OFF
- #define COLORED_DEL	COLOR_RED "DEL" COLOR_OFF
+diff --git a/src/shared/hci.c b/src/shared/hci.c
+index f741a2bf5ca9..07fdffc82e0c 100644
+--- a/src/shared/hci.c
++++ b/src/shared/hci.c
+@@ -17,6 +17,11 @@
+ #include <string.h>
+ #include <sys/socket.h>
+ #include <sys/uio.h>
++#include <sys/un.h>
++#include <sys/types.h>
++#include <sys/stat.h>
++#include <fcntl.h>
++#include <errno.h>
  
--#define PROMPT_ON	"[bluetooth]# "
-+#define PROMPT_ON	"[bluetoothctl]> "
- #define PROMPT_OFF	"Waiting to connect to bluetoothd..."
+ #include "monitor/bt.h"
+ #include "src/shared/mainloop.h"
+@@ -53,6 +58,7 @@ struct bt_hci {
+ 	struct queue *cmd_queue;
+ 	struct queue *rsp_queue;
+ 	struct queue *evt_list;
++	struct queue *data_queue;
+ };
  
- static DBusConnection *dbus_conn;
-@@ -333,7 +333,7 @@ static void set_default_device(GDBusProxy *proxy, const char *attribute)
- 	path = g_dbus_proxy_get_path(proxy);
+ struct cmd {
+@@ -73,6 +79,13 @@ struct evt {
+ 	void *user_data;
+ };
  
- 	dbus_message_iter_get_basic(&iter, &desc);
--	desc = g_strdup_printf("[%s%s%s]# ", desc,
-+	desc = g_strdup_printf("[%s%s%s]> ", desc,
- 				attribute ? ":" : "",
- 				attribute ? attribute + strlen(path) : "");
- 
-@@ -2099,7 +2099,7 @@ static void set_default_local_attribute(char *attr)
- 	default_local_attr = attr;
- 	default_attr = NULL;
- 
--	desc = g_strdup_printf("[%s]# ", attr);
-+	desc = g_strdup_printf("[%s]> ", attr);
- 
- 	bt_shell_set_prompt(desc, COLOR_BLUE);
- 	g_free(desc);
-diff --git a/client/mgmt.c b/client/mgmt.c
-index 59dcb3135344..1946d65d2fe2 100644
---- a/client/mgmt.c
-+++ b/client/mgmt.c
-@@ -71,16 +71,16 @@ static int pending_index = 0;
- #define MIN(x, y) ((x) < (y) ? (x) : (y))
- #endif
- 
--#define PROMPT_ON	COLOR_BLUE "[mgmt]" COLOR_OFF "# "
-+#define PROMPT_ON	COLOR_BLUE "[mgmt]" COLOR_OFF "> "
- 
- static void update_prompt(uint16_t index)
++struct data {
++	uint8_t type;
++	uint16_t handle;
++	void *data;
++	uint8_t size;
++};
++
+ static void cmd_free(void *data)
  {
- 	char str[32];
- 
- 	if (index == MGMT_INDEX_NONE)
--		snprintf(str, sizeof(str), "[mgmt]# ");
-+		snprintf(str, sizeof(str), "[mgmt]> ");
- 	else
--		snprintf(str, sizeof(str), "[hci%u]# ", index);
-+		snprintf(str, sizeof(str), "[hci%u]> ", index);
- 
- 	bt_shell_set_prompt(str, COLOR_BLUE);
+ 	struct cmd *cmd = data;
+@@ -94,6 +107,14 @@ static void evt_free(void *data)
+ 	free(evt);
  }
-diff --git a/tools/bluetooth-player.c b/tools/bluetooth-player.c
-index 83045ca3fe41..63a95b878fb8 100644
---- a/tools/bluetooth-player.c
-+++ b/tools/bluetooth-player.c
-@@ -33,7 +33,7 @@
- #include "src/shared/shell.h"
- #include "client/player.h"
  
--#define PROMPT	"[bluetooth]# "
-+#define PROMPT	"[bluetooth-player]> "
- 
- static DBusConnection *dbus_conn;
- 
-diff --git a/tools/btpclientctl.c b/tools/btpclientctl.c
-index eb97463148d2..f6f61ed5d651 100644
---- a/tools/btpclientctl.c
-+++ b/tools/btpclientctl.c
-@@ -34,7 +34,7 @@
- 
- #define DEFAULT_SOCKET_PATH	"/tmp/bt-stack-tester"
- 
--#define PROMPT_ON	COLOR_BLUE "[btpclient]" COLOR_OFF "# "
-+#define PROMPT_ON	COLOR_BLUE "[btpclient]" COLOR_OFF "> "
- 
- #define EVT_OPCODE_BASE	0x80
- 
-diff --git a/tools/mesh-cfgclient.c b/tools/mesh-cfgclient.c
-index e64950a9cc65..3bd2b673ad7f 100644
---- a/tools/mesh-cfgclient.c
-+++ b/tools/mesh-cfgclient.c
-@@ -38,7 +38,7 @@
- #include "tools/mesh/model.h"
- #include "tools/mesh/remote.h"
- 
--#define PROMPT_ON	"[mesh-cfgclient]# "
-+#define PROMPT_ON	"[mesh-cfgclient]> "
- #define PROMPT_OFF	"Waiting to connect to bluetooth-meshd..."
- 
- #define CFG_SRV_MODEL	0x0000
-diff --git a/tools/mesh-gatt/util.c b/tools/mesh-gatt/util.c
-index 58f240a7748e..84fa7b5eedb0 100644
---- a/tools/mesh-gatt/util.c
-+++ b/tools/mesh-gatt/util.c
-@@ -29,7 +29,7 @@ void set_menu_prompt(const char *name, const char *id)
++static void data_free(void *data)
++{
++	struct data *d = data;
++
++	free(d->data);
++	free(d);
++}
++
+ static void send_command(struct bt_hci *hci, uint16_t opcode,
+ 						void *data, uint8_t size)
  {
- 	char *prompt;
+@@ -126,17 +147,44 @@ static void send_command(struct bt_hci *hci, uint16_t opcode,
+ 	hci->num_cmds--;
+ }
  
--	prompt = g_strdup_printf("[%s%s%s]# ", name,
-+	prompt = g_strdup_printf("[%s%s%s]> ", name,
- 					id ? ": Target = " : "", id ? id : "");
- 	bt_shell_set_prompt(prompt, COLOR_BLUE);
- 	g_free(prompt);
-diff --git a/tools/mesh/util.c b/tools/mesh/util.c
-index 310aae0c63e6..6e81bf5f0285 100644
---- a/tools/mesh/util.c
-+++ b/tools/mesh/util.c
-@@ -28,7 +28,7 @@ void set_menu_prompt(const char *name, const char *id)
++static void send_data(struct bt_hci *hci, uint8_t type, uint16_t handle,
++						void *data, uint16_t size)
++{
++	struct iovec iov[3];
++	struct bt_hci_acl_hdr hdr;
++
++	hdr.handle = cpu_to_le16(handle);
++	hdr.dlen = cpu_to_le16(size);
++
++	iov[0].iov_base = &type;
++	iov[0].iov_len  = 1;
++	iov[1].iov_base = &hdr;
++	iov[1].iov_len  = sizeof(hdr);
++	iov[2].iov_base = data;
++	iov[2].iov_len  = size;
++
++	io_send(hci->io, iov, 3);
++}
++
+ static bool io_write_callback(struct io *io, void *user_data)
  {
- 	char *prompt;
+ 	struct bt_hci *hci = user_data;
+ 	struct cmd *cmd;
++	struct data *data;
  
--	prompt = l_strdup_printf("[%s%s%s]# ", name,
-+	prompt = l_strdup_printf("[%s%s%s]> ", name,
- 					id ? ": Target = " : "", id ? id : "");
- 	bt_shell_set_prompt(prompt, COLOR_BLUE);
- 	l_free(prompt);
-diff --git a/tools/meshctl.c b/tools/meshctl.c
-index 00a68a3d1d57..7b9c44b11e49 100644
---- a/tools/meshctl.c
-+++ b/tools/meshctl.c
-@@ -54,7 +54,7 @@
- #define COLORED_CHG	COLOR_YELLOW "CHG" COLOR_OFF
- #define COLORED_DEL	COLOR_RED "DEL" COLOR_OFF
+-	cmd = queue_pop_head(hci->cmd_queue);
+-	if (cmd) {
+-		send_command(hci, cmd->opcode, cmd->data, cmd->size);
+-		queue_push_tail(hci->rsp_queue, cmd);
++	if (hci->num_cmds) {
++		cmd = queue_pop_head(hci->cmd_queue);
++		if (cmd) {
++			send_command(hci, cmd->opcode, cmd->data, cmd->size);
++			queue_push_tail(hci->rsp_queue, cmd);
++		}
+ 	}
  
--#define PROMPT_ON	"[meshctl]# "
-+#define PROMPT_ON	"[meshctl]> "
- #define PROMPT_OFF	"Waiting to connect to bluetoothd..."
++	data = queue_pop_head(hci->data_queue);
++	if (data)
++		send_data(hci, data->type, data->handle,
++					data->data, data->size);
++
+ 	hci->writer_active = false;
  
- #define MESH_PROV_DATA_IN_UUID_STR	"00002adb-0000-1000-8000-00805f9b34fb"
-@@ -603,7 +603,7 @@ static void set_connected_device(GDBusProxy *proxy)
- 			goto done;
+ 	return false;
+@@ -147,10 +195,7 @@ static void wakeup_writer(struct bt_hci *hci)
+ 	if (hci->writer_active)
+ 		return;
  
- 	dbus_message_iter_get_basic(&iter, &desc);
--	desc = g_strdup_printf(COLOR_BLUE "[%s%s%s]" COLOR_OFF "# ", desc,
-+	desc = g_strdup_printf(COLOR_BLUE "[%s%s%s]" COLOR_OFF "> ", desc,
- 			       (desc && mesh) ? "-" : "",
- 				mesh ? buf : "");
+-	if (hci->num_cmds < 1)
+-		return;
+-
+-	if (queue_isempty(hci->cmd_queue))
++	if (queue_isempty(hci->cmd_queue) && queue_isempty(hci->data_queue))
+ 		return;
  
+ 	if (!io_set_write_handler(hci->io, io_write_callback, hci, NULL))
+@@ -300,11 +345,13 @@ static struct bt_hci *create_hci(int fd)
+ 	hci->cmd_queue = queue_new();
+ 	hci->rsp_queue = queue_new();
+ 	hci->evt_list = queue_new();
++	hci->data_queue = queue_new();
+ 
+ 	if (!io_set_read_handler(hci->io, io_read_callback, hci, NULL)) {
+ 		queue_destroy(hci->evt_list, NULL);
+ 		queue_destroy(hci->rsp_queue, NULL);
+ 		queue_destroy(hci->cmd_queue, NULL);
++		queue_destroy(hci->data_queue, NULL);
+ 		io_destroy(hci->io);
+ 		free(hci);
+ 		return NULL;
+@@ -353,8 +400,11 @@ struct bt_hci *bt_hci_new_user_channel(uint16_t index)
+ 	int fd;
+ 
+ 	fd = create_socket(index, HCI_CHANNEL_USER);
+-	if (fd < 0)
++	if (fd < 0) {
++		printf("Unable to create user channel socket: %s(%d)\n",
++			strerror(errno), -errno);
+ 		return NULL;
++	}
+ 
+ 	hci = create_hci(fd);
+ 	if (!hci) {
+@@ -423,6 +473,7 @@ void bt_hci_unref(struct bt_hci *hci)
+ 	queue_destroy(hci->evt_list, evt_free);
+ 	queue_destroy(hci->cmd_queue, cmd_free);
+ 	queue_destroy(hci->rsp_queue, cmd_free);
++	queue_destroy(hci->data_queue, data_free);
+ 
+ 	io_destroy(hci->io);
+ 
+@@ -523,6 +574,7 @@ bool bt_hci_flush(struct bt_hci *hci)
+ 
+ 	queue_remove_all(hci->cmd_queue, NULL, NULL, cmd_free);
+ 	queue_remove_all(hci->rsp_queue, NULL, NULL, cmd_free);
++	queue_remove_all(hci->data_queue, NULL, NULL, data_free);
+ 
+ 	return true;
+ }
+@@ -556,6 +608,48 @@ unsigned int bt_hci_register(struct bt_hci *hci, uint8_t event,
+ 	return evt->id;
+ }
+ 
++bool bt_hci_send_data(struct bt_hci *hci, uint8_t type, uint16_t handle,
++				const void *data, uint8_t size)
++{
++	struct data *d;
++
++	if (!hci)
++		return false;
++
++	/* Check if type really reflects to a data packet */
++	switch (type) {
++	case BT_H4_ACL_PKT:
++	case BT_H4_SCO_PKT:
++	case BT_H4_EVT_PKT:
++		break;
++	default:
++		return false;
++	}
++
++	d = new0(struct data, 1);
++	d->type = type;
++	d->handle = handle;
++	d->size = size;
++
++	if (d->size > 0) {
++		d->data = util_memdup(data, d->size);
++		if (!d->data) {
++			free(d);
++			return false;
++		}
++	}
++
++	if (!queue_push_tail(hci->data_queue, d)) {
++		free(d->data);
++		free(d);
++		return false;
++	}
++
++	wakeup_writer(hci);
++
++	return true;
++}
++
+ static bool match_evt_id(const void *a, const void *b)
+ {
+ 	const struct evt *evt = a;
+diff --git a/src/shared/hci.h b/src/shared/hci.h
+index 9298442e512a..76ee72f54ace 100644
+--- a/src/shared/hci.h
++++ b/src/shared/hci.h
+@@ -34,6 +34,9 @@ unsigned int bt_hci_send(struct bt_hci *hci, uint16_t opcode,
+ bool bt_hci_cancel(struct bt_hci *hci, unsigned int id);
+ bool bt_hci_flush(struct bt_hci *hci);
+ 
++bool bt_hci_send_data(struct bt_hci *hci, uint8_t type, uint16_t handle,
++				const void *data, uint8_t size);
++
+ unsigned int bt_hci_register(struct bt_hci *hci, uint8_t event,
+ 				bt_hci_callback_func_t callback,
+ 				void *user_data, bt_hci_destroy_func_t destroy);
 -- 
 2.47.1
 
