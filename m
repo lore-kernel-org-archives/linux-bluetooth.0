@@ -1,69 +1,73 @@
-Received: from fhigh-a6-smtp.messagingengine.com (fhigh-a6-smtp.messagingengine.com [103.168.172.157])
+Received: from fout-a3-smtp.messagingengine.com (fout-a3-smtp.messagingengine.com [103.168.172.146])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83E191C1F22;
-	Wed, 11 Dec 2024 22:04:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.157
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F5F5195;
+	Wed, 11 Dec 2024 22:13:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.146
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733954644; cv=none; b=E/0yYgx9cXwum6t4EDfyZv16I11mmk+9jPea/PcN7HNU4MDbokZpY3nLugl0SJWybQRRRXPfyXrRYLEgMrpD1xg95CxCAmi2e5WayQY45gxKWuq97CRaOCUgsPp97SavA7f69seSkHFFvivLVWzZJdknZijHySg+Ihn8AsmsZDI=
+	t=1733955226; cv=none; b=e02Ll8DTDm2nJw1Vyx8F36r4KchpnyeslzrZIlnI8VauRj3rB5Q922jOMqDyLnb7IkdlsX/McxXilu0O1qmNmCftr3Y2f74S0Dzyy0fGdkZO4eNG6VTkFKT8sqfPdX8GPcVK12+hWJdUo4PgBwBnimGS8qveTGkePAsw5xBNPIs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733954644; c=relaxed/simple;
-	bh=Hv0zWzOQEs6qRg/VUin3ERVsmFe9Y7g3hCYYWIeTv4I=;
-	h=MIME-Version:Date:From:To:Message-Id:Subject:Content-Type; b=ZXjiU4ijq+am27WtUlxMlhbAdO0TEZPjeoTob7NjVXl0piW6Y8lMfDC+zwN5+xAjd+J+vRYISwutyq3VsHIrvvtBpLPYKmyZWyv0UfTLiZwm6zqUDnPZgMypJjadmkzR4NTqe5lK/xZG68lszkZz79wD+2n7AN7FikVpNEm57G8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=doridian.net; spf=pass smtp.mailfrom=doridian.net; dkim=pass (2048-bit key) header.d=doridian.net header.i=@doridian.net header.b=KqeM4W7A; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=Vxj92516; arc=none smtp.client-ip=103.168.172.157
+	s=arc-20240116; t=1733955226; c=relaxed/simple;
+	bh=q+FOrqG3gG1AxswsUGDqpOSt7PBcwIFozsaIYehD2eY=;
+	h=MIME-Version:Date:From:To:Message-Id:In-Reply-To:References:
+	 Subject:Content-Type; b=k8t10umuy4JgXPk1IthHPDvG9mxdG1ELvYGj3VzD/sacf4MfXAvr0W43fLsquAE0FNKJbdtnpha5fRMWoh5Y0t4ZzG4MBpawO2RCw23N1crwE8GBdvcp3m2ozut8IFclqek4w1uYkA/yWylyMgZIAkCoaY7MrWmg+MMzJjGbOl0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=doridian.net; spf=pass smtp.mailfrom=doridian.net; dkim=pass (2048-bit key) header.d=doridian.net header.i=@doridian.net header.b=mcIleZeM; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=nr90kPZ1; arc=none smtp.client-ip=103.168.172.146
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=doridian.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=doridian.net
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=doridian.net header.i=@doridian.net header.b="KqeM4W7A";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="Vxj92516"
+	dkim=pass (2048-bit key) header.d=doridian.net header.i=@doridian.net header.b="mcIleZeM";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="nr90kPZ1"
 Received: from phl-compute-12.internal (phl-compute-12.phl.internal [10.202.2.52])
-	by mailfhigh.phl.internal (Postfix) with ESMTP id 5466111401E2;
-	Wed, 11 Dec 2024 17:04:00 -0500 (EST)
+	by mailfout.phl.internal (Postfix) with ESMTP id 4B33D1384134;
+	Wed, 11 Dec 2024 17:13:43 -0500 (EST)
 Received: from phl-imap-06 ([10.202.2.83])
-  by phl-compute-12.internal (MEProxy); Wed, 11 Dec 2024 17:04:00 -0500
+  by phl-compute-12.internal (MEProxy); Wed, 11 Dec 2024 17:13:43 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=doridian.net; h=
 	cc:content-transfer-encoding:content-type:content-type:date:date
-	:from:from:in-reply-to:message-id:mime-version:reply-to:subject
-	:subject:to:to; s=fm3; t=1733954640; x=1734041040; bh=QM6eF9GvfG
-	SbVYjB4dW/iVwNkGRvMd6wEUj09flznnI=; b=KqeM4W7A2NHOKNYxwe1ChnNK8V
-	fDUaX3tXfx8yes2DYCw/SRuPB+cpGSA44S6T6tOx3hYXXinU6aMgJO/mYSkPIXko
-	1VDGoRj1N1iwh1dyiTC77lPfPbSmZ5lFqqK1NQr6QeUH164U+mEA4ZKbyNK3JYLe
-	ilWv2XTtNxqN2ct+B+QMGFcUi3CPUkHsbeVz6nr1VQrobq4IvsYnJ69WwgEgEv2t
-	+qyAyw1vHHLU7PKhz8/4/6CDTaHI19VA3F87Ir/wndTlqpbvEm8SUGQGcDrNADWX
-	+hRJAPqr7T4gD0/i+w50hgyRYSc49fKXPpzTaCkm4TQ+bxMEMDo108KMYlkQ==
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm3; t=1733955223;
+	 x=1734041623; bh=b5blImECO9sDDWUloaXyT2Kn2WUa1fpKbi+hSvk9AsA=; b=
+	mcIleZeMv5gY/LlGEwQRIW/+WExJinMuQQvoyqV2CMSo6wxr6nctY5vi51PFUzEo
+	L6Pcv9s/qvLj/ylFZDkjAIW5cR466B813KFoOZxcp1cJjOzoo7Uf+M1JLY1UHnps
+	lQ1bBbzaEelJjPHb3aaePscUxHSL0qw/FeZ/ZfX96CZm8enestM+Gdxy8k8h83FI
+	25nFZGDxk++cgh7vpJkYUllmdX5I6bEAW5zk1rLwg++euQ+FT8/hrrvMHeDJSEZR
+	HcDN4G+og04hHAemdIZ2xan0OyNU1q8SYGyhCzrESsDFOuH3EScgooEPl+JPIdWz
+	4qoNHE4vxQoKEDyl25Y+uA==
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
 	messagingengine.com; h=cc:content-transfer-encoding:content-type
 	:content-type:date:date:feedback-id:feedback-id:from:from
-	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=
-	1733954640; x=1734041040; bh=QM6eF9GvfGSbVYjB4dW/iVwNkGRvMd6wEUj
-	09flznnI=; b=Vxj92516Sqy2D9Wy5l1V3+6yKPpf/IZAFUa0WoY8ni9tpJckZs+
-	TqTmC13Te+4zO/9NGAzf2W/brwr4I3O45pNoGTdtPXC6Ba4udKvo+OG5i7kqZDql
-	5nLSGrlXs9vGuWj81iz70xI+l4p2anB9grboSx4AgQcBYqzp6TyWF7SbnA/jGHvj
-	fVR2YEv6AfDg5K+XV0l3ZhE7N6bybRGs+8cEiOGGcSIstJQvQhFDbkqchji8cgFW
-	SJOR4q/iAupG/tJEghnXZfRTCY8DJ46LP8UcR5H0BJfq1kw5wfZIWsFXCz+4QbHA
-	5zRMDPoOnu6BvTcUi6SJOSzzhwUpSL4PPGw==
-X-ME-Sender: <xms:UAxaZzu7N4HT6bnyqeGT5Vj8faRr8w_ENk7JaIiCf4ECTnkNPONVSg>
-    <xme:UAxaZ0fWSyPUfffTnC7zf6Beq7UioP91PrRkT_I4n-TQanutAz-prxNxxhU2S7aEk
-    BuI51pl5yuVaHf_zTc>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefuddrkedtgdduheehucetufdoteggodetrfdotf
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to:x-me-proxy:x-me-sender
+	:x-me-sender:x-sasl-enc; s=fm1; t=1733955223; x=1734041623; bh=b
+	5blImECO9sDDWUloaXyT2Kn2WUa1fpKbi+hSvk9AsA=; b=nr90kPZ1/P6778hT1
+	8jm30+cdq+vHNbHOSIKGh0UnUGnr82FH+Ny14r/Jic0kqVnZk5OSlIA1226rb10P
+	ucFnWOGfDriHMHbQ7iO025FyZ3379ROHs9k8i4lm/Rn4RQyFBDfuTsTzeRoSjrJr
+	wTQLueG32g8Y/J9ElA86Da+yhfyWRQqb+T86c7FgAqD+bh1LYKD3MEff2EvEsykP
+	64JwFX2n+r5jvL3Da2nYq52TA6TDzJFTaeZ/gFOWnULqaKnjEJ21jGpkAIKsdfAG
+	ZubSXXI/8SxkjlgKN2oCKFV4/xON9Jj5YRjgztM7Up+cx8fRRcT/fKsNN1vqlo84
+	6uu9A==
+X-ME-Sender: <xms:lw5aZwhgprbYCqkKrGfJIeVZhmu4TRXf-Mo1IGuV0wnSM13Jj3IIxQ>
+    <xme:lw5aZ5AvdP6-CaxE99LsU_2pyL_sauKYO94V8PX-m0WdKcOGj8Y4KJHwZMap0Kd0g
+    gmlGtW5AKyZOu3uErQ>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefuddrkedtgdduheejucetufdoteggodetrfdotf
     fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggvpdfu
     rfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucenucfjughrpefoggffhf
-    fvkffutgfgsehtjeertdertddtnecuhfhrohhmpedfofgrrhhkucffihgvthiivghrfdcu
-    oehgihhtseguohhrihguihgrnhdrnhgvtheqnecuggftrfgrthhtvghrnhepkeduveeuhe
-    eiiedtuedtiedttdehleefgfetleelgeetledugfethedtjedujeelnecuvehluhhsthgv
-    rhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepghhithesughorhhiughirg
-    hnrdhnvghtpdhnsggprhgtphhtthhopedvpdhmohguvgepshhmthhpohhuthdprhgtphht
-    thhopehlihhnuhigqdgslhhuvghtohhothhhsehvghgvrhdrkhgvrhhnvghlrdhorhhgpd
-    hrtghpthhtoheplhhinhhugidqkhgvrhhnvghlsehvghgvrhdrkhgvrhhnvghlrdhorhhg
-X-ME-Proxy: <xmx:UAxaZ2xeojxdIVd6bPWEr4m8y_V0o0S5NIyVnZiXl3k3dSnTx3SYIw>
-    <xmx:UAxaZyOoaqoVnbEvjeybL5LrnFmfCiEj-bpOgXtdqHfOo2_OQrl97Q>
-    <xmx:UAxaZz_NAPlVVqdKKe3TjUs1-53xiZ4H3IxNFPYyrk6t_OwLhPzZjg>
-    <xmx:UAxaZyWauBYqwQGblLpt06mbtKNCXWZwD8gjoQtpMGXNUzn4vc6m_Q>
-    <xmx:UAxaZ9l0k1v_WMXr5-3W1lRIjHtOqa9mAAgR4keMvaE0hNROVwtHW-NP>
+    fvkfgjfhfutgfgsehtjeertdertddtnecuhfhrohhmpedfofgrrhhkucffihgvthiivghr
+    fdcuoehgihhtseguohhrihguihgrnhdrnhgvtheqnecuggftrfgrthhtvghrnhepvdekie
+    ejteelheegtddvvefhfeekffeludekjeduhfelleevhfekfeegvdffgeejnecuvehluhhs
+    thgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepghhithesughorhhiug
+    hirghnrdhnvghtpdhnsggprhgtphhtthhopedvpdhmohguvgepshhmthhpohhuthdprhgt
+    phhtthhopehlihhnuhigqdgslhhuvghtohhothhhsehvghgvrhdrkhgvrhhnvghlrdhorh
+    hgpdhrtghpthhtoheplhhinhhugidqkhgvrhhnvghlsehvghgvrhdrkhgvrhhnvghlrdho
+    rhhg
+X-ME-Proxy: <xmx:lw5aZ4H4U2qrHw4gFVwv_Linv6XzagTlaMNBynpKkLrYlGqA859RjA>
+    <xmx:lw5aZxQh1PBkqUYBd4bazTv97CIsy3TveT0B-IZ1aR1EziqasNoutw>
+    <xmx:lw5aZ9zRvTK9NEP5jq96MYbf6nO3Zyv8ke-A7JZB_utso9MPDY2N9g>
+    <xmx:lw5aZ_6eFOXeTGpXRblqceEZUpxFXBPOGmhxQoWHNKvIWzxTd5z8Eg>
+    <xmx:lw5aZ-q6HhultHn3-45J4U15fPHtEs9YxltgwooFxzbE7284JNJT8NzX>
 Feedback-ID: ie91947d0:Fastmail
 Received: by mailuser.phl.internal (Postfix, from userid 501)
-	id 169C529C006F; Wed, 11 Dec 2024 17:04:00 -0500 (EST)
+	id 112A829C0072; Wed, 11 Dec 2024 17:13:43 -0500 (EST)
 X-Mailer: MessagingEngine.com Webmail Interface
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -71,68 +75,37 @@ List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Date: Wed, 11 Dec 2024 14:03:39 -0800
+Date: Wed, 11 Dec 2024 14:13:22 -0800
 From: "Mark Dietzer" <git@doridian.net>
 To: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Message-Id: <85c64500-b6e7-481f-94fe-5d8fa78b008c@app.fastmail.com>
-Subject: [PATCH] Bluetooth: btusb: Add ID 0x2c7c:0x0130 for Qualcomm WCN785x
+Message-Id: <ef1099f8-077b-4580-9edc-2c0db2ebf211@app.fastmail.com>
+In-Reply-To: <b67656e9-2111-4f36-950d-48fe64f30fb4@app.fastmail.com>
+References: <b67656e9-2111-4f36-950d-48fe64f30fb4@app.fastmail.com>
+Subject: Re: [PATCH] Bluetooth: btusb: Add ID 0x2c7c:0x0130 for Qualcomm WCN785x
 Content-Type: text/plain
 Content-Transfer-Encoding: 7bit
 
-Adds a new entry with VID 0x2c7c and PID 0x0130 to the btusb quirks table as it uses a Qualcomm WCN785x chipset
-
-The device information from /sys/kernel/debug/usb/devices is provided below:
-T:  Bus=01 Lev=01 Prnt=01 Port=04 Cnt=05 Dev#=  7 Spd=12   MxCh= 0
-D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-P:  Vendor=2c7c ProdID=0130 Rev= 0.01
-C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
-I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
-E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-I:  If#= 1 Alt= 6 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  63 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  63 Ivl=1ms
-I:  If#= 1 Alt= 7 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  65 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  65 Ivl=1ms
+Sorry about the previous patch. My E-Mail client first tried sending it as HTML and then helpfully removed all leading whitespace.
+Below is a working patch with correct whitespace (I hope)
 
 Signed-off-by: Mark Dietzer <git@doridian.net>
 ---
-drivers/bluetooth/btusb.c | 2 ++
-1 file changed, 2 insertions(+)
+ drivers/bluetooth/btusb.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
 diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
 index 279fe6c115fa..20ba8ceff7d1 100644
 --- a/drivers/bluetooth/btusb.c
 +++ b/drivers/bluetooth/btusb.c
 @@ -377,6 +377,8 @@ static const struct usb_device_id quirks_table[] = {
-     BTUSB_WIDEBAND_SPEECH },
-{ USB_DEVICE(0x13d3, 0x3623), .driver_info = BTUSB_QCA_WCN6855 |
-     BTUSB_WIDEBAND_SPEECH },
-+ { USB_DEVICE(0x2c7c, 0x0130), .driver_info = BTUSB_QCA_WCN6855 |
-+      BTUSB_WIDEBAND_SPEECH },
+ 						     BTUSB_WIDEBAND_SPEECH },
+ 	{ USB_DEVICE(0x13d3, 0x3623), .driver_info = BTUSB_QCA_WCN6855 |
+ 						     BTUSB_WIDEBAND_SPEECH },
++	{ USB_DEVICE(0x2c7c, 0x0130), .driver_info = BTUSB_QCA_WCN6855 |
++						     BTUSB_WIDEBAND_SPEECH },
  
-/* Broadcom BCM2035 */
-{ USB_DEVICE(0x0a5c, 0x2009), .driver_info = BTUSB_BCM92035 },
+ 	/* Broadcom BCM2035 */
+ 	{ USB_DEVICE(0x0a5c, 0x2009), .driver_info = BTUSB_BCM92035 },
 -- 
 2.47.1
 
