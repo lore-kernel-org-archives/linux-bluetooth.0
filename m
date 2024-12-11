@@ -1,158 +1,231 @@
-Received: from mail-yb1-f176.google.com (mail-yb1-f176.google.com [209.85.219.176])
+Received: from mail-yw1-f179.google.com (mail-yw1-f179.google.com [209.85.128.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 125AF1FF5F4
-	for <linux-bluetooth@vger.kernel.org>; Wed, 11 Dec 2024 17:46:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40E052594A5
+	for <linux-bluetooth@vger.kernel.org>; Wed, 11 Dec 2024 19:22:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733939215; cv=none; b=AlKWi44UXZvofqVRBazowWQmh1oc9YAe1THQ152T4fbgUx+bwZ0s5GY2QP8h90XxaRBIsUQvPPLsewCLJjljc6c8coyrTgxA5BVXee0zEvBYm2XpZPsUMDOe9OxeAhB+0W2sT6l3twRvuxS4C8nkIFd6pQAgusfykowuZqrtOFc=
+	t=1733944937; cv=none; b=PdesqNDTU1fH03VTa6jsthXDvcVzeRq1og/+nkGNj0yEr8RF8rkxmK2lPlysA1gDa22KqHnNyOt3yAARfDkeclldBevPwSXcMy4j5IvEzy35qqMhewtCDTq8WhNAesv+dHsE60jumKzD3q6qk/MwRmicewW6tLprCvdISezBx0E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733939215; c=relaxed/simple;
-	bh=xKfttj73jG1uTZpJNN82RMi2jpdXNIkxOf7nv7eMMZ0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=asXImXpAh4hbDg5LKYJvOji8Zygo6Pzom81j85Sc3G8dwcgAPaPhEb/ed3ZOwgIUggaszx34QSl/NjNVU4XUuBOYhaAxwbp+oF7cnOlnPAJ98b4EfvSeocVhWHXq7mvXtBIuAhvMNAwzSuzYmSc8t3s6hB0OmrG80RLypfJUPSk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=raspberrypi.com; spf=pass smtp.mailfrom=raspberrypi.com; dkim=pass (2048-bit key) header.d=raspberrypi.com header.i=@raspberrypi.com header.b=iJ1Rv1gP; arc=none smtp.client-ip=209.85.219.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=raspberrypi.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=raspberrypi.com
+	s=arc-20240116; t=1733944937; c=relaxed/simple;
+	bh=l/5FHLYr04XhlSWBZGOT+CkwGNNbydpoNJppu/IR5nA=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=CM9YFe19C3PPEEMyD/DdpWVDRt9MD9lULBLlWV3zTGg1XROPzRu9K9FbPHm+83DgXWtf/DvfxrnU+l2n4m8DPj201F77UKfJX+IDRXZBfjr9xdppsgQPuFpL+xeb3KG+uRRFK/qUHC2P1Uasmzx9+JAwJ7QpsBxx5xxpG63BQQk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GVaE0lJc; arc=none smtp.client-ip=209.85.128.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=raspberrypi.com header.i=@raspberrypi.com header.b="iJ1Rv1gP"
-Received: by mail-yb1-f176.google.com with SMTP id 3f1490d57ef6-e39fb8548e2so5649796276.3
-        for <linux-bluetooth@vger.kernel.org>; Wed, 11 Dec 2024 09:46:51 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GVaE0lJc"
+Received: by mail-yw1-f179.google.com with SMTP id 00721157ae682-6efe4324f96so48509047b3.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 11 Dec 2024 11:22:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=raspberrypi.com; s=google; t=1733939211; x=1734544011; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=XX4yF9JMGXX3II/VI0ICz4h+LN+8Yz44eu6TfJ04Ugk=;
-        b=iJ1Rv1gPyVXZinfE2j1hskrQVtwOTmifZx892vfPVXmW+A4luks2PdH2B2Tl4HOqN6
-         U9LqS7pYhhesWy/EGPUEEaXNixUTWci5GU5iiVALQSIcaGNrrwa3KRwiY7NIu2Xm5M9O
-         b3bR1JInOlALvNN3xwW/FiAhOLXRWEdfW4VOahL/Xlyp3XRxMh8RsYIj5yDvN6DZJ7Ul
-         iOh4z0HBbsY9FYf1yBBSENjuPtqUFQzg036S66WXVQnVehFi4bWC3djajWjWbKhxsi1b
-         JZ7nHrGpMISaEuXqGNuZ52zlgMmrRhLWgeS7Sg8Hjg+/P5uGHHslF0Tnhj90FCLu3x1z
-         uF0g==
+        d=gmail.com; s=20230601; t=1733944932; x=1734549732; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=anHBtQYJ6KQdQcYE7bhg46eOJ1Y2DGanoXn0gMS3LNs=;
+        b=GVaE0lJcwZoCbJkKlTI6imkS3DNRBgbyzzbP+6dSGp/wEIbvpIb68ENJ51iZJqPdBx
+         eUotYCCTVSQAne1CgfVowIN1AXJPClJknS4ohcPN/Nj7Z9B+43nq0D10WrBzhaZH829b
+         3W5ZDCRjGR/cao/8kSn2iE/q8BF18W6o+BJwGzI4vN3QkvfFXgvJLVjC1CzMTVZDR0bn
+         3dN4Sgsqv41C+nJozLOVeSLU1BCeaE10oFo4JLxQWAdwRsdqUWaQjS8egZz32ebjKJLz
+         +GQz8aDLCPsywpzzkSL72XM2+zA0YElzi17MYO3fookDFqFaYDI84ScmWw8do5yt9gcf
+         2pqQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733939211; x=1734544011;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=XX4yF9JMGXX3II/VI0ICz4h+LN+8Yz44eu6TfJ04Ugk=;
-        b=sQojy548is2xFhtPMYUcNF5pjYuuCkvNks5Xj/wshE6Y6hdje/ilOW1ehsiTB31cPQ
-         Ko2mh4hUQAPaX6XFwDHKL6ORPvx+gkZyPZhilfz4VhFKlx3D0yyrzyjn29h1jZHh86Sb
-         Q3Qoc7P6R/GckuwpqudZXjMoAyHUr4mNhZyW9ALJFS9HVpK5wYw2JEUMLoXALa+lEOiT
-         t36M0oIpnCRYi96YSGLWxJep9hDeLxKQMVnXY68G3SuK9AwxvJXvjKI7xcNaUV98RXDt
-         IPhknppwuSyvLJjbgH8qjrJDdcWkuwSz7VxKa4nOL+8VsiRvYkIMuOzhKvEmn6LXji8F
-         /TCQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUfam3lryB1VamXJnhxQPtxaujrcHPJ0OMiMOfOmVZcd4Z9rdnlO7bx4P7QGuQ6h8c+X0APKzUgHLFJO/PPJzY=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx1tA4JLqsOi1eR4LXMta4bKU9e2pvsNB4kDatxU2BuqriX7sYk
-	RocFFOcp8M5eFSq2UB1w4NQn3KmNazArc3Cy3eHkPq90VFMBVjSbs/1J91La8UyEwuB7kY0ve+T
-	CPty4Xtj6Vwh/FD3SlBOQujACnQ6nwUIP2DY4tw==
-X-Gm-Gg: ASbGncvJt1qxAYj3QKS3xJB1Rh3jwc4wlogwPxPrhbS2qMgGQja3IdWLNkTFVLsyBlS
-	jP92BQLPPU/iuxpIF9cGGn/gd64bK8w5xaKM=
-X-Google-Smtp-Source: AGHT+IG3lDp6pcc8WpN9DOxtNpymp29steFnShZFR78LeXrDU2v7lqz7zSz8oGrhbnT8m3jrCYcj2LxsZTVFVNmSQds=
-X-Received: by 2002:a05:6902:230d:b0:e39:8a36:5771 with SMTP id
- 3f1490d57ef6-e3da3158089mr228005276.34.1733939211006; Wed, 11 Dec 2024
- 09:46:51 -0800 (PST)
+        d=1e100.net; s=20230601; t=1733944932; x=1734549732;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=anHBtQYJ6KQdQcYE7bhg46eOJ1Y2DGanoXn0gMS3LNs=;
+        b=YhHKUm8kb+Ic8Pfml5EVwIlOkdxDv2Bf2tahEobrhfk3Be5WSD28zvzgu0XGt3Wl3S
+         HSKxCZ8eaVxgE6KWcurLxoR9i8KEQW9krwJASeP/AfvxZw4O/lgwUbZz7k7ne4PGqOs0
+         VcsNXhQWUt51lFXv/r47r2KHSgg781QZHa282p5Pw1Gv6EtlR323e9tWiBCcmHGd1Npo
+         Racl+OZYtp0/z9x3QDRpbft/tEcmOr+FRjmsP5OA/YN5jmyN5FNgE8twiguuBXBdB4B9
+         WEwNU/ibVW1wNxzz2E6d8G3MaMTiZQKzxOoiQs7WILdsSV2rjuJm9rcjgEtOTaFFiymL
+         DJyg==
+X-Gm-Message-State: AOJu0YwHYFSy3I0JZgFhwb0wVz6JKaJAO73aK/wL4UC5qwFa8Tf2k+SK
+	3GNh/NZfP2mL+Je9+Hz4gwF7UFE3VxcHjq2j66hvFHCCl577KcWuC7i1kg==
+X-Gm-Gg: ASbGncuxKc+MiOtj/bfYtsCJxnIR8Zbp7qsZv/2TKS0+hu9hbGYRLawU72CUnaihXvW
+	XZxEKJ1SArdR49hHWMGq0xtcpHSyf2TY14OTplADND0nSBE7MJ4p3ELjnYcYaHAEoMyAzd3VvTR
+	kyPeYK7Qh06JJ/SmQfa0zsjcSml8d/1XDOdHNhkpO5DB14TN7+Yr6RmDTCrs7KG3wSMqIlPsyyW
+	5Vig5OCMKOlg6ZOMx8M+dEHIakx3EFGcLhmUj5vlIDFhiwBkGQ2fJmqcsdBGmxdHgXbCc4qbrl1
+	DF4NmhZMPepXdihFjeGudjtWGg==
+X-Google-Smtp-Source: AGHT+IE/iPzsJVyhXaDULezfcQ1gW7qdwvSGvNT2VaqdLxNlsDce0ONTFvYBNv4tngv7SJ2Sa7h73A==
+X-Received: by 2002:a05:690c:64c1:b0:6ef:5fee:1cbe with SMTP id 00721157ae682-6f19e86b362mr7168587b3.40.1733944932405;
+        Wed, 11 Dec 2024 11:22:12 -0800 (PST)
+Received: from lvondent-mobl5.. (syn-107-146-107-067.res.spectrum.com. [107.146.107.67])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-6f14ce8be30sm3670077b3.79.2024.12.11.11.22.11
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 11 Dec 2024 11:22:11 -0800 (PST)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ v2 1/5] tools: Use '>' as prompt end marker
+Date: Wed, 11 Dec 2024 14:22:06 -0500
+Message-ID: <20241211192210.1864347-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241210-converge-secs-to-jiffies-v3-0-ddfefd7e9f2a@linux.microsoft.com>
- <20241210-converge-secs-to-jiffies-v3-16-ddfefd7e9f2a@linux.microsoft.com>
-In-Reply-To: <20241210-converge-secs-to-jiffies-v3-16-ddfefd7e9f2a@linux.microsoft.com>
-From: Dave Stevenson <dave.stevenson@raspberrypi.com>
-Date: Wed, 11 Dec 2024 17:46:32 +0000
-Message-ID: <CAPY8ntDHcGpsaNytY2up_54e03twqZ2fj1=JTnb8x7LLo3uGDQ@mail.gmail.com>
-Subject: Re: [PATCH v3 16/19] staging: vc04_services: Convert timeouts to secs_to_jiffies()
-To: Easwar Hariharan <eahariha@linux.microsoft.com>
-Cc: Pablo Neira Ayuso <pablo@netfilter.org>, Jozsef Kadlecsik <kadlec@netfilter.org>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Julia Lawall <Julia.Lawall@inria.fr>, Nicolas Palix <nicolas.palix@imag.fr>, 
-	Daniel Mack <daniel@zonque.org>, Haojian Zhuang <haojian.zhuang@gmail.com>, 
-	Robert Jarzmik <robert.jarzmik@free.fr>, Russell King <linux@armlinux.org.uk>, 
-	Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>, 
-	Alexander Gordeev <agordeev@linux.ibm.com>, Christian Borntraeger <borntraeger@linux.ibm.com>, 
-	Sven Schnelle <svens@linux.ibm.com>, Ofir Bitton <obitton@habana.ai>, 
-	Oded Gabbay <ogabbay@kernel.org>, Lucas De Marchi <lucas.demarchi@intel.com>, 
-	=?UTF-8?Q?Thomas_Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>, 
-	Rodrigo Vivi <rodrigo.vivi@intel.com>, 
-	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, Maxime Ripard <mripard@kernel.org>, 
-	Thomas Zimmermann <tzimmermann@suse.de>, David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, 
-	Jeroen de Borst <jeroendb@google.com>, Praveen Kaligineedi <pkaligineedi@google.com>, 
-	Shailend Chand <shailend@google.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	James Smart <james.smart@broadcom.com>, Dick Kennedy <dick.kennedy@broadcom.com>, 
-	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>, 
-	"Martin K. Petersen" <martin.petersen@oracle.com>, =?UTF-8?Q?Roger_Pau_Monn=C3=A9?= <roger.pau@citrix.com>, 
-	Jens Axboe <axboe@kernel.dk>, Kalle Valo <kvalo@kernel.org>, Jeff Johnson <jjohnson@kernel.org>, 
-	Catalin Marinas <catalin.marinas@arm.com>, Andrew Morton <akpm@linux-foundation.org>, 
-	Jack Wang <jinpu.wang@cloud.ionos.com>, Marcel Holtmann <marcel@holtmann.org>, 
-	Johan Hedberg <johan.hedberg@gmail.com>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
-	Florian Fainelli <florian.fainelli@broadcom.com>, Ray Jui <rjui@broadcom.com>, 
-	Scott Branden <sbranden@broadcom.com>, 
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, Xiubo Li <xiubli@redhat.com>, 
-	Ilya Dryomov <idryomov@gmail.com>, Josh Poimboeuf <jpoimboe@kernel.org>, Jiri Kosina <jikos@kernel.org>, 
-	Miroslav Benes <mbenes@suse.cz>, Petr Mladek <pmladek@suse.com>, 
-	Joe Lawrence <joe.lawrence@redhat.com>, Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>, 
-	Louis Peens <louis.peens@corigine.com>, Michael Ellerman <mpe@ellerman.id.au>, 
-	Nicholas Piggin <npiggin@gmail.com>, Christophe Leroy <christophe.leroy@csgroup.eu>, 
-	Naveen N Rao <naveen@kernel.org>, Madhavan Srinivasan <maddy@linux.ibm.com>, netfilter-devel@vger.kernel.org, 
-	coreteam@netfilter.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	cocci@inria.fr, linux-arm-kernel@lists.infradead.org, 
-	linux-s390@vger.kernel.org, dri-devel@lists.freedesktop.org, 
-	intel-xe@lists.freedesktop.org, linux-scsi@vger.kernel.org, 
-	xen-devel@lists.xenproject.org, linux-block@vger.kernel.org, 
-	linux-wireless@vger.kernel.org, ath11k@lists.infradead.org, 
-	linux-mm@kvack.org, linux-bluetooth@vger.kernel.org, 
-	linux-staging@lists.linux.dev, linux-rpi-kernel@lists.infradead.org, 
-	ceph-devel@vger.kernel.org, live-patching@vger.kernel.org, 
-	linux-sound@vger.kernel.org, oss-drivers@corigine.com, 
-	linuxppc-dev@lists.ozlabs.org, Anna-Maria Behnsen <anna-maria@linutronix.de>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-On Tue, 10 Dec 2024 at 22:02, Easwar Hariharan
-<eahariha@linux.microsoft.com> wrote:
->
-> Commit b35108a51cf7 ("jiffies: Define secs_to_jiffies()") introduced
-> secs_to_jiffies(). As the value here is a multiple of 1000, use
-> secs_to_jiffies() instead of msecs_to_jiffies to avoid the multiplication.
->
-> This is converted using scripts/coccinelle/misc/secs_to_jiffies.cocci with
-> the following Coccinelle rules:
->
-> @@ constant C; @@
->
-> - msecs_to_jiffies(C * 1000)
-> + secs_to_jiffies(C)
->
-> @@ constant C; @@
->
-> - msecs_to_jiffies(C * MSEC_PER_SEC)
-> + secs_to_jiffies(C)
->
-> Signed-off-by: Easwar Hariharan <eahariha@linux.microsoft.com>
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Reviewed-by: Dave Stevenson <dave.stevenson@raspberrypi.com>
+This replaces the use of '#' with '>' as prompt end marker since the
+former is used to describe comments on the script which might be
+confused with prompt.
+---
+ client/main.c            | 6 +++---
+ client/mgmt.c            | 6 +++---
+ tools/bluetooth-player.c | 2 +-
+ tools/btpclientctl.c     | 2 +-
+ tools/mesh-cfgclient.c   | 2 +-
+ tools/mesh-gatt/util.c   | 2 +-
+ tools/mesh/util.c        | 2 +-
+ tools/meshctl.c          | 4 ++--
+ 8 files changed, 13 insertions(+), 13 deletions(-)
 
-> ---
->  drivers/staging/vc04_services/bcm2835-audio/bcm2835-vchiq.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/drivers/staging/vc04_services/bcm2835-audio/bcm2835-vchiq.c b/drivers/staging/vc04_services/bcm2835-audio/bcm2835-vchiq.c
-> index dc0d715ed97078ad0f0a41db78428db4f4135a76..0dbe76ee557032d7861acfc002cc203ff2e6971d 100644
-> --- a/drivers/staging/vc04_services/bcm2835-audio/bcm2835-vchiq.c
-> +++ b/drivers/staging/vc04_services/bcm2835-audio/bcm2835-vchiq.c
-> @@ -59,7 +59,7 @@ static int bcm2835_audio_send_msg_locked(struct bcm2835_audio_instance *instance
->
->         if (wait) {
->                 if (!wait_for_completion_timeout(&instance->msg_avail_comp,
-> -                                                msecs_to_jiffies(10 * 1000))) {
-> +                                                secs_to_jiffies(10))) {
->                         dev_err(instance->dev,
->                                 "vchi message timeout, msg=%d\n", m->type);
->                         return -ETIMEDOUT;
->
-> --
-> 2.43.0
->
+diff --git a/client/main.c b/client/main.c
+index 3f8143dde4b8..9258b44655dd 100644
+--- a/client/main.c
++++ b/client/main.c
+@@ -43,7 +43,7 @@
+ #define COLORED_CHG	COLOR_YELLOW "CHG" COLOR_OFF
+ #define COLORED_DEL	COLOR_RED "DEL" COLOR_OFF
+ 
+-#define PROMPT_ON	"[bluetooth]# "
++#define PROMPT_ON	"[bluetoothctl]> "
+ #define PROMPT_OFF	"Waiting to connect to bluetoothd..."
+ 
+ static DBusConnection *dbus_conn;
+@@ -333,7 +333,7 @@ static void set_default_device(GDBusProxy *proxy, const char *attribute)
+ 	path = g_dbus_proxy_get_path(proxy);
+ 
+ 	dbus_message_iter_get_basic(&iter, &desc);
+-	desc = g_strdup_printf("[%s%s%s]# ", desc,
++	desc = g_strdup_printf("[%s%s%s]> ", desc,
+ 				attribute ? ":" : "",
+ 				attribute ? attribute + strlen(path) : "");
+ 
+@@ -2099,7 +2099,7 @@ static void set_default_local_attribute(char *attr)
+ 	default_local_attr = attr;
+ 	default_attr = NULL;
+ 
+-	desc = g_strdup_printf("[%s]# ", attr);
++	desc = g_strdup_printf("[%s]> ", attr);
+ 
+ 	bt_shell_set_prompt(desc, COLOR_BLUE);
+ 	g_free(desc);
+diff --git a/client/mgmt.c b/client/mgmt.c
+index 59dcb3135344..1946d65d2fe2 100644
+--- a/client/mgmt.c
++++ b/client/mgmt.c
+@@ -71,16 +71,16 @@ static int pending_index = 0;
+ #define MIN(x, y) ((x) < (y) ? (x) : (y))
+ #endif
+ 
+-#define PROMPT_ON	COLOR_BLUE "[mgmt]" COLOR_OFF "# "
++#define PROMPT_ON	COLOR_BLUE "[mgmt]" COLOR_OFF "> "
+ 
+ static void update_prompt(uint16_t index)
+ {
+ 	char str[32];
+ 
+ 	if (index == MGMT_INDEX_NONE)
+-		snprintf(str, sizeof(str), "[mgmt]# ");
++		snprintf(str, sizeof(str), "[mgmt]> ");
+ 	else
+-		snprintf(str, sizeof(str), "[hci%u]# ", index);
++		snprintf(str, sizeof(str), "[hci%u]> ", index);
+ 
+ 	bt_shell_set_prompt(str, COLOR_BLUE);
+ }
+diff --git a/tools/bluetooth-player.c b/tools/bluetooth-player.c
+index 83045ca3fe41..63a95b878fb8 100644
+--- a/tools/bluetooth-player.c
++++ b/tools/bluetooth-player.c
+@@ -33,7 +33,7 @@
+ #include "src/shared/shell.h"
+ #include "client/player.h"
+ 
+-#define PROMPT	"[bluetooth]# "
++#define PROMPT	"[bluetooth-player]> "
+ 
+ static DBusConnection *dbus_conn;
+ 
+diff --git a/tools/btpclientctl.c b/tools/btpclientctl.c
+index eb97463148d2..f6f61ed5d651 100644
+--- a/tools/btpclientctl.c
++++ b/tools/btpclientctl.c
+@@ -34,7 +34,7 @@
+ 
+ #define DEFAULT_SOCKET_PATH	"/tmp/bt-stack-tester"
+ 
+-#define PROMPT_ON	COLOR_BLUE "[btpclient]" COLOR_OFF "# "
++#define PROMPT_ON	COLOR_BLUE "[btpclient]" COLOR_OFF "> "
+ 
+ #define EVT_OPCODE_BASE	0x80
+ 
+diff --git a/tools/mesh-cfgclient.c b/tools/mesh-cfgclient.c
+index e64950a9cc65..3bd2b673ad7f 100644
+--- a/tools/mesh-cfgclient.c
++++ b/tools/mesh-cfgclient.c
+@@ -38,7 +38,7 @@
+ #include "tools/mesh/model.h"
+ #include "tools/mesh/remote.h"
+ 
+-#define PROMPT_ON	"[mesh-cfgclient]# "
++#define PROMPT_ON	"[mesh-cfgclient]> "
+ #define PROMPT_OFF	"Waiting to connect to bluetooth-meshd..."
+ 
+ #define CFG_SRV_MODEL	0x0000
+diff --git a/tools/mesh-gatt/util.c b/tools/mesh-gatt/util.c
+index 58f240a7748e..84fa7b5eedb0 100644
+--- a/tools/mesh-gatt/util.c
++++ b/tools/mesh-gatt/util.c
+@@ -29,7 +29,7 @@ void set_menu_prompt(const char *name, const char *id)
+ {
+ 	char *prompt;
+ 
+-	prompt = g_strdup_printf("[%s%s%s]# ", name,
++	prompt = g_strdup_printf("[%s%s%s]> ", name,
+ 					id ? ": Target = " : "", id ? id : "");
+ 	bt_shell_set_prompt(prompt, COLOR_BLUE);
+ 	g_free(prompt);
+diff --git a/tools/mesh/util.c b/tools/mesh/util.c
+index 310aae0c63e6..6e81bf5f0285 100644
+--- a/tools/mesh/util.c
++++ b/tools/mesh/util.c
+@@ -28,7 +28,7 @@ void set_menu_prompt(const char *name, const char *id)
+ {
+ 	char *prompt;
+ 
+-	prompt = l_strdup_printf("[%s%s%s]# ", name,
++	prompt = l_strdup_printf("[%s%s%s]> ", name,
+ 					id ? ": Target = " : "", id ? id : "");
+ 	bt_shell_set_prompt(prompt, COLOR_BLUE);
+ 	l_free(prompt);
+diff --git a/tools/meshctl.c b/tools/meshctl.c
+index 00a68a3d1d57..7b9c44b11e49 100644
+--- a/tools/meshctl.c
++++ b/tools/meshctl.c
+@@ -54,7 +54,7 @@
+ #define COLORED_CHG	COLOR_YELLOW "CHG" COLOR_OFF
+ #define COLORED_DEL	COLOR_RED "DEL" COLOR_OFF
+ 
+-#define PROMPT_ON	"[meshctl]# "
++#define PROMPT_ON	"[meshctl]> "
+ #define PROMPT_OFF	"Waiting to connect to bluetoothd..."
+ 
+ #define MESH_PROV_DATA_IN_UUID_STR	"00002adb-0000-1000-8000-00805f9b34fb"
+@@ -603,7 +603,7 @@ static void set_connected_device(GDBusProxy *proxy)
+ 			goto done;
+ 
+ 	dbus_message_iter_get_basic(&iter, &desc);
+-	desc = g_strdup_printf(COLOR_BLUE "[%s%s%s]" COLOR_OFF "# ", desc,
++	desc = g_strdup_printf(COLOR_BLUE "[%s%s%s]" COLOR_OFF "> ", desc,
+ 			       (desc && mesh) ? "-" : "",
+ 				mesh ? buf : "");
+ 
+-- 
+2.47.1
+
