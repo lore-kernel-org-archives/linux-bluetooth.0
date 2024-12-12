@@ -1,196 +1,102 @@
-Received: from out-25.smtp.github.com (out-25.smtp.github.com [192.30.252.208])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F65029A9
-	for <linux-bluetooth@vger.kernel.org>; Thu, 12 Dec 2024 18:17:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.208
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 295A91AF0C8
+	for <linux-bluetooth@vger.kernel.org>; Thu, 12 Dec 2024 21:00:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734027459; cv=none; b=GHc3q4xddAC5IwxZj4yXSRtHAzzsdxb6J65KJTcJ94gBEtw7O6xjpoxEkrZ06cUcGQS2vU8TrXqlXDjWNOyJ2kSOilm2zZcKGwkux7gXChIHXEpHA9+EgVFf6lZtTj1zA2MbADRuQIm+mTnbZANMwfJYj20PxkKWk6/LPjTwLg0=
+	t=1734037215; cv=none; b=hviDV0Dg8XGKk6h07Do4TOTwZ/KNN6ptbdUJQ/CQ7KPOE6/LEQ7jAyC093/5ChAFkt1ycCCgeECZn2SUpXLVXMTy9F6pBuzK3u15Zcl1+tR90x1CiUM8g1nl81mRZ6HxfJjg1hfb2sbp+en13hNo1o6QDbtK6Ppr/Wjinfp+YrE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734027459; c=relaxed/simple;
-	bh=K9rUJCzri+oaOn7aKfbIb4UC1ZQ2SbE8EKQf0/ieN1g=;
-	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=RoavC7vmt2IWzhNFOiCsm3mRCda6MFBucqKBhysVtWl25zlhWxB4o4tOBJS7kAAnnQ7Hy0CUwHxCBSpc+7guAf0aEBZd2DCJzSemo2+J1G99lXo6x1/qrFJPNUsrkzOVMj1uCrEymELYScRo426i47T3H5w5wZ/a2LuoVDgon+k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=bRP2DMgx; arc=none smtp.client-ip=192.30.252.208
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
+	s=arc-20240116; t=1734037215; c=relaxed/simple;
+	bh=kZYnQbNH70H5w2jAlKPVjHNbe3iARUNc9noj6MmRx4k=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=rfDoFtF6BvEkez34eRr13XIR778Lcol46Nj/K4ChvvTFGQbMeuoz4Bred0pKDkk5KBu0w/by81Y2gfUM4qt+uIQksCKQxU+m35FRUscBvyF4a0gqCBl3GvjJE4PfTsHyNKclvFnMim6ObNVgW3ITBcqswfj3dg6ny6Q1qZQlP4Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cjdKxr7j; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="bRP2DMgx"
-Received: from github.com (hubbernetes-node-fcab8d3.ash1-iad.github.net [10.56.173.16])
-	by smtp.github.com (Postfix) with ESMTPA id 911D514084B
-	for <linux-bluetooth@vger.kernel.org>; Thu, 12 Dec 2024 10:17:36 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-	s=pf2023; t=1734027456;
-	bh=A8uc5WOr9CUC8NyEYmDMfsex5mPAUKpQ++dUcGOAs/A=;
-	h=Date:From:To:Subject:List-Unsubscribe:From;
-	b=bRP2DMgxnlUy8cLsl4efNLo5TJh0NzSBJoEZM2QJJjTMLEIVp8ExWF+M92vQCE91w
-	 6qPNwyMYn9md2soGPDwiIukunzvOhFtKFgzOVV9YcfrbjaAYQlqa0dQCktRaol+aUs
-	 uPJrnyr4iZW5thP1PZNO9rBKU2/kQiAiXCh7uwdM=
-Date: Thu, 12 Dec 2024 10:17:36 -0800
-From: BluezTestBot <noreply@github.com>
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/master/b1fd40-40e5eb@github.com>
-Subject: [bluez/bluez] 5f0ec3: tools: Use '>' as prompt end marker
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cjdKxr7j"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B57ADC4CECE;
+	Thu, 12 Dec 2024 21:00:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1734037214;
+	bh=kZYnQbNH70H5w2jAlKPVjHNbe3iARUNc9noj6MmRx4k=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=cjdKxr7jsX5aE0Zt3Dwvrvzpmsb79YK1H153mhaTXKuzcvwwiQW+iWslyKDimZIt3
+	 bTyrdPAlP9B1npKkU1XVs9zFvYKE7JMyhF8pgXPfjcVHAltOJNZKG6/nN6zumKqEf3
+	 2dcIG7RXsgezTKoirIEE2K6JCB/09UhLJDc/8/VuT4xlutPPgaFjJJ/6CPm3MTJnM8
+	 W2kad9hOGoLSy1N/P6IY/VVVzMTjoF46J3HeTo4eOs9ZyRco/741z04kLZu8Ckcdf8
+	 CUUG/sbRPXDfGv2NKgRQLFKFHDASny8UBPPPxs+MR6/U4jeRAkoQzVjpAVlXKbv094
+	 U0giljhMJ1/0g==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 34C1C380A959;
+	Thu, 12 Dec 2024 21:00:32 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v1 1/3] Bluetooth: hci_sync: Fix not setting Random Address
+ when required
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <173403723107.2437918.12876941907710218957.git-patchwork-notify@kernel.org>
+Date: Thu, 12 Dec 2024 21:00:31 +0000
+References: <20241125204211.716883-1-luiz.dentz@gmail.com>
+In-Reply-To: <20241125204211.716883-1-luiz.dentz@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
 
-  Branch: refs/heads/master
-  Home:   https://github.com/bluez/bluez
-  Commit: 5f0ec38851e165265627eb69158dbb336ce3fd02
-      https://github.com/bluez/bluez/commit/5f0ec38851e165265627eb69158dbb336ce3fd02
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2024-12-11 (Wed, 11 Dec 2024)
+Hello:
 
-  Changed paths:
-    M client/main.c
-    M client/mgmt.c
-    M tools/bluetooth-player.c
-    M tools/btpclientctl.c
-    M tools/mesh-cfgclient.c
-    M tools/mesh-gatt/util.c
-    M tools/mesh/util.c
-    M tools/meshctl.c
+This series was applied to bluetooth/bluetooth-next.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-  Log Message:
-  -----------
-  tools: Use '>' as prompt end marker
+On Mon, 25 Nov 2024 15:42:09 -0500 you wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> 
+> This fixes errors such as the following when Own address type is set to
+> Random Address but it has not been programmed yet due to either be
+> advertising or connecting:
+> 
+> < HCI Command: LE Set Exte.. (0x08|0x0041) plen 13
+>         Own address type: Random (0x03)
+>         Filter policy: Ignore not in accept list (0x01)
+>         PHYs: 0x05
+>         Entry 0: LE 1M
+>           Type: Passive (0x00)
+>           Interval: 60.000 msec (0x0060)
+>           Window: 30.000 msec (0x0030)
+>         Entry 1: LE Coded
+>           Type: Passive (0x00)
+>           Interval: 180.000 msec (0x0120)
+>           Window: 90.000 msec (0x0090)
+> > HCI Event: Command Complete (0x0e) plen 4
+>       LE Set Extended Scan Parameters (0x08|0x0041) ncmd 1
+>         Status: Success (0x00)
+> < HCI Command: LE Set Exten.. (0x08|0x0042) plen 6
+>         Extended scan: Enabled (0x01)
+>         Filter duplicates: Enabled (0x01)
+>         Duration: 0 msec (0x0000)
+>         Period: 0.00 sec (0x0000)
+> > HCI Event: Command Complete (0x0e) plen 4
+>       LE Set Extended Scan Enable (0x08|0x0042) ncmd 1
+>         Status: Invalid HCI Command Parameters (0x12)
+> 
+> [...]
 
-This replaces the use of '#' with '>' as prompt end marker since the
-former is used to describe comments on the script which might be
-confused with prompt.
+Here is the summary with links:
+  - [v1,1/3] Bluetooth: hci_sync: Fix not setting Random Address when required
+    https://git.kernel.org/bluetooth/bluetooth-next/c/e8e5b0502559
+  - [v1,2/3] Bluetooth: MGMT: Fix Add Device to responding before completing
+    https://git.kernel.org/bluetooth/bluetooth-next/c/fcd17fe2deb9
+  - [v1,3/3] Bluetooth: MGMT: Mark LL Privacy as stable
+    https://git.kernel.org/bluetooth/bluetooth-next/c/514e14b1a7c3
 
-
-  Commit: d1eb37042d9d2890647f31de38da946e34063433
-      https://github.com/bluez/bluez/commit/d1eb37042d9d2890647f31de38da946e34063433
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2024-12-11 (Wed, 11 Dec 2024)
-
-  Changed paths:
-    M client/bluetoothctl-admin.rst
-    M client/bluetoothctl-advertise.rst
-    M client/bluetoothctl-assistant.rst
-    M client/bluetoothctl-endpoint.rst
-    M client/bluetoothctl-gatt.rst
-    M client/bluetoothctl-mgmt.rst
-    M client/bluetoothctl-monitor.rst
-    M client/bluetoothctl-player.rst
-    M client/bluetoothctl-scan.rst
-    M client/bluetoothctl-transport.rst
-    M client/bluetoothctl.rst
-
-  Log Message:
-  -----------
-  bluetoothctl: Update documentation to use '>' as prompt end marker
-
-This replaces the use of '#' with '>' as prompt end marker since the
-former is used to describe comments on the script which might be
-confused with prompt.
-
-
-  Commit: 560dcd2ea3d267674c6ab5f7c60c62cd6ed4b6f7
-      https://github.com/bluez/bluez/commit/560dcd2ea3d267674c6ab5f7c60c62cd6ed4b6f7
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2024-12-11 (Wed, 11 Dec 2024)
-
-  Changed paths:
-    M src/shared/hci.c
-    M src/shared/hci.h
-
-  Log Message:
-  -----------
-  share/hci: Introduce bt_hci_send_data
-
-This introduces bt_hci_send_data which can be used to send ACL, SCO or
-ISO data packets to the underline HCI socket.
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
-  Commit: 5527c88bc717439e8d11f9ffffc502a1b2fa785f
-      https://github.com/bluez/bluez/commit/5527c88bc717439e8d11f9ffffc502a1b2fa785f
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2024-12-11 (Wed, 11 Dec 2024)
-
-  Changed paths:
-    M Makefile.tools
-    A client/hci.c
-    A client/hci.h
-    M client/main.c
-
-  Log Message:
-  -----------
-  client: Add HCI submenu
-
-This adds HCI submenu:
-
-Menu hci:
-Available commands:
--------------------
-open <index> <chan=raw,user>                      Open HCI channel
-cmd <opcode> [parameters...]                      Send HCI data
-send <type=acl,sco,iso> <handle> [data...]        Send HCI data
-register <event>                                  Register HCI event handler
-unregister <event>                                Unregister HCI event handler
-close                                             Close HCI channel
-
-Examples:
-
-In order to open a user channel the controller needs to be power off
-first:
-bluetooth# power off
-bluetooth# hci.open 0 user
-HCI index 0 user channel opened
-
-Then commands can be sent hci.cmd, so the following is sending HCI reset:
-bluetooth# hci.cmd 0x0c03
-HCI Command complete:
-  00
-
-For sending data packets to specific handle hci.send can be used:
-bluetooth# hci.send acl 0x0000
-
-
-  Commit: 6905331e2cd8894040b18d1711444fb5e654b958
-      https://github.com/bluez/bluez/commit/6905331e2cd8894040b18d1711444fb5e654b958
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2024-12-11 (Wed, 11 Dec 2024)
-
-  Changed paths:
-    M Makefile.tools
-    A client/bluetoothctl-hci.rst
-
-  Log Message:
-  -----------
-  client: Add bluetoothctl-hci.1 man page
-
-This adds bluetoothctl-hci.rst which is then converted to
-bluetoothctl-hci.1 using rst2man.
-
-
-  Commit: 40e5ebd0cb2cb3c3957fec710a18f29efe4b6e65
-      https://github.com/bluez/bluez/commit/40e5ebd0cb2cb3c3957fec710a18f29efe4b6e65
-  Author: Damodar Reddy GangiReddy <quic_dgangire@quicinc.com>
-  Date:   2024-12-12 (Thu, 12 Dec 2024)
-
-  Changed paths:
-    M tools/obexctl.c
-
-  Log Message:
-  -----------
-  tools/obexctl: Add support for system/session bus
-
-Currently obexctl only uses session bus.
-As obexd has been enabled support for both session and system bus.
-Configuring obexctl to use session/system bus during the runtime
-if the name is available over session or system bus.
-
-
-Compare: https://github.com/bluez/bluez/compare/b1fd40996000...40e5ebd0cb2c
-
-To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
