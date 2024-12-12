@@ -1,141 +1,144 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27DCC259481;
-	Thu, 12 Dec 2024 07:16:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 798262063C2
+	for <linux-bluetooth@vger.kernel.org>; Thu, 12 Dec 2024 08:44:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733987795; cv=none; b=DB6QaQ/FppntPcWQEbNNmZCWvpORfTNGKyWPvrbrgKBs8egyLaNRhWrT23Vo7zTTMgvL1TLrvhe2dtrsNUF377xjduNIg11lA88f45MGD88jvkIqJyjC+f0JrX0YdOABlQV6VM+JlNDDgn5SPliPQ+s5NTQ2KX9S6ToDWk09A/g=
+	t=1733993073; cv=none; b=KArkzjb7+4xXT5AUJRh4asCSCn6JBYRplFJISccTrcB8ch19rdRQb8Tb7LonCB5wRm9wS79/nENGNPHjYA8apylncBTMQmBmkRm/c0nUa5VurXfkZgMnkasYfyhNrZP1waGZ45sizwkCgsKx2vaLAI57rMGdryXDzGndvG2/b8g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733987795; c=relaxed/simple;
-	bh=UqElnz4uGe42lv9Y3Bp2dv+DQRNjaTIKlj+yzpAL/D8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=QrDZK2dmGiDu1QJ/IDKcpb7xRAxalVKM8ZFEupTJ9MH5qaoHZDNVQe8ftu4p6SAMNLIA7AW0yiNZCAUQ5EZr9Bc/Z0cH4a+91lSKiLwqSq85aiW8HCW0I24tp9kmqDbACLQ9K1/tPIOpKdiqXdAgcD7h1ep3pMEqH2W+nh65k/A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=L17uqeCn; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1733993073; c=relaxed/simple;
+	bh=pu9hTPtCMtObxpP0cwNSw8LchlWDYWdY37q88nHLCHI=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=bF94lkhIpfOpNzLSDRlg/PsMAvbFwZprh0b68pxSK6W9pnOgyIF0w0Q9ngd67CMY3QwnMD7SpII9wXnma8mI61XLTfl6hfiAYzOTOb2t7eaLWLCTbwmx2PjOXhl8acykifSz8G6rkij59gVsgwmAc+YIkAznVChVa+kzVaVgBNo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OvOwaPua; arc=none smtp.client-ip=209.85.208.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="L17uqeCn"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CD781C4CECE;
-	Thu, 12 Dec 2024 07:16:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733987794;
-	bh=UqElnz4uGe42lv9Y3Bp2dv+DQRNjaTIKlj+yzpAL/D8=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=L17uqeCnxXYViMuE6E/i1jKmjOJem5LAK2OlImKGJthJfc1nhT6sze9YR6Ck2BETO
-	 W0I5U6Xfr5HTGbEQ+/kyjq8IJDgS9Jxi+geZpUzUBTLmw7s3OjKRoYxGQKey2zS6Fm
-	 QDkj519aYhYY9CwZeiiZYr0M6gfuScf2P8MdfDcmSoCXFHiOlcKoLnNdQaemj+8lwK
-	 1piWOmx05rf28WX3LghmgrGG93oNfdNiqHHH0EI/bLXIMUfzC29ULzWhcMUxPmCUap
-	 avnMZgNr7DiiEvOuFSEG1YyKYZI82Eq700zyFPJEMZzki3t6+AvW1WAhyI3Of78hlG
-	 WzPKeVs4fzckA==
-Message-ID: <ecb8535a-d421-4774-88d3-e904bb08a0e4@kernel.org>
-Date: Thu, 12 Dec 2024 08:16:26 +0100
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OvOwaPua"
+Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-5d4e2aa7ea9so569690a12.2
+        for <linux-bluetooth@vger.kernel.org>; Thu, 12 Dec 2024 00:44:31 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1733993069; x=1734597869; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=SZd0Gbu6XQwYCQcGohlZ2WR8NsphWYmvDVrFlMqvsUY=;
+        b=OvOwaPuatLkgELAB5OSLupBGKIu0iuwKt57sqJD8pCJYRgutMt33CA3HCRzySyJ89t
+         SV2/ELBEWl4sfvIqWdvBdmY/yoPpluUzHvW4w4TPW3e37foMkpVljGqgzzvi4MgiXEtO
+         oP4R0jani1TGEx2LPENsnAeqz0mGeu9mI5EnLM+4yutY/npvucCXbeFrwk/ZwWpIfwzt
+         9qzvRnDW6vPv5fgsZXAZMR1Klh/0EclSioZ6ZUfM8JARjRLVLIGt5XNAvnChkw2E+byf
+         Z8Zsh2Br36MFpiG0j5j4ha0ifL01elL7FRV4eB6n83QOX5sbYhUZGaF7SKiivTDoNcmH
+         yHfA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733993069; x=1734597869;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=SZd0Gbu6XQwYCQcGohlZ2WR8NsphWYmvDVrFlMqvsUY=;
+        b=iQ0X8fROtzAkeJ89RNd8D0+w2tQY+Gw0smA8v0xjpTXkmNQ0xB7TWiACxOud60jRr3
+         Lm7ONZE4T396tsm2ibvlEgfBailkcnJwitJWdDdUX0RO2q3hdLEiD1ewugQTewlCqclQ
+         5gGveoMYvJddd25OHhfzoKBp90Cx+6tzrewDG1gaMHf0ncSBXWyRv0Rj6PRbbddF71b4
+         NhbnBwkjXCi1lfiMylh3d2oJVUywNgUkeLiGS+EXUA62AqYsX4xSIoeNgDAVIfOtO978
+         ynGBJh2InWq0ETReh+vHV3GAvU5fRIloB1PHvf65hJoFdmxy6kAiwCxY+nEm6pfGyZt6
+         DOHQ==
+X-Gm-Message-State: AOJu0YwBpTQH1IkSow4TLuYdnjnaENOUtQWpj0hPgECSMOPYaylZDMus
+	afOpj5DDWH2tJMrbPM4CY5ZFRqZwg9fqCtphCPIvRujf2/qBvH7knljbXQ==
+X-Gm-Gg: ASbGncsgeUUdim0V9fYzLtI1mfPpdl7/CoGRpKRugyCBxasXMVOTCeqnkSVHs6vgXOW
+	GY8+5PiirelZ2SxfuKLgsiiWPbyVmJmmYpFafr2lGVfJGOvwLXa23MG7lfo1FvVpPC2GUWF/zWL
+	9KqoenFAXLTL04RaU1qlG9kT8nUC0dl3aabmnpMo2y8sPqmyMhFYlSUOgRBKpgxSMVIcC2yt2fL
+	b7Yu1JCY2vH5dSCUQPn3U5Re/u58LKZJbAQCUy47+4l8LzYf0iQtT2bcObIPh16Rlm4PMBqdLYG
+	eruky3727AqFkTAW0F8f9J2G5jCamM7vLydq98MudN0=
+X-Google-Smtp-Source: AGHT+IHtRMSM3zo+riWXa8ceQO8ws0eqTJpz2gA4PkdG99SzjPXht7cOhTYRpNBkK2n60ECDVsjv1w==
+X-Received: by 2002:a05:6402:1ecf:b0:5d0:e3fa:17e2 with SMTP id 4fb4d7f45d1cf-5d54763c067mr4423a12.11.1733993069164;
+        Thu, 12 Dec 2024 00:44:29 -0800 (PST)
+Received: from raspberrypi.home (46.205.203.47.nat.ftth.dynamic.t-mobile.pl. [46.205.203.47])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5d42a754cb0sm2948476a12.88.2024.12.12.00.44.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 12 Dec 2024 00:44:28 -0800 (PST)
+From: Arkadiusz Bokowy <arkadiusz.bokowy@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Arkadiusz Bokowy <arkadiusz.bokowy@gmail.com>
+Subject: [PATCH 1/2] sbc: Pass const pointer if structure is not modified
+Date: Thu, 12 Dec 2024 09:44:18 +0100
+Message-Id: <20241212084419.1326427-1-arkadiusz.bokowy@gmail.com>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 1/4] dt-bindings: net: bluetooth: qca: Expand
- firmware-name property
-To: "Cheng Jiang (IOE)" <quic_chejiang@quicinc.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Rob Herring
- <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Conor Dooley <conor+dt@kernel.org>, Bjorn Andersson <andersson@kernel.org>,
- Konrad Dybcio <konradybcio@kernel.org>,
- Balakrishna Godavarthi <quic_bgodavar@quicinc.com>,
- Rocky Liao <quic_rjliao@quicinc.com>, linux-bluetooth@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-arm-msm@vger.kernel.org, quic_jiaymao@quicinc.com,
- quic_shuaz@quicinc.com, quic_zijuhu@quicinc.com, quic_mohamull@quicinc.com
-References: <20241210151636.2474809-1-quic_chejiang@quicinc.com>
- <20241210151636.2474809-2-quic_chejiang@quicinc.com>
- <vbwg7djb4me6i4ow2q74ltqjxvkxeulhzyq4n6ak7aifhtf36f@x66pjje2iu6u>
- <62afbaea-67b1-4572-9e78-d1dbe5fae20a@quicinc.com>
- <f818f089-0490-42da-9aee-1a7006c11978@kernel.org>
- <65fd0932-4519-44ac-ba9d-55ee97b43233@quicinc.com>
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 fv0=
-In-Reply-To: <65fd0932-4519-44ac-ba9d-55ee97b43233@quicinc.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 11/12/2024 11:16, Cheng Jiang (IOE) wrote:
-> Hi Krzysztof,
-> 
-> On 12/11/2024 5:48 PM, Krzysztof Kozlowski wrote:
->> On 11/12/2024 10:39, Cheng Jiang (IOE) wrote:
->>>>>
->>>>> diff --git a/Documentation/devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml b/Documentation/devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml
->>>>> index 7bb68311c..2782d2325 100644
->>>>> --- a/Documentation/devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml
->>>>> +++ b/Documentation/devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml
->>>>> @@ -101,7 +101,10 @@ properties:
->>>>>    max-speed: true
->>>>>  
->>>>>    firmware-name:
->>>>> -    description: specify the name of nvm firmware to load
->>>>> +    description:
->>>>> +      If one item is present, specify the name of the NVM firmware to load.
->>>>> +      If two items are present, the first item specifies the name of the NVM,
->>>>> +      and the second specifies the name of the rampatch firmware to load.
->>>>
->>>> Don't repeat constraints in free form text. Use proper constraints so
->>>> you can validate your DTS. And then actually do validate your DTS...
->>>>
->>> It seems unnecessary to add this description, so I will drop this change. Is that okay?
->>
->> You need to list the items and describe them. See how all other bindings
->> do it.
->>
-> The firmware names are not fixed strings; they vary depending on the chip, board, or platform.
+---
+ sbc/sbc.c |  8 ++++----
+ sbc/sbc.h | 10 +++++-----
+ 2 files changed, 9 insertions(+), 9 deletions(-)
 
-Instead of replying immediately and pushing this back again on us, read
-other bindings. There are nowhere "fixed strings".
+diff --git a/sbc/sbc.c b/sbc/sbc.c
+index 886806d..428c8ee 100644
+--- a/sbc/sbc.c
++++ b/sbc/sbc.c
+@@ -1378,7 +1378,7 @@ SBC_EXPORT void sbc_finish(sbc_t *sbc)
+ 	memset(sbc, 0, sizeof(sbc_t));
+ }
+ 
+-SBC_EXPORT size_t sbc_get_frame_length(sbc_t *sbc)
++SBC_EXPORT size_t sbc_get_frame_length(const sbc_t *sbc)
+ {
+ 	int ret;
+ 	uint8_t subbands, channels, blocks, joint, bitpool;
+@@ -1407,7 +1407,7 @@ SBC_EXPORT size_t sbc_get_frame_length(sbc_t *sbc)
+ 	return ret;
+ }
+ 
+-SBC_EXPORT unsigned sbc_get_frame_duration(sbc_t *sbc)
++SBC_EXPORT unsigned sbc_get_frame_duration(const sbc_t *sbc)
+ {
+ 	uint8_t subbands, blocks;
+ 	uint16_t frequency;
+@@ -1448,7 +1448,7 @@ SBC_EXPORT unsigned sbc_get_frame_duration(sbc_t *sbc)
+ 	return (1000000 * blocks * subbands) / frequency;
+ }
+ 
+-SBC_EXPORT size_t sbc_get_codesize(sbc_t *sbc)
++SBC_EXPORT size_t sbc_get_codesize(const sbc_t *sbc)
+ {
+ 	uint16_t subbands, channels, blocks;
+ 	struct sbc_priv *priv;
+@@ -1470,7 +1470,7 @@ SBC_EXPORT size_t sbc_get_codesize(sbc_t *sbc)
+ 	return subbands * blocks * channels * 2;
+ }
+ 
+-SBC_EXPORT const char *sbc_get_implementation_info(sbc_t *sbc)
++SBC_EXPORT const char *sbc_get_implementation_info(const sbc_t *sbc)
+ {
+ 	struct sbc_priv *priv;
+ 
+diff --git a/sbc/sbc.h b/sbc/sbc.h
+index 9b8c6f2..b7323e8 100644
+--- a/sbc/sbc.h
++++ b/sbc/sbc.h
+@@ -86,15 +86,15 @@ ssize_t sbc_encode(sbc_t *sbc, const void *input, size_t input_len,
+ 			void *output, size_t output_len, ssize_t *written);
+ 
+ /* Returns the compressed block size in bytes */
+-size_t sbc_get_frame_length(sbc_t *sbc);
++size_t sbc_get_frame_length(const sbc_t *sbc);
+ 
+-/* Returns the time one input/output block takes to play in msec*/
+-unsigned sbc_get_frame_duration(sbc_t *sbc);
++/* Returns the time one input/output block takes to play in msec */
++unsigned sbc_get_frame_duration(const sbc_t *sbc);
+ 
+ /* Returns the uncompressed block size in bytes */
+-size_t sbc_get_codesize(sbc_t *sbc);
++size_t sbc_get_codesize(const sbc_t *sbc);
+ 
+-const char *sbc_get_implementation_info(sbc_t *sbc);
++const char *sbc_get_implementation_info(const sbc_t *sbc);
+ void sbc_finish(sbc_t *sbc);
+ 
+ #ifdef __cplusplus
+-- 
+2.39.5
 
-
-Best regards,
-Krzysztof
