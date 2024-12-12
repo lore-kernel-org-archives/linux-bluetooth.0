@@ -1,80 +1,108 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-17.smtp.github.com (out-17.smtp.github.com [192.30.252.200])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17DCB1B1D61
-	for <linux-bluetooth@vger.kernel.org>; Thu, 12 Dec 2024 21:10:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E75913FD72
+	for <linux-bluetooth@vger.kernel.org>; Thu, 12 Dec 2024 21:12:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.200
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734037815; cv=none; b=iVmWDh4Ur9d/aJDD9VC+VQeqCWuj6eh9n5+kuhCz141PWwhQSXk0Arkv7skLVtHiDg9f3Zi318AVR4eKwSl3/Fp83kl3xFstrdqhot941HwtQ2OxSzz9evYSXg0jigQjj/52y0htReX3ysxvE6u/COI5HucOw25sf4fvZHbVICI=
+	t=1734037941; cv=none; b=eNbTRh/c9owXVDHY9iKiOmZXpxSjUuWVvVsiaTN+V5tErpzsHIdyYPJP3jJBcI2nWJ2Gx7kJrdBqmCxtW1RoKbDxsO3xwCrwd9+cVT464BNsFDWz4zcPV/8vdQWl8rAeQp0Txp9okLpCsXdolbhLnaeHdSZKfcxXbOjSw0gJb8g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734037815; c=relaxed/simple;
-	bh=1QeqjgFuaj9omXYoOyLvRu4RQludERvw22B0bRnFIi8=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=oDoDbCNr4tNrz/HCti8sODo68LNDBBYSaqDEsuYcuYi57TRAOGwytLOOH4tsZ+D5q9bLs3Lka3zNpCtIAtemzSF7Jj6pRFAASspUePL+/yHL3JKYjD+6L5aSz9eHlf9hVNfpeOXEjtc4EOzsDnJaSDiu7NFMeYdG5MGuN5N9DaI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=an7rrA4r; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1734037941; c=relaxed/simple;
+	bh=l6LQF6IgRoySvyY4xlIC+NZv4S3Kw5thxPT7/hUoChE=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=DHkd5BTqh7TBfrLbkMKb+p0oCVQTP17qkTYAhXvEoqtJ8YVPhG24mnz2tL9keJKiMvp8LP5zXIaI1cLo1BJcpSLdoXoWIS2XyGQjrCxjDPzaUhUn6JeQIdqzuU+l+phT28YvGxNkV5gVRcBF9uHN0iG7AKJv80aTpgLVQvlsvZ8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=BIh612Zr; arc=none smtp.client-ip=192.30.252.200
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="an7rrA4r"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B5978C4CECE;
-	Thu, 12 Dec 2024 21:10:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734037814;
-	bh=1QeqjgFuaj9omXYoOyLvRu4RQludERvw22B0bRnFIi8=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=an7rrA4rWdP3SxwKg5mOVfcKTm9pnStS1ucvefkPEWPW9k8gDU2A5SS6TpCG/bUQX
-	 rJlyS+Pmxp7Hmss54QGTVxqYsDiLcNlxtnpqEuWaQ0T28RVBj05PCNTiCkwimYot7d
-	 /LelqlooWO5rfjL03LpK/4LnhncdGMrHebHDW0Q5SdTufqKvd83w4EReuug8n8QUbW
-	 9XU9CW+qQeCP1XrsBAkl8/Viqd2PKTBxuY30gejMCwSUg8sVNjleNnDr+0fG9sN0FL
-	 mpDI2wxmxBMJIyeHCE9Mn0xcBsxMrVEedvZ4fcBYLTeek40Nc/yxB3UyZMUgleDMA/
-	 w4+HgAo42eAKw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 34484380A959;
-	Thu, 12 Dec 2024 21:10:32 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="BIh612Zr"
+Received: from github.com (hubbernetes-node-0243b98.va3-iad.github.net [10.48.131.41])
+	by smtp.github.com (Postfix) with ESMTPA id 709A24E0978
+	for <linux-bluetooth@vger.kernel.org>; Thu, 12 Dec 2024 13:12:19 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1734037939;
+	bh=cNnOkEP8OlFGTgdL9FN4qYLWFK8wG0KVarRaeWLAXPI=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=BIh612Zr1wrA2cC0UizTCmsBdEXinU/OxIjTxBv1C1Kjt3VemHxazWt4qeKcu9W9U
+	 oD/tjRGtPe7/922MllTksjSNflTIyfqkX15Jm0Qlb+EtoVbCmJBFjweHH3Edpv7Nit
+	 5ozi3bobN+in2iPito/NWkh9vM96gF4KCcc/ZvEw=
+Date: Thu, 12 Dec 2024 13:12:19 -0800
+From: Luiz Augusto von Dentz <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/master/40e5eb-92f3a3@github.com>
+Subject: [bluez/bluez] c9d70c: main.conf: Add LE.CentralAddressResolution
+ option
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH BlueZ v1 1/3] main.conf: Add LE.CentralAddressResolution
- option
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <173403783101.2440486.2304036636574738171.git-patchwork-notify@kernel.org>
-Date: Thu, 12 Dec 2024 21:10:31 +0000
-References: <20241125204711.719853-1-luiz.dentz@gmail.com>
-In-Reply-To: <20241125204711.719853-1-luiz.dentz@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-Hello:
+  Branch: refs/heads/master
+  Home:   https://github.com/bluez/bluez
+  Commit: c9d70ca65f9ad84740d5ba0d3447ddc682a18ab7
+      https://github.com/bluez/bluez/commit/c9d70ca65f9ad84740d5ba0d3447ddc682a18ab7
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2024-12-12 (Thu, 12 Dec 2024)
 
-This series was applied to bluetooth/bluez.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+  Changed paths:
+    M lib/mgmt.h
+    M src/adapter.c
+    M src/btd.h
+    M src/device.c
+    M src/device.h
+    M src/gatt-database.c
+    M src/main.c
+    M src/main.conf
 
-On Mon, 25 Nov 2024 15:47:08 -0500 you wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> 
-> This adds CentralAddressResolution option to LE group which controls the
-> GATT attribute of the same name using the new MGMT Device Flag with the
-> fallback to LL Privacy experimental UUID.
-> 
-> Fixes: https://github.com/bluez/bluez/issues/1028
-> 
-> [...]
+  Log Message:
+  -----------
+  main.conf: Add LE.CentralAddressResolution option
 
-Here is the summary with links:
-  - [BlueZ,v1,1/3] main.conf: Add LE.CentralAddressResolution option
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=c9d70ca65f9a
-  - [BlueZ,v1,2/3] monitor: Add support for Address Resoluton flag
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=7e0fe7d5c143
-  - [BlueZ,v1,3/3] mgmt-tester: Fix LL Privacy tests
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=92f3a3b108c2
+This adds CentralAddressResolution option to LE group which controls the
+GATT attribute of the same name using the new MGMT Device Flag with the
+fallback to LL Privacy experimental UUID.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+Fixes: https://github.com/bluez/bluez/issues/1028
 
 
+  Commit: 7e0fe7d5c143052613b27ec3986b70e65ff88ac4
+      https://github.com/bluez/bluez/commit/7e0fe7d5c143052613b27ec3986b70e65ff88ac4
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2024-12-12 (Thu, 12 Dec 2024)
+
+  Changed paths:
+    M monitor/packet.c
+
+  Log Message:
+  -----------
+  monitor: Add support for Address Resoluton flag
+
+This adds proper decoding for Address Resolution flag.
+
+
+  Commit: 92f3a3b108c22e3395c9dab0acefdfb894404cfe
+      https://github.com/bluez/bluez/commit/92f3a3b108c22e3395c9dab0acefdfb894404cfe
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2024-12-12 (Thu, 12 Dec 2024)
+
+  Changed paths:
+    M tools/mgmt-tester.c
+
+  Log Message:
+  -----------
+  mgmt-tester: Fix LL Privacy tests
+
+Now that LL Privacy is triggered via Set Device Flags tests that used
+the Set Experimental features needs to be fixed so they work as
+intended.
+
+
+Compare: https://github.com/bluez/bluez/compare/40e5ebd0cb2c...92f3a3b108c2
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
