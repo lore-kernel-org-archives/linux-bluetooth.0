@@ -1,48 +1,70 @@
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93826210F6A;
-	Thu, 12 Dec 2024 10:46:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C5C21DDA14
+	for <linux-bluetooth@vger.kernel.org>; Thu, 12 Dec 2024 11:56:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734000418; cv=none; b=ixf/XU9HmnOl9cq2JR6gTJCKkF7N/f4eCqw+G958OZvMgB0b+n1Kw/TbY9i2TOEkbyJJP4hnT63d57gg7s9v1Nv7YM2fF8IaTlqIP2RST2YL4/OJZ+0fC1ZsG8P10RYaqyKNSfjQPWlK2LCQ9tUG511jwWEl9KnNeTAHXNpJr0s=
+	t=1734004563; cv=none; b=acDu6Q02tCDLyyXHGTVF9Yjk8qA0atpWAu64HQ8fTyOr/Wf2V3yhRg8L76UmIodZY5e0YMC4P2eQPxaw26Csh1McL6vcYaQ6d7vTIJ/2xxT9Ayk7bylSd/ImTm/MCwJbKc8Lq3hpI8zzLKYtojNJSu9nD3cMiLG1H8KNcDkquS4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734000418; c=relaxed/simple;
-	bh=cB1uUmAhU+aHRtpBwlueGez8aRvqoT36e/Nk75OuHkY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=Vj9mh3Y5W4qT723Se+FDwIVtAmH29VLmpOTgdwkVmHeptW2bb48NPXqglpRPb6os6P3JX8lCAmmiw5AOghNbQlmM2LNBJvXYuz2UQuL6AIX9k0I91O0R+MwqS49zY22cSDk0RvMDPMcb1k0QqbXj+jd1kGXvLfQ9leRHAR3YxC4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=ID6nVJSB; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+	s=arc-20240116; t=1734004563; c=relaxed/simple;
+	bh=2nF4sMbNNcAbjh6M6CI4/V5hj1XPKTswrGt6J91nTus=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Rec/w/sYWNJ/bCFYZEwzaJOYaVwPTkHW90Xn0RryRDs8rnRO/Xi0+LzOFrajDFSJV0FoMJn3kb36lrb8RntE72Imao+xOPmjOxpmTutxgeDBfqe4CBilfmEVcHfC7PLaN9pPxoRO8a+WLOzo8ywfJ9J7ocXFSzOIfhljtiH6QmM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=QoMICHdr; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="ID6nVJSB"
-Received: from pps.filterd (m0279872.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4BC7KleG015124;
-	Thu, 12 Dec 2024 10:46:49 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	jEIIHkgbMQKsYOwH4G4GkI9cirdEanSGZxZwk+xUnvg=; b=ID6nVJSBLfY7ECAb
-	W4q9KKKp3UUseUMBlTyhHVkWATqNr23vmvkWiayS7a0ArUMKbMe6xhZ1r36KnEZO
-	Zx2yJC4iNJnng5DH9/jb9KIWIu5y3nm1p9ASRVUQiPUoKiaXA98PyjhBArOZfAug
-	7Ecg5EyeExEvhr2Om9OfGpDdbLGHeNd17H9E9EYM2T6llNJOtCKdFp27/PYAKhKE
-	LjvcULXJZA6rZqqf/q6xqInAuJvsn+p2NGfTOKNBXaFdSQvhZ0RsmbsJ2+/Gxo99
-	Cl3AiOjuUnlm5sCBSSL2ANCitqiEG9S7riMUwhihjklR956V3V3K3M3ioTq6TOjG
-	e6WiBA==
-Received: from nalasppmta03.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 43f7dpkuqm-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 12 Dec 2024 10:46:49 +0000 (GMT)
-Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
-	by NALASPPMTA03.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 4BCAkirx023600
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 12 Dec 2024 10:46:45 GMT
-Received: from [10.216.23.48] (10.80.80.8) by nalasex01a.na.qualcomm.com
- (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Thu, 12 Dec
- 2024 02:46:37 -0800
-Message-ID: <3c313557-ca99-4e6f-9d71-641e8c256126@quicinc.com>
-Date: Thu, 12 Dec 2024 16:16:33 +0530
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QoMICHdr"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1734004561;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=3euoebI4IXSCrPQSncwT3g7j7yaCMbga1TfcWV4sQzs=;
+	b=QoMICHdrrV/gwbDIOAv9fHevt7SxwbRzoBeZllMY0Iv/bZKXq2hsjXeUfwxqZNIvLtUnVl
+	HlAWokDrdTEZeMbMH6hEh/iBCauE/fn+oVO3nNeWccEKRNY3mWyaH1hThb7ua5sdwc/+iZ
+	la9MWFQGCBiuXToFME5WAqnOgHFDz2w=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-637-kQE0kSbhOAa2Yz5KWfP6nw-1; Thu, 12 Dec 2024 06:55:59 -0500
+X-MC-Unique: kQE0kSbhOAa2Yz5KWfP6nw-1
+X-Mimecast-MFC-AGG-ID: kQE0kSbhOAa2Yz5KWfP6nw
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-385d52591d6so313617f8f.1
+        for <linux-bluetooth@vger.kernel.org>; Thu, 12 Dec 2024 03:55:59 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1734004558; x=1734609358;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=3euoebI4IXSCrPQSncwT3g7j7yaCMbga1TfcWV4sQzs=;
+        b=SV1fK1o0AovPZpz5qPHmEyc8kZTnIDYh1zfwqVJbshsQWegwt94NvcPzVVaXK86GOq
+         tF3z6qf6pjEyb2z+uetAq7fDwXgcNcny9BGhMXabZZu1ZpZrRMcgNMQ/ZUbLZwCp2qz1
+         7TzHcYVJ8D8KdfwcMr6atDKv9uxE2/ZwHm+n8IBtJftCJZ94UN4fY339SJIXtrI9VGYw
+         uEbD6Fpo9uDnV8UX2niZthl7XR12y54oAyPI39TRNC/771+t7md4BRcUi4hD/hhT2+NB
+         IuphjXabvEHiLCQBq4zpTmF6pWimpQ2sOQbEj8NVcxX8/MxiOEWY77wSJY1lTUexQYzu
+         YmBg==
+X-Gm-Message-State: AOJu0Yz2BcGq0jkVjeHqcvsXjLxClqgUGchuJyMAKoxvJEpgaIm8GZ96
+	S/HAFVb+e6xlVANQVqp2Dc53/vi9A0xvrv/qUkyeRR5JhdcwjgzM+gOS6MBrHn4XaO1Qe1ilmhl
+	zLXuE1mLjQ6iV/R4ZNzTiNOMP2H4nq6T9G/oHPR/F/p8tOiA3M+U3Fz3bSrFLjD8aiQ==
+X-Gm-Gg: ASbGncswKrKZ3Fn5ZW0tP3GsIlC8yFnycRDDCChv/dWuqYswprecSjzxxCX9MAb5VTS
+	+qVu0UaaUUK0aO60APZ2HN+DPR7rBVldUTPf6X8IMoHWxMQiQbhhugXxQ7hEw1jtzfz/NbUziva
+	z68MGh19MzTCP9+IOiSpPTvVMpMkZhKaPQkEReVHxP2NSDEgb9Uy546ITWNoIhf/8xjugEnE4GA
+	38uk2GyD+mrwrfkZMS7Cm6hFVlkQNsG1xUMxOpyYj2Zzl5qp77fAz/r6Aueu5h8VSCym6w+iv1e
+	+8VkKqU=
+X-Received: by 2002:a5d:59ae:0:b0:386:4244:15c7 with SMTP id ffacd0b85a97d-387888628d6mr2044443f8f.25.1734004558329;
+        Thu, 12 Dec 2024 03:55:58 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEcPhZnYsOjIwfm7ByMsW6dzEWzI5foPYWVqg+0x2zxmXyXth64gr4How96aoMJjPfh8zMifg==
+X-Received: by 2002:a5d:59ae:0:b0:386:4244:15c7 with SMTP id ffacd0b85a97d-387888628d6mr2044432f8f.25.1734004558004;
+        Thu, 12 Dec 2024 03:55:58 -0800 (PST)
+Received: from [192.168.88.24] (146-241-48-67.dyn.eolo.it. [146.241.48.67])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4362559ef66sm14560265e9.25.2024.12.12.03.55.56
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 12 Dec 2024 03:55:56 -0800 (PST)
+Message-ID: <ba32a8c5-3d90-437e-a4bc-a67304230f79@redhat.com>
+Date: Thu, 12 Dec 2024 12:55:55 +0100
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -50,135 +72,39 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 0/4] Enable Bluetooth on qcs6490-rb3gen2 board
-To: "Rob Herring (Arm)" <robh@kernel.org>
-CC: <linux-arm-msm@vger.kernel.org>, <linux-bluetooth@vger.kernel.org>,
-        "Bjorn
- Andersson" <andersson@kernel.org>,
-        Konrad Dybcio <konradybcio@kernel.org>, <quic_anubhavg@quicinc.com>,
-        Mark Brown <broonie@kernel.org>,
-        "Bartosz
- Golaszewski" <bartosz.golaszewski@linaro.org>,
-        <linux-pm@vger.kernel.org>, <quic_mohamull@quicinc.com>,
-        <quic_hbandi@quicinc.com>, <devicetree@vger.kernel.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        "Luiz
- Augusto von Dentz" <luiz.dentz@gmail.com>,
-        Liam Girdwood
-	<lgirdwood@gmail.com>,
-        Conor Dooley <conor+dt@kernel.org>, <linux-kernel@vger.kernel.org>,
-        Krzysztof Kozlowski <krzk+dt@kernel.org>,
-        Bartosz Golaszewski <brgl@bgdev.pl>
-References: <20241209103455.9675-1-quic_janathot@quicinc.com>
- <173386568587.497565.1413799827375300987.robh@kernel.org>
+Subject: Re: pull request: bluetooth 2024-12-11
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>, davem@davemloft.net,
+ kuba@kernel.org
+Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
+References: <20241211172115.1816733-1-luiz.dentz@gmail.com>
 Content-Language: en-US
-From: Janaki Ramaiah Thota <quic_janathot@quicinc.com>
-In-Reply-To: <173386568587.497565.1413799827375300987.robh@kernel.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nalasex01a.na.qualcomm.com (10.47.209.196)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: ZFQ2FmKDgk_xdmQS2RW5CYLrDTAF7MM-
-X-Proofpoint-ORIG-GUID: ZFQ2FmKDgk_xdmQS2RW5CYLrDTAF7MM-
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
- definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 spamscore=0
- priorityscore=1501 lowpriorityscore=0 phishscore=0 clxscore=1015
- mlxlogscore=999 mlxscore=0 adultscore=0 bulkscore=0 malwarescore=0
- impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2411120000 definitions=main-2412120076
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20241211172115.1816733-1-luiz.dentz@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
+On 12/11/24 18:21, Luiz Augusto von Dentz wrote:
+> The following changes since commit 3dd002f20098b9569f8fd7f8703f364571e2e975:
+> 
+>   net: renesas: rswitch: handle stop vs interrupt race (2024-12-10 19:08:00 -0800)
+> 
+> are available in the Git repository at:
+> 
+>   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2024-12-11
+> 
+> for you to fetch changes up to 69e8a8410d7bcd3636091b5915a939b9972f99f1:
+> 
+>   Bluetooth: btmtk: avoid UAF in btmtk_process_coredump (2024-12-11 12:01:13 -0500)
 
+On top of this I see a new build warning:
 
-On 12/11/2024 3:12 AM, Rob Herring (Arm) wrote:
-> 
-> On Mon, 09 Dec 2024 16:04:51 +0530, Janaki Ramaiah Thota wrote:
->> - Patch 1/4 Add description of the PMU of the WCN6750 module.
->> - Patch 2/4 add and enable BT node for qcs6490-rb3gen board.
->> - Patch 3/4 use the power sequencer for wcn6750.
->> - Patch 4/4 add support for the WCN6750 PMU.
->>
->> ----
->> Changes from v4:
->> * Added reviewed tag by Krzysztof in p1
->> * Updated the p2 commit message with sw_ctrl and wifi-enable are
->>    handled in wifi FW.
->> * Added blank line between the nodes in p2
->> * Placed the structures in proper order in p4
->> * Link to v4: https://lore.kernel.org/all/20241204131706.20791-1-quic_janathot@quicinc.com/
->>
->> Changes from v3:
->> * Defined the PMU node and used the its output to power up BT
->> * Used power sequencer for wcn wcn6750 module
->> * Split the patch to multiple as per subtree
->> * Add description of the PMU of the WCN6750 module
->> * Include separate UART state node for sleep pin configuarion
->> * Link to v3: https://lore.kernel.org/linux-arm-msm/20241022104600.3228-1-quic_janathot@quicinc.com/
->>
->> Changes from v2:
->> * Sorted nodes alphabetically
->> * Link to v2: https://lore.kernel.org/linux-arm-msm/20241010105107.30118-1-quic_janathot@quicinc.com/
->>
->> Changes from v1:
->> * Corrected the board name in subject
->> * Link to v1: https://lore.kernel.org/linux-arm-msm/20241009111436.23473-1-quic_janathot@quicinc.com/
->>
->> Janaki Ramaiah Thota (4):
->>    regulator:·dt-bindings:·qcom,qca6390-pmu:·document wcn6750-pmu
->>    arm64: dts: qcom: qcs6490-rb3gen: add and enable BT node
->>    Bluetooth: hci_qca: use the power sequencer for wcn6750
->>    power: sequencing: qcom-wcn: add support for the WCN6750 PMU
->>
->>   .../bindings/regulator/qcom,qca6390-pmu.yaml  |  27 +++
->>   arch/arm64/boot/dts/qcom/qcs6490-rb3gen2.dts  | 168 +++++++++++++++++-
->>   drivers/bluetooth/hci_qca.c                   |   2 +-
->>   drivers/power/sequencing/pwrseq-qcom-wcn.c    |  22 +++
->>   4 files changed, 217 insertions(+), 2 deletions(-)
->>
->> --
->>
->>
->>
-> 
-> 
-> My bot found new DTB warnings on the .dts files added or changed in this
-> series.
-> 
-> Some warnings may be from an existing SoC .dtsi. Or perhaps the warnings
-> are fixed by another series. Ultimately, it is up to the platform
-> maintainer whether these warnings are acceptable or not. No need to reply
-> unless the platform maintainer has comments.
-> 
-> If you already ran DT checks and didn't see these error(s), then
-> make sure dt-schema is up to date:
-> 
->    pip3 install dtschema --upgrade
-> 
-> 
-> New warnings running 'make CHECK_DTBS=y qcom/qcs6490-rb3gen2.dtb' for 20241209103455.9675-1-quic_janathot@quicinc.com:
-> 
-> arch/arm64/boot/dts/qcom/qcs6490-rb3gen2.dtb: bluetooth: 'enable-gpios' is a required property
-> 	from schema $id: http://devicetree.org/schemas/net/bluetooth/qualcomm-bluetooth.yaml#
-> arch/arm64/boot/dts/qcom/qcs6490-rb3gen2.dtb: bluetooth: 'swctrl-gpios' is a required property
-> 	from schema $id: http://devicetree.org/schemas/net/bluetooth/qualcomm-bluetooth.yaml#
-> arch/arm64/boot/dts/qcom/qcs6490-rb3gen2.dtb: bluetooth: 'vddio-supply' is a required property
-> 	from schema $id: http://devicetree.org/schemas/net/bluetooth/qualcomm-bluetooth.yaml#
-> arch/arm64/boot/dts/qcom/qcs6490-rb3gen2.dtb: bluetooth: 'vddbtcxmx-supply' is a required property
-> 	from schema $id: http://devicetree.org/schemas/net/bluetooth/qualcomm-bluetooth.yaml#
-> arch/arm64/boot/dts/qcom/qcs6490-rb3gen2.dtb: bluetooth: 'vddasd-supply' is a required property
-> 	from schema $id: http://devicetree.org/schemas/net/bluetooth/qualcomm-bluetooth.yaml#
-> arch/arm64/boot/dts/qcom/qcs6490-rb3gen2.dtb: pinctrl@f100000: Unevaluated properties are not allowed ('qup_uart7_sleep' was unexpected)
-> 	from schema $id: http://devicetree.org/schemas/pinctrl/qcom,sc7280-pinctrl.yaml#
-> 
+net/bluetooth/hci_core.c:60:1: warning: symbol 'hci_cb_list_lock' was
+not declared. Should it be static?
 
-Since the DTS files for all boards using the WCN6750 BT chip are not 
-updated according to the PMU node, updating the 
-bluetooth/qualcomm-bluetooth.yaml file will result in similar warnings 
-for other boards.
+Would you mind fixing that and re-sending? We are still on time for
+tomorrow 'net' PR.
 
 Thanks,
-Janakiram
+
+Paolo
 
