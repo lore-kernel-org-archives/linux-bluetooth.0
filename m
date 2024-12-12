@@ -1,76 +1,84 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83BB921C166;
-	Thu, 12 Dec 2024 15:30:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF3B3229698
+	for <linux-bluetooth@vger.kernel.org>; Thu, 12 Dec 2024 16:14:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734017417; cv=none; b=SLD5QI6nRBZYyTrbZtnGFLcjJrGNv4EtMO1w+tUhFqiwxdChX26kEa5m0rkMLiI8xG0kprWclhTiIiBKVFapbq5gKsreeL6qqrFJRRB44Dk2P0jbwBgJctvThi0njpFvGfuc2CQ5ZaQ0uHfaAeTqm2tvHmX3aDpMLEgvius1xE0=
+	t=1734020094; cv=none; b=OQM2Dh2CfCpsewUHKQaCiltrUbyO3HTuoM5uCshCBxw7ucqpoEngOivgQNb2516eee8w3hVHHNga1iYCChkMLI1073F1QWk5LUmLb4kyxlgq1it0GbsfvWMFttdFGC8sgDP5y6rVy0UOA0bCP6Za86V9fShYeF/ElZO7FZdgA/c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734017417; c=relaxed/simple;
-	bh=NGwT/sP6fdeGKQ6iR9Uw1CJTnYeHzQsJrSFdTagVG44=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=igXoQpXNdM9+DaigJbuSQfhJmEd/VMB6ZfBSFjWmsxwWquzgwkqln9JC0opnKe0L6TN44J8xRNUJO2bmbiRvaGmkjlDlJhEKxuyAfk6Y0Tcg7OEPEA/ivtnWMOc28FmYj1F8T+DlyTBmSP17BL9UgOI3+fTCuxGaIcp7uriX4eA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=g1G4jnCJ; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1734020094; c=relaxed/simple;
+	bh=75k8vQfAdxNCyc8upk6BS2mFTnwef5NOPkGdceviGNk=;
+	h=From:To:Subject:Date:Message-Id:MIME-Version:Content-Type; b=F5GTUV2GLPkwcW6TrU6fOOj53wXn6l3wvd+8d0L9tCqL+A73DqucCWK9VtMBHkSdK/Dju0T342th0IDO7mJplcCard7QFSRcApbJ4FMaWlez+hkYTW7B0G1sGyP7kYIDAGP/BLaOX2qTjUQGDxR09c0GI3w+admjdSeiM6kvuZg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=fcwJHgut; arc=none smtp.client-ip=148.251.105.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="g1G4jnCJ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1231AC4CECE;
-	Thu, 12 Dec 2024 15:30:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734017417;
-	bh=NGwT/sP6fdeGKQ6iR9Uw1CJTnYeHzQsJrSFdTagVG44=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=g1G4jnCJ8aVRftXS8THsL/gbpoht3H8LJeSz3Usi15hdpYC0NLN7TrUSUIAQuYyIF
-	 hB+mNv5mg87n6xP0V6DLmwbU9e0IYVw3C0egBT0/idMJjng4K8dMjAaW7nqZFROnfQ
-	 ys7fEdPdgxICWsaEUmlz6z9n4X6QcBosEE6JsJBucE8IgjH9ZwAqV8LLwiP+SrgloV
-	 /eWPyKHGmhvZT8K8+2O+sOr/reFb51/KKYjFVpm37Vvm3T3U0KnewOj4pkKhpRmLKS
-	 cB+hDXLk2COpzvyw+eYmuh/fuslmefSu8Jaq3L/J3M2ijvHCtZZMssNYWYeR99fG8L
-	 3w3uxufAEGNCg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 7109E380A959;
-	Thu, 12 Dec 2024 15:30:34 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="fcwJHgut"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+	s=mail; t=1734020090;
+	bh=75k8vQfAdxNCyc8upk6BS2mFTnwef5NOPkGdceviGNk=;
+	h=From:To:Subject:Date:From;
+	b=fcwJHgutx/kwln77xB1H9DsYxbh76u6aHN5P2+ED7CJX7SzECG7Xkp+Atriv0CBva
+	 iNjQ05+i/ViH+e4uaQn4EYxXFCMyol63gvYWY2wANsfEkd5dVHNby4cSDfR4EpTm7N
+	 MvzwOAss17kxAj/MV4jOObzRmLUZW+aVPXnQ+dZraFii3UIFXs9PGodTB6B+0xNWmb
+	 nIKGxvnAN58z07n2otlMbndfd/tTXPf1Q/mcuC+I38HlnMUVBW3Fg+h6dgPkd/Lweq
+	 LsYVynNZlmc8SvlRmGq22Xxq4JF54+ZvhRY6ysOkjvw1htbWcU8ad3gCUQEIRxXnLZ
+	 5DVWU9B89qLog==
+Received: from fdanis-XPS-13-9370.. (67.227.121.78.rev.sfr.net [78.121.227.67])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: fdanis)
+	by bali.collaboradmins.com (Postfix) with ESMTPSA id B380017E37A8
+	for <linux-bluetooth@vger.kernel.org>; Thu, 12 Dec 2024 17:14:50 +0100 (CET)
+From: =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?= <frederic.danis@collabora.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ] lib: Add constant for 16 bits transparent voice setting
+Date: Thu, 12 Dec 2024 17:14:45 +0100
+Message-Id: <20241212161445.298083-1-frederic.danis@collabora.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Subject: Re: pull request: bluetooth 2024-12-12
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <173401743299.2337313.1332143889147091604.git-patchwork-notify@kernel.org>
-Date: Thu, 12 Dec 2024 15:30:32 +0000
-References: <20241212142806.2046274-1-luiz.dentz@gmail.com>
-In-Reply-To: <20241212142806.2046274-1-luiz.dentz@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: davem@davemloft.net, kuba@kernel.org, linux-bluetooth@vger.kernel.org,
- netdev@vger.kernel.org
 
-Hello:
+Add 16 bits, 2s complement, transparent air coding format for mSBC.
+Corresponding commit implements functionality on kernel side.
 
-This pull request was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+The voice setting is used by sco_connect() or sco_conn_defer_accept()
+after being set by sco_sock_setsockopt().
 
-On Thu, 12 Dec 2024 09:28:05 -0500 you wrote:
-> The following changes since commit 3dd002f20098b9569f8fd7f8703f364571e2e975:
-> 
->   net: renesas: rswitch: handle stop vs interrupt race (2024-12-10 19:08:00 -0800)
-> 
-> are available in the Git repository at:
-> 
->   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2024-12-12
-> 
-> [...]
+The PCM part of the voice setting is used for offload mode through PCM
+chipset port.
+This commits add support for mSBC 16 bits offloading, i.e. audio data
+not transported over HCI.
 
-Here is the summary with links:
-  - pull request: bluetooth 2024-12-12
-    https://git.kernel.org/netdev/net/c/ad913dfd8bfa
+The BCM4349B1 supports 16 bits transparent data on its I2S port.
+If BT_VOICE_TRANSPARENT is used when accepting a SCO connection, this
+gives only garbage audio while using BT_VOICE_TRANSPARENT_16BIT gives
+correct audio.
+This has been tested with connection to iPhone 14 and Samsung S24.
+---
+ lib/bluetooth.h | 1 +
+ 1 file changed, 1 insertion(+)
 
-You are awesome, thank you!
+diff --git a/lib/bluetooth.h b/lib/bluetooth.h
+index 073ed875d..32e58678b 100644
+--- a/lib/bluetooth.h
++++ b/lib/bluetooth.h
+@@ -111,6 +111,7 @@ struct bt_voice {
+ 
+ #define BT_VOICE_TRANSPARENT			0x0003
+ #define BT_VOICE_CVSD_16BIT			0x0060
++#define BT_VOICE_TRANSPARENT_16BIT		0x0063
+ 
+ #define BT_PHY			14
+ 
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.34.1
 
