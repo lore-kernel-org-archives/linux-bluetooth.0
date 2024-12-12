@@ -1,132 +1,146 @@
-Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 273A520E02D
-	for <linux-bluetooth@vger.kernel.org>; Thu, 12 Dec 2024 08:44:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB8E520ADFF
+	for <linux-bluetooth@vger.kernel.org>; Thu, 12 Dec 2024 10:03:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733993078; cv=none; b=IHVIpvoluz8cqY7PogGhYnsCGH5szn5GYWWUFXGYIrhGf5dWfmsqw6W7hhuoLlmrvvgtRwxocov4/faTNsfBoLSnH9v72D3m1kme4t3Id3TvnZF4Q6llD2MlVtQbdWVCXTa17OZ5E8APs+7Y2e9iMTSEhuHLfNXx2GM75E2gO18=
+	t=1733997819; cv=none; b=uL3t6g78nccSWWKnliAIhu1tDw0JV0MDpLRoUKShTkc8v9pDBuPsZUlGBuKh/Pp6hW+xx6RDoGzTzvMyCcATv4hBULjUyZUaw7y3iMfHGpksPBXUJFmMfvDRxRuNyiZZrkHISd8djdrvf3Pqp4wF38Ixq0PzPXW2TEs8X0FjYyg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733993078; c=relaxed/simple;
-	bh=wll8mfUJPfBxpFYpKgOcB0K3t6bxxcxWKiVYQEF6/9Y=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=vCu3Ir1L1OVwDb7KOtAeVPaZNQxrSoxYGMTbB7QniiSMX584X67LkPnPUGtvviKoSP3nqP2f/Sv223td3Ht2GvxHjjKjvp2N9VIpk6LOFCMuPKC0U8OIzsFx1uXgejaXwM3XLHl9tr49INHxZktaWjUfwaZYaXqzy1UStKioxPA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AoIWG+F5; arc=none smtp.client-ip=209.85.218.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1733997819; c=relaxed/simple;
+	bh=2H8h1Nfoc5f+Dhu3pA1T+My9+ckrZ7/7fSy9strk77U=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=itHPqqJt1UjBehR5uUmENXZKkdjyiTjn5jQFSepYWE1y8vjWO+LfwM2vn8b/G2QO6akbjbiWEbPwJfHHG/8FhGf+Ko2pQ8CPe+5zOPekZ5R2Segt3hf00XpIVWwO5bgWzk34ZAarlx3g4b6SMflj54qHG86VNO4QBgNL3hpLxIE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=mNfHSPDl; arc=none smtp.client-ip=148.251.105.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AoIWG+F5"
-Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-a9e8522445dso60414866b.1
-        for <linux-bluetooth@vger.kernel.org>; Thu, 12 Dec 2024 00:44:36 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1733993075; x=1734597875; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=gSc2uHjP/LSBPWbFukm535fyWEeje0qmDbvk4k0NIHQ=;
-        b=AoIWG+F5qLd9o4ysCkXPKyRbRX9EHGEWNWf9h4/HrnIIZbpFMtsa8Lfbxdc1yJqIll
-         Yxd3pXwNVzKkjGaQhRU8Lb4iRKQLXysTWk4Sg8ktk0Rmju2QTWXpIdFAFaB7S2IipK4X
-         iNxyEb2i0t5/7irUNcLJbpDLCAUGTCODGW2yz9eMrQr2Px3fFkvmLTG3dEzHQCttpWAz
-         kjKSSb6P+SZY8zMMGRf7DYwzuUt/Q23dyU7xdudfuAmDo/YwITd9OWfXZmrqv8GAd7C7
-         5d5CjaR+YT4IECJSnNsaFWv9dVwUIn8QfAevU21cMmZ6XXf1qELAObCWoI3Mwv4qqeMf
-         H2Mg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733993075; x=1734597875;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=gSc2uHjP/LSBPWbFukm535fyWEeje0qmDbvk4k0NIHQ=;
-        b=BbSQAEyyY47f5LkbrMcJiFNoQVZ0pF7OJydqdn9bVm67lQ8u5maRzHmRNMXa7p8DAb
-         zDx4NVtmHyIYgtzHh+dGBWyJpIG0w0K00fxhiR/iMafa45fSVcApSpZsZ6BUL8ixQQSh
-         zgj/iX1yOSUGnC7DN00yxsWWf+llH7pGYsBAQ4hYVar0uJsY+BkxxQZiEaVtHnTGoCgh
-         jpgXJjVkwDr244wF6dw8E9dU7I8cwDJBwJGUbsdmYdOGGKEaGMjkW/a7TK7gaORRGMd+
-         ptnZ9/Pk9GmlQ9EiRCdsQTiY4N13nhbF2liNos0u0Kx8P16HjDc0ULzT9ymrVfWNzJ4Y
-         mLQw==
-X-Gm-Message-State: AOJu0YzKcN+hBHpuVrb6U8t4HzysJGIU0+tz40zqLCj/LQeREddip32q
-	Z1ldmQcNgOq4tzCRQTFYEfyT6kPj0L/I79M0XM1gXRerACbGrEnac6WoVQ==
-X-Gm-Gg: ASbGncv8E5mW0fy3lA+reBsO363L4PzbxxZix9E9BW4T0SISdnpPsPgYc8SGlNZJRID
-	E9qicXrJRprmJ4A0DVHE0yYR71cffmdSFdKrU7bAOytnT3+6DS1dXHS6ZZcvjTWSEMJpWG4CyB4
-	POqRpda/VxCLtqiIACaadSDkhDyq28oQr+Xh6UgEMcYBu9UqDN71LwQiWurF4Sdqwd3tQ/mGKKL
-	nu8T8VmTrZ7LX7eZA489hvQR57FAHR1MM3qzh2tmhy8s0vGKBD4Jo2hd4eURJUf1WD7g1hLu8FT
-	+1oSELyo13UiZc4GFwVj302XRNACGQAu+kittsD9Z8s=
-X-Google-Smtp-Source: AGHT+IHKIcj5/ArT/nhYljrt8qzcAgpHu85TivtEu1Tj/TzvelCPMJDn7mYpiqEoypTnzUlqevOmag==
-X-Received: by 2002:a17:906:31cc:b0:aa6:6ca2:b772 with SMTP id a640c23a62f3a-aa6b10d6602mr660144166b.10.1733993074993;
-        Thu, 12 Dec 2024 00:44:34 -0800 (PST)
-Received: from raspberrypi.home (46.205.203.47.nat.ftth.dynamic.t-mobile.pl. [46.205.203.47])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5d42a754cb0sm2948476a12.88.2024.12.12.00.44.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 12 Dec 2024 00:44:34 -0800 (PST)
-From: Arkadiusz Bokowy <arkadiusz.bokowy@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Arkadiusz Bokowy <arkadiusz.bokowy@gmail.com>
-Subject: [PATCH 2/2] sbc: Add sbc_get_delay API to retrieve codec delay
-Date: Thu, 12 Dec 2024 09:44:19 +0100
-Message-Id: <20241212084419.1326427-2-arkadiusz.bokowy@gmail.com>
-X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20241212084419.1326427-1-arkadiusz.bokowy@gmail.com>
-References: <20241212084419.1326427-1-arkadiusz.bokowy@gmail.com>
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="mNfHSPDl"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+	s=mail; t=1733997815;
+	bh=2H8h1Nfoc5f+Dhu3pA1T+My9+ckrZ7/7fSy9strk77U=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=mNfHSPDlRRpFZOBF82YMoS0p5Dtv4tUaPxcpHEUcyQbXi8FeMzQ+L0qBSmhRAEiG+
+	 qkVxYru0Xct0nlq0V2H1jx74YoDuoBWwOAzQsQpjjD4pX9VsxV02/XKux4a8+I8qPX
+	 UcbdfymwcLIIWVF143ZCJJ4DrCsPBbH8lzZ6NiVd+I+oUttrM7NqC+h+oOAHXpQ4QL
+	 Hb2VcWhVDgRsZfOecvhW6moGLU6nMtTY0fhc03zKLphoHZshchWXohmV9m/yJelUhA
+	 JxGCiISUL9WBbsag26Re2ulJC8mUfEpZ7rWdAcfbtj6M9WDDnJnGO1huQtXl9caB9e
+	 CXat/QQpeDLoQ==
+Received: from [192.168.1.100] (2-237-20-237.ip236.fastwebnet.it [2.237.20.237])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits))
+	(No client certificate requested)
+	(Authenticated sender: kholk11)
+	by bali.collaboradmins.com (Postfix) with ESMTPSA id 51F1A17E35F2;
+	Thu, 12 Dec 2024 11:03:35 +0100 (CET)
+Message-ID: <d5101ebb-6d6a-47f1-bd14-032b85ea7021@collabora.com>
+Date: Thu, 12 Dec 2024 11:03:34 +0100
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH Resend] Bluetooth: btmtk: avoid UAF in
+ btmtk_process_coredump
+To: Thadeu Lima de Souza Cascardo <cascardo@igalia.com>,
+ linux-bluetooth@vger.kernel.org
+Cc: linux-mediatek@lists.infradead.org, Marcel Holtmann
+ <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+ Matthias Brugger <matthias.bgg@gmail.com>, Jing Cai <jing.cai@mediatek.com>,
+ Chris Lu <chris.lu@mediatek.com>, Sean Wang <sean.wang@mediatek.com>,
+ kernel-dev@igalia.com
+References: <20240731190330.1619718-1-cascardo@igalia.com>
+ <Z1iYKvmenw81i1UG@quatroqueijos.cascardo.eti.br>
+From: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+Content-Language: en-US
+In-Reply-To: <Z1iYKvmenw81i1UG@quatroqueijos.cascardo.eti.br>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Most audio codecs introduce intrinsic codec delay. SBC codec introduces
-encode/decode delay which is not constant but depends on the number of
-subbunds used. Providing API for that will simplify library usage in
-case when precise delay calculation is required.
----
- sbc/sbc.c | 20 ++++++++++++++++++++
- sbc/sbc.h |  3 +++
- 2 files changed, 23 insertions(+)
+Il 10/12/24 20:36, Thadeu Lima de Souza Cascardo ha scritto:
+> hci_devcd_append may lead to the release of the skb, so it cannot be
+> accessed once it is called.
+> 
+> ==================================================================
+> BUG: KASAN: slab-use-after-free in btmtk_process_coredump+0x2a7/0x2d0 [btmtk]
+> Read of size 4 at addr ffff888033cfabb0 by task kworker/0:3/82
+> 
+> CPU: 0 PID: 82 Comm: kworker/0:3 Tainted: G     U             6.6.40-lockdep-03464-g1d8b4eb3060e #1 b0b3c1cc0c842735643fb411799d97921d1f688c
+> Hardware name: Google Yaviks_Ufs/Yaviks_Ufs, BIOS Google_Yaviks_Ufs.15217.552.0 05/07/2024
+> Workqueue: events btusb_rx_work [btusb]
+> Call Trace:
+>   <TASK>
+>   dump_stack_lvl+0xfd/0x150
+>   print_report+0x131/0x780
+>   kasan_report+0x177/0x1c0
+>   btmtk_process_coredump+0x2a7/0x2d0 [btmtk 03edd567dd71a65958807c95a65db31d433e1d01]
+>   btusb_recv_acl_mtk+0x11c/0x1a0 [btusb 675430d1e87c4f24d0c1f80efe600757a0f32bec]
+>   btusb_rx_work+0x9e/0xe0 [btusb 675430d1e87c4f24d0c1f80efe600757a0f32bec]
+>   worker_thread+0xe44/0x2cc0
+>   kthread+0x2ff/0x3a0
+>   ret_from_fork+0x51/0x80
+>   ret_from_fork_asm+0x1b/0x30
+>   </TASK>
+> 
+> Allocated by task 82:
+>   stack_trace_save+0xdc/0x190
+>   kasan_set_track+0x4e/0x80
+>   __kasan_slab_alloc+0x4e/0x60
+>   kmem_cache_alloc+0x19f/0x360
+>   skb_clone+0x132/0xf70
+>   btusb_recv_acl_mtk+0x104/0x1a0 [btusb]
+>   btusb_rx_work+0x9e/0xe0 [btusb]
+>   worker_thread+0xe44/0x2cc0
+>   kthread+0x2ff/0x3a0
+>   ret_from_fork+0x51/0x80
+>   ret_from_fork_asm+0x1b/0x30
+> 
+> Freed by task 1733:
+>   stack_trace_save+0xdc/0x190
+>   kasan_set_track+0x4e/0x80
+>   kasan_save_free_info+0x28/0xb0
+>   ____kasan_slab_free+0xfd/0x170
+>   kmem_cache_free+0x183/0x3f0
+>   hci_devcd_rx+0x91a/0x2060 [bluetooth]
+>   worker_thread+0xe44/0x2cc0
+>   kthread+0x2ff/0x3a0
+>   ret_from_fork+0x51/0x80
+>   ret_from_fork_asm+0x1b/0x30
+> 
+> The buggy address belongs to the object at ffff888033cfab40
+>   which belongs to the cache skbuff_head_cache of size 232
+> The buggy address is located 112 bytes inside of
+>   freed 232-byte region [ffff888033cfab40, ffff888033cfac28)
+> 
+> The buggy address belongs to the physical page:
+> page:00000000a174ba93 refcount:1 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x33cfa
+> head:00000000a174ba93 order:1 entire_mapcount:0 nr_pages_mapped:0 pincount:0
+> anon flags: 0x4000000000000840(slab|head|zone=1)
+> page_type: 0xffffffff()
+> raw: 4000000000000840 ffff888100848a00 0000000000000000 0000000000000001
+> raw: 0000000000000000 0000000080190019 00000001ffffffff 0000000000000000
+> page dumped because: kasan: bad access detected
+> 
+> Memory state around the buggy address:
+>   ffff888033cfaa80: fb fb fb fb fb fb fb fb fb fb fb fb fb fc fc fc
+>   ffff888033cfab00: fc fc fc fc fc fc fc fc fa fb fb fb fb fb fb fb
+>> ffff888033cfab80: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+>                                       ^
+>   ffff888033cfac00: fb fb fb fb fb fc fc fc fc fc fc fc fc fc fc fc
+>   ffff888033cfac80: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+> ==================================================================
+> 
+> Check if we need to call hci_devcd_complete before calling
+> hci_devcd_append. That requires that we check data->cd_info.cnt >=
+> MTK_COREDUMP_NUM instead of data->cd_info.cnt > MTK_COREDUMP_NUM, as we
+> increment data->cd_info.cnt only once the call to hci_devcd_append
+> succeeds.
+> 
+> Fixes: 0b7015132878 ("Bluetooth: btusb: mediatek: add MediaTek devcoredump support")
+> Signed-off-by: Thadeu Lima de Souza Cascardo <cascardo@igalia.com>
 
-diff --git a/sbc/sbc.c b/sbc/sbc.c
-index 428c8ee..869f367 100644
---- a/sbc/sbc.c
-+++ b/sbc/sbc.c
-@@ -1470,6 +1470,26 @@ SBC_EXPORT size_t sbc_get_codesize(const sbc_t *sbc)
- 	return subbands * blocks * channels * 2;
- }
- 
-+SBC_EXPORT unsigned sbc_get_delay(const sbc_t *sbc)
-+{
-+	uint16_t subbands;
-+	struct sbc_priv *priv;
-+
-+	priv = sbc->priv;
-+	if (!priv->init) {
-+		subbands = sbc->subbands ? 8 : 4;
-+	} else {
-+		subbands = priv->frame.subbands;
-+	}
-+
-+	/*
-+	 * The delay is caused by the processing function which analyzes
-+	 * old samples to encode the current frame. The amount of that
-+	 * samples depends on the number of subbands.
-+	 */
-+	return subbands * 9 + 1;
-+}
-+
- SBC_EXPORT const char *sbc_get_implementation_info(const sbc_t *sbc)
- {
- 	struct sbc_priv *priv;
-diff --git a/sbc/sbc.h b/sbc/sbc.h
-index b7323e8..829b161 100644
---- a/sbc/sbc.h
-+++ b/sbc/sbc.h
-@@ -94,6 +94,9 @@ unsigned sbc_get_frame_duration(const sbc_t *sbc);
- /* Returns the uncompressed block size in bytes */
- size_t sbc_get_codesize(const sbc_t *sbc);
- 
-+/* Returns the delay introduced by the codec in frames */
-+unsigned sbc_get_delay(const sbc_t *sbc);
-+
- const char *sbc_get_implementation_info(const sbc_t *sbc);
- void sbc_finish(sbc_t *sbc);
- 
--- 
-2.39.5
+Reviewed-by: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+
 
