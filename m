@@ -1,32 +1,32 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEE056BFCA;
-	Fri, 13 Dec 2024 08:49:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B0D46BFCA;
+	Fri, 13 Dec 2024 08:51:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734079791; cv=none; b=egCkeDE2ApBlRd04rsCI+mF3JOVYnysCmv92ZKMZUHq5fvJLhpYnSTBoUKgOjg8ZWg+G5NYHgft1IMwNB7+SjhzRFICaX9AoQuha5ueKz635+sBVwWaWeal0XxxvMzIRxK5GWQvGyB/d3HkLcYSUprVVoHIxo5VUNUzAJAD4Bo0=
+	t=1734079864; cv=none; b=TwFViQxaGJzBWmPkk6cfGYgHg5/ozFgCaBiTEEDa5myn35Jwvvxmu9JhuuZuvR4C7Zn+u51PbZWBvQyH0bmEIr3aTWRSudLAN4NHYZbeD8QXfVYqiNrRGlQJgfElnnD/BdTVz/EA7E9x+I3pmvt/FQZjRjfK9iYTplIHhIPkiSQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734079791; c=relaxed/simple;
-	bh=uGYv9JPSUdHkzvZVqTt7TTbPWsYRVOVyjafBD22J8K8=;
+	s=arc-20240116; t=1734079864; c=relaxed/simple;
+	bh=SHfv6Fa2cZK8RSvq+JDLJt6xCCCIJTBGEMQ6uDlKnOg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XjGLDTMVi0i47MsPHc9d8KVqBOsLq9vTkE3NEYo4X+fhhPq3ex1ZLIl+Ppi0beCURG2prbl5YEAhiJe8pulu38j/HZX9wBHFGGLE5ZlYH0g8Xziyz8Q+5NQmJMXwtwMCp/pzC5eqMr+N+T40fM3vnqUQFmF9xH74kfnXOjMDRIo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GdOxvaL6; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=QRX5ieDNKPd9EsXSrpIkFGlYTE23VQJsaiwEQmlTn2mh7FAwauNMQNjLEEf8PgTJh4qbFdMZIioLby1pwGTYt6RY9P2psiXmYMXRTuZIiWGcWBCxkYE15nPO9XcXdKGEnppEN8fupJ/pit/kxucfi5rXjzz66FmjsS4eaf7+jAg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YSYUNEEy; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GdOxvaL6"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E91F5C4CED0;
-	Fri, 13 Dec 2024 08:49:49 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YSYUNEEy"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ED9A9C4CED0;
+	Fri, 13 Dec 2024 08:51:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734079790;
-	bh=uGYv9JPSUdHkzvZVqTt7TTbPWsYRVOVyjafBD22J8K8=;
+	s=k20201202; t=1734079863;
+	bh=SHfv6Fa2cZK8RSvq+JDLJt6xCCCIJTBGEMQ6uDlKnOg=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=GdOxvaL6j+dBERdwG6abxICQnVQqFiGX4KzgeOvoL3ExFNVXwKF+uufP4mNTNYWrv
-	 DkSEG+vFdZzI3Fn0P4YZ3QK00xtIC5TXBxZ302I2i+OMjIBo/qLXbMX/a4wDO089hp
-	 zK8I4eQJ/s2fNPLGHKx8m4agrMFYqJLwoOOxfuHx2WM7YKRSKnSOGc874tFf4no6vf
-	 /wFxAK0gQn3wCOO06KsHgr2lgwbXhbYSoeSWmuVKYKfVZ0YBHkX+1QwJrPWgvv61PV
-	 ETmPEbRbjN+nSIXSLAQaLxlE3fumWTcGyROlcY7MvJEjPA8Ql2/6niUuH2RB0X7WoS
-	 +IQAhKl2o8Pug==
-Date: Fri, 13 Dec 2024 09:49:47 +0100
+	b=YSYUNEEyUQ9dorfk9LAZPL84EGeG9FutZA83Kw3nXvd4Z7Kt3LMvgOKotEeRzSlFf
+	 lcrSc/r2xxCchJ0hgZMbjiJRGI6UV7L4x8y/hooS4PIyJ37e3Ys+KEzCi8rqzngyh8
+	 Q4RFvVB+UgwxdwkjiKoGiC41yNGoBfjNW6YP26HBh8Td25AUvxOjNVs4jUN8hEPxXH
+	 c/Qfmvw+p5zhNrQUzK6/agFkiRehJKt720LpZZ6MTXUqhdbQ7Nou8AHOGnTwOHkm98
+	 t5LUctmPbsd5xR/fkcfbeIYxrSN6tvWrDJxVUhJxk+gqM2m+FVazdajqeNA1oC1E7Z
+	 TqB00vdbvh44g==
+Date: Fri, 13 Dec 2024 09:51:00 +0100
 From: Krzysztof Kozlowski <krzk@kernel.org>
 To: Cheng Jiang <quic_chejiang@quicinc.com>
 Cc: Marcel Holtmann <marcel@holtmann.org>, 
@@ -37,11 +37,11 @@ Cc: Marcel Holtmann <marcel@holtmann.org>,
 	linux-bluetooth@vger.kernel.org, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
 	linux-arm-msm@vger.kernel.org, quic_jiaymao@quicinc.com, quic_shuaz@quicinc.com, 
 	quic_zijuhu@quicinc.com, quic_mohamull@quicinc.com
-Subject: Re: [PATCH v5 1/4] dt-bindings: net: bluetooth: qca: Expand
- firmware-name property
-Message-ID: <cyupscw22xvovh647dsaukiro5d5oiv5i573awanjkoqdczhb6@spdtixeqtysf>
+Subject: Re: [PATCH v5 4/4] arm64: dts: qcom: sa8775p-ride: Add firmware-name
+ in BT node
+Message-ID: <qjfytsieecdiavyosc6u2t2t5uhmkzrhw4ad7oykd7x23o5yp2@5bteod5q7yud>
 References: <20241212150232.3823088-1-quic_chejiang@quicinc.com>
- <20241212150232.3823088-2-quic_chejiang@quicinc.com>
+ <20241212150232.3823088-5-quic_chejiang@quicinc.com>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -50,37 +50,21 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20241212150232.3823088-2-quic_chejiang@quicinc.com>
+In-Reply-To: <20241212150232.3823088-5-quic_chejiang@quicinc.com>
 
-On Thu, Dec 12, 2024 at 11:02:29PM +0800, Cheng Jiang wrote:
-> Expand the firmware-name property to specify the names of NVM and
-> rampatch firmware to load. This update will support loading specific
-> firmware (nvm and rampatch) for certain chips, like the QCA6698
-> Bluetooth chip, which shares the same IP core as the WCN6855 but has
-> different RF components and RAM sizes, requiring new firmware files.
-> 
-> We might use different connectivity boards on the same platform. For
-> example, QCA6698-based boards can support either a two-antenna or
-> three-antenna solution, both of which work on the sa8775p-ride platform.
-> Due to differences in connectivity boards and variations in RF
-> performance from different foundries, different NVM configurations are
-> used based on the board ID.
-> 
-> So In firmware-name, if the NVM file has an extension, the NVM file will
-> be used. Otherwise, the system will first try the .bNN (board ID) file,
-> and if that fails, it will fall back to the .bin file.
-> 
-> Possible configurations:
-> firmware-name = "QCA6698/hpnv21.bin", "QCA6698/hpbtfw21.tlv";
-> firmware-name = "QCA6698/hpnv21", "QCA6698/hpbtfw21.tlv";
-> firmware-name = "QCA6698/hpnv21.bin";
+On Thu, Dec 12, 2024 at 11:02:32PM +0800, Cheng Jiang wrote:
+> The sa8775p-ride platform uses the QCA6698 Bluetooth chip. While the
+> QCA6698 shares the same IP core as the WCN6855, it has different RF
+> components and RAM sizes, requiring new firmware files. Use the
+> firmware-name property to specify the NVM and rampatch firmware to load.
 > 
 > Signed-off-by: Cheng Jiang <quic_chejiang@quicinc.com>
 > ---
->  .../bindings/net/bluetooth/qualcomm-bluetooth.yaml           | 5 ++++-
->  1 file changed, 4 insertions(+), 1 deletion(-)
+>  arch/arm64/boot/dts/qcom/sa8775p-ride.dtsi | 1 +
+>  1 file changed, 1 insertion(+)
 
-Acked-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Just to recap: this patch must not be applied to Bluetooth tree, but it
+should go via Qualcomm soc.
 
 Best regards,
 Krzysztof
