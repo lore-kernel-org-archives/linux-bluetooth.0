@@ -1,93 +1,101 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mailgw01.mediatek.com (unknown [60.244.123.138])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03BFC1AF0BD
-	for <linux-bluetooth@vger.kernel.org>; Fri, 13 Dec 2024 09:29:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6680918FDDF;
+	Fri, 13 Dec 2024 09:41:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=60.244.123.138
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734082198; cv=none; b=UTl/rvGLOD3RTQREiYPfpJJOAnZCfg75AeIRR6kbmSdgpi31tfIaywrv3uobdY/eDvVewrU7l3TCE34bkhp9DqE8L0Edor+eF+ep3CXwdqXGcARuj+jiebQ2dQLCYb9k+KSbkiIRFZJKAiqUYmrATy/r2NUvxviYzLUAZYUfTOg=
+	t=1734082893; cv=none; b=DlC9ewsnG3SPhE2mgSrnI5yCRKv7iYa1jYHzev3VAfrTjS5jpwihzjY490zz5DVLc5lftRW6hehrBwBUZp5jGFjJpuDqpnefQpbNCAbCZLpdxahyiMwRKFB3dz1wrvZpvCPgiEUUyCnmc5Su8gM7GA1OmXkxvvbS76zxQxfoPew=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734082198; c=relaxed/simple;
-	bh=3F3gAFbQpqJSQNtX0cR4tAdli/l1pgYY5zDxP7C/U3E=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=uTfi6XBopB9Ql3ZOwWcddn7E/4bFUvnQ3/BANY9838RsOYZ0BIapK5ruorxvnLqbeGC2BdhgKA9OodF9EWq2qUeJmYBnXhP4EYAOYP7zKxwcOHRv0ZcHhOolRpIcAs/vy29T0uH1Chi0GAxZH+08K81pANcOJB1beN8BOdItaQA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lEXOdlY3; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1734082893; c=relaxed/simple;
+	bh=xOXiS2wRIDztLaIqs5qYSwXYJdPN5DTOH3N7PYSnCUc=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=J+etidfA12OFtdRt5oVCghp7kyvRPPf7QpTYxkJiI5h72KgKSt8jmVHsaPNSCeS+CP5b1IwhNPtSRZj/HzQpyfBBLUjeF4nQ0+Puj1Wj74rAuRY3TcIWBtPvJk0AhCA/vkgVZ1O/tMNjd5cAyGYbG6iUfhMyF/ofckUGu6v1obc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com; spf=pass smtp.mailfrom=mediatek.com; dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b=ProEbuOs; arc=none smtp.client-ip=60.244.123.138
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mediatek.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lEXOdlY3"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 7FE7CC4CED1
-	for <linux-bluetooth@vger.kernel.org>; Fri, 13 Dec 2024 09:29:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734082197;
-	bh=3F3gAFbQpqJSQNtX0cR4tAdli/l1pgYY5zDxP7C/U3E=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=lEXOdlY38Slzq25+YTZTORGY4zM8kS+h8IY9Zjwz3t8Ep8F8e0MpfMMCEIqmUHWgG
-	 xklawKcOKzkZLAgDSJPx0st/Gm3bgdJ8P33o0ICZ/lSwiMcLy/KSUS2dyK7Ea61rSB
-	 rwehHyQlDgUBnd6DK96I/pYJp5trYhVNqEhkO0ORxeWklC9R4CL7+WVxryui/0ZoVm
-	 O7pucuxTvOkwqDxUrwAZdQ6zPOzoHk/NTMKv0tZGNz9bnFR4HgtxxwQ/Uv+doEFUOX
-	 b160HR/PIYmkroc8Wd8Ftqa2klgcUgywqBOzTi0sKqryNzyKzFILgT6zigrvAkPPzP
-	 2JLrzsfBvPB4g==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id 6E39FC41614; Fri, 13 Dec 2024 09:29:57 +0000 (UTC)
-From: bugzilla-daemon@kernel.org
-To: linux-bluetooth@vger.kernel.org
-Subject: [Bug 219294] NULL dereference pointer in Bluetooth at boot
-Date: Fri, 13 Dec 2024 09:29:57 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: pmenzel+bugzilla.kernel.org@molgen.mpg.de
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P3
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: cc
-Message-ID: <bug-219294-62941-wpTkRmWIRU@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-219294-62941@https.bugzilla.kernel.org/>
-References: <bug-219294-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+	dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b="ProEbuOs"
+X-UUID: 6bfe8a20b93611ef99858b75a2457dd9-20241213
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
+	h=Content-Type:MIME-Version:Message-ID:Date:Subject:CC:To:From; bh=LrfMJ3h3u1jnLMa7N2XZu8l1yWiNNUJSdAbw5NA1lr0=;
+	b=ProEbuOsj8K154YQtZb9p2clWWXNhER+iRpQX4XuPB8Ak8X+Ec7lJ/dkhcLt5D/slJ7O1H+UP1hEfxV0uvGWaQFrFS2VD6lzknVWlM9vuWPMSi7gkQKPvJZ0BFxj3UEKXgz07KLSi1/D7vJu3n2al+7IANptlUDHWBwt+HmKDs4=;
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.1.45,REQID:6840c50e-ba88-4aa5-a160-83e296f94a2b,IP:0,U
+	RL:0,TC:0,Content:0,EDM:-25,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTIO
+	N:release,TS:-25
+X-CID-META: VersionHash:6493067,CLOUDID:b2581513-8f5d-4ac6-9276-7b9691c7b8d6,B
+	ulkID:nil,BulkQuantity:0,Recheck:0,SF:102,TC:nil,Content:0,EDM:1,IP:nil,UR
+	L:1,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES:1,S
+	PR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
+X-CID-BVR: 0
+X-CID-BAS: 0,_,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR,TF_CID_SPAM_ULS
+X-UUID: 6bfe8a20b93611ef99858b75a2457dd9-20241213
+Received: from mtkmbs14n2.mediatek.inc [(172.21.101.76)] by mailgw01.mediatek.com
+	(envelope-from <chris.lu@mediatek.com>)
+	(Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
+	with ESMTP id 276874414; Fri, 13 Dec 2024 17:41:26 +0800
+Received: from mtkmbs11n2.mediatek.inc (172.21.101.187) by
+ MTKMBS14N1.mediatek.inc (172.21.101.75) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.26; Fri, 13 Dec 2024 17:41:22 +0800
+Received: from mtksdccf07.mediatek.inc (172.21.84.99) by
+ mtkmbs11n2.mediatek.inc (172.21.101.73) with Microsoft SMTP Server id
+ 15.2.1118.26 via Frontend Transport; Fri, 13 Dec 2024 17:41:22 +0800
+From: Chris Lu <chris.lu@mediatek.com>
+To: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg
+	<johan.hedberg@gmail.com>, Luiz Von Dentz <luiz.dentz@gmail.com>
+CC: Hao Qin <hao.qin@mediatek.com>, Aaron Hou <aaron.hou@mediatek.com>, "Steve
+ Lee" <steve.lee@mediatek.com>, linux-bluetooth
+	<linux-bluetooth@vger.kernel.org>, linux-kernel
+	<linux-kernel@vger.kernel.org>, linux-mediatek
+	<linux-mediatek@lists.infradead.org>, Chris Lu <chris.lu@mediatek.com>
+Subject: [PATCH] Bluetooth: btmtk: add quirk to support HCI_QUIRK_SIMULTANEOUS_DISCOVERY
+Date: Fri, 13 Dec 2024 17:41:18 +0800
+Message-ID: <20241213094118.23647-1-chris.lu@mediatek.com>
+X-Mailer: git-send-email 2.18.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain
+X-TM-AS-Product-Ver: SMEX-14.0.0.3152-9.1.1006-23728.005
+X-TM-AS-Result: No-10--1.642100-8.000000
+X-TMASE-MatchedRID: tiRXYRqWr+tocr5vRHCIaibMb0f5D0uqTJDl9FKHbrmtwWMX5hmdv6PF
+	jJEFr+olKE0Je8DR/D4NXwNUB3oA790H8LFZNFG7MGpgBNI6BaPvMA9WW7X2a/mHADpWjR4Nxll
+	YNXARfpWxz8p0BoLSI+B+R4NVzQv5shljvamtnvY1mT6tqJoFqKL8uYddyDmU+IfoVuvrGMeAhO
+	caQrQ0U1GyRcoeF18qmKP0zzpTAeGwod8xOMKmvMCBO+zxAW5pftwZ3X11IV0=
+X-TM-AS-User-Approved-Sender: No
+X-TM-AS-User-Blocked-Sender: No
+X-TMASE-Result: 10--1.642100-8.000000
+X-TMASE-Version: SMEX-14.0.0.3152-9.1.1006-23728.005
+X-TM-SNTS-SMTP:
+	CEC39923689531D895F816C4BA509C57F9BD1D15EBDF4B59EB11286153AEA5682000:8
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D219294
+Add quirk to support HCI_QUIRK_SIMULTANEOUS_DISCOVERY feature for MT79xx
+series chipset.
 
-Paul Menzel (pmenzel+bugzilla.kernel.org@molgen.mpg.de) changed:
+Signed-off-by: Chris Lu <chris.lu@mediatek.com>
+---
+ drivers/bluetooth/btmtk.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-                 CC|                            |pmenzel+bugzilla.kernel.org
-                   |                            |@molgen.mpg.de
+diff --git a/drivers/bluetooth/btmtk.c b/drivers/bluetooth/btmtk.c
+index 8a3f7c3fcfec..562d6ecf0b71 100644
+--- a/drivers/bluetooth/btmtk.c
++++ b/drivers/bluetooth/btmtk.c
+@@ -1367,6 +1367,9 @@ int btmtk_usb_setup(struct hci_dev *hdev)
+ 			return err;
+ 		}
+ 
++		/* Apply common HCI quirks for MediaTek chipset */
++		set_bit(HCI_QUIRK_SIMULTANEOUS_DISCOVERY, &hdev->quirks);
++
+ 		hci_set_msft_opcode(hdev, 0xFD30);
+ 		hci_set_aosp_capable(hdev);
+ 
+-- 
+2.18.0
 
---- Comment #6 from Paul Menzel (pmenzel+bugzilla.kernel.org@molgen.mpg.de)=
- ---
-Luiz responded [1]:
-
-> I suspect this has been fixed recently:
->=20
->
-> https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.=
-git/commit/?id=3D6f3f7e9414834fc4210a2d11ff6172031e98d9ff
-
-Does this commit fix the issue for you?
-
-[1]:
-https://lore.kernel.org/all/CABBYNZJJ+28EvyEvDsVzZv6ZbZLhSkZ-tuDckAvNfR_=3D=
-qCKVMw@mail.gmail.com/#t
-
---=20
-You may reply to this email to add a comment.
-
-You are receiving this mail because:
-You are the assignee for the bug.=
