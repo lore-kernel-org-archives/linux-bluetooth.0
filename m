@@ -1,103 +1,93 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B9D8199956;
-	Fri, 13 Dec 2024 09:22:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03BFC1AF0BD
+	for <linux-bluetooth@vger.kernel.org>; Fri, 13 Dec 2024 09:29:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734081721; cv=none; b=XO6e4pZ0tQ3SQTXmj2iIi0FZ373LGGXBPF2YqhdBE0tjEWdAFkVWGqvKmEReWGnD7gMOyCCz/+e7u3zo4+4xPxZ9ImBgEHUex8kO4Gxq6+ZFHtXXqoQklZ/zxLd57uzMFSi5RtC7k6J8Se0U5GJpQGSXLgWxN8ggiME409nOv1I=
+	t=1734082198; cv=none; b=UTl/rvGLOD3RTQREiYPfpJJOAnZCfg75AeIRR6kbmSdgpi31tfIaywrv3uobdY/eDvVewrU7l3TCE34bkhp9DqE8L0Edor+eF+ep3CXwdqXGcARuj+jiebQ2dQLCYb9k+KSbkiIRFZJKAiqUYmrATy/r2NUvxviYzLUAZYUfTOg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734081721; c=relaxed/simple;
-	bh=1pZwS7TcmAmvi1wRt87ykSfWXKxO0bgHI7AQxo14fME=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Xa7ofvcnjL1GZ/qU+h0oEwUvdUfTgwgZcGT5qUHqSHnYDPn2ycgPQBhDFHScADF5+m2tncZCyTlfAPjSmykcnf1PYtkX1H0/sbIpgo83ReohD0uSGXrEOWqfKUcqF3eURjbu3pRC8mq5jkdDVJyNEpSJMofU4ZzecloEWTQtlvo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZXtO6Sec; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1734082198; c=relaxed/simple;
+	bh=3F3gAFbQpqJSQNtX0cR4tAdli/l1pgYY5zDxP7C/U3E=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=uTfi6XBopB9Ql3ZOwWcddn7E/4bFUvnQ3/BANY9838RsOYZ0BIapK5ruorxvnLqbeGC2BdhgKA9OodF9EWq2qUeJmYBnXhP4EYAOYP7zKxwcOHRv0ZcHhOolRpIcAs/vy29T0uH1Chi0GAxZH+08K81pANcOJB1beN8BOdItaQA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lEXOdlY3; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZXtO6Sec"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A87C6C4CED0;
-	Fri, 13 Dec 2024 09:22:00 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lEXOdlY3"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 7FE7CC4CED1
+	for <linux-bluetooth@vger.kernel.org>; Fri, 13 Dec 2024 09:29:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734081720;
-	bh=1pZwS7TcmAmvi1wRt87ykSfWXKxO0bgHI7AQxo14fME=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ZXtO6SecypVwW4bZOZYHoRONZHfX6IegE1muMPfVtDTFvbtrwzKTmaTDj4b3BTzuS
-	 rEz/tRuT3vckwAmnhZs55Fl3l5H81f5zP0naV3bEUcwXur+BbFPml2Ieeduefx6Xel
-	 2fmuedUWzM4ghvsvXTk0brXPVIobaAuj0WGJIeZnsoDQ1MV8tnahutmn653nIITYfi
-	 yyoqSug08QA6YEDSB2T7eciPcUcEJu28chNV22Za9X6iEH4m4D0wakkhF1wxHBqwgd
-	 dfRgbnQZbtzKvu895tVvZezkoJ/aAou2EvnmWphNy/vb5ZmBBcA6f8NHBQNu2n1yNL
-	 oU2iryPTJw2ug==
-Received: from johan by xi.lan with local (Exim 4.97.1)
-	(envelope-from <johan@kernel.org>)
-	id 1tM1s4-000000001O9-3lSL;
-	Fri, 13 Dec 2024 10:22:04 +0100
-Date: Fri, 13 Dec 2024 10:22:04 +0100
-From: Johan Hovold <johan@kernel.org>
-To: Zijun Hu <quic_zijuhu@quicinc.com>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Steev Klimaszewski <steev@kali.org>,
-	Paul Menzel <pmenzel@molgen.mpg.de>, Zijun Hu <zijun_hu@icloud.com>,
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
-	Bjorn Andersson <bjorande@quicinc.com>,
-	"Aiqun Yu (Maria)" <quic_aiquny@quicinc.com>,
-	Cheng Jiang <quic_chejiang@quicinc.com>,
-	Jens Glathe <jens.glathe@oldschoolsolutions.biz>,
-	stable@vger.kernel.org, Johan Hovold <johan+linaro@kernel.org>
-Subject: Re: [PATCH v2] Bluetooth: qca: Support downloading board ID specific
- NVM for WCN6855
-Message-ID: <Z1v8vLWH7TmwwzQl@hovoldconsulting.com>
-References: <20241116-x13s_wcn6855_fix-v2-1-c08c298d5fbf@quicinc.com>
+	s=k20201202; t=1734082197;
+	bh=3F3gAFbQpqJSQNtX0cR4tAdli/l1pgYY5zDxP7C/U3E=;
+	h=From:To:Subject:Date:In-Reply-To:References:From;
+	b=lEXOdlY38Slzq25+YTZTORGY4zM8kS+h8IY9Zjwz3t8Ep8F8e0MpfMMCEIqmUHWgG
+	 xklawKcOKzkZLAgDSJPx0st/Gm3bgdJ8P33o0ICZ/lSwiMcLy/KSUS2dyK7Ea61rSB
+	 rwehHyQlDgUBnd6DK96I/pYJp5trYhVNqEhkO0ORxeWklC9R4CL7+WVxryui/0ZoVm
+	 O7pucuxTvOkwqDxUrwAZdQ6zPOzoHk/NTMKv0tZGNz9bnFR4HgtxxwQ/Uv+doEFUOX
+	 b160HR/PIYmkroc8Wd8Ftqa2klgcUgywqBOzTi0sKqryNzyKzFILgT6zigrvAkPPzP
+	 2JLrzsfBvPB4g==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+	id 6E39FC41614; Fri, 13 Dec 2024 09:29:57 +0000 (UTC)
+From: bugzilla-daemon@kernel.org
+To: linux-bluetooth@vger.kernel.org
+Subject: [Bug 219294] NULL dereference pointer in Bluetooth at boot
+Date: Fri, 13 Dec 2024 09:29:57 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: pmenzel+bugzilla.kernel.org@molgen.mpg.de
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P3
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: cc
+Message-ID: <bug-219294-62941-wpTkRmWIRU@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-219294-62941@https.bugzilla.kernel.org/>
+References: <bug-219294-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20241116-x13s_wcn6855_fix-v2-1-c08c298d5fbf@quicinc.com>
 
-Hi Luiz,
+https://bugzilla.kernel.org/show_bug.cgi?id=3D219294
 
-On Sat, Nov 16, 2024 at 07:49:23AM -0800, Zijun Hu wrote:
-> For WCN6855, board ID specific NVM needs to be downloaded once board ID
-> is available, but the default NVM is always downloaded currently, and
-> the wrong NVM causes poor RF performance which effects user experience.
-> 
-> Fix by downloading board ID specific NVM if board ID is available.
-> 
-> Cc: Bjorn Andersson <bjorande@quicinc.com>
-> Cc: Aiqun Yu (Maria) <quic_aiquny@quicinc.com>
-> Cc: Cheng Jiang <quic_chejiang@quicinc.com>
-> Cc: Johan Hovold <johan@kernel.org>
-> Cc: Jens Glathe <jens.glathe@oldschoolsolutions.biz>
-> Cc: Steev Klimaszewski <steev@kali.org>
-> Cc: Paul Menzel <pmenzel@molgen.mpg.de>
-> Fixes: 095327fede00 ("Bluetooth: hci_qca: Add support for QTI Bluetooth chip wcn6855")
-> Cc: stable@vger.kernel.org # 6.4
-> Reviewed-by: Johan Hovold <johan+linaro@kernel.org>
-> Tested-by: Johan Hovold <johan+linaro@kernel.org>
-> Tested-by: Steev Klimaszewski <steev@kali.org>
-> Tested-by: Jens Glathe <jens.glathe@oldschoolsolutions.biz>
-> Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
+Paul Menzel (pmenzel+bugzilla.kernel.org@molgen.mpg.de) changed:
 
-> I will help to backport it to LTS kernels ASAP once this commit
-> is mainlined.
-> ---
-> Changes in v2:
-> - Correct subject and commit message
-> - Temporarily add nvm fallback logic to speed up backport.
-> — Add fix/stable tags as suggested by Luiz and Johan
-> - Link to v1: https://lore.kernel.org/r/20241113-x13s_wcn6855_fix-v1-1-15af0aa2549c@quicinc.com
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+                 CC|                            |pmenzel+bugzilla.kernel.org
+                   |                            |@molgen.mpg.de
 
-The board-specific NVM configuration files have now been included in the
-linux-firmware-20241210 release and are making their way into the
-distros (e.g. Arch Linux ARM and Fedora now ship them).
+--- Comment #6 from Paul Menzel (pmenzel+bugzilla.kernel.org@molgen.mpg.de)=
+ ---
+Luiz responded [1]:
 
-Could we get this merged for 6.13-rc (and backported) so that Lenovo
-ThinkPad X13s users can finally enjoy excellent Bluetooth range? :)
+> I suspect this has been fixed recently:
+>=20
+>
+> https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.=
+git/commit/?id=3D6f3f7e9414834fc4210a2d11ff6172031e98d9ff
 
-Johan
+Does this commit fix the issue for you?
+
+[1]:
+https://lore.kernel.org/all/CABBYNZJJ+28EvyEvDsVzZv6ZbZLhSkZ-tuDckAvNfR_=3D=
+qCKVMw@mail.gmail.com/#t
+
+--=20
+You may reply to this email to add a comment.
+
+You are receiving this mail because:
+You are the assignee for the bug.=
