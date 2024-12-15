@@ -1,127 +1,101 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f171.google.com (mail-pg1-f171.google.com [209.85.215.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10BB9189F20
-	for <linux-bluetooth@vger.kernel.org>; Sun, 15 Dec 2024 21:06:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 598C0189905
+	for <linux-bluetooth@vger.kernel.org>; Sun, 15 Dec 2024 21:14:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734296766; cv=none; b=qwJhsGeb5OD4ey2SZeoqAILIJszPOaORAr73FGkLQGf0Mno2oxwjdHlm/UACld2xERiNzC7RVSG5OZFGG/KkhKjVeH7sPZKDDL/vO76VUnYh8ttKGdaajdc+CqSIUXfD1lyffqEbKjf2eRACbh0ErpQA6F8u/n/a+g8+rZVoj10=
+	t=1734297273; cv=none; b=jbwuVoK9ZC0+8EuKOLwp27Lvjblg8lbcRvIUaDnwtajSCUNSwphFTB1j+TGtKQd4X5fEaj2uur6jtmtYh7YEIFTFBYfcymbsiMr0TTsBkELNhI+pw/20evRkm1HCV/D9Op6Z4RxMNdpNuO/WhQ6quTW8z4Mgf8a6mmGrQ6RPYW4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734296766; c=relaxed/simple;
-	bh=oovXPkK7murpuRWTPBN3BotIlOv0ecFw7SXF7+cShBk=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=VOG/8aLlM8in0//LEqqMKpHtpfVmBJQXSvJYJtBDrvvwR+CG3r6M32MpyD/VftSaRbRLj3kAP/HvPRRZaJWrYG3Oc4qp7A6XKUP3yydz85b1no6iB9LgLuHdYu9TbOfA6U8j6WCdPcD72DL2e5TEKLCrw9uCLvf1j/B5lHqJSfw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jjSKBfed; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1734297273; c=relaxed/simple;
+	bh=Vb/P415kXr2/l9j6T58UydhaYH/gpLCkvP8MwrSeCKs=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=SiNmll8VfUdMiy4NJmCZzbZ9qHzGFriNiel+zDx3+IOdd+8X/kyZdNXiAS+Vf5UXUrSbSQEvtq2qHf1JXbqad8hXaJZ86mmPFDLpKVvH4YJKnLYiVpCBSD5wDNM/oMBamPgkNK+4Dme2y+Et3VkX2VaxBsl9aH8iq5Jca+GFgno=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=R1z0tG7X; arc=none smtp.client-ip=209.85.215.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jjSKBfed"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 8C990C4CECE
-	for <linux-bluetooth@vger.kernel.org>; Sun, 15 Dec 2024 21:06:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734296765;
-	bh=oovXPkK7murpuRWTPBN3BotIlOv0ecFw7SXF7+cShBk=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=jjSKBfednbQ+Y/vSCL+wsopaYdUYwvA2OKrV3E9FyQ2MjYeTmihIB7k04G9Rc+kvN
-	 NLCSHAYrJulry1wXAnLoOdb3P94Mf0SyNLT0LAqFIMLUyEyJG22b9LP8u4Vbl0a3Rh
-	 DbwBx5Cl5AUWPl8j9r+LlVpCT+JhYIYBNDiq+1IJ7ofXJH4tN03CgUhGjATH97xRSl
-	 jBe7I5DTYYku47UFPq8oncHLfzq+qce0lR0CbDbRlMHFv+Q/s91y7VWJK+PwojX0I3
-	 LRIys9JNPxHfq1ULYfbMUZrAAKeuLQuB0PJQas/SAGlOMBcE0SLPL2epcWfMdvj+Cn
-	 Pq7Cc1EHJdmyw==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id 7ABAFC3279E; Sun, 15 Dec 2024 21:06:05 +0000 (UTC)
-From: bugzilla-daemon@kernel.org
-To: linux-bluetooth@vger.kernel.org
-Subject: [Bug 219514] PC does not resume from suspend, bisect points to
- btusb/mediatek
-Date: Sun, 15 Dec 2024 21:06:05 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: h@realh.co.uk
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P3
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-219514-62941-ESnLv8F142@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-219514-62941@https.bugzilla.kernel.org/>
-References: <bug-219514-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="R1z0tG7X"
+Received: by mail-pg1-f171.google.com with SMTP id 41be03b00d2f7-7fd581c2bf4so1925543a12.3
+        for <linux-bluetooth@vger.kernel.org>; Sun, 15 Dec 2024 13:14:32 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1734297271; x=1734902071; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=Vb/P415kXr2/l9j6T58UydhaYH/gpLCkvP8MwrSeCKs=;
+        b=R1z0tG7XOAuqOPog8ArJsOVRmMJK4k/fJ9EsA+kQE87HRWGBZ00O449wzZYswybWPe
+         v7Hv18zm4IoM8P0C0q5yTYTrjhoGTaAOWiUvJFegvsi8MbkaYdtBN0xdPN5MqLZPpMWW
+         H97EyxR2UauMKutrhp20AOUC/X2pqRzj2cf3W+6XpWwcr/Ib1vOBLr+oK3FyLZcQkg7V
+         YQYIie0I6m0C6Wrg8Ku/ya6PgkrjDNXmaopwov7+12RHws12Lqo8Mll3yHN7zDTSJb8i
+         AQDhEf3x0rrjD4EIexmq5mElrfzDkX3hb/6xL5l3U0K0h4Cgj82gM2XHsS2Hy6erGYF3
+         sz3g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1734297271; x=1734902071;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Vb/P415kXr2/l9j6T58UydhaYH/gpLCkvP8MwrSeCKs=;
+        b=AnmB+Id9P04N+zDfTmyaKNFz2GrZ6GWiUDEbCw3RBEdlKGt3kFdaJq6WTPRH3YI76K
+         sMXXS11u0NjuEdGHCWrb00HGPbJReCZjkkw5FLbdblVX5UKvtWxF3ehUQ4vbq810OwO1
+         GSz/dsdj8WVE349O785BSNALXqRjbR0vVk4N9IXWwMKEzHo9Hn2qVbwAHn8vpqHxsYjo
+         Mdr1s/bfx8japUr/KSpI+HTm+K/izk2aDmUELgNbysY10+2UbqMK0KfcDoiFtszUW/6n
+         BHp4JZsrTbCtQcpt3/ICOQx+yNIHSLT/pc/zESM2foP6K3LNEuCuL8KIi2Sn+8J+xVrr
+         mvEg==
+X-Gm-Message-State: AOJu0YySrY4ItR/BgxLQZabIkxlEtS6a+fAy/T2GuZD6x6+xMozRfi7p
+	0EVFWKvwqRdu93Nc+Rs84+/o//8jEbRkiYgivZEzezBsqUe4I3V8lGhwRw==
+X-Gm-Gg: ASbGncvEIdHkEMsrELqJPRjdlKHo52e1pcwQmZ4EILssY7gFTTzI4LhZB1QmsIJ+smk
+	8xUot1bk0Rh+yDdDFcJJPJc5dkxTbDCxZsUvO1scUf+n2ed9Mk3+TjYcZsyJ5VkvpjgCE4p7gti
+	H78+OrypMIEh2b/MA5PeosfhLdWWYsWVpQKRYClSYDhKV1j8wnX1LPoC+5AVPqYrbYNWJ+Nq+YI
+	21/j1Ue8rzg9KHLL956WBHVPlAT1o70dAZ/BOqXYGtOdvk0dDqI7GAlDesaBw==
+X-Google-Smtp-Source: AGHT+IHiLDyFQ6Kpz2zPEe5zKKbR4xk0+HaQvzm/yCY/Hf2AfxPKg7zyjGzxeVOHm3ukwtEn6r3dpQ==
+X-Received: by 2002:a17:90a:c2c6:b0:2ee:f076:20f1 with SMTP id 98e67ed59e1d1-2f28f869282mr16746469a91.0.1734297271398;
+        Sun, 15 Dec 2024 13:14:31 -0800 (PST)
+Received: from [172.17.0.2] ([20.172.5.219])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2f142de475bsm6688017a91.31.2024.12.15.13.14.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 15 Dec 2024 13:14:30 -0800 (PST)
+Message-ID: <675f46b6.170a0220.2965d5.d8ad@mx.google.com>
+Date: Sun, 15 Dec 2024 13:14:30 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============5552516967082003075=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, bugzilla-daemon@kernel.org
+Subject: RE: [Bug,219514] PC does not resume from suspend, bisect points to btusb/mediatek
+In-Reply-To: <bug-219514-62941-ESnLv8F142@https.bugzilla.kernel.org/>
+References: <bug-219514-62941-ESnLv8F142@https.bugzilla.kernel.org/>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D219514
+--===============5552516967082003075==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
---- Comment #2 from Tony Houghton (h@realh.co.uk) ---
-I've copied btusb.c and btmtk.c from 6dc22ab9f085 to a checkout of 6.13-rc2=
- and
-changed a few lines to make it compatible with some things that have changed
-since then:
+This is an automated email and please do not reply to this email.
 
-diff --git a/drivers/bluetooth/btmtk.c b/drivers/bluetooth/btmtk.c
-index fe3b892f6c6e..9eeddbb7d991 100644
---- a/drivers/bluetooth/btmtk.c
-+++ b/drivers/bluetooth/btmtk.c
-@@ -6,7 +6,7 @@
- #include <linux/firmware.h>
- #include <linux/usb.h>
- #include <linux/iopoll.h>
--#include <asm/unaligned.h>
-+#include <linux/unaligned.h>
+Dear Submitter,
 
- #include <net/bluetooth/bluetooth.h>
- #include <net/bluetooth/hci_core.h>
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 034256c399dd..0e5cc454e2f9 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -17,7 +17,7 @@
- #include <linux/suspend.h>
- #include <linux/gpio/consumer.h>
- #include <linux/debugfs.h>
--#include <asm/unaligned.h>
-+#include <linux/unaligned.h>
+Thank you for submitting the patches to the linux bluetooth mailing list.
+While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
 
- #include <net/bluetooth/bluetooth.h>
- #include <net/bluetooth/hci_core.h>
-@@ -3887,8 +3887,8 @@ static int btusb_probe(struct usb_interface *intf,
-        if (id->driver_info & BTUSB_WIDEBAND_SPEECH)
-                set_bit(HCI_QUIRK_WIDEBAND_SPEECH_SUPPORTED, &hdev->quirks);
+----- Output -----
 
--       if (id->driver_info & BTUSB_VALID_LE_STATES)
--               set_bit(HCI_QUIRK_VALID_LE_STATES, &hdev->quirks);
-+       if (!(id->driver_info & BTUSB_VALID_LE_STATES))
-+               set_bit(HCI_QUIRK_BROKEN_LE_STATES, &hdev->quirks);
+error: patch failed: drivers/bluetooth/btmtk.c:6
+error: drivers/bluetooth/btmtk.c: patch does not apply
+error: patch failed: drivers/bluetooth/btusb.c:17
+error: drivers/bluetooth/btusb.c: patch does not apply
+hint: Use 'git am --show-current-patch' to see the failed patch
 
-        if (id->driver_info & BTUSB_DIGIANSWER) {
-                data->cmdreq_type =3D USB_TYPE_VENDOR;
+Please resolve the issue and submit the patches again.
 
-Some guesswork was involved, but it seems to work for me. I'd like to try to
-get to the bottom of the issue so I don't have to keep patching my kernel. =
-Are
-there any options I could try?
 
-I've got plenty of experience with C, but not with the kernel, so if you co=
-uld
-give me some guidance such as a summary of what changed in ceac1cb0259d, wh=
-at
-code paths are taken during suspend/resume and any code tweaks I can try, it
-would be much appreciated.
+---
+Regards,
+Linux Bluetooth
 
---=20
-You may reply to this email to add a comment.
 
-You are receiving this mail because:
-You are the assignee for the bug.=
+--===============5552516967082003075==--
