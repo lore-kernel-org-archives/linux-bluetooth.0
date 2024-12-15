@@ -1,140 +1,127 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26743194C86
-	for <linux-bluetooth@vger.kernel.org>; Fri, 13 Dec 2024 22:16:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10BB9189F20
+	for <linux-bluetooth@vger.kernel.org>; Sun, 15 Dec 2024 21:06:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734128174; cv=none; b=lLeDk3z65D2cLt97YjvnAyKJZO7Dw5wL9vdOtY8MXpKIo3e2ekiqcSda9FtdrGs9SAKsqOxs79sqgkIHCqmMxJ5O+HvBxF+tEbb0ClqAdz+BEs2nnTL+7eDumBXjPf7l/APmxZuCS+I4YM2WWwhds1RGA3DiHVk2Co2/N+1ZdCw=
+	t=1734296766; cv=none; b=qwJhsGeb5OD4ey2SZeoqAILIJszPOaORAr73FGkLQGf0Mno2oxwjdHlm/UACld2xERiNzC7RVSG5OZFGG/KkhKjVeH7sPZKDDL/vO76VUnYh8ttKGdaajdc+CqSIUXfD1lyffqEbKjf2eRACbh0ErpQA6F8u/n/a+g8+rZVoj10=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734128174; c=relaxed/simple;
-	bh=abvZuP+XR/peLHTHB2cs6zv4nddi9soJW/nbDJI6UEE=;
-	h=Date:From:To:Cc:Subject:Message-ID; b=j4t8uXKXq9No+e65kk8LIsu34ty4qeCQU8hGTu6lpVP3TXFL72ARGFtq6easoTI6eAuUP6PXZZb0UwnAKuC3F8CvA0WnseZtm+4ppRDnyHWlAFAeQV4FAXIhx7RGwH1hP18tADpchjsLVu6zZu5zotKE3omZ1FVhdTCGJOEIxsw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=YE5C5w1r; arc=none smtp.client-ip=192.198.163.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1734296766; c=relaxed/simple;
+	bh=oovXPkK7murpuRWTPBN3BotIlOv0ecFw7SXF7+cShBk=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=VOG/8aLlM8in0//LEqqMKpHtpfVmBJQXSvJYJtBDrvvwR+CG3r6M32MpyD/VftSaRbRLj3kAP/HvPRRZaJWrYG3Oc4qp7A6XKUP3yydz85b1no6iB9LgLuHdYu9TbOfA6U8j6WCdPcD72DL2e5TEKLCrw9uCLvf1j/B5lHqJSfw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jjSKBfed; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="YE5C5w1r"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1734128173; x=1765664173;
-  h=date:from:to:cc:subject:message-id;
-  bh=abvZuP+XR/peLHTHB2cs6zv4nddi9soJW/nbDJI6UEE=;
-  b=YE5C5w1rw7srqRLLJjCTt3uEU2vvlhXaHkBYnkmxBL/uPhDmYMGrrYk7
-   6chfVksk3p/d+D3P74VbcWYCDUaS4OtUughIzLHC0zHsdgJlzXWRNtIcq
-   /s3a10D5VhbFrAeawh63QTU5VW/Lw3vW0tTCFOSn26j69OIY6KLKhqMmF
-   /27lk+owpFVIrAImIWCKK/HG2k/bzl+RmttpE2C+xI2efBuvezPwS8MRc
-   kRN7PCvzUBg1yg6fXZcW83WqySUB8zP2VoROqJ6dU2C9s2ASYhyjHiPna
-   28ZomptRg7/vDfs7seSMR4JU/4dAdMq04l/dR46Dr+IaqizF336j+FU4p
-   Q==;
-X-CSE-ConnectionGUID: /A6MidICSTCGop7+y/qUMg==
-X-CSE-MsgGUID: PKV4My2tRZSxwAEm2sVxUA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11285"; a="33891347"
-X-IronPort-AV: E=Sophos;i="6.12,232,1728975600"; 
-   d="scan'208";a="33891347"
-Received: from fmviesa001.fm.intel.com ([10.60.135.141])
-  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Dec 2024 14:16:13 -0800
-X-CSE-ConnectionGUID: l421E7S/T1ixJo7QRoQlbg==
-X-CSE-MsgGUID: HNbSjqjER5eN055DD1ypfA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
-   d="scan'208";a="127649749"
-Received: from lkp-server01.sh.intel.com (HELO 82a3f569d0cb) ([10.239.97.150])
-  by fmviesa001.fm.intel.com with ESMTP; 13 Dec 2024 14:16:12 -0800
-Received: from kbuild by 82a3f569d0cb with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1tMDxB-000CU1-21;
-	Fri, 13 Dec 2024 22:16:09 +0000
-Date: Sat, 14 Dec 2024 06:15:33 +0800
-From: kernel test robot <lkp@intel.com>
-To: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: [bluetooth-next:master] BUILD SUCCESS
- 514e14b1a7c38520c955e59ec0ce09270cc4853c
-Message-ID: <202412140627.wZpls5KL-lkp@intel.com>
-User-Agent: s-nail v14.9.24
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jjSKBfed"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 8C990C4CECE
+	for <linux-bluetooth@vger.kernel.org>; Sun, 15 Dec 2024 21:06:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1734296765;
+	bh=oovXPkK7murpuRWTPBN3BotIlOv0ecFw7SXF7+cShBk=;
+	h=From:To:Subject:Date:In-Reply-To:References:From;
+	b=jjSKBfednbQ+Y/vSCL+wsopaYdUYwvA2OKrV3E9FyQ2MjYeTmihIB7k04G9Rc+kvN
+	 NLCSHAYrJulry1wXAnLoOdb3P94Mf0SyNLT0LAqFIMLUyEyJG22b9LP8u4Vbl0a3Rh
+	 DbwBx5Cl5AUWPl8j9r+LlVpCT+JhYIYBNDiq+1IJ7ofXJH4tN03CgUhGjATH97xRSl
+	 jBe7I5DTYYku47UFPq8oncHLfzq+qce0lR0CbDbRlMHFv+Q/s91y7VWJK+PwojX0I3
+	 LRIys9JNPxHfq1ULYfbMUZrAAKeuLQuB0PJQas/SAGlOMBcE0SLPL2epcWfMdvj+Cn
+	 Pq7Cc1EHJdmyw==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+	id 7ABAFC3279E; Sun, 15 Dec 2024 21:06:05 +0000 (UTC)
+From: bugzilla-daemon@kernel.org
+To: linux-bluetooth@vger.kernel.org
+Subject: [Bug 219514] PC does not resume from suspend, bisect points to
+ btusb/mediatek
+Date: Sun, 15 Dec 2024 21:06:05 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: h@realh.co.uk
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P3
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-219514-62941-ESnLv8F142@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-219514-62941@https.bugzilla.kernel.org/>
+References: <bug-219514-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
 
-tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
-branch HEAD: 514e14b1a7c38520c955e59ec0ce09270cc4853c  Bluetooth: MGMT: Mark LL Privacy as stable
+https://bugzilla.kernel.org/show_bug.cgi?id=3D219514
 
-elapsed time: 1453m
+--- Comment #2 from Tony Houghton (h@realh.co.uk) ---
+I've copied btusb.c and btmtk.c from 6dc22ab9f085 to a checkout of 6.13-rc2=
+ and
+changed a few lines to make it compatible with some things that have changed
+since then:
 
-configs tested: 63
-configs skipped: 2
+diff --git a/drivers/bluetooth/btmtk.c b/drivers/bluetooth/btmtk.c
+index fe3b892f6c6e..9eeddbb7d991 100644
+--- a/drivers/bluetooth/btmtk.c
++++ b/drivers/bluetooth/btmtk.c
+@@ -6,7 +6,7 @@
+ #include <linux/firmware.h>
+ #include <linux/usb.h>
+ #include <linux/iopoll.h>
+-#include <asm/unaligned.h>
++#include <linux/unaligned.h>
 
-The following configs have been built successfully.
-More configs may be tested in the coming days.
+ #include <net/bluetooth/bluetooth.h>
+ #include <net/bluetooth/hci_core.h>
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 034256c399dd..0e5cc454e2f9 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -17,7 +17,7 @@
+ #include <linux/suspend.h>
+ #include <linux/gpio/consumer.h>
+ #include <linux/debugfs.h>
+-#include <asm/unaligned.h>
++#include <linux/unaligned.h>
 
-tested configs:
-arc                  randconfig-001-20241213    gcc-13.2.0
-arc                  randconfig-002-20241213    gcc-13.2.0
-arm                  randconfig-001-20241213    clang-16
-arm                  randconfig-002-20241213    clang-18
-arm                  randconfig-003-20241213    gcc-14.2.0
-arm                  randconfig-004-20241213    clang-18
-arm64                randconfig-001-20241213    gcc-14.2.0
-arm64                randconfig-002-20241213    gcc-14.2.0
-arm64                randconfig-003-20241213    clang-18
-arm64                randconfig-004-20241213    gcc-14.2.0
-csky                 randconfig-001-20241213    gcc-14.2.0
-csky                 randconfig-002-20241213    gcc-14.2.0
-hexagon              randconfig-001-20241213    clang-20
-hexagon              randconfig-002-20241213    clang-20
-i386       buildonly-randconfig-001-20241213    clang-19
-i386       buildonly-randconfig-002-20241213    gcc-12
-i386       buildonly-randconfig-003-20241213    gcc-12
-i386       buildonly-randconfig-004-20241213    clang-19
-i386       buildonly-randconfig-005-20241213    gcc-12
-i386       buildonly-randconfig-006-20241213    gcc-12
-loongarch                       allmodconfig    gcc-14.2.0
-loongarch            randconfig-001-20241213    gcc-14.2.0
-loongarch            randconfig-002-20241213    gcc-14.2.0
-m68k                            allmodconfig    gcc-14.2.0
-m68k                            allyesconfig    gcc-14.2.0
-m68k                       m5407c3_defconfig    gcc-14.2.0
-nios2                randconfig-001-20241213    gcc-14.2.0
-nios2                randconfig-002-20241213    gcc-14.2.0
-parisc               randconfig-001-20241213    gcc-14.2.0
-parisc               randconfig-002-20241213    gcc-14.2.0
-powerpc              randconfig-001-20241213    gcc-14.2.0
-powerpc              randconfig-002-20241213    clang-20
-powerpc              randconfig-003-20241213    gcc-14.2.0
-powerpc64            randconfig-001-20241213    gcc-14.2.0
-powerpc64            randconfig-002-20241213    gcc-14.2.0
-powerpc64            randconfig-003-20241213    gcc-14.2.0
-riscv                randconfig-001-20241213    gcc-14.2.0
-riscv                randconfig-002-20241213    gcc-14.2.0
-s390                            allmodconfig    clang-19
-s390                            allyesconfig    gcc-14.2.0
-s390                 randconfig-001-20241213    gcc-14.2.0
-s390                 randconfig-002-20241213    clang-19
-sh                              allmodconfig    gcc-14.2.0
-sh                              allyesconfig    gcc-14.2.0
-sh                   randconfig-001-20241213    gcc-14.2.0
-sh                   randconfig-002-20241213    gcc-14.2.0
-sparc                           allmodconfig    gcc-14.2.0
-sparc                randconfig-001-20241213    gcc-14.2.0
-sparc                randconfig-002-20241213    gcc-14.2.0
-sparc64              randconfig-001-20241213    gcc-14.2.0
-sparc64              randconfig-002-20241213    gcc-14.2.0
-um                   randconfig-001-20241213    gcc-12
-um                   randconfig-002-20241213    clang-16
-x86_64                           allnoconfig    clang-19
-x86_64     buildonly-randconfig-001-20241213    gcc-12
-x86_64     buildonly-randconfig-002-20241213    gcc-12
-x86_64     buildonly-randconfig-003-20241213    gcc-12
-x86_64     buildonly-randconfig-004-20241213    gcc-12
-x86_64     buildonly-randconfig-005-20241213    gcc-12
-x86_64     buildonly-randconfig-006-20241213    clang-19
-x86_64                             defconfig    gcc-11
-xtensa               randconfig-001-20241213    gcc-14.2.0
-xtensa               randconfig-002-20241213    gcc-14.2.0
+ #include <net/bluetooth/bluetooth.h>
+ #include <net/bluetooth/hci_core.h>
+@@ -3887,8 +3887,8 @@ static int btusb_probe(struct usb_interface *intf,
+        if (id->driver_info & BTUSB_WIDEBAND_SPEECH)
+                set_bit(HCI_QUIRK_WIDEBAND_SPEECH_SUPPORTED, &hdev->quirks);
 
---
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+-       if (id->driver_info & BTUSB_VALID_LE_STATES)
+-               set_bit(HCI_QUIRK_VALID_LE_STATES, &hdev->quirks);
++       if (!(id->driver_info & BTUSB_VALID_LE_STATES))
++               set_bit(HCI_QUIRK_BROKEN_LE_STATES, &hdev->quirks);
+
+        if (id->driver_info & BTUSB_DIGIANSWER) {
+                data->cmdreq_type =3D USB_TYPE_VENDOR;
+
+Some guesswork was involved, but it seems to work for me. I'd like to try to
+get to the bottom of the issue so I don't have to keep patching my kernel. =
+Are
+there any options I could try?
+
+I've got plenty of experience with C, but not with the kernel, so if you co=
+uld
+give me some guidance such as a summary of what changed in ceac1cb0259d, wh=
+at
+code paths are taken during suspend/resume and any code tweaks I can try, it
+would be much appreciated.
+
+--=20
+You may reply to this email to add a comment.
+
+You are receiving this mail because:
+You are the assignee for the bug.=
