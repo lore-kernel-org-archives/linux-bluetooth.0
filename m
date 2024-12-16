@@ -1,101 +1,171 @@
-Received: from mail-pg1-f171.google.com (mail-pg1-f171.google.com [209.85.215.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx.treblig.org (mx.treblig.org [46.235.229.95])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 598C0189905
-	for <linux-bluetooth@vger.kernel.org>; Sun, 15 Dec 2024 21:14:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A816FE56A;
+	Mon, 16 Dec 2024 01:26:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.229.95
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734297273; cv=none; b=jbwuVoK9ZC0+8EuKOLwp27Lvjblg8lbcRvIUaDnwtajSCUNSwphFTB1j+TGtKQd4X5fEaj2uur6jtmtYh7YEIFTFBYfcymbsiMr0TTsBkELNhI+pw/20evRkm1HCV/D9Op6Z4RxMNdpNuO/WhQ6quTW8z4Mgf8a6mmGrQ6RPYW4=
+	t=1734312407; cv=none; b=Kc3wWb4W7rHMQcIvgffZyHfPvo8m2JoMF6RmFn3luwOFKjbQK7Phal/rngxqfNe7fkfvapQWrUADTlwWvhSBzAoFgmQbhh2vNy8wRdMUkC3QyMBJCPFOn58MEN3KlY0Q+g00SqT67P6NUNPeg4kb3KCL9oPDR7eIiaiDhJMaqHM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734297273; c=relaxed/simple;
-	bh=Vb/P415kXr2/l9j6T58UydhaYH/gpLCkvP8MwrSeCKs=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=SiNmll8VfUdMiy4NJmCZzbZ9qHzGFriNiel+zDx3+IOdd+8X/kyZdNXiAS+Vf5UXUrSbSQEvtq2qHf1JXbqad8hXaJZ86mmPFDLpKVvH4YJKnLYiVpCBSD5wDNM/oMBamPgkNK+4Dme2y+Et3VkX2VaxBsl9aH8iq5Jca+GFgno=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=R1z0tG7X; arc=none smtp.client-ip=209.85.215.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1734312407; c=relaxed/simple;
+	bh=hDsdqkjqR5C1PC+eX1OCSK4L0F7UjCPeuei1VlMplpE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=kwkhgIBM36iHShTmV501GOnSJP5Pt2rLtU/tOfMkM0BTUBI1FtWd5XGPE5Su9HkReBgggR4Fldbxpe8WR+rtvTl2E04q27yoy9+FnjGzNEUbshKBv8DxXjPOkTxxhEQEwwT3NMn3fAwbUvu83MaCIyQtqgeIlzFyh1gpvzbi3OA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org; spf=pass smtp.mailfrom=treblig.org; dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b=Yi5iAljf; arc=none smtp.client-ip=46.235.229.95
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=treblig.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="R1z0tG7X"
-Received: by mail-pg1-f171.google.com with SMTP id 41be03b00d2f7-7fd581c2bf4so1925543a12.3
-        for <linux-bluetooth@vger.kernel.org>; Sun, 15 Dec 2024 13:14:32 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1734297271; x=1734902071; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=Vb/P415kXr2/l9j6T58UydhaYH/gpLCkvP8MwrSeCKs=;
-        b=R1z0tG7XOAuqOPog8ArJsOVRmMJK4k/fJ9EsA+kQE87HRWGBZ00O449wzZYswybWPe
-         v7Hv18zm4IoM8P0C0q5yTYTrjhoGTaAOWiUvJFegvsi8MbkaYdtBN0xdPN5MqLZPpMWW
-         H97EyxR2UauMKutrhp20AOUC/X2pqRzj2cf3W+6XpWwcr/Ib1vOBLr+oK3FyLZcQkg7V
-         YQYIie0I6m0C6Wrg8Ku/ya6PgkrjDNXmaopwov7+12RHws12Lqo8Mll3yHN7zDTSJb8i
-         AQDhEf3x0rrjD4EIexmq5mElrfzDkX3hb/6xL5l3U0K0h4Cgj82gM2XHsS2Hy6erGYF3
-         sz3g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734297271; x=1734902071;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Vb/P415kXr2/l9j6T58UydhaYH/gpLCkvP8MwrSeCKs=;
-        b=AnmB+Id9P04N+zDfTmyaKNFz2GrZ6GWiUDEbCw3RBEdlKGt3kFdaJq6WTPRH3YI76K
-         sMXXS11u0NjuEdGHCWrb00HGPbJReCZjkkw5FLbdblVX5UKvtWxF3ehUQ4vbq810OwO1
-         GSz/dsdj8WVE349O785BSNALXqRjbR0vVk4N9IXWwMKEzHo9Hn2qVbwAHn8vpqHxsYjo
-         Mdr1s/bfx8japUr/KSpI+HTm+K/izk2aDmUELgNbysY10+2UbqMK0KfcDoiFtszUW/6n
-         BHp4JZsrTbCtQcpt3/ICOQx+yNIHSLT/pc/zESM2foP6K3LNEuCuL8KIi2Sn+8J+xVrr
-         mvEg==
-X-Gm-Message-State: AOJu0YySrY4ItR/BgxLQZabIkxlEtS6a+fAy/T2GuZD6x6+xMozRfi7p
-	0EVFWKvwqRdu93Nc+Rs84+/o//8jEbRkiYgivZEzezBsqUe4I3V8lGhwRw==
-X-Gm-Gg: ASbGncvEIdHkEMsrELqJPRjdlKHo52e1pcwQmZ4EILssY7gFTTzI4LhZB1QmsIJ+smk
-	8xUot1bk0Rh+yDdDFcJJPJc5dkxTbDCxZsUvO1scUf+n2ed9Mk3+TjYcZsyJ5VkvpjgCE4p7gti
-	H78+OrypMIEh2b/MA5PeosfhLdWWYsWVpQKRYClSYDhKV1j8wnX1LPoC+5AVPqYrbYNWJ+Nq+YI
-	21/j1Ue8rzg9KHLL956WBHVPlAT1o70dAZ/BOqXYGtOdvk0dDqI7GAlDesaBw==
-X-Google-Smtp-Source: AGHT+IHiLDyFQ6Kpz2zPEe5zKKbR4xk0+HaQvzm/yCY/Hf2AfxPKg7zyjGzxeVOHm3ukwtEn6r3dpQ==
-X-Received: by 2002:a17:90a:c2c6:b0:2ee:f076:20f1 with SMTP id 98e67ed59e1d1-2f28f869282mr16746469a91.0.1734297271398;
-        Sun, 15 Dec 2024 13:14:31 -0800 (PST)
-Received: from [172.17.0.2] ([20.172.5.219])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2f142de475bsm6688017a91.31.2024.12.15.13.14.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 15 Dec 2024 13:14:30 -0800 (PST)
-Message-ID: <675f46b6.170a0220.2965d5.d8ad@mx.google.com>
-Date: Sun, 15 Dec 2024 13:14:30 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============5552516967082003075=="
+	dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b="Yi5iAljf"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=treblig.org
+	; s=bytemarkmx; h=MIME-Version:Message-ID:Date:Subject:From:Content-Type:From
+	:Subject; bh=Ed70Ob2ebRAEalOLLlRfdmXMwXCLAiy2X1HhJXsXAHg=; b=Yi5iAljfykL2hBnN
+	y28RTE/WCxJslH0QtwpiRK/l9do1KIrOHgDNHXs6TFxZYXE/wx2qgGv18k1fXDOCWDch+Fivo5SIn
+	SDu1maS48i3OoaGRgy51De5iyM9Ly59JQBO26GJT9t83kjy0oTmJdGs1wSORMRpGojDhrzsOhKwAU
+	H6Hj+IalvXExvKrC+WQGb861lV8h7e/EBlUjBv8JpXvV21V5FWzYCx1n433LyJQbJQzMy1+hBOMRv
+	jcFCYQPqxx1s9/bMaVJmlK7Jnehj7kE6clYnTcPegEZ3wrCO7Wr1Zh4GaPotp0LmnP45b/aDxKtZ8
+	90dOTGdjjR31WJt2Ug==;
+Received: from localhost ([127.0.0.1] helo=dalek.home.treblig.org)
+	by mx.treblig.org with esmtp (Exim 4.96)
+	(envelope-from <linux@treblig.org>)
+	id 1tMzsa-005W3X-38;
+	Mon, 16 Dec 2024 01:26:37 +0000
+From: linux@treblig.org
+To: marcel@holtmann.org,
+	johan.hedberg@gmail.com,
+	luiz.dentz@gmail.com
+Cc: linux-bluetooth@vger.kernel.org,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	"Dr. David Alan Gilbert" <linux@treblig.org>
+Subject: [PATCH] Bluetooth: hci: Remove deadcode
+Date: Mon, 16 Dec 2024 01:26:36 +0000
+Message-ID: <20241216012636.484775-1-linux@treblig.org>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, bugzilla-daemon@kernel.org
-Subject: RE: [Bug,219514] PC does not resume from suspend, bisect points to btusb/mediatek
-In-Reply-To: <bug-219514-62941-ESnLv8F142@https.bugzilla.kernel.org/>
-References: <bug-219514-62941-ESnLv8F142@https.bugzilla.kernel.org/>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 
---===============5552516967082003075==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+From: "Dr. David Alan Gilbert" <linux@treblig.org>
 
-This is an automated email and please do not reply to this email.
+hci_bdaddr_list_del_with_flags() was added in 2020's
+commit 8baaa4038edb ("Bluetooth: Add bdaddr_list_with_flags for classic
+whitelist")
+but has remained unused.
 
-Dear Submitter,
+hci_remove_ext_adv_instance() was added in 2020's
+commit eca0ae4aea66 ("Bluetooth: Add initial implementation of BIS
+connections")
+but has remained unused.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
+Remove them.
 
------ Output -----
-
-error: patch failed: drivers/bluetooth/btmtk.c:6
-error: drivers/bluetooth/btmtk.c: patch does not apply
-error: patch failed: drivers/bluetooth/btusb.c:17
-error: drivers/bluetooth/btusb.c: patch does not apply
-hint: Use 'git am --show-current-patch' to see the failed patch
-
-Please resolve the issue and submit the patches again.
-
-
+Signed-off-by: Dr. David Alan Gilbert <linux@treblig.org>
 ---
-Regards,
-Linux Bluetooth
+ include/net/bluetooth/hci_core.h |  2 --
+ include/net/bluetooth/hci_sync.h |  1 -
+ net/bluetooth/hci_core.c         | 20 --------------------
+ net/bluetooth/hci_sync.c         | 24 ------------------------
+ 4 files changed, 47 deletions(-)
 
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index ca22ead85dbe..d122f6398879 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -1759,8 +1759,6 @@ int hci_bdaddr_list_add_with_flags(struct list_head *list, bdaddr_t *bdaddr,
+ int hci_bdaddr_list_del(struct list_head *list, bdaddr_t *bdaddr, u8 type);
+ int hci_bdaddr_list_del_with_irk(struct list_head *list, bdaddr_t *bdaddr,
+ 				 u8 type);
+-int hci_bdaddr_list_del_with_flags(struct list_head *list, bdaddr_t *bdaddr,
+-				   u8 type);
+ void hci_bdaddr_list_clear(struct list_head *list);
+ 
+ struct hci_conn_params *hci_conn_params_lookup(struct hci_dev *hdev,
+diff --git a/include/net/bluetooth/hci_sync.h b/include/net/bluetooth/hci_sync.h
+index f3052cb252ef..7e2cf0cca939 100644
+--- a/include/net/bluetooth/hci_sync.h
++++ b/include/net/bluetooth/hci_sync.h
+@@ -140,7 +140,6 @@ int hci_update_scan(struct hci_dev *hdev);
+ int hci_write_le_host_supported_sync(struct hci_dev *hdev, u8 le, u8 simul);
+ int hci_remove_ext_adv_instance_sync(struct hci_dev *hdev, u8 instance,
+ 				     struct sock *sk);
+-int hci_remove_ext_adv_instance(struct hci_dev *hdev, u8 instance);
+ struct sk_buff *hci_read_local_oob_data_sync(struct hci_dev *hdev, bool ext,
+ 					     struct sock *sk);
+ 
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 18ab5628f85a..ba955447b359 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -2181,26 +2181,6 @@ int hci_bdaddr_list_del_with_irk(struct list_head *list, bdaddr_t *bdaddr,
+ 	return 0;
+ }
+ 
+-int hci_bdaddr_list_del_with_flags(struct list_head *list, bdaddr_t *bdaddr,
+-				   u8 type)
+-{
+-	struct bdaddr_list_with_flags *entry;
+-
+-	if (!bacmp(bdaddr, BDADDR_ANY)) {
+-		hci_bdaddr_list_clear(list);
+-		return 0;
+-	}
+-
+-	entry = hci_bdaddr_list_lookup_with_flags(list, bdaddr, type);
+-	if (!entry)
+-		return -ENOENT;
+-
+-	list_del(&entry->list);
+-	kfree(entry);
+-
+-	return 0;
+-}
+-
+ /* This function requires the caller holds hdev->lock */
+ struct hci_conn_params *hci_conn_params_lookup(struct hci_dev *hdev,
+ 					       bdaddr_t *addr, u8 addr_type)
+diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+index c86f4e42e69c..984b72d073d7 100644
+--- a/net/bluetooth/hci_sync.c
++++ b/net/bluetooth/hci_sync.c
+@@ -1785,30 +1785,6 @@ int hci_remove_ext_adv_instance_sync(struct hci_dev *hdev, u8 instance,
+ 					HCI_CMD_TIMEOUT, sk);
+ }
+ 
+-static int remove_ext_adv_sync(struct hci_dev *hdev, void *data)
+-{
+-	struct adv_info *adv = data;
+-	u8 instance = 0;
+-
+-	if (adv)
+-		instance = adv->instance;
+-
+-	return hci_remove_ext_adv_instance_sync(hdev, instance, NULL);
+-}
+-
+-int hci_remove_ext_adv_instance(struct hci_dev *hdev, u8 instance)
+-{
+-	struct adv_info *adv = NULL;
+-
+-	if (instance) {
+-		adv = hci_find_adv_instance(hdev, instance);
+-		if (!adv)
+-			return -EINVAL;
+-	}
+-
+-	return hci_cmd_sync_queue(hdev, remove_ext_adv_sync, adv, NULL);
+-}
+-
+ int hci_le_terminate_big_sync(struct hci_dev *hdev, u8 handle, u8 reason)
+ {
+ 	struct hci_cp_le_term_big cp;
+-- 
+2.47.1
 
---===============5552516967082003075==--
