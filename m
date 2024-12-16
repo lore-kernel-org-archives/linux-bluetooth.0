@@ -1,153 +1,182 @@
-Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx1.sberdevices.ru (mx2.sberdevices.ru [45.89.224.132])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC1381FFC51
-	for <linux-bluetooth@vger.kernel.org>; Mon, 16 Dec 2024 08:38:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92D21204564;
+	Mon, 16 Dec 2024 11:58:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.89.224.132
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734338291; cv=none; b=EOQRMXK44RQeFjwdetrOPbu+YUuLVeWTvSgm2EDPy2+D3EJL4yBjWiptthr6V3iUkcW4YykWAw5Sho/KnlfVZZvIhYfJsOEmkHRaHz3PDR49VW3Yt+AUmgFGoC3Df0Hh92h/E1Duw6iVkepvhYqwUTqoOkiYmg53p/ZsqV8gg6A=
+	t=1734350337; cv=none; b=HF+azFVgVPmsFyPbL0FR81bA10hYsRc5pNz15DDP13dovpOUMO6GSEOld69GB0DfAl/IheM5xJhIZ7CqqiWXOqU22b+mXuRyddYeanORm19g3WU6TWShXeo3yG/2R4iGRGVnXSqxdpocH4bFsPyPTCr8It/n0MAY89e5H/e5wUA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734338291; c=relaxed/simple;
-	bh=MM3xhQvljroKXzstMV3n0pOmHMM3KuYMQtIo4Wa3q14=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=UaH1jkUZpO4fBBZOWriq0drUULuiflXCB3P44ODcH1Rn6KewI9TY4LrwoYxjGkVKgEROAtIXIRNHEoUcSJPvemmmZQmO42IrOO8rMKh1lGoKXwQXqTh0SJx7jqWl8dYI0pbCy87KsO7zaBQUD04dvnN8Fh0D6hLBJi+SERNDXKk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Q0V7fTwE; arc=none smtp.client-ip=209.85.210.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1734350337; c=relaxed/simple;
+	bh=lm3kgClJug7qa+J0SXo8cfDLbmK5Qv+6XxvlK4603KQ=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:CC:References:
+	 In-Reply-To:Content-Type; b=AZJGn1EDBOYldQn1lMIOR6umfGl6RtB4yWGCT/Z3YqMwJ+GmkuC2u/L9PL4Dkx2tbPOJjMkfu57qFe0zdhZ1R8y69aL2PdX2xbVRasvAVWbxITjMckTgZFYJpscIJJw34+hCJdNvRV0XVF0grWGZPYR6Hj/teZU3DjdSN8jfM0Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=salutedevices.com; spf=pass smtp.mailfrom=salutedevices.com; dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b=pQnyzuYS; arc=none smtp.client-ip=45.89.224.132
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=salutedevices.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=salutedevices.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Q0V7fTwE"
-Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-728d1a2f180so2761382b3a.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 16 Dec 2024 00:38:09 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1734338289; x=1734943089; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=zDatzOVdaylDp+8wLYRBwtZ6GfpiEPTmuXkK5auXig0=;
-        b=Q0V7fTwEOlZ7ZhCTgtA0pT3iP99fK0VvVg+wGJpqu1n+1GwHqMmh58xloP3IF8jZVz
-         jR3JOfw5h9GdPHdwTwMD/VJdYRBl/r+fXwo/VOUwl4sdUAxU9YdGyOhqg2UP4yH7UpoQ
-         8o/poLNf68ZbtN1w3I1HhDzZUHV+cwha0CGvvxQ5NYKHl46U6PlwGs5LcAulKCDVTOHH
-         Zr/AZdsEoo+aIag2wFz7nLZvQsecqx78cvPyahb4qgQqJ1+zn815H/HWN5AjdU2xjndz
-         Xz/JGFP0wXH9kZ351+d7YYt5TpRJ13rdFgY6Uqk4AySUAu9v39G6RR4pTDuY+wYnA1Qh
-         hG9w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734338289; x=1734943089;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=zDatzOVdaylDp+8wLYRBwtZ6GfpiEPTmuXkK5auXig0=;
-        b=OC1il7ZZfma5t9lqU8QaGkUt7kr1ZHvaw9cWfRlWFfic7AGo2aS8TkOmXDDlSkCrjx
-         8PgmqpKEPG99C3vcHwO11Ko9d19YMV2oHc2IqjoEQOvJ9M4BuNFQY+CqiY9XfgK2fY2v
-         d9i9TrCl4wgFJBwrjfjr4fsRK3Io4TvhN2Gr0VVcsK+7gQXV8tS8Splw82bblSeYhPlH
-         KfZDW2qIaqdE1RPQ5GKPtNK/Vgyg9owwMHSVZSvgDTneva/HrRGSPY4BWMPqAbZphrxV
-         7HggT61apF0PXMZtPX/qwYUvZhr5Zd5x1Q+B5qDB+JMMW+Oig5MOVHx2Q8+B9RbRC29V
-         FPqA==
-X-Gm-Message-State: AOJu0YyeP/3SCj5M1C9wNWcMEPwz1ZcLJl+tDDNJbf93rTqBCJD25HKl
-	5YZWFu5iDpIicnDq/Ti1XOfwD/xHPVzxism/KteV8rae4IxMWQQP59wXyA==
-X-Gm-Gg: ASbGncs3weFkSpm1G7bf/cTf220iRIRRgfkVzsVIjuqkZTL0dq3H5E6pB4BfJ2EheMa
-	hhjRpKLJ/dEbd/hCQBWHgmAuIp3IV1ONzULfvX5khy+HZ5pY8lD4+mxrIvRrW2/iFzPy2oEbg4l
-	VpjuaMPbXu0NDmnNQvUfLoQDk9yhMS/AKoTyJVJ8/5ScINrL/pjCG6VL2u9FDavB9hqqH5weXya
-	2uQgJL5d59FmZDiH56rLe3OtxCOGa3ecfMwKyTf+kwwUA07x4U8yhYYh19LmQ==
-X-Google-Smtp-Source: AGHT+IHDJwUD4v3f86XSm1V71I4FZsGWX+HR9aOfaETXQhabpgamfDiHI+p7P8OFS/DzntJ96lAzKg==
-X-Received: by 2002:a05:6a21:b8d:b0:1e1:adcd:eadb with SMTP id adf61e73a8af0-1e1e000c365mr14555449637.11.1734338288634;
-        Mon, 16 Dec 2024 00:38:08 -0800 (PST)
-Received: from [172.17.0.2] ([20.172.2.104])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-72918b78f7dsm4193978b3a.97.2024.12.16.00.38.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 16 Dec 2024 00:38:08 -0800 (PST)
-Message-ID: <675fe6f0.050a0220.2b4856.a3cc@mx.google.com>
-Date: Mon, 16 Dec 2024 00:38:08 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============7567931763256384223=="
+	dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b="pQnyzuYS"
+Received: from p-infra-ksmg-sc-msk02.sberdevices.ru (localhost [127.0.0.1])
+	by mx1.sberdevices.ru (Postfix) with ESMTP id 2808C120004;
+	Mon, 16 Dec 2024 14:58:34 +0300 (MSK)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru 2808C120004
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=salutedevices.com;
+	s=mail; t=1734350314;
+	bh=N4EIz87hdTFuSyYktZ8RMVmUnwBSsWbB+okMih0CFqM=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Content-Type:From;
+	b=pQnyzuYSX/M9GJOkTUyKebvfexTMuenJvJqRSPXkRsdmFDZqUgi3QpwYXnbSVvRpx
+	 haS5OFBOLgbvgmaCtmsQkufQBq2CeHXn0yK7TvMs6N9Szz3royzN7Jnz9jb9VcyvDA
+	 4Y1RDfXVugkpZHsvIH8mS6bxtv19fk2xsB4rB/PT5Zd7KoRDabgISmAGstjEciKLLi
+	 eogsjx92cghoqVPGZtgGDuovsus2x0HBNN5aTzA/aW9mgiczZNHLb3rA9e/HtLzlm0
+	 EkWnImCuSxL9J0GjSj2e2jFIPVB6wGH0N7FoHBP60QdGGRE20IY8PERfHRRZXC8/oM
+	 zGGDXpcsaYU1g==
+Received: from smtp.sberdevices.ru (p-i-exch-sc-m02.sberdevices.ru [172.16.192.103])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.sberdevices.ru (Postfix) with ESMTPS;
+	Mon, 16 Dec 2024 14:58:33 +0300 (MSK)
+Message-ID: <e18ebe28-e300-f9e3-ef66-1b7811ebd447@salutedevices.com>
+Date: Mon, 16 Dec 2024 14:58:28 +0300
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, quic_chejiang@quicinc.com
-Subject: RE: [v1] Bluetooth: hci_sync: Fix disconnect complete event timeout issue
-In-Reply-To: <20241216080758.3450976-1-quic_chejiang@quicinc.com>
-References: <20241216080758.3450976-1-quic_chejiang@quicinc.com>
-Reply-To: linux-bluetooth@vger.kernel.org
-
---===============7567931763256384223==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.4.2
+Subject: Re: [PATCH v1] Bluetooth: hci_uart: fix race during initialization
+Content-Language: en-US
+From: Arseniy Krasnov <avkrasnov@salutedevices.com>
+To: Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz
+	<luiz.dentz@gmail.com>
+CC: <linux-bluetooth@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<oxffffaa@gmail.com>, <ddrokosov@salutedevices.com>
+References: <a1db0c90-1803-e01c-3e23-d18e4343a4eb@salutedevices.com>
+In-Reply-To: <a1db0c90-1803-e01c-3e23-d18e4343a4eb@salutedevices.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: p-i-exch-a-m2.sberdevices.ru (172.24.196.120) To
+ p-i-exch-a-m1.sberdevices.ru (172.24.196.116)
+X-KSMG-Rule-ID: 10
+X-KSMG-Message-Action: clean
+X-KSMG-AntiSpam-Lua-Profiles: 189858 [Dec 16 2024]
+X-KSMG-AntiSpam-Version: 6.1.1.7
+X-KSMG-AntiSpam-Envelope-From: avkrasnov@salutedevices.com
+X-KSMG-AntiSpam-Rate: 0
+X-KSMG-AntiSpam-Status: not_detected
+X-KSMG-AntiSpam-Method: none
+X-KSMG-AntiSpam-Auth: dkim=none
+X-KSMG-AntiSpam-Info: LuaCore: 47 0.3.47 57010b355d009055a5b6c34e0385c69b21a4e07f, {Tracking_from_domain_doesnt_match_to}, salutedevices.com:7.1.1;127.0.0.199:7.1.2;smtp.sberdevices.ru:5.0.1,7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1, FromAlignment: s
+X-MS-Exchange-Organization-SCL: -1
+X-KSMG-AntiSpam-Interceptor-Info: scan successful
+X-KSMG-AntiPhishing: Clean
+X-KSMG-LinksScanning: Clean
+X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.0.1.6960, bases: 2024/12/16 09:00:00 #26886042
+X-KSMG-AntiVirus-Status: Clean, skipped
 
-This is automated email and please do not reply to this email!
+Hi, sorry, pls ping
 
-Dear submitter,
+Thanks
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=918106
-
----Test result---
-
-Test Summary:
-CheckPatch                    PENDING   0.40 seconds
-GitLint                       PENDING   0.25 seconds
-SubjectPrefix                 PASS      0.07 seconds
-BuildKernel                   PASS      25.14 seconds
-CheckAllWarning               PASS      27.29 seconds
-CheckSparse                   WARNING   30.84 seconds
-BuildKernel32                 PASS      24.66 seconds
-TestRunnerSetup               PASS      437.78 seconds
-TestRunner_l2cap-tester       PASS      20.72 seconds
-TestRunner_iso-tester         PASS      30.18 seconds
-TestRunner_bnep-tester        PASS      4.86 seconds
-TestRunner_mgmt-tester        FAIL      122.69 seconds
-TestRunner_rfcomm-tester      PASS      7.66 seconds
-TestRunner_sco-tester         FAIL      9.40 seconds
-TestRunner_ioctl-tester       PASS      8.14 seconds
-TestRunner_mesh-tester        PASS      5.96 seconds
-TestRunner_smp-tester         PASS      6.98 seconds
-TestRunner_userchan-tester    PASS      5.05 seconds
-IncrementalBuild              PENDING   0.72 seconds
-
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: CheckSparse - WARNING
-Desc: Run sparse tool with linux kernel
-Output:
-net/bluetooth/hci_event.c: note: in included file (through include/net/bluetooth/hci_core.h):
-##############################
-Test: TestRunner_mgmt-tester - FAIL
-Desc: Run mgmt-tester with test-runner
-Output:
-Total: 490, Passed: 483 (98.6%), Failed: 3, Not Run: 4
-
-Failed Test Cases
-LL Privacy - Set Flags 1 (Add to RL)                 Failed       0.153 seconds
-LL Privacy - Set Flags 3 (2 Devices to RL)           Failed       0.169 seconds
-LL Privacy - Start Discovery 2 (Disable RL)          Failed       0.187 seconds
-##############################
-Test: TestRunner_sco-tester - FAIL
-Desc: Run sco-tester with test-runner
-Output:
-BUG: KASAN: slab-use-after-free in hci_abort_conn_sync+0xc92/0xf30
-Total: 15, Passed: 14 (93.3%), Failed: 0, Not Run: 1
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============7567931763256384223==--
+On 27.11.2024 15:38, Arseniy Krasnov wrote:
+> 'hci_register_dev()' calls power up function, which is executed by
+> kworker - 'hci_power_on()'. This function does access to bluetooth chip
+> using callbacks from 'hci_ldisc.c', for example 'hci_uart_send_frame()'.
+> Now 'hci_uart_send_frame()' checks 'HCI_UART_PROTO_READY' bit set, and
+> if not - it fails. Problem is that 'HCI_UART_PROTO_READY' is set after
+> 'hci_register_dev()', and there is tiny chance that 'hci_power_on()' will
+> be executed before setting this bit. In that case HCI init logic fails.
+> 
+> Patch adds one more bit in addition to 'HCI_UART_PROTO_READY' which
+> allows to perform power up logic without original bit set.
+> 
+> Signed-off-by: Arseniy Krasnov <avkrasnov@salutedevices.com>
+> ---
+>  drivers/bluetooth/hci_ldisc.c | 19 ++++++++++++++-----
+>  drivers/bluetooth/hci_uart.h  |  1 +
+>  2 files changed, 15 insertions(+), 5 deletions(-)
+> 
+> diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
+> index 30192bb083549..2e20f00649bd7 100644
+> --- a/drivers/bluetooth/hci_ldisc.c
+> +++ b/drivers/bluetooth/hci_ldisc.c
+> @@ -102,7 +102,8 @@ static inline struct sk_buff *hci_uart_dequeue(struct hci_uart *hu)
+>  	if (!skb) {
+>  		percpu_down_read(&hu->proto_lock);
+>  
+> -		if (test_bit(HCI_UART_PROTO_READY, &hu->flags))
+> +		if (test_bit(HCI_UART_PROTO_READY, &hu->flags) ||
+> +		    test_bit(HCI_UART_PROTO_INIT, &hu->flags))
+>  			skb = hu->proto->dequeue(hu);
+>  
+>  		percpu_up_read(&hu->proto_lock);
+> @@ -124,7 +125,8 @@ int hci_uart_tx_wakeup(struct hci_uart *hu)
+>  	if (!percpu_down_read_trylock(&hu->proto_lock))
+>  		return 0;
+>  
+> -	if (!test_bit(HCI_UART_PROTO_READY, &hu->flags))
+> +	if (!test_bit(HCI_UART_PROTO_READY, &hu->flags) &&
+> +	    !test_bit(HCI_UART_PROTO_INIT, &hu->flags))
+>  		goto no_schedule;
+>  
+>  	set_bit(HCI_UART_TX_WAKEUP, &hu->tx_state);
+> @@ -278,7 +280,8 @@ static int hci_uart_send_frame(struct hci_dev *hdev, struct sk_buff *skb)
+>  
+>  	percpu_down_read(&hu->proto_lock);
+>  
+> -	if (!test_bit(HCI_UART_PROTO_READY, &hu->flags)) {
+> +	if (!test_bit(HCI_UART_PROTO_READY, &hu->flags) &&
+> +	    !test_bit(HCI_UART_PROTO_INIT, &hu->flags)) {
+>  		percpu_up_read(&hu->proto_lock);
+>  		return -EUNATCH;
+>  	}
+> @@ -582,7 +585,8 @@ static void hci_uart_tty_wakeup(struct tty_struct *tty)
+>  	if (tty != hu->tty)
+>  		return;
+>  
+> -	if (test_bit(HCI_UART_PROTO_READY, &hu->flags))
+> +	if (test_bit(HCI_UART_PROTO_READY, &hu->flags) ||
+> +	    test_bit(HCI_UART_PROTO_INIT, &hu->flags))
+>  		hci_uart_tx_wakeup(hu);
+>  }
+>  
+> @@ -608,7 +612,8 @@ static void hci_uart_tty_receive(struct tty_struct *tty, const u8 *data,
+>  
+>  	percpu_down_read(&hu->proto_lock);
+>  
+> -	if (!test_bit(HCI_UART_PROTO_READY, &hu->flags)) {
+> +	if (!test_bit(HCI_UART_PROTO_READY, &hu->flags) &&
+> +	    !test_bit(HCI_UART_PROTO_INIT, &hu->flags)) {
+>  		percpu_up_read(&hu->proto_lock);
+>  		return;
+>  	}
+> @@ -704,12 +709,16 @@ static int hci_uart_set_proto(struct hci_uart *hu, int id)
+>  
+>  	hu->proto = p;
+>  
+> +	set_bit(HCI_UART_PROTO_INIT, &hu->flags);
+> +
+>  	err = hci_uart_register_dev(hu);
+>  	if (err) {
+>  		return err;
+>  	}
+>  
+>  	set_bit(HCI_UART_PROTO_READY, &hu->flags);
+> +	clear_bit(HCI_UART_PROTO_INIT, &hu->flags);
+> +
+>  	return 0;
+>  }
+>  
+> diff --git a/drivers/bluetooth/hci_uart.h b/drivers/bluetooth/hci_uart.h
+> index 00bf7ae82c5b7..39f39704be41f 100644
+> --- a/drivers/bluetooth/hci_uart.h
+> +++ b/drivers/bluetooth/hci_uart.h
+> @@ -89,6 +89,7 @@ struct hci_uart {
+>  #define HCI_UART_REGISTERED		1
+>  #define HCI_UART_PROTO_READY		2
+>  #define HCI_UART_NO_SUSPEND_NOTIFIER	3
+> +#define HCI_UART_PROTO_INIT		4
+>  
+>  /* TX states  */
+>  #define HCI_UART_SENDING	1
