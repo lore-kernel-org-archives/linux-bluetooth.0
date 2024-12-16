@@ -1,182 +1,203 @@
-Received: from mx1.sberdevices.ru (mx2.sberdevices.ru [45.89.224.132])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92D21204564;
-	Mon, 16 Dec 2024 11:58:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.89.224.132
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C24BF2054FE;
+	Mon, 16 Dec 2024 13:36:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734350337; cv=none; b=HF+azFVgVPmsFyPbL0FR81bA10hYsRc5pNz15DDP13dovpOUMO6GSEOld69GB0DfAl/IheM5xJhIZ7CqqiWXOqU22b+mXuRyddYeanORm19g3WU6TWShXeo3yG/2R4iGRGVnXSqxdpocH4bFsPyPTCr8It/n0MAY89e5H/e5wUA=
+	t=1734356167; cv=none; b=DGMuI7DJ9RtvxXaS9YwmX44FMBDSkgLVwD0Vm4JagTX2ChrCb9BlryyvCqNcK2H9DSXYFYTrzk73C/Yiz0EfGYX78F8o/pEz4czyb3eTRgnoRncQr/HJbUKNNBnPG36l0bMVJe9h1nwl0x214LgAJA9u8UaNo87307uep+OrFDk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734350337; c=relaxed/simple;
-	bh=lm3kgClJug7qa+J0SXo8cfDLbmK5Qv+6XxvlK4603KQ=;
+	s=arc-20240116; t=1734356167; c=relaxed/simple;
+	bh=WyP7BzgYY7YGA+a0ILLeArWmBBHz47BFHlAp06/Vr8E=;
 	h=Message-ID:Date:MIME-Version:Subject:From:To:CC:References:
-	 In-Reply-To:Content-Type; b=AZJGn1EDBOYldQn1lMIOR6umfGl6RtB4yWGCT/Z3YqMwJ+GmkuC2u/L9PL4Dkx2tbPOJjMkfu57qFe0zdhZ1R8y69aL2PdX2xbVRasvAVWbxITjMckTgZFYJpscIJJw34+hCJdNvRV0XVF0grWGZPYR6Hj/teZU3DjdSN8jfM0Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=salutedevices.com; spf=pass smtp.mailfrom=salutedevices.com; dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b=pQnyzuYS; arc=none smtp.client-ip=45.89.224.132
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=salutedevices.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=salutedevices.com
+	 In-Reply-To:Content-Type; b=q18GjiOU3xQHPLG5QTH0UWJ97h7hgFBv8wZQOHwCxEAk49FQM3ePh/sXhZiZbVvSR6DqVEKv0Oq7tIWs7uaGV99tdoUSFyeFfvE/R++Udwj/SUgSI0P4Syku1HH/AVgK3Q+tCi/KqWKV9L5RqAHoOYPmXVXKR30EdFM2stidDms=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=gGB6biMD; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b="pQnyzuYS"
-Received: from p-infra-ksmg-sc-msk02.sberdevices.ru (localhost [127.0.0.1])
-	by mx1.sberdevices.ru (Postfix) with ESMTP id 2808C120004;
-	Mon, 16 Dec 2024 14:58:34 +0300 (MSK)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru 2808C120004
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=salutedevices.com;
-	s=mail; t=1734350314;
-	bh=N4EIz87hdTFuSyYktZ8RMVmUnwBSsWbB+okMih0CFqM=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Content-Type:From;
-	b=pQnyzuYSX/M9GJOkTUyKebvfexTMuenJvJqRSPXkRsdmFDZqUgi3QpwYXnbSVvRpx
-	 haS5OFBOLgbvgmaCtmsQkufQBq2CeHXn0yK7TvMs6N9Szz3royzN7Jnz9jb9VcyvDA
-	 4Y1RDfXVugkpZHsvIH8mS6bxtv19fk2xsB4rB/PT5Zd7KoRDabgISmAGstjEciKLLi
-	 eogsjx92cghoqVPGZtgGDuovsus2x0HBNN5aTzA/aW9mgiczZNHLb3rA9e/HtLzlm0
-	 EkWnImCuSxL9J0GjSj2e2jFIPVB6wGH0N7FoHBP60QdGGRE20IY8PERfHRRZXC8/oM
-	 zGGDXpcsaYU1g==
-Received: from smtp.sberdevices.ru (p-i-exch-sc-m02.sberdevices.ru [172.16.192.103])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.sberdevices.ru (Postfix) with ESMTPS;
-	Mon, 16 Dec 2024 14:58:33 +0300 (MSK)
-Message-ID: <e18ebe28-e300-f9e3-ef66-1b7811ebd447@salutedevices.com>
-Date: Mon, 16 Dec 2024 14:58:28 +0300
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="gGB6biMD"
+Received: from pps.filterd (m0279872.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4BGBLi4L026769;
+	Mon, 16 Dec 2024 13:36:02 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	ytcw+NCskfRTmLBds1Ot3cdlcldMD7z44DgB0WOj1Ak=; b=gGB6biMDbJY9xyK7
+	2BlNK6b/OruZd+h+PzCCUxTmtNQGgnmPRQ3sCV3FqSq5O7lryul3ZDQ3YQw2SKBV
+	qYzKWA0Ieubq6BfjrlxHA6J2YMQIY9L2pIy0wK/6If0TDEpdir+dIT6c5UD/pumw
+	dxIGXpNkafK0lrYayJWHESoTHTDDkNFLlyu37ptqiWQPUm/9Pvkro+HNjWapCl2I
+	locG8ETl3uqE+olURsoInA5+epwbpfqIzR7ERBCPE+XHBHIuapv4yseCPPcVDThb
+	jxUEgFKSQMdfFy6+p0k53gUQ5VNwg/vUzSdJoq1QIv0VNh87aLVzeYB8hJ/neq01
+	wLC6lA==
+Received: from nalasppmta04.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 43jk8grca2-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 16 Dec 2024 13:36:02 +0000 (GMT)
+Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
+	by NALASPPMTA04.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 4BGDa1Gv009387
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 16 Dec 2024 13:36:01 GMT
+Received: from [10.253.36.176] (10.80.80.8) by nalasex01c.na.qualcomm.com
+ (10.47.97.35) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Mon, 16 Dec
+ 2024 05:35:59 -0800
+Message-ID: <9be4f9c2-bf10-4bd2-ad56-40684f4fb5c3@quicinc.com>
+Date: Mon, 16 Dec 2024 21:35:56 +0800
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.4.2
-Subject: Re: [PATCH v1] Bluetooth: hci_uart: fix race during initialization
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v1] Bluetooth: hci_sync: clear cmd_sync_work_list when
+ power off
+From: Jiayang Mao <quic_jiaymao@quicinc.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+CC: Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg
+	<johan.hedberg@gmail.com>,
+        <linux-bluetooth@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <quic_chejiang@quicinc.com>, <quic_shuaz@quicinc.com>
+References: <20241125175111.8598-1-quic_jiaymao@quicinc.com>
+ <CABBYNZLY_PAA0jPiHwGKUmdd3SKqwViLSHAkNHH0=trdqrDRnQ@mail.gmail.com>
+ <8107a53f-5967-461b-8c89-773096a316d1@quicinc.com>
+ <CABBYNZJarA24Sy5qXKy77Jtnn+RBYhSg7Hxj9wUxENNvwkiyTg@mail.gmail.com>
+ <f96edd22-c7d1-4d83-96d6-8138fbb1ff71@quicinc.com>
 Content-Language: en-US
-From: Arseniy Krasnov <avkrasnov@salutedevices.com>
-To: Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz
-	<luiz.dentz@gmail.com>
-CC: <linux-bluetooth@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<oxffffaa@gmail.com>, <ddrokosov@salutedevices.com>
-References: <a1db0c90-1803-e01c-3e23-d18e4343a4eb@salutedevices.com>
-In-Reply-To: <a1db0c90-1803-e01c-3e23-d18e4343a4eb@salutedevices.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: p-i-exch-a-m2.sberdevices.ru (172.24.196.120) To
- p-i-exch-a-m1.sberdevices.ru (172.24.196.116)
-X-KSMG-Rule-ID: 10
-X-KSMG-Message-Action: clean
-X-KSMG-AntiSpam-Lua-Profiles: 189858 [Dec 16 2024]
-X-KSMG-AntiSpam-Version: 6.1.1.7
-X-KSMG-AntiSpam-Envelope-From: avkrasnov@salutedevices.com
-X-KSMG-AntiSpam-Rate: 0
-X-KSMG-AntiSpam-Status: not_detected
-X-KSMG-AntiSpam-Method: none
-X-KSMG-AntiSpam-Auth: dkim=none
-X-KSMG-AntiSpam-Info: LuaCore: 47 0.3.47 57010b355d009055a5b6c34e0385c69b21a4e07f, {Tracking_from_domain_doesnt_match_to}, salutedevices.com:7.1.1;127.0.0.199:7.1.2;smtp.sberdevices.ru:5.0.1,7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1, FromAlignment: s
-X-MS-Exchange-Organization-SCL: -1
-X-KSMG-AntiSpam-Interceptor-Info: scan successful
-X-KSMG-AntiPhishing: Clean
-X-KSMG-LinksScanning: Clean
-X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.0.1.6960, bases: 2024/12/16 09:00:00 #26886042
-X-KSMG-AntiVirus-Status: Clean, skipped
+In-Reply-To: <f96edd22-c7d1-4d83-96d6-8138fbb1ff71@quicinc.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nalasex01c.na.qualcomm.com (10.47.97.35)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: PFGyh9t2_qUzWqJvmCciqnL6dQ7-pkmf
+X-Proofpoint-ORIG-GUID: PFGyh9t2_qUzWqJvmCciqnL6dQ7-pkmf
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
+ definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999 adultscore=0
+ spamscore=0 priorityscore=1501 mlxscore=0 phishscore=0 malwarescore=0
+ lowpriorityscore=0 suspectscore=0 impostorscore=0 bulkscore=0
+ clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2411120000 definitions=main-2412160114
 
-Hi, sorry, pls ping
+Hi Luiz,
 
-Thanks
+On 2024/12/4 21:47, Jiayang Mao wrote:
+> Hi Luiz,
+> 
+> On 2024/12/4 1:28, Luiz Augusto von Dentz wrote:
+>> Hi Jiayang,
+>>
+>> On Tue, Dec 3, 2024 at 12:19 PM Jiayang Mao <quic_jiaymao@quicinc.com> 
+>> wrote:
+>>>
+>>> Hi Luiz,
+>>>
+>>> On 2024/12/3 4:41, Luiz Augusto von Dentz wrote:
+>>>> Hi Jiayang,
+>>>>
+>>>> On Mon, Nov 25, 2024 at 12:51 PM Jiayang Mao 
+>>>> <quic_jiaymao@quicinc.com> wrote:
+>>>>>
+>>>>> Clear the remaining command in cmd_sync_work_list when BT is
+>>>>> performing power off. In some cases, this list is not empty after
+>>>>> power off. BT host will try to send more HCI commands.
+>>>>> This can cause unexpected results.
+>>>>
+>>>> What commands are in the queue?
+>>>
+>>> If turning off BT during pairing, "hci_acl_create_conn_sync" has chances
+>>> to be left in the queue. Then the driver will try to send the HCI
+>>> command of creating connection but failed.
+>>
+>> There shouldn't be happening though:
+>>
+>>      /* Terminated due to Power Off */
+>>      err = hci_disconnect_all_sync(hdev, HCI_ERROR_REMOTE_POWER_OFF);
+>>      if (err)
+>>          goto out;
+>>
+>>      err = hci_dev_close_sync(hdev);
+>>
+>> Perhaps there is something attempting to connect after
+>> hci_disconnect_all_sync has completed, in that case there is a bug
+>> around this sequence or we need to check HCI_POWERING_DOWN to not
+>> attempt to process the connection attempts.
+>>
+> After pairing, an L2CAP channel is to be created by l2cap_sock_create
+> function. It eventually calls hci_connect_acl_sync, which adds
+> hci_acl_create_conn_sync to the cmd_sync_work_list.
+> 
+> The issue arises if BT is turned off after this addition but before
+> hci_acl_create_conn_sync is execute.
+> 
+> Your suggestion to check HCI_POWERING_DOWN seems more appropriate
+> for addressing this issue. We can try incorporating this check into
+> hci_acl_create_conn_sync.
 
-On 27.11.2024 15:38, Arseniy Krasnov wrote:
-> 'hci_register_dev()' calls power up function, which is executed by
-> kworker - 'hci_power_on()'. This function does access to bluetooth chip
-> using callbacks from 'hci_ldisc.c', for example 'hci_uart_send_frame()'.
-> Now 'hci_uart_send_frame()' checks 'HCI_UART_PROTO_READY' bit set, and
-> if not - it fails. Problem is that 'HCI_UART_PROTO_READY' is set after
-> 'hci_register_dev()', and there is tiny chance that 'hci_power_on()' will
-> be executed before setting this bit. In that case HCI init logic fails.
+Thank you for your attention to this matter. Could you please help to
+check my reply? Please let me know if there are any other concerns, or
+if I should submit another change to check HCI_POWERING_DOWN in
+hci_acl_create_conn_sync.
 > 
-> Patch adds one more bit in addition to 'HCI_UART_PROTO_READY' which
-> allows to perform power up logic without original bit set.
+>>>>
+>>>>> Signed-off-by: Jiayang Mao <quic_jiaymao@quicinc.com>
+>>>>> ---
+>>>>>    net/bluetooth/hci_sync.c | 6 ++++++
+>>>>>    1 file changed, 6 insertions(+)
+>>>>>
+>>>>> diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+>>>>> index c86f4e42e..bc622d074 100644
+>>>>> --- a/net/bluetooth/hci_sync.c
+>>>>> +++ b/net/bluetooth/hci_sync.c
+>>>>> @@ -5139,6 +5139,7 @@ int hci_dev_close_sync(struct hci_dev *hdev)
+>>>>>    {
+>>>>>           bool auto_off;
+>>>>>           int err = 0;
+>>>>> +       struct hci_cmd_sync_work_entry *entry, *tmp;
+>>>>>
+>>>>>           bt_dev_dbg(hdev, "");
+>>>>>
+>>>>> @@ -5258,6 +5259,11 @@ int hci_dev_close_sync(struct hci_dev *hdev)
+>>>>>           clear_bit(HCI_RUNNING, &hdev->flags);
+>>>>>           hci_sock_dev_event(hdev, HCI_DEV_CLOSE);
+>>>>>
+>>>>> +       mutex_lock(&hdev->cmd_sync_work_lock);
+>>>>> +       list_for_each_entry_safe(entry, tmp, &hdev- 
+>>>>> >cmd_sync_work_list, list)
+>>>>> +               _hci_cmd_sync_cancel_entry(hdev, entry, -ECANCELED);
+>>>>> +       mutex_unlock(&hdev->cmd_sync_work_lock);
+>>>>
+>>>> Seems equivalent to hci_cmd_sync_clear, that said we should have been
+>>>> running with that lock already, also if there is a sequence like
+>>>> close/open the close may cancel the subsequent open, so I don't think
+>>>> we should be canceling every subsequent callback like this.
+>>>
+>>> In hci_cmd_sync_clear, the work cmd_sync_work and reenable_adv_work are
+>>> canceled. hci_cmd_sync_clear is not directly called because these two
+>>> works should not be canceled during power off.
+>>> Do you mean the added code should be moved to other functions to avoid
+>>> the risk of lock?
+>>>
+>>> Yes. This change lacks considering sequence of close/open. I will update
+>>> the implementation to ensure it does not remove the opening and the
+>>> operations after re-opening.
+>>>>
+>>>>>           /* After this point our queues are empty and no tasks are 
+>>>>> scheduled. */
+>>>>>           hdev->close(hdev);
+>>>>>
+>>>>> -- 
+>>>>> 2.25.1
+>>>>>
+>>>>
+>>>>
+>>>
+>>
+>>
 > 
-> Signed-off-by: Arseniy Krasnov <avkrasnov@salutedevices.com>
-> ---
->  drivers/bluetooth/hci_ldisc.c | 19 ++++++++++++++-----
->  drivers/bluetooth/hci_uart.h  |  1 +
->  2 files changed, 15 insertions(+), 5 deletions(-)
-> 
-> diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
-> index 30192bb083549..2e20f00649bd7 100644
-> --- a/drivers/bluetooth/hci_ldisc.c
-> +++ b/drivers/bluetooth/hci_ldisc.c
-> @@ -102,7 +102,8 @@ static inline struct sk_buff *hci_uart_dequeue(struct hci_uart *hu)
->  	if (!skb) {
->  		percpu_down_read(&hu->proto_lock);
->  
-> -		if (test_bit(HCI_UART_PROTO_READY, &hu->flags))
-> +		if (test_bit(HCI_UART_PROTO_READY, &hu->flags) ||
-> +		    test_bit(HCI_UART_PROTO_INIT, &hu->flags))
->  			skb = hu->proto->dequeue(hu);
->  
->  		percpu_up_read(&hu->proto_lock);
-> @@ -124,7 +125,8 @@ int hci_uart_tx_wakeup(struct hci_uart *hu)
->  	if (!percpu_down_read_trylock(&hu->proto_lock))
->  		return 0;
->  
-> -	if (!test_bit(HCI_UART_PROTO_READY, &hu->flags))
-> +	if (!test_bit(HCI_UART_PROTO_READY, &hu->flags) &&
-> +	    !test_bit(HCI_UART_PROTO_INIT, &hu->flags))
->  		goto no_schedule;
->  
->  	set_bit(HCI_UART_TX_WAKEUP, &hu->tx_state);
-> @@ -278,7 +280,8 @@ static int hci_uart_send_frame(struct hci_dev *hdev, struct sk_buff *skb)
->  
->  	percpu_down_read(&hu->proto_lock);
->  
-> -	if (!test_bit(HCI_UART_PROTO_READY, &hu->flags)) {
-> +	if (!test_bit(HCI_UART_PROTO_READY, &hu->flags) &&
-> +	    !test_bit(HCI_UART_PROTO_INIT, &hu->flags)) {
->  		percpu_up_read(&hu->proto_lock);
->  		return -EUNATCH;
->  	}
-> @@ -582,7 +585,8 @@ static void hci_uart_tty_wakeup(struct tty_struct *tty)
->  	if (tty != hu->tty)
->  		return;
->  
-> -	if (test_bit(HCI_UART_PROTO_READY, &hu->flags))
-> +	if (test_bit(HCI_UART_PROTO_READY, &hu->flags) ||
-> +	    test_bit(HCI_UART_PROTO_INIT, &hu->flags))
->  		hci_uart_tx_wakeup(hu);
->  }
->  
-> @@ -608,7 +612,8 @@ static void hci_uart_tty_receive(struct tty_struct *tty, const u8 *data,
->  
->  	percpu_down_read(&hu->proto_lock);
->  
-> -	if (!test_bit(HCI_UART_PROTO_READY, &hu->flags)) {
-> +	if (!test_bit(HCI_UART_PROTO_READY, &hu->flags) &&
-> +	    !test_bit(HCI_UART_PROTO_INIT, &hu->flags)) {
->  		percpu_up_read(&hu->proto_lock);
->  		return;
->  	}
-> @@ -704,12 +709,16 @@ static int hci_uart_set_proto(struct hci_uart *hu, int id)
->  
->  	hu->proto = p;
->  
-> +	set_bit(HCI_UART_PROTO_INIT, &hu->flags);
-> +
->  	err = hci_uart_register_dev(hu);
->  	if (err) {
->  		return err;
->  	}
->  
->  	set_bit(HCI_UART_PROTO_READY, &hu->flags);
-> +	clear_bit(HCI_UART_PROTO_INIT, &hu->flags);
-> +
->  	return 0;
->  }
->  
-> diff --git a/drivers/bluetooth/hci_uart.h b/drivers/bluetooth/hci_uart.h
-> index 00bf7ae82c5b7..39f39704be41f 100644
-> --- a/drivers/bluetooth/hci_uart.h
-> +++ b/drivers/bluetooth/hci_uart.h
-> @@ -89,6 +89,7 @@ struct hci_uart {
->  #define HCI_UART_REGISTERED		1
->  #define HCI_UART_PROTO_READY		2
->  #define HCI_UART_NO_SUSPEND_NOTIFIER	3
-> +#define HCI_UART_PROTO_INIT		4
->  
->  /* TX states  */
->  #define HCI_UART_SENDING	1
+Thanks,
+Jiayang Mao
