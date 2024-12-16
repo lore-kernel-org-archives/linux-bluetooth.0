@@ -1,119 +1,193 @@
 Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C51C91CDA19;
-	Mon, 16 Dec 2024 06:52:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15CF01CEAD5;
+	Mon, 16 Dec 2024 08:08:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734331923; cv=none; b=qlimVSftg+1iOuU4AQVJHReROtkYqhmpwjB0n/Ed1w49Y4gNQNGqwo1OPc1lOr/TZBOy590MHlF26tQlb6DP+1yCWPwdi1odBhcP+ArI2Vt1HXPVmpS66nSHEMH1h4TTY1kSyrxCL3MNDbrbBH+S1lTRVXLGipwFkw9hGi4MYeE=
+	t=1734336509; cv=none; b=e/qwihzqLvvNU/WKkFODUBdQ40CSmJBXIR1bhkmGRB7knGfc8mQFIuPeOl/xTshcu4RGEWTbtzcbgDeJqTrhP0PwJHaCaC0B3dgkoUCn8WNnh4bG++GNN8S1UKoV0lSc5KcqfZfYD0XeYX69kU0xhY/gBzq39i+yUGe25/GtgQY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734331923; c=relaxed/simple;
-	bh=WMrEz+LMhGjGjcGy2RvNwSXp26knQ5HaO7GsCo1wpug=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=Q7EfR2eQT3Iq0f6FuDliJpr25tz1DNak/EHnCcqGQu5bToy3LIbkQa+QrjvOfeAsRiyLbFERRhf9iTBfd6I0m0VSgy2akkkHg/1xtmquWhIUx0Ev2zTOVWCaypRJ+9MYAzv7/rJZ0lL+cb+v5GfPI4k9J1Y9V7kncASDHvXany0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=Zh022Krx; arc=none smtp.client-ip=205.220.168.131
+	s=arc-20240116; t=1734336509; c=relaxed/simple;
+	bh=vKRg9IvjfK+czGohhlnN+R6sJwilUcCYTWCQQeDkfgY=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=A3xl7Sj9bg4/GTNKx0mL9pvIJELhZd7tV+qw8Ao4qE+P0Vjcco16sQcvpiRx7L4kkmcyKog6+FpNe619aGCjF0+0emEa8IVD1b1OfFx7mgzS6tm5pw2HcPBAbGvBekS4AtK8WZ/vM0nHtefrGixOlEwzDItd702d6XRosbpNpV4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=Ycsasqec; arc=none smtp.client-ip=205.220.168.131
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="Zh022Krx"
-Received: from pps.filterd (m0279866.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4BG6XUMM022881;
-	Mon, 16 Dec 2024 06:51:55 GMT
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="Ycsasqec"
+Received: from pps.filterd (m0279862.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4BG70dj2009305;
+	Mon, 16 Dec 2024 08:08:18 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	W5DE1K6aJ4x+TQ/APFlbqgz5GJVAuTMDhtcN8go7qyU=; b=Zh022Krx94TmLyvC
-	MRSrq+ENJehlp6spgxyttsl+mrlTTZwyw/XdSADzepqQ1CWX21OWgH89aMvYvdSF
-	1hDPQddur9HBCVfG41e0LNngFXjLkuz6qJ0TcC3eYjeEFi/i/WtDgbqNmHYHisQE
-	oAkKNoVEB+TciQVCI+BZJNVjVHjtOrGgZCa344Hl4wjQB8WG15lwwUc7NEv1QPtv
-	v04cw2dFjGXZQPuldxlCNnklzlPbSATsOEt6ChMiMCEZT7Ac4tXflvrlLJWqwDGK
-	EZro2XaKeOjp83njBcJXHZkBEyvoiHe49G8doPk+Rn3TM6968VAH71ZRSC1dHc8t
-	L5EIiQ==
-Received: from nalasppmta01.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 43jf1w8429-1
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=qcppdkim1; bh=ZXXxk4rz1MSk4Nse1rMuOF
+	VjQQ+tODMhIlyfIHY/zUk=; b=YcsasqecQmGOw7t/saWssRQq62BWhW1VJ5lBEc
+	F49tHvzjKr//LEKIQF3fgn6EPQ4py+2Dxy5XnRZ2oMe+YRuXU6zPuis1ZdJ/yEzj
+	nWtVMgmdkYelIff5PgOyfRvI/GD13sgSM1SiWIobTtMAY9ZKM/Q7XfNOZsOTKapA
+	6Es4MEUaXtferPOOGLwGxqMDFGv6ajg9mq+mrJ4uhWIZVAMR2coJKicjTekj1efI
+	SosDDjLfAtyjzemNXArvbcwd+UuomEpguBkRLP90SgjjvYpAG93L2Y3cwYRCUSGa
+	nFRxJM8DO7H69Y35Zqig+tDSjaJfhHUvYh/mSlQYWMeRwI6w==
+Received: from nalasppmta05.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 43jfemg5ur-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 16 Dec 2024 06:51:54 +0000 (GMT)
+	Mon, 16 Dec 2024 08:08:17 +0000 (GMT)
 Received: from nalasex01b.na.qualcomm.com (nalasex01b.na.qualcomm.com [10.47.209.197])
-	by NALASPPMTA01.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 4BG6psPs016371
+	by NALASPPMTA05.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 4BG88HVs019279
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 16 Dec 2024 06:51:54 GMT
-Received: from [10.231.216.175] (10.80.80.8) by nalasex01b.na.qualcomm.com
- (10.47.209.197) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Sun, 15 Dec
- 2024 22:51:50 -0800
-Message-ID: <86c148b7-3f5c-468d-a935-72dd5e4660d0@quicinc.com>
-Date: Mon, 16 Dec 2024 14:51:47 +0800
+	Mon, 16 Dec 2024 08:08:17 GMT
+Received: from chejiang-gv.qualcomm.com (10.80.80.8) by
+ nalasex01b.na.qualcomm.com (10.47.209.197) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.9; Mon, 16 Dec 2024 00:08:13 -0800
+From: Cheng Jiang <quic_chejiang@quicinc.com>
+To: Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg
+	<johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>
+CC: Simon Horman <horms@kernel.org>, <linux-bluetooth@vger.kernel.org>,
+        <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <quic_chejiang@quicinc.com>, <quic_jiaymao@quicinc.com>,
+        <quic_shuaz@quicinc.com>, <quic_zijuhu@quicinc.com>,
+        <quic_mohamull@quicinc.com>
+Subject: [PATCH v1] Bluetooth: hci_sync: Fix disconnect complete event timeout issue
+Date: Mon, 16 Dec 2024 16:07:58 +0800
+Message-ID: <20241216080758.3450976-1-quic_chejiang@quicinc.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 4/4] arm64: dts: qcom: sa8775p-ride: Add firmware-name
- in BT node
-To: Krzysztof Kozlowski <krzk@kernel.org>
-CC: Marcel Holtmann <marcel@holtmann.org>,
-        Luiz Augusto von Dentz
-	<luiz.dentz@gmail.com>,
-        Rob Herring <robh@kernel.org>,
-        Krzysztof Kozlowski
-	<krzk+dt@kernel.org>,
-        Conor Dooley <conor+dt@kernel.org>,
-        Bjorn Andersson
-	<andersson@kernel.org>,
-        Konrad Dybcio <konradybcio@kernel.org>,
-        "Balakrishna
- Godavarthi" <quic_bgodavar@quicinc.com>,
-        Rocky Liao
-	<quic_rjliao@quicinc.com>,
-        <linux-bluetooth@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <linux-arm-msm@vger.kernel.org>,
-        <quic_jiaymao@quicinc.com>, <quic_shuaz@quicinc.com>,
-        <quic_zijuhu@quicinc.com>, <quic_mohamull@quicinc.com>
-References: <20241212150232.3823088-1-quic_chejiang@quicinc.com>
- <20241212150232.3823088-5-quic_chejiang@quicinc.com>
- <qjfytsieecdiavyosc6u2t2t5uhmkzrhw4ad7oykd7x23o5yp2@5bteod5q7yud>
-Content-Language: en-US
-From: "Cheng Jiang (IOE)" <quic_chejiang@quicinc.com>
-In-Reply-To: <qjfytsieecdiavyosc6u2t2t5uhmkzrhw4ad7oykd7x23o5yp2@5bteod5q7yud>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
  nalasex01b.na.qualcomm.com (10.47.209.197)
 X-QCInternal: smtphost
 X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: IdnB2OcfefonCRdWd8BheKOh4UDbCRyG
-X-Proofpoint-ORIG-GUID: IdnB2OcfefonCRdWd8BheKOh4UDbCRyG
+X-Proofpoint-GUID: 3GikgXpARt62adh3mqDkazdpc5kVy8Oz
+X-Proofpoint-ORIG-GUID: 3GikgXpARt62adh3mqDkazdpc5kVy8Oz
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
  definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 mlxscore=0
- impostorscore=0 suspectscore=0 phishscore=0 adultscore=0 bulkscore=0
- lowpriorityscore=0 spamscore=0 mlxlogscore=999 priorityscore=1501
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2411120000 definitions=main-2412160055
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011 spamscore=0
+ mlxscore=0 lowpriorityscore=0 bulkscore=0 malwarescore=0 adultscore=0
+ priorityscore=1501 phishscore=0 impostorscore=0 suspectscore=0
+ mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2411120000 definitions=main-2412160066
 
-Hi Krzysztof,
+Sometimes, the remote device doesn't acknowledge the LL_TERMINATE_IND
+in time, requiring the controller to wait for the supervision timeout,
+which may exceed 2 seconds. In the current implementation, the
+HCI_EV_DISCONN_COMPLETE event is ignored if it arrives late, since
+the hci_abort_conn_sync has cleaned up the connection after 2 seconds.
+This causes the mgmt to get stuck, resulting in bluetoothd waiting
+indefinitely for the mgmt response to the disconnect. To recover,
+restarting bluetoothd is necessary.
 
-On 12/13/2024 4:51 PM, Krzysztof Kozlowski wrote:
-> On Thu, Dec 12, 2024 at 11:02:32PM +0800, Cheng Jiang wrote:
->> The sa8775p-ride platform uses the QCA6698 Bluetooth chip. While the
->> QCA6698 shares the same IP core as the WCN6855, it has different RF
->> components and RAM sizes, requiring new firmware files. Use the
->> firmware-name property to specify the NVM and rampatch firmware to load.
->>
->> Signed-off-by: Cheng Jiang <quic_chejiang@quicinc.com>
->> ---
->>  arch/arm64/boot/dts/qcom/sa8775p-ride.dtsi | 1 +
->>  1 file changed, 1 insertion(+)
-> 
-> Just to recap: this patch must not be applied to Bluetooth tree, but it
-> should go via Qualcomm soc.
-> 
-Thanks, I will submit a separated patch of this changes. 
+bluetoothctl log like this:
+[Designer Mouse]# disconnect D9:B5:6C:F2:51:91
+Attempting to disconnect from D9:B5:6C:F2:51:91
+[Designer Mouse]#
+[Designer Mouse]# power off
+[Designer Mouse]#
+Failed to set power off: org.freedesktop.DBus.Error.NoReply.
 
-> Best regards,
-> Krzysztof
-> 
+Signed-off-by: Cheng Jiang <quic_chejiang@quicinc.com>
+---
+ include/net/bluetooth/hci_core.h |  2 ++
+ net/bluetooth/hci_conn.c         |  9 +++++++++
+ net/bluetooth/hci_event.c        |  9 +++++++++
+ net/bluetooth/hci_sync.c         | 18 ++++++++++++++++++
+ 4 files changed, 38 insertions(+)
+
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 734cd50cd..2ab079dcf 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -753,6 +753,8 @@ struct hci_conn {
+ 
+ 	struct bt_codec codec;
+ 
++	struct completion disc_ev_comp;
++
+ 	void (*connect_cfm_cb)	(struct hci_conn *conn, u8 status);
+ 	void (*security_cfm_cb)	(struct hci_conn *conn, u8 status);
+ 	void (*disconn_cfm_cb)	(struct hci_conn *conn, u8 reason);
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index d097e308a..e0244e191 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -1028,6 +1028,15 @@ static struct hci_conn *__hci_conn_add(struct hci_dev *hdev, int type, bdaddr_t
+ 
+ 	hci_conn_init_sysfs(conn);
+ 
++	/* This disc_ev_comp is inited when we send a disconnect request to
++	 * the remote device but fail to receive the disconnect complete
++	 * event within the expected time (2 seconds). This occurs because
++	 * the remote device doesn't ack the terminate indication, forcing
++	 * the controller to wait for the supervision timeout.
++	 */
++	init_completion(&conn->disc_ev_comp);
++	complete(&conn->disc_ev_comp);
++
+ 	return conn;
+ }
+ 
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 2cc7a9306..60ecb2b18 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -3366,6 +3366,15 @@ static void hci_disconn_complete_evt(struct hci_dev *hdev, void *data,
+ 	if (!conn)
+ 		goto unlock;
+ 
++	/* Wake up disc_ev_comp here is ok. Since we hold the hdev lock
++	 * hci_abort_conn_sync will wait hdev lock release to continue.
++	 */
++	if (!completion_done(&conn->disc_ev_comp)) {
++		complete(&conn->disc_ev_comp);
++		/* Add some delay for hci_abort_conn_sync to handle the complete */
++		usleep_range(100, 1000);
++	}
++
+ 	if (ev->status) {
+ 		mgmt_disconnect_failed(hdev, &conn->dst, conn->type,
+ 				       conn->dst_type, ev->status);
+diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+index 0badec712..783d04b57 100644
+--- a/net/bluetooth/hci_sync.c
++++ b/net/bluetooth/hci_sync.c
+@@ -5590,6 +5590,24 @@ int hci_abort_conn_sync(struct hci_dev *hdev, struct hci_conn *conn, u8 reason)
+ 		break;
+ 	}
+ 
++	/* Check whether the connection is successfully disconnected.
++	 * Sometimes the remote device doesn't acknowledge the
++	 * LL_TERMINATE_IND in time, requiring the controller to wait
++	 * for the supervision timeout, which may exceed 2 seconds. In
++	 * this case, we need to wait for the HCI_EV_DISCONN_COMPLETE
++	 * event before cleaning up the connection.
++	 */
++	if (err == -ETIMEDOUT) {
++		u32 idle_delay = msecs_to_jiffies(10 * conn->le_supv_timeout);
++
++		reinit_completion(&conn->disc_ev_comp);
++		if (!wait_for_completion_timeout(&conn->disc_ev_comp, idle_delay)) {
++			bt_dev_warn(hdev, "Failed to get complete");
++			mgmt_disconnect_failed(hdev, &conn->dst, conn->type,
++					       conn->dst_type, conn->abort_reason);
++		}
++	}
++
+ 	hci_dev_lock(hdev);
+ 
+ 	/* Check if the connection has been cleaned up concurrently */
+
+base-commit: e25c8d66f6786300b680866c0e0139981273feba
+-- 
+2.34.1
 
