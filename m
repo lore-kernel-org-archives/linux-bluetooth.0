@@ -1,124 +1,137 @@
-Received: from mail-qv1-f43.google.com (mail-qv1-f43.google.com [209.85.219.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 410CF629
-	for <linux-bluetooth@vger.kernel.org>; Tue, 17 Dec 2024 19:18:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.43
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB5E11D89EC;
+	Tue, 17 Dec 2024 20:53:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734463117; cv=none; b=g5+z+N6q/6y03edisjTvGbRjdkZXfjmA/tjisCCclr26OhBdtTqTs95g17tdKzVTolYinHRzJ6TX9+XlbLkchy7DCNs6GvwSFfM1DJxKD8Nl0WLxYDSRLOk4V9JGKUkbu82N5psDz8tJZhqTphJuIFjz0w5RxDiYQ1njW8VRFOQ=
+	t=1734468808; cv=none; b=J6iIu0jP5BI8CPgWTJ9wGjMr0xqdNB+cff313scXxM0ONuMsxvJHghfw6k8BLr2A4WFpJDIGUcLAPgn3bmiDmilYYX+A4A3QwdB3E1oyb/w98C6Sfa5PWnVbCwt3WrnEkD/igj5qk83zJ6gkmXyjuQYzeDqXP0jn6ppHUVVrvSg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734463117; c=relaxed/simple;
-	bh=j3LvlY1i3m+OHMkxNY741tm15M4jnSqBvmqVjb80mRU=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=QOEUM8ZcnL0RT45VOyHFmSgocFaSpzA+rWnsGPswEn4fTz52wJVY+ivPnyBgqVnlxzS1llJJwlQ2yW40clCxDj42IhqtjoHWWi7qZrJ0zRpFJilBXTiqRf9TgY1WlVNsST++9LOAH1YA7ex/O80263jCb4+VP6kAq5i5NPn+f3M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gBORUVfR; arc=none smtp.client-ip=209.85.219.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1734468808; c=relaxed/simple;
+	bh=AZ0CsLKt8J6l6W4VDxSftOcj1gfWEjTLXyKq8DV0roY=;
+	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=dwDQMpU6mk+Lo8KUOSSXsIzOLy2BKL0l6Wc83FApFCet/kF1R9z2jPo4po/j8cLEwuUqzuKojbuksb7KIOGpNU0a97g1NteXfdtoNSdHbsmJZJxqM6QI+zAbgVSCVQlUF+MEV/GIwXUn5gqKlofdjmdbhU5SqmO7Lj5x83aUlbo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=PN+5X7vl; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gBORUVfR"
-Received: by mail-qv1-f43.google.com with SMTP id 6a1803df08f44-6dd049b5428so4895116d6.2
-        for <linux-bluetooth@vger.kernel.org>; Tue, 17 Dec 2024 11:18:36 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1734463115; x=1735067915; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=ekY68zdz/rvnguFgUDFnyuopL+q9HtZPRTUO7OIfgyQ=;
-        b=gBORUVfRzExkSFxXEM0IDdG1n3dRQHvmhPmzEHKn7bICZLvwo0GncK2Q7CqBdRuQWD
-         fxSf83Crp3k7OPmhVn9AxwKsyOlXf5i6aAKY9fCzddbyFQ5J0gYIxqntN0EbTsjFy5ld
-         WdKOrZiukNZuQbo+tu8yRM4oJsSV9KddlcOarKsgqwTXgSo3+8LvlV5i3/TEjz5BLi3F
-         02C1iEVT3nR3y4NKXAvXbyAZx3z9ORwQgZNJpq82P9mxwVBO+ShiyOh90jld7l2onK0F
-         ycOwOj1GNClwlUFPAt2I9L9jUt2ZI82vQzVoIJjDHgB2141dqKVZrP5uxDlRCByLtw6m
-         S9eQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734463115; x=1735067915;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ekY68zdz/rvnguFgUDFnyuopL+q9HtZPRTUO7OIfgyQ=;
-        b=JppWJUYv2eSrTaAHcfePojqYdTp/1XwoRRW69qZpoHOWdas5BZ/PhM6/5TKFknCiaf
-         04hEuX3xS+rnOcxUfdeaVSZcMN2MALxu5IFb3rgrbXffMydX9ZxRW5W+U31JeeUoHDjG
-         sHgZNnJ4klLCbc17QLu6e9uaGi9yxSA9gKL90YZoJ6XYVIIxsSp4GnFgM/H9/FDuom/u
-         L5DBZyPR/wRHYK2B/NyTQXauepPuhohM2QAHk5f5EQaqv4zXFzfzODpukNwAG7nVtc3L
-         4YywcX9Y3yzkpU1z2tcyFTazGB1PKzIEoAqBDAeX7yxD58gMoRWxdj/Bk4y7an0bjt6t
-         zXhA==
-X-Gm-Message-State: AOJu0YyW6JHEokcRtayGULSS/wFqVltwIhre8cae2nV5NWLZX4Z1rsDb
-	LPY4Iy7DH95gHdFqRPjmKNIC0+scsKET/N912F+dmAPkNcCcMSzTfG3T0Q==
-X-Gm-Gg: ASbGncshcuemVpcm5Q6ylsJshsWAJ0lamEutzYKehXuIVnPg+n5Ae1rdm9i1S5gU1aG
-	fnBt6/CzmffzdV9nz/NLVEuXO2daxR6I2FubfcanPz2am3eZ3FHr+prs64tCIxY6wKUz6UWVNxI
-	VpiShFnEDdfMcdHZS/x+iVaRCGJ6WKzb7MYimUjgQlRJpj/MNgis09rqlpEUVH95+FQCi2I9Aqy
-	xwFiwzZdJN2NJXzroHO21E+4wu0LeNptdV1MCRKjULEQ75F/db10Vl3BPWeRH0s
-X-Google-Smtp-Source: AGHT+IGrjwAIdvtUza/trJO5aYcCcran8tyrmGQHf4hxGlNblMQw+JXEWf17JcYtSnTIsM8h/wJu4w==
-X-Received: by 2002:ad4:5f8c:0:b0:6d4:1e43:f3a5 with SMTP id 6a1803df08f44-6dd091b0317mr2967506d6.13.1734463114841;
-        Tue, 17 Dec 2024 11:18:34 -0800 (PST)
-Received: from [172.17.0.2] ([74.235.135.255])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6dccd261b42sm41316686d6.52.2024.12.17.11.18.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 17 Dec 2024 11:18:33 -0800 (PST)
-Message-ID: <6761ce89.0c0a0220.63d60.e8d3@mx.google.com>
-Date: Tue, 17 Dec 2024 11:18:33 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============4703946235930925021=="
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="PN+5X7vl"
+Received: from [192.168.35.166] (c-73-118-245-227.hsd1.wa.comcast.net [73.118.245.227])
+	by linux.microsoft.com (Postfix) with ESMTPSA id 313DC2171F96;
+	Tue, 17 Dec 2024 12:53:23 -0800 (PST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 313DC2171F96
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1734468805;
+	bh=aVc5gziW3F5u0OxTruXlabKnVm24GGvTVYzcdDQRKKI=;
+	h=Date:Cc:Subject:To:References:From:In-Reply-To:From;
+	b=PN+5X7vl8fqADT/aII8zIGfk60UMtxJ9pR+EBirm4pXAa4JZO11zP4etUexy4ZsF1
+	 Hz5jBPkUY126l1G2C1Lf0cgYJmqJpx2Ac/wrr+Dl/I1W058j7FPkFRH8CsABxT6WHb
+	 +lq4b3CWgOR3ojB2J6CV+93O4Hyq14ifZiz9VEy4=
+Message-ID: <14ad0c08-7b3b-47b6-8cc1-8a4179238e5a@linux.microsoft.com>
+Date: Tue, 17 Dec 2024 12:53:22 -0800
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [BlueZ,v1,1/2] client: Add command wake
-In-Reply-To: <20241217181334.3243011-1-luiz.dentz@gmail.com>
-References: <20241217181334.3243011-1-luiz.dentz@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
-
---===============4703946235930925021==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Cc: eahariha@linux.microsoft.com, Pablo Neira Ayuso <pablo@netfilter.org>,
+ Jozsef Kadlecsik <kadlec@netfilter.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, Julia Lawall <Julia.Lawall@inria.fr>,
+ Nicolas Palix <nicolas.palix@imag.fr>, Daniel Mack <daniel@zonque.org>,
+ Haojian Zhuang <haojian.zhuang@gmail.com>,
+ Robert Jarzmik <robert.jarzmik@free.fr>, Russell King
+ <linux@armlinux.org.uk>, Heiko Carstens <hca@linux.ibm.com>,
+ Vasily Gorbik <gor@linux.ibm.com>, Alexander Gordeev
+ <agordeev@linux.ibm.com>, Christian Borntraeger <borntraeger@linux.ibm.com>,
+ Sven Schnelle <svens@linux.ibm.com>, Ofir Bitton <obitton@habana.ai>,
+ Oded Gabbay <ogabbay@kernel.org>, Lucas De Marchi
+ <lucas.demarchi@intel.com>,
+ =?UTF-8?Q?Thomas_Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>,
+ Rodrigo Vivi <rodrigo.vivi@intel.com>,
+ Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+ Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>,
+ David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
+ Jeroen de Borst <jeroendb@google.com>,
+ Praveen Kaligineedi <pkaligineedi@google.com>,
+ Shailend Chand <shailend@google.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ James Smart <james.smart@broadcom.com>,
+ Dick Kennedy <dick.kennedy@broadcom.com>,
+ "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>,
+ "Martin K. Petersen" <martin.petersen@oracle.com>,
+ =?UTF-8?Q?Roger_Pau_Monn=C3=A9?= <roger.pau@citrix.com>,
+ Jens Axboe <axboe@kernel.dk>, Kalle Valo <kvalo@kernel.org>,
+ Jeff Johnson <jjohnson@kernel.org>, Catalin Marinas
+ <catalin.marinas@arm.com>, Jack Wang <jinpu.wang@cloud.ionos.com>,
+ Marcel Holtmann <marcel@holtmann.org>,
+ Johan Hedberg <johan.hedberg@gmail.com>,
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Florian Fainelli <florian.fainelli@broadcom.com>, Ray Jui
+ <rjui@broadcom.com>, Scott Branden <sbranden@broadcom.com>,
+ Broadcom internal kernel review list
+ <bcm-kernel-feedback-list@broadcom.com>, Xiubo Li <xiubli@redhat.com>,
+ Ilya Dryomov <idryomov@gmail.com>, Josh Poimboeuf <jpoimboe@kernel.org>,
+ Jiri Kosina <jikos@kernel.org>, Miroslav Benes <mbenes@suse.cz>,
+ Petr Mladek <pmladek@suse.com>, Joe Lawrence <joe.lawrence@redhat.com>,
+ Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
+ Louis Peens <louis.peens@corigine.com>, Michael Ellerman
+ <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>,
+ Christophe Leroy <christophe.leroy@csgroup.eu>,
+ Naveen N Rao <naveen@kernel.org>, Madhavan Srinivasan <maddy@linux.ibm.com>,
+ netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, cocci@inria.fr,
+ linux-arm-kernel@lists.infradead.org, linux-s390@vger.kernel.org,
+ dri-devel@lists.freedesktop.org, intel-xe@lists.freedesktop.org,
+ linux-scsi@vger.kernel.org, xen-devel@lists.xenproject.org,
+ linux-block@vger.kernel.org, linux-wireless@vger.kernel.org,
+ ath11k@lists.infradead.org, linux-mm@kvack.org,
+ linux-bluetooth@vger.kernel.org, linux-staging@lists.linux.dev,
+ linux-rpi-kernel@lists.infradead.org, ceph-devel@vger.kernel.org,
+ live-patching@vger.kernel.org, linux-sound@vger.kernel.org,
+ oss-drivers@corigine.com, linuxppc-dev@lists.ozlabs.org,
+ Anna-Maria Behnsen <anna-maria@linutronix.de>,
+ Jeff Johnson <quic_jjohnson@quicinc.com>, paul@paul-moore.com
+Subject: Re: [PATCH v3 00/19] Converge on using secs_to_jiffies()
+To: Andrew Morton <akpm@linux-foundation.org>
+References: <20241210-converge-secs-to-jiffies-v3-0-ddfefd7e9f2a@linux.microsoft.com>
+ <20241210163520.95fa1c8aa83e1915004ed884@linux-foundation.org>
+ <422470cd-84f0-469e-93c2-493c5091391d@linux.microsoft.com>
+From: Easwar Hariharan <eahariha@linux.microsoft.com>
+Content-Language: en-US
+In-Reply-To: <422470cd-84f0-469e-93c2-493c5091391d@linux.microsoft.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-This is automated email and please do not reply to this email!
+On 12/10/2024 5:00 PM, Easwar Hariharan wrote:
+> On 12/10/2024 4:35 PM, Andrew Morton wrote:
+>> On Tue, 10 Dec 2024 22:02:31 +0000 Easwar Hariharan <eahariha@linux.microsoft.com> wrote:
+>>
+>>> This is a series that follows up on my previous series to introduce
+>>> secs_to_jiffies() and convert a few initial users.
+>>
+>> Thanks, I added this to mm.git.  I suppressed the usual added-to-mm
+>> emails because soooo many cc's!
+>>
+>> I'd ask relevant maintainers to send in any acks and I'll paste them
+>> into the relevant changelogs.
+> 
+> Thank you, Andrew!
+> 
+> - Easwar
 
-Dear submitter,
+Hi Andrew,
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=918786
+There have been a couple of comments[1][2] that came in after you queued
+the series to mm. Would you rather I send individual patches addressing
+these, or just send a v4 of the entire series (-netdev of course) so you
+can replace it wholesale?
 
----Test result---
+Thanks,
+Easwar
 
-Test Summary:
-CheckPatch                    PENDING   0.22 seconds
-GitLint                       PENDING   0.19 seconds
-BuildEll                      PASS      20.44 seconds
-BluezMake                     PASS      1576.00 seconds
-MakeCheck                     PASS      12.89 seconds
-MakeDistcheck                 PASS      158.77 seconds
-CheckValgrind                 PASS      214.09 seconds
-CheckSmatch                   PASS      273.04 seconds
-bluezmakeextell               PASS      99.11 seconds
-IncrementalBuild              PENDING   0.29 seconds
-ScanBuild                     PASS      845.50 seconds
-
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============4703946235930925021==--
+[1]
+https://lore.kernel.org/all/07784753-6874-4dda-a080-2d2812f4a10a@csgroup.eu/
+[2]
+https://lore.kernel.org/all/Z2G1ZPL2cAlQOYlF@li-008a6a4c-3549-11b2-a85c-c5cc2836eea2.ibm.com/
