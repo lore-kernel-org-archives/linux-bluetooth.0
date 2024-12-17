@@ -1,176 +1,126 @@
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A4661FA24A;
-	Tue, 17 Dec 2024 17:43:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from mail-il1-f208.google.com (mail-il1-f208.google.com [209.85.166.208])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97DC41F8F13
+	for <linux-bluetooth@vger.kernel.org>; Tue, 17 Dec 2024 17:47:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.208
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734457425; cv=none; b=uydDUNVCCdBV7WhmXD2f6HyMk008XcXZgITXqGV5/NsKx9qVQ9SJin0EPAH0XXr2gaqzYcopSo9DL0eQ1V+AmaAV+2bRpx9r/vgxQ6QuFL9wqA9QR+NdirOATWCrZ7voXo8Gi+6nkiw6hEITJOdPd7ZYwaCti3angAtKFsUUheg=
+	t=1734457643; cv=none; b=upd5YrJgmRZgQ0sKBwzZkxjhurQ9h29dQSxLx/UnP9KT4Slq2+Wxjf613MRKYEcBsSxwir4UHCF2Ar6KIal5ucCUcZZbDygefSCwY8WSygvy4N/Id+/VferSvL5MGISrQaCuBMuAWdTJYWT4niClJj+lMR9kZcgq2gUdJOPYGyo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734457425; c=relaxed/simple;
-	bh=8L9yZu+YSSMC3BBiLERVQU5N7SevsXLGZW7h8pfgPR8=;
-	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=m6jJlDXE3BNb7ve8PvLvGuN5QqhJyyXCL5txmQb74C9QoNRa8CejS8xyT2VKDcqJa6IQqcwgo1GhhKeHdE0PwMjHM2NbRP3YpMABX1G6aeVXSqztyP8lalaVD9o9ZygrlKNftY3mNJPWJum5ekpShwxnvBdSrg6uvQMYu6gkNWQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=VkPXr4Q5; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="VkPXr4Q5"
-Received: from [192.168.35.166] (c-73-118-245-227.hsd1.wa.comcast.net [73.118.245.227])
-	by linux.microsoft.com (Postfix) with ESMTPSA id 4C1542171F87;
-	Tue, 17 Dec 2024 09:43:32 -0800 (PST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 4C1542171F87
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1734457414;
-	bh=qz8oz73s4rCDJSC1TgNUQNYJjOVU8exHA2BYkyw+ZD0=;
-	h=Date:Cc:Subject:To:References:From:In-Reply-To:From;
-	b=VkPXr4Q51kSzYXC6iV4Rnt0hdXMx9YWH59To4VTRyzVF/4SXLeJpUxO01knfWumzM
-	 CzAbcmQnzc2Qsz94yaL1AgsNLmsei1LV793lD8Qkn1YDLJvzyEf9X476Tc2IwzAabU
-	 HeEAso29uXPVkfVcznz9hizNBAvL5QWBolCDD9Qs=
-Message-ID: <f3f9a686-8be3-49f0-bcfb-10b864fa5a11@linux.microsoft.com>
-Date: Tue, 17 Dec 2024 09:43:31 -0800
+	s=arc-20240116; t=1734457643; c=relaxed/simple;
+	bh=rOMzSUbdv/gveRhTm2I2F7wnf7DGWlfucxbI3WoU1Hw=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=OWKWzmsw/7A4WVDS6/tqnF7quTjV29ahRhuTsL1m2wdSPwBo2OGl/c1t6FYCxY1RdHIe479U9ftGu2st+guLnsOqZ3TYBQ0HmOJ3WrodM4piJx3u9FIDIPzIeQOpluezQFRyIdDkJPVqyZl+ILnjQPNxcfEzY1JlVaiWF7YFRrw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.208
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f208.google.com with SMTP id e9e14a558f8ab-3a9cc5c246bso61584405ab.2
+        for <linux-bluetooth@vger.kernel.org>; Tue, 17 Dec 2024 09:47:21 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1734457641; x=1735062441;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=+IMCIZzAb/VwYOZoArVtfVey0hVqHrFpA05KWEERMbo=;
+        b=cPjKwewEklnZ9K6Vgm7Xux0i8d+sD072Lt4rEo11lHUKNA4Ezjo6vBnN22Jf2I9P/q
+         O2itrC78ZP6N2+y1Yqfe2ExcHKSmIkMlXQH/W8iJKQgHUfZ6xVWWv+GbQ/DJAqwTAyNV
+         3wiH5bJLJpPSHO7v2wx/miFAubNUaLQzHrz0+sH60grBET2O9Z6Z/0ARhgYBZ9QRq/+r
+         pL3TRXJ0glrvxqjBxsYwpEmWSI0USUoiOk1K3B95ubl2hxJu5r2qTMqVabs0dDF00hos
+         Bz7wu5OCeS5CQLVe1bAQvvpv25MX9pkykXu0Dthy1ZhLU+3a+KfP3p6VEMdCz4eTi+ds
+         /6hg==
+X-Forwarded-Encrypted: i=1; AJvYcCUjg7eNoPH7eobeMfwoX0AcaHH8fokfmshZGMR4FYU32kFtQcgu2ub61iG/gnt9C/vxKIibNI4WGq6f6HmfuZw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YydkdnTQCXpdqac3HsVA7J6cKpjE7z6Lkn9kkL73v2w7cLsz0LC
+	5LRytCehCEnJW7UtFylSrqYjGN2eVHyj61ISMVk5UB4AHPca03qRkaZqorP1aiKgAM7TS8nVoJ2
+	GOjg7nkBN9EtVKX1jhyCDughlsemA+rfWmxmbgQ91JwBBFW3bKgR38sE=
+X-Google-Smtp-Source: AGHT+IH5n14YjZ3FJypP+k/nHQvu8mjBqqTDefHjaHRFpfcFSgn7bHNBWUWC1o7dn12wubjiifbNJ/iDGv692gRzCa3pVO4Os9Im
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Cc: eahariha@linux.microsoft.com, Pablo Neira Ayuso <pablo@netfilter.org>,
- Jozsef Kadlecsik <kadlec@netfilter.org>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, Nicolas Palix <nicolas.palix@imag.fr>,
- Daniel Mack <daniel@zonque.org>, Haojian Zhuang <haojian.zhuang@gmail.com>,
- Robert Jarzmik <robert.jarzmik@free.fr>, Russell King
- <linux@armlinux.org.uk>, Heiko Carstens <hca@linux.ibm.com>,
- Vasily Gorbik <gor@linux.ibm.com>,
- Christian Borntraeger <borntraeger@linux.ibm.com>,
- Sven Schnelle <svens@linux.ibm.com>, Ofir Bitton <obitton@habana.ai>,
- Oded Gabbay <ogabbay@kernel.org>, Lucas De Marchi
- <lucas.demarchi@intel.com>,
- =?UTF-8?Q?Thomas_Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>,
- Rodrigo Vivi <rodrigo.vivi@intel.com>,
- Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
- Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>,
- David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
- Jeroen de Borst <jeroendb@google.com>,
- Praveen Kaligineedi <pkaligineedi@google.com>,
- Shailend Chand <shailend@google.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- James Smart <james.smart@broadcom.com>,
- Dick Kennedy <dick.kennedy@broadcom.com>,
- "James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
- "Martin K. Petersen" <martin.petersen@oracle.com>,
- =?UTF-8?Q?Roger_Pau_Monn=C3=A9?= <roger.pau@citrix.com>,
- Jens Axboe <axboe@kernel.dk>, Kalle Valo <kvalo@kernel.org>,
- Jeff Johnson <jjohnson@kernel.org>, Catalin Marinas
- <catalin.marinas@arm.com>, Andrew Morton <akpm@linux-foundation.org>,
- Jack Wang <jinpu.wang@cloud.ionos.com>, Marcel Holtmann
- <marcel@holtmann.org>, Johan Hedberg <johan.hedberg@gmail.com>,
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- Florian Fainelli <florian.fainelli@broadcom.com>, Ray Jui
- <rjui@broadcom.com>, Scott Branden <sbranden@broadcom.com>,
- Broadcom internal kernel review list
- <bcm-kernel-feedback-list@broadcom.com>, Xiubo Li <xiubli@redhat.com>,
- Ilya Dryomov <idryomov@gmail.com>, Josh Poimboeuf <jpoimboe@kernel.org>,
- Jiri Kosina <jikos@kernel.org>, Miroslav Benes <mbenes@suse.cz>,
- Petr Mladek <pmladek@suse.com>, Joe Lawrence <joe.lawrence@redhat.com>,
- Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
- Louis Peens <louis.peens@corigine.com>, Michael Ellerman
- <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>,
- Christophe Leroy <christophe.leroy@csgroup.eu>,
- Naveen N Rao <naveen@kernel.org>, Madhavan Srinivasan <maddy@linux.ibm.com>,
- netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, cocci@inria.fr,
- linux-arm-kernel@lists.infradead.org, linux-s390@vger.kernel.org,
- dri-devel@lists.freedesktop.org, intel-xe@lists.freedesktop.org,
- linux-scsi@vger.kernel.org, xen-devel@lists.xenproject.org,
- linux-block@vger.kernel.org, linux-wireless@vger.kernel.org,
- ath11k@lists.infradead.org, linux-mm@kvack.org,
- linux-bluetooth@vger.kernel.org, linux-staging@lists.linux.dev,
- linux-rpi-kernel@lists.infradead.org, ceph-devel@vger.kernel.org,
- live-patching@vger.kernel.org, linux-sound@vger.kernel.org,
- oss-drivers@corigine.com, linuxppc-dev@lists.ozlabs.org,
- Anna-Maria Behnsen <anna-maria@linutronix.de>
-Subject: Re: [PATCH v3 02/19] coccinelle: misc: Add secs_to_jiffies script
-To: Julia Lawall <julia.lawall@inria.fr>,
- Alexander Gordeev <agordeev@linux.ibm.com>
-References: <20241210-converge-secs-to-jiffies-v3-0-ddfefd7e9f2a@linux.microsoft.com>
- <20241210-converge-secs-to-jiffies-v3-2-ddfefd7e9f2a@linux.microsoft.com>
- <Z2G02RN7VelcrjNT@li-008a6a4c-3549-11b2-a85c-c5cc2836eea2.ibm.com>
- <alpine.DEB.2.22.394.2412171831300.3566@hadrien>
-From: Easwar Hariharan <eahariha@linux.microsoft.com>
-Content-Language: en-US
-In-Reply-To: <alpine.DEB.2.22.394.2412171831300.3566@hadrien>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+X-Received: by 2002:a05:6e02:20e1:b0:3ab:71d2:9bd9 with SMTP id
+ e9e14a558f8ab-3aff800ee22mr167151215ab.16.1734457640882; Tue, 17 Dec 2024
+ 09:47:20 -0800 (PST)
+Date: Tue, 17 Dec 2024 09:47:20 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6761b928.050a0220.29fcd0.006e.GAE@google.com>
+Subject: [syzbot] [bluetooth?] WARNING in hci_conn_timeout (2)
+From: syzbot <syzbot+fc4b5b2477d4ca272907@syzkaller.appspotmail.com>
+To: johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, luiz.dentz@gmail.com, marcel@holtmann.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On 12/17/2024 9:33 AM, Julia Lawall wrote:
-> 
-> 
-> On Tue, 17 Dec 2024, Alexander Gordeev wrote:
-> 
->> On Tue, Dec 10, 2024 at 10:02:33PM +0000, Easwar Hariharan wrote:
->>
->> Hi Easwar,
->>
->>> This script finds and suggests conversions of timeout patterns that
->>> result in seconds-denominated timeouts to use the new secs_to_jiffies()
->>> API in include/linux/jiffies.h for better readability.
->>>
->>> Suggested-by: Anna-Maria Behnsen <anna-maria@linutronix.de>
->>> Signed-off-by: Easwar Hariharan <eahariha@linux.microsoft.com>
->>> ---
->>>  scripts/coccinelle/misc/secs_to_jiffies.cocci | 22 ++++++++++++++++++++++
->>>  1 file changed, 22 insertions(+)
->>>
->>> diff --git a/scripts/coccinelle/misc/secs_to_jiffies.cocci b/scripts/coccinelle/misc/secs_to_jiffies.cocci
->>> new file mode 100644
->>> index 0000000000000000000000000000000000000000..8bbb2884ea5db939c63fd4513cf5ca8c977aa8cb
->>> --- /dev/null
->>> +++ b/scripts/coccinelle/misc/secs_to_jiffies.cocci
->>> @@ -0,0 +1,22 @@
->>> +// SPDX-License-Identifier: GPL-2.0-only
->>> +///
->>> +/// Find usages of:
->>> +/// - msecs_to_jiffies(value*1000)
->>> +/// - msecs_to_jiffies(value*MSEC_PER_SEC)
->>> +///
->>> +// Confidence: High
->>> +// Copyright: (C) 2024 Easwar Hariharan, Microsoft
->>> +// Keywords: secs, seconds, jiffies
->>> +//
->>> +
->>> +virtual patch
->>> +
->>> +@depends on patch@ constant C; @@
->>> +
->>> +- msecs_to_jiffies(C * 1000)
->>> ++ secs_to_jiffies(C)
->>> +
->>> +@depends on patch@ constant C; @@
->>> +
->>> +- msecs_to_jiffies(C * MSEC_PER_SEC)
->>> ++ secs_to_jiffies(C)
->>
->> If you used this script only, then it did not seem to recognize line arch/s390/mm/cmm.c:207
->>
->> 	mod_timer(&cmm_timer, jiffies + msecs_to_jiffies(cmm_timeout_seconds * MSEC_PER_SEC));
-> 
-> There is the requirement that C is a constant, and cmm_timeout_seconds is
-> not considered to be a constant, ie it is not all capital letters.
-> Indeed, it doesn't seem to be a constant at all.  I don't know if the
-> requirement of being a comstant is really necessary.
-> 
-> julia
-> 
->>
->> Thanks!
->>
+Hello,
 
-As the cover letter says, this is part 1. I intend to do further parts
-that address the cases where the multiplicand is an expression, as well
-as the cases where the timeout provided to msecs_to_jiffies() is
-denominated in seconds (i.e. ends in 000)
+syzbot found the following issue on:
 
-Thanks,
-Easwar
+HEAD commit:    f44d154d6e3d Merge tag 'soc-fixes-6.13' of git://git.kerne..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=129d5730580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=6a2b862bf4a5409f
+dashboard link: https://syzkaller.appspot.com/bug?extid=fc4b5b2477d4ca272907
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=12f282df980000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=127e4744580000
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/e8be4151807d/disk-f44d154d.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/a5f22853d301/vmlinux-f44d154d.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/d7a4a78964e0/bzImage-f44d154d.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+fc4b5b2477d4ca272907@syzkaller.appspotmail.com
+
+------------[ cut here ]------------
+WARNING: CPU: 1 PID: 5856 at net/bluetooth/hci_conn.c:567 hci_conn_timeout+0xfb/0x290 net/bluetooth/hci_conn.c:567
+Modules linked in:
+CPU: 1 UID: 0 PID: 5856 Comm: kworker/u9:7 Not tainted 6.13.0-rc3-syzkaller-00017-gf44d154d6e3d #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 11/25/2024
+Workqueue: hci4 hci_conn_timeout
+RIP: 0010:hci_conn_timeout+0xfb/0x290 net/bluetooth/hci_conn.c:567
+Code: 4c 89 f7 e8 07 c2 09 00 eb 07 e8 70 55 e5 f6 b0 13 0f b6 f0 4c 89 f7 5b 41 5c 41 5e 41 5f 5d e9 5b b3 fe ff e8 56 55 e5 f6 90 <0f> 0b 90 eb 8f 89 e9 80 e1 07 80 c1 03 38 c1 0f 8c 36 ff ff ff 48
+RSP: 0018:ffffc90003177b90 EFLAGS: 00010293
+RAX: ffffffff8aba1e9a RBX: ffff8880310048e8 RCX: ffff888034bf1e00
+RDX: 0000000000000000 RSI: 00000000ffffffff RDI: 0000000000000000
+RBP: 00000000ffffffff R08: ffffffff8aba1e03 R09: 1ffff11006200802
+R10: dffffc0000000000 R11: ffffed1006200803 R12: dffffc0000000000
+R13: ffffffff8168ee96 R14: ffff888031004000 R15: 0000000002400000
+FS:  0000000000000000(0000) GS:ffff8880b8700000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f2cfa32a588 CR3: 00000000338ec000 CR4: 0000000000350ef0
+Call Trace:
+ <TASK>
+ process_one_work kernel/workqueue.c:3229 [inline]
+ process_scheduled_works+0xa68/0x1840 kernel/workqueue.c:3310
+ worker_thread+0x870/0xd30 kernel/workqueue.c:3391
+ kthread+0x2f2/0x390 kernel/kthread.c:389
+ ret_from_fork+0x4d/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
+ </TASK>
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
