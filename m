@@ -1,81 +1,92 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-20.smtp.github.com (out-20.smtp.github.com [192.30.252.203])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EBA21BEF60
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48D1E1B424F
 	for <linux-bluetooth@vger.kernel.org>; Wed, 18 Dec 2024 14:40:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.30.252.203
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734532815; cv=none; b=H7h3TYKxSeF1+ty6/ZTKwOp9gqRLwlyswiCCv6oAbVUH8WcP0IaNeMK3Jm2KM0kW87nSuVhzXypuI5p8V6hkbCjs/4JwkmfO0irzuf55E84QIqg5V3TSSqDvDTJeC0MJTMwMrHtD4jucEZ8+I5AuL4Rp4ai4Clbrikc0/nrZyYk=
+	t=1734532815; cv=none; b=paANOkz/EZO9nW6RFE4r+tPS2ZjvTi/1JJI1Sick2SO0aRt9zLgIVsT8n0pFo4VxNQgfCbEcKqXagYSO0J+zCmrLSJ/Oig0N1m8lX+2znpPdjiFKVQFh/hYluKbt5/7eMuN1guHdZ5o3OcPFy7odi1Xwz9D+lmGzqQZYXImQ7uE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1734532815; c=relaxed/simple;
-	bh=XyliEA8MAm4NdtI7RgjpeCf9nu951WYhy/9nhSCYc+U=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=d63aJRoopMaUAgavmLx6hTkysg34261qcDuqJKJggpOMYOJBhL1Au2NZrTQRQtQko74qYOjGaMyIysoKAwBz5CIbORcUJ+/hGKAMxoYJwIoOIYY5M5EBmGT9Dh7pCQhv2ZxbqYsgWhmc2RoMg5v8/FXlFeXnj9ptZXOT4JjIGls=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=e5svVOZJ; arc=none smtp.client-ip=10.30.226.201
+	bh=XMJVxzUf50fPyi7syGkMUfvD7oVEYKpAP/aiDeGl3+M=;
+	h=Date:From:To:Message-ID:Subject:Mime-Version:Content-Type; b=Ms0Kv3Q1Be63hWF/XXekbV/GekvgngdqiIupGllTS4XictPZh0N8bdL+yFsNRhqK3EbLQqXNqiIo4+BdmnyLa2f8CObBz02dwhibBc8ojmA39/me+soQvOv1sYNcPgVsoxcGQfGNdhWiSXP0iVt+AuIkfAhIHbIhWlXl/t9QKus=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com; spf=pass smtp.mailfrom=github.com; dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b=mbD1KkxP; arc=none smtp.client-ip=192.30.252.203
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=github.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=github.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="e5svVOZJ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D656CC4CECD;
-	Wed, 18 Dec 2024 14:40:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734532813;
-	bh=XyliEA8MAm4NdtI7RgjpeCf9nu951WYhy/9nhSCYc+U=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=e5svVOZJ+KZTSGO8TUQs5p//xvDFrfNXM4RT/NXh6DWF2olMG4bh8LZVb31Wr4LZG
-	 ivyZUw+RVSXeJ5CLnKqaRoSI06CD2m1LihPfyIAe5XN3SMJU95QFT2Lf1OmclJ/+U4
-	 ptKELl9b2M/LidUCvKovqIhdtsorY3Ut6Y/zsctLy4Z/iJMEveV/Tb3KaFmIDdRktE
-	 yiAqqejdLX6fiSas4v466DKQ4fvupmhXbdGOWv2CDRp4fEMOtDuMLDJHVNvQCmMipR
-	 C3c1QKnEQ2Fl1vgXy0R34XLS4Qk83uRzAIfvZdaNijQajGKMT/MM7bG7NmoL5CxohB
-	 RkfFeqc5NmINw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70D873805DB1;
-	Wed, 18 Dec 2024 14:40:32 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	dkim=pass (1024-bit key) header.d=github.com header.i=@github.com header.b="mbD1KkxP"
+Received: from github.com (hubbernetes-node-4ae5255.va3-iad.github.net [10.48.222.11])
+	by smtp.github.com (Postfix) with ESMTPA id 72C878C03E7
+	for <linux-bluetooth@vger.kernel.org>; Wed, 18 Dec 2024 06:40:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+	s=pf2023; t=1734532813;
+	bh=Zj445Fjdr5GLdHu5xbuRIN1w0x+CKmiI/fn8oN62QFM=;
+	h=Date:From:To:Subject:List-Unsubscribe:From;
+	b=mbD1KkxPyEXiKYNU+1FYcRcgZ41jiSGH7r8A1xvkAEmtMP6RcLjQTNmE8/ekAMo/L
+	 rEwCnZmgWePH271NoMgP4Mseg69DviMh1dgH9AakxhkaAROK4Lg6JhaylQL8EwPwNs
+	 bxarlbxSbzkYs10iKBVYbTUOC3cJ9lF2QQaPLdJg=
+Date: Wed, 18 Dec 2024 06:40:13 -0800
+From: Luiz Augusto von Dentz <noreply@github.com>
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/master/c2caa2-dfb1ff@github.com>
+Subject: [bluez/bluez] c0fb6c: client: Add command wake
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH BlueZ v1 1/2] client: Add command wake
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <173453283126.1631723.7819448687372201714.git-patchwork-notify@kernel.org>
-Date: Wed, 18 Dec 2024 14:40:31 +0000
-References: <20241217181334.3243011-1-luiz.dentz@gmail.com>
-In-Reply-To: <20241217181334.3243011-1-luiz.dentz@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 
-Hello:
+  Branch: refs/heads/master
+  Home:   https://github.com/bluez/bluez
+  Commit: c0fb6c067e48e1c867d2447a275253bea4d7ec40
+      https://github.com/bluez/bluez/commit/c0fb6c067e48e1c867d2447a275253bea4d7ec40
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2024-12-17 (Tue, 17 Dec 2024)
 
-This series was applied to bluetooth/bluez.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+  Changed paths:
+    M client/main.c
 
-On Tue, 17 Dec 2024 13:13:33 -0500 you wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> 
-> This adds command wake which can be used to set WakeAllowed property:
-> 
-> [bluetoothctl]> wake XX:XX:XX:XX:XX:XX off
-> [bluetoothctl]> Changing wake off succeeded
-> [bluetoothctl]> [CHG] Device XX:XX:XX:XX:XX:XX WakeAllowed: no
-> [bluetoothctl]> wake XX:XX:XX:XX:XX:XX on
-> [bluetoothctl]> Changing wake on succeeded
-> [bluetoothctl]> [CHG] Device XX:XX:XX:XX:XX:XX WakeAllowed: yes
-> [bluetoothctl]> wake XX:XX:XX:XX:XX:XX
-> 
-> [...]
+  Log Message:
+  -----------
+  client: Add command wake
 
-Here is the summary with links:
-  - [BlueZ,v1,1/2] client: Add command wake
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=c0fb6c067e48
-  - [BlueZ,v1,2/2] device: Fix not being able to set WakeAllowed
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=dfb1ffdc95a0
+This adds command wake which can be used to set WakeAllowed property:
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+[bluetoothctl]> wake XX:XX:XX:XX:XX:XX off
+[bluetoothctl]> Changing wake off succeeded
+[bluetoothctl]> [CHG] Device XX:XX:XX:XX:XX:XX WakeAllowed: no
+[bluetoothctl]> wake XX:XX:XX:XX:XX:XX on
+[bluetoothctl]> Changing wake on succeeded
+[bluetoothctl]> [CHG] Device XX:XX:XX:XX:XX:XX WakeAllowed: yes
+[bluetoothctl]> wake XX:XX:XX:XX:XX:XX
 
 
+  Commit: dfb1ffdc95a00bc06d81a75c11ab5ad2e24d37bf
+      https://github.com/bluez/bluez/commit/dfb1ffdc95a00bc06d81a75c11ab5ad2e24d37bf
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2024-12-17 (Tue, 17 Dec 2024)
+
+  Changed paths:
+    M src/device.c
+
+  Log Message:
+  -----------
+  device: Fix not being able to set WakeAllowed
+
+Setting WakeAllowed was not working as intended since
+device_set_wake_override was changing the current_flags which
+btd_device_flags_changed checks to determine if flags has been changed
+to only then call device_set_wake_allowed_complete.
+
+Fixes: https://github.com/bluez/bluez/issues/1045
+
+
+Compare: https://github.com/bluez/bluez/compare/c2caa26a4d62...dfb1ffdc95a0
+
+To unsubscribe from these emails, change your notification settings at https://github.com/bluez/bluez/settings/notifications
