@@ -1,335 +1,557 @@
-Received: from mail-il1-f205.google.com (mail-il1-f205.google.com [209.85.166.205])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19807158555
-	for <linux-bluetooth@vger.kernel.org>; Wed, 18 Dec 2024 07:43:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.205
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67F12155303;
+	Wed, 18 Dec 2024 08:23:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734507802; cv=none; b=biatti0rZchD2mI410Stf56YoycBUQ7+jJ3oYtrTKznEAm0YIrFLvRQMB07Zuj502jn//YRCN23Oy9kR89owBmvWDX6rWxAroLkc4aqyThs5YMij8AbsI+T4hLPsAWmAY2kumXdSrOq4tv9sgr1SVSXLmp73KUjSxnAlY/7yfFQ=
+	t=1734510207; cv=none; b=STs9cg7Rc0ObYKtjvGDeFMh5TQlhzdYCA43/6EsoIZ6M77goxbJvZ/fpUL3MgdDYPaVZn2PzNzIUGAc/nfUpad97otXw6/FhRlfmMHoMXDF5+t5UDcDP4DoDKe3ZQyRldXPgXoXoUvYKaGyWtpD4WITC5ru/izQolGg8dJNV1pc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734507802; c=relaxed/simple;
-	bh=BaQjCdcSOt+9cR2RBk/qkGl9sIMcLi5Tne+Hoy40QMg=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=POknoLtGTeAklfIuNWbkAKCK/WOA51++0794xqlo5qEex58beFQvC9zLc0esSCMP/2/Ca2e6b9IKVSdq7kCEvFJqbs4Uq7c2S91UdtYZN9imjg10eDecAaVOxRcoyLmb22I+GTCrVpDBG+amXWAdcuzMvd7zyMSEOpBVoDMn1+Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.205
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f205.google.com with SMTP id e9e14a558f8ab-3a9d075bdc3so115598235ab.3
-        for <linux-bluetooth@vger.kernel.org>; Tue, 17 Dec 2024 23:43:19 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734507799; x=1735112599;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=+GUkvGq7Lls6QIr9yvirUWFF3o/qk+ORqL2S4r6ZMgw=;
-        b=KDZW5k3JVXuK5s898cbYBD6sxaLPmkPro8DmvpuURyQX4gBM5kI/cxZ1j9o+9ZMrOo
-         +qEzBDpNmrKQlWqyxxdtAXNvJzpKoWUoynY+AgwXomv/zABwUH9HMo739J0DcWW6xJEa
-         ypzC6fNHBBjpqdLsBkSMI1hTRQ8KoFbsncUoEOhO8fsJmAbwyA0TdgN4ikbZn0vVpoEI
-         6iXDIr988w0x4TnfSpwTdT0n2wu3RL3QhJAe8VkLdJO1ZNjWkziEZT58jFXQZZCfHb0L
-         TPCluPqggvroErfPWLXYRWHYy5JxN625eGbfDvHNLQjyOdoIGqIw9PqyjFpmPjmVTtnj
-         myfQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWB8VhI9sE7ntBpyAVgok+9OYJCYH3GXqN+CUteAoo7uGEDrzxJTLGtjFSuPKDq3tzW7eKuyTp0et5Fh0LdKkA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwX0sb5k+Ve+RVd4GDxciqP+TdlxTYHtuvE4cbcrcDSnRmZe1Yw
-	E33Pq8XlULGd5OlzZEA9e+KEi6WdmzhixyFqRm0P9/dxRoZNZinKXquP2Q++yOJRX0DwE7PgA7L
-	2wiE5qRpIU7jifW1c0eY7BpceyjFq61UHG2AprJANMYzb3E9MlbhG1xg=
-X-Google-Smtp-Source: AGHT+IFI+Tgxb0/4eAxKE7/t9pEbpWIk13bIWvqHnyJUNL0HQiPX1bDa3WzIRBQD8BKPFYBagQpyHklAZ8w6pFLIyQlj/vJxjUtA
+	s=arc-20240116; t=1734510207; c=relaxed/simple;
+	bh=ph/0W8omgEAtWlWkYgHwoIANyY0laHftBeKehS1TLFI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=nawk2qBxSdd4aVSchpiCygkOxTXLfIexuCJnEX5vKb1WDu76+4Kz81yiFVO+A6MzuGgoFsOoDCMl/KGNmoay4aUok+8C+UvxzThDAf2x5CcEaBEw0wUl+xLYbOfSqe6J9lxrzeH9UgMXFXJpA+HSdfG8AAlmMZf8KgAl01870Es=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=F6k8uQw/; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="F6k8uQw/"
+Received: from pps.filterd (m0279872.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4BI85fx7008854;
+	Wed, 18 Dec 2024 08:23:02 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	FRUGo2gNadzNeoMgpCJnve4JmJ+pqxC1Zhk3rBgHLYc=; b=F6k8uQw/zBeKQx/I
+	fJMcSM5R4EoVvN9m05QNcu4vY9dwbKmTxr1BJLpiwR+08oHXfkTsP++p8X5/1tvQ
+	N6X9kA1X6YQxWQ9AEhVzKBoYvhwgXrLV3iRDBB91wW2LeBF95dpqQsGr8zmiigLz
+	NlQXIuST90Mz95e/cGC/Aa8CDZvd285T0ivKR+dY7io/uZ3RcGDXKUJ6iEMeumi2
+	p/SN5SQt6oZBRHEw4eFJXPsU/rUEba2IfciFw+8UVqZAt1cpI/+AlpuTUx6LKcQu
+	WHOdnnNGkciUiOO1YydtJrs0Lzl5tr8JytSTD8JbDJ+8/frN79LqSlFP0o950+h3
+	BOAKmg==
+Received: from nalasppmta02.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 43ktk2g1am-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 18 Dec 2024 08:23:02 +0000 (GMT)
+Received: from nalasex01b.na.qualcomm.com (nalasex01b.na.qualcomm.com [10.47.209.197])
+	by NALASPPMTA02.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 4BI8N1jV010757
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 18 Dec 2024 08:23:01 GMT
+Received: from [10.231.216.175] (10.80.80.8) by nalasex01b.na.qualcomm.com
+ (10.47.209.197) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Wed, 18 Dec
+ 2024 00:22:57 -0800
+Message-ID: <d776ec24-75d3-44b8-bdf3-f7b1c221ecc2@quicinc.com>
+Date: Wed, 18 Dec 2024 16:22:53 +0800
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1c8e:b0:3a6:c98d:86bc with SMTP id
- e9e14a558f8ab-3bdc0411e61mr18228905ab.1.1734507799310; Tue, 17 Dec 2024
- 23:43:19 -0800 (PST)
-Date: Tue, 17 Dec 2024 23:43:19 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <67627d17.050a0220.29fcd0.0088.GAE@google.com>
-Subject: [syzbot] [bluetooth?] WARNING: held lock freed in bt_accept_dequeue
-From: syzbot <syzbot+4c5f0c6f8cc60159bdbf@syzkaller.appspotmail.com>
-To: johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, luiz.dentz@gmail.com, marcel@holtmann.org, 
-	syzkaller-bugs@googlegroups.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v1] Bluetooth: hci_sync: Fix disconnect complete event
+ timeout issue
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+CC: Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg
+	<johan.hedberg@gmail.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        "Eric
+ Dumazet" <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>,
+        Simon Horman <horms@kernel.org>, <linux-bluetooth@vger.kernel.org>,
+        <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <quic_jiaymao@quicinc.com>, <quic_shuaz@quicinc.com>,
+        <quic_zijuhu@quicinc.com>, <quic_mohamull@quicinc.com>
+References: <20241216080758.3450976-1-quic_chejiang@quicinc.com>
+ <CABBYNZLRdu_f9eNEapPp5mNqgcUE0jby5VPpaMaArY_FjyjB8Q@mail.gmail.com>
+ <CABBYNZKPu20vHx3DMGXVobR_5t-WUgt-KX41+tA1Lrz+aDFY-Q@mail.gmail.com>
+ <bb9505d6-e8ae-47dc-a1e0-6d1974dc12ac@quicinc.com>
+ <CABBYNZJuic=HfeF1-ybuKELCOEOYk9OWtvqXC4vyrnnZLUp7RQ@mail.gmail.com>
+ <ae3a0f6d-c844-4874-acf4-03a4f9cf3a24@quicinc.com>
+ <CABBYNZJcHvVYBUmS6AeA6OGnV8n1EKh5JxB8aLqP9OBqA-amyg@mail.gmail.com>
+Content-Language: en-US
+From: "Cheng Jiang (IOE)" <quic_chejiang@quicinc.com>
+In-Reply-To: <CABBYNZJcHvVYBUmS6AeA6OGnV8n1EKh5JxB8aLqP9OBqA-amyg@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nalasex01b.na.qualcomm.com (10.47.209.197)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: JVRoFAHm-vvzHNP5KkMDlyWypoWFins7
+X-Proofpoint-ORIG-GUID: JVRoFAHm-vvzHNP5KkMDlyWypoWFins7
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
+ definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999 clxscore=1015
+ adultscore=0 mlxscore=0 phishscore=0 lowpriorityscore=0 suspectscore=0
+ impostorscore=0 spamscore=0 priorityscore=1501 bulkscore=0 malwarescore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2411120000
+ definitions=main-2412180066
 
-Hello,
+Hi Luiz,
 
-syzbot found the following issue on:
+On 12/17/2024 11:13 PM, Luiz Augusto von Dentz wrote:
+> Hi Cheng,
+> 
+> On Tue, Dec 17, 2024 at 12:51 AM Cheng Jiang (IOE)
+> <quic_chejiang@quicinc.com> wrote:
+>>
+>> Hi Luiz,
+>>
+>> On 12/17/2024 11:15 AM, Luiz Augusto von Dentz wrote:
+>>> Hi Cheng,
+>>>
+>>> On Mon, Dec 16, 2024 at 9:49 PM Cheng Jiang (IOE)
+>>> <quic_chejiang@quicinc.com> wrote:
+>>>>
+>>>> Hi Luiz,
+>>>>
+>>>> On 12/16/2024 10:42 PM, Luiz Augusto von Dentz wrote:
+>>>>> Hi Cheng,
+>>>>>
+>>>>> On Mon, Dec 16, 2024 at 9:32 AM Luiz Augusto von Dentz
+>>>>> <luiz.dentz@gmail.com> wrote:
+>>>>>>
+>>>>>> Hi Cheng,
+>>>>>>
+>>>>>> On Mon, Dec 16, 2024 at 3:08 AM Cheng Jiang <quic_chejiang@quicinc.com> wrote:
+>>>>>>>
+>>>>>>> Sometimes, the remote device doesn't acknowledge the LL_TERMINATE_IND
+>>>>>>> in time, requiring the controller to wait for the supervision timeout,
+>>>>>>> which may exceed 2 seconds. In the current implementation, the
+>>>>>>> HCI_EV_DISCONN_COMPLETE event is ignored if it arrives late, since
+>>>>>>> the hci_abort_conn_sync has cleaned up the connection after 2 seconds.
+>>>>>>> This causes the mgmt to get stuck, resulting in bluetoothd waiting
+>>>>>>> indefinitely for the mgmt response to the disconnect. To recover,
+>>>>>>> restarting bluetoothd is necessary.
+>>>>>>>
+>>>>>>> bluetoothctl log like this:
+>>>>>>> [Designer Mouse]# disconnect D9:B5:6C:F2:51:91
+>>>>>>> Attempting to disconnect from D9:B5:6C:F2:51:91
+>>>>>>> [Designer Mouse]#
+>>>>>>> [Designer Mouse]# power off
+>>>>>>> [Designer Mouse]#
+>>>>>>> Failed to set power off: org.freedesktop.DBus.Error.NoReply.
+>>>>>>>
+>>>>>>> Signed-off-by: Cheng Jiang <quic_chejiang@quicinc.com>
+>>>>>>> ---
+>>>>>>>  include/net/bluetooth/hci_core.h |  2 ++
+>>>>>>>  net/bluetooth/hci_conn.c         |  9 +++++++++
+>>>>>>>  net/bluetooth/hci_event.c        |  9 +++++++++
+>>>>>>>  net/bluetooth/hci_sync.c         | 18 ++++++++++++++++++
+>>>>>>>  4 files changed, 38 insertions(+)
+>>>>>>>
+>>>>>>> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+>>>>>>> index 734cd50cd..2ab079dcf 100644
+>>>>>>> --- a/include/net/bluetooth/hci_core.h
+>>>>>>> +++ b/include/net/bluetooth/hci_core.h
+>>>>>>> @@ -753,6 +753,8 @@ struct hci_conn {
+>>>>>>>
+>>>>>>>         struct bt_codec codec;
+>>>>>>>
+>>>>>>> +       struct completion disc_ev_comp;
+>>>>>>> +
+>>>>>>>         void (*connect_cfm_cb)  (struct hci_conn *conn, u8 status);
+>>>>>>>         void (*security_cfm_cb) (struct hci_conn *conn, u8 status);
+>>>>>>>         void (*disconn_cfm_cb)  (struct hci_conn *conn, u8 reason);
+>>>>>>> diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+>>>>>>> index d097e308a..e0244e191 100644
+>>>>>>> --- a/net/bluetooth/hci_conn.c
+>>>>>>> +++ b/net/bluetooth/hci_conn.c
+>>>>>>> @@ -1028,6 +1028,15 @@ static struct hci_conn *__hci_conn_add(struct hci_dev *hdev, int type, bdaddr_t
+>>>>>>>
+>>>>>>>         hci_conn_init_sysfs(conn);
+>>>>>>>
+>>>>>>> +       /* This disc_ev_comp is inited when we send a disconnect request to
+>>>>>>> +        * the remote device but fail to receive the disconnect complete
+>>>>>>> +        * event within the expected time (2 seconds). This occurs because
+>>>>>>> +        * the remote device doesn't ack the terminate indication, forcing
+>>>>>>> +        * the controller to wait for the supervision timeout.
+>>>>>>> +        */
+>>>>>>> +       init_completion(&conn->disc_ev_comp);
+>>>>>>> +       complete(&conn->disc_ev_comp);
+>>>>>>> +
+>>>>>>>         return conn;
+>>>>>>>  }
+>>>>>>>
+>>>>>>> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+>>>>>>> index 2cc7a9306..60ecb2b18 100644
+>>>>>>> --- a/net/bluetooth/hci_event.c
+>>>>>>> +++ b/net/bluetooth/hci_event.c
+>>>>>>> @@ -3366,6 +3366,15 @@ static void hci_disconn_complete_evt(struct hci_dev *hdev, void *data,
+>>>>>>>         if (!conn)
+>>>>>>>                 goto unlock;
+>>>>>>>
+>>>>>>> +       /* Wake up disc_ev_comp here is ok. Since we hold the hdev lock
+>>>>>>> +        * hci_abort_conn_sync will wait hdev lock release to continue.
+>>>>>>> +        */
+>>>>>>> +       if (!completion_done(&conn->disc_ev_comp)) {
+>>>>>>> +               complete(&conn->disc_ev_comp);
+>>>>>>> +               /* Add some delay for hci_abort_conn_sync to handle the complete */
+>>>>>>> +               usleep_range(100, 1000);
+>>>>>>> +       }
+>>>>>>> +
+>>>>>>>         if (ev->status) {
+>>>>>>>                 mgmt_disconnect_failed(hdev, &conn->dst, conn->type,
+>>>>>>>                                        conn->dst_type, ev->status);
+>>>>>>> diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+>>>>>>> index 0badec712..783d04b57 100644
+>>>>>>> --- a/net/bluetooth/hci_sync.c
+>>>>>>> +++ b/net/bluetooth/hci_sync.c
+>>>>>>> @@ -5590,6 +5590,24 @@ int hci_abort_conn_sync(struct hci_dev *hdev, struct hci_conn *conn, u8 reason)
+>>>>>>>                 break;
+>>>>>>>         }
+>>>>>>>
+>>>>>>> +       /* Check whether the connection is successfully disconnected.
+>>>>>>> +        * Sometimes the remote device doesn't acknowledge the
+>>>>>>> +        * LL_TERMINATE_IND in time, requiring the controller to wait
+>>>>>>> +        * for the supervision timeout, which may exceed 2 seconds. In
+>>>>>>> +        * this case, we need to wait for the HCI_EV_DISCONN_COMPLETE
+>>>>>>> +        * event before cleaning up the connection.
+>>>>>>> +        */
+>>>>>>> +       if (err == -ETIMEDOUT) {
+>>>>>>> +               u32 idle_delay = msecs_to_jiffies(10 * conn->le_supv_timeout);
+>>>>>>> +
+>>>>>>> +               reinit_completion(&conn->disc_ev_comp);
+>>>>>>> +               if (!wait_for_completion_timeout(&conn->disc_ev_comp, idle_delay)) {
+>>>>>>> +                       bt_dev_warn(hdev, "Failed to get complete");
+>>>>>>> +                       mgmt_disconnect_failed(hdev, &conn->dst, conn->type,
+>>>>>>> +                                              conn->dst_type, conn->abort_reason);
+>>>>>>> +               }
+>>>>>>> +       }
+>>>>>>
+>>>>>> Why don't we just set the supervision timeout as timeout then? If we
+>>>>>> will have to wait for it anyway just change hci_disconnect_sync to use
+>>>>>> 10 * conn->le_supv_timeout as timeout instead.
+>>>>>>
+>>>> hci_disconnect_sync uses __hci_cmd_sync_status_sk to wait for the
+>>>> HCI_EV_DISCONN_COMPLETE event, which will send the command in hci_cmd_work.
+>>>> In hci_cmd_work, it will start a timer with HCI_CMD_TIMEOUT(2s) to wait
+>>>> for the event. So even in hci_disconnect_sync we can set the timeout to
+>>>> supervision timeout, hci_disconnect_sync still timeout after 2s.
+>>>
+>>> Wait, why are you talking about HCI_CMD_TIMEOUT when I told you to use
+>>> the supervision timeout instead? If it still timeout after to 2
+>>> seconds then there is something still forcing HCI_CMD_TIMEOUT which
+>>> shouldn't happen.
+>>>
+>> Since the lower layer (hci_cmd_work) has set the timeout to HCI_CMD_TIMEOUT, so
+>> even the upper layer set to a larger timeout value, like supervision timeout,
+>> it still get the timeout after HCI_CMD_TIMEOUT. The timeout flow is:
+>> hci_disconnect_sync -> __hci_cmd_sync_sk(wait_event_interruptible_timeout) ->
+>> hci_cmd_work -> hci_cmd_timeout -> hci_cmd_sync_cancel_sync -> wake up the
+>> wait_event_interruptible_timeout in __hci_cmd_sync_sk -> hci_disconnect_sync timeout.
+>>
+>> So even if we set a large timeout value in hci_disconnect_sync, it doesn't work
+>> since it's waked up by other event, not the real timeout.
+>>
+>> What's more, in the hci_disconnect_sync, if the reason it not power_off, it waits
+>> for the disconnect complete event rather than command status event. According to
+>> BT core spec, disconnect complete event has to wait for remote's ack or wait until
+>> supervision timeout. It's a valid case that the disconnect complete event taking
+>> more than 2s.
+> 
+> You seems to be confusing the role of 2 different timers:
+> 
+>     err = wait_event_interruptible_timeout(hdev->req_wait_q,
+>                            hdev->req_status != HCI_REQ_PEND,
+>                            timeout);
+> 
+> and
+> 
+>             queue_delayed_work(hdev->workqueue, &hdev->cmd_timer,
+>                        HCI_CMD_TIMEOUT);
+> 
+> The former waits for a specific event, while the later waits for
+> handle_cmd_cnt_and_timer, each can have a distinct timeout as in the
+> code bellow:
+> 
+>     return __hci_cmd_sync_status_sk(hdev, HCI_OP_LE_EXT_CREATE_CONN,
+>                     plen, data,
+>                     HCI_EV_LE_ENHANCED_CONN_COMPLETE,
+>                     conn->conn_timeout, NULL);
+> 
+> The reason there are 2 timers is that we need to track the number of
+> commands outstanding in the controller, and no you can't delay Command
+> Status:
+> 
+> When the Controller receives the HCI_Disconnect command, it _shall_ send the
+> HCI_Command_Status event to the Host.
+> 
+> So even if HCI_Disconnection_Complete is delayed the following shall
+> still work provided the HCI_Command_Status is still being generated
+> accordingly:
+> 
+> index 0badec7120ab..0ab607fb6433 100644
+> --- a/net/bluetooth/hci_sync.c
+> +++ b/net/bluetooth/hci_sync.c
+> @@ -5444,7 +5444,7 @@ static int hci_disconnect_sync(struct hci_dev
+> *hdev, struct hci_conn *conn,
+>                 return __hci_cmd_sync_status_sk(hdev, HCI_OP_DISCONNECT,
+>                                                 sizeof(cp), &cp,
+>                                                 HCI_EV_DISCONN_COMPLETE,
+> -                                               HCI_CMD_TIMEOUT, NULL);
+> +                                               conn->disc_timeout, NULL);
+> 
+>         return __hci_cmd_sync_status(hdev, HCI_OP_DISCONNECT, sizeof(cp), &cp,
+>                                      HCI_CMD_TIMEOUT);
+> 
+> Then we need to adjust conn->disc_timeout according to supervision
+> timeout, that said it appears disc_timeout is actually acting as idle
+> timeout, so perhaps we need a separate field, also it doesn't look
+> like we track the supervision timeout for non-LE links.
+> 
+Yes, you are right. I mixed up the two timers. Thank you for the detail
+explanation. 
+I just found you have fixed this issue by 227a0cdf4a028a73dc256d0f5144b4808d718893.
+Link: https://github.com/bluez/bluez/issues/932
 
-HEAD commit:    243f750a2df0 Merge tag 'gpio-fixes-for-v6.13-rc3' of git:/..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=149edbe8580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=99a5586995ec03b2
-dashboard link: https://syzkaller.appspot.com/bug?extid=4c5f0c6f8cc60159bdbf
-compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
-userspace arch: i386
+We are using an old codebase. Sorry for this. 
 
-Unfortunately, I don't have any reproducer for this issue yet.
+BTW, do you think we should change the timeout value here? Set the timeout value 
+based on the link type.  
 
-Downloadable assets:
-disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/7feb34a89c2a/non_bootable_disk-243f750a.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/e3ec11e872fc/vmlinux-243f750a.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/d9df37410c95/bzImage-243f750a.xz
+@@ -5419,6 +5419,7 @@ static int hci_disconnect_sync(struct hci_dev *hdev, struct hci_conn *conn,
+                               u8 reason)
+ {
+        struct hci_cp_disconnect cp;
++       u32 disc_timeout;
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+4c5f0c6f8cc60159bdbf@syzkaller.appspotmail.com
-
-=========================
-WARNING: held lock freed!
-6.13.0-rc2-syzkaller-00192-g243f750a2df0 #0 Not tainted
--------------------------
-syz.0.39/6085 is freeing memory ffff88806780b000-ffff88806780b7ff, with a lock still held there!
-ffff88806780b258 (sk_lock-AF_BLUETOOTH-BTPROTO_L2CAP){+.+.}-{0:0}, at: lock_sock include/net/sock.h:1617 [inline]
-ffff88806780b258 (sk_lock-AF_BLUETOOTH-BTPROTO_L2CAP){+.+.}-{0:0}, at: bt_accept_dequeue+0x249/0x600 net/bluetooth/af_bluetooth.c:276
-2 locks held by syz.0.39/6085:
- #0: ffff888066585008 (&sb->s_type->i_mutex_key#10){+.+.}-{4:4}, at: inode_lock include/linux/fs.h:818 [inline]
- #0: ffff888066585008 (&sb->s_type->i_mutex_key#10){+.+.}-{4:4}, at: __sock_release+0x86/0x270 net/socket.c:639
- #1: ffff88806780b258 (sk_lock-AF_BLUETOOTH-BTPROTO_L2CAP){+.+.}-{0:0}, at: lock_sock include/net/sock.h:1617 [inline]
- #1: ffff88806780b258 (sk_lock-AF_BLUETOOTH-BTPROTO_L2CAP){+.+.}-{0:0}, at: bt_accept_dequeue+0x249/0x600 net/bluetooth/af_bluetooth.c:276
-
-stack backtrace:
-CPU: 3 UID: 0 PID: 6085 Comm: syz.0.39 Not tainted 6.13.0-rc2-syzkaller-00192-g243f750a2df0 #0
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:94 [inline]
- dump_stack_lvl+0x116/0x1f0 lib/dump_stack.c:120
- print_freed_lock_bug kernel/locking/lockdep.c:6662 [inline]
- debug_check_no_locks_freed+0x208/0x2b0 kernel/locking/lockdep.c:6697
- slab_free_hook mm/slub.c:2281 [inline]
- slab_free mm/slub.c:4613 [inline]
- kfree+0xe5/0x4b0 mm/slub.c:4761
- sk_prot_free net/core/sock.c:2201 [inline]
- __sk_destruct+0x5eb/0x720 net/core/sock.c:2293
- sk_destruct+0xc2/0xf0 net/core/sock.c:2308
- __sk_free+0xf4/0x3e0 net/core/sock.c:2319
- sk_free+0x6a/0x90 net/core/sock.c:2330
- sock_put include/net/sock.h:1904 [inline]
- bt_accept_unlink+0x245/0x2e0 net/bluetooth/af_bluetooth.c:259
- bt_accept_dequeue+0x517/0x600 net/bluetooth/af_bluetooth.c:305
- l2cap_sock_cleanup_listen+0x5c/0x2a0 net/bluetooth/l2cap_sock.c:1439
- l2cap_sock_release+0x5c/0x210 net/bluetooth/l2cap_sock.c:1413
- __sock_release+0xb0/0x270 net/socket.c:640
- sock_close+0x1c/0x30 net/socket.c:1408
- __fput+0x3f8/0xb60 fs/file_table.c:450
- task_work_run+0x14e/0x250 kernel/task_work.c:239
- resume_user_mode_work include/linux/resume_user_mode.h:50 [inline]
- exit_to_user_mode_loop kernel/entry/common.c:114 [inline]
- exit_to_user_mode_prepare include/linux/entry-common.h:329 [inline]
- __syscall_exit_to_user_mode_work kernel/entry/common.c:207 [inline]
- syscall_exit_to_user_mode+0x27b/0x2a0 kernel/entry/common.c:218
- __do_fast_syscall_32+0x80/0x120 arch/x86/entry/common.c:389
- do_fast_syscall_32+0x32/0x80 arch/x86/entry/common.c:411
- entry_SYSENTER_compat_after_hwframe+0x84/0x8e
-RIP: 0023:0xf7ff5579
-Code: b8 01 10 06 03 74 b4 01 10 07 03 74 b0 01 10 08 03 74 d8 01 00 00 00 00 00 00 00 00 00 00 00 00 00 51 52 55 89 e5 0f 34 cd 80 <5d> 5a 59 c3 90 90 90 90 8d b4 26 00 00 00 00 8d b4 26 00 00 00 00
-RSP: 002b:00000000ff8596dc EFLAGS: 00000202 ORIG_RAX: 00000000000001b4
-RAX: 0000000000000000 RBX: 0000000000000003 RCX: 000000000000001e
-RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000000
-RBP: 0000000000000000 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000000
- </TASK>
-==================================================================
-BUG: KASAN: slab-use-after-free in debug_spin_lock_before kernel/locking/spinlock_debug.c:86 [inline]
-BUG: KASAN: slab-use-after-free in do_raw_spin_lock+0x271/0x2c0 kernel/locking/spinlock_debug.c:115
-Read of size 4 at addr ffff88806780b1c4 by task syz.0.39/6085
-
-CPU: 3 UID: 0 PID: 6085 Comm: syz.0.39 Not tainted 6.13.0-rc2-syzkaller-00192-g243f750a2df0 #0
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:94 [inline]
- dump_stack_lvl+0x116/0x1f0 lib/dump_stack.c:120
- print_address_description mm/kasan/report.c:378 [inline]
- print_report+0xc3/0x620 mm/kasan/report.c:489
- kasan_report+0xd9/0x110 mm/kasan/report.c:602
- debug_spin_lock_before kernel/locking/spinlock_debug.c:86 [inline]
- do_raw_spin_lock+0x271/0x2c0 kernel/locking/spinlock_debug.c:115
- spin_lock_bh include/linux/spinlock.h:356 [inline]
- release_sock+0x21/0x220 net/core/sock.c:3635
- bt_accept_dequeue+0x505/0x600 net/bluetooth/af_bluetooth.c:309
- l2cap_sock_cleanup_listen+0x5c/0x2a0 net/bluetooth/l2cap_sock.c:1439
- l2cap_sock_release+0x5c/0x210 net/bluetooth/l2cap_sock.c:1413
- __sock_release+0xb0/0x270 net/socket.c:640
- sock_close+0x1c/0x30 net/socket.c:1408
- __fput+0x3f8/0xb60 fs/file_table.c:450
- task_work_run+0x14e/0x250 kernel/task_work.c:239
- resume_user_mode_work include/linux/resume_user_mode.h:50 [inline]
- exit_to_user_mode_loop kernel/entry/common.c:114 [inline]
- exit_to_user_mode_prepare include/linux/entry-common.h:329 [inline]
- __syscall_exit_to_user_mode_work kernel/entry/common.c:207 [inline]
- syscall_exit_to_user_mode+0x27b/0x2a0 kernel/entry/common.c:218
- __do_fast_syscall_32+0x80/0x120 arch/x86/entry/common.c:389
- do_fast_syscall_32+0x32/0x80 arch/x86/entry/common.c:411
- entry_SYSENTER_compat_after_hwframe+0x84/0x8e
-RIP: 0023:0xf7ff5579
-Code: b8 01 10 06 03 74 b4 01 10 07 03 74 b0 01 10 08 03 74 d8 01 00 00 00 00 00 00 00 00 00 00 00 00 00 51 52 55 89 e5 0f 34 cd 80 <5d> 5a 59 c3 90 90 90 90 8d b4 26 00 00 00 00 8d b4 26 00 00 00 00
-RSP: 002b:00000000ff8596dc EFLAGS: 00000202 ORIG_RAX: 00000000000001b4
-RAX: 0000000000000000 RBX: 0000000000000003 RCX: 000000000000001e
-RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000000
-RBP: 0000000000000000 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000000
- </TASK>
-
-Allocated by task 5953:
- kasan_save_stack+0x33/0x60 mm/kasan/common.c:47
- kasan_save_track+0x14/0x30 mm/kasan/common.c:68
- poison_kmalloc_redzone mm/kasan/common.c:377 [inline]
- __kasan_kmalloc+0xaa/0xb0 mm/kasan/common.c:394
- kasan_kmalloc include/linux/kasan.h:260 [inline]
- __do_kmalloc_node mm/slub.c:4298 [inline]
- __kmalloc_noprof+0x21a/0x4f0 mm/slub.c:4310
- kmalloc_noprof include/linux/slab.h:905 [inline]
- sk_prot_alloc+0x1a8/0x2a0 net/core/sock.c:2165
- sk_alloc+0x36/0xb90 net/core/sock.c:2218
- bt_sock_alloc+0x3b/0x3a0 net/bluetooth/af_bluetooth.c:148
- l2cap_sock_alloc.constprop.0+0x33/0x1c0 net/bluetooth/l2cap_sock.c:1879
- l2cap_sock_new_connection_cb+0x101/0x240 net/bluetooth/l2cap_sock.c:1470
- l2cap_connect_cfm+0x85f/0xf10 net/bluetooth/l2cap_core.c:7263
- hci_connect_cfm include/net/bluetooth/hci_core.h:2057 [inline]
- hci_remote_features_evt+0x5aa/0xa30 net/bluetooth/hci_event.c:3726
- hci_event_func net/bluetooth/hci_event.c:7473 [inline]
- hci_event_packet+0x9eb/0x1190 net/bluetooth/hci_event.c:7525
- hci_rx_work+0x2c5/0x16b0 net/bluetooth/hci_core.c:4035
- process_one_work+0x958/0x1b30 kernel/workqueue.c:3229
- process_scheduled_works kernel/workqueue.c:3310 [inline]
- worker_thread+0x6c8/0xf00 kernel/workqueue.c:3391
- kthread+0x2c1/0x3a0 kernel/kthread.c:389
- ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
-
-Freed by task 6085:
- kasan_save_stack+0x33/0x60 mm/kasan/common.c:47
- kasan_save_track+0x14/0x30 mm/kasan/common.c:68
- kasan_save_free_info+0x3b/0x60 mm/kasan/generic.c:582
- poison_slab_object mm/kasan/common.c:247 [inline]
- __kasan_slab_free+0x51/0x70 mm/kasan/common.c:264
- kasan_slab_free include/linux/kasan.h:233 [inline]
- slab_free_hook mm/slub.c:2353 [inline]
- slab_free mm/slub.c:4613 [inline]
- kfree+0x14f/0x4b0 mm/slub.c:4761
- sk_prot_free net/core/sock.c:2201 [inline]
- __sk_destruct+0x5eb/0x720 net/core/sock.c:2293
- sk_destruct+0xc2/0xf0 net/core/sock.c:2308
- __sk_free+0xf4/0x3e0 net/core/sock.c:2319
- sk_free+0x6a/0x90 net/core/sock.c:2330
- sock_put include/net/sock.h:1904 [inline]
- bt_accept_unlink+0x245/0x2e0 net/bluetooth/af_bluetooth.c:259
- bt_accept_dequeue+0x517/0x600 net/bluetooth/af_bluetooth.c:305
- l2cap_sock_cleanup_listen+0x5c/0x2a0 net/bluetooth/l2cap_sock.c:1439
- l2cap_sock_release+0x5c/0x210 net/bluetooth/l2cap_sock.c:1413
- __sock_release+0xb0/0x270 net/socket.c:640
- sock_close+0x1c/0x30 net/socket.c:1408
- __fput+0x3f8/0xb60 fs/file_table.c:450
- task_work_run+0x14e/0x250 kernel/task_work.c:239
- resume_user_mode_work include/linux/resume_user_mode.h:50 [inline]
- exit_to_user_mode_loop kernel/entry/common.c:114 [inline]
- exit_to_user_mode_prepare include/linux/entry-common.h:329 [inline]
- __syscall_exit_to_user_mode_work kernel/entry/common.c:207 [inline]
- syscall_exit_to_user_mode+0x27b/0x2a0 kernel/entry/common.c:218
- __do_fast_syscall_32+0x80/0x120 arch/x86/entry/common.c:389
- do_fast_syscall_32+0x32/0x80 arch/x86/entry/common.c:411
- entry_SYSENTER_compat_after_hwframe+0x84/0x8e
-
-The buggy address belongs to the object at ffff88806780b000
- which belongs to the cache kmalloc-2k of size 2048
-The buggy address is located 452 bytes inside of
- freed 2048-byte region [ffff88806780b000, ffff88806780b800)
-
-The buggy address belongs to the physical page:
-page: refcount:1 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x67808
-head: order:3 mapcount:0 entire_mapcount:0 nr_pages_mapped:0 pincount:0
-flags: 0x4fff00000000040(head|node=1|zone=1|lastcpupid=0x7ff)
-page_type: f5(slab)
-raw: 04fff00000000040 ffff88801ac42f00 ffffea00019a8600 dead000000000002
-raw: 0000000000000000 0000000000080008 00000001f5000000 0000000000000000
-head: 04fff00000000040 ffff88801ac42f00 ffffea00019a8600 dead000000000002
-head: 0000000000000000 0000000000080008 00000001f5000000 0000000000000000
-head: 04fff00000000003 ffffea00019e0201 ffffffffffffffff 0000000000000000
-head: 0000000000000008 0000000000000000 00000000ffffffff 0000000000000000
-page dumped because: kasan: bad access detected
-page_owner tracks the page as allocated
-page last allocated via order 3, migratetype Unmovable, gfp_mask 0xd20c0(__GFP_IO|__GFP_FS|__GFP_NOWARN|__GFP_NORETRY|__GFP_COMP|__GFP_NOMEMALLOC), pid 5945, tgid 5945 (syz-executor), ts 45957452176, free_ts 0
- set_page_owner include/linux/page_owner.h:32 [inline]
- post_alloc_hook+0x2d1/0x350 mm/page_alloc.c:1556
- prep_new_page mm/page_alloc.c:1564 [inline]
- get_page_from_freelist+0xfce/0x2f80 mm/page_alloc.c:3474
- __alloc_pages_noprof+0x223/0x25b0 mm/page_alloc.c:4751
- alloc_pages_mpol_noprof+0x2c9/0x610 mm/mempolicy.c:2269
- alloc_slab_page mm/slub.c:2423 [inline]
- allocate_slab mm/slub.c:2589 [inline]
- new_slab+0x2c9/0x410 mm/slub.c:2642
- ___slab_alloc+0xce2/0x1650 mm/slub.c:3830
- __slab_alloc.constprop.0+0x56/0xb0 mm/slub.c:3920
- __slab_alloc_node mm/slub.c:3995 [inline]
- slab_alloc_node mm/slub.c:4156 [inline]
- __kmalloc_cache_noprof+0xf6/0x420 mm/slub.c:4324
- kmalloc_noprof include/linux/slab.h:901 [inline]
- kzalloc_noprof include/linux/slab.h:1037 [inline]
- nsim_bus_dev_new drivers/net/netdevsim/bus.c:425 [inline]
- new_device_store+0x207/0x730 drivers/net/netdevsim/bus.c:173
- bus_attr_store+0x71/0xb0 drivers/base/bus.c:172
- sysfs_kf_write+0x117/0x170 fs/sysfs/file.c:139
- kernfs_fop_write_iter+0x33d/0x500 fs/kernfs/file.c:334
- new_sync_write fs/read_write.c:586 [inline]
- vfs_write+0x5ae/0x1150 fs/read_write.c:679
- ksys_write+0x12b/0x250 fs/read_write.c:731
- do_syscall_32_irqs_on arch/x86/entry/common.c:165 [inline]
- __do_fast_syscall_32+0x73/0x120 arch/x86/entry/common.c:386
- do_fast_syscall_32+0x32/0x80 arch/x86/entry/common.c:411
-page_owner free stack trace missing
-
-Memory state around the buggy address:
- ffff88806780b080: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
- ffff88806780b100: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
->ffff88806780b180: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-                                           ^
- ffff88806780b200: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
- ffff88806780b280: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-==================================================================
-----------------
-Code disassembly (best guess), 2 bytes skipped:
-   0:	10 06                	adc    %al,(%rsi)
-   2:	03 74 b4 01          	add    0x1(%rsp,%rsi,4),%esi
-   6:	10 07                	adc    %al,(%rdi)
-   8:	03 74 b0 01          	add    0x1(%rax,%rsi,4),%esi
-   c:	10 08                	adc    %cl,(%rax)
-   e:	03 74 d8 01          	add    0x1(%rax,%rbx,8),%esi
-  1e:	00 51 52             	add    %dl,0x52(%rcx)
-  21:	55                   	push   %rbp
-  22:	89 e5                	mov    %esp,%ebp
-  24:	0f 34                	sysenter
-  26:	cd 80                	int    $0x80
-* 28:	5d                   	pop    %rbp <-- trapping instruction
-  29:	5a                   	pop    %rdx
-  2a:	59                   	pop    %rcx
-  2b:	c3                   	ret
-  2c:	90                   	nop
-  2d:	90                   	nop
-  2e:	90                   	nop
-  2f:	90                   	nop
-  30:	8d b4 26 00 00 00 00 	lea    0x0(%rsi,%riz,1),%esi
-  37:	8d b4 26 00 00 00 00 	lea    0x0(%rsi,%riz,1),%esi
+        if (test_bit(HCI_CONN_BIG_CREATED, &conn->flags)) {
+                /* This is a BIS connection, hci_conn_del will
+@@ -5440,11 +5441,18 @@ static int hci_disconnect_sync(struct hci_dev *hdev, struct hci_conn *conn,
+         * used when suspending or powering off, where we don't want to wait
+         * for the peer's response.
+         */
+-       if (reason != HCI_ERROR_REMOTE_POWER_OFF)
++
++       if (reason != HCI_ERROR_REMOTE_POWER_OFF) {
++               if (conn->type == LE_LINK)
++                       disc_timeout = msecs_to_jiffies(10 * conn->le_supv_timeout);
++               else
++                       disc_timeout = conn->disc_timeout;
++
+                return __hci_cmd_sync_status_sk(hdev, HCI_OP_DISCONNECT,
+                                                sizeof(cp), &cp,
+                                                HCI_EV_DISCONN_COMPLETE,
+-                                               HCI_CMD_TIMEOUT, NULL);
++                                               disc_timeout, NULL);
++       }
 
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+>>>>>> That said, we really need to fix bluetoothd if it is not able to be
+>>>>>> cleaned up if SET_POWERED command fails, but it looks like it is
+>>>>>> handling errors correctly so it sounds like something else is at play.
+>>>>>
+>>>> The issue arises after a 2-second timeout of hci_disconnect_sync. During
+>>>> hci_abort_conn_sync, the connection is cleaned up by hci_conn_failed.
+>>>> after supervision timeout, the disconnect complete event arrives, but
+>>>> it returns at line 3370 since the connection has already been removed.
+>>>> As a result, bluetoothd does not send the mgmt event for MGMT_OP_DISCONNECT
+>>>> to the application layer (bluetoothctl), causing bluetoothctl to get stuck
+>>>> and unable to perform other mgmt commands.
+>>>
+>>> The command shall have completed regardless if disconnect complete has
+>>> been received or not, the is the whole point of having a timeout, so
+>>> this makes no sense to me, or you are not describing what is happening
+>>> here. Also there is no MGMT_OP_DISCONNECT pending, it is
+>>> MGMT_OP_SET_POWERED, if you are talking about the DISCONNECTED event
+>>> that is a totally different thing and perhaps that is the source of
+>>> the problem because if we do cleanup hci_conn even in case the command
+>>> fails/times out then we should be generating a disconnected event as
+>>> well.
+>>>
+>> Here is the flow describe the issue. For normal case:
+>> ┌───────────┐          ┌──────────┐           ┌──────┐           ┌──────────┐           ┌──────┐
+>> │bluetootctl│          │bluetoothd│           │kernel│           │controller│           │remote│
+>> └─────┬─────┘          └─────┬────┘           └───┬──┘           └─────┬────┘           └───┬──┘
+>>       │   disconnect cmd     │                    │                    │                    │
+>>       │─────────────────────>│                    │                    │                    │
+>>       │                      │                    │                    │                    │
+>>       │                      │    MGMT_OP         │                    │                    │
+>>       │                      │    _DISCONNECT     │                    │                    │
+>>       │                      │───────────────────>│                    │                    │
+>>       │                      │                    │                    │                    │
+>>       │                      │                    │  HCI_Disconnect    │                    │
+>>       │                      │                    │───────────────────>│                    │
+>>       │                      │                    │                    │                    │
+>>       │                      │                    │                    │   LL_TERMINATE     │
+>>       │                      │                    │                    │   _IND             │
+>>       │                      │                    │                    │───────────────────>│
+>>       │                      │                    │                    │                    │
+>>       │                      │                    │                    │        ACK         │
+>>       │                      │                    │                    │<───────────────────│
+>>       │                      │                    │                    │                    │
+>>       │                      │                    │   Disc_Comp_Evt    │                    │
+>>       │                      │                    │<───────────────────│                    │
+>>       │                      │                    │                    │                    │
+>>       │                      │   MGMT Response    │                    │                    │
+>>       │                      │<───────────────────│                    │                    │
+>>       │                      │                    │                    │                    │
+>>       │      disc succ       │                    │                    │                    │
+>>       │<─────────────────────│                    │                    │                    │
+>> ┌─────┴─────┐          ┌─────┴────┐           ┌───┴──┐           ┌─────┴────┐           ┌───┴──┐
+>> │bluetootctl│          │bluetoothd│           │kernel│           │controller│           │remote│
+>> └───────────┘          └──────────┘           └──────┘           └──────────┘           └──────┘
+>>
+>>
+>> The failure case like this:
+>>
+>> ┌───────────┐          ┌──────────┐           ┌──────┐            ┌──────────┐           ┌──────┐
+>> │bluetootctl│          │bluetoothd│           │kernel│            │controller│           │remote│
+>> └─────┬─────┘          └─────┬────┘           └───┬──┘            └─────┬────┘           └───┬──┘
+>>       │     disconnect       │                    │                     │                    │
+>>       │     cmd              │                    │                     │                    │
+>>       │─────────────────────>│                    │                     │                    │
+>>       │                      │                    │                     │                    │
+>>       │                      │    MGMT_OP_        │                     │                    │
+>>       │                      │    DISCONNECT      │                     │                    │
+>>       │                      │───────────────────>│                     │                    │
+>>       │                      │                    │                     │                    │
+>>       │                      │                   ┌┴┐     HCI_           │                    │
+>>       │                      │                   │ │     Disconnect     │                    │
+>>       │                      │                   │ │ ──────────────────>│                    │
+>>       │                      │                   │ │                    │                    │
+>>       │                      │                   │ │                    │  LL_TERMINATE     ┌┴┐
+>>       │                      │                   │ │                    │  _IND             │ │
+>>       │                      │                   │ │                    │─────────────────> │ │
+>>       │                      │                   │ │                    │                   │ │
+>>       │                      │                   │ │ 2s                 │                   │ │
+>>       │                      │                   │ │                    │                   │ │
+>>       │                      │                   │ │                    │                   │ │ More
+>>       │                      │                   │ │                    │                   │ │ than
+>>       │                      │                   │ │                    │                   │ │ 2s
+>>       │                      │                   │ │                    │                   │ │
+>>       │                      │                   │ │                    │                   │ │
+>>       │                      │                   │ │                    │                   │ │
+>>       │                      │                   └┬┘                    │                   │ │
+>>       │                      │                    │────┐                │                   │ │
+>>       │                      │                    │    │ hci_disconnect │                   │ │
+>>       │                      │                    │<───┘ sync timeout,  │                   │ │
+>>       │                      │                    │      del 'con' by   │                   │ │
+>>       │                      │                    │      hci_conn_failed│                   │ │
+>>       │                      │                    │                     │                   └┬┘
+>>       │                      │                    │                     │        ACK         │
+>>       │                      │                    │                     │<───────────────────│
+>>       │                      │                    │                     │                    │
+>>       │                      │                    │   Disc_Comp_Evt     │                    │
+>>       │                      │                    │<────────────────────│                    │
+>>       │                      │                    │                     │                    │
+>>       │                      │                    │────┐                │                    │
+>>       │                     \│/                   │    │ ignore the     │                    │
+>>       │                      X                    │<───┘ event since    │                    │
+>>       │                     /│\                   │      'con' has been │                    │
+>>       │                      │     MGMT           │      deleted        │                    │
+>>       │                      │     Response       │                     │                    │
+>>       │                      │<─ ─ ─ ─ ─ ─ ─ ─ ─ ─│                     │                    │
+>> ┌─────┴─────┐          ┌─────┴────┐           ┌───┴──┐            ┌─────┴────┐           ┌───┴──┐
+>> │bluetootctl│          │bluetoothd│           │kernel│            │controller│           │remote│
+>> └───────────┘          └──────────┘           └──────┘            └──────────┘           └──────┘
+>>
+>>
+>> So in the failure case, the bluetoothd is blocked by waiting the mgmt response from kernel. From
+>> our test, bluetoothd can't accept any command related to mgmt from bluetothctl.
+>>
+>>>>
+>>>> 3355 static void hci_disconn_complete_evt(struct hci_dev *hdev, void *data,
+>>>> 3356              struct sk_buff *skb)
+>>>> 3357 {
+>>>> 3358   struct hci_ev_disconn_complete *ev = data;
+>>>> 3359   u8 reason;
+>>>> 3360   struct hci_conn_params *params;
+>>>> 3361   struct hci_conn *conn;
+>>>> 3362   bool mgmt_connected;
+>>>> 3363
+>>>> 3364   bt_dev_dbg(hdev, "status 0x%2.2x", ev->status);
+>>>> 3365
+>>>> 3366   hci_dev_lock(hdev);
+>>>> 3367
+>>>> 3368   conn = hci_conn_hash_lookup_handle(hdev, __le16_to_cpu(ev->handle));
+>>>> 3369   if (!conn)
+>>>> 3370     goto unlock;
+>>>> 3371
+>>>> 3372   if (ev->status) {
+>>>> 3373     mgmt_disconnect_failed(hdev, &conn->dst, conn->type,
+>>>> 3374                conn->dst_type, ev->status);
+>>>> 3375     goto unlock;
+>>>> 3376   }
+>>>> 3377
+>>>> 3378   conn->state = BT_CLOSED;
+>>>> 3379
+>>>> 3380   mgmt_connected = test_and_clear_bit(HCI_CONN_MGMT_CONNECTED, &conn->flags);
+>>>> 3381
+>>>>
+>>>>> I double checked this and apparently this could no longer fail:
+>>>>>
+>>>>> +               /* Disregard possible errors since hci_conn_del shall have been
+>>>>> +                * called even in case of errors had occurred since it would
+>>>>> +                * then cause hci_conn_failed to be called which calls
+>>>>> +                * hci_conn_del internally.
+>>>>> +                */
+>>>>> +               hci_abort_conn_sync(hdev, conn, reason);
+>>>>>
+>>>>> So it will clean up the hci_conn no matter what is the timeout, so
+>>>>> either you don't have this change or it is not working for some
+>>>>> reason.
+>>>>>
+>>>> The issue is mgmt command is not repsonsed by bluetoothd, then the bluetootlctl is
+>>>> blocked. It does not happen during the power off stage. It happened when disconnect
+>>>> a BLE device, but the disconnect complete event sent from controller to host 2s later.
+>>>> Then it causes the mgmt in bluetoothctl is blocked as decribed as above.
+>>>
+>>> There is a difference about a MGMT command, initiated by bluetoothd,
+>>> versus a MGMT event initiated by the kernel, so the daemon is not
+>>> blocked it just don't get a disconnection event, which is different
+>>> than a command complete.
+>>>
+>>> What is the command sequence that you use to reproduce the problem?
+>> Here is the command log:
+>> [CHG] Controller 8C:FD:F0:21:81:87 Pairable: yes
+>> [bluetooth]# power on
+>> Changing power on succeeded
+>> [bluetooth]# connect CF:90:67:3C:7A:56
+>> Attempting to connect to CF:90:67:3C:7A:56
+>> [CHG] Device CF:90:67:3C:7A:56 Connected: yes
+>> Connection successful
+>> [CHG] Device CF:90:67:3C:7A:56 ServicesResolved: yes
+>> [Designer Mouse]#
+>> [Designer Mouse]# disconnect D9:B5:6C:F2:51:91
+>> Attempting to disconnect from D9:B5:6C:F2:51:91 ## no disconnection success response
+>> [Designer Mouse]#
+>> [Designer Mouse]# power off
+>> [Designer Mouse]#
+>> Failed to set power off: org.freedesktop.DBus.Error.NoReply
+>>
+>> To easily reproduce this issue, we use a firmware which always send the disconnect
+>> complete event more than 2s. Then the issue occurred 100%.
+>>
+>> Actually, the root cause is the hci_disconnect_sync doesn't handle this case since it
+>> relies on __hci_cmd_sync_status_sk, which maximum timeout value is constrained to 2s.
+>>
+>>>
+>>>>>>>         hci_dev_lock(hdev);
+>>>>>>>
+>>>>>>>         /* Check if the connection has been cleaned up concurrently */
+>>>>>>>
+>>>>>>> base-commit: e25c8d66f6786300b680866c0e0139981273feba
+>>>>>>> --
+>>>>>>> 2.34.1
+>>>>>>>
+>>>>>>
+>>>>>>
+>>>>>> --
+>>>>>> Luiz Augusto von Dentz
+>>>>>
+>>>>>
+>>>>>
+>>>>
+>>>
+>>>
+>>
+> 
+> 
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
