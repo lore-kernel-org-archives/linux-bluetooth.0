@@ -1,129 +1,103 @@
-Received: from mx1.sberdevices.ru (mx2.sberdevices.ru [45.89.224.132])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f179.google.com (mail-lj1-f179.google.com [209.85.208.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E9A835948;
-	Thu, 19 Dec 2024 18:42:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.89.224.132
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62D801A0AFE
+	for <linux-bluetooth@vger.kernel.org>; Thu, 19 Dec 2024 18:59:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734633783; cv=none; b=kSIro5QW76DZMyvPhVm/2edWV8hPzGfheHE2KNsJQ9bV1ilHsNIuZnxDG1Csp12ulduo8O7ZLyBs4Fhv2mTzhDIE4JAjiSRZdN20e7J3BqxgN5jHPjBk/q5+U9C3C+CqgGbcyAYAhL3IP8cafuBZhY4hRgUrV1GFPTsZaix8Juw=
+	t=1734634768; cv=none; b=hhty+usmvEfogJarNWA8DXq7qArvyyBV7BREc2xu+5ddQCeld1yGmjVnv/51FKXH/jUZnZ1qfCvkFml0YVzmgeI2OuciEszuZir4bazwEmsmJDBA8hWekFclRU/knRrgsLk44QwH6qLcTiQICUrUTzBuDcDUqVftfwqvTxd+Fn4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734633783; c=relaxed/simple;
-	bh=JVoO4kNfpxLIokbCUppurFxG/LXqe2Sag3iMswzKh1s=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:CC:References:
-	 In-Reply-To:Content-Type; b=WYFyhhRwRd2oypVmSlqAku3uC91lTr/XGjW+6DL23qMQRoEnrdPFj8OkS7lk1YgmRgJ8aE6ZHOFZgZSm1d+NUqBjv9FD48RceRRK4r7Axe9h7Xnerl5ssSy+OFpakJObhbAhJC0WIy97TxUkzLOcRllfJFU7cvCJE5Mmy9LSyqc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=salutedevices.com; spf=pass smtp.mailfrom=salutedevices.com; dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b=O9hPinNP; arc=none smtp.client-ip=45.89.224.132
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=salutedevices.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=salutedevices.com
+	s=arc-20240116; t=1734634768; c=relaxed/simple;
+	bh=QbH4lL5Wgb8JtRqzSPcCC/Tx+e1Rl7sCHWvvYP69duA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=hDo/eN2mPOQIBBHpqtTBU575IBkd1DvaAOfkO/aHWNG5i+PsWbgU2cv0ix1NmGwY237ZOSA0vfz854h0L3Mst5/CT1Z+PRmFWy+Osw1MzhqHP+vO8TdKlVN+N2Sdb7p0hjW5osxAE5u5myPkxf9/4WNBlY6WSS1qZlg4IMs69p4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=i5yJQ1Fi; arc=none smtp.client-ip=209.85.208.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b="O9hPinNP"
-Received: from p-infra-ksmg-sc-msk02.sberdevices.ru (localhost [127.0.0.1])
-	by mx1.sberdevices.ru (Postfix) with ESMTP id 27F1B120010;
-	Thu, 19 Dec 2024 21:42:36 +0300 (MSK)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru 27F1B120010
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=salutedevices.com;
-	s=mail; t=1734633756;
-	bh=esL9DkuK7JtVtcWQZeaz4UPNp+QhH3Q1Gw/XCsJDSic=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Content-Type:From;
-	b=O9hPinNPz6kxzm8oXspY2cHhVk8ejbzHg1tfwX+vNykRTA0saOmhTwPAiyw3n8FaW
-	 QEPFUEFUoVmKGiLkNDIR+XBRPchjuN6Pjiw4vNBf2b+2R9a2LDmi7oSjp/69U3yMLW
-	 nBgJVVQcqC8Dk9gBYRorQEMuCRvCmCXjJjD1T466TfvdSRxLe27b2kPcmU+wqI9Kbh
-	 FXUqHctMYBBq5YdHtRnQCoytmNhDxP7WHTGH/7F6S278Xf/6poAs+v7wnn5hNiAJLn
-	 LS4HLDn2jftkPj22V8/wE1SxKuol9b1H6FI/nhkblIKi/nNzuAJmrdOvFvHXzz5LXp
-	 oVmwHgLqsT/cA==
-Received: from smtp.sberdevices.ru (p-i-exch-sc-m02.sberdevices.ru [172.16.192.103])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.sberdevices.ru (Postfix) with ESMTPS;
-	Thu, 19 Dec 2024 21:42:35 +0300 (MSK)
-Message-ID: <4ef9c3a9-a8c4-fb98-2244-ed2770f71c17@salutedevices.com>
-Date: Thu, 19 Dec 2024 21:42:26 +0300
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="i5yJQ1Fi"
+Received: by mail-lj1-f179.google.com with SMTP id 38308e7fff4ca-3003e203acaso11862991fa.1
+        for <linux-bluetooth@vger.kernel.org>; Thu, 19 Dec 2024 10:59:26 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1734634764; x=1735239564; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=sKf9OymRdeyOXICNgHL4hfs9o+CDWWbupK2CayDhNZk=;
+        b=i5yJQ1Fi+bjqMew4XUxV2+EMzUqCQ7B/lHA2O6q08G7RqEc83kc8WkX7QonKv5QZqB
+         NogQXYejonn/IU6bMZHTyrl3l9CASVx62AXMaV7WHkT8tegFqYTKRcGhUmXi+5Y/YWzP
+         0IV6wLeyMnSIrNQpRzYcChgZXOz4jkEJwSA6fNucfQde9uaPvHhKjOIR6GFSGzMzQ4Ip
+         N5dclJbPqZf9JMDJcSGH1Z3bCEAnFOvFMbM584dz326l09VjkdE80kKuqf/x8GUHdnc9
+         njJuVU8/l7dIz8pqOv7qP8Avoy8Ya+CSAVIrFOKnyYlJ1PpYEmkP2ZbKHroxoB662o/M
+         IMsA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1734634764; x=1735239564;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=sKf9OymRdeyOXICNgHL4hfs9o+CDWWbupK2CayDhNZk=;
+        b=MnNB8aLeiAAlxELnbVxTPRy+6tDEDfrVS0KquiNdx6hIL22nL8LVc3qwSSGHiYReRr
+         T+gCA4hkO/d+OCFn4Nip+2IWZ1WqYsMatabwVObXGa5qRRQPJbce2iQlfrU7UEtBCZ/S
+         b0cX96YptORA1rY3ycVgcAKc0h4m9WfSyhwNMxnaz40CfvTmdcgRO87pBCNtqG5olb20
+         kB5A3yhm4W2loHsrBIUL6wcNtPS/ATfHcpueyGpKfW6oK4wv3Vd1fVEN/N9ONDrOZlm5
+         T/5NQYo+pYINWJYaPMp5nm4RGbksfyWljuJ+AjlTjiWo23/Ksl97yEhyKLdBegy8rBNI
+         9BWA==
+X-Gm-Message-State: AOJu0YwhEIENKpL30IrkBglfQgcV+cmyuTyXeMLaATnY4y6clEiTGtqJ
+	08C4yyspk+PYx9VqziFd5SSStNGSpEJmgkpfjCk0x+r4ZPYKoQu82jZz7Sc3LLzgA9UbtbJeTpi
+	Yz5UaHBxNCtYIsgSTYKqP1EZG7Og=
+X-Gm-Gg: ASbGncv01Vy/wZol1G6O3cmcpuskNMNUFg80N2HjBTg8LeMSOEGHcmf1TYh5WlqiIBP
+	l2+idp9MSrGIfN+/zSfiWMttvbjwqcQR5WoK+fvc=
+X-Google-Smtp-Source: AGHT+IH4ZEXn145CNSbQxXexgHRgIy4h2Uuf0AEANcYpVCpoKWvA/OkbQL6TBjQ7j/jeO5XGTl/DsHiZV5bzgXNJbks=
+X-Received: by 2002:a2e:bc26:0:b0:2ff:cfbb:c893 with SMTP id
+ 38308e7fff4ca-304685032femr616121fa.6.1734634764141; Thu, 19 Dec 2024
+ 10:59:24 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.4.2
-Subject: Re: [PATCH v2] Bluetooth: hci_uart: fix race during initialization
-Content-Language: en-US
-From: Arseniy Krasnov <avkrasnov@salutedevices.com>
-To: Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz
-	<luiz.dentz@gmail.com>
-CC: <oxffffaa@gmail.com>, <linux-bluetooth@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <kernel@salutedevices.com>
-References: <d159c57f-8490-4c26-79da-6ad3612c4a14@salutedevices.com>
-In-Reply-To: <d159c57f-8490-4c26-79da-6ad3612c4a14@salutedevices.com>
+References: <20241219181140.423916-1-kieran.r.geary@gmail.com> <20241219181140.423916-2-kieran.r.geary@gmail.com>
+In-Reply-To: <20241219181140.423916-2-kieran.r.geary@gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Thu, 19 Dec 2024 13:59:11 -0500
+Message-ID: <CABBYNZKSKtzo6=A75pO4McbpC=qVXhniY=P4yBqMJAOJfxboGw@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 1/1] Set `SDP_LARGE_MTU` flag for DS4 Rev. 2 product code
+To: Kieran Geary <kieran.r.geary@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: p-i-exch-a-m1.sberdevices.ru (172.24.196.116) To
- p-i-exch-a-m1.sberdevices.ru (172.24.196.116)
-X-KSMG-Rule-ID: 10
-X-KSMG-Message-Action: clean
-X-KSMG-AntiSpam-Lua-Profiles: 189957 [Dec 19 2024]
-X-KSMG-AntiSpam-Version: 6.1.1.7
-X-KSMG-AntiSpam-Envelope-From: avkrasnov@salutedevices.com
-X-KSMG-AntiSpam-Rate: 0
-X-KSMG-AntiSpam-Status: not_detected
-X-KSMG-AntiSpam-Method: none
-X-KSMG-AntiSpam-Auth: dkim=none
-X-KSMG-AntiSpam-Info: LuaCore: 49 0.3.49 28b3b64a43732373258a371bd1554adb2caa23cb, {Tracking_uf_ne_domains}, {Tracking_from_domain_doesnt_match_to}, patchwork.kernel.org:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2;salutedevices.com:7.1.1;smtp.sberdevices.ru:7.1.1,5.0.1, FromAlignment: s
-X-MS-Exchange-Organization-SCL: -1
-X-KSMG-AntiSpam-Interceptor-Info: scan successful
-X-KSMG-AntiPhishing: Clean, bases: 2024/12/19 18:23:00
-X-KSMG-LinksScanning: Clean, bases: 2024/12/19 18:23:00
-X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.0.1.6960, bases: 2024/12/19 17:48:00 #26892060
-X-KSMG-AntiVirus-Status: Clean, skipped
+Content-Transfer-Encoding: quoted-printable
 
-Hi, sorry i'm new in bluetooth subsystem. I get the following
-message from CI:
-https://patchwork.kernel.org/project/bluetooth/list/?series=918554
-Where one of tests was failed. Where I can get more information
-about failure:
+Hi Kieran,
 
-tedd_an/TestRunner_mgmt-tester 	fail 	TestRunner_mgmt-tester: Total: 490, Passed: 483 (98.6%), Failed: 3, Not Run: 4 
-
-?
-
-Thanks
-
-On 17.12.2024 11:12, Arseniy Krasnov wrote:
-> 'hci_register_dev()' calls power up function, which is executed by
-> kworker - 'hci_power_on()'. This function does access to bluetooth chip
-> using callbacks from 'hci_ldisc.c', for example 'hci_uart_send_frame()'.
-> Now 'hci_uart_send_frame()' checks 'HCI_UART_PROTO_READY' bit set, and
-> if not - it fails. Problem is that 'HCI_UART_PROTO_READY' is set after
-> 'hci_register_dev()', and there is tiny chance that 'hci_power_on()' will
-> be executed before setting this bit. In that case HCI init logic fails.
-> 
-> Patch moves setting of 'HCI_UART_PROTO_READY' before calling function
-> 'hci_uart_register_dev()'.
-> 
-> Signed-off-by: Arseniy Krasnov <avkrasnov@salutedevices.com>
+On Thu, Dec 19, 2024 at 1:13=E2=80=AFPM Kieran Geary <kieran.r.geary@gmail.=
+com> wrote:
+>
 > ---
->  Changelog v1->v2:
->  * Move 'set_bit()' before 'hci_uart_register_dev()' instead of
->    adding new bit 'HCI_UART_PROTO_INIT'.
-> 
->  drivers/bluetooth/hci_ldisc.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
-> index 30192bb083549..07b9aa09bbe2e 100644
-> --- a/drivers/bluetooth/hci_ldisc.c
-> +++ b/drivers/bluetooth/hci_ldisc.c
-> @@ -704,12 +704,13 @@ static int hci_uart_set_proto(struct hci_uart *hu, int id)
->  
->  	hu->proto = p;
->  
-> +	set_bit(HCI_UART_PROTO_READY, &hu->flags);
-> +
->  	err = hci_uart_register_dev(hu);
->  	if (err) {
->  		return err;
->  	}
->  
-> -	set_bit(HCI_UART_PROTO_READY, &hu->flags);
->  	return 0;
->  }
->  
+>  src/device.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/src/device.c b/src/device.c
+> index 2b3d19f55..4e5a5b945 100644
+> --- a/src/device.c
+> +++ b/src/device.c
+> @@ -6047,7 +6047,7 @@ static uint16_t get_sdp_flags(struct btd_device *de=
+vice)
+>          * results in SDP response being dropped by kernel. Workaround th=
+is by
+>          * forcing SDP code to use bigger MTU while connecting.
+>          */
+> -       if (vid =3D=3D 0x054c && pid =3D=3D 0x05c4)
+> +       if (vid =3D=3D 0x054c && (pid =3D=3D 0x05c4 || pid =3D=3D 0x09cc)=
+)
+>                 return SDP_LARGE_MTU;
+>
+>         if (btd_adapter_ssp_enabled(device->adapter))
+> --
+> 2.47.1
+
+Perhaps it would be a good idea to create a vid:pid table if there are
+multiple devices being affected.
+
+--=20
+Luiz Augusto von Dentz
