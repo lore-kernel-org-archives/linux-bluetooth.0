@@ -1,124 +1,130 @@
-Received: from mail-qk1-f169.google.com (mail-qk1-f169.google.com [209.85.222.169])
+Received: from mail-lj1-f170.google.com (mail-lj1-f170.google.com [209.85.208.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1781A1A0BF1
-	for <linux-bluetooth@vger.kernel.org>; Thu, 19 Dec 2024 19:17:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DE17194A73;
+	Thu, 19 Dec 2024 19:18:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734635824; cv=none; b=uTsJeGLEu+L47vx2X2n6MMN59mjVaZ0MW912N64uik0qmRiUV9901+Q/AFdyIufB99r4zVgVW+7fvtkZJLTSI7+kq14r3t8OJHPuxstdarB/Do+tMr6wDiehYsb/328FjWa5eVg0fYxDlUn9FVVR1qsbb+5jbYRE0HPHeAiVYFY=
+	t=1734635906; cv=none; b=cF8JGeQmI9U6D9++COV3n4UQa8OOwbHc7kZ4N34irN7K+gbm2O0D+riDSatk+9QPbpoIR3GezB5ebVS56wztZtLXcbfhrE4QNO3E3H/vhaMdE63T3k6X9C4A9lpGq3V+01F24qUqfIXRH8T6QmF3I39zcV92jfqVQ105xf4wnNI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734635824; c=relaxed/simple;
-	bh=fqiyeECoHzb15pusKZR9UNej6odZVhTIst/LpBleG1s=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=ShnzS1wPLJdXTMZaReZQTA0cK3Uj077kCStkbrhu+akpgEyV/kcNEWkbhnoe5UJzSiszSAihibpHt7L3VgctEipkkZ5BkNfxTlKc3b7oOSLX6QvRIaVcV8B2seux4B2hZcjC7VwKN7SaokZqdKI3DtKbrsnI5HickN960gB81Jc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MHj9om/y; arc=none smtp.client-ip=209.85.222.169
+	s=arc-20240116; t=1734635906; c=relaxed/simple;
+	bh=gsFITovRAUCz48Qpkem36KKK/09MvlsvdGyC+5kn3Dk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=qBYhSWwPHx6Nlk6yLaMJ8ov1wtx8mOWyelurZIYINvDoSjesMn/3J/gVD2wg5q0Xw2V/3QUJEWtbRXzjuknXn9Fi03GWJjjsjBdeq6CBH+SKxL9b3K+hBtyCuR8DmyO+4BeWbkYW3EcCFgT8xtV4DFAoXIt3G0Q3FOxk5vvkdN4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WP7l6A78; arc=none smtp.client-ip=209.85.208.170
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MHj9om/y"
-Received: by mail-qk1-f169.google.com with SMTP id af79cd13be357-7b85d5cc39eso100147085a.3
-        for <linux-bluetooth@vger.kernel.org>; Thu, 19 Dec 2024 11:17:02 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WP7l6A78"
+Received: by mail-lj1-f170.google.com with SMTP id 38308e7fff4ca-30227c56b11so12477821fa.3;
+        Thu, 19 Dec 2024 11:18:24 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1734635822; x=1735240622; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=O3m0tLodCguz3g7ir/P/PMaK72NGahatzHDUV+oIOwY=;
-        b=MHj9om/yjggZPTsGEQ9s3v0yh9VB9034sRKYVFhUWvpvRQNJsNSGqJDNWl6P2PWmmC
-         yPxoNW7Pfq9LGfIgaYv2jZ3frHRGxmySLcCN9rQQReySQUJNxMhO605yMyMZ5TROdkbS
-         Uul1exhVlDYv6ERdKfKutpP8QsO32ZJLilpGv0oN80KMZjsaFkuIN1G3eCHk9By9FAHQ
-         Ua+E9MnuSgBNsWUtezNaTt2T3MKTO/D/JzRHAJ2g7gCawHpmNqGsfcIcib17mcwW9Kzv
-         RVx8iRqKZqK/krD5TdS03niixULZoNnkPKZayZohfYttxftlp4M2IQY0pK7J7wREJf5b
-         79/g==
+        d=gmail.com; s=20230601; t=1734635903; x=1735240703; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Qeqm8/fpmY0PJBD1X3xTDPRGYg3W0OXKSs0TSek86QM=;
+        b=WP7l6A78ulHHJr6mAKOLvbupSNvv9aD9RqG+++qCb1Wr3yf+ks1wv1rRh4u//3ykCz
+         GeJRseNWjPdH2+NmIuJWmeSmaJs57pns/SG8ffIG8aX89DQMhhPTD0YFnI0Fh3IUQ+h1
+         E+0rMwjJ2oFj7SkUHqxOOMIHNYI/+MCaYTibwuv1ndvO0G5w/WF6xIrEjdW8SyWRVBFP
+         gWtZqQ1Rnr0z1s2i9ftTQeLVyqfek3IwP7skBbm0d24+3RZi/1c0BBGG6ekcSKoVARsy
+         iMyvGHXQA4JydG4csueeVE50gkfuQy5YSwi+4vUdFY9eVIHI8rsuEmsnevdMC7LP9vg2
+         zWig==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734635822; x=1735240622;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=O3m0tLodCguz3g7ir/P/PMaK72NGahatzHDUV+oIOwY=;
-        b=E9YMKH5MaXVlVTtPoBwGWaCL+K0yD2BjwExBA0dQuoO1nrhlN7eFtd4d2MOjemsUg4
-         X86LprL97iN9ylIn9NHxQr/tHMod4AST16NxeAhqFWJyekuLxDZGwT7WuYEZiNG+uq39
-         REv1VNZzQU4KoppMgxR0uQYdevcpSgm7i67wqkGufbfR/FP9faI8am9Qi+5rc/kjuZZa
-         gFsfiPhwXid/ZBLEaqToiOmLsfgoFZdVppzUMNDUbL69lKoiqeWKU2sVOERDuvmtcnZv
-         KlklPvHqnm8lMBb9TYIBYUhaSl7qcHsTQJBVKo38HKdNvSmIjSgNhEzaqRjiaoWDjXXk
-         a+HA==
-X-Gm-Message-State: AOJu0YzXAQsSwQ/RCEAnnaPFJ7CK9QK6XikKx+s6KeiwCAPU42Tzp8Db
-	4BC2RlwI4OqhCRB28eD4gKYsSNtJOudWeke416EczkqrPv34dkNJqDPlKg==
-X-Gm-Gg: ASbGncszmNKKd9otsk9lopQBGbDdPcioSHRIozns3E+hDEYYt2lHH5vFKzNXwc6+BX9
-	kdQJsDFXJtPiMdR5vAx9BomXiDHxPZwBq19uk7t4mnaZvSfieeN6LU5tGJ3LnpJ5UqzPg/+Yste
-	MNFuhgLX9zYX1jxhlxT7ZUdBir1c+NyG+ClDGshsoEaC99tzl3Cv/wjDcpqtRr9+Q83KIX09imw
-	FAEeD2HOzN5nmsYUEvSOEFjpeE9MJQzftgy/YtgOrFu0jnLi3+SCeIn4zZjXB8=
-X-Google-Smtp-Source: AGHT+IHZdqPk1yXEEj2KSgSFwL25/D76qM9YCvv4oKO2IcRaaAQZlakeFYAVHbAtQX91a4aSAZ/bYw==
-X-Received: by 2002:a05:620a:4414:b0:7b6:eed4:6957 with SMTP id af79cd13be357-7b9ba853191mr895685a.60.1734635821802;
-        Thu, 19 Dec 2024 11:17:01 -0800 (PST)
-Received: from [172.17.0.2] ([20.161.76.235])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7b9ac2bbd1dsm74375585a.18.2024.12.19.11.17.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 19 Dec 2024 11:17:01 -0800 (PST)
-Message-ID: <6764712d.050a0220.9f9d5.33ab@mx.google.com>
-Date: Thu, 19 Dec 2024 11:17:01 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============2892108296621056319=="
+        d=1e100.net; s=20230601; t=1734635903; x=1735240703;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Qeqm8/fpmY0PJBD1X3xTDPRGYg3W0OXKSs0TSek86QM=;
+        b=c47a38fZQMR1U3G0mFE3bm1sdfXo9K9k9WDjRzlNV5oJtg+6niLOpsgGs2a25DEcHi
+         3huRGS+BoZiTZLBVsS05rIZCiOscoF0dHCPh0V9npHZ7oV6++90mdXCVpC4XYqe7xLL6
+         l7QNYCZdKX9Gbw8XgHsG72VKeT7c3F2thilmTs7lbXkafnjeq8DyVamFGnmPU6YbQ1f5
+         h99ENKFSyQev0eUgDMdRf2RrFdzdrzS6yJtMHzDpeBAZkm3AA6zjc+VsUEmVjeyHfFh+
+         LEq6oLhOeyW0wfjGssekPt5yZQzYOEgEuCJTgoCQifRFVNx5MR2yTNqvwWReebNpe7FX
+         1MvQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU7eXuosU5sSxnm3J6gvmWxo4LNinaBn2m/oZa0zIWj6lyfp9YmzgGcnsoRZTRASHo9zWJ8beQeGlHodV0U@vger.kernel.org, AJvYcCX97jI7+kut+whkl/72lJAvjyuDfZVVMG5tx7MnqYv5KzY8Gc6W7mK34Wlm5fMmFIl/D/8/PjOhTGo6xwFNc9U=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxVu0NPbuDn0k6odc+OK1pAhAAyn5lwOxaJ5BqPZ3LNDqVmHnOq
+	nJfXJ/dk7UIVtVexl8/L2yHfZO8WxH/UfYBjmNt2Upu0+bjiydq1d+XeCDzZcqIugCrF9/2yNqJ
+	U7CfLh1adEMR4PcF0XDzUi9aXGtTrbL6v
+X-Gm-Gg: ASbGncvBXEha9OGJwQkMsnqYR9z+GrxHy7Ey+nRgbMpdoR7/LB7JNli/l/gRGffJkNp
+	QmuXoyGQ3h49xuzk+aJn/N52fjfuFr4KUIsWmSK0=
+X-Google-Smtp-Source: AGHT+IHYhFEYW2GDb6SYAg+bDRIfVX9CwplULnliHANZ719sCutZcHEzvg1AnOlXFaA5xSNZwgkSyPPKntoujHy6mgM=
+X-Received: by 2002:a2e:bba5:0:b0:302:40ec:a1b3 with SMTP id
+ 38308e7fff4ca-30468577a8emr635951fa.21.1734635902320; Thu, 19 Dec 2024
+ 11:18:22 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, kieran.r.geary@gmail.com
-Subject: RE: Fix SDP buffer overflow for DS4 (Revision 2)
-In-Reply-To: <20241219181140.423916-2-kieran.r.geary@gmail.com>
-References: <20241219181140.423916-2-kieran.r.geary@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+References: <d159c57f-8490-4c26-79da-6ad3612c4a14@salutedevices.com>
+In-Reply-To: <d159c57f-8490-4c26-79da-6ad3612c4a14@salutedevices.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Thu, 19 Dec 2024 14:18:09 -0500
+Message-ID: <CABBYNZLa9amkcQzqRyiCK7acKeXiPLkfX8thMonQhXN+5PnmmQ@mail.gmail.com>
+Subject: Re: [PATCH v2] Bluetooth: hci_uart: fix race during initialization
+To: Arseniy Krasnov <avkrasnov@salutedevices.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>, oxffffaa@gmail.com, 
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	kernel@salutedevices.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
---===============2892108296621056319==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi Arseniy,
 
-This is automated email and please do not reply to this email!
+On Tue, Dec 17, 2024 at 3:12=E2=80=AFAM Arseniy Krasnov
+<avkrasnov@salutedevices.com> wrote:
+>
+> 'hci_register_dev()' calls power up function, which is executed by
+> kworker - 'hci_power_on()'. This function does access to bluetooth chip
+> using callbacks from 'hci_ldisc.c', for example 'hci_uart_send_frame()'.
+> Now 'hci_uart_send_frame()' checks 'HCI_UART_PROTO_READY' bit set, and
+> if not - it fails. Problem is that 'HCI_UART_PROTO_READY' is set after
+> 'hci_register_dev()', and there is tiny chance that 'hci_power_on()' will
+> be executed before setting this bit. In that case HCI init logic fails.
+>
+> Patch moves setting of 'HCI_UART_PROTO_READY' before calling function
+> 'hci_uart_register_dev()'.
+>
+> Signed-off-by: Arseniy Krasnov <avkrasnov@salutedevices.com>
+> ---
+>  Changelog v1->v2:
+>  * Move 'set_bit()' before 'hci_uart_register_dev()' instead of
+>    adding new bit 'HCI_UART_PROTO_INIT'.
 
-Dear submitter,
+What drivers/controllers this was tested with? I want to make sure
+this doesn't cause regressions to other drivers if there are perhaps
+some drivers assuming HCI_UART_PROTO_READY was set in a certain order.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=919589
-
----Test result---
-
-Test Summary:
-CheckPatch                    PENDING   0.21 seconds
-GitLint                       PENDING   0.20 seconds
-BuildEll                      PASS      20.66 seconds
-BluezMake                     PASS      1619.79 seconds
-MakeCheck                     PASS      13.05 seconds
-MakeDistcheck                 PASS      159.85 seconds
-CheckValgrind                 PASS      215.65 seconds
-CheckSmatch                   PASS      274.02 seconds
-bluezmakeextell               PASS      99.84 seconds
-IncrementalBuild              PENDING   0.27 seconds
-ScanBuild                     PASS      855.39 seconds
-
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
+>  drivers/bluetooth/hci_ldisc.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+>
+> diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.=
+c
+> index 30192bb083549..07b9aa09bbe2e 100644
+> --- a/drivers/bluetooth/hci_ldisc.c
+> +++ b/drivers/bluetooth/hci_ldisc.c
+> @@ -704,12 +704,13 @@ static int hci_uart_set_proto(struct hci_uart *hu, =
+int id)
+>
+>         hu->proto =3D p;
+>
+> +       set_bit(HCI_UART_PROTO_READY, &hu->flags);
+> +
+>         err =3D hci_uart_register_dev(hu);
+>         if (err) {
+>                 return err;
+>         }
+>
+> -       set_bit(HCI_UART_PROTO_READY, &hu->flags);
+>         return 0;
+>  }
+>
+> --
+> 2.30.1
 
 
 
----
-Regards,
-Linux Bluetooth
-
-
---===============2892108296621056319==--
+--=20
+Luiz Augusto von Dentz
