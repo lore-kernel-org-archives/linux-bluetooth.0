@@ -1,103 +1,143 @@
-Received: from mail-lj1-f179.google.com (mail-lj1-f179.google.com [209.85.208.179])
+Received: from mail-lj1-f172.google.com (mail-lj1-f172.google.com [209.85.208.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62D801A0AFE
-	for <linux-bluetooth@vger.kernel.org>; Thu, 19 Dec 2024 18:59:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DC5C7494;
+	Thu, 19 Dec 2024 19:01:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734634768; cv=none; b=hhty+usmvEfogJarNWA8DXq7qArvyyBV7BREc2xu+5ddQCeld1yGmjVnv/51FKXH/jUZnZ1qfCvkFml0YVzmgeI2OuciEszuZir4bazwEmsmJDBA8hWekFclRU/knRrgsLk44QwH6qLcTiQICUrUTzBuDcDUqVftfwqvTxd+Fn4=
+	t=1734634886; cv=none; b=FQn2DJtKIekjm9ZCqWHkQEMfWwF5Fkz2q3KU9wmCRaUCqxkt2mKDoF/lnIyslu0xsLYEUUEbVGSTvmEQYtTNh/P5S3XkgRWptdmXkfWBd45VZ1cAkKxtr1z5gV2Yi0vTDjHZyp8k6jpAx9mnn0dutWxBSvQqzpcG2XZ2hgKwDBQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734634768; c=relaxed/simple;
-	bh=QbH4lL5Wgb8JtRqzSPcCC/Tx+e1Rl7sCHWvvYP69duA=;
+	s=arc-20240116; t=1734634886; c=relaxed/simple;
+	bh=b0+gv3uyTV+HosiffGvaIVPnh0kk6aGQ66cZGpzjL7M=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=hDo/eN2mPOQIBBHpqtTBU575IBkd1DvaAOfkO/aHWNG5i+PsWbgU2cv0ix1NmGwY237ZOSA0vfz854h0L3Mst5/CT1Z+PRmFWy+Osw1MzhqHP+vO8TdKlVN+N2Sdb7p0hjW5osxAE5u5myPkxf9/4WNBlY6WSS1qZlg4IMs69p4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=i5yJQ1Fi; arc=none smtp.client-ip=209.85.208.179
+	 To:Cc:Content-Type; b=sHbsZ54yFfG2lQ7QhuwuUQw2q9HZW3MKYrJIWNOSUoq+S6qCtMXCWiM5Ft7U9yZcdWVTFPap5Z5TinLhpUrK91c30mdQg9kzTryFUoWF5GqJJHn/bb0f4cSTUnm7DyeKxwvfPPbWto8PhSycrE9aw8dTHOC2Eh7Y+t43LkUIwIo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=byTArJB0; arc=none smtp.client-ip=209.85.208.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="i5yJQ1Fi"
-Received: by mail-lj1-f179.google.com with SMTP id 38308e7fff4ca-3003e203acaso11862991fa.1
-        for <linux-bluetooth@vger.kernel.org>; Thu, 19 Dec 2024 10:59:26 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="byTArJB0"
+Received: by mail-lj1-f172.google.com with SMTP id 38308e7fff4ca-30167f4c1deso11152031fa.1;
+        Thu, 19 Dec 2024 11:01:19 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1734634764; x=1735239564; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1734634877; x=1735239677; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=sKf9OymRdeyOXICNgHL4hfs9o+CDWWbupK2CayDhNZk=;
-        b=i5yJQ1Fi+bjqMew4XUxV2+EMzUqCQ7B/lHA2O6q08G7RqEc83kc8WkX7QonKv5QZqB
-         NogQXYejonn/IU6bMZHTyrl3l9CASVx62AXMaV7WHkT8tegFqYTKRcGhUmXi+5Y/YWzP
-         0IV6wLeyMnSIrNQpRzYcChgZXOz4jkEJwSA6fNucfQde9uaPvHhKjOIR6GFSGzMzQ4Ip
-         N5dclJbPqZf9JMDJcSGH1Z3bCEAnFOvFMbM584dz326l09VjkdE80kKuqf/x8GUHdnc9
-         njJuVU8/l7dIz8pqOv7qP8Avoy8Ya+CSAVIrFOKnyYlJ1PpYEmkP2ZbKHroxoB662o/M
-         IMsA==
+        bh=UGHTyRr+NEqJSmsLQoRsQQ0M1PdzWmBL0dwj3KFEFOA=;
+        b=byTArJB0D4T+lBDYPvf04B8T0dMvFnm/bvxMJzsZUfsM2w1T+RMaKjaENCB+7LJhvM
+         ZofhfoOtfex4JLCQf7AyKma4bkEUo6mAuSlRhfl9lczbEVKAo9QzY5ROvguMjtaCLYa6
+         VGCCh2wudFSpG4bZRvYphTLGXY5nB2UD7f/xT5NS9aCgjrn2TK37Va7N6jzaAPA46qlS
+         SmqGW8SARnG3EhkQhGcS1AdpSjEhIpyGM5wIfIMA4r8PFVvLojvQVS3nbq24fOHX259z
+         DyXOwss9l0jLRAW4mfDKzty0b27OxukP5o94ZmwSISbs7PGvcvqPzrI245N+YzdzQQxX
+         1c0Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734634764; x=1735239564;
+        d=1e100.net; s=20230601; t=1734634877; x=1735239677;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=sKf9OymRdeyOXICNgHL4hfs9o+CDWWbupK2CayDhNZk=;
-        b=MnNB8aLeiAAlxELnbVxTPRy+6tDEDfrVS0KquiNdx6hIL22nL8LVc3qwSSGHiYReRr
-         T+gCA4hkO/d+OCFn4Nip+2IWZ1WqYsMatabwVObXGa5qRRQPJbce2iQlfrU7UEtBCZ/S
-         b0cX96YptORA1rY3ycVgcAKc0h4m9WfSyhwNMxnaz40CfvTmdcgRO87pBCNtqG5olb20
-         kB5A3yhm4W2loHsrBIUL6wcNtPS/ATfHcpueyGpKfW6oK4wv3Vd1fVEN/N9ONDrOZlm5
-         T/5NQYo+pYINWJYaPMp5nm4RGbksfyWljuJ+AjlTjiWo23/Ksl97yEhyKLdBegy8rBNI
-         9BWA==
-X-Gm-Message-State: AOJu0YwhEIENKpL30IrkBglfQgcV+cmyuTyXeMLaATnY4y6clEiTGtqJ
-	08C4yyspk+PYx9VqziFd5SSStNGSpEJmgkpfjCk0x+r4ZPYKoQu82jZz7Sc3LLzgA9UbtbJeTpi
-	Yz5UaHBxNCtYIsgSTYKqP1EZG7Og=
-X-Gm-Gg: ASbGncv01Vy/wZol1G6O3cmcpuskNMNUFg80N2HjBTg8LeMSOEGHcmf1TYh5WlqiIBP
-	l2+idp9MSrGIfN+/zSfiWMttvbjwqcQR5WoK+fvc=
-X-Google-Smtp-Source: AGHT+IH4ZEXn145CNSbQxXexgHRgIy4h2Uuf0AEANcYpVCpoKWvA/OkbQL6TBjQ7j/jeO5XGTl/DsHiZV5bzgXNJbks=
-X-Received: by 2002:a2e:bc26:0:b0:2ff:cfbb:c893 with SMTP id
- 38308e7fff4ca-304685032femr616121fa.6.1734634764141; Thu, 19 Dec 2024
- 10:59:24 -0800 (PST)
+        bh=UGHTyRr+NEqJSmsLQoRsQQ0M1PdzWmBL0dwj3KFEFOA=;
+        b=VPE+rC8/q5NrWwGpkz0/wo7rukF0/yxtN2HMlb/m/nkgSPbHmehBCmaX0caYBjhKa5
+         4Zxhe1r784ehTh/MuF0SEUM+TUzH9NUD0wp3VxfEiIKMZJNExCxutPE0+d8kczqNgHrX
+         uZeuKo7gD6iFjsVMhMTgTkO335MjRZ5V1XT0LyXDJbLckKw0XtcBU1tcul/uXYRn2/Am
+         SFKQJiTluc33GtKCu+gC3c3WC0D6mBkOl73ELkOBrkBHIKkqLZZ5Vfh1YlV9SCJ7s7AC
+         H9XIs5IYAqz60VIYzBrfQMk60XUa5dW+Nt3wzUbmLTO2TE16ivV3B8EHYabQOD1G5vHW
+         BxzQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUeQ9opNUS/d8MuU7Op7qhiYpfhooGX+WfigJpf+pn9hg4gzFzr6W/tB4fnJTI9iGtUDEqBWVLOtGxf9Ib5@vger.kernel.org, AJvYcCVSdY+4220I2Pk+HwSXc2zIw7TcBm+FyrvvrZzWS3tiJlbiDledy1S1HEBoNjA3MbbNnQ15OBZfTYAxpSA60EY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwfoJgmwPBCrdGf9Ki/W9hYBH4cCxJGN8rPN3JjUCqOdwSuD9J+
+	rBv0tAB0vIdtgmqDETsggONWSXcYF37jYsM4HkqtiUsoXnxa3Oaw9DEC67eSV+EVEvJDWqwJWvU
+	Mhp023C15NJPxUYaRgY/dVOHs7xY=
+X-Gm-Gg: ASbGncu/3F+XBeB/lI9kHPNs2/bBUwzYq1GJHyVHD1Jlomi1860kWsuL3LHqt7L9syy
+	ivAG6EZ+qpdJJhy71tTVrKs7YXhWeBPk9KGrWzPk=
+X-Google-Smtp-Source: AGHT+IGtbrC8/XD7gxUIBX5lD9OI40y8fVDtukJ8JmQ6CQbSDa4Zp0CnfE7zYNCdR2UzvgrwosulvSLloWfbIBLmabM=
+X-Received: by 2002:a2e:be8a:0:b0:300:3a15:8f22 with SMTP id
+ 38308e7fff4ca-30468593419mr610981fa.21.1734634877179; Thu, 19 Dec 2024
+ 11:01:17 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241219181140.423916-1-kieran.r.geary@gmail.com> <20241219181140.423916-2-kieran.r.geary@gmail.com>
-In-Reply-To: <20241219181140.423916-2-kieran.r.geary@gmail.com>
+References: <d159c57f-8490-4c26-79da-6ad3612c4a14@salutedevices.com> <4ef9c3a9-a8c4-fb98-2244-ed2770f71c17@salutedevices.com>
+In-Reply-To: <4ef9c3a9-a8c4-fb98-2244-ed2770f71c17@salutedevices.com>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Thu, 19 Dec 2024 13:59:11 -0500
-Message-ID: <CABBYNZKSKtzo6=A75pO4McbpC=qVXhniY=P4yBqMJAOJfxboGw@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 1/1] Set `SDP_LARGE_MTU` flag for DS4 Rev. 2 product code
-To: Kieran Geary <kieran.r.geary@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
+Date: Thu, 19 Dec 2024 14:01:05 -0500
+Message-ID: <CABBYNZKXJAvOQie37yCgNUTct2HXzPYNNqNN5Am+pGViGe1=Gw@mail.gmail.com>
+Subject: Re: [PATCH v2] Bluetooth: hci_uart: fix race during initialization
+To: Arseniy Krasnov <avkrasnov@salutedevices.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>, oxffffaa@gmail.com, 
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	kernel@salutedevices.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi Kieran,
+Hi Arseniy,
 
-On Thu, Dec 19, 2024 at 1:13=E2=80=AFPM Kieran Geary <kieran.r.geary@gmail.=
-com> wrote:
+On Thu, Dec 19, 2024 at 1:42=E2=80=AFPM Arseniy Krasnov
+<avkrasnov@salutedevices.com> wrote:
 >
-> ---
->  src/device.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> Hi, sorry i'm new in bluetooth subsystem. I get the following
+> message from CI:
+> https://patchwork.kernel.org/project/bluetooth/list/?series=3D918554
+> Where one of tests was failed. Where I can get more information
+> about failure:
 >
-> diff --git a/src/device.c b/src/device.c
-> index 2b3d19f55..4e5a5b945 100644
-> --- a/src/device.c
-> +++ b/src/device.c
-> @@ -6047,7 +6047,7 @@ static uint16_t get_sdp_flags(struct btd_device *de=
-vice)
->          * results in SDP response being dropped by kernel. Workaround th=
-is by
->          * forcing SDP code to use bigger MTU while connecting.
->          */
-> -       if (vid =3D=3D 0x054c && pid =3D=3D 0x05c4)
-> +       if (vid =3D=3D 0x054c && (pid =3D=3D 0x05c4 || pid =3D=3D 0x09cc)=
-)
->                 return SDP_LARGE_MTU;
->
->         if (btd_adapter_ssp_enabled(device->adapter))
-> --
-> 2.47.1
+> tedd_an/TestRunner_mgmt-tester  fail    TestRunner_mgmt-tester: Total: 49=
+0, Passed: 483 (98.6%), Failed: 3, Not Run: 4
 
-Perhaps it would be a good idea to create a vid:pid table if there are
-multiple devices being affected.
+These looks like a false positives, your changes should affect the
+tests since that run with hci_vhci driver, not the uart ones.
+
+> ?
+>
+> Thanks
+>
+> On 17.12.2024 11:12, Arseniy Krasnov wrote:
+> > 'hci_register_dev()' calls power up function, which is executed by
+> > kworker - 'hci_power_on()'. This function does access to bluetooth chip
+> > using callbacks from 'hci_ldisc.c', for example 'hci_uart_send_frame()'=
+.
+> > Now 'hci_uart_send_frame()' checks 'HCI_UART_PROTO_READY' bit set, and
+> > if not - it fails. Problem is that 'HCI_UART_PROTO_READY' is set after
+> > 'hci_register_dev()', and there is tiny chance that 'hci_power_on()' wi=
+ll
+> > be executed before setting this bit. In that case HCI init logic fails.
+> >
+> > Patch moves setting of 'HCI_UART_PROTO_READY' before calling function
+> > 'hci_uart_register_dev()'.
+> >
+> > Signed-off-by: Arseniy Krasnov <avkrasnov@salutedevices.com>
+> > ---
+> >  Changelog v1->v2:
+> >  * Move 'set_bit()' before 'hci_uart_register_dev()' instead of
+> >    adding new bit 'HCI_UART_PROTO_INIT'.
+> >
+> >  drivers/bluetooth/hci_ldisc.c | 3 ++-
+> >  1 file changed, 2 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldis=
+c.c
+> > index 30192bb083549..07b9aa09bbe2e 100644
+> > --- a/drivers/bluetooth/hci_ldisc.c
+> > +++ b/drivers/bluetooth/hci_ldisc.c
+> > @@ -704,12 +704,13 @@ static int hci_uart_set_proto(struct hci_uart *hu=
+, int id)
+> >
+> >       hu->proto =3D p;
+> >
+> > +     set_bit(HCI_UART_PROTO_READY, &hu->flags);
+> > +
+> >       err =3D hci_uart_register_dev(hu);
+> >       if (err) {
+> >               return err;
+> >       }
+> >
+> > -     set_bit(HCI_UART_PROTO_READY, &hu->flags);
+> >       return 0;
+> >  }
+> >
+
+
 
 --=20
 Luiz Augusto von Dentz
