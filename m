@@ -1,153 +1,95 @@
-Received: from mail-lf1-f44.google.com (mail-lf1-f44.google.com [209.85.167.44])
+Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E577E374CC
-	for <linux-bluetooth@vger.kernel.org>; Fri, 20 Dec 2024 15:01:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 643501DFF8
+	for <linux-bluetooth@vger.kernel.org>; Fri, 20 Dec 2024 15:08:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734706871; cv=none; b=TUP7YFQLZSMfnLEoA/lLplLzT36EtRkQdv+RMuTfvRwp/6Ra2/mrAPUzWNV6Z5EuOYeJVnqSfogqKcncOZgyjKL3kX2lqdZiw4c8V2wj+ReFyupj7gdWg1zfkdAY0yXdgFsgJgKPe/8Xyj6wOeBowZ5PTL5b/kOsfGP9OCs//XM=
+	t=1734707299; cv=none; b=P2y2UGFUD9O0C3r7tJhO9UmC6QirzKOgrIG2c+iTAs/ckPddg3Z6K6Vb374NXImSfXJCkG3GeBfQIdtBHvI2wvg/zACe/9qwcyUZM5mFfBCm9ihsst4aksF8Obk0Co0yaj4ljL2BGhQtpx5Lnj+FAaL+vpgN8uV6pwYAdegO8Sc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734706871; c=relaxed/simple;
-	bh=jR32CqntLHRBx0H4jaeGOLZHaZOIhbtaDxMKGM9EN3U=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=YhbElV0UU5veEngWwv4XgxDcrnigM6FKDYyoMS6BUW9hSbdfK7MrFrWnbFQxPv1fRv7By6voSfPV3ML2/VhwNiO12j9QjFwO+XoTNajuSf3COqKn2A9zUfcGOAYtiS5yh+sczbDRjNXeIdHn4AWk/FU6ELRTNcuSvxDOOkIun6s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CAI3ajTn; arc=none smtp.client-ip=209.85.167.44
+	s=arc-20240116; t=1734707299; c=relaxed/simple;
+	bh=+CO2Uy0lPHRIKGZvLp5lKKQeE2apXFkA06zcnfQ2rG8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=J2ehh4k6+oehxMX7dg0UZ6jRt5ZfGTr5C6HChKhXl4vRGiYMxte3V6x2JhxmG+Q28FOvO+/IC9LLeTn1V2i4RMUT2npNpvsEPLa0ph1HVRmYwfPHyALAZsfw9WKUtEaEqe8eL+e8RARp7d1ZlfO2E98pMEXcnKegHPa4RO8lrBM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Otq8NTsj; arc=none smtp.client-ip=209.85.128.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CAI3ajTn"
-Received: by mail-lf1-f44.google.com with SMTP id 2adb3069b0e04-54026562221so1926701e87.1
-        for <linux-bluetooth@vger.kernel.org>; Fri, 20 Dec 2024 07:01:08 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Otq8NTsj"
+Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-436202dd7f6so21967665e9.0
+        for <linux-bluetooth@vger.kernel.org>; Fri, 20 Dec 2024 07:08:17 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1734706867; x=1735311667; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=hQio5ZoRnKe0VFNo0RdJ+ODzh/OnfgbUGj5YShVXvKE=;
-        b=CAI3ajTn3emhHHNglmSs4am0OUmmXqoB+wJld/ddrdyM7c+wF92L0NhucFlTIVasND
-         dEACXrFfKrAXhjeT/kzd9X7ryz7xkZCtonkJkflZRfSNL5fjkL5NTcVtJLINA9nh6yGV
-         MiHSIWTYXTZ1ad5qre/cayVPsLiNy/ijaEO4XhFnmjw2Uyf92c+ItgKrbP4fhwkyO0r3
-         GzEtIB9gF0gvLs0pjbufHtolyU9z559wpyiDLYWvlFY0zcoEVjsQe5irPw5CD98jwExS
-         9+KaUD39YMGSnY5ZZEYPXhlkHi+YF6peOAwKTdSnp1eBz6FKLUFWkcpdpD0cyiBsq0TP
-         Ti0g==
+        d=gmail.com; s=20230601; t=1734707295; x=1735312095; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=3YZRqjjUfgy2DA1rJGlqiXXagmbsLcsm+Hzdvqs7Cs4=;
+        b=Otq8NTsjhgCQGyVahAk+mhVoirqmNxYXQg01aO/hcKuSYrMGAGODcq9hUbcbPJEAgT
+         G0zhIaAan/gJQW82ZxdXdna90gb2UgqrdsBBuJ/wnhOJpa+wpBJRLfKqO3IjSjtsr3nY
+         qcbebMJb8oIt0VG0JrTG/byXN1N5DRJBJ9S2LNylSlQhfEPwiQ5EOWEXsNzlITviwgyw
+         BctDpUt7n/KtRJ9UDEP7xmPh11Xi5zm3S58V425Q66MEXSr/2ODhxsNk3DEpqUUbEkhb
+         OkuxMMpKpaPPtowEoB8h1uxXmwx8XPvTiATCEuvYrr4D4r+632kM/flIbAPrEVplT3LA
+         Qnmg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734706867; x=1735311667;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=hQio5ZoRnKe0VFNo0RdJ+ODzh/OnfgbUGj5YShVXvKE=;
-        b=sJ36tZA5o81/zRG515N3B2rU20w3YZOiEbOFOcayNBv7Q2ezMJMpCgn5wu6OHXn848
-         Fdyusk3kbdwAmpyuHujQ8YASIvz3iPUQsu9QnmBSgh4DKwF/jb6dG7JdfMcCFnuJWCWS
-         xh8WXgz8KjkFm2EfpGEdXnoPdENeWA4J3voDCSZSS/9XPCF3M6UZ6kr3ly43j+jSYu8B
-         4C1X57wy3J1GaPswRrN4buw/Z2jyaSYBc6x1ApyTua6L/O5pWV0WvkEqs8Gw8id0at1f
-         qpdlFlcZamVCPb44ZGzJGHjJ041mRrzUZoVLKoNuoYoikW/oOM68vIJ9/He4A7Ox2ezk
-         /4ZQ==
-X-Gm-Message-State: AOJu0YzlUFKRRMx6hzuPHBhwGB9JP/Ed5yJCnmfArbCBVmJUf94yqyne
-	wzWHHcKiSNVP4dKza8+sARkeBkTJHgLIbfZNYHcJtnGowUi4b1r5PS7SeWlRVUNwPRr/diEjYAE
-	w7XieHfNEIuzllGPYHVUCxflgBaUqrA==
-X-Gm-Gg: ASbGncvdAdf6zACv4t47+4EOpMka8yWmACX02+4iNS+0uKOtrIZkcu5BdzkFDzvBkBP
-	6IbtewIza7VR4xJt/CmfJxHzcsX403UsLtWTb768=
-X-Google-Smtp-Source: AGHT+IFbNoeiquIBH76kD5kAw8JNoI/IK6jUxbehZAthjojVN3+HkVObLYtUy4bqm5ef1xNW91NnnX0ZGOfma3uUim0=
-X-Received: by 2002:a05:6512:e83:b0:542:2240:8c0 with SMTP id
- 2adb3069b0e04-542295224fdmr788999e87.12.1734706866558; Fri, 20 Dec 2024
- 07:01:06 -0800 (PST)
+        d=1e100.net; s=20230601; t=1734707295; x=1735312095;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=3YZRqjjUfgy2DA1rJGlqiXXagmbsLcsm+Hzdvqs7Cs4=;
+        b=Fhm8H7YOoUFTao0XSXn7QbtHYFhPEyGIzkZqGb/N2kJs2KRizQgxUw8qbim7iE0ANv
+         J34r1Aa6VyJAoIYToDSrVGJGJO21bs3L3POEMpHjMk9TRg7opzw9/Y73gJscGZ1mN09X
+         4t4AsN1ezEJ56j3yfOfVeH6+BkD6ytHxfrirQ8AjsVUjX1BZ2vPvxvR2RIluf8/wbTQL
+         LTyLo7dMdMehlzC6I7buYxN2zOwjbJchrcOrMsM5b3x/lwlHbeAb6c89QmmhuQcw7Hwo
+         PTQv+W5bmwyrDFRYQ8tE4IXJHHNE3oZTYGLn3/VjezojQDo0tcmIMkQAorTwFeFFQ+z1
+         zaCw==
+X-Gm-Message-State: AOJu0Ywf9FukWyRXx+i0Jc8eK6ONL7geqInkBl8Ybl2XWo0RKh99BNAv
+	B5vjkbbPp818ar9dSPxHib3PlinBMGpKrAo7OIAqOUPiq5SIjRJVmrdGKZfR2wualQ==
+X-Gm-Gg: ASbGncv5qZfaaWCua/Oh+YwlmjoP0bbxeX3v6+wC+fAlaAJj1+lOFKUvg1w0Tlu3f6Z
+	At3MNtwZV9zipXOgcZQw9ZqSDcuGinXuVrXIm8afzgW1LO14/eCv1lQyHMPm7dw5KvrclZTTCEE
+	IJFUOKH4+MhC933nZfU9flqx0LtTE+uAbnmWl8lfOglZPN2kJ2ap2yFT/WtAy95m9HXGfKfg2FC
+	zLILWk8S8j334dpIyI5alDfu06gaU537wXP6Amp41NPPJ4mRcypxbFH5Kd6yhiojSaoQGTOL9Ix
+	tlcZKBvDnf6PnmVOKqLw6ZmJj7aCyWr8C5xeaaqJ7d5t/R5BE8uKvw==
+X-Google-Smtp-Source: AGHT+IHV6j/ABVdjrF5KJCTWiTL2m6f82GB7DMPRj1hqqjPWrY662W1eiU0Ic/R6gF1ABwCGVSauZw==
+X-Received: by 2002:a5d:47cc:0:b0:388:e178:ddb7 with SMTP id ffacd0b85a97d-38a223fd492mr3430699f8f.56.1734707293612;
+        Fri, 20 Dec 2024 07:08:13 -0800 (PST)
+Received: from ror-bladestealth.home (2a01cb040148e70016160a88cade74c5.ipv6.abo.wanadoo.fr. [2a01:cb04:148:e700:1616:a88:cade:74c5])
+        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-4364b0532a6sm107099525e9.1.2024.12.20.07.08.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 20 Dec 2024 07:08:12 -0800 (PST)
+From: Tobias Daeullary <rorgate@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Tobias Daeullary <rorgate@gmail.com>
+Subject: [PATCH] Bluetooth: btusb: Add hwid for WCN785x
+Date: Fri, 20 Dec 2024 15:07:35 +0000
+Message-ID: <20241220150744.51842-1-rorgate@gmail.com>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241220125927.84698-1-quic_amisjain@quicinc.com>
-In-Reply-To: <20241220125927.84698-1-quic_amisjain@quicinc.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Fri, 20 Dec 2024 10:00:54 -0500
-Message-ID: <CABBYNZKm6jJCNnxDcX7TPEuG=UzKnzGEKKNyemefgKrwgYT8uA@mail.gmail.com>
-Subject: Re: [PATCH v1] Doc: Obex Implement support for message listing format
- version 1.1
-To: Amisha Jain <quic_amisjain@quicinc.com>
-Cc: linux-bluetooth@vger.kernel.org, quic_mohamull@quicinc.com, 
-	quic_hbandi@quicinc.com, quic_anubhavg@quicinc.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-Hi Amisha,
+Patch has been tested and pairing/connection issues with 3 different
+devices are gone.
 
-On Fri, Dec 20, 2024 at 7:59=E2=80=AFAM Amisha Jain <quic_amisjain@quicinc.=
-com> wrote:
->
-> Add the documentation for the =E2=80=98Messages-Listing Format Version 1.=
-1=E2=80=99
-> feature for MCE.
->
-> ---
->  doc/org.bluez.obex.Message.rst | 39 ++++++++++++++++++++++++++++++++++
->  1 file changed, 39 insertions(+)
->
-> diff --git a/doc/org.bluez.obex.Message.rst b/doc/org.bluez.obex.Message.=
-rst
-> index 082f87271..260445970 100644
-> --- a/doc/org.bluez.obex.Message.rst
-> +++ b/doc/org.bluez.obex.Message.rst
-> @@ -137,3 +137,42 @@ boolean Protected [readonly]
->  ````````````````````````````
->
->         Message protected flag
-> +
-> +string DeliveryStatus [readonly]
-> +````````````````````````````````
+Signed-off-by: Tobias Daeullary <rorgate@gmail.com>
+---
+ drivers/bluetooth/btusb.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-This probably needs to be marked as optional since not all protocols
-may have a delivery status, also I don't think you have marked the
-entire label with '`' so rst2man will probably fail to parse it.
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 279fe6c115fa..20ba8ceff7d1 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -377,6 +377,8 @@ static const struct usb_device_id quirks_table[] = {
+ 						     BTUSB_WIDEBAND_SPEECH },
+ 	{ USB_DEVICE(0x13d3, 0x3623), .driver_info = BTUSB_QCA_WCN6855 |
+ 						     BTUSB_WIDEBAND_SPEECH },
++	{ USB_DEVICE(0x2c7c, 0x0130), .driver_info = BTUSB_QCA_WCN6855 |
++						     BTUSB_WIDEBAND_SPEECH },
+ 
+ 	/* Broadcom BCM2035 */
+ 	{ USB_DEVICE(0x0a5c, 0x2009), .driver_info = BTUSB_BCM92035 },
+-- 
+2.47.1
 
-> +
-> +       Message delivery status
-> +
-> +       Possible values:
-> +
-> +       :"delivered":
-> +       :"sent":
-> +       :"unknown":
-> +
-> +uint64 ConversationId [readonly]
-> +````````````````````````````````
-> +
-> +       Message conversation id
-> +       Identification of the conversation
-
-This is a server side ID, is it unique or per folder?
-
-> +
-> +string ConversationName [readonly]
-> +````````````````````````````````
-> +
-> +       Human readable name of the conversation
-> +
-> +string Direction [readonly]
-> +````````````````````````````````
-> +
-> +       Indicate the direction of the message
-> +
-> +       Possible values:
-> +
-> +       :"incoming":
-> +       :"outgoing":
-> +       :"outgoingdraft":
-> +       :"outgoingpending":
-
-The last 2 I would just enumerate as "draft" and "pending".
-
-> +
-> +string AttachmentMimeTypes [readonly]
-> +````````````````````````````````
-> +
-> +       MIME type of the attachment
-> \ No newline at end of file
-> --
-> 2.34.1
->
->
-
-
---=20
-Luiz Augusto von Dentz
