@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFFF721C194;
-	Fri, 20 Dec 2024 17:12:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D052222F39B;
+	Fri, 20 Dec 2024 17:13:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734714750; cv=none; b=efBPvVHrVo90SNQWps97laQxdns1sOn+ep94WhxNOHQQQQCOkUvKZbhQzj0B7+bBJCvClAoBJe6gpuVDYoEFFUKRRNHtYv7I/Ov8dciMj0BmGfZq7/mdYli+Dvwcv/tADDV4kfoGItDTrNl7EPFjc1/MbiGxw45fQhHLfRuJnww=
+	t=1734714794; cv=none; b=rtfl3t7CaKHAutc5qYN0ficgacFKFuDPTTI8zUdO3l9l1h6VIgW20RtG4hTm1cOUvLQ4vhH4SzaKGi8m+rjMv+tpzbWWbdn1wygf/TntEXhEZFFVBff1ugmFw7eFbcb+6161rOk7BPucH2BmIjprC9jvJQtWlylgiAMMTKF7pKM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734714750; c=relaxed/simple;
-	bh=FM3zsMyXOWvmaw/qAOcNHtGPrSRpy4VVEvl4BQ2MCyg=;
+	s=arc-20240116; t=1734714794; c=relaxed/simple;
+	bh=PGS/lsy2wUtPh3KO2jvGR5uIdnr5rDi8lV7qamaBX00=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Pxi0jdikxBsQVYFF71m1bCjiYPV2lM5fT/X3Xl5obEju4iVJlthArcrFh+WyUj6khW0rkadEfuLmOdCEarYqlZzPtnwa3OLCxB5y8/ulPVj3/QZ3HJFPCqjnlaJqWui3BJWpq5TaU82Rqk7ZaQF5OMMfBoLACPIBmILm4q2hSRg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UyZVOli0; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=qXE8vIx3mcdfORxGrZspcVUVxLEI9onlpjZ19ROP+CROMiIynrwwgkIVWUC6WrgQ2O8oWtAhGyW7kR+kc4vUD6ggaqC0s9G1suA1hUozNe3kvVkRbCCg3u3nle41w4xgJl1AHt9hiiIkSfyHF6cWirl+mbLLS4JITiGeLlEbLIw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=W9rwmdtr; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UyZVOli0"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EB426C4CECD;
-	Fri, 20 Dec 2024 17:12:27 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="W9rwmdtr"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0C0A5C4CECD;
+	Fri, 20 Dec 2024 17:13:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734714749;
-	bh=FM3zsMyXOWvmaw/qAOcNHtGPrSRpy4VVEvl4BQ2MCyg=;
+	s=k20201202; t=1734714794;
+	bh=PGS/lsy2wUtPh3KO2jvGR5uIdnr5rDi8lV7qamaBX00=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=UyZVOli0I+nEc5Y/cLk/FJx65Wx/lCWVaHDzK/WrL4TBzJ75wxAnm+7kEgvMVD+GA
-	 atnkKgsKcrH3HOC2aS1lecZ/mMxEf5an5/9L5v9CVeJQF3jyDq+Sxi1P1hJejtWmYq
-	 cWUu9dkr2pCQvoFRdkZ97st7xZSzUD8QmLQTmWK3Qug4PVzvtzRmm3SLaCTO+dkym/
-	 1Hr/l+vPXksQMGAzPLMsDENvr+7I1QwgyZ87rug+LRbrHh/2t6cZOlM3TDx8y253r9
-	 CjOKHHUuhknBrmKq8oXEMCBMS3H2+fc4ZZovSx5OkmeS5h+1JumtEhc4aK53sHILJV
-	 YY3LRxC75WQ3Q==
+	b=W9rwmdtrBKusVsAfGwg/JMRtyc5NGuS9sxEVZouWtKe2tZGjh/xqXNNvs/cWXltZk
+	 P9iaQX/r2W54VPa2i/kC40wFc0q/Y75RVOvGosZEY+SoK1UWGUUQD4s7nsGi2IkKxt
+	 +9CDDcEnkiee5RYWhKFOtwglo2xbduqI3IwnF7phh+EMiGrTEgpX8dtuPNa4EFFYvd
+	 GISjAphE1eS3f2vb62GpWioHLCwF4TR0RJ+pqGN2XflOsXGxce7JpuzE9VTVRijPnN
+	 CSwUV3s/WONHWddj2OCFHxrCK/ohTIPHqnwtvwYckCwq1ohITEVV61NRKlRvDUhOV7
+	 z+rDMMAiLKbaQ==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
@@ -43,12 +43,12 @@ Cc: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
 	viro@zeniv.linux.org.uk,
 	linux-bluetooth@vger.kernel.org,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.12 25/29] Bluetooth: hci_core: Fix sleeping function called from invalid context
-Date: Fri, 20 Dec 2024 12:11:26 -0500
-Message-Id: <20241220171130.511389-25-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.6 14/16] Bluetooth: hci_core: Fix sleeping function called from invalid context
+Date: Fri, 20 Dec 2024 12:12:38 -0500
+Message-Id: <20241220171240.511904-14-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20241220171130.511389-1-sashal@kernel.org>
-References: <20241220171130.511389-1-sashal@kernel.org>
+In-Reply-To: <20241220171240.511904-1-sashal@kernel.org>
+References: <20241220171240.511904-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
@@ -57,7 +57,7 @@ List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.12.6
+X-stable-base: Linux 6.6.67
 Content-Transfer-Encoding: 8bit
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
@@ -118,10 +118,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  6 files changed, 97 insertions(+), 57 deletions(-)
 
 diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index c95f7e6ba255..ba7b52584770 100644
+index 4185eb679180..c4e38b7ea6ff 100644
 --- a/include/net/bluetooth/hci_core.h
 +++ b/include/net/bluetooth/hci_core.h
-@@ -804,7 +804,6 @@ struct hci_conn_params {
+@@ -800,7 +800,6 @@ struct hci_conn_params {
  extern struct list_head hci_dev_list;
  extern struct list_head hci_cb_list;
  extern rwlock_t hci_dev_list_lock;
@@ -129,7 +129,7 @@ index c95f7e6ba255..ba7b52584770 100644
  
  #define hci_dev_set_flag(hdev, nr)             set_bit((nr), (hdev)->dev_flags)
  #define hci_dev_clear_flag(hdev, nr)           clear_bit((nr), (hdev)->dev_flags)
-@@ -2007,24 +2006,47 @@ struct hci_cb {
+@@ -1925,24 +1924,47 @@ struct hci_cb {
  
  	char *name;
  
@@ -182,7 +182,7 @@ index c95f7e6ba255..ba7b52584770 100644
  
  	if (conn->connect_cfm_cb)
  		conn->connect_cfm_cb(conn, status);
-@@ -2032,43 +2054,55 @@ static inline void hci_connect_cfm(struct hci_conn *conn, __u8 status)
+@@ -1950,43 +1972,55 @@ static inline void hci_connect_cfm(struct hci_conn *conn, __u8 status)
  
  static inline void hci_disconn_cfm(struct hci_conn *conn, __u8 reason)
  {
@@ -253,7 +253,7 @@ index c95f7e6ba255..ba7b52584770 100644
  	__u8 encrypt;
  
  	if (conn->state == BT_CONFIG) {
-@@ -2095,40 +2129,38 @@ static inline void hci_encrypt_cfm(struct hci_conn *conn, __u8 status)
+@@ -2013,40 +2047,38 @@ static inline void hci_encrypt_cfm(struct hci_conn *conn, __u8 status)
  			conn->sec_level = conn->pending_sec_level;
  	}
  
@@ -310,10 +310,10 @@ index c95f7e6ba255..ba7b52584770 100644
  
  static inline bool hci_bdaddr_is_rpa(bdaddr_t *bdaddr, u8 addr_type)
 diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 72439764186e..b5553c08e731 100644
+index 30519d47e8a6..f29fd3264401 100644
 --- a/net/bluetooth/hci_core.c
 +++ b/net/bluetooth/hci_core.c
-@@ -57,7 +57,6 @@ DEFINE_RWLOCK(hci_dev_list_lock);
+@@ -58,7 +58,6 @@ DEFINE_RWLOCK(hci_dev_list_lock);
  
  /* HCI callback list */
  LIST_HEAD(hci_cb_list);
@@ -321,7 +321,7 @@ index 72439764186e..b5553c08e731 100644
  
  /* HCI ID Numbering */
  static DEFINE_IDA(hci_index_ida);
-@@ -2993,9 +2992,7 @@ int hci_register_cb(struct hci_cb *cb)
+@@ -2957,9 +2956,7 @@ int hci_register_cb(struct hci_cb *cb)
  {
  	BT_DBG("%p name %s", cb, cb->name);
  
@@ -332,7 +332,7 @@ index 72439764186e..b5553c08e731 100644
  
  	return 0;
  }
-@@ -3005,9 +3002,8 @@ int hci_unregister_cb(struct hci_cb *cb)
+@@ -2969,9 +2966,8 @@ int hci_unregister_cb(struct hci_cb *cb)
  {
  	BT_DBG("%p name %s", cb, cb->name);
  
@@ -345,11 +345,11 @@ index 72439764186e..b5553c08e731 100644
  	return 0;
  }
 diff --git a/net/bluetooth/iso.c b/net/bluetooth/iso.c
-index 5e2d9758bd3c..73238e9ec946 100644
+index c2c80d600083..244edce43c60 100644
 --- a/net/bluetooth/iso.c
 +++ b/net/bluetooth/iso.c
-@@ -2104,6 +2104,11 @@ int iso_connect_ind(struct hci_dev *hdev, bdaddr_t *bdaddr, __u8 *flags)
- 	return HCI_LM_ACCEPT;
+@@ -1850,6 +1850,11 @@ int iso_connect_ind(struct hci_dev *hdev, bdaddr_t *bdaddr, __u8 *flags)
+ 	return lm;
  }
  
 +static bool iso_match(struct hci_conn *hcon)
@@ -360,7 +360,7 @@ index 5e2d9758bd3c..73238e9ec946 100644
  static void iso_connect_cfm(struct hci_conn *hcon, __u8 status)
  {
  	if (hcon->type != ISO_LINK) {
-@@ -2285,6 +2290,7 @@ void iso_recv(struct hci_conn *hcon, struct sk_buff *skb, u16 flags)
+@@ -2031,6 +2036,7 @@ void iso_recv(struct hci_conn *hcon, struct sk_buff *skb, u16 flags)
  
  static struct hci_cb iso_cb = {
  	.name		= "ISO",
@@ -369,10 +369,10 @@ index 5e2d9758bd3c..73238e9ec946 100644
  	.disconn_cfm	= iso_disconn_cfm,
  };
 diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 6544c1ed7143..27b4c4a2ba1f 100644
+index 93651c421767..acb148759bd0 100644
 --- a/net/bluetooth/l2cap_core.c
 +++ b/net/bluetooth/l2cap_core.c
-@@ -7217,6 +7217,11 @@ static struct l2cap_chan *l2cap_global_fixed_chan(struct l2cap_chan *c,
+@@ -7223,6 +7223,11 @@ static struct l2cap_chan *l2cap_global_fixed_chan(struct l2cap_chan *c,
  	return NULL;
  }
  
@@ -384,7 +384,7 @@ index 6544c1ed7143..27b4c4a2ba1f 100644
  static void l2cap_connect_cfm(struct hci_conn *hcon, u8 status)
  {
  	struct hci_dev *hdev = hcon->hdev;
-@@ -7224,9 +7229,6 @@ static void l2cap_connect_cfm(struct hci_conn *hcon, u8 status)
+@@ -7230,9 +7235,6 @@ static void l2cap_connect_cfm(struct hci_conn *hcon, u8 status)
  	struct l2cap_chan *pchan;
  	u8 dst_type;
  
@@ -394,7 +394,7 @@ index 6544c1ed7143..27b4c4a2ba1f 100644
  	BT_DBG("hcon %p bdaddr %pMR status %d", hcon, &hcon->dst, status);
  
  	if (status) {
-@@ -7291,9 +7293,6 @@ int l2cap_disconn_ind(struct hci_conn *hcon)
+@@ -7297,9 +7299,6 @@ int l2cap_disconn_ind(struct hci_conn *hcon)
  
  static void l2cap_disconn_cfm(struct hci_conn *hcon, u8 reason)
  {
@@ -404,7 +404,7 @@ index 6544c1ed7143..27b4c4a2ba1f 100644
  	BT_DBG("hcon %p reason %d", hcon, reason);
  
  	l2cap_conn_del(hcon, bt_to_errno(reason));
-@@ -7572,6 +7571,7 @@ void l2cap_recv_acldata(struct hci_conn *hcon, struct sk_buff *skb, u16 flags)
+@@ -7578,6 +7577,7 @@ void l2cap_recv_acldata(struct hci_conn *hcon, struct sk_buff *skb, u16 flags)
  
  static struct hci_cb l2cap_cb = {
  	.name		= "L2CAP",
@@ -413,7 +413,7 @@ index 6544c1ed7143..27b4c4a2ba1f 100644
  	.disconn_cfm	= l2cap_disconn_cfm,
  	.security_cfm	= l2cap_security_cfm,
 diff --git a/net/bluetooth/rfcomm/core.c b/net/bluetooth/rfcomm/core.c
-index ad5177e3a69b..4c56ca5a216c 100644
+index 1d34d8497033..9d46afb24caf 100644
 --- a/net/bluetooth/rfcomm/core.c
 +++ b/net/bluetooth/rfcomm/core.c
 @@ -2134,6 +2134,11 @@ static int rfcomm_run(void *unused)
@@ -437,10 +437,10 @@ index ad5177e3a69b..4c56ca5a216c 100644
  };
  
 diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
-index 1c7252a36866..38460bf8946c 100644
+index fb368540139a..6453d7ee92f2 100644
 --- a/net/bluetooth/sco.c
 +++ b/net/bluetooth/sco.c
-@@ -1353,11 +1353,13 @@ int sco_connect_ind(struct hci_dev *hdev, bdaddr_t *bdaddr, __u8 *flags)
+@@ -1352,11 +1352,13 @@ int sco_connect_ind(struct hci_dev *hdev, bdaddr_t *bdaddr, __u8 *flags)
  	return lm;
  }
  
@@ -457,7 +457,7 @@ index 1c7252a36866..38460bf8946c 100644
  	BT_DBG("hcon %p bdaddr %pMR status %u", hcon, &hcon->dst, status);
  
  	if (!status) {
-@@ -1372,9 +1374,6 @@ static void sco_connect_cfm(struct hci_conn *hcon, __u8 status)
+@@ -1371,9 +1373,6 @@ static void sco_connect_cfm(struct hci_conn *hcon, __u8 status)
  
  static void sco_disconn_cfm(struct hci_conn *hcon, __u8 reason)
  {
@@ -467,7 +467,7 @@ index 1c7252a36866..38460bf8946c 100644
  	BT_DBG("hcon %p reason %d", hcon, reason);
  
  	sco_conn_del(hcon, bt_to_errno(reason));
-@@ -1400,6 +1399,7 @@ void sco_recv_scodata(struct hci_conn *hcon, struct sk_buff *skb)
+@@ -1399,6 +1398,7 @@ void sco_recv_scodata(struct hci_conn *hcon, struct sk_buff *skb)
  
  static struct hci_cb sco_cb = {
  	.name		= "SCO",
