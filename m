@@ -1,124 +1,480 @@
-Received: from mail-qk1-f178.google.com (mail-qk1-f178.google.com [209.85.222.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7927A39FF3
-	for <linux-bluetooth@vger.kernel.org>; Fri, 20 Dec 2024 16:14:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFFF721C194;
+	Fri, 20 Dec 2024 17:12:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734711277; cv=none; b=ZbGbMgGQ4eZCkPO6AbuY3mSIXsPkBnnDS3WKMgSxE5+m+eH0lCAzRwBA5BL8BnTjtukVxknYjzF6X/UtFipEyM01SIiBcI//U99EmLmtwkiMoewhQC6+MJ12JH8QPA66VoAoDquGGHtJoY6hY7WoDKRbIO3FGurNca6F1wfTgtI=
+	t=1734714750; cv=none; b=efBPvVHrVo90SNQWps97laQxdns1sOn+ep94WhxNOHQQQQCOkUvKZbhQzj0B7+bBJCvClAoBJe6gpuVDYoEFFUKRRNHtYv7I/Ov8dciMj0BmGfZq7/mdYli+Dvwcv/tADDV4kfoGItDTrNl7EPFjc1/MbiGxw45fQhHLfRuJnww=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734711277; c=relaxed/simple;
-	bh=LsUb4pC1I3P2upWQDOQUUBuMsaa8CMMxL6iybOKLH+0=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=Gw67IcLCFTGRd2BvGEVmcvPCRAvUYIm54hdfplZgQht3gPXK2CCu8SF/F3e5ITbStm5PZfBegh9olW36tFSugZhUUO3D+YUEksba8YTsd3Y8fkHY8RzeeuIhwM5DDDThsV0HO4kbCC+gIrMVsNmJtq1oiYj0P+Xoj/PzaREFXyQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FAGqHUGx; arc=none smtp.client-ip=209.85.222.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1734714750; c=relaxed/simple;
+	bh=FM3zsMyXOWvmaw/qAOcNHtGPrSRpy4VVEvl4BQ2MCyg=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=Pxi0jdikxBsQVYFF71m1bCjiYPV2lM5fT/X3Xl5obEju4iVJlthArcrFh+WyUj6khW0rkadEfuLmOdCEarYqlZzPtnwa3OLCxB5y8/ulPVj3/QZ3HJFPCqjnlaJqWui3BJWpq5TaU82Rqk7ZaQF5OMMfBoLACPIBmILm4q2hSRg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UyZVOli0; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FAGqHUGx"
-Received: by mail-qk1-f178.google.com with SMTP id af79cd13be357-7b6f1be1daeso168997085a.0
-        for <linux-bluetooth@vger.kernel.org>; Fri, 20 Dec 2024 08:14:34 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1734711273; x=1735316073; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=qTDyishXLFZ0meWXxTDgcV4ISlDk2tEC835I59DYAHk=;
-        b=FAGqHUGxksIWw3aIzteED8zdP/J3XY2UGP52c4VZHhosrwJMJrh0O9+oviM8FWP2Jv
-         kHiPgLe3sm84tX3+gu40QmNagbg4c6VwWXGMO0vmQ+70XgffrVQ7b6r0qyfxIxS8e0Mj
-         64Lne+U+oHCAcBXxA++O9yzzDYQ/yzhqO/IB5oCG0NwjIJ9rRWtohoQV/1nvBMEkuLD4
-         HdSrn7+w1FXEvVni4fPYdw2h9g4nmdMzWVYlbvcd3TXEsTJhlwdNkr9QjqLltvyyUh2I
-         Gge4P1Ti3+C6PZEwz7u2pw9KUT0za536LIm8sM+01O+8NULvc19fUhaTNzhlp16bVI9A
-         F52Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734711273; x=1735316073;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=qTDyishXLFZ0meWXxTDgcV4ISlDk2tEC835I59DYAHk=;
-        b=f7WDFmC9X5xaVZTmTTVRuplmDxfvWhpQO/4EIzzL2SJSgB3yWZglASK8XQ7KOaAHML
-         DRUm6RV/HySxT7/wvLykx2Vj6KmGQaQqSzWhY8cyq1dwKr5bokEz67ze3/tF5BT+TdSN
-         28EwcOQL1zzGlbVYS72k+vqD6q21CGsDbRBLwkOipdvbOv731sytUDupxW/a32mrcjPi
-         gtehupxaZfRGYztCjwokFVst5fAePv6lsaGXwlaNDrv+g9yISGF190fAQHQxnfUzXLAS
-         dpKfSnM0RkYhMkSztZxsVKDcQBS7uqLp9GRU5g/k54FYYMi9pKvinKi3uyheugz7pDzF
-         1EBw==
-X-Gm-Message-State: AOJu0Yy22IUmRTBUG17o7LassuhGXL9BgzzqNAGVcZmm2QKPkaA05zub
-	EBoHhdGtWAq+TC3DUTqahPEgvd7nEqKg8eouEPmCW1MOPyia3duBVfKnbQ==
-X-Gm-Gg: ASbGncv7ymuYf3J4RjQd9QK4lARxjg9P6yD9p/ZmiyYWdB/GVzw8GZ/gr2mQ07t0Qvc
-	vPfl/Q6cA8xVpqlBoybd2/y8Y5qiPY8TqKjD39l0HwpiRmQ9Zk8IQSBuBYrAuBCFzm/Mp4yXpNJ
-	GVhE7JE+AE+znFldxVnfSM1yx7EewbX2FiXgbKK4KgoaLY/T0MoTlfkVC+dssifHa9GBNauGP2F
-	GMID6PtMdMQ0KJ7zzfapu9HFz16e5r4lgZgaNYT0gQoO1besLIDj/EI/oMlHm6J
-X-Google-Smtp-Source: AGHT+IFeFHYK/EBjrQ2PWsZ7e/8lpAU6Af4egi4MC6PDEygm/61ywBTZkmZel7r4fTIxKX2NnMwd2w==
-X-Received: by 2002:a05:620a:318c:b0:7b6:e20d:2b47 with SMTP id af79cd13be357-7b9ba7fe5e8mr602907985a.49.1734711273096;
-        Fri, 20 Dec 2024 08:14:33 -0800 (PST)
-Received: from [172.17.0.2] ([172.183.82.218])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7b9ac2df7a0sm148478985a.47.2024.12.20.08.14.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 20 Dec 2024 08:14:32 -0800 (PST)
-Message-ID: <676597e8.050a0220.c9379.637d@mx.google.com>
-Date: Fri, 20 Dec 2024 08:14:32 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============1966631255703468972=="
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UyZVOli0"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EB426C4CECD;
+	Fri, 20 Dec 2024 17:12:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1734714749;
+	bh=FM3zsMyXOWvmaw/qAOcNHtGPrSRpy4VVEvl4BQ2MCyg=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=UyZVOli0I+nEc5Y/cLk/FJx65Wx/lCWVaHDzK/WrL4TBzJ75wxAnm+7kEgvMVD+GA
+	 atnkKgsKcrH3HOC2aS1lecZ/mMxEf5an5/9L5v9CVeJQF3jyDq+Sxi1P1hJejtWmYq
+	 cWUu9dkr2pCQvoFRdkZ97st7xZSzUD8QmLQTmWK3Qug4PVzvtzRmm3SLaCTO+dkym/
+	 1Hr/l+vPXksQMGAzPLMsDENvr+7I1QwgyZ87rug+LRbrHh/2t6cZOlM3TDx8y253r9
+	 CjOKHHUuhknBrmKq8oXEMCBMS3H2+fc4ZZovSx5OkmeS5h+1JumtEhc4aK53sHILJV
+	 YY3LRxC75WQ3Q==
+From: Sasha Levin <sashal@kernel.org>
+To: linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Cc: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
+	syzbot+2fb0835e0c9cefc34614@syzkaller.appspotmail.com,
+	Sasha Levin <sashal@kernel.org>,
+	marcel@holtmann.org,
+	johan.hedberg@gmail.com,
+	luiz.dentz@gmail.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	20373622@buaa.edu.cn,
+	viro@zeniv.linux.org.uk,
+	linux-bluetooth@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.12 25/29] Bluetooth: hci_core: Fix sleeping function called from invalid context
+Date: Fri, 20 Dec 2024 12:11:26 -0500
+Message-Id: <20241220171130.511389-25-sashal@kernel.org>
+X-Mailer: git-send-email 2.39.5
+In-Reply-To: <20241220171130.511389-1-sashal@kernel.org>
+References: <20241220171130.511389-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, iulia.tanasescu@nxp.com
-Subject: RE: client/player: Rework transport select for encrypted streams
-In-Reply-To: <20241220144458.27739-2-iulia.tanasescu@nxp.com>
-References: <20241220144458.27739-2-iulia.tanasescu@nxp.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+X-stable: review
+X-Patchwork-Hint: Ignore
+X-stable-base: Linux 6.12.6
+Content-Transfer-Encoding: 8bit
 
---===============1966631255703468972==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This is automated email and please do not reply to this email!
+[ Upstream commit 4d94f05558271654670d18c26c912da0c1c15549 ]
 
-Dear submitter,
+This reworks hci_cb_list to not use mutex hci_cb_list_lock to avoid bugs
+like the bellow:
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=919923
+BUG: sleeping function called from invalid context at kernel/locking/mutex.c:585
+in_atomic(): 0, irqs_disabled(): 0, non_block: 0, pid: 5070, name: kworker/u9:2
+preempt_count: 0, expected: 0
+RCU nest depth: 1, expected: 0
+4 locks held by kworker/u9:2/5070:
+ #0: ffff888015be3948 ((wq_completion)hci0#2){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3229 [inline]
+ #0: ffff888015be3948 ((wq_completion)hci0#2){+.+.}-{0:0}, at: process_scheduled_works+0x8e0/0x1770 kernel/workqueue.c:3335
+ #1: ffffc90003b6fd00 ((work_completion)(&hdev->rx_work)){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3230 [inline]
+ #1: ffffc90003b6fd00 ((work_completion)(&hdev->rx_work)){+.+.}-{0:0}, at: process_scheduled_works+0x91b/0x1770 kernel/workqueue.c:3335
+ #2: ffff8880665d0078 (&hdev->lock){+.+.}-{3:3}, at: hci_le_create_big_complete_evt+0xcf/0xae0 net/bluetooth/hci_event.c:6914
+ #3: ffffffff8e132020 (rcu_read_lock){....}-{1:2}, at: rcu_lock_acquire include/linux/rcupdate.h:298 [inline]
+ #3: ffffffff8e132020 (rcu_read_lock){....}-{1:2}, at: rcu_read_lock include/linux/rcupdate.h:750 [inline]
+ #3: ffffffff8e132020 (rcu_read_lock){....}-{1:2}, at: hci_le_create_big_complete_evt+0xdb/0xae0 net/bluetooth/hci_event.c:6915
+CPU: 0 PID: 5070 Comm: kworker/u9:2 Not tainted 6.8.0-syzkaller-08073-g480e035fc4c7 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 03/27/2024
+Workqueue: hci0 hci_rx_work
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:88 [inline]
+ dump_stack_lvl+0x241/0x360 lib/dump_stack.c:114
+ __might_resched+0x5d4/0x780 kernel/sched/core.c:10187
+ __mutex_lock_common kernel/locking/mutex.c:585 [inline]
+ __mutex_lock+0xc1/0xd70 kernel/locking/mutex.c:752
+ hci_connect_cfm include/net/bluetooth/hci_core.h:2004 [inline]
+ hci_le_create_big_complete_evt+0x3d9/0xae0 net/bluetooth/hci_event.c:6939
+ hci_event_func net/bluetooth/hci_event.c:7514 [inline]
+ hci_event_packet+0xa53/0x1540 net/bluetooth/hci_event.c:7569
+ hci_rx_work+0x3e8/0xca0 net/bluetooth/hci_core.c:4171
+ process_one_work kernel/workqueue.c:3254 [inline]
+ process_scheduled_works+0xa00/0x1770 kernel/workqueue.c:3335
+ worker_thread+0x86d/0xd70 kernel/workqueue.c:3416
+ kthread+0x2f0/0x390 kernel/kthread.c:388
+ ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:243
+ </TASK>
 
----Test result---
-
-Test Summary:
-CheckPatch                    PENDING   0.25 seconds
-GitLint                       PENDING   0.23 seconds
-BuildEll                      PASS      21.54 seconds
-BluezMake                     PASS      1690.61 seconds
-MakeCheck                     PASS      12.90 seconds
-MakeDistcheck                 PASS      170.49 seconds
-CheckValgrind                 PASS      225.99 seconds
-CheckSmatch                   PASS      291.03 seconds
-bluezmakeextell               PASS      103.98 seconds
-IncrementalBuild              PENDING   0.27 seconds
-ScanBuild                     PASS      910.26 seconds
-
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
-
-
-
+Reported-by: syzbot+2fb0835e0c9cefc34614@syzkaller.appspotmail.com
+Tested-by: syzbot+2fb0835e0c9cefc34614@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=2fb0835e0c9cefc34614
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
-Regards,
-Linux Bluetooth
+ include/net/bluetooth/hci_core.h | 108 ++++++++++++++++++++-----------
+ net/bluetooth/hci_core.c         |  10 +--
+ net/bluetooth/iso.c              |   6 ++
+ net/bluetooth/l2cap_core.c       |  12 ++--
+ net/bluetooth/rfcomm/core.c      |   6 ++
+ net/bluetooth/sco.c              |  12 ++--
+ 6 files changed, 97 insertions(+), 57 deletions(-)
 
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index c95f7e6ba255..ba7b52584770 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -804,7 +804,6 @@ struct hci_conn_params {
+ extern struct list_head hci_dev_list;
+ extern struct list_head hci_cb_list;
+ extern rwlock_t hci_dev_list_lock;
+-extern struct mutex hci_cb_list_lock;
+ 
+ #define hci_dev_set_flag(hdev, nr)             set_bit((nr), (hdev)->dev_flags)
+ #define hci_dev_clear_flag(hdev, nr)           clear_bit((nr), (hdev)->dev_flags)
+@@ -2007,24 +2006,47 @@ struct hci_cb {
+ 
+ 	char *name;
+ 
++	bool (*match)		(struct hci_conn *conn);
+ 	void (*connect_cfm)	(struct hci_conn *conn, __u8 status);
+ 	void (*disconn_cfm)	(struct hci_conn *conn, __u8 status);
+ 	void (*security_cfm)	(struct hci_conn *conn, __u8 status,
+-								__u8 encrypt);
++				 __u8 encrypt);
+ 	void (*key_change_cfm)	(struct hci_conn *conn, __u8 status);
+ 	void (*role_switch_cfm)	(struct hci_conn *conn, __u8 status, __u8 role);
+ };
+ 
++static inline void hci_cb_lookup(struct hci_conn *conn, struct list_head *list)
++{
++	struct hci_cb *cb, *cpy;
++
++	rcu_read_lock();
++	list_for_each_entry_rcu(cb, &hci_cb_list, list) {
++		if (cb->match && cb->match(conn)) {
++			cpy = kmalloc(sizeof(*cpy), GFP_ATOMIC);
++			if (!cpy)
++				break;
++
++			*cpy = *cb;
++			INIT_LIST_HEAD(&cpy->list);
++			list_add_rcu(&cpy->list, list);
++		}
++	}
++	rcu_read_unlock();
++}
++
+ static inline void hci_connect_cfm(struct hci_conn *conn, __u8 status)
+ {
+-	struct hci_cb *cb;
++	struct list_head list;
++	struct hci_cb *cb, *tmp;
++
++	INIT_LIST_HEAD(&list);
++	hci_cb_lookup(conn, &list);
+ 
+-	mutex_lock(&hci_cb_list_lock);
+-	list_for_each_entry(cb, &hci_cb_list, list) {
++	list_for_each_entry_safe(cb, tmp, &list, list) {
+ 		if (cb->connect_cfm)
+ 			cb->connect_cfm(conn, status);
++		kfree(cb);
+ 	}
+-	mutex_unlock(&hci_cb_list_lock);
+ 
+ 	if (conn->connect_cfm_cb)
+ 		conn->connect_cfm_cb(conn, status);
+@@ -2032,43 +2054,55 @@ static inline void hci_connect_cfm(struct hci_conn *conn, __u8 status)
+ 
+ static inline void hci_disconn_cfm(struct hci_conn *conn, __u8 reason)
+ {
+-	struct hci_cb *cb;
++	struct list_head list;
++	struct hci_cb *cb, *tmp;
++
++	INIT_LIST_HEAD(&list);
++	hci_cb_lookup(conn, &list);
+ 
+-	mutex_lock(&hci_cb_list_lock);
+-	list_for_each_entry(cb, &hci_cb_list, list) {
++	list_for_each_entry_safe(cb, tmp, &list, list) {
+ 		if (cb->disconn_cfm)
+ 			cb->disconn_cfm(conn, reason);
++		kfree(cb);
+ 	}
+-	mutex_unlock(&hci_cb_list_lock);
+ 
+ 	if (conn->disconn_cfm_cb)
+ 		conn->disconn_cfm_cb(conn, reason);
+ }
+ 
+-static inline void hci_auth_cfm(struct hci_conn *conn, __u8 status)
++static inline void hci_security_cfm(struct hci_conn *conn, __u8 status,
++				    __u8 encrypt)
+ {
+-	struct hci_cb *cb;
+-	__u8 encrypt;
+-
+-	if (test_bit(HCI_CONN_ENCRYPT_PEND, &conn->flags))
+-		return;
++	struct list_head list;
++	struct hci_cb *cb, *tmp;
+ 
+-	encrypt = test_bit(HCI_CONN_ENCRYPT, &conn->flags) ? 0x01 : 0x00;
++	INIT_LIST_HEAD(&list);
++	hci_cb_lookup(conn, &list);
+ 
+-	mutex_lock(&hci_cb_list_lock);
+-	list_for_each_entry(cb, &hci_cb_list, list) {
++	list_for_each_entry_safe(cb, tmp, &list, list) {
+ 		if (cb->security_cfm)
+ 			cb->security_cfm(conn, status, encrypt);
++		kfree(cb);
+ 	}
+-	mutex_unlock(&hci_cb_list_lock);
+ 
+ 	if (conn->security_cfm_cb)
+ 		conn->security_cfm_cb(conn, status);
+ }
+ 
++static inline void hci_auth_cfm(struct hci_conn *conn, __u8 status)
++{
++	__u8 encrypt;
++
++	if (test_bit(HCI_CONN_ENCRYPT_PEND, &conn->flags))
++		return;
++
++	encrypt = test_bit(HCI_CONN_ENCRYPT, &conn->flags) ? 0x01 : 0x00;
++
++	hci_security_cfm(conn, status, encrypt);
++}
++
+ static inline void hci_encrypt_cfm(struct hci_conn *conn, __u8 status)
+ {
+-	struct hci_cb *cb;
+ 	__u8 encrypt;
+ 
+ 	if (conn->state == BT_CONFIG) {
+@@ -2095,40 +2129,38 @@ static inline void hci_encrypt_cfm(struct hci_conn *conn, __u8 status)
+ 			conn->sec_level = conn->pending_sec_level;
+ 	}
+ 
+-	mutex_lock(&hci_cb_list_lock);
+-	list_for_each_entry(cb, &hci_cb_list, list) {
+-		if (cb->security_cfm)
+-			cb->security_cfm(conn, status, encrypt);
+-	}
+-	mutex_unlock(&hci_cb_list_lock);
+-
+-	if (conn->security_cfm_cb)
+-		conn->security_cfm_cb(conn, status);
++	hci_security_cfm(conn, status, encrypt);
+ }
+ 
+ static inline void hci_key_change_cfm(struct hci_conn *conn, __u8 status)
+ {
+-	struct hci_cb *cb;
++	struct list_head list;
++	struct hci_cb *cb, *tmp;
++
++	INIT_LIST_HEAD(&list);
++	hci_cb_lookup(conn, &list);
+ 
+-	mutex_lock(&hci_cb_list_lock);
+-	list_for_each_entry(cb, &hci_cb_list, list) {
++	list_for_each_entry_safe(cb, tmp, &list, list) {
+ 		if (cb->key_change_cfm)
+ 			cb->key_change_cfm(conn, status);
++		kfree(cb);
+ 	}
+-	mutex_unlock(&hci_cb_list_lock);
+ }
+ 
+ static inline void hci_role_switch_cfm(struct hci_conn *conn, __u8 status,
+ 								__u8 role)
+ {
+-	struct hci_cb *cb;
++	struct list_head list;
++	struct hci_cb *cb, *tmp;
++
++	INIT_LIST_HEAD(&list);
++	hci_cb_lookup(conn, &list);
+ 
+-	mutex_lock(&hci_cb_list_lock);
+-	list_for_each_entry(cb, &hci_cb_list, list) {
++	list_for_each_entry_safe(cb, tmp, &list, list) {
+ 		if (cb->role_switch_cfm)
+ 			cb->role_switch_cfm(conn, status, role);
++		kfree(cb);
+ 	}
+-	mutex_unlock(&hci_cb_list_lock);
+ }
+ 
+ static inline bool hci_bdaddr_is_rpa(bdaddr_t *bdaddr, u8 addr_type)
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 72439764186e..b5553c08e731 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -57,7 +57,6 @@ DEFINE_RWLOCK(hci_dev_list_lock);
+ 
+ /* HCI callback list */
+ LIST_HEAD(hci_cb_list);
+-DEFINE_MUTEX(hci_cb_list_lock);
+ 
+ /* HCI ID Numbering */
+ static DEFINE_IDA(hci_index_ida);
+@@ -2993,9 +2992,7 @@ int hci_register_cb(struct hci_cb *cb)
+ {
+ 	BT_DBG("%p name %s", cb, cb->name);
+ 
+-	mutex_lock(&hci_cb_list_lock);
+-	list_add_tail(&cb->list, &hci_cb_list);
+-	mutex_unlock(&hci_cb_list_lock);
++	list_add_tail_rcu(&cb->list, &hci_cb_list);
+ 
+ 	return 0;
+ }
+@@ -3005,9 +3002,8 @@ int hci_unregister_cb(struct hci_cb *cb)
+ {
+ 	BT_DBG("%p name %s", cb, cb->name);
+ 
+-	mutex_lock(&hci_cb_list_lock);
+-	list_del(&cb->list);
+-	mutex_unlock(&hci_cb_list_lock);
++	list_del_rcu(&cb->list);
++	synchronize_rcu();
+ 
+ 	return 0;
+ }
+diff --git a/net/bluetooth/iso.c b/net/bluetooth/iso.c
+index 5e2d9758bd3c..73238e9ec946 100644
+--- a/net/bluetooth/iso.c
++++ b/net/bluetooth/iso.c
+@@ -2104,6 +2104,11 @@ int iso_connect_ind(struct hci_dev *hdev, bdaddr_t *bdaddr, __u8 *flags)
+ 	return HCI_LM_ACCEPT;
+ }
+ 
++static bool iso_match(struct hci_conn *hcon)
++{
++	return hcon->type == ISO_LINK || hcon->type == LE_LINK;
++}
++
+ static void iso_connect_cfm(struct hci_conn *hcon, __u8 status)
+ {
+ 	if (hcon->type != ISO_LINK) {
+@@ -2285,6 +2290,7 @@ void iso_recv(struct hci_conn *hcon, struct sk_buff *skb, u16 flags)
+ 
+ static struct hci_cb iso_cb = {
+ 	.name		= "ISO",
++	.match		= iso_match,
+ 	.connect_cfm	= iso_connect_cfm,
+ 	.disconn_cfm	= iso_disconn_cfm,
+ };
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 6544c1ed7143..27b4c4a2ba1f 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -7217,6 +7217,11 @@ static struct l2cap_chan *l2cap_global_fixed_chan(struct l2cap_chan *c,
+ 	return NULL;
+ }
+ 
++static bool l2cap_match(struct hci_conn *hcon)
++{
++	return hcon->type == ACL_LINK || hcon->type == LE_LINK;
++}
++
+ static void l2cap_connect_cfm(struct hci_conn *hcon, u8 status)
+ {
+ 	struct hci_dev *hdev = hcon->hdev;
+@@ -7224,9 +7229,6 @@ static void l2cap_connect_cfm(struct hci_conn *hcon, u8 status)
+ 	struct l2cap_chan *pchan;
+ 	u8 dst_type;
+ 
+-	if (hcon->type != ACL_LINK && hcon->type != LE_LINK)
+-		return;
+-
+ 	BT_DBG("hcon %p bdaddr %pMR status %d", hcon, &hcon->dst, status);
+ 
+ 	if (status) {
+@@ -7291,9 +7293,6 @@ int l2cap_disconn_ind(struct hci_conn *hcon)
+ 
+ static void l2cap_disconn_cfm(struct hci_conn *hcon, u8 reason)
+ {
+-	if (hcon->type != ACL_LINK && hcon->type != LE_LINK)
+-		return;
+-
+ 	BT_DBG("hcon %p reason %d", hcon, reason);
+ 
+ 	l2cap_conn_del(hcon, bt_to_errno(reason));
+@@ -7572,6 +7571,7 @@ void l2cap_recv_acldata(struct hci_conn *hcon, struct sk_buff *skb, u16 flags)
+ 
+ static struct hci_cb l2cap_cb = {
+ 	.name		= "L2CAP",
++	.match		= l2cap_match,
+ 	.connect_cfm	= l2cap_connect_cfm,
+ 	.disconn_cfm	= l2cap_disconn_cfm,
+ 	.security_cfm	= l2cap_security_cfm,
+diff --git a/net/bluetooth/rfcomm/core.c b/net/bluetooth/rfcomm/core.c
+index ad5177e3a69b..4c56ca5a216c 100644
+--- a/net/bluetooth/rfcomm/core.c
++++ b/net/bluetooth/rfcomm/core.c
+@@ -2134,6 +2134,11 @@ static int rfcomm_run(void *unused)
+ 	return 0;
+ }
+ 
++static bool rfcomm_match(struct hci_conn *hcon)
++{
++	return hcon->type == ACL_LINK;
++}
++
+ static void rfcomm_security_cfm(struct hci_conn *conn, u8 status, u8 encrypt)
+ {
+ 	struct rfcomm_session *s;
+@@ -2180,6 +2185,7 @@ static void rfcomm_security_cfm(struct hci_conn *conn, u8 status, u8 encrypt)
+ 
+ static struct hci_cb rfcomm_cb = {
+ 	.name		= "RFCOMM",
++	.match		= rfcomm_match,
+ 	.security_cfm	= rfcomm_security_cfm
+ };
+ 
+diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
+index 1c7252a36866..38460bf8946c 100644
+--- a/net/bluetooth/sco.c
++++ b/net/bluetooth/sco.c
+@@ -1353,11 +1353,13 @@ int sco_connect_ind(struct hci_dev *hdev, bdaddr_t *bdaddr, __u8 *flags)
+ 	return lm;
+ }
+ 
+-static void sco_connect_cfm(struct hci_conn *hcon, __u8 status)
++static bool sco_match(struct hci_conn *hcon)
+ {
+-	if (hcon->type != SCO_LINK && hcon->type != ESCO_LINK)
+-		return;
++	return hcon->type == SCO_LINK || hcon->type == ESCO_LINK;
++}
+ 
++static void sco_connect_cfm(struct hci_conn *hcon, __u8 status)
++{
+ 	BT_DBG("hcon %p bdaddr %pMR status %u", hcon, &hcon->dst, status);
+ 
+ 	if (!status) {
+@@ -1372,9 +1374,6 @@ static void sco_connect_cfm(struct hci_conn *hcon, __u8 status)
+ 
+ static void sco_disconn_cfm(struct hci_conn *hcon, __u8 reason)
+ {
+-	if (hcon->type != SCO_LINK && hcon->type != ESCO_LINK)
+-		return;
+-
+ 	BT_DBG("hcon %p reason %d", hcon, reason);
+ 
+ 	sco_conn_del(hcon, bt_to_errno(reason));
+@@ -1400,6 +1399,7 @@ void sco_recv_scodata(struct hci_conn *hcon, struct sk_buff *skb)
+ 
+ static struct hci_cb sco_cb = {
+ 	.name		= "SCO",
++	.match		= sco_match,
+ 	.connect_cfm	= sco_connect_cfm,
+ 	.disconn_cfm	= sco_disconn_cfm,
+ };
+-- 
+2.39.5
 
---===============1966631255703468972==--
