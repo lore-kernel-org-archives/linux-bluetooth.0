@@ -1,501 +1,378 @@
-Received: from EUR02-VI1-obe.outbound.protection.outlook.com (mail-vi1eur02on2077.outbound.protection.outlook.com [40.107.241.77])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f169.google.com (mail-lj1-f169.google.com [209.85.208.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EB1179EA
-	for <linux-bluetooth@vger.kernel.org>; Fri, 20 Dec 2024 14:45:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.241.77
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734705919; cv=fail; b=MNMTfHFefeBQ60SQ5rxNQcRAt+BXH3shy/KyGe0Zo5Vbaa+ArBYFc+V+ctcmTcvH+nXzqyAve6gNBBUC0NeLoJ+upwfqzldtn3oAGO5CBeLD/hat0Eh4P5bM37yUQ/3vY41Bq5nV4ya4Yctl9fQpy51NrbaM7RoF41auoDy9Pa8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734705919; c=relaxed/simple;
-	bh=aVCUdXcX6Sv8AxaHguaCY7lNyx0kHjRV/9K7hMYFjfI=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=lxVIHGGJGOQJD4eg2l1bz3UznL9N+vFzXivz6Jn/m9OkYDdDmuqcOMnui5ZDzGVrXCskwoM0lqFe6ym8Zr1fkhDWdFDOdrdu2ServB+JIkA4H4M+4LHA9cBhDdzKBFewAVpcWLOh2We+bGnsSwDnDt0/lgYroJObVkIcYGyZICw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=MBGELe3n; arc=fail smtp.client-ip=40.107.241.77
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 332BD208AD
+	for <linux-bluetooth@vger.kernel.org>; Fri, 20 Dec 2024 14:47:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.169
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1734706051; cv=none; b=sLRXpKVurkORHQjAKyWd/cjG/pr7KatwwnCd3jjk2LEXivTO7M2d6SAWWVu1xQS4YjisFjDs97l39InHFAdVhK6KQ11L9MS9eT3E79lkp0ywbOVdor2kZV8YeOiCwj/aNHnJJCZqRi8K+AjhCcjG2MFeE7oJMlDxvDiH3sq3e+s=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1734706051; c=relaxed/simple;
+	bh=9rjVwphuilDHneJFj/NWowBXkGTC/qz1C5cY3ZPK9vE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=bHPTxFyhGbiA86Q+Gds45WHJsxV+/gI8GtBcU5CTR/J9fXkn0cf9IgPjSUjBrDi9PkKrGffphNGPVtNIQ0kNCCDIe581STSBVrPVagEWZApDbgUVEMNCy1XX1c1RLslkE4IcKo+ChN4cUk6T2pgmHATZSBKUnZy+jUsyCqVXLWw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SQiBLfXv; arc=none smtp.client-ip=209.85.208.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="MBGELe3n"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=ihMIdYIaRJNBM98Cq5xQ4uG8rdvqbAHoxOO0PHMpRfK6ttqaA7YkJckfgz+aDqIVx3HqCdplnEpbd31YJp5zeie1iCxQD8RbV420cqpJxnC65oBsufyQuHa2sI5dvuQ3J21lr1KJIoLGFzAzibKVWrQoeWq+6hNR1Ej0RqbWoRjTElPvhf067TgPUH7LGPLILfjI4VZldLuKBetJMwhRy0xC/54NrmnekNBhVz8prVRd3YAodGwYczhWpzaz4sUUujX6iTSpqBgvE6lwUNobJ17oGVzsUMBq2/6kgLZgk7fdXsB+Or3Ze4dBpiLxT6AkDxGku6UxXICP71nHndqdJQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=XOWUHo6OKQ+CT6j9Jj7kvJYKzY/+r7ou5SFVW/gUByc=;
- b=VdPC4kPpeVKmGbJGQm3ENmGk82YqC2HsRIGG4FxoNDri9yvoyc9nyxennKpQfEmMenWeeh/rQ+daHg+56b1WTyqFq8wussvuRkGJLPiOjwTKEX05JU594BHiyOOP1MsbBO9AKm3mQGAkRARpl4G2V9YGPAJz8DMIgxAQ+tYagks63XTjwaRozT19vq2UFWEhJsXnUvBTKGHHjHapmHSMcYTEgxlyN4gRD9cMTZea2NRTM4eLHoxu4zvqXGBOd1OrWcOYTHhegL38jvxF6qO7r4mpDxVnDf5H7XGQxWJ2/k3tdJZ7FCEBJwzpHVbnkZPbD7ziAWJOs8E0RWp4ykkHiA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=XOWUHo6OKQ+CT6j9Jj7kvJYKzY/+r7ou5SFVW/gUByc=;
- b=MBGELe3nKZQjTrcNWDWx++Jza0KOzDH7K6aybo4WnPDC/qrCWT8TflDVqmTKpmiGj346tbzK2rzOJnGBhSDt6KYi+nVZ5/pyh5R9cO4lT4a6zpTlwmFzoXg11ASdhnoMDOXPDWN5NSotvlQRvC9M05JojRHjsbvf1Jutkrcvfzf9InnsAFTqnmWEVIzka2xWsHCyJR1Glbk7LuxUhhEIWlcXaGa/0HsMwzDt2ADjAfUgvWhn7Vp0NF8KZ9ufX16qkFNgB7den/tNjNJbuV1NoaOGneuOSXOzDzYc1yOuSfhsIaFaPfs5H2wYdSyDl6xPkBOQ9r8ctzJD+w2/4qHAaQ==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from AS8PR04MB8898.eurprd04.prod.outlook.com (2603:10a6:20b:42d::15)
- by AS5PR04MB10059.eurprd04.prod.outlook.com (2603:10a6:20b:680::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8272.16; Fri, 20 Dec
- 2024 14:45:12 +0000
-Received: from AS8PR04MB8898.eurprd04.prod.outlook.com
- ([fe80::5e22:869c:33c:9654]) by AS8PR04MB8898.eurprd04.prod.outlook.com
- ([fe80::5e22:869c:33c:9654%4]) with mapi id 15.20.8272.013; Fri, 20 Dec 2024
- 14:45:12 +0000
-From: Iulia Tanasescu <iulia.tanasescu@nxp.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: claudia.rosu@nxp.com,
-	mihai-octavian.urzica@nxp.com,
-	andrei.istodorescu@nxp.com,
-	luiz.dentz@gmail.com,
-	Iulia Tanasescu <iulia.tanasescu@nxp.com>
-Subject: [PATCH BlueZ 1/1] client/player: Rework transport select for encrypted streams
-Date: Fri, 20 Dec 2024 16:44:58 +0200
-Message-ID: <20241220144458.27739-2-iulia.tanasescu@nxp.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20241220144458.27739-1-iulia.tanasescu@nxp.com>
-References: <20241220144458.27739-1-iulia.tanasescu@nxp.com>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: AM0PR10CA0041.EURPRD10.PROD.OUTLOOK.COM
- (2603:10a6:20b:150::21) To AS8PR04MB8898.eurprd04.prod.outlook.com
- (2603:10a6:20b:42d::15)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SQiBLfXv"
+Received: by mail-lj1-f169.google.com with SMTP id 38308e7fff4ca-300479ca5c6so21479751fa.3
+        for <linux-bluetooth@vger.kernel.org>; Fri, 20 Dec 2024 06:47:26 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1734706045; x=1735310845; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=k9/P4NEVoHrkMb2hdxovclx4YWrVjeDVVCJSTlc3cac=;
+        b=SQiBLfXvDrkHTVpcvfwwyHRF1m9M40mGePGJ5UzIU4euHxCTh5z+VflGWcQPJjd4U2
+         AoWPm9GT4SBItd5c6bx0YbXjq8Z93oabA2+e2Tsb5vbNmH46apGZo51dOd9u2owZpopL
+         GvIJ9J7/wJkvhDeweAeUd2VDfO9fepGVyJjL/2Bg2uZPDB1Aa9q1+lp98wjkW/O590XH
+         JbdD/ejn2cVx9CAH003cjLqRZ7hfMMOol3X4cI+wIdM28oMpROYdoyuN19gXK0sPyM7z
+         vmlUC8XLug0w46bV/qR8QGH2cnCY37Yph893ML4atXB4USPjsEC9itJR/Vx68htAD5+S
+         1plA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1734706045; x=1735310845;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=k9/P4NEVoHrkMb2hdxovclx4YWrVjeDVVCJSTlc3cac=;
+        b=FDNjZii3/dLZTRb8dsMXM410P7StcEiBgmsfb58EmTUgck8r64T4c4qgKXt+ki+bJQ
+         fmAKTJg8V+7aALsvwRXMEPbV0HPZXjJ3W4ZonQWcsVg7X6ZX0PXbjMLbBIoFodhkpATa
+         SxfAAy9PypOmnZUMc+w9auh40g7jnkWbAlL+5O8FMAmhRT1c4JVqtJI7IqLhit0x5he+
+         m7Ltst6ETte/LraqcZhg5QIV3z6t0KyuwbxCjBOrzTaz7WaaVCEoyAAf69MF30pMdHk3
+         ZXrX+3YtIg+Ij8yA+9keOqqvJtMaw0hMDZ2PuGpOh3Qx+piYOB2ourn4iaGBMq0Jv9z4
+         gWMw==
+X-Gm-Message-State: AOJu0YxC4pl7bpbtiatgwsa2wUn9AhGmTr345YvCPFab1Q2YjDYUutC9
+	7QD9yu8ysUqigWUjZ7mnoP/fNzptgwbTO5HZKIskGfcwmkZxOBjCkERTkKxSPYMNGDBRGsRxXTh
+	nv6yHTWE3WVTL0C6RNZzr/DIU3PSMhQ==
+X-Gm-Gg: ASbGnctabYRmInRlMCkdoC0n3NBdSdvf73HpuL8Rd4+4hUO4dq1CDL9fg7AUnwrsbml
+	yVl2FOBBbyyC8vjBL05PPK6OIrJZMl/8EB7m6QpY=
+X-Google-Smtp-Source: AGHT+IEql8TYj6OheiGZgJLO6zZg7QtV8+q8ceuhRIQy1Rc4H4UHsZ+mshCgEv0OnOzdmsLyH8nFbZ7zQZoxmjoRlgw=
+X-Received: by 2002:a2e:a70e:0:b0:302:16da:a03e with SMTP id
+ 38308e7fff4ca-304686299b5mr8006481fa.38.1734706044880; Fri, 20 Dec 2024
+ 06:47:24 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AS8PR04MB8898:EE_|AS5PR04MB10059:EE_
-X-MS-Office365-Filtering-Correlation-Id: 8f1ceda2-350f-4169-0227-08dd2104e886
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|376014;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?GAb53wwz8NRdWAyyAdECsb3M1Qpmvi7mh8q3Trdg7s/vEuV/FtqDY0fi6T/4?=
- =?us-ascii?Q?SgdoZmxSjiIAXOM9YiEnv0VK6nNk0ZS7/jvGXMliOb+50CRX4o3Ye0ZsgFVO?=
- =?us-ascii?Q?oRmpKCOtahg3lsNak738CMsRDcD5e7SrH8VgcRSZvae+qux/4ZYx0v2WX3KP?=
- =?us-ascii?Q?4EwJzKsBE9d+6PGHtjG7/rG2hKW6mqCqKQHaoUo7Px0TGfibmCUXsOMQRvCq?=
- =?us-ascii?Q?X4tmMi1XhFAEPySaWPv154GiCuSKzdFmCZ/P/B+PZ/gOnJaRkWnUNeL2L2t4?=
- =?us-ascii?Q?Gw3mB4TN5/PG245WNkVuW7qmQqzARDS6P0XSSOziqx37IC8gxpiPxXtMMmi8?=
- =?us-ascii?Q?31g7TSdcJQuFLR/xYwZVaFOI2hJQWFwP6HKbGtRxDY28dfQ5rzwzfvW2S3pl?=
- =?us-ascii?Q?CecCTt0eF70dNWGyMPF/fWWd3GrRaNVm+tusDN4KyYDKPHz6bdo7JA0pWJrG?=
- =?us-ascii?Q?KiTWrVgygtkpkqUs7hf0EOAh95FPo2DAC+hGhWU08iSIOA8Vr74Zez63UeEc?=
- =?us-ascii?Q?69GvDdrYJ7d97elOIgh9dLY8LF1y/NkW6dhFR1J2PGKf0EVo+K2lTLTswnZj?=
- =?us-ascii?Q?zT20gCHp0A8GxcZVBaoNbyBBWYKe3ucyKyzEH421FxVvHOo5Lu+xVqe2kNR9?=
- =?us-ascii?Q?D/ubmpePeWLVOrTYSGy/4kBvtKzPi+7XXfTvHx5n3MdWywUAKKyOuZcD/rp0?=
- =?us-ascii?Q?viG/WisD3C7BdZetg7vWEjOJfUuS/uZWqTfOXEE5a0T3ju78u6G32B/iYCRr?=
- =?us-ascii?Q?2y+JTXSduJ4GoVV+XVH1qyLnlxTsWdqE2dTT2jsf78jFcMuQSCnuLh/GpQj5?=
- =?us-ascii?Q?MdClhQ6QaJk2GD64fROGVSHfaW/xAKSmLWLC+QahhzIVhr3QspOMIRFQshWn?=
- =?us-ascii?Q?qRzztxswhsFcgcFLhWsDlTpifVbu17GDHgMGKi5eK/IEk5QeBNgr4mo5jBbL?=
- =?us-ascii?Q?Q+KUTGAmhN+8PnxNW/aILukJAjP1y1Fr0skcXP59Vjf2MQNPzGrRCTn97BVI?=
- =?us-ascii?Q?5UPnXL1RPWZj5M5FaL8cDI3cKsA2egFyISJoTJcxoTwoV+2Oqiy1sIxgNOkq?=
- =?us-ascii?Q?s8DnaeEyV9lG8G47xNqnLlh5ukH6qAGWKSx/i1ZnVaZOWFwHpQ+s6r6kiQVE?=
- =?us-ascii?Q?EkWgPmnP5NtaRoLfNYuBkWjQKzPmgLYbt4jms5NvN3VMcdXdniKRAYQukHld?=
- =?us-ascii?Q?LNZ/dTGpQTaFGp1vbvL9qhQnsbeGkCGhsMfzc1BnLvIfbXiqkgZ3ZwkK+esX?=
- =?us-ascii?Q?8cX0bCrSXcy3CxMJmtzBTlwF4m/bKkP4fX42aO4TjE8PItZ+4MgiBwcZujTL?=
- =?us-ascii?Q?WX5Uuc154Ov3H4MfYcDPsc9V3zH5BRJ5+ELJ4dEJztaBxOSJT0kal2RB1CYi?=
- =?us-ascii?Q?nwaJkO4nwRHNFeDvvZcO3bCCEtkg?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AS8PR04MB8898.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?V8TD792SJ2JPibLZOwWgEYdtjp1p7FiaQgzmD7JnoLpcivvtSeme6vmBswv0?=
- =?us-ascii?Q?7wZyGsln7oqd2QYyTN5rl4MOjF0zrHlAnmAkY4dMEqo9F7AQTFWyk5f+htbA?=
- =?us-ascii?Q?4BEhP0OhOZ3DxkABWKKjhQWYTqc3uP19IieqMJrSVQutTLBGDytTBZR4CCVR?=
- =?us-ascii?Q?r9XbM4k3QV67rFNavubKzmXw4tXzS7qCLndKbM9i9Z7cqZOUa9MDeAEqX5jc?=
- =?us-ascii?Q?cr2uRiO0av2ODfseEQHbUH1lQgAOFxe8Nadn873rvpRNhiKRWITd+Hc3ctQu?=
- =?us-ascii?Q?y2a5hk0PCkUkUmNPVcwMRQF0ZgEzjlLnOpPW6A9Z0fJvtp29Q4blW/ZuHAkT?=
- =?us-ascii?Q?9bjI+y5dk3xzP06jv0RVOMvuYOpOGcdOk2b7yEgYoJVBjt5CbvBYrbJ00ado?=
- =?us-ascii?Q?Cu6/0RSiYMELIXu8Q38Rn5qMct1zfAfskJJwD5o0b7UHFLodsiYQBMRNGnSO?=
- =?us-ascii?Q?tz6eXM4woveXAUZLMADdyWFQ4CpQXFNMMo96f3sN7G0yHUn4NO0sxHdKWmdS?=
- =?us-ascii?Q?tNeQUOhPizjTcw2sNDlLPPqO+BvmSjQqwaNDiFbYKl8yRxtRJa1v+16MPrCU?=
- =?us-ascii?Q?UA0MFhT54qvdgETqY/zss2EBdTUm/mDeuJzuGOnd773XBJpURM8Ddmq3bLeA?=
- =?us-ascii?Q?Ht7QJexDzBTvrFeatKO9z+96VwIwNMdGeTByJOyCwN/Wt4z1mW31X6DHau0b?=
- =?us-ascii?Q?hsk2K8hB9htFjWcU18FxPDxuwGqmrjMAUog19iEP2/entstdVw+KdOPnHslq?=
- =?us-ascii?Q?20mxbDS6KO2iwXPHnTQCnCYjzoLJFysTEQQAZjl8Bxe6i9rit5b21tFRY9uU?=
- =?us-ascii?Q?Hut5PlCWC6KqJRMnWIRLh5vyOD0/MFm/FOK5xq+skecaaFhpqjbtAKnL8Vmj?=
- =?us-ascii?Q?doL68gXBsvSpZl+Svvv7qwuDJRzMg5c0mK1AabnPxREj7BUyTvqb8ywEaBP/?=
- =?us-ascii?Q?Ga89MRGctsg06o8uabJuwy9rACG7C7L4b/ULvR3f2SnTT0tH3UTuTRNutE1o?=
- =?us-ascii?Q?GNhVU4ppeo0dfoJa2EWMB3GUzP18j2KWgTtbmL0r1oXqRFbPrGLJYKlp/Rly?=
- =?us-ascii?Q?oA5PoX8wY8N5OJIke1q3ru1HZbC7ULp+R3ngylzylFh4qH/4lWuwF58iYceQ?=
- =?us-ascii?Q?hgNdyDFSAWfV42oEv5kJOrIszvtCdK04PdZBq4cyIUWvRgTkmzl629raMKXS?=
- =?us-ascii?Q?GmPGzCfG/SHeXC6jUmknhdlyGtYziBst27sIYthP1ExjcI4MWrqZeOxV74yp?=
- =?us-ascii?Q?Cbi24J0NPemZ53xoruOiqKKZ3eMWngfT/PiQ7RFTeNLH4a+wt8sEDXw5t0ua?=
- =?us-ascii?Q?hJVen2ONS2PxeZp37P6CSBzaldKa0gkEUfZyK07ej+ZExnuKZt44fURHpyfu?=
- =?us-ascii?Q?aTafKI6DP+QmQOorgFMK+O52DjpkVPic4aO+4fnWbK6EDQzYfam3taXtaUfP?=
- =?us-ascii?Q?wdztbf7jfAN+fR1uKMnx7hjn5Iq1VfXXIDzlXLv+uBOROCSJ9/HVJOg++bf8?=
- =?us-ascii?Q?Kfzcqt+pvbpLHVhCuuj9MqTS4pW/uwG3xaPXCOsbisDrr6cQdgtVU+sxxdf5?=
- =?us-ascii?Q?PmZZ/eWWnoekoR4Hf3w+0d3snQz0oCk5+yChpEeFUxeU9iFxo2fKLOL2rMQS?=
- =?us-ascii?Q?eQ=3D=3D?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8f1ceda2-350f-4169-0227-08dd2104e886
-X-MS-Exchange-CrossTenant-AuthSource: AS8PR04MB8898.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Dec 2024 14:45:12.3116
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 6EJbnv/JORREsR0FC0n44zadXUsB8/UJ07K+fyzWwBCyG655wOnVGaE/76loCIO3JoM0IUVHx/lZnh5bU+vNXw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS5PR04MB10059
+References: <20241220125812.84592-1-quic_amisjain@quicinc.com>
+In-Reply-To: <20241220125812.84592-1-quic_amisjain@quicinc.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Fri, 20 Dec 2024 09:47:12 -0500
+Message-ID: <CABBYNZJKyPJu965k6yco17f-J6sqxEQ7kc49mJcVpBL8N1d7Kw@mail.gmail.com>
+Subject: Re: [PATCH v1] obex: Implement support for message listing format
+ version 1.1 for MCE
+To: Amisha Jain <quic_amisjain@quicinc.com>
+Cc: linux-bluetooth@vger.kernel.org, quic_mohamull@quicinc.com, 
+	quic_hbandi@quicinc.com, quic_anubhavg@quicinc.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-This fixes the transport select flow in bluetoothctl: If the user tries
-to select multiple encrypted transports, the prompts for the Broadcast
-Code overlap, causing the UI to be distorted:
+Hi Amisha,
 
-[11-AE-0A-C1-F4-30]# transport.select
-                     /org/bluez/hci0/dev_11_AE_0A_C1_F4_30/bis1/fd0
-                     /org/bluez/hci0/dev_11_AE_0A_C1_F4_30/bis2/fd1
-[] Enter brocast code[value/no]: Successfully linked transport
-                     /org/bluez/hci0/dev_11_AE_0A_C1_F4_30/bis2/fd1
-[] Enter brocast code[value/no]: Borne House
-(null)Setting broadcast code succeeded
-(null)[CHG] Transport /org/bluez/hci0/dev_11_AE_0A_C1_F4_30/bis1/fd0
-                     State: broadcasting
-(null)Select successful
-(null)
+On Fri, Dec 20, 2024 at 7:58=E2=80=AFAM Amisha Jain <quic_amisjain@quicinc.=
+com> wrote:
+>
+> As per spec, Messages-Listing Format Version 1.1 is being marked
+> mandatory feature to be supported in MAP 1.3 & above versions.
+> This change is added for MAP client role.
+>
+> This change is required for passing below testcases-
+> 1) MAP/MCE/MFB/BV-01-C
+> Verify that the MCE correctly advertises the correct feature bits
+> in the MNS SDP record.
+> 2) MAP/MCE/MFB/BV-03-C
+> Verify that the MCE correctly advertises the correct MapSupportedFeatures
+> bits in the MNS SDP record during MAS connection.
+>
+> Also add the Messages-Listing Format Version 1.1 as supported
+> in mns sdp record.
+>
+> ---
+>  obexd/client/map.c | 169 +++++++++++++++++++++++++++++++++++++++++++++
+>  src/profile.c      |   2 +-
+>  2 files changed, 170 insertions(+), 1 deletion(-)
+>
+> diff --git a/obexd/client/map.c b/obexd/client/map.c
+> index 29b0ed96e..c6f3dd342 100644
+> --- a/obexd/client/map.c
+> +++ b/obexd/client/map.c
+> @@ -123,6 +123,11 @@ struct map_msg {
+>         uint64_t attachment_size;
+>         uint8_t flags;
+>         char *folder;
+> +       char *delivery_status;
+> +       uint64_t conversation_id;
+> +       char *conversation_name;
+> +       char *direction;
+> +       char *attachment_mime_types;
+>         GDBusPendingPropertySet pending;
+>  };
+>
+> @@ -418,6 +423,10 @@ static void map_msg_free(void *data)
+>         g_free(msg->recipient_address);
+>         g_free(msg->type);
+>         g_free(msg->status);
+> +       g_free(msg->delivery_status);
+> +       g_free(msg->conversation_name);
+> +       g_free(msg->direction);
+> +       g_free(msg->attachment_mime_types);
+>         g_free(msg);
+>  }
+>
+> @@ -778,6 +787,93 @@ static void set_deleted(const GDBusPropertyTable *pr=
+operty,
+>         set_status(property, iter, id, STATUS_DELETE, data);
+>  }
+>
+> +static gboolean delivery_status_exists(const GDBusPropertyTable *propert=
+y,
+> +                                                               void *dat=
+a)
+> +{
+> +       struct map_msg *msg =3D data;
+> +
+> +       return msg->delivery_status !=3D NULL;
+> +}
+> +
+> +static gboolean get_delivery_status(const GDBusPropertyTable *property,
+> +                                       DBusMessageIter *iter, void *data=
+)
+> +{
+> +       struct map_msg *msg =3D data;
+> +
+> +       dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING,
+> +                                               &msg->delivery_status);
+> +
+> +       return TRUE;
+> +}
+> +
+> +static gboolean get_conversation_id(const GDBusPropertyTable *property,
+> +                                       DBusMessageIter *iter, void *data=
+)
+> +{
+> +       struct map_msg *msg =3D data;
+> +
+> +       dbus_message_iter_append_basic(iter, DBUS_TYPE_UINT64,
+> +                                               &msg->conversation_id);
+> +
+> +       return TRUE;
+> +}
+> +
+> +static gboolean conversation_name_exists(const GDBusPropertyTable *prope=
+rty,
+> +                                                               void *dat=
+a)
+> +{
+> +       struct map_msg *msg =3D data;
+> +
+> +       return msg->conversation_name !=3D NULL;
+> +}
+> +
+> +static gboolean get_conversation_name(const GDBusPropertyTable *property=
+,
+> +                                       DBusMessageIter *iter, void *data=
+)
+> +{
+> +       struct map_msg *msg =3D data;
+> +
+> +       dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING,
+> +                                               &msg->conversation_name);
+> +
+> +       return TRUE;
+> +}
+> +
+> +static gboolean direction_exists(const GDBusPropertyTable *property,
+> +                                                               void *dat=
+a)
+> +{
+> +       struct map_msg *msg =3D data;
+> +
+> +       return msg->direction !=3D NULL;
+> +}
+> +
+> +static gboolean get_direction(const GDBusPropertyTable *property,
+> +                                       DBusMessageIter *iter, void *data=
+)
+> +{
+> +       struct map_msg *msg =3D data;
+> +
+> +       dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING,
+> +                                                       &msg->direction);
+> +
+> +       return TRUE;
+> +}
+> +
+> +static gboolean attachment_mime_exists(const GDBusPropertyTable *propert=
+y,
+> +                                                               void *dat=
+a)
+> +{
+> +       struct map_msg *msg =3D data;
+> +
+> +       return msg->attachment_mime_types !=3D NULL;
+> +}
+> +
+> +static gboolean get_attachment_mime_types(const GDBusPropertyTable *prop=
+erty,
+> +                                       DBusMessageIter *iter, void *data=
+)
+> +{
+> +       struct map_msg *msg =3D data;
+> +
+> +       dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING,
+> +                                               &msg->attachment_mime_typ=
+es);
+> +
+> +       return TRUE;
+> +}
+> +
+>  static const GDBusMethodTable map_msg_methods[] =3D {
+>         { GDBUS_METHOD("Get",
+>                         GDBUS_ARGS({ "targetfile", "s" },
+> @@ -809,6 +905,13 @@ static const GDBusPropertyTable map_msg_properties[]=
+ =3D {
+>         { "Sent", "b", get_sent },
+>         { "Protected", "b", get_protected },
+>         { "Deleted", "b", NULL, set_deleted },
+> +       { "DeliveryStatus", "s", get_delivery_status, NULL, delivery_stat=
+us_exists },
+> +       { "ConversationId", "t", get_conversation_id },
+> +       { "ConversationName", "s", get_conversation_name, NULL,
+> +                                               conversation_name_exists =
+},
+> +       { "Direction", "s", get_direction, NULL, direction_exists },
+> +       { "AttachmentMimeTypes", "s", get_attachment_mime_types, NULL,
+> +                                                       attachment_mime_e=
+xists },
 
-This commit updates the transport select command handler to first
-link all transports before setting the Broadcast Code only on the
-primary link (the Broadcast Code is common for all BISes in the BIG).
-After the Broadcast Code is successfully set, each link is selected
-one by one. The bluetoothctl log below shows the updated output:
+Before you go ahead adding new properties you need to update
+org.bluez.obex.Message interface explaining what each new property
+represents, if they are optional, etc.
 
-client/bluetoothctl
-[bluetooth]# endpoint.register 00001851-0000-1000-8000-00805f9b34fb 0x06
-[/local/endpoint/ep0] Auto Accept (yes/no): y
-[/local/endpoint/ep0] Max Transports (auto/value): a
-[/local/endpoint/ep0] Locations: 1
-[/local/endpoint/ep0] Supported Context (value): 1
-[bluetooth]# Endpoint /local/endpoint/ep0 registered
-[bluetooth]# scan on
-[bluetooth]# [NEW] Device 11:16:BD:36:58:3F 11-16-BD-36-58-3F
-[11-16-BD-36-58-3F]# [CHG] Device 11:16:BD:36:58:3F Connected: yes
-[11-16-BD-36-58-3F]# [NEW] Transport
-                     /org/bluez/hci0/dev_11_16_BD_36_58_3F/bis1/fd0
-[11-16-BD-36-58-3F]# [NEW] Transport
-                     /org/bluez/hci0/dev_11_16_BD_36_58_3F/bis2/fd1
-[11-16-BD-36-58-3F]# transport.select
-                     /org/bluez/hci0/dev_11_16_BD_36_58_3F/bis1/fd0
-                     /org/bluez/hci0/dev_11_16_BD_36_58_3F/bis2/fd1
-[11-AE-0A-C1-F4-30]# Successfully linked transport
-                     /org/bluez/hci0/dev_11_AE_0A_C1_F4_30/bis2/fd3
-[] Enter brocast code[value/no]: Borne House
-[11-AE-0A-C1-F4-30]# Setting broadcast code succeeded
-[11-AE-0A-C1-F4-30]# [CHG] Transport
-                     /org/bluez/hci0/dev_11_AE_0A_C1_F4_30/bis1/fd2
-                     State: broadcasting
-[11-AE-0A-C1-F4-30]# Select successful
-[11-AE-0A-C1-F4-30]# [CHG] Transport
-                     /org/bluez/hci0/dev_11_AE_0A_C1_F4_30/bis2/fd3
-                     State: broadcasting
-[11-AE-0A-C1-F4-30]# Select successful
-[11-AE-0A-C1-F4-30]# transport.acquire
-                     /org/bluez/hci0/dev_11_AE_0A_C1_F4_30/bis1/fd2
-                     /org/bluez/hci0/dev_11_AE_0A_C1_F4_30/bis2/fd3
-auto acquiring...
-Transport /org/bluez/hci0/dev_11_AE_0A_C1_F4_30/bis1/fd2 acquiring
-auto acquiring...
-Transport /org/bluez/hci0/dev_11_AE_0A_C1_F4_30/bis2/fd3 acquiring
-[11-AE-0A-C1-F4-30]# Transport
-                     /org/bluez/hci0/dev_11_AE_0A_C1_F4_30/bis1/fd2
-                     acquiring complete
-[11-AE-0A-C1-F4-30]# Acquire successful: fd 11 MTU 40:0
-[11-AE-0A-C1-F4-30]# [CHG] Transport
-                     /org/bluez/hci0/dev_11_AE_0A_C1_F4_30/bis1/fd2
-                     State: active
-[11-AE-0A-C1-F4-30]# Transport
-                     /org/bluez/hci0/dev_11_AE_0A_C1_F4_30/bis2/fd3
-                     acquiring complete
-[11-AE-0A-C1-F4-30]# Acquire successful: fd 7 MTU 40:0
-[11-AE-0A-C1-F4-30]# [CHG] Transport
-                     /org/bluez/hci0/dev_11_AE_0A_C1_F4_30/bis2/fd3
-                     State: active
+>         { }
+>  };
+>
+> @@ -1061,6 +1164,67 @@ static void parse_protected(struct map_msg *msg, c=
+onst char *value)
+>                                                 MAP_MSG_INTERFACE, "Prote=
+cted");
+>  }
+>
+> +static void parse_delivery_status(struct map_msg *msg, const char *value=
+)
+> +{
+> +       if (g_strcmp0(msg->delivery_status, value) =3D=3D 0)
+> +               return;
+> +
+> +       g_free(msg->delivery_status);
+> +       msg->delivery_status =3D g_strdup(value);
+> +
+> +       g_dbus_emit_property_changed(conn, msg->path,
+> +                                       MAP_MSG_INTERFACE, "DeliveryStatu=
+s");
+> +}
+> +
+> +static void parse_conversation_id(struct map_msg *msg, const char *value=
+)
+> +{
+> +       uint64_t conversation_id =3D strtoull(value, NULL, 16);
+> +
+> +       if (msg->conversation_id =3D=3D conversation_id)
+> +               return;
+> +
+> +       msg->conversation_id =3D conversation_id;
+> +
+> +       g_dbus_emit_property_changed(conn, msg->path,
+> +                                       MAP_MSG_INTERFACE, "ConversationI=
+d");
+> +}
+> +
+> +static void parse_conversation_name(struct map_msg *msg, const char *val=
+ue)
+> +{
+> +       if (g_strcmp0(msg->conversation_name, value) =3D=3D 0)
+> +               return;
+> +
+> +       g_free(msg->conversation_name);
+> +       msg->conversation_name =3D g_strdup(value);
+> +
+> +       g_dbus_emit_property_changed(conn, msg->path,
+> +                                               MAP_MSG_INTERFACE, "Conve=
+rsationName");
+> +}
+> +
+> +static void parse_direction(struct map_msg *msg, const char *value)
+> +{
+> +       if (g_strcmp0(msg->direction, value) =3D=3D 0)
+> +               return;
+> +
+> +       g_free(msg->direction);
+> +       msg->direction =3D g_strdup(value);
+> +
+> +       g_dbus_emit_property_changed(conn, msg->path,
+> +                                               MAP_MSG_INTERFACE, "Direc=
+tion");
+> +}
+> +
+> +static void parse_mime_types(struct map_msg *msg, const char *value)
+> +{
+> +       if (g_strcmp0(msg->attachment_mime_types, value) =3D=3D 0)
+> +               return;
+> +
+> +       g_free(msg->attachment_mime_types);
+> +       msg->attachment_mime_types =3D g_strdup(value);
+> +
+> +       g_dbus_emit_property_changed(conn, msg->path,
+> +                                               MAP_MSG_INTERFACE, "Attac=
+hmentMimeTypes");
+> +}
+> +
+>  static const struct map_msg_parser {
+>         const char *name;
+>         void (*func) (struct map_msg *msg, const char *value);
+> @@ -1081,6 +1245,11 @@ static const struct map_msg_parser {
+>                 { "read", parse_read },
+>                 { "sent", parse_sent },
+>                 { "protected", parse_protected },
+> +               { "delivery_status", parse_delivery_status},
+> +               { "conversation_id", parse_conversation_id},
+> +               { "conversation_name", parse_conversation_name},
+> +               { "direction", parse_direction},
+> +               { "attachment_mime_types", parse_mime_types},
+>                 { }
+>  };
+>
+> diff --git a/src/profile.c b/src/profile.c
+> index 6bc6778de..70ac058f4 100644
+> --- a/src/profile.c
+> +++ b/src/profile.c
+> @@ -563,7 +563,7 @@
+>                         <text value=3D\"%s\"/>                           =
+ \
+>                 </attribute>                                            \
+>                 <attribute id=3D\"0x0317\">                              =
+ \
+> -                       <uint32 value=3D\"0x0000007f\"/>                 =
+ \
+> +                       <uint32 value=3D\"0x0000027f\"/>                 =
+ \
+>                 </attribute>                                            \
+>                 <attribute id=3D\"0x0200\">                              =
+ \
+>                         <uint16 value=3D\"%u\" name=3D\"psm\"/>          =
+   \
 
-The BIG Create Sync command is sent with the correct Broadcast Code,
-for the 2 acquired BISes:
+Are you bumping the version here? I guess we want to update the
+documentation about the profiles versions as well.
 
-< HCI Command: LE Broadcast Isochronous Group Create Sync (0x08|0x006b)
-        BIG Handle: 0x00
-        BIG Sync Handle: 0x0000
-        Encryption: Encrypted (0x01)
-        Broadcast Code[16]: 426f726e6520486f7573650000000000
-        Maximum Number Subevents: 0x00
-        Timeout: 20000 ms (0x07d0)
-        Number of BIS: 2
-        BIS ID: 0x01
-        BIS ID: 0x02
-> HCI Event: Command Status (0x0f)
-      LE Broadcast Isochronous Group Create Sync (0x08|0x006b) ncmd 1
-        Status: Success (0x00)
----
- client/player.c | 159 ++++++++++++++++++++++++++++++++++++++----------
- 1 file changed, 127 insertions(+), 32 deletions(-)
+> --
+> 2.34.1
+>
+>
 
-diff --git a/client/player.c b/client/player.c
-index f93c9d908..464a9cc14 100644
---- a/client/player.c
-+++ b/client/player.c
-@@ -115,6 +115,8 @@ struct endpoint {
- 	uint8_t iso_group;
- 	uint8_t iso_stream;
- 	struct queue *acquiring;
-+	struct queue *links;
-+	struct queue *selecting;
- 	struct queue *transports;
- 	DBusMessage *msg;
- 	struct preset *preset;
-@@ -148,6 +150,9 @@ struct transport {
- 	int num;
- };
- 
-+static void transport_set_links(struct endpoint *ep, GDBusProxy *proxy);
-+static void transport_select(GDBusProxy *proxy);
-+
- static void endpoint_unregister(void *data)
- {
- 	struct endpoint *ep = data;
-@@ -2918,6 +2923,8 @@ static void endpoint_free(void *data)
- 		free(ep->preset);
- 
- 	queue_destroy(ep->acquiring, NULL);
-+	queue_destroy(ep->links, NULL);
-+	queue_destroy(ep->selecting, NULL);
- 	queue_destroy(ep->transports, free);
- 
- 	g_free(ep->path);
-@@ -4887,6 +4894,7 @@ static void acquire_reply(DBusMessage *message, void *user_data)
- static void select_reply(DBusMessage *message, void *user_data)
- {
- 	DBusError error;
-+	struct endpoint *ep = user_data;
- 
- 	dbus_error_init(&error);
- 
-@@ -4898,7 +4906,13 @@ static void select_reply(DBusMessage *message, void *user_data)
- 
- 	bt_shell_printf("Select successful\n");
- 
--	return bt_shell_noninteractive_quit(EXIT_SUCCESS);
-+	if (queue_isempty(ep->selecting)) {
-+		/* All links have been selected */
-+		queue_destroy(ep->selecting, NULL);
-+		ep->selecting = NULL;
-+
-+		return bt_shell_noninteractive_quit(EXIT_SUCCESS);
-+	}
- }
- 
- static void unselect_reply(DBusMessage *message, void *user_data)
-@@ -5170,9 +5184,7 @@ static void set_bcode_cb(const DBusError *error, void *user_data)
- 
- 	bt_shell_printf("Setting broadcast code succeeded\n");
- 
--	if (!g_dbus_proxy_method_call(proxy, "Select", NULL,
--				select_reply, proxy, NULL))
--		return bt_shell_noninteractive_quit(EXIT_FAILURE);
-+	transport_select(proxy);
- }
- 
- static void set_bcode(const char *input, void *user_data)
-@@ -5197,15 +5209,35 @@ static void set_bcode(const char *input, void *user_data)
- 	g_free(bcode);
- }
- 
--static void transport_select(void *data, void *user_data)
-+static void transport_select(GDBusProxy *proxy)
-+{
-+	struct endpoint *ep;
-+	GDBusProxy *link;
-+
-+	ep = find_ep_by_transport(g_dbus_proxy_get_path(proxy));
-+	if (!ep)
-+		return bt_shell_noninteractive_quit(EXIT_FAILURE);
-+
-+	if (!g_dbus_proxy_method_call(proxy, "Select", NULL,
-+					select_reply, ep, NULL)) {
-+		bt_shell_printf("Failed select transport\n");
-+		return bt_shell_noninteractive_quit(EXIT_FAILURE);
-+	}
-+
-+	/* Select next link */
-+	link = queue_pop_head(ep->selecting);
-+	if (link)
-+		transport_select(link);
-+}
-+
-+static void transport_set_bcode(GDBusProxy *proxy)
- {
--	GDBusProxy *proxy = data;
- 	DBusMessageIter iter, array, entry, value;
- 	unsigned char encryption;
- 	const char *key;
- 
- 	if (g_dbus_proxy_get_property(proxy, "QoS", &iter) == FALSE)
--		return;
-+		return bt_shell_noninteractive_quit(EXIT_FAILURE);
- 
- 	dbus_message_iter_recurse(&iter, &array);
- 
-@@ -5229,11 +5261,10 @@ static void transport_select(void *data, void *user_data)
- 		dbus_message_iter_next(&array);
- 	}
- 
--	if (!g_dbus_proxy_method_call(proxy, "Select", NULL,
--					select_reply, proxy, NULL)) {
--		bt_shell_printf("Failed select transport\n");
--		return;
--	}
-+	/* Go straight to selecting transport, if Broadcast Code
-+	 * is not required.
-+	 */
-+	transport_select(proxy);
- }
- 
- static void transport_unselect(GDBusProxy *proxy, bool prompt)
-@@ -5247,7 +5278,23 @@ static void transport_unselect(GDBusProxy *proxy, bool prompt)
- 
- static void set_links_cb(const DBusError *error, void *user_data)
- {
--	GDBusProxy *link = user_data;
-+	GDBusProxy *proxy = user_data;
-+	const char *path = g_dbus_proxy_get_path(proxy);
-+	struct endpoint *ep;
-+	GDBusProxy *link;
-+
-+	ep = find_ep_by_transport(path);
-+	if (!ep) {
-+		bt_shell_printf("Local endpoint not found\n");
-+		return bt_shell_noninteractive_quit(EXIT_FAILURE);
-+	}
-+
-+	link = queue_pop_head(ep->links);
-+
-+	if (queue_isempty(ep->links)) {
-+		queue_destroy(ep->links, NULL);
-+		ep->links = NULL;
-+	}
- 
- 	if (dbus_error_is_set(error)) {
- 		bt_shell_printf("Failed to set link %s: %s\n",
-@@ -5258,13 +5305,60 @@ static void set_links_cb(const DBusError *error, void *user_data)
- 
- 	bt_shell_printf("Successfully linked transport %s\n",
- 						g_dbus_proxy_get_path(link));
-+
-+	if (!ep->selecting)
-+		ep->selecting = queue_new();
-+
-+	/* Enqueue link to mark that it is ready to be selected */
-+	queue_push_tail(ep->selecting, link);
-+
-+	/* Continue setting the remanining links */
-+	transport_set_links(ep, proxy);
-+}
-+
-+static void transport_set_links(struct endpoint *ep, GDBusProxy *proxy)
-+{
-+	GDBusProxy *link;
-+	const char *path;
-+
-+	link = queue_peek_head(ep->links);
-+	if (link) {
-+		path = g_dbus_proxy_get_path(link);
-+
-+		if (g_dbus_proxy_set_property_array(proxy, "Links",
-+					DBUS_TYPE_OBJECT_PATH,
-+					&path, 1, set_links_cb,
-+					proxy, NULL) == FALSE) {
-+			bt_shell_printf("Linking transport %s failed\n", path);
-+			return bt_shell_noninteractive_quit(EXIT_FAILURE);
-+		}
-+
-+		return;
-+	}
-+
-+	/* If all links have been set, check is transport requires the
-+	 * user to provide a Broadcast Code.
-+	 */
-+	transport_set_bcode(proxy);
-+}
-+
-+static void endpoint_set_links(struct endpoint *ep)
-+{
-+	GDBusProxy *proxy = queue_pop_head(ep->links);
-+
-+	if (!proxy) {
-+		bt_shell_printf("No transport to set links for\n");
-+		return bt_shell_noninteractive_quit(EXIT_FAILURE);
-+	}
-+
-+	transport_set_links(ep, proxy);
- }
- 
- static void cmd_select_transport(int argc, char *argv[])
- {
--	GDBusProxy *proxy = NULL, *link;
-+	GDBusProxy *link = NULL;
- 	struct queue *links = queue_new();
--	const char *path;
-+	struct endpoint *ep;
- 	int i;
- 
- 	for (i = 1; i < argc; i++) {
-@@ -5272,35 +5366,36 @@ static void cmd_select_transport(int argc, char *argv[])
- 					BLUEZ_MEDIA_TRANSPORT_INTERFACE);
- 		if (!link) {
- 			bt_shell_printf("Transport %s not found\n", argv[i]);
--			return bt_shell_noninteractive_quit(EXIT_FAILURE);
-+			goto fail;
- 		}
- 
- 		if (find_transport(link)) {
- 			bt_shell_printf("Transport %s already acquired\n",
- 					argv[i]);
--			return bt_shell_noninteractive_quit(EXIT_FAILURE);
-+			goto fail;
- 		}
- 
-+		/* Enqueue all links */
- 		queue_push_tail(links, link);
-+	}
- 
--		if (!proxy) {
--			proxy = link;
--			continue;
--		}
-+	/* Get reference to local endpoint */
-+	ep = find_ep_by_transport(g_dbus_proxy_get_path(link));
-+	if (!ep) {
-+		bt_shell_printf("Local endpoint not found\n");
-+		goto fail;
-+	}
- 
--		path = g_dbus_proxy_get_path(link);
-+	ep->links = links;
- 
--		if (g_dbus_proxy_set_property_array(proxy, "Links",
--					DBUS_TYPE_OBJECT_PATH,
--					&path, 1, set_links_cb,
--					link, NULL) == FALSE) {
--			bt_shell_printf("Linking transport %s failed\n",
--								argv[i]);
--			return bt_shell_noninteractive_quit(EXIT_FAILURE);
--		}
--	}
-+	/* Link streams before selecting one by one */
-+	endpoint_set_links(ep);
-+
-+	return;
- 
--	queue_foreach(links, transport_select, NULL);
-+fail:
-+	queue_destroy(links, NULL);
-+	return bt_shell_noninteractive_quit(EXIT_FAILURE);
- }
- 
- static void cmd_unselect_transport(int argc, char *argv[])
--- 
-2.43.0
 
+--=20
+Luiz Augusto von Dentz
