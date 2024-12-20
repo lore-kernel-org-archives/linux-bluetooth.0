@@ -1,124 +1,120 @@
-Received: from mail-qv1-f50.google.com (mail-qv1-f50.google.com [209.85.219.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-relay-internal-0.canonical.com (smtp-relay-internal-0.canonical.com [185.125.188.122])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5F502A1D1
-	for <linux-bluetooth@vger.kernel.org>; Fri, 20 Dec 2024 03:31:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E53BE8632B
+	for <linux-bluetooth@vger.kernel.org>; Fri, 20 Dec 2024 08:22:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.122
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734665501; cv=none; b=mhsJ1CZK9pHm8bQDkqET+J2YgJYPGoL1KrehzhC3aAhz2K7M2fuOg0VTQhlok7snVG5f2qjqNUQCmJkwv7E8oSSG3G9oAriLqogDwIPZmmLC7SXNGycCgmxQQ4p13fdIxkvQf4CSq2M/ZY2BgelFwJgN01Kza+fHCZKju8rcxmM=
+	t=1734682965; cv=none; b=ozJn5kJTpdKnq/CscYsnbvF2DaKU9/biM4KrIZ3Vbs07dQ3r/e3iL5CLGAixuWOFAuq4niOkinsk8AQQcwPR4+aIUJZr9PrmRwF4SYmHqEQPeklNrm7VjbrdKvCrelFNdHpqTArs71VQItyVMBknKbMrfauKCENPY6KVWyspK74=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734665501; c=relaxed/simple;
-	bh=7CHSeNhYV1xr24/TWiVl8LMIfH7I6Ce3mrPFueAEvu4=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=q8ZXzcd3LPLy2rnfN2bIb5I1h9BzsiMqYB1lqOVTW12qMigAuk61EfN1fv5VCSO+yG3HA+FhV6tbTeN5AmYNN7NLAdwQEozcAb7K7nrK5SWjlcVGPph7ogHM4B+Ma0wUtp8jeAi9VDY3/3EXmJTw+eBGztLQmrlIUxJdCk2QcQ4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SoElYNVH; arc=none smtp.client-ip=209.85.219.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1734682965; c=relaxed/simple;
+	bh=0OC55Al4J0J7rKt8QDIR7HjE47S5GI/De2AjS2HTTyI=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=qZeycO0OxMTWXVXMnVLTPqVLEgd3VBL6HAYebkX+p3myymVONYyEPWxN/itqIjO9abu3hVAgbMP85Wm8+DdmlAjlAVKfkX62J5BMFLewWmlB6HOcd1tcb/n3QoBT5PeCAJts5GWfgOAMBlvsvVD0PfhIlPONYjP5czWJdWeoeUQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b=QDRbKLjo; arc=none smtp.client-ip=185.125.188.122
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SoElYNVH"
-Received: by mail-qv1-f50.google.com with SMTP id 6a1803df08f44-6dccccd429eso11761016d6.3
-        for <linux-bluetooth@vger.kernel.org>; Thu, 19 Dec 2024 19:31:39 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1734665498; x=1735270298; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=gaXq5ZCQ5kCTjPjwBphtv19IigM/hcc+0D/ydYV2vdQ=;
-        b=SoElYNVHMiHR20BJv2espJBND9I9aZZGWYVJsulesU3PiT10V8qlOsZ+FFSWH3bVzo
-         MktLlgZSwYIUVdC7Stc2ZyMyBcWJusFl5R8hMElQga3i2RD/ViXbBdqSExTnNgrNAJ7c
-         nb/0NMZVx9CKzmYLLnmYuPQMFq/BjBXjydBIGxXEcZsE+Ci44cDPxQTdCbw85H3vqXP0
-         Aq3SbpZs0a6qhF4LHoJccqdyd21i1tMxyMud3AZyyEzn7xvhXsY8gYZFpF5g/S3njkqG
-         m//rJFwoDPzVtTffUEYbStlPf6wp1knF0pThr03hY0RNzu+eHrDSzaAkJ19+8v6+9Vfc
-         QZ7Q==
+	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="QDRbKLjo"
+Received: from mail-pf1-f199.google.com (mail-pf1-f199.google.com [209.85.210.199])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-relay-internal-0.canonical.com (Postfix) with ESMTPS id CE2F63F688
+	for <linux-bluetooth@vger.kernel.org>; Fri, 20 Dec 2024 08:22:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
+	s=20210705; t=1734682952;
+	bh=ZKWxqv+/d/UlGXH+lUF4T34EylRckkfoJKBfUXiLv0Q=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version;
+	b=QDRbKLjo8u0US4rN2XFZtN+HrehY46Vao1OkAbYyvjf5pDzgcVD5NNtVAOVRx0Yw9
+	 4k0HS6H9lihQdo40PEHFGu2GVC8w6rXU6ur1r508qnvCkRqCVN5ryVzDShjFophY8i
+	 PdtyA/Z8iERsOBG4MJ9yDAYvvUwMCszUeAfvWqLTQVdFX0R+YmDQUXlgjrsKD/b3Eh
+	 7Scodqbq/qZPYkqfJVot/sdVa8e23Gu0eOrk9hT90ebTdvB33bVZeSeU1ZbzSr+dzG
+	 BV+dAVBmy+hoY8IudPiwcnxEq+GrYtWY6Oz6WNeZ/27fZ7uG2ZcDfVbhozltsu8Vio
+	 B3xJpBJ7XOcZg==
+Received: by mail-pf1-f199.google.com with SMTP id d2e1a72fcca58-728cd4fd607so1622672b3a.0
+        for <linux-bluetooth@vger.kernel.org>; Fri, 20 Dec 2024 00:22:32 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734665498; x=1735270298;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=gaXq5ZCQ5kCTjPjwBphtv19IigM/hcc+0D/ydYV2vdQ=;
-        b=PLlQKae/ITc/WmiOWEBqQTLVXKCSE+uI7zJjviYLbuUMgQi0GM1hestISSd1Glanxz
-         TIi1dSNdh04Xk0iFhd++kIZ3DXQUWxhNzwp1vpQQGyIYYxK71Bd9SoY7w1LMzI6/VhN6
-         gLR93ReSUgjHqTdaeNQN9XMotJ1wz3W58gHzbUdihylefPaSJzx4KM6Xdy03AA/8/aCT
-         Fw5eydhaXcdzrFPafM2FbH5joHQrQedyNn4AlAOKcES6S+EhjzYE3D+vFteucDgJr99g
-         1cGmbEADRoCJw3+bKpFy7WzZLrDIZFPLY/yRWMD5ymzUdmN4GuKHDXj4g6KODnoZkk0G
-         h5ng==
-X-Gm-Message-State: AOJu0YyKBvpQB77KbYwYnxR6Le1rTqywXTlwXu2HBGDWaMBhvbZZGSZ6
-	lQ9JYzudk7l6r1VZHhg+NiP+D7UDPnamABEBCEKHzl8PqS7o+Pq3mTIH6g==
-X-Gm-Gg: ASbGncuIHw9GqJae4TETMc+yZdM799evN3NhT/BOS6RSstSodwvwZg+e1EzOTvZyT5F
-	X+svGZaA0eXyyjiIKP1nDdkVxzlqLp8+Wp8BBG5Lyqx4GT0ZIFof41eg5yr/TMD4IycLFNlfEQE
-	NhpDNFZellrKAzaUUIYsYQ73uBXATRLwJWXa1+roiCV2RmB6d518N3+z4W9ihkkwcYIZh6DqdAT
-	filIXRPWUV63Nmh7CwrbbXo7wAA3EOY5KKeKQpbzBbP+Ub6MQC4Du1zDkaKHQ==
-X-Google-Smtp-Source: AGHT+IHROMasiauiyUzGz2NG1evESzpxsAm9ldF8/wuSmEhO9TXe4dgLiEKwOtWEGV7BD/0UuKgzew==
-X-Received: by 2002:ad4:5ba5:0:b0:6d8:a84b:b50d with SMTP id 6a1803df08f44-6dd2339ff8cmr21729896d6.33.1734665498316;
-        Thu, 19 Dec 2024 19:31:38 -0800 (PST)
-Received: from [172.17.0.2] ([20.161.78.56])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6dd181d53ecsm12672316d6.114.2024.12.19.19.31.37
+        d=1e100.net; s=20230601; t=1734682951; x=1735287751;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ZKWxqv+/d/UlGXH+lUF4T34EylRckkfoJKBfUXiLv0Q=;
+        b=NB0mvYu/Rx/HY5JjDarXyuPopG/5PnTcdeQXForBoHJ7MXSTE1oqRBnPOTDpT03gtp
+         pihC0w9LdCjw6uEbQnLzo4DPPOCQaGGTSH/J4xrFjDQsDAQIDGprFEmRkNq4pgqPZtjr
+         gyh3uVsIOECYCJofA8kJH2uNLLLIfXJwjX6q/E3mfpE5PvT/am+R9K70m6eNl3bRLxVb
+         fNH87GFTz4L9rFbTooBrGPSy9qgCR240nPGzKtDdOcmc+g5o1Pxnh0uGuJWZ+uIPCbvb
+         hdwDRGmlOax4q0fZO0T6efnhQrXdLrzT5bTLHA03ZZT0cem3bq0TMPjAsLmK90Thaz/f
+         K8JA==
+X-Forwarded-Encrypted: i=1; AJvYcCUTOZD1Wr6BtBlDTyHWLusa+7pmGOE+RiUZUU0TJGV/mVErieBWVSDFYE35i6uZjBc64Yyo++O1oMtt7jNed/8=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxd1UcoEM66M48SfHExsj1kRC2MCyLjuQV5B++Nuhsf41v/+bke
+	r801vIGmjYpg3Tzd/Gs9n3q89eBQ/3fRLIfhNOnIc2dyAylIIHTn6EG/2LaDbXqGO61tbD4FBcY
+	upT4WgJkfbUgD6oC8Y14bi96oFuYYTDaZTCRUVrXC1Ur/l0Q33wuJsr10SG70tQGAexkoLy5V+f
+	VBoedyKQ==
+X-Gm-Gg: ASbGnctnQqo4qRLg6PZebyb/7KzPfg1BhdloJE7gkhmAZHYX25zcq1Rxq16c6QybDeG
+	zKgHqZ6dNN7flwGZ/HvQdYzlgwqFL1X3bSRUxOxoN//tevhEATkLsb7CxldG6AJy0zu7dJZHPGa
+	r+nea+sYyDmw5pTMDdNEKND5FZSunHoNCu23Z/ozvBr/ChME0ZXGNgAmoByqXj4VyG4XKTqOIi6
+	1py5XcWee/ksbHRSYAbt2+oqiPFZ7HULQDTruw0dqtllhs+HNWKjLIyb/ohPpvsdU4OjNRubRzn
+	pqr0oyMTrVwCxbDM9MSCvGXidvLuRhA128RusoH9zc8M3pYnrm5UIPUwRmo=
+X-Received: by 2002:a05:6a20:6a25:b0:1d9:18af:d150 with SMTP id adf61e73a8af0-1e5e05a9e39mr3675557637.21.1734682950653;
+        Fri, 20 Dec 2024 00:22:30 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFm7GX+pP1g923C5hQQ0a9bh32CJGMl4Fogybf96/cjd8Uk0Kyt2ntUkVZ/cENoayYT+cCTTw==
+X-Received: by 2002:a05:6a20:6a25:b0:1d9:18af:d150 with SMTP id adf61e73a8af0-1e5e05a9e39mr3675527637.21.1734682950294;
+        Fri, 20 Dec 2024 00:22:30 -0800 (PST)
+Received: from rickywu0421-ThinkPad-X1-Carbon-Gen-11.. (118-163-61-247.hinet-ip.hinet.net. [118.163.61.247])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-72aad90e439sm2567942b3a.178.2024.12.20.00.22.28
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 19 Dec 2024 19:31:37 -0800 (PST)
-Message-ID: <6764e519.0c0a0220.1817a7.4fbf@mx.google.com>
-Date: Thu, 19 Dec 2024 19:31:37 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============4155734946613082019=="
+        Fri, 20 Dec 2024 00:22:29 -0800 (PST)
+From: En-Wei Wu <en-wei.wu@canonical.com>
+To: marcel@holtmann.org,
+	luiz.dentz@gmail.com,
+	linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] Bluetooth: btusb: Add NULL check for data in btusb_suspend
+Date: Fri, 20 Dec 2024 16:22:25 +0800
+Message-ID: <20241220082225.1064236-1-en-wei.wu@canonical.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, kieran.r.geary@gmail.com
-Subject: RE: [BlueZ,v2] Set `SDP_LARGE_MTU` flag for DS4 Rev. 2 product code
-In-Reply-To: <20241220020818.478090-1-kieran.r.geary@gmail.com>
-References: <20241220020818.478090-1-kieran.r.geary@gmail.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 
---===============4155734946613082019==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+When performing warm boot tests with an MT7920 device,
+we encounter NULL pointer dereference with failure rate 5/30.
+The crash occurs during device suspend when btusb attempts
+to access data->hdev where data is NULL. This may happen due
+to a race condition between PM suspend and device disconnect.
+The root cause needs further investigation.
 
-This is automated email and please do not reply to this email!
+BUG: kernel NULL pointer dereference, address: 0000000000000000
+Workqueue: pm pm_runtime_work
+RIP: 0010:btusb_suspend+0x1d/0x1d0 [btusb]
 
-Dear submitter,
+Add a NULL check for data and return -ENODEV in this case to
+prevent the NULL pointer dereference. This indicates that the
+device is no longer available, which is appropriate when the
+driver's private data is missing.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=919714
-
----Test result---
-
-Test Summary:
-CheckPatch                    PENDING   0.19 seconds
-GitLint                       PENDING   0.19 seconds
-BuildEll                      PASS      20.67 seconds
-BluezMake                     PASS      1587.12 seconds
-MakeCheck                     PASS      13.29 seconds
-MakeDistcheck                 PASS      159.70 seconds
-CheckValgrind                 PASS      215.45 seconds
-CheckSmatch                   PASS      274.95 seconds
-bluezmakeextell               PASS      99.81 seconds
-IncrementalBuild              PENDING   0.26 seconds
-ScanBuild                     PASS      848.94 seconds
-
-Details
-##############################
-Test: CheckPatch - PENDING
-Desc: Run checkpatch.pl script
-Output:
-
-##############################
-Test: GitLint - PENDING
-Desc: Run gitlint
-Output:
-
-##############################
-Test: IncrementalBuild - PENDING
-Desc: Incremental build with the patches in the series
-Output:
-
-
-
+Signed-off-by: En-Wei Wu <en-wei.wu@canonical.com>
 ---
-Regards,
-Linux Bluetooth
+ drivers/bluetooth/btusb.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 279fe6c115fa..a0461528548b 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -4096,6 +4096,9 @@ static int btusb_suspend(struct usb_interface *intf, pm_message_t message)
+ 
+ 	BT_DBG("intf %p", intf);
+ 
++	if (!data)
++		return -ENODEV;
++
+ 	/* Don't auto-suspend if there are connections; external suspend calls
+ 	 * shall never fail.
+ 	 */
+-- 
+2.43.0
 
---===============4155734946613082019==--
