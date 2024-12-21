@@ -1,137 +1,238 @@
-Received: from mail-il1-f205.google.com (mail-il1-f205.google.com [209.85.166.205])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fout-b1-smtp.messagingengine.com (fout-b1-smtp.messagingengine.com [202.12.124.144])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 093D91DED57
-	for <linux-bluetooth@vger.kernel.org>; Sat, 21 Dec 2024 14:19:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.205
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F0772837B;
+	Sat, 21 Dec 2024 17:06:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.144
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734790766; cv=none; b=EdII2YGr89yxh4nCMw19CBybLUGp0uRf3IqKhrWd2ijJHU3zb/TumVOx/IlsC1yKgQBlPU1ShvELKkNF/YvS9bKCs1cQXAr4eAji14ql/kJ51Bvv8rWgv8VGJiHoDS78eEt+eDSPymy69K2xsEz5T8ppQBooNmqVAUliA0N8ld0=
+	t=1734800786; cv=none; b=djU77TQOoBDKHIr2GkbmlLojfg/NweINdEDzkbcTN/AQPuKOx/n0AohY8mKT9N4eUd8Osn5qvUK4HyPjZRVoJ7e8a9dqpDvtoesh1FmuPs03ZvBnQA73os+/IWpjIJM2arXWxq/TUACOETIvO2iDlNfRWVWJ4+G1XGqpvvpSxhk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734790766; c=relaxed/simple;
-	bh=nTFkNhV0eaATNy0xfDJFTe2P9/OiOudK/G5FzPBoP40=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=ceCOsBtRxAOXK1sGLTMJogDAo6p14XolY4ATVR8eKdqP6a2IKfxwXaHMT6WVJNR7zd5q6APMLo1oN7YcSQCKZIC3WcUVjMqhaC75sGn1dsw+rGfKCLoM115MLAzZRkecWQAmja6DV8fsQY9s0ZbX8cygpDhziknEvg+86/pVTjE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.205
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f205.google.com with SMTP id e9e14a558f8ab-3a7e0d5899bso60430275ab.0
-        for <linux-bluetooth@vger.kernel.org>; Sat, 21 Dec 2024 06:19:24 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734790764; x=1735395564;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=9YQVhEgBv7J3tvUn1uwF626v640gjPkr9QtcuT6tahQ=;
-        b=DNyJHSk3SJ8MtyhLorzBhUQdz2WZt3VeA4DYFSdbeYln55o6aVW3cG7QJKzAf9Q9Cf
-         1rng0g6Sa14at0qxdt6dMAaSSo8lAo4M9IaNDoFnaTMg3Ru/R0SxiLbfOFo633kW9yku
-         uInt/Wu0mxxtjVPiNMOTJV6NgnldolMvy4IKDLviogO68el0HcdNVgv769NnD3Gh9y/n
-         2mtiYDbAHXT+x5lYl4JNRzn2koGg9ZsvwpadYQVO4FdBFZF4KTc6t3Nx6WmgJbrk/p50
-         KZUkm0Wpq4RCZsvD3qp3hb8K9TB7lebUlnrbh1PfVqon8L2n0RaTEPLK7WBYuriHtOKB
-         jO1Q==
-X-Forwarded-Encrypted: i=1; AJvYcCVyPAJSd+vh6Hk4eVySynks4rkooJZNdJGBs6VrrQLzNkSX3w4Dt3dtptu+5Z4xsVJOU16bcs6Ar5iDCcrY7Dc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxGC3eTAjXAw0yB/sbQWdDmjLycdnnt4V78acZtNisEGroIyyLr
-	ukAisNVJjo+ClD92EY9/yCu9Ee/b6F0cffPqoq6KAEtm4HwxWoGPGfEf12UpZqj3Qa6BNwjJ9Et
-	r8wYnLj25TRr8GEvo/Ej+Z2RH08dWN+yDuR5pFUJGB1Kk5/xp/hNjbGY=
-X-Google-Smtp-Source: AGHT+IFhoW1RdoeXvSRubE41vBBiMjX/kFHai96nGIBFX1fa06h249wtmVXzb3J7tEn8XUe5MEV1r0Pzi4toOkMsPvL2c9wr0gXk
+	s=arc-20240116; t=1734800786; c=relaxed/simple;
+	bh=IaHSJ+OXAVOFCnyOlnFkmXJwVXyaYn9nA3CZS6NTfLE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=L04PO+Mu1N9RXLaomYj+L98tnOklbwEUZEJkRzFy5FTz5MMNwBoZ4hiYxHUaiEReiV8znA3wkRaqo49xTY3ZpekyX7VK3r8ErL+1x6uZu3d0y0svyyXbveAFeXR0UPHAYleZ9MR08YDq+3D4y/BMLQDfIwUwWv0lnYl/FwHzQj8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=getstate.dev; spf=pass smtp.mailfrom=getstate.dev; dkim=pass (2048-bit key) header.d=getstate.dev header.i=@getstate.dev header.b=ObSgvbhT; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=kGJIJcPx; arc=none smtp.client-ip=202.12.124.144
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=getstate.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=getstate.dev
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=getstate.dev header.i=@getstate.dev header.b="ObSgvbhT";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="kGJIJcPx"
+Received: from phl-compute-04.internal (phl-compute-04.phl.internal [10.202.2.44])
+	by mailfout.stl.internal (Postfix) with ESMTP id 28B4E1140113;
+	Sat, 21 Dec 2024 12:06:22 -0500 (EST)
+Received: from phl-mailfrontend-01 ([10.202.2.162])
+  by phl-compute-04.internal (MEProxy); Sat, 21 Dec 2024 12:06:22 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=getstate.dev; h=
+	cc:cc:content-transfer-encoding:content-type:date:date:from:from
+	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
+	:to; s=fm3; t=1734800782; x=1734887182; bh=Eo6uklfXqDFDAaDg6YsYT
+	G8dVUfWDNi3DyoOE3Py6Oc=; b=ObSgvbhTe/SZnXerauTJoVI3BJFFvhcMFTxae
+	ez1iyo2IcV7oXye8gp2FYPyVy24UT/Vi1vmiZANgljGSu1KlgeZCcZ0WKw1tGoVc
+	W9FHUU062HnGKKkvpCC40w4MlOfE7L/7HC5VYACtdMadkUEoIki8S60WvaIbMOjO
+	K7VXXXDhhIqZQBd+yinP7imXelNxoHQZ0mcZS4wkF/jzQZL9KlDgU7MXjUif4aD5
+	eTbHsFQbMN2evKE3R//VVx6sLdFmaPnG2JJr81SJ+MpvFKH3kBwjtT249vwhHgFx
+	LyCqN8Wa6UUkX53Xi5+U6F3Wlj4WkozsUm3eEqBZNfMVi0u0Q==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:date:date:feedback-id:feedback-id:from:from
+	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=
+	1734800782; x=1734887182; bh=Eo6uklfXqDFDAaDg6YsYTG8dVUfWDNi3Dyo
+	OE3Py6Oc=; b=kGJIJcPx7tEY2O7wwQZMnhaWiC1N10Z/Hb2hBfcNeRz9NqivSn4
+	EJWRPCADA1Wg4pHzZQm3XaNOlc3gsTmXs5k7g4MBPEh1qy8VzkTGYMmqm1A5c+XV
+	MQYqzoVMF423yWLXfJaxoZY/mmKBd01tEa2lfHLHgkqhGhOrcrX+R4ZkZXfQAxhC
+	ZcUKdy/vHrV6R0f/A3HCHoHwweOpFSsqbnHoV+obwSTYgpBTMUv9HXS0CMomZIPr
+	34GCbsctvEmtTRgD6AcG80u4gxBFGxsqCarCediNYyxJsMSpDacEPyU5ch9gEMFn
+	5ELFkh2904mXuhXLN3JAzshFFUQekIxeUHg==
+X-ME-Sender: <xms:jfVmZ3LkN9hCbVRwbiysfI57qmVvVQBQT_yBldnLr9ANvjzLxdD6FQ>
+    <xme:jfVmZ7LMGATwsOiwHXSBlzr85-4uBiWpmHaT_8I57Oy1aLg6mFkjk3tuRryrcWOG-
+    C0IRoWLxBiiIscl4_s>
+X-ME-Received: <xmr:jfVmZ_tr7w2G72Li4rSMalZsejPlweVmzTqCEDLl5il-aO9FV0-KAGgk8GUfRO1vsLhG_9-vsIyR>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefuddruddthedgjeefucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggvpdfu
+    rfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucenucfjughrpefhvfevuf
+    ffkffoggfgsedtkeertdertddtnecuhfhrohhmpeforgiiihhnucetlhcujfgruggurggu
+    uceomhgriihinhesghgvthhsthgrthgvrdguvghvqeenucggtffrrghtthgvrhhnpedtfe
+    fftdeluedugfefieejgeduieeiieevlefgvdeikeekledugfefudelueekvdenucffohhm
+    rghinhepkhgvrhhnvghlrdhorhhgpdhshiiikhgrlhhlvghrrdgrphhpshhpohhtrdgtoh
+    hmnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepmhgr
+    iihinhesghgvthhsthgrthgvrdguvghvpdhnsggprhgtphhtthhopeejpdhmohguvgepsh
+    hmthhpohhuthdprhgtphhtthhopehmrghrtggvlheshhholhhtmhgrnhhnrdhorhhgpdhr
+    tghpthhtohepjhhohhgrnhdrhhgvuggsvghrghesghhmrghilhdrtghomhdprhgtphhtth
+    hopehluhhiiidruggvnhhtiiesghhmrghilhdrtghomhdprhgtphhtthhopehlihhnuhig
+    qdgslhhuvghtohhothhhsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplh
+    hinhhugidqkhgvrhhnvghlsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohep
+    mhgriihinhesghgvthhsthgrthgvrdguvghvpdhrtghpthhtohepshihiigsohhtodegje
+    elrghffhehudgssgefieduvghfhegrrgdukeesshihiihkrghllhgvrhdrrghpphhsphho
+    thhmrghilhdrtghomh
+X-ME-Proxy: <xmx:jfVmZwboO4SkC2askXXQCXU6oBr8Kzol3ktVuePkPZY_BkDEE9Q89g>
+    <xmx:jfVmZ-bywnWmH3EKGrKH4etXuDZb2J0itLtmwcmf1vywVId_5PayjA>
+    <xmx:jfVmZ0CsKittfLfRkxZEq8Nf6D1gbrILuduKRS2qXKgmEyiypr2nxg>
+    <xmx:jfVmZ8ZoinVIe2QCT3GwbJ0L5bCT1tTCyVD8nkziCzk9PoyOX0BtBw>
+    <xmx:jfVmZ27n9q5BY61UkRxqQlFX9sasTHLz44EBMWEnzbeppnALR_i0MFHX>
+Feedback-ID: i0ed1493d:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Sat,
+ 21 Dec 2024 12:06:19 -0500 (EST)
+From: Mazin Al Haddad <mazin@getstate.dev>
+To: marcel@holtmann.org,
+	johan.hedberg@gmail.com,
+	luiz.dentz@gmail.com
+Cc: linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Mazin Al Haddad <mazin@getstate.dev>,
+	syzbot+479aff51bb361ef5aa18@syzkaller.appspotmail.com
+Subject: [PATCH v2] bluetooth: hci: Fix UAF from MGMT_OP_REMOVE_ADV_MONITOR during closure
+Date: Sat, 21 Dec 2024 20:04:59 +0300
+Message-ID: <20241221170459.23095-1-mazin@getstate.dev>
+X-Mailer: git-send-email 2.46.0
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:148d:b0:3a7:d7dd:e70f with SMTP id
- e9e14a558f8ab-3c2d2d5112bmr59976535ab.12.1734790764247; Sat, 21 Dec 2024
- 06:19:24 -0800 (PST)
-Date: Sat, 21 Dec 2024 06:19:24 -0800
-In-Reply-To: <000000000000cd69c7061dfe35d2@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6766ce6c.050a0220.226966.000e.GAE@google.com>
-Subject: Re: [syzbot] [bluetooth?] WARNING: ODEBUG bug in hci_release_dev (2)
-From: syzbot <syzbot+b170dbf55520ebf5969a@syzkaller.appspotmail.com>
-To: johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, luiz.dentz@gmail.com, marcel@holtmann.org, 
-	netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-syzbot has found a reproducer for the following issue on:
+When hci_dev is closing down, mgmt_power_off will free parts of the device.
+The freed memory can then be accessed when processing pending
+MGMT_OP_REMOVE_ADV_MONITOR cmds. Since submitting the command is allowed
+when it is powered off (as in previous discussions linked below), fix
+this by returning MGMT_STATUS_BUSY to pending MGMT_OP_REMOVE_ADV_MONITOR
+operations submitted as hci_dev_close_sync is running. Avoid processing
+pending cmds since doing so will lead to reacquiring the same lock. Add
+a sanity check within mgmt_remove_adv_monitor to ensure the cmd is still
+valid and exit early if not.
 
-HEAD commit:    499551201b5f Merge tag 'arm64-fixes' of git://git.kernel.o..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=17916f30580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=c22efbd20f8da769
-dashboard link: https://syzkaller.appspot.com/bug?extid=b170dbf55520ebf5969a
-compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1090c0c4580000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=10a1efe8580000
+BUG: KASAN: slab-use-after-free in mgmt_remove_adv_monitor_sync+0x3a/0xd0
+net/bluetooth/mgmt.c:5543
+Read of size 8 at addr ffff88814128f898 by task kworker/u9:4/5961
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/5ee1fc255de9/disk-49955120.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/24f10c9fac9a/vmlinux-49955120.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/211e35102c2e/bzImage-49955120.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+b170dbf55520ebf5969a@syzkaller.appspotmail.com
-
-------------[ cut here ]------------
-ODEBUG: free active (active state 0) object: ffff888033d51248 object type: timer_list hint: hci_devcd_timeout+0x0/0x2f0 include/linux/skbuff.h:2741
-WARNING: CPU: 1 PID: 5828 at lib/debugobjects.c:612 debug_print_object+0x1a2/0x2b0 lib/debugobjects.c:612
-Modules linked in:
-CPU: 1 UID: 0 PID: 5828 Comm: syz-executor344 Not tainted 6.13.0-rc3-syzkaller-00209-g499551201b5f #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/13/2024
-RIP: 0010:debug_print_object+0x1a2/0x2b0 lib/debugobjects.c:612
-Code: fc ff df 48 89 fa 48 c1 ea 03 80 3c 02 00 75 54 48 8b 14 dd a0 7f b1 8b 41 56 4c 89 e6 48 c7 c7 20 74 b1 8b e8 4f 59 bc fc 90 <0f> 0b 90 90 58 83 05 b6 5a 7f 0b 01 48 83 c4 18 5b 5d 41 5c 41 5d
-RSP: 0018:ffffc90003faf768 EFLAGS: 00010286
-RAX: 0000000000000000 RBX: 0000000000000003 RCX: ffffffff815a16c9
-RDX: ffff888028419e00 RSI: ffffffff815a16d6 RDI: 0000000000000001
-RBP: 0000000000000001 R08: 0000000000000001 R09: 0000000000000000
-R10: 0000000000000001 R11: 0000000000000001 R12: ffffffff8bb17ac0
-R13: ffffffff8b4f8020 R14: ffffffff8a2ad340 R15: ffffc90003faf878
-FS:  0000000000000000(0000) GS:ffff8880b8700000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 000055f6d80ebeb8 CR3: 000000007c30e000 CR4: 00000000003526f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
  <TASK>
- __debug_check_no_obj_freed lib/debugobjects.c:1099 [inline]
- debug_check_no_obj_freed+0x4b7/0x600 lib/debugobjects.c:1129
- slab_free_hook mm/slub.c:2284 [inline]
- slab_free mm/slub.c:4613 [inline]
- kfree+0x2b3/0x4b0 mm/slub.c:4761
- hci_release_dev+0x4d9/0x600 net/bluetooth/hci_core.c:2758
- bt_host_release+0x6a/0xb0 net/bluetooth/hci_sysfs.c:87
- device_release+0xa1/0x240 drivers/base/core.c:2567
- kobject_cleanup lib/kobject.c:689 [inline]
- kobject_release lib/kobject.c:720 [inline]
- kref_put include/linux/kref.h:65 [inline]
- kobject_put+0x1e4/0x5a0 lib/kobject.c:737
- put_device+0x1f/0x30 drivers/base/core.c:3773
- vhci_release+0x81/0xf0 drivers/bluetooth/hci_vhci.c:665
- __fput+0x3f8/0xb60 fs/file_table.c:450
- task_work_run+0x14e/0x250 kernel/task_work.c:239
- exit_task_work include/linux/task_work.h:43 [inline]
- do_exit+0xad8/0x2d70 kernel/exit.c:938
- do_group_exit+0xd3/0x2a0 kernel/exit.c:1087
- get_signal+0x2576/0x2610 kernel/signal.c:3017
- arch_do_signal_or_restart+0x90/0x7e0 arch/x86/kernel/signal.c:337
- exit_to_user_mode_loop kernel/entry/common.c:111 [inline]
- exit_to_user_mode_prepare include/linux/entry-common.h:329 [inline]
- __syscall_exit_to_user_mode_work kernel/entry/common.c:207 [inline]
- syscall_exit_to_user_mode+0x150/0x2a0 kernel/entry/common.c:218
- do_syscall_64+0xda/0x250 arch/x86/entry/common.c:89
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f977f68926a
-Code: Unable to access opcode bytes at 0x7f977f689240.
-RSP: 002b:00007ffc28c89690 EFLAGS: 00000293 ORIG_RAX: 0000000000000003
-RAX: 0000000000000000 RBX: 0000000000000004 RCX: 00007f977f68926a
-RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000003
-RBP: 0000000000000000 R08: 00007f977f6e1049 R09: 00007f977f6e1049
-R10: 0000000000008000 R11: 0000000000000293 R12: 00007f977f6e1049
-R13: 00007ffc28c896e0 R14: 00007ffc28c89720 R15: 0000000000000000
+ __dump_stack lib/dump_stack.c:94 [inline]
+ dump_stack_lvl+0x241/0x360 lib/dump_stack.c:120
+ print_address_description mm/kasan/report.c:378 [inline]
+ print_report+0x169/0x550 mm/kasan/report.c:489
+ kasan_report+0x143/0x180 mm/kasan/report.c:602
+ mgmt_remove_adv_monitor_sync+0x3a/0xd0 net/bluetooth/mgmt.c:5543
+ hci_cmd_sync_work+0x22b/0x400 net/bluetooth/hci_sync.c:332
+ process_one_work kernel/workqueue.c:3229 [inline]
+ process_scheduled_works+0xa63/0x1850 kernel/workqueue.c:3310
+ worker_thread+0x870/0xd30 kernel/workqueue.c:3391
+ kthread+0x2f0/0x390 kernel/kthread.c:389
+ ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
  </TASK>
 
+Freed by task 16022:
+ kasan_save_stack mm/kasan/common.c:47 [inline]
+ kasan_save_track+0x3f/0x80 mm/kasan/common.c:68
+ kasan_save_free_info+0x40/0x50 mm/kasan/generic.c:582
+ poison_slab_object mm/kasan/common.c:247 [inline]
+ __kasan_slab_free+0x59/0x70 mm/kasan/common.c:264
+ kasan_slab_free include/linux/kasan.h:233 [inline]
+ slab_free_hook mm/slub.c:2338 [inline]
+ slab_free mm/slub.c:4598 [inline]
+ kfree+0x196/0x420 mm/slub.c:4746
+ mgmt_pending_foreach+0xd1/0x130 net/bluetooth/mgmt_util.c:259
+ __mgmt_power_off+0x183/0x430 net/bluetooth/mgmt.c:9550
+ hci_dev_close_sync+0x6c4/0x11c0 net/bluetooth/hci_sync.c:5208
+ hci_dev_do_close net/bluetooth/hci_core.c:483 [inline]
+ hci_dev_close+0x112/0x210 net/bluetooth/hci_core.c:508
+ sock_do_ioctl+0x158/0x460 net/socket.c:1209
+ sock_ioctl+0x626/0x8e0 net/socket.c:1328
+ vfs_ioctl fs/ioctl.c:51 [inline]
+ __do_sys_ioctl fs/ioctl.c:906 [inline]
+ __se_sys_ioctl+0xf5/0x170 fs/ioctl.c:892
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
 
+Link: https://lore.kernel.org/lkml/20240424135903.24169-1-jlee@suse.com/
+Reported-by: syzbot+479aff51bb361ef5aa18@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=479aff51bb361ef5aa18
+Signed-off-by: Mazin Al Haddad <mazin@getstate.dev>
 ---
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
+Changes since v1:
+ * Change return code to ECANCELED
+ * Send out MGMT_STATUS_CANCELLED instead of MGMT_STATUS_BUSY
+ * Style fixes 
+
+ net/bluetooth/hci_sync.c |  5 +++--
+ net/bluetooth/mgmt.c     | 20 ++++++++++++++++++--
+ 2 files changed, 21 insertions(+), 4 deletions(-)
+
+diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+index c86f4e42e69c..aa5aa3fed32d 100644
+--- a/net/bluetooth/hci_sync.c
++++ b/net/bluetooth/hci_sync.c
+@@ -5197,6 +5197,9 @@ int hci_dev_close_sync(struct hci_dev *hdev)
+ 	 */
+ 	drain_workqueue(hdev->workqueue);
+ 
++	/* flush cmd  work */
++	flush_work(&hdev->cmd_work);
++
+ 	hci_dev_lock(hdev);
+ 
+ 	hci_discovery_set_state(hdev, DISCOVERY_STOPPED);
+@@ -5234,8 +5237,6 @@ int hci_dev_close_sync(struct hci_dev *hdev)
+ 		clear_bit(HCI_INIT, &hdev->flags);
+ 	}
+ 
+-	/* flush cmd  work */
+-	flush_work(&hdev->cmd_work);
+ 
+ 	/* Drop queues */
+ 	skb_queue_purge(&hdev->rx_q);
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index b31192d473d0..ec86ae851e56 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -5519,9 +5519,17 @@ static void mgmt_remove_adv_monitor_complete(struct hci_dev *hdev,
+ {
+ 	struct mgmt_rp_remove_adv_monitor rp;
+ 	struct mgmt_pending_cmd *cmd = data;
+-	struct mgmt_cp_remove_adv_monitor *cp = cmd->param;
++	struct mgmt_cp_remove_adv_monitor *cp;
++
++	// if executing while device is closing down, status could
++	// be invalid as pending cmd could be removed by __mgmt_power_off
++	// so exit early if the device was busy.
++	if (status == -ECANCELED ||
++	    cmd != pending_find(MGMT_OP_REMOVE_ADV_MONITOR, hdev))
++		return;
+ 
+ 	hci_dev_lock(hdev);
++	cp = cmd->param;
+ 
+ 	rp.monitor_handle = cp->monitor_handle;
+ 
+@@ -5540,6 +5548,10 @@ static void mgmt_remove_adv_monitor_complete(struct hci_dev *hdev,
+ static int mgmt_remove_adv_monitor_sync(struct hci_dev *hdev, void *data)
+ {
+ 	struct mgmt_pending_cmd *cmd = data;
++
++	if (cmd != pending_find(MGMT_OP_REMOVE_ADV_MONITOR, hdev))
++		return -ECANCELED;
++
+ 	struct mgmt_cp_remove_adv_monitor *cp = cmd->param;
+ 	u16 handle = __le16_to_cpu(cp->monitor_handle);
+ 
+@@ -9544,8 +9556,12 @@ void __mgmt_power_off(struct hci_dev *hdev)
+ 	 */
+ 	if (hci_dev_test_flag(hdev, HCI_UNREGISTER))
+ 		match.mgmt_status = MGMT_STATUS_INVALID_INDEX;
+-	else
++	else {
++		match.mgmt_status = MGMT_STATUS_CANCELLED;
++		mgmt_pending_foreach(MGMT_OP_REMOVE_ADV_MONITOR, hdev,
++				     cmd_status_rsp, &match);
+ 		match.mgmt_status = MGMT_STATUS_NOT_POWERED;
++	}
+ 
+ 	mgmt_pending_foreach(0, hdev, cmd_complete_rsp, &match);
+ 
+
+base-commit: 499551201b5f4fd3c0618a3e95e3d0d15ea18f31
+-- 
+2.46.0
+
