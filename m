@@ -1,116 +1,137 @@
-Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
+Received: from mail-il1-f205.google.com (mail-il1-f205.google.com [209.85.166.205])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6CF31EC4F6;
-	Sat, 21 Dec 2024 09:52:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 093D91DED57
+	for <linux-bluetooth@vger.kernel.org>; Sat, 21 Dec 2024 14:19:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.205
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734774780; cv=none; b=ptusGSoHJNIzeTIdrlcUmBJLoeI/tZcfm9XrMQCpmU0eHkVt1uwzRJmlsxbeh1wOgI+VKokuA1J+AiUg6vucsrb73fUE5poDW5I9+jU0mSDf2k7EhkdvY1clMIPGzzGfrOIVuthGFGXduqjb4iTgn2z/rvhtzBs1w8BUOOcogc4=
+	t=1734790766; cv=none; b=EdII2YGr89yxh4nCMw19CBybLUGp0uRf3IqKhrWd2ijJHU3zb/TumVOx/IlsC1yKgQBlPU1ShvELKkNF/YvS9bKCs1cQXAr4eAji14ql/kJ51Bvv8rWgv8VGJiHoDS78eEt+eDSPymy69K2xsEz5T8ppQBooNmqVAUliA0N8ld0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734774780; c=relaxed/simple;
-	bh=DeopnxgzWv0Cqe0zQdIGhe7mTeKy3V4rGekfmmHMBXM=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=qnfX0XkvSU7iwlMuSTCwUMKqN+slCiuUyyhXD8ZtUZKUAX5UnqArtbWhPiHMff0QRQf3hZukcW7/jOhOTL8LQCr4n42p40KFAo4i50r/SebngWLF4u3DHv77XN91yRVldJS40oeuQifNMrsjJLPjjTVcQRM/VH1Y3d6Rxtj24qM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Mqzpcw9C; arc=none smtp.client-ip=209.85.128.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Mqzpcw9C"
-Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-43626213fffso23370145e9.1;
-        Sat, 21 Dec 2024 01:52:58 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1734774777; x=1735379577; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:from:subject:user-agent:mime-version:date:message-id:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=F7wU5N3Rc+yxdkSrB3ZsiwvxSqXteUyf9TiI9dS8GWc=;
-        b=Mqzpcw9CdvMjFpE/G5r9M1ktPznUabNySmuFi0LkOcwxxbb7PF/7+vCdPpaTrZpiMZ
-         SsHvHjuTp1Rp16EgjX58SBQHD7El9+dbOvQfRe1DdP2PaPvb4DgrTHWPTaFenQjshNO/
-         PTWVmmMsYj+AFr7BRCiPdYXs0wqoiXQNCkx6bp4VeQhtnJvNsO+V6vArhNlRDOP3vOJq
-         kpD+Mu3wV3KGRw7c6+tviQ4IYhb3Z3DoM+XM0g4l6OZbMqCkr6BcRnSVztCYUMY0xXsW
-         Ztk9zwralBnQdbaD0DOq16YT3qEvbOG/8QDNqfGwOTVZU8tMfdxIuKLtUSn8VaEZQRMM
-         4Q9g==
+	s=arc-20240116; t=1734790766; c=relaxed/simple;
+	bh=nTFkNhV0eaATNy0xfDJFTe2P9/OiOudK/G5FzPBoP40=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=ceCOsBtRxAOXK1sGLTMJogDAo6p14XolY4ATVR8eKdqP6a2IKfxwXaHMT6WVJNR7zd5q6APMLo1oN7YcSQCKZIC3WcUVjMqhaC75sGn1dsw+rGfKCLoM115MLAzZRkecWQAmja6DV8fsQY9s0ZbX8cygpDhziknEvg+86/pVTjE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.205
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f205.google.com with SMTP id e9e14a558f8ab-3a7e0d5899bso60430275ab.0
+        for <linux-bluetooth@vger.kernel.org>; Sat, 21 Dec 2024 06:19:24 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734774777; x=1735379577;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:from:subject:user-agent:mime-version:date:message-id
+        d=1e100.net; s=20230601; t=1734790764; x=1735395564;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=F7wU5N3Rc+yxdkSrB3ZsiwvxSqXteUyf9TiI9dS8GWc=;
-        b=IfT4xZrgpQg5Fn88cfc1TxSYH+TFlf/8EKfQQzQirgRq2iXtnnFQ+yK9K54+z6u/i5
-         uhsk8WScTdXl6NW10Wj+z7fzUQrdJnJrizMjUQilOx61HW0iJUkKSBndgKJxwP51pu2x
-         5jzqQo5b7zkawVr8p1i0PZ9bISpTIdu2c8TI7U35nnrjPde/Uo3qmNY5eqoE7CsavpNZ
-         s+1NPUCSt6T7o4T3JxIZKB4iRo9VT4RgPbnqufruUpoCf6RKnB30MBnoRIfUQAloojPS
-         OwiJCCtpTtfPD8+mJik8/1roobFzMsCvs39bn3OVuxYKVlGBNqqjTtN39HkLKjQdzZX9
-         p4dQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVGEAqBtbg64T3jibZxtwzh81NSok/aLLbNxnR9sIKZW99XYHht4zVjP3VU7PxJam0VVZnKYwWUOsP1CeuY@vger.kernel.org, AJvYcCXBxQYeTG196jnoIAIJdcOYnR9ovOHOVJ6KdSXhl4v2N5fBSbXLoFaNnyN19ZHoaVN0aZHtt2nw+pq20FUMX8I=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxjb2tkC/I2w3MxbNs1vzmHIyOlwVpBmylxF+Z/cV0bWcSgNYOz
-	z+DCqZ7yYpCdijgx2yNAHHI6E3YMr9GPXw3H5w4Rg9edk4vDOz2o
-X-Gm-Gg: ASbGncviIQLc12Pws0sokw5tOSKvNyosNc++KPWgOOgwHRgnCvBFGcOoEuzqjyW3gAm
-	nGrCSQTLUFnqamaaqngNWONQO4ktj1kgL246AQCDzv1hYsrv6jUXf3Rh1WLcAl8Bcn/6I4g4uYh
-	C+b/8RdUpF2vlSef0LUqlcuHc9ltXhYq3pJfXTRBqeBu3zkzvNhHsc17ZrGBIFtbDUkqbrfPd59
-	TF+o38AwMFwP7HhulbBr8xsK6brdaqHtirlFFj7rictOnO0NuY2s4ioHugEnml79NorKlzr4Yz8
-	ooMB/PIHcJDPzr+2nuSSDQojCGkwt/cMzLmfPcg=
-X-Google-Smtp-Source: AGHT+IHjxLdXW8mbGjkft5APD+lMWkYg/9/MWVjfMYYRs7EuMja17eWwm0wb+Q5Gfbj7nNRta4GP2Q==
-X-Received: by 2002:a05:600c:4f89:b0:431:15f1:421d with SMTP id 5b1f17b1804b1-4365fc09731mr81614135e9.16.1734774776704;
-        Sat, 21 Dec 2024 01:52:56 -0800 (PST)
-Received: from [192.168.10.194] (net-188-216-175-96.cust.vodafonedsl.it. [188.216.175.96])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-436612899f0sm70967715e9.38.2024.12.21.01.52.55
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 21 Dec 2024 01:52:56 -0800 (PST)
-Message-ID: <1eeecc68-be5f-46e6-aed6-594c4b32df21@gmail.com>
-Date: Sat, 21 Dec 2024 10:52:54 +0100
+        bh=9YQVhEgBv7J3tvUn1uwF626v640gjPkr9QtcuT6tahQ=;
+        b=DNyJHSk3SJ8MtyhLorzBhUQdz2WZt3VeA4DYFSdbeYln55o6aVW3cG7QJKzAf9Q9Cf
+         1rng0g6Sa14at0qxdt6dMAaSSo8lAo4M9IaNDoFnaTMg3Ru/R0SxiLbfOFo633kW9yku
+         uInt/Wu0mxxtjVPiNMOTJV6NgnldolMvy4IKDLviogO68el0HcdNVgv769NnD3Gh9y/n
+         2mtiYDbAHXT+x5lYl4JNRzn2koGg9ZsvwpadYQVO4FdBFZF4KTc6t3Nx6WmgJbrk/p50
+         KZUkm0Wpq4RCZsvD3qp3hb8K9TB7lebUlnrbh1PfVqon8L2n0RaTEPLK7WBYuriHtOKB
+         jO1Q==
+X-Forwarded-Encrypted: i=1; AJvYcCVyPAJSd+vh6Hk4eVySynks4rkooJZNdJGBs6VrrQLzNkSX3w4Dt3dtptu+5Z4xsVJOU16bcs6Ar5iDCcrY7Dc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxGC3eTAjXAw0yB/sbQWdDmjLycdnnt4V78acZtNisEGroIyyLr
+	ukAisNVJjo+ClD92EY9/yCu9Ee/b6F0cffPqoq6KAEtm4HwxWoGPGfEf12UpZqj3Qa6BNwjJ9Et
+	r8wYnLj25TRr8GEvo/Ej+Z2RH08dWN+yDuR5pFUJGB1Kk5/xp/hNjbGY=
+X-Google-Smtp-Source: AGHT+IFhoW1RdoeXvSRubE41vBBiMjX/kFHai96nGIBFX1fa06h249wtmVXzb3J7tEn8XUe5MEV1r0Pzi4toOkMsPvL2c9wr0gXk
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [REGRESSION] bluetooth: mt7921: Crash on Resume From Suspend And
- Hibernate
-From: Sergio Callegari <sergio.callegari@gmail.com>
-To: jglotzer@gmail.com
-Cc: Aaron.Hou@mediatek.com, Chris.Lu@mediatek.com, Deren.Wu@mediatek.com,
- Hao.Qin@mediatek.com, Sean.Wang@mediatek.com, johan.hedberg@gmail.com,
- linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-mediatek@lists.infradead.org, luiz.dentz@gmail.com,
- marc.payne@mdpsys.co.uk, marcel@holtmann.org, regressions@leemhuis.info,
- regressions@lists.linux.dev, steve.lee@mediatek.com, tiwai@suse.de
-References: <20241127231432.8112-1-jglotzer@gmail.com>
- <ad78ad62-ebd2-40d7-8a6d-623ae947584c@gmail.com>
-Content-Language: en-US, it-IT
-In-Reply-To: <ad78ad62-ebd2-40d7-8a6d-623ae947584c@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+X-Received: by 2002:a05:6e02:148d:b0:3a7:d7dd:e70f with SMTP id
+ e9e14a558f8ab-3c2d2d5112bmr59976535ab.12.1734790764247; Sat, 21 Dec 2024
+ 06:19:24 -0800 (PST)
+Date: Sat, 21 Dec 2024 06:19:24 -0800
+In-Reply-To: <000000000000cd69c7061dfe35d2@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6766ce6c.050a0220.226966.000e.GAE@google.com>
+Subject: Re: [syzbot] [bluetooth?] WARNING: ODEBUG bug in hci_release_dev (2)
+From: syzbot <syzbot+b170dbf55520ebf5969a@syzkaller.appspotmail.com>
+To: johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, luiz.dentz@gmail.com, marcel@holtmann.org, 
+	netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
+
+syzbot has found a reproducer for the following issue on:
+
+HEAD commit:    499551201b5f Merge tag 'arm64-fixes' of git://git.kernel.o..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=17916f30580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=c22efbd20f8da769
+dashboard link: https://syzkaller.appspot.com/bug?extid=b170dbf55520ebf5969a
+compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1090c0c4580000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=10a1efe8580000
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/5ee1fc255de9/disk-49955120.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/24f10c9fac9a/vmlinux-49955120.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/211e35102c2e/bzImage-49955120.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+b170dbf55520ebf5969a@syzkaller.appspotmail.com
+
+------------[ cut here ]------------
+ODEBUG: free active (active state 0) object: ffff888033d51248 object type: timer_list hint: hci_devcd_timeout+0x0/0x2f0 include/linux/skbuff.h:2741
+WARNING: CPU: 1 PID: 5828 at lib/debugobjects.c:612 debug_print_object+0x1a2/0x2b0 lib/debugobjects.c:612
+Modules linked in:
+CPU: 1 UID: 0 PID: 5828 Comm: syz-executor344 Not tainted 6.13.0-rc3-syzkaller-00209-g499551201b5f #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/13/2024
+RIP: 0010:debug_print_object+0x1a2/0x2b0 lib/debugobjects.c:612
+Code: fc ff df 48 89 fa 48 c1 ea 03 80 3c 02 00 75 54 48 8b 14 dd a0 7f b1 8b 41 56 4c 89 e6 48 c7 c7 20 74 b1 8b e8 4f 59 bc fc 90 <0f> 0b 90 90 58 83 05 b6 5a 7f 0b 01 48 83 c4 18 5b 5d 41 5c 41 5d
+RSP: 0018:ffffc90003faf768 EFLAGS: 00010286
+RAX: 0000000000000000 RBX: 0000000000000003 RCX: ffffffff815a16c9
+RDX: ffff888028419e00 RSI: ffffffff815a16d6 RDI: 0000000000000001
+RBP: 0000000000000001 R08: 0000000000000001 R09: 0000000000000000
+R10: 0000000000000001 R11: 0000000000000001 R12: ffffffff8bb17ac0
+R13: ffffffff8b4f8020 R14: ffffffff8a2ad340 R15: ffffc90003faf878
+FS:  0000000000000000(0000) GS:ffff8880b8700000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 000055f6d80ebeb8 CR3: 000000007c30e000 CR4: 00000000003526f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ __debug_check_no_obj_freed lib/debugobjects.c:1099 [inline]
+ debug_check_no_obj_freed+0x4b7/0x600 lib/debugobjects.c:1129
+ slab_free_hook mm/slub.c:2284 [inline]
+ slab_free mm/slub.c:4613 [inline]
+ kfree+0x2b3/0x4b0 mm/slub.c:4761
+ hci_release_dev+0x4d9/0x600 net/bluetooth/hci_core.c:2758
+ bt_host_release+0x6a/0xb0 net/bluetooth/hci_sysfs.c:87
+ device_release+0xa1/0x240 drivers/base/core.c:2567
+ kobject_cleanup lib/kobject.c:689 [inline]
+ kobject_release lib/kobject.c:720 [inline]
+ kref_put include/linux/kref.h:65 [inline]
+ kobject_put+0x1e4/0x5a0 lib/kobject.c:737
+ put_device+0x1f/0x30 drivers/base/core.c:3773
+ vhci_release+0x81/0xf0 drivers/bluetooth/hci_vhci.c:665
+ __fput+0x3f8/0xb60 fs/file_table.c:450
+ task_work_run+0x14e/0x250 kernel/task_work.c:239
+ exit_task_work include/linux/task_work.h:43 [inline]
+ do_exit+0xad8/0x2d70 kernel/exit.c:938
+ do_group_exit+0xd3/0x2a0 kernel/exit.c:1087
+ get_signal+0x2576/0x2610 kernel/signal.c:3017
+ arch_do_signal_or_restart+0x90/0x7e0 arch/x86/kernel/signal.c:337
+ exit_to_user_mode_loop kernel/entry/common.c:111 [inline]
+ exit_to_user_mode_prepare include/linux/entry-common.h:329 [inline]
+ __syscall_exit_to_user_mode_work kernel/entry/common.c:207 [inline]
+ syscall_exit_to_user_mode+0x150/0x2a0 kernel/entry/common.c:218
+ do_syscall_64+0xda/0x250 arch/x86/entry/common.c:89
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f977f68926a
+Code: Unable to access opcode bytes at 0x7f977f689240.
+RSP: 002b:00007ffc28c89690 EFLAGS: 00000293 ORIG_RAX: 0000000000000003
+RAX: 0000000000000000 RBX: 0000000000000004 RCX: 00007f977f68926a
+RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000003
+RBP: 0000000000000000 R08: 00007f977f6e1049 R09: 00007f977f6e1049
+R10: 0000000000008000 R11: 0000000000000293 R12: 00007f977f6e1049
+R13: 00007ffc28c896e0 R14: 00007ffc28c89720 R15: 0000000000000000
+ </TASK>
 
 
-On 06/12/2024 03:29, John Glotzer wrote:
- > Sergio,
- >
- > My apologies, I neglected to mention that my setup is PCI, and not USB.
- >
-Thanks for confirming, good to see that the issue can be reliably 
-reproduced with a setup similar to mine!
-
- >
- > What I am struggling to understand is given how easy this issue is to 
-reproduce -  an AMD CPU, Mediatek MT7922 wifi/bluetooth chip,
- > and a 6.11 kernel, you suspend, and then wake up, kernel panics -  I 
-would have thought that the interested parties would
- > make this a priority.
- >
-I wonder it it might be possible to revert back to the code in kernel 
-6.10 (that worked fine), until the current issue can be triaged and fixed.
-
-The other way round, I am getting the impression that other changes are 
-getting stacked on top of the faulty ones, further complicating the picture.
-
-As of today, with kernel 6.11.11, the issue has /worsened/ for me. On 
-6.11.4 I could hibernate/resume by kfkilling bluetooth only, which was 
-not so bad, since I only use bluetooth rarely. With 6.11.11 I need to 
-rfkill the wlan too.
-
-Can this be confirmed too?
-
-Sergio
-
+---
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
