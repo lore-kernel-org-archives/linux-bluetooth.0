@@ -1,113 +1,112 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtp-fw-80009.amazon.com (smtp-fw-80009.amazon.com [99.78.197.220])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 143712206BC
-	for <linux-bluetooth@vger.kernel.org>; Fri, 20 Dec 2024 17:40:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 319ED1DF269;
+	Sat, 21 Dec 2024 08:17:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.220
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734716460; cv=none; b=UMtfnay3PFzxqVfxT7XeY+c9Hl+11o2MV6iLnicDPpGzXWURzVF0VROOKfI4mvXPkv2jE3yn0yaCDpjFzO1Pfy9m1pH0SkQb39nggiQt8+PLMNe53D8VkVYr9IWOkQyQuIt/pv/sp9j4pRu2qp4LBLvBpv3U0KnV9VUint5qklM=
+	t=1734769061; cv=none; b=CPiRfDAR6P/nJtTbQNQSbaLD46xVSBjjjqS/B1nDDCRQ5dXrI9V/vQoOB5uiQbeC14BTcTolYeCpwxR1y1T3li1a10RHYTtT1zwwrRdzCXMASuZCOZ2Non+mPHU4dLlJGSm5yRnR1Z4hQjjXy8ga5NoXp0wfcDHZ6/1X/lnjxDQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734716460; c=relaxed/simple;
-	bh=xLuNVgNBMSsMfvtwa4XFZ6iCJtWQprlxmOYOTUrat2w=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=hYGai1S0Adgcr2kugunmvBQbgRiRfuQibY5BIvq4BZ0RMewytJqJZpNkWO3hn/mhQfT0uRaFEs/v+YSOtUEeczzeLzjoLd/bxWmzj0fXXBZgtJzpE5+yFYaaau64bnnmi1YMB8Azincf22/Cmu0N3epwMy21LDknBWjd+dZjL3w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=q9LHfwfw; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1734769061; c=relaxed/simple;
+	bh=ZfCo1bskYbhtwN12RIG2EQFQ0aAZfTnGZ5Ya543AloQ=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=AlDpSAdrMvlbzvqBCbNr3zM90OJg0ALu+4Y+EkuxbNWb89URAHlAd/eHAObAgOzMPI+U8bryI8/fCGi+zTKMCh7bejgXssv+2LVK4yLDPkzhcElLCpoIU4QLQ0gKH6v6HBc/WxSfhnIZC3kDxOkab31kPeK7E5uMzxu1IRzdVFE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=S+tp3DpF; arc=none smtp.client-ip=99.78.197.220
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="q9LHfwfw"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 6866FC4CED7
-	for <linux-bluetooth@vger.kernel.org>; Fri, 20 Dec 2024 17:40:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734716459;
-	bh=xLuNVgNBMSsMfvtwa4XFZ6iCJtWQprlxmOYOTUrat2w=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=q9LHfwfwadhQ+9jVNaT9DB9TmktjH57yYrHHsM947BmjACbpR3Ppoc/vitN+7K3yG
-	 Kf0a7fUqdtDAaYSuimBr0EdHs9imlVGFne9RtF1GtCvkrNCp17CKC7YOaWzIkKPir+
-	 i4QRK71vyuUlo+yCzdNvTg9TSAmiEQbRHYa9GhWd7tE4YdWTehlsugdYaUCXWrRvog
-	 fLWJdhOBBKQaYik3S7UBiU3gjsHHo6BCLh39WIDeK8N39A1vF7zS8l35E5apLWIiz8
-	 eD4YarFLjXPuoB97NbB/J7hUjPyo6CdXX5mYL29O86yyP5IlTG/s4gApGVX9Wzoel1
-	 cds7sj1Zp49QQ==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id 59B83C4160E; Fri, 20 Dec 2024 17:40:59 +0000 (UTC)
-From: bugzilla-daemon@kernel.org
-To: linux-bluetooth@vger.kernel.org
-Subject: [Bug 219294] NULL dereference pointer in Bluetooth at boot
-Date: Fri, 20 Dec 2024 17:40:59 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: casteyde.christian@free.fr
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P3
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-219294-62941-u6wd1GwcNl@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-219294-62941@https.bugzilla.kernel.org/>
-References: <bug-219294-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="S+tp3DpF"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1734769060; x=1766305060;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=B3pUGK886agq7GOCKwKEUH1qlETW5QxolobcuW4Z5mk=;
+  b=S+tp3DpFOOthWqJC3VEQnzqdM3Ok4zwrcP49nDwSD9BdhTfwpvnnpY2d
+   oXyIzaMjOFCgjYiq91LrZPUs0q6W49ubd9qzhjaQBc2yLZww4v9p2/VRD
+   +as1qvE35K3dham50ZtgH0E6M/o4PIx8hdWKRhGD4AtgaZWPbsCpxLKfL
+   U=;
+X-IronPort-AV: E=Sophos;i="6.12,253,1728950400"; 
+   d="scan'208";a="157705105"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
+  by smtp-border-fw-80009.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Dec 2024 08:17:38 +0000
+Received: from EX19MTAUWA002.ant.amazon.com [10.0.21.151:21727]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.44.219:2525] with esmtp (Farcaster)
+ id d0764f2f-112f-4a2f-b34d-80eccdab9453; Sat, 21 Dec 2024 08:17:38 +0000 (UTC)
+X-Farcaster-Flow-ID: d0764f2f-112f-4a2f-b34d-80eccdab9453
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
+ Sat, 21 Dec 2024 08:17:38 +0000
+Received: from 6c7e67c6786f.amazon.com (10.118.252.154) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
+ Sat, 21 Dec 2024 08:17:33 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <pchelkin@ispras.ru>
+CC: <edumazet@google.com>, <ignat@cloudflare.com>, <johan.hedberg@gmail.com>,
+	<kuba@kernel.org>, <kuniyu@amazon.com>, <linux-bluetooth@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <luiz.dentz@gmail.com>,
+	<lvc-project@linuxtesting.org>, <marcel@holtmann.org>,
+	<netdev@vger.kernel.org>, <stable@vger.kernel.org>
+Subject: Re: [PATCH] Bluetooth: L2CAP: handle NULL sock pointer in l2cap_sock_alloc
+Date: Sat, 21 Dec 2024 17:17:18 +0900
+Message-ID: <20241221081718.98353-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.39.5 (Apple Git-154)
+In-Reply-To: <20241217211959.279881-1-pchelkin@ispras.ru>
+References: <20241217211959.279881-1-pchelkin@ispras.ru>
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D035UWB001.ant.amazon.com (10.13.138.33) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D219294
+From: Fedor Pchelkin <pchelkin@ispras.ru>
+Date: Wed, 18 Dec 2024 00:19:59 +0300
+> A NULL sock pointer is passed into l2cap_sock_alloc() when it is called
+> from l2cap_sock_new_connection_cb() and the error handling paths should
+> also be aware of it.
+> 
+> Seemingly a more elegant solution would be to swap bt_sock_alloc() and
+> l2cap_chan_create() calls since they are not interdependent to that moment
+> but then l2cap_chan_create() adds the soon to be deallocated and still
+> dummy-initialized channel to the global list accessible by many L2CAP
+> paths. The channel would be removed from the list in short period of time
+> but be a bit more straight-forward here and just check for NULL instead of
+> changing the order of function calls.
+> 
+> Found by Linux Verification Center (linuxtesting.org) with SVACE static
+> analysis tool.
+> 
+> Fixes: 7c4f78cdb8e7 ("Bluetooth: L2CAP: do not leave dangling sk pointer on error in l2cap_sock_create()")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Fedor Pchelkin <pchelkin@ispras.ru>
 
---- Comment #7 from Christian Casteyde (casteyde.christian@free.fr) ---
-Le vendredi 13 d=C3=A9cembre 2024, 10:29:57 CET bugzilla-daemon@kernel.org =
-a=20
-=C3=A9crit :
-> https://bugzilla.kernel.org/show_bug.cgi?id=3D219294
->=20
-> Paul Menzel (pmenzel+bugzilla.kernel.org@molgen.mpg.de) changed:
->=20
->            What    |Removed                     |Added
-> -------------------------------------------------------------------------=
----
-> CC|                            |pmenzel+bugzilla.kernel.org
->                    |                            |@molgen.mpg.de
->=20
-> --- Comment #6 from Paul Menzel (pmenzel+bugzilla.kernel.org@molgen.mpg.d=
-e)
+Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+
+
 > ---
-> Luiz responded [1]:
-> > I suspect this has been fixed recently:
-> >=20
-> >=20
-> > https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-nex=
-t.g
-> > it/commit/?id=3D6f3f7e9414834fc4210a2d11ff6172031e98d9ff
-> Does this commit fix the issue for you?
->=20
-> [1]:
-> https://lore.kernel.org/all/CABBYNZJJ+28EvyEvDsVzZv6ZbZLhSkZ-tuDckAvNfR_=
-=3DqCK
-> VMw@mail.gmail.com/#t
-
-I didn't managed to apply the patch on 6.12.6.
-There was rejects I fixed manually, but it doesn't build with the following=
-=20
-error:
-drivers/bluetooth/btusb.c: Dans la fonction =C2=AB btusb_probe =C2=BB:
-drivers/bluetooth/btusb.c:3862:21: erreur: =C2=AB struct btusb_data =C2=BB =
-n'a pas de=20
-membre nomm=C3=A9 =C2=AB disconnect =C2=BB
- 3862 |                 data->disconnect =3D btusb_mtk_disconnect;
-
-The commit doesn't contains header diff.
-
---=20
-You may reply to this email to add a comment.
-
-You are receiving this mail because:
-You are the assignee for the bug.=
+>  net/bluetooth/l2cap_sock.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+> index 3d2553dcdb1b..49f97d4138ea 100644
+> --- a/net/bluetooth/l2cap_sock.c
+> +++ b/net/bluetooth/l2cap_sock.c
+> @@ -1888,7 +1888,8 @@ static struct sock *l2cap_sock_alloc(struct net *net, struct socket *sock,
+>  	chan = l2cap_chan_create();
+>  	if (!chan) {
+>  		sk_free(sk);
+> -		sock->sk = NULL;
+> +		if (sock)
+> +			sock->sk = NULL;
+>  		return NULL;
+>  	}
+>  
+> -- 
+> 2.39.5
