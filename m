@@ -1,148 +1,145 @@
-Received: from smtp-relay-internal-1.canonical.com (smtp-relay-internal-1.canonical.com [185.125.188.123])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f181.google.com (mail-qt1-f181.google.com [209.85.160.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AA0313B5A9
-	for <linux-bluetooth@vger.kernel.org>; Tue, 24 Dec 2024 06:35:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.123
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2062B18AE2
+	for <linux-bluetooth@vger.kernel.org>; Tue, 24 Dec 2024 06:36:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735022134; cv=none; b=lVTs4lhm/pv1c4mKnB55VKOV7Dzv9YicTgk8pUyo7y0vgUKpLHs5vK8vZtk8cnsw44fNtAuUbO+c5jtpd8rCyC/eISIaiFIvCvUsmS5Q0F5P+D4SoorAZMoscC/PgKnN45lqsGGS2Klfwcjrb877LpOZ+EKY9k7/FukWEIQdrHM=
+	t=1735022218; cv=none; b=DvfuO8PP2m12YLIeTYoWxW1Pc9cBgTbUNuQS63aE9GtYJrmJW1Uxyr68U0MG8dZpdw5Ha3lfT/4E4g2veXl8RklHQnuKdFen6TD9/verfjS/wOzH35F08yo+3MPHafOS9W1088X8uqAA1JT23tOxWk6WvMBa9Fv4Cw4T/Mx71HI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735022134; c=relaxed/simple;
-	bh=Fc//BvLtNzucggJF05op7cNgpfTea16gVJpVd23Rre8=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=Y0NAblNbXOhq0D+UJnPQXe7yje/rPyg97z8FFiwa45y7p+a/FaVV7VWy4lZ4rDFQXzBTA0Td4m06f0g+Ush3MUpbZWWN+62mVerVTWhqzJePJuujQV8NtPkOYaRABGyDV2UAVt6M7GcTOHQRYcEZ/0uzTDBh3xn0zfL6rgwCGKE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b=qS7vcaL1; arc=none smtp.client-ip=185.125.188.123
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
+	s=arc-20240116; t=1735022218; c=relaxed/simple;
+	bh=SByVEyLgoGJvnxb+oMQnFjC5Ur/O+lsu4NUhNrd7q+Y=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=pnCn7FXrQhaq5yr/wlrQkfDcMqlFIN3PhqBwilmVq9JZwf4WeNi+bO3Gq4mSwQ9m18mN+u3cGCYIOmdHivozNHUkZ8oQkKbWQ1r7N179dv2AnqkcuEGS/CcpTu2bKaScp0OD3mVmvwh2TX2Ln/onauogVIpAmYL+wYnn/WTY0gw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aBxovB4I; arc=none smtp.client-ip=209.85.160.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="qS7vcaL1"
-Received: from mail-pl1-f198.google.com (mail-pl1-f198.google.com [209.85.214.198])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-relay-internal-1.canonical.com (Postfix) with ESMTPS id 7758D40F32
-	for <linux-bluetooth@vger.kernel.org>; Tue, 24 Dec 2024 06:35:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-	s=20210705; t=1735022127;
-	bh=QHsr9mK/yFLgkCZbDNzHrvtRXwxS+ZRBie/IoJEYUVM=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version;
-	b=qS7vcaL1ZGPmeDH4DFTE6YftZQ2IE9z7uiTSMb7TlyT8znzbNF7dVrYtC3gvtKGmw
-	 e0FuDyRD97OKXzbRZQ6NSHICOztHvlsSECwY9R6w+z6zGk0vDsQWvW8s1lgNgy59X3
-	 Q/7PABqc1PCw4V2vhxfvjYDqx++xIXjZYI8dklVzyx41RcONlXBUP+8x30uWQP0SCi
-	 cZkVIyjrF1Fq6/fYIMkW8sjlhEfzrMCHm0d5s3KHo0213hOv/+iapErkyKJB0jfwJ1
-	 +HLi/W0ivEse1ulTI3h9Uogf7Jdb3u2OVRn56Np8kOsOL1CuKc+Izcby0cPwU+Q8FS
-	 +zOkEe5C3Y63w==
-Received: by mail-pl1-f198.google.com with SMTP id d9443c01a7336-2163c2f32fdso78691905ad.2
-        for <linux-bluetooth@vger.kernel.org>; Mon, 23 Dec 2024 22:35:27 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aBxovB4I"
+Received: by mail-qt1-f181.google.com with SMTP id d75a77b69052e-4678cce3d60so47690841cf.2
+        for <linux-bluetooth@vger.kernel.org>; Mon, 23 Dec 2024 22:36:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1735022216; x=1735627016; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=hVv1hcQak99+qsXPhmjmnpTiwfh/pDVcnTefalqeOZg=;
+        b=aBxovB4I/KFqDlrzWglk94EYxgFviXFm+t3EGTtew0JhVtbGg44jYIrfbuakBmvzIw
+         AOl3/Ofud00pDmY0XV54EF6/H/7ZVMkJ+mH6ZP4QQgyjHruYxErtlCMck/ccXMUN7H1H
+         wBSwCbIWFZj29Ux0G/4Vw+6q8XraaC49UCFiwhVAMXyQKfI6p7JR+xZy+dziCRY5nJsU
+         y1JMA0q0uHNG/l9UNrhnegWN35Fg4bdBlu482/uJq+43g3o0Zx4n1FPuY4zWLnbrUiyk
+         nNoNdQZVZsHn3olXkZngN2vYCp/btlXmUpq6y0pa9qHdNCNsk2uZ/PDzKrvompVrjpRf
+         IThw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1735022126; x=1735626926;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=QHsr9mK/yFLgkCZbDNzHrvtRXwxS+ZRBie/IoJEYUVM=;
-        b=AgDraI7ITQZWAvosIrGCmckXHHHKaP8zg9E9Mx6d9RECdLA/gKr5PI5XG/uovF0cEw
-         IjhYh28U1SLmvt1IR1eqOQjjzLxlij5Eek6J81h2s7iBkl8g8z03cbklmDPO5Iv6a3uB
-         7eg7YUszCAdwF2SNl6TuDUcLX/6A4YFH6SO/45m4QvYyDCqvMcMAWQENgJP6YrCh9lde
-         ZGhaw/REq4fEOSIj0VNqoGfHzNJ7dB4mmxQkt3n/mpXS6xTnIXK4XVHz2KLMJA5i/BHH
-         Wt5I465CIn8qYvbDgjIWawHp5N4PI7qv0bWllNL8ztef/DhN5L2Pk7tcAyTyhlYcF3va
-         8nMA==
-X-Forwarded-Encrypted: i=1; AJvYcCV56J0WxwbuObOEauvVtanx9NniiRjsZuo+qsPaztNy7Tv6DCRUlqTNxhhFHbkox6W5ToBPj3YIr+UX8HxG3x8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyO+l2vVwIZUJNPWoOfMRycM22P0Xx+KW0zUTYU1qhKJ6p8oPCX
-	4nusTC6FixFY/m0Ik1Fbz0ozjpm52GmdyalNyJGe94U0CICWtfBFUBh1eXWQMeovVEQhp0+UaWE
-	SPWjkegvjQHcwhqiUDSN742c9YLfpbzSIktvPgCxwsotl8DsvAd7LABFhe9eU8WvyL+bbJPMRFI
-	shK4PE3VpSGu2kQA==
-X-Gm-Gg: ASbGncsiSN9m1PCqgUpGEi7o76dMX2hCDrv+mNhed9D91nvG4n3kZOf5OmTQFLXD+DP
-	J2B1A/BG5En5qUppuLryoBxWMyfrBUAdlNL73Gdpp7ecLxIihR7S9GJZhuurFpqDjOryQ/DdMMp
-	QCLVRCM5p8wEHYZTjo54twHQZds8bYg5QD/WSgDNlU9s+yhxb+Dd5jFIHg9k5jV4wkuRzwE1feY
-	FfHo5fTlYZavKg4ErWxRKQzKuVK7cJCgiND31wTjnVBZLzA5zzZhUzioAN+Cd3MdG3baQ5AmLsc
-	YqW3dwBkHWLpTl5aMPC4Xa22b4QKu+Xq7Kgf6tqtKiD5aKFt0yqtVoLLeo4=
-X-Received: by 2002:a17:903:234e:b0:216:46f4:7e3d with SMTP id d9443c01a7336-219e6e9fa68mr209031135ad.15.1735022125759;
-        Mon, 23 Dec 2024 22:35:25 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHgc7Th6s0aA0dnxlepxZMUh6gLN/w2mRq3nR4KRNzR4ZyXxFtGBfkam9v0cukTcBQWw51TNw==
-X-Received: by 2002:a17:903:234e:b0:216:46f4:7e3d with SMTP id d9443c01a7336-219e6e9fa68mr209030965ad.15.1735022125458;
-        Mon, 23 Dec 2024 22:35:25 -0800 (PST)
-Received: from rickywu0421-ThinkPad-X1-Carbon-Gen-11.. (118-163-61-247.hinet-ip.hinet.net. [118.163.61.247])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-219dca02e3dsm81305515ad.282.2024.12.23.22.35.24
+        d=1e100.net; s=20230601; t=1735022216; x=1735627016;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=hVv1hcQak99+qsXPhmjmnpTiwfh/pDVcnTefalqeOZg=;
+        b=GfGUj40idEThXRnx8l9Hq35RHT5oJ1oyCu0g23ZdKrDF9RtPF7XrVYNaDakC+ee+tZ
+         Ek4og7uk/9Y9yjPy7jRfECvdPxyHdlYTP6sQSWhiK7oGnmlGLQAuU1th7bEfyu20ygMx
+         mJjyr43x7C2KrH4/wg5QpiDWTZgG+alyvok8ozPpPCBuWq+J2hKqulEkublbky2SNR6q
+         PaVwv2XumTodVj6E8bRwodFzrN4DHgW/VWobQ8A6I2SE0j+7H4kaRUYwJT8yAwd9JC3z
+         qlawMVGRLkpWLKMfEP2WR5ykBo66cKSTpH5ETbTfAwPm4nJEIVwZxsvY0E0HzNvF3fCQ
+         PGXw==
+X-Gm-Message-State: AOJu0YwaXUbHyrnORHf70CvvXsC4BJEGRuMTi81Y1GJVEK8B2RcyqU48
+	ImQRhNAcUMH5eNfly/eYy2ZKATZVvsCfx7rtdkt0VcuZd7WSaoEU0hwzcg==
+X-Gm-Gg: ASbGncvSj7yBpiRtTzNsiL2wUlV8vwd90U+NvKNKfbCdp8pW8656ORrNT7fHb1zmPBp
+	hj1lFvNVOBMwb2o/dIVKv8IQ7gDqhpLNzdiPjxp+Q6N0OzTQytfUUeV8f0w+Dgmu9MPUIS0BzC3
+	8R3J7/h5Odql9z83yqHcAap7yEAfqqqrV7JJfU+9R5Kf8fiHX7dsgpv7iGvi6FO6aH1bL1NwhBA
+	MFyfbVaa4slHMcH9LcL7FPo1Xd47xgrqxiyiaB6Hk94Ox1WWIsNN2Rf2YGbtCg=
+X-Google-Smtp-Source: AGHT+IF9CxzYvFdqivbmYfaywoVIE1vsTlAmJSKsbympNLo+/l5NmRebosmVSZ073+b3DNjFsBtWeQ==
+X-Received: by 2002:a05:622a:347:b0:467:84df:92ee with SMTP id d75a77b69052e-46a4a9a69f8mr232743621cf.40.1735022215615;
+        Mon, 23 Dec 2024 22:36:55 -0800 (PST)
+Received: from [172.17.0.2] ([40.67.133.145])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-46a3e64cfacsm51070481cf.14.2024.12.23.22.36.54
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 23 Dec 2024 22:35:25 -0800 (PST)
-From: En-Wei Wu <en-wei.wu@canonical.com>
-To: marcel@holtmann.org,
-	luiz.dentz@gmail.com,
-	linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] Bluetooth: btusb: Add new VID/PID 13d3/3628 for MT7925
-Date: Tue, 24 Dec 2024 14:35:22 +0800
-Message-ID: <20241224063522.82004-1-en-wei.wu@canonical.com>
-X-Mailer: git-send-email 2.43.0
+        Mon, 23 Dec 2024 22:36:55 -0800 (PST)
+Message-ID: <676a5687.c80a0220.2d79db.0edb@mx.google.com>
+Date: Mon, 23 Dec 2024 22:36:55 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============1905276946501272434=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, zhangheng@kylinos.cn
+Subject: RE: [v2] tty: rfcomm: use sysfs_emit() instead of sprintf()
+In-Reply-To: <20241224060730.3231502-1-zhangheng@kylinos.cn>
+References: <20241224060730.3231502-1-zhangheng@kylinos.cn>
+Reply-To: linux-bluetooth@vger.kernel.org
 
-Add VID 13d3 & PID 3628 for MediaTek MT7925 USB Bluetooth chip.
+--===============1905276946501272434==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-The information in /sys/kernel/debug/usb/devices about the Bluetooth
-device is listed as the below.
+This is automated email and please do not reply to this email!
 
-T:  Bus=01 Lev=01 Prnt=01 Port=03 Cnt=03 Dev#=  4 Spd=480  MxCh= 0
-D:  Ver= 2.10 Cls=ef(misc ) Sub=02 Prot=01 MxPS=64 #Cfgs=  1
-P:  Vendor=13d3 ProdID=3628 Rev= 1.00
-S:  Manufacturer=MediaTek Inc.
-S:  Product=Wireless_Device
-S:  SerialNumber=000000000
-C:* #Ifs= 3 Cfg#= 1 Atr=e0 MxPwr=100mA
-A:  FirstIf#= 0 IfCount= 3 Cls=e0(wlcon) Sub=01 Prot=01
-I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=125us
-E:  Ad=82(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-E:  Ad=02(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-I:  If#= 1 Alt= 6 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  63 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  63 Ivl=1ms
-I:  If#= 2 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=8a(I) Atr=03(Int.) MxPS=  64 Ivl=125us
-E:  Ad=0a(O) Atr=03(Int.) MxPS=  64 Ivl=125us
-I:* If#= 2 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=8a(I) Atr=03(Int.) MxPS= 512 Ivl=125us
-E:  Ad=0a(O) Atr=03(Int.) MxPS= 512 Ivl=125us
+Dear submitter,
 
-Signed-off-by: En-Wei Wu <en-wei.wu@canonical.com>
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=920623
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PENDING   0.28 seconds
+GitLint                       PENDING   0.19 seconds
+SubjectPrefix                 FAIL      0.39 seconds
+BuildKernel                   PASS      25.99 seconds
+CheckAllWarning               PASS      27.92 seconds
+CheckSparse                   PASS      31.62 seconds
+BuildKernel32                 PASS      25.30 seconds
+TestRunnerSetup               PASS      447.90 seconds
+TestRunner_l2cap-tester       PASS      21.19 seconds
+TestRunner_iso-tester         PASS      36.65 seconds
+TestRunner_bnep-tester        PASS      4.93 seconds
+TestRunner_mgmt-tester        FAIL      121.28 seconds
+TestRunner_rfcomm-tester      PASS      8.04 seconds
+TestRunner_sco-tester         PASS      9.53 seconds
+TestRunner_ioctl-tester       PASS      8.30 seconds
+TestRunner_mesh-tester        PASS      6.15 seconds
+TestRunner_smp-tester         PASS      7.17 seconds
+TestRunner_userchan-tester    PASS      5.11 seconds
+IncrementalBuild              PENDING   0.86 seconds
+
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
+
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
+
+##############################
+Test: SubjectPrefix - FAIL
+Desc: Check subject contains "Bluetooth" prefix
+Output:
+"Bluetooth: " prefix is not specified in the subject
+##############################
+Test: TestRunner_mgmt-tester - FAIL
+Desc: Run mgmt-tester with test-runner
+Output:
+Total: 490, Passed: 485 (99.0%), Failed: 1, Not Run: 4
+
+Failed Test Cases
+LL Privacy - Set Flags 2 (Enable RL)                 Failed       0.151 seconds
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
+
+
+
 ---
- drivers/bluetooth/btusb.c | 2 ++
- 1 file changed, 2 insertions(+)
+Regards,
+Linux Bluetooth
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 279fe6c115fa..f7a4ae5ff3d2 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -674,6 +674,8 @@ static const struct usb_device_id quirks_table[] = {
- 						     BTUSB_WIDEBAND_SPEECH },
- 	{ USB_DEVICE(0x13d3, 0x3608), .driver_info = BTUSB_MEDIATEK |
- 						     BTUSB_WIDEBAND_SPEECH },
-+	{ USB_DEVICE(0x13d3, 0x3628), .driver_info = BTUSB_MEDIATEK |
-+						     BTUSB_WIDEBAND_SPEECH },
- 
- 	/* Additional Realtek 8723AE Bluetooth devices */
- 	{ USB_DEVICE(0x0930, 0x021d), .driver_info = BTUSB_REALTEK },
--- 
-2.43.0
 
+--===============1905276946501272434==--
