@@ -1,101 +1,78 @@
-Received: from mail-qk1-f169.google.com (mail-qk1-f169.google.com [209.85.222.169])
+Received: from mail-il1-f197.google.com (mail-il1-f197.google.com [209.85.166.197])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4E52450F2
-	for <linux-bluetooth@vger.kernel.org>; Thu, 26 Dec 2024 10:15:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02F561CCEE7
+	for <linux-bluetooth@vger.kernel.org>; Thu, 26 Dec 2024 13:05:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.197
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735208141; cv=none; b=CSMxMudst3dDfVw4FcmuFyg2EWc+P/YXj5jfcRiFNmYp3R6ABZnWRaN7xAKnbfn7hoFEuCtk0KdXTuhHgsiIAkGFqM/+wwxupM1rjfpL6Cz/7C2AgleRhB2Pu0vBepJ54G5yRsWP4/5xPHaQgMe3zCztrg92fPZDDmiE+49TnFo=
+	t=1735218304; cv=none; b=TK1FIzgTjMuBYYXqfIJ5blz4Hl4/wLWBHSQxvpYc4nmnwaA5qn6LlhmRjX5JGRw3ECpaVlhh65V42+aIkzZzGGOPLiUbfTpNhYIWuM+Ei+U4CZ6cMoPY/whET0DbCcjcuCBKiAfItTBnsjVS9mdcwAPpCht1m5WjUA38LUTKELc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735208141; c=relaxed/simple;
-	bh=Ym18IppCEncEcVLphAV6XXXEJFK96mg3RynNp/Rg2w8=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=FNC7N97hX5rcYv1aRV+DL4vdN0HerVMCcXYRg+j9DyOrYdm0Y1jSEJhw1SaA/Pwh2XvzbNGwzPDaop3dOVnqRbs6a+YVk1HG4eb0kQOKV8NTOqK+o5KmDTGm6gqOUq+8BJrFlJROSECaeL39etO5ssMRGFoxter6BR8D9JETjsM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EIM+pfSu; arc=none smtp.client-ip=209.85.222.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EIM+pfSu"
-Received: by mail-qk1-f169.google.com with SMTP id af79cd13be357-7b6f8524f23so677379285a.2
-        for <linux-bluetooth@vger.kernel.org>; Thu, 26 Dec 2024 02:15:39 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1735208138; x=1735812938; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=Ym18IppCEncEcVLphAV6XXXEJFK96mg3RynNp/Rg2w8=;
-        b=EIM+pfSuu8lQwSdpNtyPQsMQ9XuClFNEcrT6xzviMWhz1XTgKsK2jMUFAZKk7QDZAk
-         BtlBRZyR8N7/CX59f+JxUnVQhckeF+LnTcyFdIGNAxRhhkV63z/dZgFMdjaCamZIl+Dp
-         kYwzDOwG0mxKcqr9TJyCbR9c5KLIecKk+JhakFePJjLbH/EJa/PnTFhSoED51GZDIwvK
-         PRiP4gUPKW+kLPYgnp4EPJJeBVg/JyaX3o0NfY9fN+kZN0EcLXg5IOP9sybPKKBVhHmY
-         oJaZlc15tS7Di/NDfs6N6ZzbZexOSjY5R/0WwkdpcoAENCnqw8nFEJvVGqYw0P6XGWB8
-         UsHw==
+	s=arc-20240116; t=1735218304; c=relaxed/simple;
+	bh=ojuoVsWI7D2MehUHk81iFoc6zeavGNHJ2AvCOakoohw=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=rUYT0B4/dkKHx2AgcecukEaQ9cZ4txMw+5qxuys7F2qM2njoqSPNvqPf6JXKe9izwX1x3Wg8CVj/aFvlh2GvlvAKQ47St0qMur0jdRlj/i77r7XZqRKiCU1AVCWgHQLh3Bf+qrYjWc2XVzpgAeOWf9IYl8ClMP5x2FLIz/D1//Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.197
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-3a812f562bbso139640635ab.1
+        for <linux-bluetooth@vger.kernel.org>; Thu, 26 Dec 2024 05:05:02 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1735208138; x=1735812938;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Ym18IppCEncEcVLphAV6XXXEJFK96mg3RynNp/Rg2w8=;
-        b=ETZZJ7x0e2wxwoGxS0MqQr4/pMOUg2sQXwNQ3jg5hu3EAOyUcsVE8Axri4njwMS20B
-         4mY6zLeeOoWtl5aBUQcBE0jKiX53TMBXDyQ30HFLIexWUKSUIIa+TOyJ0sJGeA62tBPk
-         joM3LEJifKvaWDCKaL4oQvdGm2eNRv1Nv32FCNW+QyNphOyeE8VPmEcFwbjQAoo0BlcW
-         qfbjNnfWIwSWErlBY9h8+mFZryRvn06DrEfZ3NxYwn/nzHv/R43PA1Y0aiwQrW8xr8t5
-         QJixmh6klW2GXakRZTMRy99eTQm3a5NfqUvWImS7TTNBCp9BdTOeepclJyHodPk4LuEZ
-         8qAA==
-X-Gm-Message-State: AOJu0YxFgz/hviqbkN6ez1DLuFuwPe2SMuJb8gLNx7Iq7kCCGvcDL/fM
-	vrxTBj/ymo42hzXTFCG/JHiOh2ouzA1R/Z8GZDEmaijtCb+zFBVo4V+qXQ==
-X-Gm-Gg: ASbGncsd4NV7Oui+wlaEstfCnoEeIUb5fm4DentsYokV0+4e+kYB5yHEDpBUnILfUzx
-	AKdLG81ccsH/AUyNt0+f5WJehDJZaQgzoRPgDhpbHwNLrXbxQB6OZ/6tRwL26az9zAcGSDuIJ6C
-	uWA7VDzvZwTTiWS2k1CZhNC2MUm4dCALXbQFunJC+OPRRvUQoKOL6J03pyJ0uWepblSRP6O9l0l
-	mEcQRk28PKiPQDLX959J518NP81NMs6D8Q2pehZtpVvG3+MqKJhYOzqxnvJJ3k=
-X-Google-Smtp-Source: AGHT+IEKu/+jnjpd08k8IDiQ/2tFko6mLL5cf/REDlmtZJhiW5siNo4ATr+IWiQL8jWaH38k1wiLoQ==
-X-Received: by 2002:a05:620a:31a2:b0:7b7:142d:53d2 with SMTP id af79cd13be357-7b9ba83640cmr3348507185a.41.1735208138239;
-        Thu, 26 Dec 2024 02:15:38 -0800 (PST)
-Received: from [172.17.0.2] ([172.183.37.90])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7b9ac4eef11sm609953885a.126.2024.12.26.02.15.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 26 Dec 2024 02:15:37 -0800 (PST)
-Message-ID: <676d2cc9.050a0220.15a4ff.377b@mx.google.com>
-Date: Thu, 26 Dec 2024 02:15:37 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============2677626877214991390=="
+        d=1e100.net; s=20230601; t=1735218302; x=1735823102;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=vfZAw6nkkopPycDGHxqbXAsiMVaMBshiMpUf9RRGGKA=;
+        b=lqxNuE5bqpxN4m2d7EnGxNoJiyKTqOQ9VD8f6FS6zNeEOwsQeJe1Q9nm3rfWOxzRRL
+         VaeIWN6jKwts9mCSM0/MkODfBmBA6/YtNtA39EmNznH3guTLpFgxJeIUCsgsesbwyRO1
+         l8Rphkw+oVYdo2qfCJJ2XJ6LRYJugkfWUzAEb7a3u9xMYF00WGNVouy1a3djf9xQVwlN
+         /AbvlekW8ke82XVuEESJsJd853Y1oRks6nQBSRjeU8rrTO5o1fLuFpOrkzYyTFBpAo/6
+         JV8naozYCFUNgA2ep23zxCWWNj+kfEjfUtJx3nQ0WHmYIusYJQe4KaZPZA9bqjpIht+G
+         eZJw==
+X-Forwarded-Encrypted: i=1; AJvYcCX2r5PRu8n5Jfk6CQoIGkU5K64PDaJlMjJvb+4wOUaEkb6EMbXjiQfQg8xUhMe1kholbOYeV5/9b4aNAb8omio=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwnDZnGVDA3uZrt0y8a9ZyqZ+ZqPgpmTZpX4DooCiyDP0Rh6dBz
+	seWNKbJSGNT2B34gbpKPs3osioM0oQ4nAOCrLIcwQ4p7rrOabJRgeqtvgl/sFVsUkDraNzDx7gs
+	BEjtVcjGJrVNjO588DF4rf+opYkCpDMhC/gezUF2UcaMMTrO5mbIQJho=
+X-Google-Smtp-Source: AGHT+IFsClCwKKxNjh2qy8IFlSdR86iJ6l6Rnz/rbCrEuCBbR90dTtUbE0c3fjildTbFNKcL6denTgyepBX/r2SPgRUFPEzxJQUJ
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, d.privalov@omp.ru
-Subject: RE: [5.10,1/1] Bluetooth: L2CAP: Fix uaf in l2cap_connect
-In-Reply-To: <20241226093539.44806-1-d.privalov@omp.ru>
-References: <20241226093539.44806-1-d.privalov@omp.ru>
-Reply-To: linux-bluetooth@vger.kernel.org
+X-Received: by 2002:a05:6e02:1889:b0:3a7:5cda:2769 with SMTP id
+ e9e14a558f8ab-3c2d2f3b65emr177346025ab.12.1735218302197; Thu, 26 Dec 2024
+ 05:05:02 -0800 (PST)
+Date: Thu, 26 Dec 2024 05:05:02 -0800
+In-Reply-To: <672efa7e.050a0220.138bd5.0039.GAE@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <676d547e.050a0220.226966.0084.GAE@google.com>
+Subject: Re: [syzbot] [bluetooth?] INFO: task hung in hci_cmd_sync_clear (3)
+From: syzbot <syzbot+217e3f1283cafe80586e@syzkaller.appspotmail.com>
+To: davem@davemloft.net, edumazet@google.com, iulia.tanasescu@nxp.com, 
+	johan.hedberg@gmail.com, kuba@kernel.org, linux-bluetooth@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, luiz.dentz@gmail.com, luiz.von.dentz@intel.com, 
+	marcel@holtmann.org, netdev@vger.kernel.org, pabeni@redhat.com, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
---===============2677626877214991390==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+syzbot has bisected this issue to:
 
-This is an automated email and please do not reply to this email.
+commit a0bfde167b506423111ddb8cd71930497a40fc54
+Author: Iulia Tanasescu <iulia.tanasescu@nxp.com>
+Date:   Tue May 30 14:21:59 2023 +0000
 
-Dear Submitter,
+    Bluetooth: ISO: Add support for connecting multiple BISes
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=11845adf980000
+start commit:   0a9b9d17f3a7 Merge tag 'pm-6.12-rc8' of git://git.kernel.o..
+git tree:       upstream
+final oops:     https://syzkaller.appspot.com/x/report.txt?x=13845adf980000
+console output: https://syzkaller.appspot.com/x/log.txt?x=15845adf980000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=327b6119dd928cbc
+dashboard link: https://syzkaller.appspot.com/bug?extid=217e3f1283cafe80586e
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1094e1a7980000
 
------ Output -----
+Reported-by: syzbot+217e3f1283cafe80586e@syzkaller.appspotmail.com
+Fixes: a0bfde167b50 ("Bluetooth: ISO: Add support for connecting multiple BISes")
 
-error: patch failed: net/bluetooth/hci_event.c:3245
-error: net/bluetooth/hci_event.c: patch does not apply
-error: patch failed: net/bluetooth/l2cap_core.c:4272
-error: net/bluetooth/l2cap_core.c: patch does not apply
-hint: Use 'git am --show-current-patch' to see the failed patch
-
-Please resolve the issue and submit the patches again.
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============2677626877214991390==--
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
