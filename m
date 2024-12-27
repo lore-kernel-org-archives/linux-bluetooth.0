@@ -1,130 +1,225 @@
-Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 609773597A
-	for <linux-bluetooth@vger.kernel.org>; Fri, 27 Dec 2024 09:54:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42ABC53389;
+	Fri, 27 Dec 2024 10:46:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735293272; cv=none; b=fgA08neKkMMQLx1osMlWNp5FVofZAt2hhb+vBOFsSdILIzmprTqw+RINMkWAwl8i+S+MESdoqI9WOeCDzVSyoWeoza++QZtE4Pm5MGlhBwBMX4pyQZJyIEYUCPrOXt+ayIdvrXju3sw+sP8Xl6jNY1D4k3YMUHgS3UpzXBLMk50=
+	t=1735296410; cv=none; b=opB7gPc6ANmNldtyKBd53KP7cN0WDBQAJ3iJJv4ndLri+C4z6VXg0mccWcK07J5Pj7+Q+FjI1ptbDHKlCY9LnOkYNJNuQJXYetbYftg02JVIa9SSD+U4IMnxo0mIwFJu867iUxqAG8uBae5IHUq1wEFh35yxX0LqPOwRM+E0nLE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735293272; c=relaxed/simple;
-	bh=WDlcAePPvrpHcGg3pg793Bny+hapaYLWZHxuYnor27I=;
-	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
-	 In-Reply-To:References; b=I3eGrPis+kuXgl7UwU2SW5fUImJK4eiaBUkqhlZmcGJfNH986wDyYM6TAymiIVa2mt06BeFui2QwYxwKKRmVZO011q5+zF125ebhv2mrxpVvWl2SnGbzkyG73L+52dkFlAvhTUd3L4B7hRdnMrVsi1h7L6wD60jZEDzlmGsc/nA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Fl9n0IqY; arc=none smtp.client-ip=209.85.214.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1735296410; c=relaxed/simple;
+	bh=JquROV4pDFWLUiB2zdzoqLhzOf1r0FY8d5JbnZP7FpQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=H0Fc8vgZF/MYdpBKUHKN9aiUiM28Tmu9OnWpo51Ckq/gnPN9qa4Uj8x6d2+dhgrHhcSF7FieUc7V1RTY0hUvo3I1WlC7gRM3TSGxYMz5ZOaNiC2vBmw/maILcbHwDLL2V1b3K5PWVd1tTMKiCCv9XXnz53mY9MUR2qtM1S8U7jU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=isW1LHuD; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Fl9n0IqY"
-Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-2164b662090so76070025ad.1
-        for <linux-bluetooth@vger.kernel.org>; Fri, 27 Dec 2024 01:54:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1735293270; x=1735898070; darn=vger.kernel.org;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=WDlcAePPvrpHcGg3pg793Bny+hapaYLWZHxuYnor27I=;
-        b=Fl9n0IqY81ml/oUxgr9PfuVDw0LqcqGbI206iU4FOwxZhfZS2s0JxYjDGsX/kpYXfG
-         44EDEfhnAUSBxfLN8LDkHg+m+UREEFSpsJ2syTvV39lY6+o20yybqsZRa39c+UEs/VTk
-         ehnfygKkNSMJr17gz0IuMz3mSEy9bQ1rv2ldX3KwqVkbf5bvsmmnp6m9eAc/zjPK2IiO
-         qLmVg+elUXMJt7Xizz9QBDJ9YDLmi56NXGljWWZ8aBKXqN/1DKXlwGlKWUTtylvGpj0I
-         NwtUwYla+2JBUnwWVTnEvyupBOCHiqOtL4g42898e4IE9mNyC5jjSyybrdMfBicVc1qP
-         qwxA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1735293270; x=1735898070;
-        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=WDlcAePPvrpHcGg3pg793Bny+hapaYLWZHxuYnor27I=;
-        b=Qr6z+tS/yKhhaa9sjzFBitRebFUp+us1uC6rLCU4POOjt/Eei2ZJO2VIAvsicSm4/A
-         h5zw3qxJBYR2W68siDCT7xuErY5Nvt3n2i3EVm3x85jxJbb0pgpnqipHrJT6/mMcKZHI
-         8leDSkPTB1Y9Pqf4BsLAGW95ka6+aFEnBF0KLB3JEAwrhkK6JDAcd2kilpOzaM/FPZyz
-         2xDvjP+TD+LPDTZqC82x5At+Mq4byavWJYc5mSq5wXqTSIlie9PvMg0IR08A6mwbZ1gR
-         dllLVIjgbbR0T9D+y3AjP50WzAjT7CHcMrGwMabb/UtVRQqfxyeqggZdIY7J9dO23iOK
-         7Fog==
-X-Gm-Message-State: AOJu0YwlQssJpXGi5A1BAcYlFr1ITEJvCeHp6mrAoqlWAKMg0P0A09o6
-	NuGjXsYOlANDqAkVQ8uq2n13KRIntZVJSu3fSaL8D+DzvhHwgvFaqDLykA==
-X-Gm-Gg: ASbGncvQswtkyILBL5XX5iyizzA3GGBmyuce+7mNzV52xfcVkee4eHE9HwhEjWt3sU8
-	gmI+14B6aaY7UCWxbv4hRPEVy7/2nmgdg19/WjvE3QlJGz7us6CNFey8+ibBspM5118jMvL6iyn
-	Nhk+fpRrCrBMDKzobccrydliVCXLl7it5mt7T9b4adcTVjuv1XbFvxddIcf1gu/DEhnAK+770bg
-	u9KdhyBv8Ntn30ZvcjsYGfgaIp5aH57gywevEcleAcO6KZV8K+vuD/A2X5HXQ==
-X-Google-Smtp-Source: AGHT+IEgsRC4SFvzucpH60E1V4u1ygq6HzSt7r/WmUJIG5mezSsjChW5HdHWPLLkjPxIkhQhJEfWNw==
-X-Received: by 2002:a17:902:f681:b0:216:7ee9:2227 with SMTP id d9443c01a7336-219e6f11630mr381484635ad.36.1735293270245;
-        Fri, 27 Dec 2024 01:54:30 -0800 (PST)
-Received: from [172.17.0.2] ([13.91.69.162])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-219dc9705d7sm131770835ad.102.2024.12.27.01.54.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 27 Dec 2024 01:54:29 -0800 (PST)
-Message-ID: <676e7955.170a0220.926d9.73c4@mx.google.com>
-Date: Fri, 27 Dec 2024 01:54:29 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============1912696968379736668=="
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="isW1LHuD"
+Received: from pps.filterd (m0279868.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4BR8HXOc016239;
+	Fri, 27 Dec 2024 10:46:36 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	LXGdG9AgBX4AVDFU2E+Vofan9uWcvYli4EiAbqpajJg=; b=isW1LHuDdDc+xXM/
+	XSbZGZvxC6EBylRgYZw5VPPXcMVHrMVIw+lD5tVjwFcoUHH3JEzC/bIozkRtbl4N
+	1WAWMFT/DVLjeXbGtCTnwb2ydvrIptuwKOPwCqrYktkm54yG812v1GLhUZCmnHcr
+	/1R9rVqzDfdfXmQCLI7hjAO5ZBqG5ktHA8xmvVXgEZslqR803qgbJAUprutGoQuN
+	Gjyr/1xNlYbHSBXDV11HmFi2GBAsJzMsARLu8L/bNFVf3niZvVtHee7QnyR6vWS0
+	HImzQWiQ2SSPgDm60+r4CtK1wwg4vRt3+7mTemgKaTgkyz41dZq9u93OK5MN620d
+	Xp4QPg==
+Received: from nalasppmta02.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 43srkprwev-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 27 Dec 2024 10:46:36 +0000 (GMT)
+Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
+	by NALASPPMTA02.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 4BRAkZGq012272
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 27 Dec 2024 10:46:35 GMT
+Received: from [10.219.1.204] (10.80.80.8) by nalasex01a.na.qualcomm.com
+ (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Fri, 27 Dec
+ 2024 02:46:31 -0800
+Message-ID: <d3bd97d8-43fb-452b-adca-ad03eb628031@quicinc.com>
+Date: Fri, 27 Dec 2024 16:16:13 +0530
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: bluez.test.bot@gmail.com
-To: linux-bluetooth@vger.kernel.org, hanchunchao@inspur.com
-Subject: RE: Bluetooth: btbcm: Fix NULL deref in btbcm_get_board_name()
-In-Reply-To: <20241227092046.23304-1-hanchunchao@inspur.com>
-References: <20241227092046.23304-1-hanchunchao@inspur.com>
-Reply-To: linux-bluetooth@vger.kernel.org
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v6 1/1] dt-bindings: bluetooth: update the wcn6750
+ required properties
+To: Krzysztof Kozlowski <krzk@kernel.org>
+CC: Marcel Holtmann <marcel@holtmann.org>,
+        Luiz Augusto von Dentz
+	<luiz.dentz@gmail.com>,
+        Rob Herring <robh@kernel.org>,
+        Krzysztof Kozlowski
+	<krzk+dt@kernel.org>,
+        Conor Dooley <conor+dt@kernel.org>,
+        "Balakrishna
+ Godavarthi" <quic_bgodavar@quicinc.com>,
+        Rocky Liao
+	<quic_rjliao@quicinc.com>, <quic_mohamull@quicinc.com>,
+        <quic_hbandi@quicinc.com>, <quic_anubhavg@quicinc.com>,
+        <linux-bluetooth@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>
+References: <20241223135700.22660-1-quic_janathot@quicinc.com>
+ <20241223135700.22660-2-quic_janathot@quicinc.com>
+ <mzfad53v2paz7cawaepvaqeht2rr5spxyctqrlniiqgyfyyqlv@ixhxcksd3guz>
+ <c87b12d2-06cd-4982-838d-ecaa97572369@quicinc.com>
+ <31ddcb1f-4606-4c5b-893a-179718ed6339@kernel.org>
+ <d7b75672-4885-491c-9797-906261979e15@quicinc.com>
+ <bfa6c330-6ba0-4361-aa6d-7ab7a61eb7f4@kernel.org>
+Content-Language: en-US
+From: Janaki Ramaiah Thota <quic_janathot@quicinc.com>
+In-Reply-To: <bfa6c330-6ba0-4361-aa6d-7ab7a61eb7f4@kernel.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nalasex01a.na.qualcomm.com (10.47.209.196)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: H8Q5aTHqgTDgHzogxbcX9IDqO3Qh-sn4
+X-Proofpoint-GUID: H8Q5aTHqgTDgHzogxbcX9IDqO3Qh-sn4
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
+ definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015
+ priorityscore=1501 mlxscore=0 lowpriorityscore=0 adultscore=0 spamscore=0
+ impostorscore=0 phishscore=0 bulkscore=0 suspectscore=0 malwarescore=0
+ mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2411120000 definitions=main-2412270087
 
---===============1912696968379736668==
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
 
-VGhpcyBpcyBhdXRvbWF0ZWQgZW1haWwgYW5kIHBsZWFzZSBkbyBub3QgcmVwbHkgdG8gdGhpcyBl
-bWFpbCEKCkRlYXIgc3VibWl0dGVyLAoKVGhhbmsgeW91IGZvciBzdWJtaXR0aW5nIHRoZSBwYXRj
-aGVzIHRvIHRoZSBsaW51eCBibHVldG9vdGggbWFpbGluZyBsaXN0LgpUaGlzIGlzIGEgQ0kgdGVz
-dCByZXN1bHRzIHdpdGggeW91ciBwYXRjaCBzZXJpZXM6ClBXIExpbms6aHR0cHM6Ly9wYXRjaHdv
-cmsua2VybmVsLm9yZy9wcm9qZWN0L2JsdWV0b290aC9saXN0Lz9zZXJpZXM9OTIxMDgwCgotLS1U
-ZXN0IHJlc3VsdC0tLQoKVGVzdCBTdW1tYXJ5OgpDaGVja1BhdGNoICAgICAgICAgICAgICAgICAg
-ICBQRU5ESU5HICAgMC4zNiBzZWNvbmRzCkdpdExpbnQgICAgICAgICAgICAgICAgICAgICAgIFBF
-TkRJTkcgICAwLjI2IHNlY29uZHMKU3ViamVjdFByZWZpeCAgICAgICAgICAgICAgICAgUEFTUyAg
-ICAgIDAuMDcgc2Vjb25kcwpCdWlsZEtlcm5lbCAgICAgICAgICAgICAgICAgICBQQVNTICAgICAg
-MjUuMzYgc2Vjb25kcwpDaGVja0FsbFdhcm5pbmcgICAgICAgICAgICAgICBXQVJOSU5HICAgMjcu
-NDYgc2Vjb25kcwpDaGVja1NwYXJzZSAgICAgICAgICAgICAgICAgICBXQVJOSU5HICAgMzAuOTcg
-c2Vjb25kcwpCdWlsZEtlcm5lbDMyICAgICAgICAgICAgICAgICBQQVNTICAgICAgMjQuNzIgc2Vj
-b25kcwpUZXN0UnVubmVyU2V0dXAgICAgICAgICAgICAgICBQQVNTICAgICAgNDQwLjk2IHNlY29u
-ZHMKVGVzdFJ1bm5lcl9sMmNhcC10ZXN0ZXIgICAgICAgUEFTUyAgICAgIDIwLjU3IHNlY29uZHMK
-VGVzdFJ1bm5lcl9pc28tdGVzdGVyICAgICAgICAgUEFTUyAgICAgIDMyLjUzIHNlY29uZHMKVGVz
-dFJ1bm5lcl9ibmVwLXRlc3RlciAgICAgICAgUEFTUyAgICAgIDQuODkgc2Vjb25kcwpUZXN0UnVu
-bmVyX21nbXQtdGVzdGVyICAgICAgICBGQUlMICAgICAgMTIxLjE5IHNlY29uZHMKVGVzdFJ1bm5l
-cl9yZmNvbW0tdGVzdGVyICAgICAgUEFTUyAgICAgIDcuNzIgc2Vjb25kcwpUZXN0UnVubmVyX3Nj
-by10ZXN0ZXIgICAgICAgICBQQVNTICAgICAgOS40NiBzZWNvbmRzClRlc3RSdW5uZXJfaW9jdGwt
-dGVzdGVyICAgICAgIFBBU1MgICAgICA4LjYwIHNlY29uZHMKVGVzdFJ1bm5lcl9tZXNoLXRlc3Rl
-ciAgICAgICAgUEFTUyAgICAgIDYuMTMgc2Vjb25kcwpUZXN0UnVubmVyX3NtcC10ZXN0ZXIgICAg
-ICAgICBQQVNTICAgICAgNy4xMyBzZWNvbmRzClRlc3RSdW5uZXJfdXNlcmNoYW4tdGVzdGVyICAg
-IFBBU1MgICAgICA1LjExIHNlY29uZHMKSW5jcmVtZW50YWxCdWlsZCAgICAgICAgICAgICAgUEVO
-RElORyAgIDAuOTUgc2Vjb25kcwoKRGV0YWlscwojIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMj
-IyMKVGVzdDogQ2hlY2tQYXRjaCAtIFBFTkRJTkcKRGVzYzogUnVuIGNoZWNrcGF0Y2gucGwgc2Ny
-aXB0Ck91dHB1dDoKCiMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIwpUZXN0OiBHaXRMaW50
-IC0gUEVORElORwpEZXNjOiBSdW4gZ2l0bGludApPdXRwdXQ6CgojIyMjIyMjIyMjIyMjIyMjIyMj
-IyMjIyMjIyMjIyMKVGVzdDogQ2hlY2tBbGxXYXJuaW5nIC0gV0FSTklORwpEZXNjOiBSdW4gbGlu
-dXgga2VybmVsIHdpdGggYWxsIHdhcm5pbmcgZW5hYmxlZApPdXRwdXQ6CmRyaXZlcnMvYmx1ZXRv
-b3RoL2J0YmNtLmM6IEluIGZ1bmN0aW9uIOKAmGJ0YmNtX2dldF9ib2FyZF9uYW1l4oCZOmRyaXZl
-cnMvYmx1ZXRvb3RoL2J0YmNtLmM6NTU3OjEwOiB3YXJuaW5nOiByZXR1cm5pbmcg4oCYaW504oCZ
-IGZyb20gYSBmdW5jdGlvbiB3aXRoIHJldHVybiB0eXBlIOKAmGNvbnN0IGNoYXIgKuKAmSBtYWtl
-cyBwb2ludGVyIGZyb20gaW50ZWdlciB3aXRob3V0IGEgY2FzdCBbLVdpbnQtY29udmVyc2lvbl0g
-IDU1NyB8ICAgcmV0dXJuIC1FTk9NRU07ICAgICAgfCAgICAgICAgICBeCiMjIyMjIyMjIyMjIyMj
-IyMjIyMjIyMjIyMjIyMjIwpUZXN0OiBDaGVja1NwYXJzZSAtIFdBUk5JTkcKRGVzYzogUnVuIHNw
-YXJzZSB0b29sIHdpdGggbGludXgga2VybmVsCk91dHB1dDoKZHJpdmVycy9ibHVldG9vdGgvYnRi
-Y20uYzogSW4gZnVuY3Rpb24g4oCYYnRiY21fZ2V0X2JvYXJkX25hbWXigJk6ZHJpdmVycy9ibHVl
-dG9vdGgvYnRiY20uYzo1NTc6MTA6IHdhcm5pbmc6IHJldHVybmluZyDigJhpbnTigJkgZnJvbSBh
-IGZ1bmN0aW9uIHdpdGggcmV0dXJuIHR5cGUg4oCYY29uc3QgY2hhciAq4oCZIG1ha2VzIHBvaW50
-ZXIgZnJvbSBpbnRlZ2VyIHdpdGhvdXQgYSBjYXN0IFstV2ludC1jb252ZXJzaW9uXWRyaXZlcnMv
-Ymx1ZXRvb3RoL2J0YmNtLmM6NTU3OjI0OiB3YXJuaW5nOiBpbmNvcnJlY3QgdHlwZSBpbiByZXR1
-cm4gZXhwcmVzc2lvbiAoZGlmZmVyZW50IGJhc2UgdHlwZXMpZHJpdmVycy9ibHVldG9vdGgvYnRi
-Y20uYzo1NTc6MjQ6ICAgIGV4cGVjdGVkIGNoYXIgY29uc3QgKmRyaXZlcnMvYmx1ZXRvb3RoL2J0
-YmNtLmM6NTU3OjI0OiAgICBnb3QgaW50CiMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIwpU
-ZXN0OiBUZXN0UnVubmVyX21nbXQtdGVzdGVyIC0gRkFJTApEZXNjOiBSdW4gbWdtdC10ZXN0ZXIg
-d2l0aCB0ZXN0LXJ1bm5lcgpPdXRwdXQ6ClRvdGFsOiA0OTAsIFBhc3NlZDogNDg1ICg5OS4wJSks
-IEZhaWxlZDogMSwgTm90IFJ1bjogNAoKRmFpbGVkIFRlc3QgQ2FzZXMKTEwgUHJpdmFjeSAtIFN0
-YXJ0IERpc2NvdmVyeSAyIChEaXNhYmxlIFJMKSAgICAgICAgICBGYWlsZWQgICAgICAgMC4xNzkg
-c2Vjb25kcwojIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMKVGVzdDogSW5jcmVtZW50YWxC
-dWlsZCAtIFBFTkRJTkcKRGVzYzogSW5jcmVtZW50YWwgYnVpbGQgd2l0aCB0aGUgcGF0Y2hlcyBp
-biB0aGUgc2VyaWVzCk91dHB1dDoKCgoKLS0tClJlZ2FyZHMsCkxpbnV4IEJsdWV0b290aAoK
 
---===============1912696968379736668==--
+On 12/27/2024 12:35 PM, Krzysztof Kozlowski wrote:
+> On 26/12/2024 07:11, Janaki Ramaiah Thota wrote:
+>>
+>>
+>> On 12/24/2024 6:57 PM, Krzysztof Kozlowski wrote:
+>>> On 24/12/2024 12:51, Janaki Ramaiah Thota wrote:
+>>>>
+>>>>
+>>>> On 12/24/2024 2:46 PM, Krzysztof Kozlowski wrote:
+>>>>> On Mon, Dec 23, 2024 at 07:27:00PM +0530, Janaki Ramaiah Thota wrote:
+>>>>>
+>>>>> Subject: everything is an update... say something useful, e.g. use PMU
+>>>>> abstraction for WCN6750
+>>>>>
+>>>>
+>>>> Sure will correct it in next patch.
+>>>>
+>>>>>> Drop the inputs from the host and instead expect the Bluetooth node to
+>>>>>> consume the outputs of the internal PMU.
+>>>>>
+>>>>> On which device?
+>>>>>
+>>>>
+>>>> It is for BT module wcn6750 attached on qcs6490-rb3gen2 board.
+>>>> will update same on next commit message.
+>>>>
+>>>>> But anyway I have doubts this is correct. enable GPIO is a pin going
+>>>>> from the host, not from PMU.
+>>>>>
+>>>>
+>>>> Yes you are correct, enable GPIO is out pin of host, but here updated
+>>>> the entries required for Bluetooth node from PMU, not from host to PMU.
+>>>
+>>> Hm? No, you removed for example enable-gpios, which is input from the
+>>> host. Sorry, I don't understand the reason behind this patch and commit
+>>> msg does not help me there.
+>>>
+>>
+>> We are migrating to powerseq for the WCN6750. As per Dmitry’s
+>> suggestion, we are now using the on-chip PMU, which necessitates the
+>> removal of some entries that are not mandatory to avoid binding errors.
+>> For example, the enable GPIO is now handled by the PMU with property
+>> bt-enable-gpios, as shown in the patch linked below
+>> https://lore.kernel.org/linux-arm-msm/20241209103455.9675-3-quic_janathot@quicinc.com/
+> I don't understand why this patch is separate from the others. Entire
+> context is missing and nothing gets explained in commit msg.
+> 
+> Best regards,
+> Krzysztof
+
+Thanks for the reply Krzysztof,
+
+* Initially sent the below patch which enables Bluetooth for the 
+qcs6490-rb3gen2 board.
+  
+https://lore.kernel.org/linux-arm-msm/20241009111436.23473-1-quic_janathot@quicinc.com/
+
+* Then Dmitry recommended implementing pwrseq to enable/disable 
+Bluetooth for the wcn6750 Bluetooth module.
+
+* Then we sent the below patches with pwrseq in v5:
+   - [PATCH v5 1/4] regulator: dt-bindings: qcom,qca6390-pmu: document 
+wcn6750-pmu
+   - [PATCH v5 2/4] arm64: dts: qcom: qcs6490-rb3gen: add and enable BT node
+   - [PATCH v5 3/4] Bluetooth: hci_qca: use the power sequencer for wcn6750
+   - [PATCH v5 4/4] power: sequencing: qcom-wcn: add support for the
+
+   [PATCH v5 1/4] and [PATCH v5 4/4] were reviewed and got merged.
+   [PATCH v5 2/4] and [PATCH v5 3/4] received Reviewed-by: Dmitry 
+Baryshkov <dmitry.baryshkov@linaro.org>
+
+* But we got the following warning messages for [PATCH v5 2/4] from Rob 
+Herring (Arm) bot:
+   New warnings running 'make CHECK_DTBS=y qcom/qcs6490-rb3gen2.dtb' for 
+20241209103455.9675-1-quic_janathot@quicinc.com:
+
+   ```
+   arch/arm64/boot/dts/qcom/qcs6490-rb3gen2.dtb: bluetooth: 
+'enable-gpios' is a required property
+     from schema $id: 
+http://devicetree.org/schemas/net/bluetooth/qualcomm-bluetooth.yaml#
+   arch/arm64/boot/dts/qcom/qcs6490-rb3gen2.dtb: bluetooth: 
+'swctrl-gpios' is a required property
+     from schema $id: 
+http://devicetree.org/schemas/net/bluetooth/qualcomm-bluetooth.yaml#
+   arch/arm64/boot/dts/qcom/qcs6490-rb3gen2.dtb: bluetooth: 
+'vddio-supply' is a required property
+     from schema $id: 
+http://devicetree.org/schemas/net/bluetooth/qualcomm-bluetooth.yaml#
+   arch/arm64/boot/dts/qcom/qcs6490-rb3gen2.dtb: bluetooth: 
+'vddbtcxmx-supply' is a required property
+     from schema $id: 
+http://devicetree.org/schemas/net/bluetooth/qualcomm-bluetooth.yaml#
+   arch/arm64/boot/dts/qcom/qcs6490-rb3gen2.dtb: bluetooth: 
+'vddasd-supply' is a required property
+     from schema $id: 
+http://devicetree.org/schemas/net/bluetooth/qualcomm-bluetooth.yaml#
+   arch/arm64/boot/dts/qcom/qcs6490-rb3gen2.dtb: pinctrl@f100000: 
+Unevaluated properties are not allowed ('qup_uart7_sleep' was unexpected)
+     from schema $id: 
+http://devicetree.org/schemas/pinctrl/qcom,sc7280-pinctrl.yaml#
+   ```
+
+We got these warnings because the binding file `qualcomm-bluetooth.yaml` 
+was not updated as per the new bluetooth node entries in P2,
+so we removed the entries from the required property for the Bluetooth 
+node and sent it as v6 PATCH-1.
+
+We will update the commit message as below in v7:
+
+```
+[PATCH v7 1/1] dt-bindings: bluetooth: Utilize PMU abstraction for WCN6750
+
+We are now using the on-chip PMU node for power sequencing to manage the
+enable/disable functionality of Bluetooth. Consequently, the inputs
+previously marked as required under the Bluetooth node can be removed.
+
+For instance, the enable GPIO is now managed by the PMU node with the
+property bt-enable-gpios, as shown in the following patch:
+https://lore.kernel.org/linux-arm-msm/20241209103455.9675-3-quic_janathot@quicinc.com/
+```
+
+Best regards,
+Janakiram
+
+
+
