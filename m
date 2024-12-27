@@ -1,231 +1,171 @@
-Received: from mail-io1-f80.google.com (mail-io1-f80.google.com [209.85.166.80])
+Received: from mail-qv1-f46.google.com (mail-qv1-f46.google.com [209.85.219.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3E9A13AD26
-	for <linux-bluetooth@vger.kernel.org>; Thu, 26 Dec 2024 18:45:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.80
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BB5D1292CE
+	for <linux-bluetooth@vger.kernel.org>; Fri, 27 Dec 2024 04:40:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735238730; cv=none; b=Kb5gxuDRhjMkmskWa80WoQbEUGepw4sy8Ddv3D/SyTr0YGrXVLJhcURsWx/0AWZX72ZcdcY9QfTJuhBT3424FO/VrrZrGgwY5alWFXCT66lN5mWW6nQrbC4679cb9761tTMU4FS2CG3O39e1kcKjFk+3ie6YESOFJBA5iQVap+8=
+	t=1735274447; cv=none; b=RZbE+6U3fkZ9bthoAta6iecmXn4djKGmHUd7Z+gKP4ryr3DieGHgiyy8eJsogbBHWfhQyZZvQq0N4/mo2pK10Sh9SH0hmr1yW1/d+VQtWDwKTiH1nZV5b/O4TgVl3FPO1n98ghaz3zTzVh92AyCDknUJk7PdcSw92cI8xq3b5z0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735238730; c=relaxed/simple;
-	bh=3Sqb1NtS05/65tKpFjZLlumOdeZwYQCnI6rupGmxCSQ=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=q4rI0geGTm6PhjzQAsGwnqlFaPgp0c1+vrEmk1Lw8uL6yBGKfkvisKQcYj0FnK36oee5wBNMWgTUIQYF8Vp/vlLmTCcRWazzM/eCN+gASuZJhfsvd5rzTWH08lOhN/uYTQHEadmDyjmrCMLWyKzcNZkTpzoh5jAbDOGSJKtMKq8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.80
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f80.google.com with SMTP id ca18e2360f4ac-844e619a122so584327239f.3
-        for <linux-bluetooth@vger.kernel.org>; Thu, 26 Dec 2024 10:45:28 -0800 (PST)
+	s=arc-20240116; t=1735274447; c=relaxed/simple;
+	bh=fltG6HENSYfbAprq0XWmF+VdsMiZUlavpYqXPP49iyw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Content-Type; b=MMbufK/ILxbV/+32m4u2rsTbuE2E5c9b9zYcsvr/S4QO8q9w1MdMCUoGlAKioKQyv4st9A7UNXpS43iS+0ZGBBNBc5gP1RxayASMhOL10KOQ+TreBpR8dtC6tDylxitoBr54DXslPmZCkxEl30LQNHnMhRI9YuNrsltCvwxHOEI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=c2eawpKh; arc=none smtp.client-ip=209.85.219.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="c2eawpKh"
+Received: by mail-qv1-f46.google.com with SMTP id 6a1803df08f44-6d8f75b31bfso61212606d6.3
+        for <linux-bluetooth@vger.kernel.org>; Thu, 26 Dec 2024 20:40:45 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1735274444; x=1735879244; darn=vger.kernel.org;
+        h=content-transfer-encoding:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=bWK0rTMkvNbFv/AHVuKBS6ZrQVOSGLQ72OIKJj/90j4=;
+        b=c2eawpKh8TSa5rMxvItEOOUOiAu8O0F5tpHov8XV7hClyW9HBe0Ik8Ewz70tLdg8xs
+         LNC0US2IYlXoSqUDkwJrm1fhlSWyPlzG9IomZB6joiSLX/GaKW1oNzcvNuGI3lhyqmrX
+         Q0eigwWU6U1eXokYtFPSd1LkVVKJDxnTO4lhI=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1735238728; x=1735843528;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=C3OvxQgpDk7nSI+HOqJBfQqCrgD+0n3JjMpc5VJpHL8=;
-        b=CX88wv1ufFzt44BVY5qdHv3xvFrmYohigEr7v0gEEjI9o0sQsOeqaTMC9cgDCJWyvZ
-         Q35duHtaaE52sFLWMbcdL6b7WVchtE0/MoIFlvRg6Xno8Ah7xuAWrF/oUXpYW3I45BeP
-         Y1LYdwil5juZp09fqyC03erGPyGvS4V49ygbHuWkuEZOre9uUDLr9LKzFZmGDEKb8CIm
-         8+Uj9kCdOs6nq86MDzP6ai7pR+h9y/nj2Lgh+j9e+fbc0s5k1nciJ3qaVistupp3umGp
-         f7K1lZ90kVmXjEBMrgGTExc//oVMWqOxMKU5iMMoo1MO3mdNzqWp2IY8E47Ow+WpDfIy
-         4HTg==
-X-Gm-Message-State: AOJu0YytZhxa6S1wjKQ7wZbwaheBjdEvG09E1nr/m7W0i8Ycyk9OMO7c
-	VcJ1apB+L/7/YiUmcuEjxShrxnr2B/R+/Y+JCQeckEOF7Mo4ZW1llWckMQTQGOcSzgUOYhkDpJB
-	B3qg2mpGRKTV+ChHPPQH22iKgx3jCM3e19I38bfFUx2Ed9A4vBAXcRSx0lg==
-X-Google-Smtp-Source: AGHT+IG6F+sgYJa/Vf2nE1u++1AEpe4pQgy3f/lQ6Rcy/A1o7XtosmGOsLZn5hIRF9wOVG4NnXbzSvDxJv5DPzY2+31hDQNJGm9p
+        d=1e100.net; s=20230601; t=1735274444; x=1735879244;
+        h=content-transfer-encoding:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=bWK0rTMkvNbFv/AHVuKBS6ZrQVOSGLQ72OIKJj/90j4=;
+        b=b9i+IMA+Ecu8rSgJTW/xUZSrADWBD6P9RekTdS6Y5MZFtMMTpJAXO/FIcZEo2g7kJj
+         oxQ/zCs9RHHelJwfxLZP/ZzSYftjNN9pleLsRiVW91ExoyzOgiF41zWV5EPV3HKbyEq7
+         MQwVUuMJ3aYlny4cU0X6VIuGSqTA8l8D3KPRaD79ryv0aNAFcLuHjx7AuzWC3wp61NJT
+         Cd+8k3uEub8nMe0HTYF0Mg2YfOlToprZskPzMrtO1frqqhKWmoTFGU8dkZI6xtmide97
+         XPoe3jF+RL/W/8jkc9e2h3u9NVFbKz/fmDGFb+zAcf+QVSZQs5E4Kdp7ZCDnW4OHWN+U
+         W5Mg==
+X-Gm-Message-State: AOJu0Yx38r2G4FNSssVkQMH7AjjbIwBm6sphDZuEi/nTa0ns8y3kPC7Z
+	JBBlwjgXIOb1pdzG6yiB/ZvFM7vdbmUD1OwOeTfylfH25GHenNRENZp4PCZcCSUP83D4Yo4r0k4
+	=
+X-Gm-Gg: ASbGncuAHJLzAxdtYydvYiEdHCbb+WjM59PWuvZDjA5MhqsrQCxFaSwUAQ+ZQ7FDn+I
+	IIG5bpjNl2BQmzuR0ZmupbDlVivBOtTPu3Iycb+IvP52WrF6L0LiPDzXnQGm3qe/9eBm1cXmHzD
+	wqlToaI5UyX+X//sJXpc1+8nMRGxaGO4fIiS0QVnlLnXbBldaDxec0bK9irIHug3JiCFzGMTsv/
+	P6INFXMKs6vMQMZELYDcqXE3Zf+D1Eoy+vorFkL0hMP65Gw0jwLXW70+fvgYgZV//75taii4PzY
+	hEZcn+Bw1DO5YrXnYxQn0xg=
+X-Google-Smtp-Source: AGHT+IHyngT4UKwOmXjw/ol0YI9+kDcaAz5xke17R92LUitq5iGd12JJACyghGJmzD06siF9BPzrJA==
+X-Received: by 2002:a05:6214:238c:b0:6d4:243f:6c9c with SMTP id 6a1803df08f44-6dd2330c5aamr468012556d6.9.1735274444184;
+        Thu, 26 Dec 2024 20:40:44 -0800 (PST)
+Received: from mail-qt1-f180.google.com (mail-qt1-f180.google.com. [209.85.160.180])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6dd1810cfd7sm76663366d6.30.2024.12.26.20.40.43
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 26 Dec 2024 20:40:43 -0800 (PST)
+Received: by mail-qt1-f180.google.com with SMTP id d75a77b69052e-4679b5c66d0so1720081cf.1
+        for <linux-bluetooth@vger.kernel.org>; Thu, 26 Dec 2024 20:40:43 -0800 (PST)
+X-Received: by 2002:ac8:7dc2:0:b0:466:97d6:b245 with SMTP id
+ d75a77b69052e-46a4a9bf122mr20241911cf.22.1735274442419; Thu, 26 Dec 2024
+ 20:40:42 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1a44:b0:3a7:6c5c:9aa4 with SMTP id
- e9e14a558f8ab-3c2d2783632mr180098155ab.12.1735238728020; Thu, 26 Dec 2024
- 10:45:28 -0800 (PST)
-Date: Thu, 26 Dec 2024 10:45:27 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <676da447.050a0220.2f3838.0470.GAE@google.com>
-Subject: [syzbot] [bluetooth?] KASAN: slab-use-after-free Read in msft_opcode_get
-From: syzbot <syzbot+8def80b4fcd383be0e59@syzkaller.appspotmail.com>
-To: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	luiz.dentz@gmail.com, marcel@holtmann.org, syzkaller-bugs@googlegroups.com
+References: <20241213120420.v2.1.Ifc708cc471a8834b344c26fce1ce2fe3e5992cad@changeid>
+ <675bb989.c80a0220.55725.032f@mx.google.com> <CAAa9mD16+vYKhWz=C=h+9cvo88HuzDoO-+eF55+Me25TbrgLTw@mail.gmail.com>
+In-Reply-To: <CAAa9mD16+vYKhWz=C=h+9cvo88HuzDoO-+eF55+Me25TbrgLTw@mail.gmail.com>
+From: Ying Hsu <yinghsu@chromium.org>
+Date: Fri, 27 Dec 2024 12:40:05 +0800
+X-Gmail-Original-Message-ID: <CAAa9mD0XEC8Q-bPvc+DJS8TLNBeWL49utUzgtmvWiCAxFEZuvg@mail.gmail.com>
+X-Gm-Features: AbW1kvbFmmcXxasnjmQBlvALH7tNqcZD8Buhfl4kUlLb4eXp9Z3N5X9nvlpryTk
+Message-ID: <CAAa9mD0XEC8Q-bPvc+DJS8TLNBeWL49utUzgtmvWiCAxFEZuvg@mail.gmail.com>
+Subject: Re: [v2] Bluetooth: btusb: add sysfs attribute to control USB alt setting
+To: linux-bluetooth@vger.kernel.org, 
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>, chromeos-bluetooth-upstreaming@chromium.org, 
+	"chharry@chromium.org" <chharry@chromium.org>, Zhengping Jiang <jiangzp@google.com>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hello,
-
-syzbot found the following issue on:
-
-HEAD commit:    9b2ffa6148b1 Merge tag 'mtd/fixes-for-6.13-rc5' of git://g..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=139ec0b0580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=c078001e66e4a17e
-dashboard link: https://syzkaller.appspot.com/bug?extid=8def80b4fcd383be0e59
-compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
-
-Unfortunately, I don't have any reproducer for this issue yet.
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/c1d66e09941d/disk-9b2ffa61.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/8aa24ea0a81d/vmlinux-9b2ffa61.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/0d9c0b1e880a/bzImage-9b2ffa61.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+8def80b4fcd383be0e59@syzkaller.appspotmail.com
-
-==================================================================
-BUG: KASAN: slab-use-after-free in msft_opcode_get+0x6d/0x80 drivers/bluetooth/hci_vhci.c:222
-Read of size 2 at addr ffff88802b5f7232 by task syz.2.1805/13856
-
-CPU: 1 UID: 0 PID: 13856 Comm: syz.2.1805 Not tainted 6.13.0-rc4-syzkaller-00012-g9b2ffa6148b1 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/13/2024
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:94 [inline]
- dump_stack_lvl+0x116/0x1f0 lib/dump_stack.c:120
- print_address_description mm/kasan/report.c:378 [inline]
- print_report+0xc3/0x620 mm/kasan/report.c:489
- kasan_report+0xd9/0x110 mm/kasan/report.c:602
- msft_opcode_get+0x6d/0x80 drivers/bluetooth/hci_vhci.c:222
- simple_attr_read+0x169/0x300 fs/libfs.c:1341
- debugfs_attr_read+0x74/0xa0 fs/debugfs/file.c:507
- full_proxy_read+0xfb/0x1b0 fs/debugfs/file.c:351
- vfs_read+0x1df/0xbe0 fs/read_write.c:563
- ksys_read+0x12b/0x250 fs/read_write.c:708
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xcd/0x250 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f4df7585d29
-Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007f4df845f038 EFLAGS: 00000246 ORIG_RAX: 0000000000000000
-RAX: ffffffffffffffda RBX: 00007f4df7775fa0 RCX: 00007f4df7585d29
-RDX: 00000000000000e1 RSI: 00000000200001c0 RDI: 0000000000000004
-RBP: 00007f4df7601aa8 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 0000000000000000 R14: 00007f4df7775fa0 R15: 00007fff18a8d4b8
- </TASK>
-
-Allocated by task 3447:
- kasan_save_stack+0x33/0x60 mm/kasan/common.c:47
- kasan_save_track+0x14/0x30 mm/kasan/common.c:68
- poison_kmalloc_redzone mm/kasan/common.c:377 [inline]
- __kasan_kmalloc+0xaa/0xb0 mm/kasan/common.c:394
- kasan_kmalloc include/linux/kasan.h:260 [inline]
- __do_kmalloc_node mm/slub.c:4298 [inline]
- __kmalloc_noprof+0x21a/0x4f0 mm/slub.c:4310
- kmalloc_noprof include/linux/slab.h:905 [inline]
- kzalloc_noprof include/linux/slab.h:1037 [inline]
- ieee802_11_parse_elems_full+0xe6/0x1630 net/mac80211/parse.c:958
- ieee802_11_parse_elems_crc net/mac80211/ieee80211_i.h:2384 [inline]
- ieee802_11_parse_elems net/mac80211/ieee80211_i.h:2391 [inline]
- ieee80211_rx_mgmt_probe_beacon net/mac80211/ibss.c:1576 [inline]
- ieee80211_ibss_rx_queued_mgmt+0xc54/0x3040 net/mac80211/ibss.c:1607
- ieee80211_iface_process_skb net/mac80211/iface.c:1613 [inline]
- ieee80211_iface_work+0xc0b/0xf00 net/mac80211/iface.c:1667
- cfg80211_wiphy_work+0x3de/0x560 net/wireless/core.c:440
- process_one_work+0x958/0x1b30 kernel/workqueue.c:3229
- process_scheduled_works kernel/workqueue.c:3310 [inline]
- worker_thread+0x6c8/0xf00 kernel/workqueue.c:3391
- kthread+0x2c1/0x3a0 kernel/kthread.c:389
- ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
-
-Freed by task 3447:
- kasan_save_stack+0x33/0x60 mm/kasan/common.c:47
- kasan_save_track+0x14/0x30 mm/kasan/common.c:68
- kasan_save_free_info+0x3b/0x60 mm/kasan/generic.c:582
- poison_slab_object mm/kasan/common.c:247 [inline]
- __kasan_slab_free+0x51/0x70 mm/kasan/common.c:264
- kasan_slab_free include/linux/kasan.h:233 [inline]
- slab_free_hook mm/slub.c:2353 [inline]
- slab_free mm/slub.c:4613 [inline]
- kfree+0x14f/0x4b0 mm/slub.c:4761
- ieee80211_rx_mgmt_probe_beacon net/mac80211/ibss.c:1581 [inline]
- ieee80211_ibss_rx_queued_mgmt+0x1ae3/0x3040 net/mac80211/ibss.c:1607
- ieee80211_iface_process_skb net/mac80211/iface.c:1613 [inline]
- ieee80211_iface_work+0xc0b/0xf00 net/mac80211/iface.c:1667
- cfg80211_wiphy_work+0x3de/0x560 net/wireless/core.c:440
- process_one_work+0x958/0x1b30 kernel/workqueue.c:3229
- process_scheduled_works kernel/workqueue.c:3310 [inline]
- worker_thread+0x6c8/0xf00 kernel/workqueue.c:3391
- kthread+0x2c1/0x3a0 kernel/kthread.c:389
- ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
-
-The buggy address belongs to the object at ffff88802b5f7000
- which belongs to the cache kmalloc-1k of size 1024
-The buggy address is located 562 bytes inside of
- freed 1024-byte region [ffff88802b5f7000, ffff88802b5f7400)
-
-The buggy address belongs to the physical page:
-page: refcount:1 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x2b5f0
-head: order:3 mapcount:0 entire_mapcount:0 nr_pages_mapped:0 pincount:0
-anon flags: 0xfff00000000040(head|node=0|zone=1|lastcpupid=0x7ff)
-page_type: f5(slab)
-raw: 00fff00000000040 ffff88801ac41dc0 0000000000000000 dead000000000001
-raw: 0000000000000000 0000000000100010 00000001f5000000 0000000000000000
-head: 00fff00000000040 ffff88801ac41dc0 0000000000000000 dead000000000001
-head: 0000000000000000 0000000000100010 00000001f5000000 0000000000000000
-head: 00fff00000000003 ffffea0000ad7c01 ffffffffffffffff 0000000000000000
-head: 0000000000000008 0000000000000000 00000000ffffffff 0000000000000000
-page dumped because: kasan: bad access detected
-page_owner tracks the page as allocated
-page last allocated via order 3, migratetype Unmovable, gfp_mask 0xd20c0(__GFP_IO|__GFP_FS|__GFP_NOWARN|__GFP_NORETRY|__GFP_COMP|__GFP_NOMEMALLOC), pid 1, tgid 1 (swapper/0), ts 11884013488, free_ts 0
- set_page_owner include/linux/page_owner.h:32 [inline]
- post_alloc_hook+0x2d1/0x350 mm/page_alloc.c:1558
- prep_new_page mm/page_alloc.c:1566 [inline]
- get_page_from_freelist+0xfce/0x2f80 mm/page_alloc.c:3476
- __alloc_pages_noprof+0x223/0x25b0 mm/page_alloc.c:4753
- alloc_pages_mpol_noprof+0x2c9/0x610 mm/mempolicy.c:2269
- alloc_slab_page mm/slub.c:2423 [inline]
- allocate_slab mm/slub.c:2589 [inline]
- new_slab+0x2c9/0x410 mm/slub.c:2642
- ___slab_alloc+0xce2/0x1650 mm/slub.c:3830
- __slab_alloc.constprop.0+0x56/0xb0 mm/slub.c:3920
- __slab_alloc_node mm/slub.c:3995 [inline]
- slab_alloc_node mm/slub.c:4156 [inline]
- __do_kmalloc_node mm/slub.c:4297 [inline]
- __kmalloc_noprof+0x2de/0x4f0 mm/slub.c:4310
- kmalloc_noprof include/linux/slab.h:905 [inline]
- kmalloc_array_noprof include/linux/slab.h:946 [inline]
- vivid_init_dv_timings drivers/media/test-drivers/vivid/vivid-core.c:1301 [inline]
- vivid_create_instance drivers/media/test-drivers/vivid/vivid-core.c:1869 [inline]
- vivid_probe drivers/media/test-drivers/vivid/vivid-core.c:2093 [inline]
- vivid_probe+0x1cce/0xba20 drivers/media/test-drivers/vivid/vivid-core.c:2078
- platform_probe+0xff/0x1f0 drivers/base/platform.c:1404
- call_driver_probe drivers/base/dd.c:579 [inline]
- really_probe+0x23e/0xa90 drivers/base/dd.c:658
- __driver_probe_device+0x1de/0x440 drivers/base/dd.c:800
- driver_probe_device+0x4c/0x1b0 drivers/base/dd.c:830
- __driver_attach+0x283/0x580 drivers/base/dd.c:1216
- bus_for_each_dev+0x13c/0x1d0 drivers/base/bus.c:370
- bus_add_driver+0x2e9/0x690 drivers/base/bus.c:675
-page_owner free stack trace missing
-
-Memory state around the buggy address:
- ffff88802b5f7100: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
- ffff88802b5f7180: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
->ffff88802b5f7200: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-                                     ^
- ffff88802b5f7280: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
- ffff88802b5f7300: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-==================================================================
+Looping in chharry@ who will be taking over this patch. Thank you for
+the review, Luiz.
 
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+On Wed, Dec 18, 2024 at 9:30=E2=80=AFAM Ying Hsu <yinghsu@chromium.org> wro=
+te:
+>
+> Hi Luiz,
+>
+> I've addressed the feedback in v1 and passed the series through our inter=
+nal CI.
+> For two LLPrivacy test failures in the `mgmt-tester, I'm wondering if
+> these failures might be unrelated to this patch.
+> Could you please take a look at the updated patch set when you have a cha=
+nce?
+>
+> Best regards,
+> Ying
+>
+> On Fri, Dec 13, 2024 at 12:35=E2=80=AFPM <bluez.test.bot@gmail.com> wrote=
+:
+> >
+> > This is automated email and please do not reply to this email!
+> >
+> > Dear submitter,
+> >
+> > Thank you for submitting the patches to the linux bluetooth mailing lis=
+t.
+> > This is a CI test results with your patch series:
+> > PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=3D9=
+17446
+> >
+> > ---Test result---
+> >
+> > Test Summary:
+> > CheckPatch                    PENDING   0.24 seconds
+> > GitLint                       PENDING   0.24 seconds
+> > SubjectPrefix                 PASS      0.09 seconds
+> > BuildKernel                   PASS      24.52 seconds
+> > CheckAllWarning               PASS      28.65 seconds
+> > CheckSparse                   PASS      30.25 seconds
+> > BuildKernel32                 PASS      24.18 seconds
+> > TestRunnerSetup               PASS      430.44 seconds
+> > TestRunner_l2cap-tester       PASS      20.19 seconds
+> > TestRunner_iso-tester         PASS      29.42 seconds
+> > TestRunner_bnep-tester        PASS      4.76 seconds
+> > TestRunner_mgmt-tester        FAIL      119.16 seconds
+> > TestRunner_rfcomm-tester      PASS      7.52 seconds
+> > TestRunner_sco-tester         PASS      9.32 seconds
+> > TestRunner_ioctl-tester       PASS      8.02 seconds
+> > TestRunner_mesh-tester        PASS      5.86 seconds
+> > TestRunner_smp-tester         PASS      6.91 seconds
+> > TestRunner_userchan-tester    PASS      5.02 seconds
+> > IncrementalBuild              PENDING   0.61 seconds
+> >
+> > Details
+> > ##############################
+> > Test: CheckPatch - PENDING
+> > Desc: Run checkpatch.pl script
+> > Output:
+> >
+> > ##############################
+> > Test: GitLint - PENDING
+> > Desc: Run gitlint
+> > Output:
+> >
+> > ##############################
+> > Test: TestRunner_mgmt-tester - FAIL
+> > Desc: Run mgmt-tester with test-runner
+> > Output:
+> > Total: 490, Passed: 484 (98.8%), Failed: 2, Not Run: 4
+> >
+> > Failed Test Cases
+> > LL Privacy - Start Discovery 2 (Disable RL)          Failed       0.190=
+ seconds
+> > LL Privacy - Set Device Flag 1 (Device Privacy)      Failed       0.153=
+ seconds
+> > ##############################
+> > Test: IncrementalBuild - PENDING
+> > Desc: Incremental build with the patches in the series
+> > Output:
+> >
+> >
+> >
+> > ---
+> > Regards,
+> > Linux Bluetooth
+> >
