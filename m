@@ -1,37 +1,37 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5590522339
-	for <linux-bluetooth@vger.kernel.org>; Mon, 30 Dec 2024 20:23:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CCD922339
+	for <linux-bluetooth@vger.kernel.org>; Mon, 30 Dec 2024 20:24:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735590234; cv=none; b=hVSukBVPPASMlpZ2pEIownDRZ2V1RqXWDPUWQr/iu0bdX/y9MAxjOVXSxbQJ6SvaFwdnNiWxgbJaR7UuAVV1Upw29MCTR8Cig6Ms4V30GFnWAGWAhR6TIXmsJOAZe3ncPD4JKw/c5mlztT3QvynZZbUTRJgssGcVn19ALKjGm9g=
+	t=1735590294; cv=none; b=mQbmBV7/z3q9f5k3Mv12NnbZtpVSddia7Na4j7k6BDkvSTFCp0pxPEpz6B9l3C16UCpkz3+2RF3x+tAJgg/clwxQdhOen+yT/P0mVI/QGd7vHHpLlZrlDWru3h3i2bH8UElM/DXoqOvpKNEDkYVXkNPIbBxuKwt1OuV31UayLNo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735590234; c=relaxed/simple;
-	bh=9AYNzwTAeAtYeOYYN/sSgZNw2oteGb+inRuZuKx9XmU=;
+	s=arc-20240116; t=1735590294; c=relaxed/simple;
+	bh=cmN9iYHK8cfE4vW0LUeslnVHaEr2hSJskrO41hwptMA=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=oxFaT21q0UPlQfR2xOFY702AGfjDEUGovKFk1VUjdym39ghL9ZlDDMUtK+BBv1R3zicDG1IKg2uXJLQXLCdoQMdkq1oarVkGle9LJKGrDLLwZSf3BHtV629P5KpLoTm7vTjkk4O2cUmu2cTyg+5uoGMOiBqqTT50MTQlV2eTNUQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oG3olPOK; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:MIME-Version; b=UZExguhZONWH5cB6l31nS+3paNkVQ2a8X0QRFUzUBn9Y6o9oZjef2xvydbIjeU1LEXuutdAg/FWalrPUtasX9jsPuhUlMpajMmrxwQAKLavTFSHdnm/DJFQ7jWDh+6zJmknwVcrIWCb4/z6Cy3wuXD9fnXyA8tipeVmQUqIwWjU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=syGvSSar; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oG3olPOK"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id DC4A1C4CED7
-	for <linux-bluetooth@vger.kernel.org>; Mon, 30 Dec 2024 20:23:53 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="syGvSSar"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 9BF20C4CEDC
+	for <linux-bluetooth@vger.kernel.org>; Mon, 30 Dec 2024 20:24:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1735590233;
-	bh=9AYNzwTAeAtYeOYYN/sSgZNw2oteGb+inRuZuKx9XmU=;
+	s=k20201202; t=1735590293;
+	bh=cmN9iYHK8cfE4vW0LUeslnVHaEr2hSJskrO41hwptMA=;
 	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=oG3olPOKXRCJWUk13YhfYwjCT8BpP0X5TOdhCQD7lic8RdcNqxbL2I7/MaiPlEAl7
-	 JmBHawKTB5Ad991dbiy5NyerZZh5EZV2HlZ48L6M1DO9nNGP5wBvfgjzFdZkboACs7
-	 YlhXqsGIgVHYIxYEpMXqSYL9t9RwSgOqHhSU4mCtsU/5DNTfwjgtswc1Kyl5YxE1U5
-	 xdVZEW3/xGF4Z4ZfUFweL2WkE2Hvt0c/ujEmvSoLCiYicqVRbzznZKlcEoyFpJhX4i
-	 3HAeTg1c4nZz+2DWtnOGmwQS32mymWXhSzuHNmRzmallHI+5Dg7eanWzYsY6zMD1UD
-	 Z75m9OD/coT7A==
+	b=syGvSSarq69MaY+qkNT1aNsIXrL+d7237zVQN4QJZbRh7llKsqYj33hzH67k1EG4v
+	 5hZmLaGPqFMYUF1NJDZvcTC4PF/Ma0teyInZLaoHPc8sJMOuMut+D63Bo9WqMtlmHv
+	 1ItFjzFpqApn7e2Y7P802I8n8mlM1uP/2/XLtY2t7EKtc7jzQ9Qq2KG2zKW+wqXz27
+	 oYAc5/CXI5/4u9HTkDTqrgayhC3XpBHv7ul7tTsS6SJIVTOqerHJnbBy4kgJwQmcto
+	 qf1LmO5mKUwcLFyovsXOyHohuNqDKYtABDi4WXeV++mJnTClRbhcs6epxLIPMrxg2n
+	 IEE2L+l3fTHaQ==
 Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id C8B9EC41612; Mon, 30 Dec 2024 20:23:53 +0000 (UTC)
+	id 92A4FC41612; Mon, 30 Dec 2024 20:24:53 +0000 (UTC)
 From: bugzilla-daemon@kernel.org
 To: linux-bluetooth@vger.kernel.org
 Subject: [Bug 219642] graph xrun not-triggered
-Date: Mon, 30 Dec 2024 20:23:53 +0000
+Date: Mon, 30 Dec 2024 20:24:53 +0000
 X-Bugzilla-Reason: AssignedTo
 X-Bugzilla-Type: changed
 X-Bugzilla-Watch-Reason: None
@@ -41,13 +41,13 @@ X-Bugzilla-Version: 2.5
 X-Bugzilla-Keywords: 
 X-Bugzilla-Severity: blocking
 X-Bugzilla-Who: aros@gmx.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
+X-Bugzilla-Status: RESOLVED
+X-Bugzilla-Resolution: ANSWERED
 X-Bugzilla-Priority: P3
 X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
 X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-219642-62941-gtr0F90ivJ@https.bugzilla.kernel.org/>
+X-Bugzilla-Changed-Fields: bug_status resolution
+Message-ID: <bug-219642-62941-N6FWz91chu@https.bugzilla.kernel.org/>
 In-Reply-To: <bug-219642-62941@https.bugzilla.kernel.org/>
 References: <bug-219642-62941@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
@@ -63,19 +63,17 @@ MIME-Version: 1.0
 
 https://bugzilla.kernel.org/show_bug.cgi?id=3D219642
 
---- Comment #1 from Artem S. Tashkinov (aros@gmx.com) ---
-This looks similar to this:
+Artem S. Tashkinov (aros@gmx.com) changed:
 
-https://gitlab.freedesktop.org/pipewire/pipewire/-/issues/4310
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+             Status|NEW                         |RESOLVED
+         Resolution|---                         |ANSWERED
 
-https://gitlab.freedesktop.org/pipewire/pipewire/-/issues/4233
+--- Comment #2 from Artem S. Tashkinov (aros@gmx.com) ---
+Or maybe just maybe even create a bug report in the PW's bug tracker.
 
-https://gitlab.freedesktop.org/pipewire/pipewire/-/issues/4182
-
-And it looks like these messages couldn't have produced the behaviour you're
-observing.
-
-Please try upgrading to the latest version of PipeWire regardless.
+The messages you're seeing are not coming from the kernel.
 
 --=20
 You may reply to this email to add a comment.
