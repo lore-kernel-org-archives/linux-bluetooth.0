@@ -1,231 +1,160 @@
-Received: from mail-il1-f206.google.com (mail-il1-f206.google.com [209.85.166.206])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mout.gmx.net (mout.gmx.net [212.227.17.21])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1705B1B4220
-	for <linux-bluetooth@vger.kernel.org>; Thu,  2 Jan 2025 14:21:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.206
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BFFE7E782
+	for <linux-bluetooth@vger.kernel.org>; Thu,  2 Jan 2025 18:56:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.17.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735827692; cv=none; b=iS53JIawGu/kbmeyvTKcWdMn5aGvOdxYMSYKBco0BSR3j47mnn9/2RkZm6aic5ViGfuzKFP8mvMSQEdx6JB0LGHTsRkLgvNrdTEhM+84ZeP02btbmqjRRHX+2KmIDOJwPkeLZy5CCDmrmc1ThG/txu+5gyQiJoiIGu8FrQQpfPs=
+	t=1735844180; cv=none; b=uZMaXzVndCZwrrb5rsHh+SpoUWJAPASU/24khwckuGlvhAIU6v0Lgeg37or46YvJNtumS6f17gljEHLudqKiwGFYfMc9E/MuVSyHAXZUVcT6wv573iODBYEUHTbDKuYBhj+lxyT6Fcz7ifgQdMYO9X2pJuzv5KIO1GQG8OCribQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735827692; c=relaxed/simple;
-	bh=wAgJluZV/Uz96G/jZ/4x6OEMweoT0/V68M6xV7lDjwM=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=Fmc2W18eRtgJbYEZjjLzmvb6Elbu4Fj/ICe6gzdy9iDZb8RJfVRYtOSe2p5hTXTrt9FP0N9NQI19wFGMcehsOP9ol4QoyzqAGEfGqQlBJTdSiyqn8WKT0qsE5/XO56e2EblRRIj4178UgktwKezQkzqwf+Uo0+OkZIVEZpC/xx4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.206
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f206.google.com with SMTP id e9e14a558f8ab-3a819a4e83dso126420925ab.1
-        for <linux-bluetooth@vger.kernel.org>; Thu, 02 Jan 2025 06:21:26 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1735827684; x=1736432484;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=peqcDb960nbFKFSbmKubX7LUXVPNPeMRWFbkIsGc1rQ=;
-        b=qGvwksdq7PZFAqUzAP8oWzh/eUHh1gq+oImOWK9lm5j5PmpC6UEwEgOnXlqWJTKoaB
-         d6SuzsZfXoWn3x/6WtuEffzKMi0BxmCGC6RKfLkXQkG1al9oKNhz/VvXrBTd/m9nCz40
-         mCytkxdOJbcwmpNFiUS43wxpnKNreDdv7TqkVzA13UBEFFOp/PugLWIdlzEwuV5BMrQU
-         yGcjv5RYzJSuMI9VstY6/2lw/fVsC2XLg3kiFa/CkErGUZx2CChVhsRWm2m+Sr1YuHfy
-         yaDuZZSlkH2x4FwoTQWI+I9tppWaM3aLkG0MDy1695TLp5OnhKGZ1vOuYNV+P/jtjejG
-         P37w==
-X-Forwarded-Encrypted: i=1; AJvYcCUbPJxDhanBko/pWMLOfloW23A9ZcKIbIaTF0XRT/8LIo5LRSzbdU9JWMhXgawuH9bCSKySKjHRL2uDc7FFaeA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyDA2pfswJW987r2IudBjc3bYaavD/eZEA29Cb4OpYapKp3mEdV
-	zBt6UW1IvDEM/x5rWcrnZ1MJX81Xme+37HvYx1O7FHD7kFbiEQG0qEpIyuZPUoxGoO22NAcgxcD
-	eYfPYVJqG0ZT2zvTF7D+9EqjrlaBEyiABUeB/UrvCGvbSzJngQ6lhbXQ=
-X-Google-Smtp-Source: AGHT+IFUSq2KaCvzG1Yl1gsJ0DPoSOTVer8SsVauxiC2Tvum/x0Di4TQ2C+jVhmVq6+j9l5cQtstSII1E5TqmWMl9tQpwAkWFvxr
+	s=arc-20240116; t=1735844180; c=relaxed/simple;
+	bh=ZhkA/NM+80hBGXSyC35CkDvFt4dvjiCLHDeLs4riEqs=;
+	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=rs1lHzBpnyeweF3xBfYu2IHEb1vthVBfqo8yNjvNikaSqUaaINXKGQmHBguKVPluw57pxffQ/NdAQdIJRCfhigq123idQigNr7t9oSl2rgKXN8v9RplprGBu9zK8Y0j+9l6YxHeaPYduerorxPs2U5GrmSYAAwiudZXgtttZc3g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.de; spf=pass smtp.mailfrom=gmx.de; dkim=pass (2048-bit key) header.d=gmx.de header.i=fiona.klute@gmx.de header.b=W55uPuBt; arc=none smtp.client-ip=212.227.17.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmx.de
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmx.de header.i=fiona.klute@gmx.de header.b="W55uPuBt"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmx.de;
+	s=s31663417; t=1735844175; x=1736448975; i=fiona.klute@gmx.de;
+	bh=ZhkA/NM+80hBGXSyC35CkDvFt4dvjiCLHDeLs4riEqs=;
+	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:To:Cc:From:
+	 Subject:Content-Type:Content-Transfer-Encoding:cc:
+	 content-transfer-encoding:content-type:date:from:message-id:
+	 mime-version:reply-to:subject:to;
+	b=W55uPuBtsfst3c91+71dj28ot/S5rMHHH37Yu59a5XO1hhQ8RigdefWU4a2JwnW8
+	 c8HvQxU6nUqa4yo9dmlapd81dqlGo0vardKURKhNmZul76Vo5hyp7GTNV5T4xr3EH
+	 ZYfsD9XrApHcyMpQN73GyABedm6lmwoiNCqak7hr/fzpqHCCV1cmfAc4EBL3AU0Ca
+	 +VHuLBUE2FhNMSqxxKfDPZzzo+aaSXxXy3/VGHh2HX8GKi8Ctm7d8YCCYrYv2enxG
+	 +v9uEtJF236trlcHmk2IqJXNz+Nxzrw/5RG1qPwg8b0Z3OE3+YQI1QfDGdAHES+xJ
+	 3bRAWwjEPtXr93fWzg==
+X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
+Received: from [192.168.0.24] ([84.249.220.44]) by mail.gmx.net (mrgmx105
+ [212.227.17.168]) with ESMTPSA (Nemesis) id 1MWigq-1t0kTf08Hw-00YRgy; Thu, 02
+ Jan 2025 19:56:15 +0100
+Message-ID: <2d83c7e7-80a2-4fa8-b095-c0ac7ad62581@gmx.de>
+Date: Thu, 2 Jan 2025 20:56:14 +0200
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1d02:b0:3a6:b445:dc92 with SMTP id
- e9e14a558f8ab-3c2d2568b0emr375936745ab.10.1735827684515; Thu, 02 Jan 2025
- 06:21:24 -0800 (PST)
-Date: Thu, 02 Jan 2025 06:21:24 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6776a0e4.050a0220.3a8527.0041.GAE@google.com>
-Subject: [syzbot] [bluetooth?] KASAN: slab-use-after-free Read in
- mgmt_remove_adv_monitor_complete (2)
-From: syzbot <syzbot+427032ea7979b6db0ffa@syzkaller.appspotmail.com>
-To: johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, luiz.dentz@gmail.com, marcel@holtmann.org, 
-	netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US, de-DE-1901, de-DE
+To: linux-bluetooth@vger.kernel.org
+Cc: Thomas Petazzoni <thomas.petazzoni@bootlin.com>
+From: Fiona Klute <fiona.klute@gmx.de>
+Subject: Bug: BlueZ Build fails with --disable-hid --enable-hog
+Autocrypt: addr=fiona.klute@gmx.de; keydata=
+ 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
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:To750VWJZgLECTZuI1Lzkp2TU6uNU1IcQvtdSsa4X2+BsIO3XOs
+ tiYIwAnBUVzCdujLw2XT82FaMt5ZQfXsO4H40pjwgpvPxcTiSU9GkypndlKMKcnancwWuMp
+ SXG2PAavneCP5zyhXf8EBY69WnoazOyj5HNmrEypxvDqjGRkkcW5aVU0hHIpsxJjSX02/Sj
+ cAr/lEyW7ABm0IIY9LqDw==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:rc/35YAf4lQ=;6QfjVwEaZlh38T8jCs5vArwu+Bu
+ MU1rdRqa3DegT8WiyESCmDM8+PtUGcTsQkF6moV9/aeO2RYkxIScoIauVdXq5R2U6A48Wy+OU
+ laI6IynUtRT4iDnqPU+ftzo+3WCrnnOK5JC5hlSGTz5mU1INuY7TDwKw4duMsWYwY2ZZFm15B
+ UV5qbmcpJJ0G+e47G1yb9eEX8uxWHtqQNLEDR3ImK3HDiudnc9PCFm/oKnclGW4MsmtcT5aqX
+ bsLoWyFN5b9p8hIBXQI73AgR+g3RMx4T5u7Kzx5bkEDnYZRIaMg59aASTyeGgZrahFjlMyeYa
+ 8usuhPykMYpUB8eCapY+chDSFpfxcBblAmRvbiXA97q9SFTPAxwj9hZM150RH7BJdK1DF4y9F
+ f3shPJZQgdEisTTmM5ywWwETmHO6FCANyamSqsQiptZ/SU05YafvJsIH3CPNcsVIIjMlaeN4Z
+ 1CRwjGYBpKdHRPKfXc7OYRN6/evjghwJqIWoKP+UU79o4YetBXlKpT4sr/ifH7OOcFjOaiuVS
+ U+p0Fbzr8g1If/lg6x3uDTXH6vdOgOnhnTAco2TcGdic5u3NPEmoeKybQ5fl5/8NeC7XKmDgv
+ fMIS0wuzVnCwX8/Rin9RVQo5ON+OX1AK6htwl0EtTJwLQGXtFl/ja+WPlfsGA8YIROJAB5Tzn
+ yKhxIJglrHKT6wwooNBMGaJlk+yLplh1zcQbKIJfvIZYVEtHgsnaUk5kmkq8j3fqDtSWaF77V
+ BDCsn2O1J8AkF7hbGB1bZ+aU4Vs3LvhQSqNtB2ypDiMX9uuZOkl031jFoNu+vNasQE8ZucrPR
+ fVebIcfV6shWVDCNlja0tjxRHVa+wiVbGbYkpvpOoxxd9OYtSkcrNH5BTHBNUafAs9xxhq3Nn
+ Qp1SphYFK60NUfz6aB3wrumX8uMtpGjBZOXb7tB9UIA+wTJIgFWKFmHe0rMOPyFBQkbSe0jYk
+ RI9x7Upwa4LcqsqRjaNp5coytg14Fwr2H1Nq9nB8FSqMveoYwj0P0DD5ZCrvWTXNYh/Jta+Au
+ dtg9Ko3c8Xnk+0qb/KsY/FTksm/UqE+tl307BKDuM6xooxkszdAZpUYQXbslPO65O3ps/jkLe
+ cL6N+/BLpfdIsYdA/3By6dA7eL/t3s
 
 Hello,
 
-syzbot found the following issue on:
+in Buildroot we've seen BlueZ 5.79 builds fail if configured with
+=2D-disable-hid and --enable-hog (see [1] for logs, [2] for discussion):
 
-HEAD commit:    9268abe611b0 Merge branch 'net-lan969x-add-rgmii-support'
-git tree:       net-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=153c2af8580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=b087c24b921cdc16
-dashboard link: https://syzkaller.appspot.com/bug?extid=427032ea7979b6db0ffa
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+/home/autobuild/autobuild/instance-7/output-1/host/lib/gcc/mips-buildroot-=
+linux-musl/13.3.0/../../../../mips-buildroot-linux-musl/bin/ld:
+profiles/input/bluetoothd-hog.o: in function `hog_disconnect':
+/home/autobuild/autobuild/instance-7/output-1/build/bluez5_utils-5.79/prof=
+iles/input/hog.c:211:(.text.hog_disconnect+0x3c):
+undefined reference to `input_get_userspace_hid'
+/home/autobuild/autobuild/instance-7/output-1/host/lib/gcc/mips-buildroot-=
+linux-musl/13.3.0/../../../../mips-buildroot-linux-musl/bin/ld:
+/home/autobuild/autobuild/instance-7/output-1/build/bluez5_utils-5.79/prof=
+iles/input/hog.c:211:(.text.hog_disconnect+0x44):
+undefined reference to `input_get_userspace_hid'
+collect2: error: ld returned 1 exit status
 
-Unfortunately, I don't have any reproducer for this issue yet.
+Looks like profiles/input/device.c isn't compiled with --disable-hid,
+which is why the function is missing during linking. It appears to me
+that either the HOG conditional should be fixed so all required files
+are compiled if it's enabled, or HOG should require HID. I'm not that
+familiar with BT input devices, so I'm not sure which is the correct
+approach.
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/8274f60b0163/disk-9268abe6.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/f7b3fde537e7/vmlinux-9268abe6.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/db4cccf7caae/bzImage-9268abe6.xz
+Buildroot has been forbidding building HID without HOG due to a similar
+bug for a while [3] due to a similar bug, which makes me wonder what's
+the recommended solution. For Buildroot granular configuration is
+desirable so embedded systems with limited storage can include only the
+required parts.
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+427032ea7979b6db0ffa@syzkaller.appspotmail.com
+What are your thoughts on this? I'm happy to look at patching once the
+correct approach is clear.
 
-==================================================================
-BUG: KASAN: slab-use-after-free in mgmt_remove_adv_monitor_complete+0x3b6/0x550 net/bluetooth/mgmt.c:5526
-Read of size 2 at addr ffff88802a3507c0 by task kworker/u9:4/5847
+Best regards,
+Fiona
 
-CPU: 1 UID: 0 PID: 5847 Comm: kworker/u9:4 Not tainted 6.13.0-rc3-syzkaller-00762-g9268abe611b0 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/13/2024
-Workqueue: hci0 hci_cmd_sync_work
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:94 [inline]
- dump_stack_lvl+0x241/0x360 lib/dump_stack.c:120
- print_address_description mm/kasan/report.c:378 [inline]
- print_report+0x169/0x550 mm/kasan/report.c:489
- kasan_report+0x143/0x180 mm/kasan/report.c:602
- mgmt_remove_adv_monitor_complete+0x3b6/0x550 net/bluetooth/mgmt.c:5526
- hci_cmd_sync_work+0x280/0x400 net/bluetooth/hci_sync.c:334
- process_one_work kernel/workqueue.c:3229 [inline]
- process_scheduled_works+0xa66/0x1840 kernel/workqueue.c:3310
- worker_thread+0x870/0xd30 kernel/workqueue.c:3391
- kthread+0x2f0/0x390 kernel/kthread.c:389
- ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
- </TASK>
-
-Allocated by task 6895:
- kasan_save_stack mm/kasan/common.c:47 [inline]
- kasan_save_track+0x3f/0x80 mm/kasan/common.c:68
- poison_kmalloc_redzone mm/kasan/common.c:377 [inline]
- __kasan_kmalloc+0x98/0xb0 mm/kasan/common.c:394
- kasan_kmalloc include/linux/kasan.h:260 [inline]
- __do_kmalloc_node mm/slub.c:4298 [inline]
- __kmalloc_node_track_caller_noprof+0x28b/0x4c0 mm/slub.c:4317
- kmemdup_noprof+0x2a/0x60 mm/util.c:135
- mgmt_pending_new+0xf0/0x250 net/bluetooth/mgmt_util.c:276
- mgmt_pending_add+0x36/0x120 net/bluetooth/mgmt_util.c:296
- remove_adv_monitor+0x102/0x1b0 net/bluetooth/mgmt.c:5568
- hci_mgmt_cmd+0xc47/0x11d0 net/bluetooth/hci_sock.c:1712
- hci_sock_sendmsg+0x7b8/0x11c0 net/bluetooth/hci_sock.c:1832
- sock_sendmsg_nosec net/socket.c:711 [inline]
- __sock_sendmsg+0x221/0x270 net/socket.c:726
- sock_write_iter+0x2d7/0x3f0 net/socket.c:1158
- new_sync_write fs/read_write.c:586 [inline]
- vfs_write+0xaeb/0xd30 fs/read_write.c:679
- ksys_write+0x18f/0x2b0 fs/read_write.c:731
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-Freed by task 6894:
- kasan_save_stack mm/kasan/common.c:47 [inline]
- kasan_save_track+0x3f/0x80 mm/kasan/common.c:68
- kasan_save_free_info+0x40/0x50 mm/kasan/generic.c:582
- poison_slab_object mm/kasan/common.c:247 [inline]
- __kasan_slab_free+0x59/0x70 mm/kasan/common.c:264
- kasan_slab_free include/linux/kasan.h:233 [inline]
- slab_free_hook mm/slub.c:2353 [inline]
- slab_free mm/slub.c:4613 [inline]
- kfree+0x196/0x430 mm/slub.c:4761
- mgmt_pending_free net/bluetooth/mgmt_util.c:308 [inline]
- mgmt_pending_remove+0x175/0x1a0 net/bluetooth/mgmt_util.c:315
- mgmt_pending_foreach+0xd1/0x130 net/bluetooth/mgmt_util.c:259
- mgmt_index_removed+0x133/0x390 net/bluetooth/mgmt.c:9483
- hci_sock_bind+0xcce/0x1150 net/bluetooth/hci_sock.c:1307
- __sys_bind_socket net/socket.c:1838 [inline]
- __sys_bind+0x1e4/0x290 net/socket.c:1869
- __do_sys_bind net/socket.c:1874 [inline]
- __se_sys_bind net/socket.c:1872 [inline]
- __x64_sys_bind+0x7a/0x90 net/socket.c:1872
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-The buggy address belongs to the object at ffff88802a3507c0
- which belongs to the cache kmalloc-8 of size 8
-The buggy address is located 0 bytes inside of
- freed 8-byte region [ffff88802a3507c0, ffff88802a3507c8)
-
-The buggy address belongs to the physical page:
-page: refcount:1 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x2a350
-flags: 0xfff00000000000(node=0|zone=1|lastcpupid=0x7ff)
-page_type: f5(slab)
-raw: 00fff00000000000 ffff88801ac41500 ffffea0001e80e80 dead000000000002
-raw: 0000000000000000 0000000080800080 00000001f5000000 0000000000000000
-page dumped because: kasan: bad access detected
-page_owner tracks the page as allocated
-page last allocated via order 0, migratetype Unmovable, gfp_mask 0x52cc0(GFP_KERNEL|__GFP_NOWARN|__GFP_NORETRY|__GFP_COMP), pid 5840, tgid 5840 (syz-executor), ts 98630915179, free_ts 98583109001
- set_page_owner include/linux/page_owner.h:32 [inline]
- post_alloc_hook+0x1f3/0x230 mm/page_alloc.c:1556
- prep_new_page mm/page_alloc.c:1564 [inline]
- get_page_from_freelist+0x365c/0x37a0 mm/page_alloc.c:3474
- __alloc_pages_noprof+0x292/0x710 mm/page_alloc.c:4751
- alloc_pages_mpol_noprof+0x3e8/0x680 mm/mempolicy.c:2269
- alloc_slab_page+0x6a/0x110 mm/slub.c:2423
- allocate_slab+0x5a/0x2b0 mm/slub.c:2589
- new_slab mm/slub.c:2642 [inline]
- ___slab_alloc+0xc27/0x14a0 mm/slub.c:3830
- __slab_alloc+0x58/0xa0 mm/slub.c:3920
- __slab_alloc_node mm/slub.c:3995 [inline]
- slab_alloc_node mm/slub.c:4156 [inline]
- __do_kmalloc_node mm/slub.c:4297 [inline]
- __kmalloc_node_track_caller_noprof+0x2e9/0x4c0 mm/slub.c:4317
- __kmemdup_nul mm/util.c:61 [inline]
- kstrdup+0x39/0xb0 mm/util.c:81
- __kernfs_new_node+0x9d/0x870 fs/kernfs/dir.c:620
- kernfs_new_node+0x137/0x240 fs/kernfs/dir.c:700
- kernfs_create_dir_ns+0x43/0x120 fs/kernfs/dir.c:1061
- sysfs_create_dir_ns+0x189/0x3a0 fs/sysfs/dir.c:59
- create_dir lib/kobject.c:73 [inline]
- kobject_add_internal+0x435/0x8d0 lib/kobject.c:240
- kobject_add_varg lib/kobject.c:374 [inline]
- kobject_add+0x152/0x220 lib/kobject.c:426
-page last free pid 1107 tgid 1107 stack trace:
- reset_page_owner include/linux/page_owner.h:25 [inline]
- free_pages_prepare mm/page_alloc.c:1127 [inline]
- free_unref_page+0xd3f/0x1010 mm/page_alloc.c:2657
- rcu_do_batch kernel/rcu/tree.c:2567 [inline]
- rcu_core+0xaaa/0x17a0 kernel/rcu/tree.c:2823
- handle_softirqs+0x2d4/0x9b0 kernel/softirq.c:561
- __do_softirq kernel/softirq.c:595 [inline]
- invoke_softirq kernel/softirq.c:435 [inline]
- __irq_exit_rcu+0xf7/0x220 kernel/softirq.c:662
- irq_exit_rcu+0x9/0x30 kernel/softirq.c:678
- instr_sysvec_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1049 [inline]
- sysvec_apic_timer_interrupt+0xa6/0xc0 arch/x86/kernel/apic/apic.c:1049
- asm_sysvec_apic_timer_interrupt+0x1a/0x20 arch/x86/include/asm/idtentry.h:702
-
-Memory state around the buggy address:
- ffff88802a350680: fa fc fc fc 00 fc fc fc fa fc fc fc fa fc fc fc
- ffff88802a350700: fa fc fc fc fa fc fc fc fa fc fc fc fa fc fc fc
->ffff88802a350780: fa fc fc fc fa fc fc fc fa fc fc fc fa fc fc fc
-                                           ^
- ffff88802a350800: fa fc fc fc fa fc fc fc fa fc fc fc fa fc fc fc
- ffff88802a350880: fa fc fc fc fa fc fc fc fa fc fc fc fa fc fc fc
-==================================================================
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+[1] http://autobuild.buildroot.net/?reason=3Dbluez5_utils-5.79
+[2]
+https://lore.kernel.org/buildroot/4abf920a-3da8-457b-a287-cb57fc7fd20d@gmx=
+.de/
+[3]
+https://gitlab.com/buildroot.org/buildroot/-/commit/9850f262fd6546d15ae27f=
+84a0e36411abc2b7b5
