@@ -1,124 +1,143 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oi1-f169.google.com (mail-oi1-f169.google.com [209.85.167.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1291343173
-	for <linux-bluetooth@vger.kernel.org>; Thu,  2 Jan 2025 23:55:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 609D1158D80
+	for <linux-bluetooth@vger.kernel.org>; Fri,  3 Jan 2025 02:39:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735862108; cv=none; b=H7VCVqcmsBbQQsf76hpfHL7v2MOfiLS6R6D7/AJYLmx3VLbVMVgk273ogAoXKXYhFv0Ch4E/HJyy2RUGU4AEZ5RLXGRhoIBNmp7MJhAX9ZfJFANLLg/Z2dajysrnKgjDDPXvkoaRl5c/3dgYMPrHWf+IZuasQ0JypFvt0p9/wpo=
+	t=1735871954; cv=none; b=CI0fmYRhXNGMPvPKsc+3IWDgVWG/6F0Yeo9M+Nh5r9TBIOfz6FNufxWW4aLMig5A73xjzV/9KRltPpifqIvALFfTu9mKNgNsLG5J+6mAcbe2fHjE/2XqdY12Q0508oi06WBnTmRBFeGJnLbFyGmnMrRhjjneCBpUF4fzhiEvlfs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735862108; c=relaxed/simple;
-	bh=sLLbOFgv4p3NvoTW9eswCE6wAfUuhBoTFDYl/LILpgk=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=Gcak+wTHbNc7Ow85Q6zYnU7VPVrbRQfyRBuDILGUwkJheUMZRTBtMgseQ2PU47vAzxlLl/1xCztya+O0ZRMmqWEZ4TbLF25sJFPzrTgh8reIEPD4VbCKWOSGiRlAXbqSudyKXUFnGoi2OJ/EybGazYjjsDFRw/AnfVxgJlQqtkg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qvOc0wyZ; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1735871954; c=relaxed/simple;
+	bh=4hFXu8Huk/kjbH67Anbe0jKhW8fMpPYIptavJwWzhJU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=EljB0OfgYxBZsHu0sGwkhKuT530EKXCTMzAZN8m/a8wpt+u9tIw/7VvcIBhWjfZxoeVAivIFb9VJyQwL3kkKc1RAx4qqucBvWjh+LtfH6qdlDkqrHS1ONRyyqM2RDCdOjZd3lRZmGXwHX3+eUQdqq98Trh5in9v70DLdMsXZorU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aZvvfRNv; arc=none smtp.client-ip=209.85.167.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qvOc0wyZ"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id AA60EC4CEDE
-	for <linux-bluetooth@vger.kernel.org>; Thu,  2 Jan 2025 23:55:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1735862107;
-	bh=sLLbOFgv4p3NvoTW9eswCE6wAfUuhBoTFDYl/LILpgk=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=qvOc0wyZE7mHeRzcdLjiXJMFx8Q8XW2zoFObAPU3KSlZNSAtS2bZy2vphXBrHzqb2
-	 FXlP4giVw6sJQwRMCl4YvxRsogB2kekL909g05DXBzamAOFDSb6zasoZr4h7e8/WWL
-	 0EzxRtMlzSyPFFWTKugnoC8eerPBjT6jDDKkOsU9R06Eza7lkVWMovoLY4wcnTTd+7
-	 C9hrFWY55xNw09jCpEGsC1PW7z+VhjR3ZrrzEpKsucn82vrV47/3u/OxBwQspMec5Z
-	 MtrarhnFJMAMJ/3HAL5SHpkbDq+8B0rk1wxrfopiICI8YNTFmlDCrLW5XemyNdZQWH
-	 CYGvNm98BIknA==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id 9AC61C41615; Thu,  2 Jan 2025 23:55:07 +0000 (UTC)
-From: bugzilla-daemon@kernel.org
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aZvvfRNv"
+Received: by mail-oi1-f169.google.com with SMTP id 5614622812f47-3eba0f09c3aso4007269b6e.1
+        for <linux-bluetooth@vger.kernel.org>; Thu, 02 Jan 2025 18:39:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1735871952; x=1736476752; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=X3KHne/Q5NTQ0UmweggjEiX+rrRlMypPs34+SbWOQQI=;
+        b=aZvvfRNvGlFTPUo3O32PCbi1V/ZlG7o9MZhU57XhywsKfkbuH65Ni0LrsAXfccf8Jj
+         fELnbTJEuF89ZBa6jK62S1diSksuSGfbfMbdkH4os1/jDelOybG30POmC0wNnghpP+wl
+         /N93rNMnGTKxSIKEMAo9axqo2+9vFDvuTaTgDwJwUH/RFfrZg/apoUODxqu87oONtnbS
+         muYVgcS9T2UX5TQQoRuHLg7ymMrwDWl4UC/PLNND6gIquvKyNjouPIwBYXyjm/pvUS2M
+         za7m+HBQrcwQd8R+CagpOT1j4FRbj5uDhvi3Ynf+IxAaJihf6A16/3mrDYVO0xNLPP5p
+         OaVw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1735871952; x=1736476752;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=X3KHne/Q5NTQ0UmweggjEiX+rrRlMypPs34+SbWOQQI=;
+        b=aT9ack0b2FfxAacgRckoNDDIh7v9ee35T40cdYLqfb5QDh7yqe2S7U1M6pGQNBd9IV
+         IB44CHYV68OtvltL53Wr2qinyYq7Twc+0M/YBJ6kt4z1LQ81NX1tIH4jV2tqmZksRldn
+         SQEViPz5wiz+z4KyQ6QLEbvOjVDDitUyM5LHjwTcNtrKZGfIi+Oygc/sWXmJ00dQ+NgI
+         JbszLn1yJPLwHRZdvS4RYG2jzXRk4ps5VgQaNhke7Jelk2QUv34jqFDscdRdCO1ncamK
+         exbIMeoxfw/gn3yDrdwEAs7S2eic0tuyJ75zPUIQXPK+P61X/gpIBv/Ad2GqXsbq3k4v
+         ldjQ==
+X-Gm-Message-State: AOJu0YzcCH+U5gWe2nC5E+meQfdZW31HjNwNyr8LtGznujeUcfrf/BBr
+	uQzAYMyEY2noaEGVcxWOIcOLEotUBsTQ/v7/bGB3s7p2S5Uof0JqlBEBxZfB
+X-Gm-Gg: ASbGncuwoonrBJVcQDReAMRqBQamqfgv2CgvN0ZNkFsUrL2S40poRlUeXMZGTyFf7Dd
+	MYYXqRKa+Pxj0T/q9szb1JrVmLH+uSnKOAPefSwoWZkyYaUtjWlEEKjC1Kw28pSRycCB0H0pTG7
+	H4gG7JJRnHCUlTQCuJdUaS+iT8nJRFG+bA0XqZCM4jU7gd0NGQlI8L+r1tx5lPcG30hwlFwcLm+
+	3HspJrlEcZcinJY7Lvxq6T77l8RxDyEQOx+HGcRHLOp3uHD+7dH7pCv5Q8bc1oa4k8df8NrllR3
+	uUYGoQpP+GINsvHPZw0h0pI=
+X-Google-Smtp-Source: AGHT+IEi0ap6xqZMXiR5meu7G2oToZAFOCGzqeXrQQA5XVbEr3ysdv6+UcgSj27m34YZIEA7AthAuw==
+X-Received: by 2002:a05:6808:1887:b0:3eb:619f:1a87 with SMTP id 5614622812f47-3ed890a93e9mr28942918b6e.28.1735871952073;
+        Thu, 02 Jan 2025 18:39:12 -0800 (PST)
+Received: from localhost.localdomain (ip174-69-128-121.br.br.cox.net. [174.69.128.121])
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-71fc97cddc3sm8023118a34.29.2025.01.02.18.39.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 02 Jan 2025 18:39:11 -0800 (PST)
+From: Blaise Duszynski <blaised@gmail.com>
+X-Google-Original-From: Blaise Duszynski <BlaiseD@GMail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [Bug 219514] PC does not resume from suspend, bisect points to
- btusb/mediatek
-Date: Thu, 02 Jan 2025 23:55:07 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: olivier@croquette.de
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P3
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: cc
-Message-ID: <bug-219514-62941-wXfMuccD2a@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-219514-62941@https.bugzilla.kernel.org/>
-References: <bug-219514-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+Cc: Blaise Duszynski <BlaiseD@GMail.com>
+Subject: [PATCH BlueZ] plugin: Order plugin init by priority
+Date: Thu,  2 Jan 2025 20:37:08 -0600
+Message-ID: <20250103023708.554604-1-BlaiseD@GMail.com>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D219514
+The init order matters for some plugins, e.g. wiimote
+Add them to a sorted list before calling add_plugin
+---
+ src/plugin.c | 17 +++++++++++------
+ 1 file changed, 11 insertions(+), 6 deletions(-)
 
-Olivier Croquette (olivier@croquette.de) changed:
+diff --git a/src/plugin.c b/src/plugin.c
+index 00d3d7b6a..137b191c8 100644
+--- a/src/plugin.c
++++ b/src/plugin.c
+@@ -37,10 +37,10 @@ struct bluetooth_plugin {
+ 
+ static int compare_priority(gconstpointer a, gconstpointer b)
+ {
+-	const struct bluetooth_plugin *plugin1 = a;
+-	const struct bluetooth_plugin *plugin2 = b;
++	const struct bluetooth_plugin_desc *plugin1 = a;
++	const struct bluetooth_plugin_desc *plugin2 = b;
+ 
+-	return plugin2->desc->priority - plugin1->desc->priority;
++	return plugin2->priority - plugin1->priority;
+ }
+ 
+ static int init_plugin(const struct bluetooth_plugin_desc *desc)
+@@ -86,7 +86,7 @@ static gboolean add_external_plugin(void *handle,
+ 
+ 	__btd_enable_debug(desc->debug_start, desc->debug_stop);
+ 
+-	plugins = g_slist_insert_sorted(plugins, plugin, compare_priority);
++	plugins = g_slist_append(plugins, plugin);
+ 	DBG("Plugin %s loaded", desc->name);
+ 
+ 	return TRUE;
+@@ -109,7 +109,7 @@ static void add_plugin(const struct bluetooth_plugin_desc *desc)
+ 		return;
+ 	}
+ 
+-	plugins = g_slist_insert_sorted(plugins, plugin, compare_priority);
++	plugins = g_slist_append(plugins, plugin);
+ 	DBG("Plugin %s loaded", desc->name);
+ }
+ 
+@@ -201,6 +201,7 @@ static void external_plugin_init(char **cli_disabled, char **cli_enabled)
+ 
+ void plugin_init(const char *enable, const char *disable)
+ {
++	GSList *builtins = NULL;
+ 	char **cli_disabled = NULL;
+ 	char **cli_enabled = NULL;
+ 	unsigned int i;
+@@ -222,12 +223,16 @@ void plugin_init(const char *enable, const char *disable)
+ 								cli_disabled))
+ 			continue;
+ 
+-		add_plugin(__bluetooth_builtin[i]);
++		builtins = g_slist_insert_sorted(builtins,
++			(void *) __bluetooth_builtin[i], compare_priority);
+ 	}
+ 
++	g_slist_foreach(builtins, (GFunc) add_plugin, NULL);
++
+ 	if IS_ENABLED(EXTERNAL_PLUGINS)
+ 		external_plugin_init(cli_enabled, cli_disabled);
+ 
++	g_slist_free(builtins);
+ 	g_strfreev(cli_enabled);
+ 	g_strfreev(cli_disabled);
+ }
+-- 
+2.47.1
 
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-                 CC|                            |olivier@croquette.de
-
---- Comment #4 from Olivier Croquette (olivier@croquette.de) ---
-I also bisected this and came to commit
-d019930b0049fc2648a6b279893d8ad330596e81, which is in the same area. I also
-found similar reports:
-
-https://bugzilla.kernel.org/show_bug.cgi?id=3D219290
-https://bugzilla.redhat.com/show_bug.cgi?id=3D2314036
-https://bbs.archlinux.org/viewtopic.php?id=3D295916
-https://bbs.archlinux.org/viewtopic.php?id=3D299987
-https://discussion.fedoraproject.org/t/kernel-6-11-3-200-fc40-unable-to-res=
-ume-from-suspend-when-bluetooth-enabled/134008/10
-https://discussion.fedoraproject.org/t/system-cannot-wake-up/134199/39
-
-A workaround that works for me and does not require to patch the kernel is =
-the
-following service:
-
-# /etc/systemd/system/bt-fix.service
-#=20
-# Author: Bojan Kseneman
-#
-https://discussion.fedoraproject.org/t/kernel-6-11-3-200-fc40-unable-to-res=
-ume-from-suspend-when-bluetooth-enabled/134008/17
-
-[Unit]
-Description=3DDisable Bluetooth before going to sleep
-Before=3Dsleep.target
-StopWhenUnneeded=3Dyes
-
-[Service]
-Type=3Doneshot
-RemainAfterExit=3Dyes
-
-ExecStart=3D/usr/sbin/rfkill block bluetooth
-ExecStop=3D/usr/sbin/rfkill unblock bluetooth
-
-[Install]
-WantedBy=3Dsleep.target
-
-
-
-I also wrote on the linux-bluetooth mailing list, with stack trace from a
-kernel oops:
-
-https://lore.kernel.org/linux-bluetooth/073c3b772abe84d480913495eea0c4da736=
-07d6e.camel@croquette.de/T/#u
-
---=20
-You may reply to this email to add a comment.
-
-You are receiving this mail because:
-You are the assignee for the bug.=
