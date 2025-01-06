@@ -1,176 +1,129 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f175.google.com (mail-qk1-f175.google.com [209.85.222.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DCEB23A0
-	for <linux-bluetooth@vger.kernel.org>; Mon,  6 Jan 2025 02:50:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E58B0522A
+	for <linux-bluetooth@vger.kernel.org>; Mon,  6 Jan 2025 04:18:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736131845; cv=none; b=HV1hL7pwydutq66ouafIiqPgppR5H7fWs04KWyWOuee/hvfhKQSsCXUsXUHWYkro6mk9lbhzyDNpwplnPSMvVeir56hbt2uW5Q7IhquGH4ggryCSbqgbrikNAKaGGecx9k1EZBU4cH1/O9uPJB4t1gJicMWpZK9kGaIwcWTzRPE=
+	t=1736137130; cv=none; b=BDFodMlm8QbUmMFRxjLTr1emD1jtI10MLqy1sO4XYPlurFZEqGlc5ZABH03jyh+iGxwEv6163U6J9lk+6Lx9kDRmBdajRKNQ+HNDR8/KUC+vD4UrYvTQxAbR4Yb90cXUAVUhceuvTY+2EZMP9Je1qR4MbMojFIqLUf+KqT/mBGk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736131845; c=relaxed/simple;
-	bh=AcaAaHwr3ThLvruY3CDw4UpTWbigSiLdtvaK7PZv464=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=Ft05eq1bFu5WFRr35E4RIZC2BPAWe5LrACG+M+Ka6McjGXRkHtZvabWokSKf05SBA6mhJ8wJpvEu06cVBN5LoxHNty6ye1cWMO+DRavAK1tiwEaVRkmL0jSXinbK5jWpeVdVzVE1WsiinIWFX+cOH7CJhJdd8ehFU+/XRNre59Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ERnFC8KD; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1736137130; c=relaxed/simple;
+	bh=Tc03BmuNMUVo1qEGXn3ut09pOP00vxVPGrTDhPBdxaE=;
+	h=Message-ID:Date:Content-Type:MIME-Version:From:To:Subject:
+	 In-Reply-To:References; b=Symed/t4lr7fFPJUwxvG9EMpw+dO5B9iptI+loAvA8RY5BwpYYbxWKQiPO5msAVAK1wpogLiH/6GYgdhx1FUsrc2mFz+cxFuCfAumoXDaN/pEVIY66yRlo0JnOUw0zCt8oAvh8/tGducOM4kXwtWBQpDvFXiabNEeK5uTDgue4I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ATS3CIrZ; arc=none smtp.client-ip=209.85.222.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ERnFC8KD"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id C17DFC4CED0;
-	Mon,  6 Jan 2025 02:50:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736131844;
-	bh=AcaAaHwr3ThLvruY3CDw4UpTWbigSiLdtvaK7PZv464=;
-	h=From:Date:Subject:To:Cc:Reply-To:From;
-	b=ERnFC8KD1CmCcgxZhkXyGDVidrDCQUbmn8VpfmqGwZyXLRyfW6e+5xsTEJHYmXQEI
-	 EM3pfRGAnQoENzTExu1M88D1yhRXswN0pcwOte8LLMFG3nS6XAVfGgFRf+X/q96wDX
-	 TfC8QCr30YFHm+kZ6E8nBPIg3hbIzf5mIjmApD8sj/vNbRS99AeYok8CG4rep25xJT
-	 cPv1wZUW/tMZNhjNGbRLWRE/P/1PPc2eiS/K7hGiMeNL+BRB1BHydAafn8M2dCKWkO
-	 0OXUNYi2I0u90lZmFL0Qa/jtyxPcN2Ra6ed3JGUDvJ9WoTeXC3kEJfP6r0OymfWPIR
-	 +XMMHmVOM9I/w==
-Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AEBC2E77197;
-	Mon,  6 Jan 2025 02:50:44 +0000 (UTC)
-From: Yang Li via B4 Relay <devnull+yang.li.amlogic.com@kernel.org>
-Date: Mon, 06 Jan 2025 10:50:33 +0800
-Subject: [PATCH BlueZ bluez] bap: fixed issue of muting music silent after
- pause and resume.
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ATS3CIrZ"
+Received: by mail-qk1-f175.google.com with SMTP id af79cd13be357-7ba0fa25f07so559461085a.2
+        for <linux-bluetooth@vger.kernel.org>; Sun, 05 Jan 2025 20:18:48 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1736137127; x=1736741927; darn=vger.kernel.org;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=v2aWM+LQVtGRm7q23Q3kc0+/FRlDY+StM51yLbrDcVk=;
+        b=ATS3CIrZufRes8FcjAH406rF1JQ4h7JlWhqZb89Pg6OSgwAXDEDbAIScC4dxdkrGy6
+         UULekAl8KHaasFjRSYvlAPVWtiSPktWUywOLYF7Y0lYkfl5On6gUNILrNZgRI9jY/22x
+         fqnCaT4JS4gR7AHv4fOC0zBYU4J6nkYG05gR0+JNaYwugBBpeJrYdkAu2+y/Kn6K1Cbn
+         Qc474jLL8jhwCgUeId/HYW+bSPTRsLRj0agzK3fT7eV/5fAOGjcZ//fxndJkcJbqE7hK
+         ey9oVgkpP7Gn/Ch2Uf1HdFFtCDpDPgkaa3xDjYbGCEulW8U7u6YITqTXu/H6t+783hIh
+         YMsQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736137127; x=1736741927;
+        h=reply-to:references:in-reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=v2aWM+LQVtGRm7q23Q3kc0+/FRlDY+StM51yLbrDcVk=;
+        b=ixjOVASQI4M5Mj4Ajw7oDLlHfenyYFvApxB4iWdGkOqbwCUEO/za7EKmz7LI31F0Uq
+         9gY/SjGejnDUGpqQFeY3T/o229TIqMF3p06sOwtEPoRMCJVFaw/1euoc5D9WZPEIzUhZ
+         eeNRbGx3e2603jK4caRJ+pcCQPoJ/z0vE4jJhv8ABQabjwOtmXdXDgAQGJHEbBeqZuzi
+         e24MDUk1NW8uFsm4K985y9Lp+wQIx4ZaV1rx5hohzwciprlgzC+SRkzX4RtXlksv2dg4
+         nmKPLXS8QpJJBcVO2POkdcWd+zeRNeIkeERWMuR86idC7UjoZBVa2XkW2a2mhlxjadmm
+         PUdw==
+X-Gm-Message-State: AOJu0YxlGtJ1Y78Vv2QTtF0EL3p7O11tP3aCtyhnCGvUQnDR/wJ7r77P
+	Xt0uwEU6FP3IOAgiDo+n2DhOuZuEiymaz6980NHwpVEbgbharD4AYUmSKQ==
+X-Gm-Gg: ASbGncsweYBlJVpeYzaFMv9Ow4+yFu9muvL2OIWq3ZRzAeqc3T5DKbRLexa/Yox0egy
+	MfphUYY+bDpEZUh9vpDyrFzjmRGDhWWj83W5GQY4TStWPe12tHMIHKCnMC6aUmRwcSwuJAwm6cZ
+	51OrLeKunQAaniZzQFmUbu5td/uVVIYSd2hi3+68fNPJCoMwKnPFHJJQNS0bc91GK5sOYQKakFw
+	htxS7epNA77YGL1hQ/lZzmgKEKX55ijGkknDStuqbNY5Vn49JpbHBDLBc1oeEs=
+X-Google-Smtp-Source: AGHT+IF1BKPQn4NDjxndn68+Kr+PwZVVMVe7k2EDF5PlZgM9B8WInjA3ZR3jmj9rQW4OtBGHJTCDsQ==
+X-Received: by 2002:a05:620a:2449:b0:7b6:fdb9:1be6 with SMTP id af79cd13be357-7b9ba7a582bmr7651354385a.29.1736137127605;
+        Sun, 05 Jan 2025 20:18:47 -0800 (PST)
+Received: from [172.17.0.2] ([40.76.119.168])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7b9ac2e89a4sm1475622685a.50.2025.01.05.20.18.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 05 Jan 2025 20:18:47 -0800 (PST)
+Message-ID: <677b59a7.050a0220.18b721.defa@mx.google.com>
+Date: Sun, 05 Jan 2025 20:18:47 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============8947198328667795772=="
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+From: bluez.test.bot@gmail.com
+To: linux-bluetooth@vger.kernel.org, devnull+yang.li.amlogic.com@kernel.org
+Subject: RE: [BlueZ,bluez] bap: fixed issue of muting music silent after pause and resume.
+In-Reply-To: <20250106-upstream-v1-1-a16879b78ffd@amlogic.com>
+References: <20250106-upstream-v1-1-a16879b78ffd@amlogic.com>
+Reply-To: linux-bluetooth@vger.kernel.org
+
+--===============8947198328667795772==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250106-upstream-v1-1-a16879b78ffd@amlogic.com>
-X-B4-Tracking: v=1; b=H4sIAPhEe2cC/x3MSwqAIBRG4a3EHSdoVGBbiQZmf3WhF5oRSXtPG
- n5wOJE8HMNTk0VyuNjzviWoPCM7m22C4CGZCllUUslahMOfDmYVClYb6NoOpqSUHw4j3/+qpX4
- JeKh73w/ykkCDYQAAAA==
-To: Linux Bluetooth <linux-bluetooth@vger.kernel.org>
-Cc: Yang Li <yang.li@amlogic.com>
-X-Mailer: b4 0.13-dev-f0463
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1736131842; l=3358;
- i=yang.li@amlogic.com; s=20240418; h=from:subject:message-id;
- bh=0vJza6mORdA09fG39CPF0TZT9NAGC+UO9Oed6hi3bPM=;
- b=pWEyFH+FovdewVUB8NJxC/3swuzP3b3j+tGRFi4lyJh+rCZGQk1ZBkq2nex7ogqvNJ6Pcj+jG
- I9lYtIydM9pCP1dgB2sm0AlOmcj1vuP2P244/62z+TZX/x+sREAnJ/b
-X-Developer-Key: i=yang.li@amlogic.com; a=ed25519;
- pk=86OaNWMr3XECW9HGNhkJ4HdR2eYA5SEAegQ3td2UCCs=
-X-Endpoint-Received: by B4 Relay for yang.li@amlogic.com/20240418 with
- auth_id=180
-X-Original-From: Yang Li <yang.li@amlogic.com>
-Reply-To: yang.li@amlogic.com
 
-From: Yang Li <yang.li@amlogic.com>
+This is automated email and please do not reply to this email!
 
-CIS sink need caching the Codec Configured when releasing by Pixel,
-state machine is releasing -> Codec. If streamming -> idle, CIS sink
-was silent after resume music.
+Dear submitter,
 
-Signed-off-by: Yang Li <yang.li@amlogic.com>
----
- src/shared/bap.c | 43 +++++++++++++++++++++++++++++++------------
- 1 file changed, 31 insertions(+), 12 deletions(-)
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=922416
 
-diff --git a/src/shared/bap.c b/src/shared/bap.c
-index 167501282..a7f5dec92 100644
---- a/src/shared/bap.c
-+++ b/src/shared/bap.c
-@@ -1063,6 +1063,28 @@ static void stream_notify_metadata(struct bt_bap_stream *stream)
- 	free(status);
- }
- 
-+static void stream_notify_release(struct bt_bap_stream *stream)
-+{
-+	struct bt_bap_endpoint *ep = stream->ep;
-+	struct bt_ascs_ase_status *status;
-+	size_t len;
-+
-+	DBG(stream->bap, "stream %p", stream);
-+
-+	len = sizeof(*status);
-+	status = malloc(len);
-+
-+	memset(status, 0, len);
-+	status->id = ep->id;
-+	ep->state = BT_BAP_STREAM_STATE_RELEASING;
-+	status->state = ep->state;
-+
-+	gatt_db_attribute_notify(ep->attr, (void *) status, len,
-+					bt_bap_get_att(stream->bap));
-+
-+	free(status);
-+}
-+
- static struct bt_bap *bt_bap_ref_safe(struct bt_bap *bap)
- {
- 	if (!bap || !bap->ref_count || !queue_find(sessions, NULL, bap))
-@@ -1634,7 +1656,7 @@ static bool stream_notify_state(void *data)
- 	struct bt_bap_stream *stream = data;
- 	struct bt_bap_endpoint *ep = stream->ep;
- 
--	DBG(stream->bap, "stream %p", stream);
-+	DBG(stream->bap, "stream %p status %d", stream, ep->state);
- 
- 	if (stream->state_id) {
- 		timeout_remove(stream->state_id);
-@@ -1655,6 +1677,9 @@ static bool stream_notify_state(void *data)
- 	case BT_ASCS_ASE_STATE_DISABLING:
- 		stream_notify_metadata(stream);
- 		break;
-+	case BT_ASCS_ASE_STATE_RELEASING:
-+		stream_notify_release(stream);
-+		break;
- 	}
- 
- 	return false;
-@@ -1936,9 +1961,7 @@ static uint8_t stream_disable(struct bt_bap_stream *stream, struct iovec *rsp)
- 	/* Sink can autonomously transit to QOS while source needs to go to
- 	 * Disabling until BT_ASCS_STOP is received.
- 	 */
--	if (stream->ep->dir == BT_BAP_SINK)
--		stream_set_state(stream, BT_BAP_STREAM_STATE_QOS);
--	else
-+	if (stream->ep->dir == BT_BAP_SOURCE)
- 		stream_set_state(stream, BT_BAP_STREAM_STATE_DISABLING);
- 
- 	return 0;
-@@ -2068,17 +2091,11 @@ static unsigned int bap_ucast_metadata(struct bt_bap_stream *stream,
- 
- static uint8_t stream_release(struct bt_bap_stream *stream, struct iovec *rsp)
- {
--	struct bt_bap_pac *pac;
--
- 	DBG(stream->bap, "stream %p", stream);
- 
- 	ascs_ase_rsp_success(rsp, stream->ep->id);
- 
--	pac = stream->lpac;
--	if (pac->ops && pac->ops->clear)
--		pac->ops->clear(stream, pac->user_data);
--
--	stream_set_state(stream, BT_BAP_STREAM_STATE_IDLE);
-+	stream_set_state(stream, BT_BAP_STREAM_STATE_RELEASING);
- 
- 	return 0;
- }
-@@ -6172,8 +6189,10 @@ static bool stream_io_disconnected(struct io *io, void *user_data)
- 
- 	DBG(stream->bap, "stream %p io disconnected", stream);
- 
--	bt_bap_stream_set_io(stream, -1);
-+	if (stream->ep->state == BT_ASCS_ASE_STATE_RELEASING)
-+		stream_set_state(stream, BT_BAP_STREAM_STATE_CONFIG);
- 
-+	bt_bap_stream_set_io(stream, -1);
- 	return false;
- }
- 
+---Test result---
+
+Test Summary:
+CheckPatch                    PENDING   0.20 seconds
+GitLint                       PENDING   0.20 seconds
+BuildEll                      PASS      20.89 seconds
+BluezMake                     PASS      1558.72 seconds
+MakeCheck                     PASS      13.50 seconds
+MakeDistcheck                 PASS      159.43 seconds
+CheckValgrind                 PASS      216.34 seconds
+CheckSmatch                   WARNING   273.05 seconds
+bluezmakeextell               PASS      101.18 seconds
+IncrementalBuild              PENDING   0.22 seconds
+ScanBuild                     PASS      865.03 seconds
+
+Details
+##############################
+Test: CheckPatch - PENDING
+Desc: Run checkpatch.pl script
+Output:
+
+##############################
+Test: GitLint - PENDING
+Desc: Run gitlint
+Output:
+
+##############################
+Test: CheckSmatch - WARNING
+Desc: Run smatch tool with source
+Output:
+src/shared/bap.c:296:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structuressrc/shared/bap.c:296:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structuressrc/shared/bap.c:296:25: warning: array of flexible structuressrc/shared/bap.c: note: in included file:./src/shared/ascs.h:88:25: warning: array of flexible structures
+##############################
+Test: IncrementalBuild - PENDING
+Desc: Incremental build with the patches in the series
+Output:
+
+
 
 ---
-base-commit: dfb1ffdc95a00bc06d81a75c11ab5ad2e24d37bf
-change-id: 20250106-upstream-1ec9ae96cda4
-
-Best regards,
--- 
-Yang Li <yang.li@amlogic.com>
+Regards,
+Linux Bluetooth
 
 
+--===============8947198328667795772==--
