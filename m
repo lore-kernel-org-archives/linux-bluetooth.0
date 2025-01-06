@@ -1,34 +1,34 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8361D1DF743;
-	Mon,  6 Jan 2025 18:10:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1A021DF26B;
+	Mon,  6 Jan 2025 18:10:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736187016; cv=none; b=iGIFcOROyxNyO3G2meJ+zlQkwG1am+7CAjoi/N+pArfhDGAR+nYnyIRfGraqZcZ6hXSGd4dylt1wN0V+Yh/bb0OScdtG+KNoguXQk+/wZro+H1ocMSwF4X9itvcAY61ZuRLB8YJXVhmR1WRO1fAtqGTbL6+DHy7XVBQV4tEzaPE=
+	t=1736187017; cv=none; b=YHky0irzZGzDbsK7ot3WH4znWgxcKCHlhaE0ByoHfgFIdZq7z2VepCUKivqTgtfT4pEguehAGuQ2el0K5ewI+aBQXLgE/SqWksdo40JzKTR17DFzg3mOx/lzYIDQtDgFAZAc79NOdVYcXPQpaWSukfIO0dI3USPPv3MjoiPNMOA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736187016; c=relaxed/simple;
-	bh=5PlDcKtqVBuOJWOxTdj/X9bXaXtbcLWHt8gsMs9B5vg=;
+	s=arc-20240116; t=1736187017; c=relaxed/simple;
+	bh=HDRfwyjWcpZdxGe5mxw9b0857FneO9FKBH8ns7GXGxw=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=gYOoMDv0lfnTScUzZKVlIAFdzg6hiZn3s4LJyS7uFjRVdXFVpNJhd5oVXaN2ehmysD9gUS4WigGzfa80QctpM1Slx73ynhtn4ecZrvmZxDSXzbWqRerNQM17tnZNM+RZ8ONU+e8OHSr3oLUYhztQ+XHMzXBNsAF6gUB2EnH+ckw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=s9gz0ceq; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=kNm9tR8js/84DAkjWT9Ye8gCUmtr3Bmdcb9/toCzqgam16H0QJSIVuCGrypzT51rtgFvAxCTKsrzbOKbQaGXKoHxL0u/f4dHHHpPvlhZMs/r8WDh4EEC7gQwAZWFmxCu3FhS2ttVpVdJIYCv8zRzTtFM+mAod6qGyNjE/x4qSfU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UOVgnalF; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="s9gz0ceq"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0FE6FC4CED6;
-	Mon,  6 Jan 2025 18:10:16 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UOVgnalF"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8F968C4CED6;
+	Mon,  6 Jan 2025 18:10:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736187016;
-	bh=5PlDcKtqVBuOJWOxTdj/X9bXaXtbcLWHt8gsMs9B5vg=;
+	s=k20201202; t=1736187017;
+	bh=HDRfwyjWcpZdxGe5mxw9b0857FneO9FKBH8ns7GXGxw=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=s9gz0ceqd1GRk25vAFoYBmUb+V6wvbE161w4PgtxZ7wHVCLnT+tbvu8ayBC1I4p3r
-	 5JloS14h1Ijt4+F2BY9C72aem6o6gvCGZUyC8ifgRKdA943L/aCiNXnN1RzrZGpBdQ
-	 KNkvMJnJpAAztSb77l84L6TT7DcRSi6mRRSuplxXfzhhgr9t+lu0vUqPDbMONYerAb
-	 4jW5xTowibHfSUEzl9YOV40ymri9aE60A8RgiSpSXMq3BrGgi9v6xig9VHaJN2Qntw
-	 c/TbDz/QVaAHfICqfk1SkDUxuX9SQ9dG1J50euQ1gWN+kAyarAWqzlpg5fwJw3u68d
-	 e/IZlAZv7HQ2g==
+	b=UOVgnalFgutDkFsC+tNuoRxsxHIr/2rY1RsPmvafSF+pWmAc8NC6fFhSKf3IYERUG
+	 N43OaL2mZrwQXP8UEGCvVGbD7uT5LqLAVlOeb/eKFTn5JiU2M6DrWaiWBbLcRtS/vs
+	 Pe4Ji2NN73tyiNr2SRNdwggvYnaXoAiaG2R3DMh3KIY7asXTVi78P5ItAJmz95aku4
+	 KYlKBux4/PtF5milAIha1n9nDSpwlbORZuRBgzaLPJru6migAeQB7grKWWa/VzCG7a
+	 QSsmLMG1x0QpdLsxpWVNdJOGZRkHqJMCnU7EngN+wwCNKFgWYMCA7hVAQtB9T/0DMt
+	 KhoZQewqIBIfg==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70DB6380A97E;
-	Mon,  6 Jan 2025 18:10:38 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAEB9380A97E;
+	Mon,  6 Jan 2025 18:10:39 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -37,17 +37,17 @@ List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2] Bluetooth: btusb: add sysfs attribute to control USB alt
- setting
+Subject: Re: [PATCH] Bluetooth: hci: Remove deadcode
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <173618703723.3577621.15231390426011092583.git-patchwork-notify@kernel.org>
-Date: Mon, 06 Jan 2025 18:10:37 +0000
-References: <20241213120420.v2.1.Ifc708cc471a8834b344c26fce1ce2fe3e5992cad@changeid>
-In-Reply-To: <20241213120420.v2.1.Ifc708cc471a8834b344c26fce1ce2fe3e5992cad@changeid>
-To: Ying Hsu <yinghsu@chromium.org>
-Cc: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com,
- chromeos-bluetooth-upstreaming@chromium.org, marcel@holtmann.org,
+ <173618703849.3577621.11756538459673947760.git-patchwork-notify@kernel.org>
+Date: Mon, 06 Jan 2025 18:10:38 +0000
+References: <20241216012636.484775-1-linux@treblig.org>
+In-Reply-To: <20241216012636.484775-1-linux@treblig.org>
+To: Dr. David Alan Gilbert <linux@treblig.org>
+Cc: marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
+ linux-bluetooth@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, netdev@vger.kernel.org,
  linux-kernel@vger.kernel.org
 
 Hello:
@@ -55,21 +55,19 @@ Hello:
 This patch was applied to bluetooth/bluetooth-next.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Fri, 13 Dec 2024 12:04:22 +0800 you wrote:
-> When a Bluetooth raw socket is open, the HCI event related to SCO
-> connection changes are not dispatched to the hci_event module, and
-> the underlying Bluetooth controller's USB Interface 1 will not be
-> updated accordingly.
+On Mon, 16 Dec 2024 01:26:36 +0000 you wrote:
+> From: "Dr. David Alan Gilbert" <linux@treblig.org>
 > 
-> This patch adds `isoc_alt` sysfs attribute, allowing user space
-> to update the alternate setting of the USB interface alternate
-> setting as needed.
+> hci_bdaddr_list_del_with_flags() was added in 2020's
+> commit 8baaa4038edb ("Bluetooth: Add bdaddr_list_with_flags for classic
+> whitelist")
+> but has remained unused.
 > 
 > [...]
 
 Here is the summary with links:
-  - [v2] Bluetooth: btusb: add sysfs attribute to control USB alt setting
-    https://git.kernel.org/bluetooth/bluetooth-next/c/e85c08c0aada
+  - Bluetooth: hci: Remove deadcode
+    https://git.kernel.org/bluetooth/bluetooth-next/c/5db2921c27a7
 
 You are awesome, thank you!
 -- 
