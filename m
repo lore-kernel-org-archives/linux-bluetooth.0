@@ -1,136 +1,176 @@
-Received: from mail-il1-f207.google.com (mail-il1-f207.google.com [209.85.166.207])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E4173398A
-	for <linux-bluetooth@vger.kernel.org>; Sun,  5 Jan 2025 07:14:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.207
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DCEB23A0
+	for <linux-bluetooth@vger.kernel.org>; Mon,  6 Jan 2025 02:50:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736061260; cv=none; b=ejAbRYX4n3icMcMS9kneO+em1WITrhJhMd3+2FL0esvPGMG+LZGOZJyOzy3f4ZWjOICtCwlKDGpJD2sKzjM9gC90FMRqITmtt9RWFhse5m4SSnHImF/M8n8O/XCSDwvm4uRBn0lKJdJupRu0Gk+GrYiYeln1zbntALTxtKVimdo=
+	t=1736131845; cv=none; b=HV1hL7pwydutq66ouafIiqPgppR5H7fWs04KWyWOuee/hvfhKQSsCXUsXUHWYkro6mk9lbhzyDNpwplnPSMvVeir56hbt2uW5Q7IhquGH4ggryCSbqgbrikNAKaGGecx9k1EZBU4cH1/O9uPJB4t1gJicMWpZK9kGaIwcWTzRPE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736061260; c=relaxed/simple;
-	bh=LQCWgS7Qc+bkoXZM1UsiYmVDhAhWcfy+V4VgCmCeRhk=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=WUemwaVhim9vvGSOSkHYpoAGkKwliGv925B3e1HuXw1IC2xUaQ440xhzlNjYFggdjI5ztAtJALYulCLKhSCxD9bX7ZzLShGyA07u/fPresoJ6eH6+6TveE9yN+Nb2DLtCVoXN8SCYDJROkHOER03NM04i7YlQ9QVj4xmilkEhI4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.207
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f207.google.com with SMTP id e9e14a558f8ab-3a91a13f63fso118548275ab.3
-        for <linux-bluetooth@vger.kernel.org>; Sat, 04 Jan 2025 23:14:18 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736061258; x=1736666058;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=gpscDy3VHv8Px7e7gmFp5GQktlm+oqpMqCbdVhnRoqM=;
-        b=dRAIxrSwJsrbZ1SG8hr/HSVOD75I3u+qdm+KDWp54vrhfzyt4odLggK0YWYOAPFZuE
-         O1h1A7VnmbL5FO/PhUJfs73ZQencOAgJmVCmS2Bfq/CuD4pyhg1Yn6lVwa4jsOSfzUPW
-         IsJIWBaWwT6mCNdoypYaGB6VQao4AHIe/tLEMOT33r/9N+tuXDOZDjLa8OQwah8n1HBo
-         v24qK9oO7CMPQHrLP0yfkz3YzhLXh/bJozJhzoJzkw+ckI+wSWHTIfGY/5RZjOcTE81K
-         Ml9UZLEU06NctUSd0/RGGw83PYqzMRtsX8jjamxwzDSfnbMOYy4EhMdi6ktGNjFXSNO5
-         GsbA==
-X-Forwarded-Encrypted: i=1; AJvYcCWW/lqXJz2+VmKiWw5c28oJ++gRk2+Zp83hcnhWnQg/IEqlKKdWFb0iw+6xqGfz+6CoTt+fku6i5K1Ee7mVXtY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwrilkkX9tLTsXrsOFfnwxhciIdGhHt5b8dhTTlbFbeUmc98+tL
-	evnHHrijQMoww4jQKkAL3ikTJ1K9cTEjW+XlDR5JTomgot+0BTRea+u/uGdJm1zidDubRGhgkzh
-	pbHr0wjEvxIYT7GHEbeN99n4axY3P6XfLtQJtGU46ehrq7e1opTTuLWo=
-X-Google-Smtp-Source: AGHT+IEZl0xuRI6kYROVHfxtCrQSGusEqWZkXPnVBpyjdtS4uxPn8ofo4x5Fer8iAyqLjbwAcZKaAjhJlTspt5Oyxh49SEKx0vqq
+	s=arc-20240116; t=1736131845; c=relaxed/simple;
+	bh=AcaAaHwr3ThLvruY3CDw4UpTWbigSiLdtvaK7PZv464=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=Ft05eq1bFu5WFRr35E4RIZC2BPAWe5LrACG+M+Ka6McjGXRkHtZvabWokSKf05SBA6mhJ8wJpvEu06cVBN5LoxHNty6ye1cWMO+DRavAK1tiwEaVRkmL0jSXinbK5jWpeVdVzVE1WsiinIWFX+cOH7CJhJdd8ehFU+/XRNre59Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ERnFC8KD; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ERnFC8KD"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id C17DFC4CED0;
+	Mon,  6 Jan 2025 02:50:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1736131844;
+	bh=AcaAaHwr3ThLvruY3CDw4UpTWbigSiLdtvaK7PZv464=;
+	h=From:Date:Subject:To:Cc:Reply-To:From;
+	b=ERnFC8KD1CmCcgxZhkXyGDVidrDCQUbmn8VpfmqGwZyXLRyfW6e+5xsTEJHYmXQEI
+	 EM3pfRGAnQoENzTExu1M88D1yhRXswN0pcwOte8LLMFG3nS6XAVfGgFRf+X/q96wDX
+	 TfC8QCr30YFHm+kZ6E8nBPIg3hbIzf5mIjmApD8sj/vNbRS99AeYok8CG4rep25xJT
+	 cPv1wZUW/tMZNhjNGbRLWRE/P/1PPc2eiS/K7hGiMeNL+BRB1BHydAafn8M2dCKWkO
+	 0OXUNYi2I0u90lZmFL0Qa/jtyxPcN2Ra6ed3JGUDvJ9WoTeXC3kEJfP6r0OymfWPIR
+	 +XMMHmVOM9I/w==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AEBC2E77197;
+	Mon,  6 Jan 2025 02:50:44 +0000 (UTC)
+From: Yang Li via B4 Relay <devnull+yang.li.amlogic.com@kernel.org>
+Date: Mon, 06 Jan 2025 10:50:33 +0800
+Subject: [PATCH BlueZ bluez] bap: fixed issue of muting music silent after
+ pause and resume.
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:3201:b0:3a7:be5e:e22d with SMTP id
- e9e14a558f8ab-3c2d1aa3e86mr396733085ab.2.1736061258217; Sat, 04 Jan 2025
- 23:14:18 -0800 (PST)
-Date: Sat, 04 Jan 2025 23:14:18 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <677a314a.050a0220.380ff0.000b.GAE@google.com>
-Subject: [syzbot] [bluetooth?] WARNING in hci_devcd_register
-From: syzbot <syzbot+7540c87aab2f3a5cef91@syzkaller.appspotmail.com>
-To: johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, luiz.dentz@gmail.com, marcel@holtmann.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20250106-upstream-v1-1-a16879b78ffd@amlogic.com>
+X-B4-Tracking: v=1; b=H4sIAPhEe2cC/x3MSwqAIBRG4a3EHSdoVGBbiQZmf3WhF5oRSXtPG
+ n5wOJE8HMNTk0VyuNjzviWoPCM7m22C4CGZCllUUslahMOfDmYVClYb6NoOpqSUHw4j3/+qpX4
+ JeKh73w/ykkCDYQAAAA==
+To: Linux Bluetooth <linux-bluetooth@vger.kernel.org>
+Cc: Yang Li <yang.li@amlogic.com>
+X-Mailer: b4 0.13-dev-f0463
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1736131842; l=3358;
+ i=yang.li@amlogic.com; s=20240418; h=from:subject:message-id;
+ bh=0vJza6mORdA09fG39CPF0TZT9NAGC+UO9Oed6hi3bPM=;
+ b=pWEyFH+FovdewVUB8NJxC/3swuzP3b3j+tGRFi4lyJh+rCZGQk1ZBkq2nex7ogqvNJ6Pcj+jG
+ I9lYtIydM9pCP1dgB2sm0AlOmcj1vuP2P244/62z+TZX/x+sREAnJ/b
+X-Developer-Key: i=yang.li@amlogic.com; a=ed25519;
+ pk=86OaNWMr3XECW9HGNhkJ4HdR2eYA5SEAegQ3td2UCCs=
+X-Endpoint-Received: by B4 Relay for yang.li@amlogic.com/20240418 with
+ auth_id=180
+X-Original-From: Yang Li <yang.li@amlogic.com>
+Reply-To: yang.li@amlogic.com
 
-Hello,
+From: Yang Li <yang.li@amlogic.com>
 
-syzbot found the following issue on:
+CIS sink need caching the Codec Configured when releasing by Pixel,
+state machine is releasing -> Codec. If streamming -> idle, CIS sink
+was silent after resume music.
 
-HEAD commit:    ccb98ccef0e5 Merge tag 'platform-drivers-x86-v6.13-4' of g..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=13255af8580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=86dd15278dbfe19f
-dashboard link: https://syzkaller.appspot.com/bug?extid=7540c87aab2f3a5cef91
-compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+Signed-off-by: Yang Li <yang.li@amlogic.com>
+---
+ src/shared/bap.c | 43 +++++++++++++++++++++++++++++++------------
+ 1 file changed, 31 insertions(+), 12 deletions(-)
 
-Unfortunately, I don't have any reproducer for this issue yet.
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/d24eb225cff7/disk-ccb98cce.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/dd81532f8240/vmlinux-ccb98cce.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/18b08e4bbf40/bzImage-ccb98cce.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+7540c87aab2f3a5cef91@syzkaller.appspotmail.com
-
-------------[ cut here ]------------
-DEBUG_LOCKS_WARN_ON(lock->magic != lock)
-WARNING: CPU: 1 PID: 10888 at kernel/locking/mutex.c:564 __mutex_lock_common kernel/locking/mutex.c:564 [inline]
-WARNING: CPU: 1 PID: 10888 at kernel/locking/mutex.c:564 __mutex_lock+0x369/0xa60 kernel/locking/mutex.c:735
-Modules linked in:
-CPU: 1 UID: 0 PID: 10888 Comm: syz.7.1098 Not tainted 6.13.0-rc5-syzkaller-00004-gccb98ccef0e5 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/13/2024
-RIP: 0010:__mutex_lock_common kernel/locking/mutex.c:564 [inline]
-RIP: 0010:__mutex_lock+0x369/0xa60 kernel/locking/mutex.c:735
-Code: d0 7c 08 84 d2 0f 85 6d 06 00 00 8b 0d 50 4f 01 05 85 c9 75 19 90 48 c7 c6 60 be 4c 8b 48 c7 c7 c0 bc 4c 8b e8 d8 4c 3e f6 90 <0f> 0b 90 90 90 e9 f2 fd ff ff 4c 8d b5 60 ff ff ff 48 89 df 4c 89
-RSP: 0018:ffffc900180cfa80 EFLAGS: 00010286
-RAX: 0000000000000000 RBX: ffff8880120c7098 RCX: ffffffff815a1789
-RDX: ffff88803156bc00 RSI: ffffffff815a1796 RDI: 0000000000000001
-RBP: ffffc900180cfbc0 R08: 0000000000000001 R09: 0000000000000000
-R10: 0000000000000001 R11: 0000000000000001 R12: dffffc0000000000
-R13: 0000000000000002 R14: 0000000000000000 R15: ffffc900180cfb00
-FS:  00007fa2501526c0(0000) GS:ffff8880b8700000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000001b3285ffff CR3: 000000003f326000 CR4: 00000000003526f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- hci_devcd_register+0x47/0x170 net/bluetooth/coredump.c:415
- force_devcd_write+0x175/0x350 drivers/bluetooth/hci_vhci.c:346
- full_proxy_write+0xfb/0x1b0 fs/debugfs/file.c:356
- vfs_write+0x24c/0x1150 fs/read_write.c:677
- ksys_write+0x12b/0x250 fs/read_write.c:731
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xcd/0x250 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7fa24f385d29
-Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007fa250152038 EFLAGS: 00000246 ORIG_RAX: 0000000000000001
-RAX: ffffffffffffffda RBX: 00007fa24f575fa0 RCX: 00007fa24f385d29
-RDX: 000000000000000e RSI: 0000000000000000 RDI: 0000000000000003
-RBP: 00007fa24f401b08 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 0000000000000000 R14: 00007fa24f575fa0 R15: 00007fff481bce58
- </TASK>
-
+diff --git a/src/shared/bap.c b/src/shared/bap.c
+index 167501282..a7f5dec92 100644
+--- a/src/shared/bap.c
++++ b/src/shared/bap.c
+@@ -1063,6 +1063,28 @@ static void stream_notify_metadata(struct bt_bap_stream *stream)
+ 	free(status);
+ }
+ 
++static void stream_notify_release(struct bt_bap_stream *stream)
++{
++	struct bt_bap_endpoint *ep = stream->ep;
++	struct bt_ascs_ase_status *status;
++	size_t len;
++
++	DBG(stream->bap, "stream %p", stream);
++
++	len = sizeof(*status);
++	status = malloc(len);
++
++	memset(status, 0, len);
++	status->id = ep->id;
++	ep->state = BT_BAP_STREAM_STATE_RELEASING;
++	status->state = ep->state;
++
++	gatt_db_attribute_notify(ep->attr, (void *) status, len,
++					bt_bap_get_att(stream->bap));
++
++	free(status);
++}
++
+ static struct bt_bap *bt_bap_ref_safe(struct bt_bap *bap)
+ {
+ 	if (!bap || !bap->ref_count || !queue_find(sessions, NULL, bap))
+@@ -1634,7 +1656,7 @@ static bool stream_notify_state(void *data)
+ 	struct bt_bap_stream *stream = data;
+ 	struct bt_bap_endpoint *ep = stream->ep;
+ 
+-	DBG(stream->bap, "stream %p", stream);
++	DBG(stream->bap, "stream %p status %d", stream, ep->state);
+ 
+ 	if (stream->state_id) {
+ 		timeout_remove(stream->state_id);
+@@ -1655,6 +1677,9 @@ static bool stream_notify_state(void *data)
+ 	case BT_ASCS_ASE_STATE_DISABLING:
+ 		stream_notify_metadata(stream);
+ 		break;
++	case BT_ASCS_ASE_STATE_RELEASING:
++		stream_notify_release(stream);
++		break;
+ 	}
+ 
+ 	return false;
+@@ -1936,9 +1961,7 @@ static uint8_t stream_disable(struct bt_bap_stream *stream, struct iovec *rsp)
+ 	/* Sink can autonomously transit to QOS while source needs to go to
+ 	 * Disabling until BT_ASCS_STOP is received.
+ 	 */
+-	if (stream->ep->dir == BT_BAP_SINK)
+-		stream_set_state(stream, BT_BAP_STREAM_STATE_QOS);
+-	else
++	if (stream->ep->dir == BT_BAP_SOURCE)
+ 		stream_set_state(stream, BT_BAP_STREAM_STATE_DISABLING);
+ 
+ 	return 0;
+@@ -2068,17 +2091,11 @@ static unsigned int bap_ucast_metadata(struct bt_bap_stream *stream,
+ 
+ static uint8_t stream_release(struct bt_bap_stream *stream, struct iovec *rsp)
+ {
+-	struct bt_bap_pac *pac;
+-
+ 	DBG(stream->bap, "stream %p", stream);
+ 
+ 	ascs_ase_rsp_success(rsp, stream->ep->id);
+ 
+-	pac = stream->lpac;
+-	if (pac->ops && pac->ops->clear)
+-		pac->ops->clear(stream, pac->user_data);
+-
+-	stream_set_state(stream, BT_BAP_STREAM_STATE_IDLE);
++	stream_set_state(stream, BT_BAP_STREAM_STATE_RELEASING);
+ 
+ 	return 0;
+ }
+@@ -6172,8 +6189,10 @@ static bool stream_io_disconnected(struct io *io, void *user_data)
+ 
+ 	DBG(stream->bap, "stream %p io disconnected", stream);
+ 
+-	bt_bap_stream_set_io(stream, -1);
++	if (stream->ep->state == BT_ASCS_ASE_STATE_RELEASING)
++		stream_set_state(stream, BT_BAP_STREAM_STATE_CONFIG);
+ 
++	bt_bap_stream_set_io(stream, -1);
+ 	return false;
+ }
+ 
 
 ---
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+base-commit: dfb1ffdc95a00bc06d81a75c11ab5ad2e24d37bf
+change-id: 20250106-upstream-1ec9ae96cda4
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+Best regards,
+-- 
+Yang Li <yang.li@amlogic.com>
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
 
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
