@@ -1,227 +1,185 @@
-Received: from mail-lj1-f175.google.com (mail-lj1-f175.google.com [209.85.208.175])
+Received: from mail-lf1-f47.google.com (mail-lf1-f47.google.com [209.85.167.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1252D50285
-	for <linux-bluetooth@vger.kernel.org>; Mon,  6 Jan 2025 16:12:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FB3C13665B;
+	Mon,  6 Jan 2025 16:29:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736179944; cv=none; b=oWy4azZscr7mHQkszERBXb6Q+ibhmOrFWyQ3UpQ9/ZLpH7Cv1l5KJUnw0243Cjo2EnEAKG3sDeyKAfSodRARH75qisG1d14wthYSaFyR5hOAPBAHUgf0/6t6r5vg8xLP6fPBVKFO1glD/9+eiwaMv4quMpcRZXEuYoe601arcuU=
+	t=1736180963; cv=none; b=hzVALPyjltiMt/UuRqT+CyVNaqO9Yzw74o90K7Hrn3LCNy6rbzMmK+whQip9LBGQqV95Eqm3Cjw+wFpF/yyAXWzFkxq0zlhVnhPBSxzph2ZHgho19BeC80LlsB4rPRtS6p/S2uqm/UNoOYSntFEqhIlkb4ExXTF/IwHQ867lpLk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736179944; c=relaxed/simple;
-	bh=OihynEtN0E74jr0Aa9mI/5O/aqQJfmkJAOX4az09YqE=;
+	s=arc-20240116; t=1736180963; c=relaxed/simple;
+	bh=OEEWAOJZqUV97MPgoyH1YHcN0G2bQJk0vxQW9n+ueQw=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=K6VVnCNRL5W6zbrpPpEHC+Hr7Z19eXrXsF+nH00U9BP12Vt29oDGdnRb+VZZYuesS5l1Ink+g71BBjSG0Q3GJoFQZzFjLbDNYShaFMSLnuq8ZDTeqZmlamRDdv4BiGff338apJwj/FGNpigV25SHqeWA8iRAmI40LaIc37AqlL0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mcn/TxfP; arc=none smtp.client-ip=209.85.208.175
+	 To:Cc:Content-Type; b=ZFgmMxSOUgwtkFESiN+mtTC4oMCowRXYIivKiJVzd/h6dASL/Rt2uDDT8O51fJrpuqgNdyT/auLkt6OBDxFUWJ9WZs+Ssu+tUjw9IVY+EuXjmb0/BVjMvXYdf9kCZ75IFIsxBSfNOuPyvSbFLDzMIVy6R9T/C4P2Tk0PnpjN4f4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PSFS5GqQ; arc=none smtp.client-ip=209.85.167.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mcn/TxfP"
-Received: by mail-lj1-f175.google.com with SMTP id 38308e7fff4ca-3003943288bso167163201fa.0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 06 Jan 2025 08:12:22 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PSFS5GqQ"
+Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-54263b52b5aso4118990e87.1;
+        Mon, 06 Jan 2025 08:29:21 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1736179941; x=1736784741; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1736180959; x=1736785759; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=E6liZHpReyPEAYcttqZnsiJmON8oLXoIXAKOhn8qdhc=;
-        b=mcn/TxfPZuMr/3QIcN+9kACnFt9i5lMogCKPnRdTtVMu7tCbIpti2rhMYUJSmZ4gQW
-         fgD7kSCBI7W2wM9lbwdl4VMFUsJMcIph0N2jIOz2/ea3EKLMMVBPALluAWIaQO613ynu
-         cqxPvEQh8oWbab3ymtspEq6VYLPEuKs1vLYd9p5xmMnNScK6LfC1y932x0F5HW/D28BK
-         k6qt1ar618ktoNkE7wzzA5U2YkiN0w962hseekCQphLs3m+Bl8xa2HVOtGIOdOzFugC5
-         3itId5U8B1xzBknxaHHKJ/OUYXi7WD2vrZz/lhF0miZsB6vGM72zNzweq2lQuURo5HPF
-         jRhA==
+        bh=pGsnUEsCVBxajGYVwChdxqKzDzDFSb30Rf6eXdmmZOU=;
+        b=PSFS5GqQMKs0QNA3Xh+645eHlMa0U4Dx9uwQBnkfGKD0zHlBcvO/Byc0uh7IxKTEf+
+         WxRGLMVB2q509HFsEjqFq65a0DvLDW/ZXFMnhzR2Ti1rMYtpgOo+BsbdpRBtDvXPeD8a
+         5GGNb7MwKBRE6JJu1jFpMgZPWypBcXv3CpoYa1hxu+MCQJDNJtgj8OSS2ysfQ6n/SyYk
+         CfKatLFgWzsjTBSKyPTxm0LVnGeqaBGvdhjcA06WkWtfYZaYBlB5nF71qpJP4kP5YTq2
+         uXlcndnsZl6R+3c1g/CfS31H18phLZKLN8vHtkpAJsUdfFpmLoBqXk+OUDUEg6/OhIUh
+         mWzA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736179941; x=1736784741;
+        d=1e100.net; s=20230601; t=1736180959; x=1736785759;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=E6liZHpReyPEAYcttqZnsiJmON8oLXoIXAKOhn8qdhc=;
-        b=PS62DFQ03ZwrB7B5yjobtge21LqD4SbsLFpnJN+HDRN+yzQBeNmfDdRhb+fzg4/1KD
-         JopPcUvzYzuImGo/p1HdTmKPvw3+2Eyk8g2/Jf+FMp5E9hdxv8eycK61gq7l2ph9zyOM
-         AJXD89xY+EtBkrKym6MJ9v2oejK3uwqGj9yaq/PxeSIUvWpkIetexw+ZSzFSZTP5KwJR
-         DyB18BgKTB3hO45U8dsXPPp4BBgCZNdYtVDhdBEjWgWU2HjVxPCwrrej9p+30mQLLF2O
-         UFWyWQXa6Wm8S8NuEhmN00ZY/L1NYN7JEGej7Z6qxQsRZt+yqAhYF2AEFk/0gP4d2NHo
-         1Lzw==
-X-Gm-Message-State: AOJu0Yz7GkTNtEdEHqt7idVZww3K24MPTCC9DrXiBFNOuroCWmedkwXt
-	1u2vvcXrmCmodHs1U0YaqCBjDqXoFTHzjFdgAlQ8YJKsm+/Dq2AMbvrjSwTfeLtRKHvk8UqPY/E
-	7ECJhRnUiwnJR0JGJk8ZNgHXUUtATNNli
-X-Gm-Gg: ASbGncuMq3k7XghyPTxRWH4/8mKRiI4C/TWwoRXWg8UrJdruKs/4km52ZuEkcyqWGAI
-	+W73xXBp+WmiJSxd7M4T7Z36pZKvRwcYXyhz6
-X-Google-Smtp-Source: AGHT+IGpiA2kjp+2h236NGeMbzmkuJV/XbA7S/DjbcFUSQBPjygqEoW6jN0V+e1/6FYglj9Dm8qO9OaCz0RYuuxrQZY=
-X-Received: by 2002:a05:651c:1401:b0:302:40ec:a1bb with SMTP id
- 38308e7fff4ca-30468575de1mr138701081fa.21.1736179940822; Mon, 06 Jan 2025
- 08:12:20 -0800 (PST)
+        bh=pGsnUEsCVBxajGYVwChdxqKzDzDFSb30Rf6eXdmmZOU=;
+        b=P91wXT4WZE51F708U7riNgXn5o+M2/NUo35wHDhugysImsLDy9ZhOIs5rYR4wT+dfH
+         pkFGAZdEV8wVBF37VoAtIHSYoA0JHr31Bp+zZTKh/dZC1sG9c8dqVBM44UmlNdjDDTBi
+         lFIGBTufsD0nk7T1vCKTvwb8JNk6Qylj0QVM9W+Y2yu/bXTI56oEEe5GYwSAiYX3Q4DG
+         a3BaR2EJOIbRELMwfZCOBKeeYU4aD7XMURnGhRORhNV1heBeAWGO6AYMWP/mYQt/+G2q
+         yVRLLv8gGEoVwAPJPn2tPUSZA4/cq5ZY9KwNfQEmUyxiFTUEubuJseVqZLCjaAGz/6FT
+         Ahrw==
+X-Forwarded-Encrypted: i=1; AJvYcCUs8vtSNyTpBrthTaeQ0m8bGM3Y9rdjD1C2GlgwQ6nOFcK7KeK7h4Iaq8CoU8qgAW/tdOR36LyU6K9c/oE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxlCqpDPh+VwYMymOQlXPLhbF1dVYgkXJMK17LsDFJnosELT6UI
+	hT9zgCOPmz87VVYNe6OiasJ4Zk/5j08u6TcHSKLJw/F1CHISq/8sFcTbW6GaYNJrPJNJPJJ9vft
+	JaoTshNOEUQgiL/gOc/NJcF6V7Zw=
+X-Gm-Gg: ASbGncvQUO7afg1XNMIQhCB6hqyLXve76cLFAkyabot2yTI4Gsa7dLFB6seb4a5UQYb
+	fNxhK87EpBF0wHw6Mqu1IFZtQ8OvhGEi/nM0f
+X-Google-Smtp-Source: AGHT+IH6J6MwPziZw8o6LICTXHRcm4Ur3xAwuiOa6ZgXKyOF3YYPQ3/IusrRvKlv21DvsMRuS2QgAAcJKNDpcSmjT3Y=
+X-Received: by 2002:a05:6512:334f:b0:542:2990:722e with SMTP id
+ 2adb3069b0e04-54229907232mr14673644e87.15.1736180959216; Mon, 06 Jan 2025
+ 08:29:19 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250106-upstream-v1-1-a16879b78ffd@amlogic.com>
-In-Reply-To: <20250106-upstream-v1-1-a16879b78ffd@amlogic.com>
+References: <20250103112019.1.I8342291b757b20cd4cdbbfe658dc58ed5df46565@changeid>
+In-Reply-To: <20250103112019.1.I8342291b757b20cd4cdbbfe658dc58ed5df46565@changeid>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 6 Jan 2025 11:12:08 -0500
-Message-ID: <CABBYNZJzjKQFA7gaQ2m+PEO_vbMgAZ4wy4fp--Rc4JFAQqAU_A@mail.gmail.com>
-Subject: Re: [PATCH BlueZ bluez] bap: fixed issue of muting music silent after
- pause and resume.
-To: yang.li@amlogic.com
-Cc: Linux Bluetooth <linux-bluetooth@vger.kernel.org>
+Date: Mon, 6 Jan 2025 11:29:06 -0500
+Message-ID: <CABBYNZKDRm7vf1RewwW-+0fBwHTS0RXKqxNME_HpyB-q-mNLYQ@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: Allow reset via sysfs
+To: Hsin-chen Chuang <chharry@chromium.org>
+Cc: linux-bluetooth@vger.kernel.org, 
+	chromeos-bluetooth-upstreaming@chromium.org, 
+	Johan Hedberg <johan.hedberg@gmail.com>, Marcel Holtmann <marcel@holtmann.org>, 
+	linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi Yang,
+Hi Hsin-chen,
 
-On Sun, Jan 5, 2025 at 9:50=E2=80=AFPM Yang Li via B4 Relay
-<devnull+yang.li.amlogic.com@kernel.org> wrote:
+On Thu, Jan 2, 2025 at 10:21=E2=80=AFPM Hsin-chen Chuang <chharry@chromium.=
+org> wrote:
 >
-> From: Yang Li <yang.li@amlogic.com>
+> Allow sysfs to trigger reset via the cmd_timeout function in hci device.
+> This is required to recover devices that are not responsive from
+> userspace.
+
+Don't we have a similar control over USB to reset the device? I think
+that would be better than introducing something btusb specific.
+
+> Also remove the cmd timeout count in btusb since we only ever allow one
+> command in flight at a time. We should always reset after a single
+> command times out.
 >
-> CIS sink need caching the Codec Configured when releasing by Pixel,
-> state machine is releasing -> Codec. If streamming -> idle, CIS sink
-> was silent after resume music.
-
-You need to work on the commit message, perhaps quote the spec if
-there is a description of the state transition.
-
-> Signed-off-by: Yang Li <yang.li@amlogic.com>
+> Signed-off-by: Hsin-chen Chuang <chharry@chromium.org>
 > ---
->  src/shared/bap.c | 43 +++++++++++++++++++++++++++++++------------
->  1 file changed, 31 insertions(+), 12 deletions(-)
+> This commit has been tested on a Chromebook by running
+> `echo 1 > /sys/class/bluetooth/hci0/reset`
 >
-> diff --git a/src/shared/bap.c b/src/shared/bap.c
-> index 167501282..a7f5dec92 100644
-> --- a/src/shared/bap.c
-> +++ b/src/shared/bap.c
-> @@ -1063,6 +1063,28 @@ static void stream_notify_metadata(struct bt_bap_s=
-tream *stream)
->         free(status);
->  }
+>  drivers/bluetooth/btusb.c | 10 ----------
+>  net/bluetooth/hci_sysfs.c | 19 +++++++++++++++++++
+>  2 files changed, 19 insertions(+), 10 deletions(-)
 >
-> +static void stream_notify_release(struct bt_bap_stream *stream)
-> +{
-> +       struct bt_bap_endpoint *ep =3D stream->ep;
-> +       struct bt_ascs_ase_status *status;
-> +       size_t len;
-> +
-> +       DBG(stream->bap, "stream %p", stream);
-> +
-> +       len =3D sizeof(*status);
-> +       status =3D malloc(len);
-
-Just use a stack variable instead of using malloc.
-
-> +
-> +       memset(status, 0, len);
-> +       status->id =3D ep->id;
-> +       ep->state =3D BT_BAP_STREAM_STATE_RELEASING;
-> +       status->state =3D ep->state;
-> +
-> +       gatt_db_attribute_notify(ep->attr, (void *) status, len,
-> +                                       bt_bap_get_att(stream->bap));
-> +
-> +       free(status);
-> +}
-> +
->  static struct bt_bap *bt_bap_ref_safe(struct bt_bap *bap)
->  {
->         if (!bap || !bap->ref_count || !queue_find(sessions, NULL, bap))
-> @@ -1634,7 +1656,7 @@ static bool stream_notify_state(void *data)
->         struct bt_bap_stream *stream =3D data;
->         struct bt_bap_endpoint *ep =3D stream->ep;
+> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+> index 279fe6c115fac..a4810c77fa0da 100644
+> --- a/drivers/bluetooth/btusb.c
+> +++ b/drivers/bluetooth/btusb.c
+> @@ -879,7 +879,6 @@ struct btusb_data {
+>         int (*disconnect)(struct hci_dev *hdev);
 >
-> -       DBG(stream->bap, "stream %p", stream);
-> +       DBG(stream->bap, "stream %p status %d", stream, ep->state);
+>         int oob_wake_irq;   /* irq for out-of-band wake-on-bt */
+> -       unsigned cmd_timeout_cnt;
 >
->         if (stream->state_id) {
->                 timeout_remove(stream->state_id);
-> @@ -1655,6 +1677,9 @@ static bool stream_notify_state(void *data)
->         case BT_ASCS_ASE_STATE_DISABLING:
->                 stream_notify_metadata(stream);
->                 break;
-> +       case BT_ASCS_ASE_STATE_RELEASING:
-> +               stream_notify_release(stream);
-
-Ok, I see where this is going, but the spec doesn't actually mandate
-to send releasing or caching the codec configuration:
-
-https://www.bluetooth.com/wp-content/uploads/Files/Specification/HTML/23166=
--ASCS-html5/out/en/index-en.html#UUID-c37600a3-4541-1926-2f13-eb29057e41d5_=
-N1661459513418
-
-Perhaps you are saying that we need to send Releasing at least? There
-is also the thing that I don't understand is why would someone send
-release command and get rid of QoS/CIG while keeping the Codec
-Configuration?
-
-> +               break;
+>         struct qca_dump_info qca_dump;
+>  };
+> @@ -912,9 +911,6 @@ static void btusb_intel_cmd_timeout(struct hci_dev *h=
+dev)
+>         struct gpio_desc *reset_gpio =3D data->reset_gpio;
+>         struct btintel_data *intel_data =3D hci_get_priv(hdev);
+>
+> -       if (++data->cmd_timeout_cnt < 5)
+> -               return;
+> -
+>         if (intel_data->acpi_reset_method) {
+>                 if (test_and_set_bit(INTEL_ACPI_RESET_ACTIVE, intel_data-=
+>flags)) {
+>                         bt_dev_err(hdev, "acpi: last reset failed ? Not r=
+esetting again");
+> @@ -997,9 +993,6 @@ static void btusb_rtl_cmd_timeout(struct hci_dev *hde=
+v)
+>
+>         btusb_rtl_alloc_devcoredump(hdev, &hdr, NULL, 0);
+>
+> -       if (++data->cmd_timeout_cnt < 5)
+> -               return;
+> -
+>         if (!reset_gpio) {
+>                 btusb_reset(hdev);
+>                 return;
+> @@ -1044,9 +1037,6 @@ static void btusb_qca_cmd_timeout(struct hci_dev *h=
+dev)
+>                 return;
 >         }
 >
->         return false;
-> @@ -1936,9 +1961,7 @@ static uint8_t stream_disable(struct bt_bap_stream =
-*stream, struct iovec *rsp)
->         /* Sink can autonomously transit to QOS while source needs to go =
-to
->          * Disabling until BT_ASCS_STOP is received.
->          */
-> -       if (stream->ep->dir =3D=3D BT_BAP_SINK)
-> -               stream_set_state(stream, BT_BAP_STREAM_STATE_QOS);
-> -       else
-> +       if (stream->ep->dir =3D=3D BT_BAP_SOURCE)
-
-Don't think this is correct, why are you taking away the setting to
-QoS like it is documented?
-
->                 stream_set_state(stream, BT_BAP_STREAM_STATE_DISABLING);
->
->         return 0;
-> @@ -2068,17 +2091,11 @@ static unsigned int bap_ucast_metadata(struct bt_=
-bap_stream *stream,
->
->  static uint8_t stream_release(struct bt_bap_stream *stream, struct iovec=
- *rsp)
->  {
-> -       struct bt_bap_pac *pac;
+> -       if (++data->cmd_timeout_cnt < 5)
+> -               return;
 > -
->         DBG(stream->bap, "stream %p", stream);
+>         if (reset_gpio) {
+>                 bt_dev_err(hdev, "Reset qca device via bt_en gpio");
 >
->         ascs_ase_rsp_success(rsp, stream->ep->id);
->
-> -       pac =3D stream->lpac;
-> -       if (pac->ops && pac->ops->clear)
-> -               pac->ops->clear(stream, pac->user_data);
-
-Hmm, I think we do depend on clear to be called to tell the upper
-stack the transport is being released, or you did test this with the
-likes of pipewire and found that is not really required?
-
-> -       stream_set_state(stream, BT_BAP_STREAM_STATE_IDLE);
-> +       stream_set_state(stream, BT_BAP_STREAM_STATE_RELEASING);
->
->         return 0;
->  }
-> @@ -6172,8 +6189,10 @@ static bool stream_io_disconnected(struct io *io, =
-void *user_data)
->
->         DBG(stream->bap, "stream %p io disconnected", stream);
->
-> -       bt_bap_stream_set_io(stream, -1);
-> +       if (stream->ep->state =3D=3D BT_ASCS_ASE_STATE_RELEASING)
-> +               stream_set_state(stream, BT_BAP_STREAM_STATE_CONFIG);
->
-> +       bt_bap_stream_set_io(stream, -1);
->         return false;
+> diff --git a/net/bluetooth/hci_sysfs.c b/net/bluetooth/hci_sysfs.c
+> index 4b54dbbf0729a..7bf2b10b0a7cf 100644
+> --- a/net/bluetooth/hci_sysfs.c
+> +++ b/net/bluetooth/hci_sysfs.c
+> @@ -90,9 +90,28 @@ static void bt_host_release(struct device *dev)
+>         module_put(THIS_MODULE);
 >  }
 >
+> +static ssize_t reset_store(struct device *dev, struct device_attribute *=
+attr,
+> +                          const char *buf, size_t count)
+> +{
+> +       struct hci_dev *hdev =3D to_hci_dev(dev);
+> +
+> +       if (hdev->cmd_timeout)
+> +               hdev->cmd_timeout(hdev);
+> +
+> +       return count;
+> +}
+> +static DEVICE_ATTR_WO(reset);
+> +
+> +static struct attribute *bt_host_attrs[] =3D {
+> +       &dev_attr_reset.attr,
+> +       NULL,
+> +};
+> +ATTRIBUTE_GROUPS(bt_host);
+> +
+>  static const struct device_type bt_host =3D {
+>         .name    =3D "host",
+>         .release =3D bt_host_release,
+> +       .groups =3D bt_host_groups,
+>  };
 >
-> ---
-> base-commit: dfb1ffdc95a00bc06d81a75c11ab5ad2e24d37bf
-> change-id: 20250106-upstream-1ec9ae96cda4
->
-> Best regards,
+>  void hci_init_sysfs(struct hci_dev *hdev)
 > --
-> Yang Li <yang.li@amlogic.com>
->
->
+> 2.47.1.613.gc27f4b7a9f-goog
 >
 
 
