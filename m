@@ -1,187 +1,104 @@
-Received: from mail-lf1-f47.google.com (mail-lf1-f47.google.com [209.85.167.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FB3C13665B;
-	Mon,  6 Jan 2025 16:29:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF60B192B79;
+	Mon,  6 Jan 2025 18:10:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736180963; cv=none; b=hzVALPyjltiMt/UuRqT+CyVNaqO9Yzw74o90K7Hrn3LCNy6rbzMmK+whQip9LBGQqV95Eqm3Cjw+wFpF/yyAXWzFkxq0zlhVnhPBSxzph2ZHgho19BeC80LlsB4rPRtS6p/S2uqm/UNoOYSntFEqhIlkb4ExXTF/IwHQ867lpLk=
+	t=1736187013; cv=none; b=Ca5u5fRpJ8NylcG/A/MpLdS6aQGztRXk/wJl+J2yAO7AzQFciyqX4TGJ8EyCG2x+DMNcewfBLmTEcgPL6zPisw2+4pbiMwnP5FF1atvdfG9SGVBTZ/tcAXS5YAjX0JfrfrGovWIY/b4/ZkTJ0BnqfHXEaj/MY2hzSr3AgRSsVuY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736180963; c=relaxed/simple;
-	bh=OEEWAOJZqUV97MPgoyH1YHcN0G2bQJk0vxQW9n+ueQw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ZFgmMxSOUgwtkFESiN+mtTC4oMCowRXYIivKiJVzd/h6dASL/Rt2uDDT8O51fJrpuqgNdyT/auLkt6OBDxFUWJ9WZs+Ssu+tUjw9IVY+EuXjmb0/BVjMvXYdf9kCZ75IFIsxBSfNOuPyvSbFLDzMIVy6R9T/C4P2Tk0PnpjN4f4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PSFS5GqQ; arc=none smtp.client-ip=209.85.167.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1736187013; c=relaxed/simple;
+	bh=3+P7uW3efrV13RngJiot9oEC9H+FWw5Pgb+Lbbe3JVo=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=k+ky2eJzmOXzworUub/uh6IguhlyX/f2/AeLiXMbElOtTUqhOyvD2xevW5HeKCus5WmFH9EZvMu6d+9Ueukp+DKgLYpLY3zkAsCQ2C2vSMzK2b+UvhThaNvG/HFVJ4u3iQR7sMp5MAahOPa+s3Y0lAJFBo7hEGZCKAPHTwR9wM8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OL7Sa7eu; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PSFS5GqQ"
-Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-54263b52b5aso4118990e87.1;
-        Mon, 06 Jan 2025 08:29:21 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1736180959; x=1736785759; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=pGsnUEsCVBxajGYVwChdxqKzDzDFSb30Rf6eXdmmZOU=;
-        b=PSFS5GqQMKs0QNA3Xh+645eHlMa0U4Dx9uwQBnkfGKD0zHlBcvO/Byc0uh7IxKTEf+
-         WxRGLMVB2q509HFsEjqFq65a0DvLDW/ZXFMnhzR2Ti1rMYtpgOo+BsbdpRBtDvXPeD8a
-         5GGNb7MwKBRE6JJu1jFpMgZPWypBcXv3CpoYa1hxu+MCQJDNJtgj8OSS2ysfQ6n/SyYk
-         CfKatLFgWzsjTBSKyPTxm0LVnGeqaBGvdhjcA06WkWtfYZaYBlB5nF71qpJP4kP5YTq2
-         uXlcndnsZl6R+3c1g/CfS31H18phLZKLN8vHtkpAJsUdfFpmLoBqXk+OUDUEg6/OhIUh
-         mWzA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736180959; x=1736785759;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=pGsnUEsCVBxajGYVwChdxqKzDzDFSb30Rf6eXdmmZOU=;
-        b=P91wXT4WZE51F708U7riNgXn5o+M2/NUo35wHDhugysImsLDy9ZhOIs5rYR4wT+dfH
-         pkFGAZdEV8wVBF37VoAtIHSYoA0JHr31Bp+zZTKh/dZC1sG9c8dqVBM44UmlNdjDDTBi
-         lFIGBTufsD0nk7T1vCKTvwb8JNk6Qylj0QVM9W+Y2yu/bXTI56oEEe5GYwSAiYX3Q4DG
-         a3BaR2EJOIbRELMwfZCOBKeeYU4aD7XMURnGhRORhNV1heBeAWGO6AYMWP/mYQt/+G2q
-         yVRLLv8gGEoVwAPJPn2tPUSZA4/cq5ZY9KwNfQEmUyxiFTUEubuJseVqZLCjaAGz/6FT
-         Ahrw==
-X-Forwarded-Encrypted: i=1; AJvYcCUs8vtSNyTpBrthTaeQ0m8bGM3Y9rdjD1C2GlgwQ6nOFcK7KeK7h4Iaq8CoU8qgAW/tdOR36LyU6K9c/oE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxlCqpDPh+VwYMymOQlXPLhbF1dVYgkXJMK17LsDFJnosELT6UI
-	hT9zgCOPmz87VVYNe6OiasJ4Zk/5j08u6TcHSKLJw/F1CHISq/8sFcTbW6GaYNJrPJNJPJJ9vft
-	JaoTshNOEUQgiL/gOc/NJcF6V7Zw=
-X-Gm-Gg: ASbGncvQUO7afg1XNMIQhCB6hqyLXve76cLFAkyabot2yTI4Gsa7dLFB6seb4a5UQYb
-	fNxhK87EpBF0wHw6Mqu1IFZtQ8OvhGEi/nM0f
-X-Google-Smtp-Source: AGHT+IH6J6MwPziZw8o6LICTXHRcm4Ur3xAwuiOa6ZgXKyOF3YYPQ3/IusrRvKlv21DvsMRuS2QgAAcJKNDpcSmjT3Y=
-X-Received: by 2002:a05:6512:334f:b0:542:2990:722e with SMTP id
- 2adb3069b0e04-54229907232mr14673644e87.15.1736180959216; Mon, 06 Jan 2025
- 08:29:19 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OL7Sa7eu"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5360CC4CED6;
+	Mon,  6 Jan 2025 18:10:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1736187013;
+	bh=3+P7uW3efrV13RngJiot9oEC9H+FWw5Pgb+Lbbe3JVo=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=OL7Sa7eukan9dlQDuHzuzN+KblLlVv7onwt11/olpHNG4s/elZpEwqhWa1B+UHNU2
+	 OIrWGVKtaJdw5iST7upWoKZMPvfh0TQRZEMBu0ory6eOephwiV6iz8e0FRPAVwas+H
+	 rfPheNw5nZQnVzgDmd4V+NMgZD2+n8BO/jjoJmI9IubeZ42DbHGNjiGTNbRUgRGQdX
+	 ZTAjbJBy8BysepcQRLx5yrXdo4KYidFY7ecfXPZjqNH9zq5Nry7qNKX1CS5OJnVJWo
+	 ppGcukgCenJRbhQHOQDihRuW0j66WDT4SCAq2nA86NrHYwenfzedMBSh4ekEHQTAoU
+	 GgEcv4E5KRYQQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AE2C8380A97E;
+	Mon,  6 Jan 2025 18:10:35 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250103112019.1.I8342291b757b20cd4cdbbfe658dc58ed5df46565@changeid>
-In-Reply-To: <20250103112019.1.I8342291b757b20cd4cdbbfe658dc58ed5df46565@changeid>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 6 Jan 2025 11:29:06 -0500
-Message-ID: <CABBYNZKDRm7vf1RewwW-+0fBwHTS0RXKqxNME_HpyB-q-mNLYQ@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: Allow reset via sysfs
-To: Hsin-chen Chuang <chharry@chromium.org>
-Cc: linux-bluetooth@vger.kernel.org, 
-	chromeos-bluetooth-upstreaming@chromium.org, 
-	Johan Hedberg <johan.hedberg@gmail.com>, Marcel Holtmann <marcel@holtmann.org>, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH Resend] Bluetooth: btusb: Add ID 0x2c7c:0x0130 for Qualcomm
+ WCN785x
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <173618703451.3577621.6424068053479999223.git-patchwork-notify@kernel.org>
+Date: Mon, 06 Jan 2025 18:10:34 +0000
+References: <b9a5c3cb-d3d4-4fae-8171-5b8c2ab9744a@app.fastmail.com>
+In-Reply-To: <b9a5c3cb-d3d4-4fae-8171-5b8c2ab9744a@app.fastmail.com>
+To: Mark Dietzer <git@doridian.net>
+Cc: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Hi Hsin-chen,
+Hello:
 
-On Thu, Jan 2, 2025 at 10:21=E2=80=AFPM Hsin-chen Chuang <chharry@chromium.=
-org> wrote:
->
-> Allow sysfs to trigger reset via the cmd_timeout function in hci device.
-> This is required to recover devices that are not responsive from
-> userspace.
+This patch was applied to bluetooth/bluetooth-next.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-Don't we have a similar control over USB to reset the device? I think
-that would be better than introducing something btusb specific.
+On Thu, 12 Dec 2024 16:02:55 -0800 you wrote:
+> Adds a new entry with VID 0x2c7c and PID 0x0130 to the btusb quirks table as it uses a Qualcomm WCN785x chipset
+> 
+> The device information from /sys/kernel/debug/usb/devices is provided below:
+> T:  Bus=01 Lev=01 Prnt=01 Port=04 Cnt=05 Dev#=  7 Spd=12   MxCh= 0
+> D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+> P:  Vendor=2c7c ProdID=0130 Rev= 0.01
+> C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
+> I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
+> E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+> E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+> I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+> I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+> I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+> I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+> I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+> I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+> I:  If#= 1 Alt= 6 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  63 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  63 Ivl=1ms
+> I:  If#= 1 Alt= 7 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  65 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  65 Ivl=1ms
+> 
+> [...]
 
-> Also remove the cmd timeout count in btusb since we only ever allow one
-> command in flight at a time. We should always reset after a single
-> command times out.
->
-> Signed-off-by: Hsin-chen Chuang <chharry@chromium.org>
-> ---
-> This commit has been tested on a Chromebook by running
-> `echo 1 > /sys/class/bluetooth/hci0/reset`
->
->  drivers/bluetooth/btusb.c | 10 ----------
->  net/bluetooth/hci_sysfs.c | 19 +++++++++++++++++++
->  2 files changed, 19 insertions(+), 10 deletions(-)
->
-> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> index 279fe6c115fac..a4810c77fa0da 100644
-> --- a/drivers/bluetooth/btusb.c
-> +++ b/drivers/bluetooth/btusb.c
-> @@ -879,7 +879,6 @@ struct btusb_data {
->         int (*disconnect)(struct hci_dev *hdev);
->
->         int oob_wake_irq;   /* irq for out-of-band wake-on-bt */
-> -       unsigned cmd_timeout_cnt;
->
->         struct qca_dump_info qca_dump;
->  };
-> @@ -912,9 +911,6 @@ static void btusb_intel_cmd_timeout(struct hci_dev *h=
-dev)
->         struct gpio_desc *reset_gpio =3D data->reset_gpio;
->         struct btintel_data *intel_data =3D hci_get_priv(hdev);
->
-> -       if (++data->cmd_timeout_cnt < 5)
-> -               return;
-> -
->         if (intel_data->acpi_reset_method) {
->                 if (test_and_set_bit(INTEL_ACPI_RESET_ACTIVE, intel_data-=
->flags)) {
->                         bt_dev_err(hdev, "acpi: last reset failed ? Not r=
-esetting again");
-> @@ -997,9 +993,6 @@ static void btusb_rtl_cmd_timeout(struct hci_dev *hde=
-v)
->
->         btusb_rtl_alloc_devcoredump(hdev, &hdr, NULL, 0);
->
-> -       if (++data->cmd_timeout_cnt < 5)
-> -               return;
-> -
->         if (!reset_gpio) {
->                 btusb_reset(hdev);
->                 return;
-> @@ -1044,9 +1037,6 @@ static void btusb_qca_cmd_timeout(struct hci_dev *h=
-dev)
->                 return;
->         }
->
-> -       if (++data->cmd_timeout_cnt < 5)
-> -               return;
-> -
->         if (reset_gpio) {
->                 bt_dev_err(hdev, "Reset qca device via bt_en gpio");
->
-> diff --git a/net/bluetooth/hci_sysfs.c b/net/bluetooth/hci_sysfs.c
-> index 4b54dbbf0729a..7bf2b10b0a7cf 100644
-> --- a/net/bluetooth/hci_sysfs.c
-> +++ b/net/bluetooth/hci_sysfs.c
-> @@ -90,9 +90,28 @@ static void bt_host_release(struct device *dev)
->         module_put(THIS_MODULE);
->  }
->
-> +static ssize_t reset_store(struct device *dev, struct device_attribute *=
-attr,
-> +                          const char *buf, size_t count)
-> +{
-> +       struct hci_dev *hdev =3D to_hci_dev(dev);
-> +
-> +       if (hdev->cmd_timeout)
-> +               hdev->cmd_timeout(hdev);
-> +
-> +       return count;
-> +}
-> +static DEVICE_ATTR_WO(reset);
-> +
-> +static struct attribute *bt_host_attrs[] =3D {
-> +       &dev_attr_reset.attr,
-> +       NULL,
-> +};
-> +ATTRIBUTE_GROUPS(bt_host);
-> +
->  static const struct device_type bt_host =3D {
->         .name    =3D "host",
->         .release =3D bt_host_release,
-> +       .groups =3D bt_host_groups,
->  };
->
->  void hci_init_sysfs(struct hci_dev *hdev)
-> --
-> 2.47.1.613.gc27f4b7a9f-goog
->
+Here is the summary with links:
+  - [Resend] Bluetooth: btusb: Add ID 0x2c7c:0x0130 for Qualcomm WCN785x
+    https://git.kernel.org/bluetooth/bluetooth-next/c/94382af338f5
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
---=20
-Luiz Augusto von Dentz
