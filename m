@@ -1,133 +1,251 @@
-Received: from mail-lj1-f180.google.com (mail-lj1-f180.google.com [209.85.208.180])
+Received: from mail-lj1-f176.google.com (mail-lj1-f176.google.com [209.85.208.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31FC71C69D;
-	Mon,  6 Jan 2025 20:58:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BE2E1DF983;
+	Mon,  6 Jan 2025 21:27:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736197099; cv=none; b=qwM2uh65Hcg+yeIUIRlf1dJc7mSlW6V9+Ft2RvKUaCvmZFh4L0KZ+yp/8QcErFPwEW4rwWhbt0AidkUx7zY3EupLhf1BgtvU3gPPhZ9JIPVwlhpx3oB0GQcP3rNJzysAX0/vfGcsFJHS9KAtyKYPVFxAfzg5EwUQH4jK7eHFQmQ=
+	t=1736198874; cv=none; b=MJvksEnjniY1hT0RY4SC+P3plSFd9svbC63TWXipt7aylEvbF0LNCo56K2xiJF0wrS9GAEIgh67nmPAejn7iybgQ9ILMjmrOdg0zy7J45o2OqZQumwnBGyxBqBHZhfLFjPkhAB2X1k9WGEF3rzNKzyJHUOVu2BeTj30ekT+aI10=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736197099; c=relaxed/simple;
-	bh=g1JExpdKvL8BIW6V0XCWerzvAYkMBqLYUbI0voD9zbY=;
+	s=arc-20240116; t=1736198874; c=relaxed/simple;
+	bh=UG/kQ6m/hutLfe1SPjyBt6w3LnGjjKWGp7HQ8OT+O1s=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=CAthBYz/arBCtAKWAnORIl+Q37As/ypoy96i79yzZhkr567Y4sNgD0LMu5XKA3JTVw5H9gKVBz48tbq8Th/L4XdSQNjb88/9sJF1/dBTqOW6RH+lgbaimdJWxmOwpxcQmYQoLljmKvw52QWNjk3ZuWGxhLjRckRj4JeOAk0x9Z8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CDbRIXat; arc=none smtp.client-ip=209.85.208.180
+	 To:Cc:Content-Type; b=FmRelDG14zQRlN+fAG9Zj9aETh5ZQFCEQkIYccGGlh25wSul/pErYpqouDXuwpztrUYU1DP7RNC0DqcJgfH630Chv4KGJUBPQUeWhokQ5X41EQvbo4okh4ux2Y7u9PzD4k0n/ZJBoeXEmY3jrd6eGm1o50Ke/pxDY6KkXwCz9MU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Tc9GcAhN; arc=none smtp.client-ip=209.85.208.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CDbRIXat"
-Received: by mail-lj1-f180.google.com with SMTP id 38308e7fff4ca-304d9a1f198so33766461fa.0;
-        Mon, 06 Jan 2025 12:58:17 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Tc9GcAhN"
+Received: by mail-lj1-f176.google.com with SMTP id 38308e7fff4ca-304d760f118so34028351fa.0;
+        Mon, 06 Jan 2025 13:27:51 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1736197096; x=1736801896; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1736198870; x=1736803670; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=lvLSlBy49U9+Y5+necr52/D9WG5pRnAPnud0tjMich4=;
-        b=CDbRIXatym6rskLGt/9k4j2KjRr84GdjYSEsTuc5gUaI1o4gK8pXhOd67BXX5aUNDj
-         yDyYaci+3slF2eFi1FKV7KKqw4L1xf4KIpQ0IoujgcodJL2Qu+3lc+swElC9NLP/GiNe
-         5xFfrz5oSL+uoqhKpnN2zz5juxZKrUQ/ob40Oo1hZwS8gIzAX0a9MWGSivdYBpDeGv9G
-         /w/tlQft2rZyZ3BPEFlkT8g9LNU51OsECSsOE60T7NXkt1TIHpFq1Vc77Rm2FJtr0ILI
-         ujO3lkHbkZ6JWC+I/NMF/d4FYMUjReqeQn8CNQplt48fkWwpTwH8Sj5SwLTmYXmNVaq0
-         GeHw==
+        bh=bfs23k40SIXXP/sXuNwPvMU4jcKltktGETzjLlAtvpI=;
+        b=Tc9GcAhNw13adn1rQ0aKcOKTJ1X+FzZkPD+uSSfGpvLpCN95FZGQBsgdbX2yZLvNXz
+         /U531+qFueupYwLqE3Kh8YZ4epEWwwP4HNUV5BhyFy1V7G/KzA3UDO//2HK8jKGUAAbN
+         oJpPvRC8zEP3FzjToH3hrIr1cHYElWXC6SoJADzKFk0ueOo7cjWaobjoO2qjqzLPbi3j
+         txjikIFSZ/S1e4BjoCAQp7MIEhnUV52QjBzlFWphbWzIFYJUm5U+ddpn2Fg7lCyyXpB0
+         DIXPsigMRRzLArqzWW5VdBAgeLHrhpRjAZu97NC1hbCccO0TKxwVyhbKHvMK66EYD+9M
+         dF8w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736197096; x=1736801896;
+        d=1e100.net; s=20230601; t=1736198870; x=1736803670;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=lvLSlBy49U9+Y5+necr52/D9WG5pRnAPnud0tjMich4=;
-        b=EogqEyf3+6lYMEFemKWu/RUITyrjsvSVa0hiZe35dN2+56LHm4pGe06rs6ctCSbcqY
-         7Ec24RRM3LTN3x7LBhRkvqXHZyErRKwfAvhHbwMdhUKdBtxICIlboR4IXKs9UGTVLHQW
-         ID+whN5uzWfWA77XqluD9O/cCjLixe1ygkZMEdxVIdGKWJZfR7lWJwMTVSUpm6SWv8th
-         Swk3aETJ7i43LJi4WRqAAY2YGXNGSqj1asofdijnTZnJQbtMfvWvDnAPCkR7DEd/k8mf
-         iCE6ve36BQ/RDQGGmBXJbjAwbGUAqDdNv/EWYBh+c9WKHpyj7DIhqx6vKoOeThOzpPB5
-         89WQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWQA2BWyRaP77Jp/YdvIxSCN4dj8W6oODaaVeDwXZ8/Rdla7XQ6c58T695QsNrb6nbfmjldAhTuH7AnfXNf@vger.kernel.org, AJvYcCWlSwiExWsPiXyygXf1iZMAneMEHf0xKAN9RSp68jr8PYOrWo6cZJLxySM2D7pUmplMG3p1S+ekh6mTYyB6kdU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwmufFBw4r4gIE/sUuVKAQkf1phyixYnzrevc5MWtPuXf4mTrRa
-	2Yvv+Azj75KF2OVaU22+ikKs8BN6UMu1X9QwQtxBv6JalrL4Z95RuQjnfUgZuk9qyVJJtJ2GMxS
-	HxOTsZmsCRoEDNoulxhtrN5OWP/qSy58s
-X-Gm-Gg: ASbGnct0po3EpoQ3lJsjBcJYyM4+AU9TGL2StD0lj4htIZ3MpKXXAxJN8E/bUDv+Orf
-	CQlvTp/TPUZ4l0Ldf3cUlCy2axXoZrxFE39U3mTw=
-X-Google-Smtp-Source: AGHT+IFADW4wfH7t6oRz+Ch47Ka6A7UY87FBku9N1Z9wCNB9+Y4X1gE152knTkaojXdLwIyr0cUUFuOEn3Esj7aSe+0=
-X-Received: by 2002:a05:651c:60d:b0:300:de99:fcc7 with SMTP id
- 38308e7fff4ca-30468630647mr150383661fa.36.1736197096034; Mon, 06 Jan 2025
- 12:58:16 -0800 (PST)
+        bh=bfs23k40SIXXP/sXuNwPvMU4jcKltktGETzjLlAtvpI=;
+        b=P6PaoFhYC4BsTDLoP0DLNYubLmoXGqQB75hvF9Ny79ZlEKTfAy2MLgGHJ/5CFyqiz/
+         q77UwOtwlJ4BKc6WQcrqqVicVSAayCeTbBiNkVgKKhEw7OoGXfsTfhaAlc1AyLd3Px+r
+         th/ArT2vKHmkeHoukShxFPGzWYekfkrk9uKo10yD2/2rxTM7QxyUuoyCdBOqmZgrRZ8t
+         lff9YxEmgLlK458Ft1t8aDgA1tzc+hu0cY9PMU6XfEFEWH0tYYT2oqxCfRdvI/X4hgvB
+         wYQPLheTb/0a7A/F6Zh7JY1Z8KYDkwdzLO/ykKHHnNShMyjigZb+slIeAkFJeOuJ6W0t
+         989g==
+X-Forwarded-Encrypted: i=1; AJvYcCUedj4g8g3ia46GjqlmSiDvv+m6pZC1Wpls0NZS8YShayXc9tlrh2/XuQ3TeHS8gTut5KZyy25iKIzyRUzu@vger.kernel.org, AJvYcCVNyUfhxvKfJ0mWD9FoR0V058udzrrD5CeRrd+m7rITty8jute0rzPkcFYWsndzQUjRX6kBeOK2T1mjDwuYg44=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxe98eoRTmPBvR0n5E8YLDmxPnE6vjwa7LR7lSv8IrrMJ6Or+cI
+	2lHH6XuBVQ/bL7t/nqrkk7+kD/bHuBIDyJm3kmEDW1S981NJFStPhZGtjfl7pksLWbh3Rn5xsdF
+	01K/EViIZMUrm4yPq/HNMqiW/nW4=
+X-Gm-Gg: ASbGncvPgfFMDGPtppM3m5xi4nwo6Y9D2/OIOeDscmDm7pXl2TRZUBc/xZzARNnGxzQ
+	27MCGG5z4v0Wvm/qxdgAMaBZ0YGBzdne9V/LF+/4=
+X-Google-Smtp-Source: AGHT+IH9suoXzXG6d/A1BlQcLerwZhYbaTfDNhpzmxeGF9J8VRrPcVKbPz+m6hPWc47cgyJPwc/BC21TECxtM/o/Yqg=
+X-Received: by 2002:a05:651c:1545:b0:300:de99:fcc6 with SMTP id
+ 38308e7fff4ca-304685dd8e0mr182139741fa.34.1736198869727; Mon, 06 Jan 2025
+ 13:27:49 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 List-Id: <linux-bluetooth.vger.kernel.org>
 List-Subscribe: <mailto:linux-bluetooth+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-bluetooth+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241223094411.47496-1-en-wei.wu@canonical.com>
-In-Reply-To: <20241223094411.47496-1-en-wei.wu@canonical.com>
+References: <20241221170459.23095-1-mazin@getstate.dev>
+In-Reply-To: <20241221170459.23095-1-mazin@getstate.dev>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 6 Jan 2025 15:58:03 -0500
-Message-ID: <CABBYNZJJdCw=iP3ketY_fDt8HcKe6mAo9LFZY9i5oSxnF=HZ1Q@mail.gmail.com>
-Subject: Re: [PATCH v2] Bluetooth: btusb: Add NULL check for data in btusb_suspend
-To: En-Wei Wu <en-wei.wu@canonical.com>
-Cc: marcel@holtmann.org, linux-bluetooth@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Markus.Elfring@web.de
+Date: Mon, 6 Jan 2025 16:27:37 -0500
+Message-ID: <CABBYNZJcpgsPFsRLfyZ7iBvQC8oXRGnqOAnGY0uqMEsPD45DqQ@mail.gmail.com>
+Subject: Re: [PATCH v2] bluetooth: hci: Fix UAF from MGMT_OP_REMOVE_ADV_MONITOR
+ during closure
+To: Mazin Al Haddad <mazin@getstate.dev>
+Cc: marcel@holtmann.org, johan.hedberg@gmail.com, 
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	syzbot+479aff51bb361ef5aa18@syzkaller.appspotmail.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi En-Wei,
+Hi Mazin,
 
-On Mon, Dec 23, 2024 at 4:44=E2=80=AFAM En-Wei Wu <en-wei.wu@canonical.com>=
- wrote:
+On Sat, Dec 21, 2024 at 12:06=E2=80=AFPM Mazin Al Haddad <mazin@getstate.de=
+v> wrote:
 >
-> When performing warm boot tests with an MT7920 device, we encounter
-> NULL pointer dereferences with failure rate 5/30. The crash occurs
-> during device suspend when btusb attempts to access data->hdev where
-> data is NULL. This may happen due to a race condition between PM suspend
-> and device disconnect. The root cause needs further investigation.
-
-Ok, so we expect this to be backported or not? Because if you do then
-we need to fix its root cause and not add a workaround.
-
+> When hci_dev is closing down, mgmt_power_off will free parts of the devic=
+e.
+> The freed memory can then be accessed when processing pending
+> MGMT_OP_REMOVE_ADV_MONITOR cmds. Since submitting the command is allowed
+> when it is powered off (as in previous discussions linked below), fix
+> this by returning MGMT_STATUS_BUSY to pending MGMT_OP_REMOVE_ADV_MONITOR
+> operations submitted as hci_dev_close_sync is running. Avoid processing
+> pending cmds since doing so will lead to reacquiring the same lock. Add
+> a sanity check within mgmt_remove_adv_monitor to ensure the cmd is still
+> valid and exit early if not.
 >
-> BUG: kernel NULL pointer dereference, address: 0000000000000000
-> Workqueue: pm pm_runtime_work
-> RIP: 0010:btusb_suspend+0x1d/0x1d0 [btusb]
+> BUG: KASAN: slab-use-after-free in mgmt_remove_adv_monitor_sync+0x3a/0xd0
+> net/bluetooth/mgmt.c:5543
+> Read of size 8 at addr ffff88814128f898 by task kworker/u9:4/5961
+>
+>  <TASK>
+>  __dump_stack lib/dump_stack.c:94 [inline]
+>  dump_stack_lvl+0x241/0x360 lib/dump_stack.c:120
+>  print_address_description mm/kasan/report.c:378 [inline]
+>  print_report+0x169/0x550 mm/kasan/report.c:489
+>  kasan_report+0x143/0x180 mm/kasan/report.c:602
+>  mgmt_remove_adv_monitor_sync+0x3a/0xd0 net/bluetooth/mgmt.c:5543
+>  hci_cmd_sync_work+0x22b/0x400 net/bluetooth/hci_sync.c:332
+>  process_one_work kernel/workqueue.c:3229 [inline]
+>  process_scheduled_works+0xa63/0x1850 kernel/workqueue.c:3310
+>  worker_thread+0x870/0xd30 kernel/workqueue.c:3391
+>  kthread+0x2f0/0x390 kernel/kthread.c:389
+>  ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
+>  ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
+>  </TASK>
+>
+> Freed by task 16022:
+>  kasan_save_stack mm/kasan/common.c:47 [inline]
+>  kasan_save_track+0x3f/0x80 mm/kasan/common.c:68
+>  kasan_save_free_info+0x40/0x50 mm/kasan/generic.c:582
+>  poison_slab_object mm/kasan/common.c:247 [inline]
+>  __kasan_slab_free+0x59/0x70 mm/kasan/common.c:264
+>  kasan_slab_free include/linux/kasan.h:233 [inline]
+>  slab_free_hook mm/slub.c:2338 [inline]
+>  slab_free mm/slub.c:4598 [inline]
+>  kfree+0x196/0x420 mm/slub.c:4746
+>  mgmt_pending_foreach+0xd1/0x130 net/bluetooth/mgmt_util.c:259
+>  __mgmt_power_off+0x183/0x430 net/bluetooth/mgmt.c:9550
+>  hci_dev_close_sync+0x6c4/0x11c0 net/bluetooth/hci_sync.c:5208
+>  hci_dev_do_close net/bluetooth/hci_core.c:483 [inline]
+>  hci_dev_close+0x112/0x210 net/bluetooth/hci_core.c:508
+>  sock_do_ioctl+0x158/0x460 net/socket.c:1209
+>  sock_ioctl+0x626/0x8e0 net/socket.c:1328
+>  vfs_ioctl fs/ioctl.c:51 [inline]
+>  __do_sys_ioctl fs/ioctl.c:906 [inline]
+>  __se_sys_ioctl+0xf5/0x170 fs/ioctl.c:892
+>  do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+>  do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
+>  entry_SYSCALL_64_after_hwframe+0x77/0x7f
+>
+> Link: https://lore.kernel.org/lkml/20240424135903.24169-1-jlee@suse.com/
+> Reported-by: syzbot+479aff51bb361ef5aa18@syzkaller.appspotmail.com
+> Closes: https://syzkaller.appspot.com/bug?extid=3D479aff51bb361ef5aa18
+> Signed-off-by: Mazin Al Haddad <mazin@getstate.dev>
 
-This looks like probe hasn't finished yet, btusb_probe is still
-pending/executing and usb_set_infdata hasn't been performed, but
-suspend is called before that completes (?).
+Missing Fixes tag, Ive been adding it myself for some time now but you
+better create the practice to include it so I don't have to go find
+what commit introduced the problem to then do git log -1
+--pretty=3Dfixes and git commit --amend.
 
-> Add a NULL check for data and return -ENODEV in this case to prevent
-> the NULL pointer dereference. This indicates that the device is no
-> longer available, which is appropriate when the driver's private data
-> is missing.
-
-Once we find the root cause then we need the Fixes tag to point out
-where this regression was introduced.
-
-> Signed-off-by: En-Wei Wu <en-wei.wu@canonical.com>
 > ---
-> Changes in v2:
-> - Change "dereference" to "dereferences" in commit message
-> - Re-flow commit message lines to use more characters per line
+> Changes since v1:
+>  * Change return code to ECANCELED
+>  * Send out MGMT_STATUS_CANCELLED instead of MGMT_STATUS_BUSY
+>  * Style fixes
 >
->  drivers/bluetooth/btusb.c | 3 +++
->  1 file changed, 3 insertions(+)
+>  net/bluetooth/hci_sync.c |  5 +++--
+>  net/bluetooth/mgmt.c     | 20 ++++++++++++++++++--
+>  2 files changed, 21 insertions(+), 4 deletions(-)
 >
-> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> index 279fe6c115fa..a0461528548b 100644
-> --- a/drivers/bluetooth/btusb.c
-> +++ b/drivers/bluetooth/btusb.c
-> @@ -4096,6 +4096,9 @@ static int btusb_suspend(struct usb_interface *intf=
-, pm_message_t message)
->
->         BT_DBG("intf %p", intf);
->
-> +       if (!data)
-> +               return -ENODEV;
-> +
->         /* Don't auto-suspend if there are connections; external suspend =
-calls
->          * shall never fail.
+> diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+> index c86f4e42e69c..aa5aa3fed32d 100644
+> --- a/net/bluetooth/hci_sync.c
+> +++ b/net/bluetooth/hci_sync.c
+> @@ -5197,6 +5197,9 @@ int hci_dev_close_sync(struct hci_dev *hdev)
 >          */
+>         drain_workqueue(hdev->workqueue);
+>
+> +       /* flush cmd  work */
+> +       flush_work(&hdev->cmd_work);
+
+Might be a good idea to add a comment why it should be fine to flush
+the command queue here, well in theory we could do immediately after
+shutdown the driver since it shall no longer be processing commands,
+in the other hand hdev is still considered running but perhaps that is
+necessary in order to run things like hci_reset_sync but it doesn't
+seem to be the case since that doesn't queue a command and instead it
+send the command directly.
+
+>         hci_dev_lock(hdev);
+>
+>         hci_discovery_set_state(hdev, DISCOVERY_STOPPED);
+> @@ -5234,8 +5237,6 @@ int hci_dev_close_sync(struct hci_dev *hdev)
+>                 clear_bit(HCI_INIT, &hdev->flags);
+>         }
+>
+> -       /* flush cmd  work */
+> -       flush_work(&hdev->cmd_work);
+>
+>         /* Drop queues */
+>         skb_queue_purge(&hdev->rx_q);
+> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+> index b31192d473d0..ec86ae851e56 100644
+> --- a/net/bluetooth/mgmt.c
+> +++ b/net/bluetooth/mgmt.c
+> @@ -5519,9 +5519,17 @@ static void mgmt_remove_adv_monitor_complete(struc=
+t hci_dev *hdev,
+>  {
+>         struct mgmt_rp_remove_adv_monitor rp;
+>         struct mgmt_pending_cmd *cmd =3D data;
+> -       struct mgmt_cp_remove_adv_monitor *cp =3D cmd->param;
+> +       struct mgmt_cp_remove_adv_monitor *cp;
+> +
+> +       // if executing while device is closing down, status could
+> +       // be invalid as pending cmd could be removed by __mgmt_power_off
+> +       // so exit early if the device was busy.
+
+We don't use C++ style comments in bluetooth.
+
+> +       if (status =3D=3D -ECANCELED ||
+> +           cmd !=3D pending_find(MGMT_OP_REMOVE_ADV_MONITOR, hdev))
+> +               return;
+>
+>         hci_dev_lock(hdev);
+> +       cp =3D cmd->param;
+>
+>         rp.monitor_handle =3D cp->monitor_handle;
+>
+> @@ -5540,6 +5548,10 @@ static void mgmt_remove_adv_monitor_complete(struc=
+t hci_dev *hdev,
+>  static int mgmt_remove_adv_monitor_sync(struct hci_dev *hdev, void *data=
+)
+>  {
+>         struct mgmt_pending_cmd *cmd =3D data;
+> +
+> +       if (cmd !=3D pending_find(MGMT_OP_REMOVE_ADV_MONITOR, hdev))
+> +               return -ECANCELED;
+> +
+>         struct mgmt_cp_remove_adv_monitor *cp =3D cmd->param;
+>         u16 handle =3D __le16_to_cpu(cp->monitor_handle);
+>
+> @@ -9544,8 +9556,12 @@ void __mgmt_power_off(struct hci_dev *hdev)
+>          */
+>         if (hci_dev_test_flag(hdev, HCI_UNREGISTER))
+>                 match.mgmt_status =3D MGMT_STATUS_INVALID_INDEX;
+> -       else
+
+CHECK: Unbalanced braces around else statement
+#63: FILE: net/bluetooth/mgmt.c:9462:
++    else {
+
+> +       else {
+> +               match.mgmt_status =3D MGMT_STATUS_CANCELLED;
+> +               mgmt_pending_foreach(MGMT_OP_REMOVE_ADV_MONITOR, hdev,
+> +                                    cmd_status_rsp, &match);
+>                 match.mgmt_status =3D MGMT_STATUS_NOT_POWERED;
+> +       }
+>
+>         mgmt_pending_foreach(0, hdev, cmd_complete_rsp, &match);
+>
+>
+> base-commit: 499551201b5f4fd3c0618a3e95e3d0d15ea18f31
 > --
-> 2.43.0
+> 2.46.0
 >
 
 
